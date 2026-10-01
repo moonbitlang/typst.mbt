@@ -311,8 +311,10 @@ pub fn LocatableSelector::resolve_unique(
     Location(loc) => loc
     other => {
       at(span, () => context.introspect())
-      let content = at(span, () => engine.introspector.query_unique(other))
-      content.location().unwrap()
+      match engine.introspect(query_unique_introspection(other, span)) {
+        Ok(content) => content.location().unwrap()
+        Err(err) => raise SourceError([err.into_error_at(span)])
+      }
     }
   }
 }

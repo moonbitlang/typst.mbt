@@ -255,11 +255,14 @@ pub impl FromValue for FontStretch with fn from_value(v) {
 
 ///|
 /// A 4-byte OpenType tag (stored as its four printable ASCII characters).
-pub(all) struct Tag(String) derive(Eq, Hash, Compare, Debug)
+///
+/// Upstream `ttf_parser::Tag`; renamed because `Tag` is the introspection
+/// tag of `introspection/tag.rs`.
+pub(all) struct OpenTypeTag(String) derive(Eq, Hash, Compare, Debug)
 
 ///|
 /// Creates a new tag from any number of bytes, padding with spaces.
-pub fn Tag::from_bytes_lossy(bytes : String) -> Tag {
+pub fn OpenTypeTag::from_bytes_lossy(bytes : String) -> OpenTypeTag {
   let buf = StringBuilder()
   for i in 0..<4 {
     if i < bytes.length() {
@@ -268,32 +271,32 @@ pub fn Tag::from_bytes_lossy(bytes : String) -> Tag {
       buf.write_char(' ')
     }
   }
-  Tag(buf.to_string())
+  OpenTypeTag(buf.to_string())
 }
 
 ///|
 /// Turns this into a string.
-pub fn Tag::to_str_lossy(self : Tag) -> String {
+pub fn OpenTypeTag::to_str_lossy(self : OpenTypeTag) -> String {
   self.0
 }
 
 ///|
-pub impl Reflect for Tag with fn input() {
+pub impl Reflect for OpenTypeTag with fn input() {
   Type(Type::str())
 }
 
 ///|
-pub impl Reflect for Tag with fn output() {
+pub impl Reflect for OpenTypeTag with fn output() {
   Type(Type::str())
 }
 
 ///|
-pub impl Reflect for Tag with fn castable(v) {
+pub impl Reflect for OpenTypeTag with fn castable(v) {
   str_castable(v)
 }
 
 ///|
-pub impl IntoValue for Tag with fn into_value(self) {
+pub impl IntoValue for OpenTypeTag with fn into_value(self) {
   Str(self.0)
 }
 
@@ -303,9 +306,9 @@ pub impl IntoValue for Tag with fn into_value(self) {
 // - be representable as printable ASCII (0x20..=0x7E)
 // - contain at least one character that isn't padding (0x20, space)
 // - padding may only appear at the end of a tag
-pub impl FromValue for Tag with fn from_value(v) {
+pub impl FromValue for OpenTypeTag with fn from_value(v) {
   if !str_castable(v) {
-    raise HintedError(Tag::input().error(v))
+    raise HintedError(OpenTypeTag::input().error(v))
   }
   let v : String = (FromValue::from_value(v) : String)
   for cluster in @unicode.graphemes(v) {
@@ -329,7 +332,7 @@ pub impl FromValue for Tag with fn from_value(v) {
     }
     within_padding = within_padding || c == ' '
   }
-  Tag::from_bytes_lossy(v)
+  OpenTypeTag::from_bytes_lossy(v)
 }
 
 // variations.rs
@@ -367,7 +370,11 @@ pub impl FromValue for AxisValue with fn from_value(v) {
 
 ///|
 /// OpenType font variation settings.
-pub(all) struct FontVariations(Array[(Tag, AxisValue)]) derive(Eq, Hash, Debug)
+pub(all) struct FontVariations(Array[(OpenTypeTag, AxisValue)]) derive (
+  Eq,
+  Hash,
+  Debug,
+)
 
 ///|
 pub impl Default for FontVariations with fn default() {
@@ -411,7 +418,10 @@ pub impl FromValue for FontVariations with fn from_value(v) {
       let mut i = 0
       for k, v in values.map {
         let hint = tag_hint_helper(i, repr_str(k))
-        let tag : Tag = with_err_hint(() => Tag::from_value(Str(k)), hint)
+        let tag : OpenTypeTag = with_err_hint(
+          () => OpenTypeTag::from_value(Str(k)),
+          hint,
+        )
         let value : AxisValue = with_err_hint(
           () => AxisValue::from_value(v),
           hint,

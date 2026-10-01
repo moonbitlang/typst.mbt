@@ -237,8 +237,13 @@ TYPEMAP = {
     "PagedPosition": "PagedPosition",
     # typst-bundle/src/format.rs
     "AssetData": "AssetData",
+    # model/cite.rs
+    "CitationForm": "CitationForm",
     # text/lang.rs
     "Locale": "Locale",
+    # foundations/target.rs, introspection/tag.rs
+    "Target": "Target",
+    "Tag": "Tag",
     # typst-html (dom.rs, css/encode.rs); ported in library/html_*.mbt
     "HtmlTag": "HtmlTag",
     "HtmlAttr": "HtmlAttr",

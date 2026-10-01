@@ -9,6 +9,7 @@ mechanical (see docs/p3-plan.md, section 2):
 
     HeadingElem::of(content) -> HeadingElem?     // `to_packed::<HeadingElem>()`
     HeadingElem::pack(self) -> Content
+    impl NativeElement for HeadingElem          // `NativeElement::ELEM` etc.
     HeadingElem::new(required...) -> HeadingElem
     elem.body() -> Content                       // required field
     elem.level(styles) -> Smart[..]              // settable: `level.get(styles)`
@@ -117,6 +118,11 @@ def main():
         emit("of", f"///|\n/// View content as `{e['name']}` if it is one.\npub fn {name}::of(c : Content) -> {name}? {{\n"
                    f"  if c.elem() == {var}() {{\n    Some({name}(c))\n  }} else {{\n    None\n  }}\n}}\n")
         emit("pack", f"///|\npub fn {name}::pack(self : {name}) -> Content {{\n  self.0\n}}\n")
+        defs.append(
+            f"///|\npub impl NativeElement for {name} with fn elem() {{\n  {var}()\n}}\n\n"
+            f"///|\npub impl NativeElement for {name} with fn from_content_unchecked(c) {{\n  {name}(c)\n}}\n\n"
+            f"///|\npub impl NativeElement for {name} with fn into_content(self) {{\n  self.0\n}}\n"
+        )
         required = []
         for i, f in enumerate(e["fields"]):
             if f["external"]:

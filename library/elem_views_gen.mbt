@@ -28,6 +28,21 @@ pub fn ContextElem::pack(self : ContextElem) -> Content {
 }
 
 ///|
+pub impl NativeElement for ContextElem with fn elem() {
+  context_elem()
+}
+
+///|
+pub impl NativeElement for ContextElem with fn from_content_unchecked(c) {
+  ContextElem(c)
+}
+
+///|
+pub impl NativeElement for ContextElem with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn ContextElem::func(self : ContextElem) -> Func {
   view_cast(self.0.field_raw(context_elem_func).unwrap(), "context.func")
 }
@@ -54,6 +69,21 @@ pub fn SymbolElem::of(c : Content) -> SymbolElem? {
 
 ///|
 pub fn SymbolElem::pack(self : SymbolElem) -> Content {
+  self.0
+}
+
+///|
+pub impl NativeElement for SymbolElem with fn elem() {
+  symbol_elem()
+}
+
+///|
+pub impl NativeElement for SymbolElem with fn from_content_unchecked(c) {
+  SymbolElem(c)
+}
+
+///|
+pub impl NativeElement for SymbolElem with fn into_content(self) {
   self.0
 }
 
@@ -92,13 +122,28 @@ pub fn TargetElem::pack(self : TargetElem) -> Content {
 }
 
 ///|
-pub fn TargetElem::target(self : TargetElem, styles : StyleChain) -> Value {
+pub impl NativeElement for TargetElem with fn elem() {
+  target_elem()
+}
+
+///|
+pub impl NativeElement for TargetElem with fn from_content_unchecked(c) {
+  TargetElem(c)
+}
+
+///|
+pub impl NativeElement for TargetElem with fn into_content(self) {
+  self.0
+}
+
+///|
+pub fn TargetElem::target(self : TargetElem, styles : StyleChain) -> Target {
   let e = target_elem()
   view_cast(styles.get_value_with_local(e, e.fields()[target_elem_target], self.0.field_raw(target_elem_target)), "target.target")
 }
 
 ///|
-pub fn TargetElem::target_local(self : TargetElem) -> Value? {
+pub fn TargetElem::target_local(self : TargetElem) -> Target? {
   match self.0.field_raw(target_elem_target) {
     Some(v) => Some(view_cast(v, "target.target"))
     None => None
@@ -106,17 +151,17 @@ pub fn TargetElem::target_local(self : TargetElem) -> Value? {
 }
 
 ///|
-pub fn TargetElem::with_target(self : TargetElem, v : Value) -> TargetElem {
+pub fn TargetElem::with_target(self : TargetElem, v : Target) -> TargetElem {
   TargetElem(self.0.with_field(target_elem_target, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn TargetElem::target_in(styles : StyleChain) -> Value {
+pub fn TargetElem::target_in(styles : StyleChain) -> Target {
   view_cast(styles.get_field(target_elem(), target_elem_target), "target.target")
 }
 
 ///|
-pub fn TargetElem::set_target(v : Value) -> Style {
+pub fn TargetElem::set_target(v : Target) -> Style {
   Property(Property::new(target_elem(), target_elem_target, IntoValue::into_value(v)))
 }
 
@@ -141,6 +186,21 @@ pub fn CounterUpdateElem::of(c : Content) -> CounterUpdateElem? {
 
 ///|
 pub fn CounterUpdateElem::pack(self : CounterUpdateElem) -> Content {
+  self.0
+}
+
+///|
+pub impl NativeElement for CounterUpdateElem with fn elem() {
+  counter_update_elem()
+}
+
+///|
+pub impl NativeElement for CounterUpdateElem with fn from_content_unchecked(c) {
+  CounterUpdateElem(c)
+}
+
+///|
+pub impl NativeElement for CounterUpdateElem with fn into_content(self) {
   self.0
 }
 
@@ -185,6 +245,21 @@ pub fn CounterDisplayElem::of(c : Content) -> CounterDisplayElem? {
 
 ///|
 pub fn CounterDisplayElem::pack(self : CounterDisplayElem) -> Content {
+  self.0
+}
+
+///|
+pub impl NativeElement for CounterDisplayElem with fn elem() {
+  counter_display_elem()
+}
+
+///|
+pub impl NativeElement for CounterDisplayElem with fn from_content_unchecked(c) {
+  CounterDisplayElem(c)
+}
+
+///|
+pub impl NativeElement for CounterDisplayElem with fn into_content(self) {
   self.0
 }
 
@@ -243,6 +318,21 @@ pub fn MetadataElem::pack(self : MetadataElem) -> Content {
 }
 
 ///|
+pub impl NativeElement for MetadataElem with fn elem() {
+  metadata_elem()
+}
+
+///|
+pub impl NativeElement for MetadataElem with fn from_content_unchecked(c) {
+  MetadataElem(c)
+}
+
+///|
+pub impl NativeElement for MetadataElem with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn MetadataElem::value(self : MetadataElem) -> Value {
   view_cast(self.0.field_raw(metadata_elem_value).unwrap(), "metadata.value")
 }
@@ -273,6 +363,21 @@ pub fn StateUpdateElem::of(c : Content) -> StateUpdateElem? {
 
 ///|
 pub fn StateUpdateElem::pack(self : StateUpdateElem) -> Content {
+  self.0
+}
+
+///|
+pub impl NativeElement for StateUpdateElem with fn elem() {
+  state_update_elem()
+}
+
+///|
+pub impl NativeElement for StateUpdateElem with fn from_content_unchecked(c) {
+  StateUpdateElem(c)
+}
+
+///|
+pub impl NativeElement for StateUpdateElem with fn into_content(self) {
   self.0
 }
 
@@ -321,17 +426,32 @@ pub fn TagElem::pack(self : TagElem) -> Content {
 }
 
 ///|
-pub fn TagElem::tag(self : TagElem) -> Value {
+pub impl NativeElement for TagElem with fn elem() {
+  tag_elem()
+}
+
+///|
+pub impl NativeElement for TagElem with fn from_content_unchecked(c) {
+  TagElem(c)
+}
+
+///|
+pub impl NativeElement for TagElem with fn into_content(self) {
+  self.0
+}
+
+///|
+pub fn TagElem::tag(self : TagElem) -> Tag {
   view_cast(self.0.field_raw(tag_elem_tag).unwrap(), "tag.tag")
 }
 
 ///|
-pub fn TagElem::with_tag(self : TagElem, v : Value) -> TagElem {
+pub fn TagElem::with_tag(self : TagElem, v : Tag) -> TagElem {
   TagElem(self.0.with_field(tag_elem_tag, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn TagElem::new(tag_ : Value) -> TagElem {
+pub fn TagElem::new(tag_ : Tag) -> TagElem {
   TagElem(Content::new(tag_elem(), [(tag_elem_tag, IntoValue::into_value(tag_))]))
 }
 
@@ -351,6 +471,21 @@ pub fn AlignElem::of(c : Content) -> AlignElem? {
 
 ///|
 pub fn AlignElem::pack(self : AlignElem) -> Content {
+  self.0
+}
+
+///|
+pub impl NativeElement for AlignElem with fn elem() {
+  align_elem()
+}
+
+///|
+pub impl NativeElement for AlignElem with fn from_content_unchecked(c) {
+  AlignElem(c)
+}
+
+///|
+pub impl NativeElement for AlignElem with fn into_content(self) {
   self.0
 }
 
@@ -414,6 +549,21 @@ pub fn ColumnsElem::of(c : Content) -> ColumnsElem? {
 
 ///|
 pub fn ColumnsElem::pack(self : ColumnsElem) -> Content {
+  self.0
+}
+
+///|
+pub impl NativeElement for ColumnsElem with fn elem() {
+  columns_elem()
+}
+
+///|
+pub impl NativeElement for ColumnsElem with fn from_content_unchecked(c) {
+  ColumnsElem(c)
+}
+
+///|
+pub impl NativeElement for ColumnsElem with fn into_content(self) {
   self.0
 }
 
@@ -568,6 +718,21 @@ pub fn ColbreakElem::pack(self : ColbreakElem) -> Content {
 }
 
 ///|
+pub impl NativeElement for ColbreakElem with fn elem() {
+  colbreak_elem()
+}
+
+///|
+pub impl NativeElement for ColbreakElem with fn from_content_unchecked(c) {
+  ColbreakElem(c)
+}
+
+///|
+pub impl NativeElement for ColbreakElem with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn ColbreakElem::weak(self : ColbreakElem, styles : StyleChain) -> Bool {
   let e = colbreak_elem()
   view_cast(styles.get_value_with_local(e, e.fields()[colbreak_elem_weak], self.0.field_raw(colbreak_elem_weak)), "colbreak.weak")
@@ -617,6 +782,21 @@ pub fn BoxElem::of(c : Content) -> BoxElem? {
 
 ///|
 pub fn BoxElem::pack(self : BoxElem) -> Content {
+  self.0
+}
+
+///|
+pub impl NativeElement for BoxElem with fn elem() {
+  box_elem()
+}
+
+///|
+pub impl NativeElement for BoxElem with fn from_content_unchecked(c) {
+  BoxElem(c)
+}
+
+///|
+pub impl NativeElement for BoxElem with fn into_content(self) {
   self.0
 }
 
@@ -935,6 +1115,21 @@ pub fn InlineElem::pack(self : InlineElem) -> Content {
 }
 
 ///|
+pub impl NativeElement for InlineElem with fn elem() {
+  inline_elem()
+}
+
+///|
+pub impl NativeElement for InlineElem with fn from_content_unchecked(c) {
+  InlineElem(c)
+}
+
+///|
+pub impl NativeElement for InlineElem with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn InlineElem::body(self : InlineElem) -> Value {
   view_cast(self.0.field_raw(inline_elem_body).unwrap(), "inline.body")
 }
@@ -965,6 +1160,21 @@ pub fn BlockElem::of(c : Content) -> BlockElem? {
 
 ///|
 pub fn BlockElem::pack(self : BlockElem) -> Content {
+  self.0
+}
+
+///|
+pub impl NativeElement for BlockElem with fn elem() {
+  block_elem()
+}
+
+///|
+pub impl NativeElement for BlockElem with fn from_content_unchecked(c) {
+  BlockElem(c)
+}
+
+///|
+pub impl NativeElement for BlockElem with fn into_content(self) {
   self.0
 }
 
@@ -1370,6 +1580,21 @@ pub fn GridElem::pack(self : GridElem) -> Content {
 }
 
 ///|
+pub impl NativeElement for GridElem with fn elem() {
+  grid_elem()
+}
+
+///|
+pub impl NativeElement for GridElem with fn from_content_unchecked(c) {
+  GridElem(c)
+}
+
+///|
+pub impl NativeElement for GridElem with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn GridElem::columns(self : GridElem, styles : StyleChain) -> TrackSizings {
   let e = grid_elem()
   view_cast(styles.get_value_with_local(e, e.fields()[grid_elem_columns], self.0.field_raw(grid_elem_columns)), "grid.columns")
@@ -1649,6 +1874,21 @@ pub fn GridHeader::pack(self : GridHeader) -> Content {
 }
 
 ///|
+pub impl NativeElement for GridHeader with fn elem() {
+  grid_header_elem()
+}
+
+///|
+pub impl NativeElement for GridHeader with fn from_content_unchecked(c) {
+  GridHeader(c)
+}
+
+///|
+pub impl NativeElement for GridHeader with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn GridHeader::repeat(self : GridHeader, styles : StyleChain) -> Bool {
   let e = grid_header_elem()
   view_cast(styles.get_value_with_local(e, e.fields()[grid_header_elem_repeat], self.0.field_raw(grid_header_elem_repeat)), "header.repeat")
@@ -1741,6 +1981,21 @@ pub fn GridFooter::pack(self : GridFooter) -> Content {
 }
 
 ///|
+pub impl NativeElement for GridFooter with fn elem() {
+  grid_footer_elem()
+}
+
+///|
+pub impl NativeElement for GridFooter with fn from_content_unchecked(c) {
+  GridFooter(c)
+}
+
+///|
+pub impl NativeElement for GridFooter with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn GridFooter::repeat(self : GridFooter, styles : StyleChain) -> Bool {
   let e = grid_footer_elem()
   view_cast(styles.get_value_with_local(e, e.fields()[grid_footer_elem_repeat], self.0.field_raw(grid_footer_elem_repeat)), "footer.repeat")
@@ -1800,6 +2055,21 @@ pub fn GridHLine::of(c : Content) -> GridHLine? {
 
 ///|
 pub fn GridHLine::pack(self : GridHLine) -> Content {
+  self.0
+}
+
+///|
+pub impl NativeElement for GridHLine with fn elem() {
+  grid_h_line_elem()
+}
+
+///|
+pub impl NativeElement for GridHLine with fn from_content_unchecked(c) {
+  GridHLine(c)
+}
+
+///|
+pub impl NativeElement for GridHLine with fn into_content(self) {
   self.0
 }
 
@@ -1973,6 +2243,21 @@ pub fn GridVLine::pack(self : GridVLine) -> Content {
 }
 
 ///|
+pub impl NativeElement for GridVLine with fn elem() {
+  grid_v_line_elem()
+}
+
+///|
+pub impl NativeElement for GridVLine with fn from_content_unchecked(c) {
+  GridVLine(c)
+}
+
+///|
+pub impl NativeElement for GridVLine with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn GridVLine::x(self : GridVLine, styles : StyleChain) -> Smart[USize] {
   let e = grid_v_line_elem()
   view_cast(styles.get_value_with_local(e, e.fields()[grid_v_line_elem_x], self.0.field_raw(grid_v_line_elem_x)), "vline.x")
@@ -2134,6 +2419,21 @@ pub fn GridCell::of(c : Content) -> GridCell? {
 
 ///|
 pub fn GridCell::pack(self : GridCell) -> Content {
+  self.0
+}
+
+///|
+pub impl NativeElement for GridCell with fn elem() {
+  grid_cell_elem()
+}
+
+///|
+pub impl NativeElement for GridCell with fn from_content_unchecked(c) {
+  GridCell(c)
+}
+
+///|
+pub impl NativeElement for GridCell with fn into_content(self) {
   self.0
 }
 
@@ -2457,6 +2757,21 @@ pub fn HideElem::pack(self : HideElem) -> Content {
 }
 
 ///|
+pub impl NativeElement for HideElem with fn elem() {
+  hide_elem()
+}
+
+///|
+pub impl NativeElement for HideElem with fn from_content_unchecked(c) {
+  HideElem(c)
+}
+
+///|
+pub impl NativeElement for HideElem with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn HideElem::body(self : HideElem) -> Content {
   view_cast(self.0.field_raw(hide_elem_body).unwrap(), "hide.body")
 }
@@ -2501,6 +2816,21 @@ pub fn LayoutElem::pack(self : LayoutElem) -> Content {
 }
 
 ///|
+pub impl NativeElement for LayoutElem with fn elem() {
+  layout_elem()
+}
+
+///|
+pub impl NativeElement for LayoutElem with fn from_content_unchecked(c) {
+  LayoutElem(c)
+}
+
+///|
+pub impl NativeElement for LayoutElem with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn LayoutElem::func(self : LayoutElem) -> Func {
   view_cast(self.0.field_raw(layout_elem_func).unwrap(), "layout.func")
 }
@@ -2531,6 +2861,21 @@ pub fn PadElem::of(c : Content) -> PadElem? {
 
 ///|
 pub fn PadElem::pack(self : PadElem) -> Content {
+  self.0
+}
+
+///|
+pub impl NativeElement for PadElem with fn elem() {
+  pad_elem()
+}
+
+///|
+pub impl NativeElement for PadElem with fn from_content_unchecked(c) {
+  PadElem(c)
+}
+
+///|
+pub impl NativeElement for PadElem with fn into_content(self) {
   self.0
 }
 
@@ -2681,6 +3026,21 @@ pub fn PageElem::of(c : Content) -> PageElem? {
 
 ///|
 pub fn PageElem::pack(self : PageElem) -> Content {
+  self.0
+}
+
+///|
+pub impl NativeElement for PageElem with fn elem() {
+  page_elem()
+}
+
+///|
+pub impl NativeElement for PageElem with fn from_content_unchecked(c) {
+  PageElem(c)
+}
+
+///|
+pub impl NativeElement for PageElem with fn into_content(self) {
   self.0
 }
 
@@ -2879,6 +3239,21 @@ pub fn PagebreakElem::pack(self : PagebreakElem) -> Content {
 }
 
 ///|
+pub impl NativeElement for PagebreakElem with fn elem() {
+  pagebreak_elem()
+}
+
+///|
+pub impl NativeElement for PagebreakElem with fn from_content_unchecked(c) {
+  PagebreakElem(c)
+}
+
+///|
+pub impl NativeElement for PagebreakElem with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn PagebreakElem::weak(self : PagebreakElem, styles : StyleChain) -> Bool {
   let e = pagebreak_elem()
   view_cast(styles.get_value_with_local(e, e.fields()[pagebreak_elem_weak], self.0.field_raw(pagebreak_elem_weak)), "pagebreak.weak")
@@ -2986,6 +3361,21 @@ pub fn PlaceElem::of(c : Content) -> PlaceElem? {
 
 ///|
 pub fn PlaceElem::pack(self : PlaceElem) -> Content {
+  self.0
+}
+
+///|
+pub impl NativeElement for PlaceElem with fn elem() {
+  place_elem()
+}
+
+///|
+pub impl NativeElement for PlaceElem with fn from_content_unchecked(c) {
+  PlaceElem(c)
+}
+
+///|
+pub impl NativeElement for PlaceElem with fn into_content(self) {
   self.0
 }
 
@@ -3198,6 +3588,21 @@ pub fn FlushElem::pack(self : FlushElem) -> Content {
 }
 
 ///|
+pub impl NativeElement for FlushElem with fn elem() {
+  flush_elem()
+}
+
+///|
+pub impl NativeElement for FlushElem with fn from_content_unchecked(c) {
+  FlushElem(c)
+}
+
+///|
+pub impl NativeElement for FlushElem with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn FlushElem::new() -> FlushElem {
   FlushElem(Content::new(flush_elem(), []))
 }
@@ -3218,6 +3623,21 @@ pub fn RepeatElem::of(c : Content) -> RepeatElem? {
 
 ///|
 pub fn RepeatElem::pack(self : RepeatElem) -> Content {
+  self.0
+}
+
+///|
+pub impl NativeElement for RepeatElem with fn elem() {
+  repeat_elem()
+}
+
+///|
+pub impl NativeElement for RepeatElem with fn from_content_unchecked(c) {
+  RepeatElem(c)
+}
+
+///|
+pub impl NativeElement for RepeatElem with fn into_content(self) {
   self.0
 }
 
@@ -3314,6 +3734,21 @@ pub fn HElem::pack(self : HElem) -> Content {
 }
 
 ///|
+pub impl NativeElement for HElem with fn elem() {
+  h_elem()
+}
+
+///|
+pub impl NativeElement for HElem with fn from_content_unchecked(c) {
+  HElem(c)
+}
+
+///|
+pub impl NativeElement for HElem with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn HElem::amount(self : HElem) -> Spacing {
   view_cast(self.0.field_raw(h_elem_amount).unwrap(), "h.amount")
 }
@@ -3373,6 +3808,21 @@ pub fn VElem::of(c : Content) -> VElem? {
 
 ///|
 pub fn VElem::pack(self : VElem) -> Content {
+  self.0
+}
+
+///|
+pub impl NativeElement for VElem with fn elem() {
+  v_elem()
+}
+
+///|
+pub impl NativeElement for VElem with fn from_content_unchecked(c) {
+  VElem(c)
+}
+
+///|
+pub impl NativeElement for VElem with fn into_content(self) {
   self.0
 }
 
@@ -3469,6 +3919,21 @@ pub fn StackElem::pack(self : StackElem) -> Content {
 }
 
 ///|
+pub impl NativeElement for StackElem with fn elem() {
+  stack_elem()
+}
+
+///|
+pub impl NativeElement for StackElem with fn from_content_unchecked(c) {
+  StackElem(c)
+}
+
+///|
+pub impl NativeElement for StackElem with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn StackElem::dir(self : StackElem, styles : StyleChain) -> Dir {
   let e = stack_elem()
   view_cast(styles.get_value_with_local(e, e.fields()[stack_elem_dir], self.0.field_raw(stack_elem_dir)), "stack.dir")
@@ -3561,6 +4026,21 @@ pub fn MoveElem::pack(self : MoveElem) -> Content {
 }
 
 ///|
+pub impl NativeElement for MoveElem with fn elem() {
+  move_elem()
+}
+
+///|
+pub impl NativeElement for MoveElem with fn from_content_unchecked(c) {
+  MoveElem(c)
+}
+
+///|
+pub impl NativeElement for MoveElem with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn MoveElem::dx(self : MoveElem, styles : StyleChain) -> Rel[Length] {
   let e = move_elem()
   view_cast(styles.get_value_with_local(e, e.fields()[move_elem_dx], self.0.field_raw(move_elem_dx)), "move.dx")
@@ -3649,6 +4129,21 @@ pub fn RotateElem::of(c : Content) -> RotateElem? {
 
 ///|
 pub fn RotateElem::pack(self : RotateElem) -> Content {
+  self.0
+}
+
+///|
+pub impl NativeElement for RotateElem with fn elem() {
+  rotate_elem()
+}
+
+///|
+pub impl NativeElement for RotateElem with fn from_content_unchecked(c) {
+  RotateElem(c)
+}
+
+///|
+pub impl NativeElement for RotateElem with fn into_content(self) {
   self.0
 }
 
@@ -3770,6 +4265,21 @@ pub fn ScaleElem::of(c : Content) -> ScaleElem? {
 
 ///|
 pub fn ScaleElem::pack(self : ScaleElem) -> Content {
+  self.0
+}
+
+///|
+pub impl NativeElement for ScaleElem with fn elem() {
+  scale_elem()
+}
+
+///|
+pub impl NativeElement for ScaleElem with fn from_content_unchecked(c) {
+  ScaleElem(c)
+}
+
+///|
+pub impl NativeElement for ScaleElem with fn into_content(self) {
   self.0
 }
 
@@ -3924,6 +4434,21 @@ pub fn SkewElem::pack(self : SkewElem) -> Content {
 }
 
 ///|
+pub impl NativeElement for SkewElem with fn elem() {
+  skew_elem()
+}
+
+///|
+pub impl NativeElement for SkewElem with fn from_content_unchecked(c) {
+  SkewElem(c)
+}
+
+///|
+pub impl NativeElement for SkewElem with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn SkewElem::ax(self : SkewElem, styles : StyleChain) -> Angle {
   let e = skew_elem()
   view_cast(styles.get_value_with_local(e, e.fields()[skew_elem_ax], self.0.field_raw(skew_elem_ax)), "skew.ax")
@@ -4074,6 +4599,21 @@ pub fn AccentElem::pack(self : AccentElem) -> Content {
 }
 
 ///|
+pub impl NativeElement for AccentElem with fn elem() {
+  accent_elem()
+}
+
+///|
+pub impl NativeElement for AccentElem with fn from_content_unchecked(c) {
+  AccentElem(c)
+}
+
+///|
+pub impl NativeElement for AccentElem with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn AccentElem::base(self : AccentElem) -> Content {
   view_cast(self.0.field_raw(accent_elem_base).unwrap(), "accent.base")
 }
@@ -4172,6 +4712,21 @@ pub fn MathAttachElem::of(c : Content) -> MathAttachElem? {
 
 ///|
 pub fn MathAttachElem::pack(self : MathAttachElem) -> Content {
+  self.0
+}
+
+///|
+pub impl NativeElement for MathAttachElem with fn elem() {
+  math_attach_elem()
+}
+
+///|
+pub impl NativeElement for MathAttachElem with fn from_content_unchecked(c) {
+  MathAttachElem(c)
+}
+
+///|
+pub impl NativeElement for MathAttachElem with fn into_content(self) {
   self.0
 }
 
@@ -4384,6 +4939,21 @@ pub fn PrimesElem::pack(self : PrimesElem) -> Content {
 }
 
 ///|
+pub impl NativeElement for PrimesElem with fn elem() {
+  primes_elem()
+}
+
+///|
+pub impl NativeElement for PrimesElem with fn from_content_unchecked(c) {
+  PrimesElem(c)
+}
+
+///|
+pub impl NativeElement for PrimesElem with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn PrimesElem::count(self : PrimesElem) -> USize {
   view_cast(self.0.field_raw(primes_elem_count).unwrap(), "primes.count")
 }
@@ -4418,6 +4988,21 @@ pub fn ScriptsElem::pack(self : ScriptsElem) -> Content {
 }
 
 ///|
+pub impl NativeElement for ScriptsElem with fn elem() {
+  scripts_elem()
+}
+
+///|
+pub impl NativeElement for ScriptsElem with fn from_content_unchecked(c) {
+  ScriptsElem(c)
+}
+
+///|
+pub impl NativeElement for ScriptsElem with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn ScriptsElem::body(self : ScriptsElem) -> Content {
   view_cast(self.0.field_raw(scripts_elem_body).unwrap(), "scripts.body")
 }
@@ -4448,6 +5033,21 @@ pub fn LimitsElem::of(c : Content) -> LimitsElem? {
 
 ///|
 pub fn LimitsElem::pack(self : LimitsElem) -> Content {
+  self.0
+}
+
+///|
+pub impl NativeElement for LimitsElem with fn elem() {
+  limits_elem()
+}
+
+///|
+pub impl NativeElement for LimitsElem with fn from_content_unchecked(c) {
+  LimitsElem(c)
+}
+
+///|
+pub impl NativeElement for LimitsElem with fn into_content(self) {
   self.0
 }
 
@@ -4515,6 +5115,21 @@ pub fn StretchElem::pack(self : StretchElem) -> Content {
 }
 
 ///|
+pub impl NativeElement for StretchElem with fn elem() {
+  stretch_elem()
+}
+
+///|
+pub impl NativeElement for StretchElem with fn from_content_unchecked(c) {
+  StretchElem(c)
+}
+
+///|
+pub impl NativeElement for StretchElem with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn StretchElem::body(self : StretchElem) -> Content {
   view_cast(self.0.field_raw(stretch_elem_body).unwrap(), "stretch.body")
 }
@@ -4574,6 +5189,21 @@ pub fn CancelElem::of(c : Content) -> CancelElem? {
 
 ///|
 pub fn CancelElem::pack(self : CancelElem) -> Content {
+  self.0
+}
+
+///|
+pub impl NativeElement for CancelElem with fn elem() {
+  cancel_elem()
+}
+
+///|
+pub impl NativeElement for CancelElem with fn from_content_unchecked(c) {
+  CancelElem(c)
+}
+
+///|
+pub impl NativeElement for CancelElem with fn into_content(self) {
   self.0
 }
 
@@ -4782,6 +5412,21 @@ pub fn EquationElem::of(c : Content) -> EquationElem? {
 
 ///|
 pub fn EquationElem::pack(self : EquationElem) -> Content {
+  self.0
+}
+
+///|
+pub impl NativeElement for EquationElem with fn elem() {
+  equation_elem()
+}
+
+///|
+pub impl NativeElement for EquationElem with fn from_content_unchecked(c) {
+  EquationElem(c)
+}
+
+///|
+pub impl NativeElement for EquationElem with fn into_content(self) {
   self.0
 }
 
@@ -5038,6 +5683,21 @@ pub fn FracElem::pack(self : FracElem) -> Content {
 }
 
 ///|
+pub impl NativeElement for FracElem with fn elem() {
+  frac_elem()
+}
+
+///|
+pub impl NativeElement for FracElem with fn from_content_unchecked(c) {
+  FracElem(c)
+}
+
+///|
+pub impl NativeElement for FracElem with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn FracElem::num(self : FracElem) -> Content {
   view_cast(self.0.field_raw(frac_elem_num).unwrap(), "frac.num")
 }
@@ -5169,6 +5829,21 @@ pub fn BinomElem::pack(self : BinomElem) -> Content {
 }
 
 ///|
+pub impl NativeElement for BinomElem with fn elem() {
+  binom_elem()
+}
+
+///|
+pub impl NativeElement for BinomElem with fn from_content_unchecked(c) {
+  BinomElem(c)
+}
+
+///|
+pub impl NativeElement for BinomElem with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn BinomElem::upper(self : BinomElem) -> Content {
   view_cast(self.0.field_raw(binom_elem_upper).unwrap(), "binom.upper")
 }
@@ -5209,6 +5884,21 @@ pub fn LrElem::of(c : Content) -> LrElem? {
 
 ///|
 pub fn LrElem::pack(self : LrElem) -> Content {
+  self.0
+}
+
+///|
+pub impl NativeElement for LrElem with fn elem() {
+  lr_elem()
+}
+
+///|
+pub impl NativeElement for LrElem with fn from_content_unchecked(c) {
+  LrElem(c)
+}
+
+///|
+pub impl NativeElement for LrElem with fn into_content(self) {
   self.0
 }
 
@@ -5276,6 +5966,21 @@ pub fn MidElem::pack(self : MidElem) -> Content {
 }
 
 ///|
+pub impl NativeElement for MidElem with fn elem() {
+  mid_elem()
+}
+
+///|
+pub impl NativeElement for MidElem with fn from_content_unchecked(c) {
+  MidElem(c)
+}
+
+///|
+pub impl NativeElement for MidElem with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn MidElem::body(self : MidElem) -> Content {
   view_cast(self.0.field_raw(mid_elem_body).unwrap(), "mid.body")
 }
@@ -5306,6 +6011,21 @@ pub fn VecElem::of(c : Content) -> VecElem? {
 
 ///|
 pub fn VecElem::pack(self : VecElem) -> Content {
+  self.0
+}
+
+///|
+pub impl NativeElement for VecElem with fn elem() {
+  vec_elem()
+}
+
+///|
+pub impl NativeElement for VecElem with fn from_content_unchecked(c) {
+  VecElem(c)
+}
+
+///|
+pub impl NativeElement for VecElem with fn into_content(self) {
   self.0
 }
 
@@ -5427,6 +6147,21 @@ pub fn MatElem::of(c : Content) -> MatElem? {
 
 ///|
 pub fn MatElem::pack(self : MatElem) -> Content {
+  self.0
+}
+
+///|
+pub impl NativeElement for MatElem with fn elem() {
+  mat_elem()
+}
+
+///|
+pub impl NativeElement for MatElem with fn from_content_unchecked(c) {
+  MatElem(c)
+}
+
+///|
+pub impl NativeElement for MatElem with fn into_content(self) {
   self.0
 }
 
@@ -5610,6 +6345,21 @@ pub fn CasesElem::pack(self : CasesElem) -> Content {
 }
 
 ///|
+pub impl NativeElement for CasesElem with fn elem() {
+  cases_elem()
+}
+
+///|
+pub impl NativeElement for CasesElem with fn from_content_unchecked(c) {
+  CasesElem(c)
+}
+
+///|
+pub impl NativeElement for CasesElem with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn CasesElem::delim(self : CasesElem, styles : StyleChain) -> DelimiterPair {
   let e = cases_elem()
   view_cast(styles.get_value_with_local(e, e.fields()[cases_elem_delim], self.0.field_raw(cases_elem_delim)), "cases.delim")
@@ -5731,6 +6481,21 @@ pub fn AlignPointElem::pack(self : AlignPointElem) -> Content {
 }
 
 ///|
+pub impl NativeElement for AlignPointElem with fn elem() {
+  align_point_elem()
+}
+
+///|
+pub impl NativeElement for AlignPointElem with fn from_content_unchecked(c) {
+  AlignPointElem(c)
+}
+
+///|
+pub impl NativeElement for AlignPointElem with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn AlignPointElem::new() -> AlignPointElem {
   AlignPointElem(Content::new(align_point_elem(), []))
 }
@@ -5751,6 +6516,21 @@ pub fn ClassElem::of(c : Content) -> ClassElem? {
 
 ///|
 pub fn ClassElem::pack(self : ClassElem) -> Content {
+  self.0
+}
+
+///|
+pub impl NativeElement for ClassElem with fn elem() {
+  class_elem()
+}
+
+///|
+pub impl NativeElement for ClassElem with fn from_content_unchecked(c) {
+  ClassElem(c)
+}
+
+///|
+pub impl NativeElement for ClassElem with fn into_content(self) {
   self.0
 }
 
@@ -5795,6 +6575,21 @@ pub fn OpElem::of(c : Content) -> OpElem? {
 
 ///|
 pub fn OpElem::pack(self : OpElem) -> Content {
+  self.0
+}
+
+///|
+pub impl NativeElement for OpElem with fn elem() {
+  op_elem()
+}
+
+///|
+pub impl NativeElement for OpElem with fn from_content_unchecked(c) {
+  OpElem(c)
+}
+
+///|
+pub impl NativeElement for OpElem with fn into_content(self) {
   self.0
 }
 
@@ -5862,6 +6657,21 @@ pub fn RootElem::pack(self : RootElem) -> Content {
 }
 
 ///|
+pub impl NativeElement for RootElem with fn elem() {
+  root_elem()
+}
+
+///|
+pub impl NativeElement for RootElem with fn from_content_unchecked(c) {
+  RootElem(c)
+}
+
+///|
+pub impl NativeElement for RootElem with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn RootElem::index(self : RootElem, styles : StyleChain) -> Content? {
   let e = root_elem()
   view_cast(styles.get_value_with_local(e, e.fields()[root_elem_index], self.0.field_raw(root_elem_index)), "root.index")
@@ -5925,6 +6735,21 @@ pub fn MathUnderlineElem::pack(self : MathUnderlineElem) -> Content {
 }
 
 ///|
+pub impl NativeElement for MathUnderlineElem with fn elem() {
+  math_underline_elem()
+}
+
+///|
+pub impl NativeElement for MathUnderlineElem with fn from_content_unchecked(c) {
+  MathUnderlineElem(c)
+}
+
+///|
+pub impl NativeElement for MathUnderlineElem with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn MathUnderlineElem::body(self : MathUnderlineElem) -> Content {
   view_cast(self.0.field_raw(math_underline_elem_body).unwrap(), "underline.body")
 }
@@ -5959,6 +6784,21 @@ pub fn MathOverlineElem::pack(self : MathOverlineElem) -> Content {
 }
 
 ///|
+pub impl NativeElement for MathOverlineElem with fn elem() {
+  math_overline_elem()
+}
+
+///|
+pub impl NativeElement for MathOverlineElem with fn from_content_unchecked(c) {
+  MathOverlineElem(c)
+}
+
+///|
+pub impl NativeElement for MathOverlineElem with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn MathOverlineElem::body(self : MathOverlineElem) -> Content {
   view_cast(self.0.field_raw(math_overline_elem_body).unwrap(), "overline.body")
 }
@@ -5989,6 +6829,21 @@ pub fn UnderbraceElem::of(c : Content) -> UnderbraceElem? {
 
 ///|
 pub fn UnderbraceElem::pack(self : UnderbraceElem) -> Content {
+  self.0
+}
+
+///|
+pub impl NativeElement for UnderbraceElem with fn elem() {
+  underbrace_elem()
+}
+
+///|
+pub impl NativeElement for UnderbraceElem with fn from_content_unchecked(c) {
+  UnderbraceElem(c)
+}
+
+///|
+pub impl NativeElement for UnderbraceElem with fn into_content(self) {
   self.0
 }
 
@@ -6056,6 +6911,21 @@ pub fn OverbraceElem::pack(self : OverbraceElem) -> Content {
 }
 
 ///|
+pub impl NativeElement for OverbraceElem with fn elem() {
+  overbrace_elem()
+}
+
+///|
+pub impl NativeElement for OverbraceElem with fn from_content_unchecked(c) {
+  OverbraceElem(c)
+}
+
+///|
+pub impl NativeElement for OverbraceElem with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn OverbraceElem::body(self : OverbraceElem) -> Content {
   view_cast(self.0.field_raw(overbrace_elem_body).unwrap(), "overbrace.body")
 }
@@ -6115,6 +6985,21 @@ pub fn UnderbracketElem::of(c : Content) -> UnderbracketElem? {
 
 ///|
 pub fn UnderbracketElem::pack(self : UnderbracketElem) -> Content {
+  self.0
+}
+
+///|
+pub impl NativeElement for UnderbracketElem with fn elem() {
+  underbracket_elem()
+}
+
+///|
+pub impl NativeElement for UnderbracketElem with fn from_content_unchecked(c) {
+  UnderbracketElem(c)
+}
+
+///|
+pub impl NativeElement for UnderbracketElem with fn into_content(self) {
   self.0
 }
 
@@ -6182,6 +7067,21 @@ pub fn OverbracketElem::pack(self : OverbracketElem) -> Content {
 }
 
 ///|
+pub impl NativeElement for OverbracketElem with fn elem() {
+  overbracket_elem()
+}
+
+///|
+pub impl NativeElement for OverbracketElem with fn from_content_unchecked(c) {
+  OverbracketElem(c)
+}
+
+///|
+pub impl NativeElement for OverbracketElem with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn OverbracketElem::body(self : OverbracketElem) -> Content {
   view_cast(self.0.field_raw(overbracket_elem_body).unwrap(), "overbracket.body")
 }
@@ -6241,6 +7141,21 @@ pub fn UnderparenElem::of(c : Content) -> UnderparenElem? {
 
 ///|
 pub fn UnderparenElem::pack(self : UnderparenElem) -> Content {
+  self.0
+}
+
+///|
+pub impl NativeElement for UnderparenElem with fn elem() {
+  underparen_elem()
+}
+
+///|
+pub impl NativeElement for UnderparenElem with fn from_content_unchecked(c) {
+  UnderparenElem(c)
+}
+
+///|
+pub impl NativeElement for UnderparenElem with fn into_content(self) {
   self.0
 }
 
@@ -6308,6 +7223,21 @@ pub fn OverparenElem::pack(self : OverparenElem) -> Content {
 }
 
 ///|
+pub impl NativeElement for OverparenElem with fn elem() {
+  overparen_elem()
+}
+
+///|
+pub impl NativeElement for OverparenElem with fn from_content_unchecked(c) {
+  OverparenElem(c)
+}
+
+///|
+pub impl NativeElement for OverparenElem with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn OverparenElem::body(self : OverparenElem) -> Content {
   view_cast(self.0.field_raw(overparen_elem_body).unwrap(), "overparen.body")
 }
@@ -6367,6 +7297,21 @@ pub fn UndershellElem::of(c : Content) -> UndershellElem? {
 
 ///|
 pub fn UndershellElem::pack(self : UndershellElem) -> Content {
+  self.0
+}
+
+///|
+pub impl NativeElement for UndershellElem with fn elem() {
+  undershell_elem()
+}
+
+///|
+pub impl NativeElement for UndershellElem with fn from_content_unchecked(c) {
+  UndershellElem(c)
+}
+
+///|
+pub impl NativeElement for UndershellElem with fn into_content(self) {
   self.0
 }
 
@@ -6434,6 +7379,21 @@ pub fn OvershellElem::pack(self : OvershellElem) -> Content {
 }
 
 ///|
+pub impl NativeElement for OvershellElem with fn elem() {
+  overshell_elem()
+}
+
+///|
+pub impl NativeElement for OvershellElem with fn from_content_unchecked(c) {
+  OvershellElem(c)
+}
+
+///|
+pub impl NativeElement for OvershellElem with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn OvershellElem::body(self : OvershellElem) -> Content {
   view_cast(self.0.field_raw(overshell_elem_body).unwrap(), "overshell.body")
 }
@@ -6493,6 +7453,21 @@ pub fn ArtifactElem::of(c : Content) -> ArtifactElem? {
 
 ///|
 pub fn ArtifactElem::pack(self : ArtifactElem) -> Content {
+  self.0
+}
+
+///|
+pub impl NativeElement for ArtifactElem with fn elem() {
+  artifact_elem()
+}
+
+///|
+pub impl NativeElement for ArtifactElem with fn from_content_unchecked(c) {
+  ArtifactElem(c)
+}
+
+///|
+pub impl NativeElement for ArtifactElem with fn into_content(self) {
   self.0
 }
 
@@ -6560,6 +7535,21 @@ pub fn PdfPdfMarkerTag::pack(self : PdfPdfMarkerTag) -> Content {
 }
 
 ///|
+pub impl NativeElement for PdfPdfMarkerTag with fn elem() {
+  pdf_marker_tag_elem()
+}
+
+///|
+pub impl NativeElement for PdfPdfMarkerTag with fn from_content_unchecked(c) {
+  PdfPdfMarkerTag(c)
+}
+
+///|
+pub impl NativeElement for PdfPdfMarkerTag with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn PdfPdfMarkerTag::body(self : PdfPdfMarkerTag) -> Content {
   view_cast(self.0.field_raw(pdf_marker_tag_elem_body).unwrap(), "pdf-marker-tag.body")
 }
@@ -6600,6 +7590,21 @@ pub fn BibliographyElem::of(c : Content) -> BibliographyElem? {
 
 ///|
 pub fn BibliographyElem::pack(self : BibliographyElem) -> Content {
+  self.0
+}
+
+///|
+pub impl NativeElement for BibliographyElem with fn elem() {
+  bibliography_elem()
+}
+
+///|
+pub impl NativeElement for BibliographyElem with fn from_content_unchecked(c) {
+  BibliographyElem(c)
+}
+
+///|
+pub impl NativeElement for BibliographyElem with fn into_content(self) {
   self.0
 }
 
@@ -6809,6 +7814,21 @@ pub fn CslLightElem::pack(self : CslLightElem) -> Content {
 }
 
 ///|
+pub impl NativeElement for CslLightElem with fn elem() {
+  csl_light_elem()
+}
+
+///|
+pub impl NativeElement for CslLightElem with fn from_content_unchecked(c) {
+  CslLightElem(c)
+}
+
+///|
+pub impl NativeElement for CslLightElem with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn CslLightElem::body(self : CslLightElem) -> Content {
   view_cast(self.0.field_raw(csl_light_elem_body).unwrap(), "csl-light.body")
 }
@@ -6843,6 +7863,21 @@ pub fn CslIndentElem::pack(self : CslIndentElem) -> Content {
 }
 
 ///|
+pub impl NativeElement for CslIndentElem with fn elem() {
+  csl_indent_elem()
+}
+
+///|
+pub impl NativeElement for CslIndentElem with fn from_content_unchecked(c) {
+  CslIndentElem(c)
+}
+
+///|
+pub impl NativeElement for CslIndentElem with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn CslIndentElem::body(self : CslIndentElem) -> Content {
   view_cast(self.0.field_raw(csl_indent_elem_body).unwrap(), "csl-indent.body")
 }
@@ -6873,6 +7908,21 @@ pub fn CiteElem::of(c : Content) -> CiteElem? {
 
 ///|
 pub fn CiteElem::pack(self : CiteElem) -> Content {
+  self.0
+}
+
+///|
+pub impl NativeElement for CiteElem with fn elem() {
+  cite_elem()
+}
+
+///|
+pub impl NativeElement for CiteElem with fn from_content_unchecked(c) {
+  CiteElem(c)
+}
+
+///|
+pub impl NativeElement for CiteElem with fn into_content(self) {
   self.0
 }
 
@@ -6916,13 +7966,13 @@ pub fn CiteElem::set_supplement(v : Content?) -> Style {
 }
 
 ///|
-pub fn CiteElem::form(self : CiteElem, styles : StyleChain) -> Value {
+pub fn CiteElem::form(self : CiteElem, styles : StyleChain) -> CitationForm? {
   let e = cite_elem()
   view_cast(styles.get_value_with_local(e, e.fields()[cite_elem_form], self.0.field_raw(cite_elem_form)), "cite.form")
 }
 
 ///|
-pub fn CiteElem::form_local(self : CiteElem) -> Value? {
+pub fn CiteElem::form_local(self : CiteElem) -> CitationForm?? {
   match self.0.field_raw(cite_elem_form) {
     Some(v) => Some(view_cast(v, "cite.form"))
     None => None
@@ -6930,17 +7980,17 @@ pub fn CiteElem::form_local(self : CiteElem) -> Value? {
 }
 
 ///|
-pub fn CiteElem::with_form(self : CiteElem, v : Value) -> CiteElem {
+pub fn CiteElem::with_form(self : CiteElem, v : CitationForm?) -> CiteElem {
   CiteElem(self.0.with_field(cite_elem_form, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn CiteElem::form_in(styles : StyleChain) -> Value {
+pub fn CiteElem::form_in(styles : StyleChain) -> CitationForm? {
   view_cast(styles.get_field(cite_elem(), cite_elem_form), "cite.form")
 }
 
 ///|
-pub fn CiteElem::set_form(v : Value) -> Style {
+pub fn CiteElem::set_form(v : CitationForm?) -> Style {
   Property(Property::new(cite_elem(), cite_elem_form, IntoValue::into_value(v)))
 }
 
@@ -7024,6 +8074,21 @@ pub fn CiteGroup::pack(self : CiteGroup) -> Content {
 }
 
 ///|
+pub impl NativeElement for CiteGroup with fn elem() {
+  cite_group_elem()
+}
+
+///|
+pub impl NativeElement for CiteGroup with fn from_content_unchecked(c) {
+  CiteGroup(c)
+}
+
+///|
+pub impl NativeElement for CiteGroup with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn CiteGroup::children(self : CiteGroup) -> Array[Content] {
   view_cast(self.0.field_raw(cite_group_elem_children).unwrap(), "cite-group.children")
 }
@@ -7058,6 +8123,21 @@ pub fn DividerElem::pack(self : DividerElem) -> Content {
 }
 
 ///|
+pub impl NativeElement for DividerElem with fn elem() {
+  divider_elem()
+}
+
+///|
+pub impl NativeElement for DividerElem with fn from_content_unchecked(c) {
+  DividerElem(c)
+}
+
+///|
+pub impl NativeElement for DividerElem with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn DividerElem::new() -> DividerElem {
   DividerElem(Content::new(divider_elem(), []))
 }
@@ -7078,6 +8158,21 @@ pub fn DocumentElem::of(c : Content) -> DocumentElem? {
 
 ///|
 pub fn DocumentElem::pack(self : DocumentElem) -> Content {
+  self.0
+}
+
+///|
+pub impl NativeElement for DocumentElem with fn elem() {
+  document_elem()
+}
+
+///|
+pub impl NativeElement for DocumentElem with fn from_content_unchecked(c) {
+  DocumentElem(c)
+}
+
+///|
+pub impl NativeElement for DocumentElem with fn into_content(self) {
   self.0
 }
 
@@ -7300,6 +8395,21 @@ pub fn EmphElem::pack(self : EmphElem) -> Content {
 }
 
 ///|
+pub impl NativeElement for EmphElem with fn elem() {
+  emph_elem()
+}
+
+///|
+pub impl NativeElement for EmphElem with fn from_content_unchecked(c) {
+  EmphElem(c)
+}
+
+///|
+pub impl NativeElement for EmphElem with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn EmphElem::body(self : EmphElem) -> Content {
   view_cast(self.0.field_raw(emph_elem_body).unwrap(), "emph.body")
 }
@@ -7330,6 +8440,21 @@ pub fn EnumElem::of(c : Content) -> EnumElem? {
 
 ///|
 pub fn EnumElem::pack(self : EnumElem) -> Content {
+  self.0
+}
+
+///|
+pub impl NativeElement for EnumElem with fn elem() {
+  enum_elem()
+}
+
+///|
+pub impl NativeElement for EnumElem with fn from_content_unchecked(c) {
+  EnumElem(c)
+}
+
+///|
+pub impl NativeElement for EnumElem with fn into_content(self) {
   self.0
 }
 
@@ -7635,6 +8760,21 @@ pub fn EnumItem::pack(self : EnumItem) -> Content {
 }
 
 ///|
+pub impl NativeElement for EnumItem with fn elem() {
+  enum_item_elem()
+}
+
+///|
+pub impl NativeElement for EnumItem with fn from_content_unchecked(c) {
+  EnumItem(c)
+}
+
+///|
+pub impl NativeElement for EnumItem with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn EnumItem::number(self : EnumItem, styles : StyleChain) -> Smart[U64] {
   let e = enum_item_elem()
   view_cast(styles.get_value_with_local(e, e.fields()[enum_item_elem_number], self.0.field_raw(enum_item_elem_number)), "item.number")
@@ -7689,6 +8829,21 @@ pub fn FigureElem::of(c : Content) -> FigureElem? {
 
 ///|
 pub fn FigureElem::pack(self : FigureElem) -> Content {
+  self.0
+}
+
+///|
+pub impl NativeElement for FigureElem with fn elem() {
+  figure_elem()
+}
+
+///|
+pub impl NativeElement for FigureElem with fn from_content_unchecked(c) {
+  FigureElem(c)
+}
+
+///|
+pub impl NativeElement for FigureElem with fn into_content(self) {
   self.0
 }
 
@@ -8010,6 +9165,21 @@ pub fn FigureCaption::pack(self : FigureCaption) -> Content {
 }
 
 ///|
+pub impl NativeElement for FigureCaption with fn elem() {
+  figure_caption_elem()
+}
+
+///|
+pub impl NativeElement for FigureCaption with fn from_content_unchecked(c) {
+  FigureCaption(c)
+}
+
+///|
+pub impl NativeElement for FigureCaption with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn FigureCaption::position(self : FigureCaption, styles : StyleChain) -> OuterVAlignment {
   let e = figure_caption_elem()
   view_cast(styles.get_value_with_local(e, e.fields()[figure_caption_elem_position], self.0.field_raw(figure_caption_elem_position)), "caption.position")
@@ -8158,6 +9328,21 @@ pub fn FootnoteElem::pack(self : FootnoteElem) -> Content {
 }
 
 ///|
+pub impl NativeElement for FootnoteElem with fn elem() {
+  footnote_elem()
+}
+
+///|
+pub impl NativeElement for FootnoteElem with fn from_content_unchecked(c) {
+  FootnoteElem(c)
+}
+
+///|
+pub impl NativeElement for FootnoteElem with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn FootnoteElem::numbering(self : FootnoteElem, styles : StyleChain) -> Numbering {
   let e = footnote_elem()
   view_cast(styles.get_value_with_local(e, e.fields()[footnote_elem_numbering], self.0.field_raw(footnote_elem_numbering)), "footnote.numbering")
@@ -8217,6 +9402,21 @@ pub fn FootnoteEntry::of(c : Content) -> FootnoteEntry? {
 
 ///|
 pub fn FootnoteEntry::pack(self : FootnoteEntry) -> Content {
+  self.0
+}
+
+///|
+pub impl NativeElement for FootnoteEntry with fn elem() {
+  footnote_entry_elem()
+}
+
+///|
+pub impl NativeElement for FootnoteEntry with fn from_content_unchecked(c) {
+  FootnoteEntry(c)
+}
+
+///|
+pub impl NativeElement for FootnoteEntry with fn into_content(self) {
   self.0
 }
 
@@ -8371,6 +9571,21 @@ pub fn FootnoteContainer::pack(self : FootnoteContainer) -> Content {
 }
 
 ///|
+pub impl NativeElement for FootnoteContainer with fn elem() {
+  footnote_container_elem()
+}
+
+///|
+pub impl NativeElement for FootnoteContainer with fn from_content_unchecked(c) {
+  FootnoteContainer(c)
+}
+
+///|
+pub impl NativeElement for FootnoteContainer with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn FootnoteContainer::new() -> FootnoteContainer {
   FootnoteContainer(Content::new(footnote_container_elem(), []))
 }
@@ -8395,6 +9610,21 @@ pub fn FootnoteMarker::pack(self : FootnoteMarker) -> Content {
 }
 
 ///|
+pub impl NativeElement for FootnoteMarker with fn elem() {
+  footnote_marker_elem()
+}
+
+///|
+pub impl NativeElement for FootnoteMarker with fn from_content_unchecked(c) {
+  FootnoteMarker(c)
+}
+
+///|
+pub impl NativeElement for FootnoteMarker with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn FootnoteMarker::new() -> FootnoteMarker {
   FootnoteMarker(Content::new(footnote_marker_elem(), []))
 }
@@ -8415,6 +9645,21 @@ pub fn HeadingElem::of(c : Content) -> HeadingElem? {
 
 ///|
 pub fn HeadingElem::pack(self : HeadingElem) -> Content {
+  self.0
+}
+
+///|
+pub impl NativeElement for HeadingElem with fn elem() {
+  heading_elem()
+}
+
+///|
+pub impl NativeElement for HeadingElem with fn from_content_unchecked(c) {
+  HeadingElem(c)
+}
+
+///|
+pub impl NativeElement for HeadingElem with fn into_content(self) {
   self.0
 }
 
@@ -8694,6 +9939,21 @@ pub fn LinkElem::pack(self : LinkElem) -> Content {
 }
 
 ///|
+pub impl NativeElement for LinkElem with fn elem() {
+  link_elem()
+}
+
+///|
+pub impl NativeElement for LinkElem with fn from_content_unchecked(c) {
+  LinkElem(c)
+}
+
+///|
+pub impl NativeElement for LinkElem with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn LinkElem::dest(self : LinkElem) -> LinkTarget {
   view_cast(self.0.field_raw(link_elem_dest).unwrap(), "link.dest")
 }
@@ -8744,6 +10004,21 @@ pub fn DirectLinkElem::of(c : Content) -> DirectLinkElem? {
 
 ///|
 pub fn DirectLinkElem::pack(self : DirectLinkElem) -> Content {
+  self.0
+}
+
+///|
+pub impl NativeElement for DirectLinkElem with fn elem() {
+  direct_link_elem()
+}
+
+///|
+pub impl NativeElement for DirectLinkElem with fn from_content_unchecked(c) {
+  DirectLinkElem(c)
+}
+
+///|
+pub impl NativeElement for DirectLinkElem with fn into_content(self) {
   self.0
 }
 
@@ -8802,6 +10077,21 @@ pub fn LinkMarker::pack(self : LinkMarker) -> Content {
 }
 
 ///|
+pub impl NativeElement for LinkMarker with fn elem() {
+  link_marker_elem()
+}
+
+///|
+pub impl NativeElement for LinkMarker with fn from_content_unchecked(c) {
+  LinkMarker(c)
+}
+
+///|
+pub impl NativeElement for LinkMarker with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn LinkMarker::body(self : LinkMarker) -> Content {
   view_cast(self.0.field_raw(link_marker_elem_body).unwrap(), "link-marker.body")
 }
@@ -8842,6 +10132,21 @@ pub fn ListElem::of(c : Content) -> ListElem? {
 
 ///|
 pub fn ListElem::pack(self : ListElem) -> Content {
+  self.0
+}
+
+///|
+pub impl NativeElement for ListElem with fn elem() {
+  list_elem()
+}
+
+///|
+pub impl NativeElement for ListElem with fn from_content_unchecked(c) {
+  ListElem(c)
+}
+
+///|
+pub impl NativeElement for ListElem with fn into_content(self) {
   self.0
 }
 
@@ -9060,6 +10365,21 @@ pub fn ListItem::pack(self : ListItem) -> Content {
 }
 
 ///|
+pub impl NativeElement for ListItem with fn elem() {
+  list_item_elem()
+}
+
+///|
+pub impl NativeElement for ListItem with fn from_content_unchecked(c) {
+  ListItem(c)
+}
+
+///|
+pub impl NativeElement for ListItem with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn ListItem::body(self : ListItem) -> Content {
   view_cast(self.0.field_raw(list_item_elem_body).unwrap(), "item.body")
 }
@@ -9085,6 +10405,21 @@ pub fn OutlineElem::of(c : Content) -> OutlineElem? {
 
 ///|
 pub fn OutlineElem::pack(self : OutlineElem) -> Content {
+  self.0
+}
+
+///|
+pub impl NativeElement for OutlineElem with fn elem() {
+  outline_elem()
+}
+
+///|
+pub impl NativeElement for OutlineElem with fn from_content_unchecked(c) {
+  OutlineElem(c)
+}
+
+///|
+pub impl NativeElement for OutlineElem with fn into_content(self) {
   self.0
 }
 
@@ -9229,6 +10564,21 @@ pub fn OutlineEntry::pack(self : OutlineEntry) -> Content {
 }
 
 ///|
+pub impl NativeElement for OutlineEntry with fn elem() {
+  outline_entry_elem()
+}
+
+///|
+pub impl NativeElement for OutlineEntry with fn from_content_unchecked(c) {
+  OutlineEntry(c)
+}
+
+///|
+pub impl NativeElement for OutlineEntry with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn OutlineEntry::level(self : OutlineEntry) -> NonZeroUSize {
   view_cast(self.0.field_raw(outline_entry_elem_level).unwrap(), "entry.level")
 }
@@ -9312,6 +10662,21 @@ pub fn PrefixInfo::pack(self : PrefixInfo) -> Content {
 }
 
 ///|
+pub impl NativeElement for PrefixInfo with fn elem() {
+  prefix_info_elem()
+}
+
+///|
+pub impl NativeElement for PrefixInfo with fn from_content_unchecked(c) {
+  PrefixInfo(c)
+}
+
+///|
+pub impl NativeElement for PrefixInfo with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn PrefixInfo::key(self : PrefixInfo) -> Location {
   view_cast(self.0.field_raw(prefix_info_elem_key).unwrap(), "prefix-info.key")
 }
@@ -9362,6 +10727,21 @@ pub fn ParElem::of(c : Content) -> ParElem? {
 
 ///|
 pub fn ParElem::pack(self : ParElem) -> Content {
+  self.0
+}
+
+///|
+pub impl NativeElement for ParElem with fn elem() {
+  par_elem()
+}
+
+///|
+pub impl NativeElement for ParElem with fn from_content_unchecked(c) {
+  ParElem(c)
+}
+
+///|
+pub impl NativeElement for ParElem with fn into_content(self) {
   self.0
 }
 
@@ -9603,6 +10983,21 @@ pub fn ParbreakElem::pack(self : ParbreakElem) -> Content {
 }
 
 ///|
+pub impl NativeElement for ParbreakElem with fn elem() {
+  parbreak_elem()
+}
+
+///|
+pub impl NativeElement for ParbreakElem with fn from_content_unchecked(c) {
+  ParbreakElem(c)
+}
+
+///|
+pub impl NativeElement for ParbreakElem with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn ParbreakElem::new() -> ParbreakElem {
   ParbreakElem(Content::new(parbreak_elem(), []))
 }
@@ -9623,6 +11018,21 @@ pub fn ParLine::of(c : Content) -> ParLine? {
 
 ///|
 pub fn ParLine::pack(self : ParLine) -> Content {
+  self.0
+}
+
+///|
+pub impl NativeElement for ParLine with fn elem() {
+  par_line_elem()
+}
+
+///|
+pub impl NativeElement for ParLine with fn from_content_unchecked(c) {
+  ParLine(c)
+}
+
+///|
+pub impl NativeElement for ParLine with fn into_content(self) {
   self.0
 }
 
@@ -9701,6 +11111,21 @@ pub fn ParLineMarker::pack(self : ParLineMarker) -> Content {
 }
 
 ///|
+pub impl NativeElement for ParLineMarker with fn elem() {
+  par_line_marker_elem()
+}
+
+///|
+pub impl NativeElement for ParLineMarker with fn from_content_unchecked(c) {
+  ParLineMarker(c)
+}
+
+///|
+pub impl NativeElement for ParLineMarker with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn ParLineMarker::numbering(self : ParLineMarker) -> Numbering {
   view_cast(self.0.field_raw(par_line_marker_elem_numbering).unwrap(), "par-line-marker.numbering")
 }
@@ -9761,6 +11186,21 @@ pub fn QuoteElem::of(c : Content) -> QuoteElem? {
 
 ///|
 pub fn QuoteElem::pack(self : QuoteElem) -> Content {
+  self.0
+}
+
+///|
+pub impl NativeElement for QuoteElem with fn elem() {
+  quote_elem()
+}
+
+///|
+pub impl NativeElement for QuoteElem with fn from_content_unchecked(c) {
+  QuoteElem(c)
+}
+
+///|
+pub impl NativeElement for QuoteElem with fn into_content(self) {
   self.0
 }
 
@@ -9896,6 +11336,21 @@ pub fn RefElem::pack(self : RefElem) -> Content {
 }
 
 ///|
+pub impl NativeElement for RefElem with fn elem() {
+  ref_elem()
+}
+
+///|
+pub impl NativeElement for RefElem with fn from_content_unchecked(c) {
+  RefElem(c)
+}
+
+///|
+pub impl NativeElement for RefElem with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn RefElem::target(self : RefElem) -> Label {
   view_cast(self.0.field_raw(ref_elem_target).unwrap(), "ref.target")
 }
@@ -10014,6 +11469,21 @@ pub fn StrongElem::pack(self : StrongElem) -> Content {
 }
 
 ///|
+pub impl NativeElement for StrongElem with fn elem() {
+  strong_elem()
+}
+
+///|
+pub impl NativeElement for StrongElem with fn from_content_unchecked(c) {
+  StrongElem(c)
+}
+
+///|
+pub impl NativeElement for StrongElem with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn StrongElem::delta(self : StrongElem, styles : StyleChain) -> Int64 {
   let e = strong_elem()
   view_cast(styles.get_value_with_local(e, e.fields()[strong_elem_delta], self.0.field_raw(strong_elem_delta)), "strong.delta")
@@ -10069,6 +11539,21 @@ pub fn TableElem::of(c : Content) -> TableElem? {
 
 ///|
 pub fn TableElem::pack(self : TableElem) -> Content {
+  self.0
+}
+
+///|
+pub impl NativeElement for TableElem with fn elem() {
+  table_elem()
+}
+
+///|
+pub impl NativeElement for TableElem with fn from_content_unchecked(c) {
+  TableElem(c)
+}
+
+///|
+pub impl NativeElement for TableElem with fn into_content(self) {
   self.0
 }
 
@@ -10376,6 +11861,21 @@ pub fn TableHeader::pack(self : TableHeader) -> Content {
 }
 
 ///|
+pub impl NativeElement for TableHeader with fn elem() {
+  table_header_elem()
+}
+
+///|
+pub impl NativeElement for TableHeader with fn from_content_unchecked(c) {
+  TableHeader(c)
+}
+
+///|
+pub impl NativeElement for TableHeader with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn TableHeader::repeat(self : TableHeader, styles : StyleChain) -> Bool {
   let e = table_header_elem()
   view_cast(styles.get_value_with_local(e, e.fields()[table_header_elem_repeat], self.0.field_raw(table_header_elem_repeat)), "header.repeat")
@@ -10468,6 +11968,21 @@ pub fn TableFooter::pack(self : TableFooter) -> Content {
 }
 
 ///|
+pub impl NativeElement for TableFooter with fn elem() {
+  table_footer_elem()
+}
+
+///|
+pub impl NativeElement for TableFooter with fn from_content_unchecked(c) {
+  TableFooter(c)
+}
+
+///|
+pub impl NativeElement for TableFooter with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn TableFooter::repeat(self : TableFooter, styles : StyleChain) -> Bool {
   let e = table_footer_elem()
   view_cast(styles.get_value_with_local(e, e.fields()[table_footer_elem_repeat], self.0.field_raw(table_footer_elem_repeat)), "footer.repeat")
@@ -10527,6 +12042,21 @@ pub fn TableHLine::of(c : Content) -> TableHLine? {
 
 ///|
 pub fn TableHLine::pack(self : TableHLine) -> Content {
+  self.0
+}
+
+///|
+pub impl NativeElement for TableHLine with fn elem() {
+  table_h_line_elem()
+}
+
+///|
+pub impl NativeElement for TableHLine with fn from_content_unchecked(c) {
+  TableHLine(c)
+}
+
+///|
+pub impl NativeElement for TableHLine with fn into_content(self) {
   self.0
 }
 
@@ -10700,6 +12230,21 @@ pub fn TableVLine::pack(self : TableVLine) -> Content {
 }
 
 ///|
+pub impl NativeElement for TableVLine with fn elem() {
+  table_v_line_elem()
+}
+
+///|
+pub impl NativeElement for TableVLine with fn from_content_unchecked(c) {
+  TableVLine(c)
+}
+
+///|
+pub impl NativeElement for TableVLine with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn TableVLine::x(self : TableVLine, styles : StyleChain) -> Smart[USize] {
   let e = table_v_line_elem()
   view_cast(styles.get_value_with_local(e, e.fields()[table_v_line_elem_x], self.0.field_raw(table_v_line_elem_x)), "vline.x")
@@ -10861,6 +12406,21 @@ pub fn TableCell::of(c : Content) -> TableCell? {
 
 ///|
 pub fn TableCell::pack(self : TableCell) -> Content {
+  self.0
+}
+
+///|
+pub impl NativeElement for TableCell with fn elem() {
+  table_cell_elem()
+}
+
+///|
+pub impl NativeElement for TableCell with fn from_content_unchecked(c) {
+  TableCell(c)
+}
+
+///|
+pub impl NativeElement for TableCell with fn into_content(self) {
   self.0
 }
 
@@ -11202,6 +12762,21 @@ pub fn TermsElem::pack(self : TermsElem) -> Content {
 }
 
 ///|
+pub impl NativeElement for TermsElem with fn elem() {
+  terms_elem()
+}
+
+///|
+pub impl NativeElement for TermsElem with fn from_content_unchecked(c) {
+  TermsElem(c)
+}
+
+///|
+pub impl NativeElement for TermsElem with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn TermsElem::tight(self : TermsElem, styles : StyleChain) -> Bool {
   let e = terms_elem()
   view_cast(styles.get_value_with_local(e, e.fields()[terms_elem_tight], self.0.field_raw(terms_elem_tight)), "terms.tight")
@@ -11387,6 +12962,21 @@ pub fn TermItem::pack(self : TermItem) -> Content {
 }
 
 ///|
+pub impl NativeElement for TermItem with fn elem() {
+  term_item_elem()
+}
+
+///|
+pub impl NativeElement for TermItem with fn from_content_unchecked(c) {
+  TermItem(c)
+}
+
+///|
+pub impl NativeElement for TermItem with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn TermItem::term(self : TermItem) -> Content {
   view_cast(self.0.field_raw(term_item_elem_term).unwrap(), "item.term")
 }
@@ -11427,6 +13017,21 @@ pub fn TitleElem::of(c : Content) -> TitleElem? {
 
 ///|
 pub fn TitleElem::pack(self : TitleElem) -> Content {
+  self.0
+}
+
+///|
+pub impl NativeElement for TitleElem with fn elem() {
+  title_elem()
+}
+
+///|
+pub impl NativeElement for TitleElem with fn from_content_unchecked(c) {
+  TitleElem(c)
+}
+
+///|
+pub impl NativeElement for TitleElem with fn into_content(self) {
   self.0
 }
 
@@ -11480,6 +13085,21 @@ pub fn UnderlineElem::of(c : Content) -> UnderlineElem? {
 
 ///|
 pub fn UnderlineElem::pack(self : UnderlineElem) -> Content {
+  self.0
+}
+
+///|
+pub impl NativeElement for UnderlineElem with fn elem() {
+  underline_elem()
+}
+
+///|
+pub impl NativeElement for UnderlineElem with fn from_content_unchecked(c) {
+  UnderlineElem(c)
+}
+
+///|
+pub impl NativeElement for UnderlineElem with fn into_content(self) {
   self.0
 }
 
@@ -11663,6 +13283,21 @@ pub fn OverlineElem::pack(self : OverlineElem) -> Content {
 }
 
 ///|
+pub impl NativeElement for OverlineElem with fn elem() {
+  overline_elem()
+}
+
+///|
+pub impl NativeElement for OverlineElem with fn from_content_unchecked(c) {
+  OverlineElem(c)
+}
+
+///|
+pub impl NativeElement for OverlineElem with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn OverlineElem::stroke(self : OverlineElem, styles : StyleChain) -> Smart[Stroke] {
   let e = overline_elem()
   view_cast(styles.get_value_with_local(e, e.fields()[overline_elem_stroke], self.0.field_raw(overline_elem_stroke)), "overline.stroke")
@@ -11842,6 +13477,21 @@ pub fn StrikeElem::pack(self : StrikeElem) -> Content {
 }
 
 ///|
+pub impl NativeElement for StrikeElem with fn elem() {
+  strike_elem()
+}
+
+///|
+pub impl NativeElement for StrikeElem with fn from_content_unchecked(c) {
+  StrikeElem(c)
+}
+
+///|
+pub impl NativeElement for StrikeElem with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn StrikeElem::stroke(self : StrikeElem, styles : StyleChain) -> Smart[Stroke] {
   let e = strike_elem()
   view_cast(styles.get_value_with_local(e, e.fields()[strike_elem_stroke], self.0.field_raw(strike_elem_stroke)), "strike.stroke")
@@ -11988,6 +13638,21 @@ pub fn HighlightElem::of(c : Content) -> HighlightElem? {
 
 ///|
 pub fn HighlightElem::pack(self : HighlightElem) -> Content {
+  self.0
+}
+
+///|
+pub impl NativeElement for HighlightElem with fn elem() {
+  highlight_elem()
+}
+
+///|
+pub impl NativeElement for HighlightElem with fn from_content_unchecked(c) {
+  HighlightElem(c)
+}
+
+///|
+pub impl NativeElement for HighlightElem with fn into_content(self) {
   self.0
 }
 
@@ -12200,6 +13865,21 @@ pub fn LinebreakElem::pack(self : LinebreakElem) -> Content {
 }
 
 ///|
+pub impl NativeElement for LinebreakElem with fn elem() {
+  linebreak_elem()
+}
+
+///|
+pub impl NativeElement for LinebreakElem with fn from_content_unchecked(c) {
+  LinebreakElem(c)
+}
+
+///|
+pub impl NativeElement for LinebreakElem with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn LinebreakElem::justify(self : LinebreakElem, styles : StyleChain) -> Bool {
   let e = linebreak_elem()
   view_cast(styles.get_value_with_local(e, e.fields()[linebreak_elem_justify], self.0.field_raw(linebreak_elem_justify)), "linebreak.justify")
@@ -12245,6 +13925,21 @@ pub fn TextElem::of(c : Content) -> TextElem? {
 
 ///|
 pub fn TextElem::pack(self : TextElem) -> Content {
+  self.0
+}
+
+///|
+pub impl NativeElement for TextElem with fn elem() {
+  text_elem()
+}
+
+///|
+pub impl NativeElement for TextElem with fn from_content_unchecked(c) {
+  TextElem(c)
+}
+
+///|
+pub impl NativeElement for TextElem with fn into_content(self) {
   self.0
 }
 
@@ -12679,6 +14374,21 @@ pub fn RawElem::pack(self : RawElem) -> Content {
 }
 
 ///|
+pub impl NativeElement for RawElem with fn elem() {
+  raw_elem()
+}
+
+///|
+pub impl NativeElement for RawElem with fn from_content_unchecked(c) {
+  RawElem(c)
+}
+
+///|
+pub impl NativeElement for RawElem with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn RawElem::text(self : RawElem) -> RawContent {
   view_cast(self.0.field_raw(raw_elem_text).unwrap(), "raw.text")
 }
@@ -12900,6 +14610,21 @@ pub fn RawLine::pack(self : RawLine) -> Content {
 }
 
 ///|
+pub impl NativeElement for RawLine with fn elem() {
+  raw_line_elem()
+}
+
+///|
+pub impl NativeElement for RawLine with fn from_content_unchecked(c) {
+  RawLine(c)
+}
+
+///|
+pub impl NativeElement for RawLine with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn RawLine::number(self : RawLine) -> Int64 {
   view_cast(self.0.field_raw(raw_line_elem_number).unwrap(), "line.number")
 }
@@ -12960,6 +14685,21 @@ pub fn SubElem::of(c : Content) -> SubElem? {
 
 ///|
 pub fn SubElem::pack(self : SubElem) -> Content {
+  self.0
+}
+
+///|
+pub impl NativeElement for SubElem with fn elem() {
+  sub_elem()
+}
+
+///|
+pub impl NativeElement for SubElem with fn from_content_unchecked(c) {
+  SubElem(c)
+}
+
+///|
+pub impl NativeElement for SubElem with fn into_content(self) {
   self.0
 }
 
@@ -13085,6 +14825,21 @@ pub fn SuperElem::pack(self : SuperElem) -> Content {
 }
 
 ///|
+pub impl NativeElement for SuperElem with fn elem() {
+  super_elem()
+}
+
+///|
+pub impl NativeElement for SuperElem with fn from_content_unchecked(c) {
+  SuperElem(c)
+}
+
+///|
+pub impl NativeElement for SuperElem with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn SuperElem::typographic(self : SuperElem, styles : StyleChain) -> Bool {
   let e = super_elem()
   view_cast(styles.get_value_with_local(e, e.fields()[super_elem_typographic], self.0.field_raw(super_elem_typographic)), "super.typographic")
@@ -13206,6 +14961,21 @@ pub fn SmallcapsElem::pack(self : SmallcapsElem) -> Content {
 }
 
 ///|
+pub impl NativeElement for SmallcapsElem with fn elem() {
+  smallcaps_elem()
+}
+
+///|
+pub impl NativeElement for SmallcapsElem with fn from_content_unchecked(c) {
+  SmallcapsElem(c)
+}
+
+///|
+pub impl NativeElement for SmallcapsElem with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn SmallcapsElem::all(self : SmallcapsElem, styles : StyleChain) -> Bool {
   let e = smallcaps_elem()
   view_cast(styles.get_value_with_local(e, e.fields()[smallcaps_elem_all], self.0.field_raw(smallcaps_elem_all)), "smallcaps.all")
@@ -13265,6 +15035,21 @@ pub fn SmartQuoteElem::of(c : Content) -> SmartQuoteElem? {
 
 ///|
 pub fn SmartQuoteElem::pack(self : SmartQuoteElem) -> Content {
+  self.0
+}
+
+///|
+pub impl NativeElement for SmartQuoteElem with fn elem() {
+  smart_quote_elem()
+}
+
+///|
+pub impl NativeElement for SmartQuoteElem with fn from_content_unchecked(c) {
+  SmartQuoteElem(c)
+}
+
+///|
+pub impl NativeElement for SmartQuoteElem with fn into_content(self) {
   self.0
 }
 
@@ -13405,6 +15190,21 @@ pub fn SpaceElem::pack(self : SpaceElem) -> Content {
 }
 
 ///|
+pub impl NativeElement for SpaceElem with fn elem() {
+  space_elem()
+}
+
+///|
+pub impl NativeElement for SpaceElem with fn from_content_unchecked(c) {
+  SpaceElem(c)
+}
+
+///|
+pub impl NativeElement for SpaceElem with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn SpaceElem::had_newline(self : SpaceElem) -> Bool {
   view_cast(self.0.field_raw(space_elem_had_newline).unwrap(), "space.had-newline")
 }
@@ -13435,6 +15235,21 @@ pub fn CurveElem::of(c : Content) -> CurveElem? {
 
 ///|
 pub fn CurveElem::pack(self : CurveElem) -> Content {
+  self.0
+}
+
+///|
+pub impl NativeElement for CurveElem with fn elem() {
+  curve_elem()
+}
+
+///|
+pub impl NativeElement for CurveElem with fn from_content_unchecked(c) {
+  CurveElem(c)
+}
+
+///|
+pub impl NativeElement for CurveElem with fn into_content(self) {
   self.0
 }
 
@@ -13560,6 +15375,21 @@ pub fn CurveMove::pack(self : CurveMove) -> Content {
 }
 
 ///|
+pub impl NativeElement for CurveMove with fn elem() {
+  curve_move_elem()
+}
+
+///|
+pub impl NativeElement for CurveMove with fn from_content_unchecked(c) {
+  CurveMove(c)
+}
+
+///|
+pub impl NativeElement for CurveMove with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn CurveMove::start(self : CurveMove) -> Axes[Rel[Length]] {
   view_cast(self.0.field_raw(curve_move_elem_start).unwrap(), "move.start")
 }
@@ -13623,6 +15453,21 @@ pub fn CurveLine::pack(self : CurveLine) -> Content {
 }
 
 ///|
+pub impl NativeElement for CurveLine with fn elem() {
+  curve_line_elem()
+}
+
+///|
+pub impl NativeElement for CurveLine with fn from_content_unchecked(c) {
+  CurveLine(c)
+}
+
+///|
+pub impl NativeElement for CurveLine with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn CurveLine::end(self : CurveLine) -> Axes[Rel[Length]] {
   view_cast(self.0.field_raw(curve_line_elem_end).unwrap(), "line.end")
 }
@@ -13682,6 +15527,21 @@ pub fn CurveQuad::of(c : Content) -> CurveQuad? {
 
 ///|
 pub fn CurveQuad::pack(self : CurveQuad) -> Content {
+  self.0
+}
+
+///|
+pub impl NativeElement for CurveQuad with fn elem() {
+  curve_quad_elem()
+}
+
+///|
+pub impl NativeElement for CurveQuad with fn from_content_unchecked(c) {
+  CurveQuad(c)
+}
+
+///|
+pub impl NativeElement for CurveQuad with fn into_content(self) {
   self.0
 }
 
@@ -13755,6 +15615,21 @@ pub fn CurveCubic::of(c : Content) -> CurveCubic? {
 
 ///|
 pub fn CurveCubic::pack(self : CurveCubic) -> Content {
+  self.0
+}
+
+///|
+pub impl NativeElement for CurveCubic with fn elem() {
+  curve_cubic_elem()
+}
+
+///|
+pub impl NativeElement for CurveCubic with fn from_content_unchecked(c) {
+  CurveCubic(c)
+}
+
+///|
+pub impl NativeElement for CurveCubic with fn into_content(self) {
   self.0
 }
 
@@ -13842,6 +15717,21 @@ pub fn CurveClose::pack(self : CurveClose) -> Content {
 }
 
 ///|
+pub impl NativeElement for CurveClose with fn elem() {
+  curve_close_elem()
+}
+
+///|
+pub impl NativeElement for CurveClose with fn from_content_unchecked(c) {
+  CurveClose(c)
+}
+
+///|
+pub impl NativeElement for CurveClose with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn CurveClose::mode(self : CurveClose, styles : StyleChain) -> CloseMode {
   let e = curve_close_elem()
   view_cast(styles.get_value_with_local(e, e.fields()[curve_close_elem_mode], self.0.field_raw(curve_close_elem_mode)), "close.mode")
@@ -13891,6 +15781,21 @@ pub fn ImageElem::of(c : Content) -> ImageElem? {
 
 ///|
 pub fn ImageElem::pack(self : ImageElem) -> Content {
+  self.0
+}
+
+///|
+pub impl NativeElement for ImageElem with fn elem() {
+  image_elem()
+}
+
+///|
+pub impl NativeElement for ImageElem with fn from_content_unchecked(c) {
+  ImageElem(c)
+}
+
+///|
+pub impl NativeElement for ImageElem with fn into_content(self) {
   self.0
 }
 
@@ -14174,6 +16079,21 @@ pub fn LineElem::pack(self : LineElem) -> Content {
 }
 
 ///|
+pub impl NativeElement for LineElem with fn elem() {
+  line_elem()
+}
+
+///|
+pub impl NativeElement for LineElem with fn from_content_unchecked(c) {
+  LineElem(c)
+}
+
+///|
+pub impl NativeElement for LineElem with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn LineElem::start(self : LineElem, styles : StyleChain) -> Axes[Rel[Length]] {
   let e = line_elem()
   view_cast(styles.get_value_with_local(e, e.fields()[line_elem_start], self.0.field_raw(line_elem_start)), "line.start")
@@ -14343,6 +16263,21 @@ pub fn PolygonElem::pack(self : PolygonElem) -> Content {
 }
 
 ///|
+pub impl NativeElement for PolygonElem with fn elem() {
+  polygon_elem()
+}
+
+///|
+pub impl NativeElement for PolygonElem with fn from_content_unchecked(c) {
+  PolygonElem(c)
+}
+
+///|
+pub impl NativeElement for PolygonElem with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn PolygonElem::fill(self : PolygonElem, styles : StyleChain) -> Paint? {
   let e = polygon_elem()
   view_cast(styles.get_value_with_local(e, e.fields()[polygon_elem_fill], self.0.field_raw(polygon_elem_fill)), "polygon.fill")
@@ -14460,6 +16395,21 @@ pub fn RectElem::of(c : Content) -> RectElem? {
 
 ///|
 pub fn RectElem::pack(self : RectElem) -> Content {
+  self.0
+}
+
+///|
+pub impl NativeElement for RectElem with fn elem() {
+  rect_elem()
+}
+
+///|
+pub impl NativeElement for RectElem with fn from_content_unchecked(c) {
+  RectElem(c)
+}
+
+///|
+pub impl NativeElement for RectElem with fn into_content(self) {
   self.0
 }
 
@@ -14720,6 +16670,21 @@ pub fn SquareElem::pack(self : SquareElem) -> Content {
 }
 
 ///|
+pub impl NativeElement for SquareElem with fn elem() {
+  square_elem()
+}
+
+///|
+pub impl NativeElement for SquareElem with fn from_content_unchecked(c) {
+  SquareElem(c)
+}
+
+///|
+pub impl NativeElement for SquareElem with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn SquareElem::width(self : SquareElem, styles : StyleChain) -> Smart[Rel[Length]] {
   let e = square_elem()
   view_cast(styles.get_value_with_local(e, e.fields()[square_elem_width], self.0.field_raw(square_elem_width)), "square.width")
@@ -14976,6 +16941,21 @@ pub fn EllipseElem::pack(self : EllipseElem) -> Content {
 }
 
 ///|
+pub impl NativeElement for EllipseElem with fn elem() {
+  ellipse_elem()
+}
+
+///|
+pub impl NativeElement for EllipseElem with fn from_content_unchecked(c) {
+  EllipseElem(c)
+}
+
+///|
+pub impl NativeElement for EllipseElem with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn EllipseElem::width(self : EllipseElem, styles : StyleChain) -> Smart[Rel[Length]] {
   let e = ellipse_elem()
   view_cast(styles.get_value_with_local(e, e.fields()[ellipse_elem_width], self.0.field_raw(ellipse_elem_width)), "ellipse.width")
@@ -15199,6 +17179,21 @@ pub fn CircleElem::of(c : Content) -> CircleElem? {
 
 ///|
 pub fn CircleElem::pack(self : CircleElem) -> Content {
+  self.0
+}
+
+///|
+pub impl NativeElement for CircleElem with fn elem() {
+  circle_elem()
+}
+
+///|
+pub impl NativeElement for CircleElem with fn from_content_unchecked(c) {
+  CircleElem(c)
+}
+
+///|
+pub impl NativeElement for CircleElem with fn into_content(self) {
   self.0
 }
 
@@ -15430,6 +17425,21 @@ pub fn HtmlFormat::pack(self : HtmlFormat) -> Content {
 }
 
 ///|
+pub impl NativeElement for HtmlFormat with fn elem() {
+  html_format_elem()
+}
+
+///|
+pub impl NativeElement for HtmlFormat with fn from_content_unchecked(c) {
+  HtmlFormat(c)
+}
+
+///|
+pub impl NativeElement for HtmlFormat with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn HtmlFormat::pretty(self : HtmlFormat, styles : StyleChain) -> Bool {
   let e = html_format_elem()
   view_cast(styles.get_value_with_local(e, e.fields()[html_format_elem_pretty], self.0.field_raw(html_format_elem_pretty)), "html.pretty")
@@ -15479,6 +17489,21 @@ pub fn HtmlElem::of(c : Content) -> HtmlElem? {
 
 ///|
 pub fn HtmlElem::pack(self : HtmlElem) -> Content {
+  self.0
+}
+
+///|
+pub impl NativeElement for HtmlElem with fn elem() {
+  html_elem()
+}
+
+///|
+pub impl NativeElement for HtmlElem with fn from_content_unchecked(c) {
+  HtmlElem(c)
+}
+
+///|
+pub impl NativeElement for HtmlElem with fn into_content(self) {
   self.0
 }
 
@@ -15627,6 +17652,21 @@ pub fn FrameElem::pack(self : FrameElem) -> Content {
 }
 
 ///|
+pub impl NativeElement for FrameElem with fn elem() {
+  frame_elem()
+}
+
+///|
+pub impl NativeElement for FrameElem with fn from_content_unchecked(c) {
+  FrameElem(c)
+}
+
+///|
+pub impl NativeElement for FrameElem with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn FrameElem::body(self : FrameElem) -> Content {
   view_cast(self.0.field_raw(frame_elem_body).unwrap(), "frame.body")
 }
@@ -15657,6 +17697,21 @@ pub fn PdfPdfFormat::of(c : Content) -> PdfPdfFormat? {
 
 ///|
 pub fn PdfPdfFormat::pack(self : PdfPdfFormat) -> Content {
+  self.0
+}
+
+///|
+pub impl NativeElement for PdfPdfFormat with fn elem() {
+  pdf_format_elem()
+}
+
+///|
+pub impl NativeElement for PdfPdfFormat with fn from_content_unchecked(c) {
+  PdfPdfFormat(c)
+}
+
+///|
+pub impl NativeElement for PdfPdfFormat with fn into_content(self) {
   self.0
 }
 
@@ -15801,6 +17856,21 @@ pub fn PdfAttachElem::pack(self : PdfAttachElem) -> Content {
 }
 
 ///|
+pub impl NativeElement for PdfAttachElem with fn elem() {
+  pdf_attach_elem()
+}
+
+///|
+pub impl NativeElement for PdfAttachElem with fn from_content_unchecked(c) {
+  PdfAttachElem(c)
+}
+
+///|
+pub impl NativeElement for PdfAttachElem with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn PdfAttachElem::path(self : PdfAttachElem) -> PathOrStr {
   view_cast(self.0.field_raw(pdf_attach_elem_path).unwrap(), "attach.path")
 }
@@ -15932,6 +18002,21 @@ pub fn SvgFormat::pack(self : SvgFormat) -> Content {
 }
 
 ///|
+pub impl NativeElement for SvgFormat with fn elem() {
+  svg_format_elem()
+}
+
+///|
+pub impl NativeElement for SvgFormat with fn from_content_unchecked(c) {
+  SvgFormat(c)
+}
+
+///|
+pub impl NativeElement for SvgFormat with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn SvgFormat::pretty(self : SvgFormat, styles : StyleChain) -> Bool {
   let e = svg_format_elem()
   view_cast(styles.get_value_with_local(e, e.fields()[svg_format_elem_pretty], self.0.field_raw(svg_format_elem_pretty)), "svg.pretty")
@@ -15981,6 +18066,21 @@ pub fn PngFormat::of(c : Content) -> PngFormat? {
 
 ///|
 pub fn PngFormat::pack(self : PngFormat) -> Content {
+  self.0
+}
+
+///|
+pub impl NativeElement for PngFormat with fn elem() {
+  png_format_elem()
+}
+
+///|
+pub impl NativeElement for PngFormat with fn from_content_unchecked(c) {
+  PngFormat(c)
+}
+
+///|
+pub impl NativeElement for PngFormat with fn into_content(self) {
   self.0
 }
 
@@ -16038,6 +18138,21 @@ pub fn BundleFormat::pack(self : BundleFormat) -> Content {
 }
 
 ///|
+pub impl NativeElement for BundleFormat with fn elem() {
+  bundle_format_elem()
+}
+
+///|
+pub impl NativeElement for BundleFormat with fn from_content_unchecked(c) {
+  BundleFormat(c)
+}
+
+///|
+pub impl NativeElement for BundleFormat with fn into_content(self) {
+  self.0
+}
+
+///|
 pub fn BundleFormat::new() -> BundleFormat {
   BundleFormat(Content::new(bundle_format_elem(), []))
 }
@@ -16058,6 +18173,21 @@ pub fn AssetElem::of(c : Content) -> AssetElem? {
 
 ///|
 pub fn AssetElem::pack(self : AssetElem) -> Content {
+  self.0
+}
+
+///|
+pub impl NativeElement for AssetElem with fn elem() {
+  asset_elem()
+}
+
+///|
+pub impl NativeElement for AssetElem with fn from_content_unchecked(c) {
+  AssetElem(c)
+}
+
+///|
+pub impl NativeElement for AssetElem with fn into_content(self) {
   self.0
 }
 

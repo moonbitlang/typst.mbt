@@ -50,6 +50,8 @@ pub let alignment_start : Alignment
 
 pub let alignment_top : Alignment
 
+pub fn analyze(&World, Array[Introspector], ArrayView[Introspection]) -> Array[SourceDiagnostic]
+
 pub fn and_(Value, Value) -> Value raise HintedError
 
 pub fn array_is_empty() -> String
@@ -728,6 +730,8 @@ pub fn context_elem() -> Element
 
 pub let context_elem_func : Int
 
+pub fn context_rule(ContextElem, Engine, StyleChain) -> Content raise SourceError
+
 pub fn convert_float_to_int(Double) -> Int64 raise HintedError
 
 pub fn counter_display_elem() -> Element
@@ -737,6 +741,8 @@ pub let counter_display_elem_both : Int
 pub let counter_display_elem_counter : Int
 
 pub let counter_display_elem_numbering : Int
+
+pub fn counter_display_rule(CounterDisplayElem, Engine, StyleChain) -> Content raise SourceError
 
 pub fn counter_update_elem() -> Element
 
@@ -831,6 +837,10 @@ pub let document_elem_keywords : Int
 pub let document_elem_path : Int
 
 pub let document_elem_title : Int
+
+pub fn document_introspection(Location, @syntax.Span) -> Introspect[Location?]
+
+pub fn document_unsupported_rule(DocumentElem, Engine, StyleChain) -> Content raise SourceError
 
 pub fn ellipse_elem() -> Element
 
@@ -1146,6 +1156,8 @@ pub let h_elem_amount : Int
 
 pub let h_elem_weak : Int
 
+pub fn[T : Fingerprint] hash128(T) -> U128
+
 pub fn heading_elem() -> Element
 
 pub let heading_elem_body : Int
@@ -1243,6 +1255,8 @@ pub let inline_elem_body : Int
 pub fn[T : Reflect] input_of(Ty[T]) -> CastInfo
 
 pub fn[T : Numeric] is_zero(T) -> Bool
+
+pub let iter_names : Array[String]
 
 pub fn join(Value, Value) -> Value raise HintedError
 
@@ -1391,6 +1405,8 @@ pub let math_underline_elem_body : Int
 pub let max_call_depth : Int
 
 pub let max_html_depth : Int
+
+pub let max_iters : Int
 
 pub let max_layout_depth : Int
 
@@ -2040,6 +2056,8 @@ pub let op_elem_text : Int
 
 pub fn or_(Value, Value) -> Value raise HintedError
 
+pub fn[T] or_raise(Result[T, Array[SourceDiagnostic]]) -> T raise SourceError
+
 pub fn out_of_bounds(Int64, Int) -> String
 
 pub fn out_of_bounds_no_default(Int64, Int) -> String
@@ -2162,6 +2180,12 @@ pub let page_elem_supplement : Int
 
 pub let page_elem_width : Int
 
+pub fn page_introspection(Location, @syntax.Span) -> Introspect[NonZeroUSize?]
+
+pub fn page_numbering_introspection(Location, @syntax.Span) -> Introspect[Numbering?]
+
+pub fn page_supplement_introspection(Location, @syntax.Span) -> Introspect[Content]
+
 pub fn pagebreak_elem() -> Element
 
 pub let pagebreak_elem_boundary : Int
@@ -2211,6 +2235,8 @@ pub let par_line_marker_elem_number_margin : Int
 pub let par_line_marker_elem_numbering : Int
 
 pub fn parbreak_elem() -> Element
+
+pub fn path_introspection(Location, @syntax.Span) -> Introspect[@syntax.VirtualPath?]
 
 pub fn pdf_attach_elem() -> Element
 
@@ -2276,6 +2302,8 @@ pub let polygon_elem_vertices : Int
 
 pub fn pos(Value) -> Value raise HintedError
 
+pub fn position_introspection(Location, @syntax.Span) -> Introspect[DocumentPosition?]
+
 pub fn prefix_info_elem() -> Element
 
 pub let prefix_info_elem_inset : Int
@@ -2291,6 +2319,14 @@ pub fn pretty_comma_list(ArrayView[String], Bool) -> String
 pub fn primes_elem() -> Element
 
 pub let primes_elem_count : Int
+
+pub fn query_first_introspection(Selector, @syntax.Span) -> Introspect[Content?]
+
+pub fn query_introspection(Selector, @syntax.Span) -> Introspect[Array[Content]]
+
+pub fn query_label_introspection(Label, @syntax.Span) -> Introspect[Result[Content, HintedString]]
+
+pub fn query_unique_introspection(Selector, @syntax.Span) -> Introspect[Result[Content, HintedString]]
 
 pub fn quote_elem() -> Element
 
@@ -2475,6 +2511,8 @@ pub let smart_quote_elem_double : Int
 pub let smart_quote_elem_enabled : Int
 
 pub let smart_quote_elem_quotes : Int
+
+pub fn[T] source_result(() -> T raise SourceError) -> Result[T, Array[SourceDiagnostic]]
 
 pub fn space_elem() -> Element
 
@@ -3076,6 +3114,8 @@ pub fn[T] trace((@syntax.DiagSpan) -> (Int, Int)?, () -> Tracepoint, @syntax.Spa
 
 pub let typst_version : (Int, Int, Int)
 
+pub let u128_zero : U128
+
 pub fn u64_from_str_radix(String, Int) -> UInt64 raise IntErrorKind
 
 pub fn underbrace_elem() -> Element
@@ -3259,6 +3299,7 @@ pub fn AccentElem::with_accent(Self, Accent) -> Self
 pub fn AccentElem::with_base(Self, Content) -> Self
 pub fn AccentElem::with_dotless(Self, Bool) -> Self
 pub fn AccentElem::with_size(Self, Rel[Length]) -> Self
+pub impl NativeElement for AccentElem
 
 pub struct AlignElem(Content)
 pub fn AlignElem::alignment(Self, StyleChain) -> Alignment
@@ -3271,11 +3312,13 @@ pub fn AlignElem::pack(Self) -> Content
 pub fn AlignElem::set_alignment(Alignment) -> Style
 pub fn AlignElem::with_alignment(Self, Alignment) -> Self
 pub fn AlignElem::with_body(Self, Content) -> Self
+pub impl NativeElement for AlignElem
 
 pub struct AlignPointElem(Content)
 pub fn AlignPointElem::new() -> Self
 pub fn AlignPointElem::of(Content) -> Self?
 pub fn AlignPointElem::pack(Self) -> Content
+pub impl NativeElement for AlignPointElem
 
 pub(all) enum Alignment {
   H(HAlignment)
@@ -3390,6 +3433,7 @@ pub fn Args::take(Self) -> Self
 pub fn Args::to_named(Self) -> Dict
 pub fn Args::to_pos(Self) -> Arr
 pub impl Eq for Args
+pub impl Fingerprint for Args
 pub impl FromValue for Args
 pub impl IntoValue for Args
 pub impl Reflect for Args
@@ -3436,6 +3480,7 @@ pub fn ArtifactElem::pack(Self) -> Content
 pub fn ArtifactElem::set_kind(ArtifactKind) -> Style
 pub fn ArtifactElem::with_body(Self, Content) -> Self
 pub fn ArtifactElem::with_kind(Self, ArtifactKind) -> Self
+pub impl NativeElement for ArtifactElem
 
 pub(all) enum ArtifactKind {
   Header
@@ -3464,6 +3509,7 @@ pub fn AssetElem::pack(Self) -> Content
 pub fn AssetElem::path(Self) -> BundlePath
 pub fn AssetElem::with_data(Self, Value) -> Self
 pub fn AssetElem::with_path(Self, BundlePath) -> Self
+pub impl NativeElement for AssetElem
 
 pub(all) enum Attribution {
   Content(Content)
@@ -3561,6 +3607,7 @@ pub fn BibliographyElem::with_sources(Self, Value) -> Self
 pub fn BibliographyElem::with_style(Self, Value) -> Self
 pub fn BibliographyElem::with_target(Self, Smart[LocatableSelector]) -> Self
 pub fn BibliographyElem::with_title(Self, Smart[Content?]) -> Self
+pub impl NativeElement for BibliographyElem
 
 pub struct Binding {
   mut value : Value
@@ -3608,6 +3655,7 @@ pub fn BinomElem::pack(Self) -> Content
 pub fn BinomElem::upper(Self) -> Content
 pub fn BinomElem::with_lower(Self, Array[Content]) -> Self
 pub fn BinomElem::with_upper(Self, Content) -> Self
+pub impl NativeElement for BinomElem
 
 pub(all) enum BlockBody {
   Content(Content)
@@ -3686,6 +3734,7 @@ pub fn BlockElem::with_radius(Self, Corners[Rel[Length]?]) -> Self
 pub fn BlockElem::with_sticky(Self, Bool) -> Self
 pub fn BlockElem::with_stroke(Self, Sides[Stroke??]) -> Self
 pub fn BlockElem::with_width(Self, Smart[Rel[Length]]) -> Self
+pub impl NativeElement for BlockElem
 
 pub(all) enum BottomEdge {
   Metric(BottomEdgeMetric)
@@ -3758,11 +3807,13 @@ pub fn BoxElem::with_outset(Self, Sides[Rel[Length]?]) -> Self
 pub fn BoxElem::with_radius(Self, Corners[Rel[Length]?]) -> Self
 pub fn BoxElem::with_stroke(Self, Sides[Stroke??]) -> Self
 pub fn BoxElem::with_width(Self, Sizing) -> Self
+pub impl NativeElement for BoxElem
 
 pub struct BundleFormat(Content)
 pub fn BundleFormat::new() -> Self
 pub fn BundleFormat::of(Content) -> Self?
 pub fn BundleFormat::pack(Self) -> Content
+pub impl NativeElement for BundleFormat
 
 pub struct BundlePath(@syntax.VirtualPath) derive(Eq, Hash)
 pub fn BundlePath::into_inner(Self) -> @syntax.VirtualPath
@@ -3821,6 +3872,7 @@ pub fn CancelElem::with_cross(Self, Bool) -> Self
 pub fn CancelElem::with_inverted(Self, Bool) -> Self
 pub fn CancelElem::with_length(Self, Rel[Length]) -> Self
 pub fn CancelElem::with_stroke(Self, Stroke) -> Self
+pub impl NativeElement for CancelElem
 
 pub(all) enum Capturer {
   Function
@@ -3866,6 +3918,7 @@ pub fn CasesElem::with_children(Self, Array[Content]) -> Self
 pub fn CasesElem::with_delim(Self, Value) -> Self
 pub fn CasesElem::with_gap(Self, Rel[Length]) -> Self
 pub fn CasesElem::with_reverse(Self, Bool) -> Self
+pub impl NativeElement for CasesElem
 
 pub(all) enum CastInfo {
   Any
@@ -3960,6 +4013,7 @@ pub fn CircleElem::with_inset(Self, Sides[Rel[Length]?]) -> Self
 pub fn CircleElem::with_outset(Self, Sides[Rel[Length]?]) -> Self
 pub fn CircleElem::with_stroke(Self, Smart[Stroke?]) -> Self
 pub fn CircleElem::with_width(Self, Smart[Rel[Length]]) -> Self
+pub impl NativeElement for CircleElem
 
 pub struct CiteElem(Content)
 pub fn CiteElem::form(Self, StyleChain) -> Value
@@ -3986,6 +4040,7 @@ pub fn CiteElem::with_lang(Self, Lang) -> Self
 pub fn CiteElem::with_region(Self, Region?) -> Self
 pub fn CiteElem::with_style(Self, Value) -> Self
 pub fn CiteElem::with_supplement(Self, Content?) -> Self
+pub impl NativeElement for CiteElem
 
 pub struct CiteGroup(Content)
 pub fn CiteGroup::children(Self) -> Array[Content]
@@ -3993,6 +4048,7 @@ pub fn CiteGroup::new(Array[Content]) -> Self
 pub fn CiteGroup::of(Content) -> Self?
 pub fn CiteGroup::pack(Self) -> Content
 pub fn CiteGroup::with_children(Self, Array[Content]) -> Self
+pub impl NativeElement for CiteGroup
 
 pub struct ClassElem(Content)
 pub fn ClassElem::body(Self) -> Content
@@ -4002,6 +4058,7 @@ pub fn ClassElem::of(Content) -> Self?
 pub fn ClassElem::pack(Self) -> Content
 pub fn ClassElem::with_body(Self, Content) -> Self
 pub fn ClassElem::with_class(Self, Value) -> Self
+pub impl NativeElement for ClassElem
 
 pub(all) enum CloseMode {
   Smooth
@@ -4041,6 +4098,7 @@ pub fn ColbreakElem::weak(Self, StyleChain) -> Bool
 pub fn ColbreakElem::weak_in(StyleChain) -> Bool
 pub fn ColbreakElem::weak_local(Self) -> Bool?
 pub fn ColbreakElem::with_weak(Self, Bool) -> Self
+pub impl NativeElement for ColbreakElem
 
 pub(all) enum Color {
   Process(ProcessColor)
@@ -4109,6 +4167,7 @@ pub fn ColumnsElem::with_body(Self, Content) -> Self
 pub fn ColumnsElem::with_count(Self, NonZeroUSize) -> Self
 pub fn ColumnsElem::with_gutter(Self, Rel[Length]) -> Self
 pub fn ColumnsElem::with_separator(Self, Content?) -> Self
+pub impl NativeElement for ColumnsElem
 
 pub(all) struct Component(Ratio)
 pub impl FromValue for Component
@@ -4168,11 +4227,13 @@ pub fn Content::span(Self) -> @syntax.Span
 pub fn Content::spanned(Self, @syntax.Span) -> Self
 pub fn Content::styled(Self, Style) -> Self
 pub fn Content::styled_with_map(Self, Styles) -> Self
+pub fn[T : NativeElement] Content::to_packed(Self) -> T?
 pub fn Content::to_sequence(Self) -> Array[Self]?
 pub fn Content::traverse(Self, (Self) -> Bool) -> Bool
 pub fn Content::with_field(Self, Int, Value) -> Self
 pub fn Content::without_field(Self, Int) -> Self
 pub impl Eq for Content
+pub impl Fingerprint for Content
 pub impl FromValue for Content
 pub impl IntoValue for Content
 pub impl Reflect for Content
@@ -4193,6 +4254,7 @@ pub fn ContextElem::new(Func) -> Self
 pub fn ContextElem::of(Content) -> Self?
 pub fn ContextElem::pack(Self) -> Content
 pub fn ContextElem::with_func(Self, Func) -> Self
+pub impl NativeElement for ContextElem
 
 pub(all) enum Corner {
   TopLeft
@@ -4248,6 +4310,7 @@ pub fn Counter::of(Element) -> Self
 pub fn Counter::repr(Self) -> String
 pub fn Counter::select(Self, Introspector, Location) -> Selector
 pub fn Counter::select_any() -> Selector
+pub impl Fingerprint for Counter
 pub impl FromValue for Counter
 pub impl IntoValue for Counter
 pub impl Reflect for Counter
@@ -4262,6 +4325,7 @@ pub fn CounterDisplayElem::pack(Self) -> Content
 pub fn CounterDisplayElem::with_both(Self, Bool) -> Self
 pub fn CounterDisplayElem::with_counter(Self, Counter) -> Self
 pub fn CounterDisplayElem::with_numbering(Self, Smart[Numbering]) -> Self
+pub impl NativeElement for CounterDisplayElem
 
 pub(all) enum CounterKey {
   Page
@@ -4269,6 +4333,7 @@ pub(all) enum CounterKey {
   Str(String)
 } derive(Eq)
 pub fn CounterKey::repr(Self) -> String
+pub impl Fingerprint for CounterKey
 pub impl FromValue for CounterKey
 pub impl IntoValue for CounterKey
 pub impl Reflect for CounterKey
@@ -4280,6 +4345,7 @@ pub fn CounterState::first(Self) -> Int64
 pub fn CounterState::init(Bool) -> Self
 pub fn CounterState::step(Self, Int, Int64) -> Unit
 pub fn CounterState::update(Self, Engine, CounterUpdate) -> Unit raise SourceError
+pub impl Fingerprint for CounterState
 pub impl FromValue for CounterState
 pub impl IntoValue for CounterState
 pub impl Reflect for CounterState
@@ -4289,6 +4355,7 @@ pub(all) enum CounterUpdate {
   Step(NonZeroUSize)
   Func(Func)
 } derive(Eq)
+pub impl Fingerprint for CounterUpdate
 pub impl FromValue for CounterUpdate
 pub impl IntoValue for CounterUpdate
 pub impl Reflect for CounterUpdate
@@ -4301,6 +4368,7 @@ pub fn CounterUpdateElem::pack(Self) -> Content
 pub fn CounterUpdateElem::update(Self) -> CounterUpdate
 pub fn CounterUpdateElem::with_key(Self, CounterKey) -> Self
 pub fn CounterUpdateElem::with_update(Self, CounterUpdate) -> Self
+pub impl NativeElement for CounterUpdateElem
 
 pub(all) enum Covers {
   LatinInCjk
@@ -4316,6 +4384,7 @@ pub fn CslIndentElem::new(Content) -> Self
 pub fn CslIndentElem::of(Content) -> Self?
 pub fn CslIndentElem::pack(Self) -> Content
 pub fn CslIndentElem::with_body(Self, Content) -> Self
+pub impl NativeElement for CslIndentElem
 
 pub struct CslLightElem(Content)
 pub fn CslLightElem::body(Self) -> Content
@@ -4323,6 +4392,7 @@ pub fn CslLightElem::new(Content) -> Self
 pub fn CslLightElem::of(Content) -> Self?
 pub fn CslLightElem::pack(Self) -> Content
 pub fn CslLightElem::with_body(Self, Content) -> Self
+pub impl NativeElement for CslLightElem
 
 pub(all) enum CssDisplay {
   Block
@@ -4404,6 +4474,7 @@ pub fn CurveClose::of(Content) -> Self?
 pub fn CurveClose::pack(Self) -> Content
 pub fn CurveClose::set_mode(CloseMode) -> Style
 pub fn CurveClose::with_mode(Self, CloseMode) -> Self
+pub impl NativeElement for CurveClose
 
 pub(all) struct CurveComponent(Content)
 pub impl FromValue for CurveComponent
@@ -4425,6 +4496,7 @@ pub fn CurveCubic::with_control_end(Self, Axes[Rel[Length]]?) -> Self
 pub fn CurveCubic::with_control_start(Self, Smart[Axes[Rel[Length]]]?) -> Self
 pub fn CurveCubic::with_end(Self, Axes[Rel[Length]]) -> Self
 pub fn CurveCubic::with_relative(Self, Bool) -> Self
+pub impl NativeElement for CurveCubic
 
 pub struct CurveElem(Content)
 pub fn CurveElem::components(Self) -> Array[CurveComponent]
@@ -4447,6 +4519,7 @@ pub fn CurveElem::with_components(Self, Array[CurveComponent]) -> Self
 pub fn CurveElem::with_fill(Self, Paint?) -> Self
 pub fn CurveElem::with_fill_rule(Self, FillRule) -> Self
 pub fn CurveElem::with_stroke(Self, Smart[Stroke?]) -> Self
+pub impl NativeElement for CurveElem
 
 pub struct CurveLine(Content)
 pub fn CurveLine::end(Self) -> Axes[Rel[Length]]
@@ -4459,6 +4532,7 @@ pub fn CurveLine::relative_local(Self) -> Bool?
 pub fn CurveLine::set_relative(Bool) -> Style
 pub fn CurveLine::with_end(Self, Axes[Rel[Length]]) -> Self
 pub fn CurveLine::with_relative(Self, Bool) -> Self
+pub impl NativeElement for CurveLine
 
 pub struct CurveMove(Content)
 pub fn CurveMove::new(Axes[Rel[Length]]) -> Self
@@ -4471,6 +4545,7 @@ pub fn CurveMove::set_relative(Bool) -> Style
 pub fn CurveMove::start(Self) -> Axes[Rel[Length]]
 pub fn CurveMove::with_relative(Self, Bool) -> Self
 pub fn CurveMove::with_start(Self, Axes[Rel[Length]]) -> Self
+pub impl NativeElement for CurveMove
 
 pub struct CurveQuad(Content)
 pub fn CurveQuad::control(Self) -> Smart[Axes[Rel[Length]]?]
@@ -4485,6 +4560,7 @@ pub fn CurveQuad::set_relative(Bool) -> Style
 pub fn CurveQuad::with_control(Self, Smart[Axes[Rel[Length]]?]) -> Self
 pub fn CurveQuad::with_end(Self, Axes[Rel[Length]]) -> Self
 pub fn CurveQuad::with_relative(Self, Bool) -> Self
+pub impl NativeElement for CurveQuad
 
 pub(all) enum DashLength {
   LineWidth
@@ -4627,6 +4703,7 @@ pub fn Dict::repr(Self) -> String
 pub fn Dict::take(Self, String) -> Value raise HintedError
 pub fn Dict::to_serde(Self, Bool) -> @serde.Data
 pub fn Dict::unexpected_keys(ArrayView[String], ArrayView[String]?) -> String
+pub impl Fingerprint for Dict
 pub impl FromValue for Dict
 pub impl IntoValue for Dict
 pub impl Reflect for Dict
@@ -4657,6 +4734,7 @@ pub fn DirectLinkElem::pack(Self) -> Content
 pub fn DirectLinkElem::with_alt(Self, String?) -> Self
 pub fn DirectLinkElem::with_body(Self, Content) -> Self
 pub fn DirectLinkElem::with_loc(Self, Location) -> Self
+pub impl NativeElement for DirectLinkElem
 
 pub struct DisplayPattern(String, @time.FormatItem)
 pub impl FromValue for DisplayPattern
@@ -4667,6 +4745,7 @@ pub struct DividerElem(Content)
 pub fn DividerElem::new() -> Self
 pub fn DividerElem::of(Content) -> Self?
 pub fn DividerElem::pack(Self) -> Content
+pub impl NativeElement for DividerElem
 
 pub struct DocumentElem(Content)
 pub fn DocumentElem::author(Self, StyleChain) -> OneOrMultiple[String]
@@ -4706,6 +4785,7 @@ pub fn DocumentElem::with_format(Self, Smart[DocumentFormat]) -> Self
 pub fn DocumentElem::with_keywords(Self, OneOrMultiple[String]) -> Self
 pub fn DocumentElem::with_path(Self, BundlePath) -> Self
 pub fn DocumentElem::with_title(Self, Content?) -> Self
+pub impl NativeElement for DocumentElem
 
 pub(all) enum DocumentFormat {
   Paged(PagedFormat)
@@ -4714,6 +4794,31 @@ pub(all) enum DocumentFormat {
 pub impl FromValue for DocumentFormat
 pub impl IntoValue for DocumentFormat
 pub impl Reflect for DocumentFormat
+
+pub struct DocumentFormatOptions {
+  options : Map[String, Value]
+}
+pub fn DocumentFormatOptions::new() -> Self
+
+pub(all) struct DocumentInfo {
+  mut title : String?
+  mut author : Array[String]
+  mut description : String?
+  mut keywords : Array[String]
+  mut date : Smart[Datetime?]
+  mut locale : Smart[Value]
+}
+pub fn DocumentInfo::new() -> Self
+
+pub(all) enum DocumentPosition {
+  Paged(PagedPosition)
+  Html(HtmlPosition)
+} derive(Eq)
+pub fn DocumentPosition::as_html(Self) -> HtmlPosition?
+pub fn DocumentPosition::as_paged(Self) -> PagedPosition?
+pub fn DocumentPosition::as_paged_or_default(Self) -> PagedPosition
+pub fn DocumentPosition::into_dict(Self) -> Dict?
+pub impl Fingerprint for DocumentPosition
 
 pub struct Duration(@time.Duration) derive(Compare, Eq, Hash)
 pub fn Duration::add(Self, Self) -> Self
@@ -4747,6 +4852,7 @@ pub(all) enum DynValue {
   RootedPath(@syntax.RootedPath)
   CounterUpdate(CounterUpdate)
   StateUpdate(StateUpdate)
+  Tag(Tag)
   HtmlCss(CssProperties)
 } derive(Eq)
 pub fn DynValue::add_dyn(Self, Self) -> Value? raise HintedError
@@ -4755,6 +4861,7 @@ pub fn DynValue::is_alignment(Self) -> Bool
 pub fn DynValue::regex_is_match(Self, String) -> Bool?
 pub fn DynValue::repr(Self) -> String
 pub fn DynValue::ty(Self) -> Type
+pub impl Fingerprint for DynValue
 
 pub struct Element(ElementData)
 pub fn Element::can(Self, String) -> Bool
@@ -4783,6 +4890,7 @@ pub fn Element::where_(Self, Array[(Int, Value)]) -> Selector
 pub impl Compare for Element
 pub impl Eq for Element
 pub impl Hash for Element
+pub impl Fingerprint for Element
 pub impl FromValue for Element
 pub impl IntoValue for Element
 pub impl Reflect for Element
@@ -4809,6 +4917,38 @@ pub struct ElementHooks {
   mut plain_text : ((Content, StringBuilder) -> Unit)?
   mut scope : () -> Scope
 }
+
+pub struct ElementIntrospector[P] {
+  // private fields
+}
+pub fn[P] ElementIntrospector::all(Self[P]) -> Array[Content]
+pub fn[P] ElementIntrospector::binary_search(Self[P], ArrayView[Content], Content) -> (Bool, Int)
+pub fn[P] ElementIntrospector::elem_index(Self[P], Content) -> Int
+pub fn[P] ElementIntrospector::get_by_idx(Self[P], Int) -> Content
+pub fn[P] ElementIntrospector::get_by_loc(Self[P], Location) -> Content?
+pub fn[P] ElementIntrospector::get_pos_by_idx(Self[P], Int) -> P
+pub fn[P] ElementIntrospector::label_count(Self[P], Label) -> Int
+pub fn[P] ElementIntrospector::len(Self[P]) -> Int
+pub fn[P] ElementIntrospector::loc_index(Self[P], Location) -> Int
+pub fn[P] ElementIntrospector::locator(Self[P], U128, Location) -> Location?
+pub fn[P] ElementIntrospector::position(Self[P], Location) -> P?
+pub fn[P] ElementIntrospector::query(Self[P], Selector) -> Array[Content]
+pub fn[P] ElementIntrospector::query_count_before(Self[P], Selector, Location) -> Int
+pub fn[P] ElementIntrospector::query_first(Self[P], Selector) -> Content?
+pub fn[P] ElementIntrospector::query_label(Self[P], Label) -> Content raise HintedError
+pub fn[P] ElementIntrospector::query_labelled(Self[P]) -> Array[Content]
+pub fn[P] ElementIntrospector::query_unique(Self[P], Selector) -> Content raise HintedError
+pub fn[P] ElementIntrospector::range_of(Self[P], Location) -> (Int, Int)?
+
+pub struct ElementIntrospectorBuilder[P] {
+  // private fields
+}
+pub fn[P, Q] ElementIntrospectorBuilder::discover_elements(Self[P], ElementIntrospector[Q], (Q) -> P) -> Unit
+pub fn[P] ElementIntrospectorBuilder::discover_tag(Self[P], Tag, P) -> Unit
+pub fn[P] ElementIntrospectorBuilder::end_insertion(Self[P], Location) -> Unit
+pub fn[P] ElementIntrospectorBuilder::finalize(Self[P]) -> ElementIntrospector[P]
+pub fn[P] ElementIntrospectorBuilder::new() -> Self[P]
+pub fn[P] ElementIntrospectorBuilder::start_insertion(Self[P]) -> Unit
 
 pub struct EllipseElem(Content)
 pub fn EllipseElem::body(Self, StyleChain) -> Content?
@@ -4849,6 +4989,7 @@ pub fn EllipseElem::with_inset(Self, Sides[Rel[Length]?]) -> Self
 pub fn EllipseElem::with_outset(Self, Sides[Rel[Length]?]) -> Self
 pub fn EllipseElem::with_stroke(Self, Smart[Stroke?]) -> Self
 pub fn EllipseElem::with_width(Self, Smart[Rel[Length]]) -> Self
+pub impl NativeElement for EllipseElem
 
 pub(all) struct Em(Scalar) derive(Compare, Default, Eq, Hash)
 pub fn Em::abs(Self) -> Self
@@ -4879,6 +5020,10 @@ pub fn EmphElem::new(Content) -> Self
 pub fn EmphElem::of(Content) -> Self?
 pub fn EmphElem::pack(Self) -> Content
 pub fn EmphElem::with_body(Self, Content) -> Self
+pub impl NativeElement for EmphElem
+
+pub(all) struct EmptyIntrospector(Unit)
+pub impl IntrospectorBackend for EmptyIntrospector
 
 pub(all) enum Encoding {
   Utf8
@@ -4905,6 +5050,7 @@ pub(all) struct Engine {
 }
 pub fn Engine::binding_guard(Self, @syntax.Span) -> BindingGuard
 pub fn[T] Engine::delay(Self, () -> T raise SourceError, T) -> T
+pub fn[T : Fingerprint] Engine::introspect(Self, Introspect[T]) -> T
 pub fn Engine::routines(Self) -> Routines
 pub fn Engine::with_route(Self, Route) -> Self
 
@@ -4961,6 +5107,7 @@ pub fn EnumElem::with_reversed(Self, Bool) -> Self
 pub fn EnumElem::with_spacing(Self, Smart[Length]) -> Self
 pub fn EnumElem::with_start(Self, Smart[U64]) -> Self
 pub fn EnumElem::with_tight(Self, Bool) -> Self
+pub impl NativeElement for EnumElem
 
 pub(all) struct EnumItem(Content) derive(Eq)
 pub fn EnumItem::body(Self) -> Content
@@ -4975,6 +5122,7 @@ pub fn EnumItem::with_body(Self, Content) -> Self
 pub fn EnumItem::with_number(Self, Smart[U64]) -> Self
 pub impl FromValue for EnumItem
 pub impl IntoValue for EnumItem
+pub impl NativeElement for EnumItem
 pub impl Reflect for EnumItem
 
 pub struct EquationElem(Content)
@@ -5022,6 +5170,7 @@ pub fn EquationElem::with_locale(Self, Value) -> Self
 pub fn EquationElem::with_number_align(Self, SpecificAlignment[OuterHAlignment, VAlignment]) -> Self
 pub fn EquationElem::with_numbering(Self, Numbering?) -> Self
 pub fn EquationElem::with_supplement(Self, Smart[Supplement?]) -> Self
+pub impl NativeElement for EquationElem
 
 pub(all) enum Feature {
   Html
@@ -5090,6 +5239,7 @@ pub fn FigureCaption::with_separator(Self, Smart[Content]) -> Self
 pub fn FigureCaption::with_supplement(Self, Content?) -> Self
 pub impl FromValue for FigureCaption
 pub impl IntoValue for FigureCaption
+pub impl NativeElement for FigureCaption
 pub impl Reflect for FigureCaption
 
 pub struct FigureElem(Content)
@@ -5147,6 +5297,7 @@ pub fn FigureElem::with_outlined(Self, Bool) -> Self
 pub fn FigureElem::with_placement(Self, Smart[VAlignment]?) -> Self
 pub fn FigureElem::with_scope(Self, PlacementScope) -> Self
 pub fn FigureElem::with_supplement(Self, Smart[Supplement?]) -> Self
+pub impl NativeElement for FigureElem
 
 pub(all) enum FigureKind {
   Elem(Element)
@@ -5190,6 +5341,7 @@ pub struct FlushElem(Content)
 pub fn FlushElem::new() -> Self
 pub fn FlushElem::of(Content) -> Self?
 pub fn FlushElem::pack(Self) -> Content
+pub impl NativeElement for FlushElem
 
 pub(all) struct FontFamily {
   name : String
@@ -5202,7 +5354,7 @@ pub impl FromValue for FontFamily
 pub impl IntoValue for FontFamily
 pub impl Reflect for FontFamily
 
-pub(all) struct FontFeatures(Array[(Tag, Int64)]) derive(Default, Eq, Hash)
+pub(all) struct FontFeatures(Array[(OpenTypeTag, Int64)]) derive(Default, Eq, Hash)
 pub impl Fold for FontFeatures
 pub impl FromValue for FontFeatures
 pub impl IntoValue for FontFeatures
@@ -5234,7 +5386,7 @@ pub impl FromValue for FontStyle
 pub impl IntoValue for FontStyle
 pub impl Reflect for FontStyle
 
-pub(all) struct FontVariations(Array[(Tag, AxisValue)]) derive(Eq, Hash, @debug.Debug)
+pub(all) struct FontVariations(Array[(OpenTypeTag, AxisValue)]) derive(Eq, Hash, @debug.Debug)
 pub impl Default for FontVariations
 pub impl Fold for FontVariations
 pub impl FromValue for FontVariations
@@ -5263,6 +5415,7 @@ pub struct FootnoteContainer(Content)
 pub fn FootnoteContainer::new() -> Self
 pub fn FootnoteContainer::of(Content) -> Self?
 pub fn FootnoteContainer::pack(Self) -> Content
+pub impl NativeElement for FootnoteContainer
 
 pub(all) struct FootnoteElem(Content) derive(Eq)
 pub fn FootnoteElem::body(Self) -> FootnoteBody
@@ -5278,6 +5431,7 @@ pub fn FootnoteElem::with_content(Content) -> Self
 pub fn FootnoteElem::with_numbering(Self, Numbering) -> Self
 pub impl FromValue for FootnoteElem
 pub impl IntoValue for FootnoteElem
+pub impl NativeElement for FootnoteElem
 pub impl Reflect for FootnoteElem
 
 pub struct FootnoteEntry(Content)
@@ -5306,11 +5460,13 @@ pub fn FootnoteEntry::with_gap(Self, Length) -> Self
 pub fn FootnoteEntry::with_indent(Self, Length) -> Self
 pub fn FootnoteEntry::with_note(Self, FootnoteElem) -> Self
 pub fn FootnoteEntry::with_separator(Self, Content) -> Self
+pub impl NativeElement for FootnoteEntry
 
 pub struct FootnoteMarker(Content)
 pub fn FootnoteMarker::new() -> Self
 pub fn FootnoteMarker::of(Content) -> Self?
 pub fn FootnoteMarker::pack(Self) -> Content
+pub impl NativeElement for FootnoteMarker
 
 pub(all) struct Format {
   elem : Element
@@ -5361,6 +5517,18 @@ pub fn FracElem::with_denom_deparenthesized(Self, Bool) -> Self
 pub fn FracElem::with_num(Self, Content) -> Self
 pub fn FracElem::with_num_deparenthesized(Self, Bool) -> Self
 pub fn FracElem::with_style(Self, Value) -> Self
+pub impl NativeElement for FracElem
+
+pub(all) enum FragmentKind {
+  Inline
+  Block
+} derive(Eq, Hash, @debug.Debug)
+
+pub struct Frame {
+  size : Axes[Abs]
+}
+pub fn Frame::new(Axes[Abs]) -> Self
+pub fn Frame::size(Self) -> Axes[Abs]
 
 pub struct FrameElem(Content)
 pub fn FrameElem::body(Self) -> Content
@@ -5368,6 +5536,7 @@ pub fn FrameElem::new(Content) -> Self
 pub fn FrameElem::of(Content) -> Self?
 pub fn FrameElem::pack(Self) -> Content
 pub fn FrameElem::with_body(Self, Content) -> Self
+pub impl NativeElement for FrameElem
 
 pub struct Func {
   inner : FuncInner
@@ -5391,6 +5560,7 @@ pub fn Func::to_element(Self) -> Element?
 pub fn Func::to_native(Self) -> NativeFuncData?
 pub fn Func::with_args(Self, Args) -> Self
 pub impl Eq for Func
+pub impl Fingerprint for Func
 pub impl FromValue for Func
 pub impl IntoValue for Func
 pub impl Reflect for Func
@@ -5486,6 +5656,7 @@ pub fn GridCell::y_in(StyleChain) -> Smart[USize]
 pub fn GridCell::y_local(Self) -> Smart[USize]?
 pub impl FromValue for GridCell
 pub impl IntoValue for GridCell
+pub impl NativeElement for GridCell
 pub impl Reflect for GridCell
 
 pub(all) enum GridChild {
@@ -5546,6 +5717,7 @@ pub fn GridElem::with_inset(Self, Celled[Sides[Rel[Length]?]]) -> Self
 pub fn GridElem::with_row_gutter(Self, TrackSizings) -> Self
 pub fn GridElem::with_rows(Self, TrackSizings) -> Self
 pub fn GridElem::with_stroke(Self, Celled[Sides[Stroke??]]) -> Self
+pub impl NativeElement for GridElem
 
 pub struct GridFooter(Content)
 pub fn GridFooter::children(Self) -> Array[GridItem]
@@ -5558,6 +5730,7 @@ pub fn GridFooter::repeat_local(Self) -> Bool?
 pub fn GridFooter::set_repeat(Bool) -> Style
 pub fn GridFooter::with_children(Self, Array[GridItem]) -> Self
 pub fn GridFooter::with_repeat(Self, Bool) -> Self
+pub impl NativeElement for GridFooter
 
 pub struct GridHLine(Content)
 pub fn GridHLine::end(Self, StyleChain) -> NonZeroUSize?
@@ -5588,6 +5761,7 @@ pub fn GridHLine::with_y(Self, Smart[USize]) -> Self
 pub fn GridHLine::y(Self, StyleChain) -> Smart[USize]
 pub fn GridHLine::y_in(StyleChain) -> Smart[USize]
 pub fn GridHLine::y_local(Self) -> Smart[USize]?
+pub impl NativeElement for GridHLine
 
 pub struct GridHeader(Content)
 pub fn GridHeader::children(Self) -> Array[GridItem]
@@ -5605,6 +5779,7 @@ pub fn GridHeader::set_repeat(Bool) -> Style
 pub fn GridHeader::with_children(Self, Array[GridItem]) -> Self
 pub fn GridHeader::with_level(Self, NonZeroU32) -> Self
 pub fn GridHeader::with_repeat(Self, Bool) -> Self
+pub impl NativeElement for GridHeader
 
 pub(all) enum GridItem {
   HLine(Content)
@@ -5645,6 +5820,7 @@ pub fn GridVLine::with_x(Self, Smart[USize]) -> Self
 pub fn GridVLine::x(Self, StyleChain) -> Smart[USize]
 pub fn GridVLine::x_in(StyleChain) -> Smart[USize]
 pub fn GridVLine::x_local(Self) -> Smart[USize]?
+pub impl NativeElement for GridVLine
 
 pub(all) enum HAlignment {
   Start
@@ -5674,6 +5850,7 @@ pub fn HElem::weak_in(StyleChain) -> Bool
 pub fn HElem::weak_local(Self) -> Bool?
 pub fn HElem::with_amount(Self, Spacing) -> Self
 pub fn HElem::with_weak(Self, Bool) -> Self
+pub impl NativeElement for HElem
 
 pub struct HeadingElem(Content)
 pub fn HeadingElem::body(Self) -> Content
@@ -5702,6 +5879,7 @@ pub fn HeadingElem::outlined(Self, StyleChain) -> Bool
 pub fn HeadingElem::outlined_in(StyleChain) -> Bool
 pub fn HeadingElem::outlined_local(Self) -> Bool?
 pub fn HeadingElem::pack(Self) -> Content
+pub fn HeadingElem::resolve_level(Self, StyleChain) -> NonZeroUSize
 pub fn HeadingElem::set_bookmarked(Smart[Bool]) -> Style
 pub fn HeadingElem::set_depth(NonZeroUSize) -> Style
 pub fn HeadingElem::set_hanging_indent(Smart[Length]) -> Style
@@ -5723,6 +5901,7 @@ pub fn HeadingElem::with_numbers(Self, String) -> Self
 pub fn HeadingElem::with_offset(Self, USize) -> Self
 pub fn HeadingElem::with_outlined(Self, Bool) -> Self
 pub fn HeadingElem::with_supplement(Self, Smart[Supplement?]) -> Self
+pub impl NativeElement for HeadingElem
 
 pub struct HideElem(Content)
 pub fn HideElem::body(Self) -> Content
@@ -5732,6 +5911,7 @@ pub fn HideElem::of(Content) -> Self?
 pub fn HideElem::pack(Self) -> Content
 pub fn HideElem::set_hidden(Bool) -> Style
 pub fn HideElem::with_body(Self, Content) -> Self
+pub impl NativeElement for HideElem
 
 pub struct HighlightElem(Content)
 pub fn HighlightElem::body(Self) -> Content
@@ -5769,6 +5949,7 @@ pub fn HighlightElem::with_fill(Self, Paint?) -> Self
 pub fn HighlightElem::with_radius(Self, Corners[Rel[Length]?]) -> Self
 pub fn HighlightElem::with_stroke(Self, Sides[Stroke??]) -> Self
 pub fn HighlightElem::with_top_edge(Self, TopEdge) -> Self
+pub impl NativeElement for HighlightElem
 
 pub(all) struct HintedString {
   message : String
@@ -5779,6 +5960,17 @@ pub fn HintedString::into_error_at(Self, @syntax.Span) -> SourceDiagnostic
 pub fn HintedString::into_warning_at(Self, @syntax.Span) -> SourceDiagnostic
 pub fn HintedString::new(String) -> Self
 pub fn HintedString::with_hint(Self, String) -> Self
+pub impl Fingerprint for HintedString
+
+pub struct History[T] {
+  // private fields
+}
+pub fn[T : Fingerprint] History::converged(Self[T]) -> Bool
+pub fn[T] History::final_introspector(Self[T]) -> Introspector
+pub fn[T] History::from_entries(Array[(Introspector, T)]) -> Self[T]
+pub fn[T] History::hint(Self[T], String, (T) -> String) -> String
+pub fn[T, U] History::map(Self[T], (T) -> U) -> Self[U]
+pub fn[T] History::values(Self[T]) -> Array[T]
 
 pub(all) struct Hsl {
   hue : Float
@@ -5862,6 +6054,7 @@ pub fn HtmlElem::with_css(Self, CssProperties) -> Self
 pub fn HtmlElem::with_optional_attr(Self, HtmlAttr, String?) -> Self
 pub fn HtmlElem::with_parent(Self, Location) -> Self
 pub fn HtmlElem::with_tag(Self, HtmlTag) -> Self
+pub impl NativeElement for HtmlElem
 
 pub struct HtmlFormat(Content)
 pub fn HtmlFormat::new() -> Self
@@ -5872,6 +6065,17 @@ pub fn HtmlFormat::pretty_in(StyleChain) -> Bool
 pub fn HtmlFormat::pretty_local(Self) -> Bool?
 pub fn HtmlFormat::set_pretty(Bool) -> Style
 pub fn HtmlFormat::with_pretty(Self, Bool) -> Self
+pub impl NativeElement for HtmlFormat
+
+pub(all) struct HtmlPosition {
+  // private fields
+} derive(Eq)
+pub fn HtmlPosition::at_char(Self, Int) -> Self
+pub fn HtmlPosition::details(Self) -> InnerHtmlPosition?
+pub fn HtmlPosition::element(Self) -> ArrayView[Int]
+pub fn HtmlPosition::in_frame(Self, Point) -> Self
+pub fn HtmlPosition::new(Array[Int]) -> Self
+pub impl Fingerprint for HtmlPosition
 
 pub struct HtmlTag(String) derive(Eq, Hash)
 pub fn HtmlTag::constant(String) -> Self
@@ -5967,6 +6171,7 @@ pub fn ImageElem::with_page(Self, NonZeroUSize) -> Self
 pub fn ImageElem::with_scaling(Self, Value) -> Self
 pub fn ImageElem::with_source(Self, Value) -> Self
 pub fn ImageElem::with_width(Self, Smart[Rel[Length]]) -> Self
+pub impl NativeElement for ImageElem
 
 pub struct InlineElem(Content)
 pub fn InlineElem::body(Self) -> Value
@@ -5974,24 +6179,57 @@ pub fn InlineElem::new(Value) -> Self
 pub fn InlineElem::of(Content) -> Self?
 pub fn InlineElem::pack(Self) -> Content
 pub fn InlineElem::with_body(Self, Value) -> Self
+pub impl NativeElement for InlineElem
+
+pub(all) enum InnerHtmlPosition {
+  Frame(Point)
+  Character(Int)
+} derive(Eq)
+pub impl Fingerprint for InnerHtmlPosition
+
+pub struct Introspect[T] {
+  introspect : (Engine, Introspector) -> T
+  diagnose : (History[T]) -> SourceDiagnostic
+}
+pub fn[T] Introspect::new((Engine, Introspector) -> T, (History[T]) -> SourceDiagnostic) -> Self[T]
+
+pub struct Introspection {
+  // private fields
+}
+pub fn[T : Fingerprint] Introspection::new(Introspect[T]) -> Self
+
+pub struct IntrospectionRecorder {
+  // private fields
+}
+pub fn IntrospectionRecorder::len(Self) -> Int
+pub fn IntrospectionRecorder::methods(Self) -> Array[String]
+pub fn IntrospectionRecorder::new() -> Self
+pub fn IntrospectionRecorder::validate(Self, Introspector) -> Bool
 
 pub struct Introspector {
   // private fields
 }
+pub fn Introspector::anchor(Self, Location) -> String?
+pub fn Introspector::backend(Self) -> &IntrospectorBackend
 pub fn Introspector::document(Self, Location) -> Location?
 pub fn Introspector::empty() -> Self
 pub fn Introspector::label_count(Self, Label) -> Int
+pub fn Introspector::locator(Self, U128, Location) -> Location?
+pub fn Introspector::new(&IntrospectorBackend) -> Self
 pub fn Introspector::page(Self, Location) -> NonZeroUSize?
 pub fn Introspector::page_numbering(Self, Location) -> Numbering?
 pub fn Introspector::page_supplement(Self, Location) -> Content?
 pub fn Introspector::pages(Self, Location) -> NonZeroUSize?
-pub fn Introspector::position_dict(Self, Location) -> Dict?
+pub fn Introspector::path(Self, Location) -> @syntax.VirtualPath?
+pub fn Introspector::position(Self, Location) -> DocumentPosition?
 pub fn Introspector::query(Self, Selector) -> Array[Content]
 pub fn Introspector::query_count_before(Self, Selector, Location) -> Int
 pub fn Introspector::query_first(Self, Selector) -> Content?
 pub fn Introspector::query_label(Self, Label) -> Content raise HintedError
 pub fn Introspector::query_labelled(Self) -> Array[Content]
 pub fn Introspector::query_unique(Self, Selector) -> Content raise HintedError
+pub fn Introspector::track_with(Self, IntrospectionRecorder) -> Self
+pub fn Introspector::untracked(Self) -> Self
 
 pub(all) struct ItalicToggle(Bool) derive(Eq, Hash)
 pub impl Fold for ItalicToggle
@@ -6013,6 +6251,7 @@ pub(all) struct Label(String) derive(Compare, Eq, Hash)
 pub fn Label::new(String) -> Self?
 pub fn Label::repr(Self) -> String
 pub fn Label::resolve(Self) -> String
+pub impl Fingerprint for Label
 pub impl FromValue for Label
 pub impl IntoValue for Label
 pub impl Reflect for Label
@@ -6031,6 +6270,13 @@ pub fn LayoutElem::new(Func) -> Self
 pub fn LayoutElem::of(Content) -> Self?
 pub fn LayoutElem::pack(Self) -> Content
 pub fn LayoutElem::with_func(Self, Func) -> Self
+pub impl NativeElement for LayoutElem
+
+pub(all) struct LayoutRegion {
+  size : Axes[Abs]
+  expand : Axes[Bool]
+}
+pub fn LayoutRegion::new(Axes[Abs], Axes[Bool]) -> Self
 
 pub(all) struct Length {
   abs : Abs
@@ -6051,6 +6297,7 @@ pub fn Length::zero() -> Self
 pub impl Add for Length
 pub impl Neg for Length
 pub impl Sub for Length
+pub impl Fingerprint for Length
 pub impl Fold for Length
 pub impl FromValue for Length
 pub impl IntoValue for Length
@@ -6098,6 +6345,7 @@ pub fn LimitsElem::pack(Self) -> Content
 pub fn LimitsElem::set_inline(Bool) -> Style
 pub fn LimitsElem::with_body(Self, Content) -> Self
 pub fn LimitsElem::with_inline(Self, Bool) -> Self
+pub impl NativeElement for LimitsElem
 
 pub(all) enum LineCap {
   Butt
@@ -6148,6 +6396,7 @@ pub fn LineElem::with_end(Self, Axes[Rel[Length]]?) -> Self
 pub fn LineElem::with_length(Self, Rel[Length]) -> Self
 pub fn LineElem::with_start(Self, Axes[Rel[Length]]) -> Self
 pub fn LineElem::with_stroke(Self, Stroke) -> Self
+pub impl NativeElement for LineElem
 
 pub(all) enum LineJoin {
   Miter
@@ -6199,6 +6448,7 @@ pub fn LinebreakElem::of(Content) -> Self?
 pub fn LinebreakElem::pack(Self) -> Content
 pub fn LinebreakElem::set_justify(Bool) -> Style
 pub fn LinebreakElem::with_justify(Self, Bool) -> Self
+pub impl NativeElement for LinebreakElem
 
 pub(all) enum Linebreaks {
   Simple
@@ -6219,6 +6469,7 @@ pub fn LinkElem::pack(Self) -> Content
 pub fn LinkElem::set_current(Value) -> Style
 pub fn LinkElem::with_body(Self, Content) -> Self
 pub fn LinkElem::with_dest(Self, Value) -> Self
+pub impl NativeElement for LinkElem
 
 pub struct LinkMarker(Content)
 pub fn LinkMarker::alt(Self) -> String?
@@ -6228,6 +6479,7 @@ pub fn LinkMarker::of(Content) -> Self?
 pub fn LinkMarker::pack(Self) -> Content
 pub fn LinkMarker::with_alt(Self, String?) -> Self
 pub fn LinkMarker::with_body(Self, Content) -> Self
+pub impl NativeElement for LinkMarker
 
 pub struct ListElem(Content)
 pub fn ListElem::body_indent(Self, StyleChain) -> Length
@@ -6267,6 +6519,7 @@ pub fn ListElem::with_marker(Self, ListMarker) -> Self
 pub fn ListElem::with_marker_align(Self, Alignment) -> Self
 pub fn ListElem::with_spacing(Self, Smart[Length]) -> Self
 pub fn ListElem::with_tight(Self, Bool) -> Self
+pub impl NativeElement for ListElem
 
 pub(all) struct ListItem(Content) derive(Eq)
 pub fn ListItem::body(Self) -> Content
@@ -6276,6 +6529,7 @@ pub fn ListItem::pack(Self) -> Content
 pub fn ListItem::with_body(Self, Content) -> Self
 pub impl FromValue for ListItem
 pub impl IntoValue for ListItem
+pub impl NativeElement for ListItem
 pub impl Reflect for ListItem
 
 pub(all) enum ListMarker {
@@ -6320,11 +6574,36 @@ pub impl FromValue for LocatableSelector
 pub impl IntoValue for LocatableSelector
 pub impl Reflect for LocatableSelector
 
-pub(all) struct Location(UInt64) derive(Compare, Eq, Hash)
+pub(all) struct Location(U128) derive(Eq, Hash, @debug.Debug)
+pub fn Location::hash(Self) -> U128
+pub fn Location::new(U128) -> Self
+pub fn Location::page_numbering(Self, Engine, @syntax.Span) -> Numbering?
 pub fn Location::repr(Self) -> String
+pub fn Location::variant(Self, Int) -> Self
+pub impl Show for Location
+pub impl Fingerprint for Location
 pub impl FromValue for Location
 pub impl IntoValue for Location
 pub impl Reflect for Location
+
+pub(all) struct LocationKey(U128) derive(Compare, Eq, Hash)
+pub fn LocationKey::new(Location) -> Self
+
+pub struct Locator {
+  // private fields
+}
+pub fn Locator::link(LocatorLink) -> Self
+pub fn Locator::relayout(Self) -> Self
+pub fn Locator::root() -> Self
+pub fn Locator::split(Self) -> SplitLocator
+pub fn Locator::synthesize(Location) -> Self
+pub impl Show for Locator
+
+pub struct LocatorLink {
+  // private fields
+}
+pub fn LocatorLink::measure(Location, @syntax.Span) -> Self
+pub fn LocatorLink::new(Locator) -> Self
 
 pub struct LrElem(Content)
 pub fn LrElem::body(Self) -> Content
@@ -6337,6 +6616,7 @@ pub fn LrElem::size_in(StyleChain) -> Rel[Length]
 pub fn LrElem::size_local(Self) -> Rel[Length]?
 pub fn LrElem::with_body(Self, Content) -> Self
 pub fn LrElem::with_size(Self, Rel[Length]) -> Self
+pub impl NativeElement for LrElem
 
 pub(all) struct Luma {
   luma : Float
@@ -6392,6 +6672,7 @@ pub fn MatElem::with_column_gap(Self, Rel[Length]) -> Self
 pub fn MatElem::with_delim(Self, Value) -> Self
 pub fn MatElem::with_row_gap(Self, Rel[Length]) -> Self
 pub fn MatElem::with_rows(Self, Array[Array[Content]]) -> Self
+pub impl NativeElement for MatElem
 
 pub struct MathAttachElem(Content)
 pub fn MathAttachElem::b(Self, StyleChain) -> Content?
@@ -6429,6 +6710,7 @@ pub fn MathAttachElem::with_br(Self, Content?) -> Self
 pub fn MathAttachElem::with_t(Self, Content?) -> Self
 pub fn MathAttachElem::with_tl(Self, Content?) -> Self
 pub fn MathAttachElem::with_tr(Self, Content?) -> Self
+pub impl NativeElement for MathAttachElem
 
 pub struct MathOverlineElem(Content)
 pub fn MathOverlineElem::body(Self) -> Content
@@ -6436,6 +6718,7 @@ pub fn MathOverlineElem::new(Content) -> Self
 pub fn MathOverlineElem::of(Content) -> Self?
 pub fn MathOverlineElem::pack(Self) -> Content
 pub fn MathOverlineElem::with_body(Self, Content) -> Self
+pub impl NativeElement for MathOverlineElem
 
 pub struct MathUnderlineElem(Content)
 pub fn MathUnderlineElem::body(Self) -> Content
@@ -6443,6 +6726,7 @@ pub fn MathUnderlineElem::new(Content) -> Self
 pub fn MathUnderlineElem::of(Content) -> Self?
 pub fn MathUnderlineElem::pack(Self) -> Content
 pub fn MathUnderlineElem::with_body(Self, Content) -> Self
+pub impl NativeElement for MathUnderlineElem
 
 pub struct MetadataElem(Content)
 pub fn MetadataElem::new(Value) -> Self
@@ -6450,6 +6734,7 @@ pub fn MetadataElem::of(Content) -> Self?
 pub fn MetadataElem::pack(Self) -> Content
 pub fn MetadataElem::value(Self) -> Value
 pub fn MetadataElem::with_value(Self, Value) -> Self
+pub impl NativeElement for MetadataElem
 
 pub struct MidElem(Content)
 pub fn MidElem::body(Self) -> Content
@@ -6457,6 +6742,7 @@ pub fn MidElem::new(Content) -> Self
 pub fn MidElem::of(Content) -> Self?
 pub fn MidElem::pack(Self) -> Content
 pub fn MidElem::with_body(Self, Content) -> Self
+pub impl NativeElement for MidElem
 
 pub(all) struct ModifierSet(String) derive(Eq, Hash, @debug.Debug)
 pub fn ModifierSet::as_str(Self) -> String
@@ -6502,6 +6788,7 @@ pub fn MoveElem::set_dy(Rel[Length]) -> Style
 pub fn MoveElem::with_body(Self, Content) -> Self
 pub fn MoveElem::with_dx(Self, Rel[Length]) -> Self
 pub fn MoveElem::with_dy(Self, Rel[Length]) -> Self
+pub impl NativeElement for MoveElem
 
 pub(all) enum NamedNumeralSystem {
   Arabic
@@ -6556,6 +6843,23 @@ pub struct NativeFuncData {
 pub fn NativeFuncData::new(name~ : String, title~ : String, docs? : String, keywords? : Array[String], contextual? : Bool, scope? : () -> Scope, params? : Array[ParamInfo], returns? : () -> CastInfo, (Engine, Context, Args) -> Value raise SourceError) -> Self
 pub fn NativeFuncData::scope(Self) -> Scope
 
+pub struct NativeRuleMap {
+  // private fields
+}
+pub fn NativeRuleMap::get(Self, Target, Content) -> NativeShowRule?
+pub fn NativeRuleMap::len(Self) -> Int
+pub fn NativeRuleMap::new() -> Self
+pub fn[T : NativeElement] NativeRuleMap::register(Self, Target, (T, Engine, StyleChain) -> Content raise SourceError) -> Unit
+pub fn[T : NativeElement] NativeRuleMap::replace(Self, Target, (T, Engine, StyleChain) -> Content raise SourceError) -> Unit
+pub impl Fingerprint for NativeRuleMap
+
+pub struct NativeShowRule {
+  // private fields
+}
+pub fn NativeShowRule::apply(Self, Content, Engine, StyleChain) -> Content raise SourceError
+pub fn NativeShowRule::elem(Self) -> Element
+pub fn[T : NativeElement] NativeShowRule::new((T, Engine, StyleChain) -> Content raise SourceError) -> Self
+
 pub struct NativeTypeData {
   name : String
   long_name : String
@@ -6594,6 +6898,7 @@ pub impl Reflect for NonZeroU64
 
 pub(all) struct NonZeroUSize(Int64) derive(Compare, Eq, Hash, @debug.Debug)
 pub fn NonZeroUSize::get(Self) -> Int64
+pub impl Fingerprint for NonZeroUSize
 pub impl FromValue for NonZeroUSize
 pub impl IntoValue for NonZeroUSize
 pub impl Reflect for NonZeroUSize
@@ -6628,6 +6933,7 @@ pub(all) enum Numbering {
 } derive(Eq)
 pub fn Numbering::apply(Self, Engine, Context, @syntax.Span, ArrayView[Int64]) -> Value raise SourceError
 pub fn Numbering::trimmed(Self) -> Self
+pub impl Fingerprint for Numbering
 pub impl FromValue for Numbering
 pub impl IntoValue for Numbering
 pub impl Reflect for Numbering
@@ -6719,6 +7025,14 @@ pub fn OpElem::set_limits(Bool) -> Style
 pub fn OpElem::text(Self) -> Content
 pub fn OpElem::with_limits(Self, Bool) -> Self
 pub fn OpElem::with_text(Self, Content) -> Self
+pub impl NativeElement for OpElem
+
+pub(all) struct OpenTypeTag(String) derive(Compare, Eq, Hash, @debug.Debug)
+pub fn OpenTypeTag::from_bytes_lossy(String) -> Self
+pub fn OpenTypeTag::to_str_lossy(Self) -> String
+pub impl FromValue for OpenTypeTag
+pub impl IntoValue for OpenTypeTag
+pub impl Reflect for OpenTypeTag
 
 pub(all) enum OuterHAlignment {
   Start
@@ -6772,6 +7086,7 @@ pub fn OutlineElem::with_depth(Self, NonZeroUSize?) -> Self
 pub fn OutlineElem::with_indent(Self, Smart[OutlineIndent]) -> Self
 pub fn OutlineElem::with_target(Self, LocatableSelector) -> Self
 pub fn OutlineElem::with_title(Self, Smart[Content?]) -> Self
+pub impl NativeElement for OutlineElem
 
 pub struct OutlineEntry(Content)
 pub fn OutlineEntry::element(Self) -> Content
@@ -6788,6 +7103,7 @@ pub fn OutlineEntry::set_parent(Value) -> Style
 pub fn OutlineEntry::with_element(Self, Content) -> Self
 pub fn OutlineEntry::with_fill(Self, Content?) -> Self
 pub fn OutlineEntry::with_level(Self, NonZeroUSize) -> Self
+pub impl NativeElement for OutlineEntry
 
 pub(all) enum OutlineIndent {
   Rel(Rel[Length])
@@ -6808,6 +7124,7 @@ pub fn OverbraceElem::pack(Self) -> Content
 pub fn OverbraceElem::set_annotation(Content?) -> Style
 pub fn OverbraceElem::with_annotation(Self, Content?) -> Self
 pub fn OverbraceElem::with_body(Self, Content) -> Self
+pub impl NativeElement for OverbraceElem
 
 pub struct OverbracketElem(Content)
 pub fn OverbracketElem::annotation(Self, StyleChain) -> Content?
@@ -6820,6 +7137,7 @@ pub fn OverbracketElem::pack(Self) -> Content
 pub fn OverbracketElem::set_annotation(Content?) -> Style
 pub fn OverbracketElem::with_annotation(Self, Content?) -> Self
 pub fn OverbracketElem::with_body(Self, Content) -> Self
+pub impl NativeElement for OverbracketElem
 
 pub struct OverlineElem(Content)
 pub fn OverlineElem::background(Self, StyleChain) -> Bool
@@ -6852,6 +7170,7 @@ pub fn OverlineElem::with_evade(Self, Bool) -> Self
 pub fn OverlineElem::with_extent(Self, Length) -> Self
 pub fn OverlineElem::with_offset(Self, Smart[Length]) -> Self
 pub fn OverlineElem::with_stroke(Self, Smart[Stroke]) -> Self
+pub impl NativeElement for OverlineElem
 
 pub struct OverparenElem(Content)
 pub fn OverparenElem::annotation(Self, StyleChain) -> Content?
@@ -6864,6 +7183,7 @@ pub fn OverparenElem::pack(Self) -> Content
 pub fn OverparenElem::set_annotation(Content?) -> Style
 pub fn OverparenElem::with_annotation(Self, Content?) -> Self
 pub fn OverparenElem::with_body(Self, Content) -> Self
+pub impl NativeElement for OverparenElem
 
 pub struct OvershellElem(Content)
 pub fn OvershellElem::annotation(Self, StyleChain) -> Content?
@@ -6876,6 +7196,7 @@ pub fn OvershellElem::pack(Self) -> Content
 pub fn OvershellElem::set_annotation(Content?) -> Style
 pub fn OvershellElem::with_annotation(Self, Content?) -> Self
 pub fn OvershellElem::with_body(Self, Content) -> Self
+pub impl NativeElement for OvershellElem
 
 pub struct PadElem(Content)
 pub fn PadElem::body(Self) -> Content
@@ -6903,6 +7224,7 @@ pub fn PadElem::with_bottom(Self, Rel[Length]) -> Self
 pub fn PadElem::with_left(Self, Rel[Length]) -> Self
 pub fn PadElem::with_right(Self, Rel[Length]) -> Self
 pub fn PadElem::with_top(Self, Rel[Length]) -> Self
+pub impl NativeElement for PadElem
 
 pub(all) enum PageBinding {
   Left
@@ -6951,6 +7273,7 @@ pub fn PageElem::set_supplement(Smart[Content?]) -> Style
 pub fn PageElem::set_width(Smart[Length]) -> Style
 pub fn PageElem::supplement_in(StyleChain) -> Smart[Content?]
 pub fn PageElem::width_in(StyleChain) -> Smart[Length]
+pub impl NativeElement for PageElem
 
 pub(all) struct PageRange {
   start : Int?
@@ -6985,6 +7308,7 @@ pub fn PagebreakElem::weak_local(Self) -> Bool?
 pub fn PagebreakElem::with_boundary(Self, Bool) -> Self
 pub fn PagebreakElem::with_to(Self, Parity?) -> Self
 pub fn PagebreakElem::with_weak(Self, Bool) -> Self
+pub impl NativeElement for PagebreakElem
 
 pub(all) enum PagedFormat {
   Pdf
@@ -6994,6 +7318,17 @@ pub(all) enum PagedFormat {
 pub impl FromValue for PagedFormat
 pub impl IntoValue for PagedFormat
 pub impl Reflect for PagedFormat
+
+pub(all) struct PagedPosition {
+  page : NonZeroUSize
+  point : Point
+} derive(Eq)
+pub fn PagedPosition::origin() -> Self
+pub fn PagedPosition::to_dict(Self) -> Dict
+pub impl Fingerprint for PagedPosition
+pub impl FromValue for PagedPosition
+pub impl IntoValue for PagedPosition
+pub impl Reflect for PagedPosition
 
 pub(all) enum Paint {
   Solid(Color)
@@ -7063,6 +7398,7 @@ pub fn ParElem::with_justify(Self, Bool) -> Self
 pub fn ParElem::with_leading(Self, Length) -> Self
 pub fn ParElem::with_linebreaks(Self, Smart[Linebreaks]) -> Self
 pub fn ParElem::with_spacing(Self, Length) -> Self
+pub impl NativeElement for ParElem
 
 pub struct ParLine(Content)
 pub fn ParLine::new() -> Self
@@ -7078,6 +7414,7 @@ pub fn ParLine::set_number_clearance(Smart[Length]) -> Style
 pub fn ParLine::set_number_margin(OuterHAlignment) -> Style
 pub fn ParLine::set_numbering(Numbering?) -> Style
 pub fn ParLine::set_numbering_scope(LineNumberingScope) -> Style
+pub impl NativeElement for ParLine
 
 pub struct ParLineMarker(Content)
 pub fn ParLineMarker::new(Numbering, Smart[HAlignment], OuterHAlignment, Smart[Length]) -> Self
@@ -7091,6 +7428,7 @@ pub fn ParLineMarker::with_number_align(Self, Smart[HAlignment]) -> Self
 pub fn ParLineMarker::with_number_clearance(Self, Smart[Length]) -> Self
 pub fn ParLineMarker::with_number_margin(Self, OuterHAlignment) -> Self
 pub fn ParLineMarker::with_numbering(Self, Numbering) -> Self
+pub impl NativeElement for ParLineMarker
 
 pub(all) struct ParamInfo {
   name : String
@@ -7108,6 +7446,7 @@ pub struct ParbreakElem(Content)
 pub fn ParbreakElem::new() -> Self
 pub fn ParbreakElem::of(Content) -> Self?
 pub fn ParbreakElem::pack(Self) -> Content
+pub impl NativeElement for ParbreakElem
 
 pub(all) enum Parity {
   Even
@@ -7156,6 +7495,7 @@ pub fn PdfAttachElem::with_description(Self, String?) -> Self
 pub fn PdfAttachElem::with_mime_type(Self, String?) -> Self
 pub fn PdfAttachElem::with_path(Self, Value) -> Self
 pub fn PdfAttachElem::with_relationship(Self, Value) -> Self
+pub impl NativeElement for PdfAttachElem
 
 pub struct PdfPdfFormat(Content)
 pub fn PdfPdfFormat::new() -> Self
@@ -7181,6 +7521,7 @@ pub fn PdfPdfFormat::with_pages(Self, PageRanges?) -> Self
 pub fn PdfPdfFormat::with_pretty(Self, Bool) -> Self
 pub fn PdfPdfFormat::with_standard(Self, Value) -> Self
 pub fn PdfPdfFormat::with_tagged(Self, Smart[Bool]) -> Self
+pub impl NativeElement for PdfPdfFormat
 
 pub struct PdfPdfMarkerTag(Content)
 pub fn PdfPdfMarkerTag::body(Self) -> Content
@@ -7190,6 +7531,7 @@ pub fn PdfPdfMarkerTag::of(Content) -> Self?
 pub fn PdfPdfMarkerTag::pack(Self) -> Content
 pub fn PdfPdfMarkerTag::with_body(Self, Content) -> Self
 pub fn PdfPdfMarkerTag::with_kind(Self, Value) -> Self
+pub impl NativeElement for PdfPdfMarkerTag
 
 pub struct PlaceElem(Content)
 pub fn PlaceElem::alignment(Self, StyleChain) -> Smart[Alignment]
@@ -7227,6 +7569,7 @@ pub fn PlaceElem::with_dx(Self, Rel[Length]) -> Self
 pub fn PlaceElem::with_dy(Self, Rel[Length]) -> Self
 pub fn PlaceElem::with_float(Self, Bool) -> Self
 pub fn PlaceElem::with_scope(Self, PlacementScope) -> Self
+pub impl NativeElement for PlaceElem
 
 pub(all) enum PlacementScope {
   Column
@@ -7246,6 +7589,15 @@ pub fn PngFormat::ppi_in(StyleChain) -> Value
 pub fn PngFormat::ppi_local(Self) -> Value?
 pub fn PngFormat::set_ppi(Value) -> Style
 pub fn PngFormat::with_ppi(Self, Value) -> Self
+pub impl NativeElement for PngFormat
+
+pub(all) struct Point {
+  x : Abs
+  y : Abs
+} derive(Default, Eq, Hash)
+pub fn Point::new(Abs, Abs) -> Self
+pub fn Point::zero() -> Self
+pub impl Fingerprint for Point
 
 pub struct PolygonElem(Content)
 pub fn PolygonElem::fill(Self, StyleChain) -> Paint?
@@ -7268,6 +7620,7 @@ pub fn PolygonElem::with_fill(Self, Paint?) -> Self
 pub fn PolygonElem::with_fill_rule(Self, FillRule) -> Self
 pub fn PolygonElem::with_stroke(Self, Smart[Stroke?]) -> Self
 pub fn PolygonElem::with_vertices(Self, Array[Axes[Rel[Length]]]) -> Self
+pub impl NativeElement for PolygonElem
 
 pub(all) struct PositiveF64(Double) derive(Eq, @debug.Debug)
 pub fn PositiveF64::get(Self) -> Double
@@ -7286,6 +7639,7 @@ pub fn PrefixInfo::pack(Self) -> Content
 pub fn PrefixInfo::with_inset(Self, Value) -> Self
 pub fn PrefixInfo::with_key(Self, Location) -> Self
 pub fn PrefixInfo::with_level(Self, NonZeroUSize) -> Self
+pub impl NativeElement for PrefixInfo
 
 pub struct PrimesElem(Content)
 pub fn PrimesElem::count(Self) -> USize
@@ -7293,6 +7647,7 @@ pub fn PrimesElem::new(USize) -> Self
 pub fn PrimesElem::of(Content) -> Self?
 pub fn PrimesElem::pack(Self) -> Content
 pub fn PrimesElem::with_count(Self, USize) -> Self
+pub impl NativeElement for PrimesElem
 
 pub(all) enum ProcessColor {
   Luma(Luma)
@@ -7393,6 +7748,7 @@ pub fn QuoteElem::with_attribution(Self, Attribution?) -> Self
 pub fn QuoteElem::with_block(Self, Bool) -> Self
 pub fn QuoteElem::with_body(Self, Content) -> Self
 pub fn QuoteElem::with_quotes(Self, Smart[Bool]) -> Self
+pub impl NativeElement for QuoteElem
 
 pub(all) struct RadialGradient {
   stops : Array[(Color, Ratio)]
@@ -7491,6 +7847,7 @@ pub fn RawElem::with_syntaxes(Self, Value) -> Self
 pub fn RawElem::with_tab_size(Self, USize) -> Self
 pub fn RawElem::with_text(Self, RawContent) -> Self
 pub fn RawElem::with_theme(Self, Value) -> Self
+pub impl NativeElement for RawElem
 
 pub struct RawLine(Content)
 pub fn RawLine::body(Self) -> Content
@@ -7504,6 +7861,7 @@ pub fn RawLine::with_body(Self, Content) -> Self
 pub fn RawLine::with_count(Self, Int64) -> Self
 pub fn RawLine::with_number(Self, Int64) -> Self
 pub fn RawLine::with_text(Self, String) -> Self
+pub impl NativeElement for RawLine
 
 pub(all) enum Readable {
   Str(String)
@@ -7514,6 +7872,14 @@ pub fn Readable::into_source(Self) -> DataSource
 pub impl FromValue for Readable
 pub impl IntoValue for Readable
 pub impl Reflect for Readable
+
+pub(all) enum RealizationKind {
+  Bundle
+  Document(info~ : DocumentInfo, options~ : DocumentFormatOptions)
+  Fragment(kind~ : @ref.Ref[FragmentKind])
+  Par
+  Math
+}
 
 pub struct Recipe {
   selector : Selector?
@@ -7569,6 +7935,7 @@ pub fn RectElem::with_outset(Self, Sides[Rel[Length]?]) -> Self
 pub fn RectElem::with_radius(Self, Corners[Rel[Length]?]) -> Self
 pub fn RectElem::with_stroke(Self, Smart[Sides[Stroke??]]) -> Self
 pub fn RectElem::with_width(Self, Smart[Rel[Length]]) -> Self
+pub impl NativeElement for RectElem
 
 pub struct RefElem(Content)
 pub fn RefElem::citation(Self) -> Value?
@@ -7590,6 +7957,7 @@ pub fn RefElem::with_element(Self, Content?) -> Self
 pub fn RefElem::with_form(Self, RefForm) -> Self
 pub fn RefElem::with_supplement(Self, Smart[Supplement?]) -> Self
 pub fn RefElem::with_target(Self, Label) -> Self
+pub impl NativeElement for RefElem
 
 pub(all) enum RefForm {
   Normal
@@ -7670,6 +8038,7 @@ pub fn RepeatElem::set_justify(Bool) -> Style
 pub fn RepeatElem::with_body(Self, Content) -> Self
 pub fn RepeatElem::with_gap(Self, Length) -> Self
 pub fn RepeatElem::with_justify(Self, Bool) -> Self
+pub impl NativeElement for RepeatElem
 
 pub(all) enum Replacement {
   Str(String)
@@ -7721,6 +8090,7 @@ pub fn RootElem::radicand(Self) -> Content
 pub fn RootElem::set_index(Content?) -> Style
 pub fn RootElem::with_index(Self, Content?) -> Self
 pub fn RootElem::with_radicand(Self, Content) -> Self
+pub impl NativeElement for RootElem
 
 pub struct RotateElem(Content)
 pub fn RotateElem::angle(Self, StyleChain) -> Angle
@@ -7743,6 +8113,7 @@ pub fn RotateElem::with_angle(Self, Angle) -> Self
 pub fn RotateElem::with_body(Self, Content) -> Self
 pub fn RotateElem::with_origin(Self, Alignment) -> Self
 pub fn RotateElem::with_reflow(Self, Bool) -> Self
+pub impl NativeElement for RotateElem
 
 pub struct Route {
   // private fields
@@ -7760,9 +8131,15 @@ pub fn Route::with_id(Self, @syntax.FileId) -> Self
 pub fn Route::within(Self, Int) -> Bool
 
 pub(all) struct Routines {
+  rules : () -> NativeRuleMap
   eval_string : (Engine, Context, String, @syntax.Span, @syntax.SyntaxMode, Scope) -> Value raise SourceError
   eval_closure : (Func, Closure, Engine, Context, Args) -> Value raise SourceError
+  realize : (RealizationKind, Engine, SplitLocator, Content, StyleChain) -> Array[(Content, StyleChain)] raise SourceError
+  layout_frame : (Engine, Content, Locator, StyleChain, LayoutRegion) -> Frame raise SourceError
+  html_mathml_body : (Content, StyleChain) -> Content??
+  html_span_filled : (Content, Color) -> Content
 }
+pub fn Routines::new(eval_string~ : (Engine, Context, String, @syntax.Span, @syntax.SyntaxMode, Scope) -> Value raise SourceError, eval_closure~ : (Func, Closure, Engine, Context, Args) -> Value raise SourceError, rules? : () -> NativeRuleMap, realize? : (RealizationKind, Engine, SplitLocator, Content, StyleChain) -> Array[(Content, StyleChain)] raise SourceError, layout_frame? : (Engine, Content, Locator, StyleChain, LayoutRegion) -> Frame raise SourceError, html_mathml_body? : (Content, StyleChain) -> Content??, html_span_filled? : (Content, Color) -> Content) -> Self
 
 pub(all) enum RowType {
   RowArray
@@ -7821,6 +8198,7 @@ pub fn ScaleElem::x_local(Self) -> Smart[ScaleAmount]?
 pub fn ScaleElem::y(Self, StyleChain) -> Smart[ScaleAmount]
 pub fn ScaleElem::y_in(StyleChain) -> Smart[ScaleAmount]
 pub fn ScaleElem::y_local(Self) -> Smart[ScaleAmount]?
+pub impl NativeElement for ScaleElem
 
 pub struct Scope {
   // private fields
@@ -7861,6 +8239,7 @@ pub fn ScriptsElem::new(Content) -> Self
 pub fn ScriptsElem::of(Content) -> Self?
 pub fn ScriptsElem::pack(Self) -> Content
 pub fn ScriptsElem::with_body(Self, Content) -> Self
+pub impl NativeElement for ScriptsElem
 
 pub(all) enum Selector {
   Elem(Element, Array[(Int, Value)]?)
@@ -7879,6 +8258,7 @@ pub fn Selector::matches(Self, Content, StyleChain?) -> Bool
 pub fn Selector::regex(Regex) -> Self raise HintedError
 pub fn Selector::repr(Self) -> String
 pub fn Selector::text(String) -> Self raise HintedError
+pub impl Fingerprint for Selector
 pub impl FromValue for Selector
 pub impl IntoValue for Selector
 pub impl Reflect for Selector
@@ -7934,16 +8314,42 @@ pub impl[T : IntoValue + Eq] IntoValue for Sides[T?]
 pub impl[T : Reflect] Reflect for Sides[T?]
 
 pub(all) struct Sink {
+  introspections : Array[Introspection]
   delayed : Array[SourceDiagnostic]
   warnings : Array[SourceDiagnostic]
   warnings_set : @hashset.HashSet[(@syntax.DiagSpan, String)]
   values : Array[(Value, Styles?)]
 }
+pub fn Sink::delayed_error(Self, SourceDiagnostic) -> Unit
 pub fn Sink::delayed_errors(Self, Array[SourceDiagnostic]) -> Unit
+pub fn Sink::extend_from_sink(Self, Self) -> Unit
+pub fn Sink::introspection(Self, Introspection) -> Unit
+pub fn Sink::introspections(Self) -> ArrayView[Introspection]
 pub fn Sink::new() -> Self
 pub fn Sink::take_delayed(Self) -> Array[SourceDiagnostic]
 pub fn Sink::value(Self, Value, Styles?) -> Unit
+pub fn Sink::values(Self) -> Array[(Value, Styles?)]
 pub fn Sink::warn(Self, SourceDiagnostic) -> Unit
+pub fn Sink::warnings(Self) -> Array[SourceDiagnostic]
+
+pub struct SipHasher128 {
+  // private fields
+}
+pub fn SipHasher128::finish128(Self) -> U128
+pub fn SipHasher128::new() -> Self
+pub fn[T : Fingerprint] SipHasher128::write(Self, T) -> Unit
+pub fn SipHasher128::write_bool(Self, Bool) -> Unit
+pub fn SipHasher128::write_bytes(Self, BytesView) -> Unit
+pub fn SipHasher128::write_discriminant(Self, Int) -> Unit
+pub fn SipHasher128::write_f64(Self, Double) -> Unit
+pub fn SipHasher128::write_i64(Self, Int64) -> Unit
+pub fn[T : Hash] SipHasher128::write_leaf(Self, String, T) -> Unit
+pub fn SipHasher128::write_str(Self, StringView) -> Unit
+pub fn SipHasher128::write_u128(Self, U128) -> Unit
+pub fn SipHasher128::write_u32(Self, UInt) -> Unit
+pub fn SipHasher128::write_u64(Self, UInt64) -> Unit
+pub fn SipHasher128::write_u8(Self, Byte) -> Unit
+pub fn SipHasher128::write_usize(Self, Int) -> Unit
 
 pub(all) enum Sizing {
   Auto
@@ -7983,6 +8389,7 @@ pub fn SkewElem::with_ay(Self, Angle) -> Self
 pub fn SkewElem::with_body(Self, Content) -> Self
 pub fn SkewElem::with_origin(Self, Alignment) -> Self
 pub fn SkewElem::with_reflow(Self, Bool) -> Self
+pub impl NativeElement for SkewElem
 
 pub struct SmallcapsElem(Content)
 pub fn SmallcapsElem::all(Self, StyleChain) -> Bool
@@ -7995,6 +8402,7 @@ pub fn SmallcapsElem::pack(Self) -> Content
 pub fn SmallcapsElem::set_all(Bool) -> Style
 pub fn SmallcapsElem::with_all(Self, Bool) -> Self
 pub fn SmallcapsElem::with_body(Self, Content) -> Self
+pub impl NativeElement for SmallcapsElem
 
 pub(all) enum Smart[T] {
   Auto
@@ -8059,6 +8467,7 @@ pub fn SmartQuoteElem::with_alternative(Self, Bool) -> Self
 pub fn SmartQuoteElem::with_double(Self, Bool) -> Self
 pub fn SmartQuoteElem::with_enabled(Self, Bool) -> Self
 pub fn SmartQuoteElem::with_quotes(Self, Smart[SmartQuoteDict]) -> Self
+pub impl NativeElement for SmartQuoteElem
 
 pub(all) struct SmartQuoteSet {
   open : String
@@ -8093,6 +8502,7 @@ pub fn SourceDiagnostic::warning_at(@syntax.Span, String) -> Self
 pub fn SourceDiagnostic::with_hint(Self, String) -> Self
 pub fn SourceDiagnostic::with_hints(Self, ArrayView[String]) -> Self
 pub fn SourceDiagnostic::with_tracepoint(Self, Tracepoint, @syntax.Span) -> Self
+pub impl Fingerprint for SourceDiagnostic
 
 pub struct SpaceElem(Content)
 pub fn SpaceElem::had_newline(Self) -> Bool
@@ -8102,6 +8512,7 @@ pub fn SpaceElem::pack(Self) -> Content
 pub fn SpaceElem::shared() -> Content
 pub fn SpaceElem::shared_with_newline() -> Content
 pub fn SpaceElem::with_had_newline(Self, Bool) -> Self
+pub impl NativeElement for SpaceElem
 
 pub(all) enum Spacing {
   Rel(Rel[Length])
@@ -8122,6 +8533,13 @@ pub fn[H : AlignmentComponent, V : AlignmentComponent] SpecificAlignment::to_ali
 pub impl[H : AlignmentComponent, V : AlignmentComponent] FromValue for SpecificAlignment[H, V]
 pub impl[H : AlignmentComponent, V : AlignmentComponent] IntoValue for SpecificAlignment[H, V]
 pub impl[H : AlignmentComponent, V : AlignmentComponent] Reflect for SpecificAlignment[H, V]
+
+pub struct SplitLocator {
+  // private fields
+}
+pub fn[K : Fingerprint] SplitLocator::next(Self, K) -> Locator
+pub fn SplitLocator::next_inner(Self, U128) -> Locator
+pub fn SplitLocator::next_location(Self, Engine, U128, @syntax.Span) -> Location
 
 pub(all) struct SpotColor {
   colorant : SpotColorant
@@ -8196,6 +8614,7 @@ pub fn SquareElem::with_outset(Self, Sides[Rel[Length]?]) -> Self
 pub fn SquareElem::with_radius(Self, Corners[Rel[Length]?]) -> Self
 pub fn SquareElem::with_stroke(Self, Smart[Sides[Stroke??]]) -> Self
 pub fn SquareElem::with_width(Self, Smart[Rel[Length]]) -> Self
+pub impl NativeElement for SquareElem
 
 pub(all) enum StackChild {
   Spacing(Spacing)
@@ -8221,6 +8640,7 @@ pub fn StackElem::spacing_local(Self) -> Spacing??
 pub fn StackElem::with_children(Self, Array[StackChild]) -> Self
 pub fn StackElem::with_dir(Self, Dir) -> Self
 pub fn StackElem::with_spacing(Self, Spacing?) -> Self
+pub impl NativeElement for StackElem
 
 pub(all) struct State {
   key : String
@@ -8230,6 +8650,7 @@ pub fn State::new(String, Value) -> Self
 pub fn State::repr(Self) -> String
 pub fn State::select(Self) -> Selector
 pub fn State::select_any() -> Selector
+pub impl Fingerprint for State
 pub impl FromValue for State
 pub impl IntoValue for State
 pub impl Reflect for State
@@ -8238,6 +8659,7 @@ pub(all) enum StateUpdate {
   Set(Value)
   Func(Func)
 } derive(Eq)
+pub impl Fingerprint for StateUpdate
 pub impl FromValue for StateUpdate
 pub impl IntoValue for StateUpdate
 pub impl Reflect for StateUpdate
@@ -8250,6 +8672,7 @@ pub fn StateUpdateElem::pack(Self) -> Content
 pub fn StateUpdateElem::update(Self) -> StateUpdate
 pub fn StateUpdateElem::with_key(Self, String) -> Self
 pub fn StateUpdateElem::with_update(Self, StateUpdate) -> Self
+pub impl NativeElement for StateUpdateElem
 
 pub(all) enum StrPattern {
   Str(String)
@@ -8278,6 +8701,7 @@ pub fn StretchElem::size_in(StyleChain) -> Rel[Length]
 pub fn StretchElem::size_local(Self) -> Rel[Length]?
 pub fn StretchElem::with_body(Self, Content) -> Self
 pub fn StretchElem::with_size(Self, Rel[Length]) -> Self
+pub impl NativeElement for StretchElem
 
 pub struct StrikeElem(Content)
 pub fn StrikeElem::background(Self, StyleChain) -> Bool
@@ -8305,6 +8729,7 @@ pub fn StrikeElem::with_body(Self, Content) -> Self
 pub fn StrikeElem::with_extent(Self, Length) -> Self
 pub fn StrikeElem::with_offset(Self, Smart[Length]) -> Self
 pub fn StrikeElem::with_stroke(Self, Smart[Stroke]) -> Self
+pub impl NativeElement for StrikeElem
 
 pub(all) struct Stroke {
   paint : Smart[Paint]
@@ -8334,6 +8759,7 @@ pub fn StrongElem::pack(Self) -> Content
 pub fn StrongElem::set_delta(Int64) -> Style
 pub fn StrongElem::with_body(Self, Content) -> Self
 pub fn StrongElem::with_delta(Self, Int64) -> Self
+pub impl NativeElement for StrongElem
 
 pub(all) enum Style {
   Property(Property)
@@ -8346,6 +8772,7 @@ pub fn Style::outside(Self) -> Bool
 pub fn Style::property(Self) -> Property?
 pub fn Style::recipe(Self) -> Recipe?
 pub fn Style::span(Self) -> @syntax.Span
+pub impl Fingerprint for Style
 
 pub struct StyleChain {
   head : Array[Style]
@@ -8388,6 +8815,7 @@ pub fn Styles::set(Self, Element, Int, Value) -> Unit
 pub fn Styles::spanned(Self, @syntax.Span) -> Self
 pub fn Styles::unset(Self) -> Unit
 pub impl Eq for Styles
+pub impl Fingerprint for Styles
 pub impl FromValue for Styles
 pub impl IntoValue for Styles
 pub impl Reflect for Styles
@@ -8420,6 +8848,7 @@ pub fn SubElem::with_baseline(Self, Smart[Length]) -> Self
 pub fn SubElem::with_body(Self, Content) -> Self
 pub fn SubElem::with_size(Self, Smart[TextSize]) -> Self
 pub fn SubElem::with_typographic(Self, Bool) -> Self
+pub impl NativeElement for SubElem
 
 pub struct SuperElem(Content)
 pub fn SuperElem::baseline(Self, StyleChain) -> Smart[Length]
@@ -8442,6 +8871,7 @@ pub fn SuperElem::with_baseline(Self, Smart[Length]) -> Self
 pub fn SuperElem::with_body(Self, Content) -> Self
 pub fn SuperElem::with_size(Self, Smart[TextSize]) -> Self
 pub fn SuperElem::with_typographic(Self, Bool) -> Self
+pub impl NativeElement for SuperElem
 
 pub(all) enum Supplement {
   Content(Content)
@@ -8460,6 +8890,7 @@ pub fn SvgFormat::pretty_in(StyleChain) -> Bool
 pub fn SvgFormat::pretty_local(Self) -> Bool?
 pub fn SvgFormat::set_pretty(Bool) -> Style
 pub fn SvgFormat::with_pretty(Self, Bool) -> Self
+pub impl NativeElement for SvgFormat
 
 pub struct Symbol {
   // private fields
@@ -8486,6 +8917,7 @@ pub fn SymbolElem::pack(Self) -> Content
 pub fn SymbolElem::packed(String) -> Content
 pub fn SymbolElem::text(Self) -> String
 pub fn SymbolElem::with_text(Self, String) -> Self
+pub impl NativeElement for SymbolElem
 
 pub(all) struct SymbolVariant(String, String)
 pub impl FromValue for SymbolVariant
@@ -8555,6 +8987,7 @@ pub fn TableCell::y_in(StyleChain) -> Smart[USize]
 pub fn TableCell::y_local(Self) -> Smart[USize]?
 pub impl FromValue for TableCell
 pub impl IntoValue for TableCell
+pub impl NativeElement for TableCell
 pub impl Reflect for TableCell
 
 pub(all) enum TableCellKind {
@@ -8629,6 +9062,7 @@ pub fn TableElem::with_stroke(Self, Celled[Sides[Stroke??]]) -> Self
 pub fn TableElem::with_summary(Self, String?) -> Self
 pub impl FromValue for TableElem
 pub impl IntoValue for TableElem
+pub impl NativeElement for TableElem
 pub impl Reflect for TableElem
 
 pub struct TableFooter(Content)
@@ -8642,6 +9076,7 @@ pub fn TableFooter::repeat_local(Self) -> Bool?
 pub fn TableFooter::set_repeat(Bool) -> Style
 pub fn TableFooter::with_children(Self, Array[TableItem]) -> Self
 pub fn TableFooter::with_repeat(Self, Bool) -> Self
+pub impl NativeElement for TableFooter
 
 pub struct TableHLine(Content)
 pub fn TableHLine::end(Self, StyleChain) -> NonZeroUSize?
@@ -8672,6 +9107,7 @@ pub fn TableHLine::with_y(Self, Smart[USize]) -> Self
 pub fn TableHLine::y(Self, StyleChain) -> Smart[USize]
 pub fn TableHLine::y_in(StyleChain) -> Smart[USize]
 pub fn TableHLine::y_local(Self) -> Smart[USize]?
+pub impl NativeElement for TableHLine
 
 pub struct TableHeader(Content)
 pub fn TableHeader::children(Self) -> Array[TableItem]
@@ -8689,6 +9125,7 @@ pub fn TableHeader::set_repeat(Bool) -> Style
 pub fn TableHeader::with_children(Self, Array[TableItem]) -> Self
 pub fn TableHeader::with_level(Self, NonZeroU32) -> Self
 pub fn TableHeader::with_repeat(Self, Bool) -> Self
+pub impl NativeElement for TableHeader
 
 pub(all) enum TableHeaderScope {
   Both
@@ -8741,30 +9178,58 @@ pub fn TableVLine::with_x(Self, Smart[USize]) -> Self
 pub fn TableVLine::x(Self, StyleChain) -> Smart[USize]
 pub fn TableVLine::x_in(StyleChain) -> Smart[USize]
 pub fn TableVLine::x_local(Self) -> Smart[USize]?
+pub impl NativeElement for TableVLine
 
-pub(all) struct Tag(String) derive(Compare, Eq, Hash, @debug.Debug)
-pub fn Tag::from_bytes_lossy(String) -> Self
-pub fn Tag::to_str_lossy(Self) -> String
+pub(all) enum Tag {
+  Start(Content, TagFlags)
+  End(Location, U128, TagFlags)
+} derive(Eq)
+pub fn Tag::location(Self) -> Location
+pub impl Show for Tag
+pub impl Fingerprint for Tag
 pub impl FromValue for Tag
 pub impl IntoValue for Tag
 pub impl Reflect for Tag
 
 pub struct TagElem(Content)
-pub fn TagElem::new(Value) -> Self
+pub fn TagElem::new(Tag) -> Self
 pub fn TagElem::of(Content) -> Self?
 pub fn TagElem::pack(Self) -> Content
-pub fn TagElem::tag(Self) -> Value
-pub fn TagElem::with_tag(Self, Value) -> Self
+pub fn TagElem::packed(Tag) -> Content
+pub fn TagElem::tag(Self) -> Tag
+pub fn TagElem::with_tag(Self, Tag) -> Self
+pub impl NativeElement for TagElem
+
+pub(all) struct TagFlags {
+  introspectable : Bool
+  tagged : Bool
+} derive(Eq, Hash, @debug.Debug)
+pub fn TagFlags::any(Self) -> Bool
+pub impl Fingerprint for TagFlags
+
+pub(all) enum Target {
+  Paged
+  Html
+  Bundle
+} derive(Eq, Hash, @debug.Debug)
+pub fn Target::default() -> Self
+pub fn Target::is_html(Self) -> Bool
+pub impl Show for Target
+pub impl Fingerprint for Target
+pub impl FromValue for Target
+pub impl IntoValue for Target
+pub impl Reflect for Target
 
 pub struct TargetElem(Content)
 pub fn TargetElem::new() -> Self
 pub fn TargetElem::of(Content) -> Self?
 pub fn TargetElem::pack(Self) -> Content
-pub fn TargetElem::set_target(Value) -> Style
-pub fn TargetElem::target(Self, StyleChain) -> Value
-pub fn TargetElem::target_in(StyleChain) -> Value
-pub fn TargetElem::target_local(Self) -> Value?
-pub fn TargetElem::with_target(Self, Value) -> Self
+pub fn TargetElem::set_target(Target) -> Style
+pub fn TargetElem::target(Self, StyleChain) -> Target
+pub fn TargetElem::target_in(StyleChain) -> Target
+pub fn TargetElem::target_local(Self) -> Target?
+pub fn TargetElem::with_target(Self, Target) -> Self
+pub impl NativeElement for TargetElem
 
 pub(all) struct TermItem(Content) derive(Eq)
 pub fn TermItem::description(Self) -> Content
@@ -8776,6 +9241,7 @@ pub fn TermItem::with_description(Self, Content) -> Self
 pub fn TermItem::with_term(Self, Content) -> Self
 pub impl FromValue for TermItem
 pub impl IntoValue for TermItem
+pub impl NativeElement for TermItem
 pub impl Reflect for TermItem
 
 pub struct TermsElem(Content)
@@ -8811,6 +9277,7 @@ pub fn TermsElem::with_separator(Self, Content) -> Self
 pub fn TermsElem::with_spacing(Self, Smart[Length]) -> Self
 pub fn TermsElem::with_tight(Self, Bool) -> Self
 pub fn TermsElem::within_in(StyleChain) -> Bool
+pub impl NativeElement for TermsElem
 
 pub(all) struct TextDir(Smart[Dir]) derive(Eq, Hash)
 pub impl FromValue for TextDir
@@ -8904,6 +9371,7 @@ pub fn TextElem::tracking_in(StyleChain) -> Length
 pub fn TextElem::variations_in(StyleChain) -> FontVariations
 pub fn TextElem::weight_in(StyleChain) -> FontWeight
 pub fn TextElem::with_text(Self, String) -> Self
+pub impl NativeElement for TextElem
 
 pub(all) struct TextSize(Length) derive(Eq, Hash)
 pub impl Fold for TextSize
@@ -8936,6 +9404,7 @@ pub fn TitleElem::of(Content) -> Self?
 pub fn TitleElem::pack(Self) -> Content
 pub fn TitleElem::set_body(Smart[Content]) -> Style
 pub fn TitleElem::with_body(Self, Smart[Content]) -> Self
+pub impl NativeElement for TitleElem
 
 pub(all) struct ToAbs(Value)
 pub impl FromValue for ToAbs
@@ -9027,6 +9496,7 @@ pub(all) enum Transformation {
   Func(Func)
   Style(Styles)
 } derive(Eq)
+pub impl Fingerprint for Transformation
 pub impl FromValue for Transformation
 pub impl Reflect for Transformation
 
@@ -9086,9 +9556,18 @@ pub impl Compare for Type
 pub impl Eq for Type
 pub impl Hash for Type
 pub impl Show for Type
+pub impl Fingerprint for Type
 pub impl FromValue for Type
 pub impl IntoValue for Type
 pub impl Reflect for Type
+
+pub(all) struct U128 {
+  hi : UInt64
+  lo : UInt64
+} derive(Compare, Default, Eq, Hash, @debug.Debug)
+pub fn U128::from_u64(UInt64) -> Self
+pub impl Show for U128
+pub impl Fingerprint for U128
 
 pub(all) struct U16(Int64) derive(Compare, Eq, Hash, @debug.Debug)
 pub fn U16::get(Self) -> Int64
@@ -9131,6 +9610,7 @@ pub fn UnderbraceElem::pack(Self) -> Content
 pub fn UnderbraceElem::set_annotation(Content?) -> Style
 pub fn UnderbraceElem::with_annotation(Self, Content?) -> Self
 pub fn UnderbraceElem::with_body(Self, Content) -> Self
+pub impl NativeElement for UnderbraceElem
 
 pub struct UnderbracketElem(Content)
 pub fn UnderbracketElem::annotation(Self, StyleChain) -> Content?
@@ -9143,6 +9623,7 @@ pub fn UnderbracketElem::pack(Self) -> Content
 pub fn UnderbracketElem::set_annotation(Content?) -> Style
 pub fn UnderbracketElem::with_annotation(Self, Content?) -> Self
 pub fn UnderbracketElem::with_body(Self, Content) -> Self
+pub impl NativeElement for UnderbracketElem
 
 pub struct UnderlineElem(Content)
 pub fn UnderlineElem::background(Self, StyleChain) -> Bool
@@ -9175,6 +9656,7 @@ pub fn UnderlineElem::with_evade(Self, Bool) -> Self
 pub fn UnderlineElem::with_extent(Self, Length) -> Self
 pub fn UnderlineElem::with_offset(Self, Smart[Length]) -> Self
 pub fn UnderlineElem::with_stroke(Self, Smart[Stroke]) -> Self
+pub impl NativeElement for UnderlineElem
 
 pub struct UnderparenElem(Content)
 pub fn UnderparenElem::annotation(Self, StyleChain) -> Content?
@@ -9187,6 +9669,7 @@ pub fn UnderparenElem::pack(Self) -> Content
 pub fn UnderparenElem::set_annotation(Content?) -> Style
 pub fn UnderparenElem::with_annotation(Self, Content?) -> Self
 pub fn UnderparenElem::with_body(Self, Content) -> Self
+pub impl NativeElement for UnderparenElem
 
 pub struct UndershellElem(Content)
 pub fn UndershellElem::annotation(Self, StyleChain) -> Content?
@@ -9199,6 +9682,7 @@ pub fn UndershellElem::pack(Self) -> Content
 pub fn UndershellElem::set_annotation(Content?) -> Style
 pub fn UndershellElem::with_annotation(Self, Content?) -> Self
 pub fn UndershellElem::with_body(Self, Content) -> Self
+pub impl NativeElement for UndershellElem
 
 pub(all) enum UnicodeNormalForm {
   Nfc
@@ -9247,6 +9731,7 @@ pub fn VElem::weak_local(Self) -> Bool?
 pub fn VElem::with_amount(Self, Spacing) -> Self
 pub fn VElem::with_attach(Self, Bool) -> Self
 pub fn VElem::with_weak(Self, Bool) -> Self
+pub impl NativeElement for VElem
 
 pub(all) enum Value {
   None
@@ -9292,6 +9777,7 @@ pub fn Value::spanned(Self, @syntax.Span) -> Self
 pub fn Value::to_serde(Self, Bool) -> @serde.Data
 pub fn Value::ty(Self) -> Type
 pub impl Eq for Value
+pub impl Fingerprint for Value
 pub impl FromValue for Value
 pub impl IntoValue for Value
 pub impl Reflect for Value
@@ -9317,6 +9803,7 @@ pub fn VecElem::with_align(Self, HAlignment) -> Self
 pub fn VecElem::with_children(Self, Array[Content]) -> Self
 pub fn VecElem::with_delim(Self, Value) -> Self
 pub fn VecElem::with_gap(Self, Rel[Length]) -> Self
+pub impl NativeElement for VecElem
 
 pub struct Version(Array[UInt]) derive(Hash)
 pub fn Version::component(Self, String) -> Int64 raise HintedError
@@ -9369,7 +9856,11 @@ pub impl Reflect for WritingScript
 // Type aliases
 pub type NativeFn = (Engine, Context, Args) -> Value raise SourceError
 
+pub type Pair = (Content, StyleChain)
+
 pub using @syntax {type RootedPath}
+
+pub type ShowFn[T] = (T, Engine, StyleChain) -> Content raise SourceError
 
 pub type SymbolVariantData = (ModifierSet, String, String?)
 
@@ -9378,6 +9869,26 @@ pub(open) trait AlignmentComponent : Reflect {
   fn try_from_alignment(Alignment) -> Self raise HintedError
   fn to_alignment(Self) -> Alignment
 }
+
+pub(open) trait Fingerprint {
+  fn fingerprint(Self, SipHasher128) -> Unit
+}
+pub impl Fingerprint for Unit
+pub impl Fingerprint for Bool
+pub impl Fingerprint for Int
+pub impl Fingerprint for Int64
+pub impl Fingerprint for UInt
+pub impl Fingerprint for UInt64
+pub impl Fingerprint for Double
+pub impl Fingerprint for String
+pub impl[T : Fingerprint] Fingerprint for T?
+pub impl[T : Fingerprint, E : Fingerprint] Fingerprint for Result[T, E]
+pub impl[T : Fingerprint] Fingerprint for Array[T]
+pub impl Fingerprint for @syntax.Span
+pub impl Fingerprint for @syntax.VirtualPath
+pub impl[A : Fingerprint, B : Fingerprint] Fingerprint for (A, B)
+pub impl[A : Fingerprint, B : Fingerprint, C : Fingerprint] Fingerprint for (A, B, C)
+pub impl[A : Fingerprint, B : Fingerprint, C : Fingerprint, D : Fingerprint] Fingerprint for (A, B, C, D)
 
 pub(open) trait Fold {
   fn fold(Self, Self) -> Self
@@ -9413,11 +9924,42 @@ pub impl IntoValue for @syntax.RootedPath
 pub impl IntoValue for @syntax.SyntaxMode
 pub impl IntoValue for @time.Month
 
+pub(open) trait IntrospectorBackend {
+  fn query(Self, Selector) -> Array[Content]
+  fn query_first(Self, Selector) -> Content?
+  fn query_unique(Self, Selector) -> Content raise HintedError
+  fn query_label(Self, Label) -> Content raise HintedError
+  fn query_labelled(Self) -> Array[Content]
+  fn query_count_before(Self, Selector, Location) -> Int
+  fn label_count(Self, Label) -> Int
+  fn locator(Self, U128, Location) -> Location?
+  fn pages(Self, Location) -> NonZeroUSize?
+  fn page(Self, Location) -> NonZeroUSize?
+  fn position(Self, Location) -> DocumentPosition?
+  fn page_numbering(Self, Location) -> Numbering?
+  fn page_supplement(Self, Location) -> Content?
+  fn anchor(Self, Location) -> String?
+  fn document(Self, Location) -> Location?
+  fn path(Self, Location) -> @syntax.VirtualPath?
+}
+
+pub(open) trait NativeElement {
+  fn elem() -> Element
+  fn from_content_unchecked(Content) -> Self
+  fn into_content(Self) -> Content
+}
+
 pub(open) trait Numeric : Add + Sub + Neg + Eq {
   fn zero() -> Self
   fn is_finite(Self) -> Bool
   fn scale(Self, Double) -> Self
   fn div_scale(Self, Double) -> Self
+}
+
+pub(open) trait Output {
+  fn target() -> Target
+  fn create(Engine, Content, StyleChain) -> Self raise SourceError
+  fn introspector(Self) -> Introspector
 }
 
 pub(open) trait Reflect {

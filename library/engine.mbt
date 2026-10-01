@@ -134,23 +134,6 @@ pub(all) struct Library {
 }
 
 ///|
-/// Defines implementation of various Typst compiler routines as a table of
-/// function pointers (upstream `Routines`).
-pub(all) struct Routines {
-  /// Evaluates a string as code/markup/math.
-  eval_string : (
-    Engine,
-    Context,
-    String,
-    @syntax.Span,
-    @syntax.SyntaxMode,
-    Scope,
-  ) -> Value raise SourceError
-  /// Calls a closure.
-  eval_closure : (Func, Closure, Engine, Context, Args) -> Value raise SourceError
-}
-
-///|
 /// Holds all data needed during compilation.
 pub(all) struct Engine {
   /// The compilation environment.
@@ -190,6 +173,21 @@ pub fn[T] Engine::delay(
 }
 
 ///|
+/// Performs an introspection on the introspector and returns its result.
+///
+/// As a side effect, the introspection is stored in the sink. If the
+/// document does not converge, the recorded introspections are used to
+/// determine the cause of non-convergence.
+pub fn[T : Fingerprint] Engine::introspect(
+  self : Engine,
+  introspection : Introspect[T],
+) -> T {
+  let output = (introspection.introspect)(self, self.introspector)
+  self.sink.introspection(Introspection::new(introspection))
+  output
+}
+
+///|
 /// A binding guard that emits deprecation warnings at `span`.
 pub fn Engine::binding_guard(
   self : Engine,
@@ -226,10 +224,16 @@ pub fn Traced::get(self : Traced, id : @syntax.FileId) -> @syntax.Span? {
 }
 
 ///|
-/// A push-only sink for delayed errors, warnings, and traced values.
+/// A push-only sink for recorded introspections, delayed errors, warnings,
+/// and traced values.
 pub(all) struct Sink {
+  /// Introspections that were performed during compilation.
+  introspections : Array[Introspection]
   /// Delayed errors: Those are errors that we can ignore until the last
-  /// iteration.
+  /// iteration. For instance, show rules may throw during earlier iterations
+  /// because the introspector is not yet ready. We first ignore that and
+  /// proceed with empty content and only if the error remains by the end of
+  /// the last iteration, we promote it.
   delayed : Array[SourceDiagnostic]
   /// Warnings emitted during iteration.
   warnings : Array[SourceDiagnostic]
@@ -245,7 +249,76 @@ pub let sink_max_values : Int = 10
 
 ///|
 pub fn Sink::new() -> Sink {
-  { delayed: [], warnings: [], warnings_set: @hashset.HashSet([]), values: [], }
+  {
+    introspections: [],
+    delayed: [],
+    warnings: [],
+    warnings_set: @hashset.HashSet([]),
+    values: [],
+  }
+}
+
+///|
+/// Get the introspections.
+pub fn Sink::introspections(self : Sink) -> ArrayView[Introspection] {
+  self.introspections
+}
+
+///|
+/// Get the stored warnings.
+pub fn Sink::warnings(self : Sink) -> Array[SourceDiagnostic] {
+  self.warnings.copy()
+}
+
+///|
+/// Get the values for the traced span.
+pub fn Sink::values(self : Sink) -> Array[(Value, Styles?)] {
+  self.values.copy()
+}
+
+///|
+/// Extend from another sink.
+pub fn Sink::extend_from_sink(self : Sink, other : Sink) -> Unit {
+  self.extend_parts(
+    other.introspections,
+    other.delayed,
+    other.warnings,
+    other.values,
+  )
+}
+
+///|
+/// Trace an introspection.
+pub fn Sink::introspection(self : Sink, introspection : Introspection) -> Unit {
+  self.introspections.push(introspection)
+}
+
+///|
+/// Add a delayed error.
+pub fn Sink::delayed_error(self : Sink, error : SourceDiagnostic) -> Unit {
+  self.delayed.push(error)
+}
+
+///|
+/// Extend from parts of another sink.
+fn Sink::extend_parts(
+  self : Sink,
+  introspections : Array[Introspection],
+  delayed : Array[SourceDiagnostic],
+  warnings : Array[SourceDiagnostic],
+  values : Array[(Value, Styles?)],
+) -> Unit {
+  self.introspections.append(introspections)
+  self.delayed.append(delayed)
+  for warning in warnings {
+    self.warn(warning)
+  }
+  for value in values {
+    if self.values.length() >= sink_max_values {
+      break
+    }
+    self.values.push(value)
+  }
 }
 
 ///|
@@ -447,21 +520,4 @@ fn context_required() -> HintedString {
   .with_hint(
     "the `context` expression should wrap everything that depends on this function",
   )
-}
-
-///|
-/// Identifies an element in the document (upstream `Location`; see
-/// `location.mbt`).
-pub(all) struct Location(UInt64) derive(Eq, Hash, Compare)
-
-///|
-/// Queries elements and their details (placeholder; see
-/// introspection/introspector.rs).
-pub struct Introspector {
-  priv dummy : Unit
-}
-
-///|
-pub fn Introspector::empty() -> Introspector {
-  { dummy: (), }
 }
