@@ -78,6 +78,8 @@ pub fn rust_debug_str(StringView) -> String
 
 pub fn script(Char) -> String
 
+pub fn script_extension_ranges(String) -> Array[(Int, Int)]?
+
 pub fn script_ranges(String) -> Array[(Int, Int)]?
 
 pub fn simple_fold_next(Int) -> Int?

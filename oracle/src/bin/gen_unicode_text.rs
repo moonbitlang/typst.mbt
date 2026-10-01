@@ -228,6 +228,25 @@ fn main() {
     let sca: Vec<String> = sc_aliases.iter().flat_map(|(a, b)| [a.clone(), b.clone()]).collect();
     emit_names(&mut out, "script_alias_pairs", "Script aliases: `[alias, canonical, ...]`.", &sca);
 
+    // Script extensions: `[offset...]` into flat ranges, indexed like
+    // `regex_script_names`.
+    let mut flat = Vec::new();
+    let mut offsets = Vec::new();
+    for name in &sc_names {
+        offsets.push(flat.len() as u32);
+        let r = class_of(&format!(r"\p{{scx={name}}}"));
+        flat.extend(r.iter().flat_map(|&(a, b)| [a, b]));
+    }
+    offsets.push(flat.len() as u32);
+    emit_ints(
+        &mut out,
+        "script_extension_offsets",
+        "Start of each script's `Script_Extensions` ranges in `script_extension_table`.",
+        &offsets,
+        12,
+    );
+    emit_ints(&mut out, "script_extension_table", "Script_Extensions ranges.", &flat, 12);
+
     // Binary properties.
     let start = bool_src.find("BY_NAME").unwrap();
     let body = &bool_src[start..];

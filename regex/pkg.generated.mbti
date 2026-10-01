@@ -1,0 +1,50 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/regex"
+
+import {
+  "moonbitlang/core/debug",
+}
+
+// Values
+
+// Errors
+pub suberror RegexError {
+  RegexError(String)
+}
+pub fn RegexError::message(Self) -> String
+pub impl Show for RegexError
+
+// Types and methods
+pub struct Captures {
+  // private fields
+}
+pub fn Captures::get(Self, Int) -> Match?
+pub fn Captures::iter(Self) -> Iter[Match?]
+pub fn Captures::len(Self) -> Int
+
+pub(all) struct Match {
+  start : Int
+  end : Int
+  text : String
+} derive(Eq, @debug.Debug)
+
+pub struct Regex {
+  // private fields
+}
+pub fn Regex::as_str(Self) -> String
+pub fn Regex::capture_names(Self) -> Array[String?]
+pub fn Regex::captures(Self, String) -> Captures?
+pub fn Regex::captures_iter(Self, String) -> Array[Captures]
+pub fn Regex::find(Self, String) -> Match?
+pub fn Regex::find_at(Self, String, Int) -> Match?
+pub fn Regex::find_iter(Self, String) -> Array[Match]
+pub fn Regex::is_match(Self, String) -> Bool
+pub fn Regex::new(String) -> Self raise RegexError
+pub fn Regex::split(Self, String) -> Array[String]
+pub impl Eq for Regex
+pub impl Hash for Regex
+pub impl Show for Regex
+
+// Type aliases
+
+// Traits

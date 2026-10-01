@@ -182,6 +182,24 @@ pub fn script_ranges(canonical : String) -> Array[(Int, Int)]? {
 }
 
 ///|
+/// The `Script_Extensions` ranges of a canonical script. `None` if there is
+/// no data for it.
+pub fn script_extension_ranges(canonical : String) -> Array[(Int, Int)]? {
+  for i, name in regex_script_names {
+    if name == canonical {
+      let out = []
+      for j = script_extension_offsets[i]
+          j < script_extension_offsets[i + 1]
+          j = j + 2 {
+        out.push((script_extension_table[j], script_extension_table[j + 1]))
+      }
+      return Some(out)
+    }
+  }
+  None
+}
+
+///|
 /// The ranges of a canonical binary property. `None` if there is no data
 /// for it.
 pub fn bool_property_ranges(canonical : String) -> Array[(Int, Int)]? {
