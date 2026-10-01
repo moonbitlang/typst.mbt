@@ -1,0 +1,305 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/time"
+
+import {
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub const MAX_YEAR : Int = 9999
+
+pub const MIN_YEAR : Int = -9999
+
+pub fn days_in_month(Month, Int) -> Int
+
+pub fn days_in_year(Int) -> Int
+
+pub fn is_leap_year(Int) -> Bool
+
+pub fn parse_borrowed_v2(String) -> Array[FormatItem] raise InvalidFormatDescription
+
+pub fn parse_owned_v2(String) -> FormatItem raise InvalidFormatDescription
+
+pub fn weeks_in_year(Int) -> Int
+
+// Errors
+pub(all) suberror ComponentRange {
+  ComponentRange(name~ : String, is_conditional~ : Bool)
+} derive(Eq, Hash, @debug.Debug)
+pub fn ComponentRange::is_conditional(Self) -> Bool
+pub fn ComponentRange::name(Self) -> String
+pub impl Show for ComponentRange
+
+pub(all) suberror Format {
+  InsufficientTypeInformation
+  InvalidComponent(String)
+  ComponentRange(ComponentRange)
+  StdIo(String)
+} derive(Eq, @debug.Debug)
+pub impl Show for Format
+
+pub(all) suberror InvalidFormatDescription {
+  UnclosedOpeningBracket(index~ : Int)
+  InvalidComponentName(name~ : String, index~ : Int)
+  InvalidModifier(value~ : String, index~ : Int)
+  MissingComponentName(index~ : Int)
+  MissingRequiredModifier(name~ : String, index~ : Int)
+  Expected(what~ : String, index~ : Int)
+  NotSupported(what~ : String, context~ : String, index~ : Int)
+  DuplicateModifier(name~ : String, index~ : Int)
+  InvalidModifierCombination(modifier~ : String, context~ : String, index~ : Int)
+} derive(Eq, @debug.Debug)
+pub impl Show for InvalidFormatDescription
+
+// Types and methods
+pub(all) enum Component {
+  Day(padding~ : Padding)
+  MonthShort(case_sensitive~ : Bool)
+  MonthLong(case_sensitive~ : Bool)
+  MonthNumerical(padding~ : Padding)
+  Ordinal(padding~ : Padding)
+  WeekdayShort(case_sensitive~ : Bool)
+  WeekdayLong(case_sensitive~ : Bool)
+  WeekdaySunday(one_indexed~ : Bool)
+  WeekdayMonday(one_indexed~ : Bool)
+  WeekNumberIso(padding~ : Padding)
+  WeekNumberSunday(padding~ : Padding)
+  WeekNumberMonday(padding~ : Padding)
+  CalendarYearFullExtendedRange(padding~ : Padding, sign_is_mandatory~ : Bool)
+  CalendarYearFullStandardRange(padding~ : Padding, sign_is_mandatory~ : Bool)
+  IsoYearFullExtendedRange(padding~ : Padding, sign_is_mandatory~ : Bool)
+  IsoYearFullStandardRange(padding~ : Padding, sign_is_mandatory~ : Bool)
+  CalendarYearCenturyExtendedRange(padding~ : Padding, sign_is_mandatory~ : Bool)
+  CalendarYearCenturyStandardRange(padding~ : Padding, sign_is_mandatory~ : Bool)
+  IsoYearCenturyExtendedRange(padding~ : Padding, sign_is_mandatory~ : Bool)
+  IsoYearCenturyStandardRange(padding~ : Padding, sign_is_mandatory~ : Bool)
+  CalendarYearLastTwo(padding~ : Padding)
+  IsoYearLastTwo(padding~ : Padding)
+  Hour12(padding~ : Padding)
+  Hour24(padding~ : Padding)
+  Minute(padding~ : Padding)
+  Period(is_uppercase~ : Bool, case_sensitive~ : Bool)
+  Second(padding~ : Padding)
+  Subsecond(digits~ : SubsecondDigits)
+  OffsetHour(sign_is_mandatory~ : Bool, padding~ : Padding)
+  OffsetMinute(padding~ : Padding)
+  OffsetSecond(padding~ : Padding)
+  Ignore(count~ : Int)
+  UnixTimestampSecond(sign_is_mandatory~ : Bool)
+  UnixTimestampMillisecond(sign_is_mandatory~ : Bool)
+  UnixTimestampMicrosecond(sign_is_mandatory~ : Bool)
+  UnixTimestampNanosecond(sign_is_mandatory~ : Bool)
+  End(trailing_input~ : TrailingInput)
+} derive(Eq, Hash, @debug.Debug)
+
+pub struct Date {
+  // private fields
+} derive(Compare, Eq, Hash, @debug.Debug)
+pub fn Date::add_duration(Self, Duration) -> Self
+pub fn Date::checked_add(Self, Duration) -> Self?
+pub fn Date::checked_sub(Self, Duration) -> Self?
+pub fn Date::day(Self) -> Int
+pub fn Date::format(Self, ArrayView[FormatItem]) -> String raise Format
+pub fn Date::format_item(Self, FormatItem) -> String raise Format
+pub fn Date::from_calendar_date(Int, Month, Int) -> Self raise ComponentRange
+pub fn Date::from_iso_week_date(Int, Int, Weekday) -> Self raise ComponentRange
+pub fn Date::from_julian_day(Int) -> Self raise ComponentRange
+pub fn Date::from_ordinal_date(Int, Int) -> Self raise ComponentRange
+pub fn Date::iso_week(Self) -> Int
+pub fn Date::maximum() -> Self
+pub fn Date::midnight(Self) -> PrimitiveDateTime
+pub fn Date::minimum() -> Self
+pub fn Date::monday_based_week(Self) -> Int
+pub fn Date::month(Self) -> Month
+pub fn Date::next_day(Self) -> Self?
+pub fn Date::ordinal(Self) -> Int
+pub fn Date::previous_day(Self) -> Self?
+pub fn Date::saturating_add(Self, Duration) -> Self
+pub fn Date::saturating_sub(Self, Duration) -> Self
+pub fn Date::sub_date(Self, Self) -> Duration
+pub fn Date::sub_duration(Self, Duration) -> Self
+pub fn Date::sunday_based_week(Self) -> Int
+pub fn Date::to_calendar_date(Self) -> (Int, Month, Int)
+pub fn Date::to_iso_week_date(Self) -> (Int, Int, Weekday)
+pub fn Date::to_julian_day(Self) -> Int
+pub fn Date::to_ordinal_date(Self) -> (Int, Int)
+pub fn Date::weekday(Self) -> Weekday
+pub fn Date::with_hms(Self, Int, Int, Int) -> PrimitiveDateTime raise ComponentRange
+pub fn Date::with_time(Self, Time) -> PrimitiveDateTime
+pub fn Date::year(Self) -> Int
+pub impl Show for Date
+
+pub struct Duration {
+  // private fields
+} derive(Compare, Eq, Hash, @debug.Debug)
+pub fn Duration::abs(Self) -> Self
+pub fn Duration::as_seconds_f64(Self) -> Double
+pub fn Duration::checked_add(Self, Self) -> Self?
+pub fn Duration::checked_neg(Self) -> Self?
+pub fn Duration::checked_seconds_f64(Double) -> Self?
+pub fn Duration::checked_sub(Self, Self) -> Self?
+pub fn Duration::days(Int64) -> Self
+pub fn Duration::div_duration(Self, Self) -> Double
+pub fn Duration::div_f64(Self, Double) -> Self
+pub fn Duration::hours(Int64) -> Self
+pub fn Duration::is_negative(Self) -> Bool
+pub fn Duration::is_positive(Self) -> Bool
+pub fn Duration::is_zero(Self) -> Bool
+pub fn Duration::maximum() -> Self
+pub fn Duration::microseconds(Int64) -> Self
+pub fn Duration::milliseconds(Int64) -> Self
+pub fn Duration::minimum() -> Self
+pub fn Duration::minutes(Int64) -> Self
+pub fn Duration::mul_f64(Self, Double) -> Self
+pub fn Duration::nanoseconds(Int64) -> Self
+pub fn Duration::new(Int64, Int) -> Self
+pub fn Duration::saturating_seconds_f64(Double) -> Self
+pub fn Duration::seconds(Int64) -> Self
+pub fn Duration::seconds_f64(Double) -> Self
+pub fn Duration::subsec_microseconds(Self) -> Int
+pub fn Duration::subsec_milliseconds(Self) -> Int
+pub fn Duration::subsec_nanoseconds(Self) -> Int
+pub fn Duration::weeks(Int64) -> Self
+pub fn Duration::whole_days(Self) -> Int64
+pub fn Duration::whole_hours(Self) -> Int64
+pub fn Duration::whole_minutes(Self) -> Int64
+pub fn Duration::whole_seconds(Self) -> Int64
+pub fn Duration::whole_weeks(Self) -> Int64
+pub fn Duration::zero() -> Self
+pub impl Add for Duration
+pub impl Neg for Duration
+pub impl Show for Duration
+pub impl Sub for Duration
+
+pub(all) enum FormatItem {
+  StringLiteral(String)
+  Component(Component)
+  Compound(Array[FormatItem])
+  Optional(FormatItem)
+  First(Array[FormatItem])
+} derive(Eq, Hash, @debug.Debug)
+
+pub(all) enum Month {
+  January
+  February
+  March
+  April
+  May
+  June
+  July
+  August
+  September
+  October
+  November
+  December
+} derive(Compare, Eq, Hash, @debug.Debug)
+pub fn Month::length(Self, Int) -> Int
+pub fn Month::name(Self) -> String
+pub fn Month::next(Self) -> Self
+pub fn Month::number(Self) -> Int
+pub fn Month::previous(Self) -> Self
+pub fn Month::try_from(Int) -> Self raise ComponentRange
+pub fn Month::try_from_u8(Int) -> Self?
+pub impl Show for Month
+
+pub(all) enum Padding {
+  Space
+  Zero
+  None_
+} derive(Eq, Hash, @debug.Debug)
+
+pub struct PrimitiveDateTime {
+  // private fields
+} derive(Compare, Eq, Hash, @debug.Debug)
+pub fn PrimitiveDateTime::add_duration(Self, Duration) -> Self
+pub fn PrimitiveDateTime::checked_add(Self, Duration) -> Self?
+pub fn PrimitiveDateTime::checked_sub(Self, Duration) -> Self?
+pub fn PrimitiveDateTime::date(Self) -> Date
+pub fn PrimitiveDateTime::day(Self) -> Int
+pub fn PrimitiveDateTime::format(Self, ArrayView[FormatItem]) -> String raise Format
+pub fn PrimitiveDateTime::format_item(Self, FormatItem) -> String raise Format
+pub fn PrimitiveDateTime::hour(Self) -> Int
+pub fn PrimitiveDateTime::iso_week(Self) -> Int
+pub fn PrimitiveDateTime::maximum() -> Self
+pub fn PrimitiveDateTime::minimum() -> Self
+pub fn PrimitiveDateTime::minute(Self) -> Int
+pub fn PrimitiveDateTime::monday_based_week(Self) -> Int
+pub fn PrimitiveDateTime::month(Self) -> Month
+pub fn PrimitiveDateTime::nanosecond(Self) -> Int
+pub fn PrimitiveDateTime::new(Date, Time) -> Self
+pub fn PrimitiveDateTime::ordinal(Self) -> Int
+pub fn PrimitiveDateTime::saturating_add(Self, Duration) -> Self
+pub fn PrimitiveDateTime::saturating_sub(Self, Duration) -> Self
+pub fn PrimitiveDateTime::second(Self) -> Int
+pub fn PrimitiveDateTime::sub_date_time(Self, Self) -> Duration
+pub fn PrimitiveDateTime::sub_duration(Self, Duration) -> Self
+pub fn PrimitiveDateTime::sunday_based_week(Self) -> Int
+pub fn PrimitiveDateTime::time(Self) -> Time
+pub fn PrimitiveDateTime::to_calendar_date(Self) -> (Int, Month, Int)
+pub fn PrimitiveDateTime::to_julian_day(Self) -> Int
+pub fn PrimitiveDateTime::weekday(Self) -> Weekday
+pub fn PrimitiveDateTime::year(Self) -> Int
+pub impl Show for PrimitiveDateTime
+
+pub(all) enum SubsecondDigits {
+  One
+  Two
+  Three
+  Four
+  Five
+  Six
+  Seven
+  Eight
+  Nine
+  OneOrMore
+} derive(Eq, Hash, @debug.Debug)
+
+pub struct Time {
+  // private fields
+} derive(Compare, Eq, Hash, @debug.Debug)
+pub fn Time::add_duration(Self, Duration) -> Self
+pub fn Time::as_hms(Self) -> (Int, Int, Int)
+pub fn Time::duration_since(Self, Self) -> Duration
+pub fn Time::duration_until(Self, Self) -> Duration
+pub fn Time::format(Self, ArrayView[FormatItem]) -> String raise Format
+pub fn Time::format_item(Self, FormatItem) -> String raise Format
+pub fn Time::from_hms(Int, Int, Int) -> Self raise ComponentRange
+pub fn Time::from_hms_nano(Int, Int, Int, Int) -> Self raise ComponentRange
+pub fn Time::hour(Self) -> Int
+pub fn Time::maximum() -> Self
+pub fn Time::microsecond(Self) -> Int
+pub fn Time::midnight() -> Self
+pub fn Time::millisecond(Self) -> Int
+pub fn Time::minute(Self) -> Int
+pub fn Time::nanosecond(Self) -> Int
+pub fn Time::second(Self) -> Int
+pub fn Time::sub_duration(Self, Duration) -> Self
+pub fn Time::sub_time(Self, Self) -> Duration
+pub impl Show for Time
+
+pub(all) enum TrailingInput {
+  Prohibit
+  Discard
+} derive(Eq, Hash, @debug.Debug)
+
+pub(all) enum Weekday {
+  Monday
+  Tuesday
+  Wednesday
+  Thursday
+  Friday
+  Saturday
+  Sunday
+} derive(Eq, Hash, @debug.Debug)
+pub fn Weekday::name(Self) -> String
+pub fn Weekday::next(Self) -> Self
+pub fn Weekday::number_days_from_monday(Self) -> Int
+pub fn Weekday::number_days_from_sunday(Self) -> Int
+pub fn Weekday::number_from_monday(Self) -> Int
+pub fn Weekday::number_from_sunday(Self) -> Int
+pub fn Weekday::previous(Self) -> Self
+pub impl Show for Weekday
+
+// Type aliases
+
+// Traits

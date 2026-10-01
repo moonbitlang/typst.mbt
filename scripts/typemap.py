@@ -84,6 +84,17 @@ TYPEMAP = {
     "StateUpdate": "StateUpdate",
     "Numbering": "Numbering",
     "NumberingPattern": "NumberingPattern",
+    "Decimal": "Decimal",
+    "ToDecimal": "ToDecimal",
+    "Version": "Version",
+    "VersionComponents": "VersionComponents",
+    "Bytes": "BytesValue",
+    "ToBytes": "ToBytes",
+    "Datetime": "Datetime",
+    "Duration": "Duration",
+    "Month": "@time.Month",
+    "Smart<DisplayPattern>": "SmartDisplayPattern",
+    "Smart<TodayOffset>": "SmartTodayOffset",
 }
 
 # Generic Rust types with a MoonBit port: Rust name -> MoonBit name. A use

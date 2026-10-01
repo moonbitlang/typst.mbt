@@ -2689,7 +2689,7 @@ pub fn native_bytes_construct() -> NativeFuncData {
           {
             name: "value",
             docs: "The value that should be converted to bytes.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[ToBytes])),
             default: None,
             positional: true,
             named: false,
@@ -2698,7 +2698,7 @@ pub fn native_bytes_construct() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[BytesValue])),
         native_bytes_construct_call,
       )
       native_bytes_construct_cell.val = Some(d)
@@ -2715,7 +2715,7 @@ fn native_bytes_construct_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let value_ : Value = args.expect("value")
+  let value_ : ToBytes = args.expect("value")
   args.take().finish()
   let output = at(args.span, () => impl_bytes_construct(value_))
   IntoValue::into_value(output)
@@ -2740,7 +2740,7 @@ pub fn native_bytes_len() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[BytesValue])),
             default: None,
             positional: true,
             named: false,
@@ -2766,7 +2766,7 @@ fn native_bytes_len_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : BytesValue = args.expect("self")
   args.take().finish()
   let output = at(args.span, () => impl_bytes_len(self_))
   IntoValue::into_value(output)
@@ -2791,7 +2791,7 @@ pub fn native_bytes_at() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[BytesValue])),
             default: None,
             positional: true,
             named: false,
@@ -2839,7 +2839,7 @@ fn native_bytes_at_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : BytesValue = args.expect("self")
   let index_ : Int64 = args.expect("index")
   let default_ : Value? = args.named("default")
   args.take().finish()
@@ -2866,7 +2866,7 @@ pub fn native_bytes_slice() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[BytesValue])),
             default: None,
             positional: true,
             named: false,
@@ -2912,7 +2912,7 @@ pub fn native_bytes_slice() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[BytesValue])),
         native_bytes_slice_call,
       )
       native_bytes_slice_cell.val = Some(d)
@@ -2929,7 +2929,7 @@ fn native_bytes_slice_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : BytesValue = args.expect("self")
   let start_ : Int64 = args.expect("start")
   let end_ : Int64? = match args.eat() {
     Some(v) => v
@@ -5562,7 +5562,7 @@ pub fn native_datetime_construct() -> NativeFuncData {
           {
             name: "month",
             docs: "The month of the datetime.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[@time.Month])),
             default: None,
             positional: false,
             named: true,
@@ -5615,7 +5615,7 @@ pub fn native_datetime_construct() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Datetime])),
         native_datetime_construct_call,
       )
       native_datetime_construct_cell.val = Some(d)
@@ -5633,7 +5633,7 @@ fn native_datetime_construct_call(
   ignore(engine)
   ignore(context)
   let year_ : I32? = args.named("year")
-  let month_ : Value? = args.named("month")
+  let month_ : @time.Month? = args.named("month")
   let day_ : U8? = args.named("day")
   let hour_ : U8? = args.named("hour")
   let minute_ : U8? = args.named("minute")
@@ -5664,7 +5664,7 @@ pub fn native_datetime_today() -> NativeFuncData {
           {
             name: "offset",
             docs: "An offset to apply to the current UTC date. If set to `{auto}`, the offset will be the local offset.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[SmartTodayOffset])),
             default: Some(() => {
               IntoValue::into_value(impl_datetime_today__offset_default()) catch {
                 _ => None
@@ -5677,7 +5677,7 @@ pub fn native_datetime_today() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Datetime])),
         native_datetime_today_call,
       )
       native_datetime_today_cell.val = Some(d)
@@ -5694,7 +5694,7 @@ fn native_datetime_today_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let offset_ : Value = match args.named("offset") {
+  let offset_ : SmartTodayOffset = match args.named("offset") {
     Some(v) => v
     None => impl_datetime_today__offset_default()
   }
@@ -5722,7 +5722,7 @@ pub fn native_datetime_display() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Datetime])),
             default: None,
             positional: true,
             named: false,
@@ -5733,7 +5733,7 @@ pub fn native_datetime_display() -> NativeFuncData {
           {
             name: "pattern",
             docs: "The format used to display the datetime.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[SmartDisplayPattern])),
             default: Some(() => {
               IntoValue::into_value(impl_datetime_display__pattern_default()) catch {
                 _ => None
@@ -5763,8 +5763,8 @@ fn native_datetime_display_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
-  let pattern_ : Value = match args.eat() {
+  let self_ : Datetime = args.expect("self")
+  let pattern_ : SmartDisplayPattern = match args.eat() {
     Some(v) => v
     None => impl_datetime_display__pattern_default()
   }
@@ -5792,7 +5792,7 @@ pub fn native_datetime_year() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Datetime])),
             default: None,
             positional: true,
             named: false,
@@ -5818,7 +5818,7 @@ fn native_datetime_year_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : Datetime = args.expect("self")
   args.take().finish()
   let output = at(args.span, () => impl_datetime_year(self_))
   IntoValue::into_value(output)
@@ -5843,7 +5843,7 @@ pub fn native_datetime_month() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Datetime])),
             default: None,
             positional: true,
             named: false,
@@ -5869,7 +5869,7 @@ fn native_datetime_month_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : Datetime = args.expect("self")
   args.take().finish()
   let output = at(args.span, () => impl_datetime_month(self_))
   IntoValue::into_value(output)
@@ -5894,7 +5894,7 @@ pub fn native_datetime_weekday() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Datetime])),
             default: None,
             positional: true,
             named: false,
@@ -5920,7 +5920,7 @@ fn native_datetime_weekday_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : Datetime = args.expect("self")
   args.take().finish()
   let output = at(args.span, () => impl_datetime_weekday(self_))
   IntoValue::into_value(output)
@@ -5945,7 +5945,7 @@ pub fn native_datetime_day() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Datetime])),
             default: None,
             positional: true,
             named: false,
@@ -5971,7 +5971,7 @@ fn native_datetime_day_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : Datetime = args.expect("self")
   args.take().finish()
   let output = at(args.span, () => impl_datetime_day(self_))
   IntoValue::into_value(output)
@@ -5996,7 +5996,7 @@ pub fn native_datetime_hour() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Datetime])),
             default: None,
             positional: true,
             named: false,
@@ -6022,7 +6022,7 @@ fn native_datetime_hour_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : Datetime = args.expect("self")
   args.take().finish()
   let output = at(args.span, () => impl_datetime_hour(self_))
   IntoValue::into_value(output)
@@ -6047,7 +6047,7 @@ pub fn native_datetime_minute() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Datetime])),
             default: None,
             positional: true,
             named: false,
@@ -6073,7 +6073,7 @@ fn native_datetime_minute_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : Datetime = args.expect("self")
   args.take().finish()
   let output = at(args.span, () => impl_datetime_minute(self_))
   IntoValue::into_value(output)
@@ -6098,7 +6098,7 @@ pub fn native_datetime_second() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Datetime])),
             default: None,
             positional: true,
             named: false,
@@ -6124,7 +6124,7 @@ fn native_datetime_second_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : Datetime = args.expect("self")
   args.take().finish()
   let output = at(args.span, () => impl_datetime_second(self_))
   IntoValue::into_value(output)
@@ -6149,7 +6149,7 @@ pub fn native_datetime_ordinal() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Datetime])),
             default: None,
             positional: true,
             named: false,
@@ -6175,7 +6175,7 @@ fn native_datetime_ordinal_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : Datetime = args.expect("self")
   args.take().finish()
   let output = at(args.span, () => impl_datetime_ordinal(self_))
   IntoValue::into_value(output)
@@ -6200,7 +6200,7 @@ pub fn native_decimal_construct() -> NativeFuncData {
           {
             name: "value",
             docs: "The value that should be converted to a decimal.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[ToDecimal])),
             default: None,
             positional: true,
             named: false,
@@ -6209,7 +6209,7 @@ pub fn native_decimal_construct() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Decimal])),
         native_decimal_construct_call,
       )
       native_decimal_construct_cell.val = Some(d)
@@ -6226,7 +6226,7 @@ fn native_decimal_construct_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let value_ : @syntax.Spanned[Value] = args.expect_spanned("value")
+  let value_ : @syntax.Spanned[ToDecimal] = args.expect_spanned("value")
   args.take().finish()
   let output = impl_decimal_construct(engine, value_)
   IntoValue::into_value(output)
@@ -6910,7 +6910,7 @@ pub fn native_duration_construct() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Duration])),
         native_duration_construct_call,
       )
       native_duration_construct_cell.val = Some(d)
@@ -6973,7 +6973,7 @@ pub fn native_duration_seconds() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Duration])),
             default: None,
             positional: true,
             named: false,
@@ -6999,7 +6999,7 @@ fn native_duration_seconds_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : Duration = args.expect("self")
   args.take().finish()
   let output = at(args.span, () => impl_duration_seconds(self_))
   IntoValue::into_value(output)
@@ -7024,7 +7024,7 @@ pub fn native_duration_minutes() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Duration])),
             default: None,
             positional: true,
             named: false,
@@ -7050,7 +7050,7 @@ fn native_duration_minutes_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : Duration = args.expect("self")
   args.take().finish()
   let output = at(args.span, () => impl_duration_minutes(self_))
   IntoValue::into_value(output)
@@ -7075,7 +7075,7 @@ pub fn native_duration_hours() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Duration])),
             default: None,
             positional: true,
             named: false,
@@ -7101,7 +7101,7 @@ fn native_duration_hours_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : Duration = args.expect("self")
   args.take().finish()
   let output = at(args.span, () => impl_duration_hours(self_))
   IntoValue::into_value(output)
@@ -7126,7 +7126,7 @@ pub fn native_duration_days() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Duration])),
             default: None,
             positional: true,
             named: false,
@@ -7152,7 +7152,7 @@ fn native_duration_days_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : Duration = args.expect("self")
   args.take().finish()
   let output = at(args.span, () => impl_duration_days(self_))
   IntoValue::into_value(output)
@@ -7177,7 +7177,7 @@ pub fn native_duration_weeks() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Duration])),
             default: None,
             positional: true,
             named: false,
@@ -7203,7 +7203,7 @@ fn native_duration_weeks_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : Duration = args.expect("self")
   args.take().finish()
   let output = at(args.span, () => impl_duration_weeks(self_))
   IntoValue::into_value(output)
@@ -7432,7 +7432,7 @@ pub fn native_f64_from_bytes() -> NativeFuncData {
           {
             name: "bytes",
             docs: "The bytes that should be converted to a float.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[BytesValue])),
             default: None,
             positional: true,
             named: false,
@@ -7473,7 +7473,7 @@ fn native_f64_from_bytes_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let bytes_ : Value = args.expect("bytes")
+  let bytes_ : BytesValue = args.expect("bytes")
   let endian_ : Endianness = match args.named("endian") {
     Some(v) => v
     None => impl_f64_from_bytes__endian_default()
@@ -7537,7 +7537,7 @@ pub fn native_f64_to_bytes() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[BytesValue])),
         native_f64_to_bytes_call,
       )
       native_f64_to_bytes_cell.val = Some(d)
@@ -8211,7 +8211,7 @@ pub fn native_i64_from_bytes() -> NativeFuncData {
           {
             name: "bytes",
             docs: "The bytes that should be converted to an integer.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[BytesValue])),
             default: None,
             positional: true,
             named: false,
@@ -8263,7 +8263,7 @@ fn native_i64_from_bytes_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let bytes_ : Value = args.expect("bytes")
+  let bytes_ : BytesValue = args.expect("bytes")
   let endian_ : Endianness = match args.named("endian") {
     Some(v) => v
     None => impl_i64_from_bytes__endian_default()
@@ -8331,7 +8331,7 @@ pub fn native_i64_to_bytes() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[BytesValue])),
         native_i64_to_bytes_call,
       )
       native_i64_to_bytes_cell.val = Some(d)
@@ -8900,7 +8900,7 @@ pub fn native_plugin_transition() -> NativeFuncData {
           {
             name: "arguments",
             docs: "The byte buffers to call the function with.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[BytesValue])),
             default: None,
             positional: true,
             named: false,
@@ -8927,7 +8927,7 @@ fn native_plugin_transition_call(
   ignore(engine)
   ignore(context)
   let func_ : Value = args.expect("func")
-  let arguments_ : Array[Value] = args.all()
+  let arguments_ : Array[BytesValue] = args.all()
   args.take().finish()
   let output = at(args.span, () => impl_plugin_transition(func_, arguments_))
   IntoValue::into_value(output)
@@ -11030,7 +11030,7 @@ pub fn native_version_construct() -> NativeFuncData {
           {
             name: "components",
             docs: "The components of the version (array arguments are flattened)",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[VersionComponents])),
             default: None,
             positional: true,
             named: false,
@@ -11039,7 +11039,7 @@ pub fn native_version_construct() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Version])),
         native_version_construct_call,
       )
       native_version_construct_cell.val = Some(d)
@@ -11056,7 +11056,7 @@ fn native_version_construct_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let components_ : Array[Value] = args.all()
+  let components_ : Array[VersionComponents] = args.all()
   args.take().finish()
   let output = at(args.span, () => impl_version_construct(components_))
   IntoValue::into_value(output)
@@ -11081,7 +11081,7 @@ pub fn native_version_at() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Version])),
             default: None,
             positional: true,
             named: false,
@@ -11118,7 +11118,7 @@ fn native_version_at_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : Version = args.expect("self")
   let index_ : Int64 = args.expect("index")
   args.take().finish()
   let output = at(args.span, () => impl_version_at(self_, index_))
@@ -13224,7 +13224,7 @@ pub fn native_cbor_encode() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[BytesValue])),
         native_cbor_encode_call,
       )
       native_cbor_encode_cell.val = Some(d)

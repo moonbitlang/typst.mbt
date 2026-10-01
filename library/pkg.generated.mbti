@@ -6,6 +6,7 @@ import {
   "moonbitlang/core/hashset",
   "moonbitlang/core/ref",
   "moonbitlang/typst/syntax",
+  "moonbitlang/typst/time",
 }
 
 // Values
@@ -150,10 +151,6 @@ pub let box_elem_width : Int
 pub fn bundle_format() -> Format
 
 pub fn bundle_format_elem() -> Element
-
-pub fn bytes_cast_b(Value) -> Bytes raise HintedError
-
-pub fn bytes_into_value_b(Bytes) -> Value
 
 pub fn cancel_elem() -> Element
 
@@ -324,6 +321,10 @@ pub let curve_quad_elem_control : Int
 pub let curve_quad_elem_end : Int
 
 pub let curve_quad_elem_relative : Int
+
+pub let decimal_one : Decimal
+
+pub let decimal_zero : Decimal
 
 pub fn direct_link_elem() -> Element
 
@@ -2641,11 +2642,19 @@ pub impl FromValue for BundlePath
 pub impl IntoValue for BundlePath
 pub impl Reflect for BundlePath
 
-pub(all) struct BytesValue(Bytes) derive(Eq, Hash)
+pub struct BytesValue(Bytes) derive(Eq, Hash)
 pub fn BytesValue::as_slice(Self) -> Bytes
+pub fn BytesValue::as_str(Self) -> String?
 pub fn BytesValue::concat(Self, Self) -> Self
+pub fn BytesValue::from_string(String) -> Self
+pub fn BytesValue::is_empty(Self) -> Bool
+pub fn BytesValue::len(Self) -> Int
 pub fn BytesValue::new(Bytes) -> Self
 pub fn BytesValue::repr(Self) -> String
+pub fn BytesValue::to_str(Self) -> String?
+pub impl FromValue for BytesValue
+pub impl IntoValue for BytesValue
+pub impl Reflect for BytesValue
 
 pub(all) enum Capturer {
   Function
@@ -2844,15 +2853,32 @@ pub impl FromValue for CounterUpdate
 pub impl IntoValue for CounterUpdate
 pub impl Reflect for CounterUpdate
 
-pub(all) struct Datetime {
-  // private fields
+pub(all) enum Datetime {
+  Date(@time.Date)
+  Time(@time.Time)
+  Datetime(@time.PrimitiveDateTime)
 } derive(Eq, Hash)
-pub fn Datetime::add_duration(Self, Duration) -> Self raise HintedError
+pub fn Datetime::add_duration(Self, Duration) -> Self
+pub fn Datetime::day(Self) -> Int?
+pub fn Datetime::from_hms(Int, Int, Int) -> Self?
+pub fn Datetime::from_toml_dict(Dict) -> Self?
+pub fn Datetime::from_ymd(Int, Int, Int) -> Self?
+pub fn Datetime::from_ymd_hms(Int, Int, Int, Int, Int, Int) -> Self?
+pub fn Datetime::hour(Self) -> Int?
 pub fn Datetime::kind(Self) -> String
+pub fn Datetime::minute(Self) -> Int?
+pub fn Datetime::month(Self) -> Int?
+pub fn Datetime::ordinal(Self) -> Int?
 pub fn Datetime::partial_cmp(Self, Self) -> Int?
 pub fn Datetime::repr(Self) -> String
+pub fn Datetime::second(Self) -> Int?
 pub fn Datetime::sub_datetime(Self, Self) -> Duration raise HintedError
-pub fn Datetime::sub_duration(Self, Duration) -> Self raise HintedError
+pub fn Datetime::sub_duration(Self, Duration) -> Self
+pub fn Datetime::weekday(Self) -> Int?
+pub fn Datetime::year(Self) -> Int?
+pub impl FromValue for Datetime
+pub impl IntoValue for Datetime
+pub impl Reflect for Datetime
 
 pub(all) enum DecNum {
   Int(Int64)
@@ -2863,22 +2889,24 @@ pub impl FromValue for DecNum
 pub impl IntoValue for DecNum
 pub impl Reflect for DecNum
 
-pub(all) struct Decimal {
-  // private fields
-} derive(Eq, Hash)
+pub struct Decimal(RustDecimal)
 pub fn Decimal::abs(Self) -> Self
 pub fn Decimal::ceil(Self) -> Self
-pub fn Decimal::checked_add(Self, Self) -> Self raise HintedError
-pub fn Decimal::checked_div(Self, Self) -> Self raise HintedError
+pub fn Decimal::checked_add(Self, Self) -> Self?
+pub fn Decimal::checked_div(Self, Self) -> Self?
 pub fn Decimal::checked_div_euclid(Self, Self) -> Self?
-pub fn Decimal::checked_mul(Self, Self) -> Self raise HintedError
+pub fn Decimal::checked_mul(Self, Self) -> Self?
 pub fn Decimal::checked_powi(Self, Int64) -> Self?
 pub fn Decimal::checked_rem(Self, Self) -> Self?
 pub fn Decimal::checked_rem_euclid(Self, Self) -> Self?
-pub fn Decimal::checked_sub(Self, Self) -> Self raise HintedError
+pub fn Decimal::checked_sub(Self, Self) -> Self?
+pub fn Decimal::clamp(Self, Self, Self) -> Self
 pub fn Decimal::floor(Self) -> Self
 pub fn Decimal::fract(Self) -> Self
 pub fn Decimal::from_int(Int64) -> Self
+pub fn Decimal::from_str(String) -> Self?
+pub fn Decimal::is_integer(Self) -> Bool
+pub fn Decimal::is_negative(Self) -> Bool
 pub fn Decimal::is_zero(Self) -> Bool
 pub fn Decimal::neg(Self) -> Self
 pub fn Decimal::repr(Self) -> String
@@ -2887,7 +2915,14 @@ pub fn Decimal::to_f64(Self) -> Double?
 pub fn Decimal::to_i64(Self) -> Int64?
 pub fn Decimal::to_string(Self) -> String
 pub fn Decimal::trunc(Self) -> Self
+pub fn Decimal::try_from_f64(Double) -> Self?
 pub impl Compare for Decimal
+pub impl Eq for Decimal
+pub impl Hash for Decimal
+pub impl Show for Decimal
+pub impl FromValue for Decimal
+pub impl IntoValue for Decimal
+pub impl Reflect for Decimal
 
 pub(all) struct Deprecation {
   message : String
@@ -2938,18 +2973,29 @@ pub impl FromValue for Dir
 pub impl IntoValue for Dir
 pub impl Reflect for Dir
 
-pub(all) struct Duration {
-  // private fields
-} derive(Eq, Hash)
+pub struct DisplayPattern(String, @time.FormatItem)
+pub impl FromValue for DisplayPattern
+pub impl IntoValue for DisplayPattern
+pub impl Reflect for DisplayPattern
+
+pub struct Duration(@time.Duration) derive(Compare, Eq, Hash)
 pub fn Duration::add(Self, Self) -> Self
+pub fn Duration::days(Self) -> Double
+pub fn Duration::decompose(Self) -> FixedArray[Int64]
 pub fn Duration::div(Self, Double) -> Self
 pub fn Duration::div_duration(Self, Self) -> Double
+pub fn Duration::hours(Self) -> Double
 pub fn Duration::is_zero(Self) -> Bool
+pub fn Duration::minutes(Self) -> Double
 pub fn Duration::mul(Self, Double) -> Self
 pub fn Duration::neg(Self) -> Self
 pub fn Duration::repr(Self) -> String
+pub fn Duration::seconds(Self) -> Double
 pub fn Duration::sub(Self, Self) -> Self
-pub impl Compare for Duration
+pub fn Duration::weeks(Self) -> Double
+pub impl FromValue for Duration
+pub impl IntoValue for Duration
+pub impl Reflect for Duration
 
 pub(all) enum DynValue {
   Alignment(Alignment)
@@ -3653,6 +3699,8 @@ pub(all) struct Routines {
   eval_closure : (Func, Closure, Engine, Context, Args) -> Value raise SourceError
 }
 
+type RustDecimal derive(Hash)
+
 pub(all) struct Scalar(Double) derive(Default)
 pub fn Scalar::get(Self) -> Double
 pub fn Scalar::new(Double) -> Self
@@ -3816,6 +3864,22 @@ pub impl[T : Fold] Fold for Smart[T]
 pub impl[T : FromValue] FromValue for Smart[T]
 pub impl[T : IntoValue] IntoValue for Smart[T]
 pub impl[T : Reflect] Reflect for Smart[T]
+
+pub(all) enum SmartDisplayPattern {
+  Auto
+  Custom(DisplayPattern)
+}
+pub impl FromValue for SmartDisplayPattern
+pub impl IntoValue for SmartDisplayPattern
+pub impl Reflect for SmartDisplayPattern
+
+pub(all) enum SmartTodayOffset {
+  Auto
+  Custom(TodayOffset)
+}
+pub impl FromValue for SmartTodayOffset
+pub impl IntoValue for SmartTodayOffset
+pub impl Reflect for SmartTodayOffset
 
 pub(all) struct SourceDiagnostic {
   severity : Severity
@@ -3988,6 +4052,19 @@ pub(all) struct ToArray(Arr)
 pub impl FromValue for ToArray
 pub impl Reflect for ToArray
 
+pub struct ToBytes(BytesValue)
+pub impl FromValue for ToBytes
+pub impl Reflect for ToBytes
+
+pub(all) enum ToDecimal {
+  Decimal(Decimal)
+  Str(String)
+  Int(Int64)
+  Float(Double)
+}
+pub impl FromValue for ToDecimal
+pub impl Reflect for ToDecimal
+
 pub(all) struct ToDict(Module)
 pub impl FromValue for ToDict
 pub impl Reflect for ToDict
@@ -4002,6 +4079,11 @@ pub(all) enum ToInt {
 }
 pub impl FromValue for ToInt
 pub impl Reflect for ToInt
+
+pub struct TodayOffset(Duration)
+pub impl FromValue for TodayOffset
+pub impl IntoValue for TodayOffset
+pub impl Reflect for TodayOffset
 
 pub(all) struct Traced(@syntax.Span?)
 pub fn Traced::get(Self, @syntax.FileId) -> @syntax.Span?
@@ -4175,12 +4257,26 @@ pub impl FromValue for Value
 pub impl IntoValue for Value
 pub impl Reflect for Value
 
-pub(all) struct Version(Array[Int]) derive(Eq, Hash)
+pub struct Version(Array[UInt]) derive(Hash)
 pub fn Version::component(Self, String) -> Int64 raise HintedError
+pub fn Version::new() -> Self
+pub fn Version::push(Self, UInt) -> Unit
 pub fn Version::repr(Self) -> String
 pub fn Version::to_string(Self) -> String
-pub fn Version::values(Self) -> Array[Int]
+pub fn Version::values(Self) -> Array[UInt]
 pub impl Compare for Version
+pub impl Eq for Version
+pub impl Show for Version
+pub impl FromValue for Version
+pub impl IntoValue for Version
+pub impl Reflect for Version
+
+pub(all) enum VersionComponents {
+  Single(UInt)
+  Multiple(Array[UInt])
+}
+pub impl FromValue for VersionComponents
+pub impl Reflect for VersionComponents
 
 pub(all) struct Warned[T] {
   output : T
@@ -4217,6 +4313,7 @@ pub impl[T : FromValue] FromValue for T?
 pub impl[T : FromValue] FromValue for Array[T]
 pub impl FromValue for @syntax.RootedPath
 pub impl FromValue for @syntax.SyntaxMode
+pub impl FromValue for @time.Month
 
 pub(open) trait IntoValue {
   fn into_value(Self) -> Value
@@ -4229,6 +4326,7 @@ pub impl[T : IntoValue] IntoValue for T?
 pub impl[T : IntoValue] IntoValue for Array[T]
 pub impl IntoValue for @syntax.RootedPath
 pub impl IntoValue for @syntax.SyntaxMode
+pub impl IntoValue for @time.Month
 
 pub(open) trait Numeric : Add + Sub + Neg + Eq {
   fn zero() -> Self
@@ -4250,11 +4348,12 @@ pub impl[T : Reflect] Reflect for T?
 pub impl[T : Reflect] Reflect for Array[T]
 pub impl Reflect for @syntax.RootedPath
 pub impl Reflect for @syntax.SyntaxMode
+pub impl Reflect for @time.Month
 
 pub(open) trait World {
   fn library(Self) -> Library
   fn main(Self) -> @syntax.FileId
   fn source(Self, @syntax.FileId) -> @syntax.Source raise FileError
   fn file(Self, @syntax.FileId) -> Bytes raise FileError
-  fn today(Self, Int64?) -> Datetime?
+  fn today(Self, Duration?) -> Datetime?
 }

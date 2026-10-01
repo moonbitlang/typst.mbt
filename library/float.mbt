@@ -52,10 +52,10 @@ fn impl_f64_from_bytes__endian_default() -> Endianness raise SourceError {
 ///|
 /// Interprets bytes as a float.
 fn impl_f64_from_bytes(
-  bytes_ : Value,
+  bytes_ : BytesValue,
   endian_ : Endianness,
 ) -> Double raise HintedError {
-  let bytes = bytes_cast_b(bytes_)
+  let bytes = bytes_.as_slice()
   // Convert slice to an array of length 4 or 8.
   let len = bytes.length()
   if len == 8 || len == 4 {
@@ -88,7 +88,7 @@ fn impl_f64_to_bytes(
   self_ : Double,
   endian_ : Endianness,
   size_ : U32,
-) -> Value raise HintedError {
+) -> BytesValue raise HintedError {
   let (bits, len) = match size_.get() {
     8L => (self_.reinterpret_as_uint64(), 8)
     4L => (self_.to_float().reinterpret_as_uint().to_uint64(), 4)
@@ -101,7 +101,7 @@ fn impl_f64_to_bytes(
     }
     ((bits >> shift) & 0xFFUL).to_byte()
   })
-  bytes_into_value_b(Bytes::from_array(buf))
+  BytesValue::new(Bytes::from_array(buf))
 }
 
 ///|

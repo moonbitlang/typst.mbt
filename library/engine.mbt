@@ -92,11 +92,14 @@ pub(open) trait World {
   /// For file locations for which [`source`](Self::source) succeeds, this
   /// should also succeed.
   fn file(Self, @syntax.FileId) -> Bytes raise FileError
-  /// Get the current date (with an optional UTC offset in hours).
+  /// Get the current date.
   ///
   /// If no offset is specified, the local date should be chosen. Otherwise,
   /// the UTC date should be chosen with the corresponding offset.
-  fn today(Self, Int64?) -> Datetime?
+  ///
+  /// If this function returns `None`, Typst's `datetime` function will
+  /// return an error.
+  fn today(Self, Duration?) -> Datetime?
 }
 
 ///|

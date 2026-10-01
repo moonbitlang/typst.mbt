@@ -419,12 +419,6 @@ fn document_elem_keywords_default() -> Value {
 }
 
 ///|
-/// TODO: port `Default::default() of Smart<Option<Datetime>>` (DocumentElem.date).
-fn document_elem_date_default() -> Value {
-  None
-}
-
-///|
 /// TODO: port `Alignment::H(HAlignment::End)` (EnumElem.number_align).
 fn enum_elem_number_align_default() -> Value {
   None

@@ -73,8 +73,52 @@ impl @library.World for TestWorld with fn file(self, id) {
 }
 
 ///|
-impl @library.World for TestWorld with fn today(_self, _offset) {
-  None
+impl @library.World for TestWorld with fn today(_self, offset) {
+  // Like upstream's test world: `typst_kit::datetime::Time::fixed` at
+  // 1970-01-01 12:00:00 UTC, shifted by the offset.
+  let now = 12L * 3600L
+  let with_offset = match offset {
+    None => now
+    Some(offset) => {
+      let seconds = offset.seconds().trunc()
+      // Check whether we can convert seconds from f64 to i32.
+      if seconds.is_nan() ||
+        seconds.is_inf() ||
+        seconds < -2147483648.0 ||
+        seconds > 2147483647.0 {
+        return None
+      }
+      // `FixedOffset::east_opt` only accepts offsets below one day.
+      let seconds = seconds.to_int64()
+      if seconds <= -86400L || seconds >= 86400L {
+        return None
+      }
+      now + seconds
+    }
+  }
+  let days = if with_offset >= 0L {
+    with_offset / 86400L
+  } else {
+    (with_offset - 86399L) / 86400L
+  }
+  let (year, month, day) = civil_from_days(days)
+  @library.Datetime::from_ymd(year, month, day)
+}
+
+///|
+/// The proleptic Gregorian date of a day count since 1970-01-01.
+fn civil_from_days(days : Int64) -> (Int, Int, Int) {
+  let z = days + 719468L
+  let era = (if z >= 0L { z } else { z - 146096L }) / 146097L
+  let doe = z - era * 146097L
+  let yoe = (doe - doe / 1460L + doe / 36524L - doe / 146096L) / 365L
+  let y = yoe + era * 400L
+  let doy = doe - (365L * yoe + yoe / 4L - yoe / 100L)
+  let mp = (5L * doy + 2L) / 153L
+  let d = doy - (153L * mp + 2L) / 5L + 1L
+  let m = if mp < 10L { mp + 3L } else { mp - 9L }
+  let y = if m <= 2L { y + 1L } else { y }
+  (y.to_int(), m.to_int(), d.to_int())
 }
 
 ///|

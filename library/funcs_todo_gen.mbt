@@ -1,59 +1,6 @@
 // Generated stubs for native functions that are not ported yet.
 
 ///|
-/// TODO: port `Bytes.construct` (typst-library/src/foundations/bytes.rs).
-fn impl_bytes_construct(value_ : Value) -> Value raise HintedError {
-  ignore(value_)
-  bail("`Bytes.construct` is not yet ported")
-}
-
-///|
-/// TODO: port `Bytes.len` (typst-library/src/foundations/bytes.rs).
-fn impl_bytes_len(self_ : Value) -> USize raise HintedError {
-  ignore(self_)
-  bail("`Bytes.len` is not yet ported")
-}
-
-///|
-/// TODO: port `Bytes.at` (typst-library/src/foundations/bytes.rs).
-fn impl_bytes_at(
-  self_ : Value,
-  index_ : Int64,
-  default_ : Value?,
-) -> Value raise HintedError {
-  ignore(self_)
-  ignore(index_)
-  ignore(default_)
-  bail("`Bytes.at` is not yet ported")
-}
-
-///|
-/// TODO: port default `Default::default()`.
-fn impl_bytes_slice__end_default() -> Int64? raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `bytes_slice.end` is not yet ported",
-    ),
-  ])
-}
-
-///|
-/// TODO: port `Bytes.slice` (typst-library/src/foundations/bytes.rs).
-fn impl_bytes_slice(
-  self_ : Value,
-  start_ : Int64,
-  end_ : Int64?,
-  count_ : Int64?,
-) -> Value raise HintedError {
-  ignore(self_)
-  ignore(start_)
-  ignore(end_)
-  ignore(count_)
-  bail("`Bytes.slice` is not yet ported")
-}
-
-///|
 /// TODO: port `Content.func` (typst-library/src/foundations/content/mod.rs).
 fn impl_content_func(self_ : Content) -> Element raise HintedError {
   ignore(self_)
@@ -89,193 +36,6 @@ fn impl_content_fields(self_ : Content) -> Dict raise HintedError {
 }
 
 ///|
-/// TODO: port `Datetime.construct` (typst-library/src/foundations/datetime.rs).
-fn impl_datetime_construct(
-  year_ : I32?,
-  month_ : Value?,
-  day_ : U8?,
-  hour_ : U8?,
-  minute_ : U8?,
-  second_ : U8?,
-) -> Value raise HintedError {
-  ignore(year_)
-  ignore(month_)
-  ignore(day_)
-  ignore(hour_)
-  ignore(minute_)
-  ignore(second_)
-  bail("`Datetime.construct` is not yet ported")
-}
-
-///|
-/// TODO: port default `Default::default()`.
-fn impl_datetime_today__offset_default() -> Value raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `datetime_today.offset` is not yet ported",
-    ),
-  ])
-}
-
-///|
-/// TODO: port `Datetime.today` (typst-library/src/foundations/datetime.rs).
-fn impl_datetime_today(
-  engine : Engine,
-  offset_ : Value,
-) -> Value raise HintedError {
-  ignore(engine)
-  ignore(offset_)
-  bail("`Datetime.today` is not yet ported")
-}
-
-///|
-/// TODO: port default `Default::default()`.
-fn impl_datetime_display__pattern_default() -> Value raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `datetime_display.pattern` is not yet ported",
-    ),
-  ])
-}
-
-///|
-/// TODO: port `Datetime.display` (typst-library/src/foundations/datetime.rs).
-fn impl_datetime_display(
-  self_ : Value,
-  pattern_ : Value,
-) -> String raise HintedError {
-  ignore(self_)
-  ignore(pattern_)
-  bail("`Datetime.display` is not yet ported")
-}
-
-///|
-/// TODO: port `Datetime.year` (typst-library/src/foundations/datetime.rs).
-fn impl_datetime_year(self_ : Value) -> I32? raise HintedError {
-  ignore(self_)
-  bail("`Datetime.year` is not yet ported")
-}
-
-///|
-/// TODO: port `Datetime.month` (typst-library/src/foundations/datetime.rs).
-fn impl_datetime_month(self_ : Value) -> U8? raise HintedError {
-  ignore(self_)
-  bail("`Datetime.month` is not yet ported")
-}
-
-///|
-/// TODO: port `Datetime.weekday` (typst-library/src/foundations/datetime.rs).
-fn impl_datetime_weekday(self_ : Value) -> U8? raise HintedError {
-  ignore(self_)
-  bail("`Datetime.weekday` is not yet ported")
-}
-
-///|
-/// TODO: port `Datetime.day` (typst-library/src/foundations/datetime.rs).
-fn impl_datetime_day(self_ : Value) -> U8? raise HintedError {
-  ignore(self_)
-  bail("`Datetime.day` is not yet ported")
-}
-
-///|
-/// TODO: port `Datetime.hour` (typst-library/src/foundations/datetime.rs).
-fn impl_datetime_hour(self_ : Value) -> U8? raise HintedError {
-  ignore(self_)
-  bail("`Datetime.hour` is not yet ported")
-}
-
-///|
-/// TODO: port `Datetime.minute` (typst-library/src/foundations/datetime.rs).
-fn impl_datetime_minute(self_ : Value) -> U8? raise HintedError {
-  ignore(self_)
-  bail("`Datetime.minute` is not yet ported")
-}
-
-///|
-/// TODO: port `Datetime.second` (typst-library/src/foundations/datetime.rs).
-fn impl_datetime_second(self_ : Value) -> U8? raise HintedError {
-  ignore(self_)
-  bail("`Datetime.second` is not yet ported")
-}
-
-///|
-/// TODO: port `Datetime.ordinal` (typst-library/src/foundations/datetime.rs).
-fn impl_datetime_ordinal(self_ : Value) -> U16? raise HintedError {
-  ignore(self_)
-  bail("`Datetime.ordinal` is not yet ported")
-}
-
-///|
-/// TODO: port `Decimal.construct` (typst-library/src/foundations/decimal.rs).
-fn impl_decimal_construct(
-  engine : Engine,
-  value_ : @syntax.Spanned[Value],
-) -> Value raise SourceError {
-  ignore(engine)
-  ignore(value_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`Decimal.construct` is not yet ported",
-    ),
-  ])
-}
-
-///|
-/// TODO: port `Duration.construct` (typst-library/src/foundations/duration.rs).
-fn impl_duration_construct(
-  seconds_ : Int64,
-  minutes_ : Int64,
-  hours_ : Int64,
-  days_ : Int64,
-  weeks_ : Int64,
-) -> Value raise HintedError {
-  ignore(seconds_)
-  ignore(minutes_)
-  ignore(hours_)
-  ignore(days_)
-  ignore(weeks_)
-  bail("`Duration.construct` is not yet ported")
-}
-
-///|
-/// TODO: port `Duration.seconds` (typst-library/src/foundations/duration.rs).
-fn impl_duration_seconds(self_ : Value) -> Double raise HintedError {
-  ignore(self_)
-  bail("`Duration.seconds` is not yet ported")
-}
-
-///|
-/// TODO: port `Duration.minutes` (typst-library/src/foundations/duration.rs).
-fn impl_duration_minutes(self_ : Value) -> Double raise HintedError {
-  ignore(self_)
-  bail("`Duration.minutes` is not yet ported")
-}
-
-///|
-/// TODO: port `Duration.hours` (typst-library/src/foundations/duration.rs).
-fn impl_duration_hours(self_ : Value) -> Double raise HintedError {
-  ignore(self_)
-  bail("`Duration.hours` is not yet ported")
-}
-
-///|
-/// TODO: port `Duration.days` (typst-library/src/foundations/duration.rs).
-fn impl_duration_days(self_ : Value) -> Double raise HintedError {
-  ignore(self_)
-  bail("`Duration.days` is not yet ported")
-}
-
-///|
-/// TODO: port `Duration.weeks` (typst-library/src/foundations/duration.rs).
-fn impl_duration_weeks(self_ : Value) -> Double raise HintedError {
-  ignore(self_)
-  bail("`Duration.weeks` is not yet ported")
-}
-
-///|
 /// TODO: port `Label.construct` (typst-library/src/foundations/label.rs).
 fn impl_label_construct(name_ : String) -> Label raise HintedError {
   ignore(name_)
@@ -302,7 +62,7 @@ fn impl_plugin(
 /// TODO: port `plugin.transition` (typst-library/src/foundations/plugin.rs).
 fn impl_plugin_transition(
   func_ : Value,
-  arguments_ : Array[Value],
+  arguments_ : Array[BytesValue],
 ) -> Value raise HintedError {
   ignore(func_)
   ignore(arguments_)
@@ -620,30 +380,6 @@ fn impl_target(context : Context) -> Value raise HintedError {
 }
 
 ///|
-/// TODO: port `Type.construct` (typst-library/src/foundations/ty.rs).
-fn impl_type_construct(value_ : Value) -> Type raise HintedError {
-  ignore(value_)
-  bail("`Type.construct` is not yet ported")
-}
-
-///|
-/// TODO: port `Version.construct` (typst-library/src/foundations/version.rs).
-fn impl_version_construct(
-  components_ : Array[Value],
-) -> Value raise HintedError {
-  ignore(components_)
-  bail("`Version.construct` is not yet ported")
-}
-
-///|
-/// TODO: port `Version.at` (typst-library/src/foundations/version.rs).
-fn impl_version_at(self_ : Value, index_ : Int64) -> Int64 raise HintedError {
-  ignore(self_)
-  ignore(index_)
-  bail("`Version.at` is not yet ported")
-}
-
-///|
 /// TODO: port `layout` (typst-library/src/layout/layout.rs).
 fn impl_layout(span : @syntax.Span, func_ : Func) -> Content raise HintedError {
   ignore(span)
@@ -693,7 +429,9 @@ fn impl_cbor(
 
 ///|
 /// TODO: port `cbor.encode` (typst-library/src/loading/cbor.rs).
-fn impl_cbor_encode(value_ : @syntax.Spanned[Value]) -> Value raise SourceError {
+fn impl_cbor_encode(
+  value_ : @syntax.Spanned[Value],
+) -> BytesValue raise SourceError {
   ignore(value_)
   raise SourceError([
     SourceDiagnostic::error_at(

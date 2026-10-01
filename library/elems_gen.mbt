@@ -56,7 +56,6 @@
 //     1 Option<CitationForm>
 //     1 Smart<Derived<CslSource, CslStyle>>
 //     1 Smart<DocumentFormat>
-//     1 Smart<Option<Datetime>>
 //     1 Vec<Packed<EnumItem>>
 //     1 SmallVec<[u64; 4]>
 //     1 Option<Packed<FigureCaption>>
@@ -122,7 +121,6 @@
 //     1 Option<PageRanges>
 //     1 PdfStandards
 //     1 Derived<PathOrStr, EcoString>
-//     1 Bytes
 //     1 Option<AttachedFileRelationship>
 //     1 Scalar
 //     1 AssetData
@@ -4560,11 +4558,11 @@ pub fn document_elem() -> Element {
             default=document_elem_keywords_default,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Smart[Datetime?]]),
             id=6,
             name="date",
             kind=Settable,
-            default=document_elem_date_default,
+            default=() => Auto,
           ),
           field_of(
             (Ty::new() : Ty[Content]),
@@ -9531,7 +9529,7 @@ pub fn pdf_attach_elem() -> Element {
             required=true,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[BytesValue]),
             id=1,
             name="data",
             kind=Required,
