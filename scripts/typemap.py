@@ -81,6 +81,40 @@ TYPEMAP = {
     "UnicodeNormalForm": "UnicodeNormalForm",
     "Caseable": "Caseable",
     "Case": "Case",
+    "Selector": "Selector",
+    "LocatableSelector": "LocatableSelector",
+    "ShowableSelector": "ShowableSelector",
+    "Element": "Element",
+    "Location": "Location",
+    "Counter": "Counter",
+    "CounterKey": "CounterKey",
+    "CounterUpdate": "CounterUpdate",
+    "CounterState": "CounterState",
+    "State": "State",
+    "StateUpdate": "StateUpdate",
+    "Numbering": "Numbering",
+    "NumberingPattern": "NumberingPattern",
+    "Decimal": "Decimal",
+    "ToDecimal": "ToDecimal",
+    "Version": "Version",
+    "VersionComponents": "VersionComponents",
+    "Bytes": "BytesValue",
+    "ToBytes": "ToBytes",
+    "Datetime": "Datetime",
+    "Duration": "Duration",
+    "Month": "@time.Month",
+    "Smart<DisplayPattern>": "SmartDisplayPattern",
+    "Smart<TodayOffset>": "SmartTodayOffset",
+    # layout/grid/mod.rs, model/table.rs
+    "TrackSizings": "TrackSizings",
+    "GridChild": "GridChild",
+    "GridItem": "GridItem",
+    "GridCell": "GridCell",
+    "TableChild": "TableChild",
+    "TableItem": "TableItem",
+    "TableCell": "TableCell",
+    "TableElem": "TableElem",
+    "TableHeaderScope": "TableHeaderScope",
 }
 
 # Generic Rust types with a MoonBit port: Rust name -> MoonBit name. A use
@@ -93,6 +127,7 @@ GENERICS = {
     "Sides": "Sides",
     "Corners": "Corners",
     "SpecificAlignment": "SpecificAlignment",
+    "Celled": "Celled",
 }
 
 

@@ -809,8 +809,10 @@ fn impl_calc_quo(
     },
     (a, b) => Some(DecNum::Float(a / b)),
     (a, b) => {
-      let q = a.checked_div(b) catch { _ => return None }
-      Some(DecNum::Decimal(q))
+      match a.checked_div(b) {
+        Some(q) => Some(DecNum::Decimal(q))
+        None => None
+      }
     },
   )
   let divided = match result {

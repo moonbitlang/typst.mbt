@@ -170,11 +170,11 @@ fn impl_i64_from_bytes__endian_default() -> Endianness raise SourceError {
 ///|
 /// Converts bytes to an integer.
 fn impl_i64_from_bytes(
-  bytes_ : Value,
+  bytes_ : BytesValue,
   endian_ : Endianness,
   signed_ : Bool,
 ) -> Int64 raise HintedError {
-  let bytes = bytes_cast_b(bytes_)
+  let bytes = bytes_.as_slice()
   let len = bytes.length()
   if len == 0 {
     return 0L
@@ -232,7 +232,7 @@ fn impl_i64_to_bytes(
   self_ : Int64,
   endian_ : Endianness,
   size_ : USize,
-) -> Value raise HintedError {
+) -> BytesValue raise HintedError {
   let array = int64_to_bytes(self_, endian_)
   let size = size_.get().to_int()
   let buf = FixedArray::make(size, b'\x00')
@@ -255,7 +255,7 @@ fn impl_i64_to_bytes(
       }
     }
   }
-  bytes_into_value_b(Bytes::from_array(buf))
+  BytesValue::new(Bytes::from_array(buf))
 }
 
 ///|

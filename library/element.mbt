@@ -555,3 +555,37 @@ pub fn ParseLocals::get(self : ParseLocals, name : String) -> Value? {
     None => None
   }
 }
+
+// cast! {
+//     Element,
+//     self => Value::Func(self.into()),
+//     v: Func => v.to_element().ok_or("expected element")?,
+// }
+
+///|
+pub impl Reflect for Element with fn input() {
+  Type(Type::func())
+}
+
+///|
+pub impl Reflect for Element with fn output() {
+  Type(Type::func())
+}
+
+///|
+pub impl Reflect for Element with fn castable(v) {
+  Func::castable(v)
+}
+
+///|
+pub impl IntoValue for Element with fn into_value(self) {
+  Func(Func::element(self))
+}
+
+///|
+pub impl FromValue for Element with fn from_value(v) {
+  match Func::from_value(v).to_element() {
+    Some(elem) => elem
+    None => bail("expected element")
+  }
+}

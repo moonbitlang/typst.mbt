@@ -73,66 +73,6 @@ fn block_elem_body_default() -> Value {
 }
 
 ///|
-/// TODO: port `Default::default() of TrackSizings` (GridElem.columns).
-fn grid_elem_columns_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of TrackSizings` (GridElem.rows).
-fn grid_elem_rows_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of TrackSizings` (GridElem.gutter).
-fn grid_elem_gutter_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of TrackSizings` (GridElem.column_gutter).
-fn grid_elem_column_gutter_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of TrackSizings` (GridElem.row_gutter).
-fn grid_elem_row_gutter_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Celled<Sides<Option<Rel<Length>>>>` (GridElem.inset).
-fn grid_elem_inset_default() -> Value {
-  None
-}
-
-///|
-/// TODO: fold for `Celled<Sides<Option<Rel<Length>>>>` (GridElem.inset).
-fn grid_elem_inset_fold(inner : Value, _outer : Value) -> Value {
-  inner
-}
-
-///|
-/// TODO: port `Default::default() of Celled<Smart<Alignment>>` (GridElem.align).
-fn grid_elem_align_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Celled<Option<Paint>>` (GridElem.fill).
-fn grid_elem_fill_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Celled<Sides<Option<Option<Arc<Stroke>>>>>` (GridElem.stroke).
-fn grid_elem_stroke_default() -> Value {
-  None
-}
-
-///|
 /// TODO: fold for `Celled<Sides<Option<Option<Arc<Stroke>>>>>` (GridElem.stroke).
 fn grid_elem_stroke_fold(inner : Value, _outer : Value) -> Value {
   inner
@@ -160,18 +100,6 @@ fn grid_v_line_elem_stroke_default() -> Value {
 /// TODO: fold for `Option<Arc<Stroke>>` (GridVLine.stroke).
 fn grid_v_line_elem_stroke_fold(inner : Value, _outer : Value) -> Value {
   inner
-}
-
-///|
-/// TODO: port `Default::default() of Smart<Option<Paint>>` (GridCell.fill).
-fn grid_cell_elem_fill_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Sides<Option<Option<Arc<Stroke>>>>` (GridCell.stroke).
-fn grid_cell_elem_stroke_default() -> Value {
-  None
 }
 
 ///|
@@ -233,12 +161,6 @@ fn page_elem_fill_default() -> Value {
 }
 
 ///|
-/// TODO: port `Default::default() of Option<Numbering>` (PageElem.numbering).
-fn page_elem_numbering_default() -> Value {
-  None
-}
-
-///|
 /// TODO: port `Default::default() of Option<Parity>` (PagebreakElem.to).
 fn pagebreak_elem_to_default() -> Value {
   None
@@ -290,12 +212,6 @@ fn cancel_elem_stroke_default() -> Value {
 /// TODO: fold for `Stroke` (CancelElem.stroke).
 fn cancel_elem_stroke_fold(inner : Value, _outer : Value) -> Value {
   inner
-}
-
-///|
-/// TODO: port `Default::default() of Option<Numbering>` (EquationElem.numbering).
-fn equation_elem_numbering_default() -> Value {
-  None
 }
 
 ///|
@@ -399,12 +315,6 @@ fn bibliography_elem_style_default() -> Value {
 // TODO: port `#[parse]` of BibliographyElem.style as `bibliography_elem_style_parse`.
 
 ///|
-/// TODO: port `Default::default() of Smart<LocatableSelector>` (BibliographyElem.target).
-fn bibliography_elem_target_default() -> Value {
-  None
-}
-
-///|
 /// TODO: port `Some(CitationForm::Normal)` (CiteElem.form).
 fn cite_elem_form_default() -> Value {
   None
@@ -433,18 +343,6 @@ fn document_elem_author_default() -> Value {
 ///|
 /// TODO: port `Default::default() of OneOrMultiple<EcoString>` (DocumentElem.keywords).
 fn document_elem_keywords_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Smart<Option<Datetime>>` (DocumentElem.date).
-fn document_elem_date_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Numbering::Pattern(NumberingPattern::from_str("1.").unwrap())` (EnumElem.numbering).
-fn enum_elem_numbering_default() -> Value {
   None
 }
 
@@ -491,26 +389,8 @@ fn figure_elem_supplement_default() -> Value {
 }
 
 ///|
-/// TODO: port `Some(NumberingPattern::from_str("1").unwrap().into())` (FigureElem.numbering).
-fn figure_elem_numbering_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Numbering::Pattern(NumberingPattern::from_str("1").unwrap())` (FootnoteElem.numbering).
-fn footnote_elem_numbering_default() -> Value {
-  None
-}
-
-///|
 /// TODO: port `LineElem::new().with_length(Ratio::new(0.3).into()).with_stroke(Stroke { thickness : Smart::Custom(Em::new(0.05).into()), .. Default::default() }).pack()` (FootnoteEntry.separator).
 fn footnote_entry_elem_separator_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Option<Numbering>` (HeadingElem.numbering).
-fn heading_elem_numbering_default() -> Value {
   None
 }
 
@@ -548,12 +428,6 @@ fn list_elem_depth_default() -> Value {
 /// TODO: fold for `Depth` (ListElem.depth).
 fn list_elem_depth_fold(inner : Value, _outer : Value) -> Value {
   inner
-}
-
-///|
-/// TODO: port `LocatableSelector(HeadingElem::ELEM.select())` (OutlineElem.target).
-fn outline_elem_target_default() -> Value {
-  None
 }
 
 ///|
@@ -605,12 +479,6 @@ fn par_elem_first_line_indent_fold(inner : Value, _outer : Value) -> Value {
 }
 
 ///|
-/// TODO: port `Default::default() of Option<Numbering>` (ParLine.numbering).
-fn par_line_elem_numbering_default() -> Value {
-  None
-}
-
-///|
 /// TODO: port `LineNumberingScope::Document` (ParLine.numbering_scope).
 fn par_line_elem_numbering_scope_default() -> Value {
   None
@@ -643,60 +511,6 @@ fn ref_elem_supplement_default() -> Value {
 ///|
 /// TODO: port `RefForm::Normal` (RefElem.form).
 fn ref_elem_form_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of TrackSizings` (TableElem.columns).
-fn table_elem_columns_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of TrackSizings` (TableElem.rows).
-fn table_elem_rows_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of TrackSizings` (TableElem.gutter).
-fn table_elem_gutter_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of TrackSizings` (TableElem.column_gutter).
-fn table_elem_column_gutter_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of TrackSizings` (TableElem.row_gutter).
-fn table_elem_row_gutter_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Celled::Value(Sides::splat(Some(Abs::pt(5.0).into())))` (TableElem.inset).
-fn table_elem_inset_default() -> Value {
-  None
-}
-
-///|
-/// TODO: fold for `Celled<Sides<Option<Rel<Length>>>>` (TableElem.inset).
-fn table_elem_inset_fold(inner : Value, _outer : Value) -> Value {
-  inner
-}
-
-///|
-/// TODO: port `Default::default() of Celled<Smart<Alignment>>` (TableElem.align).
-fn table_elem_align_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Celled<Option<Paint>>` (TableElem.fill).
-fn table_elem_fill_default() -> Value {
   None
 }
 
@@ -737,27 +551,9 @@ fn table_v_line_elem_stroke_fold(inner : Value, _outer : Value) -> Value {
 }
 
 ///|
-/// TODO: port `Default::default() of Smart<Option<Paint>>` (TableCell.fill).
-fn table_cell_elem_fill_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Sides<Option<Option<Arc<Stroke>>>>` (TableCell.stroke).
-fn table_cell_elem_stroke_default() -> Value {
-  None
-}
-
-///|
 /// TODO: fold for `Sides<Option<Option<Arc<Stroke>>>>` (TableCell.stroke).
 fn table_cell_elem_stroke_fold(inner : Value, _outer : Value) -> Value {
   inner
-}
-
-///|
-/// TODO: port `Default::default() of Smart<TableCellKind>` (TableCell.kind).
-fn table_cell_elem_kind_default() -> Value {
-  None
 }
 
 ///|

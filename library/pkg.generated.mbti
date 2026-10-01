@@ -7,6 +7,7 @@ import {
   "moonbitlang/core/ref",
   "moonbitlang/typst/regex",
   "moonbitlang/typst/syntax",
+  "moonbitlang/typst/time",
 }
 
 // Values
@@ -152,10 +153,6 @@ pub fn bundle_format() -> Format
 
 pub fn bundle_format_elem() -> Element
 
-pub fn bytes_cast_b(Value) -> Bytes raise HintedError
-
-pub fn bytes_into_value_b(Bytes) -> Value
-
 pub fn cancel_elem() -> Element
 
 pub let cancel_elem_angle : Int
@@ -185,6 +182,8 @@ pub let cases_elem_reverse : Int
 pub fn[T : Reflect] cast_error(Ty[T], Value) -> HintedString
 
 pub fn cast_usize(Value) -> Int64 raise HintedError
+
+pub fn[T : Reflect] castable_of(Ty[T], Value) -> Bool
 
 pub fn circle_elem() -> Element
 
@@ -323,6 +322,10 @@ pub let curve_quad_elem_control : Int
 pub let curve_quad_elem_end : Int
 
 pub let curve_quad_elem_relative : Int
+
+pub let decimal_one : Decimal
+
+pub let decimal_zero : Decimal
 
 pub fn direct_link_elem() -> Element
 
@@ -527,6 +530,8 @@ pub fn format_float_with_unit(Double, String) -> String
 pub fn format_int_with_base(Int64, Int64) -> String
 
 pub fn format_module(Array[Format]) -> Module
+
+pub fn format_selector(Selector, String) -> String
 
 pub fn frac_elem() -> Element
 
@@ -2638,11 +2643,19 @@ pub impl FromValue for BundlePath
 pub impl IntoValue for BundlePath
 pub impl Reflect for BundlePath
 
-pub(all) struct BytesValue(Bytes) derive(Eq, Hash)
+pub struct BytesValue(Bytes) derive(Eq, Hash)
 pub fn BytesValue::as_slice(Self) -> Bytes
+pub fn BytesValue::as_str(Self) -> String?
 pub fn BytesValue::concat(Self, Self) -> Self
+pub fn BytesValue::from_string(String) -> Self
+pub fn BytesValue::is_empty(Self) -> Bool
+pub fn BytesValue::len(Self) -> Int
 pub fn BytesValue::new(Bytes) -> Self
 pub fn BytesValue::repr(Self) -> String
+pub fn BytesValue::to_str(Self) -> String?
+pub impl FromValue for BytesValue
+pub impl IntoValue for BytesValue
+pub impl Reflect for BytesValue
 
 pub(all) enum Capturer {
   Function
@@ -2694,6 +2707,27 @@ pub(all) enum Category {
   Png
   Bundle
 } derive(Eq, Hash, @debug.Debug)
+
+pub(all) enum Celled[T] {
+  CelledValue(T)
+  CelledFunc(Func)
+  CelledArray(Array[T])
+} derive(Eq)
+pub impl[T : Default] Default for Celled[T]
+pub impl[T : Fold] Fold for Celled[T]
+pub impl[T : FromValue] FromValue for Celled[T]
+pub impl[T : IntoValue] IntoValue for Celled[T]
+pub impl[T : Reflect] Reflect for Celled[T]
+
+pub(all) enum ChineseCase {
+  Upper
+  Lower
+} derive(Eq, @debug.Debug)
+
+pub(all) enum ChineseVariant {
+  Traditional
+  Simple
+} derive(Eq, @debug.Debug)
 
 pub(all) struct Closure {
   node : ClosureNode
@@ -2806,20 +2840,74 @@ pub impl[T : FromValue] FromValue for Corners[T?]
 pub impl[T : IntoValue + Eq] IntoValue for Corners[T?]
 pub impl[T : Reflect] Reflect for Corners[T?]
 
-pub(all) struct Counter {
-  // private fields
-} derive(Eq, Hash)
+pub(all) struct Counter(CounterKey) derive(Eq)
+pub fn Counter::display_at(Self, Engine, Location, StyleChain, Numbering, @syntax.Span) -> Content raise SourceError
+pub fn Counter::is_page(Self) -> Bool
+pub fn Counter::new(CounterKey) -> Self
+pub fn Counter::of(Element) -> Self
 pub fn Counter::repr(Self) -> String
+pub fn Counter::select(Self, Introspector, Location) -> Selector
+pub fn Counter::select_any() -> Selector
+pub impl FromValue for Counter
+pub impl IntoValue for Counter
+pub impl Reflect for Counter
 
-pub(all) struct Datetime {
-  // private fields
+pub(all) enum CounterKey {
+  Page
+  Selector(Selector)
+  Str(String)
+} derive(Eq)
+pub fn CounterKey::repr(Self) -> String
+pub impl FromValue for CounterKey
+pub impl IntoValue for CounterKey
+pub impl Reflect for CounterKey
+
+pub(all) struct CounterState(Array[Int64]) derive(Eq)
+pub fn CounterState::copy(Self) -> Self
+pub fn CounterState::display(Self, Engine, Context, @syntax.Span, Numbering) -> Value raise SourceError
+pub fn CounterState::first(Self) -> Int64
+pub fn CounterState::init(Bool) -> Self
+pub fn CounterState::step(Self, Int, Int64) -> Unit
+pub fn CounterState::update(Self, Engine, CounterUpdate) -> Unit raise SourceError
+pub impl FromValue for CounterState
+pub impl IntoValue for CounterState
+pub impl Reflect for CounterState
+
+pub(all) enum CounterUpdate {
+  Set(CounterState)
+  Step(NonZeroUSize)
+  Func(Func)
+} derive(Eq)
+pub impl FromValue for CounterUpdate
+pub impl IntoValue for CounterUpdate
+pub impl Reflect for CounterUpdate
+
+pub(all) enum Datetime {
+  Date(@time.Date)
+  Time(@time.Time)
+  Datetime(@time.PrimitiveDateTime)
 } derive(Eq, Hash)
-pub fn Datetime::add_duration(Self, Duration) -> Self raise HintedError
+pub fn Datetime::add_duration(Self, Duration) -> Self
+pub fn Datetime::day(Self) -> Int?
+pub fn Datetime::from_hms(Int, Int, Int) -> Self?
+pub fn Datetime::from_toml_dict(Dict) -> Self?
+pub fn Datetime::from_ymd(Int, Int, Int) -> Self?
+pub fn Datetime::from_ymd_hms(Int, Int, Int, Int, Int, Int) -> Self?
+pub fn Datetime::hour(Self) -> Int?
 pub fn Datetime::kind(Self) -> String
+pub fn Datetime::minute(Self) -> Int?
+pub fn Datetime::month(Self) -> Int?
+pub fn Datetime::ordinal(Self) -> Int?
 pub fn Datetime::partial_cmp(Self, Self) -> Int?
 pub fn Datetime::repr(Self) -> String
+pub fn Datetime::second(Self) -> Int?
 pub fn Datetime::sub_datetime(Self, Self) -> Duration raise HintedError
-pub fn Datetime::sub_duration(Self, Duration) -> Self raise HintedError
+pub fn Datetime::sub_duration(Self, Duration) -> Self
+pub fn Datetime::weekday(Self) -> Int?
+pub fn Datetime::year(Self) -> Int?
+pub impl FromValue for Datetime
+pub impl IntoValue for Datetime
+pub impl Reflect for Datetime
 
 pub(all) enum DecNum {
   Int(Int64)
@@ -2830,22 +2918,24 @@ pub impl FromValue for DecNum
 pub impl IntoValue for DecNum
 pub impl Reflect for DecNum
 
-pub(all) struct Decimal {
-  // private fields
-} derive(Eq, Hash)
+pub struct Decimal(RustDecimal)
 pub fn Decimal::abs(Self) -> Self
 pub fn Decimal::ceil(Self) -> Self
-pub fn Decimal::checked_add(Self, Self) -> Self raise HintedError
-pub fn Decimal::checked_div(Self, Self) -> Self raise HintedError
+pub fn Decimal::checked_add(Self, Self) -> Self?
+pub fn Decimal::checked_div(Self, Self) -> Self?
 pub fn Decimal::checked_div_euclid(Self, Self) -> Self?
-pub fn Decimal::checked_mul(Self, Self) -> Self raise HintedError
+pub fn Decimal::checked_mul(Self, Self) -> Self?
 pub fn Decimal::checked_powi(Self, Int64) -> Self?
 pub fn Decimal::checked_rem(Self, Self) -> Self?
 pub fn Decimal::checked_rem_euclid(Self, Self) -> Self?
-pub fn Decimal::checked_sub(Self, Self) -> Self raise HintedError
+pub fn Decimal::checked_sub(Self, Self) -> Self?
+pub fn Decimal::clamp(Self, Self, Self) -> Self
 pub fn Decimal::floor(Self) -> Self
 pub fn Decimal::fract(Self) -> Self
 pub fn Decimal::from_int(Int64) -> Self
+pub fn Decimal::from_str(String) -> Self?
+pub fn Decimal::is_integer(Self) -> Bool
+pub fn Decimal::is_negative(Self) -> Bool
 pub fn Decimal::is_zero(Self) -> Bool
 pub fn Decimal::neg(Self) -> Self
 pub fn Decimal::repr(Self) -> String
@@ -2854,7 +2944,14 @@ pub fn Decimal::to_f64(Self) -> Double?
 pub fn Decimal::to_i64(Self) -> Int64?
 pub fn Decimal::to_string(Self) -> String
 pub fn Decimal::trunc(Self) -> Self
+pub fn Decimal::try_from_f64(Double) -> Self?
 pub impl Compare for Decimal
+pub impl Eq for Decimal
+pub impl Hash for Decimal
+pub impl Show for Decimal
+pub impl FromValue for Decimal
+pub impl IntoValue for Decimal
+pub impl Reflect for Decimal
 
 pub(all) struct Deprecation {
   message : String
@@ -2905,18 +3002,29 @@ pub impl FromValue for Dir
 pub impl IntoValue for Dir
 pub impl Reflect for Dir
 
-pub(all) struct Duration {
-  // private fields
-} derive(Eq, Hash)
+pub struct DisplayPattern(String, @time.FormatItem)
+pub impl FromValue for DisplayPattern
+pub impl IntoValue for DisplayPattern
+pub impl Reflect for DisplayPattern
+
+pub struct Duration(@time.Duration) derive(Compare, Eq, Hash)
 pub fn Duration::add(Self, Self) -> Self
+pub fn Duration::days(Self) -> Double
+pub fn Duration::decompose(Self) -> FixedArray[Int64]
 pub fn Duration::div(Self, Double) -> Self
 pub fn Duration::div_duration(Self, Self) -> Double
+pub fn Duration::hours(Self) -> Double
 pub fn Duration::is_zero(Self) -> Bool
+pub fn Duration::minutes(Self) -> Double
 pub fn Duration::mul(Self, Double) -> Self
 pub fn Duration::neg(Self) -> Self
 pub fn Duration::repr(Self) -> String
+pub fn Duration::seconds(Self) -> Double
 pub fn Duration::sub(Self, Self) -> Self
-pub impl Compare for Duration
+pub fn Duration::weeks(Self) -> Double
+pub impl FromValue for Duration
+pub impl IntoValue for Duration
+pub impl Reflect for Duration
 
 pub(all) enum DynValue {
   Alignment(Alignment)
@@ -2929,6 +3037,8 @@ pub(all) enum DynValue {
   Location(Location)
   Selector(Selector)
   RootedPath(@syntax.RootedPath)
+  CounterUpdate(CounterUpdate)
+  StateUpdate(StateUpdate)
 } derive(Eq)
 pub fn DynValue::add_dyn(Self, Self) -> Value? raise HintedError
 pub fn DynValue::field(Self, String) -> Value??
@@ -2964,6 +3074,9 @@ pub fn Element::where_(Self, Array[(Int, Value)]) -> Selector
 pub impl Compare for Element
 pub impl Eq for Element
 pub impl Hash for Element
+pub impl FromValue for Element
+pub impl IntoValue for Element
+pub impl Reflect for Element
 
 pub struct ElementData {
   name : String
@@ -3143,6 +3256,33 @@ pub(all) struct Gradient {
 } derive(Eq, Hash)
 pub fn Gradient::repr(Self) -> String
 
+pub struct GridCell(Content)
+pub fn GridCell::from_content(Content) -> Self
+pub fn GridCell::new(Content) -> Self
+pub impl FromValue for GridCell
+pub impl IntoValue for GridCell
+pub impl Reflect for GridCell
+
+pub(all) enum GridChild {
+  Header(Content)
+  Footer(Content)
+  Item(GridItem)
+} derive(Eq)
+pub fn GridChild::try_from(Content) -> Self raise HintedError
+pub impl FromValue for GridChild
+pub impl IntoValue for GridChild
+pub impl Reflect for GridChild
+
+pub(all) enum GridItem {
+  HLine(Content)
+  VLine(Content)
+  Cell(Content)
+} derive(Eq)
+pub fn GridItem::try_from(Content) -> Self raise HintedError
+pub impl FromValue for GridItem
+pub impl IntoValue for GridItem
+pub impl Reflect for GridItem
+
 pub(all) enum HAlignment {
   Start
   Left
@@ -3191,7 +3331,20 @@ pub impl Reflect for I8
 pub struct Introspector {
   // private fields
 }
+pub fn Introspector::document(Self, Location) -> Location?
 pub fn Introspector::empty() -> Self
+pub fn Introspector::label_count(Self, Label) -> Int
+pub fn Introspector::page(Self, Location) -> NonZeroUSize?
+pub fn Introspector::page_numbering(Self, Location) -> Numbering?
+pub fn Introspector::page_supplement(Self, Location) -> Content?
+pub fn Introspector::pages(Self, Location) -> NonZeroUSize?
+pub fn Introspector::position_dict(Self, Location) -> Dict?
+pub fn Introspector::query(Self, Selector) -> Array[Content]
+pub fn Introspector::query_count_before(Self, Selector, Location) -> Int
+pub fn Introspector::query_first(Self, Selector) -> Content?
+pub fn Introspector::query_label(Self, Label) -> Content raise HintedError
+pub fn Introspector::query_labelled(Self) -> Array[Content]
+pub fn Introspector::query_unique(Self, Selector) -> Content raise HintedError
 
 pub(all) struct Label(String) derive(Compare, Eq, Hash)
 pub fn Label::new(String) -> Self?
@@ -3251,8 +3404,17 @@ pub fn LibraryBuilder::with_inputs(Self, Dict) -> Self
 pub struct LinkElem(Content)
 pub fn LinkElem::from_url(String) -> Content raise HintedError
 
+pub(all) struct LocatableSelector(Selector) derive(Eq)
+pub fn LocatableSelector::resolve_unique(Self, Engine, Context, @syntax.Span) -> Location raise SourceError
+pub impl FromValue for LocatableSelector
+pub impl IntoValue for LocatableSelector
+pub impl Reflect for LocatableSelector
+
 pub(all) struct Location(UInt64) derive(Compare, Eq, Hash)
 pub fn Location::repr(Self) -> String
+pub impl FromValue for Location
+pub impl IntoValue for Location
+pub impl Reflect for Location
 
 pub(all) struct ModifierSet(String) derive(Eq, Hash, @debug.Debug)
 pub fn ModifierSet::as_str(Self) -> String
@@ -3281,6 +3443,45 @@ pub fn Module::with_file_id(Self, @syntax.FileId) -> Self
 pub fn Module::with_name(Self, String) -> Self
 pub fn Module::with_scope(Self, Scope) -> Self
 pub impl Eq for Module
+
+pub(all) enum NamedNumeralSystem {
+  Arabic
+  CircledArabic
+  DoubleCircledArabic
+  LowerLatin
+  UpperLatin
+  LowerRoman
+  UpperRoman
+  LowerGreek
+  UpperGreek
+  LowerArmenian
+  UpperArmenian
+  Hebrew
+  LowerSimplifiedChinese
+  UpperSimplifiedChinese
+  LowerTraditionalChinese
+  UpperTraditionalChinese
+  HiraganaAiueo
+  HiraganaIroha
+  KatakanaAiueo
+  KatakanaIroha
+  KoreanJamo
+  KoreanSyllable
+  EasternArabic
+  ArabicAbjad
+  Persian
+  Devanagari
+  Tibetan
+  Bengali
+  BengaliLetters
+  Symbols
+} derive(Eq, Hash, @debug.Debug)
+pub fn NamedNumeralSystem::all() -> Array[Self]
+pub fn NamedNumeralSystem::from_name(String) -> Self?
+pub fn NamedNumeralSystem::from_shorthand(String) -> Self?
+pub fn NamedNumeralSystem::name(Self) -> String
+pub fn NamedNumeralSystem::shorthand(Self) -> String?
+pub fn NamedNumeralSystem::system(Self) -> NumeralSystem
 
 pub struct NativeFuncData {
   function : (Engine, Context, Args) -> Value raise SourceError
@@ -3339,6 +3540,41 @@ pub(all) enum Num {
 pub impl FromValue for Num
 pub impl IntoValue for Num
 pub impl Reflect for Num
+
+pub(all) enum Numbering {
+  Pattern(NumberingPattern)
+  Func(Func)
+} derive(Eq)
+pub fn Numbering::apply(Self, Engine, Context, @syntax.Span, ArrayView[Int64]) -> Value raise SourceError
+pub fn Numbering::trimmed(Self) -> Self
+pub impl FromValue for Numbering
+pub impl IntoValue for Numbering
+pub impl Reflect for Numbering
+
+pub(all) struct NumberingPattern {
+  pieces : Array[(String, NamedNumeralSystem)]
+  suffix : String
+  // private fields
+} derive(Eq)
+pub fn NumberingPattern::apply(Self, (Engine, @syntax.Span)?, ArrayView[Int64]) -> String raise HintedError
+pub fn NumberingPattern::apply_kth(Self, Engine, @syntax.Span, Int, Int64) -> String
+pub fn NumberingPattern::from_str(String) -> Self raise HintedError
+pub fn NumberingPattern::num_pieces(Self) -> Int
+pub fn NumberingPattern::to_string(Self) -> String
+pub impl FromValue for NumberingPattern
+pub impl IntoValue for NumberingPattern
+pub impl Reflect for NumberingPattern
+
+pub(all) enum NumeralSystem {
+  Positional(Array[String])
+  Bijective(Array[String])
+  Additive(Array[(String, UInt64)])
+  Symbolic(Array[String])
+  Fixed(Array[String])
+  ZerolessFixed(Array[String])
+  Chinese(ChineseVariant, ChineseCase)
+}
+pub fn NumeralSystem::represent(Self, UInt64) -> Result[String, RepresentationError]
 
 pub(all) enum NumericUnit {
   Pt
@@ -3509,6 +3745,11 @@ pub impl FromValue for Replacement
 pub impl IntoValue for Replacement
 pub impl Reflect for Replacement
 
+pub(all) enum RepresentationError {
+  Zero
+  TooLarge
+} derive(Eq, @debug.Debug)
+
 pub struct Route {
   // private fields
 }
@@ -3528,6 +3769,8 @@ pub(all) struct Routines {
   eval_string : (Engine, Context, String, @syntax.Span, @syntax.SyntaxMode, Scope) -> Value raise SourceError
   eval_closure : (Func, Closure, Engine, Context, Args) -> Value raise SourceError
 }
+
+type RustDecimal derive(Hash)
 
 pub(all) struct Scalar(Double) derive(Default)
 pub fn Scalar::get(Self) -> Double
@@ -3587,9 +3830,14 @@ pub(all) enum Selector {
   After(selector~ : Selector, start~ : Selector, inclusive~ : Bool)
   Within(selector~ : Selector, ancestor~ : Selector)
 } derive(Eq)
+pub fn Selector::can(String) -> Self
+pub fn Selector::matches(Self, Content, StyleChain?) -> Bool
 pub fn Selector::regex(Regex) -> Self raise HintedError
 pub fn Selector::repr(Self) -> String
 pub fn Selector::text(String) -> Self raise HintedError
+pub impl FromValue for Selector
+pub impl IntoValue for Selector
+pub impl Reflect for Selector
 
 pub struct SequenceElem(Content)
 pub fn SequenceElem::children(Content) -> Array[Content]
@@ -3600,8 +3848,9 @@ pub(all) enum Severity {
   Warning
 } derive(Eq, Hash, @debug.Debug)
 
-pub(all) struct ShowableSelector(Selector)
+pub(all) struct ShowableSelector(Selector) derive(Eq)
 pub impl FromValue for ShowableSelector
+pub impl IntoValue for ShowableSelector
 pub impl Reflect for ShowableSelector
 
 pub(all) enum Side {
@@ -3687,6 +3936,22 @@ pub impl[T : FromValue] FromValue for Smart[T]
 pub impl[T : IntoValue] IntoValue for Smart[T]
 pub impl[T : Reflect] Reflect for Smart[T]
 
+pub(all) enum SmartDisplayPattern {
+  Auto
+  Custom(DisplayPattern)
+}
+pub impl FromValue for SmartDisplayPattern
+pub impl IntoValue for SmartDisplayPattern
+pub impl Reflect for SmartDisplayPattern
+
+pub(all) enum SmartTodayOffset {
+  Auto
+  Custom(TodayOffset)
+}
+pub impl FromValue for SmartTodayOffset
+pub impl IntoValue for SmartTodayOffset
+pub impl Reflect for SmartTodayOffset
+
 pub(all) struct SourceDiagnostic {
   severity : Severity
   span : @syntax.DiagSpan
@@ -3735,9 +4000,24 @@ pub(all) struct SpotColorant {
 pub fn SpotColorant::repr(Self) -> String
 
 pub(all) struct State {
-  // private fields
-} derive(Eq, Hash)
+  key : String
+  init : Value
+} derive(Eq)
+pub fn State::new(String, Value) -> Self
 pub fn State::repr(Self) -> String
+pub fn State::select(Self) -> Selector
+pub fn State::select_any() -> Selector
+pub impl FromValue for State
+pub impl IntoValue for State
+pub impl Reflect for State
+
+pub(all) enum StateUpdate {
+  Set(Value)
+  Func(Func)
+} derive(Eq)
+pub impl FromValue for StateUpdate
+pub impl IntoValue for StateUpdate
+pub impl Reflect for StateUpdate
 
 pub(all) enum StrPattern {
   Str(String)
@@ -3843,6 +4123,60 @@ pub(all) struct SymbolVariant(String, String)
 pub impl FromValue for SymbolVariant
 pub impl Reflect for SymbolVariant
 
+pub struct TableCell(Content)
+pub fn TableCell::from_content(Content) -> Self
+pub fn TableCell::kind(Self) -> Smart[TableCellKind]?
+pub fn TableCell::new(Content) -> Self
+pub fn TableCell::with_kind(Self, Smart[TableCellKind]) -> Self
+pub impl FromValue for TableCell
+pub impl IntoValue for TableCell
+pub impl Reflect for TableCell
+
+pub(all) enum TableCellKind {
+  Header(NonZeroU32, TableHeaderScope)
+  Footer
+  Data
+} derive(Eq, Hash, @debug.Debug)
+pub impl Default for TableCellKind
+
+pub(all) enum TableChild {
+  Header(Content)
+  Footer(Content)
+  Item(TableItem)
+} derive(Eq)
+pub fn TableChild::try_from(Content) -> Self raise HintedError
+pub impl FromValue for TableChild
+pub impl IntoValue for TableChild
+pub impl Reflect for TableChild
+
+pub struct TableElem(Content)
+pub fn TableElem::with_summary(Self, String?) -> Self
+pub impl FromValue for TableElem
+pub impl IntoValue for TableElem
+pub impl Reflect for TableElem
+
+pub(all) enum TableHeaderScope {
+  Both
+  Column
+  Row
+} derive(Eq, Hash, @debug.Debug)
+pub fn TableHeaderScope::refers_to_column(Self) -> Bool
+pub fn TableHeaderScope::refers_to_row(Self) -> Bool
+pub impl Default for TableHeaderScope
+pub impl FromValue for TableHeaderScope
+pub impl IntoValue for TableHeaderScope
+pub impl Reflect for TableHeaderScope
+
+pub(all) enum TableItem {
+  HLine(Content)
+  VLine(Content)
+  Cell(Content)
+} derive(Eq)
+pub fn TableItem::try_from(Content) -> Self raise HintedError
+pub impl FromValue for TableItem
+pub impl IntoValue for TableItem
+pub impl Reflect for TableItem
+
 pub struct TextElem(Content)
 pub fn TextElem::packed(String) -> Content
 
@@ -3858,6 +4192,19 @@ pub impl Reflect for ToAbs
 pub(all) struct ToArray(Arr)
 pub impl FromValue for ToArray
 pub impl Reflect for ToArray
+
+pub struct ToBytes(BytesValue)
+pub impl FromValue for ToBytes
+pub impl Reflect for ToBytes
+
+pub(all) enum ToDecimal {
+  Decimal(Decimal)
+  Str(String)
+  Int(Int64)
+  Float(Double)
+}
+pub impl FromValue for ToDecimal
+pub impl Reflect for ToDecimal
 
 pub(all) struct ToDict(Module)
 pub impl FromValue for ToDict
@@ -3881,6 +4228,11 @@ pub(all) enum ToStr {
 pub impl FromValue for ToStr
 pub impl Reflect for ToStr
 
+pub struct TodayOffset(Duration)
+pub impl FromValue for TodayOffset
+pub impl IntoValue for TodayOffset
+pub impl Reflect for TodayOffset
+
 pub(all) struct Traced(@syntax.Span?)
 pub fn Traced::get(Self, @syntax.FileId) -> @syntax.Span?
 pub fn Traced::new(traced? : @syntax.Span) -> Self
@@ -3892,6 +4244,12 @@ pub(all) enum Tracepoint {
   Include(String)
 } derive(Eq, Hash, @debug.Debug)
 pub impl Show for Tracepoint
+
+pub(all) struct TrackSizings(Array[Sizing]) derive(Eq, Hash)
+pub impl Default for TrackSizings
+pub impl FromValue for TrackSizings
+pub impl IntoValue for TrackSizings
+pub impl Reflect for TrackSizings
 
 pub(all) enum Transformation {
   Content(Content)
@@ -4063,12 +4421,26 @@ pub impl FromValue for Value
 pub impl IntoValue for Value
 pub impl Reflect for Value
 
-pub(all) struct Version(Array[Int]) derive(Eq, Hash)
+pub struct Version(Array[UInt]) derive(Hash)
 pub fn Version::component(Self, String) -> Int64 raise HintedError
+pub fn Version::new() -> Self
+pub fn Version::push(Self, UInt) -> Unit
 pub fn Version::repr(Self) -> String
 pub fn Version::to_string(Self) -> String
-pub fn Version::values(Self) -> Array[Int]
+pub fn Version::values(Self) -> Array[UInt]
 pub impl Compare for Version
+pub impl Eq for Version
+pub impl Show for Version
+pub impl FromValue for Version
+pub impl IntoValue for Version
+pub impl Reflect for Version
+
+pub(all) enum VersionComponents {
+  Single(UInt)
+  Multiple(Array[UInt])
+}
+pub impl FromValue for VersionComponents
+pub impl Reflect for VersionComponents
 
 pub(all) struct Warned[T] {
   output : T
@@ -4106,6 +4478,7 @@ pub impl[T : FromValue] FromValue for T?
 pub impl[T : FromValue] FromValue for Array[T]
 pub impl FromValue for @syntax.RootedPath
 pub impl FromValue for @syntax.SyntaxMode
+pub impl FromValue for @time.Month
 
 pub(open) trait IntoValue {
   fn into_value(Self) -> Value
@@ -4119,6 +4492,7 @@ pub impl[T : IntoValue] IntoValue for T?
 pub impl[T : IntoValue] IntoValue for Array[T]
 pub impl IntoValue for @syntax.RootedPath
 pub impl IntoValue for @syntax.SyntaxMode
+pub impl IntoValue for @time.Month
 
 pub(open) trait Numeric : Add + Sub + Neg + Eq {
   fn zero() -> Self
@@ -4141,11 +4515,12 @@ pub impl[T : Reflect] Reflect for T?
 pub impl[T : Reflect] Reflect for Array[T]
 pub impl Reflect for @syntax.RootedPath
 pub impl Reflect for @syntax.SyntaxMode
+pub impl Reflect for @time.Month
 
 pub(open) trait World {
   fn library(Self) -> Library
   fn main(Self) -> @syntax.FileId
   fn source(Self, @syntax.FileId) -> @syntax.Source raise FileError
   fn file(Self, @syntax.FileId) -> Bytes raise FileError
-  fn today(Self, Int64?) -> Datetime?
+  fn today(Self, Duration?) -> Datetime?
 }

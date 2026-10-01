@@ -660,12 +660,6 @@ fn impl_str_rev(self_ : String) -> String raise HintedError {
 // Casts.
 
 ///|
-/// Whether `v` can be cast to `T` (upstream `T::castable(&v)`).
-fn[T : Reflect] castable_of(_ : Ty[T], v : Value) -> Bool {
-  T::castable(v)
-}
-
-///|
 /// Whether `v` can be cast to a string (upstream `Str::castable`).
 fn str_castable(v : Value) -> Bool {
   castable_of((Ty::new() : Ty[String]), v)
@@ -756,7 +750,7 @@ pub impl FromValue for ToStr with fn from_value(v) {
     Decimal(d) => Str(d.to_string())
     Version(v) => Str(v.to_string())
     Bytes(b) =>
-      match utf8_decode(b.0) {
+      match b.to_str() {
         Some(s) => Str(s)
         None => bail("bytes are not valid UTF-8")
       }
@@ -766,45 +760,6 @@ pub impl FromValue for ToStr with fn from_value(v) {
     Symbol(s) => Str(s.get())
     v => raise HintedError(ToStr::input().error(v))
   }
-}
-
-///|
-/// Decode valid UTF-8 (Rust `str::from_utf8`), or `None` if invalid.
-fn utf8_decode(bytes : Bytes) -> String? {
-  let out = StringBuilder()
-  let n = bytes.length()
-  let mut i = 0
-  while i < n {
-    let b0 = bytes[i].to_int()
-    let (len, min, init) = if b0 < 0x80 {
-      (1, 0, b0)
-    } else if b0 >= 0xC2 && b0 <= 0xDF {
-      (2, 0x80, b0 & 0x1F)
-    } else if b0 >= 0xE0 && b0 <= 0xEF {
-      (3, 0x800, b0 & 0x0F)
-    } else if b0 >= 0xF0 && b0 <= 0xF4 {
-      (4, 0x10000, b0 & 0x07)
-    } else {
-      return None
-    }
-    if i + len > n {
-      return None
-    }
-    let mut c = init
-    for j in 1..<len {
-      let b = bytes[i + j].to_int()
-      if (b & 0xC0) != 0x80 {
-        return None
-      }
-      c = (c << 6) | (b & 0x3F)
-    }
-    if c < min || c > 0x10FFFF || (c >= 0xD800 && c <= 0xDFFF) {
-      return None
-    }
-    out.write_char(c.unsafe_to_char())
-    i += len
-  }
-  Some(out.to_string())
 }
 
 ///|
