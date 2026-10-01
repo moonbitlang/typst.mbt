@@ -170,6 +170,36 @@ TYPEMAP = {
     "LineNumberingScope": "LineNumberingScope",
     "DocumentFormat": "DocumentFormat",
     "ArtifactKind": "ArtifactKind",
+    # visualize/color.rs
+    "Color": "Color",
+    "ProcessColor": "ProcessColor",
+    "ColorSpace": "ColorSpace",
+    "ProcessColorSpace": "ProcessColorSpace",
+    "SpotColorant": "SpotColorant",
+    "SpotColorantName": "SpotColorantName",
+    "WeightedColor": "WeightedColor",
+    "Component": "Component",
+    "RatioComponent": "RatioComponent",
+    "ChromaComponent": "ChromaComponent",
+    # visualize/gradient.rs
+    "Gradient": "Gradient",
+    "GradientStop": "GradientStop",
+    "RatioOrAngle": "RatioOrAngle",
+    "RelativeTo": "RelativeTo",
+    # visualize/tiling.rs, paint.rs
+    "Tiling": "Tiling",
+    "Paint": "Paint",
+    # visualize/stroke.rs
+    "Stroke": "Stroke",
+    "Arc<Stroke>": "Stroke",
+    "LineCap": "LineCap",
+    "LineJoin": "LineJoin",
+    "DashPattern": "DashPattern",
+    "DashLength": "DashLength",
+    # visualize/shape.rs, curve.rs
+    "FillRule": "FillRule",
+    "CloseMode": "CloseMode",
+    "CurveComponent": "CurveComponent",
     # typst-html (dom.rs, css/encode.rs); ported in library/html_*.mbt
     "HtmlTag": "HtmlTag",
     "HtmlAttr": "HtmlAttr",

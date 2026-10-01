@@ -663,6 +663,42 @@ pub fn colbreak_elem() -> Element
 
 pub let colbreak_elem_weak : Int
 
+pub let color_aqua : Color
+
+pub let color_black : Color
+
+pub let color_blue : Color
+
+pub let color_eastern : Color
+
+pub let color_fuchsia : Color
+
+pub let color_gray : Color
+
+pub let color_green : Color
+
+pub let color_lime : Color
+
+pub let color_maroon : Color
+
+pub let color_navy : Color
+
+pub let color_olive : Color
+
+pub let color_orange : Color
+
+pub let color_purple : Color
+
+pub let color_red : Color
+
+pub let color_silver : Color
+
+pub let color_teal : Color
+
+pub let color_white : Color
+
+pub let color_yellow : Color
+
 pub fn columns_elem() -> Element
 
 pub let columns_elem_balanced : Int
@@ -2333,6 +2369,8 @@ pub fn repr_rooted_path(@syntax.RootedPath) -> String
 
 pub fn repr_str(String) -> String
 
+pub fn resolve_color_space(Smart[ColorSpace], Array[Color]) -> ColorSpace
+
 pub fn root_elem() -> Element
 
 pub let root_elem_index : Int
@@ -3573,9 +3611,9 @@ pub fn BlockElem::breakable_local(Self) -> Bool?
 pub fn BlockElem::clip(Self, StyleChain) -> Bool
 pub fn BlockElem::clip_in(StyleChain) -> Bool
 pub fn BlockElem::clip_local(Self) -> Bool?
-pub fn BlockElem::fill(Self, StyleChain) -> Value
-pub fn BlockElem::fill_in(StyleChain) -> Value
-pub fn BlockElem::fill_local(Self) -> Value?
+pub fn BlockElem::fill(Self, StyleChain) -> Paint?
+pub fn BlockElem::fill_in(StyleChain) -> Paint?
+pub fn BlockElem::fill_local(Self) -> Paint??
 pub fn BlockElem::height(Self, StyleChain) -> Sizing
 pub fn BlockElem::height_in(StyleChain) -> Sizing
 pub fn BlockElem::height_local(Self) -> Sizing?
@@ -3596,20 +3634,20 @@ pub fn BlockElem::set_below(Smart[Spacing]) -> Style
 pub fn BlockElem::set_body(BlockBody?) -> Style
 pub fn BlockElem::set_breakable(Bool) -> Style
 pub fn BlockElem::set_clip(Bool) -> Style
-pub fn BlockElem::set_fill(Value) -> Style
+pub fn BlockElem::set_fill(Paint?) -> Style
 pub fn BlockElem::set_height(Sizing) -> Style
 pub fn BlockElem::set_inset(Sides[Rel[Length]?]) -> Style
 pub fn BlockElem::set_outset(Sides[Rel[Length]?]) -> Style
 pub fn BlockElem::set_radius(Corners[Rel[Length]?]) -> Style
 pub fn BlockElem::set_sticky(Bool) -> Style
-pub fn BlockElem::set_stroke(Value) -> Style
+pub fn BlockElem::set_stroke(Sides[Stroke??]) -> Style
 pub fn BlockElem::set_width(Smart[Rel[Length]]) -> Style
 pub fn BlockElem::sticky(Self, StyleChain) -> Bool
 pub fn BlockElem::sticky_in(StyleChain) -> Bool
 pub fn BlockElem::sticky_local(Self) -> Bool?
-pub fn BlockElem::stroke(Self, StyleChain) -> Value
-pub fn BlockElem::stroke_in(StyleChain) -> Value
-pub fn BlockElem::stroke_local(Self) -> Value?
+pub fn BlockElem::stroke(Self, StyleChain) -> Sides[Stroke??]
+pub fn BlockElem::stroke_in(StyleChain) -> Sides[Stroke??]
+pub fn BlockElem::stroke_local(Self) -> Sides[Stroke??]?
 pub fn BlockElem::width(Self, StyleChain) -> Smart[Rel[Length]]
 pub fn BlockElem::width_in(StyleChain) -> Smart[Rel[Length]]
 pub fn BlockElem::width_local(Self) -> Smart[Rel[Length]]?
@@ -3618,13 +3656,13 @@ pub fn BlockElem::with_below(Self, Smart[Spacing]) -> Self
 pub fn BlockElem::with_body(Self, BlockBody?) -> Self
 pub fn BlockElem::with_breakable(Self, Bool) -> Self
 pub fn BlockElem::with_clip(Self, Bool) -> Self
-pub fn BlockElem::with_fill(Self, Value) -> Self
+pub fn BlockElem::with_fill(Self, Paint?) -> Self
 pub fn BlockElem::with_height(Self, Sizing) -> Self
 pub fn BlockElem::with_inset(Self, Sides[Rel[Length]?]) -> Self
 pub fn BlockElem::with_outset(Self, Sides[Rel[Length]?]) -> Self
 pub fn BlockElem::with_radius(Self, Corners[Rel[Length]?]) -> Self
 pub fn BlockElem::with_sticky(Self, Bool) -> Self
-pub fn BlockElem::with_stroke(Self, Value) -> Self
+pub fn BlockElem::with_stroke(Self, Sides[Stroke??]) -> Self
 pub fn BlockElem::with_width(Self, Smart[Rel[Length]]) -> Self
 
 pub(all) enum BottomEdge {
@@ -3654,9 +3692,9 @@ pub fn BoxElem::body_local(Self) -> Content??
 pub fn BoxElem::clip(Self, StyleChain) -> Bool
 pub fn BoxElem::clip_in(StyleChain) -> Bool
 pub fn BoxElem::clip_local(Self) -> Bool?
-pub fn BoxElem::fill(Self, StyleChain) -> Value
-pub fn BoxElem::fill_in(StyleChain) -> Value
-pub fn BoxElem::fill_local(Self) -> Value?
+pub fn BoxElem::fill(Self, StyleChain) -> Paint?
+pub fn BoxElem::fill_in(StyleChain) -> Paint?
+pub fn BoxElem::fill_local(Self) -> Paint??
 pub fn BoxElem::height(Self, StyleChain) -> Smart[Rel[Length]]
 pub fn BoxElem::height_in(StyleChain) -> Smart[Rel[Length]]
 pub fn BoxElem::height_local(Self) -> Smart[Rel[Length]]?
@@ -3675,28 +3713,28 @@ pub fn BoxElem::radius_local(Self) -> Corners[Rel[Length]?]?
 pub fn BoxElem::set_baseline(BaselinePos) -> Style
 pub fn BoxElem::set_body(Content?) -> Style
 pub fn BoxElem::set_clip(Bool) -> Style
-pub fn BoxElem::set_fill(Value) -> Style
+pub fn BoxElem::set_fill(Paint?) -> Style
 pub fn BoxElem::set_height(Smart[Rel[Length]]) -> Style
 pub fn BoxElem::set_inset(Sides[Rel[Length]?]) -> Style
 pub fn BoxElem::set_outset(Sides[Rel[Length]?]) -> Style
 pub fn BoxElem::set_radius(Corners[Rel[Length]?]) -> Style
-pub fn BoxElem::set_stroke(Value) -> Style
+pub fn BoxElem::set_stroke(Sides[Stroke??]) -> Style
 pub fn BoxElem::set_width(Sizing) -> Style
-pub fn BoxElem::stroke(Self, StyleChain) -> Value
-pub fn BoxElem::stroke_in(StyleChain) -> Value
-pub fn BoxElem::stroke_local(Self) -> Value?
+pub fn BoxElem::stroke(Self, StyleChain) -> Sides[Stroke??]
+pub fn BoxElem::stroke_in(StyleChain) -> Sides[Stroke??]
+pub fn BoxElem::stroke_local(Self) -> Sides[Stroke??]?
 pub fn BoxElem::width(Self, StyleChain) -> Sizing
 pub fn BoxElem::width_in(StyleChain) -> Sizing
 pub fn BoxElem::width_local(Self) -> Sizing?
 pub fn BoxElem::with_baseline(Self, BaselinePos) -> Self
 pub fn BoxElem::with_body(Self, Content?) -> Self
 pub fn BoxElem::with_clip(Self, Bool) -> Self
-pub fn BoxElem::with_fill(Self, Value) -> Self
+pub fn BoxElem::with_fill(Self, Paint?) -> Self
 pub fn BoxElem::with_height(Self, Smart[Rel[Length]]) -> Self
 pub fn BoxElem::with_inset(Self, Sides[Rel[Length]?]) -> Self
 pub fn BoxElem::with_outset(Self, Sides[Rel[Length]?]) -> Self
 pub fn BoxElem::with_radius(Self, Corners[Rel[Length]?]) -> Self
-pub fn BoxElem::with_stroke(Self, Value) -> Self
+pub fn BoxElem::with_stroke(Self, Sides[Stroke??]) -> Self
 pub fn BoxElem::with_width(Self, Sizing) -> Self
 
 pub struct BundleFormat(Content)
@@ -3750,17 +3788,17 @@ pub fn CancelElem::set_background(Bool) -> Style
 pub fn CancelElem::set_cross(Bool) -> Style
 pub fn CancelElem::set_inverted(Bool) -> Style
 pub fn CancelElem::set_length(Rel[Length]) -> Style
-pub fn CancelElem::set_stroke(Value) -> Style
-pub fn CancelElem::stroke(Self, StyleChain) -> Value
-pub fn CancelElem::stroke_in(StyleChain) -> Value
-pub fn CancelElem::stroke_local(Self) -> Value?
+pub fn CancelElem::set_stroke(Stroke) -> Style
+pub fn CancelElem::stroke(Self, StyleChain) -> Stroke
+pub fn CancelElem::stroke_in(StyleChain) -> Stroke
+pub fn CancelElem::stroke_local(Self) -> Stroke?
 pub fn CancelElem::with_angle(Self, Value) -> Self
 pub fn CancelElem::with_background(Self, Bool) -> Self
 pub fn CancelElem::with_body(Self, Content) -> Self
 pub fn CancelElem::with_cross(Self, Bool) -> Self
 pub fn CancelElem::with_inverted(Self, Bool) -> Self
 pub fn CancelElem::with_length(Self, Rel[Length]) -> Self
-pub fn CancelElem::with_stroke(Self, Value) -> Self
+pub fn CancelElem::with_stroke(Self, Stroke) -> Self
 
 pub(all) enum Capturer {
   Function
@@ -3856,13 +3894,18 @@ pub(all) enum ChineseVariant {
   Simple
 } derive(Eq, @debug.Debug)
 
+pub(all) struct ChromaComponent(Float)
+pub impl FromValue for ChromaComponent
+pub impl IntoValue for ChromaComponent
+pub impl Reflect for ChromaComponent
+
 pub struct CircleElem(Content)
 pub fn CircleElem::body(Self, StyleChain) -> Content?
 pub fn CircleElem::body_in(StyleChain) -> Content?
 pub fn CircleElem::body_local(Self) -> Content??
-pub fn CircleElem::fill(Self, StyleChain) -> Value
-pub fn CircleElem::fill_in(StyleChain) -> Value
-pub fn CircleElem::fill_local(Self) -> Value?
+pub fn CircleElem::fill(Self, StyleChain) -> Paint?
+pub fn CircleElem::fill_in(StyleChain) -> Paint?
+pub fn CircleElem::fill_local(Self) -> Paint??
 pub fn CircleElem::height(Self, StyleChain) -> Sizing
 pub fn CircleElem::height_in(StyleChain) -> Sizing
 pub fn CircleElem::height_local(Self) -> Sizing?
@@ -3876,24 +3919,24 @@ pub fn CircleElem::outset_in(StyleChain) -> Sides[Rel[Length]?]
 pub fn CircleElem::outset_local(Self) -> Sides[Rel[Length]?]?
 pub fn CircleElem::pack(Self) -> Content
 pub fn CircleElem::set_body(Content?) -> Style
-pub fn CircleElem::set_fill(Value) -> Style
+pub fn CircleElem::set_fill(Paint?) -> Style
 pub fn CircleElem::set_height(Sizing) -> Style
 pub fn CircleElem::set_inset(Sides[Rel[Length]?]) -> Style
 pub fn CircleElem::set_outset(Sides[Rel[Length]?]) -> Style
-pub fn CircleElem::set_stroke(Value) -> Style
+pub fn CircleElem::set_stroke(Smart[Stroke?]) -> Style
 pub fn CircleElem::set_width(Smart[Rel[Length]]) -> Style
-pub fn CircleElem::stroke(Self, StyleChain) -> Value
-pub fn CircleElem::stroke_in(StyleChain) -> Value
-pub fn CircleElem::stroke_local(Self) -> Value?
+pub fn CircleElem::stroke(Self, StyleChain) -> Smart[Stroke?]
+pub fn CircleElem::stroke_in(StyleChain) -> Smart[Stroke?]
+pub fn CircleElem::stroke_local(Self) -> Smart[Stroke?]?
 pub fn CircleElem::width(Self, StyleChain) -> Smart[Rel[Length]]
 pub fn CircleElem::width_in(StyleChain) -> Smart[Rel[Length]]
 pub fn CircleElem::width_local(Self) -> Smart[Rel[Length]]?
 pub fn CircleElem::with_body(Self, Content?) -> Self
-pub fn CircleElem::with_fill(Self, Value) -> Self
+pub fn CircleElem::with_fill(Self, Paint?) -> Self
 pub fn CircleElem::with_height(Self, Sizing) -> Self
 pub fn CircleElem::with_inset(Self, Sides[Rel[Length]?]) -> Self
 pub fn CircleElem::with_outset(Self, Sides[Rel[Length]?]) -> Self
-pub fn CircleElem::with_stroke(Self, Value) -> Self
+pub fn CircleElem::with_stroke(Self, Smart[Stroke?]) -> Self
 pub fn CircleElem::with_width(Self, Smart[Rel[Length]]) -> Self
 
 pub struct CiteElem(Content)
@@ -3938,6 +3981,15 @@ pub fn ClassElem::pack(Self) -> Content
 pub fn ClassElem::with_body(Self, Content) -> Self
 pub fn ClassElem::with_class(Self, Value) -> Self
 
+pub(all) enum CloseMode {
+  Smooth
+  Straight
+} derive(Eq, Hash, @debug.Debug)
+pub impl Default for CloseMode
+pub impl FromValue for CloseMode
+pub impl IntoValue for CloseMode
+pub impl Reflect for CloseMode
+
 pub(all) struct Closure {
   node : ClosureNode
   defaults : Array[Value]
@@ -3951,6 +4003,13 @@ pub(all) enum ClosureNode {
   Context(@syntax.SyntaxNode)
 }
 
+pub(all) struct Cmyk {
+  c : Float
+  m : Float
+  y : Float
+  k : Float
+} derive(Eq, @debug.Debug)
+
 pub struct ColbreakElem(Content)
 pub fn ColbreakElem::new() -> Self
 pub fn ColbreakElem::of(Content) -> Self?
@@ -3961,10 +4020,46 @@ pub fn ColbreakElem::weak_in(StyleChain) -> Bool
 pub fn ColbreakElem::weak_local(Self) -> Bool?
 pub fn ColbreakElem::with_weak(Self, Bool) -> Self
 
-pub(all) struct Color {
-  // private fields
-} derive(Eq, Hash)
+pub(all) enum Color {
+  Process(ProcessColor)
+  Spot(SpotColor)
+}
+pub fn Color::alpha(Self) -> Float?
+pub fn Color::from_str(String) -> Result[Self, String]
+pub fn Color::from_u32(UInt) -> Self
+pub fn Color::from_u8(Int, Int, Int, Int) -> Self
+pub fn Color::mix_iter(Array[WeightedColor], Smart[ColorSpace]) -> Self raise HintedError
 pub fn Color::repr(Self) -> String
+pub fn Color::space(Self) -> ColorSpace
+pub fn Color::to_cmyk(Self) -> Cmyk
+pub fn Color::to_hsl(Self) -> Hsl
+pub fn Color::to_hsv(Self) -> Hsv
+pub fn Color::to_linear_rgb(Self) -> LinearRgb
+pub fn Color::to_luma(Self) -> Luma
+pub fn Color::to_oklab(Self) -> Oklab
+pub fn Color::to_oklch(Self) -> Oklch
+pub fn Color::to_process(Self) -> ProcessColor
+pub fn Color::to_process_space(Self, ProcessColorSpace) -> Self
+pub fn Color::to_rgb(Self) -> Rgb
+pub fn Color::to_space(Self, ColorSpace) -> Self raise HintedError
+pub fn Color::to_vec4(Self) -> FixedArray[Float]
+pub fn Color::to_vec4_u8(Self) -> FixedArray[Int]
+pub fn Color::with_alpha(Self, Float) -> Self
+pub impl Eq for Color
+pub impl Hash for Color
+pub impl FromValue for Color
+pub impl IntoValue for Color
+pub impl Reflect for Color
+pub impl ToCss for Color
+
+pub(all) enum ColorSpace {
+  Process(ProcessColorSpace)
+  Spot(SpotColorant)
+} derive(Eq)
+pub fn ColorSpace::hue_index(Self) -> Int?
+pub impl FromValue for ColorSpace
+pub impl IntoValue for ColorSpace
+pub impl Reflect for ColorSpace
 
 pub struct ColumnsElem(Content)
 pub fn ColumnsElem::balanced(Self, StyleChain) -> Bool
@@ -3992,6 +4087,21 @@ pub fn ColumnsElem::with_body(Self, Content) -> Self
 pub fn ColumnsElem::with_count(Self, NonZeroUSize) -> Self
 pub fn ColumnsElem::with_gutter(Self, Rel[Length]) -> Self
 pub fn ColumnsElem::with_separator(Self, Content?) -> Self
+
+pub(all) struct Component(Ratio)
+pub impl FromValue for Component
+pub impl IntoValue for Component
+pub impl Reflect for Component
+
+pub(all) struct ConicGradient {
+  stops : Array[(Color, Ratio)]
+  angle : Angle
+  center : Axes[Ratio]
+  space : ColorSpace
+  relative : Smart[RelativeTo]
+  anti_alias : Bool
+} derive(Eq)
+pub fn ConicGradient::repr(Self) -> String
 
 pub struct Content {
   elem : Element
@@ -4264,14 +4374,19 @@ pub fn CssWriter::fail(Self, String) -> Unit
 pub fn CssWriter::write(Self, String) -> Unit
 
 pub struct CurveClose(Content)
-pub fn CurveClose::mode(Self, StyleChain) -> Value
-pub fn CurveClose::mode_in(StyleChain) -> Value
-pub fn CurveClose::mode_local(Self) -> Value?
+pub fn CurveClose::mode(Self, StyleChain) -> CloseMode
+pub fn CurveClose::mode_in(StyleChain) -> CloseMode
+pub fn CurveClose::mode_local(Self) -> CloseMode?
 pub fn CurveClose::new() -> Self
 pub fn CurveClose::of(Content) -> Self?
 pub fn CurveClose::pack(Self) -> Content
-pub fn CurveClose::set_mode(Value) -> Style
-pub fn CurveClose::with_mode(Self, Value) -> Self
+pub fn CurveClose::set_mode(CloseMode) -> Style
+pub fn CurveClose::with_mode(Self, CloseMode) -> Self
+
+pub(all) struct CurveComponent(Content)
+pub impl FromValue for CurveComponent
+pub impl IntoValue for CurveComponent
+pub impl Reflect for CurveComponent
 
 pub struct CurveCubic(Content)
 pub fn CurveCubic::control_end(Self) -> Axes[Rel[Length]]?
@@ -4290,26 +4405,26 @@ pub fn CurveCubic::with_end(Self, Axes[Rel[Length]]) -> Self
 pub fn CurveCubic::with_relative(Self, Bool) -> Self
 
 pub struct CurveElem(Content)
-pub fn CurveElem::components(Self) -> Value
-pub fn CurveElem::fill(Self, StyleChain) -> Value
-pub fn CurveElem::fill_in(StyleChain) -> Value
-pub fn CurveElem::fill_local(Self) -> Value?
-pub fn CurveElem::fill_rule(Self, StyleChain) -> Value
-pub fn CurveElem::fill_rule_in(StyleChain) -> Value
-pub fn CurveElem::fill_rule_local(Self) -> Value?
-pub fn CurveElem::new(Value) -> Self
+pub fn CurveElem::components(Self) -> Array[CurveComponent]
+pub fn CurveElem::fill(Self, StyleChain) -> Paint?
+pub fn CurveElem::fill_in(StyleChain) -> Paint?
+pub fn CurveElem::fill_local(Self) -> Paint??
+pub fn CurveElem::fill_rule(Self, StyleChain) -> FillRule
+pub fn CurveElem::fill_rule_in(StyleChain) -> FillRule
+pub fn CurveElem::fill_rule_local(Self) -> FillRule?
+pub fn CurveElem::new(Array[CurveComponent]) -> Self
 pub fn CurveElem::of(Content) -> Self?
 pub fn CurveElem::pack(Self) -> Content
-pub fn CurveElem::set_fill(Value) -> Style
-pub fn CurveElem::set_fill_rule(Value) -> Style
-pub fn CurveElem::set_stroke(Value) -> Style
-pub fn CurveElem::stroke(Self, StyleChain) -> Value
-pub fn CurveElem::stroke_in(StyleChain) -> Value
-pub fn CurveElem::stroke_local(Self) -> Value?
-pub fn CurveElem::with_components(Self, Value) -> Self
-pub fn CurveElem::with_fill(Self, Value) -> Self
-pub fn CurveElem::with_fill_rule(Self, Value) -> Self
-pub fn CurveElem::with_stroke(Self, Value) -> Self
+pub fn CurveElem::set_fill(Paint?) -> Style
+pub fn CurveElem::set_fill_rule(FillRule) -> Style
+pub fn CurveElem::set_stroke(Smart[Stroke?]) -> Style
+pub fn CurveElem::stroke(Self, StyleChain) -> Smart[Stroke?]
+pub fn CurveElem::stroke_in(StyleChain) -> Smart[Stroke?]
+pub fn CurveElem::stroke_local(Self) -> Smart[Stroke?]?
+pub fn CurveElem::with_components(Self, Array[CurveComponent]) -> Self
+pub fn CurveElem::with_fill(Self, Paint?) -> Self
+pub fn CurveElem::with_fill_rule(Self, FillRule) -> Self
+pub fn CurveElem::with_stroke(Self, Smart[Stroke?]) -> Self
 
 pub struct CurveLine(Content)
 pub fn CurveLine::end(Self) -> Axes[Rel[Length]]
@@ -4348,6 +4463,24 @@ pub fn CurveQuad::set_relative(Bool) -> Style
 pub fn CurveQuad::with_control(Self, Smart[Axes[Rel[Length]]?]) -> Self
 pub fn CurveQuad::with_end(Self, Axes[Rel[Length]]) -> Self
 pub fn CurveQuad::with_relative(Self, Bool) -> Self
+
+pub(all) enum DashLength {
+  LineWidth
+  Length(Length)
+} derive(Eq)
+pub fn DashLength::repr(Self) -> String
+pub impl FromValue for DashLength
+pub impl IntoValue for DashLength
+pub impl Reflect for DashLength
+
+pub(all) struct DashPattern {
+  array : Array[DashLength]
+  phase : Length
+} derive(Eq)
+pub fn DashPattern::repr(Self) -> String
+pub impl FromValue for DashPattern
+pub impl IntoValue for DashPattern
+pub impl Reflect for DashPattern
 
 pub(all) enum Datetime {
   Date(@time.Date)
@@ -4642,9 +4775,9 @@ pub struct EllipseElem(Content)
 pub fn EllipseElem::body(Self, StyleChain) -> Content?
 pub fn EllipseElem::body_in(StyleChain) -> Content?
 pub fn EllipseElem::body_local(Self) -> Content??
-pub fn EllipseElem::fill(Self, StyleChain) -> Value
-pub fn EllipseElem::fill_in(StyleChain) -> Value
-pub fn EllipseElem::fill_local(Self) -> Value?
+pub fn EllipseElem::fill(Self, StyleChain) -> Paint?
+pub fn EllipseElem::fill_in(StyleChain) -> Paint?
+pub fn EllipseElem::fill_local(Self) -> Paint??
 pub fn EllipseElem::height(Self, StyleChain) -> Sizing
 pub fn EllipseElem::height_in(StyleChain) -> Sizing
 pub fn EllipseElem::height_local(Self) -> Sizing?
@@ -4658,24 +4791,24 @@ pub fn EllipseElem::outset_in(StyleChain) -> Sides[Rel[Length]?]
 pub fn EllipseElem::outset_local(Self) -> Sides[Rel[Length]?]?
 pub fn EllipseElem::pack(Self) -> Content
 pub fn EllipseElem::set_body(Content?) -> Style
-pub fn EllipseElem::set_fill(Value) -> Style
+pub fn EllipseElem::set_fill(Paint?) -> Style
 pub fn EllipseElem::set_height(Sizing) -> Style
 pub fn EllipseElem::set_inset(Sides[Rel[Length]?]) -> Style
 pub fn EllipseElem::set_outset(Sides[Rel[Length]?]) -> Style
-pub fn EllipseElem::set_stroke(Value) -> Style
+pub fn EllipseElem::set_stroke(Smart[Stroke?]) -> Style
 pub fn EllipseElem::set_width(Smart[Rel[Length]]) -> Style
-pub fn EllipseElem::stroke(Self, StyleChain) -> Value
-pub fn EllipseElem::stroke_in(StyleChain) -> Value
-pub fn EllipseElem::stroke_local(Self) -> Value?
+pub fn EllipseElem::stroke(Self, StyleChain) -> Smart[Stroke?]
+pub fn EllipseElem::stroke_in(StyleChain) -> Smart[Stroke?]
+pub fn EllipseElem::stroke_local(Self) -> Smart[Stroke?]?
 pub fn EllipseElem::width(Self, StyleChain) -> Smart[Rel[Length]]
 pub fn EllipseElem::width_in(StyleChain) -> Smart[Rel[Length]]
 pub fn EllipseElem::width_local(Self) -> Smart[Rel[Length]]?
 pub fn EllipseElem::with_body(Self, Content?) -> Self
-pub fn EllipseElem::with_fill(Self, Value) -> Self
+pub fn EllipseElem::with_fill(Self, Paint?) -> Self
 pub fn EllipseElem::with_height(Self, Sizing) -> Self
 pub fn EllipseElem::with_inset(Self, Sides[Rel[Length]?]) -> Self
 pub fn EllipseElem::with_outset(Self, Sides[Rel[Length]?]) -> Self
-pub fn EllipseElem::with_stroke(Self, Value) -> Self
+pub fn EllipseElem::with_stroke(Self, Smart[Stroke?]) -> Self
 pub fn EllipseElem::with_width(Self, Smart[Rel[Length]]) -> Self
 
 pub(all) struct Em(Scalar) derive(Compare, Default, Eq, Hash)
@@ -4977,6 +5110,15 @@ pub impl FromValue for FigureKind
 pub impl IntoValue for FigureKind
 pub impl Reflect for FigureKind
 
+pub(all) enum FillRule {
+  NonZero
+  EvenOdd
+} derive(Eq, Hash, @debug.Debug)
+pub impl Default for FillRule
+pub impl FromValue for FillRule
+pub impl IntoValue for FillRule
+pub impl Reflect for FillRule
+
 pub(all) struct FirstLineIndent {
   amount : Length?
   all : Bool?
@@ -5214,10 +5356,30 @@ pub(all) enum FuncInner {
   With(Func, Args)
 }
 
-pub(all) struct Gradient {
-  // private fields
-} derive(Eq, Hash)
+pub(all) enum Gradient {
+  Linear(LinearGradient)
+  Radial(RadialGradient)
+  Conic(ConicGradient)
+} derive(Eq)
+pub fn Gradient::anti_alias(Self) -> Bool
+pub fn Gradient::relative(Self) -> Smart[RelativeTo]
 pub fn Gradient::repr(Self) -> String
+pub fn Gradient::sample(Self, RatioOrAngle) -> Color
+pub fn Gradient::space(Self) -> ColorSpace
+pub fn Gradient::stops_ref(Self) -> Array[(Color, Ratio)]
+pub fn Gradient::unwrap_relative(Self, Bool) -> RelativeTo
+pub fn Gradient::with_relative(Self, RelativeTo) -> Self
+pub impl FromValue for Gradient
+pub impl IntoValue for Gradient
+pub impl Reflect for Gradient
+
+pub(all) struct GradientStop {
+  color : Color
+  offset : Ratio?
+} derive(Eq)
+pub impl FromValue for GradientStop
+pub impl IntoValue for GradientStop
+pub impl Reflect for GradientStop
 
 pub struct GridCell(Content)
 pub fn GridCell::align(Self, StyleChain) -> Smart[Alignment]
@@ -5230,9 +5392,9 @@ pub fn GridCell::breakable_local(Self) -> Smart[Bool]?
 pub fn GridCell::colspan(Self, StyleChain) -> NonZeroUSize
 pub fn GridCell::colspan_in(StyleChain) -> NonZeroUSize
 pub fn GridCell::colspan_local(Self) -> NonZeroUSize?
-pub fn GridCell::fill(Self, StyleChain) -> Value
-pub fn GridCell::fill_in(StyleChain) -> Value
-pub fn GridCell::fill_local(Self) -> Value?
+pub fn GridCell::fill(Self, StyleChain) -> Smart[Paint?]
+pub fn GridCell::fill_in(StyleChain) -> Smart[Paint?]
+pub fn GridCell::fill_local(Self) -> Smart[Paint?]?
 pub fn GridCell::from_content(Content) -> Self
 pub fn GridCell::inset(Self, StyleChain) -> Smart[Sides[Rel[Length]?]]
 pub fn GridCell::inset_in(StyleChain) -> Smart[Sides[Rel[Length]?]]
@@ -5249,25 +5411,25 @@ pub fn GridCell::rowspan_local(Self) -> NonZeroUSize?
 pub fn GridCell::set_align(Smart[Alignment]) -> Style
 pub fn GridCell::set_breakable(Smart[Bool]) -> Style
 pub fn GridCell::set_colspan(NonZeroUSize) -> Style
-pub fn GridCell::set_fill(Value) -> Style
+pub fn GridCell::set_fill(Smart[Paint?]) -> Style
 pub fn GridCell::set_inset(Smart[Sides[Rel[Length]?]]) -> Style
 pub fn GridCell::set_is_repeated(Bool) -> Style
 pub fn GridCell::set_rowspan(NonZeroUSize) -> Style
-pub fn GridCell::set_stroke(Value) -> Style
+pub fn GridCell::set_stroke(Sides[Stroke??]) -> Style
 pub fn GridCell::set_x(Smart[USize]) -> Style
 pub fn GridCell::set_y(Smart[USize]) -> Style
-pub fn GridCell::stroke(Self, StyleChain) -> Value
-pub fn GridCell::stroke_in(StyleChain) -> Value
-pub fn GridCell::stroke_local(Self) -> Value?
+pub fn GridCell::stroke(Self, StyleChain) -> Sides[Stroke??]
+pub fn GridCell::stroke_in(StyleChain) -> Sides[Stroke??]
+pub fn GridCell::stroke_local(Self) -> Sides[Stroke??]?
 pub fn GridCell::with_align(Self, Smart[Alignment]) -> Self
 pub fn GridCell::with_body(Self, Content) -> Self
 pub fn GridCell::with_breakable(Self, Smart[Bool]) -> Self
 pub fn GridCell::with_colspan(Self, NonZeroUSize) -> Self
-pub fn GridCell::with_fill(Self, Value) -> Self
+pub fn GridCell::with_fill(Self, Smart[Paint?]) -> Self
 pub fn GridCell::with_inset(Self, Smart[Sides[Rel[Length]?]]) -> Self
 pub fn GridCell::with_is_repeated(Self, Bool) -> Self
 pub fn GridCell::with_rowspan(Self, NonZeroUSize) -> Self
-pub fn GridCell::with_stroke(Self, Value) -> Self
+pub fn GridCell::with_stroke(Self, Sides[Stroke??]) -> Self
 pub fn GridCell::with_x(Self, Smart[USize]) -> Self
 pub fn GridCell::with_y(Self, Smart[USize]) -> Self
 pub fn GridCell::x(Self, StyleChain) -> Smart[USize]
@@ -5301,9 +5463,9 @@ pub fn GridElem::column_gutter_local(Self) -> TrackSizings?
 pub fn GridElem::columns(Self, StyleChain) -> TrackSizings
 pub fn GridElem::columns_in(StyleChain) -> TrackSizings
 pub fn GridElem::columns_local(Self) -> TrackSizings?
-pub fn GridElem::fill(Self, StyleChain) -> Value
-pub fn GridElem::fill_in(StyleChain) -> Value
-pub fn GridElem::fill_local(Self) -> Value?
+pub fn GridElem::fill(Self, StyleChain) -> Celled[Paint?]
+pub fn GridElem::fill_in(StyleChain) -> Celled[Paint?]
+pub fn GridElem::fill_local(Self) -> Celled[Paint?]?
 pub fn GridElem::grid(Self) -> Value?
 pub fn GridElem::inset(Self, StyleChain) -> Celled[Sides[Rel[Length]?]]
 pub fn GridElem::inset_in(StyleChain) -> Celled[Sides[Rel[Length]?]]
@@ -5320,24 +5482,24 @@ pub fn GridElem::rows_local(Self) -> TrackSizings?
 pub fn GridElem::set_align(Celled[Smart[Alignment]]) -> Style
 pub fn GridElem::set_column_gutter(TrackSizings) -> Style
 pub fn GridElem::set_columns(TrackSizings) -> Style
-pub fn GridElem::set_fill(Value) -> Style
+pub fn GridElem::set_fill(Celled[Paint?]) -> Style
 pub fn GridElem::set_inset(Celled[Sides[Rel[Length]?]]) -> Style
 pub fn GridElem::set_row_gutter(TrackSizings) -> Style
 pub fn GridElem::set_rows(TrackSizings) -> Style
-pub fn GridElem::set_stroke(Value) -> Style
-pub fn GridElem::stroke(Self, StyleChain) -> Value
-pub fn GridElem::stroke_in(StyleChain) -> Value
-pub fn GridElem::stroke_local(Self) -> Value?
+pub fn GridElem::set_stroke(Celled[Sides[Stroke??]]) -> Style
+pub fn GridElem::stroke(Self, StyleChain) -> Celled[Sides[Stroke??]]
+pub fn GridElem::stroke_in(StyleChain) -> Celled[Sides[Stroke??]]
+pub fn GridElem::stroke_local(Self) -> Celled[Sides[Stroke??]]?
 pub fn GridElem::with_align(Self, Celled[Smart[Alignment]]) -> Self
 pub fn GridElem::with_children(Self, Array[GridChild]) -> Self
 pub fn GridElem::with_column_gutter(Self, TrackSizings) -> Self
 pub fn GridElem::with_columns(Self, TrackSizings) -> Self
-pub fn GridElem::with_fill(Self, Value) -> Self
+pub fn GridElem::with_fill(Self, Celled[Paint?]) -> Self
 pub fn GridElem::with_grid(Self, Value) -> Self
 pub fn GridElem::with_inset(Self, Celled[Sides[Rel[Length]?]]) -> Self
 pub fn GridElem::with_row_gutter(Self, TrackSizings) -> Self
 pub fn GridElem::with_rows(Self, TrackSizings) -> Self
-pub fn GridElem::with_stroke(Self, Value) -> Self
+pub fn GridElem::with_stroke(Self, Celled[Sides[Stroke??]]) -> Self
 
 pub struct GridFooter(Content)
 pub fn GridFooter::children(Self) -> Array[GridItem]
@@ -5364,18 +5526,18 @@ pub fn GridHLine::position_local(Self) -> OuterVAlignment?
 pub fn GridHLine::set_end(NonZeroUSize?) -> Style
 pub fn GridHLine::set_position(OuterVAlignment) -> Style
 pub fn GridHLine::set_start(USize) -> Style
-pub fn GridHLine::set_stroke(Value) -> Style
+pub fn GridHLine::set_stroke(Stroke?) -> Style
 pub fn GridHLine::set_y(Smart[USize]) -> Style
 pub fn GridHLine::start(Self, StyleChain) -> USize
 pub fn GridHLine::start_in(StyleChain) -> USize
 pub fn GridHLine::start_local(Self) -> USize?
-pub fn GridHLine::stroke(Self, StyleChain) -> Value
-pub fn GridHLine::stroke_in(StyleChain) -> Value
-pub fn GridHLine::stroke_local(Self) -> Value?
+pub fn GridHLine::stroke(Self, StyleChain) -> Stroke?
+pub fn GridHLine::stroke_in(StyleChain) -> Stroke?
+pub fn GridHLine::stroke_local(Self) -> Stroke??
 pub fn GridHLine::with_end(Self, NonZeroUSize?) -> Self
 pub fn GridHLine::with_position(Self, OuterVAlignment) -> Self
 pub fn GridHLine::with_start(Self, USize) -> Self
-pub fn GridHLine::with_stroke(Self, Value) -> Self
+pub fn GridHLine::with_stroke(Self, Stroke?) -> Self
 pub fn GridHLine::with_y(Self, Smart[USize]) -> Self
 pub fn GridHLine::y(Self, StyleChain) -> Smart[USize]
 pub fn GridHLine::y_in(StyleChain) -> Smart[USize]
@@ -5421,18 +5583,18 @@ pub fn GridVLine::position_local(Self) -> OuterHAlignment?
 pub fn GridVLine::set_end(NonZeroUSize?) -> Style
 pub fn GridVLine::set_position(OuterHAlignment) -> Style
 pub fn GridVLine::set_start(USize) -> Style
-pub fn GridVLine::set_stroke(Value) -> Style
+pub fn GridVLine::set_stroke(Stroke?) -> Style
 pub fn GridVLine::set_x(Smart[USize]) -> Style
 pub fn GridVLine::start(Self, StyleChain) -> USize
 pub fn GridVLine::start_in(StyleChain) -> USize
 pub fn GridVLine::start_local(Self) -> USize?
-pub fn GridVLine::stroke(Self, StyleChain) -> Value
-pub fn GridVLine::stroke_in(StyleChain) -> Value
-pub fn GridVLine::stroke_local(Self) -> Value?
+pub fn GridVLine::stroke(Self, StyleChain) -> Stroke?
+pub fn GridVLine::stroke_in(StyleChain) -> Stroke?
+pub fn GridVLine::stroke_local(Self) -> Stroke??
 pub fn GridVLine::with_end(Self, NonZeroUSize?) -> Self
 pub fn GridVLine::with_position(Self, OuterHAlignment) -> Self
 pub fn GridVLine::with_start(Self, USize) -> Self
-pub fn GridVLine::with_stroke(Self, Value) -> Self
+pub fn GridVLine::with_stroke(Self, Stroke?) -> Self
 pub fn GridVLine::with_x(Self, Smart[USize]) -> Self
 pub fn GridVLine::x(Self, StyleChain) -> Smart[USize]
 pub fn GridVLine::x_in(StyleChain) -> Smart[USize]
@@ -5533,9 +5695,9 @@ pub fn HighlightElem::bottom_edge_local(Self) -> BottomEdge?
 pub fn HighlightElem::extent(Self, StyleChain) -> Length
 pub fn HighlightElem::extent_in(StyleChain) -> Length
 pub fn HighlightElem::extent_local(Self) -> Length?
-pub fn HighlightElem::fill(Self, StyleChain) -> Value
-pub fn HighlightElem::fill_in(StyleChain) -> Value
-pub fn HighlightElem::fill_local(Self) -> Value?
+pub fn HighlightElem::fill(Self, StyleChain) -> Paint?
+pub fn HighlightElem::fill_in(StyleChain) -> Paint?
+pub fn HighlightElem::fill_local(Self) -> Paint??
 pub fn HighlightElem::new(Content) -> Self
 pub fn HighlightElem::of(Content) -> Self?
 pub fn HighlightElem::pack(Self) -> Content
@@ -5544,22 +5706,22 @@ pub fn HighlightElem::radius_in(StyleChain) -> Corners[Rel[Length]?]
 pub fn HighlightElem::radius_local(Self) -> Corners[Rel[Length]?]?
 pub fn HighlightElem::set_bottom_edge(BottomEdge) -> Style
 pub fn HighlightElem::set_extent(Length) -> Style
-pub fn HighlightElem::set_fill(Value) -> Style
+pub fn HighlightElem::set_fill(Paint?) -> Style
 pub fn HighlightElem::set_radius(Corners[Rel[Length]?]) -> Style
-pub fn HighlightElem::set_stroke(Value) -> Style
+pub fn HighlightElem::set_stroke(Sides[Stroke??]) -> Style
 pub fn HighlightElem::set_top_edge(TopEdge) -> Style
-pub fn HighlightElem::stroke(Self, StyleChain) -> Value
-pub fn HighlightElem::stroke_in(StyleChain) -> Value
-pub fn HighlightElem::stroke_local(Self) -> Value?
+pub fn HighlightElem::stroke(Self, StyleChain) -> Sides[Stroke??]
+pub fn HighlightElem::stroke_in(StyleChain) -> Sides[Stroke??]
+pub fn HighlightElem::stroke_local(Self) -> Sides[Stroke??]?
 pub fn HighlightElem::top_edge(Self, StyleChain) -> TopEdge
 pub fn HighlightElem::top_edge_in(StyleChain) -> TopEdge
 pub fn HighlightElem::top_edge_local(Self) -> TopEdge?
 pub fn HighlightElem::with_body(Self, Content) -> Self
 pub fn HighlightElem::with_bottom_edge(Self, BottomEdge) -> Self
 pub fn HighlightElem::with_extent(Self, Length) -> Self
-pub fn HighlightElem::with_fill(Self, Value) -> Self
+pub fn HighlightElem::with_fill(Self, Paint?) -> Self
 pub fn HighlightElem::with_radius(Self, Corners[Rel[Length]?]) -> Self
-pub fn HighlightElem::with_stroke(Self, Value) -> Self
+pub fn HighlightElem::with_stroke(Self, Sides[Stroke??]) -> Self
 pub fn HighlightElem::with_top_edge(Self, TopEdge) -> Self
 
 pub(all) struct HintedString {
@@ -5571,6 +5733,37 @@ pub fn HintedString::into_error_at(Self, @syntax.Span) -> SourceDiagnostic
 pub fn HintedString::into_warning_at(Self, @syntax.Span) -> SourceDiagnostic
 pub fn HintedString::new(String) -> Self
 pub fn HintedString::with_hint(Self, String) -> Self
+
+pub(all) struct Hsl {
+  hue : Float
+  saturation : Float
+  lightness : Float
+  alpha : Float
+} derive(@debug.Debug)
+pub fn Hsl::from_hsv(Hsv) -> Self
+pub fn Hsl::from_luma(Luma) -> Self
+pub fn Hsl::from_oklab(Oklab) -> Self
+pub fn Hsl::from_oklch(Oklch) -> Self
+pub fn Hsl::from_rgb(Rgb) -> Self
+pub fn Hsl::lighten(Self, Float) -> Self
+pub fn Hsl::saturate(Self, Float) -> Self
+pub impl Eq for Hsl
+pub impl ToCss for Hsl
+
+pub(all) struct Hsv {
+  hue : Float
+  saturation : Float
+  value : Float
+  alpha : Float
+} derive(@debug.Debug)
+pub fn Hsv::from_hsl(Hsl) -> Self
+pub fn Hsv::from_luma(Luma) -> Self
+pub fn Hsv::from_oklab(Oklab) -> Self
+pub fn Hsv::from_oklch(Oklch) -> Self
+pub fn Hsv::from_rgb(Rgb) -> Self
+pub fn Hsv::lighten(Self, Float) -> Self
+pub fn Hsv::saturate(Self, Float) -> Self
+pub impl Eq for Hsv
 
 pub struct HtmlAttr(String) derive(Eq, Hash)
 pub fn HtmlAttr::constant(String) -> Self
@@ -5860,6 +6053,16 @@ pub fn LimitsElem::set_inline(Bool) -> Style
 pub fn LimitsElem::with_body(Self, Content) -> Self
 pub fn LimitsElem::with_inline(Self, Bool) -> Self
 
+pub(all) enum LineCap {
+  Butt
+  Round
+  Square
+} derive(Eq, Hash, @debug.Debug)
+pub fn LineCap::repr(Self) -> String
+pub impl FromValue for LineCap
+pub impl IntoValue for LineCap
+pub impl Reflect for LineCap
+
 pub struct LineElem(Content)
 pub fn LineElem::angle(Self, StyleChain) -> Angle
 pub fn LineElem::angle_in(StyleChain) -> Angle
@@ -5877,18 +6080,28 @@ pub fn LineElem::set_angle(Angle) -> Style
 pub fn LineElem::set_end(Axes[Rel[Length]]?) -> Style
 pub fn LineElem::set_length(Rel[Length]) -> Style
 pub fn LineElem::set_start(Axes[Rel[Length]]) -> Style
-pub fn LineElem::set_stroke(Value) -> Style
+pub fn LineElem::set_stroke(Stroke) -> Style
 pub fn LineElem::start(Self, StyleChain) -> Axes[Rel[Length]]
 pub fn LineElem::start_in(StyleChain) -> Axes[Rel[Length]]
 pub fn LineElem::start_local(Self) -> Axes[Rel[Length]]?
-pub fn LineElem::stroke(Self, StyleChain) -> Value
-pub fn LineElem::stroke_in(StyleChain) -> Value
-pub fn LineElem::stroke_local(Self) -> Value?
+pub fn LineElem::stroke(Self, StyleChain) -> Stroke
+pub fn LineElem::stroke_in(StyleChain) -> Stroke
+pub fn LineElem::stroke_local(Self) -> Stroke?
 pub fn LineElem::with_angle(Self, Angle) -> Self
 pub fn LineElem::with_end(Self, Axes[Rel[Length]]?) -> Self
 pub fn LineElem::with_length(Self, Rel[Length]) -> Self
 pub fn LineElem::with_start(Self, Axes[Rel[Length]]) -> Self
-pub fn LineElem::with_stroke(Self, Value) -> Self
+pub fn LineElem::with_stroke(Self, Stroke) -> Self
+
+pub(all) enum LineJoin {
+  Miter
+  Round
+  Bevel
+} derive(Eq, Hash, @debug.Debug)
+pub fn LineJoin::repr(Self) -> String
+pub impl FromValue for LineJoin
+pub impl IntoValue for LineJoin
+pub impl Reflect for LineJoin
 
 pub(all) enum LineNumberingScope {
   Document
@@ -5897,6 +6110,29 @@ pub(all) enum LineNumberingScope {
 pub impl FromValue for LineNumberingScope
 pub impl IntoValue for LineNumberingScope
 pub impl Reflect for LineNumberingScope
+
+pub(all) struct LinearGradient {
+  stops : Array[(Color, Ratio)]
+  angle : Angle
+  space : ColorSpace
+  relative : Smart[RelativeTo]
+  anti_alias : Bool
+} derive(Eq)
+pub fn LinearGradient::repr(Self) -> String
+
+pub(all) struct LinearRgb {
+  red : Float
+  green : Float
+  blue : Float
+  alpha : Float
+} derive(@debug.Debug)
+pub fn LinearRgb::from_luma(Luma) -> Self
+pub fn LinearRgb::from_oklab(Oklab) -> Self
+pub fn LinearRgb::from_oklch(Oklch) -> Self
+pub fn LinearRgb::from_rgb(Rgb) -> Self
+pub fn LinearRgb::lighten(Self, Float) -> Self
+pub impl Eq for LinearRgb
+pub impl ToCss for LinearRgb
 
 pub struct LinebreakElem(Content)
 pub fn LinebreakElem::justify(Self, StyleChain) -> Bool
@@ -6025,6 +6261,19 @@ pub fn LrElem::size_in(StyleChain) -> Rel[Length]
 pub fn LrElem::size_local(Self) -> Rel[Length]?
 pub fn LrElem::with_body(Self, Content) -> Self
 pub fn LrElem::with_size(Self, Rel[Length]) -> Self
+
+pub(all) struct Luma {
+  luma : Float
+  alpha : Float
+} derive(@debug.Debug)
+pub fn Luma::from_hsl(Hsl) -> Self
+pub fn Luma::from_hsv(Hsv) -> Self
+pub fn Luma::from_linear_rgb(LinearRgb) -> Self
+pub fn Luma::from_oklab(Oklab) -> Self
+pub fn Luma::from_oklch(Oklch) -> Self
+pub fn Luma::from_rgb(Rgb) -> Self
+pub fn Luma::lighten(Self, Float) -> Self
+pub impl Eq for Luma
 
 pub(all) struct Margin[T] {
   sides : Sides[T?]
@@ -6344,6 +6593,38 @@ pub(all) enum NumericUnit {
   Percent
 } derive(Eq, @debug.Debug)
 
+pub(all) struct Oklab {
+  l : Float
+  a : Float
+  b : Float
+  alpha : Float
+} derive(@debug.Debug)
+pub fn Oklab::from_hsl(Hsl) -> Self
+pub fn Oklab::from_hsv(Hsv) -> Self
+pub fn Oklab::from_linear_rgb(LinearRgb) -> Self
+pub fn Oklab::from_luma(Luma) -> Self
+pub fn Oklab::from_oklch(Oklch) -> Self
+pub fn Oklab::from_rgb(Rgb) -> Self
+pub fn Oklab::lighten(Self, Float) -> Self
+pub impl Eq for Oklab
+pub impl ToCss for Oklab
+
+pub(all) struct Oklch {
+  l : Float
+  chroma : Float
+  hue : Float
+  alpha : Float
+} derive(@debug.Debug)
+pub fn Oklch::from_hsl(Hsl) -> Self
+pub fn Oklch::from_hsv(Hsv) -> Self
+pub fn Oklch::from_linear_rgb(LinearRgb) -> Self
+pub fn Oklch::from_luma(Luma) -> Self
+pub fn Oklch::from_oklab(Oklab) -> Self
+pub fn Oklch::from_rgb(Rgb) -> Self
+pub fn Oklch::lighten(Self, Float) -> Self
+pub impl Eq for Oklch
+pub impl ToCss for Oklch
+
 pub(all) struct OneOrMultiple[T](Array[T]) derive(Eq, Hash)
 pub impl[T] Default for OneOrMultiple[T]
 pub impl[T] Fold for OneOrMultiple[T]
@@ -6485,16 +6766,16 @@ pub fn OverlineElem::set_background(Bool) -> Style
 pub fn OverlineElem::set_evade(Bool) -> Style
 pub fn OverlineElem::set_extent(Length) -> Style
 pub fn OverlineElem::set_offset(Smart[Length]) -> Style
-pub fn OverlineElem::set_stroke(Value) -> Style
-pub fn OverlineElem::stroke(Self, StyleChain) -> Value
-pub fn OverlineElem::stroke_in(StyleChain) -> Value
-pub fn OverlineElem::stroke_local(Self) -> Value?
+pub fn OverlineElem::set_stroke(Smart[Stroke]) -> Style
+pub fn OverlineElem::stroke(Self, StyleChain) -> Smart[Stroke]
+pub fn OverlineElem::stroke_in(StyleChain) -> Smart[Stroke]
+pub fn OverlineElem::stroke_local(Self) -> Smart[Stroke]?
 pub fn OverlineElem::with_background(Self, Bool) -> Self
 pub fn OverlineElem::with_body(Self, Content) -> Self
 pub fn OverlineElem::with_evade(Self, Bool) -> Self
 pub fn OverlineElem::with_extent(Self, Length) -> Self
 pub fn OverlineElem::with_offset(Self, Smart[Length]) -> Self
-pub fn OverlineElem::with_stroke(Self, Value) -> Self
+pub fn OverlineElem::with_stroke(Self, Smart[Stroke]) -> Self
 
 pub struct OverparenElem(Content)
 pub fn OverparenElem::annotation(Self, StyleChain) -> Content?
@@ -6561,7 +6842,7 @@ pub fn PageElem::background_in(StyleChain) -> Content?
 pub fn PageElem::binding_in(StyleChain) -> Smart[PageBinding]
 pub fn PageElem::bleed_in(StyleChain) -> Margin[Rel[Length]]
 pub fn PageElem::columns_in(StyleChain) -> NonZeroUSize
-pub fn PageElem::fill_in(StyleChain) -> Value
+pub fn PageElem::fill_in(StyleChain) -> Smart[Paint?]
 pub fn PageElem::flipped_in(StyleChain) -> Bool
 pub fn PageElem::footer_descent_in(StyleChain) -> Rel[Length]
 pub fn PageElem::footer_in(StyleChain) -> Smart[Content?]
@@ -6579,7 +6860,7 @@ pub fn PageElem::set_background(Content?) -> Style
 pub fn PageElem::set_binding(Smart[PageBinding]) -> Style
 pub fn PageElem::set_bleed(Margin[Rel[Length]]) -> Style
 pub fn PageElem::set_columns(NonZeroUSize) -> Style
-pub fn PageElem::set_fill(Value) -> Style
+pub fn PageElem::set_fill(Smart[Paint?]) -> Style
 pub fn PageElem::set_flipped(Bool) -> Style
 pub fn PageElem::set_footer(Smart[Content?]) -> Style
 pub fn PageElem::set_footer_descent(Rel[Length]) -> Style
@@ -6637,6 +6918,20 @@ pub(all) enum PagedFormat {
 pub impl FromValue for PagedFormat
 pub impl IntoValue for PagedFormat
 pub impl Reflect for PagedFormat
+
+pub(all) enum Paint {
+  Solid(Color)
+  Gradient(Gradient)
+  Tiling(Tiling)
+} derive(Eq)
+pub fn Paint::as_decoration(Self) -> Self
+pub fn Paint::relative(Self) -> Smart[RelativeTo]
+pub fn Paint::repr(Self) -> String
+pub fn Paint::unwrap_solid(Self) -> Color
+pub impl FromValue for Paint
+pub impl IntoValue for Paint
+pub impl Reflect for Paint
+pub impl ToCss for Paint
 
 pub(all) struct Paper {
   name : String
@@ -6877,25 +7172,25 @@ pub fn PngFormat::set_ppi(Value) -> Style
 pub fn PngFormat::with_ppi(Self, Value) -> Self
 
 pub struct PolygonElem(Content)
-pub fn PolygonElem::fill(Self, StyleChain) -> Value
-pub fn PolygonElem::fill_in(StyleChain) -> Value
-pub fn PolygonElem::fill_local(Self) -> Value?
-pub fn PolygonElem::fill_rule(Self, StyleChain) -> Value
-pub fn PolygonElem::fill_rule_in(StyleChain) -> Value
-pub fn PolygonElem::fill_rule_local(Self) -> Value?
+pub fn PolygonElem::fill(Self, StyleChain) -> Paint?
+pub fn PolygonElem::fill_in(StyleChain) -> Paint?
+pub fn PolygonElem::fill_local(Self) -> Paint??
+pub fn PolygonElem::fill_rule(Self, StyleChain) -> FillRule
+pub fn PolygonElem::fill_rule_in(StyleChain) -> FillRule
+pub fn PolygonElem::fill_rule_local(Self) -> FillRule?
 pub fn PolygonElem::new(Array[Axes[Rel[Length]]]) -> Self
 pub fn PolygonElem::of(Content) -> Self?
 pub fn PolygonElem::pack(Self) -> Content
-pub fn PolygonElem::set_fill(Value) -> Style
-pub fn PolygonElem::set_fill_rule(Value) -> Style
-pub fn PolygonElem::set_stroke(Value) -> Style
-pub fn PolygonElem::stroke(Self, StyleChain) -> Value
-pub fn PolygonElem::stroke_in(StyleChain) -> Value
-pub fn PolygonElem::stroke_local(Self) -> Value?
+pub fn PolygonElem::set_fill(Paint?) -> Style
+pub fn PolygonElem::set_fill_rule(FillRule) -> Style
+pub fn PolygonElem::set_stroke(Smart[Stroke?]) -> Style
+pub fn PolygonElem::stroke(Self, StyleChain) -> Smart[Stroke?]
+pub fn PolygonElem::stroke_in(StyleChain) -> Smart[Stroke?]
+pub fn PolygonElem::stroke_local(Self) -> Smart[Stroke?]?
 pub fn PolygonElem::vertices(Self) -> Array[Axes[Rel[Length]]]
-pub fn PolygonElem::with_fill(Self, Value) -> Self
-pub fn PolygonElem::with_fill_rule(Self, Value) -> Self
-pub fn PolygonElem::with_stroke(Self, Value) -> Self
+pub fn PolygonElem::with_fill(Self, Paint?) -> Self
+pub fn PolygonElem::with_fill_rule(Self, FillRule) -> Self
+pub fn PolygonElem::with_stroke(Self, Smart[Stroke?]) -> Self
 pub fn PolygonElem::with_vertices(Self, Array[Axes[Rel[Length]]]) -> Self
 
 pub(all) struct PositiveF64(Double) derive(Eq, @debug.Debug)
@@ -6922,6 +7217,62 @@ pub fn PrimesElem::new(USize) -> Self
 pub fn PrimesElem::of(Content) -> Self?
 pub fn PrimesElem::pack(Self) -> Content
 pub fn PrimesElem::with_count(Self, USize) -> Self
+
+pub(all) enum ProcessColor {
+  Luma(Luma)
+  Oklab(Oklab)
+  Oklch(Oklch)
+  Rgb(Rgb)
+  LinearRgb(LinearRgb)
+  Cmyk(Cmyk)
+  Hsl(Hsl)
+  Hsv(Hsv)
+}
+pub fn ProcessColor::alpha(Self) -> Float?
+pub fn ProcessColor::components(Self, Bool) -> Arr
+pub fn ProcessColor::darken(Self, Ratio) -> Self
+pub fn ProcessColor::desaturate(Self, @syntax.Span, Ratio) -> Self raise SourceError
+pub fn ProcessColor::from_str(String) -> Result[Self, String]
+pub fn ProcessColor::from_u32(UInt) -> Self
+pub fn ProcessColor::from_u8(Int, Int, Int, Int) -> Self
+pub fn ProcessColor::lighten(Self, Ratio) -> Self
+pub fn ProcessColor::negate(Self, ProcessColorSpace) -> Self
+pub fn ProcessColor::repr(Self) -> String
+pub fn ProcessColor::saturate(Self, @syntax.Span, Ratio) -> Self raise SourceError
+pub fn ProcessColor::space(Self) -> ProcessColorSpace
+pub fn ProcessColor::to_cmyk(Self) -> Cmyk
+pub fn ProcessColor::to_hex(Self) -> String
+pub fn ProcessColor::to_hsl(Self) -> Hsl
+pub fn ProcessColor::to_hsv(Self) -> Hsv
+pub fn ProcessColor::to_linear_rgb(Self) -> LinearRgb
+pub fn ProcessColor::to_luma(Self) -> Luma
+pub fn ProcessColor::to_oklab(Self) -> Oklab
+pub fn ProcessColor::to_oklch(Self) -> Oklch
+pub fn ProcessColor::to_rgb(Self) -> Rgb
+pub fn ProcessColor::to_space(Self, ProcessColorSpace) -> Self
+pub fn ProcessColor::to_vec4(Self) -> FixedArray[Float]
+pub fn ProcessColor::to_vec4_u8(Self) -> FixedArray[Int]
+pub fn ProcessColor::with_alpha(Self, Float) -> Self
+pub impl Eq for ProcessColor
+pub impl Hash for ProcessColor
+pub impl FromValue for ProcessColor
+pub impl IntoValue for ProcessColor
+pub impl Reflect for ProcessColor
+
+pub(all) enum ProcessColorSpace {
+  Oklab
+  Oklch
+  Srgb
+  D65Gray
+  LinearRgb
+  Hsl
+  Hsv
+  Cmyk
+} derive(Eq, @debug.Debug)
+pub fn ProcessColorSpace::hue_index(Self) -> Int?
+pub impl FromValue for ProcessColorSpace
+pub impl IntoValue for ProcessColorSpace
+pub impl Reflect for ProcessColorSpace
 
 pub struct Property {
   elem : Element
@@ -6967,6 +7318,18 @@ pub fn QuoteElem::with_block(Self, Bool) -> Self
 pub fn QuoteElem::with_body(Self, Content) -> Self
 pub fn QuoteElem::with_quotes(Self, Smart[Bool]) -> Self
 
+pub(all) struct RadialGradient {
+  stops : Array[(Color, Ratio)]
+  center : Axes[Ratio]
+  radius : Ratio
+  focal_center : Axes[Ratio]
+  focal_radius : Ratio
+  space : ColorSpace
+  relative : Smart[RelativeTo]
+  anti_alias : Bool
+} derive(Eq)
+pub fn RadialGradient::repr(Self) -> String
+
 pub(all) struct Ratio(Scalar) derive(Compare, Default, Eq, Hash)
 pub fn Ratio::abs(Self) -> Self
 pub fn Ratio::div_by(Self, Double) -> Self
@@ -6990,6 +7353,20 @@ pub impl IntoValue for Ratio
 pub impl Numeric for Ratio
 pub impl Reflect for Ratio
 pub impl ToCss for Ratio
+
+pub(all) struct RatioComponent(Ratio)
+pub impl FromValue for RatioComponent
+pub impl IntoValue for RatioComponent
+pub impl Reflect for RatioComponent
+
+pub(all) enum RatioOrAngle {
+  Ratio(Ratio)
+  Angle(Angle)
+} derive(Eq)
+pub fn RatioOrAngle::to_ratio(Self) -> Ratio
+pub impl FromValue for RatioOrAngle
+pub impl IntoValue for RatioOrAngle
+pub impl Reflect for RatioOrAngle
 
 pub(all) enum RawContent {
   Text(String)
@@ -7066,9 +7443,9 @@ pub struct RectElem(Content)
 pub fn RectElem::body(Self, StyleChain) -> Content?
 pub fn RectElem::body_in(StyleChain) -> Content?
 pub fn RectElem::body_local(Self) -> Content??
-pub fn RectElem::fill(Self, StyleChain) -> Value
-pub fn RectElem::fill_in(StyleChain) -> Value
-pub fn RectElem::fill_local(Self) -> Value?
+pub fn RectElem::fill(Self, StyleChain) -> Paint?
+pub fn RectElem::fill_in(StyleChain) -> Paint?
+pub fn RectElem::fill_local(Self) -> Paint??
 pub fn RectElem::height(Self, StyleChain) -> Sizing
 pub fn RectElem::height_in(StyleChain) -> Sizing
 pub fn RectElem::height_local(Self) -> Sizing?
@@ -7085,26 +7462,26 @@ pub fn RectElem::radius(Self, StyleChain) -> Corners[Rel[Length]?]
 pub fn RectElem::radius_in(StyleChain) -> Corners[Rel[Length]?]
 pub fn RectElem::radius_local(Self) -> Corners[Rel[Length]?]?
 pub fn RectElem::set_body(Content?) -> Style
-pub fn RectElem::set_fill(Value) -> Style
+pub fn RectElem::set_fill(Paint?) -> Style
 pub fn RectElem::set_height(Sizing) -> Style
 pub fn RectElem::set_inset(Sides[Rel[Length]?]) -> Style
 pub fn RectElem::set_outset(Sides[Rel[Length]?]) -> Style
 pub fn RectElem::set_radius(Corners[Rel[Length]?]) -> Style
-pub fn RectElem::set_stroke(Value) -> Style
+pub fn RectElem::set_stroke(Smart[Sides[Stroke??]]) -> Style
 pub fn RectElem::set_width(Smart[Rel[Length]]) -> Style
-pub fn RectElem::stroke(Self, StyleChain) -> Value
-pub fn RectElem::stroke_in(StyleChain) -> Value
-pub fn RectElem::stroke_local(Self) -> Value?
+pub fn RectElem::stroke(Self, StyleChain) -> Smart[Sides[Stroke??]]
+pub fn RectElem::stroke_in(StyleChain) -> Smart[Sides[Stroke??]]
+pub fn RectElem::stroke_local(Self) -> Smart[Sides[Stroke??]]?
 pub fn RectElem::width(Self, StyleChain) -> Smart[Rel[Length]]
 pub fn RectElem::width_in(StyleChain) -> Smart[Rel[Length]]
 pub fn RectElem::width_local(Self) -> Smart[Rel[Length]]?
 pub fn RectElem::with_body(Self, Content?) -> Self
-pub fn RectElem::with_fill(Self, Value) -> Self
+pub fn RectElem::with_fill(Self, Paint?) -> Self
 pub fn RectElem::with_height(Self, Sizing) -> Self
 pub fn RectElem::with_inset(Self, Sides[Rel[Length]?]) -> Self
 pub fn RectElem::with_outset(Self, Sides[Rel[Length]?]) -> Self
 pub fn RectElem::with_radius(Self, Corners[Rel[Length]?]) -> Self
-pub fn RectElem::with_stroke(Self, Value) -> Self
+pub fn RectElem::with_stroke(Self, Smart[Sides[Stroke??]]) -> Self
 pub fn RectElem::with_width(Self, Smart[Rel[Length]]) -> Self
 
 pub struct RefElem(Content)
@@ -7183,6 +7560,14 @@ pub impl[T : Numeric] Numeric for Rel[T]
 pub impl Reflect for Rel[Length]
 pub impl ToCss for Rel[Length]
 
+pub(all) enum RelativeTo {
+  Self_
+  Parent
+} derive(Eq, Hash, @debug.Debug)
+pub impl FromValue for RelativeTo
+pub impl IntoValue for RelativeTo
+pub impl Reflect for RelativeTo
+
 pub struct RepeatElem(Content)
 pub fn RepeatElem::body(Self) -> Content
 pub fn RepeatElem::gap(Self, StyleChain) -> Length
@@ -7212,6 +7597,24 @@ pub(all) enum RepresentationError {
   Zero
   TooLarge
 } derive(Eq, @debug.Debug)
+
+pub(all) struct Rgb {
+  red : Float
+  green : Float
+  blue : Float
+  alpha : Float
+} derive(@debug.Debug)
+pub fn Rgb::from_hsl(Hsl) -> Self
+pub fn Rgb::from_hsv(Hsv) -> Self
+pub fn Rgb::from_linear(LinearRgb) -> Self
+pub fn Rgb::from_luma(Luma) -> Self
+pub fn Rgb::from_oklab(Oklab) -> Self
+pub fn Rgb::from_oklch(Oklch) -> Self
+pub fn Rgb::from_rgb(Self) -> Self
+pub fn Rgb::lighten(Self, Float) -> Self
+pub fn Rgb::to_linear(Self) -> LinearRgb
+pub impl Eq for Rgb
+pub impl ToCss for Rgb
 
 pub struct RootElem(Content)
 pub fn RootElem::index(Self, StyleChain) -> Content?
@@ -7618,18 +8021,42 @@ pub impl[H : AlignmentComponent, V : AlignmentComponent] FromValue for SpecificA
 pub impl[H : AlignmentComponent, V : AlignmentComponent] IntoValue for SpecificAlignment[H, V]
 pub impl[H : AlignmentComponent, V : AlignmentComponent] Reflect for SpecificAlignment[H, V]
 
+pub(all) struct SpotColor {
+  colorant : SpotColorant
+  tint : Ratio
+} derive(Eq)
+pub fn SpotColor::darken(Self, Ratio) -> Self
+pub fn SpotColor::fallback(Self) -> ProcessColor
+pub fn SpotColor::lighten(Self, Ratio) -> Self
+pub fn SpotColor::negate(Self) -> Self
+pub fn SpotColor::repr(Self) -> String
+
 pub(all) struct SpotColorant {
-  // private fields
-} derive(Eq, Hash)
+  name : SpotColorantName?
+  fallback : ProcessColor
+} derive(Eq)
 pub fn SpotColorant::repr(Self) -> String
+pub impl Hash for SpotColorant
+pub impl FromValue for SpotColorant
+pub impl IntoValue for SpotColorant
+pub impl Reflect for SpotColorant
+
+pub(all) enum SpotColorantName {
+  All
+  Custom(String)
+} derive(Eq)
+pub fn SpotColorantName::repr(Self) -> String
+pub impl FromValue for SpotColorantName
+pub impl IntoValue for SpotColorantName
+pub impl Reflect for SpotColorantName
 
 pub struct SquareElem(Content)
 pub fn SquareElem::body(Self, StyleChain) -> Content?
 pub fn SquareElem::body_in(StyleChain) -> Content?
 pub fn SquareElem::body_local(Self) -> Content??
-pub fn SquareElem::fill(Self, StyleChain) -> Value
-pub fn SquareElem::fill_in(StyleChain) -> Value
-pub fn SquareElem::fill_local(Self) -> Value?
+pub fn SquareElem::fill(Self, StyleChain) -> Paint?
+pub fn SquareElem::fill_in(StyleChain) -> Paint?
+pub fn SquareElem::fill_local(Self) -> Paint??
 pub fn SquareElem::height(Self, StyleChain) -> Sizing
 pub fn SquareElem::height_in(StyleChain) -> Sizing
 pub fn SquareElem::height_local(Self) -> Sizing?
@@ -7646,26 +8073,26 @@ pub fn SquareElem::radius(Self, StyleChain) -> Corners[Rel[Length]?]
 pub fn SquareElem::radius_in(StyleChain) -> Corners[Rel[Length]?]
 pub fn SquareElem::radius_local(Self) -> Corners[Rel[Length]?]?
 pub fn SquareElem::set_body(Content?) -> Style
-pub fn SquareElem::set_fill(Value) -> Style
+pub fn SquareElem::set_fill(Paint?) -> Style
 pub fn SquareElem::set_height(Sizing) -> Style
 pub fn SquareElem::set_inset(Sides[Rel[Length]?]) -> Style
 pub fn SquareElem::set_outset(Sides[Rel[Length]?]) -> Style
 pub fn SquareElem::set_radius(Corners[Rel[Length]?]) -> Style
-pub fn SquareElem::set_stroke(Value) -> Style
+pub fn SquareElem::set_stroke(Smart[Sides[Stroke??]]) -> Style
 pub fn SquareElem::set_width(Smart[Rel[Length]]) -> Style
-pub fn SquareElem::stroke(Self, StyleChain) -> Value
-pub fn SquareElem::stroke_in(StyleChain) -> Value
-pub fn SquareElem::stroke_local(Self) -> Value?
+pub fn SquareElem::stroke(Self, StyleChain) -> Smart[Sides[Stroke??]]
+pub fn SquareElem::stroke_in(StyleChain) -> Smart[Sides[Stroke??]]
+pub fn SquareElem::stroke_local(Self) -> Smart[Sides[Stroke??]]?
 pub fn SquareElem::width(Self, StyleChain) -> Smart[Rel[Length]]
 pub fn SquareElem::width_in(StyleChain) -> Smart[Rel[Length]]
 pub fn SquareElem::width_local(Self) -> Smart[Rel[Length]]?
 pub fn SquareElem::with_body(Self, Content?) -> Self
-pub fn SquareElem::with_fill(Self, Value) -> Self
+pub fn SquareElem::with_fill(Self, Paint?) -> Self
 pub fn SquareElem::with_height(Self, Sizing) -> Self
 pub fn SquareElem::with_inset(Self, Sides[Rel[Length]?]) -> Self
 pub fn SquareElem::with_outset(Self, Sides[Rel[Length]?]) -> Self
 pub fn SquareElem::with_radius(Self, Corners[Rel[Length]?]) -> Self
-pub fn SquareElem::with_stroke(Self, Value) -> Self
+pub fn SquareElem::with_stroke(Self, Smart[Sides[Stroke??]]) -> Self
 pub fn SquareElem::with_width(Self, Smart[Rel[Length]]) -> Self
 
 pub(all) enum StackChild {
@@ -7767,21 +8194,32 @@ pub fn StrikeElem::pack(Self) -> Content
 pub fn StrikeElem::set_background(Bool) -> Style
 pub fn StrikeElem::set_extent(Length) -> Style
 pub fn StrikeElem::set_offset(Smart[Length]) -> Style
-pub fn StrikeElem::set_stroke(Value) -> Style
-pub fn StrikeElem::stroke(Self, StyleChain) -> Value
-pub fn StrikeElem::stroke_in(StyleChain) -> Value
-pub fn StrikeElem::stroke_local(Self) -> Value?
+pub fn StrikeElem::set_stroke(Smart[Stroke]) -> Style
+pub fn StrikeElem::stroke(Self, StyleChain) -> Smart[Stroke]
+pub fn StrikeElem::stroke_in(StyleChain) -> Smart[Stroke]
+pub fn StrikeElem::stroke_local(Self) -> Smart[Stroke]?
 pub fn StrikeElem::with_background(Self, Bool) -> Self
 pub fn StrikeElem::with_body(Self, Content) -> Self
 pub fn StrikeElem::with_extent(Self, Length) -> Self
 pub fn StrikeElem::with_offset(Self, Smart[Length]) -> Self
-pub fn StrikeElem::with_stroke(Self, Value) -> Self
+pub fn StrikeElem::with_stroke(Self, Smart[Stroke]) -> Self
 
 pub(all) struct Stroke {
-  // private fields
-} derive(Eq, Hash)
+  paint : Smart[Paint]
+  thickness : Smart[Length]
+  cap : Smart[LineCap]
+  join : Smart[LineJoin]
+  dash : Smart[DashPattern?]
+  miter_limit : Smart[Ratio]
+} derive(Eq)
 pub fn Stroke::field(Self, String) -> Value?
+pub fn Stroke::from_pair(Paint, Length) -> Self
 pub fn Stroke::repr(Self) -> String
+pub impl Default for Stroke
+pub impl Fold for Stroke
+pub impl FromValue for Stroke
+pub impl IntoValue for Stroke
+pub impl Reflect for Stroke
 
 pub struct StrongElem(Content)
 pub fn StrongElem::body(Self) -> Content
@@ -7962,9 +8400,9 @@ pub fn TableCell::breakable_local(Self) -> Smart[Bool]?
 pub fn TableCell::colspan(Self, StyleChain) -> NonZeroUSize
 pub fn TableCell::colspan_in(StyleChain) -> NonZeroUSize
 pub fn TableCell::colspan_local(Self) -> NonZeroUSize?
-pub fn TableCell::fill(Self, StyleChain) -> Value
-pub fn TableCell::fill_in(StyleChain) -> Value
-pub fn TableCell::fill_local(Self) -> Value?
+pub fn TableCell::fill(Self, StyleChain) -> Smart[Paint?]
+pub fn TableCell::fill_in(StyleChain) -> Smart[Paint?]
+pub fn TableCell::fill_local(Self) -> Smart[Paint?]?
 pub fn TableCell::from_content(Content) -> Self
 pub fn TableCell::inset(Self, StyleChain) -> Smart[Sides[Rel[Length]?]]
 pub fn TableCell::inset_in(StyleChain) -> Smart[Sides[Rel[Length]?]]
@@ -7984,27 +8422,27 @@ pub fn TableCell::rowspan_local(Self) -> NonZeroUSize?
 pub fn TableCell::set_align(Smart[Alignment]) -> Style
 pub fn TableCell::set_breakable(Smart[Bool]) -> Style
 pub fn TableCell::set_colspan(NonZeroUSize) -> Style
-pub fn TableCell::set_fill(Value) -> Style
+pub fn TableCell::set_fill(Smart[Paint?]) -> Style
 pub fn TableCell::set_inset(Smart[Sides[Rel[Length]?]]) -> Style
 pub fn TableCell::set_is_repeated(Bool) -> Style
 pub fn TableCell::set_kind(Value) -> Style
 pub fn TableCell::set_rowspan(NonZeroUSize) -> Style
-pub fn TableCell::set_stroke(Value) -> Style
+pub fn TableCell::set_stroke(Sides[Stroke??]) -> Style
 pub fn TableCell::set_x(Smart[USize]) -> Style
 pub fn TableCell::set_y(Smart[USize]) -> Style
-pub fn TableCell::stroke(Self, StyleChain) -> Value
-pub fn TableCell::stroke_in(StyleChain) -> Value
-pub fn TableCell::stroke_local(Self) -> Value?
+pub fn TableCell::stroke(Self, StyleChain) -> Sides[Stroke??]
+pub fn TableCell::stroke_in(StyleChain) -> Sides[Stroke??]
+pub fn TableCell::stroke_local(Self) -> Sides[Stroke??]?
 pub fn TableCell::with_align(Self, Smart[Alignment]) -> Self
 pub fn TableCell::with_body(Self, Content) -> Self
 pub fn TableCell::with_breakable(Self, Smart[Bool]) -> Self
 pub fn TableCell::with_colspan(Self, NonZeroUSize) -> Self
-pub fn TableCell::with_fill(Self, Value) -> Self
+pub fn TableCell::with_fill(Self, Smart[Paint?]) -> Self
 pub fn TableCell::with_inset(Self, Smart[Sides[Rel[Length]?]]) -> Self
 pub fn TableCell::with_is_repeated(Self, Bool) -> Self
 pub fn TableCell::with_kind(Self, Smart[TableCellKind]) -> Self
 pub fn TableCell::with_rowspan(Self, NonZeroUSize) -> Self
-pub fn TableCell::with_stroke(Self, Value) -> Self
+pub fn TableCell::with_stroke(Self, Sides[Stroke??]) -> Self
 pub fn TableCell::with_x(Self, Smart[USize]) -> Self
 pub fn TableCell::with_y(Self, Smart[USize]) -> Self
 pub fn TableCell::x(Self, StyleChain) -> Smart[USize]
@@ -8045,9 +8483,9 @@ pub fn TableElem::column_gutter_local(Self) -> TrackSizings?
 pub fn TableElem::columns(Self, StyleChain) -> TrackSizings
 pub fn TableElem::columns_in(StyleChain) -> TrackSizings
 pub fn TableElem::columns_local(Self) -> TrackSizings?
-pub fn TableElem::fill(Self, StyleChain) -> Value
-pub fn TableElem::fill_in(StyleChain) -> Value
-pub fn TableElem::fill_local(Self) -> Value?
+pub fn TableElem::fill(Self, StyleChain) -> Celled[Paint?]
+pub fn TableElem::fill_in(StyleChain) -> Celled[Paint?]
+pub fn TableElem::fill_local(Self) -> Celled[Paint?]?
 pub fn TableElem::grid(Self) -> Value?
 pub fn TableElem::inset(Self, StyleChain) -> Celled[Sides[Rel[Length]?]]
 pub fn TableElem::inset_in(StyleChain) -> Celled[Sides[Rel[Length]?]]
@@ -8064,15 +8502,15 @@ pub fn TableElem::rows_local(Self) -> TrackSizings?
 pub fn TableElem::set_align(Celled[Smart[Alignment]]) -> Style
 pub fn TableElem::set_column_gutter(TrackSizings) -> Style
 pub fn TableElem::set_columns(TrackSizings) -> Style
-pub fn TableElem::set_fill(Value) -> Style
+pub fn TableElem::set_fill(Celled[Paint?]) -> Style
 pub fn TableElem::set_inset(Celled[Sides[Rel[Length]?]]) -> Style
 pub fn TableElem::set_row_gutter(TrackSizings) -> Style
 pub fn TableElem::set_rows(TrackSizings) -> Style
-pub fn TableElem::set_stroke(Value) -> Style
+pub fn TableElem::set_stroke(Celled[Sides[Stroke??]]) -> Style
 pub fn TableElem::set_summary(String?) -> Style
-pub fn TableElem::stroke(Self, StyleChain) -> Value
-pub fn TableElem::stroke_in(StyleChain) -> Value
-pub fn TableElem::stroke_local(Self) -> Value?
+pub fn TableElem::stroke(Self, StyleChain) -> Celled[Sides[Stroke??]]
+pub fn TableElem::stroke_in(StyleChain) -> Celled[Sides[Stroke??]]
+pub fn TableElem::stroke_local(Self) -> Celled[Sides[Stroke??]]?
 pub fn TableElem::summary(Self, StyleChain) -> String?
 pub fn TableElem::summary_in(StyleChain) -> String?
 pub fn TableElem::summary_local(Self) -> String??
@@ -8080,12 +8518,12 @@ pub fn TableElem::with_align(Self, Celled[Smart[Alignment]]) -> Self
 pub fn TableElem::with_children(Self, Array[TableChild]) -> Self
 pub fn TableElem::with_column_gutter(Self, TrackSizings) -> Self
 pub fn TableElem::with_columns(Self, TrackSizings) -> Self
-pub fn TableElem::with_fill(Self, Value) -> Self
+pub fn TableElem::with_fill(Self, Celled[Paint?]) -> Self
 pub fn TableElem::with_grid(Self, Value) -> Self
 pub fn TableElem::with_inset(Self, Celled[Sides[Rel[Length]?]]) -> Self
 pub fn TableElem::with_row_gutter(Self, TrackSizings) -> Self
 pub fn TableElem::with_rows(Self, TrackSizings) -> Self
-pub fn TableElem::with_stroke(Self, Value) -> Self
+pub fn TableElem::with_stroke(Self, Celled[Sides[Stroke??]]) -> Self
 pub fn TableElem::with_summary(Self, String?) -> Self
 pub impl FromValue for TableElem
 pub impl IntoValue for TableElem
@@ -8116,18 +8554,18 @@ pub fn TableHLine::position_local(Self) -> OuterVAlignment?
 pub fn TableHLine::set_end(NonZeroUSize?) -> Style
 pub fn TableHLine::set_position(OuterVAlignment) -> Style
 pub fn TableHLine::set_start(USize) -> Style
-pub fn TableHLine::set_stroke(Value) -> Style
+pub fn TableHLine::set_stroke(Stroke?) -> Style
 pub fn TableHLine::set_y(Smart[USize]) -> Style
 pub fn TableHLine::start(Self, StyleChain) -> USize
 pub fn TableHLine::start_in(StyleChain) -> USize
 pub fn TableHLine::start_local(Self) -> USize?
-pub fn TableHLine::stroke(Self, StyleChain) -> Value
-pub fn TableHLine::stroke_in(StyleChain) -> Value
-pub fn TableHLine::stroke_local(Self) -> Value?
+pub fn TableHLine::stroke(Self, StyleChain) -> Stroke?
+pub fn TableHLine::stroke_in(StyleChain) -> Stroke?
+pub fn TableHLine::stroke_local(Self) -> Stroke??
 pub fn TableHLine::with_end(Self, NonZeroUSize?) -> Self
 pub fn TableHLine::with_position(Self, OuterVAlignment) -> Self
 pub fn TableHLine::with_start(Self, USize) -> Self
-pub fn TableHLine::with_stroke(Self, Value) -> Self
+pub fn TableHLine::with_stroke(Self, Stroke?) -> Self
 pub fn TableHLine::with_y(Self, Smart[USize]) -> Self
 pub fn TableHLine::y(Self, StyleChain) -> Smart[USize]
 pub fn TableHLine::y_in(StyleChain) -> Smart[USize]
@@ -8185,18 +8623,18 @@ pub fn TableVLine::position_local(Self) -> OuterHAlignment?
 pub fn TableVLine::set_end(NonZeroUSize?) -> Style
 pub fn TableVLine::set_position(OuterHAlignment) -> Style
 pub fn TableVLine::set_start(USize) -> Style
-pub fn TableVLine::set_stroke(Value) -> Style
+pub fn TableVLine::set_stroke(Stroke?) -> Style
 pub fn TableVLine::set_x(Smart[USize]) -> Style
 pub fn TableVLine::start(Self, StyleChain) -> USize
 pub fn TableVLine::start_in(StyleChain) -> USize
 pub fn TableVLine::start_local(Self) -> USize?
-pub fn TableVLine::stroke(Self, StyleChain) -> Value
-pub fn TableVLine::stroke_in(StyleChain) -> Value
-pub fn TableVLine::stroke_local(Self) -> Value?
+pub fn TableVLine::stroke(Self, StyleChain) -> Stroke?
+pub fn TableVLine::stroke_in(StyleChain) -> Stroke?
+pub fn TableVLine::stroke_local(Self) -> Stroke??
 pub fn TableVLine::with_end(Self, NonZeroUSize?) -> Self
 pub fn TableVLine::with_position(Self, OuterHAlignment) -> Self
 pub fn TableVLine::with_start(Self, USize) -> Self
-pub fn TableVLine::with_stroke(Self, Value) -> Self
+pub fn TableVLine::with_stroke(Self, Stroke?) -> Self
 pub fn TableVLine::with_x(Self, Smart[USize]) -> Self
 pub fn TableVLine::x(Self, StyleChain) -> Smart[USize]
 pub fn TableVLine::x_in(StyleChain) -> Smart[USize]
@@ -8291,7 +8729,7 @@ pub fn TextElem::discretionary_ligatures_in(StyleChain) -> Bool
 pub fn TextElem::emph_in(StyleChain) -> ItalicToggle
 pub fn TextElem::fallback_in(StyleChain) -> Bool
 pub fn TextElem::features_in(StyleChain) -> FontFeatures
-pub fn TextElem::fill_in(StyleChain) -> Value
+pub fn TextElem::fill_in(StyleChain) -> Paint
 pub fn TextElem::font_in(StyleChain) -> FontList
 pub fn TextElem::fractions_in(StyleChain) -> Bool
 pub fn TextElem::historical_ligatures_in(StyleChain) -> Bool
@@ -8321,7 +8759,7 @@ pub fn TextElem::set_discretionary_ligatures(Bool) -> Style
 pub fn TextElem::set_emph(ItalicToggle) -> Style
 pub fn TextElem::set_fallback(Bool) -> Style
 pub fn TextElem::set_features(FontFeatures) -> Style
-pub fn TextElem::set_fill(Value) -> Style
+pub fn TextElem::set_fill(Paint) -> Style
 pub fn TextElem::set_font(FontList) -> Style
 pub fn TextElem::set_fractions(Bool) -> Style
 pub fn TextElem::set_historical_ligatures(Bool) -> Style
@@ -8341,7 +8779,7 @@ pub fn TextElem::set_smallcaps(Value) -> Style
 pub fn TextElem::set_spacing(Rel[Length]) -> Style
 pub fn TextElem::set_span_offset(USize) -> Style
 pub fn TextElem::set_stretch(FontStretch) -> Style
-pub fn TextElem::set_stroke(Value) -> Style
+pub fn TextElem::set_stroke(Stroke?) -> Style
 pub fn TextElem::set_style(FontStyle) -> Style
 pub fn TextElem::set_stylistic_set(StylisticSets) -> Style
 pub fn TextElem::set_top_edge(TopEdge) -> Style
@@ -8355,7 +8793,7 @@ pub fn TextElem::smallcaps_in(StyleChain) -> Value
 pub fn TextElem::spacing_in(StyleChain) -> Rel[Length]
 pub fn TextElem::span_offset_in(StyleChain) -> USize
 pub fn TextElem::stretch_in(StyleChain) -> FontStretch
-pub fn TextElem::stroke_in(StyleChain) -> Value
+pub fn TextElem::stroke_in(StyleChain) -> Stroke?
 pub fn TextElem::style_in(StyleChain) -> FontStyle
 pub fn TextElem::stylistic_set_in(StyleChain) -> StylisticSets
 pub fn TextElem::text(Self) -> String
@@ -8372,9 +8810,20 @@ pub impl IntoValue for TextSize
 pub impl Reflect for TextSize
 
 pub(all) struct Tiling {
-  // private fields
-} derive(Eq, Hash)
+  body : Content
+  size : Axes[Abs]
+  spacing : Axes[Abs]
+  offset : Axes[Abs]
+  angle : Angle
+  relative : Smart[RelativeTo]
+} derive(Eq)
+pub fn Tiling::relative(Self) -> Smart[RelativeTo]
 pub fn Tiling::repr(Self) -> String
+pub fn Tiling::unwrap_relative(Self, Bool) -> RelativeTo
+pub fn Tiling::with_relative(Self, RelativeTo) -> Self
+pub impl FromValue for Tiling
+pub impl IntoValue for Tiling
+pub impl Reflect for Tiling
 
 pub struct TitleElem(Content)
 pub fn TitleElem::body(Self, StyleChain) -> Smart[Content]
@@ -8614,16 +9063,16 @@ pub fn UnderlineElem::set_background(Bool) -> Style
 pub fn UnderlineElem::set_evade(Bool) -> Style
 pub fn UnderlineElem::set_extent(Length) -> Style
 pub fn UnderlineElem::set_offset(Smart[Length]) -> Style
-pub fn UnderlineElem::set_stroke(Value) -> Style
-pub fn UnderlineElem::stroke(Self, StyleChain) -> Value
-pub fn UnderlineElem::stroke_in(StyleChain) -> Value
-pub fn UnderlineElem::stroke_local(Self) -> Value?
+pub fn UnderlineElem::set_stroke(Smart[Stroke]) -> Style
+pub fn UnderlineElem::stroke(Self, StyleChain) -> Smart[Stroke]
+pub fn UnderlineElem::stroke_in(StyleChain) -> Smart[Stroke]
+pub fn UnderlineElem::stroke_local(Self) -> Smart[Stroke]?
 pub fn UnderlineElem::with_background(Self, Bool) -> Self
 pub fn UnderlineElem::with_body(Self, Content) -> Self
 pub fn UnderlineElem::with_evade(Self, Bool) -> Self
 pub fn UnderlineElem::with_extent(Self, Length) -> Self
 pub fn UnderlineElem::with_offset(Self, Smart[Length]) -> Self
-pub fn UnderlineElem::with_stroke(Self, Value) -> Self
+pub fn UnderlineElem::with_stroke(Self, Smart[Stroke]) -> Self
 
 pub struct UnderparenElem(Content)
 pub fn UnderparenElem::annotation(Self, StyleChain) -> Content?
@@ -8791,6 +9240,15 @@ pub impl Fold for WeightDelta
 pub impl FromValue for WeightDelta
 pub impl IntoValue for WeightDelta
 pub impl Reflect for WeightDelta
+
+pub(all) struct WeightedColor {
+  color : Color
+  weight : Double
+}
+pub fn WeightedColor::new(Color, Double) -> Self
+pub impl FromValue for WeightedColor
+pub impl IntoValue for WeightedColor
+pub impl Reflect for WeightedColor
 
 pub(all) struct WritingScript(String) derive(Compare, Eq, Hash, @debug.Debug)
 pub fn WritingScript::as_str(Self) -> String

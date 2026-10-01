@@ -492,9 +492,112 @@ pub impl ToCss for Rel[Length] with fn emit(self, w) {
   w.calc().sum(self.rel).sum(self.abs.em).sum(self.abs.abs).finish()
 }
 
-// TODO: `ToCss for Paint` and `ToCss for Color` (and the color models
-// `Rgb`, `Oklab`, `Oklch`, `LinearRgb`, `Hsl`) once `visualize/color.rs` and
-// `visualize/paint.rs` are ported.
+///|
+pub impl ToCss for Paint with emit(self, w) {
+  match self {
+    Solid(color) => w.emit(color)
+    Gradient(_) => w.fail("gradient")
+    Tiling(_) => w.fail("tiling")
+  }
+}
+
+///|
+pub impl ToCss for Color with emit(self, w) {
+  // Convert to ProcessColor (spot colors use their fallback)
+  let process = self.to_process()
+  match process {
+    Rgb(_) | Cmyk(_) | Luma(_) => w.emit(process.to_rgb())
+    Oklab(v) => w.emit(v)
+    Oklch(v) => w.emit(v)
+    LinearRgb(v) => w.emit(v)
+    Hsl(_) | Hsv(_) => w.emit(process.to_hsl())
+  }
+}
+
+///|
+pub impl ToCss for Rgb with emit(self, w) {
+  // `self.into_format::<u8, u8>()`
+  let (r, g, b, a) = (
+    f32_to_u8_stimulus(self.red),
+    f32_to_u8_stimulus(self.green),
+    f32_to_u8_stimulus(self.blue),
+    f32_to_u8_stimulus(self.alpha),
+  )
+
+  // Checks if the 8-bit representation of an f32 RGBA color is [very
+  // close](css_is_very_close) to the original. If yes, uses a hex
+  // representation, otherwise falls back to an `rgb` call.
+  if css_is_very_close(self.red.to_double(), css_u8_to_f32(r)) &&
+    css_is_very_close(self.blue.to_double(), css_u8_to_f32(b)) &&
+    css_is_very_close(self.green.to_double(), css_u8_to_f32(g)) &&
+    css_is_very_close(self.alpha.to_double(), css_u8_to_f32(a)) {
+    w.write("#" + hex2(r) + hex2(g) + hex2(b))
+    if a != 255 {
+      w.write(hex2(a))
+    }
+  } else {
+    w
+    .call("rgb", Space)
+    .arg(css_to_ratio(self.red.to_double()))
+    .arg(css_to_ratio(self.green.to_double()))
+    .arg(css_to_ratio(self.blue.to_double()))
+    .maybe_alpha_arg(self.alpha.to_double())
+    .finish()
+  }
+}
+
+///|
+pub impl ToCss for Oklab with emit(self, w) {
+  w
+  .call("oklab", Space)
+  .arg(css_to_ratio(self.l.to_double()))
+  .arg(CssNumber(self.a.to_double()))
+  .arg(CssNumber(self.b.to_double()))
+  .maybe_alpha_arg(self.alpha.to_double())
+  .finish()
+}
+
+///|
+pub impl ToCss for Oklch with emit(self, w) {
+  w
+  .call("oklch", Space)
+  .arg(css_to_ratio(self.l.to_double()))
+  .arg(CssNumber(self.chroma.to_double()))
+  .arg(css_to_angle(normalize_signed_angle(self.hue).to_double()))
+  .maybe_alpha_arg(self.alpha.to_double())
+  .finish()
+}
+
+///|
+pub impl ToCss for LinearRgb with emit(self, w) {
+  w
+  .call("color", Space)
+  .arg("srgb-linear")
+  .arg(css_to_ratio(self.red.to_double()))
+  .arg(css_to_ratio(self.green.to_double()))
+  .arg(css_to_ratio(self.blue.to_double()))
+  .maybe_alpha_arg(self.alpha.to_double())
+  .finish()
+}
+
+///|
+pub impl ToCss for Hsl with emit(self, w) {
+  w
+  .call("hsl", Space)
+  .arg(css_to_angle(normalize_signed_angle(self.hue).to_double()))
+  .arg(css_to_ratio(self.saturation.to_double()))
+  .arg(css_to_ratio(self.lightness.to_double()))
+  .maybe_alpha_arg(self.alpha.to_double())
+  .finish()
+}
+
+///|
+/// palette's `IntoStimulus<f32> for u8` (as used by `into_format`), widened
+/// to `f64` like upstream's `is_very_close`.
+fn css_u8_to_f32(x : Int) -> Double {
+  let max : Float = 255.0
+  (x.to_float() * ((1.0 : Float) / max)).to_double()
+}
 
 ///|
 pub impl ToCss for CssDisplay with fn emit(self, w) {

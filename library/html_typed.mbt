@@ -210,7 +210,8 @@ fn AttrType::convert(ty : @html_assets.Type) -> AttrType {
       Native(native_attr_of((Ty::new() : Ty[Datetime]), datetime_into_attr))
     Duration =>
       Native(native_attr_of((Ty::new() : Ty[Duration]), duration_into_attr))
-    Color => Native(color_attr_type())
+    // TODO: Warnings are currently ignored.
+    Color => Native(native_attr_of((Ty::new() : Ty[Color]), c => to_css(c)))
     HorizontalDir => {
       let base = native_attr_of((Ty::new() : Ty[Dir]), dir_into_attr)
       Native({ ..base, cast: v => Some(horizontal_dir_cast(v)), })
@@ -485,23 +486,6 @@ fn none_value_input() -> CastInfo {
 /// float `Display` impl produces.
 fn f64_into_attr(f : Double) -> String {
   rust_display_f64(f)
-}
-
-///|
-/// `IntoAttr for Color`.
-fn color_attr_type() -> NativeAttrType {
-  {
-    input: () => Type(Type::color()),
-    castable: v => v is Color(_),
-    cast: v => {
-      match v {
-        // TODO: `self.to_css(())` (warnings are ignored) once
-        // `visualize/color.rs` and `ToCss for Color` are ported.
-        Color(_) => bail("`color` attributes are not yet ported")
-        _ => raise HintedError(CastInfo::Type(Type::color()).error(v))
-      }
-    },
-  }
 }
 
 ///|
