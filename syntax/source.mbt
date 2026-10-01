@@ -18,9 +18,10 @@ pub fn Source::new(id : FileId, text : String) -> Source {
 }
 
 ///|
-/// Create a source file without a real id, usually for testing.
+/// Create a source file without a real id and path, usually for testing.
 pub fn Source::detached(text : String) -> Source {
-  Source::new(FileId(1), text)
+  let vpath = VirtualPath::new("main.typ") catch { _ => abort("unreachable") }
+  Source::new(RootedPath::new(Project, vpath).intern(), text)
 }
 
 ///|

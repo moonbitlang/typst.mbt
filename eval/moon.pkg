@@ -3,4 +3,5 @@ import {
   "moonbitlang/typst/syntax/ast",
   "moonbitlang/typst/library",
   "moonbitlang/typst/unicode",
+  "moonbitlang/core/encoding/utf8",
 }

@@ -40,6 +40,9 @@ TYPEMAP = {
     "Dict": "Dict",
     "Args": "Args",
     "Type": "Type",
+    "RootedPath": "RootedPath",
+    "PathOrStr": "PathOrStr",
+    "BundlePath": "BundlePath",
 }
 
 # Generic Rust types with a MoonBit port: Rust name -> MoonBit name. A use

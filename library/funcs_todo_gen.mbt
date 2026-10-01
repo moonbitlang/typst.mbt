@@ -1788,20 +1788,6 @@ fn impl_eval(
 }
 
 ///|
-/// TODO: port `RootedPath.construct` (typst-library/src/foundations/path.rs).
-fn impl_rooted_path_construct(
-  path_ : @syntax.Spanned[Value],
-) -> Value raise SourceError {
-  ignore(path_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`RootedPath.construct` is not yet ported",
-    ),
-  ])
-}
-
-///|
 /// TODO: port `plugin` (typst-library/src/foundations/plugin.rs).
 fn impl_plugin(
   engine : Engine,
@@ -2906,7 +2892,7 @@ fn impl_read__encoding_default() -> Value raise SourceError {
 /// TODO: port `read` (typst-library/src/loading/read.rs).
 fn impl_read(
   engine : Engine,
-  path_ : @syntax.Spanned[Value],
+  path_ : @syntax.Spanned[PathOrStr],
   encoding_ : Value,
 ) -> Value raise SourceError {
   ignore(engine)

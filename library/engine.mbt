@@ -2,7 +2,8 @@
 // `Library` parts of `lib.rs`.
 
 ///|
-/// An error that occurred while trying to load a file.
+/// An error that occurred while trying to load a file (upstream
+/// `diag::FileError`).
 pub(all) suberror FileError {
   /// A file was not found at this path.
   NotFound(String)
@@ -14,24 +15,65 @@ pub(all) suberror FileError {
   NotSource
   /// The file was not valid UTF-8, but should have been.
   InvalidUtf8
+  /// A virtual Typst path could not be realized into a real path on the
+  /// current platform.
+  Realize(@syntax.RealizeError)
   /// The package the file is part of could not be loaded.
-  Package(String)
+  Package(PackageError)
   /// Another error.
+  ///
+  /// The optional string can give more details, if available.
   Other(String?)
 } derive(Eq, Hash, Debug)
 
 ///|
 pub impl Show for FileError with fn output(self, logger) {
+  match self {
+    NotFound(path) =>
+      logger.write_string("file not found (searched at \{path})")
+    AccessDenied => logger.write_string("failed to load file (access denied)")
+    IsDirectory => logger.write_string("failed to load file (is a directory)")
+    NotSource => logger.write_string("not a Typst source file")
+    InvalidUtf8 => logger.write_string("file is not valid UTF-8")
+    Realize(err) => logger.write_string("failed to load file (\{err})")
+    Package(err) => Show::output(err, logger)
+    Other(Some(err)) => logger.write_string("failed to load file (\{err})")
+    Other(None) => logger.write_string("failed to load file")
+  }
+}
+
+///|
+/// An error that occurred while trying to load a package (upstream
+/// `diag::PackageError`).
+///
+/// Some variants have an optional string can give more details, if available.
+pub(all) suberror PackageError {
+  /// The specified package does not exist.
+  NotFound(@syntax.PackageSpec)
+  /// The specified package was found, but the version does not exist.
+  VersionNotFound(@syntax.PackageSpec, @syntax.PackageVersion)
+  /// Failed to retrieve the package through the network.
+  NetworkFailed(String?)
+  /// The package archive was malformed.
+  MalformedArchive(String?)
+  /// Another error.
+  Other(String?)
+} derive(Eq, Hash, Debug)
+
+///|
+pub impl Show for PackageError with fn output(self, logger) {
   logger.write_string(
     match self {
-      NotFound(path) => "file not found (searched at \{path})"
-      AccessDenied => "failed to load file (access denied)"
-      IsDirectory => "failed to load file (is a directory)"
-      NotSource => "not a typst source file"
-      InvalidUtf8 => "file is not valid utf-8"
-      Package(error) => error
-      Other(Some(err)) => "failed to load file (\{err})"
-      Other(None) => "failed to load file"
+      NotFound(spec) => "package not found (searched for \{spec})"
+      VersionNotFound(spec, latest) =>
+        "package found, but version \{spec.version} does not exist (latest is \{latest})"
+      NetworkFailed(Some(err)) => "failed to download package (\{err})"
+      NetworkFailed(None) => "failed to download package"
+      MalformedArchive(Some(err)) => "failed to decompress package (\{err})"
+      MalformedArchive(None) =>
+        "failed to decompress package (archive malformed)"
+      Other(Some(err)) => "failed to load package (\{err})"
+      Other(None) => "failed to load package"
     },
   )
 }
@@ -43,16 +85,18 @@ pub(open) trait World {
   fn library(Self) -> Library
   /// Get the file id of the main source file.
   fn main(Self) -> @syntax.FileId
-  /// Try to access the specified source file.
+  /// Try to access the specified file location as a source file.
   fn source(Self, @syntax.FileId) -> @syntax.Source raise FileError
   /// Try to access the specified file.
+  ///
+  /// For file locations for which [`source`](Self::source) succeeds, this
+  /// should also succeed.
   fn file(Self, @syntax.FileId) -> Bytes raise FileError
   /// Get the current date (with an optional UTC offset in hours).
+  ///
+  /// If no offset is specified, the local date should be chosen. Otherwise,
+  /// the UTC date should be chosen with the corresponding offset.
   fn today(Self, Int64?) -> Datetime?
-  /// Resolve a path relative to a file into a file id.
-  fn resolve_path(Self, @syntax.FileId?, String) -> @syntax.FileId raise HintedError
-  /// The file stem of a file (used as module name).
-  fn file_stem(Self, @syntax.FileId) -> String
 }
 
 ///|

@@ -8786,7 +8786,7 @@ pub fn native_rooted_path_construct() -> NativeFuncData {
           {
             name: "path",
             docs: "Converts a string or path to a path.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[PathOrStr])),
             default: None,
             positional: true,
             named: false,
@@ -8795,7 +8795,7 @@ pub fn native_rooted_path_construct() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[RootedPath])),
         native_rooted_path_construct_call,
       )
       native_rooted_path_construct_cell.val = Some(d)
@@ -8812,7 +8812,7 @@ fn native_rooted_path_construct_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let path_ : @syntax.Spanned[Value] = args.expect_spanned("path")
+  let path_ : @syntax.Spanned[PathOrStr] = args.expect_spanned("path")
   args.take().finish()
   let output = impl_rooted_path_construct(path_)
   IntoValue::into_value(output)
@@ -13477,7 +13477,7 @@ pub fn native_read() -> NativeFuncData {
           {
             name: "path",
             docs: "Path to a file.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[PathOrStr])),
             default: None,
             positional: true,
             named: false,
@@ -13518,7 +13518,7 @@ fn native_read_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let path_ : @syntax.Spanned[Value] = args.expect_spanned("path")
+  let path_ : @syntax.Spanned[PathOrStr] = args.expect_spanned("path")
   let encoding_ : Value = match args.named("encoding") {
     Some(v) => v
     None => impl_read__encoding_default()

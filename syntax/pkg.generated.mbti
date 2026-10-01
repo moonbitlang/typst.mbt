@@ -50,6 +50,8 @@ pub fn split_newlines(String) -> Array[String]
 
 pub let stmt_set : SyntaxSet
 
+pub let typst_version : (Int, Int, Int)
+
 pub let unary_op_set : SyntaxSet
 
 pub fn unescape_str_literal(String) -> String
@@ -61,6 +63,23 @@ pub fn utf8_slice(String, Int, Int) -> String
 pub fn utf8_to_utf16(String, Int) -> Int
 
 // Errors
+pub(all) suberror PathError {
+  Escapes
+  Backslash
+} derive(Eq, Hash, @debug.Debug)
+pub impl Show for PathError
+
+pub(all) suberror RealizeError {
+  Invalid(String)
+} derive(Eq, Hash, @debug.Debug)
+pub impl Show for RealizeError
+
+pub(all) suberror VirtualizeError {
+  Path(PathError)
+  Invalid(String)
+  Utf8
+} derive(Eq, Hash, @debug.Debug)
+pub impl Show for VirtualizeError
 
 // Types and methods
 pub(all) enum Assoc {
@@ -126,8 +145,14 @@ pub fn Diagnosis::default() -> Self
 pub fn Diagnosis::either(Self) -> Bool
 pub fn Diagnosis::or(Self, Self) -> Self
 
-pub(all) struct FileId(UInt16) derive(Compare, Eq, Hash, @debug.Debug)
+pub struct FileId(UInt16) derive(Compare, Eq, Hash, @debug.Debug)
+pub fn FileId::from_raw(UInt16) -> Self
+pub fn FileId::get(Self) -> RootedPath
 pub fn FileId::into_raw(Self) -> UInt16
+pub fn FileId::new(RootedPath) -> Self
+pub fn FileId::root(Self) -> VirtualRoot
+pub fn FileId::unique(RootedPath) -> Self
+pub fn FileId::vpath(Self) -> VirtualPath
 
 pub struct Lines {
   // private fields
@@ -190,6 +215,65 @@ pub(all) enum NonDecimalBase {
 } derive(Eq, @debug.Debug)
 pub fn NonDecimalBase::get(Self) -> Int
 pub fn NonDecimalBase::name(Self) -> String
+
+pub(all) struct PackageInfo {
+  name : String
+  version : PackageVersion
+  entrypoint : String
+  authors : Array[String]
+  license : String?
+  description : String?
+  homepage : String?
+  repository : String?
+  keywords : Array[String]
+  categories : Array[String]
+  disciplines : Array[String]
+  compiler : VersionBound?
+  exclude : Array[String]
+  unknown_fields : Array[String]
+}
+
+pub(all) struct PackageManifest {
+  package : PackageInfo
+  template : TemplateInfo?
+  tool : ToolInfo
+  unknown_fields : Array[String]
+}
+pub fn PackageManifest::from_toml(String) -> Result[Self, String]
+pub fn PackageManifest::validate(Self, PackageSpec) -> Result[Unit, String]
+
+pub(all) struct PackageSpec {
+  namespace : String
+  name : String
+  version : PackageVersion
+} derive(Eq, Hash, @debug.Debug)
+pub fn PackageSpec::from_str(String) -> Result[Self, String]
+pub fn PackageSpec::versionless(Self) -> VersionlessPackageSpec
+pub impl Show for PackageSpec
+
+pub(all) struct PackageVersion {
+  major : UInt
+  minor : UInt
+  patch : UInt
+} derive(Compare, Eq, Hash, @debug.Debug)
+pub fn PackageVersion::compiler() -> Self
+pub fn PackageVersion::from_str(String) -> Result[Self, String]
+pub fn PackageVersion::matches_eq(Self, VersionBound) -> Bool
+pub fn PackageVersion::matches_ge(Self, VersionBound) -> Bool
+pub fn PackageVersion::matches_gt(Self, VersionBound) -> Bool
+pub fn PackageVersion::matches_le(Self, VersionBound) -> Bool
+pub fn PackageVersion::matches_lt(Self, VersionBound) -> Bool
+pub impl Show for PackageVersion
+
+pub struct RootedPath {
+  // private fields
+} derive(Eq, Hash)
+pub fn RootedPath::intern(Self) -> FileId
+pub fn RootedPath::map(Self, (VirtualPath) -> VirtualPath) -> Self
+pub fn RootedPath::new(VirtualRoot, VirtualPath) -> Self
+pub fn RootedPath::root(Self) -> VirtualRoot
+pub fn RootedPath::vpath(Self) -> VirtualPath
+pub impl Show for RootedPath
 
 pub(all) enum Side {
   Before
@@ -441,6 +525,17 @@ pub fn SyntaxSet::of(ArrayView[SyntaxKind]) -> Self
 pub fn SyntaxSet::remove(Self, SyntaxKind) -> Self
 pub fn SyntaxSet::union(Self, Self) -> Self
 
+pub(all) struct TemplateInfo {
+  path : String
+  entrypoint : String
+  thumbnail : String?
+  unknown_fields : Array[String]
+}
+
+pub(all) struct ToolInfo {
+  sections : Array[String]
+}
+
 pub(all) enum UnOp {
   Pos
   Neg
@@ -449,6 +544,46 @@ pub(all) enum UnOp {
 pub fn UnOp::as_str(Self) -> String
 pub fn UnOp::from_kind(SyntaxKind) -> Self?
 pub fn UnOp::precedence(Self) -> Int
+
+pub(all) struct VersionBound {
+  major : UInt
+  minor : UInt?
+  patch : UInt?
+} derive(Compare, Eq, Hash, @debug.Debug)
+pub fn VersionBound::from_str(String) -> Result[Self, String]
+pub impl Show for VersionBound
+
+pub(all) struct VersionlessPackageSpec {
+  namespace : String
+  name : String
+} derive(Eq, Hash, @debug.Debug)
+pub fn VersionlessPackageSpec::at(Self, PackageVersion) -> PackageSpec
+pub fn VersionlessPackageSpec::from_str(String) -> Result[Self, String]
+pub impl Show for VersionlessPackageSpec
+
+pub struct VirtualPath {
+  // private fields
+} derive(Eq, Hash)
+pub fn VirtualPath::extension(Self) -> String?
+pub fn VirtualPath::file_name(Self) -> String?
+pub fn VirtualPath::file_stem(Self) -> String?
+pub fn VirtualPath::get_with_slash(Self) -> String
+pub fn VirtualPath::get_without_slash(Self) -> String
+pub fn VirtualPath::into_with_slash(Self) -> String
+pub fn VirtualPath::is_root(Self) -> Bool
+pub fn VirtualPath::join(Self, String) -> Self raise PathError
+pub fn VirtualPath::new(String) -> Self raise PathError
+pub fn VirtualPath::parent(Self) -> Self?
+pub fn VirtualPath::realize(Self, String) -> String raise RealizeError
+pub fn VirtualPath::relative_from(Self, Self) -> String
+pub fn VirtualPath::virtualize(String, String) -> Self raise VirtualizeError
+pub fn VirtualPath::with_extension(Self, String) -> Self
+pub impl Show for VirtualPath
+
+pub(all) enum VirtualRoot {
+  Project
+  Package(PackageSpec)
+} derive(Eq, Hash, @debug.Debug)
 
 // Type aliases
 

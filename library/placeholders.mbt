@@ -434,18 +434,6 @@ pub fn State::repr(self : State) -> String {
 }
 
 ///|
-/// A path rooted in a project or package. (placeholder; see
-/// foundations/path.rs)
-pub(all) struct RootedPath {
-  priv repr_ : String
-} derive(Eq, Hash)
-
-///|
-pub fn RootedPath::repr(self : RootedPath) -> String {
-  self.repr_
-}
-
-///|
 /// The repr of a location. (placeholder; see introspection/location.rs)
 pub fn Location::repr(self : Location) -> String {
   ignore(self)

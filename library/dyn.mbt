@@ -61,7 +61,7 @@ pub fn DynValue::repr(self : DynValue) -> String {
     State(v) => v.repr()
     Location(v) => v.repr()
     Selector(v) => v.repr()
-    RootedPath(v) => v.repr()
+    RootedPath(v) => repr_rooted_path(v)
   }
 }
 

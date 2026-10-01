@@ -1799,6 +1799,8 @@ pub fn repr_float(Double) -> String
 
 pub fn repr_int(Int64) -> String
 
+pub fn repr_rooted_path(@syntax.RootedPath) -> String
+
 pub fn repr_str(String) -> String
 
 pub fn root_elem() -> Element
@@ -2273,7 +2275,8 @@ pub(all) suberror FileError {
   IsDirectory
   NotSource
   InvalidUtf8
-  Package(String)
+  Realize(@syntax.RealizeError)
+  Package(PackageError)
   Other(String?)
 } derive(Eq, Hash, @debug.Debug)
 pub impl Show for FileError
@@ -2281,6 +2284,15 @@ pub impl Show for FileError
 pub(all) suberror HintedError {
   HintedError(HintedString)
 } derive(@debug.Debug)
+
+pub(all) suberror PackageError {
+  NotFound(@syntax.PackageSpec)
+  VersionNotFound(@syntax.PackageSpec, @syntax.PackageVersion)
+  NetworkFailed(String?)
+  MalformedArchive(String?)
+  Other(String?)
+} derive(Eq, Hash, @debug.Debug)
+pub impl Show for PackageError
 
 pub(all) suberror SourceError {
   SourceError(Array[SourceDiagnostic])
@@ -2479,6 +2491,13 @@ pub(all) struct BindingGuard {
   emit : (HintedString) -> Unit
 }
 pub fn BindingGuard::silent(Features) -> Self
+
+pub struct BundlePath(@syntax.VirtualPath) derive(Eq, Hash)
+pub fn BundlePath::into_inner(Self) -> @syntax.VirtualPath
+pub fn BundlePath::new(@syntax.VirtualPath) -> Self raise HintedError
+pub impl FromValue for BundlePath
+pub impl IntoValue for BundlePath
+pub impl Reflect for BundlePath
 
 pub(all) struct BytesValue(Bytes) derive(Eq, Hash)
 pub fn BytesValue::concat(Self, Self) -> Self
@@ -2685,7 +2704,7 @@ pub(all) enum DynValue {
   State(State)
   Location(Location)
   Selector(Selector)
-  RootedPath(RootedPath)
+  RootedPath(@syntax.RootedPath)
 } derive(Eq)
 pub fn DynValue::add_dyn(Self, Self) -> Value? raise HintedError
 pub fn DynValue::field(Self, String) -> Value??
@@ -3054,6 +3073,16 @@ pub(all) struct ParamInfo {
   settable : Bool
 }
 
+pub(all) enum PathOrStr {
+  Path(@syntax.RootedPath)
+  Str(String)
+} derive(Eq, Hash)
+pub fn PathOrStr::resolve(Self, @syntax.FileId) -> @syntax.RootedPath raise HintedError
+pub fn PathOrStr::resolve_if_some(Self, @syntax.FileId?) -> @syntax.RootedPath raise HintedError
+pub impl FromValue for PathOrStr
+pub impl IntoValue for PathOrStr
+pub impl Reflect for PathOrStr
+
 pub struct Property {
   elem : Element
   id : Int
@@ -3141,11 +3170,6 @@ pub impl FromValue for Rel[Length]
 pub impl IntoValue for Rel[Length]
 pub impl[T : Numeric] Numeric for Rel[T]
 pub impl Reflect for Rel[Length]
-
-pub(all) struct RootedPath {
-  // private fields
-} derive(Eq, Hash)
-pub fn RootedPath::repr(Self) -> String
 
 pub struct Route {
   // private fields
@@ -3535,6 +3559,8 @@ pub(all) struct Warned[T] {
 // Type aliases
 pub type NativeFn = (Engine, Context, Args) -> Value raise SourceError
 
+pub using @syntax {type RootedPath}
+
 // Traits
 pub(open) trait FromValue : Reflect {
   fn from_value(Value) -> Self raise HintedError
@@ -3545,6 +3571,7 @@ pub impl FromValue for Double
 pub impl FromValue for String
 pub impl[T : FromValue] FromValue for T?
 pub impl[T : FromValue] FromValue for Array[T]
+pub impl FromValue for @syntax.RootedPath
 
 pub(open) trait IntoValue {
   fn into_value(Self) -> Value
@@ -3555,6 +3582,7 @@ pub impl IntoValue for Double
 pub impl IntoValue for String
 pub impl[T : IntoValue] IntoValue for T?
 pub impl[T : IntoValue] IntoValue for Array[T]
+pub impl IntoValue for @syntax.RootedPath
 
 pub(open) trait Numeric : Add + Sub + Neg + Eq {
   fn zero() -> Self
@@ -3574,6 +3602,7 @@ pub impl Reflect for Double
 pub impl Reflect for String
 pub impl[T : Reflect] Reflect for T?
 pub impl[T : Reflect] Reflect for Array[T]
+pub impl Reflect for @syntax.RootedPath
 
 pub(open) trait World {
   fn library(Self) -> Library
@@ -3581,6 +3610,4 @@ pub(open) trait World {
   fn source(Self, @syntax.FileId) -> @syntax.Source raise FileError
   fn file(Self, @syntax.FileId) -> Bytes raise FileError
   fn today(Self, Int64?) -> Datetime?
-  fn resolve_path(Self, @syntax.FileId?, String) -> @syntax.FileId raise HintedError
-  fn file_stem(Self, @syntax.FileId) -> String
 }

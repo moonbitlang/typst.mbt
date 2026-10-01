@@ -75,7 +75,7 @@ fn calc_module() -> Module {
 
 ///|
 /// The version of upstream Typst this is a port of.
-pub let typst_version : (Int, Int, Int) = (0, 15, 1)
+pub let typst_version : (Int, Int, Int) = @syntax.typst_version
 
 ///|
 /// The `sys` module (upstream `sys::module`).
