@@ -233,6 +233,42 @@ pub fn colbreak_elem() -> Element
 
 pub let colbreak_elem_weak : Int
 
+pub let color_aqua : Color
+
+pub let color_black : Color
+
+pub let color_blue : Color
+
+pub let color_eastern : Color
+
+pub let color_fuchsia : Color
+
+pub let color_gray : Color
+
+pub let color_green : Color
+
+pub let color_lime : Color
+
+pub let color_maroon : Color
+
+pub let color_navy : Color
+
+pub let color_olive : Color
+
+pub let color_orange : Color
+
+pub let color_purple : Color
+
+pub let color_red : Color
+
+pub let color_silver : Color
+
+pub let color_teal : Color
+
+pub let color_white : Color
+
+pub let color_yellow : Color
+
 pub fn columns_elem() -> Element
 
 pub let columns_elem_balanced : Int
@@ -1853,6 +1889,8 @@ pub fn repr_rooted_path(@syntax.RootedPath) -> String
 
 pub fn repr_str(String) -> String
 
+pub fn resolve_color_space(Smart[ColorSpace], Array[Color]) -> ColorSpace
+
 pub fn root_elem() -> Element
 
 pub let root_elem_index : Int
@@ -2677,6 +2715,20 @@ pub(all) enum Category {
   Bundle
 } derive(Eq, Hash, @debug.Debug)
 
+pub(all) struct ChromaComponent(Float)
+pub impl FromValue for ChromaComponent
+pub impl IntoValue for ChromaComponent
+pub impl Reflect for ChromaComponent
+
+pub(all) enum CloseMode {
+  Smooth
+  Straight
+} derive(Eq, Hash, @debug.Debug)
+pub impl Default for CloseMode
+pub impl FromValue for CloseMode
+pub impl IntoValue for CloseMode
+pub impl Reflect for CloseMode
+
 pub(all) struct Closure {
   node : ClosureNode
   defaults : Array[Value]
@@ -2690,10 +2742,67 @@ pub(all) enum ClosureNode {
   Context(@syntax.SyntaxNode)
 }
 
-pub(all) struct Color {
-  // private fields
-} derive(Eq, Hash)
+pub(all) struct Cmyk {
+  c : Float
+  m : Float
+  y : Float
+  k : Float
+} derive(Eq, @debug.Debug)
+
+pub(all) enum Color {
+  Process(ProcessColor)
+  Spot(SpotColor)
+}
+pub fn Color::alpha(Self) -> Float?
+pub fn Color::from_str(String) -> Result[Self, String]
+pub fn Color::from_u32(UInt) -> Self
+pub fn Color::from_u8(Int, Int, Int, Int) -> Self
+pub fn Color::mix_iter(Array[WeightedColor], Smart[ColorSpace]) -> Self raise HintedError
 pub fn Color::repr(Self) -> String
+pub fn Color::space(Self) -> ColorSpace
+pub fn Color::to_cmyk(Self) -> Cmyk
+pub fn Color::to_hsl(Self) -> Hsl
+pub fn Color::to_hsv(Self) -> Hsv
+pub fn Color::to_linear_rgb(Self) -> LinearRgb
+pub fn Color::to_luma(Self) -> Luma
+pub fn Color::to_oklab(Self) -> Oklab
+pub fn Color::to_oklch(Self) -> Oklch
+pub fn Color::to_process(Self) -> ProcessColor
+pub fn Color::to_process_space(Self, ProcessColorSpace) -> Self
+pub fn Color::to_rgb(Self) -> Rgb
+pub fn Color::to_space(Self, ColorSpace) -> Self raise HintedError
+pub fn Color::to_vec4(Self) -> FixedArray[Float]
+pub fn Color::to_vec4_u8(Self) -> FixedArray[Int]
+pub fn Color::with_alpha(Self, Float) -> Self
+pub impl Eq for Color
+pub impl Hash for Color
+pub impl FromValue for Color
+pub impl IntoValue for Color
+pub impl Reflect for Color
+
+pub(all) enum ColorSpace {
+  Process(ProcessColorSpace)
+  Spot(SpotColorant)
+} derive(Eq)
+pub fn ColorSpace::hue_index(Self) -> Int?
+pub impl FromValue for ColorSpace
+pub impl IntoValue for ColorSpace
+pub impl Reflect for ColorSpace
+
+pub(all) struct Component(Ratio)
+pub impl FromValue for Component
+pub impl IntoValue for Component
+pub impl Reflect for Component
+
+pub(all) struct ConicGradient {
+  stops : Array[(Color, Ratio)]
+  angle : Angle
+  center : Axes[Ratio]
+  space : ColorSpace
+  relative : Smart[RelativeTo]
+  anti_alias : Bool
+} derive(Eq)
+pub fn ConicGradient::repr(Self) -> String
 
 pub struct Content {
   elem : Element
@@ -2792,6 +2901,29 @@ pub(all) struct Counter {
   // private fields
 } derive(Eq, Hash)
 pub fn Counter::repr(Self) -> String
+
+pub(all) struct CurveComponent(Content)
+pub impl FromValue for CurveComponent
+pub impl IntoValue for CurveComponent
+pub impl Reflect for CurveComponent
+
+pub(all) enum DashLength {
+  LineWidth
+  Length(Length)
+} derive(Eq)
+pub fn DashLength::repr(Self) -> String
+pub impl FromValue for DashLength
+pub impl IntoValue for DashLength
+pub impl Reflect for DashLength
+
+pub(all) struct DashPattern {
+  array : Array[DashLength]
+  phase : Length
+} derive(Eq)
+pub fn DashPattern::repr(Self) -> String
+pub impl FromValue for DashPattern
+pub impl IntoValue for DashPattern
+pub impl Reflect for DashPattern
 
 pub(all) struct Datetime {
   // private fields
@@ -3052,6 +3184,15 @@ pub(all) enum FieldKind {
   External
 } derive(Eq, @debug.Debug)
 
+pub(all) enum FillRule {
+  NonZero
+  EvenOdd
+} derive(Eq, Hash, @debug.Debug)
+pub impl Default for FillRule
+pub impl FromValue for FillRule
+pub impl IntoValue for FillRule
+pub impl Reflect for FillRule
+
 pub(all) enum FixedAlignment {
   Start
   Center
@@ -3120,10 +3261,30 @@ pub(all) enum FuncInner {
   With(Func, Args)
 }
 
-pub(all) struct Gradient {
-  // private fields
-} derive(Eq, Hash)
+pub(all) enum Gradient {
+  Linear(LinearGradient)
+  Radial(RadialGradient)
+  Conic(ConicGradient)
+} derive(Eq)
+pub fn Gradient::anti_alias(Self) -> Bool
+pub fn Gradient::relative(Self) -> Smart[RelativeTo]
 pub fn Gradient::repr(Self) -> String
+pub fn Gradient::sample(Self, RatioOrAngle) -> Color
+pub fn Gradient::space(Self) -> ColorSpace
+pub fn Gradient::stops_ref(Self) -> Array[(Color, Ratio)]
+pub fn Gradient::unwrap_relative(Self, Bool) -> RelativeTo
+pub fn Gradient::with_relative(Self, RelativeTo) -> Self
+pub impl FromValue for Gradient
+pub impl IntoValue for Gradient
+pub impl Reflect for Gradient
+
+pub(all) struct GradientStop {
+  color : Color
+  offset : Ratio?
+} derive(Eq)
+pub impl FromValue for GradientStop
+pub impl IntoValue for GradientStop
+pub impl Reflect for GradientStop
 
 pub(all) enum HAlignment {
   Start
@@ -3151,6 +3312,36 @@ pub fn HintedString::into_error_at(Self, @syntax.Span) -> SourceDiagnostic
 pub fn HintedString::into_warning_at(Self, @syntax.Span) -> SourceDiagnostic
 pub fn HintedString::new(String) -> Self
 pub fn HintedString::with_hint(Self, String) -> Self
+
+pub(all) struct Hsl {
+  hue : Float
+  saturation : Float
+  lightness : Float
+  alpha : Float
+} derive(@debug.Debug)
+pub fn Hsl::from_hsv(Hsv) -> Self
+pub fn Hsl::from_luma(Luma) -> Self
+pub fn Hsl::from_oklab(Oklab) -> Self
+pub fn Hsl::from_oklch(Oklch) -> Self
+pub fn Hsl::from_rgb(Rgb) -> Self
+pub fn Hsl::lighten(Self, Float) -> Self
+pub fn Hsl::saturate(Self, Float) -> Self
+pub impl Eq for Hsl
+
+pub(all) struct Hsv {
+  hue : Float
+  saturation : Float
+  value : Float
+  alpha : Float
+} derive(@debug.Debug)
+pub fn Hsv::from_hsl(Hsl) -> Self
+pub fn Hsv::from_luma(Luma) -> Self
+pub fn Hsv::from_oklab(Oklab) -> Self
+pub fn Hsv::from_oklch(Oklch) -> Self
+pub fn Hsv::from_rgb(Rgb) -> Self
+pub fn Hsv::lighten(Self, Float) -> Self
+pub fn Hsv::saturate(Self, Float) -> Self
+pub impl Eq for Hsv
 
 pub(all) struct I16(Int64) derive(Compare, Eq, Hash, @debug.Debug)
 pub fn I16::get(Self) -> Int64
@@ -3228,11 +3419,66 @@ pub fn LibraryBuilder::with_features(Self, Features) -> Self
 pub fn LibraryBuilder::with_global(Self, (Scope) -> Unit) -> Self
 pub fn LibraryBuilder::with_inputs(Self, Dict) -> Self
 
+pub(all) enum LineCap {
+  Butt
+  Round
+  Square
+} derive(Eq, Hash, @debug.Debug)
+pub fn LineCap::repr(Self) -> String
+pub impl FromValue for LineCap
+pub impl IntoValue for LineCap
+pub impl Reflect for LineCap
+
+pub(all) enum LineJoin {
+  Miter
+  Round
+  Bevel
+} derive(Eq, Hash, @debug.Debug)
+pub fn LineJoin::repr(Self) -> String
+pub impl FromValue for LineJoin
+pub impl IntoValue for LineJoin
+pub impl Reflect for LineJoin
+
+pub(all) struct LinearGradient {
+  stops : Array[(Color, Ratio)]
+  angle : Angle
+  space : ColorSpace
+  relative : Smart[RelativeTo]
+  anti_alias : Bool
+} derive(Eq)
+pub fn LinearGradient::repr(Self) -> String
+
+pub(all) struct LinearRgb {
+  red : Float
+  green : Float
+  blue : Float
+  alpha : Float
+} derive(@debug.Debug)
+pub fn LinearRgb::from_luma(Luma) -> Self
+pub fn LinearRgb::from_oklab(Oklab) -> Self
+pub fn LinearRgb::from_oklch(Oklch) -> Self
+pub fn LinearRgb::from_rgb(Rgb) -> Self
+pub fn LinearRgb::lighten(Self, Float) -> Self
+pub impl Eq for LinearRgb
+
 pub struct LinkElem(Content)
 pub fn LinkElem::from_url(String) -> Content raise HintedError
 
 pub(all) struct Location(UInt64) derive(Compare, Eq, Hash)
 pub fn Location::repr(Self) -> String
+
+pub(all) struct Luma {
+  luma : Float
+  alpha : Float
+} derive(@debug.Debug)
+pub fn Luma::from_hsl(Hsl) -> Self
+pub fn Luma::from_hsv(Hsv) -> Self
+pub fn Luma::from_linear_rgb(LinearRgb) -> Self
+pub fn Luma::from_oklab(Oklab) -> Self
+pub fn Luma::from_oklch(Oklch) -> Self
+pub fn Luma::from_rgb(Rgb) -> Self
+pub fn Luma::lighten(Self, Float) -> Self
+pub impl Eq for Luma
 
 pub(all) struct ModifierSet(String) derive(Eq, Hash, @debug.Debug)
 pub fn ModifierSet::as_str(Self) -> String
@@ -3332,6 +3578,36 @@ pub(all) enum NumericUnit {
   Percent
 } derive(Eq, @debug.Debug)
 
+pub(all) struct Oklab {
+  l : Float
+  a : Float
+  b : Float
+  alpha : Float
+} derive(@debug.Debug)
+pub fn Oklab::from_hsl(Hsl) -> Self
+pub fn Oklab::from_hsv(Hsv) -> Self
+pub fn Oklab::from_linear_rgb(LinearRgb) -> Self
+pub fn Oklab::from_luma(Luma) -> Self
+pub fn Oklab::from_oklch(Oklch) -> Self
+pub fn Oklab::from_rgb(Rgb) -> Self
+pub fn Oklab::lighten(Self, Float) -> Self
+pub impl Eq for Oklab
+
+pub(all) struct Oklch {
+  l : Float
+  chroma : Float
+  hue : Float
+  alpha : Float
+} derive(@debug.Debug)
+pub fn Oklch::from_hsl(Hsl) -> Self
+pub fn Oklch::from_hsv(Hsv) -> Self
+pub fn Oklch::from_linear_rgb(LinearRgb) -> Self
+pub fn Oklch::from_luma(Luma) -> Self
+pub fn Oklch::from_oklab(Oklab) -> Self
+pub fn Oklch::from_rgb(Rgb) -> Self
+pub fn Oklch::lighten(Self, Float) -> Self
+pub impl Eq for Oklch
+
 pub(all) enum OuterHAlignment {
   Start
   Left
@@ -3360,6 +3636,19 @@ pub impl FromValue for OuterVAlignment
 pub impl IntoValue for OuterVAlignment
 pub impl Reflect for OuterVAlignment
 
+pub(all) enum Paint {
+  Solid(Color)
+  Gradient(Gradient)
+  Tiling(Tiling)
+} derive(Eq)
+pub fn Paint::as_decoration(Self) -> Self
+pub fn Paint::relative(Self) -> Smart[RelativeTo]
+pub fn Paint::repr(Self) -> String
+pub fn Paint::unwrap_solid(Self) -> Color
+pub impl FromValue for Paint
+pub impl IntoValue for Paint
+pub impl Reflect for Paint
+
 pub(all) struct ParamInfo {
   name : String
   docs : String
@@ -3387,6 +3676,62 @@ pub impl FromValue for PathOrStr
 pub impl IntoValue for PathOrStr
 pub impl Reflect for PathOrStr
 
+pub(all) enum ProcessColor {
+  Luma(Luma)
+  Oklab(Oklab)
+  Oklch(Oklch)
+  Rgb(Rgb)
+  LinearRgb(LinearRgb)
+  Cmyk(Cmyk)
+  Hsl(Hsl)
+  Hsv(Hsv)
+}
+pub fn ProcessColor::alpha(Self) -> Float?
+pub fn ProcessColor::components(Self, Bool) -> Arr
+pub fn ProcessColor::darken(Self, Ratio) -> Self
+pub fn ProcessColor::desaturate(Self, @syntax.Span, Ratio) -> Self raise SourceError
+pub fn ProcessColor::from_str(String) -> Result[Self, String]
+pub fn ProcessColor::from_u32(UInt) -> Self
+pub fn ProcessColor::from_u8(Int, Int, Int, Int) -> Self
+pub fn ProcessColor::lighten(Self, Ratio) -> Self
+pub fn ProcessColor::negate(Self, ProcessColorSpace) -> Self
+pub fn ProcessColor::repr(Self) -> String
+pub fn ProcessColor::saturate(Self, @syntax.Span, Ratio) -> Self raise SourceError
+pub fn ProcessColor::space(Self) -> ProcessColorSpace
+pub fn ProcessColor::to_cmyk(Self) -> Cmyk
+pub fn ProcessColor::to_hex(Self) -> String
+pub fn ProcessColor::to_hsl(Self) -> Hsl
+pub fn ProcessColor::to_hsv(Self) -> Hsv
+pub fn ProcessColor::to_linear_rgb(Self) -> LinearRgb
+pub fn ProcessColor::to_luma(Self) -> Luma
+pub fn ProcessColor::to_oklab(Self) -> Oklab
+pub fn ProcessColor::to_oklch(Self) -> Oklch
+pub fn ProcessColor::to_rgb(Self) -> Rgb
+pub fn ProcessColor::to_space(Self, ProcessColorSpace) -> Self
+pub fn ProcessColor::to_vec4(Self) -> FixedArray[Float]
+pub fn ProcessColor::to_vec4_u8(Self) -> FixedArray[Int]
+pub fn ProcessColor::with_alpha(Self, Float) -> Self
+pub impl Eq for ProcessColor
+pub impl Hash for ProcessColor
+pub impl FromValue for ProcessColor
+pub impl IntoValue for ProcessColor
+pub impl Reflect for ProcessColor
+
+pub(all) enum ProcessColorSpace {
+  Oklab
+  Oklch
+  Srgb
+  D65Gray
+  LinearRgb
+  Hsl
+  Hsv
+  Cmyk
+} derive(Eq, @debug.Debug)
+pub fn ProcessColorSpace::hue_index(Self) -> Int?
+pub impl FromValue for ProcessColorSpace
+pub impl IntoValue for ProcessColorSpace
+pub impl Reflect for ProcessColorSpace
+
 pub struct Property {
   elem : Element
   id : Int
@@ -3406,6 +3751,18 @@ pub(all) enum Quadrant {
   Third
   Fourth
 } derive(Compare, Eq, Hash, @debug.Debug)
+
+pub(all) struct RadialGradient {
+  stops : Array[(Color, Ratio)]
+  center : Axes[Ratio]
+  radius : Ratio
+  focal_center : Axes[Ratio]
+  focal_radius : Ratio
+  space : ColorSpace
+  relative : Smart[RelativeTo]
+  anti_alias : Bool
+} derive(Eq)
+pub fn RadialGradient::repr(Self) -> String
 
 pub(all) struct Ratio(Scalar) derive(Compare, Default, Eq, Hash)
 pub fn Ratio::abs(Self) -> Self
@@ -3429,6 +3786,20 @@ pub impl FromValue for Ratio
 pub impl IntoValue for Ratio
 pub impl Numeric for Ratio
 pub impl Reflect for Ratio
+
+pub(all) struct RatioComponent(Ratio)
+pub impl FromValue for RatioComponent
+pub impl IntoValue for RatioComponent
+pub impl Reflect for RatioComponent
+
+pub(all) enum RatioOrAngle {
+  Ratio(Ratio)
+  Angle(Angle)
+} derive(Eq)
+pub fn RatioOrAngle::to_ratio(Self) -> Ratio
+pub impl FromValue for RatioOrAngle
+pub impl IntoValue for RatioOrAngle
+pub impl Reflect for RatioOrAngle
 
 pub struct RawElem(Content)
 pub fn RawElem::packed_code(String) -> Content
@@ -3475,6 +3846,31 @@ pub impl FromValue for Rel[Length]
 pub impl IntoValue for Rel[Length]
 pub impl[T : Numeric] Numeric for Rel[T]
 pub impl Reflect for Rel[Length]
+
+pub(all) enum RelativeTo {
+  Self_
+  Parent
+} derive(Eq, Hash, @debug.Debug)
+pub impl FromValue for RelativeTo
+pub impl IntoValue for RelativeTo
+pub impl Reflect for RelativeTo
+
+pub(all) struct Rgb {
+  red : Float
+  green : Float
+  blue : Float
+  alpha : Float
+} derive(@debug.Debug)
+pub fn Rgb::from_hsl(Hsl) -> Self
+pub fn Rgb::from_hsv(Hsv) -> Self
+pub fn Rgb::from_linear(LinearRgb) -> Self
+pub fn Rgb::from_luma(Luma) -> Self
+pub fn Rgb::from_oklab(Oklab) -> Self
+pub fn Rgb::from_oklch(Oklch) -> Self
+pub fn Rgb::from_rgb(Self) -> Self
+pub fn Rgb::lighten(Self, Float) -> Self
+pub fn Rgb::to_linear(Self) -> LinearRgb
+pub impl Eq for Rgb
 
 pub struct Route {
   // private fields
@@ -3694,10 +4090,34 @@ pub impl[H : AlignmentComponent, V : AlignmentComponent] FromValue for SpecificA
 pub impl[H : AlignmentComponent, V : AlignmentComponent] IntoValue for SpecificAlignment[H, V]
 pub impl[H : AlignmentComponent, V : AlignmentComponent] Reflect for SpecificAlignment[H, V]
 
+pub(all) struct SpotColor {
+  colorant : SpotColorant
+  tint : Ratio
+} derive(Eq)
+pub fn SpotColor::darken(Self, Ratio) -> Self
+pub fn SpotColor::fallback(Self) -> ProcessColor
+pub fn SpotColor::lighten(Self, Ratio) -> Self
+pub fn SpotColor::negate(Self) -> Self
+pub fn SpotColor::repr(Self) -> String
+
 pub(all) struct SpotColorant {
-  // private fields
-} derive(Eq, Hash)
+  name : SpotColorantName?
+  fallback : ProcessColor
+} derive(Eq)
 pub fn SpotColorant::repr(Self) -> String
+pub impl Hash for SpotColorant
+pub impl FromValue for SpotColorant
+pub impl IntoValue for SpotColorant
+pub impl Reflect for SpotColorant
+
+pub(all) enum SpotColorantName {
+  All
+  Custom(String)
+} derive(Eq)
+pub fn SpotColorantName::repr(Self) -> String
+pub impl FromValue for SpotColorantName
+pub impl IntoValue for SpotColorantName
+pub impl Reflect for SpotColorantName
 
 pub(all) struct State {
   // private fields
@@ -3705,10 +4125,21 @@ pub(all) struct State {
 pub fn State::repr(Self) -> String
 
 pub(all) struct Stroke {
-  // private fields
-} derive(Eq, Hash)
+  paint : Smart[Paint]
+  thickness : Smart[Length]
+  cap : Smart[LineCap]
+  join : Smart[LineJoin]
+  dash : Smart[DashPattern?]
+  miter_limit : Smart[Ratio]
+} derive(Eq)
 pub fn Stroke::field(Self, String) -> Value?
+pub fn Stroke::from_pair(Paint, Length) -> Self
 pub fn Stroke::repr(Self) -> String
+pub impl Default for Stroke
+pub impl Fold for Stroke
+pub impl FromValue for Stroke
+pub impl IntoValue for Stroke
+pub impl Reflect for Stroke
 
 pub(all) enum Style {
   Property(Property)
@@ -3796,9 +4227,20 @@ pub struct TextElem(Content)
 pub fn TextElem::packed(String) -> Content
 
 pub(all) struct Tiling {
-  // private fields
-} derive(Eq, Hash)
+  body : Content
+  size : Axes[Abs]
+  spacing : Axes[Abs]
+  offset : Axes[Abs]
+  angle : Angle
+  relative : Smart[RelativeTo]
+} derive(Eq)
+pub fn Tiling::relative(Self) -> Smart[RelativeTo]
 pub fn Tiling::repr(Self) -> String
+pub fn Tiling::unwrap_relative(Self, Bool) -> RelativeTo
+pub fn Tiling::with_relative(Self, RelativeTo) -> Self
+pub impl FromValue for Tiling
+pub impl IntoValue for Tiling
+pub impl Reflect for Tiling
 
 pub(all) struct ToAbs(Value)
 pub impl FromValue for ToAbs
@@ -4006,6 +4448,15 @@ pub(all) struct Warned[T] {
   output : T
   warnings : Array[SourceDiagnostic]
 }
+
+pub(all) struct WeightedColor {
+  color : Color
+  weight : Double
+}
+pub fn WeightedColor::new(Color, Double) -> Self
+pub impl FromValue for WeightedColor
+pub impl IntoValue for WeightedColor
+pub impl Reflect for WeightedColor
 
 // Type aliases
 pub type NativeFn = (Engine, Context, Args) -> Value raise SourceError
