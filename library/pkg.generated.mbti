@@ -2677,6 +2677,17 @@ pub(all) enum Category {
   Bundle
 } derive(Eq, Hash, @debug.Debug)
 
+pub(all) enum Celled[T] {
+  CelledValue(T)
+  CelledFunc(Func)
+  CelledArray(Array[T])
+} derive(Eq)
+pub impl[T : Default] Default for Celled[T]
+pub impl[T : Fold] Fold for Celled[T]
+pub impl[T : FromValue] FromValue for Celled[T]
+pub impl[T : IntoValue] IntoValue for Celled[T]
+pub impl[T : Reflect] Reflect for Celled[T]
+
 pub(all) struct Closure {
   node : ClosureNode
   defaults : Array[Value]
@@ -3124,6 +3135,33 @@ pub(all) struct Gradient {
   // private fields
 } derive(Eq, Hash)
 pub fn Gradient::repr(Self) -> String
+
+pub struct GridCell(Content)
+pub fn GridCell::from_content(Content) -> Self
+pub fn GridCell::new(Content) -> Self
+pub impl FromValue for GridCell
+pub impl IntoValue for GridCell
+pub impl Reflect for GridCell
+
+pub(all) enum GridChild {
+  Header(Content)
+  Footer(Content)
+  Item(GridItem)
+} derive(Eq)
+pub fn GridChild::try_from(Content) -> Self raise HintedError
+pub impl FromValue for GridChild
+pub impl IntoValue for GridChild
+pub impl Reflect for GridChild
+
+pub(all) enum GridItem {
+  HLine(Content)
+  VLine(Content)
+  Cell(Content)
+} derive(Eq)
+pub fn GridItem::try_from(Content) -> Self raise HintedError
+pub impl FromValue for GridItem
+pub impl IntoValue for GridItem
+pub impl Reflect for GridItem
 
 pub(all) enum HAlignment {
   Start
@@ -3792,6 +3830,60 @@ pub(all) struct SymbolVariant(String, String)
 pub impl FromValue for SymbolVariant
 pub impl Reflect for SymbolVariant
 
+pub struct TableCell(Content)
+pub fn TableCell::from_content(Content) -> Self
+pub fn TableCell::kind(Self) -> Smart[TableCellKind]?
+pub fn TableCell::new(Content) -> Self
+pub fn TableCell::with_kind(Self, Smart[TableCellKind]) -> Self
+pub impl FromValue for TableCell
+pub impl IntoValue for TableCell
+pub impl Reflect for TableCell
+
+pub(all) enum TableCellKind {
+  Header(NonZeroU32, TableHeaderScope)
+  Footer
+  Data
+} derive(Eq, Hash, @debug.Debug)
+pub impl Default for TableCellKind
+
+pub(all) enum TableChild {
+  Header(Content)
+  Footer(Content)
+  Item(TableItem)
+} derive(Eq)
+pub fn TableChild::try_from(Content) -> Self raise HintedError
+pub impl FromValue for TableChild
+pub impl IntoValue for TableChild
+pub impl Reflect for TableChild
+
+pub struct TableElem(Content)
+pub fn TableElem::with_summary(Self, String?) -> Self
+pub impl FromValue for TableElem
+pub impl IntoValue for TableElem
+pub impl Reflect for TableElem
+
+pub(all) enum TableHeaderScope {
+  Both
+  Column
+  Row
+} derive(Eq, Hash, @debug.Debug)
+pub fn TableHeaderScope::refers_to_column(Self) -> Bool
+pub fn TableHeaderScope::refers_to_row(Self) -> Bool
+pub impl Default for TableHeaderScope
+pub impl FromValue for TableHeaderScope
+pub impl IntoValue for TableHeaderScope
+pub impl Reflect for TableHeaderScope
+
+pub(all) enum TableItem {
+  HLine(Content)
+  VLine(Content)
+  Cell(Content)
+} derive(Eq)
+pub fn TableItem::try_from(Content) -> Self raise HintedError
+pub impl FromValue for TableItem
+pub impl IntoValue for TableItem
+pub impl Reflect for TableItem
+
 pub struct TextElem(Content)
 pub fn TextElem::packed(String) -> Content
 
@@ -3834,6 +3926,12 @@ pub(all) enum Tracepoint {
   Include(String)
 } derive(Eq, Hash, @debug.Debug)
 pub impl Show for Tracepoint
+
+pub(all) struct TrackSizings(Array[Sizing]) derive(Eq, Hash)
+pub impl Default for TrackSizings
+pub impl FromValue for TrackSizings
+pub impl IntoValue for TrackSizings
+pub impl Reflect for TrackSizings
 
 pub(all) enum Transformation {
   Content(Content)
