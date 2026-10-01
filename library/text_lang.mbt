@@ -241,6 +241,42 @@ pub impl Default for Locale with fn default() {
 }
 
 ///|
+pub fn Locale::get_in(styles : StyleChain) -> Locale {
+  Locale::new(TextElem::lang_in(styles), TextElem::region_in(styles))
+}
+
+// Upstream `Locale` has no cast: it is only stored in internal synthesized
+// fields. Its value form here is the array `(lang, region)`.
+
+///|
+pub impl Reflect for Locale with fn input() {
+  Type(Type::array())
+}
+
+///|
+pub impl Reflect for Locale with fn output() {
+  Type(Type::array())
+}
+
+///|
+pub impl Reflect for Locale with fn castable(v) {
+  v is Array(_)
+}
+
+///|
+pub impl IntoValue for Locale with fn into_value(self) {
+  Array(
+    Arr::from_array([self.lang.into_value(), IntoValue::into_value(self.region)]),
+  )
+}
+
+///|
+pub impl FromValue for Locale with fn from_value(v) {
+  let (lang, region) : (Lang, Region?) = FromValue::from_value(v)
+  Locale::new(lang, region)
+}
+
+///|
 pub fn Locale::rfc_3066(self : Locale) -> String {
   match self.region {
     Some(region) => self.lang.as_str() + "-" + region.as_str()
