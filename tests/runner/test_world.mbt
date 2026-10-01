@@ -332,7 +332,39 @@ fn define_test_globals(scope : @library.Scope) -> Unit {
     }),
   )
   |> ignore
-  // TODO: `lines` needs `Numbering`.
+  // Generates `count` lines of text based on the numbering.
+  scope.define_func(
+    @library.native_func("lines", (engine, context, args) => {
+      let count : @library.U64 = args.expect("count")
+      let numbering : @library.Numbering = match args.eat() {
+        Some(numbering) => numbering
+        None =>
+          Pattern(
+            @library.NumberingPattern::from_str("A") catch {
+              _ => abort("valid pattern")
+            },
+          )
+      }
+      args.take().finish()
+      let span = args.span
+      // `(1..=count).map(..).collect::<Array>().join(Some("\n"), None, None)`
+      let values = []
+      for n in 1L..<=count.get() {
+        values.push(numbering.apply(engine, context, span, [n]))
+      }
+      @library.at(span, () => {
+        let mut result : @library.Value = None
+        for i, value in values {
+          if i > 0 {
+            result = @library.join(result, Str("\n"))
+          }
+          result = @library.join(result, value)
+        }
+        result
+      })
+    }),
+  )
+  |> ignore
   scope.define_func(
     @library.native_func("bounds", (_, _, args) => {
       let _ : @library.Content = args.expect("content")

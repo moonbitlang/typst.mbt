@@ -447,8 +447,8 @@ fn context_required() -> HintedString {
 }
 
 ///|
-/// Identifies an element in the document (placeholder; see
-/// introspection/location.rs).
+/// Identifies an element in the document (upstream `Location`; see
+/// `location.mbt`).
 pub(all) struct Location(UInt64) derive(Eq, Hash, Compare)
 
 ///|

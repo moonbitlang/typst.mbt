@@ -5269,7 +5269,7 @@ pub fn native_content_func() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Element])),
         native_content_func_call,
       )
       native_content_func_cell.val = Some(d)
@@ -5509,7 +5509,7 @@ pub fn native_content_location() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Location?])),
         native_content_location_call,
       )
       native_content_location_cell.val = Some(d)
@@ -7668,7 +7668,7 @@ pub fn native_func_where() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Selector])),
         native_func_where_call,
       )
       native_func_where_cell.val = Some(d)
@@ -9003,7 +9003,7 @@ pub fn native_selector_construct() -> NativeFuncData {
           {
             name: "target",
             docs: "Can be an element function like a `heading` or `figure`, a `{<label>}` or a more complex selector like `{heading.where(level: 1)}`.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Selector])),
             default: None,
             positional: true,
             named: false,
@@ -9012,7 +9012,7 @@ pub fn native_selector_construct() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Selector])),
         native_selector_construct_call,
       )
       native_selector_construct_cell.val = Some(d)
@@ -9029,7 +9029,7 @@ fn native_selector_construct_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let target_ : Value = args.expect("target")
+  let target_ : Selector = args.expect("target")
   args.take().finish()
   let output = at(args.span, () => impl_selector_construct(target_))
   IntoValue::into_value(output)
@@ -9054,7 +9054,7 @@ pub fn native_selector_or() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Selector])),
             default: None,
             positional: true,
             named: false,
@@ -9065,7 +9065,7 @@ pub fn native_selector_or() -> NativeFuncData {
           {
             name: "others",
             docs: "The other selectors to match on.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Selector])),
             default: None,
             positional: true,
             named: false,
@@ -9074,7 +9074,7 @@ pub fn native_selector_or() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Selector])),
         native_selector_or_call,
       )
       native_selector_or_cell.val = Some(d)
@@ -9091,8 +9091,8 @@ fn native_selector_or_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
-  let others_ : Array[Value] = args.all()
+  let self_ : Selector = args.expect("self")
+  let others_ : Array[Selector] = args.all()
   args.take().finish()
   let output = at(args.span, () => impl_selector_or(self_, others_))
   IntoValue::into_value(output)
@@ -9117,7 +9117,7 @@ pub fn native_selector_and() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Selector])),
             default: None,
             positional: true,
             named: false,
@@ -9128,7 +9128,7 @@ pub fn native_selector_and() -> NativeFuncData {
           {
             name: "others",
             docs: "The other selectors to match on.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Selector])),
             default: None,
             positional: true,
             named: false,
@@ -9137,7 +9137,7 @@ pub fn native_selector_and() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Selector])),
         native_selector_and_call,
       )
       native_selector_and_cell.val = Some(d)
@@ -9154,8 +9154,8 @@ fn native_selector_and_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
-  let others_ : Array[Value] = args.all()
+  let self_ : Selector = args.expect("self")
+  let others_ : Array[Selector] = args.all()
   args.take().finish()
   let output = at(args.span, () => impl_selector_and(self_, others_))
   IntoValue::into_value(output)
@@ -9180,7 +9180,7 @@ pub fn native_selector_before() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Selector])),
             default: None,
             positional: true,
             named: false,
@@ -9191,7 +9191,7 @@ pub fn native_selector_before() -> NativeFuncData {
           {
             name: "end",
             docs: "The original selection will end at the first match of `end`.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[LocatableSelector])),
             default: None,
             positional: true,
             named: false,
@@ -9211,7 +9211,7 @@ pub fn native_selector_before() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Selector])),
         native_selector_before_call,
       )
       native_selector_before_cell.val = Some(d)
@@ -9228,8 +9228,8 @@ fn native_selector_before_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
-  let end_ : Value = args.expect("end")
+  let self_ : Selector = args.expect("self")
+  let end_ : LocatableSelector = args.expect("end")
   let inclusive_ : Bool = match args.named("inclusive") {
     Some(v) => v
     None => true
@@ -9258,7 +9258,7 @@ pub fn native_selector_after() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Selector])),
             default: None,
             positional: true,
             named: false,
@@ -9269,7 +9269,7 @@ pub fn native_selector_after() -> NativeFuncData {
           {
             name: "start",
             docs: "The original selection will start at the first match of `start`.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[LocatableSelector])),
             default: None,
             positional: true,
             named: false,
@@ -9289,7 +9289,7 @@ pub fn native_selector_after() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Selector])),
         native_selector_after_call,
       )
       native_selector_after_cell.val = Some(d)
@@ -9306,8 +9306,8 @@ fn native_selector_after_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
-  let start_ : Value = args.expect("start")
+  let self_ : Selector = args.expect("self")
+  let start_ : LocatableSelector = args.expect("start")
   let inclusive_ : Bool = match args.named("inclusive") {
     Some(v) => v
     None => true
@@ -9338,7 +9338,7 @@ pub fn native_selector_within() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Selector])),
             default: None,
             positional: true,
             named: false,
@@ -9349,7 +9349,7 @@ pub fn native_selector_within() -> NativeFuncData {
           {
             name: "ancestor",
             docs: "Only matches of `self` that are descendants of any element matching this selector will be included in the output.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[LocatableSelector])),
             default: None,
             positional: true,
             named: false,
@@ -9358,7 +9358,7 @@ pub fn native_selector_within() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Selector])),
         native_selector_within_call,
       )
       native_selector_within_cell.val = Some(d)
@@ -9375,8 +9375,8 @@ fn native_selector_within_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
-  let ancestor_ : Value = args.expect("ancestor")
+  let self_ : Selector = args.expect("self")
+  let ancestor_ : LocatableSelector = args.expect("ancestor")
   args.take().finish()
   let output = at(args.span, () => impl_selector_within(self_, ancestor_))
   IntoValue::into_value(output)
@@ -11144,7 +11144,7 @@ pub fn native_counter_construct() -> NativeFuncData {
           {
             name: "key",
             docs: "The key that identifies this counter globally.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[CounterKey])),
             default: None,
             positional: true,
             named: false,
@@ -11153,7 +11153,7 @@ pub fn native_counter_construct() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Counter])),
         native_counter_construct_call,
       )
       native_counter_construct_cell.val = Some(d)
@@ -11170,7 +11170,7 @@ fn native_counter_construct_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let key_ : Value = args.expect("key")
+  let key_ : CounterKey = args.expect("key")
   args.take().finish()
   let output = at(args.span, () => impl_counter_construct(key_))
   IntoValue::into_value(output)
@@ -11195,7 +11195,7 @@ pub fn native_counter_get() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Counter])),
             default: None,
             positional: true,
             named: false,
@@ -11204,7 +11204,7 @@ pub fn native_counter_get() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[CounterState])),
         native_counter_get_call,
       )
       native_counter_get_cell.val = Some(d)
@@ -11221,7 +11221,7 @@ fn native_counter_get_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : Counter = args.expect("self")
   args.take().finish()
   let output = impl_counter_get(self_, engine, context, args.span)
   IntoValue::into_value(output)
@@ -11246,7 +11246,7 @@ pub fn native_counter_display() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Counter])),
             default: None,
             positional: true,
             named: false,
@@ -11257,7 +11257,7 @@ pub fn native_counter_display() -> NativeFuncData {
           {
             name: "numbering",
             docs: "A @numbering[numbering pattern or a function], which specifies how to display the counter. If given a function, that function receives each number of the counter as a separate argument. If the amount of numbers varies, e.g. for the heading argument, you can use an @arguments[argument sink].",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Smart[Numbering]])),
             default: Some(() => {
               IntoValue::into_value(impl_counter_display__numbering_default()) catch {
                 _ => None
@@ -11272,7 +11272,7 @@ pub fn native_counter_display() -> NativeFuncData {
           {
             name: "at",
             docs: "The place at which the counter should be displayed.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Smart[LocatableSelector]])),
             default: Some(() => {
               IntoValue::into_value(impl_counter_display__at_default()) catch {
                 _ => None
@@ -11313,12 +11313,12 @@ fn native_counter_display_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
-  let numbering_ : Value = match args.eat() {
+  let self_ : Counter = args.expect("self")
+  let numbering_ : Smart[Numbering] = match args.eat() {
     Some(v) => v
     None => impl_counter_display__numbering_default()
   }
-  let at_ : Value = match args.named("at") {
+  let at_ : Smart[LocatableSelector] = match args.named("at") {
     Some(v) => v
     None => impl_counter_display__at_default()
   }
@@ -11358,7 +11358,7 @@ pub fn native_counter_at() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Counter])),
             default: None,
             positional: true,
             named: false,
@@ -11369,7 +11369,7 @@ pub fn native_counter_at() -> NativeFuncData {
           {
             name: "selector",
             docs: "The place at which the counter's value should be retrieved.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[LocatableSelector])),
             default: None,
             positional: true,
             named: false,
@@ -11378,7 +11378,7 @@ pub fn native_counter_at() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[CounterState])),
         native_counter_at_call,
       )
       native_counter_at_cell.val = Some(d)
@@ -11395,8 +11395,8 @@ fn native_counter_at_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
-  let selector_ : Value = args.expect("selector")
+  let self_ : Counter = args.expect("self")
+  let selector_ : LocatableSelector = args.expect("selector")
   args.take().finish()
   let output = impl_counter_at(self_, engine, context, args.span, selector_)
   IntoValue::into_value(output)
@@ -11421,7 +11421,7 @@ pub fn native_counter_final() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Counter])),
             default: None,
             positional: true,
             named: false,
@@ -11430,7 +11430,7 @@ pub fn native_counter_final() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[CounterState])),
         native_counter_final_call,
       )
       native_counter_final_cell.val = Some(d)
@@ -11447,7 +11447,7 @@ fn native_counter_final_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : Counter = args.expect("self")
   args.take().finish()
   let output = impl_counter_final(self_, engine, context, args.span)
   IntoValue::into_value(output)
@@ -11472,7 +11472,7 @@ pub fn native_counter_step() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Counter])),
             default: None,
             positional: true,
             named: false,
@@ -11513,7 +11513,7 @@ fn native_counter_step_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : Counter = args.expect("self")
   let level_ : NonZeroUSize = match args.named("level") {
     Some(v) => v
     None => impl_counter_step__level_default()
@@ -11542,7 +11542,7 @@ pub fn native_counter_update() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Counter])),
             default: None,
             positional: true,
             named: false,
@@ -11553,7 +11553,7 @@ pub fn native_counter_update() -> NativeFuncData {
           {
             name: "update",
             docs: "If given an integer or array of integers, sets the counter to that value. If given a function, that function receives the previous counter value (with each number as a separate argument) and has to return the new value (integer or array).",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[CounterUpdate])),
             default: None,
             positional: true,
             named: false,
@@ -11579,8 +11579,8 @@ fn native_counter_update_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
-  let update_ : Value = args.expect("update")
+  let self_ : Counter = args.expect("self")
+  let update_ : CounterUpdate = args.expect("update")
   args.take().finish()
   let output = at(args.span, () => {
     impl_counter_update(self_, args.span, update_)
@@ -11604,7 +11604,7 @@ pub fn native_here() -> NativeFuncData {
         keywords=[],
         contextual=true,
         params=[],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Location])),
         native_here_call,
       )
       native_here_cell.val = Some(d)
@@ -11645,7 +11645,7 @@ pub fn native_locate() -> NativeFuncData {
           {
             name: "selector",
             docs: "A selector that should match exactly one element. This element will be located.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[LocatableSelector])),
             default: None,
             positional: true,
             named: false,
@@ -11654,7 +11654,7 @@ pub fn native_locate() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Location])),
         native_locate_call,
       )
       native_locate_cell.val = Some(d)
@@ -11671,7 +11671,7 @@ fn native_locate_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let selector_ : Value = args.expect("selector")
+  let selector_ : LocatableSelector = args.expect("selector")
   args.take().finish()
   let output = impl_locate(engine, context, args.span, selector_)
   IntoValue::into_value(output)
@@ -11696,7 +11696,7 @@ pub fn native_location_page() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Location])),
             default: None,
             positional: true,
             named: false,
@@ -11722,7 +11722,7 @@ fn native_location_page_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : Location = args.expect("self")
   args.take().finish()
   let output = at(args.span, () => impl_location_page(self_, engine, args.span))
   IntoValue::into_value(output)
@@ -11747,7 +11747,7 @@ pub fn native_location_page_numbering() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Location])),
             default: None,
             positional: true,
             named: false,
@@ -11756,7 +11756,7 @@ pub fn native_location_page_numbering() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Numbering?])),
         native_location_page_numbering_call,
       )
       native_location_page_numbering_cell.val = Some(d)
@@ -11773,7 +11773,7 @@ fn native_location_page_numbering_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : Location = args.expect("self")
   args.take().finish()
   let output = at(args.span, () => {
     impl_location_page_numbering(self_, engine, args.span)
@@ -11800,7 +11800,7 @@ pub fn native_location_position() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Location])),
             default: None,
             positional: true,
             named: false,
@@ -11826,7 +11826,7 @@ fn native_location_position_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : Location = args.expect("self")
   args.take().finish()
   let output = at(args.span, () => {
     impl_location_position(self_, engine, args.span)
@@ -11853,7 +11853,7 @@ pub fn native_query() -> NativeFuncData {
           {
             name: "target",
             docs: "Can be - an element function like a `heading` or `figure`, - a `{<label>}`, - a more complex selector like `{heading.where(level: 1)}`, - or `{selector(heading).before(here())}`.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[LocatableSelector])),
             default: None,
             positional: true,
             named: false,
@@ -11879,7 +11879,7 @@ fn native_query_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let target_ : Value = args.expect("target")
+  let target_ : LocatableSelector = args.expect("target")
   args.take().finish()
   let output = at(args.span, () => {
     impl_query(engine, context, args.span, target_)
@@ -11930,7 +11930,7 @@ pub fn native_state_construct() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[State])),
         native_state_construct_call,
       )
       native_state_construct_cell.val = Some(d)
@@ -11976,7 +11976,7 @@ pub fn native_state_get() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[State])),
             default: None,
             positional: true,
             named: false,
@@ -12002,7 +12002,7 @@ fn native_state_get_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : State = args.expect("self")
   args.take().finish()
   let output = impl_state_get(self_, engine, context, args.span)
   IntoValue::into_value(output)
@@ -12027,7 +12027,7 @@ pub fn native_state_at() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[State])),
             default: None,
             positional: true,
             named: false,
@@ -12038,7 +12038,7 @@ pub fn native_state_at() -> NativeFuncData {
           {
             name: "selector",
             docs: "The place at which the state's value should be retrieved.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[LocatableSelector])),
             default: None,
             positional: true,
             named: false,
@@ -12064,8 +12064,8 @@ fn native_state_at_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
-  let selector_ : Value = args.expect("selector")
+  let self_ : State = args.expect("self")
+  let selector_ : LocatableSelector = args.expect("selector")
   args.take().finish()
   let output = impl_state_at(self_, engine, context, args.span, selector_)
   IntoValue::into_value(output)
@@ -12090,7 +12090,7 @@ pub fn native_state_final() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[State])),
             default: None,
             positional: true,
             named: false,
@@ -12116,7 +12116,7 @@ fn native_state_final_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : State = args.expect("self")
   args.take().finish()
   let output = impl_state_final(self_, engine, context, args.span)
   IntoValue::into_value(output)
@@ -12141,7 +12141,7 @@ pub fn native_state_update() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[State])),
             default: None,
             positional: true,
             named: false,
@@ -12152,7 +12152,7 @@ pub fn native_state_update() -> NativeFuncData {
           {
             name: "update",
             docs: "A value to update to or a function to update with.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[StateUpdate])),
             default: None,
             positional: true,
             named: false,
@@ -12178,8 +12178,8 @@ fn native_state_update_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
-  let update_ : Value = args.expect("update")
+  let self_ : State = args.expect("self")
+  let update_ : StateUpdate = args.expect("update")
   args.take().finish()
   let output = at(args.span, () => impl_state_update(self_, args.span, update_))
   IntoValue::into_value(output)
@@ -14955,7 +14955,7 @@ pub fn native_numbering() -> NativeFuncData {
           {
             name: "numbering",
             docs: "Defines how the numbering works.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Numbering])),
             default: None,
             positional: true,
             named: false,
@@ -14992,7 +14992,7 @@ fn native_numbering_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let numbering_ : Value = args.expect("numbering")
+  let numbering_ : Numbering = args.expect("numbering")
   let numbers_ : Array[U64] = args.all()
   args.take().finish()
   let output = impl_numbering(engine, context, args.span, numbering_, numbers_)

@@ -71,6 +71,19 @@ TYPEMAP = {
     "ToFloat": "ToFloat",
     "Base": "Base",
     "Endianness": "Endianness",
+    "Selector": "Selector",
+    "LocatableSelector": "LocatableSelector",
+    "ShowableSelector": "ShowableSelector",
+    "Element": "Element",
+    "Location": "Location",
+    "Counter": "Counter",
+    "CounterKey": "CounterKey",
+    "CounterUpdate": "CounterUpdate",
+    "CounterState": "CounterState",
+    "State": "State",
+    "StateUpdate": "StateUpdate",
+    "Numbering": "Numbering",
+    "NumberingPattern": "NumberingPattern",
 }
 
 # Generic Rust types with a MoonBit port: Rust name -> MoonBit name. A use

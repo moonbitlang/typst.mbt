@@ -2,7 +2,6 @@
 // Unmapped field types (stored untyped as `Value`):
 //    10 TrackSizings
 //     9 Option<Paint>
-//     6 Option<Numbering>
 //     4 Option<Arc<Stroke>>
 //     4 Smart<Option<Supplement>>
 //     4 Smart<Option<Stroke>>
@@ -13,8 +12,6 @@
 //     3 DelimiterPair
 //     3 Lang
 //     3 Option<Region>
-//     3 Numbering
-//     3 Location
 //     3 Smart<Stroke>
 //     2 Celled<Sides<Option<Rel<Length>>>>
 //     2 Celled<Smart<Alignment>>
@@ -26,7 +23,6 @@
 //     2 PlacementScope
 //     2 Stroke
 //     2 OneOrMultiple<EcoString>
-//     2 Option<Counter>
 //     2 Depth
 //     2 Vec<TableItem>
 //     2 TopEdge
@@ -35,11 +31,6 @@
 //     2 FillRule
 //     2 Smart<Sides<Option<Option<Stroke>>>>
 //     1 Target
-//     1 CounterKey
-//     1 CounterUpdate
-//     1 Counter
-//     1 Smart<Numbering>
-//     1 StateUpdate
 //     1 Tag
 //     1 BaselinePos
 //     1 callbacks::InlineCallback
@@ -62,7 +53,6 @@
 //     1 PdfMarkerTagKind
 //     1 Derived<OneOrMultiple<DataSource>, Bibliography>
 //     1 Derived<CslSource, CslStyle>
-//     1 Smart<LocatableSelector>
 //     1 Option<CitationForm>
 //     1 Smart<Derived<CslSource, CslStyle>>
 //     1 Smart<DocumentFormat>
@@ -72,14 +62,12 @@
 //     1 Option<Packed<FigureCaption>>
 //     1 Smart<FigureKind>
 //     1 FigureKind
-//     1 Option<Location>
 //     1 FootnoteBody
 //     1 Packed<FootnoteElem>
 //     1 LinkTarget
 //     1 Option<Destination>
 //     1 ListMarker
 //     1 Vec<Packed<ListItem>>
-//     1 LocatableSelector
 //     1 Smart<OutlineIndent>
 //     1 Option<Packed<OutlineElem>>
 //     1 Abs
@@ -167,6 +155,7 @@ pub fn context_elem() -> Element {
         ],
       )
       context_elem_cell.val = Some(e)
+      context_elem_init(e)
       e
     }
   }
@@ -262,7 +251,7 @@ pub fn counter_update_elem() -> Element {
         capabilities=["Construct", "Locatable", "Count"],
         fields=[
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[CounterKey]),
             id=0,
             name="key",
             kind=Required,
@@ -270,7 +259,7 @@ pub fn counter_update_elem() -> Element {
             required=true,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[CounterUpdate]),
             id=1,
             name="update",
             kind=Required,
@@ -281,6 +270,7 @@ pub fn counter_update_elem() -> Element {
         ],
       )
       counter_update_elem_cell.val = Some(e)
+      counter_update_elem_init(e)
       e
     }
   }
@@ -309,7 +299,7 @@ pub fn counter_display_elem() -> Element {
         capabilities=["Construct", "Unqueriable", "Locatable"],
         fields=[
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Counter]),
             id=0,
             name="counter",
             kind=Required,
@@ -318,7 +308,7 @@ pub fn counter_display_elem() -> Element {
             internal=true,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Smart[Numbering]]),
             id=1,
             name="numbering",
             kind=Required,
@@ -338,6 +328,7 @@ pub fn counter_display_elem() -> Element {
         ],
       )
       counter_display_elem_cell.val = Some(e)
+      counter_display_elem_init(e)
       e
     }
   }
@@ -412,7 +403,7 @@ pub fn state_update_elem() -> Element {
             required=true,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[StateUpdate]),
             id=1,
             name="update",
             kind=Required,
@@ -423,6 +414,7 @@ pub fn state_update_elem() -> Element {
         ],
       )
       state_update_elem_cell.val = Some(e)
+      state_update_elem_init(e)
       e
     }
   }
@@ -1732,11 +1724,11 @@ pub fn page_elem() -> Element {
             default=page_elem_fill_default,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Numbering?]),
             id=9,
             name="numbering",
             kind=Ghost,
-            default=page_elem_numbering_default,
+            default=() => None,
           ),
           field_of(
             (Ty::new() : Ty[Smart[Content?]]),
@@ -2930,11 +2922,11 @@ pub fn equation_elem() -> Element {
             Bool(false)
           }),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Numbering?]),
             id=1,
             name="numbering",
             kind=Settable,
-            default=equation_elem_numbering_default,
+            default=() => None,
           ),
           field_of(
             (Ty::new() : Ty[SpecificAlignment[OuterHAlignment, VAlignment]]),
@@ -4236,11 +4228,11 @@ pub fn bibliography_elem() -> Element {
             default=bibliography_elem_style_default,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Smart[LocatableSelector]]),
             id=4,
             name="target",
             kind=Settable,
-            default=bibliography_elem_target_default,
+            default=() => Auto,
           ),
           field_of(
             (Ty::new() : Ty[Smart[String]?]),
@@ -4669,7 +4661,7 @@ pub fn enum_elem() -> Element {
             Bool(true)
           }),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Numbering]),
             id=1,
             name="numbering",
             kind=Settable,
@@ -4890,7 +4882,7 @@ pub fn figure_elem() -> Element {
             default=figure_elem_supplement_default,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Numbering?]),
             id=7,
             name="numbering",
             kind=Settable,
@@ -4907,7 +4899,7 @@ pub fn figure_elem() -> Element {
             default=() => Bool(true),
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Counter?]),
             id=10,
             name="counter",
             kind=Synthesized,
@@ -5009,19 +5001,19 @@ pub fn figure_caption_elem() -> Element {
             kind=Synthesized,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Numbering?]),
             id=5,
             name="numbering",
             kind=Synthesized,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Counter?]),
             id=6,
             name="counter",
             kind=Synthesized,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Location?]),
             id=7,
             name="figure-location",
             kind=Synthesized,
@@ -5076,7 +5068,7 @@ pub fn footnote_elem() -> Element {
         capabilities=["Locatable", "Tagged", "Count"],
         fields=[
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Numbering]),
             id=0,
             name="numbering",
             kind=Settable,
@@ -5262,11 +5254,11 @@ pub fn heading_elem() -> Element {
             default=() => Int(0L),
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Numbering?]),
             id=3,
             name="numbering",
             kind=Settable,
-            default=heading_elem_numbering_default,
+            default=() => None,
           ),
           field_of(
             (Ty::new() : Ty[Value]),
@@ -5425,7 +5417,7 @@ pub fn direct_link_elem() -> Element {
         capabilities=["Construct"],
         fields=[
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Location]),
             id=0,
             name="loc",
             kind=Required,
@@ -5679,7 +5671,7 @@ pub fn outline_elem() -> Element {
             default=() => Auto,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[LocatableSelector]),
             id=1,
             name="target",
             kind=Settable,
@@ -5803,7 +5795,7 @@ pub fn prefix_info_elem() -> Element {
         capabilities=["Construct", "Unqueriable", "Locatable"],
         fields=[
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Location]),
             id=0,
             name="key",
             kind=Required,
@@ -5992,11 +5984,11 @@ pub fn par_line_elem() -> Element {
         capabilities=["Construct", "Locatable"],
         fields=[
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Numbering?]),
             id=0,
             name="numbering",
             kind=Ghost,
-            default=par_line_elem_numbering_default,
+            default=() => None,
           ),
           field_of(
             (Ty::new() : Ty[Smart[HAlignment]]),
@@ -6066,7 +6058,7 @@ pub fn par_line_marker_elem() -> Element {
         capabilities=["Construct", "Unqueriable", "Locatable", "Count"],
         fields=[
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Numbering]),
             id=0,
             name="numbering",
             kind=Required,
@@ -9379,7 +9371,7 @@ pub fn html_elem() -> Element {
             default=html_elem_css_default,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Location]),
             id=4,
             name="parent",
             kind=Synthesized,

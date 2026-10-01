@@ -233,12 +233,6 @@ fn page_elem_fill_default() -> Value {
 }
 
 ///|
-/// TODO: port `Default::default() of Option<Numbering>` (PageElem.numbering).
-fn page_elem_numbering_default() -> Value {
-  None
-}
-
-///|
 /// TODO: port `Default::default() of Option<Parity>` (PagebreakElem.to).
 fn pagebreak_elem_to_default() -> Value {
   None
@@ -290,12 +284,6 @@ fn cancel_elem_stroke_default() -> Value {
 /// TODO: fold for `Stroke` (CancelElem.stroke).
 fn cancel_elem_stroke_fold(inner : Value, _outer : Value) -> Value {
   inner
-}
-
-///|
-/// TODO: port `Default::default() of Option<Numbering>` (EquationElem.numbering).
-fn equation_elem_numbering_default() -> Value {
-  None
 }
 
 ///|
@@ -399,12 +387,6 @@ fn bibliography_elem_style_default() -> Value {
 // TODO: port `#[parse]` of BibliographyElem.style as `bibliography_elem_style_parse`.
 
 ///|
-/// TODO: port `Default::default() of Smart<LocatableSelector>` (BibliographyElem.target).
-fn bibliography_elem_target_default() -> Value {
-  None
-}
-
-///|
 /// TODO: port `Some(CitationForm::Normal)` (CiteElem.form).
 fn cite_elem_form_default() -> Value {
   None
@@ -439,12 +421,6 @@ fn document_elem_keywords_default() -> Value {
 ///|
 /// TODO: port `Default::default() of Smart<Option<Datetime>>` (DocumentElem.date).
 fn document_elem_date_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Numbering::Pattern(NumberingPattern::from_str("1.").unwrap())` (EnumElem.numbering).
-fn enum_elem_numbering_default() -> Value {
   None
 }
 
@@ -491,26 +467,8 @@ fn figure_elem_supplement_default() -> Value {
 }
 
 ///|
-/// TODO: port `Some(NumberingPattern::from_str("1").unwrap().into())` (FigureElem.numbering).
-fn figure_elem_numbering_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Numbering::Pattern(NumberingPattern::from_str("1").unwrap())` (FootnoteElem.numbering).
-fn footnote_elem_numbering_default() -> Value {
-  None
-}
-
-///|
 /// TODO: port `LineElem::new().with_length(Ratio::new(0.3).into()).with_stroke(Stroke { thickness : Smart::Custom(Em::new(0.05).into()), .. Default::default() }).pack()` (FootnoteEntry.separator).
 fn footnote_entry_elem_separator_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Option<Numbering>` (HeadingElem.numbering).
-fn heading_elem_numbering_default() -> Value {
   None
 }
 
@@ -548,12 +506,6 @@ fn list_elem_depth_default() -> Value {
 /// TODO: fold for `Depth` (ListElem.depth).
 fn list_elem_depth_fold(inner : Value, _outer : Value) -> Value {
   inner
-}
-
-///|
-/// TODO: port `LocatableSelector(HeadingElem::ELEM.select())` (OutlineElem.target).
-fn outline_elem_target_default() -> Value {
-  None
 }
 
 ///|
@@ -602,12 +554,6 @@ fn par_elem_first_line_indent_default() -> Value {
 /// TODO: fold for `FirstLineIndent` (ParElem.first_line_indent).
 fn par_elem_first_line_indent_fold(inner : Value, _outer : Value) -> Value {
   inner
-}
-
-///|
-/// TODO: port `Default::default() of Option<Numbering>` (ParLine.numbering).
-fn par_line_elem_numbering_default() -> Value {
-  None
 }
 
 ///|

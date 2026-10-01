@@ -333,39 +333,3 @@ pub fn Stroke::field(self : Stroke, _field : String) -> Value? {
   ignore(self)
   None
 }
-
-///|
-/// A counter. (placeholder; see introspection/counter.rs)
-pub(all) struct Counter {
-  priv repr_ : String
-} derive(Eq, Hash)
-
-///|
-pub fn Counter::repr(self : Counter) -> String {
-  self.repr_
-}
-
-///|
-/// A state. (placeholder; see introspection/state.rs)
-pub(all) struct State {
-  priv repr_ : String
-} derive(Eq, Hash)
-
-///|
-pub fn State::repr(self : State) -> String {
-  self.repr_
-}
-
-///|
-/// The repr of a location. (placeholder; see introspection/location.rs)
-pub fn Location::repr(self : Location) -> String {
-  ignore(self)
-  "location(..)"
-}
-
-///|
-/// The repr of a selector. (placeholder; see foundations/selector.rs)
-pub fn Selector::repr(self : Selector) -> String {
-  ignore(self)
-  "selector(..)"
-}

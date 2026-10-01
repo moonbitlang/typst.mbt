@@ -99,52 +99,6 @@ fn link_body_from_url(url : String) -> String {
 }
 
 ///|
-/// A selector that can be used with show rules (upstream `ShowableSelector`).
-pub(all) struct ShowableSelector(Selector)
-
-///|
-pub impl Reflect for ShowableSelector with fn input() {
-  Union([
-    Type(Type::symbol()),
-    Type(Type::str()),
-    Type(Type::label()),
-    Type(Type::func()),
-    Type(Type::regex()),
-    Type(Type::selector()),
-  ])
-}
-
-///|
-pub impl Reflect for ShowableSelector with fn output() {
-  Type(Type::selector())
-}
-
-///|
-pub impl Reflect for ShowableSelector with fn castable(v) {
-  v is (Symbol(_) | Str(_) | Label(_) | Func(_))
-}
-
-///|
-pub impl FromValue for ShowableSelector with fn from_value(v) {
-  match v {
-    Symbol(s) => ShowableSelector(Regex(regex_escape(s.get())))
-    Str(s) =>
-      if s.is_empty() {
-        bail("text selector is empty")
-      } else {
-        ShowableSelector(Regex(regex_escape(s)))
-      }
-    Label(l) => ShowableSelector(Label(l))
-    Func(f) =>
-      match f.to_element() {
-        Some(elem) => ShowableSelector(Elem(elem, None))
-        None => bail("only element functions can be used as selectors")
-      }
-    v => raise HintedError(ShowableSelector::input().error(v))
-  }
-}
-
-///|
 /// Escape regex metacharacters (upstream `regex::escape`).
 pub fn regex_escape(s : String) -> String {
   let buf = StringBuilder()
