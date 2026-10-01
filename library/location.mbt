@@ -7,7 +7,7 @@
 /// access its absolute position on the pages. You can retrieve the current
 /// location with the `here` function and the location of a queried or shown
 /// element with the `location()` method on content.
-pub(all) struct Location(U128) derive(Eq, Hash)
+pub(all) struct Location(U128) derive(Eq, Hash, Debug)
 
 ///|
 /// Create a new location from a unique hash.

@@ -16,7 +16,7 @@ pub(all) struct U128 {
   hi : UInt64
   /// The lower 64 bits.
   lo : UInt64
-} derive(Eq, Hash, Compare, Default)
+} derive(Eq, Hash, Compare, Default, Debug)
 
 ///|
 /// Create a 128-bit integer from a 64-bit one.

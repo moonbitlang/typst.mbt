@@ -213,18 +213,3 @@ pub fn[T] History::hint(
   }
   hint.to_string()
 }
-
-///|
-/// Performs an introspection on the introspector and returns its result.
-///
-/// As a side effect, the introspection is stored in the sink. If the
-/// document does not converge, the recorded introspections are used to
-/// determine the cause of non-convergence.
-pub fn[T : Fingerprint] Engine::introspect(
-  self : Engine,
-  introspection : Introspect[T],
-) -> T {
-  let output = (introspection.introspect)(self, self.introspector)
-  self.sink.introspection(Introspection::new(introspection))
-  output
-}

@@ -5091,7 +5091,7 @@ pub impl FromValue for LocatableSelector
 pub impl IntoValue for LocatableSelector
 pub impl Reflect for LocatableSelector
 
-pub(all) struct Location(U128) derive(Eq, Hash)
+pub(all) struct Location(U128) derive(Eq, Hash, @debug.Debug)
 pub fn Location::hash(Self) -> U128
 pub fn Location::new(U128) -> Self
 pub fn Location::page_numbering(Self, Engine, @syntax.Span) -> Numbering?
@@ -7618,7 +7618,7 @@ pub impl Reflect for Type
 pub(all) struct U128 {
   hi : UInt64
   lo : UInt64
-} derive(Compare, Default, Eq, Hash)
+} derive(Compare, Default, Eq, Hash, @debug.Debug)
 pub fn U128::from_u64(UInt64) -> Self
 pub impl Show for U128
 pub impl Fingerprint for U128
