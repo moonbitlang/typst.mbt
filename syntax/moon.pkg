@@ -1,3 +1,4 @@
 import {
   "moonbitlang/typst/unicode",
+  "moonbitlang/core/encoding/utf8",
 }

@@ -1,7 +1,7 @@
 // Differential test runner: compares the MoonBit port against reference
 // outputs dumped by the Rust oracle (see `scripts/goldens.sh`).
 //
-// Usage: moon run tests/runner -- syntax [filter] [--verbose]
+// Usage: moon run tests/runner -- <syntax|ast> [filter] [--verbose]
 
 ///|
 let suite_dir = ".repos/typst/tests/suite"
@@ -16,7 +16,8 @@ fn main {
   let verbose = args.contains("--verbose") || args.contains("-v")
   let filter = args[2:].iter().find_first(a => !a.has_prefix("-"))
   match stage {
-    "syntax" => run_syntax(filter, verbose)
+    "syntax" => run_stage("syntax", syntax_report, filter, verbose)
+    "ast" => run_stage("ast", ast_report, filter, verbose)
     _ => {
       println("unknown stage: \{stage}")
       @sys.exit(2)
@@ -25,7 +26,12 @@ fn main {
 }
 
 ///|
-fn run_syntax(filter : String?, verbose : Bool) -> Unit {
+fn run_stage(
+  stage : String,
+  report : (String) -> String,
+  filter : String?,
+  verbose : Bool,
+) -> Unit {
   let mut passed = 0
   let mut failed = 0
   let failures = []
@@ -35,7 +41,7 @@ fn run_syntax(filter : String?, verbose : Bool) -> Unit {
       end=file.length(),
     )
     let golden_path = golden_dir +
-      "/syntax/" +
+      "/\{stage}/" +
       rel.unsafe_substring(start=0, end=rel.length() - 4) +
       ".txt"
     let text = read(file)
@@ -44,7 +50,7 @@ fn run_syntax(filter : String?, verbose : Bool) -> Unit {
       if filter is Some(f) && !tc.name.contains(f) {
         continue
       }
-      let actual = syntax_report(tc.body)
+      let actual = report(tc.body)
       let expected = golden.get(tc.name).unwrap_or("<missing golden>")
       if actual == expected {
         passed += 1
@@ -61,7 +67,7 @@ fn run_syntax(filter : String?, verbose : Bool) -> Unit {
       println(first_diff(expected, actual))
     }
   }
-  println("syntax: \{passed} passed, \{failed} failed")
+  println("\{stage}: \{passed} passed, \{failed} failed")
 }
 
 ///|

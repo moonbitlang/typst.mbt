@@ -6,10 +6,12 @@
 | --- | --- | --- |
 | P0 scaffolding | done | oracle crate, goldens script, Unicode table generator, runner |
 | P1 syntax (lexer, parser, nodes, spans, LinkedNode) | **done** | 3792/3792 suite cases: tree + diagnostics byte-identical |
-| P1 syntax (typed AST, reparser, highlight, Lines) | todo | |
+| P1 syntax (typed AST, Lines) | **done** | 3792/3792 suite cases: AST semantic dump + `Lines` conversions identical (`ast` stage) |
+| P1 syntax (reparser, highlight) | todo | |
 | P2 eval | todo | |
 
-Run `scripts/upstream.sh && scripts/goldens.sh syntax && moon run tests/runner --target native -- syntax`.
+Run `scripts/upstream.sh && scripts/goldens.sh && moon run tests/runner --target native -- syntax`
+(and `-- ast`).
 
 Upstream reference: `.repos/typst` @ `e58a63af0` (2026-09-30). Pin this; port
 against one commit and re-sync deliberately.

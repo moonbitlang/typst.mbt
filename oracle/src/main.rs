@@ -5,13 +5,14 @@
 //! upstream results so that the MoonBit port can be checked against them
 //! without needing Rust at test time.
 //!
-//! Usage: `typst-oracle syntax <suite-dir> <out-dir>`
+//! Usage: `typst-oracle <syntax|ast> <suite-dir> <out-dir>`
 
 use std::fmt::Write as _;
 use std::path::{Path, PathBuf};
 
 use typst_syntax::{DiagSpanKind, Source, SyntaxDiagnostic};
 
+mod ast_dump;
 mod collect;
 mod eval;
 mod world;
@@ -22,7 +23,12 @@ fn main() {
         Some("syntax") => {
             let suite = PathBuf::from(&args[2]);
             let out = PathBuf::from(&args[3]);
-            dump_syntax(&suite, &out);
+            dump(&suite, &out, syntax_report);
+        }
+        Some("ast") => {
+            let suite = PathBuf::from(&args[2]);
+            let out = PathBuf::from(&args[3]);
+            dump(&suite, &out, ast_dump::ast_report);
         }
         Some("eval") => {
             // Paths are resolved relative to the upstream checkout.
@@ -39,14 +45,19 @@ fn main() {
             let text = std::fs::read_to_string(&args[2]).unwrap();
             print!("{}", syntax_report(&text));
         }
+        Some("ast-file") => {
+            // Debugging aid: dump the AST stage for a single file.
+            let text = std::fs::read_to_string(&args[2]).unwrap();
+            print!("{}", ast_dump::ast_report(&text));
+        }
         _ => {
-            eprintln!("usage: typst-oracle syntax <suite-dir> <out-dir>");
+            eprintln!("usage: typst-oracle <syntax|ast> <suite-dir> <out-dir>");
             std::process::exit(2);
         }
     }
 }
 
-fn dump_syntax(suite: &Path, out: &Path) {
+fn dump(suite: &Path, out: &Path, report_fn: fn(&str) -> String) {
     let mut count = 0;
     for file in collect::typ_files(suite) {
         let rel = file.strip_prefix(suite).unwrap();
@@ -54,7 +65,7 @@ fn dump_syntax(suite: &Path, out: &Path) {
         let mut report = String::new();
         for test in collect::split_tests(&text) {
             writeln!(report, "=== {}", test.name).unwrap();
-            report.push_str(&syntax_report(&test.body));
+            report.push_str(&report_fn(&test.body));
             count += 1;
         }
         let dest = out.join(rel).with_extension("txt");

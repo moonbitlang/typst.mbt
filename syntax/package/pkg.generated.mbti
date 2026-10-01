@@ -1,0 +1,53 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/syntax/package"
+
+import {
+  "moonbitlang/core/debug",
+}
+
+// Values
+
+// Errors
+
+// Types and methods
+pub(all) struct PackageSpec {
+  namespace : String
+  name : String
+  version : PackageVersion
+} derive(Eq, Hash, @debug.Debug)
+pub fn PackageSpec::from_str(String) -> Result[Self, String]
+pub fn PackageSpec::versionless(Self) -> VersionlessPackageSpec
+pub impl Show for PackageSpec
+
+pub(all) struct PackageVersion {
+  major : UInt
+  minor : UInt
+  patch : UInt
+} derive(Compare, Eq, Hash, @debug.Debug)
+pub fn PackageVersion::from_str(String) -> Result[Self, String]
+pub fn PackageVersion::matches_eq(Self, VersionBound) -> Bool
+pub fn PackageVersion::matches_ge(Self, VersionBound) -> Bool
+pub fn PackageVersion::matches_gt(Self, VersionBound) -> Bool
+pub fn PackageVersion::matches_le(Self, VersionBound) -> Bool
+pub fn PackageVersion::matches_lt(Self, VersionBound) -> Bool
+pub impl Show for PackageVersion
+
+pub(all) struct VersionBound {
+  major : UInt
+  minor : UInt?
+  patch : UInt?
+} derive(Compare, Eq, Hash, @debug.Debug)
+pub fn VersionBound::from_str(String) -> Result[Self, String]
+pub impl Show for VersionBound
+
+pub(all) struct VersionlessPackageSpec {
+  namespace : String
+  name : String
+} derive(Eq, Hash, @debug.Debug)
+pub fn VersionlessPackageSpec::at(Self, PackageVersion) -> PackageSpec
+pub fn VersionlessPackageSpec::from_str(String) -> Result[Self, String]
+pub impl Show for VersionlessPackageSpec
+
+// Type aliases
+
+// Traits

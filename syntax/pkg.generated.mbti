@@ -129,6 +129,27 @@ pub fn Diagnosis::or(Self, Self) -> Self
 pub(all) struct FileId(UInt16) derive(Compare, Eq, Hash, @debug.Debug)
 pub fn FileId::into_raw(Self) -> UInt16
 
+pub struct Lines {
+  // private fields
+}
+pub fn Lines::byte_to_column(Self, Int) -> Int?
+pub fn Lines::byte_to_line(Self, Int) -> Int?
+pub fn Lines::byte_to_line_column(Self, Int) -> (Int, Int)?
+pub fn Lines::byte_to_utf16(Self, Int) -> Int?
+pub fn Lines::edit(Self, Int, Int, String) -> Unit
+pub fn Lines::len_bytes(Self) -> Int
+pub fn Lines::len_lines(Self) -> Int
+pub fn Lines::len_utf16(Self) -> Int
+pub fn Lines::line_column_to_byte(Self, Int, Int) -> Int?
+pub fn Lines::line_to_byte(Self, Int) -> Int?
+pub fn Lines::line_to_range(Self, Int) -> (Int, Int)?
+pub fn Lines::new(String) -> Self
+pub fn Lines::replace(Self, String) -> Bool
+pub fn Lines::replacement_range(Self, String) -> (Int, Int)?
+pub fn Lines::text(Self) -> String
+pub fn Lines::utf16_to_byte(Self, Int) -> Int?
+pub impl Hash for Lines
+
 pub struct LinkedNode {
   node : SyntaxNode
   parent : LinkedNode?
