@@ -53,18 +53,26 @@ fn impl_i64_construct(
           // Parse the digits part into u64
           //  => abs(i64::MIN) fits into u64
           let bigger = u64_from_str_radix(s, radix) catch {
-            kind => raise parse_str_error(kind, base_).into_source(value_.span)
+            kind =>
+              raise parse_str_error(kind, base_).into_int_parse_error(
+                value_.span,
+              )
           }
           // Number wouldn't fit into i64
           if bigger > 0x8000_0000_0000_0000UL {
-            raise parse_str_error(NegOverflow, base_).into_source(value_.span)
+            raise parse_str_error(NegOverflow, base_).into_int_parse_error(
+              value_.span,
+            )
           }
           (0UL - bigger).reinterpret_as_int64()
         }
         // Positive
         None =>
           i64_from_str_radix(s, radix) catch {
-            kind => raise parse_str_error(kind, base_).into_source(value_.span)
+            kind =>
+              raise parse_str_error(kind, base_).into_int_parse_error(
+                value_.span,
+              )
           }
       }
     }
@@ -73,7 +81,7 @@ fn impl_i64_construct(
 
 ///|
 /// Convert a hinted string into a source error at a span.
-fn HintedString::into_source(
+fn HintedString::into_int_parse_error(
   self : HintedString,
   span : @syntax.Span,
 ) -> SourceError {

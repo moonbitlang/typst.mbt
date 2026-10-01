@@ -103,7 +103,7 @@ fn impl_dict_filter(
 ) -> Dict raise SourceError {
   let out = Dict::new()
   for k, v in self_.map {
-    if call_test(test_, engine, context, v.shared()) {
+    if call_bool_test(test_, engine, context, v.shared()) {
       out.insert(k, v.shared())
     }
   }

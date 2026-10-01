@@ -146,7 +146,7 @@ fn impl_array_contains(self_ : Arr, value_ : Value) -> Bool raise HintedError {
 ///|
 /// Call a function with one value and cast the result to a boolean
 /// (upstream `f.call(engine, context, [v])?.cast::<bool>().at(f.span())`).
-fn call_test(
+fn call_bool_test(
   f : Func,
   engine : Engine,
   context : Context,
@@ -166,7 +166,7 @@ fn impl_array_find(
   searcher_ : Func,
 ) -> Value? raise SourceError {
   for item in self_.items {
-    if call_test(searcher_, engine, context, item.shared()) {
+    if call_bool_test(searcher_, engine, context, item.shared()) {
       return Some(item.shared())
     }
   }
@@ -183,7 +183,7 @@ fn impl_array_position(
   searcher_ : Func,
 ) -> Int64? raise SourceError {
   for i, item in self_.items {
-    if call_test(searcher_, engine, context, item.shared()) {
+    if call_bool_test(searcher_, engine, context, item.shared()) {
       return Some(i.to_int64())
     }
   }
@@ -259,7 +259,7 @@ fn impl_array_filter(
 ) -> Arr raise SourceError {
   let kept = []
   for item in self_.items {
-    if call_test(test_, engine, context, item.shared()) {
+    if call_bool_test(test_, engine, context, item.shared()) {
       kept.push(item.shared())
     }
   }
@@ -434,7 +434,7 @@ fn impl_array_any(
   test_ : Func,
 ) -> Bool raise SourceError {
   for item in self_.items {
-    if call_test(test_, engine, context, item.shared()) {
+    if call_bool_test(test_, engine, context, item.shared()) {
       return true
     }
   }
@@ -450,7 +450,7 @@ fn impl_array_all(
   test_ : Func,
 ) -> Bool raise SourceError {
   for item in self_.items {
-    if !call_test(test_, engine, context, item.shared()) {
+    if !call_bool_test(test_, engine, context, item.shared()) {
       return false
     }
   }

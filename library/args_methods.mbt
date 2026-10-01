@@ -55,7 +55,7 @@ fn impl_args_filter(
 ) -> Args raise SourceError {
   let items = []
   for arg in self_.items {
-    if call_test(test_, engine, context, arg.value.v.shared()) {
+    if call_bool_test(test_, engine, context, arg.value.v.shared()) {
       items.push({
         span: arg.span,
         name: arg.name,

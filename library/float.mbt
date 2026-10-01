@@ -234,7 +234,9 @@ pub fn rust_parse_f64(s : String) -> Double? {
     "." +
     frac_part +
     exp
+  // The syntax is valid, so a failure means the value is out of range,
+  // which Rust maps to infinity.
   Some(@string.parse_double(text)) catch {
-    _ => None
+    _ => Some(if negative { -@double.infinity } else { @double.infinity })
   }
 }
