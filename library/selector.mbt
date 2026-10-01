@@ -11,7 +11,7 @@ pub(all) enum Selector {
   /// Matches elements with a specific label.
   Label(Label)
   /// Matches text elements through a regular expression.
-  Regex(String)
+  Regex(Regex)
   /// Matches elements with a specific capability.
   Can(String)
   /// Matches if any of the subselectors match.
@@ -25,3 +25,24 @@ pub(all) enum Selector {
   /// Matches all matches of `selector` within `ancestor`.
   Within(selector~ : Selector, ancestor~ : Selector)
 } derive(Eq)
+
+///|
+/// Define a simple text selector.
+pub fn Selector::text(text : String) -> Selector raise HintedError {
+  if text.is_empty() {
+    bail("text selector is empty")
+  }
+  Regex(Regex::new(regex_escape(text)))
+}
+
+///|
+/// Define a regex selector.
+pub fn Selector::regex(regex : Regex) -> Selector raise HintedError {
+  if regex.as_str().is_empty() {
+    bail("regex selector is empty")
+  }
+  if regex.is_match("") {
+    bail("regex matches empty text")
+  }
+  Regex(regex)
+}

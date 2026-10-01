@@ -5,6 +5,7 @@ import {
   "moonbitlang/core/debug",
   "moonbitlang/core/hashset",
   "moonbitlang/core/ref",
+  "moonbitlang/typst/regex",
   "moonbitlang/typst/syntax",
 }
 
@@ -2649,6 +2650,23 @@ pub(all) enum Capturer {
 } derive(Eq, Hash, @debug.Debug)
 pub impl Show for Capturer
 
+pub(all) enum Case {
+  Lower
+  Upper
+} derive(Eq, Hash, @debug.Debug)
+pub fn Case::apply(Self, String) -> String
+pub impl FromValue for Case
+pub impl IntoValue for Case
+pub impl Reflect for Case
+
+pub(all) enum Caseable {
+  Str(String)
+  Content(Content)
+}
+pub impl FromValue for Caseable
+pub impl IntoValue for Caseable
+pub impl Reflect for Caseable
+
 pub(all) enum CastInfo {
   Any
   Value(Value, String)
@@ -3176,7 +3194,9 @@ pub struct Introspector {
 pub fn Introspector::empty() -> Self
 
 pub(all) struct Label(String) derive(Compare, Eq, Hash)
+pub fn Label::new(String) -> Self?
 pub fn Label::repr(Self) -> String
+pub fn Label::resolve(Self) -> String
 pub impl FromValue for Label
 pub impl IntoValue for Label
 pub impl Reflect for Label
@@ -3443,11 +3463,16 @@ pub fn Recipe::apply(Self, Engine, Context, Content) -> Content raise SourceErro
 pub fn Recipe::new(Selector?, Transformation, @syntax.Span) -> Self
 pub impl Eq for Recipe
 
-pub(all) struct Regex {
-  // private fields
+pub struct Regex {
+  inner : @regex.Regex
 } derive(Eq, Hash)
+pub fn Regex::as_str(Self) -> String
 pub fn Regex::is_match(Self, String) -> Bool
+pub fn Regex::new(String) -> Self raise HintedError
 pub fn Regex::repr(Self) -> String
+pub impl FromValue for Regex
+pub impl IntoValue for Regex
+pub impl Reflect for Regex
 
 pub(all) struct Rel[T] {
   rel : Ratio
@@ -3475,6 +3500,14 @@ pub impl FromValue for Rel[Length]
 pub impl IntoValue for Rel[Length]
 pub impl[T : Numeric] Numeric for Rel[T]
 pub impl Reflect for Rel[Length]
+
+pub(all) enum Replacement {
+  Str(String)
+  Func(Func)
+}
+pub impl FromValue for Replacement
+pub impl IntoValue for Replacement
+pub impl Reflect for Replacement
 
 pub struct Route {
   // private fields
@@ -3546,7 +3579,7 @@ pub(all) enum Selector {
   Elem(Element, Array[(Int, Value)]?)
   Location(Location)
   Label(Label)
-  Regex(String)
+  Regex(Regex)
   Can(String)
   Or(Array[Selector])
   And(Array[Selector])
@@ -3554,7 +3587,9 @@ pub(all) enum Selector {
   After(selector~ : Selector, start~ : Selector, inclusive~ : Bool)
   Within(selector~ : Selector, ancestor~ : Selector)
 } derive(Eq)
+pub fn Selector::regex(Regex) -> Self raise HintedError
 pub fn Selector::repr(Self) -> String
+pub fn Selector::text(String) -> Self raise HintedError
 
 pub struct SequenceElem(Content)
 pub fn SequenceElem::children(Content) -> Array[Content]
@@ -3704,6 +3739,22 @@ pub(all) struct State {
 } derive(Eq, Hash)
 pub fn State::repr(Self) -> String
 
+pub(all) enum StrPattern {
+  Str(String)
+  Regex(Regex)
+}
+pub impl FromValue for StrPattern
+pub impl IntoValue for StrPattern
+pub impl Reflect for StrPattern
+
+pub(all) enum StrSide {
+  Start
+  End
+} derive(Eq)
+pub impl FromValue for StrSide
+pub impl IntoValue for StrSide
+pub impl Reflect for StrSide
+
 pub(all) struct Stroke {
   // private fields
 } derive(Eq, Hash)
@@ -3823,6 +3874,13 @@ pub(all) enum ToInt {
 pub impl FromValue for ToInt
 pub impl Reflect for ToInt
 
+pub(all) enum ToStr {
+  Str(String)
+  Int(Int64)
+}
+pub impl FromValue for ToStr
+pub impl Reflect for ToStr
+
 pub(all) struct Traced(@syntax.Span?)
 pub fn Traced::get(Self, @syntax.FileId) -> @syntax.Span?
 pub fn Traced::new(traced? : @syntax.Span) -> Self
@@ -3933,6 +3991,16 @@ pub impl FromValue for USize
 pub impl IntoValue for USize
 pub impl Reflect for USize
 
+pub(all) enum UnicodeNormalForm {
+  Nfc
+  Nfd
+  Nfkc
+  Nfkd
+} derive(Eq, Hash)
+pub impl FromValue for UnicodeNormalForm
+pub impl IntoValue for UnicodeNormalForm
+pub impl Reflect for UnicodeNormalForm
+
 pub(all) enum VAlignment {
   Top
   Horizon
@@ -4030,6 +4098,7 @@ pub(open) trait FromValue : Reflect {
   fn from_value(Value) -> Self raise HintedError
 }
 pub impl FromValue for Bool
+pub impl FromValue for Char
 pub impl FromValue for Int64
 pub impl FromValue for Double
 pub impl FromValue for String
@@ -4042,6 +4111,7 @@ pub(open) trait IntoValue {
   fn into_value(Self) -> Value
 }
 pub impl IntoValue for Bool
+pub impl IntoValue for Char
 pub impl IntoValue for Int64
 pub impl IntoValue for Double
 pub impl IntoValue for String
@@ -4063,6 +4133,7 @@ pub(open) trait Reflect {
   fn castable(Value) -> Bool
 }
 pub impl Reflect for Bool
+pub impl Reflect for Char
 pub impl Reflect for Int64
 pub impl Reflect for Double
 pub impl Reflect for String

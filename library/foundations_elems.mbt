@@ -121,19 +121,15 @@ pub impl Reflect for ShowableSelector with fn output() {
 
 ///|
 pub impl Reflect for ShowableSelector with fn castable(v) {
-  v is (Symbol(_) | Str(_) | Label(_) | Func(_))
+  v is (Symbol(_) | Str(_) | Label(_) | Func(_) | Dyn(Regex(_)))
 }
 
 ///|
 pub impl FromValue for ShowableSelector with fn from_value(v) {
   match v {
-    Symbol(s) => ShowableSelector(Regex(regex_escape(s.get())))
-    Str(s) =>
-      if s.is_empty() {
-        bail("text selector is empty")
-      } else {
-        ShowableSelector(Regex(regex_escape(s)))
-      }
+    Symbol(s) => ShowableSelector(Selector::text(s.get()))
+    Str(s) => ShowableSelector(Selector::text(s))
+    Dyn(Regex(regex)) => ShowableSelector(Selector::regex(regex))
     Label(l) => ShowableSelector(Label(l))
     Func(f) =>
       match f.to_element() {

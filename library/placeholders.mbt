@@ -72,15 +72,6 @@ pub fn BytesValue::repr(self : BytesValue) -> String {
 }
 
 ///|
-/// A label. (placeholder; see foundations/label.rs)
-pub(all) struct Label(String) derive(Eq, Hash, Compare)
-
-///|
-pub fn Label::repr(self : Label) -> String {
-  "<" + self.0 + ">"
-}
-
-///|
 /// A datetime. (placeholder; see foundations/datetime.rs)
 pub(all) struct Datetime {
   priv repr_ : String
@@ -286,24 +277,6 @@ pub fn stroke_from_pair(_a : Value, _b : Value) -> Value raise HintedError {
 
 // Placeholders for dynamic types (see `dyn.mbt`). Each owner replaces its
 // section with the real port, keeping the methods used by `dyn.mbt`.
-
-///|
-/// A regular expression. (placeholder; see foundations/str.rs)
-pub(all) struct Regex {
-  priv pattern : String
-} derive(Eq, Hash)
-
-///|
-pub fn Regex::repr(self : Regex) -> String {
-  "regex(" + repr_str(self.pattern) + ")"
-}
-
-///|
-/// Whether the regex matches somewhere in the string.
-pub fn Regex::is_match(self : Regex, _s : String) -> Bool {
-  ignore(self)
-  false
-}
 
 ///|
 /// A spot colorant. (placeholder; see visualize/color.rs)

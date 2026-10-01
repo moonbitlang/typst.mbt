@@ -1021,12 +1021,6 @@ fn text_elem_deco_fold(inner : Value, _outer : Value) -> Value {
 }
 
 ///|
-/// TODO: port `Default::default() of Option<Case>` (TextElem.case).
-fn text_elem_case_default() -> Value {
-  None
-}
-
-///|
 /// TODO: port `Default::default() of Option<Smallcaps>` (TextElem.smallcaps).
 fn text_elem_smallcaps_default() -> Value {
   None

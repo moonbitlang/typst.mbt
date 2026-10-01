@@ -71,6 +71,16 @@ TYPEMAP = {
     "ToFloat": "ToFloat",
     "Base": "Base",
     "Endianness": "Endianness",
+    # foundations/str.rs, text/case.rs
+    "char": "Char",
+    "Regex": "Regex",
+    "StrPattern": "StrPattern",
+    "StrSide": "StrSide",
+    "Replacement": "Replacement",
+    "ToStr": "ToStr",
+    "UnicodeNormalForm": "UnicodeNormalForm",
+    "Caseable": "Caseable",
+    "Case": "Case",
 }
 
 # Generic Rust types with a MoonBit port: Rust name -> MoonBit name. A use
