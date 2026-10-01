@@ -121,111 +121,18 @@ pub impl IntoValue for Covers with fn into_value(self) {
 pub impl FromValue for Covers with fn from_value(v) {
   match v {
     Str("latin-in-cjk") => LatinInCjk
-    // TODO: reject regexes that are not a single dot, literal or character
-    // class ("coverage regex may only use dot, letters, and character
-    // classes", hint "the regex is applied to each letter individually")
-    // once `Regex` is ported and exposes its pattern (see
-    // [covers_regex_is_valid]).
-    Dyn(Regex(regex)) => Regex(regex)
+    Dyn(Regex(regex)) => {
+      if !@regex.ast_is_single_char(regex.as_str()) {
+        raise HintedError(
+          HintedString::new(
+            "coverage regex may only use dot, letters, and character classes",
+          ).with_hint("the regex is applied to each letter individually"),
+        )
+      }
+      Regex(regex)
+    }
     v => raise HintedError(Covers::input().error(v))
   }
-}
-
-///|
-/// Whether a coverage regex pattern parses to a single class, dot or literal
-/// (upstream: `regex_syntax` AST is `ClassBracketed`, `ClassUnicode`,
-/// `ClassPerl`, `Dot` or `Literal`).
-fn covers_regex_is_valid(pattern : String) -> Bool {
-  let chars = pattern.to_array()
-  let n = chars.length()
-  if n == 0 {
-    return false
-  }
-  // Index after a single atom starting at `i`, or `None`.
-  let end = match chars[0] {
-    '.' => Some(1)
-    '[' => {
-      // Find the matching closing bracket, honoring nesting and escapes.
-      let mut depth = 0
-      let mut i = 0
-      let mut result : Int? = None
-      while i < n {
-        let c = chars[i]
-        if c == '\\' {
-          i += 2
-          continue
-        }
-        if c == '[' {
-          depth += 1
-          // A `]` directly after `[` or `[^` is a literal.
-          if i + 1 < n && chars[i + 1] == '^' {
-            i += 1
-          }
-          if i + 1 < n && chars[i + 1] == ']' {
-            i += 1
-          }
-        } else if c == ']' {
-          depth -= 1
-          if depth == 0 {
-            result = Some(i + 1)
-            break
-          }
-        }
-        i += 1
-      }
-      result
-    }
-    '\\' =>
-      if n < 2 {
-        None
-      } else {
-        match chars[1] {
-          'p' | 'P' =>
-            if n > 2 && chars[2] == '{' {
-              let mut i = 3
-              while i < n && chars[i] != '}' {
-                i += 1
-              }
-              if i < n {
-                Some(i + 1)
-              } else {
-                None
-              }
-            } else if n > 2 {
-              Some(3)
-            } else {
-              None
-            }
-          'x' =>
-            if n > 2 && chars[2] == '{' {
-              let mut i = 3
-              while i < n && chars[i] != '}' {
-                i += 1
-              }
-              if i < n {
-                Some(i + 1)
-              } else {
-                None
-              }
-            } else {
-              Some(4)
-            }
-          'd' | 'D' | 's' | 'S' | 'w' | 'W' => Some(2)
-          'b' | 'B' | 'A' | 'z' => None
-          c if (c >= '0' && c <= '9') ||
-            (c >= 'a' && c <= 'z') ||
-            (c >= 'A' && c <= 'Z') =>
-            match c {
-              'n' | 't' | 'r' | 'f' | 'v' | 'a' | 'e' => Some(2)
-              _ => None
-            }
-          _ => Some(2)
-        }
-      }
-    '(' | ')' | '|' | '*' | '+' | '?' | '{' | '^' | '$' => None
-    _ => Some(1)
-  }
-  end == Some(n)
 }
 
 ///|
