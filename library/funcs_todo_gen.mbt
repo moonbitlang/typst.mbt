@@ -2184,59 +2184,6 @@ fn impl_tiling_construct(
 }
 
 ///|
-/// TODO: port `PdfFormat.table-summary` (typst-pdf/src/format.rs).
-fn impl_pdf_format_table_summary(
-  summary_ : String?,
-  table_ : Value,
-) -> Content raise HintedError {
-  ignore(summary_)
-  ignore(table_)
-  bail("`PdfFormat.table-summary` is not yet ported")
-}
-
-///|
-/// TODO: port default `NonZeroU32::ONE`.
-fn impl_pdf_format_header_cell__level_default() -> NonZeroU32 raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `pdf_format_header_cell.level` is not yet ported",
-    ),
-  ])
-}
-
-///|
-/// TODO: port default `Default::default()`.
-fn impl_pdf_format_header_cell__scope_default() -> Value raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `pdf_format_header_cell.scope` is not yet ported",
-    ),
-  ])
-}
-
-///|
-/// TODO: port `PdfFormat.header-cell` (typst-pdf/src/format.rs).
-fn impl_pdf_format_header_cell(
-  level_ : NonZeroU32,
-  scope_ : Value,
-  cell_ : Value,
-) -> Content raise HintedError {
-  ignore(level_)
-  ignore(scope_)
-  ignore(cell_)
-  bail("`PdfFormat.header-cell` is not yet ported")
-}
-
-///|
-/// TODO: port `PdfFormat.data-cell` (typst-pdf/src/format.rs).
-fn impl_pdf_format_data_cell(cell_ : Value) -> Content raise HintedError {
-  ignore(cell_)
-  bail("`PdfFormat.data-cell` is not yet ported")
-}
-
-///|
 /// TODO: port constant `Color::BLACK`.
 fn impl_color_const_black() -> Value {
   None

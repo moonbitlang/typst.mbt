@@ -184,7 +184,7 @@ def foldable(mty):
         return True
     if mty.endswith("?"):
         return foldable(mty[:-1])
-    m = re.fullmatch(r"Smart\[(.*)\]", mty)
+    m = re.fullmatch(r"(?:Smart|Celled)\[(.*)\]", mty)
     if m:
         return foldable(m.group(1))
     m = re.fullmatch(r"(?:Sides|Corners)\[(.*)\?\]", mty)
