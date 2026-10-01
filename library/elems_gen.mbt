@@ -911,6 +911,7 @@ pub fn block_elem() -> Element {
             name="above",
             kind=Settable,
             default=block_elem_above_default,
+            parse=block_elem_above_parse,
           ),
           field_of(
             (Ty::new() : Ty[Value]),
@@ -918,6 +919,7 @@ pub fn block_elem() -> Element {
             name="below",
             kind=Settable,
             default=block_elem_below_default,
+            parse=block_elem_below_parse,
           ),
           field_of((Ty::new() : Ty[Bool]), id=11, name="clip", kind=Settable, default=() => {
             Bool(false)
@@ -1030,6 +1032,7 @@ pub fn grid_elem() -> Element {
             name="column-gutter",
             kind=Settable,
             default=grid_elem_column_gutter_default,
+            parse=grid_elem_column_gutter_parse,
           ),
           field_of(
             (Ty::new() : Ty[Value]),
@@ -1037,6 +1040,7 @@ pub fn grid_elem() -> Element {
             name="row-gutter",
             kind=Settable,
             default=grid_elem_row_gutter_default,
+            parse=grid_elem_row_gutter_parse,
           ),
           field_of(
             (Ty::new() : Ty[Value]),
@@ -1460,6 +1464,7 @@ pub fn grid_cell_elem() -> Element {
             kind=Settable,
             internal=true,
             default=() => Bool(false),
+            parse=grid_cell_elem_is_repeated_parse,
           ),
         ],
       )
@@ -1605,6 +1610,7 @@ pub fn pad_elem() -> Element {
             name="left",
             kind=Settable,
             default=() => Relative(Rel::zero()),
+            parse=pad_elem_left_parse,
           ),
           field_of(
             (Ty::new() : Ty[Rel[Length]]),
@@ -1612,6 +1618,7 @@ pub fn pad_elem() -> Element {
             name="top",
             kind=Settable,
             default=() => Relative(Rel::zero()),
+            parse=pad_elem_top_parse,
           ),
           field_of(
             (Ty::new() : Ty[Rel[Length]]),
@@ -1619,6 +1626,7 @@ pub fn pad_elem() -> Element {
             name="right",
             kind=Settable,
             default=() => Relative(Rel::zero()),
+            parse=pad_elem_right_parse,
           ),
           field_of(
             (Ty::new() : Ty[Rel[Length]]),
@@ -1626,6 +1634,7 @@ pub fn pad_elem() -> Element {
             name="bottom",
             kind=Settable,
             default=() => Relative(Rel::zero()),
+            parse=pad_elem_bottom_parse,
           ),
           field_of(
             (Ty::new() : Ty[Rel[Length]]),
@@ -1929,6 +1938,7 @@ pub fn pagebreak_elem() -> Element {
             kind=Settable,
             internal=true,
             default=() => Bool(false),
+            parse=pagebreak_elem_boundary_parse,
           ),
         ],
       )
@@ -2188,6 +2198,7 @@ pub fn v_elem() -> Element {
             kind=Settable,
             internal=true,
             default=() => Bool(false),
+            parse=v_elem_attach_parse,
           ),
         ],
       )
@@ -2410,6 +2421,7 @@ pub fn scale_elem() -> Element {
             name="x",
             kind=Settable,
             default=scale_elem_x_default,
+            parse=scale_elem_x_parse,
           ),
           field_of(
             (Ty::new() : Ty[Value]),
@@ -2417,6 +2429,7 @@ pub fn scale_elem() -> Element {
             name="y",
             kind=Settable,
             default=scale_elem_y_default,
+            parse=scale_elem_y_parse,
           ),
           field_of(
             (Ty::new() : Ty[Value]),
@@ -3142,6 +3155,7 @@ pub fn frac_elem() -> Element {
             kind=Settable,
             internal=true,
             default=() => Bool(false),
+            parse=frac_elem_num_deparenthesized_parse,
           ),
           field_of(
             (Ty::new() : Ty[Bool]),
@@ -3150,6 +3164,7 @@ pub fn frac_elem() -> Element {
             kind=Settable,
             internal=true,
             default=() => Bool(false),
+            parse=frac_elem_denom_deparenthesized_parse,
           ),
         ],
       )
@@ -3206,6 +3221,7 @@ pub fn binom_elem() -> Element {
             positional=true,
             required=true,
             variadic=true,
+            parse=binom_elem_lower_parse,
           ),
         ],
       )
@@ -3251,6 +3267,7 @@ pub fn lr_elem() -> Element {
             kind=Required,
             positional=true,
             required=true,
+            parse=lr_elem_body_parse,
           ),
         ],
       )
@@ -3418,6 +3435,7 @@ pub fn mat_elem() -> Element {
             name="row-gap",
             kind=Settable,
             default=mat_elem_row_gap_default,
+            parse=mat_elem_row_gap_parse,
           ),
           field_of(
             (Ty::new() : Ty[Rel[Length]]),
@@ -3425,6 +3443,7 @@ pub fn mat_elem() -> Element {
             name="column-gap",
             kind=Settable,
             default=mat_elem_column_gap_default,
+            parse=mat_elem_column_gap_parse,
           ),
           field_of(
             (Ty::new() : Ty[Array[Content]]),
@@ -3434,6 +3453,7 @@ pub fn mat_elem() -> Element {
             positional=true,
             required=true,
             variadic=true,
+            parse=mat_elem_rows_parse,
           ),
         ],
       )
@@ -5394,6 +5414,7 @@ pub fn link_elem() -> Element {
             kind=Required,
             positional=true,
             required=true,
+            parse=link_elem_dest_parse,
           ),
           field_of(
             (Ty::new() : Ty[Content]),
@@ -5402,6 +5423,7 @@ pub fn link_elem() -> Element {
             kind=Required,
             positional=true,
             required=true,
+            parse=link_elem_body_parse,
           ),
           field_of(
             (Ty::new() : Ty[Value]),
@@ -6373,6 +6395,7 @@ pub fn table_elem() -> Element {
             name="column-gutter",
             kind=Settable,
             default=table_elem_column_gutter_default,
+            parse=table_elem_column_gutter_parse,
           ),
           field_of(
             (Ty::new() : Ty[Value]),
@@ -6380,6 +6403,7 @@ pub fn table_elem() -> Element {
             name="row-gutter",
             kind=Settable,
             default=table_elem_row_gutter_default,
+            parse=table_elem_row_gutter_parse,
           ),
           field_of(
             (Ty::new() : Ty[Value]),
@@ -6427,6 +6451,7 @@ pub fn table_elem() -> Element {
             kind=Settable,
             internal=true,
             default=table_elem_summary_default,
+            parse=table_elem_summary_parse,
           ),
           field_of(
             (Ty::new() : Ty[Value]),
@@ -6814,6 +6839,7 @@ pub fn table_cell_elem() -> Element {
             kind=Settable,
             internal=true,
             default=table_cell_elem_kind_default,
+            parse=table_cell_elem_kind_parse,
           ),
           field_of(
             (Ty::new() : Ty[Bool]),
@@ -6822,6 +6848,7 @@ pub fn table_cell_elem() -> Element {
             kind=Settable,
             internal=true,
             default=() => Bool(false),
+            parse=table_cell_elem_is_repeated_parse,
           ),
         ],
       )
@@ -7466,6 +7493,7 @@ pub fn text_elem() -> Element {
             kind=Ghost,
             default=text_elem_size_default,
             fold=text_elem_size_fold,
+            parse=text_elem_size_parse,
           ),
           field_of(
             (Ty::new() : Ty[Value]),
@@ -7473,6 +7501,7 @@ pub fn text_elem() -> Element {
             name="fill",
             kind=Ghost,
             default=text_elem_fill_default,
+            parse=text_elem_fill_parse,
           ),
           field_of(
             (Ty::new() : Ty[Value]),
@@ -8288,6 +8317,7 @@ pub fn space_elem() -> Element {
             positional=true,
             required=true,
             internal=true,
+            parse=space_elem_had_newline_parse,
           ),
         ],
       )

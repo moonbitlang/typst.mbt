@@ -52,7 +52,7 @@ pub struct FieldInfo {
   fold : ((Value, Value) -> Value)?
   /// For fields with a `#[parse]` attribute: custom argument parsing. Returns
   /// `None` if the argument was not given.
-  parse : ((Engine, Args) -> Value? raise SourceError)?
+  parse : ((Engine, Args, ParseLocals) -> Value? raise SourceError)?
 }
 
 ///|
@@ -299,9 +299,10 @@ fn FieldInfo::parse_arg(
   self : FieldInfo,
   engine : Engine,
   args : Args,
+  locals : ParseLocals,
 ) -> Value? raise SourceError {
   if self.parse is Some(parse) {
-    return parse(engine, args)
+    return parse(engine, args, locals)
   }
   if self.variadic {
     let items = args.all_with(self.cast)
@@ -326,9 +327,10 @@ pub fn Element::construct(
     return f(engine, args)
   }
   let values = FixedArray::make(self.0.fields.length(), (None : Value?))
+  let locals = ParseLocals::new()
   for f in self.0.fields {
     if f.is_construct_field() {
-      values[f.id] = f.parse_arg(engine, args)
+      values[f.id] = f.parse_arg(engine, args, locals)
     }
   }
   Content::from_fields(self, values)
@@ -358,9 +360,10 @@ pub fn Element::set_fields(
     Some(f) => f(engine, args)
     None => {
       let styles = Styles::new()
+      let locals = ParseLocals::new()
       for f in self.0.fields {
         if f.is_construct_field() && !f.required {
-          if f.parse_arg(engine, args) is Some(value) {
+          if f.parse_arg(engine, args, locals) is Some(value) {
             styles.set(self, f.id, value)
           }
         }
@@ -490,7 +493,7 @@ pub fn[T : FromValue + IntoValue] field_of(
   internal? : Bool = false,
   default? : () -> Value,
   fold? : (Value, Value) -> Value,
-  parse? : (Engine, Args) -> Value? raise SourceError,
+  parse? : (Engine, Args, ParseLocals) -> Value? raise SourceError,
 ) -> FieldInfo {
   {
     id,
@@ -523,4 +526,32 @@ pub fn Element::settable_field_accessor(
     }
   }
   None
+}
+
+///|
+/// Local variables shared between the `#[parse]` hooks of one element
+/// construction or set rule (upstream's macro emits all field parsers into
+/// one function, so a parser can bind a `let` used by later fields, e.g.
+/// `gutter` for `column-gutter` and `row-gutter`).
+pub(all) struct ParseLocals(Map[String, Value?])
+
+///|
+pub fn ParseLocals::new() -> ParseLocals {
+  ParseLocals({})
+}
+
+///|
+/// Bind a local.
+pub fn ParseLocals::set(self : ParseLocals, name : String, v : Value?) -> Unit {
+  self.0[name] = v
+}
+
+///|
+/// Read a local bound by an earlier field's parser (`None` if unbound or
+/// bound to `None`).
+pub fn ParseLocals::get(self : ParseLocals, name : String) -> Value? {
+  match self.0.get(name) {
+    Some(v) => v
+    None => None
+  }
 }

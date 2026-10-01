@@ -7,7 +7,7 @@ rules and field access glue. This script generates the equivalent data tables
 
 * `<elem>_<field>_default() -> Value`  for `#[default(..)]` expressions that
   cannot be translated mechanically,
-* `<elem>_<field>_parse(Engine, Args) -> Value? raise SourceError` for
+* `<elem>_<field>_parse(Engine, Args, ParseLocals) -> Value? raise SourceError` for
   `#[parse(..)]` fields.
 
 Any such hook that is not defined in a handwritten `library/*.mbt` file gets a
