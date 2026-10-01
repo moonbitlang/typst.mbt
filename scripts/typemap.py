@@ -40,6 +40,12 @@ TYPEMAP = {
     "Dict": "Dict",
     "Args": "Args",
     "Type": "Type",
+    "Decimal": "Decimal",
+    "ToDecimal": "ToDecimal",
+    "Version": "Version",
+    "VersionComponents": "VersionComponents",
+    "Bytes": "BytesValue",
+    "ToBytes": "ToBytes",
 }
 
 # Generic Rust types with a MoonBit port: Rust name -> MoonBit name. A use

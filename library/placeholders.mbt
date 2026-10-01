@@ -61,43 +61,6 @@ pub fn Symbol::modified(
 }
 
 ///|
-/// A version. (placeholder; see foundations/version.rs)
-pub(all) struct Version(Array[Int]) derive(Eq, Hash)
-
-///|
-pub fn Version::repr(self : Version) -> String {
-  "version(" + self.0.map(c => c.to_string()).join(", ") + ")"
-}
-
-///|
-pub fn Version::to_string(self : Version) -> String {
-  self.0.map(c => c.to_string()).join(".")
-}
-
-///|
-pub fn Version::component(
-  self : Version,
-  field : String,
-) -> Int64 raise HintedError {
-  let idx = match field {
-    "major" => 0
-    "minor" => 1
-    "patch" => 2
-    _ => bail("unknown version component")
-  }
-  self.0.get(idx).unwrap_or(0).to_int64()
-}
-
-///|
-/// Raw bytes. (placeholder; see foundations/bytes.rs)
-pub(all) struct BytesValue(Bytes) derive(Eq, Hash)
-
-///|
-pub fn BytesValue::repr(self : BytesValue) -> String {
-  "bytes(\{self.0.length()})"
-}
-
-///|
 /// A label. (placeholder; see foundations/label.rs)
 pub(all) struct Label(String) derive(Eq, Hash, Compare)
 
@@ -118,22 +81,6 @@ pub fn Datetime::repr(self : Datetime) -> String {
 }
 
 ///|
-/// A decimal number. (placeholder; see foundations/decimal.rs)
-pub(all) struct Decimal {
-  priv text : String
-} derive(Eq, Hash)
-
-///|
-pub fn Decimal::repr(self : Decimal) -> String {
-  "decimal(" + repr_str(self.text) + ")"
-}
-
-///|
-pub fn Decimal::to_string(self : Decimal) -> String {
-  self.text
-}
-
-///|
 /// A duration. (placeholder; see foundations/duration.rs)
 pub(all) struct Duration {
   priv seconds : Int64
@@ -147,87 +94,6 @@ pub fn Duration::repr(self : Duration) -> String {
 ///|
 pub fn Symbol::func(self : Symbol) -> Func raise HintedError {
   bail("symbol \{self.repr()} is not callable")
-}
-
-///|
-pub impl Compare for Version with fn compare(self, other) {
-  let n = if self.0.length() > other.0.length() {
-    self.0.length()
-  } else {
-    other.0.length()
-  }
-  for i in 0..<n {
-    let a = self.0.get(i).unwrap_or(0)
-    let b = other.0.get(i).unwrap_or(0)
-    if a != b {
-      return a.compare(b)
-    }
-  }
-  0
-}
-
-///|
-pub fn BytesValue::concat(self : BytesValue, other : BytesValue) -> BytesValue {
-  let buf = @buffer.new()
-  buf.write_bytes(self.0)
-  buf.write_bytes(other.0)
-  BytesValue(buf.to_bytes())
-}
-
-///|
-pub fn Decimal::from_int(i : Int64) -> Decimal {
-  { text: i.to_string(), }
-}
-
-///|
-pub fn Decimal::neg(self : Decimal) -> Decimal {
-  self
-}
-
-///|
-pub fn Decimal::is_zero(self : Decimal) -> Bool {
-  self.text == "0"
-}
-
-///|
-pub fn Decimal::checked_add(
-  self : Decimal,
-  _other : Decimal,
-) -> Decimal raise HintedError {
-  bail("decimal arithmetic is not ported yet") |> ignore
-  self
-}
-
-///|
-pub fn Decimal::checked_sub(
-  self : Decimal,
-  _other : Decimal,
-) -> Decimal raise HintedError {
-  bail("decimal arithmetic is not ported yet") |> ignore
-  self
-}
-
-///|
-pub fn Decimal::checked_mul(
-  self : Decimal,
-  _other : Decimal,
-) -> Decimal raise HintedError {
-  bail("decimal arithmetic is not ported yet") |> ignore
-  self
-}
-
-///|
-pub fn Decimal::checked_div(
-  self : Decimal,
-  _other : Decimal,
-) -> Decimal raise HintedError {
-  bail("decimal arithmetic is not ported yet") |> ignore
-  self
-}
-
-///|
-pub impl Compare for Decimal with fn compare(self, other) {
-  self.text.compare(other.text)
 }
 
 ///|

@@ -82,7 +82,17 @@ pub let typst_version : (Int, Int, Int) = (0, 15, 1)
 fn sys_module(inputs : Dict) -> Module {
   let scope = Scope::deduplicating()
   let (major, minor, patch) = typst_version
-  scope.define("version", Version(Version([major, minor, patch]))) |> ignore
+  scope.define(
+    "version",
+    Version(
+      Version([
+        major.reinterpret_as_uint(),
+        minor.reinterpret_as_uint(),
+        patch.reinterpret_as_uint(),
+      ]),
+    ),
+  )
+  |> ignore
   scope.define("inputs", Dict(inputs)) |> ignore
   Module::new("sys", scope)
 }

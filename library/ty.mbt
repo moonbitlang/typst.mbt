@@ -161,3 +161,9 @@ pub fn Type::repr(self : Type) -> String {
 pub impl Show for Type with fn output(self, logger) {
   logger.write_string(self.long_name())
 }
+
+///|
+/// Determines a value's type (upstream `Type::construct`).
+fn impl_type_construct(value_ : Value) -> Type raise HintedError {
+  value_.ty()
+}
