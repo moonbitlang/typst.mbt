@@ -739,7 +739,11 @@ pub impl FromValue for NumberWidth with fn from_value(v) {
 
 ///|
 /// OpenType font features settings.
-pub(all) struct FontFeatures(Array[(Tag, Int64)]) derive(Eq, Hash, Default)
+pub(all) struct FontFeatures(Array[(OpenTypeTag, Int64)]) derive (
+  Eq,
+  Hash,
+  Default,
+)
 
 ///|
 pub impl Reflect for FontFeatures with fn input() {
@@ -772,7 +776,7 @@ pub impl FromValue for FontFeatures with fn from_value(v) {
       let out = []
       for i, v in values.items {
         let tag = with_err_hint(
-          () => Tag::from_value(v),
+          () => OpenTypeTag::from_value(v),
           tag_hint_helper(i, v.repr()),
         ) catch {
           HintedError(e) => {
@@ -800,7 +804,7 @@ pub impl FromValue for FontFeatures with fn from_value(v) {
       let mut i = 0
       for k, v in values.map {
         let hint = tag_hint_helper(i, repr_str(k))
-        let tag = with_err_hint(() => Tag::from_value(Str(k)), hint)
+        let tag = with_err_hint(() => OpenTypeTag::from_value(Str(k)), hint)
         let num = with_err_hint(() => U32::from_value(v).0, hint)
         out.push((tag, num))
         i += 1

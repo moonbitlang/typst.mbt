@@ -244,10 +244,10 @@ fn test_library() -> @library.Library {
   match test_library_cell.val {
     Some(lib) => lib
     None => {
-      let routines : @library.Routines = {
-        eval_string: @eval.routines_eval_string(),
-        eval_closure: @eval.routines_eval_closure(),
-      }
+      let routines = @library.Routines::new(
+        eval_string=@eval.routines_eval_string(),
+        eval_closure=@eval.routines_eval_closure(),
+      )
       let formats = [
         @library.html_format(),
         @library.pdf_format(),

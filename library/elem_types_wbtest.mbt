@@ -31,16 +31,22 @@ test "font weight casts" {
 
 ///|
 test "tag validation" {
-  inspect(cast_err_msg(() => Tag::from_value(Str("a")) |> ignore), content="ok")
   inspect(
-    cast_err_msg(() => Tag::from_value(Str("foobar")) |> ignore),
+    cast_err_msg(() => OpenTypeTag::from_value(Str("a")) |> ignore),
+    content="ok",
+  )
+  inspect(
+    cast_err_msg(() => OpenTypeTag::from_value(Str("foobar")) |> ignore),
     content="tag must be one to four characters in length | found 6 characters",
   )
   inspect(
-    cast_err_msg(() => Tag::from_value(Str("a b")) |> ignore),
+    cast_err_msg(() => OpenTypeTag::from_value(Str("a b")) |> ignore),
     content="spaces may only appear as padding following a tag",
   )
-  inspect(Tag::from_bytes_lossy("a").to_str_lossy().length(), content="4")
+  inspect(
+    OpenTypeTag::from_bytes_lossy("a").to_str_lossy().length(),
+    content="4",
+  )
 }
 
 ///|

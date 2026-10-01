@@ -28,13 +28,6 @@ fn impl_plugin_transition(
 }
 
 ///|
-/// TODO: port `target` (typst-library/src/foundations/target.rs).
-fn impl_target(context : Context) -> Value raise HintedError {
-  ignore(context)
-  bail("`target` is not yet ported")
-}
-
-///|
 /// TODO: port `layout` (typst-library/src/layout/layout.rs).
 fn impl_layout(span : @syntax.Span, func_ : Func) -> Content raise HintedError {
   ignore(span)

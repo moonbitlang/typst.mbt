@@ -205,6 +205,9 @@ TYPEMAP = {
     "FillRule": "FillRule",
     "CloseMode": "CloseMode",
     "CurveComponent": "CurveComponent",
+    # foundations/target.rs, introspection/tag.rs
+    "Target": "Target",
+    "Tag": "Tag",
     # typst-html (dom.rs, css/encode.rs); ported in library/html_*.mbt
     "HtmlTag": "HtmlTag",
     "HtmlAttr": "HtmlAttr",
