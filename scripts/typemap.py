@@ -48,6 +48,8 @@ TYPEMAP = {
     "Dir": "Dir",
     "Side": "Side",
     "Axis": "Axis",
+    "Spacing": "Spacing",
+    "Sizing": "Sizing",
 }
 
 # Generic Rust types with a MoonBit port: Rust name -> MoonBit name. A use

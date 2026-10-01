@@ -127,6 +127,8 @@ def translate_default(rust_ty, mty, expr):
             return f"Length({em})"
         if mty == "Rel[Length]":
             return f"Relative(Rel::from_abs({em}))"
+        if mty == "Spacing":
+            return f"Length({em})"
     m = re.fullmatch(r"Abs::pt\(([-\d.e]+)\)\.into\(\)", e)
     if m:
         ab = f"Length::from_abs(Abs::pt({float_lit(m.group(1))}))"

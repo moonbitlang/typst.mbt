@@ -2,13 +2,11 @@
 // Unmapped field types (stored untyped as `Value`):
 //    10 TrackSizings
 //     9 Option<Paint>
-//     7 Sizing
 //     6 Option<Numbering>
 //     4 Option<Arc<Stroke>>
 //     4 Smart<Option<Supplement>>
 //     4 Smart<Option<Stroke>>
 //     3 Sides<Option<Option<Stroke>>>
-//     3 Smart<Spacing>
 //     3 Smart<Option<Paint>>
 //     3 Smart<ScaleAmount>
 //     3 Locale
@@ -26,7 +24,6 @@
 //     2 Vec<GridItem>
 //     2 Sides<Option<Option<Arc<Stroke>>>>
 //     2 PlacementScope
-//     2 Spacing
 //     2 Stroke
 //     2 BundlePath
 //     2 OneOrMultiple<EcoString>
@@ -54,7 +51,6 @@
 //     1 Margin<Rel<Length>>
 //     1 Smart<Binding>
 //     1 Option<Parity>
-//     1 Option<Spacing>
 //     1 Vec<StackChild>
 //     1 Accent
 //     1 Smart<CancelAngle>
@@ -646,7 +642,7 @@ pub fn box_elem() -> Element {
         capabilities=[],
         fields=[
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Sizing]),
             id=0,
             name="width",
             kind=Settable,
@@ -814,7 +810,7 @@ pub fn block_elem() -> Element {
             default=() => Auto,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Sizing]),
             id=1,
             name="height",
             kind=Settable,
@@ -867,25 +863,25 @@ pub fn block_elem() -> Element {
             fold=fold_of((Ty::new() : Ty[Sides[Rel[Length]?]])),
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Smart[Spacing]]),
             id=8,
             name="spacing",
             kind=External,
-            default=block_elem_spacing_default,
+            default=() => Length(Length::from_em(Em::new(1.2))),
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Smart[Spacing]]),
             id=9,
             name="above",
             kind=Settable,
-            default=block_elem_above_default,
+            default=() => Auto,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Smart[Spacing]]),
             id=10,
             name="below",
             kind=Settable,
-            default=block_elem_below_default,
+            default=() => Auto,
           ),
           field_of((Ty::new() : Ty[Bool]), id=11, name="clip", kind=Settable, default=() => {
             Bool(false)
@@ -2104,7 +2100,7 @@ pub fn h_elem() -> Element {
         capabilities=[],
         fields=[
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Spacing]),
             id=0,
             name="amount",
             kind=Required,
@@ -2145,7 +2141,7 @@ pub fn v_elem() -> Element {
         capabilities=[],
         fields=[
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Spacing]),
             id=0,
             name="amount",
             kind=Required,
@@ -2200,11 +2196,11 @@ pub fn stack_elem() -> Element {
             Dyn(Dir(Dir::TTB))
           }),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Spacing?]),
             id=1,
             name="spacing",
             kind=Settable,
-            default=stack_elem_spacing_default,
+            default=() => None,
           ),
           field_of(
             (Ty::new() : Ty[Value]),
@@ -8616,7 +8612,7 @@ pub fn image_elem() -> Element {
             default=() => Auto,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Sizing]),
             id=3,
             name="height",
             kind=Settable,
@@ -8866,7 +8862,7 @@ pub fn rect_elem() -> Element {
             default=() => Auto,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Sizing]),
             id=1,
             name="height",
             kind=Settable,
@@ -8982,7 +8978,7 @@ pub fn square_elem() -> Element {
             default=() => Auto,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Sizing]),
             id=2,
             name="height",
             kind=Settable,
@@ -9094,7 +9090,7 @@ pub fn ellipse_elem() -> Element {
             default=() => Auto,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Sizing]),
             id=1,
             name="height",
             kind=Settable,
@@ -9199,7 +9195,7 @@ pub fn circle_elem() -> Element {
             default=() => Auto,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Sizing]),
             id=2,
             name="height",
             kind=Settable,

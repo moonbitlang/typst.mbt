@@ -66,25 +66,7 @@ fn block_elem_stroke_fold(inner : Value, _outer : Value) -> Value {
   inner
 }
 
-///|
-/// TODO: port `Smart::Custom(Em::new(1.2).into())` (BlockElem.spacing).
-fn block_elem_spacing_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Smart<Spacing>` (BlockElem.above).
-fn block_elem_above_default() -> Value {
-  None
-}
-
 // TODO: port `#[parse]` of BlockElem.above as `block_elem_above_parse`.
-
-///|
-/// TODO: port `Default::default() of Smart<Spacing>` (BlockElem.below).
-fn block_elem_below_default() -> Value {
-  None
-}
 
 // TODO: port `#[parse]` of BlockElem.below as `block_elem_below_parse`.
 
@@ -289,12 +271,6 @@ fn place_elem_scope_default() -> Value {
 }
 
 // TODO: port `#[parse]` of VElem.attach as `v_elem_attach_parse`.
-
-///|
-/// TODO: port `Default::default() of Option<Spacing>` (StackElem.spacing).
-fn stack_elem_spacing_default() -> Value {
-  None
-}
 
 ///|
 /// TODO: port `Smart::Custom(ScaleAmount::Ratio(Ratio::one()))` (ScaleElem.factor).

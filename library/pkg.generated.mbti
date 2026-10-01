@@ -3447,6 +3447,18 @@ pub fn Sink::take_delayed(Self) -> Array[SourceDiagnostic]
 pub fn Sink::value(Self, Value, Styles?) -> Unit
 pub fn Sink::warn(Self, SourceDiagnostic) -> Unit
 
+pub(all) enum Sizing {
+  Auto
+  Rel(Rel[Length])
+  Fr(Fr)
+} derive(Eq, Hash)
+pub fn Sizing::is_auto(Self) -> Bool
+pub fn Sizing::is_fractional(Self) -> Bool
+pub impl Default for Sizing
+pub impl FromValue for Sizing
+pub impl IntoValue for Sizing
+pub impl Reflect for Sizing
+
 pub(all) enum Smart[T] {
   Auto
   Custom(T)
@@ -3491,6 +3503,16 @@ pub fn SourceDiagnostic::with_tracepoint(Self, Tracepoint, @syntax.Span) -> Self
 pub struct SpaceElem(Content)
 pub fn SpaceElem::shared() -> Content
 pub fn SpaceElem::shared_with_newline() -> Content
+
+pub(all) enum Spacing {
+  Rel(Rel[Length])
+  Fr(Fr)
+} derive(Eq, Hash)
+pub fn Spacing::is_fractional(Self) -> Bool
+pub fn Spacing::is_zero(Self) -> Bool
+pub impl FromValue for Spacing
+pub impl IntoValue for Spacing
+pub impl Reflect for Spacing
 
 pub(all) enum SpecificAlignment[H, V] {
   H(H)
