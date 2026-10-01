@@ -147,6 +147,8 @@ pub let box_elem_stroke : Int
 
 pub let box_elem_width : Int
 
+pub fn bundle_format() -> Format
+
 pub fn bundle_format_elem() -> Element
 
 pub fn cancel_elem() -> Element
@@ -431,7 +433,7 @@ pub let equation_elem_variant : Int
 
 pub fn exp10(Int) -> Double
 
-pub fn[T : FromValue + IntoValue] field_of(Ty[T], id~ : Int, name~ : String, docs? : String, kind~ : FieldKind, positional? : Bool, required? : Bool, variadic? : Bool, internal? : Bool, default? : () -> Value, fold? : (Value, Value) -> Value, parse? : (Engine, Args) -> Value? raise SourceError) -> FieldInfo
+pub fn[T : FromValue + IntoValue] field_of(Ty[T], id~ : Int, name~ : String, docs? : String, kind~ : FieldKind, positional? : Bool, required? : Bool, variadic? : Bool, internal? : Bool, default? : () -> Value, fold? : (Value, Value) -> Value, parse? : (Engine, Args, ParseLocals) -> Value? raise SourceError) -> FieldInfo
 
 pub fn fields_field(Value, String) -> Value raise HintedError
 
@@ -517,6 +519,8 @@ pub fn format_float_with_unit(Double, String) -> String
 
 pub fn format_int_with_base(Int64, Int64) -> String
 
+pub fn format_module(Array[Format]) -> Module
+
 pub fn frac_elem() -> Element
 
 pub let frac_elem_denom : Int
@@ -534,6 +538,10 @@ pub fn frame_elem() -> Element
 pub let frame_elem_body : Int
 
 pub fn geq(Value, Value) -> Value raise HintedError
+
+pub fn get_accent_func(String) -> Func?
+
+pub fn get_lr_wrapper_func(String) -> Func?
 
 pub fn grid_cell_elem() -> Element
 
@@ -686,6 +694,8 @@ pub let html_elem_parent : Int
 pub let html_elem_role : Int
 
 pub let html_elem_tag : Int
+
+pub fn html_format() -> Format
 
 pub fn html_format_elem() -> Element
 
@@ -1357,6 +1367,12 @@ pub fn native_outline_entry_prefix() -> NativeFuncData
 
 pub fn native_panic() -> NativeFuncData
 
+pub fn native_pdf_format_data_cell() -> NativeFuncData
+
+pub fn native_pdf_format_header_cell() -> NativeFuncData
+
+pub fn native_pdf_format_table_summary() -> NativeFuncData
+
 pub fn native_plugin() -> NativeFuncData
 
 pub fn native_plugin_transition() -> NativeFuncData
@@ -1669,6 +1685,8 @@ pub let pdf_attach_elem_path : Int
 
 pub let pdf_attach_elem_relationship : Int
 
+pub fn pdf_format() -> Format
+
 pub fn pdf_format_elem() -> Element
 
 pub let pdf_format_elem_pages : Int
@@ -1700,6 +1718,8 @@ pub let place_elem_dy : Int
 pub let place_elem_float : Int
 
 pub let place_elem_scope : Int
+
+pub fn png_format() -> Format
 
 pub fn png_format_elem() -> Element
 
@@ -1998,6 +2018,8 @@ pub let super_elem_body : Int
 pub let super_elem_size : Int
 
 pub let super_elem_typographic : Int
+
+pub fn svg_format() -> Format
 
 pub fn svg_format_elem() -> Element
 
@@ -2348,6 +2370,13 @@ pub(all) enum AbsUnit {
   In
 } derive(Eq, Hash, @debug.Debug)
 
+pub(all) struct Accent(Char) derive(Eq, Hash, @debug.Debug)
+pub fn Accent::combining(String) -> Self?
+pub fn Accent::normalize(String) -> Self?
+pub impl FromValue for Accent
+pub impl IntoValue for Accent
+pub impl Reflect for Accent
+
 pub(all) enum Alignment {
   H(HAlignment)
   V(VAlignment)
@@ -2633,6 +2662,7 @@ pub fn Content::repeat(Self, Int) -> Self
 pub fn Content::repr(Self) -> String
 pub fn Content::sequence(ArrayView[Self]) -> Self
 pub fn Content::sequence_recursive_for_each(Self, (Self) -> Unit) -> Unit
+pub fn Content::set(Self, Element, Int, Value) -> Self
 pub fn Content::span(Self) -> @syntax.Span
 pub fn Content::spanned(Self, @syntax.Span) -> Self
 pub fn Content::styled(Self, Style) -> Self
@@ -2910,7 +2940,7 @@ pub struct FieldInfo {
   cast : (Value) -> Value raise HintedError
   default : (() -> Value)?
   fold : ((Value, Value) -> Value)?
-  parse : ((Engine, Args) -> Value? raise SourceError)?
+  parse : ((Engine, Args, ParseLocals) -> Value? raise SourceError)?
 }
 
 pub(all) enum FieldKind {
@@ -2929,6 +2959,13 @@ pub(all) enum FixedAlignment {
 pub fn FixedAlignment::from_side(Side) -> Self
 pub fn FixedAlignment::inv(Self) -> Self
 pub fn FixedAlignment::position(Self, Abs) -> Abs
+
+pub(all) struct Format {
+  elem : Element
+  feature : Feature?
+}
+pub fn Format::new(Element) -> Self
+pub fn Format::with_feature(Self, Feature) -> Self
 
 pub(all) struct Fr(Scalar) derive(Compare, Default, Eq, Hash)
 pub fn Fr::abs(Self) -> Self
@@ -3076,13 +3113,14 @@ pub(all) struct Library {
   std : Binding
   mut features : Features
 }
-pub fn Library::builder(Routines) -> LibraryBuilder
+pub fn Library::builder(Routines, Array[Format]) -> LibraryBuilder
 
 pub(all) struct LibraryBuilder {
   mut features : Features
   extra : Array[(Scope) -> Unit]
   routines : Routines
   mut inputs : Dict
+  formats : Array[Format]
 }
 pub fn LibraryBuilder::build(Self) -> Library
 pub fn LibraryBuilder::with_features(Self, Features) -> Self
@@ -3094,6 +3132,17 @@ pub fn LinkElem::from_url(String) -> Content raise HintedError
 
 pub(all) struct Location(UInt64) derive(Compare, Eq, Hash)
 pub fn Location::repr(Self) -> String
+
+pub(all) struct ModifierSet(String) derive(Eq, Hash, @debug.Debug)
+pub fn ModifierSet::as_str(Self) -> String
+pub fn[T] ModifierSet::best_match_in(Self, Iter[(Self, T)]) -> T?
+pub fn ModifierSet::contains(Self, String) -> Bool
+pub fn ModifierSet::default() -> Self
+pub fn ModifierSet::from_raw_dotted(String) -> Self
+pub fn ModifierSet::insert_raw(Self, String) -> Self
+pub fn ModifierSet::is_empty(Self) -> Bool
+pub fn ModifierSet::is_subset(Self, Self) -> Bool
+pub fn ModifierSet::iter(Self) -> Array[String]
 
 pub struct Module {
   // private fields
@@ -3213,6 +3262,11 @@ pub(all) struct ParamInfo {
   required : Bool
   settable : Bool
 }
+
+pub(all) struct ParseLocals(Map[String, Value?])
+pub fn ParseLocals::get(Self, String) -> Value?
+pub fn ParseLocals::new() -> Self
+pub fn ParseLocals::set(Self, String, Value?) -> Unit
 
 pub struct Property {
   elem : Element
@@ -3354,6 +3408,7 @@ pub fn Scope::get(Self, String) -> Binding?
 pub fn Scope::iter(Self) -> Iter[(String, Binding)]
 pub fn Scope::length(Self) -> Int
 pub fn Scope::new() -> Self
+pub fn Scope::prelude_path(Self, Array[String]) -> Binding?
 pub fn Scope::reset_category(Self) -> Unit
 pub fn Scope::start_category(Self, Category) -> Unit
 
@@ -3597,17 +3652,30 @@ pub impl FromValue for Styles
 pub impl IntoValue for Styles
 pub impl Reflect for Styles
 
-pub(all) struct Symbol {
+pub struct Symbol {
   // private fields
 } derive(Eq, Hash)
 pub fn Symbol::func(Self) -> Func raise HintedError
 pub fn Symbol::get(Self) -> String
+pub fn Symbol::list(Array[(ModifierSet, String, String?)]) -> Self
 pub fn Symbol::modified(Self, BindingGuard, String) -> Self raise HintedError
+pub fn Symbol::modifiers(Self) -> Array[String]
 pub fn Symbol::repr(Self) -> String
+pub fn Symbol::runtime(Array[(ModifierSet, String, String?)]) -> Self
 pub fn Symbol::runtime_char(Char) -> Self
+pub fn Symbol::single(String) -> Self
+pub fn Symbol::variants(Self) -> Array[(ModifierSet, String, String?)]
+pub impl Show for Symbol
+pub impl FromValue for Symbol
+pub impl IntoValue for Symbol
+pub impl Reflect for Symbol
 
 pub struct SymbolElem(Content)
 pub fn SymbolElem::packed(String) -> Content
+
+pub(all) struct SymbolVariant(String, String)
+pub impl FromValue for SymbolVariant
+pub impl Reflect for SymbolVariant
 
 pub struct TextElem(Content)
 pub fn TextElem::packed(String) -> Content
@@ -3803,6 +3871,8 @@ pub(all) struct Warned[T] {
 // Type aliases
 pub type NativeFn = (Engine, Context, Args) -> Value raise SourceError
 
+pub type SymbolVariantData = (ModifierSet, String, String?)
+
 // Traits
 pub(open) trait AlignmentComponent : Reflect {
   fn try_from_alignment(Alignment) -> Self raise HintedError
@@ -3824,6 +3894,7 @@ pub impl FromValue for Double
 pub impl FromValue for String
 pub impl[T : FromValue] FromValue for T?
 pub impl[T : FromValue] FromValue for Array[T]
+pub impl FromValue for @syntax.SyntaxMode
 
 pub(open) trait IntoValue {
   fn into_value(Self) -> Value
@@ -3834,6 +3905,7 @@ pub impl IntoValue for Double
 pub impl IntoValue for String
 pub impl[T : IntoValue] IntoValue for T?
 pub impl[T : IntoValue] IntoValue for Array[T]
+pub impl IntoValue for @syntax.SyntaxMode
 
 pub(open) trait Numeric : Add + Sub + Neg + Eq {
   fn zero() -> Self
@@ -3853,6 +3925,7 @@ pub impl Reflect for Double
 pub impl Reflect for String
 pub impl[T : Reflect] Reflect for T?
 pub impl[T : Reflect] Reflect for Array[T]
+pub impl Reflect for @syntax.SyntaxMode
 
 pub(open) trait World {
   fn library(Self) -> Library

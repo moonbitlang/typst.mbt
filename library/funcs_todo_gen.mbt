@@ -1548,22 +1548,6 @@ fn impl_f64_to_bytes(
 }
 
 ///|
-/// TODO: port `Func.with` (typst-library/src/foundations/func.rs).
-fn impl_func_with(self_ : Func, args : Args) -> Func raise HintedError {
-  ignore(self_)
-  ignore(args)
-  bail("`Func.with` is not yet ported")
-}
-
-///|
-/// TODO: port `Func.where-` (typst-library/src/foundations/func.rs).
-fn impl_func_where(self_ : Func, args : Args) -> Value raise HintedError {
-  ignore(self_)
-  ignore(args)
-  bail("`Func.where-` is not yet ported")
-}
-
-///|
 /// TODO: port default `Spanned::new(Base::Default, Span::detached())`.
 fn impl_i64_construct__base_default() -> @syntax.Spanned[Value] raise SourceError {
   raise SourceError([
@@ -1743,48 +1727,6 @@ fn impl_assert_ne(
   ignore(right_)
   ignore(message_)
   bail("`assert.ne` is not yet ported")
-}
-
-///|
-/// TODO: port default `SyntaxMode::Code`.
-fn impl_eval__mode_default() -> Value raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `eval.mode` is not yet ported",
-    ),
-  ])
-}
-
-///|
-/// TODO: port default `Default::default()`.
-fn impl_eval__scope_default() -> Dict raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `eval.scope` is not yet ported",
-    ),
-  ])
-}
-
-///|
-/// TODO: port `eval` (typst-library/src/foundations/mod.rs).
-fn impl_eval(
-  engine : Engine,
-  source_ : @syntax.Spanned[String],
-  mode_ : Value,
-  scope_ : Dict,
-) -> Value raise SourceError {
-  ignore(engine)
-  ignore(source_)
-  ignore(mode_)
-  ignore(scope_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`eval` is not yet ported",
-    ),
-  ])
 }
 
 ///|
@@ -2200,22 +2142,6 @@ fn impl_regex_construct(
     SourceDiagnostic::error_at(
       @syntax.Span::detached(),
       "`Regex.construct` is not yet ported",
-    ),
-  ])
-}
-
-///|
-/// TODO: port `Symbol.construct` (typst-library/src/foundations/symbol.rs).
-fn impl_symbol_construct(
-  span : @syntax.Span,
-  variants_ : Array[@syntax.Spanned[Value]],
-) -> Value raise SourceError {
-  ignore(span)
-  ignore(variants_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`Symbol.construct` is not yet ported",
     ),
   ])
 }
@@ -2825,186 +2751,6 @@ fn impl_yaml_encode(
 }
 
 ///|
-/// TODO: port `math.floor` (typst-library/src/math/lr.rs).
-fn impl_math_floor(
-  size_ : Rel[Length]?,
-  body_ : Content,
-) -> Content raise HintedError {
-  ignore(size_)
-  ignore(body_)
-  bail("`math.floor` is not yet ported")
-}
-
-///|
-/// TODO: port `math.ceil` (typst-library/src/math/lr.rs).
-fn impl_math_ceil(
-  size_ : Rel[Length]?,
-  body_ : Content,
-) -> Content raise HintedError {
-  ignore(size_)
-  ignore(body_)
-  bail("`math.ceil` is not yet ported")
-}
-
-///|
-/// TODO: port `math.round` (typst-library/src/math/lr.rs).
-fn impl_math_round(
-  size_ : Rel[Length]?,
-  body_ : Content,
-) -> Content raise HintedError {
-  ignore(size_)
-  ignore(body_)
-  bail("`math.round` is not yet ported")
-}
-
-///|
-/// TODO: port `math.abs` (typst-library/src/math/lr.rs).
-fn impl_math_abs(
-  size_ : Rel[Length]?,
-  body_ : Content,
-) -> Content raise HintedError {
-  ignore(size_)
-  ignore(body_)
-  bail("`math.abs` is not yet ported")
-}
-
-///|
-/// TODO: port `math.norm` (typst-library/src/math/lr.rs).
-fn impl_math_norm(
-  size_ : Rel[Length]?,
-  body_ : Content,
-) -> Content raise HintedError {
-  ignore(size_)
-  ignore(body_)
-  bail("`math.norm` is not yet ported")
-}
-
-///|
-/// TODO: port `math.sqrt` (typst-library/src/math/root.rs).
-fn impl_math_sqrt(
-  span : @syntax.Span,
-  radicand_ : Content,
-) -> Content raise HintedError {
-  ignore(span)
-  ignore(radicand_)
-  bail("`math.sqrt` is not yet ported")
-}
-
-///|
-/// TODO: port `math.bold` (typst-library/src/math/style.rs).
-fn impl_math_bold(body_ : Content) -> Content raise HintedError {
-  ignore(body_)
-  bail("`math.bold` is not yet ported")
-}
-
-///|
-/// TODO: port `math.upright` (typst-library/src/math/style.rs).
-fn impl_math_upright(body_ : Content) -> Content raise HintedError {
-  ignore(body_)
-  bail("`math.upright` is not yet ported")
-}
-
-///|
-/// TODO: port `math.italic` (typst-library/src/math/style.rs).
-fn impl_math_italic(body_ : Content) -> Content raise HintedError {
-  ignore(body_)
-  bail("`math.italic` is not yet ported")
-}
-
-///|
-/// TODO: port `math.serif` (typst-library/src/math/style.rs).
-fn impl_math_serif(body_ : Content) -> Content raise HintedError {
-  ignore(body_)
-  bail("`math.serif` is not yet ported")
-}
-
-///|
-/// TODO: port `math.sans` (typst-library/src/math/style.rs).
-fn impl_math_sans(body_ : Content) -> Content raise HintedError {
-  ignore(body_)
-  bail("`math.sans` is not yet ported")
-}
-
-///|
-/// TODO: port `math.cal` (typst-library/src/math/style.rs).
-fn impl_math_cal(body_ : Content) -> Content raise HintedError {
-  ignore(body_)
-  bail("`math.cal` is not yet ported")
-}
-
-///|
-/// TODO: port `math.scr` (typst-library/src/math/style.rs).
-fn impl_math_scr(body_ : Content) -> Content raise HintedError {
-  ignore(body_)
-  bail("`math.scr` is not yet ported")
-}
-
-///|
-/// TODO: port `math.frak` (typst-library/src/math/style.rs).
-fn impl_math_frak(body_ : Content) -> Content raise HintedError {
-  ignore(body_)
-  bail("`math.frak` is not yet ported")
-}
-
-///|
-/// TODO: port `math.mono` (typst-library/src/math/style.rs).
-fn impl_math_mono(body_ : Content) -> Content raise HintedError {
-  ignore(body_)
-  bail("`math.mono` is not yet ported")
-}
-
-///|
-/// TODO: port `math.bb` (typst-library/src/math/style.rs).
-fn impl_math_bb(body_ : Content) -> Content raise HintedError {
-  ignore(body_)
-  bail("`math.bb` is not yet ported")
-}
-
-///|
-/// TODO: port `math.display` (typst-library/src/math/style.rs).
-fn impl_math_display(
-  body_ : Content,
-  cramped_ : Bool,
-) -> Content raise HintedError {
-  ignore(body_)
-  ignore(cramped_)
-  bail("`math.display` is not yet ported")
-}
-
-///|
-/// TODO: port `math.inline` (typst-library/src/math/style.rs).
-fn impl_math_inline(
-  body_ : Content,
-  cramped_ : Bool,
-) -> Content raise HintedError {
-  ignore(body_)
-  ignore(cramped_)
-  bail("`math.inline` is not yet ported")
-}
-
-///|
-/// TODO: port `math.script` (typst-library/src/math/style.rs).
-fn impl_math_script(
-  body_ : Content,
-  cramped_ : Bool,
-) -> Content raise HintedError {
-  ignore(body_)
-  ignore(cramped_)
-  bail("`math.script` is not yet ported")
-}
-
-///|
-/// TODO: port `math.sscript` (typst-library/src/math/style.rs).
-fn impl_math_sscript(
-  body_ : Content,
-  cramped_ : Bool,
-) -> Content raise HintedError {
-  ignore(body_)
-  ignore(cramped_)
-  bail("`math.sscript` is not yet ported")
-}
-
-///|
 /// TODO: port `numbering` (typst-library/src/model/numbering.rs).
 fn impl_numbering(
   engine : Engine,
@@ -3142,13 +2888,6 @@ fn impl_lower(text_ : Value) -> Value raise HintedError {
 fn impl_upper(text_ : Value) -> Value raise HintedError {
   ignore(text_)
   bail("`upper` is not yet ported")
-}
-
-///|
-/// TODO: port `lorem` (typst-library/src/text/lorem.rs).
-fn impl_lorem(words_ : USize) -> String raise HintedError {
-  ignore(words_)
-  bail("`lorem` is not yet ported")
 }
 
 ///|
@@ -3906,6 +3645,59 @@ fn impl_tiling_construct(
 }
 
 ///|
+/// TODO: port `PdfFormat.table-summary` (typst-pdf/src/format.rs).
+fn impl_pdf_format_table_summary(
+  summary_ : String?,
+  table_ : Value,
+) -> Content raise HintedError {
+  ignore(summary_)
+  ignore(table_)
+  bail("`PdfFormat.table-summary` is not yet ported")
+}
+
+///|
+/// TODO: port default `NonZeroU32::ONE`.
+fn impl_pdf_format_header_cell__level_default() -> NonZeroU32 raise SourceError {
+  raise SourceError([
+    SourceDiagnostic::error_at(
+      @syntax.Span::detached(),
+      "default of `pdf_format_header_cell.level` is not yet ported",
+    ),
+  ])
+}
+
+///|
+/// TODO: port default `Default::default()`.
+fn impl_pdf_format_header_cell__scope_default() -> Value raise SourceError {
+  raise SourceError([
+    SourceDiagnostic::error_at(
+      @syntax.Span::detached(),
+      "default of `pdf_format_header_cell.scope` is not yet ported",
+    ),
+  ])
+}
+
+///|
+/// TODO: port `PdfFormat.header-cell` (typst-pdf/src/format.rs).
+fn impl_pdf_format_header_cell(
+  level_ : NonZeroU32,
+  scope_ : Value,
+  cell_ : Value,
+) -> Content raise HintedError {
+  ignore(level_)
+  ignore(scope_)
+  ignore(cell_)
+  bail("`PdfFormat.header-cell` is not yet ported")
+}
+
+///|
+/// TODO: port `PdfFormat.data-cell` (typst-pdf/src/format.rs).
+fn impl_pdf_format_data_cell(cell_ : Value) -> Content raise HintedError {
+  ignore(cell_)
+  bail("`PdfFormat.data-cell` is not yet ported")
+}
+
+///|
 /// TODO: port constant `f64::INF`.
 fn impl_f64_const_inf() -> Value {
   None
@@ -4041,4 +3833,10 @@ fn impl_color_const_lime() -> Value {
 /// TODO: port constant `Color::MAP`.
 fn impl_color_const_map() -> Value {
   None
+}
+
+///|
+/// TODO: port `#[defs]` of `HtmlFormat` (typst-html/src/format.rs).
+fn defs_html_format(scope : Scope) -> Unit {
+  ignore(scope)
 }

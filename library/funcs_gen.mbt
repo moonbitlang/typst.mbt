@@ -8708,7 +8708,7 @@ pub fn native_eval() -> NativeFuncData {
           {
             name: "mode",
             docs: "The @reference:syntax:modes[syntactical mode] in which the string is parsed.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[@syntax.SyntaxMode])),
             default: Some(() => {
               IntoValue::into_value(impl_eval__mode_default()) catch {
                 _ => None
@@ -8754,7 +8754,7 @@ fn native_eval_call(
   ignore(engine)
   ignore(context)
   let source_ : @syntax.Spanned[String] = args.expect_spanned("source")
-  let mode_ : Value = match args.named("mode") {
+  let mode_ : @syntax.SyntaxMode = match args.named("mode") {
     Some(v) => v
     None => impl_eval__mode_default()
   }
@@ -10890,7 +10890,7 @@ pub fn native_symbol_construct() -> NativeFuncData {
           {
             name: "variants",
             docs: "The variants of the symbol.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[SymbolVariant])),
             default: None,
             positional: true,
             named: false,
@@ -10899,7 +10899,7 @@ pub fn native_symbol_construct() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Symbol])),
         native_symbol_construct_call,
       )
       native_symbol_construct_cell.val = Some(d)
@@ -10916,7 +10916,7 @@ fn native_symbol_construct_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let variants_ : Array[@syntax.Spanned[Value]] = args.all_spanned()
+  let variants_ : Array[@syntax.Spanned[SymbolVariant]] = args.all_spanned()
   args.take().finish()
   let output = impl_symbol_construct(args.span, variants_)
   IntoValue::into_value(output)
@@ -18616,6 +18616,217 @@ fn native_tiling_construct_call(
 }
 
 ///|
+let native_pdf_format_table_summary_cell : Ref[NativeFuncData?] = { val: None, }
+
+///|
+/// A summary of the purpose and structure of a complex table. (upstream `PdfFormat::table_summary`, typst-pdf/src/format.rs)
+pub fn native_pdf_format_table_summary() -> NativeFuncData {
+  match native_pdf_format_table_summary_cell.val {
+    Some(d) => d
+    None => {
+      let d = NativeFuncData::new(
+        name="table-summary",
+        title="Table Summary",
+        docs="A summary of the purpose and structure of a complex table.",
+        keywords=[],
+        contextual=false,
+        params=[
+          {
+            name: "summary",
+            docs: "",
+            input: () => input_of((Ty::new() : Ty[String])),
+            default: None,
+            positional: false,
+            named: true,
+            variadic: false,
+            required: false,
+            settable: false,
+          },
+          {
+            name: "table",
+            docs: "The table.",
+            input: () => input_of((Ty::new() : Ty[Value])),
+            default: None,
+            positional: true,
+            named: false,
+            variadic: false,
+            required: true,
+            settable: false,
+          },
+        ],
+        returns=() => output_of((Ty::new() : Ty[Content])),
+        native_pdf_format_table_summary_call,
+      )
+      native_pdf_format_table_summary_cell.val = Some(d)
+      d
+    }
+  }
+}
+
+///|
+fn native_pdf_format_table_summary_call(
+  engine : Engine,
+  context : Context,
+  args : Args,
+) -> Value raise SourceError {
+  ignore(engine)
+  ignore(context)
+  let summary_ : String? = args.named("summary")
+  let table_ : Value = args.expect("table")
+  args.take().finish()
+  let output = at(args.span, () => {
+    impl_pdf_format_table_summary(summary_, table_)
+  })
+  IntoValue::into_value(output)
+}
+
+///|
+let native_pdf_format_header_cell_cell : Ref[NativeFuncData?] = { val: None, }
+
+///|
+/// Explicitly defines a cell as a header cell. (upstream `PdfFormat::header_cell`, typst-pdf/src/format.rs)
+pub fn native_pdf_format_header_cell() -> NativeFuncData {
+  match native_pdf_format_header_cell_cell.val {
+    Some(d) => d
+    None => {
+      let d = NativeFuncData::new(
+        name="header-cell",
+        title="Header Cell",
+        docs="Explicitly defines a cell as a header cell.",
+        keywords=[],
+        contextual=false,
+        params=[
+          {
+            name: "level",
+            docs: "The nesting level of this header cell.",
+            input: () => input_of((Ty::new() : Ty[NonZeroU32])),
+            default: Some(() => {
+              IntoValue::into_value(
+                impl_pdf_format_header_cell__level_default(),
+              ) catch {
+                _ => None
+              }
+            }),
+            positional: false,
+            named: true,
+            variadic: false,
+            required: false,
+            settable: false,
+          },
+          {
+            name: "scope",
+            docs: "What track of the table this header cell applies to.",
+            input: () => input_of((Ty::new() : Ty[Value])),
+            default: Some(() => {
+              IntoValue::into_value(
+                impl_pdf_format_header_cell__scope_default(),
+              ) catch {
+                _ => None
+              }
+            }),
+            positional: false,
+            named: true,
+            variadic: false,
+            required: false,
+            settable: false,
+          },
+          {
+            name: "cell",
+            docs: "The table cell.",
+            input: () => input_of((Ty::new() : Ty[Value])),
+            default: None,
+            positional: true,
+            named: false,
+            variadic: false,
+            required: true,
+            settable: false,
+          },
+        ],
+        returns=() => output_of((Ty::new() : Ty[Content])),
+        native_pdf_format_header_cell_call,
+      )
+      native_pdf_format_header_cell_cell.val = Some(d)
+      d
+    }
+  }
+}
+
+///|
+fn native_pdf_format_header_cell_call(
+  engine : Engine,
+  context : Context,
+  args : Args,
+) -> Value raise SourceError {
+  ignore(engine)
+  ignore(context)
+  let level_ : NonZeroU32 = match args.named("level") {
+    Some(v) => v
+    None => impl_pdf_format_header_cell__level_default()
+  }
+  let scope_ : Value = match args.named("scope") {
+    Some(v) => v
+    None => impl_pdf_format_header_cell__scope_default()
+  }
+  let cell_ : Value = args.expect("cell")
+  args.take().finish()
+  let output = at(args.span, () => {
+    impl_pdf_format_header_cell(level_, scope_, cell_)
+  })
+  IntoValue::into_value(output)
+}
+
+///|
+let native_pdf_format_data_cell_cell : Ref[NativeFuncData?] = { val: None, }
+
+///|
+/// Explicitly defines this cell as a data cell. (upstream `PdfFormat::data_cell`, typst-pdf/src/format.rs)
+pub fn native_pdf_format_data_cell() -> NativeFuncData {
+  match native_pdf_format_data_cell_cell.val {
+    Some(d) => d
+    None => {
+      let d = NativeFuncData::new(
+        name="data-cell",
+        title="Data Cell",
+        docs="Explicitly defines this cell as a data cell.",
+        keywords=[],
+        contextual=false,
+        params=[
+          {
+            name: "cell",
+            docs: "The table cell.",
+            input: () => input_of((Ty::new() : Ty[Value])),
+            default: None,
+            positional: true,
+            named: false,
+            variadic: false,
+            required: true,
+            settable: false,
+          },
+        ],
+        returns=() => output_of((Ty::new() : Ty[Content])),
+        native_pdf_format_data_cell_call,
+      )
+      native_pdf_format_data_cell_cell.val = Some(d)
+      d
+    }
+  }
+}
+
+///|
+fn native_pdf_format_data_cell_call(
+  engine : Engine,
+  context : Context,
+  args : Args,
+) -> Value raise SourceError {
+  ignore(engine)
+  ignore(context)
+  let cell_ : Value = args.expect("cell")
+  args.take().finish()
+  let output = at(args.span, () => impl_pdf_format_data_cell(cell_))
+  IntoValue::into_value(output)
+}
+
+///|
 fn scope_assert() -> Scope {
   let s = Scope::deduplicating()
   s.define_func(native_assert_eq()) |> ignore
@@ -19117,6 +19328,30 @@ fn register_scopes() -> Unit {
     data.set_scope(s)
     data.set_constructor(native_tiling_construct())
   })
+  html_format_elem().hooks().scope = () => {
+    let s = Scope::deduplicating()
+    s.define_elem(html_elem()) |> ignore
+    s.define_elem(frame_elem()) |> ignore
+    defs_html_format(s)
+    s
+  }
+  pdf_format_elem().hooks().scope = () => {
+    let s = Scope::deduplicating()
+    s.define_elem(pdf_attach_elem()) |> ignore
+    s.define_elem(artifact_elem()) |> ignore
+    s.define_func(native_pdf_format_table_summary()).with_feature(A11yExtras)
+    |> ignore
+    s.define_func(native_pdf_format_header_cell()).with_feature(A11yExtras)
+    |> ignore
+    s.define_func(native_pdf_format_data_cell()).with_feature(A11yExtras)
+    |> ignore
+    s
+  }
+  bundle_format_elem().hooks().scope = () => {
+    let s = Scope::deduplicating()
+    s.define_elem(asset_elem()) |> ignore
+    s
+  }
 }
 
 ///|

@@ -7,14 +7,14 @@ rules and field access glue. This script generates the equivalent data tables
 
 * `<elem>_<field>_default() -> Value`  for `#[default(..)]` expressions that
   cannot be translated mechanically,
-* `<elem>_<field>_parse(Engine, Args) -> Value? raise SourceError` for
+* `<elem>_<field>_parse(Engine, Args, ParseLocals) -> Value? raise SourceError` for
   `#[parse(..)]` fields.
 
 Any such hook that is not defined in a handwritten `library/*.mbt` file gets a
 stub in `library/elems_todo_gen.mbt`, so the package always compiles; the stub
 list doubles as a TODO list.
 
-Field types are mapped through TYPEMAP. Types without a MoonBit port yet map to
+Field types are mapped through TYPEMAP (scripts/typemap.py). Types without a MoonBit port yet map to
 `Value` (no validation) and are listed in the generated file header.
 """
 

@@ -308,6 +308,15 @@ pub fn math_module() -> Module {
     math.define_elem(elem) |> ignore
   }
   define_globals(math, "math")
+
+  // Text operators.
+  op_define(math)
+
+  // Spacings.
+  math_define_spacings(math)
+
+  // Symbols.
+  symbols_define_math(math)
   Module::new("math", math)
 }
 
@@ -323,12 +332,23 @@ pub(all) struct LibraryBuilder {
   routines : Routines
   /// The `sys.inputs` dictionary.
   mut inputs : Dict
+  /// The registered export formats.
+  formats : Array[Format]
 }
 
 ///|
 /// Create a library builder with the given routines.
-pub fn Library::builder(routines : Routines) -> LibraryBuilder {
-  { features: Features::all(), extra: [], routines, inputs: Dict::new(), }
+pub fn Library::builder(
+  routines : Routines,
+  formats : Array[Format],
+) -> LibraryBuilder {
+  {
+    features: Features::all(),
+    extra: [],
+    routines,
+    inputs: Dict::new(),
+    formats,
+  }
 }
 
 ///|
@@ -374,8 +394,14 @@ pub fn LibraryBuilder::build(self : LibraryBuilder) -> Library {
   visualize_define(global)
   introspection_define(global)
   loading_define(global)
+  symbols_define(global)
+  global.define("format", Module(format_module(self.formats))) |> ignore
   global.define("math", Module(math)) |> ignore
   prelude_layout(global)
+  // If available, add some items to the global prelude.
+  global.prelude_path(["format", "html"]) |> ignore
+  global.prelude_path(["format", "pdf"]) |> ignore
+  global.prelude_path(["format", "bundle", "asset"]) |> ignore
   for f in self.extra {
     f(global)
   }

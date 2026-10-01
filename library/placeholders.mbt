@@ -35,32 +35,6 @@ pub fn Tiling::repr(self : Tiling) -> String {
 }
 
 ///|
-/// A symbol. (placeholder; see foundations/symbol.rs)
-pub(all) struct Symbol {
-  priv text : String
-} derive(Eq, Hash)
-
-///|
-pub fn Symbol::repr(self : Symbol) -> String {
-  "symbol(" + repr_str(self.text) + ")"
-}
-
-///|
-pub fn Symbol::get(self : Symbol) -> String {
-  self.text
-}
-
-///|
-pub fn Symbol::modified(
-  self : Symbol,
-  _guard_ : BindingGuard,
-  field : String,
-) -> Symbol raise HintedError {
-  bail("unknown symbol modifier: \{field}") |> ignore
-  self
-}
-
-///|
 /// A version. (placeholder; see foundations/version.rs)
 pub(all) struct Version(Array[Int]) derive(Eq, Hash)
 
@@ -142,11 +116,6 @@ pub(all) struct Duration {
 ///|
 pub fn Duration::repr(self : Duration) -> String {
   "duration(seconds: \{self.seconds})"
-}
-
-///|
-pub fn Symbol::func(self : Symbol) -> Func raise HintedError {
-  bail("symbol \{self.repr()} is not callable")
 }
 
 ///|
@@ -313,13 +282,6 @@ pub fn Datetime::kind(self : Datetime) -> String {
 /// `Stroke::from_pair`).
 pub fn stroke_from_pair(_a : Value, _b : Value) -> Value raise HintedError {
   bail("strokes are not ported yet")
-}
-
-///|
-/// A symbol for a single character at runtime (upstream
-/// `Symbol::runtime_char`).
-pub fn Symbol::runtime_char(c : Char) -> Symbol {
-  { text: c.to_string(), }
 }
 
 // Placeholders for dynamic types (see `dyn.mbt`). Each owner replaces its
