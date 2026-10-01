@@ -40,6 +40,7 @@ TYPEMAP = {
     "Dict": "Dict",
     "Args": "Args",
     "Type": "Type",
+    "SyntaxMode": "@syntax.SyntaxMode",
 }
 
 # Generic Rust types with a MoonBit port: Rust name -> MoonBit name. A use
