@@ -15,7 +15,6 @@
 //     1 Option<Smallcaps>
 //     1 Option<ShiftSettings>
 //     1 Vec<Packed<RawLine>>
-//     1 AssetData
 
 ///|
 let context_elem_cell : Ref[Element?] = Ref::new(None)
@@ -5846,7 +5845,7 @@ pub fn asset_elem() -> Element {
         capabilities=["Locatable"],
         fields=[
         field_of((Ty::new() : Ty[BundlePath]), id=0, name="path", kind=Required, positional=true, required=true),
-        field_of((Ty::new() : Ty[Value]), id=1, name="data", kind=Required, positional=true, required=true),
+        field_of((Ty::new() : Ty[AssetData]), id=1, name="data", kind=Required, positional=true, required=true),
         ],
       )
       asset_elem_cell.val = Some(e)

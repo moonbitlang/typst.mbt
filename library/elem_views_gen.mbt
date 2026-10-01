@@ -16072,16 +16072,16 @@ pub fn AssetElem::with_path(self : AssetElem, v : BundlePath) -> AssetElem {
 }
 
 ///|
-pub fn AssetElem::data(self : AssetElem) -> Value {
+pub fn AssetElem::data(self : AssetElem) -> AssetData {
   view_cast(self.0.field_raw(asset_elem_data).unwrap(), "asset.data")
 }
 
 ///|
-pub fn AssetElem::with_data(self : AssetElem, v : Value) -> AssetElem {
+pub fn AssetElem::with_data(self : AssetElem, v : AssetData) -> AssetElem {
   AssetElem(self.0.with_field(asset_elem_data, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn AssetElem::new(path_ : BundlePath, data_ : Value) -> AssetElem {
+pub fn AssetElem::new(path_ : BundlePath, data_ : AssetData) -> AssetElem {
   AssetElem(Content::new(asset_elem(), [(asset_elem_path, IntoValue::into_value(path_)), (asset_elem_data, IntoValue::into_value(data_))]))
 }

@@ -235,6 +235,8 @@ TYPEMAP = {
     "Destination": "Destination",
     "Url": "Url",
     "PagedPosition": "PagedPosition",
+    # typst-bundle/src/format.rs
+    "AssetData": "AssetData",
     # text/lang.rs
     "Locale": "Locale",
     # typst-html (dom.rs, css/encode.rs); ported in library/html_*.mbt
