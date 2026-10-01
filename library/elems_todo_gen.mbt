@@ -951,54 +951,6 @@ fn image_elem_icc_default() -> Value {
 // TODO: port `#[parse]` of ImageElem.icc as `image_elem_icc_parse`.
 
 ///|
-/// TODO: port `Default::default() of Sizing` (RectElem.height).
-fn rect_elem_height_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Sides::splat(Some(Abs::pt(5.0).into()))` (RectElem.inset).
-fn rect_elem_inset_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Sizing` (SquareElem.height).
-fn square_elem_height_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Sides::splat(Some(Abs::pt(5.0).into()))` (SquareElem.inset).
-fn square_elem_inset_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Sizing` (EllipseElem.height).
-fn ellipse_elem_height_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Sides::splat(Some(Abs::pt(5.0).into()))` (EllipseElem.inset).
-fn ellipse_elem_inset_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Sizing` (CircleElem.height).
-fn circle_elem_height_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Sides::splat(Some(Abs::pt(5.0).into()))` (CircleElem.inset).
-fn circle_elem_inset_default() -> Value {
-  None
-}
-
-///|
 /// TODO: port `Default::default() of HtmlAttrs` (HtmlElem.attrs).
 fn html_elem_attrs_default() -> Value {
   None

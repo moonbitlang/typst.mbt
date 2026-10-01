@@ -119,3 +119,52 @@ fn circle_elem_height_parse(
     size => size
   }
 }
+
+// Field defaults of the shape elements.
+
+///|
+/// The default inset of shapes: `Sides::splat(Some(Abs::pt(5.0).into()))`.
+fn shape_default_inset() -> Value {
+  let inset : Rel[Length] = Rel::from_abs(Length::from_abs(Abs::pt(5.0)))
+  Sides::splat(Some(inset)).into_value()
+}
+
+///|
+fn rect_elem_height_default() -> Value {
+  Sizing::Auto.into_value()
+}
+
+///|
+fn rect_elem_inset_default() -> Value {
+  shape_default_inset()
+}
+
+///|
+fn square_elem_height_default() -> Value {
+  Sizing::Auto.into_value()
+}
+
+///|
+fn square_elem_inset_default() -> Value {
+  shape_default_inset()
+}
+
+///|
+fn ellipse_elem_height_default() -> Value {
+  Sizing::Auto.into_value()
+}
+
+///|
+fn ellipse_elem_inset_default() -> Value {
+  shape_default_inset()
+}
+
+///|
+fn circle_elem_height_default() -> Value {
+  Sizing::Auto.into_value()
+}
+
+///|
+fn circle_elem_inset_default() -> Value {
+  shape_default_inset()
+}

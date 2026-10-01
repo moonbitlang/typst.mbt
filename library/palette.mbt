@@ -15,36 +15,6 @@ fn f32_(x : Double) -> Float {
 }
 
 ///|
-fn f32_powf(x : Float, y : Float) -> Float {
-  Float::from_double(@math.pow(x.to_double(), y.to_double()))
-}
-
-///|
-fn f32_cbrt(x : Float) -> Float {
-  Float::from_double(@math.cbrt(x.to_double()))
-}
-
-///|
-fn f32_atan2(y : Float, x : Float) -> Float {
-  Float::from_double(@math.atan2(y.to_double(), x.to_double()))
-}
-
-///|
-fn f32_sin(x : Float) -> Float {
-  Float::from_double(@math.sin(x.to_double()))
-}
-
-///|
-fn f32_cos(x : Float) -> Float {
-  Float::from_double(@math.cos(x.to_double()))
-}
-
-///|
-fn f32_hypot(x : Float, y : Float) -> Float {
-  Float::from_double(@math.hypot(x.to_double(), y.to_double()))
-}
-
-///|
 fn f32_floor(x : Float) -> Float {
   Float::from_double(x.to_double().floor())
 }
@@ -312,7 +282,8 @@ fn srgb_into_linear(x : Float) -> Float {
   if x <= f32_(0.04045) {
     f32_(1.0 / 12.92) * x
   } else {
-    f32_powf(x * f32_(1.0 / 1.055) + f32_(0.055 / 1.055), f32_(2.4))
+    // `mul_add` is fused (`libm::fmaf`).
+    f32_powf(f32_fma(x, f32_(1.0 / 1.055), f32_(0.055 / 1.055)), f32_(2.4))
   }
 }
 
