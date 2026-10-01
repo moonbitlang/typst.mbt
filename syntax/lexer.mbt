@@ -181,7 +181,7 @@ fn Lexer::raw(self : Lexer) -> (SyntaxKind, SyntaxNode) {
       SyntaxNode::leaf(RawDelim, "`"),
       SyntaxNode::leaf(RawDelim, "`"),
     ]
-    return (Raw, SyntaxNode::inner(Raw, nodes))
+    return (Raw, SyntaxNode::inner_owned(Raw, nodes))
   }
   // Find end of raw text.
   let mut found = 0
@@ -218,7 +218,7 @@ fn Lexer::raw(self : Lexer) -> (SyntaxKind, SyntaxNode) {
 
   // Closing delimiter.
   nodes.push(SyntaxNode::leaf(RawDelim, delim_text))
-  let raw = SyntaxNode::inner(Raw, nodes)
+  let raw = SyntaxNode::inner_owned(Raw, nodes)
   add_raw_warnings(raw, backticks, diff_future_tag_len, tag, inner_len)
   (Raw, raw)
 }
@@ -745,7 +745,7 @@ fn Lexer::math_ident_or_field(
       SyntaxNode::leaf(Dot, "."),
       SyntaxNode::leaf(MathIdent, ident),
     ]
-    node = SyntaxNode::inner(kind, children)
+    node = SyntaxNode::inner_owned(kind, children)
   }
   (kind, node)
 }
@@ -904,8 +904,18 @@ fn Lexer::invalid_char_in_code(self : Lexer, c : Char) -> SyntaxKind {
 fn Lexer::ident(self : Lexer, start : Int) -> SyntaxKind {
   self.s.eat_while(is_id_continue) |> ignore
   let ident = self.s.from(start)
-  let prev = self.s.get(0, start)
-  if !(prev.has_suffix(".") || prev.has_suffix("@")) || prev.has_suffix("..") {
+  // Look at the (ASCII) characters before the identifier without copying.
+  let text = self.s.text
+  let unit_at = (i : Int) => {
+    if i >= 0 {
+      text.code_unit_at(i).to_int()
+    } else {
+      -1
+    }
+  }
+  let p1 = unit_at(start - 1)
+  let p2 = unit_at(start - 2)
+  if !(p1 == '.' || p1 == '@') || (p1 == '.' && p2 == '.') {
     if keyword(ident) is Some(kw) {
       return kw
     }
@@ -1196,7 +1206,7 @@ fn keyword(ident : String) -> SyntaxKind? {
 /// Eat a newline (treating `\r\n` as one).
 fn scanner_eat_newline(s : Scanner) -> Bool {
   let ate = s.eat_if_pred(is_newline)
-  if ate && s.before().has_suffix("\r") {
+  if ate && s.text.code_unit_at(s.cursor - 1) == '\r' {
     s.eat_if_char('\n') |> ignore
   }
   ate

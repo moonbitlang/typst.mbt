@@ -215,8 +215,18 @@ pub fn SyntaxNode::leaf(kind : SyntaxKind, text : StringView) -> SyntaxNode {
 }
 
 ///|
-/// Create a new inner node with children.
+/// Create a new inner node with children. The children array is copied, so
+/// the caller keeps no alias into the new node.
 pub fn SyntaxNode::inner(
+  kind : SyntaxKind,
+  children : ArrayView[SyntaxNode],
+) -> SyntaxNode {
+  SyntaxNode::inner_owned(kind, children.to_array())
+}
+
+///|
+/// Create a new inner node taking ownership of `children`.
+fn SyntaxNode::inner_owned(
   kind : SyntaxKind,
   children : Array[SyntaxNode],
 ) -> SyntaxNode {
@@ -247,7 +257,7 @@ pub fn SyntaxNode::deep_clone(self : SyntaxNode) -> SyntaxNode {
 
 ///|
 /// Add a warning message to an existing node.
-pub fn SyntaxNode::warn(self : SyntaxNode, message : String) -> Unit {
+fn SyntaxNode::warn(self : SyntaxNode, message : String) -> Unit {
   let kind = self.kind()
   self.data = Warning(
     { child: self.data, sub_range: None, message, hints: [], },
@@ -257,7 +267,7 @@ pub fn SyntaxNode::warn(self : SyntaxNode, message : String) -> Unit {
 
 ///|
 /// Add a warning around this node at a particular sub-range of its text.
-pub fn SyntaxNode::warn_at(
+fn SyntaxNode::warn_at(
   self : SyntaxNode,
   start : Int,
   end : Int,
@@ -284,13 +294,13 @@ fn SyntaxNode::hints_mut(self : SyntaxNode) -> Array[(String, SubRange?)] {
 
 ///|
 /// Add a user-presentable hint to an existing error or warning.
-pub fn SyntaxNode::hint(self : SyntaxNode, hint : String) -> Unit {
+fn SyntaxNode::hint(self : SyntaxNode, hint : String) -> Unit {
   self.hints_mut().push((hint, None))
 }
 
 ///|
 /// Add a hint to an existing error or warning at a sub-range of the text.
-pub fn SyntaxNode::hint_at(
+fn SyntaxNode::hint_at(
   self : SyntaxNode,
   start : Int,
   end : Int,
@@ -304,7 +314,7 @@ pub fn SyntaxNode::hint_at(
 
 ///|
 /// Add multiple hints to an error or warning.
-pub fn SyntaxNode::with_hints(
+fn SyntaxNode::with_hints(
   self : SyntaxNode,
   hints : ArrayView[String],
 ) -> SyntaxNode {
