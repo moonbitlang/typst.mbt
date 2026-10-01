@@ -7639,8 +7639,8 @@ pub fn native_func_where() -> NativeFuncData {
     Some(d) => d
     None => {
       let d = NativeFuncData::new(
-        name="where-",
-        title="Where ",
+        name="where",
+        title="Where",
         docs="Returns a selector that filters for elements belonging to this function whose fields have the values of the given arguments.",
         keywords=[],
         contextual=false,
@@ -10397,8 +10397,8 @@ pub fn native_str_match() -> NativeFuncData {
     Some(d) => d
     None => {
       let d = NativeFuncData::new(
-        name="match-",
-        title="Match ",
+        name="match",
+        title="Match",
         docs="Searches for the specified pattern in the string and returns a dictionary with details about the first match or `{none}` if there is no match.",
         keywords=[],
         contextual=false,
@@ -11412,8 +11412,8 @@ pub fn native_counter_final() -> NativeFuncData {
     Some(d) => d
     None => {
       let d = NativeFuncData::new(
-        name="final-",
-        title="Final ",
+        name="final",
+        title="Final",
         docs="Retrieves the value of the counter at the end of the document. Always returns an array of integers, even if the counter has just one number.",
         keywords=[],
         contextual=true,
@@ -12081,8 +12081,8 @@ pub fn native_state_final() -> NativeFuncData {
     Some(d) => d
     None => {
       let d = NativeFuncData::new(
-        name="final-",
-        title="Final ",
+        name="final",
+        title="Final",
         docs="Retrieves the value of the state at the end of the document.",
         keywords=[],
         contextual=true,
