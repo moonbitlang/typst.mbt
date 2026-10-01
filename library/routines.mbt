@@ -25,7 +25,7 @@ pub(all) struct Routines {
     Pair,
   ] raise SourceError
   /// Lays out content into a single region, producing a single frame.
-  layout_frame : (Engine, Content, Locator, StyleChain, Region) -> Frame raise SourceError
+  layout_frame : (Engine, Content, Locator, StyleChain, LayoutRegion) -> Frame raise SourceError
   /// Returns the body of a MathML `HtmlElem`, if the content is one.
   html_mathml_body : (Content, StyleChain) -> Content??
   /// Wraps content in a span with a color.
@@ -56,7 +56,7 @@ pub fn Routines::new(
   ] raise SourceError = (_, _, _, content, _) => {
     bail_at(content.span(), "realization is not available")
   },
-  layout_frame? : (Engine, Content, Locator, StyleChain, Region) -> Frame raise SourceError = (
+  layout_frame? : (Engine, Content, Locator, StyleChain, LayoutRegion) -> Frame raise SourceError = (
     _,
     content,
     _,

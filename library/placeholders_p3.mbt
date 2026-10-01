@@ -23,8 +23,10 @@ pub fn Frame::size(self : Frame) -> Axes[Abs] {
 }
 
 ///|
-/// A single region to layout into. (placeholder; see layout/regions.rs)
-pub(all) struct Region {
+/// A single region to layout into (upstream `layout::Region`; renamed
+/// because `Region` is the text region of `text/lang.rs`). (placeholder; see
+/// layout/regions.rs)
+pub(all) struct LayoutRegion {
   /// The size of the region.
   size : Axes[Abs]
   /// Whether elements should expand to fill the regions instead of shrinking
@@ -34,7 +36,7 @@ pub(all) struct Region {
 
 ///|
 /// Create a new region.
-pub fn Region::new(size : Axes[Abs], expand : Axes[Bool]) -> Region {
+pub fn LayoutRegion::new(size : Axes[Abs], expand : Axes[Bool]) -> LayoutRegion {
   { size, expand, }
 }
 

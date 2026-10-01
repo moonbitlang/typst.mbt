@@ -1094,7 +1094,7 @@ pub fn BoxElem::set_height(v : Smart[Rel[Length]]) -> Style {
 }
 
 ///|
-pub fn BoxElem::baseline(self : BoxElem, styles : StyleChain) -> Value {
+pub fn BoxElem::baseline(self : BoxElem, styles : StyleChain) -> BaselinePos {
   let e = box_elem()
   view_cast(
     styles.get_value_with_local(
@@ -1107,7 +1107,7 @@ pub fn BoxElem::baseline(self : BoxElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn BoxElem::baseline_local(self : BoxElem) -> Value? {
+pub fn BoxElem::baseline_local(self : BoxElem) -> BaselinePos? {
   match self.0.field_raw(box_elem_baseline) {
     Some(v) => Some(view_cast(v, "box.baseline"))
     None => None
@@ -1115,24 +1115,24 @@ pub fn BoxElem::baseline_local(self : BoxElem) -> Value? {
 }
 
 ///|
-pub fn BoxElem::with_baseline(self : BoxElem, v : Value) -> BoxElem {
+pub fn BoxElem::with_baseline(self : BoxElem, v : BaselinePos) -> BoxElem {
   BoxElem(self.0.with_field(box_elem_baseline, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn BoxElem::baseline_in(styles : StyleChain) -> Value {
+pub fn BoxElem::baseline_in(styles : StyleChain) -> BaselinePos {
   view_cast(styles.get_field(box_elem(), box_elem_baseline), "box.baseline")
 }
 
 ///|
-pub fn BoxElem::set_baseline(v : Value) -> Style {
+pub fn BoxElem::set_baseline(v : BaselinePos) -> Style {
   Property(
     Property::new(box_elem(), box_elem_baseline, IntoValue::into_value(v)),
   )
 }
 
 ///|
-pub fn BoxElem::fill(self : BoxElem, styles : StyleChain) -> Value {
+pub fn BoxElem::fill(self : BoxElem, styles : StyleChain) -> Paint? {
   let e = box_elem()
   view_cast(
     styles.get_value_with_local(
@@ -1145,7 +1145,7 @@ pub fn BoxElem::fill(self : BoxElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn BoxElem::fill_local(self : BoxElem) -> Value? {
+pub fn BoxElem::fill_local(self : BoxElem) -> Paint?? {
   match self.0.field_raw(box_elem_fill) {
     Some(v) => Some(view_cast(v, "box.fill"))
     None => None
@@ -1153,22 +1153,22 @@ pub fn BoxElem::fill_local(self : BoxElem) -> Value? {
 }
 
 ///|
-pub fn BoxElem::with_fill(self : BoxElem, v : Value) -> BoxElem {
+pub fn BoxElem::with_fill(self : BoxElem, v : Paint?) -> BoxElem {
   BoxElem(self.0.with_field(box_elem_fill, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn BoxElem::fill_in(styles : StyleChain) -> Value {
+pub fn BoxElem::fill_in(styles : StyleChain) -> Paint? {
   view_cast(styles.get_field(box_elem(), box_elem_fill), "box.fill")
 }
 
 ///|
-pub fn BoxElem::set_fill(v : Value) -> Style {
+pub fn BoxElem::set_fill(v : Paint?) -> Style {
   Property(Property::new(box_elem(), box_elem_fill, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn BoxElem::stroke(self : BoxElem, styles : StyleChain) -> Value {
+pub fn BoxElem::stroke(self : BoxElem, styles : StyleChain) -> Sides[Stroke??] {
   let e = box_elem()
   view_cast(
     styles.get_value_with_local(
@@ -1181,7 +1181,7 @@ pub fn BoxElem::stroke(self : BoxElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn BoxElem::stroke_local(self : BoxElem) -> Value? {
+pub fn BoxElem::stroke_local(self : BoxElem) -> Sides[Stroke??]? {
   match self.0.field_raw(box_elem_stroke) {
     Some(v) => Some(view_cast(v, "box.stroke"))
     None => None
@@ -1189,17 +1189,17 @@ pub fn BoxElem::stroke_local(self : BoxElem) -> Value? {
 }
 
 ///|
-pub fn BoxElem::with_stroke(self : BoxElem, v : Value) -> BoxElem {
+pub fn BoxElem::with_stroke(self : BoxElem, v : Sides[Stroke??]) -> BoxElem {
   BoxElem(self.0.with_field(box_elem_stroke, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn BoxElem::stroke_in(styles : StyleChain) -> Value {
+pub fn BoxElem::stroke_in(styles : StyleChain) -> Sides[Stroke??] {
   view_cast(styles.get_field(box_elem(), box_elem_stroke), "box.stroke")
 }
 
 ///|
-pub fn BoxElem::set_stroke(v : Value) -> Style {
+pub fn BoxElem::set_stroke(v : Sides[Stroke??]) -> Style {
   Property(Property::new(box_elem(), box_elem_stroke, IntoValue::into_value(v)))
 }
 
@@ -1611,7 +1611,7 @@ pub fn BlockElem::set_breakable(v : Bool) -> Style {
 }
 
 ///|
-pub fn BlockElem::fill(self : BlockElem, styles : StyleChain) -> Value {
+pub fn BlockElem::fill(self : BlockElem, styles : StyleChain) -> Paint? {
   let e = block_elem()
   view_cast(
     styles.get_value_with_local(
@@ -1624,7 +1624,7 @@ pub fn BlockElem::fill(self : BlockElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn BlockElem::fill_local(self : BlockElem) -> Value? {
+pub fn BlockElem::fill_local(self : BlockElem) -> Paint?? {
   match self.0.field_raw(block_elem_fill) {
     Some(v) => Some(view_cast(v, "block.fill"))
     None => None
@@ -1632,24 +1632,27 @@ pub fn BlockElem::fill_local(self : BlockElem) -> Value? {
 }
 
 ///|
-pub fn BlockElem::with_fill(self : BlockElem, v : Value) -> BlockElem {
+pub fn BlockElem::with_fill(self : BlockElem, v : Paint?) -> BlockElem {
   BlockElem(self.0.with_field(block_elem_fill, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn BlockElem::fill_in(styles : StyleChain) -> Value {
+pub fn BlockElem::fill_in(styles : StyleChain) -> Paint? {
   view_cast(styles.get_field(block_elem(), block_elem_fill), "block.fill")
 }
 
 ///|
-pub fn BlockElem::set_fill(v : Value) -> Style {
+pub fn BlockElem::set_fill(v : Paint?) -> Style {
   Property(
     Property::new(block_elem(), block_elem_fill, IntoValue::into_value(v)),
   )
 }
 
 ///|
-pub fn BlockElem::stroke(self : BlockElem, styles : StyleChain) -> Value {
+pub fn BlockElem::stroke(
+  self : BlockElem,
+  styles : StyleChain,
+) -> Sides[Stroke??] {
   let e = block_elem()
   view_cast(
     styles.get_value_with_local(
@@ -1662,7 +1665,7 @@ pub fn BlockElem::stroke(self : BlockElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn BlockElem::stroke_local(self : BlockElem) -> Value? {
+pub fn BlockElem::stroke_local(self : BlockElem) -> Sides[Stroke??]? {
   match self.0.field_raw(block_elem_stroke) {
     Some(v) => Some(view_cast(v, "block.stroke"))
     None => None
@@ -1670,17 +1673,20 @@ pub fn BlockElem::stroke_local(self : BlockElem) -> Value? {
 }
 
 ///|
-pub fn BlockElem::with_stroke(self : BlockElem, v : Value) -> BlockElem {
+pub fn BlockElem::with_stroke(
+  self : BlockElem,
+  v : Sides[Stroke??],
+) -> BlockElem {
   BlockElem(self.0.with_field(block_elem_stroke, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn BlockElem::stroke_in(styles : StyleChain) -> Value {
+pub fn BlockElem::stroke_in(styles : StyleChain) -> Sides[Stroke??] {
   view_cast(styles.get_field(block_elem(), block_elem_stroke), "block.stroke")
 }
 
 ///|
-pub fn BlockElem::set_stroke(v : Value) -> Style {
+pub fn BlockElem::set_stroke(v : Sides[Stroke??]) -> Style {
   Property(
     Property::new(block_elem(), block_elem_stroke, IntoValue::into_value(v)),
   )
@@ -1977,7 +1983,7 @@ pub fn BlockElem::set_sticky(v : Bool) -> Style {
 }
 
 ///|
-pub fn BlockElem::body(self : BlockElem, styles : StyleChain) -> Value {
+pub fn BlockElem::body(self : BlockElem, styles : StyleChain) -> BlockBody? {
   let e = block_elem()
   view_cast(
     styles.get_value_with_local(
@@ -1990,7 +1996,7 @@ pub fn BlockElem::body(self : BlockElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn BlockElem::body_local(self : BlockElem) -> Value? {
+pub fn BlockElem::body_local(self : BlockElem) -> BlockBody?? {
   match self.0.field_raw(block_elem_body) {
     Some(v) => Some(view_cast(v, "block.body"))
     None => None
@@ -1998,17 +2004,17 @@ pub fn BlockElem::body_local(self : BlockElem) -> Value? {
 }
 
 ///|
-pub fn BlockElem::with_body(self : BlockElem, v : Value) -> BlockElem {
+pub fn BlockElem::with_body(self : BlockElem, v : BlockBody?) -> BlockElem {
   BlockElem(self.0.with_field(block_elem_body, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn BlockElem::body_in(styles : StyleChain) -> Value {
+pub fn BlockElem::body_in(styles : StyleChain) -> BlockBody? {
   view_cast(styles.get_field(block_elem(), block_elem_body), "block.body")
 }
 
 ///|
-pub fn BlockElem::set_body(v : Value) -> Style {
+pub fn BlockElem::set_body(v : BlockBody?) -> Style {
   Property(
     Property::new(block_elem(), block_elem_body, IntoValue::into_value(v)),
   )
@@ -2311,7 +2317,7 @@ pub fn GridElem::set_align(v : Celled[Smart[Alignment]]) -> Style {
 }
 
 ///|
-pub fn GridElem::fill(self : GridElem, styles : StyleChain) -> Value {
+pub fn GridElem::fill(self : GridElem, styles : StyleChain) -> Celled[Paint?] {
   let e = grid_elem()
   view_cast(
     styles.get_value_with_local(
@@ -2324,7 +2330,7 @@ pub fn GridElem::fill(self : GridElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn GridElem::fill_local(self : GridElem) -> Value? {
+pub fn GridElem::fill_local(self : GridElem) -> Celled[Paint?]? {
   match self.0.field_raw(grid_elem_fill) {
     Some(v) => Some(view_cast(v, "grid.fill"))
     None => None
@@ -2332,22 +2338,25 @@ pub fn GridElem::fill_local(self : GridElem) -> Value? {
 }
 
 ///|
-pub fn GridElem::with_fill(self : GridElem, v : Value) -> GridElem {
+pub fn GridElem::with_fill(self : GridElem, v : Celled[Paint?]) -> GridElem {
   GridElem(self.0.with_field(grid_elem_fill, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn GridElem::fill_in(styles : StyleChain) -> Value {
+pub fn GridElem::fill_in(styles : StyleChain) -> Celled[Paint?] {
   view_cast(styles.get_field(grid_elem(), grid_elem_fill), "grid.fill")
 }
 
 ///|
-pub fn GridElem::set_fill(v : Value) -> Style {
+pub fn GridElem::set_fill(v : Celled[Paint?]) -> Style {
   Property(Property::new(grid_elem(), grid_elem_fill, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn GridElem::stroke(self : GridElem, styles : StyleChain) -> Value {
+pub fn GridElem::stroke(
+  self : GridElem,
+  styles : StyleChain,
+) -> Celled[Sides[Stroke??]] {
   let e = grid_elem()
   view_cast(
     styles.get_value_with_local(
@@ -2360,7 +2369,7 @@ pub fn GridElem::stroke(self : GridElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn GridElem::stroke_local(self : GridElem) -> Value? {
+pub fn GridElem::stroke_local(self : GridElem) -> Celled[Sides[Stroke??]]? {
   match self.0.field_raw(grid_elem_stroke) {
     Some(v) => Some(view_cast(v, "grid.stroke"))
     None => None
@@ -2368,17 +2377,20 @@ pub fn GridElem::stroke_local(self : GridElem) -> Value? {
 }
 
 ///|
-pub fn GridElem::with_stroke(self : GridElem, v : Value) -> GridElem {
+pub fn GridElem::with_stroke(
+  self : GridElem,
+  v : Celled[Sides[Stroke??]],
+) -> GridElem {
   GridElem(self.0.with_field(grid_elem_stroke, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn GridElem::stroke_in(styles : StyleChain) -> Value {
+pub fn GridElem::stroke_in(styles : StyleChain) -> Celled[Sides[Stroke??]] {
   view_cast(styles.get_field(grid_elem(), grid_elem_stroke), "grid.stroke")
 }
 
 ///|
-pub fn GridElem::set_stroke(v : Value) -> Style {
+pub fn GridElem::set_stroke(v : Celled[Sides[Stroke??]]) -> Style {
   Property(
     Property::new(grid_elem(), grid_elem_stroke, IntoValue::into_value(v)),
   )
@@ -2849,7 +2861,7 @@ pub fn GridHLine::set_end(v : NonZeroUSize?) -> Style {
 }
 
 ///|
-pub fn GridHLine::stroke(self : GridHLine, styles : StyleChain) -> Value {
+pub fn GridHLine::stroke(self : GridHLine, styles : StyleChain) -> Stroke? {
   let e = grid_h_line_elem()
   view_cast(
     styles.get_value_with_local(
@@ -2862,7 +2874,7 @@ pub fn GridHLine::stroke(self : GridHLine, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn GridHLine::stroke_local(self : GridHLine) -> Value? {
+pub fn GridHLine::stroke_local(self : GridHLine) -> Stroke?? {
   match self.0.field_raw(grid_h_line_elem_stroke) {
     Some(v) => Some(view_cast(v, "hline.stroke"))
     None => None
@@ -2870,14 +2882,14 @@ pub fn GridHLine::stroke_local(self : GridHLine) -> Value? {
 }
 
 ///|
-pub fn GridHLine::with_stroke(self : GridHLine, v : Value) -> GridHLine {
+pub fn GridHLine::with_stroke(self : GridHLine, v : Stroke?) -> GridHLine {
   GridHLine(
     self.0.with_field(grid_h_line_elem_stroke, IntoValue::into_value(v)),
   )
 }
 
 ///|
-pub fn GridHLine::stroke_in(styles : StyleChain) -> Value {
+pub fn GridHLine::stroke_in(styles : StyleChain) -> Stroke? {
   view_cast(
     styles.get_field(grid_h_line_elem(), grid_h_line_elem_stroke),
     "hline.stroke",
@@ -2885,7 +2897,7 @@ pub fn GridHLine::stroke_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn GridHLine::set_stroke(v : Value) -> Style {
+pub fn GridHLine::set_stroke(v : Stroke?) -> Style {
   Property(
     Property::new(
       grid_h_line_elem(),
@@ -3120,7 +3132,7 @@ pub fn GridVLine::set_end(v : NonZeroUSize?) -> Style {
 }
 
 ///|
-pub fn GridVLine::stroke(self : GridVLine, styles : StyleChain) -> Value {
+pub fn GridVLine::stroke(self : GridVLine, styles : StyleChain) -> Stroke? {
   let e = grid_v_line_elem()
   view_cast(
     styles.get_value_with_local(
@@ -3133,7 +3145,7 @@ pub fn GridVLine::stroke(self : GridVLine, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn GridVLine::stroke_local(self : GridVLine) -> Value? {
+pub fn GridVLine::stroke_local(self : GridVLine) -> Stroke?? {
   match self.0.field_raw(grid_v_line_elem_stroke) {
     Some(v) => Some(view_cast(v, "vline.stroke"))
     None => None
@@ -3141,14 +3153,14 @@ pub fn GridVLine::stroke_local(self : GridVLine) -> Value? {
 }
 
 ///|
-pub fn GridVLine::with_stroke(self : GridVLine, v : Value) -> GridVLine {
+pub fn GridVLine::with_stroke(self : GridVLine, v : Stroke?) -> GridVLine {
   GridVLine(
     self.0.with_field(grid_v_line_elem_stroke, IntoValue::into_value(v)),
   )
 }
 
 ///|
-pub fn GridVLine::stroke_in(styles : StyleChain) -> Value {
+pub fn GridVLine::stroke_in(styles : StyleChain) -> Stroke? {
   view_cast(
     styles.get_field(grid_v_line_elem(), grid_v_line_elem_stroke),
     "vline.stroke",
@@ -3156,7 +3168,7 @@ pub fn GridVLine::stroke_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn GridVLine::set_stroke(v : Value) -> Style {
+pub fn GridVLine::set_stroke(v : Stroke?) -> Style {
   Property(
     Property::new(
       grid_v_line_elem(),
@@ -3530,7 +3542,7 @@ pub fn GridCell::set_align(v : Smart[Alignment]) -> Style {
 }
 
 ///|
-pub fn GridCell::fill(self : GridCell, styles : StyleChain) -> Value {
+pub fn GridCell::fill(self : GridCell, styles : StyleChain) -> Smart[Paint?] {
   let e = grid_cell_elem()
   view_cast(
     styles.get_value_with_local(
@@ -3543,7 +3555,7 @@ pub fn GridCell::fill(self : GridCell, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn GridCell::fill_local(self : GridCell) -> Value? {
+pub fn GridCell::fill_local(self : GridCell) -> Smart[Paint?]? {
   match self.0.field_raw(grid_cell_elem_fill) {
     Some(v) => Some(view_cast(v, "cell.fill"))
     None => None
@@ -3551,12 +3563,12 @@ pub fn GridCell::fill_local(self : GridCell) -> Value? {
 }
 
 ///|
-pub fn GridCell::with_fill(self : GridCell, v : Value) -> GridCell {
+pub fn GridCell::with_fill(self : GridCell, v : Smart[Paint?]) -> GridCell {
   GridCell(self.0.with_field(grid_cell_elem_fill, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn GridCell::fill_in(styles : StyleChain) -> Value {
+pub fn GridCell::fill_in(styles : StyleChain) -> Smart[Paint?] {
   view_cast(
     styles.get_field(grid_cell_elem(), grid_cell_elem_fill),
     "cell.fill",
@@ -3564,7 +3576,7 @@ pub fn GridCell::fill_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn GridCell::set_fill(v : Value) -> Style {
+pub fn GridCell::set_fill(v : Smart[Paint?]) -> Style {
   Property(
     Property::new(
       grid_cell_elem(),
@@ -3575,7 +3587,10 @@ pub fn GridCell::set_fill(v : Value) -> Style {
 }
 
 ///|
-pub fn GridCell::stroke(self : GridCell, styles : StyleChain) -> Value {
+pub fn GridCell::stroke(
+  self : GridCell,
+  styles : StyleChain,
+) -> Sides[Stroke??] {
   let e = grid_cell_elem()
   view_cast(
     styles.get_value_with_local(
@@ -3588,7 +3603,7 @@ pub fn GridCell::stroke(self : GridCell, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn GridCell::stroke_local(self : GridCell) -> Value? {
+pub fn GridCell::stroke_local(self : GridCell) -> Sides[Stroke??]? {
   match self.0.field_raw(grid_cell_elem_stroke) {
     Some(v) => Some(view_cast(v, "cell.stroke"))
     None => None
@@ -3596,12 +3611,12 @@ pub fn GridCell::stroke_local(self : GridCell) -> Value? {
 }
 
 ///|
-pub fn GridCell::with_stroke(self : GridCell, v : Value) -> GridCell {
+pub fn GridCell::with_stroke(self : GridCell, v : Sides[Stroke??]) -> GridCell {
   GridCell(self.0.with_field(grid_cell_elem_stroke, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn GridCell::stroke_in(styles : StyleChain) -> Value {
+pub fn GridCell::stroke_in(styles : StyleChain) -> Sides[Stroke??] {
   view_cast(
     styles.get_field(grid_cell_elem(), grid_cell_elem_stroke),
     "cell.stroke",
@@ -3609,7 +3624,7 @@ pub fn GridCell::stroke_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn GridCell::set_stroke(v : Value) -> Style {
+pub fn GridCell::set_stroke(v : Sides[Stroke??]) -> Style {
   Property(
     Property::new(
       grid_cell_elem(),
@@ -4095,36 +4110,38 @@ pub fn PageElem::set_flipped(v : Bool) -> Style {
 }
 
 ///|
-pub fn PageElem::margin_in(styles : StyleChain) -> Value {
+pub fn PageElem::margin_in(
+  styles : StyleChain,
+) -> Smart[Margin[Smart[Rel[Length]]]] {
   view_cast(styles.get_field(page_elem(), page_elem_margin), "page.margin")
 }
 
 ///|
-pub fn PageElem::set_margin(v : Value) -> Style {
+pub fn PageElem::set_margin(v : Smart[Margin[Smart[Rel[Length]]]]) -> Style {
   Property(
     Property::new(page_elem(), page_elem_margin, IntoValue::into_value(v)),
   )
 }
 
 ///|
-pub fn PageElem::bleed_in(styles : StyleChain) -> Value {
+pub fn PageElem::bleed_in(styles : StyleChain) -> Margin[Rel[Length]] {
   view_cast(styles.get_field(page_elem(), page_elem_bleed), "page.bleed")
 }
 
 ///|
-pub fn PageElem::set_bleed(v : Value) -> Style {
+pub fn PageElem::set_bleed(v : Margin[Rel[Length]]) -> Style {
   Property(
     Property::new(page_elem(), page_elem_bleed, IntoValue::into_value(v)),
   )
 }
 
 ///|
-pub fn PageElem::binding_in(styles : StyleChain) -> Value {
+pub fn PageElem::binding_in(styles : StyleChain) -> Smart[PageBinding] {
   view_cast(styles.get_field(page_elem(), page_elem_binding), "page.binding")
 }
 
 ///|
-pub fn PageElem::set_binding(v : Value) -> Style {
+pub fn PageElem::set_binding(v : Smart[PageBinding]) -> Style {
   Property(
     Property::new(page_elem(), page_elem_binding, IntoValue::into_value(v)),
   )
@@ -4143,12 +4160,12 @@ pub fn PageElem::set_columns(v : NonZeroUSize) -> Style {
 }
 
 ///|
-pub fn PageElem::fill_in(styles : StyleChain) -> Value {
+pub fn PageElem::fill_in(styles : StyleChain) -> Smart[Paint?] {
   view_cast(styles.get_field(page_elem(), page_elem_fill), "page.fill")
 }
 
 ///|
-pub fn PageElem::set_fill(v : Value) -> Style {
+pub fn PageElem::set_fill(v : Smart[Paint?]) -> Style {
   Property(Property::new(page_elem(), page_elem_fill, IntoValue::into_value(v)))
 }
 
@@ -4383,7 +4400,7 @@ pub fn PagebreakElem::set_weak(v : Bool) -> Style {
 }
 
 ///|
-pub fn PagebreakElem::to(self : PagebreakElem, styles : StyleChain) -> Value {
+pub fn PagebreakElem::to(self : PagebreakElem, styles : StyleChain) -> Parity? {
   let e = pagebreak_elem()
   view_cast(
     styles.get_value_with_local(
@@ -4396,7 +4413,7 @@ pub fn PagebreakElem::to(self : PagebreakElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn PagebreakElem::to_local(self : PagebreakElem) -> Value? {
+pub fn PagebreakElem::to_local(self : PagebreakElem) -> Parity?? {
   match self.0.field_raw(pagebreak_elem_to) {
     Some(v) => Some(view_cast(v, "pagebreak.to"))
     None => None
@@ -4404,12 +4421,15 @@ pub fn PagebreakElem::to_local(self : PagebreakElem) -> Value? {
 }
 
 ///|
-pub fn PagebreakElem::with_to(self : PagebreakElem, v : Value) -> PagebreakElem {
+pub fn PagebreakElem::with_to(
+  self : PagebreakElem,
+  v : Parity?,
+) -> PagebreakElem {
   PagebreakElem(self.0.with_field(pagebreak_elem_to, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn PagebreakElem::to_in(styles : StyleChain) -> Value {
+pub fn PagebreakElem::to_in(styles : StyleChain) -> Parity? {
   view_cast(
     styles.get_field(pagebreak_elem(), pagebreak_elem_to),
     "pagebreak.to",
@@ -4417,7 +4437,7 @@ pub fn PagebreakElem::to_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn PagebreakElem::set_to(v : Value) -> Style {
+pub fn PagebreakElem::set_to(v : Parity?) -> Style {
   Property(
     Property::new(pagebreak_elem(), pagebreak_elem_to, IntoValue::into_value(v)),
   )
@@ -4563,7 +4583,10 @@ pub fn PlaceElem::set_alignment(v : Smart[Alignment]) -> Style {
 }
 
 ///|
-pub fn PlaceElem::scope(self : PlaceElem, styles : StyleChain) -> Value {
+pub fn PlaceElem::scope(
+  self : PlaceElem,
+  styles : StyleChain,
+) -> PlacementScope {
   let e = place_elem()
   view_cast(
     styles.get_value_with_local(
@@ -4576,7 +4599,7 @@ pub fn PlaceElem::scope(self : PlaceElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn PlaceElem::scope_local(self : PlaceElem) -> Value? {
+pub fn PlaceElem::scope_local(self : PlaceElem) -> PlacementScope? {
   match self.0.field_raw(place_elem_scope) {
     Some(v) => Some(view_cast(v, "place.scope"))
     None => None
@@ -4584,17 +4607,17 @@ pub fn PlaceElem::scope_local(self : PlaceElem) -> Value? {
 }
 
 ///|
-pub fn PlaceElem::with_scope(self : PlaceElem, v : Value) -> PlaceElem {
+pub fn PlaceElem::with_scope(self : PlaceElem, v : PlacementScope) -> PlaceElem {
   PlaceElem(self.0.with_field(place_elem_scope, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn PlaceElem::scope_in(styles : StyleChain) -> Value {
+pub fn PlaceElem::scope_in(styles : StyleChain) -> PlacementScope {
   view_cast(styles.get_field(place_elem(), place_elem_scope), "place.scope")
 }
 
 ///|
-pub fn PlaceElem::set_scope(v : Value) -> Style {
+pub fn PlaceElem::set_scope(v : PlacementScope) -> Style {
   Property(
     Property::new(place_elem(), place_elem_scope, IntoValue::into_value(v)),
   )
@@ -5260,17 +5283,20 @@ pub fn StackElem::set_spacing(v : Spacing?) -> Style {
 }
 
 ///|
-pub fn StackElem::children(self : StackElem) -> Value {
+pub fn StackElem::children(self : StackElem) -> Array[StackChild] {
   view_cast(self.0.field_raw(stack_elem_children).unwrap(), "stack.children")
 }
 
 ///|
-pub fn StackElem::with_children(self : StackElem, v : Value) -> StackElem {
+pub fn StackElem::with_children(
+  self : StackElem,
+  v : Array[StackChild],
+) -> StackElem {
   StackElem(self.0.with_field(stack_elem_children, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn StackElem::new(children_ : Value) -> StackElem {
+pub fn StackElem::new(children_ : Array[StackChild]) -> StackElem {
   StackElem(
     Content::new(stack_elem(), [
       (stack_elem_children, IntoValue::into_value(children_)),
@@ -5609,7 +5635,10 @@ pub impl NativeElement for ScaleElem with fn into_content(self) {
 }
 
 ///|
-pub fn ScaleElem::x(self : ScaleElem, styles : StyleChain) -> Value {
+pub fn ScaleElem::x(
+  self : ScaleElem,
+  styles : StyleChain,
+) -> Smart[ScaleAmount] {
   let e = scale_elem()
   view_cast(
     styles.get_value_with_local(
@@ -5622,7 +5651,7 @@ pub fn ScaleElem::x(self : ScaleElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn ScaleElem::x_local(self : ScaleElem) -> Value? {
+pub fn ScaleElem::x_local(self : ScaleElem) -> Smart[ScaleAmount]? {
   match self.0.field_raw(scale_elem_x) {
     Some(v) => Some(view_cast(v, "scale.x"))
     None => None
@@ -5630,22 +5659,25 @@ pub fn ScaleElem::x_local(self : ScaleElem) -> Value? {
 }
 
 ///|
-pub fn ScaleElem::with_x(self : ScaleElem, v : Value) -> ScaleElem {
+pub fn ScaleElem::with_x(self : ScaleElem, v : Smart[ScaleAmount]) -> ScaleElem {
   ScaleElem(self.0.with_field(scale_elem_x, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn ScaleElem::x_in(styles : StyleChain) -> Value {
+pub fn ScaleElem::x_in(styles : StyleChain) -> Smart[ScaleAmount] {
   view_cast(styles.get_field(scale_elem(), scale_elem_x), "scale.x")
 }
 
 ///|
-pub fn ScaleElem::set_x(v : Value) -> Style {
+pub fn ScaleElem::set_x(v : Smart[ScaleAmount]) -> Style {
   Property(Property::new(scale_elem(), scale_elem_x, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn ScaleElem::y(self : ScaleElem, styles : StyleChain) -> Value {
+pub fn ScaleElem::y(
+  self : ScaleElem,
+  styles : StyleChain,
+) -> Smart[ScaleAmount] {
   let e = scale_elem()
   view_cast(
     styles.get_value_with_local(
@@ -5658,7 +5690,7 @@ pub fn ScaleElem::y(self : ScaleElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn ScaleElem::y_local(self : ScaleElem) -> Value? {
+pub fn ScaleElem::y_local(self : ScaleElem) -> Smart[ScaleAmount]? {
   match self.0.field_raw(scale_elem_y) {
     Some(v) => Some(view_cast(v, "scale.y"))
     None => None
@@ -5666,17 +5698,17 @@ pub fn ScaleElem::y_local(self : ScaleElem) -> Value? {
 }
 
 ///|
-pub fn ScaleElem::with_y(self : ScaleElem, v : Value) -> ScaleElem {
+pub fn ScaleElem::with_y(self : ScaleElem, v : Smart[ScaleAmount]) -> ScaleElem {
   ScaleElem(self.0.with_field(scale_elem_y, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn ScaleElem::y_in(styles : StyleChain) -> Value {
+pub fn ScaleElem::y_in(styles : StyleChain) -> Smart[ScaleAmount] {
   view_cast(styles.get_field(scale_elem(), scale_elem_y), "scale.y")
 }
 
 ///|
-pub fn ScaleElem::set_y(v : Value) -> Style {
+pub fn ScaleElem::set_y(v : Smart[ScaleAmount]) -> Style {
   Property(Property::new(scale_elem(), scale_elem_y, IntoValue::into_value(v)))
 }
 
@@ -6997,7 +7029,7 @@ pub fn CancelElem::set_angle(v : Value) -> Style {
 }
 
 ///|
-pub fn CancelElem::stroke(self : CancelElem, styles : StyleChain) -> Value {
+pub fn CancelElem::stroke(self : CancelElem, styles : StyleChain) -> Stroke {
   let e = cancel_elem()
   view_cast(
     styles.get_value_with_local(
@@ -7010,7 +7042,7 @@ pub fn CancelElem::stroke(self : CancelElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn CancelElem::stroke_local(self : CancelElem) -> Value? {
+pub fn CancelElem::stroke_local(self : CancelElem) -> Stroke? {
   match self.0.field_raw(cancel_elem_stroke) {
     Some(v) => Some(view_cast(v, "cancel.stroke"))
     None => None
@@ -7018,12 +7050,12 @@ pub fn CancelElem::stroke_local(self : CancelElem) -> Value? {
 }
 
 ///|
-pub fn CancelElem::with_stroke(self : CancelElem, v : Value) -> CancelElem {
+pub fn CancelElem::with_stroke(self : CancelElem, v : Stroke) -> CancelElem {
   CancelElem(self.0.with_field(cancel_elem_stroke, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn CancelElem::stroke_in(styles : StyleChain) -> Value {
+pub fn CancelElem::stroke_in(styles : StyleChain) -> Stroke {
   view_cast(
     styles.get_field(cancel_elem(), cancel_elem_stroke),
     "cancel.stroke",
@@ -7031,7 +7063,7 @@ pub fn CancelElem::stroke_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn CancelElem::set_stroke(v : Value) -> Style {
+pub fn CancelElem::set_stroke(v : Stroke) -> Style {
   Property(
     Property::new(cancel_elem(), cancel_elem_stroke, IntoValue::into_value(v)),
   )
@@ -7288,7 +7320,7 @@ pub fn EquationElem::set_number_align(
 pub fn EquationElem::supplement(
   self : EquationElem,
   styles : StyleChain,
-) -> Value {
+) -> Smart[Supplement?] {
   let e = equation_elem()
   view_cast(
     styles.get_value_with_local(
@@ -7301,7 +7333,9 @@ pub fn EquationElem::supplement(
 }
 
 ///|
-pub fn EquationElem::supplement_local(self : EquationElem) -> Value? {
+pub fn EquationElem::supplement_local(
+  self : EquationElem,
+) -> Smart[Supplement?]? {
   match self.0.field_raw(equation_elem_supplement) {
     Some(v) => Some(view_cast(v, "equation.supplement"))
     None => None
@@ -7311,7 +7345,7 @@ pub fn EquationElem::supplement_local(self : EquationElem) -> Value? {
 ///|
 pub fn EquationElem::with_supplement(
   self : EquationElem,
-  v : Value,
+  v : Smart[Supplement?],
 ) -> EquationElem {
   EquationElem(
     self.0.with_field(equation_elem_supplement, IntoValue::into_value(v)),
@@ -7319,7 +7353,7 @@ pub fn EquationElem::with_supplement(
 }
 
 ///|
-pub fn EquationElem::supplement_in(styles : StyleChain) -> Value {
+pub fn EquationElem::supplement_in(styles : StyleChain) -> Smart[Supplement?] {
   view_cast(
     styles.get_field(equation_elem(), equation_elem_supplement),
     "equation.supplement",
@@ -7327,7 +7361,7 @@ pub fn EquationElem::supplement_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn EquationElem::set_supplement(v : Value) -> Style {
+pub fn EquationElem::set_supplement(v : Smart[Supplement?]) -> Style {
   Property(
     Property::new(
       equation_elem(),
@@ -9831,7 +9865,10 @@ pub impl NativeElement for ArtifactElem with fn into_content(self) {
 }
 
 ///|
-pub fn ArtifactElem::kind(self : ArtifactElem, styles : StyleChain) -> Value {
+pub fn ArtifactElem::kind(
+  self : ArtifactElem,
+  styles : StyleChain,
+) -> ArtifactKind {
   let e = artifact_elem()
   view_cast(
     styles.get_value_with_local(
@@ -9844,7 +9881,7 @@ pub fn ArtifactElem::kind(self : ArtifactElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn ArtifactElem::kind_local(self : ArtifactElem) -> Value? {
+pub fn ArtifactElem::kind_local(self : ArtifactElem) -> ArtifactKind? {
   match self.0.field_raw(artifact_elem_kind) {
     Some(v) => Some(view_cast(v, "artifact.kind"))
     None => None
@@ -9852,12 +9889,15 @@ pub fn ArtifactElem::kind_local(self : ArtifactElem) -> Value? {
 }
 
 ///|
-pub fn ArtifactElem::with_kind(self : ArtifactElem, v : Value) -> ArtifactElem {
+pub fn ArtifactElem::with_kind(
+  self : ArtifactElem,
+  v : ArtifactKind,
+) -> ArtifactElem {
   ArtifactElem(self.0.with_field(artifact_elem_kind, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn ArtifactElem::kind_in(styles : StyleChain) -> Value {
+pub fn ArtifactElem::kind_in(styles : StyleChain) -> ArtifactKind {
   view_cast(
     styles.get_field(artifact_elem(), artifact_elem_kind),
     "artifact.kind",
@@ -9865,7 +9905,7 @@ pub fn ArtifactElem::kind_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn ArtifactElem::set_kind(v : Value) -> Style {
+pub fn ArtifactElem::set_kind(v : ArtifactKind) -> Style {
   Property(
     Property::new(artifact_elem(), artifact_elem_kind, IntoValue::into_value(v)),
   )
@@ -10299,7 +10339,7 @@ pub fn BibliographyElem::set_group(v : Smart[String]?) -> Style {
 }
 
 ///|
-pub fn BibliographyElem::lang(self : BibliographyElem) -> Value? {
+pub fn BibliographyElem::lang(self : BibliographyElem) -> Lang? {
   match self.0.field_raw(bibliography_elem_lang) {
     Some(v) => Some(view_cast(v, "bibliography.lang"))
     None => None
@@ -10309,7 +10349,7 @@ pub fn BibliographyElem::lang(self : BibliographyElem) -> Value? {
 ///|
 pub fn BibliographyElem::with_lang(
   self : BibliographyElem,
-  v : Value,
+  v : Lang,
 ) -> BibliographyElem {
   BibliographyElem(
     self.0.with_field(bibliography_elem_lang, IntoValue::into_value(v)),
@@ -10317,7 +10357,7 @@ pub fn BibliographyElem::with_lang(
 }
 
 ///|
-pub fn BibliographyElem::region(self : BibliographyElem) -> Value? {
+pub fn BibliographyElem::region(self : BibliographyElem) -> Region?? {
   match self.0.field_raw(bibliography_elem_region) {
     Some(v) => Some(view_cast(v, "bibliography.region"))
     None => None
@@ -10327,7 +10367,7 @@ pub fn BibliographyElem::region(self : BibliographyElem) -> Value? {
 ///|
 pub fn BibliographyElem::with_region(
   self : BibliographyElem,
-  v : Value,
+  v : Region?,
 ) -> BibliographyElem {
   BibliographyElem(
     self.0.with_field(bibliography_elem_region, IntoValue::into_value(v)),
@@ -10617,7 +10657,7 @@ pub fn CiteElem::set_style(v : Value) -> Style {
 }
 
 ///|
-pub fn CiteElem::lang(self : CiteElem) -> Value? {
+pub fn CiteElem::lang(self : CiteElem) -> Lang? {
   match self.0.field_raw(cite_elem_lang) {
     Some(v) => Some(view_cast(v, "cite.lang"))
     None => None
@@ -10625,12 +10665,12 @@ pub fn CiteElem::lang(self : CiteElem) -> Value? {
 }
 
 ///|
-pub fn CiteElem::with_lang(self : CiteElem, v : Value) -> CiteElem {
+pub fn CiteElem::with_lang(self : CiteElem, v : Lang) -> CiteElem {
   CiteElem(self.0.with_field(cite_elem_lang, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn CiteElem::region(self : CiteElem) -> Value? {
+pub fn CiteElem::region(self : CiteElem) -> Region?? {
   match self.0.field_raw(cite_elem_region) {
     Some(v) => Some(view_cast(v, "cite.region"))
     None => None
@@ -10638,7 +10678,7 @@ pub fn CiteElem::region(self : CiteElem) -> Value? {
 }
 
 ///|
-pub fn CiteElem::with_region(self : CiteElem, v : Value) -> CiteElem {
+pub fn CiteElem::with_region(self : CiteElem, v : Region?) -> CiteElem {
   CiteElem(self.0.with_field(cite_elem_region, IntoValue::into_value(v)))
 }
 
@@ -10797,7 +10837,10 @@ pub fn DocumentElem::with_path(
 }
 
 ///|
-pub fn DocumentElem::format(self : DocumentElem, styles : StyleChain) -> Value {
+pub fn DocumentElem::format(
+  self : DocumentElem,
+  styles : StyleChain,
+) -> Smart[DocumentFormat] {
   let e = document_elem()
   view_cast(
     styles.get_value_with_local(
@@ -10810,7 +10853,9 @@ pub fn DocumentElem::format(self : DocumentElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn DocumentElem::format_local(self : DocumentElem) -> Value? {
+pub fn DocumentElem::format_local(
+  self : DocumentElem,
+) -> Smart[DocumentFormat]? {
   match self.0.field_raw(document_elem_format) {
     Some(v) => Some(view_cast(v, "document.format"))
     None => None
@@ -10820,7 +10865,7 @@ pub fn DocumentElem::format_local(self : DocumentElem) -> Value? {
 ///|
 pub fn DocumentElem::with_format(
   self : DocumentElem,
-  v : Value,
+  v : Smart[DocumentFormat],
 ) -> DocumentElem {
   DocumentElem(
     self.0.with_field(document_elem_format, IntoValue::into_value(v)),
@@ -10828,7 +10873,7 @@ pub fn DocumentElem::with_format(
 }
 
 ///|
-pub fn DocumentElem::format_in(styles : StyleChain) -> Value {
+pub fn DocumentElem::format_in(styles : StyleChain) -> Smart[DocumentFormat] {
   view_cast(
     styles.get_field(document_elem(), document_elem_format),
     "document.format",
@@ -10836,7 +10881,7 @@ pub fn DocumentElem::format_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn DocumentElem::set_format(v : Value) -> Style {
+pub fn DocumentElem::set_format(v : Smart[DocumentFormat]) -> Style {
   Property(
     Property::new(
       document_elem(),
@@ -10898,7 +10943,10 @@ pub fn DocumentElem::set_title(v : Content?) -> Style {
 }
 
 ///|
-pub fn DocumentElem::author(self : DocumentElem, styles : StyleChain) -> Value {
+pub fn DocumentElem::author(
+  self : DocumentElem,
+  styles : StyleChain,
+) -> OneOrMultiple[String] {
   let e = document_elem()
   view_cast(
     styles.get_value_with_local(
@@ -10911,7 +10959,9 @@ pub fn DocumentElem::author(self : DocumentElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn DocumentElem::author_local(self : DocumentElem) -> Value? {
+pub fn DocumentElem::author_local(
+  self : DocumentElem,
+) -> OneOrMultiple[String]? {
   match self.0.field_raw(document_elem_author) {
     Some(v) => Some(view_cast(v, "document.author"))
     None => None
@@ -10921,7 +10971,7 @@ pub fn DocumentElem::author_local(self : DocumentElem) -> Value? {
 ///|
 pub fn DocumentElem::with_author(
   self : DocumentElem,
-  v : Value,
+  v : OneOrMultiple[String],
 ) -> DocumentElem {
   DocumentElem(
     self.0.with_field(document_elem_author, IntoValue::into_value(v)),
@@ -10929,7 +10979,7 @@ pub fn DocumentElem::with_author(
 }
 
 ///|
-pub fn DocumentElem::author_in(styles : StyleChain) -> Value {
+pub fn DocumentElem::author_in(styles : StyleChain) -> OneOrMultiple[String] {
   view_cast(
     styles.get_field(document_elem(), document_elem_author),
     "document.author",
@@ -10937,7 +10987,7 @@ pub fn DocumentElem::author_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn DocumentElem::set_author(v : Value) -> Style {
+pub fn DocumentElem::set_author(v : OneOrMultiple[String]) -> Style {
   Property(
     Property::new(
       document_elem(),
@@ -11004,7 +11054,7 @@ pub fn DocumentElem::set_description(v : Content?) -> Style {
 pub fn DocumentElem::keywords(
   self : DocumentElem,
   styles : StyleChain,
-) -> Value {
+) -> OneOrMultiple[String] {
   let e = document_elem()
   view_cast(
     styles.get_value_with_local(
@@ -11017,7 +11067,9 @@ pub fn DocumentElem::keywords(
 }
 
 ///|
-pub fn DocumentElem::keywords_local(self : DocumentElem) -> Value? {
+pub fn DocumentElem::keywords_local(
+  self : DocumentElem,
+) -> OneOrMultiple[String]? {
   match self.0.field_raw(document_elem_keywords) {
     Some(v) => Some(view_cast(v, "document.keywords"))
     None => None
@@ -11027,7 +11079,7 @@ pub fn DocumentElem::keywords_local(self : DocumentElem) -> Value? {
 ///|
 pub fn DocumentElem::with_keywords(
   self : DocumentElem,
-  v : Value,
+  v : OneOrMultiple[String],
 ) -> DocumentElem {
   DocumentElem(
     self.0.with_field(document_elem_keywords, IntoValue::into_value(v)),
@@ -11035,7 +11087,7 @@ pub fn DocumentElem::with_keywords(
 }
 
 ///|
-pub fn DocumentElem::keywords_in(styles : StyleChain) -> Value {
+pub fn DocumentElem::keywords_in(styles : StyleChain) -> OneOrMultiple[String] {
   view_cast(
     styles.get_field(document_elem(), document_elem_keywords),
     "document.keywords",
@@ -11043,7 +11095,7 @@ pub fn DocumentElem::keywords_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn DocumentElem::set_keywords(v : Value) -> Style {
+pub fn DocumentElem::set_keywords(v : OneOrMultiple[String]) -> Style {
   Property(
     Property::new(
       document_elem(),
@@ -11561,39 +11613,38 @@ pub fn EnumElem::set_number_align(v : Alignment) -> Style {
 }
 
 ///|
-pub fn EnumElem::children(self : EnumElem) -> Value {
+pub fn EnumElem::children(self : EnumElem) -> Array[EnumItem] {
   view_cast(self.0.field_raw(enum_elem_children).unwrap(), "enum.children")
 }
 
 ///|
-pub fn EnumElem::with_children(self : EnumElem, v : Value) -> EnumElem {
+pub fn EnumElem::with_children(
+  self : EnumElem,
+  v : Array[EnumItem],
+) -> EnumElem {
   EnumElem(self.0.with_field(enum_elem_children, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn EnumElem::parents_in(styles : StyleChain) -> Value {
+pub fn EnumElem::parents_in(styles : StyleChain) -> Array[U64] {
   view_cast(styles.get_field(enum_elem(), enum_elem_parents), "enum.parents")
 }
 
 ///|
-pub fn EnumElem::set_parents(v : Value) -> Style {
+pub fn EnumElem::set_parents(v : Array[U64]) -> Style {
   Property(
     Property::new(enum_elem(), enum_elem_parents, IntoValue::into_value(v)),
   )
 }
 
 ///|
-pub fn EnumElem::new(children_ : Value) -> EnumElem {
+pub fn EnumElem::new(children_ : Array[EnumItem]) -> EnumElem {
   EnumElem(
     Content::new(enum_elem(), [
       (enum_elem_children, IntoValue::into_value(children_)),
     ]),
   )
 }
-
-///|
-/// Typed view of `item` content (upstream `Packed<EnumItem>`).
-pub struct EnumItem(Content)
 
 ///|
 /// View content as `item` if it is one.
@@ -11678,15 +11729,6 @@ pub fn EnumItem::body(self : EnumItem) -> Content {
 ///|
 pub fn EnumItem::with_body(self : EnumItem, v : Content) -> EnumItem {
   EnumItem(self.0.with_field(enum_item_elem_body, IntoValue::into_value(v)))
-}
-
-///|
-pub fn EnumItem::new(body_ : Content) -> EnumItem {
-  EnumItem(
-    Content::new(enum_item_elem(), [
-      (enum_item_elem_body, IntoValue::into_value(body_)),
-    ]),
-  )
 }
 
 ///|
@@ -11823,7 +11865,10 @@ pub fn FigureElem::set_placement(v : Smart[VAlignment]?) -> Style {
 }
 
 ///|
-pub fn FigureElem::scope(self : FigureElem, styles : StyleChain) -> Value {
+pub fn FigureElem::scope(
+  self : FigureElem,
+  styles : StyleChain,
+) -> PlacementScope {
   let e = figure_elem()
   view_cast(
     styles.get_value_with_local(
@@ -11836,7 +11881,7 @@ pub fn FigureElem::scope(self : FigureElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn FigureElem::scope_local(self : FigureElem) -> Value? {
+pub fn FigureElem::scope_local(self : FigureElem) -> PlacementScope? {
   match self.0.field_raw(figure_elem_scope) {
     Some(v) => Some(view_cast(v, "figure.scope"))
     None => None
@@ -11844,24 +11889,30 @@ pub fn FigureElem::scope_local(self : FigureElem) -> Value? {
 }
 
 ///|
-pub fn FigureElem::with_scope(self : FigureElem, v : Value) -> FigureElem {
+pub fn FigureElem::with_scope(
+  self : FigureElem,
+  v : PlacementScope,
+) -> FigureElem {
   FigureElem(self.0.with_field(figure_elem_scope, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn FigureElem::scope_in(styles : StyleChain) -> Value {
+pub fn FigureElem::scope_in(styles : StyleChain) -> PlacementScope {
   view_cast(styles.get_field(figure_elem(), figure_elem_scope), "figure.scope")
 }
 
 ///|
-pub fn FigureElem::set_scope(v : Value) -> Style {
+pub fn FigureElem::set_scope(v : PlacementScope) -> Style {
   Property(
     Property::new(figure_elem(), figure_elem_scope, IntoValue::into_value(v)),
   )
 }
 
 ///|
-pub fn FigureElem::caption(self : FigureElem, styles : StyleChain) -> Value {
+pub fn FigureElem::caption(
+  self : FigureElem,
+  styles : StyleChain,
+) -> FigureCaption? {
   let e = figure_elem()
   view_cast(
     styles.get_value_with_local(
@@ -11874,7 +11925,7 @@ pub fn FigureElem::caption(self : FigureElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn FigureElem::caption_local(self : FigureElem) -> Value? {
+pub fn FigureElem::caption_local(self : FigureElem) -> FigureCaption?? {
   match self.0.field_raw(figure_elem_caption) {
     Some(v) => Some(view_cast(v, "figure.caption"))
     None => None
@@ -11882,12 +11933,15 @@ pub fn FigureElem::caption_local(self : FigureElem) -> Value? {
 }
 
 ///|
-pub fn FigureElem::with_caption(self : FigureElem, v : Value) -> FigureElem {
+pub fn FigureElem::with_caption(
+  self : FigureElem,
+  v : FigureCaption?,
+) -> FigureElem {
   FigureElem(self.0.with_field(figure_elem_caption, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn FigureElem::caption_in(styles : StyleChain) -> Value {
+pub fn FigureElem::caption_in(styles : StyleChain) -> FigureCaption? {
   view_cast(
     styles.get_field(figure_elem(), figure_elem_caption),
     "figure.caption",
@@ -11895,14 +11949,17 @@ pub fn FigureElem::caption_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn FigureElem::set_caption(v : Value) -> Style {
+pub fn FigureElem::set_caption(v : FigureCaption?) -> Style {
   Property(
     Property::new(figure_elem(), figure_elem_caption, IntoValue::into_value(v)),
   )
 }
 
 ///|
-pub fn FigureElem::kind(self : FigureElem, styles : StyleChain) -> Value {
+pub fn FigureElem::kind(
+  self : FigureElem,
+  styles : StyleChain,
+) -> Smart[FigureKind] {
   let e = figure_elem()
   view_cast(
     styles.get_value_with_local(
@@ -11915,7 +11972,7 @@ pub fn FigureElem::kind(self : FigureElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn FigureElem::kind_local(self : FigureElem) -> Value? {
+pub fn FigureElem::kind_local(self : FigureElem) -> Smart[FigureKind]? {
   match self.0.field_raw(figure_elem_kind) {
     Some(v) => Some(view_cast(v, "figure.kind"))
     None => None
@@ -11923,24 +11980,30 @@ pub fn FigureElem::kind_local(self : FigureElem) -> Value? {
 }
 
 ///|
-pub fn FigureElem::with_kind(self : FigureElem, v : Value) -> FigureElem {
+pub fn FigureElem::with_kind(
+  self : FigureElem,
+  v : Smart[FigureKind],
+) -> FigureElem {
   FigureElem(self.0.with_field(figure_elem_kind, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn FigureElem::kind_in(styles : StyleChain) -> Value {
+pub fn FigureElem::kind_in(styles : StyleChain) -> Smart[FigureKind] {
   view_cast(styles.get_field(figure_elem(), figure_elem_kind), "figure.kind")
 }
 
 ///|
-pub fn FigureElem::set_kind(v : Value) -> Style {
+pub fn FigureElem::set_kind(v : Smart[FigureKind]) -> Style {
   Property(
     Property::new(figure_elem(), figure_elem_kind, IntoValue::into_value(v)),
   )
 }
 
 ///|
-pub fn FigureElem::supplement(self : FigureElem, styles : StyleChain) -> Value {
+pub fn FigureElem::supplement(
+  self : FigureElem,
+  styles : StyleChain,
+) -> Smart[Supplement?] {
   let e = figure_elem()
   view_cast(
     styles.get_value_with_local(
@@ -11953,7 +12016,7 @@ pub fn FigureElem::supplement(self : FigureElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn FigureElem::supplement_local(self : FigureElem) -> Value? {
+pub fn FigureElem::supplement_local(self : FigureElem) -> Smart[Supplement?]? {
   match self.0.field_raw(figure_elem_supplement) {
     Some(v) => Some(view_cast(v, "figure.supplement"))
     None => None
@@ -11961,14 +12024,17 @@ pub fn FigureElem::supplement_local(self : FigureElem) -> Value? {
 }
 
 ///|
-pub fn FigureElem::with_supplement(self : FigureElem, v : Value) -> FigureElem {
+pub fn FigureElem::with_supplement(
+  self : FigureElem,
+  v : Smart[Supplement?],
+) -> FigureElem {
   FigureElem(
     self.0.with_field(figure_elem_supplement, IntoValue::into_value(v)),
   )
 }
 
 ///|
-pub fn FigureElem::supplement_in(styles : StyleChain) -> Value {
+pub fn FigureElem::supplement_in(styles : StyleChain) -> Smart[Supplement?] {
   view_cast(
     styles.get_field(figure_elem(), figure_elem_supplement),
     "figure.supplement",
@@ -11976,7 +12042,7 @@ pub fn FigureElem::supplement_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn FigureElem::set_supplement(v : Value) -> Style {
+pub fn FigureElem::set_supplement(v : Smart[Supplement?]) -> Style {
   Property(
     Property::new(
       figure_elem(),
@@ -12152,10 +12218,6 @@ pub fn FigureElem::new(body_ : Content) -> FigureElem {
 }
 
 ///|
-/// Typed view of `caption` content (upstream `Packed<FigureCaption>`).
-pub struct FigureCaption(Content)
-
-///|
 /// View content as `caption` if it is one.
 pub fn FigureCaption::of(c : Content) -> FigureCaption? {
   if c.elem() == figure_caption_elem() {
@@ -12307,7 +12369,7 @@ pub fn FigureCaption::with_body(
 }
 
 ///|
-pub fn FigureCaption::kind(self : FigureCaption) -> Value? {
+pub fn FigureCaption::kind(self : FigureCaption) -> FigureKind? {
   match self.0.field_raw(figure_caption_elem_kind) {
     Some(v) => Some(view_cast(v, "caption.kind"))
     None => None
@@ -12317,7 +12379,7 @@ pub fn FigureCaption::kind(self : FigureCaption) -> Value? {
 ///|
 pub fn FigureCaption::with_kind(
   self : FigureCaption,
-  v : Value,
+  v : FigureKind,
 ) -> FigureCaption {
   FigureCaption(
     self.0.with_field(figure_caption_elem_kind, IntoValue::into_value(v)),
@@ -12398,19 +12460,6 @@ pub fn FigureCaption::with_figure_location(
     ),
   )
 }
-
-///|
-pub fn FigureCaption::new(body_ : Content) -> FigureCaption {
-  FigureCaption(
-    Content::new(figure_caption_elem(), [
-      (figure_caption_elem_body, IntoValue::into_value(body_)),
-    ]),
-  )
-}
-
-///|
-/// Typed view of `footnote` content (upstream `Packed<FootnoteElem>`).
-pub struct FootnoteElem(Content)
 
 ///|
 /// View content as `footnote` if it is one.
@@ -12496,17 +12545,20 @@ pub fn FootnoteElem::set_numbering(v : Numbering) -> Style {
 }
 
 ///|
-pub fn FootnoteElem::body(self : FootnoteElem) -> Value {
+pub fn FootnoteElem::body(self : FootnoteElem) -> FootnoteBody {
   view_cast(self.0.field_raw(footnote_elem_body).unwrap(), "footnote.body")
 }
 
 ///|
-pub fn FootnoteElem::with_body(self : FootnoteElem, v : Value) -> FootnoteElem {
+pub fn FootnoteElem::with_body(
+  self : FootnoteElem,
+  v : FootnoteBody,
+) -> FootnoteElem {
   FootnoteElem(self.0.with_field(footnote_elem_body, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn FootnoteElem::new(body_ : Value) -> FootnoteElem {
+pub fn FootnoteElem::new(body_ : FootnoteBody) -> FootnoteElem {
   FootnoteElem(
     Content::new(footnote_elem(), [
       (footnote_elem_body, IntoValue::into_value(body_)),
@@ -12549,14 +12601,14 @@ pub impl NativeElement for FootnoteEntry with fn into_content(self) {
 }
 
 ///|
-pub fn FootnoteEntry::note(self : FootnoteEntry) -> Value {
+pub fn FootnoteEntry::note(self : FootnoteEntry) -> FootnoteElem {
   view_cast(self.0.field_raw(footnote_entry_elem_note).unwrap(), "entry.note")
 }
 
 ///|
 pub fn FootnoteEntry::with_note(
   self : FootnoteEntry,
-  v : Value,
+  v : FootnoteElem,
 ) -> FootnoteEntry {
   FootnoteEntry(
     self.0.with_field(footnote_entry_elem_note, IntoValue::into_value(v)),
@@ -12773,7 +12825,7 @@ pub fn FootnoteEntry::set_indent(v : Length) -> Style {
 }
 
 ///|
-pub fn FootnoteEntry::new(note_ : Value) -> FootnoteEntry {
+pub fn FootnoteEntry::new(note_ : FootnoteElem) -> FootnoteEntry {
   FootnoteEntry(
     Content::new(footnote_entry_elem(), [
       (footnote_entry_elem_note, IntoValue::into_value(note_)),
@@ -13085,7 +13137,7 @@ pub fn HeadingElem::set_numbering(v : Numbering?) -> Style {
 pub fn HeadingElem::supplement(
   self : HeadingElem,
   styles : StyleChain,
-) -> Value {
+) -> Smart[Supplement?] {
   let e = heading_elem()
   view_cast(
     styles.get_value_with_local(
@@ -13098,7 +13150,7 @@ pub fn HeadingElem::supplement(
 }
 
 ///|
-pub fn HeadingElem::supplement_local(self : HeadingElem) -> Value? {
+pub fn HeadingElem::supplement_local(self : HeadingElem) -> Smart[Supplement?]? {
   match self.0.field_raw(heading_elem_supplement) {
     Some(v) => Some(view_cast(v, "heading.supplement"))
     None => None
@@ -13108,7 +13160,7 @@ pub fn HeadingElem::supplement_local(self : HeadingElem) -> Value? {
 ///|
 pub fn HeadingElem::with_supplement(
   self : HeadingElem,
-  v : Value,
+  v : Smart[Supplement?],
 ) -> HeadingElem {
   HeadingElem(
     self.0.with_field(heading_elem_supplement, IntoValue::into_value(v)),
@@ -13116,7 +13168,7 @@ pub fn HeadingElem::with_supplement(
 }
 
 ///|
-pub fn HeadingElem::supplement_in(styles : StyleChain) -> Value {
+pub fn HeadingElem::supplement_in(styles : StyleChain) -> Smart[Supplement?] {
   view_cast(
     styles.get_field(heading_elem(), heading_elem_supplement),
     "heading.supplement",
@@ -13124,7 +13176,7 @@ pub fn HeadingElem::supplement_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn HeadingElem::set_supplement(v : Value) -> Style {
+pub fn HeadingElem::set_supplement(v : Smart[Supplement?]) -> Style {
   Property(
     Property::new(
       heading_elem(),
@@ -13628,7 +13680,7 @@ pub fn ListElem::set_tight(v : Bool) -> Style {
 }
 
 ///|
-pub fn ListElem::marker(self : ListElem, styles : StyleChain) -> Value {
+pub fn ListElem::marker(self : ListElem, styles : StyleChain) -> ListMarker {
   let e = list_elem()
   view_cast(
     styles.get_value_with_local(
@@ -13641,7 +13693,7 @@ pub fn ListElem::marker(self : ListElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn ListElem::marker_local(self : ListElem) -> Value? {
+pub fn ListElem::marker_local(self : ListElem) -> ListMarker? {
   match self.0.field_raw(list_elem_marker) {
     Some(v) => Some(view_cast(v, "list.marker"))
     None => None
@@ -13649,17 +13701,17 @@ pub fn ListElem::marker_local(self : ListElem) -> Value? {
 }
 
 ///|
-pub fn ListElem::with_marker(self : ListElem, v : Value) -> ListElem {
+pub fn ListElem::with_marker(self : ListElem, v : ListMarker) -> ListElem {
   ListElem(self.0.with_field(list_elem_marker, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn ListElem::marker_in(styles : StyleChain) -> Value {
+pub fn ListElem::marker_in(styles : StyleChain) -> ListMarker {
   view_cast(styles.get_field(list_elem(), list_elem_marker), "list.marker")
 }
 
 ///|
-pub fn ListElem::set_marker(v : Value) -> Style {
+pub fn ListElem::set_marker(v : ListMarker) -> Style {
   Property(
     Property::new(list_elem(), list_elem_marker, IntoValue::into_value(v)),
   )
@@ -13827,39 +13879,38 @@ pub fn ListElem::set_marker_align(v : Alignment) -> Style {
 }
 
 ///|
-pub fn ListElem::children(self : ListElem) -> Value {
+pub fn ListElem::children(self : ListElem) -> Array[ListItem] {
   view_cast(self.0.field_raw(list_elem_children).unwrap(), "list.children")
 }
 
 ///|
-pub fn ListElem::with_children(self : ListElem, v : Value) -> ListElem {
+pub fn ListElem::with_children(
+  self : ListElem,
+  v : Array[ListItem],
+) -> ListElem {
   ListElem(self.0.with_field(list_elem_children, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn ListElem::depth_in(styles : StyleChain) -> Value {
+pub fn ListElem::depth_in(styles : StyleChain) -> Depth {
   view_cast(styles.get_field(list_elem(), list_elem_depth), "list.depth")
 }
 
 ///|
-pub fn ListElem::set_depth(v : Value) -> Style {
+pub fn ListElem::set_depth(v : Depth) -> Style {
   Property(
     Property::new(list_elem(), list_elem_depth, IntoValue::into_value(v)),
   )
 }
 
 ///|
-pub fn ListElem::new(children_ : Value) -> ListElem {
+pub fn ListElem::new(children_ : Array[ListItem]) -> ListElem {
   ListElem(
     Content::new(list_elem(), [
       (list_elem_children, IntoValue::into_value(children_)),
     ]),
   )
 }
-
-///|
-/// Typed view of `item` content (upstream `Packed<ListItem>`).
-pub struct ListItem(Content)
 
 ///|
 /// View content as `item` if it is one.
@@ -13899,15 +13950,6 @@ pub fn ListItem::body(self : ListItem) -> Content {
 ///|
 pub fn ListItem::with_body(self : ListItem, v : Content) -> ListItem {
   ListItem(self.0.with_field(list_item_elem_body, IntoValue::into_value(v)))
-}
-
-///|
-pub fn ListItem::new(body_ : Content) -> ListItem {
-  ListItem(
-    Content::new(list_item_elem(), [
-      (list_item_elem_body, IntoValue::into_value(body_)),
-    ]),
-  )
 }
 
 ///|
@@ -14086,7 +14128,10 @@ pub fn OutlineElem::set_depth(v : NonZeroUSize?) -> Style {
 }
 
 ///|
-pub fn OutlineElem::indent(self : OutlineElem, styles : StyleChain) -> Value {
+pub fn OutlineElem::indent(
+  self : OutlineElem,
+  styles : StyleChain,
+) -> Smart[OutlineIndent] {
   let e = outline_elem()
   view_cast(
     styles.get_value_with_local(
@@ -14099,7 +14144,7 @@ pub fn OutlineElem::indent(self : OutlineElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn OutlineElem::indent_local(self : OutlineElem) -> Value? {
+pub fn OutlineElem::indent_local(self : OutlineElem) -> Smart[OutlineIndent]? {
   match self.0.field_raw(outline_elem_indent) {
     Some(v) => Some(view_cast(v, "outline.indent"))
     None => None
@@ -14107,12 +14152,15 @@ pub fn OutlineElem::indent_local(self : OutlineElem) -> Value? {
 }
 
 ///|
-pub fn OutlineElem::with_indent(self : OutlineElem, v : Value) -> OutlineElem {
+pub fn OutlineElem::with_indent(
+  self : OutlineElem,
+  v : Smart[OutlineIndent],
+) -> OutlineElem {
   OutlineElem(self.0.with_field(outline_elem_indent, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn OutlineElem::indent_in(styles : StyleChain) -> Value {
+pub fn OutlineElem::indent_in(styles : StyleChain) -> Smart[OutlineIndent] {
   view_cast(
     styles.get_field(outline_elem(), outline_elem_indent),
     "outline.indent",
@@ -14120,7 +14168,7 @@ pub fn OutlineElem::indent_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn OutlineElem::set_indent(v : Value) -> Style {
+pub fn OutlineElem::set_indent(v : Smart[OutlineIndent]) -> Style {
   Property(
     Property::new(outline_elem(), outline_elem_indent, IntoValue::into_value(v)),
   )
@@ -14524,7 +14572,7 @@ pub fn ParElem::set_justify(v : Bool) -> Style {
 pub fn ParElem::justification_limits(
   self : ParElem,
   styles : StyleChain,
-) -> Value {
+) -> JustificationLimits {
   let e = par_elem()
   view_cast(
     styles.get_value_with_local(
@@ -14537,7 +14585,9 @@ pub fn ParElem::justification_limits(
 }
 
 ///|
-pub fn ParElem::justification_limits_local(self : ParElem) -> Value? {
+pub fn ParElem::justification_limits_local(
+  self : ParElem,
+) -> JustificationLimits? {
   match self.0.field_raw(par_elem_justification_limits) {
     Some(v) => Some(view_cast(v, "par.justification-limits"))
     None => None
@@ -14545,14 +14595,19 @@ pub fn ParElem::justification_limits_local(self : ParElem) -> Value? {
 }
 
 ///|
-pub fn ParElem::with_justification_limits(self : ParElem, v : Value) -> ParElem {
+pub fn ParElem::with_justification_limits(
+  self : ParElem,
+  v : JustificationLimits,
+) -> ParElem {
   ParElem(
     self.0.with_field(par_elem_justification_limits, IntoValue::into_value(v)),
   )
 }
 
 ///|
-pub fn ParElem::justification_limits_in(styles : StyleChain) -> Value {
+pub fn ParElem::justification_limits_in(
+  styles : StyleChain,
+) -> JustificationLimits {
   view_cast(
     styles.get_field(par_elem(), par_elem_justification_limits),
     "par.justification-limits",
@@ -14560,7 +14615,7 @@ pub fn ParElem::justification_limits_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn ParElem::set_justification_limits(v : Value) -> Style {
+pub fn ParElem::set_justification_limits(v : JustificationLimits) -> Style {
   Property(
     Property::new(
       par_elem(),
@@ -14571,7 +14626,10 @@ pub fn ParElem::set_justification_limits(v : Value) -> Style {
 }
 
 ///|
-pub fn ParElem::linebreaks(self : ParElem, styles : StyleChain) -> Value {
+pub fn ParElem::linebreaks(
+  self : ParElem,
+  styles : StyleChain,
+) -> Smart[Linebreaks] {
   let e = par_elem()
   view_cast(
     styles.get_value_with_local(
@@ -14584,7 +14642,7 @@ pub fn ParElem::linebreaks(self : ParElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn ParElem::linebreaks_local(self : ParElem) -> Value? {
+pub fn ParElem::linebreaks_local(self : ParElem) -> Smart[Linebreaks]? {
   match self.0.field_raw(par_elem_linebreaks) {
     Some(v) => Some(view_cast(v, "par.linebreaks"))
     None => None
@@ -14592,24 +14650,30 @@ pub fn ParElem::linebreaks_local(self : ParElem) -> Value? {
 }
 
 ///|
-pub fn ParElem::with_linebreaks(self : ParElem, v : Value) -> ParElem {
+pub fn ParElem::with_linebreaks(
+  self : ParElem,
+  v : Smart[Linebreaks],
+) -> ParElem {
   ParElem(self.0.with_field(par_elem_linebreaks, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn ParElem::linebreaks_in(styles : StyleChain) -> Value {
+pub fn ParElem::linebreaks_in(styles : StyleChain) -> Smart[Linebreaks] {
   view_cast(styles.get_field(par_elem(), par_elem_linebreaks), "par.linebreaks")
 }
 
 ///|
-pub fn ParElem::set_linebreaks(v : Value) -> Style {
+pub fn ParElem::set_linebreaks(v : Smart[Linebreaks]) -> Style {
   Property(
     Property::new(par_elem(), par_elem_linebreaks, IntoValue::into_value(v)),
   )
 }
 
 ///|
-pub fn ParElem::first_line_indent(self : ParElem, styles : StyleChain) -> Value {
+pub fn ParElem::first_line_indent(
+  self : ParElem,
+  styles : StyleChain,
+) -> FirstLineIndent {
   let e = par_elem()
   view_cast(
     styles.get_value_with_local(
@@ -14622,7 +14686,7 @@ pub fn ParElem::first_line_indent(self : ParElem, styles : StyleChain) -> Value 
 }
 
 ///|
-pub fn ParElem::first_line_indent_local(self : ParElem) -> Value? {
+pub fn ParElem::first_line_indent_local(self : ParElem) -> FirstLineIndent? {
   match self.0.field_raw(par_elem_first_line_indent) {
     Some(v) => Some(view_cast(v, "par.first-line-indent"))
     None => None
@@ -14630,14 +14694,17 @@ pub fn ParElem::first_line_indent_local(self : ParElem) -> Value? {
 }
 
 ///|
-pub fn ParElem::with_first_line_indent(self : ParElem, v : Value) -> ParElem {
+pub fn ParElem::with_first_line_indent(
+  self : ParElem,
+  v : FirstLineIndent,
+) -> ParElem {
   ParElem(
     self.0.with_field(par_elem_first_line_indent, IntoValue::into_value(v)),
   )
 }
 
 ///|
-pub fn ParElem::first_line_indent_in(styles : StyleChain) -> Value {
+pub fn ParElem::first_line_indent_in(styles : StyleChain) -> FirstLineIndent {
   view_cast(
     styles.get_field(par_elem(), par_elem_first_line_indent),
     "par.first-line-indent",
@@ -14645,7 +14712,7 @@ pub fn ParElem::first_line_indent_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn ParElem::set_first_line_indent(v : Value) -> Style {
+pub fn ParElem::set_first_line_indent(v : FirstLineIndent) -> Style {
   Property(
     Property::new(
       par_elem(),
@@ -14863,7 +14930,7 @@ pub fn ParLine::set_number_clearance(v : Smart[Length]) -> Style {
 }
 
 ///|
-pub fn ParLine::numbering_scope_in(styles : StyleChain) -> Value {
+pub fn ParLine::numbering_scope_in(styles : StyleChain) -> LineNumberingScope {
   view_cast(
     styles.get_field(par_line_elem(), par_line_elem_numbering_scope),
     "line.numbering-scope",
@@ -14871,7 +14938,7 @@ pub fn ParLine::numbering_scope_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn ParLine::set_numbering_scope(v : Value) -> Style {
+pub fn ParLine::set_numbering_scope(v : LineNumberingScope) -> Style {
   Property(
     Property::new(
       par_line_elem(),
@@ -15135,7 +15202,10 @@ pub fn QuoteElem::set_quotes(v : Smart[Bool]) -> Style {
 }
 
 ///|
-pub fn QuoteElem::attribution(self : QuoteElem, styles : StyleChain) -> Value {
+pub fn QuoteElem::attribution(
+  self : QuoteElem,
+  styles : StyleChain,
+) -> Attribution? {
   let e = quote_elem()
   view_cast(
     styles.get_value_with_local(
@@ -15148,7 +15218,7 @@ pub fn QuoteElem::attribution(self : QuoteElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn QuoteElem::attribution_local(self : QuoteElem) -> Value? {
+pub fn QuoteElem::attribution_local(self : QuoteElem) -> Attribution?? {
   match self.0.field_raw(quote_elem_attribution) {
     Some(v) => Some(view_cast(v, "quote.attribution"))
     None => None
@@ -15156,12 +15226,15 @@ pub fn QuoteElem::attribution_local(self : QuoteElem) -> Value? {
 }
 
 ///|
-pub fn QuoteElem::with_attribution(self : QuoteElem, v : Value) -> QuoteElem {
+pub fn QuoteElem::with_attribution(
+  self : QuoteElem,
+  v : Attribution?,
+) -> QuoteElem {
   QuoteElem(self.0.with_field(quote_elem_attribution, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn QuoteElem::attribution_in(styles : StyleChain) -> Value {
+pub fn QuoteElem::attribution_in(styles : StyleChain) -> Attribution? {
   view_cast(
     styles.get_field(quote_elem(), quote_elem_attribution),
     "quote.attribution",
@@ -15169,7 +15242,7 @@ pub fn QuoteElem::attribution_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn QuoteElem::set_attribution(v : Value) -> Style {
+pub fn QuoteElem::set_attribution(v : Attribution?) -> Style {
   Property(
     Property::new(
       quote_elem(),
@@ -15190,12 +15263,12 @@ pub fn QuoteElem::with_body(self : QuoteElem, v : Content) -> QuoteElem {
 }
 
 ///|
-pub fn QuoteElem::depth_in(styles : StyleChain) -> Value {
+pub fn QuoteElem::depth_in(styles : StyleChain) -> Depth {
   view_cast(styles.get_field(quote_elem(), quote_elem_depth), "quote.depth")
 }
 
 ///|
-pub fn QuoteElem::set_depth(v : Value) -> Style {
+pub fn QuoteElem::set_depth(v : Depth) -> Style {
   Property(
     Property::new(quote_elem(), quote_elem_depth, IntoValue::into_value(v)),
   )
@@ -15253,7 +15326,10 @@ pub fn RefElem::with_target(self : RefElem, v : Label) -> RefElem {
 }
 
 ///|
-pub fn RefElem::supplement(self : RefElem, styles : StyleChain) -> Value {
+pub fn RefElem::supplement(
+  self : RefElem,
+  styles : StyleChain,
+) -> Smart[Supplement?] {
   let e = ref_elem()
   view_cast(
     styles.get_value_with_local(
@@ -15266,7 +15342,7 @@ pub fn RefElem::supplement(self : RefElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn RefElem::supplement_local(self : RefElem) -> Value? {
+pub fn RefElem::supplement_local(self : RefElem) -> Smart[Supplement?]? {
   match self.0.field_raw(ref_elem_supplement) {
     Some(v) => Some(view_cast(v, "ref.supplement"))
     None => None
@@ -15274,24 +15350,27 @@ pub fn RefElem::supplement_local(self : RefElem) -> Value? {
 }
 
 ///|
-pub fn RefElem::with_supplement(self : RefElem, v : Value) -> RefElem {
+pub fn RefElem::with_supplement(
+  self : RefElem,
+  v : Smart[Supplement?],
+) -> RefElem {
   RefElem(self.0.with_field(ref_elem_supplement, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn RefElem::supplement_in(styles : StyleChain) -> Value {
+pub fn RefElem::supplement_in(styles : StyleChain) -> Smart[Supplement?] {
   view_cast(styles.get_field(ref_elem(), ref_elem_supplement), "ref.supplement")
 }
 
 ///|
-pub fn RefElem::set_supplement(v : Value) -> Style {
+pub fn RefElem::set_supplement(v : Smart[Supplement?]) -> Style {
   Property(
     Property::new(ref_elem(), ref_elem_supplement, IntoValue::into_value(v)),
   )
 }
 
 ///|
-pub fn RefElem::form(self : RefElem, styles : StyleChain) -> Value {
+pub fn RefElem::form(self : RefElem, styles : StyleChain) -> RefForm {
   let e = ref_elem()
   view_cast(
     styles.get_value_with_local(
@@ -15304,7 +15383,7 @@ pub fn RefElem::form(self : RefElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn RefElem::form_local(self : RefElem) -> Value? {
+pub fn RefElem::form_local(self : RefElem) -> RefForm? {
   match self.0.field_raw(ref_elem_form) {
     Some(v) => Some(view_cast(v, "ref.form"))
     None => None
@@ -15312,17 +15391,17 @@ pub fn RefElem::form_local(self : RefElem) -> Value? {
 }
 
 ///|
-pub fn RefElem::with_form(self : RefElem, v : Value) -> RefElem {
+pub fn RefElem::with_form(self : RefElem, v : RefForm) -> RefElem {
   RefElem(self.0.with_field(ref_elem_form, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn RefElem::form_in(styles : StyleChain) -> Value {
+pub fn RefElem::form_in(styles : StyleChain) -> RefForm {
   view_cast(styles.get_field(ref_elem(), ref_elem_form), "ref.form")
 }
 
 ///|
-pub fn RefElem::set_form(v : Value) -> Style {
+pub fn RefElem::set_form(v : RefForm) -> Style {
   Property(Property::new(ref_elem(), ref_elem_form, IntoValue::into_value(v)))
 }
 
@@ -15748,7 +15827,7 @@ pub fn TableElem::set_align(v : Celled[Smart[Alignment]]) -> Style {
 }
 
 ///|
-pub fn TableElem::fill(self : TableElem, styles : StyleChain) -> Value {
+pub fn TableElem::fill(self : TableElem, styles : StyleChain) -> Celled[Paint?] {
   let e = table_elem()
   view_cast(
     styles.get_value_with_local(
@@ -15761,7 +15840,7 @@ pub fn TableElem::fill(self : TableElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn TableElem::fill_local(self : TableElem) -> Value? {
+pub fn TableElem::fill_local(self : TableElem) -> Celled[Paint?]? {
   match self.0.field_raw(table_elem_fill) {
     Some(v) => Some(view_cast(v, "table.fill"))
     None => None
@@ -15769,24 +15848,27 @@ pub fn TableElem::fill_local(self : TableElem) -> Value? {
 }
 
 ///|
-pub fn TableElem::with_fill(self : TableElem, v : Value) -> TableElem {
+pub fn TableElem::with_fill(self : TableElem, v : Celled[Paint?]) -> TableElem {
   TableElem(self.0.with_field(table_elem_fill, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn TableElem::fill_in(styles : StyleChain) -> Value {
+pub fn TableElem::fill_in(styles : StyleChain) -> Celled[Paint?] {
   view_cast(styles.get_field(table_elem(), table_elem_fill), "table.fill")
 }
 
 ///|
-pub fn TableElem::set_fill(v : Value) -> Style {
+pub fn TableElem::set_fill(v : Celled[Paint?]) -> Style {
   Property(
     Property::new(table_elem(), table_elem_fill, IntoValue::into_value(v)),
   )
 }
 
 ///|
-pub fn TableElem::stroke(self : TableElem, styles : StyleChain) -> Value {
+pub fn TableElem::stroke(
+  self : TableElem,
+  styles : StyleChain,
+) -> Celled[Sides[Stroke??]] {
   let e = table_elem()
   view_cast(
     styles.get_value_with_local(
@@ -15799,7 +15881,7 @@ pub fn TableElem::stroke(self : TableElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn TableElem::stroke_local(self : TableElem) -> Value? {
+pub fn TableElem::stroke_local(self : TableElem) -> Celled[Sides[Stroke??]]? {
   match self.0.field_raw(table_elem_stroke) {
     Some(v) => Some(view_cast(v, "table.stroke"))
     None => None
@@ -15807,17 +15889,20 @@ pub fn TableElem::stroke_local(self : TableElem) -> Value? {
 }
 
 ///|
-pub fn TableElem::with_stroke(self : TableElem, v : Value) -> TableElem {
+pub fn TableElem::with_stroke(
+  self : TableElem,
+  v : Celled[Sides[Stroke??]],
+) -> TableElem {
   TableElem(self.0.with_field(table_elem_stroke, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn TableElem::stroke_in(styles : StyleChain) -> Value {
+pub fn TableElem::stroke_in(styles : StyleChain) -> Celled[Sides[Stroke??]] {
   view_cast(styles.get_field(table_elem(), table_elem_stroke), "table.stroke")
 }
 
 ///|
-pub fn TableElem::set_stroke(v : Value) -> Style {
+pub fn TableElem::set_stroke(v : Celled[Sides[Stroke??]]) -> Style {
   Property(
     Property::new(table_elem(), table_elem_stroke, IntoValue::into_value(v)),
   )
@@ -16332,7 +16417,7 @@ pub fn TableHLine::set_end(v : NonZeroUSize?) -> Style {
 }
 
 ///|
-pub fn TableHLine::stroke(self : TableHLine, styles : StyleChain) -> Value {
+pub fn TableHLine::stroke(self : TableHLine, styles : StyleChain) -> Stroke? {
   let e = table_h_line_elem()
   view_cast(
     styles.get_value_with_local(
@@ -16345,7 +16430,7 @@ pub fn TableHLine::stroke(self : TableHLine, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn TableHLine::stroke_local(self : TableHLine) -> Value? {
+pub fn TableHLine::stroke_local(self : TableHLine) -> Stroke?? {
   match self.0.field_raw(table_h_line_elem_stroke) {
     Some(v) => Some(view_cast(v, "hline.stroke"))
     None => None
@@ -16353,14 +16438,14 @@ pub fn TableHLine::stroke_local(self : TableHLine) -> Value? {
 }
 
 ///|
-pub fn TableHLine::with_stroke(self : TableHLine, v : Value) -> TableHLine {
+pub fn TableHLine::with_stroke(self : TableHLine, v : Stroke?) -> TableHLine {
   TableHLine(
     self.0.with_field(table_h_line_elem_stroke, IntoValue::into_value(v)),
   )
 }
 
 ///|
-pub fn TableHLine::stroke_in(styles : StyleChain) -> Value {
+pub fn TableHLine::stroke_in(styles : StyleChain) -> Stroke? {
   view_cast(
     styles.get_field(table_h_line_elem(), table_h_line_elem_stroke),
     "hline.stroke",
@@ -16368,7 +16453,7 @@ pub fn TableHLine::stroke_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn TableHLine::set_stroke(v : Value) -> Style {
+pub fn TableHLine::set_stroke(v : Stroke?) -> Style {
   Property(
     Property::new(
       table_h_line_elem(),
@@ -16608,7 +16693,7 @@ pub fn TableVLine::set_end(v : NonZeroUSize?) -> Style {
 }
 
 ///|
-pub fn TableVLine::stroke(self : TableVLine, styles : StyleChain) -> Value {
+pub fn TableVLine::stroke(self : TableVLine, styles : StyleChain) -> Stroke? {
   let e = table_v_line_elem()
   view_cast(
     styles.get_value_with_local(
@@ -16621,7 +16706,7 @@ pub fn TableVLine::stroke(self : TableVLine, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn TableVLine::stroke_local(self : TableVLine) -> Value? {
+pub fn TableVLine::stroke_local(self : TableVLine) -> Stroke?? {
   match self.0.field_raw(table_v_line_elem_stroke) {
     Some(v) => Some(view_cast(v, "vline.stroke"))
     None => None
@@ -16629,14 +16714,14 @@ pub fn TableVLine::stroke_local(self : TableVLine) -> Value? {
 }
 
 ///|
-pub fn TableVLine::with_stroke(self : TableVLine, v : Value) -> TableVLine {
+pub fn TableVLine::with_stroke(self : TableVLine, v : Stroke?) -> TableVLine {
   TableVLine(
     self.0.with_field(table_v_line_elem_stroke, IntoValue::into_value(v)),
   )
 }
 
 ///|
-pub fn TableVLine::stroke_in(styles : StyleChain) -> Value {
+pub fn TableVLine::stroke_in(styles : StyleChain) -> Stroke? {
   view_cast(
     styles.get_field(table_v_line_elem(), table_v_line_elem_stroke),
     "vline.stroke",
@@ -16644,7 +16729,7 @@ pub fn TableVLine::stroke_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn TableVLine::set_stroke(v : Value) -> Style {
+pub fn TableVLine::set_stroke(v : Stroke?) -> Style {
   Property(
     Property::new(
       table_v_line_elem(),
@@ -17039,7 +17124,7 @@ pub fn TableCell::set_align(v : Smart[Alignment]) -> Style {
 }
 
 ///|
-pub fn TableCell::fill(self : TableCell, styles : StyleChain) -> Value {
+pub fn TableCell::fill(self : TableCell, styles : StyleChain) -> Smart[Paint?] {
   let e = table_cell_elem()
   view_cast(
     styles.get_value_with_local(
@@ -17052,7 +17137,7 @@ pub fn TableCell::fill(self : TableCell, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn TableCell::fill_local(self : TableCell) -> Value? {
+pub fn TableCell::fill_local(self : TableCell) -> Smart[Paint?]? {
   match self.0.field_raw(table_cell_elem_fill) {
     Some(v) => Some(view_cast(v, "cell.fill"))
     None => None
@@ -17060,12 +17145,12 @@ pub fn TableCell::fill_local(self : TableCell) -> Value? {
 }
 
 ///|
-pub fn TableCell::with_fill(self : TableCell, v : Value) -> TableCell {
+pub fn TableCell::with_fill(self : TableCell, v : Smart[Paint?]) -> TableCell {
   TableCell(self.0.with_field(table_cell_elem_fill, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn TableCell::fill_in(styles : StyleChain) -> Value {
+pub fn TableCell::fill_in(styles : StyleChain) -> Smart[Paint?] {
   view_cast(
     styles.get_field(table_cell_elem(), table_cell_elem_fill),
     "cell.fill",
@@ -17073,7 +17158,7 @@ pub fn TableCell::fill_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn TableCell::set_fill(v : Value) -> Style {
+pub fn TableCell::set_fill(v : Smart[Paint?]) -> Style {
   Property(
     Property::new(
       table_cell_elem(),
@@ -17084,7 +17169,10 @@ pub fn TableCell::set_fill(v : Value) -> Style {
 }
 
 ///|
-pub fn TableCell::stroke(self : TableCell, styles : StyleChain) -> Value {
+pub fn TableCell::stroke(
+  self : TableCell,
+  styles : StyleChain,
+) -> Sides[Stroke??] {
   let e = table_cell_elem()
   view_cast(
     styles.get_value_with_local(
@@ -17097,7 +17185,7 @@ pub fn TableCell::stroke(self : TableCell, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn TableCell::stroke_local(self : TableCell) -> Value? {
+pub fn TableCell::stroke_local(self : TableCell) -> Sides[Stroke??]? {
   match self.0.field_raw(table_cell_elem_stroke) {
     Some(v) => Some(view_cast(v, "cell.stroke"))
     None => None
@@ -17105,12 +17193,15 @@ pub fn TableCell::stroke_local(self : TableCell) -> Value? {
 }
 
 ///|
-pub fn TableCell::with_stroke(self : TableCell, v : Value) -> TableCell {
+pub fn TableCell::with_stroke(
+  self : TableCell,
+  v : Sides[Stroke??],
+) -> TableCell {
   TableCell(self.0.with_field(table_cell_elem_stroke, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn TableCell::stroke_in(styles : StyleChain) -> Value {
+pub fn TableCell::stroke_in(styles : StyleChain) -> Sides[Stroke??] {
   view_cast(
     styles.get_field(table_cell_elem(), table_cell_elem_stroke),
     "cell.stroke",
@@ -17118,7 +17209,7 @@ pub fn TableCell::stroke_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn TableCell::set_stroke(v : Value) -> Style {
+pub fn TableCell::set_stroke(v : Sides[Stroke??]) -> Style {
   Property(
     Property::new(
       table_cell_elem(),
@@ -17504,12 +17595,15 @@ pub fn TermsElem::set_spacing(v : Smart[Length]) -> Style {
 }
 
 ///|
-pub fn TermsElem::children(self : TermsElem) -> Value {
+pub fn TermsElem::children(self : TermsElem) -> Array[TermItem] {
   view_cast(self.0.field_raw(terms_elem_children).unwrap(), "terms.children")
 }
 
 ///|
-pub fn TermsElem::with_children(self : TermsElem, v : Value) -> TermsElem {
+pub fn TermsElem::with_children(
+  self : TermsElem,
+  v : Array[TermItem],
+) -> TermsElem {
   TermsElem(self.0.with_field(terms_elem_children, IntoValue::into_value(v)))
 }
 
@@ -17526,17 +17620,13 @@ pub fn TermsElem::set_within(v : Bool) -> Style {
 }
 
 ///|
-pub fn TermsElem::new(children_ : Value) -> TermsElem {
+pub fn TermsElem::new(children_ : Array[TermItem]) -> TermsElem {
   TermsElem(
     Content::new(terms_elem(), [
       (terms_elem_children, IntoValue::into_value(children_)),
     ]),
   )
 }
-
-///|
-/// Typed view of `item` content (upstream `Packed<TermItem>`).
-pub struct TermItem(Content)
 
 ///|
 /// View content as `item` if it is one.
@@ -17718,7 +17808,7 @@ pub impl NativeElement for UnderlineElem with fn into_content(self) {
 pub fn UnderlineElem::stroke(
   self : UnderlineElem,
   styles : StyleChain,
-) -> Value {
+) -> Smart[Stroke] {
   let e = underline_elem()
   view_cast(
     styles.get_value_with_local(
@@ -17731,7 +17821,7 @@ pub fn UnderlineElem::stroke(
 }
 
 ///|
-pub fn UnderlineElem::stroke_local(self : UnderlineElem) -> Value? {
+pub fn UnderlineElem::stroke_local(self : UnderlineElem) -> Smart[Stroke]? {
   match self.0.field_raw(underline_elem_stroke) {
     Some(v) => Some(view_cast(v, "underline.stroke"))
     None => None
@@ -17741,7 +17831,7 @@ pub fn UnderlineElem::stroke_local(self : UnderlineElem) -> Value? {
 ///|
 pub fn UnderlineElem::with_stroke(
   self : UnderlineElem,
-  v : Value,
+  v : Smart[Stroke],
 ) -> UnderlineElem {
   UnderlineElem(
     self.0.with_field(underline_elem_stroke, IntoValue::into_value(v)),
@@ -17749,7 +17839,7 @@ pub fn UnderlineElem::with_stroke(
 }
 
 ///|
-pub fn UnderlineElem::stroke_in(styles : StyleChain) -> Value {
+pub fn UnderlineElem::stroke_in(styles : StyleChain) -> Smart[Stroke] {
   view_cast(
     styles.get_field(underline_elem(), underline_elem_stroke),
     "underline.stroke",
@@ -17757,7 +17847,7 @@ pub fn UnderlineElem::stroke_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn UnderlineElem::set_stroke(v : Value) -> Style {
+pub fn UnderlineElem::set_stroke(v : Smart[Stroke]) -> Style {
   Property(
     Property::new(
       underline_elem(),
@@ -18035,7 +18125,10 @@ pub impl NativeElement for OverlineElem with fn into_content(self) {
 }
 
 ///|
-pub fn OverlineElem::stroke(self : OverlineElem, styles : StyleChain) -> Value {
+pub fn OverlineElem::stroke(
+  self : OverlineElem,
+  styles : StyleChain,
+) -> Smart[Stroke] {
   let e = overline_elem()
   view_cast(
     styles.get_value_with_local(
@@ -18048,7 +18141,7 @@ pub fn OverlineElem::stroke(self : OverlineElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn OverlineElem::stroke_local(self : OverlineElem) -> Value? {
+pub fn OverlineElem::stroke_local(self : OverlineElem) -> Smart[Stroke]? {
   match self.0.field_raw(overline_elem_stroke) {
     Some(v) => Some(view_cast(v, "overline.stroke"))
     None => None
@@ -18058,7 +18151,7 @@ pub fn OverlineElem::stroke_local(self : OverlineElem) -> Value? {
 ///|
 pub fn OverlineElem::with_stroke(
   self : OverlineElem,
-  v : Value,
+  v : Smart[Stroke],
 ) -> OverlineElem {
   OverlineElem(
     self.0.with_field(overline_elem_stroke, IntoValue::into_value(v)),
@@ -18066,7 +18159,7 @@ pub fn OverlineElem::with_stroke(
 }
 
 ///|
-pub fn OverlineElem::stroke_in(styles : StyleChain) -> Value {
+pub fn OverlineElem::stroke_in(styles : StyleChain) -> Smart[Stroke] {
   view_cast(
     styles.get_field(overline_elem(), overline_elem_stroke),
     "overline.stroke",
@@ -18074,7 +18167,7 @@ pub fn OverlineElem::stroke_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn OverlineElem::set_stroke(v : Value) -> Style {
+pub fn OverlineElem::set_stroke(v : Smart[Stroke]) -> Style {
   Property(
     Property::new(
       overline_elem(),
@@ -18342,7 +18435,10 @@ pub impl NativeElement for StrikeElem with fn into_content(self) {
 }
 
 ///|
-pub fn StrikeElem::stroke(self : StrikeElem, styles : StyleChain) -> Value {
+pub fn StrikeElem::stroke(
+  self : StrikeElem,
+  styles : StyleChain,
+) -> Smart[Stroke] {
   let e = strike_elem()
   view_cast(
     styles.get_value_with_local(
@@ -18355,7 +18451,7 @@ pub fn StrikeElem::stroke(self : StrikeElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn StrikeElem::stroke_local(self : StrikeElem) -> Value? {
+pub fn StrikeElem::stroke_local(self : StrikeElem) -> Smart[Stroke]? {
   match self.0.field_raw(strike_elem_stroke) {
     Some(v) => Some(view_cast(v, "strike.stroke"))
     None => None
@@ -18363,12 +18459,15 @@ pub fn StrikeElem::stroke_local(self : StrikeElem) -> Value? {
 }
 
 ///|
-pub fn StrikeElem::with_stroke(self : StrikeElem, v : Value) -> StrikeElem {
+pub fn StrikeElem::with_stroke(
+  self : StrikeElem,
+  v : Smart[Stroke],
+) -> StrikeElem {
   StrikeElem(self.0.with_field(strike_elem_stroke, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn StrikeElem::stroke_in(styles : StyleChain) -> Value {
+pub fn StrikeElem::stroke_in(styles : StyleChain) -> Smart[Stroke] {
   view_cast(
     styles.get_field(strike_elem(), strike_elem_stroke),
     "strike.stroke",
@@ -18376,7 +18475,7 @@ pub fn StrikeElem::stroke_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn StrikeElem::set_stroke(v : Value) -> Style {
+pub fn StrikeElem::set_stroke(v : Smart[Stroke]) -> Style {
   Property(
     Property::new(strike_elem(), strike_elem_stroke, IntoValue::into_value(v)),
   )
@@ -18571,7 +18670,7 @@ pub impl NativeElement for HighlightElem with fn into_content(self) {
 }
 
 ///|
-pub fn HighlightElem::fill(self : HighlightElem, styles : StyleChain) -> Value {
+pub fn HighlightElem::fill(self : HighlightElem, styles : StyleChain) -> Paint? {
   let e = highlight_elem()
   view_cast(
     styles.get_value_with_local(
@@ -18584,7 +18683,7 @@ pub fn HighlightElem::fill(self : HighlightElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn HighlightElem::fill_local(self : HighlightElem) -> Value? {
+pub fn HighlightElem::fill_local(self : HighlightElem) -> Paint?? {
   match self.0.field_raw(highlight_elem_fill) {
     Some(v) => Some(view_cast(v, "highlight.fill"))
     None => None
@@ -18594,7 +18693,7 @@ pub fn HighlightElem::fill_local(self : HighlightElem) -> Value? {
 ///|
 pub fn HighlightElem::with_fill(
   self : HighlightElem,
-  v : Value,
+  v : Paint?,
 ) -> HighlightElem {
   HighlightElem(
     self.0.with_field(highlight_elem_fill, IntoValue::into_value(v)),
@@ -18602,7 +18701,7 @@ pub fn HighlightElem::with_fill(
 }
 
 ///|
-pub fn HighlightElem::fill_in(styles : StyleChain) -> Value {
+pub fn HighlightElem::fill_in(styles : StyleChain) -> Paint? {
   view_cast(
     styles.get_field(highlight_elem(), highlight_elem_fill),
     "highlight.fill",
@@ -18610,7 +18709,7 @@ pub fn HighlightElem::fill_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn HighlightElem::set_fill(v : Value) -> Style {
+pub fn HighlightElem::set_fill(v : Paint?) -> Style {
   Property(
     Property::new(
       highlight_elem(),
@@ -18624,7 +18723,7 @@ pub fn HighlightElem::set_fill(v : Value) -> Style {
 pub fn HighlightElem::stroke(
   self : HighlightElem,
   styles : StyleChain,
-) -> Value {
+) -> Sides[Stroke??] {
   let e = highlight_elem()
   view_cast(
     styles.get_value_with_local(
@@ -18637,7 +18736,7 @@ pub fn HighlightElem::stroke(
 }
 
 ///|
-pub fn HighlightElem::stroke_local(self : HighlightElem) -> Value? {
+pub fn HighlightElem::stroke_local(self : HighlightElem) -> Sides[Stroke??]? {
   match self.0.field_raw(highlight_elem_stroke) {
     Some(v) => Some(view_cast(v, "highlight.stroke"))
     None => None
@@ -18647,7 +18746,7 @@ pub fn HighlightElem::stroke_local(self : HighlightElem) -> Value? {
 ///|
 pub fn HighlightElem::with_stroke(
   self : HighlightElem,
-  v : Value,
+  v : Sides[Stroke??],
 ) -> HighlightElem {
   HighlightElem(
     self.0.with_field(highlight_elem_stroke, IntoValue::into_value(v)),
@@ -18655,7 +18754,7 @@ pub fn HighlightElem::with_stroke(
 }
 
 ///|
-pub fn HighlightElem::stroke_in(styles : StyleChain) -> Value {
+pub fn HighlightElem::stroke_in(styles : StyleChain) -> Sides[Stroke??] {
   view_cast(
     styles.get_field(highlight_elem(), highlight_elem_stroke),
     "highlight.stroke",
@@ -18663,7 +18762,7 @@ pub fn HighlightElem::stroke_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn HighlightElem::set_stroke(v : Value) -> Style {
+pub fn HighlightElem::set_stroke(v : Sides[Stroke??]) -> Style {
   Property(
     Property::new(
       highlight_elem(),
@@ -18677,7 +18776,7 @@ pub fn HighlightElem::set_stroke(v : Value) -> Style {
 pub fn HighlightElem::top_edge(
   self : HighlightElem,
   styles : StyleChain,
-) -> Value {
+) -> TopEdge {
   let e = highlight_elem()
   view_cast(
     styles.get_value_with_local(
@@ -18690,7 +18789,7 @@ pub fn HighlightElem::top_edge(
 }
 
 ///|
-pub fn HighlightElem::top_edge_local(self : HighlightElem) -> Value? {
+pub fn HighlightElem::top_edge_local(self : HighlightElem) -> TopEdge? {
   match self.0.field_raw(highlight_elem_top_edge) {
     Some(v) => Some(view_cast(v, "highlight.top-edge"))
     None => None
@@ -18700,7 +18799,7 @@ pub fn HighlightElem::top_edge_local(self : HighlightElem) -> Value? {
 ///|
 pub fn HighlightElem::with_top_edge(
   self : HighlightElem,
-  v : Value,
+  v : TopEdge,
 ) -> HighlightElem {
   HighlightElem(
     self.0.with_field(highlight_elem_top_edge, IntoValue::into_value(v)),
@@ -18708,7 +18807,7 @@ pub fn HighlightElem::with_top_edge(
 }
 
 ///|
-pub fn HighlightElem::top_edge_in(styles : StyleChain) -> Value {
+pub fn HighlightElem::top_edge_in(styles : StyleChain) -> TopEdge {
   view_cast(
     styles.get_field(highlight_elem(), highlight_elem_top_edge),
     "highlight.top-edge",
@@ -18716,7 +18815,7 @@ pub fn HighlightElem::top_edge_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn HighlightElem::set_top_edge(v : Value) -> Style {
+pub fn HighlightElem::set_top_edge(v : TopEdge) -> Style {
   Property(
     Property::new(
       highlight_elem(),
@@ -18730,7 +18829,7 @@ pub fn HighlightElem::set_top_edge(v : Value) -> Style {
 pub fn HighlightElem::bottom_edge(
   self : HighlightElem,
   styles : StyleChain,
-) -> Value {
+) -> BottomEdge {
   let e = highlight_elem()
   view_cast(
     styles.get_value_with_local(
@@ -18743,7 +18842,7 @@ pub fn HighlightElem::bottom_edge(
 }
 
 ///|
-pub fn HighlightElem::bottom_edge_local(self : HighlightElem) -> Value? {
+pub fn HighlightElem::bottom_edge_local(self : HighlightElem) -> BottomEdge? {
   match self.0.field_raw(highlight_elem_bottom_edge) {
     Some(v) => Some(view_cast(v, "highlight.bottom-edge"))
     None => None
@@ -18753,7 +18852,7 @@ pub fn HighlightElem::bottom_edge_local(self : HighlightElem) -> Value? {
 ///|
 pub fn HighlightElem::with_bottom_edge(
   self : HighlightElem,
-  v : Value,
+  v : BottomEdge,
 ) -> HighlightElem {
   HighlightElem(
     self.0.with_field(highlight_elem_bottom_edge, IntoValue::into_value(v)),
@@ -18761,7 +18860,7 @@ pub fn HighlightElem::with_bottom_edge(
 }
 
 ///|
-pub fn HighlightElem::bottom_edge_in(styles : StyleChain) -> Value {
+pub fn HighlightElem::bottom_edge_in(styles : StyleChain) -> BottomEdge {
   view_cast(
     styles.get_field(highlight_elem(), highlight_elem_bottom_edge),
     "highlight.bottom-edge",
@@ -18769,7 +18868,7 @@ pub fn HighlightElem::bottom_edge_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn HighlightElem::set_bottom_edge(v : Value) -> Style {
+pub fn HighlightElem::set_bottom_edge(v : BottomEdge) -> Style {
   Property(
     Property::new(
       highlight_elem(),
@@ -19034,12 +19133,12 @@ pub impl NativeElement for TextElem with fn into_content(self) {
 }
 
 ///|
-pub fn TextElem::font_in(styles : StyleChain) -> Value {
+pub fn TextElem::font_in(styles : StyleChain) -> FontList {
   view_cast(styles.get_field(text_elem(), text_elem_font), "text.font")
 }
 
 ///|
-pub fn TextElem::set_font(v : Value) -> Style {
+pub fn TextElem::set_font(v : FontList) -> Style {
   Property(Property::new(text_elem(), text_elem_font, IntoValue::into_value(v)))
 }
 
@@ -19056,68 +19155,68 @@ pub fn TextElem::set_fallback(v : Bool) -> Style {
 }
 
 ///|
-pub fn TextElem::style_in(styles : StyleChain) -> Value {
+pub fn TextElem::style_in(styles : StyleChain) -> FontStyle {
   view_cast(styles.get_field(text_elem(), text_elem_style), "text.style")
 }
 
 ///|
-pub fn TextElem::set_style(v : Value) -> Style {
+pub fn TextElem::set_style(v : FontStyle) -> Style {
   Property(
     Property::new(text_elem(), text_elem_style, IntoValue::into_value(v)),
   )
 }
 
 ///|
-pub fn TextElem::weight_in(styles : StyleChain) -> Value {
+pub fn TextElem::weight_in(styles : StyleChain) -> FontWeight {
   view_cast(styles.get_field(text_elem(), text_elem_weight), "text.weight")
 }
 
 ///|
-pub fn TextElem::set_weight(v : Value) -> Style {
+pub fn TextElem::set_weight(v : FontWeight) -> Style {
   Property(
     Property::new(text_elem(), text_elem_weight, IntoValue::into_value(v)),
   )
 }
 
 ///|
-pub fn TextElem::stretch_in(styles : StyleChain) -> Value {
+pub fn TextElem::stretch_in(styles : StyleChain) -> FontStretch {
   view_cast(styles.get_field(text_elem(), text_elem_stretch), "text.stretch")
 }
 
 ///|
-pub fn TextElem::set_stretch(v : Value) -> Style {
+pub fn TextElem::set_stretch(v : FontStretch) -> Style {
   Property(
     Property::new(text_elem(), text_elem_stretch, IntoValue::into_value(v)),
   )
 }
 
 ///|
-pub fn TextElem::size_in(styles : StyleChain) -> Value {
+pub fn TextElem::size_in(styles : StyleChain) -> TextSize {
   view_cast(styles.get_field(text_elem(), text_elem_size), "text.size")
 }
 
 ///|
-pub fn TextElem::set_size(v : Value) -> Style {
+pub fn TextElem::set_size(v : TextSize) -> Style {
   Property(Property::new(text_elem(), text_elem_size, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn TextElem::fill_in(styles : StyleChain) -> Value {
+pub fn TextElem::fill_in(styles : StyleChain) -> Paint {
   view_cast(styles.get_field(text_elem(), text_elem_fill), "text.fill")
 }
 
 ///|
-pub fn TextElem::set_fill(v : Value) -> Style {
+pub fn TextElem::set_fill(v : Paint) -> Style {
   Property(Property::new(text_elem(), text_elem_fill, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn TextElem::stroke_in(styles : StyleChain) -> Value {
+pub fn TextElem::stroke_in(styles : StyleChain) -> Stroke? {
   view_cast(styles.get_field(text_elem(), text_elem_stroke), "text.stroke")
 }
 
 ///|
-pub fn TextElem::set_stroke(v : Value) -> Style {
+pub fn TextElem::set_stroke(v : Stroke?) -> Style {
   Property(
     Property::new(text_elem(), text_elem_stroke, IntoValue::into_value(v)),
   )
@@ -19148,7 +19247,7 @@ pub fn TextElem::set_spacing(v : Rel[Length]) -> Style {
 }
 
 ///|
-pub fn TextElem::cjk_latin_spacing_in(styles : StyleChain) -> Value {
+pub fn TextElem::cjk_latin_spacing_in(styles : StyleChain) -> Smart[Never?] {
   view_cast(
     styles.get_field(text_elem(), text_elem_cjk_latin_spacing),
     "text.cjk-latin-spacing",
@@ -19156,7 +19255,7 @@ pub fn TextElem::cjk_latin_spacing_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn TextElem::set_cjk_latin_spacing(v : Value) -> Style {
+pub fn TextElem::set_cjk_latin_spacing(v : Smart[Never?]) -> Style {
   Property(
     Property::new(
       text_elem(),
@@ -19191,19 +19290,19 @@ pub fn TextElem::set_overhang(v : Bool) -> Style {
 }
 
 ///|
-pub fn TextElem::top_edge_in(styles : StyleChain) -> Value {
+pub fn TextElem::top_edge_in(styles : StyleChain) -> TopEdge {
   view_cast(styles.get_field(text_elem(), text_elem_top_edge), "text.top-edge")
 }
 
 ///|
-pub fn TextElem::set_top_edge(v : Value) -> Style {
+pub fn TextElem::set_top_edge(v : TopEdge) -> Style {
   Property(
     Property::new(text_elem(), text_elem_top_edge, IntoValue::into_value(v)),
   )
 }
 
 ///|
-pub fn TextElem::bottom_edge_in(styles : StyleChain) -> Value {
+pub fn TextElem::bottom_edge_in(styles : StyleChain) -> BottomEdge {
   view_cast(
     styles.get_field(text_elem(), text_elem_bottom_edge),
     "text.bottom-edge",
@@ -19211,53 +19310,53 @@ pub fn TextElem::bottom_edge_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn TextElem::set_bottom_edge(v : Value) -> Style {
+pub fn TextElem::set_bottom_edge(v : BottomEdge) -> Style {
   Property(
     Property::new(text_elem(), text_elem_bottom_edge, IntoValue::into_value(v)),
   )
 }
 
 ///|
-pub fn TextElem::lang_in(styles : StyleChain) -> Value {
+pub fn TextElem::lang_in(styles : StyleChain) -> Lang {
   view_cast(styles.get_field(text_elem(), text_elem_lang), "text.lang")
 }
 
 ///|
-pub fn TextElem::set_lang(v : Value) -> Style {
+pub fn TextElem::set_lang(v : Lang) -> Style {
   Property(Property::new(text_elem(), text_elem_lang, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn TextElem::region_in(styles : StyleChain) -> Value {
+pub fn TextElem::region_in(styles : StyleChain) -> Region? {
   view_cast(styles.get_field(text_elem(), text_elem_region), "text.region")
 }
 
 ///|
-pub fn TextElem::set_region(v : Value) -> Style {
+pub fn TextElem::set_region(v : Region?) -> Style {
   Property(
     Property::new(text_elem(), text_elem_region, IntoValue::into_value(v)),
   )
 }
 
 ///|
-pub fn TextElem::script_in(styles : StyleChain) -> Value {
+pub fn TextElem::script_in(styles : StyleChain) -> Smart[WritingScript] {
   view_cast(styles.get_field(text_elem(), text_elem_script), "text.script")
 }
 
 ///|
-pub fn TextElem::set_script(v : Value) -> Style {
+pub fn TextElem::set_script(v : Smart[WritingScript]) -> Style {
   Property(
     Property::new(text_elem(), text_elem_script, IntoValue::into_value(v)),
   )
 }
 
 ///|
-pub fn TextElem::dir_in(styles : StyleChain) -> Value {
+pub fn TextElem::dir_in(styles : StyleChain) -> TextDir {
   view_cast(styles.get_field(text_elem(), text_elem_dir), "text.dir")
 }
 
 ///|
-pub fn TextElem::set_dir(v : Value) -> Style {
+pub fn TextElem::set_dir(v : TextDir) -> Style {
   Property(Property::new(text_elem(), text_elem_dir, IntoValue::into_value(v)))
 }
 
@@ -19277,12 +19376,12 @@ pub fn TextElem::set_hyphenate(v : Smart[Bool]) -> Style {
 }
 
 ///|
-pub fn TextElem::costs_in(styles : StyleChain) -> Value {
+pub fn TextElem::costs_in(styles : StyleChain) -> Costs {
   view_cast(styles.get_field(text_elem(), text_elem_costs), "text.costs")
 }
 
 ///|
-pub fn TextElem::set_costs(v : Value) -> Style {
+pub fn TextElem::set_costs(v : Costs) -> Style {
   Property(
     Property::new(text_elem(), text_elem_costs, IntoValue::into_value(v)),
   )
@@ -19301,7 +19400,7 @@ pub fn TextElem::set_kerning(v : Bool) -> Style {
 }
 
 ///|
-pub fn TextElem::alternates_in(styles : StyleChain) -> Value {
+pub fn TextElem::alternates_in(styles : StyleChain) -> Alternates {
   view_cast(
     styles.get_field(text_elem(), text_elem_alternates),
     "text.alternates",
@@ -19309,14 +19408,14 @@ pub fn TextElem::alternates_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn TextElem::set_alternates(v : Value) -> Style {
+pub fn TextElem::set_alternates(v : Alternates) -> Style {
   Property(
     Property::new(text_elem(), text_elem_alternates, IntoValue::into_value(v)),
   )
 }
 
 ///|
-pub fn TextElem::stylistic_set_in(styles : StyleChain) -> Value {
+pub fn TextElem::stylistic_set_in(styles : StyleChain) -> StylisticSets {
   view_cast(
     styles.get_field(text_elem(), text_elem_stylistic_set),
     "text.stylistic-set",
@@ -19324,7 +19423,7 @@ pub fn TextElem::stylistic_set_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn TextElem::set_stylistic_set(v : Value) -> Style {
+pub fn TextElem::set_stylistic_set(v : StylisticSets) -> Style {
   Property(
     Property::new(
       text_elem(),
@@ -19388,7 +19487,7 @@ pub fn TextElem::set_historical_ligatures(v : Bool) -> Style {
 }
 
 ///|
-pub fn TextElem::number_type_in(styles : StyleChain) -> Value {
+pub fn TextElem::number_type_in(styles : StyleChain) -> Smart[NumberType] {
   view_cast(
     styles.get_field(text_elem(), text_elem_number_type),
     "text.number-type",
@@ -19396,14 +19495,14 @@ pub fn TextElem::number_type_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn TextElem::set_number_type(v : Value) -> Style {
+pub fn TextElem::set_number_type(v : Smart[NumberType]) -> Style {
   Property(
     Property::new(text_elem(), text_elem_number_type, IntoValue::into_value(v)),
   )
 }
 
 ///|
-pub fn TextElem::number_width_in(styles : StyleChain) -> Value {
+pub fn TextElem::number_width_in(styles : StyleChain) -> Smart[NumberWidth] {
   view_cast(
     styles.get_field(text_elem(), text_elem_number_width),
     "text.number-width",
@@ -19411,7 +19510,7 @@ pub fn TextElem::number_width_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn TextElem::set_number_width(v : Value) -> Style {
+pub fn TextElem::set_number_width(v : Smart[NumberWidth]) -> Style {
   Property(
     Property::new(text_elem(), text_elem_number_width, IntoValue::into_value(v)),
   )
@@ -19448,19 +19547,19 @@ pub fn TextElem::set_fractions(v : Bool) -> Style {
 }
 
 ///|
-pub fn TextElem::features_in(styles : StyleChain) -> Value {
+pub fn TextElem::features_in(styles : StyleChain) -> FontFeatures {
   view_cast(styles.get_field(text_elem(), text_elem_features), "text.features")
 }
 
 ///|
-pub fn TextElem::set_features(v : Value) -> Style {
+pub fn TextElem::set_features(v : FontFeatures) -> Style {
   Property(
     Property::new(text_elem(), text_elem_features, IntoValue::into_value(v)),
   )
 }
 
 ///|
-pub fn TextElem::variations_in(styles : StyleChain) -> Value {
+pub fn TextElem::variations_in(styles : StyleChain) -> FontVariations {
   view_cast(
     styles.get_field(text_elem(), text_elem_variations),
     "text.variations",
@@ -19468,7 +19567,7 @@ pub fn TextElem::variations_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn TextElem::set_variations(v : Value) -> Style {
+pub fn TextElem::set_variations(v : FontVariations) -> Style {
   Property(
     Property::new(text_elem(), text_elem_variations, IntoValue::into_value(v)),
   )
@@ -19500,24 +19599,24 @@ pub fn TextElem::set_span_offset(v : USize) -> Style {
 }
 
 ///|
-pub fn TextElem::delta_in(styles : StyleChain) -> Value {
+pub fn TextElem::delta_in(styles : StyleChain) -> WeightDelta {
   view_cast(styles.get_field(text_elem(), text_elem_delta), "text.delta")
 }
 
 ///|
-pub fn TextElem::set_delta(v : Value) -> Style {
+pub fn TextElem::set_delta(v : WeightDelta) -> Style {
   Property(
     Property::new(text_elem(), text_elem_delta, IntoValue::into_value(v)),
   )
 }
 
 ///|
-pub fn TextElem::emph_in(styles : StyleChain) -> Value {
+pub fn TextElem::emph_in(styles : StyleChain) -> ItalicToggle {
   view_cast(styles.get_field(text_elem(), text_elem_emph), "text.emph")
 }
 
 ///|
-pub fn TextElem::set_emph(v : Value) -> Style {
+pub fn TextElem::set_emph(v : ItalicToggle) -> Style {
   Property(Property::new(text_elem(), text_elem_emph, IntoValue::into_value(v)))
 }
 
@@ -19613,12 +19712,12 @@ pub impl NativeElement for RawElem with fn into_content(self) {
 }
 
 ///|
-pub fn RawElem::text(self : RawElem) -> Value {
+pub fn RawElem::text(self : RawElem) -> RawContent {
   view_cast(self.0.field_raw(raw_elem_text).unwrap(), "raw.text")
 }
 
 ///|
-pub fn RawElem::with_text(self : RawElem, v : Value) -> RawElem {
+pub fn RawElem::with_text(self : RawElem, v : RawContent) -> RawElem {
   RawElem(self.0.with_field(raw_elem_text, IntoValue::into_value(v)))
 }
 
@@ -19856,7 +19955,7 @@ pub fn RawElem::with_lines(self : RawElem, v : Value) -> RawElem {
 }
 
 ///|
-pub fn RawElem::new(text_ : Value) -> RawElem {
+pub fn RawElem::new(text_ : RawContent) -> RawElem {
   RawElem(
     Content::new(raw_elem(), [(raw_elem_text, IntoValue::into_value(text_))]),
   )
@@ -20067,7 +20166,7 @@ pub fn SubElem::set_baseline(v : Smart[Length]) -> Style {
 }
 
 ///|
-pub fn SubElem::size(self : SubElem, styles : StyleChain) -> Value {
+pub fn SubElem::size(self : SubElem, styles : StyleChain) -> Smart[TextSize] {
   let e = sub_elem()
   view_cast(
     styles.get_value_with_local(
@@ -20080,7 +20179,7 @@ pub fn SubElem::size(self : SubElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn SubElem::size_local(self : SubElem) -> Value? {
+pub fn SubElem::size_local(self : SubElem) -> Smart[TextSize]? {
   match self.0.field_raw(sub_elem_size) {
     Some(v) => Some(view_cast(v, "sub.size"))
     None => None
@@ -20088,17 +20187,17 @@ pub fn SubElem::size_local(self : SubElem) -> Value? {
 }
 
 ///|
-pub fn SubElem::with_size(self : SubElem, v : Value) -> SubElem {
+pub fn SubElem::with_size(self : SubElem, v : Smart[TextSize]) -> SubElem {
   SubElem(self.0.with_field(sub_elem_size, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn SubElem::size_in(styles : StyleChain) -> Value {
+pub fn SubElem::size_in(styles : StyleChain) -> Smart[TextSize] {
   view_cast(styles.get_field(sub_elem(), sub_elem_size), "sub.size")
 }
 
 ///|
-pub fn SubElem::set_size(v : Value) -> Style {
+pub fn SubElem::set_size(v : Smart[TextSize]) -> Style {
   Property(Property::new(sub_elem(), sub_elem_size, IntoValue::into_value(v)))
 }
 
@@ -20246,7 +20345,10 @@ pub fn SuperElem::set_baseline(v : Smart[Length]) -> Style {
 }
 
 ///|
-pub fn SuperElem::size(self : SuperElem, styles : StyleChain) -> Value {
+pub fn SuperElem::size(
+  self : SuperElem,
+  styles : StyleChain,
+) -> Smart[TextSize] {
   let e = super_elem()
   view_cast(
     styles.get_value_with_local(
@@ -20259,7 +20361,7 @@ pub fn SuperElem::size(self : SuperElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn SuperElem::size_local(self : SuperElem) -> Value? {
+pub fn SuperElem::size_local(self : SuperElem) -> Smart[TextSize]? {
   match self.0.field_raw(super_elem_size) {
     Some(v) => Some(view_cast(v, "super.size"))
     None => None
@@ -20267,17 +20369,17 @@ pub fn SuperElem::size_local(self : SuperElem) -> Value? {
 }
 
 ///|
-pub fn SuperElem::with_size(self : SuperElem, v : Value) -> SuperElem {
+pub fn SuperElem::with_size(self : SuperElem, v : Smart[TextSize]) -> SuperElem {
   SuperElem(self.0.with_field(super_elem_size, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn SuperElem::size_in(styles : StyleChain) -> Value {
+pub fn SuperElem::size_in(styles : StyleChain) -> Smart[TextSize] {
   view_cast(styles.get_field(super_elem(), super_elem_size), "super.size")
 }
 
 ///|
-pub fn SuperElem::set_size(v : Value) -> Style {
+pub fn SuperElem::set_size(v : Smart[TextSize]) -> Style {
   Property(
     Property::new(super_elem(), super_elem_size, IntoValue::into_value(v)),
   )
@@ -20600,7 +20702,7 @@ pub fn SmartQuoteElem::set_alternative(v : Bool) -> Style {
 pub fn SmartQuoteElem::quotes(
   self : SmartQuoteElem,
   styles : StyleChain,
-) -> Value {
+) -> Smart[SmartQuoteDict] {
   let e = smart_quote_elem()
   view_cast(
     styles.get_value_with_local(
@@ -20613,7 +20715,9 @@ pub fn SmartQuoteElem::quotes(
 }
 
 ///|
-pub fn SmartQuoteElem::quotes_local(self : SmartQuoteElem) -> Value? {
+pub fn SmartQuoteElem::quotes_local(
+  self : SmartQuoteElem,
+) -> Smart[SmartQuoteDict]? {
   match self.0.field_raw(smart_quote_elem_quotes) {
     Some(v) => Some(view_cast(v, "smartquote.quotes"))
     None => None
@@ -20623,7 +20727,7 @@ pub fn SmartQuoteElem::quotes_local(self : SmartQuoteElem) -> Value? {
 ///|
 pub fn SmartQuoteElem::with_quotes(
   self : SmartQuoteElem,
-  v : Value,
+  v : Smart[SmartQuoteDict],
 ) -> SmartQuoteElem {
   SmartQuoteElem(
     self.0.with_field(smart_quote_elem_quotes, IntoValue::into_value(v)),
@@ -20631,7 +20735,7 @@ pub fn SmartQuoteElem::with_quotes(
 }
 
 ///|
-pub fn SmartQuoteElem::quotes_in(styles : StyleChain) -> Value {
+pub fn SmartQuoteElem::quotes_in(styles : StyleChain) -> Smart[SmartQuoteDict] {
   view_cast(
     styles.get_field(smart_quote_elem(), smart_quote_elem_quotes),
     "smartquote.quotes",
@@ -20639,7 +20743,7 @@ pub fn SmartQuoteElem::quotes_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn SmartQuoteElem::set_quotes(v : Value) -> Style {
+pub fn SmartQuoteElem::set_quotes(v : Smart[SmartQuoteDict]) -> Style {
   Property(
     Property::new(
       smart_quote_elem(),
@@ -20741,7 +20845,7 @@ pub impl NativeElement for CurveElem with fn into_content(self) {
 }
 
 ///|
-pub fn CurveElem::fill(self : CurveElem, styles : StyleChain) -> Value {
+pub fn CurveElem::fill(self : CurveElem, styles : StyleChain) -> Paint? {
   let e = curve_elem()
   view_cast(
     styles.get_value_with_local(
@@ -20754,7 +20858,7 @@ pub fn CurveElem::fill(self : CurveElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn CurveElem::fill_local(self : CurveElem) -> Value? {
+pub fn CurveElem::fill_local(self : CurveElem) -> Paint?? {
   match self.0.field_raw(curve_elem_fill) {
     Some(v) => Some(view_cast(v, "curve.fill"))
     None => None
@@ -20762,24 +20866,24 @@ pub fn CurveElem::fill_local(self : CurveElem) -> Value? {
 }
 
 ///|
-pub fn CurveElem::with_fill(self : CurveElem, v : Value) -> CurveElem {
+pub fn CurveElem::with_fill(self : CurveElem, v : Paint?) -> CurveElem {
   CurveElem(self.0.with_field(curve_elem_fill, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn CurveElem::fill_in(styles : StyleChain) -> Value {
+pub fn CurveElem::fill_in(styles : StyleChain) -> Paint? {
   view_cast(styles.get_field(curve_elem(), curve_elem_fill), "curve.fill")
 }
 
 ///|
-pub fn CurveElem::set_fill(v : Value) -> Style {
+pub fn CurveElem::set_fill(v : Paint?) -> Style {
   Property(
     Property::new(curve_elem(), curve_elem_fill, IntoValue::into_value(v)),
   )
 }
 
 ///|
-pub fn CurveElem::fill_rule(self : CurveElem, styles : StyleChain) -> Value {
+pub fn CurveElem::fill_rule(self : CurveElem, styles : StyleChain) -> FillRule {
   let e = curve_elem()
   view_cast(
     styles.get_value_with_local(
@@ -20792,7 +20896,7 @@ pub fn CurveElem::fill_rule(self : CurveElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn CurveElem::fill_rule_local(self : CurveElem) -> Value? {
+pub fn CurveElem::fill_rule_local(self : CurveElem) -> FillRule? {
   match self.0.field_raw(curve_elem_fill_rule) {
     Some(v) => Some(view_cast(v, "curve.fill-rule"))
     None => None
@@ -20800,12 +20904,12 @@ pub fn CurveElem::fill_rule_local(self : CurveElem) -> Value? {
 }
 
 ///|
-pub fn CurveElem::with_fill_rule(self : CurveElem, v : Value) -> CurveElem {
+pub fn CurveElem::with_fill_rule(self : CurveElem, v : FillRule) -> CurveElem {
   CurveElem(self.0.with_field(curve_elem_fill_rule, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn CurveElem::fill_rule_in(styles : StyleChain) -> Value {
+pub fn CurveElem::fill_rule_in(styles : StyleChain) -> FillRule {
   view_cast(
     styles.get_field(curve_elem(), curve_elem_fill_rule),
     "curve.fill-rule",
@@ -20813,14 +20917,17 @@ pub fn CurveElem::fill_rule_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn CurveElem::set_fill_rule(v : Value) -> Style {
+pub fn CurveElem::set_fill_rule(v : FillRule) -> Style {
   Property(
     Property::new(curve_elem(), curve_elem_fill_rule, IntoValue::into_value(v)),
   )
 }
 
 ///|
-pub fn CurveElem::stroke(self : CurveElem, styles : StyleChain) -> Value {
+pub fn CurveElem::stroke(
+  self : CurveElem,
+  styles : StyleChain,
+) -> Smart[Stroke?] {
   let e = curve_elem()
   view_cast(
     styles.get_value_with_local(
@@ -20833,7 +20940,7 @@ pub fn CurveElem::stroke(self : CurveElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn CurveElem::stroke_local(self : CurveElem) -> Value? {
+pub fn CurveElem::stroke_local(self : CurveElem) -> Smart[Stroke?]? {
   match self.0.field_raw(curve_elem_stroke) {
     Some(v) => Some(view_cast(v, "curve.stroke"))
     None => None
@@ -20841,24 +20948,27 @@ pub fn CurveElem::stroke_local(self : CurveElem) -> Value? {
 }
 
 ///|
-pub fn CurveElem::with_stroke(self : CurveElem, v : Value) -> CurveElem {
+pub fn CurveElem::with_stroke(
+  self : CurveElem,
+  v : Smart[Stroke?],
+) -> CurveElem {
   CurveElem(self.0.with_field(curve_elem_stroke, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn CurveElem::stroke_in(styles : StyleChain) -> Value {
+pub fn CurveElem::stroke_in(styles : StyleChain) -> Smart[Stroke?] {
   view_cast(styles.get_field(curve_elem(), curve_elem_stroke), "curve.stroke")
 }
 
 ///|
-pub fn CurveElem::set_stroke(v : Value) -> Style {
+pub fn CurveElem::set_stroke(v : Smart[Stroke?]) -> Style {
   Property(
     Property::new(curve_elem(), curve_elem_stroke, IntoValue::into_value(v)),
   )
 }
 
 ///|
-pub fn CurveElem::components(self : CurveElem) -> Value {
+pub fn CurveElem::components(self : CurveElem) -> Array[CurveComponent] {
   view_cast(
     self.0.field_raw(curve_elem_components).unwrap(),
     "curve.components",
@@ -20866,12 +20976,15 @@ pub fn CurveElem::components(self : CurveElem) -> Value {
 }
 
 ///|
-pub fn CurveElem::with_components(self : CurveElem, v : Value) -> CurveElem {
+pub fn CurveElem::with_components(
+  self : CurveElem,
+  v : Array[CurveComponent],
+) -> CurveElem {
   CurveElem(self.0.with_field(curve_elem_components, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn CurveElem::new(components_ : Value) -> CurveElem {
+pub fn CurveElem::new(components_ : Array[CurveComponent]) -> CurveElem {
   CurveElem(
     Content::new(curve_elem(), [
       (curve_elem_components, IntoValue::into_value(components_)),
@@ -21389,7 +21502,7 @@ pub impl NativeElement for CurveClose with fn into_content(self) {
 }
 
 ///|
-pub fn CurveClose::mode(self : CurveClose, styles : StyleChain) -> Value {
+pub fn CurveClose::mode(self : CurveClose, styles : StyleChain) -> CloseMode {
   let e = curve_close_elem()
   view_cast(
     styles.get_value_with_local(
@@ -21402,7 +21515,7 @@ pub fn CurveClose::mode(self : CurveClose, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn CurveClose::mode_local(self : CurveClose) -> Value? {
+pub fn CurveClose::mode_local(self : CurveClose) -> CloseMode? {
   match self.0.field_raw(curve_close_elem_mode) {
     Some(v) => Some(view_cast(v, "close.mode"))
     None => None
@@ -21410,12 +21523,12 @@ pub fn CurveClose::mode_local(self : CurveClose) -> Value? {
 }
 
 ///|
-pub fn CurveClose::with_mode(self : CurveClose, v : Value) -> CurveClose {
+pub fn CurveClose::with_mode(self : CurveClose, v : CloseMode) -> CurveClose {
   CurveClose(self.0.with_field(curve_close_elem_mode, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn CurveClose::mode_in(styles : StyleChain) -> Value {
+pub fn CurveClose::mode_in(styles : StyleChain) -> CloseMode {
   view_cast(
     styles.get_field(curve_close_elem(), curve_close_elem_mode),
     "close.mode",
@@ -21423,7 +21536,7 @@ pub fn CurveClose::mode_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn CurveClose::set_mode(v : Value) -> Style {
+pub fn CurveClose::set_mode(v : CloseMode) -> Style {
   Property(
     Property::new(
       curve_close_elem(),
@@ -22005,7 +22118,7 @@ pub fn LineElem::set_angle(v : Angle) -> Style {
 }
 
 ///|
-pub fn LineElem::stroke(self : LineElem, styles : StyleChain) -> Value {
+pub fn LineElem::stroke(self : LineElem, styles : StyleChain) -> Stroke {
   let e = line_elem()
   view_cast(
     styles.get_value_with_local(
@@ -22018,7 +22131,7 @@ pub fn LineElem::stroke(self : LineElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn LineElem::stroke_local(self : LineElem) -> Value? {
+pub fn LineElem::stroke_local(self : LineElem) -> Stroke? {
   match self.0.field_raw(line_elem_stroke) {
     Some(v) => Some(view_cast(v, "line.stroke"))
     None => None
@@ -22026,17 +22139,17 @@ pub fn LineElem::stroke_local(self : LineElem) -> Value? {
 }
 
 ///|
-pub fn LineElem::with_stroke(self : LineElem, v : Value) -> LineElem {
+pub fn LineElem::with_stroke(self : LineElem, v : Stroke) -> LineElem {
   LineElem(self.0.with_field(line_elem_stroke, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn LineElem::stroke_in(styles : StyleChain) -> Value {
+pub fn LineElem::stroke_in(styles : StyleChain) -> Stroke {
   view_cast(styles.get_field(line_elem(), line_elem_stroke), "line.stroke")
 }
 
 ///|
-pub fn LineElem::set_stroke(v : Value) -> Style {
+pub fn LineElem::set_stroke(v : Stroke) -> Style {
   Property(
     Property::new(line_elem(), line_elem_stroke, IntoValue::into_value(v)),
   )
@@ -22082,7 +22195,7 @@ pub impl NativeElement for PolygonElem with fn into_content(self) {
 }
 
 ///|
-pub fn PolygonElem::fill(self : PolygonElem, styles : StyleChain) -> Value {
+pub fn PolygonElem::fill(self : PolygonElem, styles : StyleChain) -> Paint? {
   let e = polygon_elem()
   view_cast(
     styles.get_value_with_local(
@@ -22095,7 +22208,7 @@ pub fn PolygonElem::fill(self : PolygonElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn PolygonElem::fill_local(self : PolygonElem) -> Value? {
+pub fn PolygonElem::fill_local(self : PolygonElem) -> Paint?? {
   match self.0.field_raw(polygon_elem_fill) {
     Some(v) => Some(view_cast(v, "polygon.fill"))
     None => None
@@ -22103,24 +22216,27 @@ pub fn PolygonElem::fill_local(self : PolygonElem) -> Value? {
 }
 
 ///|
-pub fn PolygonElem::with_fill(self : PolygonElem, v : Value) -> PolygonElem {
+pub fn PolygonElem::with_fill(self : PolygonElem, v : Paint?) -> PolygonElem {
   PolygonElem(self.0.with_field(polygon_elem_fill, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn PolygonElem::fill_in(styles : StyleChain) -> Value {
+pub fn PolygonElem::fill_in(styles : StyleChain) -> Paint? {
   view_cast(styles.get_field(polygon_elem(), polygon_elem_fill), "polygon.fill")
 }
 
 ///|
-pub fn PolygonElem::set_fill(v : Value) -> Style {
+pub fn PolygonElem::set_fill(v : Paint?) -> Style {
   Property(
     Property::new(polygon_elem(), polygon_elem_fill, IntoValue::into_value(v)),
   )
 }
 
 ///|
-pub fn PolygonElem::fill_rule(self : PolygonElem, styles : StyleChain) -> Value {
+pub fn PolygonElem::fill_rule(
+  self : PolygonElem,
+  styles : StyleChain,
+) -> FillRule {
   let e = polygon_elem()
   view_cast(
     styles.get_value_with_local(
@@ -22133,7 +22249,7 @@ pub fn PolygonElem::fill_rule(self : PolygonElem, styles : StyleChain) -> Value 
 }
 
 ///|
-pub fn PolygonElem::fill_rule_local(self : PolygonElem) -> Value? {
+pub fn PolygonElem::fill_rule_local(self : PolygonElem) -> FillRule? {
   match self.0.field_raw(polygon_elem_fill_rule) {
     Some(v) => Some(view_cast(v, "polygon.fill-rule"))
     None => None
@@ -22143,7 +22259,7 @@ pub fn PolygonElem::fill_rule_local(self : PolygonElem) -> Value? {
 ///|
 pub fn PolygonElem::with_fill_rule(
   self : PolygonElem,
-  v : Value,
+  v : FillRule,
 ) -> PolygonElem {
   PolygonElem(
     self.0.with_field(polygon_elem_fill_rule, IntoValue::into_value(v)),
@@ -22151,7 +22267,7 @@ pub fn PolygonElem::with_fill_rule(
 }
 
 ///|
-pub fn PolygonElem::fill_rule_in(styles : StyleChain) -> Value {
+pub fn PolygonElem::fill_rule_in(styles : StyleChain) -> FillRule {
   view_cast(
     styles.get_field(polygon_elem(), polygon_elem_fill_rule),
     "polygon.fill-rule",
@@ -22159,7 +22275,7 @@ pub fn PolygonElem::fill_rule_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn PolygonElem::set_fill_rule(v : Value) -> Style {
+pub fn PolygonElem::set_fill_rule(v : FillRule) -> Style {
   Property(
     Property::new(
       polygon_elem(),
@@ -22170,7 +22286,10 @@ pub fn PolygonElem::set_fill_rule(v : Value) -> Style {
 }
 
 ///|
-pub fn PolygonElem::stroke(self : PolygonElem, styles : StyleChain) -> Value {
+pub fn PolygonElem::stroke(
+  self : PolygonElem,
+  styles : StyleChain,
+) -> Smart[Stroke?] {
   let e = polygon_elem()
   view_cast(
     styles.get_value_with_local(
@@ -22183,7 +22302,7 @@ pub fn PolygonElem::stroke(self : PolygonElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn PolygonElem::stroke_local(self : PolygonElem) -> Value? {
+pub fn PolygonElem::stroke_local(self : PolygonElem) -> Smart[Stroke?]? {
   match self.0.field_raw(polygon_elem_stroke) {
     Some(v) => Some(view_cast(v, "polygon.stroke"))
     None => None
@@ -22191,12 +22310,15 @@ pub fn PolygonElem::stroke_local(self : PolygonElem) -> Value? {
 }
 
 ///|
-pub fn PolygonElem::with_stroke(self : PolygonElem, v : Value) -> PolygonElem {
+pub fn PolygonElem::with_stroke(
+  self : PolygonElem,
+  v : Smart[Stroke?],
+) -> PolygonElem {
   PolygonElem(self.0.with_field(polygon_elem_stroke, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn PolygonElem::stroke_in(styles : StyleChain) -> Value {
+pub fn PolygonElem::stroke_in(styles : StyleChain) -> Smart[Stroke?] {
   view_cast(
     styles.get_field(polygon_elem(), polygon_elem_stroke),
     "polygon.stroke",
@@ -22204,7 +22326,7 @@ pub fn PolygonElem::stroke_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn PolygonElem::set_stroke(v : Value) -> Style {
+pub fn PolygonElem::set_stroke(v : Smart[Stroke?]) -> Style {
   Property(
     Property::new(polygon_elem(), polygon_elem_stroke, IntoValue::into_value(v)),
   )
@@ -22354,7 +22476,7 @@ pub fn RectElem::set_height(v : Sizing) -> Style {
 }
 
 ///|
-pub fn RectElem::fill(self : RectElem, styles : StyleChain) -> Value {
+pub fn RectElem::fill(self : RectElem, styles : StyleChain) -> Paint? {
   let e = rect_elem()
   view_cast(
     styles.get_value_with_local(
@@ -22367,7 +22489,7 @@ pub fn RectElem::fill(self : RectElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn RectElem::fill_local(self : RectElem) -> Value? {
+pub fn RectElem::fill_local(self : RectElem) -> Paint?? {
   match self.0.field_raw(rect_elem_fill) {
     Some(v) => Some(view_cast(v, "rect.fill"))
     None => None
@@ -22375,22 +22497,25 @@ pub fn RectElem::fill_local(self : RectElem) -> Value? {
 }
 
 ///|
-pub fn RectElem::with_fill(self : RectElem, v : Value) -> RectElem {
+pub fn RectElem::with_fill(self : RectElem, v : Paint?) -> RectElem {
   RectElem(self.0.with_field(rect_elem_fill, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn RectElem::fill_in(styles : StyleChain) -> Value {
+pub fn RectElem::fill_in(styles : StyleChain) -> Paint? {
   view_cast(styles.get_field(rect_elem(), rect_elem_fill), "rect.fill")
 }
 
 ///|
-pub fn RectElem::set_fill(v : Value) -> Style {
+pub fn RectElem::set_fill(v : Paint?) -> Style {
   Property(Property::new(rect_elem(), rect_elem_fill, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn RectElem::stroke(self : RectElem, styles : StyleChain) -> Value {
+pub fn RectElem::stroke(
+  self : RectElem,
+  styles : StyleChain,
+) -> Smart[Sides[Stroke??]] {
   let e = rect_elem()
   view_cast(
     styles.get_value_with_local(
@@ -22403,7 +22528,7 @@ pub fn RectElem::stroke(self : RectElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn RectElem::stroke_local(self : RectElem) -> Value? {
+pub fn RectElem::stroke_local(self : RectElem) -> Smart[Sides[Stroke??]]? {
   match self.0.field_raw(rect_elem_stroke) {
     Some(v) => Some(view_cast(v, "rect.stroke"))
     None => None
@@ -22411,17 +22536,20 @@ pub fn RectElem::stroke_local(self : RectElem) -> Value? {
 }
 
 ///|
-pub fn RectElem::with_stroke(self : RectElem, v : Value) -> RectElem {
+pub fn RectElem::with_stroke(
+  self : RectElem,
+  v : Smart[Sides[Stroke??]],
+) -> RectElem {
   RectElem(self.0.with_field(rect_elem_stroke, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn RectElem::stroke_in(styles : StyleChain) -> Value {
+pub fn RectElem::stroke_in(styles : StyleChain) -> Smart[Sides[Stroke??]] {
   view_cast(styles.get_field(rect_elem(), rect_elem_stroke), "rect.stroke")
 }
 
 ///|
-pub fn RectElem::set_stroke(v : Value) -> Style {
+pub fn RectElem::set_stroke(v : Smart[Sides[Stroke??]]) -> Style {
   Property(
     Property::new(rect_elem(), rect_elem_stroke, IntoValue::into_value(v)),
   )
@@ -22720,7 +22848,7 @@ pub fn SquareElem::set_height(v : Sizing) -> Style {
 }
 
 ///|
-pub fn SquareElem::fill(self : SquareElem, styles : StyleChain) -> Value {
+pub fn SquareElem::fill(self : SquareElem, styles : StyleChain) -> Paint? {
   let e = square_elem()
   view_cast(
     styles.get_value_with_local(
@@ -22733,7 +22861,7 @@ pub fn SquareElem::fill(self : SquareElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn SquareElem::fill_local(self : SquareElem) -> Value? {
+pub fn SquareElem::fill_local(self : SquareElem) -> Paint?? {
   match self.0.field_raw(square_elem_fill) {
     Some(v) => Some(view_cast(v, "square.fill"))
     None => None
@@ -22741,24 +22869,27 @@ pub fn SquareElem::fill_local(self : SquareElem) -> Value? {
 }
 
 ///|
-pub fn SquareElem::with_fill(self : SquareElem, v : Value) -> SquareElem {
+pub fn SquareElem::with_fill(self : SquareElem, v : Paint?) -> SquareElem {
   SquareElem(self.0.with_field(square_elem_fill, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn SquareElem::fill_in(styles : StyleChain) -> Value {
+pub fn SquareElem::fill_in(styles : StyleChain) -> Paint? {
   view_cast(styles.get_field(square_elem(), square_elem_fill), "square.fill")
 }
 
 ///|
-pub fn SquareElem::set_fill(v : Value) -> Style {
+pub fn SquareElem::set_fill(v : Paint?) -> Style {
   Property(
     Property::new(square_elem(), square_elem_fill, IntoValue::into_value(v)),
   )
 }
 
 ///|
-pub fn SquareElem::stroke(self : SquareElem, styles : StyleChain) -> Value {
+pub fn SquareElem::stroke(
+  self : SquareElem,
+  styles : StyleChain,
+) -> Smart[Sides[Stroke??]] {
   let e = square_elem()
   view_cast(
     styles.get_value_with_local(
@@ -22771,7 +22902,7 @@ pub fn SquareElem::stroke(self : SquareElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn SquareElem::stroke_local(self : SquareElem) -> Value? {
+pub fn SquareElem::stroke_local(self : SquareElem) -> Smart[Sides[Stroke??]]? {
   match self.0.field_raw(square_elem_stroke) {
     Some(v) => Some(view_cast(v, "square.stroke"))
     None => None
@@ -22779,12 +22910,15 @@ pub fn SquareElem::stroke_local(self : SquareElem) -> Value? {
 }
 
 ///|
-pub fn SquareElem::with_stroke(self : SquareElem, v : Value) -> SquareElem {
+pub fn SquareElem::with_stroke(
+  self : SquareElem,
+  v : Smart[Sides[Stroke??]],
+) -> SquareElem {
   SquareElem(self.0.with_field(square_elem_stroke, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn SquareElem::stroke_in(styles : StyleChain) -> Value {
+pub fn SquareElem::stroke_in(styles : StyleChain) -> Smart[Sides[Stroke??]] {
   view_cast(
     styles.get_field(square_elem(), square_elem_stroke),
     "square.stroke",
@@ -22792,7 +22926,7 @@ pub fn SquareElem::stroke_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn SquareElem::set_stroke(v : Value) -> Style {
+pub fn SquareElem::set_stroke(v : Smart[Sides[Stroke??]]) -> Style {
   Property(
     Property::new(square_elem(), square_elem_stroke, IntoValue::into_value(v)),
   )
@@ -23102,7 +23236,7 @@ pub fn EllipseElem::set_height(v : Sizing) -> Style {
 }
 
 ///|
-pub fn EllipseElem::fill(self : EllipseElem, styles : StyleChain) -> Value {
+pub fn EllipseElem::fill(self : EllipseElem, styles : StyleChain) -> Paint? {
   let e = ellipse_elem()
   view_cast(
     styles.get_value_with_local(
@@ -23115,7 +23249,7 @@ pub fn EllipseElem::fill(self : EllipseElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn EllipseElem::fill_local(self : EllipseElem) -> Value? {
+pub fn EllipseElem::fill_local(self : EllipseElem) -> Paint?? {
   match self.0.field_raw(ellipse_elem_fill) {
     Some(v) => Some(view_cast(v, "ellipse.fill"))
     None => None
@@ -23123,24 +23257,27 @@ pub fn EllipseElem::fill_local(self : EllipseElem) -> Value? {
 }
 
 ///|
-pub fn EllipseElem::with_fill(self : EllipseElem, v : Value) -> EllipseElem {
+pub fn EllipseElem::with_fill(self : EllipseElem, v : Paint?) -> EllipseElem {
   EllipseElem(self.0.with_field(ellipse_elem_fill, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn EllipseElem::fill_in(styles : StyleChain) -> Value {
+pub fn EllipseElem::fill_in(styles : StyleChain) -> Paint? {
   view_cast(styles.get_field(ellipse_elem(), ellipse_elem_fill), "ellipse.fill")
 }
 
 ///|
-pub fn EllipseElem::set_fill(v : Value) -> Style {
+pub fn EllipseElem::set_fill(v : Paint?) -> Style {
   Property(
     Property::new(ellipse_elem(), ellipse_elem_fill, IntoValue::into_value(v)),
   )
 }
 
 ///|
-pub fn EllipseElem::stroke(self : EllipseElem, styles : StyleChain) -> Value {
+pub fn EllipseElem::stroke(
+  self : EllipseElem,
+  styles : StyleChain,
+) -> Smart[Stroke?] {
   let e = ellipse_elem()
   view_cast(
     styles.get_value_with_local(
@@ -23153,7 +23290,7 @@ pub fn EllipseElem::stroke(self : EllipseElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn EllipseElem::stroke_local(self : EllipseElem) -> Value? {
+pub fn EllipseElem::stroke_local(self : EllipseElem) -> Smart[Stroke?]? {
   match self.0.field_raw(ellipse_elem_stroke) {
     Some(v) => Some(view_cast(v, "ellipse.stroke"))
     None => None
@@ -23161,12 +23298,15 @@ pub fn EllipseElem::stroke_local(self : EllipseElem) -> Value? {
 }
 
 ///|
-pub fn EllipseElem::with_stroke(self : EllipseElem, v : Value) -> EllipseElem {
+pub fn EllipseElem::with_stroke(
+  self : EllipseElem,
+  v : Smart[Stroke?],
+) -> EllipseElem {
   EllipseElem(self.0.with_field(ellipse_elem_stroke, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn EllipseElem::stroke_in(styles : StyleChain) -> Value {
+pub fn EllipseElem::stroke_in(styles : StyleChain) -> Smart[Stroke?] {
   view_cast(
     styles.get_field(ellipse_elem(), ellipse_elem_stroke),
     "ellipse.stroke",
@@ -23174,7 +23314,7 @@ pub fn EllipseElem::stroke_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn EllipseElem::set_stroke(v : Value) -> Style {
+pub fn EllipseElem::set_stroke(v : Smart[Stroke?]) -> Style {
   Property(
     Property::new(ellipse_elem(), ellipse_elem_stroke, IntoValue::into_value(v)),
   )
@@ -23437,7 +23577,7 @@ pub fn CircleElem::set_height(v : Sizing) -> Style {
 }
 
 ///|
-pub fn CircleElem::fill(self : CircleElem, styles : StyleChain) -> Value {
+pub fn CircleElem::fill(self : CircleElem, styles : StyleChain) -> Paint? {
   let e = circle_elem()
   view_cast(
     styles.get_value_with_local(
@@ -23450,7 +23590,7 @@ pub fn CircleElem::fill(self : CircleElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn CircleElem::fill_local(self : CircleElem) -> Value? {
+pub fn CircleElem::fill_local(self : CircleElem) -> Paint?? {
   match self.0.field_raw(circle_elem_fill) {
     Some(v) => Some(view_cast(v, "circle.fill"))
     None => None
@@ -23458,24 +23598,27 @@ pub fn CircleElem::fill_local(self : CircleElem) -> Value? {
 }
 
 ///|
-pub fn CircleElem::with_fill(self : CircleElem, v : Value) -> CircleElem {
+pub fn CircleElem::with_fill(self : CircleElem, v : Paint?) -> CircleElem {
   CircleElem(self.0.with_field(circle_elem_fill, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn CircleElem::fill_in(styles : StyleChain) -> Value {
+pub fn CircleElem::fill_in(styles : StyleChain) -> Paint? {
   view_cast(styles.get_field(circle_elem(), circle_elem_fill), "circle.fill")
 }
 
 ///|
-pub fn CircleElem::set_fill(v : Value) -> Style {
+pub fn CircleElem::set_fill(v : Paint?) -> Style {
   Property(
     Property::new(circle_elem(), circle_elem_fill, IntoValue::into_value(v)),
   )
 }
 
 ///|
-pub fn CircleElem::stroke(self : CircleElem, styles : StyleChain) -> Value {
+pub fn CircleElem::stroke(
+  self : CircleElem,
+  styles : StyleChain,
+) -> Smart[Stroke?] {
   let e = circle_elem()
   view_cast(
     styles.get_value_with_local(
@@ -23488,7 +23631,7 @@ pub fn CircleElem::stroke(self : CircleElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn CircleElem::stroke_local(self : CircleElem) -> Value? {
+pub fn CircleElem::stroke_local(self : CircleElem) -> Smart[Stroke?]? {
   match self.0.field_raw(circle_elem_stroke) {
     Some(v) => Some(view_cast(v, "circle.stroke"))
     None => None
@@ -23496,12 +23639,15 @@ pub fn CircleElem::stroke_local(self : CircleElem) -> Value? {
 }
 
 ///|
-pub fn CircleElem::with_stroke(self : CircleElem, v : Value) -> CircleElem {
+pub fn CircleElem::with_stroke(
+  self : CircleElem,
+  v : Smart[Stroke?],
+) -> CircleElem {
   CircleElem(self.0.with_field(circle_elem_stroke, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn CircleElem::stroke_in(styles : StyleChain) -> Value {
+pub fn CircleElem::stroke_in(styles : StyleChain) -> Smart[Stroke?] {
   view_cast(
     styles.get_field(circle_elem(), circle_elem_stroke),
     "circle.stroke",
@@ -23509,7 +23655,7 @@ pub fn CircleElem::stroke_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn CircleElem::set_stroke(v : Value) -> Style {
+pub fn CircleElem::set_stroke(v : Smart[Stroke?]) -> Style {
   Property(
     Property::new(circle_elem(), circle_elem_stroke, IntoValue::into_value(v)),
   )
@@ -24005,7 +24151,10 @@ pub impl NativeElement for PdfPdfFormat with fn into_content(self) {
 }
 
 ///|
-pub fn PdfPdfFormat::pages(self : PdfPdfFormat, styles : StyleChain) -> Value {
+pub fn PdfPdfFormat::pages(
+  self : PdfPdfFormat,
+  styles : StyleChain,
+) -> PageRanges? {
   let e = pdf_format_elem()
   view_cast(
     styles.get_value_with_local(
@@ -24018,7 +24167,7 @@ pub fn PdfPdfFormat::pages(self : PdfPdfFormat, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn PdfPdfFormat::pages_local(self : PdfPdfFormat) -> Value? {
+pub fn PdfPdfFormat::pages_local(self : PdfPdfFormat) -> PageRanges?? {
   match self.0.field_raw(pdf_format_elem_pages) {
     Some(v) => Some(view_cast(v, "pdf.pages"))
     None => None
@@ -24026,14 +24175,17 @@ pub fn PdfPdfFormat::pages_local(self : PdfPdfFormat) -> Value? {
 }
 
 ///|
-pub fn PdfPdfFormat::with_pages(self : PdfPdfFormat, v : Value) -> PdfPdfFormat {
+pub fn PdfPdfFormat::with_pages(
+  self : PdfPdfFormat,
+  v : PageRanges?,
+) -> PdfPdfFormat {
   PdfPdfFormat(
     self.0.with_field(pdf_format_elem_pages, IntoValue::into_value(v)),
   )
 }
 
 ///|
-pub fn PdfPdfFormat::pages_in(styles : StyleChain) -> Value {
+pub fn PdfPdfFormat::pages_in(styles : StyleChain) -> PageRanges? {
   view_cast(
     styles.get_field(pdf_format_elem(), pdf_format_elem_pages),
     "pdf.pages",
@@ -24041,7 +24193,7 @@ pub fn PdfPdfFormat::pages_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn PdfPdfFormat::set_pages(v : Value) -> Style {
+pub fn PdfPdfFormat::set_pages(v : PageRanges?) -> Style {
   Property(
     Property::new(
       pdf_format_elem(),

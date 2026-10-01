@@ -412,7 +412,7 @@ fn count_update(elem : Content) -> CounterUpdate? {
     }
   } else if FootnoteElem::of(elem) is Some(footnote) {
     // `FootnoteElem::is_ref`: the body is a reference to another footnote.
-    if footnote.body() is Label(_) {
+    if footnote.body() is Reference(_) {
       None
     } else {
       Some(Step(NonZeroUSize(1L)))

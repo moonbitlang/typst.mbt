@@ -15477,7 +15477,7 @@ pub fn native_color_luma() -> NativeFuncData {
           {
             name: "lightness",
             docs: "The lightness component.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Component])),
             default: None,
             positional: true,
             named: false,
@@ -15488,7 +15488,7 @@ pub fn native_color_luma() -> NativeFuncData {
           {
             name: "alpha",
             docs: "The alpha component.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Component])),
             default: None,
             positional: true,
             named: false,
@@ -15499,7 +15499,7 @@ pub fn native_color_luma() -> NativeFuncData {
           {
             name: "color",
             docs: "Alternatively: The color to convert to grayscale.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Color])),
             default: None,
             positional: true,
             named: false,
@@ -15508,7 +15508,7 @@ pub fn native_color_luma() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Color])),
         native_color_luma_call,
       )
       native_color_luma_cell.val = Some(d)
@@ -15548,7 +15548,7 @@ pub fn native_color_oklab() -> NativeFuncData {
           {
             name: "lightness",
             docs: "The lightness component.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[RatioComponent])),
             default: None,
             positional: true,
             named: false,
@@ -15559,7 +15559,7 @@ pub fn native_color_oklab() -> NativeFuncData {
           {
             name: "a",
             docs: "The a (\"green/red\") component.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[ChromaComponent])),
             default: None,
             positional: true,
             named: false,
@@ -15570,7 +15570,7 @@ pub fn native_color_oklab() -> NativeFuncData {
           {
             name: "b",
             docs: "The b (\"blue/yellow\") component.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[ChromaComponent])),
             default: None,
             positional: true,
             named: false,
@@ -15581,7 +15581,7 @@ pub fn native_color_oklab() -> NativeFuncData {
           {
             name: "alpha",
             docs: "The alpha component.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[RatioComponent])),
             default: None,
             positional: true,
             named: false,
@@ -15592,7 +15592,7 @@ pub fn native_color_oklab() -> NativeFuncData {
           {
             name: "color",
             docs: "Alternatively: The color to convert to Oklab.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Color])),
             default: None,
             positional: true,
             named: false,
@@ -15601,7 +15601,7 @@ pub fn native_color_oklab() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Color])),
         native_color_oklab_call,
       )
       native_color_oklab_cell.val = Some(d)
@@ -15641,7 +15641,7 @@ pub fn native_color_oklch() -> NativeFuncData {
           {
             name: "lightness",
             docs: "The lightness component.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[RatioComponent])),
             default: None,
             positional: true,
             named: false,
@@ -15652,7 +15652,7 @@ pub fn native_color_oklch() -> NativeFuncData {
           {
             name: "chroma",
             docs: "The chroma component.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[ChromaComponent])),
             default: None,
             positional: true,
             named: false,
@@ -15674,7 +15674,7 @@ pub fn native_color_oklch() -> NativeFuncData {
           {
             name: "alpha",
             docs: "The alpha component.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[RatioComponent])),
             default: None,
             positional: true,
             named: false,
@@ -15685,7 +15685,7 @@ pub fn native_color_oklch() -> NativeFuncData {
           {
             name: "color",
             docs: "Alternatively: The color to convert to Oklch.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Color])),
             default: None,
             positional: true,
             named: false,
@@ -15694,7 +15694,7 @@ pub fn native_color_oklch() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Color])),
         native_color_oklch_call,
       )
       native_color_oklch_cell.val = Some(d)
@@ -15734,7 +15734,7 @@ pub fn native_color_linear_rgb() -> NativeFuncData {
           {
             name: "red",
             docs: "The red component.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Component])),
             default: None,
             positional: true,
             named: false,
@@ -15745,7 +15745,7 @@ pub fn native_color_linear_rgb() -> NativeFuncData {
           {
             name: "green",
             docs: "The green component.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Component])),
             default: None,
             positional: true,
             named: false,
@@ -15756,7 +15756,7 @@ pub fn native_color_linear_rgb() -> NativeFuncData {
           {
             name: "blue",
             docs: "The blue component.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Component])),
             default: None,
             positional: true,
             named: false,
@@ -15767,7 +15767,7 @@ pub fn native_color_linear_rgb() -> NativeFuncData {
           {
             name: "alpha",
             docs: "The alpha component.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Component])),
             default: None,
             positional: true,
             named: false,
@@ -15778,7 +15778,7 @@ pub fn native_color_linear_rgb() -> NativeFuncData {
           {
             name: "color",
             docs: "Alternatively: The color to convert to linear RGB(A).",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Color])),
             default: None,
             positional: true,
             named: false,
@@ -15787,7 +15787,7 @@ pub fn native_color_linear_rgb() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Color])),
         native_color_linear_rgb_call,
       )
       native_color_linear_rgb_cell.val = Some(d)
@@ -15827,7 +15827,7 @@ pub fn native_color_rgb() -> NativeFuncData {
           {
             name: "red",
             docs: "The red component.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Component])),
             default: None,
             positional: true,
             named: false,
@@ -15838,7 +15838,7 @@ pub fn native_color_rgb() -> NativeFuncData {
           {
             name: "green",
             docs: "The green component.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Component])),
             default: None,
             positional: true,
             named: false,
@@ -15849,7 +15849,7 @@ pub fn native_color_rgb() -> NativeFuncData {
           {
             name: "blue",
             docs: "The blue component.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Component])),
             default: None,
             positional: true,
             named: false,
@@ -15860,7 +15860,7 @@ pub fn native_color_rgb() -> NativeFuncData {
           {
             name: "alpha",
             docs: "The alpha component.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Component])),
             default: None,
             positional: true,
             named: false,
@@ -15882,7 +15882,7 @@ pub fn native_color_rgb() -> NativeFuncData {
           {
             name: "color",
             docs: "Alternatively: The color to convert to RGB(a).",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Color])),
             default: None,
             positional: true,
             named: false,
@@ -15891,7 +15891,7 @@ pub fn native_color_rgb() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Color])),
         native_color_rgb_call,
       )
       native_color_rgb_cell.val = Some(d)
@@ -15931,7 +15931,7 @@ pub fn native_color_cmyk() -> NativeFuncData {
           {
             name: "cyan",
             docs: "The cyan component.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[RatioComponent])),
             default: None,
             positional: true,
             named: false,
@@ -15942,7 +15942,7 @@ pub fn native_color_cmyk() -> NativeFuncData {
           {
             name: "magenta",
             docs: "The magenta component.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[RatioComponent])),
             default: None,
             positional: true,
             named: false,
@@ -15953,7 +15953,7 @@ pub fn native_color_cmyk() -> NativeFuncData {
           {
             name: "yellow",
             docs: "The yellow component.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[RatioComponent])),
             default: None,
             positional: true,
             named: false,
@@ -15964,7 +15964,7 @@ pub fn native_color_cmyk() -> NativeFuncData {
           {
             name: "key",
             docs: "The key component.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[RatioComponent])),
             default: None,
             positional: true,
             named: false,
@@ -15975,7 +15975,7 @@ pub fn native_color_cmyk() -> NativeFuncData {
           {
             name: "color",
             docs: "Alternatively: The color to convert to CMYK.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Color])),
             default: None,
             positional: true,
             named: false,
@@ -15984,7 +15984,7 @@ pub fn native_color_cmyk() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Color])),
         native_color_cmyk_call,
       )
       native_color_cmyk_cell.val = Some(d)
@@ -16035,7 +16035,7 @@ pub fn native_color_hsl() -> NativeFuncData {
           {
             name: "saturation",
             docs: "The saturation component.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Component])),
             default: None,
             positional: true,
             named: false,
@@ -16046,7 +16046,7 @@ pub fn native_color_hsl() -> NativeFuncData {
           {
             name: "lightness",
             docs: "The lightness component.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Component])),
             default: None,
             positional: true,
             named: false,
@@ -16057,7 +16057,7 @@ pub fn native_color_hsl() -> NativeFuncData {
           {
             name: "alpha",
             docs: "The alpha component.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Component])),
             default: None,
             positional: true,
             named: false,
@@ -16068,7 +16068,7 @@ pub fn native_color_hsl() -> NativeFuncData {
           {
             name: "color",
             docs: "Alternatively: The color to convert to HSL.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Color])),
             default: None,
             positional: true,
             named: false,
@@ -16077,7 +16077,7 @@ pub fn native_color_hsl() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Color])),
         native_color_hsl_call,
       )
       native_color_hsl_cell.val = Some(d)
@@ -16128,7 +16128,7 @@ pub fn native_color_hsv() -> NativeFuncData {
           {
             name: "saturation",
             docs: "The saturation component.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Component])),
             default: None,
             positional: true,
             named: false,
@@ -16139,7 +16139,7 @@ pub fn native_color_hsv() -> NativeFuncData {
           {
             name: "value",
             docs: "The value component.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Component])),
             default: None,
             positional: true,
             named: false,
@@ -16150,7 +16150,7 @@ pub fn native_color_hsv() -> NativeFuncData {
           {
             name: "alpha",
             docs: "The alpha component.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Component])),
             default: None,
             positional: true,
             named: false,
@@ -16161,7 +16161,7 @@ pub fn native_color_hsv() -> NativeFuncData {
           {
             name: "color",
             docs: "Alternatively: The color to convert to HSL.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Color])),
             default: None,
             positional: true,
             named: false,
@@ -16170,7 +16170,7 @@ pub fn native_color_hsv() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Color])),
         native_color_hsv_call,
       )
       native_color_hsv_cell.val = Some(d)
@@ -16210,7 +16210,7 @@ pub fn native_color_components() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Color])),
             default: None,
             positional: true,
             named: false,
@@ -16247,7 +16247,7 @@ fn native_color_components_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : Color = args.expect("self")
   let alpha_ : Bool = match args.named("alpha") {
     Some(v) => v
     None => true
@@ -16276,7 +16276,7 @@ pub fn native_color_space() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Color])),
             default: None,
             positional: true,
             named: false,
@@ -16285,7 +16285,7 @@ pub fn native_color_space() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[ColorSpace])),
         native_color_space_call,
       )
       native_color_space_cell.val = Some(d)
@@ -16302,7 +16302,7 @@ fn native_color_space_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : Color = args.expect("self")
   args.take().finish()
   let output = at(args.span, () => impl_color_space(self_))
   IntoValue::into_value(output)
@@ -16327,7 +16327,7 @@ pub fn native_color_to_hex() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Color])),
             default: None,
             positional: true,
             named: false,
@@ -16353,7 +16353,7 @@ fn native_color_to_hex_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : Color = args.expect("self")
   args.take().finish()
   let output = at(args.span, () => impl_color_to_hex(self_))
   IntoValue::into_value(output)
@@ -16378,7 +16378,7 @@ pub fn native_color_lighten() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Color])),
             default: None,
             positional: true,
             named: false,
@@ -16398,7 +16398,7 @@ pub fn native_color_lighten() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Color])),
         native_color_lighten_call,
       )
       native_color_lighten_cell.val = Some(d)
@@ -16415,7 +16415,7 @@ fn native_color_lighten_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : Color = args.expect("self")
   let factor_ : Ratio = args.expect("factor")
   args.take().finish()
   let output = at(args.span, () => impl_color_lighten(self_, factor_))
@@ -16441,7 +16441,7 @@ pub fn native_color_darken() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Color])),
             default: None,
             positional: true,
             named: false,
@@ -16461,7 +16461,7 @@ pub fn native_color_darken() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Color])),
         native_color_darken_call,
       )
       native_color_darken_cell.val = Some(d)
@@ -16478,7 +16478,7 @@ fn native_color_darken_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : Color = args.expect("self")
   let factor_ : Ratio = args.expect("factor")
   args.take().finish()
   let output = at(args.span, () => impl_color_darken(self_, factor_))
@@ -16504,7 +16504,7 @@ pub fn native_color_saturate() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Color])),
             default: None,
             positional: true,
             named: false,
@@ -16524,7 +16524,7 @@ pub fn native_color_saturate() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Color])),
         native_color_saturate_call,
       )
       native_color_saturate_cell.val = Some(d)
@@ -16541,7 +16541,7 @@ fn native_color_saturate_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : Color = args.expect("self")
   let factor_ : Ratio = args.expect("factor")
   args.take().finish()
   let output = impl_color_saturate(self_, args.span, factor_)
@@ -16567,7 +16567,7 @@ pub fn native_color_desaturate() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Color])),
             default: None,
             positional: true,
             named: false,
@@ -16587,7 +16587,7 @@ pub fn native_color_desaturate() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Color])),
         native_color_desaturate_call,
       )
       native_color_desaturate_cell.val = Some(d)
@@ -16604,7 +16604,7 @@ fn native_color_desaturate_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : Color = args.expect("self")
   let factor_ : Ratio = args.expect("factor")
   args.take().finish()
   let output = impl_color_desaturate(self_, args.span, factor_)
@@ -16630,7 +16630,7 @@ pub fn native_color_negate() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Color])),
             default: None,
             positional: true,
             named: false,
@@ -16641,7 +16641,7 @@ pub fn native_color_negate() -> NativeFuncData {
           {
             name: "space",
             docs: "The color space used for the transformation. By default, a perceptual color space is used.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Smart[ColorSpace]])),
             default: Some(() => {
               IntoValue::into_value(impl_color_negate__space_default()) catch {
                 _ => None
@@ -16654,7 +16654,7 @@ pub fn native_color_negate() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Color])),
         native_color_negate_call,
       )
       native_color_negate_cell.val = Some(d)
@@ -16671,8 +16671,8 @@ fn native_color_negate_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
-  let space_ : Value = match args.named("space") {
+  let self_ : Color = args.expect("self")
+  let space_ : Smart[ColorSpace] = match args.named("space") {
     Some(v) => v
     None => impl_color_negate__space_default()
   }
@@ -16700,7 +16700,7 @@ pub fn native_color_rotate() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Color])),
             default: None,
             positional: true,
             named: false,
@@ -16722,7 +16722,7 @@ pub fn native_color_rotate() -> NativeFuncData {
           {
             name: "space",
             docs: "The color space used to rotate. By default, this happens in a perceptual color space (@color.oklch[`oklch`]).",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[ProcessColorSpace])),
             default: Some(() => {
               IntoValue::into_value(impl_color_rotate__space_default()) catch {
                 _ => None
@@ -16735,7 +16735,7 @@ pub fn native_color_rotate() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Color])),
         native_color_rotate_call,
       )
       native_color_rotate_cell.val = Some(d)
@@ -16752,9 +16752,9 @@ fn native_color_rotate_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : Color = args.expect("self")
   let angle_ : Angle = args.expect("angle")
-  let space_ : Value = match args.named("space") {
+  let space_ : ProcessColorSpace = match args.named("space") {
     Some(v) => v
     None => impl_color_rotate__space_default()
   }
@@ -16782,7 +16782,7 @@ pub fn native_color_mix() -> NativeFuncData {
           {
             name: "colors",
             docs: "The colors, optionally with weights, specified as a pair (array of length two) of color and weight (float or ratio).",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[WeightedColor])),
             default: None,
             positional: true,
             named: false,
@@ -16793,7 +16793,7 @@ pub fn native_color_mix() -> NativeFuncData {
           {
             name: "space",
             docs: "The color space to mix in. By default, this happens in a perceptual color space (@color.oklab[`oklab`]) or, if all colors use the same spot colorant, using that colorant.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Smart[ColorSpace]])),
             default: Some(() => {
               IntoValue::into_value(impl_color_mix__space_default()) catch {
                 _ => None
@@ -16806,7 +16806,7 @@ pub fn native_color_mix() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Color])),
         native_color_mix_call,
       )
       native_color_mix_cell.val = Some(d)
@@ -16823,8 +16823,8 @@ fn native_color_mix_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let colors_ : Array[Value] = args.all()
-  let space_ : Value = match args.named("space") {
+  let colors_ : Array[WeightedColor] = args.all()
+  let space_ : Smart[ColorSpace] = match args.named("space") {
     Some(v) => v
     None => impl_color_mix__space_default()
   }
@@ -16852,7 +16852,7 @@ pub fn native_color_transparentize() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Color])),
             default: None,
             positional: true,
             named: false,
@@ -16872,7 +16872,7 @@ pub fn native_color_transparentize() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Color])),
         native_color_transparentize_call,
       )
       native_color_transparentize_cell.val = Some(d)
@@ -16889,7 +16889,7 @@ fn native_color_transparentize_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : Color = args.expect("self")
   let scale_ : Ratio = args.expect("scale")
   args.take().finish()
   let output = at(args.span, () => impl_color_transparentize(self_, scale_))
@@ -16915,7 +16915,7 @@ pub fn native_color_opacify() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Color])),
             default: None,
             positional: true,
             named: false,
@@ -16935,7 +16935,7 @@ pub fn native_color_opacify() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Color])),
         native_color_opacify_call,
       )
       native_color_opacify_cell.val = Some(d)
@@ -16952,7 +16952,7 @@ fn native_color_opacify_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : Color = args.expect("self")
   let scale_ : Ratio = args.expect("scale")
   args.take().finish()
   let output = at(args.span, () => impl_color_opacify(self_, scale_))
@@ -16978,7 +16978,7 @@ pub fn native_spot_colorant_construct() -> NativeFuncData {
           {
             name: "name",
             docs: "Name of the spot colorant to use.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[SpotColorantName?])),
             default: None,
             positional: true,
             named: false,
@@ -16989,7 +16989,7 @@ pub fn native_spot_colorant_construct() -> NativeFuncData {
           {
             name: "fallback",
             docs: "How to render this color if the specified colorant is not available.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[ProcessColor])),
             default: None,
             positional: true,
             named: false,
@@ -16998,7 +16998,7 @@ pub fn native_spot_colorant_construct() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[SpotColorant])),
         native_spot_colorant_construct_call,
       )
       native_spot_colorant_construct_cell.val = Some(d)
@@ -17015,8 +17015,8 @@ fn native_spot_colorant_construct_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let name_ : Value = args.expect("name")
-  let fallback_ : Value = args.expect("fallback")
+  let name_ : SpotColorantName? = args.expect("name")
+  let fallback_ : ProcessColor = args.expect("fallback")
   args.take().finish()
   let output = impl_spot_colorant_construct(name_, fallback_)
   IntoValue::into_value(output)
@@ -17041,7 +17041,7 @@ pub fn native_spot_colorant_tint() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[SpotColorant])),
             default: None,
             positional: true,
             named: false,
@@ -17061,7 +17061,7 @@ pub fn native_spot_colorant_tint() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Color])),
         native_spot_colorant_tint_call,
       )
       native_spot_colorant_tint_cell.val = Some(d)
@@ -17078,7 +17078,7 @@ fn native_spot_colorant_tint_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : SpotColorant = args.expect("self")
   let value_ : @syntax.Spanned[Ratio] = args.expect_spanned("value")
   args.take().finish()
   let output = impl_spot_colorant_tint(self_, value_)
@@ -17104,7 +17104,7 @@ pub fn native_gradient_linear() -> NativeFuncData {
           {
             name: "stops",
             docs: "The color @gradient:stops[stops] of the gradient.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[GradientStop])),
             default: None,
             positional: true,
             named: false,
@@ -17115,7 +17115,7 @@ pub fn native_gradient_linear() -> NativeFuncData {
           {
             name: "space",
             docs: "The color space in which to interpolate the gradient.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Smart[ColorSpace]])),
             default: Some(() => {
               IntoValue::into_value(impl_gradient_linear__space_default().v) catch {
                 _ => None
@@ -17130,11 +17130,9 @@ pub fn native_gradient_linear() -> NativeFuncData {
           {
             name: "relative",
             docs: "The @gradient:relativeness[relative placement] of the gradient.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Smart[RelativeTo]])),
             default: Some(() => {
-              IntoValue::into_value(impl_gradient_linear__relative_default()) catch {
-                _ => None
-              }
+              IntoValue::into_value((Smart::Auto : Smart[RelativeTo]))
             }),
             positional: false,
             named: true,
@@ -17169,7 +17167,7 @@ pub fn native_gradient_linear() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Gradient])),
         native_gradient_linear_call,
       )
       native_gradient_linear_cell.val = Some(d)
@@ -17186,14 +17184,15 @@ fn native_gradient_linear_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let stops_ : Array[@syntax.Spanned[Value]] = args.all_spanned()
-  let space_ : @syntax.Spanned[Value] = match args.named_spanned("space") {
+  let stops_ : Array[@syntax.Spanned[GradientStop]] = args.all_spanned()
+  let space_ : @syntax.Spanned[Smart[ColorSpace]] = match
+    args.named_spanned("space") {
     Some(v) => v
     None => impl_gradient_linear__space_default()
   }
-  let relative_ : Value = match args.named("relative") {
+  let relative_ : Smart[RelativeTo] = match args.named("relative") {
     Some(v) => v
-    None => impl_gradient_linear__relative_default()
+    None => Smart::Auto
   }
   let output = impl_gradient_linear(args, args.span, stops_, space_, relative_)
   IntoValue::into_value(output)
@@ -17218,7 +17217,7 @@ pub fn native_gradient_radial() -> NativeFuncData {
           {
             name: "stops",
             docs: "The color @gradient:stops[stops] of the gradient.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[GradientStop])),
             default: None,
             positional: true,
             named: false,
@@ -17229,7 +17228,7 @@ pub fn native_gradient_radial() -> NativeFuncData {
           {
             name: "space",
             docs: "The color space in which to interpolate the gradient.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Smart[ColorSpace]])),
             default: Some(() => {
               IntoValue::into_value(impl_gradient_radial__space_default().v) catch {
                 _ => None
@@ -17244,11 +17243,9 @@ pub fn native_gradient_radial() -> NativeFuncData {
           {
             name: "relative",
             docs: "The @gradient:relativeness[relative placement] of the gradient.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Smart[RelativeTo]])),
             default: Some(() => {
-              IntoValue::into_value(impl_gradient_radial__relative_default()) catch {
-                _ => None
-              }
+              IntoValue::into_value((Smart::Auto : Smart[RelativeTo]))
             }),
             positional: false,
             named: true,
@@ -17317,7 +17314,7 @@ pub fn native_gradient_radial() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Gradient])),
         native_gradient_radial_call,
       )
       native_gradient_radial_cell.val = Some(d)
@@ -17334,14 +17331,15 @@ fn native_gradient_radial_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let stops_ : Array[@syntax.Spanned[Value]] = args.all_spanned()
-  let space_ : @syntax.Spanned[Value] = match args.named_spanned("space") {
+  let stops_ : Array[@syntax.Spanned[GradientStop]] = args.all_spanned()
+  let space_ : @syntax.Spanned[Smart[ColorSpace]] = match
+    args.named_spanned("space") {
     Some(v) => v
     None => impl_gradient_radial__space_default()
   }
-  let relative_ : Value = match args.named("relative") {
+  let relative_ : Smart[RelativeTo] = match args.named("relative") {
     Some(v) => v
-    None => impl_gradient_radial__relative_default()
+    None => Smart::Auto
   }
   let center_ : Axes[Ratio] = match args.named("center") {
     Some(v) => v
@@ -17393,7 +17391,7 @@ pub fn native_gradient_conic() -> NativeFuncData {
           {
             name: "stops",
             docs: "The color @gradient:stops[stops] of the gradient.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[GradientStop])),
             default: None,
             positional: true,
             named: false,
@@ -17419,7 +17417,7 @@ pub fn native_gradient_conic() -> NativeFuncData {
           {
             name: "space",
             docs: "The color space in which to interpolate the gradient.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Smart[ColorSpace]])),
             default: Some(() => {
               IntoValue::into_value(impl_gradient_conic__space_default().v) catch {
                 _ => None
@@ -17434,11 +17432,9 @@ pub fn native_gradient_conic() -> NativeFuncData {
           {
             name: "relative",
             docs: "The @gradient:relativeness[relative placement] of the gradient.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Smart[RelativeTo]])),
             default: Some(() => {
-              IntoValue::into_value(impl_gradient_conic__relative_default()) catch {
-                _ => None
-              }
+              IntoValue::into_value((Smart::Auto : Smart[RelativeTo]))
             }),
             positional: false,
             named: true,
@@ -17462,7 +17458,7 @@ pub fn native_gradient_conic() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Gradient])),
         native_gradient_conic_call,
       )
       native_gradient_conic_cell.val = Some(d)
@@ -17479,18 +17475,19 @@ fn native_gradient_conic_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let stops_ : Array[@syntax.Spanned[Value]] = args.all_spanned()
+  let stops_ : Array[@syntax.Spanned[GradientStop]] = args.all_spanned()
   let angle_ : Angle = match args.named("angle") {
     Some(v) => v
     None => impl_gradient_conic__angle_default()
   }
-  let space_ : @syntax.Spanned[Value] = match args.named_spanned("space") {
+  let space_ : @syntax.Spanned[Smart[ColorSpace]] = match
+    args.named_spanned("space") {
     Some(v) => v
     None => impl_gradient_conic__space_default()
   }
-  let relative_ : Value = match args.named("relative") {
+  let relative_ : Smart[RelativeTo] = match args.named("relative") {
     Some(v) => v
-    None => impl_gradient_conic__relative_default()
+    None => Smart::Auto
   }
   let center_ : Axes[Ratio] = match args.named("center") {
     Some(v) => v
@@ -17527,7 +17524,7 @@ pub fn native_gradient_sharp() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Gradient])),
             default: None,
             positional: true,
             named: false,
@@ -17562,7 +17559,7 @@ pub fn native_gradient_sharp() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Gradient])),
         native_gradient_sharp_call,
       )
       native_gradient_sharp_cell.val = Some(d)
@@ -17579,7 +17576,7 @@ fn native_gradient_sharp_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : Gradient = args.expect("self")
   let steps_ : @syntax.Spanned[USize] = args.expect_spanned("steps")
   let smoothness_ : @syntax.Spanned[Ratio] = match
     args.named_spanned("smoothness") {
@@ -17610,7 +17607,7 @@ pub fn native_gradient_repeat() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Gradient])),
             default: None,
             positional: true,
             named: false,
@@ -17641,7 +17638,7 @@ pub fn native_gradient_repeat() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Gradient])),
         native_gradient_repeat_call,
       )
       native_gradient_repeat_cell.val = Some(d)
@@ -17658,7 +17655,7 @@ fn native_gradient_repeat_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : Gradient = args.expect("self")
   let repetitions_ : @syntax.Spanned[USize] = args.expect_spanned("repetitions")
   let mirror_ : Bool = match args.named("mirror") {
     Some(v) => v
@@ -17688,7 +17685,7 @@ pub fn native_gradient_kind() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Gradient])),
             default: None,
             positional: true,
             named: false,
@@ -17714,7 +17711,7 @@ fn native_gradient_kind_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : Gradient = args.expect("self")
   args.take().finish()
   let output = at(args.span, () => impl_gradient_kind(self_))
   IntoValue::into_value(output)
@@ -17739,7 +17736,7 @@ pub fn native_gradient_stops() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Gradient])),
             default: None,
             positional: true,
             named: false,
@@ -17748,7 +17745,7 @@ pub fn native_gradient_stops() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Array[GradientStop]])),
         native_gradient_stops_call,
       )
       native_gradient_stops_cell.val = Some(d)
@@ -17765,7 +17762,7 @@ fn native_gradient_stops_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : Gradient = args.expect("self")
   args.take().finish()
   let output = at(args.span, () => impl_gradient_stops(self_))
   IntoValue::into_value(output)
@@ -17790,7 +17787,7 @@ pub fn native_gradient_space() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Gradient])),
             default: None,
             positional: true,
             named: false,
@@ -17799,7 +17796,7 @@ pub fn native_gradient_space() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[ColorSpace])),
         native_gradient_space_call,
       )
       native_gradient_space_cell.val = Some(d)
@@ -17816,7 +17813,7 @@ fn native_gradient_space_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : Gradient = args.expect("self")
   args.take().finish()
   let output = at(args.span, () => impl_gradient_space(self_))
   IntoValue::into_value(output)
@@ -17841,7 +17838,7 @@ pub fn native_gradient_relative() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Gradient])),
             default: None,
             positional: true,
             named: false,
@@ -17850,7 +17847,7 @@ pub fn native_gradient_relative() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Smart[RelativeTo]])),
         native_gradient_relative_call,
       )
       native_gradient_relative_cell.val = Some(d)
@@ -17867,7 +17864,7 @@ fn native_gradient_relative_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : Gradient = args.expect("self")
   args.take().finish()
   let output = at(args.span, () => impl_gradient_relative(self_))
   IntoValue::into_value(output)
@@ -17892,7 +17889,7 @@ pub fn native_gradient_angle() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Gradient])),
             default: None,
             positional: true,
             named: false,
@@ -17918,7 +17915,7 @@ fn native_gradient_angle_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : Gradient = args.expect("self")
   args.take().finish()
   let output = at(args.span, () => impl_gradient_angle(self_))
   IntoValue::into_value(output)
@@ -17943,7 +17940,7 @@ pub fn native_gradient_center() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Gradient])),
             default: None,
             positional: true,
             named: false,
@@ -17969,7 +17966,7 @@ fn native_gradient_center_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : Gradient = args.expect("self")
   args.take().finish()
   let output = at(args.span, () => impl_gradient_center(self_))
   IntoValue::into_value(output)
@@ -17994,7 +17991,7 @@ pub fn native_gradient_radius() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Gradient])),
             default: None,
             positional: true,
             named: false,
@@ -18020,7 +18017,7 @@ fn native_gradient_radius_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : Gradient = args.expect("self")
   args.take().finish()
   let output = at(args.span, () => impl_gradient_radius(self_))
   IntoValue::into_value(output)
@@ -18045,7 +18042,7 @@ pub fn native_gradient_focal_center() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Gradient])),
             default: None,
             positional: true,
             named: false,
@@ -18071,7 +18068,7 @@ fn native_gradient_focal_center_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : Gradient = args.expect("self")
   args.take().finish()
   let output = at(args.span, () => impl_gradient_focal_center(self_))
   IntoValue::into_value(output)
@@ -18096,7 +18093,7 @@ pub fn native_gradient_focal_radius() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Gradient])),
             default: None,
             positional: true,
             named: false,
@@ -18122,7 +18119,7 @@ fn native_gradient_focal_radius_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : Gradient = args.expect("self")
   args.take().finish()
   let output = at(args.span, () => impl_gradient_focal_radius(self_))
   IntoValue::into_value(output)
@@ -18147,7 +18144,7 @@ pub fn native_gradient_sample() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Gradient])),
             default: None,
             positional: true,
             named: false,
@@ -18158,7 +18155,7 @@ pub fn native_gradient_sample() -> NativeFuncData {
           {
             name: "t",
             docs: "The position at which to sample the gradient.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[RatioOrAngle])),
             default: None,
             positional: true,
             named: false,
@@ -18167,7 +18164,7 @@ pub fn native_gradient_sample() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Color])),
         native_gradient_sample_call,
       )
       native_gradient_sample_cell.val = Some(d)
@@ -18184,8 +18181,8 @@ fn native_gradient_sample_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
-  let t_ : Value = args.expect("t")
+  let self_ : Gradient = args.expect("self")
+  let t_ : RatioOrAngle = args.expect("t")
   args.take().finish()
   let output = at(args.span, () => impl_gradient_sample(self_, t_))
   IntoValue::into_value(output)
@@ -18210,7 +18207,7 @@ pub fn native_gradient_samples() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Gradient])),
             default: None,
             positional: true,
             named: false,
@@ -18221,7 +18218,7 @@ pub fn native_gradient_samples() -> NativeFuncData {
           {
             name: "ts",
             docs: "The positions at which to sample the gradient.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[RatioOrAngle])),
             default: None,
             positional: true,
             named: false,
@@ -18247,8 +18244,8 @@ fn native_gradient_samples_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
-  let ts_ : Array[Value] = args.all()
+  let self_ : Gradient = args.expect("self")
+  let ts_ : Array[RatioOrAngle] = args.all()
   args.take().finish()
   let output = at(args.span, () => impl_gradient_samples(self_, ts_))
   IntoValue::into_value(output)
@@ -18273,7 +18270,7 @@ pub fn native_polygon_elem_regular() -> NativeFuncData {
           {
             name: "fill",
             docs: "How to fill the polygon. See the general @polygon.fill[polygon's documentation] for more details.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Paint?])),
             default: None,
             positional: false,
             named: true,
@@ -18284,7 +18281,7 @@ pub fn native_polygon_elem_regular() -> NativeFuncData {
           {
             name: "stroke",
             docs: "How to stroke the polygon. See the general @polygon.stroke[polygon's documentation] for more details.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Smart[Stroke?]])),
             default: None,
             positional: false,
             named: true,
@@ -18336,8 +18333,8 @@ fn native_polygon_elem_regular_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let fill_ : Value? = args.named("fill")
-  let stroke_ : Value? = args.named("stroke")
+  let fill_ : Paint?? = args.named("fill")
+  let stroke_ : Smart[Stroke?]? = args.named("stroke")
   let size_ : Length = match args.named("size") {
     Some(v) => v
     None => impl_polygon_elem_regular__size_default()
@@ -18372,7 +18369,7 @@ pub fn native_stroke_construct() -> NativeFuncData {
           {
             name: "paint",
             docs: "The color or gradient to use for the stroke.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Smart[Paint]])),
             default: None,
             positional: true,
             named: false,
@@ -18394,7 +18391,7 @@ pub fn native_stroke_construct() -> NativeFuncData {
           {
             name: "cap",
             docs: "How the ends of the stroke are rendered.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Smart[LineCap]])),
             default: None,
             positional: true,
             named: false,
@@ -18405,7 +18402,7 @@ pub fn native_stroke_construct() -> NativeFuncData {
           {
             name: "join",
             docs: "How sharp turns are rendered.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Smart[LineJoin]])),
             default: None,
             positional: true,
             named: false,
@@ -18416,7 +18413,7 @@ pub fn native_stroke_construct() -> NativeFuncData {
           {
             name: "dash",
             docs: "The dash pattern to use. This can be:",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Smart[DashPattern?]])),
             default: None,
             positional: true,
             named: false,
@@ -18436,7 +18433,7 @@ pub fn native_stroke_construct() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Stroke])),
         native_stroke_construct_call,
       )
       native_stroke_construct_cell.val = Some(d)
@@ -18536,11 +18533,9 @@ pub fn native_tiling_construct() -> NativeFuncData {
           {
             name: "relative",
             docs: "Determines relative to which element's bounding box the tiling is drawn.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Smart[RelativeTo]])),
             default: Some(() => {
-              IntoValue::into_value(impl_tiling_construct__relative_default()) catch {
-                _ => None
-              }
+              IntoValue::into_value((Smart::Auto : Smart[RelativeTo]))
             }),
             positional: false,
             named: true,
@@ -18560,7 +18555,7 @@ pub fn native_tiling_construct() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Tiling])),
         native_tiling_construct_call,
       )
       native_tiling_construct_cell.val = Some(d)
@@ -18596,9 +18591,9 @@ fn native_tiling_construct_call(
     Some(v) => v
     None => impl_tiling_construct__angle_default()
   }
-  let relative_ : Value = match args.named("relative") {
+  let relative_ : Smart[RelativeTo] = match args.named("relative") {
     Some(v) => v
-    None => impl_tiling_construct__relative_default()
+    None => Smart::Auto
   }
   let body_ : Content = args.expect("body")
   args.take().finish()

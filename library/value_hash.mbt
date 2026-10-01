@@ -96,11 +96,12 @@ pub impl Fingerprint for Value with fn fingerprint(self, state) {
     }
     Gradient(v) => {
       state.write_discriminant(11)
-      state.write_leaf(v.repr(), v)
+      state.write_str(v.repr())
     }
     Tiling(v) => {
       state.write_discriminant(12)
-      state.write_leaf(v.repr(), v)
+      state.write(v.body)
+      state.write_str(v.repr())
     }
     Symbol(v) => {
       state.write_discriminant(13)
