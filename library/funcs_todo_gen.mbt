@@ -831,7 +831,7 @@ fn impl_calc_atanh(
 
 ///|
 /// TODO: port default `Spanned::detached(10.0)`.
-fn impl_calc_log__base_default() -> Double raise SourceError {
+fn impl_calc_log__base_default() -> @syntax.Spanned[Double] raise SourceError {
   raise SourceError([
     SourceDiagnostic::error_at(
       @syntax.Span::detached(),
@@ -1096,7 +1096,7 @@ fn impl_calc_quo(
 
 ///|
 /// TODO: port default `Spanned::detached(2.0)`.
-fn impl_calc_norm__p_default() -> Double raise SourceError {
+fn impl_calc_norm__p_default() -> @syntax.Spanned[Double] raise SourceError {
   raise SourceError([
     SourceDiagnostic::error_at(
       @syntax.Span::detached(),
@@ -1565,7 +1565,7 @@ fn impl_func_where(self_ : Func, args : Args) -> Value raise HintedError {
 
 ///|
 /// TODO: port default `Spanned::new(Base::Default, Span::detached())`.
-fn impl_i64_construct__base_default() -> Value raise SourceError {
+fn impl_i64_construct__base_default() -> @syntax.Spanned[Value] raise SourceError {
   raise SourceError([
     SourceDiagnostic::error_at(
       @syntax.Span::detached(),
@@ -1903,7 +1903,7 @@ fn impl_selector_within(
 
 ///|
 /// TODO: port default `Spanned::detached(Base::Default)`.
-fn impl_str_construct__base_default() -> Value raise SourceError {
+fn impl_str_construct__base_default() -> @syntax.Spanned[Value] raise SourceError {
   raise SourceError([
     SourceDiagnostic::error_at(
       @syntax.Span::detached(),
@@ -3623,7 +3623,7 @@ fn impl_spot_colorant_tint(
 
 ///|
 /// TODO: port default `Spanned::detached(Smart::Auto)`.
-fn impl_gradient_linear__space_default() -> Value raise SourceError {
+fn impl_gradient_linear__space_default() -> @syntax.Spanned[Value] raise SourceError {
   raise SourceError([
     SourceDiagnostic::error_at(
       @syntax.Span::detached(),
@@ -3678,7 +3678,7 @@ fn impl_gradient_linear(
 
 ///|
 /// TODO: port default `Spanned::detached(Smart::Auto)`.
-fn impl_gradient_radial__space_default() -> Value raise SourceError {
+fn impl_gradient_radial__space_default() -> @syntax.Spanned[Value] raise SourceError {
   raise SourceError([
     SourceDiagnostic::error_at(
       @syntax.Span::detached(),
@@ -3711,7 +3711,7 @@ fn impl_gradient_radial__center_default() -> Value raise SourceError {
 
 ///|
 /// TODO: port default `Spanned::detached(Ratio::new(0.5))`.
-fn impl_gradient_radial__radius_default() -> Ratio raise SourceError {
+fn impl_gradient_radial__radius_default() -> @syntax.Spanned[Ratio] raise SourceError {
   raise SourceError([
     SourceDiagnostic::error_at(
       @syntax.Span::detached(),
@@ -3733,7 +3733,7 @@ fn impl_gradient_radial__focal_center_default() -> Value raise SourceError {
 
 ///|
 /// TODO: port default `Spanned::detached(Ratio::new(0.0))`.
-fn impl_gradient_radial__focal_radius_default() -> Ratio raise SourceError {
+fn impl_gradient_radial__focal_radius_default() -> @syntax.Spanned[Ratio] raise SourceError {
   raise SourceError([
     SourceDiagnostic::error_at(
       @syntax.Span::detached(),
@@ -3783,7 +3783,7 @@ fn impl_gradient_conic__angle_default() -> Angle raise SourceError {
 
 ///|
 /// TODO: port default `Spanned::detached(Smart::Auto)`.
-fn impl_gradient_conic__space_default() -> Value raise SourceError {
+fn impl_gradient_conic__space_default() -> @syntax.Spanned[Value] raise SourceError {
   raise SourceError([
     SourceDiagnostic::error_at(
       @syntax.Span::detached(),
@@ -3840,7 +3840,7 @@ fn impl_gradient_conic(
 
 ///|
 /// TODO: port default `Spanned::detached(Ratio::zero())`.
-fn impl_gradient_sharp__smoothness_default() -> Ratio raise SourceError {
+fn impl_gradient_sharp__smoothness_default() -> @syntax.Spanned[Ratio] raise SourceError {
   raise SourceError([
     SourceDiagnostic::error_at(
       @syntax.Span::detached(),
@@ -4009,7 +4009,7 @@ fn impl_stroke_construct(args : Args) -> Value raise SourceError {
 
 ///|
 /// TODO: port default `Spanned::detached(Smart::Auto)`.
-fn impl_tiling_construct__size_default() -> Value raise SourceError {
+fn impl_tiling_construct__size_default() -> @syntax.Spanned[Value] raise SourceError {
   raise SourceError([
     SourceDiagnostic::error_at(
       @syntax.Span::detached(),
@@ -4020,7 +4020,7 @@ fn impl_tiling_construct__size_default() -> Value raise SourceError {
 
 ///|
 /// TODO: port default `Spanned::detached(Axes::splat(Length::zero()))`.
-fn impl_tiling_construct__spacing_default() -> Value raise SourceError {
+fn impl_tiling_construct__spacing_default() -> @syntax.Spanned[Value] raise SourceError {
   raise SourceError([
     SourceDiagnostic::error_at(
       @syntax.Span::detached(),
@@ -4031,7 +4031,7 @@ fn impl_tiling_construct__spacing_default() -> Value raise SourceError {
 
 ///|
 /// TODO: port default `Spanned::new(Axes::splat(Rel::zero()), Span::detached())`.
-fn impl_tiling_construct__offset_default() -> Value raise SourceError {
+fn impl_tiling_construct__offset_default() -> @syntax.Spanned[Value] raise SourceError {
   raise SourceError([
     SourceDiagnostic::error_at(
       @syntax.Span::detached(),
@@ -4042,7 +4042,7 @@ fn impl_tiling_construct__offset_default() -> Value raise SourceError {
 
 ///|
 /// TODO: port default `Spanned::detached(Angle::zero())`.
-fn impl_tiling_construct__angle_default() -> Angle raise SourceError {
+fn impl_tiling_construct__angle_default() -> @syntax.Spanned[Angle] raise SourceError {
   raise SourceError([
     SourceDiagnostic::error_at(
       @syntax.Span::detached(),

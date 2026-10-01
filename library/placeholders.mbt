@@ -145,27 +145,6 @@ pub fn Duration::repr(self : Duration) -> String {
 }
 
 ///|
-/// Internal native values stored in `Value::Dyn` (upstream `Dynamic`).
-pub(all) enum DynValue {
-  /// Placeholder until the first internal types are ported.
-  Placeholder
-} derive(Eq, Hash)
-
-///|
-pub fn DynValue::ty(self : DynValue) -> Type {
-  match self {
-    Placeholder => Type::none()
-  }
-}
-
-///|
-pub fn DynValue::repr(self : DynValue) -> String {
-  match self {
-    Placeholder => ".."
-  }
-}
-
-///|
 pub fn Symbol::func(self : Symbol) -> Func raise HintedError {
   bail("symbol \{self.repr()} is not callable")
 }
@@ -330,35 +309,6 @@ pub fn Datetime::kind(self : Datetime) -> String {
 }
 
 ///|
-pub fn DynValue::is_alignment(self : DynValue) -> Bool {
-  ignore(self)
-  false
-}
-
-///|
-pub fn DynValue::add_dyn(
-  self : DynValue,
-  _other : DynValue,
-) -> Value? raise HintedError {
-  ignore(self)
-  None
-}
-
-///|
-pub fn DynValue::regex_is_match(self : DynValue, _s : String) -> Bool? {
-  ignore(self)
-  None
-}
-
-///|
-/// Access a field on a dynamic value: `None` if the type has no fields,
-/// `Some(None)` if the field is missing.
-pub fn DynValue::field(self : DynValue, _field : String) -> Value?? {
-  ignore(self)
-  None
-}
-
-///|
 /// Create a stroke from a paint and a thickness (upstream
 /// `Stroke::from_pair`).
 pub fn stroke_from_pair(_a : Value, _b : Value) -> Value raise HintedError {
@@ -370,4 +320,141 @@ pub fn stroke_from_pair(_a : Value, _b : Value) -> Value raise HintedError {
 /// `Symbol::runtime_char`).
 pub fn Symbol::runtime_char(c : Char) -> Symbol {
   { text: c.to_string(), }
+}
+
+// Placeholders for dynamic types (see `dyn.mbt`). Each owner replaces its
+// section with the real port, keeping the methods used by `dyn.mbt`.
+
+///|
+/// An alignment. (placeholder; see layout/align.rs)
+pub(all) struct Alignment {
+  priv repr_ : String
+} derive(Eq, Hash)
+
+///|
+pub fn Alignment::repr(self : Alignment) -> String {
+  self.repr_
+}
+
+///|
+/// Sum two alignments (upstream `Add for Alignment`).
+pub fn Alignment::add(
+  self : Alignment,
+  _other : Alignment,
+) -> Alignment raise HintedError {
+  bail("alignments are not ported yet") |> ignore
+  self
+}
+
+///|
+/// The fields of an alignment (`x`, `y`); `None` if missing.
+pub fn Alignment::field(self : Alignment, _field : String) -> Value? {
+  ignore(self)
+  None
+}
+
+///|
+/// A direction. (placeholder; see layout/dir.rs)
+pub(all) struct Dir {
+  priv repr_ : String
+} derive(Eq, Hash)
+
+///|
+pub fn Dir::repr(self : Dir) -> String {
+  self.repr_
+}
+
+///|
+/// A regular expression. (placeholder; see foundations/str.rs)
+pub(all) struct Regex {
+  priv pattern : String
+} derive(Eq, Hash)
+
+///|
+pub fn Regex::repr(self : Regex) -> String {
+  "regex(" + repr_str(self.pattern) + ")"
+}
+
+///|
+/// Whether the regex matches somewhere in the string.
+pub fn Regex::is_match(self : Regex, _s : String) -> Bool {
+  ignore(self)
+  false
+}
+
+///|
+/// A spot colorant. (placeholder; see visualize/color.rs)
+pub(all) struct SpotColorant {
+  priv repr_ : String
+} derive(Eq, Hash)
+
+///|
+pub fn SpotColorant::repr(self : SpotColorant) -> String {
+  self.repr_
+}
+
+///|
+/// A stroke. (placeholder; see visualize/stroke.rs)
+pub(all) struct Stroke {
+  priv repr_ : String
+} derive(Eq, Hash)
+
+///|
+pub fn Stroke::repr(self : Stroke) -> String {
+  self.repr_
+}
+
+///|
+/// The fields of a stroke; `None` if missing.
+pub fn Stroke::field(self : Stroke, _field : String) -> Value? {
+  ignore(self)
+  None
+}
+
+///|
+/// A counter. (placeholder; see introspection/counter.rs)
+pub(all) struct Counter {
+  priv repr_ : String
+} derive(Eq, Hash)
+
+///|
+pub fn Counter::repr(self : Counter) -> String {
+  self.repr_
+}
+
+///|
+/// A state. (placeholder; see introspection/state.rs)
+pub(all) struct State {
+  priv repr_ : String
+} derive(Eq, Hash)
+
+///|
+pub fn State::repr(self : State) -> String {
+  self.repr_
+}
+
+///|
+/// A path rooted in a project or package. (placeholder; see
+/// foundations/path.rs)
+pub(all) struct RootedPath {
+  priv repr_ : String
+} derive(Eq, Hash)
+
+///|
+pub fn RootedPath::repr(self : RootedPath) -> String {
+  self.repr_
+}
+
+///|
+/// The repr of a location. (placeholder; see introspection/location.rs)
+pub fn Location::repr(self : Location) -> String {
+  ignore(self)
+  "location(..)"
+}
+
+///|
+/// The repr of a selector. (placeholder; see foundations/selector.rs)
+pub fn Selector::repr(self : Selector) -> String {
+  ignore(self)
+  "selector(..)"
 }
