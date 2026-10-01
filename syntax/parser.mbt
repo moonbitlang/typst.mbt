@@ -1454,7 +1454,7 @@ fn Parser::new(text : String, offset : Int, mode : SyntaxMode) -> Parser {
 /// Consume the parser, generating a single top-level node.
 fn Parser::finish_into(self : Parser, kind : SyntaxKind) -> SyntaxNode {
   guard self.at(End) else { abort("parser did not reach the end") }
-  SyntaxNode::inner(kind, self.nodes)
+  SyntaxNode::inner_owned(kind, self.nodes)
 }
 
 ///|
@@ -1594,7 +1594,7 @@ fn Parser::wrap(self : Parser, from : Int, kind : SyntaxKind) -> Unit {
   let children = self.nodes[from:to].to_array()
   let rest = self.nodes[to:].to_array()
   self.nodes.truncate(from)
-  self.nodes.push(SyntaxNode::inner(kind, children))
+  self.nodes.push(SyntaxNode::inner_owned(kind, children))
   self.nodes.append(rest)
 }
 

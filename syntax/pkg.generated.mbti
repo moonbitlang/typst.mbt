@@ -395,9 +395,7 @@ pub fn SyntaxNode::diagnosis(Self) -> Diagnosis
 pub fn SyntaxNode::error(String, StringView) -> Self
 pub fn SyntaxNode::errors_and_warnings(Self) -> (Array[SyntaxDiagnostic], Array[SyntaxDiagnostic])
 pub fn SyntaxNode::full_text(Self) -> String
-pub fn SyntaxNode::hint(Self, String) -> Unit
-pub fn SyntaxNode::hint_at(Self, Int, Int, String) -> Unit
-pub fn SyntaxNode::inner(SyntaxKind, Array[Self]) -> Self
+pub fn SyntaxNode::inner(SyntaxKind, ArrayView[Self]) -> Self
 pub fn SyntaxNode::is_empty(Self) -> Bool
 pub fn SyntaxNode::is_inner(Self) -> Bool
 pub fn SyntaxNode::is_leaf(Self) -> Bool
@@ -409,9 +407,6 @@ pub fn SyntaxNode::placeholder(SyntaxKind) -> Self
 pub fn SyntaxNode::span(Self) -> Span
 pub fn SyntaxNode::spanless_eq(Self, Self) -> Bool
 pub fn SyntaxNode::synthesize(Self, Span) -> Unit
-pub fn SyntaxNode::warn(Self, String) -> Unit
-pub fn SyntaxNode::warn_at(Self, Int, Int, String) -> Unit
-pub fn SyntaxNode::with_hints(Self, ArrayView[String]) -> Self
 
 pub(all) struct SyntaxSet {
   a : UInt64
