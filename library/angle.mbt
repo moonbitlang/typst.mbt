@@ -82,6 +82,18 @@ pub fn Angle::to_deg(self : Angle) -> Double {
 }
 
 ///|
+/// Converts this angle to radians (`angle.rad`).
+fn impl_angle_to_rad(self_ : Angle) -> Double raise HintedError {
+  self_.to_rad()
+}
+
+///|
+/// Converts this angle to degrees (`angle.deg`).
+fn impl_angle_to_deg(self_ : Angle) -> Double raise HintedError {
+  self_.to_deg()
+}
+
+///|
 /// The angle normalized to `[0, 2π)`.
 pub fn Angle::normalized(self : Angle) -> Angle {
   Angle::rad(rem_euclid(self.to_rad(), 2.0 * @math.PI))

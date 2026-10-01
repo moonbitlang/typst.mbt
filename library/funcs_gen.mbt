@@ -12204,7 +12204,7 @@ pub fn native_alignment_axis() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Alignment])),
             default: None,
             positional: true,
             named: false,
@@ -12213,7 +12213,7 @@ pub fn native_alignment_axis() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Axis?])),
         native_alignment_axis_call,
       )
       native_alignment_axis_cell.val = Some(d)
@@ -12230,7 +12230,7 @@ fn native_alignment_axis_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : Alignment = args.expect("self")
   args.take().finish()
   let output = at(args.span, () => impl_alignment_axis(self_))
   IntoValue::into_value(output)
@@ -12255,7 +12255,7 @@ pub fn native_alignment_inv() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Alignment])),
             default: None,
             positional: true,
             named: false,
@@ -12264,7 +12264,7 @@ pub fn native_alignment_inv() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Alignment])),
         native_alignment_inv_call,
       )
       native_alignment_inv_cell.val = Some(d)
@@ -12281,7 +12281,7 @@ fn native_alignment_inv_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : Alignment = args.expect("self")
   args.take().finish()
   let output = at(args.span, () => impl_alignment_inv(self_))
   IntoValue::into_value(output)
@@ -12408,7 +12408,7 @@ pub fn native_dir_from() -> NativeFuncData {
           {
             name: "side",
             docs: "The starting point for the direction.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Side])),
             default: None,
             positional: true,
             named: false,
@@ -12417,7 +12417,7 @@ pub fn native_dir_from() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Dir])),
         native_dir_from_call,
       )
       native_dir_from_cell.val = Some(d)
@@ -12434,7 +12434,7 @@ fn native_dir_from_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let side_ : Value = args.expect("side")
+  let side_ : Side = args.expect("side")
   args.take().finish()
   let output = at(args.span, () => impl_dir_from(side_))
   IntoValue::into_value(output)
@@ -12459,7 +12459,7 @@ pub fn native_dir_to() -> NativeFuncData {
           {
             name: "side",
             docs: "The end point for the direction.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Side])),
             default: None,
             positional: true,
             named: false,
@@ -12468,7 +12468,7 @@ pub fn native_dir_to() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Dir])),
         native_dir_to_call,
       )
       native_dir_to_cell.val = Some(d)
@@ -12485,7 +12485,7 @@ fn native_dir_to_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let side_ : Value = args.expect("side")
+  let side_ : Side = args.expect("side")
   args.take().finish()
   let output = at(args.span, () => impl_dir_to(side_))
   IntoValue::into_value(output)
@@ -12510,7 +12510,7 @@ pub fn native_dir_axis() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Dir])),
             default: None,
             positional: true,
             named: false,
@@ -12519,7 +12519,7 @@ pub fn native_dir_axis() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Axis])),
         native_dir_axis_call,
       )
       native_dir_axis_cell.val = Some(d)
@@ -12536,7 +12536,7 @@ fn native_dir_axis_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : Dir = args.expect("self")
   args.take().finish()
   let output = at(args.span, () => impl_dir_axis(self_))
   IntoValue::into_value(output)
@@ -12561,7 +12561,7 @@ pub fn native_dir_sign() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Dir])),
             default: None,
             positional: true,
             named: false,
@@ -12587,7 +12587,7 @@ fn native_dir_sign_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : Dir = args.expect("self")
   args.take().finish()
   let output = at(args.span, () => impl_dir_sign(self_))
   IntoValue::into_value(output)
@@ -12612,7 +12612,7 @@ pub fn native_dir_start() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Dir])),
             default: None,
             positional: true,
             named: false,
@@ -12621,7 +12621,7 @@ pub fn native_dir_start() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Side])),
         native_dir_start_call,
       )
       native_dir_start_cell.val = Some(d)
@@ -12638,7 +12638,7 @@ fn native_dir_start_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : Dir = args.expect("self")
   args.take().finish()
   let output = at(args.span, () => impl_dir_start(self_))
   IntoValue::into_value(output)
@@ -12663,7 +12663,7 @@ pub fn native_dir_end() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Dir])),
             default: None,
             positional: true,
             named: false,
@@ -12672,7 +12672,7 @@ pub fn native_dir_end() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Side])),
         native_dir_end_call,
       )
       native_dir_end_cell.val = Some(d)
@@ -12689,7 +12689,7 @@ fn native_dir_end_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : Dir = args.expect("self")
   args.take().finish()
   let output = at(args.span, () => impl_dir_end(self_))
   IntoValue::into_value(output)
@@ -12714,7 +12714,7 @@ pub fn native_dir_inv() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Dir])),
             default: None,
             positional: true,
             named: false,
@@ -12723,7 +12723,7 @@ pub fn native_dir_inv() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Dir])),
         native_dir_inv_call,
       )
       native_dir_inv_cell.val = Some(d)
@@ -12740,7 +12740,7 @@ fn native_dir_inv_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : Dir = args.expect("self")
   args.take().finish()
   let output = at(args.span, () => impl_dir_inv(self_))
   IntoValue::into_value(output)
@@ -13071,11 +13071,9 @@ pub fn native_measure() -> NativeFuncData {
           {
             name: "width",
             docs: "The width available to layout the content.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Smart[Length]])),
             default: Some(() => {
-              IntoValue::into_value(impl_measure__width_default()) catch {
-                _ => None
-              }
+              IntoValue::into_value((Smart::Auto : Smart[Length]))
             }),
             positional: false,
             named: true,
@@ -13086,11 +13084,9 @@ pub fn native_measure() -> NativeFuncData {
           {
             name: "height",
             docs: "The height available to layout the content.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Smart[Length]])),
             default: Some(() => {
-              IntoValue::into_value(impl_measure__height_default()) catch {
-                _ => None
-              }
+              IntoValue::into_value((Smart::Auto : Smart[Length]))
             }),
             positional: false,
             named: true,
@@ -13127,13 +13123,13 @@ fn native_measure_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let width_ : Value = match args.named("width") {
+  let width_ : Smart[Length] = match args.named("width") {
     Some(v) => v
-    None => impl_measure__width_default()
+    None => Smart::Auto
   }
-  let height_ : Value = match args.named("height") {
+  let height_ : Smart[Length] = match args.named("height") {
     Some(v) => v
-    None => impl_measure__height_default()
+    None => Smart::Auto
   }
   let content_ : Content = args.expect("content")
   args.take().finish()
@@ -17149,7 +17145,7 @@ pub fn native_gradient_linear() -> NativeFuncData {
           {
             name: "dir",
             docs: "The direction of the gradient.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Dir])),
             default: Some(() => {
               IntoValue::into_value(impl_gradient_linear__dir_default()) catch {
                 _ => None
@@ -17263,7 +17259,7 @@ pub fn native_gradient_radial() -> NativeFuncData {
           {
             name: "center",
             docs: "The center of the end circle of the gradient.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Axes[Ratio]])),
             default: Some(() => {
               IntoValue::into_value(impl_gradient_radial__center_default()) catch {
                 _ => None
@@ -17293,13 +17289,9 @@ pub fn native_gradient_radial() -> NativeFuncData {
           {
             name: "focal-center",
             docs: "The center of the focal circle of the gradient.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Smart[Axes[Ratio]]])),
             default: Some(() => {
-              IntoValue::into_value(
-                impl_gradient_radial__focal_center_default(),
-              ) catch {
-                _ => None
-              }
+              IntoValue::into_value((Smart::Auto : Smart[Axes[Ratio]]))
             }),
             positional: false,
             named: true,
@@ -17351,7 +17343,7 @@ fn native_gradient_radial_call(
     Some(v) => v
     None => impl_gradient_radial__relative_default()
   }
-  let center_ : Value = match args.named("center") {
+  let center_ : Axes[Ratio] = match args.named("center") {
     Some(v) => v
     None => impl_gradient_radial__center_default()
   }
@@ -17359,9 +17351,9 @@ fn native_gradient_radial_call(
     Some(v) => v
     None => impl_gradient_radial__radius_default()
   }
-  let focal_center_ : Value = match args.named("focal-center") {
+  let focal_center_ : Smart[Axes[Ratio]] = match args.named("focal-center") {
     Some(v) => v
-    None => impl_gradient_radial__focal_center_default()
+    None => Smart::Auto
   }
   let focal_radius_ : @syntax.Spanned[Ratio] = match
     args.named_spanned("focal-radius") {
@@ -17457,7 +17449,7 @@ pub fn native_gradient_conic() -> NativeFuncData {
           {
             name: "center",
             docs: "The center of the circle of the gradient.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Axes[Ratio]])),
             default: Some(() => {
               IntoValue::into_value(impl_gradient_conic__center_default()) catch {
                 _ => None
@@ -17500,7 +17492,7 @@ fn native_gradient_conic_call(
     Some(v) => v
     None => impl_gradient_conic__relative_default()
   }
-  let center_ : Value = match args.named("center") {
+  let center_ : Axes[Ratio] = match args.named("center") {
     Some(v) => v
     None => impl_gradient_conic__center_default()
   }
@@ -17960,7 +17952,7 @@ pub fn native_gradient_center() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Axes[Ratio]?])),
         native_gradient_center_call,
       )
       native_gradient_center_cell.val = Some(d)
@@ -18062,7 +18054,7 @@ pub fn native_gradient_focal_center() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Axes[Ratio]?])),
         native_gradient_focal_center_call,
       )
       native_gradient_focal_center_cell.val = Some(d)
@@ -18391,7 +18383,7 @@ pub fn native_stroke_construct() -> NativeFuncData {
           {
             name: "thickness",
             docs: "The stroke's thickness.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Smart[Length]])),
             default: None,
             positional: true,
             named: false,
@@ -18435,7 +18427,7 @@ pub fn native_stroke_construct() -> NativeFuncData {
           {
             name: "miter-limit",
             docs: "Number at which protruding sharp bends are rendered with a bevel instead or a miter join. The higher the number, the sharper an angle can be before it is bevelled. Only applicable if `join` is `{\"miter\"}`.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Smart[Double]])),
             default: None,
             positional: true,
             named: false,
@@ -18484,7 +18476,7 @@ pub fn native_tiling_construct() -> NativeFuncData {
           {
             name: "size",
             docs: "The bounding box of each cell of the tiling, specified as a `(x, y)` pair.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Smart[Axes[Length]]])),
             default: Some(() => {
               IntoValue::into_value(impl_tiling_construct__size_default().v) catch {
                 _ => None
@@ -18499,7 +18491,7 @@ pub fn native_tiling_construct() -> NativeFuncData {
           {
             name: "spacing",
             docs: "The spacing between cells of the tiling, specified as a `(x, y)` pair.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Axes[Length]])),
             default: Some(() => {
               IntoValue::into_value(impl_tiling_construct__spacing_default().v) catch {
                 _ => None
@@ -18514,7 +18506,7 @@ pub fn native_tiling_construct() -> NativeFuncData {
           {
             name: "offset",
             docs: "Shifts the entire tile grid without affecting the tile size or spacing.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Axes[Rel[Length]]])),
             default: Some(() => {
               IntoValue::into_value(impl_tiling_construct__offset_default().v) catch {
                 _ => None
@@ -18585,15 +18577,18 @@ fn native_tiling_construct_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let size_ : @syntax.Spanned[Value] = match args.named_spanned("size") {
+  let size_ : @syntax.Spanned[Smart[Axes[Length]]] = match
+    args.named_spanned("size") {
     Some(v) => v
     None => impl_tiling_construct__size_default()
   }
-  let spacing_ : @syntax.Spanned[Value] = match args.named_spanned("spacing") {
+  let spacing_ : @syntax.Spanned[Axes[Length]] = match
+    args.named_spanned("spacing") {
     Some(v) => v
     None => impl_tiling_construct__spacing_default()
   }
-  let offset_ : @syntax.Spanned[Value] = match args.named_spanned("offset") {
+  let offset_ : @syntax.Spanned[Axes[Rel[Length]]] = match
+    args.named_spanned("offset") {
     Some(v) => v
     None => impl_tiling_construct__offset_default()
   }

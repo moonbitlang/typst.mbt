@@ -562,3 +562,61 @@ pub impl FromValue for Styles with fn from_value(v) {
     v => raise HintedError(CastInfo::Type(Type::styles()).error(v))
   }
 }
+
+///|
+/// A property that is folded to determine its final value (upstream
+/// `Fold`).
+///
+/// Note: Folding must be associative, i.e. any implementation must satisfy
+/// `fold(fold(a, b), c) == fold(a, fold(b, c))`.
+pub(open) trait Fold {
+  /// Fold this inner value with an outer folded value.
+  fn fold(Self, Self) -> Self
+}
+
+///|
+pub impl Fold for Bool with fn fold(self, _) {
+  self
+}
+
+///|
+pub impl[T : Fold] Fold for T? with fn fold(self, outer) {
+  match (self, outer) {
+    (Some(inner), Some(outer)) => Some(inner.fold(outer))
+    // An explicit `None` should be respected, thus we don't do
+    // `inner.or(outer)`.
+    (inner, _) => inner
+  }
+}
+
+///|
+/// Attempts to fold this inner value with an outer value. However, if
+/// either value is `None`, returns the other one instead of folding
+/// (upstream `AlternativeFold::fold_or`).
+pub fn[T : Fold] fold_or(inner : T?, outer : T?) -> T? {
+  match (inner, outer) {
+    (Some(inner), Some(outer)) => Some(inner.fold(outer))
+    // If one of values is `None`, return the other one instead of
+    // folding.
+    (Some(_), None) => inner
+    (None, _) => outer
+  }
+}
+
+///|
+/// The value-level fold function of a field of type `T` (upstream: the
+/// `#[fold]` attribute folds through `T`'s `Fold` impl).
+pub fn[T : FromValue + IntoValue + Fold] fold_of(
+  _ty : Ty[T],
+) -> (Value, Value) -> Value {
+  (inner, outer) => {
+    let folded = try {
+      let i : T = T::from_value(inner)
+      let o : T = T::from_value(outer)
+      Some(IntoValue::into_value(Fold::fold(i, o)))
+    } catch {
+      _ => None
+    }
+    folded.unwrap_or(inner)
+  }
+}

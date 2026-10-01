@@ -328,10 +328,8 @@ fn prelude_define(global : Scope) -> Unit {
   // lime (`Color::BLACK`, ...), and luma, oklab, oklch, rgb, cmyk
   // (`Color::luma_data()`, ...).
   global.define_func(native_array_range()) |> ignore
-  // TODO(directions): ltr, rtl, ttb, btt (`Dir::LTR`, ...).
-  // TODO(alignments): start, left, center, right, end, top, horizon, bottom
-  // (`Alignment::START`, ...).
-
+  // Directions and alignments.
+  prelude_layout(global)
 }
 
 ///|

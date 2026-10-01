@@ -40,6 +40,16 @@ TYPEMAP = {
     "Dict": "Dict",
     "Args": "Args",
     "Type": "Type",
+    "Alignment": "Alignment",
+    "HAlignment": "HAlignment",
+    "VAlignment": "VAlignment",
+    "OuterHAlignment": "OuterHAlignment",
+    "OuterVAlignment": "OuterVAlignment",
+    "Dir": "Dir",
+    "Side": "Side",
+    "Axis": "Axis",
+    "Spacing": "Spacing",
+    "Sizing": "Sizing",
     "SyntaxMode": "@syntax.SyntaxMode",
     "Symbol": "Symbol",
     "SymbolVariant": "SymbolVariant",
@@ -67,6 +77,12 @@ TYPEMAP = {
 # `X<A, B>` maps to `X[A', B']` if every argument maps to a ported type
 # (or is literally `Value`).
 GENERICS = {
+    "Smart": "Smart",
+    "Axes": "Axes",
+    # Only `Sides<Option<T>>` / `Corners<Option<T>>` are castable upstream.
+    "Sides": "Sides",
+    "Corners": "Corners",
+    "SpecificAlignment": "SpecificAlignment",
 }
 
 

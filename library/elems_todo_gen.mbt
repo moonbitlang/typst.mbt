@@ -13,26 +13,8 @@ fn align_elem_alignment_default() -> Value {
 }
 
 ///|
-/// TODO: fold for `Alignment` (AlignElem.alignment).
-fn align_elem_alignment_fold(inner : Value, _outer : Value) -> Value {
-  inner
-}
-
-///|
-/// TODO: port `` (ColumnsElem.separator).
-fn columns_elem_separator_default() -> Value {
-  None
-}
-
-///|
 /// TODO: port `Default::default() of Sizing` (BoxElem.width).
 fn box_elem_width_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Smart<Rel<Length>>` (BoxElem.height).
-fn box_elem_height_default() -> Value {
   None
 }
 
@@ -61,54 +43,6 @@ fn box_elem_stroke_fold(inner : Value, _outer : Value) -> Value {
 }
 
 ///|
-/// TODO: port `Default::default() of Corners<Option<Rel<Length>>>` (BoxElem.radius).
-fn box_elem_radius_default() -> Value {
-  None
-}
-
-///|
-/// TODO: fold for `Corners<Option<Rel<Length>>>` (BoxElem.radius).
-fn box_elem_radius_fold(inner : Value, _outer : Value) -> Value {
-  inner
-}
-
-///|
-/// TODO: port `Default::default() of Sides<Option<Rel<Length>>>` (BoxElem.inset).
-fn box_elem_inset_default() -> Value {
-  None
-}
-
-///|
-/// TODO: fold for `Sides<Option<Rel<Length>>>` (BoxElem.inset).
-fn box_elem_inset_fold(inner : Value, _outer : Value) -> Value {
-  inner
-}
-
-///|
-/// TODO: port `Default::default() of Sides<Option<Rel<Length>>>` (BoxElem.outset).
-fn box_elem_outset_default() -> Value {
-  None
-}
-
-///|
-/// TODO: fold for `Sides<Option<Rel<Length>>>` (BoxElem.outset).
-fn box_elem_outset_fold(inner : Value, _outer : Value) -> Value {
-  inner
-}
-
-///|
-/// TODO: port `Default::default() of Option<Content>` (BoxElem.body).
-fn box_elem_body_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Smart<Rel<Length>>` (BlockElem.width).
-fn block_elem_width_default() -> Value {
-  None
-}
-
-///|
 /// TODO: port `Default::default() of Sizing` (BlockElem.height).
 fn block_elem_height_default() -> Value {
   None
@@ -130,60 +64,6 @@ fn block_elem_stroke_default() -> Value {
 /// TODO: fold for `Sides<Option<Option<Stroke>>>` (BlockElem.stroke).
 fn block_elem_stroke_fold(inner : Value, _outer : Value) -> Value {
   inner
-}
-
-///|
-/// TODO: port `Default::default() of Corners<Option<Rel<Length>>>` (BlockElem.radius).
-fn block_elem_radius_default() -> Value {
-  None
-}
-
-///|
-/// TODO: fold for `Corners<Option<Rel<Length>>>` (BlockElem.radius).
-fn block_elem_radius_fold(inner : Value, _outer : Value) -> Value {
-  inner
-}
-
-///|
-/// TODO: port `Default::default() of Sides<Option<Rel<Length>>>` (BlockElem.inset).
-fn block_elem_inset_default() -> Value {
-  None
-}
-
-///|
-/// TODO: fold for `Sides<Option<Rel<Length>>>` (BlockElem.inset).
-fn block_elem_inset_fold(inner : Value, _outer : Value) -> Value {
-  inner
-}
-
-///|
-/// TODO: port `Default::default() of Sides<Option<Rel<Length>>>` (BlockElem.outset).
-fn block_elem_outset_default() -> Value {
-  None
-}
-
-///|
-/// TODO: fold for `Sides<Option<Rel<Length>>>` (BlockElem.outset).
-fn block_elem_outset_fold(inner : Value, _outer : Value) -> Value {
-  inner
-}
-
-///|
-/// TODO: port `Smart::Custom(Em::new(1.2).into())` (BlockElem.spacing).
-fn block_elem_spacing_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Smart<Spacing>` (BlockElem.above).
-fn block_elem_above_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Smart<Spacing>` (BlockElem.below).
-fn block_elem_below_default() -> Value {
-  None
 }
 
 ///|
@@ -259,24 +139,6 @@ fn grid_elem_stroke_fold(inner : Value, _outer : Value) -> Value {
 }
 
 ///|
-/// TODO: port `Default::default() of Smart<usize>` (GridHLine.y).
-fn grid_h_line_elem_y_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of usize` (GridHLine.start).
-fn grid_h_line_elem_start_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Option<NonZeroUsize>` (GridHLine.end).
-fn grid_h_line_elem_end_default() -> Value {
-  None
-}
-
-///|
 /// TODO: port `Some(Arc::new(Stroke::default()))` (GridHLine.stroke).
 fn grid_h_line_elem_stroke_default() -> Value {
   None
@@ -289,30 +151,6 @@ fn grid_h_line_elem_stroke_fold(inner : Value, _outer : Value) -> Value {
 }
 
 ///|
-/// TODO: port `OuterVAlignment::Top` (GridHLine.position).
-fn grid_h_line_elem_position_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Smart<usize>` (GridVLine.x).
-fn grid_v_line_elem_x_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of usize` (GridVLine.start).
-fn grid_v_line_elem_start_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Option<NonZeroUsize>` (GridVLine.end).
-fn grid_v_line_elem_end_default() -> Value {
-  None
-}
-
-///|
 /// TODO: port `Some(Arc::new(Stroke::default()))` (GridVLine.stroke).
 fn grid_v_line_elem_stroke_default() -> Value {
   None
@@ -322,36 +160,6 @@ fn grid_v_line_elem_stroke_default() -> Value {
 /// TODO: fold for `Option<Arc<Stroke>>` (GridVLine.stroke).
 fn grid_v_line_elem_stroke_fold(inner : Value, _outer : Value) -> Value {
   inner
-}
-
-///|
-/// TODO: port `OuterHAlignment::Start` (GridVLine.position).
-fn grid_v_line_elem_position_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Smart<usize>` (GridCell.x).
-fn grid_cell_elem_x_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Smart<usize>` (GridCell.y).
-fn grid_cell_elem_y_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Smart<Sides<Option<Rel<Length>>>>` (GridCell.inset).
-fn grid_cell_elem_inset_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Smart<Alignment>` (GridCell.align).
-fn grid_cell_elem_align_default() -> Value {
-  None
 }
 
 ///|
@@ -370,12 +178,6 @@ fn grid_cell_elem_stroke_default() -> Value {
 /// TODO: fold for `Sides<Option<Option<Arc<Stroke>>>>` (GridCell.stroke).
 fn grid_cell_elem_stroke_fold(inner : Value, _outer : Value) -> Value {
   inner
-}
-
-///|
-/// TODO: port `Default::default() of Smart<bool>` (GridCell.breakable).
-fn grid_cell_elem_breakable_default() -> Value {
-  None
 }
 
 ///|
@@ -437,50 +239,8 @@ fn page_elem_numbering_default() -> Value {
 }
 
 ///|
-/// TODO: port `Default::default() of Smart<Option<Content>>` (PageElem.supplement).
-fn page_elem_supplement_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `SpecificAlignment::Both(HAlignment::Center, OuterVAlignment::Bottom)` (PageElem.number_align).
-fn page_elem_number_align_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Smart<Option<Content>>` (PageElem.header).
-fn page_elem_header_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Smart<Option<Content>>` (PageElem.footer).
-fn page_elem_footer_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Option<Content>` (PageElem.background).
-fn page_elem_background_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Option<Content>` (PageElem.foreground).
-fn page_elem_foreground_default() -> Value {
-  None
-}
-
-///|
 /// TODO: port `Default::default() of Option<Parity>` (PagebreakElem.to).
 fn pagebreak_elem_to_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Smart::Custom(Alignment::START)` (PlaceElem.alignment).
-fn place_elem_alignment_default() -> Value {
   None
 }
 
@@ -488,30 +248,6 @@ fn place_elem_alignment_default() -> Value {
 /// TODO: port `Default::default() of PlacementScope` (PlaceElem.scope).
 fn place_elem_scope_default() -> Value {
   None
-}
-
-///|
-/// TODO: port `Dir::TTB` (StackElem.dir).
-fn stack_elem_dir_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Option<Spacing>` (StackElem.spacing).
-fn stack_elem_spacing_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `HAlignment::Center + VAlignment::Horizon` (RotateElem.origin).
-fn rotate_elem_origin_default() -> Value {
-  None
-}
-
-///|
-/// TODO: fold for `Alignment` (RotateElem.origin).
-fn rotate_elem_origin_fold(inner : Value, _outer : Value) -> Value {
-  inner
 }
 
 ///|
@@ -529,66 +265,6 @@ fn scale_elem_x_default() -> Value {
 ///|
 /// TODO: port `Smart::Custom(ScaleAmount::Ratio(Ratio::one()))` (ScaleElem.y).
 fn scale_elem_y_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `HAlignment::Center + VAlignment::Horizon` (ScaleElem.origin).
-fn scale_elem_origin_default() -> Value {
-  None
-}
-
-///|
-/// TODO: fold for `Alignment` (ScaleElem.origin).
-fn scale_elem_origin_fold(inner : Value, _outer : Value) -> Value {
-  inner
-}
-
-///|
-/// TODO: port `HAlignment::Center + VAlignment::Horizon` (SkewElem.origin).
-fn skew_elem_origin_default() -> Value {
-  None
-}
-
-///|
-/// TODO: fold for `Alignment` (SkewElem.origin).
-fn skew_elem_origin_fold(inner : Value, _outer : Value) -> Value {
-  inner
-}
-
-///|
-/// TODO: port `Default::default() of Option<Content>` (AttachElem.t).
-fn math_attach_elem_t_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Option<Content>` (AttachElem.b).
-fn math_attach_elem_b_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Option<Content>` (AttachElem.tl).
-fn math_attach_elem_tl_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Option<Content>` (AttachElem.bl).
-fn math_attach_elem_bl_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Option<Content>` (AttachElem.tr).
-fn math_attach_elem_tr_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Option<Content>` (AttachElem.br).
-fn math_attach_elem_br_default() -> Value {
   None
 }
 
@@ -623,20 +299,8 @@ fn equation_elem_numbering_default() -> Value {
 }
 
 ///|
-/// TODO: port `SpecificAlignment::Both(OuterHAlignment::End, VAlignment::Horizon)` (EquationElem.number_align).
-fn equation_elem_number_align_default() -> Value {
-  None
-}
-
-///|
 /// TODO: port `Default::default() of Smart<Option<Supplement>>` (EquationElem.supplement).
 fn equation_elem_supplement_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Option<EcoString>` (EquationElem.alt).
-fn equation_elem_alt_default() -> Value {
   None
 }
 
@@ -649,12 +313,6 @@ fn equation_elem_size_default() -> Value {
 ///|
 /// TODO: port `Default::default() of Option<MathVariant>` (EquationElem.variant).
 fn equation_elem_variant_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Option<bool>` (EquationElem.italic).
-fn equation_elem_italic_default() -> Value {
   None
 }
 
@@ -677,12 +335,6 @@ fn vec_elem_delim_default() -> Value {
 }
 
 ///|
-/// TODO: port `HAlignment::Center` (VecElem.align).
-fn vec_elem_align_default() -> Value {
-  None
-}
-
-///|
 /// TODO: port `DEFAULT_ROW_GAP.into()` (VecElem.gap).
 fn vec_elem_gap_default() -> Value {
   None
@@ -691,12 +343,6 @@ fn vec_elem_gap_default() -> Value {
 ///|
 /// TODO: port `DelimiterPair::PAREN` (MatElem.delim).
 fn mat_elem_delim_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `HAlignment::Center` (MatElem.align).
-fn mat_elem_align_default() -> Value {
   None
 }
 
@@ -737,72 +383,12 @@ fn cases_elem_gap_default() -> Value {
 }
 
 ///|
-/// TODO: port `Default::default() of Option<Content>` (RootElem.index).
-fn root_elem_index_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Option<Content>` (UnderbraceElem.annotation).
-fn underbrace_elem_annotation_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Option<Content>` (OverbraceElem.annotation).
-fn overbrace_elem_annotation_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Option<Content>` (UnderbracketElem.annotation).
-fn underbracket_elem_annotation_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Option<Content>` (OverbracketElem.annotation).
-fn overbracket_elem_annotation_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Option<Content>` (UnderparenElem.annotation).
-fn underparen_elem_annotation_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Option<Content>` (OverparenElem.annotation).
-fn overparen_elem_annotation_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Option<Content>` (UndershellElem.annotation).
-fn undershell_elem_annotation_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Option<Content>` (OvershellElem.annotation).
-fn overshell_elem_annotation_default() -> Value {
-  None
-}
-
-///|
 /// TODO: port `ArtifactKind::Other` (ArtifactElem.kind).
 fn artifact_elem_kind_default() -> Value {
   None
 }
 
 // TODO: port `#[parse]` of BibliographyElem.sources as `bibliography_elem_sources_parse`.
-
-///|
-/// TODO: port `Default::default() of Smart<Option<Content>>` (BibliographyElem.title).
-fn bibliography_elem_title_default() -> Value {
-  None
-}
 
 ///|
 /// TODO: port `{ let default = ArchivedStyle::InstituteOfElectricalAndElectronicsEngineers; Derived::new(CslSource::Named(default, None), CslStyle::from_archived(default)) }` (BibliographyElem.style).
@@ -815,18 +401,6 @@ fn bibliography_elem_style_default() -> Value {
 ///|
 /// TODO: port `Default::default() of Smart<LocatableSelector>` (BibliographyElem.target).
 fn bibliography_elem_target_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Some(Smart::Auto)` (BibliographyElem.group).
-fn bibliography_elem_group_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Option<Content>` (CiteElem.supplement).
-fn cite_elem_supplement_default() -> Value {
   None
 }
 
@@ -851,20 +425,8 @@ fn document_elem_format_default() -> Value {
 }
 
 ///|
-/// TODO: port `Default::default() of Option<Content>` (DocumentElem.title).
-fn document_elem_title_default() -> Value {
-  None
-}
-
-///|
 /// TODO: port `Default::default() of OneOrMultiple<EcoString>` (DocumentElem.author).
 fn document_elem_author_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Option<Content>` (DocumentElem.description).
-fn document_elem_description_default() -> Value {
   None
 }
 
@@ -887,18 +449,6 @@ fn enum_elem_numbering_default() -> Value {
 }
 
 ///|
-/// TODO: port `Default::default() of Smart<u64>` (EnumElem.start).
-fn enum_elem_start_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Smart<Length>` (EnumElem.spacing).
-fn enum_elem_spacing_default() -> Value {
-  None
-}
-
-///|
 /// TODO: port `Alignment::H(HAlignment::End)` (EnumElem.number_align).
 fn enum_elem_number_align_default() -> Value {
   None
@@ -914,24 +464,6 @@ fn enum_elem_parents_default() -> Value {
 /// TODO: fold for `SmallVec<[u64; 4]>` (EnumElem.parents).
 fn enum_elem_parents_fold(inner : Value, _outer : Value) -> Value {
   inner
-}
-
-///|
-/// TODO: port `Default::default() of Smart<u64>` (EnumItem.number).
-fn enum_item_elem_number_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Option<EcoString>` (FigureElem.alt).
-fn figure_elem_alt_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Option<Smart<VAlignment>>` (FigureElem.placement).
-fn figure_elem_placement_default() -> Value {
-  None
 }
 
 ///|
@@ -965,18 +497,6 @@ fn figure_elem_numbering_default() -> Value {
 }
 
 ///|
-/// TODO: port `OuterVAlignment::Bottom` (FigureCaption.position).
-fn figure_caption_elem_position_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Smart<Content>` (FigureCaption.separator).
-fn figure_caption_elem_separator_default() -> Value {
-  None
-}
-
-///|
 /// TODO: port `Numbering::Pattern(NumberingPattern::from_str("1").unwrap())` (FootnoteElem.numbering).
 fn footnote_elem_numbering_default() -> Value {
   None
@@ -985,18 +505,6 @@ fn footnote_elem_numbering_default() -> Value {
 ///|
 /// TODO: port `LineElem::new().with_length(Ratio::new(0.3).into()).with_stroke(Stroke { thickness : Smart::Custom(Em::new(0.05).into()), .. Default::default() }).pack()` (FootnoteEntry.separator).
 fn footnote_entry_elem_separator_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Smart<NonZeroUsize>` (HeadingElem.level).
-fn heading_elem_level_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `0` (HeadingElem.offset).
-fn heading_elem_offset_default() -> Value {
   None
 }
 
@@ -1025,12 +533,6 @@ fn list_elem_marker_default() -> Value {
 }
 
 ///|
-/// TODO: port `Default::default() of Smart<Length>` (ListElem.spacing).
-fn list_elem_spacing_default() -> Value {
-  None
-}
-
-///|
 /// TODO: port `Alignment::H(HAlignment::End)` (ListElem.marker_align).
 fn list_elem_marker_align_default() -> Value {
   None
@@ -1049,20 +551,8 @@ fn list_elem_depth_fold(inner : Value, _outer : Value) -> Value {
 }
 
 ///|
-/// TODO: port `Default::default() of Smart<Option<Content>>` (OutlineElem.title).
-fn outline_elem_title_default() -> Value {
-  None
-}
-
-///|
 /// TODO: port `LocatableSelector(HeadingElem::ELEM.select())` (OutlineElem.target).
 fn outline_elem_target_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Option<NonZeroUsize>` (OutlineElem.depth).
-fn outline_elem_depth_default() -> Value {
   None
 }
 
@@ -1121,32 +611,8 @@ fn par_line_elem_numbering_default() -> Value {
 }
 
 ///|
-/// TODO: port `Default::default() of Smart<HAlignment>` (ParLine.number_align).
-fn par_line_elem_number_align_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `OuterHAlignment::Start` (ParLine.number_margin).
-fn par_line_elem_number_margin_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `` (ParLine.number_clearance).
-fn par_line_elem_number_clearance_default() -> Value {
-  None
-}
-
-///|
 /// TODO: port `LineNumberingScope::Document` (ParLine.numbering_scope).
 fn par_line_elem_numbering_scope_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Smart<bool>` (QuoteElem.quotes).
-fn quote_elem_quotes_default() -> Value {
   None
 }
 
@@ -1247,30 +713,6 @@ fn table_elem_stroke_fold(inner : Value, _outer : Value) -> Value {
 }
 
 ///|
-/// TODO: port `Default::default() of Option<EcoString>` (TableElem.summary).
-fn table_elem_summary_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Smart<usize>` (TableHLine.y).
-fn table_h_line_elem_y_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of usize` (TableHLine.start).
-fn table_h_line_elem_start_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Option<NonZeroUsize>` (TableHLine.end).
-fn table_h_line_elem_end_default() -> Value {
-  None
-}
-
-///|
 /// TODO: port `Some(Arc::new(Stroke::default()))` (TableHLine.stroke).
 fn table_h_line_elem_stroke_default() -> Value {
   None
@@ -1283,30 +725,6 @@ fn table_h_line_elem_stroke_fold(inner : Value, _outer : Value) -> Value {
 }
 
 ///|
-/// TODO: port `OuterVAlignment::Top` (TableHLine.position).
-fn table_h_line_elem_position_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Smart<usize>` (TableVLine.x).
-fn table_v_line_elem_x_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of usize` (TableVLine.start).
-fn table_v_line_elem_start_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Option<NonZeroUsize>` (TableVLine.end).
-fn table_v_line_elem_end_default() -> Value {
-  None
-}
-
-///|
 /// TODO: port `Some(Arc::new(Stroke::default()))` (TableVLine.stroke).
 fn table_v_line_elem_stroke_default() -> Value {
   None
@@ -1316,36 +734,6 @@ fn table_v_line_elem_stroke_default() -> Value {
 /// TODO: fold for `Option<Arc<Stroke>>` (TableVLine.stroke).
 fn table_v_line_elem_stroke_fold(inner : Value, _outer : Value) -> Value {
   inner
-}
-
-///|
-/// TODO: port `OuterHAlignment::Start` (TableVLine.position).
-fn table_v_line_elem_position_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Smart<usize>` (TableCell.x).
-fn table_cell_elem_x_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Smart<usize>` (TableCell.y).
-fn table_cell_elem_y_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Smart<Sides<Option<Rel<Length>>>>` (TableCell.inset).
-fn table_cell_elem_inset_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Smart<Alignment>` (TableCell.align).
-fn table_cell_elem_align_default() -> Value {
-  None
 }
 
 ///|
@@ -1367,12 +755,6 @@ fn table_cell_elem_stroke_fold(inner : Value, _outer : Value) -> Value {
 }
 
 ///|
-/// TODO: port `Default::default() of Smart<bool>` (TableCell.breakable).
-fn table_cell_elem_breakable_default() -> Value {
-  None
-}
-
-///|
 /// TODO: port `Default::default() of Smart<TableCellKind>` (TableCell.kind).
 fn table_cell_elem_kind_default() -> Value {
   None
@@ -1381,18 +763,6 @@ fn table_cell_elem_kind_default() -> Value {
 ///|
 /// TODO: port `HElem::new(Em::new(0.6).into()).with_weak(true).pack()` (TermsElem.separator).
 fn terms_elem_separator_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Smart<Length>` (TermsElem.spacing).
-fn terms_elem_spacing_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Smart<Content>` (TitleElem.body).
-fn title_elem_body_default() -> Value {
   None
 }
 
@@ -1409,12 +779,6 @@ fn underline_elem_stroke_fold(inner : Value, _outer : Value) -> Value {
 }
 
 ///|
-/// TODO: port `Default::default() of Smart<Length>` (UnderlineElem.offset).
-fn underline_elem_offset_default() -> Value {
-  None
-}
-
-///|
 /// TODO: port `Default::default() of Smart<Stroke>` (OverlineElem.stroke).
 fn overline_elem_stroke_default() -> Value {
   None
@@ -1427,12 +791,6 @@ fn overline_elem_stroke_fold(inner : Value, _outer : Value) -> Value {
 }
 
 ///|
-/// TODO: port `Default::default() of Smart<Length>` (OverlineElem.offset).
-fn overline_elem_offset_default() -> Value {
-  None
-}
-
-///|
 /// TODO: port `Default::default() of Smart<Stroke>` (StrikeElem.stroke).
 fn strike_elem_stroke_default() -> Value {
   None
@@ -1442,12 +800,6 @@ fn strike_elem_stroke_default() -> Value {
 /// TODO: fold for `Smart<Stroke>` (StrikeElem.stroke).
 fn strike_elem_stroke_fold(inner : Value, _outer : Value) -> Value {
   inner
-}
-
-///|
-/// TODO: port `Default::default() of Smart<Length>` (StrikeElem.offset).
-fn strike_elem_offset_default() -> Value {
-  None
 }
 
 ///|
@@ -1478,18 +830,6 @@ fn highlight_elem_top_edge_default() -> Value {
 /// TODO: port `BottomEdge::Metric(BottomEdgeMetric::Descender)` (HighlightElem.bottom_edge).
 fn highlight_elem_bottom_edge_default() -> Value {
   None
-}
-
-///|
-/// TODO: port `Default::default() of Corners<Option<Rel<Length>>>` (HighlightElem.radius).
-fn highlight_elem_radius_default() -> Value {
-  None
-}
-
-///|
-/// TODO: fold for `Corners<Option<Rel<Length>>>` (HighlightElem.radius).
-fn highlight_elem_radius_fold(inner : Value, _outer : Value) -> Value {
-  inner
 }
 
 ///|
@@ -1585,12 +925,6 @@ fn text_elem_dir_default() -> Value {
 }
 
 ///|
-/// TODO: port `Default::default() of Smart<bool>` (TextElem.hyphenate).
-fn text_elem_hyphenate_default() -> Value {
-  None
-}
-
-///|
 /// TODO: port `Default::default() of Costs` (TextElem.costs).
 fn text_elem_costs_default() -> Value {
   None
@@ -1651,12 +985,6 @@ fn text_elem_variations_fold(inner : Value, _outer : Value) -> Value {
 }
 
 ///|
-/// TODO: port `Default::default() of usize` (TextElem.span_offset).
-fn text_elem_span_offset_default() -> Value {
-  None
-}
-
-///|
 /// TODO: port `Default::default() of WeightDelta` (TextElem.delta).
 fn text_elem_delta_default() -> Value {
   None
@@ -1711,18 +1039,6 @@ fn text_elem_shift_settings_default() -> Value {
 }
 
 ///|
-/// TODO: port `Default::default() of Option<EcoString>` (RawElem.lang).
-fn raw_elem_lang_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `HAlignment::Start` (RawElem.align).
-fn raw_elem_align_default() -> Value {
-  None
-}
-
-///|
 /// TODO: port `Default::default() of Derived<OneOrMultiple<DataSource>, Vec<RawSyntax>>` (RawElem.syntaxes).
 fn raw_elem_syntaxes_default() -> Value {
   None
@@ -1745,26 +1061,8 @@ fn raw_elem_theme_default() -> Value {
 // TODO: port `#[parse]` of RawElem.theme as `raw_elem_theme_parse`.
 
 ///|
-/// TODO: port `2` (RawElem.tab_size).
-fn raw_elem_tab_size_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Smart<Length>` (SubElem.baseline).
-fn sub_elem_baseline_default() -> Value {
-  None
-}
-
-///|
 /// TODO: port `Default::default() of Smart<TextSize>` (SubElem.size).
 fn sub_elem_size_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Smart<Length>` (SuperElem.baseline).
-fn super_elem_baseline_default() -> Value {
   None
 }
 
@@ -1819,20 +1117,8 @@ fn image_elem_format_default() -> Value {
 }
 
 ///|
-/// TODO: port `Default::default() of Smart<Rel<Length>>` (ImageElem.width).
-fn image_elem_width_default() -> Value {
-  None
-}
-
-///|
 /// TODO: port `Default::default() of Sizing` (ImageElem.height).
 fn image_elem_height_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Option<EcoString>` (ImageElem.alt).
-fn image_elem_alt_default() -> Value {
   None
 }
 
@@ -1855,18 +1141,6 @@ fn image_elem_icc_default() -> Value {
 }
 
 // TODO: port `#[parse]` of ImageElem.icc as `image_elem_icc_parse`.
-
-///|
-/// TODO: port `Default::default() of Axes<Rel<Length>>` (LineElem.start).
-fn line_elem_start_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Option<Axes<Rel<Length>>>` (LineElem.end).
-fn line_elem_end_default() -> Value {
-  None
-}
 
 ///|
 /// TODO: port `Default::default() of Stroke` (LineElem.stroke).
@@ -1905,12 +1179,6 @@ fn polygon_elem_stroke_fold(inner : Value, _outer : Value) -> Value {
 }
 
 ///|
-/// TODO: port `Default::default() of Smart<Rel<Length>>` (RectElem.width).
-fn rect_elem_width_default() -> Value {
-  None
-}
-
-///|
 /// TODO: port `Default::default() of Sizing` (RectElem.height).
 fn rect_elem_height_default() -> Value {
   None
@@ -1935,56 +1203,8 @@ fn rect_elem_stroke_fold(inner : Value, _outer : Value) -> Value {
 }
 
 ///|
-/// TODO: port `Default::default() of Corners<Option<Rel<Length>>>` (RectElem.radius).
-fn rect_elem_radius_default() -> Value {
-  None
-}
-
-///|
-/// TODO: fold for `Corners<Option<Rel<Length>>>` (RectElem.radius).
-fn rect_elem_radius_fold(inner : Value, _outer : Value) -> Value {
-  inner
-}
-
-///|
 /// TODO: port `Sides::splat(Some(Abs::pt(5.0).into()))` (RectElem.inset).
 fn rect_elem_inset_default() -> Value {
-  None
-}
-
-///|
-/// TODO: fold for `Sides<Option<Rel<Length>>>` (RectElem.inset).
-fn rect_elem_inset_fold(inner : Value, _outer : Value) -> Value {
-  inner
-}
-
-///|
-/// TODO: port `Default::default() of Sides<Option<Rel<Length>>>` (RectElem.outset).
-fn rect_elem_outset_default() -> Value {
-  None
-}
-
-///|
-/// TODO: fold for `Sides<Option<Rel<Length>>>` (RectElem.outset).
-fn rect_elem_outset_fold(inner : Value, _outer : Value) -> Value {
-  inner
-}
-
-///|
-/// TODO: port `Default::default() of Option<Content>` (RectElem.body).
-fn rect_elem_body_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Smart<Length>` (SquareElem.size).
-fn square_elem_size_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Smart<Rel<Length>>` (SquareElem.width).
-fn square_elem_width_default() -> Value {
   None
 }
 
@@ -2017,50 +1237,8 @@ fn square_elem_stroke_fold(inner : Value, _outer : Value) -> Value {
 }
 
 ///|
-/// TODO: port `Default::default() of Corners<Option<Rel<Length>>>` (SquareElem.radius).
-fn square_elem_radius_default() -> Value {
-  None
-}
-
-///|
-/// TODO: fold for `Corners<Option<Rel<Length>>>` (SquareElem.radius).
-fn square_elem_radius_fold(inner : Value, _outer : Value) -> Value {
-  inner
-}
-
-///|
 /// TODO: port `Sides::splat(Some(Abs::pt(5.0).into()))` (SquareElem.inset).
 fn square_elem_inset_default() -> Value {
-  None
-}
-
-///|
-/// TODO: fold for `Sides<Option<Rel<Length>>>` (SquareElem.inset).
-fn square_elem_inset_fold(inner : Value, _outer : Value) -> Value {
-  inner
-}
-
-///|
-/// TODO: port `Default::default() of Sides<Option<Rel<Length>>>` (SquareElem.outset).
-fn square_elem_outset_default() -> Value {
-  None
-}
-
-///|
-/// TODO: fold for `Sides<Option<Rel<Length>>>` (SquareElem.outset).
-fn square_elem_outset_fold(inner : Value, _outer : Value) -> Value {
-  inner
-}
-
-///|
-/// TODO: port `Default::default() of Option<Content>` (SquareElem.body).
-fn square_elem_body_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Smart<Rel<Length>>` (EllipseElem.width).
-fn ellipse_elem_width_default() -> Value {
   None
 }
 
@@ -2094,36 +1272,6 @@ fn ellipse_elem_inset_default() -> Value {
   None
 }
 
-///|
-/// TODO: fold for `Sides<Option<Rel<Length>>>` (EllipseElem.inset).
-fn ellipse_elem_inset_fold(inner : Value, _outer : Value) -> Value {
-  inner
-}
-
-///|
-/// TODO: port `Default::default() of Sides<Option<Rel<Length>>>` (EllipseElem.outset).
-fn ellipse_elem_outset_default() -> Value {
-  None
-}
-
-///|
-/// TODO: fold for `Sides<Option<Rel<Length>>>` (EllipseElem.outset).
-fn ellipse_elem_outset_fold(inner : Value, _outer : Value) -> Value {
-  inner
-}
-
-///|
-/// TODO: port `Default::default() of Option<Content>` (EllipseElem.body).
-fn ellipse_elem_body_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Smart<Rel<Length>>` (CircleElem.width).
-fn circle_elem_width_default() -> Value {
-  None
-}
-
 // TODO: port `#[parse]` of CircleElem.width as `circle_elem_width_parse`.
 
 ///|
@@ -2153,30 +1301,6 @@ fn circle_elem_inset_default() -> Value {
 }
 
 ///|
-/// TODO: fold for `Sides<Option<Rel<Length>>>` (CircleElem.inset).
-fn circle_elem_inset_fold(inner : Value, _outer : Value) -> Value {
-  inner
-}
-
-///|
-/// TODO: port `Default::default() of Sides<Option<Rel<Length>>>` (CircleElem.outset).
-fn circle_elem_outset_default() -> Value {
-  None
-}
-
-///|
-/// TODO: fold for `Sides<Option<Rel<Length>>>` (CircleElem.outset).
-fn circle_elem_outset_fold(inner : Value, _outer : Value) -> Value {
-  inner
-}
-
-///|
-/// TODO: port `Default::default() of Option<Content>` (CircleElem.body).
-fn circle_elem_body_default() -> Value {
-  None
-}
-
-///|
 /// TODO: port `Default::default() of HtmlAttrs` (HtmlElem.attrs).
 fn html_elem_attrs_default() -> Value {
   None
@@ -2189,24 +1313,12 @@ fn html_elem_attrs_fold(inner : Value, _outer : Value) -> Value {
 }
 
 ///|
-/// TODO: port `Default::default() of Option<Content>` (HtmlElem.body).
-fn html_elem_body_default() -> Value {
-  None
-}
-
-///|
 /// TODO: port `Default::default() of css::Properties` (HtmlElem.css).
 fn html_elem_css_default() -> Value {
   None
 }
 
 // TODO: port `#[parse]` of HtmlElem.css as `html_elem_css_parse`.
-
-///|
-/// TODO: port `Default::default() of Option<EcoString>` (HtmlElem.role).
-fn html_elem_role_default() -> Value {
-  None
-}
 
 ///|
 /// TODO: port `` (PdfFormat.pages).
@@ -2220,12 +1332,6 @@ fn pdf_format_elem_standard_default() -> Value {
   None
 }
 
-///|
-/// TODO: port `` (PdfFormat.tagged).
-fn pdf_format_elem_tagged_default() -> Value {
-  None
-}
-
 // TODO: port `#[parse]` of AttachElem.path as `pdf_attach_elem_path_parse`.
 
 // TODO: port `#[parse]` of AttachElem.data as `pdf_attach_elem_data_parse`.
@@ -2233,18 +1339,6 @@ fn pdf_format_elem_tagged_default() -> Value {
 ///|
 /// TODO: port `Default::default() of Option<AttachedFileRelationship>` (AttachElem.relationship).
 fn pdf_attach_elem_relationship_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Option<EcoString>` (AttachElem.mime_type).
-fn pdf_attach_elem_mime_type_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Option<EcoString>` (AttachElem.description).
-fn pdf_attach_elem_description_default() -> Value {
   None
 }
 
