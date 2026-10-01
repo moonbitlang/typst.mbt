@@ -57,6 +57,11 @@ TYPEMAP = {
     "RootedPath": "RootedPath",
     "PathOrStr": "PathOrStr",
     "BundlePath": "BundlePath",
+    "DataSource": "DataSource",
+    "Readable": "Readable",
+    "Encoding": "Encoding",
+    "Delimiter": "Delimiter",
+    "RowType": "RowType",
     # foundations/array.rs, dict.rs, args.rs
     "ToArray": "ToArray",
     "ToDict": "ToDict",

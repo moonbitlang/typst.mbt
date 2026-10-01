@@ -1,0 +1,51 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/data/json"
+
+import {
+  "moonbitlang/core/debug",
+  "moonbitlang/typst/data/serde",
+}
+
+// Values
+pub fn from_slice(Bytes) -> @serde.Data raise JsonError
+
+pub fn to_string(@serde.Data, pretty~ : Bool) -> String
+
+pub fn valid_utf8(BytesView) -> Bool
+
+// Errors
+pub(all) suberror JsonError {
+  JsonError(code~ : ErrorCode, line~ : Int, column~ : Int)
+} derive(@debug.Debug)
+pub fn JsonError::column(Self) -> Int
+pub fn JsonError::line(Self) -> Int
+pub fn JsonError::message(Self) -> String
+
+// Types and methods
+pub(all) enum ErrorCode {
+  EofWhileParsingList
+  EofWhileParsingObject
+  EofWhileParsingString
+  EofWhileParsingValue
+  ExpectedColon
+  ExpectedListCommaOrEnd
+  ExpectedObjectCommaOrEnd
+  ExpectedSomeIdent
+  ExpectedSomeValue
+  InvalidEscape
+  InvalidNumber
+  NumberOutOfRange
+  InvalidUnicodeCodePoint
+  ControlCharacterWhileParsingString
+  KeyMustBeAString
+  LoneLeadingSurrogateInHexEscape
+  TrailingComma
+  TrailingCharacters
+  UnexpectedEndOfHexEscape
+  RecursionLimitExceeded
+} derive(Eq, @debug.Debug)
+pub impl Show for ErrorCode
+
+// Type aliases
+
+// Traits

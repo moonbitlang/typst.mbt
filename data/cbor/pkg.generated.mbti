@@ -1,0 +1,27 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/data/cbor"
+
+import {
+  "moonbitlang/core/debug",
+  "moonbitlang/typst/data/serde",
+}
+
+// Values
+pub fn from_slice(Bytes) -> @serde.Data raise CborError
+
+pub fn to_bytes(@serde.Data) -> Bytes
+
+// Errors
+pub(all) suberror CborError {
+  Io(String)
+  Syntax(Int)
+  Semantic(Int?, String)
+  RecursionLimitExceeded
+} derive(@debug.Debug)
+pub fn CborError::message(Self) -> String
+
+// Types and methods
+
+// Type aliases
+
+// Traits

@@ -1,0 +1,160 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/data/xml"
+
+import {
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub const NS_XMLNS_URI : String = "http://www.w3.org/2000/xmlns/"
+
+pub const NS_XML_URI : String = "http://www.w3.org/XML/1998/namespace"
+
+// Errors
+pub(all) suberror XmlError {
+  InvalidXmlPrefixUri(TextPos)
+  UnexpectedXmlUri(TextPos)
+  UnexpectedXmlnsUri(TextPos)
+  InvalidElementNamePrefix(TextPos)
+  DuplicatedNamespace(String, TextPos)
+  UnknownNamespace(String, TextPos)
+  UnexpectedCloseTag(String, String, TextPos)
+  UnexpectedEntityCloseTag(TextPos)
+  UnknownEntityReference(String, TextPos)
+  MalformedEntityReference(TextPos)
+  EntityReferenceLoop(TextPos)
+  InvalidAttributeValue(TextPos)
+  DuplicatedAttribute(String, TextPos)
+  NoRootNode
+  UnclosedRootNode
+  UnexpectedDeclaration(TextPos)
+  DtdDetected
+  NodesLimitReached
+  AttributesLimitReached
+  NamespacesLimitReached
+  InvalidName(TextPos)
+  NonXmlChar(Char, TextPos)
+  InvalidChar(Byte, Byte, TextPos)
+  InvalidChar2(String, Byte, TextPos)
+  InvalidString(String, TextPos)
+  InvalidExternalID(TextPos)
+  EntityResolver(TextPos, String)
+  InvalidComment(TextPos)
+  InvalidCharacterData(TextPos)
+  UnknownToken(TextPos)
+  UnexpectedEndOfStream
+}
+pub fn XmlError::pos(Self) -> TextPos
+pub fn XmlError::to_string(Self) -> String
+pub impl Show for XmlError
+
+// Types and methods
+pub struct Attribute {
+  // private fields
+}
+pub fn Attribute::name(Self) -> String
+pub fn Attribute::namespace(Self) -> String?
+pub fn Attribute::range(Self) -> (Int, Int)
+pub fn Attribute::range_qname(Self) -> (Int, Int)
+pub fn Attribute::range_value(Self) -> (Int, Int)
+pub fn Attribute::value(Self) -> String
+
+pub struct Document {
+  // private fields
+}
+pub fn Document::descendants(Self) -> Array[Node]
+pub fn Document::get_node(Self, Int) -> Node?
+pub fn Document::input_text(Self) -> String
+pub fn Document::parse(String) -> Self raise XmlError
+pub fn Document::parse_utf8_with_options(Bytes, ParsingOptions) -> Self raise XmlError
+pub fn Document::parse_with_options(String, ParsingOptions) -> Self raise XmlError
+pub fn Document::root(Self) -> Node
+pub fn Document::root_element(Self) -> Node
+pub fn Document::text_pos_at(Self, Int) -> TextPos
+
+pub(all) struct ExpandedName {
+  uri : String?
+  name : String
+} derive(Eq)
+pub fn ExpandedName::name(Self) -> String
+pub fn ExpandedName::namespace(Self) -> String?
+pub impl Show for ExpandedName
+
+pub struct Namespace {
+  // private fields
+} derive(Eq, @debug.Debug)
+pub fn Namespace::name(Self) -> String?
+pub fn Namespace::uri(Self) -> String
+
+pub struct Node {
+  // private fields
+}
+pub fn Node::attribute(Self, String, ns? : String) -> String?
+pub fn Node::attribute_node(Self, String, ns? : String) -> Attribute?
+pub fn Node::attributes(Self) -> Array[Attribute]
+pub fn Node::children(Self) -> Array[Self]
+pub fn Node::default_namespace(Self) -> String?
+pub fn Node::descendants(Self) -> Array[Self]
+pub fn Node::document(Self) -> Document
+pub fn Node::first_child(Self) -> Self?
+pub fn Node::first_element_child(Self) -> Self?
+pub fn Node::has_attribute(Self, String, ns? : String) -> Bool
+pub fn Node::has_children(Self) -> Bool
+pub fn Node::has_siblings(Self) -> Bool
+pub fn Node::has_tag_name(Self, String, ns? : String) -> Bool
+pub fn Node::id(Self) -> Int
+pub fn Node::is_comment(Self) -> Bool
+pub fn Node::is_element(Self) -> Bool
+pub fn Node::is_pi(Self) -> Bool
+pub fn Node::is_root(Self) -> Bool
+pub fn Node::is_text(Self) -> Bool
+pub fn Node::last_child(Self) -> Self?
+pub fn Node::last_element_child(Self) -> Self?
+pub fn Node::lookup_namespace_uri(Self, String?) -> String?
+pub fn Node::lookup_prefix(Self, String) -> String?
+pub fn Node::namespaces(Self) -> Array[Namespace]
+pub fn Node::next_sibling(Self) -> Self?
+pub fn Node::next_sibling_element(Self) -> Self?
+pub fn Node::node_type(Self) -> NodeType
+pub fn Node::parent(Self) -> Self?
+pub fn Node::parent_element(Self) -> Self?
+pub fn Node::pi(Self) -> PI?
+pub fn Node::prev_sibling(Self) -> Self?
+pub fn Node::prev_sibling_element(Self) -> Self?
+pub fn Node::range(Self) -> (Int, Int)
+pub fn Node::tag_name(Self) -> ExpandedName
+pub fn Node::tail(Self) -> String?
+pub fn Node::text(Self) -> String?
+pub impl Eq for Node
+pub impl Show for Node
+pub impl @debug.Debug for Node
+
+pub(all) enum NodeType {
+  Root
+  Element
+  PI
+  Comment
+  Text
+} derive(Eq, @debug.Debug)
+
+pub(all) struct PI {
+  target : String
+  value : String?
+} derive(Eq, @debug.Debug)
+
+pub(all) struct ParsingOptions {
+  allow_dtd : Bool
+  nodes_limit : UInt
+}
+pub fn ParsingOptions::default() -> Self
+
+pub(all) struct TextPos {
+  row : Int
+  col : Int
+} derive(Eq, @debug.Debug)
+pub fn TextPos::new(Int, Int) -> Self
+pub impl Show for TextPos
+
+// Type aliases
+
+// Traits

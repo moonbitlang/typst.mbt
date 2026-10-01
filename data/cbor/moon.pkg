@@ -1,0 +1,8 @@
+import {
+  "moonbitlang/typst/data/serde",
+  "moonbitlang/core/bigint",
+  "moonbitlang/core/math",
+  "moonbitlang/core/double",
+  "moonbitlang/core/string",
+  "moonbitlang/core/encoding/utf8",
+}

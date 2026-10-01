@@ -1,0 +1,23 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/data/toml"
+
+import {
+  "moonbitlang/core/debug",
+  "moonbitlang/typst/data/serde",
+}
+
+// Values
+pub fn parse(String) -> @serde.Data raise TomlError
+
+pub fn to_string(@serde.Data, pretty~ : Bool) -> String raise TomlError
+
+// Errors
+pub(all) suberror TomlError {
+  TomlError(message~ : String, span~ : (Int, Int)?)
+} derive(Eq, @debug.Debug)
+
+// Types and methods
+
+// Type aliases
+
+// Traits

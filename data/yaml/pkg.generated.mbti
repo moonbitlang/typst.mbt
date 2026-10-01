@@ -1,0 +1,28 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/data/yaml"
+
+import {
+  "moonbitlang/core/debug",
+  "moonbitlang/typst/data/serde",
+}
+
+// Values
+pub fn parse(Bytes) -> @serde.Data raise YamlError
+
+pub fn to_string(@serde.Data) -> String raise YamlError
+
+// Errors
+pub(all) suberror YamlError {
+  YamlError(message~ : String, location~ : Location?)
+} derive(Eq, @debug.Debug)
+
+// Types and methods
+pub(all) struct Location {
+  index : Int
+  line : Int
+  column : Int
+} derive(Eq, @debug.Debug)
+
+// Type aliases
+
+// Traits

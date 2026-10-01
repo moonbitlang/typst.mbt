@@ -11,6 +11,13 @@ import {
   "moonbitlang/typst/syntax/ast",
   "moonbitlang/core/double",
   "moonbitlang/core/encoding/utf8",
+  "moonbitlang/typst/data/serde",
+  "moonbitlang/typst/data/json",
+  "moonbitlang/typst/data/csv",
+  "moonbitlang/typst/data/xml",
+  "moonbitlang/typst/data/cbor",
+  "moonbitlang/typst/data/toml",
+  "moonbitlang/typst/data/yaml",
   "moonbitlang/typst/time",
   "moonbitlang/typst/html_assets",
 }

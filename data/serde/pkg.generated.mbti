@@ -1,0 +1,50 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/data/serde"
+
+import {
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub fn decode_utf8(BytesView) -> String?
+
+pub let expecting_typst_value : String
+
+pub fn format_debug(Double) -> String
+
+pub fn format_display(Double) -> String
+
+pub fn format_ryu(Double) -> String
+
+pub fn format_zmij(Double) -> String
+
+pub fn invalid_type(String, String) -> String
+
+pub fn shortest_digits(Double) -> (String, Int)
+
+pub let toml_datetime_field : String
+
+pub fn utf8_error(BytesView) -> (Int, Int?)?
+
+pub fn valid_utf8(BytesView) -> Bool
+
+pub fn with_decimal_point(Double) -> String
+
+// Errors
+
+// Types and methods
+pub(all) enum Data {
+  None
+  Bool(Bool)
+  Int(Int64)
+  Float(Double)
+  Str(String)
+  Bytes(Bytes)
+  Seq(Array[Data])
+  Map(Array[(String, Data)])
+} derive(Eq, @debug.Debug)
+pub fn Data::from_u64(UInt64) -> Self
+
+// Type aliases
+
+// Traits

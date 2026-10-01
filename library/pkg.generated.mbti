@@ -5,6 +5,9 @@ import {
   "moonbitlang/core/debug",
   "moonbitlang/core/hashset",
   "moonbitlang/core/ref",
+  "moonbitlang/typst/data/serde",
+  "moonbitlang/typst/data/xml",
+  "moonbitlang/typst/data/yaml",
   "moonbitlang/typst/regex",
   "moonbitlang/typst/syntax",
   "moonbitlang/typst/time",
@@ -573,6 +576,10 @@ pub fn bundle_format() -> Format
 
 pub fn bundle_format_elem() -> Element
 
+pub fn bytes_as_str(BytesView) -> String raise LoadErr
+
+pub fn bytes_to_str(BytesView) -> String?
+
 pub fn cancel_elem() -> Element
 
 pub let cancel_elem_angle : Int
@@ -1019,6 +1026,10 @@ pub fn format_module(Array[Format]) -> Module
 
 pub fn format_selector(Selector, String) -> String
 
+pub fn format_xml_like_error(String, @xml.XmlError) -> LoadError
+
+pub fn format_yaml_error(@yaml.YamlError) -> LoadError
+
 pub fn frac_elem() -> Element
 
 pub let frac_elem_denom : Int
@@ -1324,6 +1335,8 @@ pub let list_elem_tight : Int
 pub fn list_item_elem() -> Element
 
 pub let list_item_elem_body : Int
+
+pub fn load_many(@syntax.Spanned[Array[DataSource]], &World) -> Array[Loaded] raise SourceError
 
 pub fn lr_elem() -> Element
 
@@ -3111,6 +3124,8 @@ pub let v_elem_attach : Int
 
 pub let v_elem_weak : Int
 
+pub fn validate_utf8(BytesView) -> Utf8Error?
+
 pub fn vec_elem() -> Element
 
 pub let vec_elem_align : Int
@@ -3120,6 +3135,8 @@ pub let vec_elem_children : Int
 pub let vec_elem_delim : Int
 
 pub let vec_elem_gap : Int
+
+pub fn[T] within(Loaded, () -> T raise LoadErr) -> T raise SourceError
 
 pub fn world_range(&World, @syntax.DiagSpan) -> (Int, Int)?
 
@@ -3154,6 +3171,10 @@ pub(all) suberror IntErrorKind {
   NegOverflow
   Zero
 } derive(Eq, @debug.Debug)
+
+pub(all) suberror LoadErr {
+  LoadErr(LoadError)
+} derive(@debug.Debug)
 
 pub(all) suberror PackageError {
   NotFound(@syntax.PackageSpec)
@@ -4483,6 +4504,15 @@ pub impl FromValue for DashPattern
 pub impl IntoValue for DashPattern
 pub impl Reflect for DashPattern
 
+pub(all) enum DataSource {
+  Path(PathOrStr)
+  Bytes(Bytes)
+} derive(Eq, Hash)
+pub fn DataSource::load(Self, @syntax.Span, &World) -> Loaded raise SourceError
+pub impl FromValue for DataSource
+pub impl IntoValue for DataSource
+pub impl Reflect for DataSource
+
 pub(all) enum Datetime {
   Date(@time.Date)
   Time(@time.Time)
@@ -4554,6 +4584,12 @@ pub impl FromValue for Decimal
 pub impl IntoValue for Decimal
 pub impl Reflect for Decimal
 
+pub(all) struct Delimiter(Char) derive(Eq, Hash)
+pub fn Delimiter::default() -> Self
+pub impl FromValue for Delimiter
+pub impl IntoValue for Delimiter
+pub impl Reflect for Delimiter
+
 pub(all) struct Deprecation {
   message : String
   until : String?
@@ -4577,6 +4613,7 @@ pub fn Dict::contains(Self, String) -> Bool
 pub fn Dict::copy(Self) -> Self
 pub fn Dict::finish(Self, ArrayView[String]) -> Unit raise HintedError
 pub fn Dict::from_pairs(ArrayView[(String, Value)]) -> Self
+pub fn Dict::from_serde_entries(Array[(String, @serde.Data)]) -> Self
 pub fn Dict::get(Self, String) -> Value raise HintedError
 pub fn Dict::insert(Self, String, Value) -> Unit
 pub fn Dict::is_empty(Self) -> Bool
@@ -4588,6 +4625,7 @@ pub fn Dict::new() -> Self
 pub fn Dict::remove(Self, String, Value?) -> Value raise HintedError
 pub fn Dict::repr(Self) -> String
 pub fn Dict::take(Self, String) -> Value raise HintedError
+pub fn Dict::to_serde(Self, Bool) -> @serde.Data
 pub fn Dict::unexpected_keys(ArrayView[String], ArrayView[String]?) -> String
 pub impl FromValue for Dict
 pub impl IntoValue for Dict
@@ -4841,6 +4879,13 @@ pub fn EmphElem::new(Content) -> Self
 pub fn EmphElem::of(Content) -> Self?
 pub fn EmphElem::pack(Self) -> Content
 pub fn EmphElem::with_body(Self, Content) -> Self
+
+pub(all) enum Encoding {
+  Utf8
+} derive(Eq, Hash, @debug.Debug)
+pub impl FromValue for Encoding
+pub impl IntoValue for Encoding
+pub impl Reflect for Encoding
 
 pub(all) enum Endianness {
   Big
@@ -6064,6 +6109,16 @@ pub impl FromValue for LineCap
 pub impl IntoValue for LineCap
 pub impl Reflect for LineCap
 
+pub(all) struct LineCol {
+  line : Int
+  col : Int
+} derive(Eq, Hash, @debug.Debug)
+pub fn LineCol::indices(Self) -> (Int, Int)
+pub fn LineCol::numbers(Self) -> (Int, Int)
+pub fn LineCol::one_based(Int, Int) -> Self
+pub fn LineCol::try_from_byte_pos(Int, Bytes) -> Self?
+pub fn LineCol::zero_based(Int, Int) -> Self
+
 pub struct LineElem(Content)
 pub fn LineElem::angle(Self, StyleChain) -> Angle
 pub fn LineElem::angle_in(StyleChain) -> Angle
@@ -6230,6 +6285,26 @@ pub(all) enum ListMarker {
 pub impl FromValue for ListMarker
 pub impl IntoValue for ListMarker
 pub impl Reflect for ListMarker
+
+pub(all) struct LoadError {
+  text_pos : ReportTextPos?
+  message : String
+} derive(Eq, Hash, @debug.Debug)
+pub fn LoadError::binary(String, String) -> Self
+pub fn LoadError::from_utf8_error(Utf8Error) -> Self
+pub fn LoadError::text(ReportTextPos, String, String) -> Self
+pub fn LoadError::within(Self, Loaded) -> SourceDiagnostic
+
+pub(all) enum LoadSource {
+  Path(@syntax.FileId)
+  Bytes
+} derive(Eq, Hash)
+
+pub(all) struct Loaded {
+  source : @syntax.Spanned[LoadSource]
+  data : Bytes
+} derive(Eq, Hash)
+pub fn Loaded::new(@syntax.Spanned[LoadSource], Bytes) -> Self
 
 pub(all) struct Locale {
   lang : Lang
@@ -7430,6 +7505,16 @@ pub fn RawLine::with_count(Self, Int64) -> Self
 pub fn RawLine::with_number(Self, Int64) -> Self
 pub fn RawLine::with_text(Self, String) -> Self
 
+pub(all) enum Readable {
+  Str(String)
+  Bytes(Bytes)
+} derive(Eq, Hash)
+pub fn Readable::into_bytes(Self) -> Bytes
+pub fn Readable::into_source(Self) -> DataSource
+pub impl FromValue for Readable
+pub impl IntoValue for Readable
+pub impl Reflect for Readable
+
 pub struct Recipe {
   selector : Selector?
   transform : Transformation
@@ -7594,6 +7679,14 @@ pub impl FromValue for Replacement
 pub impl IntoValue for Replacement
 pub impl Reflect for Replacement
 
+pub(all) enum ReportTextPos {
+  Full(Int, Int, LineCol)
+  Range(Int, Int)
+  LineCol(LineCol)
+  NoPos
+} derive(Eq, Hash, @debug.Debug)
+pub fn ReportTextPos::full(Int, Int, LineCol) -> Self
+
 pub(all) enum RepresentationError {
   Zero
   TooLarge
@@ -7670,6 +7763,14 @@ pub(all) struct Routines {
   eval_string : (Engine, Context, String, @syntax.Span, @syntax.SyntaxMode, Scope) -> Value raise SourceError
   eval_closure : (Func, Closure, Engine, Context, Args) -> Value raise SourceError
 }
+
+pub(all) enum RowType {
+  RowArray
+  RowDict
+} derive(Eq, Hash, @debug.Debug)
+pub impl FromValue for RowType
+pub impl IntoValue for RowType
+pub impl Reflect for RowType
 
 type RustDecimal derive(Hash)
 
@@ -9109,6 +9210,11 @@ pub impl FromValue for UnicodeNormalForm
 pub impl IntoValue for UnicodeNormalForm
 pub impl Reflect for UnicodeNormalForm
 
+pub(all) struct Utf8Error {
+  valid_up_to : Int
+  error_len : Int?
+} derive(Eq, @debug.Debug)
+
 pub(all) enum VAlignment {
   Top
   Horizon
@@ -9177,11 +9283,13 @@ pub(all) enum Value {
 pub fn[T : FromValue] Value::cast(Self) -> T raise HintedError
 pub fn Value::display(Self) -> Content
 pub fn Value::field(Self, String, BindingGuard) -> Self raise HintedError
+pub fn Value::from_serde(@serde.Data) -> Self
 pub fn Value::numeric(Double, NumericUnit) -> Self
 pub fn Value::repr(Self) -> String
 pub fn Value::scope(Self) -> Scope?
 pub fn Value::shared(Self) -> Self
 pub fn Value::spanned(Self, @syntax.Span) -> Self
+pub fn Value::to_serde(Self, Bool) -> @serde.Data
 pub fn Value::ty(Self) -> Type
 pub impl Eq for Value
 pub impl FromValue for Value
