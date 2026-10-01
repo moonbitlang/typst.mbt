@@ -235,3 +235,14 @@ pub fn Regex::split(self : Regex, s : String) -> Array[String] {
   out.push(s.unsafe_substring(start=hay.utf16[last], end=s.length()))
   out
 }
+
+///|
+/// Whether the pattern parses (without translation) to a single dot,
+/// literal or character class (upstream: matching the `regex_syntax::ast::Ast`
+/// of a font coverage regex against `ClassBracketed | ClassUnicode |
+/// ClassPerl | Dot | Literal`).
+pub fn ast_is_single_char(pattern : String) -> Bool {
+  let ast = Parser::new(pattern).parse() catch { _ => return false }
+  ast
+  is (ClassBracketed(_) | ClassUnicode(_) | ClassPerl(_) | Dot(_) | Literal(_))
+}

@@ -6,6 +6,7 @@ import {
 }
 
 // Values
+pub fn ast_is_single_char(String) -> Bool
 
 // Errors
 pub suberror RegexError {

@@ -120,7 +120,7 @@ fn impl_str_first(
 ) -> String raise HintedError {
   let graphemes = @unicode.graphemes(self_)
   match graphemes.get(0) {
-    Some(g) => g.to_string()
+    Some(g) => g.to_owned()
     None =>
       match default_ {
         Some(d) => d
@@ -137,7 +137,7 @@ fn impl_str_last(
 ) -> String raise HintedError {
   let graphemes = @unicode.graphemes(self_)
   match graphemes.last() {
-    Some(g) => g.to_string()
+    Some(g) => g.to_owned()
     None =>
       match default_ {
         Some(d) => d
@@ -205,7 +205,7 @@ fn impl_str_slice(
 ///|
 /// Returns the grapheme clusters of the string as an array of substrings.
 fn impl_str_clusters(self_ : String) -> Arr raise HintedError {
-  Arr::from_array(@unicode.graphemes(self_).map(g => Value::Str(g.to_string())))
+  Arr::from_array(@unicode.graphemes(self_).map(g => Value::Str(g.to_owned())))
 }
 
 ///|

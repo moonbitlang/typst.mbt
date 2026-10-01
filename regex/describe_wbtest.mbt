@@ -23,3 +23,14 @@ fn describe(pattern : String, hay : String) -> String {
   out.write_string(re.split(hay).map(s => @unicode.rust_debug_str(s)).join(","))
   out.to_string()
 }
+
+///|
+test "ast_is_single_char" {
+  inspect(ast_is_single_char("[a-z]"), content="true")
+  inspect(ast_is_single_char("\\p{L}"), content="true")
+  inspect(ast_is_single_char("."), content="true")
+  inspect(ast_is_single_char("a"), content="true")
+  inspect(ast_is_single_char("ab"), content="false")
+  inspect(ast_is_single_char("[a-z]+"), content="false")
+  inspect(ast_is_single_char("("), content="false")
+}
