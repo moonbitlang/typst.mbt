@@ -1,0 +1,66 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/eval"
+
+import {
+  "moonbitlang/typst/library",
+  "moonbitlang/typst/syntax",
+  "moonbitlang/typst/syntax/ast",
+}
+
+// Values
+pub fn eval_closure(@library.Func, @library.Closure, @library.Engine, @library.Context, @library.Args) -> @library.Value raise @library.SourceError
+
+pub fn eval_expr(Vm, @ast.Expr) -> @library.Value raise @library.SourceError
+
+pub fn eval_markup(Vm, @ast.Markup) -> @library.Content raise @library.SourceError
+
+pub fn eval_source(&@library.World, @library.Library, @library.Traced, @library.Sink, @library.Route, @syntax.Source) -> @library.Module raise @library.SourceError
+
+pub fn eval_string(@library.Engine, @library.Context, String, @syntax.Span, @syntax.SyntaxMode, @library.Scope) -> @library.Value raise @library.SourceError
+
+pub fn hint_if_shadowed_std(Vm, @ast.Expr, @library.HintedString) -> @library.HintedString
+
+pub fn import_(@library.Engine, String, @syntax.Span) -> @library.Module raise @library.SourceError
+
+pub fn routines_eval_closure() -> (@library.Func, @library.Closure, @library.Engine, @library.Context, @library.Args) -> @library.Value raise @library.SourceError
+
+pub fn routines_eval_string() -> (@library.Engine, @library.Context, String, @syntax.Span, @syntax.SyntaxMode, @library.Scope) -> @library.Value raise @library.SourceError
+
+// Errors
+
+// Types and methods
+pub struct CapturesVisitor {
+  // private fields
+}
+pub fn CapturesVisitor::finish(Self) -> @library.Scope
+pub fn CapturesVisitor::new(@library.Scopes?, @library.Capturer) -> Self
+pub fn CapturesVisitor::visit(Self, @syntax.SyntaxNode) -> Unit
+
+pub(all) enum FlowEvent {
+  Break(@syntax.Span)
+  Continue(@syntax.Span)
+  Return(@syntax.Span, @library.Value?, Bool)
+}
+pub fn FlowEvent::forbidden(Self) -> @library.SourceDiagnostic
+
+pub struct Place {
+  get : () -> @library.Value
+  set : (@library.Value) -> Unit
+}
+
+pub struct Vm {
+  engine : @library.Engine
+  mut flow : FlowEvent?
+  scopes : @library.Scopes
+  inspected : @syntax.Span?
+  context : @library.Context
+}
+pub fn Vm::bind(Self, @ast.Ident, @library.Binding) -> Unit
+pub fn Vm::define(Self, @ast.Ident, @library.Value) -> Unit
+pub fn Vm::new(@library.Engine, @library.Context, @library.Scopes, @syntax.Span) -> Self
+pub fn Vm::trace(Self, @library.Value) -> Unit
+pub fn Vm::trace_at(Self, @syntax.Span, @library.Value) -> Unit
+
+// Type aliases
+
+// Traits

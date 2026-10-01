@@ -364,3 +364,10 @@ pub fn DynValue::field(self : DynValue, _field : String) -> Value?? {
 pub fn stroke_from_pair(_a : Value, _b : Value) -> Value raise HintedError {
   bail("strokes are not ported yet")
 }
+
+///|
+/// A symbol for a single character at runtime (upstream
+/// `Symbol::runtime_char`).
+pub fn Symbol::runtime_char(c : Char) -> Symbol {
+  { text: c.to_string(), }
+}

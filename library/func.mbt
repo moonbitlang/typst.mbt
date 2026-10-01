@@ -102,7 +102,7 @@ pub(all) enum ClosureNode {
 
 ///|
 /// A user-defined closure.
-pub struct Closure {
+pub(all) struct Closure {
   /// The closure's syntax node.
   node : ClosureNode
   /// Default values of named parameters.

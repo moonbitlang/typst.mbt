@@ -419,6 +419,8 @@ pub fn[T : FromValue + IntoValue] field_of(Ty[T], id~ : Int, name~ : String, doc
 
 pub fn fields_field(Value, String) -> Value raise HintedError
 
+pub fn fields_on(Type) -> Array[String]
+
 pub fn figure_caption_elem() -> Element
 
 pub let figure_caption_elem_body : Int
@@ -807,6 +809,8 @@ pub let math_attach_elem_tl : Int
 
 pub let math_attach_elem_tr : Int
 
+pub fn math_module() -> Module
+
 pub fn math_overline_elem() -> Element
 
 pub let math_overline_elem_body : Int
@@ -846,6 +850,8 @@ pub let move_elem_dx : Int
 pub let move_elem_dy : Int
 
 pub fn mul(Value, Value) -> Value raise HintedError
+
+pub fn native_func(String, title? : String, params? : Array[ParamInfo], scope? : () -> Scope, contextual? : Bool, (Engine, Context, Args) -> Value raise SourceError) -> NativeFuncData
 
 pub fn neg(Value) -> Value raise HintedError
 
@@ -1180,6 +1186,10 @@ pub let ref_elem_form : Int
 pub let ref_elem_supplement : Int
 
 pub let ref_elem_target : Int
+
+pub fn regex_escape(String) -> String
+
+pub fn register_global(String, NativeFuncData) -> Unit
 
 pub fn rem_euclid(Double, Double) -> Double
 
@@ -1766,7 +1776,7 @@ pub(all) struct Arg {
   value : @syntax.Spanned[Value]
 }
 
-pub struct Args {
+pub(all) struct Args {
   mut span : @syntax.Span
   items : Array[Arg]
 }
@@ -1806,6 +1816,7 @@ pub fn Arr::at_index(Self, Int64) -> Value raise HintedError
 pub fn Arr::concat(Self, Self) -> Self
 pub fn Arr::copy(Self) -> Self
 pub fn Arr::from_array(Array[Value]) -> Self
+pub fn Arr::insert(Self, Int64, Value) -> Unit raise HintedError
 pub fn Arr::is_empty(Self) -> Bool
 pub fn Arr::iter(Self) -> Iter[Value]
 pub fn Arr::len(Self) -> Int
@@ -1813,6 +1824,8 @@ pub fn Arr::locate(Self, Int64, Bool) -> Int raise HintedError
 pub fn Arr::locate_opt(Self, Int64, Bool) -> Int?
 pub fn Arr::make_mut(Self) -> Self
 pub fn Arr::new() -> Self
+pub fn Arr::pop(Self) -> Value raise HintedError
+pub fn Arr::remove(Self, Int64, Value?) -> Value raise HintedError
 pub fn Arr::repeat(Self, Int64) -> Self raise HintedError
 pub fn Arr::repr(Self) -> String
 pub impl FromValue for Arr
@@ -1833,6 +1846,7 @@ pub fn Binding::detached(Value) -> Self
 pub fn Binding::feature(Self) -> Feature?
 pub fn Binding::new(Value, @syntax.Span) -> Self
 pub fn Binding::read(Self, BindingGuard, String) -> Value raise HintedError
+pub fn Binding::set_value(Self, Value) -> Unit
 pub fn Binding::with_category(Self, Category) -> Self
 pub fn Binding::with_deprecation(Self, Deprecation) -> Self
 pub fn Binding::with_documentation(Self, BindingDocumentation) -> Self
@@ -1894,7 +1908,7 @@ pub(all) enum Category {
   Bundle
 } derive(Eq, Hash, @debug.Debug)
 
-pub struct Closure {
+pub(all) struct Closure {
   node : ClosureNode
   defaults : Array[Value]
   captured : Scope
@@ -2021,6 +2035,7 @@ pub fn Dict::len(Self) -> Int
 pub fn Dict::make_mut(Self) -> Self
 pub fn Dict::merge(Self, Self) -> Self
 pub fn Dict::new() -> Self
+pub fn Dict::remove(Self, String, Value?) -> Value raise HintedError
 pub fn Dict::repr(Self) -> String
 pub fn Dict::take(Self, String) -> Value raise HintedError
 pub impl FromValue for Dict
@@ -2070,6 +2085,7 @@ pub fn Element::repr(Self) -> String
 pub fn Element::scope(Self) -> Scope
 pub fn Element::select(Self) -> Selector
 pub fn Element::set(Self, Engine, Args) -> Styles raise SourceError
+pub fn Element::settable_field_accessor(Self, String) -> ((StyleChain) -> Value)?
 pub fn Element::title(Self) -> String
 pub fn Element::where_(Self, Array[(Int, Value)]) -> Selector
 pub impl Compare for Element
@@ -2119,7 +2135,7 @@ pub impl Neg for Em
 pub impl Sub for Em
 pub impl Numeric for Em
 
-pub struct Engine {
+pub(all) struct Engine {
   world : &World
   library : Library
   introspector : Introspector
@@ -2272,7 +2288,7 @@ pub impl IntoValue for Length
 pub impl Numeric for Length
 pub impl Reflect for Length
 
-pub struct Library {
+pub(all) struct Library {
   routines : Routines
   global : Module
   math : Module
@@ -2280,6 +2296,19 @@ pub struct Library {
   std : Binding
   mut features : Features
 }
+pub fn Library::builder(Routines) -> LibraryBuilder
+
+pub(all) struct LibraryBuilder {
+  mut features : Features
+  extra : Array[(Scope) -> Unit]
+  routines : Routines
+}
+pub fn LibraryBuilder::build(Self) -> Library
+pub fn LibraryBuilder::with_features(Self, Features) -> Self
+pub fn LibraryBuilder::with_global(Self, (Scope) -> Unit) -> Self
+
+pub struct LinkElem(Content)
+pub fn LinkElem::from_url(String) -> Content raise HintedError
 
 pub(all) struct Location(UInt64) derive(Compare, Eq, Hash)
 
@@ -2447,7 +2476,7 @@ pub fn Route::unnested(Self) -> Self
 pub fn Route::with_id(Self, @syntax.FileId) -> Self
 pub fn Route::within(Self, Int) -> Bool
 
-pub struct Routines {
+pub(all) struct Routines {
   eval_string : (Engine, Context, String, @syntax.Span, @syntax.SyntaxMode, Scope) -> Value raise SourceError
   eval_closure : (Func, Closure, Engine, Context, Args) -> Value raise SourceError
 }
@@ -2471,6 +2500,9 @@ pub fn Scope::bind(Self, String, Binding) -> Binding
 pub fn Scope::copy(Self) -> Self
 pub fn Scope::deduplicating() -> Self
 pub fn Scope::define(Self, String, Value) -> Binding
+pub fn Scope::define_elem(Self, Element) -> Binding
+pub fn Scope::define_func(Self, NativeFuncData) -> Binding
+pub fn Scope::define_type(Self, Type) -> Binding
 pub fn Scope::get(Self, String) -> Binding?
 pub fn Scope::iter(Self) -> Iter[(String, Binding)]
 pub fn Scope::length(Self) -> Int
@@ -2478,7 +2510,7 @@ pub fn Scope::new() -> Self
 pub fn Scope::reset_category(Self) -> Unit
 pub fn Scope::start_category(Self, Category) -> Unit
 
-pub struct Scopes {
+pub(all) struct Scopes {
   mut top : Scope
   scopes : Array[Scope]
   base : Library?
@@ -2515,7 +2547,11 @@ pub(all) enum Severity {
   Warning
 } derive(Eq, Hash, @debug.Debug)
 
-pub struct Sink {
+pub(all) struct ShowableSelector(Selector)
+pub impl FromValue for ShowableSelector
+pub impl Reflect for ShowableSelector
+
+pub(all) struct Sink {
   delayed : Array[SourceDiagnostic]
   warnings : Array[SourceDiagnostic]
   warnings_set : @hashset.HashSet[(@syntax.DiagSpan, String)]
@@ -2544,6 +2580,10 @@ pub fn SourceDiagnostic::warning_at(@syntax.Span, String) -> Self
 pub fn SourceDiagnostic::with_hint(Self, String) -> Self
 pub fn SourceDiagnostic::with_hints(Self, ArrayView[String]) -> Self
 pub fn SourceDiagnostic::with_tracepoint(Self, Tracepoint, @syntax.Span) -> Self
+
+pub struct SpaceElem(Content)
+pub fn SpaceElem::shared() -> Content
+pub fn SpaceElem::shared_with_newline() -> Content
 
 pub(all) enum Style {
   Property(Property)
@@ -2609,6 +2649,7 @@ pub fn Symbol::func(Self) -> Func raise HintedError
 pub fn Symbol::get(Self) -> String
 pub fn Symbol::modified(Self, BindingGuard, String) -> Self raise HintedError
 pub fn Symbol::repr(Self) -> String
+pub fn Symbol::runtime_char(Char) -> Self
 
 pub struct SymbolElem(Content)
 pub fn SymbolElem::packed(String) -> Content
@@ -2621,7 +2662,7 @@ pub(all) struct Tiling {
 } derive(Eq, Hash)
 pub fn Tiling::repr(Self) -> String
 
-pub struct Traced(@syntax.Span?)
+pub(all) struct Traced(@syntax.Span?)
 pub fn Traced::get(Self, @syntax.FileId) -> @syntax.Span?
 pub fn Traced::new(traced? : @syntax.Span) -> Self
 
@@ -2740,6 +2781,7 @@ pub fn Value::numeric(Double, NumericUnit) -> Self
 pub fn Value::repr(Self) -> String
 pub fn Value::scope(Self) -> Scope?
 pub fn Value::shared(Self) -> Self
+pub fn Value::spanned(Self, @syntax.Span) -> Self
 pub fn Value::ty(Self) -> Type
 pub impl Eq for Value
 pub impl FromValue for Value
@@ -2807,4 +2849,5 @@ pub(open) trait World {
   fn file(Self, @syntax.FileId) -> Bytes raise FileError
   fn today(Self, Int64?) -> Datetime?
   fn resolve_path(Self, @syntax.FileId?, String) -> @syntax.FileId raise HintedError
+  fn file_stem(Self, @syntax.FileId) -> String
 }

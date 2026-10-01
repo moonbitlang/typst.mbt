@@ -51,6 +51,8 @@ pub(open) trait World {
   fn today(Self, Int64?) -> Datetime?
   /// Resolve a path relative to a file into a file id.
   fn resolve_path(Self, @syntax.FileId?, String) -> @syntax.FileId raise HintedError
+  /// The file stem of a file (used as module name).
+  fn file_stem(Self, @syntax.FileId) -> String
 }
 
 ///|
@@ -68,7 +70,7 @@ pub fn world_range(world : &World, span : @syntax.DiagSpan) -> (Int, Int)? {
 
 ///|
 /// Definition of Typst's standard library.
-pub struct Library {
+pub(all) struct Library {
   /// The function pointers into the compiler.
   routines : Routines
   /// The module that contains the definitions that are available everywhere.
@@ -87,7 +89,7 @@ pub struct Library {
 ///|
 /// Defines implementation of various Typst compiler routines as a table of
 /// function pointers (upstream `Routines`).
-pub struct Routines {
+pub(all) struct Routines {
   /// Evaluates a string as code/markup/math.
   eval_string : (
     Engine,
@@ -103,7 +105,7 @@ pub struct Routines {
 
 ///|
 /// Holds all data needed during compilation.
-pub struct Engine {
+pub(all) struct Engine {
   /// The compilation environment.
   world : &World
   /// The standard library.
@@ -160,7 +162,7 @@ pub fn Engine::with_route(self : Engine, route : Route) -> Engine {
 
 ///|
 /// May hold a span that is currently under inspection.
-pub struct Traced(@syntax.Span?)
+pub(all) struct Traced(@syntax.Span?)
 
 ///|
 pub fn Traced::new(traced? : @syntax.Span) -> Traced {
@@ -178,7 +180,7 @@ pub fn Traced::get(self : Traced, id : @syntax.FileId) -> @syntax.Span? {
 
 ///|
 /// A push-only sink for delayed errors, warnings, and traced values.
-pub struct Sink {
+pub(all) struct Sink {
   /// Delayed errors: Those are errors that we can ignore until the last
   /// iteration.
   delayed : Array[SourceDiagnostic]

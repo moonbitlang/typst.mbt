@@ -498,3 +498,18 @@ pub fn[T : FromValue + IntoValue] field_of(
     parse,
   }
 }
+
+///|
+/// An accessor for the given settable field's value in a style chain
+/// (upstream `Element::settable_field_accessor`).
+pub fn Element::settable_field_accessor(
+  self : Element,
+  name : String,
+) -> ((StyleChain) -> Value)? {
+  for f in self.0.fields {
+    if f.name == name && !f.internal && f.kind is (Settable | Ghost) {
+      return Some(styles => styles.get_value_with_local(self, f, None))
+    }
+  }
+  None
+}

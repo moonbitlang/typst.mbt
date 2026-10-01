@@ -43,3 +43,21 @@ fn no_fields(ty : Type) -> String {
 fn missing_field(ty : Type, field : String) -> String {
   "\{ty} does not contain field \"\{field}\""
 }
+
+///|
+/// The list of fields on a type.
+pub fn fields_on(ty : Type) -> Array[String] {
+  if ty == Type::version() {
+    ["major", "minor", "patch"]
+  } else if ty == Type::length() {
+    ["em", "abs"]
+  } else if ty == Type::relative() {
+    ["ratio", "length"]
+  } else if ty == Type::stroke() {
+    ["paint", "thickness", "cap", "join", "dash", "miter-limit"]
+  } else if ty == Type::alignment() {
+    ["x", "y"]
+  } else {
+    []
+  }
+}
