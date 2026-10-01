@@ -1123,7 +1123,7 @@ fn impl_calc_norm(
 
 ///|
 /// TODO: port `Content.func` (typst-library/src/foundations/content/mod.rs).
-fn impl_content_func(self_ : Content) -> Value raise HintedError {
+fn impl_content_func(self_ : Content) -> Element raise HintedError {
   ignore(self_)
   bail("`Content.func` is not yet ported")
 }
@@ -1154,13 +1154,6 @@ fn impl_content_at(
 fn impl_content_fields(self_ : Content) -> Dict raise HintedError {
   ignore(self_)
   bail("`Content.fields` is not yet ported")
-}
-
-///|
-/// TODO: port `Content.location` (typst-library/src/foundations/content/mod.rs).
-fn impl_content_location(self_ : Content) -> Value raise HintedError {
-  ignore(self_)
-  bail("`Content.location` is not yet ported")
 }
 
 ///|
@@ -1556,14 +1549,6 @@ fn impl_func_with(self_ : Func, args : Args) -> Func raise HintedError {
 }
 
 ///|
-/// TODO: port `Func.where-` (typst-library/src/foundations/func.rs).
-fn impl_func_where(self_ : Func, args : Args) -> Value raise HintedError {
-  ignore(self_)
-  ignore(args)
-  bail("`Func.where-` is not yet ported")
-}
-
-///|
 /// TODO: port default `Spanned::new(Base::Default, Span::detached())`.
 fn impl_i64_construct__base_default() -> @syntax.Spanned[Value] raise SourceError {
   raise SourceError([
@@ -1836,72 +1821,6 @@ fn impl_repr(value_ : Value) -> String raise HintedError {
 }
 
 ///|
-/// TODO: port `Selector.construct` (typst-library/src/foundations/selector.rs).
-fn impl_selector_construct(target_ : Value) -> Value raise HintedError {
-  ignore(target_)
-  bail("`Selector.construct` is not yet ported")
-}
-
-///|
-/// TODO: port `Selector.or` (typst-library/src/foundations/selector.rs).
-fn impl_selector_or(
-  self_ : Value,
-  others_ : Array[Value],
-) -> Value raise HintedError {
-  ignore(self_)
-  ignore(others_)
-  bail("`Selector.or` is not yet ported")
-}
-
-///|
-/// TODO: port `Selector.and` (typst-library/src/foundations/selector.rs).
-fn impl_selector_and(
-  self_ : Value,
-  others_ : Array[Value],
-) -> Value raise HintedError {
-  ignore(self_)
-  ignore(others_)
-  bail("`Selector.and` is not yet ported")
-}
-
-///|
-/// TODO: port `Selector.before` (typst-library/src/foundations/selector.rs).
-fn impl_selector_before(
-  self_ : Value,
-  end_ : Value,
-  inclusive_ : Bool,
-) -> Value raise HintedError {
-  ignore(self_)
-  ignore(end_)
-  ignore(inclusive_)
-  bail("`Selector.before` is not yet ported")
-}
-
-///|
-/// TODO: port `Selector.after` (typst-library/src/foundations/selector.rs).
-fn impl_selector_after(
-  self_ : Value,
-  start_ : Value,
-  inclusive_ : Bool,
-) -> Value raise HintedError {
-  ignore(self_)
-  ignore(start_)
-  ignore(inclusive_)
-  bail("`Selector.after` is not yet ported")
-}
-
-///|
-/// TODO: port `Selector.within` (typst-library/src/foundations/selector.rs).
-fn impl_selector_within(
-  self_ : Value,
-  ancestor_ : Value,
-) -> Value raise HintedError {
-  ignore(self_)
-  ignore(ancestor_)
-  bail("`Selector.within` is not yet ported")
-}
-
-///|
 /// TODO: port default `Spanned::detached(Base::Default)`.
 fn impl_str_construct__base_default() -> @syntax.Spanned[Value] raise SourceError {
   raise SourceError([
@@ -2099,11 +2018,11 @@ fn impl_str_position(
 }
 
 ///|
-/// TODO: port `Str.match-` (typst-library/src/foundations/str.rs).
+/// TODO: port `Str.match` (typst-library/src/foundations/str.rs).
 fn impl_str_match(self_ : String, pattern_ : Value) -> Dict? raise HintedError {
   ignore(self_)
   ignore(pattern_)
-  bail("`Str.match-` is not yet ported")
+  bail("`Str.match` is not yet ported")
 }
 
 ///|
@@ -2249,338 +2168,6 @@ fn impl_version_at(self_ : Value, index_ : Int64) -> Int64 raise HintedError {
   ignore(self_)
   ignore(index_)
   bail("`Version.at` is not yet ported")
-}
-
-///|
-/// TODO: port `Counter.construct` (typst-library/src/introspection/counter.rs).
-fn impl_counter_construct(key_ : Value) -> Value raise HintedError {
-  ignore(key_)
-  bail("`Counter.construct` is not yet ported")
-}
-
-///|
-/// TODO: port `Counter.get` (typst-library/src/introspection/counter.rs).
-fn impl_counter_get(
-  self_ : Value,
-  engine : Engine,
-  context : Context,
-  span : @syntax.Span,
-) -> Value raise SourceError {
-  ignore(self_)
-  ignore(engine)
-  ignore(context)
-  ignore(span)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`Counter.get` is not yet ported",
-    ),
-  ])
-}
-
-///|
-/// TODO: port default `Default::default()`.
-fn impl_counter_display__numbering_default() -> Value raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `counter_display.numbering` is not yet ported",
-    ),
-  ])
-}
-
-///|
-/// TODO: port default `Default::default()`.
-fn impl_counter_display__at_default() -> Value raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `counter_display.at` is not yet ported",
-    ),
-  ])
-}
-
-///|
-/// TODO: port `Counter.display` (typst-library/src/introspection/counter.rs).
-fn impl_counter_display(
-  self_ : Value,
-  engine : Engine,
-  context : Context,
-  span : @syntax.Span,
-  numbering_ : Value,
-  at_ : Value,
-  both_ : Bool,
-) -> Value raise SourceError {
-  ignore(self_)
-  ignore(engine)
-  ignore(context)
-  ignore(span)
-  ignore(numbering_)
-  ignore(at_)
-  ignore(both_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`Counter.display` is not yet ported",
-    ),
-  ])
-}
-
-///|
-/// TODO: port `Counter.at` (typst-library/src/introspection/counter.rs).
-fn impl_counter_at(
-  self_ : Value,
-  engine : Engine,
-  context : Context,
-  span : @syntax.Span,
-  selector_ : Value,
-) -> Value raise SourceError {
-  ignore(self_)
-  ignore(engine)
-  ignore(context)
-  ignore(span)
-  ignore(selector_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`Counter.at` is not yet ported",
-    ),
-  ])
-}
-
-///|
-/// TODO: port `Counter.final-` (typst-library/src/introspection/counter.rs).
-fn impl_counter_final(
-  self_ : Value,
-  engine : Engine,
-  context : Context,
-  span : @syntax.Span,
-) -> Value raise SourceError {
-  ignore(self_)
-  ignore(engine)
-  ignore(context)
-  ignore(span)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`Counter.final-` is not yet ported",
-    ),
-  ])
-}
-
-///|
-/// TODO: port default `NonZeroUsize::ONE`.
-fn impl_counter_step__level_default() -> NonZeroUSize raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `counter_step.level` is not yet ported",
-    ),
-  ])
-}
-
-///|
-/// TODO: port `Counter.step` (typst-library/src/introspection/counter.rs).
-fn impl_counter_step(
-  self_ : Value,
-  span : @syntax.Span,
-  level_ : NonZeroUSize,
-) -> Content raise HintedError {
-  ignore(self_)
-  ignore(span)
-  ignore(level_)
-  bail("`Counter.step` is not yet ported")
-}
-
-///|
-/// TODO: port `Counter.update` (typst-library/src/introspection/counter.rs).
-fn impl_counter_update(
-  self_ : Value,
-  span : @syntax.Span,
-  update_ : Value,
-) -> Content raise HintedError {
-  ignore(self_)
-  ignore(span)
-  ignore(update_)
-  bail("`Counter.update` is not yet ported")
-}
-
-///|
-/// TODO: port `here` (typst-library/src/introspection/here.rs).
-fn impl_here(context : Context) -> Value raise HintedError {
-  ignore(context)
-  bail("`here` is not yet ported")
-}
-
-///|
-/// TODO: port `locate` (typst-library/src/introspection/locate.rs).
-fn impl_locate(
-  engine : Engine,
-  context : Context,
-  span : @syntax.Span,
-  selector_ : Value,
-) -> Value raise SourceError {
-  ignore(engine)
-  ignore(context)
-  ignore(span)
-  ignore(selector_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`locate` is not yet ported",
-    ),
-  ])
-}
-
-///|
-/// TODO: port `Location.page` (typst-library/src/introspection/location.rs).
-fn impl_location_page(
-  self_ : Value,
-  engine : Engine,
-  span : @syntax.Span,
-) -> NonZeroUSize? raise HintedError {
-  ignore(self_)
-  ignore(engine)
-  ignore(span)
-  bail("`Location.page` is not yet ported")
-}
-
-///|
-/// TODO: port `Location.page-numbering` (typst-library/src/introspection/location.rs).
-fn impl_location_page_numbering(
-  self_ : Value,
-  engine : Engine,
-  span : @syntax.Span,
-) -> Value raise HintedError {
-  ignore(self_)
-  ignore(engine)
-  ignore(span)
-  bail("`Location.page-numbering` is not yet ported")
-}
-
-///|
-/// TODO: port `Location.position` (typst-library/src/introspection/location.rs).
-fn impl_location_position(
-  self_ : Value,
-  engine : Engine,
-  span : @syntax.Span,
-) -> Dict? raise HintedError {
-  ignore(self_)
-  ignore(engine)
-  ignore(span)
-  bail("`Location.position` is not yet ported")
-}
-
-///|
-/// TODO: port `query` (typst-library/src/introspection/query.rs).
-fn impl_query(
-  engine : Engine,
-  context : Context,
-  span : @syntax.Span,
-  target_ : Value,
-) -> Arr raise HintedError {
-  ignore(engine)
-  ignore(context)
-  ignore(span)
-  ignore(target_)
-  bail("`query` is not yet ported")
-}
-
-///|
-/// TODO: port default `Default::default()`.
-fn impl_state_construct__init_default() -> Value raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `state_construct.init` is not yet ported",
-    ),
-  ])
-}
-
-///|
-/// TODO: port `State.construct` (typst-library/src/introspection/state.rs).
-fn impl_state_construct(
-  key_ : String,
-  init_ : Value,
-) -> Value raise HintedError {
-  ignore(key_)
-  ignore(init_)
-  bail("`State.construct` is not yet ported")
-}
-
-///|
-/// TODO: port `State.get` (typst-library/src/introspection/state.rs).
-fn impl_state_get(
-  self_ : Value,
-  engine : Engine,
-  context : Context,
-  span : @syntax.Span,
-) -> Value raise SourceError {
-  ignore(self_)
-  ignore(engine)
-  ignore(context)
-  ignore(span)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`State.get` is not yet ported",
-    ),
-  ])
-}
-
-///|
-/// TODO: port `State.at` (typst-library/src/introspection/state.rs).
-fn impl_state_at(
-  self_ : Value,
-  engine : Engine,
-  context : Context,
-  span : @syntax.Span,
-  selector_ : Value,
-) -> Value raise SourceError {
-  ignore(self_)
-  ignore(engine)
-  ignore(context)
-  ignore(span)
-  ignore(selector_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`State.at` is not yet ported",
-    ),
-  ])
-}
-
-///|
-/// TODO: port `State.final-` (typst-library/src/introspection/state.rs).
-fn impl_state_final(
-  self_ : Value,
-  engine : Engine,
-  context : Context,
-  span : @syntax.Span,
-) -> Value raise SourceError {
-  ignore(self_)
-  ignore(engine)
-  ignore(context)
-  ignore(span)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`State.final-` is not yet ported",
-    ),
-  ])
-}
-
-///|
-/// TODO: port `State.update` (typst-library/src/introspection/state.rs).
-fn impl_state_update(
-  self_ : Value,
-  span : @syntax.Span,
-  update_ : Value,
-) -> Content raise HintedError {
-  ignore(self_)
-  ignore(span)
-  ignore(update_)
-  bail("`State.update` is not yet ported")
 }
 
 ///|
@@ -3176,28 +2763,6 @@ fn impl_math_sscript(
   ignore(body_)
   ignore(cramped_)
   bail("`math.sscript` is not yet ported")
-}
-
-///|
-/// TODO: port `numbering` (typst-library/src/model/numbering.rs).
-fn impl_numbering(
-  engine : Engine,
-  context : Context,
-  span : @syntax.Span,
-  numbering_ : Value,
-  numbers_ : Array[U64],
-) -> Value raise SourceError {
-  ignore(engine)
-  ignore(context)
-  ignore(span)
-  ignore(numbering_)
-  ignore(numbers_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`numbering` is not yet ported",
-    ),
-  ])
 }
 
 ///|

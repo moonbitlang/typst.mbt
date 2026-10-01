@@ -921,12 +921,6 @@ fn document_elem_date_default() -> Value {
 }
 
 ///|
-/// TODO: port `Numbering::Pattern(NumberingPattern::from_str("1.").unwrap())` (EnumElem.numbering).
-fn enum_elem_numbering_default() -> Value {
-  None
-}
-
-///|
 /// TODO: port `Default::default() of Smart<u64>` (EnumElem.start).
 fn enum_elem_start_default() -> Value {
   None
@@ -999,12 +993,6 @@ fn figure_elem_supplement_default() -> Value {
 }
 
 ///|
-/// TODO: port `Some(NumberingPattern::from_str("1").unwrap().into())` (FigureElem.numbering).
-fn figure_elem_numbering_default() -> Value {
-  None
-}
-
-///|
 /// TODO: port `OuterVAlignment::Bottom` (FigureCaption.position).
 fn figure_caption_elem_position_default() -> Value {
   None
@@ -1013,12 +1001,6 @@ fn figure_caption_elem_position_default() -> Value {
 ///|
 /// TODO: port `Default::default() of Smart<Content>` (FigureCaption.separator).
 fn figure_caption_elem_separator_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Numbering::Pattern(NumberingPattern::from_str("1").unwrap())` (FootnoteElem.numbering).
-fn footnote_elem_numbering_default() -> Value {
   None
 }
 

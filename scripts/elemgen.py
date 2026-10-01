@@ -47,6 +47,17 @@ TYPEMAP = {
     "Label": "Label",
     "Styles": "Styles",
     "Value": "Value",
+    "Selector": "Selector",
+    "LocatableSelector": "LocatableSelector",
+    "Location": "Location",
+    "Option<Location>": "Location?",
+    "Counter": "Counter",
+    "Option<Counter>": "Counter?",
+    "CounterKey": "CounterKey",
+    "CounterUpdate": "CounterUpdate",
+    "StateUpdate": "StateUpdate",
+    "Numbering": "Numbering",
+    "Option<Numbering>": "Numbering?",
 }
 
 # Rust `Default::default()` of a mapped type, as a Value expression.

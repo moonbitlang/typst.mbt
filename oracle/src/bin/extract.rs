@@ -478,6 +478,8 @@ fn parse_meta(attr: &Attribute) -> Meta {
 
 /// `heck::ToKebabCase` for the identifiers we encounter.
 fn kebab(s: &str) -> String {
+    // heck drops leading and trailing underscores (`where_` -> `where`).
+    let s = s.trim_matches('_');
     let mut out = String::new();
     let chars: Vec<char> = s.chars().collect();
     for (i, &c) in chars.iter().enumerate() {
