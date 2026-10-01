@@ -13,6 +13,8 @@ use std::path::{Path, PathBuf};
 use typst_syntax::{DiagSpanKind, Source, SyntaxDiagnostic};
 
 mod collect;
+mod eval;
+mod world;
 
 fn main() {
     let args: Vec<String> = std::env::args().collect();
@@ -21,6 +23,16 @@ fn main() {
             let suite = PathBuf::from(&args[2]);
             let out = PathBuf::from(&args[3]);
             dump_syntax(&suite, &out);
+        }
+        Some("eval") => {
+            // Paths are resolved relative to the upstream checkout.
+            let suite = PathBuf::from(&args[2]);
+            let out = std::path::absolute(PathBuf::from(&args[3])).unwrap();
+            let upstream = std::path::absolute(&suite).unwrap();
+            let root = upstream.ancestors().nth(2).unwrap().to_path_buf();
+            std::env::set_current_dir(&root).unwrap();
+            let rel = upstream.strip_prefix(&root).unwrap();
+            eval::dump_eval(rel, &out);
         }
         Some("parse") => {
             // Debugging aid: parse a single file and print the tree.
