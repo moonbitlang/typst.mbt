@@ -135,6 +135,10 @@ pub fn bundle_format() -> Format
 
 pub fn bundle_format_elem() -> Element
 
+pub fn bytes_cast_b(Value) -> Bytes raise HintedError
+
+pub fn bytes_into_value_b(Bytes) -> Value
+
 pub fn cancel_elem() -> Element
 
 pub let cancel_elem_angle : Int
@@ -234,6 +238,8 @@ pub fn contains(BindingGuard, Value, Value) -> Bool?
 pub fn context_elem() -> Element
 
 pub let context_elem_func : Int
+
+pub fn convert_float_to_int(Double) -> Int64 raise HintedError
 
 pub fn counter_display_elem() -> Element
 
@@ -681,6 +687,8 @@ pub fn html_format_elem() -> Element
 
 pub let html_format_elem_pretty : Int
 
+pub fn i64_from_str_radix(String, Int) -> Int64 raise IntErrorKind
+
 pub fn image_elem() -> Element
 
 pub let image_elem_alt : Int
@@ -720,6 +728,8 @@ pub fn layout_elem() -> Element
 pub let layout_elem_func : Int
 
 pub fn leq(Value, Value) -> Value raise HintedError
+
+pub fn libm_erf(Double) -> Double
 
 pub fn limits_elem() -> Element
 
@@ -1839,6 +1849,8 @@ pub let rotate_elem_origin : Int
 
 pub let rotate_elem_reflow : Int
 
+pub fn round_int_with_precision(Int64, Int) -> Int64?
+
 pub fn round_with_precision(Double, Int) -> Double
 
 pub fn rust_debug_f64(Double) -> String
@@ -1848,6 +1860,8 @@ pub fn rust_display_f64(Double) -> String
 pub fn rust_fixed_f64(Double, Int) -> String
 
 pub fn rust_lines(String) -> Array[String]
+
+pub fn rust_parse_f64(String) -> Double?
 
 pub fn rust_rem(Double, Double) -> Double
 
@@ -2225,6 +2239,8 @@ pub fn[T] trace((@syntax.DiagSpan) -> (Int, Int)?, () -> Tracepoint, @syntax.Spa
 
 pub let typst_version : (Int, Int, Int)
 
+pub fn u64_from_str_radix(String, Int) -> UInt64 raise IntErrorKind
+
 pub fn underbrace_elem() -> Element
 
 pub let underbrace_elem_annotation : Int
@@ -2306,6 +2322,14 @@ pub impl Show for FileError
 pub(all) suberror HintedError {
   HintedError(HintedString)
 } derive(@debug.Debug)
+
+pub(all) suberror IntErrorKind {
+  Empty
+  InvalidDigit
+  PosOverflow
+  NegOverflow
+  Zero
+} derive(Eq, @debug.Debug)
 
 pub(all) suberror PackageError {
   NotFound(@syntax.PackageSpec)
@@ -2409,6 +2433,14 @@ pub impl IntoValue for Angle
 pub impl Numeric for Angle
 pub impl Reflect for Angle
 
+pub(all) enum AngleLike {
+  Int(Int64)
+  Float(Double)
+  Angle(Angle)
+}
+pub impl FromValue for AngleLike
+pub impl Reflect for AngleLike
+
 pub(all) enum AngleUnit {
   Rad
   Deg
@@ -2459,6 +2491,13 @@ pub impl FromValue for Args
 pub impl IntoValue for Args
 pub impl Reflect for Args
 
+pub(all) enum ArgumentKey {
+  Index(Int64)
+  Name(String)
+}
+pub impl FromValue for ArgumentKey
+pub impl Reflect for ArgumentKey
+
 pub struct Arr {
   items : Array[Value]
   mut shared : Bool
@@ -2482,6 +2521,15 @@ pub fn Arr::repr(Self) -> String
 pub impl FromValue for Arr
 pub impl IntoValue for Arr
 pub impl Reflect for Arr
+
+pub(all) enum Base {
+  Default
+  User(Int64)
+} derive(Eq, @debug.Debug)
+pub fn Base::value(Self) -> Int64
+pub impl FromValue for Base
+pub impl IntoValue for Base
+pub impl Reflect for Base
 
 pub struct Binding {
   mut value : Value
@@ -2529,7 +2577,9 @@ pub impl IntoValue for BundlePath
 pub impl Reflect for BundlePath
 
 pub(all) struct BytesValue(Bytes) derive(Eq, Hash)
+pub fn BytesValue::as_slice(Self) -> Bytes
 pub fn BytesValue::concat(Self, Self) -> Self
+pub fn BytesValue::new(Bytes) -> Self
 pub fn BytesValue::repr(Self) -> String
 
 pub(all) enum Capturer {
@@ -2661,18 +2711,39 @@ pub fn Datetime::repr(Self) -> String
 pub fn Datetime::sub_datetime(Self, Self) -> Duration raise HintedError
 pub fn Datetime::sub_duration(Self, Duration) -> Self raise HintedError
 
+pub(all) enum DecNum {
+  Int(Int64)
+  Float(Double)
+  Decimal(Decimal)
+}
+pub impl FromValue for DecNum
+pub impl IntoValue for DecNum
+pub impl Reflect for DecNum
+
 pub(all) struct Decimal {
   // private fields
 } derive(Eq, Hash)
+pub fn Decimal::abs(Self) -> Self
+pub fn Decimal::ceil(Self) -> Self
 pub fn Decimal::checked_add(Self, Self) -> Self raise HintedError
 pub fn Decimal::checked_div(Self, Self) -> Self raise HintedError
+pub fn Decimal::checked_div_euclid(Self, Self) -> Self?
 pub fn Decimal::checked_mul(Self, Self) -> Self raise HintedError
+pub fn Decimal::checked_powi(Self, Int64) -> Self?
+pub fn Decimal::checked_rem(Self, Self) -> Self?
+pub fn Decimal::checked_rem_euclid(Self, Self) -> Self?
 pub fn Decimal::checked_sub(Self, Self) -> Self raise HintedError
+pub fn Decimal::floor(Self) -> Self
+pub fn Decimal::fract(Self) -> Self
 pub fn Decimal::from_int(Int64) -> Self
 pub fn Decimal::is_zero(Self) -> Bool
 pub fn Decimal::neg(Self) -> Self
 pub fn Decimal::repr(Self) -> String
+pub fn Decimal::round(Self, Int) -> Self?
+pub fn Decimal::to_f64(Self) -> Double?
+pub fn Decimal::to_i64(Self) -> Int64?
 pub fn Decimal::to_string(Self) -> String
+pub fn Decimal::trunc(Self) -> Self
 pub impl Compare for Decimal
 
 pub(all) struct Deprecation {
@@ -2813,6 +2884,14 @@ pub impl Add for Em
 pub impl Neg for Em
 pub impl Sub for Em
 pub impl Numeric for Em
+
+pub(all) enum Endianness {
+  Big
+  Little
+} derive(Eq, Hash, @debug.Debug)
+pub impl FromValue for Endianness
+pub impl IntoValue for Endianness
+pub impl Reflect for Endianness
 
 pub(all) struct Engine {
   world : &World
@@ -3098,6 +3177,14 @@ pub impl FromValue for NonZeroUSize
 pub impl IntoValue for NonZeroUSize
 pub impl Reflect for NonZeroUSize
 
+pub(all) enum Num {
+  Int(Int64)
+  Float(Double)
+}
+pub impl FromValue for Num
+pub impl IntoValue for Num
+pub impl Reflect for Num
+
 pub(all) enum NumericUnit {
   Pt
   Mm
@@ -3248,6 +3335,7 @@ pub(all) struct Routines {
 pub(all) struct Scalar(Double) derive(Default)
 pub fn Scalar::get(Self) -> Double
 pub fn Scalar::new(Double) -> Self
+pub fn Scalar::powi(Self, Int) -> Self
 pub impl Add for Scalar
 pub impl Compare for Scalar
 pub impl Div for Scalar
@@ -3457,6 +3545,29 @@ pub(all) struct Tiling {
 } derive(Eq, Hash)
 pub fn Tiling::repr(Self) -> String
 
+pub(all) struct ToAbs(Value)
+pub impl FromValue for ToAbs
+pub impl Reflect for ToAbs
+
+pub(all) struct ToArray(Arr)
+pub impl FromValue for ToArray
+pub impl Reflect for ToArray
+
+pub(all) struct ToDict(Module)
+pub impl FromValue for ToDict
+pub impl Reflect for ToDict
+
+pub(all) struct ToFloat(Double)
+pub impl FromValue for ToFloat
+pub impl Reflect for ToFloat
+
+pub(all) enum ToInt {
+  Int(Int64)
+  Str(String)
+}
+pub impl FromValue for ToInt
+pub impl Reflect for ToInt
+
 pub(all) struct Traced(@syntax.Span?)
 pub fn Traced::get(Self, @syntax.FileId) -> @syntax.Span?
 pub fn Traced::new(traced? : @syntax.Span) -> Self
@@ -3617,6 +3728,7 @@ pub(all) struct Version(Array[Int]) derive(Eq, Hash)
 pub fn Version::component(Self, String) -> Int64 raise HintedError
 pub fn Version::repr(Self) -> String
 pub fn Version::to_string(Self) -> String
+pub fn Version::values(Self) -> Array[Int]
 pub impl Compare for Version
 
 pub(all) struct Warned[T] {
