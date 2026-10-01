@@ -3319,13 +3319,6 @@ fn impl_upper(text_ : Value) -> Value raise HintedError {
 }
 
 ///|
-/// TODO: port `lorem` (typst-library/src/text/lorem.rs).
-fn impl_lorem(words_ : USize) -> String raise HintedError {
-  ignore(words_)
-  bail("`lorem` is not yet ported")
-}
-
-///|
 /// TODO: port `Color.luma` (typst-library/src/visualize/color.rs).
 fn impl_color_luma(args : Args) -> Value raise SourceError {
   ignore(args)
