@@ -37,7 +37,8 @@ fn html_typed_create_func_data(
   element : @html_assets.ElemInfo,
 ) -> NativeFuncData {
   let name = element.name
-  let title = name.substring(end=1).to_upper() + name.substring(start=1)
+  let title = name.unsafe_substring(start=0, end=1).to_upper() +
+    name.unsafe_substring(start=1, end=name.length())
   NativeFuncData::new(
     name~,
     title~,
@@ -615,13 +616,16 @@ fn image_candidate_cast(v : Value) -> String raise HintedError {
   let v : Dict = v.cast()
   let v = v.copy()
   let src : String = v.take("src").cast()
-  let width : NonZeroU64? = match (try? v.take("width")) {
-    Ok(value) => Some(value.cast())
-    Err(_) => None
+  // Upstream `v.take(key).ok()`: `take` only fails for missing keys.
+  let width : NonZeroU64? = if v.contains("width") {
+    Some(v.take("width").cast())
+  } else {
+    None
   }
-  let density : PositiveF64? = match (try? v.take("density")) {
-    Ok(value) => Some(value.cast())
-    Err(_) => None
+  let density : PositiveF64? = if v.contains("density") {
+    Some(v.take("density").cast())
+  } else {
+    None
   }
   v.finish(["src", "width", "density"])
   if src.is_empty() {

@@ -1,0 +1,43 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/html"
+
+import {
+  "moonbitlang/typst/library",
+  "moonbitlang/typst/syntax",
+}
+
+// Values
+pub fn html_encode(HtmlElement, pretty? : Bool) -> String raise @library.SourceError
+
+pub fn iter_with_dom_indices(ArrayView[HtmlNode]) -> Array[(HtmlNode, Int)]
+
+pub fn resolve_inline_styles(HtmlElement) -> Unit
+
+// Errors
+
+// Types and methods
+pub(all) struct HtmlElement {
+  mut tag : @library.HtmlTag
+  mut attrs : @library.HtmlAttrs
+  mut css : @library.CssProperties
+  mut children : Array[HtmlNode]
+  mut parent : @library.Location?
+  mut span : @syntax.Span
+  mut pre_span : Bool
+}
+pub fn HtmlElement::new(@library.HtmlTag) -> Self
+pub fn HtmlElement::spanned(Self, @syntax.Span) -> Self
+pub fn HtmlElement::with_attr(Self, @library.HtmlAttr, String) -> Self
+pub fn HtmlElement::with_children(Self, Array[HtmlNode]) -> Self
+pub fn HtmlElement::with_css(Self, @library.CssProperties) -> Self
+
+pub(all) enum HtmlNode {
+  Text(String, @syntax.Span)
+  Element(HtmlElement)
+}
+pub fn HtmlNode::span(Self) -> @syntax.Span
+pub fn HtmlNode::text(String, @syntax.Span) -> Self
+
+// Type aliases
+
+// Traits

@@ -1,0 +1,66 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/html_assets"
+
+import {
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub fn attr_strings() -> Array[(String, String)]
+
+pub fn attrs() -> Array[AttrInfo]
+
+pub let attrs_global : Int
+
+pub fn elems() -> Array[ElemInfo]
+
+// Errors
+
+// Types and methods
+pub struct AttrInfo {
+  name : String
+  docs : String
+  ty : Type
+}
+pub fn AttrInfo::new(String, String, Type) -> Self
+
+pub struct ElemInfo {
+  name : String
+  docs : String
+  attrs : Array[Int]
+}
+pub fn ElemInfo::attributes(Self) -> Array[AttrInfo]
+pub fn ElemInfo::get_attr(Self, String) -> AttrInfo?
+pub fn ElemInfo::new(String, String, Array[Int]) -> Self
+
+pub(all) enum Type {
+  Presence
+  None_
+  NoneEmpty
+  NoneUndefined
+  Auto
+  TrueFalse
+  YesNo
+  OnOff
+  HorizontalDir
+  Str
+  Char
+  Int
+  NonNegativeInt
+  PositiveInt
+  Float
+  PositiveFloat
+  Datetime
+  Duration
+  Color
+  IconSize
+  ImageCandidate
+  SourceSize
+  Strings(Int, Int)
+  Union(Array[Type])
+  List(Type, Char, Bool)
+} derive(Eq, @debug.Debug)
+
+// Type aliases
+
+// Traits
