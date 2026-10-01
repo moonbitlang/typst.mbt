@@ -44,6 +44,8 @@ pub fn is_cjk_script(Char) -> Bool
 
 pub fn is_control(Char) -> Bool
 
+pub fn is_default_ignorable(Char) -> Bool
+
 pub fn is_lowercase(Char) -> Bool
 
 pub fn is_numeric(Char) -> Bool

@@ -238,6 +238,12 @@ pub impl Fold for TextSize with fn fold(self, outer) {
 }
 
 ///|
+/// Upstream `Resolve for TextSize`.
+pub fn TextSize::resolve(self : TextSize, styles : StyleChain) -> Abs {
+  self.0.resolve(styles)
+}
+
+///|
 pub impl Reflect for TextSize with fn input() {
   Type(Type::length())
 }

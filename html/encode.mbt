@@ -1,8 +1,55 @@
 // Port of `typst-html/src/encode.rs`: encodes an HTML DOM into a string.
 //
-// `html(document, options)` and `html_in_bundle(..)` need `HtmlDocument` and
-// the late link resolver (only used for frames); both delegate to
-// `html_impl`, which is ported as [html_encode].
+// The late link resolver (upstream `LateLinkResolver`) is only used to
+// resolve links in frames (SVG) and cross-document links in bundles; neither
+// is supported yet, so the writer doesn't carry one.
+
+///|
+/// Settings for HTML export (upstream `HtmlOptions<Partial>`).
+pub(all) struct HtmlOptions {
+  /// Format options that override the defaults set by the document.
+  format : @library.PartialHtmlFormatOptions
+} derive(Eq, Default)
+
+///|
+/// Resolved settings for HTML export (upstream `HtmlOptions<Complete>`).
+pub(all) struct CompleteHtmlOptions {
+  /// The resolved format options.
+  format : @library.HtmlFormatOptions
+} derive(Eq)
+
+///|
+/// Resolves the final options given those set by the document.
+pub fn HtmlOptions::resolve(
+  self : HtmlOptions,
+  doc : @library.HtmlFormatOptions,
+) -> CompleteHtmlOptions {
+  { format: self.format.resolve(doc), }
+}
+
+///|
+/// Encodes an HTML document into a string.
+pub fn html(
+  document : HtmlDocument,
+  options : HtmlOptions,
+) -> String raise @library.SourceError {
+  let options = options.resolve(
+    @library.HtmlFormatOptions::get(document.options()),
+  )
+  html_encode(document.root(), pretty=options.format.pretty.v)
+}
+
+///|
+/// Encodes an HTML root element into a string as part of a bundle.
+///
+/// See `export_html` in `typst-bundle` for more details on why this takes the
+/// root element instead of the document.
+pub fn html_in_bundle(
+  root : HtmlElement,
+  options : CompleteHtmlOptions,
+) -> String raise @library.SourceError {
+  html_encode(root, pretty=options.format.pretty.v)
+}
 
 ///|
 /// Encodes an HTML root element into a string (upstream `html_impl`, the
@@ -57,8 +104,10 @@ fn write_node(
   escape_text : Bool,
 ) -> Unit raise @library.SourceError {
   match node {
+    Tag(_) => ()
     Text(text, span) => write_text(w, text, span, escape_text)
     Element(element) => write_element(w, element)
+    Frame(frame) => write_frame(w, frame)
   }
 }
 
@@ -151,6 +200,7 @@ fn write_children(
     .any(node => {
       match node {
         Element(child) => wants_pretty_around(child)
+        Frame(_) => true
         _ => false
       }
     })
@@ -159,8 +209,9 @@ fn write_children(
   w.level += 1
   for c in element.children {
     let pretty_around = match c {
+      Tag(_) => continue
       Element(child) => w.pretty && wants_pretty_around(child)
-      Text(_, _) => false
+      Text(_, _) | Frame(_) => false
     }
     let take_indent = indent
     indent = false
@@ -180,6 +231,7 @@ fn write_children(
 fn starts_with_newline(element : HtmlElement) -> Bool {
   for child in element.children {
     match child {
+      Tag(_) => ()
       Text(text, _) => return text.has_prefix("\n") || text.has_prefix("\r")
       _ => return false
     }
@@ -253,8 +305,9 @@ fn walk_raw_text(
 ) -> Unit raise @library.SourceError {
   for c in element.children {
     match c {
+      Tag(_) => ()
       Text(text, span) => f(text, span)
-      Element({ span, .. }) =>
+      Element({ span, .. }) | Frame({ span, .. }) =>
         @library.bail_at(
           span, "HTML raw text element cannot have non-text children",
         )
@@ -428,4 +481,19 @@ fn write_escape(w : Writer, c : Char) -> Unit raise @library.HintedError {
 /// The error message for a character that cannot be encoded.
 fn unencodable(c : Char) -> String {
   "the character `\{@library.repr_str(c.to_string())}` cannot be encoded in HTML"
+}
+
+///|
+/// Encode a laid out frame into the writer.
+///
+/// TODO: Upstream embeds the frame as an inline SVG via
+/// `typst_svg::svg_in_html` (indenting its lines when pretty printing).
+/// Frames can't be produced yet as layout isn't ported (the `layout_frame`
+/// routine fails before a frame reaches the DOM), and SVG export isn't
+/// either.
+fn write_frame(
+  _w : Writer,
+  frame : HtmlFrame,
+) -> Unit raise @library.SourceError {
+  @library.bail_at(frame.span, "SVG export is not available")
 }

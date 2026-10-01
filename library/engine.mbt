@@ -459,6 +459,16 @@ pub fn Route::check_layout_depth(self : Route) -> Unit raise HintedError {
 }
 
 ///|
+/// Ensures that we are within the maximum HTML depth.
+pub fn Route::check_html_depth(self : Route) -> Unit raise HintedError {
+  if !self.within(max_html_depth) {
+    bail_hinted("maximum HTML depth exceeded", [
+      "try to reduce the amount of nesting of your HTML",
+    ])
+  }
+}
+
+///|
 /// Ensures that we are within the maximum function call depth.
 pub fn Route::check_call_depth(self : Route) -> Unit raise HintedError {
   if !self.within(max_call_depth) {

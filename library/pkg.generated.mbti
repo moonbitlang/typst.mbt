@@ -806,6 +806,8 @@ pub let decimal_one : Decimal
 
 pub let decimal_zero : Decimal
 
+pub fn default_formats() -> Array[Format]
+
 pub fn direct_link_elem() -> Element
 
 pub let direct_link_elem_alt : Int
@@ -1313,6 +1315,8 @@ pub let line_elem_stroke : Int
 pub fn linebreak_elem() -> Element
 
 pub let linebreak_elem_justify : Int
+
+pub fn link_anchor_introspection(Location, @syntax.Span) -> Introspect[String?]
 
 pub fn link_elem() -> Element
 
@@ -3344,6 +3348,13 @@ pub impl FromValue for Alternates
 pub impl IntoValue for Alternates
 pub impl Reflect for Alternates
 
+pub struct AnchorGenerator {
+  // private fields
+}
+pub fn AnchorGenerator::identify(Self, Label?) -> String
+pub fn AnchorGenerator::introspector(Self) -> &IntrospectorBackend
+pub fn AnchorGenerator::new(&IntrospectorBackend) -> Self
+
 pub(all) struct Angle(Scalar) derive(Compare, Default, Eq, Hash)
 pub fn Angle::abs(Self) -> Self
 pub fn Angle::acos(Double) -> Self
@@ -4681,6 +4692,14 @@ pub impl FromValue for Depth
 pub impl IntoValue for Depth
 pub impl Reflect for Depth
 
+pub(all) enum Destination {
+  Url(String)
+  Position(PagedPosition)
+  Location(Location)
+} derive(Eq)
+pub fn Destination::of_value(Value) -> Self
+pub impl IntoValue for Destination
+
 pub struct Dict {
   map : Map[String, Value]
   mut shared : Bool
@@ -4795,10 +4814,12 @@ pub impl FromValue for DocumentFormat
 pub impl IntoValue for DocumentFormat
 pub impl Reflect for DocumentFormat
 
-pub struct DocumentFormatOptions {
-  options : Map[String, Value]
-}
-pub fn DocumentFormatOptions::new() -> Self
+pub struct DocumentFormatOptions(Array[FormatOptions])
+pub fn DocumentFormatOptions::copy(Self) -> Self
+pub fn DocumentFormatOptions::get(Self, Element) -> FormatOptions
+pub fn DocumentFormatOptions::new(formats? : Array[Format]) -> Self
+pub fn DocumentFormatOptions::populate(Self, StyleChain, @syntax.Span) -> Unit
+pub impl Fingerprint for DocumentFormatOptions
 
 pub(all) struct DocumentInfo {
   mut title : String?
@@ -4806,9 +4827,13 @@ pub(all) struct DocumentInfo {
   mut description : String?
   mut keywords : Array[String]
   mut date : Smart[Datetime?]
-  mut locale : Smart[Value]
+  mut locale : Smart[Locale]
 }
+pub fn DocumentInfo::copy(Self) -> Self
 pub fn DocumentInfo::new() -> Self
+pub fn DocumentInfo::populate(Self, StyleChain) -> Unit
+pub fn DocumentInfo::populate_locale(Self, StyleChain) -> Unit
+pub impl Default for DocumentInfo
 
 pub(all) enum DocumentPosition {
   Paged(PagedPosition)
@@ -4862,6 +4887,12 @@ pub fn DynValue::regex_is_match(Self, String) -> Bool?
 pub fn DynValue::repr(Self) -> String
 pub fn DynValue::ty(Self) -> Type
 pub impl Fingerprint for DynValue
+
+pub struct EarlyLinkResolver {
+  // private fields
+}
+pub fn EarlyLinkResolver::new(Location, @syntax.Span) -> Self
+pub fn EarlyLinkResolver::resolve(Self, Engine, Location) -> ResolvedLink raise HintedError
 
 pub struct Element(ElementData)
 pub fn Element::can(Self, String) -> Bool
@@ -5475,6 +5506,16 @@ pub(all) struct Format {
 pub fn Format::new(Element) -> Self
 pub fn Format::with_feature(Self, Feature) -> Self
 
+pub struct FormatOptions {
+  elem : Element
+  // private fields
+}
+pub fn FormatOptions::copy(Self) -> Self
+pub fn FormatOptions::default_for(Element) -> Self
+pub fn FormatOptions::get(Self, Int) -> SpannedValue[Value]
+pub fn FormatOptions::populate(Self, StyleChain, @syntax.Span) -> Unit
+pub impl Fingerprint for FormatOptions
+
 pub(all) struct Fr(Scalar) derive(Compare, Default, Eq, Hash)
 pub fn Fr::abs(Self) -> Self
 pub fn Fr::div_by(Self, Double) -> Self
@@ -6067,6 +6108,11 @@ pub fn HtmlFormat::set_pretty(Bool) -> Style
 pub fn HtmlFormat::with_pretty(Self, Bool) -> Self
 pub impl NativeElement for HtmlFormat
 
+pub(all) struct HtmlFormatOptions {
+  pretty : SpannedValue[Bool]
+} derive(Eq)
+pub fn HtmlFormatOptions::get(DocumentFormatOptions) -> Self
+
 pub(all) struct HtmlPosition {
   // private fields
 } derive(Eq)
@@ -6462,11 +6508,13 @@ pub struct LinkElem(Content)
 pub fn LinkElem::body(Self) -> Content
 pub fn LinkElem::current_in(StyleChain) -> Value
 pub fn LinkElem::dest(Self) -> Value
+pub fn LinkElem::find_destinations(&IntrospectorBackend) -> Array[Location]
 pub fn LinkElem::from_url(String) -> Content raise HintedError
 pub fn LinkElem::new(Value, Content) -> Self
 pub fn LinkElem::of(Content) -> Self?
 pub fn LinkElem::pack(Self) -> Content
 pub fn LinkElem::set_current(Value) -> Style
+pub fn LinkElem::target(Self) -> LinkTarget
 pub fn LinkElem::with_body(Self, Content) -> Self
 pub fn LinkElem::with_dest(Self, Value) -> Self
 pub impl NativeElement for LinkElem
@@ -6480,6 +6528,15 @@ pub fn LinkMarker::pack(Self) -> Content
 pub fn LinkMarker::with_alt(Self, String?) -> Self
 pub fn LinkMarker::with_body(Self, Content) -> Self
 pub impl NativeElement for LinkMarker
+
+pub(all) enum LinkTarget {
+  Dest(Destination)
+  Label(Label)
+} derive(Eq)
+pub fn LinkTarget::of_value(Value) -> Self
+pub fn LinkTarget::resolve_early(Self, Engine, @syntax.Span) -> Destination raise SourceError
+pub fn LinkTarget::resolve_late(Self, &IntrospectorBackend) -> Destination raise HintedError
+pub impl IntoValue for LinkTarget
 
 pub struct ListElem(Content)
 pub fn ListElem::body_indent(Self, StyleChain) -> Length
@@ -7462,6 +7519,11 @@ pub fn ParseLocals::get(Self, String) -> Value?
 pub fn ParseLocals::new() -> Self
 pub fn ParseLocals::set(Self, String, Value?) -> Unit
 
+pub(all) struct PartialHtmlFormatOptions {
+  pretty : Bool?
+} derive(Default, Eq)
+pub fn PartialHtmlFormatOptions::resolve(Self, HtmlFormatOptions) -> HtmlFormatOptions
+
 pub(all) enum PathOrStr {
   Path(@syntax.RootedPath)
   Str(String)
@@ -8061,6 +8123,12 @@ pub(all) enum RepresentationError {
   TooLarge
 } derive(Eq, @debug.Debug)
 
+pub(all) enum ResolvedLink {
+  Local(anchor~ : String)
+  Cross(from~ : @syntax.VirtualPath, to~ : @syntax.VirtualPath, anchor~ : String)
+} derive(Eq)
+pub fn ResolvedLink::into_relative_uri(Self) -> String raise HintedError
+
 pub(all) struct Rgb {
   red : Float
   green : Float
@@ -8119,6 +8187,7 @@ pub struct Route {
   // private fields
 }
 pub fn Route::check_call_depth(Self) -> Unit raise HintedError
+pub fn Route::check_html_depth(Self) -> Unit raise HintedError
 pub fn Route::check_layout_depth(Self) -> Unit raise HintedError
 pub fn Route::check_show_depth(Self) -> Unit raise HintedError
 pub fn Route::contains(Self, @syntax.FileId) -> Bool
@@ -8477,6 +8546,25 @@ pub impl FromValue for SmartQuoteSet
 pub impl IntoValue for SmartQuoteSet
 pub impl Reflect for SmartQuoteSet
 
+pub struct SmartQuoter {
+  // private fields
+}
+pub fn SmartQuoter::new() -> Self
+pub fn SmartQuoter::quote(Self, Char?, SmartQuotes, Bool) -> String
+pub fn SmartQuoter::reset(Self) -> Unit
+
+pub(all) struct SmartQuotes {
+  single_open : String
+  single_close : String
+  double_open : String
+  double_close : String
+}
+pub fn SmartQuotes::close(Self, Bool) -> String
+pub fn SmartQuotes::fallback(Bool) -> String
+pub fn SmartQuotes::get(Smart[SmartQuoteDict], Lang, Region?, Bool) -> Self
+pub fn SmartQuotes::get_in(StyleChain) -> Self
+pub fn SmartQuotes::open(Self, Bool) -> String
+
 pub(all) enum SmartTodayOffset {
   Auto
   Custom(TodayOffset)
@@ -8523,6 +8611,12 @@ pub fn Spacing::is_zero(Self) -> Bool
 pub impl FromValue for Spacing
 pub impl IntoValue for Spacing
 pub impl Reflect for Spacing
+
+pub(all) struct SpannedValue[T] {
+  v : T
+  span : @syntax.Span
+} derive(Eq)
+pub fn[T] SpannedValue::detached(T) -> Self[T]
 
 pub(all) enum SpecificAlignment[H, V] {
   H(H)
@@ -8790,6 +8884,8 @@ pub fn StyleChain::new(Styles) -> Self
 pub fn StyleChain::pop(Self) -> Self
 pub fn StyleChain::recipes(Self) -> Iter[Recipe]
 pub fn StyleChain::to_map(Self) -> Styles
+pub fn StyleChain::trunk(Iter[Self]) -> Self?
+pub fn StyleChain::trunk_from_pairs(ArrayView[(Content, Self)]) -> Self?
 pub impl Eq for StyleChain
 
 pub struct StyledElem(Content)
@@ -8811,6 +8907,7 @@ pub fn Styles::liftable(Self) -> Self
 pub fn Styles::new() -> Self
 pub fn Styles::outside(Self) -> Self
 pub fn Styles::push(Self, Style) -> Unit
+pub fn Styles::root(ArrayView[(Content, StyleChain)], StyleChain) -> Self
 pub fn Styles::set(Self, Element, Int, Value) -> Unit
 pub fn Styles::spanned(Self, @syntax.Span) -> Self
 pub fn Styles::unset(Self) -> Unit
@@ -9374,6 +9471,7 @@ pub fn TextElem::with_text(Self, String) -> Self
 pub impl NativeElement for TextElem
 
 pub(all) struct TextSize(Length) derive(Eq, Hash)
+pub fn TextSize::resolve(Self, StyleChain) -> Abs
 pub impl Fold for TextSize
 pub impl FromValue for TextSize
 pub impl IntoValue for TextSize
