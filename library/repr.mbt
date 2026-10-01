@@ -5,6 +5,12 @@
 pub let minus_sign : String = "\u{2212}"
 
 ///|
+/// Returns the string representation of a value.
+fn impl_repr(value_ : Value) -> String raise HintedError {
+  value_.repr()
+}
+
+///|
 /// Format an integer in a base. Negative numbers use the Unicode minus sign.
 pub fn format_int_with_base(n : Int64, base : Int64) -> String {
   if n == 0L {

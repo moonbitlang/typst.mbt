@@ -40,6 +40,20 @@ TYPEMAP = {
     "Dict": "Dict",
     "Args": "Args",
     "Type": "Type",
+    # foundations/array.rs, dict.rs, args.rs
+    "ToArray": "ToArray",
+    "ToDict": "ToDict",
+    "ArgumentKey": "ArgumentKey",
+    # foundations/calc.rs
+    "ToAbs": "ToAbs",
+    "Num": "Num",
+    "DecNum": "DecNum",
+    "AngleLike": "AngleLike",
+    # foundations/int.rs, float.rs, str.rs (`Base`)
+    "ToInt": "ToInt",
+    "ToFloat": "ToFloat",
+    "Base": "Base",
+    "Endianness": "Endianness",
 }
 
 # Generic Rust types with a MoonBit port: Rust name -> MoonBit name. A use

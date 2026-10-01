@@ -312,6 +312,24 @@ pub fn math_module() -> Module {
 }
 
 ///|
+/// Defines scoped items in the global scope (upstream `prelude`).
+fn prelude_define(global : Scope) -> Unit {
+  // TODO(colors): black, gray, silver, white, navy, blue, aqua, teal,
+  // eastern, purple, fuchsia, maroon, red, orange, yellow, olive, green,
+  // lime (`Color::BLACK`, ...), and luma, oklab, oklch, rgb, cmyk
+  // (`Color::luma_data()`, ...).
+  global.define_func(native_array_range()) |> ignore
+  // TODO(directions): ltr, rtl, ttb, btt (`Dir::LTR`, ...).
+  // TODO(alignments): start, left, center, right, end, top, horizon, bottom
+  // (`Alignment::START`, ...).
+
+  // TODO(formats): if available, add some items to the global prelude:
+  // `global.prelude_path(["format", "html"])`,
+  // `global.prelude_path(["format", "pdf"])`,
+  // `global.prelude_path(["format", "bundle", "asset"])`.
+}
+
+///|
 /// Extra definitions added to the global scope by embedders (e.g. test
 /// functions), applied after the standard definitions.
 pub(all) struct LibraryBuilder {
@@ -375,6 +393,7 @@ pub fn LibraryBuilder::build(self : LibraryBuilder) -> Library {
   introspection_define(global)
   loading_define(global)
   global.define("math", Module(math)) |> ignore
+  prelude_define(global)
   for f in self.extra {
     f(global)
   }
