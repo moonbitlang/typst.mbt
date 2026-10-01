@@ -1,5 +1,7 @@
 import {
   "moonbitlang/typst/syntax",
+  "moonbitlang/typst/syntax/ast",
+  "moonbitlang/core/string",
   "moonbitlang/typst/unicode",
   "moonbitlang/x/fs",
   "moonbitlang/x/sys",
