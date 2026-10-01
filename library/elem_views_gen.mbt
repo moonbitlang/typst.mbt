@@ -8694,12 +8694,12 @@ pub fn LinkElem::pack(self : LinkElem) -> Content {
 }
 
 ///|
-pub fn LinkElem::dest(self : LinkElem) -> Value {
+pub fn LinkElem::dest(self : LinkElem) -> LinkTarget {
   view_cast(self.0.field_raw(link_elem_dest).unwrap(), "link.dest")
 }
 
 ///|
-pub fn LinkElem::with_dest(self : LinkElem, v : Value) -> LinkElem {
+pub fn LinkElem::with_dest(self : LinkElem, v : LinkTarget) -> LinkElem {
   LinkElem(self.0.with_field(link_elem_dest, IntoValue::into_value(v)))
 }
 
@@ -8714,17 +8714,17 @@ pub fn LinkElem::with_body(self : LinkElem, v : Content) -> LinkElem {
 }
 
 ///|
-pub fn LinkElem::current_in(styles : StyleChain) -> Value {
+pub fn LinkElem::current_in(styles : StyleChain) -> Destination? {
   view_cast(styles.get_field(link_elem(), link_elem_current), "link.current")
 }
 
 ///|
-pub fn LinkElem::set_current(v : Value) -> Style {
+pub fn LinkElem::set_current(v : Destination?) -> Style {
   Property(Property::new(link_elem(), link_elem_current, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn LinkElem::new(dest_ : Value, body_ : Content) -> LinkElem {
+pub fn LinkElem::new(dest_ : LinkTarget, body_ : Content) -> LinkElem {
   LinkElem(Content::new(link_elem(), [(link_elem_dest, IntoValue::into_value(dest_)), (link_elem_body, IntoValue::into_value(body_))]))
 }
 
@@ -15985,13 +15985,13 @@ pub fn PngFormat::pack(self : PngFormat) -> Content {
 }
 
 ///|
-pub fn PngFormat::ppi(self : PngFormat, styles : StyleChain) -> Value {
+pub fn PngFormat::ppi(self : PngFormat, styles : StyleChain) -> Scalar {
   let e = png_format_elem()
   view_cast(styles.get_value_with_local(e, e.fields()[png_format_elem_ppi], self.0.field_raw(png_format_elem_ppi)), "png.ppi")
 }
 
 ///|
-pub fn PngFormat::ppi_local(self : PngFormat) -> Value? {
+pub fn PngFormat::ppi_local(self : PngFormat) -> Scalar? {
   match self.0.field_raw(png_format_elem_ppi) {
     Some(v) => Some(view_cast(v, "png.ppi"))
     None => None
@@ -15999,17 +15999,17 @@ pub fn PngFormat::ppi_local(self : PngFormat) -> Value? {
 }
 
 ///|
-pub fn PngFormat::with_ppi(self : PngFormat, v : Value) -> PngFormat {
+pub fn PngFormat::with_ppi(self : PngFormat, v : Scalar) -> PngFormat {
   PngFormat(self.0.with_field(png_format_elem_ppi, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn PngFormat::ppi_in(styles : StyleChain) -> Value {
+pub fn PngFormat::ppi_in(styles : StyleChain) -> Scalar {
   view_cast(styles.get_field(png_format_elem(), png_format_elem_ppi), "png.ppi")
 }
 
 ///|
-pub fn PngFormat::set_ppi(v : Value) -> Style {
+pub fn PngFormat::set_ppi(v : Scalar) -> Style {
   Property(Property::new(png_format_elem(), png_format_elem_ppi, IntoValue::into_value(v)))
 }
 

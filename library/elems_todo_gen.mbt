@@ -55,12 +55,6 @@ fn footnote_entry_elem_separator_default() -> Value {
 }
 
 ///|
-/// TODO: port `Default::default() of Option<Destination>` (LinkElem.current).
-fn link_elem_current_default() -> Value {
-  None
-}
-
-///|
 /// TODO: port `Default::default() of Option<Packed<OutlineElem>>` (OutlineEntry.parent).
 fn outline_entry_elem_parent_default() -> Value {
   None
@@ -135,9 +129,3 @@ fn raw_elem_syntaxes_fold(inner : Value, _outer : Value) -> Value {
 // TODO: port `#[parse]` of RawElem.syntaxes as `raw_elem_syntaxes_parse`.
 
 // TODO: port `#[parse]` of RawElem.theme as `raw_elem_theme_parse`.
-
-///|
-/// TODO: port `Scalar::new(144.0)` (PngFormat.ppi).
-fn png_format_elem_ppi_default() -> Value {
-  None
-}

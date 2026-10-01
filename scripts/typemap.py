@@ -228,6 +228,13 @@ TYPEMAP = {
     "PdfStandard": "PdfStandard",
     "AttachedFileRelationship": "AttachedFileRelationship",
     "PdfMarkerTagKind": "PdfMarkerTagKind",
+    # typst_utils
+    "Scalar": "Scalar",
+    # model/link.rs, introspection/position.rs
+    "LinkTarget": "LinkTarget",
+    "Destination": "Destination",
+    "Url": "Url",
+    "PagedPosition": "PagedPosition",
     # text/lang.rs
     "Locale": "Locale",
     # typst-html (dom.rs, css/encode.rs); ported in library/html_*.mbt

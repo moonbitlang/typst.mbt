@@ -7,8 +7,6 @@
 //     1 Derived<CslSource, CslStyle>
 //     1 Option<CitationForm>
 //     1 Smart<Derived<CslSource, CslStyle>>
-//     1 LinkTarget
-//     1 Option<Destination>
 //     1 Option<Packed<OutlineElem>>
 //     1 Abs
 //     1 Option<Packed<CiteElem>>
@@ -17,7 +15,6 @@
 //     1 Option<Smallcaps>
 //     1 Option<ShiftSettings>
 //     1 Vec<Packed<RawLine>>
-//     1 Scalar
 //     1 AssetData
 
 ///|
@@ -3307,9 +3304,9 @@ pub fn link_elem() -> Element {
         keywords=[],
         capabilities=["Locatable"],
         fields=[
-        field_of((Ty::new() : Ty[Value]), id=0, name="dest", kind=Required, positional=true, required=true, parse=link_elem_dest_parse),
+        field_of((Ty::new() : Ty[LinkTarget]), id=0, name="dest", kind=Required, positional=true, required=true, parse=link_elem_dest_parse),
         field_of((Ty::new() : Ty[Content]), id=1, name="body", kind=Required, positional=true, required=true, parse=link_elem_body_parse),
-        field_of((Ty::new() : Ty[Value]), id=2, name="current", kind=Ghost, internal=true, default=link_elem_current_default),
+        field_of((Ty::new() : Ty[Destination?]), id=2, name="current", kind=Ghost, internal=true, default=() => None),
         ],
       )
       link_elem_cell.val = Some(e)
@@ -5795,7 +5792,7 @@ pub fn png_format_elem() -> Element {
         keywords=[],
         capabilities=["Construct"],
         fields=[
-        field_of((Ty::new() : Ty[Value]), id=0, name="ppi", kind=Settable, default=png_format_elem_ppi_default),
+        field_of((Ty::new() : Ty[Scalar]), id=0, name="ppi", kind=Settable, default=png_format_elem_ppi_default),
         ],
       )
       png_format_elem_cell.val = Some(e)
