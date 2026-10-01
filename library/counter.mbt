@@ -708,8 +708,8 @@ pub fn CounterState::step(self : CounterState, level : Int, by : Int64) -> Unit 
     self.0.push(0L)
   }
   let cur = self.0[level - 1]
-  self.0[level - 1] = if cur > @int64.max_value - by {
-    @int64.max_value
+  self.0[level - 1] = if cur > @int64.MAX_VALUE - by {
+    @int64.MAX_VALUE
   } else {
     cur + by
   }

@@ -165,6 +165,8 @@ pub fn[T : Reflect] cast_error(Ty[T], Value) -> HintedString
 
 pub fn cast_usize(Value) -> Int64 raise HintedError
 
+pub fn[T : Reflect] castable_of(Ty[T], Value) -> Bool
+
 pub fn circle_elem() -> Element
 
 pub let circle_elem_body : Int
@@ -500,6 +502,8 @@ pub fn format_float_with_unit(Double, String) -> String
 pub fn format_int_with_base(Int64, Int64) -> String
 
 pub fn format_module(Array[Format]) -> Module
+
+pub fn format_selector(Selector, String) -> String
 
 pub fn frac_elem() -> Element
 
@@ -2536,6 +2540,16 @@ pub(all) enum Category {
   Bundle
 } derive(Eq, Hash, @debug.Debug)
 
+pub(all) enum ChineseCase {
+  Upper
+  Lower
+} derive(Eq, @debug.Debug)
+
+pub(all) enum ChineseVariant {
+  Traditional
+  Simple
+} derive(Eq, @debug.Debug)
+
 pub(all) struct Closure {
   node : ClosureNode
   defaults : Array[Value]
@@ -2615,10 +2629,47 @@ pub fn Context::location(Self) -> Location raise HintedError
 pub fn Context::new(location? : Location, styles? : StyleChain) -> Self
 pub fn Context::none() -> Self
 
-pub(all) struct Counter {
-  // private fields
-} derive(Eq, Hash)
+pub(all) struct Counter(CounterKey) derive(Eq)
+pub fn Counter::display_at(Self, Engine, Location, StyleChain, Numbering, @syntax.Span) -> Content raise SourceError
+pub fn Counter::is_page(Self) -> Bool
+pub fn Counter::new(CounterKey) -> Self
+pub fn Counter::of(Element) -> Self
 pub fn Counter::repr(Self) -> String
+pub fn Counter::select(Self, Introspector, Location) -> Selector
+pub fn Counter::select_any() -> Selector
+pub impl FromValue for Counter
+pub impl IntoValue for Counter
+pub impl Reflect for Counter
+
+pub(all) enum CounterKey {
+  Page
+  Selector(Selector)
+  Str(String)
+} derive(Eq)
+pub fn CounterKey::repr(Self) -> String
+pub impl FromValue for CounterKey
+pub impl IntoValue for CounterKey
+pub impl Reflect for CounterKey
+
+pub(all) struct CounterState(Array[Int64]) derive(Eq)
+pub fn CounterState::copy(Self) -> Self
+pub fn CounterState::display(Self, Engine, Context, @syntax.Span, Numbering) -> Value raise SourceError
+pub fn CounterState::first(Self) -> Int64
+pub fn CounterState::init(Bool) -> Self
+pub fn CounterState::step(Self, Int, Int64) -> Unit
+pub fn CounterState::update(Self, Engine, CounterUpdate) -> Unit raise SourceError
+pub impl FromValue for CounterState
+pub impl IntoValue for CounterState
+pub impl Reflect for CounterState
+
+pub(all) enum CounterUpdate {
+  Set(CounterState)
+  Step(NonZeroUSize)
+  Func(Func)
+} derive(Eq)
+pub impl FromValue for CounterUpdate
+pub impl IntoValue for CounterUpdate
+pub impl Reflect for CounterUpdate
 
 pub(all) struct Datetime {
   // private fields
@@ -2704,6 +2755,8 @@ pub(all) enum DynValue {
   Location(Location)
   Selector(Selector)
   RootedPath(RootedPath)
+  CounterUpdate(CounterUpdate)
+  StateUpdate(StateUpdate)
 } derive(Eq)
 pub fn DynValue::add_dyn(Self, Self) -> Value? raise HintedError
 pub fn DynValue::field(Self, String) -> Value??
@@ -2739,6 +2792,9 @@ pub fn Element::where_(Self, Array[(Int, Value)]) -> Selector
 pub impl Compare for Element
 pub impl Eq for Element
 pub impl Hash for Element
+pub impl FromValue for Element
+pub impl IntoValue for Element
+pub impl Reflect for Element
 
 pub struct ElementData {
   name : String
@@ -2930,7 +2986,20 @@ pub impl Reflect for I8
 pub struct Introspector {
   // private fields
 }
+pub fn Introspector::document(Self, Location) -> Location?
 pub fn Introspector::empty() -> Self
+pub fn Introspector::label_count(Self, Label) -> Int
+pub fn Introspector::page(Self, Location) -> NonZeroUSize?
+pub fn Introspector::page_numbering(Self, Location) -> Numbering?
+pub fn Introspector::page_supplement(Self, Location) -> Content?
+pub fn Introspector::pages(Self, Location) -> NonZeroUSize?
+pub fn Introspector::position_dict(Self, Location) -> Dict?
+pub fn Introspector::query(Self, Selector) -> Array[Content]
+pub fn Introspector::query_count_before(Self, Selector, Location) -> Int
+pub fn Introspector::query_first(Self, Selector) -> Content?
+pub fn Introspector::query_label(Self, Label) -> Content raise HintedError
+pub fn Introspector::query_labelled(Self) -> Array[Content]
+pub fn Introspector::query_unique(Self, Selector) -> Content raise HintedError
 
 pub(all) struct Label(String) derive(Compare, Eq, Hash)
 pub fn Label::repr(Self) -> String
@@ -2986,8 +3055,17 @@ pub fn LibraryBuilder::with_inputs(Self, Dict) -> Self
 pub struct LinkElem(Content)
 pub fn LinkElem::from_url(String) -> Content raise HintedError
 
+pub(all) struct LocatableSelector(Selector) derive(Eq)
+pub fn LocatableSelector::resolve_unique(Self, Engine, Context, @syntax.Span) -> Location raise SourceError
+pub impl FromValue for LocatableSelector
+pub impl IntoValue for LocatableSelector
+pub impl Reflect for LocatableSelector
+
 pub(all) struct Location(UInt64) derive(Compare, Eq, Hash)
 pub fn Location::repr(Self) -> String
+pub impl FromValue for Location
+pub impl IntoValue for Location
+pub impl Reflect for Location
 
 pub struct Module {
   // private fields
@@ -3005,6 +3083,45 @@ pub fn Module::with_file_id(Self, @syntax.FileId) -> Self
 pub fn Module::with_name(Self, String) -> Self
 pub fn Module::with_scope(Self, Scope) -> Self
 pub impl Eq for Module
+
+pub(all) enum NamedNumeralSystem {
+  Arabic
+  CircledArabic
+  DoubleCircledArabic
+  LowerLatin
+  UpperLatin
+  LowerRoman
+  UpperRoman
+  LowerGreek
+  UpperGreek
+  LowerArmenian
+  UpperArmenian
+  Hebrew
+  LowerSimplifiedChinese
+  UpperSimplifiedChinese
+  LowerTraditionalChinese
+  UpperTraditionalChinese
+  HiraganaAiueo
+  HiraganaIroha
+  KatakanaAiueo
+  KatakanaIroha
+  KoreanJamo
+  KoreanSyllable
+  EasternArabic
+  ArabicAbjad
+  Persian
+  Devanagari
+  Tibetan
+  Bengali
+  BengaliLetters
+  Symbols
+} derive(Eq, Hash, @debug.Debug)
+pub fn NamedNumeralSystem::all() -> Array[Self]
+pub fn NamedNumeralSystem::from_name(String) -> Self?
+pub fn NamedNumeralSystem::from_shorthand(String) -> Self?
+pub fn NamedNumeralSystem::name(Self) -> String
+pub fn NamedNumeralSystem::shorthand(Self) -> String?
+pub fn NamedNumeralSystem::system(Self) -> NumeralSystem
 
 pub struct NativeFuncData {
   function : (Engine, Context, Args) -> Value raise SourceError
@@ -3055,6 +3172,41 @@ pub fn NonZeroUSize::get(Self) -> Int64
 pub impl FromValue for NonZeroUSize
 pub impl IntoValue for NonZeroUSize
 pub impl Reflect for NonZeroUSize
+
+pub(all) enum Numbering {
+  Pattern(NumberingPattern)
+  Func(Func)
+} derive(Eq)
+pub fn Numbering::apply(Self, Engine, Context, @syntax.Span, ArrayView[Int64]) -> Value raise SourceError
+pub fn Numbering::trimmed(Self) -> Self
+pub impl FromValue for Numbering
+pub impl IntoValue for Numbering
+pub impl Reflect for Numbering
+
+pub(all) struct NumberingPattern {
+  pieces : Array[(String, NamedNumeralSystem)]
+  suffix : String
+  // private fields
+} derive(Eq)
+pub fn NumberingPattern::apply(Self, (Engine, @syntax.Span)?, ArrayView[Int64]) -> String raise HintedError
+pub fn NumberingPattern::apply_kth(Self, Engine, @syntax.Span, Int, Int64) -> String
+pub fn NumberingPattern::from_str(String) -> Self raise HintedError
+pub fn NumberingPattern::num_pieces(Self) -> Int
+pub fn NumberingPattern::to_string(Self) -> String
+pub impl FromValue for NumberingPattern
+pub impl IntoValue for NumberingPattern
+pub impl Reflect for NumberingPattern
+
+pub(all) enum NumeralSystem {
+  Positional(Array[String])
+  Bijective(Array[String])
+  Additive(Array[(String, UInt64)])
+  Symbolic(Array[String])
+  Fixed(Array[String])
+  ZerolessFixed(Array[String])
+  Chinese(ChineseVariant, ChineseCase)
+}
+pub fn NumeralSystem::represent(Self, UInt64) -> Result[String, RepresentationError]
 
 pub(all) enum NumericUnit {
   Pt
@@ -3168,6 +3320,11 @@ pub impl IntoValue for Rel[Length]
 pub impl[T : Numeric] Numeric for Rel[T]
 pub impl Reflect for Rel[Length]
 
+pub(all) enum RepresentationError {
+  Zero
+  TooLarge
+} derive(Eq, @debug.Debug)
+
 pub(all) struct RootedPath {
   // private fields
 } derive(Eq, Hash)
@@ -3250,7 +3407,14 @@ pub(all) enum Selector {
   After(selector~ : Selector, start~ : Selector, inclusive~ : Bool)
   Within(selector~ : Selector, ancestor~ : Selector)
 } derive(Eq)
+pub fn Selector::can(String) -> Self
+pub fn Selector::matches(Self, Content, StyleChain?) -> Bool
+pub fn Selector::regex(Regex) -> Self raise HintedError
 pub fn Selector::repr(Self) -> String
+pub fn Selector::text(String) -> Self raise HintedError
+pub impl FromValue for Selector
+pub impl IntoValue for Selector
+pub impl Reflect for Selector
 
 pub struct SequenceElem(Content)
 pub fn SequenceElem::children(Content) -> Array[Content]
@@ -3261,8 +3425,9 @@ pub(all) enum Severity {
   Warning
 } derive(Eq, Hash, @debug.Debug)
 
-pub(all) struct ShowableSelector(Selector)
+pub(all) struct ShowableSelector(Selector) derive(Eq)
 pub impl FromValue for ShowableSelector
+pub impl IntoValue for ShowableSelector
 pub impl Reflect for ShowableSelector
 
 pub(all) struct Sink {
@@ -3305,9 +3470,24 @@ pub(all) struct SpotColorant {
 pub fn SpotColorant::repr(Self) -> String
 
 pub(all) struct State {
-  // private fields
-} derive(Eq, Hash)
+  key : String
+  init : Value
+} derive(Eq)
+pub fn State::new(String, Value) -> Self
 pub fn State::repr(Self) -> String
+pub fn State::select(Self) -> Selector
+pub fn State::select_any() -> Selector
+pub impl FromValue for State
+pub impl IntoValue for State
+pub impl Reflect for State
+
+pub(all) enum StateUpdate {
+  Set(Value)
+  Func(Func)
+} derive(Eq)
+pub impl FromValue for StateUpdate
+pub impl IntoValue for StateUpdate
+pub impl Reflect for StateUpdate
 
 pub(all) struct Stroke {
   // private fields
