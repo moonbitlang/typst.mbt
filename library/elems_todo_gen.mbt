@@ -134,12 +134,6 @@ fn raw_elem_syntaxes_fold(inner : Value, _outer : Value) -> Value {
 
 // TODO: port `#[parse]` of RawElem.syntaxes as `raw_elem_syntaxes_parse`.
 
-///|
-/// TODO: port `Default::default() of Smart<Option<Derived<DataSource, RawTheme>>>` (RawElem.theme).
-fn raw_elem_theme_default() -> Value {
-  None
-}
-
 // TODO: port `#[parse]` of RawElem.theme as `raw_elem_theme_parse`.
 
 // TODO: port `#[parse]` of ImageElem.source as `image_elem_source_parse`.
@@ -165,12 +159,6 @@ fn image_elem_fit_default() -> Value {
 ///|
 /// TODO: port `Default::default() of Smart<ImageScaling>` (ImageElem.scaling).
 fn image_elem_scaling_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Smart<Derived<DataSource, Bytes>>` (ImageElem.icc).
-fn image_elem_icc_default() -> Value {
   None
 }
 
