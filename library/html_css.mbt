@@ -342,7 +342,7 @@ fn CssCallWriter::finish(self : CssCallWriter) -> Unit {
 priv enum CssSeparator {
   Space
   Slash
-} derive(Eq)
+}
 
 ///|
 /// Writes a lazy CSS `calc(<calc-sum>) expression`.
@@ -596,7 +596,7 @@ pub impl ToCss for Hsl with fn emit(self, w) {
 /// to `f64` like upstream's `is_very_close`.
 fn css_u8_to_f32(x : Int) -> Double {
   let max : Float = 255.0
-  (x.to_float() * ((1.0 : Float) / max)).to_double()
+  (Float::from_int(x) * ((1.0 : Float) / max)).to_double()
 }
 
 ///|

@@ -109,7 +109,7 @@ pub impl Reflect for HtmlTag with fn output() {
 
 ///|
 pub impl Reflect for HtmlTag with fn castable(v) {
-  v is Str(_)
+  input_castable_str(v)
 }
 
 ///|
@@ -119,10 +119,15 @@ pub impl IntoValue for HtmlTag with fn into_value(self) {
 
 ///|
 pub impl FromValue for HtmlTag with fn from_value(v) {
-  match v {
-    Str(s) => HtmlTag::intern(s)
-    _ => cast_fail_with(HtmlTag::input(), v)
-  }
+  // Upstream casts from `Str` (which also accepts symbols).
+  let s : String = v.cast()
+  HtmlTag::intern(s)
+}
+
+///|
+/// Whether the value is castable to `Str`.
+fn input_castable_str(v : Value) -> Bool {
+  html_castable_of((Ty::new() : Ty[String]), v)
 }
 
 // Predefined constants for HTML tags (upstream `tag::*`).

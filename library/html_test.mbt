@@ -54,18 +54,12 @@ test "html tag predicates" {
   assert_false(@library.tag_script.should_group_into_pars())
   assert_false(@library.tag_div.should_group_into_pars())
   inspect(
-    @library.CssDisplay::default_for(@library.tag_li).map(d => d.as_str()),
-    content=(
-      #|Some(list-item)
-    ),
+    @library.CssDisplay::default_for(@library.tag_li).unwrap().as_str(),
+    content="list-item",
   )
   inspect(
-    @library.CssDisplay::default_for(@library.tag_mathml_math).map(d => {
-      d.as_str()
-    }),
-    content=(
-      #|Some(inline math)
-    ),
+    @library.CssDisplay::default_for(@library.tag_mathml_math).unwrap().as_str(),
+    content="inline math",
   )
   assert_true(
     @library.CssDisplay::default_for(@library.HtmlTag::constant("x-y")) is None,
@@ -98,10 +92,8 @@ test "html attrs" {
   outer.push(@library.attr_title, "t")
   let folded = @library.Fold::fold(inner, outer)
   inspect(
-    folded.pairs().map(p => "\{p.0}=\{p.1}"),
-    content=(
-      #|[id=1, class=c, title=t]
-    ),
+    folded.pairs().map(p => "\{p.0}=\{p.1}").join(", "),
+    content="id=1, class=c, title=t",
   )
   inspect(
     @library.IntoValue::into_value(folded).repr(),
@@ -159,5 +151,5 @@ test "to_css" {
     .with_("display", @library.CssDisplay::Block)
     .finish()
   inspect(built.to_inline(), content="display: block; width: 10pt")
-  inspect(warnings, content="[]")
+  assert_true(warnings.is_empty())
 }

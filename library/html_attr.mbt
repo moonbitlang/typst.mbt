@@ -65,7 +65,7 @@ pub impl Reflect for HtmlAttr with fn output() {
 
 ///|
 pub impl Reflect for HtmlAttr with fn castable(v) {
-  v is Str(_)
+  input_castable_str(v)
 }
 
 ///|
@@ -75,10 +75,9 @@ pub impl IntoValue for HtmlAttr with fn into_value(self) {
 
 ///|
 pub impl FromValue for HtmlAttr with fn from_value(v) {
-  match v {
-    Str(s) => HtmlAttr::intern(s)
-    _ => cast_fail_with(HtmlAttr::input(), v)
-  }
+  // Upstream casts from `Str` (which also accepts symbols).
+  let s : String = v.cast()
+  HtmlAttr::intern(s)
 }
 
 ///|
