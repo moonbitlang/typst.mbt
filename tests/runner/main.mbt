@@ -14,6 +14,7 @@ fn main {
   let args = @env.args()
   let stage = args.get(1).unwrap_or("syntax")
   let verbose = args.contains("--verbose") || args.contains("-v")
+  dump_actual.val = args.contains("--dump")
   let filter = args[2:].iter().find_first(a => !a.has_prefix("-"))
   match stage {
     "syntax" =>
@@ -48,11 +49,13 @@ fn run_stage(
       ".txt"
     let text = read(file)
     let golden = split_golden(read(golden_path))
+    let dump = StringBuilder()
     for tc in split_tests(text) {
       if filter is Some(f) && !tc.name.contains(f) {
         continue
       }
       let actual = report(rel, tc)
+      dump.write_string("=== \{tc.name}\n\{actual}")
       let expected = golden.get(tc.name).unwrap_or("<missing golden>")
       if actual == expected {
         passed += 1
@@ -61,9 +64,19 @@ fn run_stage(
         failures.push((rel, tc.name, expected, actual))
       }
     }
+    if dump_actual.val {
+      let out = "_build/actual/\{stage}/" +
+        rel.unsafe_substring(start=0, end=rel.length() - 4) +
+        ".txt"
+      ensure_parent_dir(out)
+      @fs.write_string_to_file(out, dump.to_string()) catch {
+        _ => ()
+      }
+    }
   }
   for f in failures {
     let (rel, name, expected, actual) = f
+    ignore(expected)
     println("FAIL \{rel} :: \{name}")
     if verbose {
       println(first_diff(expected, actual))
@@ -193,4 +206,21 @@ fn typ_files(dir : String) -> Array[String] {
   walk(dir)
   out.sort()
   out
+}
+
+///|
+let dump_actual : Ref[Bool] = Ref::new(false)
+
+///|
+fn ensure_parent_dir(path : String) -> Unit {
+  let parts = path.split("/").map(p => p.to_string()).collect()
+  let mut dir = ""
+  for i in 0..<(parts.length() - 1) {
+    dir = if dir.is_empty() { parts[i] } else { dir + "/" + parts[i] }
+    if !@fs.path_exists(dir) {
+      @fs.create_dir(dir) catch {
+        _ => ()
+      }
+    }
+  }
 }

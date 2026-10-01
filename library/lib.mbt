@@ -39,32 +39,57 @@ pub fn Scope::define_elem(self : Scope, elem : Element) -> Binding {
 }
 
 ///|
-/// Registered global native functions per category, filled by ported
-/// modules (see `register_global`).
-let global_funcs : Map[String, Array[NativeFuncData]] = {}
-
-///|
-/// Register a global native function under a category (in definition
-/// order).
-pub fn register_global(category : String, data : NativeFuncData) -> Unit {
-  match global_funcs.get(category) {
-    Some(list) => list.push(data)
-    None => global_funcs[category] = [data]
+/// Define the generated global native functions of a category.
+fn define_globals(scope : Scope, category : String) -> Unit {
+  for f in generated_globals(category) {
+    scope.define_func(f) |> ignore
   }
 }
 
 ///|
-fn define_registered(scope : Scope, category : String) -> Unit {
-  if global_funcs.get(category) is Some(list) {
-    for f in list {
-      scope.define_func(f) |> ignore
-    }
+/// Whether the scopes of native types and elements were registered.
+let scopes_registered : Ref[Bool] = { val: false, }
+
+///|
+/// Register the scopes of native types and elements (once).
+fn ensure_scopes() -> Unit {
+  if !scopes_registered.val {
+    scopes_registered.val = true
+    register_scopes()
   }
+}
+
+///|
+/// The `calc` module (upstream `calc::module`).
+fn calc_module() -> Module {
+  let scope = Scope::new()
+  for f in generated_calc_funcs() {
+    scope.define_func(f) |> ignore
+  }
+  scope.define("inf", Float(@double.infinity)) |> ignore
+  scope.define("pi", Float(@math.PI)) |> ignore
+  scope.define("tau", Float(2.0 * @math.PI)) |> ignore
+  scope.define("e", Float(2.718281828459045)) |> ignore
+  Module::new("calc", scope)
+}
+
+///|
+/// The version of upstream Typst this is a port of.
+pub let typst_version : (Int, Int, Int) = (0, 15, 1)
+
+///|
+/// The `sys` module (upstream `sys::module`).
+fn sys_module(inputs : Dict) -> Module {
+  let scope = Scope::deduplicating()
+  let (major, minor, patch) = typst_version
+  scope.define("version", Version(Version([major, minor, patch]))) |> ignore
+  scope.define("inputs", Dict(inputs)) |> ignore
+  Module::new("sys", scope)
 }
 
 ///|
 /// The foundations definitions (upstream `foundations::define`).
-fn foundations_define(global : Scope) -> Unit {
+fn foundations_define(global : Scope, inputs : Dict) -> Unit {
   global.start_category(Foundations)
   for
     ty in [
@@ -92,7 +117,9 @@ fn foundations_define(global : Scope) -> Unit {
     ] {
     global.define_type(ty) |> ignore
   }
-  define_registered(global, "foundations")
+  define_globals(global, "foundations")
+  global.define("calc", Module(calc_module())) |> ignore
+  global.define("sys", Module(sys_module(inputs))) |> ignore
   global.reset_category()
 }
 
@@ -125,7 +152,7 @@ fn model_define(global : Scope) -> Unit {
     ] {
     global.define_elem(elem) |> ignore
   }
-  define_registered(global, "model")
+  define_globals(global, "model")
   global.reset_category()
 }
 
@@ -149,7 +176,7 @@ fn text_define(global : Scope) -> Unit {
     ] {
     global.define_elem(elem) |> ignore
   }
-  define_registered(global, "text")
+  define_globals(global, "text")
   global.reset_category()
 }
 
@@ -193,7 +220,7 @@ fn layout_define(global : Scope) -> Unit {
     ] {
     global.define_elem(elem) |> ignore
   }
-  define_registered(global, "layout")
+  define_globals(global, "layout")
   global.reset_category()
 }
 
@@ -217,7 +244,7 @@ fn visualize_define(global : Scope) -> Unit {
     ] {
     global.define_elem(elem) |> ignore
   }
-  define_registered(global, "visualize")
+  define_globals(global, "visualize")
   global.reset_category()
 }
 
@@ -229,7 +256,7 @@ fn introspection_define(global : Scope) -> Unit {
     global.define_type(ty) |> ignore
   }
   global.define_elem(metadata_elem()) |> ignore
-  define_registered(global, "introspection")
+  define_globals(global, "introspection")
   global.reset_category()
 }
 
@@ -237,7 +264,7 @@ fn introspection_define(global : Scope) -> Unit {
 /// The loading definitions (upstream `loading::define`).
 fn loading_define(global : Scope) -> Unit {
   global.start_category(DataLoading)
-  define_registered(global, "loading")
+  define_globals(global, "loading")
   global.reset_category()
 }
 
@@ -280,7 +307,7 @@ pub fn math_module() -> Module {
     ] {
     math.define_elem(elem) |> ignore
   }
-  define_registered(math, "math")
+  define_globals(math, "math")
   Module::new("math", math)
 }
 
@@ -294,12 +321,14 @@ pub(all) struct LibraryBuilder {
   extra : Array[(Scope) -> Unit]
   /// Routines into the compiler.
   routines : Routines
+  /// The `sys.inputs` dictionary.
+  mut inputs : Dict
 }
 
 ///|
 /// Create a library builder with the given routines.
 pub fn Library::builder(routines : Routines) -> LibraryBuilder {
-  { features: Features::all(), extra: [], routines, }
+  { features: Features::all(), extra: [], routines, inputs: Dict::new(), }
 }
 
 ///|
@@ -309,6 +338,16 @@ pub fn LibraryBuilder::with_features(
   features : Features,
 ) -> LibraryBuilder {
   self.features = features
+  self
+}
+
+///|
+/// Configure the `sys.inputs` dictionary.
+pub fn LibraryBuilder::with_inputs(
+  self : LibraryBuilder,
+  inputs : Dict,
+) -> LibraryBuilder {
+  self.inputs = inputs
   self
 }
 
@@ -325,9 +364,10 @@ pub fn LibraryBuilder::with_global(
 ///|
 /// Build the library.
 pub fn LibraryBuilder::build(self : LibraryBuilder) -> Library {
+  ensure_scopes()
   let math = math_module()
   let global = Scope::deduplicating()
-  foundations_define(global)
+  foundations_define(global, self.inputs)
   model_define(global)
   text_define(global)
   layout_define(global)
@@ -335,7 +375,6 @@ pub fn LibraryBuilder::build(self : LibraryBuilder) -> Library {
   introspection_define(global)
   loading_define(global)
   global.define("math", Module(math)) |> ignore
-  define_registered(global, "prelude")
   for f in self.extra {
     f(global)
   }

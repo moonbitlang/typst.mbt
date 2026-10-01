@@ -5,3 +5,4 @@ target/
 *.log
 .DS_Store
 tests/golden/
+__pycache__/

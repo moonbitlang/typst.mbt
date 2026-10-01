@@ -1,0 +1,351 @@
+#!/usr/bin/env python3
+"""Generate MoonBit native function wrappers from gen/manifest.json.
+
+Upstream's `#[func]` macro wraps a typed Rust function into a closure that
+parses `Args`. This generates the same wrappers (`library/funcs_gen.mbt`):
+
+    native_<key>() -> NativeFuncData        (cached)
+
+which call a handwritten implementation
+
+    impl_<key>(self?, engine?, context?, args?, span?, params...) -> T raise E
+
+where E is `SourceError` for `SourceResult` returns and `HintedError`
+otherwise. Missing implementations get a stub in `library/funcs_todo_gen.mbt`
+that raises "... is not yet ported", so the package always compiles.
+
+Non-trivial `#[default(..)]` values call `impl_<key>__<param>_default()`.
+
+It also generates `register_scopes()` which builds the scopes of types,
+elements and functions (`#[scope]` blocks), and registers global functions.
+"""
+
+import json
+import os
+import re
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from typemap import mbt_type  # noqa: E402
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+LIB = os.path.join(ROOT, "library")
+
+# Which module a free function belongs to, by file.
+MODULE_PREFIX = {
+    "typst-library/src/foundations/calc.rs": "calc",
+    "typst-library/src/math/lr.rs": "math",
+    "typst-library/src/math/root.rs": "math",
+    "typst-library/src/math/style.rs": "math",
+}
+
+# Global functions per category (upstream `define` functions).
+GLOBALS = {
+    "foundations": ["repr", "panic", "assert", "eval", "plugin", "target"],
+    "model": ["numbering"],
+    "text": ["lower", "upper", "lorem"],
+    "layout": ["measure", "layout"],
+    "introspection": ["here", "query", "locate"],
+    "loading": ["read", "csv", "json", "toml", "yaml", "cbor", "xml"],
+}
+
+MATH_FUNCS = ["abs", "norm", "round", "sqrt", "upright", "bold", "italic", "serif",
+              "sans", "scr", "cal", "frak", "mono", "bb", "display", "inline",
+              "script", "sscript"]
+
+
+def snake(ident):
+    s = re.sub(r"(?<=[a-z0-9])([A-Z])", r"_\1", ident)
+    s = re.sub(r"([A-Z]+)([A-Z][a-z])", r"\1_\2", s)
+    return s.lower()
+
+
+def func_key(f):
+    if f["parent"]:
+        return snake(f["parent"]) + "_" + f["ident"].rstrip("_")
+    prefix = MODULE_PREFIX.get(f["file"])
+    return (prefix + "_" if prefix else "") + f["ident"].rstrip("_")
+
+
+def mbt_str(s):
+    return json.dumps(s, ensure_ascii=False).replace("\\{", "\\\\{")
+
+
+def strip_result(ty):
+    """Returns (inner type, raise type)."""
+    m = re.fullmatch(r"SourceResult<(.*)>", ty)
+    if m:
+        return m.group(1), "SourceError"
+    m = re.fullmatch(r"(?:StrResult|HintedStrResult)<(.*)>", ty)
+    if m:
+        return m.group(1), "HintedError"
+    return ty, "HintedError"
+
+
+def ret_type(rust):
+    if rust in ("()", "NoneValue", "Never"):
+        return "Unit"
+    return mbt_type(rust)
+
+
+def unspanned(ty):
+    m = re.fullmatch(r"Spanned<(.*)>", ty)
+    return (m.group(1), True) if m else (ty, False)
+
+
+def literal_default(mty, expr):
+    e = expr.strip()
+    if mty == "Bool" and e in ("true", "false"):
+        return e
+    if mty in ("Int64",) and re.fullmatch(r"-?\d+", e):
+        return e + "L"
+    if mty in ("USize", "U64", "U32", "U8") and re.fullmatch(r"\d+", e):
+        return f"{mty}({e}L)"
+    if mty == "Double" and re.fullmatch(r"-?\d+(\.\d+)?", e):
+        return e if "." in e else e + ".0"
+    if mty.endswith("?") and e == "None":
+        return "None"
+    if mty == "Value" and e == "Value::None":
+        return "None"
+    return None
+
+
+def defined_functions():
+    names = set()
+    for fn in os.listdir(LIB):
+        if not fn.endswith(".mbt") or fn.endswith("_gen.mbt"):
+            continue
+        with open(os.path.join(LIB, fn)) as f:
+            for m in re.finditer(r"^(?:pub )?fn ([a-z_][a-z0-9_]*)\(", f.read(), re.M):
+                names.add(m.group(1))
+    return names
+
+
+def type_accessor(manifest):
+    """Rust type ident -> `Type::x()` accessor (as in types_gen.mbt)."""
+    special = {"dictionary": "dict", "arguments": "args", "function": "func", "type": "type_"}
+    acc = {}
+    for t in manifest["types"]:
+        name = special.get(t["name"], t["name"].replace("-", "_"))
+        acc[t["ident"]] = f"Type::{name}()"
+    acc.update({"i64": "Type::int()", "f64": "Type::float()", "bool": "Type::bool()"})
+    return acc
+
+
+def elem_var(ident, file=""):
+    s = snake(ident)
+    s = s if s.endswith("_elem") else s + "_elem"
+    if ident in ("UnderlineElem", "OverlineElem", "AttachElem"):
+        if "/math/" in file:
+            s = "math_" + s
+        elif "typst-pdf" in file:
+            s = "pdf_" + s
+    return s
+
+
+def main():
+    manifest = json.load(open(os.path.join(ROOT, "gen", "manifest.json")))
+    defined = defined_functions()
+    acc = type_accessor(manifest)
+    elem_files = {e["ident"]: e["file"] for e in manifest["elems"]}
+    out = ["// Generated by scripts/funcgen.py from gen/manifest.json. Do not edit.\n"]
+    todo = ["// Generated stubs for native functions that are not ported yet.\n"]
+    keys = {}
+    func_scopes = {s["self_ty"]: s for s in manifest["scopes"]}
+    for f in manifest["funcs"]:
+        if f["file"].startswith(("typst-pdf", "typst-html", "typst-bundle")):
+            continue
+        key = func_key(f)
+        if key in keys:
+            continue
+        keys[key] = f
+        impl = f"impl_{key}"
+        ret_inner, raise_ty = strip_result(f["returns"])
+        rty = ret_type(ret_inner)
+        sig = []
+        parse = []
+        call_args = []
+        infos = []
+        if f["self_param"]:
+            sty = mbt_type(f["parent"]) if f["parent"] else "Value"
+            sig.append(f"self_ : {sty}")
+            parse.append(f'  let self_ : {sty} = args.expect("self")')
+            call_args.append("self_")
+            infos.append(
+                f'    {{ name: "self", docs: "", input: () => input_of((Ty::new() : Ty[{sty}])), '
+                f"default: None, positional: true, named: false, variadic: false, required: true, settable: false }},"
+            )
+        if f["engine"]:
+            sig.append("engine : Engine")
+            call_args.append("engine")
+        if f["context"]:
+            sig.append("context : Context")
+            call_args.append("context")
+        if f["args"]:
+            sig.append("args : Args")
+            call_args.append("args")
+        if f["span"]:
+            sig.append("span : @syntax.Span")
+            call_args.append("args.span")
+        for p in f["params"]:
+            ident = p["ident"] + "_"
+            raw, spanned = unspanned(p["ty"])
+            if p["variadic"]:
+                m = re.fullmatch(r"Vec<(.*)>", raw)
+                item, item_spanned = unspanned(m.group(1) if m else "Value")
+                ity = mbt_type(item)
+                pty = f"Array[{'@syntax.Spanned[' + ity + ']' if item_spanned else ity}]"
+                getter = "args.all_spanned()" if item_spanned else "args.all()"
+                info_ty = ity
+            elif p["named"] and p["default"] is None:
+                m = re.fullmatch(r"Option<(.*)>", raw)
+                inner = m.group(1) if m else raw
+                ity = mbt_type(inner)
+                pty = (f"@syntax.Spanned[{ity}]?" if spanned else f"{ity}?")
+                getter = (f'args.named_spanned({mbt_str(p["name"])})' if spanned
+                          else f'args.named({mbt_str(p["name"])})')
+                info_ty = ity
+            else:
+                ity = mbt_type(raw)
+                pty = f"@syntax.Spanned[{ity}]" if spanned else ity
+                info_ty = ity
+                if p["default"] is not None:
+                    lit = literal_default(ity, p["default"])
+                    dname = f"{impl}__{p['ident']}_default"
+                    if lit is None:
+                        if dname not in defined:
+                            todo.append(
+                                f"///|\n/// TODO: port default `{p['default']}`.\nfn {dname}() -> {ity} raise SourceError {{\n  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), \"default of `{key}.{p['ident']}` is not yet ported\")])\n}}\n"
+                            )
+                        dexpr = f"{dname}()"
+                    else:
+                        dexpr = lit
+                    if spanned:
+                        dexpr = f"{{ v: {dexpr}, span: args.span }}"
+                    base = (f'args.named_spanned({mbt_str(p["name"])})' if p["named"] and spanned
+                            else f'args.named({mbt_str(p["name"])})' if p["named"]
+                            else "args.eat_spanned_cast()" if spanned else "args.eat()")
+                    getter = f"match {base} {{\n    Some(v) => v\n    None => {dexpr}\n  }}"
+                else:
+                    getter = (f'args.expect_spanned({mbt_str(p["name"])})' if spanned
+                              else f'args.expect({mbt_str(p["name"])})')
+            if not p["external"]:
+                sig.append(f"{ident} : {pty}")
+                parse.append(f"  let {ident} : {pty} = {getter}")
+                call_args.append(ident)
+            positional = not p["named"]
+            required = positional and p["default"] is None and not p["variadic"]
+            infos.append(
+                f'    {{ name: {mbt_str(p["name"])}, docs: {mbt_str(p["doc"])}, '
+                f"input: () => input_of((Ty::new() : Ty[{info_ty}])), default: None, "
+                f"positional: {str(positional).lower()}, named: {str(p['named']).lower()}, "
+                f"variadic: {str(p['variadic']).lower()}, required: {str(required).lower()}, settable: false }},"
+            )
+        finish = "" if f["args"] else "  args.take().finish()\n"
+        call = f"{impl}({', '.join(call_args)})"
+        if raise_ty == "HintedError":
+            call = f"at(args.span, () => {call})"
+        conv = "None" if rty == "Unit" else "IntoValue::into_value(output)"
+        bind = "" if rty == "Unit" else "let output = "
+        if rty == "Unit":
+            body = f"  {call}\n  None"
+        else:
+            body = f"  {bind}{call}\n  {conv}"
+        scope_fn = ""
+        if f["scope"] and f["ident"] in func_scopes:
+            scope_fn = f", scope=scope_{key}"
+        out.append(
+            f"///|\nlet native_{key}_cell : Ref[NativeFuncData?] = {{ val: None }}\n\n"
+            f"///|\n/// {f['doc']} (upstream `{(f['parent'] + '::') if f['parent'] else ''}{f['ident']}`, {f['file']})\n"
+            f"pub fn native_{key}() -> NativeFuncData {{\n"
+            f"  match native_{key}_cell.val {{\n    Some(d) => d\n    None => {{\n"
+            f"      let d = NativeFuncData::new(\n"
+            f"        name={mbt_str(f['name'])},\n        title={mbt_str(f['title'])},\n"
+            f"        docs={mbt_str(f['doc'])},\n        contextual={str(f['contextual']).lower()},\n"
+            f"        params=[\n" + "\n".join("    " + i for i in infos) + "\n        ],\n"
+            f"        returns=() => output_of((Ty::new() : Ty[{'Value' if rty == 'Unit' else rty}])){scope_fn},\n"
+            f"        native_{key}_call,\n      )\n"
+            f"      native_{key}_cell.val = Some(d)\n      d\n    }}\n  }}\n}}\n\n"
+            f"///|\nfn native_{key}_call(engine : Engine, context : Context, args : Args) -> Value raise SourceError {{\n"
+            f"  ignore(engine)\n  ignore(context)\n"
+            + "\n".join(parse) + ("\n" if parse else "")
+            + finish + body + "\n}\n"
+        )
+        if impl not in defined:
+            what = (f["parent"] + "." if f["parent"] else (MODULE_PREFIX.get(f["file"], "") + "." if MODULE_PREFIX.get(f["file"]) else "")) + f["name"]
+            ret = "" if rty == "Unit" else f" -> {rty}"
+            ret = f"{ret if ret else ' -> Unit'} raise {raise_ty}"
+            uses = "\n".join(f"  ignore({a.split(' : ')[0]})" for a in sig)
+            todo.append(
+                f"///|\n/// TODO: port `{what}` ({f['file']}).\nfn {impl}({', '.join(sig)}){ret} {{\n"
+                + (uses + "\n" if uses else "")
+                + (f'  bail("`{what}` is not yet ported")\n' if raise_ty == "HintedError"
+                   else f'  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`{what}` is not yet ported")])\n')
+                + "}\n"
+            )
+
+    # Scopes.
+    reg = ["///|\n/// Builds the scopes of native types, elements and functions.\nfn register_scopes() -> Unit {"]
+    for s in manifest["scopes"]:
+        ty = s["self_ty"]
+        if s["file"].startswith(("typst-pdf", "typst-html", "typst-bundle")):
+            continue
+        defs = []
+        ctor = None
+        for mem in s["members"]:
+            attrs = " ".join(mem["attrs"])
+            if mem["kind"] == "fn" and "#[func" in attrs:
+                f = next((x for x in manifest["funcs"] if x["ident"] == mem["ident"] and x["parent"] == ty), None)
+                if f is None:
+                    continue
+                key = func_key(f)
+                if f["constructor"]:
+                    ctor = key
+                    continue
+                line = f"    s.define_func(native_{key}())"
+                if f["deprecated"]:
+                    m = re.search(r'message\s*=\s*"([^"]*)"', f["deprecated"])
+                    msg = m.group(1) if m else "item is deprecated"
+                    line += f".with_deprecation(Deprecation::new().with_message({mbt_str(msg)}))"
+                defs.append(line + " |> ignore")
+            elif mem["kind"] == "const" and "#[constant" in attrs:
+                cname = f"impl_{snake(ty)}_const_{mem['ident'].lower()}"
+                if cname not in defined:
+                    todo.append(f"///|\n/// TODO: port constant `{ty}::{mem['ident']}`.\nfn {cname}() -> Value {{\n  None\n}}\n")
+                defs.append(f"    s.define({mbt_str(mem['ident'].lower().replace('_', '-'))}, {cname}()) |> ignore")
+            elif mem["kind"] == "type" and "#[elem" in attrs:
+                defs.append(f"    s.define_elem({elem_var(mem['tokens'], elem_files.get(mem['tokens'], ''))}()) |> ignore")
+        body = "\n".join(defs)
+        if ty in acc:
+            ctor_line = f"\n    data.set_constructor(native_{ctor}())" if ctor else ""
+            reg.append(
+                f"  {acc[ty]}.0.register(data => {{\n    let s = Scope::new()\n{body}\n    data.set_scope(s){ctor_line}\n  }})"
+            )
+        elif ty.endswith("Elem") or ty in elem_files:
+            reg.append(
+                f"  {elem_var(ty, elem_files.get(ty, ''))}().hooks().scope = () => {{\n    let s = Scope::new()\n{body}\n    s\n  }}"
+            )
+        else:
+            # A function scope (e.g. `assert`).
+            fkey = next((func_key(x) for x in manifest["funcs"] if x["ident"] == ty and x["parent"] is None), None)
+            if fkey is None:
+                continue
+            out.append(f"///|\nfn scope_{fkey}() -> Scope {{\n  let s = Scope::new()\n{body.replace('    ', '  ')}\n  s\n}}\n")
+    reg.append("}\n")
+    # Global functions per category.
+    glob = ["///|\n/// The global native functions of a category, in upstream definition\n/// order.\nfn generated_globals(category : String) -> Array[NativeFuncData] {\n  match category {"]
+    for cat, names in list(GLOBALS.items()) + [("math", ["math_" + n for n in MATH_FUNCS])]:
+        glob.append(f'    "{cat}" => [' + ", ".join(f"native_{n}()" for n in names) + "]")
+    glob.append("    _ => []\n  }\n}\n")
+    calc = [func_key(f) for f in manifest["funcs"] if f["file"] == "typst-library/src/foundations/calc.rs"]
+    glob.append("///|\n/// The functions of the `calc` module.\nfn generated_calc_funcs() -> Array[NativeFuncData] {\n  [" + ", ".join(f"native_{k}()" for k in calc) + "]\n}\n")
+    reg.extend(glob)
+    with open(os.path.join(LIB, "funcs_gen.mbt"), "w") as fh:
+        fh.write("\n".join(out) + "\n" + "\n".join(reg))
+    with open(os.path.join(LIB, "funcs_todo_gen.mbt"), "w") as fh:
+        fh.write("\n".join(todo))
+    print(f"{len(keys)} functions, {sum(1 for t in todo[1:] if 'TODO: port `' in t)} todo stubs", file=sys.stderr)
+
+
+if __name__ == "__main__":
+    main()

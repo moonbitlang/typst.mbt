@@ -317,3 +317,82 @@ pub fn Args::merge(self : Args, rhs : Args) -> Args {
   }
   { span: @syntax.Span::detached(), items, }
 }
+
+// Helpers for `Spanned<T>` parameters (upstream casts from
+// `Spanned<Value>` into `Spanned<T>`, keeping the argument's span).
+
+///|
+fn[T : FromValue] cast_spanned(
+  value : @syntax.Spanned[Value],
+) -> @syntax.Spanned[T] raise SourceError {
+  { v: at(value.span, () => T::from_value(value.v)), span: value.span, }
+}
+
+///|
+/// Consume and cast the first positional argument, keeping its span.
+pub fn[T : FromValue] Args::eat_spanned_cast(
+  self : Args,
+) -> @syntax.Spanned[T]? raise SourceError {
+  match self.eat_spanned() {
+    Some(value) => Some(cast_spanned(value))
+    None => None
+  }
+}
+
+///|
+/// [Args::expect] for a spanned parameter.
+pub fn[T : FromValue] Args::expect_spanned(
+  self : Args,
+  what : String,
+) -> @syntax.Spanned[T] raise SourceError {
+  match self.eat_spanned() {
+    Some(value) => cast_spanned(value)
+    None => raise SourceError([self.missing_argument(what)])
+  }
+}
+
+///|
+/// [Args::named] for a spanned parameter.
+pub fn[T : FromValue] Args::named_spanned(
+  self : Args,
+  name : String,
+) -> @syntax.Spanned[T]? raise SourceError {
+  let mut i = 0
+  let mut found : @syntax.Spanned[T]? = None
+  while i < self.items.length() {
+    if self.items[i].name == Some(name) {
+      found = Some(cast_spanned(self.items.remove(i).value))
+    } else {
+      i += 1
+    }
+  }
+  found
+}
+
+///|
+/// [Args::all] for spanned parameters.
+pub fn[T : FromValue] Args::all_spanned(
+  self : Args,
+) -> Array[@syntax.Spanned[T]] raise SourceError {
+  let list = []
+  let errors = []
+  let kept = []
+  for item in self.items {
+    if item.name is Some(_) {
+      kept.push(item)
+      continue
+    }
+    let span = item.value.span
+    try T::from_value(item.value.v) catch {
+      HintedError(err) => errors.push(err.into_error_at(span))
+    } noraise {
+      v => list.push(({ v, span, } : @syntax.Spanned[T]))
+    }
+  }
+  self.items.clear()
+  self.items.append(kept)
+  if !errors.is_empty() {
+    raise SourceError(errors)
+  }
+  list
+}
