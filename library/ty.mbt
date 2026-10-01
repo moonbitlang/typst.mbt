@@ -86,7 +86,7 @@ pub impl Hash for Type with fn hash_combine(self, hasher) {
 ///|
 /// Order by long name (upstream `Ord for Type`).
 pub impl Compare for Type with fn compare(self, other) {
-  self.0.long_name.compare(other.0.long_name)
+  compare_str(self.0.long_name, other.0.long_name)
 }
 
 ///|

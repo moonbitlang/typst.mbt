@@ -118,7 +118,7 @@ pub impl Hash for Element with fn hash_combine(self, hasher) {
 ///|
 /// Order by name (upstream `Ord for Element`).
 pub impl Compare for Element with fn compare(self, other) {
-  self.0.name.compare(other.0.name)
+  compare_str(self.0.name, other.0.name)
 }
 
 ///|
