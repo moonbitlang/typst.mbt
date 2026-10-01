@@ -3350,6 +3350,7 @@ pub fn[T : FromValue] Args::expect_spanned(Self, String) -> @syntax.Spanned[T] r
 pub fn Args::expect_with(Self, String, (Value) -> Value raise HintedError) -> Value raise SourceError
 pub fn Args::field(Self, String) -> Value raise HintedError
 pub fn[T : FromValue] Args::find(Self) -> T? raise SourceError
+pub fn[T : FromValue] Args::find_spanned(Self) -> @syntax.Spanned[T]? raise SourceError
 pub fn Args::find_with(Self, (Value) -> Bool, (Value) -> Value raise HintedError) -> Value? raise SourceError
 pub fn Args::finish(Self) -> Unit raise SourceError
 pub fn Args::insert(Self, Int, @syntax.Span, Value) -> Unit

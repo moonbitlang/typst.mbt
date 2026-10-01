@@ -1,41 +1,6 @@
 // Generated stubs for native functions that are not ported yet.
 
 ///|
-/// TODO: port `Content.func` (typst-library/src/foundations/content/mod.rs).
-fn impl_content_func(self_ : Content) -> Element raise HintedError {
-  ignore(self_)
-  bail("`Content.func` is not yet ported")
-}
-
-///|
-/// TODO: port `Content.has` (typst-library/src/foundations/content/mod.rs).
-fn impl_content_has(self_ : Content, field_ : String) -> Bool raise HintedError {
-  ignore(self_)
-  ignore(field_)
-  bail("`Content.has` is not yet ported")
-}
-
-///|
-/// TODO: port `Content.at` (typst-library/src/foundations/content/mod.rs).
-fn impl_content_at(
-  self_ : Content,
-  field_ : String,
-  default_ : Value?,
-) -> Value raise HintedError {
-  ignore(self_)
-  ignore(field_)
-  ignore(default_)
-  bail("`Content.at` is not yet ported")
-}
-
-///|
-/// TODO: port `Content.fields` (typst-library/src/foundations/content/mod.rs).
-fn impl_content_fields(self_ : Content) -> Dict raise HintedError {
-  ignore(self_)
-  bail("`Content.fields` is not yet ported")
-}
-
-///|
 /// TODO: port `plugin` (typst-library/src/foundations/plugin.rs).
 fn impl_plugin(
   engine : Engine,
