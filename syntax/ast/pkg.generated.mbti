@@ -1,0 +1,1065 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/syntax/ast"
+
+import {
+  "moonbitlang/core/debug",
+  "moonbitlang/typst/syntax",
+}
+
+// Values
+pub fn[T : AstNode] cast(@syntax.SyntaxNode) -> T?
+
+pub let math_shorthand_list : ReadOnlyArray[(String, Char)]
+
+pub let shorthand_list : ReadOnlyArray[(String, Char)]
+
+// Errors
+
+// Types and methods
+pub(all) enum Arg {
+  Pos(Expr)
+  Named(Named)
+  Spread(Spread)
+}
+pub fn Arg::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn Arg::placeholder() -> Self
+pub fn Arg::span(Self) -> @syntax.Span
+pub fn Arg::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for Arg
+
+pub struct Args {
+  node : @syntax.SyntaxNode
+}
+pub fn Args::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn Args::items(Self) -> Iter[Arg]
+pub fn Args::placeholder() -> Self
+pub fn Args::span(Self) -> @syntax.Span
+pub fn Args::to_untyped(Self) -> @syntax.SyntaxNode
+pub fn Args::trailing_comma(Self) -> Bool
+pub impl AstNode for Args
+
+pub(all) enum ArrayItem {
+  Pos(Expr)
+  Spread(Spread)
+}
+pub fn ArrayItem::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn ArrayItem::placeholder() -> Self
+pub fn ArrayItem::span(Self) -> @syntax.Span
+pub fn ArrayItem::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for ArrayItem
+
+pub struct ArrayLit {
+  node : @syntax.SyntaxNode
+}
+pub fn ArrayLit::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn ArrayLit::items(Self) -> Iter[ArrayItem]
+pub fn ArrayLit::placeholder() -> Self
+pub fn ArrayLit::span(Self) -> @syntax.Span
+pub fn ArrayLit::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for ArrayLit
+
+pub struct Auto {
+  node : @syntax.SyntaxNode
+}
+pub fn Auto::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn Auto::placeholder() -> Self
+pub fn Auto::span(Self) -> @syntax.Span
+pub fn Auto::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for Auto
+
+pub(all) enum BareImportError {
+  Dynamic
+  PathInvalid
+  PackageInvalid
+} derive(Eq, Hash, @debug.Debug)
+
+pub struct Binary {
+  node : @syntax.SyntaxNode
+}
+pub fn Binary::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn Binary::lhs(Self) -> Expr
+pub fn Binary::op(Self) -> @syntax.BinOp
+pub fn Binary::placeholder() -> Self
+pub fn Binary::rhs(Self) -> Expr
+pub fn Binary::span(Self) -> @syntax.Span
+pub fn Binary::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for Binary
+
+pub struct BlockComment {
+  node : @syntax.SyntaxNode
+}
+pub fn BlockComment::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn BlockComment::placeholder() -> Self
+pub fn BlockComment::span(Self) -> @syntax.Span
+pub fn BlockComment::text(Self) -> String
+pub fn BlockComment::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for BlockComment
+
+pub struct BoolLit {
+  node : @syntax.SyntaxNode
+}
+pub fn BoolLit::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn BoolLit::get(Self) -> Bool
+pub fn BoolLit::placeholder() -> Self
+pub fn BoolLit::span(Self) -> @syntax.Span
+pub fn BoolLit::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for BoolLit
+
+pub struct Closure {
+  node : @syntax.SyntaxNode
+}
+pub fn Closure::body(Self) -> Expr
+pub fn Closure::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn Closure::name(Self) -> Ident?
+pub fn Closure::params(Self) -> Params
+pub fn Closure::placeholder() -> Self
+pub fn Closure::span(Self) -> @syntax.Span
+pub fn Closure::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for Closure
+
+pub struct Code {
+  node : @syntax.SyntaxNode
+}
+pub fn Code::exprs(Self) -> Iter[Expr]
+pub fn Code::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn Code::placeholder() -> Self
+pub fn Code::span(Self) -> @syntax.Span
+pub fn Code::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for Code
+
+pub struct CodeBlock {
+  node : @syntax.SyntaxNode
+}
+pub fn CodeBlock::body(Self) -> Code
+pub fn CodeBlock::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn CodeBlock::placeholder() -> Self
+pub fn CodeBlock::span(Self) -> @syntax.Span
+pub fn CodeBlock::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for CodeBlock
+
+pub struct Conditional {
+  node : @syntax.SyntaxNode
+}
+pub fn Conditional::condition(Self) -> Expr
+pub fn Conditional::else_body(Self) -> Expr?
+pub fn Conditional::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn Conditional::if_body(Self) -> Expr
+pub fn Conditional::placeholder() -> Self
+pub fn Conditional::span(Self) -> @syntax.Span
+pub fn Conditional::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for Conditional
+
+pub struct ContentBlock {
+  node : @syntax.SyntaxNode
+}
+pub fn ContentBlock::body(Self) -> Markup
+pub fn ContentBlock::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn ContentBlock::placeholder() -> Self
+pub fn ContentBlock::span(Self) -> @syntax.Span
+pub fn ContentBlock::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for ContentBlock
+
+pub struct Contextual {
+  node : @syntax.SyntaxNode
+}
+pub fn Contextual::body(Self) -> Expr
+pub fn Contextual::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn Contextual::placeholder() -> Self
+pub fn Contextual::span(Self) -> @syntax.Span
+pub fn Contextual::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for Contextual
+
+pub struct DestructAssignment {
+  node : @syntax.SyntaxNode
+}
+pub fn DestructAssignment::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn DestructAssignment::pattern(Self) -> Pattern
+pub fn DestructAssignment::placeholder() -> Self
+pub fn DestructAssignment::span(Self) -> @syntax.Span
+pub fn DestructAssignment::to_untyped(Self) -> @syntax.SyntaxNode
+pub fn DestructAssignment::value(Self) -> Expr
+pub impl AstNode for DestructAssignment
+
+pub struct Destructuring {
+  node : @syntax.SyntaxNode
+}
+pub fn Destructuring::bindings(Self) -> Array[Ident]
+pub fn Destructuring::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn Destructuring::items(Self) -> Iter[DestructuringItem]
+pub fn Destructuring::placeholder() -> Self
+pub fn Destructuring::span(Self) -> @syntax.Span
+pub fn Destructuring::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for Destructuring
+
+pub(all) enum DestructuringItem {
+  Pattern(Pattern)
+  Named(Named)
+  Spread(Spread)
+}
+pub fn DestructuringItem::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn DestructuringItem::placeholder() -> Self
+pub fn DestructuringItem::span(Self) -> @syntax.Span
+pub fn DestructuringItem::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for DestructuringItem
+
+pub struct Dict {
+  node : @syntax.SyntaxNode
+}
+pub fn Dict::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn Dict::items(Self) -> Iter[DictItem]
+pub fn Dict::placeholder() -> Self
+pub fn Dict::span(Self) -> @syntax.Span
+pub fn Dict::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for Dict
+
+pub(all) enum DictItem {
+  Named(Named)
+  Keyed(Keyed)
+  Spread(Spread)
+}
+pub fn DictItem::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn DictItem::placeholder() -> Self
+pub fn DictItem::span(Self) -> @syntax.Span
+pub fn DictItem::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for DictItem
+
+pub struct Emph {
+  node : @syntax.SyntaxNode
+}
+pub fn Emph::body(Self) -> Markup
+pub fn Emph::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn Emph::placeholder() -> Self
+pub fn Emph::span(Self) -> @syntax.Span
+pub fn Emph::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for Emph
+
+pub struct EnumItem {
+  node : @syntax.SyntaxNode
+}
+pub fn EnumItem::body(Self) -> Markup
+pub fn EnumItem::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn EnumItem::number(Self) -> UInt64?
+pub fn EnumItem::placeholder() -> Self
+pub fn EnumItem::span(Self) -> @syntax.Span
+pub fn EnumItem::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for EnumItem
+
+pub struct Equation {
+  node : @syntax.SyntaxNode
+}
+pub fn Equation::block(Self) -> Bool
+pub fn Equation::body(Self) -> Math
+pub fn Equation::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn Equation::placeholder() -> Self
+pub fn Equation::span(Self) -> @syntax.Span
+pub fn Equation::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for Equation
+
+pub struct Escape {
+  node : @syntax.SyntaxNode
+}
+pub fn Escape::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn Escape::get(Self) -> Char
+pub fn Escape::placeholder() -> Self
+pub fn Escape::span(Self) -> @syntax.Span
+pub fn Escape::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for Escape
+
+pub(all) enum Expr {
+  Text(Text)
+  Space(Space)
+  Linebreak(Linebreak)
+  Parbreak(Parbreak)
+  Escape(Escape)
+  Shorthand(Shorthand)
+  SmartQuote(SmartQuote)
+  Strong(Strong)
+  Emph(Emph)
+  Raw(Raw)
+  Link(Link)
+  Label(Label)
+  Ref(Ref)
+  Heading(Heading)
+  ListItem(ListItem)
+  EnumItem(EnumItem)
+  TermItem(TermItem)
+  Equation(Equation)
+  Math(Math)
+  MathText(MathText)
+  MathIdent(MathIdent)
+  MathFieldAccess(MathFieldAccess)
+  MathShorthand(MathShorthand)
+  MathAlignPoint(MathAlignPoint)
+  MathCall(MathCall)
+  MathDelimited(MathDelimited)
+  MathAttach(MathAttach)
+  MathPrimes(MathPrimes)
+  MathFrac(MathFrac)
+  MathRoot(MathRoot)
+  Ident(Ident)
+  None(None)
+  Auto(Auto)
+  Bool(BoolLit)
+  Int(IntLit)
+  Float(Float)
+  Numeric(Numeric)
+  Str(Str)
+  CodeBlock(CodeBlock)
+  ContentBlock(ContentBlock)
+  Parenthesized(Parenthesized)
+  Array(ArrayLit)
+  Dict(Dict)
+  Unary(Unary)
+  Binary(Binary)
+  FieldAccess(FieldAccess)
+  FuncCall(FuncCall)
+  Closure(Closure)
+  LetBinding(LetBinding)
+  DestructAssignment(DestructAssignment)
+  SetRule(SetRule)
+  ShowRule(ShowRule)
+  Contextual(Contextual)
+  Conditional(Conditional)
+  WhileLoop(WhileLoop)
+  ForLoop(ForLoop)
+  ModuleImport(ModuleImport)
+  ModuleInclude(ModuleInclude)
+  LoopBreak(LoopBreak)
+  LoopContinue(LoopContinue)
+  FuncReturn(FuncReturn)
+}
+pub fn Expr::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn Expr::hash(Self) -> Bool
+pub fn Expr::is_literal(Self) -> Bool
+pub fn Expr::placeholder() -> Self
+pub fn Expr::span(Self) -> @syntax.Span
+pub fn Expr::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for Expr
+
+pub struct FieldAccess {
+  node : @syntax.SyntaxNode
+}
+pub fn FieldAccess::field(Self) -> Ident
+pub fn FieldAccess::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn FieldAccess::placeholder() -> Self
+pub fn FieldAccess::span(Self) -> @syntax.Span
+pub fn FieldAccess::target(Self) -> Expr
+pub fn FieldAccess::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for FieldAccess
+
+pub struct Float {
+  node : @syntax.SyntaxNode
+}
+pub fn Float::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn Float::get(Self) -> Double
+pub fn Float::placeholder() -> Self
+pub fn Float::span(Self) -> @syntax.Span
+pub fn Float::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for Float
+
+pub struct ForLoop {
+  node : @syntax.SyntaxNode
+}
+pub fn ForLoop::body(Self) -> Expr
+pub fn ForLoop::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn ForLoop::iterable(Self) -> Expr
+pub fn ForLoop::pattern(Self) -> Pattern
+pub fn ForLoop::placeholder() -> Self
+pub fn ForLoop::span(Self) -> @syntax.Span
+pub fn ForLoop::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for ForLoop
+
+pub struct FuncCall {
+  node : @syntax.SyntaxNode
+}
+pub fn FuncCall::args(Self) -> Args
+pub fn FuncCall::callee(Self) -> Expr
+pub fn FuncCall::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn FuncCall::placeholder() -> Self
+pub fn FuncCall::span(Self) -> @syntax.Span
+pub fn FuncCall::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for FuncCall
+
+pub struct FuncReturn {
+  node : @syntax.SyntaxNode
+}
+pub fn FuncReturn::body(Self) -> Expr?
+pub fn FuncReturn::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn FuncReturn::placeholder() -> Self
+pub fn FuncReturn::span(Self) -> @syntax.Span
+pub fn FuncReturn::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for FuncReturn
+
+pub struct Heading {
+  node : @syntax.SyntaxNode
+}
+pub fn Heading::body(Self) -> Markup
+pub fn Heading::depth(Self) -> Int
+pub fn Heading::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn Heading::placeholder() -> Self
+pub fn Heading::span(Self) -> @syntax.Span
+pub fn Heading::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for Heading
+
+pub struct Ident {
+  node : @syntax.SyntaxNode
+}
+pub fn Ident::as_str(Self) -> String
+pub fn Ident::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn Ident::get(Self) -> String
+pub fn Ident::placeholder() -> Self
+pub fn Ident::span(Self) -> @syntax.Span
+pub fn Ident::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for Ident
+
+pub(all) enum ImportItem {
+  Simple(ImportItemPath)
+  Renamed(RenamedImportItem)
+}
+pub fn ImportItem::bound_name(Self) -> Ident
+pub fn ImportItem::original_name(Self) -> Ident
+pub fn ImportItem::path(Self) -> ImportItemPath
+
+pub struct ImportItemPath {
+  node : @syntax.SyntaxNode
+}
+pub fn ImportItemPath::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn ImportItemPath::iter(Self) -> Iter[Ident]
+pub fn ImportItemPath::name(Self) -> Ident
+pub fn ImportItemPath::placeholder() -> Self
+pub fn ImportItemPath::span(Self) -> @syntax.Span
+pub fn ImportItemPath::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for ImportItemPath
+
+pub struct ImportItems {
+  node : @syntax.SyntaxNode
+}
+pub fn ImportItems::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn ImportItems::iter(Self) -> Iter[ImportItem]
+pub fn ImportItems::placeholder() -> Self
+pub fn ImportItems::span(Self) -> @syntax.Span
+pub fn ImportItems::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for ImportItems
+
+pub(all) enum Imports {
+  Wildcard
+  Items(ImportItems)
+}
+
+pub struct IntLit {
+  node : @syntax.SyntaxNode
+}
+pub fn IntLit::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn IntLit::get(Self) -> Result[Int64, IntLiteralError]
+pub fn IntLit::placeholder() -> Self
+pub fn IntLit::span(Self) -> @syntax.Span
+pub fn IntLit::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for IntLit
+
+pub(all) enum IntLiteralError {
+  PosOverflow(base~ : @syntax.NonDecimalBase?, max_plus_one~ : Bool)
+  InvalidDigit(@syntax.NonDecimalBase, String)
+} derive(Eq, @debug.Debug)
+
+pub struct Keyed {
+  node : @syntax.SyntaxNode
+}
+pub fn Keyed::expr(Self) -> Expr
+pub fn Keyed::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn Keyed::key(Self) -> Expr
+pub fn Keyed::placeholder() -> Self
+pub fn Keyed::span(Self) -> @syntax.Span
+pub fn Keyed::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for Keyed
+
+pub struct Label {
+  node : @syntax.SyntaxNode
+}
+pub fn Label::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn Label::get(Self) -> String
+pub fn Label::placeholder() -> Self
+pub fn Label::span(Self) -> @syntax.Span
+pub fn Label::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for Label
+
+pub struct LetBinding {
+  node : @syntax.SyntaxNode
+}
+pub fn LetBinding::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn LetBinding::init(Self) -> Expr?
+pub fn LetBinding::kind(Self) -> LetBindingKind
+pub fn LetBinding::placeholder() -> Self
+pub fn LetBinding::span(Self) -> @syntax.Span
+pub fn LetBinding::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for LetBinding
+
+pub(all) enum LetBindingKind {
+  Normal(Pattern)
+  Closure(Ident)
+}
+pub fn LetBindingKind::bindings(Self) -> Array[Ident]
+
+pub struct LineComment {
+  node : @syntax.SyntaxNode
+}
+pub fn LineComment::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn LineComment::placeholder() -> Self
+pub fn LineComment::span(Self) -> @syntax.Span
+pub fn LineComment::text(Self) -> String
+pub fn LineComment::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for LineComment
+
+pub struct Linebreak {
+  node : @syntax.SyntaxNode
+}
+pub fn Linebreak::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn Linebreak::placeholder() -> Self
+pub fn Linebreak::span(Self) -> @syntax.Span
+pub fn Linebreak::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for Linebreak
+
+pub struct Link {
+  node : @syntax.SyntaxNode
+}
+pub fn Link::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn Link::get(Self) -> String
+pub fn Link::placeholder() -> Self
+pub fn Link::span(Self) -> @syntax.Span
+pub fn Link::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for Link
+
+pub struct ListItem {
+  node : @syntax.SyntaxNode
+}
+pub fn ListItem::body(Self) -> Markup
+pub fn ListItem::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn ListItem::placeholder() -> Self
+pub fn ListItem::span(Self) -> @syntax.Span
+pub fn ListItem::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for ListItem
+
+pub struct LoopBreak {
+  node : @syntax.SyntaxNode
+}
+pub fn LoopBreak::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn LoopBreak::placeholder() -> Self
+pub fn LoopBreak::span(Self) -> @syntax.Span
+pub fn LoopBreak::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for LoopBreak
+
+pub struct LoopContinue {
+  node : @syntax.SyntaxNode
+}
+pub fn LoopContinue::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn LoopContinue::placeholder() -> Self
+pub fn LoopContinue::span(Self) -> @syntax.Span
+pub fn LoopContinue::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for LoopContinue
+
+pub struct Markup {
+  node : @syntax.SyntaxNode
+}
+pub fn Markup::exprs(Self) -> Iter[Expr]
+pub fn Markup::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn Markup::placeholder() -> Self
+pub fn Markup::span(Self) -> @syntax.Span
+pub fn Markup::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for Markup
+
+pub struct Math {
+  node : @syntax.SyntaxNode
+}
+pub fn Math::exprs(Self) -> Iter[Expr]
+pub fn Math::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn Math::placeholder() -> Self
+pub fn Math::span(Self) -> @syntax.Span
+pub fn Math::to_untyped(Self) -> @syntax.SyntaxNode
+pub fn Math::was_deparenthesized(Self) -> Bool
+pub impl AstNode for Math
+
+pub(all) enum MathAccess {
+  MathIdent(MathIdent)
+  MathFieldAccess(MathFieldAccess)
+}
+pub fn MathAccess::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn MathAccess::placeholder() -> Self
+pub fn MathAccess::span(Self) -> @syntax.Span
+pub fn MathAccess::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for MathAccess
+
+pub struct MathAlignPoint {
+  node : @syntax.SyntaxNode
+}
+pub fn MathAlignPoint::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn MathAlignPoint::placeholder() -> Self
+pub fn MathAlignPoint::span(Self) -> @syntax.Span
+pub fn MathAlignPoint::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for MathAlignPoint
+
+pub(all) struct MathArg {
+  arg : Arg
+  ends_in_semicolon : Bool
+}
+
+pub(all) enum MathArgItem {
+  Arg(Arg)
+  Space(Space)
+  Comma(Char, @syntax.SyntaxNode)
+  Semicolon(Char, @syntax.SyntaxNode)
+  LeftParen(Char, @syntax.SyntaxNode)
+  RightParen(Char, @syntax.SyntaxNode)
+}
+
+pub struct MathArgs {
+  node : @syntax.SyntaxNode
+}
+pub fn MathArgs::arg_items(Self) -> Iter[MathArg]
+pub fn MathArgs::content_items(Self) -> Iter[MathArgItem]
+pub fn MathArgs::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn MathArgs::placeholder() -> Self
+pub fn MathArgs::span(Self) -> @syntax.Span
+pub fn MathArgs::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for MathArgs
+
+pub struct MathAttach {
+  node : @syntax.SyntaxNode
+}
+pub fn MathAttach::base(Self) -> Expr
+pub fn MathAttach::bottom(Self) -> Expr?
+pub fn MathAttach::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn MathAttach::placeholder() -> Self
+pub fn MathAttach::primes(Self) -> MathPrimes?
+pub fn MathAttach::span(Self) -> @syntax.Span
+pub fn MathAttach::to_untyped(Self) -> @syntax.SyntaxNode
+pub fn MathAttach::top(Self) -> Expr?
+pub impl AstNode for MathAttach
+
+pub struct MathCall {
+  node : @syntax.SyntaxNode
+}
+pub fn MathCall::args(Self) -> MathArgs
+pub fn MathCall::callee(Self) -> MathAccess
+pub fn MathCall::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn MathCall::placeholder() -> Self
+pub fn MathCall::span(Self) -> @syntax.Span
+pub fn MathCall::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for MathCall
+
+pub struct MathDelimited {
+  node : @syntax.SyntaxNode
+}
+pub fn MathDelimited::body(Self) -> Math
+pub fn MathDelimited::close(Self) -> Expr
+pub fn MathDelimited::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn MathDelimited::open(Self) -> Expr
+pub fn MathDelimited::placeholder() -> Self
+pub fn MathDelimited::span(Self) -> @syntax.Span
+pub fn MathDelimited::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for MathDelimited
+
+pub struct MathFieldAccess {
+  node : @syntax.SyntaxNode
+}
+pub fn MathFieldAccess::field(Self) -> MathIdent
+pub fn MathFieldAccess::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn MathFieldAccess::placeholder() -> Self
+pub fn MathFieldAccess::span(Self) -> @syntax.Span
+pub fn MathFieldAccess::target(Self) -> MathAccess
+pub fn MathFieldAccess::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for MathFieldAccess
+
+pub struct MathFrac {
+  node : @syntax.SyntaxNode
+}
+pub fn MathFrac::denom(Self) -> Expr
+pub fn MathFrac::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn MathFrac::num(Self) -> Expr
+pub fn MathFrac::placeholder() -> Self
+pub fn MathFrac::span(Self) -> @syntax.Span
+pub fn MathFrac::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for MathFrac
+
+pub struct MathIdent {
+  node : @syntax.SyntaxNode
+}
+pub fn MathIdent::as_str(Self) -> String
+pub fn MathIdent::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn MathIdent::get(Self) -> String
+pub fn MathIdent::placeholder() -> Self
+pub fn MathIdent::span(Self) -> @syntax.Span
+pub fn MathIdent::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for MathIdent
+
+pub struct MathPrimes {
+  node : @syntax.SyntaxNode
+}
+pub fn MathPrimes::count(Self) -> Int
+pub fn MathPrimes::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn MathPrimes::placeholder() -> Self
+pub fn MathPrimes::span(Self) -> @syntax.Span
+pub fn MathPrimes::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for MathPrimes
+
+pub struct MathRoot {
+  node : @syntax.SyntaxNode
+}
+pub fn MathRoot::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn MathRoot::index(Self) -> Byte?
+pub fn MathRoot::placeholder() -> Self
+pub fn MathRoot::radicand(Self) -> Expr
+pub fn MathRoot::span(Self) -> @syntax.Span
+pub fn MathRoot::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for MathRoot
+
+pub struct MathShorthand {
+  node : @syntax.SyntaxNode
+}
+pub fn MathShorthand::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn MathShorthand::get(Self) -> Char
+pub fn MathShorthand::placeholder() -> Self
+pub fn MathShorthand::span(Self) -> @syntax.Span
+pub fn MathShorthand::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for MathShorthand
+
+pub struct MathText {
+  node : @syntax.SyntaxNode
+}
+pub fn MathText::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn MathText::get(Self) -> MathTextKind
+pub fn MathText::placeholder() -> Self
+pub fn MathText::span(Self) -> @syntax.Span
+pub fn MathText::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for MathText
+
+pub(all) enum MathTextKind {
+  Grapheme(String)
+  Number(String)
+}
+
+pub struct ModuleImport {
+  node : @syntax.SyntaxNode
+}
+pub fn ModuleImport::bare_name(Self) -> Result[String, BareImportError]
+pub fn ModuleImport::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn ModuleImport::imports(Self) -> Imports?
+pub fn ModuleImport::new_name(Self) -> Ident?
+pub fn ModuleImport::placeholder() -> Self
+pub fn ModuleImport::source(Self) -> Expr
+pub fn ModuleImport::span(Self) -> @syntax.Span
+pub fn ModuleImport::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for ModuleImport
+
+pub struct ModuleInclude {
+  node : @syntax.SyntaxNode
+}
+pub fn ModuleInclude::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn ModuleInclude::placeholder() -> Self
+pub fn ModuleInclude::source(Self) -> Expr
+pub fn ModuleInclude::span(Self) -> @syntax.Span
+pub fn ModuleInclude::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for ModuleInclude
+
+pub struct Named {
+  node : @syntax.SyntaxNode
+}
+pub fn Named::expr(Self) -> Expr
+pub fn Named::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn Named::name(Self) -> Ident
+pub fn Named::pattern(Self) -> Pattern
+pub fn Named::placeholder() -> Self
+pub fn Named::span(Self) -> @syntax.Span
+pub fn Named::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for Named
+
+pub struct None {
+  node : @syntax.SyntaxNode
+}
+pub fn None::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn None::placeholder() -> Self
+pub fn None::span(Self) -> @syntax.Span
+pub fn None::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for None
+
+pub struct Numeric {
+  node : @syntax.SyntaxNode
+}
+pub fn Numeric::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn Numeric::get(Self) -> (Double, NumericUnit)
+pub fn Numeric::placeholder() -> Self
+pub fn Numeric::span(Self) -> @syntax.Span
+pub fn Numeric::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for Numeric
+
+pub(all) enum NumericUnit {
+  Pt
+  Mm
+  Cm
+  In
+  Rad
+  Deg
+  Em
+  Fr
+  Percent
+} derive(Eq, Hash, @debug.Debug)
+
+pub(all) enum Param {
+  Pos(Pattern)
+  Named(Named)
+  Spread(Spread)
+}
+pub fn Param::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn Param::placeholder() -> Self
+pub fn Param::span(Self) -> @syntax.Span
+pub fn Param::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for Param
+
+pub struct Params {
+  node : @syntax.SyntaxNode
+}
+pub fn Params::children(Self) -> Iter[Param]
+pub fn Params::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn Params::placeholder() -> Self
+pub fn Params::span(Self) -> @syntax.Span
+pub fn Params::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for Params
+
+pub struct Parbreak {
+  node : @syntax.SyntaxNode
+}
+pub fn Parbreak::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn Parbreak::placeholder() -> Self
+pub fn Parbreak::span(Self) -> @syntax.Span
+pub fn Parbreak::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for Parbreak
+
+pub struct Parenthesized {
+  node : @syntax.SyntaxNode
+}
+pub fn Parenthesized::expr(Self) -> Expr
+pub fn Parenthesized::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn Parenthesized::pattern(Self) -> Pattern
+pub fn Parenthesized::placeholder() -> Self
+pub fn Parenthesized::span(Self) -> @syntax.Span
+pub fn Parenthesized::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for Parenthesized
+
+pub(all) enum Pattern {
+  Normal(Expr)
+  Placeholder(Underscore)
+  Parenthesized(Parenthesized)
+  Destructuring(Destructuring)
+}
+pub fn Pattern::bindings(Self) -> Array[Ident]
+pub fn Pattern::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn Pattern::placeholder() -> Self
+pub fn Pattern::span(Self) -> @syntax.Span
+pub fn Pattern::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for Pattern
+
+pub struct Raw {
+  node : @syntax.SyntaxNode
+}
+pub fn Raw::block(Self) -> Bool
+pub fn Raw::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn Raw::lang(Self) -> RawLang?
+pub fn Raw::lines(Self) -> Iter[Text]
+pub fn Raw::placeholder() -> Self
+pub fn Raw::span(Self) -> @syntax.Span
+pub fn Raw::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for Raw
+
+pub struct RawDelim {
+  node : @syntax.SyntaxNode
+}
+pub fn RawDelim::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn RawDelim::placeholder() -> Self
+pub fn RawDelim::span(Self) -> @syntax.Span
+pub fn RawDelim::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for RawDelim
+
+pub struct RawLang {
+  node : @syntax.SyntaxNode
+}
+pub fn RawLang::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn RawLang::get(Self) -> String
+pub fn RawLang::placeholder() -> Self
+pub fn RawLang::span(Self) -> @syntax.Span
+pub fn RawLang::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for RawLang
+
+pub struct Ref {
+  node : @syntax.SyntaxNode
+}
+pub fn Ref::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn Ref::placeholder() -> Self
+pub fn Ref::span(Self) -> @syntax.Span
+pub fn Ref::supplement(Self) -> ContentBlock?
+pub fn Ref::target(Self) -> String
+pub fn Ref::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for Ref
+
+pub struct RenamedImportItem {
+  node : @syntax.SyntaxNode
+}
+pub fn RenamedImportItem::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn RenamedImportItem::new_name(Self) -> Ident
+pub fn RenamedImportItem::original_name(Self) -> Ident
+pub fn RenamedImportItem::path(Self) -> ImportItemPath
+pub fn RenamedImportItem::placeholder() -> Self
+pub fn RenamedImportItem::span(Self) -> @syntax.Span
+pub fn RenamedImportItem::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for RenamedImportItem
+
+pub struct SetRule {
+  node : @syntax.SyntaxNode
+}
+pub fn SetRule::args(Self) -> Args
+pub fn SetRule::condition(Self) -> Expr?
+pub fn SetRule::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn SetRule::placeholder() -> Self
+pub fn SetRule::span(Self) -> @syntax.Span
+pub fn SetRule::target(Self) -> Expr
+pub fn SetRule::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for SetRule
+
+pub struct Shorthand {
+  node : @syntax.SyntaxNode
+}
+pub fn Shorthand::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn Shorthand::get(Self) -> Char
+pub fn Shorthand::placeholder() -> Self
+pub fn Shorthand::span(Self) -> @syntax.Span
+pub fn Shorthand::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for Shorthand
+
+pub struct ShowRule {
+  node : @syntax.SyntaxNode
+}
+pub fn ShowRule::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn ShowRule::placeholder() -> Self
+pub fn ShowRule::selector(Self) -> Expr?
+pub fn ShowRule::span(Self) -> @syntax.Span
+pub fn ShowRule::to_untyped(Self) -> @syntax.SyntaxNode
+pub fn ShowRule::transform(Self) -> Expr
+pub impl AstNode for ShowRule
+
+pub struct SmartQuote {
+  node : @syntax.SyntaxNode
+}
+pub fn SmartQuote::double(Self) -> Bool
+pub fn SmartQuote::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn SmartQuote::placeholder() -> Self
+pub fn SmartQuote::span(Self) -> @syntax.Span
+pub fn SmartQuote::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for SmartQuote
+
+pub struct Space {
+  node : @syntax.SyntaxNode
+}
+pub fn Space::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn Space::had_newline(Self) -> Bool
+pub fn Space::placeholder() -> Self
+pub fn Space::span(Self) -> @syntax.Span
+pub fn Space::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for Space
+
+pub struct Spread {
+  node : @syntax.SyntaxNode
+}
+pub fn Spread::expr(Self) -> Expr
+pub fn Spread::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn Spread::placeholder() -> Self
+pub fn Spread::sink_expr(Self) -> Expr?
+pub fn Spread::sink_ident(Self) -> Ident?
+pub fn Spread::span(Self) -> @syntax.Span
+pub fn Spread::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for Spread
+
+pub struct Str {
+  node : @syntax.SyntaxNode
+}
+pub fn Str::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn Str::get(Self) -> String
+pub fn Str::placeholder() -> Self
+pub fn Str::span(Self) -> @syntax.Span
+pub fn Str::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for Str
+
+pub struct Strong {
+  node : @syntax.SyntaxNode
+}
+pub fn Strong::body(Self) -> Markup
+pub fn Strong::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn Strong::placeholder() -> Self
+pub fn Strong::span(Self) -> @syntax.Span
+pub fn Strong::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for Strong
+
+pub struct TermItem {
+  node : @syntax.SyntaxNode
+}
+pub fn TermItem::description(Self) -> Markup
+pub fn TermItem::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn TermItem::placeholder() -> Self
+pub fn TermItem::span(Self) -> @syntax.Span
+pub fn TermItem::term(Self) -> Markup
+pub fn TermItem::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for TermItem
+
+pub struct Text {
+  node : @syntax.SyntaxNode
+}
+pub fn Text::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn Text::get(Self) -> String
+pub fn Text::placeholder() -> Self
+pub fn Text::span(Self) -> @syntax.Span
+pub fn Text::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for Text
+
+pub struct Unary {
+  node : @syntax.SyntaxNode
+}
+pub fn Unary::expr(Self) -> Expr
+pub fn Unary::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn Unary::op(Self) -> @syntax.UnOp
+pub fn Unary::placeholder() -> Self
+pub fn Unary::span(Self) -> @syntax.Span
+pub fn Unary::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for Unary
+
+pub struct Underscore {
+  node : @syntax.SyntaxNode
+}
+pub fn Underscore::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn Underscore::placeholder() -> Self
+pub fn Underscore::span(Self) -> @syntax.Span
+pub fn Underscore::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for Underscore
+
+pub struct WhileLoop {
+  node : @syntax.SyntaxNode
+}
+pub fn WhileLoop::body(Self) -> Expr
+pub fn WhileLoop::condition(Self) -> Expr
+pub fn WhileLoop::from_untyped(@syntax.SyntaxNode) -> Self?
+pub fn WhileLoop::placeholder() -> Self
+pub fn WhileLoop::span(Self) -> @syntax.Span
+pub fn WhileLoop::to_untyped(Self) -> @syntax.SyntaxNode
+pub impl AstNode for WhileLoop
+
+// Type aliases
+pub using @syntax {type Assoc}
+
+pub using @syntax {type BinOp}
+
+pub using @syntax {type NonDecimalBase}
+
+pub using @syntax {type UnOp}
+
+// Traits
+pub(open) trait AstNode {
+  fn from_untyped(@syntax.SyntaxNode) -> Self?
+  fn to_untyped(Self) -> @syntax.SyntaxNode
+  fn span(Self) -> @syntax.Span = _
+  fn placeholder() -> Self
+}
