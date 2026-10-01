@@ -10628,12 +10628,12 @@ pub fn OutlineEntry::set_fill(v : Content?) -> Style {
 }
 
 ///|
-pub fn OutlineEntry::parent_in(styles : StyleChain) -> Value {
+pub fn OutlineEntry::parent_in(styles : StyleChain) -> OutlineElem? {
   view_cast(styles.get_field(outline_entry_elem(), outline_entry_elem_parent), "entry.parent")
 }
 
 ///|
-pub fn OutlineEntry::set_parent(v : Value) -> Style {
+pub fn OutlineEntry::set_parent(v : OutlineElem?) -> Style {
   Property(Property::new(outline_entry_elem(), outline_entry_elem_parent, IntoValue::into_value(v)))
 }
 
@@ -10697,17 +10697,17 @@ pub fn PrefixInfo::with_level(self : PrefixInfo, v : NonZeroUSize) -> PrefixInfo
 }
 
 ///|
-pub fn PrefixInfo::inset(self : PrefixInfo) -> Value {
+pub fn PrefixInfo::inset(self : PrefixInfo) -> Abs {
   view_cast(self.0.field_raw(prefix_info_elem_inset).unwrap(), "prefix-info.inset")
 }
 
 ///|
-pub fn PrefixInfo::with_inset(self : PrefixInfo, v : Value) -> PrefixInfo {
+pub fn PrefixInfo::with_inset(self : PrefixInfo, v : Abs) -> PrefixInfo {
   PrefixInfo(self.0.with_field(prefix_info_elem_inset, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn PrefixInfo::new(key_ : Location, level_ : NonZeroUSize, inset_ : Value) -> PrefixInfo {
+pub fn PrefixInfo::new(key_ : Location, level_ : NonZeroUSize, inset_ : Abs) -> PrefixInfo {
   PrefixInfo(Content::new(prefix_info_elem(), [(prefix_info_elem_key, IntoValue::into_value(key_)), (prefix_info_elem_level, IntoValue::into_value(level_)), (prefix_info_elem_inset, IntoValue::into_value(inset_))]))
 }
 
@@ -11419,7 +11419,7 @@ pub fn RefElem::set_form(v : RefForm) -> Style {
 }
 
 ///|
-pub fn RefElem::citation(self : RefElem) -> Value? {
+pub fn RefElem::citation(self : RefElem) -> CiteElem?? {
   match self.0.field_raw(ref_elem_citation) {
     Some(v) => Some(view_cast(v, "ref.citation"))
     None => None
@@ -11427,7 +11427,7 @@ pub fn RefElem::citation(self : RefElem) -> Value? {
 }
 
 ///|
-pub fn RefElem::with_citation(self : RefElem, v : Value) -> RefElem {
+pub fn RefElem::with_citation(self : RefElem, v : CiteElem?) -> RefElem {
   RefElem(self.0.with_field(ref_elem_citation, IntoValue::into_value(v)))
 }
 
@@ -14334,22 +14334,22 @@ pub fn TextElem::set_case(v : Case?) -> Style {
 }
 
 ///|
-pub fn TextElem::smallcaps_in(styles : StyleChain) -> Value {
+pub fn TextElem::smallcaps_in(styles : StyleChain) -> Smallcaps? {
   view_cast(styles.get_field(text_elem(), text_elem_smallcaps), "text.smallcaps")
 }
 
 ///|
-pub fn TextElem::set_smallcaps(v : Value) -> Style {
+pub fn TextElem::set_smallcaps(v : Smallcaps?) -> Style {
   Property(Property::new(text_elem(), text_elem_smallcaps, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn TextElem::shift_settings_in(styles : StyleChain) -> Value {
+pub fn TextElem::shift_settings_in(styles : StyleChain) -> ShiftSettings? {
   view_cast(styles.get_field(text_elem(), text_elem_shift_settings), "text.shift-settings")
 }
 
 ///|
-pub fn TextElem::set_shift_settings(v : Value) -> Style {
+pub fn TextElem::set_shift_settings(v : ShiftSettings?) -> Style {
   Property(Property::new(text_elem(), text_elem_shift_settings, IntoValue::into_value(v)))
 }
 
@@ -14573,7 +14573,7 @@ pub fn RawElem::set_tab_size(v : USize) -> Style {
 }
 
 ///|
-pub fn RawElem::lines(self : RawElem) -> Value? {
+pub fn RawElem::lines(self : RawElem) -> Array[RawLine]? {
   match self.0.field_raw(raw_elem_lines) {
     Some(v) => Some(view_cast(v, "raw.lines"))
     None => None
@@ -14581,7 +14581,7 @@ pub fn RawElem::lines(self : RawElem) -> Value? {
 }
 
 ///|
-pub fn RawElem::with_lines(self : RawElem, v : Value) -> RawElem {
+pub fn RawElem::with_lines(self : RawElem, v : Array[RawLine]) -> RawElem {
   RawElem(self.0.with_field(raw_elem_lines, IntoValue::into_value(v)))
 }
 

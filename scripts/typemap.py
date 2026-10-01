@@ -239,6 +239,14 @@ TYPEMAP = {
     "AssetData": "AssetData",
     # model/cite.rs
     "CitationForm": "CitationForm",
+    # text/shift.rs, text/smallcaps.rs, Packed<T> of plain elements
+    "Smallcaps": "Smallcaps",
+    "ShiftSettings": "ShiftSettings",
+    "Packed<OutlineElem>": "OutlineElem",
+    "Packed<CiteElem>": "CiteElem",
+    "Packed<RawLine>": "RawLine",
+    # layout/abs.rs
+    "Abs": "Abs",
     # text/lang.rs
     "Locale": "Locale",
     # foundations/target.rs, introspection/tag.rs

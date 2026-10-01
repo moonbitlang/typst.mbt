@@ -4,14 +4,8 @@
 //     1 callbacks::InlineCallback
 //     1 Derived<CslSource, CslStyle>
 //     1 Smart<Derived<CslSource, CslStyle>>
-//     1 Option<Packed<OutlineElem>>
-//     1 Abs
-//     1 Option<Packed<CiteElem>>
 //     1 Smart<TableCellKind>
 //     1 SmallVec<[Decoration; 1]>
-//     1 Option<Smallcaps>
-//     1 Option<ShiftSettings>
-//     1 Vec<Packed<RawLine>>
 
 ///|
 let context_elem_cell : Ref[Element?] = Ref::new(None)
@@ -3532,7 +3526,7 @@ pub fn outline_entry_elem() -> Element {
         field_of((Ty::new() : Ty[NonZeroUSize]), id=0, name="level", kind=Required, positional=true, required=true),
         field_of((Ty::new() : Ty[Content]), id=1, name="element", kind=Required, positional=true, required=true),
         field_of((Ty::new() : Ty[Content?]), id=2, name="fill", kind=Settable, default=outline_entry_elem_fill_default),
-        field_of((Ty::new() : Ty[Value]), id=3, name="parent", kind=Ghost, internal=true, default=outline_entry_elem_parent_default),
+        field_of((Ty::new() : Ty[OutlineElem?]), id=3, name="parent", kind=Ghost, internal=true, default=() => None),
         ],
       )
       outline_entry_elem_cell.val = Some(e)
@@ -3571,7 +3565,7 @@ pub fn prefix_info_elem() -> Element {
         fields=[
         field_of((Ty::new() : Ty[Location]), id=0, name="key", kind=Required, positional=true, required=true),
         field_of((Ty::new() : Ty[NonZeroUSize]), id=1, name="level", kind=Required, positional=true, required=true, internal=true),
-        field_of((Ty::new() : Ty[Value]), id=2, name="inset", kind=Required, positional=true, required=true, internal=true),
+        field_of((Ty::new() : Ty[Abs]), id=2, name="inset", kind=Required, positional=true, required=true, internal=true),
         ],
       )
       prefix_info_elem_cell.val = Some(e)
@@ -3817,7 +3811,7 @@ pub fn ref_elem() -> Element {
         field_of((Ty::new() : Ty[Label]), id=0, name="target", kind=Required, positional=true, required=true),
         field_of((Ty::new() : Ty[Smart[Supplement?]]), id=1, name="supplement", kind=Settable, default=() => Auto),
         field_of((Ty::new() : Ty[RefForm]), id=2, name="form", kind=Settable, default=ref_elem_form_default),
-        field_of((Ty::new() : Ty[Value]), id=3, name="citation", kind=Synthesized),
+        field_of((Ty::new() : Ty[CiteElem?]), id=3, name="citation", kind=Synthesized),
         field_of((Ty::new() : Ty[Content?]), id=4, name="element", kind=Synthesized),
         ],
       )
@@ -4562,8 +4556,8 @@ pub fn text_elem() -> Element {
         field_of((Ty::new() : Ty[ItalicToggle]), id=37, name="emph", kind=Ghost, internal=true, default=text_elem_emph_default, fold=text_elem_emph_fold),
         field_of((Ty::new() : Ty[Value]), id=38, name="deco", kind=Ghost, internal=true, default=text_elem_deco_default, fold=text_elem_deco_fold),
         field_of((Ty::new() : Ty[Case?]), id=39, name="case", kind=Ghost, internal=true, default=() => None),
-        field_of((Ty::new() : Ty[Value]), id=40, name="smallcaps", kind=Ghost, internal=true, default=text_elem_smallcaps_default),
-        field_of((Ty::new() : Ty[Value]), id=41, name="shift-settings", kind=Ghost, internal=true, default=text_elem_shift_settings_default),
+        field_of((Ty::new() : Ty[Smallcaps?]), id=40, name="smallcaps", kind=Ghost, internal=true, default=() => None),
+        field_of((Ty::new() : Ty[ShiftSettings?]), id=41, name="shift-settings", kind=Ghost, internal=true, default=() => None),
         ],
       )
       text_elem_cell.val = Some(e)
@@ -4722,7 +4716,7 @@ pub fn raw_elem() -> Element {
         field_of((Ty::new() : Ty[OneOrMultiple[DataSource]]), id=4, name="syntaxes", kind=Settable, default=raw_elem_syntaxes_default, fold=raw_elem_syntaxes_fold),
         field_of((Ty::new() : Ty[Smart[DataSource?]]), id=5, name="theme", kind=Settable, default=() => Auto),
         field_of((Ty::new() : Ty[USize]), id=6, name="tab-size", kind=Settable, default=() => Int(2L)),
-        field_of((Ty::new() : Ty[Value]), id=7, name="lines", kind=Synthesized),
+        field_of((Ty::new() : Ty[Array[RawLine]]), id=7, name="lines", kind=Synthesized),
         ],
       )
       raw_elem_cell.val = Some(e)

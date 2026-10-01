@@ -43,12 +43,6 @@ fn footnote_entry_elem_separator_default() -> Value {
 }
 
 ///|
-/// TODO: port `Default::default() of Option<Packed<OutlineElem>>` (OutlineEntry.parent).
-fn outline_entry_elem_parent_default() -> Value {
-  None
-}
-
-///|
 /// TODO: port `Celled::Value(Sides::splat(Some(Some(Arc::new(Stroke::default())))))` (TableElem.stroke).
 fn table_elem_stroke_default() -> Value {
   None
@@ -88,18 +82,6 @@ fn text_elem_deco_default() -> Value {
 /// TODO: fold for `SmallVec<[Decoration; 1]>` (TextElem.deco).
 fn text_elem_deco_fold(inner : Value, _outer : Value) -> Value {
   inner
-}
-
-///|
-/// TODO: port `Default::default() of Option<Smallcaps>` (TextElem.smallcaps).
-fn text_elem_smallcaps_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Option<ShiftSettings>` (TextElem.shift_settings).
-fn text_elem_shift_settings_default() -> Value {
-  None
 }
 
 ///|
