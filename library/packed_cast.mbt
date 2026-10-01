@@ -47,6 +47,44 @@ pub impl FromValue for OutlineElem with fn from_value(v) {
   OutlineElem(packed_from_value(outline_elem(), v))
 }
 
+// cast! {
+//     OutlineEntry,
+//     v: Content => v.unpack::<Self>().map_err(|_| "expected outline entry")?
+// }
+
+///|
+pub impl Reflect for OutlineEntry with fn input() {
+  Type(Type::content())
+}
+
+///|
+pub impl Reflect for OutlineEntry with fn output() {
+  Type(Type::content())
+}
+
+///|
+pub impl Reflect for OutlineEntry with fn castable(v) {
+  castable_of((Ty::new() : Ty[Content]), v)
+}
+
+///|
+pub impl IntoValue for OutlineEntry with fn into_value(self) {
+  Content(self.0)
+}
+
+///|
+pub impl FromValue for OutlineEntry with fn from_value(v) {
+  if castable_of((Ty::new() : Ty[Content]), v) {
+    let content : Content = v.cast()
+    match OutlineEntry::of(content) {
+      Some(entry) => entry
+      None => bail("expected outline entry")
+    }
+  } else {
+    raise HintedError(OutlineEntry::input().error(v))
+  }
+}
+
 ///|
 pub impl Reflect for CiteElem with fn input() {
   Type(Type::content())

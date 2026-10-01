@@ -247,6 +247,7 @@ TYPEMAP = {
     "Packed<RawLine>": "RawLine",
     # layout/abs.rs
     "Abs": "Abs",
+    "OutlineEntry": "OutlineEntry",
     # text/lang.rs
     "Locale": "Locale",
     # foundations/target.rs, introspection/tag.rs

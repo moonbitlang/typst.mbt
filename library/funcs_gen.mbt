@@ -9714,7 +9714,7 @@ pub fn native_outline_entry_indented() -> NativeFuncData {
         keywords=[],
         contextual=true,
         params=[
-        { name: "self", docs: "", input: () => input_of((Ty::new() : Ty[Value])), default: None, positional: true, named: false, variadic: false, required: true, settable: false },
+        { name: "self", docs: "", input: () => input_of((Ty::new() : Ty[OutlineEntry])), default: None, positional: true, named: false, variadic: false, required: true, settable: false },
         { name: "prefix", docs: "The `prefix` is aligned with the `inner` content of entries that have level one less.", input: () => input_of((Ty::new() : Ty[Content?])), default: None, positional: true, named: false, variadic: false, required: true, settable: false },
         { name: "inner", docs: "The formatted inner content of the entry.", input: () => input_of((Ty::new() : Ty[Content])), default: None, positional: true, named: false, variadic: false, required: true, settable: false },
         { name: "gap", docs: "The gap between the prefix and the inner content.", input: () => input_of((Ty::new() : Ty[Length])), default: Some(() => try { IntoValue::into_value(impl_outline_entry_indented__gap_default()) } catch { _ => None }), positional: false, named: true, variadic: false, required: false, settable: false },
@@ -9732,7 +9732,7 @@ pub fn native_outline_entry_indented() -> NativeFuncData {
 fn native_outline_entry_indented_call(engine : Engine, context : Context, args : Args) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : OutlineEntry = args.expect("self")
   let prefix_ : Content? = args.expect("prefix")
   let inner_ : Content = args.expect("inner")
   let gap_ : Length = match args.named("gap") {
@@ -9760,7 +9760,7 @@ pub fn native_outline_entry_prefix() -> NativeFuncData {
         keywords=[],
         contextual=true,
         params=[
-        { name: "self", docs: "", input: () => input_of((Ty::new() : Ty[Value])), default: None, positional: true, named: false, variadic: false, required: true, settable: false },
+        { name: "self", docs: "", input: () => input_of((Ty::new() : Ty[OutlineEntry])), default: None, positional: true, named: false, variadic: false, required: true, settable: false },
         ],
         returns=() => output_of((Ty::new() : Ty[Content?])),
         native_outline_entry_prefix_call,
@@ -9775,7 +9775,7 @@ pub fn native_outline_entry_prefix() -> NativeFuncData {
 fn native_outline_entry_prefix_call(engine : Engine, context : Context, args : Args) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : OutlineEntry = args.expect("self")
   args.take().finish()
   let output = impl_outline_entry_prefix(self_, engine, context, args.span)
   IntoValue::into_value(output)
@@ -9797,7 +9797,7 @@ pub fn native_outline_entry_inner() -> NativeFuncData {
         keywords=[],
         contextual=true,
         params=[
-        { name: "self", docs: "", input: () => input_of((Ty::new() : Ty[Value])), default: None, positional: true, named: false, variadic: false, required: true, settable: false },
+        { name: "self", docs: "", input: () => input_of((Ty::new() : Ty[OutlineEntry])), default: None, positional: true, named: false, variadic: false, required: true, settable: false },
         ],
         returns=() => output_of((Ty::new() : Ty[Content])),
         native_outline_entry_inner_call,
@@ -9812,7 +9812,7 @@ pub fn native_outline_entry_inner() -> NativeFuncData {
 fn native_outline_entry_inner_call(engine : Engine, context : Context, args : Args) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : OutlineEntry = args.expect("self")
   args.take().finish()
   let output = impl_outline_entry_inner(self_, engine, context, args.span)
   IntoValue::into_value(output)
@@ -9834,7 +9834,7 @@ pub fn native_outline_entry_body() -> NativeFuncData {
         keywords=[],
         contextual=false,
         params=[
-        { name: "self", docs: "", input: () => input_of((Ty::new() : Ty[Value])), default: None, positional: true, named: false, variadic: false, required: true, settable: false },
+        { name: "self", docs: "", input: () => input_of((Ty::new() : Ty[OutlineEntry])), default: None, positional: true, named: false, variadic: false, required: true, settable: false },
         ],
         returns=() => output_of((Ty::new() : Ty[Content])),
         native_outline_entry_body_call,
@@ -9849,7 +9849,7 @@ pub fn native_outline_entry_body() -> NativeFuncData {
 fn native_outline_entry_body_call(engine : Engine, context : Context, args : Args) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : OutlineEntry = args.expect("self")
   args.take().finish()
   let output = at(args.span, () => impl_outline_entry_body(self_))
   IntoValue::into_value(output)
@@ -9871,7 +9871,7 @@ pub fn native_outline_entry_page() -> NativeFuncData {
         keywords=[],
         contextual=true,
         params=[
-        { name: "self", docs: "", input: () => input_of((Ty::new() : Ty[Value])), default: None, positional: true, named: false, variadic: false, required: true, settable: false },
+        { name: "self", docs: "", input: () => input_of((Ty::new() : Ty[OutlineEntry])), default: None, positional: true, named: false, variadic: false, required: true, settable: false },
         ],
         returns=() => output_of((Ty::new() : Ty[Content])),
         native_outline_entry_page_call,
@@ -9886,7 +9886,7 @@ pub fn native_outline_entry_page() -> NativeFuncData {
 fn native_outline_entry_page_call(engine : Engine, context : Context, args : Args) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : OutlineEntry = args.expect("self")
   args.take().finish()
   let output = impl_outline_entry_page(self_, engine, context, args.span)
   IntoValue::into_value(output)
