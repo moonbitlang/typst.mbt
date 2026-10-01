@@ -207,9 +207,58 @@ fn test_library() -> @library.Library {
       let lib = @library.Library::builder(routines)
         .with_global(define_test_globals)
         .build()
+      define_test_colors(lib)
       test_library_cell.val = Some(lib)
       lib
     }
+  }
+}
+
+///|
+/// Define the test colors (`conifer`, `forest`, `check.red`).
+///
+/// The oracle constructs them natively with `Color::from_u8`; here they are
+/// evaluated from equivalent code so that the test world does not depend on
+/// the internals of the color port. Colors that cannot be evaluated yet are
+/// left undefined.
+fn define_test_colors(lib : @library.Library) -> Unit {
+  let world : TestWorld = { main: @syntax.Source::detached(""), library: lib, }
+  let engine : @library.Engine = {
+    world,
+    library: lib,
+    introspector: @library.Introspector::empty(),
+    traced: @library.Traced::new(),
+    sink: @library.Sink::new(),
+    route: @library.Route::root(),
+  }
+  let color = (code : String) => {
+    let value = @eval.eval_string(
+      engine,
+      @library.Context::none(),
+      code,
+      @syntax.Span::detached(),
+      Code,
+      @library.Scope::new(),
+    ) catch {
+      _ => return None
+    }
+    if value is Color(_) {
+      Some(value)
+    } else {
+      None
+    }
+  }
+  let global = lib.global.scope()
+  if color("rgb(\"#9feb52\")") is Some(v) {
+    global.define("conifer", v) |> ignore
+  }
+  if color("rgb(\"#43a127\")") is Some(v) {
+    global.define("forest", v) |> ignore
+  }
+  if color("red") is Some(v) &&
+    global.get("check") is Some(binding) &&
+    binding.value is Module(check) {
+    check.scope().define("red", v) |> ignore
   }
 }
 
