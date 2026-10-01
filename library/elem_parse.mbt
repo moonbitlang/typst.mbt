@@ -337,22 +337,6 @@ fn binom_elem_lower_parse(
   Some(Array(Arr::from_array(values.map(s => Content(s.v.display())))))
 }
 
-// math/lr.rs: LrElem
-
-///|
-fn lr_elem_body_parse(
-  _engine : Engine,
-  args : Args,
-  _locals : ParseLocals,
-) -> Value? raise SourceError {
-  let arguments : Array[Content] = args.all()
-  let mut body = arguments.get(0).unwrap_or(Content::empty())
-  for arg in arguments[1:] {
-    body = body.add(SymbolElem::packed(",").add(arg))
-  }
-  Some(Content(body))
-}
-
 // math/matrix.rs: MatElem
 
 ///|

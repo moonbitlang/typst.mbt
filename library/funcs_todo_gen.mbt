@@ -2147,22 +2147,6 @@ fn impl_regex_construct(
 }
 
 ///|
-/// TODO: port `Symbol.construct` (typst-library/src/foundations/symbol.rs).
-fn impl_symbol_construct(
-  span : @syntax.Span,
-  variants_ : Array[@syntax.Spanned[Value]],
-) -> Value raise SourceError {
-  ignore(span)
-  ignore(variants_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`Symbol.construct` is not yet ported",
-    ),
-  ])
-}
-
-///|
 /// TODO: port `target` (typst-library/src/foundations/target.rs).
 fn impl_target(context : Context) -> Value raise HintedError {
   ignore(context)

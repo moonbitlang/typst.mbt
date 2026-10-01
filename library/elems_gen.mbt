@@ -2,18 +2,15 @@
 // Unmapped field types (stored untyped as `Value`):
 //    14 Smart<Length>
 //    12 Sides<Option<Rel<Length>>>
-//    10 NonZeroUsize
 //    10 TrackSizings
 //     9 Option<Paint>
 //     8 Smart<usize>
-//     8 usize
 //     7 Sizing
 //     7 Smart<Rel<Length>>
 //     6 Alignment
 //     6 Smart<bool>
 //     6 Option<Numbering>
 //     5 Corners<Option<Rel<Length>>>
-//     5 Option<NonZeroUsize>
 //     5 Smart<Option<Content>>
 //     5 Axes<Rel<Length>>
 //     4 Option<Arc<Stroke>>
@@ -39,7 +36,6 @@
 //     2 Celled<Option<Paint>>
 //     2 Celled<Sides<Option<Option<Arc<Stroke>>>>>
 //     2 Arc<CellGrid>
-//     2 NonZeroU32
 //     2 Vec<GridItem>
 //     2 Smart<Sides<Option<Rel<Length>>>>
 //     2 Sides<Option<Option<Arc<Stroke>>>>
@@ -80,7 +76,6 @@
 //     1 Dir
 //     1 Option<Spacing>
 //     1 Vec<StackChild>
-//     1 Accent
 //     1 Smart<CancelAngle>
 //     1 SpecificAlignment<OuterHAlignment, VAlignment>
 //     1 MathSize
@@ -88,7 +83,6 @@
 //     1 (i16, i16)
 //     1 FracStyle
 //     1 Option<Augment>
-//     1 Vec<Vec<Content>>
 //     1 MathClass
 //     1 ArtifactKind
 //     1 PdfMarkerTagKind
@@ -572,7 +566,7 @@ pub fn columns_elem() -> Element {
         capabilities=[],
         fields=[
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[NonZeroUSize]),
             id=0,
             name="count",
             kind=Settable,
@@ -1148,9 +1142,13 @@ pub fn grid_header_elem() -> Element {
           field_of((Ty::new() : Ty[Bool]), id=0, name="repeat", kind=Settable, default=() => {
             Bool(true)
           }),
-          field_of((Ty::new() : Ty[Value]), id=1, name="level", kind=Settable, default=() => {
-            Int(1L)
-          }),
+          field_of(
+            (Ty::new() : Ty[NonZeroU32]),
+            id=1,
+            name="level",
+            kind=Settable,
+            default=() => Int(1L),
+          ),
           field_of(
             (Ty::new() : Ty[Value]),
             id=2,
@@ -1243,14 +1241,14 @@ pub fn grid_h_line_elem() -> Element {
             default=grid_h_line_elem_y_default,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[USize]),
             id=1,
             name="start",
             kind=Settable,
             default=grid_h_line_elem_start_default,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[NonZeroUSize?]),
             id=2,
             name="end",
             kind=Settable,
@@ -1318,14 +1316,14 @@ pub fn grid_v_line_elem() -> Element {
             default=grid_v_line_elem_x_default,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[USize]),
             id=1,
             name="start",
             kind=Settable,
             default=grid_v_line_elem_start_default,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[NonZeroUSize?]),
             id=2,
             name="end",
             kind=Settable,
@@ -1408,14 +1406,14 @@ pub fn grid_cell_elem() -> Element {
             default=grid_cell_elem_y_default,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[NonZeroUSize]),
             id=3,
             name="colspan",
             kind=Settable,
             default=() => Int(1L),
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[NonZeroUSize]),
             id=4,
             name="rowspan",
             kind=Settable,
@@ -1759,9 +1757,13 @@ pub fn page_elem() -> Element {
             kind=Ghost,
             default=page_elem_binding_default,
           ),
-          field_of((Ty::new() : Ty[Value]), id=7, name="columns", kind=Ghost, default=() => {
-            Int(1L)
-          }),
+          field_of(
+            (Ty::new() : Ty[NonZeroUSize]),
+            id=7,
+            name="columns",
+            kind=Ghost,
+            default=() => Int(1L),
+          ),
           field_of(
             (Ty::new() : Ty[Value]),
             id=8,
@@ -2565,7 +2567,7 @@ pub fn accent_elem() -> Element {
             required=true,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Accent]),
             id=1,
             name="accent",
             kind=Required,
@@ -2718,7 +2720,7 @@ pub fn primes_elem() -> Element {
         capabilities=["Mathy"],
         fields=[
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[USize]),
             id=0,
             name="count",
             kind=Required,
@@ -5293,15 +5295,19 @@ pub fn heading_elem() -> Element {
             kind=Settable,
             default=heading_elem_level_default,
           ),
-          field_of((Ty::new() : Ty[Value]), id=1, name="depth", kind=Settable, default=() => {
-            Int(1L)
-          }),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[NonZeroUSize]),
+            id=1,
+            name="depth",
+            kind=Settable,
+            default=() => Int(1L),
+          ),
+          field_of(
+            (Ty::new() : Ty[USize]),
             id=2,
             name="offset",
             kind=Settable,
-            default=() => Int(0L),
+            default=heading_elem_offset_default,
           ),
           field_of(
             (Ty::new() : Ty[Value]),
@@ -5728,7 +5734,7 @@ pub fn outline_elem() -> Element {
             default=outline_elem_target_default,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[NonZeroUSize?]),
             id=2,
             name="depth",
             kind=Settable,
@@ -5778,7 +5784,7 @@ pub fn outline_entry_elem() -> Element {
         capabilities=["Locatable", "Tagged"],
         fields=[
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[NonZeroUSize]),
             id=0,
             name="level",
             kind=Required,
@@ -5853,7 +5859,7 @@ pub fn prefix_info_elem() -> Element {
             required=true,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[NonZeroUSize]),
             id=1,
             name="level",
             kind=Required,
@@ -6523,9 +6529,13 @@ pub fn table_header_elem() -> Element {
           field_of((Ty::new() : Ty[Bool]), id=0, name="repeat", kind=Settable, default=() => {
             Bool(true)
           }),
-          field_of((Ty::new() : Ty[Value]), id=1, name="level", kind=Settable, default=() => {
-            Int(1L)
-          }),
+          field_of(
+            (Ty::new() : Ty[NonZeroU32]),
+            id=1,
+            name="level",
+            kind=Settable,
+            default=() => Int(1L),
+          ),
           field_of(
             (Ty::new() : Ty[Value]),
             id=2,
@@ -6618,14 +6628,14 @@ pub fn table_h_line_elem() -> Element {
             default=table_h_line_elem_y_default,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[USize]),
             id=1,
             name="start",
             kind=Settable,
             default=table_h_line_elem_start_default,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[NonZeroUSize?]),
             id=2,
             name="end",
             kind=Settable,
@@ -6693,14 +6703,14 @@ pub fn table_v_line_elem() -> Element {
             default=table_v_line_elem_x_default,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[USize]),
             id=1,
             name="start",
             kind=Settable,
             default=table_v_line_elem_start_default,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[NonZeroUSize?]),
             id=2,
             name="end",
             kind=Settable,
@@ -6783,14 +6793,14 @@ pub fn table_cell_elem() -> Element {
             default=table_cell_elem_y_default,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[NonZeroUSize]),
             id=3,
             name="colspan",
             kind=Settable,
             default=() => Int(1L),
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[NonZeroUSize]),
             id=4,
             name="rowspan",
             kind=Settable,
@@ -7697,7 +7707,7 @@ pub fn text_elem() -> Element {
             required=true,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[USize]),
             id=35,
             name="span-offset",
             kind=Ghost,
@@ -7950,11 +7960,11 @@ pub fn raw_elem() -> Element {
             default=raw_elem_theme_default,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[USize]),
             id=6,
             name="tab-size",
             kind=Settable,
-            default=() => Int(2L),
+            default=raw_elem_tab_size_default,
           ),
           field_of(
             (Ty::new() : Ty[Value]),
@@ -8699,9 +8709,13 @@ pub fn image_elem() -> Element {
             kind=Settable,
             default=image_elem_alt_default,
           ),
-          field_of((Ty::new() : Ty[Value]), id=5, name="page", kind=Settable, default=() => {
-            Int(1L)
-          }),
+          field_of(
+            (Ty::new() : Ty[NonZeroUSize]),
+            id=5,
+            name="page",
+            kind=Settable,
+            default=() => Int(1L),
+          ),
           field_of(
             (Ty::new() : Ty[Value]),
             id=6,

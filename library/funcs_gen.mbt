@@ -10890,7 +10890,7 @@ pub fn native_symbol_construct() -> NativeFuncData {
           {
             name: "variants",
             docs: "The variants of the symbol.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[SymbolVariant])),
             default: None,
             positional: true,
             named: false,
@@ -10899,7 +10899,7 @@ pub fn native_symbol_construct() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Symbol])),
         native_symbol_construct_call,
       )
       native_symbol_construct_cell.val = Some(d)
@@ -10916,7 +10916,7 @@ fn native_symbol_construct_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let variants_ : Array[@syntax.Spanned[Value]] = args.all_spanned()
+  let variants_ : Array[@syntax.Spanned[SymbolVariant]] = args.all_spanned()
   args.take().finish()
   let output = impl_symbol_construct(args.span, variants_)
   IntoValue::into_value(output)

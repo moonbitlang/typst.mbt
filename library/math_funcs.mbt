@@ -1,5 +1,5 @@
-// Native math functions of `typst-library/src/math/{lr.rs, root.rs,
-// style.rs}`.
+// Native math functions of `typst-library/src/math/{root.rs, style.rs}`
+// (the `lr.rs` ones are in `lr.mbt`).
 
 ///|
 /// Set a style property on content (upstream `Content::set`).
@@ -11,82 +11,6 @@ pub fn Content::set(
 ) -> Content {
   self.styled(Property(Property::new(elem, id, value)))
 }
-
-// lr.rs
-
-///|
-fn delimited(
-  body : Content,
-  left : String,
-  right : String,
-  size : Rel[Length]?,
-) -> Content {
-  let span = body.span()
-  let mut elem = Content::new(lr_elem(), [
-    (
-      lr_elem_body,
-      Content(
-        Content::sequence([
-          SymbolElem::packed(left),
-          body,
-          SymbolElem::packed(right),
-        ]),
-      ),
-    ),
-  ])
-  // Push size only if size is provided
-  if size is Some(size) {
-    elem = elem.with_field(lr_elem_size, IntoValue::into_value(size))
-  }
-  elem.spanned(span)
-}
-
-///|
-/// Floors an expression.
-fn impl_math_floor(
-  size_ : Rel[Length]?,
-  body_ : Content,
-) -> Content raise HintedError {
-  delimited(body_, "⌊", "⌋", size_)
-}
-
-///|
-/// Ceils an expression.
-fn impl_math_ceil(
-  size_ : Rel[Length]?,
-  body_ : Content,
-) -> Content raise HintedError {
-  delimited(body_, "⌈", "⌉", size_)
-}
-
-///|
-/// Rounds an expression.
-fn impl_math_round(
-  size_ : Rel[Length]?,
-  body_ : Content,
-) -> Content raise HintedError {
-  delimited(body_, "⌊", "⌉", size_)
-}
-
-///|
-/// Takes the absolute value of an expression.
-fn impl_math_abs(
-  size_ : Rel[Length]?,
-  body_ : Content,
-) -> Content raise HintedError {
-  delimited(body_, "|", "|", size_)
-}
-
-///|
-/// Takes the norm of an expression.
-fn impl_math_norm(
-  size_ : Rel[Length]?,
-  body_ : Content,
-) -> Content raise HintedError {
-  delimited(body_, "‖", "‖", size_)
-}
-
-// root.rs
 
 ///|
 /// A square root.
@@ -120,12 +44,6 @@ fn math_size(body : Content, size : String, cramped : Bool) -> Content {
 /// Bold font style in math.
 fn impl_math_bold(body_ : Content) -> Content raise HintedError {
   body_.set(equation_elem(), equation_elem_bold, Bool(true))
-}
-
-///|
-/// Upright (non-italic) font style in math.
-fn impl_math_upright(body_ : Content) -> Content raise HintedError {
-  body_.set(equation_elem(), equation_elem_italic, Bool(false))
 }
 
 ///|

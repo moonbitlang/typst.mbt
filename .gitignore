@@ -1,9 +1,9 @@
-.repos/
+.repos
 _build/
 target/
 .mooncakes/
 *.log
 .DS_Store
-tests/golden/
+tests/golden
 __pycache__/
 .claude/

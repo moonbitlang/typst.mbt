@@ -308,6 +308,15 @@ pub fn math_module() -> Module {
     math.define_elem(elem) |> ignore
   }
   define_globals(math, "math")
+
+  // Text operators.
+  op_define(math)
+
+  // Spacings.
+  math_define_spacings(math)
+
+  // Symbols.
+  symbols_define_math(math)
   Module::new("math", math)
 }
 
@@ -385,6 +394,7 @@ pub fn LibraryBuilder::build(self : LibraryBuilder) -> Library {
   visualize_define(global)
   introspection_define(global)
   loading_define(global)
+  symbols_define(global)
   global.define("format", Module(format_module(self.formats))) |> ignore
   global.define("math", Module(math)) |> ignore
   // If available, add some items to the global prelude.

@@ -14,7 +14,7 @@ Any such hook that is not defined in a handwritten `library/*.mbt` file gets a
 stub in `library/elems_todo_gen.mbt`, so the package always compiles; the stub
 list doubles as a TODO list.
 
-Field types are mapped through TYPEMAP. Types without a MoonBit port yet map to
+Field types are mapped through TYPEMAP (scripts/typemap.py). Types without a MoonBit port yet map to
 `Value` (no validation) and are listed in the generated file header.
 """
 
@@ -26,28 +26,9 @@ import sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LIB = os.path.join(ROOT, "library")
 
-# Rust field type -> MoonBit type (must implement FromValue + IntoValue).
-TYPEMAP = {
-    "bool": "Bool",
-    "i64": "Int64",
-    "f64": "Double",
-    "Content": "Content",
-    "Option<Content>": "Content?",
-    "Vec<Content>": "Array[Content]",
-    "Length": "Length",
-    "Angle": "Angle",
-    "Ratio": "Ratio",
-    "Fr": "Fr",
-    "Rel<Length>": "Rel[Length]",
-    "EcoString": "String",
-    "Str": "String",
-    "Option<EcoString>": "String?",
-    "Option<bool>": "Bool?",
-    "Func": "Func",
-    "Label": "Label",
-    "Styles": "Styles",
-    "Value": "Value",
-}
+# Field types are mapped with the shared TYPEMAP of `typemap.py`.
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from typemap import mbt_type  # noqa: E402
 
 # Rust `Default::default()` of a mapped type, as a Value expression.
 TYPE_DEFAULTS = {
@@ -81,10 +62,6 @@ def elem_var(ident, file=""):
         elif "typst-pdf" in file:
             s = "pdf_" + s
     return s
-
-
-def mbt_type(rust):
-    return TYPEMAP.get(rust, "Value")
 
 
 def float_lit(x):

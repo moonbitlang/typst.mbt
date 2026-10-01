@@ -995,6 +995,12 @@ fn heading_elem_level_default() -> Value {
 }
 
 ///|
+/// TODO: port `0` (HeadingElem.offset).
+fn heading_elem_offset_default() -> Value {
+  None
+}
+
+///|
 /// TODO: port `Default::default() of Option<Numbering>` (HeadingElem.numbering).
 fn heading_elem_numbering_default() -> Value {
   None
@@ -1737,6 +1743,12 @@ fn raw_elem_theme_default() -> Value {
 }
 
 // TODO: port `#[parse]` of RawElem.theme as `raw_elem_theme_parse`.
+
+///|
+/// TODO: port `2` (RawElem.tab_size).
+fn raw_elem_tab_size_default() -> Value {
+  None
+}
 
 ///|
 /// TODO: port `Default::default() of Smart<Length>` (SubElem.baseline).

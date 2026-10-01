@@ -41,6 +41,9 @@ TYPEMAP = {
     "Args": "Args",
     "Type": "Type",
     "SyntaxMode": "@syntax.SyntaxMode",
+    "Symbol": "Symbol",
+    "SymbolVariant": "SymbolVariant",
+    "Accent": "Accent",
 }
 
 # Generic Rust types with a MoonBit port: Rust name -> MoonBit name. A use
