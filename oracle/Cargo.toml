@@ -11,6 +11,7 @@ typst-utils = { path = "../.repos/typst/crates/typst-utils", features = ["full"]
 unicode-ident = "1.0"
 unicode-math-class = "0.1"
 unicode-script = "0.5"
+codex = { git = "https://github.com/typst/codex", rev = "2e43ab9" }
 typst = { path = "../.repos/typst/crates/typst" }
 typst-eval = { path = "../.repos/typst/crates/typst-eval" }
 typst-library = { path = "../.repos/typst/crates/typst-library" }

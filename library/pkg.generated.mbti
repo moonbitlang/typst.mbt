@@ -515,6 +515,10 @@ pub let frame_elem_body : Int
 
 pub fn geq(Value, Value) -> Value raise HintedError
 
+pub fn get_accent_func(String) -> Func?
+
+pub fn get_lr_wrapper_func(String) -> Func?
+
 pub fn grid_cell_elem() -> Element
 
 pub let grid_cell_elem_align : Int
@@ -2328,6 +2332,13 @@ pub(all) enum AbsUnit {
   In
 } derive(Eq, Hash, @debug.Debug)
 
+pub(all) struct Accent(Char) derive(Eq, Hash, @debug.Debug)
+pub fn Accent::combining(String) -> Self?
+pub fn Accent::normalize(String) -> Self?
+pub impl FromValue for Accent
+pub impl IntoValue for Accent
+pub impl Reflect for Accent
+
 pub(all) struct Alignment {
   // private fields
 } derive(Eq, Hash)
@@ -2963,6 +2974,17 @@ pub fn LinkElem::from_url(String) -> Content raise HintedError
 pub(all) struct Location(UInt64) derive(Compare, Eq, Hash)
 pub fn Location::repr(Self) -> String
 
+pub(all) struct ModifierSet(String) derive(Eq, Hash, @debug.Debug)
+pub fn ModifierSet::as_str(Self) -> String
+pub fn[T] ModifierSet::best_match_in(Self, Iter[(Self, T)]) -> T?
+pub fn ModifierSet::contains(Self, String) -> Bool
+pub fn ModifierSet::default() -> Self
+pub fn ModifierSet::from_raw_dotted(String) -> Self
+pub fn ModifierSet::insert_raw(Self, String) -> Self
+pub fn ModifierSet::is_empty(Self) -> Bool
+pub fn ModifierSet::is_subset(Self, Self) -> Bool
+pub fn ModifierSet::iter(Self) -> Array[String]
+
 pub struct Module {
   // private fields
 }
@@ -3345,17 +3367,30 @@ pub impl FromValue for Styles
 pub impl IntoValue for Styles
 pub impl Reflect for Styles
 
-pub(all) struct Symbol {
+pub struct Symbol {
   // private fields
 } derive(Eq, Hash)
 pub fn Symbol::func(Self) -> Func raise HintedError
 pub fn Symbol::get(Self) -> String
+pub fn Symbol::list(Array[(ModifierSet, String, String?)]) -> Self
 pub fn Symbol::modified(Self, BindingGuard, String) -> Self raise HintedError
+pub fn Symbol::modifiers(Self) -> Array[String]
 pub fn Symbol::repr(Self) -> String
+pub fn Symbol::runtime(Array[(ModifierSet, String, String?)]) -> Self
 pub fn Symbol::runtime_char(Char) -> Self
+pub fn Symbol::single(String) -> Self
+pub fn Symbol::variants(Self) -> Array[(ModifierSet, String, String?)]
+pub impl Show for Symbol
+pub impl FromValue for Symbol
+pub impl IntoValue for Symbol
+pub impl Reflect for Symbol
 
 pub struct SymbolElem(Content)
 pub fn SymbolElem::packed(String) -> Content
+
+pub(all) struct SymbolVariant(String, String)
+pub impl FromValue for SymbolVariant
+pub impl Reflect for SymbolVariant
 
 pub struct TextElem(Content)
 pub fn TextElem::packed(String) -> Content
@@ -3534,6 +3569,8 @@ pub(all) struct Warned[T] {
 
 // Type aliases
 pub type NativeFn = (Engine, Context, Args) -> Value raise SourceError
+
+pub type SymbolVariantData = (ModifierSet, String, String?)
 
 // Traits
 pub(open) trait FromValue : Reflect {

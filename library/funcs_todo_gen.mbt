@@ -2205,22 +2205,6 @@ fn impl_regex_construct(
 }
 
 ///|
-/// TODO: port `Symbol.construct` (typst-library/src/foundations/symbol.rs).
-fn impl_symbol_construct(
-  span : @syntax.Span,
-  variants_ : Array[@syntax.Spanned[Value]],
-) -> Value raise SourceError {
-  ignore(span)
-  ignore(variants_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`Symbol.construct` is not yet ported",
-    ),
-  ])
-}
-
-///|
 /// TODO: port `target` (typst-library/src/foundations/target.rs).
 fn impl_target(context : Context) -> Value raise HintedError {
   ignore(context)
@@ -2999,61 +2983,6 @@ fn impl_yaml_encode(
 }
 
 ///|
-/// TODO: port `math.floor` (typst-library/src/math/lr.rs).
-fn impl_math_floor(
-  size_ : Rel[Length]?,
-  body_ : Content,
-) -> Content raise HintedError {
-  ignore(size_)
-  ignore(body_)
-  bail("`math.floor` is not yet ported")
-}
-
-///|
-/// TODO: port `math.ceil` (typst-library/src/math/lr.rs).
-fn impl_math_ceil(
-  size_ : Rel[Length]?,
-  body_ : Content,
-) -> Content raise HintedError {
-  ignore(size_)
-  ignore(body_)
-  bail("`math.ceil` is not yet ported")
-}
-
-///|
-/// TODO: port `math.round` (typst-library/src/math/lr.rs).
-fn impl_math_round(
-  size_ : Rel[Length]?,
-  body_ : Content,
-) -> Content raise HintedError {
-  ignore(size_)
-  ignore(body_)
-  bail("`math.round` is not yet ported")
-}
-
-///|
-/// TODO: port `math.abs` (typst-library/src/math/lr.rs).
-fn impl_math_abs(
-  size_ : Rel[Length]?,
-  body_ : Content,
-) -> Content raise HintedError {
-  ignore(size_)
-  ignore(body_)
-  bail("`math.abs` is not yet ported")
-}
-
-///|
-/// TODO: port `math.norm` (typst-library/src/math/lr.rs).
-fn impl_math_norm(
-  size_ : Rel[Length]?,
-  body_ : Content,
-) -> Content raise HintedError {
-  ignore(size_)
-  ignore(body_)
-  bail("`math.norm` is not yet ported")
-}
-
-///|
 /// TODO: port `math.sqrt` (typst-library/src/math/root.rs).
 fn impl_math_sqrt(
   span : @syntax.Span,
@@ -3069,13 +2998,6 @@ fn impl_math_sqrt(
 fn impl_math_bold(body_ : Content) -> Content raise HintedError {
   ignore(body_)
   bail("`math.bold` is not yet ported")
-}
-
-///|
-/// TODO: port `math.upright` (typst-library/src/math/style.rs).
-fn impl_math_upright(body_ : Content) -> Content raise HintedError {
-  ignore(body_)
-  bail("`math.upright` is not yet ported")
 }
 
 ///|
