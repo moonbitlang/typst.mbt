@@ -833,44 +833,6 @@ fn highlight_elem_bottom_edge_default() -> Value {
 }
 
 ///|
-/// TODO: port `FontList(vec ![FontFamily::new("Libertinus Serif")])` (TextElem.font).
-fn text_elem_font_default() -> Value {
-  None
-}
-
-// TODO: port `#[parse]` of TextElem.font as `text_elem_font_parse`.
-
-///|
-/// TODO: port `Default::default() of FontStyle` (TextElem.style).
-fn text_elem_style_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of FontWeight` (TextElem.weight).
-fn text_elem_weight_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of FontStretch` (TextElem.stretch).
-fn text_elem_stretch_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `TextSize(Abs::pt(11.0).into())` (TextElem.size).
-fn text_elem_size_default() -> Value {
-  None
-}
-
-///|
-/// TODO: fold for `TextSize` (TextElem.size).
-fn text_elem_size_fold(inner : Value, _outer : Value) -> Value {
-  inner
-}
-
-///|
 /// TODO: port `Color::BLACK.into()` (TextElem.fill).
 fn text_elem_fill_default() -> Value {
   None
@@ -880,132 +842,6 @@ fn text_elem_fill_default() -> Value {
 /// TODO: port `Default::default() of Option<Stroke>` (TextElem.stroke).
 fn text_elem_stroke_default() -> Value {
   None
-}
-
-///|
-/// TODO: port `Default::default() of Smart<Option<Never>>` (TextElem.cjk_latin_spacing).
-fn text_elem_cjk_latin_spacing_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `TopEdge::Metric(TopEdgeMetric::CapHeight)` (TextElem.top_edge).
-fn text_elem_top_edge_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `BottomEdge::Metric(BottomEdgeMetric::Baseline)` (TextElem.bottom_edge).
-fn text_elem_bottom_edge_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Lang::ENGLISH` (TextElem.lang).
-fn text_elem_lang_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Option<Region>` (TextElem.region).
-fn text_elem_region_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Smart<WritingScript>` (TextElem.script).
-fn text_elem_script_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of TextDir` (TextElem.dir).
-fn text_elem_dir_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Costs` (TextElem.costs).
-fn text_elem_costs_default() -> Value {
-  None
-}
-
-///|
-/// TODO: fold for `Costs` (TextElem.costs).
-fn text_elem_costs_fold(inner : Value, _outer : Value) -> Value {
-  inner
-}
-
-///|
-/// TODO: port `Default::default() of Alternates` (TextElem.alternates).
-fn text_elem_alternates_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of StylisticSets` (TextElem.stylistic_set).
-fn text_elem_stylistic_set_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Smart<NumberType>` (TextElem.number_type).
-fn text_elem_number_type_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Smart<NumberWidth>` (TextElem.number_width).
-fn text_elem_number_width_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of FontFeatures` (TextElem.features).
-fn text_elem_features_default() -> Value {
-  None
-}
-
-///|
-/// TODO: fold for `FontFeatures` (TextElem.features).
-fn text_elem_features_fold(inner : Value, _outer : Value) -> Value {
-  inner
-}
-
-///|
-/// TODO: port `Default::default() of FontVariations` (TextElem.variations).
-fn text_elem_variations_default() -> Value {
-  None
-}
-
-///|
-/// TODO: fold for `FontVariations` (TextElem.variations).
-fn text_elem_variations_fold(inner : Value, _outer : Value) -> Value {
-  inner
-}
-
-///|
-/// TODO: port `Default::default() of WeightDelta` (TextElem.delta).
-fn text_elem_delta_default() -> Value {
-  None
-}
-
-///|
-/// TODO: fold for `WeightDelta` (TextElem.delta).
-fn text_elem_delta_fold(inner : Value, _outer : Value) -> Value {
-  inner
-}
-
-///|
-/// TODO: port `ItalicToggle(false)` (TextElem.emph).
-fn text_elem_emph_default() -> Value {
-  None
-}
-
-///|
-/// TODO: fold for `ItalicToggle` (TextElem.emph).
-fn text_elem_emph_fold(inner : Value, _outer : Value) -> Value {
-  inner
 }
 
 ///|
@@ -1059,18 +895,6 @@ fn raw_elem_theme_default() -> Value {
 }
 
 // TODO: port `#[parse]` of RawElem.theme as `raw_elem_theme_parse`.
-
-///|
-/// TODO: port `Default::default() of Smart<TextSize>` (SubElem.size).
-fn sub_elem_size_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Smart<TextSize>` (SuperElem.size).
-fn super_elem_size_default() -> Value {
-  None
-}
 
 ///|
 /// TODO: port `Default::default() of Smart<SmartQuoteDict>` (SmartQuoteElem.quotes).

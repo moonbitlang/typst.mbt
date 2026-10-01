@@ -11,8 +11,6 @@
 //     3 Smart<ScaleAmount>
 //     3 Locale
 //     3 DelimiterPair
-//     3 Lang
-//     3 Option<Region>
 //     3 Numbering
 //     3 Location
 //     3 Smart<Stroke>
@@ -29,9 +27,6 @@
 //     2 Option<Counter>
 //     2 Depth
 //     2 Vec<TableItem>
-//     2 TopEdge
-//     2 BottomEdge
-//     2 Smart<TextSize>
 //     2 FillRule
 //     2 Smart<Sides<Option<Option<Stroke>>>>
 //     1 Target
@@ -93,25 +88,8 @@
 //     1 Vec<TableChild>
 //     1 Smart<TableCellKind>
 //     1 Vec<Packed<TermItem>>
-//     1 FontList
-//     1 FontStyle
-//     1 FontWeight
-//     1 FontStretch
-//     1 TextSize
 //     1 Paint
 //     1 Option<Stroke>
-//     1 Smart<Option<Never>>
-//     1 Smart<WritingScript>
-//     1 TextDir
-//     1 Costs
-//     1 Alternates
-//     1 StylisticSets
-//     1 Smart<NumberType>
-//     1 Smart<NumberWidth>
-//     1 FontFeatures
-//     1 FontVariations
-//     1 WeightDelta
-//     1 ItalicToggle
 //     1 SmallVec<[Decoration; 1]>
 //     1 Option<Case>
 //     1 Option<Smallcaps>
@@ -4250,14 +4228,14 @@ pub fn bibliography_elem() -> Element {
             default=() => Auto,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Lang]),
             id=6,
             name="lang",
             kind=Synthesized,
             internal=true,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Region?]),
             id=7,
             name="region",
             kind=Synthesized,
@@ -4411,14 +4389,14 @@ pub fn cite_elem() -> Element {
             default=cite_elem_style_default,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Lang]),
             id=4,
             name="lang",
             kind=Synthesized,
             internal=true,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Region?]),
             id=5,
             name="region",
             kind=Synthesized,
@@ -7294,14 +7272,14 @@ pub fn highlight_elem() -> Element {
             fold=highlight_elem_stroke_fold,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[TopEdge]),
             id=2,
             name="top-edge",
             kind=Settable,
             default=highlight_elem_top_edge_default,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[BottomEdge]),
             id=3,
             name="bottom-edge",
             kind=Settable,
@@ -7410,38 +7388,39 @@ pub fn text_elem() -> Element {
         capabilities=["Debug", "Construct", "PlainText", "Repr"],
         fields=[
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[FontList]),
             id=0,
             name="font",
             kind=Ghost,
             default=text_elem_font_default,
+            parse=text_elem_font_parse,
           ),
           field_of((Ty::new() : Ty[Bool]), id=1, name="fallback", kind=Ghost, default=() => {
             Bool(true)
           }),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[FontStyle]),
             id=2,
             name="style",
             kind=Ghost,
             default=text_elem_style_default,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[FontWeight]),
             id=3,
             name="weight",
             kind=Ghost,
             default=text_elem_weight_default,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[FontStretch]),
             id=4,
             name="stretch",
             kind=Ghost,
             default=text_elem_stretch_default,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[TextSize]),
             id=5,
             name="size",
             kind=Ghost,
@@ -7479,11 +7458,11 @@ pub fn text_elem() -> Element {
             default=() => Relative(Rel::one()),
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Smart[Never?]]),
             id=10,
             name="cjk-latin-spacing",
             kind=Ghost,
-            default=text_elem_cjk_latin_spacing_default,
+            default=() => Auto,
           ),
           field_of(
             (Ty::new() : Ty[Length]),
@@ -7496,42 +7475,42 @@ pub fn text_elem() -> Element {
             Bool(true)
           }),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[TopEdge]),
             id=13,
             name="top-edge",
             kind=Ghost,
             default=text_elem_top_edge_default,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[BottomEdge]),
             id=14,
             name="bottom-edge",
             kind=Ghost,
             default=text_elem_bottom_edge_default,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Lang]),
             id=15,
             name="lang",
             kind=Ghost,
             default=text_elem_lang_default,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Region?]),
             id=16,
             name="region",
             kind=Ghost,
-            default=text_elem_region_default,
+            default=() => None,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Smart[WritingScript]]),
             id=17,
             name="script",
             kind=Ghost,
-            default=text_elem_script_default,
+            default=() => Auto,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[TextDir]),
             id=18,
             name="dir",
             kind=Ghost,
@@ -7545,7 +7524,7 @@ pub fn text_elem() -> Element {
             default=() => Auto,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Costs]),
             id=20,
             name="costs",
             kind=Ghost,
@@ -7556,14 +7535,14 @@ pub fn text_elem() -> Element {
             Bool(true)
           }),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Alternates]),
             id=22,
             name="alternates",
             kind=Ghost,
             default=text_elem_alternates_default,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[StylisticSets]),
             id=23,
             name="stylistic-set",
             kind=Ghost,
@@ -7591,18 +7570,18 @@ pub fn text_elem() -> Element {
             default=() => Bool(false),
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Smart[NumberType]]),
             id=27,
             name="number-type",
             kind=Ghost,
-            default=text_elem_number_type_default,
+            default=() => Auto,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Smart[NumberWidth]]),
             id=28,
             name="number-width",
             kind=Ghost,
-            default=text_elem_number_width_default,
+            default=() => Auto,
           ),
           field_of(
             (Ty::new() : Ty[Bool]),
@@ -7619,7 +7598,7 @@ pub fn text_elem() -> Element {
             default=() => Bool(false),
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[FontFeatures]),
             id=31,
             name="features",
             kind=Ghost,
@@ -7627,7 +7606,7 @@ pub fn text_elem() -> Element {
             fold=text_elem_features_fold,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[FontVariations]),
             id=32,
             name="variations",
             kind=Ghost,
@@ -7659,7 +7638,7 @@ pub fn text_elem() -> Element {
             default=() => Int(0L),
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[WeightDelta]),
             id=36,
             name="delta",
             kind=Ghost,
@@ -7668,7 +7647,7 @@ pub fn text_elem() -> Element {
             fold=text_elem_delta_fold,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[ItalicToggle]),
             id=37,
             name="emph",
             kind=Ghost,
@@ -8047,11 +8026,11 @@ pub fn sub_elem() -> Element {
             default=() => Auto,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Smart[TextSize]]),
             id=2,
             name="size",
             kind=Settable,
-            default=sub_elem_size_default,
+            default=() => Auto,
           ),
           field_of(
             (Ty::new() : Ty[Content]),
@@ -8112,11 +8091,11 @@ pub fn super_elem() -> Element {
             default=() => Auto,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Smart[TextSize]]),
             id=2,
             name="size",
             kind=Settable,
-            default=super_elem_size_default,
+            default=() => Auto,
           ),
           field_of(
             (Ty::new() : Ty[Content]),

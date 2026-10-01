@@ -71,6 +71,28 @@ TYPEMAP = {
     "ToFloat": "ToFloat",
     "Base": "Base",
     "Endianness": "Endianness",
+    # text/mod.rs, text/font/, text/lang.rs
+    "FontList": "FontList",
+    "FontStyle": "FontStyle",
+    "FontWeight": "FontWeight",
+    "FontStretch": "FontStretch",
+    "TextSize": "TextSize",
+    "TopEdge": "TopEdge",
+    "BottomEdge": "BottomEdge",
+    "TextDir": "TextDir",
+    "Costs": "Costs",
+    "Alternates": "Alternates",
+    "StylisticSets": "StylisticSets",
+    "NumberType": "NumberType",
+    "NumberWidth": "NumberWidth",
+    "FontFeatures": "FontFeatures",
+    "FontVariations": "FontVariations",
+    "WeightDelta": "WeightDelta",
+    "ItalicToggle": "ItalicToggle",
+    "Never": "Never",
+    "Lang": "Lang",
+    "Region": "Region",
+    "WritingScript": "WritingScript",
 }
 
 # Generic Rust types with a MoonBit port: Rust name -> MoonBit name. A use
