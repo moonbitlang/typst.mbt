@@ -8,10 +8,12 @@
 | P1 syntax (lexer, parser, nodes, spans, LinkedNode) | **done** | 3792/3792 suite cases: tree + diagnostics byte-identical |
 | P1 syntax (typed AST, Lines) | **done** | 3792/3792 suite cases: AST semantic dump + `Lines` conversions identical (`ast` stage) |
 | P1 syntax (reparser, highlight) | todo | |
-| P2 eval | todo | |
+| P2 eval (typst-eval) | **done** | VM, closures, imports, rules, math; `eval` stage runs end to end |
+| P2 library foundations | in progress | 1424/3792 `eval` stage cases identical (2026-10-02); generators: `elemgen.py` (142 elements), `funcgen.py` (301 native functions) |
 
 Run `scripts/upstream.sh && scripts/goldens.sh && moon run tests/runner --target native -- syntax`
-(and `-- ast`).
+(and `-- ast`, `-- eval`). `python3 scripts/classify.py eval 60` buckets the
+remaining `eval` failures.
 
 Upstream reference: `.repos/typst` @ `e58a63af0` (2026-09-30). Pin this; port
 against one commit and re-sync deliberately.
