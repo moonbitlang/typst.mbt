@@ -137,3 +137,15 @@ pub impl FromValue for BaselinePos with fn from_value(v) {
 fn box_elem_baseline_default() -> Value {
   BaselinePos::default().into_value()
 }
+
+///|
+/// Upstream `Sizing::default()` (`auto`).
+fn box_elem_width_default() -> Value {
+  Auto
+}
+
+///|
+/// Upstream `Sizing::default()` (`auto`).
+fn block_elem_height_default() -> Value {
+  Auto
+}

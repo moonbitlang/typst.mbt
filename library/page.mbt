@@ -5,6 +5,40 @@
 // PageElem hooks
 
 ///|
+fn page_elem_init(e : Element) -> Unit {
+  // The page constructor is special: It doesn't create a page element.
+  // Instead, it just ensures that the passed content lives in a separate
+  // page and styles it. Because no element node is produced, `show` rules
+  // can't match `page`; use `set` rules instead.
+  e.hooks().construct = Some((engine, args) => {
+    let styles = e.set_fields(engine, args)
+    let body : Content = args.expect("body")
+    Content::sequence([
+      pagebreak_shared_weak(),
+      // We put an effectless, invisible non-tag element on the page. This has
+      // two desirable consequences:
+      // - The page is kept even if the body is empty
+      // - The page doesn't inherit shared styles from the body
+      Content::new(flush_elem(), []),
+      body,
+      pagebreak_shared_boundary(),
+    ]).styled_with_map(styles)
+  })
+}
+
+///|
+/// A weak page break (upstream `PagebreakElem::shared_weak`).
+fn pagebreak_shared_weak() -> Content {
+  Content::new(pagebreak_elem(), []).with_field(pagebreak_elem_weak, Bool(true))
+}
+
+///|
+/// A weak boundary page break (upstream `PagebreakElem::shared_boundary`).
+fn pagebreak_shared_boundary() -> Content {
+  pagebreak_shared_weak().with_field(pagebreak_elem_boundary, Bool(true))
+}
+
+///|
 fn page_elem_paper_default() -> Value {
   Paper::a4().into_value()
 }

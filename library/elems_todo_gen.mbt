@@ -13,12 +13,6 @@ fn align_elem_alignment_default() -> Value {
 }
 
 ///|
-/// TODO: port `Default::default() of Sizing` (BoxElem.width).
-fn box_elem_width_default() -> Value {
-  None
-}
-
-///|
 /// TODO: port `Default::default() of Option<Paint>` (BoxElem.fill).
 fn box_elem_fill_default() -> Value {
   None
@@ -34,12 +28,6 @@ fn box_elem_stroke_default() -> Value {
 /// TODO: fold for `Sides<Option<Option<Stroke>>>` (BoxElem.stroke).
 fn box_elem_stroke_fold(inner : Value, _outer : Value) -> Value {
   inner
-}
-
-///|
-/// TODO: port `Default::default() of Sizing` (BlockElem.height).
-fn block_elem_height_default() -> Value {
-  None
 }
 
 ///|
@@ -544,18 +532,6 @@ fn highlight_elem_stroke_default() -> Value {
 /// TODO: fold for `Sides<Option<Option<Stroke>>>` (HighlightElem.stroke).
 fn highlight_elem_stroke_fold(inner : Value, _outer : Value) -> Value {
   inner
-}
-
-///|
-/// TODO: port `TopEdge::Metric(TopEdgeMetric::Ascender)` (HighlightElem.top_edge).
-fn highlight_elem_top_edge_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `BottomEdge::Metric(BottomEdgeMetric::Descender)` (HighlightElem.bottom_edge).
-fn highlight_elem_bottom_edge_default() -> Value {
-  None
 }
 
 ///|

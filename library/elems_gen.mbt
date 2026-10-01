@@ -1755,6 +1755,7 @@ pub fn page_elem() -> Element {
         ],
       )
       page_elem_cell.val = Some(e)
+      page_elem_init(e)
       e
     }
   }
