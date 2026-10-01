@@ -219,11 +219,12 @@ def main():
                 args.append(f"fold={fname}")
             if f["parse"] is not None:
                 fname = f"{var}_{snake(f['ident'])}_parse"
-                if fname not in defined:
-                    todo.append(
-                        f"///|\n/// TODO: port `#[parse]` of {e['ident']}.{f['ident']}.\nfn {fname}(_engine : Engine, args : Args) -> Value? raise SourceError {{\n  args.named_with({mbt_str(f['name'])}, v => v)\n}}\n"
-                    )
-                args.append(f"parse={fname}")
+                # Until the custom parsing is ported, fall back to the default
+                # parsing of the field.
+                if fname in defined:
+                    args.append(f"parse={fname}")
+                else:
+                    todo.append(f"// TODO: port `#[parse]` of {e['ident']}.{f['ident']} as `{fname}`.\n")
             fields.append(f"    field_of({', '.join(args)}),")
         caps = ", ".join(mbt_str(c) for c in e["capabilities"])
         kws = ", ".join(mbt_str(k) for k in e["keywords"])

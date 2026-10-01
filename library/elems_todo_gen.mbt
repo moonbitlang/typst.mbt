@@ -180,14 +180,7 @@ fn block_elem_above_default() -> Value {
   None
 }
 
-///|
-/// TODO: port `#[parse]` of BlockElem.above.
-fn block_elem_above_parse(
-  _engine : Engine,
-  args : Args,
-) -> Value? raise SourceError {
-  args.named_with("above", v => v)
-}
+// TODO: port `#[parse]` of BlockElem.above as `block_elem_above_parse`.
 
 ///|
 /// TODO: port `Default::default() of Smart<Spacing>` (BlockElem.below).
@@ -195,14 +188,7 @@ fn block_elem_below_default() -> Value {
   None
 }
 
-///|
-/// TODO: port `#[parse]` of BlockElem.below.
-fn block_elem_below_parse(
-  _engine : Engine,
-  args : Args,
-) -> Value? raise SourceError {
-  args.named_with("below", v => v)
-}
+// TODO: port `#[parse]` of BlockElem.below as `block_elem_below_parse`.
 
 ///|
 /// TODO: port `Default::default() of Option<BlockBody>` (BlockElem.body).
@@ -234,14 +220,7 @@ fn grid_elem_column_gutter_default() -> Value {
   None
 }
 
-///|
-/// TODO: port `#[parse]` of GridElem.column_gutter.
-fn grid_elem_column_gutter_parse(
-  _engine : Engine,
-  args : Args,
-) -> Value? raise SourceError {
-  args.named_with("column-gutter", v => v)
-}
+// TODO: port `#[parse]` of GridElem.column_gutter as `grid_elem_column_gutter_parse`.
 
 ///|
 /// TODO: port `Default::default() of TrackSizings` (GridElem.row_gutter).
@@ -249,14 +228,7 @@ fn grid_elem_row_gutter_default() -> Value {
   None
 }
 
-///|
-/// TODO: port `#[parse]` of GridElem.row_gutter.
-fn grid_elem_row_gutter_parse(
-  _engine : Engine,
-  args : Args,
-) -> Value? raise SourceError {
-  args.named_with("row-gutter", v => v)
-}
+// TODO: port `#[parse]` of GridElem.row_gutter as `grid_elem_row_gutter_parse`.
 
 ///|
 /// TODO: port `Default::default() of Celled<Sides<Option<Rel<Length>>>>` (GridElem.inset).
@@ -414,50 +386,15 @@ fn grid_cell_elem_breakable_default() -> Value {
   None
 }
 
-///|
-/// TODO: port `#[parse]` of GridCell.is_repeated.
-fn grid_cell_elem_is_repeated_parse(
-  _engine : Engine,
-  args : Args,
-) -> Value? raise SourceError {
-  args.named_with("is-repeated", v => v)
-}
+// TODO: port `#[parse]` of GridCell.is_repeated as `grid_cell_elem_is_repeated_parse`.
 
-///|
-/// TODO: port `#[parse]` of PadElem.left.
-fn pad_elem_left_parse(
-  _engine : Engine,
-  args : Args,
-) -> Value? raise SourceError {
-  args.named_with("left", v => v)
-}
+// TODO: port `#[parse]` of PadElem.left as `pad_elem_left_parse`.
 
-///|
-/// TODO: port `#[parse]` of PadElem.top.
-fn pad_elem_top_parse(
-  _engine : Engine,
-  args : Args,
-) -> Value? raise SourceError {
-  args.named_with("top", v => v)
-}
+// TODO: port `#[parse]` of PadElem.top as `pad_elem_top_parse`.
 
-///|
-/// TODO: port `#[parse]` of PadElem.right.
-fn pad_elem_right_parse(
-  _engine : Engine,
-  args : Args,
-) -> Value? raise SourceError {
-  args.named_with("right", v => v)
-}
+// TODO: port `#[parse]` of PadElem.right as `pad_elem_right_parse`.
 
-///|
-/// TODO: port `#[parse]` of PadElem.bottom.
-fn pad_elem_bottom_parse(
-  _engine : Engine,
-  args : Args,
-) -> Value? raise SourceError {
-  args.named_with("bottom", v => v)
-}
+// TODO: port `#[parse]` of PadElem.bottom as `pad_elem_bottom_parse`.
 
 ///|
 /// TODO: port `Paper::A4` (PageElem.paper).
@@ -471,14 +408,7 @@ fn page_elem_width_default() -> Value {
   None
 }
 
-///|
-/// TODO: port `#[parse]` of PageElem.width.
-fn page_elem_width_parse(
-  _engine : Engine,
-  args : Args,
-) -> Value? raise SourceError {
-  args.named_with("width", v => v)
-}
+// TODO: port `#[parse]` of PageElem.width as `page_elem_width_parse`.
 
 ///|
 /// TODO: port `Smart::Custom(Paper::A4.height().into())` (PageElem.height).
@@ -486,14 +416,7 @@ fn page_elem_height_default() -> Value {
   None
 }
 
-///|
-/// TODO: port `#[parse]` of PageElem.height.
-fn page_elem_height_parse(
-  _engine : Engine,
-  args : Args,
-) -> Value? raise SourceError {
-  args.named_with("height", v => v)
-}
+// TODO: port `#[parse]` of PageElem.height as `page_elem_height_parse`.
 
 ///|
 /// TODO: port `Default::default() of Smart<Margin<Smart<Rel<Length>>>>` (PageElem.margin).
@@ -573,14 +496,7 @@ fn pagebreak_elem_to_default() -> Value {
   None
 }
 
-///|
-/// TODO: port `#[parse]` of PagebreakElem.boundary.
-fn pagebreak_elem_boundary_parse(
-  _engine : Engine,
-  args : Args,
-) -> Value? raise SourceError {
-  args.named_with("boundary", v => v)
-}
+// TODO: port `#[parse]` of PagebreakElem.boundary as `pagebreak_elem_boundary_parse`.
 
 ///|
 /// TODO: port `Smart::Custom(Alignment::START)` (PlaceElem.alignment).
@@ -594,14 +510,7 @@ fn place_elem_scope_default() -> Value {
   None
 }
 
-///|
-/// TODO: port `#[parse]` of VElem.attach.
-fn v_elem_attach_parse(
-  _engine : Engine,
-  args : Args,
-) -> Value? raise SourceError {
-  args.named_with("attach", v => v)
-}
+// TODO: port `#[parse]` of VElem.attach as `v_elem_attach_parse`.
 
 ///|
 /// TODO: port `Dir::TTB` (StackElem.dir).
@@ -639,14 +548,7 @@ fn scale_elem_x_default() -> Value {
   None
 }
 
-///|
-/// TODO: port `#[parse]` of ScaleElem.x.
-fn scale_elem_x_parse(
-  _engine : Engine,
-  args : Args,
-) -> Value? raise SourceError {
-  args.named_with("x", v => v)
-}
+// TODO: port `#[parse]` of ScaleElem.x as `scale_elem_x_parse`.
 
 ///|
 /// TODO: port `Smart::Custom(ScaleAmount::Ratio(Ratio::one()))` (ScaleElem.y).
@@ -654,14 +556,7 @@ fn scale_elem_y_default() -> Value {
   None
 }
 
-///|
-/// TODO: port `#[parse]` of ScaleElem.y.
-fn scale_elem_y_parse(
-  _engine : Engine,
-  args : Args,
-) -> Value? raise SourceError {
-  args.named_with("y", v => v)
-}
+// TODO: port `#[parse]` of ScaleElem.y as `scale_elem_y_parse`.
 
 ///|
 /// TODO: port `HAlignment::Center + VAlignment::Horizon` (ScaleElem.origin).
@@ -801,41 +696,13 @@ fn frac_elem_style_default() -> Value {
   None
 }
 
-///|
-/// TODO: port `#[parse]` of FracElem.num_deparenthesized.
-fn frac_elem_num_deparenthesized_parse(
-  _engine : Engine,
-  args : Args,
-) -> Value? raise SourceError {
-  args.named_with("num-deparenthesized", v => v)
-}
+// TODO: port `#[parse]` of FracElem.num_deparenthesized as `frac_elem_num_deparenthesized_parse`.
 
-///|
-/// TODO: port `#[parse]` of FracElem.denom_deparenthesized.
-fn frac_elem_denom_deparenthesized_parse(
-  _engine : Engine,
-  args : Args,
-) -> Value? raise SourceError {
-  args.named_with("denom-deparenthesized", v => v)
-}
+// TODO: port `#[parse]` of FracElem.denom_deparenthesized as `frac_elem_denom_deparenthesized_parse`.
 
-///|
-/// TODO: port `#[parse]` of BinomElem.lower.
-fn binom_elem_lower_parse(
-  _engine : Engine,
-  args : Args,
-) -> Value? raise SourceError {
-  args.named_with("lower", v => v)
-}
+// TODO: port `#[parse]` of BinomElem.lower as `binom_elem_lower_parse`.
 
-///|
-/// TODO: port `#[parse]` of LrElem.body.
-fn lr_elem_body_parse(
-  _engine : Engine,
-  args : Args,
-) -> Value? raise SourceError {
-  args.named_with("body", v => v)
-}
+// TODO: port `#[parse]` of LrElem.body as `lr_elem_body_parse`.
 
 ///|
 /// TODO: port `DelimiterPair::PAREN` (VecElem.delim).
@@ -885,14 +752,7 @@ fn mat_elem_row_gap_default() -> Value {
   None
 }
 
-///|
-/// TODO: port `#[parse]` of MatElem.row_gap.
-fn mat_elem_row_gap_parse(
-  _engine : Engine,
-  args : Args,
-) -> Value? raise SourceError {
-  args.named_with("row-gap", v => v)
-}
+// TODO: port `#[parse]` of MatElem.row_gap as `mat_elem_row_gap_parse`.
 
 ///|
 /// TODO: port `DEFAULT_COL_GAP.into()` (MatElem.column_gap).
@@ -900,23 +760,9 @@ fn mat_elem_column_gap_default() -> Value {
   None
 }
 
-///|
-/// TODO: port `#[parse]` of MatElem.column_gap.
-fn mat_elem_column_gap_parse(
-  _engine : Engine,
-  args : Args,
-) -> Value? raise SourceError {
-  args.named_with("column-gap", v => v)
-}
+// TODO: port `#[parse]` of MatElem.column_gap as `mat_elem_column_gap_parse`.
 
-///|
-/// TODO: port `#[parse]` of MatElem.rows.
-fn mat_elem_rows_parse(
-  _engine : Engine,
-  args : Args,
-) -> Value? raise SourceError {
-  args.named_with("rows", v => v)
-}
+// TODO: port `#[parse]` of MatElem.rows as `mat_elem_rows_parse`.
 
 ///|
 /// TODO: port `DelimiterPair::BRACE` (CasesElem.delim).
@@ -990,14 +836,7 @@ fn artifact_elem_kind_default() -> Value {
   None
 }
 
-///|
-/// TODO: port `#[parse]` of BibliographyElem.sources.
-fn bibliography_elem_sources_parse(
-  _engine : Engine,
-  args : Args,
-) -> Value? raise SourceError {
-  args.named_with("sources", v => v)
-}
+// TODO: port `#[parse]` of BibliographyElem.sources as `bibliography_elem_sources_parse`.
 
 ///|
 /// TODO: port `Default::default() of Smart<Option<Content>>` (BibliographyElem.title).
@@ -1011,14 +850,7 @@ fn bibliography_elem_style_default() -> Value {
   None
 }
 
-///|
-/// TODO: port `#[parse]` of BibliographyElem.style.
-fn bibliography_elem_style_parse(
-  _engine : Engine,
-  args : Args,
-) -> Value? raise SourceError {
-  args.named_with("style", v => v)
-}
+// TODO: port `#[parse]` of BibliographyElem.style as `bibliography_elem_style_parse`.
 
 ///|
 /// TODO: port `Default::default() of Smart<LocatableSelector>` (BibliographyElem.target).
@@ -1050,14 +882,7 @@ fn cite_elem_style_default() -> Value {
   None
 }
 
-///|
-/// TODO: port `#[parse]` of CiteElem.style.
-fn cite_elem_style_parse(
-  _engine : Engine,
-  args : Args,
-) -> Value? raise SourceError {
-  args.named_with("style", v => v)
-}
+// TODO: port `#[parse]` of CiteElem.style as `cite_elem_style_parse`.
 
 ///|
 /// TODO: port `Default::default() of Smart<DocumentFormat>` (DocumentElem.format).
@@ -1221,23 +1046,9 @@ fn heading_elem_supplement_default() -> Value {
   None
 }
 
-///|
-/// TODO: port `#[parse]` of LinkElem.dest.
-fn link_elem_dest_parse(
-  _engine : Engine,
-  args : Args,
-) -> Value? raise SourceError {
-  args.named_with("dest", v => v)
-}
+// TODO: port `#[parse]` of LinkElem.dest as `link_elem_dest_parse`.
 
-///|
-/// TODO: port `#[parse]` of LinkElem.body.
-fn link_elem_body_parse(
-  _engine : Engine,
-  args : Args,
-) -> Value? raise SourceError {
-  args.named_with("body", v => v)
-}
+// TODO: port `#[parse]` of LinkElem.body as `link_elem_body_parse`.
 
 ///|
 /// TODO: port `Default::default() of Option<Destination>` (LinkElem.current).
@@ -1431,14 +1242,7 @@ fn table_elem_column_gutter_default() -> Value {
   None
 }
 
-///|
-/// TODO: port `#[parse]` of TableElem.column_gutter.
-fn table_elem_column_gutter_parse(
-  _engine : Engine,
-  args : Args,
-) -> Value? raise SourceError {
-  args.named_with("column-gutter", v => v)
-}
+// TODO: port `#[parse]` of TableElem.column_gutter as `table_elem_column_gutter_parse`.
 
 ///|
 /// TODO: port `Default::default() of TrackSizings` (TableElem.row_gutter).
@@ -1446,14 +1250,7 @@ fn table_elem_row_gutter_default() -> Value {
   None
 }
 
-///|
-/// TODO: port `#[parse]` of TableElem.row_gutter.
-fn table_elem_row_gutter_parse(
-  _engine : Engine,
-  args : Args,
-) -> Value? raise SourceError {
-  args.named_with("row-gutter", v => v)
-}
+// TODO: port `#[parse]` of TableElem.row_gutter as `table_elem_row_gutter_parse`.
 
 ///|
 /// TODO: port `Celled::Value(Sides::splat(Some(Abs::pt(5.0).into())))` (TableElem.inset).
@@ -1497,14 +1294,7 @@ fn table_elem_summary_default() -> Value {
   None
 }
 
-///|
-/// TODO: port `#[parse]` of TableElem.summary.
-fn table_elem_summary_parse(
-  _engine : Engine,
-  args : Args,
-) -> Value? raise SourceError {
-  args.named_with("summary", v => v)
-}
+// TODO: port `#[parse]` of TableElem.summary as `table_elem_summary_parse`.
 
 ///|
 /// TODO: port `Default::default() of Smart<usize>` (TableHLine.y).
@@ -1632,23 +1422,9 @@ fn table_cell_elem_kind_default() -> Value {
   None
 }
 
-///|
-/// TODO: port `#[parse]` of TableCell.kind.
-fn table_cell_elem_kind_parse(
-  _engine : Engine,
-  args : Args,
-) -> Value? raise SourceError {
-  args.named_with("kind", v => v)
-}
+// TODO: port `#[parse]` of TableCell.kind as `table_cell_elem_kind_parse`.
 
-///|
-/// TODO: port `#[parse]` of TableCell.is_repeated.
-fn table_cell_elem_is_repeated_parse(
-  _engine : Engine,
-  args : Args,
-) -> Value? raise SourceError {
-  args.named_with("is-repeated", v => v)
-}
+// TODO: port `#[parse]` of TableCell.is_repeated as `table_cell_elem_is_repeated_parse`.
 
 ///|
 /// TODO: port `HElem::new(Em::new(0.6).into()).with_weak(true).pack()` (TermsElem.separator).
@@ -1770,14 +1546,7 @@ fn text_elem_font_default() -> Value {
   None
 }
 
-///|
-/// TODO: port `#[parse]` of TextElem.font.
-fn text_elem_font_parse(
-  _engine : Engine,
-  args : Args,
-) -> Value? raise SourceError {
-  args.named_with("font", v => v)
-}
+// TODO: port `#[parse]` of TextElem.font as `text_elem_font_parse`.
 
 ///|
 /// TODO: port `Default::default() of FontStyle` (TextElem.style).
@@ -1809,14 +1578,7 @@ fn text_elem_size_fold(inner : Value, _outer : Value) -> Value {
   inner
 }
 
-///|
-/// TODO: port `#[parse]` of TextElem.size.
-fn text_elem_size_parse(
-  _engine : Engine,
-  args : Args,
-) -> Value? raise SourceError {
-  args.named_with("size", v => v)
-}
+// TODO: port `#[parse]` of TextElem.size as `text_elem_size_parse`.
 
 ///|
 /// TODO: port `Color::BLACK.into()` (TextElem.fill).
@@ -1824,14 +1586,7 @@ fn text_elem_fill_default() -> Value {
   None
 }
 
-///|
-/// TODO: port `#[parse]` of TextElem.fill.
-fn text_elem_fill_parse(
-  _engine : Engine,
-  args : Args,
-) -> Value? raise SourceError {
-  args.named_with("fill", v => v)
-}
+// TODO: port `#[parse]` of TextElem.fill as `text_elem_fill_parse`.
 
 ///|
 /// TODO: port `Default::default() of Option<Stroke>` (TextElem.stroke).
@@ -2031,14 +1786,7 @@ fn raw_elem_syntaxes_fold(inner : Value, _outer : Value) -> Value {
   inner
 }
 
-///|
-/// TODO: port `#[parse]` of RawElem.syntaxes.
-fn raw_elem_syntaxes_parse(
-  _engine : Engine,
-  args : Args,
-) -> Value? raise SourceError {
-  args.named_with("syntaxes", v => v)
-}
+// TODO: port `#[parse]` of RawElem.syntaxes as `raw_elem_syntaxes_parse`.
 
 ///|
 /// TODO: port `Default::default() of Smart<Option<Derived<DataSource, RawTheme>>>` (RawElem.theme).
@@ -2046,14 +1794,7 @@ fn raw_elem_theme_default() -> Value {
   None
 }
 
-///|
-/// TODO: port `#[parse]` of RawElem.theme.
-fn raw_elem_theme_parse(
-  _engine : Engine,
-  args : Args,
-) -> Value? raise SourceError {
-  args.named_with("theme", v => v)
-}
+// TODO: port `#[parse]` of RawElem.theme as `raw_elem_theme_parse`.
 
 ///|
 /// TODO: port `Default::default() of Smart<Length>` (SubElem.baseline).
@@ -2085,14 +1826,7 @@ fn smart_quote_elem_quotes_default() -> Value {
   None
 }
 
-///|
-/// TODO: port `#[parse]` of SpaceElem.had_newline.
-fn space_elem_had_newline_parse(
-  _engine : Engine,
-  args : Args,
-) -> Value? raise SourceError {
-  args.named_with("had-newline", v => v)
-}
+// TODO: port `#[parse]` of SpaceElem.had_newline as `space_elem_had_newline_parse`.
 
 ///|
 /// TODO: port `Default::default() of Option<Paint>` (CurveElem.fill).
@@ -2124,14 +1858,7 @@ fn curve_close_elem_mode_default() -> Value {
   None
 }
 
-///|
-/// TODO: port `#[parse]` of ImageElem.source.
-fn image_elem_source_parse(
-  _engine : Engine,
-  args : Args,
-) -> Value? raise SourceError {
-  args.named_with("source", v => v)
-}
+// TODO: port `#[parse]` of ImageElem.source as `image_elem_source_parse`.
 
 ///|
 /// TODO: port `Default::default() of Smart<ImageFormat>` (ImageElem.format).
@@ -2175,14 +1902,7 @@ fn image_elem_icc_default() -> Value {
   None
 }
 
-///|
-/// TODO: port `#[parse]` of ImageElem.icc.
-fn image_elem_icc_parse(
-  _engine : Engine,
-  args : Args,
-) -> Value? raise SourceError {
-  args.named_with("icc", v => v)
-}
+// TODO: port `#[parse]` of ImageElem.icc as `image_elem_icc_parse`.
 
 ///|
 /// TODO: port `Default::default() of Axes<Rel<Length>>` (LineElem.start).
@@ -2316,14 +2036,7 @@ fn square_elem_width_default() -> Value {
   None
 }
 
-///|
-/// TODO: port `#[parse]` of SquareElem.width.
-fn square_elem_width_parse(
-  _engine : Engine,
-  args : Args,
-) -> Value? raise SourceError {
-  args.named_with("width", v => v)
-}
+// TODO: port `#[parse]` of SquareElem.width as `square_elem_width_parse`.
 
 ///|
 /// TODO: port `Default::default() of Sizing` (SquareElem.height).
@@ -2331,14 +2044,7 @@ fn square_elem_height_default() -> Value {
   None
 }
 
-///|
-/// TODO: port `#[parse]` of SquareElem.height.
-fn square_elem_height_parse(
-  _engine : Engine,
-  args : Args,
-) -> Value? raise SourceError {
-  args.named_with("height", v => v)
-}
+// TODO: port `#[parse]` of SquareElem.height as `square_elem_height_parse`.
 
 ///|
 /// TODO: port `Default::default() of Option<Paint>` (SquareElem.fill).
@@ -2466,14 +2172,7 @@ fn circle_elem_width_default() -> Value {
   None
 }
 
-///|
-/// TODO: port `#[parse]` of CircleElem.width.
-fn circle_elem_width_parse(
-  _engine : Engine,
-  args : Args,
-) -> Value? raise SourceError {
-  args.named_with("width", v => v)
-}
+// TODO: port `#[parse]` of CircleElem.width as `circle_elem_width_parse`.
 
 ///|
 /// TODO: port `Default::default() of Sizing` (CircleElem.height).
@@ -2481,14 +2180,7 @@ fn circle_elem_height_default() -> Value {
   None
 }
 
-///|
-/// TODO: port `#[parse]` of CircleElem.height.
-fn circle_elem_height_parse(
-  _engine : Engine,
-  args : Args,
-) -> Value? raise SourceError {
-  args.named_with("height", v => v)
-}
+// TODO: port `#[parse]` of CircleElem.height as `circle_elem_height_parse`.
 
 ///|
 /// TODO: port `Default::default() of Option<Paint>` (CircleElem.fill).
@@ -2556,14 +2248,7 @@ fn html_elem_css_default() -> Value {
   None
 }
 
-///|
-/// TODO: port `#[parse]` of HtmlElem.css.
-fn html_elem_css_parse(
-  _engine : Engine,
-  args : Args,
-) -> Value? raise SourceError {
-  args.named_with("css", v => v)
-}
+// TODO: port `#[parse]` of HtmlElem.css as `html_elem_css_parse`.
 
 ///|
 /// TODO: port `Default::default() of Option<EcoString>` (HtmlElem.role).
@@ -2589,23 +2274,9 @@ fn pdf_format_elem_tagged_default() -> Value {
   None
 }
 
-///|
-/// TODO: port `#[parse]` of AttachElem.path.
-fn pdf_attach_elem_path_parse(
-  _engine : Engine,
-  args : Args,
-) -> Value? raise SourceError {
-  args.named_with("path", v => v)
-}
+// TODO: port `#[parse]` of AttachElem.path as `pdf_attach_elem_path_parse`.
 
-///|
-/// TODO: port `#[parse]` of AttachElem.data.
-fn pdf_attach_elem_data_parse(
-  _engine : Engine,
-  args : Args,
-) -> Value? raise SourceError {
-  args.named_with("data", v => v)
-}
+// TODO: port `#[parse]` of AttachElem.data as `pdf_attach_elem_data_parse`.
 
 ///|
 /// TODO: port `Default::default() of Option<AttachedFileRelationship>` (AttachElem.relationship).
