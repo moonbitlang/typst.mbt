@@ -416,3 +416,20 @@ fn count_utf8_chars_lossy(bytes : Bytes, start : Int, end : Int) -> Int {
   count
 }
 
+///|
+/// Format a user-facing error message for an XML-like file format.
+pub fn format_xml_like_error(format : String, error : @xml.XmlError) -> LoadError {
+  let pos = error.pos()
+  let pos = LineCol::one_based(pos.row, pos.col)
+  let message = match error {
+    UnexpectedCloseTag(expected, actual, _) =>
+      "failed to parse \{format} (found closing tag '\{actual}' instead of '\{expected}')"
+    UnknownEntityReference(entity, _) =>
+      "failed to parse \{format} (unknown entity '\{entity}')"
+    DuplicatedAttribute(attr, _) =>
+      "failed to parse \{format} (duplicate attribute '\{attr}')"
+    NoRootNode => "failed to parse \{format} (missing root node)"
+    err => "failed to parse \{format} (\{err.to_string()})"
+  }
+  { text_pos: Some(LineCol(pos)), message }
+}

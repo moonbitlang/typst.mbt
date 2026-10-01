@@ -13,6 +13,7 @@ import {
   "moonbitlang/typst/data/serde",
   "moonbitlang/typst/data/json",
   "moonbitlang/typst/data/csv",
+  "moonbitlang/typst/data/xml",
 }
 
 import {

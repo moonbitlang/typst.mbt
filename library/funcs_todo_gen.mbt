@@ -1904,14 +1904,6 @@ fn impl_toml_encode(value_ : @syntax.Spanned[Dict], pretty_ : Bool) -> String ra
 }
 
 ///|
-/// TODO: port `xml` (typst-library/src/loading/xml.rs).
-fn impl_xml(engine : Engine, source_ : @syntax.Spanned[DataSource]) -> Value raise SourceError {
-  ignore(engine)
-  ignore(source_)
-  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`xml` is not yet ported")])
-}
-
-///|
 /// TODO: port `yaml` (typst-library/src/loading/yaml.rs).
 fn impl_yaml(engine : Engine, source_ : @syntax.Spanned[DataSource]) -> Value raise SourceError {
   ignore(engine)
