@@ -337,14 +337,11 @@ pub impl Eq for Func with fn equal(self, other) {
 /// The name of the closure, if it has one.
 pub fn Closure::name(self : Closure) -> String? {
   match self.node {
-    Closure(node) => (closure_name_hook.val)(node)
+    Closure(node) =>
+      match @ast.Closure::from_untyped(node) {
+        Some(closure) => closure.name().map(ident => ident.get())
+        None => None
+      }
     Context(_) => None
   }
 }
-
-///|
-/// Extracts the name of a closure node (installed by the eval package,
-/// which owns the typed AST).
-pub let closure_name_hook : Ref[(@syntax.SyntaxNode) -> String?] = Ref::new(_ => {
-  None
-})
