@@ -95,6 +95,16 @@ TYPEMAP = {
     "Month": "@time.Month",
     "Smart<DisplayPattern>": "SmartDisplayPattern",
     "Smart<TodayOffset>": "SmartTodayOffset",
+    # layout/grid/mod.rs, model/table.rs
+    "TrackSizings": "TrackSizings",
+    "GridChild": "GridChild",
+    "GridItem": "GridItem",
+    "GridCell": "GridCell",
+    "TableChild": "TableChild",
+    "TableItem": "TableItem",
+    "TableCell": "TableCell",
+    "TableElem": "TableElem",
+    "TableHeaderScope": "TableHeaderScope",
 }
 
 # Generic Rust types with a MoonBit port: Rust name -> MoonBit name. A use
@@ -107,6 +117,7 @@ GENERICS = {
     "Sides": "Sides",
     "Corners": "Corners",
     "SpecificAlignment": "SpecificAlignment",
+    "Celled": "Celled",
 }
 
 

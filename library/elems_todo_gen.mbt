@@ -73,66 +73,6 @@ fn block_elem_body_default() -> Value {
 }
 
 ///|
-/// TODO: port `Default::default() of TrackSizings` (GridElem.columns).
-fn grid_elem_columns_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of TrackSizings` (GridElem.rows).
-fn grid_elem_rows_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of TrackSizings` (GridElem.gutter).
-fn grid_elem_gutter_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of TrackSizings` (GridElem.column_gutter).
-fn grid_elem_column_gutter_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of TrackSizings` (GridElem.row_gutter).
-fn grid_elem_row_gutter_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Celled<Sides<Option<Rel<Length>>>>` (GridElem.inset).
-fn grid_elem_inset_default() -> Value {
-  None
-}
-
-///|
-/// TODO: fold for `Celled<Sides<Option<Rel<Length>>>>` (GridElem.inset).
-fn grid_elem_inset_fold(inner : Value, _outer : Value) -> Value {
-  inner
-}
-
-///|
-/// TODO: port `Default::default() of Celled<Smart<Alignment>>` (GridElem.align).
-fn grid_elem_align_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Celled<Option<Paint>>` (GridElem.fill).
-fn grid_elem_fill_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Celled<Sides<Option<Option<Arc<Stroke>>>>>` (GridElem.stroke).
-fn grid_elem_stroke_default() -> Value {
-  None
-}
-
-///|
 /// TODO: fold for `Celled<Sides<Option<Option<Arc<Stroke>>>>>` (GridElem.stroke).
 fn grid_elem_stroke_fold(inner : Value, _outer : Value) -> Value {
   inner
@@ -160,18 +100,6 @@ fn grid_v_line_elem_stroke_default() -> Value {
 /// TODO: fold for `Option<Arc<Stroke>>` (GridVLine.stroke).
 fn grid_v_line_elem_stroke_fold(inner : Value, _outer : Value) -> Value {
   inner
-}
-
-///|
-/// TODO: port `Default::default() of Smart<Option<Paint>>` (GridCell.fill).
-fn grid_cell_elem_fill_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Sides<Option<Option<Arc<Stroke>>>>` (GridCell.stroke).
-fn grid_cell_elem_stroke_default() -> Value {
-  None
 }
 
 ///|
@@ -587,60 +515,6 @@ fn ref_elem_form_default() -> Value {
 }
 
 ///|
-/// TODO: port `Default::default() of TrackSizings` (TableElem.columns).
-fn table_elem_columns_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of TrackSizings` (TableElem.rows).
-fn table_elem_rows_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of TrackSizings` (TableElem.gutter).
-fn table_elem_gutter_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of TrackSizings` (TableElem.column_gutter).
-fn table_elem_column_gutter_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of TrackSizings` (TableElem.row_gutter).
-fn table_elem_row_gutter_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Celled::Value(Sides::splat(Some(Abs::pt(5.0).into())))` (TableElem.inset).
-fn table_elem_inset_default() -> Value {
-  None
-}
-
-///|
-/// TODO: fold for `Celled<Sides<Option<Rel<Length>>>>` (TableElem.inset).
-fn table_elem_inset_fold(inner : Value, _outer : Value) -> Value {
-  inner
-}
-
-///|
-/// TODO: port `Default::default() of Celled<Smart<Alignment>>` (TableElem.align).
-fn table_elem_align_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Celled<Option<Paint>>` (TableElem.fill).
-fn table_elem_fill_default() -> Value {
-  None
-}
-
-///|
 /// TODO: port `Celled::Value(Sides::splat(Some(Some(Arc::new(Stroke::default())))))` (TableElem.stroke).
 fn table_elem_stroke_default() -> Value {
   None
@@ -677,27 +551,9 @@ fn table_v_line_elem_stroke_fold(inner : Value, _outer : Value) -> Value {
 }
 
 ///|
-/// TODO: port `Default::default() of Smart<Option<Paint>>` (TableCell.fill).
-fn table_cell_elem_fill_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Sides<Option<Option<Arc<Stroke>>>>` (TableCell.stroke).
-fn table_cell_elem_stroke_default() -> Value {
-  None
-}
-
-///|
 /// TODO: fold for `Sides<Option<Option<Arc<Stroke>>>>` (TableCell.stroke).
 fn table_cell_elem_stroke_fold(inner : Value, _outer : Value) -> Value {
   inner
-}
-
-///|
-/// TODO: port `Default::default() of Smart<TableCellKind>` (TableCell.kind).
-fn table_cell_elem_kind_default() -> Value {
-  None
 }
 
 ///|

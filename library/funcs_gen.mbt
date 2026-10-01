@@ -18645,7 +18645,7 @@ pub fn native_pdf_format_table_summary() -> NativeFuncData {
           {
             name: "table",
             docs: "The table.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[TableElem])),
             default: None,
             positional: true,
             named: false,
@@ -18672,7 +18672,7 @@ fn native_pdf_format_table_summary_call(
   ignore(engine)
   ignore(context)
   let summary_ : String? = args.named("summary")
-  let table_ : Value = args.expect("table")
+  let table_ : TableElem = args.expect("table")
   args.take().finish()
   let output = at(args.span, () => {
     impl_pdf_format_table_summary(summary_, table_)
@@ -18716,7 +18716,7 @@ pub fn native_pdf_format_header_cell() -> NativeFuncData {
           {
             name: "scope",
             docs: "What track of the table this header cell applies to.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[TableHeaderScope])),
             default: Some(() => {
               IntoValue::into_value(
                 impl_pdf_format_header_cell__scope_default(),
@@ -18733,7 +18733,7 @@ pub fn native_pdf_format_header_cell() -> NativeFuncData {
           {
             name: "cell",
             docs: "The table cell.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[TableCell])),
             default: None,
             positional: true,
             named: false,
@@ -18763,11 +18763,11 @@ fn native_pdf_format_header_cell_call(
     Some(v) => v
     None => impl_pdf_format_header_cell__level_default()
   }
-  let scope_ : Value = match args.named("scope") {
+  let scope_ : TableHeaderScope = match args.named("scope") {
     Some(v) => v
     None => impl_pdf_format_header_cell__scope_default()
   }
-  let cell_ : Value = args.expect("cell")
+  let cell_ : TableCell = args.expect("cell")
   args.take().finish()
   let output = at(args.span, () => {
     impl_pdf_format_header_cell(level_, scope_, cell_)
@@ -18794,7 +18794,7 @@ pub fn native_pdf_format_data_cell() -> NativeFuncData {
           {
             name: "cell",
             docs: "The table cell.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[TableCell])),
             default: None,
             positional: true,
             named: false,
@@ -18820,7 +18820,7 @@ fn native_pdf_format_data_cell_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let cell_ : Value = args.expect("cell")
+  let cell_ : TableCell = args.expect("cell")
   args.take().finish()
   let output = at(args.span, () => impl_pdf_format_data_cell(cell_))
   IntoValue::into_value(output)
