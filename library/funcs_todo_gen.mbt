@@ -1873,21 +1873,6 @@ fn impl_measure(engine : Engine, context : Context, span : @syntax.Span, width_ 
 }
 
 ///|
-/// TODO: port `cbor` (typst-library/src/loading/cbor.rs).
-fn impl_cbor(engine : Engine, source_ : @syntax.Spanned[DataSource]) -> Value raise SourceError {
-  ignore(engine)
-  ignore(source_)
-  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`cbor` is not yet ported")])
-}
-
-///|
-/// TODO: port `cbor.encode` (typst-library/src/loading/cbor.rs).
-fn impl_cbor_encode(value_ : @syntax.Spanned[Value]) -> Value raise SourceError {
-  ignore(value_)
-  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`cbor.encode` is not yet ported")])
-}
-
-///|
 /// TODO: port `toml` (typst-library/src/loading/toml.rs).
 fn impl_toml(engine : Engine, source_ : @syntax.Spanned[DataSource]) -> Dict raise SourceError {
   ignore(engine)
