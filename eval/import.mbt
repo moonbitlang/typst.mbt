@@ -242,19 +242,107 @@ fn import_file(
   }
 
   // Prevent cyclic importing.
-  if engine.route.contains(source.id()) {
+  if route_contains(engine.route, source.id()) {
     @library.bail_at(span, "cyclic import")
   }
 
-  // Evaluate the file.
-  eval_source(
-    engine.world,
-    engine.library,
-    engine.traced,
-    engine.sink,
-    engine.route,
-    source,
-  )
+  // Evaluate the file (memoized, see `eval_source_memoized`).
+  eval_source_memoized(engine, source)
+}
+
+///|
+/// A memoized module evaluation.
+priv struct EvalMemo {
+  world : &@library.World
+  library : @library.Library
+  text : String
+  /// The outer route and the file ids it was queried for (comemo tracks
+  /// `Route::contains` calls, so only those answers must match).
+  route : @library.Route
+  queried : Array[@syntax.FileId]
+  traced : @library.Traced
+  result : Result[@library.Module, Array[@library.SourceDiagnostic]]
+  sink : @library.Sink
+}
+
+///|
+/// Memoized file evaluations by file id.
+let eval_memo : Map[@syntax.FileId, Array[EvalMemo]] = {}
+
+///|
+/// Evaluate a source file like `eval_source`, but return the same module for
+/// repeated evaluations with identical inputs.
+///
+/// Upstream `typst_eval::eval` is memoized by comemo, so importing the same
+/// file twice yields the same module (modules compare by identity). This
+/// mirrors that: the result and the sink effects (warnings, ...) are cached
+/// and replayed for the same world, library, source text, route and traced
+/// span.
+fn eval_source_memoized(
+  engine : @library.Engine,
+  source : @syntax.Source,
+) -> @library.Module raise @library.SourceError {
+  let id = source.id()
+  let entries = match eval_memo.get(id) {
+    Some(entries) => entries
+    None => {
+      let entries = []
+      eval_memo[id] = entries
+      entries
+    }
+  }
+  for memo in entries {
+    if physical_equal(memo.world, engine.world) &&
+      physical_equal(memo.library, engine.library) &&
+      memo.text == source.text() &&
+      memo.queried
+      .iter()
+      .all(q => memo.route.contains(q) == engine.route.contains(q)) &&
+      memo.traced.0 == engine.traced.0 {
+      engine.sink.extend_from_sink(memo.sink)
+      match memo.result {
+        Ok(module) => return module
+        Err(errors) => raise @library.SourceError(errors)
+      }
+    }
+  }
+  let sink = @library.Sink::new()
+  let queried = [id]
+  route_queries.push(queried)
+  let result : Result[@library.Module, Array[@library.SourceDiagnostic]] = try
+    eval_source(
+      engine.world,
+      engine.library,
+      engine.traced,
+      sink,
+      engine.route,
+      source,
+    )
+  catch {
+    @library.SourceError(errors) => Err(errors)
+  } noraise {
+    module => Ok(module)
+  }
+  route_queries.pop() |> ignore
+  // Queries made here are also made by the enclosing evaluations.
+  for outer in route_queries {
+    outer.append(queried)
+  }
+  entries.push({
+    world: engine.world,
+    library: engine.library,
+    text: source.text(),
+    route: engine.route,
+    queried,
+    traced: engine.traced,
+    result,
+    sink,
+  })
+  engine.sink.extend_from_sink(sink)
+  match result {
+    Ok(module) => module
+    Err(errors) => raise @library.SourceError(errors)
+  }
 }
 
 ///|
@@ -299,4 +387,18 @@ fn resolve_package(
     @library.PathOrStr::Str(manifest.package.entrypoint).resolve(manifest_id)
   })
   (manifest.package.name, entrypoint.intern())
+}
+
+///|
+/// The file ids queried on the route by the evaluations in progress
+/// (innermost last).
+let route_queries : Array[Array[@syntax.FileId]] = []
+
+///|
+/// `Route::contains`, recording the query for memoization.
+fn route_contains(route : @library.Route, id : @syntax.FileId) -> Bool {
+  if route_queries.last() is Some(queried) {
+    queried.push(id)
+  }
+  route.contains(id)
 }

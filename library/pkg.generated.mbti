@@ -667,8 +667,6 @@ pub let class_elem_body : Int
 
 pub let class_elem_class : Int
 
-pub let closure_name_hook : @ref.Ref[(@syntax.SyntaxNode) -> String?]
-
 pub fn colbreak_elem() -> Element
 
 pub let colbreak_elem_weak : Int
