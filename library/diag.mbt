@@ -26,7 +26,7 @@ pub(all) enum Tracepoint {
 } derive(Eq, Hash, Debug)
 
 ///|
-pub impl Show for Tracepoint with output(self, logger) {
+pub impl Show for Tracepoint with fn output(self, logger) {
   match self {
     Call(Some(name)) => logger.write_string("while calling `\{name}`")
     Call(None) => logger.write_string("while calling function")
@@ -58,7 +58,7 @@ pub fn SourceDiagnostic::error(
   span : @syntax.DiagSpan,
   message : String,
 ) -> SourceDiagnostic {
-  { severity: Error, span, message, trace: [], hints: [] }
+  { severity: Error, span, message, trace: [], hints: [], }
 }
 
 ///|
@@ -76,7 +76,7 @@ pub fn SourceDiagnostic::warning(
   span : @syntax.DiagSpan,
   message : String,
 ) -> SourceDiagnostic {
-  { severity: Warning, span, message, trace: [], hints: [] }
+  { severity: Warning, span, message, trace: [], hints: [], }
 }
 
 ///|
@@ -91,7 +91,7 @@ pub fn SourceDiagnostic::warning_at(
 ///|
 /// Adds a single hint to the diagnostic.
 pub fn SourceDiagnostic::hint(self : SourceDiagnostic, hint : String) -> Unit {
-  self.hints.push({ v: hint, span: @syntax.DiagSpan::detached() })
+  self.hints.push({ v: hint, span: @syntax.DiagSpan::detached(), })
 }
 
 ///|
@@ -101,7 +101,7 @@ pub fn SourceDiagnostic::spanned_hint(
   hint : String,
   span : @syntax.DiagSpan,
 ) -> Unit {
-  self.hints.push({ v: hint, span })
+  self.hints.push({ v: hint, span, })
 }
 
 ///|
@@ -133,7 +133,7 @@ pub fn SourceDiagnostic::with_tracepoint(
   tracepoint : Tracepoint,
   span : @syntax.Span,
 ) -> SourceDiagnostic {
-  self.trace.push({ v: tracepoint, span })
+  self.trace.push({ v: tracepoint, span, })
   self
 }
 
@@ -143,7 +143,11 @@ pub fn SourceDiagnostic::from_syntax(
   diag : @syntax.SyntaxDiagnostic,
 ) -> SourceDiagnostic {
   {
-    severity: if diag.is_error { Error } else { Warning },
+    severity: if diag.is_error {
+      Error
+    } else {
+      Warning
+    },
     span: diag.span,
     message: diag.message,
     trace: [],
@@ -161,7 +165,7 @@ pub(all) struct HintedString {
 
 ///|
 pub fn HintedString::new(message : String) -> HintedString {
-  { message, hints: [] }
+  { message, hints: [], }
 }
 
 ///|
@@ -213,7 +217,7 @@ pub(all) suberror SourceError {
 ///|
 /// Raise a [HintedError] with a message (upstream `bail!("...")`).
 pub fn[T] bail(message : String) -> T raise HintedError {
-  raise HintedError({ message, hints: [] })
+  raise HintedError({ message, hints: [], })
 }
 
 ///|
@@ -222,7 +226,7 @@ pub fn[T] bail_hinted(
   message : String,
   hints : ArrayView[String],
 ) -> T raise HintedError {
-  raise HintedError({ message, hints: hints.to_array() })
+  raise HintedError({ message, hints: hints.to_array(), })
 }
 
 ///|
@@ -233,7 +237,9 @@ pub fn[T] bail_at(
   message : String,
   hints? : ArrayView[String] = [],
 ) -> T raise SourceError {
-  raise SourceError([SourceDiagnostic::error_at(span, message).with_hints(hints)])
+  raise SourceError([
+    SourceDiagnostic::error_at(span, message).with_hints(hints),
+  ])
 }
 
 ///|
@@ -244,7 +250,10 @@ pub fn[T] bail_diag(diag : SourceDiagnostic) -> T raise SourceError {
 
 ///|
 /// Attach a span to the errors of `f` (upstream `.at(span)`).
-pub fn[T] at(span : @syntax.Span, f : () -> T raise HintedError) -> T raise SourceError {
+pub fn[T] at(
+  span : @syntax.Span,
+  f : () -> T raise HintedError,
+) -> T raise SourceError {
   f() catch {
     HintedError(err) => raise SourceError([err.into_error_at(span)])
   }
@@ -273,7 +282,7 @@ pub fn[T] trace(
           te >= ee {
           continue
         }
-        error.trace.push({ v: make_point(), span })
+        error.trace.push({ v: make_point(), span, })
       }
       raise SourceError(errors)
     }

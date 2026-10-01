@@ -3,7 +3,7 @@
 
 ///|
 /// An error that occurred while trying to load a file.
-pub(all) enum FileError {
+pub(all) suberror FileError {
   /// A file was not found at this path.
   NotFound(String)
   /// A file could not be accessed.
@@ -21,7 +21,7 @@ pub(all) enum FileError {
 } derive(Eq, Hash, Debug)
 
 ///|
-pub impl Show for FileError with output(self, logger) {
+pub impl Show for FileError with fn output(self, logger) {
   logger.write_string(
     match self {
       NotFound(path) => "file not found (searched at \{path})"
@@ -40,17 +40,17 @@ pub impl Show for FileError with output(self, logger) {
 /// The environment in which typesetting occurs.
 pub(open) trait World {
   /// The standard library.
-  library(Self) -> Library
+  fn library(Self) -> Library
   /// Get the file id of the main source file.
-  main(Self) -> @syntax.FileId
+  fn main(Self) -> @syntax.FileId
   /// Try to access the specified source file.
-  source(Self, @syntax.FileId) -> @syntax.Source raise FileError
+  fn source(Self, @syntax.FileId) -> @syntax.Source raise FileError
   /// Try to access the specified file.
-  file(Self, @syntax.FileId) -> @builtin.Bytes raise FileError
+  fn file(Self, @syntax.FileId) -> Bytes raise FileError
   /// Get the current date (with an optional UTC offset in hours).
-  today(Self, Int64?) -> Datetime?
+  fn today(Self, Int64?) -> Datetime?
   /// Resolve a path relative to a file into a file id.
-  resolve_path(Self, @syntax.FileId?, String) -> @syntax.FileId raise HintedError
+  fn resolve_path(Self, @syntax.FileId?, String) -> @syntax.FileId raise HintedError
 }
 
 ///|
@@ -59,7 +59,7 @@ pub fn world_range(world : &World, span : @syntax.DiagSpan) -> (Int, Int)? {
   match span.get() {
     Detached => None
     Number(id~, num~, sub_range~) =>
-      try world.source(id).range(num, sub_range) catch {
+      world.source(id).range(num, sub_range) catch {
         _ => None
       }
     Range(start~, end~, ..) => Some((start, end))
@@ -89,7 +89,14 @@ pub struct Library {
 /// function pointers (upstream `Routines`).
 pub struct Routines {
   /// Evaluates a string as code/markup/math.
-  eval_string : (Engine, Context, String, @syntax.Span, @syntax.SyntaxMode, Scope) -> Value raise SourceError
+  eval_string : (
+    Engine,
+    Context,
+    String,
+    @syntax.Span,
+    @syntax.SyntaxMode,
+    Scope,
+  ) -> Value raise SourceError
   /// Calls a closure.
   eval_closure : (Func, Closure, Engine, Context, Args) -> Value raise SourceError
 }
@@ -135,7 +142,10 @@ pub fn[T] Engine::delay(
 
 ///|
 /// A binding guard that emits deprecation warnings at `span`.
-pub fn Engine::binding_guard(self : Engine, span : @syntax.Span) -> BindingGuard {
+pub fn Engine::binding_guard(
+  self : Engine,
+  span : @syntax.Span,
+) -> BindingGuard {
   {
     features: self.library.features,
     emit: message => self.sink.warn(message.into_warning_at(span)),
@@ -186,7 +196,7 @@ pub let sink_max_values : Int = 10
 
 ///|
 pub fn Sink::new() -> Sink {
-  { delayed: [], warnings: [], warnings_set: @hashset.HashSet([]), values: [] }
+  { delayed: [], warnings: [], warnings_set: @hashset.HashSet([]), values: [], }
 }
 
 ///|
@@ -199,7 +209,10 @@ pub fn Sink::take_delayed(self : Sink) -> Array[SourceDiagnostic] {
 
 ///|
 /// Push delayed errors.
-pub fn Sink::delayed_errors(self : Sink, errors : Array[SourceDiagnostic]) -> Unit {
+pub fn Sink::delayed_errors(
+  self : Sink,
+  errors : Array[SourceDiagnostic],
+) -> Unit {
   self.delayed.append(errors)
 }
 
@@ -236,25 +249,25 @@ pub struct Route {
 ///|
 /// Create a new, empty route.
 pub fn Route::root() -> Route {
-  { outer: None, id: None, len: 0 }
+  { outer: None, id: None, len: 0, }
 }
 
 ///|
 /// Extend the route with another segment with a default length of 1.
 pub fn Route::extend(outer : Route) -> Route {
-  { outer: Some(outer), id: None, len: 1 }
+  { outer: Some(outer), id: None, len: 1, }
 }
 
 ///|
 /// Attach a file id to the route segment.
 pub fn Route::with_id(self : Route, id : @syntax.FileId) -> Route {
-  { ..self, id: Some(id) }
+  { ..self, id: Some(id), }
 }
 
 ///|
 /// Set the length of the route segment to zero.
 pub fn Route::unnested(self : Route) -> Route {
-  { ..self, len: 0 }
+  { ..self, len: 0, }
 }
 
 ///|
@@ -342,13 +355,13 @@ pub struct Context {
 
 ///|
 pub fn Context::new(location? : Location, styles? : StyleChain) -> Context {
-  { location, styles }
+  { location, styles, }
 }
 
 ///|
 /// An empty context.
 pub fn Context::none() -> Context {
-  { location: None, styles: None }
+  { location: None, styles: None, }
 }
 
 ///|
@@ -401,5 +414,5 @@ pub struct Introspector {
 
 ///|
 pub fn Introspector::empty() -> Introspector {
-  { dummy: () }
+  { dummy: (), }
 }

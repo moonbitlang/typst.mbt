@@ -14,7 +14,7 @@ pub fn Feature::all() -> Array[Feature] {
 }
 
 ///|
-pub impl Show for Feature with output(self, logger) {
+pub impl Show for Feature with fn output(self, logger) {
   logger.write_string(
     match self {
       Html => "html"
@@ -82,7 +82,7 @@ pub(all) struct Deprecation {
 
 ///|
 pub fn Deprecation::new() -> Deprecation {
-  { message: "item is deprecated", until: None }
+  { message: "item is deprecated", until: None, }
 }
 
 ///|
@@ -94,8 +94,11 @@ pub fn Deprecation::with_message(
 }
 
 ///|
-pub fn Deprecation::with_until(self : Deprecation, version : String) -> Deprecation {
-  { ..self, until: Some(version) }
+pub fn Deprecation::with_until(
+  self : Deprecation,
+  version : String,
+) -> Deprecation {
+  { ..self, until: Some(version), }
 }
 
 ///|
@@ -118,7 +121,7 @@ pub(all) struct BindingGuard {
 ///|
 /// A guard that never emits warnings.
 pub fn BindingGuard::silent(features : Features) -> BindingGuard {
-  { features, emit: _ => () }
+  { features, emit: _ => (), }
 }
 
 ///|
@@ -131,7 +134,7 @@ pub(all) enum Capturer {
 } derive(Eq, Hash, Debug)
 
 ///|
-pub impl Show for Capturer with output(self, logger) {
+pub impl Show for Capturer with fn output(self, logger) {
   logger.write_string(
     match self {
       Function => "function"
@@ -177,7 +180,7 @@ pub struct Binding {
 ///|
 /// Create a new binding with a span marking its definition site.
 pub fn Binding::new(value : Value, span : @syntax.Span) -> Binding {
-  { value, kind: Normal, span, check_access: false, info: None }
+  { value, kind: Normal, span, check_access: false, info: None, }
 }
 
 ///|
@@ -272,13 +275,13 @@ fn feature_cannot(feature : Feature, what : String) -> HintedString {
 }
 
 ///|
-fn Binding::check(self : Binding, guard : BindingGuard) -> Feature? {
+fn Binding::check(self : Binding, guard_ : BindingGuard) -> Feature? {
   guard self.info is Some(info) else { return None }
-  if info.feature is Some(feature) && !guard.features.is_enabled(feature) {
+  if info.feature is Some(feature) && !guard_.features.is_enabled(feature) {
     return Some(feature)
   }
   if info.deprecation is Some(d) {
-    (guard.emit)(d.to_hinted())
+    (guard_.emit)(d.to_hinted())
   }
   None
 }
@@ -289,10 +292,10 @@ fn Binding::check(self : Binding, guard : BindingGuard) -> Feature? {
 /// `x`").
 pub fn Binding::read(
   self : Binding,
-  guard : BindingGuard,
+  guard_ : BindingGuard,
   what : String,
 ) -> Value raise HintedError {
-  if self.check_access && self.check(guard) is Some(feature) {
+  if self.check_access && self.check(guard_) is Some(feature) {
     raise HintedError(feature_cannot(feature, what))
   }
   self.value
@@ -302,10 +305,10 @@ pub fn Binding::read(
 /// Check write access to the value.
 pub fn Binding::check_write(
   self : Binding,
-  guard : BindingGuard,
+  guard_ : BindingGuard,
   what : String,
 ) -> Unit raise HintedError {
-  if self.check_access && self.check(guard) is Some(feature) {
+  if self.check_access && self.check(guard_) is Some(feature) {
     raise HintedError(feature_cannot(feature, what))
   }
   if self.kind is Captured(capturer) {
@@ -362,13 +365,13 @@ pub struct Scope {
 
 ///|
 pub fn Scope::new() -> Scope {
-  { map: {}, deduplicate: false, category: None }
+  { map: {}, deduplicate: false, category: None, }
 }
 
 ///|
 /// Create a new scope with duplication prevention.
 pub fn Scope::deduplicating() -> Scope {
-  { map: {}, deduplicate: true, category: None }
+  { map: {}, deduplicate: true, category: None, }
 }
 
 ///|
@@ -428,7 +431,7 @@ pub fn Scope::copy(self : Scope) -> Scope {
   for k, v in self.map {
     map[k] = v.copy()
   }
-  { map, deduplicate: self.deduplicate, category: self.category }
+  { map, deduplicate: self.deduplicate, category: self.category, }
 }
 
 ///|
@@ -444,7 +447,7 @@ pub struct Scopes {
 
 ///|
 pub fn Scopes::new(base : Library?) -> Scopes {
-  { top: Scope::new(), scopes: [], base }
+  { top: Scope::new(), scopes: [], base, }
 }
 
 ///|
@@ -516,9 +519,9 @@ pub fn Scopes::get_binding_in_math(
 pub fn Scopes::get(
   self : Scopes,
   name : String,
-  guard : BindingGuard,
+  guard_ : BindingGuard,
 ) -> Value raise HintedError {
-  self.get_binding(name).read(guard, "access variable `\{name}`")
+  self.get_binding(name).read(guard_, "access variable `\{name}`")
 }
 
 ///|
@@ -526,9 +529,9 @@ pub fn Scopes::get(
 pub fn Scopes::get_in_math(
   self : Scopes,
   name : String,
-  guard : BindingGuard,
+  guard_ : BindingGuard,
 ) -> Value raise HintedError {
-  self.get_binding_in_math(name).read(guard, "access variable `\{name}`")
+  self.get_binding_in_math(name).read(guard_, "access variable `\{name}`")
 }
 
 ///|
@@ -536,12 +539,12 @@ pub fn Scopes::get_in_math(
 pub fn Scopes::get_mut(
   self : Scopes,
   name : String,
-  guard : BindingGuard,
+  guard_ : BindingGuard,
 ) -> Binding raise HintedError {
   let found = if self.top.get(name) is Some(b) {
     Some(b)
   } else {
-    let mut res = None
+    let mut res : Binding? = None
     for i = self.scopes.length() - 1; i >= 0; i = i - 1 {
       if self.scopes[i].get(name) is Some(b) {
         res = Some(b)
@@ -552,13 +555,13 @@ pub fn Scopes::get_mut(
   }
   match found {
     Some(b) => {
-      b.check_write(guard, "access variable `\{name}`")
+      b.check_write(guard_, "access variable `\{name}`")
       b
     }
     None =>
       match self.base.bind(base => base.global.scope().get(name)) {
         Some(binding) => {
-          binding.read(guard, "access variable `\{name}`") |> ignore
+          binding.read(guard_, "access variable `\{name}`") |> ignore
           raise HintedError(cannot_mutate_constant(name))
         }
         None if name == "std" => raise HintedError(cannot_mutate_constant(name))

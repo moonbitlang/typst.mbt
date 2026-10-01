@@ -11,27 +11,27 @@ pub(all) struct Rel[T] {
 
 ///|
 pub fn[T : Numeric] Rel::zero() -> Rel[T] {
-  { rel: Ratio::zero(), abs: T::zero() }
+  { rel: Ratio::zero(), abs: T::zero(), }
 }
 
 ///|
 pub fn[T : Numeric] Rel::one() -> Rel[T] {
-  { rel: Ratio::one(), abs: T::zero() }
+  { rel: Ratio::one(), abs: T::zero(), }
 }
 
 ///|
 pub fn[T] Rel::new(rel : Ratio, abs : T) -> Rel[T] {
-  { rel, abs }
+  { rel, abs, }
 }
 
 ///|
 pub fn[T : Numeric] Rel::from_abs(abs : T) -> Rel[T] {
-  { rel: Ratio::zero(), abs }
+  { rel: Ratio::zero(), abs, }
 }
 
 ///|
 pub fn[T : Numeric] Rel::from_ratio(rel : Ratio) -> Rel[T] {
-  { rel, abs: T::zero() }
+  { rel, abs: T::zero(), }
 }
 
 ///|
@@ -53,7 +53,7 @@ pub fn[T : Numeric] Rel::relative_to(self : Rel[T], whole : T) -> T {
 ///|
 /// Map the absolute part with `f`.
 pub fn[T, U] Rel::map(self : Rel[T], f : (T) -> U) -> Rel[U] {
-  { rel: self.rel, abs: f(self.abs) }
+  { rel: self.rel, abs: f(self.abs), }
 }
 
 ///|
@@ -86,46 +86,46 @@ pub fn Rel::partial_cmp_length(self : Rel[Length], other : Rel[Length]) -> Int? 
 }
 
 ///|
-pub impl[T : Numeric] Add for Rel[T] with add(self, other) {
-  { rel: self.rel + other.rel, abs: self.abs + other.abs }
+pub impl[T : Numeric] Add for Rel[T] with fn add(self, other) {
+  { rel: self.rel + other.rel, abs: self.abs + other.abs, }
 }
 
 ///|
-pub impl[T : Numeric] Sub for Rel[T] with sub(self, other) {
-  { rel: self.rel - other.rel, abs: self.abs - other.abs }
+pub impl[T : Numeric] Sub for Rel[T] with fn sub(self, other) {
+  { rel: self.rel - other.rel, abs: self.abs - other.abs, }
 }
 
 ///|
-pub impl[T : Numeric] Neg for Rel[T] with neg(self) {
-  { rel: -self.rel, abs: -self.abs }
+pub impl[T : Numeric] Neg for Rel[T] with fn neg(self) {
+  { rel: -self.rel, abs: -self.abs, }
 }
 
 ///|
-pub impl[T : Numeric] Numeric for Rel[T] with zero() {
+pub impl[T : Numeric] Numeric for Rel[T] with fn zero() {
   Rel::zero()
 }
 
 ///|
-pub impl[T : Numeric] Numeric for Rel[T] with is_finite(self) {
+pub impl[T : Numeric] Numeric for Rel[T] with fn is_finite(self) {
   Numeric::is_finite(self.rel) && self.abs.is_finite()
 }
 
 ///|
-pub impl[T : Numeric] Numeric for Rel[T] with scale(self, factor) {
-  { rel: self.rel.times(factor), abs: self.abs.scale(factor) }
+pub impl[T : Numeric] Numeric for Rel[T] with fn scale(self, factor) {
+  { rel: self.rel.times(factor), abs: self.abs.scale(factor), }
 }
 
 ///|
-pub impl[T : Numeric] Numeric for Rel[T] with div_scale(self, factor) {
-  { rel: self.rel.div_by(factor), abs: self.abs.div_scale(factor) }
+pub impl[T : Numeric] Numeric for Rel[T] with fn div_scale(self, factor) {
+  { rel: self.rel.div_by(factor), abs: self.abs.div_scale(factor), }
 }
 
 ///|
 pub fn[T : Numeric] Rel::times(self : Rel[T], factor : Double) -> Rel[T] {
-  { rel: self.rel.times(factor), abs: self.abs.scale(factor) }
+  { rel: self.rel.times(factor), abs: self.abs.scale(factor), }
 }
 
 ///|
 pub fn[T : Numeric] Rel::div_by(self : Rel[T], factor : Double) -> Rel[T] {
-  { rel: self.rel.div_by(factor), abs: self.abs.div_scale(factor) }
+  { rel: self.rel.div_by(factor), abs: self.abs.div_scale(factor), }
 }

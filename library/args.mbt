@@ -26,7 +26,9 @@ pub struct Args {
 pub fn Args::new(span : @syntax.Span, values : ArrayView[Value]) -> Args {
   {
     span,
-    items: values.to_array().map(v => { span, name: None, value: { v, span } }),
+    items: values
+    .to_array()
+    .map(v => ({ span, name: None, value: { v, span, }, } : Arg)),
   }
 }
 
@@ -53,13 +55,17 @@ pub fn Args::insert(
   span : @syntax.Span,
   value : Value,
 ) -> Unit {
-  self.items.insert(index, { span: self.span, name: None, value: { v: value, span } })
+  self.items.insert(index, {
+    span: self.span,
+    name: None,
+    value: { v: value, span, },
+  })
 }
 
 ///|
 /// Push a positional argument.
 pub fn Args::push(self : Args, span : @syntax.Span, value : Value) -> Unit {
-  self.items.push({ span: self.span, name: None, value: { v: value, span } })
+  self.items.push({ span: self.span, name: None, value: { v: value, span, }, })
 }
 
 ///|
@@ -108,7 +114,10 @@ pub fn Args::consume(self : Args, n : Int) -> Array[Arg] raise SourceError {
 ///
 /// Returns a `missing argument: {what}` error if no positional argument is
 /// left.
-pub fn[T : FromValue] Args::expect(self : Args, what : String) -> T raise SourceError {
+pub fn[T : FromValue] Args::expect(
+  self : Args,
+  what : String,
+) -> T raise SourceError {
   match self.eat() {
     Some(v) => v
     None => raise SourceError([self.missing_argument(what)])
@@ -171,11 +180,14 @@ pub fn[T : FromValue] Args::all(self : Args) -> Array[T] raise SourceError {
 ///|
 /// Cast and remove the value for the given named argument, returning an
 /// error if the conversion fails.
-pub fn[T : FromValue] Args::named(self : Args, name : String) -> T? raise SourceError {
+pub fn[T : FromValue] Args::named(
+  self : Args,
+  name : String,
+) -> T? raise SourceError {
   // We don't quit once we have a match because when multiple matches exist,
   // we want to remove all of them and use the last one.
   let mut i = 0
-  let mut found = None
+  let mut found : T? = None
   while i < self.items.length() {
     if self.items[i].name == Some(name) {
       let value = self.items.remove(i).value
@@ -204,7 +216,7 @@ pub fn[T : FromValue] Args::named_or_find(
 pub fn Args::take(self : Args) -> Args {
   let items = self.items.copy()
   self.items.clear()
-  { span: self.span, items }
+  { span: self.span, items, }
 }
 
 ///|
@@ -240,7 +252,9 @@ pub fn Args::field(self : Args, field : String) -> Value raise HintedError {
 /// The positional arguments.
 pub fn Args::to_pos(self : Args) -> Arr {
   Arr::from_array(
-    self.items.filter(item => item.name is None).map(item => item.value.v.shared()),
+    self.items
+    .filter(item => item.name is None)
+    .map(item => item.value.v.shared()),
   )
 }
 
@@ -264,7 +278,7 @@ pub fn Args::copy(self : Args) -> Args {
     items: self.items.map(a => {
       span: a.span,
       name: a.name,
-      value: { v: a.value.v.shared(), span: a.value.span },
+      value: { v: a.value.v.shared(), span: a.value.span, },
     }),
   }
 }
@@ -272,16 +286,18 @@ pub fn Args::copy(self : Args) -> Args {
 ///|
 /// Upstream `Repr for Args`.
 pub fn Args::repr(self : Args) -> String {
-  let pieces = self.items.map(arg => match arg.name {
-    Some(name) => "\{name}: \{arg.value.v.repr()}"
-    None => arg.value.v.repr()
+  let pieces = self.items.map(arg => {
+    match arg.name {
+      Some(name) => "\{name}: \{arg.value.v.repr()}"
+      None => arg.value.v.repr()
+    }
   })
   "arguments" + pretty_array_like(pieces, false)
 }
 
 ///|
 /// Upstream `PartialEq for Args`: compares positional and named parts.
-pub impl Eq for Args with equal(self, other) {
+pub impl Eq for Args with fn equal(self, other) {
   equal(Array(self.to_pos()), Array(other.to_pos())) &&
   equal(Dict(self.to_named()), Dict(other.to_named()))
 }
@@ -290,12 +306,14 @@ pub impl Eq for Args with equal(self, other) {
 /// Merge two argument lists (upstream `Add for Args`): named arguments of
 /// `rhs` replace those of `self`.
 pub fn Args::merge(self : Args, rhs : Args) -> Args {
-  let items = self.items.filter(item => match item.name {
-    Some(name) => !rhs.items.iter().any(a => a.name == Some(name))
-    None => true
+  let items = self.items.filter(item => {
+    match item.name {
+      Some(name) => !rhs.items.iter().any(a => a.name == Some(name))
+      None => true
+    }
   })
   for a in rhs.items {
     items.push(a)
   }
-  { span: @syntax.Span::detached(), items }
+  { span: @syntax.Span::detached(), items, }
 }

@@ -18,19 +18,19 @@ pub struct Arr {
 ///|
 /// Create a new, empty array.
 pub fn Arr::new() -> Arr {
-  { items: [], shared: false }
+  { items: [], shared: false, }
 }
 
 ///|
 /// Create an array taking ownership of the given values.
 pub fn Arr::from_array(items : Array[Value]) -> Arr {
-  { items, shared: false }
+  { items, shared: false, }
 }
 
 ///|
 /// A fresh, unshared copy of this array (items are marked shared).
 pub fn Arr::copy(self : Arr) -> Arr {
-  { items: self.items.map(v => v.shared()), shared: false }
+  { items: self.items.map(v => v.shared()), shared: false, }
 }
 
 ///|
@@ -64,7 +64,11 @@ pub fn Arr::iter(self : Arr) -> Iter[Value] {
 
 ///|
 /// Resolve an index or return an out-of-bounds error.
-pub fn Arr::locate(self : Arr, index : Int64, end_ok : Bool) -> Int raise HintedError {
+pub fn Arr::locate(
+  self : Arr,
+  index : Int64,
+  end_ok : Bool,
+) -> Int raise HintedError {
   match self.locate_opt(index, end_ok) {
     Some(i) => i
     None => bail(out_of_bounds(index, self.len()))
@@ -117,7 +121,7 @@ pub fn Arr::repr(self : Arr) -> String {
 /// Repeat this array `n` times.
 pub fn Arr::repeat(self : Arr, n : Int64) -> Arr raise HintedError {
   let count = self.len().to_int64() * n
-  if n > 0L && count / n != self.len().to_int64() || count > 0x7FFFFFFFL {
+  if (n > 0L && count / n != self.len().to_int64()) || count > 0x7FFFFFFFL {
     bail("cannot repeat this array \{n} times")
   }
   let out = []

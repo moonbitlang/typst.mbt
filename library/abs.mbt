@@ -150,7 +150,7 @@ pub fn Abs::signum(self : Abs) -> Double {
 }
 
 ///|
-pub impl Numeric for Abs with div_scale(self, factor) {
+pub impl Numeric for Abs with fn div_scale(self, factor) {
   self.div_by(factor)
 }
 
@@ -170,37 +170,37 @@ pub fn Abs::ratio_to(self : Abs, other : Abs) -> Double {
 }
 
 ///|
-pub impl Add for Abs with add(self, other) {
+pub impl Add for Abs with fn add(self, other) {
   Abs(self.0 + other.0)
 }
 
 ///|
-pub impl Sub for Abs with sub(self, other) {
+pub impl Sub for Abs with fn sub(self, other) {
   Abs(self.0 - other.0)
 }
 
 ///|
-pub impl Neg for Abs with neg(self) {
+pub impl Neg for Abs with fn neg(self) {
   Abs(-self.0)
 }
 
 ///|
-pub impl Mod for Abs with mod(self, other) {
+pub impl Mod for Abs with fn mod(self, other) {
   Abs(Scalar::new(rust_rem(self.to_raw(), other.to_raw())))
 }
 
 ///|
-pub impl Numeric for Abs with zero() {
+pub impl Numeric for Abs with fn zero() {
   Abs::zero()
 }
 
 ///|
-pub impl Numeric for Abs with is_finite(self) {
+pub impl Numeric for Abs with fn is_finite(self) {
   !self.to_raw().is_inf() && !self.to_raw().is_nan()
 }
 
 ///|
-pub impl Numeric for Abs with scale(self, factor) {
+pub impl Numeric for Abs with fn scale(self, factor) {
   self.times(factor)
 }
 

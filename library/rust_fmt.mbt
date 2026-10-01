@@ -42,7 +42,12 @@ fn shortest_digits(x : Double) -> (String, Int) {
       } else {
         e
       }
-      (s.unsafe_substring(start=0, end=i), @string.parse_int(e) catch { _ => 0 })
+      (
+        s.unsafe_substring(start=0, end=i),
+        @string.parse_int(e) catch {
+          _ => 0
+        },
+      )
     }
     None => (s, 0)
   }
@@ -78,7 +83,7 @@ pub fn rust_display_f64(x : Double) -> String {
   if x.is_nan() {
     return "NaN"
   }
-  let neg = x < 0.0 || (x == 0.0 && (1.0 / x) < 0.0)
+  let neg = x < 0.0 || (x == 0.0 && 1.0 / x < 0.0)
   let sign = if neg { "-" } else { "" }
   if x.is_inf() {
     return sign + "inf"
@@ -98,7 +103,7 @@ fn place_point(digits : String, point : Int, min_frac : Int) -> String {
   let n = digits.length()
   if point <= 0 {
     buf.write_string("0.")
-    for _ in 0..<(-point) {
+    for _ in 0..<-point {
       buf.write_char('0')
     }
     buf.write_string(digits)
@@ -129,7 +134,7 @@ pub fn rust_debug_f64(x : Double) -> String {
   if x.is_nan() {
     return "NaN"
   }
-  let neg = x < 0.0 || (x == 0.0 && (1.0 / x) < 0.0)
+  let neg = x < 0.0 || (x == 0.0 && 1.0 / x < 0.0)
   let sign = if neg { "-" } else { "" }
   if x.is_inf() {
     return sign + "inf"
@@ -162,7 +167,7 @@ pub fn rust_fixed_f64(x : Double, prec : Int) -> String {
   if x.is_nan() {
     return "NaN"
   }
-  let neg = x < 0.0 || (x == 0.0 && (1.0 / x) < 0.0)
+  let neg = x < 0.0 || (x == 0.0 && 1.0 / x < 0.0)
   let sign = if neg { "-" } else { "" }
   if x.is_inf() {
     return sign + "inf"
@@ -187,7 +192,10 @@ fn exact_fixed(a : Double, prec : Int) -> String {
   let mb = @bigint.BigInt::from_uint64(m)
   let ten_p = @bigint.BigInt::from_int(10).pow(@bigint.BigInt::from_int(prec))
   let (num, den) = if e >= 0 {
-    (mb * ten_p * @bigint.BigInt::from_int(2).pow(@bigint.BigInt::from_int(e)), @bigint.BigInt::from_int(1))
+    (
+      mb * ten_p * @bigint.BigInt::from_int(2).pow(@bigint.BigInt::from_int(e)),
+      @bigint.BigInt::from_int(1),
+    )
   } else {
     (mb * ten_p, @bigint.BigInt::from_int(2).pow(@bigint.BigInt::from_int(-e)))
   }
@@ -195,7 +203,10 @@ fn exact_fixed(a : Double, prec : Int) -> String {
   let r = num - q * den
   let twice = r * @bigint.BigInt::from_int(2)
   let q = if twice > den ||
-    (twice == den && q % @bigint.BigInt::from_int(2) != @bigint.BigInt::from_int(0)) {
+    (
+      twice == den &&
+      q % @bigint.BigInt::from_int(2) != @bigint.BigInt::from_int(0)
+    ) {
     q + @bigint.BigInt::from_int(1)
   } else {
     q

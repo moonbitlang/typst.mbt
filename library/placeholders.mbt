@@ -53,7 +53,7 @@ pub fn Symbol::get(self : Symbol) -> String {
 ///|
 pub fn Symbol::modified(
   self : Symbol,
-  _guard : BindingGuard,
+  _guard_ : BindingGuard,
   field : String,
 ) -> Symbol raise HintedError {
   bail("unknown symbol modifier: \{field}") |> ignore
@@ -75,7 +75,10 @@ pub fn Version::to_string(self : Version) -> String {
 }
 
 ///|
-pub fn Version::component(self : Version, field : String) -> Int64 raise HintedError {
+pub fn Version::component(
+  self : Version,
+  field : String,
+) -> Int64 raise HintedError {
   let idx = match field {
     "major" => 0
     "minor" => 1
@@ -87,10 +90,10 @@ pub fn Version::component(self : Version, field : String) -> Int64 raise HintedE
 
 ///|
 /// Raw bytes. (placeholder; see foundations/bytes.rs)
-pub(all) struct Bytes(@builtin.Bytes) derive(Eq, Hash)
+pub(all) struct BytesValue(Bytes) derive(Eq, Hash)
 
 ///|
-pub fn Bytes::repr(self : Bytes) -> String {
+pub fn BytesValue::repr(self : BytesValue) -> String {
   "bytes(\{self.0.length()})"
 }
 
@@ -160,4 +163,204 @@ pub fn DynValue::repr(self : DynValue) -> String {
   match self {
     Placeholder => ".."
   }
+}
+
+///|
+pub fn Symbol::func(self : Symbol) -> Func raise HintedError {
+  bail("symbol \{self.repr()} is not callable")
+}
+
+///|
+pub impl Compare for Version with fn compare(self, other) {
+  let n = if self.0.length() > other.0.length() {
+    self.0.length()
+  } else {
+    other.0.length()
+  }
+  for i in 0..<n {
+    let a = self.0.get(i).unwrap_or(0)
+    let b = other.0.get(i).unwrap_or(0)
+    if a != b {
+      return a.compare(b)
+    }
+  }
+  0
+}
+
+///|
+pub fn BytesValue::concat(self : BytesValue, other : BytesValue) -> BytesValue {
+  let buf = @buffer.new()
+  buf.write_bytes(self.0)
+  buf.write_bytes(other.0)
+  BytesValue(buf.to_bytes())
+}
+
+///|
+pub fn Decimal::from_int(i : Int64) -> Decimal {
+  { text: i.to_string(), }
+}
+
+///|
+pub fn Decimal::neg(self : Decimal) -> Decimal {
+  self
+}
+
+///|
+pub fn Decimal::is_zero(self : Decimal) -> Bool {
+  self.text == "0"
+}
+
+///|
+pub fn Decimal::checked_add(
+  self : Decimal,
+  _other : Decimal,
+) -> Decimal raise HintedError {
+  bail("decimal arithmetic is not ported yet") |> ignore
+  self
+}
+
+///|
+pub fn Decimal::checked_sub(
+  self : Decimal,
+  _other : Decimal,
+) -> Decimal raise HintedError {
+  bail("decimal arithmetic is not ported yet") |> ignore
+  self
+}
+
+///|
+pub fn Decimal::checked_mul(
+  self : Decimal,
+  _other : Decimal,
+) -> Decimal raise HintedError {
+  bail("decimal arithmetic is not ported yet") |> ignore
+  self
+}
+
+///|
+pub fn Decimal::checked_div(
+  self : Decimal,
+  _other : Decimal,
+) -> Decimal raise HintedError {
+  bail("decimal arithmetic is not ported yet") |> ignore
+  self
+}
+
+///|
+pub impl Compare for Decimal with fn compare(self, other) {
+  self.text.compare(other.text)
+}
+
+///|
+pub fn Duration::neg(self : Duration) -> Duration {
+  { seconds: -self.seconds, }
+}
+
+///|
+pub fn Duration::is_zero(self : Duration) -> Bool {
+  self.seconds == 0L
+}
+
+///|
+pub fn Duration::add(self : Duration, other : Duration) -> Duration {
+  { seconds: self.seconds + other.seconds, }
+}
+
+///|
+pub fn Duration::sub(self : Duration, other : Duration) -> Duration {
+  { seconds: self.seconds - other.seconds, }
+}
+
+///|
+pub fn Duration::mul(self : Duration, f : Double) -> Duration {
+  { seconds: (self.seconds.to_double() * f).to_int64(), }
+}
+
+///|
+pub fn Duration::div(self : Duration, f : Double) -> Duration {
+  { seconds: (self.seconds.to_double() / f).to_int64(), }
+}
+
+///|
+pub fn Duration::div_duration(self : Duration, other : Duration) -> Double {
+  self.seconds.to_double() / other.seconds.to_double()
+}
+
+///|
+pub impl Compare for Duration with fn compare(self, other) {
+  self.seconds.compare(other.seconds)
+}
+
+///|
+pub fn Datetime::add_duration(
+  self : Datetime,
+  _d : Duration,
+) -> Datetime raise HintedError {
+  bail("datetime arithmetic is not ported yet") |> ignore
+  self
+}
+
+///|
+pub fn Datetime::sub_duration(
+  self : Datetime,
+  _d : Duration,
+) -> Datetime raise HintedError {
+  bail("datetime arithmetic is not ported yet") |> ignore
+  self
+}
+
+///|
+pub fn Datetime::sub_datetime(
+  self : Datetime,
+  _d : Datetime,
+) -> Duration raise HintedError {
+  bail("datetime arithmetic is not ported yet")
+}
+
+///|
+pub fn Datetime::partial_cmp(self : Datetime, _other : Datetime) -> Int? {
+  ignore(self)
+  None
+}
+
+///|
+pub fn Datetime::kind(self : Datetime) -> String {
+  ignore(self)
+  "datetime"
+}
+
+///|
+pub fn DynValue::is_alignment(self : DynValue) -> Bool {
+  ignore(self)
+  false
+}
+
+///|
+pub fn DynValue::add_dyn(
+  self : DynValue,
+  _other : DynValue,
+) -> Value? raise HintedError {
+  ignore(self)
+  None
+}
+
+///|
+pub fn DynValue::regex_is_match(self : DynValue, _s : String) -> Bool? {
+  ignore(self)
+  None
+}
+
+///|
+/// Access a field on a dynamic value: `None` if the type has no fields,
+/// `Some(None)` if the field is missing.
+pub fn DynValue::field(self : DynValue, _field : String) -> Value?? {
+  ignore(self)
+  None
+}
+
+///|
+/// Create a stroke from a paint and a thickness (upstream
+/// `Stroke::from_pair`).
+pub fn stroke_from_pair(_a : Value, _b : Value) -> Value raise HintedError {
+  bail("strokes are not ported yet")
 }

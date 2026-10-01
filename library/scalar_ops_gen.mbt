@@ -1,38 +1,38 @@
 // Generated arithmetic for scalar newtypes.
 
 ///|
-pub impl Add for Em with add(self, other) {
+pub impl Add for Em with fn add(self, other) {
   Em(self.0 + other.0)
 }
 
 ///|
-pub impl Sub for Em with sub(self, other) {
+pub impl Sub for Em with fn sub(self, other) {
   Em(self.0 - other.0)
 }
 
 ///|
-pub impl Neg for Em with neg(self) {
+pub impl Neg for Em with fn neg(self) {
   Em(-self.0)
 }
 
 ///|
-pub impl Numeric for Em with zero() {
+pub impl Numeric for Em with fn zero() {
   Em(Scalar(0.0))
 }
 
 ///|
-pub impl Numeric for Em with is_finite(self) {
+pub impl Numeric for Em with fn is_finite(self) {
   let x = self.0.0
   !x.is_inf() && !x.is_nan()
 }
 
 ///|
-pub impl Numeric for Em with scale(self, factor) {
+pub impl Numeric for Em with fn scale(self, factor) {
   Em(Scalar::new(self.0.0 * factor))
 }
 
 ///|
-pub impl Numeric for Em with div_scale(self, factor) {
+pub impl Numeric for Em with fn div_scale(self, factor) {
   Em(Scalar::new(self.0.0 / factor))
 }
 
@@ -52,38 +52,38 @@ pub fn Em::ratio_to(self : Em, other : Em) -> Double {
 }
 
 ///|
-pub impl Add for Angle with add(self, other) {
+pub impl Add for Angle with fn add(self, other) {
   Angle(self.0 + other.0)
 }
 
 ///|
-pub impl Sub for Angle with sub(self, other) {
+pub impl Sub for Angle with fn sub(self, other) {
   Angle(self.0 - other.0)
 }
 
 ///|
-pub impl Neg for Angle with neg(self) {
+pub impl Neg for Angle with fn neg(self) {
   Angle(-self.0)
 }
 
 ///|
-pub impl Numeric for Angle with zero() {
+pub impl Numeric for Angle with fn zero() {
   Angle(Scalar(0.0))
 }
 
 ///|
-pub impl Numeric for Angle with is_finite(self) {
+pub impl Numeric for Angle with fn is_finite(self) {
   let x = self.0.0
   !x.is_inf() && !x.is_nan()
 }
 
 ///|
-pub impl Numeric for Angle with scale(self, factor) {
+pub impl Numeric for Angle with fn scale(self, factor) {
   Angle(Scalar::new(self.0.0 * factor))
 }
 
 ///|
-pub impl Numeric for Angle with div_scale(self, factor) {
+pub impl Numeric for Angle with fn div_scale(self, factor) {
   Angle(Scalar::new(self.0.0 / factor))
 }
 
@@ -103,38 +103,38 @@ pub fn Angle::ratio_to(self : Angle, other : Angle) -> Double {
 }
 
 ///|
-pub impl Add for Ratio with add(self, other) {
+pub impl Add for Ratio with fn add(self, other) {
   Ratio(self.0 + other.0)
 }
 
 ///|
-pub impl Sub for Ratio with sub(self, other) {
+pub impl Sub for Ratio with fn sub(self, other) {
   Ratio(self.0 - other.0)
 }
 
 ///|
-pub impl Neg for Ratio with neg(self) {
+pub impl Neg for Ratio with fn neg(self) {
   Ratio(-self.0)
 }
 
 ///|
-pub impl Numeric for Ratio with zero() {
+pub impl Numeric for Ratio with fn zero() {
   Ratio(Scalar(0.0))
 }
 
 ///|
-pub impl Numeric for Ratio with is_finite(self) {
+pub impl Numeric for Ratio with fn is_finite(self) {
   let x = self.0.0
   !x.is_inf() && !x.is_nan()
 }
 
 ///|
-pub impl Numeric for Ratio with scale(self, factor) {
+pub impl Numeric for Ratio with fn scale(self, factor) {
   Ratio(Scalar::new(self.0.0 * factor))
 }
 
 ///|
-pub impl Numeric for Ratio with div_scale(self, factor) {
+pub impl Numeric for Ratio with fn div_scale(self, factor) {
   Ratio(Scalar::new(self.0.0 / factor))
 }
 
@@ -154,38 +154,38 @@ pub fn Ratio::ratio_to(self : Ratio, other : Ratio) -> Double {
 }
 
 ///|
-pub impl Add for Fr with add(self, other) {
+pub impl Add for Fr with fn add(self, other) {
   Fr(self.0 + other.0)
 }
 
 ///|
-pub impl Sub for Fr with sub(self, other) {
+pub impl Sub for Fr with fn sub(self, other) {
   Fr(self.0 - other.0)
 }
 
 ///|
-pub impl Neg for Fr with neg(self) {
+pub impl Neg for Fr with fn neg(self) {
   Fr(-self.0)
 }
 
 ///|
-pub impl Numeric for Fr with zero() {
+pub impl Numeric for Fr with fn zero() {
   Fr(Scalar(0.0))
 }
 
 ///|
-pub impl Numeric for Fr with is_finite(self) {
+pub impl Numeric for Fr with fn is_finite(self) {
   let x = self.0.0
   !x.is_inf() && !x.is_nan()
 }
 
 ///|
-pub impl Numeric for Fr with scale(self, factor) {
+pub impl Numeric for Fr with fn scale(self, factor) {
   Fr(Scalar::new(self.0.0 * factor))
 }
 
 ///|
-pub impl Numeric for Fr with div_scale(self, factor) {
+pub impl Numeric for Fr with fn div_scale(self, factor) {
   Fr(Scalar::new(self.0.0 / factor))
 }
 

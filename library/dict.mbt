@@ -14,7 +14,7 @@ pub struct Dict {
 ///|
 /// Create a new, empty dictionary.
 pub fn Dict::new() -> Dict {
-  { map: {}, shared: false }
+  { map: {}, shared: false, }
 }
 
 ///|
@@ -24,7 +24,7 @@ pub fn Dict::from_pairs(pairs : ArrayView[(String, Value)]) -> Dict {
   for pair in pairs {
     map[pair.0] = pair.1
   }
-  { map, shared: false }
+  { map, shared: false, }
 }
 
 ///|
@@ -34,7 +34,7 @@ pub fn Dict::copy(self : Dict) -> Dict {
   for k, v in self.map {
     map[k] = v.shared()
   }
-  { map, shared: false }
+  { map, shared: false, }
 }
 
 ///|

@@ -36,7 +36,7 @@ pub(all) enum Value {
   /// A string: `"string"`. Typst strings are indexed by UTF-8 bytes.
   Str(String)
   /// Raw bytes.
-  Bytes(Bytes)
+  Bytes(BytesValue)
   /// A label: `<intro>`.
   Label(Label)
   /// A datetime.
@@ -249,17 +249,17 @@ pub fn Value::display(self : Value) -> Content {
 pub fn Value::field(
   self : Value,
   field : String,
-  guard : BindingGuard,
+  guard_ : BindingGuard,
 ) -> Value raise HintedError {
   match self {
-    Symbol(symbol) => Symbol(symbol.modified(guard, field))
+    Symbol(symbol) => Symbol(symbol.modified(guard_, field))
     Version(version) => Int(version.component(field))
     Dict(dict) => dict.get(field).shared()
     Args(args) => args.field(field).shared()
     Content(content) => content.field_by_name(field)
-    Type(ty) => ty.field(field, guard)
-    Func(func) => func.field(field, guard)
-    Module(module) => module.field(field, guard)
+    Type(ty) => ty.field(field, guard_)
+    Func(func) => func.field(field, guard_)
+    Module(module) => module.field(field, guard_)
     _ => fields_field(self, field)
   }
 }
@@ -276,6 +276,6 @@ pub fn Value::scope(self : Value) -> Scope? {
 }
 
 ///|
-pub impl Eq for Value with equal(self, other) {
+pub impl Eq for Value with fn equal(self, other) {
   equal(self, other)
 }

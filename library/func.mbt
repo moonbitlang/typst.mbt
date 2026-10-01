@@ -137,7 +137,7 @@ pub struct Func {
 
 ///|
 pub fn Func::from_inner(inner : FuncInner) -> Func {
-  { inner, span: @syntax.Span::detached() }
+  { inner, span: @syntax.Span::detached(), }
 }
 
 ///|
@@ -205,16 +205,17 @@ pub fn Func::scope(self : Func) -> Scope? {
 pub fn Func::field(
   self : Func,
   field : String,
-  guard : BindingGuard,
+  guard_ : BindingGuard,
 ) -> Value raise HintedError {
   guard self.scope() is Some(scope) else {
     bail("cannot access fields on user-defined functions")
   }
   match scope.get(field) {
-    Some(binding) => binding.read(guard, "access field `\{field}`").shared()
+    Some(binding) => binding.read(guard_, "access field `\{field}`").shared()
     None =>
       match self.name() {
-        Some(name) => bail("function `\{name}` does not contain field `\{field}`")
+        Some(name) =>
+          bail("function `\{name}` does not contain field `\{field}`")
         None => bail("function does not contain field `\{field}`")
       }
   }
@@ -263,7 +264,7 @@ pub fn Func::call(
       let items = pre.items.map(a => {
         span: a.span,
         name: a.name,
-        value: { v: a.value.v.shared(), span: a.value.span },
+        value: { v: a.value.v.shared(), span: a.value.span, },
       })
       for a in args.items {
         items.push(a)
@@ -296,7 +297,7 @@ pub fn Func::span(self : Func) -> @syntax.Span {
 /// Attach a span to this function if it doesn't already have one.
 pub fn Func::spanned(self : Func, span : @syntax.Span) -> Func {
   if self.span.is_detached() {
-    { inner: self.inner, span }
+    { inner: self.inner, span, }
   } else {
     self
   }
@@ -305,7 +306,7 @@ pub fn Func::spanned(self : Func, span : @syntax.Span) -> Func {
 ///|
 /// Returns a new function that has the given arguments pre-applied.
 pub fn Func::with_args(self : Func, args : Args) -> Func {
-  { inner: With(self, args.take()), span: self.span }
+  { inner: With(self, args.take()), span: self.span, }
 }
 
 ///|
@@ -322,7 +323,7 @@ pub fn Func::repr(self : Func) -> String {
 
 ///|
 /// Upstream `PartialEq for Func` (identity of the inner representation).
-pub impl Eq for Func with equal(self, other) {
+pub impl Eq for Func with fn equal(self, other) {
   match (self.inner, other.inner) {
     (Native(a), Native(b)) => physical_equal(a, b)
     (Element(a), Element(b)) => a == b
@@ -344,4 +345,6 @@ pub fn Closure::name(self : Closure) -> String? {
 ///|
 /// Extracts the name of a closure node (installed by the eval package,
 /// which owns the typed AST).
-pub let closure_name_hook : Ref[(@syntax.SyntaxNode) -> String?] = Ref::new(_ => None)
+pub let closure_name_hook : Ref[(@syntax.SyntaxNode) -> String?] = Ref::new(_ => {
+  None
+})

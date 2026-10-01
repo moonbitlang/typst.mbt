@@ -74,18 +74,18 @@ fn NativeTypeData::ensure(self : NativeTypeData) -> Unit {
 pub struct Type(NativeTypeData)
 
 ///|
-pub impl Eq for Type with equal(self, other) {
+pub impl Eq for Type with fn equal(self, other) {
   physical_equal(self.0, other.0)
 }
 
 ///|
-pub impl Hash for Type with hash_combine(self, hasher) {
+pub impl Hash for Type with fn hash_combine(self, hasher) {
   hasher.combine_string(self.0.name)
 }
 
 ///|
 /// Order by long name (upstream `Ord for Type`).
-pub impl Compare for Type with compare(self, other) {
+pub impl Compare for Type with fn compare(self, other) {
   self.0.long_name.compare(other.0.long_name)
 }
 
@@ -135,11 +135,11 @@ pub fn Type::scope(self : Type) -> Scope {
 pub fn Type::field(
   self : Type,
   field : String,
-  guard : BindingGuard,
+  guard_ : BindingGuard,
 ) -> Value raise HintedError {
   match self.scope().get(field) {
     Some(binding) =>
-      binding.read(guard, "access field `\{field}` on type \{self}").shared()
+      binding.read(guard_, "access field `\{field}` on type \{self}").shared()
     None => bail("type \{self} does not contain field `\{field}`")
   }
 }
@@ -158,6 +158,6 @@ pub fn Type::repr(self : Type) -> String {
 
 ///|
 /// Upstream `Display for Type`: the long name.
-pub impl Show for Type with output(self, logger) {
+pub impl Show for Type with fn output(self, logger) {
   logger.write_string(self.long_name())
 }

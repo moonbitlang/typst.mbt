@@ -17,7 +17,10 @@ pub(all) enum CastInfo {
 /// Walk all contained non-union infos.
 pub fn CastInfo::walk(self : CastInfo, f : (CastInfo) -> Unit) -> Unit {
   match self {
-    Union(infos) => for child in infos { child.walk(f) }
+    Union(infos) =>
+      for child in infos {
+        child.walk(f)
+      }
     other => f(other)
   }
 }
@@ -27,16 +30,18 @@ pub fn CastInfo::walk(self : CastInfo, f : (CastInfo) -> Unit) -> Unit {
 pub fn CastInfo::error(self : CastInfo, found : Value) -> HintedString {
   let mut matching_type = false
   let parts : Array[String] = []
-  self.walk(info => match info {
-    Any => parts.push("anything")
-    Value(value, _) => {
-      parts.push(value.repr())
-      if value.ty() == found.ty() {
-        matching_type = true
+  self.walk(info => {
+    match info {
+      Any => parts.push("anything")
+      Value(value, _) => {
+        parts.push(value.repr())
+        if value.ty() == found.ty() {
+          matching_type = true
+        }
       }
+      Type(ty) => parts.push(ty.to_string())
+      Union(_) => ()
     }
-    Type(ty) => parts.push(ty.to_string())
-    Union(_) => ()
   })
   let msg = StringBuilder()
   msg.write_string("expected ")
@@ -108,23 +113,23 @@ pub fn CastInfo::union_with(self : CastInfo, rhs : CastInfo) -> CastInfo {
 /// Determine details of a type (upstream `Reflect`).
 pub(open) trait Reflect {
   /// Describe what can be cast into this value.
-  input() -> CastInfo
+  fn input() -> CastInfo
   /// Describe what this value can be cast into.
-  output() -> CastInfo
+  fn output() -> CastInfo
   /// Whether the given value can be converted to `T`.
-  castable(Value) -> Bool
+  fn castable(Value) -> Bool
 }
 
 ///|
 /// Cast a Rust value into a Typst [Value] (upstream `IntoValue`).
 pub(open) trait IntoValue {
-  into_value(Self) -> Value
+  fn into_value(Self) -> Value
 }
 
 ///|
 /// Try to cast a Typst [Value] into a value (upstream `FromValue`).
 pub(open) trait FromValue: Reflect {
-  from_value(Value) -> Self raise HintedError
+  fn from_value(Value) -> Self raise HintedError
 }
 
 ///|
@@ -151,14 +156,8 @@ pub fn[T : Reflect] output_of(_ : Ty[T]) -> CastInfo {
 
 ///|
 /// The error for a value that could not be cast into `T`.
-pub fn[T : Reflect] cast_error(found : Value) -> HintedString {
+pub fn[T : Reflect] cast_error(_ty : Ty[T], found : Value) -> HintedString {
   T::input().error(found)
-}
-
-///|
-/// Raise the cast error of `T`.
-pub fn[T : Reflect, R] cast_fail(found : Value) -> R raise HintedError {
-  raise HintedError(T::input().error(found))
 }
 
 ///|
@@ -170,54 +169,54 @@ pub fn[T : FromValue] Value::cast(self : Value) -> T raise HintedError {
 // Value itself.
 
 ///|
-pub impl Reflect for Value with input() {
+pub impl Reflect for Value with fn input() {
   Any
 }
 
 ///|
-pub impl Reflect for Value with output() {
+pub impl Reflect for Value with fn output() {
   Any
 }
 
 ///|
-pub impl Reflect for Value with castable(_) {
+pub impl Reflect for Value with fn castable(_) {
   true
 }
 
 ///|
-pub impl IntoValue for Value with into_value(self) {
+pub impl IntoValue for Value with fn into_value(self) {
   self
 }
 
 ///|
-pub impl FromValue for Value with from_value(v) {
+pub impl FromValue for Value with fn from_value(v) {
   v
 }
 
 // Primitive types.
 
 ///|
-pub impl Reflect for Bool with input() {
+pub impl Reflect for Bool with fn input() {
   Type(Type::bool())
 }
 
 ///|
-pub impl Reflect for Bool with output() {
+pub impl Reflect for Bool with fn output() {
   Type(Type::bool())
 }
 
 ///|
-pub impl Reflect for Bool with castable(v) {
+pub impl Reflect for Bool with fn castable(v) {
   v is Bool(_)
 }
 
 ///|
-pub impl IntoValue for Bool with into_value(self) {
+pub impl IntoValue for Bool with fn into_value(self) {
   Bool(self)
 }
 
 ///|
-pub impl FromValue for Bool with from_value(v) {
+pub impl FromValue for Bool with fn from_value(v) {
   match v {
     Bool(b) => b
     v => cast_fail_with(Type(Type::bool()), v)
@@ -230,27 +229,27 @@ fn[R] cast_fail_with(info : CastInfo, found : Value) -> R raise HintedError {
 }
 
 ///|
-pub impl Reflect for Int64 with input() {
+pub impl Reflect for Int64 with fn input() {
   Type(Type::int())
 }
 
 ///|
-pub impl Reflect for Int64 with output() {
+pub impl Reflect for Int64 with fn output() {
   Type(Type::int())
 }
 
 ///|
-pub impl Reflect for Int64 with castable(v) {
+pub impl Reflect for Int64 with fn castable(v) {
   v is Int(_)
 }
 
 ///|
-pub impl IntoValue for Int64 with into_value(self) {
+pub impl IntoValue for Int64 with fn into_value(self) {
   Int(self)
 }
 
 ///|
-pub impl FromValue for Int64 with from_value(v) {
+pub impl FromValue for Int64 with fn from_value(v) {
   match v {
     Int(i) => i
     v => cast_fail_with(Type(Type::int()), v)
@@ -258,27 +257,27 @@ pub impl FromValue for Int64 with from_value(v) {
 }
 
 ///|
-pub impl Reflect for Double with input() {
+pub impl Reflect for Double with fn input() {
   Type(Type::float())
 }
 
 ///|
-pub impl Reflect for Double with output() {
+pub impl Reflect for Double with fn output() {
   Type(Type::float())
 }
 
 ///|
-pub impl Reflect for Double with castable(v) {
+pub impl Reflect for Double with fn castable(v) {
   v is (Float(_) | Int(_))
 }
 
 ///|
-pub impl IntoValue for Double with into_value(self) {
+pub impl IntoValue for Double with fn into_value(self) {
   Float(self)
 }
 
 ///|
-pub impl FromValue for Double with from_value(v) {
+pub impl FromValue for Double with fn from_value(v) {
   match v {
     Float(f) => f
     Int(i) => i.to_double()
@@ -287,27 +286,27 @@ pub impl FromValue for Double with from_value(v) {
 }
 
 ///|
-pub impl Reflect for String with input() {
+pub impl Reflect for String with fn input() {
   Type(Type::str())
 }
 
 ///|
-pub impl Reflect for String with output() {
+pub impl Reflect for String with fn output() {
   Type(Type::str())
 }
 
 ///|
-pub impl Reflect for String with castable(v) {
+pub impl Reflect for String with fn castable(v) {
   v is (Str(_) | Symbol(_))
 }
 
 ///|
-pub impl IntoValue for String with into_value(self) {
+pub impl IntoValue for String with fn into_value(self) {
   Str(self)
 }
 
 ///|
-pub impl FromValue for String with from_value(v) {
+pub impl FromValue for String with fn from_value(v) {
   match v {
     Str(s) => s
     Symbol(s) => s.get()
@@ -316,27 +315,27 @@ pub impl FromValue for String with from_value(v) {
 }
 
 ///|
-pub impl Reflect for Length with input() {
+pub impl Reflect for Length with fn input() {
   Type(Type::length())
 }
 
 ///|
-pub impl Reflect for Length with output() {
+pub impl Reflect for Length with fn output() {
   Type(Type::length())
 }
 
 ///|
-pub impl Reflect for Length with castable(v) {
+pub impl Reflect for Length with fn castable(v) {
   v is Length(_)
 }
 
 ///|
-pub impl IntoValue for Length with into_value(self) {
+pub impl IntoValue for Length with fn into_value(self) {
   Length(self)
 }
 
 ///|
-pub impl FromValue for Length with from_value(v) {
+pub impl FromValue for Length with fn from_value(v) {
   match v {
     Length(l) => l
     v => cast_fail_with(Type(Type::length()), v)
@@ -344,27 +343,27 @@ pub impl FromValue for Length with from_value(v) {
 }
 
 ///|
-pub impl Reflect for Angle with input() {
+pub impl Reflect for Angle with fn input() {
   Type(Type::angle())
 }
 
 ///|
-pub impl Reflect for Angle with output() {
+pub impl Reflect for Angle with fn output() {
   Type(Type::angle())
 }
 
 ///|
-pub impl Reflect for Angle with castable(v) {
+pub impl Reflect for Angle with fn castable(v) {
   v is Angle(_)
 }
 
 ///|
-pub impl IntoValue for Angle with into_value(self) {
+pub impl IntoValue for Angle with fn into_value(self) {
   Angle(self)
 }
 
 ///|
-pub impl FromValue for Angle with from_value(v) {
+pub impl FromValue for Angle with fn from_value(v) {
   match v {
     Angle(a) => a
     v => cast_fail_with(Type(Type::angle()), v)
@@ -372,27 +371,27 @@ pub impl FromValue for Angle with from_value(v) {
 }
 
 ///|
-pub impl Reflect for Ratio with input() {
+pub impl Reflect for Ratio with fn input() {
   Type(Type::ratio())
 }
 
 ///|
-pub impl Reflect for Ratio with output() {
+pub impl Reflect for Ratio with fn output() {
   Type(Type::ratio())
 }
 
 ///|
-pub impl Reflect for Ratio with castable(v) {
+pub impl Reflect for Ratio with fn castable(v) {
   v is Ratio(_)
 }
 
 ///|
-pub impl IntoValue for Ratio with into_value(self) {
+pub impl IntoValue for Ratio with fn into_value(self) {
   Ratio(self)
 }
 
 ///|
-pub impl FromValue for Ratio with from_value(v) {
+pub impl FromValue for Ratio with fn from_value(v) {
   match v {
     Ratio(r) => r
     v => cast_fail_with(Type(Type::ratio()), v)
@@ -400,27 +399,27 @@ pub impl FromValue for Ratio with from_value(v) {
 }
 
 ///|
-pub impl Reflect for Fr with input() {
+pub impl Reflect for Fr with fn input() {
   Type(Type::fraction())
 }
 
 ///|
-pub impl Reflect for Fr with output() {
+pub impl Reflect for Fr with fn output() {
   Type(Type::fraction())
 }
 
 ///|
-pub impl Reflect for Fr with castable(v) {
+pub impl Reflect for Fr with fn castable(v) {
   v is Fraction(_)
 }
 
 ///|
-pub impl IntoValue for Fr with into_value(self) {
+pub impl IntoValue for Fr with fn into_value(self) {
   Fraction(self)
 }
 
 ///|
-pub impl FromValue for Fr with from_value(v) {
+pub impl FromValue for Fr with fn from_value(v) {
   match v {
     Fraction(f) => f
     v => cast_fail_with(Type(Type::fraction()), v)
@@ -429,27 +428,27 @@ pub impl FromValue for Fr with from_value(v) {
 
 ///|
 /// `Rel<Length>` accepts lengths, ratios and relative lengths.
-pub impl Reflect for Rel[Length] with input() {
+pub impl Reflect for Rel[Length] with fn input() {
   Type(Type::relative())
 }
 
 ///|
-pub impl Reflect for Rel[Length] with output() {
+pub impl Reflect for Rel[Length] with fn output() {
   Type(Type::relative())
 }
 
 ///|
-pub impl Reflect for Rel[Length] with castable(v) {
+pub impl Reflect for Rel[Length] with fn castable(v) {
   v is (Relative(_) | Length(_) | Ratio(_))
 }
 
 ///|
-pub impl IntoValue for Rel[Length] with into_value(self) {
+pub impl IntoValue for Rel[Length] with fn into_value(self) {
   Relative(self)
 }
 
 ///|
-pub impl FromValue for Rel[Length] with from_value(v) {
+pub impl FromValue for Rel[Length] with fn from_value(v) {
   match v {
     Relative(r) => r
     Length(l) => Rel::from_abs(l)
@@ -459,27 +458,27 @@ pub impl FromValue for Rel[Length] with from_value(v) {
 }
 
 ///|
-pub impl Reflect for Content with input() {
+pub impl Reflect for Content with fn input() {
   Type(Type::content())
 }
 
 ///|
-pub impl Reflect for Content with output() {
+pub impl Reflect for Content with fn output() {
   Type(Type::content())
 }
 
 ///|
-pub impl Reflect for Content with castable(v) {
+pub impl Reflect for Content with fn castable(v) {
   v is (Content(_) | None | Str(_) | Symbol(_))
 }
 
 ///|
-pub impl IntoValue for Content with into_value(self) {
+pub impl IntoValue for Content with fn into_value(self) {
   Content(self)
 }
 
 ///|
-pub impl FromValue for Content with from_value(v) {
+pub impl FromValue for Content with fn from_value(v) {
   match v {
     Content(c) => c
     None => Content::empty()
@@ -490,27 +489,27 @@ pub impl FromValue for Content with from_value(v) {
 }
 
 ///|
-pub impl Reflect for Func with input() {
+pub impl Reflect for Func with fn input() {
   Type(Type::func())
 }
 
 ///|
-pub impl Reflect for Func with output() {
+pub impl Reflect for Func with fn output() {
   Type(Type::func())
 }
 
 ///|
-pub impl Reflect for Func with castable(v) {
+pub impl Reflect for Func with fn castable(v) {
   v is (Func(_) | Type(_) | Symbol(_))
 }
 
 ///|
-pub impl IntoValue for Func with into_value(self) {
+pub impl IntoValue for Func with fn into_value(self) {
   Func(self)
 }
 
 ///|
-pub impl FromValue for Func with from_value(v) {
+pub impl FromValue for Func with fn from_value(v) {
   match v {
     Func(f) => f
     Type(ty) => ty.constructor()
@@ -520,27 +519,27 @@ pub impl FromValue for Func with from_value(v) {
 }
 
 ///|
-pub impl Reflect for Type with input() {
+pub impl Reflect for Type with fn input() {
   Type(Type::type_())
 }
 
 ///|
-pub impl Reflect for Type with output() {
+pub impl Reflect for Type with fn output() {
   Type(Type::type_())
 }
 
 ///|
-pub impl Reflect for Type with castable(v) {
+pub impl Reflect for Type with fn castable(v) {
   v is Type(_)
 }
 
 ///|
-pub impl IntoValue for Type with into_value(self) {
+pub impl IntoValue for Type with fn into_value(self) {
   Type(self)
 }
 
 ///|
-pub impl FromValue for Type with from_value(v) {
+pub impl FromValue for Type with fn from_value(v) {
   match v {
     Type(t) => t
     v => cast_fail_with(Type(Type::type_()), v)
@@ -548,27 +547,27 @@ pub impl FromValue for Type with from_value(v) {
 }
 
 ///|
-pub impl Reflect for Arr with input() {
+pub impl Reflect for Arr with fn input() {
   Type(Type::array())
 }
 
 ///|
-pub impl Reflect for Arr with output() {
+pub impl Reflect for Arr with fn output() {
   Type(Type::array())
 }
 
 ///|
-pub impl Reflect for Arr with castable(v) {
+pub impl Reflect for Arr with fn castable(v) {
   v is Array(_)
 }
 
 ///|
-pub impl IntoValue for Arr with into_value(self) {
+pub impl IntoValue for Arr with fn into_value(self) {
   Array(self)
 }
 
 ///|
-pub impl FromValue for Arr with from_value(v) {
+pub impl FromValue for Arr with fn from_value(v) {
   match v {
     Array(a) => a
     v => cast_fail_with(Type(Type::array()), v)
@@ -576,27 +575,27 @@ pub impl FromValue for Arr with from_value(v) {
 }
 
 ///|
-pub impl Reflect for Dict with input() {
+pub impl Reflect for Dict with fn input() {
   Type(Type::dict())
 }
 
 ///|
-pub impl Reflect for Dict with output() {
+pub impl Reflect for Dict with fn output() {
   Type(Type::dict())
 }
 
 ///|
-pub impl Reflect for Dict with castable(v) {
+pub impl Reflect for Dict with fn castable(v) {
   v is Dict(_)
 }
 
 ///|
-pub impl IntoValue for Dict with into_value(self) {
+pub impl IntoValue for Dict with fn into_value(self) {
   Dict(self)
 }
 
 ///|
-pub impl FromValue for Dict with from_value(v) {
+pub impl FromValue for Dict with fn from_value(v) {
   match v {
     Dict(d) => d
     v => cast_fail_with(Type(Type::dict()), v)
@@ -604,27 +603,27 @@ pub impl FromValue for Dict with from_value(v) {
 }
 
 ///|
-pub impl Reflect for Label with input() {
+pub impl Reflect for Label with fn input() {
   Type(Type::label())
 }
 
 ///|
-pub impl Reflect for Label with output() {
+pub impl Reflect for Label with fn output() {
   Type(Type::label())
 }
 
 ///|
-pub impl Reflect for Label with castable(v) {
+pub impl Reflect for Label with fn castable(v) {
   v is Label(_)
 }
 
 ///|
-pub impl IntoValue for Label with into_value(self) {
+pub impl IntoValue for Label with fn into_value(self) {
   Label(self)
 }
 
 ///|
-pub impl FromValue for Label with from_value(v) {
+pub impl FromValue for Label with fn from_value(v) {
   match v {
     Label(l) => l
     v => cast_fail_with(Type(Type::label()), v)
@@ -635,22 +634,22 @@ pub impl FromValue for Label with from_value(v) {
 
 ///|
 /// `Option<T>`: `none` or a `T`.
-pub impl[T : Reflect] Reflect for T? with input() {
+pub impl[T : Reflect] Reflect for T? with fn input() {
   T::input().union_with(Type(Type::none()))
 }
 
 ///|
-pub impl[T : Reflect] Reflect for T? with output() {
+pub impl[T : Reflect] Reflect for T? with fn output() {
   T::output().union_with(Type(Type::none()))
 }
 
 ///|
-pub impl[T : Reflect] Reflect for T? with castable(v) {
+pub impl[T : Reflect] Reflect for T? with fn castable(v) {
   v is None || T::castable(v)
 }
 
 ///|
-pub impl[T : IntoValue] IntoValue for T? with into_value(self) {
+pub impl[T : IntoValue] IntoValue for T? with fn into_value(self) {
   match self {
     Some(v) => v.into_value()
     None => None
@@ -658,7 +657,7 @@ pub impl[T : IntoValue] IntoValue for T? with into_value(self) {
 }
 
 ///|
-pub impl[T : FromValue] FromValue for T? with from_value(v) {
+pub impl[T : FromValue] FromValue for T? with fn from_value(v) {
   match v {
     None => None
     v if T::castable(v) => Some(T::from_value(v))
@@ -668,27 +667,30 @@ pub impl[T : FromValue] FromValue for T? with from_value(v) {
 
 ///|
 /// `Vec<T>`: an array of `T`.
-pub impl[T : Reflect] Reflect for Array with input() {
+pub impl[T : Reflect] Reflect for Array[T] with fn input() {
+  ignore(T::input)
   Type(Type::array())
 }
 
 ///|
-pub impl[T : Reflect] Reflect for Array with output() {
+pub impl[T : Reflect] Reflect for Array[T] with fn output() {
+  ignore(T::output)
   Type(Type::array())
 }
 
 ///|
-pub impl[T : Reflect] Reflect for Array with castable(v) {
+pub impl[T : Reflect] Reflect for Array[T] with fn castable(v) {
+  ignore(T::castable)
   v is Array(_)
 }
 
 ///|
-pub impl[T : IntoValue] IntoValue for Array with into_value(self) {
+pub impl[T : IntoValue] IntoValue for Array[T] with fn into_value(self) {
   Array(Arr::from_array(self.map(x => x.into_value())))
 }
 
 ///|
-pub impl[T : FromValue] FromValue for Array with from_value(v) {
+pub impl[T : FromValue] FromValue for Array[T] with fn from_value(v) {
   match v {
     Array(a) => a.items.map(x => T::from_value(x))
     v => cast_fail_with(Type(Type::array()), v)

@@ -20,37 +20,40 @@ pub struct Module {
 ///|
 /// Create a new module.
 pub fn Module::new(name : String, scope : Scope) -> Module {
-  { name: Some(name), inner: { scope, content: Content::empty(), file_id: None } }
+  {
+    name: Some(name),
+    inner: { scope, content: Content::empty(), file_id: None, },
+  }
 }
 
 ///|
 /// Create a new anonymous module without a name.
 pub fn Module::anonymous(scope : Scope) -> Module {
-  { name: None, inner: { scope, content: Content::empty(), file_id: None } }
+  { name: None, inner: { scope, content: Content::empty(), file_id: None, }, }
 }
 
 ///|
 /// Update the module's name.
 pub fn Module::with_name(self : Module, name : String) -> Module {
-  { name: Some(name), inner: self.inner }
+  { name: Some(name), inner: self.inner, }
 }
 
 ///|
 /// Update the module's scope.
 pub fn Module::with_scope(self : Module, scope : Scope) -> Module {
-  { name: self.name, inner: { ..self.inner, scope, } }
+  { name: self.name, inner: { ..self.inner, scope, }, }
 }
 
 ///|
 /// Update the module's content.
 pub fn Module::with_content(self : Module, content : Content) -> Module {
-  { name: self.name, inner: { ..self.inner, content, } }
+  { name: self.name, inner: { ..self.inner, content, }, }
 }
 
 ///|
 /// Update the module's file id.
 pub fn Module::with_file_id(self : Module, file_id : @syntax.FileId) -> Module {
-  { name: self.name, inner: { ..self.inner, file_id: Some(file_id) } }
+  { name: self.name, inner: { ..self.inner, file_id: Some(file_id), }, }
 }
 
 ///|
@@ -76,10 +79,10 @@ pub fn Module::file_id(self : Module) -> @syntax.FileId? {
 pub fn Module::field(
   self : Module,
   field : String,
-  guard : BindingGuard,
+  guard_ : BindingGuard,
 ) -> Value raise HintedError {
   match self.scope().get(field) {
-    Some(binding) => binding.read(guard, "access field `\{field}`").shared()
+    Some(binding) => binding.read(guard_, "access field `\{field}`").shared()
     None =>
       match self.name {
         Some(name) => bail("module `\{name}` does not contain `\{field}`")
@@ -105,6 +108,6 @@ pub fn Module::repr(self : Module) -> String {
 
 ///|
 /// Upstream `PartialEq for Module`: same name and same shared inner data.
-pub impl Eq for Module with equal(self, other) {
+pub impl Eq for Module with fn equal(self, other) {
   self.name == other.name && physical_equal(self.inner, other.inner)
 }

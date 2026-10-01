@@ -12,24 +12,24 @@ pub(all) struct Length {
 
 ///|
 pub fn Length::zero() -> Length {
-  { abs: Abs::zero(), em: Em::zero() }
+  { abs: Abs::zero(), em: Em::zero(), }
 }
 
 ///|
 pub fn Length::from_abs(abs : Abs) -> Length {
-  { abs, em: Em::zero() }
+  { abs, em: Em::zero(), }
 }
 
 ///|
 pub fn Length::from_em(em : Em) -> Length {
-  { abs: Abs::zero(), em }
+  { abs: Abs::zero(), em, }
 }
 
 ///|
 /// Try to compute the absolute value of the length.
 pub fn Length::try_abs(self : Length) -> Length? {
   if self.abs.is_zero() || self.em.is_zero() {
-    Some({ abs: self.abs.abs(), em: self.em.abs() })
+    Some({ abs: self.abs.abs(), em: self.em.abs(), })
   } else {
     None
   }
@@ -75,48 +75,48 @@ pub fn Length::partial_cmp(self : Length, other : Length) -> Int? {
 }
 
 ///|
-pub impl Add for Length with add(self, other) {
-  { abs: self.abs + other.abs, em: self.em + other.em }
+pub impl Add for Length with fn add(self, other) {
+  { abs: self.abs + other.abs, em: self.em + other.em, }
 }
 
 ///|
-pub impl Sub for Length with sub(self, other) {
-  { abs: self.abs - other.abs, em: self.em - other.em }
+pub impl Sub for Length with fn sub(self, other) {
+  { abs: self.abs - other.abs, em: self.em - other.em, }
 }
 
 ///|
-pub impl Neg for Length with neg(self) {
-  { abs: -self.abs, em: -self.em }
+pub impl Neg for Length with fn neg(self) {
+  { abs: -self.abs, em: -self.em, }
 }
 
 ///|
-pub impl Numeric for Length with zero() {
+pub impl Numeric for Length with fn zero() {
   Length::zero()
 }
 
 ///|
-pub impl Numeric for Length with is_finite(self) {
+pub impl Numeric for Length with fn is_finite(self) {
   self.abs.is_finite() && Numeric::is_finite(self.em)
 }
 
 ///|
-pub impl Numeric for Length with scale(self, factor) {
-  { abs: self.abs.times(factor), em: self.em.times(factor) }
+pub impl Numeric for Length with fn scale(self, factor) {
+  { abs: self.abs.times(factor), em: self.em.times(factor), }
 }
 
 ///|
-pub impl Numeric for Length with div_scale(self, factor) {
+pub impl Numeric for Length with fn div_scale(self, factor) {
   self.div_by(factor)
 }
 
 ///|
 pub fn Length::times(self : Length, factor : Double) -> Length {
-  { abs: self.abs.times(factor), em: self.em.times(factor) }
+  { abs: self.abs.times(factor), em: self.em.times(factor), }
 }
 
 ///|
 pub fn Length::div_by(self : Length, factor : Double) -> Length {
-  { abs: self.abs.div_by(factor), em: self.em.div_by(factor) }
+  { abs: self.abs.div_by(factor), em: self.em.div_by(factor), }
 }
 
 ///|

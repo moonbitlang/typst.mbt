@@ -106,18 +106,18 @@ pub struct ElementData {
 pub struct Element(ElementData)
 
 ///|
-pub impl Eq for Element with equal(self, other) {
+pub impl Eq for Element with fn equal(self, other) {
   physical_equal(self.0, other.0)
 }
 
 ///|
-pub impl Hash for Element with hash_combine(self, hasher) {
+pub impl Hash for Element with fn hash_combine(self, hasher) {
   hasher.combine_string(self.0.name)
 }
 
 ///|
 /// Order by name (upstream `Ord for Element`).
-pub impl Compare for Element with compare(self, other) {
+pub impl Compare for Element with fn compare(self, other) {
   self.0.name.compare(other.0.name)
 }
 
@@ -378,7 +378,10 @@ pub fn Element::select(self : Element) -> Selector {
 ///|
 /// Create a selector for this element, filtering for those that fields
 /// match the given argument.
-pub fn Element::where_(self : Element, fields : Array[(Int, Value)]) -> Selector {
+pub fn Element::where_(
+  self : Element,
+  fields : Array[(Int, Value)],
+) -> Selector {
   Elem(self, Some(fields))
 }
 
@@ -450,7 +453,7 @@ pub fn Args::named_with(
   cast : (Value) -> Value raise HintedError,
 ) -> Value? raise SourceError {
   let mut i = 0
-  let mut found = None
+  let mut found : Value? = None
   while i < self.items.length() {
     if self.items[i].name == Some(name) {
       let value = self.items.remove(i).value
