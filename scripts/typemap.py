@@ -47,6 +47,11 @@ TYPEMAP = {
     "RootedPath": "RootedPath",
     "PathOrStr": "PathOrStr",
     "BundlePath": "BundlePath",
+    "DataSource": "DataSource",
+    "Readable": "Readable",
+    "Encoding": "Encoding",
+    "Delimiter": "Delimiter",
+    "RowType": "RowType",
 }
 
 # Generic Rust types with a MoonBit port: Rust name -> MoonBit name. A use

@@ -9,6 +9,10 @@ import {
   "moonbitlang/core/int64",
   "moonbitlang/typst/syntax/ast",
   "moonbitlang/core/double",
+  "moonbitlang/core/encoding/utf8",
+  "moonbitlang/typst/data/serde",
+  "moonbitlang/typst/data/json",
+  "moonbitlang/typst/data/csv",
 }
 
 import {

@@ -16,11 +16,7 @@ fn impl_args_len(self_ : Args) -> USize raise HintedError {
 
 ///|
 /// TODO: port `Args.at` (typst-library/src/foundations/args.rs).
-fn impl_args_at(
-  self_ : Args,
-  key_ : Value,
-  default_ : Value?,
-) -> Value raise HintedError {
+fn impl_args_at(self_ : Args, key_ : Value, default_ : Value?) -> Value raise HintedError {
   ignore(self_)
   ignore(key_)
   ignore(default_)
@@ -43,42 +39,22 @@ fn impl_args_to_named(self_ : Args) -> Dict raise HintedError {
 
 ///|
 /// TODO: port `Args.filter` (typst-library/src/foundations/args.rs).
-fn impl_args_filter(
-  self_ : Args,
-  engine : Engine,
-  context : Context,
-  test_ : Func,
-) -> Args raise SourceError {
+fn impl_args_filter(self_ : Args, engine : Engine, context : Context, test_ : Func) -> Args raise SourceError {
   ignore(self_)
   ignore(engine)
   ignore(context)
   ignore(test_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`Args.filter` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`Args.filter` is not yet ported")])
 }
 
 ///|
 /// TODO: port `Args.map` (typst-library/src/foundations/args.rs).
-fn impl_args_map(
-  self_ : Args,
-  engine : Engine,
-  context : Context,
-  mapper_ : Func,
-) -> Args raise SourceError {
+fn impl_args_map(self_ : Args, engine : Engine, context : Context, mapper_ : Func) -> Args raise SourceError {
   ignore(self_)
   ignore(engine)
   ignore(context)
   ignore(mapper_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`Args.map` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`Args.map` is not yet ported")])
 }
 
 ///|
@@ -113,11 +89,7 @@ fn impl_array_last(self_ : Arr, default_ : Value?) -> Value raise HintedError {
 
 ///|
 /// TODO: port `Array.at` (typst-library/src/foundations/array.rs).
-fn impl_array_at(
-  self_ : Arr,
-  index_ : Int64,
-  default_ : Value?,
-) -> Value raise HintedError {
+fn impl_array_at(self_ : Arr, index_ : Int64, default_ : Value?) -> Value raise HintedError {
   ignore(self_)
   ignore(index_)
   ignore(default_)
@@ -141,11 +113,7 @@ fn impl_array_pop(self_ : Arr) -> Value raise HintedError {
 
 ///|
 /// TODO: port `Array.insert` (typst-library/src/foundations/array.rs).
-fn impl_array_insert(
-  self_ : Arr,
-  index_ : Int64,
-  value_ : Value,
-) -> Unit raise HintedError {
+fn impl_array_insert(self_ : Arr, index_ : Int64, value_ : Value) -> Unit raise HintedError {
   ignore(self_)
   ignore(index_)
   ignore(value_)
@@ -154,11 +122,7 @@ fn impl_array_insert(
 
 ///|
 /// TODO: port `Array.remove` (typst-library/src/foundations/array.rs).
-fn impl_array_remove(
-  self_ : Arr,
-  index_ : Int64,
-  default_ : Value?,
-) -> Value raise HintedError {
+fn impl_array_remove(self_ : Arr, index_ : Int64, default_ : Value?) -> Value raise HintedError {
   ignore(self_)
   ignore(index_)
   ignore(default_)
@@ -168,22 +132,12 @@ fn impl_array_remove(
 ///|
 /// TODO: port default `Default::default()`.
 fn impl_array_slice__end_default() -> Int64? raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `array_slice.end` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "default of `array_slice.end` is not yet ported")])
 }
 
 ///|
 /// TODO: port `Array.slice` (typst-library/src/foundations/array.rs).
-fn impl_array_slice(
-  self_ : Arr,
-  start_ : Int64,
-  end_ : Int64?,
-  count_ : Int64?,
-) -> Arr raise HintedError {
+fn impl_array_slice(self_ : Arr, start_ : Int64, end_ : Int64?, count_ : Int64?) -> Arr raise HintedError {
   ignore(self_)
   ignore(start_)
   ignore(end_)
@@ -201,122 +155,63 @@ fn impl_array_contains(self_ : Arr, value_ : Value) -> Bool raise HintedError {
 
 ///|
 /// TODO: port `Array.find` (typst-library/src/foundations/array.rs).
-fn impl_array_find(
-  self_ : Arr,
-  engine : Engine,
-  context : Context,
-  searcher_ : Func,
-) -> Value? raise SourceError {
+fn impl_array_find(self_ : Arr, engine : Engine, context : Context, searcher_ : Func) -> Value? raise SourceError {
   ignore(self_)
   ignore(engine)
   ignore(context)
   ignore(searcher_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`Array.find` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`Array.find` is not yet ported")])
 }
 
 ///|
 /// TODO: port `Array.position` (typst-library/src/foundations/array.rs).
-fn impl_array_position(
-  self_ : Arr,
-  engine : Engine,
-  context : Context,
-  searcher_ : Func,
-) -> Int64? raise SourceError {
+fn impl_array_position(self_ : Arr, engine : Engine, context : Context, searcher_ : Func) -> Int64? raise SourceError {
   ignore(self_)
   ignore(engine)
   ignore(context)
   ignore(searcher_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`Array.position` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`Array.position` is not yet ported")])
 }
 
 ///|
 /// TODO: port default `Default::default()`.
 fn impl_array_range__start_default() -> Int64 raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `array_range.start` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "default of `array_range.start` is not yet ported")])
 }
 
 ///|
 /// TODO: port default `NonZeroI64::new(1).unwrap()`.
 fn impl_array_range__step_default() -> NonZeroI64 raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `array_range.step` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "default of `array_range.step` is not yet ported")])
 }
 
 ///|
 /// TODO: port `Array.range` (typst-library/src/foundations/array.rs).
-fn impl_array_range(
-  args : Args,
-  inclusive_ : Bool,
-  step_ : NonZeroI64,
-) -> Arr raise SourceError {
+fn impl_array_range(args : Args, inclusive_ : Bool, step_ : NonZeroI64) -> Arr raise SourceError {
   ignore(args)
   ignore(inclusive_)
   ignore(step_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`Array.range` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`Array.range` is not yet ported")])
 }
 
 ///|
 /// TODO: port `Array.filter` (typst-library/src/foundations/array.rs).
-fn impl_array_filter(
-  self_ : Arr,
-  engine : Engine,
-  context : Context,
-  test_ : Func,
-) -> Arr raise SourceError {
+fn impl_array_filter(self_ : Arr, engine : Engine, context : Context, test_ : Func) -> Arr raise SourceError {
   ignore(self_)
   ignore(engine)
   ignore(context)
   ignore(test_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`Array.filter` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`Array.filter` is not yet ported")])
 }
 
 ///|
 /// TODO: port `Array.map` (typst-library/src/foundations/array.rs).
-fn impl_array_map(
-  self_ : Arr,
-  engine : Engine,
-  context : Context,
-  mapper_ : Func,
-) -> Arr raise SourceError {
+fn impl_array_map(self_ : Arr, engine : Engine, context : Context, mapper_ : Func) -> Arr raise SourceError {
   ignore(self_)
   ignore(engine)
   ignore(context)
   ignore(mapper_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`Array.map` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`Array.map` is not yet ported")])
 }
 
 ///|
@@ -329,42 +224,22 @@ fn impl_array_enumerate(self_ : Arr, start_ : Int64) -> Arr raise HintedError {
 
 ///|
 /// TODO: port `Array.zip` (typst-library/src/foundations/array.rs).
-fn impl_array_zip(
-  self_ : Arr,
-  args : Args,
-  exact_ : Bool,
-) -> Arr raise SourceError {
+fn impl_array_zip(self_ : Arr, args : Args, exact_ : Bool) -> Arr raise SourceError {
   ignore(self_)
   ignore(args)
   ignore(exact_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`Array.zip` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`Array.zip` is not yet ported")])
 }
 
 ///|
 /// TODO: port `Array.fold` (typst-library/src/foundations/array.rs).
-fn impl_array_fold(
-  self_ : Arr,
-  engine : Engine,
-  context : Context,
-  init_ : Value,
-  folder_ : Func,
-) -> Value raise SourceError {
+fn impl_array_fold(self_ : Arr, engine : Engine, context : Context, init_ : Value, folder_ : Func) -> Value raise SourceError {
   ignore(self_)
   ignore(engine)
   ignore(context)
   ignore(init_)
   ignore(folder_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`Array.fold` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`Array.fold` is not yet ported")])
 }
 
 ///|
@@ -377,10 +252,7 @@ fn impl_array_sum(self_ : Arr, default_ : Value?) -> Value raise HintedError {
 
 ///|
 /// TODO: port `Array.product` (typst-library/src/foundations/array.rs).
-fn impl_array_product(
-  self_ : Arr,
-  default_ : Value?,
-) -> Value raise HintedError {
+fn impl_array_product(self_ : Arr, default_ : Value?) -> Value raise HintedError {
   ignore(self_)
   ignore(default_)
   bail("`Array.product` is not yet ported")
@@ -388,42 +260,22 @@ fn impl_array_product(
 
 ///|
 /// TODO: port `Array.any` (typst-library/src/foundations/array.rs).
-fn impl_array_any(
-  self_ : Arr,
-  engine : Engine,
-  context : Context,
-  test_ : Func,
-) -> Bool raise SourceError {
+fn impl_array_any(self_ : Arr, engine : Engine, context : Context, test_ : Func) -> Bool raise SourceError {
   ignore(self_)
   ignore(engine)
   ignore(context)
   ignore(test_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`Array.any` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`Array.any` is not yet ported")])
 }
 
 ///|
 /// TODO: port `Array.all` (typst-library/src/foundations/array.rs).
-fn impl_array_all(
-  self_ : Arr,
-  engine : Engine,
-  context : Context,
-  test_ : Func,
-) -> Bool raise SourceError {
+fn impl_array_all(self_ : Arr, engine : Engine, context : Context, test_ : Func) -> Bool raise SourceError {
   ignore(self_)
   ignore(engine)
   ignore(context)
   ignore(test_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`Array.all` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`Array.all` is not yet ported")])
 }
 
 ///|
@@ -451,33 +303,18 @@ fn impl_array_split(self_ : Arr, at_ : Value) -> Arr raise HintedError {
 ///|
 /// TODO: port default `Default::default()`.
 fn impl_array_join__separator_default() -> Value? raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `array_join.separator` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "default of `array_join.separator` is not yet ported")])
 }
 
 ///|
 /// TODO: port default `Default::default()`.
 fn impl_array_join__default_default() -> Value? raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `array_join.default` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "default of `array_join.default` is not yet ported")])
 }
 
 ///|
 /// TODO: port `Array.join` (typst-library/src/foundations/array.rs).
-fn impl_array_join(
-  self_ : Arr,
-  separator_ : Value?,
-  last_ : Value?,
-  default_ : Value?,
-) -> Value raise HintedError {
+fn impl_array_join(self_ : Arr, separator_ : Value?, last_ : Value?, default_ : Value?) -> Value raise HintedError {
   ignore(self_)
   ignore(separator_)
   ignore(last_)
@@ -487,10 +324,7 @@ fn impl_array_join(
 
 ///|
 /// TODO: port `Array.intersperse` (typst-library/src/foundations/array.rs).
-fn impl_array_intersperse(
-  self_ : Arr,
-  separator_ : Value,
-) -> Arr raise HintedError {
+fn impl_array_intersperse(self_ : Arr, separator_ : Value) -> Arr raise HintedError {
   ignore(self_)
   ignore(separator_)
   bail("`Array.intersperse` is not yet ported")
@@ -498,11 +332,7 @@ fn impl_array_intersperse(
 
 ///|
 /// TODO: port `Array.chunks` (typst-library/src/foundations/array.rs).
-fn impl_array_chunks(
-  self_ : Arr,
-  chunk_size_ : NonZeroUSize,
-  exact_ : Bool,
-) -> Arr raise HintedError {
+fn impl_array_chunks(self_ : Arr, chunk_size_ : NonZeroUSize, exact_ : Bool) -> Arr raise HintedError {
   ignore(self_)
   ignore(chunk_size_)
   ignore(exact_)
@@ -511,10 +341,7 @@ fn impl_array_chunks(
 
 ///|
 /// TODO: port `Array.windows` (typst-library/src/foundations/array.rs).
-fn impl_array_windows(
-  self_ : Arr,
-  window_size_ : NonZeroUSize,
-) -> Arr raise HintedError {
+fn impl_array_windows(self_ : Arr, window_size_ : NonZeroUSize) -> Arr raise HintedError {
   ignore(self_)
   ignore(window_size_)
   bail("`Array.windows` is not yet ported")
@@ -522,46 +349,24 @@ fn impl_array_windows(
 
 ///|
 /// TODO: port `Array.sorted` (typst-library/src/foundations/array.rs).
-fn impl_array_sorted(
-  self_ : Arr,
-  engine : Engine,
-  context : Context,
-  span : @syntax.Span,
-  key_ : Func?,
-  by_ : Func?,
-) -> Arr raise SourceError {
+fn impl_array_sorted(self_ : Arr, engine : Engine, context : Context, span : @syntax.Span, key_ : Func?, by_ : Func?) -> Arr raise SourceError {
   ignore(self_)
   ignore(engine)
   ignore(context)
   ignore(span)
   ignore(key_)
   ignore(by_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`Array.sorted` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`Array.sorted` is not yet ported")])
 }
 
 ///|
 /// TODO: port `Array.dedup` (typst-library/src/foundations/array.rs).
-fn impl_array_dedup(
-  self_ : Arr,
-  engine : Engine,
-  context : Context,
-  key_ : Func?,
-) -> Arr raise SourceError {
+fn impl_array_dedup(self_ : Arr, engine : Engine, context : Context, key_ : Func?) -> Arr raise SourceError {
   ignore(self_)
   ignore(engine)
   ignore(context)
   ignore(key_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`Array.dedup` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`Array.dedup` is not yet ported")])
 }
 
 ///|
@@ -573,29 +378,12 @@ fn impl_array_to_dict(self_ : Arr) -> Dict raise HintedError {
 
 ///|
 /// TODO: port `Array.reduce` (typst-library/src/foundations/array.rs).
-fn impl_array_reduce(
-  self_ : Arr,
-  engine : Engine,
-  context : Context,
-  reducer_ : Func,
-) -> Value raise SourceError {
+fn impl_array_reduce(self_ : Arr, engine : Engine, context : Context, reducer_ : Func) -> Value raise SourceError {
   ignore(self_)
   ignore(engine)
   ignore(context)
   ignore(reducer_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`Array.reduce` is not yet ported",
-    ),
-  ])
-}
-
-///|
-/// TODO: port `Bytes.construct` (typst-library/src/foundations/bytes.rs).
-fn impl_bytes_construct(value_ : Value) -> Value raise HintedError {
-  ignore(value_)
-  bail("`Bytes.construct` is not yet ported")
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`Array.reduce` is not yet ported")])
 }
 
 ///|
@@ -607,11 +395,7 @@ fn impl_bytes_len(self_ : Value) -> USize raise HintedError {
 
 ///|
 /// TODO: port `Bytes.at` (typst-library/src/foundations/bytes.rs).
-fn impl_bytes_at(
-  self_ : Value,
-  index_ : Int64,
-  default_ : Value?,
-) -> Value raise HintedError {
+fn impl_bytes_at(self_ : Value, index_ : Int64, default_ : Value?) -> Value raise HintedError {
   ignore(self_)
   ignore(index_)
   ignore(default_)
@@ -621,22 +405,12 @@ fn impl_bytes_at(
 ///|
 /// TODO: port default `Default::default()`.
 fn impl_bytes_slice__end_default() -> Int64? raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `bytes_slice.end` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "default of `bytes_slice.end` is not yet ported")])
 }
 
 ///|
 /// TODO: port `Bytes.slice` (typst-library/src/foundations/bytes.rs).
-fn impl_bytes_slice(
-  self_ : Value,
-  start_ : Int64,
-  end_ : Int64?,
-  count_ : Int64?,
-) -> Value raise HintedError {
+fn impl_bytes_slice(self_ : Value, start_ : Int64, end_ : Int64?, count_ : Int64?) -> Value raise HintedError {
   ignore(self_)
   ignore(start_)
   ignore(end_)
@@ -653,64 +427,34 @@ fn impl_calc_abs(value_ : Value) -> Value raise HintedError {
 
 ///|
 /// TODO: port `calc.pow` (typst-library/src/foundations/calc.rs).
-fn impl_calc_pow(
-  span : @syntax.Span,
-  base_ : Value,
-  exponent_ : @syntax.Spanned[Value],
-) -> Value raise SourceError {
+fn impl_calc_pow(span : @syntax.Span, base_ : Value, exponent_ : @syntax.Spanned[Value]) -> Value raise SourceError {
   ignore(span)
   ignore(base_)
   ignore(exponent_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`calc.pow` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`calc.pow` is not yet ported")])
 }
 
 ///|
 /// TODO: port `calc.exp` (typst-library/src/foundations/calc.rs).
-fn impl_calc_exp(
-  span : @syntax.Span,
-  exponent_ : @syntax.Spanned[Value],
-) -> Double raise SourceError {
+fn impl_calc_exp(span : @syntax.Span, exponent_ : @syntax.Spanned[Value]) -> Double raise SourceError {
   ignore(span)
   ignore(exponent_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`calc.exp` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`calc.exp` is not yet ported")])
 }
 
 ///|
 /// TODO: port `calc.sqrt` (typst-library/src/foundations/calc.rs).
 fn impl_calc_sqrt(value_ : @syntax.Spanned[Value]) -> Double raise SourceError {
   ignore(value_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`calc.sqrt` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`calc.sqrt` is not yet ported")])
 }
 
 ///|
 /// TODO: port `calc.root` (typst-library/src/foundations/calc.rs).
-fn impl_calc_root(
-  radicand_ : Double,
-  index_ : @syntax.Spanned[Int64],
-) -> Double raise SourceError {
+fn impl_calc_root(radicand_ : Double, index_ : @syntax.Spanned[Int64]) -> Double raise SourceError {
   ignore(radicand_)
   ignore(index_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`calc.root` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`calc.root` is not yet ported")])
 }
 
 ///|
@@ -738,24 +482,14 @@ fn impl_calc_tan(angle_ : Value) -> Double raise HintedError {
 /// TODO: port `calc.asin` (typst-library/src/foundations/calc.rs).
 fn impl_calc_asin(value_ : @syntax.Spanned[Value]) -> Angle raise SourceError {
   ignore(value_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`calc.asin` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`calc.asin` is not yet ported")])
 }
 
 ///|
 /// TODO: port `calc.acos` (typst-library/src/foundations/calc.rs).
 fn impl_calc_acos(value_ : @syntax.Spanned[Value]) -> Angle raise SourceError {
   ignore(value_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`calc.acos` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`calc.acos` is not yet ported")])
 }
 
 ///|
@@ -803,75 +537,39 @@ fn impl_calc_asinh(value_ : Double) -> Double raise HintedError {
 
 ///|
 /// TODO: port `calc.acosh` (typst-library/src/foundations/calc.rs).
-fn impl_calc_acosh(
-  value_ : @syntax.Spanned[Double],
-) -> Double raise SourceError {
+fn impl_calc_acosh(value_ : @syntax.Spanned[Double]) -> Double raise SourceError {
   ignore(value_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`calc.acosh` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`calc.acosh` is not yet ported")])
 }
 
 ///|
 /// TODO: port `calc.atanh` (typst-library/src/foundations/calc.rs).
-fn impl_calc_atanh(
-  value_ : @syntax.Spanned[Double],
-) -> Double raise SourceError {
+fn impl_calc_atanh(value_ : @syntax.Spanned[Double]) -> Double raise SourceError {
   ignore(value_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`calc.atanh` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`calc.atanh` is not yet ported")])
 }
 
 ///|
 /// TODO: port default `Spanned::detached(10.0)`.
 fn impl_calc_log__base_default() -> @syntax.Spanned[Double] raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `calc_log.base` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "default of `calc_log.base` is not yet ported")])
 }
 
 ///|
 /// TODO: port `calc.log` (typst-library/src/foundations/calc.rs).
-fn impl_calc_log(
-  span : @syntax.Span,
-  value_ : @syntax.Spanned[Value],
-  base_ : @syntax.Spanned[Double],
-) -> Double raise SourceError {
+fn impl_calc_log(span : @syntax.Span, value_ : @syntax.Spanned[Value], base_ : @syntax.Spanned[Double]) -> Double raise SourceError {
   ignore(span)
   ignore(value_)
   ignore(base_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`calc.log` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`calc.log` is not yet ported")])
 }
 
 ///|
 /// TODO: port `calc.ln` (typst-library/src/foundations/calc.rs).
-fn impl_calc_ln(
-  span : @syntax.Span,
-  value_ : @syntax.Spanned[Value],
-) -> Double raise SourceError {
+fn impl_calc_ln(span : @syntax.Span, value_ : @syntax.Spanned[Value]) -> Double raise SourceError {
   ignore(span)
   ignore(value_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`calc.ln` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`calc.ln` is not yet ported")])
 }
 
 ///|
@@ -958,54 +656,28 @@ fn impl_calc_round(value_ : Value, digits_ : Int64) -> Value raise HintedError {
 
 ///|
 /// TODO: port `calc.clamp` (typst-library/src/foundations/calc.rs).
-fn impl_calc_clamp(
-  span : @syntax.Span,
-  value_ : Value,
-  min_ : Value,
-  max_ : @syntax.Spanned[Value],
-) -> Value raise SourceError {
+fn impl_calc_clamp(span : @syntax.Span, value_ : Value, min_ : Value, max_ : @syntax.Spanned[Value]) -> Value raise SourceError {
   ignore(span)
   ignore(value_)
   ignore(min_)
   ignore(max_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`calc.clamp` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`calc.clamp` is not yet ported")])
 }
 
 ///|
 /// TODO: port `calc.min` (typst-library/src/foundations/calc.rs).
-fn impl_calc_min(
-  span : @syntax.Span,
-  values_ : Array[@syntax.Spanned[Value]],
-) -> Value raise SourceError {
+fn impl_calc_min(span : @syntax.Span, values_ : Array[@syntax.Spanned[Value]]) -> Value raise SourceError {
   ignore(span)
   ignore(values_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`calc.min` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`calc.min` is not yet ported")])
 }
 
 ///|
 /// TODO: port `calc.max` (typst-library/src/foundations/calc.rs).
-fn impl_calc_max(
-  span : @syntax.Span,
-  values_ : Array[@syntax.Spanned[Value]],
-) -> Value raise SourceError {
+fn impl_calc_max(span : @syntax.Span, values_ : Array[@syntax.Spanned[Value]]) -> Value raise SourceError {
   ignore(span)
   ignore(values_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`calc.max` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`calc.max` is not yet ported")])
 }
 
 ///|
@@ -1024,101 +696,52 @@ fn impl_calc_odd(value_ : Int64) -> Bool raise HintedError {
 
 ///|
 /// TODO: port `calc.rem` (typst-library/src/foundations/calc.rs).
-fn impl_calc_rem(
-  span : @syntax.Span,
-  dividend_ : Value,
-  divisor_ : @syntax.Spanned[Value],
-) -> Value raise SourceError {
+fn impl_calc_rem(span : @syntax.Span, dividend_ : Value, divisor_ : @syntax.Spanned[Value]) -> Value raise SourceError {
   ignore(span)
   ignore(dividend_)
   ignore(divisor_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`calc.rem` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`calc.rem` is not yet ported")])
 }
 
 ///|
 /// TODO: port `calc.div-euclid` (typst-library/src/foundations/calc.rs).
-fn impl_calc_div_euclid(
-  span : @syntax.Span,
-  dividend_ : Value,
-  divisor_ : @syntax.Spanned[Value],
-) -> Value raise SourceError {
+fn impl_calc_div_euclid(span : @syntax.Span, dividend_ : Value, divisor_ : @syntax.Spanned[Value]) -> Value raise SourceError {
   ignore(span)
   ignore(dividend_)
   ignore(divisor_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`calc.div-euclid` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`calc.div-euclid` is not yet ported")])
 }
 
 ///|
 /// TODO: port `calc.rem-euclid` (typst-library/src/foundations/calc.rs).
-fn impl_calc_rem_euclid(
-  span : @syntax.Span,
-  dividend_ : Value,
-  divisor_ : @syntax.Spanned[Value],
-) -> Value raise SourceError {
+fn impl_calc_rem_euclid(span : @syntax.Span, dividend_ : Value, divisor_ : @syntax.Spanned[Value]) -> Value raise SourceError {
   ignore(span)
   ignore(dividend_)
   ignore(divisor_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`calc.rem-euclid` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`calc.rem-euclid` is not yet ported")])
 }
 
 ///|
 /// TODO: port `calc.quo` (typst-library/src/foundations/calc.rs).
-fn impl_calc_quo(
-  span : @syntax.Span,
-  dividend_ : Value,
-  divisor_ : @syntax.Spanned[Value],
-) -> Int64 raise SourceError {
+fn impl_calc_quo(span : @syntax.Span, dividend_ : Value, divisor_ : @syntax.Spanned[Value]) -> Int64 raise SourceError {
   ignore(span)
   ignore(dividend_)
   ignore(divisor_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`calc.quo` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`calc.quo` is not yet ported")])
 }
 
 ///|
 /// TODO: port default `Spanned::detached(2.0)`.
 fn impl_calc_norm__p_default() -> @syntax.Spanned[Double] raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `calc_norm.p` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "default of `calc_norm.p` is not yet ported")])
 }
 
 ///|
 /// TODO: port `calc.norm` (typst-library/src/foundations/calc.rs).
-fn impl_calc_norm(
-  p_ : @syntax.Spanned[Double],
-  values_ : Array[Double],
-) -> Double raise SourceError {
+fn impl_calc_norm(p_ : @syntax.Spanned[Double], values_ : Array[Double]) -> Double raise SourceError {
   ignore(p_)
   ignore(values_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`calc.norm` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`calc.norm` is not yet ported")])
 }
 
 ///|
@@ -1138,11 +761,7 @@ fn impl_content_has(self_ : Content, field_ : String) -> Bool raise HintedError 
 
 ///|
 /// TODO: port `Content.at` (typst-library/src/foundations/content/mod.rs).
-fn impl_content_at(
-  self_ : Content,
-  field_ : String,
-  default_ : Value?,
-) -> Value raise HintedError {
+fn impl_content_at(self_ : Content, field_ : String, default_ : Value?) -> Value raise HintedError {
   ignore(self_)
   ignore(field_)
   ignore(default_)
@@ -1165,14 +784,7 @@ fn impl_content_location(self_ : Content) -> Value raise HintedError {
 
 ///|
 /// TODO: port `Datetime.construct` (typst-library/src/foundations/datetime.rs).
-fn impl_datetime_construct(
-  year_ : I32?,
-  month_ : Value?,
-  day_ : U8?,
-  hour_ : U8?,
-  minute_ : U8?,
-  second_ : U8?,
-) -> Value raise HintedError {
+fn impl_datetime_construct(year_ : I32?, month_ : Value?, day_ : U8?, hour_ : U8?, minute_ : U8?, second_ : U8?) -> Value raise HintedError {
   ignore(year_)
   ignore(month_)
   ignore(day_)
@@ -1185,20 +797,12 @@ fn impl_datetime_construct(
 ///|
 /// TODO: port default `Default::default()`.
 fn impl_datetime_today__offset_default() -> Value raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `datetime_today.offset` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "default of `datetime_today.offset` is not yet ported")])
 }
 
 ///|
 /// TODO: port `Datetime.today` (typst-library/src/foundations/datetime.rs).
-fn impl_datetime_today(
-  engine : Engine,
-  offset_ : Value,
-) -> Value raise HintedError {
+fn impl_datetime_today(engine : Engine, offset_ : Value) -> Value raise HintedError {
   ignore(engine)
   ignore(offset_)
   bail("`Datetime.today` is not yet ported")
@@ -1207,20 +811,12 @@ fn impl_datetime_today(
 ///|
 /// TODO: port default `Default::default()`.
 fn impl_datetime_display__pattern_default() -> Value raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `datetime_display.pattern` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "default of `datetime_display.pattern` is not yet ported")])
 }
 
 ///|
 /// TODO: port `Datetime.display` (typst-library/src/foundations/datetime.rs).
-fn impl_datetime_display(
-  self_ : Value,
-  pattern_ : Value,
-) -> String raise HintedError {
+fn impl_datetime_display(self_ : Value, pattern_ : Value) -> String raise HintedError {
   ignore(self_)
   ignore(pattern_)
   bail("`Datetime.display` is not yet ported")
@@ -1284,34 +880,18 @@ fn impl_datetime_ordinal(self_ : Value) -> U16? raise HintedError {
 
 ///|
 /// TODO: port `Decimal.construct` (typst-library/src/foundations/decimal.rs).
-fn impl_decimal_construct(
-  engine : Engine,
-  value_ : @syntax.Spanned[Value],
-) -> Value raise SourceError {
+fn impl_decimal_construct(engine : Engine, value_ : @syntax.Spanned[Value]) -> Value raise SourceError {
   ignore(engine)
   ignore(value_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`Decimal.construct` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`Decimal.construct` is not yet ported")])
 }
 
 ///|
 /// TODO: port `Dict.construct` (typst-library/src/foundations/dict.rs).
-fn impl_dict_construct(
-  engine : Engine,
-  value_ : @syntax.Spanned[Value],
-) -> Dict raise SourceError {
+fn impl_dict_construct(engine : Engine, value_ : @syntax.Spanned[Value]) -> Dict raise SourceError {
   ignore(engine)
   ignore(value_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`Dict.construct` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`Dict.construct` is not yet ported")])
 }
 
 ///|
@@ -1323,11 +903,7 @@ fn impl_dict_len(self_ : Dict) -> USize raise HintedError {
 
 ///|
 /// TODO: port `Dict.at` (typst-library/src/foundations/dict.rs).
-fn impl_dict_at(
-  self_ : Dict,
-  key_ : String,
-  default_ : Value?,
-) -> Value raise HintedError {
+fn impl_dict_at(self_ : Dict, key_ : String, default_ : Value?) -> Value raise HintedError {
   ignore(self_)
   ignore(key_)
   ignore(default_)
@@ -1336,11 +912,7 @@ fn impl_dict_at(
 
 ///|
 /// TODO: port `Dict.insert` (typst-library/src/foundations/dict.rs).
-fn impl_dict_insert(
-  self_ : Dict,
-  key_ : String,
-  value_ : Value,
-) -> Unit raise HintedError {
+fn impl_dict_insert(self_ : Dict, key_ : String, value_ : Value) -> Unit raise HintedError {
   ignore(self_)
   ignore(key_)
   ignore(value_)
@@ -1349,11 +921,7 @@ fn impl_dict_insert(
 
 ///|
 /// TODO: port `Dict.remove` (typst-library/src/foundations/dict.rs).
-fn impl_dict_remove(
-  self_ : Dict,
-  key_ : String,
-  default_ : Value?,
-) -> Value raise HintedError {
+fn impl_dict_remove(self_ : Dict, key_ : String, default_ : Value?) -> Value raise HintedError {
   ignore(self_)
   ignore(key_)
   ignore(default_)
@@ -1383,53 +951,27 @@ fn impl_dict_pairs(self_ : Dict) -> Arr raise HintedError {
 
 ///|
 /// TODO: port `Dict.filter` (typst-library/src/foundations/dict.rs).
-fn impl_dict_filter(
-  self_ : Dict,
-  engine : Engine,
-  context : Context,
-  test_ : Func,
-) -> Dict raise SourceError {
+fn impl_dict_filter(self_ : Dict, engine : Engine, context : Context, test_ : Func) -> Dict raise SourceError {
   ignore(self_)
   ignore(engine)
   ignore(context)
   ignore(test_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`Dict.filter` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`Dict.filter` is not yet ported")])
 }
 
 ///|
 /// TODO: port `Dict.map` (typst-library/src/foundations/dict.rs).
-fn impl_dict_map(
-  self_ : Dict,
-  engine : Engine,
-  context : Context,
-  mapper_ : Func,
-) -> Dict raise SourceError {
+fn impl_dict_map(self_ : Dict, engine : Engine, context : Context, mapper_ : Func) -> Dict raise SourceError {
   ignore(self_)
   ignore(engine)
   ignore(context)
   ignore(mapper_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`Dict.map` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`Dict.map` is not yet ported")])
 }
 
 ///|
 /// TODO: port `Duration.construct` (typst-library/src/foundations/duration.rs).
-fn impl_duration_construct(
-  seconds_ : Int64,
-  minutes_ : Int64,
-  hours_ : Int64,
-  days_ : Int64,
-  weeks_ : Int64,
-) -> Value raise HintedError {
+fn impl_duration_construct(seconds_ : Int64, minutes_ : Int64, hours_ : Int64, days_ : Int64, weeks_ : Int64) -> Value raise HintedError {
   ignore(seconds_)
   ignore(minutes_)
   ignore(hours_)
@@ -1504,20 +1046,12 @@ fn impl_f64_signum(self_ : Double) -> Double raise HintedError {
 ///|
 /// TODO: port default `Endianness::Little`.
 fn impl_f64_from_bytes__endian_default() -> Value raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `f64_from_bytes.endian` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "default of `f64_from_bytes.endian` is not yet ported")])
 }
 
 ///|
 /// TODO: port `f64.from-bytes` (typst-library/src/foundations/float.rs).
-fn impl_f64_from_bytes(
-  bytes_ : Value,
-  endian_ : Value,
-) -> Double raise HintedError {
+fn impl_f64_from_bytes(bytes_ : Value, endian_ : Value) -> Double raise HintedError {
   ignore(bytes_)
   ignore(endian_)
   bail("`f64.from-bytes` is not yet ported")
@@ -1526,21 +1060,12 @@ fn impl_f64_from_bytes(
 ///|
 /// TODO: port default `Endianness::Little`.
 fn impl_f64_to_bytes__endian_default() -> Value raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `f64_to_bytes.endian` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "default of `f64_to_bytes.endian` is not yet ported")])
 }
 
 ///|
 /// TODO: port `f64.to-bytes` (typst-library/src/foundations/float.rs).
-fn impl_f64_to_bytes(
-  self_ : Double,
-  endian_ : Value,
-  size_ : U32,
-) -> Value raise HintedError {
+fn impl_f64_to_bytes(self_ : Double, endian_ : Value, size_ : U32) -> Value raise HintedError {
   ignore(self_)
   ignore(endian_)
   ignore(size_)
@@ -1550,28 +1075,15 @@ fn impl_f64_to_bytes(
 ///|
 /// TODO: port default `Spanned::new(Base::Default, Span::detached())`.
 fn impl_i64_construct__base_default() -> @syntax.Spanned[Value] raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `i64_construct.base` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "default of `i64_construct.base` is not yet ported")])
 }
 
 ///|
 /// TODO: port `i64.construct` (typst-library/src/foundations/int.rs).
-fn impl_i64_construct(
-  value_ : @syntax.Spanned[Value],
-  base_ : @syntax.Spanned[Value],
-) -> Int64 raise SourceError {
+fn impl_i64_construct(value_ : @syntax.Spanned[Value], base_ : @syntax.Spanned[Value]) -> Int64 raise SourceError {
   ignore(value_)
   ignore(base_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`i64.construct` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`i64.construct` is not yet ported")])
 }
 
 ///|
@@ -1622,11 +1134,7 @@ fn impl_i64_bit_lshift(self_ : Int64, shift_ : U32) -> Int64 raise HintedError {
 
 ///|
 /// TODO: port `i64.bit-rshift` (typst-library/src/foundations/int.rs).
-fn impl_i64_bit_rshift(
-  self_ : Int64,
-  shift_ : U32,
-  logical_ : Bool,
-) -> Int64 raise HintedError {
+fn impl_i64_bit_rshift(self_ : Int64, shift_ : U32, logical_ : Bool) -> Int64 raise HintedError {
   ignore(self_)
   ignore(shift_)
   ignore(logical_)
@@ -1636,21 +1144,12 @@ fn impl_i64_bit_rshift(
 ///|
 /// TODO: port default `Endianness::Little`.
 fn impl_i64_from_bytes__endian_default() -> Value raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `i64_from_bytes.endian` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "default of `i64_from_bytes.endian` is not yet ported")])
 }
 
 ///|
 /// TODO: port `i64.from-bytes` (typst-library/src/foundations/int.rs).
-fn impl_i64_from_bytes(
-  bytes_ : Value,
-  endian_ : Value,
-  signed_ : Bool,
-) -> Int64 raise HintedError {
+fn impl_i64_from_bytes(bytes_ : Value, endian_ : Value, signed_ : Bool) -> Int64 raise HintedError {
   ignore(bytes_)
   ignore(endian_)
   ignore(signed_)
@@ -1660,21 +1159,12 @@ fn impl_i64_from_bytes(
 ///|
 /// TODO: port default `Endianness::Little`.
 fn impl_i64_to_bytes__endian_default() -> Value raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `i64_to_bytes.endian` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "default of `i64_to_bytes.endian` is not yet ported")])
 }
 
 ///|
 /// TODO: port `i64.to-bytes` (typst-library/src/foundations/int.rs).
-fn impl_i64_to_bytes(
-  self_ : Int64,
-  endian_ : Value,
-  size_ : USize,
-) -> Value raise HintedError {
+fn impl_i64_to_bytes(self_ : Int64, endian_ : Value, size_ : USize) -> Value raise HintedError {
   ignore(self_)
   ignore(endian_)
   ignore(size_)
@@ -1705,11 +1195,7 @@ fn impl_assert(condition_ : Bool, message_ : String?) -> Unit raise HintedError 
 
 ///|
 /// TODO: port `assert.eq` (typst-library/src/foundations/mod.rs).
-fn impl_assert_eq(
-  left_ : Value,
-  right_ : Value,
-  message_ : String?,
-) -> Unit raise HintedError {
+fn impl_assert_eq(left_ : Value, right_ : Value, message_ : String?) -> Unit raise HintedError {
   ignore(left_)
   ignore(right_)
   ignore(message_)
@@ -1718,11 +1204,7 @@ fn impl_assert_eq(
 
 ///|
 /// TODO: port `assert.ne` (typst-library/src/foundations/mod.rs).
-fn impl_assert_ne(
-  left_ : Value,
-  right_ : Value,
-  message_ : String?,
-) -> Unit raise HintedError {
+fn impl_assert_ne(left_ : Value, right_ : Value, message_ : String?) -> Unit raise HintedError {
   ignore(left_)
   ignore(right_)
   ignore(message_)
@@ -1731,26 +1213,15 @@ fn impl_assert_ne(
 
 ///|
 /// TODO: port `plugin` (typst-library/src/foundations/plugin.rs).
-fn impl_plugin(
-  engine : Engine,
-  source_ : @syntax.Spanned[Value],
-) -> Value raise SourceError {
+fn impl_plugin(engine : Engine, source_ : @syntax.Spanned[DataSource]) -> Value raise SourceError {
   ignore(engine)
   ignore(source_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`plugin` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`plugin` is not yet ported")])
 }
 
 ///|
 /// TODO: port `plugin.transition` (typst-library/src/foundations/plugin.rs).
-fn impl_plugin_transition(
-  func_ : Value,
-  arguments_ : Array[Value],
-) -> Value raise HintedError {
+fn impl_plugin_transition(func_ : Value, arguments_ : Array[Value]) -> Value raise HintedError {
   ignore(func_)
   ignore(arguments_)
   bail("`plugin.transition` is not yet ported")
@@ -1772,10 +1243,7 @@ fn impl_selector_construct(target_ : Value) -> Value raise HintedError {
 
 ///|
 /// TODO: port `Selector.or` (typst-library/src/foundations/selector.rs).
-fn impl_selector_or(
-  self_ : Value,
-  others_ : Array[Value],
-) -> Value raise HintedError {
+fn impl_selector_or(self_ : Value, others_ : Array[Value]) -> Value raise HintedError {
   ignore(self_)
   ignore(others_)
   bail("`Selector.or` is not yet ported")
@@ -1783,10 +1251,7 @@ fn impl_selector_or(
 
 ///|
 /// TODO: port `Selector.and` (typst-library/src/foundations/selector.rs).
-fn impl_selector_and(
-  self_ : Value,
-  others_ : Array[Value],
-) -> Value raise HintedError {
+fn impl_selector_and(self_ : Value, others_ : Array[Value]) -> Value raise HintedError {
   ignore(self_)
   ignore(others_)
   bail("`Selector.and` is not yet ported")
@@ -1794,11 +1259,7 @@ fn impl_selector_and(
 
 ///|
 /// TODO: port `Selector.before` (typst-library/src/foundations/selector.rs).
-fn impl_selector_before(
-  self_ : Value,
-  end_ : Value,
-  inclusive_ : Bool,
-) -> Value raise HintedError {
+fn impl_selector_before(self_ : Value, end_ : Value, inclusive_ : Bool) -> Value raise HintedError {
   ignore(self_)
   ignore(end_)
   ignore(inclusive_)
@@ -1807,11 +1268,7 @@ fn impl_selector_before(
 
 ///|
 /// TODO: port `Selector.after` (typst-library/src/foundations/selector.rs).
-fn impl_selector_after(
-  self_ : Value,
-  start_ : Value,
-  inclusive_ : Bool,
-) -> Value raise HintedError {
+fn impl_selector_after(self_ : Value, start_ : Value, inclusive_ : Bool) -> Value raise HintedError {
   ignore(self_)
   ignore(start_)
   ignore(inclusive_)
@@ -1820,10 +1277,7 @@ fn impl_selector_after(
 
 ///|
 /// TODO: port `Selector.within` (typst-library/src/foundations/selector.rs).
-fn impl_selector_within(
-  self_ : Value,
-  ancestor_ : Value,
-) -> Value raise HintedError {
+fn impl_selector_within(self_ : Value, ancestor_ : Value) -> Value raise HintedError {
   ignore(self_)
   ignore(ancestor_)
   bail("`Selector.within` is not yet ported")
@@ -1832,28 +1286,15 @@ fn impl_selector_within(
 ///|
 /// TODO: port default `Spanned::detached(Base::Default)`.
 fn impl_str_construct__base_default() -> @syntax.Spanned[Value] raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `str_construct.base` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "default of `str_construct.base` is not yet ported")])
 }
 
 ///|
 /// TODO: port `Str.construct` (typst-library/src/foundations/str.rs).
-fn impl_str_construct(
-  value_ : Value,
-  base_ : @syntax.Spanned[Value],
-) -> String raise SourceError {
+fn impl_str_construct(value_ : Value, base_ : @syntax.Spanned[Value]) -> String raise SourceError {
   ignore(value_)
   ignore(base_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`Str.construct` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`Str.construct` is not yet ported")])
 }
 
 ///|
@@ -1865,10 +1306,7 @@ fn impl_str_len(self_ : String) -> USize raise HintedError {
 
 ///|
 /// TODO: port `Str.first` (typst-library/src/foundations/str.rs).
-fn impl_str_first(
-  self_ : String,
-  default_ : String?,
-) -> String raise HintedError {
+fn impl_str_first(self_ : String, default_ : String?) -> String raise HintedError {
   ignore(self_)
   ignore(default_)
   bail("`Str.first` is not yet ported")
@@ -1876,10 +1314,7 @@ fn impl_str_first(
 
 ///|
 /// TODO: port `Str.last` (typst-library/src/foundations/str.rs).
-fn impl_str_last(
-  self_ : String,
-  default_ : String?,
-) -> String raise HintedError {
+fn impl_str_last(self_ : String, default_ : String?) -> String raise HintedError {
   ignore(self_)
   ignore(default_)
   bail("`Str.last` is not yet ported")
@@ -1887,11 +1322,7 @@ fn impl_str_last(
 
 ///|
 /// TODO: port `Str.at` (typst-library/src/foundations/str.rs).
-fn impl_str_at(
-  self_ : String,
-  index_ : Int64,
-  default_ : Value?,
-) -> Value raise HintedError {
+fn impl_str_at(self_ : String, index_ : Int64, default_ : Value?) -> Value raise HintedError {
   ignore(self_)
   ignore(index_)
   ignore(default_)
@@ -1901,22 +1332,12 @@ fn impl_str_at(
 ///|
 /// TODO: port default `Default::default()`.
 fn impl_str_slice__end_default() -> Int64? raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `str_slice.end` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "default of `str_slice.end` is not yet ported")])
 }
 
 ///|
 /// TODO: port `Str.slice` (typst-library/src/foundations/str.rs).
-fn impl_str_slice(
-  self_ : String,
-  start_ : Int64,
-  end_ : Int64?,
-  count_ : Int64?,
-) -> String raise HintedError {
+fn impl_str_slice(self_ : String, start_ : Int64, end_ : Int64?, count_ : Int64?) -> String raise HintedError {
   ignore(self_)
   ignore(start_)
   ignore(end_)
@@ -1955,20 +1376,12 @@ fn impl_str_from_unicode(value_ : U32) -> String raise HintedError {
 ///|
 /// TODO: port default `UnicodeNormalForm::Nfc`.
 fn impl_str_normalize__form_default() -> Value raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `str_normalize.form` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "default of `str_normalize.form` is not yet ported")])
 }
 
 ///|
 /// TODO: port `Str.normalize` (typst-library/src/foundations/str.rs).
-fn impl_str_normalize(
-  self_ : String,
-  form_ : Value,
-) -> String raise HintedError {
+fn impl_str_normalize(self_ : String, form_ : Value) -> String raise HintedError {
   ignore(self_)
   ignore(form_)
   bail("`Str.normalize` is not yet ported")
@@ -1976,10 +1389,7 @@ fn impl_str_normalize(
 
 ///|
 /// TODO: port `Str.contains` (typst-library/src/foundations/str.rs).
-fn impl_str_contains(
-  self_ : String,
-  pattern_ : Value,
-) -> Bool raise HintedError {
+fn impl_str_contains(self_ : String, pattern_ : Value) -> Bool raise HintedError {
   ignore(self_)
   ignore(pattern_)
   bail("`Str.contains` is not yet ported")
@@ -1987,10 +1397,7 @@ fn impl_str_contains(
 
 ///|
 /// TODO: port `Str.starts-with` (typst-library/src/foundations/str.rs).
-fn impl_str_starts_with(
-  self_ : String,
-  pattern_ : Value,
-) -> Bool raise HintedError {
+fn impl_str_starts_with(self_ : String, pattern_ : Value) -> Bool raise HintedError {
   ignore(self_)
   ignore(pattern_)
   bail("`Str.starts-with` is not yet ported")
@@ -1998,10 +1405,7 @@ fn impl_str_starts_with(
 
 ///|
 /// TODO: port `Str.ends-with` (typst-library/src/foundations/str.rs).
-fn impl_str_ends_with(
-  self_ : String,
-  pattern_ : Value,
-) -> Bool raise HintedError {
+fn impl_str_ends_with(self_ : String, pattern_ : Value) -> Bool raise HintedError {
   ignore(self_)
   ignore(pattern_)
   bail("`Str.ends-with` is not yet ported")
@@ -2017,10 +1421,7 @@ fn impl_str_find(self_ : String, pattern_ : Value) -> String? raise HintedError 
 
 ///|
 /// TODO: port `Str.position` (typst-library/src/foundations/str.rs).
-fn impl_str_position(
-  self_ : String,
-  pattern_ : Value,
-) -> USize? raise HintedError {
+fn impl_str_position(self_ : String, pattern_ : Value) -> USize? raise HintedError {
   ignore(self_)
   ignore(pattern_)
   bail("`Str.position` is not yet ported")
@@ -2044,47 +1445,25 @@ fn impl_str_matches(self_ : String, pattern_ : Value) -> Arr raise HintedError {
 
 ///|
 /// TODO: port `Str.replace` (typst-library/src/foundations/str.rs).
-fn impl_str_replace(
-  self_ : String,
-  engine : Engine,
-  context : Context,
-  pattern_ : Value,
-  replacement_ : Value,
-  count_ : USize?,
-) -> String raise SourceError {
+fn impl_str_replace(self_ : String, engine : Engine, context : Context, pattern_ : Value, replacement_ : Value, count_ : USize?) -> String raise SourceError {
   ignore(self_)
   ignore(engine)
   ignore(context)
   ignore(pattern_)
   ignore(replacement_)
   ignore(count_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`Str.replace` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`Str.replace` is not yet ported")])
 }
 
 ///|
 /// TODO: port default `Default::default()`.
 fn impl_str_trim__pattern_default() -> Value raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `str_trim.pattern` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "default of `str_trim.pattern` is not yet ported")])
 }
 
 ///|
 /// TODO: port `Str.trim` (typst-library/src/foundations/str.rs).
-fn impl_str_trim(
-  self_ : String,
-  pattern_ : Value,
-  at_ : Value?,
-  repeat_ : Bool,
-) -> String raise HintedError {
+fn impl_str_trim(self_ : String, pattern_ : Value, at_ : Value?, repeat_ : Bool) -> String raise HintedError {
   ignore(self_)
   ignore(pattern_)
   ignore(at_)
@@ -2095,12 +1474,7 @@ fn impl_str_trim(
 ///|
 /// TODO: port default `Default::default()`.
 fn impl_str_split__pattern_default() -> Value raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `str_split.pattern` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "default of `str_split.pattern` is not yet ported")])
 }
 
 ///|
@@ -2120,16 +1494,9 @@ fn impl_str_rev(self_ : String) -> String raise HintedError {
 
 ///|
 /// TODO: port `Regex.construct` (typst-library/src/foundations/str.rs).
-fn impl_regex_construct(
-  regex_ : @syntax.Spanned[String],
-) -> Value raise SourceError {
+fn impl_regex_construct(regex_ : @syntax.Spanned[String]) -> Value raise SourceError {
   ignore(regex_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`Regex.construct` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`Regex.construct` is not yet ported")])
 }
 
 ///|
@@ -2148,9 +1515,7 @@ fn impl_type_construct(value_ : Value) -> Type raise HintedError {
 
 ///|
 /// TODO: port `Version.construct` (typst-library/src/foundations/version.rs).
-fn impl_version_construct(
-  components_ : Array[Value],
-) -> Value raise HintedError {
+fn impl_version_construct(components_ : Array[Value]) -> Value raise HintedError {
   ignore(components_)
   bail("`Version.construct` is not yet ported")
 }
@@ -2172,57 +1537,29 @@ fn impl_counter_construct(key_ : Value) -> Value raise HintedError {
 
 ///|
 /// TODO: port `Counter.get` (typst-library/src/introspection/counter.rs).
-fn impl_counter_get(
-  self_ : Value,
-  engine : Engine,
-  context : Context,
-  span : @syntax.Span,
-) -> Value raise SourceError {
+fn impl_counter_get(self_ : Value, engine : Engine, context : Context, span : @syntax.Span) -> Value raise SourceError {
   ignore(self_)
   ignore(engine)
   ignore(context)
   ignore(span)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`Counter.get` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`Counter.get` is not yet ported")])
 }
 
 ///|
 /// TODO: port default `Default::default()`.
 fn impl_counter_display__numbering_default() -> Value raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `counter_display.numbering` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "default of `counter_display.numbering` is not yet ported")])
 }
 
 ///|
 /// TODO: port default `Default::default()`.
 fn impl_counter_display__at_default() -> Value raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `counter_display.at` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "default of `counter_display.at` is not yet ported")])
 }
 
 ///|
 /// TODO: port `Counter.display` (typst-library/src/introspection/counter.rs).
-fn impl_counter_display(
-  self_ : Value,
-  engine : Engine,
-  context : Context,
-  span : @syntax.Span,
-  numbering_ : Value,
-  at_ : Value,
-  both_ : Bool,
-) -> Value raise SourceError {
+fn impl_counter_display(self_ : Value, engine : Engine, context : Context, span : @syntax.Span, numbering_ : Value, at_ : Value, both_ : Bool) -> Value raise SourceError {
   ignore(self_)
   ignore(engine)
   ignore(context)
@@ -2230,74 +1567,39 @@ fn impl_counter_display(
   ignore(numbering_)
   ignore(at_)
   ignore(both_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`Counter.display` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`Counter.display` is not yet ported")])
 }
 
 ///|
 /// TODO: port `Counter.at` (typst-library/src/introspection/counter.rs).
-fn impl_counter_at(
-  self_ : Value,
-  engine : Engine,
-  context : Context,
-  span : @syntax.Span,
-  selector_ : Value,
-) -> Value raise SourceError {
+fn impl_counter_at(self_ : Value, engine : Engine, context : Context, span : @syntax.Span, selector_ : Value) -> Value raise SourceError {
   ignore(self_)
   ignore(engine)
   ignore(context)
   ignore(span)
   ignore(selector_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`Counter.at` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`Counter.at` is not yet ported")])
 }
 
 ///|
 /// TODO: port `Counter.final-` (typst-library/src/introspection/counter.rs).
-fn impl_counter_final(
-  self_ : Value,
-  engine : Engine,
-  context : Context,
-  span : @syntax.Span,
-) -> Value raise SourceError {
+fn impl_counter_final(self_ : Value, engine : Engine, context : Context, span : @syntax.Span) -> Value raise SourceError {
   ignore(self_)
   ignore(engine)
   ignore(context)
   ignore(span)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`Counter.final-` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`Counter.final-` is not yet ported")])
 }
 
 ///|
 /// TODO: port default `NonZeroUsize::ONE`.
 fn impl_counter_step__level_default() -> NonZeroUSize raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `counter_step.level` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "default of `counter_step.level` is not yet ported")])
 }
 
 ///|
 /// TODO: port `Counter.step` (typst-library/src/introspection/counter.rs).
-fn impl_counter_step(
-  self_ : Value,
-  span : @syntax.Span,
-  level_ : NonZeroUSize,
-) -> Content raise HintedError {
+fn impl_counter_step(self_ : Value, span : @syntax.Span, level_ : NonZeroUSize) -> Content raise HintedError {
   ignore(self_)
   ignore(span)
   ignore(level_)
@@ -2306,11 +1608,7 @@ fn impl_counter_step(
 
 ///|
 /// TODO: port `Counter.update` (typst-library/src/introspection/counter.rs).
-fn impl_counter_update(
-  self_ : Value,
-  span : @syntax.Span,
-  update_ : Value,
-) -> Content raise HintedError {
+fn impl_counter_update(self_ : Value, span : @syntax.Span, update_ : Value) -> Content raise HintedError {
   ignore(self_)
   ignore(span)
   ignore(update_)
@@ -2326,31 +1624,17 @@ fn impl_here(context : Context) -> Value raise HintedError {
 
 ///|
 /// TODO: port `locate` (typst-library/src/introspection/locate.rs).
-fn impl_locate(
-  engine : Engine,
-  context : Context,
-  span : @syntax.Span,
-  selector_ : Value,
-) -> Value raise SourceError {
+fn impl_locate(engine : Engine, context : Context, span : @syntax.Span, selector_ : Value) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
   ignore(span)
   ignore(selector_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`locate` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`locate` is not yet ported")])
 }
 
 ///|
 /// TODO: port `Location.page` (typst-library/src/introspection/location.rs).
-fn impl_location_page(
-  self_ : Value,
-  engine : Engine,
-  span : @syntax.Span,
-) -> NonZeroUSize? raise HintedError {
+fn impl_location_page(self_ : Value, engine : Engine, span : @syntax.Span) -> NonZeroUSize? raise HintedError {
   ignore(self_)
   ignore(engine)
   ignore(span)
@@ -2359,11 +1643,7 @@ fn impl_location_page(
 
 ///|
 /// TODO: port `Location.page-numbering` (typst-library/src/introspection/location.rs).
-fn impl_location_page_numbering(
-  self_ : Value,
-  engine : Engine,
-  span : @syntax.Span,
-) -> Value raise HintedError {
+fn impl_location_page_numbering(self_ : Value, engine : Engine, span : @syntax.Span) -> Value raise HintedError {
   ignore(self_)
   ignore(engine)
   ignore(span)
@@ -2372,11 +1652,7 @@ fn impl_location_page_numbering(
 
 ///|
 /// TODO: port `Location.position` (typst-library/src/introspection/location.rs).
-fn impl_location_position(
-  self_ : Value,
-  engine : Engine,
-  span : @syntax.Span,
-) -> Dict? raise HintedError {
+fn impl_location_position(self_ : Value, engine : Engine, span : @syntax.Span) -> Dict? raise HintedError {
   ignore(self_)
   ignore(engine)
   ignore(span)
@@ -2385,12 +1661,7 @@ fn impl_location_position(
 
 ///|
 /// TODO: port `query` (typst-library/src/introspection/query.rs).
-fn impl_query(
-  engine : Engine,
-  context : Context,
-  span : @syntax.Span,
-  target_ : Value,
-) -> Arr raise HintedError {
+fn impl_query(engine : Engine, context : Context, span : @syntax.Span, target_ : Value) -> Arr raise HintedError {
   ignore(engine)
   ignore(context)
   ignore(span)
@@ -2401,20 +1672,12 @@ fn impl_query(
 ///|
 /// TODO: port default `Default::default()`.
 fn impl_state_construct__init_default() -> Value raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `state_construct.init` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "default of `state_construct.init` is not yet ported")])
 }
 
 ///|
 /// TODO: port `State.construct` (typst-library/src/introspection/state.rs).
-fn impl_state_construct(
-  key_ : String,
-  init_ : Value,
-) -> Value raise HintedError {
+fn impl_state_construct(key_ : String, init_ : Value) -> Value raise HintedError {
   ignore(key_)
   ignore(init_)
   bail("`State.construct` is not yet ported")
@@ -2422,73 +1685,38 @@ fn impl_state_construct(
 
 ///|
 /// TODO: port `State.get` (typst-library/src/introspection/state.rs).
-fn impl_state_get(
-  self_ : Value,
-  engine : Engine,
-  context : Context,
-  span : @syntax.Span,
-) -> Value raise SourceError {
+fn impl_state_get(self_ : Value, engine : Engine, context : Context, span : @syntax.Span) -> Value raise SourceError {
   ignore(self_)
   ignore(engine)
   ignore(context)
   ignore(span)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`State.get` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`State.get` is not yet ported")])
 }
 
 ///|
 /// TODO: port `State.at` (typst-library/src/introspection/state.rs).
-fn impl_state_at(
-  self_ : Value,
-  engine : Engine,
-  context : Context,
-  span : @syntax.Span,
-  selector_ : Value,
-) -> Value raise SourceError {
+fn impl_state_at(self_ : Value, engine : Engine, context : Context, span : @syntax.Span, selector_ : Value) -> Value raise SourceError {
   ignore(self_)
   ignore(engine)
   ignore(context)
   ignore(span)
   ignore(selector_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`State.at` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`State.at` is not yet ported")])
 }
 
 ///|
 /// TODO: port `State.final-` (typst-library/src/introspection/state.rs).
-fn impl_state_final(
-  self_ : Value,
-  engine : Engine,
-  context : Context,
-  span : @syntax.Span,
-) -> Value raise SourceError {
+fn impl_state_final(self_ : Value, engine : Engine, context : Context, span : @syntax.Span) -> Value raise SourceError {
   ignore(self_)
   ignore(engine)
   ignore(context)
   ignore(span)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`State.final-` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`State.final-` is not yet ported")])
 }
 
 ///|
 /// TODO: port `State.update` (typst-library/src/introspection/state.rs).
-fn impl_state_update(
-  self_ : Value,
-  span : @syntax.Span,
-  update_ : Value,
-) -> Content raise HintedError {
+fn impl_state_update(self_ : Value, span : @syntax.Span, update_ : Value) -> Content raise HintedError {
   ignore(self_)
   ignore(span)
   ignore(update_)
@@ -2582,74 +1810,39 @@ fn impl_layout(span : @syntax.Span, func_ : Func) -> Content raise HintedError {
 
 ///|
 /// TODO: port `Length.pt` (typst-library/src/layout/length.rs).
-fn impl_length_to_pt(
-  self_ : Length,
-  span : @syntax.Span,
-) -> Double raise SourceError {
+fn impl_length_to_pt(self_ : Length, span : @syntax.Span) -> Double raise SourceError {
   ignore(self_)
   ignore(span)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`Length.pt` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`Length.pt` is not yet ported")])
 }
 
 ///|
 /// TODO: port `Length.mm` (typst-library/src/layout/length.rs).
-fn impl_length_to_mm(
-  self_ : Length,
-  span : @syntax.Span,
-) -> Double raise SourceError {
+fn impl_length_to_mm(self_ : Length, span : @syntax.Span) -> Double raise SourceError {
   ignore(self_)
   ignore(span)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`Length.mm` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`Length.mm` is not yet ported")])
 }
 
 ///|
 /// TODO: port `Length.cm` (typst-library/src/layout/length.rs).
-fn impl_length_to_cm(
-  self_ : Length,
-  span : @syntax.Span,
-) -> Double raise SourceError {
+fn impl_length_to_cm(self_ : Length, span : @syntax.Span) -> Double raise SourceError {
   ignore(self_)
   ignore(span)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`Length.cm` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`Length.cm` is not yet ported")])
 }
 
 ///|
 /// TODO: port `Length.inches` (typst-library/src/layout/length.rs).
-fn impl_length_to_inches(
-  self_ : Length,
-  span : @syntax.Span,
-) -> Double raise SourceError {
+fn impl_length_to_inches(self_ : Length, span : @syntax.Span) -> Double raise SourceError {
   ignore(self_)
   ignore(span)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`Length.inches` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`Length.inches` is not yet ported")])
 }
 
 ///|
 /// TODO: port `Length.to-absolute` (typst-library/src/layout/length.rs).
-fn impl_length_to_absolute(
-  self_ : Length,
-  context : Context,
-) -> Length raise HintedError {
+fn impl_length_to_absolute(self_ : Length, context : Context) -> Length raise HintedError {
   ignore(self_)
   ignore(context)
   bail("`Length.to-absolute` is not yet ported")
@@ -2658,302 +1851,101 @@ fn impl_length_to_absolute(
 ///|
 /// TODO: port default `Smart::Auto`.
 fn impl_measure__width_default() -> Value raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `measure.width` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "default of `measure.width` is not yet ported")])
 }
 
 ///|
 /// TODO: port default `Smart::Auto`.
 fn impl_measure__height_default() -> Value raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `measure.height` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "default of `measure.height` is not yet ported")])
 }
 
 ///|
 /// TODO: port `measure` (typst-library/src/layout/measure.rs).
-fn impl_measure(
-  engine : Engine,
-  context : Context,
-  span : @syntax.Span,
-  width_ : Value,
-  height_ : Value,
-  content_ : Content,
-) -> Dict raise SourceError {
+fn impl_measure(engine : Engine, context : Context, span : @syntax.Span, width_ : Value, height_ : Value, content_ : Content) -> Dict raise SourceError {
   ignore(engine)
   ignore(context)
   ignore(span)
   ignore(width_)
   ignore(height_)
   ignore(content_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`measure` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`measure` is not yet ported")])
 }
 
 ///|
 /// TODO: port `cbor` (typst-library/src/loading/cbor.rs).
-fn impl_cbor(
-  engine : Engine,
-  source_ : @syntax.Spanned[Value],
-) -> Value raise SourceError {
+fn impl_cbor(engine : Engine, source_ : @syntax.Spanned[DataSource]) -> Value raise SourceError {
   ignore(engine)
   ignore(source_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`cbor` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`cbor` is not yet ported")])
 }
 
 ///|
 /// TODO: port `cbor.encode` (typst-library/src/loading/cbor.rs).
 fn impl_cbor_encode(value_ : @syntax.Spanned[Value]) -> Value raise SourceError {
   ignore(value_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`cbor.encode` is not yet ported",
-    ),
-  ])
-}
-
-///|
-/// TODO: port default `Default::default()`.
-fn impl_csv__delimiter_default() -> Value raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `csv.delimiter` is not yet ported",
-    ),
-  ])
-}
-
-///|
-/// TODO: port default `RowType::Array`.
-fn impl_csv__row_type_default() -> Value raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `csv.row_type` is not yet ported",
-    ),
-  ])
-}
-
-///|
-/// TODO: port `csv` (typst-library/src/loading/csv.rs).
-fn impl_csv(
-  engine : Engine,
-  source_ : @syntax.Spanned[Value],
-  delimiter_ : Value,
-  row_type_ : Value,
-) -> Arr raise SourceError {
-  ignore(engine)
-  ignore(source_)
-  ignore(delimiter_)
-  ignore(row_type_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`csv` is not yet ported",
-    ),
-  ])
-}
-
-///|
-/// TODO: port `json` (typst-library/src/loading/json.rs).
-fn impl_json(
-  engine : Engine,
-  source_ : @syntax.Spanned[Value],
-) -> Value raise SourceError {
-  ignore(engine)
-  ignore(source_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`json` is not yet ported",
-    ),
-  ])
-}
-
-///|
-/// TODO: port `json.encode` (typst-library/src/loading/json.rs).
-fn impl_json_encode(
-  value_ : @syntax.Spanned[Value],
-  pretty_ : Bool,
-) -> String raise SourceError {
-  ignore(value_)
-  ignore(pretty_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`json.encode` is not yet ported",
-    ),
-  ])
-}
-
-///|
-/// TODO: port default `Some(Encoding::Utf8)`.
-fn impl_read__encoding_default() -> Value raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `read.encoding` is not yet ported",
-    ),
-  ])
-}
-
-///|
-/// TODO: port `read` (typst-library/src/loading/read.rs).
-fn impl_read(
-  engine : Engine,
-  path_ : @syntax.Spanned[PathOrStr],
-  encoding_ : Value,
-) -> Value raise SourceError {
-  ignore(engine)
-  ignore(path_)
-  ignore(encoding_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`read` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`cbor.encode` is not yet ported")])
 }
 
 ///|
 /// TODO: port `toml` (typst-library/src/loading/toml.rs).
-fn impl_toml(
-  engine : Engine,
-  source_ : @syntax.Spanned[Value],
-) -> Dict raise SourceError {
+fn impl_toml(engine : Engine, source_ : @syntax.Spanned[DataSource]) -> Dict raise SourceError {
   ignore(engine)
   ignore(source_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`toml` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`toml` is not yet ported")])
 }
 
 ///|
 /// TODO: port `toml.encode` (typst-library/src/loading/toml.rs).
-fn impl_toml_encode(
-  value_ : @syntax.Spanned[Dict],
-  pretty_ : Bool,
-) -> String raise SourceError {
+fn impl_toml_encode(value_ : @syntax.Spanned[Dict], pretty_ : Bool) -> String raise SourceError {
   ignore(value_)
   ignore(pretty_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`toml.encode` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`toml.encode` is not yet ported")])
 }
 
 ///|
 /// TODO: port `xml` (typst-library/src/loading/xml.rs).
-fn impl_xml(
-  engine : Engine,
-  source_ : @syntax.Spanned[Value],
-) -> Value raise SourceError {
+fn impl_xml(engine : Engine, source_ : @syntax.Spanned[DataSource]) -> Value raise SourceError {
   ignore(engine)
   ignore(source_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`xml` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`xml` is not yet ported")])
 }
 
 ///|
 /// TODO: port `yaml` (typst-library/src/loading/yaml.rs).
-fn impl_yaml(
-  engine : Engine,
-  source_ : @syntax.Spanned[Value],
-) -> Value raise SourceError {
+fn impl_yaml(engine : Engine, source_ : @syntax.Spanned[DataSource]) -> Value raise SourceError {
   ignore(engine)
   ignore(source_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`yaml` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`yaml` is not yet ported")])
 }
 
 ///|
 /// TODO: port `yaml.encode` (typst-library/src/loading/yaml.rs).
-fn impl_yaml_encode(
-  value_ : @syntax.Spanned[Value],
-) -> String raise SourceError {
+fn impl_yaml_encode(value_ : @syntax.Spanned[Value]) -> String raise SourceError {
   ignore(value_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`yaml.encode` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`yaml.encode` is not yet ported")])
 }
 
 ///|
 /// TODO: port `numbering` (typst-library/src/model/numbering.rs).
-fn impl_numbering(
-  engine : Engine,
-  context : Context,
-  span : @syntax.Span,
-  numbering_ : Value,
-  numbers_ : Array[U64],
-) -> Value raise SourceError {
+fn impl_numbering(engine : Engine, context : Context, span : @syntax.Span, numbering_ : Value, numbers_ : Array[U64]) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
   ignore(span)
   ignore(numbering_)
   ignore(numbers_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`numbering` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`numbering` is not yet ported")])
 }
 
 ///|
 /// TODO: port default `Em::new(0.5).into()`.
 fn impl_outline_entry_indented__gap_default() -> Length raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `outline_entry_indented.gap` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "default of `outline_entry_indented.gap` is not yet ported")])
 }
 
 ///|
 /// TODO: port `OutlineEntry.indented` (typst-library/src/model/outline.rs).
-fn impl_outline_entry_indented(
-  self_ : Value,
-  engine : Engine,
-  context : Context,
-  span : @syntax.Span,
-  prefix_ : Content?,
-  inner_ : Content,
-  gap_ : Length,
-) -> Content raise SourceError {
+fn impl_outline_entry_indented(self_ : Value, engine : Engine, context : Context, span : @syntax.Span, prefix_ : Content?, inner_ : Content, gap_ : Length) -> Content raise SourceError {
   ignore(self_)
   ignore(engine)
   ignore(context)
@@ -2961,52 +1953,27 @@ fn impl_outline_entry_indented(
   ignore(prefix_)
   ignore(inner_)
   ignore(gap_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`OutlineEntry.indented` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`OutlineEntry.indented` is not yet ported")])
 }
 
 ///|
 /// TODO: port `OutlineEntry.prefix` (typst-library/src/model/outline.rs).
-fn impl_outline_entry_prefix(
-  self_ : Value,
-  engine : Engine,
-  context : Context,
-  span : @syntax.Span,
-) -> Content? raise SourceError {
+fn impl_outline_entry_prefix(self_ : Value, engine : Engine, context : Context, span : @syntax.Span) -> Content? raise SourceError {
   ignore(self_)
   ignore(engine)
   ignore(context)
   ignore(span)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`OutlineEntry.prefix` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`OutlineEntry.prefix` is not yet ported")])
 }
 
 ///|
 /// TODO: port `OutlineEntry.inner` (typst-library/src/model/outline.rs).
-fn impl_outline_entry_inner(
-  self_ : Value,
-  engine : Engine,
-  context : Context,
-  span : @syntax.Span,
-) -> Content raise SourceError {
+fn impl_outline_entry_inner(self_ : Value, engine : Engine, context : Context, span : @syntax.Span) -> Content raise SourceError {
   ignore(self_)
   ignore(engine)
   ignore(context)
   ignore(span)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`OutlineEntry.inner` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`OutlineEntry.inner` is not yet ported")])
 }
 
 ///|
@@ -3018,22 +1985,12 @@ fn impl_outline_entry_body(self_ : Value) -> Content raise HintedError {
 
 ///|
 /// TODO: port `OutlineEntry.page` (typst-library/src/model/outline.rs).
-fn impl_outline_entry_page(
-  self_ : Value,
-  engine : Engine,
-  context : Context,
-  span : @syntax.Span,
-) -> Content raise SourceError {
+fn impl_outline_entry_page(self_ : Value, engine : Engine, context : Context, span : @syntax.Span) -> Content raise SourceError {
   ignore(self_)
   ignore(engine)
   ignore(context)
   ignore(span)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`OutlineEntry.page` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`OutlineEntry.page` is not yet ported")])
 }
 
 ///|
@@ -3054,96 +2011,56 @@ fn impl_upper(text_ : Value) -> Value raise HintedError {
 /// TODO: port `Color.luma` (typst-library/src/visualize/color.rs).
 fn impl_color_luma(args : Args) -> Value raise SourceError {
   ignore(args)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`Color.luma` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`Color.luma` is not yet ported")])
 }
 
 ///|
 /// TODO: port `Color.oklab` (typst-library/src/visualize/color.rs).
 fn impl_color_oklab(args : Args) -> Value raise SourceError {
   ignore(args)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`Color.oklab` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`Color.oklab` is not yet ported")])
 }
 
 ///|
 /// TODO: port `Color.oklch` (typst-library/src/visualize/color.rs).
 fn impl_color_oklch(args : Args) -> Value raise SourceError {
   ignore(args)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`Color.oklch` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`Color.oklch` is not yet ported")])
 }
 
 ///|
 /// TODO: port `Color.linear-rgb` (typst-library/src/visualize/color.rs).
 fn impl_color_linear_rgb(args : Args) -> Value raise SourceError {
   ignore(args)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`Color.linear-rgb` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`Color.linear-rgb` is not yet ported")])
 }
 
 ///|
 /// TODO: port `Color.rgb` (typst-library/src/visualize/color.rs).
 fn impl_color_rgb(args : Args) -> Value raise SourceError {
   ignore(args)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`Color.rgb` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`Color.rgb` is not yet ported")])
 }
 
 ///|
 /// TODO: port `Color.cmyk` (typst-library/src/visualize/color.rs).
 fn impl_color_cmyk(args : Args) -> Value raise SourceError {
   ignore(args)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`Color.cmyk` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`Color.cmyk` is not yet ported")])
 }
 
 ///|
 /// TODO: port `Color.hsl` (typst-library/src/visualize/color.rs).
 fn impl_color_hsl(args : Args) -> Value raise SourceError {
   ignore(args)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`Color.hsl` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`Color.hsl` is not yet ported")])
 }
 
 ///|
 /// TODO: port `Color.hsv` (typst-library/src/visualize/color.rs).
 fn impl_color_hsv(args : Args) -> Value raise SourceError {
   ignore(args)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`Color.hsv` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`Color.hsv` is not yet ported")])
 }
 
 ///|
@@ -3170,10 +2087,7 @@ fn impl_color_to_hex(self_ : Value) -> String raise HintedError {
 
 ///|
 /// TODO: port `Color.lighten` (typst-library/src/visualize/color.rs).
-fn impl_color_lighten(
-  self_ : Value,
-  factor_ : Ratio,
-) -> Value raise HintedError {
+fn impl_color_lighten(self_ : Value, factor_ : Ratio) -> Value raise HintedError {
   ignore(self_)
   ignore(factor_)
   bail("`Color.lighten` is not yet ported")
@@ -3189,49 +2103,26 @@ fn impl_color_darken(self_ : Value, factor_ : Ratio) -> Value raise HintedError 
 
 ///|
 /// TODO: port `Color.saturate` (typst-library/src/visualize/color.rs).
-fn impl_color_saturate(
-  self_ : Value,
-  span : @syntax.Span,
-  factor_ : Ratio,
-) -> Value raise SourceError {
+fn impl_color_saturate(self_ : Value, span : @syntax.Span, factor_ : Ratio) -> Value raise SourceError {
   ignore(self_)
   ignore(span)
   ignore(factor_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`Color.saturate` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`Color.saturate` is not yet ported")])
 }
 
 ///|
 /// TODO: port `Color.desaturate` (typst-library/src/visualize/color.rs).
-fn impl_color_desaturate(
-  self_ : Value,
-  span : @syntax.Span,
-  factor_ : Ratio,
-) -> Value raise SourceError {
+fn impl_color_desaturate(self_ : Value, span : @syntax.Span, factor_ : Ratio) -> Value raise SourceError {
   ignore(self_)
   ignore(span)
   ignore(factor_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`Color.desaturate` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`Color.desaturate` is not yet ported")])
 }
 
 ///|
 /// TODO: port default `Default::default()`.
 fn impl_color_negate__space_default() -> Value raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `color_negate.space` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "default of `color_negate.space` is not yet ported")])
 }
 
 ///|
@@ -3245,51 +2136,28 @@ fn impl_color_negate(self_ : Value, space_ : Value) -> Value raise HintedError {
 ///|
 /// TODO: port default `ProcessColorSpace::Oklch`.
 fn impl_color_rotate__space_default() -> Value raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `color_rotate.space` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "default of `color_rotate.space` is not yet ported")])
 }
 
 ///|
 /// TODO: port `Color.rotate` (typst-library/src/visualize/color.rs).
-fn impl_color_rotate(
-  self_ : Value,
-  span : @syntax.Span,
-  angle_ : Angle,
-  space_ : Value,
-) -> Value raise SourceError {
+fn impl_color_rotate(self_ : Value, span : @syntax.Span, angle_ : Angle, space_ : Value) -> Value raise SourceError {
   ignore(self_)
   ignore(span)
   ignore(angle_)
   ignore(space_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`Color.rotate` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`Color.rotate` is not yet ported")])
 }
 
 ///|
 /// TODO: port default `Default::default()`.
 fn impl_color_mix__space_default() -> Value raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `color_mix.space` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "default of `color_mix.space` is not yet ported")])
 }
 
 ///|
 /// TODO: port `Color.mix` (typst-library/src/visualize/color.rs).
-fn impl_color_mix(
-  colors_ : Array[Value],
-  space_ : Value,
-) -> Value raise HintedError {
+fn impl_color_mix(colors_ : Array[Value], space_ : Value) -> Value raise HintedError {
   ignore(colors_)
   ignore(space_)
   bail("`Color.mix` is not yet ported")
@@ -3297,10 +2165,7 @@ fn impl_color_mix(
 
 ///|
 /// TODO: port `Color.transparentize` (typst-library/src/visualize/color.rs).
-fn impl_color_transparentize(
-  self_ : Value,
-  scale_ : Ratio,
-) -> Value raise HintedError {
+fn impl_color_transparentize(self_ : Value, scale_ : Ratio) -> Value raise HintedError {
   ignore(self_)
   ignore(scale_)
   bail("`Color.transparentize` is not yet ported")
@@ -3316,169 +2181,88 @@ fn impl_color_opacify(self_ : Value, scale_ : Ratio) -> Value raise HintedError 
 
 ///|
 /// TODO: port `SpotColorant.construct` (typst-library/src/visualize/color.rs).
-fn impl_spot_colorant_construct(
-  name_ : Value,
-  fallback_ : Value,
-) -> Value raise SourceError {
+fn impl_spot_colorant_construct(name_ : Value, fallback_ : Value) -> Value raise SourceError {
   ignore(name_)
   ignore(fallback_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`SpotColorant.construct` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`SpotColorant.construct` is not yet ported")])
 }
 
 ///|
 /// TODO: port `SpotColorant.tint` (typst-library/src/visualize/color.rs).
-fn impl_spot_colorant_tint(
-  self_ : Value,
-  value_ : @syntax.Spanned[Ratio],
-) -> Value raise SourceError {
+fn impl_spot_colorant_tint(self_ : Value, value_ : @syntax.Spanned[Ratio]) -> Value raise SourceError {
   ignore(self_)
   ignore(value_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`SpotColorant.tint` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`SpotColorant.tint` is not yet ported")])
 }
 
 ///|
 /// TODO: port default `Spanned::detached(Smart::Auto)`.
 fn impl_gradient_linear__space_default() -> @syntax.Spanned[Value] raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `gradient_linear.space` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "default of `gradient_linear.space` is not yet ported")])
 }
 
 ///|
 /// TODO: port default `Smart::Auto`.
 fn impl_gradient_linear__relative_default() -> Value raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `gradient_linear.relative` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "default of `gradient_linear.relative` is not yet ported")])
 }
 
 ///|
 /// TODO: port default `Dir::LTR`.
 fn impl_gradient_linear__dir_default() -> Value raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `gradient_linear.dir` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "default of `gradient_linear.dir` is not yet ported")])
 }
 
 ///|
 /// TODO: port `Gradient.linear` (typst-library/src/visualize/gradient.rs).
-fn impl_gradient_linear(
-  args : Args,
-  span : @syntax.Span,
-  stops_ : Array[@syntax.Spanned[Value]],
-  space_ : @syntax.Spanned[Value],
-  relative_ : Value,
-) -> Value raise SourceError {
+fn impl_gradient_linear(args : Args, span : @syntax.Span, stops_ : Array[@syntax.Spanned[Value]], space_ : @syntax.Spanned[Value], relative_ : Value) -> Value raise SourceError {
   ignore(args)
   ignore(span)
   ignore(stops_)
   ignore(space_)
   ignore(relative_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`Gradient.linear` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`Gradient.linear` is not yet ported")])
 }
 
 ///|
 /// TODO: port default `Spanned::detached(Smart::Auto)`.
 fn impl_gradient_radial__space_default() -> @syntax.Spanned[Value] raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `gradient_radial.space` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "default of `gradient_radial.space` is not yet ported")])
 }
 
 ///|
 /// TODO: port default `Smart::Auto`.
 fn impl_gradient_radial__relative_default() -> Value raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `gradient_radial.relative` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "default of `gradient_radial.relative` is not yet ported")])
 }
 
 ///|
 /// TODO: port default `Axes::splat(Ratio::new(0.5))`.
 fn impl_gradient_radial__center_default() -> Value raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `gradient_radial.center` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "default of `gradient_radial.center` is not yet ported")])
 }
 
 ///|
 /// TODO: port default `Spanned::detached(Ratio::new(0.5))`.
 fn impl_gradient_radial__radius_default() -> @syntax.Spanned[Ratio] raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `gradient_radial.radius` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "default of `gradient_radial.radius` is not yet ported")])
 }
 
 ///|
 /// TODO: port default `Smart::Auto`.
 fn impl_gradient_radial__focal_center_default() -> Value raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `gradient_radial.focal_center` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "default of `gradient_radial.focal_center` is not yet ported")])
 }
 
 ///|
 /// TODO: port default `Spanned::detached(Ratio::new(0.0))`.
 fn impl_gradient_radial__focal_radius_default() -> @syntax.Spanned[Ratio] raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `gradient_radial.focal_radius` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "default of `gradient_radial.focal_radius` is not yet ported")])
 }
 
 ///|
 /// TODO: port `Gradient.radial` (typst-library/src/visualize/gradient.rs).
-fn impl_gradient_radial(
-  span : @syntax.Span,
-  stops_ : Array[@syntax.Spanned[Value]],
-  space_ : @syntax.Spanned[Value],
-  relative_ : Value,
-  center_ : Value,
-  radius_ : @syntax.Spanned[Ratio],
-  focal_center_ : Value,
-  focal_radius_ : @syntax.Spanned[Ratio],
-) -> Value raise SourceError {
+fn impl_gradient_radial(span : @syntax.Span, stops_ : Array[@syntax.Spanned[Value]], space_ : @syntax.Spanned[Value], relative_ : Value, center_ : Value, radius_ : @syntax.Spanned[Ratio], focal_center_ : Value, focal_radius_ : @syntax.Spanned[Ratio]) -> Value raise SourceError {
   ignore(span)
   ignore(stops_)
   ignore(space_)
@@ -3487,127 +2271,67 @@ fn impl_gradient_radial(
   ignore(radius_)
   ignore(focal_center_)
   ignore(focal_radius_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`Gradient.radial` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`Gradient.radial` is not yet ported")])
 }
 
 ///|
 /// TODO: port default `Angle::zero()`.
 fn impl_gradient_conic__angle_default() -> Angle raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `gradient_conic.angle` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "default of `gradient_conic.angle` is not yet ported")])
 }
 
 ///|
 /// TODO: port default `Spanned::detached(Smart::Auto)`.
 fn impl_gradient_conic__space_default() -> @syntax.Spanned[Value] raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `gradient_conic.space` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "default of `gradient_conic.space` is not yet ported")])
 }
 
 ///|
 /// TODO: port default `Smart::Auto`.
 fn impl_gradient_conic__relative_default() -> Value raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `gradient_conic.relative` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "default of `gradient_conic.relative` is not yet ported")])
 }
 
 ///|
 /// TODO: port default `Axes::splat(Ratio::new(0.5))`.
 fn impl_gradient_conic__center_default() -> Value raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `gradient_conic.center` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "default of `gradient_conic.center` is not yet ported")])
 }
 
 ///|
 /// TODO: port `Gradient.conic` (typst-library/src/visualize/gradient.rs).
-fn impl_gradient_conic(
-  span : @syntax.Span,
-  stops_ : Array[@syntax.Spanned[Value]],
-  angle_ : Angle,
-  space_ : @syntax.Spanned[Value],
-  relative_ : Value,
-  center_ : Value,
-) -> Value raise SourceError {
+fn impl_gradient_conic(span : @syntax.Span, stops_ : Array[@syntax.Spanned[Value]], angle_ : Angle, space_ : @syntax.Spanned[Value], relative_ : Value, center_ : Value) -> Value raise SourceError {
   ignore(span)
   ignore(stops_)
   ignore(angle_)
   ignore(space_)
   ignore(relative_)
   ignore(center_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`Gradient.conic` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`Gradient.conic` is not yet ported")])
 }
 
 ///|
 /// TODO: port default `Spanned::detached(Ratio::zero())`.
 fn impl_gradient_sharp__smoothness_default() -> @syntax.Spanned[Ratio] raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `gradient_sharp.smoothness` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "default of `gradient_sharp.smoothness` is not yet ported")])
 }
 
 ///|
 /// TODO: port `Gradient.sharp` (typst-library/src/visualize/gradient.rs).
-fn impl_gradient_sharp(
-  self_ : Value,
-  steps_ : @syntax.Spanned[USize],
-  smoothness_ : @syntax.Spanned[Ratio],
-) -> Value raise SourceError {
+fn impl_gradient_sharp(self_ : Value, steps_ : @syntax.Spanned[USize], smoothness_ : @syntax.Spanned[Ratio]) -> Value raise SourceError {
   ignore(self_)
   ignore(steps_)
   ignore(smoothness_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`Gradient.sharp` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`Gradient.sharp` is not yet ported")])
 }
 
 ///|
 /// TODO: port `Gradient.repeat` (typst-library/src/visualize/gradient.rs).
-fn impl_gradient_repeat(
-  self_ : Value,
-  repetitions_ : @syntax.Spanned[USize],
-  mirror_ : Bool,
-) -> Value raise SourceError {
+fn impl_gradient_repeat(self_ : Value, repetitions_ : @syntax.Spanned[USize], mirror_ : Bool) -> Value raise SourceError {
   ignore(self_)
   ignore(repetitions_)
   ignore(mirror_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`Gradient.repeat` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`Gradient.repeat` is not yet ported")])
 }
 
 ///|
@@ -3683,10 +2407,7 @@ fn impl_gradient_sample(self_ : Value, t_ : Value) -> Value raise HintedError {
 
 ///|
 /// TODO: port `Gradient.samples` (typst-library/src/visualize/gradient.rs).
-fn impl_gradient_samples(
-  self_ : Value,
-  ts_ : Array[Value],
-) -> Arr raise HintedError {
+fn impl_gradient_samples(self_ : Value, ts_ : Array[Value]) -> Arr raise HintedError {
   ignore(self_)
   ignore(ts_)
   bail("`Gradient.samples` is not yet ported")
@@ -3695,23 +2416,12 @@ fn impl_gradient_samples(
 ///|
 /// TODO: port default `Em::one().into()`.
 fn impl_polygon_elem_regular__size_default() -> Length raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `polygon_elem_regular.size` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "default of `polygon_elem_regular.size` is not yet ported")])
 }
 
 ///|
 /// TODO: port `PolygonElem.regular` (typst-library/src/visualize/polygon.rs).
-fn impl_polygon_elem_regular(
-  span : @syntax.Span,
-  fill_ : Value?,
-  stroke_ : Value?,
-  size_ : Length,
-  vertices_ : U64,
-) -> Content raise HintedError {
+fn impl_polygon_elem_regular(span : @syntax.Span, fill_ : Value?, stroke_ : Value?, size_ : Length, vertices_ : U64) -> Content raise HintedError {
   ignore(span)
   ignore(fill_)
   ignore(stroke_)
@@ -3724,81 +2434,42 @@ fn impl_polygon_elem_regular(
 /// TODO: port `Stroke.construct` (typst-library/src/visualize/stroke.rs).
 fn impl_stroke_construct(args : Args) -> Value raise SourceError {
   ignore(args)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`Stroke.construct` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`Stroke.construct` is not yet ported")])
 }
 
 ///|
 /// TODO: port default `Spanned::detached(Smart::Auto)`.
 fn impl_tiling_construct__size_default() -> @syntax.Spanned[Value] raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `tiling_construct.size` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "default of `tiling_construct.size` is not yet ported")])
 }
 
 ///|
 /// TODO: port default `Spanned::detached(Axes::splat(Length::zero()))`.
 fn impl_tiling_construct__spacing_default() -> @syntax.Spanned[Value] raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `tiling_construct.spacing` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "default of `tiling_construct.spacing` is not yet ported")])
 }
 
 ///|
 /// TODO: port default `Spanned::new(Axes::splat(Rel::zero()), Span::detached())`.
 fn impl_tiling_construct__offset_default() -> @syntax.Spanned[Value] raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `tiling_construct.offset` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "default of `tiling_construct.offset` is not yet ported")])
 }
 
 ///|
 /// TODO: port default `Spanned::detached(Angle::zero())`.
 fn impl_tiling_construct__angle_default() -> @syntax.Spanned[Angle] raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `tiling_construct.angle` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "default of `tiling_construct.angle` is not yet ported")])
 }
 
 ///|
 /// TODO: port default `Smart::Auto`.
 fn impl_tiling_construct__relative_default() -> Value raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `tiling_construct.relative` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "default of `tiling_construct.relative` is not yet ported")])
 }
 
 ///|
 /// TODO: port `Tiling.construct` (typst-library/src/visualize/tiling.rs).
-fn impl_tiling_construct(
-  engine : Engine,
-  span : @syntax.Span,
-  size_ : @syntax.Spanned[Value],
-  spacing_ : @syntax.Spanned[Value],
-  offset_ : @syntax.Spanned[Value],
-  angle_ : @syntax.Spanned[Angle],
-  relative_ : Value,
-  body_ : Content,
-) -> Value raise SourceError {
+fn impl_tiling_construct(engine : Engine, span : @syntax.Span, size_ : @syntax.Spanned[Value], spacing_ : @syntax.Spanned[Value], offset_ : @syntax.Spanned[Value], angle_ : @syntax.Spanned[Angle], relative_ : Value, body_ : Content) -> Value raise SourceError {
   ignore(engine)
   ignore(span)
   ignore(size_)
@@ -3807,20 +2478,12 @@ fn impl_tiling_construct(
   ignore(angle_)
   ignore(relative_)
   ignore(body_)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`Tiling.construct` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`Tiling.construct` is not yet ported")])
 }
 
 ///|
 /// TODO: port `PdfFormat.table-summary` (typst-pdf/src/format.rs).
-fn impl_pdf_format_table_summary(
-  summary_ : String?,
-  table_ : Value,
-) -> Content raise HintedError {
+fn impl_pdf_format_table_summary(summary_ : String?, table_ : Value) -> Content raise HintedError {
   ignore(summary_)
   ignore(table_)
   bail("`PdfFormat.table-summary` is not yet ported")
@@ -3829,32 +2492,18 @@ fn impl_pdf_format_table_summary(
 ///|
 /// TODO: port default `NonZeroU32::ONE`.
 fn impl_pdf_format_header_cell__level_default() -> NonZeroU32 raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `pdf_format_header_cell.level` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "default of `pdf_format_header_cell.level` is not yet ported")])
 }
 
 ///|
 /// TODO: port default `Default::default()`.
 fn impl_pdf_format_header_cell__scope_default() -> Value raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `pdf_format_header_cell.scope` is not yet ported",
-    ),
-  ])
+  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "default of `pdf_format_header_cell.scope` is not yet ported")])
 }
 
 ///|
 /// TODO: port `PdfFormat.header-cell` (typst-pdf/src/format.rs).
-fn impl_pdf_format_header_cell(
-  level_ : NonZeroU32,
-  scope_ : Value,
-  cell_ : Value,
-) -> Content raise HintedError {
+fn impl_pdf_format_header_cell(level_ : NonZeroU32, scope_ : Value, cell_ : Value) -> Content raise HintedError {
   ignore(level_)
   ignore(scope_)
   ignore(cell_)
