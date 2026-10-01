@@ -1,6 +1,6 @@
 ///|
-/// Identifies a file in a project or package (interned, non-zero, 16 bits).
-pub(all) struct FileId(UInt16) derive(Eq, Hash, Compare, Debug)
+/// An interned version of [RootedPath] (see `path.mbt`; non-zero, 16 bits).
+pub struct FileId(UInt16) derive(Eq, Hash, Compare, Debug)
 
 ///|
 pub fn FileId::into_raw(self : FileId) -> UInt16 {

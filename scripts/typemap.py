@@ -44,6 +44,9 @@ TYPEMAP = {
     "Symbol": "Symbol",
     "SymbolVariant": "SymbolVariant",
     "Accent": "Accent",
+    "RootedPath": "RootedPath",
+    "PathOrStr": "PathOrStr",
+    "BundlePath": "BundlePath",
 }
 
 # Generic Rust types with a MoonBit port: Rust name -> MoonBit name. A use

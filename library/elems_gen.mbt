@@ -42,7 +42,6 @@
 //     2 PlacementScope
 //     2 Spacing
 //     2 Stroke
-//     2 BundlePath
 //     2 OneOrMultiple<EcoString>
 //     2 Smart<u64>
 //     2 Option<Counter>
@@ -4569,7 +4568,7 @@ pub fn document_elem() -> Element {
         capabilities=["Locatable", "ShowSet"],
         fields=[
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[BundlePath]),
             id=0,
             name="path",
             kind=Required,
@@ -9750,7 +9749,7 @@ pub fn asset_elem() -> Element {
         capabilities=["Locatable"],
         fields=[
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[BundlePath]),
             id=0,
             name="path",
             kind=Required,

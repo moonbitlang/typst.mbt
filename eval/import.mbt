@@ -30,6 +30,19 @@ fn eval_module_import(
       )
       replaced_source = true
     }
+    // Upstream: `v if RootedPath::castable(v)`.
+    Dyn(RootedPath(path)) => {
+      let id = path.intern()
+      source = Module(
+        @library.trace(
+          s => @library.world_range(vm.engine.world, s),
+          () => Import(id.get().vpath().get_with_slash()),
+          imp.span(),
+          () => import_file(vm.engine, id, source_span),
+        ),
+      )
+      replaced_source = true
+    }
     v =>
       @library.bail_at(
         source_span,
@@ -178,6 +191,16 @@ fn eval_module_include(
         () => import_(vm.engine, path, source_span),
       )
     Module(module) => module
+    // Upstream: `v if RootedPath::castable(&v)`.
+    Dyn(RootedPath(path)) => {
+      let id = path.intern()
+      @library.trace(
+        s => @library.world_range(vm.engine.world, s),
+        () => Include(id.get().vpath().get_with_slash()),
+        inc.span(),
+        () => import_file(vm.engine, id, source_span),
+      )
+    }
     v =>
       @library.bail_at(source_span, "expected path or module, found \{v.ty()}")
   }
@@ -191,12 +214,23 @@ pub fn import_(
   from : String,
   span : @syntax.Span,
 ) -> @library.Module raise @library.SourceError {
-  let id = @library.at(span, () => engine.world.resolve_path(span.id(), from))
-  import_file(engine, id, span)
+  if from.has_prefix("@") {
+    let spec = match @syntax.PackageSpec::from_str(from) {
+      Ok(spec) => spec
+      Err(err) => @library.bail_at(span, err)
+    }
+    import_package(engine, spec, span)
+  } else {
+    let path = @library.at(span, () => {
+      @library.PathOrStr::Str(from).resolve_if_some(span.id())
+    }).intern()
+    import_file(engine, path, span)
+  }
 }
 
 ///|
-/// Import a file from a path.
+/// Import a file from a path. The path is resolved relative to the given
+/// `span`.
 fn import_file(
   engine : @library.Engine,
   id : @syntax.FileId,
@@ -221,4 +255,48 @@ fn import_file(
     engine.route,
     source,
   )
+}
+
+///|
+/// Import an external package.
+fn import_package(
+  engine : @library.Engine,
+  spec : @syntax.PackageSpec,
+  span : @syntax.Span,
+) -> @library.Module raise @library.SourceError {
+  let (name, id) = resolve_package(engine, spec, span)
+  import_file(engine, id, span).with_name(name)
+}
+
+///|
+/// Resolve the name and entrypoint of a package.
+fn resolve_package(
+  engine : @library.Engine,
+  spec : @syntax.PackageSpec,
+  span : @syntax.Span,
+) -> (String, @syntax.FileId) raise @library.SourceError {
+  // Evaluate the manifest.
+  let vpath = @syntax.VirtualPath::new("typst.toml") catch {
+    _ => abort("unreachable")
+  }
+  let manifest_id = @syntax.RootedPath::new(Package(spec), vpath).intern()
+  let bytes = engine.world.file(manifest_id) catch {
+    err => @library.bail_at(span, err.to_string())
+  }
+  let string = @utf8.decode(bytes) catch {
+    _ => @library.bail_at(span, @library.FileError::InvalidUtf8.to_string())
+  }
+  let manifest = match @syntax.PackageManifest::from_toml(string) {
+    Ok(manifest) => manifest
+    Err(err) => @library.bail_at(span, "package manifest is malformed (\{err})")
+  }
+  if manifest.validate(spec) is Err(err) {
+    @library.bail_at(span, err)
+  }
+
+  // Evaluate the entry point.
+  let entrypoint = @library.at(span, () => {
+    @library.PathOrStr::Str(manifest.package.entrypoint).resolve(manifest_id)
+  })
+  (manifest.package.name, entrypoint.intern())
 }

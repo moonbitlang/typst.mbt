@@ -1,19 +1,24 @@
 // The test world, mirroring upstream `tests/src/world.rs` (as adapted in
 // `oracle/src/world.rs`).
+//
+// The oracle runs with the upstream checkout as its working directory, so
+// real paths (as shown in file errors) are relative to it. Here, they are
+// realized relative to the empty root like in the oracle and only prefixed
+// with `upstream_root` for the actual file system access.
 
 ///|
 /// Root of the upstream checkout (test files are resolved relative to it).
 let upstream_root = ".repos/typst"
 
 ///|
-/// Root of the `typst-dev-assets` files (for `/assets/...` paths).
+/// Root of the `typst-dev-assets` files (for `assets/...` paths).
 fn dev_assets_root() -> String {
   let home = @env.get_env_vars().get("HOME").unwrap_or("")
   let base = home + "/.cargo/git/checkouts"
-  let dirs = (@fs.read_dir(base) catch { _ => [][:] }).to_array()
+  let dirs = (@fs.read_dir(base) catch { _ => [][:] }).to_owned()
   for d in dirs {
     if d.has_prefix("typst-dev-assets-") {
-      let revs = (@fs.read_dir(base + "/" + d) catch { _ => [][:] }).to_array()
+      let revs = (@fs.read_dir(base + "/" + d) catch { _ => [][:] }).to_owned()
       for r in revs {
         return base + "/" + d + "/" + r + "/files"
       }
@@ -23,54 +28,20 @@ fn dev_assets_root() -> String {
 }
 
 ///|
-/// Interns virtual paths (absolute, with leading slash) into file ids.
-priv struct PathInterner {
-  ids : Map[String, @syntax.FileId]
-  paths : Array[String]
-}
-
-///|
-let interner : PathInterner = { ids: {}, paths: [""], }
-
-///|
-fn intern_path(vpath : String) -> @syntax.FileId {
-  match interner.ids.get(vpath) {
-    Some(id) => id
-    None => {
-      let id = @syntax.FileId(interner.paths.length().to_uint16())
-      interner.paths.push(vpath)
-      interner.ids[vpath] = id
-      id
-    }
-  }
-}
-
-///|
-fn path_of(id : @syntax.FileId) -> String {
-  interner.paths[id.0.to_int()]
-}
-
-///|
-/// Normalize a virtual path (resolve `.` and `..`).
-fn normalize_vpath(path : String) -> String {
-  let parts = []
-  for part in path.split("/") {
-    let part = part.to_string()
-    match part {
-      "" | "." => ()
-      ".." => parts.pop() |> ignore
-      p => parts.push(p)
-    }
-  }
-  "/" + parts.join("/")
-}
-
-///|
 /// The test world.
 priv struct TestWorld {
   main : @syntax.Source
   library : @library.Library
-  sources : Map[Int, @syntax.Source]
+}
+
+///|
+/// Create the main source for a test body at a path relative to the upstream
+/// checkout, like upstream `parse_test_body`.
+fn TestWorld::main_source(path : String, body : String) -> @syntax.Source {
+  let vpath = @syntax.VirtualPath::virtualize("", path) catch {
+    e => abort(e.to_string())
+  }
+  @syntax.Source::new(@syntax.RootedPath::new(Project, vpath).intern(), body)
 }
 
 ///|
@@ -86,28 +57,19 @@ impl @library.World for TestWorld with fn main(self) {
 ///|
 impl @library.World for TestWorld with fn source(self, id) {
   if id == self.main.id() {
-    return self.main
-  }
-  match self.sources.get(id.0.to_int()) {
-    Some(s) => s
-    None => {
-      let bytes = load_file(path_of(id))
-      let text = @utf8.decode(bytes) catch {
-        _ => raise @library.FileError::InvalidUtf8
-      }
-      let source = @syntax.Source::new(id, text)
-      self.sources[id.0.to_int()] = source
-      source
-    }
+    self.main
+  } else {
+    file_store.source(id)
   }
 }
 
 ///|
 impl @library.World for TestWorld with fn file(self, id) {
   if id == self.main.id() {
-    return @utf8.encode(self.main.text())
+    @utf8.encode(self.main.text())
+  } else {
+    file_store.file(id)
   }
-  load_file(path_of(id))
 }
 
 ///|
@@ -116,47 +78,116 @@ impl @library.World for TestWorld with fn today(_self, _offset) {
 }
 
 ///|
-impl @library.World for TestWorld with fn resolve_path(_self, within, path) {
-  let base = match within {
-    Some(id) => {
-      let p = path_of(id)
-      match p.rev_find("/") {
-        Some(i) => p.unsafe_substring(start=0, end=i)
-        None => ""
+/// Caches loaded files and sources (upstream `typst_kit::files::FileStore`).
+priv struct FileStore {
+  files : Map[@syntax.FileId, Result[Bytes, @library.FileError]]
+  sources : Map[@syntax.FileId, Result[@syntax.Source, @library.FileError]]
+}
+
+///|
+let file_store : FileStore = { files: Map([]), sources: Map([]), }
+
+///|
+fn FileStore::file(
+  self : FileStore,
+  id : @syntax.FileId,
+) -> Bytes raise @library.FileError {
+  let result = match self.files.get(id) {
+    Some(result) => result
+    None => {
+      let result = try test_files_load(id) catch {
+        e => Err(e)
+      } noraise {
+        bytes => Ok(bytes)
       }
+      self.files[id] = result
+      result
     }
-    None => ""
   }
-  let full = if path.has_prefix("/") { path } else { base + "/" + path }
-  intern_path(normalize_vpath(full))
-}
-
-///|
-impl @library.World for TestWorld with fn file_stem(_self, id) {
-  let p = path_of(id)
-  let name = match p.rev_find("/") {
-    Some(i) => p.unsafe_substring(start=i + 1, end=p.length())
-    None => p
-  }
-  match name.rev_find(".") {
-    Some(i) if i > 0 => name.unsafe_substring(start=0, end=i)
-    _ => name
+  match result {
+    Ok(bytes) => bytes
+    Err(e) => raise e
   }
 }
 
 ///|
-fn load_file(vpath : String) -> Bytes raise @library.FileError {
-  let real = if vpath.has_prefix("/assets/") {
-    dev_assets_root() + vpath.unsafe_substring(start=7, end=vpath.length())
-  } else {
-    upstream_root + vpath
+fn FileStore::source(
+  self : FileStore,
+  id : @syntax.FileId,
+) -> @syntax.Source raise @library.FileError {
+  let result = match self.sources.get(id) {
+    Some(result) => result
+    None => {
+      let result = try {
+        let bytes = self.file(id)
+        // Strip a UTF-8 BOM like upstream.
+        let view = if bytes.length() >= 3 &&
+          bytes[0] == b'\xef' &&
+          bytes[1] == b'\xbb' &&
+          bytes[2] == b'\xbf' {
+          bytes[3:]
+        } else {
+          bytes[:]
+        }
+        let text = @utf8.decode(view) catch {
+          _ => raise @library.FileError::InvalidUtf8
+        }
+        @syntax.Source::new(id, text)
+      } catch {
+        e => Err(e)
+      } noraise {
+        source => Ok(source)
+      }
+      self.sources[id] = result
+      result
+    }
+  }
+  match result {
+    Ok(source) => source
+    Err(e) => raise e
+  }
+}
+
+///|
+/// Resolve a file id to a real path relative to the upstream checkout
+/// (upstream `TestFiles::resolve`).
+fn test_files_resolve(id : @syntax.FileId) -> String raise @library.FileError {
+  let root = match id.root() {
+    Project => ""
+    Package(spec) => {
+      guard spec.namespace == "test" else {
+        abort("unexpected package namespace")
+      }
+      "tests/packages/\{spec.name}-\{spec.version}"
+    }
+  }
+  id.vpath().realize(root) catch {
+    e => raise @library.FileError::Realize(e)
+  }
+}
+
+///|
+/// Load a file (upstream `FileLoader for TestFiles`).
+fn test_files_load(id : @syntax.FileId) -> Bytes raise @library.FileError {
+  let path = test_files_resolve(id)
+  if path.has_prefix("assets/") {
+    let real = dev_assets_root() +
+      "/" +
+      path.unsafe_substring(start=7, end=path.length())
+    return @fs.read_file_to_bytes(real) catch {
+      _ => raise @library.FileError::NotFound(path)
+    }
+  }
+  let real = upstream_root + "/" + path
+  if !@fs.path_exists(real) {
+    raise @library.FileError::NotFound(path)
   }
   let is_dir = @fs.is_dir(real) catch { _ => false }
   if is_dir {
     raise @library.FileError::IsDirectory
   }
   @fs.read_file_to_bytes(real) catch {
-    _ => raise @library.FileError::NotFound(real)
+    _ => raise @library.FileError::AccessDenied
   }
 }
 
@@ -183,9 +214,58 @@ fn test_library() -> @library.Library {
       let lib = @library.Library::builder(routines, formats)
         .with_global(define_test_globals)
         .build()
+      define_test_colors(lib)
       test_library_cell.val = Some(lib)
       lib
     }
+  }
+}
+
+///|
+/// Define the test colors (`conifer`, `forest`, `check.red`).
+///
+/// The oracle constructs them natively with `Color::from_u8`; here they are
+/// evaluated from equivalent code so that the test world does not depend on
+/// the internals of the color port. Colors that cannot be evaluated yet are
+/// left undefined.
+fn define_test_colors(lib : @library.Library) -> Unit {
+  let world : TestWorld = { main: @syntax.Source::detached(""), library: lib, }
+  let engine : @library.Engine = {
+    world,
+    library: lib,
+    introspector: @library.Introspector::empty(),
+    traced: @library.Traced::new(),
+    sink: @library.Sink::new(),
+    route: @library.Route::root(),
+  }
+  let color = (code : String) => {
+    let value = @eval.eval_string(
+      engine,
+      @library.Context::none(),
+      code,
+      @syntax.Span::detached(),
+      Code,
+      @library.Scope::new(),
+    ) catch {
+      _ => return None
+    }
+    if value is Color(_) {
+      Some(value)
+    } else {
+      None
+    }
+  }
+  let global = lib.global.scope()
+  if color("rgb(\"#9feb52\")") is Some(v) {
+    global.define("conifer", v) |> ignore
+  }
+  if color("rgb(\"#43a127\")") is Some(v) {
+    global.define("forest", v) |> ignore
+  }
+  if color("red") is Some(v) &&
+    global.get("check") is Some(binding) &&
+    binding.value is Module(check) {
+    check.scope().define("red", v) |> ignore
   }
 }
 
@@ -272,16 +352,15 @@ fn define_test_globals(scope : @library.Scope) -> Unit {
 ///|
 /// Evaluate a test case in the oracle's report format.
 fn eval_report(rel : String, tc : TestCase) -> String {
-  let vpath = "/tests/suite/" + rel
-  let id = intern_path(vpath)
-  let source = @syntax.Source::new(id, tc.body)
+  let source = TestWorld::main_source("tests/suite/" + rel, tc.body)
+  let id = source.id()
   let library = test_library()
   let features = parse_features(tc.attrs)
   let library = match features {
     Some(f) => { ..library, features: f, }
     None => library
   }
-  let world : TestWorld = { main: source, library, sources: {}, }
+  let world : TestWorld = { main: source, library, }
   let sink = @library.Sink::new()
   let out = StringBuilder()
   try
@@ -387,7 +466,7 @@ fn locate(
   if id == main {
     "\{start}..\{end}"
   } else {
-    let p = path_of(id)
-    "\{@unicode.rust_debug_str(p.unsafe_substring(start=1, end=p.length()))}:\{start}..\{end}"
+    let p = id.vpath().get_without_slash()
+    "\{@unicode.rust_debug_str(p)}:\{start}..\{end}"
   }
 }

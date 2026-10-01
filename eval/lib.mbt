@@ -53,16 +53,10 @@ pub fn eval_source(
   }
 
   // Assemble the module.
-  let name = world_file_stem(world, id)
+  let name = id.vpath().file_stem().unwrap_or("")
   @library.Module::new(name, vm.scopes.top)
   .with_content(output)
   .with_file_id(id)
-}
-
-///|
-/// The file stem used as module name.
-fn world_file_stem(world : &@library.World, id : @syntax.FileId) -> String {
-  world.file_stem(id)
 }
 
 ///|
