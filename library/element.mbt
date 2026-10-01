@@ -341,7 +341,20 @@ pub fn Element::set(
   engine : Engine,
   args : Args,
 ) -> Styles raise SourceError {
-  let styles = match self.0.hooks.set {
+  let styles = self.set_fields(engine, args)
+  args.finish()
+  styles
+}
+
+///|
+/// Parse the settable fields from the arguments without checking for
+/// leftover arguments (upstream `Set::set`).
+pub fn Element::set_fields(
+  self : Element,
+  engine : Engine,
+  args : Args,
+) -> Styles raise SourceError {
+  match self.0.hooks.set {
     Some(f) => f(engine, args)
     None => {
       let styles = Styles::new()
@@ -355,8 +368,6 @@ pub fn Element::set(
       styles
     }
   }
-  args.finish()
-  styles
 }
 
 ///|

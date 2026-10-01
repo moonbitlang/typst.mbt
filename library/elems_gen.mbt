@@ -240,6 +240,7 @@ pub fn symbol_elem() -> Element {
         ],
       )
       symbol_elem_cell.val = Some(e)
+      symbol_elem_init(e)
       e
     }
   }
@@ -7763,6 +7764,7 @@ pub fn text_elem() -> Element {
         ],
       )
       text_elem_cell.val = Some(e)
+      text_elem_init(e)
       e
     }
   }
@@ -8328,6 +8330,7 @@ pub fn space_elem() -> Element {
         ],
       )
       space_elem_cell.val = Some(e)
+      space_elem_init(e)
       e
     }
   }

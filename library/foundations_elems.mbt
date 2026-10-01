@@ -45,7 +45,7 @@ pub fn SpaceElem::shared() -> Content {
   match space_shared_cell.val {
     Some(c) => c
     None => {
-      let c = Content::new(space_elem(), [])
+      let c = Content::new(space_elem(), [(space_elem_had_newline, Bool(false))])
       space_shared_cell.val = Some(c)
       c
     }
@@ -53,10 +53,20 @@ pub fn SpaceElem::shared() -> Content {
 }
 
 ///|
+let space_newline_cell : Ref[Content?] = { val: None, }
+
+///|
 /// Shared space content with a newline (upstream
 /// `SpaceElem::shared_with_newline`).
 pub fn SpaceElem::shared_with_newline() -> Content {
-  SpaceElem::shared()
+  match space_newline_cell.val {
+    Some(c) => c
+    None => {
+      let c = Content::new(space_elem(), [(space_elem_had_newline, Bool(true))])
+      space_newline_cell.val = Some(c)
+      c
+    }
+  }
 }
 
 ///|
