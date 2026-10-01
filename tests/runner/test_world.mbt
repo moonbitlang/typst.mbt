@@ -173,7 +173,14 @@ fn test_library() -> @library.Library {
         eval_string: @eval.routines_eval_string(),
         eval_closure: @eval.routines_eval_closure(),
       }
-      let lib = @library.Library::builder(routines)
+      let formats = [
+        @library.html_format(),
+        @library.pdf_format(),
+        @library.svg_format(),
+        @library.png_format(),
+        @library.bundle_format(),
+      ]
+      let lib = @library.Library::builder(routines, formats)
         .with_global(define_test_globals)
         .build()
       test_library_cell.val = Some(lib)
@@ -184,6 +191,15 @@ fn test_library() -> @library.Library {
 
 ///|
 fn define_test_globals(scope : @library.Scope) -> Unit {
+  let check = @library.Scope::new()
+  check
+  .define("deprecated", None)
+  .with_deprecation(
+    @library.Deprecation::new().with_message("this value is useless"),
+  )
+  |> ignore
+  check.define("gated", None).with_feature(Html) |> ignore
+  scope.define("check", Module(@library.Module::new("check", check))) |> ignore
   let test_scope = () => {
     let s = @library.Scope::new()
     s
@@ -236,15 +252,21 @@ fn define_test_globals(scope : @library.Scope) -> Unit {
     }),
   )
   |> ignore
-  let check = @library.Scope::new()
-  check
-  .define("deprecated", None)
-  .with_deprecation(
-    @library.Deprecation::new().with_message("this value is useless"),
+  // TODO: `lines` needs `Numbering`.
+  scope.define_func(
+    @library.native_func("bounds", (_, _, args) => {
+      let _ : @library.Content = args.expect("content")
+      args.take().finish()
+      // Upstream wraps the content in a block with a custom multi-layouter
+      // body, which reprs as `block(body: auto)`.
+      Content(
+        @library.Content::new(@library.block_elem(), [
+          (@library.block_elem_body, Auto),
+        ]),
+      )
+    }),
   )
   |> ignore
-  check.define("gated", None).with_feature(Html) |> ignore
-  scope.define("check", Module(@library.Module::new("check", check))) |> ignore
 }
 
 ///|

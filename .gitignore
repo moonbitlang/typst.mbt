@@ -6,3 +6,4 @@ target/
 .DS_Store
 tests/golden/
 __pycache__/
+.claude/
