@@ -2688,6 +2688,7 @@ pub fn Element::repr(Self) -> String
 pub fn Element::scope(Self) -> Scope
 pub fn Element::select(Self) -> Selector
 pub fn Element::set(Self, Engine, Args) -> Styles raise SourceError
+pub fn Element::set_fields(Self, Engine, Args) -> Styles raise SourceError
 pub fn Element::settable_field_accessor(Self, String) -> ((StyleChain) -> Value)?
 pub fn Element::title(Self) -> String
 pub fn Element::where_(Self, Array[(Int, Value)]) -> Selector
