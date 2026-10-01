@@ -499,6 +499,26 @@ pub fn[T : FromValue + IntoValue + Fold] fold_of(Ty[T]) -> (Value, Value) -> Val
 
 pub fn[T : Fold] fold_or(T?, T?) -> T?
 
+pub let font_stretch_normal : FontStretch
+
+pub let font_weight_black : FontWeight
+
+pub let font_weight_bold : FontWeight
+
+pub let font_weight_extrabold : FontWeight
+
+pub let font_weight_extralight : FontWeight
+
+pub let font_weight_light : FontWeight
+
+pub let font_weight_medium : FontWeight
+
+pub let font_weight_regular : FontWeight
+
+pub let font_weight_semibold : FontWeight
+
+pub let font_weight_thin : FontWeight
+
 pub fn footnote_container_elem() -> Element
 
 pub fn footnote_elem() -> Element
@@ -748,6 +768,30 @@ pub fn[T : Reflect] input_of(Ty[T]) -> CastInfo
 pub fn[T : Numeric] is_zero(T) -> Bool
 
 pub fn join(Value, Value) -> Value raise HintedError
+
+pub let lang_arabic : Lang
+
+pub let lang_divehi : Lang
+
+pub let lang_english : Lang
+
+pub let lang_hebrew : Lang
+
+pub let lang_kashmiri : Lang
+
+pub let lang_pashto : Lang
+
+pub let lang_persian : Lang
+
+pub let lang_punjabi : Lang
+
+pub let lang_sindhi : Lang
+
+pub let lang_urdu : Lang
+
+pub let lang_uyghur : Lang
+
+pub let lang_yiddish : Lang
 
 pub fn layout_elem() -> Element
 
@@ -2476,6 +2520,11 @@ pub impl FromValue for Alignment
 pub impl IntoValue for Alignment
 pub impl Reflect for Alignment
 
+pub(all) struct Alternates(Int64) derive(Default, Eq, Hash)
+pub impl FromValue for Alternates
+pub impl IntoValue for Alternates
+pub impl Reflect for Alternates
+
 pub(all) struct Angle(Scalar) derive(Compare, Default, Eq, Hash)
 pub fn Angle::abs(Self) -> Self
 pub fn Angle::acos(Double) -> Self
@@ -2600,15 +2649,34 @@ pub impl Reflect for Arr
 
 pub struct ArtifactElem(Content)
 pub fn ArtifactElem::body(Self) -> Content
-pub fn ArtifactElem::kind(Self, StyleChain) -> Value
-pub fn ArtifactElem::kind_in(StyleChain) -> Value
-pub fn ArtifactElem::kind_local(Self) -> Value?
+pub fn ArtifactElem::kind(Self, StyleChain) -> ArtifactKind
+pub fn ArtifactElem::kind_in(StyleChain) -> ArtifactKind
+pub fn ArtifactElem::kind_local(Self) -> ArtifactKind?
 pub fn ArtifactElem::new(Content) -> Self
 pub fn ArtifactElem::of(Content) -> Self?
 pub fn ArtifactElem::pack(Self) -> Content
-pub fn ArtifactElem::set_kind(Value) -> Style
+pub fn ArtifactElem::set_kind(ArtifactKind) -> Style
 pub fn ArtifactElem::with_body(Self, Content) -> Self
-pub fn ArtifactElem::with_kind(Self, Value) -> Self
+pub fn ArtifactElem::with_kind(Self, ArtifactKind) -> Self
+
+pub(all) enum ArtifactKind {
+  Header
+  Footer
+  Watermark
+  PageNumber
+  LineNumber
+  Redaction
+  Bates
+  Page
+  PaginationOther
+  Layout
+  Background
+  Other
+} derive(Eq, Hash, @debug.Debug)
+pub impl Default for ArtifactKind
+pub impl FromValue for ArtifactKind
+pub impl IntoValue for ArtifactKind
+pub impl Reflect for ArtifactKind
 
 pub struct AssetElem(Content)
 pub fn AssetElem::data(Self) -> Value
@@ -2618,6 +2686,14 @@ pub fn AssetElem::pack(Self) -> Content
 pub fn AssetElem::path(Self) -> BundlePath
 pub fn AssetElem::with_data(Self, Value) -> Self
 pub fn AssetElem::with_path(Self, BundlePath) -> Self
+
+pub(all) enum Attribution {
+  Content(Content)
+  Label(Label)
+} derive(Eq)
+pub impl FromValue for Attribution
+pub impl IntoValue for Attribution
+pub impl Reflect for Attribution
 
 pub(all) struct Axes[T] {
   x : T
@@ -2646,6 +2722,11 @@ pub impl FromValue for Axis
 pub impl IntoValue for Axis
 pub impl Reflect for Axis
 
+pub(all) struct AxisValue(Double) derive(Eq, Hash, @debug.Debug)
+pub impl FromValue for AxisValue
+pub impl IntoValue for AxisValue
+pub impl Reflect for AxisValue
+
 pub(all) enum Base {
   Default
   User(Int64)
@@ -2655,6 +2736,18 @@ pub impl FromValue for Base
 pub impl IntoValue for Base
 pub impl Reflect for Base
 
+pub(all) struct BaselinePos {
+  at : Smart[VAlignment]?
+  shift : Rel[Length]?
+} derive(Eq, Hash)
+pub fn BaselinePos::at(Self) -> Smart[VAlignment]
+pub fn BaselinePos::shift(Self) -> Rel[Length]
+pub impl Default for BaselinePos
+pub impl Fold for BaselinePos
+pub impl FromValue for BaselinePos
+pub impl IntoValue for BaselinePos
+pub impl Reflect for BaselinePos
+
 pub struct BibliographyElem(Content)
 pub fn BibliographyElem::full(Self, StyleChain) -> Bool
 pub fn BibliographyElem::full_in(StyleChain) -> Bool
@@ -2662,11 +2755,11 @@ pub fn BibliographyElem::full_local(Self) -> Bool?
 pub fn BibliographyElem::group(Self, StyleChain) -> Smart[String]?
 pub fn BibliographyElem::group_in(StyleChain) -> Smart[String]?
 pub fn BibliographyElem::group_local(Self) -> Smart[String]??
-pub fn BibliographyElem::lang(Self) -> Value?
+pub fn BibliographyElem::lang(Self) -> Lang?
 pub fn BibliographyElem::new(Value) -> Self
 pub fn BibliographyElem::of(Content) -> Self?
 pub fn BibliographyElem::pack(Self) -> Content
-pub fn BibliographyElem::region(Self) -> Value?
+pub fn BibliographyElem::region(Self) -> Region??
 pub fn BibliographyElem::set_full(Bool) -> Style
 pub fn BibliographyElem::set_group(Smart[String]?) -> Style
 pub fn BibliographyElem::set_style(Value) -> Style
@@ -2684,8 +2777,8 @@ pub fn BibliographyElem::title_in(StyleChain) -> Smart[Content?]
 pub fn BibliographyElem::title_local(Self) -> Smart[Content?]?
 pub fn BibliographyElem::with_full(Self, Bool) -> Self
 pub fn BibliographyElem::with_group(Self, Smart[String]?) -> Self
-pub fn BibliographyElem::with_lang(Self, Value) -> Self
-pub fn BibliographyElem::with_region(Self, Value) -> Self
+pub fn BibliographyElem::with_lang(Self, Lang) -> Self
+pub fn BibliographyElem::with_region(Self, Region?) -> Self
 pub fn BibliographyElem::with_sources(Self, Value) -> Self
 pub fn BibliographyElem::with_style(Self, Value) -> Self
 pub fn BibliographyElem::with_target(Self, Smart[LocatableSelector]) -> Self
@@ -2738,6 +2831,14 @@ pub fn BinomElem::upper(Self) -> Content
 pub fn BinomElem::with_lower(Self, Array[Content]) -> Self
 pub fn BinomElem::with_upper(Self, Content) -> Self
 
+pub(all) enum BlockBody {
+  Content(Content)
+} derive(Eq)
+pub impl Default for BlockBody
+pub impl FromValue for BlockBody
+pub impl IntoValue for BlockBody
+pub impl Reflect for BlockBody
+
 pub struct BlockElem(Content)
 pub fn BlockElem::above(Self, StyleChain) -> Smart[Spacing]
 pub fn BlockElem::above_in(StyleChain) -> Smart[Spacing]
@@ -2745,9 +2846,9 @@ pub fn BlockElem::above_local(Self) -> Smart[Spacing]?
 pub fn BlockElem::below(Self, StyleChain) -> Smart[Spacing]
 pub fn BlockElem::below_in(StyleChain) -> Smart[Spacing]
 pub fn BlockElem::below_local(Self) -> Smart[Spacing]?
-pub fn BlockElem::body(Self, StyleChain) -> Value
-pub fn BlockElem::body_in(StyleChain) -> Value
-pub fn BlockElem::body_local(Self) -> Value?
+pub fn BlockElem::body(Self, StyleChain) -> BlockBody?
+pub fn BlockElem::body_in(StyleChain) -> BlockBody?
+pub fn BlockElem::body_local(Self) -> BlockBody??
 pub fn BlockElem::breakable(Self, StyleChain) -> Bool
 pub fn BlockElem::breakable_in(StyleChain) -> Bool
 pub fn BlockElem::breakable_local(Self) -> Bool?
@@ -2774,7 +2875,7 @@ pub fn BlockElem::radius_in(StyleChain) -> Corners[Rel[Length]?]
 pub fn BlockElem::radius_local(Self) -> Corners[Rel[Length]?]?
 pub fn BlockElem::set_above(Smart[Spacing]) -> Style
 pub fn BlockElem::set_below(Smart[Spacing]) -> Style
-pub fn BlockElem::set_body(Value) -> Style
+pub fn BlockElem::set_body(BlockBody?) -> Style
 pub fn BlockElem::set_breakable(Bool) -> Style
 pub fn BlockElem::set_clip(Bool) -> Style
 pub fn BlockElem::set_fill(Value) -> Style
@@ -2796,7 +2897,7 @@ pub fn BlockElem::width_in(StyleChain) -> Smart[Rel[Length]]
 pub fn BlockElem::width_local(Self) -> Smart[Rel[Length]]?
 pub fn BlockElem::with_above(Self, Smart[Spacing]) -> Self
 pub fn BlockElem::with_below(Self, Smart[Spacing]) -> Self
-pub fn BlockElem::with_body(Self, Value) -> Self
+pub fn BlockElem::with_body(Self, BlockBody?) -> Self
 pub fn BlockElem::with_breakable(Self, Bool) -> Self
 pub fn BlockElem::with_clip(Self, Bool) -> Self
 pub fn BlockElem::with_fill(Self, Value) -> Self
@@ -2808,10 +2909,27 @@ pub fn BlockElem::with_sticky(Self, Bool) -> Self
 pub fn BlockElem::with_stroke(Self, Value) -> Self
 pub fn BlockElem::with_width(Self, Smart[Rel[Length]]) -> Self
 
+pub(all) enum BottomEdge {
+  Metric(BottomEdgeMetric)
+  Length(Length)
+} derive(Eq, Hash)
+pub impl FromValue for BottomEdge
+pub impl IntoValue for BottomEdge
+pub impl Reflect for BottomEdge
+
+pub(all) enum BottomEdgeMetric {
+  Baseline
+  Descender
+  Bounds
+} derive(Eq, Hash, @debug.Debug)
+pub impl FromValue for BottomEdgeMetric
+pub impl IntoValue for BottomEdgeMetric
+pub impl Reflect for BottomEdgeMetric
+
 pub struct BoxElem(Content)
-pub fn BoxElem::baseline(Self, StyleChain) -> Value
-pub fn BoxElem::baseline_in(StyleChain) -> Value
-pub fn BoxElem::baseline_local(Self) -> Value?
+pub fn BoxElem::baseline(Self, StyleChain) -> BaselinePos
+pub fn BoxElem::baseline_in(StyleChain) -> BaselinePos
+pub fn BoxElem::baseline_local(Self) -> BaselinePos?
 pub fn BoxElem::body(Self, StyleChain) -> Content?
 pub fn BoxElem::body_in(StyleChain) -> Content?
 pub fn BoxElem::body_local(Self) -> Content??
@@ -2836,7 +2954,7 @@ pub fn BoxElem::pack(Self) -> Content
 pub fn BoxElem::radius(Self, StyleChain) -> Corners[Rel[Length]?]
 pub fn BoxElem::radius_in(StyleChain) -> Corners[Rel[Length]?]
 pub fn BoxElem::radius_local(Self) -> Corners[Rel[Length]?]?
-pub fn BoxElem::set_baseline(Value) -> Style
+pub fn BoxElem::set_baseline(BaselinePos) -> Style
 pub fn BoxElem::set_body(Content?) -> Style
 pub fn BoxElem::set_clip(Bool) -> Style
 pub fn BoxElem::set_fill(Value) -> Style
@@ -2852,7 +2970,7 @@ pub fn BoxElem::stroke_local(Self) -> Value?
 pub fn BoxElem::width(Self, StyleChain) -> Sizing
 pub fn BoxElem::width_in(StyleChain) -> Sizing
 pub fn BoxElem::width_local(Self) -> Sizing?
-pub fn BoxElem::with_baseline(Self, Value) -> Self
+pub fn BoxElem::with_baseline(Self, BaselinePos) -> Self
 pub fn BoxElem::with_body(Self, Content?) -> Self
 pub fn BoxElem::with_clip(Self, Bool) -> Self
 pub fn BoxElem::with_fill(Self, Value) -> Self
@@ -3065,11 +3183,11 @@ pub fn CiteElem::form(Self, StyleChain) -> Value
 pub fn CiteElem::form_in(StyleChain) -> Value
 pub fn CiteElem::form_local(Self) -> Value?
 pub fn CiteElem::key(Self) -> Label
-pub fn CiteElem::lang(Self) -> Value?
+pub fn CiteElem::lang(Self) -> Lang?
 pub fn CiteElem::new(Label) -> Self
 pub fn CiteElem::of(Content) -> Self?
 pub fn CiteElem::pack(Self) -> Content
-pub fn CiteElem::region(Self) -> Value?
+pub fn CiteElem::region(Self) -> Region??
 pub fn CiteElem::set_form(Value) -> Style
 pub fn CiteElem::set_style(Value) -> Style
 pub fn CiteElem::set_supplement(Content?) -> Style
@@ -3081,8 +3199,8 @@ pub fn CiteElem::supplement_in(StyleChain) -> Content?
 pub fn CiteElem::supplement_local(Self) -> Content??
 pub fn CiteElem::with_form(Self, Value) -> Self
 pub fn CiteElem::with_key(Self, Label) -> Self
-pub fn CiteElem::with_lang(Self, Value) -> Self
-pub fn CiteElem::with_region(Self, Value) -> Self
+pub fn CiteElem::with_lang(Self, Lang) -> Self
+pub fn CiteElem::with_region(Self, Region?) -> Self
 pub fn CiteElem::with_style(Self, Value) -> Self
 pub fn CiteElem::with_supplement(Self, Content?) -> Self
 
@@ -3257,6 +3375,21 @@ pub impl[T : FromValue] FromValue for Corners[T?]
 pub impl[T : IntoValue + Eq] IntoValue for Corners[T?]
 pub impl[T : Reflect] Reflect for Corners[T?]
 
+pub(all) struct Costs {
+  hyphenation : Ratio?
+  runt : Ratio?
+  widow : Ratio?
+  orphan : Ratio?
+} derive(Default, Eq, Hash)
+pub fn Costs::hyphenation(Self) -> Ratio
+pub fn Costs::orphan(Self) -> Ratio
+pub fn Costs::runt(Self) -> Ratio
+pub fn Costs::widow(Self) -> Ratio
+pub impl Fold for Costs
+pub impl FromValue for Costs
+pub impl IntoValue for Costs
+pub impl Reflect for Costs
+
 pub(all) struct Counter(CounterKey) derive(Eq)
 pub fn Counter::display_at(Self, Engine, Location, StyleChain, Numbering, @syntax.Span) -> Content raise SourceError
 pub fn Counter::is_page(Self) -> Bool
@@ -3318,6 +3451,14 @@ pub fn CounterUpdateElem::pack(Self) -> Content
 pub fn CounterUpdateElem::update(Self) -> CounterUpdate
 pub fn CounterUpdateElem::with_key(Self, CounterKey) -> Self
 pub fn CounterUpdateElem::with_update(Self, CounterUpdate) -> Self
+
+pub(all) enum Covers {
+  LatinInCjk
+  Regex(Regex)
+} derive(Eq, Hash)
+pub impl FromValue for Covers
+pub impl IntoValue for Covers
+pub impl Reflect for Covers
 
 pub struct CslIndentElem(Content)
 pub fn CslIndentElem::body(Self) -> Content
@@ -3499,6 +3640,12 @@ pub fn Deprecation::to_hinted(Self) -> HintedString
 pub fn Deprecation::with_message(Self, String) -> Self
 pub fn Deprecation::with_until(Self, String) -> Self
 
+pub(all) struct Depth(Int64) derive(Default, Eq, Hash)
+pub impl Fold for Depth
+pub impl FromValue for Depth
+pub impl IntoValue for Depth
+pub impl Reflect for Depth
+
 pub struct Dict {
   map : Map[String, Value]
   mut shared : Bool
@@ -3561,9 +3708,9 @@ pub fn DividerElem::of(Content) -> Self?
 pub fn DividerElem::pack(Self) -> Content
 
 pub struct DocumentElem(Content)
-pub fn DocumentElem::author(Self, StyleChain) -> Value
-pub fn DocumentElem::author_in(StyleChain) -> Value
-pub fn DocumentElem::author_local(Self) -> Value?
+pub fn DocumentElem::author(Self, StyleChain) -> OneOrMultiple[String]
+pub fn DocumentElem::author_in(StyleChain) -> OneOrMultiple[String]
+pub fn DocumentElem::author_local(Self) -> OneOrMultiple[String]?
 pub fn DocumentElem::body(Self) -> Content
 pub fn DocumentElem::date(Self, StyleChain) -> Smart[Datetime?]
 pub fn DocumentElem::date_in(StyleChain) -> Smart[Datetime?]
@@ -3571,33 +3718,41 @@ pub fn DocumentElem::date_local(Self) -> Smart[Datetime?]?
 pub fn DocumentElem::description(Self, StyleChain) -> Content?
 pub fn DocumentElem::description_in(StyleChain) -> Content?
 pub fn DocumentElem::description_local(Self) -> Content??
-pub fn DocumentElem::format(Self, StyleChain) -> Value
-pub fn DocumentElem::format_in(StyleChain) -> Value
-pub fn DocumentElem::format_local(Self) -> Value?
-pub fn DocumentElem::keywords(Self, StyleChain) -> Value
-pub fn DocumentElem::keywords_in(StyleChain) -> Value
-pub fn DocumentElem::keywords_local(Self) -> Value?
+pub fn DocumentElem::format(Self, StyleChain) -> Smart[DocumentFormat]
+pub fn DocumentElem::format_in(StyleChain) -> Smart[DocumentFormat]
+pub fn DocumentElem::format_local(Self) -> Smart[DocumentFormat]?
+pub fn DocumentElem::keywords(Self, StyleChain) -> OneOrMultiple[String]
+pub fn DocumentElem::keywords_in(StyleChain) -> OneOrMultiple[String]
+pub fn DocumentElem::keywords_local(Self) -> OneOrMultiple[String]?
 pub fn DocumentElem::new(BundlePath, Content) -> Self
 pub fn DocumentElem::of(Content) -> Self?
 pub fn DocumentElem::pack(Self) -> Content
 pub fn DocumentElem::path(Self) -> BundlePath
-pub fn DocumentElem::set_author(Value) -> Style
+pub fn DocumentElem::set_author(OneOrMultiple[String]) -> Style
 pub fn DocumentElem::set_date(Smart[Datetime?]) -> Style
 pub fn DocumentElem::set_description(Content?) -> Style
-pub fn DocumentElem::set_format(Value) -> Style
-pub fn DocumentElem::set_keywords(Value) -> Style
+pub fn DocumentElem::set_format(Smart[DocumentFormat]) -> Style
+pub fn DocumentElem::set_keywords(OneOrMultiple[String]) -> Style
 pub fn DocumentElem::set_title(Content?) -> Style
 pub fn DocumentElem::title(Self, StyleChain) -> Content?
 pub fn DocumentElem::title_in(StyleChain) -> Content?
 pub fn DocumentElem::title_local(Self) -> Content??
-pub fn DocumentElem::with_author(Self, Value) -> Self
+pub fn DocumentElem::with_author(Self, OneOrMultiple[String]) -> Self
 pub fn DocumentElem::with_body(Self, Content) -> Self
 pub fn DocumentElem::with_date(Self, Smart[Datetime?]) -> Self
 pub fn DocumentElem::with_description(Self, Content?) -> Self
-pub fn DocumentElem::with_format(Self, Value) -> Self
-pub fn DocumentElem::with_keywords(Self, Value) -> Self
+pub fn DocumentElem::with_format(Self, Smart[DocumentFormat]) -> Self
+pub fn DocumentElem::with_keywords(Self, OneOrMultiple[String]) -> Self
 pub fn DocumentElem::with_path(Self, BundlePath) -> Self
 pub fn DocumentElem::with_title(Self, Content?) -> Self
+
+pub(all) enum DocumentFormat {
+  Paged(PagedFormat)
+  Html
+} derive(Eq, Hash, @debug.Debug)
+pub impl FromValue for DocumentFormat
+pub impl IntoValue for DocumentFormat
+pub impl Reflect for DocumentFormat
 
 pub struct Duration(@time.Duration) derive(Compare, Eq, Hash)
 pub fn Duration::add(Self, Self) -> Self
@@ -3787,14 +3942,14 @@ pub struct EnumElem(Content)
 pub fn EnumElem::body_indent(Self, StyleChain) -> Length
 pub fn EnumElem::body_indent_in(StyleChain) -> Length
 pub fn EnumElem::body_indent_local(Self) -> Length?
-pub fn EnumElem::children(Self) -> Value
+pub fn EnumElem::children(Self) -> Array[EnumItem]
 pub fn EnumElem::full(Self, StyleChain) -> Bool
 pub fn EnumElem::full_in(StyleChain) -> Bool
 pub fn EnumElem::full_local(Self) -> Bool?
 pub fn EnumElem::indent(Self, StyleChain) -> Length
 pub fn EnumElem::indent_in(StyleChain) -> Length
 pub fn EnumElem::indent_local(Self) -> Length?
-pub fn EnumElem::new(Value) -> Self
+pub fn EnumElem::new(Array[EnumItem]) -> Self
 pub fn EnumElem::number_align(Self, StyleChain) -> Alignment
 pub fn EnumElem::number_align_in(StyleChain) -> Alignment
 pub fn EnumElem::number_align_local(Self) -> Alignment?
@@ -3803,7 +3958,7 @@ pub fn EnumElem::numbering_in(StyleChain) -> Numbering
 pub fn EnumElem::numbering_local(Self) -> Numbering?
 pub fn EnumElem::of(Content) -> Self?
 pub fn EnumElem::pack(Self) -> Content
-pub fn EnumElem::parents_in(StyleChain) -> Value
+pub fn EnumElem::parents_in(StyleChain) -> Array[U64]
 pub fn EnumElem::reversed(Self, StyleChain) -> Bool
 pub fn EnumElem::reversed_in(StyleChain) -> Bool
 pub fn EnumElem::reversed_local(Self) -> Bool?
@@ -3812,7 +3967,7 @@ pub fn EnumElem::set_full(Bool) -> Style
 pub fn EnumElem::set_indent(Length) -> Style
 pub fn EnumElem::set_number_align(Alignment) -> Style
 pub fn EnumElem::set_numbering(Numbering) -> Style
-pub fn EnumElem::set_parents(Value) -> Style
+pub fn EnumElem::set_parents(Array[U64]) -> Style
 pub fn EnumElem::set_reversed(Bool) -> Style
 pub fn EnumElem::set_spacing(Smart[Length]) -> Style
 pub fn EnumElem::set_start(Smart[U64]) -> Style
@@ -3827,7 +3982,7 @@ pub fn EnumElem::tight(Self, StyleChain) -> Bool
 pub fn EnumElem::tight_in(StyleChain) -> Bool
 pub fn EnumElem::tight_local(Self) -> Bool?
 pub fn EnumElem::with_body_indent(Self, Length) -> Self
-pub fn EnumElem::with_children(Self, Value) -> Self
+pub fn EnumElem::with_children(Self, Array[EnumItem]) -> Self
 pub fn EnumElem::with_full(Self, Bool) -> Self
 pub fn EnumElem::with_indent(Self, Length) -> Self
 pub fn EnumElem::with_number_align(Self, Alignment) -> Self
@@ -3837,7 +3992,7 @@ pub fn EnumElem::with_spacing(Self, Smart[Length]) -> Self
 pub fn EnumElem::with_start(Self, Smart[U64]) -> Self
 pub fn EnumElem::with_tight(Self, Bool) -> Self
 
-pub struct EnumItem(Content)
+pub(all) struct EnumItem(Content) derive(Eq)
 pub fn EnumItem::body(Self) -> Content
 pub fn EnumItem::new(Content) -> Self
 pub fn EnumItem::number(Self, StyleChain) -> Smart[U64]
@@ -3848,6 +4003,9 @@ pub fn EnumItem::pack(Self) -> Content
 pub fn EnumItem::set_number(Smart[U64]) -> Style
 pub fn EnumItem::with_body(Self, Content) -> Self
 pub fn EnumItem::with_number(Self, Smart[U64]) -> Self
+pub impl FromValue for EnumItem
+pub impl IntoValue for EnumItem
+pub impl Reflect for EnumItem
 
 pub struct EquationElem(Content)
 pub fn EquationElem::alt(Self, StyleChain) -> String?
@@ -3880,12 +4038,12 @@ pub fn EquationElem::set_number_align(SpecificAlignment[OuterHAlignment, VAlignm
 pub fn EquationElem::set_numbering(Numbering?) -> Style
 pub fn EquationElem::set_script_scale(Value) -> Style
 pub fn EquationElem::set_size(Value) -> Style
-pub fn EquationElem::set_supplement(Value) -> Style
+pub fn EquationElem::set_supplement(Smart[Supplement?]) -> Style
 pub fn EquationElem::set_variant(Value) -> Style
 pub fn EquationElem::size_in(StyleChain) -> Value
-pub fn EquationElem::supplement(Self, StyleChain) -> Value
-pub fn EquationElem::supplement_in(StyleChain) -> Value
-pub fn EquationElem::supplement_local(Self) -> Value?
+pub fn EquationElem::supplement(Self, StyleChain) -> Smart[Supplement?]
+pub fn EquationElem::supplement_in(StyleChain) -> Smart[Supplement?]
+pub fn EquationElem::supplement_local(Self) -> Smart[Supplement?]?
 pub fn EquationElem::variant_in(StyleChain) -> Value
 pub fn EquationElem::with_alt(Self, String?) -> Self
 pub fn EquationElem::with_block(Self, Bool) -> Self
@@ -3893,7 +4051,7 @@ pub fn EquationElem::with_body(Self, Content) -> Self
 pub fn EquationElem::with_locale(Self, Value) -> Self
 pub fn EquationElem::with_number_align(Self, SpecificAlignment[OuterHAlignment, VAlignment]) -> Self
 pub fn EquationElem::with_numbering(Self, Numbering?) -> Self
-pub fn EquationElem::with_supplement(Self, Value) -> Self
+pub fn EquationElem::with_supplement(Self, Smart[Supplement?]) -> Self
 
 pub(all) enum Feature {
   Html
@@ -3934,11 +4092,11 @@ pub(all) enum FieldKind {
   External
 } derive(Eq, @debug.Debug)
 
-pub struct FigureCaption(Content)
+pub(all) struct FigureCaption(Content) derive(Eq)
 pub fn FigureCaption::body(Self) -> Content
 pub fn FigureCaption::counter(Self) -> Counter??
 pub fn FigureCaption::figure_location(Self) -> Location??
-pub fn FigureCaption::kind(Self) -> Value?
+pub fn FigureCaption::kind(Self) -> FigureKind?
 pub fn FigureCaption::new(Content) -> Self
 pub fn FigureCaption::numbering(Self) -> Numbering??
 pub fn FigureCaption::of(Content) -> Self?
@@ -3955,27 +4113,30 @@ pub fn FigureCaption::supplement(Self) -> Content??
 pub fn FigureCaption::with_body(Self, Content) -> Self
 pub fn FigureCaption::with_counter(Self, Counter?) -> Self
 pub fn FigureCaption::with_figure_location(Self, Location?) -> Self
-pub fn FigureCaption::with_kind(Self, Value) -> Self
+pub fn FigureCaption::with_kind(Self, FigureKind) -> Self
 pub fn FigureCaption::with_numbering(Self, Numbering?) -> Self
 pub fn FigureCaption::with_position(Self, OuterVAlignment) -> Self
 pub fn FigureCaption::with_separator(Self, Smart[Content]) -> Self
 pub fn FigureCaption::with_supplement(Self, Content?) -> Self
+pub impl FromValue for FigureCaption
+pub impl IntoValue for FigureCaption
+pub impl Reflect for FigureCaption
 
 pub struct FigureElem(Content)
 pub fn FigureElem::alt(Self, StyleChain) -> String?
 pub fn FigureElem::alt_in(StyleChain) -> String?
 pub fn FigureElem::alt_local(Self) -> String??
 pub fn FigureElem::body(Self) -> Content
-pub fn FigureElem::caption(Self, StyleChain) -> Value
-pub fn FigureElem::caption_in(StyleChain) -> Value
-pub fn FigureElem::caption_local(Self) -> Value?
+pub fn FigureElem::caption(Self, StyleChain) -> FigureCaption?
+pub fn FigureElem::caption_in(StyleChain) -> FigureCaption?
+pub fn FigureElem::caption_local(Self) -> FigureCaption??
 pub fn FigureElem::counter(Self) -> Counter??
 pub fn FigureElem::gap(Self, StyleChain) -> Length
 pub fn FigureElem::gap_in(StyleChain) -> Length
 pub fn FigureElem::gap_local(Self) -> Length?
-pub fn FigureElem::kind(Self, StyleChain) -> Value
-pub fn FigureElem::kind_in(StyleChain) -> Value
-pub fn FigureElem::kind_local(Self) -> Value?
+pub fn FigureElem::kind(Self, StyleChain) -> Smart[FigureKind]
+pub fn FigureElem::kind_in(StyleChain) -> Smart[FigureKind]
+pub fn FigureElem::kind_local(Self) -> Smart[FigureKind]?
 pub fn FigureElem::locale(Self) -> Value?
 pub fn FigureElem::new(Content) -> Self
 pub fn FigureElem::numbering(Self, StyleChain) -> Numbering?
@@ -3989,33 +4150,53 @@ pub fn FigureElem::pack(Self) -> Content
 pub fn FigureElem::placement(Self, StyleChain) -> Smart[VAlignment]?
 pub fn FigureElem::placement_in(StyleChain) -> Smart[VAlignment]?
 pub fn FigureElem::placement_local(Self) -> Smart[VAlignment]??
-pub fn FigureElem::scope(Self, StyleChain) -> Value
-pub fn FigureElem::scope_in(StyleChain) -> Value
-pub fn FigureElem::scope_local(Self) -> Value?
+pub fn FigureElem::scope(Self, StyleChain) -> PlacementScope
+pub fn FigureElem::scope_in(StyleChain) -> PlacementScope
+pub fn FigureElem::scope_local(Self) -> PlacementScope?
 pub fn FigureElem::set_alt(String?) -> Style
-pub fn FigureElem::set_caption(Value) -> Style
+pub fn FigureElem::set_caption(FigureCaption?) -> Style
 pub fn FigureElem::set_gap(Length) -> Style
-pub fn FigureElem::set_kind(Value) -> Style
+pub fn FigureElem::set_kind(Smart[FigureKind]) -> Style
 pub fn FigureElem::set_numbering(Numbering?) -> Style
 pub fn FigureElem::set_outlined(Bool) -> Style
 pub fn FigureElem::set_placement(Smart[VAlignment]?) -> Style
-pub fn FigureElem::set_scope(Value) -> Style
-pub fn FigureElem::set_supplement(Value) -> Style
-pub fn FigureElem::supplement(Self, StyleChain) -> Value
-pub fn FigureElem::supplement_in(StyleChain) -> Value
-pub fn FigureElem::supplement_local(Self) -> Value?
+pub fn FigureElem::set_scope(PlacementScope) -> Style
+pub fn FigureElem::set_supplement(Smart[Supplement?]) -> Style
+pub fn FigureElem::supplement(Self, StyleChain) -> Smart[Supplement?]
+pub fn FigureElem::supplement_in(StyleChain) -> Smart[Supplement?]
+pub fn FigureElem::supplement_local(Self) -> Smart[Supplement?]?
 pub fn FigureElem::with_alt(Self, String?) -> Self
 pub fn FigureElem::with_body(Self, Content) -> Self
-pub fn FigureElem::with_caption(Self, Value) -> Self
+pub fn FigureElem::with_caption(Self, FigureCaption?) -> Self
 pub fn FigureElem::with_counter(Self, Counter?) -> Self
 pub fn FigureElem::with_gap(Self, Length) -> Self
-pub fn FigureElem::with_kind(Self, Value) -> Self
+pub fn FigureElem::with_kind(Self, Smart[FigureKind]) -> Self
 pub fn FigureElem::with_locale(Self, Value) -> Self
 pub fn FigureElem::with_numbering(Self, Numbering?) -> Self
 pub fn FigureElem::with_outlined(Self, Bool) -> Self
 pub fn FigureElem::with_placement(Self, Smart[VAlignment]?) -> Self
-pub fn FigureElem::with_scope(Self, Value) -> Self
-pub fn FigureElem::with_supplement(Self, Value) -> Self
+pub fn FigureElem::with_scope(Self, PlacementScope) -> Self
+pub fn FigureElem::with_supplement(Self, Smart[Supplement?]) -> Self
+
+pub(all) enum FigureKind {
+  Elem(Element)
+  Name(String)
+} derive(Eq)
+pub impl FromValue for FigureKind
+pub impl IntoValue for FigureKind
+pub impl Reflect for FigureKind
+
+pub(all) struct FirstLineIndent {
+  amount : Length?
+  all : Bool?
+} derive(Eq, Hash)
+pub fn FirstLineIndent::all(Self) -> Bool
+pub fn FirstLineIndent::amount(Self) -> Length
+pub impl Default for FirstLineIndent
+pub impl Fold for FirstLineIndent
+pub impl FromValue for FirstLineIndent
+pub impl IntoValue for FirstLineIndent
+pub impl Reflect for FirstLineIndent
 
 pub(all) enum FixedAlignment {
   Start
@@ -4031,22 +4212,94 @@ pub fn FlushElem::new() -> Self
 pub fn FlushElem::of(Content) -> Self?
 pub fn FlushElem::pack(Self) -> Content
 
+pub(all) struct FontFamily {
+  name : String
+  covers : Covers?
+} derive(Eq, Hash)
+pub fn FontFamily::as_str(Self) -> String
+pub fn FontFamily::new(String) -> Self
+pub fn FontFamily::with_coverage(String, Covers?) -> Self
+pub impl FromValue for FontFamily
+pub impl IntoValue for FontFamily
+pub impl Reflect for FontFamily
+
+pub(all) struct FontFeatures(Array[(Tag, Int64)]) derive(Default, Eq, Hash)
+pub impl Fold for FontFeatures
+pub impl FromValue for FontFeatures
+pub impl IntoValue for FontFeatures
+pub impl Reflect for FontFeatures
+
+pub(all) struct FontList(Array[FontFamily]) derive(Eq, Hash)
+pub fn FontList::new(Array[FontFamily]) -> Self raise HintedError
+pub impl FromValue for FontList
+pub impl IntoValue for FontList
+pub impl Reflect for FontList
+
+pub(all) struct FontStretch(Int) derive(Compare, Eq, Hash, @debug.Debug)
+pub fn FontStretch::from_ratio(Ratio) -> Self
+pub fn FontStretch::repr(Self) -> String
+pub fn FontStretch::to_ratio(Self) -> Ratio
+pub impl Default for FontStretch
+pub impl FromValue for FontStretch
+pub impl IntoValue for FontStretch
+pub impl Reflect for FontStretch
+
+pub(all) enum FontStyle {
+  Normal
+  Italic
+  Oblique
+} derive(Compare, Eq, Hash, @debug.Debug)
+pub fn FontStyle::distance(Self, Self) -> Int
+pub impl Default for FontStyle
+pub impl FromValue for FontStyle
+pub impl IntoValue for FontStyle
+pub impl Reflect for FontStyle
+
+pub(all) struct FontVariations(Array[(Tag, AxisValue)]) derive(Eq, Hash, @debug.Debug)
+pub impl Default for FontVariations
+pub impl Fold for FontVariations
+pub impl FromValue for FontVariations
+pub impl IntoValue for FontVariations
+pub impl Reflect for FontVariations
+
+pub(all) struct FontWeight(Int) derive(Compare, Eq, Hash, @debug.Debug)
+pub fn FontWeight::distance(Self, Self) -> Int
+pub fn FontWeight::from_number(Int) -> Self
+pub fn FontWeight::thicken(Self, Int) -> Self
+pub fn FontWeight::to_number(Self) -> Int
+pub impl Default for FontWeight
+pub impl FromValue for FontWeight
+pub impl IntoValue for FontWeight
+pub impl Reflect for FontWeight
+
+pub(all) enum FootnoteBody {
+  Content(Content)
+  Reference(Label)
+} derive(Eq)
+pub impl FromValue for FootnoteBody
+pub impl IntoValue for FootnoteBody
+pub impl Reflect for FootnoteBody
+
 pub struct FootnoteContainer(Content)
 pub fn FootnoteContainer::new() -> Self
 pub fn FootnoteContainer::of(Content) -> Self?
 pub fn FootnoteContainer::pack(Self) -> Content
 
-pub struct FootnoteElem(Content)
-pub fn FootnoteElem::body(Self) -> Value
-pub fn FootnoteElem::new(Value) -> Self
+pub(all) struct FootnoteElem(Content) derive(Eq)
+pub fn FootnoteElem::body(Self) -> FootnoteBody
+pub fn FootnoteElem::new(FootnoteBody) -> Self
 pub fn FootnoteElem::numbering(Self, StyleChain) -> Numbering
 pub fn FootnoteElem::numbering_in(StyleChain) -> Numbering
 pub fn FootnoteElem::numbering_local(Self) -> Numbering?
 pub fn FootnoteElem::of(Content) -> Self?
 pub fn FootnoteElem::pack(Self) -> Content
 pub fn FootnoteElem::set_numbering(Numbering) -> Style
-pub fn FootnoteElem::with_body(Self, Value) -> Self
+pub fn FootnoteElem::with_body(Self, FootnoteBody) -> Self
+pub fn FootnoteElem::with_content(Content) -> Self
 pub fn FootnoteElem::with_numbering(Self, Numbering) -> Self
+pub impl FromValue for FootnoteElem
+pub impl IntoValue for FootnoteElem
+pub impl Reflect for FootnoteElem
 
 pub struct FootnoteEntry(Content)
 pub fn FootnoteEntry::clearance(Self, StyleChain) -> Length
@@ -4058,8 +4311,8 @@ pub fn FootnoteEntry::gap_local(Self) -> Length?
 pub fn FootnoteEntry::indent(Self, StyleChain) -> Length
 pub fn FootnoteEntry::indent_in(StyleChain) -> Length
 pub fn FootnoteEntry::indent_local(Self) -> Length?
-pub fn FootnoteEntry::new(Value) -> Self
-pub fn FootnoteEntry::note(Self) -> Value
+pub fn FootnoteEntry::new(FootnoteElem) -> Self
+pub fn FootnoteEntry::note(Self) -> FootnoteElem
 pub fn FootnoteEntry::of(Content) -> Self?
 pub fn FootnoteEntry::pack(Self) -> Content
 pub fn FootnoteEntry::separator(Self, StyleChain) -> Content
@@ -4072,7 +4325,7 @@ pub fn FootnoteEntry::set_separator(Content) -> Style
 pub fn FootnoteEntry::with_clearance(Self, Length) -> Self
 pub fn FootnoteEntry::with_gap(Self, Length) -> Self
 pub fn FootnoteEntry::with_indent(Self, Length) -> Self
-pub fn FootnoteEntry::with_note(Self, Value) -> Self
+pub fn FootnoteEntry::with_note(Self, FootnoteElem) -> Self
 pub fn FootnoteEntry::with_separator(Self, Content) -> Self
 
 pub struct FootnoteMarker(Content)
@@ -4457,10 +4710,10 @@ pub fn HeadingElem::set_level(Smart[NonZeroUSize]) -> Style
 pub fn HeadingElem::set_numbering(Numbering?) -> Style
 pub fn HeadingElem::set_offset(USize) -> Style
 pub fn HeadingElem::set_outlined(Bool) -> Style
-pub fn HeadingElem::set_supplement(Value) -> Style
-pub fn HeadingElem::supplement(Self, StyleChain) -> Value
-pub fn HeadingElem::supplement_in(StyleChain) -> Value
-pub fn HeadingElem::supplement_local(Self) -> Value?
+pub fn HeadingElem::set_supplement(Smart[Supplement?]) -> Style
+pub fn HeadingElem::supplement(Self, StyleChain) -> Smart[Supplement?]
+pub fn HeadingElem::supplement_in(StyleChain) -> Smart[Supplement?]
+pub fn HeadingElem::supplement_local(Self) -> Smart[Supplement?]?
 pub fn HeadingElem::with_body(Self, Content) -> Self
 pub fn HeadingElem::with_bookmarked(Self, Smart[Bool]) -> Self
 pub fn HeadingElem::with_depth(Self, NonZeroUSize) -> Self
@@ -4470,7 +4723,7 @@ pub fn HeadingElem::with_numbering(Self, Numbering?) -> Self
 pub fn HeadingElem::with_numbers(Self, String) -> Self
 pub fn HeadingElem::with_offset(Self, USize) -> Self
 pub fn HeadingElem::with_outlined(Self, Bool) -> Self
-pub fn HeadingElem::with_supplement(Self, Value) -> Self
+pub fn HeadingElem::with_supplement(Self, Smart[Supplement?]) -> Self
 
 pub struct HideElem(Content)
 pub fn HideElem::body(Self) -> Content
@@ -4483,9 +4736,9 @@ pub fn HideElem::with_body(Self, Content) -> Self
 
 pub struct HighlightElem(Content)
 pub fn HighlightElem::body(Self) -> Content
-pub fn HighlightElem::bottom_edge(Self, StyleChain) -> Value
-pub fn HighlightElem::bottom_edge_in(StyleChain) -> Value
-pub fn HighlightElem::bottom_edge_local(Self) -> Value?
+pub fn HighlightElem::bottom_edge(Self, StyleChain) -> BottomEdge
+pub fn HighlightElem::bottom_edge_in(StyleChain) -> BottomEdge
+pub fn HighlightElem::bottom_edge_local(Self) -> BottomEdge?
 pub fn HighlightElem::extent(Self, StyleChain) -> Length
 pub fn HighlightElem::extent_in(StyleChain) -> Length
 pub fn HighlightElem::extent_local(Self) -> Length?
@@ -4498,25 +4751,25 @@ pub fn HighlightElem::pack(Self) -> Content
 pub fn HighlightElem::radius(Self, StyleChain) -> Corners[Rel[Length]?]
 pub fn HighlightElem::radius_in(StyleChain) -> Corners[Rel[Length]?]
 pub fn HighlightElem::radius_local(Self) -> Corners[Rel[Length]?]?
-pub fn HighlightElem::set_bottom_edge(Value) -> Style
+pub fn HighlightElem::set_bottom_edge(BottomEdge) -> Style
 pub fn HighlightElem::set_extent(Length) -> Style
 pub fn HighlightElem::set_fill(Value) -> Style
 pub fn HighlightElem::set_radius(Corners[Rel[Length]?]) -> Style
 pub fn HighlightElem::set_stroke(Value) -> Style
-pub fn HighlightElem::set_top_edge(Value) -> Style
+pub fn HighlightElem::set_top_edge(TopEdge) -> Style
 pub fn HighlightElem::stroke(Self, StyleChain) -> Value
 pub fn HighlightElem::stroke_in(StyleChain) -> Value
 pub fn HighlightElem::stroke_local(Self) -> Value?
-pub fn HighlightElem::top_edge(Self, StyleChain) -> Value
-pub fn HighlightElem::top_edge_in(StyleChain) -> Value
-pub fn HighlightElem::top_edge_local(Self) -> Value?
+pub fn HighlightElem::top_edge(Self, StyleChain) -> TopEdge
+pub fn HighlightElem::top_edge_in(StyleChain) -> TopEdge
+pub fn HighlightElem::top_edge_local(Self) -> TopEdge?
 pub fn HighlightElem::with_body(Self, Content) -> Self
-pub fn HighlightElem::with_bottom_edge(Self, Value) -> Self
+pub fn HighlightElem::with_bottom_edge(Self, BottomEdge) -> Self
 pub fn HighlightElem::with_extent(Self, Length) -> Self
 pub fn HighlightElem::with_fill(Self, Value) -> Self
 pub fn HighlightElem::with_radius(Self, Corners[Rel[Length]?]) -> Self
 pub fn HighlightElem::with_stroke(Self, Value) -> Self
-pub fn HighlightElem::with_top_edge(Self, Value) -> Self
+pub fn HighlightElem::with_top_edge(Self, TopEdge) -> Self
 
 pub(all) struct HintedString {
   message : String
@@ -4656,6 +4909,22 @@ pub fn Introspector::query_label(Self, Label) -> Content raise HintedError
 pub fn Introspector::query_labelled(Self) -> Array[Content]
 pub fn Introspector::query_unique(Self, Selector) -> Content raise HintedError
 
+pub(all) struct ItalicToggle(Bool) derive(Eq, Hash)
+pub impl Fold for ItalicToggle
+pub impl FromValue for ItalicToggle
+pub impl IntoValue for ItalicToggle
+pub impl Reflect for ItalicToggle
+
+pub(all) struct JustificationLimits {
+  spacing : Limits[Rel[Length]]?
+  tracking : Limits[Length]?
+} derive(Eq, Hash)
+pub impl Default for JustificationLimits
+pub impl Fold for JustificationLimits
+pub impl FromValue for JustificationLimits
+pub impl IntoValue for JustificationLimits
+pub impl Reflect for JustificationLimits
+
 pub(all) struct Label(String) derive(Compare, Eq, Hash)
 pub fn Label::new(String) -> Self?
 pub fn Label::repr(Self) -> String
@@ -4663,6 +4932,14 @@ pub fn Label::resolve(Self) -> String
 pub impl FromValue for Label
 pub impl IntoValue for Label
 pub impl Reflect for Label
+
+pub(all) struct Lang(String) derive(Compare, Eq, Hash, @debug.Debug)
+pub fn Lang::as_str(Self) -> String
+pub fn Lang::dir(Self) -> Dir
+pub fn Lang::from_str(String) -> Self raise HintedError
+pub impl FromValue for Lang
+pub impl IntoValue for Lang
+pub impl Reflect for Lang
 
 pub struct LayoutElem(Content)
 pub fn LayoutElem::func(Self) -> Func
@@ -4718,6 +4995,13 @@ pub fn LibraryBuilder::with_features(Self, Features) -> Self
 pub fn LibraryBuilder::with_global(Self, (Scope) -> Unit) -> Self
 pub fn LibraryBuilder::with_inputs(Self, Dict) -> Self
 
+pub(all) struct Limits[T] {
+  min : T
+  max : T
+} derive(Eq, Hash)
+pub impl[T] Fold for Limits[T]
+pub impl[T : IntoValue] IntoValue for Limits[T]
+
 pub struct LimitsElem(Content)
 pub fn LimitsElem::body(Self) -> Content
 pub fn LimitsElem::inline(Self, StyleChain) -> Bool
@@ -4760,6 +5044,14 @@ pub fn LineElem::with_length(Self, Rel[Length]) -> Self
 pub fn LineElem::with_start(Self, Axes[Rel[Length]]) -> Self
 pub fn LineElem::with_stroke(Self, Value) -> Self
 
+pub(all) enum LineNumberingScope {
+  Document
+  Page
+} derive(Eq, Hash, @debug.Debug)
+pub impl FromValue for LineNumberingScope
+pub impl IntoValue for LineNumberingScope
+pub impl Reflect for LineNumberingScope
+
 pub struct LinebreakElem(Content)
 pub fn LinebreakElem::justify(Self, StyleChain) -> Bool
 pub fn LinebreakElem::justify_in(StyleChain) -> Bool
@@ -4769,6 +5061,14 @@ pub fn LinebreakElem::of(Content) -> Self?
 pub fn LinebreakElem::pack(Self) -> Content
 pub fn LinebreakElem::set_justify(Bool) -> Style
 pub fn LinebreakElem::with_justify(Self, Bool) -> Self
+
+pub(all) enum Linebreaks {
+  Simple
+  Optimized
+} derive(Eq, Hash, @debug.Debug)
+pub impl FromValue for Linebreaks
+pub impl IntoValue for Linebreaks
+pub impl Reflect for Linebreaks
 
 pub struct LinkElem(Content)
 pub fn LinkElem::body(Self) -> Content
@@ -4795,24 +5095,24 @@ pub struct ListElem(Content)
 pub fn ListElem::body_indent(Self, StyleChain) -> Length
 pub fn ListElem::body_indent_in(StyleChain) -> Length
 pub fn ListElem::body_indent_local(Self) -> Length?
-pub fn ListElem::children(Self) -> Value
-pub fn ListElem::depth_in(StyleChain) -> Value
+pub fn ListElem::children(Self) -> Array[ListItem]
+pub fn ListElem::depth_in(StyleChain) -> Depth
 pub fn ListElem::indent(Self, StyleChain) -> Length
 pub fn ListElem::indent_in(StyleChain) -> Length
 pub fn ListElem::indent_local(Self) -> Length?
-pub fn ListElem::marker(Self, StyleChain) -> Value
+pub fn ListElem::marker(Self, StyleChain) -> ListMarker
 pub fn ListElem::marker_align(Self, StyleChain) -> Alignment
 pub fn ListElem::marker_align_in(StyleChain) -> Alignment
 pub fn ListElem::marker_align_local(Self) -> Alignment?
-pub fn ListElem::marker_in(StyleChain) -> Value
-pub fn ListElem::marker_local(Self) -> Value?
-pub fn ListElem::new(Value) -> Self
+pub fn ListElem::marker_in(StyleChain) -> ListMarker
+pub fn ListElem::marker_local(Self) -> ListMarker?
+pub fn ListElem::new(Array[ListItem]) -> Self
 pub fn ListElem::of(Content) -> Self?
 pub fn ListElem::pack(Self) -> Content
 pub fn ListElem::set_body_indent(Length) -> Style
-pub fn ListElem::set_depth(Value) -> Style
+pub fn ListElem::set_depth(Depth) -> Style
 pub fn ListElem::set_indent(Length) -> Style
-pub fn ListElem::set_marker(Value) -> Style
+pub fn ListElem::set_marker(ListMarker) -> Style
 pub fn ListElem::set_marker_align(Alignment) -> Style
 pub fn ListElem::set_spacing(Smart[Length]) -> Style
 pub fn ListElem::set_tight(Bool) -> Style
@@ -4823,19 +5123,38 @@ pub fn ListElem::tight(Self, StyleChain) -> Bool
 pub fn ListElem::tight_in(StyleChain) -> Bool
 pub fn ListElem::tight_local(Self) -> Bool?
 pub fn ListElem::with_body_indent(Self, Length) -> Self
-pub fn ListElem::with_children(Self, Value) -> Self
+pub fn ListElem::with_children(Self, Array[ListItem]) -> Self
 pub fn ListElem::with_indent(Self, Length) -> Self
-pub fn ListElem::with_marker(Self, Value) -> Self
+pub fn ListElem::with_marker(Self, ListMarker) -> Self
 pub fn ListElem::with_marker_align(Self, Alignment) -> Self
 pub fn ListElem::with_spacing(Self, Smart[Length]) -> Self
 pub fn ListElem::with_tight(Self, Bool) -> Self
 
-pub struct ListItem(Content)
+pub(all) struct ListItem(Content) derive(Eq)
 pub fn ListItem::body(Self) -> Content
 pub fn ListItem::new(Content) -> Self
 pub fn ListItem::of(Content) -> Self?
 pub fn ListItem::pack(Self) -> Content
 pub fn ListItem::with_body(Self, Content) -> Self
+pub impl FromValue for ListItem
+pub impl IntoValue for ListItem
+pub impl Reflect for ListItem
+
+pub(all) enum ListMarker {
+  Content(Array[Content])
+  Func(Func)
+} derive(Eq)
+pub impl FromValue for ListMarker
+pub impl IntoValue for ListMarker
+pub impl Reflect for ListMarker
+
+pub(all) struct Locale {
+  lang : Lang
+  region : Region?
+} derive(Compare, Eq, Hash, @debug.Debug)
+pub fn Locale::new(Lang, Region?) -> Self
+pub fn Locale::rfc_3066(Self) -> String
+pub impl Default for Locale
 
 pub(all) struct LocatableSelector(Selector) derive(Eq)
 pub fn LocatableSelector::resolve_unique(Self, Engine, Context, @syntax.Span) -> Location raise SourceError
@@ -4860,6 +5179,16 @@ pub fn LrElem::size_in(StyleChain) -> Rel[Length]
 pub fn LrElem::size_local(Self) -> Rel[Length]?
 pub fn LrElem::with_body(Self, Content) -> Self
 pub fn LrElem::with_size(Self, Rel[Length]) -> Self
+
+pub(all) struct Margin[T] {
+  sides : Sides[T?]
+  two_sided : Bool?
+} derive(Eq, Hash, @debug.Debug)
+pub fn[T] Margin::splat(T?) -> Self[T]
+pub impl[T : Fold] Fold for Margin[T]
+pub impl[T : FromValue] FromValue for Margin[T]
+pub impl[T : IntoValue + Eq] IntoValue for Margin[T]
+pub impl[T : Reflect] Reflect for Margin[T]
 
 pub struct MatElem(Content)
 pub fn MatElem::align(Self, StyleChain) -> HAlignment
@@ -5068,6 +5397,12 @@ pub fn NativeTypeData::register(Self, (Self) -> Unit) -> Unit
 pub fn NativeTypeData::set_constructor(Self, NativeFuncData) -> Unit
 pub fn NativeTypeData::set_scope(Self, Scope) -> Unit
 
+pub(all) enum Never {
+} derive(Eq, Hash)
+pub impl FromValue for Never
+pub impl IntoValue for Never
+pub impl Reflect for Never
+
 pub(all) struct NonZeroI64(Int64) derive(Compare, Eq, Hash, @debug.Debug)
 pub fn NonZeroI64::get(Self) -> Int64
 pub impl FromValue for NonZeroI64
@@ -5099,6 +5434,22 @@ pub(all) enum Num {
 pub impl FromValue for Num
 pub impl IntoValue for Num
 pub impl Reflect for Num
+
+pub(all) enum NumberType {
+  Lining
+  OldStyle
+} derive(Eq, Hash, @debug.Debug)
+pub impl FromValue for NumberType
+pub impl IntoValue for NumberType
+pub impl Reflect for NumberType
+
+pub(all) enum NumberWidth {
+  Proportional
+  Tabular
+} derive(Eq, Hash, @debug.Debug)
+pub impl FromValue for NumberWidth
+pub impl IntoValue for NumberWidth
+pub impl Reflect for NumberWidth
 
 pub(all) enum Numbering {
   Pattern(NumberingPattern)
@@ -5147,6 +5498,13 @@ pub(all) enum NumericUnit {
   Percent
 } derive(Eq, @debug.Debug)
 
+pub(all) struct OneOrMultiple[T](Array[T]) derive(Eq, Hash)
+pub impl[T] Default for OneOrMultiple[T]
+pub impl[T] Fold for OneOrMultiple[T]
+pub impl[T : FromValue] FromValue for OneOrMultiple[T]
+pub impl[T : IntoValue] IntoValue for OneOrMultiple[T]
+pub impl[T : Reflect] Reflect for OneOrMultiple[T]
+
 pub struct OpElem(Content)
 pub fn OpElem::limits(Self, StyleChain) -> Bool
 pub fn OpElem::limits_in(StyleChain) -> Bool
@@ -5191,14 +5549,14 @@ pub struct OutlineElem(Content)
 pub fn OutlineElem::depth(Self, StyleChain) -> NonZeroUSize?
 pub fn OutlineElem::depth_in(StyleChain) -> NonZeroUSize?
 pub fn OutlineElem::depth_local(Self) -> NonZeroUSize??
-pub fn OutlineElem::indent(Self, StyleChain) -> Value
-pub fn OutlineElem::indent_in(StyleChain) -> Value
-pub fn OutlineElem::indent_local(Self) -> Value?
+pub fn OutlineElem::indent(Self, StyleChain) -> Smart[OutlineIndent]
+pub fn OutlineElem::indent_in(StyleChain) -> Smart[OutlineIndent]
+pub fn OutlineElem::indent_local(Self) -> Smart[OutlineIndent]?
 pub fn OutlineElem::new() -> Self
 pub fn OutlineElem::of(Content) -> Self?
 pub fn OutlineElem::pack(Self) -> Content
 pub fn OutlineElem::set_depth(NonZeroUSize?) -> Style
-pub fn OutlineElem::set_indent(Value) -> Style
+pub fn OutlineElem::set_indent(Smart[OutlineIndent]) -> Style
 pub fn OutlineElem::set_target(LocatableSelector) -> Style
 pub fn OutlineElem::set_title(Smart[Content?]) -> Style
 pub fn OutlineElem::target(Self, StyleChain) -> LocatableSelector
@@ -5208,7 +5566,7 @@ pub fn OutlineElem::title(Self, StyleChain) -> Smart[Content?]
 pub fn OutlineElem::title_in(StyleChain) -> Smart[Content?]
 pub fn OutlineElem::title_local(Self) -> Smart[Content?]?
 pub fn OutlineElem::with_depth(Self, NonZeroUSize?) -> Self
-pub fn OutlineElem::with_indent(Self, Value) -> Self
+pub fn OutlineElem::with_indent(Self, Smart[OutlineIndent]) -> Self
 pub fn OutlineElem::with_target(Self, LocatableSelector) -> Self
 pub fn OutlineElem::with_title(Self, Smart[Content?]) -> Self
 
@@ -5227,6 +5585,14 @@ pub fn OutlineEntry::set_parent(Value) -> Style
 pub fn OutlineEntry::with_element(Self, Content) -> Self
 pub fn OutlineEntry::with_fill(Self, Content?) -> Self
 pub fn OutlineEntry::with_level(Self, NonZeroUSize) -> Self
+
+pub(all) enum OutlineIndent {
+  Rel(Rel[Length])
+  Func(Func)
+} derive(Eq)
+pub impl FromValue for OutlineIndent
+pub impl IntoValue for OutlineIndent
+pub impl Reflect for OutlineIndent
 
 pub struct OverbraceElem(Content)
 pub fn OverbraceElem::annotation(Self, StyleChain) -> Content?
@@ -5335,10 +5701,19 @@ pub fn PadElem::with_left(Self, Rel[Length]) -> Self
 pub fn PadElem::with_right(Self, Rel[Length]) -> Self
 pub fn PadElem::with_top(Self, Rel[Length]) -> Self
 
+pub(all) enum PageBinding {
+  Left
+  Right
+} derive(Eq, Hash, @debug.Debug)
+pub fn PageBinding::swap(Self, Int) -> Bool
+pub impl FromValue for PageBinding
+pub impl IntoValue for PageBinding
+pub impl Reflect for PageBinding
+
 pub struct PageElem(Content)
 pub fn PageElem::background_in(StyleChain) -> Content?
-pub fn PageElem::binding_in(StyleChain) -> Value
-pub fn PageElem::bleed_in(StyleChain) -> Value
+pub fn PageElem::binding_in(StyleChain) -> Smart[PageBinding]
+pub fn PageElem::bleed_in(StyleChain) -> Margin[Rel[Length]]
 pub fn PageElem::columns_in(StyleChain) -> NonZeroUSize
 pub fn PageElem::fill_in(StyleChain) -> Value
 pub fn PageElem::flipped_in(StyleChain) -> Bool
@@ -5348,15 +5723,15 @@ pub fn PageElem::foreground_in(StyleChain) -> Content?
 pub fn PageElem::header_ascent_in(StyleChain) -> Rel[Length]
 pub fn PageElem::header_in(StyleChain) -> Smart[Content?]
 pub fn PageElem::height_in(StyleChain) -> Smart[Length]
-pub fn PageElem::margin_in(StyleChain) -> Value
+pub fn PageElem::margin_in(StyleChain) -> Smart[Margin[Smart[Rel[Length]]]]
 pub fn PageElem::new() -> Self
 pub fn PageElem::number_align_in(StyleChain) -> SpecificAlignment[HAlignment, OuterVAlignment]
 pub fn PageElem::numbering_in(StyleChain) -> Numbering?
 pub fn PageElem::of(Content) -> Self?
 pub fn PageElem::pack(Self) -> Content
 pub fn PageElem::set_background(Content?) -> Style
-pub fn PageElem::set_binding(Value) -> Style
-pub fn PageElem::set_bleed(Value) -> Style
+pub fn PageElem::set_binding(Smart[PageBinding]) -> Style
+pub fn PageElem::set_bleed(Margin[Rel[Length]]) -> Style
 pub fn PageElem::set_columns(NonZeroUSize) -> Style
 pub fn PageElem::set_fill(Value) -> Style
 pub fn PageElem::set_flipped(Bool) -> Style
@@ -5366,13 +5741,27 @@ pub fn PageElem::set_foreground(Content?) -> Style
 pub fn PageElem::set_header(Smart[Content?]) -> Style
 pub fn PageElem::set_header_ascent(Rel[Length]) -> Style
 pub fn PageElem::set_height(Smart[Length]) -> Style
-pub fn PageElem::set_margin(Value) -> Style
+pub fn PageElem::set_margin(Smart[Margin[Smart[Rel[Length]]]]) -> Style
 pub fn PageElem::set_number_align(SpecificAlignment[HAlignment, OuterVAlignment]) -> Style
 pub fn PageElem::set_numbering(Numbering?) -> Style
 pub fn PageElem::set_supplement(Smart[Content?]) -> Style
 pub fn PageElem::set_width(Smart[Length]) -> Style
 pub fn PageElem::supplement_in(StyleChain) -> Smart[Content?]
 pub fn PageElem::width_in(StyleChain) -> Smart[Length]
+
+pub(all) struct PageRange {
+  start : Int?
+  end : Int?
+} derive(Eq, Hash, @debug.Debug)
+pub impl FromValue for PageRange
+pub impl IntoValue for PageRange
+pub impl Reflect for PageRange
+
+pub(all) struct PageRanges(Array[PageRange]) derive(Eq, Hash, @debug.Debug)
+pub fn PageRanges::includes_page(Self, Int) -> Bool
+pub impl FromValue for PageRanges
+pub impl IntoValue for PageRanges
+pub impl Reflect for PageRanges
 
 pub struct PagebreakElem(Content)
 pub fn PagebreakElem::boundary(Self, StyleChain) -> Bool
@@ -5382,58 +5771,80 @@ pub fn PagebreakElem::new() -> Self
 pub fn PagebreakElem::of(Content) -> Self?
 pub fn PagebreakElem::pack(Self) -> Content
 pub fn PagebreakElem::set_boundary(Bool) -> Style
-pub fn PagebreakElem::set_to(Value) -> Style
+pub fn PagebreakElem::set_to(Parity?) -> Style
 pub fn PagebreakElem::set_weak(Bool) -> Style
-pub fn PagebreakElem::to(Self, StyleChain) -> Value
-pub fn PagebreakElem::to_in(StyleChain) -> Value
-pub fn PagebreakElem::to_local(Self) -> Value?
+pub fn PagebreakElem::to(Self, StyleChain) -> Parity?
+pub fn PagebreakElem::to_in(StyleChain) -> Parity?
+pub fn PagebreakElem::to_local(Self) -> Parity??
 pub fn PagebreakElem::weak(Self, StyleChain) -> Bool
 pub fn PagebreakElem::weak_in(StyleChain) -> Bool
 pub fn PagebreakElem::weak_local(Self) -> Bool?
 pub fn PagebreakElem::with_boundary(Self, Bool) -> Self
-pub fn PagebreakElem::with_to(Self, Value) -> Self
+pub fn PagebreakElem::with_to(Self, Parity?) -> Self
 pub fn PagebreakElem::with_weak(Self, Bool) -> Self
+
+pub(all) enum PagedFormat {
+  Pdf
+  Png
+  Svg
+} derive(Eq, Hash, @debug.Debug)
+pub impl FromValue for PagedFormat
+pub impl IntoValue for PagedFormat
+pub impl Reflect for PagedFormat
+
+pub(all) struct Paper {
+  name : String
+  width : Double
+  height : Double
+} derive(Eq, Hash, @debug.Debug)
+pub fn Paper::a4() -> Self
+pub fn Paper::from_name(String) -> Self?
+pub fn Paper::height(Self) -> Abs
+pub fn Paper::width(Self) -> Abs
+pub impl FromValue for Paper
+pub impl IntoValue for Paper
+pub impl Reflect for Paper
 
 pub struct ParElem(Content)
 pub fn ParElem::body(Self) -> Content
-pub fn ParElem::first_line_indent(Self, StyleChain) -> Value
-pub fn ParElem::first_line_indent_in(StyleChain) -> Value
-pub fn ParElem::first_line_indent_local(Self) -> Value?
+pub fn ParElem::first_line_indent(Self, StyleChain) -> FirstLineIndent
+pub fn ParElem::first_line_indent_in(StyleChain) -> FirstLineIndent
+pub fn ParElem::first_line_indent_local(Self) -> FirstLineIndent?
 pub fn ParElem::hanging_indent(Self, StyleChain) -> Length
 pub fn ParElem::hanging_indent_in(StyleChain) -> Length
 pub fn ParElem::hanging_indent_local(Self) -> Length?
-pub fn ParElem::justification_limits(Self, StyleChain) -> Value
-pub fn ParElem::justification_limits_in(StyleChain) -> Value
-pub fn ParElem::justification_limits_local(Self) -> Value?
+pub fn ParElem::justification_limits(Self, StyleChain) -> JustificationLimits
+pub fn ParElem::justification_limits_in(StyleChain) -> JustificationLimits
+pub fn ParElem::justification_limits_local(Self) -> JustificationLimits?
 pub fn ParElem::justify(Self, StyleChain) -> Bool
 pub fn ParElem::justify_in(StyleChain) -> Bool
 pub fn ParElem::justify_local(Self) -> Bool?
 pub fn ParElem::leading(Self, StyleChain) -> Length
 pub fn ParElem::leading_in(StyleChain) -> Length
 pub fn ParElem::leading_local(Self) -> Length?
-pub fn ParElem::linebreaks(Self, StyleChain) -> Value
-pub fn ParElem::linebreaks_in(StyleChain) -> Value
-pub fn ParElem::linebreaks_local(Self) -> Value?
+pub fn ParElem::linebreaks(Self, StyleChain) -> Smart[Linebreaks]
+pub fn ParElem::linebreaks_in(StyleChain) -> Smart[Linebreaks]
+pub fn ParElem::linebreaks_local(Self) -> Smart[Linebreaks]?
 pub fn ParElem::new(Content) -> Self
 pub fn ParElem::of(Content) -> Self?
 pub fn ParElem::pack(Self) -> Content
-pub fn ParElem::set_first_line_indent(Value) -> Style
+pub fn ParElem::set_first_line_indent(FirstLineIndent) -> Style
 pub fn ParElem::set_hanging_indent(Length) -> Style
-pub fn ParElem::set_justification_limits(Value) -> Style
+pub fn ParElem::set_justification_limits(JustificationLimits) -> Style
 pub fn ParElem::set_justify(Bool) -> Style
 pub fn ParElem::set_leading(Length) -> Style
-pub fn ParElem::set_linebreaks(Value) -> Style
+pub fn ParElem::set_linebreaks(Smart[Linebreaks]) -> Style
 pub fn ParElem::set_spacing(Length) -> Style
 pub fn ParElem::spacing(Self, StyleChain) -> Length
 pub fn ParElem::spacing_in(StyleChain) -> Length
 pub fn ParElem::spacing_local(Self) -> Length?
 pub fn ParElem::with_body(Self, Content) -> Self
-pub fn ParElem::with_first_line_indent(Self, Value) -> Self
+pub fn ParElem::with_first_line_indent(Self, FirstLineIndent) -> Self
 pub fn ParElem::with_hanging_indent(Self, Length) -> Self
-pub fn ParElem::with_justification_limits(Self, Value) -> Self
+pub fn ParElem::with_justification_limits(Self, JustificationLimits) -> Self
 pub fn ParElem::with_justify(Self, Bool) -> Self
 pub fn ParElem::with_leading(Self, Length) -> Self
-pub fn ParElem::with_linebreaks(Self, Value) -> Self
+pub fn ParElem::with_linebreaks(Self, Smart[Linebreaks]) -> Self
 pub fn ParElem::with_spacing(Self, Length) -> Self
 
 pub struct ParLine(Content)
@@ -5442,14 +5853,14 @@ pub fn ParLine::number_align_in(StyleChain) -> Smart[HAlignment]
 pub fn ParLine::number_clearance_in(StyleChain) -> Smart[Length]
 pub fn ParLine::number_margin_in(StyleChain) -> OuterHAlignment
 pub fn ParLine::numbering_in(StyleChain) -> Numbering?
-pub fn ParLine::numbering_scope_in(StyleChain) -> Value
+pub fn ParLine::numbering_scope_in(StyleChain) -> LineNumberingScope
 pub fn ParLine::of(Content) -> Self?
 pub fn ParLine::pack(Self) -> Content
 pub fn ParLine::set_number_align(Smart[HAlignment]) -> Style
 pub fn ParLine::set_number_clearance(Smart[Length]) -> Style
 pub fn ParLine::set_number_margin(OuterHAlignment) -> Style
 pub fn ParLine::set_numbering(Numbering?) -> Style
-pub fn ParLine::set_numbering_scope(Value) -> Style
+pub fn ParLine::set_numbering_scope(LineNumberingScope) -> Style
 
 pub struct ParLineMarker(Content)
 pub fn ParLineMarker::new(Numbering, Smart[HAlignment], OuterHAlignment, Smart[Length]) -> Self
@@ -5480,6 +5891,15 @@ pub struct ParbreakElem(Content)
 pub fn ParbreakElem::new() -> Self
 pub fn ParbreakElem::of(Content) -> Self?
 pub fn ParbreakElem::pack(Self) -> Content
+
+pub(all) enum Parity {
+  Even
+  Odd
+} derive(Eq, Hash, @debug.Debug)
+pub fn Parity::matches(Self, Int) -> Bool
+pub impl FromValue for Parity
+pub impl IntoValue for Parity
+pub impl Reflect for Parity
 
 pub(all) struct ParseLocals(Map[String, Value?])
 pub fn ParseLocals::get(Self, String) -> Value?
@@ -5524,13 +5944,13 @@ pub struct PdfPdfFormat(Content)
 pub fn PdfPdfFormat::new() -> Self
 pub fn PdfPdfFormat::of(Content) -> Self?
 pub fn PdfPdfFormat::pack(Self) -> Content
-pub fn PdfPdfFormat::pages(Self, StyleChain) -> Value
-pub fn PdfPdfFormat::pages_in(StyleChain) -> Value
-pub fn PdfPdfFormat::pages_local(Self) -> Value?
+pub fn PdfPdfFormat::pages(Self, StyleChain) -> PageRanges?
+pub fn PdfPdfFormat::pages_in(StyleChain) -> PageRanges?
+pub fn PdfPdfFormat::pages_local(Self) -> PageRanges??
 pub fn PdfPdfFormat::pretty(Self, StyleChain) -> Bool
 pub fn PdfPdfFormat::pretty_in(StyleChain) -> Bool
 pub fn PdfPdfFormat::pretty_local(Self) -> Bool?
-pub fn PdfPdfFormat::set_pages(Value) -> Style
+pub fn PdfPdfFormat::set_pages(PageRanges?) -> Style
 pub fn PdfPdfFormat::set_pretty(Bool) -> Style
 pub fn PdfPdfFormat::set_standard(Value) -> Style
 pub fn PdfPdfFormat::set_tagged(Smart[Bool]) -> Style
@@ -5540,7 +5960,7 @@ pub fn PdfPdfFormat::standard_local(Self) -> Value?
 pub fn PdfPdfFormat::tagged(Self, StyleChain) -> Smart[Bool]
 pub fn PdfPdfFormat::tagged_in(StyleChain) -> Smart[Bool]
 pub fn PdfPdfFormat::tagged_local(Self) -> Smart[Bool]?
-pub fn PdfPdfFormat::with_pages(Self, Value) -> Self
+pub fn PdfPdfFormat::with_pages(Self, PageRanges?) -> Self
 pub fn PdfPdfFormat::with_pretty(Self, Bool) -> Self
 pub fn PdfPdfFormat::with_standard(Self, Value) -> Self
 pub fn PdfPdfFormat::with_tagged(Self, Smart[Bool]) -> Self
@@ -5574,22 +5994,31 @@ pub fn PlaceElem::float_local(Self) -> Bool?
 pub fn PlaceElem::new(Content) -> Self
 pub fn PlaceElem::of(Content) -> Self?
 pub fn PlaceElem::pack(Self) -> Content
-pub fn PlaceElem::scope(Self, StyleChain) -> Value
-pub fn PlaceElem::scope_in(StyleChain) -> Value
-pub fn PlaceElem::scope_local(Self) -> Value?
+pub fn PlaceElem::scope(Self, StyleChain) -> PlacementScope
+pub fn PlaceElem::scope_in(StyleChain) -> PlacementScope
+pub fn PlaceElem::scope_local(Self) -> PlacementScope?
 pub fn PlaceElem::set_alignment(Smart[Alignment]) -> Style
 pub fn PlaceElem::set_clearance(Length) -> Style
 pub fn PlaceElem::set_dx(Rel[Length]) -> Style
 pub fn PlaceElem::set_dy(Rel[Length]) -> Style
 pub fn PlaceElem::set_float(Bool) -> Style
-pub fn PlaceElem::set_scope(Value) -> Style
+pub fn PlaceElem::set_scope(PlacementScope) -> Style
 pub fn PlaceElem::with_alignment(Self, Smart[Alignment]) -> Self
 pub fn PlaceElem::with_body(Self, Content) -> Self
 pub fn PlaceElem::with_clearance(Self, Length) -> Self
 pub fn PlaceElem::with_dx(Self, Rel[Length]) -> Self
 pub fn PlaceElem::with_dy(Self, Rel[Length]) -> Self
 pub fn PlaceElem::with_float(Self, Bool) -> Self
-pub fn PlaceElem::with_scope(Self, Value) -> Self
+pub fn PlaceElem::with_scope(Self, PlacementScope) -> Self
+
+pub(all) enum PlacementScope {
+  Column
+  Parent
+} derive(Eq, Hash, @debug.Debug)
+pub impl Default for PlacementScope
+pub impl FromValue for PlacementScope
+pub impl IntoValue for PlacementScope
+pub impl Reflect for PlacementScope
 
 pub struct PngFormat(Content)
 pub fn PngFormat::new() -> Self
@@ -5662,25 +6091,25 @@ pub(all) enum Quadrant {
 } derive(Compare, Eq, Hash, @debug.Debug)
 
 pub struct QuoteElem(Content)
-pub fn QuoteElem::attribution(Self, StyleChain) -> Value
-pub fn QuoteElem::attribution_in(StyleChain) -> Value
-pub fn QuoteElem::attribution_local(Self) -> Value?
+pub fn QuoteElem::attribution(Self, StyleChain) -> Attribution?
+pub fn QuoteElem::attribution_in(StyleChain) -> Attribution?
+pub fn QuoteElem::attribution_local(Self) -> Attribution??
 pub fn QuoteElem::block(Self, StyleChain) -> Bool
 pub fn QuoteElem::block_in(StyleChain) -> Bool
 pub fn QuoteElem::block_local(Self) -> Bool?
 pub fn QuoteElem::body(Self) -> Content
-pub fn QuoteElem::depth_in(StyleChain) -> Value
+pub fn QuoteElem::depth_in(StyleChain) -> Depth
 pub fn QuoteElem::new(Content) -> Self
 pub fn QuoteElem::of(Content) -> Self?
 pub fn QuoteElem::pack(Self) -> Content
 pub fn QuoteElem::quotes(Self, StyleChain) -> Smart[Bool]
 pub fn QuoteElem::quotes_in(StyleChain) -> Smart[Bool]
 pub fn QuoteElem::quotes_local(Self) -> Smart[Bool]?
-pub fn QuoteElem::set_attribution(Value) -> Style
+pub fn QuoteElem::set_attribution(Attribution?) -> Style
 pub fn QuoteElem::set_block(Bool) -> Style
-pub fn QuoteElem::set_depth(Value) -> Style
+pub fn QuoteElem::set_depth(Depth) -> Style
 pub fn QuoteElem::set_quotes(Smart[Bool]) -> Style
-pub fn QuoteElem::with_attribution(Self, Value) -> Self
+pub fn QuoteElem::with_attribution(Self, Attribution?) -> Self
 pub fn QuoteElem::with_block(Self, Bool) -> Self
 pub fn QuoteElem::with_body(Self, Content) -> Self
 pub fn QuoteElem::with_quotes(Self, Smart[Bool]) -> Self
@@ -5708,6 +6137,14 @@ pub impl IntoValue for Ratio
 pub impl Numeric for Ratio
 pub impl Reflect for Ratio
 
+pub(all) enum RawContent {
+  Text(String)
+} derive(Eq, Hash, @debug.Debug)
+pub fn RawContent::get(Self) -> String
+pub impl FromValue for RawContent
+pub impl IntoValue for RawContent
+pub impl Reflect for RawContent
+
 pub struct RawElem(Content)
 pub fn RawElem::align(Self, StyleChain) -> HAlignment
 pub fn RawElem::align_in(StyleChain) -> HAlignment
@@ -5719,7 +6156,7 @@ pub fn RawElem::lang(Self, StyleChain) -> String?
 pub fn RawElem::lang_in(StyleChain) -> String?
 pub fn RawElem::lang_local(Self) -> String??
 pub fn RawElem::lines(Self) -> Value?
-pub fn RawElem::new(Value) -> Self
+pub fn RawElem::new(RawContent) -> Self
 pub fn RawElem::of(Content) -> Self?
 pub fn RawElem::pack(Self) -> Content
 pub fn RawElem::packed_code(String) -> Content
@@ -5735,7 +6172,7 @@ pub fn RawElem::syntaxes_local(Self) -> Value?
 pub fn RawElem::tab_size(Self, StyleChain) -> USize
 pub fn RawElem::tab_size_in(StyleChain) -> USize
 pub fn RawElem::tab_size_local(Self) -> USize?
-pub fn RawElem::text(Self) -> Value
+pub fn RawElem::text(Self) -> RawContent
 pub fn RawElem::theme(Self, StyleChain) -> Value
 pub fn RawElem::theme_in(StyleChain) -> Value
 pub fn RawElem::theme_local(Self) -> Value?
@@ -5745,7 +6182,7 @@ pub fn RawElem::with_lang(Self, String?) -> Self
 pub fn RawElem::with_lines(Self, Value) -> Self
 pub fn RawElem::with_syntaxes(Self, Value) -> Self
 pub fn RawElem::with_tab_size(Self, USize) -> Self
-pub fn RawElem::with_text(Self, Value) -> Self
+pub fn RawElem::with_text(Self, RawContent) -> Self
 pub fn RawElem::with_theme(Self, Value) -> Self
 
 pub struct RawLine(Content)
@@ -5819,23 +6256,32 @@ pub fn RectElem::with_width(Self, Smart[Rel[Length]]) -> Self
 pub struct RefElem(Content)
 pub fn RefElem::citation(Self) -> Value?
 pub fn RefElem::element(Self) -> Content??
-pub fn RefElem::form(Self, StyleChain) -> Value
-pub fn RefElem::form_in(StyleChain) -> Value
-pub fn RefElem::form_local(Self) -> Value?
+pub fn RefElem::form(Self, StyleChain) -> RefForm
+pub fn RefElem::form_in(StyleChain) -> RefForm
+pub fn RefElem::form_local(Self) -> RefForm?
 pub fn RefElem::new(Label) -> Self
 pub fn RefElem::of(Content) -> Self?
 pub fn RefElem::pack(Self) -> Content
-pub fn RefElem::set_form(Value) -> Style
-pub fn RefElem::set_supplement(Value) -> Style
-pub fn RefElem::supplement(Self, StyleChain) -> Value
-pub fn RefElem::supplement_in(StyleChain) -> Value
-pub fn RefElem::supplement_local(Self) -> Value?
+pub fn RefElem::set_form(RefForm) -> Style
+pub fn RefElem::set_supplement(Smart[Supplement?]) -> Style
+pub fn RefElem::supplement(Self, StyleChain) -> Smart[Supplement?]
+pub fn RefElem::supplement_in(StyleChain) -> Smart[Supplement?]
+pub fn RefElem::supplement_local(Self) -> Smart[Supplement?]?
 pub fn RefElem::target(Self) -> Label
 pub fn RefElem::with_citation(Self, Value) -> Self
 pub fn RefElem::with_element(Self, Content?) -> Self
-pub fn RefElem::with_form(Self, Value) -> Self
-pub fn RefElem::with_supplement(Self, Value) -> Self
+pub fn RefElem::with_form(Self, RefForm) -> Self
+pub fn RefElem::with_supplement(Self, Smart[Supplement?]) -> Self
 pub fn RefElem::with_target(Self, Label) -> Self
+
+pub(all) enum RefForm {
+  Normal
+  Page
+} derive(Eq, Hash, @debug.Debug)
+pub impl Default for RefForm
+pub impl FromValue for RefForm
+pub impl IntoValue for RefForm
+pub impl Reflect for RefForm
 
 pub struct Regex {
   inner : @regex.Regex
@@ -5847,6 +6293,13 @@ pub fn Regex::repr(Self) -> String
 pub impl FromValue for Regex
 pub impl IntoValue for Regex
 pub impl Reflect for Regex
+
+pub(all) struct Region(String) derive(Compare, Eq, Hash, @debug.Debug)
+pub fn Region::as_str(Self) -> String
+pub fn Region::from_str(String) -> Self raise HintedError
+pub impl FromValue for Region
+pub impl IntoValue for Region
+pub impl Reflect for Region
 
 pub(all) struct Rel[T] {
   rel : Ratio
@@ -5974,6 +6427,14 @@ pub impl Mul for Scalar
 pub impl Neg for Scalar
 pub impl Sub for Scalar
 
+pub(all) enum ScaleAmount {
+  Ratio(Ratio)
+  Length(Length)
+} derive(Eq, Hash)
+pub impl FromValue for ScaleAmount
+pub impl IntoValue for ScaleAmount
+pub impl Reflect for ScaleAmount
+
 pub struct ScaleElem(Content)
 pub fn ScaleElem::body(Self) -> Content
 pub fn ScaleElem::new(Content) -> Self
@@ -5987,19 +6448,19 @@ pub fn ScaleElem::reflow_in(StyleChain) -> Bool
 pub fn ScaleElem::reflow_local(Self) -> Bool?
 pub fn ScaleElem::set_origin(Alignment) -> Style
 pub fn ScaleElem::set_reflow(Bool) -> Style
-pub fn ScaleElem::set_x(Value) -> Style
-pub fn ScaleElem::set_y(Value) -> Style
+pub fn ScaleElem::set_x(Smart[ScaleAmount]) -> Style
+pub fn ScaleElem::set_y(Smart[ScaleAmount]) -> Style
 pub fn ScaleElem::with_body(Self, Content) -> Self
 pub fn ScaleElem::with_origin(Self, Alignment) -> Self
 pub fn ScaleElem::with_reflow(Self, Bool) -> Self
-pub fn ScaleElem::with_x(Self, Value) -> Self
-pub fn ScaleElem::with_y(Self, Value) -> Self
-pub fn ScaleElem::x(Self, StyleChain) -> Value
-pub fn ScaleElem::x_in(StyleChain) -> Value
-pub fn ScaleElem::x_local(Self) -> Value?
-pub fn ScaleElem::y(Self, StyleChain) -> Value
-pub fn ScaleElem::y_in(StyleChain) -> Value
-pub fn ScaleElem::y_local(Self) -> Value?
+pub fn ScaleElem::with_x(Self, Smart[ScaleAmount]) -> Self
+pub fn ScaleElem::with_y(Self, Smart[ScaleAmount]) -> Self
+pub fn ScaleElem::x(Self, StyleChain) -> Smart[ScaleAmount]
+pub fn ScaleElem::x_in(StyleChain) -> Smart[ScaleAmount]
+pub fn ScaleElem::x_local(Self) -> Smart[ScaleAmount]?
+pub fn ScaleElem::y(Self, StyleChain) -> Smart[ScaleAmount]
+pub fn ScaleElem::y_in(StyleChain) -> Smart[ScaleAmount]
+pub fn ScaleElem::y_local(Self) -> Smart[ScaleAmount]?
 
 pub struct Scope {
   // private fields
@@ -6206,6 +6667,14 @@ pub impl FromValue for SmartDisplayPattern
 pub impl IntoValue for SmartDisplayPattern
 pub impl Reflect for SmartDisplayPattern
 
+pub(all) struct SmartQuoteDict {
+  double : Smart[SmartQuoteSet]
+  single : Smart[SmartQuoteSet]
+} derive(Eq, Hash, @debug.Debug)
+pub impl FromValue for SmartQuoteDict
+pub impl IntoValue for SmartQuoteDict
+pub impl Reflect for SmartQuoteDict
+
 pub struct SmartQuoteElem(Content)
 pub fn SmartQuoteElem::alternative(Self, StyleChain) -> Bool
 pub fn SmartQuoteElem::alternative_in(StyleChain) -> Bool
@@ -6219,17 +6688,25 @@ pub fn SmartQuoteElem::enabled_local(Self) -> Bool?
 pub fn SmartQuoteElem::new() -> Self
 pub fn SmartQuoteElem::of(Content) -> Self?
 pub fn SmartQuoteElem::pack(Self) -> Content
-pub fn SmartQuoteElem::quotes(Self, StyleChain) -> Value
-pub fn SmartQuoteElem::quotes_in(StyleChain) -> Value
-pub fn SmartQuoteElem::quotes_local(Self) -> Value?
+pub fn SmartQuoteElem::quotes(Self, StyleChain) -> Smart[SmartQuoteDict]
+pub fn SmartQuoteElem::quotes_in(StyleChain) -> Smart[SmartQuoteDict]
+pub fn SmartQuoteElem::quotes_local(Self) -> Smart[SmartQuoteDict]?
 pub fn SmartQuoteElem::set_alternative(Bool) -> Style
 pub fn SmartQuoteElem::set_double(Bool) -> Style
 pub fn SmartQuoteElem::set_enabled(Bool) -> Style
-pub fn SmartQuoteElem::set_quotes(Value) -> Style
+pub fn SmartQuoteElem::set_quotes(Smart[SmartQuoteDict]) -> Style
 pub fn SmartQuoteElem::with_alternative(Self, Bool) -> Self
 pub fn SmartQuoteElem::with_double(Self, Bool) -> Self
 pub fn SmartQuoteElem::with_enabled(Self, Bool) -> Self
-pub fn SmartQuoteElem::with_quotes(Self, Value) -> Self
+pub fn SmartQuoteElem::with_quotes(Self, Smart[SmartQuoteDict]) -> Self
+
+pub(all) struct SmartQuoteSet {
+  open : String
+  close : String
+} derive(Eq, Hash, @debug.Debug)
+pub impl FromValue for SmartQuoteSet
+pub impl IntoValue for SmartQuoteSet
+pub impl Reflect for SmartQuoteSet
 
 pub(all) enum SmartTodayOffset {
   Auto
@@ -6336,12 +6813,20 @@ pub fn SquareElem::with_radius(Self, Corners[Rel[Length]?]) -> Self
 pub fn SquareElem::with_stroke(Self, Value) -> Self
 pub fn SquareElem::with_width(Self, Smart[Rel[Length]]) -> Self
 
+pub(all) enum StackChild {
+  Spacing(Spacing)
+  Block(Content)
+} derive(Eq)
+pub impl FromValue for StackChild
+pub impl IntoValue for StackChild
+pub impl Reflect for StackChild
+
 pub struct StackElem(Content)
-pub fn StackElem::children(Self) -> Value
+pub fn StackElem::children(Self) -> Array[StackChild]
 pub fn StackElem::dir(Self, StyleChain) -> Dir
 pub fn StackElem::dir_in(StyleChain) -> Dir
 pub fn StackElem::dir_local(Self) -> Dir?
-pub fn StackElem::new(Value) -> Self
+pub fn StackElem::new(Array[StackChild]) -> Self
 pub fn StackElem::of(Content) -> Self?
 pub fn StackElem::pack(Self) -> Content
 pub fn StackElem::set_dir(Dir) -> Style
@@ -6349,7 +6834,7 @@ pub fn StackElem::set_spacing(Spacing?) -> Style
 pub fn StackElem::spacing(Self, StyleChain) -> Spacing?
 pub fn StackElem::spacing_in(StyleChain) -> Spacing?
 pub fn StackElem::spacing_local(Self) -> Spacing??
-pub fn StackElem::with_children(Self, Value) -> Self
+pub fn StackElem::with_children(Self, Array[StackChild]) -> Self
 pub fn StackElem::with_dir(Self, Dir) -> Self
 pub fn StackElem::with_spacing(Self, Spacing?) -> Self
 
@@ -6512,6 +6997,13 @@ pub impl FromValue for Styles
 pub impl IntoValue for Styles
 pub impl Reflect for Styles
 
+pub(all) struct StylisticSets(Int) derive(Default, Eq, Hash)
+pub fn StylisticSets::has(Self, Int) -> Bool
+pub fn StylisticSets::sets(Self) -> Array[Int]
+pub impl FromValue for StylisticSets
+pub impl IntoValue for StylisticSets
+pub impl Reflect for StylisticSets
+
 pub struct SubElem(Content)
 pub fn SubElem::baseline(Self, StyleChain) -> Smart[Length]
 pub fn SubElem::baseline_in(StyleChain) -> Smart[Length]
@@ -6521,17 +7013,17 @@ pub fn SubElem::new(Content) -> Self
 pub fn SubElem::of(Content) -> Self?
 pub fn SubElem::pack(Self) -> Content
 pub fn SubElem::set_baseline(Smart[Length]) -> Style
-pub fn SubElem::set_size(Value) -> Style
+pub fn SubElem::set_size(Smart[TextSize]) -> Style
 pub fn SubElem::set_typographic(Bool) -> Style
-pub fn SubElem::size(Self, StyleChain) -> Value
-pub fn SubElem::size_in(StyleChain) -> Value
-pub fn SubElem::size_local(Self) -> Value?
+pub fn SubElem::size(Self, StyleChain) -> Smart[TextSize]
+pub fn SubElem::size_in(StyleChain) -> Smart[TextSize]
+pub fn SubElem::size_local(Self) -> Smart[TextSize]?
 pub fn SubElem::typographic(Self, StyleChain) -> Bool
 pub fn SubElem::typographic_in(StyleChain) -> Bool
 pub fn SubElem::typographic_local(Self) -> Bool?
 pub fn SubElem::with_baseline(Self, Smart[Length]) -> Self
 pub fn SubElem::with_body(Self, Content) -> Self
-pub fn SubElem::with_size(Self, Value) -> Self
+pub fn SubElem::with_size(Self, Smart[TextSize]) -> Self
 pub fn SubElem::with_typographic(Self, Bool) -> Self
 
 pub struct SuperElem(Content)
@@ -6543,18 +7035,26 @@ pub fn SuperElem::new(Content) -> Self
 pub fn SuperElem::of(Content) -> Self?
 pub fn SuperElem::pack(Self) -> Content
 pub fn SuperElem::set_baseline(Smart[Length]) -> Style
-pub fn SuperElem::set_size(Value) -> Style
+pub fn SuperElem::set_size(Smart[TextSize]) -> Style
 pub fn SuperElem::set_typographic(Bool) -> Style
-pub fn SuperElem::size(Self, StyleChain) -> Value
-pub fn SuperElem::size_in(StyleChain) -> Value
-pub fn SuperElem::size_local(Self) -> Value?
+pub fn SuperElem::size(Self, StyleChain) -> Smart[TextSize]
+pub fn SuperElem::size_in(StyleChain) -> Smart[TextSize]
+pub fn SuperElem::size_local(Self) -> Smart[TextSize]?
 pub fn SuperElem::typographic(Self, StyleChain) -> Bool
 pub fn SuperElem::typographic_in(StyleChain) -> Bool
 pub fn SuperElem::typographic_local(Self) -> Bool?
 pub fn SuperElem::with_baseline(Self, Smart[Length]) -> Self
 pub fn SuperElem::with_body(Self, Content) -> Self
-pub fn SuperElem::with_size(Self, Value) -> Self
+pub fn SuperElem::with_size(Self, Smart[TextSize]) -> Self
 pub fn SuperElem::with_typographic(Self, Bool) -> Self
+
+pub(all) enum Supplement {
+  Content(Content)
+  Func(Func)
+} derive(Eq)
+pub impl FromValue for Supplement
+pub impl IntoValue for Supplement
+pub impl Reflect for Supplement
 
 pub struct SvgFormat(Content)
 pub fn SvgFormat::new() -> Self
@@ -6847,6 +7347,13 @@ pub fn TableVLine::x(Self, StyleChain) -> Smart[USize]
 pub fn TableVLine::x_in(StyleChain) -> Smart[USize]
 pub fn TableVLine::x_local(Self) -> Smart[USize]?
 
+pub(all) struct Tag(String) derive(Compare, Eq, Hash, @debug.Debug)
+pub fn Tag::from_bytes_lossy(String) -> Self
+pub fn Tag::to_str_lossy(Self) -> String
+pub impl FromValue for Tag
+pub impl IntoValue for Tag
+pub impl Reflect for Tag
+
 pub struct TagElem(Content)
 pub fn TagElem::new(Value) -> Self
 pub fn TagElem::of(Content) -> Self?
@@ -6864,7 +7371,7 @@ pub fn TargetElem::target_in(StyleChain) -> Value
 pub fn TargetElem::target_local(Self) -> Value?
 pub fn TargetElem::with_target(Self, Value) -> Self
 
-pub struct TermItem(Content)
+pub(all) struct TermItem(Content) derive(Eq)
 pub fn TermItem::description(Self) -> Content
 pub fn TermItem::new(Content, Content) -> Self
 pub fn TermItem::of(Content) -> Self?
@@ -6872,16 +7379,19 @@ pub fn TermItem::pack(Self) -> Content
 pub fn TermItem::term(Self) -> Content
 pub fn TermItem::with_description(Self, Content) -> Self
 pub fn TermItem::with_term(Self, Content) -> Self
+pub impl FromValue for TermItem
+pub impl IntoValue for TermItem
+pub impl Reflect for TermItem
 
 pub struct TermsElem(Content)
-pub fn TermsElem::children(Self) -> Value
+pub fn TermsElem::children(Self) -> Array[TermItem]
 pub fn TermsElem::hanging_indent(Self, StyleChain) -> Length
 pub fn TermsElem::hanging_indent_in(StyleChain) -> Length
 pub fn TermsElem::hanging_indent_local(Self) -> Length?
 pub fn TermsElem::indent(Self, StyleChain) -> Length
 pub fn TermsElem::indent_in(StyleChain) -> Length
 pub fn TermsElem::indent_local(Self) -> Length?
-pub fn TermsElem::new(Value) -> Self
+pub fn TermsElem::new(Array[TermItem]) -> Self
 pub fn TermsElem::of(Content) -> Self?
 pub fn TermsElem::pack(Self) -> Content
 pub fn TermsElem::separator(Self, StyleChain) -> Content
@@ -6899,7 +7409,7 @@ pub fn TermsElem::spacing_local(Self) -> Smart[Length]?
 pub fn TermsElem::tight(Self, StyleChain) -> Bool
 pub fn TermsElem::tight_in(StyleChain) -> Bool
 pub fn TermsElem::tight_local(Self) -> Bool?
-pub fn TermsElem::with_children(Self, Value) -> Self
+pub fn TermsElem::with_children(Self, Array[TermItem]) -> Self
 pub fn TermsElem::with_hanging_indent(Self, Length) -> Self
 pub fn TermsElem::with_indent(Self, Length) -> Self
 pub fn TermsElem::with_separator(Self, Content) -> Self
@@ -6907,93 +7417,104 @@ pub fn TermsElem::with_spacing(Self, Smart[Length]) -> Self
 pub fn TermsElem::with_tight(Self, Bool) -> Self
 pub fn TermsElem::within_in(StyleChain) -> Bool
 
+pub(all) struct TextDir(Smart[Dir]) derive(Eq, Hash)
+pub impl FromValue for TextDir
+pub impl IntoValue for TextDir
+pub impl Reflect for TextDir
+
 pub struct TextElem(Content)
-pub fn TextElem::alternates_in(StyleChain) -> Value
+pub fn TextElem::alternates_in(StyleChain) -> Alternates
 pub fn TextElem::baseline_in(StyleChain) -> Length
-pub fn TextElem::bottom_edge_in(StyleChain) -> Value
+pub fn TextElem::bottom_edge_in(StyleChain) -> BottomEdge
 pub fn TextElem::case_in(StyleChain) -> Case?
-pub fn TextElem::cjk_latin_spacing_in(StyleChain) -> Value
-pub fn TextElem::costs_in(StyleChain) -> Value
+pub fn TextElem::cjk_latin_spacing_in(StyleChain) -> Smart[Never?]
+pub fn TextElem::costs_in(StyleChain) -> Costs
 pub fn TextElem::deco_in(StyleChain) -> Value
-pub fn TextElem::delta_in(StyleChain) -> Value
-pub fn TextElem::dir_in(StyleChain) -> Value
+pub fn TextElem::delta_in(StyleChain) -> WeightDelta
+pub fn TextElem::dir_in(StyleChain) -> TextDir
 pub fn TextElem::discretionary_ligatures_in(StyleChain) -> Bool
-pub fn TextElem::emph_in(StyleChain) -> Value
+pub fn TextElem::emph_in(StyleChain) -> ItalicToggle
 pub fn TextElem::fallback_in(StyleChain) -> Bool
-pub fn TextElem::features_in(StyleChain) -> Value
+pub fn TextElem::features_in(StyleChain) -> FontFeatures
 pub fn TextElem::fill_in(StyleChain) -> Value
-pub fn TextElem::font_in(StyleChain) -> Value
+pub fn TextElem::font_in(StyleChain) -> FontList
 pub fn TextElem::fractions_in(StyleChain) -> Bool
 pub fn TextElem::historical_ligatures_in(StyleChain) -> Bool
 pub fn TextElem::hyphenate_in(StyleChain) -> Smart[Bool]
 pub fn TextElem::kerning_in(StyleChain) -> Bool
-pub fn TextElem::lang_in(StyleChain) -> Value
+pub fn TextElem::lang_in(StyleChain) -> Lang
 pub fn TextElem::ligatures_in(StyleChain) -> Bool
 pub fn TextElem::new(String) -> Self
-pub fn TextElem::number_type_in(StyleChain) -> Value
-pub fn TextElem::number_width_in(StyleChain) -> Value
+pub fn TextElem::number_type_in(StyleChain) -> Smart[NumberType]
+pub fn TextElem::number_width_in(StyleChain) -> Smart[NumberWidth]
 pub fn TextElem::of(Content) -> Self?
 pub fn TextElem::overhang_in(StyleChain) -> Bool
 pub fn TextElem::pack(Self) -> Content
 pub fn TextElem::packed(String) -> Content
-pub fn TextElem::region_in(StyleChain) -> Value
-pub fn TextElem::script_in(StyleChain) -> Value
-pub fn TextElem::set_alternates(Value) -> Style
+pub fn TextElem::region_in(StyleChain) -> Region?
+pub fn TextElem::script_in(StyleChain) -> Smart[WritingScript]
+pub fn TextElem::set_alternates(Alternates) -> Style
 pub fn TextElem::set_baseline(Length) -> Style
-pub fn TextElem::set_bottom_edge(Value) -> Style
+pub fn TextElem::set_bottom_edge(BottomEdge) -> Style
 pub fn TextElem::set_case(Case?) -> Style
-pub fn TextElem::set_cjk_latin_spacing(Value) -> Style
-pub fn TextElem::set_costs(Value) -> Style
+pub fn TextElem::set_cjk_latin_spacing(Smart[Never?]) -> Style
+pub fn TextElem::set_costs(Costs) -> Style
 pub fn TextElem::set_deco(Value) -> Style
-pub fn TextElem::set_delta(Value) -> Style
-pub fn TextElem::set_dir(Value) -> Style
+pub fn TextElem::set_delta(WeightDelta) -> Style
+pub fn TextElem::set_dir(TextDir) -> Style
 pub fn TextElem::set_discretionary_ligatures(Bool) -> Style
-pub fn TextElem::set_emph(Value) -> Style
+pub fn TextElem::set_emph(ItalicToggle) -> Style
 pub fn TextElem::set_fallback(Bool) -> Style
-pub fn TextElem::set_features(Value) -> Style
+pub fn TextElem::set_features(FontFeatures) -> Style
 pub fn TextElem::set_fill(Value) -> Style
-pub fn TextElem::set_font(Value) -> Style
+pub fn TextElem::set_font(FontList) -> Style
 pub fn TextElem::set_fractions(Bool) -> Style
 pub fn TextElem::set_historical_ligatures(Bool) -> Style
 pub fn TextElem::set_hyphenate(Smart[Bool]) -> Style
 pub fn TextElem::set_kerning(Bool) -> Style
-pub fn TextElem::set_lang(Value) -> Style
+pub fn TextElem::set_lang(Lang) -> Style
 pub fn TextElem::set_ligatures(Bool) -> Style
-pub fn TextElem::set_number_type(Value) -> Style
-pub fn TextElem::set_number_width(Value) -> Style
+pub fn TextElem::set_number_type(Smart[NumberType]) -> Style
+pub fn TextElem::set_number_width(Smart[NumberWidth]) -> Style
 pub fn TextElem::set_overhang(Bool) -> Style
-pub fn TextElem::set_region(Value) -> Style
-pub fn TextElem::set_script(Value) -> Style
+pub fn TextElem::set_region(Region?) -> Style
+pub fn TextElem::set_script(Smart[WritingScript]) -> Style
 pub fn TextElem::set_shift_settings(Value) -> Style
-pub fn TextElem::set_size(Value) -> Style
+pub fn TextElem::set_size(TextSize) -> Style
 pub fn TextElem::set_slashed_zero(Bool) -> Style
 pub fn TextElem::set_smallcaps(Value) -> Style
 pub fn TextElem::set_spacing(Rel[Length]) -> Style
 pub fn TextElem::set_span_offset(USize) -> Style
-pub fn TextElem::set_stretch(Value) -> Style
+pub fn TextElem::set_stretch(FontStretch) -> Style
 pub fn TextElem::set_stroke(Value) -> Style
-pub fn TextElem::set_style(Value) -> Style
-pub fn TextElem::set_stylistic_set(Value) -> Style
-pub fn TextElem::set_top_edge(Value) -> Style
+pub fn TextElem::set_style(FontStyle) -> Style
+pub fn TextElem::set_stylistic_set(StylisticSets) -> Style
+pub fn TextElem::set_top_edge(TopEdge) -> Style
 pub fn TextElem::set_tracking(Length) -> Style
-pub fn TextElem::set_variations(Value) -> Style
-pub fn TextElem::set_weight(Value) -> Style
+pub fn TextElem::set_variations(FontVariations) -> Style
+pub fn TextElem::set_weight(FontWeight) -> Style
 pub fn TextElem::shift_settings_in(StyleChain) -> Value
-pub fn TextElem::size_in(StyleChain) -> Value
+pub fn TextElem::size_in(StyleChain) -> TextSize
 pub fn TextElem::slashed_zero_in(StyleChain) -> Bool
 pub fn TextElem::smallcaps_in(StyleChain) -> Value
 pub fn TextElem::spacing_in(StyleChain) -> Rel[Length]
 pub fn TextElem::span_offset_in(StyleChain) -> USize
-pub fn TextElem::stretch_in(StyleChain) -> Value
+pub fn TextElem::stretch_in(StyleChain) -> FontStretch
 pub fn TextElem::stroke_in(StyleChain) -> Value
-pub fn TextElem::style_in(StyleChain) -> Value
-pub fn TextElem::stylistic_set_in(StyleChain) -> Value
+pub fn TextElem::style_in(StyleChain) -> FontStyle
+pub fn TextElem::stylistic_set_in(StyleChain) -> StylisticSets
 pub fn TextElem::text(Self) -> String
-pub fn TextElem::top_edge_in(StyleChain) -> Value
+pub fn TextElem::top_edge_in(StyleChain) -> TopEdge
 pub fn TextElem::tracking_in(StyleChain) -> Length
-pub fn TextElem::variations_in(StyleChain) -> Value
-pub fn TextElem::weight_in(StyleChain) -> Value
+pub fn TextElem::variations_in(StyleChain) -> FontVariations
+pub fn TextElem::weight_in(StyleChain) -> FontWeight
 pub fn TextElem::with_text(Self, String) -> Self
+
+pub(all) struct TextSize(Length) derive(Eq, Hash)
+pub impl Fold for TextSize
+pub impl FromValue for TextSize
+pub impl IntoValue for TextSize
+pub impl Reflect for TextSize
 
 pub(all) struct Tiling {
   // private fields
@@ -7057,6 +7578,25 @@ pub struct TodayOffset(Duration)
 pub impl FromValue for TodayOffset
 pub impl IntoValue for TodayOffset
 pub impl Reflect for TodayOffset
+
+pub(all) enum TopEdge {
+  Metric(TopEdgeMetric)
+  Length(Length)
+} derive(Eq, Hash)
+pub impl FromValue for TopEdge
+pub impl IntoValue for TopEdge
+pub impl Reflect for TopEdge
+
+pub(all) enum TopEdgeMetric {
+  Ascender
+  CapHeight
+  XHeight
+  Baseline
+  Bounds
+} derive(Eq, Hash, @debug.Debug)
+pub impl FromValue for TopEdgeMetric
+pub impl IntoValue for TopEdgeMetric
+pub impl Reflect for TopEdgeMetric
 
 pub(all) struct Traced(@syntax.Span?)
 pub fn Traced::get(Self, @syntax.FileId) -> @syntax.Span?
@@ -7390,6 +7930,19 @@ pub(all) struct Warned[T] {
   output : T
   warnings : Array[SourceDiagnostic]
 }
+
+pub(all) struct WeightDelta(Int64) derive(Default, Eq, Hash)
+pub impl Fold for WeightDelta
+pub impl FromValue for WeightDelta
+pub impl IntoValue for WeightDelta
+pub impl Reflect for WeightDelta
+
+pub(all) struct WritingScript(String) derive(Compare, Eq, Hash, @debug.Debug)
+pub fn WritingScript::as_str(Self) -> String
+pub fn WritingScript::from_str(String) -> Self raise HintedError
+pub impl FromValue for WritingScript
+pub impl IntoValue for WritingScript
+pub impl Reflect for WritingScript
 
 // Type aliases
 pub type NativeFn = (Engine, Context, Args) -> Value raise SourceError

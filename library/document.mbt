@@ -1,0 +1,151 @@
+// Port of the castable value types of `typst-library/src/model/document.rs`
+// (`DocumentFormat`, `PagedFormat`) and `OneOrMultiple` (upstream
+// `typst-library/src/foundations/array.rs`).
+
+///|
+/// Supported export formats for bundle documents.
+pub(all) enum DocumentFormat {
+  /// One of the page formats.
+  Paged(PagedFormat)
+  /// The document format of the web.
+  Html
+} derive(Eq, Hash, Debug)
+
+///|
+pub impl Reflect for DocumentFormat with fn input() {
+  PagedFormat::input().union_with(
+    Value(Str("html"), "The document format of the web."),
+  )
+}
+
+///|
+pub impl Reflect for DocumentFormat with fn output() {
+  DocumentFormat::input()
+}
+
+///|
+pub impl Reflect for DocumentFormat with fn castable(v) {
+  v is Str("html") || PagedFormat::castable(v)
+}
+
+///|
+pub impl IntoValue for DocumentFormat with fn into_value(self) {
+  match self {
+    Paged(v) => v.into_value()
+    Html => Str("html")
+  }
+}
+
+///|
+pub impl FromValue for DocumentFormat with fn from_value(v) {
+  match v {
+    Str("html") => Html
+    v if PagedFormat::castable(v) => Paged(PagedFormat::from_value(v))
+    v => raise HintedError(DocumentFormat::input().error(v))
+  }
+}
+
+///|
+/// Supported paged export formats for bundle documents.
+pub(all) enum PagedFormat {
+  /// High-fidelity document and graphics format, with focus on exact
+  /// reproduction in print.
+  Pdf
+  /// Raster format for illustrations and transparent graphics.
+  Png
+  /// The vector graphics format of the web.
+  Svg
+} derive(Eq, Hash, Debug)
+
+///|
+let paged_format_names : Array[String] = ["pdf", "png", "svg"]
+
+///|
+pub impl Reflect for PagedFormat with fn input() {
+  str_names_input(paged_format_names)
+}
+
+///|
+pub impl Reflect for PagedFormat with fn output() {
+  PagedFormat::input()
+}
+
+///|
+pub impl Reflect for PagedFormat with fn castable(v) {
+  str_names_find(paged_format_names, v) is Some(_)
+}
+
+///|
+pub impl IntoValue for PagedFormat with fn into_value(self) {
+  match self {
+    Pdf => Str("pdf")
+    Png => Str("png")
+    Svg => Str("svg")
+  }
+}
+
+///|
+pub impl FromValue for PagedFormat with fn from_value(v) {
+  match str_names_find(paged_format_names, v) {
+    Some(0) => Pdf
+    Some(1) => Png
+    Some(_) => Svg
+    None => raise HintedError(PagedFormat::input().error(v))
+  }
+}
+
+///|
+/// One element, or multiple provided as an array.
+pub(all) struct OneOrMultiple[T](Array[T]) derive(Eq, Hash)
+
+///|
+pub impl[T] Default for OneOrMultiple[T] with fn default() {
+  OneOrMultiple([])
+}
+
+///|
+pub impl[T] Fold for OneOrMultiple[T] with fn fold(self, outer) {
+  OneOrMultiple(outer.0 + self.0)
+}
+
+///|
+pub impl[T : Reflect] Reflect for OneOrMultiple[T] with fn input() {
+  T::input().union_with(Type(Type::array()))
+}
+
+///|
+pub impl[T : Reflect] Reflect for OneOrMultiple[T] with fn output() {
+  T::output().union_with(Type(Type::array()))
+}
+
+///|
+pub impl[T : Reflect] Reflect for OneOrMultiple[T] with fn castable(value) {
+  value is Array(_) || T::castable(value)
+}
+
+///|
+pub impl[T : IntoValue] IntoValue for OneOrMultiple[T] with fn into_value(self) {
+  IntoValue::into_value(self.0)
+}
+
+///|
+pub impl[T : FromValue] FromValue for OneOrMultiple[T] with fn from_value(value) {
+  if T::castable(value) {
+    return OneOrMultiple([T::from_value(value)])
+  }
+  match value {
+    Array(array) => OneOrMultiple(array.items.map(v => T::from_value(v)))
+    _ =>
+      raise HintedError(T::input().union_with(Type(Type::array())).error(value))
+  }
+}
+
+///|
+fn document_elem_author_default() -> Value {
+  (OneOrMultiple::default() : OneOrMultiple[String]).into_value()
+}
+
+///|
+fn document_elem_keywords_default() -> Value {
+  (OneOrMultiple::default() : OneOrMultiple[String]).into_value()
+}
