@@ -41,5 +41,8 @@
 - Error messages, hints and reprs must be byte-identical to upstream. Read
   the upstream source; never guess a message.
 - Rust float/integer formatting helpers live in `library/rust_fmt.mbt`.
+- MoonBit's `String::compare` (and `Array[String]::sort`) orders by length
+  first. Use `compare_str` (code-point = Rust `str` order) wherever upstream
+  sorts or compares strings.
 - Measure with `moon run tests/runner --target native -- eval --dump`, then
   `python3 scripts/classify.py eval 60` for the biggest failure buckets.
