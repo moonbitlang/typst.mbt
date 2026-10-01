@@ -57,6 +57,11 @@ TYPEMAP = {
     "RootedPath": "RootedPath",
     "PathOrStr": "PathOrStr",
     "BundlePath": "BundlePath",
+    "DataSource": "DataSource",
+    "Readable": "Readable",
+    "Encoding": "Encoding",
+    "Delimiter": "Delimiter",
+    "RowType": "RowType",
     # foundations/array.rs, dict.rs, args.rs
     "ToArray": "ToArray",
     "ToDict": "ToDict",
@@ -203,6 +208,11 @@ TYPEMAP = {
     # foundations/target.rs, introspection/tag.rs
     "Target": "Target",
     "Tag": "Tag",
+    # typst-html (dom.rs, css/encode.rs); ported in library/html_*.mbt
+    "HtmlTag": "HtmlTag",
+    "HtmlAttr": "HtmlAttr",
+    "HtmlAttrs": "HtmlAttrs",
+    "css::Properties": "CssProperties",
 }
 
 # Generic Rust types with a MoonBit port: Rust name -> MoonBit name. A use

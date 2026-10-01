@@ -8837,7 +8837,7 @@ pub fn native_plugin() -> NativeFuncData {
           {
             name: "source",
             docs: "A path to a WebAssembly file or raw WebAssembly bytes.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[DataSource])),
             default: None,
             positional: true,
             named: false,
@@ -8864,7 +8864,7 @@ fn native_plugin_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let source_ : @syntax.Spanned[Value] = args.expect_spanned("source")
+  let source_ : @syntax.Spanned[DataSource] = args.expect_spanned("source")
   args.take().finish()
   let output = impl_plugin(engine, source_)
   IntoValue::into_value(output)
@@ -13163,7 +13163,7 @@ pub fn native_cbor() -> NativeFuncData {
           {
             name: "source",
             docs: "A path to a CBOR file or raw CBOR bytes.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[DataSource])),
             default: None,
             positional: true,
             named: false,
@@ -13190,7 +13190,7 @@ fn native_cbor_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let source_ : @syntax.Spanned[Value] = args.expect_spanned("source")
+  let source_ : @syntax.Spanned[DataSource] = args.expect_spanned("source")
   args.take().finish()
   let output = impl_cbor(engine, source_)
   IntoValue::into_value(output)
@@ -13266,7 +13266,7 @@ pub fn native_csv() -> NativeFuncData {
           {
             name: "source",
             docs: "A path to a CSV file or raw CSV bytes.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[DataSource])),
             default: None,
             positional: true,
             named: false,
@@ -13277,7 +13277,7 @@ pub fn native_csv() -> NativeFuncData {
           {
             name: "delimiter",
             docs: "The delimiter that separates columns in the CSV file. Must be a single ASCII character.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Delimiter])),
             default: Some(() => {
               IntoValue::into_value(impl_csv__delimiter_default()) catch {
                 _ => None
@@ -13292,7 +13292,7 @@ pub fn native_csv() -> NativeFuncData {
           {
             name: "row-type",
             docs: "How to represent the file's rows.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[RowType])),
             default: Some(() => {
               IntoValue::into_value(impl_csv__row_type_default()) catch {
                 _ => None
@@ -13322,12 +13322,12 @@ fn native_csv_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let source_ : @syntax.Spanned[Value] = args.expect_spanned("source")
-  let delimiter_ : Value = match args.named("delimiter") {
+  let source_ : @syntax.Spanned[DataSource] = args.expect_spanned("source")
+  let delimiter_ : Delimiter = match args.named("delimiter") {
     Some(v) => v
     None => impl_csv__delimiter_default()
   }
-  let row_type_ : Value = match args.named("row-type") {
+  let row_type_ : RowType = match args.named("row-type") {
     Some(v) => v
     None => impl_csv__row_type_default()
   }
@@ -13355,7 +13355,7 @@ pub fn native_json() -> NativeFuncData {
           {
             name: "source",
             docs: "A path to a JSON file or raw JSON bytes.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[DataSource])),
             default: None,
             positional: true,
             named: false,
@@ -13382,7 +13382,7 @@ fn native_json_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let source_ : @syntax.Spanned[Value] = args.expect_spanned("source")
+  let source_ : @syntax.Spanned[DataSource] = args.expect_spanned("source")
   args.take().finish()
   let output = impl_json(engine, source_)
   IntoValue::into_value(output)
@@ -13484,7 +13484,7 @@ pub fn native_read() -> NativeFuncData {
           {
             name: "encoding",
             docs: "The encoding to read the file with.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Encoding?])),
             default: Some(() => {
               IntoValue::into_value(impl_read__encoding_default()) catch {
                 _ => None
@@ -13497,7 +13497,7 @@ pub fn native_read() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Readable])),
         native_read_call,
       )
       native_read_cell.val = Some(d)
@@ -13515,7 +13515,7 @@ fn native_read_call(
   ignore(engine)
   ignore(context)
   let path_ : @syntax.Spanned[PathOrStr] = args.expect_spanned("path")
-  let encoding_ : Value = match args.named("encoding") {
+  let encoding_ : Encoding? = match args.named("encoding") {
     Some(v) => v
     None => impl_read__encoding_default()
   }
@@ -13543,7 +13543,7 @@ pub fn native_toml() -> NativeFuncData {
           {
             name: "source",
             docs: "A path to a TOML file or raw TOML bytes.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[DataSource])),
             default: None,
             positional: true,
             named: false,
@@ -13570,7 +13570,7 @@ fn native_toml_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let source_ : @syntax.Spanned[Value] = args.expect_spanned("source")
+  let source_ : @syntax.Spanned[DataSource] = args.expect_spanned("source")
   args.take().finish()
   let output = impl_toml(engine, source_)
   IntoValue::into_value(output)
@@ -13661,7 +13661,7 @@ pub fn native_xml() -> NativeFuncData {
           {
             name: "source",
             docs: "A path to an XML file or raw XML bytes.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[DataSource])),
             default: None,
             positional: true,
             named: false,
@@ -13687,7 +13687,7 @@ fn native_xml_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let source_ : @syntax.Spanned[Value] = args.expect_spanned("source")
+  let source_ : @syntax.Spanned[DataSource] = args.expect_spanned("source")
   args.take().finish()
   let output = impl_xml(engine, source_)
   IntoValue::into_value(output)
@@ -13712,7 +13712,7 @@ pub fn native_yaml() -> NativeFuncData {
           {
             name: "source",
             docs: "A path to a YAML file or raw YAML bytes.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[DataSource])),
             default: None,
             positional: true,
             named: false,
@@ -13739,7 +13739,7 @@ fn native_yaml_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let source_ : @syntax.Spanned[Value] = args.expect_spanned("source")
+  let source_ : @syntax.Spanned[DataSource] = args.expect_spanned("source")
   args.take().finish()
   let output = impl_yaml(engine, source_)
   IntoValue::into_value(output)

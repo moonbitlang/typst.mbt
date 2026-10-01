@@ -267,26 +267,6 @@ fn image_elem_icc_default() -> Value {
 // TODO: port `#[parse]` of ImageElem.icc as `image_elem_icc_parse`.
 
 ///|
-/// TODO: port `Default::default() of HtmlAttrs` (HtmlElem.attrs).
-fn html_elem_attrs_default() -> Value {
-  None
-}
-
-///|
-/// TODO: fold for `HtmlAttrs` (HtmlElem.attrs).
-fn html_elem_attrs_fold(inner : Value, _outer : Value) -> Value {
-  inner
-}
-
-///|
-/// TODO: port `Default::default() of css::Properties` (HtmlElem.css).
-fn html_elem_css_default() -> Value {
-  None
-}
-
-// TODO: port `#[parse]` of HtmlElem.css as `html_elem_css_parse`.
-
-///|
 /// TODO: port `` (PdfFormat.standard).
 fn pdf_format_elem_standard_default() -> Value {
   None

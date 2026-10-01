@@ -125,11 +125,11 @@ fn MarkovChain::learn(self : MarkovChain, sentence : String) -> Unit {
   // Byte-wise lexicographic order like Rust's `&str` ordering (the texts are
   // ASCII, so UTF-16 code unit order agrees).
   keys.sort_by((a, b) => {
-    let c = a.0.compare(b.0)
+    let c = compare_str(a.0, b.0)
     if c != 0 {
       c
     } else {
-      a.1.compare(b.1)
+      compare_str(a.1, b.1)
     }
   })
   self.keys = keys

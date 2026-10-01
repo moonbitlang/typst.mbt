@@ -33,9 +33,6 @@
 //     1 ImageFit
 //     1 Smart<ImageScaling>
 //     1 Smart<Derived<DataSource, Bytes>>
-//     1 HtmlTag
-//     1 HtmlAttrs
-//     1 css::Properties
 //     1 PdfStandards
 //     1 Derived<PathOrStr, EcoString>
 //     1 Option<AttachedFileRelationship>
@@ -9203,6 +9200,7 @@ pub fn html_format_elem() -> Element {
         ],
       )
       html_format_elem_cell.val = Some(e)
+      html_format_elem_init(e)
       e
     }
   }
@@ -9228,7 +9226,7 @@ pub fn html_elem() -> Element {
         capabilities=[],
         fields=[
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[HtmlTag]),
             id=0,
             name="tag",
             kind=Required,
@@ -9236,7 +9234,7 @@ pub fn html_elem() -> Element {
             required=true,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[HtmlAttrs]),
             id=1,
             name="attrs",
             kind=Settable,
@@ -9252,12 +9250,13 @@ pub fn html_elem() -> Element {
             default=() => None,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[CssProperties]),
             id=3,
             name="css",
             kind=Settable,
             internal=true,
             default=html_elem_css_default,
+            parse=html_elem_css_parse,
           ),
           field_of(
             (Ty::new() : Ty[Location]),

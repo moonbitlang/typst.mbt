@@ -186,7 +186,7 @@ pub fn Symbol::modifiers(self : Symbol) -> Array[String] {
       }
     }
   }
-  out.sort()
+  out.sort_by(compare_str)
   out.dedup()
   out
 }
@@ -241,7 +241,7 @@ fn impl_symbol_construct(
     }
 
     // Canonicalize the modifier order.
-    modifiers.sort()
+    modifiers.sort_by(compare_str)
 
     // Ensure that there are no duplicate modifiers.
     let mut duplicate : String? = None
