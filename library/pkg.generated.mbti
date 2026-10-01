@@ -2328,6 +2328,13 @@ pub(all) enum AbsUnit {
   In
 } derive(Eq, Hash, @debug.Debug)
 
+pub(all) struct Alignment {
+  // private fields
+} derive(Eq, Hash)
+pub fn Alignment::add(Self, Self) -> Self raise HintedError
+pub fn Alignment::field(Self, String) -> Value?
+pub fn Alignment::repr(Self) -> String
+
 pub(all) struct Angle(Scalar) derive(Compare, Default, Eq, Hash)
 pub fn Angle::abs(Self) -> Self
 pub fn Angle::acos(Double) -> Self
@@ -2590,6 +2597,11 @@ pub fn Context::location(Self) -> Location raise HintedError
 pub fn Context::new(location? : Location, styles? : StyleChain) -> Self
 pub fn Context::none() -> Self
 
+pub(all) struct Counter {
+  // private fields
+} derive(Eq, Hash)
+pub fn Counter::repr(Self) -> String
+
 pub(all) struct Datetime {
   // private fields
 } derive(Eq, Hash)
@@ -2645,6 +2657,11 @@ pub impl FromValue for Dict
 pub impl IntoValue for Dict
 pub impl Reflect for Dict
 
+pub(all) struct Dir {
+  // private fields
+} derive(Eq, Hash)
+pub fn Dir::repr(Self) -> String
+
 pub(all) struct Duration {
   // private fields
 } derive(Eq, Hash)
@@ -2659,8 +2676,17 @@ pub fn Duration::sub(Self, Self) -> Self
 pub impl Compare for Duration
 
 pub(all) enum DynValue {
-  Placeholder
-} derive(Eq, Hash)
+  Alignment(Alignment)
+  Dir(Dir)
+  Regex(Regex)
+  SpotColorant(SpotColorant)
+  Stroke(Stroke)
+  Counter(Counter)
+  State(State)
+  Location(Location)
+  Selector(Selector)
+  RootedPath(RootedPath)
+} derive(Eq)
 pub fn DynValue::add_dyn(Self, Self) -> Value? raise HintedError
 pub fn DynValue::field(Self, String) -> Value??
 pub fn DynValue::is_alignment(Self) -> Bool
@@ -2935,6 +2961,7 @@ pub struct LinkElem(Content)
 pub fn LinkElem::from_url(String) -> Content raise HintedError
 
 pub(all) struct Location(UInt64) derive(Compare, Eq, Hash)
+pub fn Location::repr(Self) -> String
 
 pub struct Module {
   // private fields
@@ -3083,6 +3110,12 @@ pub fn Recipe::apply(Self, Engine, Context, Content) -> Content raise SourceErro
 pub fn Recipe::new(Selector?, Transformation, @syntax.Span) -> Self
 pub impl Eq for Recipe
 
+pub(all) struct Regex {
+  // private fields
+} derive(Eq, Hash)
+pub fn Regex::is_match(Self, String) -> Bool
+pub fn Regex::repr(Self) -> String
+
 pub(all) struct Rel[T] {
   rel : Ratio
   abs : T
@@ -3108,6 +3141,11 @@ pub impl FromValue for Rel[Length]
 pub impl IntoValue for Rel[Length]
 pub impl[T : Numeric] Numeric for Rel[T]
 pub impl Reflect for Rel[Length]
+
+pub(all) struct RootedPath {
+  // private fields
+} derive(Eq, Hash)
+pub fn RootedPath::repr(Self) -> String
 
 pub struct Route {
   // private fields
@@ -3185,6 +3223,7 @@ pub(all) enum Selector {
   After(selector~ : Selector, start~ : Selector, inclusive~ : Bool)
   Within(selector~ : Selector, ancestor~ : Selector)
 } derive(Eq)
+pub fn Selector::repr(Self) -> String
 
 pub struct SequenceElem(Content)
 pub fn SequenceElem::children(Content) -> Array[Content]
@@ -3232,6 +3271,22 @@ pub fn SourceDiagnostic::with_tracepoint(Self, Tracepoint, @syntax.Span) -> Self
 pub struct SpaceElem(Content)
 pub fn SpaceElem::shared() -> Content
 pub fn SpaceElem::shared_with_newline() -> Content
+
+pub(all) struct SpotColorant {
+  // private fields
+} derive(Eq, Hash)
+pub fn SpotColorant::repr(Self) -> String
+
+pub(all) struct State {
+  // private fields
+} derive(Eq, Hash)
+pub fn State::repr(Self) -> String
+
+pub(all) struct Stroke {
+  // private fields
+} derive(Eq, Hash)
+pub fn Stroke::field(Self, String) -> Value?
+pub fn Stroke::repr(Self) -> String
 
 pub(all) enum Style {
   Property(Property)

@@ -42,6 +42,13 @@ TYPEMAP = {
     "Type": "Type",
 }
 
+# Generic Rust types with a MoonBit port: Rust name -> MoonBit name. A use
+# `X<A, B>` maps to `X[A', B']` if every argument maps to a ported type
+# (or is literally `Value`).
+GENERICS = {
+}
+
+
 def _split_generics(s):
     """Split `A, B<C, D>` at top-level commas."""
     out, depth, cur = [], 0, ""
@@ -74,4 +81,11 @@ def mbt_type(rust):
         if inner == "Value" and m.group(1) != "Value":
             return "Value"
         return f"Array[{inner}]"
+    m = re.fullmatch(r"(\w+)<(.*)>", rust)
+    if m and m.group(1) in GENERICS:
+        args = _split_generics(m.group(2))
+        mapped = [mbt_type(a) for a in args]
+        if any(x == "Value" and a != "Value" for x, a in zip(mapped, args)):
+            return "Value"
+        return f"{GENERICS[m.group(1)]}[{', '.join(mapped)}]"
     return "Value"

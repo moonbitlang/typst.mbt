@@ -152,6 +152,8 @@ def main():
     todo = ["// Generated stubs for native functions that are not ported yet.\n"]
     keys = {}
     func_scopes = {s["self_ty"]: s for s in manifest["scopes"]}
+    type_names = {t["ident"]: t["name"] for t in manifest["types"]}
+    type_names.update({"i64": "int", "f64": "float", "bool": "bool"})
     for f in manifest["funcs"]:
         if f["file"].startswith(("typst-pdf", "typst-html", "typst-bundle")):
             continue
@@ -188,6 +190,7 @@ def main():
             sig.append("span : @syntax.Span")
             call_args.append("args.span")
         for p in f["params"]:
+            info_default = "None"
             ident = p["ident"] + "_"
             raw, spanned = unspanned(p["ty"])
             if p["variadic"]:
@@ -210,18 +213,21 @@ def main():
                 pty = f"@syntax.Spanned[{ity}]" if spanned else ity
                 info_ty = ity
                 if p["default"] is not None:
-                    lit = literal_default(ity, p["default"])
+                    # Upstream evaluates the default expression with the full
+                    # parameter type (including `Spanned`).
+                    lit = None if spanned else literal_default(ity, p["default"])
                     dname = f"{impl}__{p['ident']}_default"
                     if lit is None:
                         if dname not in defined:
                             todo.append(
-                                f"///|\n/// TODO: port default `{p['default']}`.\nfn {dname}() -> {ity} raise SourceError {{\n  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), \"default of `{key}.{p['ident']}` is not yet ported\")])\n}}\n"
+                                f"///|\n/// TODO: port default `{p['default']}`.\nfn {dname}() -> {pty} raise SourceError {{\n  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), \"default of `{key}.{p['ident']}` is not yet ported\")])\n}}\n"
                             )
                         dexpr = f"{dname}()"
+                        val = f"{dexpr}.v" if spanned else dexpr
+                        info_default = f"Some(() => try {{ IntoValue::into_value({val}) }} catch {{ _ => None }})"
                     else:
                         dexpr = lit
-                    if spanned:
-                        dexpr = f"{{ v: {dexpr}, span: args.span }}"
+                        info_default = f"Some(() => IntoValue::into_value(({lit} : {ity})))"
                     base = (f'args.named_spanned({mbt_str(p["name"])})' if p["named"] and spanned
                             else f'args.named({mbt_str(p["name"])})' if p["named"]
                             else "args.eat_spanned_cast()" if spanned else "args.eat()")
@@ -234,10 +240,10 @@ def main():
                 parse.append(f"  let {ident} : {pty} = {getter}")
                 call_args.append(ident)
             positional = not p["named"]
-            required = positional and p["default"] is None and not p["variadic"]
+            required = positional and p["default"] is None
             infos.append(
                 f'    {{ name: {mbt_str(p["name"])}, docs: {mbt_str(p["doc"])}, '
-                f"input: () => input_of((Ty::new() : Ty[{info_ty}])), default: None, "
+                f"input: () => input_of((Ty::new() : Ty[{info_ty}])), default: {info_default}, "
                 f"positional: {str(positional).lower()}, named: {str(p['named']).lower()}, "
                 f"variadic: {str(p['variadic']).lower()}, required: {str(required).lower()}, settable: false }},"
             )
@@ -251,6 +257,14 @@ def main():
             body = f"  {call}\n  None"
         else:
             body = f"  {bind}{call}\n  {conv}"
+        if ret_inner == "Never":
+            returns = "Union([])"
+        elif rty == "Unit":
+            returns = "Type(Type::none())"
+        else:
+            returns = f"output_of((Ty::new() : Ty[{rty}]))"
+        # Constructors are named after their type (upstream `NativeType::NAME`).
+        fname = type_names.get(f["parent"], f["name"]) if f["constructor"] else f["name"]
         scope_fn = ""
         if f["scope"] and f["ident"] in func_scopes:
             scope_fn = f", scope=scope_{key}"
@@ -260,10 +274,11 @@ def main():
             f"pub fn native_{key}() -> NativeFuncData {{\n"
             f"  match native_{key}_cell.val {{\n    Some(d) => d\n    None => {{\n"
             f"      let d = NativeFuncData::new(\n"
-            f"        name={mbt_str(f['name'])},\n        title={mbt_str(f['title'])},\n"
-            f"        docs={mbt_str(f['doc'])},\n        contextual={str(f['contextual']).lower()},\n"
+            f"        name={mbt_str(fname)},\n        title={mbt_str(f['title'])},\n"
+            f"        docs={mbt_str(f['doc'])},\n        keywords=[{', '.join(mbt_str(k) for k in f['keywords'])}],\n"
+            f"        contextual={str(f['contextual']).lower()},\n"
             f"        params=[\n" + "\n".join("    " + i for i in infos) + "\n        ],\n"
-            f"        returns=() => output_of((Ty::new() : Ty[{'Value' if rty == 'Unit' else rty}])){scope_fn},\n"
+            f"        returns=() => {returns}{scope_fn},\n"
             f"        native_{key}_call,\n      )\n"
             f"      native_{key}_cell.val = Some(d)\n      d\n    }}\n  }}\n}}\n\n"
             f"///|\nfn native_{key}_call(engine : Engine, context : Context, args : Args) -> Value raise SourceError {{\n"
@@ -327,18 +342,18 @@ def main():
         if ty in acc:
             ctor_line = f"\n    data.set_constructor(native_{ctor}())" if ctor else ""
             reg.append(
-                f"  {acc[ty]}.0.register(data => {{\n    let s = Scope::new()\n{body}\n    data.set_scope(s){ctor_line}\n  }})"
+                f"  {acc[ty]}.0.register(data => {{\n    let s = Scope::deduplicating()\n{body}\n    data.set_scope(s){ctor_line}\n  }})"
             )
         elif ty.endswith("Elem") or ty in elem_files:
             reg.append(
-                f"  {elem_var(ty, elem_files.get(ty, ''))}().hooks().scope = () => {{\n    let s = Scope::new()\n{body}\n    s\n  }}"
+                f"  {elem_var(ty, elem_files.get(ty, ''))}().hooks().scope = () => {{\n    let s = Scope::deduplicating()\n{body}\n    s\n  }}"
             )
         else:
             # A function scope (e.g. `assert`).
             fkey = next((func_key(x) for x in manifest["funcs"] if x["ident"] == ty and x["parent"] is None), None)
             if fkey is None:
                 continue
-            out.append(f"///|\nfn scope_{fkey}() -> Scope {{\n  let s = Scope::new()\n{body.replace('    ', '  ')}\n  s\n}}\n")
+            out.append(f"///|\nfn scope_{fkey}() -> Scope {{\n  let s = Scope::deduplicating()\n{body.replace('    ', '  ')}\n  s\n}}\n")
     reg.append("}\n")
     # Global functions per category.
     glob = ["///|\n/// The global native functions of a category, in upstream definition\n/// order.\nfn generated_globals(category : String) -> Array[NativeFuncData] {\n  match category {"]

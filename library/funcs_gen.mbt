@@ -10,9 +10,10 @@ pub fn native_args_construct() -> NativeFuncData {
     Some(d) => d
     None => {
       let d = NativeFuncData::new(
-        name="construct",
+        name="arguments",
         title="Construct",
         docs="Construct spreadable arguments in place.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -23,7 +24,7 @@ pub fn native_args_construct() -> NativeFuncData {
             positional: true,
             named: false,
             variadic: true,
-            required: false,
+            required: true,
             settable: false,
           },
         ],
@@ -61,6 +62,7 @@ pub fn native_args_len() -> NativeFuncData {
         name="len",
         title="Length",
         docs="The number of arguments, positional or named.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -111,6 +113,7 @@ pub fn native_args_at() -> NativeFuncData {
         name="at",
         title="At",
         docs="Returns the positional argument at the specified index, or the named argument with the specified name.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -185,6 +188,7 @@ pub fn native_args_to_pos() -> NativeFuncData {
         name="pos",
         title="Positional",
         docs="Returns the captured positional arguments as an array.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -235,6 +239,7 @@ pub fn native_args_to_named() -> NativeFuncData {
         name="named",
         title="Named",
         docs="Returns the captured named arguments as a dictionary.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -285,6 +290,7 @@ pub fn native_args_filter() -> NativeFuncData {
         name="filter",
         title="Filter",
         docs="Produces a new `arguments` with only the arguments for which the value passes the test.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -347,6 +353,7 @@ pub fn native_args_map() -> NativeFuncData {
         name="map",
         title="Map",
         docs="Produces a new `arguments` by transforming each argument value with the passed function.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -406,9 +413,10 @@ pub fn native_array_construct() -> NativeFuncData {
     Some(d) => d
     None => {
       let d = NativeFuncData::new(
-        name="construct",
+        name="array",
         title="Construct",
         docs="Converts a value to an array.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -459,6 +467,7 @@ pub fn native_array_len() -> NativeFuncData {
         name="len",
         title="Length",
         docs="The number of values in the array.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -509,6 +518,7 @@ pub fn native_array_first() -> NativeFuncData {
         name="first",
         title="First",
         docs="Returns the first item in the array. May be used on the left-hand side of an assignment. Returns the default value if the array is empty or fails with an error if no default value was specified.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -571,6 +581,7 @@ pub fn native_array_last() -> NativeFuncData {
         name="last",
         title="Last",
         docs="Returns the last item in the array. May be used on the left-hand side of an assignment. Returns the default value if the array is empty or fails with an error if no default value was specified.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -633,6 +644,7 @@ pub fn native_array_at() -> NativeFuncData {
         name="at",
         title="At",
         docs="Returns the item at the specified index in the array. May be used on the left-hand side of an assignment. Returns the default value if the index is out of bounds or fails with an error if no default value was specified.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -707,6 +719,7 @@ pub fn native_array_push() -> NativeFuncData {
         name="push",
         title="Push",
         docs="Adds a value to the end of the array.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -732,7 +745,7 @@ pub fn native_array_push() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => Type(Type::none()),
         native_array_push_call,
       )
       native_array_push_cell.val = Some(d)
@@ -769,6 +782,7 @@ pub fn native_array_pop() -> NativeFuncData {
         name="pop",
         title="Pop",
         docs="Removes the last item from the array and returns it. Fails with an error if the array is empty.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -819,6 +833,7 @@ pub fn native_array_insert() -> NativeFuncData {
         name="insert",
         title="Insert",
         docs="Inserts a value into the array at the specified index, shifting all subsequent elements to the right. Fails with an error if the index is out of bounds.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -855,7 +870,7 @@ pub fn native_array_insert() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => Type(Type::none()),
         native_array_insert_call,
       )
       native_array_insert_cell.val = Some(d)
@@ -893,6 +908,7 @@ pub fn native_array_remove() -> NativeFuncData {
         name="remove",
         title="Remove",
         docs="Removes the value at the specified index from the array and return it.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -967,6 +983,7 @@ pub fn native_array_slice() -> NativeFuncData {
         name="slice",
         title="Slice",
         docs="Extracts a subslice of the array. Fails with an error if the start or end index is out of bounds.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -995,7 +1012,11 @@ pub fn native_array_slice() -> NativeFuncData {
             name: "end",
             docs: "The end index (exclusive). If omitted, the whole slice until the end of the array is extracted. If negative, indexes from the back.",
             input: () => input_of((Ty::new() : Ty[Int64?])),
-            default: None,
+            default: Some(() => {
+              IntoValue::into_value(impl_array_slice__end_default()) catch {
+                _ => None
+              }
+            }),
             positional: true,
             named: false,
             variadic: false,
@@ -1056,6 +1077,7 @@ pub fn native_array_contains() -> NativeFuncData {
         name="contains",
         title="Contains",
         docs="Whether the array contains the specified value.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -1118,6 +1140,7 @@ pub fn native_array_find() -> NativeFuncData {
         name="find",
         title="Find",
         docs="Searches for an item for which the given function returns `{true}` and returns the first match or `{none}` if there is no match.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -1180,6 +1203,7 @@ pub fn native_array_position() -> NativeFuncData {
         name="position",
         title="Position",
         docs="Searches for an item for which the given function returns `{true}` and returns the index of the first match or `{none}` if there is no match.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -1242,13 +1266,18 @@ pub fn native_array_range() -> NativeFuncData {
         name="range",
         title="Range",
         docs="Create an array consisting of a sequence of numbers.",
+        keywords=[],
         contextual=false,
         params=[
           {
             name: "start",
             docs: "The start of the range (inclusive).",
             input: () => input_of((Ty::new() : Ty[Int64])),
-            default: None,
+            default: Some(() => {
+              IntoValue::into_value(impl_array_range__start_default()) catch {
+                _ => None
+              }
+            }),
             positional: true,
             named: false,
             variadic: false,
@@ -1270,7 +1299,7 @@ pub fn native_array_range() -> NativeFuncData {
             name: "inclusive",
             docs: "Whether `end` is inclusive.",
             input: () => input_of((Ty::new() : Ty[Bool])),
-            default: None,
+            default: Some(() => IntoValue::into_value((false : Bool))),
             positional: false,
             named: true,
             variadic: false,
@@ -1281,7 +1310,11 @@ pub fn native_array_range() -> NativeFuncData {
             name: "step",
             docs: "The distance between the generated numbers.",
             input: () => input_of((Ty::new() : Ty[NonZeroI64])),
-            default: None,
+            default: Some(() => {
+              IntoValue::into_value(impl_array_range__step_default()) catch {
+                _ => None
+              }
+            }),
             positional: false,
             named: true,
             variadic: false,
@@ -1331,6 +1364,7 @@ pub fn native_array_filter() -> NativeFuncData {
         name="filter",
         title="Filter",
         docs="Produces a new array with only the items from the original one for which the given function returns `{true}`.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -1393,6 +1427,7 @@ pub fn native_array_map() -> NativeFuncData {
         name="map",
         title="Map",
         docs="Produces a new array in which all items from the original one were transformed with the given function.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -1455,6 +1490,7 @@ pub fn native_array_enumerate() -> NativeFuncData {
         name="enumerate",
         title="Enumerate",
         docs="Returns a new array with the values alongside their indices.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -1472,7 +1508,7 @@ pub fn native_array_enumerate() -> NativeFuncData {
             name: "start",
             docs: "The index returned for the first pair of the returned list.",
             input: () => input_of((Ty::new() : Ty[Int64])),
-            default: None,
+            default: Some(() => IntoValue::into_value((0L : Int64))),
             positional: false,
             named: true,
             variadic: false,
@@ -1520,6 +1556,7 @@ pub fn native_array_zip() -> NativeFuncData {
         name="zip",
         title="Zip",
         docs="Zips the array with other arrays.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -1537,7 +1574,7 @@ pub fn native_array_zip() -> NativeFuncData {
             name: "exact",
             docs: "Whether all arrays have to have the same length. For example, `{(1, 2).zip((1, 2, 3), exact: true)}` produces an error.",
             input: () => input_of((Ty::new() : Ty[Bool])),
-            default: None,
+            default: Some(() => IntoValue::into_value((false : Bool))),
             positional: false,
             named: true,
             variadic: false,
@@ -1552,7 +1589,7 @@ pub fn native_array_zip() -> NativeFuncData {
             positional: true,
             named: false,
             variadic: true,
-            required: false,
+            required: true,
             settable: false,
           },
         ],
@@ -1595,6 +1632,7 @@ pub fn native_array_fold() -> NativeFuncData {
         name="fold",
         title="Fold",
         docs="Folds all items into a single value using an accumulator function.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -1669,6 +1707,7 @@ pub fn native_array_sum() -> NativeFuncData {
         name="sum",
         title="Sum",
         docs="Sums all items (works for all types that can be added).",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -1731,6 +1770,7 @@ pub fn native_array_product() -> NativeFuncData {
         name="product",
         title="Product",
         docs="Calculates the product of all items (works for all types that can be multiplied).",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -1793,6 +1833,7 @@ pub fn native_array_any() -> NativeFuncData {
         name="any",
         title="Any",
         docs="Whether the given function returns `{true}` for any item in the array.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -1855,6 +1896,7 @@ pub fn native_array_all() -> NativeFuncData {
         name="all",
         title="All",
         docs="Whether the given function returns `{true}` for all items in the array.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -1917,6 +1959,7 @@ pub fn native_array_flatten() -> NativeFuncData {
         name="flatten",
         title="Flatten",
         docs="Combine all nested arrays into a single flat one.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -1967,6 +2010,7 @@ pub fn native_array_rev() -> NativeFuncData {
         name="rev",
         title="Reverse",
         docs="Return a new array with the same items, but in reverse order.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -2017,6 +2061,7 @@ pub fn native_array_split() -> NativeFuncData {
         name="split",
         title="Split",
         docs="Split the array at occurrences of the specified value.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -2079,6 +2124,7 @@ pub fn native_array_join() -> NativeFuncData {
         name="join",
         title="Join",
         docs="Combine all items in the array into one.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -2096,7 +2142,11 @@ pub fn native_array_join() -> NativeFuncData {
             name: "separator",
             docs: "A value to insert between each item of the array.",
             input: () => input_of((Ty::new() : Ty[Value?])),
-            default: None,
+            default: Some(() => {
+              IntoValue::into_value(impl_array_join__separator_default()) catch {
+                _ => None
+              }
+            }),
             positional: true,
             named: false,
             variadic: false,
@@ -2118,7 +2168,11 @@ pub fn native_array_join() -> NativeFuncData {
             name: "default",
             docs: "What to return if the array is empty.",
             input: () => input_of((Ty::new() : Ty[Value?])),
-            default: None,
+            default: Some(() => {
+              IntoValue::into_value(impl_array_join__default_default()) catch {
+                _ => None
+              }
+            }),
             positional: false,
             named: true,
             variadic: false,
@@ -2173,6 +2227,7 @@ pub fn native_array_intersperse() -> NativeFuncData {
         name="intersperse",
         title="Intersperse",
         docs="Returns an array with a copy of the separator value placed between adjacent elements.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -2235,6 +2290,7 @@ pub fn native_array_chunks() -> NativeFuncData {
         name="chunks",
         title="Chunks",
         docs="Splits an array into non-overlapping chunks, starting at the beginning, ending with a single remainder chunk.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -2263,7 +2319,7 @@ pub fn native_array_chunks() -> NativeFuncData {
             name: "exact",
             docs: "Whether to discard the remainder if its size is less than `chunk-size`.",
             input: () => input_of((Ty::new() : Ty[Bool])),
-            default: None,
+            default: Some(() => IntoValue::into_value((false : Bool))),
             positional: false,
             named: true,
             variadic: false,
@@ -2312,6 +2368,7 @@ pub fn native_array_windows() -> NativeFuncData {
         name="windows",
         title="Windows",
         docs="Returns sliding windows of `window-size` elements over an array.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -2374,6 +2431,7 @@ pub fn native_array_sorted() -> NativeFuncData {
         name="sorted",
         title="Sorted",
         docs="Return a sorted version of this array, optionally by a given key function. The sorting algorithm used is stable.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -2448,6 +2506,7 @@ pub fn native_array_dedup() -> NativeFuncData {
         name="dedup",
         title="Deduplicate",
         docs="Deduplicates all items in the array.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -2510,6 +2569,7 @@ pub fn native_array_to_dict() -> NativeFuncData {
         name="to-dict",
         title="To Dict",
         docs="Converts an array of pairs into a dictionary. The first value of each pair is the key, the second the value.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -2560,6 +2620,7 @@ pub fn native_array_reduce() -> NativeFuncData {
         name="reduce",
         title="Reduce",
         docs="Reduces the elements to a single one, by repeatedly applying a reducing operation.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -2619,9 +2680,10 @@ pub fn native_bytes_construct() -> NativeFuncData {
     Some(d) => d
     None => {
       let d = NativeFuncData::new(
-        name="construct",
+        name="bytes",
         title="Construct",
         docs="Converts a value to bytes.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -2672,6 +2734,7 @@ pub fn native_bytes_len() -> NativeFuncData {
         name="len",
         title="Length",
         docs="The length in bytes.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -2722,6 +2785,7 @@ pub fn native_bytes_at() -> NativeFuncData {
         name="at",
         title="At",
         docs="Returns the byte at the specified index. Returns the default value if the index is out of bounds or fails with an error if no default value was specified.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -2796,6 +2860,7 @@ pub fn native_bytes_slice() -> NativeFuncData {
         name="slice",
         title="Slice",
         docs="Extracts a subslice of the bytes. Fails with an error if the start or end index is out of bounds.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -2824,7 +2889,11 @@ pub fn native_bytes_slice() -> NativeFuncData {
             name: "end",
             docs: "The end index (exclusive). If omitted, the whole slice until the end is extracted.",
             input: () => input_of((Ty::new() : Ty[Int64?])),
-            default: None,
+            default: Some(() => {
+              IntoValue::into_value(impl_bytes_slice__end_default()) catch {
+                _ => None
+              }
+            }),
             positional: true,
             named: false,
             variadic: false,
@@ -2885,6 +2954,7 @@ pub fn native_calc_abs() -> NativeFuncData {
         name="abs",
         title="Absolute",
         docs="Calculates the absolute value of a numeric value.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -2935,6 +3005,7 @@ pub fn native_calc_pow() -> NativeFuncData {
         name="pow",
         title="Power",
         docs="Raises a value to some exponent.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -2997,6 +3068,7 @@ pub fn native_calc_exp() -> NativeFuncData {
         name="exp",
         title="Exponential",
         docs="Raises a value to some exponent of $e$.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -3047,6 +3119,7 @@ pub fn native_calc_sqrt() -> NativeFuncData {
         name="sqrt",
         title="Square Root",
         docs="Calculates the square root of a number.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -3097,6 +3170,7 @@ pub fn native_calc_root() -> NativeFuncData {
         name="root",
         title="Root",
         docs="Calculates the real $n$#super[th] root of a number.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -3159,6 +3233,7 @@ pub fn native_calc_sin() -> NativeFuncData {
         name="sin",
         title="Sine",
         docs="Calculates the sine of an angle.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -3209,6 +3284,7 @@ pub fn native_calc_cos() -> NativeFuncData {
         name="cos",
         title="Cosine",
         docs="Calculates the cosine of an angle.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -3259,6 +3335,7 @@ pub fn native_calc_tan() -> NativeFuncData {
         name="tan",
         title="Tangent",
         docs="Calculates the tangent of an angle.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -3309,6 +3386,7 @@ pub fn native_calc_asin() -> NativeFuncData {
         name="asin",
         title="Arcsine",
         docs="Calculates the arcsine of a number.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -3359,6 +3437,7 @@ pub fn native_calc_acos() -> NativeFuncData {
         name="acos",
         title="Arccosine",
         docs="Calculates the arccosine of a number.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -3409,6 +3488,7 @@ pub fn native_calc_atan() -> NativeFuncData {
         name="atan",
         title="Arctangent",
         docs="Calculates the arctangent of a number.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -3459,6 +3539,7 @@ pub fn native_calc_atan2() -> NativeFuncData {
         name="atan2",
         title="Four-quadrant Arctangent",
         docs="Calculates the four-quadrant arctangent of a coordinate.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -3521,6 +3602,7 @@ pub fn native_calc_sinh() -> NativeFuncData {
         name="sinh",
         title="Hyperbolic Sine",
         docs="Calculates the hyperbolic sine of a hyperbolic angle.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -3571,6 +3653,7 @@ pub fn native_calc_cosh() -> NativeFuncData {
         name="cosh",
         title="Hyperbolic Cosine",
         docs="Calculates the hyperbolic cosine of a hyperbolic angle.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -3621,6 +3704,7 @@ pub fn native_calc_tanh() -> NativeFuncData {
         name="tanh",
         title="Hyperbolic Tangent",
         docs="Calculates the hyperbolic tangent of a hyperbolic angle.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -3671,6 +3755,7 @@ pub fn native_calc_asinh() -> NativeFuncData {
         name="asinh",
         title="Inverse Hyperbolic Sine",
         docs="Calculates the inverse hyperbolic sine of a number.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -3721,6 +3806,7 @@ pub fn native_calc_acosh() -> NativeFuncData {
         name="acosh",
         title="Inverse Hyperbolic Cosine",
         docs="Calculates the inverse hyperbolic cosine of a number.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -3771,6 +3857,7 @@ pub fn native_calc_atanh() -> NativeFuncData {
         name="atanh",
         title="Inverse Hyperbolic Tangent",
         docs="Calculates the inverse hyperbolic tangent of a number.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -3821,6 +3908,7 @@ pub fn native_calc_log() -> NativeFuncData {
         name="log",
         title="Logarithm",
         docs="Calculates the logarithm of a number.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -3838,7 +3926,11 @@ pub fn native_calc_log() -> NativeFuncData {
             name: "base",
             docs: "The base of the logarithm. May not be zero.",
             input: () => input_of((Ty::new() : Ty[Double])),
-            default: None,
+            default: Some(() => {
+              IntoValue::into_value(impl_calc_log__base_default().v) catch {
+                _ => None
+              }
+            }),
             positional: false,
             named: true,
             variadic: false,
@@ -3866,7 +3958,7 @@ fn native_calc_log_call(
   let value_ : @syntax.Spanned[Value] = args.expect_spanned("value")
   let base_ : @syntax.Spanned[Double] = match args.named_spanned("base") {
     Some(v) => v
-    None => { v: impl_calc_log__base_default(), span: args.span, }
+    None => impl_calc_log__base_default()
   }
   args.take().finish()
   let output = impl_calc_log(args.span, value_, base_)
@@ -3886,6 +3978,7 @@ pub fn native_calc_ln() -> NativeFuncData {
         name="ln",
         title="Natural Logarithm",
         docs="Calculates the natural logarithm of a number.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -3936,6 +4029,7 @@ pub fn native_calc_erf() -> NativeFuncData {
         name="erf",
         title="Error Function",
         docs="Applies the error function to a number.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -3986,6 +4080,7 @@ pub fn native_calc_fact() -> NativeFuncData {
         name="fact",
         title="Factorial",
         docs="Calculates the factorial of a number.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -4036,6 +4131,7 @@ pub fn native_calc_perm() -> NativeFuncData {
         name="perm",
         title="Permutation",
         docs="Calculates a permutation.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -4098,6 +4194,7 @@ pub fn native_calc_binom() -> NativeFuncData {
         name="binom",
         title="Binomial",
         docs="Calculates a binomial coefficient.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -4160,6 +4257,7 @@ pub fn native_calc_gcd() -> NativeFuncData {
         name="gcd",
         title="Greatest Common Divisor",
         docs="Calculates the greatest common divisor of two integers.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -4222,6 +4320,7 @@ pub fn native_calc_lcm() -> NativeFuncData {
         name="lcm",
         title="Least Common Multiple",
         docs="Calculates the least common multiple of two integers.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -4284,6 +4383,7 @@ pub fn native_calc_floor() -> NativeFuncData {
         name="floor",
         title="Floor",
         docs="Rounds a number down to the nearest integer.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -4334,6 +4434,7 @@ pub fn native_calc_ceil() -> NativeFuncData {
         name="ceil",
         title="Ceil",
         docs="Rounds a number up to the nearest integer.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -4384,6 +4485,7 @@ pub fn native_calc_trunc() -> NativeFuncData {
         name="trunc",
         title="Truncate",
         docs="Returns the integer part of a number.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -4434,6 +4536,7 @@ pub fn native_calc_fract() -> NativeFuncData {
         name="fract",
         title="Fractional",
         docs="Returns the fractional part of a number.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -4484,6 +4587,7 @@ pub fn native_calc_round() -> NativeFuncData {
         name="round",
         title="Round",
         docs="Rounds a number to the nearest integer.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -4501,7 +4605,7 @@ pub fn native_calc_round() -> NativeFuncData {
             name: "digits",
             docs: "If positive, the number of decimal places.",
             input: () => input_of((Ty::new() : Ty[Int64])),
-            default: None,
+            default: Some(() => IntoValue::into_value((0L : Int64))),
             positional: false,
             named: true,
             variadic: false,
@@ -4549,6 +4653,7 @@ pub fn native_calc_clamp() -> NativeFuncData {
         name="clamp",
         title="Clamp",
         docs="Clamps a number between a minimum and maximum value.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -4623,6 +4728,7 @@ pub fn native_calc_min() -> NativeFuncData {
         name="min",
         title="Minimum",
         docs="Determines the minimum of a sequence of values.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -4633,7 +4739,7 @@ pub fn native_calc_min() -> NativeFuncData {
             positional: true,
             named: false,
             variadic: true,
-            required: false,
+            required: true,
             settable: false,
           },
         ],
@@ -4673,6 +4779,7 @@ pub fn native_calc_max() -> NativeFuncData {
         name="max",
         title="Maximum",
         docs="Determines the maximum of a sequence of values.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -4683,7 +4790,7 @@ pub fn native_calc_max() -> NativeFuncData {
             positional: true,
             named: false,
             variadic: true,
-            required: false,
+            required: true,
             settable: false,
           },
         ],
@@ -4723,6 +4830,7 @@ pub fn native_calc_even() -> NativeFuncData {
         name="even",
         title="Even",
         docs="Determines whether an integer is even.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -4773,6 +4881,7 @@ pub fn native_calc_odd() -> NativeFuncData {
         name="odd",
         title="Odd",
         docs="Determines whether an integer is odd.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -4823,6 +4932,7 @@ pub fn native_calc_rem() -> NativeFuncData {
         name="rem",
         title="Remainder",
         docs="Calculates the remainder of two numbers (signed modulo).",
+        keywords=["modulo", "modulus"],
         contextual=false,
         params=[
           {
@@ -4885,6 +4995,7 @@ pub fn native_calc_div_euclid() -> NativeFuncData {
         name="div-euclid",
         title="Euclidean Division",
         docs="Performs euclidean division of two numbers.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -4947,6 +5058,7 @@ pub fn native_calc_rem_euclid() -> NativeFuncData {
         name="rem-euclid",
         title="Euclidean Remainder",
         docs="This calculates the least nonnegative remainder of a division (nonnegative modulo).",
+        keywords=["modulo", "modulus"],
         contextual=false,
         params=[
           {
@@ -5009,6 +5121,7 @@ pub fn native_calc_quo() -> NativeFuncData {
         name="quo",
         title="Quotient",
         docs="Calculates the quotient (floored division) of two numbers.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -5071,13 +5184,18 @@ pub fn native_calc_norm() -> NativeFuncData {
         name="norm",
         title="𝑝-Norm",
         docs="Calculates the $p$-norm of a sequence of values.",
+        keywords=[],
         contextual=false,
         params=[
           {
             name: "p",
             docs: "The value of $p$. Must be greater than zero.",
             input: () => input_of((Ty::new() : Ty[Double])),
-            default: None,
+            default: Some(() => {
+              IntoValue::into_value(impl_calc_norm__p_default().v) catch {
+                _ => None
+              }
+            }),
             positional: false,
             named: true,
             variadic: false,
@@ -5092,7 +5210,7 @@ pub fn native_calc_norm() -> NativeFuncData {
             positional: true,
             named: false,
             variadic: true,
-            required: false,
+            required: true,
             settable: false,
           },
         ],
@@ -5115,7 +5233,7 @@ fn native_calc_norm_call(
   ignore(context)
   let p_ : @syntax.Spanned[Double] = match args.named_spanned("p") {
     Some(v) => v
-    None => { v: impl_calc_norm__p_default(), span: args.span, }
+    None => impl_calc_norm__p_default()
   }
   let values_ : Array[Double] = args.all()
   args.take().finish()
@@ -5136,6 +5254,7 @@ pub fn native_content_func() -> NativeFuncData {
         name="func",
         title="Func",
         docs="The content's element function. This function can be used to create the element contained in this content. It can be used in set and show rules for the element. Can be compared with global functions to check whether you have a specific kind of element.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -5186,6 +5305,7 @@ pub fn native_content_has() -> NativeFuncData {
         name="has",
         title="Has",
         docs="Whether the content has the specified field.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -5248,6 +5368,7 @@ pub fn native_content_at() -> NativeFuncData {
         name="at",
         title="At",
         docs="Access the specified field on the content. Returns the default value if the field does not exist or fails with an error if no default value was specified.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -5322,6 +5443,7 @@ pub fn native_content_fields() -> NativeFuncData {
         name="fields",
         title="Fields",
         docs="Returns the fields of this content.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -5372,6 +5494,7 @@ pub fn native_content_location() -> NativeFuncData {
         name="location",
         title="Location",
         docs="The location of the content. This is only available on content returned by @query[query] or provided by a @reference:styling:show-rules[show rule], for other content it will be `{none}`. The resulting location can be used with @counter[counters], @state[state] and @query[queries].",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -5419,9 +5542,10 @@ pub fn native_datetime_construct() -> NativeFuncData {
     Some(d) => d
     None => {
       let d = NativeFuncData::new(
-        name="construct",
+        name="datetime",
         title="Construct",
         docs="Creates a new datetime.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -5534,13 +5658,18 @@ pub fn native_datetime_today() -> NativeFuncData {
         name="today",
         title="Today",
         docs="Returns the current date.",
+        keywords=[],
         contextual=false,
         params=[
           {
             name: "offset",
             docs: "An offset to apply to the current UTC date. If set to `{auto}`, the offset will be the local offset.",
             input: () => input_of((Ty::new() : Ty[Value])),
-            default: None,
+            default: Some(() => {
+              IntoValue::into_value(impl_datetime_today__offset_default()) catch {
+                _ => None
+              }
+            }),
             positional: false,
             named: true,
             variadic: false,
@@ -5587,6 +5716,7 @@ pub fn native_datetime_display() -> NativeFuncData {
         name="display",
         title="Display",
         docs="Displays the datetime in a specified format.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -5604,7 +5734,11 @@ pub fn native_datetime_display() -> NativeFuncData {
             name: "pattern",
             docs: "The format used to display the datetime.",
             input: () => input_of((Ty::new() : Ty[Value])),
-            default: None,
+            default: Some(() => {
+              IntoValue::into_value(impl_datetime_display__pattern_default()) catch {
+                _ => None
+              }
+            }),
             positional: true,
             named: false,
             variadic: false,
@@ -5652,6 +5786,7 @@ pub fn native_datetime_year() -> NativeFuncData {
         name="year",
         title="Year",
         docs="The year if it was specified, or `{none}` for times without a date.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -5702,6 +5837,7 @@ pub fn native_datetime_month() -> NativeFuncData {
         name="month",
         title="Month",
         docs="The month if it was specified, or `{none}` for times without a date.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -5752,6 +5888,7 @@ pub fn native_datetime_weekday() -> NativeFuncData {
         name="weekday",
         title="Weekday",
         docs="The weekday (counting Monday as 1) or `{none}` for times without a date.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -5802,6 +5939,7 @@ pub fn native_datetime_day() -> NativeFuncData {
         name="day",
         title="Day",
         docs="The day if it was specified, or `{none}` for times without a date.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -5852,6 +5990,7 @@ pub fn native_datetime_hour() -> NativeFuncData {
         name="hour",
         title="Hour",
         docs="The hour if it was specified, or `{none}` for dates without a time.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -5902,6 +6041,7 @@ pub fn native_datetime_minute() -> NativeFuncData {
         name="minute",
         title="Minute",
         docs="The minute if it was specified, or `{none}` for dates without a time.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -5952,6 +6092,7 @@ pub fn native_datetime_second() -> NativeFuncData {
         name="second",
         title="Second",
         docs="The second if it was specified, or `{none}` for dates without a time.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -6002,6 +6143,7 @@ pub fn native_datetime_ordinal() -> NativeFuncData {
         name="ordinal",
         title="Ordinal",
         docs="The ordinal (day of the year), or `{none}` for times without a date.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -6049,9 +6191,10 @@ pub fn native_decimal_construct() -> NativeFuncData {
     Some(d) => d
     None => {
       let d = NativeFuncData::new(
-        name="construct",
+        name="decimal",
         title="Construct",
         docs="Converts a value to a `decimal`.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -6099,9 +6242,10 @@ pub fn native_dict_construct() -> NativeFuncData {
     Some(d) => d
     None => {
       let d = NativeFuncData::new(
-        name="construct",
+        name="dictionary",
         title="Construct",
         docs="Converts a value into a dictionary.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -6152,6 +6296,7 @@ pub fn native_dict_len() -> NativeFuncData {
         name="len",
         title="Length",
         docs="The number of pairs in the dictionary.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -6202,6 +6347,7 @@ pub fn native_dict_at() -> NativeFuncData {
         name="at",
         title="At",
         docs="Returns the value associated with the specified key in the dictionary.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -6276,6 +6422,7 @@ pub fn native_dict_insert() -> NativeFuncData {
         name="insert",
         title="Insert",
         docs="Inserts a new pair into the dictionary. If the dictionary already contains this key, the value is updated.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -6312,7 +6459,7 @@ pub fn native_dict_insert() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => Type(Type::none()),
         native_dict_insert_call,
       )
       native_dict_insert_cell.val = Some(d)
@@ -6350,6 +6497,7 @@ pub fn native_dict_remove() -> NativeFuncData {
         name="remove",
         title="Remove",
         docs="Removes a pair from the dictionary by key and return the value.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -6424,6 +6572,7 @@ pub fn native_dict_keys() -> NativeFuncData {
         name="keys",
         title="Keys",
         docs="Returns the keys of the dictionary as an array in insertion order.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -6474,6 +6623,7 @@ pub fn native_dict_values() -> NativeFuncData {
         name="values",
         title="Values",
         docs="Returns the values of the dictionary as an array in insertion order.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -6524,6 +6674,7 @@ pub fn native_dict_pairs() -> NativeFuncData {
         name="pairs",
         title="Pairs",
         docs="Returns the keys and values of the dictionary as an array of pairs. Each pair is represented as an array of length two.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -6574,6 +6725,7 @@ pub fn native_dict_filter() -> NativeFuncData {
         name="filter",
         title="Filter",
         docs="Produces a new dictionary with only the pairs from the original one for which the given function returns `{true}`.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -6636,6 +6788,7 @@ pub fn native_dict_map() -> NativeFuncData {
         name="map",
         title="Map",
         docs="Produces a new dictionary where the keys are the same, but the values are transformed with the given function.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -6695,16 +6848,17 @@ pub fn native_duration_construct() -> NativeFuncData {
     Some(d) => d
     None => {
       let d = NativeFuncData::new(
-        name="construct",
+        name="duration",
         title="Construct",
         docs="Creates a new duration.",
+        keywords=[],
         contextual=false,
         params=[
           {
             name: "seconds",
             docs: "The number of seconds.",
             input: () => input_of((Ty::new() : Ty[Int64])),
-            default: None,
+            default: Some(() => IntoValue::into_value((0L : Int64))),
             positional: false,
             named: true,
             variadic: false,
@@ -6715,7 +6869,7 @@ pub fn native_duration_construct() -> NativeFuncData {
             name: "minutes",
             docs: "The number of minutes.",
             input: () => input_of((Ty::new() : Ty[Int64])),
-            default: None,
+            default: Some(() => IntoValue::into_value((0L : Int64))),
             positional: false,
             named: true,
             variadic: false,
@@ -6726,7 +6880,7 @@ pub fn native_duration_construct() -> NativeFuncData {
             name: "hours",
             docs: "The number of hours.",
             input: () => input_of((Ty::new() : Ty[Int64])),
-            default: None,
+            default: Some(() => IntoValue::into_value((0L : Int64))),
             positional: false,
             named: true,
             variadic: false,
@@ -6737,7 +6891,7 @@ pub fn native_duration_construct() -> NativeFuncData {
             name: "days",
             docs: "The number of days.",
             input: () => input_of((Ty::new() : Ty[Int64])),
-            default: None,
+            default: Some(() => IntoValue::into_value((0L : Int64))),
             positional: false,
             named: true,
             variadic: false,
@@ -6748,7 +6902,7 @@ pub fn native_duration_construct() -> NativeFuncData {
             name: "weeks",
             docs: "The number of weeks.",
             input: () => input_of((Ty::new() : Ty[Int64])),
-            default: None,
+            default: Some(() => IntoValue::into_value((0L : Int64))),
             positional: false,
             named: true,
             variadic: false,
@@ -6813,6 +6967,7 @@ pub fn native_duration_seconds() -> NativeFuncData {
         name="seconds",
         title="Seconds",
         docs="The duration expressed in seconds.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -6863,6 +7018,7 @@ pub fn native_duration_minutes() -> NativeFuncData {
         name="minutes",
         title="Minutes",
         docs="The duration expressed in minutes.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -6913,6 +7069,7 @@ pub fn native_duration_hours() -> NativeFuncData {
         name="hours",
         title="Hours",
         docs="The duration expressed in hours.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -6963,6 +7120,7 @@ pub fn native_duration_days() -> NativeFuncData {
         name="days",
         title="Days",
         docs="The duration expressed in days.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -7013,6 +7171,7 @@ pub fn native_duration_weeks() -> NativeFuncData {
         name="weeks",
         title="Weeks",
         docs="The duration expressed in weeks.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -7060,9 +7219,10 @@ pub fn native_f64_construct() -> NativeFuncData {
     Some(d) => d
     None => {
       let d = NativeFuncData::new(
-        name="construct",
+        name="float",
         title="Construct",
         docs="Converts a value to a float.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -7113,6 +7273,7 @@ pub fn native_f64_is_nan() -> NativeFuncData {
         name="is-nan",
         title="Is NaN",
         docs="Checks if a float is not a number.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -7163,6 +7324,7 @@ pub fn native_f64_is_infinite() -> NativeFuncData {
         name="is-infinite",
         title="Is Infinite",
         docs="Checks if a float is infinite.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -7213,6 +7375,7 @@ pub fn native_f64_signum() -> NativeFuncData {
         name="signum",
         title="Signum",
         docs="Calculates the sign of a floating point number.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -7263,6 +7426,7 @@ pub fn native_f64_from_bytes() -> NativeFuncData {
         name="from-bytes",
         title="From Bytes",
         docs="Interprets bytes as a float.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -7280,7 +7444,11 @@ pub fn native_f64_from_bytes() -> NativeFuncData {
             name: "endian",
             docs: "The endianness of the conversion.",
             input: () => input_of((Ty::new() : Ty[Value])),
-            default: None,
+            default: Some(() => {
+              IntoValue::into_value(impl_f64_from_bytes__endian_default()) catch {
+                _ => None
+              }
+            }),
             positional: false,
             named: true,
             variadic: false,
@@ -7328,6 +7496,7 @@ pub fn native_f64_to_bytes() -> NativeFuncData {
         name="to-bytes",
         title="To Bytes",
         docs="Converts a float to bytes.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -7345,7 +7514,11 @@ pub fn native_f64_to_bytes() -> NativeFuncData {
             name: "endian",
             docs: "The endianness of the conversion.",
             input: () => input_of((Ty::new() : Ty[Value])),
-            default: None,
+            default: Some(() => {
+              IntoValue::into_value(impl_f64_to_bytes__endian_default()) catch {
+                _ => None
+              }
+            }),
             positional: false,
             named: true,
             variadic: false,
@@ -7356,7 +7529,7 @@ pub fn native_f64_to_bytes() -> NativeFuncData {
             name: "size",
             docs: "The size of the resulting bytes.",
             input: () => input_of((Ty::new() : Ty[U32])),
-            default: None,
+            default: Some(() => IntoValue::into_value((U32(8L) : U32))),
             positional: false,
             named: true,
             variadic: false,
@@ -7408,6 +7581,7 @@ pub fn native_func_with() -> NativeFuncData {
         name="with",
         title="With",
         docs="Returns a new function that has the given arguments pre-applied.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -7429,7 +7603,7 @@ pub fn native_func_with() -> NativeFuncData {
             positional: true,
             named: false,
             variadic: true,
-            required: false,
+            required: true,
             settable: false,
           },
         ],
@@ -7468,6 +7642,7 @@ pub fn native_func_where() -> NativeFuncData {
         name="where-",
         title="Where ",
         docs="Returns a selector that filters for elements belonging to this function whose fields have the values of the given arguments.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -7489,7 +7664,7 @@ pub fn native_func_where() -> NativeFuncData {
             positional: true,
             named: false,
             variadic: true,
-            required: false,
+            required: true,
             settable: false,
           },
         ],
@@ -7525,9 +7700,10 @@ pub fn native_i64_construct() -> NativeFuncData {
     Some(d) => d
     None => {
       let d = NativeFuncData::new(
-        name="construct",
+        name="int",
         title="Construct",
         docs="Converts a value to an integer. Raises an error if there is an attempt to parse an invalid string or produce an integer that doesn't fit into a 64-bit signed integer.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -7545,7 +7721,11 @@ pub fn native_i64_construct() -> NativeFuncData {
             name: "base",
             docs: "The base (radix) for parsing strings, between 2 and 36.",
             input: () => input_of((Ty::new() : Ty[Value])),
-            default: None,
+            default: Some(() => {
+              IntoValue::into_value(impl_i64_construct__base_default().v) catch {
+                _ => None
+              }
+            }),
             positional: false,
             named: true,
             variadic: false,
@@ -7573,7 +7753,7 @@ fn native_i64_construct_call(
   let value_ : @syntax.Spanned[Value] = args.expect_spanned("value")
   let base_ : @syntax.Spanned[Value] = match args.named_spanned("base") {
     Some(v) => v
-    None => { v: impl_i64_construct__base_default(), span: args.span, }
+    None => impl_i64_construct__base_default()
   }
   args.take().finish()
   let output = impl_i64_construct(value_, base_)
@@ -7593,6 +7773,7 @@ pub fn native_i64_signum() -> NativeFuncData {
         name="signum",
         title="Signum",
         docs="Calculates the sign of an integer.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -7643,6 +7824,7 @@ pub fn native_i64_bit_not() -> NativeFuncData {
         name="bit-not",
         title="Bitwise NOT",
         docs="Calculates the bitwise NOT of an integer.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -7693,6 +7875,7 @@ pub fn native_i64_bit_and() -> NativeFuncData {
         name="bit-and",
         title="Bitwise AND",
         docs="Calculates the bitwise AND between two integers.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -7755,6 +7938,7 @@ pub fn native_i64_bit_or() -> NativeFuncData {
         name="bit-or",
         title="Bitwise OR",
         docs="Calculates the bitwise OR between two integers.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -7817,6 +8001,7 @@ pub fn native_i64_bit_xor() -> NativeFuncData {
         name="bit-xor",
         title="Bitwise XOR",
         docs="Calculates the bitwise XOR between two integers.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -7879,6 +8064,7 @@ pub fn native_i64_bit_lshift() -> NativeFuncData {
         name="bit-lshift",
         title="Bitwise Left Shift",
         docs="Shifts the operand's bits to the left by the specified amount.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -7941,6 +8127,7 @@ pub fn native_i64_bit_rshift() -> NativeFuncData {
         name="bit-rshift",
         title="Bitwise Right Shift",
         docs="Shifts the operand's bits to the right by the specified amount. Performs an arithmetic shift by default (extends the sign bit to the left, such that negative numbers stay negative), but that can be changed by the `logical` parameter.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -7969,7 +8156,7 @@ pub fn native_i64_bit_rshift() -> NativeFuncData {
             name: "logical",
             docs: "Toggles whether a logical (unsigned) right shift should be performed instead of arithmetic right shift. If this is `{true}`, negative operands will not preserve their sign bit, and bits which appear to the left after the shift will be `{0}`. This parameter has no effect on non-negative operands.",
             input: () => input_of((Ty::new() : Ty[Bool])),
-            default: None,
+            default: Some(() => IntoValue::into_value((false : Bool))),
             positional: false,
             named: true,
             variadic: false,
@@ -8018,6 +8205,7 @@ pub fn native_i64_from_bytes() -> NativeFuncData {
         name="from-bytes",
         title="From Bytes",
         docs="Converts bytes to an integer.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -8035,7 +8223,11 @@ pub fn native_i64_from_bytes() -> NativeFuncData {
             name: "endian",
             docs: "The endianness of the conversion.",
             input: () => input_of((Ty::new() : Ty[Value])),
-            default: None,
+            default: Some(() => {
+              IntoValue::into_value(impl_i64_from_bytes__endian_default()) catch {
+                _ => None
+              }
+            }),
             positional: false,
             named: true,
             variadic: false,
@@ -8046,7 +8238,7 @@ pub fn native_i64_from_bytes() -> NativeFuncData {
             name: "signed",
             docs: "Whether the bytes should be treated as a signed integer. If this is `{true}` and the most significant bit is set, the resulting number will negative.",
             input: () => input_of((Ty::new() : Ty[Bool])),
-            default: None,
+            default: Some(() => IntoValue::into_value((true : Bool))),
             positional: false,
             named: true,
             variadic: false,
@@ -8098,6 +8290,7 @@ pub fn native_i64_to_bytes() -> NativeFuncData {
         name="to-bytes",
         title="To Bytes",
         docs="Converts an integer to bytes.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -8115,7 +8308,11 @@ pub fn native_i64_to_bytes() -> NativeFuncData {
             name: "endian",
             docs: "The endianness of the conversion.",
             input: () => input_of((Ty::new() : Ty[Value])),
-            default: None,
+            default: Some(() => {
+              IntoValue::into_value(impl_i64_to_bytes__endian_default()) catch {
+                _ => None
+              }
+            }),
             positional: false,
             named: true,
             variadic: false,
@@ -8126,7 +8323,7 @@ pub fn native_i64_to_bytes() -> NativeFuncData {
             name: "size",
             docs: "The size in bytes of the resulting bytes (must be at least zero). If the integer is too large to fit in the specified size, the conversion will truncate the remaining bytes based on the endianness. To keep the same resulting value, if the endianness is big-endian, the truncation will happen at the rightmost bytes. Otherwise, if the endianness is little-endian, the truncation will happen at the leftmost bytes.",
             input: () => input_of((Ty::new() : Ty[USize])),
-            default: None,
+            default: Some(() => IntoValue::into_value((USize(8L) : USize))),
             positional: false,
             named: true,
             variadic: false,
@@ -8175,9 +8372,10 @@ pub fn native_label_construct() -> NativeFuncData {
     Some(d) => d
     None => {
       let d = NativeFuncData::new(
-        name="construct",
+        name="label",
         title="Construct",
         docs="Creates a label from a string.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -8228,6 +8426,7 @@ pub fn native_panic() -> NativeFuncData {
         name="panic",
         title="Panic",
         docs="Fails with an error.",
+        keywords=["error"],
         contextual=false,
         params=[
           {
@@ -8238,11 +8437,11 @@ pub fn native_panic() -> NativeFuncData {
             positional: true,
             named: false,
             variadic: true,
-            required: false,
+            required: true,
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => Union([]),
         native_panic_call,
       )
       native_panic_cell.val = Some(d)
@@ -8278,6 +8477,7 @@ pub fn native_assert() -> NativeFuncData {
         name="assert",
         title="Assert",
         docs="Ensures that a condition is fulfilled.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -8303,7 +8503,7 @@ pub fn native_assert() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => Type(Type::none()),
         scope=scope_assert,
         native_assert_call,
       )
@@ -8341,6 +8541,7 @@ pub fn native_assert_eq() -> NativeFuncData {
         name="eq",
         title="Assert Equal",
         docs="Ensures that two values are equal.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -8377,7 +8578,7 @@ pub fn native_assert_eq() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => Type(Type::none()),
         native_assert_eq_call,
       )
       native_assert_eq_cell.val = Some(d)
@@ -8415,6 +8616,7 @@ pub fn native_assert_ne() -> NativeFuncData {
         name="ne",
         title="Assert Not Equal",
         docs="Ensures that two values are not equal.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -8451,7 +8653,7 @@ pub fn native_assert_ne() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => Type(Type::none()),
         native_assert_ne_call,
       )
       native_assert_ne_cell.val = Some(d)
@@ -8489,6 +8691,7 @@ pub fn native_eval() -> NativeFuncData {
         name="eval",
         title="Evaluate",
         docs="Evaluates a string as Typst code.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -8506,7 +8709,11 @@ pub fn native_eval() -> NativeFuncData {
             name: "mode",
             docs: "The @reference:syntax:modes[syntactical mode] in which the string is parsed.",
             input: () => input_of((Ty::new() : Ty[Value])),
-            default: None,
+            default: Some(() => {
+              IntoValue::into_value(impl_eval__mode_default()) catch {
+                _ => None
+              }
+            }),
             positional: false,
             named: true,
             variadic: false,
@@ -8517,7 +8724,11 @@ pub fn native_eval() -> NativeFuncData {
             name: "scope",
             docs: "A scope of definitions that are made available.",
             input: () => input_of((Ty::new() : Ty[Dict])),
-            default: None,
+            default: Some(() => {
+              IntoValue::into_value(impl_eval__scope_default()) catch {
+                _ => None
+              }
+            }),
             positional: false,
             named: true,
             variadic: false,
@@ -8566,9 +8777,10 @@ pub fn native_rooted_path_construct() -> NativeFuncData {
     Some(d) => d
     None => {
       let d = NativeFuncData::new(
-        name="construct",
+        name="path",
         title="Construct",
         docs="Creates a path from a string.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -8619,6 +8831,7 @@ pub fn native_plugin() -> NativeFuncData {
         name="plugin",
         title="Plugin",
         docs="Loads a WebAssembly module.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -8670,6 +8883,7 @@ pub fn native_plugin_transition() -> NativeFuncData {
         name="transition",
         title="Transition",
         docs="Calls a plugin function that has side effects and returns a new module with plugin functions that are guaranteed to have observed the results of the mutable call.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -8691,7 +8905,7 @@ pub fn native_plugin_transition() -> NativeFuncData {
             positional: true,
             named: false,
             variadic: true,
-            required: false,
+            required: true,
             settable: false,
           },
         ],
@@ -8732,6 +8946,7 @@ pub fn native_repr() -> NativeFuncData {
         name="repr",
         title="Representation",
         docs="Returns the string representation of a value.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -8779,9 +8994,10 @@ pub fn native_selector_construct() -> NativeFuncData {
     Some(d) => d
     None => {
       let d = NativeFuncData::new(
-        name="construct",
+        name="selector",
         title="Construct",
         docs="Turns a value into a selector. The following values are accepted: - An element function like a `heading` or `figure`. - A @str[string] or @regex[regular expression]. - A `{<label>}`. - A @location. - A more complex selector like `{heading.where(level: 1)}`.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -8832,6 +9048,7 @@ pub fn native_selector_or() -> NativeFuncData {
         name="or",
         title="Or",
         docs="Selects all elements that match this or any of the other selectors.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -8853,7 +9070,7 @@ pub fn native_selector_or() -> NativeFuncData {
             positional: true,
             named: false,
             variadic: true,
-            required: false,
+            required: true,
             settable: false,
           },
         ],
@@ -8894,6 +9111,7 @@ pub fn native_selector_and() -> NativeFuncData {
         name="and",
         title="And",
         docs="Selects all elements that match this and all of the other selectors.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -8915,7 +9133,7 @@ pub fn native_selector_and() -> NativeFuncData {
             positional: true,
             named: false,
             variadic: true,
-            required: false,
+            required: true,
             settable: false,
           },
         ],
@@ -8956,6 +9174,7 @@ pub fn native_selector_before() -> NativeFuncData {
         name="before",
         title="Before",
         docs="Returns a modified selector that will only match elements that occur before the first match of `end`.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -8984,7 +9203,7 @@ pub fn native_selector_before() -> NativeFuncData {
             name: "inclusive",
             docs: "Whether `end` itself should match or not. This is only relevant if both selectors match the same type of element. Defaults to `{true}`.",
             input: () => input_of((Ty::new() : Ty[Bool])),
-            default: None,
+            default: Some(() => IntoValue::into_value((true : Bool))),
             positional: false,
             named: true,
             variadic: false,
@@ -9033,6 +9252,7 @@ pub fn native_selector_after() -> NativeFuncData {
         name="after",
         title="After",
         docs="Returns a modified selector that will only match elements that occur after the first match of `start`.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -9061,7 +9281,7 @@ pub fn native_selector_after() -> NativeFuncData {
             name: "inclusive",
             docs: "Whether `start` itself should match or not. This is only relevant if both selectors match the same type of element. Defaults to `{true}`.",
             input: () => input_of((Ty::new() : Ty[Bool])),
-            default: None,
+            default: Some(() => IntoValue::into_value((true : Bool))),
             positional: false,
             named: true,
             variadic: false,
@@ -9112,6 +9332,7 @@ pub fn native_selector_within() -> NativeFuncData {
         name="within",
         title="Within",
         docs="Returns a modified selector that will only match elements that are contained within any elements matching the `ancestor` selector.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -9171,9 +9392,10 @@ pub fn native_str_construct() -> NativeFuncData {
     Some(d) => d
     None => {
       let d = NativeFuncData::new(
-        name="construct",
+        name="str",
         title="Construct",
         docs="Converts a value to a string.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -9191,7 +9413,11 @@ pub fn native_str_construct() -> NativeFuncData {
             name: "base",
             docs: "The base (radix) to display integers in, between 2 and 36.",
             input: () => input_of((Ty::new() : Ty[Value])),
-            default: None,
+            default: Some(() => {
+              IntoValue::into_value(impl_str_construct__base_default().v) catch {
+                _ => None
+              }
+            }),
             positional: false,
             named: true,
             variadic: false,
@@ -9219,7 +9445,7 @@ fn native_str_construct_call(
   let value_ : Value = args.expect("value")
   let base_ : @syntax.Spanned[Value] = match args.named_spanned("base") {
     Some(v) => v
-    None => { v: impl_str_construct__base_default(), span: args.span, }
+    None => impl_str_construct__base_default()
   }
   args.take().finish()
   let output = impl_str_construct(value_, base_)
@@ -9239,6 +9465,7 @@ pub fn native_str_len() -> NativeFuncData {
         name="len",
         title="Length",
         docs="The length of the string in UTF-8 encoded bytes.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -9289,6 +9516,7 @@ pub fn native_str_first() -> NativeFuncData {
         name="first",
         title="First",
         docs="Extracts the first grapheme cluster of the string.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -9351,6 +9579,7 @@ pub fn native_str_last() -> NativeFuncData {
         name="last",
         title="Last",
         docs="Extracts the last grapheme cluster of the string.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -9413,6 +9642,7 @@ pub fn native_str_at() -> NativeFuncData {
         name="at",
         title="At",
         docs="Extracts the first grapheme cluster after the specified index. Returns the default value if the index is out of bounds or fails with an error if no default value was specified.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -9487,6 +9717,7 @@ pub fn native_str_slice() -> NativeFuncData {
         name="slice",
         title="Slice",
         docs="Extracts a substring of the string. Fails with an error if the start or end index is out of bounds.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -9515,7 +9746,11 @@ pub fn native_str_slice() -> NativeFuncData {
             name: "end",
             docs: "The end byte index (exclusive). If omitted, the whole slice until the end of the string is extracted. If negative, indexes from the back.",
             input: () => input_of((Ty::new() : Ty[Int64?])),
-            default: None,
+            default: Some(() => {
+              IntoValue::into_value(impl_str_slice__end_default()) catch {
+                _ => None
+              }
+            }),
             positional: true,
             named: false,
             variadic: false,
@@ -9576,6 +9811,7 @@ pub fn native_str_clusters() -> NativeFuncData {
         name="clusters",
         title="Clusters",
         docs="Returns the grapheme clusters of the string as an array of substrings.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -9626,6 +9862,7 @@ pub fn native_str_codepoints() -> NativeFuncData {
         name="codepoints",
         title="Codepoints",
         docs="Returns the Unicode codepoints of the string as an array of substrings.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -9676,6 +9913,7 @@ pub fn native_str_to_unicode() -> NativeFuncData {
         name="to-unicode",
         title="To Unicode",
         docs="Converts a character into its corresponding code point.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -9726,6 +9964,7 @@ pub fn native_str_from_unicode() -> NativeFuncData {
         name="from-unicode",
         title="From Unicode",
         docs="Converts a unicode code point into its corresponding string.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -9776,6 +10015,7 @@ pub fn native_str_normalize() -> NativeFuncData {
         name="normalize",
         title="Normalize",
         docs="Normalizes the string to the given Unicode normal form.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -9793,7 +10033,11 @@ pub fn native_str_normalize() -> NativeFuncData {
             name: "form",
             docs: "",
             input: () => input_of((Ty::new() : Ty[Value])),
-            default: None,
+            default: Some(() => {
+              IntoValue::into_value(impl_str_normalize__form_default()) catch {
+                _ => None
+              }
+            }),
             positional: false,
             named: true,
             variadic: false,
@@ -9841,6 +10085,7 @@ pub fn native_str_contains() -> NativeFuncData {
         name="contains",
         title="Contains",
         docs="Whether the string contains the specified pattern.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -9903,6 +10148,7 @@ pub fn native_str_starts_with() -> NativeFuncData {
         name="starts-with",
         title="Starts With",
         docs="Whether the string starts with the specified pattern.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -9965,6 +10211,7 @@ pub fn native_str_ends_with() -> NativeFuncData {
         name="ends-with",
         title="Ends With",
         docs="Whether the string ends with the specified pattern.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -10027,6 +10274,7 @@ pub fn native_str_find() -> NativeFuncData {
         name="find",
         title="Find",
         docs="Searches for the specified pattern in the string and returns the first match as a string or `{none}` if there is no match.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -10089,6 +10337,7 @@ pub fn native_str_position() -> NativeFuncData {
         name="position",
         title="Position",
         docs="Searches for the specified pattern in the string and returns the index of the first match as an integer or `{none}` if there is no match.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -10151,6 +10400,7 @@ pub fn native_str_match() -> NativeFuncData {
         name="match-",
         title="Match ",
         docs="Searches for the specified pattern in the string and returns a dictionary with details about the first match or `{none}` if there is no match.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -10213,6 +10463,7 @@ pub fn native_str_matches() -> NativeFuncData {
         name="matches",
         title="Matches",
         docs="Searches for the specified pattern in the string and returns an array of dictionaries with details about all matches. For details about the returned dictionaries, see @str.match[above].",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -10275,6 +10526,7 @@ pub fn native_str_replace() -> NativeFuncData {
         name="replace",
         title="Replace",
         docs="Replace at most `count` occurrences of the given pattern with a replacement string or function (beginning from the start). If no count is given, all occurrences are replaced.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -10363,6 +10615,7 @@ pub fn native_str_trim() -> NativeFuncData {
         name="trim",
         title="Trim",
         docs="Removes matches of a pattern from one or both sides of the string, once or repeatedly and returns the resulting string.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -10380,7 +10633,11 @@ pub fn native_str_trim() -> NativeFuncData {
             name: "pattern",
             docs: "The pattern to search for. If `{none}`, trims white spaces.",
             input: () => input_of((Ty::new() : Ty[Value])),
-            default: None,
+            default: Some(() => {
+              IntoValue::into_value(impl_str_trim__pattern_default()) catch {
+                _ => None
+              }
+            }),
             positional: true,
             named: false,
             variadic: false,
@@ -10402,7 +10659,7 @@ pub fn native_str_trim() -> NativeFuncData {
             name: "repeat",
             docs: "Whether to repeatedly removes matches of the pattern or just once. Defaults to `{true}`.",
             input: () => input_of((Ty::new() : Ty[Bool])),
-            default: None,
+            default: Some(() => IntoValue::into_value((true : Bool))),
             positional: false,
             named: true,
             variadic: false,
@@ -10455,6 +10712,7 @@ pub fn native_str_split() -> NativeFuncData {
         name="split",
         title="Split",
         docs="Splits a string at matches of a specified pattern and returns an array of the resulting parts.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -10472,7 +10730,11 @@ pub fn native_str_split() -> NativeFuncData {
             name: "pattern",
             docs: "The pattern to split at. Defaults to whitespace.",
             input: () => input_of((Ty::new() : Ty[Value])),
-            default: None,
+            default: Some(() => {
+              IntoValue::into_value(impl_str_split__pattern_default()) catch {
+                _ => None
+              }
+            }),
             positional: true,
             named: false,
             variadic: false,
@@ -10520,6 +10782,7 @@ pub fn native_str_rev() -> NativeFuncData {
         name="rev",
         title="Reverse",
         docs="Reverses the string.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -10567,9 +10830,10 @@ pub fn native_regex_construct() -> NativeFuncData {
     Some(d) => d
     None => {
       let d = NativeFuncData::new(
-        name="construct",
+        name="regex",
         title="Construct",
         docs="Create a regular expression from a string.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -10617,9 +10881,10 @@ pub fn native_symbol_construct() -> NativeFuncData {
     Some(d) => d
     None => {
       let d = NativeFuncData::new(
-        name="construct",
+        name="symbol",
         title="Construct",
         docs="Create a custom symbol with modifiers.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -10630,7 +10895,7 @@ pub fn native_symbol_construct() -> NativeFuncData {
             positional: true,
             named: false,
             variadic: true,
-            required: false,
+            required: true,
             settable: false,
           },
         ],
@@ -10670,6 +10935,7 @@ pub fn native_target() -> NativeFuncData {
         name="target",
         title="Target",
         docs="Returns the current export target.",
+        keywords=[],
         contextual=true,
         params=[],
         returns=() => output_of((Ty::new() : Ty[Value])),
@@ -10704,9 +10970,10 @@ pub fn native_type_construct() -> NativeFuncData {
     Some(d) => d
     None => {
       let d = NativeFuncData::new(
-        name="construct",
+        name="type",
         title="Construct",
         docs="Determines a value's type.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -10754,9 +11021,10 @@ pub fn native_version_construct() -> NativeFuncData {
     Some(d) => d
     None => {
       let d = NativeFuncData::new(
-        name="construct",
+        name="version",
         title="Construct",
         docs="Creates a new version.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -10767,7 +11035,7 @@ pub fn native_version_construct() -> NativeFuncData {
             positional: true,
             named: false,
             variadic: true,
-            required: false,
+            required: true,
             settable: false,
           },
         ],
@@ -10807,6 +11075,7 @@ pub fn native_version_at() -> NativeFuncData {
         name="at",
         title="At",
         docs="Retrieves a component of a version.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -10866,9 +11135,10 @@ pub fn native_counter_construct() -> NativeFuncData {
     Some(d) => d
     None => {
       let d = NativeFuncData::new(
-        name="construct",
+        name="counter",
         title="Construct",
         docs="Create a new counter identified by a key.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -10919,6 +11189,7 @@ pub fn native_counter_get() -> NativeFuncData {
         name="get",
         title="Get",
         docs="Retrieves the value of the counter at the current location. Always returns an array of integers, even if the counter has just one number.",
+        keywords=[],
         contextual=true,
         params=[
           {
@@ -10969,6 +11240,7 @@ pub fn native_counter_display() -> NativeFuncData {
         name="display",
         title="Display",
         docs="Displays the value of the counter.",
+        keywords=[],
         contextual=true,
         params=[
           {
@@ -10986,7 +11258,11 @@ pub fn native_counter_display() -> NativeFuncData {
             name: "numbering",
             docs: "A @numbering[numbering pattern or a function], which specifies how to display the counter. If given a function, that function receives each number of the counter as a separate argument. If the amount of numbers varies, e.g. for the heading argument, you can use an @arguments[argument sink].",
             input: () => input_of((Ty::new() : Ty[Value])),
-            default: None,
+            default: Some(() => {
+              IntoValue::into_value(impl_counter_display__numbering_default()) catch {
+                _ => None
+              }
+            }),
             positional: true,
             named: false,
             variadic: false,
@@ -10997,7 +11273,11 @@ pub fn native_counter_display() -> NativeFuncData {
             name: "at",
             docs: "The place at which the counter should be displayed.",
             input: () => input_of((Ty::new() : Ty[Value])),
-            default: None,
+            default: Some(() => {
+              IntoValue::into_value(impl_counter_display__at_default()) catch {
+                _ => None
+              }
+            }),
             positional: false,
             named: true,
             variadic: false,
@@ -11008,7 +11288,7 @@ pub fn native_counter_display() -> NativeFuncData {
             name: "both",
             docs: "If enabled, displays the current and final top-level count together. Both can be styled through a single numbering pattern. This is used by the page numbering property to display the current and total number of pages when a pattern like `{\"1 / 1\"}` is given.",
             input: () => input_of((Ty::new() : Ty[Bool])),
-            default: None,
+            default: Some(() => IntoValue::into_value((false : Bool))),
             positional: false,
             named: true,
             variadic: false,
@@ -11072,6 +11352,7 @@ pub fn native_counter_at() -> NativeFuncData {
         name="at",
         title="At",
         docs="Retrieves the value of the counter at the given location. Always returns an array of integers, even if the counter has just one number.",
+        keywords=[],
         contextual=true,
         params=[
           {
@@ -11134,6 +11415,7 @@ pub fn native_counter_final() -> NativeFuncData {
         name="final-",
         title="Final ",
         docs="Retrieves the value of the counter at the end of the document. Always returns an array of integers, even if the counter has just one number.",
+        keywords=[],
         contextual=true,
         params=[
           {
@@ -11184,6 +11466,7 @@ pub fn native_counter_step() -> NativeFuncData {
         name="step",
         title="Step",
         docs="Increases the value of the counter by one.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -11201,7 +11484,11 @@ pub fn native_counter_step() -> NativeFuncData {
             name: "level",
             docs: "The depth at which to step the counter. Defaults to `{1}`.",
             input: () => input_of((Ty::new() : Ty[NonZeroUSize])),
-            default: None,
+            default: Some(() => {
+              IntoValue::into_value(impl_counter_step__level_default()) catch {
+                _ => None
+              }
+            }),
             positional: false,
             named: true,
             variadic: false,
@@ -11249,6 +11536,7 @@ pub fn native_counter_update() -> NativeFuncData {
         name="update",
         title="Update",
         docs="Updates the value of the counter.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -11313,6 +11601,7 @@ pub fn native_here() -> NativeFuncData {
         name="here",
         title="Here",
         docs="Provides the current location in the document.",
+        keywords=[],
         contextual=true,
         params=[],
         returns=() => output_of((Ty::new() : Ty[Value])),
@@ -11350,6 +11639,7 @@ pub fn native_locate() -> NativeFuncData {
         name="locate",
         title="Locate",
         docs="Determines the location of an element in the document.",
+        keywords=[],
         contextual=true,
         params=[
           {
@@ -11400,6 +11690,7 @@ pub fn native_location_page() -> NativeFuncData {
         name="page",
         title="Page",
         docs="Returns the page number for this location.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -11450,6 +11741,7 @@ pub fn native_location_page_numbering() -> NativeFuncData {
         name="page-numbering",
         title="Page Numbering",
         docs="Returns the page numbering pattern of the page at this location. This can be used when displaying the page counter in order to obtain the local numbering. This is useful if you are building custom indices or outlines.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -11502,6 +11794,7 @@ pub fn native_location_position() -> NativeFuncData {
         name="position",
         title="Position",
         docs="Returns a dictionary with the page number and the x, y position for this location. The page number starts at one and the coordinates are measured from the top-left of the page.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -11554,6 +11847,7 @@ pub fn native_query() -> NativeFuncData {
         name="query",
         title="Query",
         docs="Finds elements in the document.",
+        keywords=[],
         contextual=true,
         params=[
           {
@@ -11603,9 +11897,10 @@ pub fn native_state_construct() -> NativeFuncData {
     Some(d) => d
     None => {
       let d = NativeFuncData::new(
-        name="construct",
+        name="state",
         title="Construct",
         docs="Create a new state identified by a key.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -11623,7 +11918,11 @@ pub fn native_state_construct() -> NativeFuncData {
             name: "init",
             docs: "The initial value of the state.",
             input: () => input_of((Ty::new() : Ty[Value])),
-            default: None,
+            default: Some(() => {
+              IntoValue::into_value(impl_state_construct__init_default()) catch {
+                _ => None
+              }
+            }),
             positional: true,
             named: false,
             variadic: false,
@@ -11671,6 +11970,7 @@ pub fn native_state_get() -> NativeFuncData {
         name="get",
         title="Get",
         docs="Retrieves the value of the state at the current location.",
+        keywords=[],
         contextual=true,
         params=[
           {
@@ -11721,6 +12021,7 @@ pub fn native_state_at() -> NativeFuncData {
         name="at",
         title="At",
         docs="Retrieves the value of the state at the given selector's unique match.",
+        keywords=[],
         contextual=true,
         params=[
           {
@@ -11783,6 +12084,7 @@ pub fn native_state_final() -> NativeFuncData {
         name="final-",
         title="Final ",
         docs="Retrieves the value of the state at the end of the document.",
+        keywords=[],
         contextual=true,
         params=[
           {
@@ -11833,6 +12135,7 @@ pub fn native_state_update() -> NativeFuncData {
         name="update",
         title="Update",
         docs="Updates the value of the state.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -11895,6 +12198,7 @@ pub fn native_alignment_axis() -> NativeFuncData {
         name="axis",
         title="Axis",
         docs="The axis this alignment belongs to. - `{\"horizontal\"}` for `start`, `left`, `center`, `right`, and `end` - `{\"vertical\"}` for `top`, `horizon`, and `bottom` - `{none}` for 2-dimensional alignments",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -11945,6 +12249,7 @@ pub fn native_alignment_inv() -> NativeFuncData {
         name="inv",
         title="Inverse",
         docs="The inverse alignment.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -11995,6 +12300,7 @@ pub fn native_angle_to_rad() -> NativeFuncData {
         name="rad",
         title="Radians",
         docs="Converts this angle to radians.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -12045,6 +12351,7 @@ pub fn native_angle_to_deg() -> NativeFuncData {
         name="deg",
         title="Degrees",
         docs="Converts this angle to degrees.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -12095,6 +12402,7 @@ pub fn native_dir_from() -> NativeFuncData {
         name="from",
         title="From",
         docs="Returns a direction from a starting point.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -12145,6 +12453,7 @@ pub fn native_dir_to() -> NativeFuncData {
         name="to",
         title="To",
         docs="Returns a direction from an end point.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -12195,6 +12504,7 @@ pub fn native_dir_axis() -> NativeFuncData {
         name="axis",
         title="Axis",
         docs="The axis this direction belongs to, either `{\"horizontal\"}` or `{\"vertical\"}`.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -12245,6 +12555,7 @@ pub fn native_dir_sign() -> NativeFuncData {
         name="sign",
         title="Sign",
         docs="The corresponding sign, for use in calculations.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -12295,6 +12606,7 @@ pub fn native_dir_start() -> NativeFuncData {
         name="start",
         title="Start",
         docs="The starting point of this direction.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -12345,6 +12657,7 @@ pub fn native_dir_end() -> NativeFuncData {
         name="end",
         title="End",
         docs="The end point of this direction.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -12395,6 +12708,7 @@ pub fn native_dir_inv() -> NativeFuncData {
         name="inv",
         title="Inverse",
         docs="The inverse (opposite) direction.",
+        keywords=["opposite"],
         contextual=false,
         params=[
           {
@@ -12445,6 +12759,7 @@ pub fn native_layout() -> NativeFuncData {
         name="layout",
         title="Layout",
         docs="Provides access to the current outer container's (or page's, if none) dimensions (width and height).",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -12495,6 +12810,7 @@ pub fn native_length_to_pt() -> NativeFuncData {
         name="pt",
         title="Points",
         docs="Converts this length to points.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -12545,6 +12861,7 @@ pub fn native_length_to_mm() -> NativeFuncData {
         name="mm",
         title="Millimeters",
         docs="Converts this length to millimeters.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -12595,6 +12912,7 @@ pub fn native_length_to_cm() -> NativeFuncData {
         name="cm",
         title="Centimeters",
         docs="Converts this length to centimeters.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -12645,6 +12963,7 @@ pub fn native_length_to_inches() -> NativeFuncData {
         name="inches",
         title="Inches",
         docs="Converts this length to inches.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -12695,6 +13014,7 @@ pub fn native_length_to_absolute() -> NativeFuncData {
         name="to-absolute",
         title="To Absolute",
         docs="Resolve this length to an absolute length.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -12745,13 +13065,18 @@ pub fn native_measure() -> NativeFuncData {
         name="measure",
         title="Measure",
         docs="Measures the layouted size of content.",
+        keywords=[],
         contextual=true,
         params=[
           {
             name: "width",
             docs: "The width available to layout the content.",
             input: () => input_of((Ty::new() : Ty[Value])),
-            default: None,
+            default: Some(() => {
+              IntoValue::into_value(impl_measure__width_default()) catch {
+                _ => None
+              }
+            }),
             positional: false,
             named: true,
             variadic: false,
@@ -12762,7 +13087,11 @@ pub fn native_measure() -> NativeFuncData {
             name: "height",
             docs: "The height available to layout the content.",
             input: () => input_of((Ty::new() : Ty[Value])),
-            default: None,
+            default: Some(() => {
+              IntoValue::into_value(impl_measure__height_default()) catch {
+                _ => None
+              }
+            }),
             positional: false,
             named: true,
             variadic: false,
@@ -12832,6 +13161,7 @@ pub fn native_cbor() -> NativeFuncData {
         name="cbor",
         title="CBOR",
         docs="Reads structured data from a CBOR file.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -12883,6 +13213,7 @@ pub fn native_cbor_encode() -> NativeFuncData {
         name="encode",
         title="Encode CBOR",
         docs="Encode structured data into CBOR bytes.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -12933,6 +13264,7 @@ pub fn native_csv() -> NativeFuncData {
         name="csv",
         title="CSV",
         docs="Reads structured data from a CSV file.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -12950,7 +13282,11 @@ pub fn native_csv() -> NativeFuncData {
             name: "delimiter",
             docs: "The delimiter that separates columns in the CSV file. Must be a single ASCII character.",
             input: () => input_of((Ty::new() : Ty[Value])),
-            default: None,
+            default: Some(() => {
+              IntoValue::into_value(impl_csv__delimiter_default()) catch {
+                _ => None
+              }
+            }),
             positional: false,
             named: true,
             variadic: false,
@@ -12961,7 +13297,11 @@ pub fn native_csv() -> NativeFuncData {
             name: "row-type",
             docs: "How to represent the file's rows.",
             input: () => input_of((Ty::new() : Ty[Value])),
-            default: None,
+            default: Some(() => {
+              IntoValue::into_value(impl_csv__row_type_default()) catch {
+                _ => None
+              }
+            }),
             positional: false,
             named: true,
             variadic: false,
@@ -13013,6 +13353,7 @@ pub fn native_json() -> NativeFuncData {
         name="json",
         title="JSON",
         docs="Reads structured data from a JSON file.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -13064,6 +13405,7 @@ pub fn native_json_encode() -> NativeFuncData {
         name="encode",
         title="Encode JSON",
         docs="Encodes structured data into a JSON string.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -13081,7 +13423,7 @@ pub fn native_json_encode() -> NativeFuncData {
             name: "pretty",
             docs: "Whether to pretty print the JSON with newlines and indentation.",
             input: () => input_of((Ty::new() : Ty[Bool])),
-            default: None,
+            default: Some(() => IntoValue::into_value((true : Bool))),
             positional: false,
             named: true,
             variadic: false,
@@ -13129,6 +13471,7 @@ pub fn native_read() -> NativeFuncData {
         name="read",
         title="Read",
         docs="Reads plain text or data from a file.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -13146,7 +13489,11 @@ pub fn native_read() -> NativeFuncData {
             name: "encoding",
             docs: "The encoding to read the file with.",
             input: () => input_of((Ty::new() : Ty[Value])),
-            default: None,
+            default: Some(() => {
+              IntoValue::into_value(impl_read__encoding_default()) catch {
+                _ => None
+              }
+            }),
             positional: false,
             named: true,
             variadic: false,
@@ -13194,6 +13541,7 @@ pub fn native_toml() -> NativeFuncData {
         name="toml",
         title="TOML",
         docs="Reads structured data from a TOML file.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -13245,6 +13593,7 @@ pub fn native_toml_encode() -> NativeFuncData {
         name="encode",
         title="Encode TOML",
         docs="Encodes structured data into a TOML string.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -13262,7 +13611,7 @@ pub fn native_toml_encode() -> NativeFuncData {
             name: "pretty",
             docs: "Whether to pretty-print the resulting TOML.",
             input: () => input_of((Ty::new() : Ty[Bool])),
-            default: None,
+            default: Some(() => IntoValue::into_value((true : Bool))),
             positional: false,
             named: true,
             variadic: false,
@@ -13310,6 +13659,7 @@ pub fn native_xml() -> NativeFuncData {
         name="xml",
         title="XML",
         docs="Reads structured data from an XML file.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -13360,6 +13710,7 @@ pub fn native_yaml() -> NativeFuncData {
         name="yaml",
         title="YAML",
         docs="Reads structured data from a YAML file.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -13411,6 +13762,7 @@ pub fn native_yaml_encode() -> NativeFuncData {
         name="encode",
         title="Encode YAML",
         docs="Encode structured data into a YAML string.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -13461,6 +13813,7 @@ pub fn native_math_floor() -> NativeFuncData {
         name="floor",
         title="Floor",
         docs="Floors an expression.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -13523,6 +13876,7 @@ pub fn native_math_ceil() -> NativeFuncData {
         name="ceil",
         title="Ceil",
         docs="Ceils an expression.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -13585,6 +13939,7 @@ pub fn native_math_round() -> NativeFuncData {
         name="round",
         title="Round",
         docs="Rounds an expression.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -13647,6 +14002,7 @@ pub fn native_math_abs() -> NativeFuncData {
         name="abs",
         title="Abs",
         docs="Takes the absolute value of an expression.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -13709,6 +14065,7 @@ pub fn native_math_norm() -> NativeFuncData {
         name="norm",
         title="Norm",
         docs="Takes the norm of an expression.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -13771,6 +14128,7 @@ pub fn native_math_sqrt() -> NativeFuncData {
         name="sqrt",
         title="Square Root",
         docs="A square root.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -13821,6 +14179,7 @@ pub fn native_math_bold() -> NativeFuncData {
         name="bold",
         title="Bold",
         docs="Bold font style in math.",
+        keywords=["mathbf"],
         contextual=false,
         params=[
           {
@@ -13871,6 +14230,7 @@ pub fn native_math_upright() -> NativeFuncData {
         name="upright",
         title="Upright",
         docs="Upright (non-italic) font style in math.",
+        keywords=["mathup"],
         contextual=false,
         params=[
           {
@@ -13921,6 +14281,7 @@ pub fn native_math_italic() -> NativeFuncData {
         name="italic",
         title="Italic",
         docs="Italic font style in math.",
+        keywords=["mathit"],
         contextual=false,
         params=[
           {
@@ -13971,6 +14332,7 @@ pub fn native_math_serif() -> NativeFuncData {
         name="serif",
         title="Serif",
         docs="Serif (roman) font style in math.",
+        keywords=["mathrm"],
         contextual=false,
         params=[
           {
@@ -14021,6 +14383,7 @@ pub fn native_math_sans() -> NativeFuncData {
         name="sans",
         title="Sans Serif",
         docs="Sans-serif font style in math.",
+        keywords=["mathsf"],
         contextual=false,
         params=[
           {
@@ -14071,6 +14434,7 @@ pub fn native_math_cal() -> NativeFuncData {
         name="cal",
         title="Calligraphic",
         docs="Calligraphic (chancery) font style in math.",
+        keywords=["mathcal", "chancery"],
         contextual=false,
         params=[
           {
@@ -14121,6 +14485,7 @@ pub fn native_math_scr() -> NativeFuncData {
         name="scr",
         title="Script Style",
         docs="Script (roundhand) font style in math.",
+        keywords=["mathscr", "roundhand"],
         contextual=false,
         params=[
           {
@@ -14171,6 +14536,7 @@ pub fn native_math_frak() -> NativeFuncData {
         name="frak",
         title="Fraktur",
         docs="Fraktur font style in math.",
+        keywords=["mathfrak", "blackletter", "gothic"],
         contextual=false,
         params=[
           {
@@ -14221,6 +14587,7 @@ pub fn native_math_mono() -> NativeFuncData {
         name="mono",
         title="Monospace",
         docs="Monospace font style in math.",
+        keywords=["mathtt"],
         contextual=false,
         params=[
           {
@@ -14271,6 +14638,7 @@ pub fn native_math_bb() -> NativeFuncData {
         name="bb",
         title="Blackboard Bold",
         docs="Blackboard bold (double-struck) font style in math.",
+        keywords=["mathbb"],
         contextual=false,
         params=[
           {
@@ -14321,6 +14689,7 @@ pub fn native_math_display() -> NativeFuncData {
         name="display",
         title="Display Size",
         docs="Forced display style in math.",
+        keywords=["displaystyle"],
         contextual=false,
         params=[
           {
@@ -14338,7 +14707,7 @@ pub fn native_math_display() -> NativeFuncData {
             name: "cramped",
             docs: "Whether to impose a height restriction for exponents, like regular sub- and superscripts do.",
             input: () => input_of((Ty::new() : Ty[Bool])),
-            default: None,
+            default: Some(() => IntoValue::into_value((false : Bool))),
             positional: false,
             named: true,
             variadic: false,
@@ -14386,6 +14755,7 @@ pub fn native_math_inline() -> NativeFuncData {
         name="inline",
         title="Inline Size",
         docs="Forced inline (text) style in math.",
+        keywords=["textstyle"],
         contextual=false,
         params=[
           {
@@ -14403,7 +14773,7 @@ pub fn native_math_inline() -> NativeFuncData {
             name: "cramped",
             docs: "Whether to impose a height restriction for exponents, like regular sub- and superscripts do.",
             input: () => input_of((Ty::new() : Ty[Bool])),
-            default: None,
+            default: Some(() => IntoValue::into_value((false : Bool))),
             positional: false,
             named: true,
             variadic: false,
@@ -14451,6 +14821,7 @@ pub fn native_math_script() -> NativeFuncData {
         name="script",
         title="Script Size",
         docs="Forced script style in math.",
+        keywords=["scriptstyle"],
         contextual=false,
         params=[
           {
@@ -14468,7 +14839,7 @@ pub fn native_math_script() -> NativeFuncData {
             name: "cramped",
             docs: "Whether to impose a height restriction for exponents, like regular sub- and superscripts do.",
             input: () => input_of((Ty::new() : Ty[Bool])),
-            default: None,
+            default: Some(() => IntoValue::into_value((true : Bool))),
             positional: false,
             named: true,
             variadic: false,
@@ -14516,6 +14887,7 @@ pub fn native_math_sscript() -> NativeFuncData {
         name="sscript",
         title="Script-Script Size",
         docs="Forced second script style in math.",
+        keywords=["scriptscriptstyle"],
         contextual=false,
         params=[
           {
@@ -14533,7 +14905,7 @@ pub fn native_math_sscript() -> NativeFuncData {
             name: "cramped",
             docs: "Whether to impose a height restriction for exponents, like regular sub- and superscripts do.",
             input: () => input_of((Ty::new() : Ty[Bool])),
-            default: None,
+            default: Some(() => IntoValue::into_value((true : Bool))),
             positional: false,
             named: true,
             variadic: false,
@@ -14581,6 +14953,7 @@ pub fn native_numbering() -> NativeFuncData {
         name="numbering",
         title="Numbering",
         docs="Applies a numbering to a sequence of numbers.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -14602,7 +14975,7 @@ pub fn native_numbering() -> NativeFuncData {
             positional: true,
             named: false,
             variadic: true,
-            required: false,
+            required: true,
             settable: false,
           },
         ],
@@ -14643,6 +15016,7 @@ pub fn native_outline_entry_indented() -> NativeFuncData {
         name="indented",
         title="Indented",
         docs="A helper function for producing an indented entry layout: Lays out a prefix and the rest of the entry in an indent-aware way.",
+        keywords=[],
         contextual=true,
         params=[
           {
@@ -14682,7 +15056,11 @@ pub fn native_outline_entry_indented() -> NativeFuncData {
             name: "gap",
             docs: "The gap between the prefix and the inner content.",
             input: () => input_of((Ty::new() : Ty[Length])),
-            default: None,
+            default: Some(() => {
+              IntoValue::into_value(impl_outline_entry_indented__gap_default()) catch {
+                _ => None
+              }
+            }),
             positional: false,
             named: true,
             variadic: false,
@@ -14740,6 +15118,7 @@ pub fn native_outline_entry_prefix() -> NativeFuncData {
         name="prefix",
         title="Prefix",
         docs="Formats the element's numbering (if any).",
+        keywords=[],
         contextual=true,
         params=[
           {
@@ -14790,6 +15169,7 @@ pub fn native_outline_entry_inner() -> NativeFuncData {
         name="inner",
         title="Inner",
         docs="Creates the default inner content of the entry.",
+        keywords=[],
         contextual=true,
         params=[
           {
@@ -14840,6 +15220,7 @@ pub fn native_outline_entry_body() -> NativeFuncData {
         name="body",
         title="Body",
         docs="The content which is displayed in place of the referred element at its entry in the outline. For a heading, this is its @heading.body[`body`]; for a figure a caption and for equations, it is empty.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -14890,6 +15271,7 @@ pub fn native_outline_entry_page() -> NativeFuncData {
         name="page",
         title="Page",
         docs="The page number of this entry's element, formatted with the numbering set for the referenced page.",
+        keywords=[],
         contextual=true,
         params=[
           {
@@ -14940,6 +15322,7 @@ pub fn native_lower() -> NativeFuncData {
         name="lower",
         title="Lowercase",
         docs="Converts a string or content to lowercase.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -14990,6 +15373,7 @@ pub fn native_upper() -> NativeFuncData {
         name="upper",
         title="Uppercase",
         docs="Converts a string or content to uppercase.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -15040,6 +15424,7 @@ pub fn native_lorem() -> NativeFuncData {
         name="lorem",
         title="Lorem",
         docs="Creates blind text.",
+        keywords=["Blind Text"],
         contextual=false,
         params=[
           {
@@ -15090,6 +15475,7 @@ pub fn native_color_luma() -> NativeFuncData {
         name="luma",
         title="Luma",
         docs="Create a grayscale color.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -15160,6 +15546,7 @@ pub fn native_color_oklab() -> NativeFuncData {
         name="oklab",
         title="Oklab",
         docs="Create an #link(\"https://bottosson.github.io/posts/oklab/\")[Oklab] color.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -15252,6 +15639,7 @@ pub fn native_color_oklch() -> NativeFuncData {
         name="oklch",
         title="Oklch",
         docs="Create an #link(\"https://bottosson.github.io/posts/oklab/\")[Oklch] color.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -15344,6 +15732,7 @@ pub fn native_color_linear_rgb() -> NativeFuncData {
         name="linear-rgb",
         title="Linear RGB",
         docs="Create an RGB(A) color with linear luma.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -15436,6 +15825,7 @@ pub fn native_color_rgb() -> NativeFuncData {
         name="rgb",
         title="RGB",
         docs="Create an RGB(A) color.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -15539,6 +15929,7 @@ pub fn native_color_cmyk() -> NativeFuncData {
         name="cmyk",
         title="CMYK",
         docs="Create a CMYK color.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -15631,6 +16022,7 @@ pub fn native_color_hsl() -> NativeFuncData {
         name="hsl",
         title="HSL",
         docs="Create an HSL color.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -15723,6 +16115,7 @@ pub fn native_color_hsv() -> NativeFuncData {
         name="hsv",
         title="HSV",
         docs="Create an HSV color.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -15815,6 +16208,7 @@ pub fn native_color_components() -> NativeFuncData {
         name="components",
         title="Components",
         docs="Extracts the components of this color.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -15832,7 +16226,7 @@ pub fn native_color_components() -> NativeFuncData {
             name: "alpha",
             docs: "Whether to include the alpha component.",
             input: () => input_of((Ty::new() : Ty[Bool])),
-            default: None,
+            default: Some(() => IntoValue::into_value((true : Bool))),
             positional: false,
             named: true,
             variadic: false,
@@ -15880,6 +16274,7 @@ pub fn native_color_space() -> NativeFuncData {
         name="space",
         title="Space",
         docs="Returns the constructor function for this color's space.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -15930,6 +16325,7 @@ pub fn native_color_to_hex() -> NativeFuncData {
         name="to-hex",
         title="To Hex",
         docs="Returns the color's RGB(A) hex representation (such as `#ffaa32` or `#020304fe`). The alpha component (last two digits in `#020304fe`) is omitted if it is equal to `ff` (255 / 100%).",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -15980,6 +16376,7 @@ pub fn native_color_lighten() -> NativeFuncData {
         name="lighten",
         title="Lighten",
         docs="Lightens a color by a given factor.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -16042,6 +16439,7 @@ pub fn native_color_darken() -> NativeFuncData {
         name="darken",
         title="Darken",
         docs="Darkens a color by a given factor.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -16104,6 +16502,7 @@ pub fn native_color_saturate() -> NativeFuncData {
         name="saturate",
         title="Saturate",
         docs="Increases the saturation of a color by a given factor.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -16166,6 +16565,7 @@ pub fn native_color_desaturate() -> NativeFuncData {
         name="desaturate",
         title="Desaturate",
         docs="Decreases the saturation of a color by a given factor.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -16228,6 +16628,7 @@ pub fn native_color_negate() -> NativeFuncData {
         name="negate",
         title="Negate",
         docs="Produces the complementary color using a provided color space. You can think of it as the opposite side on a color wheel.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -16245,7 +16646,11 @@ pub fn native_color_negate() -> NativeFuncData {
             name: "space",
             docs: "The color space used for the transformation. By default, a perceptual color space is used.",
             input: () => input_of((Ty::new() : Ty[Value])),
-            default: None,
+            default: Some(() => {
+              IntoValue::into_value(impl_color_negate__space_default()) catch {
+                _ => None
+              }
+            }),
             positional: false,
             named: true,
             variadic: false,
@@ -16293,6 +16698,7 @@ pub fn native_color_rotate() -> NativeFuncData {
         name="rotate",
         title="Rotate",
         docs="Rotates the hue of the color by a given angle.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -16321,7 +16727,11 @@ pub fn native_color_rotate() -> NativeFuncData {
             name: "space",
             docs: "The color space used to rotate. By default, this happens in a perceptual color space (@color.oklch[`oklch`]).",
             input: () => input_of((Ty::new() : Ty[Value])),
-            default: None,
+            default: Some(() => {
+              IntoValue::into_value(impl_color_rotate__space_default()) catch {
+                _ => None
+              }
+            }),
             positional: false,
             named: true,
             variadic: false,
@@ -16370,6 +16780,7 @@ pub fn native_color_mix() -> NativeFuncData {
         name="mix",
         title="Mix",
         docs="Create a color by mixing two or more colors.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -16380,14 +16791,18 @@ pub fn native_color_mix() -> NativeFuncData {
             positional: true,
             named: false,
             variadic: true,
-            required: false,
+            required: true,
             settable: false,
           },
           {
             name: "space",
             docs: "The color space to mix in. By default, this happens in a perceptual color space (@color.oklab[`oklab`]) or, if all colors use the same spot colorant, using that colorant.",
             input: () => input_of((Ty::new() : Ty[Value])),
-            default: None,
+            default: Some(() => {
+              IntoValue::into_value(impl_color_mix__space_default()) catch {
+                _ => None
+              }
+            }),
             positional: false,
             named: true,
             variadic: false,
@@ -16435,6 +16850,7 @@ pub fn native_color_transparentize() -> NativeFuncData {
         name="transparentize",
         title="Transparentize",
         docs="Makes a color more transparent by a given factor.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -16497,6 +16913,7 @@ pub fn native_color_opacify() -> NativeFuncData {
         name="opacify",
         title="Opacify",
         docs="Makes a color more opaque by a given scale.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -16556,9 +16973,10 @@ pub fn native_spot_colorant_construct() -> NativeFuncData {
     Some(d) => d
     None => {
       let d = NativeFuncData::new(
-        name="construct",
+        name="spot",
         title="Construct",
         docs="Create a new spot colorant.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -16621,6 +17039,7 @@ pub fn native_spot_colorant_tint() -> NativeFuncData {
         name="tint",
         title="Tint",
         docs="Create a spot color at a specific tint of this colorant.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -16683,6 +17102,7 @@ pub fn native_gradient_linear() -> NativeFuncData {
         name="linear",
         title="Linear Gradient",
         docs="Creates a new linear gradient, in which colors transition along a straight line.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -16693,14 +17113,18 @@ pub fn native_gradient_linear() -> NativeFuncData {
             positional: true,
             named: false,
             variadic: true,
-            required: false,
+            required: true,
             settable: false,
           },
           {
             name: "space",
             docs: "The color space in which to interpolate the gradient.",
             input: () => input_of((Ty::new() : Ty[Value])),
-            default: None,
+            default: Some(() => {
+              IntoValue::into_value(impl_gradient_linear__space_default().v) catch {
+                _ => None
+              }
+            }),
             positional: false,
             named: true,
             variadic: false,
@@ -16711,7 +17135,11 @@ pub fn native_gradient_linear() -> NativeFuncData {
             name: "relative",
             docs: "The @gradient:relativeness[relative placement] of the gradient.",
             input: () => input_of((Ty::new() : Ty[Value])),
-            default: None,
+            default: Some(() => {
+              IntoValue::into_value(impl_gradient_linear__relative_default()) catch {
+                _ => None
+              }
+            }),
             positional: false,
             named: true,
             variadic: false,
@@ -16722,7 +17150,11 @@ pub fn native_gradient_linear() -> NativeFuncData {
             name: "dir",
             docs: "The direction of the gradient.",
             input: () => input_of((Ty::new() : Ty[Value])),
-            default: None,
+            default: Some(() => {
+              IntoValue::into_value(impl_gradient_linear__dir_default()) catch {
+                _ => None
+              }
+            }),
             positional: true,
             named: false,
             variadic: false,
@@ -16761,7 +17193,7 @@ fn native_gradient_linear_call(
   let stops_ : Array[@syntax.Spanned[Value]] = args.all_spanned()
   let space_ : @syntax.Spanned[Value] = match args.named_spanned("space") {
     Some(v) => v
-    None => { v: impl_gradient_linear__space_default(), span: args.span, }
+    None => impl_gradient_linear__space_default()
   }
   let relative_ : Value = match args.named("relative") {
     Some(v) => v
@@ -16784,6 +17216,7 @@ pub fn native_gradient_radial() -> NativeFuncData {
         name="radial",
         title="Radial Gradient",
         docs="Creates a new radial gradient, in which colors radiate away from an origin.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -16794,14 +17227,18 @@ pub fn native_gradient_radial() -> NativeFuncData {
             positional: true,
             named: false,
             variadic: true,
-            required: false,
+            required: true,
             settable: false,
           },
           {
             name: "space",
             docs: "The color space in which to interpolate the gradient.",
             input: () => input_of((Ty::new() : Ty[Value])),
-            default: None,
+            default: Some(() => {
+              IntoValue::into_value(impl_gradient_radial__space_default().v) catch {
+                _ => None
+              }
+            }),
             positional: false,
             named: true,
             variadic: false,
@@ -16812,7 +17249,11 @@ pub fn native_gradient_radial() -> NativeFuncData {
             name: "relative",
             docs: "The @gradient:relativeness[relative placement] of the gradient.",
             input: () => input_of((Ty::new() : Ty[Value])),
-            default: None,
+            default: Some(() => {
+              IntoValue::into_value(impl_gradient_radial__relative_default()) catch {
+                _ => None
+              }
+            }),
             positional: false,
             named: true,
             variadic: false,
@@ -16823,7 +17264,11 @@ pub fn native_gradient_radial() -> NativeFuncData {
             name: "center",
             docs: "The center of the end circle of the gradient.",
             input: () => input_of((Ty::new() : Ty[Value])),
-            default: None,
+            default: Some(() => {
+              IntoValue::into_value(impl_gradient_radial__center_default()) catch {
+                _ => None
+              }
+            }),
             positional: false,
             named: true,
             variadic: false,
@@ -16834,7 +17279,11 @@ pub fn native_gradient_radial() -> NativeFuncData {
             name: "radius",
             docs: "The radius of the end circle of the gradient.",
             input: () => input_of((Ty::new() : Ty[Ratio])),
-            default: None,
+            default: Some(() => {
+              IntoValue::into_value(impl_gradient_radial__radius_default().v) catch {
+                _ => None
+              }
+            }),
             positional: false,
             named: true,
             variadic: false,
@@ -16845,7 +17294,13 @@ pub fn native_gradient_radial() -> NativeFuncData {
             name: "focal-center",
             docs: "The center of the focal circle of the gradient.",
             input: () => input_of((Ty::new() : Ty[Value])),
-            default: None,
+            default: Some(() => {
+              IntoValue::into_value(
+                impl_gradient_radial__focal_center_default(),
+              ) catch {
+                _ => None
+              }
+            }),
             positional: false,
             named: true,
             variadic: false,
@@ -16856,7 +17311,13 @@ pub fn native_gradient_radial() -> NativeFuncData {
             name: "focal-radius",
             docs: "The radius of the focal circle of the gradient.",
             input: () => input_of((Ty::new() : Ty[Ratio])),
-            default: None,
+            default: Some(() => {
+              IntoValue::into_value(
+                impl_gradient_radial__focal_radius_default().v,
+              ) catch {
+                _ => None
+              }
+            }),
             positional: false,
             named: true,
             variadic: false,
@@ -16884,7 +17345,7 @@ fn native_gradient_radial_call(
   let stops_ : Array[@syntax.Spanned[Value]] = args.all_spanned()
   let space_ : @syntax.Spanned[Value] = match args.named_spanned("space") {
     Some(v) => v
-    None => { v: impl_gradient_radial__space_default(), span: args.span, }
+    None => impl_gradient_radial__space_default()
   }
   let relative_ : Value = match args.named("relative") {
     Some(v) => v
@@ -16896,7 +17357,7 @@ fn native_gradient_radial_call(
   }
   let radius_ : @syntax.Spanned[Ratio] = match args.named_spanned("radius") {
     Some(v) => v
-    None => { v: impl_gradient_radial__radius_default(), span: args.span, }
+    None => impl_gradient_radial__radius_default()
   }
   let focal_center_ : Value = match args.named("focal-center") {
     Some(v) => v
@@ -16905,8 +17366,7 @@ fn native_gradient_radial_call(
   let focal_radius_ : @syntax.Spanned[Ratio] = match
     args.named_spanned("focal-radius") {
     Some(v) => v
-    None =>
-      { v: impl_gradient_radial__focal_radius_default(), span: args.span, }
+    None => impl_gradient_radial__focal_radius_default()
   }
   args.take().finish()
   let output = impl_gradient_radial(
@@ -16935,6 +17395,7 @@ pub fn native_gradient_conic() -> NativeFuncData {
         name="conic",
         title="Conic Gradient",
         docs="Creates a new conic gradient, in which colors change radially around a center point.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -16945,14 +17406,18 @@ pub fn native_gradient_conic() -> NativeFuncData {
             positional: true,
             named: false,
             variadic: true,
-            required: false,
+            required: true,
             settable: false,
           },
           {
             name: "angle",
             docs: "The angle of the gradient.",
             input: () => input_of((Ty::new() : Ty[Angle])),
-            default: None,
+            default: Some(() => {
+              IntoValue::into_value(impl_gradient_conic__angle_default()) catch {
+                _ => None
+              }
+            }),
             positional: false,
             named: true,
             variadic: false,
@@ -16963,7 +17428,11 @@ pub fn native_gradient_conic() -> NativeFuncData {
             name: "space",
             docs: "The color space in which to interpolate the gradient.",
             input: () => input_of((Ty::new() : Ty[Value])),
-            default: None,
+            default: Some(() => {
+              IntoValue::into_value(impl_gradient_conic__space_default().v) catch {
+                _ => None
+              }
+            }),
             positional: false,
             named: true,
             variadic: false,
@@ -16974,7 +17443,11 @@ pub fn native_gradient_conic() -> NativeFuncData {
             name: "relative",
             docs: "The @gradient:relativeness[relative placement] of the gradient.",
             input: () => input_of((Ty::new() : Ty[Value])),
-            default: None,
+            default: Some(() => {
+              IntoValue::into_value(impl_gradient_conic__relative_default()) catch {
+                _ => None
+              }
+            }),
             positional: false,
             named: true,
             variadic: false,
@@ -16985,7 +17458,11 @@ pub fn native_gradient_conic() -> NativeFuncData {
             name: "center",
             docs: "The center of the circle of the gradient.",
             input: () => input_of((Ty::new() : Ty[Value])),
-            default: None,
+            default: Some(() => {
+              IntoValue::into_value(impl_gradient_conic__center_default()) catch {
+                _ => None
+              }
+            }),
             positional: false,
             named: true,
             variadic: false,
@@ -17017,7 +17494,7 @@ fn native_gradient_conic_call(
   }
   let space_ : @syntax.Spanned[Value] = match args.named_spanned("space") {
     Some(v) => v
-    None => { v: impl_gradient_conic__space_default(), span: args.span, }
+    None => impl_gradient_conic__space_default()
   }
   let relative_ : Value = match args.named("relative") {
     Some(v) => v
@@ -17052,6 +17529,7 @@ pub fn native_gradient_sharp() -> NativeFuncData {
         name="sharp",
         title="Sharp",
         docs="Creates a sharp version of this gradient.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -17080,7 +17558,11 @@ pub fn native_gradient_sharp() -> NativeFuncData {
             name: "smoothness",
             docs: "How much to smooth the gradient.",
             input: () => input_of((Ty::new() : Ty[Ratio])),
-            default: None,
+            default: Some(() => {
+              IntoValue::into_value(impl_gradient_sharp__smoothness_default().v) catch {
+                _ => None
+              }
+            }),
             positional: false,
             named: true,
             variadic: false,
@@ -17110,7 +17592,7 @@ fn native_gradient_sharp_call(
   let smoothness_ : @syntax.Spanned[Ratio] = match
     args.named_spanned("smoothness") {
     Some(v) => v
-    None => { v: impl_gradient_sharp__smoothness_default(), span: args.span, }
+    None => impl_gradient_sharp__smoothness_default()
   }
   args.take().finish()
   let output = impl_gradient_sharp(self_, steps_, smoothness_)
@@ -17130,6 +17612,7 @@ pub fn native_gradient_repeat() -> NativeFuncData {
         name="repeat",
         title="Repeat",
         docs="Repeats this gradient a given number of times, optionally mirroring it at every second repetition.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -17158,7 +17641,7 @@ pub fn native_gradient_repeat() -> NativeFuncData {
             name: "mirror",
             docs: "Whether to mirror the gradient at every second repetition, i.e., the first instance (and all odd ones) stays unchanged.",
             input: () => input_of((Ty::new() : Ty[Bool])),
-            default: None,
+            default: Some(() => IntoValue::into_value((false : Bool))),
             positional: false,
             named: true,
             variadic: false,
@@ -17207,6 +17690,7 @@ pub fn native_gradient_kind() -> NativeFuncData {
         name="kind",
         title="Kind",
         docs="Returns the kind of this gradient.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -17257,6 +17741,7 @@ pub fn native_gradient_stops() -> NativeFuncData {
         name="stops",
         title="Stops",
         docs="Returns the stops of this gradient.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -17307,6 +17792,7 @@ pub fn native_gradient_space() -> NativeFuncData {
         name="space",
         title="Space",
         docs="Returns the mixing space of this gradient.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -17357,6 +17843,7 @@ pub fn native_gradient_relative() -> NativeFuncData {
         name="relative",
         title="Relative",
         docs="Returns the relative placement of this gradient.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -17407,6 +17894,7 @@ pub fn native_gradient_angle() -> NativeFuncData {
         name="angle",
         title="Angle",
         docs="Returns the angle of this gradient.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -17457,6 +17945,7 @@ pub fn native_gradient_center() -> NativeFuncData {
         name="center",
         title="Center",
         docs="Returns the center of this gradient.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -17507,6 +17996,7 @@ pub fn native_gradient_radius() -> NativeFuncData {
         name="radius",
         title="Radius",
         docs="Returns the radius of this gradient.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -17557,6 +18047,7 @@ pub fn native_gradient_focal_center() -> NativeFuncData {
         name="focal-center",
         title="Focal Center",
         docs="Returns the focal-center of this gradient.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -17607,6 +18098,7 @@ pub fn native_gradient_focal_radius() -> NativeFuncData {
         name="focal-radius",
         title="Focal Radius",
         docs="Returns the focal-radius of this gradient.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -17657,6 +18149,7 @@ pub fn native_gradient_sample() -> NativeFuncData {
         name="sample",
         title="Sample",
         docs="Sample the gradient at a given position.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -17719,6 +18212,7 @@ pub fn native_gradient_samples() -> NativeFuncData {
         name="samples",
         title="Samples",
         docs="Samples the gradient at multiple positions at once and returns the results as an array.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -17740,7 +18234,7 @@ pub fn native_gradient_samples() -> NativeFuncData {
             positional: true,
             named: false,
             variadic: true,
-            required: false,
+            required: true,
             settable: false,
           },
         ],
@@ -17781,6 +18275,7 @@ pub fn native_polygon_elem_regular() -> NativeFuncData {
         name="regular",
         title="Regular Polygon",
         docs="A regular polygon, defined by its size and number of vertices.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -17809,7 +18304,11 @@ pub fn native_polygon_elem_regular() -> NativeFuncData {
             name: "size",
             docs: "The diameter of the #link(\"https://en.wikipedia.org/wiki/Circumcircle\")[circumcircle] of the regular polygon.",
             input: () => input_of((Ty::new() : Ty[Length])),
-            default: None,
+            default: Some(() => {
+              IntoValue::into_value(impl_polygon_elem_regular__size_default()) catch {
+                _ => None
+              }
+            }),
             positional: false,
             named: true,
             variadic: false,
@@ -17820,7 +18319,7 @@ pub fn native_polygon_elem_regular() -> NativeFuncData {
             name: "vertices",
             docs: "The number of vertices in the polygon.",
             input: () => input_of((Ty::new() : Ty[U64])),
-            default: None,
+            default: Some(() => IntoValue::into_value((U64(3L) : U64))),
             positional: false,
             named: true,
             variadic: false,
@@ -17872,9 +18371,10 @@ pub fn native_stroke_construct() -> NativeFuncData {
     Some(d) => d
     None => {
       let d = NativeFuncData::new(
-        name="construct",
+        name="stroke",
         title="Construct",
         docs="Converts a value to a stroke or constructs a stroke with the given parameters.",
+        keywords=[],
         contextual=false,
         params=[
           {
@@ -17975,16 +18475,21 @@ pub fn native_tiling_construct() -> NativeFuncData {
     Some(d) => d
     None => {
       let d = NativeFuncData::new(
-        name="construct",
+        name="tiling",
         title="Construct",
         docs="Construct a new tiling.",
+        keywords=[],
         contextual=false,
         params=[
           {
             name: "size",
             docs: "The bounding box of each cell of the tiling, specified as a `(x, y)` pair.",
             input: () => input_of((Ty::new() : Ty[Value])),
-            default: None,
+            default: Some(() => {
+              IntoValue::into_value(impl_tiling_construct__size_default().v) catch {
+                _ => None
+              }
+            }),
             positional: false,
             named: true,
             variadic: false,
@@ -17995,7 +18500,11 @@ pub fn native_tiling_construct() -> NativeFuncData {
             name: "spacing",
             docs: "The spacing between cells of the tiling, specified as a `(x, y)` pair.",
             input: () => input_of((Ty::new() : Ty[Value])),
-            default: None,
+            default: Some(() => {
+              IntoValue::into_value(impl_tiling_construct__spacing_default().v) catch {
+                _ => None
+              }
+            }),
             positional: false,
             named: true,
             variadic: false,
@@ -18006,7 +18515,11 @@ pub fn native_tiling_construct() -> NativeFuncData {
             name: "offset",
             docs: "Shifts the entire tile grid without affecting the tile size or spacing.",
             input: () => input_of((Ty::new() : Ty[Value])),
-            default: None,
+            default: Some(() => {
+              IntoValue::into_value(impl_tiling_construct__offset_default().v) catch {
+                _ => None
+              }
+            }),
             positional: false,
             named: true,
             variadic: false,
@@ -18017,7 +18530,11 @@ pub fn native_tiling_construct() -> NativeFuncData {
             name: "angle",
             docs: "Rotates the tiles and the grid clockwise about the offset coordinates by the specified angle. The rotation is applied after the offset.",
             input: () => input_of((Ty::new() : Ty[Angle])),
-            default: None,
+            default: Some(() => {
+              IntoValue::into_value(impl_tiling_construct__angle_default().v) catch {
+                _ => None
+              }
+            }),
             positional: false,
             named: true,
             variadic: false,
@@ -18028,7 +18545,11 @@ pub fn native_tiling_construct() -> NativeFuncData {
             name: "relative",
             docs: "Determines relative to which element's bounding box the tiling is drawn.",
             input: () => input_of((Ty::new() : Ty[Value])),
-            default: None,
+            default: Some(() => {
+              IntoValue::into_value(impl_tiling_construct__relative_default()) catch {
+                _ => None
+              }
+            }),
             positional: false,
             named: true,
             variadic: false,
@@ -18066,19 +18587,19 @@ fn native_tiling_construct_call(
   ignore(context)
   let size_ : @syntax.Spanned[Value] = match args.named_spanned("size") {
     Some(v) => v
-    None => { v: impl_tiling_construct__size_default(), span: args.span, }
+    None => impl_tiling_construct__size_default()
   }
   let spacing_ : @syntax.Spanned[Value] = match args.named_spanned("spacing") {
     Some(v) => v
-    None => { v: impl_tiling_construct__spacing_default(), span: args.span, }
+    None => impl_tiling_construct__spacing_default()
   }
   let offset_ : @syntax.Spanned[Value] = match args.named_spanned("offset") {
     Some(v) => v
-    None => { v: impl_tiling_construct__offset_default(), span: args.span, }
+    None => impl_tiling_construct__offset_default()
   }
   let angle_ : @syntax.Spanned[Angle] = match args.named_spanned("angle") {
     Some(v) => v
-    None => { v: impl_tiling_construct__angle_default(), span: args.span, }
+    None => impl_tiling_construct__angle_default()
   }
   let relative_ : Value = match args.named("relative") {
     Some(v) => v
@@ -18101,7 +18622,7 @@ fn native_tiling_construct_call(
 
 ///|
 fn scope_assert() -> Scope {
-  let s = Scope::new()
+  let s = Scope::deduplicating()
   s.define_func(native_assert_eq()) |> ignore
   s.define_func(native_assert_ne()) |> ignore
   s
@@ -18109,35 +18630,35 @@ fn scope_assert() -> Scope {
 
 ///|
 fn scope_plugin() -> Scope {
-  let s = Scope::new()
+  let s = Scope::deduplicating()
   s.define_func(native_plugin_transition()) |> ignore
   s
 }
 
 ///|
 fn scope_cbor() -> Scope {
-  let s = Scope::new()
+  let s = Scope::deduplicating()
   s.define_func(native_cbor_encode()) |> ignore
   s
 }
 
 ///|
 fn scope_json() -> Scope {
-  let s = Scope::new()
+  let s = Scope::deduplicating()
   s.define_func(native_json_encode()) |> ignore
   s
 }
 
 ///|
 fn scope_toml() -> Scope {
-  let s = Scope::new()
+  let s = Scope::deduplicating()
   s.define_func(native_toml_encode()) |> ignore
   s
 }
 
 ///|
 fn scope_yaml() -> Scope {
-  let s = Scope::new()
+  let s = Scope::deduplicating()
   s.define_func(native_yaml_encode()) |> ignore
   s
 }
@@ -18146,7 +18667,7 @@ fn scope_yaml() -> Scope {
 /// Builds the scopes of native types, elements and functions.
 fn register_scopes() -> Unit {
   Type::args().0.register(data => {
-    let s = Scope::new()
+    let s = Scope::deduplicating()
     s.define_func(native_args_len()) |> ignore
     s.define_func(native_args_at()) |> ignore
     s.define_func(native_args_to_pos()) |> ignore
@@ -18157,7 +18678,7 @@ fn register_scopes() -> Unit {
     data.set_constructor(native_args_construct())
   })
   Type::array().0.register(data => {
-    let s = Scope::new()
+    let s = Scope::deduplicating()
     s.define_func(native_array_len()) |> ignore
     s.define_func(native_array_first()) |> ignore
     s.define_func(native_array_last()) |> ignore
@@ -18195,7 +18716,7 @@ fn register_scopes() -> Unit {
     data.set_constructor(native_array_construct())
   })
   Type::bytes().0.register(data => {
-    let s = Scope::new()
+    let s = Scope::deduplicating()
     s.define_func(native_bytes_len()) |> ignore
     s.define_func(native_bytes_at()) |> ignore
     s.define_func(native_bytes_slice()) |> ignore
@@ -18203,7 +18724,7 @@ fn register_scopes() -> Unit {
     data.set_constructor(native_bytes_construct())
   })
   Type::content().0.register(data => {
-    let s = Scope::new()
+    let s = Scope::deduplicating()
     s.define_func(native_content_func()) |> ignore
     s.define_func(native_content_has()) |> ignore
     s.define_func(native_content_at()) |> ignore
@@ -18212,7 +18733,7 @@ fn register_scopes() -> Unit {
     data.set_scope(s)
   })
   Type::datetime().0.register(data => {
-    let s = Scope::new()
+    let s = Scope::deduplicating()
     s.define_func(native_datetime_today()) |> ignore
     s.define_func(native_datetime_display()) |> ignore
     s.define_func(native_datetime_year()) |> ignore
@@ -18227,13 +18748,13 @@ fn register_scopes() -> Unit {
     data.set_constructor(native_datetime_construct())
   })
   Type::decimal().0.register(data => {
-    let s = Scope::new()
+    let s = Scope::deduplicating()
 
     data.set_scope(s)
     data.set_constructor(native_decimal_construct())
   })
   Type::dict().0.register(data => {
-    let s = Scope::new()
+    let s = Scope::deduplicating()
     s.define_func(native_dict_len()) |> ignore
     s.define_func(native_dict_at()) |> ignore
     s.define_func(native_dict_insert()) |> ignore
@@ -18247,7 +18768,7 @@ fn register_scopes() -> Unit {
     data.set_constructor(native_dict_construct())
   })
   Type::duration().0.register(data => {
-    let s = Scope::new()
+    let s = Scope::deduplicating()
     s.define_func(native_duration_seconds()) |> ignore
     s.define_func(native_duration_minutes()) |> ignore
     s.define_func(native_duration_hours()) |> ignore
@@ -18257,7 +18778,7 @@ fn register_scopes() -> Unit {
     data.set_constructor(native_duration_construct())
   })
   Type::float().0.register(data => {
-    let s = Scope::new()
+    let s = Scope::deduplicating()
     s.define("inf", impl_f64_const_inf()) |> ignore
     s.define("nan", impl_f64_const_nan()) |> ignore
     s.define_func(native_f64_is_nan()) |> ignore
@@ -18269,13 +18790,13 @@ fn register_scopes() -> Unit {
     data.set_constructor(native_f64_construct())
   })
   Type::func().0.register(data => {
-    let s = Scope::new()
+    let s = Scope::deduplicating()
     s.define_func(native_func_with()) |> ignore
     s.define_func(native_func_where()) |> ignore
     data.set_scope(s)
   })
   Type::int().0.register(data => {
-    let s = Scope::new()
+    let s = Scope::deduplicating()
     s.define("max", impl_i64_const_max()) |> ignore
     s.define("min", impl_i64_const_min()) |> ignore
     s.define_func(native_i64_signum()) |> ignore
@@ -18291,19 +18812,19 @@ fn register_scopes() -> Unit {
     data.set_constructor(native_i64_construct())
   })
   Type::label().0.register(data => {
-    let s = Scope::new()
+    let s = Scope::deduplicating()
 
     data.set_scope(s)
     data.set_constructor(native_label_construct())
   })
   Type::path().0.register(data => {
-    let s = Scope::new()
+    let s = Scope::deduplicating()
 
     data.set_scope(s)
     data.set_constructor(native_rooted_path_construct())
   })
   Type::selector().0.register(data => {
-    let s = Scope::new()
+    let s = Scope::deduplicating()
     s.define_func(native_selector_or()) |> ignore
     s.define_func(native_selector_and()) |> ignore
     s.define_func(native_selector_before()) |> ignore
@@ -18313,7 +18834,7 @@ fn register_scopes() -> Unit {
     data.set_constructor(native_selector_construct())
   })
   Type::str().0.register(data => {
-    let s = Scope::new()
+    let s = Scope::deduplicating()
     s.define_func(native_str_len()) |> ignore
     s.define_func(native_str_first()) |> ignore
     s.define_func(native_str_last()) |> ignore
@@ -18339,31 +18860,31 @@ fn register_scopes() -> Unit {
     data.set_constructor(native_str_construct())
   })
   Type::regex().0.register(data => {
-    let s = Scope::new()
+    let s = Scope::deduplicating()
 
     data.set_scope(s)
     data.set_constructor(native_regex_construct())
   })
   Type::symbol().0.register(data => {
-    let s = Scope::new()
+    let s = Scope::deduplicating()
 
     data.set_scope(s)
     data.set_constructor(native_symbol_construct())
   })
   Type::type_().0.register(data => {
-    let s = Scope::new()
+    let s = Scope::deduplicating()
 
     data.set_scope(s)
     data.set_constructor(native_type_construct())
   })
   Type::version().0.register(data => {
-    let s = Scope::new()
+    let s = Scope::deduplicating()
     s.define_func(native_version_at()) |> ignore
     data.set_scope(s)
     data.set_constructor(native_version_construct())
   })
   Type::counter().0.register(data => {
-    let s = Scope::new()
+    let s = Scope::deduplicating()
     s.define_func(native_counter_get()) |> ignore
     s.define_func(native_counter_display()) |> ignore
     s.define_func(native_counter_at()) |> ignore
@@ -18374,14 +18895,14 @@ fn register_scopes() -> Unit {
     data.set_constructor(native_counter_construct())
   })
   Type::location().0.register(data => {
-    let s = Scope::new()
+    let s = Scope::deduplicating()
     s.define_func(native_location_page()) |> ignore
     s.define_func(native_location_page_numbering()) |> ignore
     s.define_func(native_location_position()) |> ignore
     data.set_scope(s)
   })
   Type::state().0.register(data => {
-    let s = Scope::new()
+    let s = Scope::deduplicating()
     s.define_func(native_state_get()) |> ignore
     s.define_func(native_state_at()) |> ignore
     s.define_func(native_state_final()) |> ignore
@@ -18390,7 +18911,7 @@ fn register_scopes() -> Unit {
     data.set_constructor(native_state_construct())
   })
   Type::alignment().0.register(data => {
-    let s = Scope::new()
+    let s = Scope::deduplicating()
     s.define("start", impl_alignment_const_start()) |> ignore
     s.define("end", impl_alignment_const_end()) |> ignore
     s.define("left", impl_alignment_const_left()) |> ignore
@@ -18404,13 +18925,13 @@ fn register_scopes() -> Unit {
     data.set_scope(s)
   })
   Type::angle().0.register(data => {
-    let s = Scope::new()
+    let s = Scope::deduplicating()
     s.define_func(native_angle_to_rad()) |> ignore
     s.define_func(native_angle_to_deg()) |> ignore
     data.set_scope(s)
   })
   Type::direction().0.register(data => {
-    let s = Scope::new()
+    let s = Scope::deduplicating()
     s.define("ltr", impl_dir_const_ltr()) |> ignore
     s.define("rtl", impl_dir_const_rtl()) |> ignore
     s.define("ttb", impl_dir_const_ttb()) |> ignore
@@ -18425,7 +18946,7 @@ fn register_scopes() -> Unit {
     data.set_scope(s)
   })
   grid_elem().hooks().scope = () => {
-    let s = Scope::new()
+    let s = Scope::deduplicating()
     s.define_elem(grid_cell_elem()) |> ignore
     s.define_elem(grid_h_line_elem()) |> ignore
     s.define_elem(grid_v_line_elem()) |> ignore
@@ -18434,7 +18955,7 @@ fn register_scopes() -> Unit {
     s
   }
   Type::length().0.register(data => {
-    let s = Scope::new()
+    let s = Scope::deduplicating()
     s.define_func(native_length_to_pt()) |> ignore
     s.define_func(native_length_to_mm()) |> ignore
     s.define_func(native_length_to_cm()) |> ignore
@@ -18443,37 +18964,37 @@ fn register_scopes() -> Unit {
     data.set_scope(s)
   })
   place_elem().hooks().scope = () => {
-    let s = Scope::new()
+    let s = Scope::deduplicating()
     s.define_elem(flush_elem()) |> ignore
     s
   }
   enum_elem().hooks().scope = () => {
-    let s = Scope::new()
+    let s = Scope::deduplicating()
     s.define_elem(enum_item_elem()) |> ignore
     s
   }
   figure_elem().hooks().scope = () => {
-    let s = Scope::new()
+    let s = Scope::deduplicating()
     s.define_elem(figure_caption_elem()) |> ignore
     s
   }
   footnote_elem().hooks().scope = () => {
-    let s = Scope::new()
+    let s = Scope::deduplicating()
     s.define_elem(footnote_entry_elem()) |> ignore
     s
   }
   list_elem().hooks().scope = () => {
-    let s = Scope::new()
+    let s = Scope::deduplicating()
     s.define_elem(list_item_elem()) |> ignore
     s
   }
   outline_elem().hooks().scope = () => {
-    let s = Scope::new()
+    let s = Scope::deduplicating()
     s.define_elem(outline_entry_elem()) |> ignore
     s
   }
   outline_entry_elem().hooks().scope = () => {
-    let s = Scope::new()
+    let s = Scope::deduplicating()
     s.define_func(native_outline_entry_indented()) |> ignore
     s.define_func(native_outline_entry_prefix()) |> ignore
     s.define_func(native_outline_entry_inner()) |> ignore
@@ -18482,12 +19003,12 @@ fn register_scopes() -> Unit {
     s
   }
   par_elem().hooks().scope = () => {
-    let s = Scope::new()
+    let s = Scope::deduplicating()
     s.define_elem(par_line_elem()) |> ignore
     s
   }
   table_elem().hooks().scope = () => {
-    let s = Scope::new()
+    let s = Scope::deduplicating()
     s.define_elem(table_cell_elem()) |> ignore
     s.define_elem(table_h_line_elem()) |> ignore
     s.define_elem(table_v_line_elem()) |> ignore
@@ -18496,17 +19017,17 @@ fn register_scopes() -> Unit {
     s
   }
   terms_elem().hooks().scope = () => {
-    let s = Scope::new()
+    let s = Scope::deduplicating()
     s.define_elem(term_item_elem()) |> ignore
     s
   }
   raw_elem().hooks().scope = () => {
-    let s = Scope::new()
+    let s = Scope::deduplicating()
     s.define_elem(raw_line_elem()) |> ignore
     s
   }
   Type::color().0.register(data => {
-    let s = Scope::new()
+    let s = Scope::deduplicating()
     s.define("black", impl_color_const_black()) |> ignore
     s.define("gray", impl_color_const_gray()) |> ignore
     s.define("white", impl_color_const_white()) |> ignore
@@ -18550,13 +19071,13 @@ fn register_scopes() -> Unit {
     data.set_scope(s)
   })
   Type::spot().0.register(data => {
-    let s = Scope::new()
+    let s = Scope::deduplicating()
     s.define_func(native_spot_colorant_tint()) |> ignore
     data.set_scope(s)
     data.set_constructor(native_spot_colorant_construct())
   })
   curve_elem().hooks().scope = () => {
-    let s = Scope::new()
+    let s = Scope::deduplicating()
     s.define_elem(curve_move_elem()) |> ignore
     s.define_elem(curve_line_elem()) |> ignore
     s.define_elem(curve_quad_elem()) |> ignore
@@ -18565,7 +19086,7 @@ fn register_scopes() -> Unit {
     s
   }
   Type::gradient().0.register(data => {
-    let s = Scope::new()
+    let s = Scope::deduplicating()
     s.define_func(native_gradient_linear()) |> ignore
     s.define_func(native_gradient_radial()) |> ignore
     s.define_func(native_gradient_conic()) |> ignore
@@ -18585,18 +19106,18 @@ fn register_scopes() -> Unit {
     data.set_scope(s)
   })
   polygon_elem().hooks().scope = () => {
-    let s = Scope::new()
+    let s = Scope::deduplicating()
     s.define_func(native_polygon_elem_regular()) |> ignore
     s
   }
   Type::stroke().0.register(data => {
-    let s = Scope::new()
+    let s = Scope::deduplicating()
 
     data.set_scope(s)
     data.set_constructor(native_stroke_construct())
   })
   Type::tiling().0.register(data => {
-    let s = Scope::new()
+    let s = Scope::deduplicating()
 
     data.set_scope(s)
     data.set_constructor(native_tiling_construct())
