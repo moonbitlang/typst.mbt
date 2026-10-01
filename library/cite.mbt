@@ -30,10 +30,14 @@ pub impl Default for CitationForm with fn default() {
 let citation_form_casts : Array[(String, CitationForm, String)] = [
   ("normal", Normal, "Display in the standard way for the active style."),
   (
-    "prose", Prose, "Produces a citation that is suitable for inclusion in a sentence.",
+    "prose",
+    Prose,
+    "Produces a citation that is suitable for inclusion in a sentence.",
   ),
   (
-    "full", Full, "Mimics a bibliography entry, with full information about the cited work.",
+    "full",
+    Full,
+    "Mimics a bibliography entry, with full information about the cited work.",
   ),
   ("author", Author, "Shows only the cited work's author(s)."),
   ("year", Year, "Shows only the cited work's year."),
@@ -41,7 +45,9 @@ let citation_form_casts : Array[(String, CitationForm, String)] = [
 
 ///|
 pub impl Reflect for CitationForm with fn input() {
-  Union(citation_form_casts.map(entry => CastInfo::Value(Str(entry.0), entry.2)))
+  Union(
+    citation_form_casts.map(entry => CastInfo::Value(Str(entry.0), entry.2)),
+  )
 }
 
 ///|

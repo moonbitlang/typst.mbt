@@ -66,7 +66,11 @@ fn OutlineIndent::resolve(
   match self {
     Rel(length) => length.times(depth.to_double())
     Func(func) => {
-      let value = func.call(engine, context, Args::new(func.span(), [Int(depth)]))
+      let value = func.call(
+        engine,
+        context,
+        Args::new(func.span(), [Int(depth)]),
+      )
       at(span, () => value.cast())
     }
   }
@@ -238,10 +242,26 @@ fn impl_outline_entry_indented(
   let value : Rel[Length] = base_indent +
     Rel::from_abs(Length::from_abs(hanging_indent.unwrap_or(Abs::zero())))
   let inset : Sides[Rel[Length]?] = {
-    left: if start == Left { Some(value) } else { None },
-    top: if start == Top { Some(value) } else { None },
-    right: if start == Right { Some(value) } else { None },
-    bottom: if start == Bottom { Some(value) } else { None },
+    left: if start == Left {
+      Some(value)
+    } else {
+      None
+    },
+    top: if start == Top {
+      Some(value)
+    } else {
+      None
+    },
+    right: if start == Right {
+      Some(value)
+    } else {
+      None
+    },
+    bottom: if start == Bottom {
+      Some(value)
+    } else {
+      None
+    },
   }
   BlockElem::new()
   .with_inset(inset)
@@ -369,7 +389,9 @@ pub fn OutlineEntry::build_inner(
 }
 
 ///|
-fn OutlineEntry::outlinable(self : OutlineEntry) -> OutlinableElem raise HintedError {
+fn OutlineEntry::outlinable(
+  self : OutlineEntry,
+) -> OutlinableElem raise HintedError {
   let element = self.element()
   match OutlinableElem::of(element) {
     Some(outlinable) => outlinable
@@ -437,7 +459,9 @@ fn compute_auto_indents(
 ) -> (Rel[Length], Abs?) {
   let elems = engine.introspect(
     query_introspection(
-      prefix_info_elem().where_([(prefix_info_elem_key, Dyn(Location(outline_loc)))]),
+      prefix_info_elem().where_([
+        (prefix_info_elem_key, Dyn(Location(outline_loc))),
+      ]),
       span,
     ),
   )

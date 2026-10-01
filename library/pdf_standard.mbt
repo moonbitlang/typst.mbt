@@ -265,11 +265,11 @@ fn pdf_configuration_finish(
   let range_max = validators.max()
   match version {
     Some(version) if range_min <= version && version <= range_max =>
-      Ok({ validators, version })
+      Ok({ validators, version, })
     Some(version) =>
       Err(VersionDoesNotMatchValidatorsRange(version, validators))
-    None if !validators.is_empty() => Ok({ validators, version: range_max })
-    None => Ok({ validators, version: PdfVersion::default() })
+    None if !validators.is_empty() => Ok({ validators, version: range_max, })
+    None => Ok({ validators, version: PdfVersion::default(), })
   }
 }
 
@@ -288,7 +288,7 @@ pub impl Show for PdfStandards with fn output(_self, logger) {
 
 ///|
 pub impl Default for PdfStandards with fn default() {
-  { config: { validators: { a: None, ua: None }, version: Pdf17 } }
+  { config: { validators: { a: None, ua: None, }, version: Pdf17, }, }
 }
 
 ///|
@@ -588,7 +588,7 @@ fn pdf_attach_elem_path_parse(
   args : Args,
   locals : ParseLocals,
 ) -> Value? raise SourceError {
-  let { v: path, span } : @syntax.Spanned[PathOrStr] = args.expect_spanned(
+  let { v: path, span, } : @syntax.Spanned[PathOrStr] = args.expect_spanned(
     "path",
   )
   let resolved = at(span, () => path.resolve_if_some(span.id()))

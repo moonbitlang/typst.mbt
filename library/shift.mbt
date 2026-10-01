@@ -142,7 +142,7 @@ pub impl FromValue for ShiftSettings with fn from_value(v) {
         Str("super") => Super
         v => raise HintedError(CastInfo::Type(Type::str()).error(v))
       }
-      { typographic, shift, size, kind }
+      { typographic, shift, size, kind, }
     }
     v => raise HintedError(ShiftSettings::input().error(v))
   }

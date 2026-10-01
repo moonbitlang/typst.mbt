@@ -161,7 +161,10 @@ pub fn Url::strip_contact_scheme(self : Url) -> (UrlContactScheme, String)? {
     let prefix = scheme.as_str()
     if self.0.has_prefix(prefix) {
       return Some(
-        (scheme, self.0.unsafe_substring(start=prefix.length(), end=self.0.length())),
+        (
+          scheme,
+          self.0.unsafe_substring(start=prefix.length(), end=self.0.length()),
+        ),
       )
     }
   }

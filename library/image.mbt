@@ -30,7 +30,7 @@ fn image_elem_icc_parse(
 ) -> Value? raise SourceError {
   let icc : @syntax.Spanned[Smart[DataSource]]? = args.named_spanned("icc")
   match icc {
-    Some({ v: Custom(source), span }) => {
+    Some({ v: Custom(source), span, }) => {
       let _loaded = source.load(span, engine.world)
       Some(source.into_value())
     }
