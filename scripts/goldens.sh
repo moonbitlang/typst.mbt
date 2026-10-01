@@ -7,7 +7,7 @@ cargo build --release -q --manifest-path oracle/Cargo.toml
 ORACLE=oracle/target/release/typst-oracle
 SUITE=.repos/typst/tests/suite
 stages=("$@")
-[ ${#stages[@]} -eq 0 ] && stages=(syntax)
+[ ${#stages[@]} -eq 0 ] && stages=(syntax eval)
 for stage in "${stages[@]}"; do
   rm -rf "tests/golden/$stage"
   "$ORACLE" "$stage" "$SUITE" "tests/golden/$stage"

@@ -1,0 +1,138 @@
+//! The `eval` stage: evaluate every test case like the upstream test runner
+//! does (`tests/src/run.rs`, `eval::eval`) and dump the diagnostics plus the
+//! `repr` of the resulting content.
+
+use std::fmt::Write as _;
+use std::path::Path;
+
+use comemo::Track;
+use ecow::EcoVec;
+use rustc_hash::FxHashSet;
+use typst::World;
+use typst::diag::{SourceDiagnostic, SourceResult, Warned};
+use typst::engine::{Route, Sink, Traced};
+use typst::foundations::{Content, Repr};
+use typst_syntax::{DiagSpanKind, FileId};
+
+use crate::collect;
+use crate::world::{TestWorld, parse_features};
+
+/// Dump eval results for every test below `suite` (a path relative to the
+/// current directory, which must be the upstream checkout).
+pub fn dump_eval(suite: &Path, out: &Path) {
+    let mut count = 0;
+    for file in collect::typ_files(suite) {
+        let rel = file.strip_prefix(suite).unwrap();
+        let text = std::fs::read_to_string(&file).unwrap();
+        let mut report = String::new();
+        for test in collect::split_tests(&text) {
+            writeln!(report, "=== {}", test.name).unwrap();
+            report.push_str(&eval_report(&file, &test));
+            count += 1;
+        }
+        let dest = out.join(rel).with_extension("txt");
+        std::fs::create_dir_all(dest.parent().unwrap()).unwrap();
+        std::fs::write(dest, report).unwrap();
+    }
+    eprintln!("evaluated {count} test cases");
+}
+
+/// Evaluate a single test case.
+pub fn eval_report(path: &Path, test: &collect::TestCase) -> String {
+    let features = test
+        .attrs
+        .split_whitespace()
+        .find_map(|a| a.strip_prefix("features(").and_then(|r| r.strip_suffix(')')))
+        .map(parse_features);
+    let source = TestWorld::main_source(path, test.body.clone());
+    let world = TestWorld::new(source, features);
+    let main_id = world.main();
+
+    let mut sink = Sink::new();
+    let output = eval_impl((&world as &dyn World).track(), Traced::default().track(), &mut sink)
+        .map_err(deduplicate);
+    let warned = Warned { output, warnings: sink.warnings() };
+
+    let mut out = String::new();
+    match &warned.output {
+        Ok(content) => {
+            writeln!(out, "ok {}", content.repr()).unwrap();
+        }
+        Err(errors) => {
+            out.push_str("err\n");
+            for diag in errors {
+                write_diag(&mut out, &world, main_id, diag);
+            }
+        }
+    }
+    for diag in &warned.warnings {
+        write_diag(&mut out, &world, main_id, diag);
+    }
+    out
+}
+
+fn eval_impl(
+    world: comemo::Tracked<dyn World + '_>,
+    traced: comemo::Tracked<Traced>,
+    sink: &mut Sink,
+) -> SourceResult<Content> {
+    let main = world.main();
+    let main = world.source(main).expect("valid main file");
+    let content = typst_eval::eval(
+        world,
+        world.library(),
+        traced,
+        sink.track_mut(),
+        Route::default().track(),
+        &main,
+    )?
+    .content();
+    Ok(content)
+}
+
+/// Deduplicate diagnostics (like upstream).
+fn deduplicate(mut diags: EcoVec<SourceDiagnostic>) -> EcoVec<SourceDiagnostic> {
+    let hash =
+        |diag: &SourceDiagnostic| typst_utils::hash128(&(&diag.span, &diag.message));
+    let mut unique = FxHashSet::default();
+    diags.retain(|diag| unique.insert(hash(diag)));
+    diags
+}
+
+fn write_diag(out: &mut String, world: &TestWorld, main: FileId, diag: &SourceDiagnostic) {
+    let severity = match diag.severity {
+        typst::diag::Severity::Error => "error",
+        typst::diag::Severity::Warning => "warning",
+    };
+    writeln!(
+        out,
+        "{severity} {} {:?}",
+        locate(world, main, diag.span.get()),
+        diag.message.as_str()
+    )
+    .unwrap();
+    for hint in &diag.hints {
+        writeln!(out, "  hint {} {:?}", locate(world, main, hint.span.get()), hint.v.as_str())
+            .unwrap();
+    }
+}
+
+/// Render a diagnostic span as `start..end` (main file) or `path:start..end`.
+fn locate(world: &TestWorld, main: FileId, kind: DiagSpanKind) -> String {
+    let (id, range) = match kind {
+        DiagSpanKind::Detached => return "-".into(),
+        DiagSpanKind::Number { id, num, sub_range } => {
+            let Ok(source) = world.source(id) else { return "?".into() };
+            match source.range(num, sub_range) {
+                Some(range) => (id, range),
+                None => return "?".into(),
+            }
+        }
+        DiagSpanKind::Range { id, range } => (id, range),
+    };
+    if id == main {
+        format!("{}..{}", range.start, range.end)
+    } else {
+        format!("{:?}:{}..{}", id.vpath().get_without_slash(), range.start, range.end)
+    }
+}

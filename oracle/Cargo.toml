@@ -7,7 +7,24 @@ description = "Dumps reference outputs of upstream Typst for differential testin
 
 [dependencies]
 typst-syntax = { path = "../.repos/typst/crates/typst-syntax" }
-typst-utils = { path = "../.repos/typst/crates/typst-utils" }
+typst-utils = { path = "../.repos/typst/crates/typst-utils", features = ["full"] }
 unicode-ident = "1.0"
 unicode-math-class = "0.1"
 unicode-script = "0.5"
+typst = { path = "../.repos/typst/crates/typst" }
+typst-eval = { path = "../.repos/typst/crates/typst-eval" }
+typst-library = { path = "../.repos/typst/crates/typst-library" }
+typst-layout = { path = "../.repos/typst/crates/typst-layout" }
+typst-html = { path = "../.repos/typst/crates/typst-html" }
+typst-pdf = { path = "../.repos/typst/crates/typst-pdf" }
+typst-svg = { path = "../.repos/typst/crates/typst-svg" }
+typst-render = { path = "../.repos/typst/crates/typst-render" }
+typst-bundle = { path = "../.repos/typst/crates/typst-bundle" }
+typst-kit = { path = "../.repos/typst/crates/typst-kit", features = ["datetime"] }
+typst-assets = { git = "https://github.com/typst/typst-assets", rev = "94dcb99", features = ["fonts"] }
+typst-dev-assets = { git = "https://github.com/typst/typst-dev-assets", rev = "e26d7ca" }
+comemo = "*"
+ecow = "*"
+parking_lot = "*"
+rustc-hash = "*"
+unscanny = "*"
