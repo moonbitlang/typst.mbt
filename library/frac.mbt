@@ -1,0 +1,65 @@
+// Port of the types of `typst-library/src/math/frac.rs` (`FracStyle`) and
+// the `FracElem` field defaults. The elements are generated.
+
+///|
+fn frac_elem_style_default() -> Value {
+  FracStyle::Vertical.into_value()
+}
+
+///|
+/// Fraction style
+pub(all) enum FracStyle {
+  /// Stacked numerator and denominator with a bar.
+  Vertical
+  /// Numerator and denominator separated by a slash.
+  Skewed
+  /// Numerator and denominator placed inline and parentheses are not
+  /// absorbed.
+  Horizontal
+} derive(Eq, Hash, Debug)
+
+///|
+pub impl Default for FracStyle with fn default() {
+  Vertical
+}
+
+///|
+pub impl Reflect for FracStyle with fn input() {
+  Union([
+    Value(Str("vertical"), "Stacked numerator and denominator with a bar."),
+    Value(Str("skewed"), "Numerator and denominator separated by a slash."),
+    Value(
+      Str("horizontal"),
+      "Numerator and denominator placed inline and parentheses are not absorbed.",
+    ),
+  ])
+}
+
+///|
+pub impl Reflect for FracStyle with fn output() {
+  FracStyle::input()
+}
+
+///|
+pub impl Reflect for FracStyle with fn castable(v) {
+  v is Str("vertical" | "skewed" | "horizontal")
+}
+
+///|
+pub impl IntoValue for FracStyle with fn into_value(self) {
+  match self {
+    Vertical => Str("vertical")
+    Skewed => Str("skewed")
+    Horizontal => Str("horizontal")
+  }
+}
+
+///|
+pub impl FromValue for FracStyle with fn from_value(v) {
+  match v {
+    Str("vertical") => Vertical
+    Str("skewed") => Skewed
+    Str("horizontal") => Horizontal
+    v => raise HintedError(FracStyle::input().error(v))
+  }
+}

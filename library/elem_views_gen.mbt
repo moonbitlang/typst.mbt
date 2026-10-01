@@ -6361,7 +6361,10 @@ pub fn CancelElem::set_cross(v : Bool) -> Style {
 }
 
 ///|
-pub fn CancelElem::angle(self : CancelElem, styles : StyleChain) -> Value {
+pub fn CancelElem::angle(
+  self : CancelElem,
+  styles : StyleChain,
+) -> Smart[CancelAngle] {
   let e = cancel_elem()
   view_cast(
     styles.get_value_with_local(
@@ -6374,7 +6377,7 @@ pub fn CancelElem::angle(self : CancelElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn CancelElem::angle_local(self : CancelElem) -> Value? {
+pub fn CancelElem::angle_local(self : CancelElem) -> Smart[CancelAngle]? {
   match self.0.field_raw(cancel_elem_angle) {
     Some(v) => Some(view_cast(v, "cancel.angle"))
     None => None
@@ -6382,17 +6385,20 @@ pub fn CancelElem::angle_local(self : CancelElem) -> Value? {
 }
 
 ///|
-pub fn CancelElem::with_angle(self : CancelElem, v : Value) -> CancelElem {
+pub fn CancelElem::with_angle(
+  self : CancelElem,
+  v : Smart[CancelAngle],
+) -> CancelElem {
   CancelElem(self.0.with_field(cancel_elem_angle, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn CancelElem::angle_in(styles : StyleChain) -> Value {
+pub fn CancelElem::angle_in(styles : StyleChain) -> Smart[CancelAngle] {
   view_cast(styles.get_field(cancel_elem(), cancel_elem_angle), "cancel.angle")
 }
 
 ///|
-pub fn CancelElem::set_angle(v : Value) -> Style {
+pub fn CancelElem::set_angle(v : Smart[CancelAngle]) -> Style {
   Property(
     Property::new(cancel_elem(), cancel_elem_angle, IntoValue::into_value(v)),
   )
@@ -6781,7 +6787,7 @@ pub fn EquationElem::with_body(
 }
 
 ///|
-pub fn EquationElem::size_in(styles : StyleChain) -> Value {
+pub fn EquationElem::size_in(styles : StyleChain) -> MathSize {
   view_cast(
     styles.get_field(equation_elem(), equation_elem_size),
     "equation.size",
@@ -6789,14 +6795,14 @@ pub fn EquationElem::size_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn EquationElem::set_size(v : Value) -> Style {
+pub fn EquationElem::set_size(v : MathSize) -> Style {
   Property(
     Property::new(equation_elem(), equation_elem_size, IntoValue::into_value(v)),
   )
 }
 
 ///|
-pub fn EquationElem::variant_in(styles : StyleChain) -> Value {
+pub fn EquationElem::variant_in(styles : StyleChain) -> MathVariant? {
   view_cast(
     styles.get_field(equation_elem(), equation_elem_variant),
     "equation.variant",
@@ -6804,7 +6810,7 @@ pub fn EquationElem::variant_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn EquationElem::set_variant(v : Value) -> Style {
+pub fn EquationElem::set_variant(v : MathVariant?) -> Style {
   Property(
     Property::new(
       equation_elem(),
@@ -6868,7 +6874,7 @@ pub fn EquationElem::set_italic(v : Bool?) -> Style {
 }
 
 ///|
-pub fn EquationElem::script_scale_in(styles : StyleChain) -> Value {
+pub fn EquationElem::script_scale_in(styles : StyleChain) -> (I16, I16) {
   view_cast(
     styles.get_field(equation_elem(), equation_elem_script_scale),
     "equation.script-scale",
@@ -6876,7 +6882,7 @@ pub fn EquationElem::script_scale_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn EquationElem::set_script_scale(v : Value) -> Style {
+pub fn EquationElem::set_script_scale(v : (I16, I16)) -> Style {
   Property(
     Property::new(
       equation_elem(),
@@ -6887,7 +6893,7 @@ pub fn EquationElem::set_script_scale(v : Value) -> Style {
 }
 
 ///|
-pub fn EquationElem::locale(self : EquationElem) -> Value? {
+pub fn EquationElem::locale(self : EquationElem) -> Locale? {
   match self.0.field_raw(equation_elem_locale) {
     Some(v) => Some(view_cast(v, "equation.locale"))
     None => None
@@ -6897,7 +6903,7 @@ pub fn EquationElem::locale(self : EquationElem) -> Value? {
 ///|
 pub fn EquationElem::with_locale(
   self : EquationElem,
-  v : Value,
+  v : Locale,
 ) -> EquationElem {
   EquationElem(
     self.0.with_field(equation_elem_locale, IntoValue::into_value(v)),
@@ -6953,7 +6959,7 @@ pub fn FracElem::with_denom(self : FracElem, v : Content) -> FracElem {
 }
 
 ///|
-pub fn FracElem::style(self : FracElem, styles : StyleChain) -> Value {
+pub fn FracElem::style(self : FracElem, styles : StyleChain) -> FracStyle {
   let e = frac_elem()
   view_cast(
     styles.get_value_with_local(
@@ -6966,7 +6972,7 @@ pub fn FracElem::style(self : FracElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn FracElem::style_local(self : FracElem) -> Value? {
+pub fn FracElem::style_local(self : FracElem) -> FracStyle? {
   match self.0.field_raw(frac_elem_style) {
     Some(v) => Some(view_cast(v, "frac.style"))
     None => None
@@ -6974,17 +6980,17 @@ pub fn FracElem::style_local(self : FracElem) -> Value? {
 }
 
 ///|
-pub fn FracElem::with_style(self : FracElem, v : Value) -> FracElem {
+pub fn FracElem::with_style(self : FracElem, v : FracStyle) -> FracElem {
   FracElem(self.0.with_field(frac_elem_style, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn FracElem::style_in(styles : StyleChain) -> Value {
+pub fn FracElem::style_in(styles : StyleChain) -> FracStyle {
   view_cast(styles.get_field(frac_elem(), frac_elem_style), "frac.style")
 }
 
 ///|
-pub fn FracElem::set_style(v : Value) -> Style {
+pub fn FracElem::set_style(v : FracStyle) -> Style {
   Property(
     Property::new(frac_elem(), frac_elem_style, IntoValue::into_value(v)),
   )
@@ -7283,7 +7289,7 @@ pub fn VecElem::pack(self : VecElem) -> Content {
 }
 
 ///|
-pub fn VecElem::delim(self : VecElem, styles : StyleChain) -> Value {
+pub fn VecElem::delim(self : VecElem, styles : StyleChain) -> DelimiterPair {
   let e = vec_elem()
   view_cast(
     styles.get_value_with_local(
@@ -7296,7 +7302,7 @@ pub fn VecElem::delim(self : VecElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn VecElem::delim_local(self : VecElem) -> Value? {
+pub fn VecElem::delim_local(self : VecElem) -> DelimiterPair? {
   match self.0.field_raw(vec_elem_delim) {
     Some(v) => Some(view_cast(v, "vec.delim"))
     None => None
@@ -7304,17 +7310,17 @@ pub fn VecElem::delim_local(self : VecElem) -> Value? {
 }
 
 ///|
-pub fn VecElem::with_delim(self : VecElem, v : Value) -> VecElem {
+pub fn VecElem::with_delim(self : VecElem, v : DelimiterPair) -> VecElem {
   VecElem(self.0.with_field(vec_elem_delim, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn VecElem::delim_in(styles : StyleChain) -> Value {
+pub fn VecElem::delim_in(styles : StyleChain) -> DelimiterPair {
   view_cast(styles.get_field(vec_elem(), vec_elem_delim), "vec.delim")
 }
 
 ///|
-pub fn VecElem::set_delim(v : Value) -> Style {
+pub fn VecElem::set_delim(v : DelimiterPair) -> Style {
   Property(Property::new(vec_elem(), vec_elem_delim, IntoValue::into_value(v)))
 }
 
@@ -7429,7 +7435,7 @@ pub fn MatElem::pack(self : MatElem) -> Content {
 }
 
 ///|
-pub fn MatElem::delim(self : MatElem, styles : StyleChain) -> Value {
+pub fn MatElem::delim(self : MatElem, styles : StyleChain) -> DelimiterPair {
   let e = mat_elem()
   view_cast(
     styles.get_value_with_local(
@@ -7442,7 +7448,7 @@ pub fn MatElem::delim(self : MatElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn MatElem::delim_local(self : MatElem) -> Value? {
+pub fn MatElem::delim_local(self : MatElem) -> DelimiterPair? {
   match self.0.field_raw(mat_elem_delim) {
     Some(v) => Some(view_cast(v, "mat.delim"))
     None => None
@@ -7450,17 +7456,17 @@ pub fn MatElem::delim_local(self : MatElem) -> Value? {
 }
 
 ///|
-pub fn MatElem::with_delim(self : MatElem, v : Value) -> MatElem {
+pub fn MatElem::with_delim(self : MatElem, v : DelimiterPair) -> MatElem {
   MatElem(self.0.with_field(mat_elem_delim, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn MatElem::delim_in(styles : StyleChain) -> Value {
+pub fn MatElem::delim_in(styles : StyleChain) -> DelimiterPair {
   view_cast(styles.get_field(mat_elem(), mat_elem_delim), "mat.delim")
 }
 
 ///|
-pub fn MatElem::set_delim(v : Value) -> Style {
+pub fn MatElem::set_delim(v : DelimiterPair) -> Style {
   Property(Property::new(mat_elem(), mat_elem_delim, IntoValue::into_value(v)))
 }
 
@@ -7501,7 +7507,7 @@ pub fn MatElem::set_align(v : HAlignment) -> Style {
 }
 
 ///|
-pub fn MatElem::augment(self : MatElem, styles : StyleChain) -> Value {
+pub fn MatElem::augment(self : MatElem, styles : StyleChain) -> Augment? {
   let e = mat_elem()
   view_cast(
     styles.get_value_with_local(
@@ -7514,7 +7520,7 @@ pub fn MatElem::augment(self : MatElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn MatElem::augment_local(self : MatElem) -> Value? {
+pub fn MatElem::augment_local(self : MatElem) -> Augment?? {
   match self.0.field_raw(mat_elem_augment) {
     Some(v) => Some(view_cast(v, "mat.augment"))
     None => None
@@ -7522,17 +7528,17 @@ pub fn MatElem::augment_local(self : MatElem) -> Value? {
 }
 
 ///|
-pub fn MatElem::with_augment(self : MatElem, v : Value) -> MatElem {
+pub fn MatElem::with_augment(self : MatElem, v : Augment?) -> MatElem {
   MatElem(self.0.with_field(mat_elem_augment, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn MatElem::augment_in(styles : StyleChain) -> Value {
+pub fn MatElem::augment_in(styles : StyleChain) -> Augment? {
   view_cast(styles.get_field(mat_elem(), mat_elem_augment), "mat.augment")
 }
 
 ///|
-pub fn MatElem::set_augment(v : Value) -> Style {
+pub fn MatElem::set_augment(v : Augment?) -> Style {
   Property(
     Property::new(mat_elem(), mat_elem_augment, IntoValue::into_value(v)),
   )
@@ -7651,7 +7657,7 @@ pub fn CasesElem::pack(self : CasesElem) -> Content {
 }
 
 ///|
-pub fn CasesElem::delim(self : CasesElem, styles : StyleChain) -> Value {
+pub fn CasesElem::delim(self : CasesElem, styles : StyleChain) -> DelimiterPair {
   let e = cases_elem()
   view_cast(
     styles.get_value_with_local(
@@ -7664,7 +7670,7 @@ pub fn CasesElem::delim(self : CasesElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn CasesElem::delim_local(self : CasesElem) -> Value? {
+pub fn CasesElem::delim_local(self : CasesElem) -> DelimiterPair? {
   match self.0.field_raw(cases_elem_delim) {
     Some(v) => Some(view_cast(v, "cases.delim"))
     None => None
@@ -7672,17 +7678,17 @@ pub fn CasesElem::delim_local(self : CasesElem) -> Value? {
 }
 
 ///|
-pub fn CasesElem::with_delim(self : CasesElem, v : Value) -> CasesElem {
+pub fn CasesElem::with_delim(self : CasesElem, v : DelimiterPair) -> CasesElem {
   CasesElem(self.0.with_field(cases_elem_delim, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn CasesElem::delim_in(styles : StyleChain) -> Value {
+pub fn CasesElem::delim_in(styles : StyleChain) -> DelimiterPair {
   view_cast(styles.get_field(cases_elem(), cases_elem_delim), "cases.delim")
 }
 
 ///|
-pub fn CasesElem::set_delim(v : Value) -> Style {
+pub fn CasesElem::set_delim(v : DelimiterPair) -> Style {
   Property(
     Property::new(cases_elem(), cases_elem_delim, IntoValue::into_value(v)),
   )
@@ -7830,12 +7836,15 @@ pub fn ClassElem::pack(self : ClassElem) -> Content {
 }
 
 ///|
-pub fn ClassElem::class(self : ClassElem) -> Value {
+pub fn ClassElem::class(self : ClassElem) -> @unicode.MathClass {
   view_cast(self.0.field_raw(class_elem_class).unwrap(), "class.class")
 }
 
 ///|
-pub fn ClassElem::with_class(self : ClassElem, v : Value) -> ClassElem {
+pub fn ClassElem::with_class(
+  self : ClassElem,
+  v : @unicode.MathClass,
+) -> ClassElem {
   ClassElem(self.0.with_field(class_elem_class, IntoValue::into_value(v)))
 }
 
@@ -7850,7 +7859,10 @@ pub fn ClassElem::with_body(self : ClassElem, v : Content) -> ClassElem {
 }
 
 ///|
-pub fn ClassElem::new(class_ : Value, body_ : Content) -> ClassElem {
+pub fn ClassElem::new(
+  class_ : @unicode.MathClass,
+  body_ : Content,
+) -> ClassElem {
   ClassElem(
     Content::new(class_elem(), [
       (class_elem_class, IntoValue::into_value(class_)),
@@ -11041,7 +11053,7 @@ pub fn FigureElem::with_counter(self : FigureElem, v : Counter?) -> FigureElem {
 }
 
 ///|
-pub fn FigureElem::locale(self : FigureElem) -> Value? {
+pub fn FigureElem::locale(self : FigureElem) -> Locale? {
   match self.0.field_raw(figure_elem_locale) {
     Some(v) => Some(view_cast(v, "figure.locale"))
     None => None
@@ -11049,7 +11061,7 @@ pub fn FigureElem::locale(self : FigureElem) -> Value? {
 }
 
 ///|
-pub fn FigureElem::with_locale(self : FigureElem, v : Value) -> FigureElem {
+pub fn FigureElem::with_locale(self : FigureElem, v : Locale) -> FigureElem {
   FigureElem(self.0.with_field(figure_elem_locale, IntoValue::into_value(v)))
 }
 
@@ -20001,7 +20013,7 @@ pub fn ImageElem::set_icc(v : Value) -> Style {
 }
 
 ///|
-pub fn ImageElem::locale(self : ImageElem) -> Value? {
+pub fn ImageElem::locale(self : ImageElem) -> Locale? {
   match self.0.field_raw(image_elem_locale) {
     Some(v) => Some(view_cast(v, "image.locale"))
     None => None
@@ -20009,7 +20021,7 @@ pub fn ImageElem::locale(self : ImageElem) -> Value? {
 }
 
 ///|
-pub fn ImageElem::with_locale(self : ImageElem, v : Value) -> ImageElem {
+pub fn ImageElem::with_locale(self : ImageElem, v : Locale) -> ImageElem {
   ImageElem(self.0.with_field(image_elem_locale, IntoValue::into_value(v)))
 }
 

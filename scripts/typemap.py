@@ -205,6 +205,17 @@ TYPEMAP = {
     "FillRule": "FillRule",
     "CloseMode": "CloseMode",
     "CurveComponent": "CurveComponent",
+    # math/*.rs
+    "MathSize": "MathSize",
+    "MathVariant": "MathVariant",
+    "MathClass": "@unicode.MathClass",
+    "FracStyle": "FracStyle",
+    "DelimiterPair": "DelimiterPair",
+    "Augment": "Augment",
+    "CancelAngle": "CancelAngle",
+    "(i16, i16)": "(I16, I16)",
+    # text/lang.rs
+    "Locale": "Locale",
     # typst-html (dom.rs, css/encode.rs); ported in library/html_*.mbt
     "HtmlTag": "HtmlTag",
     "HtmlAttr": "HtmlAttr",
