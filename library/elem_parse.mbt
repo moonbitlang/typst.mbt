@@ -289,19 +289,20 @@ fn text_elem_fill_parse(
   args : Args,
   _locals : ParseLocals,
 ) -> Value? raise SourceError {
-  // TODO: reject gradients and tilings relative to `self` ("gradients and
-  // tilings on text must be relative to the parent") once `Paint` is ported.
-  match named_as(args, "fill", text_elem(), text_elem_fill) {
-    Some(value) => Some(value)
-    // `Paint` is a color, gradient or tiling.
-    None =>
-      find_castable_as(
-        args,
-        v => v is (Color(_) | Gradient(_) | Tiling(_)),
-        text_elem(),
-        text_elem_fill,
-      )
+  let paint : @syntax.Spanned[Paint]? = match args.named_spanned("fill") {
+    Some(paint) => Some(paint)
+    None => args.find_spanned()
   }
+  guard paint is Some(paint) else { return None }
+  if paint.v.relative() == Custom(Self_) {
+    raise SourceError([
+      SourceDiagnostic::error_at(
+        paint.span,
+        "gradients and tilings on text must be relative to the parent",
+      ).with_hint("make sure to set `relative: auto` on your text fill"),
+    ])
+  }
+  Some(IntoValue::into_value(paint.v))
 }
 
 // math/frac.rs: FracElem, BinomElem
