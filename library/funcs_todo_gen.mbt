@@ -380,9 +380,3 @@ fn impl_outline_entry_page(
     ),
   ])
 }
-
-///|
-/// TODO: port `#[defs]` of `HtmlFormat` (typst-html/src/format.rs).
-fn defs_html_format(scope : Scope) -> Unit {
-  ignore(scope)
-}

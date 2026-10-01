@@ -35,6 +35,9 @@ pub(all) enum DynValue {
   /// `introspection/state.rs` (internal: the `update` field of state
   /// updates)
   StateUpdate(StateUpdate)
+  /// `typst-html/src/css/encode.rs` (internal: the `css` field of HTML
+  /// elements)
+  HtmlCss(CssProperties)
 } derive(Eq)
 
 ///|
@@ -54,6 +57,9 @@ pub fn DynValue::ty(self : DynValue) -> Type {
     // Internal values that are never exposed to users.
     CounterUpdate(_) => Type::counter()
     StateUpdate(_) => Type::state()
+    // Upstream's `css::Properties` has no Typst type; it is only stored in
+    // an internal field.
+    HtmlCss(_) => Type::dict()
   }
 }
 
@@ -73,6 +79,7 @@ pub fn DynValue::repr(self : DynValue) -> String {
     RootedPath(v) => repr_rooted_path(v)
     CounterUpdate(_) => "counter.update(..)"
     StateUpdate(_) => "state.update(..)"
+    HtmlCss(p) => "css(\{repr_str(p.to_inline())})"
   }
 }
 

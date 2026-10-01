@@ -65,6 +65,426 @@ pub let asset_elem_path : Int
 
 pub fn[T] at(@syntax.Span, () -> T raise HintedError) -> T raise SourceError
 
+pub let attr_abbr : HtmlAttr
+
+pub let attr_accept : HtmlAttr
+
+pub let attr_accept_charset : HtmlAttr
+
+pub let attr_accesskey : HtmlAttr
+
+pub let attr_action : HtmlAttr
+
+pub let attr_allow : HtmlAttr
+
+pub let attr_allowfullscreen : HtmlAttr
+
+pub let attr_alpha : HtmlAttr
+
+pub let attr_alt : HtmlAttr
+
+pub let attr_aria_activedescendant : HtmlAttr
+
+pub let attr_aria_atomic : HtmlAttr
+
+pub let attr_aria_autocomplete : HtmlAttr
+
+pub let attr_aria_busy : HtmlAttr
+
+pub let attr_aria_checked : HtmlAttr
+
+pub let attr_aria_colcount : HtmlAttr
+
+pub let attr_aria_colindex : HtmlAttr
+
+pub let attr_aria_colspan : HtmlAttr
+
+pub let attr_aria_controls : HtmlAttr
+
+pub let attr_aria_current : HtmlAttr
+
+pub let attr_aria_describedby : HtmlAttr
+
+pub let attr_aria_details : HtmlAttr
+
+pub let attr_aria_disabled : HtmlAttr
+
+pub let attr_aria_errormessage : HtmlAttr
+
+pub let attr_aria_expanded : HtmlAttr
+
+pub let attr_aria_flowto : HtmlAttr
+
+pub let attr_aria_haspopup : HtmlAttr
+
+pub let attr_aria_hidden : HtmlAttr
+
+pub let attr_aria_invalid : HtmlAttr
+
+pub let attr_aria_keyshortcuts : HtmlAttr
+
+pub let attr_aria_label : HtmlAttr
+
+pub let attr_aria_labelledby : HtmlAttr
+
+pub let attr_aria_level : HtmlAttr
+
+pub let attr_aria_live : HtmlAttr
+
+pub let attr_aria_modal : HtmlAttr
+
+pub let attr_aria_multiline : HtmlAttr
+
+pub let attr_aria_multiselectable : HtmlAttr
+
+pub let attr_aria_orientation : HtmlAttr
+
+pub let attr_aria_owns : HtmlAttr
+
+pub let attr_aria_placeholder : HtmlAttr
+
+pub let attr_aria_posinset : HtmlAttr
+
+pub let attr_aria_pressed : HtmlAttr
+
+pub let attr_aria_readonly : HtmlAttr
+
+pub let attr_aria_relevant : HtmlAttr
+
+pub let attr_aria_required : HtmlAttr
+
+pub let attr_aria_roledescription : HtmlAttr
+
+pub let attr_aria_rowcount : HtmlAttr
+
+pub let attr_aria_rowindex : HtmlAttr
+
+pub let attr_aria_rowspan : HtmlAttr
+
+pub let attr_aria_selected : HtmlAttr
+
+pub let attr_aria_setsize : HtmlAttr
+
+pub let attr_aria_sort : HtmlAttr
+
+pub let attr_aria_valuemax : HtmlAttr
+
+pub let attr_aria_valuemin : HtmlAttr
+
+pub let attr_aria_valuenow : HtmlAttr
+
+pub let attr_aria_valuetext : HtmlAttr
+
+pub let attr_as : HtmlAttr
+
+pub let attr_async : HtmlAttr
+
+pub let attr_autocapitalize : HtmlAttr
+
+pub let attr_autocomplete : HtmlAttr
+
+pub let attr_autocorrect : HtmlAttr
+
+pub let attr_autofocus : HtmlAttr
+
+pub let attr_autoplay : HtmlAttr
+
+pub let attr_blocking : HtmlAttr
+
+pub let attr_charset : HtmlAttr
+
+pub let attr_checked : HtmlAttr
+
+pub let attr_cite : HtmlAttr
+
+pub let attr_class : HtmlAttr
+
+pub let attr_closedby : HtmlAttr
+
+pub let attr_color : HtmlAttr
+
+pub let attr_colorspace : HtmlAttr
+
+pub let attr_cols : HtmlAttr
+
+pub let attr_colspan : HtmlAttr
+
+pub let attr_command : HtmlAttr
+
+pub let attr_commandfor : HtmlAttr
+
+pub let attr_content : HtmlAttr
+
+pub let attr_contenteditable : HtmlAttr
+
+pub let attr_controls : HtmlAttr
+
+pub let attr_coords : HtmlAttr
+
+pub let attr_crossorigin : HtmlAttr
+
+pub let attr_data : HtmlAttr
+
+pub let attr_datetime : HtmlAttr
+
+pub let attr_decoding : HtmlAttr
+
+pub let attr_default : HtmlAttr
+
+pub let attr_defer : HtmlAttr
+
+pub let attr_dir : HtmlAttr
+
+pub let attr_dirname : HtmlAttr
+
+pub let attr_disabled : HtmlAttr
+
+pub let attr_download : HtmlAttr
+
+pub let attr_draggable : HtmlAttr
+
+pub let attr_enctype : HtmlAttr
+
+pub let attr_enterkeyhint : HtmlAttr
+
+pub let attr_fetchpriority : HtmlAttr
+
+pub let attr_for : HtmlAttr
+
+pub let attr_form : HtmlAttr
+
+pub let attr_formaction : HtmlAttr
+
+pub let attr_formenctype : HtmlAttr
+
+pub let attr_formmethod : HtmlAttr
+
+pub let attr_formnovalidate : HtmlAttr
+
+pub let attr_formtarget : HtmlAttr
+
+pub let attr_headers : HtmlAttr
+
+pub let attr_height : HtmlAttr
+
+pub let attr_hidden : HtmlAttr
+
+pub let attr_high : HtmlAttr
+
+pub let attr_href : HtmlAttr
+
+pub let attr_hreflang : HtmlAttr
+
+pub let attr_http_equiv : HtmlAttr
+
+pub let attr_id : HtmlAttr
+
+pub let attr_imagesizes : HtmlAttr
+
+pub let attr_imagesrcset : HtmlAttr
+
+pub let attr_inert : HtmlAttr
+
+pub let attr_inputmode : HtmlAttr
+
+pub let attr_integrity : HtmlAttr
+
+pub let attr_is : HtmlAttr
+
+pub let attr_ismap : HtmlAttr
+
+pub let attr_itemid : HtmlAttr
+
+pub let attr_itemprop : HtmlAttr
+
+pub let attr_itemref : HtmlAttr
+
+pub let attr_itemscope : HtmlAttr
+
+pub let attr_itemtype : HtmlAttr
+
+pub let attr_kind : HtmlAttr
+
+pub let attr_label : HtmlAttr
+
+pub let attr_lang : HtmlAttr
+
+pub let attr_list : HtmlAttr
+
+pub let attr_loading : HtmlAttr
+
+pub let attr_loop : HtmlAttr
+
+pub let attr_low : HtmlAttr
+
+pub let attr_mathml_accent : HtmlAttr
+
+pub let attr_mathml_accentunder : HtmlAttr
+
+pub let attr_mathml_columnspan : HtmlAttr
+
+pub let attr_mathml_display : HtmlAttr
+
+pub let attr_mathml_displaystyle : HtmlAttr
+
+pub let attr_mathml_fence : HtmlAttr
+
+pub let attr_mathml_form : HtmlAttr
+
+pub let attr_mathml_height : HtmlAttr
+
+pub let attr_mathml_largeop : HtmlAttr
+
+pub let attr_mathml_linethickness : HtmlAttr
+
+pub let attr_mathml_lspace : HtmlAttr
+
+pub let attr_mathml_mathvariant : HtmlAttr
+
+pub let attr_mathml_maxsize : HtmlAttr
+
+pub let attr_mathml_minsize : HtmlAttr
+
+pub let attr_mathml_movablelimits : HtmlAttr
+
+pub let attr_mathml_rowspan : HtmlAttr
+
+pub let attr_mathml_rspace : HtmlAttr
+
+pub let attr_mathml_scriptlevel : HtmlAttr
+
+pub let attr_mathml_separator : HtmlAttr
+
+pub let attr_mathml_stretchy : HtmlAttr
+
+pub let attr_mathml_symmetric : HtmlAttr
+
+pub let attr_mathml_width : HtmlAttr
+
+pub let attr_max : HtmlAttr
+
+pub let attr_maxlength : HtmlAttr
+
+pub let attr_media : HtmlAttr
+
+pub let attr_method : HtmlAttr
+
+pub let attr_min : HtmlAttr
+
+pub let attr_minlength : HtmlAttr
+
+pub let attr_multiple : HtmlAttr
+
+pub let attr_muted : HtmlAttr
+
+pub let attr_name : HtmlAttr
+
+pub let attr_nomodule : HtmlAttr
+
+pub let attr_nonce : HtmlAttr
+
+pub let attr_novalidate : HtmlAttr
+
+pub let attr_open : HtmlAttr
+
+pub let attr_optimum : HtmlAttr
+
+pub let attr_pattern : HtmlAttr
+
+pub let attr_ping : HtmlAttr
+
+pub let attr_placeholder : HtmlAttr
+
+pub let attr_playsinline : HtmlAttr
+
+pub let attr_popover : HtmlAttr
+
+pub let attr_popovertarget : HtmlAttr
+
+pub let attr_popovertargetaction : HtmlAttr
+
+pub let attr_poster : HtmlAttr
+
+pub let attr_preload : HtmlAttr
+
+pub let attr_readonly : HtmlAttr
+
+pub let attr_referrerpolicy : HtmlAttr
+
+pub let attr_rel : HtmlAttr
+
+pub let attr_required : HtmlAttr
+
+pub let attr_reversed : HtmlAttr
+
+pub let attr_role : HtmlAttr
+
+pub let attr_rows : HtmlAttr
+
+pub let attr_rowspan : HtmlAttr
+
+pub let attr_sandbox : HtmlAttr
+
+pub let attr_scope : HtmlAttr
+
+pub let attr_selected : HtmlAttr
+
+pub let attr_shadowrootclonable : HtmlAttr
+
+pub let attr_shadowrootcustomelementregistry : HtmlAttr
+
+pub let attr_shadowrootdelegatesfocus : HtmlAttr
+
+pub let attr_shadowrootmode : HtmlAttr
+
+pub let attr_shadowrootserializable : HtmlAttr
+
+pub let attr_shape : HtmlAttr
+
+pub let attr_size : HtmlAttr
+
+pub let attr_sizes : HtmlAttr
+
+pub let attr_slot : HtmlAttr
+
+pub let attr_span : HtmlAttr
+
+pub let attr_spellcheck : HtmlAttr
+
+pub let attr_src : HtmlAttr
+
+pub let attr_srcdoc : HtmlAttr
+
+pub let attr_srclang : HtmlAttr
+
+pub let attr_srcset : HtmlAttr
+
+pub let attr_start : HtmlAttr
+
+pub let attr_step : HtmlAttr
+
+pub let attr_style : HtmlAttr
+
+pub let attr_tabindex : HtmlAttr
+
+pub let attr_target : HtmlAttr
+
+pub let attr_title : HtmlAttr
+
+pub let attr_translate : HtmlAttr
+
+pub let attr_type : HtmlAttr
+
+pub let attr_usemap : HtmlAttr
+
+pub let attr_value : HtmlAttr
+
+pub let attr_width : HtmlAttr
+
+pub let attr_wrap : HtmlAttr
+
+pub let attr_writingsuggestions : HtmlAttr
+
 pub fn[T] bail(String) -> T raise HintedError
 
 pub fn[T] bail_at(@syntax.Span, String, hints? : ArrayView[String]) -> T raise SourceError
@@ -184,6 +604,16 @@ pub fn[T : Reflect] cast_error(Ty[T], Value) -> HintedString
 pub fn cast_usize(Value) -> Int64 raise HintedError
 
 pub fn[T : Reflect] castable_of(Ty[T], Value) -> Bool
+
+pub fn charsets_is_valid_in_attribute_name(Char) -> Bool
+
+pub fn charsets_is_valid_in_attribute_value(Char) -> Bool
+
+pub fn charsets_is_valid_in_normal_element_text(Char) -> Bool
+
+pub fn charsets_is_valid_in_tag_name(Char) -> Bool
+
+pub fn charsets_is_w3c_text_char(Char) -> Bool
 
 pub fn circle_elem() -> Element
 
@@ -2223,9 +2653,293 @@ pub let table_v_line_elem_stroke : Int
 
 pub let table_v_line_elem_x : Int
 
+pub let tag_a : HtmlTag
+
+pub let tag_abbr : HtmlTag
+
+pub let tag_address : HtmlTag
+
+pub let tag_area : HtmlTag
+
+pub let tag_article : HtmlTag
+
+pub let tag_aside : HtmlTag
+
+pub let tag_audio : HtmlTag
+
+pub let tag_b : HtmlTag
+
+pub let tag_base : HtmlTag
+
+pub let tag_bdi : HtmlTag
+
+pub let tag_bdo : HtmlTag
+
+pub let tag_blockquote : HtmlTag
+
+pub let tag_body : HtmlTag
+
+pub let tag_br : HtmlTag
+
+pub let tag_button : HtmlTag
+
+pub let tag_canvas : HtmlTag
+
+pub let tag_caption : HtmlTag
+
+pub let tag_cite : HtmlTag
+
+pub let tag_code : HtmlTag
+
+pub let tag_col : HtmlTag
+
+pub let tag_colgroup : HtmlTag
+
+pub let tag_data : HtmlTag
+
+pub let tag_datalist : HtmlTag
+
+pub let tag_dd : HtmlTag
+
+pub let tag_del : HtmlTag
+
+pub let tag_details : HtmlTag
+
+pub let tag_dfn : HtmlTag
+
+pub let tag_dialog : HtmlTag
+
+pub let tag_div : HtmlTag
+
+pub let tag_dl : HtmlTag
+
+pub let tag_dt : HtmlTag
+
 pub fn tag_elem() -> Element
 
 pub let tag_elem_tag : Int
+
+pub let tag_em : HtmlTag
+
+pub let tag_embed : HtmlTag
+
+pub let tag_fieldset : HtmlTag
+
+pub let tag_figcaption : HtmlTag
+
+pub let tag_figure : HtmlTag
+
+pub let tag_footer : HtmlTag
+
+pub let tag_form : HtmlTag
+
+pub let tag_h1 : HtmlTag
+
+pub let tag_h2 : HtmlTag
+
+pub let tag_h3 : HtmlTag
+
+pub let tag_h4 : HtmlTag
+
+pub let tag_h5 : HtmlTag
+
+pub let tag_h6 : HtmlTag
+
+pub let tag_head : HtmlTag
+
+pub let tag_header : HtmlTag
+
+pub let tag_hgroup : HtmlTag
+
+pub let tag_hr : HtmlTag
+
+pub let tag_html : HtmlTag
+
+pub let tag_i : HtmlTag
+
+pub let tag_iframe : HtmlTag
+
+pub let tag_img : HtmlTag
+
+pub let tag_input : HtmlTag
+
+pub let tag_ins : HtmlTag
+
+pub let tag_kbd : HtmlTag
+
+pub let tag_label : HtmlTag
+
+pub let tag_legend : HtmlTag
+
+pub let tag_li : HtmlTag
+
+pub let tag_link : HtmlTag
+
+pub let tag_main : HtmlTag
+
+pub let tag_map : HtmlTag
+
+pub let tag_mark : HtmlTag
+
+pub let tag_mathml_annotation : HtmlTag
+
+pub let tag_mathml_annotation_xml : HtmlTag
+
+pub let tag_mathml_maction : HtmlTag
+
+pub let tag_mathml_math : HtmlTag
+
+pub let tag_mathml_merror : HtmlTag
+
+pub let tag_mathml_mfrac : HtmlTag
+
+pub let tag_mathml_mi : HtmlTag
+
+pub let tag_mathml_mmultiscripts : HtmlTag
+
+pub let tag_mathml_mn : HtmlTag
+
+pub let tag_mathml_mo : HtmlTag
+
+pub let tag_mathml_mover : HtmlTag
+
+pub let tag_mathml_mpadded : HtmlTag
+
+pub let tag_mathml_mphantom : HtmlTag
+
+pub let tag_mathml_mprescripts : HtmlTag
+
+pub let tag_mathml_mroot : HtmlTag
+
+pub let tag_mathml_mrow : HtmlTag
+
+pub let tag_mathml_ms : HtmlTag
+
+pub let tag_mathml_mspace : HtmlTag
+
+pub let tag_mathml_msqrt : HtmlTag
+
+pub let tag_mathml_mstyle : HtmlTag
+
+pub let tag_mathml_msub : HtmlTag
+
+pub let tag_mathml_msubsup : HtmlTag
+
+pub let tag_mathml_msup : HtmlTag
+
+pub let tag_mathml_mtable : HtmlTag
+
+pub let tag_mathml_mtd : HtmlTag
+
+pub let tag_mathml_mtext : HtmlTag
+
+pub let tag_mathml_mtr : HtmlTag
+
+pub let tag_mathml_munder : HtmlTag
+
+pub let tag_mathml_munderover : HtmlTag
+
+pub let tag_mathml_semantics : HtmlTag
+
+pub let tag_menu : HtmlTag
+
+pub let tag_meta : HtmlTag
+
+pub let tag_meter : HtmlTag
+
+pub let tag_nav : HtmlTag
+
+pub let tag_noscript : HtmlTag
+
+pub let tag_object : HtmlTag
+
+pub let tag_ol : HtmlTag
+
+pub let tag_optgroup : HtmlTag
+
+pub let tag_option : HtmlTag
+
+pub let tag_output : HtmlTag
+
+pub let tag_p : HtmlTag
+
+pub let tag_picture : HtmlTag
+
+pub let tag_pre : HtmlTag
+
+pub let tag_progress : HtmlTag
+
+pub let tag_q : HtmlTag
+
+pub let tag_rp : HtmlTag
+
+pub let tag_rt : HtmlTag
+
+pub let tag_ruby : HtmlTag
+
+pub let tag_s : HtmlTag
+
+pub let tag_samp : HtmlTag
+
+pub let tag_script : HtmlTag
+
+pub let tag_search : HtmlTag
+
+pub let tag_section : HtmlTag
+
+pub let tag_select : HtmlTag
+
+pub let tag_slot : HtmlTag
+
+pub let tag_small : HtmlTag
+
+pub let tag_source : HtmlTag
+
+pub let tag_span : HtmlTag
+
+pub let tag_strong : HtmlTag
+
+pub let tag_style : HtmlTag
+
+pub let tag_sub : HtmlTag
+
+pub let tag_summary : HtmlTag
+
+pub let tag_sup : HtmlTag
+
+pub let tag_table : HtmlTag
+
+pub let tag_tbody : HtmlTag
+
+pub let tag_td : HtmlTag
+
+pub let tag_template : HtmlTag
+
+pub let tag_textarea : HtmlTag
+
+pub let tag_tfoot : HtmlTag
+
+pub let tag_th : HtmlTag
+
+pub let tag_thead : HtmlTag
+
+pub let tag_time : HtmlTag
+
+pub let tag_title : HtmlTag
+
+pub let tag_tr : HtmlTag
+
+pub let tag_track : HtmlTag
+
+pub let tag_u : HtmlTag
+
+pub let tag_ul : HtmlTag
+
+pub let tag_var : HtmlTag
+
+pub let tag_video : HtmlTag
+
+pub let tag_wbr : HtmlTag
 
 pub fn target_elem() -> Element
 
@@ -2342,6 +3056,8 @@ pub let text_elem_weight : Int
 pub fn title_elem() -> Element
 
 pub let title_elem_body : Int
+
+pub fn[T : ToCss] to_css(T, sink? : (HintedString) -> Unit) -> String
 
 pub fn[T] trace((@syntax.DiagSpan) -> (Int, Int)?, () -> Tracepoint, @syntax.Span, () -> T raise SourceError) -> T raise SourceError
 
@@ -2488,6 +3204,7 @@ pub impl Sub for Abs
 pub impl Fold for Abs
 pub impl IntoValue for Abs
 pub impl Numeric for Abs
+pub impl ToCss for Abs
 
 pub(all) enum AbsUnit {
   Pt
@@ -2595,6 +3312,7 @@ pub impl FromValue for Angle
 pub impl IntoValue for Angle
 pub impl Numeric for Angle
 pub impl Reflect for Angle
+pub impl ToCss for Angle
 
 pub(all) enum AngleLike {
   Int(Int64)
@@ -3333,6 +4051,7 @@ pub impl Hash for Color
 pub impl FromValue for Color
 pub impl IntoValue for Color
 pub impl Reflect for Color
+pub impl ToCss for Color
 
 pub(all) enum ColorSpace {
   Process(ProcessColorSpace)
@@ -3583,6 +4302,77 @@ pub fn CslLightElem::new(Content) -> Self
 pub fn CslLightElem::of(Content) -> Self?
 pub fn CslLightElem::pack(Self) -> Content
 pub fn CslLightElem::with_body(Self, Content) -> Self
+
+pub(all) enum CssDisplay {
+  Block
+  Inline
+  RunIn
+  Flow
+  FlowRoot
+  Table
+  Flex
+  Grid
+  Ruby
+  ListItem
+  TableRowGroup
+  TableHeaderGroup
+  TableFooterGroup
+  TableRow
+  TableCell
+  TableColumnGroup
+  TableColumn
+  TableCaption
+  RubyBase
+  RubyText
+  Contents
+  None_
+  InlineBlock
+  InlineTable
+  InlineFlex
+  InlineGrid
+  InlineMath
+  BlockMath
+} derive(Eq, Hash, @debug.Debug)
+pub fn CssDisplay::as_str(Self) -> String
+pub fn CssDisplay::default_for(HtmlTag) -> Self?
+pub fn CssDisplay::is_tabular(Self) -> Bool
+pub impl ToCss for CssDisplay
+
+pub struct CssProperties(Array[CssProperty]) derive(Eq, Hash)
+pub fn CssProperties::build((HintedString) -> Unit) -> CssPropertiesBuilder
+pub fn CssProperties::copy(Self) -> Self
+pub fn CssProperties::is_empty(Self) -> Bool
+pub fn CssProperties::iter(Self) -> Iter[CssProperty]
+pub fn CssProperties::length(Self) -> Int
+pub fn CssProperties::new() -> Self
+pub fn CssProperties::push(Self, String, String) -> Unit
+pub fn CssProperties::remove(Self, String) -> Unit
+pub fn CssProperties::to_inline(Self) -> String
+pub fn CssProperties::with_(Self, String, String) -> Self
+pub impl Default for CssProperties
+pub impl FromValue for CssProperties
+pub impl IntoValue for CssProperties
+pub impl Reflect for CssProperties
+
+pub struct CssPropertiesBuilder {
+  // private fields
+}
+pub fn CssPropertiesBuilder::finish(Self) -> CssProperties
+pub fn CssPropertiesBuilder::new((HintedString) -> Unit) -> Self
+pub fn[T : ToCss] CssPropertiesBuilder::push(Self, String, T) -> Unit
+pub fn[T : ToCss] CssPropertiesBuilder::with_(Self, String, T) -> Self
+
+pub struct CssProperty {
+  name : String
+  value : String
+} derive(Eq, Hash, @debug.Debug)
+pub fn CssProperty::new(String, String) -> Self
+
+pub struct CssWriter {
+  // private fields
+}
+pub fn CssWriter::fail(Self, String) -> Unit
+pub fn CssWriter::write(Self, String) -> Unit
 
 pub struct CurveClose(Content)
 pub fn CurveClose::mode(Self, StyleChain) -> CloseMode
@@ -3919,6 +4709,7 @@ pub(all) enum DynValue {
   RootedPath(@syntax.RootedPath)
   CounterUpdate(CounterUpdate)
   StateUpdate(StateUpdate)
+  HtmlCss(CssProperties)
 } derive(Eq)
 pub fn DynValue::add_dyn(Self, Self) -> Value? raise HintedError
 pub fn DynValue::field(Self, String) -> Value??
@@ -4042,6 +4833,7 @@ pub impl Neg for Em
 pub impl Sub for Em
 pub impl IntoValue for Em
 pub impl Numeric for Em
+pub impl ToCss for Em
 
 pub struct EmphElem(Content)
 pub fn EmphElem::body(Self) -> Content
@@ -4957,6 +5749,7 @@ pub fn Hsl::from_rgb(Rgb) -> Self
 pub fn Hsl::lighten(Self, Float) -> Self
 pub fn Hsl::saturate(Self, Float) -> Self
 pub impl Eq for Hsl
+pub impl ToCss for Hsl
 
 pub(all) struct Hsv {
   hue : Float
@@ -4973,31 +5766,57 @@ pub fn Hsv::lighten(Self, Float) -> Self
 pub fn Hsv::saturate(Self, Float) -> Self
 pub impl Eq for Hsv
 
+pub struct HtmlAttr(String) derive(Eq, Hash)
+pub fn HtmlAttr::constant(String) -> Self
+pub fn HtmlAttr::intern(String) -> Self raise HintedError
+pub fn HtmlAttr::resolve(Self) -> String
+pub impl Show for HtmlAttr
+pub impl FromValue for HtmlAttr
+pub impl IntoValue for HtmlAttr
+pub impl Reflect for HtmlAttr
+
+pub struct HtmlAttrs(Array[(HtmlAttr, String)]) derive(Eq, Hash)
+pub fn HtmlAttrs::copy(Self) -> Self
+pub fn HtmlAttrs::get(Self, HtmlAttr) -> String?
+pub fn HtmlAttrs::is_empty(Self) -> Bool
+pub fn HtmlAttrs::new() -> Self
+pub fn HtmlAttrs::pairs(Self) -> Array[(HtmlAttr, String)]
+pub fn HtmlAttrs::push(Self, HtmlAttr, String) -> Unit
+pub fn HtmlAttrs::push_front(Self, HtmlAttr, String) -> Unit
+pub fn HtmlAttrs::set_existing(Self, HtmlAttr, String) -> Bool
+pub impl Default for HtmlAttrs
+pub impl Fold for HtmlAttrs
+pub impl FromValue for HtmlAttrs
+pub impl IntoValue for HtmlAttrs
+pub impl Reflect for HtmlAttrs
+
 pub struct HtmlElem(Content)
-pub fn HtmlElem::attrs(Self, StyleChain) -> Value
-pub fn HtmlElem::attrs_in(StyleChain) -> Value
-pub fn HtmlElem::attrs_local(Self) -> Value?
+pub fn HtmlElem::attrs(Self, StyleChain) -> HtmlAttrs
+pub fn HtmlElem::attrs_in(StyleChain) -> HtmlAttrs
+pub fn HtmlElem::attrs_local(Self) -> HtmlAttrs?
 pub fn HtmlElem::body(Self, StyleChain) -> Content?
 pub fn HtmlElem::body_in(StyleChain) -> Content?
 pub fn HtmlElem::body_local(Self) -> Content??
-pub fn HtmlElem::css(Self, StyleChain) -> Value
-pub fn HtmlElem::css_in(StyleChain) -> Value
-pub fn HtmlElem::css_local(Self) -> Value?
-pub fn HtmlElem::new(Value) -> Self
+pub fn HtmlElem::css(Self, StyleChain) -> CssProperties
+pub fn HtmlElem::css_in(StyleChain) -> CssProperties
+pub fn HtmlElem::css_local(Self) -> CssProperties?
+pub fn HtmlElem::new(HtmlTag) -> Self
 pub fn HtmlElem::of(Content) -> Self?
 pub fn HtmlElem::pack(Self) -> Content
 pub fn HtmlElem::parent(Self) -> Location?
 pub fn HtmlElem::role_in(StyleChain) -> String?
-pub fn HtmlElem::set_attrs(Value) -> Style
+pub fn HtmlElem::set_attrs(HtmlAttrs) -> Style
 pub fn HtmlElem::set_body(Content?) -> Style
-pub fn HtmlElem::set_css(Value) -> Style
+pub fn HtmlElem::set_css(CssProperties) -> Style
 pub fn HtmlElem::set_role(String?) -> Style
-pub fn HtmlElem::tag(Self) -> Value
-pub fn HtmlElem::with_attrs(Self, Value) -> Self
+pub fn HtmlElem::tag(Self) -> HtmlTag
+pub fn HtmlElem::with_attr(Self, HtmlAttr, String) -> Self
+pub fn HtmlElem::with_attrs(Self, HtmlAttrs) -> Self
 pub fn HtmlElem::with_body(Self, Content?) -> Self
-pub fn HtmlElem::with_css(Self, Value) -> Self
+pub fn HtmlElem::with_css(Self, CssProperties) -> Self
+pub fn HtmlElem::with_optional_attr(Self, HtmlAttr, String?) -> Self
 pub fn HtmlElem::with_parent(Self, Location) -> Self
-pub fn HtmlElem::with_tag(Self, Value) -> Self
+pub fn HtmlElem::with_tag(Self, HtmlTag) -> Self
 
 pub struct HtmlFormat(Content)
 pub fn HtmlFormat::new() -> Self
@@ -5008,6 +5827,34 @@ pub fn HtmlFormat::pretty_in(StyleChain) -> Bool
 pub fn HtmlFormat::pretty_local(Self) -> Bool?
 pub fn HtmlFormat::set_pretty(Bool) -> Style
 pub fn HtmlFormat::with_pretty(Self, Bool) -> Self
+
+pub struct HtmlTag(String) derive(Eq, Hash)
+pub fn HtmlTag::constant(String) -> Self
+pub fn HtmlTag::intern(String) -> Self raise HintedError
+pub fn HtmlTag::is_embedded_content(Self) -> Bool
+pub fn HtmlTag::is_escapable_raw(Self) -> Bool
+pub fn HtmlTag::is_flow_content(Self) -> Bool
+pub fn HtmlTag::is_foreign(Self) -> Bool
+pub fn HtmlTag::is_foreign_self_closing(Self) -> Bool
+pub fn HtmlTag::is_heading_content(Self) -> Bool
+pub fn HtmlTag::is_interactive_content(Self) -> Bool
+pub fn HtmlTag::is_mathml(Self) -> Bool
+pub fn HtmlTag::is_mathml_token(Self) -> Bool
+pub fn HtmlTag::is_metadata_content(Self) -> Bool
+pub fn HtmlTag::is_palpable_content(Self) -> Bool
+pub fn HtmlTag::is_phrasing_content(Self) -> Bool
+pub fn HtmlTag::is_raw(Self) -> Bool
+pub fn HtmlTag::is_replaced(Self) -> Bool
+pub fn HtmlTag::is_script_supporting_element(Self) -> Bool
+pub fn HtmlTag::is_sectioning_content(Self) -> Bool
+pub fn HtmlTag::is_void(Self) -> Bool
+pub fn HtmlTag::is_whitespace_collapsing(Self) -> Bool
+pub fn HtmlTag::resolve(Self) -> String
+pub fn HtmlTag::should_group_into_pars(Self) -> Bool
+pub impl Show for HtmlTag
+pub impl FromValue for HtmlTag
+pub impl IntoValue for HtmlTag
+pub impl Reflect for HtmlTag
 
 pub(all) struct I16(Int64) derive(Compare, Eq, Hash, @debug.Debug)
 pub fn I16::get(Self) -> Int64
@@ -5164,6 +6011,7 @@ pub impl FromValue for Length
 pub impl IntoValue for Length
 pub impl Numeric for Length
 pub impl Reflect for Length
+pub impl ToCss for Length
 
 pub(all) struct Library {
   routines : Routines
@@ -5285,6 +6133,7 @@ pub fn LinearRgb::from_oklch(Oklch) -> Self
 pub fn LinearRgb::from_rgb(Rgb) -> Self
 pub fn LinearRgb::lighten(Self, Float) -> Self
 pub impl Eq for LinearRgb
+pub impl ToCss for LinearRgb
 
 pub struct LinebreakElem(Content)
 pub fn LinebreakElem::justify(Self, StyleChain) -> Bool
@@ -5759,6 +6608,7 @@ pub fn Oklab::from_oklch(Oklch) -> Self
 pub fn Oklab::from_rgb(Rgb) -> Self
 pub fn Oklab::lighten(Self, Float) -> Self
 pub impl Eq for Oklab
+pub impl ToCss for Oklab
 
 pub(all) struct Oklch {
   l : Float
@@ -5774,6 +6624,7 @@ pub fn Oklch::from_oklab(Oklab) -> Self
 pub fn Oklch::from_rgb(Rgb) -> Self
 pub fn Oklch::lighten(Self, Float) -> Self
 pub impl Eq for Oklch
+pub impl ToCss for Oklch
 
 pub(all) struct OneOrMultiple[T](Array[T]) derive(Eq, Hash)
 pub impl[T] Default for OneOrMultiple[T]
@@ -6081,6 +6932,7 @@ pub fn Paint::unwrap_solid(Self) -> Color
 pub impl FromValue for Paint
 pub impl IntoValue for Paint
 pub impl Reflect for Paint
+pub impl ToCss for Paint
 
 pub(all) struct Paper {
   name : String
@@ -6342,6 +7194,13 @@ pub fn PolygonElem::with_fill_rule(Self, FillRule) -> Self
 pub fn PolygonElem::with_stroke(Self, Smart[Stroke?]) -> Self
 pub fn PolygonElem::with_vertices(Self, Array[Axes[Rel[Length]]]) -> Self
 
+pub(all) struct PositiveF64(Double) derive(Eq, @debug.Debug)
+pub fn PositiveF64::get(Self) -> Double
+pub fn PositiveF64::new(Double) -> Self?
+pub impl FromValue for PositiveF64
+pub impl IntoValue for PositiveF64
+pub impl Reflect for PositiveF64
+
 pub struct PrefixInfo(Content)
 pub fn PrefixInfo::inset(Self) -> Value
 pub fn PrefixInfo::key(Self) -> Location
@@ -6494,6 +7353,7 @@ pub impl FromValue for Ratio
 pub impl IntoValue for Ratio
 pub impl Numeric for Ratio
 pub impl Reflect for Ratio
+pub impl ToCss for Ratio
 
 pub(all) struct RatioComponent(Ratio)
 pub impl FromValue for RatioComponent
@@ -6699,6 +7559,7 @@ pub impl FromValue for Rel[Length]
 pub impl IntoValue for Rel[Length]
 pub impl[T : Numeric] Numeric for Rel[T]
 pub impl Reflect for Rel[Length]
+pub impl ToCss for Rel[Length]
 
 pub(all) enum RelativeTo {
   Self_
@@ -6754,6 +7615,7 @@ pub fn Rgb::from_rgb(Self) -> Self
 pub fn Rgb::lighten(Self, Float) -> Self
 pub fn Rgb::to_linear(Self) -> LinearRgb
 pub impl Eq for Rgb
+pub impl ToCss for Rgb
 
 pub struct RootElem(Content)
 pub fn RootElem::index(Self, StyleChain) -> Content?
@@ -8465,6 +9327,11 @@ pub impl[T : Reflect] Reflect for Array[T]
 pub impl Reflect for @syntax.RootedPath
 pub impl Reflect for @syntax.SyntaxMode
 pub impl Reflect for @time.Month
+
+pub(open) trait ToCss {
+  fn emit(Self, CssWriter) -> Unit
+}
+pub impl ToCss for String
 
 pub(open) trait World {
   fn library(Self) -> Library
