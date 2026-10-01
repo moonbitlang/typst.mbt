@@ -4,6 +4,7 @@ import {
   "moonbitlang/typst/library",
   "moonbitlang/typst/eval",
   "moonbitlang/typst/typst",
+  "moonbitlang/typst/html",
   "moonbitlang/core/string",
   "moonbitlang/typst/unicode",
   "moonbitlang/x/fs",

@@ -11,8 +11,6 @@ pub fn[T : @library.Output] compile(&@library.World) -> @library.Warned[Result[T
 
 pub fn deduplicate(Array[@library.SourceDiagnostic]) -> Array[@library.SourceDiagnostic]
 
-pub fn html(HtmlDocument, pretty~ : Bool) -> String raise @library.SourceError
-
 pub fn library(Array[@library.Format]) -> @library.Library
 
 pub fn library_builder(Array[@library.Format]) -> @library.LibraryBuilder
@@ -24,10 +22,6 @@ pub fn[T : @library.Output] trace(&@library.World, @syntax.Span) -> Array[(@libr
 // Errors
 
 // Types and methods
-pub struct HtmlDocument {
-  // private fields
-}
-pub impl @library.Output for HtmlDocument
 
 // Type aliases
 

@@ -128,7 +128,7 @@ impl @library.IntrospectorBackend for CountBackend with fn path(_, _) {
 
 ///|
 /// How many times a test output was created.
-let creations : Ref[Int] = { val: 0 }
+let creations : Ref[Int] = { val: 0, }
 
 ///|
 /// Observes the number of labelled elements `seen` and produces a document
@@ -139,10 +139,7 @@ priv struct CountDoc {
 }
 
 ///|
-fn count_doc_create(
-  engine : @library.Engine,
-  cap : Int,
-) -> CountDoc {
+fn count_doc_create(engine : @library.Engine, cap : Int) -> CountDoc {
   creations.val += 1
   let seen = engine.introspector.query_labelled().length()
   { n: if seen + 1 < cap { seen + 1 } else { cap }, }

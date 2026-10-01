@@ -294,7 +294,7 @@ pub let routines : @library.Routines = {
   rules: () => {
     let rules = @library.NativeRuleMap::new()
     // TODO(driver): `@layout.register(rules)` once layout is ported.
-    // TEMPORARY: `@html.register(rules)` once the HTML rules land.
+    @html.register(rules)
     rules
   },
   eval_string: @eval.routines_eval_string(),
@@ -303,8 +303,6 @@ pub let routines : @library.Routines = {
   realize: stub_realize,
   // TODO(driver): `@layout.layout_frame` once layout is ported.
   layout_frame: stub_layout_frame,
-  // TEMPORARY: `@html.html_mathml_body` once the HTML rules land.
-  html_mathml_body: stub_html_mathml_body,
-  // TEMPORARY: `@html.html_span_filled` once the HTML rules land.
-  html_span_filled: stub_html_span_filled,
+  html_mathml_body: @html.html_mathml_body,
+  html_span_filled: @html.html_span_filled,
 }

@@ -558,12 +558,16 @@ fn html_report(rel : String, tc : TestCase) -> String {
   }
   let world : TestWorld = { main: source, library, }
   let warned : @library.Warned[
-    Result[@typst.HtmlDocument, Array[@library.SourceDiagnostic]],
+    Result[@html.HtmlDocument, Array[@library.SourceDiagnostic]],
   ] = @typst.compile(world)
   let out = StringBuilder()
   match warned.output {
     Ok(doc) =>
-      try @typst.html(doc, pretty=true) catch {
+      try
+        @html.html(doc, {
+          format: @library.PartialHtmlFormatOptions::{ pretty: Some(true), },
+        })
+      catch {
         @library.SourceError(errors) => {
           out.write_string("err\n")
           for diag in @typst.deduplicate(errors) {
