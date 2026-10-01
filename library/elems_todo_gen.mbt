@@ -702,8 +702,6 @@ fn frac_elem_style_default() -> Value {
 
 // TODO: port `#[parse]` of BinomElem.lower as `binom_elem_lower_parse`.
 
-// TODO: port `#[parse]` of LrElem.body as `lr_elem_body_parse`.
-
 ///|
 /// TODO: port `DelimiterPair::PAREN` (VecElem.delim).
 fn vec_elem_delim_default() -> Value {

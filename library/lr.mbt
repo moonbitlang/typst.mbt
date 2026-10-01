@@ -212,3 +212,18 @@ fn delimited(
   }
   elem.spanned(span)
 }
+
+///|
+/// Custom parsing of `LrElem.body`: all positional content arguments, joined
+/// by commas.
+fn lr_elem_body_parse(
+  _engine : Engine,
+  args : Args,
+) -> Value? raise SourceError {
+  let arguments : Array[Content] = args.all()
+  let mut body = arguments.get(0).unwrap_or(Content::empty())
+  for i in 1..<arguments.length() {
+    body = body.add(SymbolElem::packed(",").add(arguments[i]))
+  }
+  Some(Content(body))
+}

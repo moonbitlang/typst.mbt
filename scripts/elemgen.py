@@ -47,6 +47,7 @@ TYPEMAP = {
     "Label": "Label",
     "Styles": "Styles",
     "Value": "Value",
+    "Accent": "Accent",
 }
 
 # Rust `Default::default()` of a mapped type, as a Value expression.

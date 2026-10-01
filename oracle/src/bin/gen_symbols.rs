@@ -2,7 +2,7 @@
 //! upstream Typst uses for its `sym` and `emoji` modules, so symbol names,
 //! variants (in order) and deprecations match exactly.
 //!
-//! Usage: `gen_symbols > library/symbols_gen.mbt`
+//! Usage: `gen_symbols > library/symbols_gen.mbt && moon fmt`
 
 use std::fmt::Write as _;
 

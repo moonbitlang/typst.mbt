@@ -80,7 +80,6 @@
 //     1 Dir
 //     1 Option<Spacing>
 //     1 Vec<StackChild>
-//     1 Accent
 //     1 Smart<CancelAngle>
 //     1 SpecificAlignment<OuterHAlignment, VAlignment>
 //     1 MathSize
@@ -2552,7 +2551,7 @@ pub fn accent_elem() -> Element {
             required=true,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Accent]),
             id=1,
             name="accent",
             kind=Required,
@@ -3251,6 +3250,7 @@ pub fn lr_elem() -> Element {
             kind=Required,
             positional=true,
             required=true,
+            parse=lr_elem_body_parse,
           ),
         ],
       )
