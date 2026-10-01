@@ -136,34 +136,6 @@ fn raw_elem_syntaxes_fold(inner : Value, _outer : Value) -> Value {
 
 // TODO: port `#[parse]` of RawElem.theme as `raw_elem_theme_parse`.
 
-// TODO: port `#[parse]` of ImageElem.source as `image_elem_source_parse`.
-
-///|
-/// TODO: port `Default::default() of Smart<ImageFormat>` (ImageElem.format).
-fn image_elem_format_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Sizing` (ImageElem.height).
-fn image_elem_height_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `ImageFit::Cover` (ImageElem.fit).
-fn image_elem_fit_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Smart<ImageScaling>` (ImageElem.scaling).
-fn image_elem_scaling_default() -> Value {
-  None
-}
-
-// TODO: port `#[parse]` of ImageElem.icc as `image_elem_icc_parse`.
-
 ///|
 /// TODO: port `` (PdfFormat.standard).
 fn pdf_format_elem_standard_default() -> Value {

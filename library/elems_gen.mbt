@@ -18,9 +18,6 @@
 //     1 Option<Smallcaps>
 //     1 Option<ShiftSettings>
 //     1 Vec<Packed<RawLine>>
-//     1 Smart<ImageFormat>
-//     1 ImageFit
-//     1 Smart<ImageScaling>
 //     1 PdfStandards
 //     1 Option<AttachedFileRelationship>
 //     1 Scalar
@@ -5212,15 +5209,15 @@ pub fn image_elem() -> Element {
         keywords=[],
         capabilities=["Locatable", "Tagged", "Synthesize", "LocalName", "Figurable"],
         fields=[
-        field_of((Ty::new() : Ty[DataSource]), id=0, name="source", kind=Required, positional=true, required=true),
-        field_of((Ty::new() : Ty[Value]), id=1, name="format", kind=Settable, default=image_elem_format_default),
+        field_of((Ty::new() : Ty[DataSource]), id=0, name="source", kind=Required, positional=true, required=true, parse=image_elem_source_parse),
+        field_of((Ty::new() : Ty[Smart[ImageFormat]]), id=1, name="format", kind=Settable, default=() => Auto),
         field_of((Ty::new() : Ty[Smart[Rel[Length]]]), id=2, name="width", kind=Settable, default=() => Auto),
         field_of((Ty::new() : Ty[Sizing]), id=3, name="height", kind=Settable, default=image_elem_height_default),
         field_of((Ty::new() : Ty[String?]), id=4, name="alt", kind=Settable, default=() => None),
         field_of((Ty::new() : Ty[NonZeroUSize]), id=5, name="page", kind=Settable, default=() => Int(1L)),
-        field_of((Ty::new() : Ty[Value]), id=6, name="fit", kind=Settable, default=image_elem_fit_default),
-        field_of((Ty::new() : Ty[Value]), id=7, name="scaling", kind=Settable, default=image_elem_scaling_default),
-        field_of((Ty::new() : Ty[Smart[DataSource]]), id=8, name="icc", kind=Settable, default=() => Auto),
+        field_of((Ty::new() : Ty[ImageFit]), id=6, name="fit", kind=Settable, default=image_elem_fit_default),
+        field_of((Ty::new() : Ty[Smart[ImageScaling]]), id=7, name="scaling", kind=Settable, default=() => Auto),
+        field_of((Ty::new() : Ty[Smart[DataSource]]), id=8, name="icc", kind=Settable, default=() => Auto, parse=image_elem_icc_parse),
         field_of((Ty::new() : Ty[Locale]), id=9, name="locale", kind=Synthesized, internal=true),
         ],
       )

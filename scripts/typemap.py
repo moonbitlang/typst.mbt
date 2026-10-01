@@ -214,6 +214,15 @@ TYPEMAP = {
     "Augment": "Augment",
     "CancelAngle": "CancelAngle",
     "(i16, i16)": "(I16, I16)",
+    # visualize/image/*.rs
+    "ImageFormat": "ImageFormat",
+    "ImageFit": "ImageFit",
+    "ImageScaling": "ImageScaling",
+    "RasterFormat": "RasterFormat",
+    "VectorFormat": "VectorFormat",
+    "ExchangeFormat": "ExchangeFormat",
+    "PixelFormat": "PixelFormat",
+    "PixelEncoding": "PixelEncoding",
     # text/lang.rs
     "Locale": "Locale",
     # typst-html (dom.rs, css/encode.rs); ported in library/html_*.mbt

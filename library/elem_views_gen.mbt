@@ -13905,13 +13905,13 @@ pub fn ImageElem::with_source(self : ImageElem, v : DataSource) -> ImageElem {
 }
 
 ///|
-pub fn ImageElem::format(self : ImageElem, styles : StyleChain) -> Value {
+pub fn ImageElem::format(self : ImageElem, styles : StyleChain) -> Smart[ImageFormat] {
   let e = image_elem()
   view_cast(styles.get_value_with_local(e, e.fields()[image_elem_format], self.0.field_raw(image_elem_format)), "image.format")
 }
 
 ///|
-pub fn ImageElem::format_local(self : ImageElem) -> Value? {
+pub fn ImageElem::format_local(self : ImageElem) -> Smart[ImageFormat]? {
   match self.0.field_raw(image_elem_format) {
     Some(v) => Some(view_cast(v, "image.format"))
     None => None
@@ -13919,17 +13919,17 @@ pub fn ImageElem::format_local(self : ImageElem) -> Value? {
 }
 
 ///|
-pub fn ImageElem::with_format(self : ImageElem, v : Value) -> ImageElem {
+pub fn ImageElem::with_format(self : ImageElem, v : Smart[ImageFormat]) -> ImageElem {
   ImageElem(self.0.with_field(image_elem_format, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn ImageElem::format_in(styles : StyleChain) -> Value {
+pub fn ImageElem::format_in(styles : StyleChain) -> Smart[ImageFormat] {
   view_cast(styles.get_field(image_elem(), image_elem_format), "image.format")
 }
 
 ///|
-pub fn ImageElem::set_format(v : Value) -> Style {
+pub fn ImageElem::set_format(v : Smart[ImageFormat]) -> Style {
   Property(Property::new(image_elem(), image_elem_format, IntoValue::into_value(v)))
 }
 
@@ -14050,13 +14050,13 @@ pub fn ImageElem::set_page(v : NonZeroUSize) -> Style {
 }
 
 ///|
-pub fn ImageElem::fit(self : ImageElem, styles : StyleChain) -> Value {
+pub fn ImageElem::fit(self : ImageElem, styles : StyleChain) -> ImageFit {
   let e = image_elem()
   view_cast(styles.get_value_with_local(e, e.fields()[image_elem_fit], self.0.field_raw(image_elem_fit)), "image.fit")
 }
 
 ///|
-pub fn ImageElem::fit_local(self : ImageElem) -> Value? {
+pub fn ImageElem::fit_local(self : ImageElem) -> ImageFit? {
   match self.0.field_raw(image_elem_fit) {
     Some(v) => Some(view_cast(v, "image.fit"))
     None => None
@@ -14064,28 +14064,28 @@ pub fn ImageElem::fit_local(self : ImageElem) -> Value? {
 }
 
 ///|
-pub fn ImageElem::with_fit(self : ImageElem, v : Value) -> ImageElem {
+pub fn ImageElem::with_fit(self : ImageElem, v : ImageFit) -> ImageElem {
   ImageElem(self.0.with_field(image_elem_fit, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn ImageElem::fit_in(styles : StyleChain) -> Value {
+pub fn ImageElem::fit_in(styles : StyleChain) -> ImageFit {
   view_cast(styles.get_field(image_elem(), image_elem_fit), "image.fit")
 }
 
 ///|
-pub fn ImageElem::set_fit(v : Value) -> Style {
+pub fn ImageElem::set_fit(v : ImageFit) -> Style {
   Property(Property::new(image_elem(), image_elem_fit, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn ImageElem::scaling(self : ImageElem, styles : StyleChain) -> Value {
+pub fn ImageElem::scaling(self : ImageElem, styles : StyleChain) -> Smart[ImageScaling] {
   let e = image_elem()
   view_cast(styles.get_value_with_local(e, e.fields()[image_elem_scaling], self.0.field_raw(image_elem_scaling)), "image.scaling")
 }
 
 ///|
-pub fn ImageElem::scaling_local(self : ImageElem) -> Value? {
+pub fn ImageElem::scaling_local(self : ImageElem) -> Smart[ImageScaling]? {
   match self.0.field_raw(image_elem_scaling) {
     Some(v) => Some(view_cast(v, "image.scaling"))
     None => None
@@ -14093,17 +14093,17 @@ pub fn ImageElem::scaling_local(self : ImageElem) -> Value? {
 }
 
 ///|
-pub fn ImageElem::with_scaling(self : ImageElem, v : Value) -> ImageElem {
+pub fn ImageElem::with_scaling(self : ImageElem, v : Smart[ImageScaling]) -> ImageElem {
   ImageElem(self.0.with_field(image_elem_scaling, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn ImageElem::scaling_in(styles : StyleChain) -> Value {
+pub fn ImageElem::scaling_in(styles : StyleChain) -> Smart[ImageScaling] {
   view_cast(styles.get_field(image_elem(), image_elem_scaling), "image.scaling")
 }
 
 ///|
-pub fn ImageElem::set_scaling(v : Value) -> Style {
+pub fn ImageElem::set_scaling(v : Smart[ImageScaling]) -> Style {
   Property(Property::new(image_elem(), image_elem_scaling, IntoValue::into_value(v)))
 }
 
