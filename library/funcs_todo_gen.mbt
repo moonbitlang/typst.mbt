@@ -580,11 +580,11 @@ fn impl_str_position(
 }
 
 ///|
-/// TODO: port `Str.match-` (typst-library/src/foundations/str.rs).
+/// TODO: port `Str.match` (typst-library/src/foundations/str.rs).
 fn impl_str_match(self_ : String, pattern_ : Value) -> Dict? raise HintedError {
   ignore(self_)
   ignore(pattern_)
-  bail("`Str.match-` is not yet ported")
+  bail("`Str.match` is not yet ported")
 }
 
 ///|
@@ -814,7 +814,7 @@ fn impl_counter_at(
 }
 
 ///|
-/// TODO: port `Counter.final-` (typst-library/src/introspection/counter.rs).
+/// TODO: port `Counter.final` (typst-library/src/introspection/counter.rs).
 fn impl_counter_final(
   self_ : Value,
   engine : Engine,
@@ -828,7 +828,7 @@ fn impl_counter_final(
   raise SourceError([
     SourceDiagnostic::error_at(
       @syntax.Span::detached(),
-      "`Counter.final-` is not yet ported",
+      "`Counter.final` is not yet ported",
     ),
   ])
 }
@@ -1016,7 +1016,7 @@ fn impl_state_at(
 }
 
 ///|
-/// TODO: port `State.final-` (typst-library/src/introspection/state.rs).
+/// TODO: port `State.final` (typst-library/src/introspection/state.rs).
 fn impl_state_final(
   self_ : Value,
   engine : Engine,
@@ -1030,7 +1030,7 @@ fn impl_state_final(
   raise SourceError([
     SourceDiagnostic::error_at(
       @syntax.Span::detached(),
-      "`State.final-` is not yet ported",
+      "`State.final` is not yet ported",
     ),
   ])
 }

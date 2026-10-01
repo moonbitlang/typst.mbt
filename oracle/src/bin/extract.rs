@@ -495,7 +495,8 @@ fn kebab(s: &str) -> String {
             out.push(c);
         }
     }
-    out
+    // Like heck, drop empty words (e.g. the trailing `_` of `where_`).
+    out.split('-').filter(|w| !w.is_empty()).collect::<Vec<_>>().join("-")
 }
 
 fn title_case(name: &str) -> String {
