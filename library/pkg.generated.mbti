@@ -131,6 +131,8 @@ pub let box_elem_stroke : Int
 
 pub let box_elem_width : Int
 
+pub fn bundle_format() -> Format
+
 pub fn bundle_format_elem() -> Element
 
 pub fn cancel_elem() -> Element
@@ -497,6 +499,8 @@ pub fn format_float_with_unit(Double, String) -> String
 
 pub fn format_int_with_base(Int64, Int64) -> String
 
+pub fn format_module(Array[Format]) -> Module
+
 pub fn frac_elem() -> Element
 
 pub let frac_elem_denom : Int
@@ -666,6 +670,8 @@ pub let html_elem_parent : Int
 pub let html_elem_role : Int
 
 pub let html_elem_tag : Int
+
+pub fn html_format() -> Format
 
 pub fn html_format_elem() -> Element
 
@@ -1337,6 +1343,12 @@ pub fn native_outline_entry_prefix() -> NativeFuncData
 
 pub fn native_panic() -> NativeFuncData
 
+pub fn native_pdf_format_data_cell() -> NativeFuncData
+
+pub fn native_pdf_format_header_cell() -> NativeFuncData
+
+pub fn native_pdf_format_table_summary() -> NativeFuncData
+
 pub fn native_plugin() -> NativeFuncData
 
 pub fn native_plugin_transition() -> NativeFuncData
@@ -1649,6 +1661,8 @@ pub let pdf_attach_elem_path : Int
 
 pub let pdf_attach_elem_relationship : Int
 
+pub fn pdf_format() -> Format
+
 pub fn pdf_format_elem() -> Element
 
 pub let pdf_format_elem_pages : Int
@@ -1680,6 +1694,8 @@ pub let place_elem_dy : Int
 pub let place_elem_float : Int
 
 pub let place_elem_scope : Int
+
+pub fn png_format() -> Format
 
 pub fn png_format_elem() -> Element
 
@@ -1978,6 +1994,8 @@ pub let super_elem_body : Int
 pub let super_elem_size : Int
 
 pub let super_elem_typographic : Int
+
+pub fn svg_format() -> Format
 
 pub fn svg_format_elem() -> Element
 
@@ -2817,6 +2835,13 @@ pub(all) enum FieldKind {
   External
 } derive(Eq, @debug.Debug)
 
+pub(all) struct Format {
+  elem : Element
+  feature : Feature?
+}
+pub fn Format::new(Element) -> Self
+pub fn Format::with_feature(Self, Feature) -> Self
+
 pub(all) struct Fr(Scalar) derive(Compare, Default, Eq, Hash)
 pub fn Fr::abs(Self) -> Self
 pub fn Fr::div_by(Self, Double) -> Self
@@ -2944,13 +2969,14 @@ pub(all) struct Library {
   std : Binding
   mut features : Features
 }
-pub fn Library::builder(Routines) -> LibraryBuilder
+pub fn Library::builder(Routines, Array[Format]) -> LibraryBuilder
 
 pub(all) struct LibraryBuilder {
   mut features : Features
   extra : Array[(Scope) -> Unit]
   routines : Routines
   mut inputs : Dict
+  formats : Array[Format]
 }
 pub fn LibraryBuilder::build(Self) -> Library
 pub fn LibraryBuilder::with_features(Self, Features) -> Self
@@ -3193,6 +3219,7 @@ pub fn Scope::get(Self, String) -> Binding?
 pub fn Scope::iter(Self) -> Iter[(String, Binding)]
 pub fn Scope::length(Self) -> Int
 pub fn Scope::new() -> Self
+pub fn Scope::prelude_path(Self, Array[String]) -> Binding?
 pub fn Scope::reset_category(Self) -> Unit
 pub fn Scope::start_category(Self, Category) -> Unit
 
