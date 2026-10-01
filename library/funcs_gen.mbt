@@ -10938,7 +10938,7 @@ pub fn native_target() -> NativeFuncData {
         keywords=[],
         contextual=true,
         params=[],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Target])),
         native_target_call,
       )
       native_target_cell.val = Some(d)

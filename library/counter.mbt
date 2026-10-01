@@ -73,8 +73,10 @@ pub fn Counter::display_at(
 }
 
 ///|
-/// The numbering of the element at the location, for counters of elements
-/// with a numbering.
+/// Resolves the numbering for this counter track.
+///
+/// This coupling between the counter type and the remaining standard library
+/// is not great ...
 fn Counter::matching_numbering(
   self : Counter,
   engine : Engine,
@@ -82,38 +84,51 @@ fn Counter::matching_numbering(
   loc : Location,
   span : @syntax.Span,
 ) -> Numbering? {
-  ignore(span)
   match self.0 {
-    Page => engine.introspector.page_numbering(loc)
+    Page => loc.page_numbering(engine, span)
     Selector(Elem(func, _)) => {
-      let from_elem = match engine.introspector.query_first(Location(loc)) {
-        Some(content) => numbering_field_of(content, func)
+      let from_elem = match
+        engine.introspect(query_first_introspection(Location(loc), span)) {
+        Some(content) =>
+          if func == heading_elem() {
+            match content.to_packed() {
+              Some((elem : HeadingElem)) => elem.numbering_local().bind(n => n)
+              None => None
+            }
+          } else if func == figure_elem() {
+            match content.to_packed() {
+              Some((elem : FigureElem)) => elem.numbering_local().bind(n => n)
+              None => None
+            }
+          } else if func == equation_elem() {
+            match content.to_packed() {
+              Some((elem : EquationElem)) => elem.numbering_local().bind(n => n)
+              None => None
+            }
+          } else if func == footnote_elem() {
+            match content.to_packed() {
+              Some((elem : FootnoteElem)) => elem.numbering_local()
+              None => None
+            }
+          } else {
+            None
+          }
         None => None
       }
       match from_elem {
         Some(numbering) => Some(numbering)
-        None => {
-          let field = if func == heading_elem() {
-            Some(heading_elem_numbering)
+        None =>
+          if func == heading_elem() {
+            HeadingElem::numbering_in(styles)
           } else if func == figure_elem() {
-            Some(figure_elem_numbering)
+            FigureElem::numbering_in(styles)
           } else if func == equation_elem() {
-            Some(equation_elem_numbering)
+            EquationElem::numbering_in(styles)
           } else if func == footnote_elem() {
-            Some(footnote_elem_numbering)
+            Some(FootnoteElem::numbering_in(styles))
           } else {
             None
           }
-          guard field is Some(id) && func.field(id) is Some(info) else {
-            return None
-          }
-          let value = styles.get_value_with_local(func, info, None)
-          try Numbering::from_value(value) catch {
-            _ => None
-          } noraise {
-            n => Some(n)
-          }
-        }
       }
     }
     _ => None
@@ -121,113 +136,60 @@ fn Counter::matching_numbering(
 }
 
 ///|
-/// The stored `numbering` field of a heading, figure, equation or footnote.
-fn numbering_field_of(content : Content, func : Element) -> Numbering? {
-  let id = if func == heading_elem() {
-    heading_elem_numbering
-  } else if func == figure_elem() {
-    figure_elem_numbering
-  } else if func == equation_elem() {
-    equation_elem_numbering
-  } else if func == footnote_elem() {
-    footnote_elem_numbering
-  } else {
-    return None
-  }
-  guard content.elem() == func else { return None }
-  match content.field_raw(id) {
-    Some(value) =>
-      try Numbering::from_value(value) catch {
-        _ => None
-      } noraise {
-        n => Some(n)
-      }
-    None => None
+/// Catch the error of a source result (upstream `SourceResult<T>` as a
+/// value).
+pub fn[T] source_result(
+  f : () -> T raise SourceError,
+) -> Result[T, Array[SourceDiagnostic]] {
+  try f() catch {
+    SourceError(errors) => Err(errors)
+  } noraise {
+    v => Ok(v)
   }
 }
 
 ///|
-/// The state of the counter at the location (upstream
-/// `CounterAtIntrospection`).
+/// Raise the error of a source result.
+pub fn[T] or_raise(
+  result : Result[T, Array[SourceDiagnostic]],
+) -> T raise SourceError {
+  match result {
+    Ok(v) => v
+    Err(errors) => raise SourceError(errors)
+  }
+}
+
+///|
+/// The state of the counter at the location.
 fn Counter::at_loc(
   self : Counter,
   engine : Engine,
   loc : Location,
   span : @syntax.Span,
 ) -> CounterState raise SourceError {
-  ignore(span)
-  let introspector = engine.introspector
-  let selector = self.select(introspector, loc)
-  let sequence = counter_sequence(self, selector, engine)
-  let offset = introspector.query_count_before(selector, loc)
-  let (state, page) = sequence[offset]
-  let state = state.copy()
-  if self.is_page() {
-    let delta = saturating_sub(
-      introspector.page(loc).unwrap_or(NonZeroUSize(1L)).0,
-      page,
-    )
-    state.step(1, delta)
-  }
-  state
+  or_raise(engine.introspect(counter_at_introspection(self, loc, span)))
 }
 
 ///|
-/// The state of the counter at the location and at the end of the document
-/// (upstream `CounterBothIntrospection`).
+/// The state of the counter at the location and at the end of the document.
 fn Counter::both_loc(
   self : Counter,
   engine : Engine,
   loc : Location,
   span : @syntax.Span,
 ) -> CounterState raise SourceError {
-  ignore(span)
-  let introspector = engine.introspector
-  let selector = self.select(introspector, loc)
-  let sequence = counter_sequence(self, selector, engine)
-  let offset = introspector.query_count_before(selector, loc)
-  let (at_state, at_page) = sequence[offset]
-  let at_state = at_state.copy()
-  let (final_state, final_page) = sequence[sequence.length() - 1]
-  let final_state = final_state.copy()
-  if self.is_page() {
-    let at_delta = saturating_sub(
-      introspector.page(loc).unwrap_or(NonZeroUSize(1L)).0,
-      at_page,
-    )
-    at_state.step(1, at_delta)
-    let final_delta = saturating_sub(
-      introspector.pages(loc).unwrap_or(NonZeroUSize(1L)).0,
-      final_page,
-    )
-    final_state.step(1, final_delta)
-  }
-  CounterState([at_state.first(), final_state.first()])
+  or_raise(engine.introspect(counter_both_introspection(self, loc, span)))
 }
 
 ///|
-/// The state of the counter at the end of the document (upstream
-/// `CounterFinalIntrospection`).
+/// The state of the counter at the end of the document.
 fn Counter::final_loc(
   self : Counter,
   engine : Engine,
   loc : Location,
   span : @syntax.Span,
 ) -> CounterState raise SourceError {
-  ignore(span)
-  let introspector = engine.introspector
-  let selector = self.select(introspector, loc)
-  let sequence = counter_sequence(self, selector, engine)
-  let (state, page) = sequence[sequence.length() - 1]
-  let state = state.copy()
-  if self.is_page() {
-    let delta = saturating_sub(
-      introspector.pages(loc).unwrap_or(NonZeroUSize(1L)).0,
-      page,
-    )
-    state.step(1, delta)
-  }
-  state
+  or_raise(engine.introspect(counter_final_introspection(self, loc, span)))
 }
 
 ///|
@@ -240,17 +202,119 @@ fn saturating_sub(a : Int64, b : Int64) -> Int64 {
 }
 
 ///|
-/// Produces the whole sequence of counter states.
+/// Retrieves a counter at a specific location (upstream
+/// `CounterAtIntrospection`).
+fn counter_at_introspection(
+  counter : Counter,
+  loc : Location,
+  span : @syntax.Span,
+) -> Introspect[Result[CounterState, Array[SourceDiagnostic]]] {
+  Introspect::new(
+    (engine, introspector) => {
+      source_result(() => {
+        let selector = counter.select(introspector, loc)
+        let sequence = counter_sequence(counter, selector, engine, introspector)
+        let offset = introspector.query_count_before(selector, loc)
+        let (state, page) = sequence[offset]
+        let state = state.copy()
+        if counter.is_page() {
+          let delta = saturating_sub(
+            introspector.page(loc).unwrap_or(NonZeroUSize(1L)).0,
+            page,
+          )
+          state.step(1, delta)
+        }
+        state
+      })
+    },
+    history => format_counter_convergence_warning(counter, span, history),
+  )
+}
+
+///|
+/// Retrieves the first number of a counter at a specific location and the
+/// first number of the final state, both in one operation (upstream
+/// `CounterBothIntrospection`).
+fn counter_both_introspection(
+  counter : Counter,
+  loc : Location,
+  span : @syntax.Span,
+) -> Introspect[Result[CounterState, Array[SourceDiagnostic]]] {
+  Introspect::new(
+    (engine, introspector) => {
+      source_result(() => {
+        let selector = counter.select(introspector, loc)
+        let sequence = counter_sequence(counter, selector, engine, introspector)
+        let offset = introspector.query_count_before(selector, loc)
+        let (at_state, at_page) = sequence[offset]
+        let at_state = at_state.copy()
+        let (final_state, final_page) = sequence[sequence.length() - 1]
+        let final_state = final_state.copy()
+        if counter.is_page() {
+          let at_delta = saturating_sub(
+            introspector.page(loc).unwrap_or(NonZeroUSize(1L)).0,
+            at_page,
+          )
+          at_state.step(1, at_delta)
+          let final_delta = saturating_sub(
+            introspector.pages(loc).unwrap_or(NonZeroUSize(1L)).0,
+            final_page,
+          )
+          final_state.step(1, final_delta)
+        }
+        CounterState([at_state.first(), final_state.first()])
+      })
+    },
+    history => format_counter_convergence_warning(counter, span, history),
+  )
+}
+
+///|
+/// Retrieves the final state of a counter (upstream
+/// `CounterFinalIntrospection`).
+fn counter_final_introspection(
+  counter : Counter,
+  loc : Location,
+  span : @syntax.Span,
+) -> Introspect[Result[CounterState, Array[SourceDiagnostic]]] {
+  Introspect::new(
+    (engine, introspector) => {
+      source_result(() => {
+        let selector = counter.select(introspector, loc)
+        let sequence = counter_sequence(counter, selector, engine, introspector)
+        let (state, page) = sequence[sequence.length() - 1]
+        let state = state.copy()
+        if counter.is_page() {
+          let delta = saturating_sub(
+            introspector.pages(loc).unwrap_or(NonZeroUSize(1L)).0,
+            page,
+          )
+          state.step(1, delta)
+        }
+        state
+      })
+    },
+    history => format_counter_convergence_warning(counter, span, history),
+  )
+}
+
+///|
+/// Produces the whole sequence of a counter.
 ///
-/// This has to happen just once for all counters, cutting down the number
-/// of counter updates from quadratic to linear.
+/// Upstream memoizes this so that it happens just once for all retrievals of
+/// the same counter, cutting down the number of computations from quadratic
+/// to linear.
 fn counter_sequence(
   counter : Counter,
   selector : Selector,
   engine : Engine,
+  introspector : Introspector,
 ) -> Array[(CounterState, Int64)] raise SourceError {
-  let introspector = engine.introspector
-  let engine = engine.with_route(Route::extend(engine.route).unnested())
+  let engine = {
+    ..engine,
+    introspector,
+    route: Route::extend(engine.route).unnested(),
+  }
   let current = CounterState::init(counter.0 is Page)
   let mut page = 1L
   let stops = [(current.copy(), page)]
@@ -279,23 +343,98 @@ fn counter_sequence(
 }
 
 ///|
+/// The warning when a counter failed to converge.
+fn format_counter_convergence_warning(
+  counter : Counter,
+  span : @syntax.Span,
+  history : History[Result[CounterState, Array[SourceDiagnostic]]],
+) -> SourceDiagnostic {
+  SourceDiagnostic::warning_at(
+    span,
+    "value of \{format_counter_key(counter)} did not converge",
+  ).with_hint(
+    history.hint("values", ret => {
+      match ret {
+        Ok(v) => format_counter_state(v)
+        Err(_) => "(errored)"
+      }
+    }),
+  )
+}
+
+///|
+/// Formats a counter's key human-readably.
+fn format_counter_key(counter : Counter) -> String {
+  match counter.0 {
+    Page => "the page counter"
+    _ => "`\{counter.repr()}`"
+  }
+}
+
+///|
+/// Formats a counter's state human-readably.
+fn format_counter_state(state : CounterState) -> String {
+  let output = StringBuilder()
+  let mut sep = ""
+  for value in state.0 {
+    output.write_string("\{sep}\{value}")
+    sep = ", "
+  }
+  output.to_string()
+}
+
+///|
 /// The counter update of an element with the `Count` capability (upstream
-/// `Count::update`).
+/// `Count::update` of the elements that implement it).
 fn count_update(elem : Content) -> CounterUpdate? {
-  if elem.elem() == counter_update_elem() {
-    match elem.field_raw(counter_update_elem_update) {
-      Some(value) =>
-        try CounterUpdate::from_value(value) catch {
-          _ => None
-        } noraise {
-          update => Some(update)
-        }
-      None => None
+  let styles = StyleChain::empty()
+  if CounterUpdateElem::of(elem) is Some(update) {
+    Some(update.update())
+  } else if HeadingElem::of(elem) is Some(heading) {
+    if heading.numbering(styles) is Some(_) {
+      Some(Step(heading.resolve_level(styles)))
+    } else {
+      None
     }
+  } else if FigureElem::of(elem) is Some(figure) {
+    // If the figure is numbered, step the counter by one. This steps the
+    // `counter(figure)` which is global to all numbered figures.
+    if figure.numbering(styles) is Some(_) {
+      Some(Step(NonZeroUSize(1L)))
+    } else {
+      None
+    }
+  } else if EquationElem::of(elem) is Some(equation) {
+    if equation.block(styles) && equation.numbering(styles) is Some(_) {
+      Some(Step(NonZeroUSize(1L)))
+    } else {
+      None
+    }
+  } else if FootnoteElem::of(elem) is Some(footnote) {
+    // `FootnoteElem::is_ref`: the body is a reference to another footnote.
+    if footnote.body() is Label(_) {
+      None
+    } else {
+      Some(Step(NonZeroUSize(1L)))
+    }
+  } else if ParLineMarker::of(elem) is Some(_) {
+    // The line counter must be updated manually by the root flow.
+    None
   } else {
-    // The `Count` implementations of other elements (headings, figures,
-    // equations, footnotes) are ported with those elements.
     Some(Step(NonZeroUSize(1L)))
+  }
+}
+
+///|
+/// The level of a heading: `level` if set, otherwise `offset + depth`
+/// (upstream `HeadingElem::resolve_level`).
+pub fn HeadingElem::resolve_level(
+  self : HeadingElem,
+  styles : StyleChain,
+) -> NonZeroUSize {
+  match self.level(styles) {
+    Custom(level) => level
+    Auto => NonZeroUSize(self.offset(styles).0 + self.depth(styles).0)
   }
 }
 

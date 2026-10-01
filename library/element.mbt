@@ -589,3 +589,29 @@ pub impl FromValue for Element with fn from_value(v) {
     None => bail("expected element")
   }
 }
+
+///|
+/// A Typst element that is defined by a native type (upstream
+/// `NativeElement`): implemented by the generated typed views
+/// (`elem_views_gen.mbt`), which wrap content of the element (upstream
+/// `Packed<T>`).
+pub(open) trait NativeElement {
+  /// The element (upstream `NativeElement::ELEM`).
+  fn elem() -> Element
+  /// Wraps content of this element without checking its element (upstream:
+  /// `Packed<T>` is a transparent wrapper around `Content`).
+  fn from_content_unchecked(Content) -> Self
+  /// The wrapped content (upstream `Packed::pack`).
+  fn into_content(Self) -> Content
+}
+
+///|
+/// View content as the element `T` if it is one (upstream
+/// `Content::to_packed`).
+pub fn[T : NativeElement] Content::to_packed(self : Content) -> T? {
+  if self.elem == T::elem() {
+    Some(T::from_content_unchecked(self))
+  } else {
+    None
+  }
+}

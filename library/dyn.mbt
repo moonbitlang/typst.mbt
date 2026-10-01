@@ -35,6 +35,8 @@ pub(all) enum DynValue {
   /// `introspection/state.rs` (internal: the `update` field of state
   /// updates)
   StateUpdate(StateUpdate)
+  /// `introspection/tag.rs` (internal: the `tag` field of tag elements)
+  Tag(Tag)
 } derive(Eq)
 
 ///|
@@ -54,6 +56,7 @@ pub fn DynValue::ty(self : DynValue) -> Type {
     // Internal values that are never exposed to users.
     CounterUpdate(_) => Type::counter()
     StateUpdate(_) => Type::state()
+    Tag(_) => Type::content()
   }
 }
 
@@ -73,6 +76,7 @@ pub fn DynValue::repr(self : DynValue) -> String {
     RootedPath(v) => repr_rooted_path(v)
     CounterUpdate(_) => "counter.update(..)"
     StateUpdate(_) => "state.update(..)"
+    Tag(tag) => tag.to_string()
   }
 }
 

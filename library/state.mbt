@@ -40,10 +40,7 @@ fn State::at_loc(
   loc : Location,
   span : @syntax.Span,
 ) -> Value raise SourceError {
-  ignore(span)
-  let sequence = state_sequence(self, engine)
-  let offset = engine.introspector.query_count_before(self.select(), loc)
-  sequence[offset]
+  or_raise(engine.introspect(state_at_introspection(self, loc, span)))
 }
 
 ///|
@@ -54,9 +51,67 @@ fn State::final_value(
   engine : Engine,
   span : @syntax.Span,
 ) -> Value raise SourceError {
-  ignore(span)
-  let sequence = state_sequence(self, engine)
-  sequence[sequence.length() - 1]
+  or_raise(engine.introspect(state_final_introspection(self, span)))
+}
+
+///|
+/// Retrieves a state at a specific location (upstream
+/// `StateAtIntrospection`).
+fn state_at_introspection(
+  state : State,
+  loc : Location,
+  span : @syntax.Span,
+) -> Introspect[Result[Value, Array[SourceDiagnostic]]] {
+  Introspect::new(
+    (engine, introspector) => {
+      source_result(() => {
+        let sequence = state_sequence(state, engine, introspector)
+        let offset = introspector.query_count_before(state.select(), loc)
+        sequence[offset]
+      })
+    },
+    history => format_state_convergence_warning(state, span, history),
+  )
+}
+
+///|
+/// Retrieves the final value of a state (upstream
+/// `StateFinalIntrospection`).
+fn state_final_introspection(
+  state : State,
+  span : @syntax.Span,
+) -> Introspect[Result[Value, Array[SourceDiagnostic]]] {
+  Introspect::new(
+    (engine, introspector) => {
+      source_result(() => {
+        let sequence = state_sequence(state, engine, introspector)
+        sequence[sequence.length() - 1]
+      })
+    },
+    history => format_state_convergence_warning(state, span, history),
+  )
+}
+
+///|
+/// The warning when a state failed to converge.
+fn format_state_convergence_warning(
+  state : State,
+  span : @syntax.Span,
+  history : History[Result[Value, Array[SourceDiagnostic]]],
+) -> SourceDiagnostic {
+  SourceDiagnostic::warning_at(
+    span,
+    "value of `state(\{repr_str(state.key)})` did not converge",
+  )
+  .with_hint(
+    history.hint("values", ret => {
+      match ret {
+        Ok(v) => "`\{v.repr()}`"
+        Err(_) => "(errored)"
+      }
+    }),
+  )
+  .with_hint("see https://typst.app/help/state-convergence for help")
 }
 
 ///|
@@ -67,9 +122,13 @@ fn State::final_value(
 fn state_sequence(
   state : State,
   engine : Engine,
+  introspector : Introspector,
 ) -> Array[Value] raise SourceError {
-  let introspector = engine.introspector
-  let engine = engine.with_route(Route::extend(engine.route).unnested())
+  let engine = {
+    ..engine,
+    introspector,
+    route: Route::extend(engine.route).unnested(),
+  }
   let mut current = state.init
   let stops = [current]
   for elem in introspector.query(state.select()) {

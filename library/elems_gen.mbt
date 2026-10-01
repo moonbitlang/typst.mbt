@@ -25,8 +25,6 @@
 //     2 Smart<TextSize>
 //     2 FillRule
 //     2 Smart<Sides<Option<Option<Stroke>>>>
-//     1 Target
-//     1 Tag
 //     1 BaselinePos
 //     1 callbacks::InlineCallback
 //     1 Option<BlockBody>
@@ -207,7 +205,7 @@ pub fn target_elem() -> Element {
         capabilities=[],
         fields=[
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Target]),
             id=0,
             name="target",
             kind=Settable,
@@ -433,7 +431,7 @@ pub fn tag_elem() -> Element {
         capabilities=["Construct", "Unlabellable"],
         fields=[
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Tag]),
             id=0,
             name="tag",
             kind=Required,
@@ -444,6 +442,7 @@ pub fn tag_elem() -> Element {
         ],
       )
       tag_elem_cell.val = Some(e)
+      tag_elem_init(e)
       e
     }
   }

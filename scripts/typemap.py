@@ -115,6 +115,9 @@ TYPEMAP = {
     "TableCell": "TableCell",
     "TableElem": "TableElem",
     "TableHeaderScope": "TableHeaderScope",
+    # foundations/target.rs, introspection/tag.rs
+    "Target": "Target",
+    "Tag": "Tag",
 }
 
 # Generic Rust types with a MoonBit port: Rust name -> MoonBit name. A use

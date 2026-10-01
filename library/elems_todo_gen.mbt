@@ -1,12 +1,6 @@
 // Generated stubs for element hooks that are not ported yet.
 
 ///|
-/// TODO: port `Default::default() of Target` (TargetElem.target).
-fn target_elem_target_default() -> Value {
-  None
-}
-
-///|
 /// TODO: port `` (AlignElem.alignment).
 fn align_elem_alignment_default() -> Value {
   None
