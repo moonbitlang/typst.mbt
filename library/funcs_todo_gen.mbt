@@ -1873,21 +1873,6 @@ fn impl_measure(engine : Engine, context : Context, span : @syntax.Span, width_ 
 }
 
 ///|
-/// TODO: port `yaml` (typst-library/src/loading/yaml.rs).
-fn impl_yaml(engine : Engine, source_ : @syntax.Spanned[DataSource]) -> Value raise SourceError {
-  ignore(engine)
-  ignore(source_)
-  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`yaml` is not yet ported")])
-}
-
-///|
-/// TODO: port `yaml.encode` (typst-library/src/loading/yaml.rs).
-fn impl_yaml_encode(value_ : @syntax.Spanned[Value]) -> String raise SourceError {
-  ignore(value_)
-  raise SourceError([SourceDiagnostic::error_at(@syntax.Span::detached(), "`yaml.encode` is not yet ported")])
-}
-
-///|
 /// TODO: port `numbering` (typst-library/src/model/numbering.rs).
 fn impl_numbering(engine : Engine, context : Context, span : @syntax.Span, numbering_ : Value, numbers_ : Array[U64]) -> Value raise SourceError {
   ignore(engine)

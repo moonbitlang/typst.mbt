@@ -16,6 +16,7 @@ import {
   "moonbitlang/typst/data/xml",
   "moonbitlang/typst/data/cbor",
   "moonbitlang/typst/data/toml",
+  "moonbitlang/typst/data/yaml",
 }
 
 import {
