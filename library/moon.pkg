@@ -12,6 +12,7 @@ import {
   "moonbitlang/core/double",
   "moonbitlang/core/encoding/utf8",
   "moonbitlang/typst/time",
+  "moonbitlang/typst/html_assets",
 }
 
 import {

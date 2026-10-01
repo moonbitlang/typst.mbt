@@ -1283,9 +1283,3 @@ fn impl_color_const_lime() -> Value {
 fn impl_color_const_map() -> Value {
   None
 }
-
-///|
-/// TODO: port `#[defs]` of `HtmlFormat` (typst-html/src/format.rs).
-fn defs_html_format(scope : Scope) -> Unit {
-  ignore(scope)
-}

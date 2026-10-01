@@ -240,3 +240,53 @@ pub fn rust_parse_f64(s : String) -> Double? {
     _ => Some(if negative { -@double.infinity } else { @double.infinity })
   }
 }
+
+///|
+/// A floating-point number that must be positive (strictly greater than
+/// zero). (upstream `PositiveF64`)
+pub(all) struct PositiveF64(Double) derive(Eq, Debug)
+
+///|
+/// Wrap a float if it is positive.
+pub fn PositiveF64::new(value : Double) -> PositiveF64? {
+  if value > 0.0 {
+    Some(PositiveF64(value))
+  } else {
+    None
+  }
+}
+
+///|
+/// Get the underlying value.
+pub fn PositiveF64::get(self : PositiveF64) -> Double {
+  self.0
+}
+
+///|
+pub impl Reflect for PositiveF64 with fn input() {
+  Type(Type::float())
+}
+
+///|
+pub impl Reflect for PositiveF64 with fn output() {
+  Type(Type::float())
+}
+
+///|
+pub impl Reflect for PositiveF64 with fn castable(v) {
+  v is (Float(_) | Int(_))
+}
+
+///|
+pub impl IntoValue for PositiveF64 with fn into_value(self) {
+  Float(self.get())
+}
+
+///|
+pub impl FromValue for PositiveF64 with fn from_value(v) {
+  let f : Double = v.cast()
+  match PositiveF64::new(f) {
+    Some(p) => p
+    None => bail("number must be positive")
+  }
+}

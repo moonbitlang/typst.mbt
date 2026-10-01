@@ -6,7 +6,7 @@
 ///|
 /// `impl Construct for HtmlFormat`.
 fn html_format_elem_init(e : Element) -> Unit {
-  e.hooks().construct = Some(fn(_engine, args) {
+  e.hooks().construct = Some((_engine, args) => {
     bail_at(args.span, "cannot be constructed manually")
   })
 }
