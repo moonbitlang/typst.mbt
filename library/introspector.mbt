@@ -202,12 +202,12 @@ pub fn Introspector::backend(self : Introspector) -> &IntrospectorBackend {
 fn Introspector::record(
   self : Introspector,
   name : String,
-  args : U128,
+  args : () -> U128,
   result : () -> U128,
   replay : (Introspector) -> U128,
 ) -> Unit {
   if self.recorder is Some(recorder) {
-    let key = hash128((name, args))
+    let key = hash128((name, args()))
     if !recorder.calls.contains(key) {
       recorder.calls[key] = { name, expected: result(), replay, }
     }
@@ -221,7 +221,7 @@ pub fn Introspector::query(
   selector : Selector,
 ) -> Array[Content] {
   let output = self.backend.query(selector)
-  self.record("query", hash128(selector), () => hash128(output), i => {
+  self.record("query", () => hash128(selector), () => hash128(output), i => {
     hash128(i.backend.query(selector))
   })
   output
@@ -234,7 +234,7 @@ pub fn Introspector::query_first(
   selector : Selector,
 ) -> Content? {
   let output = self.backend.query_first(selector)
-  self.record("query_first", hash128(selector), () => hash128(output), i => {
+  self.record("query_first", () => hash128(selector), () => hash128(output), i => {
     hash128(i.backend.query_first(selector))
   })
   output
@@ -258,7 +258,7 @@ pub fn Introspector::query_unique(
   selector : Selector,
 ) -> Content raise HintedError {
   let output = result_of(() => self.backend.query_unique(selector))
-  self.record("query_unique", hash128(selector), () => hash128(output), i => {
+  self.record("query_unique", () => hash128(selector), () => hash128(output), i => {
     hash128(result_of(() => i.backend.query_unique(selector)))
   })
   match output {
@@ -274,7 +274,7 @@ pub fn Introspector::query_label(
   label : Label,
 ) -> Content raise HintedError {
   let output = result_of(() => self.backend.query_label(label))
-  self.record("query_label", hash128(label), () => hash128(output), i => {
+  self.record("query_label", () => hash128(label), () => hash128(output), i => {
     hash128(result_of(() => i.backend.query_label(label)))
   })
   match output {
@@ -287,7 +287,7 @@ pub fn Introspector::query_label(
 /// Queries for all elements with a label.
 pub fn Introspector::query_labelled(self : Introspector) -> Array[Content] {
   let output = self.backend.query_labelled()
-  self.record("query_labelled", u128_zero, () => hash128(output), i => {
+  self.record("query_labelled", () => u128_zero, () => hash128(output), i => {
     hash128(i.backend.query_labelled())
   })
   output
@@ -304,7 +304,7 @@ pub fn Introspector::query_count_before(
   let output = self.backend.query_count_before(selector, end)
   self.record(
     "query_count_before",
-    hash128((selector, end)),
+    () => hash128((selector, end)),
     () => hash128(output),
     i => hash128(i.backend.query_count_before(selector, end)),
   )
@@ -315,7 +315,7 @@ pub fn Introspector::query_count_before(
 /// Checks how many times a label exists.
 pub fn Introspector::label_count(self : Introspector, label : Label) -> Int {
   let output = self.backend.label_count(label)
-  self.record("label_count", hash128(label), () => hash128(output), i => {
+  self.record("label_count", () => hash128(label), () => hash128(output), i => {
     hash128(i.backend.label_count(label))
   })
   output
@@ -330,7 +330,7 @@ pub fn Introspector::locator(
   base : Location,
 ) -> Location? {
   let output = self.backend.locator(key, base)
-  self.record("locator", hash128((key, base)), () => hash128(output), i => {
+  self.record("locator", () => hash128((key, base)), () => hash128(output), i => {
     hash128(i.backend.locator(key, base))
   })
   output
@@ -344,7 +344,7 @@ pub fn Introspector::pages(
   location : Location,
 ) -> NonZeroUSize? {
   let output = self.backend.pages(location)
-  self.record("pages", hash128(location), () => hash128(output), i => {
+  self.record("pages", () => hash128(location), () => hash128(output), i => {
     hash128(i.backend.pages(location))
   })
   output
@@ -357,7 +357,7 @@ pub fn Introspector::page(
   location : Location,
 ) -> NonZeroUSize? {
   let output = self.backend.page(location)
-  self.record("page", hash128(location), () => hash128(output), i => {
+  self.record("page", () => hash128(location), () => hash128(output), i => {
     hash128(i.backend.page(location))
   })
   output
@@ -370,7 +370,7 @@ pub fn Introspector::position(
   location : Location,
 ) -> DocumentPosition? {
   let output = self.backend.position(location)
-  self.record("position", hash128(location), () => hash128(output), i => {
+  self.record("position", () => hash128(location), () => hash128(output), i => {
     hash128(i.backend.position(location))
   })
   output
@@ -383,9 +383,12 @@ pub fn Introspector::page_numbering(
   location : Location,
 ) -> Numbering? {
   let output = self.backend.page_numbering(location)
-  self.record("page_numbering", hash128(location), () => hash128(output), i => {
-    hash128(i.backend.page_numbering(location))
-  })
+  self.record(
+    "page_numbering",
+    () => hash128(location),
+    () => hash128(output),
+    i => hash128(i.backend.page_numbering(location)),
+  )
   output
 }
 
@@ -396,9 +399,12 @@ pub fn Introspector::page_supplement(
   location : Location,
 ) -> Content? {
   let output = self.backend.page_supplement(location)
-  self.record("page_supplement", hash128(location), () => hash128(output), i => {
-    hash128(i.backend.page_supplement(location))
-  })
+  self.record(
+    "page_supplement",
+    () => hash128(location),
+    () => hash128(output),
+    i => hash128(i.backend.page_supplement(location)),
+  )
   output
 }
 
@@ -409,7 +415,7 @@ pub fn Introspector::anchor(
   location : Location,
 ) -> String? {
   let output = self.backend.anchor(location)
-  self.record("anchor", hash128(location), () => hash128(output), i => {
+  self.record("anchor", () => hash128(location), () => hash128(output), i => {
     hash128(i.backend.anchor(location))
   })
   output
@@ -423,7 +429,7 @@ pub fn Introspector::document(
   location : Location,
 ) -> Location? {
   let output = self.backend.document(location)
-  self.record("document", hash128(location), () => hash128(output), i => {
+  self.record("document", () => hash128(location), () => hash128(output), i => {
     hash128(i.backend.document(location))
   })
   output
@@ -437,7 +443,7 @@ pub fn Introspector::path(
   location : Location,
 ) -> @syntax.VirtualPath? {
   let output = self.backend.path(location)
-  self.record("path", hash128(location), () => hash128(output), i => {
+  self.record("path", () => hash128(location), () => hash128(output), i => {
     hash128(i.backend.path(location))
   })
   output
