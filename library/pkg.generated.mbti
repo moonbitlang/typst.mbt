@@ -1,0 +1,2810 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/library"
+
+import {
+  "moonbitlang/core/debug",
+  "moonbitlang/core/hashset",
+  "moonbitlang/core/ref",
+  "moonbitlang/typst/syntax",
+}
+
+// Values
+pub fn accent_elem() -> Element
+
+pub let accent_elem_accent : Int
+
+pub let accent_elem_base : Int
+
+pub let accent_elem_dotless : Int
+
+pub let accent_elem_size : Int
+
+pub fn add(Value, Value) -> Value raise HintedError
+
+pub fn align_elem() -> Element
+
+pub let align_elem_alignment : Int
+
+pub let align_elem_body : Int
+
+pub fn align_point_elem() -> Element
+
+pub fn and_(Value, Value) -> Value raise HintedError
+
+pub fn array_is_empty() -> String
+
+pub fn artifact_elem() -> Element
+
+pub let artifact_elem_body : Int
+
+pub let artifact_elem_kind : Int
+
+pub fn asset_elem() -> Element
+
+pub let asset_elem_data : Int
+
+pub let asset_elem_path : Int
+
+pub fn[T] at(@syntax.Span, () -> T raise HintedError) -> T raise SourceError
+
+pub fn[T] bail(String) -> T raise HintedError
+
+pub fn[T] bail_at(@syntax.Span, String, hints? : ArrayView[String]) -> T raise SourceError
+
+pub fn[T] bail_diag(SourceDiagnostic) -> T raise SourceError
+
+pub fn[T] bail_hinted(String, ArrayView[String]) -> T raise HintedError
+
+pub fn bibliography_elem() -> Element
+
+pub let bibliography_elem_full : Int
+
+pub let bibliography_elem_group : Int
+
+pub let bibliography_elem_lang : Int
+
+pub let bibliography_elem_region : Int
+
+pub let bibliography_elem_sources : Int
+
+pub let bibliography_elem_style : Int
+
+pub let bibliography_elem_target : Int
+
+pub let bibliography_elem_title : Int
+
+pub fn binom_elem() -> Element
+
+pub let binom_elem_lower : Int
+
+pub let binom_elem_upper : Int
+
+pub fn block_elem() -> Element
+
+pub let block_elem_above : Int
+
+pub let block_elem_below : Int
+
+pub let block_elem_body : Int
+
+pub let block_elem_breakable : Int
+
+pub let block_elem_clip : Int
+
+pub let block_elem_fill : Int
+
+pub let block_elem_height : Int
+
+pub let block_elem_inset : Int
+
+pub let block_elem_outset : Int
+
+pub let block_elem_radius : Int
+
+pub let block_elem_spacing : Int
+
+pub let block_elem_sticky : Int
+
+pub let block_elem_stroke : Int
+
+pub let block_elem_width : Int
+
+pub fn box_elem() -> Element
+
+pub let box_elem_baseline : Int
+
+pub let box_elem_body : Int
+
+pub let box_elem_clip : Int
+
+pub let box_elem_fill : Int
+
+pub let box_elem_height : Int
+
+pub let box_elem_inset : Int
+
+pub let box_elem_outset : Int
+
+pub let box_elem_radius : Int
+
+pub let box_elem_stroke : Int
+
+pub let box_elem_width : Int
+
+pub fn bundle_format_elem() -> Element
+
+pub fn cancel_elem() -> Element
+
+pub let cancel_elem_angle : Int
+
+pub let cancel_elem_background : Int
+
+pub let cancel_elem_body : Int
+
+pub let cancel_elem_cross : Int
+
+pub let cancel_elem_inverted : Int
+
+pub let cancel_elem_length : Int
+
+pub let cancel_elem_stroke : Int
+
+pub fn cases_elem() -> Element
+
+pub let cases_elem_children : Int
+
+pub let cases_elem_delim : Int
+
+pub let cases_elem_gap : Int
+
+pub let cases_elem_reverse : Int
+
+pub fn[T : Reflect] cast_error(Ty[T], Value) -> HintedString
+
+pub fn cast_usize(Value) -> Int64 raise HintedError
+
+pub fn circle_elem() -> Element
+
+pub let circle_elem_body : Int
+
+pub let circle_elem_fill : Int
+
+pub let circle_elem_height : Int
+
+pub let circle_elem_inset : Int
+
+pub let circle_elem_outset : Int
+
+pub let circle_elem_radius : Int
+
+pub let circle_elem_stroke : Int
+
+pub let circle_elem_width : Int
+
+pub fn cite_elem() -> Element
+
+pub let cite_elem_form : Int
+
+pub let cite_elem_key : Int
+
+pub let cite_elem_lang : Int
+
+pub let cite_elem_region : Int
+
+pub let cite_elem_style : Int
+
+pub let cite_elem_supplement : Int
+
+pub fn cite_group_elem() -> Element
+
+pub let cite_group_elem_children : Int
+
+pub fn class_elem() -> Element
+
+pub let class_elem_body : Int
+
+pub let class_elem_class : Int
+
+pub let closure_name_hook : @ref.Ref[(@syntax.SyntaxNode) -> String?]
+
+pub fn colbreak_elem() -> Element
+
+pub let colbreak_elem_weak : Int
+
+pub fn columns_elem() -> Element
+
+pub let columns_elem_balanced : Int
+
+pub let columns_elem_body : Int
+
+pub let columns_elem_count : Int
+
+pub let columns_elem_gutter : Int
+
+pub let columns_elem_separator : Int
+
+pub fn compare(Value, Value) -> Int raise HintedError
+
+pub fn compare_str(String, String) -> Int
+
+pub fn contains(BindingGuard, Value, Value) -> Bool?
+
+pub fn context_elem() -> Element
+
+pub let context_elem_func : Int
+
+pub fn counter_display_elem() -> Element
+
+pub let counter_display_elem_both : Int
+
+pub let counter_display_elem_counter : Int
+
+pub let counter_display_elem_numbering : Int
+
+pub fn counter_update_elem() -> Element
+
+pub let counter_update_elem_key : Int
+
+pub let counter_update_elem_update : Int
+
+pub fn csl_indent_elem() -> Element
+
+pub let csl_indent_elem_body : Int
+
+pub fn csl_light_elem() -> Element
+
+pub let csl_light_elem_body : Int
+
+pub fn curve_close_elem() -> Element
+
+pub let curve_close_elem_mode : Int
+
+pub fn curve_cubic_elem() -> Element
+
+pub let curve_cubic_elem_control_end : Int
+
+pub let curve_cubic_elem_control_start : Int
+
+pub let curve_cubic_elem_end : Int
+
+pub let curve_cubic_elem_relative : Int
+
+pub fn curve_elem() -> Element
+
+pub let curve_elem_components : Int
+
+pub let curve_elem_fill : Int
+
+pub let curve_elem_fill_rule : Int
+
+pub let curve_elem_stroke : Int
+
+pub fn curve_line_elem() -> Element
+
+pub let curve_line_elem_end : Int
+
+pub let curve_line_elem_relative : Int
+
+pub fn curve_move_elem() -> Element
+
+pub let curve_move_elem_relative : Int
+
+pub let curve_move_elem_start : Int
+
+pub fn curve_quad_elem() -> Element
+
+pub let curve_quad_elem_control : Int
+
+pub let curve_quad_elem_end : Int
+
+pub let curve_quad_elem_relative : Int
+
+pub fn direct_link_elem() -> Element
+
+pub let direct_link_elem_alt : Int
+
+pub let direct_link_elem_body : Int
+
+pub let direct_link_elem_loc : Int
+
+pub fn display_float(Double) -> String
+
+pub fn div(Value, Value) -> Value raise HintedError
+
+pub fn divider_elem() -> Element
+
+pub fn document_elem() -> Element
+
+pub let document_elem_author : Int
+
+pub let document_elem_body : Int
+
+pub let document_elem_date : Int
+
+pub let document_elem_description : Int
+
+pub let document_elem_format : Int
+
+pub let document_elem_keywords : Int
+
+pub let document_elem_path : Int
+
+pub let document_elem_title : Int
+
+pub fn ellipse_elem() -> Element
+
+pub let ellipse_elem_body : Int
+
+pub let ellipse_elem_fill : Int
+
+pub let ellipse_elem_height : Int
+
+pub let ellipse_elem_inset : Int
+
+pub let ellipse_elem_outset : Int
+
+pub let ellipse_elem_stroke : Int
+
+pub let ellipse_elem_width : Int
+
+pub fn emph_elem() -> Element
+
+pub let emph_elem_body : Int
+
+pub fn enum_elem() -> Element
+
+pub let enum_elem_body_indent : Int
+
+pub let enum_elem_children : Int
+
+pub let enum_elem_full : Int
+
+pub let enum_elem_indent : Int
+
+pub let enum_elem_number_align : Int
+
+pub let enum_elem_numbering : Int
+
+pub let enum_elem_parents : Int
+
+pub let enum_elem_reversed : Int
+
+pub let enum_elem_spacing : Int
+
+pub let enum_elem_start : Int
+
+pub let enum_elem_tight : Int
+
+pub fn enum_item_elem() -> Element
+
+pub let enum_item_elem_body : Int
+
+pub let enum_item_elem_number : Int
+
+pub fn eq_(Value, Value) -> Value raise HintedError
+
+pub fn equal(Value, Value) -> Bool
+
+pub fn equation_elem() -> Element
+
+pub let equation_elem_alt : Int
+
+pub let equation_elem_block : Int
+
+pub let equation_elem_body : Int
+
+pub let equation_elem_bold : Int
+
+pub let equation_elem_cramped : Int
+
+pub let equation_elem_italic : Int
+
+pub let equation_elem_locale : Int
+
+pub let equation_elem_number_align : Int
+
+pub let equation_elem_numbering : Int
+
+pub let equation_elem_script_scale : Int
+
+pub let equation_elem_size : Int
+
+pub let equation_elem_supplement : Int
+
+pub let equation_elem_variant : Int
+
+pub fn exp10(Int) -> Double
+
+pub fn[T : FromValue + IntoValue] field_of(Ty[T], id~ : Int, name~ : String, docs? : String, kind~ : FieldKind, positional? : Bool, required? : Bool, variadic? : Bool, internal? : Bool, default? : () -> Value, fold? : (Value, Value) -> Value, parse? : (Engine, Args) -> Value? raise SourceError) -> FieldInfo
+
+pub fn fields_field(Value, String) -> Value raise HintedError
+
+pub fn figure_caption_elem() -> Element
+
+pub let figure_caption_elem_body : Int
+
+pub let figure_caption_elem_counter : Int
+
+pub let figure_caption_elem_figure_location : Int
+
+pub let figure_caption_elem_kind : Int
+
+pub let figure_caption_elem_numbering : Int
+
+pub let figure_caption_elem_position : Int
+
+pub let figure_caption_elem_separator : Int
+
+pub let figure_caption_elem_supplement : Int
+
+pub fn figure_elem() -> Element
+
+pub let figure_elem_alt : Int
+
+pub let figure_elem_body : Int
+
+pub let figure_elem_caption : Int
+
+pub let figure_elem_counter : Int
+
+pub let figure_elem_gap : Int
+
+pub let figure_elem_kind : Int
+
+pub let figure_elem_locale : Int
+
+pub let figure_elem_numbering : Int
+
+pub let figure_elem_outlined : Int
+
+pub let figure_elem_placement : Int
+
+pub let figure_elem_scope : Int
+
+pub let figure_elem_supplement : Int
+
+pub fn flush_elem() -> Element
+
+pub fn footnote_container_elem() -> Element
+
+pub fn footnote_elem() -> Element
+
+pub let footnote_elem_body : Int
+
+pub let footnote_elem_numbering : Int
+
+pub fn footnote_entry_elem() -> Element
+
+pub let footnote_entry_elem_clearance : Int
+
+pub let footnote_entry_elem_gap : Int
+
+pub let footnote_entry_elem_indent : Int
+
+pub let footnote_entry_elem_note : Int
+
+pub let footnote_entry_elem_separator : Int
+
+pub fn footnote_marker_elem() -> Element
+
+pub fn format_float(Double, precision? : Int, Bool, String) -> String
+
+pub fn format_float_component(Double) -> String
+
+pub fn format_float_with_unit(Double, String) -> String
+
+pub fn format_int_with_base(Int64, Int64) -> String
+
+pub fn frac_elem() -> Element
+
+pub let frac_elem_denom : Int
+
+pub let frac_elem_denom_deparenthesized : Int
+
+pub let frac_elem_num : Int
+
+pub let frac_elem_num_deparenthesized : Int
+
+pub let frac_elem_style : Int
+
+pub fn frame_elem() -> Element
+
+pub let frame_elem_body : Int
+
+pub fn geq(Value, Value) -> Value raise HintedError
+
+pub fn grid_cell_elem() -> Element
+
+pub let grid_cell_elem_align : Int
+
+pub let grid_cell_elem_body : Int
+
+pub let grid_cell_elem_breakable : Int
+
+pub let grid_cell_elem_colspan : Int
+
+pub let grid_cell_elem_fill : Int
+
+pub let grid_cell_elem_inset : Int
+
+pub let grid_cell_elem_is_repeated : Int
+
+pub let grid_cell_elem_rowspan : Int
+
+pub let grid_cell_elem_stroke : Int
+
+pub let grid_cell_elem_x : Int
+
+pub let grid_cell_elem_y : Int
+
+pub fn grid_elem() -> Element
+
+pub let grid_elem_align : Int
+
+pub let grid_elem_children : Int
+
+pub let grid_elem_column_gutter : Int
+
+pub let grid_elem_columns : Int
+
+pub let grid_elem_fill : Int
+
+pub let grid_elem_grid : Int
+
+pub let grid_elem_gutter : Int
+
+pub let grid_elem_inset : Int
+
+pub let grid_elem_row_gutter : Int
+
+pub let grid_elem_rows : Int
+
+pub let grid_elem_stroke : Int
+
+pub fn grid_footer_elem() -> Element
+
+pub let grid_footer_elem_children : Int
+
+pub let grid_footer_elem_repeat : Int
+
+pub fn grid_h_line_elem() -> Element
+
+pub let grid_h_line_elem_end : Int
+
+pub let grid_h_line_elem_position : Int
+
+pub let grid_h_line_elem_start : Int
+
+pub let grid_h_line_elem_stroke : Int
+
+pub let grid_h_line_elem_y : Int
+
+pub fn grid_header_elem() -> Element
+
+pub let grid_header_elem_children : Int
+
+pub let grid_header_elem_level : Int
+
+pub let grid_header_elem_repeat : Int
+
+pub fn grid_v_line_elem() -> Element
+
+pub let grid_v_line_elem_end : Int
+
+pub let grid_v_line_elem_position : Int
+
+pub let grid_v_line_elem_start : Int
+
+pub let grid_v_line_elem_stroke : Int
+
+pub let grid_v_line_elem_x : Int
+
+pub fn gt(Value, Value) -> Value raise HintedError
+
+pub fn h_elem() -> Element
+
+pub let h_elem_amount : Int
+
+pub let h_elem_weak : Int
+
+pub fn heading_elem() -> Element
+
+pub let heading_elem_body : Int
+
+pub let heading_elem_bookmarked : Int
+
+pub let heading_elem_depth : Int
+
+pub let heading_elem_hanging_indent : Int
+
+pub let heading_elem_level : Int
+
+pub let heading_elem_numbering : Int
+
+pub let heading_elem_numbers : Int
+
+pub let heading_elem_offset : Int
+
+pub let heading_elem_outlined : Int
+
+pub let heading_elem_supplement : Int
+
+pub fn hide_elem() -> Element
+
+pub let hide_elem_body : Int
+
+pub let hide_elem_hidden : Int
+
+pub fn highlight_elem() -> Element
+
+pub let highlight_elem_body : Int
+
+pub let highlight_elem_bottom_edge : Int
+
+pub let highlight_elem_extent : Int
+
+pub let highlight_elem_fill : Int
+
+pub let highlight_elem_radius : Int
+
+pub let highlight_elem_stroke : Int
+
+pub let highlight_elem_top_edge : Int
+
+pub fn html_elem() -> Element
+
+pub let html_elem_attrs : Int
+
+pub let html_elem_body : Int
+
+pub let html_elem_css : Int
+
+pub let html_elem_parent : Int
+
+pub let html_elem_role : Int
+
+pub let html_elem_tag : Int
+
+pub fn html_format_elem() -> Element
+
+pub let html_format_elem_pretty : Int
+
+pub fn image_elem() -> Element
+
+pub let image_elem_alt : Int
+
+pub let image_elem_fit : Int
+
+pub let image_elem_format : Int
+
+pub let image_elem_height : Int
+
+pub let image_elem_icc : Int
+
+pub let image_elem_locale : Int
+
+pub let image_elem_page : Int
+
+pub let image_elem_scaling : Int
+
+pub let image_elem_source : Int
+
+pub let image_elem_width : Int
+
+pub fn in_(BindingGuard, Value, Value) -> Value raise HintedError
+
+pub fn inline_elem() -> Element
+
+pub let inline_elem_body : Int
+
+pub fn[T : Reflect] input_of(Ty[T]) -> CastInfo
+
+pub fn[T : Numeric] is_zero(T) -> Bool
+
+pub fn join(Value, Value) -> Value raise HintedError
+
+pub fn layout_elem() -> Element
+
+pub let layout_elem_func : Int
+
+pub fn leq(Value, Value) -> Value raise HintedError
+
+pub fn limits_elem() -> Element
+
+pub let limits_elem_body : Int
+
+pub let limits_elem_inline : Int
+
+pub fn line_elem() -> Element
+
+pub let line_elem_angle : Int
+
+pub let line_elem_end : Int
+
+pub let line_elem_length : Int
+
+pub let line_elem_start : Int
+
+pub let line_elem_stroke : Int
+
+pub fn linebreak_elem() -> Element
+
+pub let linebreak_elem_justify : Int
+
+pub fn link_elem() -> Element
+
+pub let link_elem_body : Int
+
+pub let link_elem_current : Int
+
+pub let link_elem_dest : Int
+
+pub fn link_marker_elem() -> Element
+
+pub let link_marker_elem_alt : Int
+
+pub let link_marker_elem_body : Int
+
+pub fn list_elem() -> Element
+
+pub let list_elem_body_indent : Int
+
+pub let list_elem_children : Int
+
+pub let list_elem_depth : Int
+
+pub let list_elem_indent : Int
+
+pub let list_elem_marker : Int
+
+pub let list_elem_marker_align : Int
+
+pub let list_elem_spacing : Int
+
+pub let list_elem_tight : Int
+
+pub fn list_item_elem() -> Element
+
+pub let list_item_elem_body : Int
+
+pub fn lr_elem() -> Element
+
+pub let lr_elem_body : Int
+
+pub let lr_elem_size : Int
+
+pub fn lt(Value, Value) -> Value raise HintedError
+
+pub fn mat_elem() -> Element
+
+pub let mat_elem_align : Int
+
+pub let mat_elem_augment : Int
+
+pub let mat_elem_column_gap : Int
+
+pub let mat_elem_delim : Int
+
+pub let mat_elem_gap : Int
+
+pub let mat_elem_row_gap : Int
+
+pub let mat_elem_rows : Int
+
+pub fn math_attach_elem() -> Element
+
+pub let math_attach_elem_b : Int
+
+pub let math_attach_elem_base : Int
+
+pub let math_attach_elem_bl : Int
+
+pub let math_attach_elem_br : Int
+
+pub let math_attach_elem_t : Int
+
+pub let math_attach_elem_tl : Int
+
+pub let math_attach_elem_tr : Int
+
+pub fn math_overline_elem() -> Element
+
+pub let math_overline_elem_body : Int
+
+pub fn math_underline_elem() -> Element
+
+pub let math_underline_elem_body : Int
+
+pub let max_call_depth : Int
+
+pub let max_html_depth : Int
+
+pub let max_layout_depth : Int
+
+pub let max_show_rule_depth : Int
+
+pub fn metadata_elem() -> Element
+
+pub let metadata_elem_value : Int
+
+pub fn mid_elem() -> Element
+
+pub let mid_elem_body : Int
+
+pub let minus_sign : String
+
+pub fn missing_key(String) -> String
+
+pub fn missing_key_no_default(String) -> String
+
+pub fn move_elem() -> Element
+
+pub let move_elem_body : Int
+
+pub let move_elem_dx : Int
+
+pub let move_elem_dy : Int
+
+pub fn mul(Value, Value) -> Value raise HintedError
+
+pub fn neg(Value) -> Value raise HintedError
+
+pub fn neq(Value, Value) -> Value raise HintedError
+
+pub fn not_(Value) -> Value raise HintedError
+
+pub fn not_in(BindingGuard, Value, Value) -> Value raise HintedError
+
+pub fn op_elem() -> Element
+
+pub let op_elem_limits : Int
+
+pub let op_elem_text : Int
+
+pub fn or_(Value, Value) -> Value raise HintedError
+
+pub fn out_of_bounds(Int64, Int) -> String
+
+pub fn out_of_bounds_no_default(Int64, Int) -> String
+
+pub fn outline_elem() -> Element
+
+pub let outline_elem_depth : Int
+
+pub let outline_elem_indent : Int
+
+pub let outline_elem_target : Int
+
+pub let outline_elem_title : Int
+
+pub fn outline_entry_elem() -> Element
+
+pub let outline_entry_elem_element : Int
+
+pub let outline_entry_elem_fill : Int
+
+pub let outline_entry_elem_level : Int
+
+pub let outline_entry_elem_parent : Int
+
+pub fn[T : Reflect] output_of(Ty[T]) -> CastInfo
+
+pub fn overbrace_elem() -> Element
+
+pub let overbrace_elem_annotation : Int
+
+pub let overbrace_elem_body : Int
+
+pub fn overbracket_elem() -> Element
+
+pub let overbracket_elem_annotation : Int
+
+pub let overbracket_elem_body : Int
+
+pub fn overline_elem() -> Element
+
+pub let overline_elem_background : Int
+
+pub let overline_elem_body : Int
+
+pub let overline_elem_evade : Int
+
+pub let overline_elem_extent : Int
+
+pub let overline_elem_offset : Int
+
+pub let overline_elem_stroke : Int
+
+pub fn overparen_elem() -> Element
+
+pub let overparen_elem_annotation : Int
+
+pub let overparen_elem_body : Int
+
+pub fn overshell_elem() -> Element
+
+pub let overshell_elem_annotation : Int
+
+pub let overshell_elem_body : Int
+
+pub fn pad_elem() -> Element
+
+pub let pad_elem_body : Int
+
+pub let pad_elem_bottom : Int
+
+pub let pad_elem_left : Int
+
+pub let pad_elem_rest : Int
+
+pub let pad_elem_right : Int
+
+pub let pad_elem_top : Int
+
+pub let pad_elem_x : Int
+
+pub let pad_elem_y : Int
+
+pub fn page_elem() -> Element
+
+pub let page_elem_background : Int
+
+pub let page_elem_binding : Int
+
+pub let page_elem_bleed : Int
+
+pub let page_elem_body : Int
+
+pub let page_elem_columns : Int
+
+pub let page_elem_fill : Int
+
+pub let page_elem_flipped : Int
+
+pub let page_elem_footer : Int
+
+pub let page_elem_footer_descent : Int
+
+pub let page_elem_foreground : Int
+
+pub let page_elem_header : Int
+
+pub let page_elem_header_ascent : Int
+
+pub let page_elem_height : Int
+
+pub let page_elem_margin : Int
+
+pub let page_elem_number_align : Int
+
+pub let page_elem_numbering : Int
+
+pub let page_elem_paper : Int
+
+pub let page_elem_supplement : Int
+
+pub let page_elem_width : Int
+
+pub fn pagebreak_elem() -> Element
+
+pub let pagebreak_elem_boundary : Int
+
+pub let pagebreak_elem_to : Int
+
+pub let pagebreak_elem_weak : Int
+
+pub fn par_elem() -> Element
+
+pub let par_elem_body : Int
+
+pub let par_elem_first_line_indent : Int
+
+pub let par_elem_hanging_indent : Int
+
+pub let par_elem_justification_limits : Int
+
+pub let par_elem_justify : Int
+
+pub let par_elem_leading : Int
+
+pub let par_elem_linebreaks : Int
+
+pub let par_elem_spacing : Int
+
+pub fn par_line_elem() -> Element
+
+pub let par_line_elem_number_align : Int
+
+pub let par_line_elem_number_clearance : Int
+
+pub let par_line_elem_number_margin : Int
+
+pub let par_line_elem_numbering : Int
+
+pub let par_line_elem_numbering_scope : Int
+
+pub fn par_line_marker_elem() -> Element
+
+pub let par_line_marker_elem_number_align : Int
+
+pub let par_line_marker_elem_number_clearance : Int
+
+pub let par_line_marker_elem_number_margin : Int
+
+pub let par_line_marker_elem_numbering : Int
+
+pub fn parbreak_elem() -> Element
+
+pub fn pdf_attach_elem() -> Element
+
+pub let pdf_attach_elem_data : Int
+
+pub let pdf_attach_elem_description : Int
+
+pub let pdf_attach_elem_mime_type : Int
+
+pub let pdf_attach_elem_path : Int
+
+pub let pdf_attach_elem_relationship : Int
+
+pub fn pdf_format_elem() -> Element
+
+pub let pdf_format_elem_pages : Int
+
+pub let pdf_format_elem_pretty : Int
+
+pub let pdf_format_elem_standard : Int
+
+pub let pdf_format_elem_tagged : Int
+
+pub fn pdf_marker_tag_elem() -> Element
+
+pub let pdf_marker_tag_elem_body : Int
+
+pub let pdf_marker_tag_elem_kind : Int
+
+pub fn place_elem() -> Element
+
+pub let place_elem_alignment : Int
+
+pub let place_elem_body : Int
+
+pub let place_elem_clearance : Int
+
+pub let place_elem_dx : Int
+
+pub let place_elem_dy : Int
+
+pub let place_elem_float : Int
+
+pub let place_elem_scope : Int
+
+pub fn png_format_elem() -> Element
+
+pub let png_format_elem_ppi : Int
+
+pub fn polygon_elem() -> Element
+
+pub let polygon_elem_fill : Int
+
+pub let polygon_elem_fill_rule : Int
+
+pub let polygon_elem_stroke : Int
+
+pub let polygon_elem_vertices : Int
+
+pub fn pos(Value) -> Value raise HintedError
+
+pub fn prefix_info_elem() -> Element
+
+pub let prefix_info_elem_inset : Int
+
+pub let prefix_info_elem_key : Int
+
+pub let prefix_info_elem_level : Int
+
+pub fn pretty_array_like(ArrayView[String], Bool) -> String
+
+pub fn pretty_comma_list(ArrayView[String], Bool) -> String
+
+pub fn primes_elem() -> Element
+
+pub let primes_elem_count : Int
+
+pub fn quote_elem() -> Element
+
+pub let quote_elem_attribution : Int
+
+pub let quote_elem_block : Int
+
+pub let quote_elem_body : Int
+
+pub let quote_elem_depth : Int
+
+pub let quote_elem_quotes : Int
+
+pub fn raw_elem() -> Element
+
+pub let raw_elem_align : Int
+
+pub let raw_elem_block : Int
+
+pub let raw_elem_lang : Int
+
+pub let raw_elem_lines : Int
+
+pub let raw_elem_syntaxes : Int
+
+pub let raw_elem_tab_size : Int
+
+pub let raw_elem_text : Int
+
+pub let raw_elem_theme : Int
+
+pub fn raw_line_elem() -> Element
+
+pub let raw_line_elem_body : Int
+
+pub let raw_line_elem_count : Int
+
+pub let raw_line_elem_number : Int
+
+pub let raw_line_elem_text : Int
+
+pub fn rect_elem() -> Element
+
+pub let rect_elem_body : Int
+
+pub let rect_elem_fill : Int
+
+pub let rect_elem_height : Int
+
+pub let rect_elem_inset : Int
+
+pub let rect_elem_outset : Int
+
+pub let rect_elem_radius : Int
+
+pub let rect_elem_stroke : Int
+
+pub let rect_elem_width : Int
+
+pub fn ref_elem() -> Element
+
+pub let ref_elem_citation : Int
+
+pub let ref_elem_element : Int
+
+pub let ref_elem_form : Int
+
+pub let ref_elem_supplement : Int
+
+pub let ref_elem_target : Int
+
+pub fn rem_euclid(Double, Double) -> Double
+
+pub fn repeat_elem() -> Element
+
+pub let repeat_elem_body : Int
+
+pub let repeat_elem_gap : Int
+
+pub let repeat_elem_justify : Int
+
+pub fn repr_float(Double) -> String
+
+pub fn repr_int(Int64) -> String
+
+pub fn repr_str(String) -> String
+
+pub fn root_elem() -> Element
+
+pub let root_elem_index : Int
+
+pub let root_elem_radicand : Int
+
+pub fn rotate_elem() -> Element
+
+pub let rotate_elem_angle : Int
+
+pub let rotate_elem_body : Int
+
+pub let rotate_elem_origin : Int
+
+pub let rotate_elem_reflow : Int
+
+pub fn round_with_precision(Double, Int) -> Double
+
+pub fn rust_debug_f64(Double) -> String
+
+pub fn rust_display_f64(Double) -> String
+
+pub fn rust_fixed_f64(Double, Int) -> String
+
+pub fn rust_lines(String) -> Array[String]
+
+pub fn rust_rem(Double, Double) -> Double
+
+pub fn rust_round(Double) -> Double
+
+pub fn rust_trim(String) -> String
+
+pub fn rust_trim_end(String) -> String
+
+pub fn rust_trim_start(String) -> String
+
+pub fn scale_elem() -> Element
+
+pub let scale_elem_body : Int
+
+pub let scale_elem_factor : Int
+
+pub let scale_elem_origin : Int
+
+pub let scale_elem_reflow : Int
+
+pub let scale_elem_x : Int
+
+pub let scale_elem_y : Int
+
+pub fn scripts_elem() -> Element
+
+pub let scripts_elem_body : Int
+
+pub fn separated_list(ArrayView[String], String) -> String
+
+pub fn sequence_elem() -> Element
+
+pub let sink_max_values : Int
+
+pub fn skew_elem() -> Element
+
+pub let skew_elem_ax : Int
+
+pub let skew_elem_ay : Int
+
+pub let skew_elem_body : Int
+
+pub let skew_elem_origin : Int
+
+pub let skew_elem_reflow : Int
+
+pub fn smallcaps_elem() -> Element
+
+pub let smallcaps_elem_all : Int
+
+pub let smallcaps_elem_body : Int
+
+pub fn smart_quote_elem() -> Element
+
+pub let smart_quote_elem_alternative : Int
+
+pub let smart_quote_elem_double : Int
+
+pub let smart_quote_elem_enabled : Int
+
+pub let smart_quote_elem_quotes : Int
+
+pub fn space_elem() -> Element
+
+pub let space_elem_had_newline : Int
+
+pub fn square_elem() -> Element
+
+pub let square_elem_body : Int
+
+pub let square_elem_fill : Int
+
+pub let square_elem_height : Int
+
+pub let square_elem_inset : Int
+
+pub let square_elem_outset : Int
+
+pub let square_elem_radius : Int
+
+pub let square_elem_size : Int
+
+pub let square_elem_stroke : Int
+
+pub let square_elem_width : Int
+
+pub fn stack_elem() -> Element
+
+pub let stack_elem_children : Int
+
+pub let stack_elem_dir : Int
+
+pub let stack_elem_spacing : Int
+
+pub fn state_update_elem() -> Element
+
+pub let state_update_elem_key : Int
+
+pub let state_update_elem_update : Int
+
+pub fn str_repeat(String, Int64) -> String raise HintedError
+
+pub fn stretch_elem() -> Element
+
+pub let stretch_elem_body : Int
+
+pub let stretch_elem_size : Int
+
+pub fn strike_elem() -> Element
+
+pub let strike_elem_background : Int
+
+pub let strike_elem_body : Int
+
+pub let strike_elem_extent : Int
+
+pub let strike_elem_offset : Int
+
+pub let strike_elem_stroke : Int
+
+pub fn stroke_from_pair(Value, Value) -> Value raise HintedError
+
+pub fn strong_elem() -> Element
+
+pub let strong_elem_body : Int
+
+pub let strong_elem_delta : Int
+
+pub fn styled_elem() -> Element
+
+pub fn sub(Value, Value) -> Value raise HintedError
+
+pub fn sub_elem() -> Element
+
+pub let sub_elem_baseline : Int
+
+pub let sub_elem_body : Int
+
+pub let sub_elem_size : Int
+
+pub let sub_elem_typographic : Int
+
+pub fn super_elem() -> Element
+
+pub let super_elem_baseline : Int
+
+pub let super_elem_body : Int
+
+pub let super_elem_size : Int
+
+pub let super_elem_typographic : Int
+
+pub fn svg_format_elem() -> Element
+
+pub let svg_format_elem_pretty : Int
+
+pub fn symbol_elem() -> Element
+
+pub let symbol_elem_text : Int
+
+pub fn table_cell_elem() -> Element
+
+pub let table_cell_elem_align : Int
+
+pub let table_cell_elem_body : Int
+
+pub let table_cell_elem_breakable : Int
+
+pub let table_cell_elem_colspan : Int
+
+pub let table_cell_elem_fill : Int
+
+pub let table_cell_elem_inset : Int
+
+pub let table_cell_elem_is_repeated : Int
+
+pub let table_cell_elem_kind : Int
+
+pub let table_cell_elem_rowspan : Int
+
+pub let table_cell_elem_stroke : Int
+
+pub let table_cell_elem_x : Int
+
+pub let table_cell_elem_y : Int
+
+pub fn table_elem() -> Element
+
+pub let table_elem_align : Int
+
+pub let table_elem_children : Int
+
+pub let table_elem_column_gutter : Int
+
+pub let table_elem_columns : Int
+
+pub let table_elem_fill : Int
+
+pub let table_elem_grid : Int
+
+pub let table_elem_gutter : Int
+
+pub let table_elem_inset : Int
+
+pub let table_elem_row_gutter : Int
+
+pub let table_elem_rows : Int
+
+pub let table_elem_stroke : Int
+
+pub let table_elem_summary : Int
+
+pub fn table_footer_elem() -> Element
+
+pub let table_footer_elem_children : Int
+
+pub let table_footer_elem_repeat : Int
+
+pub fn table_h_line_elem() -> Element
+
+pub let table_h_line_elem_end : Int
+
+pub let table_h_line_elem_position : Int
+
+pub let table_h_line_elem_start : Int
+
+pub let table_h_line_elem_stroke : Int
+
+pub let table_h_line_elem_y : Int
+
+pub fn table_header_elem() -> Element
+
+pub let table_header_elem_children : Int
+
+pub let table_header_elem_level : Int
+
+pub let table_header_elem_repeat : Int
+
+pub fn table_v_line_elem() -> Element
+
+pub let table_v_line_elem_end : Int
+
+pub let table_v_line_elem_position : Int
+
+pub let table_v_line_elem_start : Int
+
+pub let table_v_line_elem_stroke : Int
+
+pub let table_v_line_elem_x : Int
+
+pub fn tag_elem() -> Element
+
+pub let tag_elem_tag : Int
+
+pub fn target_elem() -> Element
+
+pub let target_elem_target : Int
+
+pub fn term_item_elem() -> Element
+
+pub let term_item_elem_description : Int
+
+pub let term_item_elem_term : Int
+
+pub fn terms_elem() -> Element
+
+pub let terms_elem_children : Int
+
+pub let terms_elem_hanging_indent : Int
+
+pub let terms_elem_indent : Int
+
+pub let terms_elem_separator : Int
+
+pub let terms_elem_spacing : Int
+
+pub let terms_elem_tight : Int
+
+pub let terms_elem_within : Int
+
+pub fn text_elem() -> Element
+
+pub let text_elem_alternates : Int
+
+pub let text_elem_baseline : Int
+
+pub let text_elem_body : Int
+
+pub let text_elem_bottom_edge : Int
+
+pub let text_elem_case : Int
+
+pub let text_elem_cjk_latin_spacing : Int
+
+pub let text_elem_costs : Int
+
+pub let text_elem_deco : Int
+
+pub let text_elem_delta : Int
+
+pub let text_elem_dir : Int
+
+pub let text_elem_discretionary_ligatures : Int
+
+pub let text_elem_emph : Int
+
+pub let text_elem_fallback : Int
+
+pub let text_elem_features : Int
+
+pub let text_elem_fill : Int
+
+pub let text_elem_font : Int
+
+pub let text_elem_fractions : Int
+
+pub let text_elem_historical_ligatures : Int
+
+pub let text_elem_hyphenate : Int
+
+pub let text_elem_kerning : Int
+
+pub let text_elem_lang : Int
+
+pub let text_elem_ligatures : Int
+
+pub let text_elem_number_type : Int
+
+pub let text_elem_number_width : Int
+
+pub let text_elem_overhang : Int
+
+pub let text_elem_region : Int
+
+pub let text_elem_script : Int
+
+pub let text_elem_shift_settings : Int
+
+pub let text_elem_size : Int
+
+pub let text_elem_slashed_zero : Int
+
+pub let text_elem_smallcaps : Int
+
+pub let text_elem_spacing : Int
+
+pub let text_elem_span_offset : Int
+
+pub let text_elem_stretch : Int
+
+pub let text_elem_stroke : Int
+
+pub let text_elem_style : Int
+
+pub let text_elem_stylistic_set : Int
+
+pub let text_elem_text : Int
+
+pub let text_elem_top_edge : Int
+
+pub let text_elem_tracking : Int
+
+pub let text_elem_variations : Int
+
+pub let text_elem_weight : Int
+
+pub fn title_elem() -> Element
+
+pub let title_elem_body : Int
+
+pub fn[T] trace((@syntax.DiagSpan) -> (Int, Int)?, () -> Tracepoint, @syntax.Span, () -> T raise SourceError) -> T raise SourceError
+
+pub fn underbrace_elem() -> Element
+
+pub let underbrace_elem_annotation : Int
+
+pub let underbrace_elem_body : Int
+
+pub fn underbracket_elem() -> Element
+
+pub let underbracket_elem_annotation : Int
+
+pub let underbracket_elem_body : Int
+
+pub fn underline_elem() -> Element
+
+pub let underline_elem_background : Int
+
+pub let underline_elem_body : Int
+
+pub let underline_elem_evade : Int
+
+pub let underline_elem_extent : Int
+
+pub let underline_elem_offset : Int
+
+pub let underline_elem_stroke : Int
+
+pub fn underparen_elem() -> Element
+
+pub let underparen_elem_annotation : Int
+
+pub let underparen_elem_body : Int
+
+pub fn undershell_elem() -> Element
+
+pub let undershell_elem_annotation : Int
+
+pub let undershell_elem_body : Int
+
+pub fn v_elem() -> Element
+
+pub let v_elem_amount : Int
+
+pub let v_elem_attach : Int
+
+pub let v_elem_weak : Int
+
+pub fn vec_elem() -> Element
+
+pub let vec_elem_align : Int
+
+pub let vec_elem_children : Int
+
+pub let vec_elem_delim : Int
+
+pub let vec_elem_gap : Int
+
+pub fn world_range(&World, @syntax.DiagSpan) -> (Int, Int)?
+
+// Errors
+pub(all) suberror FieldAccessError {
+  Unknown
+  Unset
+} derive(Eq, @debug.Debug)
+pub fn FieldAccessError::message(Self, Content, String) -> String
+pub fn FieldAccessError::message_no_default(Self, Content, String) -> String
+
+pub(all) suberror FileError {
+  NotFound(String)
+  AccessDenied
+  IsDirectory
+  NotSource
+  InvalidUtf8
+  Package(String)
+  Other(String?)
+} derive(Eq, Hash, @debug.Debug)
+pub impl Show for FileError
+
+pub(all) suberror HintedError {
+  HintedError(HintedString)
+} derive(@debug.Debug)
+
+pub(all) suberror SourceError {
+  SourceError(Array[SourceDiagnostic])
+} derive(@debug.Debug)
+
+// Types and methods
+pub(all) struct Abs(Scalar) derive(Compare, Default, Eq, Hash)
+pub fn Abs::abs(Self) -> Self
+pub fn Abs::approx_empty(Self) -> Bool
+pub fn Abs::approx_eq(Self, Self) -> Bool
+pub fn Abs::cm(Double) -> Self
+pub fn Abs::div_by(Self, Double) -> Self
+pub fn Abs::fits(Self, Self) -> Bool
+pub fn Abs::inches(Double) -> Self
+pub fn Abs::inf() -> Self
+pub fn Abs::is_finite(Self) -> Bool
+pub fn Abs::is_zero(Self) -> Bool
+pub fn Abs::max(Self, Self) -> Self
+pub fn Abs::min(Self, Self) -> Self
+pub fn Abs::mm(Double) -> Self
+pub fn Abs::pt(Double) -> Self
+pub fn Abs::ratio_to(Self, Self) -> Double
+pub fn Abs::raw(Double) -> Self
+pub fn Abs::repr(Self) -> String
+pub fn Abs::signum(Self) -> Double
+pub fn Abs::times(Self, Double) -> Self
+pub fn Abs::to_cm(Self) -> Double
+pub fn Abs::to_inches(Self) -> Double
+pub fn Abs::to_mm(Self) -> Double
+pub fn Abs::to_pt(Self) -> Double
+pub fn Abs::to_raw(Self) -> Double
+pub fn Abs::to_unit(Self, AbsUnit) -> Double
+pub fn Abs::with_unit(Double, AbsUnit) -> Self
+pub fn Abs::zero() -> Self
+pub impl Add for Abs
+pub impl Mod for Abs
+pub impl Neg for Abs
+pub impl Sub for Abs
+pub impl Numeric for Abs
+
+pub(all) enum AbsUnit {
+  Pt
+  Mm
+  Cm
+  In
+} derive(Eq, Hash, @debug.Debug)
+
+pub(all) struct Angle(Scalar) derive(Compare, Default, Eq, Hash)
+pub fn Angle::abs(Self) -> Self
+pub fn Angle::acos(Double) -> Self
+pub fn Angle::asin(Double) -> Self
+pub fn Angle::atan(Double) -> Self
+pub fn Angle::atan2(Double, Double) -> Self
+pub fn Angle::cos(Self) -> Double
+pub fn Angle::deg(Double) -> Self
+pub fn Angle::div_by(Self, Double) -> Self
+pub fn Angle::from_ratio(Ratio) -> Self
+pub fn Angle::normalized(Self) -> Self
+pub fn Angle::quadrant(Self) -> Quadrant
+pub fn Angle::rad(Double) -> Self
+pub fn Angle::ratio_to(Self, Self) -> Double
+pub fn Angle::raw(Double) -> Self
+pub fn Angle::repr(Self) -> String
+pub fn Angle::sin(Self) -> Double
+pub fn Angle::tan(Self) -> Double
+pub fn Angle::times(Self, Double) -> Self
+pub fn Angle::to_deg(Self) -> Double
+pub fn Angle::to_rad(Self) -> Double
+pub fn Angle::to_raw(Self) -> Double
+pub fn Angle::to_unit(Self, AngleUnit) -> Double
+pub fn Angle::with_unit(Double, AngleUnit) -> Self
+pub fn Angle::zero() -> Self
+pub impl Add for Angle
+pub impl Neg for Angle
+pub impl Sub for Angle
+pub impl FromValue for Angle
+pub impl IntoValue for Angle
+pub impl Numeric for Angle
+pub impl Reflect for Angle
+
+pub(all) enum AngleUnit {
+  Rad
+  Deg
+} derive(Eq, Hash, @debug.Debug)
+
+pub(all) struct Arg {
+  span : @syntax.Span
+  name : String?
+  value : @syntax.Spanned[Value]
+}
+
+pub struct Args {
+  mut span : @syntax.Span
+  items : Array[Arg]
+}
+pub fn[T : FromValue] Args::all(Self) -> Array[T] raise SourceError
+pub fn Args::all_with(Self, (Value) -> Value raise HintedError) -> Array[Value] raise SourceError
+pub fn Args::consume(Self, Int) -> Array[Arg] raise SourceError
+pub fn Args::copy(Self) -> Self
+pub fn[T : FromValue] Args::eat(Self) -> T? raise SourceError
+pub fn Args::eat_spanned(Self) -> @syntax.Spanned[Value]?
+pub fn[T : FromValue] Args::expect(Self, String) -> T raise SourceError
+pub fn Args::expect_with(Self, String, (Value) -> Value raise HintedError) -> Value raise SourceError
+pub fn Args::field(Self, String) -> Value raise HintedError
+pub fn[T : FromValue] Args::find(Self) -> T? raise SourceError
+pub fn Args::find_with(Self, (Value) -> Bool, (Value) -> Value raise HintedError) -> Value? raise SourceError
+pub fn Args::finish(Self) -> Unit raise SourceError
+pub fn Args::insert(Self, Int, @syntax.Span, Value) -> Unit
+pub fn Args::is_empty(Self) -> Bool
+pub fn Args::merge(Self, Self) -> Self
+pub fn[T : FromValue] Args::named(Self, String) -> T? raise SourceError
+pub fn[T : FromValue] Args::named_or_find(Self, String) -> T? raise SourceError
+pub fn Args::named_with(Self, String, (Value) -> Value raise HintedError) -> Value? raise SourceError
+pub fn Args::new(@syntax.Span, ArrayView[Value]) -> Self
+pub fn Args::push(Self, @syntax.Span, Value) -> Unit
+pub fn Args::remaining(Self) -> Int
+pub fn Args::repr(Self) -> String
+pub fn Args::spanned(Self, @syntax.Span) -> Self
+pub fn Args::take(Self) -> Self
+pub fn Args::to_named(Self) -> Dict
+pub fn Args::to_pos(Self) -> Arr
+pub impl Eq for Args
+
+pub struct Arr {
+  items : Array[Value]
+  mut shared : Bool
+}
+pub fn Arr::at_index(Self, Int64) -> Value raise HintedError
+pub fn Arr::concat(Self, Self) -> Self
+pub fn Arr::copy(Self) -> Self
+pub fn Arr::from_array(Array[Value]) -> Self
+pub fn Arr::is_empty(Self) -> Bool
+pub fn Arr::iter(Self) -> Iter[Value]
+pub fn Arr::len(Self) -> Int
+pub fn Arr::locate(Self, Int64, Bool) -> Int raise HintedError
+pub fn Arr::locate_opt(Self, Int64, Bool) -> Int?
+pub fn Arr::make_mut(Self) -> Self
+pub fn Arr::new() -> Self
+pub fn Arr::repeat(Self, Int64) -> Self raise HintedError
+pub fn Arr::repr(Self) -> String
+pub impl FromValue for Arr
+pub impl IntoValue for Arr
+pub impl Reflect for Arr
+
+pub struct Binding {
+  mut value : Value
+  span : @syntax.Span
+  // private fields
+}
+pub fn Binding::capture(Self, Capturer) -> Self
+pub fn Binding::category(Self) -> Category?
+pub fn Binding::check_write(Self, BindingGuard, String) -> Unit raise HintedError
+pub fn Binding::copy(Self) -> Self
+pub fn Binding::deprecation(Self) -> Deprecation?
+pub fn Binding::detached(Value) -> Self
+pub fn Binding::feature(Self) -> Feature?
+pub fn Binding::new(Value, @syntax.Span) -> Self
+pub fn Binding::read(Self, BindingGuard, String) -> Value raise HintedError
+pub fn Binding::with_category(Self, Category) -> Self
+pub fn Binding::with_deprecation(Self, Deprecation) -> Self
+pub fn Binding::with_documentation(Self, BindingDocumentation) -> Self
+pub fn Binding::with_feature(Self, Feature) -> Self
+
+pub(all) struct BindingDocumentation {
+  name : String
+  title : String
+  docs : String
+} derive(Eq, Hash)
+
+pub(all) enum BindingError {
+  Captured(Capturer)
+  Feature(Feature)
+}
+pub fn BindingError::cannot(Self, String) -> HintedString
+
+pub(all) struct BindingGuard {
+  features : Features
+  emit : (HintedString) -> Unit
+}
+pub fn BindingGuard::silent(Features) -> Self
+
+pub(all) struct BytesValue(Bytes) derive(Eq, Hash)
+pub fn BytesValue::concat(Self, Self) -> Self
+pub fn BytesValue::repr(Self) -> String
+
+pub(all) enum Capturer {
+  Function
+  Context
+} derive(Eq, Hash, @debug.Debug)
+pub impl Show for Capturer
+
+pub(all) enum CastInfo {
+  Any
+  Value(Value, String)
+  Type(Type)
+  Union(Array[CastInfo])
+} derive(Eq)
+pub fn CastInfo::error(Self, Value) -> HintedString
+pub fn CastInfo::union_with(Self, Self) -> Self
+pub fn CastInfo::walk(Self, (Self) -> Unit) -> Unit
+
+pub(all) enum Category {
+  Foundations
+  Introspection
+  Layout
+  DataLoading
+  Math
+  Model
+  Symbols
+  Text
+  Visualize
+  Format
+  Pdf
+  Html
+  Svg
+  Png
+  Bundle
+} derive(Eq, Hash, @debug.Debug)
+
+pub struct Closure {
+  node : ClosureNode
+  defaults : Array[Value]
+  captured : Scope
+  num_pos_params : Int
+}
+pub fn Closure::name(Self) -> String?
+
+pub(all) enum ClosureNode {
+  Closure(@syntax.SyntaxNode)
+  Context(@syntax.SyntaxNode)
+}
+
+pub(all) struct Color {
+  // private fields
+} derive(Eq, Hash)
+pub fn Color::repr(Self) -> String
+
+pub struct Content {
+  elem : Element
+  fields : FixedArray[Value?]
+  span : @syntax.Span
+  label : Label?
+  location : Location?
+  lifecycle : Array[Int]
+}
+pub fn Content::add(Self, Self) -> Self
+pub fn Content::can(Self, String) -> Bool
+pub fn Content::elem(Self) -> Element
+pub fn Content::empty() -> Self
+pub fn Content::field(Self, Int) -> Value raise HintedError
+pub fn Content::field_by_name(Self, String) -> Value raise HintedError
+pub fn Content::field_raw(Self, Int) -> Value?
+pub fn Content::fields(Self) -> Dict
+pub fn Content::from_fields(Element, FixedArray[Value?]) -> Self
+pub fn Content::func(Self) -> Element
+pub fn Content::get(Self, Int, styles? : StyleChain) -> Value raise FieldAccessError
+pub fn Content::get_by_name(Self, String) -> Value raise FieldAccessError
+pub fn Content::guarded(Self, Int) -> Self
+pub fn Content::has(Self, String) -> Bool
+pub fn Content::is_(Self, Element) -> Bool
+pub fn Content::is_empty(Self) -> Bool
+pub fn Content::is_guarded(Self, Int) -> Bool
+pub fn Content::is_prepared(Self) -> Bool
+pub fn Content::label(Self) -> Label?
+pub fn Content::labelled(Self, Label) -> Self
+pub fn Content::located(Self, Location) -> Self
+pub fn Content::location(Self) -> Location?
+pub fn Content::mark_prepared(Self) -> Self
+pub fn Content::materialize(Self, StyleChain) -> Self
+pub fn Content::new(Element, ArrayView[(Int, Value)]) -> Self
+pub fn Content::plain_text(Self) -> String
+pub fn Content::repeat(Self, Int) -> Self
+pub fn Content::repr(Self) -> String
+pub fn Content::sequence(ArrayView[Self]) -> Self
+pub fn Content::sequence_recursive_for_each(Self, (Self) -> Unit) -> Unit
+pub fn Content::span(Self) -> @syntax.Span
+pub fn Content::spanned(Self, @syntax.Span) -> Self
+pub fn Content::styled(Self, Style) -> Self
+pub fn Content::styled_with_map(Self, Styles) -> Self
+pub fn Content::to_sequence(Self) -> Array[Self]?
+pub fn Content::traverse(Self, (Self) -> Bool) -> Bool
+pub fn Content::with_field(Self, Int, Value) -> Self
+pub fn Content::without_field(Self, Int) -> Self
+pub impl Eq for Content
+pub impl FromValue for Content
+pub impl IntoValue for Content
+pub impl Reflect for Content
+
+pub struct Context {
+  location : Location?
+  styles : StyleChain?
+}
+pub fn Context::get_styles(Self) -> StyleChain raise HintedError
+pub fn Context::introspect(Self) -> Unit raise HintedError
+pub fn Context::location(Self) -> Location raise HintedError
+pub fn Context::new(location? : Location, styles? : StyleChain) -> Self
+pub fn Context::none() -> Self
+
+pub(all) struct Datetime {
+  // private fields
+} derive(Eq, Hash)
+pub fn Datetime::add_duration(Self, Duration) -> Self raise HintedError
+pub fn Datetime::kind(Self) -> String
+pub fn Datetime::partial_cmp(Self, Self) -> Int?
+pub fn Datetime::repr(Self) -> String
+pub fn Datetime::sub_datetime(Self, Self) -> Duration raise HintedError
+pub fn Datetime::sub_duration(Self, Duration) -> Self raise HintedError
+
+pub(all) struct Decimal {
+  // private fields
+} derive(Eq, Hash)
+pub fn Decimal::checked_add(Self, Self) -> Self raise HintedError
+pub fn Decimal::checked_div(Self, Self) -> Self raise HintedError
+pub fn Decimal::checked_mul(Self, Self) -> Self raise HintedError
+pub fn Decimal::checked_sub(Self, Self) -> Self raise HintedError
+pub fn Decimal::from_int(Int64) -> Self
+pub fn Decimal::is_zero(Self) -> Bool
+pub fn Decimal::neg(Self) -> Self
+pub fn Decimal::repr(Self) -> String
+pub fn Decimal::to_string(Self) -> String
+pub impl Compare for Decimal
+
+pub(all) struct Deprecation {
+  message : String
+  until : String?
+} derive(Eq, Hash, @debug.Debug)
+pub fn Deprecation::new() -> Self
+pub fn Deprecation::to_hinted(Self) -> HintedString
+pub fn Deprecation::with_message(Self, String) -> Self
+pub fn Deprecation::with_until(Self, String) -> Self
+
+pub struct Dict {
+  map : Map[String, Value]
+  mut shared : Bool
+}
+pub fn Dict::contains(Self, String) -> Bool
+pub fn Dict::copy(Self) -> Self
+pub fn Dict::from_pairs(ArrayView[(String, Value)]) -> Self
+pub fn Dict::get(Self, String) -> Value raise HintedError
+pub fn Dict::insert(Self, String, Value) -> Unit
+pub fn Dict::is_empty(Self) -> Bool
+pub fn Dict::iter(Self) -> Iter2[String, Value]
+pub fn Dict::len(Self) -> Int
+pub fn Dict::make_mut(Self) -> Self
+pub fn Dict::merge(Self, Self) -> Self
+pub fn Dict::new() -> Self
+pub fn Dict::repr(Self) -> String
+pub fn Dict::take(Self, String) -> Value raise HintedError
+pub impl FromValue for Dict
+pub impl IntoValue for Dict
+pub impl Reflect for Dict
+
+pub(all) struct Duration {
+  // private fields
+} derive(Eq, Hash)
+pub fn Duration::add(Self, Self) -> Self
+pub fn Duration::div(Self, Double) -> Self
+pub fn Duration::div_duration(Self, Self) -> Double
+pub fn Duration::is_zero(Self) -> Bool
+pub fn Duration::mul(Self, Double) -> Self
+pub fn Duration::neg(Self) -> Self
+pub fn Duration::repr(Self) -> String
+pub fn Duration::sub(Self, Self) -> Self
+pub impl Compare for Duration
+
+pub(all) enum DynValue {
+  Placeholder
+} derive(Eq, Hash)
+pub fn DynValue::add_dyn(Self, Self) -> Value? raise HintedError
+pub fn DynValue::field(Self, String) -> Value??
+pub fn DynValue::is_alignment(Self) -> Bool
+pub fn DynValue::regex_is_match(Self, String) -> Bool?
+pub fn DynValue::repr(Self) -> String
+pub fn DynValue::ty(Self) -> Type
+
+pub struct Element(ElementData)
+pub fn Element::can(Self, String) -> Bool
+pub fn Element::construct(Self, Engine, Args) -> Content raise SourceError
+pub fn Element::docs(Self) -> String
+pub fn Element::field(Self, Int) -> FieldInfo?
+pub fn Element::field_id(Self, String) -> Int?
+pub fn Element::field_name(Self, Int) -> String?
+pub fn Element::fields(Self) -> Array[FieldInfo]
+pub fn Element::hooks(Self) -> ElementHooks
+pub fn Element::is_locatable(Self) -> Bool
+pub fn Element::is_tagged(Self) -> Bool
+pub fn Element::is_unqueriable(Self) -> Bool
+pub fn Element::local_name(Self, String, String?) -> String?
+pub fn Element::name(Self) -> String
+pub fn Element::new(name~ : String, title~ : String, docs? : String, keywords? : Array[String], capabilities? : Array[String], fields~ : Array[FieldInfo]) -> Self
+pub fn Element::params(Self) -> Array[ParamInfo]
+pub fn Element::repr(Self) -> String
+pub fn Element::scope(Self) -> Scope
+pub fn Element::select(Self) -> Selector
+pub fn Element::set(Self, Engine, Args) -> Styles raise SourceError
+pub fn Element::title(Self) -> String
+pub fn Element::where_(Self, Array[(Int, Value)]) -> Selector
+pub impl Compare for Element
+pub impl Eq for Element
+pub impl Hash for Element
+
+pub struct ElementData {
+  name : String
+  title : String
+  docs : String
+  keywords : Array[String]
+  capabilities : Array[String]
+  fields : Array[FieldInfo]
+  hooks : ElementHooks
+  // private fields
+}
+
+pub struct ElementHooks {
+  mut construct : ((Engine, Args) -> Content raise SourceError)?
+  mut set : ((Engine, Args) -> Styles raise SourceError)?
+  mut repr : ((Content) -> String)?
+  mut eq : ((Content, Content) -> Bool)?
+  mut local_name : ((String, String?) -> String)?
+  mut synthesize : ((Engine, Content, StyleChain) -> Content raise SourceError)?
+  mut show_set : ((Content, StyleChain) -> Styles)?
+  mut plain_text : ((Content, StringBuilder) -> Unit)?
+  mut scope : () -> Scope
+}
+
+pub(all) struct Em(Scalar) derive(Compare, Default, Eq, Hash)
+pub fn Em::abs(Self) -> Self
+pub fn Em::at(Self, Abs) -> Abs
+pub fn Em::div_by(Self, Double) -> Self
+pub fn Em::from_abs(Abs, Abs) -> Self
+pub fn Em::from_length(Length, Abs) -> Self
+pub fn Em::from_units(Double, Double) -> Self
+pub fn Em::get(Self) -> Double
+pub fn Em::is_zero(Self) -> Bool
+pub fn Em::new(Double) -> Self
+pub fn Em::one() -> Self
+pub fn Em::ratio_to(Self, Self) -> Double
+pub fn Em::repr(Self) -> String
+pub fn Em::times(Self, Double) -> Self
+pub fn Em::zero() -> Self
+pub impl Add for Em
+pub impl Neg for Em
+pub impl Sub for Em
+pub impl Numeric for Em
+
+pub struct Engine {
+  world : &World
+  library : Library
+  introspector : Introspector
+  traced : Traced
+  sink : Sink
+  route : Route
+}
+pub fn Engine::binding_guard(Self, @syntax.Span) -> BindingGuard
+pub fn[T] Engine::delay(Self, () -> T raise SourceError, T) -> T
+pub fn Engine::routines(Self) -> Routines
+pub fn Engine::with_route(Self, Route) -> Self
+
+pub(all) enum Feature {
+  Html
+  Bundle
+  A11yExtras
+} derive(Eq, Hash, @debug.Debug)
+pub fn Feature::all() -> Array[Self]
+pub fn Feature::from_str(String) -> Self?
+pub impl Show for Feature
+
+pub(all) struct Features(Array[Feature]) derive(Eq, Hash)
+pub fn Features::all() -> Self
+pub fn Features::is_enabled(Self, Feature) -> Bool
+pub fn Features::none() -> Self
+
+pub struct FieldInfo {
+  id : Int
+  name : String
+  docs : String
+  kind : FieldKind
+  positional : Bool
+  required : Bool
+  variadic : Bool
+  internal : Bool
+  input : () -> CastInfo
+  castable : (Value) -> Bool
+  cast : (Value) -> Value raise HintedError
+  default : (() -> Value)?
+  fold : ((Value, Value) -> Value)?
+  parse : ((Engine, Args) -> Value? raise SourceError)?
+}
+
+pub(all) enum FieldKind {
+  Required
+  Synthesized
+  Settable
+  Ghost
+  External
+} derive(Eq, @debug.Debug)
+
+pub(all) struct Fr(Scalar) derive(Compare, Default, Eq, Hash)
+pub fn Fr::abs(Self) -> Self
+pub fn Fr::div_by(Self, Double) -> Self
+pub fn Fr::get(Self) -> Double
+pub fn Fr::new(Double) -> Self
+pub fn Fr::one() -> Self
+pub fn Fr::ratio_to(Self, Self) -> Double
+pub fn Fr::repr(Self) -> String
+pub fn Fr::share(Self, Self, Abs) -> Abs
+pub fn Fr::times(Self, Double) -> Self
+pub fn Fr::zero() -> Self
+pub impl Add for Fr
+pub impl Neg for Fr
+pub impl Sub for Fr
+pub impl FromValue for Fr
+pub impl IntoValue for Fr
+pub impl Numeric for Fr
+pub impl Reflect for Fr
+
+pub struct Func {
+  inner : FuncInner
+  span : @syntax.Span
+}
+pub fn Func::call(Self, Engine, Context, Args) -> Value raise SourceError
+pub fn Func::call_values(Self, Engine, Context, ArrayView[Value]) -> Value raise SourceError
+pub fn Func::closure(Closure) -> Self
+pub fn Func::contextual(Self) -> Bool?
+pub fn Func::element(Element) -> Self
+pub fn Func::field(Self, String, BindingGuard) -> Value raise HintedError
+pub fn Func::from_inner(FuncInner) -> Self
+pub fn Func::name(Self) -> String?
+pub fn Func::native(NativeFuncData) -> Self
+pub fn Func::repr(Self) -> String
+pub fn Func::scope(Self) -> Scope?
+pub fn Func::span(Self) -> @syntax.Span
+pub fn Func::spanned(Self, @syntax.Span) -> Self
+pub fn Func::title(Self) -> String?
+pub fn Func::to_element(Self) -> Element?
+pub fn Func::to_native(Self) -> NativeFuncData?
+pub fn Func::with_args(Self, Args) -> Self
+pub impl Eq for Func
+pub impl FromValue for Func
+pub impl IntoValue for Func
+pub impl Reflect for Func
+
+pub(all) enum FuncInner {
+  Native(NativeFuncData)
+  Element(Element)
+  Closure(Closure)
+  With(Func, Args)
+}
+
+pub(all) struct Gradient {
+  // private fields
+} derive(Eq, Hash)
+pub fn Gradient::repr(Self) -> String
+
+pub(all) struct HintedString {
+  message : String
+  hints : Array[String]
+} derive(Eq, Hash, @debug.Debug)
+pub fn HintedString::hint(Self, String) -> Unit
+pub fn HintedString::into_error_at(Self, @syntax.Span) -> SourceDiagnostic
+pub fn HintedString::into_warning_at(Self, @syntax.Span) -> SourceDiagnostic
+pub fn HintedString::new(String) -> Self
+pub fn HintedString::with_hint(Self, String) -> Self
+
+pub struct Introspector {
+  // private fields
+}
+pub fn Introspector::empty() -> Self
+
+pub(all) struct Label(String) derive(Compare, Eq, Hash)
+pub fn Label::repr(Self) -> String
+pub impl FromValue for Label
+pub impl IntoValue for Label
+pub impl Reflect for Label
+
+pub(all) struct Length {
+  abs : Abs
+  em : Em
+} derive(Default, Eq, Hash)
+pub fn Length::at(Self, Abs) -> Abs
+pub fn Length::div_by(Self, Double) -> Self
+pub fn Length::from_abs(Abs) -> Self
+pub fn Length::from_em(Em) -> Self
+pub fn Length::is_zero(Self) -> Bool
+pub fn Length::partial_cmp(Self, Self) -> Int?
+pub fn Length::repr(Self) -> String
+pub fn Length::times(Self, Double) -> Self
+pub fn Length::try_abs(Self) -> Self?
+pub fn Length::try_div(Self, Self) -> Double?
+pub fn Length::zero() -> Self
+pub impl Add for Length
+pub impl Neg for Length
+pub impl Sub for Length
+pub impl FromValue for Length
+pub impl IntoValue for Length
+pub impl Numeric for Length
+pub impl Reflect for Length
+
+pub struct Library {
+  routines : Routines
+  global : Module
+  math : Module
+  styles : Styles
+  std : Binding
+  mut features : Features
+}
+
+pub(all) struct Location(UInt64) derive(Compare, Eq, Hash)
+
+pub struct Module {
+  // private fields
+}
+pub fn Module::anonymous(Scope) -> Self
+pub fn Module::content(Self) -> Content
+pub fn Module::field(Self, String, BindingGuard) -> Value raise HintedError
+pub fn Module::file_id(Self) -> @syntax.FileId?
+pub fn Module::name(Self) -> String?
+pub fn Module::new(String, Scope) -> Self
+pub fn Module::repr(Self) -> String
+pub fn Module::scope(Self) -> Scope
+pub fn Module::with_content(Self, Content) -> Self
+pub fn Module::with_file_id(Self, @syntax.FileId) -> Self
+pub fn Module::with_name(Self, String) -> Self
+pub fn Module::with_scope(Self, Scope) -> Self
+pub impl Eq for Module
+
+pub struct NativeFuncData {
+  function : (Engine, Context, Args) -> Value raise SourceError
+  name : String
+  title : String
+  docs : String
+  keywords : Array[String]
+  contextual : Bool
+  params : Array[ParamInfo]
+  returns : () -> CastInfo
+  // private fields
+}
+pub fn NativeFuncData::new(name~ : String, title~ : String, docs? : String, keywords? : Array[String], contextual? : Bool, scope? : () -> Scope, params? : Array[ParamInfo], returns? : () -> CastInfo, (Engine, Context, Args) -> Value raise SourceError) -> Self
+pub fn NativeFuncData::scope(Self) -> Scope
+
+pub struct NativeTypeData {
+  name : String
+  long_name : String
+  title : String
+  docs : String
+  // private fields
+}
+pub fn NativeTypeData::new(name~ : String, long_name~ : String, title~ : String, docs~ : String) -> Self
+pub fn NativeTypeData::register(Self, (Self) -> Unit) -> Unit
+pub fn NativeTypeData::set_constructor(Self, NativeFuncData) -> Unit
+pub fn NativeTypeData::set_scope(Self, Scope) -> Unit
+
+pub(all) enum NumericUnit {
+  Pt
+  Mm
+  Cm
+  In
+  Rad
+  Deg
+  Em
+  Fr
+  Percent
+} derive(Eq, @debug.Debug)
+
+pub(all) struct ParamInfo {
+  name : String
+  docs : String
+  input : () -> CastInfo
+  default : (() -> Value)?
+  positional : Bool
+  named : Bool
+  variadic : Bool
+  required : Bool
+  settable : Bool
+}
+
+pub struct Property {
+  elem : Element
+  id : Int
+  value : Value
+  span : @syntax.Span
+  liftable : Bool
+  outside : Bool
+}
+pub fn Property::is_(Self, Element, Int) -> Bool
+pub fn Property::is_of(Self, Element) -> Bool
+pub fn Property::new(Element, Int, Value) -> Self
+pub impl Eq for Property
+
+pub(all) enum Quadrant {
+  First
+  Second
+  Third
+  Fourth
+} derive(Compare, Eq, Hash, @debug.Debug)
+
+pub(all) struct Ratio(Scalar) derive(Compare, Default, Eq, Hash)
+pub fn Ratio::abs(Self) -> Self
+pub fn Ratio::div_by(Self, Double) -> Self
+pub fn Ratio::get(Self) -> Double
+pub fn Ratio::is_one(Self) -> Bool
+pub fn Ratio::is_zero(Self) -> Bool
+pub fn Ratio::mul_ratio(Self, Self) -> Self
+pub fn Ratio::new(Double) -> Self
+pub fn[T : Numeric] Ratio::of(Self, T) -> T
+pub fn Ratio::one() -> Self
+pub fn Ratio::ratio_to(Self, Self) -> Double
+pub fn Ratio::recip(Self) -> Self
+pub fn Ratio::repr(Self) -> String
+pub fn Ratio::times(Self, Double) -> Self
+pub fn Ratio::zero() -> Self
+pub impl Add for Ratio
+pub impl Neg for Ratio
+pub impl Sub for Ratio
+pub impl FromValue for Ratio
+pub impl IntoValue for Ratio
+pub impl Numeric for Ratio
+pub impl Reflect for Ratio
+
+pub struct RawElem(Content)
+pub fn RawElem::packed_code(String) -> Content
+
+pub struct Recipe {
+  selector : Selector?
+  transform : Transformation
+  span : @syntax.Span
+  outside : Bool
+}
+pub fn Recipe::apply(Self, Engine, Context, Content) -> Content raise SourceError
+pub fn Recipe::new(Selector?, Transformation, @syntax.Span) -> Self
+pub impl Eq for Recipe
+
+pub(all) struct Rel[T] {
+  rel : Ratio
+  abs : T
+} derive(Default, Eq, Hash)
+pub fn[T : Numeric] Rel::div_by(Self[T], Double) -> Self[T]
+pub fn[T : Numeric] Rel::from_abs(T) -> Self[T]
+pub fn[T : Numeric] Rel::from_ratio(Ratio) -> Self[T]
+pub fn[T : Numeric] Rel::is_one(Self[T]) -> Bool
+pub fn[T : Numeric] Rel::is_zero(Self[T]) -> Bool
+pub fn[T, U] Rel::map(Self[T], (T) -> U) -> Self[U]
+pub fn[T] Rel::new(Ratio, T) -> Self[T]
+pub fn[T : Numeric] Rel::one() -> Self[T]
+pub fn Rel::partial_cmp_length(Self[Length], Self[Length]) -> Int?
+pub fn[T : Numeric] Rel::relative_to(Self[T], T) -> T
+pub fn Rel::repr_length(Self[Length]) -> String
+pub fn[T : Numeric] Rel::times(Self[T], Double) -> Self[T]
+pub fn Rel::try_div_length(Self[Length], Self[Length]) -> Double?
+pub fn[T : Numeric] Rel::zero() -> Self[T]
+pub impl[T : Numeric] Add for Rel[T]
+pub impl[T : Numeric] Neg for Rel[T]
+pub impl[T : Numeric] Sub for Rel[T]
+pub impl FromValue for Rel[Length]
+pub impl IntoValue for Rel[Length]
+pub impl[T : Numeric] Numeric for Rel[T]
+pub impl Reflect for Rel[Length]
+
+pub struct Route {
+  // private fields
+}
+pub fn Route::check_call_depth(Self) -> Unit raise HintedError
+pub fn Route::check_layout_depth(Self) -> Unit raise HintedError
+pub fn Route::check_show_depth(Self) -> Unit raise HintedError
+pub fn Route::contains(Self, @syntax.FileId) -> Bool
+pub fn Route::decrease(Self) -> Unit
+pub fn Route::extend(Self) -> Self
+pub fn Route::increase(Self) -> Unit
+pub fn Route::root() -> Self
+pub fn Route::unnested(Self) -> Self
+pub fn Route::with_id(Self, @syntax.FileId) -> Self
+pub fn Route::within(Self, Int) -> Bool
+
+pub struct Routines {
+  eval_string : (Engine, Context, String, @syntax.Span, @syntax.SyntaxMode, Scope) -> Value raise SourceError
+  eval_closure : (Func, Closure, Engine, Context, Args) -> Value raise SourceError
+}
+
+pub(all) struct Scalar(Double) derive(Default)
+pub fn Scalar::get(Self) -> Double
+pub fn Scalar::new(Double) -> Self
+pub impl Add for Scalar
+pub impl Compare for Scalar
+pub impl Div for Scalar
+pub impl Eq for Scalar
+pub impl Hash for Scalar
+pub impl Mul for Scalar
+pub impl Neg for Scalar
+pub impl Sub for Scalar
+
+pub struct Scope {
+  // private fields
+}
+pub fn Scope::bind(Self, String, Binding) -> Binding
+pub fn Scope::copy(Self) -> Self
+pub fn Scope::deduplicating() -> Self
+pub fn Scope::define(Self, String, Value) -> Binding
+pub fn Scope::get(Self, String) -> Binding?
+pub fn Scope::iter(Self) -> Iter[(String, Binding)]
+pub fn Scope::length(Self) -> Int
+pub fn Scope::new() -> Self
+pub fn Scope::reset_category(Self) -> Unit
+pub fn Scope::start_category(Self, Category) -> Unit
+
+pub struct Scopes {
+  mut top : Scope
+  scopes : Array[Scope]
+  base : Library?
+}
+pub fn Scopes::check_std_shadowed(Self, String) -> Bool
+pub fn Scopes::enter(Self) -> Unit
+pub fn Scopes::exit(Self) -> Unit
+pub fn Scopes::get(Self, String, BindingGuard) -> Value raise HintedError
+pub fn Scopes::get_binding(Self, String) -> Binding raise HintedError
+pub fn Scopes::get_binding_in_math(Self, String) -> Binding raise HintedError
+pub fn Scopes::get_in_math(Self, String, BindingGuard) -> Value raise HintedError
+pub fn Scopes::get_mut(Self, String, BindingGuard) -> Binding raise HintedError
+pub fn Scopes::new(Library?) -> Self
+
+pub(all) enum Selector {
+  Elem(Element, Array[(Int, Value)]?)
+  Location(Location)
+  Label(Label)
+  Regex(String)
+  Can(String)
+  Or(Array[Selector])
+  And(Array[Selector])
+  Before(selector~ : Selector, end~ : Selector, inclusive~ : Bool)
+  After(selector~ : Selector, start~ : Selector, inclusive~ : Bool)
+  Within(selector~ : Selector, ancestor~ : Selector)
+} derive(Eq)
+
+pub struct SequenceElem(Content)
+pub fn SequenceElem::children(Content) -> Array[Content]
+pub fn SequenceElem::new(Array[Content]) -> Content
+
+pub(all) enum Severity {
+  Error
+  Warning
+} derive(Eq, Hash, @debug.Debug)
+
+pub struct Sink {
+  delayed : Array[SourceDiagnostic]
+  warnings : Array[SourceDiagnostic]
+  warnings_set : @hashset.HashSet[(@syntax.DiagSpan, String)]
+  values : Array[(Value, Styles?)]
+}
+pub fn Sink::delayed_errors(Self, Array[SourceDiagnostic]) -> Unit
+pub fn Sink::new() -> Self
+pub fn Sink::take_delayed(Self) -> Array[SourceDiagnostic]
+pub fn Sink::value(Self, Value, Styles?) -> Unit
+pub fn Sink::warn(Self, SourceDiagnostic) -> Unit
+
+pub(all) struct SourceDiagnostic {
+  severity : Severity
+  span : @syntax.DiagSpan
+  message : String
+  trace : Array[@syntax.Spanned[Tracepoint]]
+  hints : Array[@syntax.DiagSpanned[String]]
+} derive(Eq, Hash, @debug.Debug)
+pub fn SourceDiagnostic::error(@syntax.DiagSpan, String) -> Self
+pub fn SourceDiagnostic::error_at(@syntax.Span, String) -> Self
+pub fn SourceDiagnostic::from_syntax(@syntax.SyntaxDiagnostic) -> Self
+pub fn SourceDiagnostic::hint(Self, String) -> Unit
+pub fn SourceDiagnostic::spanned_hint(Self, String, @syntax.DiagSpan) -> Unit
+pub fn SourceDiagnostic::warning(@syntax.DiagSpan, String) -> Self
+pub fn SourceDiagnostic::warning_at(@syntax.Span, String) -> Self
+pub fn SourceDiagnostic::with_hint(Self, String) -> Self
+pub fn SourceDiagnostic::with_hints(Self, ArrayView[String]) -> Self
+pub fn SourceDiagnostic::with_tracepoint(Self, Tracepoint, @syntax.Span) -> Self
+
+pub(all) enum Style {
+  Property(Property)
+  Recipe(Recipe)
+  Revocation(Int)
+} derive(Eq)
+pub fn Style::element(Self) -> Element?
+pub fn Style::liftable(Self) -> Bool
+pub fn Style::outside(Self) -> Bool
+pub fn Style::property(Self) -> Property?
+pub fn Style::recipe(Self) -> Recipe?
+pub fn Style::span(Self) -> @syntax.Span
+
+pub struct StyleChain {
+  head : Array[Style]
+  tail : StyleChain?
+}
+pub fn StyleChain::chain(Self, Styles) -> Self
+pub fn StyleChain::chain_one(Self, Style) -> Self
+pub fn StyleChain::empty() -> Self
+pub fn StyleChain::entries(Self) -> Iter[Style]
+pub fn StyleChain::get_field(Self, Element, Int) -> Value
+pub fn StyleChain::get_value_with_local(Self, Element, FieldInfo, Value?) -> Value
+pub fn StyleChain::has(Self, Element, Int) -> Bool
+pub fn StyleChain::links(Self) -> Array[Array[Style]]
+pub fn StyleChain::new(Styles) -> Self
+pub fn StyleChain::pop(Self) -> Self
+pub fn StyleChain::recipes(Self) -> Iter[Recipe]
+pub fn StyleChain::to_map(Self) -> Styles
+pub impl Eq for StyleChain
+
+pub struct StyledElem(Content)
+pub fn StyledElem::child(Content) -> Content
+pub fn StyledElem::new(Content, Styles) -> Content
+pub fn StyledElem::styles(Content) -> Styles
+
+pub struct Styles {
+  items : Array[Style]
+}
+pub fn Styles::apply(Self, Self) -> Unit
+pub fn Styles::apply_one(Self, Style) -> Unit
+pub fn Styles::copy(Self) -> Self
+pub fn Styles::from_array(Array[Style]) -> Self
+pub fn Styles::has(Self, Element, Int) -> Bool
+pub fn Styles::is_empty(Self) -> Bool
+pub fn Styles::iter(Self) -> Iter[Style]
+pub fn Styles::liftable(Self) -> Self
+pub fn Styles::new() -> Self
+pub fn Styles::outside(Self) -> Self
+pub fn Styles::push(Self, Style) -> Unit
+pub fn Styles::set(Self, Element, Int, Value) -> Unit
+pub fn Styles::spanned(Self, @syntax.Span) -> Self
+pub fn Styles::unset(Self) -> Unit
+pub impl Eq for Styles
+pub impl FromValue for Styles
+pub impl IntoValue for Styles
+pub impl Reflect for Styles
+
+pub(all) struct Symbol {
+  // private fields
+} derive(Eq, Hash)
+pub fn Symbol::func(Self) -> Func raise HintedError
+pub fn Symbol::get(Self) -> String
+pub fn Symbol::modified(Self, BindingGuard, String) -> Self raise HintedError
+pub fn Symbol::repr(Self) -> String
+
+pub struct SymbolElem(Content)
+pub fn SymbolElem::packed(String) -> Content
+
+pub struct TextElem(Content)
+pub fn TextElem::packed(String) -> Content
+
+pub(all) struct Tiling {
+  // private fields
+} derive(Eq, Hash)
+pub fn Tiling::repr(Self) -> String
+
+pub struct Traced(@syntax.Span?)
+pub fn Traced::get(Self, @syntax.FileId) -> @syntax.Span?
+pub fn Traced::new(traced? : @syntax.Span) -> Self
+
+pub(all) enum Tracepoint {
+  Call(String?)
+  Show(String)
+  Import(String)
+  Include(String)
+} derive(Eq, Hash, @debug.Debug)
+pub impl Show for Tracepoint
+
+pub(all) enum Transformation {
+  Content(Content)
+  Func(Func)
+  Style(Styles)
+} derive(Eq)
+pub impl FromValue for Transformation
+pub impl Reflect for Transformation
+
+pub struct Ty[T](Unit)
+pub fn[T] Ty::new() -> Self[T]
+
+pub struct Type(NativeTypeData)
+pub fn Type::alignment() -> Self
+pub fn Type::all_native() -> Array[Self]
+pub fn Type::angle() -> Self
+pub fn Type::args() -> Self
+pub fn Type::array() -> Self
+pub fn Type::auto() -> Self
+pub fn Type::bool() -> Self
+pub fn Type::bytes() -> Self
+pub fn Type::color() -> Self
+pub fn Type::constructor(Self) -> Func raise HintedError
+pub fn Type::content() -> Self
+pub fn Type::counter() -> Self
+pub fn Type::datetime() -> Self
+pub fn Type::decimal() -> Self
+pub fn Type::dict() -> Self
+pub fn Type::direction() -> Self
+pub fn Type::docs(Self) -> String
+pub fn Type::duration() -> Self
+pub fn Type::field(Self, String, BindingGuard) -> Value raise HintedError
+pub fn Type::float() -> Self
+pub fn Type::fraction() -> Self
+pub fn Type::func() -> Self
+pub fn Type::gradient() -> Self
+pub fn Type::int() -> Self
+pub fn Type::label() -> Self
+pub fn Type::length() -> Self
+pub fn Type::location() -> Self
+pub fn Type::long_name(Self) -> String
+pub fn Type::module() -> Self
+pub fn Type::none() -> Self
+pub fn Type::path() -> Self
+pub fn Type::ratio() -> Self
+pub fn Type::regex() -> Self
+pub fn Type::relative() -> Self
+pub fn Type::repr(Self) -> String
+pub fn Type::scope(Self) -> Scope
+pub fn Type::selector() -> Self
+pub fn Type::short_name(Self) -> String
+pub fn Type::spot() -> Self
+pub fn Type::state() -> Self
+pub fn Type::str() -> Self
+pub fn Type::stroke() -> Self
+pub fn Type::styles() -> Self
+pub fn Type::symbol() -> Self
+pub fn Type::tiling() -> Self
+pub fn Type::title(Self) -> String
+pub fn Type::type_() -> Self
+pub fn Type::version() -> Self
+pub impl Compare for Type
+pub impl Eq for Type
+pub impl Hash for Type
+pub impl Show for Type
+pub impl FromValue for Type
+pub impl IntoValue for Type
+pub impl Reflect for Type
+
+pub(all) enum Value {
+  None
+  Auto
+  Bool(Bool)
+  Int(Int64)
+  Float(Double)
+  Length(Length)
+  Angle(Angle)
+  Ratio(Ratio)
+  Relative(Rel[Length])
+  Fraction(Fr)
+  Color(Color)
+  Gradient(Gradient)
+  Tiling(Tiling)
+  Symbol(Symbol)
+  Version(Version)
+  Str(String)
+  Bytes(BytesValue)
+  Label(Label)
+  Datetime(Datetime)
+  Decimal(Decimal)
+  Duration(Duration)
+  Content(Content)
+  Styles(Styles)
+  Array(Arr)
+  Dict(Dict)
+  Func(Func)
+  Args(Args)
+  Type(Type)
+  Module(Module)
+  Dyn(DynValue)
+}
+pub fn[T : FromValue] Value::cast(Self) -> T raise HintedError
+pub fn Value::display(Self) -> Content
+pub fn Value::field(Self, String, BindingGuard) -> Self raise HintedError
+pub fn Value::numeric(Double, NumericUnit) -> Self
+pub fn Value::repr(Self) -> String
+pub fn Value::scope(Self) -> Scope?
+pub fn Value::shared(Self) -> Self
+pub fn Value::ty(Self) -> Type
+pub impl Eq for Value
+pub impl FromValue for Value
+pub impl IntoValue for Value
+pub impl Reflect for Value
+
+pub(all) struct Version(Array[Int]) derive(Eq, Hash)
+pub fn Version::component(Self, String) -> Int64 raise HintedError
+pub fn Version::repr(Self) -> String
+pub fn Version::to_string(Self) -> String
+pub impl Compare for Version
+
+pub(all) struct Warned[T] {
+  output : T
+  warnings : Array[SourceDiagnostic]
+}
+
+// Type aliases
+pub type NativeFn = (Engine, Context, Args) -> Value raise SourceError
+
+// Traits
+pub(open) trait FromValue : Reflect {
+  fn from_value(Value) -> Self raise HintedError
+}
+pub impl FromValue for Bool
+pub impl FromValue for Int64
+pub impl FromValue for Double
+pub impl FromValue for String
+pub impl[T : FromValue] FromValue for T?
+pub impl[T : FromValue] FromValue for Array[T]
+
+pub(open) trait IntoValue {
+  fn into_value(Self) -> Value
+}
+pub impl IntoValue for Bool
+pub impl IntoValue for Int64
+pub impl IntoValue for Double
+pub impl IntoValue for String
+pub impl[T : IntoValue] IntoValue for T?
+pub impl[T : IntoValue] IntoValue for Array[T]
+
+pub(open) trait Numeric : Add + Sub + Neg + Eq {
+  fn zero() -> Self
+  fn is_finite(Self) -> Bool
+  fn scale(Self, Double) -> Self
+  fn div_scale(Self, Double) -> Self
+}
+
+pub(open) trait Reflect {
+  fn input() -> CastInfo
+  fn output() -> CastInfo
+  fn castable(Value) -> Bool
+}
+pub impl Reflect for Bool
+pub impl Reflect for Int64
+pub impl Reflect for Double
+pub impl Reflect for String
+pub impl[T : Reflect] Reflect for T?
+pub impl[T : Reflect] Reflect for Array[T]
+
+pub(open) trait World {
+  fn library(Self) -> Library
+  fn main(Self) -> @syntax.FileId
+  fn source(Self, @syntax.FileId) -> @syntax.Source raise FileError
+  fn file(Self, @syntax.FileId) -> Bytes raise FileError
+  fn today(Self, Int64?) -> Datetime?
+  fn resolve_path(Self, @syntax.FileId?, String) -> @syntax.FileId raise HintedError
+}

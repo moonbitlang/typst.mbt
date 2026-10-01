@@ -1,0 +1,16 @@
+import {
+  "moonbitlang/typst/syntax",
+  "moonbitlang/typst/unicode",
+  "moonbitlang/core/string",
+  "moonbitlang/core/math",
+  "moonbitlang/core/bigint",
+  "moonbitlang/core/hashset",
+  "moonbitlang/core/buffer",
+  "moonbitlang/core/int64",
+  "moonbitlang/typst/syntax/ast",
+  "moonbitlang/core/double",
+}
+
+import {
+  "moonbitlang/core/double",
+} for "test"
