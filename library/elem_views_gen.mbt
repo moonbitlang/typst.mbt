@@ -21745,17 +21745,17 @@ pub fn HtmlElem::pack(self : HtmlElem) -> Content {
 }
 
 ///|
-pub fn HtmlElem::tag(self : HtmlElem) -> Value {
+pub fn HtmlElem::tag(self : HtmlElem) -> HtmlTag {
   view_cast(self.0.field_raw(html_elem_tag).unwrap(), "elem.tag")
 }
 
 ///|
-pub fn HtmlElem::with_tag(self : HtmlElem, v : Value) -> HtmlElem {
+pub fn HtmlElem::with_tag(self : HtmlElem, v : HtmlTag) -> HtmlElem {
   HtmlElem(self.0.with_field(html_elem_tag, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn HtmlElem::attrs(self : HtmlElem, styles : StyleChain) -> Value {
+pub fn HtmlElem::attrs(self : HtmlElem, styles : StyleChain) -> HtmlAttrs {
   let e = html_elem()
   view_cast(
     styles.get_value_with_local(
@@ -21768,7 +21768,7 @@ pub fn HtmlElem::attrs(self : HtmlElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn HtmlElem::attrs_local(self : HtmlElem) -> Value? {
+pub fn HtmlElem::attrs_local(self : HtmlElem) -> HtmlAttrs? {
   match self.0.field_raw(html_elem_attrs) {
     Some(v) => Some(view_cast(v, "elem.attrs"))
     None => None
@@ -21776,17 +21776,17 @@ pub fn HtmlElem::attrs_local(self : HtmlElem) -> Value? {
 }
 
 ///|
-pub fn HtmlElem::with_attrs(self : HtmlElem, v : Value) -> HtmlElem {
+pub fn HtmlElem::with_attrs(self : HtmlElem, v : HtmlAttrs) -> HtmlElem {
   HtmlElem(self.0.with_field(html_elem_attrs, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn HtmlElem::attrs_in(styles : StyleChain) -> Value {
+pub fn HtmlElem::attrs_in(styles : StyleChain) -> HtmlAttrs {
   view_cast(styles.get_field(html_elem(), html_elem_attrs), "elem.attrs")
 }
 
 ///|
-pub fn HtmlElem::set_attrs(v : Value) -> Style {
+pub fn HtmlElem::set_attrs(v : HtmlAttrs) -> Style {
   Property(
     Property::new(html_elem(), html_elem_attrs, IntoValue::into_value(v)),
   )
@@ -21829,7 +21829,7 @@ pub fn HtmlElem::set_body(v : Content?) -> Style {
 }
 
 ///|
-pub fn HtmlElem::css(self : HtmlElem, styles : StyleChain) -> Value {
+pub fn HtmlElem::css(self : HtmlElem, styles : StyleChain) -> CssProperties {
   let e = html_elem()
   view_cast(
     styles.get_value_with_local(
@@ -21842,7 +21842,7 @@ pub fn HtmlElem::css(self : HtmlElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn HtmlElem::css_local(self : HtmlElem) -> Value? {
+pub fn HtmlElem::css_local(self : HtmlElem) -> CssProperties? {
   match self.0.field_raw(html_elem_css) {
     Some(v) => Some(view_cast(v, "elem.css"))
     None => None
@@ -21850,17 +21850,17 @@ pub fn HtmlElem::css_local(self : HtmlElem) -> Value? {
 }
 
 ///|
-pub fn HtmlElem::with_css(self : HtmlElem, v : Value) -> HtmlElem {
+pub fn HtmlElem::with_css(self : HtmlElem, v : CssProperties) -> HtmlElem {
   HtmlElem(self.0.with_field(html_elem_css, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn HtmlElem::css_in(styles : StyleChain) -> Value {
+pub fn HtmlElem::css_in(styles : StyleChain) -> CssProperties {
   view_cast(styles.get_field(html_elem(), html_elem_css), "elem.css")
 }
 
 ///|
-pub fn HtmlElem::set_css(v : Value) -> Style {
+pub fn HtmlElem::set_css(v : CssProperties) -> Style {
   Property(Property::new(html_elem(), html_elem_css, IntoValue::into_value(v)))
 }
 
@@ -21888,7 +21888,7 @@ pub fn HtmlElem::set_role(v : String?) -> Style {
 }
 
 ///|
-pub fn HtmlElem::new(tag_ : Value) -> HtmlElem {
+pub fn HtmlElem::new(tag_ : HtmlTag) -> HtmlElem {
   HtmlElem(
     Content::new(html_elem(), [(html_elem_tag, IntoValue::into_value(tag_))]),
   )

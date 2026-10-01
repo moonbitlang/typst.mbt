@@ -115,6 +115,11 @@ TYPEMAP = {
     "TableCell": "TableCell",
     "TableElem": "TableElem",
     "TableHeaderScope": "TableHeaderScope",
+    # typst-html (dom.rs, css/encode.rs); ported in library/html_*.mbt
+    "HtmlTag": "HtmlTag",
+    "HtmlAttr": "HtmlAttr",
+    "HtmlAttrs": "HtmlAttrs",
+    "css::Properties": "CssProperties",
 }
 
 # Generic Rust types with a MoonBit port: Rust name -> MoonBit name. A use
