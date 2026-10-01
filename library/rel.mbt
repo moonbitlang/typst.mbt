@@ -74,6 +74,11 @@ pub fn Rel::repr_length(self : Rel[Length]) -> String {
 }
 
 ///|
+pub impl Fold for Rel[Length] with fn fold(self, outer) {
+  { rel: self.rel, abs: self.abs.fold(outer.abs), }
+}
+
+///|
 /// Upstream `PartialOrd for Rel<Length>`.
 pub fn Rel::partial_cmp_length(self : Rel[Length], other : Rel[Length]) -> Int? {
   if self.rel.is_zero() && other.rel.is_zero() {

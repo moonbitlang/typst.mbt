@@ -1,0 +1,185 @@
+\d	a1b22c333
+\d+	a1b22c333
+\d*	a1b22
+1[0-9]	10 11 9 120
+whole	the whole wholesome
+\d{1,2}$	abc 123
+\(|\)	f(x) (y)
+[0-9]	hello 2 world 3
+.	héllo 🌍!
+(\w+) (\w+)	hello world foo bar
+^\d+$	12345
+^\d+$	123a45
+^[abc]+$	abcabc
+^[abc]$	ab
+^(newline|注释|换行newline|newline换行)$	换行newline
+^(.+)\s*(:)\s*(.+)$	key : value
+\w+\.?	Hello. World again.
+\w+	Straße café naïve 東京
+\p{Letter}	a1β2東
+\d{2}:\d{2}	at 12:34 and 5:67 or 99:00
+\d$	abc1\n2
+\[|\]	[a] [b]
+\S	a b\tc
+[mit]+e	time mite emit
+[a-z]+	ABC def GHI jkl
+[a-z]	Z
+[Tt]ys	Typst typst tys
+[,;]	a,b;c
+Who's|We've	Who's there? We've come.
+20-FFFF	20-FFFF
+(\d+):(\d+)	10:20 30:40
+(VAR_GLOBAL|END_VAR||BOOL)	VAR_GLOBAL x END_VAR BOOL
+(Lua)?(La)?TeX	LuaTeX LaTeX TeX LuaLaTeX
+(?i)rust	Rust RUST rust rUsT
+(?i)\bworld\b	Hello World worldwide WORLD
+(,\n)?\)$	(a,\n)
+	abc
+a*	baaac
+a*?	aaa
+(a|ab)(c|bcd)(d*)	abcd
+(a*)*	b
+(a*)+	b
+(a|b)*	abab
+(a?)*?b	aab
+x*	xxyxx
+\b	hello world
+\B	ab cd
+^	a\nb\nc
+(?m)^	a\nb\nc
+(?m)$	a\nb\nc
+(?m)^\w+$	one\ntwo\nthree
+(?s).+	a\nb
+.+	a\nb
+[^a]	abc
+(?i)[^a]	aAbB
+(?i)ǅ	ǄǅǆDŽ
+(?i)k	kKK
+[[:alpha:]]+	ab12cd
+[[:^digit:]]+	ab12cd
+[\d&&[0-4]]+	0123456789
+[a-z--[aeiou]]+	hello
+[a-z~~[a-c]]+	abxyz
+\p{Greek}+	abc αβγ def
+\P{L}+	abc 123 def
+\p{gc=Lu}	aBcD
+\p{Lu}	aBcD
+\pL	1a
+\p{Han}	漢字かな
+\p{sc=Hiragana}+	漢字かな
+\p{Alphabetic}+	a1b
+\p{White_Space}	a b
+\x41B\U00000043\x{44}	ABCD
+\u{1F600}	x😀y
+a{2}	aaaaa
+a{2,}	aaaaa
+a{2,3}	aaaaaaa
+a{2,3}?	aaaaaaa
+a{,3}	aaa
+(?x) a b c # comment	abc
+(?U)a+	aaa
+(?U)a+?	aaa
+(?P<year>\d{4})-(?<month>\d{2})	2024-01 1999-12
+a|b|c	xaybzc
+(a)|(b)	ab
+(?:ab)+	ababab
+\bfoo\b	foo foobar barfoo foo
+\b{start}\w+	hi there
+\w+\b{end}	hi there
+\<\w	hi there
+(	abc
+)	abc
+[	abc
+a{2,1}	abc
+\k	abc
+\1	abc
+(?=a)	abc
+(?i	abc
+(?z)	abc
+\p{Foo}	abc
+\p{gc=Foo}	abc
+x{	abc
+*	abc
+a**	aaa
+[z-a]	abc
+(?P<n>a)(?P<n>b)	ab
+\xFF	ÿ
+(?-u)\xFF	ÿ
+(?-u).	a
+(?-u)\w+	abc é
+[\u{20}-\u{FFFF}]	a\tb
+[\u{1D49C}-\u{1D503}]	x𝒜y
+[🔗⛓‍💥]	🔗 ⛓‍💥
+[^🖥️]	a🖥️b
+\d	١٢٣
+(?i)straße	STRASSE strasse Straße
+(?i)ß	ẞ ß
+(?i)[a-c]+	ABCabc
+(?i)σ	Σσς
+é	é
+café	café café
+\s+	a \t\n b
+^$	
+^$	a
+a$	a\n
+(?R)^a$	a\r\nb
+x	
+[[:word:]]+	foo_bar baz
+\D+	ab12
+\W+	ab, cd!
+(?i)Δ	δΔ
+(a)(b)?	a
+(a(b)?)+	aba
+a\n(	x
+(?x)a\n  [	x
+\d*	١a٢
+(?i)[^k]	kKKa
+(?i)[[:upper:]]+	abcXYZ
+(?i)\p{Lu}+	abcXYZ
+[\p{Greek}--\p{Lu}]+	αΑβΒ
+\b\w	über straße
+\B\w	über
+(?u:\w)+(?-u:\w)+	éa
+(a+|b+)*c	aabbac
+(a*)(b*)	ab
+((a)|b)+	ab
+(?i)(?-i:a)A	aA AA aa
+a(?i)b|c	aB C
+x*?y	xxy
+.*?	ab
+(?s:.)	\n
+[^\n]+	a\nb
+\p{Any}	x
+\p{Assigned}+	ab
+\p{Is_Greek}	α
+\p{isc}	a
+\p{scx=Greek}	α
+[\w&&\d]	a1
+[-a]	-a
+[a-]	-a
+[]a]	]a
+[^]a]	]ab
+\x{110000}	a
+\u{}	a
+(?<1a>x)	x
+(?<>x)	x
+a{1,2	a
+\b{foo}	a
+\b{2}	a
+(?i-)a	a
+(?--i)a	a
+(?ii)a	a
+[[:alpha:]-z]	a
+\pZ+	a b
+\p{Zs}	a b
+\p{L}	1
+\p{Cs}	a
+\p{Unknown}	a
+\p{Katakana_Or_Hiragana}	a
+ab|a	ab
+a|ab	ab
+(|a)+	aa
+(a|)+	aa
+(a*)*b	aab
+(a*)+?b	aab
+(?:a|b)*?c	ababc

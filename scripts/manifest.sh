@@ -4,6 +4,7 @@
 # schema drift.
 set -euo pipefail
 cd "$(dirname "$0")/.."
-cargo build --release -q --manifest-path oracle/Cargo.toml --bin extract
+# Build from inside oracle/ so that its rust-toolchain.toml applies.
+(cd oracle && cargo build --release -q --bin extract)
 mkdir -p gen
 oracle/target/release/extract .repos/typst/crates > gen/manifest.json

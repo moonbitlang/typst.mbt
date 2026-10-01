@@ -1,0 +1,1063 @@
+// Port of the castable value types of `typst-library/src/text/mod.rs` and
+// the `TextElem` field hooks (defaults, folds, `#[parse]`). Font selection,
+// shaping and other layout-time helpers are not ported here.
+
+// FontFamily, Covers, FontList
+
+///|
+/// A lowercased font family like "arial".
+pub(all) struct FontFamily {
+  /// The name of the font family.
+  name : String
+  /// A regex that defines the Unicode codepoints supported by the font.
+  covers : Covers?
+} derive(Eq, Hash)
+
+///|
+/// Create a named font family variant.
+pub fn FontFamily::new(string : String) -> FontFamily {
+  FontFamily::with_coverage(string, None)
+}
+
+///|
+/// Create a font family by name and optional Unicode coverage.
+pub fn FontFamily::with_coverage(
+  string : String,
+  covers : Covers?,
+) -> FontFamily {
+  { name: string.to_lower(), covers, }
+}
+
+///|
+/// The lowercased family name.
+pub fn FontFamily::as_str(self : FontFamily) -> String {
+  self.name
+}
+
+///|
+pub impl Reflect for FontFamily with fn input() {
+  CastInfo::Type(Type::str()).union_with(Type(Type::dict()))
+}
+
+///|
+pub impl Reflect for FontFamily with fn output() {
+  FontFamily::input()
+}
+
+///|
+pub impl Reflect for FontFamily with fn castable(v) {
+  str_castable(v) || v is Dict(_)
+}
+
+///|
+pub impl IntoValue for FontFamily with fn into_value(self) {
+  match self.covers {
+    Some(covers) =>
+      Dict(
+        Dict::from_pairs([
+          ("name", Str(self.name)),
+          ("covers", covers.into_value()),
+        ]),
+      )
+    None => Str(self.name)
+  }
+}
+
+///|
+pub impl FromValue for FontFamily with fn from_value(v) {
+  if str_castable(v) {
+    let string : String = (FromValue::from_value(v) : String)
+    return FontFamily::new(string)
+  }
+  match v {
+    Dict(v) => {
+      let v = v.copy()
+      let name : String = v.take("name").cast()
+      let covers : Covers? = dict_take_cast(v, "covers")
+      let ret = FontFamily::with_coverage(name, covers)
+      v.finish(["name", "covers"])
+      ret
+    }
+    v => raise HintedError(FontFamily::input().error(v))
+  }
+}
+
+///|
+/// Defines which codepoints a font family will be used for.
+pub(all) enum Covers {
+  /// Covers all codepoints except those used both in Latin and CJK fonts.
+  LatinInCjk
+  /// Covers the set of codepoints for which the regex matches.
+  Regex(Regex)
+} derive(Eq, Hash)
+
+///|
+pub impl Reflect for Covers with fn input() {
+  CastInfo::Value(
+    Str("latin-in-cjk"),
+    "Covers all codepoints except those used both in Latin and CJK fonts.",
+  ).union_with(Type(Type::regex()))
+}
+
+///|
+pub impl Reflect for Covers with fn output() {
+  Covers::input()
+}
+
+///|
+pub impl Reflect for Covers with fn castable(v) {
+  v is (Str("latin-in-cjk") | Dyn(Regex(_)))
+}
+
+///|
+pub impl IntoValue for Covers with fn into_value(self) {
+  match self {
+    LatinInCjk => Str("latin-in-cjk")
+    Regex(regex) => Dyn(Regex(regex))
+  }
+}
+
+///|
+pub impl FromValue for Covers with fn from_value(v) {
+  match v {
+    Str("latin-in-cjk") => LatinInCjk
+    Dyn(Regex(regex)) => {
+      if !@regex.ast_is_single_char(regex.as_str()) {
+        raise HintedError(
+          HintedString::new(
+            "coverage regex may only use dot, letters, and character classes",
+          ).with_hint("the regex is applied to each letter individually"),
+        )
+      }
+      Regex(regex)
+    }
+    v => raise HintedError(Covers::input().error(v))
+  }
+}
+
+///|
+/// Font family fallback list.
+///
+/// Must contain at least one font.
+pub(all) struct FontList(Array[FontFamily]) derive(Eq, Hash)
+
+///|
+pub fn FontList::new(fonts : Array[FontFamily]) -> FontList raise HintedError {
+  if fonts.is_empty() {
+    bail("font fallback list must not be empty")
+  } else {
+    FontList(fonts)
+  }
+}
+
+///|
+pub impl Reflect for FontList with fn input() {
+  FontFamily::input().union_with(Type(Type::array()))
+}
+
+///|
+pub impl Reflect for FontList with fn output() {
+  FontList::input()
+}
+
+///|
+pub impl Reflect for FontList with fn castable(v) {
+  FontFamily::castable(v) || v is Array(_)
+}
+
+///|
+pub impl IntoValue for FontList with fn into_value(self) {
+  if self.0.length() == 1 {
+    self.0[0].into_value()
+  } else {
+    IntoValue::into_value(self.0)
+  }
+}
+
+///|
+pub impl FromValue for FontList with fn from_value(v) {
+  if FontFamily::castable(v) {
+    return FontList([FontFamily::from_value(v)])
+  }
+  match v {
+    Array(values) =>
+      FontList::new(values.items.map(v => FontFamily::from_value(v)))
+    v => raise HintedError(FontList::input().error(v))
+  }
+}
+
+///|
+/// The default font list (upstream
+/// `FontList(vec![FontFamily::new("Libertinus Serif")])`).
+fn text_elem_font_default() -> Value {
+  FontList([FontFamily::new("Libertinus Serif")]).into_value()
+}
+
+///|
+fn text_elem_font_parse(
+  _engine : Engine,
+  args : Args,
+  _locals : ParseLocals,
+) -> Value? raise SourceError {
+  let font_list : FontList? = args.named("font")
+  // TODO: `check_font_list(engine, list)` warns about unknown font families
+  // ("unknown font family: {family}") once the font book is available.
+  font_list.map(list => list.into_value())
+}
+
+// FontStyle, FontWeight, FontStretch (see text_font.mbt)
+
+///|
+fn text_elem_style_default() -> Value {
+  FontStyle::default().into_value()
+}
+
+///|
+fn text_elem_weight_default() -> Value {
+  FontWeight::default().into_value()
+}
+
+///|
+fn text_elem_stretch_default() -> Value {
+  FontStretch::default().into_value()
+}
+
+// TextSize
+
+///|
+/// The size of text.
+pub(all) struct TextSize(Length) derive(Eq, Hash)
+
+///|
+pub impl Fold for TextSize with fn fold(self, outer) {
+  // Multiply the two linear functions.
+  TextSize({
+    em: Em::new(self.0.em.get() * outer.0.em.get()),
+    abs: outer.0.abs.times(self.0.em.get()) + self.0.abs,
+  })
+}
+
+///|
+pub impl Reflect for TextSize with fn input() {
+  Type(Type::length())
+}
+
+///|
+pub impl Reflect for TextSize with fn output() {
+  Type(Type::length())
+}
+
+///|
+pub impl Reflect for TextSize with fn castable(v) {
+  v is Length(_)
+}
+
+///|
+pub impl IntoValue for TextSize with fn into_value(self) {
+  Length(self.0)
+}
+
+///|
+pub impl FromValue for TextSize with fn from_value(v) {
+  TextSize(Length::from_value(v))
+}
+
+///|
+fn text_elem_size_default() -> Value {
+  TextSize(Length::from_abs(Abs::pt(11.0))).into_value()
+}
+
+///|
+fn text_elem_size_fold(inner : Value, outer : Value) -> Value {
+  fold_of((Ty::new() : Ty[TextSize]))(inner, outer)
+}
+
+// TopEdge, BottomEdge
+
+///|
+/// Specifies the top edge of text.
+pub(all) enum TopEdge {
+  /// An edge specified via font metrics or bounding box.
+  Metric(TopEdgeMetric)
+  /// An edge specified as a length.
+  Length(Length)
+} derive(Eq, Hash)
+
+///|
+pub impl Reflect for TopEdge with fn input() {
+  TopEdgeMetric::input().union_with(Type(Type::length()))
+}
+
+///|
+pub impl Reflect for TopEdge with fn output() {
+  TopEdge::input()
+}
+
+///|
+pub impl Reflect for TopEdge with fn castable(v) {
+  TopEdgeMetric::castable(v) || v is Length(_)
+}
+
+///|
+pub impl IntoValue for TopEdge with fn into_value(self) {
+  match self {
+    Metric(metric) => metric.into_value()
+    Length(length) => Length(length)
+  }
+}
+
+///|
+pub impl FromValue for TopEdge with fn from_value(v) {
+  if TopEdgeMetric::castable(v) {
+    return Metric(TopEdgeMetric::from_value(v))
+  }
+  match v {
+    Length(l) => Length(l)
+    v => raise HintedError(TopEdge::input().error(v))
+  }
+}
+
+///|
+/// Metrics that describe the top edge of text.
+pub(all) enum TopEdgeMetric {
+  /// The font's ascender, which typically exceeds the height of all glyphs.
+  Ascender
+  /// The approximate height of uppercase letters.
+  CapHeight
+  /// The approximate height of non-ascending lowercase letters.
+  XHeight
+  /// The baseline on which the letters rest.
+  Baseline
+  /// The top edge of the glyph's bounding box.
+  Bounds
+} derive(Eq, Hash, Debug)
+
+///|
+let top_edge_metric_names : Array[String] = [
+  "ascender", "cap-height", "x-height", "baseline", "bounds",
+]
+
+///|
+let top_edge_metric_values : Array[TopEdgeMetric] = [
+  Ascender,
+  CapHeight,
+  XHeight,
+  Baseline,
+  Bounds,
+]
+
+///|
+pub impl Reflect for TopEdgeMetric with fn input() {
+  str_names_input(top_edge_metric_names)
+}
+
+///|
+pub impl Reflect for TopEdgeMetric with fn output() {
+  TopEdgeMetric::input()
+}
+
+///|
+pub impl Reflect for TopEdgeMetric with fn castable(v) {
+  str_names_find(top_edge_metric_names, v) is Some(_)
+}
+
+///|
+pub impl IntoValue for TopEdgeMetric with fn into_value(self) {
+  for i, m in top_edge_metric_values {
+    if m == self {
+      return Str(top_edge_metric_names[i])
+    }
+  }
+  None
+}
+
+///|
+pub impl FromValue for TopEdgeMetric with fn from_value(v) {
+  match str_names_find(top_edge_metric_names, v) {
+    Some(i) => top_edge_metric_values[i]
+    None => raise HintedError(TopEdgeMetric::input().error(v))
+  }
+}
+
+///|
+fn text_elem_top_edge_default() -> Value {
+  TopEdge::Metric(CapHeight).into_value()
+}
+
+///|
+/// Specifies the bottom edge of text.
+pub(all) enum BottomEdge {
+  /// An edge specified via font metrics or bounding box.
+  Metric(BottomEdgeMetric)
+  /// An edge specified as a length.
+  Length(Length)
+} derive(Eq, Hash)
+
+///|
+pub impl Reflect for BottomEdge with fn input() {
+  BottomEdgeMetric::input().union_with(Type(Type::length()))
+}
+
+///|
+pub impl Reflect for BottomEdge with fn output() {
+  BottomEdge::input()
+}
+
+///|
+pub impl Reflect for BottomEdge with fn castable(v) {
+  BottomEdgeMetric::castable(v) || v is Length(_)
+}
+
+///|
+pub impl IntoValue for BottomEdge with fn into_value(self) {
+  match self {
+    Metric(metric) => metric.into_value()
+    Length(length) => Length(length)
+  }
+}
+
+///|
+pub impl FromValue for BottomEdge with fn from_value(v) {
+  if BottomEdgeMetric::castable(v) {
+    return Metric(BottomEdgeMetric::from_value(v))
+  }
+  match v {
+    Length(l) => Length(l)
+    v => raise HintedError(BottomEdge::input().error(v))
+  }
+}
+
+///|
+/// Metrics that describe the bottom edge of text.
+pub(all) enum BottomEdgeMetric {
+  /// The baseline on which the letters rest.
+  Baseline
+  /// The font's descender, which typically exceeds the depth of all glyphs.
+  Descender
+  /// The bottom edge of the glyph's bounding box.
+  Bounds
+} derive(Eq, Hash, Debug)
+
+///|
+let bottom_edge_metric_names : Array[String] = [
+  "baseline", "descender", "bounds",
+]
+
+///|
+let bottom_edge_metric_values : Array[BottomEdgeMetric] = [
+  Baseline,
+  Descender,
+  Bounds,
+]
+
+///|
+pub impl Reflect for BottomEdgeMetric with fn input() {
+  str_names_input(bottom_edge_metric_names)
+}
+
+///|
+pub impl Reflect for BottomEdgeMetric with fn output() {
+  BottomEdgeMetric::input()
+}
+
+///|
+pub impl Reflect for BottomEdgeMetric with fn castable(v) {
+  str_names_find(bottom_edge_metric_names, v) is Some(_)
+}
+
+///|
+pub impl IntoValue for BottomEdgeMetric with fn into_value(self) {
+  for i, m in bottom_edge_metric_values {
+    if m == self {
+      return Str(bottom_edge_metric_names[i])
+    }
+  }
+  None
+}
+
+///|
+pub impl FromValue for BottomEdgeMetric with fn from_value(v) {
+  match str_names_find(bottom_edge_metric_names, v) {
+    Some(i) => bottom_edge_metric_values[i]
+    None => raise HintedError(BottomEdgeMetric::input().error(v))
+  }
+}
+
+///|
+fn text_elem_bottom_edge_default() -> Value {
+  BottomEdge::Metric(Baseline).into_value()
+}
+
+// TextDir
+
+///|
+/// The direction of text and inline objects in their line.
+pub(all) struct TextDir(Smart[Dir]) derive(Eq, Hash)
+
+///|
+pub impl Reflect for TextDir with fn input() {
+  input_of((Ty::new() : Ty[Smart[Dir]]))
+}
+
+///|
+pub impl Reflect for TextDir with fn output() {
+  TextDir::input()
+}
+
+///|
+pub impl Reflect for TextDir with fn castable(v) {
+  v is Auto || Dir::castable(v)
+}
+
+///|
+pub impl IntoValue for TextDir with fn into_value(self) {
+  self.0.into_value()
+}
+
+///|
+pub impl FromValue for TextDir with fn from_value(v) {
+  let v : Smart[Dir] = Smart::from_value(v)
+  if v.is_custom_and(dir => dir.axis() == Y) {
+    bail("text direction must be horizontal")
+  }
+  TextDir(v)
+}
+
+///|
+fn text_elem_dir_default() -> Value {
+  TextDir(Auto).into_value()
+}
+
+// Alternates, StylisticSets
+
+///|
+/// A selection into the Stylistic Alternates.
+pub(all) struct Alternates(Int64) derive(Eq, Hash, Default)
+
+///|
+pub impl Reflect for Alternates with fn input() {
+  CastInfo::Type(Type::bool()).union_with(Type(Type::int()))
+}
+
+///|
+pub impl Reflect for Alternates with fn output() {
+  Alternates::input()
+}
+
+///|
+pub impl Reflect for Alternates with fn castable(v) {
+  v is (Bool(_) | Int(_))
+}
+
+///|
+pub impl IntoValue for Alternates with fn into_value(self) {
+  Int(self.0)
+}
+
+///|
+pub impl FromValue for Alternates with fn from_value(v) {
+  match v {
+    Bool(b) => Alternates(if b { 1 } else { 0 })
+    Int(_) => Alternates(U32::from_value(v).0)
+    v => raise HintedError(Alternates::input().error(v))
+  }
+}
+
+///|
+fn text_elem_alternates_default() -> Value {
+  Alternates::default().into_value()
+}
+
+///|
+/// A set of stylistic sets to enable.
+pub(all) struct StylisticSets(Int) derive(Eq, Hash, Default)
+
+///|
+/// Returns whether this set contains a particular stylistic set.
+pub fn StylisticSets::has(self : StylisticSets, ss : Int) -> Bool {
+  (self.0 & (1 << ss)) != 0
+}
+
+///|
+/// Returns all stylistic sets to enable.
+pub fn StylisticSets::sets(self : StylisticSets) -> Array[Int] {
+  let out = []
+  for i in 1..<=20 {
+    if self.has(i) {
+      out.push(i)
+    }
+  }
+  out
+}
+
+///|
+pub impl Reflect for StylisticSets with fn input() {
+  CastInfo::Type(Type::none())
+  .union_with(Type(Type::int()))
+  .union_with(Type(Type::array()))
+}
+
+///|
+pub impl Reflect for StylisticSets with fn output() {
+  StylisticSets::input()
+}
+
+///|
+pub impl Reflect for StylisticSets with fn castable(v) {
+  v is (None | Int(_) | Array(_))
+}
+
+///|
+pub impl IntoValue for StylisticSets with fn into_value(self) {
+  Array(Arr::from_array(self.sets().map(i => Int(i.to_int64()))))
+}
+
+///|
+pub impl FromValue for StylisticSets with fn from_value(v) {
+  match v {
+    None => StylisticSets(0)
+    Int(v) =>
+      if v >= 1L && v <= 20L {
+        StylisticSets(1 << v.to_int())
+      } else {
+        bail("stylistic set must be between 1 and 20")
+      }
+    Array(_) => {
+      let v : Array[Int64] = FromValue::from_value(v)
+      let mut flags = 0
+      for i in v {
+        if i >= 1L && i <= 20L {
+          flags = flags | (1 << i.to_int())
+        } else {
+          bail("stylistic set must be between 1 and 20")
+        }
+      }
+      StylisticSets(flags)
+    }
+    v => raise HintedError(StylisticSets::input().error(v))
+  }
+}
+
+///|
+fn text_elem_stylistic_set_default() -> Value {
+  StylisticSets::default().into_value()
+}
+
+// NumberType, NumberWidth
+
+///|
+/// Which kind of numbers / figures to select.
+pub(all) enum NumberType {
+  /// Numbers that fit well with capital text (the OpenType `lnum` font
+  /// feature).
+  Lining
+  /// Numbers that fit well into a flow of upper- and lowercase text (the
+  /// OpenType `onum` font feature).
+  OldStyle
+} derive(Eq, Hash, Debug)
+
+///|
+let number_type_names : Array[String] = ["lining", "old-style"]
+
+///|
+pub impl Reflect for NumberType with fn input() {
+  str_names_input(number_type_names)
+}
+
+///|
+pub impl Reflect for NumberType with fn output() {
+  NumberType::input()
+}
+
+///|
+pub impl Reflect for NumberType with fn castable(v) {
+  str_names_find(number_type_names, v) is Some(_)
+}
+
+///|
+pub impl IntoValue for NumberType with fn into_value(self) {
+  match self {
+    Lining => Str("lining")
+    OldStyle => Str("old-style")
+  }
+}
+
+///|
+pub impl FromValue for NumberType with fn from_value(v) {
+  match str_names_find(number_type_names, v) {
+    Some(0) => Lining
+    Some(_) => OldStyle
+    None => raise HintedError(NumberType::input().error(v))
+  }
+}
+
+///|
+/// The width of numbers / figures.
+pub(all) enum NumberWidth {
+  /// Numbers with glyph-specific widths (the OpenType `pnum` font feature).
+  Proportional
+  /// Numbers of equal width (the OpenType `tnum` font feature).
+  Tabular
+} derive(Eq, Hash, Debug)
+
+///|
+let number_width_names : Array[String] = ["proportional", "tabular"]
+
+///|
+pub impl Reflect for NumberWidth with fn input() {
+  str_names_input(number_width_names)
+}
+
+///|
+pub impl Reflect for NumberWidth with fn output() {
+  NumberWidth::input()
+}
+
+///|
+pub impl Reflect for NumberWidth with fn castable(v) {
+  str_names_find(number_width_names, v) is Some(_)
+}
+
+///|
+pub impl IntoValue for NumberWidth with fn into_value(self) {
+  match self {
+    Proportional => Str("proportional")
+    Tabular => Str("tabular")
+  }
+}
+
+///|
+pub impl FromValue for NumberWidth with fn from_value(v) {
+  match str_names_find(number_width_names, v) {
+    Some(0) => Proportional
+    Some(_) => Tabular
+    None => raise HintedError(NumberWidth::input().error(v))
+  }
+}
+
+// FontFeatures
+
+///|
+/// OpenType font features settings.
+pub(all) struct FontFeatures(Array[(Tag, Int64)]) derive(Eq, Hash, Default)
+
+///|
+pub impl Reflect for FontFeatures with fn input() {
+  CastInfo::Type(Type::array()).union_with(Type(Type::dict()))
+}
+
+///|
+pub impl Reflect for FontFeatures with fn output() {
+  FontFeatures::input()
+}
+
+///|
+pub impl Reflect for FontFeatures with fn castable(v) {
+  v is (Array(_) | Dict(_))
+}
+
+///|
+pub impl IntoValue for FontFeatures with fn into_value(self) {
+  let dict = Dict::new()
+  for pair in self.0 {
+    dict.insert(pair.0.to_str_lossy(), Int(pair.1))
+  }
+  Dict(dict)
+}
+
+///|
+pub impl FromValue for FontFeatures with fn from_value(v) {
+  match v {
+    Array(values) => {
+      let out = []
+      for i, v in values.items {
+        let tag = with_err_hint(
+          () => Tag::from_value(v),
+          tag_hint_helper(i, v.repr()),
+        ) catch {
+          HintedError(e) => {
+            // Append a hint if the value is a string containing the
+            // assignment operator `=` or another type was supplied.
+            let append = match v {
+              Str(s) => s.contains("=")
+              Symbol(s) => s.get().contains("=")
+              _ => true
+            }
+            if append {
+              e.hint(
+                "to set features with custom values, consider supplying a dictionary",
+              )
+            }
+            raise HintedError(e)
+          }
+        }
+        out.push((tag, 1L))
+      }
+      FontFeatures(out)
+    }
+    Dict(values) => {
+      let out = []
+      let mut i = 0
+      for k, v in values.map {
+        let hint = tag_hint_helper(i, repr_str(k))
+        let tag = with_err_hint(() => Tag::from_value(Str(k)), hint)
+        let num = with_err_hint(() => U32::from_value(v).0, hint)
+        out.push((tag, num))
+        i += 1
+      }
+      FontFeatures(out)
+    }
+    v => raise HintedError(FontFeatures::input().error(v))
+  }
+}
+
+///|
+pub impl Fold for FontFeatures with fn fold(self, outer) {
+  FontFeatures(outer.0 + self.0)
+}
+
+///|
+fn text_elem_features_default() -> Value {
+  FontFeatures::default().into_value()
+}
+
+///|
+fn text_elem_features_fold(inner : Value, outer : Value) -> Value {
+  fold_of((Ty::new() : Ty[FontFeatures]))(inner, outer)
+}
+
+///|
+fn text_elem_variations_default() -> Value {
+  FontVariations::default().into_value()
+}
+
+///|
+fn text_elem_variations_fold(inner : Value, outer : Value) -> Value {
+  fold_of((Ty::new() : Ty[FontVariations]))(inner, outer)
+}
+
+// ItalicToggle, WeightDelta
+
+///|
+/// A toggle that turns on and off alternatingly if folded.
+///
+/// Internal field type without upstream casts; stored as a boolean.
+pub(all) struct ItalicToggle(Bool) derive(Eq, Hash)
+
+///|
+pub impl Fold for ItalicToggle with fn fold(self, outer) {
+  ItalicToggle(self.0 != outer.0)
+}
+
+///|
+pub impl Reflect for ItalicToggle with fn input() {
+  Type(Type::bool())
+}
+
+///|
+pub impl Reflect for ItalicToggle with fn output() {
+  Type(Type::bool())
+}
+
+///|
+pub impl Reflect for ItalicToggle with fn castable(v) {
+  v is Bool(_)
+}
+
+///|
+pub impl IntoValue for ItalicToggle with fn into_value(self) {
+  Bool(self.0)
+}
+
+///|
+pub impl FromValue for ItalicToggle with fn from_value(v) {
+  ItalicToggle((FromValue::from_value(v) : Bool))
+}
+
+///|
+fn text_elem_emph_default() -> Value {
+  ItalicToggle(false).into_value()
+}
+
+///|
+fn text_elem_emph_fold(inner : Value, outer : Value) -> Value {
+  fold_of((Ty::new() : Ty[ItalicToggle]))(inner, outer)
+}
+
+///|
+/// A delta that is summed up when folded.
+///
+/// Internal field type without upstream casts; stored as an integer.
+pub(all) struct WeightDelta(Int64) derive(Eq, Hash, Default)
+
+///|
+pub impl Fold for WeightDelta with fn fold(self, outer) {
+  WeightDelta(outer.0 + self.0)
+}
+
+///|
+pub impl Reflect for WeightDelta with fn input() {
+  Type(Type::int())
+}
+
+///|
+pub impl Reflect for WeightDelta with fn output() {
+  Type(Type::int())
+}
+
+///|
+pub impl Reflect for WeightDelta with fn castable(v) {
+  v is Int(_)
+}
+
+///|
+pub impl IntoValue for WeightDelta with fn into_value(self) {
+  Int(self.0)
+}
+
+///|
+pub impl FromValue for WeightDelta with fn from_value(v) {
+  WeightDelta((FromValue::from_value(v) : Int64))
+}
+
+///|
+fn text_elem_delta_default() -> Value {
+  WeightDelta::default().into_value()
+}
+
+///|
+fn text_elem_delta_fold(inner : Value, outer : Value) -> Value {
+  fold_of((Ty::new() : Ty[WeightDelta]))(inner, outer)
+}
+
+// Costs
+
+///|
+/// Costs for various layout decisions.
+///
+/// Costs are updated (prioritizing the later value) when folded.
+pub(all) struct Costs {
+  hyphenation : Ratio?
+  runt : Ratio?
+  widow : Ratio?
+  orphan : Ratio?
+} derive(Eq, Hash, Default)
+
+///|
+pub fn Costs::hyphenation(self : Costs) -> Ratio {
+  self.hyphenation.unwrap_or(Ratio::one())
+}
+
+///|
+pub fn Costs::runt(self : Costs) -> Ratio {
+  self.runt.unwrap_or(Ratio::one())
+}
+
+///|
+pub fn Costs::widow(self : Costs) -> Ratio {
+  self.widow.unwrap_or(Ratio::one())
+}
+
+///|
+pub fn Costs::orphan(self : Costs) -> Ratio {
+  self.orphan.unwrap_or(Ratio::one())
+}
+
+///|
+pub impl Fold for Costs with fn fold(self, outer) {
+  {
+    hyphenation: self.hyphenation |> opt_or(outer.hyphenation),
+    runt: self.runt |> opt_or(outer.runt),
+    widow: self.widow |> opt_or(outer.widow),
+    orphan: self.orphan |> opt_or(outer.orphan),
+  }
+}
+
+///|
+pub impl Reflect for Costs with fn input() {
+  Type(Type::dict())
+}
+
+///|
+pub impl Reflect for Costs with fn output() {
+  Type(Type::dict())
+}
+
+///|
+pub impl Reflect for Costs with fn castable(v) {
+  v is Dict(_)
+}
+
+///|
+pub impl IntoValue for Costs with fn into_value(self) {
+  Dict(
+    Dict::from_pairs([
+      ("hyphenation", Ratio(self.hyphenation())),
+      ("runt", Ratio(self.runt())),
+      ("widow", Ratio(self.widow())),
+      ("orphan", Ratio(self.orphan())),
+    ]),
+  )
+}
+
+///|
+pub impl FromValue for Costs with fn from_value(v) {
+  match v {
+    Dict(v) => {
+      let v = v.copy()
+      let ret = {
+        hyphenation: dict_take_cast(v, "hyphenation"),
+        runt: dict_take_cast(v, "runt"),
+        widow: dict_take_cast(v, "widow"),
+        orphan: dict_take_cast(v, "orphan"),
+      }
+      v.finish(["hyphenation", "runt", "widow", "orphan"])
+      ret
+    }
+    v => raise HintedError(Costs::input().error(v))
+  }
+}
+
+///|
+fn text_elem_costs_default() -> Value {
+  Costs::default().into_value()
+}
+
+///|
+fn text_elem_costs_fold(inner : Value, outer : Value) -> Value {
+  fold_of((Ty::new() : Ty[Costs]))(inner, outer)
+}
+
+// Never
+
+///|
+/// A type that can never be constructed (upstream `Never`, used as
+/// `Smart<Option<Never>>`).
+pub(all) enum Never {} derive(Eq, Hash)
+
+///|
+pub impl Reflect for Never with fn input() {
+  Union([])
+}
+
+///|
+pub impl Reflect for Never with fn output() {
+  Union([])
+}
+
+///|
+pub impl Reflect for Never with fn castable(_) {
+  false
+}
+
+///|
+pub impl IntoValue for Never with fn into_value(self) {
+  match self {
+
+  }
+}
+
+///|
+pub impl FromValue for Never with fn from_value(v) {
+  raise HintedError(Never::input().error(v))
+}

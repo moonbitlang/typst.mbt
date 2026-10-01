@@ -7,7 +7,7 @@ fn impl_csv__delimiter_default() -> Delimiter {
 
 ///|
 fn impl_csv__row_type_default() -> RowType {
-  Array
+  RowArray
 }
 
 ///|
@@ -24,7 +24,7 @@ fn impl_csv(
   row_type_ : RowType,
 ) -> Arr raise SourceError {
   let loaded = source_.v.load(source_.span, engine.world)
-  let has_headers = row_type_ == Dict
+  let has_headers = row_type_ == RowDict
   let reader = @csv.Reader::new(
     loaded.data,
     delimiter=delimiter_.0.to_int().to_byte(),
@@ -127,9 +127,12 @@ pub impl FromValue for Delimiter with fn from_value(v) {
 
 ///|
 /// The type of parsed rows.
+///
+/// (The variants are named `RowArray`/`RowDict` instead of upstream's
+/// `Array`/`Dict` to avoid clashing with `Value::Array`/`Value::Dict`.)
 pub(all) enum RowType {
-  Array
-  Dict
+  RowArray
+  RowDict
 } derive(Eq, Hash, Debug)
 
 ///|
@@ -150,8 +153,8 @@ pub impl Reflect for RowType with fn castable(v) {
 ///|
 pub impl IntoValue for RowType with fn into_value(self) {
   match self {
-    Array => Type(Type::array())
-    Dict => Type(Type::dict())
+    RowArray => Type(Type::array())
+    RowDict => Type(Type::dict())
   }
 }
 
@@ -160,9 +163,9 @@ pub impl FromValue for RowType with fn from_value(v) {
   match v {
     Type(ty) =>
       if ty == Type::array() {
-        Array
+        RowArray
       } else if ty == Type::dict() {
-        Dict
+        RowDict
       } else {
         bail("expected `array` or `dictionary`")
       }

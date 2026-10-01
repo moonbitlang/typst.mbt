@@ -1,6 +1,7 @@
 import {
   "moonbitlang/typst/syntax",
   "moonbitlang/typst/unicode",
+  "moonbitlang/typst/regex",
   "moonbitlang/core/string",
   "moonbitlang/core/math",
   "moonbitlang/core/bigint",
@@ -17,6 +18,7 @@ import {
   "moonbitlang/typst/data/cbor",
   "moonbitlang/typst/data/toml",
   "moonbitlang/typst/data/yaml",
+  "moonbitlang/typst/time",
 }
 
 import {

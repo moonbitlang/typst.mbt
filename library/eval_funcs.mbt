@@ -83,24 +83,3 @@ fn impl_func_with(self_ : Func, args : Args) -> Func raise HintedError {
   let span = self_.span()
   { inner: With(self_, args.take()), span, }
 }
-
-///|
-/// Returns a selector that filters for elements belonging to this function
-/// whose fields have the values of the given arguments.
-fn impl_func_where(self_ : Func, args : Args) -> Value raise HintedError {
-  let fields = args.to_named()
-  let kept = args.items.filter(arg => arg.name is None)
-  args.items.clear()
-  args.items.append(kept)
-  guard self_.to_element() is Some(element) else {
-    bail("`where()` can only be called on element functions")
-  }
-  let out = []
-  for key, value in fields.iter() {
-    match element.field_id(key) {
-      Some(id) => out.push((id, value))
-      None => bail("element `\{element.name()}` does not have field `\{key}`")
-    }
-  }
-  Dyn(Selector(element.where_(out)))
-}

@@ -29,7 +29,7 @@ fn impl_toml_encode(
   value_ : @syntax.Spanned[Dict],
   pretty_ : Bool,
 ) -> String raise SourceError {
-  let { v: value, span } = value_
+  let { v: value, span, } = value_
   @toml.to_string(value.to_serde(true), pretty=pretty_) catch {
     @toml.TomlError(message~, ..) =>
       bail_at(span, "failed to encode value as TOML (\{message})")

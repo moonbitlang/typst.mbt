@@ -6,11 +6,29 @@ import {
 }
 
 // Values
+pub fn bool_property_ranges(String) -> Array[(Int, Int)]?
+
+pub fn canonical_combining_class(Int) -> Int
+
+pub fn canonical_general_category(String) -> String?
+
+pub fn canonical_property_name(String) -> String?
+
+pub fn canonical_script(String) -> String?
+
+pub fn char_to_lowercase(Char) -> String
+
+pub fn char_to_uppercase(Char) -> String
+
+pub fn chars_with_case_variants(Int, Int) -> Array[Int]
+
 pub fn decode_at(StringView, Int) -> (Int, Int)
 
 pub fn decode_before(StringView, Int) -> (Int, Int)
 
 pub fn default_math_class(Char) -> MathClass?
+
+pub fn general_category_ranges(String) -> Array[(Int, Int)]?
 
 pub fn grapheme_end(StringView, Int) -> Int
 
@@ -34,15 +52,41 @@ pub fn is_uppercase(Char) -> Bool
 
 pub fn is_whitespace(Char) -> Bool
 
+pub fn is_word_character(Int) -> Bool
+
 pub fn is_xid_continue(Char) -> Bool
 
 pub fn is_xid_start(Char) -> Bool
+
+pub fn nfc(StringView) -> String
+
+pub fn nfd(StringView) -> String
+
+pub fn nfkc(StringView) -> String
+
+pub fn nfkd(StringView) -> String
+
+pub fn perl_digit_ranges() -> Array[(Int, Int)]
+
+pub fn perl_space_ranges() -> Array[(Int, Int)]
+
+pub fn perl_word_ranges() -> Array[(Int, Int)]
 
 pub fn rust_debug_char(Char) -> String
 
 pub fn rust_debug_str(StringView) -> String
 
 pub fn script(Char) -> String
+
+pub fn script_extension_ranges(String) -> Array[(Int, Int)]?
+
+pub fn script_ranges(String) -> Array[(Int, Int)]?
+
+pub fn simple_fold_next(Int) -> Int?
+
+pub fn to_lowercase(StringView) -> String
+
+pub fn to_uppercase(StringView) -> String
 
 // Errors
 

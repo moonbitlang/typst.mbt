@@ -29,51 +29,123 @@ pub fn exp10(n : Int) -> Double {
 
 ///|
 /// The shortest round-trip decimal digits and exponent of a finite, non-zero
-/// double: `x = 0.d1d2d3... * 10^exp` (digits without leading zeros).
+/// double: `x = 0.d1d2d3... * 10^exp` (digits without leading or trailing
+/// zeros).
+///
+/// This is Rust's `core::num::flt2dec::strategy::dragon::format_shortest`
+/// (which its Grisu fast path agrees with), including how it picks between
+/// two equally short candidates: when the remaining digits are exactly half
+/// way, it rounds up.
 fn shortest_digits(x : Double) -> (String, Int) {
-  // MoonBit's `to_string` produces the shortest round-trip representation
-  // (like Rust), either as plain decimal or with an `e` exponent.
-  let s = x.abs().to_string()
-  let (mantissa, exp) = match s.find("e") {
-    Some(i) => {
-      let e = s.unsafe_substring(start=i + 1, end=s.length())
-      let e = if e.has_prefix("+") {
-        e.unsafe_substring(start=1, end=e.length())
-      } else {
-        e
-      }
-      (
-        s.unsafe_substring(start=0, end=i),
-        @string.parse_int(e) catch {
-          _ => 0
-        },
-      )
+  // `flt2dec::decode`: the value is `mant * 2^exp`, its neighbors are
+  // `(mant - minus) * 2^exp` and `(mant + plus) * 2^exp` (half way to the
+  // adjacent floats), inclusive if the original mantissa is even.
+  let bits = x.abs().reinterpret_as_uint64()
+  let biased = ((bits >> 52) & 0x7FFUL).to_int()
+  let frac = bits & 0xFFFFFFFFFFFFFUL
+  let (raw_mant, raw_exp) = if biased == 0 {
+    (frac << 1, -1075)
+  } else {
+    (frac | 0x10000000000000UL, biased - 1075)
+  }
+  let inclusive = (raw_mant & 1UL) == 0UL
+  let (mant, minus, plus, exp) = if biased == 0 {
+    (raw_mant, 1, 1, raw_exp)
+  } else if raw_mant == 0x10000000000000UL {
+    (raw_mant << 2, 1, 2, raw_exp - 2)
+  } else {
+    (raw_mant << 1, 1, 1, raw_exp - 1)
+  }
+  let mut r = @bigint.BigInt::from_uint64(mant)
+  let mut m_minus = @bigint.BigInt::from_int(minus)
+  let mut m_plus = @bigint.BigInt::from_int(plus)
+  let mut s = @bigint.BigInt::from_int(1)
+  if exp < 0 {
+    s = s << -exp
+  } else {
+    r = r << exp
+    m_minus = m_minus << exp
+    m_plus = m_plus << exp
+  }
+  // `a < b` with the bound inclusiveness (`cmp(a, b) < rounding`).
+  let below = (a : @bigint.BigInt, b : @bigint.BigInt) => {
+    if inclusive {
+      a <= b
+    } else {
+      a < b
     }
-    None => (s, 0)
   }
-  let (int_part, frac_part) = match mantissa.find(".") {
-    Some(i) =>
-      (
-        mantissa.unsafe_substring(start=0, end=i),
-        mantissa.unsafe_substring(start=i + 1, end=mantissa.length()),
-      )
-    None => (mantissa, "")
+  // Find the exponent `k`: the smallest with `r + plus < 10^k * s` (or `<=`
+  // if exclusive), comparing exactly by scaling the other side for negative
+  // powers.
+  let ten = @bigint.BigInt::from_int(10)
+  let upper = r + m_plus
+  let scaled_below = (k : Int) => {
+    if k >= 0 {
+      below(s * ten.pow(@bigint.BigInt::from_int(k)), upper)
+    } else {
+      below(s, upper * ten.pow(@bigint.BigInt::from_int(-k)))
+    }
   }
-  let all = int_part + frac_part
-  // Position of the decimal point relative to `all`.
-  let mut point = int_part.length() + exp
-  // Strip leading zeros.
-  let mut start = 0
-  while start < all.length() - 1 && all.code_unit_at(start) == '0' {
-    start += 1
-    point -= 1
+  let mut k = @math.log10(x.abs()).floor().to_int()
+  while scaled_below(k) {
+    k += 1
   }
-  // Strip trailing zeros.
-  let mut end = all.length()
-  while end > start + 1 && all.code_unit_at(end - 1) == '0' {
-    end -= 1
+  while !scaled_below(k - 1) {
+    k -= 1
   }
-  (all.unsafe_substring(start~, end~), point)
+  // Generate digits from the `10^(k-1)` position: scale the numerator side
+  // instead of the denominator for negative positions.
+  let (r0, mm0, mp0, s0) = if k - 1 >= 0 {
+    (r, m_minus, m_plus, s * ten.pow(@bigint.BigInt::from_int(k - 1)))
+  } else {
+    let f = ten.pow(@bigint.BigInt::from_int(1 - k))
+    (r * f, m_minus * f, m_plus * f, s)
+  }
+  let mut r = r0
+  let mut m_minus = mm0
+  let mut m_plus = mp0
+  let scale = s0
+  let digits = []
+  let mut down = false
+  let mut up = false
+  for ;; {
+    let d = r / scale
+    r = r % scale
+    digits.push(d.to_int())
+    down = below(r, m_minus)
+    up = below(scale, r + m_plus)
+    if down || up {
+      break
+    }
+    r = r * ten
+    m_minus = m_minus * ten
+    m_plus = m_plus * ten
+  }
+  // Round up if we stopped closer to (or exactly half way to) the upper
+  // candidate.
+  if up && (!down || r + r >= scale) {
+    let mut i = digits.length() - 1
+    while i >= 0 && digits[i] == 9 {
+      digits[i] = 0
+      i -= 1
+    }
+    if i < 0 {
+      digits[0] = 1
+      digits.push(0)
+      k += 1
+    } else {
+      digits[i] += 1
+    }
+  }
+  while digits.length() > 1 && digits[digits.length() - 1] == 0 {
+    digits.pop() |> ignore
+  }
+  let buf = StringBuilder()
+  for d in digits {
+    buf.write_char(Int::unsafe_to_char(48 + d))
+  }
+  (buf.to_string(), k)
 }
 
 ///|

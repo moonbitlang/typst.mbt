@@ -21,8 +21,10 @@ fn impl_yaml(
 
 ///|
 /// Encode structured data into a YAML string.
-fn impl_yaml_encode(value_ : @syntax.Spanned[Value]) -> String raise SourceError {
-  let { v: value, span } = value_
+fn impl_yaml_encode(
+  value_ : @syntax.Spanned[Value],
+) -> String raise SourceError {
+  let { v: value, span, } = value_
   @yaml.to_string(value.to_serde(true)) catch {
     @yaml.YamlError(message~, ..) =>
       bail_at(span, "failed to encode value as YAML (\{message})")

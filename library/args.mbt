@@ -396,3 +396,17 @@ pub fn[T : FromValue] Args::all_spanned(
   }
   list
 }
+
+///|
+/// [Args::find] keeping the argument's span.
+pub fn[T : FromValue] Args::find_spanned(
+  self : Args,
+) -> @syntax.Spanned[T]? raise SourceError {
+  for i, slot in self.items {
+    if slot.name is None && castable_of((Ty::new() : Ty[T]), slot.value.v) {
+      let value = self.items.remove(i).value
+      return Some(cast_spanned(value))
+    }
+  }
+  None
+}

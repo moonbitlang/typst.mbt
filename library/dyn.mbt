@@ -29,6 +29,12 @@ pub(all) enum DynValue {
   Selector(Selector)
   /// `foundations/path.rs`
   RootedPath(RootedPath)
+  /// `introspection/counter.rs` (internal: the `update` field of counter
+  /// updates)
+  CounterUpdate(CounterUpdate)
+  /// `introspection/state.rs` (internal: the `update` field of state
+  /// updates)
+  StateUpdate(StateUpdate)
 } derive(Eq)
 
 ///|
@@ -45,6 +51,9 @@ pub fn DynValue::ty(self : DynValue) -> Type {
     Location(_) => Type::location()
     Selector(_) => Type::selector()
     RootedPath(_) => Type::path()
+    // Internal values that are never exposed to users.
+    CounterUpdate(_) => Type::counter()
+    StateUpdate(_) => Type::state()
   }
 }
 
@@ -62,6 +71,8 @@ pub fn DynValue::repr(self : DynValue) -> String {
     Location(v) => v.repr()
     Selector(v) => v.repr()
     RootedPath(v) => repr_rooted_path(v)
+    CounterUpdate(_) => "counter.update(..)"
+    StateUpdate(_) => "state.update(..)"
   }
 }
 

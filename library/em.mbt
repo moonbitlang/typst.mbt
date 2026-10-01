@@ -87,3 +87,8 @@ pub fn Abs::is_zero(self : Abs) -> Bool {
 pub fn Em::is_zero(self : Em) -> Bool {
   self.get() == 0.0
 }
+
+///|
+pub impl IntoValue for Em with fn into_value(self) {
+  Length(Length::from_em(self))
+}
