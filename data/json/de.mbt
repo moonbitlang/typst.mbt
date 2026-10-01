@@ -101,7 +101,7 @@ priv struct Deserializer {
 /// Deserialize a value from JSON bytes (upstream
 /// `serde_json::from_slice::<Value>`).
 pub fn from_slice(bytes : Bytes) -> @serde.Data raise JsonError {
-  let de : Deserializer = { slice: bytes, index: 0, remaining_depth: 128 }
+  let de : Deserializer = { slice: bytes, index: 0, remaining_depth: 128, }
   let value = de.deserialize_any()
   de.end()
   value
@@ -193,13 +193,17 @@ fn Deserializer::parse_whitespace(self : Deserializer) -> Byte? {
 }
 
 ///|
-fn Deserializer::parse_ident(self : Deserializer, ident : String) -> Unit raise JsonError {
+fn Deserializer::parse_ident(
+  self : Deserializer,
+  ident : String,
+) -> Unit raise JsonError {
   for expected in ident {
     match self.next_char() {
       None => raise self.error(EofWhileParsingValue)
-      Some(next) => if next.to_int() != expected.to_int() {
-        raise self.error(ExpectedSomeIdent)
-      }
+      Some(next) =>
+        if next.to_int() != expected.to_int() {
+          raise self.error(ExpectedSomeIdent)
+        }
     }
   }
 }
@@ -520,7 +524,9 @@ fn Deserializer::end_map(self : Deserializer) -> Unit raise JsonError {
 }
 
 ///|
-fn Deserializer::parse_object_colon(self : Deserializer) -> Unit raise JsonError {
+fn Deserializer::parse_object_colon(
+  self : Deserializer,
+) -> Unit raise JsonError {
   match self.parse_whitespace() {
     Some(b':') => self.eat_char()
     Some(_) => raise self.peek_error(ExpectedColon)
@@ -530,7 +536,9 @@ fn Deserializer::parse_object_colon(self : Deserializer) -> Unit raise JsonError
 
 ///|
 /// Upstream `deserialize_any` driving Typst's `ValueVisitor`.
-fn Deserializer::deserialize_any(self : Deserializer) -> @serde.Data raise JsonError {
+fn Deserializer::deserialize_any(
+  self : Deserializer,
+) -> @serde.Data raise JsonError {
   let peek = match self.parse_whitespace() {
     Some(b) => b
     None => raise self.peek_error(EofWhileParsingValue)
@@ -592,7 +600,9 @@ fn Deserializer::deserialize_any(self : Deserializer) -> @serde.Data raise JsonE
 
 ///|
 /// Upstream `SeqAccess::next_element_seed` loop.
-fn Deserializer::visit_seq(self : Deserializer) -> Array[@serde.Data] raise JsonError {
+fn Deserializer::visit_seq(
+  self : Deserializer,
+) -> Array[@serde.Data] raise JsonError {
   let items = []
   let mut first = true
   while true {
@@ -681,7 +691,9 @@ fn Deserializer::parse_str(self : Deserializer) -> String raise JsonError {
         scratch.write_bytesview(self.slice[start:self.index])
         self.index += 1
         let bytes = scratch.to_bytes()
-        guard valid_utf8(bytes) else { raise self.error(InvalidUnicodeCodePoint) }
+        guard valid_utf8(bytes) else {
+          raise self.error(InvalidUnicodeCodePoint)
+        }
         return @utf8.decode(bytes) catch { _ => panic() }
       }
       b'\\' => {

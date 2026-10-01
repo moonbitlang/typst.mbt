@@ -18,10 +18,7 @@ fn impl_bytes_construct(value_ : Value) -> Value raise HintedError {
           Int(byte) if byte >= 0L && byte <= 255L =>
             buf.write_byte(byte.to_int().to_byte())
           Int(_) => bail("number must be between 0 and 255")
-          value =>
-            raise HintedError(
-              cast_error((Ty::new() : Ty[Int64]), value),
-            )
+          value => raise HintedError(cast_error((Ty::new() : Ty[Int64]), value))
         }
       }
       Bytes(BytesValue(buf.to_bytes()))

@@ -114,7 +114,7 @@ fn write_float(buf : Buffer, v : Double) -> Unit {
 /// `f16::from_f64` round-trips bit-exactly through `f64::from`.
 fn f16_bits(v : Double) -> Int? {
   let bits = v.reinterpret_as_uint64()
-  let sign = if (bits >> 63) != 0UL { 0x8000 } else { 0 }
+  let sign = if bits >> 63 != 0UL { 0x8000 } else { 0 }
   let exp = ((bits >> 52) & 0x7FFUL).to_int()
   let mant = bits & 0xF_FFFF_FFFF_FFFFUL
   if exp == 0x7FF {
@@ -156,7 +156,7 @@ fn f16_bits(v : Double) -> Int? {
   } else {
     // Subnormal half: value = m * 2^-24 with m < 1024.
     let shift = -14 - e // 1..=10
-    let full = (mant | 0x10_0000_0000_0000UL) // 53 bits with implicit one
+    let full = mant | 0x10_0000_0000_0000UL // 53 bits with implicit one
     // The half mantissa keeps the top (11 - shift) bits of `full`.
     let drop = 42 + shift
     if (full & ((1UL << drop) - 1UL)) != 0UL {

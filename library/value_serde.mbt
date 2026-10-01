@@ -172,7 +172,7 @@ fn days_in_month(year : Int, month : Int) -> Int {
 ///|
 fn datetime_from_parts(parts : Array[(String, Int)]) -> Datetime? {
   let parts = parts.map(part => "\{part.0}: \{part.1}")
-  Some({ repr_: "datetime" + pretty_array_like(parts, false) })
+  Some({ repr_: "datetime" + pretty_array_like(parts, false), })
 }
 
 ///|

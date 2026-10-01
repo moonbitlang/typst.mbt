@@ -1,7 +1,11 @@
 // Expected outputs were produced by upstream Typst (csv 1.4.0).
 
 ///|
-fn read_all(data : Bytes, delimiter? : Byte = b',', headers? : Bool = false) -> String {
+fn read_all(
+  data : Bytes,
+  delimiter? : Byte = b',',
+  headers? : Bool = false,
+) -> String {
   let reader = @csv.Reader::new(data, delimiter~, has_headers=headers)
   let out = StringBuilder()
   try {
@@ -46,7 +50,6 @@ test "records" {
       #|line]
       #|[, ]
       #|
-
     ),
   )
   inspect(
@@ -55,7 +58,6 @@ test "records" {
       #|[a, b]
       #|[1, 2]
       #|
-
     ),
   )
   inspect(
@@ -65,7 +67,6 @@ test "records" {
       #|d]
       #|[e, f]
       #|
-
     ),
   )
   inspect(read_all(b""), content="")
@@ -77,7 +78,6 @@ test "records" {
       #|[1, 2]
       #|[3, 4]
       #|
-
     ),
   )
 }
@@ -92,7 +92,6 @@ test "errors" {
       #|[a, b]
       #|error UnequalLengths(pos=Some({byte: 4, line: 1, record: 1}), expected_len=2, len=3)
       #|
-
     ),
   )
   inspect(
@@ -101,7 +100,6 @@ test "errors" {
       #|headers [a, b]
       #|error UnequalLengths(pos=Some({byte: 4, line: 2, record: 1}), expected_len=2, len=3)
       #|
-
     ),
   )
   inspect(
@@ -111,7 +109,6 @@ test "errors" {
       #|[1, 2]
       #|error UnequalLengths(pos=Some({byte: 8, line: 3, record: 2}), expected_len=2, len=3)
       #|
-
     ),
   )
   inspect(
@@ -127,7 +124,6 @@ test "errors" {
       #|headers [a, b]
       #|error Utf8(pos=Some({byte: 4, line: 2, record: 1}), field=1, valid_up_to=0)
       #|
-
     ),
   )
   inspect(
@@ -143,7 +139,6 @@ test "errors" {
       #|[1, 2]
       #|error UnequalLengths(pos=Some({byte: 4, line: 2, record: 1}), expected_len=2, len=1)
       #|
-
     ),
   )
 }

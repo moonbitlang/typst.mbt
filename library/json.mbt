@@ -14,7 +14,10 @@ fn impl_json(
   let raw = loaded.data
   // If the file starts with a UTF-8 Byte Order Mark (BOM), return a friendly
   // error message.
-  if raw.length() >= 3 && raw[0] == b'\xef' && raw[1] == b'\xbb' && raw[2] == b'\xbf' {
+  if raw.length() >= 3 &&
+    raw[0] == b'\xef' &&
+    raw[1] == b'\xbb' &&
+    raw[2] == b'\xbf' {
     bail_diag(
       LoadError::text(
         LineCol(LineCol::one_based(1, 1)),

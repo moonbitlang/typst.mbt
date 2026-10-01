@@ -106,7 +106,11 @@ pub struct Reader {
 ///|
 /// Create a reader over `data` (upstream `ReaderBuilder::new()
 /// .has_headers(..).delimiter(..).from_reader(..)`).
-pub fn Reader::new(data : Bytes, delimiter~ : Byte, has_headers~ : Bool) -> Reader {
+pub fn Reader::new(
+  data : Bytes,
+  delimiter~ : Byte,
+  has_headers~ : Bool,
+) -> Reader {
   {
     data,
     delimiter,
@@ -115,7 +119,7 @@ pub fn Reader::new(data : Bytes, delimiter~ : Byte, has_headers~ : Bool) -> Read
     nfa_state: StartRecord,
     has_read: false,
     line: 1,
-    cur_pos: { byte: 0, line: 1, record: 0 },
+    cur_pos: { byte: 0, line: 1, record: 0, },
     eof: false,
     headers: None,
     headers_pos: None,
@@ -154,7 +158,12 @@ fn Reader::transition_nfa(
 ) -> (NfaState, NfaInputAction) {
   match state {
     End => (End, Epsilon)
-    StartRecord => if is_term(c) { (StartRecord, Discard) } else { (StartField, Epsilon) }
+    StartRecord =>
+      if is_term(c) {
+        (StartRecord, Discard)
+      } else {
+        (StartField, Epsilon)
+      }
     EndRecord => (StartRecord, Epsilon)
     StartField =>
       if c == b'"' {
@@ -192,8 +201,18 @@ fn Reader::transition_nfa(
       } else {
         (InField, CopyToOutput)
       }
-    InRecordTerm => if c == b'\r' { (CRLF, Discard) } else { (EndRecord, Discard) }
-    CRLF => if c == b'\n' { (StartRecord, Discard) } else { (StartRecord, Epsilon) }
+    InRecordTerm =>
+      if c == b'\r' {
+        (CRLF, Discard)
+      } else {
+        (EndRecord, Discard)
+      }
+    CRLF =>
+      if c == b'\n' {
+        (StartRecord, Discard)
+      } else {
+        (StartRecord, Epsilon)
+      }
   }
 }
 
@@ -250,13 +269,13 @@ fn Reader::read_byte_record_impl(
     if s == End {
       self.nfa_state = s
       self.eof = true
-      self.cur_pos = { ..self.cur_pos, byte: self.index, line: self.line }
+      self.cur_pos = { ..self.cur_pos, byte: self.index, line: self.line, }
       return (None, pos)
     }
     fields.push(field.to_bytes())
   }
   self.nfa_state = state
-  self.cur_pos = { ..self.cur_pos, byte: self.index, line: self.line }
+  self.cur_pos = { ..self.cur_pos, byte: self.index, line: self.line, }
   self.add_record(fields, pos)
   (Some(fields), pos)
 }
@@ -276,13 +295,17 @@ fn Reader::add_record(
   record : Array[Bytes],
   pos : Position,
 ) -> Unit raise CsvError {
-  self.cur_pos = { ..self.cur_pos, record: self.cur_pos.record + 1 }
+  self.cur_pos = { ..self.cur_pos, record: self.cur_pos.record + 1, }
   match self.first_field_count {
     None => self.first_field_count = Some(record.length())
     Some(expected) =>
       if record.length() != expected {
         raise CsvError(
-          UnequalLengths(pos=Some(pos), expected_len=expected, len=record.length()),
+          UnequalLengths(
+            pos=Some(pos),
+            expected_len=expected,
+            len=record.length(),
+          ),
         )
       }
   }
@@ -328,8 +351,7 @@ fn decode_fields(
 ) -> Array[String] raise CsvError {
   fields.mapi((i, field) => {
     match utf8_valid_up_to(field) {
-      Some(valid_up_to) =>
-        raise CsvError(Utf8(pos~, field=i, valid_up_to~))
+      Some(valid_up_to) => raise CsvError(Utf8(pos~, field=i, valid_up_to~))
       None => @utf8.decode(field) catch { _ => panic() }
     }
   })

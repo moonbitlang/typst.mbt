@@ -29,7 +29,7 @@ pub fn LoadError::text(
   message : String,
   error : String,
 ) -> LoadError {
-  { text_pos: Some(pos), message: "\{message} (\{error})" }
+  { text_pos: Some(pos), message: "\{message} (\{error})", }
 }
 
 ///|
@@ -37,7 +37,7 @@ pub fn LoadError::text(
 /// a concrete error (e.g. `invalid number`). For use with binary sources,
 /// which do not have useful position information.
 pub fn LoadError::binary(message : String, error : String) -> LoadError {
-  { text_pos: None, message: "\{message} (\{error})" }
+  { text_pos: None, message: "\{message} (\{error})", }
 }
 
 ///|
@@ -65,7 +65,10 @@ pub fn LoadError::within(self : LoadError, loaded : Loaded) -> SourceDiagnostic 
 ///|
 /// Run `f` and convert its [LoadErr] into a [SourceError] by adding the
 /// [Loaded] context (upstream `Result::within`).
-pub fn[T] within(loaded : Loaded, f : () -> T raise LoadErr) -> T raise SourceError {
+pub fn[T] within(
+  loaded : Loaded,
+  f : () -> T raise LoadErr,
+) -> T raise SourceError {
   f() catch {
     LoadErr(err) => raise SourceError([err.within(loaded)])
   }
@@ -96,11 +99,7 @@ fn load_err_in_text(
       // Either `ReportPos::None` was provided, or resolving the range from
       // the line/column failed. If present report the possibly wrong
       // line/column in the error message anyway.
-      let span = @syntax.DiagSpan::from_range(
-        file_id,
-        0,
-        loaded.data.length(),
-      )
+      let span = @syntax.DiagSpan::from_range(file_id, 0, loaded.data.length())
       let message = match pos.line_col(lines) {
         Some(pair) => {
           let (line, col) = pair.numbers()
@@ -185,13 +184,20 @@ pub(all) enum ReportTextPos {
 
 ///|
 /// Creates a position from a pre-existing range and line-column pair.
-pub fn ReportTextPos::full(start : Int, end : Int, pair : LineCol) -> ReportTextPos {
+pub fn ReportTextPos::full(
+  start : Int,
+  end : Int,
+  pair : LineCol,
+) -> ReportTextPos {
   Full(start, end, pair)
 }
 
 ///|
 /// Tries to determine the byte range for this position.
-fn ReportTextPos::range(self : ReportTextPos, lines : @syntax.Lines) -> (Int, Int)? {
+fn ReportTextPos::range(
+  self : ReportTextPos,
+  lines : @syntax.Lines,
+) -> (Int, Int)? {
   match self {
     Full(start, end, _) => Some((start, end))
     Range(start, end) => Some((start, end))
@@ -246,7 +252,7 @@ pub(all) struct LineCol {
 ///|
 /// Constructs the line/column pair from 0-based indices.
 pub fn LineCol::zero_based(line : Int, col : Int) -> LineCol {
-  { line, col }
+  { line, col, }
 }
 
 ///|
@@ -325,7 +331,7 @@ pub fn validate_utf8(bytes : BytesView) -> Utf8Error? {
     } else {
       0
     }
-    let err = fn(len : Int?) { Some({ valid_up_to: i, error_len: len }) }
+    let err = fn(len : Int?) { Some({ valid_up_to: i, error_len: len, }) }
     if width == 0 {
       return err(Some(1))
     }
@@ -409,7 +415,8 @@ fn count_utf8_chars_lossy(bytes : Bytes, start : Int, end : Int) -> Int {
         }
         // The invalid sequence counts as one item.
         count += 1
-        i += err.valid_up_to + err.error_len.unwrap_or(end - i - err.valid_up_to)
+        i += err.valid_up_to +
+          err.error_len.unwrap_or(end - i - err.valid_up_to)
       }
     }
   }
@@ -418,7 +425,10 @@ fn count_utf8_chars_lossy(bytes : Bytes, start : Int, end : Int) -> Int {
 
 ///|
 /// Format a user-facing error message for an XML-like file format.
-pub fn format_xml_like_error(format : String, error : @xml.XmlError) -> LoadError {
+pub fn format_xml_like_error(
+  format : String,
+  error : @xml.XmlError,
+) -> LoadError {
   let pos = error.pos()
   let pos = LineCol::one_based(pos.row, pos.col)
   let message = match error {
@@ -431,5 +441,5 @@ pub fn format_xml_like_error(format : String, error : @xml.XmlError) -> LoadErro
     NoRootNode => "failed to parse \{format} (missing root node)"
     err => "failed to parse \{format} (\{err.to_string()})"
   }
-  { text_pos: Some(LineCol(pos)), message }
+  { text_pos: Some(LineCol(pos)), message, }
 }

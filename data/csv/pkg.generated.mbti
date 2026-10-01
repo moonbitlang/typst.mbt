@@ -1,0 +1,37 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/data/csv"
+
+import {
+  "moonbitlang/core/debug",
+}
+
+// Values
+
+// Errors
+pub(all) suberror CsvError {
+  CsvError(ErrorKind)
+} derive(@debug.Debug)
+
+// Types and methods
+pub(all) enum ErrorKind {
+  Utf8(pos~ : Position?, field~ : Int, valid_up_to~ : Int)
+  UnequalLengths(pos~ : Position?, expected_len~ : Int, len~ : Int)
+} derive(Eq, @debug.Debug)
+pub fn ErrorKind::position(Self) -> Position?
+
+pub(all) struct Position {
+  byte : Int
+  line : Int
+  record : Int
+} derive(Eq, @debug.Debug)
+
+pub struct Reader {
+  // private fields
+}
+pub fn Reader::headers(Self) -> Array[String] raise CsvError
+pub fn Reader::new(Bytes, delimiter~ : Byte, has_headers~ : Bool) -> Self
+pub fn Reader::read_record(Self) -> Array[String]? raise CsvError
+
+// Type aliases
+
+// Traits

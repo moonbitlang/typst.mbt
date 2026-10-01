@@ -74,12 +74,15 @@ priv struct Deserializer {
 /// Deserialize a value from CBOR bytes (upstream
 /// `ciborium::from_reader::<Value>`). Trailing data is ignored.
 pub fn from_slice(data : Bytes) -> @serde.Data raise CborError {
-  let de : Deserializer = { data, index: 0, buffer: None, recurse: 256 }
+  let de : Deserializer = { data, index: 0, buffer: None, recurse: 256, }
   de.deserialize_any()
 }
 
 ///|
-fn Deserializer::read_exact(self : Deserializer, len : Int) -> BytesView raise CborError {
+fn Deserializer::read_exact(
+  self : Deserializer,
+  len : Int,
+) -> BytesView raise CborError {
   if self.index + len > self.data.length() {
     self.index = self.data.length()
     raise Io(unexpected_eof)
@@ -156,7 +159,8 @@ fn Deserializer::pull(self : Deserializer) -> Header raise CborError {
         (Some(x), 0) => Simple(x.to_int())
         (Some(x), 1) => Simple(x.to_int())
         (Some(x), 2) => Float(f16_to_double(x.to_int()))
-        (Some(x), 4) => Float(Float::reinterpret_from_uint(x.to_uint()).to_double())
+        (Some(x), 4) =>
+          Float(Float::reinterpret_from_uint(x.to_uint()).to_double())
         (Some(x), _) => Float(x.reinterpret_as_double())
       }
   }
@@ -197,7 +201,8 @@ fn f16_to_double(bits : Int) -> Double {
 fn Header::unexpected(self : Header) -> String {
   match self {
     Positive(x) => "integer `\{x}`"
-    Negative(x) => "integer `\{(x ^ 0xFFFF_FFFF_FFFF_FFFFUL).reinterpret_as_int64()}`"
+    Negative(x) =>
+      "integer `\{(x ^ 0xFFFF_FFFF_FFFF_FFFFUL).reinterpret_as_int64()}`"
     Bytes(_) => "bytes"
     Text(_) => "string"
     Array(_) => "sequence"
@@ -290,9 +295,11 @@ fn Deserializer::byte_segments(
   len : Int?,
 ) -> Array[BytesView] raise CborError {
   self.push(Bytes(len))
-  self.segments(h => match h {
-    Bytes(len) => Ok(len)
-    _ => Err(())
+  self.segments(h => {
+    match h {
+      Bytes(len) => Ok(len)
+      _ => Err(())
+    }
   })
 }
 
@@ -334,9 +341,11 @@ fn Deserializer::text_segments(
 ) -> String raise CborError {
   let offset = self.index
   self.push(Text(len))
-  let segments = self.segments(h => match h {
-    Text(len) => Ok(len)
-    _ => Err(())
+  let segments = self.segments(h => {
+    match h {
+      Text(len) => Ok(len)
+      _ => Err(())
+    }
   })
   let buf = StringBuilder()
   for segment in segments {
@@ -362,14 +371,17 @@ fn int_data(neg : Bool, raw : @bigint.BigInt) -> @serde.Data {
 
 ///|
 /// Upstream `deserialize_any` driving Typst's `ValueVisitor`.
-fn Deserializer::deserialize_any(self : Deserializer) -> @serde.Data raise CborError {
+fn Deserializer::deserialize_any(
+  self : Deserializer,
+) -> @serde.Data raise CborError {
   let header = self.pull()
   match header {
     // `deserialize_u64` / `deserialize_i64` / `deserialize_i128`.
     Positive(x) => @serde.Data::from_u64(x)
     Negative(x) => int_data(true, @bigint.BigInt::from_uint64(x))
     // `deserialize_bytes` / `deserialize_byte_buf`.
-    Bytes(Some(len)) if len <= scratch_len => Bytes(self.read_exact(len).to_owned())
+    Bytes(Some(len)) if len <= scratch_len =>
+      Bytes(self.read_exact(len).to_owned())
     Bytes(len) => {
       let buf = Buffer()
       for segment in self.byte_segments(len) {
@@ -439,7 +451,9 @@ fn Deserializer::deserialize_any(self : Deserializer) -> @serde.Data raise CborE
           let (neg, raw) = self.integer(Some(Tag(tag)))
           if neg &&
             raw >
-            @bigint.BigInt::from_string("170141183460469231731687303715884105727") {
+            @bigint.BigInt::from_string(
+              "170141183460469231731687303715884105727",
+            ) {
             raise Semantic(None, "integer too large")
           }
           int_data(neg, raw)
@@ -460,7 +474,14 @@ fn Deserializer::deserialize_any(self : Deserializer) -> @serde.Data raise CborE
     Simple(20) => Bool(false)
     Simple(21) => Bool(true)
     Simple(22) | Simple(23) => None
-    h => raise h.expected(if h is Break { "non-break" } else { "known simple value" })
+    h =>
+      raise h.expected(
+        if h is Break {
+          "non-break"
+        } else {
+          "known simple value"
+        },
+      )
   }
 }
 

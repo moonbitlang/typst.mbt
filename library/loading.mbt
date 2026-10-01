@@ -54,19 +54,21 @@ pub fn DataSource::load(
   match self {
     Path(path) => {
       let resolved = at(span, () => path.resolve_if_some(span.id())).intern()
-      let data = at(span, () => world.file(resolved) catch {
-        error => {
-          let hinted = HintedString::new(error.to_string())
-          if path is Str(string) &&
-            (string.has_prefix("http://") || string.has_prefix("https://")) {
-            hinted.hint("network access is not supported")
+      let data = at(span, () => {
+        world.file(resolved) catch {
+          error => {
+            let hinted = HintedString::new(error.to_string())
+            if path is Str(string) &&
+              (string.has_prefix("http://") || string.has_prefix("https://")) {
+              hinted.hint("network access is not supported")
+            }
+            raise HintedError(hinted)
           }
-          raise HintedError(hinted)
         }
       })
-      { source: { v: Path(resolved), span }, data }
+      { source: { v: Path(resolved), span, }, data, }
     }
-    Bytes(data) => { source: { v: Bytes, span }, data }
+    Bytes(data) => { source: { v: Bytes, span, }, data, }
   }
 }
 
@@ -90,8 +92,11 @@ pub(all) struct Loaded {
 } derive(Eq, Hash)
 
 ///|
-pub fn Loaded::new(source : @syntax.Spanned[LoadSource], bytes : Bytes) -> Loaded {
-  { source, data: bytes }
+pub fn Loaded::new(
+  source : @syntax.Spanned[LoadSource],
+  bytes : Bytes,
+) -> Loaded {
+  { source, data: bytes, }
 }
 
 ///|

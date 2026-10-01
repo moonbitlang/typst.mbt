@@ -38,8 +38,10 @@ fn impl_csv(
     // Counting lines from 2 because we have a header.
     line_offset += 1
     headers = Some(
-      within(loaded, () => reader.headers() catch {
-        err => raise LoadErr(format_csv_error(err, 1))
+      within(loaded, () => {
+        reader.headers() catch {
+          err => raise LoadErr(format_csv_error(err, 1))
+        }
       }),
     )
   }
@@ -50,8 +52,10 @@ fn impl_csv(
     // with `has_headers` set to `false`. See issue:
     // https://github.com/BurntSushi/rust-csv/issues/184
     let current = line + line_offset
-    let row = within(loaded, () => reader.read_record() catch {
-      err => raise LoadErr(format_csv_error(err, current))
+    let row = within(loaded, () => {
+      reader.read_record() catch {
+        err => raise LoadErr(format_csv_error(err, current))
+      }
     })
     guard row is Some(row) else { break }
     line += 1
