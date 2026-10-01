@@ -495,6 +495,26 @@ pub fn[T : FromValue + IntoValue + Fold] fold_of(Ty[T]) -> (Value, Value) -> Val
 
 pub fn[T : Fold] fold_or(T?, T?) -> T?
 
+pub let font_stretch_normal : FontStretch
+
+pub let font_weight_black : FontWeight
+
+pub let font_weight_bold : FontWeight
+
+pub let font_weight_extrabold : FontWeight
+
+pub let font_weight_extralight : FontWeight
+
+pub let font_weight_light : FontWeight
+
+pub let font_weight_medium : FontWeight
+
+pub let font_weight_regular : FontWeight
+
+pub let font_weight_semibold : FontWeight
+
+pub let font_weight_thin : FontWeight
+
 pub fn footnote_container_elem() -> Element
 
 pub fn footnote_elem() -> Element
@@ -742,6 +762,30 @@ pub fn[T : Reflect] input_of(Ty[T]) -> CastInfo
 pub fn[T : Numeric] is_zero(T) -> Bool
 
 pub fn join(Value, Value) -> Value raise HintedError
+
+pub let lang_arabic : Lang
+
+pub let lang_divehi : Lang
+
+pub let lang_english : Lang
+
+pub let lang_hebrew : Lang
+
+pub let lang_kashmiri : Lang
+
+pub let lang_pashto : Lang
+
+pub let lang_persian : Lang
+
+pub let lang_punjabi : Lang
+
+pub let lang_sindhi : Lang
+
+pub let lang_urdu : Lang
+
+pub let lang_uyghur : Lang
+
+pub let lang_yiddish : Lang
 
 pub fn layout_elem() -> Element
 
@@ -2434,6 +2478,11 @@ pub impl FromValue for Alignment
 pub impl IntoValue for Alignment
 pub impl Reflect for Alignment
 
+pub(all) struct Alternates(Int64) derive(Default, Eq, Hash)
+pub impl FromValue for Alternates
+pub impl IntoValue for Alternates
+pub impl Reflect for Alternates
+
 pub(all) struct Angle(Scalar) derive(Compare, Default, Eq, Hash)
 pub fn Angle::abs(Self) -> Self
 pub fn Angle::acos(Double) -> Self
@@ -2556,6 +2605,33 @@ pub impl FromValue for Arr
 pub impl IntoValue for Arr
 pub impl Reflect for Arr
 
+pub(all) enum ArtifactKind {
+  Header
+  Footer
+  Watermark
+  PageNumber
+  LineNumber
+  Redaction
+  Bates
+  Page
+  PaginationOther
+  Layout
+  Background
+  Other
+} derive(Eq, Hash, @debug.Debug)
+pub impl Default for ArtifactKind
+pub impl FromValue for ArtifactKind
+pub impl IntoValue for ArtifactKind
+pub impl Reflect for ArtifactKind
+
+pub(all) enum Attribution {
+  Content(Content)
+  Label(Label)
+} derive(Eq)
+pub impl FromValue for Attribution
+pub impl IntoValue for Attribution
+pub impl Reflect for Attribution
+
 pub(all) struct Axes[T] {
   x : T
   y : T
@@ -2583,6 +2659,11 @@ pub impl FromValue for Axis
 pub impl IntoValue for Axis
 pub impl Reflect for Axis
 
+pub(all) struct AxisValue(Double) derive(Eq, Hash, @debug.Debug)
+pub impl FromValue for AxisValue
+pub impl IntoValue for AxisValue
+pub impl Reflect for AxisValue
+
 pub(all) enum Base {
   Default
   User(Int64)
@@ -2591,6 +2672,18 @@ pub fn Base::value(Self) -> Int64
 pub impl FromValue for Base
 pub impl IntoValue for Base
 pub impl Reflect for Base
+
+pub(all) struct BaselinePos {
+  at : Smart[VAlignment]?
+  shift : Rel[Length]?
+} derive(Eq, Hash)
+pub fn BaselinePos::at(Self) -> Smart[VAlignment]
+pub fn BaselinePos::shift(Self) -> Rel[Length]
+pub impl Default for BaselinePos
+pub impl Fold for BaselinePos
+pub impl FromValue for BaselinePos
+pub impl IntoValue for BaselinePos
+pub impl Reflect for BaselinePos
 
 pub struct Binding {
   mut value : Value
@@ -2630,6 +2723,31 @@ pub(all) struct BindingGuard {
 }
 pub fn BindingGuard::silent(Features) -> Self
 
+pub(all) enum BlockBody {
+  Content(Content)
+} derive(Eq)
+pub impl Default for BlockBody
+pub impl FromValue for BlockBody
+pub impl IntoValue for BlockBody
+pub impl Reflect for BlockBody
+
+pub(all) enum BottomEdge {
+  Metric(BottomEdgeMetric)
+  Length(Length)
+} derive(Eq, Hash)
+pub impl FromValue for BottomEdge
+pub impl IntoValue for BottomEdge
+pub impl Reflect for BottomEdge
+
+pub(all) enum BottomEdgeMetric {
+  Baseline
+  Descender
+  Bounds
+} derive(Eq, Hash, @debug.Debug)
+pub impl FromValue for BottomEdgeMetric
+pub impl IntoValue for BottomEdgeMetric
+pub impl Reflect for BottomEdgeMetric
+
 pub struct BundlePath(@syntax.VirtualPath) derive(Eq, Hash)
 pub fn BundlePath::into_inner(Self) -> @syntax.VirtualPath
 pub fn BundlePath::new(@syntax.VirtualPath) -> Self raise HintedError
@@ -2648,6 +2766,23 @@ pub(all) enum Capturer {
   Context
 } derive(Eq, Hash, @debug.Debug)
 pub impl Show for Capturer
+
+pub(all) enum Case {
+  Lower
+  Upper
+} derive(Eq, Hash, @debug.Debug)
+pub fn Case::apply(Self, String) -> String
+pub impl FromValue for Case
+pub impl IntoValue for Case
+pub impl Reflect for Case
+
+pub(all) enum Caseable {
+  Str(String)
+  Content(Content)
+}
+pub impl FromValue for Caseable
+pub impl IntoValue for Caseable
+pub impl Reflect for Caseable
 
 pub(all) enum CastInfo {
   Any
@@ -2788,10 +2923,33 @@ pub impl[T : FromValue] FromValue for Corners[T?]
 pub impl[T : IntoValue + Eq] IntoValue for Corners[T?]
 pub impl[T : Reflect] Reflect for Corners[T?]
 
+pub(all) struct Costs {
+  hyphenation : Ratio?
+  runt : Ratio?
+  widow : Ratio?
+  orphan : Ratio?
+} derive(Default, Eq, Hash)
+pub fn Costs::hyphenation(Self) -> Ratio
+pub fn Costs::orphan(Self) -> Ratio
+pub fn Costs::runt(Self) -> Ratio
+pub fn Costs::widow(Self) -> Ratio
+pub impl Fold for Costs
+pub impl FromValue for Costs
+pub impl IntoValue for Costs
+pub impl Reflect for Costs
+
 pub(all) struct Counter {
   // private fields
 } derive(Eq, Hash)
 pub fn Counter::repr(Self) -> String
+
+pub(all) enum Covers {
+  LatinInCjk
+  Regex(Regex)
+} derive(Eq, Hash)
+pub impl FromValue for Covers
+pub impl IntoValue for Covers
+pub impl Reflect for Covers
 
 pub(all) struct Datetime {
   // private fields
@@ -2847,6 +3005,12 @@ pub fn Deprecation::to_hinted(Self) -> HintedString
 pub fn Deprecation::with_message(Self, String) -> Self
 pub fn Deprecation::with_until(Self, String) -> Self
 
+pub(all) struct Depth(Int64) derive(Default, Eq, Hash)
+pub impl Fold for Depth
+pub impl FromValue for Depth
+pub impl IntoValue for Depth
+pub impl Reflect for Depth
+
 pub struct Dict {
   map : Map[String, Value]
   mut shared : Bool
@@ -2886,6 +3050,14 @@ pub fn Dir::start(Self) -> Side
 pub impl FromValue for Dir
 pub impl IntoValue for Dir
 pub impl Reflect for Dir
+
+pub(all) enum DocumentFormat {
+  Paged(PagedFormat)
+  Html
+} derive(Eq, Hash, @debug.Debug)
+pub impl FromValue for DocumentFormat
+pub impl IntoValue for DocumentFormat
+pub impl Reflect for DocumentFormat
 
 pub(all) struct Duration {
   // private fields
@@ -2946,6 +3118,9 @@ pub fn Element::where_(Self, Array[(Int, Value)]) -> Selector
 pub impl Compare for Element
 pub impl Eq for Element
 pub impl Hash for Element
+pub impl FromValue for Element
+pub impl IntoValue for Element
+pub impl Reflect for Element
 
 pub struct ElementData {
   name : String
@@ -3013,6 +3188,12 @@ pub fn[T] Engine::delay(Self, () -> T raise SourceError, T) -> T
 pub fn Engine::routines(Self) -> Routines
 pub fn Engine::with_route(Self, Route) -> Self
 
+pub(all) struct EnumItem(Content) derive(Eq)
+pub fn EnumItem::new(Content) -> Self
+pub impl FromValue for EnumItem
+pub impl IntoValue for EnumItem
+pub impl Reflect for EnumItem
+
 pub(all) enum Feature {
   Html
   Bundle
@@ -3052,6 +3233,32 @@ pub(all) enum FieldKind {
   External
 } derive(Eq, @debug.Debug)
 
+pub(all) struct FigureCaption(Content) derive(Eq)
+pub fn FigureCaption::new(Content) -> Self
+pub impl FromValue for FigureCaption
+pub impl IntoValue for FigureCaption
+pub impl Reflect for FigureCaption
+
+pub(all) enum FigureKind {
+  Elem(Element)
+  Name(String)
+} derive(Eq)
+pub impl FromValue for FigureKind
+pub impl IntoValue for FigureKind
+pub impl Reflect for FigureKind
+
+pub(all) struct FirstLineIndent {
+  amount : Length?
+  all : Bool?
+} derive(Eq, Hash)
+pub fn FirstLineIndent::all(Self) -> Bool
+pub fn FirstLineIndent::amount(Self) -> Length
+pub impl Default for FirstLineIndent
+pub impl Fold for FirstLineIndent
+pub impl FromValue for FirstLineIndent
+pub impl IntoValue for FirstLineIndent
+pub impl Reflect for FirstLineIndent
+
 pub(all) enum FixedAlignment {
   Start
   Center
@@ -3060,6 +3267,80 @@ pub(all) enum FixedAlignment {
 pub fn FixedAlignment::from_side(Side) -> Self
 pub fn FixedAlignment::inv(Self) -> Self
 pub fn FixedAlignment::position(Self, Abs) -> Abs
+
+pub(all) struct FontFamily {
+  name : String
+  covers : Covers?
+} derive(Eq, Hash)
+pub fn FontFamily::as_str(Self) -> String
+pub fn FontFamily::new(String) -> Self
+pub fn FontFamily::with_coverage(String, Covers?) -> Self
+pub impl FromValue for FontFamily
+pub impl IntoValue for FontFamily
+pub impl Reflect for FontFamily
+
+pub(all) struct FontFeatures(Array[(Tag, Int64)]) derive(Default, Eq, Hash)
+pub impl Fold for FontFeatures
+pub impl FromValue for FontFeatures
+pub impl IntoValue for FontFeatures
+pub impl Reflect for FontFeatures
+
+pub(all) struct FontList(Array[FontFamily]) derive(Eq, Hash)
+pub fn FontList::new(Array[FontFamily]) -> Self raise HintedError
+pub impl FromValue for FontList
+pub impl IntoValue for FontList
+pub impl Reflect for FontList
+
+pub(all) struct FontStretch(Int) derive(Compare, Eq, Hash, @debug.Debug)
+pub fn FontStretch::from_ratio(Ratio) -> Self
+pub fn FontStretch::repr(Self) -> String
+pub fn FontStretch::to_ratio(Self) -> Ratio
+pub impl Default for FontStretch
+pub impl FromValue for FontStretch
+pub impl IntoValue for FontStretch
+pub impl Reflect for FontStretch
+
+pub(all) enum FontStyle {
+  Normal
+  Italic
+  Oblique
+} derive(Compare, Eq, Hash, @debug.Debug)
+pub fn FontStyle::distance(Self, Self) -> Int
+pub impl Default for FontStyle
+pub impl FromValue for FontStyle
+pub impl IntoValue for FontStyle
+pub impl Reflect for FontStyle
+
+pub(all) struct FontVariations(Array[(Tag, AxisValue)]) derive(Eq, Hash, @debug.Debug)
+pub impl Default for FontVariations
+pub impl Fold for FontVariations
+pub impl FromValue for FontVariations
+pub impl IntoValue for FontVariations
+pub impl Reflect for FontVariations
+
+pub(all) struct FontWeight(Int) derive(Compare, Eq, Hash, @debug.Debug)
+pub fn FontWeight::distance(Self, Self) -> Int
+pub fn FontWeight::from_number(Int) -> Self
+pub fn FontWeight::thicken(Self, Int) -> Self
+pub fn FontWeight::to_number(Self) -> Int
+pub impl Default for FontWeight
+pub impl FromValue for FontWeight
+pub impl IntoValue for FontWeight
+pub impl Reflect for FontWeight
+
+pub(all) enum FootnoteBody {
+  Content(Content)
+  Reference(Label)
+} derive(Eq)
+pub impl FromValue for FootnoteBody
+pub impl IntoValue for FootnoteBody
+pub impl Reflect for FootnoteBody
+
+pub(all) struct FootnoteElem(Content) derive(Eq)
+pub fn FootnoteElem::with_content(Content) -> Self
+pub impl FromValue for FootnoteElem
+pub impl IntoValue for FootnoteElem
+pub impl Reflect for FootnoteElem
 
 pub(all) struct Format {
   elem : Element
@@ -3175,11 +3456,35 @@ pub struct Introspector {
 }
 pub fn Introspector::empty() -> Self
 
+pub(all) struct ItalicToggle(Bool) derive(Eq, Hash)
+pub impl Fold for ItalicToggle
+pub impl FromValue for ItalicToggle
+pub impl IntoValue for ItalicToggle
+pub impl Reflect for ItalicToggle
+
+pub(all) struct JustificationLimits {
+  spacing : Limits[Rel[Length]]?
+  tracking : Limits[Length]?
+} derive(Eq, Hash)
+pub impl Default for JustificationLimits
+pub impl Fold for JustificationLimits
+pub impl FromValue for JustificationLimits
+pub impl IntoValue for JustificationLimits
+pub impl Reflect for JustificationLimits
+
 pub(all) struct Label(String) derive(Compare, Eq, Hash)
 pub fn Label::repr(Self) -> String
 pub impl FromValue for Label
 pub impl IntoValue for Label
 pub impl Reflect for Label
+
+pub(all) struct Lang(String) derive(Compare, Eq, Hash, @debug.Debug)
+pub fn Lang::as_str(Self) -> String
+pub fn Lang::dir(Self) -> Dir
+pub fn Lang::from_str(String) -> Self raise HintedError
+pub impl FromValue for Lang
+pub impl IntoValue for Lang
+pub impl Reflect for Lang
 
 pub(all) struct Length {
   abs : Abs
@@ -3228,11 +3533,66 @@ pub fn LibraryBuilder::with_features(Self, Features) -> Self
 pub fn LibraryBuilder::with_global(Self, (Scope) -> Unit) -> Self
 pub fn LibraryBuilder::with_inputs(Self, Dict) -> Self
 
+pub(all) struct Limits[T] {
+  min : T
+  max : T
+} derive(Eq, Hash)
+pub impl[T] Fold for Limits[T]
+pub impl[T : IntoValue] IntoValue for Limits[T]
+
+pub(all) enum LineNumberingScope {
+  Document
+  Page
+} derive(Eq, Hash, @debug.Debug)
+pub impl FromValue for LineNumberingScope
+pub impl IntoValue for LineNumberingScope
+pub impl Reflect for LineNumberingScope
+
+pub(all) enum Linebreaks {
+  Simple
+  Optimized
+} derive(Eq, Hash, @debug.Debug)
+pub impl FromValue for Linebreaks
+pub impl IntoValue for Linebreaks
+pub impl Reflect for Linebreaks
+
 pub struct LinkElem(Content)
 pub fn LinkElem::from_url(String) -> Content raise HintedError
 
+pub(all) struct ListItem(Content) derive(Eq)
+pub fn ListItem::new(Content) -> Self
+pub impl FromValue for ListItem
+pub impl IntoValue for ListItem
+pub impl Reflect for ListItem
+
+pub(all) enum ListMarker {
+  Content(Array[Content])
+  Func(Func)
+} derive(Eq)
+pub impl FromValue for ListMarker
+pub impl IntoValue for ListMarker
+pub impl Reflect for ListMarker
+
+pub(all) struct Locale {
+  lang : Lang
+  region : Region?
+} derive(Compare, Eq, Hash, @debug.Debug)
+pub fn Locale::new(Lang, Region?) -> Self
+pub fn Locale::rfc_3066(Self) -> String
+pub impl Default for Locale
+
 pub(all) struct Location(UInt64) derive(Compare, Eq, Hash)
 pub fn Location::repr(Self) -> String
+
+pub(all) struct Margin[T] {
+  sides : Sides[T?]
+  two_sided : Bool?
+} derive(Eq, Hash, @debug.Debug)
+pub fn[T] Margin::splat(T?) -> Self[T]
+pub impl[T : Fold] Fold for Margin[T]
+pub impl[T : FromValue] FromValue for Margin[T]
+pub impl[T : IntoValue + Eq] IntoValue for Margin[T]
+pub impl[T : Reflect] Reflect for Margin[T]
 
 pub(all) struct ModifierSet(String) derive(Eq, Hash, @debug.Debug)
 pub fn ModifierSet::as_str(Self) -> String
@@ -3288,6 +3648,12 @@ pub fn NativeTypeData::register(Self, (Self) -> Unit) -> Unit
 pub fn NativeTypeData::set_constructor(Self, NativeFuncData) -> Unit
 pub fn NativeTypeData::set_scope(Self, Scope) -> Unit
 
+pub(all) enum Never {
+} derive(Eq, Hash)
+pub impl FromValue for Never
+pub impl IntoValue for Never
+pub impl Reflect for Never
+
 pub(all) struct NonZeroI64(Int64) derive(Compare, Eq, Hash, @debug.Debug)
 pub fn NonZeroI64::get(Self) -> Int64
 pub impl FromValue for NonZeroI64
@@ -3320,6 +3686,22 @@ pub impl FromValue for Num
 pub impl IntoValue for Num
 pub impl Reflect for Num
 
+pub(all) enum NumberType {
+  Lining
+  OldStyle
+} derive(Eq, Hash, @debug.Debug)
+pub impl FromValue for NumberType
+pub impl IntoValue for NumberType
+pub impl Reflect for NumberType
+
+pub(all) enum NumberWidth {
+  Proportional
+  Tabular
+} derive(Eq, Hash, @debug.Debug)
+pub impl FromValue for NumberWidth
+pub impl IntoValue for NumberWidth
+pub impl Reflect for NumberWidth
+
 pub(all) enum NumericUnit {
   Pt
   Mm
@@ -3331,6 +3713,13 @@ pub(all) enum NumericUnit {
   Fr
   Percent
 } derive(Eq, @debug.Debug)
+
+pub(all) struct OneOrMultiple[T](Array[T]) derive(Eq, Hash)
+pub impl[T] Default for OneOrMultiple[T]
+pub impl[T] Fold for OneOrMultiple[T]
+pub impl[T : FromValue] FromValue for OneOrMultiple[T]
+pub impl[T : IntoValue] IntoValue for OneOrMultiple[T]
+pub impl[T : Reflect] Reflect for OneOrMultiple[T]
 
 pub(all) enum OuterHAlignment {
   Start
@@ -3360,6 +3749,59 @@ pub impl FromValue for OuterVAlignment
 pub impl IntoValue for OuterVAlignment
 pub impl Reflect for OuterVAlignment
 
+pub(all) enum OutlineIndent {
+  Rel(Rel[Length])
+  Func(Func)
+} derive(Eq)
+pub impl FromValue for OutlineIndent
+pub impl IntoValue for OutlineIndent
+pub impl Reflect for OutlineIndent
+
+pub(all) enum PageBinding {
+  Left
+  Right
+} derive(Eq, Hash, @debug.Debug)
+pub fn PageBinding::swap(Self, Int) -> Bool
+pub impl FromValue for PageBinding
+pub impl IntoValue for PageBinding
+pub impl Reflect for PageBinding
+
+pub(all) struct PageRange {
+  start : Int?
+  end : Int?
+} derive(Eq, Hash, @debug.Debug)
+pub impl FromValue for PageRange
+pub impl IntoValue for PageRange
+pub impl Reflect for PageRange
+
+pub(all) struct PageRanges(Array[PageRange]) derive(Eq, Hash, @debug.Debug)
+pub fn PageRanges::includes_page(Self, Int) -> Bool
+pub impl FromValue for PageRanges
+pub impl IntoValue for PageRanges
+pub impl Reflect for PageRanges
+
+pub(all) enum PagedFormat {
+  Pdf
+  Png
+  Svg
+} derive(Eq, Hash, @debug.Debug)
+pub impl FromValue for PagedFormat
+pub impl IntoValue for PagedFormat
+pub impl Reflect for PagedFormat
+
+pub(all) struct Paper {
+  name : String
+  width : Double
+  height : Double
+} derive(Eq, Hash, @debug.Debug)
+pub fn Paper::a4() -> Self
+pub fn Paper::from_name(String) -> Self?
+pub fn Paper::height(Self) -> Abs
+pub fn Paper::width(Self) -> Abs
+pub impl FromValue for Paper
+pub impl IntoValue for Paper
+pub impl Reflect for Paper
+
 pub(all) struct ParamInfo {
   name : String
   docs : String
@@ -3371,6 +3813,15 @@ pub(all) struct ParamInfo {
   required : Bool
   settable : Bool
 }
+
+pub(all) enum Parity {
+  Even
+  Odd
+} derive(Eq, Hash, @debug.Debug)
+pub fn Parity::matches(Self, Int) -> Bool
+pub impl FromValue for Parity
+pub impl IntoValue for Parity
+pub impl Reflect for Parity
 
 pub(all) struct ParseLocals(Map[String, Value?])
 pub fn ParseLocals::get(Self, String) -> Value?
@@ -3386,6 +3837,15 @@ pub fn PathOrStr::resolve_if_some(Self, @syntax.FileId?) -> @syntax.RootedPath r
 pub impl FromValue for PathOrStr
 pub impl IntoValue for PathOrStr
 pub impl Reflect for PathOrStr
+
+pub(all) enum PlacementScope {
+  Column
+  Parent
+} derive(Eq, Hash, @debug.Debug)
+pub impl Default for PlacementScope
+pub impl FromValue for PlacementScope
+pub impl IntoValue for PlacementScope
+pub impl Reflect for PlacementScope
 
 pub struct Property {
   elem : Element
@@ -3430,6 +3890,14 @@ pub impl IntoValue for Ratio
 pub impl Numeric for Ratio
 pub impl Reflect for Ratio
 
+pub(all) enum RawContent {
+  Text(String)
+} derive(Eq, Hash, @debug.Debug)
+pub fn RawContent::get(Self) -> String
+pub impl FromValue for RawContent
+pub impl IntoValue for RawContent
+pub impl Reflect for RawContent
+
 pub struct RawElem(Content)
 pub fn RawElem::packed_code(String) -> Content
 
@@ -3443,11 +3911,27 @@ pub fn Recipe::apply(Self, Engine, Context, Content) -> Content raise SourceErro
 pub fn Recipe::new(Selector?, Transformation, @syntax.Span) -> Self
 pub impl Eq for Recipe
 
+pub(all) enum RefForm {
+  Normal
+  Page
+} derive(Eq, Hash, @debug.Debug)
+pub impl Default for RefForm
+pub impl FromValue for RefForm
+pub impl IntoValue for RefForm
+pub impl Reflect for RefForm
+
 pub(all) struct Regex {
   // private fields
 } derive(Eq, Hash)
 pub fn Regex::is_match(Self, String) -> Bool
 pub fn Regex::repr(Self) -> String
+
+pub(all) struct Region(String) derive(Compare, Eq, Hash, @debug.Debug)
+pub fn Region::as_str(Self) -> String
+pub fn Region::from_str(String) -> Self raise HintedError
+pub impl FromValue for Region
+pub impl IntoValue for Region
+pub impl Reflect for Region
 
 pub(all) struct Rel[T] {
   rel : Ratio
@@ -3508,6 +3992,14 @@ pub impl Hash for Scalar
 pub impl Mul for Scalar
 pub impl Neg for Scalar
 pub impl Sub for Scalar
+
+pub(all) enum ScaleAmount {
+  Ratio(Ratio)
+  Length(Length)
+} derive(Eq, Hash)
+pub impl FromValue for ScaleAmount
+pub impl IntoValue for ScaleAmount
+pub impl Reflect for ScaleAmount
 
 pub struct Scope {
   // private fields
@@ -3652,6 +4144,22 @@ pub impl[T : FromValue] FromValue for Smart[T]
 pub impl[T : IntoValue] IntoValue for Smart[T]
 pub impl[T : Reflect] Reflect for Smart[T]
 
+pub(all) struct SmartQuoteDict {
+  double : Smart[SmartQuoteSet]
+  single : Smart[SmartQuoteSet]
+} derive(Eq, Hash, @debug.Debug)
+pub impl FromValue for SmartQuoteDict
+pub impl IntoValue for SmartQuoteDict
+pub impl Reflect for SmartQuoteDict
+
+pub(all) struct SmartQuoteSet {
+  open : String
+  close : String
+} derive(Eq, Hash, @debug.Debug)
+pub impl FromValue for SmartQuoteSet
+pub impl IntoValue for SmartQuoteSet
+pub impl Reflect for SmartQuoteSet
+
 pub(all) struct SourceDiagnostic {
   severity : Severity
   span : @syntax.DiagSpan
@@ -3698,6 +4206,14 @@ pub(all) struct SpotColorant {
   // private fields
 } derive(Eq, Hash)
 pub fn SpotColorant::repr(Self) -> String
+
+pub(all) enum StackChild {
+  Spacing(Spacing)
+  Block(Content)
+} derive(Eq)
+pub impl FromValue for StackChild
+pub impl IntoValue for StackChild
+pub impl Reflect for StackChild
 
 pub(all) struct State {
   // private fields
@@ -3767,6 +4283,21 @@ pub impl FromValue for Styles
 pub impl IntoValue for Styles
 pub impl Reflect for Styles
 
+pub(all) struct StylisticSets(Int) derive(Default, Eq, Hash)
+pub fn StylisticSets::has(Self, Int) -> Bool
+pub fn StylisticSets::sets(Self) -> Array[Int]
+pub impl FromValue for StylisticSets
+pub impl IntoValue for StylisticSets
+pub impl Reflect for StylisticSets
+
+pub(all) enum Supplement {
+  Content(Content)
+  Func(Func)
+} derive(Eq)
+pub impl FromValue for Supplement
+pub impl IntoValue for Supplement
+pub impl Reflect for Supplement
+
 pub struct Symbol {
   // private fields
 } derive(Eq, Hash)
@@ -3792,8 +4323,31 @@ pub(all) struct SymbolVariant(String, String)
 pub impl FromValue for SymbolVariant
 pub impl Reflect for SymbolVariant
 
+pub(all) struct Tag(String) derive(Compare, Eq, Hash, @debug.Debug)
+pub fn Tag::from_bytes_lossy(String) -> Self
+pub fn Tag::to_str_lossy(Self) -> String
+pub impl FromValue for Tag
+pub impl IntoValue for Tag
+pub impl Reflect for Tag
+
+pub(all) struct TermItem(Content) derive(Eq)
+pub impl FromValue for TermItem
+pub impl IntoValue for TermItem
+pub impl Reflect for TermItem
+
+pub(all) struct TextDir(Smart[Dir]) derive(Eq, Hash)
+pub impl FromValue for TextDir
+pub impl IntoValue for TextDir
+pub impl Reflect for TextDir
+
 pub struct TextElem(Content)
 pub fn TextElem::packed(String) -> Content
+
+pub(all) struct TextSize(Length) derive(Eq, Hash)
+pub impl Fold for TextSize
+pub impl FromValue for TextSize
+pub impl IntoValue for TextSize
+pub impl Reflect for TextSize
 
 pub(all) struct Tiling {
   // private fields
@@ -3822,6 +4376,25 @@ pub(all) enum ToInt {
 }
 pub impl FromValue for ToInt
 pub impl Reflect for ToInt
+
+pub(all) enum TopEdge {
+  Metric(TopEdgeMetric)
+  Length(Length)
+} derive(Eq, Hash)
+pub impl FromValue for TopEdge
+pub impl IntoValue for TopEdge
+pub impl Reflect for TopEdge
+
+pub(all) enum TopEdgeMetric {
+  Ascender
+  CapHeight
+  XHeight
+  Baseline
+  Bounds
+} derive(Eq, Hash, @debug.Debug)
+pub impl FromValue for TopEdgeMetric
+pub impl IntoValue for TopEdgeMetric
+pub impl Reflect for TopEdgeMetric
 
 pub(all) struct Traced(@syntax.Span?)
 pub fn Traced::get(Self, @syntax.FileId) -> @syntax.Span?
@@ -4006,6 +4579,19 @@ pub(all) struct Warned[T] {
   output : T
   warnings : Array[SourceDiagnostic]
 }
+
+pub(all) struct WeightDelta(Int64) derive(Default, Eq, Hash)
+pub impl Fold for WeightDelta
+pub impl FromValue for WeightDelta
+pub impl IntoValue for WeightDelta
+pub impl Reflect for WeightDelta
+
+pub(all) struct WritingScript(String) derive(Compare, Eq, Hash, @debug.Debug)
+pub fn WritingScript::as_str(Self) -> String
+pub fn WritingScript::from_str(String) -> Self raise HintedError
+pub impl FromValue for WritingScript
+pub impl IntoValue for WritingScript
+pub impl Reflect for WritingScript
 
 // Type aliases
 pub type NativeFn = (Engine, Context, Args) -> Value raise SourceError
