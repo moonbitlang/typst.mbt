@@ -7,9 +7,8 @@ MoonBit. See [PLAN.md](PLAN.md) for scope, architecture and status.
 
 | Path | Contents |
 | --- | --- |
-| `syntax/` | Port of `typst-syntax`: lexer, parser, syntax nodes, spans, `Lines` |
+| `syntax/` | Port of `typst-syntax`: lexer, parser, syntax nodes, spans, `Lines`, paths and file ids (`path.rs`), packages and manifests (`package.rs`) |
 | `syntax/ast/` | Typed AST over the syntax tree (`ast.rs`) |
-| `syntax/package/` | Package specifications (`package.rs`, without the manifest) |
 | `unicode/` | Unicode property tables generated from the Rust crates upstream uses |
 | `oracle/` | Rust crate dumping upstream reference outputs (goldens) |
 | `tests/runner/` | Differential runner comparing the port against the goldens |

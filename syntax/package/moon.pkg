@@ -1,7 +1,0 @@
-import {
-  "moonbitlang/typst/syntax",
-}
-
-// Upstream names the field `namespace`, which MoonBit reserves.
-
-warnings = "-reserved_keyword"

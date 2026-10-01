@@ -130,7 +130,7 @@ pub fn native_args_at() -> NativeFuncData {
           {
             name: "key",
             docs: "The index or name of the argument to get.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[ArgumentKey])),
             default: None,
             positional: true,
             named: false,
@@ -168,7 +168,7 @@ fn native_args_at_call(
   ignore(engine)
   ignore(context)
   let self_ : Args = args.expect("self")
-  let key_ : Value = args.expect("key")
+  let key_ : ArgumentKey = args.expect("key")
   let default_ : Value? = args.named("default")
   args.take().finish()
   let output = at(args.span, () => impl_args_at(self_, key_, default_))
@@ -422,7 +422,7 @@ pub fn native_array_construct() -> NativeFuncData {
           {
             name: "value",
             docs: "The value that should be converted to an array.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[ToArray])),
             default: None,
             positional: true,
             named: false,
@@ -448,7 +448,7 @@ fn native_array_construct_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let value_ : Value = args.expect("value")
+  let value_ : ToArray = args.expect("value")
   args.take().finish()
   let output = at(args.span, () => impl_array_construct(value_))
   IntoValue::into_value(output)
@@ -2960,7 +2960,7 @@ pub fn native_calc_abs() -> NativeFuncData {
           {
             name: "value",
             docs: "The value whose absolute value to calculate.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[ToAbs])),
             default: None,
             positional: true,
             named: false,
@@ -2986,7 +2986,7 @@ fn native_calc_abs_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let value_ : Value = args.expect("value")
+  let value_ : ToAbs = args.expect("value")
   args.take().finish()
   let output = at(args.span, () => impl_calc_abs(value_))
   IntoValue::into_value(output)
@@ -3011,7 +3011,7 @@ pub fn native_calc_pow() -> NativeFuncData {
           {
             name: "base",
             docs: "The base of the power.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[DecNum])),
             default: None,
             positional: true,
             named: false,
@@ -3022,7 +3022,7 @@ pub fn native_calc_pow() -> NativeFuncData {
           {
             name: "exponent",
             docs: "The exponent of the power.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Num])),
             default: None,
             positional: true,
             named: false,
@@ -3031,7 +3031,7 @@ pub fn native_calc_pow() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[DecNum])),
         native_calc_pow_call,
       )
       native_calc_pow_cell.val = Some(d)
@@ -3048,8 +3048,8 @@ fn native_calc_pow_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let base_ : Value = args.expect("base")
-  let exponent_ : @syntax.Spanned[Value] = args.expect_spanned("exponent")
+  let base_ : DecNum = args.expect("base")
+  let exponent_ : @syntax.Spanned[Num] = args.expect_spanned("exponent")
   args.take().finish()
   let output = impl_calc_pow(args.span, base_, exponent_)
   IntoValue::into_value(output)
@@ -3074,7 +3074,7 @@ pub fn native_calc_exp() -> NativeFuncData {
           {
             name: "exponent",
             docs: "The exponent of the power.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Num])),
             default: None,
             positional: true,
             named: false,
@@ -3100,7 +3100,7 @@ fn native_calc_exp_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let exponent_ : @syntax.Spanned[Value] = args.expect_spanned("exponent")
+  let exponent_ : @syntax.Spanned[Num] = args.expect_spanned("exponent")
   args.take().finish()
   let output = impl_calc_exp(args.span, exponent_)
   IntoValue::into_value(output)
@@ -3125,7 +3125,7 @@ pub fn native_calc_sqrt() -> NativeFuncData {
           {
             name: "value",
             docs: "The number whose square root to calculate. Must be non-negative.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Num])),
             default: None,
             positional: true,
             named: false,
@@ -3151,7 +3151,7 @@ fn native_calc_sqrt_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let value_ : @syntax.Spanned[Value] = args.expect_spanned("value")
+  let value_ : @syntax.Spanned[Num] = args.expect_spanned("value")
   args.take().finish()
   let output = impl_calc_sqrt(value_)
   IntoValue::into_value(output)
@@ -3239,7 +3239,7 @@ pub fn native_calc_sin() -> NativeFuncData {
           {
             name: "angle",
             docs: "The angle whose sine to calculate.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[AngleLike])),
             default: None,
             positional: true,
             named: false,
@@ -3265,7 +3265,7 @@ fn native_calc_sin_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let angle_ : Value = args.expect("angle")
+  let angle_ : AngleLike = args.expect("angle")
   args.take().finish()
   let output = at(args.span, () => impl_calc_sin(angle_))
   IntoValue::into_value(output)
@@ -3290,7 +3290,7 @@ pub fn native_calc_cos() -> NativeFuncData {
           {
             name: "angle",
             docs: "The angle whose cosine to calculate.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[AngleLike])),
             default: None,
             positional: true,
             named: false,
@@ -3316,7 +3316,7 @@ fn native_calc_cos_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let angle_ : Value = args.expect("angle")
+  let angle_ : AngleLike = args.expect("angle")
   args.take().finish()
   let output = at(args.span, () => impl_calc_cos(angle_))
   IntoValue::into_value(output)
@@ -3341,7 +3341,7 @@ pub fn native_calc_tan() -> NativeFuncData {
           {
             name: "angle",
             docs: "The angle whose tangent to calculate.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[AngleLike])),
             default: None,
             positional: true,
             named: false,
@@ -3367,7 +3367,7 @@ fn native_calc_tan_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let angle_ : Value = args.expect("angle")
+  let angle_ : AngleLike = args.expect("angle")
   args.take().finish()
   let output = at(args.span, () => impl_calc_tan(angle_))
   IntoValue::into_value(output)
@@ -3392,7 +3392,7 @@ pub fn native_calc_asin() -> NativeFuncData {
           {
             name: "value",
             docs: "The number whose arcsine to calculate. Must be between $-1$ and $1$.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Num])),
             default: None,
             positional: true,
             named: false,
@@ -3418,7 +3418,7 @@ fn native_calc_asin_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let value_ : @syntax.Spanned[Value] = args.expect_spanned("value")
+  let value_ : @syntax.Spanned[Num] = args.expect_spanned("value")
   args.take().finish()
   let output = impl_calc_asin(value_)
   IntoValue::into_value(output)
@@ -3443,7 +3443,7 @@ pub fn native_calc_acos() -> NativeFuncData {
           {
             name: "value",
             docs: "The number whose arccosine to calculate. Must be between $-1$ and $1$.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Num])),
             default: None,
             positional: true,
             named: false,
@@ -3469,7 +3469,7 @@ fn native_calc_acos_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let value_ : @syntax.Spanned[Value] = args.expect_spanned("value")
+  let value_ : @syntax.Spanned[Num] = args.expect_spanned("value")
   args.take().finish()
   let output = impl_calc_acos(value_)
   IntoValue::into_value(output)
@@ -3494,7 +3494,7 @@ pub fn native_calc_atan() -> NativeFuncData {
           {
             name: "value",
             docs: "The number whose arctangent to calculate.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Num])),
             default: None,
             positional: true,
             named: false,
@@ -3520,7 +3520,7 @@ fn native_calc_atan_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let value_ : Value = args.expect("value")
+  let value_ : Num = args.expect("value")
   args.take().finish()
   let output = at(args.span, () => impl_calc_atan(value_))
   IntoValue::into_value(output)
@@ -3545,7 +3545,7 @@ pub fn native_calc_atan2() -> NativeFuncData {
           {
             name: "x",
             docs: "The $x$ coordinate.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Num])),
             default: None,
             positional: true,
             named: false,
@@ -3556,7 +3556,7 @@ pub fn native_calc_atan2() -> NativeFuncData {
           {
             name: "y",
             docs: "The $y$ coordinate.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Num])),
             default: None,
             positional: true,
             named: false,
@@ -3582,8 +3582,8 @@ fn native_calc_atan2_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let x_ : Value = args.expect("x")
-  let y_ : Value = args.expect("y")
+  let x_ : Num = args.expect("x")
+  let y_ : Num = args.expect("y")
   args.take().finish()
   let output = at(args.span, () => impl_calc_atan2(x_, y_))
   IntoValue::into_value(output)
@@ -3914,7 +3914,7 @@ pub fn native_calc_log() -> NativeFuncData {
           {
             name: "value",
             docs: "The number whose logarithm to calculate. Must be strictly positive.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Num])),
             default: None,
             positional: true,
             named: false,
@@ -3955,7 +3955,7 @@ fn native_calc_log_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let value_ : @syntax.Spanned[Value] = args.expect_spanned("value")
+  let value_ : @syntax.Spanned[Num] = args.expect_spanned("value")
   let base_ : @syntax.Spanned[Double] = match args.named_spanned("base") {
     Some(v) => v
     None => impl_calc_log__base_default()
@@ -3984,7 +3984,7 @@ pub fn native_calc_ln() -> NativeFuncData {
           {
             name: "value",
             docs: "The number whose logarithm to calculate. Must be strictly positive.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Num])),
             default: None,
             positional: true,
             named: false,
@@ -4010,7 +4010,7 @@ fn native_calc_ln_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let value_ : @syntax.Spanned[Value] = args.expect_spanned("value")
+  let value_ : @syntax.Spanned[Num] = args.expect_spanned("value")
   args.take().finish()
   let output = impl_calc_ln(args.span, value_)
   IntoValue::into_value(output)
@@ -4389,7 +4389,7 @@ pub fn native_calc_floor() -> NativeFuncData {
           {
             name: "value",
             docs: "The number to round down.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[DecNum])),
             default: None,
             positional: true,
             named: false,
@@ -4415,7 +4415,7 @@ fn native_calc_floor_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let value_ : Value = args.expect("value")
+  let value_ : DecNum = args.expect("value")
   args.take().finish()
   let output = at(args.span, () => impl_calc_floor(value_))
   IntoValue::into_value(output)
@@ -4440,7 +4440,7 @@ pub fn native_calc_ceil() -> NativeFuncData {
           {
             name: "value",
             docs: "The number to round up.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[DecNum])),
             default: None,
             positional: true,
             named: false,
@@ -4466,7 +4466,7 @@ fn native_calc_ceil_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let value_ : Value = args.expect("value")
+  let value_ : DecNum = args.expect("value")
   args.take().finish()
   let output = at(args.span, () => impl_calc_ceil(value_))
   IntoValue::into_value(output)
@@ -4491,7 +4491,7 @@ pub fn native_calc_trunc() -> NativeFuncData {
           {
             name: "value",
             docs: "The number to truncate.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[DecNum])),
             default: None,
             positional: true,
             named: false,
@@ -4517,7 +4517,7 @@ fn native_calc_trunc_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let value_ : Value = args.expect("value")
+  let value_ : DecNum = args.expect("value")
   args.take().finish()
   let output = at(args.span, () => impl_calc_trunc(value_))
   IntoValue::into_value(output)
@@ -4542,7 +4542,7 @@ pub fn native_calc_fract() -> NativeFuncData {
           {
             name: "value",
             docs: "The number to truncate.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[DecNum])),
             default: None,
             positional: true,
             named: false,
@@ -4551,7 +4551,7 @@ pub fn native_calc_fract() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[DecNum])),
         native_calc_fract_call,
       )
       native_calc_fract_cell.val = Some(d)
@@ -4568,7 +4568,7 @@ fn native_calc_fract_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let value_ : Value = args.expect("value")
+  let value_ : DecNum = args.expect("value")
   args.take().finish()
   let output = at(args.span, () => impl_calc_fract(value_))
   IntoValue::into_value(output)
@@ -4593,7 +4593,7 @@ pub fn native_calc_round() -> NativeFuncData {
           {
             name: "value",
             docs: "The number to round.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[DecNum])),
             default: None,
             positional: true,
             named: false,
@@ -4613,7 +4613,7 @@ pub fn native_calc_round() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[DecNum])),
         native_calc_round_call,
       )
       native_calc_round_cell.val = Some(d)
@@ -4630,7 +4630,7 @@ fn native_calc_round_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let value_ : Value = args.expect("value")
+  let value_ : DecNum = args.expect("value")
   let digits_ : Int64 = match args.named("digits") {
     Some(v) => v
     None => 0L
@@ -4659,7 +4659,7 @@ pub fn native_calc_clamp() -> NativeFuncData {
           {
             name: "value",
             docs: "The number to clamp.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[DecNum])),
             default: None,
             positional: true,
             named: false,
@@ -4670,7 +4670,7 @@ pub fn native_calc_clamp() -> NativeFuncData {
           {
             name: "min",
             docs: "The inclusive minimum value.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[DecNum])),
             default: None,
             positional: true,
             named: false,
@@ -4681,7 +4681,7 @@ pub fn native_calc_clamp() -> NativeFuncData {
           {
             name: "max",
             docs: "The inclusive maximum value.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[DecNum])),
             default: None,
             positional: true,
             named: false,
@@ -4690,7 +4690,7 @@ pub fn native_calc_clamp() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[DecNum])),
         native_calc_clamp_call,
       )
       native_calc_clamp_cell.val = Some(d)
@@ -4707,9 +4707,9 @@ fn native_calc_clamp_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let value_ : Value = args.expect("value")
-  let min_ : Value = args.expect("min")
-  let max_ : @syntax.Spanned[Value] = args.expect_spanned("max")
+  let value_ : DecNum = args.expect("value")
+  let min_ : DecNum = args.expect("min")
+  let max_ : @syntax.Spanned[DecNum] = args.expect_spanned("max")
   args.take().finish()
   let output = impl_calc_clamp(args.span, value_, min_, max_)
   IntoValue::into_value(output)
@@ -4938,7 +4938,7 @@ pub fn native_calc_rem() -> NativeFuncData {
           {
             name: "dividend",
             docs: "The dividend of the remainder.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[DecNum])),
             default: None,
             positional: true,
             named: false,
@@ -4949,7 +4949,7 @@ pub fn native_calc_rem() -> NativeFuncData {
           {
             name: "divisor",
             docs: "The divisor of the remainder.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[DecNum])),
             default: None,
             positional: true,
             named: false,
@@ -4958,7 +4958,7 @@ pub fn native_calc_rem() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[DecNum])),
         native_calc_rem_call,
       )
       native_calc_rem_cell.val = Some(d)
@@ -4975,8 +4975,8 @@ fn native_calc_rem_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let dividend_ : Value = args.expect("dividend")
-  let divisor_ : @syntax.Spanned[Value] = args.expect_spanned("divisor")
+  let dividend_ : DecNum = args.expect("dividend")
+  let divisor_ : @syntax.Spanned[DecNum] = args.expect_spanned("divisor")
   args.take().finish()
   let output = impl_calc_rem(args.span, dividend_, divisor_)
   IntoValue::into_value(output)
@@ -5001,7 +5001,7 @@ pub fn native_calc_div_euclid() -> NativeFuncData {
           {
             name: "dividend",
             docs: "The dividend of the division.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[DecNum])),
             default: None,
             positional: true,
             named: false,
@@ -5012,7 +5012,7 @@ pub fn native_calc_div_euclid() -> NativeFuncData {
           {
             name: "divisor",
             docs: "The divisor of the division.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[DecNum])),
             default: None,
             positional: true,
             named: false,
@@ -5021,7 +5021,7 @@ pub fn native_calc_div_euclid() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[DecNum])),
         native_calc_div_euclid_call,
       )
       native_calc_div_euclid_cell.val = Some(d)
@@ -5038,8 +5038,8 @@ fn native_calc_div_euclid_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let dividend_ : Value = args.expect("dividend")
-  let divisor_ : @syntax.Spanned[Value] = args.expect_spanned("divisor")
+  let dividend_ : DecNum = args.expect("dividend")
+  let divisor_ : @syntax.Spanned[DecNum] = args.expect_spanned("divisor")
   args.take().finish()
   let output = impl_calc_div_euclid(args.span, dividend_, divisor_)
   IntoValue::into_value(output)
@@ -5064,7 +5064,7 @@ pub fn native_calc_rem_euclid() -> NativeFuncData {
           {
             name: "dividend",
             docs: "The dividend of the remainder.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[DecNum])),
             default: None,
             positional: true,
             named: false,
@@ -5075,7 +5075,7 @@ pub fn native_calc_rem_euclid() -> NativeFuncData {
           {
             name: "divisor",
             docs: "The divisor of the remainder.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[DecNum])),
             default: None,
             positional: true,
             named: false,
@@ -5084,7 +5084,7 @@ pub fn native_calc_rem_euclid() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[DecNum])),
         native_calc_rem_euclid_call,
       )
       native_calc_rem_euclid_cell.val = Some(d)
@@ -5101,8 +5101,8 @@ fn native_calc_rem_euclid_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let dividend_ : Value = args.expect("dividend")
-  let divisor_ : @syntax.Spanned[Value] = args.expect_spanned("divisor")
+  let dividend_ : DecNum = args.expect("dividend")
+  let divisor_ : @syntax.Spanned[DecNum] = args.expect_spanned("divisor")
   args.take().finish()
   let output = impl_calc_rem_euclid(args.span, dividend_, divisor_)
   IntoValue::into_value(output)
@@ -5127,7 +5127,7 @@ pub fn native_calc_quo() -> NativeFuncData {
           {
             name: "dividend",
             docs: "The dividend of the quotient.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[DecNum])),
             default: None,
             positional: true,
             named: false,
@@ -5138,7 +5138,7 @@ pub fn native_calc_quo() -> NativeFuncData {
           {
             name: "divisor",
             docs: "The divisor of the quotient.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[DecNum])),
             default: None,
             positional: true,
             named: false,
@@ -5164,8 +5164,8 @@ fn native_calc_quo_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let dividend_ : Value = args.expect("dividend")
-  let divisor_ : @syntax.Spanned[Value] = args.expect_spanned("divisor")
+  let dividend_ : DecNum = args.expect("dividend")
+  let divisor_ : @syntax.Spanned[DecNum] = args.expect_spanned("divisor")
   args.take().finish()
   let output = impl_calc_quo(args.span, dividend_, divisor_)
   IntoValue::into_value(output)
@@ -6251,7 +6251,7 @@ pub fn native_dict_construct() -> NativeFuncData {
           {
             name: "value",
             docs: "The value that should be converted to a dictionary.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[ToDict])),
             default: None,
             positional: true,
             named: false,
@@ -6277,7 +6277,7 @@ fn native_dict_construct_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let value_ : @syntax.Spanned[Value] = args.expect_spanned("value")
+  let value_ : @syntax.Spanned[ToDict] = args.expect_spanned("value")
   args.take().finish()
   let output = impl_dict_construct(engine, value_)
   IntoValue::into_value(output)
@@ -7228,7 +7228,7 @@ pub fn native_f64_construct() -> NativeFuncData {
           {
             name: "value",
             docs: "The value that should be converted to a float.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[ToFloat])),
             default: None,
             positional: true,
             named: false,
@@ -7254,7 +7254,7 @@ fn native_f64_construct_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let value_ : Value = args.expect("value")
+  let value_ : ToFloat = args.expect("value")
   args.take().finish()
   let output = at(args.span, () => impl_f64_construct(value_))
   IntoValue::into_value(output)
@@ -7443,7 +7443,7 @@ pub fn native_f64_from_bytes() -> NativeFuncData {
           {
             name: "endian",
             docs: "The endianness of the conversion.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Endianness])),
             default: Some(() => {
               IntoValue::into_value(impl_f64_from_bytes__endian_default()) catch {
                 _ => None
@@ -7474,7 +7474,7 @@ fn native_f64_from_bytes_call(
   ignore(engine)
   ignore(context)
   let bytes_ : Value = args.expect("bytes")
-  let endian_ : Value = match args.named("endian") {
+  let endian_ : Endianness = match args.named("endian") {
     Some(v) => v
     None => impl_f64_from_bytes__endian_default()
   }
@@ -7513,7 +7513,7 @@ pub fn native_f64_to_bytes() -> NativeFuncData {
           {
             name: "endian",
             docs: "The endianness of the conversion.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Endianness])),
             default: Some(() => {
               IntoValue::into_value(impl_f64_to_bytes__endian_default()) catch {
                 _ => None
@@ -7555,7 +7555,7 @@ fn native_f64_to_bytes_call(
   ignore(engine)
   ignore(context)
   let self_ : Double = args.expect("self")
-  let endian_ : Value = match args.named("endian") {
+  let endian_ : Endianness = match args.named("endian") {
     Some(v) => v
     None => impl_f64_to_bytes__endian_default()
   }
@@ -7639,8 +7639,8 @@ pub fn native_func_where() -> NativeFuncData {
     Some(d) => d
     None => {
       let d = NativeFuncData::new(
-        name="where-",
-        title="Where ",
+        name="where",
+        title="Where",
         docs="Returns a selector that filters for elements belonging to this function whose fields have the values of the given arguments.",
         keywords=[],
         contextual=false,
@@ -7709,7 +7709,7 @@ pub fn native_i64_construct() -> NativeFuncData {
           {
             name: "value",
             docs: "The value that should be converted to an integer.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[ToInt])),
             default: None,
             positional: true,
             named: false,
@@ -7720,7 +7720,7 @@ pub fn native_i64_construct() -> NativeFuncData {
           {
             name: "base",
             docs: "The base (radix) for parsing strings, between 2 and 36.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Base])),
             default: Some(() => {
               IntoValue::into_value(impl_i64_construct__base_default().v) catch {
                 _ => None
@@ -7750,8 +7750,8 @@ fn native_i64_construct_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let value_ : @syntax.Spanned[Value] = args.expect_spanned("value")
-  let base_ : @syntax.Spanned[Value] = match args.named_spanned("base") {
+  let value_ : @syntax.Spanned[ToInt] = args.expect_spanned("value")
+  let base_ : @syntax.Spanned[Base] = match args.named_spanned("base") {
     Some(v) => v
     None => impl_i64_construct__base_default()
   }
@@ -8222,7 +8222,7 @@ pub fn native_i64_from_bytes() -> NativeFuncData {
           {
             name: "endian",
             docs: "The endianness of the conversion.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Endianness])),
             default: Some(() => {
               IntoValue::into_value(impl_i64_from_bytes__endian_default()) catch {
                 _ => None
@@ -8264,7 +8264,7 @@ fn native_i64_from_bytes_call(
   ignore(engine)
   ignore(context)
   let bytes_ : Value = args.expect("bytes")
-  let endian_ : Value = match args.named("endian") {
+  let endian_ : Endianness = match args.named("endian") {
     Some(v) => v
     None => impl_i64_from_bytes__endian_default()
   }
@@ -8307,7 +8307,7 @@ pub fn native_i64_to_bytes() -> NativeFuncData {
           {
             name: "endian",
             docs: "The endianness of the conversion.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Endianness])),
             default: Some(() => {
               IntoValue::into_value(impl_i64_to_bytes__endian_default()) catch {
                 _ => None
@@ -8349,7 +8349,7 @@ fn native_i64_to_bytes_call(
   ignore(engine)
   ignore(context)
   let self_ : Int64 = args.expect("self")
-  let endian_ : Value = match args.named("endian") {
+  let endian_ : Endianness = match args.named("endian") {
     Some(v) => v
     None => impl_i64_to_bytes__endian_default()
   }
@@ -8708,7 +8708,7 @@ pub fn native_eval() -> NativeFuncData {
           {
             name: "mode",
             docs: "The @reference:syntax:modes[syntactical mode] in which the string is parsed.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[@syntax.SyntaxMode])),
             default: Some(() => {
               IntoValue::into_value(impl_eval__mode_default()) catch {
                 _ => None
@@ -8754,7 +8754,7 @@ fn native_eval_call(
   ignore(engine)
   ignore(context)
   let source_ : @syntax.Spanned[String] = args.expect_spanned("source")
-  let mode_ : Value = match args.named("mode") {
+  let mode_ : @syntax.SyntaxMode = match args.named("mode") {
     Some(v) => v
     None => impl_eval__mode_default()
   }
@@ -8786,7 +8786,7 @@ pub fn native_rooted_path_construct() -> NativeFuncData {
           {
             name: "path",
             docs: "Converts a string or path to a path.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[PathOrStr])),
             default: None,
             positional: true,
             named: false,
@@ -8795,7 +8795,7 @@ pub fn native_rooted_path_construct() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[RootedPath])),
         native_rooted_path_construct_call,
       )
       native_rooted_path_construct_cell.val = Some(d)
@@ -8812,7 +8812,7 @@ fn native_rooted_path_construct_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let path_ : @syntax.Spanned[Value] = args.expect_spanned("path")
+  let path_ : @syntax.Spanned[PathOrStr] = args.expect_spanned("path")
   args.take().finish()
   let output = impl_rooted_path_construct(path_)
   IntoValue::into_value(output)
@@ -9412,7 +9412,7 @@ pub fn native_str_construct() -> NativeFuncData {
           {
             name: "base",
             docs: "The base (radix) to display integers in, between 2 and 36.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Base])),
             default: Some(() => {
               IntoValue::into_value(impl_str_construct__base_default().v) catch {
                 _ => None
@@ -9443,7 +9443,7 @@ fn native_str_construct_call(
   ignore(engine)
   ignore(context)
   let value_ : Value = args.expect("value")
-  let base_ : @syntax.Spanned[Value] = match args.named_spanned("base") {
+  let base_ : @syntax.Spanned[Base] = match args.named_spanned("base") {
     Some(v) => v
     None => impl_str_construct__base_default()
   }
@@ -10397,8 +10397,8 @@ pub fn native_str_match() -> NativeFuncData {
     Some(d) => d
     None => {
       let d = NativeFuncData::new(
-        name="match-",
-        title="Match ",
+        name="match",
+        title="Match",
         docs="Searches for the specified pattern in the string and returns a dictionary with details about the first match or `{none}` if there is no match.",
         keywords=[],
         contextual=false,
@@ -10890,7 +10890,7 @@ pub fn native_symbol_construct() -> NativeFuncData {
           {
             name: "variants",
             docs: "The variants of the symbol.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[SymbolVariant])),
             default: None,
             positional: true,
             named: false,
@@ -10899,7 +10899,7 @@ pub fn native_symbol_construct() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Symbol])),
         native_symbol_construct_call,
       )
       native_symbol_construct_cell.val = Some(d)
@@ -10916,7 +10916,7 @@ fn native_symbol_construct_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let variants_ : Array[@syntax.Spanned[Value]] = args.all_spanned()
+  let variants_ : Array[@syntax.Spanned[SymbolVariant]] = args.all_spanned()
   args.take().finish()
   let output = impl_symbol_construct(args.span, variants_)
   IntoValue::into_value(output)
@@ -11412,8 +11412,8 @@ pub fn native_counter_final() -> NativeFuncData {
     Some(d) => d
     None => {
       let d = NativeFuncData::new(
-        name="final-",
-        title="Final ",
+        name="final",
+        title="Final",
         docs="Retrieves the value of the counter at the end of the document. Always returns an array of integers, even if the counter has just one number.",
         keywords=[],
         contextual=true,
@@ -12081,8 +12081,8 @@ pub fn native_state_final() -> NativeFuncData {
     Some(d) => d
     None => {
       let d = NativeFuncData::new(
-        name="final-",
-        title="Final ",
+        name="final",
+        title="Final",
         docs="Retrieves the value of the state at the end of the document.",
         keywords=[],
         contextual=true,
@@ -12204,7 +12204,7 @@ pub fn native_alignment_axis() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Alignment])),
             default: None,
             positional: true,
             named: false,
@@ -12213,7 +12213,7 @@ pub fn native_alignment_axis() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Axis?])),
         native_alignment_axis_call,
       )
       native_alignment_axis_cell.val = Some(d)
@@ -12230,7 +12230,7 @@ fn native_alignment_axis_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : Alignment = args.expect("self")
   args.take().finish()
   let output = at(args.span, () => impl_alignment_axis(self_))
   IntoValue::into_value(output)
@@ -12255,7 +12255,7 @@ pub fn native_alignment_inv() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Alignment])),
             default: None,
             positional: true,
             named: false,
@@ -12264,7 +12264,7 @@ pub fn native_alignment_inv() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Alignment])),
         native_alignment_inv_call,
       )
       native_alignment_inv_cell.val = Some(d)
@@ -12281,7 +12281,7 @@ fn native_alignment_inv_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : Alignment = args.expect("self")
   args.take().finish()
   let output = at(args.span, () => impl_alignment_inv(self_))
   IntoValue::into_value(output)
@@ -12408,7 +12408,7 @@ pub fn native_dir_from() -> NativeFuncData {
           {
             name: "side",
             docs: "The starting point for the direction.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Side])),
             default: None,
             positional: true,
             named: false,
@@ -12417,7 +12417,7 @@ pub fn native_dir_from() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Dir])),
         native_dir_from_call,
       )
       native_dir_from_cell.val = Some(d)
@@ -12434,7 +12434,7 @@ fn native_dir_from_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let side_ : Value = args.expect("side")
+  let side_ : Side = args.expect("side")
   args.take().finish()
   let output = at(args.span, () => impl_dir_from(side_))
   IntoValue::into_value(output)
@@ -12459,7 +12459,7 @@ pub fn native_dir_to() -> NativeFuncData {
           {
             name: "side",
             docs: "The end point for the direction.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Side])),
             default: None,
             positional: true,
             named: false,
@@ -12468,7 +12468,7 @@ pub fn native_dir_to() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Dir])),
         native_dir_to_call,
       )
       native_dir_to_cell.val = Some(d)
@@ -12485,7 +12485,7 @@ fn native_dir_to_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let side_ : Value = args.expect("side")
+  let side_ : Side = args.expect("side")
   args.take().finish()
   let output = at(args.span, () => impl_dir_to(side_))
   IntoValue::into_value(output)
@@ -12510,7 +12510,7 @@ pub fn native_dir_axis() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Dir])),
             default: None,
             positional: true,
             named: false,
@@ -12519,7 +12519,7 @@ pub fn native_dir_axis() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Axis])),
         native_dir_axis_call,
       )
       native_dir_axis_cell.val = Some(d)
@@ -12536,7 +12536,7 @@ fn native_dir_axis_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : Dir = args.expect("self")
   args.take().finish()
   let output = at(args.span, () => impl_dir_axis(self_))
   IntoValue::into_value(output)
@@ -12561,7 +12561,7 @@ pub fn native_dir_sign() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Dir])),
             default: None,
             positional: true,
             named: false,
@@ -12587,7 +12587,7 @@ fn native_dir_sign_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : Dir = args.expect("self")
   args.take().finish()
   let output = at(args.span, () => impl_dir_sign(self_))
   IntoValue::into_value(output)
@@ -12612,7 +12612,7 @@ pub fn native_dir_start() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Dir])),
             default: None,
             positional: true,
             named: false,
@@ -12621,7 +12621,7 @@ pub fn native_dir_start() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Side])),
         native_dir_start_call,
       )
       native_dir_start_cell.val = Some(d)
@@ -12638,7 +12638,7 @@ fn native_dir_start_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : Dir = args.expect("self")
   args.take().finish()
   let output = at(args.span, () => impl_dir_start(self_))
   IntoValue::into_value(output)
@@ -12663,7 +12663,7 @@ pub fn native_dir_end() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Dir])),
             default: None,
             positional: true,
             named: false,
@@ -12672,7 +12672,7 @@ pub fn native_dir_end() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Side])),
         native_dir_end_call,
       )
       native_dir_end_cell.val = Some(d)
@@ -12689,7 +12689,7 @@ fn native_dir_end_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : Dir = args.expect("self")
   args.take().finish()
   let output = at(args.span, () => impl_dir_end(self_))
   IntoValue::into_value(output)
@@ -12714,7 +12714,7 @@ pub fn native_dir_inv() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Dir])),
             default: None,
             positional: true,
             named: false,
@@ -12723,7 +12723,7 @@ pub fn native_dir_inv() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Dir])),
         native_dir_inv_call,
       )
       native_dir_inv_cell.val = Some(d)
@@ -12740,7 +12740,7 @@ fn native_dir_inv_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : Dir = args.expect("self")
   args.take().finish()
   let output = at(args.span, () => impl_dir_inv(self_))
   IntoValue::into_value(output)
@@ -13071,11 +13071,9 @@ pub fn native_measure() -> NativeFuncData {
           {
             name: "width",
             docs: "The width available to layout the content.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Smart[Length]])),
             default: Some(() => {
-              IntoValue::into_value(impl_measure__width_default()) catch {
-                _ => None
-              }
+              IntoValue::into_value((Smart::Auto : Smart[Length]))
             }),
             positional: false,
             named: true,
@@ -13086,11 +13084,9 @@ pub fn native_measure() -> NativeFuncData {
           {
             name: "height",
             docs: "The height available to layout the content.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Smart[Length]])),
             default: Some(() => {
-              IntoValue::into_value(impl_measure__height_default()) catch {
-                _ => None
-              }
+              IntoValue::into_value((Smart::Auto : Smart[Length]))
             }),
             positional: false,
             named: true,
@@ -13127,13 +13123,13 @@ fn native_measure_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let width_ : Value = match args.named("width") {
+  let width_ : Smart[Length] = match args.named("width") {
     Some(v) => v
-    None => impl_measure__width_default()
+    None => Smart::Auto
   }
-  let height_ : Value = match args.named("height") {
+  let height_ : Smart[Length] = match args.named("height") {
     Some(v) => v
-    None => impl_measure__height_default()
+    None => Smart::Auto
   }
   let content_ : Content = args.expect("content")
   args.take().finish()
@@ -13477,7 +13473,7 @@ pub fn native_read() -> NativeFuncData {
           {
             name: "path",
             docs: "Path to a file.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[PathOrStr])),
             default: None,
             positional: true,
             named: false,
@@ -13518,7 +13514,7 @@ fn native_read_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let path_ : @syntax.Spanned[Value] = args.expect_spanned("path")
+  let path_ : @syntax.Spanned[PathOrStr] = args.expect_spanned("path")
   let encoding_ : Value = match args.named("encoding") {
     Some(v) => v
     None => impl_read__encoding_default()
@@ -17149,7 +17145,7 @@ pub fn native_gradient_linear() -> NativeFuncData {
           {
             name: "dir",
             docs: "The direction of the gradient.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Dir])),
             default: Some(() => {
               IntoValue::into_value(impl_gradient_linear__dir_default()) catch {
                 _ => None
@@ -17263,7 +17259,7 @@ pub fn native_gradient_radial() -> NativeFuncData {
           {
             name: "center",
             docs: "The center of the end circle of the gradient.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Axes[Ratio]])),
             default: Some(() => {
               IntoValue::into_value(impl_gradient_radial__center_default()) catch {
                 _ => None
@@ -17293,13 +17289,9 @@ pub fn native_gradient_radial() -> NativeFuncData {
           {
             name: "focal-center",
             docs: "The center of the focal circle of the gradient.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Smart[Axes[Ratio]]])),
             default: Some(() => {
-              IntoValue::into_value(
-                impl_gradient_radial__focal_center_default(),
-              ) catch {
-                _ => None
-              }
+              IntoValue::into_value((Smart::Auto : Smart[Axes[Ratio]]))
             }),
             positional: false,
             named: true,
@@ -17351,7 +17343,7 @@ fn native_gradient_radial_call(
     Some(v) => v
     None => impl_gradient_radial__relative_default()
   }
-  let center_ : Value = match args.named("center") {
+  let center_ : Axes[Ratio] = match args.named("center") {
     Some(v) => v
     None => impl_gradient_radial__center_default()
   }
@@ -17359,9 +17351,9 @@ fn native_gradient_radial_call(
     Some(v) => v
     None => impl_gradient_radial__radius_default()
   }
-  let focal_center_ : Value = match args.named("focal-center") {
+  let focal_center_ : Smart[Axes[Ratio]] = match args.named("focal-center") {
     Some(v) => v
-    None => impl_gradient_radial__focal_center_default()
+    None => Smart::Auto
   }
   let focal_radius_ : @syntax.Spanned[Ratio] = match
     args.named_spanned("focal-radius") {
@@ -17457,7 +17449,7 @@ pub fn native_gradient_conic() -> NativeFuncData {
           {
             name: "center",
             docs: "The center of the circle of the gradient.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Axes[Ratio]])),
             default: Some(() => {
               IntoValue::into_value(impl_gradient_conic__center_default()) catch {
                 _ => None
@@ -17500,7 +17492,7 @@ fn native_gradient_conic_call(
     Some(v) => v
     None => impl_gradient_conic__relative_default()
   }
-  let center_ : Value = match args.named("center") {
+  let center_ : Axes[Ratio] = match args.named("center") {
     Some(v) => v
     None => impl_gradient_conic__center_default()
   }
@@ -17960,7 +17952,7 @@ pub fn native_gradient_center() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Axes[Ratio]?])),
         native_gradient_center_call,
       )
       native_gradient_center_cell.val = Some(d)
@@ -18062,7 +18054,7 @@ pub fn native_gradient_focal_center() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Axes[Ratio]?])),
         native_gradient_focal_center_call,
       )
       native_gradient_focal_center_cell.val = Some(d)
@@ -18391,7 +18383,7 @@ pub fn native_stroke_construct() -> NativeFuncData {
           {
             name: "thickness",
             docs: "The stroke's thickness.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Smart[Length]])),
             default: None,
             positional: true,
             named: false,
@@ -18435,7 +18427,7 @@ pub fn native_stroke_construct() -> NativeFuncData {
           {
             name: "miter-limit",
             docs: "Number at which protruding sharp bends are rendered with a bevel instead or a miter join. The higher the number, the sharper an angle can be before it is bevelled. Only applicable if `join` is `{\"miter\"}`.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Smart[Double]])),
             default: None,
             positional: true,
             named: false,
@@ -18484,7 +18476,7 @@ pub fn native_tiling_construct() -> NativeFuncData {
           {
             name: "size",
             docs: "The bounding box of each cell of the tiling, specified as a `(x, y)` pair.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Smart[Axes[Length]]])),
             default: Some(() => {
               IntoValue::into_value(impl_tiling_construct__size_default().v) catch {
                 _ => None
@@ -18499,7 +18491,7 @@ pub fn native_tiling_construct() -> NativeFuncData {
           {
             name: "spacing",
             docs: "The spacing between cells of the tiling, specified as a `(x, y)` pair.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Axes[Length]])),
             default: Some(() => {
               IntoValue::into_value(impl_tiling_construct__spacing_default().v) catch {
                 _ => None
@@ -18514,7 +18506,7 @@ pub fn native_tiling_construct() -> NativeFuncData {
           {
             name: "offset",
             docs: "Shifts the entire tile grid without affecting the tile size or spacing.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Axes[Rel[Length]]])),
             default: Some(() => {
               IntoValue::into_value(impl_tiling_construct__offset_default().v) catch {
                 _ => None
@@ -18585,15 +18577,18 @@ fn native_tiling_construct_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let size_ : @syntax.Spanned[Value] = match args.named_spanned("size") {
+  let size_ : @syntax.Spanned[Smart[Axes[Length]]] = match
+    args.named_spanned("size") {
     Some(v) => v
     None => impl_tiling_construct__size_default()
   }
-  let spacing_ : @syntax.Spanned[Value] = match args.named_spanned("spacing") {
+  let spacing_ : @syntax.Spanned[Axes[Length]] = match
+    args.named_spanned("spacing") {
     Some(v) => v
     None => impl_tiling_construct__spacing_default()
   }
-  let offset_ : @syntax.Spanned[Value] = match args.named_spanned("offset") {
+  let offset_ : @syntax.Spanned[Axes[Rel[Length]]] = match
+    args.named_spanned("offset") {
     Some(v) => v
     None => impl_tiling_construct__offset_default()
   }
@@ -18617,6 +18612,217 @@ fn native_tiling_construct_call(
     relative_,
     body_,
   )
+  IntoValue::into_value(output)
+}
+
+///|
+let native_pdf_format_table_summary_cell : Ref[NativeFuncData?] = { val: None, }
+
+///|
+/// A summary of the purpose and structure of a complex table. (upstream `PdfFormat::table_summary`, typst-pdf/src/format.rs)
+pub fn native_pdf_format_table_summary() -> NativeFuncData {
+  match native_pdf_format_table_summary_cell.val {
+    Some(d) => d
+    None => {
+      let d = NativeFuncData::new(
+        name="table-summary",
+        title="Table Summary",
+        docs="A summary of the purpose and structure of a complex table.",
+        keywords=[],
+        contextual=false,
+        params=[
+          {
+            name: "summary",
+            docs: "",
+            input: () => input_of((Ty::new() : Ty[String])),
+            default: None,
+            positional: false,
+            named: true,
+            variadic: false,
+            required: false,
+            settable: false,
+          },
+          {
+            name: "table",
+            docs: "The table.",
+            input: () => input_of((Ty::new() : Ty[Value])),
+            default: None,
+            positional: true,
+            named: false,
+            variadic: false,
+            required: true,
+            settable: false,
+          },
+        ],
+        returns=() => output_of((Ty::new() : Ty[Content])),
+        native_pdf_format_table_summary_call,
+      )
+      native_pdf_format_table_summary_cell.val = Some(d)
+      d
+    }
+  }
+}
+
+///|
+fn native_pdf_format_table_summary_call(
+  engine : Engine,
+  context : Context,
+  args : Args,
+) -> Value raise SourceError {
+  ignore(engine)
+  ignore(context)
+  let summary_ : String? = args.named("summary")
+  let table_ : Value = args.expect("table")
+  args.take().finish()
+  let output = at(args.span, () => {
+    impl_pdf_format_table_summary(summary_, table_)
+  })
+  IntoValue::into_value(output)
+}
+
+///|
+let native_pdf_format_header_cell_cell : Ref[NativeFuncData?] = { val: None, }
+
+///|
+/// Explicitly defines a cell as a header cell. (upstream `PdfFormat::header_cell`, typst-pdf/src/format.rs)
+pub fn native_pdf_format_header_cell() -> NativeFuncData {
+  match native_pdf_format_header_cell_cell.val {
+    Some(d) => d
+    None => {
+      let d = NativeFuncData::new(
+        name="header-cell",
+        title="Header Cell",
+        docs="Explicitly defines a cell as a header cell.",
+        keywords=[],
+        contextual=false,
+        params=[
+          {
+            name: "level",
+            docs: "The nesting level of this header cell.",
+            input: () => input_of((Ty::new() : Ty[NonZeroU32])),
+            default: Some(() => {
+              IntoValue::into_value(
+                impl_pdf_format_header_cell__level_default(),
+              ) catch {
+                _ => None
+              }
+            }),
+            positional: false,
+            named: true,
+            variadic: false,
+            required: false,
+            settable: false,
+          },
+          {
+            name: "scope",
+            docs: "What track of the table this header cell applies to.",
+            input: () => input_of((Ty::new() : Ty[Value])),
+            default: Some(() => {
+              IntoValue::into_value(
+                impl_pdf_format_header_cell__scope_default(),
+              ) catch {
+                _ => None
+              }
+            }),
+            positional: false,
+            named: true,
+            variadic: false,
+            required: false,
+            settable: false,
+          },
+          {
+            name: "cell",
+            docs: "The table cell.",
+            input: () => input_of((Ty::new() : Ty[Value])),
+            default: None,
+            positional: true,
+            named: false,
+            variadic: false,
+            required: true,
+            settable: false,
+          },
+        ],
+        returns=() => output_of((Ty::new() : Ty[Content])),
+        native_pdf_format_header_cell_call,
+      )
+      native_pdf_format_header_cell_cell.val = Some(d)
+      d
+    }
+  }
+}
+
+///|
+fn native_pdf_format_header_cell_call(
+  engine : Engine,
+  context : Context,
+  args : Args,
+) -> Value raise SourceError {
+  ignore(engine)
+  ignore(context)
+  let level_ : NonZeroU32 = match args.named("level") {
+    Some(v) => v
+    None => impl_pdf_format_header_cell__level_default()
+  }
+  let scope_ : Value = match args.named("scope") {
+    Some(v) => v
+    None => impl_pdf_format_header_cell__scope_default()
+  }
+  let cell_ : Value = args.expect("cell")
+  args.take().finish()
+  let output = at(args.span, () => {
+    impl_pdf_format_header_cell(level_, scope_, cell_)
+  })
+  IntoValue::into_value(output)
+}
+
+///|
+let native_pdf_format_data_cell_cell : Ref[NativeFuncData?] = { val: None, }
+
+///|
+/// Explicitly defines this cell as a data cell. (upstream `PdfFormat::data_cell`, typst-pdf/src/format.rs)
+pub fn native_pdf_format_data_cell() -> NativeFuncData {
+  match native_pdf_format_data_cell_cell.val {
+    Some(d) => d
+    None => {
+      let d = NativeFuncData::new(
+        name="data-cell",
+        title="Data Cell",
+        docs="Explicitly defines this cell as a data cell.",
+        keywords=[],
+        contextual=false,
+        params=[
+          {
+            name: "cell",
+            docs: "The table cell.",
+            input: () => input_of((Ty::new() : Ty[Value])),
+            default: None,
+            positional: true,
+            named: false,
+            variadic: false,
+            required: true,
+            settable: false,
+          },
+        ],
+        returns=() => output_of((Ty::new() : Ty[Content])),
+        native_pdf_format_data_cell_call,
+      )
+      native_pdf_format_data_cell_cell.val = Some(d)
+      d
+    }
+  }
+}
+
+///|
+fn native_pdf_format_data_cell_call(
+  engine : Engine,
+  context : Context,
+  args : Args,
+) -> Value raise SourceError {
+  ignore(engine)
+  ignore(context)
+  let cell_ : Value = args.expect("cell")
+  args.take().finish()
+  let output = at(args.span, () => impl_pdf_format_data_cell(cell_))
   IntoValue::into_value(output)
 }
 
@@ -19122,6 +19328,30 @@ fn register_scopes() -> Unit {
     data.set_scope(s)
     data.set_constructor(native_tiling_construct())
   })
+  html_format_elem().hooks().scope = () => {
+    let s = Scope::deduplicating()
+    s.define_elem(html_elem()) |> ignore
+    s.define_elem(frame_elem()) |> ignore
+    defs_html_format(s)
+    s
+  }
+  pdf_format_elem().hooks().scope = () => {
+    let s = Scope::deduplicating()
+    s.define_elem(pdf_attach_elem()) |> ignore
+    s.define_elem(artifact_elem()) |> ignore
+    s.define_func(native_pdf_format_table_summary()).with_feature(A11yExtras)
+    |> ignore
+    s.define_func(native_pdf_format_header_cell()).with_feature(A11yExtras)
+    |> ignore
+    s.define_func(native_pdf_format_data_cell()).with_feature(A11yExtras)
+    |> ignore
+    s
+  }
+  bundle_format_elem().hooks().scope = () => {
+    let s = Scope::deduplicating()
+    s.define_elem(asset_elem()) |> ignore
+    s
+  }
 }
 
 ///|

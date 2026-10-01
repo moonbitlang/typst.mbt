@@ -103,6 +103,8 @@ def literal_default(mty, expr):
         return f"{mty}({e}L)"
     if mty == "Double" and re.fullmatch(r"-?\d+(\.\d+)?", e):
         return e if "." in e else e + ".0"
+    if mty.startswith("Smart[") and e == "Smart::Auto":
+        return "Smart::Auto"
     if mty.endswith("?") and e == "None":
         return "None"
     if mty == "Value" and e == "Value::None":
@@ -155,8 +157,6 @@ def main():
     type_names = {t["ident"]: t["name"] for t in manifest["types"]}
     type_names.update({"i64": "int", "f64": "float", "bool": "bool"})
     for f in manifest["funcs"]:
-        if f["file"].startswith(("typst-pdf", "typst-html", "typst-bundle")):
-            continue
         key = func_key(f)
         if key in keys:
             continue
@@ -303,8 +303,6 @@ def main():
     reg = ["///|\n/// Builds the scopes of native types, elements and functions.\nfn register_scopes() -> Unit {"]
     for s in manifest["scopes"]:
         ty = s["self_ty"]
-        if s["file"].startswith(("typst-pdf", "typst-html", "typst-bundle")):
-            continue
         defs = []
         ctor = None
         s_file = s["file"]
@@ -323,7 +321,15 @@ def main():
                     m = re.search(r'message\s*=\s*"([^"]*)"', f["deprecated"])
                     msg = m.group(1) if m else "item is deprecated"
                     line += f".with_deprecation(Deprecation::new().with_message({mbt_str(msg)}))"
+                m = re.search(r"#\[feature = (\w+)\]", attrs)
+                if m:
+                    line += f".with_feature({m.group(1)})"
                 defs.append(line + " |> ignore")
+            elif mem["kind"] == "fn" and "#[defs]" in attrs:
+                dname = f"defs_{snake(ty)}"
+                if dname not in defined:
+                    todo.append(f"///|\n/// TODO: port `#[defs]` of `{ty}` ({s_file}).\nfn {dname}(scope : Scope) -> Unit {{\n  ignore(scope)\n}}\n")
+                defs.append(f"    {dname}(s)")
             elif mem["kind"] == "const" and "#[constant" in attrs:
                 cname = f"impl_{snake(ty)}_const_{mem['ident'].lower()}"
                 if cname not in defined:

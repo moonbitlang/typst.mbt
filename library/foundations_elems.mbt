@@ -90,13 +90,12 @@ pub fn LinkElem::from_url(url : String) -> Content raise HintedError {
 ///|
 /// Strip `mailto:` and `tel:` prefixes from a URL for display.
 fn link_body_from_url(url : String) -> String {
-  let mut text = url
   for prefix in ["mailto:", "tel:"] {
-    if text.has_prefix(prefix) {
-      text = text.unsafe_substring(start=prefix.length(), end=text.length())
+    if url.has_prefix(prefix) {
+      return url.unsafe_substring(start=prefix.length(), end=url.length())
     }
   }
-  text
+  url
 }
 
 ///|

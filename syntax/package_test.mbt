@@ -1,14 +1,14 @@
 ///|
-fn version(s : String) -> @package.PackageVersion raise {
-  match @package.PackageVersion::from_str(s) {
+fn version(s : String) -> @syntax.PackageVersion raise {
+  match @syntax.PackageVersion::from_str(s) {
     Ok(v) => v
     Err(e) => fail(e)
   }
 }
 
 ///|
-fn bound(s : String) -> @package.VersionBound raise {
-  match @package.VersionBound::from_str(s) {
+fn bound(s : String) -> @syntax.VersionBound raise {
+  match @syntax.VersionBound::from_str(s) {
     Ok(v) => v
     Err(e) => fail(e)
   }
@@ -31,66 +31,66 @@ test "version version match" {
 
 ///|
 test "package spec parsing" {
-  let show = (r : Result[@package.PackageSpec, String]) => {
+  let show = (r : Result[@syntax.PackageSpec, String]) => {
     match r {
       Ok(spec) => "Ok(\{spec})"
       Err(e) => "Err(\{e})"
     }
   }
   inspect(
-    show(@package.PackageSpec::from_str("@preview/foo:0.1.0")),
+    show(@syntax.PackageSpec::from_str("@preview/foo:0.1.0")),
     content="Ok(@preview/foo:0.1.0)",
   )
   inspect(
-    show(@package.PackageSpec::from_str("@preview/foo:+1.2.3")),
+    show(@syntax.PackageSpec::from_str("@preview/foo:+1.2.3")),
     content="Ok(@preview/foo:1.2.3)",
   )
   inspect(
-    show(@package.PackageSpec::from_str("preview/foo:0.1.0")),
+    show(@syntax.PackageSpec::from_str("preview/foo:0.1.0")),
     content="Err(package specification must start with '@')",
   )
   inspect(
-    show(@package.PackageSpec::from_str("@/foo:0.1.0")),
+    show(@syntax.PackageSpec::from_str("@/foo:0.1.0")),
     content="Err(package specification is missing namespace)",
   )
   inspect(
-    show(@package.PackageSpec::from_str("@1x/foo:0.1.0")),
+    show(@syntax.PackageSpec::from_str("@1x/foo:0.1.0")),
     content="Err(`1x` is not a valid package namespace)",
   )
   inspect(
-    show(@package.PackageSpec::from_str("@preview")),
+    show(@syntax.PackageSpec::from_str("@preview")),
     content="Err(package specification is missing name)",
   )
   inspect(
-    show(@package.PackageSpec::from_str("@preview/f-o:0.1.0")),
+    show(@syntax.PackageSpec::from_str("@preview/f-o:0.1.0")),
     content="Ok(@preview/f-o:0.1.0)",
   )
   inspect(
-    show(@package.PackageSpec::from_str("@preview/foo")),
+    show(@syntax.PackageSpec::from_str("@preview/foo")),
     content="Err(package specification is missing version)",
   )
   inspect(
-    show(@package.PackageSpec::from_str("@preview/foo:1")),
+    show(@syntax.PackageSpec::from_str("@preview/foo:1")),
     content="Err(version number is missing minor version)",
   )
   inspect(
-    show(@package.PackageSpec::from_str("@preview/foo:1..2")),
+    show(@syntax.PackageSpec::from_str("@preview/foo:1..2")),
     content="Err(version number is missing minor version)",
   )
   inspect(
-    show(@package.PackageSpec::from_str("@preview/foo:1.x.2")),
+    show(@syntax.PackageSpec::from_str("@preview/foo:1.x.2")),
     content="Err(`x` is not a valid minor version)",
   )
   inspect(
-    show(@package.PackageSpec::from_str("@preview/foo:1.2.3.4")),
+    show(@syntax.PackageSpec::from_str("@preview/foo:1.2.3.4")),
     content="Err(version number has unexpected fourth component: `4`)",
   )
   inspect(
-    show(@package.PackageSpec::from_str("@preview/foo:1.2.4294967296")),
+    show(@syntax.PackageSpec::from_str("@preview/foo:1.2.4294967296")),
     content="Err(`4294967296` is not a valid patch version)",
   )
   let versionless = (s : String) => {
-    match @package.VersionlessPackageSpec::from_str(s) {
+    match @syntax.VersionlessPackageSpec::from_str(s) {
       Ok(spec) => "Ok(\{spec})"
       Err(e) => "Err(\{e})"
     }
@@ -105,7 +105,7 @@ test "package spec parsing" {
 ///|
 test "version bound parsing" {
   let show = (s : String) => {
-    match @package.VersionBound::from_str(s) {
+    match @syntax.VersionBound::from_str(s) {
       Ok(b) => "Ok(\{b})"
       Err(e) => "Err(\{e})"
     }
@@ -118,4 +118,43 @@ test "version bound parsing" {
     show("1.2.3.4"),
     content="Err(version bound has unexpected fourth component: `4`)",
   )
+}
+
+///|
+test "package manifest" {
+  let spec = match @syntax.PackageSpec::from_str("@test/future:0.1.0") {
+    Ok(s) => s
+    Err(e) => fail(e)
+  }
+  let text =
+    #|# A manifest.
+    #|[package]
+    #|name = "future"
+    #|version = "0.1.0"
+    #|entrypoint = 'lib.typ'
+    #|authors = ["A", "Bé",]
+    #|compiler = "1.0.0"
+    #|extra = { a = 1, b.c = [1.5, true] }
+    #|
+    #|[tool.my-tool]
+    #|key = """
+    #|value"""
+  let manifest = match @syntax.PackageManifest::from_toml(text) {
+    Ok(m) => m
+    Err(e) => fail(e)
+  }
+  assert_eq(manifest.package.entrypoint, "lib.typ")
+  assert_eq(manifest.package.authors, ["A", "Bé"])
+  assert_eq(manifest.package.unknown_fields, ["extra"])
+  assert_eq(manifest.tool.sections, ["my-tool"])
+  assert_eq(
+    manifest.validate(spec),
+    Err("package requires Typst 1.0.0 or newer (current version is 0.15.1)"),
+  )
+  let missing = @syntax.PackageManifest::from_toml("[package]\nname = \"x\"\n")
+  assert_true(missing is Err("missing field `version`"))
+  let wrong = @syntax.PackageManifest::from_toml(
+    "[package]\nname = 1\nversion = \"0.1.0\"\nentrypoint = \"a\"",
+  )
+  assert_true(wrong is Err("invalid type: integer `1`, expected a string"))
 }

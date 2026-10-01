@@ -35,32 +35,6 @@ pub fn Tiling::repr(self : Tiling) -> String {
 }
 
 ///|
-/// A symbol. (placeholder; see foundations/symbol.rs)
-pub(all) struct Symbol {
-  priv text : String
-} derive(Eq, Hash)
-
-///|
-pub fn Symbol::repr(self : Symbol) -> String {
-  "symbol(" + repr_str(self.text) + ")"
-}
-
-///|
-pub fn Symbol::get(self : Symbol) -> String {
-  self.text
-}
-
-///|
-pub fn Symbol::modified(
-  self : Symbol,
-  _guard_ : BindingGuard,
-  field : String,
-) -> Symbol raise HintedError {
-  bail("unknown symbol modifier: \{field}") |> ignore
-  self
-}
-
-///|
 /// A version. (placeholder; see foundations/version.rs)
 pub(all) struct Version(Array[Int]) derive(Eq, Hash)
 
@@ -142,11 +116,6 @@ pub(all) struct Duration {
 ///|
 pub fn Duration::repr(self : Duration) -> String {
   "duration(seconds: \{self.seconds})"
-}
-
-///|
-pub fn Symbol::func(self : Symbol) -> Func raise HintedError {
-  bail("symbol \{self.repr()} is not callable")
 }
 
 ///|
@@ -315,54 +284,8 @@ pub fn stroke_from_pair(_a : Value, _b : Value) -> Value raise HintedError {
   bail("strokes are not ported yet")
 }
 
-///|
-/// A symbol for a single character at runtime (upstream
-/// `Symbol::runtime_char`).
-pub fn Symbol::runtime_char(c : Char) -> Symbol {
-  { text: c.to_string(), }
-}
-
 // Placeholders for dynamic types (see `dyn.mbt`). Each owner replaces its
 // section with the real port, keeping the methods used by `dyn.mbt`.
-
-///|
-/// An alignment. (placeholder; see layout/align.rs)
-pub(all) struct Alignment {
-  priv repr_ : String
-} derive(Eq, Hash)
-
-///|
-pub fn Alignment::repr(self : Alignment) -> String {
-  self.repr_
-}
-
-///|
-/// Sum two alignments (upstream `Add for Alignment`).
-pub fn Alignment::add(
-  self : Alignment,
-  _other : Alignment,
-) -> Alignment raise HintedError {
-  bail("alignments are not ported yet") |> ignore
-  self
-}
-
-///|
-/// The fields of an alignment (`x`, `y`); `None` if missing.
-pub fn Alignment::field(self : Alignment, _field : String) -> Value? {
-  ignore(self)
-  None
-}
-
-///|
-/// A direction. (placeholder; see layout/dir.rs)
-pub(all) struct Dir {
-  priv repr_ : String
-} derive(Eq, Hash)
-
-///|
-pub fn Dir::repr(self : Dir) -> String {
-  self.repr_
-}
 
 ///|
 /// A regular expression. (placeholder; see foundations/str.rs)
@@ -430,18 +353,6 @@ pub(all) struct State {
 
 ///|
 pub fn State::repr(self : State) -> String {
-  self.repr_
-}
-
-///|
-/// A path rooted in a project or package. (placeholder; see
-/// foundations/path.rs)
-pub(all) struct RootedPath {
-  priv repr_ : String
-} derive(Eq, Hash)
-
-///|
-pub fn RootedPath::repr(self : RootedPath) -> String {
   self.repr_
 }
 

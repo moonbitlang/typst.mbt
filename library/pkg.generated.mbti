@@ -29,6 +29,22 @@ pub let align_elem_body : Int
 
 pub fn align_point_elem() -> Element
 
+pub let alignment_bottom : Alignment
+
+pub let alignment_center : Alignment
+
+pub let alignment_end : Alignment
+
+pub let alignment_horizon : Alignment
+
+pub let alignment_left : Alignment
+
+pub let alignment_right : Alignment
+
+pub let alignment_start : Alignment
+
+pub let alignment_top : Alignment
+
 pub fn and_(Value, Value) -> Value raise HintedError
 
 pub fn array_is_empty() -> String
@@ -131,7 +147,13 @@ pub let box_elem_stroke : Int
 
 pub let box_elem_width : Int
 
+pub fn bundle_format() -> Format
+
 pub fn bundle_format_elem() -> Element
+
+pub fn bytes_cast_b(Value) -> Bytes raise HintedError
+
+pub fn bytes_into_value_b(Bytes) -> Value
 
 pub fn cancel_elem() -> Element
 
@@ -232,6 +254,8 @@ pub fn contains(BindingGuard, Value, Value) -> Bool?
 pub fn context_elem() -> Element
 
 pub let context_elem_func : Int
+
+pub fn convert_float_to_int(Double) -> Int64 raise HintedError
 
 pub fn counter_display_elem() -> Element
 
@@ -415,7 +439,7 @@ pub let equation_elem_variant : Int
 
 pub fn exp10(Int) -> Double
 
-pub fn[T : FromValue + IntoValue] field_of(Ty[T], id~ : Int, name~ : String, docs? : String, kind~ : FieldKind, positional? : Bool, required? : Bool, variadic? : Bool, internal? : Bool, default? : () -> Value, fold? : (Value, Value) -> Value, parse? : (Engine, Args) -> Value? raise SourceError) -> FieldInfo
+pub fn[T : FromValue + IntoValue] field_of(Ty[T], id~ : Int, name~ : String, docs? : String, kind~ : FieldKind, positional? : Bool, required? : Bool, variadic? : Bool, internal? : Bool, default? : () -> Value, fold? : (Value, Value) -> Value, parse? : (Engine, Args, ParseLocals) -> Value? raise SourceError) -> FieldInfo
 
 pub fn fields_field(Value, String) -> Value raise HintedError
 
@@ -467,6 +491,10 @@ pub let figure_elem_supplement : Int
 
 pub fn flush_elem() -> Element
 
+pub fn[T : FromValue + IntoValue + Fold] fold_of(Ty[T]) -> (Value, Value) -> Value
+
+pub fn[T : Fold] fold_or(T?, T?) -> T?
+
 pub fn footnote_container_elem() -> Element
 
 pub fn footnote_elem() -> Element
@@ -497,6 +525,8 @@ pub fn format_float_with_unit(Double, String) -> String
 
 pub fn format_int_with_base(Int64, Int64) -> String
 
+pub fn format_module(Array[Format]) -> Module
+
 pub fn frac_elem() -> Element
 
 pub let frac_elem_denom : Int
@@ -514,6 +544,10 @@ pub fn frame_elem() -> Element
 pub let frame_elem_body : Int
 
 pub fn geq(Value, Value) -> Value raise HintedError
+
+pub fn get_accent_func(String) -> Func?
+
+pub fn get_lr_wrapper_func(String) -> Func?
 
 pub fn grid_cell_elem() -> Element
 
@@ -667,9 +701,13 @@ pub let html_elem_role : Int
 
 pub let html_elem_tag : Int
 
+pub fn html_format() -> Format
+
 pub fn html_format_elem() -> Element
 
 pub let html_format_elem_pretty : Int
+
+pub fn i64_from_str_radix(String, Int) -> Int64 raise IntErrorKind
 
 pub fn image_elem() -> Element
 
@@ -710,6 +748,8 @@ pub fn layout_elem() -> Element
 pub let layout_elem_func : Int
 
 pub fn leq(Value, Value) -> Value raise HintedError
+
+pub fn libm_erf(Double) -> Double
 
 pub fn limits_elem() -> Element
 
@@ -1337,6 +1377,12 @@ pub fn native_outline_entry_prefix() -> NativeFuncData
 
 pub fn native_panic() -> NativeFuncData
 
+pub fn native_pdf_format_data_cell() -> NativeFuncData
+
+pub fn native_pdf_format_header_cell() -> NativeFuncData
+
+pub fn native_pdf_format_table_summary() -> NativeFuncData
+
 pub fn native_plugin() -> NativeFuncData
 
 pub fn native_plugin_transition() -> NativeFuncData
@@ -1649,6 +1695,8 @@ pub let pdf_attach_elem_path : Int
 
 pub let pdf_attach_elem_relationship : Int
 
+pub fn pdf_format() -> Format
+
 pub fn pdf_format_elem() -> Element
 
 pub let pdf_format_elem_pages : Int
@@ -1680,6 +1728,8 @@ pub let place_elem_dy : Int
 pub let place_elem_float : Int
 
 pub let place_elem_scope : Int
+
+pub fn png_format() -> Format
 
 pub fn png_format_elem() -> Element
 
@@ -1799,6 +1849,8 @@ pub fn repr_float(Double) -> String
 
 pub fn repr_int(Int64) -> String
 
+pub fn repr_rooted_path(@syntax.RootedPath) -> String
+
 pub fn repr_str(String) -> String
 
 pub fn root_elem() -> Element
@@ -1817,6 +1869,8 @@ pub let rotate_elem_origin : Int
 
 pub let rotate_elem_reflow : Int
 
+pub fn round_int_with_precision(Int64, Int) -> Int64?
+
 pub fn round_with_precision(Double, Int) -> Double
 
 pub fn rust_debug_f64(Double) -> String
@@ -1826,6 +1880,8 @@ pub fn rust_display_f64(Double) -> String
 pub fn rust_fixed_f64(Double, Int) -> String
 
 pub fn rust_lines(String) -> Array[String]
+
+pub fn rust_parse_f64(String) -> Double?
 
 pub fn rust_rem(Double, Double) -> Double
 
@@ -1978,6 +2034,8 @@ pub let super_elem_body : Int
 pub let super_elem_size : Int
 
 pub let super_elem_typographic : Int
+
+pub fn svg_format() -> Format
 
 pub fn svg_format_elem() -> Element
 
@@ -2201,6 +2259,8 @@ pub fn[T] trace((@syntax.DiagSpan) -> (Int, Int)?, () -> Tracepoint, @syntax.Spa
 
 pub let typst_version : (Int, Int, Int)
 
+pub fn u64_from_str_radix(String, Int) -> UInt64 raise IntErrorKind
+
 pub fn underbrace_elem() -> Element
 
 pub let underbrace_elem_annotation : Int
@@ -2273,7 +2333,8 @@ pub(all) suberror FileError {
   IsDirectory
   NotSource
   InvalidUtf8
-  Package(String)
+  Realize(@syntax.RealizeError)
+  Package(PackageError)
   Other(String?)
 } derive(Eq, Hash, @debug.Debug)
 pub impl Show for FileError
@@ -2281,6 +2342,23 @@ pub impl Show for FileError
 pub(all) suberror HintedError {
   HintedError(HintedString)
 } derive(@debug.Debug)
+
+pub(all) suberror IntErrorKind {
+  Empty
+  InvalidDigit
+  PosOverflow
+  NegOverflow
+  Zero
+} derive(Eq, @debug.Debug)
+
+pub(all) suberror PackageError {
+  NotFound(@syntax.PackageSpec)
+  VersionNotFound(@syntax.PackageSpec, @syntax.PackageVersion)
+  NetworkFailed(String?)
+  MalformedArchive(String?)
+  Other(String?)
+} derive(Eq, Hash, @debug.Debug)
+pub impl Show for PackageError
 
 pub(all) suberror SourceError {
   SourceError(Array[SourceDiagnostic])
@@ -2319,6 +2397,8 @@ pub impl Add for Abs
 pub impl Mod for Abs
 pub impl Neg for Abs
 pub impl Sub for Abs
+pub impl Fold for Abs
+pub impl IntoValue for Abs
 pub impl Numeric for Abs
 
 pub(all) enum AbsUnit {
@@ -2328,12 +2408,31 @@ pub(all) enum AbsUnit {
   In
 } derive(Eq, Hash, @debug.Debug)
 
-pub(all) struct Alignment {
-  // private fields
-} derive(Eq, Hash)
+pub(all) struct Accent(Char) derive(Eq, Hash, @debug.Debug)
+pub fn Accent::combining(String) -> Self?
+pub fn Accent::normalize(String) -> Self?
+pub impl FromValue for Accent
+pub impl IntoValue for Accent
+pub impl Reflect for Accent
+
+pub(all) enum Alignment {
+  H(HAlignment)
+  V(VAlignment)
+  Both(HAlignment, VAlignment)
+} derive(Eq, Hash, @debug.Debug)
 pub fn Alignment::add(Self, Self) -> Self raise HintedError
 pub fn Alignment::field(Self, String) -> Value?
+pub fn Alignment::fix(Self, Dir) -> Axes[FixedAlignment]
+pub fn Alignment::from_side(Side) -> Self
+pub fn Alignment::inv(Self) -> Self
 pub fn Alignment::repr(Self) -> String
+pub fn Alignment::x(Self) -> HAlignment?
+pub fn Alignment::y(Self) -> VAlignment?
+pub impl Default for Alignment
+pub impl Fold for Alignment
+pub impl FromValue for Alignment
+pub impl IntoValue for Alignment
+pub impl Reflect for Alignment
 
 pub(all) struct Angle(Scalar) derive(Compare, Default, Eq, Hash)
 pub fn Angle::abs(Self) -> Self
@@ -2367,6 +2466,14 @@ pub impl FromValue for Angle
 pub impl IntoValue for Angle
 pub impl Numeric for Angle
 pub impl Reflect for Angle
+
+pub(all) enum AngleLike {
+  Int(Int64)
+  Float(Double)
+  Angle(Angle)
+}
+pub impl FromValue for AngleLike
+pub impl Reflect for AngleLike
 
 pub(all) enum AngleUnit {
   Rad
@@ -2418,6 +2525,13 @@ pub impl FromValue for Args
 pub impl IntoValue for Args
 pub impl Reflect for Args
 
+pub(all) enum ArgumentKey {
+  Index(Int64)
+  Name(String)
+}
+pub impl FromValue for ArgumentKey
+pub impl Reflect for ArgumentKey
+
 pub struct Arr {
   items : Array[Value]
   mut shared : Bool
@@ -2441,6 +2555,42 @@ pub fn Arr::repr(Self) -> String
 pub impl FromValue for Arr
 pub impl IntoValue for Arr
 pub impl Reflect for Arr
+
+pub(all) struct Axes[T] {
+  x : T
+  y : T
+} derive(Default, Eq, Hash, @debug.Debug)
+pub fn[T] Axes::all(Self[T], (T) -> Bool) -> Bool
+pub fn[T] Axes::any(Self[T], (T) -> Bool) -> Bool
+pub fn[T] Axes::get(Self[T], Axis) -> T
+pub fn[T, U] Axes::map(Self[T], (T) -> U) -> Self[U]
+pub fn[T] Axes::new(T, T) -> Self[T]
+pub fn[T] Axes::splat(T) -> Self[T]
+pub fn[T] Axes::unwrap_or_smart(Self[Smart[T]], Self[T]) -> Self[T]
+pub fn[T, U] Axes::zip(Self[T], Self[U]) -> Self[(T, U)]
+pub fn[T, V, U] Axes::zip_map(Self[T], Self[V], (T, V) -> U) -> Self[U]
+pub impl[T : FromValue] FromValue for Axes[T]
+pub impl[T : IntoValue] IntoValue for Axes[T]
+pub impl[T : Reflect] Reflect for Axes[T]
+
+pub(all) enum Axis {
+  X
+  Y
+} derive(Eq, Hash, @debug.Debug)
+pub fn Axis::dir(Self, Bool) -> Dir
+pub fn Axis::other(Self) -> Self
+pub impl FromValue for Axis
+pub impl IntoValue for Axis
+pub impl Reflect for Axis
+
+pub(all) enum Base {
+  Default
+  User(Int64)
+} derive(Eq, @debug.Debug)
+pub fn Base::value(Self) -> Int64
+pub impl FromValue for Base
+pub impl IntoValue for Base
+pub impl Reflect for Base
 
 pub struct Binding {
   mut value : Value
@@ -2480,8 +2630,17 @@ pub(all) struct BindingGuard {
 }
 pub fn BindingGuard::silent(Features) -> Self
 
+pub struct BundlePath(@syntax.VirtualPath) derive(Eq, Hash)
+pub fn BundlePath::into_inner(Self) -> @syntax.VirtualPath
+pub fn BundlePath::new(@syntax.VirtualPath) -> Self raise HintedError
+pub impl FromValue for BundlePath
+pub impl IntoValue for BundlePath
+pub impl Reflect for BundlePath
+
 pub(all) struct BytesValue(Bytes) derive(Eq, Hash)
+pub fn BytesValue::as_slice(Self) -> Bytes
 pub fn BytesValue::concat(Self, Self) -> Self
+pub fn BytesValue::new(Bytes) -> Self
 pub fn BytesValue::repr(Self) -> String
 
 pub(all) enum Capturer {
@@ -2574,6 +2733,7 @@ pub fn Content::repeat(Self, Int) -> Self
 pub fn Content::repr(Self) -> String
 pub fn Content::sequence(ArrayView[Self]) -> Self
 pub fn Content::sequence_recursive_for_each(Self, (Self) -> Unit) -> Unit
+pub fn Content::set(Self, Element, Int, Value) -> Self
 pub fn Content::span(Self) -> @syntax.Span
 pub fn Content::spanned(Self, @syntax.Span) -> Self
 pub fn Content::styled(Self, Style) -> Self
@@ -2597,6 +2757,37 @@ pub fn Context::location(Self) -> Location raise HintedError
 pub fn Context::new(location? : Location, styles? : StyleChain) -> Self
 pub fn Context::none() -> Self
 
+pub(all) enum Corner {
+  TopLeft
+  TopRight
+  BottomRight
+  BottomLeft
+} derive(Eq, Hash, @debug.Debug)
+pub fn Corner::inv(Self) -> Self
+pub fn Corner::next_ccw(Self) -> Self
+pub fn Corner::next_cw(Self) -> Self
+pub fn Corner::side_ccw(Self) -> Side
+pub fn Corner::side_cw(Self) -> Side
+
+pub(all) struct Corners[T] {
+  top_left : T
+  top_right : T
+  bottom_right : T
+  bottom_left : T
+} derive(Default, Eq, Hash, @debug.Debug)
+pub fn[T] Corners::get(Self[T], Corner) -> T
+pub fn[T : Eq] Corners::is_uniform(Self[T]) -> Bool
+pub fn[T] Corners::iter(Self[T]) -> Iter[T]
+pub fn[T, U] Corners::map(Self[T], (T) -> U) -> Self[U]
+pub fn[T] Corners::new(T, T, T, T) -> Self[T]
+pub fn[T] Corners::splat(T) -> Self[T]
+pub fn[T] Corners::unwrap_or(Self[T?], T) -> Self[T]
+pub fn[T, U] Corners::zip(Self[T], Self[U]) -> Self[(T, U)]
+pub impl[T : Fold] Fold for Corners[T?]
+pub impl[T : FromValue] FromValue for Corners[T?]
+pub impl[T : IntoValue + Eq] IntoValue for Corners[T?]
+pub impl[T : Reflect] Reflect for Corners[T?]
+
 pub(all) struct Counter {
   // private fields
 } derive(Eq, Hash)
@@ -2612,18 +2803,39 @@ pub fn Datetime::repr(Self) -> String
 pub fn Datetime::sub_datetime(Self, Self) -> Duration raise HintedError
 pub fn Datetime::sub_duration(Self, Duration) -> Self raise HintedError
 
+pub(all) enum DecNum {
+  Int(Int64)
+  Float(Double)
+  Decimal(Decimal)
+}
+pub impl FromValue for DecNum
+pub impl IntoValue for DecNum
+pub impl Reflect for DecNum
+
 pub(all) struct Decimal {
   // private fields
 } derive(Eq, Hash)
+pub fn Decimal::abs(Self) -> Self
+pub fn Decimal::ceil(Self) -> Self
 pub fn Decimal::checked_add(Self, Self) -> Self raise HintedError
 pub fn Decimal::checked_div(Self, Self) -> Self raise HintedError
+pub fn Decimal::checked_div_euclid(Self, Self) -> Self?
 pub fn Decimal::checked_mul(Self, Self) -> Self raise HintedError
+pub fn Decimal::checked_powi(Self, Int64) -> Self?
+pub fn Decimal::checked_rem(Self, Self) -> Self?
+pub fn Decimal::checked_rem_euclid(Self, Self) -> Self?
 pub fn Decimal::checked_sub(Self, Self) -> Self raise HintedError
+pub fn Decimal::floor(Self) -> Self
+pub fn Decimal::fract(Self) -> Self
 pub fn Decimal::from_int(Int64) -> Self
 pub fn Decimal::is_zero(Self) -> Bool
 pub fn Decimal::neg(Self) -> Self
 pub fn Decimal::repr(Self) -> String
+pub fn Decimal::round(Self, Int) -> Self?
+pub fn Decimal::to_f64(Self) -> Double?
+pub fn Decimal::to_i64(Self) -> Int64?
 pub fn Decimal::to_string(Self) -> String
+pub fn Decimal::trunc(Self) -> Self
 pub impl Compare for Decimal
 
 pub(all) struct Deprecation {
@@ -2641,6 +2853,7 @@ pub struct Dict {
 }
 pub fn Dict::contains(Self, String) -> Bool
 pub fn Dict::copy(Self) -> Self
+pub fn Dict::finish(Self, ArrayView[String]) -> Unit raise HintedError
 pub fn Dict::from_pairs(ArrayView[(String, Value)]) -> Self
 pub fn Dict::get(Self, String) -> Value raise HintedError
 pub fn Dict::insert(Self, String, Value) -> Unit
@@ -2653,14 +2866,26 @@ pub fn Dict::new() -> Self
 pub fn Dict::remove(Self, String, Value?) -> Value raise HintedError
 pub fn Dict::repr(Self) -> String
 pub fn Dict::take(Self, String) -> Value raise HintedError
+pub fn Dict::unexpected_keys(ArrayView[String], ArrayView[String]?) -> String
 pub impl FromValue for Dict
 pub impl IntoValue for Dict
 pub impl Reflect for Dict
 
-pub(all) struct Dir {
-  // private fields
-} derive(Eq, Hash)
+pub(all) enum Dir {
+  LTR
+  RTL
+  TTB
+  BTT
+} derive(Eq, Hash, @debug.Debug)
+pub fn Dir::axis(Self) -> Axis
+pub fn Dir::end(Self) -> Side
+pub fn Dir::inv(Self) -> Self
+pub fn Dir::is_positive(Self) -> Bool
 pub fn Dir::repr(Self) -> String
+pub fn Dir::start(Self) -> Side
+pub impl FromValue for Dir
+pub impl IntoValue for Dir
+pub impl Reflect for Dir
 
 pub(all) struct Duration {
   // private fields
@@ -2685,7 +2910,7 @@ pub(all) enum DynValue {
   State(State)
   Location(Location)
   Selector(Selector)
-  RootedPath(RootedPath)
+  RootedPath(@syntax.RootedPath)
 } derive(Eq)
 pub fn DynValue::add_dyn(Self, Self) -> Value? raise HintedError
 pub fn DynValue::field(Self, String) -> Value??
@@ -2758,12 +2983,22 @@ pub fn Em::new(Double) -> Self
 pub fn Em::one() -> Self
 pub fn Em::ratio_to(Self, Self) -> Double
 pub fn Em::repr(Self) -> String
+pub fn Em::resolve(Self, StyleChain) -> Abs
 pub fn Em::times(Self, Double) -> Self
 pub fn Em::zero() -> Self
 pub impl Add for Em
 pub impl Neg for Em
 pub impl Sub for Em
+pub impl IntoValue for Em
 pub impl Numeric for Em
+
+pub(all) enum Endianness {
+  Big
+  Little
+} derive(Eq, Hash, @debug.Debug)
+pub impl FromValue for Endianness
+pub impl IntoValue for Endianness
+pub impl Reflect for Endianness
 
 pub(all) struct Engine {
   world : &World
@@ -2806,7 +3041,7 @@ pub struct FieldInfo {
   cast : (Value) -> Value raise HintedError
   default : (() -> Value)?
   fold : ((Value, Value) -> Value)?
-  parse : ((Engine, Args) -> Value? raise SourceError)?
+  parse : ((Engine, Args, ParseLocals) -> Value? raise SourceError)?
 }
 
 pub(all) enum FieldKind {
@@ -2816,6 +3051,22 @@ pub(all) enum FieldKind {
   Ghost
   External
 } derive(Eq, @debug.Debug)
+
+pub(all) enum FixedAlignment {
+  Start
+  Center
+  End
+} derive(Compare, Eq, Hash, @debug.Debug)
+pub fn FixedAlignment::from_side(Side) -> Self
+pub fn FixedAlignment::inv(Self) -> Self
+pub fn FixedAlignment::position(Self, Abs) -> Abs
+
+pub(all) struct Format {
+  elem : Element
+  feature : Feature?
+}
+pub fn Format::new(Element) -> Self
+pub fn Format::with_feature(Self, Feature) -> Self
 
 pub(all) struct Fr(Scalar) derive(Compare, Default, Eq, Hash)
 pub fn Fr::abs(Self) -> Self
@@ -2874,6 +3125,23 @@ pub(all) struct Gradient {
 } derive(Eq, Hash)
 pub fn Gradient::repr(Self) -> String
 
+pub(all) enum HAlignment {
+  Start
+  Left
+  Center
+  Right
+  End
+} derive(Eq, Hash, @debug.Debug)
+pub fn HAlignment::fix(Self, Dir) -> FixedAlignment
+pub fn HAlignment::inv(Self) -> Self
+pub fn HAlignment::repr(Self) -> String
+pub fn HAlignment::try_from(Alignment) -> Self raise HintedError
+pub impl Default for HAlignment
+pub impl AlignmentComponent for HAlignment
+pub impl FromValue for HAlignment
+pub impl IntoValue for HAlignment
+pub impl Reflect for HAlignment
+
 pub(all) struct HintedString {
   message : String
   hints : Array[String]
@@ -2924,6 +3192,7 @@ pub fn Length::from_em(Em) -> Self
 pub fn Length::is_zero(Self) -> Bool
 pub fn Length::partial_cmp(Self, Self) -> Int?
 pub fn Length::repr(Self) -> String
+pub fn Length::resolve(Self, StyleChain) -> Abs
 pub fn Length::times(Self, Double) -> Self
 pub fn Length::try_abs(Self) -> Self?
 pub fn Length::try_div(Self, Self) -> Double?
@@ -2931,6 +3200,7 @@ pub fn Length::zero() -> Self
 pub impl Add for Length
 pub impl Neg for Length
 pub impl Sub for Length
+pub impl Fold for Length
 pub impl FromValue for Length
 pub impl IntoValue for Length
 pub impl Numeric for Length
@@ -2944,13 +3214,14 @@ pub(all) struct Library {
   std : Binding
   mut features : Features
 }
-pub fn Library::builder(Routines) -> LibraryBuilder
+pub fn Library::builder(Routines, Array[Format]) -> LibraryBuilder
 
 pub(all) struct LibraryBuilder {
   mut features : Features
   extra : Array[(Scope) -> Unit]
   routines : Routines
   mut inputs : Dict
+  formats : Array[Format]
 }
 pub fn LibraryBuilder::build(Self) -> Library
 pub fn LibraryBuilder::with_features(Self, Features) -> Self
@@ -2962,6 +3233,17 @@ pub fn LinkElem::from_url(String) -> Content raise HintedError
 
 pub(all) struct Location(UInt64) derive(Compare, Eq, Hash)
 pub fn Location::repr(Self) -> String
+
+pub(all) struct ModifierSet(String) derive(Eq, Hash, @debug.Debug)
+pub fn ModifierSet::as_str(Self) -> String
+pub fn[T] ModifierSet::best_match_in(Self, Iter[(Self, T)]) -> T?
+pub fn ModifierSet::contains(Self, String) -> Bool
+pub fn ModifierSet::default() -> Self
+pub fn ModifierSet::from_raw_dotted(String) -> Self
+pub fn ModifierSet::insert_raw(Self, String) -> Self
+pub fn ModifierSet::is_empty(Self) -> Bool
+pub fn ModifierSet::is_subset(Self, Self) -> Bool
+pub fn ModifierSet::iter(Self) -> Array[String]
 
 pub struct Module {
   // private fields
@@ -3030,6 +3312,14 @@ pub impl FromValue for NonZeroUSize
 pub impl IntoValue for NonZeroUSize
 pub impl Reflect for NonZeroUSize
 
+pub(all) enum Num {
+  Int(Int64)
+  Float(Double)
+}
+pub impl FromValue for Num
+pub impl IntoValue for Num
+pub impl Reflect for Num
+
 pub(all) enum NumericUnit {
   Pt
   Mm
@@ -3042,6 +3332,34 @@ pub(all) enum NumericUnit {
   Percent
 } derive(Eq, @debug.Debug)
 
+pub(all) enum OuterHAlignment {
+  Start
+  Left
+  Right
+  End
+} derive(Eq, Hash, @debug.Debug)
+pub fn OuterHAlignment::fix(Self, Dir) -> FixedAlignment
+pub fn OuterHAlignment::to_h(Self) -> HAlignment
+pub fn OuterHAlignment::try_from(Alignment) -> Self raise HintedError
+pub impl Default for OuterHAlignment
+pub impl AlignmentComponent for OuterHAlignment
+pub impl FromValue for OuterHAlignment
+pub impl IntoValue for OuterHAlignment
+pub impl Reflect for OuterHAlignment
+
+pub(all) enum OuterVAlignment {
+  Top
+  Bottom
+} derive(Compare, Eq, Hash, @debug.Debug)
+pub fn OuterVAlignment::fix(Self, Dir) -> FixedAlignment
+pub fn OuterVAlignment::to_v(Self) -> VAlignment
+pub fn OuterVAlignment::try_from(Alignment) -> Self raise HintedError
+pub impl Default for OuterVAlignment
+pub impl AlignmentComponent for OuterVAlignment
+pub impl FromValue for OuterVAlignment
+pub impl IntoValue for OuterVAlignment
+pub impl Reflect for OuterVAlignment
+
 pub(all) struct ParamInfo {
   name : String
   docs : String
@@ -3053,6 +3371,21 @@ pub(all) struct ParamInfo {
   required : Bool
   settable : Bool
 }
+
+pub(all) struct ParseLocals(Map[String, Value?])
+pub fn ParseLocals::get(Self, String) -> Value?
+pub fn ParseLocals::new() -> Self
+pub fn ParseLocals::set(Self, String, Value?) -> Unit
+
+pub(all) enum PathOrStr {
+  Path(@syntax.RootedPath)
+  Str(String)
+} derive(Eq, Hash)
+pub fn PathOrStr::resolve(Self, @syntax.FileId) -> @syntax.RootedPath raise HintedError
+pub fn PathOrStr::resolve_if_some(Self, @syntax.FileId?) -> @syntax.RootedPath raise HintedError
+pub impl FromValue for PathOrStr
+pub impl IntoValue for PathOrStr
+pub impl Reflect for PathOrStr
 
 pub struct Property {
   elem : Element
@@ -3137,15 +3470,11 @@ pub fn[T : Numeric] Rel::zero() -> Self[T]
 pub impl[T : Numeric] Add for Rel[T]
 pub impl[T : Numeric] Neg for Rel[T]
 pub impl[T : Numeric] Sub for Rel[T]
+pub impl Fold for Rel[Length]
 pub impl FromValue for Rel[Length]
 pub impl IntoValue for Rel[Length]
 pub impl[T : Numeric] Numeric for Rel[T]
 pub impl Reflect for Rel[Length]
-
-pub(all) struct RootedPath {
-  // private fields
-} derive(Eq, Hash)
-pub fn RootedPath::repr(Self) -> String
 
 pub struct Route {
   // private fields
@@ -3170,6 +3499,7 @@ pub(all) struct Routines {
 pub(all) struct Scalar(Double) derive(Default)
 pub fn Scalar::get(Self) -> Double
 pub fn Scalar::new(Double) -> Self
+pub fn Scalar::powi(Self, Int) -> Self
 pub impl Add for Scalar
 pub impl Compare for Scalar
 pub impl Div for Scalar
@@ -3193,6 +3523,7 @@ pub fn Scope::get(Self, String) -> Binding?
 pub fn Scope::iter(Self) -> Iter[(String, Binding)]
 pub fn Scope::length(Self) -> Int
 pub fn Scope::new() -> Self
+pub fn Scope::prelude_path(Self, Array[String]) -> Binding?
 pub fn Scope::reset_category(Self) -> Unit
 pub fn Scope::start_category(Self, Category) -> Unit
 
@@ -3238,6 +3569,42 @@ pub(all) struct ShowableSelector(Selector)
 pub impl FromValue for ShowableSelector
 pub impl Reflect for ShowableSelector
 
+pub(all) enum Side {
+  Left
+  Top
+  Right
+  Bottom
+} derive(Eq, Hash, @debug.Debug)
+pub fn Side::axis(Self) -> Axis
+pub fn Side::end_corner(Self) -> Corner
+pub fn Side::inv(Self) -> Self
+pub fn Side::next_ccw(Self) -> Self
+pub fn Side::next_cw(Self) -> Self
+pub fn Side::start_corner(Self) -> Corner
+pub impl FromValue for Side
+pub impl IntoValue for Side
+pub impl Reflect for Side
+
+pub(all) struct Sides[T] {
+  left : T
+  top : T
+  right : T
+  bottom : T
+} derive(Default, Eq, Hash, @debug.Debug)
+pub fn[T] Sides::get(Self[T], Side) -> T
+pub fn[T : Eq] Sides::is_uniform(Self[T]) -> Bool
+pub fn[T] Sides::iter(Self[T]) -> Iter[T]
+pub fn[T, U] Sides::map(Self[T], (T) -> U) -> Self[U]
+pub fn[T, U] Sides::map_corners(Self[T], (T, T) -> U) -> Corners[U]
+pub fn[T] Sides::new(T, T, T, T) -> Self[T]
+pub fn[T] Sides::splat(T) -> Self[T]
+pub fn[T] Sides::unwrap_or(Self[T?], T) -> Self[T]
+pub fn[T, U] Sides::zip(Self[T], Self[U]) -> Self[(T, U)]
+pub impl[T : Fold] Fold for Sides[T?]
+pub impl[T : FromValue] FromValue for Sides[T?]
+pub impl[T : IntoValue + Eq] IntoValue for Sides[T?]
+pub impl[T : Reflect] Reflect for Sides[T?]
+
 pub(all) struct Sink {
   delayed : Array[SourceDiagnostic]
   warnings : Array[SourceDiagnostic]
@@ -3249,6 +3616,41 @@ pub fn Sink::new() -> Self
 pub fn Sink::take_delayed(Self) -> Array[SourceDiagnostic]
 pub fn Sink::value(Self, Value, Styles?) -> Unit
 pub fn Sink::warn(Self, SourceDiagnostic) -> Unit
+
+pub(all) enum Sizing {
+  Auto
+  Rel(Rel[Length])
+  Fr(Fr)
+} derive(Eq, Hash)
+pub fn Sizing::is_auto(Self) -> Bool
+pub fn Sizing::is_fractional(Self) -> Bool
+pub impl Default for Sizing
+pub impl FromValue for Sizing
+pub impl IntoValue for Sizing
+pub impl Reflect for Sizing
+
+pub(all) enum Smart[T] {
+  Auto
+  Custom(T)
+} derive(Eq, Hash, @debug.Debug)
+pub fn[T, U] Smart::and_then(Self[T], (T) -> Self[U]) -> Self[U]
+pub fn[T] Smart::custom(Self[T]) -> T?
+pub fn[T] Smart::flatten(Self[Self[T]]) -> Self[T]
+pub fn[T] Smart::from_option(T?) -> Self[T]
+pub fn[T] Smart::is_auto(Self[T]) -> Bool
+pub fn[T] Smart::is_custom(Self[T]) -> Bool
+pub fn[T] Smart::is_custom_and(Self[T], (T) -> Bool) -> Bool
+pub fn[T, U] Smart::map(Self[T], (T) -> U) -> Self[U]
+pub fn[T, U] Smart::map_or(Self[T], U, (T) -> U) -> U
+pub fn[T] Smart::or_(Self[T], Self[T]) -> Self[T]
+pub fn[T] Smart::or_else(Self[T], () -> Self[T]) -> Self[T]
+pub fn[T] Smart::unwrap_or(Self[T], T) -> T
+pub fn[T] Smart::unwrap_or_else(Self[T], () -> T) -> T
+pub impl[T] Default for Smart[T]
+pub impl[T : Fold] Fold for Smart[T]
+pub impl[T : FromValue] FromValue for Smart[T]
+pub impl[T : IntoValue] IntoValue for Smart[T]
+pub impl[T : Reflect] Reflect for Smart[T]
 
 pub(all) struct SourceDiagnostic {
   severity : Severity
@@ -3271,6 +3673,26 @@ pub fn SourceDiagnostic::with_tracepoint(Self, Tracepoint, @syntax.Span) -> Self
 pub struct SpaceElem(Content)
 pub fn SpaceElem::shared() -> Content
 pub fn SpaceElem::shared_with_newline() -> Content
+
+pub(all) enum Spacing {
+  Rel(Rel[Length])
+  Fr(Fr)
+} derive(Eq, Hash)
+pub fn Spacing::is_fractional(Self) -> Bool
+pub fn Spacing::is_zero(Self) -> Bool
+pub impl FromValue for Spacing
+pub impl IntoValue for Spacing
+pub impl Reflect for Spacing
+
+pub(all) enum SpecificAlignment[H, V] {
+  H(H)
+  V(V)
+  Both(H, V)
+} derive(Eq, Hash, @debug.Debug)
+pub fn[H : AlignmentComponent, V : AlignmentComponent] SpecificAlignment::to_alignment(Self[H, V]) -> Alignment
+pub impl[H : AlignmentComponent, V : AlignmentComponent] FromValue for SpecificAlignment[H, V]
+pub impl[H : AlignmentComponent, V : AlignmentComponent] IntoValue for SpecificAlignment[H, V]
+pub impl[H : AlignmentComponent, V : AlignmentComponent] Reflect for SpecificAlignment[H, V]
 
 pub(all) struct SpotColorant {
   // private fields
@@ -3345,17 +3767,30 @@ pub impl FromValue for Styles
 pub impl IntoValue for Styles
 pub impl Reflect for Styles
 
-pub(all) struct Symbol {
+pub struct Symbol {
   // private fields
 } derive(Eq, Hash)
 pub fn Symbol::func(Self) -> Func raise HintedError
 pub fn Symbol::get(Self) -> String
+pub fn Symbol::list(Array[(ModifierSet, String, String?)]) -> Self
 pub fn Symbol::modified(Self, BindingGuard, String) -> Self raise HintedError
+pub fn Symbol::modifiers(Self) -> Array[String]
 pub fn Symbol::repr(Self) -> String
+pub fn Symbol::runtime(Array[(ModifierSet, String, String?)]) -> Self
 pub fn Symbol::runtime_char(Char) -> Self
+pub fn Symbol::single(String) -> Self
+pub fn Symbol::variants(Self) -> Array[(ModifierSet, String, String?)]
+pub impl Show for Symbol
+pub impl FromValue for Symbol
+pub impl IntoValue for Symbol
+pub impl Reflect for Symbol
 
 pub struct SymbolElem(Content)
 pub fn SymbolElem::packed(String) -> Content
+
+pub(all) struct SymbolVariant(String, String)
+pub impl FromValue for SymbolVariant
+pub impl Reflect for SymbolVariant
 
 pub struct TextElem(Content)
 pub fn TextElem::packed(String) -> Content
@@ -3364,6 +3799,29 @@ pub(all) struct Tiling {
   // private fields
 } derive(Eq, Hash)
 pub fn Tiling::repr(Self) -> String
+
+pub(all) struct ToAbs(Value)
+pub impl FromValue for ToAbs
+pub impl Reflect for ToAbs
+
+pub(all) struct ToArray(Arr)
+pub impl FromValue for ToArray
+pub impl Reflect for ToArray
+
+pub(all) struct ToDict(Module)
+pub impl FromValue for ToDict
+pub impl Reflect for ToDict
+
+pub(all) struct ToFloat(Double)
+pub impl FromValue for ToFloat
+pub impl Reflect for ToFloat
+
+pub(all) enum ToInt {
+  Int(Int64)
+  Str(String)
+}
+pub impl FromValue for ToInt
+pub impl Reflect for ToInt
 
 pub(all) struct Traced(@syntax.Span?)
 pub fn Traced::get(Self, @syntax.FileId) -> @syntax.Span?
@@ -3475,6 +3933,22 @@ pub impl FromValue for USize
 pub impl IntoValue for USize
 pub impl Reflect for USize
 
+pub(all) enum VAlignment {
+  Top
+  Horizon
+  Bottom
+} derive(Compare, Eq, Hash, @debug.Debug)
+pub fn VAlignment::fix(Self, Dir) -> FixedAlignment
+pub fn VAlignment::inv(Self) -> Self
+pub fn VAlignment::position(Self, Abs) -> Abs
+pub fn VAlignment::repr(Self) -> String
+pub fn VAlignment::try_from(Alignment) -> Self raise HintedError
+pub impl Default for VAlignment
+pub impl AlignmentComponent for VAlignment
+pub impl FromValue for VAlignment
+pub impl IntoValue for VAlignment
+pub impl Reflect for VAlignment
+
 pub(all) enum Value {
   None
   Auto
@@ -3525,6 +3999,7 @@ pub(all) struct Version(Array[Int]) derive(Eq, Hash)
 pub fn Version::component(Self, String) -> Int64 raise HintedError
 pub fn Version::repr(Self) -> String
 pub fn Version::to_string(Self) -> String
+pub fn Version::values(Self) -> Array[Int]
 pub impl Compare for Version
 
 pub(all) struct Warned[T] {
@@ -3535,7 +4010,22 @@ pub(all) struct Warned[T] {
 // Type aliases
 pub type NativeFn = (Engine, Context, Args) -> Value raise SourceError
 
+pub using @syntax {type RootedPath}
+
+pub type SymbolVariantData = (ModifierSet, String, String?)
+
 // Traits
+pub(open) trait AlignmentComponent : Reflect {
+  fn try_from_alignment(Alignment) -> Self raise HintedError
+  fn to_alignment(Self) -> Alignment
+}
+
+pub(open) trait Fold {
+  fn fold(Self, Self) -> Self
+}
+pub impl Fold for Bool
+pub impl[T : Fold] Fold for T?
+
 pub(open) trait FromValue : Reflect {
   fn from_value(Value) -> Self raise HintedError
 }
@@ -3545,6 +4035,8 @@ pub impl FromValue for Double
 pub impl FromValue for String
 pub impl[T : FromValue] FromValue for T?
 pub impl[T : FromValue] FromValue for Array[T]
+pub impl FromValue for @syntax.RootedPath
+pub impl FromValue for @syntax.SyntaxMode
 
 pub(open) trait IntoValue {
   fn into_value(Self) -> Value
@@ -3555,6 +4047,8 @@ pub impl IntoValue for Double
 pub impl IntoValue for String
 pub impl[T : IntoValue] IntoValue for T?
 pub impl[T : IntoValue] IntoValue for Array[T]
+pub impl IntoValue for @syntax.RootedPath
+pub impl IntoValue for @syntax.SyntaxMode
 
 pub(open) trait Numeric : Add + Sub + Neg + Eq {
   fn zero() -> Self
@@ -3574,6 +4068,8 @@ pub impl Reflect for Double
 pub impl Reflect for String
 pub impl[T : Reflect] Reflect for T?
 pub impl[T : Reflect] Reflect for Array[T]
+pub impl Reflect for @syntax.RootedPath
+pub impl Reflect for @syntax.SyntaxMode
 
 pub(open) trait World {
   fn library(Self) -> Library
@@ -3581,6 +4077,4 @@ pub(open) trait World {
   fn source(Self, @syntax.FileId) -> @syntax.Source raise FileError
   fn file(Self, @syntax.FileId) -> Bytes raise FileError
   fn today(Self, Int64?) -> Datetime?
-  fn resolve_path(Self, @syntax.FileId?, String) -> @syntax.FileId raise HintedError
-  fn file_stem(Self, @syntax.FileId) -> String
 }

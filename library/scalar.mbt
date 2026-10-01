@@ -15,6 +15,31 @@ pub fn Scalar::get(self : Scalar) -> Double {
 }
 
 ///|
+/// Raises a number to an integer power.
+pub fn Scalar::powi(self : Scalar, b : Int) -> Scalar {
+  // Ported from https://github.com/llvm/llvm-project/blob/0ee439b/compiler-rt/lib/builtins/powidf2.c
+  // Copyright: The LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+  let mut a = self.get()
+  let mut b = b
+  let recip = b < 0
+  let mut r = 1.0
+  while true {
+    if (b & 1) != 0 {
+      r *= a
+    }
+    b /= 2
+    if b == 0 {
+      break
+    }
+    a *= a
+  }
+  if recip {
+    r = 1.0 / r
+  }
+  Scalar::new(r)
+}
+
+///|
 pub impl Eq for Scalar with fn equal(self, other) {
   self.0 == other.0
 }

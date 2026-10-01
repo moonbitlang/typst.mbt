@@ -40,12 +40,49 @@ TYPEMAP = {
     "Dict": "Dict",
     "Args": "Args",
     "Type": "Type",
+    "Alignment": "Alignment",
+    "HAlignment": "HAlignment",
+    "VAlignment": "VAlignment",
+    "OuterHAlignment": "OuterHAlignment",
+    "OuterVAlignment": "OuterVAlignment",
+    "Dir": "Dir",
+    "Side": "Side",
+    "Axis": "Axis",
+    "Spacing": "Spacing",
+    "Sizing": "Sizing",
+    "SyntaxMode": "@syntax.SyntaxMode",
+    "Symbol": "Symbol",
+    "SymbolVariant": "SymbolVariant",
+    "Accent": "Accent",
+    "RootedPath": "RootedPath",
+    "PathOrStr": "PathOrStr",
+    "BundlePath": "BundlePath",
+    # foundations/array.rs, dict.rs, args.rs
+    "ToArray": "ToArray",
+    "ToDict": "ToDict",
+    "ArgumentKey": "ArgumentKey",
+    # foundations/calc.rs
+    "ToAbs": "ToAbs",
+    "Num": "Num",
+    "DecNum": "DecNum",
+    "AngleLike": "AngleLike",
+    # foundations/int.rs, float.rs, str.rs (`Base`)
+    "ToInt": "ToInt",
+    "ToFloat": "ToFloat",
+    "Base": "Base",
+    "Endianness": "Endianness",
 }
 
 # Generic Rust types with a MoonBit port: Rust name -> MoonBit name. A use
 # `X<A, B>` maps to `X[A', B']` if every argument maps to a ported type
 # (or is literally `Value`).
 GENERICS = {
+    "Smart": "Smart",
+    "Axes": "Axes",
+    # Only `Sides<Option<T>>` / `Corners<Option<T>>` are castable upstream.
+    "Sides": "Sides",
+    "Corners": "Corners",
+    "SpecificAlignment": "SpecificAlignment",
 }
 
 

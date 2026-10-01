@@ -141,7 +141,7 @@ pub fn ModuleImport::bare_name(
     Str(string) => {
       let string = string.get()
       let name = if string.has_prefix("@") {
-        match @package.PackageSpec::from_str(string) {
+        match @syntax.PackageSpec::from_str(string) {
           Ok(spec) => spec.name
           Err(_) => return Err(PackageInvalid)
         }
