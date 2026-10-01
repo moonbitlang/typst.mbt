@@ -15018,7 +15018,7 @@ pub fn native_outline_entry_indented() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[OutlineEntry])),
             default: None,
             positional: true,
             named: false,
@@ -15081,7 +15081,7 @@ fn native_outline_entry_indented_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : OutlineEntry = args.expect("self")
   let prefix_ : Content? = args.expect("prefix")
   let inner_ : Content = args.expect("inner")
   let gap_ : Length = match args.named("gap") {
@@ -15120,7 +15120,7 @@ pub fn native_outline_entry_prefix() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[OutlineEntry])),
             default: None,
             positional: true,
             named: false,
@@ -15146,7 +15146,7 @@ fn native_outline_entry_prefix_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : OutlineEntry = args.expect("self")
   args.take().finish()
   let output = impl_outline_entry_prefix(self_, engine, context, args.span)
   IntoValue::into_value(output)
@@ -15171,7 +15171,7 @@ pub fn native_outline_entry_inner() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[OutlineEntry])),
             default: None,
             positional: true,
             named: false,
@@ -15197,7 +15197,7 @@ fn native_outline_entry_inner_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : OutlineEntry = args.expect("self")
   args.take().finish()
   let output = impl_outline_entry_inner(self_, engine, context, args.span)
   IntoValue::into_value(output)
@@ -15222,7 +15222,7 @@ pub fn native_outline_entry_body() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[OutlineEntry])),
             default: None,
             positional: true,
             named: false,
@@ -15248,7 +15248,7 @@ fn native_outline_entry_body_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : OutlineEntry = args.expect("self")
   args.take().finish()
   let output = at(args.span, () => impl_outline_entry_body(self_))
   IntoValue::into_value(output)
@@ -15273,7 +15273,7 @@ pub fn native_outline_entry_page() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[OutlineEntry])),
             default: None,
             positional: true,
             named: false,
@@ -15299,7 +15299,7 @@ fn native_outline_entry_page_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : OutlineEntry = args.expect("self")
   args.take().finish()
   let output = impl_outline_entry_page(self_, engine, context, args.span)
   IntoValue::into_value(output)

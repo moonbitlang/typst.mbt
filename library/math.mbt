@@ -67,3 +67,88 @@ fn math_upright(body : Content) -> Content {
     Property(Property::new(equation_elem(), equation_elem_italic, Bool(false))),
   )
 }
+
+// The `MathClass` cast (upstream `foundations/cast.rs`), used by
+// `ClassElem::class`.
+
+///|
+fn math_class_name(class : @unicode.MathClass) -> String {
+  match class {
+    Normal => "normal"
+    Alphabetic => "alphabetic"
+    Binary => "binary"
+    Closing => "closing"
+    Diacritic => "diacritic"
+    Fence => "fence"
+    GlyphPart => "glyph-part"
+    Large => "large"
+    Opening => "opening"
+    Punctuation => "punctuation"
+    Relation => "relation"
+    Space => "space"
+    Unary => "unary"
+    Vary => "vary"
+    Special => "special"
+  }
+}
+
+///|
+/// The castable math classes, in upstream's order.
+let math_class_casts : Array[(String, @unicode.MathClass, String)] = [
+  ("normal", Normal, "The default class for non-special things."),
+  ("punctuation", Punctuation, "Punctuation, e.g. a comma."),
+  ("opening", Opening, "An opening delimiter, e.g. `(`."),
+  ("closing", Closing, "A closing delimiter, e.g. `)`."),
+  ("fence", Fence, "A delimiter that is the same on both sides, e.g. `|`."),
+  ("large", Large, "A large operator like `sum`."),
+  ("relation", Relation, "A relation like `=` or `prec`."),
+  ("unary", Unary, "A unary operator like `not`."),
+  ("binary", Binary, "A binary operator like `times`."),
+  ("vary", Vary, "An operator that can be both unary or binary like `+`."),
+  ("diacritic", Diacritic, "An accent character."),
+]
+
+///|
+pub impl Reflect for @unicode.MathClass with fn input() {
+  let mut info : CastInfo? = None
+  for entry in math_class_casts {
+    let next = CastInfo::Value(Str(entry.0), entry.2)
+    info = Some(
+      match info {
+        None => next
+        Some(info) => info.union_with(next)
+      },
+    )
+  }
+  info.unwrap()
+}
+
+///|
+pub impl Reflect for @unicode.MathClass with fn output() {
+  input_of((Ty::new() : Ty[@unicode.MathClass]))
+}
+
+///|
+pub impl Reflect for @unicode.MathClass with fn castable(v) {
+  match v {
+    Str(s) => math_class_casts.iter().any(entry => entry.0 == s)
+    _ => false
+  }
+}
+
+///|
+pub impl IntoValue for @unicode.MathClass with fn into_value(self) {
+  Str(math_class_name(self))
+}
+
+///|
+pub impl FromValue for @unicode.MathClass with fn from_value(v) {
+  if v is Str(s) {
+    for entry in math_class_casts {
+      if entry.0 == s {
+        return entry.1
+      }
+    }
+  }
+  raise HintedError(input_of((Ty::new() : Ty[@unicode.MathClass])).error(v))
+}

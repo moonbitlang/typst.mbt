@@ -12,6 +12,45 @@ fn html_format_elem_init(e : Element) -> Unit {
 }
 
 ///|
+/// Document settings for HTML export (upstream
+/// `HtmlFormatOptions<Complete>`).
+pub(all) struct HtmlFormatOptions {
+  pretty : SpannedValue[Bool]
+} derive(Eq)
+
+///|
+/// The HTML format options configured by a document (upstream
+/// `options.get::<HtmlFormat>()`).
+pub fn HtmlFormatOptions::get(
+  options : DocumentFormatOptions,
+) -> HtmlFormatOptions {
+  let o = options.get(html_format_elem())
+  let pretty = o.get(html_format_elem_pretty)
+  { pretty: { v: pretty.v is Bool(true), span: pretty.span, }, }
+}
+
+///|
+/// Partially specified document settings for HTML export (upstream
+/// `HtmlFormatOptions<Partial>`).
+pub(all) struct PartialHtmlFormatOptions {
+  pretty : Bool?
+} derive(Eq, Default)
+
+///|
+/// Resolves the partial options to complete ones, given defaults.
+pub fn PartialHtmlFormatOptions::resolve(
+  self : PartialHtmlFormatOptions,
+  default : HtmlFormatOptions,
+) -> HtmlFormatOptions {
+  {
+    pretty: match self.pretty {
+      Some(v) => SpannedValue::detached(v)
+      None => default.pretty
+    },
+  }
+}
+
+///|
 /// `HtmlAttrs::default()`.
 fn html_elem_attrs_default() -> Value {
   HtmlAttrs::new().into_value()

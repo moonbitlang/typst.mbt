@@ -144,6 +144,12 @@ fn main() {
     emit_set(&mut out, "control_table", "Rust `char::is_control`.", &ranges(char::is_control));
     emit_set(
         &mut out,
+        "default_ignorable_table",
+        "Default_Ignorable_Code_Point (typst_library::text::is_default_ignorable).",
+        &ranges(typst_library::text::is_default_ignorable),
+    );
+    emit_set(
+        &mut out,
         "debug_escape_table",
         "Characters escaped by Rust's `Debug for str` when not at the start.",
         &ranges(|c| debug_escapes(c, "a")),

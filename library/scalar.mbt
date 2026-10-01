@@ -111,3 +111,36 @@ pub(open) trait Numeric: Add + Sub + Neg + Eq {
 pub fn[T : Numeric] is_zero(x : T) -> Bool {
   x == T::zero()
 }
+
+// The `Scalar` cast (upstream `foundations/float.rs`).
+
+///|
+pub impl Reflect for Scalar with fn input() {
+  input_of((Ty::new() : Ty[Double]))
+}
+
+///|
+pub impl Reflect for Scalar with fn output() {
+  output_of((Ty::new() : Ty[Double]))
+}
+
+///|
+pub impl Reflect for Scalar with fn castable(v) {
+  castable_of((Ty::new() : Ty[Double]), v)
+}
+
+///|
+pub impl IntoValue for Scalar with fn into_value(self) {
+  Float(self.get())
+}
+
+///|
+pub impl FromValue for Scalar with fn from_value(v) {
+  Scalar::new(FromValue::from_value(v))
+}
+
+///|
+/// The default of `PngFormat::ppi` (`typst-render/src/format.rs`).
+fn png_format_elem_ppi_default() -> Value {
+  Scalar::new(144.0).into_value()
+}
