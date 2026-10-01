@@ -323,10 +323,29 @@ pub fn math_module() -> Module {
 ///|
 /// Defines scoped items in the global scope (upstream `prelude`).
 fn prelude_define(global : Scope) -> Unit {
-  // TODO(colors): black, gray, silver, white, navy, blue, aqua, teal,
-  // eastern, purple, fuchsia, maroon, red, orange, yellow, olive, green,
-  // lime (`Color::BLACK`, ...), and luma, oklab, oklch, rgb, cmyk
-  // (`Color::luma_data()`, ...).
+  global.define("black", Color(color_black)) |> ignore
+  global.define("gray", Color(color_gray)) |> ignore
+  global.define("silver", Color(color_silver)) |> ignore
+  global.define("white", Color(color_white)) |> ignore
+  global.define("navy", Color(color_navy)) |> ignore
+  global.define("blue", Color(color_blue)) |> ignore
+  global.define("aqua", Color(color_aqua)) |> ignore
+  global.define("teal", Color(color_teal)) |> ignore
+  global.define("eastern", Color(color_eastern)) |> ignore
+  global.define("purple", Color(color_purple)) |> ignore
+  global.define("fuchsia", Color(color_fuchsia)) |> ignore
+  global.define("maroon", Color(color_maroon)) |> ignore
+  global.define("red", Color(color_red)) |> ignore
+  global.define("orange", Color(color_orange)) |> ignore
+  global.define("yellow", Color(color_yellow)) |> ignore
+  global.define("olive", Color(color_olive)) |> ignore
+  global.define("green", Color(color_green)) |> ignore
+  global.define("lime", Color(color_lime)) |> ignore
+  global.define_func(native_color_luma()) |> ignore
+  global.define_func(native_color_oklab()) |> ignore
+  global.define_func(native_color_oklch()) |> ignore
+  global.define_func(native_color_rgb()) |> ignore
+  global.define_func(native_color_cmyk()) |> ignore
   global.define_func(native_array_range()) |> ignore
   // Directions and alignments.
   prelude_layout(global)

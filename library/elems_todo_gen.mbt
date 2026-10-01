@@ -25,45 +25,9 @@ fn box_elem_baseline_default() -> Value {
 }
 
 ///|
-/// TODO: port `Default::default() of Option<Paint>` (BoxElem.fill).
-fn box_elem_fill_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Sides<Option<Option<Stroke>>>` (BoxElem.stroke).
-fn box_elem_stroke_default() -> Value {
-  None
-}
-
-///|
-/// TODO: fold for `Sides<Option<Option<Stroke>>>` (BoxElem.stroke).
-fn box_elem_stroke_fold(inner : Value, _outer : Value) -> Value {
-  inner
-}
-
-///|
 /// TODO: port `Default::default() of Sizing` (BlockElem.height).
 fn block_elem_height_default() -> Value {
   None
-}
-
-///|
-/// TODO: port `Default::default() of Option<Paint>` (BlockElem.fill).
-fn block_elem_fill_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Sides<Option<Option<Stroke>>>` (BlockElem.stroke).
-fn block_elem_stroke_default() -> Value {
-  None
-}
-
-///|
-/// TODO: fold for `Sides<Option<Option<Stroke>>>` (BlockElem.stroke).
-fn block_elem_stroke_fold(inner : Value, _outer : Value) -> Value {
-  inner
 }
 
 ///|
@@ -145,39 +109,9 @@ fn grid_h_line_elem_stroke_default() -> Value {
 }
 
 ///|
-/// TODO: fold for `Option<Arc<Stroke>>` (GridHLine.stroke).
-fn grid_h_line_elem_stroke_fold(inner : Value, _outer : Value) -> Value {
-  inner
-}
-
-///|
 /// TODO: port `Some(Arc::new(Stroke::default()))` (GridVLine.stroke).
 fn grid_v_line_elem_stroke_default() -> Value {
   None
-}
-
-///|
-/// TODO: fold for `Option<Arc<Stroke>>` (GridVLine.stroke).
-fn grid_v_line_elem_stroke_fold(inner : Value, _outer : Value) -> Value {
-  inner
-}
-
-///|
-/// TODO: port `Default::default() of Smart<Option<Paint>>` (GridCell.fill).
-fn grid_cell_elem_fill_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Sides<Option<Option<Arc<Stroke>>>>` (GridCell.stroke).
-fn grid_cell_elem_stroke_default() -> Value {
-  None
-}
-
-///|
-/// TODO: fold for `Sides<Option<Option<Arc<Stroke>>>>` (GridCell.stroke).
-fn grid_cell_elem_stroke_fold(inner : Value, _outer : Value) -> Value {
-  inner
 }
 
 ///|
@@ -223,12 +157,6 @@ fn page_elem_bleed_default() -> Value {
 ///|
 /// TODO: port `Default::default() of Smart<Binding>` (PageElem.binding).
 fn page_elem_binding_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Smart<Option<Paint>>` (PageElem.fill).
-fn page_elem_fill_default() -> Value {
   None
 }
 
@@ -284,12 +212,6 @@ fn cancel_elem_angle_default() -> Value {
 /// TODO: port `Stroke { thickness : Smart::Custom(Em::new(0.05).into()), .. Default::default() }` (CancelElem.stroke).
 fn cancel_elem_stroke_default() -> Value {
   None
-}
-
-///|
-/// TODO: fold for `Stroke` (CancelElem.stroke).
-fn cancel_elem_stroke_fold(inner : Value, _outer : Value) -> Value {
-  inner
 }
 
 ///|
@@ -719,39 +641,9 @@ fn table_h_line_elem_stroke_default() -> Value {
 }
 
 ///|
-/// TODO: fold for `Option<Arc<Stroke>>` (TableHLine.stroke).
-fn table_h_line_elem_stroke_fold(inner : Value, _outer : Value) -> Value {
-  inner
-}
-
-///|
 /// TODO: port `Some(Arc::new(Stroke::default()))` (TableVLine.stroke).
 fn table_v_line_elem_stroke_default() -> Value {
   None
-}
-
-///|
-/// TODO: fold for `Option<Arc<Stroke>>` (TableVLine.stroke).
-fn table_v_line_elem_stroke_fold(inner : Value, _outer : Value) -> Value {
-  inner
-}
-
-///|
-/// TODO: port `Default::default() of Smart<Option<Paint>>` (TableCell.fill).
-fn table_cell_elem_fill_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Sides<Option<Option<Arc<Stroke>>>>` (TableCell.stroke).
-fn table_cell_elem_stroke_default() -> Value {
-  None
-}
-
-///|
-/// TODO: fold for `Sides<Option<Option<Arc<Stroke>>>>` (TableCell.stroke).
-fn table_cell_elem_stroke_fold(inner : Value, _outer : Value) -> Value {
-  inner
 }
 
 ///|
@@ -767,57 +659,9 @@ fn terms_elem_separator_default() -> Value {
 }
 
 ///|
-/// TODO: port `Default::default() of Smart<Stroke>` (UnderlineElem.stroke).
-fn underline_elem_stroke_default() -> Value {
-  None
-}
-
-///|
-/// TODO: fold for `Smart<Stroke>` (UnderlineElem.stroke).
-fn underline_elem_stroke_fold(inner : Value, _outer : Value) -> Value {
-  inner
-}
-
-///|
-/// TODO: port `Default::default() of Smart<Stroke>` (OverlineElem.stroke).
-fn overline_elem_stroke_default() -> Value {
-  None
-}
-
-///|
-/// TODO: fold for `Smart<Stroke>` (OverlineElem.stroke).
-fn overline_elem_stroke_fold(inner : Value, _outer : Value) -> Value {
-  inner
-}
-
-///|
-/// TODO: port `Default::default() of Smart<Stroke>` (StrikeElem.stroke).
-fn strike_elem_stroke_default() -> Value {
-  None
-}
-
-///|
-/// TODO: fold for `Smart<Stroke>` (StrikeElem.stroke).
-fn strike_elem_stroke_fold(inner : Value, _outer : Value) -> Value {
-  inner
-}
-
-///|
 /// TODO: port `Some(Color::from_u8(0xFF, 0xFD, 0x11, 0xA1).into())` (HighlightElem.fill).
 fn highlight_elem_fill_default() -> Value {
   None
-}
-
-///|
-/// TODO: port `Default::default() of Sides<Option<Option<Stroke>>>` (HighlightElem.stroke).
-fn highlight_elem_stroke_default() -> Value {
-  None
-}
-
-///|
-/// TODO: fold for `Sides<Option<Option<Stroke>>>` (HighlightElem.stroke).
-fn highlight_elem_stroke_fold(inner : Value, _outer : Value) -> Value {
-  inner
 }
 
 ///|
@@ -873,12 +717,6 @@ fn text_elem_size_fold(inner : Value, _outer : Value) -> Value {
 ///|
 /// TODO: port `Color::BLACK.into()` (TextElem.fill).
 fn text_elem_fill_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Option<Stroke>` (TextElem.stroke).
-fn text_elem_stroke_default() -> Value {
   None
 }
 
@@ -1078,36 +916,6 @@ fn smart_quote_elem_quotes_default() -> Value {
   None
 }
 
-///|
-/// TODO: port `Default::default() of Option<Paint>` (CurveElem.fill).
-fn curve_elem_fill_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `` (CurveElem.fill_rule).
-fn curve_elem_fill_rule_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Smart<Option<Stroke>>` (CurveElem.stroke).
-fn curve_elem_stroke_default() -> Value {
-  None
-}
-
-///|
-/// TODO: fold for `Smart<Option<Stroke>>` (CurveElem.stroke).
-fn curve_elem_stroke_fold(inner : Value, _outer : Value) -> Value {
-  inner
-}
-
-///|
-/// TODO: port `Default::default() of CloseMode` (CurveClose.mode).
-fn curve_close_elem_mode_default() -> Value {
-  None
-}
-
 // TODO: port `#[parse]` of ImageElem.source as `image_elem_source_parse`.
 
 ///|
@@ -1143,63 +951,9 @@ fn image_elem_icc_default() -> Value {
 // TODO: port `#[parse]` of ImageElem.icc as `image_elem_icc_parse`.
 
 ///|
-/// TODO: port `Default::default() of Stroke` (LineElem.stroke).
-fn line_elem_stroke_default() -> Value {
-  None
-}
-
-///|
-/// TODO: fold for `Stroke` (LineElem.stroke).
-fn line_elem_stroke_fold(inner : Value, _outer : Value) -> Value {
-  inner
-}
-
-///|
-/// TODO: port `Default::default() of Option<Paint>` (PolygonElem.fill).
-fn polygon_elem_fill_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `` (PolygonElem.fill_rule).
-fn polygon_elem_fill_rule_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Smart<Option<Stroke>>` (PolygonElem.stroke).
-fn polygon_elem_stroke_default() -> Value {
-  None
-}
-
-///|
-/// TODO: fold for `Smart<Option<Stroke>>` (PolygonElem.stroke).
-fn polygon_elem_stroke_fold(inner : Value, _outer : Value) -> Value {
-  inner
-}
-
-///|
 /// TODO: port `Default::default() of Sizing` (RectElem.height).
 fn rect_elem_height_default() -> Value {
   None
-}
-
-///|
-/// TODO: port `Default::default() of Option<Paint>` (RectElem.fill).
-fn rect_elem_fill_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Smart<Sides<Option<Option<Stroke>>>>` (RectElem.stroke).
-fn rect_elem_stroke_default() -> Value {
-  None
-}
-
-///|
-/// TODO: fold for `Smart<Sides<Option<Option<Stroke>>>>` (RectElem.stroke).
-fn rect_elem_stroke_fold(inner : Value, _outer : Value) -> Value {
-  inner
 }
 
 ///|
@@ -1208,32 +962,10 @@ fn rect_elem_inset_default() -> Value {
   None
 }
 
-// TODO: port `#[parse]` of SquareElem.width as `square_elem_width_parse`.
-
 ///|
 /// TODO: port `Default::default() of Sizing` (SquareElem.height).
 fn square_elem_height_default() -> Value {
   None
-}
-
-// TODO: port `#[parse]` of SquareElem.height as `square_elem_height_parse`.
-
-///|
-/// TODO: port `Default::default() of Option<Paint>` (SquareElem.fill).
-fn square_elem_fill_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Smart<Sides<Option<Option<Stroke>>>>` (SquareElem.stroke).
-fn square_elem_stroke_default() -> Value {
-  None
-}
-
-///|
-/// TODO: fold for `Smart<Sides<Option<Option<Stroke>>>>` (SquareElem.stroke).
-fn square_elem_stroke_fold(inner : Value, _outer : Value) -> Value {
-  inner
 }
 
 ///|
@@ -1249,49 +981,15 @@ fn ellipse_elem_height_default() -> Value {
 }
 
 ///|
-/// TODO: port `Default::default() of Option<Paint>` (EllipseElem.fill).
-fn ellipse_elem_fill_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Smart<Option<Stroke>>` (EllipseElem.stroke).
-fn ellipse_elem_stroke_default() -> Value {
-  None
-}
-
-///|
-/// TODO: fold for `Smart<Option<Stroke>>` (EllipseElem.stroke).
-fn ellipse_elem_stroke_fold(inner : Value, _outer : Value) -> Value {
-  inner
-}
-
-///|
 /// TODO: port `Sides::splat(Some(Abs::pt(5.0).into()))` (EllipseElem.inset).
 fn ellipse_elem_inset_default() -> Value {
   None
 }
 
-// TODO: port `#[parse]` of CircleElem.width as `circle_elem_width_parse`.
-
 ///|
 /// TODO: port `Default::default() of Sizing` (CircleElem.height).
 fn circle_elem_height_default() -> Value {
   None
-}
-
-// TODO: port `#[parse]` of CircleElem.height as `circle_elem_height_parse`.
-
-///|
-/// TODO: port `Default::default() of Option<Paint>` (CircleElem.fill).
-fn circle_elem_fill_default() -> Value {
-  None
-}
-
-///|
-/// TODO: fold for `Smart<Option<Stroke>>` (CircleElem.stroke).
-fn circle_elem_stroke_fold(inner : Value, _outer : Value) -> Value {
-  inner
 }
 
 ///|

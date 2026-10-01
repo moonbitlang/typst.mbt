@@ -45,6 +45,9 @@ TYPE_DEFAULTS = {
     "Fr": "Fraction(Fr::zero())",
     "Rel[Length]": "Relative(Rel::zero())",
     "String": 'Str("")',
+    "Stroke": "Dyn(Stroke(Stroke::default()))",
+    "FillRule": 'Str("non-zero")',
+    "CloseMode": 'Str("smooth")',
 }
 
 
@@ -175,7 +178,7 @@ def translate_alignment(e):
 
 
 # MoonBit types with a `Fold` impl.
-FOLD_TYPES = {"Bool", "Length", "Rel[Length]", "Alignment"}
+FOLD_TYPES = {"Bool", "Length", "Rel[Length]", "Alignment", "Stroke"}
 
 
 def foldable(mty):
