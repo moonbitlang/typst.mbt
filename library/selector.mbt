@@ -16,7 +16,7 @@ pub(all) enum Selector {
   /// Matches elements with a specific label.
   Label(Label)
   /// Matches text elements through a regular expression.
-  Regex(String)
+  Regex(Regex)
   /// Matches elements with a specific capability.
   ///
   /// This is not exposed, but used internally.
@@ -41,26 +41,19 @@ pub fn Selector::text(text : String) -> Selector raise HintedError {
   if text.is_empty() {
     bail("text selector is empty")
   }
-  Regex(regex_escape(text))
+  Regex(Regex::new(regex_escape(text)))
 }
 
 ///|
 /// Define a regex selector.
 pub fn Selector::regex(regex : Regex) -> Selector raise HintedError {
-  let pattern = regex_selector_pattern(regex)
-  if pattern.is_empty() {
+  if regex.as_str().is_empty() {
     bail("regex selector is empty")
   }
   if regex.is_match("") {
     bail("regex matches empty text")
   }
-  Regex(pattern)
-}
-
-///|
-/// The pattern of a regex, as stored in [Selector::Regex].
-fn regex_selector_pattern(regex : Regex) -> String {
-  regex.pattern
+  Regex(regex)
 }
 
 ///|
@@ -220,7 +213,7 @@ pub fn Selector::repr(self : Selector) -> String {
         None => elem.name()
       }
     Label(label) => label.repr()
-    Regex(regex) => "regex(" + repr_str(regex) + ")"
+    Regex(regex) => regex.repr()
     Can(_) => "selector(..)"
     Or(selectors) | And(selectors) => {
       let function = if self is Or(_) { "or" } else { "and" }

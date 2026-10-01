@@ -93,7 +93,6 @@
 //     1 WeightDelta
 //     1 ItalicToggle
 //     1 SmallVec<[Decoration; 1]>
-//     1 Option<Case>
 //     1 Option<Smallcaps>
 //     1 Option<ShiftSettings>
 //     1 RawContent
@@ -7669,12 +7668,12 @@ pub fn text_elem() -> Element {
             fold=text_elem_deco_fold,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Case?]),
             id=39,
             name="case",
             kind=Ghost,
             internal=true,
-            default=text_elem_case_default,
+            default=() => None,
           ),
           field_of(
             (Ty::new() : Ty[Value]),

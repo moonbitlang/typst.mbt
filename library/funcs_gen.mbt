@@ -9401,7 +9401,7 @@ pub fn native_str_construct() -> NativeFuncData {
           {
             name: "value",
             docs: "The value that should be converted to a string.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[ToStr])),
             default: None,
             positional: true,
             named: false,
@@ -9442,7 +9442,7 @@ fn native_str_construct_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let value_ : Value = args.expect("value")
+  let value_ : ToStr = args.expect("value")
   let base_ : @syntax.Spanned[Base] = match args.named_spanned("base") {
     Some(v) => v
     None => impl_str_construct__base_default()
@@ -9919,7 +9919,7 @@ pub fn native_str_to_unicode() -> NativeFuncData {
           {
             name: "character",
             docs: "The character that should be converted.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Char])),
             default: None,
             positional: true,
             named: false,
@@ -9945,7 +9945,7 @@ fn native_str_to_unicode_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let character_ : Value = args.expect("character")
+  let character_ : Char = args.expect("character")
   args.take().finish()
   let output = at(args.span, () => impl_str_to_unicode(character_))
   IntoValue::into_value(output)
@@ -10032,7 +10032,7 @@ pub fn native_str_normalize() -> NativeFuncData {
           {
             name: "form",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[UnicodeNormalForm])),
             default: Some(() => {
               IntoValue::into_value(impl_str_normalize__form_default()) catch {
                 _ => None
@@ -10063,7 +10063,7 @@ fn native_str_normalize_call(
   ignore(engine)
   ignore(context)
   let self_ : String = args.expect("self")
-  let form_ : Value = match args.named("form") {
+  let form_ : UnicodeNormalForm = match args.named("form") {
     Some(v) => v
     None => impl_str_normalize__form_default()
   }
@@ -10102,7 +10102,7 @@ pub fn native_str_contains() -> NativeFuncData {
           {
             name: "pattern",
             docs: "The pattern to search for.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[StrPattern])),
             default: None,
             positional: true,
             named: false,
@@ -10129,7 +10129,7 @@ fn native_str_contains_call(
   ignore(engine)
   ignore(context)
   let self_ : String = args.expect("self")
-  let pattern_ : Value = args.expect("pattern")
+  let pattern_ : StrPattern = args.expect("pattern")
   args.take().finish()
   let output = at(args.span, () => impl_str_contains(self_, pattern_))
   IntoValue::into_value(output)
@@ -10165,7 +10165,7 @@ pub fn native_str_starts_with() -> NativeFuncData {
           {
             name: "pattern",
             docs: "The pattern the string might start with.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[StrPattern])),
             default: None,
             positional: true,
             named: false,
@@ -10192,7 +10192,7 @@ fn native_str_starts_with_call(
   ignore(engine)
   ignore(context)
   let self_ : String = args.expect("self")
-  let pattern_ : Value = args.expect("pattern")
+  let pattern_ : StrPattern = args.expect("pattern")
   args.take().finish()
   let output = at(args.span, () => impl_str_starts_with(self_, pattern_))
   IntoValue::into_value(output)
@@ -10228,7 +10228,7 @@ pub fn native_str_ends_with() -> NativeFuncData {
           {
             name: "pattern",
             docs: "The pattern the string might end with.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[StrPattern])),
             default: None,
             positional: true,
             named: false,
@@ -10255,7 +10255,7 @@ fn native_str_ends_with_call(
   ignore(engine)
   ignore(context)
   let self_ : String = args.expect("self")
-  let pattern_ : Value = args.expect("pattern")
+  let pattern_ : StrPattern = args.expect("pattern")
   args.take().finish()
   let output = at(args.span, () => impl_str_ends_with(self_, pattern_))
   IntoValue::into_value(output)
@@ -10291,7 +10291,7 @@ pub fn native_str_find() -> NativeFuncData {
           {
             name: "pattern",
             docs: "The pattern to search for.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[StrPattern])),
             default: None,
             positional: true,
             named: false,
@@ -10318,7 +10318,7 @@ fn native_str_find_call(
   ignore(engine)
   ignore(context)
   let self_ : String = args.expect("self")
-  let pattern_ : Value = args.expect("pattern")
+  let pattern_ : StrPattern = args.expect("pattern")
   args.take().finish()
   let output = at(args.span, () => impl_str_find(self_, pattern_))
   IntoValue::into_value(output)
@@ -10354,7 +10354,7 @@ pub fn native_str_position() -> NativeFuncData {
           {
             name: "pattern",
             docs: "The pattern to search for.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[StrPattern])),
             default: None,
             positional: true,
             named: false,
@@ -10381,7 +10381,7 @@ fn native_str_position_call(
   ignore(engine)
   ignore(context)
   let self_ : String = args.expect("self")
-  let pattern_ : Value = args.expect("pattern")
+  let pattern_ : StrPattern = args.expect("pattern")
   args.take().finish()
   let output = at(args.span, () => impl_str_position(self_, pattern_))
   IntoValue::into_value(output)
@@ -10417,7 +10417,7 @@ pub fn native_str_match() -> NativeFuncData {
           {
             name: "pattern",
             docs: "The pattern to search for.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[StrPattern])),
             default: None,
             positional: true,
             named: false,
@@ -10444,7 +10444,7 @@ fn native_str_match_call(
   ignore(engine)
   ignore(context)
   let self_ : String = args.expect("self")
-  let pattern_ : Value = args.expect("pattern")
+  let pattern_ : StrPattern = args.expect("pattern")
   args.take().finish()
   let output = at(args.span, () => impl_str_match(self_, pattern_))
   IntoValue::into_value(output)
@@ -10480,7 +10480,7 @@ pub fn native_str_matches() -> NativeFuncData {
           {
             name: "pattern",
             docs: "The pattern to search for.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[StrPattern])),
             default: None,
             positional: true,
             named: false,
@@ -10507,7 +10507,7 @@ fn native_str_matches_call(
   ignore(engine)
   ignore(context)
   let self_ : String = args.expect("self")
-  let pattern_ : Value = args.expect("pattern")
+  let pattern_ : StrPattern = args.expect("pattern")
   args.take().finish()
   let output = at(args.span, () => impl_str_matches(self_, pattern_))
   IntoValue::into_value(output)
@@ -10543,7 +10543,7 @@ pub fn native_str_replace() -> NativeFuncData {
           {
             name: "pattern",
             docs: "The pattern to search for.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[StrPattern])),
             default: None,
             positional: true,
             named: false,
@@ -10554,7 +10554,7 @@ pub fn native_str_replace() -> NativeFuncData {
           {
             name: "replacement",
             docs: "The string to replace the matches with or a function that gets a dictionary for each match and can return individual replacement strings.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Replacement])),
             default: None,
             positional: true,
             named: false,
@@ -10592,8 +10592,8 @@ fn native_str_replace_call(
   ignore(engine)
   ignore(context)
   let self_ : String = args.expect("self")
-  let pattern_ : Value = args.expect("pattern")
-  let replacement_ : Value = args.expect("replacement")
+  let pattern_ : StrPattern = args.expect("pattern")
+  let replacement_ : Replacement = args.expect("replacement")
   let count_ : USize? = args.named("count")
   args.take().finish()
   let output = impl_str_replace(
@@ -10632,7 +10632,7 @@ pub fn native_str_trim() -> NativeFuncData {
           {
             name: "pattern",
             docs: "The pattern to search for. If `{none}`, trims white spaces.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[StrPattern?])),
             default: Some(() => {
               IntoValue::into_value(impl_str_trim__pattern_default()) catch {
                 _ => None
@@ -10647,7 +10647,7 @@ pub fn native_str_trim() -> NativeFuncData {
           {
             name: "at",
             docs: "Can be `{start}` or `{end}` to only trim the start or end of the string. If omitted, both sides are trimmed.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[StrSide])),
             default: None,
             positional: false,
             named: true,
@@ -10685,11 +10685,11 @@ fn native_str_trim_call(
   ignore(engine)
   ignore(context)
   let self_ : String = args.expect("self")
-  let pattern_ : Value = match args.eat() {
+  let pattern_ : StrPattern? = match args.eat() {
     Some(v) => v
     None => impl_str_trim__pattern_default()
   }
-  let at_ : Value? = args.named("at")
+  let at_ : StrSide? = args.named("at")
   let repeat_ : Bool = match args.named("repeat") {
     Some(v) => v
     None => true
@@ -10729,7 +10729,7 @@ pub fn native_str_split() -> NativeFuncData {
           {
             name: "pattern",
             docs: "The pattern to split at. Defaults to whitespace.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[StrPattern?])),
             default: Some(() => {
               IntoValue::into_value(impl_str_split__pattern_default()) catch {
                 _ => None
@@ -10760,7 +10760,7 @@ fn native_str_split_call(
   ignore(engine)
   ignore(context)
   let self_ : String = args.expect("self")
-  let pattern_ : Value = match args.eat() {
+  let pattern_ : StrPattern? = match args.eat() {
     Some(v) => v
     None => impl_str_split__pattern_default()
   }
@@ -10848,7 +10848,7 @@ pub fn native_regex_construct() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Regex])),
         native_regex_construct_call,
       )
       native_regex_construct_cell.val = Some(d)
@@ -15324,7 +15324,7 @@ pub fn native_lower() -> NativeFuncData {
           {
             name: "text",
             docs: "The text to convert to lowercase.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Caseable])),
             default: None,
             positional: true,
             named: false,
@@ -15333,7 +15333,7 @@ pub fn native_lower() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Caseable])),
         native_lower_call,
       )
       native_lower_cell.val = Some(d)
@@ -15350,7 +15350,7 @@ fn native_lower_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let text_ : Value = args.expect("text")
+  let text_ : Caseable = args.expect("text")
   args.take().finish()
   let output = at(args.span, () => impl_lower(text_))
   IntoValue::into_value(output)
@@ -15375,7 +15375,7 @@ pub fn native_upper() -> NativeFuncData {
           {
             name: "text",
             docs: "The text to convert to uppercase.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Caseable])),
             default: None,
             positional: true,
             named: false,
@@ -15384,7 +15384,7 @@ pub fn native_upper() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Caseable])),
         native_upper_call,
       )
       native_upper_cell.val = Some(d)
@@ -15401,7 +15401,7 @@ fn native_upper_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let text_ : Value = args.expect("text")
+  let text_ : Caseable = args.expect("text")
   args.take().finish()
   let output = at(args.span, () => impl_upper(text_))
   IntoValue::into_value(output)

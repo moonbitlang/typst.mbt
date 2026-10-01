@@ -2541,6 +2541,8 @@ dependencies = [
  "parking_lot",
  "proc-macro2",
  "quote",
+ "regex",
+ "regex-syntax",
  "rustc-hash",
  "serde",
  "serde_json",
@@ -2561,6 +2563,7 @@ dependencies = [
  "typst-utils",
  "unicode-ident",
  "unicode-math-class",
+ "unicode-normalization",
  "unicode-script",
  "unscanny",
 ]
