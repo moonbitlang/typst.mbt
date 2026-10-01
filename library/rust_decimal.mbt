@@ -71,7 +71,7 @@ fn RustDecimal::raw(
   negative : Bool,
   scale : Int,
 ) -> RustDecimal {
-  { mantissa, scale, negative }
+  { mantissa, scale, negative, }
 }
 
 ///|
@@ -81,7 +81,7 @@ fn RustDecimal::from_parts(
   negative : Bool,
   scale : Int,
 ) -> RustDecimal {
-  { mantissa, scale, negative: negative && !mantissa.is_zero() }
+  { mantissa, scale, negative: negative && !mantissa.is_zero(), }
 }
 
 ///|
@@ -107,13 +107,13 @@ fn RustDecimal::from_i64(n : Int64) -> RustDecimal {
 
 ///|
 fn RustDecimal::abs(self : RustDecimal) -> RustDecimal {
-  { ..self, negative: false }
+  { ..self, negative: false, }
 }
 
 ///|
 /// `Neg for Decimal`: flips the sign bit (also for zero).
 fn RustDecimal::neg(self : RustDecimal) -> RustDecimal {
-  { ..self, negative: !self.negative }
+  { ..self, negative: !self.negative, }
 }
 
 ///|
@@ -145,10 +145,7 @@ fn RustDecimal::cmp(self : RustDecimal, other : RustDecimal) -> Int {
 /// like `Buf24::rescale`: drops the fewest digits needed, rounding half to
 /// even (taking all dropped digits into account). Returns `None` on
 /// overflow.
-fn rd_rescale(
-  mantissa : @bigint.BigInt,
-  scale : Int,
-) -> (@bigint.BigInt, Int)? {
+fn rd_rescale(mantissa : @bigint.BigInt, scale : Int) -> (@bigint.BigInt, Int)? {
   if mantissa < overflow_u96 && scale <= rd_max_scale {
     return Some((mantissa, scale))
   }
@@ -200,7 +197,7 @@ fn rd_add_sub(
     // 0 - x or 0 + x
     let mut result = d2
     if subtract && !d2.is_zero() {
-      result = { ..d2, negative: !d2.negative }
+      result = { ..d2, negative: !d2.negative, }
     }
     return Some(result)
   }
@@ -455,8 +452,7 @@ fn RustDecimal::checked_div(
       remainder = scaled - rq * divisor
       quotient = quotient + rq
       if quotient >= overflow_u96 {
-        match
-          rd_unscale_from_overflow(quotient, scale, !remainder.is_zero()) {
+        match rd_unscale_from_overflow(quotient, scale, !remainder.is_zero()) {
           Some((q, s)) => {
             quotient = q
             scale = s
@@ -504,7 +500,10 @@ fn RustDecimal::checked_rem(
 ///|
 /// Truncates the mantissa to the given (smaller) scale. Returns the result
 /// and whether a non-zero digit was discarded.
-fn RustDecimal::truncate_to(self : RustDecimal, scale : Int) -> (RustDecimal, Bool) {
+fn RustDecimal::truncate_to(
+  self : RustDecimal,
+  scale : Int,
+) -> (RustDecimal, Bool) {
   if self.scale <= scale {
     return (self, false)
   }
@@ -696,7 +695,7 @@ fn DecWide::from_decimal(d : RustDecimal) -> DecWide {
   data[0] = words.0
   data[1] = words.1
   data[2] = words.2
-  { data, scale: d.scale, negative: d.negative }
+  { data, scale: d.scale, negative: d.negative, }
 }
 
 ///|
@@ -743,7 +742,11 @@ fn wide_add_one(data : FixedArray[UInt]) -> Unit {
 }
 
 ///|
-fn div_buf_by_power(data : FixedArray[UInt], upper : Ref[Int], power : UInt) -> Unit {
+fn div_buf_by_power(
+  data : FixedArray[UInt],
+  upper : Ref[Int],
+  power : UInt,
+) -> Unit {
   let mut remainder = 0U
   let u = upper.val
   for i = u; i >= 0; i = i - 1 {
@@ -755,8 +758,7 @@ fn div_buf_by_power(data : FixedArray[UInt], upper : Ref[Int], power : UInt) -> 
     upper.val = u - 1
   }
   let power_half = power >> 1
-  if remainder > power_half ||
-    (remainder == power_half && (data[0] & 1U) != 0U) {
+  if remainder > power_half || (remainder == power_half && (data[0] & 1U) != 0U) {
     wide_add_one(data)
   }
 }
@@ -779,7 +781,7 @@ fn rescale_buf(
   }
   let mut rescale_target = if upper.val > target {
     let bits = (upper.val - target) * 32 - data[upper.val].clz()
-    ((if bits > 0 { bits } else { 0 }) * 77 >> 8) + 1
+    (((if bits > 0 { bits } else { 0 }) * 77) >> 8) + 1
   } else {
     0
   }
@@ -894,7 +896,7 @@ fn DecWide::to_decimal(self : DecWide) -> RustDecimal? {
 ///|
 fn DecWide::checked_mul(self : DecWide, other : DecWide) -> DecWide? {
   if self.is_zero() || other.is_zero() {
-    return Some({ data: FixedArray::make(6, 0U), scale: 0, negative: false })
+    return Some({ data: FixedArray::make(6, 0U), scale: 0, negative: false, })
   }
   let scale = self.scale + other.scale
   let negative = self.negative != other.negative
@@ -903,13 +905,13 @@ fn DecWide::checked_mul(self : DecWide, other : DecWide) -> DecWide? {
   let b = other.data
   let a_upper = upper_word_n(a, 6)
   let b_upper = upper_word_n(b, 6)
-  for i in 0..=a_upper {
+  for i in 0..<=a_upper {
     let a_word = a[i]
     if a_word == 0U {
       continue
     }
     let mut carry = 0UL
-    for j in 0..=b_upper {
+    for j in 0..<=b_upper {
       let pos = i + j
       carry += a_word.to_uint64() * b[j].to_uint64() + product[pos].to_uint64()
       product[pos] = carry.to_uint()
@@ -941,7 +943,7 @@ fn DecWide::checked_mul(self : DecWide, other : DecWide) -> DecWide? {
         scale.val -= power_idx
       }
     }
-    return Some({ data, scale: scale.val, negative })
+    return Some({ data, scale: scale.val, negative, })
   }
   if !rescale_buf(product, upper, scale, 5) {
     return None
@@ -950,7 +952,7 @@ fn DecWide::checked_mul(self : DecWide, other : DecWide) -> DecWide? {
   for i in 0..<6 {
     data[i] = product[i]
   }
-  Some({ data, scale: scale.val, negative })
+  Some({ data, scale: scale.val, negative, })
 }
 
 ///|

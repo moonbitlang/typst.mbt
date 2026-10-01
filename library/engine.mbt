@@ -47,8 +47,14 @@ pub(open) trait World {
   fn source(Self, @syntax.FileId) -> @syntax.Source raise FileError
   /// Try to access the specified file.
   fn file(Self, @syntax.FileId) -> Bytes raise FileError
-  /// Get the current date (with an optional UTC offset in hours).
-  fn today(Self, Int64?) -> Datetime?
+  /// Get the current date.
+  ///
+  /// If no offset is specified, the local date should be chosen. Otherwise,
+  /// the UTC date should be chosen with the corresponding offset.
+  ///
+  /// If this function returns `None`, Typst's `datetime` function will
+  /// return an error.
+  fn today(Self, Duration?) -> Datetime?
   /// Resolve a path relative to a file into a file id.
   fn resolve_path(Self, @syntax.FileId?, String) -> @syntax.FileId raise HintedError
   /// The file stem of a file (used as module name).

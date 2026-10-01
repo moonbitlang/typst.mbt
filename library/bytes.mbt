@@ -55,7 +55,10 @@ pub fn BytesValue::len(self : BytesValue) -> Int {
 
 ///|
 /// Resolve an index or throw an out of bounds error.
-fn BytesValue::locate(self : BytesValue, index : Int64) -> Int raise HintedError {
+fn BytesValue::locate(
+  self : BytesValue,
+  index : Int64,
+) -> Int raise HintedError {
   match self.locate_opt(index) {
     Some(i) => i
     None => bail(bytes_out_of_bounds(index, self.len()))

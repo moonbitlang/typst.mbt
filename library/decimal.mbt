@@ -104,7 +104,8 @@ pub fn Decimal::round(self : Decimal, digits : Int) -> Decimal? {
   let num = self.0
   let old_scale = num.scale
   let digits = -digits.to_int64()
-  let scaled : RustDecimal? = if old_scale.to_int64() + digits > rd_max_scale.to_int64() {
+  let scaled : RustDecimal? = if old_scale.to_int64() + digits >
+    rd_max_scale.to_int64() {
     None
   } else {
     // Same as dividing by 10^digits.
@@ -113,7 +114,9 @@ pub fn Decimal::round(self : Decimal, digits : Int) -> Decimal? {
   let ten_to_digits = RustDecimal::from_i64(10L).checked_powi(digits)
   guard (scaled, ten_to_digits) is (Some(num), Some(ten_to_digits)) else {
     // Scaling more than any possible amount of integer digits.
-    return Some(Decimal::Decimal(RustDecimal::raw(big_zero, self.is_negative(), 0)))
+    return Some(
+      Decimal::Decimal(RustDecimal::raw(big_zero, self.is_negative(), 0)),
+    )
   }
 
   // Round to this integer digit.

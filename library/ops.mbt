@@ -156,8 +156,10 @@ pub fn add(lhs : Value, rhs : Value) -> Value raise HintedError {
     (Float(a), Int(b)) => Float(a + b.to_double())
     (Float(a), Float(b)) => Float(a + b)
     (Decimal(a), Decimal(b)) => Decimal(decimal_or_too_large(a.checked_add(b)))
-    (Decimal(a), Int(b)) => Decimal(decimal_or_too_large(a.checked_add(Decimal::from_int(b))))
-    (Int(a), Decimal(b)) => Decimal(decimal_or_too_large(Decimal::from_int(a).checked_add(b)))
+    (Decimal(a), Int(b)) =>
+      Decimal(decimal_or_too_large(a.checked_add(Decimal::from_int(b))))
+    (Int(a), Decimal(b)) =>
+      Decimal(decimal_or_too_large(Decimal::from_int(a).checked_add(b)))
     (Angle(a), Angle(b)) => Angle(a + b)
     (Length(a), Length(b)) => Length(a + b)
     (Length(a), Ratio(b)) => Relative(Rel::from_ratio(b) + Rel::from_abs(a))
@@ -209,8 +211,10 @@ pub fn sub(lhs : Value, rhs : Value) -> Value raise HintedError {
     (Float(a), Int(b)) => Float(a - b.to_double())
     (Float(a), Float(b)) => Float(a - b)
     (Decimal(a), Decimal(b)) => Decimal(decimal_or_too_large(a.checked_sub(b)))
-    (Decimal(a), Int(b)) => Decimal(decimal_or_too_large(a.checked_sub(Decimal::from_int(b))))
-    (Int(a), Decimal(b)) => Decimal(decimal_or_too_large(Decimal::from_int(a).checked_sub(b)))
+    (Decimal(a), Int(b)) =>
+      Decimal(decimal_or_too_large(a.checked_sub(Decimal::from_int(b))))
+    (Int(a), Decimal(b)) =>
+      Decimal(decimal_or_too_large(Decimal::from_int(a).checked_sub(b)))
     (Angle(a), Angle(b)) => Angle(a - b)
     (Length(a), Length(b)) => Length(a - b)
     (Length(a), Ratio(b)) => Relative(Rel::from_ratio(-b) + Rel::from_abs(a))
@@ -238,8 +242,10 @@ pub fn mul(lhs : Value, rhs : Value) -> Value raise HintedError {
     (Float(a), Int(b)) => Float(a * b.to_double())
     (Float(a), Float(b)) => Float(a * b)
     (Decimal(a), Decimal(b)) => Decimal(decimal_or_too_large(a.checked_mul(b)))
-    (Decimal(a), Int(b)) => Decimal(decimal_or_too_large(a.checked_mul(Decimal::from_int(b))))
-    (Int(a), Decimal(b)) => Decimal(decimal_or_too_large(Decimal::from_int(a).checked_mul(b)))
+    (Decimal(a), Int(b)) =>
+      Decimal(decimal_or_too_large(a.checked_mul(Decimal::from_int(b))))
+    (Int(a), Decimal(b)) =>
+      Decimal(decimal_or_too_large(Decimal::from_int(a).checked_mul(b)))
     (Length(a), Int(b)) => Length(a.times(b.to_double()))
     (Length(a), Float(b)) => Length(a.times(b))
     (Length(a), Ratio(b)) => Length(a.times(b.get()))
@@ -295,8 +301,10 @@ pub fn div(lhs : Value, rhs : Value) -> Value raise HintedError {
     (Float(a), Int(b)) => Float(a / b.to_double())
     (Float(a), Float(b)) => Float(a / b)
     (Decimal(a), Decimal(b)) => Decimal(decimal_or_too_large(a.checked_div(b)))
-    (Decimal(a), Int(b)) => Decimal(decimal_or_too_large(a.checked_div(Decimal::from_int(b))))
-    (Int(a), Decimal(b)) => Decimal(decimal_or_too_large(Decimal::from_int(a).checked_div(b)))
+    (Decimal(a), Int(b)) =>
+      Decimal(decimal_or_too_large(a.checked_div(Decimal::from_int(b))))
+    (Int(a), Decimal(b)) =>
+      Decimal(decimal_or_too_large(Decimal::from_int(a).checked_div(b)))
     (Length(a), Int(b)) => Length(a.div_by(b.to_double()))
     (Length(a), Float(b)) => Length(a.div_by(b))
     (Length(a), Length(b)) => Float(try_div_length(a, b))

@@ -115,8 +115,6 @@ fn report() -> Unit raise {
   if !harness_failures.is_empty() {
     let n = harness_failures.length()
     let shown = harness_failures[0:if n > 40 { 40 } else { n }].to_array()
-    fail(
-      "\{n} of \{harness_checks.val} checks failed:\n" + shown.join("\n"),
-    )
+    fail("\{n} of \{harness_checks.val} checks failed:\n" + shown.join("\n"))
   }
 }

@@ -1,0 +1,7 @@
+[package]
+name = "timeharness"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+time = { version = "=0.3.55", features = ["formatting", "macros", "parsing"] }
