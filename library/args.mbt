@@ -14,7 +14,7 @@ pub(all) struct Arg {
 
 ///|
 /// Captured arguments to a function.
-pub struct Args {
+pub(all) struct Args {
   /// The callsite span for the function.
   mut span : @syntax.Span
   /// The positional and named arguments.

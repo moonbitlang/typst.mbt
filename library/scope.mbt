@@ -317,6 +317,12 @@ pub fn Binding::check_write(
 }
 
 ///|
+/// Overwrite the bound value.
+pub fn Binding::set_value(self : Binding, value : Value) -> Unit {
+  self.value = value
+}
+
+///|
 /// Create a copy of the binding for closure capturing.
 pub fn Binding::capture(self : Binding, capturer : Capturer) -> Binding {
   {
@@ -436,7 +442,7 @@ pub fn Scope::copy(self : Scope) -> Scope {
 
 ///|
 /// A stack of scopes.
-pub struct Scopes {
+pub(all) struct Scopes {
   /// The active scope.
   mut top : Scope
   /// The stack of lower scopes.

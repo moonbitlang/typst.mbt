@@ -145,3 +145,23 @@ pub fn missing_key(key : String) -> String {
 pub fn missing_key_no_default(key : String) -> String {
   "dictionary does not contain key \{repr_str(key)} and no default value was specified"
 }
+
+///|
+/// Removes a pair from the dictionary and returns the value.
+pub fn Dict::remove(
+  self : Dict,
+  key : String,
+  default : Value?,
+) -> Value raise HintedError {
+  match self.map.get(key) {
+    Some(v) => {
+      self.map.remove(key)
+      v
+    }
+    None =>
+      match default {
+        Some(d) => d
+        None => bail(missing_key(key))
+      }
+  }
+}

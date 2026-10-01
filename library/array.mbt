@@ -160,3 +160,40 @@ pub fn out_of_bounds(index : Int64, len : Int) -> String {
 pub fn out_of_bounds_no_default(index : Int64, len : Int) -> String {
   "array index out of bounds (index: \{index}, len: \{len}) and no default value was specified"
 }
+
+///|
+/// Remove the last item from the array and return it.
+pub fn Arr::pop(self : Arr) -> Value raise HintedError {
+  match self.items.pop() {
+    Some(v) => v
+    None => bail(array_is_empty())
+  }
+}
+
+///|
+/// Insert a value into the array at the specified index.
+pub fn Arr::insert(
+  self : Arr,
+  index : Int64,
+  value : Value,
+) -> Unit raise HintedError {
+  let i = self.locate(index, true)
+  self.items.insert(i, value)
+}
+
+///|
+/// Remove the value at the specified index from the array and return it.
+pub fn Arr::remove(
+  self : Arr,
+  index : Int64,
+  default : Value?,
+) -> Value raise HintedError {
+  match self.locate_opt(index, false) {
+    Some(i) => self.items.remove(i)
+    None =>
+      match default {
+        Some(d) => d
+        None => bail(out_of_bounds_no_default(index, self.len()))
+      }
+  }
+}

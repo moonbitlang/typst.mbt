@@ -279,3 +279,13 @@ pub fn Value::scope(self : Value) -> Scope? {
 pub impl Eq for Value with fn equal(self, other) {
   equal(self, other)
 }
+
+///|
+/// Attach a span to the value, if possible.
+pub fn Value::spanned(self : Value, span : @syntax.Span) -> Value {
+  match self {
+    Content(v) => Content(v.spanned(span))
+    Func(v) => Func(v.spanned(span))
+    v => v
+  }
+}

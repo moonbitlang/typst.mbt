@@ -1,7 +1,7 @@
 // Differential test runner: compares the MoonBit port against reference
 // outputs dumped by the Rust oracle (see `scripts/goldens.sh`).
 //
-// Usage: moon run tests/runner -- <syntax|ast> [filter] [--verbose]
+// Usage: moon run tests/runner -- <syntax|ast|eval> [filter] [--verbose]
 
 ///|
 let suite_dir = ".repos/typst/tests/suite"
@@ -16,8 +16,10 @@ fn main {
   let verbose = args.contains("--verbose") || args.contains("-v")
   let filter = args[2:].iter().find_first(a => !a.has_prefix("-"))
   match stage {
-    "syntax" => run_stage("syntax", syntax_report, filter, verbose)
-    "ast" => run_stage("ast", ast_report, filter, verbose)
+    "syntax" =>
+      run_stage("syntax", (_, tc) => syntax_report(tc.body), filter, verbose)
+    "ast" => run_stage("ast", (_, tc) => ast_report(tc.body), filter, verbose)
+    "eval" => run_stage("eval", eval_report, filter, verbose)
     _ => {
       println("unknown stage: \{stage}")
       @sys.exit(2)
@@ -28,7 +30,7 @@ fn main {
 ///|
 fn run_stage(
   stage : String,
-  report : (String) -> String,
+  report : (String, TestCase) -> String,
   filter : String?,
   verbose : Bool,
 ) -> Unit {
@@ -50,7 +52,7 @@ fn run_stage(
       if filter is Some(f) && !tc.name.contains(f) {
         continue
       }
-      let actual = report(tc.body)
+      let actual = report(rel, tc)
       let expected = golden.get(tc.name).unwrap_or("<missing golden>")
       if actual == expected {
         passed += 1
