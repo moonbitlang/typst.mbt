@@ -12204,7 +12204,7 @@ pub fn native_alignment_axis() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Alignment])),
             default: None,
             positional: true,
             named: false,
@@ -12213,7 +12213,7 @@ pub fn native_alignment_axis() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Axis?])),
         native_alignment_axis_call,
       )
       native_alignment_axis_cell.val = Some(d)
@@ -12230,7 +12230,7 @@ fn native_alignment_axis_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : Alignment = args.expect("self")
   args.take().finish()
   let output = at(args.span, () => impl_alignment_axis(self_))
   IntoValue::into_value(output)
@@ -12255,7 +12255,7 @@ pub fn native_alignment_inv() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Alignment])),
             default: None,
             positional: true,
             named: false,
@@ -12264,7 +12264,7 @@ pub fn native_alignment_inv() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Alignment])),
         native_alignment_inv_call,
       )
       native_alignment_inv_cell.val = Some(d)
@@ -12281,7 +12281,7 @@ fn native_alignment_inv_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : Alignment = args.expect("self")
   args.take().finish()
   let output = at(args.span, () => impl_alignment_inv(self_))
   IntoValue::into_value(output)
@@ -12408,7 +12408,7 @@ pub fn native_dir_from() -> NativeFuncData {
           {
             name: "side",
             docs: "The starting point for the direction.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Side])),
             default: None,
             positional: true,
             named: false,
@@ -12417,7 +12417,7 @@ pub fn native_dir_from() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Dir])),
         native_dir_from_call,
       )
       native_dir_from_cell.val = Some(d)
@@ -12434,7 +12434,7 @@ fn native_dir_from_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let side_ : Value = args.expect("side")
+  let side_ : Side = args.expect("side")
   args.take().finish()
   let output = at(args.span, () => impl_dir_from(side_))
   IntoValue::into_value(output)
@@ -12459,7 +12459,7 @@ pub fn native_dir_to() -> NativeFuncData {
           {
             name: "side",
             docs: "The end point for the direction.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Side])),
             default: None,
             positional: true,
             named: false,
@@ -12468,7 +12468,7 @@ pub fn native_dir_to() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Dir])),
         native_dir_to_call,
       )
       native_dir_to_cell.val = Some(d)
@@ -12485,7 +12485,7 @@ fn native_dir_to_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let side_ : Value = args.expect("side")
+  let side_ : Side = args.expect("side")
   args.take().finish()
   let output = at(args.span, () => impl_dir_to(side_))
   IntoValue::into_value(output)
@@ -12510,7 +12510,7 @@ pub fn native_dir_axis() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Dir])),
             default: None,
             positional: true,
             named: false,
@@ -12519,7 +12519,7 @@ pub fn native_dir_axis() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Axis])),
         native_dir_axis_call,
       )
       native_dir_axis_cell.val = Some(d)
@@ -12536,7 +12536,7 @@ fn native_dir_axis_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : Dir = args.expect("self")
   args.take().finish()
   let output = at(args.span, () => impl_dir_axis(self_))
   IntoValue::into_value(output)
@@ -12561,7 +12561,7 @@ pub fn native_dir_sign() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Dir])),
             default: None,
             positional: true,
             named: false,
@@ -12587,7 +12587,7 @@ fn native_dir_sign_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : Dir = args.expect("self")
   args.take().finish()
   let output = at(args.span, () => impl_dir_sign(self_))
   IntoValue::into_value(output)
@@ -12612,7 +12612,7 @@ pub fn native_dir_start() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Dir])),
             default: None,
             positional: true,
             named: false,
@@ -12621,7 +12621,7 @@ pub fn native_dir_start() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Side])),
         native_dir_start_call,
       )
       native_dir_start_cell.val = Some(d)
@@ -12638,7 +12638,7 @@ fn native_dir_start_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : Dir = args.expect("self")
   args.take().finish()
   let output = at(args.span, () => impl_dir_start(self_))
   IntoValue::into_value(output)
@@ -12663,7 +12663,7 @@ pub fn native_dir_end() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Dir])),
             default: None,
             positional: true,
             named: false,
@@ -12672,7 +12672,7 @@ pub fn native_dir_end() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Side])),
         native_dir_end_call,
       )
       native_dir_end_cell.val = Some(d)
@@ -12689,7 +12689,7 @@ fn native_dir_end_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : Dir = args.expect("self")
   args.take().finish()
   let output = at(args.span, () => impl_dir_end(self_))
   IntoValue::into_value(output)
@@ -12714,7 +12714,7 @@ pub fn native_dir_inv() -> NativeFuncData {
           {
             name: "self",
             docs: "",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Dir])),
             default: None,
             positional: true,
             named: false,
@@ -12723,7 +12723,7 @@ pub fn native_dir_inv() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Dir])),
         native_dir_inv_call,
       )
       native_dir_inv_cell.val = Some(d)
@@ -12740,7 +12740,7 @@ fn native_dir_inv_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let self_ : Value = args.expect("self")
+  let self_ : Dir = args.expect("self")
   args.take().finish()
   let output = at(args.span, () => impl_dir_inv(self_))
   IntoValue::into_value(output)
@@ -17145,7 +17145,7 @@ pub fn native_gradient_linear() -> NativeFuncData {
           {
             name: "dir",
             docs: "The direction of the gradient.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Dir])),
             default: Some(() => {
               IntoValue::into_value(impl_gradient_linear__dir_default()) catch {
                 _ => None

@@ -233,6 +233,49 @@ pub fn Side::axis(self : Side) -> Axis {
 }
 
 ///|
+pub impl Reflect for Side with fn input() {
+  Type(Type::alignment())
+}
+
+///|
+pub impl Reflect for Side with fn output() {
+  Type(Type::alignment())
+}
+
+///|
+pub impl Reflect for Side with fn castable(value) {
+  value is Dyn(Alignment(_))
+}
+
+///|
+pub impl IntoValue for Side with fn into_value(self) {
+  Alignment::from_side(self).into_value()
+}
+
+///|
+pub impl FromValue for Side with fn from_value(value) {
+  match value {
+    Dyn(Alignment(align)) =>
+      match align {
+        H(Left) => Left
+        H(Right) => Right
+        V(Top) => Top
+        V(Bottom) => Bottom
+        _ => bail("cannot convert this alignment to a side")
+      }
+    _ => raise HintedError(CastInfo::Type(Type::alignment()).error(value))
+  }
+}
+
+///|
+pub impl[T : Fold] Fold for Sides[T?] with fn fold(self, outer) {
+  // Usually, folding an inner `None` with an `outer` prefers the explicit
+  // `None`. However, here `None` means unspecified and thus we want
+  // `outer`, so we use `fold_or` to opt into such behavior.
+  self.zip(outer).map(p => fold_or(p.0, p.1))
+}
+
+///|
 /// Rust `Option::or`: keeps `self` if it is `Some`, otherwise `other`.
 fn[T] opt_or(this : T?, other : T?) -> T? {
   match this {

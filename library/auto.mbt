@@ -131,6 +131,16 @@ pub fn[T] Smart::from_option(value : T?) -> Smart[T] {
   }
 }
 
+///|
+pub impl[T : Fold] Fold for Smart[T] with fn fold(self, outer) {
+  match (self, outer) {
+    (Custom(inner), Custom(outer)) => Custom(inner.fold(outer))
+    // An explicit `auto` should be respected, thus we don't do
+    // `inner.or(outer)`.
+    (inner, _) => inner
+  }
+}
+
 // The `auto` value itself (upstream `AutoValue`).
 
 ///|

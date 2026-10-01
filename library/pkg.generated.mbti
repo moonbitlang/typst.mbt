@@ -29,6 +29,22 @@ pub let align_elem_body : Int
 
 pub fn align_point_elem() -> Element
 
+pub let alignment_bottom : Alignment
+
+pub let alignment_center : Alignment
+
+pub let alignment_end : Alignment
+
+pub let alignment_horizon : Alignment
+
+pub let alignment_left : Alignment
+
+pub let alignment_right : Alignment
+
+pub let alignment_start : Alignment
+
+pub let alignment_top : Alignment
+
 pub fn and_(Value, Value) -> Value raise HintedError
 
 pub fn array_is_empty() -> String
@@ -466,6 +482,10 @@ pub let figure_elem_scope : Int
 pub let figure_elem_supplement : Int
 
 pub fn flush_elem() -> Element
+
+pub fn[T : FromValue + IntoValue + Fold] fold_of(Ty[T]) -> (Value, Value) -> Value
+
+pub fn[T : Fold] fold_or(T?, T?) -> T?
 
 pub fn footnote_container_elem() -> Element
 
@@ -2328,12 +2348,24 @@ pub(all) enum AbsUnit {
   In
 } derive(Eq, Hash, @debug.Debug)
 
-pub(all) struct Alignment {
-  // private fields
-} derive(Eq, Hash)
+pub(all) enum Alignment {
+  H(HAlignment)
+  V(VAlignment)
+  Both(HAlignment, VAlignment)
+} derive(Eq, Hash, @debug.Debug)
 pub fn Alignment::add(Self, Self) -> Self raise HintedError
 pub fn Alignment::field(Self, String) -> Value?
+pub fn Alignment::fix(Self, Dir) -> Axes[FixedAlignment]
+pub fn Alignment::from_side(Side) -> Self
+pub fn Alignment::inv(Self) -> Self
 pub fn Alignment::repr(Self) -> String
+pub fn Alignment::x(Self) -> HAlignment?
+pub fn Alignment::y(Self) -> VAlignment?
+pub impl Default for Alignment
+pub impl Fold for Alignment
+pub impl FromValue for Alignment
+pub impl IntoValue for Alignment
+pub impl Reflect for Alignment
 
 pub(all) struct Angle(Scalar) derive(Compare, Default, Eq, Hash)
 pub fn Angle::abs(Self) -> Self
@@ -2463,6 +2495,7 @@ pub(all) enum Axis {
   X
   Y
 } derive(Eq, Hash, @debug.Debug)
+pub fn Axis::dir(Self, Bool) -> Dir
 pub fn Axis::other(Self) -> Self
 pub impl FromValue for Axis
 pub impl IntoValue for Axis
@@ -2649,6 +2682,7 @@ pub fn[T] Corners::new(T, T, T, T) -> Self[T]
 pub fn[T] Corners::splat(T) -> Self[T]
 pub fn[T] Corners::unwrap_or(Self[T?], T) -> Self[T]
 pub fn[T, U] Corners::zip(Self[T], Self[U]) -> Self[(T, U)]
+pub impl[T : Fold] Fold for Corners[T?]
 pub impl[T : FromValue] FromValue for Corners[T?]
 pub impl[T : IntoValue + Eq] IntoValue for Corners[T?]
 pub impl[T : Reflect] Reflect for Corners[T?]
@@ -2715,10 +2749,21 @@ pub impl FromValue for Dict
 pub impl IntoValue for Dict
 pub impl Reflect for Dict
 
-pub(all) struct Dir {
-  // private fields
-} derive(Eq, Hash)
+pub(all) enum Dir {
+  LTR
+  RTL
+  TTB
+  BTT
+} derive(Eq, Hash, @debug.Debug)
+pub fn Dir::axis(Self) -> Axis
+pub fn Dir::end(Self) -> Side
+pub fn Dir::inv(Self) -> Self
+pub fn Dir::is_positive(Self) -> Bool
 pub fn Dir::repr(Self) -> String
+pub fn Dir::start(Self) -> Side
+pub impl FromValue for Dir
+pub impl IntoValue for Dir
+pub impl Reflect for Dir
 
 pub(all) struct Duration {
   // private fields
@@ -2816,6 +2861,7 @@ pub fn Em::new(Double) -> Self
 pub fn Em::one() -> Self
 pub fn Em::ratio_to(Self, Self) -> Double
 pub fn Em::repr(Self) -> String
+pub fn Em::resolve(Self, StyleChain) -> Abs
 pub fn Em::times(Self, Double) -> Self
 pub fn Em::zero() -> Self
 pub impl Add for Em
@@ -2875,6 +2921,15 @@ pub(all) enum FieldKind {
   External
 } derive(Eq, @debug.Debug)
 
+pub(all) enum FixedAlignment {
+  Start
+  Center
+  End
+} derive(Compare, Eq, Hash, @debug.Debug)
+pub fn FixedAlignment::from_side(Side) -> Self
+pub fn FixedAlignment::inv(Self) -> Self
+pub fn FixedAlignment::position(Self, Abs) -> Abs
+
 pub(all) struct Fr(Scalar) derive(Compare, Default, Eq, Hash)
 pub fn Fr::abs(Self) -> Self
 pub fn Fr::div_by(Self, Double) -> Self
@@ -2932,6 +2987,23 @@ pub(all) struct Gradient {
 } derive(Eq, Hash)
 pub fn Gradient::repr(Self) -> String
 
+pub(all) enum HAlignment {
+  Start
+  Left
+  Center
+  Right
+  End
+} derive(Eq, Hash, @debug.Debug)
+pub fn HAlignment::fix(Self, Dir) -> FixedAlignment
+pub fn HAlignment::inv(Self) -> Self
+pub fn HAlignment::repr(Self) -> String
+pub fn HAlignment::try_from(Alignment) -> Self raise HintedError
+pub impl Default for HAlignment
+pub impl AlignmentComponent for HAlignment
+pub impl FromValue for HAlignment
+pub impl IntoValue for HAlignment
+pub impl Reflect for HAlignment
+
 pub(all) struct HintedString {
   message : String
   hints : Array[String]
@@ -2982,6 +3054,7 @@ pub fn Length::from_em(Em) -> Self
 pub fn Length::is_zero(Self) -> Bool
 pub fn Length::partial_cmp(Self, Self) -> Int?
 pub fn Length::repr(Self) -> String
+pub fn Length::resolve(Self, StyleChain) -> Abs
 pub fn Length::times(Self, Double) -> Self
 pub fn Length::try_abs(Self) -> Self?
 pub fn Length::try_div(Self, Self) -> Double?
@@ -2989,6 +3062,7 @@ pub fn Length::zero() -> Self
 pub impl Add for Length
 pub impl Neg for Length
 pub impl Sub for Length
+pub impl Fold for Length
 pub impl FromValue for Length
 pub impl IntoValue for Length
 pub impl Numeric for Length
@@ -3100,6 +3174,34 @@ pub(all) enum NumericUnit {
   Percent
 } derive(Eq, @debug.Debug)
 
+pub(all) enum OuterHAlignment {
+  Start
+  Left
+  Right
+  End
+} derive(Eq, Hash, @debug.Debug)
+pub fn OuterHAlignment::fix(Self, Dir) -> FixedAlignment
+pub fn OuterHAlignment::to_h(Self) -> HAlignment
+pub fn OuterHAlignment::try_from(Alignment) -> Self raise HintedError
+pub impl Default for OuterHAlignment
+pub impl AlignmentComponent for OuterHAlignment
+pub impl FromValue for OuterHAlignment
+pub impl IntoValue for OuterHAlignment
+pub impl Reflect for OuterHAlignment
+
+pub(all) enum OuterVAlignment {
+  Top
+  Bottom
+} derive(Compare, Eq, Hash, @debug.Debug)
+pub fn OuterVAlignment::fix(Self, Dir) -> FixedAlignment
+pub fn OuterVAlignment::to_v(Self) -> VAlignment
+pub fn OuterVAlignment::try_from(Alignment) -> Self raise HintedError
+pub impl Default for OuterVAlignment
+pub impl AlignmentComponent for OuterVAlignment
+pub impl FromValue for OuterVAlignment
+pub impl IntoValue for OuterVAlignment
+pub impl Reflect for OuterVAlignment
+
 pub(all) struct ParamInfo {
   name : String
   docs : String
@@ -3195,6 +3297,7 @@ pub fn[T : Numeric] Rel::zero() -> Self[T]
 pub impl[T : Numeric] Add for Rel[T]
 pub impl[T : Numeric] Neg for Rel[T]
 pub impl[T : Numeric] Sub for Rel[T]
+pub impl Fold for Rel[Length]
 pub impl FromValue for Rel[Length]
 pub impl IntoValue for Rel[Length]
 pub impl[T : Numeric] Numeric for Rel[T]
@@ -3308,6 +3411,9 @@ pub fn Side::inv(Self) -> Self
 pub fn Side::next_ccw(Self) -> Self
 pub fn Side::next_cw(Self) -> Self
 pub fn Side::start_corner(Self) -> Corner
+pub impl FromValue for Side
+pub impl IntoValue for Side
+pub impl Reflect for Side
 
 pub(all) struct Sides[T] {
   left : T
@@ -3324,6 +3430,7 @@ pub fn[T] Sides::new(T, T, T, T) -> Self[T]
 pub fn[T] Sides::splat(T) -> Self[T]
 pub fn[T] Sides::unwrap_or(Self[T?], T) -> Self[T]
 pub fn[T, U] Sides::zip(Self[T], Self[U]) -> Self[(T, U)]
+pub impl[T : Fold] Fold for Sides[T?]
 pub impl[T : FromValue] FromValue for Sides[T?]
 pub impl[T : IntoValue + Eq] IntoValue for Sides[T?]
 pub impl[T : Reflect] Reflect for Sides[T?]
@@ -3358,6 +3465,7 @@ pub fn[T] Smart::or_else(Self[T], () -> Self[T]) -> Self[T]
 pub fn[T] Smart::unwrap_or(Self[T], T) -> T
 pub fn[T] Smart::unwrap_or_else(Self[T], () -> T) -> T
 pub impl[T] Default for Smart[T]
+pub impl[T : Fold] Fold for Smart[T]
 pub impl[T : FromValue] FromValue for Smart[T]
 pub impl[T : IntoValue] IntoValue for Smart[T]
 pub impl[T : Reflect] Reflect for Smart[T]
@@ -3383,6 +3491,16 @@ pub fn SourceDiagnostic::with_tracepoint(Self, Tracepoint, @syntax.Span) -> Self
 pub struct SpaceElem(Content)
 pub fn SpaceElem::shared() -> Content
 pub fn SpaceElem::shared_with_newline() -> Content
+
+pub(all) enum SpecificAlignment[H, V] {
+  H(H)
+  V(V)
+  Both(H, V)
+} derive(Eq, Hash, @debug.Debug)
+pub fn[H : AlignmentComponent, V : AlignmentComponent] SpecificAlignment::to_alignment(Self[H, V]) -> Alignment
+pub impl[H : AlignmentComponent, V : AlignmentComponent] FromValue for SpecificAlignment[H, V]
+pub impl[H : AlignmentComponent, V : AlignmentComponent] IntoValue for SpecificAlignment[H, V]
+pub impl[H : AlignmentComponent, V : AlignmentComponent] Reflect for SpecificAlignment[H, V]
 
 pub(all) struct SpotColorant {
   // private fields
@@ -3587,6 +3705,22 @@ pub impl FromValue for USize
 pub impl IntoValue for USize
 pub impl Reflect for USize
 
+pub(all) enum VAlignment {
+  Top
+  Horizon
+  Bottom
+} derive(Compare, Eq, Hash, @debug.Debug)
+pub fn VAlignment::fix(Self, Dir) -> FixedAlignment
+pub fn VAlignment::inv(Self) -> Self
+pub fn VAlignment::position(Self, Abs) -> Abs
+pub fn VAlignment::repr(Self) -> String
+pub fn VAlignment::try_from(Alignment) -> Self raise HintedError
+pub impl Default for VAlignment
+pub impl AlignmentComponent for VAlignment
+pub impl FromValue for VAlignment
+pub impl IntoValue for VAlignment
+pub impl Reflect for VAlignment
+
 pub(all) enum Value {
   None
   Auto
@@ -3648,6 +3782,17 @@ pub(all) struct Warned[T] {
 pub type NativeFn = (Engine, Context, Args) -> Value raise SourceError
 
 // Traits
+pub(open) trait AlignmentComponent : Reflect {
+  fn try_from_alignment(Alignment) -> Self raise HintedError
+  fn to_alignment(Self) -> Alignment
+}
+
+pub(open) trait Fold {
+  fn fold(Self, Self) -> Self
+}
+pub impl Fold for Bool
+pub impl[T : Fold] Fold for T?
+
 pub(open) trait FromValue : Reflect {
   fn from_value(Value) -> Self raise HintedError
 }

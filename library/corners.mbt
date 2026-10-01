@@ -171,6 +171,14 @@ pub impl[T : FromValue] FromValue for Corners[T?] with fn from_value(value) {
 }
 
 ///|
+pub impl[T : Fold] Fold for Corners[T?] with fn fold(self, outer) {
+  // Usually, folding an inner `None` with an `outer` prefers the explicit
+  // `None`. However, here `None` means unspecified and thus we want
+  // `outer`, so we use `fold_or` to opt into such behavior.
+  self.zip(outer).map(p => fold_or(p.0, p.1))
+}
+
+///|
 /// The four corners of a rectangle.
 pub(all) enum Corner {
   /// The top left corner.

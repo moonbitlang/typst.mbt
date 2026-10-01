@@ -40,6 +40,14 @@ TYPEMAP = {
     "Dict": "Dict",
     "Args": "Args",
     "Type": "Type",
+    "Alignment": "Alignment",
+    "HAlignment": "HAlignment",
+    "VAlignment": "VAlignment",
+    "OuterHAlignment": "OuterHAlignment",
+    "OuterVAlignment": "OuterVAlignment",
+    "Dir": "Dir",
+    "Side": "Side",
+    "Axis": "Axis",
 }
 
 # Generic Rust types with a MoonBit port: Rust name -> MoonBit name. A use
@@ -51,6 +59,7 @@ GENERICS = {
     # Only `Sides<Option<T>>` / `Corners<Option<T>>` are castable upstream.
     "Sides": "Sides",
     "Corners": "Corners",
+    "SpecificAlignment": "SpecificAlignment",
 }
 
 

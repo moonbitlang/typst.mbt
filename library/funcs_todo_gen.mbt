@@ -2584,163 +2584,11 @@ fn impl_state_update(
 }
 
 ///|
-/// TODO: port `Alignment.axis` (typst-library/src/layout/align.rs).
-fn impl_alignment_axis(self_ : Value) -> Value raise HintedError {
-  ignore(self_)
-  bail("`Alignment.axis` is not yet ported")
-}
-
-///|
-/// TODO: port `Alignment.inv` (typst-library/src/layout/align.rs).
-fn impl_alignment_inv(self_ : Value) -> Value raise HintedError {
-  ignore(self_)
-  bail("`Alignment.inv` is not yet ported")
-}
-
-///|
-/// TODO: port `Angle.rad` (typst-library/src/layout/angle.rs).
-fn impl_angle_to_rad(self_ : Angle) -> Double raise HintedError {
-  ignore(self_)
-  bail("`Angle.rad` is not yet ported")
-}
-
-///|
-/// TODO: port `Angle.deg` (typst-library/src/layout/angle.rs).
-fn impl_angle_to_deg(self_ : Angle) -> Double raise HintedError {
-  ignore(self_)
-  bail("`Angle.deg` is not yet ported")
-}
-
-///|
-/// TODO: port `Dir.from` (typst-library/src/layout/dir.rs).
-fn impl_dir_from(side_ : Value) -> Value raise HintedError {
-  ignore(side_)
-  bail("`Dir.from` is not yet ported")
-}
-
-///|
-/// TODO: port `Dir.to` (typst-library/src/layout/dir.rs).
-fn impl_dir_to(side_ : Value) -> Value raise HintedError {
-  ignore(side_)
-  bail("`Dir.to` is not yet ported")
-}
-
-///|
-/// TODO: port `Dir.axis` (typst-library/src/layout/dir.rs).
-fn impl_dir_axis(self_ : Value) -> Value raise HintedError {
-  ignore(self_)
-  bail("`Dir.axis` is not yet ported")
-}
-
-///|
-/// TODO: port `Dir.sign` (typst-library/src/layout/dir.rs).
-fn impl_dir_sign(self_ : Value) -> Int64 raise HintedError {
-  ignore(self_)
-  bail("`Dir.sign` is not yet ported")
-}
-
-///|
-/// TODO: port `Dir.start` (typst-library/src/layout/dir.rs).
-fn impl_dir_start(self_ : Value) -> Value raise HintedError {
-  ignore(self_)
-  bail("`Dir.start` is not yet ported")
-}
-
-///|
-/// TODO: port `Dir.end` (typst-library/src/layout/dir.rs).
-fn impl_dir_end(self_ : Value) -> Value raise HintedError {
-  ignore(self_)
-  bail("`Dir.end` is not yet ported")
-}
-
-///|
-/// TODO: port `Dir.inv` (typst-library/src/layout/dir.rs).
-fn impl_dir_inv(self_ : Value) -> Value raise HintedError {
-  ignore(self_)
-  bail("`Dir.inv` is not yet ported")
-}
-
-///|
 /// TODO: port `layout` (typst-library/src/layout/layout.rs).
 fn impl_layout(span : @syntax.Span, func_ : Func) -> Content raise HintedError {
   ignore(span)
   ignore(func_)
   bail("`layout` is not yet ported")
-}
-
-///|
-/// TODO: port `Length.pt` (typst-library/src/layout/length.rs).
-fn impl_length_to_pt(
-  self_ : Length,
-  span : @syntax.Span,
-) -> Double raise SourceError {
-  ignore(self_)
-  ignore(span)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`Length.pt` is not yet ported",
-    ),
-  ])
-}
-
-///|
-/// TODO: port `Length.mm` (typst-library/src/layout/length.rs).
-fn impl_length_to_mm(
-  self_ : Length,
-  span : @syntax.Span,
-) -> Double raise SourceError {
-  ignore(self_)
-  ignore(span)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`Length.mm` is not yet ported",
-    ),
-  ])
-}
-
-///|
-/// TODO: port `Length.cm` (typst-library/src/layout/length.rs).
-fn impl_length_to_cm(
-  self_ : Length,
-  span : @syntax.Span,
-) -> Double raise SourceError {
-  ignore(self_)
-  ignore(span)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`Length.cm` is not yet ported",
-    ),
-  ])
-}
-
-///|
-/// TODO: port `Length.inches` (typst-library/src/layout/length.rs).
-fn impl_length_to_inches(
-  self_ : Length,
-  span : @syntax.Span,
-) -> Double raise SourceError {
-  ignore(self_)
-  ignore(span)
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "`Length.inches` is not yet ported",
-    ),
-  ])
-}
-
-///|
-/// TODO: port `Length.to-absolute` (typst-library/src/layout/length.rs).
-fn impl_length_to_absolute(
-  self_ : Length,
-  context : Context,
-) -> Length raise HintedError {
-  ignore(self_)
-  ignore(context)
-  bail("`Length.to-absolute` is not yet ported")
 }
 
 ///|
@@ -3623,7 +3471,7 @@ fn impl_gradient_linear__relative_default() -> Value raise SourceError {
 
 ///|
 /// TODO: port default `Dir::LTR`.
-fn impl_gradient_linear__dir_default() -> Value raise SourceError {
+fn impl_gradient_linear__dir_default() -> Dir raise SourceError {
   raise SourceError([
     SourceDiagnostic::error_at(
       @syntax.Span::detached(),
@@ -4078,78 +3926,6 @@ fn impl_i64_const_max() -> Value {
 ///|
 /// TODO: port constant `i64::MIN`.
 fn impl_i64_const_min() -> Value {
-  None
-}
-
-///|
-/// TODO: port constant `Alignment::START`.
-fn impl_alignment_const_start() -> Value {
-  None
-}
-
-///|
-/// TODO: port constant `Alignment::END`.
-fn impl_alignment_const_end() -> Value {
-  None
-}
-
-///|
-/// TODO: port constant `Alignment::LEFT`.
-fn impl_alignment_const_left() -> Value {
-  None
-}
-
-///|
-/// TODO: port constant `Alignment::CENTER`.
-fn impl_alignment_const_center() -> Value {
-  None
-}
-
-///|
-/// TODO: port constant `Alignment::RIGHT`.
-fn impl_alignment_const_right() -> Value {
-  None
-}
-
-///|
-/// TODO: port constant `Alignment::TOP`.
-fn impl_alignment_const_top() -> Value {
-  None
-}
-
-///|
-/// TODO: port constant `Alignment::HORIZON`.
-fn impl_alignment_const_horizon() -> Value {
-  None
-}
-
-///|
-/// TODO: port constant `Alignment::BOTTOM`.
-fn impl_alignment_const_bottom() -> Value {
-  None
-}
-
-///|
-/// TODO: port constant `Dir::LTR`.
-fn impl_dir_const_ltr() -> Value {
-  None
-}
-
-///|
-/// TODO: port constant `Dir::RTL`.
-fn impl_dir_const_rtl() -> Value {
-  None
-}
-
-///|
-/// TODO: port constant `Dir::TTB`.
-fn impl_dir_const_ttb() -> Value {
-  None
-}
-
-///|
-/// TODO: port constant `Dir::BTT`.
-fn impl_dir_const_btt() -> Value {
   None
 }
 

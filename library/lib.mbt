@@ -375,6 +375,7 @@ pub fn LibraryBuilder::build(self : LibraryBuilder) -> Library {
   introspection_define(global)
   loading_define(global)
   global.define("math", Module(math)) |> ignore
+  prelude_layout(global)
   for f in self.extra {
     f(global)
   }

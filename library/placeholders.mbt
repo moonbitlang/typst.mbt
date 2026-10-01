@@ -326,45 +326,6 @@ pub fn Symbol::runtime_char(c : Char) -> Symbol {
 // section with the real port, keeping the methods used by `dyn.mbt`.
 
 ///|
-/// An alignment. (placeholder; see layout/align.rs)
-pub(all) struct Alignment {
-  priv repr_ : String
-} derive(Eq, Hash)
-
-///|
-pub fn Alignment::repr(self : Alignment) -> String {
-  self.repr_
-}
-
-///|
-/// Sum two alignments (upstream `Add for Alignment`).
-pub fn Alignment::add(
-  self : Alignment,
-  _other : Alignment,
-) -> Alignment raise HintedError {
-  bail("alignments are not ported yet") |> ignore
-  self
-}
-
-///|
-/// The fields of an alignment (`x`, `y`); `None` if missing.
-pub fn Alignment::field(self : Alignment, _field : String) -> Value? {
-  ignore(self)
-  None
-}
-
-///|
-/// A direction. (placeholder; see layout/dir.rs)
-pub(all) struct Dir {
-  priv repr_ : String
-} derive(Eq, Hash)
-
-///|
-pub fn Dir::repr(self : Dir) -> String {
-  self.repr_
-}
-
-///|
 /// A regular expression. (placeholder; see foundations/str.rs)
 pub(all) struct Regex {
   priv pattern : String

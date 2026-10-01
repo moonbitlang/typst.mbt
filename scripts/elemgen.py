@@ -141,7 +141,54 @@ def translate_default(rust_ty, mty, expr):
         return "Relative(Rel::one())"
     if e == "Angle::zero()" and mty == "Angle":
         return "Angle(Angle::zero())"
+    if ALIGN_TYPES.fullmatch(mty):
+        align = translate_alignment(e)
+        if align:
+            return f"Dyn(Alignment({align}))"
+    m = re.fullmatch(r"Dir::(LTR|RTL|TTB|BTT)", e)
+    if m and mty == "Dir":
+        return f"Dyn(Dir(Dir::{m.group(1)}))"
     return None
+
+
+ALIGN_TYPES = re.compile(r"(Outer)?[HV]?Alignment|SpecificAlignment\[.*\]")
+
+
+def translate_alignment(e):
+    """Translate an alignment expression into an `Alignment` expression."""
+    m = re.fullmatch(r"Alignment::([A-Z]+)", e)
+    if m:
+        return f"alignment_{m.group(1).lower()}"
+    m = re.fullmatch(r"(?:Outer)?HAlignment::(\w+)", e)
+    if m:
+        return f"Alignment::H(HAlignment::{m.group(1)})"
+    m = re.fullmatch(r"(?:Outer)?VAlignment::(\w+)", e)
+    if m:
+        return f"Alignment::V(VAlignment::{m.group(1)})"
+    m = (re.fullmatch(r"(?:Outer)?HAlignment::(\w+) \+ (?:Outer)?VAlignment::(\w+)", e)
+         or re.fullmatch(r"SpecificAlignment::Both\((?:Outer)?HAlignment::(\w+), (?:Outer)?VAlignment::(\w+)\)", e))
+    if m:
+        return f"Alignment::Both(HAlignment::{m.group(1)}, VAlignment::{m.group(2)})"
+    return None
+
+
+# MoonBit types with a `Fold` impl.
+FOLD_TYPES = {"Bool", "Length", "Rel[Length]", "Alignment"}
+
+
+def foldable(mty):
+    """Whether the MoonBit type implements `Fold`."""
+    if mty in FOLD_TYPES:
+        return True
+    if mty.endswith("?"):
+        return foldable(mty[:-1])
+    m = re.fullmatch(r"Smart\[(.*)\]", mty)
+    if m:
+        return foldable(m.group(1))
+    m = re.fullmatch(r"(?:Sides|Corners)\[(.*)\?\]", mty)
+    if m:
+        return foldable(m.group(1))
+    return False
 
 
 def defined_functions():
@@ -222,7 +269,9 @@ def main():
                     args.append(f"default=() => {expr}")
             if f["fold"]:
                 fname = f"{var}_{snake(f['ident'])}_fold"
-                if fname not in defined:
+                if fname not in defined and foldable(mty):
+                    fname = f"fold_of((Ty::new() : Ty[{mty}]))"
+                elif fname not in defined:
                     todo.append(
                         f"///|\n/// TODO: fold for `{f['ty']}` ({e['ident']}.{f['ident']}).\nfn {fname}(inner : Value, _outer : Value) -> Value {{\n  inner\n}}\n"
                     )

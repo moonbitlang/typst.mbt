@@ -3,21 +3,16 @@
 //    10 TrackSizings
 //     9 Option<Paint>
 //     7 Sizing
-//     6 Alignment
 //     6 Option<Numbering>
 //     4 Option<Arc<Stroke>>
-//     4 OuterHAlignment
 //     4 Smart<Option<Supplement>>
 //     4 Smart<Option<Stroke>>
 //     3 Sides<Option<Option<Stroke>>>
 //     3 Smart<Spacing>
-//     3 OuterVAlignment
-//     3 Smart<Alignment>
 //     3 Smart<Option<Paint>>
 //     3 Smart<ScaleAmount>
 //     3 Locale
 //     3 DelimiterPair
-//     3 HAlignment
 //     3 Lang
 //     3 Option<Region>
 //     3 Numbering
@@ -37,7 +32,6 @@
 //     2 OneOrMultiple<EcoString>
 //     2 Option<Counter>
 //     2 Depth
-//     2 Smart<HAlignment>
 //     2 Vec<TableItem>
 //     2 TopEdge
 //     2 BottomEdge
@@ -59,14 +53,11 @@
 //     1 Smart<Margin<Smart<Rel<Length>>>>
 //     1 Margin<Rel<Length>>
 //     1 Smart<Binding>
-//     1 SpecificAlignment<HAlignment, OuterVAlignment>
 //     1 Option<Parity>
-//     1 Dir
 //     1 Option<Spacing>
 //     1 Vec<StackChild>
 //     1 Accent
 //     1 Smart<CancelAngle>
-//     1 SpecificAlignment<OuterHAlignment, VAlignment>
 //     1 MathSize
 //     1 Option<MathVariant>
 //     1 (i16, i16)
@@ -84,7 +75,6 @@
 //     1 Smart<Option<Datetime>>
 //     1 Vec<Packed<EnumItem>>
 //     1 SmallVec<[u64; 4]>
-//     1 Option<Smart<VAlignment>>
 //     1 Option<Packed<FigureCaption>>
 //     1 Smart<FigureKind>
 //     1 FigureKind
@@ -503,13 +493,13 @@ pub fn align_elem() -> Element {
         capabilities=[],
         fields=[
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Alignment]),
             id=0,
             name="alignment",
             kind=Settable,
             positional=true,
             default=align_elem_alignment_default,
-            fold=align_elem_alignment_fold,
+            fold=fold_of((Ty::new() : Ty[Alignment])),
           ),
           field_of(
             (Ty::new() : Ty[Content]),
@@ -697,7 +687,7 @@ pub fn box_elem() -> Element {
             name="radius",
             kind=Settable,
             default=() => Dict(Dict::new()),
-            fold=box_elem_radius_fold,
+            fold=fold_of((Ty::new() : Ty[Corners[Rel[Length]?]])),
           ),
           field_of(
             (Ty::new() : Ty[Sides[Rel[Length]?]]),
@@ -705,7 +695,7 @@ pub fn box_elem() -> Element {
             name="inset",
             kind=Settable,
             default=() => Dict(Dict::new()),
-            fold=box_elem_inset_fold,
+            fold=fold_of((Ty::new() : Ty[Sides[Rel[Length]?]])),
           ),
           field_of(
             (Ty::new() : Ty[Sides[Rel[Length]?]]),
@@ -713,7 +703,7 @@ pub fn box_elem() -> Element {
             name="outset",
             kind=Settable,
             default=() => Dict(Dict::new()),
-            fold=box_elem_outset_fold,
+            fold=fold_of((Ty::new() : Ty[Sides[Rel[Length]?]])),
           ),
           field_of((Ty::new() : Ty[Bool]), id=8, name="clip", kind=Settable, default=() => {
             Bool(false)
@@ -858,7 +848,7 @@ pub fn block_elem() -> Element {
             name="radius",
             kind=Settable,
             default=() => Dict(Dict::new()),
-            fold=block_elem_radius_fold,
+            fold=fold_of((Ty::new() : Ty[Corners[Rel[Length]?]])),
           ),
           field_of(
             (Ty::new() : Ty[Sides[Rel[Length]?]]),
@@ -866,7 +856,7 @@ pub fn block_elem() -> Element {
             name="inset",
             kind=Settable,
             default=() => Dict(Dict::new()),
-            fold=block_elem_inset_fold,
+            fold=fold_of((Ty::new() : Ty[Sides[Rel[Length]?]])),
           ),
           field_of(
             (Ty::new() : Ty[Sides[Rel[Length]?]]),
@@ -874,7 +864,7 @@ pub fn block_elem() -> Element {
             name="outset",
             kind=Settable,
             default=() => Dict(Dict::new()),
-            fold=block_elem_outset_fold,
+            fold=fold_of((Ty::new() : Ty[Sides[Rel[Length]?]])),
           ),
           field_of(
             (Ty::new() : Ty[Value]),
@@ -1239,11 +1229,11 @@ pub fn grid_h_line_elem() -> Element {
             fold=grid_h_line_elem_stroke_fold,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[OuterVAlignment]),
             id=4,
             name="position",
             kind=Settable,
-            default=grid_h_line_elem_position_default,
+            default=() => Dyn(Alignment(Alignment::V(VAlignment::Top))),
           ),
         ],
       )
@@ -1310,11 +1300,11 @@ pub fn grid_v_line_elem() -> Element {
             fold=grid_v_line_elem_stroke_fold,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[OuterHAlignment]),
             id=4,
             name="position",
             kind=Settable,
-            default=grid_v_line_elem_position_default,
+            default=() => Dyn(Alignment(Alignment::H(HAlignment::Start))),
           ),
         ],
       )
@@ -1399,11 +1389,11 @@ pub fn grid_cell_elem() -> Element {
             default=() => Auto,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Smart[Alignment]]),
             id=6,
             name="align",
             kind=Settable,
-            default=grid_cell_elem_align_default,
+            default=() => Auto,
           ),
           field_of(
             (Ty::new() : Ty[Value]),
@@ -1753,11 +1743,17 @@ pub fn page_elem() -> Element {
             default=() => Auto,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[SpecificAlignment[HAlignment, OuterVAlignment]]),
             id=11,
             name="number-align",
             kind=Ghost,
-            default=page_elem_number_align_default,
+            default=() => {
+              Dyn(
+                Alignment(
+                  Alignment::Both(HAlignment::Center, VAlignment::Bottom),
+                ),
+              )
+            },
           ),
           field_of(
             (Ty::new() : Ty[Smart[Content?]]),
@@ -1942,12 +1938,12 @@ pub fn place_elem() -> Element {
         capabilities=["Unqueriable", "Locatable", "Tagged"],
         fields=[
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Smart[Alignment]]),
             id=0,
             name="alignment",
             kind=Settable,
             positional=true,
-            default=place_elem_alignment_default,
+            default=() => Dyn(Alignment(alignment_start)),
           ),
           field_of(
             (Ty::new() : Ty[Value]),
@@ -2200,13 +2196,9 @@ pub fn stack_elem() -> Element {
         keywords=[],
         capabilities=[],
         fields=[
-          field_of(
-            (Ty::new() : Ty[Value]),
-            id=0,
-            name="dir",
-            kind=Settable,
-            default=stack_elem_dir_default,
-          ),
+          field_of((Ty::new() : Ty[Dir]), id=0, name="dir", kind=Settable, default=() => {
+            Dyn(Dir(Dir::TTB))
+          }),
           field_of(
             (Ty::new() : Ty[Value]),
             id=1,
@@ -2320,12 +2312,18 @@ pub fn rotate_elem() -> Element {
             default=() => Angle(Angle::zero()),
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Alignment]),
             id=1,
             name="origin",
             kind=Settable,
-            default=rotate_elem_origin_default,
-            fold=rotate_elem_origin_fold,
+            default=() => {
+              Dyn(
+                Alignment(
+                  Alignment::Both(HAlignment::Center, VAlignment::Horizon),
+                ),
+              )
+            },
+            fold=fold_of((Ty::new() : Ty[Alignment])),
           ),
           field_of((Ty::new() : Ty[Bool]), id=2, name="reflow", kind=Settable, default=() => {
             Bool(false)
@@ -2397,12 +2395,18 @@ pub fn scale_elem() -> Element {
             default=scale_elem_y_default,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Alignment]),
             id=3,
             name="origin",
             kind=Settable,
-            default=scale_elem_origin_default,
-            fold=scale_elem_origin_fold,
+            default=() => {
+              Dyn(
+                Alignment(
+                  Alignment::Both(HAlignment::Center, VAlignment::Horizon),
+                ),
+              )
+            },
+            fold=fold_of((Ty::new() : Ty[Alignment])),
           ),
           field_of((Ty::new() : Ty[Bool]), id=4, name="reflow", kind=Settable, default=() => {
             Bool(false)
@@ -2464,12 +2468,18 @@ pub fn skew_elem() -> Element {
             Angle(Angle::zero())
           }),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Alignment]),
             id=2,
             name="origin",
             kind=Settable,
-            default=skew_elem_origin_default,
-            fold=skew_elem_origin_fold,
+            default=() => {
+              Dyn(
+                Alignment(
+                  Alignment::Both(HAlignment::Center, VAlignment::Horizon),
+                ),
+              )
+            },
+            fold=fold_of((Ty::new() : Ty[Alignment])),
           ),
           field_of((Ty::new() : Ty[Bool]), id=3, name="reflow", kind=Settable, default=() => {
             Bool(false)
@@ -2920,11 +2930,15 @@ pub fn equation_elem() -> Element {
             default=equation_elem_numbering_default,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[SpecificAlignment[OuterHAlignment, VAlignment]]),
             id=2,
             name="number-align",
             kind=Settable,
-            default=equation_elem_number_align_default,
+            default=() => {
+              Dyn(
+                Alignment(Alignment::Both(HAlignment::End, VAlignment::Horizon)),
+              )
+            },
           ),
           field_of(
             (Ty::new() : Ty[Value]),
@@ -3275,11 +3289,11 @@ pub fn vec_elem() -> Element {
             default=vec_elem_delim_default,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[HAlignment]),
             id=1,
             name="align",
             kind=Settable,
-            default=vec_elem_align_default,
+            default=() => Dyn(Alignment(Alignment::H(HAlignment::Center))),
           ),
           field_of(
             (Ty::new() : Ty[Rel[Length]]),
@@ -3341,11 +3355,11 @@ pub fn mat_elem() -> Element {
             default=mat_elem_delim_default,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[HAlignment]),
             id=1,
             name="align",
             kind=Settable,
-            default=mat_elem_align_default,
+            default=() => Dyn(Alignment(Alignment::H(HAlignment::Center))),
           ),
           field_of(
             (Ty::new() : Ty[Value]),
@@ -4686,7 +4700,7 @@ pub fn enum_elem() -> Element {
             default=() => Auto,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Alignment]),
             id=8,
             name="number-align",
             kind=Settable,
@@ -4827,11 +4841,11 @@ pub fn figure_elem() -> Element {
             None
           }),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Smart[VAlignment]?]),
             id=2,
             name="placement",
             kind=Settable,
-            default=figure_elem_placement_default,
+            default=() => None,
           ),
           field_of(
             (Ty::new() : Ty[Value]),
@@ -4952,11 +4966,11 @@ pub fn figure_caption_elem() -> Element {
         capabilities=["Locatable", "Tagged", "Synthesize"],
         fields=[
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[OuterVAlignment]),
             id=0,
             name="position",
             kind=Settable,
-            default=figure_caption_elem_position_default,
+            default=() => Dyn(Alignment(Alignment::V(VAlignment::Bottom))),
           ),
           field_of(
             (Ty::new() : Ty[Smart[Content]]),
@@ -5534,7 +5548,7 @@ pub fn list_elem() -> Element {
             default=() => Auto,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Alignment]),
             id=5,
             name="marker-align",
             kind=Settable,
@@ -5969,18 +5983,18 @@ pub fn par_line_elem() -> Element {
             default=par_line_elem_numbering_default,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Smart[HAlignment]]),
             id=1,
             name="number-align",
             kind=Ghost,
-            default=par_line_elem_number_align_default,
+            default=() => Auto,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[OuterHAlignment]),
             id=2,
             name="number-margin",
             kind=Ghost,
-            default=par_line_elem_number_margin_default,
+            default=() => Dyn(Alignment(Alignment::H(HAlignment::Start))),
           ),
           field_of(
             (Ty::new() : Ty[Smart[Length]]),
@@ -6045,7 +6059,7 @@ pub fn par_line_marker_elem() -> Element {
             internal=true,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Smart[HAlignment]]),
             id=1,
             name="number-align",
             kind=Required,
@@ -6054,7 +6068,7 @@ pub fn par_line_marker_elem() -> Element {
             internal=true,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[OuterHAlignment]),
             id=2,
             name="number-margin",
             kind=Required,
@@ -6565,11 +6579,11 @@ pub fn table_h_line_elem() -> Element {
             fold=table_h_line_elem_stroke_fold,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[OuterVAlignment]),
             id=4,
             name="position",
             kind=Settable,
-            default=table_h_line_elem_position_default,
+            default=() => Dyn(Alignment(Alignment::V(VAlignment::Top))),
           ),
         ],
       )
@@ -6636,11 +6650,11 @@ pub fn table_v_line_elem() -> Element {
             fold=table_v_line_elem_stroke_fold,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[OuterHAlignment]),
             id=4,
             name="position",
             kind=Settable,
-            default=table_v_line_elem_position_default,
+            default=() => Dyn(Alignment(Alignment::H(HAlignment::Start))),
           ),
         ],
       )
@@ -6725,11 +6739,11 @@ pub fn table_cell_elem() -> Element {
             default=() => Auto,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Smart[Alignment]]),
             id=6,
             name="align",
             kind=Settable,
-            default=table_cell_elem_align_default,
+            default=() => Auto,
           ),
           field_of(
             (Ty::new() : Ty[Value]),
@@ -7285,7 +7299,7 @@ pub fn highlight_elem() -> Element {
             name="radius",
             kind=Settable,
             default=() => Dict(Dict::new()),
-            fold=highlight_elem_radius_fold,
+            fold=fold_of((Ty::new() : Ty[Corners[Rel[Length]?]])),
           ),
           field_of(
             (Ty::new() : Ty[Content]),
@@ -7845,11 +7859,11 @@ pub fn raw_elem() -> Element {
             default=() => None,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[HAlignment]),
             id=3,
             name="align",
             kind=Settable,
-            default=raw_elem_align_default,
+            default=() => Dyn(Alignment(Alignment::H(HAlignment::Start))),
           ),
           field_of(
             (Ty::new() : Ty[Value]),
@@ -8879,7 +8893,7 @@ pub fn rect_elem() -> Element {
             name="radius",
             kind=Settable,
             default=() => Dict(Dict::new()),
-            fold=rect_elem_radius_fold,
+            fold=fold_of((Ty::new() : Ty[Corners[Rel[Length]?]])),
           ),
           field_of(
             (Ty::new() : Ty[Sides[Rel[Length]?]]),
@@ -8887,7 +8901,7 @@ pub fn rect_elem() -> Element {
             name="inset",
             kind=Settable,
             default=rect_elem_inset_default,
-            fold=rect_elem_inset_fold,
+            fold=fold_of((Ty::new() : Ty[Sides[Rel[Length]?]])),
           ),
           field_of(
             (Ty::new() : Ty[Sides[Rel[Length]?]]),
@@ -8895,7 +8909,7 @@ pub fn rect_elem() -> Element {
             name="outset",
             kind=Settable,
             default=() => Dict(Dict::new()),
-            fold=rect_elem_outset_fold,
+            fold=fold_of((Ty::new() : Ty[Sides[Rel[Length]?]])),
           ),
           field_of(
             (Ty::new() : Ty[Content?]),
@@ -8995,7 +9009,7 @@ pub fn square_elem() -> Element {
             name="radius",
             kind=Settable,
             default=() => Dict(Dict::new()),
-            fold=square_elem_radius_fold,
+            fold=fold_of((Ty::new() : Ty[Corners[Rel[Length]?]])),
           ),
           field_of(
             (Ty::new() : Ty[Sides[Rel[Length]?]]),
@@ -9003,7 +9017,7 @@ pub fn square_elem() -> Element {
             name="inset",
             kind=Settable,
             default=square_elem_inset_default,
-            fold=square_elem_inset_fold,
+            fold=fold_of((Ty::new() : Ty[Sides[Rel[Length]?]])),
           ),
           field_of(
             (Ty::new() : Ty[Sides[Rel[Length]?]]),
@@ -9011,7 +9025,7 @@ pub fn square_elem() -> Element {
             name="outset",
             kind=Settable,
             default=() => Dict(Dict::new()),
-            fold=square_elem_outset_fold,
+            fold=fold_of((Ty::new() : Ty[Sides[Rel[Length]?]])),
           ),
           field_of(
             (Ty::new() : Ty[Content?]),
@@ -9107,7 +9121,7 @@ pub fn ellipse_elem() -> Element {
             name="inset",
             kind=Settable,
             default=ellipse_elem_inset_default,
-            fold=ellipse_elem_inset_fold,
+            fold=fold_of((Ty::new() : Ty[Sides[Rel[Length]?]])),
           ),
           field_of(
             (Ty::new() : Ty[Sides[Rel[Length]?]]),
@@ -9115,7 +9129,7 @@ pub fn ellipse_elem() -> Element {
             name="outset",
             kind=Settable,
             default=() => Dict(Dict::new()),
-            fold=ellipse_elem_outset_fold,
+            fold=fold_of((Ty::new() : Ty[Sides[Rel[Length]?]])),
           ),
           field_of(
             (Ty::new() : Ty[Content?]),
@@ -9212,7 +9226,7 @@ pub fn circle_elem() -> Element {
             name="inset",
             kind=Settable,
             default=circle_elem_inset_default,
-            fold=circle_elem_inset_fold,
+            fold=fold_of((Ty::new() : Ty[Sides[Rel[Length]?]])),
           ),
           field_of(
             (Ty::new() : Ty[Sides[Rel[Length]?]]),
@@ -9220,7 +9234,7 @@ pub fn circle_elem() -> Element {
             name="outset",
             kind=Settable,
             default=() => Dict(Dict::new()),
-            fold=circle_elem_outset_fold,
+            fold=fold_of((Ty::new() : Ty[Sides[Rel[Length]?]])),
           ),
           field_of(
             (Ty::new() : Ty[Content?]),
