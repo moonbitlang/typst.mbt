@@ -137,22 +137,6 @@ fn raw_elem_syntaxes_fold(inner : Value, _outer : Value) -> Value {
 // TODO: port `#[parse]` of RawElem.theme as `raw_elem_theme_parse`.
 
 ///|
-/// TODO: port `` (PdfFormat.standard).
-fn pdf_format_elem_standard_default() -> Value {
-  None
-}
-
-// TODO: port `#[parse]` of AttachElem.path as `pdf_attach_elem_path_parse`.
-
-// TODO: port `#[parse]` of AttachElem.data as `pdf_attach_elem_data_parse`.
-
-///|
-/// TODO: port `Default::default() of Option<AttachedFileRelationship>` (AttachElem.relationship).
-fn pdf_attach_elem_relationship_default() -> Value {
-  None
-}
-
-///|
 /// TODO: port `Scalar::new(144.0)` (PngFormat.ppi).
 fn png_format_elem_ppi_default() -> Value {
   None

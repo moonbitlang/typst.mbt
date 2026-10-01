@@ -4,7 +4,6 @@
 //     1 Target
 //     1 Tag
 //     1 callbacks::InlineCallback
-//     1 PdfMarkerTagKind
 //     1 Derived<CslSource, CslStyle>
 //     1 Option<CitationForm>
 //     1 Smart<Derived<CslSource, CslStyle>>
@@ -18,8 +17,6 @@
 //     1 Option<Smallcaps>
 //     1 Option<ShiftSettings>
 //     1 Vec<Packed<RawLine>>
-//     1 PdfStandards
-//     1 Option<AttachedFileRelationship>
 //     1 Scalar
 //     1 AssetData
 
@@ -2564,7 +2561,7 @@ pub fn pdf_marker_tag_elem() -> Element {
         capabilities=["Construct", "Tagged"],
         fields=[
         field_of((Ty::new() : Ty[Content]), id=0, name="body", kind=Required, positional=true, required=true),
-        field_of((Ty::new() : Ty[Value]), id=1, name="kind", kind=Required, positional=true, required=true, internal=true),
+        field_of((Ty::new() : Ty[PdfMarkerTagKind]), id=1, name="kind", kind=Required, positional=true, required=true, internal=true),
         ],
       )
       pdf_marker_tag_elem_cell.val = Some(e)
@@ -5687,7 +5684,7 @@ pub fn pdf_format_elem() -> Element {
         capabilities=["Construct"],
         fields=[
         field_of((Ty::new() : Ty[PageRanges?]), id=0, name="pages", kind=Settable, default=() => None),
-        field_of((Ty::new() : Ty[Value]), id=1, name="standard", kind=Settable, default=pdf_format_elem_standard_default),
+        field_of((Ty::new() : Ty[PdfStandards]), id=1, name="standard", kind=Settable, default=pdf_format_elem_standard_default),
         field_of((Ty::new() : Ty[Smart[Bool]]), id=2, name="tagged", kind=Settable, default=() => Auto),
         field_of((Ty::new() : Ty[Bool]), id=3, name="pretty", kind=Settable, default=() => Bool(false)),
         ],
@@ -5726,9 +5723,9 @@ pub fn pdf_attach_elem() -> Element {
         keywords=["embed"],
         capabilities=["Locatable"],
         fields=[
-        field_of((Ty::new() : Ty[PathOrStr]), id=0, name="path", kind=Required, positional=true, required=true),
-        field_of((Ty::new() : Ty[BytesValue]), id=1, name="data", kind=Required, positional=true, required=true),
-        field_of((Ty::new() : Ty[Value]), id=2, name="relationship", kind=Settable, default=pdf_attach_elem_relationship_default),
+        field_of((Ty::new() : Ty[PathOrStr]), id=0, name="path", kind=Required, positional=true, required=true, parse=pdf_attach_elem_path_parse),
+        field_of((Ty::new() : Ty[BytesValue]), id=1, name="data", kind=Required, positional=true, required=true, parse=pdf_attach_elem_data_parse),
+        field_of((Ty::new() : Ty[AttachedFileRelationship?]), id=2, name="relationship", kind=Settable, default=() => None),
         field_of((Ty::new() : Ty[String?]), id=3, name="mime-type", kind=Settable, default=() => None),
         field_of((Ty::new() : Ty[String?]), id=4, name="description", kind=Settable, default=() => None),
         ],

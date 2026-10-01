@@ -6570,17 +6570,17 @@ pub fn PdfPdfMarkerTag::with_body(self : PdfPdfMarkerTag, v : Content) -> PdfPdf
 }
 
 ///|
-pub fn PdfPdfMarkerTag::kind(self : PdfPdfMarkerTag) -> Value {
+pub fn PdfPdfMarkerTag::kind(self : PdfPdfMarkerTag) -> PdfMarkerTagKind {
   view_cast(self.0.field_raw(pdf_marker_tag_elem_kind).unwrap(), "pdf-marker-tag.kind")
 }
 
 ///|
-pub fn PdfPdfMarkerTag::with_kind(self : PdfPdfMarkerTag, v : Value) -> PdfPdfMarkerTag {
+pub fn PdfPdfMarkerTag::with_kind(self : PdfPdfMarkerTag, v : PdfMarkerTagKind) -> PdfPdfMarkerTag {
   PdfPdfMarkerTag(self.0.with_field(pdf_marker_tag_elem_kind, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn PdfPdfMarkerTag::new(body_ : Content, kind_ : Value) -> PdfPdfMarkerTag {
+pub fn PdfPdfMarkerTag::new(body_ : Content, kind_ : PdfMarkerTagKind) -> PdfPdfMarkerTag {
   PdfPdfMarkerTag(Content::new(pdf_marker_tag_elem(), [(pdf_marker_tag_elem_body, IntoValue::into_value(body_)), (pdf_marker_tag_elem_kind, IntoValue::into_value(kind_))]))
 }
 
@@ -15690,13 +15690,13 @@ pub fn PdfPdfFormat::set_pages(v : PageRanges?) -> Style {
 }
 
 ///|
-pub fn PdfPdfFormat::standard(self : PdfPdfFormat, styles : StyleChain) -> Value {
+pub fn PdfPdfFormat::standard(self : PdfPdfFormat, styles : StyleChain) -> PdfStandards {
   let e = pdf_format_elem()
   view_cast(styles.get_value_with_local(e, e.fields()[pdf_format_elem_standard], self.0.field_raw(pdf_format_elem_standard)), "pdf.standard")
 }
 
 ///|
-pub fn PdfPdfFormat::standard_local(self : PdfPdfFormat) -> Value? {
+pub fn PdfPdfFormat::standard_local(self : PdfPdfFormat) -> PdfStandards? {
   match self.0.field_raw(pdf_format_elem_standard) {
     Some(v) => Some(view_cast(v, "pdf.standard"))
     None => None
@@ -15704,17 +15704,17 @@ pub fn PdfPdfFormat::standard_local(self : PdfPdfFormat) -> Value? {
 }
 
 ///|
-pub fn PdfPdfFormat::with_standard(self : PdfPdfFormat, v : Value) -> PdfPdfFormat {
+pub fn PdfPdfFormat::with_standard(self : PdfPdfFormat, v : PdfStandards) -> PdfPdfFormat {
   PdfPdfFormat(self.0.with_field(pdf_format_elem_standard, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn PdfPdfFormat::standard_in(styles : StyleChain) -> Value {
+pub fn PdfPdfFormat::standard_in(styles : StyleChain) -> PdfStandards {
   view_cast(styles.get_field(pdf_format_elem(), pdf_format_elem_standard), "pdf.standard")
 }
 
 ///|
-pub fn PdfPdfFormat::set_standard(v : Value) -> Style {
+pub fn PdfPdfFormat::set_standard(v : PdfStandards) -> Style {
   Property(Property::new(pdf_format_elem(), pdf_format_elem_standard, IntoValue::into_value(v)))
 }
 
@@ -15821,13 +15821,13 @@ pub fn PdfAttachElem::with_data(self : PdfAttachElem, v : BytesValue) -> PdfAtta
 }
 
 ///|
-pub fn PdfAttachElem::relationship(self : PdfAttachElem, styles : StyleChain) -> Value {
+pub fn PdfAttachElem::relationship(self : PdfAttachElem, styles : StyleChain) -> AttachedFileRelationship? {
   let e = pdf_attach_elem()
   view_cast(styles.get_value_with_local(e, e.fields()[pdf_attach_elem_relationship], self.0.field_raw(pdf_attach_elem_relationship)), "attach.relationship")
 }
 
 ///|
-pub fn PdfAttachElem::relationship_local(self : PdfAttachElem) -> Value? {
+pub fn PdfAttachElem::relationship_local(self : PdfAttachElem) -> AttachedFileRelationship?? {
   match self.0.field_raw(pdf_attach_elem_relationship) {
     Some(v) => Some(view_cast(v, "attach.relationship"))
     None => None
@@ -15835,17 +15835,17 @@ pub fn PdfAttachElem::relationship_local(self : PdfAttachElem) -> Value? {
 }
 
 ///|
-pub fn PdfAttachElem::with_relationship(self : PdfAttachElem, v : Value) -> PdfAttachElem {
+pub fn PdfAttachElem::with_relationship(self : PdfAttachElem, v : AttachedFileRelationship?) -> PdfAttachElem {
   PdfAttachElem(self.0.with_field(pdf_attach_elem_relationship, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn PdfAttachElem::relationship_in(styles : StyleChain) -> Value {
+pub fn PdfAttachElem::relationship_in(styles : StyleChain) -> AttachedFileRelationship? {
   view_cast(styles.get_field(pdf_attach_elem(), pdf_attach_elem_relationship), "attach.relationship")
 }
 
 ///|
-pub fn PdfAttachElem::set_relationship(v : Value) -> Style {
+pub fn PdfAttachElem::set_relationship(v : AttachedFileRelationship?) -> Style {
   Property(Property::new(pdf_attach_elem(), pdf_attach_elem_relationship, IntoValue::into_value(v)))
 }
 

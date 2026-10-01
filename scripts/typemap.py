@@ -223,6 +223,11 @@ TYPEMAP = {
     "ExchangeFormat": "ExchangeFormat",
     "PixelFormat": "PixelFormat",
     "PixelEncoding": "PixelEncoding",
+    # typst-pdf/src/format.rs, model/accessibility.rs
+    "PdfStandards": "PdfStandards",
+    "PdfStandard": "PdfStandard",
+    "AttachedFileRelationship": "AttachedFileRelationship",
+    "PdfMarkerTagKind": "PdfMarkerTagKind",
     # text/lang.rs
     "Locale": "Locale",
     # typst-html (dom.rs, css/encode.rs); ported in library/html_*.mbt
