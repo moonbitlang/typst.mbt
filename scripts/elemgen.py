@@ -178,7 +178,7 @@ def translate_alignment(e):
 
 
 # MoonBit types with a `Fold` impl.
-FOLD_TYPES = {"Bool", "Length", "Rel[Length]", "Alignment", "Stroke"}
+FOLD_TYPES = {"Bool", "Length", "Rel[Length]", "Alignment", "Stroke", "Augment"}
 
 
 def foldable(mty):

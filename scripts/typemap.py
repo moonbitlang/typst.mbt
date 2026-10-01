@@ -205,6 +205,51 @@ TYPEMAP = {
     "FillRule": "FillRule",
     "CloseMode": "CloseMode",
     "CurveComponent": "CurveComponent",
+    # math/*.rs
+    "MathSize": "MathSize",
+    "MathVariant": "MathVariant",
+    "MathClass": "@unicode.MathClass",
+    "FracStyle": "FracStyle",
+    "DelimiterPair": "DelimiterPair",
+    "Augment": "Augment",
+    "CancelAngle": "CancelAngle",
+    "(i16, i16)": "(I16, I16)",
+    # visualize/image/*.rs
+    "ImageFormat": "ImageFormat",
+    "ImageFit": "ImageFit",
+    "ImageScaling": "ImageScaling",
+    "RasterFormat": "RasterFormat",
+    "VectorFormat": "VectorFormat",
+    "ExchangeFormat": "ExchangeFormat",
+    "PixelFormat": "PixelFormat",
+    "PixelEncoding": "PixelEncoding",
+    # typst-pdf/src/format.rs, model/accessibility.rs
+    "PdfStandards": "PdfStandards",
+    "PdfStandard": "PdfStandard",
+    "AttachedFileRelationship": "AttachedFileRelationship",
+    "PdfMarkerTagKind": "PdfMarkerTagKind",
+    # typst_utils
+    "Scalar": "Scalar",
+    # model/link.rs, introspection/position.rs
+    "LinkTarget": "LinkTarget",
+    "Destination": "Destination",
+    "Url": "Url",
+    "PagedPosition": "PagedPosition",
+    # typst-bundle/src/format.rs
+    "AssetData": "AssetData",
+    # model/cite.rs
+    "CitationForm": "CitationForm",
+    # text/shift.rs, text/smallcaps.rs, Packed<T> of plain elements
+    "Smallcaps": "Smallcaps",
+    "ShiftSettings": "ShiftSettings",
+    "Packed<OutlineElem>": "OutlineElem",
+    "Packed<CiteElem>": "CiteElem",
+    "Packed<RawLine>": "RawLine",
+    # layout/abs.rs
+    "Abs": "Abs",
+    "OutlineEntry": "OutlineEntry",
+    # text/lang.rs
+    "Locale": "Locale",
     # foundations/target.rs, introspection/tag.rs
     "Target": "Target",
     "Tag": "Tag",
@@ -259,6 +304,12 @@ def mbt_type(rust):
     if m:
         inner = mbt_type(m.group(1))
         return "Value" if inner == "Value" and m.group(1) != "Value" else inner + "?"
+    # `Derived<S, D>` casts like its user-visible source `S` (upstream's
+    # `Reflect`/`IntoValue` impls); the derived part is computed by the
+    # field's `#[parse]` hook and not stored in the field value.
+    m = re.fullmatch(r"Derived<(.*)>", rust)
+    if m:
+        return mbt_type(_split_generics(m.group(1))[0])
     m = re.fullmatch(r"Vec<(.*)>", rust)
     if m:
         inner = mbt_type(m.group(1))

@@ -214,6 +214,33 @@ pub impl IntoValue for Abs with fn into_value(self) {
   Length(Length::from_abs(self))
 }
 
+// Upstream `Abs` only casts into a value (as a length); it is stored in
+// internal fields (e.g. `PrefixInfo::inset`). Casting back takes the absolute
+// part of a length.
+
+///|
+pub impl Reflect for Abs with fn input() {
+  Type(Type::length())
+}
+
+///|
+pub impl Reflect for Abs with fn output() {
+  Type(Type::length())
+}
+
+///|
+pub impl Reflect for Abs with fn castable(v) {
+  v is Length(_)
+}
+
+///|
+pub impl FromValue for Abs with fn from_value(v) {
+  match v {
+    Length(l) => l.abs
+    v => raise HintedError(CastInfo::Type(Type::length()).error(v))
+  }
+}
+
 ///|
 pub impl Fold for Abs with fn fold(self, _) {
   self
