@@ -91,7 +91,7 @@ fn eval_impl(
 }
 
 /// Deduplicate diagnostics (like upstream).
-fn deduplicate(mut diags: EcoVec<SourceDiagnostic>) -> EcoVec<SourceDiagnostic> {
+pub fn deduplicate(mut diags: EcoVec<SourceDiagnostic>) -> EcoVec<SourceDiagnostic> {
     let hash =
         |diag: &SourceDiagnostic| typst_utils::hash128(&(&diag.span, &diag.message));
     let mut unique = FxHashSet::default();
@@ -99,7 +99,7 @@ fn deduplicate(mut diags: EcoVec<SourceDiagnostic>) -> EcoVec<SourceDiagnostic> 
     diags
 }
 
-fn write_diag(out: &mut String, world: &TestWorld, main: FileId, diag: &SourceDiagnostic) {
+pub fn write_diag(out: &mut String, world: &TestWorld, main: FileId, diag: &SourceDiagnostic) {
     let severity = match diag.severity {
         typst::diag::Severity::Error => "error",
         typst::diag::Severity::Warning => "warning",
