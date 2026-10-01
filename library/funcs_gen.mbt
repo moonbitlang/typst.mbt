@@ -8708,7 +8708,7 @@ pub fn native_eval() -> NativeFuncData {
           {
             name: "mode",
             docs: "The @reference:syntax:modes[syntactical mode] in which the string is parsed.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[@syntax.SyntaxMode])),
             default: Some(() => {
               IntoValue::into_value(impl_eval__mode_default()) catch {
                 _ => None
@@ -8754,7 +8754,7 @@ fn native_eval_call(
   ignore(engine)
   ignore(context)
   let source_ : @syntax.Spanned[String] = args.expect_spanned("source")
-  let mode_ : Value = match args.named("mode") {
+  let mode_ : @syntax.SyntaxMode = match args.named("mode") {
     Some(v) => v
     None => impl_eval__mode_default()
   }

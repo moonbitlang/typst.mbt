@@ -2592,6 +2592,7 @@ pub fn Content::repeat(Self, Int) -> Self
 pub fn Content::repr(Self) -> String
 pub fn Content::sequence(ArrayView[Self]) -> Self
 pub fn Content::sequence_recursive_for_each(Self, (Self) -> Unit) -> Unit
+pub fn Content::set(Self, Element, Int, Value) -> Self
 pub fn Content::span(Self) -> @syntax.Span
 pub fn Content::spanned(Self, @syntax.Span) -> Self
 pub fn Content::styled(Self, Style) -> Self
@@ -3577,6 +3578,7 @@ pub impl FromValue for Double
 pub impl FromValue for String
 pub impl[T : FromValue] FromValue for T?
 pub impl[T : FromValue] FromValue for Array[T]
+pub impl FromValue for @syntax.SyntaxMode
 
 pub(open) trait IntoValue {
   fn into_value(Self) -> Value
@@ -3587,6 +3589,7 @@ pub impl IntoValue for Double
 pub impl IntoValue for String
 pub impl[T : IntoValue] IntoValue for T?
 pub impl[T : IntoValue] IntoValue for Array[T]
+pub impl IntoValue for @syntax.SyntaxMode
 
 pub(open) trait Numeric : Add + Sub + Neg + Eq {
   fn zero() -> Self
@@ -3606,6 +3609,7 @@ pub impl Reflect for Double
 pub impl Reflect for String
 pub impl[T : Reflect] Reflect for T?
 pub impl[T : Reflect] Reflect for Array[T]
+pub impl Reflect for @syntax.SyntaxMode
 
 pub(open) trait World {
   fn library(Self) -> Library
