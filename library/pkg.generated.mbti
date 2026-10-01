@@ -417,7 +417,7 @@ pub let equation_elem_variant : Int
 
 pub fn exp10(Int) -> Double
 
-pub fn[T : FromValue + IntoValue] field_of(Ty[T], id~ : Int, name~ : String, docs? : String, kind~ : FieldKind, positional? : Bool, required? : Bool, variadic? : Bool, internal? : Bool, default? : () -> Value, fold? : (Value, Value) -> Value, parse? : (Engine, Args) -> Value? raise SourceError) -> FieldInfo
+pub fn[T : FromValue + IntoValue] field_of(Ty[T], id~ : Int, name~ : String, docs? : String, kind~ : FieldKind, positional? : Bool, required? : Bool, variadic? : Bool, internal? : Bool, default? : () -> Value, fold? : (Value, Value) -> Value, parse? : (Engine, Args, ParseLocals) -> Value? raise SourceError) -> FieldInfo
 
 pub fn fields_field(Value, String) -> Value raise HintedError
 
@@ -2824,7 +2824,7 @@ pub struct FieldInfo {
   cast : (Value) -> Value raise HintedError
   default : (() -> Value)?
   fold : ((Value, Value) -> Value)?
-  parse : ((Engine, Args) -> Value? raise SourceError)?
+  parse : ((Engine, Args, ParseLocals) -> Value? raise SourceError)?
 }
 
 pub(all) enum FieldKind {
@@ -3079,6 +3079,11 @@ pub(all) struct ParamInfo {
   required : Bool
   settable : Bool
 }
+
+pub(all) struct ParseLocals(Map[String, Value?])
+pub fn ParseLocals::get(Self, String) -> Value?
+pub fn ParseLocals::new() -> Self
+pub fn ParseLocals::set(Self, String, Value?) -> Unit
 
 pub struct Property {
   elem : Element

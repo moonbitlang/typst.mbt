@@ -180,15 +180,11 @@ fn block_elem_above_default() -> Value {
   None
 }
 
-// TODO: port `#[parse]` of BlockElem.above as `block_elem_above_parse`.
-
 ///|
 /// TODO: port `Default::default() of Smart<Spacing>` (BlockElem.below).
 fn block_elem_below_default() -> Value {
   None
 }
-
-// TODO: port `#[parse]` of BlockElem.below as `block_elem_below_parse`.
 
 ///|
 /// TODO: port `Default::default() of Option<BlockBody>` (BlockElem.body).
@@ -220,15 +216,11 @@ fn grid_elem_column_gutter_default() -> Value {
   None
 }
 
-// TODO: port `#[parse]` of GridElem.column_gutter as `grid_elem_column_gutter_parse`.
-
 ///|
 /// TODO: port `Default::default() of TrackSizings` (GridElem.row_gutter).
 fn grid_elem_row_gutter_default() -> Value {
   None
 }
-
-// TODO: port `#[parse]` of GridElem.row_gutter as `grid_elem_row_gutter_parse`.
 
 ///|
 /// TODO: port `Default::default() of Celled<Sides<Option<Rel<Length>>>>` (GridElem.inset).
@@ -386,16 +378,6 @@ fn grid_cell_elem_breakable_default() -> Value {
   None
 }
 
-// TODO: port `#[parse]` of GridCell.is_repeated as `grid_cell_elem_is_repeated_parse`.
-
-// TODO: port `#[parse]` of PadElem.left as `pad_elem_left_parse`.
-
-// TODO: port `#[parse]` of PadElem.top as `pad_elem_top_parse`.
-
-// TODO: port `#[parse]` of PadElem.right as `pad_elem_right_parse`.
-
-// TODO: port `#[parse]` of PadElem.bottom as `pad_elem_bottom_parse`.
-
 ///|
 /// TODO: port `Paper::A4` (PageElem.paper).
 fn page_elem_paper_default() -> Value {
@@ -496,8 +478,6 @@ fn pagebreak_elem_to_default() -> Value {
   None
 }
 
-// TODO: port `#[parse]` of PagebreakElem.boundary as `pagebreak_elem_boundary_parse`.
-
 ///|
 /// TODO: port `Smart::Custom(Alignment::START)` (PlaceElem.alignment).
 fn place_elem_alignment_default() -> Value {
@@ -509,8 +489,6 @@ fn place_elem_alignment_default() -> Value {
 fn place_elem_scope_default() -> Value {
   None
 }
-
-// TODO: port `#[parse]` of VElem.attach as `v_elem_attach_parse`.
 
 ///|
 /// TODO: port `Dir::TTB` (StackElem.dir).
@@ -548,15 +526,11 @@ fn scale_elem_x_default() -> Value {
   None
 }
 
-// TODO: port `#[parse]` of ScaleElem.x as `scale_elem_x_parse`.
-
 ///|
 /// TODO: port `Smart::Custom(ScaleAmount::Ratio(Ratio::one()))` (ScaleElem.y).
 fn scale_elem_y_default() -> Value {
   None
 }
-
-// TODO: port `#[parse]` of ScaleElem.y as `scale_elem_y_parse`.
 
 ///|
 /// TODO: port `HAlignment::Center + VAlignment::Horizon` (ScaleElem.origin).
@@ -696,14 +670,6 @@ fn frac_elem_style_default() -> Value {
   None
 }
 
-// TODO: port `#[parse]` of FracElem.num_deparenthesized as `frac_elem_num_deparenthesized_parse`.
-
-// TODO: port `#[parse]` of FracElem.denom_deparenthesized as `frac_elem_denom_deparenthesized_parse`.
-
-// TODO: port `#[parse]` of BinomElem.lower as `binom_elem_lower_parse`.
-
-// TODO: port `#[parse]` of LrElem.body as `lr_elem_body_parse`.
-
 ///|
 /// TODO: port `DelimiterPair::PAREN` (VecElem.delim).
 fn vec_elem_delim_default() -> Value {
@@ -752,17 +718,11 @@ fn mat_elem_row_gap_default() -> Value {
   None
 }
 
-// TODO: port `#[parse]` of MatElem.row_gap as `mat_elem_row_gap_parse`.
-
 ///|
 /// TODO: port `DEFAULT_COL_GAP.into()` (MatElem.column_gap).
 fn mat_elem_column_gap_default() -> Value {
   None
 }
-
-// TODO: port `#[parse]` of MatElem.column_gap as `mat_elem_column_gap_parse`.
-
-// TODO: port `#[parse]` of MatElem.rows as `mat_elem_rows_parse`.
 
 ///|
 /// TODO: port `DelimiterPair::BRACE` (CasesElem.delim).
@@ -1046,10 +1006,6 @@ fn heading_elem_supplement_default() -> Value {
   None
 }
 
-// TODO: port `#[parse]` of LinkElem.dest as `link_elem_dest_parse`.
-
-// TODO: port `#[parse]` of LinkElem.body as `link_elem_body_parse`.
-
 ///|
 /// TODO: port `Default::default() of Option<Destination>` (LinkElem.current).
 fn link_elem_current_default() -> Value {
@@ -1242,15 +1198,11 @@ fn table_elem_column_gutter_default() -> Value {
   None
 }
 
-// TODO: port `#[parse]` of TableElem.column_gutter as `table_elem_column_gutter_parse`.
-
 ///|
 /// TODO: port `Default::default() of TrackSizings` (TableElem.row_gutter).
 fn table_elem_row_gutter_default() -> Value {
   None
 }
-
-// TODO: port `#[parse]` of TableElem.row_gutter as `table_elem_row_gutter_parse`.
 
 ///|
 /// TODO: port `Celled::Value(Sides::splat(Some(Abs::pt(5.0).into())))` (TableElem.inset).
@@ -1293,8 +1245,6 @@ fn table_elem_stroke_fold(inner : Value, _outer : Value) -> Value {
 fn table_elem_summary_default() -> Value {
   None
 }
-
-// TODO: port `#[parse]` of TableElem.summary as `table_elem_summary_parse`.
 
 ///|
 /// TODO: port `Default::default() of Smart<usize>` (TableHLine.y).
@@ -1421,10 +1371,6 @@ fn table_cell_elem_breakable_default() -> Value {
 fn table_cell_elem_kind_default() -> Value {
   None
 }
-
-// TODO: port `#[parse]` of TableCell.kind as `table_cell_elem_kind_parse`.
-
-// TODO: port `#[parse]` of TableCell.is_repeated as `table_cell_elem_is_repeated_parse`.
 
 ///|
 /// TODO: port `HElem::new(Em::new(0.6).into()).with_weak(true).pack()` (TermsElem.separator).
@@ -1578,15 +1524,11 @@ fn text_elem_size_fold(inner : Value, _outer : Value) -> Value {
   inner
 }
 
-// TODO: port `#[parse]` of TextElem.size as `text_elem_size_parse`.
-
 ///|
 /// TODO: port `Color::BLACK.into()` (TextElem.fill).
 fn text_elem_fill_default() -> Value {
   None
 }
-
-// TODO: port `#[parse]` of TextElem.fill as `text_elem_fill_parse`.
 
 ///|
 /// TODO: port `Default::default() of Option<Stroke>` (TextElem.stroke).
@@ -1825,8 +1767,6 @@ fn super_elem_size_default() -> Value {
 fn smart_quote_elem_quotes_default() -> Value {
   None
 }
-
-// TODO: port `#[parse]` of SpaceElem.had_newline as `space_elem_had_newline_parse`.
 
 ///|
 /// TODO: port `Default::default() of Option<Paint>` (CurveElem.fill).
