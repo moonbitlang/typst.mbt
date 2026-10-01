@@ -165,3 +165,41 @@ pub fn Dict::remove(
       }
   }
 }
+
+///|
+/// Check if there is any remaining pair, and if so return an
+/// "unexpected key" error.
+pub fn Dict::finish(
+  self : Dict,
+  expected : ArrayView[String],
+) -> Unit raise HintedError {
+  if self.is_empty() {
+    return
+  }
+  let unexpected = self.map.keys().collect()
+  bail(Dict::unexpected_keys(unexpected, Some(expected)))
+}
+
+///|
+/// Return an "unexpected key" error string.
+pub fn Dict::unexpected_keys(
+  unexpected : ArrayView[String],
+  hint_expected : ArrayView[String]?,
+) -> String {
+  let format_as_list = (arr : ArrayView[String]) => {
+    separated_list(arr.map(s => "\"\{s}\""), "and")
+  }
+  let msg = StringBuilder::new()
+  msg.write_string(
+    match unexpected.length() {
+      1 => "unexpected key "
+      _ => "unexpected keys "
+    },
+  )
+  msg.write_string(format_as_list(unexpected))
+  if hint_expected is Some(expected) {
+    msg.write_string(", valid keys are ")
+    msg.write_string(format_as_list(expected))
+  }
+  msg.to_string()
+}

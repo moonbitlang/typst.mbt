@@ -46,6 +46,11 @@ TYPEMAP = {
 # `X<A, B>` maps to `X[A', B']` if every argument maps to a ported type
 # (or is literally `Value`).
 GENERICS = {
+    "Smart": "Smart",
+    "Axes": "Axes",
+    # Only `Sides<Option<T>>` / `Corners<Option<T>>` are castable upstream.
+    "Sides": "Sides",
+    "Corners": "Corners",
 }
 
 

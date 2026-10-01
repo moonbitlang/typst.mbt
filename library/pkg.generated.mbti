@@ -2442,6 +2442,32 @@ pub impl FromValue for Arr
 pub impl IntoValue for Arr
 pub impl Reflect for Arr
 
+pub(all) struct Axes[T] {
+  x : T
+  y : T
+} derive(Default, Eq, Hash, @debug.Debug)
+pub fn[T] Axes::all(Self[T], (T) -> Bool) -> Bool
+pub fn[T] Axes::any(Self[T], (T) -> Bool) -> Bool
+pub fn[T] Axes::get(Self[T], Axis) -> T
+pub fn[T, U] Axes::map(Self[T], (T) -> U) -> Self[U]
+pub fn[T] Axes::new(T, T) -> Self[T]
+pub fn[T] Axes::splat(T) -> Self[T]
+pub fn[T] Axes::unwrap_or_smart(Self[Smart[T]], Self[T]) -> Self[T]
+pub fn[T, U] Axes::zip(Self[T], Self[U]) -> Self[(T, U)]
+pub fn[T, V, U] Axes::zip_map(Self[T], Self[V], (T, V) -> U) -> Self[U]
+pub impl[T : FromValue] FromValue for Axes[T]
+pub impl[T : IntoValue] IntoValue for Axes[T]
+pub impl[T : Reflect] Reflect for Axes[T]
+
+pub(all) enum Axis {
+  X
+  Y
+} derive(Eq, Hash, @debug.Debug)
+pub fn Axis::other(Self) -> Self
+pub impl FromValue for Axis
+pub impl IntoValue for Axis
+pub impl Reflect for Axis
+
 pub struct Binding {
   mut value : Value
   span : @syntax.Span
@@ -2597,6 +2623,36 @@ pub fn Context::location(Self) -> Location raise HintedError
 pub fn Context::new(location? : Location, styles? : StyleChain) -> Self
 pub fn Context::none() -> Self
 
+pub(all) enum Corner {
+  TopLeft
+  TopRight
+  BottomRight
+  BottomLeft
+} derive(Eq, Hash, @debug.Debug)
+pub fn Corner::inv(Self) -> Self
+pub fn Corner::next_ccw(Self) -> Self
+pub fn Corner::next_cw(Self) -> Self
+pub fn Corner::side_ccw(Self) -> Side
+pub fn Corner::side_cw(Self) -> Side
+
+pub(all) struct Corners[T] {
+  top_left : T
+  top_right : T
+  bottom_right : T
+  bottom_left : T
+} derive(Default, Eq, Hash, @debug.Debug)
+pub fn[T] Corners::get(Self[T], Corner) -> T
+pub fn[T : Eq] Corners::is_uniform(Self[T]) -> Bool
+pub fn[T] Corners::iter(Self[T]) -> Iter[T]
+pub fn[T, U] Corners::map(Self[T], (T) -> U) -> Self[U]
+pub fn[T] Corners::new(T, T, T, T) -> Self[T]
+pub fn[T] Corners::splat(T) -> Self[T]
+pub fn[T] Corners::unwrap_or(Self[T?], T) -> Self[T]
+pub fn[T, U] Corners::zip(Self[T], Self[U]) -> Self[(T, U)]
+pub impl[T : FromValue] FromValue for Corners[T?]
+pub impl[T : IntoValue + Eq] IntoValue for Corners[T?]
+pub impl[T : Reflect] Reflect for Corners[T?]
+
 pub(all) struct Counter {
   // private fields
 } derive(Eq, Hash)
@@ -2641,6 +2697,7 @@ pub struct Dict {
 }
 pub fn Dict::contains(Self, String) -> Bool
 pub fn Dict::copy(Self) -> Self
+pub fn Dict::finish(Self, ArrayView[String]) -> Unit raise HintedError
 pub fn Dict::from_pairs(ArrayView[(String, Value)]) -> Self
 pub fn Dict::get(Self, String) -> Value raise HintedError
 pub fn Dict::insert(Self, String, Value) -> Unit
@@ -2653,6 +2710,7 @@ pub fn Dict::new() -> Self
 pub fn Dict::remove(Self, String, Value?) -> Value raise HintedError
 pub fn Dict::repr(Self) -> String
 pub fn Dict::take(Self, String) -> Value raise HintedError
+pub fn Dict::unexpected_keys(ArrayView[String], ArrayView[String]?) -> String
 pub impl FromValue for Dict
 pub impl IntoValue for Dict
 pub impl Reflect for Dict
@@ -3238,6 +3296,38 @@ pub(all) struct ShowableSelector(Selector)
 pub impl FromValue for ShowableSelector
 pub impl Reflect for ShowableSelector
 
+pub(all) enum Side {
+  Left
+  Top
+  Right
+  Bottom
+} derive(Eq, Hash, @debug.Debug)
+pub fn Side::axis(Self) -> Axis
+pub fn Side::end_corner(Self) -> Corner
+pub fn Side::inv(Self) -> Self
+pub fn Side::next_ccw(Self) -> Self
+pub fn Side::next_cw(Self) -> Self
+pub fn Side::start_corner(Self) -> Corner
+
+pub(all) struct Sides[T] {
+  left : T
+  top : T
+  right : T
+  bottom : T
+} derive(Default, Eq, Hash, @debug.Debug)
+pub fn[T] Sides::get(Self[T], Side) -> T
+pub fn[T : Eq] Sides::is_uniform(Self[T]) -> Bool
+pub fn[T] Sides::iter(Self[T]) -> Iter[T]
+pub fn[T, U] Sides::map(Self[T], (T) -> U) -> Self[U]
+pub fn[T, U] Sides::map_corners(Self[T], (T, T) -> U) -> Corners[U]
+pub fn[T] Sides::new(T, T, T, T) -> Self[T]
+pub fn[T] Sides::splat(T) -> Self[T]
+pub fn[T] Sides::unwrap_or(Self[T?], T) -> Self[T]
+pub fn[T, U] Sides::zip(Self[T], Self[U]) -> Self[(T, U)]
+pub impl[T : FromValue] FromValue for Sides[T?]
+pub impl[T : IntoValue + Eq] IntoValue for Sides[T?]
+pub impl[T : Reflect] Reflect for Sides[T?]
+
 pub(all) struct Sink {
   delayed : Array[SourceDiagnostic]
   warnings : Array[SourceDiagnostic]
@@ -3249,6 +3339,28 @@ pub fn Sink::new() -> Self
 pub fn Sink::take_delayed(Self) -> Array[SourceDiagnostic]
 pub fn Sink::value(Self, Value, Styles?) -> Unit
 pub fn Sink::warn(Self, SourceDiagnostic) -> Unit
+
+pub(all) enum Smart[T] {
+  Auto
+  Custom(T)
+} derive(Eq, Hash, @debug.Debug)
+pub fn[T, U] Smart::and_then(Self[T], (T) -> Self[U]) -> Self[U]
+pub fn[T] Smart::custom(Self[T]) -> T?
+pub fn[T] Smart::flatten(Self[Self[T]]) -> Self[T]
+pub fn[T] Smart::from_option(T?) -> Self[T]
+pub fn[T] Smart::is_auto(Self[T]) -> Bool
+pub fn[T] Smart::is_custom(Self[T]) -> Bool
+pub fn[T] Smart::is_custom_and(Self[T], (T) -> Bool) -> Bool
+pub fn[T, U] Smart::map(Self[T], (T) -> U) -> Self[U]
+pub fn[T, U] Smart::map_or(Self[T], U, (T) -> U) -> U
+pub fn[T] Smart::or_(Self[T], Self[T]) -> Self[T]
+pub fn[T] Smart::or_else(Self[T], () -> Self[T]) -> Self[T]
+pub fn[T] Smart::unwrap_or(Self[T], T) -> T
+pub fn[T] Smart::unwrap_or_else(Self[T], () -> T) -> T
+pub impl[T] Default for Smart[T]
+pub impl[T : FromValue] FromValue for Smart[T]
+pub impl[T : IntoValue] IntoValue for Smart[T]
+pub impl[T : Reflect] Reflect for Smart[T]
 
 pub(all) struct SourceDiagnostic {
   severity : Severity

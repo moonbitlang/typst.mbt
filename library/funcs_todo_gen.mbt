@@ -2744,35 +2744,13 @@ fn impl_length_to_absolute(
 }
 
 ///|
-/// TODO: port default `Smart::Auto`.
-fn impl_measure__width_default() -> Value raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `measure.width` is not yet ported",
-    ),
-  ])
-}
-
-///|
-/// TODO: port default `Smart::Auto`.
-fn impl_measure__height_default() -> Value raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `measure.height` is not yet ported",
-    ),
-  ])
-}
-
-///|
 /// TODO: port `measure` (typst-library/src/layout/measure.rs).
 fn impl_measure(
   engine : Engine,
   context : Context,
   span : @syntax.Span,
-  width_ : Value,
-  height_ : Value,
+  width_ : Smart[Length],
+  height_ : Smart[Length],
   content_ : Content,
 ) -> Dict raise SourceError {
   ignore(engine)
@@ -3700,7 +3678,7 @@ fn impl_gradient_radial__relative_default() -> Value raise SourceError {
 
 ///|
 /// TODO: port default `Axes::splat(Ratio::new(0.5))`.
-fn impl_gradient_radial__center_default() -> Value raise SourceError {
+fn impl_gradient_radial__center_default() -> Axes[Ratio] raise SourceError {
   raise SourceError([
     SourceDiagnostic::error_at(
       @syntax.Span::detached(),
@@ -3716,17 +3694,6 @@ fn impl_gradient_radial__radius_default() -> @syntax.Spanned[Ratio] raise Source
     SourceDiagnostic::error_at(
       @syntax.Span::detached(),
       "default of `gradient_radial.radius` is not yet ported",
-    ),
-  ])
-}
-
-///|
-/// TODO: port default `Smart::Auto`.
-fn impl_gradient_radial__focal_center_default() -> Value raise SourceError {
-  raise SourceError([
-    SourceDiagnostic::error_at(
-      @syntax.Span::detached(),
-      "default of `gradient_radial.focal_center` is not yet ported",
     ),
   ])
 }
@@ -3749,9 +3716,9 @@ fn impl_gradient_radial(
   stops_ : Array[@syntax.Spanned[Value]],
   space_ : @syntax.Spanned[Value],
   relative_ : Value,
-  center_ : Value,
+  center_ : Axes[Ratio],
   radius_ : @syntax.Spanned[Ratio],
-  focal_center_ : Value,
+  focal_center_ : Smart[Axes[Ratio]],
   focal_radius_ : @syntax.Spanned[Ratio],
 ) -> Value raise SourceError {
   ignore(span)
@@ -3805,7 +3772,7 @@ fn impl_gradient_conic__relative_default() -> Value raise SourceError {
 
 ///|
 /// TODO: port default `Axes::splat(Ratio::new(0.5))`.
-fn impl_gradient_conic__center_default() -> Value raise SourceError {
+fn impl_gradient_conic__center_default() -> Axes[Ratio] raise SourceError {
   raise SourceError([
     SourceDiagnostic::error_at(
       @syntax.Span::detached(),
@@ -3822,7 +3789,7 @@ fn impl_gradient_conic(
   angle_ : Angle,
   space_ : @syntax.Spanned[Value],
   relative_ : Value,
-  center_ : Value,
+  center_ : Axes[Ratio],
 ) -> Value raise SourceError {
   ignore(span)
   ignore(stops_)
@@ -3922,7 +3889,7 @@ fn impl_gradient_angle(self_ : Value) -> Angle? raise HintedError {
 
 ///|
 /// TODO: port `Gradient.center` (typst-library/src/visualize/gradient.rs).
-fn impl_gradient_center(self_ : Value) -> Value raise HintedError {
+fn impl_gradient_center(self_ : Value) -> Axes[Ratio]? raise HintedError {
   ignore(self_)
   bail("`Gradient.center` is not yet ported")
 }
@@ -3936,7 +3903,7 @@ fn impl_gradient_radius(self_ : Value) -> Ratio? raise HintedError {
 
 ///|
 /// TODO: port `Gradient.focal-center` (typst-library/src/visualize/gradient.rs).
-fn impl_gradient_focal_center(self_ : Value) -> Value raise HintedError {
+fn impl_gradient_focal_center(self_ : Value) -> Axes[Ratio]? raise HintedError {
   ignore(self_)
   bail("`Gradient.focal-center` is not yet ported")
 }
@@ -4009,7 +3976,7 @@ fn impl_stroke_construct(args : Args) -> Value raise SourceError {
 
 ///|
 /// TODO: port default `Spanned::detached(Smart::Auto)`.
-fn impl_tiling_construct__size_default() -> @syntax.Spanned[Value] raise SourceError {
+fn impl_tiling_construct__size_default() -> @syntax.Spanned[Smart[Axes[Length]]] raise SourceError {
   raise SourceError([
     SourceDiagnostic::error_at(
       @syntax.Span::detached(),
@@ -4020,7 +3987,7 @@ fn impl_tiling_construct__size_default() -> @syntax.Spanned[Value] raise SourceE
 
 ///|
 /// TODO: port default `Spanned::detached(Axes::splat(Length::zero()))`.
-fn impl_tiling_construct__spacing_default() -> @syntax.Spanned[Value] raise SourceError {
+fn impl_tiling_construct__spacing_default() -> @syntax.Spanned[Axes[Length]] raise SourceError {
   raise SourceError([
     SourceDiagnostic::error_at(
       @syntax.Span::detached(),
@@ -4031,7 +3998,7 @@ fn impl_tiling_construct__spacing_default() -> @syntax.Spanned[Value] raise Sour
 
 ///|
 /// TODO: port default `Spanned::new(Axes::splat(Rel::zero()), Span::detached())`.
-fn impl_tiling_construct__offset_default() -> @syntax.Spanned[Value] raise SourceError {
+fn impl_tiling_construct__offset_default() -> @syntax.Spanned[Axes[Rel[Length]]] raise SourceError {
   raise SourceError([
     SourceDiagnostic::error_at(
       @syntax.Span::detached(),
@@ -4067,9 +4034,9 @@ fn impl_tiling_construct__relative_default() -> Value raise SourceError {
 fn impl_tiling_construct(
   engine : Engine,
   span : @syntax.Span,
-  size_ : @syntax.Spanned[Value],
-  spacing_ : @syntax.Spanned[Value],
-  offset_ : @syntax.Spanned[Value],
+  size_ : @syntax.Spanned[Smart[Axes[Length]]],
+  spacing_ : @syntax.Spanned[Axes[Length]],
+  offset_ : @syntax.Spanned[Axes[Rel[Length]]],
   angle_ : @syntax.Spanned[Angle],
   relative_ : Value,
   body_ : Content,

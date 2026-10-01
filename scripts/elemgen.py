@@ -23,31 +23,14 @@ import os
 import re
 import sys
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from typemap import mbt_type  # noqa: E402
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LIB = os.path.join(ROOT, "library")
 
-# Rust field type -> MoonBit type (must implement FromValue + IntoValue).
-TYPEMAP = {
-    "bool": "Bool",
-    "i64": "Int64",
-    "f64": "Double",
-    "Content": "Content",
-    "Option<Content>": "Content?",
-    "Vec<Content>": "Array[Content]",
-    "Length": "Length",
-    "Angle": "Angle",
-    "Ratio": "Ratio",
-    "Fr": "Fr",
-    "Rel<Length>": "Rel[Length]",
-    "EcoString": "String",
-    "Str": "String",
-    "Option<EcoString>": "String?",
-    "Option<bool>": "Bool?",
-    "Func": "Func",
-    "Label": "Label",
-    "Styles": "Styles",
-    "Value": "Value",
-}
+# MoonBit integer types (all cast from/to `Value::Int`).
+INT_TYPES = ("Int64", "U8", "U16", "U32", "U64", "USize", "I8", "I16", "I32")
 
 # Rust `Default::default()` of a mapped type, as a Value expression.
 TYPE_DEFAULTS = {
@@ -83,8 +66,26 @@ def elem_var(ident, file=""):
     return s
 
 
-def mbt_type(rust):
-    return TYPEMAP.get(rust, "Value")
+def type_default(mty):
+    """Rust `Default::default()` of a mapped type as a Value expression."""
+    if mty in TYPE_DEFAULTS:
+        return TYPE_DEFAULTS[mty]
+    if mty in INT_TYPES:
+        return "Int(0L)"
+    if mty.endswith("?"):
+        return "None"
+    if mty.startswith("Smart["):
+        return "Auto"
+    # `Sides::splat(None)` / `Corners::splat(None)` cast to an empty dict.
+    if re.fullmatch(r"(Sides|Corners)\[.*\?\]", mty):
+        return "Dict(Dict::new())"
+    m = re.fullmatch(r"Axes\[(.*)\]", mty)
+    if m and type_default(m.group(1)):
+        d = type_default(m.group(1))
+        return f"Array(Arr::from_array([{d}, {d}]))"
+    if mty.startswith("Array["):
+        return "Array(Arr::new())"
+    return None
 
 
 def float_lit(x):
@@ -95,12 +96,21 @@ def translate_default(rust_ty, mty, expr):
     """Translate a `#[default(expr)]` into a Value expression, or None."""
     e = expr.strip()
     if e == "":
-        return TYPE_DEFAULTS.get(mty) if mty != "Value" else None
+        return type_default(mty) if mty != "Value" else None
     if e in ("true", "false") and mty == "Bool":
         return f"Bool({e})"
     if re.fullmatch(r"-?\d+", e):
-        if mty in ("Int64", "Value") and rust_ty in ("i64", "usize", "u64", "isize", "NonZeroUsize"):
+        if (mty in ("Value",) + INT_TYPES or mty.startswith("NonZero")) and rust_ty in (
+            "i64", "usize", "u64", "isize", "u8", "u16", "u32", "i8", "i16", "i32",
+                "NonZeroUsize", "NonZeroU32", "NonZeroU64", "NonZeroI64"):
             return f"Int({e}L)"
+    # `Smart::Custom(x)` and `Some(x)` have the same value as `x`.
+    m = re.fullmatch(r"(?:Smart::Custom|Some)\((.*)\)", e)
+    if m:
+        inner = re.fullmatch(r"(?:Smart|Option)<(.*)>", rust_ty)
+        if inner and (mty.startswith("Smart[") or mty.endswith("?")):
+            inner_mty = mty[len("Smart["):-1] if mty.startswith("Smart[") else mty[:-1]
+            return translate_default(inner.group(1), inner_mty, m.group(1))
     if e in ("NonZeroUsize::ONE", "NonZeroU32::ONE"):
         return "Int(1L)"
     m = re.fullmatch(r"NonZeroUsize::new\((\d+)\)\.unwrap\(\)", e)

@@ -103,6 +103,8 @@ def literal_default(mty, expr):
         return f"{mty}({e}L)"
     if mty == "Double" and re.fullmatch(r"-?\d+(\.\d+)?", e):
         return e if "." in e else e + ".0"
+    if mty.startswith("Smart[") and e == "Smart::Auto":
+        return "Smart::Auto"
     if mty.endswith("?") and e == "None":
         return "None"
     if mty == "Value" and e == "Value::None":
