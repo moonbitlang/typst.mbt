@@ -2,20 +2,67 @@
 package "moonbitlang/typst/html"
 
 import {
+  "moonbitlang/core/debug",
+  "moonbitlang/core/hashset",
   "moonbitlang/typst/library",
   "moonbitlang/typst/syntax",
 }
 
 // Values
+pub fn convert_to_nodes(@library.Engine, @library.SplitLocator, ArrayView[(@library.Content, @library.StyleChain)], ConversionLevel, Whitespace) -> Array[HtmlNode] raise @library.SourceError
+
+pub fn create_link_anchors(HtmlDocument, @hashset.HashSet[@library.Location]) -> Map[@library.Location, String]
+
+pub fn html(HtmlDocument, HtmlOptions) -> String raise @library.SourceError
+
+pub fn html_block_fragment(@library.Engine, @library.Content, @library.Locator, @library.StyleChain, Whitespace) -> Array[HtmlNode] raise @library.SourceError
+
+pub fn html_document(@library.Engine, @library.Content, @library.StyleChain) -> HtmlDocument raise @library.SourceError
+
+pub fn html_document_for_bundle(@library.Engine, @library.Content, @library.Locator, @library.StyleChain) -> HtmlDocument raise @library.SourceError
+
 pub fn html_encode(HtmlElement, pretty? : Bool) -> String raise @library.SourceError
 
+pub fn html_in_bundle(HtmlElement, CompleteHtmlOptions) -> String raise @library.SourceError
+
+pub fn html_inline_fragment(@library.Engine, @library.Content, @library.SplitLocator, @library.SmartQuoter, @library.StyleChain, Whitespace) -> Array[HtmlNode] raise @library.SourceError
+
+pub fn html_math_fragment(@library.Engine, @library.Content, @library.SplitLocator, @library.SmartQuoter, @library.StyleChain, Whitespace) -> Array[HtmlNode] raise @library.SourceError
+
+pub fn html_mathml_body(@library.Content, @library.StyleChain) -> @library.Content??
+
+pub fn html_span_filled(@library.Content, @library.Color) -> @library.Content
+
 pub fn iter_with_dom_indices(ArrayView[HtmlNode]) -> Array[(HtmlNode, Int)]
+
+pub fn register(@library.NativeRuleMap) -> Unit
 
 pub fn resolve_inline_styles(HtmlElement) -> Unit
 
 // Errors
 
 // Types and methods
+pub(all) struct CompleteHtmlOptions {
+  format : @library.HtmlFormatOptions
+} derive(Eq)
+
+pub(all) enum ConversionLevel {
+  Block
+  Inline(@library.SmartQuoter)
+}
+
+pub struct HtmlDocument {
+  // private fields
+}
+pub fn HtmlDocument::info(Self) -> @library.DocumentInfo
+pub fn HtmlDocument::introspector(Self) -> HtmlIntrospector
+pub fn HtmlDocument::new(HtmlOutput, @library.DocumentInfo, @library.DocumentFormatOptions) -> Self
+pub fn HtmlDocument::options(Self) -> @library.DocumentFormatOptions
+pub fn HtmlDocument::root(Self) -> HtmlElement
+pub fn HtmlDocument::root_mut(Self) -> HtmlElement
+pub fn HtmlDocument::root_node(Self) -> HtmlNode
+pub impl @library.Output for HtmlDocument
+
 pub(all) struct HtmlElement {
   mut tag : @library.HtmlTag
   mut attrs : @library.HtmlAttrs
@@ -31,12 +78,53 @@ pub fn HtmlElement::with_attr(Self, @library.HtmlAttr, String) -> Self
 pub fn HtmlElement::with_children(Self, Array[HtmlNode]) -> Self
 pub fn HtmlElement::with_css(Self, @library.CssProperties) -> Self
 
+pub(all) struct HtmlFrame {
+  inner : @library.Frame
+  text_size : @library.Abs
+  mut id : String?
+  mut css : @library.CssProperties
+  anchors : Array[(@library.Point, String)]
+  span : @syntax.Span
+}
+pub fn HtmlFrame::new(@library.Frame, @library.StyleChain, @syntax.Span) -> Self
+
+pub struct HtmlIntrospector {
+  // private fields
+}
+pub fn HtmlIntrospector::elements(Self) -> @library.ElementIntrospector[@library.HtmlPosition]
+pub fn HtmlIntrospector::frame_link_targets(Self) -> @hashset.HashSet[@library.Location]
+pub fn HtmlIntrospector::html_position(Self, @library.Location) -> @library.HtmlPosition?
+pub fn HtmlIntrospector::link_targets(Self) -> @hashset.HashSet[@library.Location]
+pub fn HtmlIntrospector::new(ArrayView[HtmlNode]) -> Self
+pub fn HtmlIntrospector::set_anchors(Self, Map[@library.Location, String]) -> Unit
+pub impl Show for HtmlIntrospector
+pub impl @library.IntrospectorBackend for HtmlIntrospector
+
 pub(all) enum HtmlNode {
+  Tag(@library.Tag)
   Text(String, @syntax.Span)
   Element(HtmlElement)
+  Frame(HtmlFrame)
 }
 pub fn HtmlNode::span(Self) -> @syntax.Span
 pub fn HtmlNode::text(String, @syntax.Span) -> Self
+
+pub(all) struct HtmlOptions {
+  format : @library.PartialHtmlFormatOptions
+} derive(Default, Eq)
+pub fn HtmlOptions::resolve(Self, @library.HtmlFormatOptions) -> CompleteHtmlOptions
+
+pub struct HtmlOutput {
+  // private fields
+}
+pub fn HtmlOutput::nodes(Self) -> ArrayView[HtmlNode]
+pub fn HtmlOutput::root(Self) -> HtmlElement
+pub fn HtmlOutput::root_node(Self) -> HtmlNode
+
+pub(all) enum Whitespace {
+  Normal
+  Pre
+} derive(Eq, Hash, @debug.Debug)
 
 // Type aliases
 

@@ -1,5 +1,154 @@
-// Port of `typst-library/src/format.rs` (registration of export formats; the
-// format option plumbing into the document is ported with realization).
+// Port of `typst-library/src/format.rs`: registration of export formats and
+// the format options configured by a document (`DocumentFormatOptions`).
+//
+// Upstream's options are typed per format (`FormatElement::Options`, with
+// `Complete`/`Partial` field markers). Here, the options of a format are the
+// spanned values of all settable fields of its element ([FormatOptions]);
+// typed views like `HtmlFormatOptions` read from them.
+
+///|
+/// A spanned value that is associated with a specific field of a format
+/// element (upstream `SpannedValue<E, I>`).
+pub(all) struct SpannedValue[T] {
+  v : T
+  span : @syntax.Span
+} derive(Eq)
+
+///|
+/// Create a new spanned value with a detached span.
+pub fn[T] SpannedValue::detached(v : T) -> SpannedValue[T] {
+  { v, span: @syntax.Span::detached(), }
+}
+
+///|
+/// Format options that have been configured by the document (upstream
+/// `FormatOptions`).
+pub struct FormatOptions {
+  /// The format element whose settable fields these are.
+  elem : Element
+  /// The values of the settable fields, by field index.
+  priv fields : Map[Int, SpannedValue[Value]]
+}
+
+///|
+/// The default options of a format element: the defaults of its settable
+/// fields (upstream `E::Options::default()`).
+pub fn FormatOptions::default_for(elem : Element) -> FormatOptions {
+  let fields : Map[Int, SpannedValue[Value]] = Map::new()
+  for field in elem.fields() {
+    if field.kind is (Settable | Ghost) {
+      fields[field.id] = SpannedValue::detached(
+        StyleChain::empty().get_field(elem, field.id),
+      )
+    }
+  }
+  { elem, fields, }
+}
+
+///|
+/// Populate these options from the spanned styles. If a field has been set,
+/// this also updates its span.
+pub fn FormatOptions::populate(
+  self : FormatOptions,
+  styles : StyleChain,
+  span : @syntax.Span,
+) -> Unit {
+  for id, _ in self.fields.copy() {
+    if styles.has(self.elem, id) {
+      self.fields[id] = { v: styles.get_field(self.elem, id), span, }
+    }
+  }
+}
+
+///|
+/// The value of the settable field with the given index.
+pub fn FormatOptions::get(
+  self : FormatOptions,
+  id : Int,
+) -> SpannedValue[Value] {
+  match self.fields.get(id) {
+    Some(v) => v
+    None => abort("field \{id} of `\{self.elem.name()}` is not settable")
+  }
+}
+
+///|
+/// A copy of the options.
+pub fn FormatOptions::copy(self : FormatOptions) -> FormatOptions {
+  { elem: self.elem, fields: self.fields.copy(), }
+}
+
+///|
+pub impl Fingerprint for FormatOptions with fn fingerprint(self, state) {
+  state.write(self.elem)
+  for id, value in self.fields {
+    state.write_usize(id)
+    state.write(value.v)
+    state.write(value.span)
+  }
+}
+
+///|
+/// A list of format options that have been configured by the document.
+pub struct DocumentFormatOptions(Array[FormatOptions])
+
+///|
+/// The formats registered by default (upstream `typst::FORMATS`).
+pub fn default_formats() -> Array[Format] {
+  [html_format(), pdf_format(), svg_format(), png_format(), bundle_format()]
+}
+
+///|
+/// Initialize default format options from a list of formats.
+pub fn DocumentFormatOptions::new(
+  formats? : Array[Format] = default_formats(),
+) -> DocumentFormatOptions {
+  DocumentFormatOptions(formats.map(f => FormatOptions::default_for(f.elem)))
+}
+
+///|
+/// Get the options of a format by its element.
+pub fn DocumentFormatOptions::get(
+  self : DocumentFormatOptions,
+  elem : Element,
+) -> FormatOptions {
+  for o in self.0 {
+    if o.elem == elem {
+      return o
+    }
+  }
+  abort(
+    "format `\{elem.name()}` not found\nhint: if you're a developer, you need to register `Library::formats`",
+  )
+}
+
+///|
+/// Populate the format options with details from the given styles.
+pub fn DocumentFormatOptions::populate(
+  self : DocumentFormatOptions,
+  styles : StyleChain,
+  span : @syntax.Span,
+) -> Unit {
+  for o in self.0 {
+    o.populate(styles, span)
+  }
+}
+
+///|
+/// A deep copy of the options.
+pub fn DocumentFormatOptions::copy(
+  self : DocumentFormatOptions,
+) -> DocumentFormatOptions {
+  DocumentFormatOptions(self.0.map(o => o.copy()))
+}
+
+///|
+pub impl Fingerprint for DocumentFormatOptions with fn fingerprint(self, state) {
+  state.write_usize(self.0.length())
+  for o in self.0 {
+    state.write(o)
+  }
+}
 
 ///|
 /// An export format with an associated format element.

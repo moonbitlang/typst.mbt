@@ -1,25 +1,20 @@
 // Port of the DOM of `typst-html/src/dom.rs`.
 //
 // `HtmlTag`, `HtmlAttr` and `HtmlAttrs` live in `library` (`html_tag.mbt`,
-// `html_attr.mbt`) because element fields store them.
-//
-// Not yet ported (later units):
-// - `HtmlDocument` (needs the HTML introspector and document info),
-// - the `Tag` node variant (needs introspection tags in `library`),
-// - the `Frame` node variant / `HtmlFrame` (needs layouted frames and SVG
-//   export).
+// `html_attr.mbt`) because element fields store them. `HtmlDocument` is in
+// `document.mbt` (together with upstream's `HtmlOutput`).
 
 ///|
 /// A child of an HTML element.
 pub(all) enum HtmlNode {
-  // TODO: `Tag(Tag)`: an introspectable element that produced something
-  // within this node.
+  /// An introspectable element that produced something within this node.
+  Tag(@library.Tag)
   /// Plain text.
   Text(String, @syntax.Span)
   /// Another element.
   Element(HtmlElement)
-  // TODO: `Frame(HtmlFrame)`: layouted content that will be embedded into
-  // HTML as an SVG.
+  /// Layouted content that will be embedded into HTML as an SVG.
+  Frame(HtmlFrame)
 }
 
 ///|
@@ -32,8 +27,10 @@ pub fn HtmlNode::text(text : String, span : @syntax.Span) -> HtmlNode {
 /// Returns the span, if any.
 pub fn HtmlNode::span(self : HtmlNode) -> @syntax.Span {
   match self {
+    Tag(_) => @syntax.Span::detached()
     Text(_, span) => span
     Element(element) => element.span
+    Frame(frame) => frame.span
   }
 }
 
@@ -56,6 +53,7 @@ pub fn iter_with_dom_indices(
   for child in nodes {
     let mut i = cursor
     match child {
+      Tag(_) => ()
       Text(_, _) => was_text = true
       _ => {
         cursor += if was_text { 1 } else { 0 }
@@ -153,4 +151,40 @@ pub fn HtmlElement::spanned(
 ) -> HtmlElement {
   self.span = span
   self
+}
+
+///|
+/// Layouted content that will be embedded into HTML as an SVG.
+pub(all) struct HtmlFrame {
+  /// The frame that will be displayed as an SVG.
+  inner : @library.Frame
+  /// The text size where the frame was defined. This is used to size the
+  /// frame with em units to make text in and outside of the frame sized
+  /// consistently.
+  text_size : @library.Abs
+  /// An ID to assign to the SVG itself.
+  mut id : String?
+  /// The element's CSS properties.
+  mut css : @library.CssProperties
+  /// IDs to assign to destination jump points within the SVG.
+  anchors : Array[(@library.Point, String)]
+  /// The span from which the frame originated.
+  span : @syntax.Span
+}
+
+///|
+/// Wraps a laid-out frame.
+pub fn HtmlFrame::new(
+  inner : @library.Frame,
+  styles : @library.StyleChain,
+  span : @syntax.Span,
+) -> HtmlFrame {
+  {
+    inner,
+    text_size: @library.TextElem::size_in(styles).resolve(styles),
+    id: None,
+    css: @library.CssProperties::new(),
+    anchors: [],
+    span,
+  }
 }
