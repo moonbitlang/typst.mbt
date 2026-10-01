@@ -1,0 +1,299 @@
+# typst.mbt — Porting the Typst engine to MoonBit
+
+## Status
+
+| Phase | State | Metric |
+| --- | --- | --- |
+| P0 scaffolding | done | oracle crate, goldens script, Unicode table generator, runner |
+| P1 syntax (lexer, parser, nodes, spans, LinkedNode) | **done** | 3792/3792 suite cases: tree + diagnostics byte-identical |
+| P1 syntax (typed AST, reparser, highlight, Lines) | todo | |
+| P2 eval | todo | |
+
+Run `scripts/upstream.sh && scripts/goldens.sh syntax && moon run tests/runner --target native -- syntax`.
+
+Upstream reference: `.repos/typst` @ `e58a63af0` (2026-09-30). Pin this; port
+against one commit and re-sync deliberately.
+
+## 1. Scope and sizing
+
+Rust lines per crate (excluding tests):
+
+| Crate | LoC | Port? | Notes |
+| --- | ---: | --- | --- |
+| typst-syntax | 12.7k | yes, P1 | lexer, parser, green/red tree, spans |
+| typst-eval | 3.5k | yes, P2 | tree-walking VM |
+| typst-library | 71.0k | yes, P2–P8 | foundations 19k, layout 12k, model 9k, visualize 8k, text 8k, math 6k, introspection 4k, loading 1k |
+| typst-macros | 2.9k | **codegen** | `#[elem]` ×167, `#[func]` ×298, so we need a generator (see §3) |
+| typst-realize | 1.7k | yes, P3 | show rules / grouping |
+| typst-layout | 22.5k | yes, P5/P7 | inline, flow, pages, grid, math |
+| typst-utils | 2.6k | partially | Scalar, PicoStr, etc. |
+| typst-svg | 2.3k | yes, P6a | first exporter (cheap pixel testing) |
+| typst-pdf | 8.8k | yes, P6b | on top of pdflite instead of krilla |
+| typst-html | 7.7k | later, P9 | |
+| typst-cli / kit / ide / render / bundle / timing | ~15k | mostly no | thin CLI of our own, no IDE, no rasterizer |
+
+That's about 140k lines of core engine. The heavy third-party crates are the
+hidden cost:
+
+| Rust dep | Role | MoonBit strategy |
+| --- | --- | --- |
+| ttf-parser | OpenType tables (cmap, hmtx, GSUB/GPOS, MATH, CFF, glyf, name, OS/2) | **write** `otf` pkg; MATH and CFF are mandatory because the bundled fonts are CFF |
+| rustybuzz | shaping | **write** in stages: (a) cmap+hmtx+kern, (b) GSUB liga/GPOS kern+mark for Latin/Greek/Cyrillic/CJK, (c) complex scripts (Arabic, Indic) later |
+| krilla | PDF writer, font subsetting, tagging | **replace** with a `pdfgen` layer on `pdflite` |
+| hayro (PDF as image) | read PDFs | **reuse** pdflite reader |
+| icu_segmenter / unicode-segmentation | UAX#14 line break, UAX#29 graphemes | **write**, with tables generated from UCD |
+| unicode-bidi | UAX#9 | **reuse** `moonbit-community/unicode/bidi` (verify conformance) |
+| unicode-script, unicode-math-class, unicode-normalization | char properties | generate tables; `moonbit-community/normalization` |
+| hypher | hyphenation | port it (small algorithm + embedded pattern tries as data) |
+| codex | symbol tables (`sym.arrow.r`…) | generate from upstream data |
+| regex | `regex()` type, show-rule selectors | `moonbitlang/regexp` (check its syntax coverage against Rust `regex`) |
+| serde_json / yaml / toml / csv / roxmltree / ciborium | `json()` / `yaml()` … loading | core `json`, `moonbit-community/toml`, `yaml` (only a subset, so it may need work), XML from `ooxml`, write csv/cbor |
+| png / image / jpeg-decoder | images | PNG: pdflite; JPEG: header-only + DCT passthrough to PDF; GIF/WebP later |
+| usvg / resvg | SVG images | later; P9 |
+| hayagriva + citationberg | bibliography / CSL | **defer** (very large); P9 |
+| syntect + two-face | raw code highlighting | **defer**; plain raw first, then a small TextMate-grammar engine |
+| wasmi | plugins | **out of scope** |
+| comemo | incremental memoization | **drop**; add plain hash caches at hot spots |
+| rayon | parallelism | drop |
+
+## 2. What office.mbt gives us
+
+* **pdflite**: object model and writer, flate, PNG decode (including interlace),
+  TrueType `loca`/`glyf` subsetting, cmap, ToUnicode, outlines/bookmarks,
+  annotations/links, metadata, dates, and a PDF *reader* (for `image("x.pdf")`).
+  This is the base for the PDF exporter.
+* **pagelayout**: its model is DOCX-shaped and its line breaking is greedy, so
+  it is **not** the engine. Reuse its PDF font-embedding/subset code
+  (`pagelayout/pdf`) as a reference.
+* **ooxml**: XML parser for `xml()` loading.
+* Missing anywhere in our stack: OpenType layout (GSUB/GPOS), CFF parsing and
+  subsetting, the MATH table, UAX#14/#29. These are the main new foundations.
+
+Link via `moon.work` + path deps during development; depend on published
+versions once the APIs stabilise. Anything that turns out to be generically
+useful (e.g. the `otf` package or CFF subsetting) should land back in pdflite
+rather than be duplicated.
+
+## 3. Architecture decisions
+
+1. **Package layout mirrors upstream crates/modules** (`syntax`, `eval`,
+   `foundations`, `model`, `text`, `layout`, `math`, `visualize`,
+   `introspection`, `realize`, `export/svg`, `export/pdf`, plus foundations
+   `otf`, `shape`, `unicode/*`, `hyph`). A 1:1 file mapping keeps upstream
+   diffs portable.
+2. **No proc macros, so write an `elemgen` code generator.** Element and
+   function definitions become a declarative spec (fields, types, defaults,
+   `settable`/`required`/`positional`/`variadic`/`fold`/`resolve`, docs).
+   Seed the spec by scraping the `#[elem]`/`#[func]` attributes from the Rust
+   source, then hand-maintain it. Generated code covers arg parsing, field
+   access, style getters, `repr`, equality and the scope registration. **This
+   is the single biggest productivity lever.** Build it before P3.
+3. **Dynamic core:** `Value` enum; `Content` = shared element header +
+   `&Element` trait object; `Styles` = persistent linked chain; `Func` =
+   native closure | user closure | element constructor | `with`.
+   Strings: Typst indexes by UTF-8 byte offsets and spans are byte ranges, so
+   keep source as UTF-8 `Bytes` with byte offsets internally and convert at
+   the boundaries. Decide this in P1; it affects everything after.
+4. **World interface** (trait): source files, files/bytes, fonts, today. A
+   native impl reads from disk. A wasm-gc impl is fed by the host.
+5. **Introspection loop:** same as upstream (re-layout until the
+   introspector converges, max 5 iterations). comemo is not only a cache: the
+   stabilization loop in `typst/src/lib.rs` validates recorded introspection
+   queries against the next document. The port needs an explicit
+   query-tracking replacement (record queries + results, re-check after each
+   iteration, report non-convergence) plus stable locations and
+   iteration-local diagnostics. Caching for speed comes later (P9).
+6. **Errors:** `SourceDiagnostic` with span, hints and trace, rendered to
+   match upstream messages byte-for-byte (the test suite asserts them).
+7. **Text representation (decided in P1):** syntax-tree text is stored as
+   MoonBit `String`; every node length, offset, span range and diagnostic
+   range is in **UTF-8 bytes** (`utf8_len`, `utf8_slice`). Columns count
+   scalar values. Runtime Typst `str` (P2) has byte-indexed semantics too
+   (`len`, `at`, `slice`, regex offsets) — it gets its own type with explicit
+   byte-offset APIs and tests for supplementary chars, combining sequences
+   and CRLF.
+8. **Mutable nodes:** upstream uses copy-on-write `Arc`s; the port uses
+   mutable node objects and deep-clones where upstream relies on value
+   semantics (parser memo arena, checkpoints).
+9. **Targets:** native first (perf, file IO); keep `wasm-gc` building in CI
+   from P1 so nothing native-only creeps into the core.
+
+## 4. Testing strategy: differential against real Typst
+
+The upstream suite has **4,276 test cases** (`tests/suite/**/*.typ`) tagged
+by mode: `eval` 1308, `paged` 2169, `html` 508, `pdftags` 133, `pdf` 15,
+`bundle` 39. Each case can carry `// Error:` / `// Warning:` / `// Hint:`
+annotations with spans. 1,962 reference PNGs live in `tests/ref`.
+
+Build a small **Rust oracle** (`oracle/`, a cargo crate depending on the
+pinned typst) that dumps, per test case:
+
+* syntax tree (kind, byte range, text) → **P1 golden**
+* diagnostics (span, message, hints) and `repr` of eval results → **P2 golden**
+* frame tree JSON (items, positions, glyph ids, advances, fonts) → **P5 golden**
+* SVG output → **P6 golden**
+
+Commit the goldens (or a compressed bundle) so `moon test` never needs
+Rust. A MoonBit runner (`tests/runner`) parses the upstream `.typ` files,
+runs each case at the right stage, and reports pass/fail per case. The
+**pass count per suite is the project's progress metric**. Keep a
+`skip.txt` with reasons, as upstream does.
+
+Comparison rules: syntax and diagnostics exact; frames with a 0.01pt
+tolerance; pixels by rasterising our SVG with `resvg` (external tool, CI
+only) and diffing against `tests/ref/*.png` with the upstream tolerance. PDF:
+`qpdf --check`, `pdftoppm` vs reference render, and veraPDF for PDF/A/UA later.
+
+Also: `moonbit-community/quickcheck`-style property tests for the lexer and
+parser (round-trip: tree text == source) and fuzz inputs from `tests/fuzz`.
+
+## 5. Phases
+
+Each phase ends at a measurable pass count. The estimates assume agent-heavy
+work with human review.
+
+**P0 — Scaffolding (≈1 week)**
+`moon.mod`, `moon.work` with office.mbt path deps, package skeleton, oracle
+crate, golden extraction, test runner, CI (native + wasm-gc), Unicode table
+generator scripts (pin UCD to the version upstream uses).
+
+**P1 — Syntax (≈2–3 weeks)** · `syntax`
+Lexer (markup/math/code/raw modes), parser, `SyntaxNode` (inner/leaf/error),
+`LinkedNode`, spans with numbering, `Source`, incremental reparse
+(optional; skip at first).
+*Exit:* 100% of syntax-tree goldens across the whole suite plus the fuzz
+corpus; round-trip property holds.
+
+**P2 — Foundations and eval (≈6–8 weeks)** · `foundations`, `eval`
+(Codex review: eval already builds elements and applies set/show rules, so
+`elemgen`, a minimal Content/Styles/StyleChain and UAX#29 move into early P2;
+also build a thin paragraph → frame → SVG slice early to validate the
+architecture end to end.)
+Value types (none/auto/bool/int/float/decimal/str/bytes/label/datetime/
+duration/version/array/dict/args/module/func/type/plugin-stub/symbol),
+methods, ops, `calc`, string ops with graphemes (needs UAX#29), regex,
+`repr`/`display`, closures, captures, destructuring, loops, imports
+(file modules), `std` scope, `#test`/`assert`, data loading
+(json/toml/yaml/csv/cbor/xml).
+*Exit:* `eval`-mode cases in `tests/suite/foundations` + `syntax`
+pass (target ≥95%), diagnostics exact.
+
+**P3 — Content, styles, realization (≈4 weeks)** · `elemgen`, `realize`,
+`introspection` (data structures only)
+Build the generator first. Then Content/Styles/Recipes/Selectors,
+set/show rules, show-set, `realize` (spaces, grouping of list items,
+paragraphs, citations), Locator/Location, counters/state/query (data side),
+labels, `context`.
+*Exit:* content `repr` goldens; the show/set tests in `styling/` that are
+`eval`-mode.
+
+**P4 — Fonts, Unicode and text (≈6–8 weeks, can overlap P2/P3)** ·
+`otf`, `shape`, `unicode/*`, `hyph`, `text`
+OpenType parser (incl. CFF/CFF2 charstrings for bbox, MATH, variable-font
+basics), FontBook/fallback/coverage, bundled fonts from `typst-assets`
+(Libertinus Serif, New Computer Modern (+Math), DejaVu Sans Mono), shaping
+stages (a)–(b), UAX#14 and #29, bidi, script, hyphenation patterns,
+smart quotes, case transforms.
+*Exit:* shaped glyph run equals rustybuzz on a Latin/CJK corpus (oracle
+dumps `glyph_id, cluster, x_advance, x_offset, y_offset`).
+
+**P5 — Layout (≈8–10 weeks)** · `layout`
+Frame model, `layout_document` → pages (margins, header/footer,
+numbering, columns), flow (blocks, spacing, floats, footnotes, placement,
+breaking), inline (prepare, shaping, bidi reorder, linebreak simple and
+Knuth-Plass with hyphenation/justification, cjk spacing), stack, pad,
+boxes/blocks, transforms, shapes, lists/enum/terms, grid/table (rowspans,
+repeating headers/footers, gutters, strokes), repeat, image sizing,
+the introspection loop.
+*Exit:* frame goldens for `layout/` and `text/` paged cases (target ≥85%).
+
+**P6a — SVG export (≈2 weeks)**
+Port `typst-svg`: glyph outlines (from `otf`), paths, gradients, tilings,
+images, clip/transform.
+*Exit:* pixel-diff vs `tests/ref` runs for all `paged` cases; this is the
+end-to-end dashboard.
+
+**P6b — PDF export (≈5–6 weeks)** · `pdfgen` on pdflite
+Fonts: Type0/CIDFontType0 (CFF) and CIDFontType2 (TrueType), ToUnicode,
+**CFF subsetting (new)**; full-font embedding as a fallback in the first
+milestone. Paint: colors (incl. ICC/CMYK), gradients (shading),
+tilings (patterns), stroke. Images: PNG (pdflite), JPEG passthrough, PDF via
+pdflite reader. Links, outline, page labels, metadata/XMP, attachments.
+Then tagged PDF (`pdftags` suite, 133 cases), PDF/A and PDF/UA.
+*Exit:* `typst compile hello.typ` parity on the CLI; qpdf clean; `pdf` and
+`pdftags` suites.
+
+**P7 — Math (≈6 weeks)** · `math`
+MATH table constants, glyph variants/assembly, fractions, attachments,
+roots, matrices/cases/vec, accents, lr, alignment, `op`, styles/variants,
+cramped/size logic.
+*Exit:* `tests/suite/math` pixel diffs.
+
+**P8 — Model completeness (≈4–6 weeks)**
+Headings/outline, figures/captions, footnotes, numbering patterns (incl.
+CJK/roman), references (without bibliography), quote, table semantics,
+`raw` (plain → highlighted), terms, par/linebreak settings, gradients,
+color spaces, `image` formats (GIF/WebP decode), SVG images (simplified usvg).
+
+**P9 — Long tail**
+Bibliography (hayagriva + CSL processor), HTML export (`html` suite, 508
+cases), packages (`@preview/…`: downloads + tar.gz via flate; native only),
+complex-script shaping, incremental compilation/memoization, performance,
+CLI polish (`compile`, `watch`, `query`, `fonts`).
+
+Rough total: **~12 months for one strong full-time developer, or ~4–6 months
+with parallel agent streams**, because P1→P2→P3→P5 is the critical path,
+while P4 (fonts/shaping), the Unicode tables and pdfgen can run in parallel
+from week 2.
+
+## 6. Parallel workstreams
+
+```
+P0 ─ P1 syntax ─ P2 eval ─ P3 content/realize ─ P5 layout ─ P7 math ─ P8
+          └─ P4a otf/CFF/MATH ─ P4b shaping ─┘          │
+          └─ unicode tables / hyph / regex check ──────┘│
+          └─ P6b pdfgen on pdflite (fonts/subset/paint) ┴─ P6a svg
+```
+
+Streams that need no engine and can start right away: `otf` (+CFF
+subsetting → upstream to pdflite), UAX#14/#29 generators, hypher port,
+codex symbol tables, oracle crate.
+
+## 7. Risks
+
+* **Shaping fidelity**: frame goldens assume rustybuzz-identical output.
+  Mitigation: scope P5 goldens to scripts we shape exactly; mark the rest
+  pixel-tolerant.
+* **Macro boilerplate**: without `elemgen` the library port balloons to
+  roughly 2× the LoC and drifts. Build it first.
+* **Floating-point drift** in layout (Knuth-Plass, `Abs`/`Scalar`
+  semantics): port `Scalar` exactly (NaN→0, ordering) and compare with
+  tolerance.
+* **Upstream churn**: Typst moves fast. Pin the commit; do quarterly
+  re-syncs driven by the upstream test diff.
+* **Performance without comemo**: measure from P5; add targeted caches.
+* **Licensing**: Typst is Apache-2.0. Keep the LICENSE/NOTICE and attribute
+  ported files. Check the font licenses in typst-assets (OFL) before bundling.
+
+## 8. office.mbt fixes found in review
+
+* `pdflite/pdf_truetype_core.mbt:185`: `entrySelector` uses natural log;
+  must be floor(log2).
+* `pdflite/pdf_truetype_subset_font.mbt:273`: `rangeShift` must be
+  `numTables*16 - searchRange`.
+* Subsets keep stale checksums by default; recompute for production.
+* Needed for Typst: glyph-ID based subsetting (composite closure,
+  GSUB/MATH-reachable glyphs), positioned-glyph emitter with clusters for
+  ToUnicode/ActualText, CFF embedding. pagelayout's `GlyphRun` is
+  UTF-16-advance based and cannot be reused as-is.
+* A PDF reader alone does not replace hayro (PDF → SVG interpretation for
+  `image("x.pdf")` in SVG export); budget separately.
+
+## 9. First concrete steps
+
+1. `moon new` the module; add `moon.work` linking `~/git/office.mbt/pdflite`.
+2. Oracle crate: dump syntax trees and diagnostics for all suite cases.
+3. Test runner that parses `--- name mode ---` sections and annotations.
+4. Port `typst-syntax` (lexer → parser → node), then drive it to 100%.
+5. In parallel: `otf` package (cmap/hmtx/head/hhea/OS2/name/post → CFF →
+   GSUB/GPOS → MATH), validated against ttf-parser dumps from the oracle.

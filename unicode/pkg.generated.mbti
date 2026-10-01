@@ -1,0 +1,70 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/unicode"
+
+import {
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub fn decode_at(StringView, Int) -> (Int, Int)
+
+pub fn decode_before(StringView, Int) -> (Int, Int)
+
+pub fn default_math_class(Char) -> MathClass?
+
+pub fn grapheme_end(StringView, Int) -> Int
+
+pub fn grapheme_start(StringView, Int) -> Int
+
+pub fn graphemes(StringView) -> Array[StringView]
+
+pub fn is_alphabetic(Char) -> Bool
+
+pub fn is_alphanumeric(Char) -> Bool
+
+pub fn is_cjk_script(Char) -> Bool
+
+pub fn is_control(Char) -> Bool
+
+pub fn is_lowercase(Char) -> Bool
+
+pub fn is_numeric(Char) -> Bool
+
+pub fn is_uppercase(Char) -> Bool
+
+pub fn is_whitespace(Char) -> Bool
+
+pub fn is_xid_continue(Char) -> Bool
+
+pub fn is_xid_start(Char) -> Bool
+
+pub fn rust_debug_char(Char) -> String
+
+pub fn rust_debug_str(StringView) -> String
+
+pub fn script(Char) -> String
+
+// Errors
+
+// Types and methods
+pub(all) enum MathClass {
+  Normal
+  Alphabetic
+  Binary
+  Closing
+  Diacritic
+  Fence
+  GlyphPart
+  Large
+  Opening
+  Punctuation
+  Relation
+  Space
+  Unary
+  Vary
+  Special
+} derive(Eq, Hash, @debug.Debug)
+
+// Type aliases
+
+// Traits

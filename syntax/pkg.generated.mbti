@@ -1,0 +1,439 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/syntax"
+
+import {
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub let arg_set : SyntaxSet
+
+pub let array_or_dict_item_set : SyntaxSet
+
+pub let atomic_code_expr_set : SyntaxSet
+
+pub let binary_op_set : SyntaxSet
+
+pub let code_expr_set : SyntaxSet
+
+pub let destructuring_item_set : SyntaxSet
+
+pub fn is_id_continue(Char) -> Bool
+
+pub fn is_id_start(Char) -> Bool
+
+pub fn is_ident(StringView) -> Bool
+
+pub fn is_newline(Char) -> Bool
+
+pub fn is_valid_label_literal_id(StringView) -> Bool
+
+pub fn link_prefix(String) -> (String, Bool)
+
+pub let math_expr_set : SyntaxSet
+
+pub let param_set : SyntaxSet
+
+pub fn parse(String) -> SyntaxNode
+
+pub fn parse_code(String) -> SyntaxNode
+
+pub fn parse_codepoint(StringView) -> Char?
+
+pub fn parse_math(String) -> SyntaxNode
+
+pub let pattern_leaf_set : SyntaxSet
+
+pub let pattern_set : SyntaxSet
+
+pub fn split_newlines(String) -> Array[String]
+
+pub let stmt_set : SyntaxSet
+
+pub let unary_op_set : SyntaxSet
+
+pub fn unescape_str_literal(String) -> String
+
+pub fn utf8_len(StringView) -> Int
+
+pub fn utf8_slice(String, Int, Int) -> String
+
+pub fn utf8_to_utf16(String, Int) -> Int
+
+// Errors
+
+// Types and methods
+pub(all) enum Assoc {
+  Left
+  Right
+} derive(Eq, Hash, @debug.Debug)
+
+pub(all) enum BinOp {
+  Add
+  Sub
+  Mul
+  Div
+  And
+  Or
+  Eq
+  Neq
+  Lt
+  Leq
+  Gt
+  Geq
+  Assign
+  In
+  NotIn
+  AddAssign
+  SubAssign
+  MulAssign
+  DivAssign
+} derive(Eq, Hash, @debug.Debug)
+pub fn BinOp::as_str(Self) -> String
+pub fn BinOp::assoc(Self) -> Assoc
+pub fn BinOp::from_kind(SyntaxKind) -> Self?
+pub fn BinOp::precedence(Self) -> Int
+
+pub(all) struct DiagSpan {
+  span : Span
+  extra : UInt64
+} derive(Eq, Hash, @debug.Debug)
+pub fn DiagSpan::detached() -> Self
+pub fn DiagSpan::from_range(FileId, Int, Int) -> Self
+pub fn DiagSpan::from_span(Span, sub_range? : SubRange) -> Self
+pub fn DiagSpan::get(Self) -> DiagSpanKind
+pub fn DiagSpan::id(Self) -> FileId?
+pub fn DiagSpan::is_detached(Self) -> Bool
+pub fn DiagSpan::or(Self, Self) -> Self
+
+pub(all) enum DiagSpanKind {
+  Detached
+  Number(id~ : FileId, num~ : SpanNumber, sub_range~ : SubRange?)
+  Range(id~ : FileId, start~ : Int, end~ : Int)
+} derive(Eq, @debug.Debug)
+
+pub(all) struct DiagSpanned[T] {
+  v : T
+  span : DiagSpan
+} derive(Eq, Hash, @debug.Debug)
+
+pub(all) struct Diagnosis {
+  errors : Bool
+  warnings : Bool
+} derive(Eq, @debug.Debug)
+pub fn Diagnosis::both(Self) -> Bool
+pub fn Diagnosis::default() -> Self
+pub fn Diagnosis::either(Self) -> Bool
+pub fn Diagnosis::or(Self, Self) -> Self
+
+pub(all) struct FileId(UInt16) derive(Compare, Eq, Hash, @debug.Debug)
+pub fn FileId::into_raw(Self) -> UInt16
+
+pub struct LinkedNode {
+  node : SyntaxNode
+  parent : LinkedNode?
+  index : Int
+  offset : Int
+}
+pub fn LinkedNode::children(Self) -> Array[Self]
+pub fn LinkedNode::find(Self, Span) -> Self?
+pub fn LinkedNode::find_number(Self, SpanNumber) -> Self?
+pub fn LinkedNode::find_range(Self, Int, Int) -> Self?
+pub fn LinkedNode::get(Self) -> SyntaxNode
+pub fn LinkedNode::index(Self) -> Int
+pub fn LinkedNode::kind(Self) -> SyntaxKind
+pub fn LinkedNode::leaf_at(Self, Int, Side) -> Self?
+pub fn LinkedNode::leftmost_leaf(Self) -> Self?
+pub fn LinkedNode::len(Self) -> Int
+pub fn LinkedNode::mode_after(Self) -> SyntaxMode?
+pub fn LinkedNode::new(SyntaxNode) -> Self
+pub fn LinkedNode::next_leaf(Self) -> Self?
+pub fn LinkedNode::next_sibling(Self) -> Self?
+pub fn LinkedNode::next_sibling_kind(Self) -> SyntaxKind?
+pub fn LinkedNode::next_sibling_with_trivia(Self) -> Self?
+pub fn LinkedNode::offset(Self) -> Int
+pub fn LinkedNode::parent(Self) -> Self?
+pub fn LinkedNode::parent_kind(Self) -> SyntaxKind?
+pub fn LinkedNode::parent_mode(Self) -> SyntaxMode?
+pub fn LinkedNode::prev_leaf(Self) -> Self?
+pub fn LinkedNode::prev_sibling(Self) -> Self?
+pub fn LinkedNode::prev_sibling_kind(Self) -> SyntaxKind?
+pub fn LinkedNode::prev_sibling_with_trivia(Self) -> Self?
+pub fn LinkedNode::range(Self) -> (Int, Int)
+pub fn LinkedNode::rightmost_leaf(Self) -> Self?
+
+pub(all) enum NonDecimalBase {
+  Hex
+  Octal
+  Binary
+} derive(Eq, @debug.Debug)
+pub fn NonDecimalBase::get(Self) -> Int
+pub fn NonDecimalBase::name(Self) -> String
+
+pub(all) enum Side {
+  Before
+  After
+} derive(Eq, @debug.Debug)
+
+pub struct Source {
+  id : FileId
+  text : String
+  root : SyntaxNode
+}
+pub fn Source::detached(String) -> Self
+pub fn Source::find(Self, Span) -> LinkedNode?
+pub fn Source::id(Self) -> FileId
+pub fn Source::new(FileId, String) -> Self
+pub fn Source::range(Self, SpanNumber, SubRange?) -> (Int, Int)?
+pub fn Source::root(Self) -> SyntaxNode
+pub fn Source::text(Self) -> String
+
+pub(all) struct Span(UInt64) derive(Compare, Eq, Hash, @debug.Debug)
+pub fn Span::detached() -> Self
+pub fn Span::from_number(FileId, SpanNumber) -> Self
+pub fn Span::from_range(FileId, Int, Int) -> Self
+pub fn Span::get(Self) -> SpanKind
+pub fn Span::id(Self) -> FileId?
+pub fn Span::is_detached(Self) -> Bool
+pub fn Span::number(Self) -> UInt64
+pub fn Span::or(Self, Self) -> Self
+
+pub(all) enum SpanKind {
+  Detached
+  Number(id~ : FileId, num~ : SpanNumber)
+  Range(id~ : FileId, start~ : Int, end~ : Int)
+} derive(Eq, @debug.Debug)
+
+pub(all) struct SpanNumber(UInt64) derive(Compare, Eq, Hash, @debug.Debug)
+
+pub(all) struct Spanned[T] {
+  v : T
+  span : Span
+} derive(Eq, Hash, @debug.Debug)
+
+pub(all) struct SubRange {
+  start : Int
+  end : Int
+} derive(Eq, Hash, @debug.Debug)
+pub fn SubRange::new(Int, Int) -> Self?
+pub fn SubRange::to_absolute(Self, Int) -> (Int, Int)
+pub fn SubRange::to_relative(Self) -> (Int, Int)
+
+pub(all) struct SyntaxDiagnostic {
+  is_error : Bool
+  span : DiagSpan
+  message : String
+  hints : Array[DiagSpanned[String]]
+} derive(Eq, @debug.Debug)
+
+pub(all) enum SyntaxKind {
+  End
+  Error
+  Shebang
+  LineComment
+  BlockComment
+  Markup
+  Text
+  SpaceNoNewline
+  SpaceWithNewline
+  Linebreak
+  Parbreak
+  Escape
+  Shorthand
+  SmartQuote
+  Strong
+  Emph
+  Raw
+  RawLang
+  RawDelim
+  RawTrimmed
+  Link
+  Label
+  Ref
+  RefMarker
+  Heading
+  HeadingMarker
+  ListItem
+  ListMarker
+  EnumItem
+  EnumMarker
+  TermItem
+  TermMarker
+  Equation
+  Math
+  MathText
+  MathIdent
+  MathFieldAccess
+  MathShorthand
+  MathAlignPoint
+  MathCall
+  MathArgs
+  MathDelimited
+  MathAttach
+  MathPrimes
+  MathFrac
+  MathRoot
+  Hash
+  LeftBrace
+  RightBrace
+  LeftBracket
+  RightBracket
+  LeftParen
+  RightParen
+  Comma
+  Semicolon
+  Colon
+  Star
+  Underscore
+  Dollar
+  Plus
+  Minus
+  Slash
+  Hat
+  Dot
+  Eq
+  EqEq
+  ExclEq
+  Lt
+  LtEq
+  Gt
+  GtEq
+  PlusEq
+  HyphEq
+  StarEq
+  SlashEq
+  Dots
+  Arrow
+  Root
+  Bang
+  Not
+  And
+  Or
+  None
+  Auto
+  Let
+  Set
+  Show
+  Context
+  If
+  Else
+  For
+  In
+  While
+  Break
+  Continue
+  Return
+  Import
+  Include
+  As
+  Code
+  Ident
+  Bool
+  Int
+  Float
+  Numeric
+  Str
+  CodeBlock
+  ContentBlock
+  Parenthesized
+  Array
+  Dict
+  Named
+  Keyed
+  Unary
+  Binary
+  FieldAccess
+  FuncCall
+  Args
+  Spread
+  Closure
+  Params
+  LetBinding
+  SetRule
+  ShowRule
+  Contextual
+  Conditional
+  WhileLoop
+  ForLoop
+  ModuleImport
+  ImportItems
+  ImportItemPath
+  RenamedImportItem
+  ModuleInclude
+  LoopBreak
+  LoopContinue
+  FuncReturn
+  Destructuring
+  DestructAssignment
+} derive(Compare, Eq, Hash, @debug.Debug)
+pub fn SyntaxKind::debug_name(Self) -> String
+pub fn SyntaxKind::from_index(Int) -> Self
+pub fn SyntaxKind::index(Self) -> Int
+pub fn SyntaxKind::is_block(Self) -> Bool
+pub fn SyntaxKind::is_error(Self) -> Bool
+pub fn SyntaxKind::is_grouping(Self) -> Bool
+pub fn SyntaxKind::is_keyword(Self) -> Bool
+pub fn SyntaxKind::is_stmt(Self) -> Bool
+pub fn SyntaxKind::is_terminator(Self) -> Bool
+pub fn SyntaxKind::is_trivia(Self) -> Bool
+pub fn SyntaxKind::name(Self) -> String
+pub impl Show for SyntaxKind
+
+pub(all) enum SyntaxMode {
+  Markup
+  Math
+  Code
+} derive(Eq, Hash, @debug.Debug)
+
+pub struct SyntaxNode {
+  // private fields
+}
+pub fn SyntaxNode::children(Self) -> ArrayView[Self]
+pub fn SyntaxNode::debug_tree(Self) -> String
+pub fn SyntaxNode::deep_clone(Self) -> Self
+pub fn SyntaxNode::diagnosis(Self) -> Diagnosis
+pub fn SyntaxNode::error(String, StringView) -> Self
+pub fn SyntaxNode::errors_and_warnings(Self) -> (Array[SyntaxDiagnostic], Array[SyntaxDiagnostic])
+pub fn SyntaxNode::full_text(Self) -> String
+pub fn SyntaxNode::hint(Self, String) -> Unit
+pub fn SyntaxNode::hint_at(Self, Int, Int, String) -> Unit
+pub fn SyntaxNode::inner(SyntaxKind, Array[Self]) -> Self
+pub fn SyntaxNode::is_empty(Self) -> Bool
+pub fn SyntaxNode::is_inner(Self) -> Bool
+pub fn SyntaxNode::is_leaf(Self) -> Bool
+pub fn SyntaxNode::kind(Self) -> SyntaxKind
+pub fn SyntaxNode::leaf(SyntaxKind, StringView) -> Self
+pub fn SyntaxNode::leaf_text(Self) -> String
+pub fn SyntaxNode::len(Self) -> Int
+pub fn SyntaxNode::placeholder(SyntaxKind) -> Self
+pub fn SyntaxNode::span(Self) -> Span
+pub fn SyntaxNode::spanless_eq(Self, Self) -> Bool
+pub fn SyntaxNode::synthesize(Self, Span) -> Unit
+pub fn SyntaxNode::warn(Self, String) -> Unit
+pub fn SyntaxNode::warn_at(Self, Int, Int, String) -> Unit
+pub fn SyntaxNode::with_hints(Self, ArrayView[String]) -> Self
+
+pub(all) struct SyntaxSet {
+  a : UInt64
+  b : UInt64
+  c : UInt64
+} derive(Eq)
+pub fn SyntaxSet::add(Self, SyntaxKind) -> Self
+pub fn SyntaxSet::contains(Self, SyntaxKind) -> Bool
+pub fn SyntaxSet::new() -> Self
+pub fn SyntaxSet::of(ArrayView[SyntaxKind]) -> Self
+pub fn SyntaxSet::remove(Self, SyntaxKind) -> Self
+pub fn SyntaxSet::union(Self, Self) -> Self
+
+pub(all) enum UnOp {
+  Pos
+  Neg
+  Not
+} derive(Eq, Hash, @debug.Debug)
+pub fn UnOp::as_str(Self) -> String
+pub fn UnOp::from_kind(SyntaxKind) -> Self?
+pub fn UnOp::precedence(Self) -> Int
+
+// Type aliases
+
+// Traits

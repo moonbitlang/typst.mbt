@@ -1,0 +1,21 @@
+name = "moonbitlang/typst"
+
+version = "0.1.0"
+
+readme = "README.md"
+
+repository = "https://github.com/moonbitlang/typst.mbt"
+
+license = "Apache-2.0"
+
+keywords = [ "typst", "typesetting", "markup", "pdf" ]
+
+description = "A port of the Typst typesetting engine to MoonBit."
+
+preferred_target = "native"
+
+warnings = "-implicit_impl_as_method"
+
+import {
+  "moonbitlang/x@0.5.5",
+}

@@ -1,0 +1,13 @@
+[package]
+name = "typst-oracle"
+version = "0.1.0"
+edition = "2024"
+publish = false
+description = "Dumps reference outputs of upstream Typst for differential testing of typst.mbt"
+
+[dependencies]
+typst-syntax = { path = "../.repos/typst/crates/typst-syntax" }
+typst-utils = { path = "../.repos/typst/crates/typst-utils" }
+unicode-ident = "1.0"
+unicode-math-class = "0.1"
+unicode-script = "0.5"
