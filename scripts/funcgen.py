@@ -292,6 +292,7 @@ def main():
             continue
         defs = []
         ctor = None
+        s_file = s["file"]
         for mem in s["members"]:
             attrs = " ".join(mem["attrs"])
             if mem["kind"] == "fn" and "#[func" in attrs:
@@ -313,6 +314,13 @@ def main():
                 if cname not in defined:
                     todo.append(f"///|\n/// TODO: port constant `{ty}::{mem['ident']}`.\nfn {cname}() -> Value {{\n  None\n}}\n")
                 defs.append(f"    s.define({mbt_str(mem['ident'].lower().replace('_', '-'))}, {cname}()) |> ignore")
+            elif mem["kind"] == "verbatim" and re.fullmatch(r"#\[elem\] type (\w+);", mem["tokens"]):
+                ident = re.fullmatch(r"#\[elem\] type (\w+);", mem["tokens"]).group(1)
+                defs.append(f"    s.define_elem({elem_var(ident, elem_files.get(ident, s_file))}()) |> ignore")
+            elif mem["kind"] == "verbatim" and re.fullmatch(r"type (\w+);", mem["tokens"]):
+                ident = re.fullmatch(r"type (\w+);", mem["tokens"]).group(1)
+                if ident in acc:
+                    defs.append(f"    s.define_type({acc[ident]}) |> ignore")
             elif mem["kind"] == "type" and "#[elem" in attrs:
                 defs.append(f"    s.define_elem({elem_var(mem['tokens'], elem_files.get(mem['tokens'], ''))}()) |> ignore")
         body = "\n".join(defs)

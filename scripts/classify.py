@@ -28,8 +28,11 @@ for dp, _, files in os.walk(gold_root):
             # Prefer a message about an unknown variable / method in our output.
             key = None
             for line in al:
-                m = re.search(r'"(unknown variable `[^`]*`|type [a-z ]+ has no method `[^`]*`|[^"]*not ported yet[^"]*|cannot access fields on type [a-z ]+)"', line)
+                m = re.search(r'"(unknown variable `[^`]*`|type [a-z ]+ has no method `[^`]*`|[^"]*not (?:yet )?ported[^"]*|cannot access fields on type [a-z ]+)"', line)
                 if m: key = m.group(1); break
+            if key is None and gl and gl[0].startswith("ok") and al and al[0] == "err":
+                m = re.search(r'"([^"]*)"', al[1] if len(al) > 1 else "")
+                if m: key = "unexpected err: " + re.sub(r"\d+", "N", m.group(1))[:90]
             if key is None:
                 for x, y in zip(gl, al):
                     if x != y:

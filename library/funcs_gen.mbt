@@ -18426,7 +18426,11 @@ fn register_scopes() -> Unit {
   })
   grid_elem().hooks().scope = () => {
     let s = Scope::new()
-
+    s.define_elem(grid_cell_elem()) |> ignore
+    s.define_elem(grid_h_line_elem()) |> ignore
+    s.define_elem(grid_v_line_elem()) |> ignore
+    s.define_elem(grid_header_elem()) |> ignore
+    s.define_elem(grid_footer_elem()) |> ignore
     s
   }
   Type::length().0.register(data => {
@@ -18440,32 +18444,32 @@ fn register_scopes() -> Unit {
   })
   place_elem().hooks().scope = () => {
     let s = Scope::new()
-
+    s.define_elem(flush_elem()) |> ignore
     s
   }
   enum_elem().hooks().scope = () => {
     let s = Scope::new()
-
+    s.define_elem(enum_item_elem()) |> ignore
     s
   }
   figure_elem().hooks().scope = () => {
     let s = Scope::new()
-
+    s.define_elem(figure_caption_elem()) |> ignore
     s
   }
   footnote_elem().hooks().scope = () => {
     let s = Scope::new()
-
+    s.define_elem(footnote_entry_elem()) |> ignore
     s
   }
   list_elem().hooks().scope = () => {
     let s = Scope::new()
-
+    s.define_elem(list_item_elem()) |> ignore
     s
   }
   outline_elem().hooks().scope = () => {
     let s = Scope::new()
-
+    s.define_elem(outline_entry_elem()) |> ignore
     s
   }
   outline_entry_elem().hooks().scope = () => {
@@ -18479,22 +18483,26 @@ fn register_scopes() -> Unit {
   }
   par_elem().hooks().scope = () => {
     let s = Scope::new()
-
+    s.define_elem(par_line_elem()) |> ignore
     s
   }
   table_elem().hooks().scope = () => {
     let s = Scope::new()
-
+    s.define_elem(table_cell_elem()) |> ignore
+    s.define_elem(table_h_line_elem()) |> ignore
+    s.define_elem(table_v_line_elem()) |> ignore
+    s.define_elem(table_header_elem()) |> ignore
+    s.define_elem(table_footer_elem()) |> ignore
     s
   }
   terms_elem().hooks().scope = () => {
     let s = Scope::new()
-
+    s.define_elem(term_item_elem()) |> ignore
     s
   }
   raw_elem().hooks().scope = () => {
     let s = Scope::new()
-
+    s.define_elem(raw_line_elem()) |> ignore
     s
   }
   Type::color().0.register(data => {
@@ -18538,6 +18546,7 @@ fn register_scopes() -> Unit {
     s.define_func(native_color_mix()) |> ignore
     s.define_func(native_color_transparentize()) |> ignore
     s.define_func(native_color_opacify()) |> ignore
+    s.define_type(Type::spot()) |> ignore
     data.set_scope(s)
   })
   Type::spot().0.register(data => {
@@ -18548,7 +18557,11 @@ fn register_scopes() -> Unit {
   })
   curve_elem().hooks().scope = () => {
     let s = Scope::new()
-
+    s.define_elem(curve_move_elem()) |> ignore
+    s.define_elem(curve_line_elem()) |> ignore
+    s.define_elem(curve_quad_elem()) |> ignore
+    s.define_elem(curve_cubic_elem()) |> ignore
+    s.define_elem(curve_close_elem()) |> ignore
     s
   }
   Type::gradient().0.register(data => {
