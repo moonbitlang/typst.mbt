@@ -59,20 +59,21 @@ fn check_encode(
 
 ///|
 test "iter_with_dom_indices" {
-  // Upstream's test without the `Tag` node (not ported yet), which
-  // receives the index of the preceding node.
   let nodes = [
     txt("A"),
     el("span"),
     txt("hi"),
     txt(" you"),
+    @html.HtmlNode::Tag(
+      Start(@library.Content::empty(), { introspectable: true, tagged: true, }),
+    ),
     txt(" there"),
     el("span"),
     txt(" my"),
     txt(" friend!"),
   ]
   assert_eq(@html.iter_with_dom_indices(nodes).map(p => p.1), [
-    0, 1, 2, 2, 2, 3, 4, 4,
+    0, 1, 2, 2, 2, 2, 3, 4, 4,
   ])
 }
 
