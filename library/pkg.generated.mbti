@@ -3526,6 +3526,7 @@ pub(all) enum Attribution {
   Content(Content)
   Label(Label)
 } derive(Eq)
+pub fn Attribution::realize(Self, @syntax.Span) -> Content
 pub impl FromValue for Attribution
 pub impl IntoValue for Attribution
 pub impl Reflect for Attribution
@@ -5254,6 +5255,8 @@ pub fn FigureCaption::pack(Self) -> Content
 pub fn FigureCaption::position(Self, StyleChain) -> OuterVAlignment
 pub fn FigureCaption::position_in(StyleChain) -> OuterVAlignment
 pub fn FigureCaption::position_local(Self) -> OuterVAlignment?
+pub fn FigureCaption::realize(Self, Engine, StyleChain) -> Content raise SourceError
+pub fn FigureCaption::resolve_separator(Self, StyleChain) -> Content
 pub fn FigureCaption::separator(Self, StyleChain) -> Smart[Content]
 pub fn FigureCaption::separator_in(StyleChain) -> Smart[Content]
 pub fn FigureCaption::separator_local(Self) -> Smart[Content]?
@@ -5301,6 +5304,7 @@ pub fn FigureElem::pack(Self) -> Content
 pub fn FigureElem::placement(Self, StyleChain) -> Smart[VAlignment]?
 pub fn FigureElem::placement_in(StyleChain) -> Smart[VAlignment]?
 pub fn FigureElem::placement_local(Self) -> Smart[VAlignment]??
+pub fn FigureElem::resolve_separator(Self, StyleChain) -> Content
 pub fn FigureElem::scope(Self, StyleChain) -> PlacementScope
 pub fn FigureElem::scope_in(StyleChain) -> PlacementScope
 pub fn FigureElem::scope_local(Self) -> PlacementScope?
@@ -5449,13 +5453,18 @@ pub fn FootnoteContainer::pack(Self) -> Content
 pub impl NativeElement for FootnoteContainer
 
 pub(all) struct FootnoteElem(Content) derive(Eq)
+pub fn FootnoteElem::alt_text(StyleChain, String) -> String
 pub fn FootnoteElem::body(Self) -> FootnoteBody
+pub fn FootnoteElem::body_content(Self) -> Content?
+pub fn FootnoteElem::declaration_location(Self, Engine) -> Location raise HintedError
+pub fn FootnoteElem::is_ref(Self) -> Bool
 pub fn FootnoteElem::new(FootnoteBody) -> Self
 pub fn FootnoteElem::numbering(Self, StyleChain) -> Numbering
 pub fn FootnoteElem::numbering_in(StyleChain) -> Numbering
 pub fn FootnoteElem::numbering_local(Self) -> Numbering?
 pub fn FootnoteElem::of(Content) -> Self?
 pub fn FootnoteElem::pack(Self) -> Content
+pub fn FootnoteElem::realize(Self, Engine, StyleChain) -> Content raise SourceError
 pub fn FootnoteElem::set_numbering(Numbering) -> Style
 pub fn FootnoteElem::with_body(Self, FootnoteBody) -> Self
 pub fn FootnoteElem::with_content(Content) -> Self
@@ -5479,6 +5488,7 @@ pub fn FootnoteEntry::new(FootnoteElem) -> Self
 pub fn FootnoteEntry::note(Self) -> FootnoteElem
 pub fn FootnoteEntry::of(Content) -> Self?
 pub fn FootnoteEntry::pack(Self) -> Content
+pub fn FootnoteEntry::realize(Self, Engine, StyleChain) -> (Content, Content) raise SourceError
 pub fn FootnoteEntry::separator(Self, StyleChain) -> Content
 pub fn FootnoteEntry::separator_in(StyleChain) -> Content
 pub fn FootnoteEntry::separator_local(Self) -> Content?
@@ -7799,6 +7809,7 @@ pub fn QuoteElem::depth_in(StyleChain) -> Depth
 pub fn QuoteElem::new(Content) -> Self
 pub fn QuoteElem::of(Content) -> Self?
 pub fn QuoteElem::pack(Self) -> Content
+pub fn QuoteElem::quoted(Content, StyleChain) -> Content
 pub fn QuoteElem::quotes(Self, StyleChain) -> Smart[Bool]
 pub fn QuoteElem::quotes_in(StyleChain) -> Smart[Bool]
 pub fn QuoteElem::quotes_local(Self) -> Smart[Bool]?
@@ -9500,6 +9511,7 @@ pub fn TitleElem::body_local(Self) -> Smart[Content]?
 pub fn TitleElem::new() -> Self
 pub fn TitleElem::of(Content) -> Self?
 pub fn TitleElem::pack(Self) -> Content
+pub fn TitleElem::resolve_body(Self, StyleChain) -> Content raise HintedError
 pub fn TitleElem::set_body(Smart[Content]) -> Style
 pub fn TitleElem::with_body(Self, Smart[Content]) -> Self
 pub impl NativeElement for TitleElem

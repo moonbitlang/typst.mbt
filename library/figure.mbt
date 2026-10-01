@@ -93,3 +93,76 @@ pub impl FromValue for FigureCaption with fn from_value(v) {
   }
   FigureCaption(FigureCaption::new(content).0.spanned(span))
 }
+
+///|
+/// Retrieves the locale separator.
+pub fn FigureElem::resolve_separator(
+  self : FigureElem,
+  styles : StyleChain,
+) -> Content {
+  match self.caption(styles) {
+    Some(caption) => caption.resolve_separator(styles)
+    None => FigureCaption::local_separator_in(styles)
+  }
+}
+
+///|
+/// Realizes the textual caption content.
+pub fn FigureCaption::realize(
+  self : FigureCaption,
+  engine : Engine,
+  styles : StyleChain,
+) -> Content raise SourceError {
+  let mut realized = self.body()
+  if self.supplement() is Some(Some(supplement)) &&
+    self.numbering() is Some(Some(numbering)) &&
+    self.counter() is Some(Some(counter)) &&
+    self.figure_location() is Some(Some(location)) {
+    let numbers = counter.display_at(
+      engine,
+      location,
+      styles,
+      numbering,
+      self.0.span(),
+    )
+    let mut supplement = supplement
+    if !supplement.is_empty() {
+      supplement = supplement.add(TextElem::packed("\u{a0}"))
+    }
+    realized = supplement
+      .add(numbers)
+      .add(self.resolve_separator(styles))
+      .add(realized)
+  }
+  realized
+}
+
+///|
+/// Retrieves the locale separator.
+pub fn FigureCaption::resolve_separator(
+  self : FigureCaption,
+  styles : StyleChain,
+) -> Content {
+  match self.separator(styles) {
+    Custom(separator) => separator
+    Auto => FigureCaption::local_separator_in(styles)
+  }
+}
+
+///|
+/// Gets the default separator in the given language and (optionally)
+/// region.
+fn FigureCaption::local_separator_in(styles : StyleChain) -> Content {
+  match FigureCaption::separator_in(styles) {
+    Custom(separator) => separator
+    Auto =>
+      TextElem::packed(
+        match TextElem::lang_in(styles).as_str() {
+          "zh" => "\u{2003}"
+          "fr" => ".\u{a0}– "
+          "ru" => ". "
+          _ => ": "
+        },
+      )
+  }
+}

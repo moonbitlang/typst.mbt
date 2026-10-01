@@ -43,6 +43,36 @@ pub impl FromValue for Attribution with fn from_value(v) {
 }
 
 ///|
+/// Realize as an em dash followed by text or a citation.
+pub fn Attribution::realize(self : Attribution, span : @syntax.Span) -> Content {
+  Content::sequence([
+    TextElem::packed("—"),
+    SpaceElem::shared(),
+    match self {
+      Content(content) => content
+      Label(label) =>
+        CiteElem::new(label).with_form(Str("prose")).pack().spanned(span)
+    },
+  ])
+}
+
+///|
+/// Wraps the body in language-dependent quotes, alternating between double
+/// and single quotes with the nesting depth.
+pub fn QuoteElem::quoted(body : Content, styles : StyleChain) -> Content {
+  let quotes = SmartQuotes::get_in(styles)
+
+  // Alternate between single and double quotes.
+  let Depth(depth) = QuoteElem::depth_in(styles)
+  let double = depth % 2 == 0
+  Content::sequence([
+    TextElem::packed(quotes.open(double)),
+    body,
+    TextElem::packed(quotes.close(double)),
+  ]).styled(QuoteElem::set_depth(Depth(1)))
+}
+
+///|
 fn quote_elem_depth_default() -> Value {
   Depth::default().into_value()
 }
