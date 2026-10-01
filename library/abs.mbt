@@ -208,3 +208,13 @@ pub impl Numeric for Abs with fn scale(self, factor) {
 pub fn Abs::repr(self : Abs) -> String {
   format_float_with_unit(self.to_pt(), "pt")
 }
+
+///|
+pub impl IntoValue for Abs with fn into_value(self) {
+  Length(Length::from_abs(self))
+}
+
+///|
+pub impl Fold for Abs with fn fold(self, _) {
+  self
+}

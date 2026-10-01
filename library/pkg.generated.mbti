@@ -2361,6 +2361,8 @@ pub impl Add for Abs
 pub impl Mod for Abs
 pub impl Neg for Abs
 pub impl Sub for Abs
+pub impl Fold for Abs
+pub impl IntoValue for Abs
 pub impl Numeric for Abs
 
 pub(all) enum AbsUnit {
@@ -2897,6 +2899,7 @@ pub fn Em::zero() -> Self
 pub impl Add for Em
 pub impl Neg for Em
 pub impl Sub for Em
+pub impl IntoValue for Em
 pub impl Numeric for Em
 
 pub(all) struct Engine {
