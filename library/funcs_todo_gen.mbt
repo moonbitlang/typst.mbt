@@ -1416,20 +1416,6 @@ fn impl_outline_entry_page(
 }
 
 ///|
-/// TODO: port `lower` (typst-library/src/text/case.rs).
-fn impl_lower(text_ : Value) -> Value raise HintedError {
-  ignore(text_)
-  bail("`lower` is not yet ported")
-}
-
-///|
-/// TODO: port `upper` (typst-library/src/text/case.rs).
-fn impl_upper(text_ : Value) -> Value raise HintedError {
-  ignore(text_)
-  bail("`upper` is not yet ported")
-}
-
-///|
 /// TODO: port `Color.luma` (typst-library/src/visualize/color.rs).
 fn impl_color_luma(args : Args) -> Value raise SourceError {
   ignore(args)

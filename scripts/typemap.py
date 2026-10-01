@@ -93,6 +93,20 @@ TYPEMAP = {
     "Lang": "Lang",
     "Region": "Region",
     "WritingScript": "WritingScript",
+    "Caseable": "Caseable",
+    "Case": "Case",
+    "SmartQuoteDict": "SmartQuoteDict",
+    "RawContent": "RawContent",
+    # layout/page.rs, place.rs, transform.rs, container.rs, stack.rs
+    "Paper": "Paper",
+    "Binding": "PageBinding",
+    "Parity": "Parity",
+    "PageRanges": "PageRanges",
+    "PlacementScope": "PlacementScope",
+    "ScaleAmount": "ScaleAmount",
+    "BlockBody": "BlockBody",
+    "BaselinePos": "BaselinePos",
+    "StackChild": "StackChild",
 }
 
 # Generic Rust types with a MoonBit port: Rust name -> MoonBit name. A use
@@ -105,6 +119,8 @@ GENERICS = {
     "Sides": "Sides",
     "Corners": "Corners",
     "SpecificAlignment": "SpecificAlignment",
+    # layout/page.rs
+    "Margin": "Margin",
 }
 
 

@@ -19,12 +19,6 @@ fn box_elem_width_default() -> Value {
 }
 
 ///|
-/// TODO: port `Default::default() of BaselinePos` (BoxElem.baseline).
-fn box_elem_baseline_default() -> Value {
-  None
-}
-
-///|
 /// TODO: port `Default::default() of Option<Paint>` (BoxElem.fill).
 fn box_elem_fill_default() -> Value {
   None
@@ -64,12 +58,6 @@ fn block_elem_stroke_default() -> Value {
 /// TODO: fold for `Sides<Option<Option<Stroke>>>` (BlockElem.stroke).
 fn block_elem_stroke_fold(inner : Value, _outer : Value) -> Value {
   inner
-}
-
-///|
-/// TODO: port `Default::default() of Option<BlockBody>` (BlockElem.body).
-fn block_elem_body_default() -> Value {
-  None
 }
 
 ///|
@@ -181,52 +169,6 @@ fn grid_cell_elem_stroke_fold(inner : Value, _outer : Value) -> Value {
 }
 
 ///|
-/// TODO: port `Paper::A4` (PageElem.paper).
-fn page_elem_paper_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Smart::Custom(Paper::A4.width().into())` (PageElem.width).
-fn page_elem_width_default() -> Value {
-  None
-}
-
-// TODO: port `#[parse]` of PageElem.width as `page_elem_width_parse`.
-
-///|
-/// TODO: port `Smart::Custom(Paper::A4.height().into())` (PageElem.height).
-fn page_elem_height_default() -> Value {
-  None
-}
-
-// TODO: port `#[parse]` of PageElem.height as `page_elem_height_parse`.
-
-///|
-/// TODO: port `Default::default() of Smart<Margin<Smart<Rel<Length>>>>` (PageElem.margin).
-fn page_elem_margin_default() -> Value {
-  None
-}
-
-///|
-/// TODO: fold for `Smart<Margin<Smart<Rel<Length>>>>` (PageElem.margin).
-fn page_elem_margin_fold(inner : Value, _outer : Value) -> Value {
-  inner
-}
-
-///|
-/// TODO: port `Default::default() of Margin<Rel<Length>>` (PageElem.bleed).
-fn page_elem_bleed_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Smart<Binding>` (PageElem.binding).
-fn page_elem_binding_default() -> Value {
-  None
-}
-
-///|
 /// TODO: port `Default::default() of Smart<Option<Paint>>` (PageElem.fill).
 fn page_elem_fill_default() -> Value {
   None
@@ -235,36 +177,6 @@ fn page_elem_fill_default() -> Value {
 ///|
 /// TODO: port `Default::default() of Option<Numbering>` (PageElem.numbering).
 fn page_elem_numbering_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Option<Parity>` (PagebreakElem.to).
-fn pagebreak_elem_to_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of PlacementScope` (PlaceElem.scope).
-fn place_elem_scope_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Smart::Custom(ScaleAmount::Ratio(Ratio::one()))` (ScaleElem.factor).
-fn scale_elem_factor_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Smart::Custom(ScaleAmount::Ratio(Ratio::one()))` (ScaleElem.x).
-fn scale_elem_x_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Smart::Custom(ScaleAmount::Ratio(Ratio::one()))` (ScaleElem.y).
-fn scale_elem_y_default() -> Value {
   None
 }
 
@@ -464,12 +376,6 @@ fn enum_elem_parents_default() -> Value {
 /// TODO: fold for `SmallVec<[u64; 4]>` (EnumElem.parents).
 fn enum_elem_parents_fold(inner : Value, _outer : Value) -> Value {
   inner
-}
-
-///|
-/// TODO: port `Default::default() of PlacementScope` (FigureElem.scope).
-fn figure_elem_scope_default() -> Value {
-  None
 }
 
 ///|
@@ -857,12 +763,6 @@ fn text_elem_deco_fold(inner : Value, _outer : Value) -> Value {
 }
 
 ///|
-/// TODO: port `Default::default() of Option<Case>` (TextElem.case).
-fn text_elem_case_default() -> Value {
-  None
-}
-
-///|
 /// TODO: port `Default::default() of Option<Smallcaps>` (TextElem.smallcaps).
 fn text_elem_smallcaps_default() -> Value {
   None
@@ -895,12 +795,6 @@ fn raw_elem_theme_default() -> Value {
 }
 
 // TODO: port `#[parse]` of RawElem.theme as `raw_elem_theme_parse`.
-
-///|
-/// TODO: port `Default::default() of Smart<SmartQuoteDict>` (SmartQuoteElem.quotes).
-fn smart_quote_elem_quotes_default() -> Value {
-  None
-}
 
 ///|
 /// TODO: port `Default::default() of Option<Paint>` (CurveElem.fill).
@@ -1143,12 +1037,6 @@ fn html_elem_css_default() -> Value {
 }
 
 // TODO: port `#[parse]` of HtmlElem.css as `html_elem_css_parse`.
-
-///|
-/// TODO: port `` (PdfFormat.pages).
-fn pdf_format_elem_pages_default() -> Value {
-  None
-}
 
 ///|
 /// TODO: port `` (PdfFormat.standard).

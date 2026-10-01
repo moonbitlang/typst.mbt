@@ -8,7 +8,6 @@
 //     4 Smart<Option<Stroke>>
 //     3 Sides<Option<Option<Stroke>>>
 //     3 Smart<Option<Paint>>
-//     3 Smart<ScaleAmount>
 //     3 Locale
 //     3 DelimiterPair
 //     3 Numbering
@@ -21,7 +20,6 @@
 //     2 Arc<CellGrid>
 //     2 Vec<GridItem>
 //     2 Sides<Option<Option<Arc<Stroke>>>>
-//     2 PlacementScope
 //     2 Stroke
 //     2 OneOrMultiple<EcoString>
 //     2 Option<Counter>
@@ -36,16 +34,8 @@
 //     1 Smart<Numbering>
 //     1 StateUpdate
 //     1 Tag
-//     1 BaselinePos
 //     1 callbacks::InlineCallback
-//     1 Option<BlockBody>
 //     1 Vec<GridChild>
-//     1 Paper
-//     1 Smart<Margin<Smart<Rel<Length>>>>
-//     1 Margin<Rel<Length>>
-//     1 Smart<Binding>
-//     1 Option<Parity>
-//     1 Vec<StackChild>
 //     1 Smart<CancelAngle>
 //     1 MathSize
 //     1 Option<MathVariant>
@@ -91,14 +81,11 @@
 //     1 Paint
 //     1 Option<Stroke>
 //     1 SmallVec<[Decoration; 1]>
-//     1 Option<Case>
 //     1 Option<Smallcaps>
 //     1 Option<ShiftSettings>
-//     1 RawContent
 //     1 Derived<OneOrMultiple<DataSource>, Vec<RawSyntax>>
 //     1 Smart<Option<Derived<DataSource, RawTheme>>>
 //     1 Vec<Packed<RawLine>>
-//     1 Smart<SmartQuoteDict>
 //     1 Vec<CurveComponent>
 //     1 CloseMode
 //     1 Derived<DataSource, Loaded>
@@ -109,7 +96,6 @@
 //     1 HtmlTag
 //     1 HtmlAttrs
 //     1 css::Properties
-//     1 Option<PageRanges>
 //     1 PdfStandards
 //     1 Derived<PathOrStr, EcoString>
 //     1 Bytes
@@ -632,7 +618,7 @@ pub fn box_elem() -> Element {
             default=() => Auto,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[BaselinePos]),
             id=2,
             name="baseline",
             kind=Settable,
@@ -872,12 +858,12 @@ pub fn block_elem() -> Element {
             default=() => Bool(false),
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[BlockBody?]),
             id=13,
             name="body",
             kind=Settable,
             positional=true,
-            default=block_elem_body_default,
+            default=() => None,
           ),
         ],
       )
@@ -1650,7 +1636,7 @@ pub fn page_elem() -> Element {
         capabilities=["Construct"],
         fields=[
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Paper]),
             id=0,
             name="paper",
             kind=External,
@@ -1662,6 +1648,7 @@ pub fn page_elem() -> Element {
             name="width",
             kind=Ghost,
             default=page_elem_width_default,
+            parse=page_elem_width_parse,
           ),
           field_of(
             (Ty::new() : Ty[Smart[Length]]),
@@ -1669,31 +1656,32 @@ pub fn page_elem() -> Element {
             name="height",
             kind=Ghost,
             default=page_elem_height_default,
+            parse=page_elem_height_parse,
           ),
           field_of((Ty::new() : Ty[Bool]), id=3, name="flipped", kind=Ghost, default=() => {
             Bool(false)
           }),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Smart[Margin[Smart[Rel[Length]]]]]),
             id=4,
             name="margin",
             kind=Ghost,
-            default=page_elem_margin_default,
+            default=() => Auto,
             fold=page_elem_margin_fold,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Margin[Rel[Length]]]),
             id=5,
             name="bleed",
             kind=Ghost,
             default=page_elem_bleed_default,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Smart[PageBinding]]),
             id=6,
             name="binding",
             kind=Ghost,
-            default=page_elem_binding_default,
+            default=() => Auto,
           ),
           field_of(
             (Ty::new() : Ty[NonZeroUSize]),
@@ -1870,13 +1858,9 @@ pub fn pagebreak_elem() -> Element {
           field_of((Ty::new() : Ty[Bool]), id=0, name="weak", kind=Settable, default=() => {
             Bool(false)
           }),
-          field_of(
-            (Ty::new() : Ty[Value]),
-            id=1,
-            name="to",
-            kind=Settable,
-            default=pagebreak_elem_to_default,
-          ),
+          field_of((Ty::new() : Ty[Parity?]), id=1, name="to", kind=Settable, default=() => {
+            None
+          }),
           field_of(
             (Ty::new() : Ty[Bool]),
             id=2,
@@ -1928,7 +1912,7 @@ pub fn place_elem() -> Element {
             default=() => Dyn(Alignment(alignment_start)),
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[PlacementScope]),
             id=1,
             name="scope",
             kind=Settable,
@@ -2190,7 +2174,7 @@ pub fn stack_elem() -> Element {
             default=() => None,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[StackChild]),
             id=2,
             name="children",
             kind=Required,
@@ -2356,7 +2340,7 @@ pub fn scale_elem() -> Element {
         capabilities=[],
         fields=[
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Smart[ScaleAmount]]),
             id=0,
             name="factor",
             kind=External,
@@ -2364,7 +2348,7 @@ pub fn scale_elem() -> Element {
             default=scale_elem_factor_default,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Smart[ScaleAmount]]),
             id=1,
             name="x",
             kind=Settable,
@@ -2372,7 +2356,7 @@ pub fn scale_elem() -> Element {
             parse=scale_elem_x_parse,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Smart[ScaleAmount]]),
             id=2,
             name="y",
             kind=Settable,
@@ -4840,7 +4824,7 @@ pub fn figure_elem() -> Element {
             default=() => None,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[PlacementScope]),
             id=3,
             name="scope",
             kind=Settable,
@@ -7665,12 +7649,12 @@ pub fn text_elem() -> Element {
             fold=text_elem_deco_fold,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Case?]),
             id=39,
             name="case",
             kind=Ghost,
             internal=true,
-            default=text_elem_case_default,
+            default=() => None,
           ),
           field_of(
             (Ty::new() : Ty[Value]),
@@ -7843,7 +7827,7 @@ pub fn raw_elem() -> Element {
         ],
         fields=[
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[RawContent]),
             id=0,
             name="text",
             kind=Required,
@@ -8200,11 +8184,11 @@ pub fn smart_quote_elem() -> Element {
             default=() => Bool(false),
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Smart[SmartQuoteDict]]),
             id=3,
             name="quotes",
             kind=Settable,
-            default=smart_quote_elem_quotes_default,
+            default=() => Auto,
           ),
         ],
       )
@@ -9450,11 +9434,11 @@ pub fn pdf_format_elem() -> Element {
         capabilities=["Construct"],
         fields=[
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[PageRanges?]),
             id=0,
             name="pages",
             kind=Settable,
-            default=pdf_format_elem_pages_default,
+            default=() => None,
           ),
           field_of(
             (Ty::new() : Ty[Value]),

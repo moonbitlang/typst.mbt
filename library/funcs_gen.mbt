@@ -15324,7 +15324,7 @@ pub fn native_lower() -> NativeFuncData {
           {
             name: "text",
             docs: "The text to convert to lowercase.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Caseable])),
             default: None,
             positional: true,
             named: false,
@@ -15333,7 +15333,7 @@ pub fn native_lower() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Caseable])),
         native_lower_call,
       )
       native_lower_cell.val = Some(d)
@@ -15350,7 +15350,7 @@ fn native_lower_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let text_ : Value = args.expect("text")
+  let text_ : Caseable = args.expect("text")
   args.take().finish()
   let output = at(args.span, () => impl_lower(text_))
   IntoValue::into_value(output)
@@ -15375,7 +15375,7 @@ pub fn native_upper() -> NativeFuncData {
           {
             name: "text",
             docs: "The text to convert to uppercase.",
-            input: () => input_of((Ty::new() : Ty[Value])),
+            input: () => input_of((Ty::new() : Ty[Caseable])),
             default: None,
             positional: true,
             named: false,
@@ -15384,7 +15384,7 @@ pub fn native_upper() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Caseable])),
         native_upper_call,
       )
       native_upper_cell.val = Some(d)
@@ -15401,7 +15401,7 @@ fn native_upper_call(
 ) -> Value raise SourceError {
   ignore(engine)
   ignore(context)
-  let text_ : Value = args.expect("text")
+  let text_ : Caseable = args.expect("text")
   args.take().finish()
   let output = at(args.span, () => impl_upper(text_))
   IntoValue::into_value(output)
