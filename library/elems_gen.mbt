@@ -4,7 +4,6 @@
 //     9 Option<Paint>
 //     6 Option<Numbering>
 //     4 Option<Arc<Stroke>>
-//     4 Smart<Option<Supplement>>
 //     4 Smart<Option<Stroke>>
 //     3 Sides<Option<Option<Stroke>>>
 //     3 Smart<Option<Paint>>
@@ -21,9 +20,7 @@
 //     2 Vec<GridItem>
 //     2 Sides<Option<Option<Arc<Stroke>>>>
 //     2 Stroke
-//     2 OneOrMultiple<EcoString>
 //     2 Option<Counter>
-//     2 Depth
 //     2 Vec<TableItem>
 //     2 FillRule
 //     2 Smart<Sides<Option<Option<Stroke>>>>
@@ -43,41 +40,22 @@
 //     1 FracStyle
 //     1 Option<Augment>
 //     1 MathClass
-//     1 ArtifactKind
 //     1 PdfMarkerTagKind
 //     1 Derived<OneOrMultiple<DataSource>, Bibliography>
 //     1 Derived<CslSource, CslStyle>
 //     1 Smart<LocatableSelector>
 //     1 Option<CitationForm>
 //     1 Smart<Derived<CslSource, CslStyle>>
-//     1 Smart<DocumentFormat>
 //     1 Smart<Option<Datetime>>
-//     1 Vec<Packed<EnumItem>>
-//     1 SmallVec<[u64; 4]>
-//     1 Option<Packed<FigureCaption>>
-//     1 Smart<FigureKind>
-//     1 FigureKind
 //     1 Option<Location>
-//     1 FootnoteBody
-//     1 Packed<FootnoteElem>
 //     1 LinkTarget
 //     1 Option<Destination>
-//     1 ListMarker
-//     1 Vec<Packed<ListItem>>
 //     1 LocatableSelector
-//     1 Smart<OutlineIndent>
 //     1 Option<Packed<OutlineElem>>
 //     1 Abs
-//     1 JustificationLimits
-//     1 Smart<Linebreaks>
-//     1 FirstLineIndent
-//     1 LineNumberingScope
-//     1 Option<Attribution>
-//     1 RefForm
 //     1 Option<Packed<CiteElem>>
 //     1 Vec<TableChild>
 //     1 Smart<TableCellKind>
-//     1 Vec<Packed<TermItem>>
 //     1 Paint
 //     1 Option<Stroke>
 //     1 SmallVec<[Decoration; 1]>
@@ -2910,11 +2888,11 @@ pub fn equation_elem() -> Element {
             },
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Smart[Supplement?]]),
             id=3,
             name="supplement",
             kind=Settable,
-            default=equation_elem_supplement_default,
+            default=() => Auto,
           ),
           field_of((Ty::new() : Ty[String?]), id=4, name="alt", kind=Settable, default=() => {
             None
@@ -4081,7 +4059,7 @@ pub fn artifact_elem() -> Element {
         capabilities=["Tagged"],
         fields=[
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[ArtifactKind]),
             id=0,
             name="kind",
             kind=Settable,
@@ -4495,11 +4473,11 @@ pub fn document_elem() -> Element {
             required=true,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Smart[DocumentFormat]]),
             id=1,
             name="format",
             kind=Settable,
-            default=document_elem_format_default,
+            default=() => Auto,
           ),
           field_of(
             (Ty::new() : Ty[Content?]),
@@ -4509,7 +4487,7 @@ pub fn document_elem() -> Element {
             default=() => None,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[OneOrMultiple[String]]),
             id=3,
             name="author",
             kind=Settable,
@@ -4523,7 +4501,7 @@ pub fn document_elem() -> Element {
             default=() => None,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[OneOrMultiple[String]]),
             id=5,
             name="keywords",
             kind=Settable,
@@ -4683,7 +4661,7 @@ pub fn enum_elem() -> Element {
             default=enum_elem_number_align_default,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[EnumItem]),
             id=9,
             name="children",
             kind=Required,
@@ -4692,12 +4670,12 @@ pub fn enum_elem() -> Element {
             variadic=true,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Array[U64]]),
             id=10,
             name="parents",
             kind=Ghost,
             internal=true,
-            default=enum_elem_parents_default,
+            default=() => Array(Arr::new()),
             fold=enum_elem_parents_fold,
           ),
         ],
@@ -4831,25 +4809,25 @@ pub fn figure_elem() -> Element {
             default=figure_elem_scope_default,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[FigureCaption?]),
             id=4,
             name="caption",
             kind=Settable,
-            default=figure_elem_caption_default,
+            default=() => None,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Smart[FigureKind]]),
             id=5,
             name="kind",
             kind=Settable,
-            default=figure_elem_kind_default,
+            default=() => Auto,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Smart[Supplement?]]),
             id=6,
             name="supplement",
             kind=Settable,
-            default=figure_elem_supplement_default,
+            default=() => Auto,
           ),
           field_of(
             (Ty::new() : Ty[Value]),
@@ -4963,7 +4941,12 @@ pub fn figure_caption_elem() -> Element {
             positional=true,
             required=true,
           ),
-          field_of((Ty::new() : Ty[Value]), id=3, name="kind", kind=Synthesized),
+          field_of(
+            (Ty::new() : Ty[FigureKind]),
+            id=3,
+            name="kind",
+            kind=Synthesized,
+          ),
           field_of(
             (Ty::new() : Ty[Content?]),
             id=4,
@@ -5045,7 +5028,7 @@ pub fn footnote_elem() -> Element {
             default=footnote_elem_numbering_default,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[FootnoteBody]),
             id=1,
             name="body",
             kind=Required,
@@ -5083,7 +5066,7 @@ pub fn footnote_entry_elem() -> Element {
         capabilities=["Locatable", "Tagged", "ShowSet"],
         fields=[
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[FootnoteElem]),
             id=0,
             name="note",
             kind=Required,
@@ -5231,11 +5214,11 @@ pub fn heading_elem() -> Element {
             default=heading_elem_numbering_default,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Smart[Supplement?]]),
             id=4,
             name="supplement",
             kind=Settable,
-            default=heading_elem_supplement_default,
+            default=() => Auto,
           ),
           field_of(
             (Ty::new() : Ty[Bool]),
@@ -5498,7 +5481,7 @@ pub fn list_elem() -> Element {
             Bool(true)
           }),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[ListMarker]),
             id=1,
             name="marker",
             kind=Settable,
@@ -5533,7 +5516,7 @@ pub fn list_elem() -> Element {
             default=list_elem_marker_align_default,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[ListItem]),
             id=6,
             name="children",
             kind=Required,
@@ -5542,7 +5525,7 @@ pub fn list_elem() -> Element {
             variadic=true,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Depth]),
             id=7,
             name="depth",
             kind=Ghost,
@@ -5655,11 +5638,11 @@ pub fn outline_elem() -> Element {
             default=() => None,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Smart[OutlineIndent]]),
             id=3,
             name="indent",
             kind=Settable,
-            default=outline_elem_indent_default,
+            default=() => Auto,
           ),
         ],
       )
@@ -5845,7 +5828,7 @@ pub fn par_elem() -> Element {
             default=() => Bool(false),
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[JustificationLimits]),
             id=3,
             name="justification-limits",
             kind=Settable,
@@ -5853,14 +5836,14 @@ pub fn par_elem() -> Element {
             fold=par_elem_justification_limits_fold,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Smart[Linebreaks]]),
             id=4,
             name="linebreaks",
             kind=Settable,
-            default=par_elem_linebreaks_default,
+            default=() => Auto,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[FirstLineIndent]),
             id=5,
             name="first-line-indent",
             kind=Settable,
@@ -5982,7 +5965,7 @@ pub fn par_line_elem() -> Element {
             default=() => Auto,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[LineNumberingScope]),
             id=4,
             name="numbering-scope",
             kind=Ghost,
@@ -6110,11 +6093,11 @@ pub fn quote_elem() -> Element {
             default=() => Auto,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Attribution?]),
             id=2,
             name="attribution",
             kind=Settable,
-            default=quote_elem_attribution_default,
+            default=() => None,
           ),
           field_of(
             (Ty::new() : Ty[Content]),
@@ -6125,7 +6108,7 @@ pub fn quote_elem() -> Element {
             required=true,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Depth]),
             id=4,
             name="depth",
             kind=Ghost,
@@ -6181,14 +6164,14 @@ pub fn ref_elem() -> Element {
             required=true,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[Smart[Supplement?]]),
             id=1,
             name="supplement",
             kind=Settable,
-            default=ref_elem_supplement_default,
+            default=() => Auto,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[RefForm]),
             id=2,
             name="form",
             kind=Settable,
@@ -6858,7 +6841,7 @@ pub fn terms_elem() -> Element {
             default=() => Auto,
           ),
           field_of(
-            (Ty::new() : Ty[Value]),
+            (Ty::new() : Ty[TermItem]),
             id=5,
             name="children",
             kind=Required,

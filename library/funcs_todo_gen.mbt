@@ -55,7 +55,7 @@ fn impl_bytes_slice(
 
 ///|
 /// TODO: port `Content.func` (typst-library/src/foundations/content/mod.rs).
-fn impl_content_func(self_ : Content) -> Value raise HintedError {
+fn impl_content_func(self_ : Content) -> Element raise HintedError {
   ignore(self_)
   bail("`Content.func` is not yet ported")
 }

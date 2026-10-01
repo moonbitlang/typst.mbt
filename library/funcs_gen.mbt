@@ -5269,7 +5269,7 @@ pub fn native_content_func() -> NativeFuncData {
             settable: false,
           },
         ],
-        returns=() => output_of((Ty::new() : Ty[Value])),
+        returns=() => output_of((Ty::new() : Ty[Element])),
         native_content_func_call,
       )
       native_content_func_cell.val = Some(d)

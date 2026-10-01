@@ -107,6 +107,28 @@ TYPEMAP = {
     "BlockBody": "BlockBody",
     "BaselinePos": "BaselinePos",
     "StackChild": "StackChild",
+    # model/*.rs
+    "Element": "Element",
+    "Depth": "Depth",
+    "ListMarker": "ListMarker",
+    "Packed<ListItem>": "ListItem",
+    "Packed<EnumItem>": "EnumItem",
+    "Packed<TermItem>": "TermItem",
+    "Packed<FigureCaption>": "FigureCaption",
+    "Packed<FootnoteElem>": "FootnoteElem",
+    "SmallVec<[u64; 4]>": "Array[U64]",
+    "FigureKind": "FigureKind",
+    "Supplement": "Supplement",
+    "RefForm": "RefForm",
+    "OutlineIndent": "OutlineIndent",
+    "Attribution": "Attribution",
+    "FootnoteBody": "FootnoteBody",
+    "JustificationLimits": "JustificationLimits",
+    "Linebreaks": "Linebreaks",
+    "FirstLineIndent": "FirstLineIndent",
+    "LineNumberingScope": "LineNumberingScope",
+    "DocumentFormat": "DocumentFormat",
+    "ArtifactKind": "ArtifactKind",
 }
 
 # Generic Rust types with a MoonBit port: Rust name -> MoonBit name. A use
@@ -121,6 +143,8 @@ GENERICS = {
     "SpecificAlignment": "SpecificAlignment",
     # layout/page.rs
     "Margin": "Margin",
+    # foundations/array.rs
+    "OneOrMultiple": "OneOrMultiple",
 }
 
 

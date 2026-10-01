@@ -211,12 +211,6 @@ fn equation_elem_numbering_default() -> Value {
 }
 
 ///|
-/// TODO: port `Default::default() of Smart<Option<Supplement>>` (EquationElem.supplement).
-fn equation_elem_supplement_default() -> Value {
-  None
-}
-
-///|
 /// TODO: port `MathSize::Text` (EquationElem.size).
 fn equation_elem_size_default() -> Value {
   None
@@ -294,12 +288,6 @@ fn cases_elem_gap_default() -> Value {
   None
 }
 
-///|
-/// TODO: port `ArtifactKind::Other` (ArtifactElem.kind).
-fn artifact_elem_kind_default() -> Value {
-  None
-}
-
 // TODO: port `#[parse]` of BibliographyElem.sources as `bibliography_elem_sources_parse`.
 
 ///|
@@ -331,24 +319,6 @@ fn cite_elem_style_default() -> Value {
 // TODO: port `#[parse]` of CiteElem.style as `cite_elem_style_parse`.
 
 ///|
-/// TODO: port `Default::default() of Smart<DocumentFormat>` (DocumentElem.format).
-fn document_elem_format_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of OneOrMultiple<EcoString>` (DocumentElem.author).
-fn document_elem_author_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of OneOrMultiple<EcoString>` (DocumentElem.keywords).
-fn document_elem_keywords_default() -> Value {
-  None
-}
-
-///|
 /// TODO: port `Default::default() of Smart<Option<Datetime>>` (DocumentElem.date).
 fn document_elem_date_default() -> Value {
   None
@@ -357,42 +327,6 @@ fn document_elem_date_default() -> Value {
 ///|
 /// TODO: port `Numbering::Pattern(NumberingPattern::from_str("1.").unwrap())` (EnumElem.numbering).
 fn enum_elem_numbering_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Alignment::H(HAlignment::End)` (EnumElem.number_align).
-fn enum_elem_number_align_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of SmallVec<[u64; 4]>` (EnumElem.parents).
-fn enum_elem_parents_default() -> Value {
-  None
-}
-
-///|
-/// TODO: fold for `SmallVec<[u64; 4]>` (EnumElem.parents).
-fn enum_elem_parents_fold(inner : Value, _outer : Value) -> Value {
-  inner
-}
-
-///|
-/// TODO: port `Default::default() of Option<Packed<FigureCaption>>` (FigureElem.caption).
-fn figure_elem_caption_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Smart<FigureKind>` (FigureElem.kind).
-fn figure_elem_kind_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Smart<Option<Supplement>>` (FigureElem.supplement).
-fn figure_elem_supplement_default() -> Value {
   None
 }
 
@@ -421,56 +355,14 @@ fn heading_elem_numbering_default() -> Value {
 }
 
 ///|
-/// TODO: port `Default::default() of Smart<Option<Supplement>>` (HeadingElem.supplement).
-fn heading_elem_supplement_default() -> Value {
-  None
-}
-
-///|
 /// TODO: port `Default::default() of Option<Destination>` (LinkElem.current).
 fn link_elem_current_default() -> Value {
   None
 }
 
 ///|
-/// TODO: port `ListMarker::Content(vec ![TextElem::packed('\u{2022}'), TextElem::packed('\u{2023}'), TextElem::packed('\u{2013}'),])` (ListElem.marker).
-fn list_elem_marker_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Alignment::H(HAlignment::End)` (ListElem.marker_align).
-fn list_elem_marker_align_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Depth` (ListElem.depth).
-fn list_elem_depth_default() -> Value {
-  None
-}
-
-///|
-/// TODO: fold for `Depth` (ListElem.depth).
-fn list_elem_depth_fold(inner : Value, _outer : Value) -> Value {
-  inner
-}
-
-///|
 /// TODO: port `LocatableSelector(HeadingElem::ELEM.select())` (OutlineElem.target).
 fn outline_elem_target_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Smart<OutlineIndent>` (OutlineElem.indent).
-fn outline_elem_indent_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Some(RepeatElem::new(TextElem::packed(".")).with_gap(Em::new(0.15).into()).pack())` (OutlineEntry.fill).
-fn outline_entry_elem_fill_default() -> Value {
   None
 }
 
@@ -481,74 +373,8 @@ fn outline_entry_elem_parent_default() -> Value {
 }
 
 ///|
-/// TODO: port `Default::default() of JustificationLimits` (ParElem.justification_limits).
-fn par_elem_justification_limits_default() -> Value {
-  None
-}
-
-///|
-/// TODO: fold for `JustificationLimits` (ParElem.justification_limits).
-fn par_elem_justification_limits_fold(inner : Value, _outer : Value) -> Value {
-  inner
-}
-
-///|
-/// TODO: port `Default::default() of Smart<Linebreaks>` (ParElem.linebreaks).
-fn par_elem_linebreaks_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of FirstLineIndent` (ParElem.first_line_indent).
-fn par_elem_first_line_indent_default() -> Value {
-  None
-}
-
-///|
-/// TODO: fold for `FirstLineIndent` (ParElem.first_line_indent).
-fn par_elem_first_line_indent_fold(inner : Value, _outer : Value) -> Value {
-  inner
-}
-
-///|
 /// TODO: port `Default::default() of Option<Numbering>` (ParLine.numbering).
 fn par_line_elem_numbering_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `LineNumberingScope::Document` (ParLine.numbering_scope).
-fn par_line_elem_numbering_scope_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Option<Attribution>` (QuoteElem.attribution).
-fn quote_elem_attribution_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `Default::default() of Depth` (QuoteElem.depth).
-fn quote_elem_depth_default() -> Value {
-  None
-}
-
-///|
-/// TODO: fold for `Depth` (QuoteElem.depth).
-fn quote_elem_depth_fold(inner : Value, _outer : Value) -> Value {
-  inner
-}
-
-///|
-/// TODO: port `Default::default() of Smart<Option<Supplement>>` (RefElem.supplement).
-fn ref_elem_supplement_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `RefForm::Normal` (RefElem.form).
-fn ref_elem_form_default() -> Value {
   None
 }
 
@@ -663,12 +489,6 @@ fn table_cell_elem_stroke_fold(inner : Value, _outer : Value) -> Value {
 ///|
 /// TODO: port `Default::default() of Smart<TableCellKind>` (TableCell.kind).
 fn table_cell_elem_kind_default() -> Value {
-  None
-}
-
-///|
-/// TODO: port `HElem::new(Em::new(0.6).into()).with_weak(true).pack()` (TermsElem.separator).
-fn terms_elem_separator_default() -> Value {
   None
 }
 
