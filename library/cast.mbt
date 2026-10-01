@@ -603,6 +603,34 @@ pub impl FromValue for Dict with fn from_value(v) {
 }
 
 ///|
+pub impl Reflect for Args with fn input() {
+  Type(Type::args())
+}
+
+///|
+pub impl Reflect for Args with fn output() {
+  Type(Type::args())
+}
+
+///|
+pub impl Reflect for Args with fn castable(v) {
+  v is Args(_)
+}
+
+///|
+pub impl IntoValue for Args with fn into_value(self) {
+  Args(self)
+}
+
+///|
+pub impl FromValue for Args with fn from_value(v) {
+  match v {
+    Args(a) => a
+    v => cast_fail_with(Type(Type::args()), v)
+  }
+}
+
+///|
 pub impl Reflect for Label with fn input() {
   Type(Type::label())
 }

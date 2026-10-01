@@ -851,7 +851,603 @@ pub let move_elem_dy : Int
 
 pub fn mul(Value, Value) -> Value raise HintedError
 
+pub fn native_alignment_axis() -> NativeFuncData
+
+pub fn native_alignment_inv() -> NativeFuncData
+
+pub fn native_angle_to_deg() -> NativeFuncData
+
+pub fn native_angle_to_rad() -> NativeFuncData
+
+pub fn native_args_at() -> NativeFuncData
+
+pub fn native_args_construct() -> NativeFuncData
+
+pub fn native_args_filter() -> NativeFuncData
+
+pub fn native_args_len() -> NativeFuncData
+
+pub fn native_args_map() -> NativeFuncData
+
+pub fn native_args_to_named() -> NativeFuncData
+
+pub fn native_args_to_pos() -> NativeFuncData
+
+pub fn native_array_all() -> NativeFuncData
+
+pub fn native_array_any() -> NativeFuncData
+
+pub fn native_array_at() -> NativeFuncData
+
+pub fn native_array_chunks() -> NativeFuncData
+
+pub fn native_array_construct() -> NativeFuncData
+
+pub fn native_array_contains() -> NativeFuncData
+
+pub fn native_array_dedup() -> NativeFuncData
+
+pub fn native_array_enumerate() -> NativeFuncData
+
+pub fn native_array_filter() -> NativeFuncData
+
+pub fn native_array_find() -> NativeFuncData
+
+pub fn native_array_first() -> NativeFuncData
+
+pub fn native_array_flatten() -> NativeFuncData
+
+pub fn native_array_fold() -> NativeFuncData
+
+pub fn native_array_insert() -> NativeFuncData
+
+pub fn native_array_intersperse() -> NativeFuncData
+
+pub fn native_array_join() -> NativeFuncData
+
+pub fn native_array_last() -> NativeFuncData
+
+pub fn native_array_len() -> NativeFuncData
+
+pub fn native_array_map() -> NativeFuncData
+
+pub fn native_array_pop() -> NativeFuncData
+
+pub fn native_array_position() -> NativeFuncData
+
+pub fn native_array_product() -> NativeFuncData
+
+pub fn native_array_push() -> NativeFuncData
+
+pub fn native_array_range() -> NativeFuncData
+
+pub fn native_array_reduce() -> NativeFuncData
+
+pub fn native_array_remove() -> NativeFuncData
+
+pub fn native_array_rev() -> NativeFuncData
+
+pub fn native_array_slice() -> NativeFuncData
+
+pub fn native_array_sorted() -> NativeFuncData
+
+pub fn native_array_split() -> NativeFuncData
+
+pub fn native_array_sum() -> NativeFuncData
+
+pub fn native_array_to_dict() -> NativeFuncData
+
+pub fn native_array_windows() -> NativeFuncData
+
+pub fn native_array_zip() -> NativeFuncData
+
+pub fn native_assert() -> NativeFuncData
+
+pub fn native_assert_eq() -> NativeFuncData
+
+pub fn native_assert_ne() -> NativeFuncData
+
+pub fn native_bytes_at() -> NativeFuncData
+
+pub fn native_bytes_construct() -> NativeFuncData
+
+pub fn native_bytes_len() -> NativeFuncData
+
+pub fn native_bytes_slice() -> NativeFuncData
+
+pub fn native_calc_abs() -> NativeFuncData
+
+pub fn native_calc_acos() -> NativeFuncData
+
+pub fn native_calc_acosh() -> NativeFuncData
+
+pub fn native_calc_asin() -> NativeFuncData
+
+pub fn native_calc_asinh() -> NativeFuncData
+
+pub fn native_calc_atan() -> NativeFuncData
+
+pub fn native_calc_atan2() -> NativeFuncData
+
+pub fn native_calc_atanh() -> NativeFuncData
+
+pub fn native_calc_binom() -> NativeFuncData
+
+pub fn native_calc_ceil() -> NativeFuncData
+
+pub fn native_calc_clamp() -> NativeFuncData
+
+pub fn native_calc_cos() -> NativeFuncData
+
+pub fn native_calc_cosh() -> NativeFuncData
+
+pub fn native_calc_div_euclid() -> NativeFuncData
+
+pub fn native_calc_erf() -> NativeFuncData
+
+pub fn native_calc_even() -> NativeFuncData
+
+pub fn native_calc_exp() -> NativeFuncData
+
+pub fn native_calc_fact() -> NativeFuncData
+
+pub fn native_calc_floor() -> NativeFuncData
+
+pub fn native_calc_fract() -> NativeFuncData
+
+pub fn native_calc_gcd() -> NativeFuncData
+
+pub fn native_calc_lcm() -> NativeFuncData
+
+pub fn native_calc_ln() -> NativeFuncData
+
+pub fn native_calc_log() -> NativeFuncData
+
+pub fn native_calc_max() -> NativeFuncData
+
+pub fn native_calc_min() -> NativeFuncData
+
+pub fn native_calc_norm() -> NativeFuncData
+
+pub fn native_calc_odd() -> NativeFuncData
+
+pub fn native_calc_perm() -> NativeFuncData
+
+pub fn native_calc_pow() -> NativeFuncData
+
+pub fn native_calc_quo() -> NativeFuncData
+
+pub fn native_calc_rem() -> NativeFuncData
+
+pub fn native_calc_rem_euclid() -> NativeFuncData
+
+pub fn native_calc_root() -> NativeFuncData
+
+pub fn native_calc_round() -> NativeFuncData
+
+pub fn native_calc_sin() -> NativeFuncData
+
+pub fn native_calc_sinh() -> NativeFuncData
+
+pub fn native_calc_sqrt() -> NativeFuncData
+
+pub fn native_calc_tan() -> NativeFuncData
+
+pub fn native_calc_tanh() -> NativeFuncData
+
+pub fn native_calc_trunc() -> NativeFuncData
+
+pub fn native_cbor() -> NativeFuncData
+
+pub fn native_cbor_encode() -> NativeFuncData
+
+pub fn native_color_cmyk() -> NativeFuncData
+
+pub fn native_color_components() -> NativeFuncData
+
+pub fn native_color_darken() -> NativeFuncData
+
+pub fn native_color_desaturate() -> NativeFuncData
+
+pub fn native_color_hsl() -> NativeFuncData
+
+pub fn native_color_hsv() -> NativeFuncData
+
+pub fn native_color_lighten() -> NativeFuncData
+
+pub fn native_color_linear_rgb() -> NativeFuncData
+
+pub fn native_color_luma() -> NativeFuncData
+
+pub fn native_color_mix() -> NativeFuncData
+
+pub fn native_color_negate() -> NativeFuncData
+
+pub fn native_color_oklab() -> NativeFuncData
+
+pub fn native_color_oklch() -> NativeFuncData
+
+pub fn native_color_opacify() -> NativeFuncData
+
+pub fn native_color_rgb() -> NativeFuncData
+
+pub fn native_color_rotate() -> NativeFuncData
+
+pub fn native_color_saturate() -> NativeFuncData
+
+pub fn native_color_space() -> NativeFuncData
+
+pub fn native_color_to_hex() -> NativeFuncData
+
+pub fn native_color_transparentize() -> NativeFuncData
+
+pub fn native_content_at() -> NativeFuncData
+
+pub fn native_content_fields() -> NativeFuncData
+
+pub fn native_content_func() -> NativeFuncData
+
+pub fn native_content_has() -> NativeFuncData
+
+pub fn native_content_location() -> NativeFuncData
+
+pub fn native_counter_at() -> NativeFuncData
+
+pub fn native_counter_construct() -> NativeFuncData
+
+pub fn native_counter_display() -> NativeFuncData
+
+pub fn native_counter_final() -> NativeFuncData
+
+pub fn native_counter_get() -> NativeFuncData
+
+pub fn native_counter_step() -> NativeFuncData
+
+pub fn native_counter_update() -> NativeFuncData
+
+pub fn native_csv() -> NativeFuncData
+
+pub fn native_datetime_construct() -> NativeFuncData
+
+pub fn native_datetime_day() -> NativeFuncData
+
+pub fn native_datetime_display() -> NativeFuncData
+
+pub fn native_datetime_hour() -> NativeFuncData
+
+pub fn native_datetime_minute() -> NativeFuncData
+
+pub fn native_datetime_month() -> NativeFuncData
+
+pub fn native_datetime_ordinal() -> NativeFuncData
+
+pub fn native_datetime_second() -> NativeFuncData
+
+pub fn native_datetime_today() -> NativeFuncData
+
+pub fn native_datetime_weekday() -> NativeFuncData
+
+pub fn native_datetime_year() -> NativeFuncData
+
+pub fn native_decimal_construct() -> NativeFuncData
+
+pub fn native_dict_at() -> NativeFuncData
+
+pub fn native_dict_construct() -> NativeFuncData
+
+pub fn native_dict_filter() -> NativeFuncData
+
+pub fn native_dict_insert() -> NativeFuncData
+
+pub fn native_dict_keys() -> NativeFuncData
+
+pub fn native_dict_len() -> NativeFuncData
+
+pub fn native_dict_map() -> NativeFuncData
+
+pub fn native_dict_pairs() -> NativeFuncData
+
+pub fn native_dict_remove() -> NativeFuncData
+
+pub fn native_dict_values() -> NativeFuncData
+
+pub fn native_dir_axis() -> NativeFuncData
+
+pub fn native_dir_end() -> NativeFuncData
+
+pub fn native_dir_from() -> NativeFuncData
+
+pub fn native_dir_inv() -> NativeFuncData
+
+pub fn native_dir_sign() -> NativeFuncData
+
+pub fn native_dir_start() -> NativeFuncData
+
+pub fn native_dir_to() -> NativeFuncData
+
+pub fn native_duration_construct() -> NativeFuncData
+
+pub fn native_duration_days() -> NativeFuncData
+
+pub fn native_duration_hours() -> NativeFuncData
+
+pub fn native_duration_minutes() -> NativeFuncData
+
+pub fn native_duration_seconds() -> NativeFuncData
+
+pub fn native_duration_weeks() -> NativeFuncData
+
+pub fn native_eval() -> NativeFuncData
+
+pub fn native_f64_construct() -> NativeFuncData
+
+pub fn native_f64_from_bytes() -> NativeFuncData
+
+pub fn native_f64_is_infinite() -> NativeFuncData
+
+pub fn native_f64_is_nan() -> NativeFuncData
+
+pub fn native_f64_signum() -> NativeFuncData
+
+pub fn native_f64_to_bytes() -> NativeFuncData
+
 pub fn native_func(String, title? : String, params? : Array[ParamInfo], scope? : () -> Scope, contextual? : Bool, (Engine, Context, Args) -> Value raise SourceError) -> NativeFuncData
+
+pub fn native_func_where() -> NativeFuncData
+
+pub fn native_func_with() -> NativeFuncData
+
+pub fn native_gradient_angle() -> NativeFuncData
+
+pub fn native_gradient_center() -> NativeFuncData
+
+pub fn native_gradient_conic() -> NativeFuncData
+
+pub fn native_gradient_focal_center() -> NativeFuncData
+
+pub fn native_gradient_focal_radius() -> NativeFuncData
+
+pub fn native_gradient_kind() -> NativeFuncData
+
+pub fn native_gradient_linear() -> NativeFuncData
+
+pub fn native_gradient_radial() -> NativeFuncData
+
+pub fn native_gradient_radius() -> NativeFuncData
+
+pub fn native_gradient_relative() -> NativeFuncData
+
+pub fn native_gradient_repeat() -> NativeFuncData
+
+pub fn native_gradient_sample() -> NativeFuncData
+
+pub fn native_gradient_samples() -> NativeFuncData
+
+pub fn native_gradient_sharp() -> NativeFuncData
+
+pub fn native_gradient_space() -> NativeFuncData
+
+pub fn native_gradient_stops() -> NativeFuncData
+
+pub fn native_here() -> NativeFuncData
+
+pub fn native_i64_bit_and() -> NativeFuncData
+
+pub fn native_i64_bit_lshift() -> NativeFuncData
+
+pub fn native_i64_bit_not() -> NativeFuncData
+
+pub fn native_i64_bit_or() -> NativeFuncData
+
+pub fn native_i64_bit_rshift() -> NativeFuncData
+
+pub fn native_i64_bit_xor() -> NativeFuncData
+
+pub fn native_i64_construct() -> NativeFuncData
+
+pub fn native_i64_from_bytes() -> NativeFuncData
+
+pub fn native_i64_signum() -> NativeFuncData
+
+pub fn native_i64_to_bytes() -> NativeFuncData
+
+pub fn native_json() -> NativeFuncData
+
+pub fn native_json_encode() -> NativeFuncData
+
+pub fn native_label_construct() -> NativeFuncData
+
+pub fn native_layout() -> NativeFuncData
+
+pub fn native_length_to_absolute() -> NativeFuncData
+
+pub fn native_length_to_cm() -> NativeFuncData
+
+pub fn native_length_to_inches() -> NativeFuncData
+
+pub fn native_length_to_mm() -> NativeFuncData
+
+pub fn native_length_to_pt() -> NativeFuncData
+
+pub fn native_locate() -> NativeFuncData
+
+pub fn native_location_page() -> NativeFuncData
+
+pub fn native_location_page_numbering() -> NativeFuncData
+
+pub fn native_location_position() -> NativeFuncData
+
+pub fn native_lorem() -> NativeFuncData
+
+pub fn native_lower() -> NativeFuncData
+
+pub fn native_math_abs() -> NativeFuncData
+
+pub fn native_math_bb() -> NativeFuncData
+
+pub fn native_math_bold() -> NativeFuncData
+
+pub fn native_math_cal() -> NativeFuncData
+
+pub fn native_math_ceil() -> NativeFuncData
+
+pub fn native_math_display() -> NativeFuncData
+
+pub fn native_math_floor() -> NativeFuncData
+
+pub fn native_math_frak() -> NativeFuncData
+
+pub fn native_math_inline() -> NativeFuncData
+
+pub fn native_math_italic() -> NativeFuncData
+
+pub fn native_math_mono() -> NativeFuncData
+
+pub fn native_math_norm() -> NativeFuncData
+
+pub fn native_math_round() -> NativeFuncData
+
+pub fn native_math_sans() -> NativeFuncData
+
+pub fn native_math_scr() -> NativeFuncData
+
+pub fn native_math_script() -> NativeFuncData
+
+pub fn native_math_serif() -> NativeFuncData
+
+pub fn native_math_sqrt() -> NativeFuncData
+
+pub fn native_math_sscript() -> NativeFuncData
+
+pub fn native_math_upright() -> NativeFuncData
+
+pub fn native_measure() -> NativeFuncData
+
+pub fn native_numbering() -> NativeFuncData
+
+pub fn native_outline_entry_body() -> NativeFuncData
+
+pub fn native_outline_entry_indented() -> NativeFuncData
+
+pub fn native_outline_entry_inner() -> NativeFuncData
+
+pub fn native_outline_entry_page() -> NativeFuncData
+
+pub fn native_outline_entry_prefix() -> NativeFuncData
+
+pub fn native_panic() -> NativeFuncData
+
+pub fn native_plugin() -> NativeFuncData
+
+pub fn native_plugin_transition() -> NativeFuncData
+
+pub fn native_polygon_elem_regular() -> NativeFuncData
+
+pub fn native_query() -> NativeFuncData
+
+pub fn native_read() -> NativeFuncData
+
+pub fn native_regex_construct() -> NativeFuncData
+
+pub fn native_repr() -> NativeFuncData
+
+pub fn native_rooted_path_construct() -> NativeFuncData
+
+pub fn native_selector_after() -> NativeFuncData
+
+pub fn native_selector_and() -> NativeFuncData
+
+pub fn native_selector_before() -> NativeFuncData
+
+pub fn native_selector_construct() -> NativeFuncData
+
+pub fn native_selector_or() -> NativeFuncData
+
+pub fn native_selector_within() -> NativeFuncData
+
+pub fn native_spot_colorant_construct() -> NativeFuncData
+
+pub fn native_spot_colorant_tint() -> NativeFuncData
+
+pub fn native_state_at() -> NativeFuncData
+
+pub fn native_state_construct() -> NativeFuncData
+
+pub fn native_state_final() -> NativeFuncData
+
+pub fn native_state_get() -> NativeFuncData
+
+pub fn native_state_update() -> NativeFuncData
+
+pub fn native_str_at() -> NativeFuncData
+
+pub fn native_str_clusters() -> NativeFuncData
+
+pub fn native_str_codepoints() -> NativeFuncData
+
+pub fn native_str_construct() -> NativeFuncData
+
+pub fn native_str_contains() -> NativeFuncData
+
+pub fn native_str_ends_with() -> NativeFuncData
+
+pub fn native_str_find() -> NativeFuncData
+
+pub fn native_str_first() -> NativeFuncData
+
+pub fn native_str_from_unicode() -> NativeFuncData
+
+pub fn native_str_last() -> NativeFuncData
+
+pub fn native_str_len() -> NativeFuncData
+
+pub fn native_str_match() -> NativeFuncData
+
+pub fn native_str_matches() -> NativeFuncData
+
+pub fn native_str_normalize() -> NativeFuncData
+
+pub fn native_str_position() -> NativeFuncData
+
+pub fn native_str_replace() -> NativeFuncData
+
+pub fn native_str_rev() -> NativeFuncData
+
+pub fn native_str_slice() -> NativeFuncData
+
+pub fn native_str_split() -> NativeFuncData
+
+pub fn native_str_starts_with() -> NativeFuncData
+
+pub fn native_str_to_unicode() -> NativeFuncData
+
+pub fn native_str_trim() -> NativeFuncData
+
+pub fn native_stroke_construct() -> NativeFuncData
+
+pub fn native_symbol_construct() -> NativeFuncData
+
+pub fn native_target() -> NativeFuncData
+
+pub fn native_tiling_construct() -> NativeFuncData
+
+pub fn native_toml() -> NativeFuncData
+
+pub fn native_toml_encode() -> NativeFuncData
+
+pub fn native_type_construct() -> NativeFuncData
+
+pub fn native_upper() -> NativeFuncData
+
+pub fn native_version_at() -> NativeFuncData
+
+pub fn native_version_construct() -> NativeFuncData
+
+pub fn native_xml() -> NativeFuncData
+
+pub fn native_yaml() -> NativeFuncData
+
+pub fn native_yaml_encode() -> NativeFuncData
 
 pub fn neg(Value) -> Value raise HintedError
 
@@ -1188,8 +1784,6 @@ pub let ref_elem_supplement : Int
 pub let ref_elem_target : Int
 
 pub fn regex_escape(String) -> String
-
-pub fn register_global(String, NativeFuncData) -> Unit
 
 pub fn rem_euclid(Double, Double) -> Double
 
@@ -1605,6 +2199,8 @@ pub let title_elem_body : Int
 
 pub fn[T] trace((@syntax.DiagSpan) -> (Int, Int)?, () -> Tracepoint, @syntax.Span, () -> T raise SourceError) -> T raise SourceError
 
+pub let typst_version : (Int, Int, Int)
+
 pub fn underbrace_elem() -> Element
 
 pub let underbrace_elem_annotation : Int
@@ -1781,12 +2377,15 @@ pub(all) struct Args {
   items : Array[Arg]
 }
 pub fn[T : FromValue] Args::all(Self) -> Array[T] raise SourceError
+pub fn[T : FromValue] Args::all_spanned(Self) -> Array[@syntax.Spanned[T]] raise SourceError
 pub fn Args::all_with(Self, (Value) -> Value raise HintedError) -> Array[Value] raise SourceError
 pub fn Args::consume(Self, Int) -> Array[Arg] raise SourceError
 pub fn Args::copy(Self) -> Self
 pub fn[T : FromValue] Args::eat(Self) -> T? raise SourceError
 pub fn Args::eat_spanned(Self) -> @syntax.Spanned[Value]?
+pub fn[T : FromValue] Args::eat_spanned_cast(Self) -> @syntax.Spanned[T]? raise SourceError
 pub fn[T : FromValue] Args::expect(Self, String) -> T raise SourceError
+pub fn[T : FromValue] Args::expect_spanned(Self, String) -> @syntax.Spanned[T] raise SourceError
 pub fn Args::expect_with(Self, String, (Value) -> Value raise HintedError) -> Value raise SourceError
 pub fn Args::field(Self, String) -> Value raise HintedError
 pub fn[T : FromValue] Args::find(Self) -> T? raise SourceError
@@ -1797,6 +2396,7 @@ pub fn Args::is_empty(Self) -> Bool
 pub fn Args::merge(Self, Self) -> Self
 pub fn[T : FromValue] Args::named(Self, String) -> T? raise SourceError
 pub fn[T : FromValue] Args::named_or_find(Self, String) -> T? raise SourceError
+pub fn[T : FromValue] Args::named_spanned(Self, String) -> @syntax.Spanned[T]? raise SourceError
 pub fn Args::named_with(Self, String, (Value) -> Value raise HintedError) -> Value? raise SourceError
 pub fn Args::new(@syntax.Span, ArrayView[Value]) -> Self
 pub fn Args::push(Self, @syntax.Span, Value) -> Unit
@@ -1807,6 +2407,9 @@ pub fn Args::take(Self) -> Self
 pub fn Args::to_named(Self) -> Dict
 pub fn Args::to_pos(Self) -> Arr
 pub impl Eq for Args
+pub impl FromValue for Args
+pub impl IntoValue for Args
+pub impl Reflect for Args
 
 pub struct Arr {
   items : Array[Value]
@@ -2254,6 +2857,24 @@ pub fn HintedString::into_warning_at(Self, @syntax.Span) -> SourceDiagnostic
 pub fn HintedString::new(String) -> Self
 pub fn HintedString::with_hint(Self, String) -> Self
 
+pub(all) struct I16(Int64) derive(Compare, Eq, Hash, @debug.Debug)
+pub fn I16::get(Self) -> Int64
+pub impl FromValue for I16
+pub impl IntoValue for I16
+pub impl Reflect for I16
+
+pub(all) struct I32(Int64) derive(Compare, Eq, Hash, @debug.Debug)
+pub fn I32::get(Self) -> Int64
+pub impl FromValue for I32
+pub impl IntoValue for I32
+pub impl Reflect for I32
+
+pub(all) struct I8(Int64) derive(Compare, Eq, Hash, @debug.Debug)
+pub fn I8::get(Self) -> Int64
+pub impl FromValue for I8
+pub impl IntoValue for I8
+pub impl Reflect for I8
+
 pub struct Introspector {
   // private fields
 }
@@ -2302,10 +2923,12 @@ pub(all) struct LibraryBuilder {
   mut features : Features
   extra : Array[(Scope) -> Unit]
   routines : Routines
+  mut inputs : Dict
 }
 pub fn LibraryBuilder::build(Self) -> Library
 pub fn LibraryBuilder::with_features(Self, Features) -> Self
 pub fn LibraryBuilder::with_global(Self, (Scope) -> Unit) -> Self
+pub fn LibraryBuilder::with_inputs(Self, Dict) -> Self
 
 pub struct LinkElem(Content)
 pub fn LinkElem::from_url(String) -> Content raise HintedError
@@ -2354,6 +2977,30 @@ pub fn NativeTypeData::new(name~ : String, long_name~ : String, title~ : String,
 pub fn NativeTypeData::register(Self, (Self) -> Unit) -> Unit
 pub fn NativeTypeData::set_constructor(Self, NativeFuncData) -> Unit
 pub fn NativeTypeData::set_scope(Self, Scope) -> Unit
+
+pub(all) struct NonZeroI64(Int64) derive(Compare, Eq, Hash, @debug.Debug)
+pub fn NonZeroI64::get(Self) -> Int64
+pub impl FromValue for NonZeroI64
+pub impl IntoValue for NonZeroI64
+pub impl Reflect for NonZeroI64
+
+pub(all) struct NonZeroU32(Int64) derive(Compare, Eq, Hash, @debug.Debug)
+pub fn NonZeroU32::get(Self) -> Int64
+pub impl FromValue for NonZeroU32
+pub impl IntoValue for NonZeroU32
+pub impl Reflect for NonZeroU32
+
+pub(all) struct NonZeroU64(Int64) derive(Compare, Eq, Hash, @debug.Debug)
+pub fn NonZeroU64::get(Self) -> Int64
+pub impl FromValue for NonZeroU64
+pub impl IntoValue for NonZeroU64
+pub impl Reflect for NonZeroU64
+
+pub(all) struct NonZeroUSize(Int64) derive(Compare, Eq, Hash, @debug.Debug)
+pub fn NonZeroUSize::get(Self) -> Int64
+pub impl FromValue for NonZeroUSize
+pub impl IntoValue for NonZeroUSize
+pub impl Reflect for NonZeroUSize
 
 pub(all) enum NumericUnit {
   Pt
@@ -2741,6 +3388,36 @@ pub impl Show for Type
 pub impl FromValue for Type
 pub impl IntoValue for Type
 pub impl Reflect for Type
+
+pub(all) struct U16(Int64) derive(Compare, Eq, Hash, @debug.Debug)
+pub fn U16::get(Self) -> Int64
+pub impl FromValue for U16
+pub impl IntoValue for U16
+pub impl Reflect for U16
+
+pub(all) struct U32(Int64) derive(Compare, Eq, Hash, @debug.Debug)
+pub fn U32::get(Self) -> Int64
+pub impl FromValue for U32
+pub impl IntoValue for U32
+pub impl Reflect for U32
+
+pub(all) struct U64(Int64) derive(Compare, Eq, Hash, @debug.Debug)
+pub fn U64::get(Self) -> Int64
+pub impl FromValue for U64
+pub impl IntoValue for U64
+pub impl Reflect for U64
+
+pub(all) struct U8(Int64) derive(Compare, Eq, Hash, @debug.Debug)
+pub fn U8::get(Self) -> Int64
+pub impl FromValue for U8
+pub impl IntoValue for U8
+pub impl Reflect for U8
+
+pub(all) struct USize(Int64) derive(Compare, Eq, Hash, @debug.Debug)
+pub fn USize::get(Self) -> Int64
+pub impl FromValue for USize
+pub impl IntoValue for USize
+pub impl Reflect for USize
 
 pub(all) enum Value {
   None
