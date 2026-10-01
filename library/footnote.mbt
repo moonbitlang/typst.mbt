@@ -90,3 +90,102 @@ pub impl FromValue for FootnoteElem with fn from_value(v) {
   }
   FootnoteElem(FootnoteElem::with_content(content).0.spanned(span))
 }
+
+///|
+/// The alternative text of a footnote number: the footnote's local name
+/// followed by the number.
+pub fn FootnoteElem::alt_text(styles : StyleChain, num : String) -> String {
+  // TODO: Upstream uses `Packed::<FootnoteElem>::local_name_in(styles)`;
+  // local names are not ported yet, so this falls back to English.
+  let local_name = footnote_elem()
+    .local_name(
+      TextElem::lang_in(styles).as_str(),
+      TextElem::region_in(styles).map(r => r.as_str()),
+    )
+    .unwrap_or("Footnote")
+  "\{local_name} \{num}"
+}
+
+///|
+/// Tests if this footnote is a reference to another footnote.
+pub fn FootnoteElem::is_ref(self : FootnoteElem) -> Bool {
+  self.body() is Reference(_)
+}
+
+///|
+/// Returns the content of the body of this footnote if it is not a ref.
+pub fn FootnoteElem::body_content(self : FootnoteElem) -> Content? {
+  match self.body() {
+    Content(content) => Some(content)
+    Reference(_) => None
+  }
+}
+
+///|
+/// Returns the content that holds the number and links to the footnote
+/// entry.
+pub fn FootnoteElem::realize(
+  self : FootnoteElem,
+  engine : Engine,
+  styles : StyleChain,
+) -> Content raise SourceError {
+  let span = self.0.span()
+  let loc = at(span, () => self.declaration_location(engine))
+  let numbering = self.numbering(styles)
+  let counter = Counter::of(footnote_elem())
+  let num = counter.display_at(engine, loc, styles, numbering, span)
+  let alt = FootnoteElem::alt_text(styles, num.plain_text())
+  let dest = loc.variant(1)
+  DirectLinkElem::new(dest, num, Some(alt)).pack().spanned(span)
+}
+
+///|
+/// Returns the location of the definition of this footnote.
+pub fn FootnoteElem::declaration_location(
+  self : FootnoteElem,
+  engine : Engine,
+) -> Location raise HintedError {
+  match self.body() {
+    Reference(label) => {
+      let element = match
+        engine.introspect(query_label_introspection(label, self.0.span())) {
+        Ok(element) => element
+        Err(err) => raise HintedError(err)
+      }
+      guard element.is_(footnote_elem()) else {
+        bail("referenced element should be a footnote")
+      }
+      let footnote = FootnoteElem(element)
+      if self.0.location() == footnote.0.location() {
+        bail("footnote cannot reference itself")
+      }
+      footnote.declaration_location(engine)
+    }
+    Content(_) => self.0.location().unwrap()
+  }
+}
+
+///|
+/// Returns the content of the superscript that holds the number and links
+/// back to the footnote, and the entry body.
+pub fn FootnoteEntry::realize(
+  self : FootnoteEntry,
+  engine : Engine,
+  styles : StyleChain,
+) -> (Content, Content) raise SourceError {
+  let span = self.0.span()
+  let note = self.note()
+  let numbering = note.numbering(StyleChain::empty())
+  let counter = Counter::of(footnote_elem())
+  guard note.0.location() is Some(dest) else {
+    bail_at(span, "footnote entry must have a location", hints=[
+      "try using a query or a show rule to customize the footnote instead",
+    ])
+  }
+  let num = counter.display_at(engine, dest, styles, numbering, span)
+  let alt = num.plain_text()
+  let link = DirectLinkElem::new(dest, num, Some(alt)).pack().spanned(span)
+  let sup = SuperElem::new(link).pack().spanned(span)
+  let body = note.body_content().unwrap()
+  (sup, body)
+}

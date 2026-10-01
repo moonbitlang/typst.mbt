@@ -72,6 +72,13 @@ pub fn is_whitespace(c : Char) -> Bool {
 }
 
 ///|
+/// Whether a codepoint is Unicode `Default_Ignorable` (upstream
+/// `typst_library::text::is_default_ignorable`).
+pub fn is_default_ignorable(c : Char) -> Bool {
+  in_ranges(default_ignorable_table, c.to_int())
+}
+
+///|
 /// Equivalent of Rust's `char::is_alphabetic`.
 pub fn is_alphabetic(c : Char) -> Bool {
   let c = c.to_int()
