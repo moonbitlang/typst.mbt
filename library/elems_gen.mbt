@@ -592,7 +592,7 @@ pub fn columns_elem() -> Element {
             id=3,
             name="separator",
             kind=Settable,
-            default=columns_elem_separator_default,
+            default=() => None,
           ),
           field_of(
             (Ty::new() : Ty[Content]),
@@ -740,7 +740,7 @@ pub fn box_elem() -> Element {
             name="body",
             kind=Settable,
             positional=true,
-            default=box_elem_body_default,
+            default=() => None,
           ),
         ],
       )
@@ -1759,7 +1759,7 @@ pub fn page_elem() -> Element {
             id=9,
             name="numbering",
             kind=Ghost,
-            default=page_elem_numbering_default,
+            default=() => None,
           ),
           field_of(
             (Ty::new() : Ty[Value]),
@@ -1808,14 +1808,14 @@ pub fn page_elem() -> Element {
             id=16,
             name="background",
             kind=Ghost,
-            default=page_elem_background_default,
+            default=() => None,
           ),
           field_of(
             (Ty::new() : Ty[Content?]),
             id=17,
             name="foreground",
             kind=Ghost,
-            default=page_elem_foreground_default,
+            default=() => None,
           ),
           field_of(
             (Ty::new() : Ty[Content]),
@@ -2611,48 +2611,24 @@ pub fn math_attach_elem() -> Element {
             positional=true,
             required=true,
           ),
-          field_of(
-            (Ty::new() : Ty[Content?]),
-            id=1,
-            name="t",
-            kind=Settable,
-            default=math_attach_elem_t_default,
-          ),
-          field_of(
-            (Ty::new() : Ty[Content?]),
-            id=2,
-            name="b",
-            kind=Settable,
-            default=math_attach_elem_b_default,
-          ),
-          field_of(
-            (Ty::new() : Ty[Content?]),
-            id=3,
-            name="tl",
-            kind=Settable,
-            default=math_attach_elem_tl_default,
-          ),
-          field_of(
-            (Ty::new() : Ty[Content?]),
-            id=4,
-            name="bl",
-            kind=Settable,
-            default=math_attach_elem_bl_default,
-          ),
-          field_of(
-            (Ty::new() : Ty[Content?]),
-            id=5,
-            name="tr",
-            kind=Settable,
-            default=math_attach_elem_tr_default,
-          ),
-          field_of(
-            (Ty::new() : Ty[Content?]),
-            id=6,
-            name="br",
-            kind=Settable,
-            default=math_attach_elem_br_default,
-          ),
+          field_of((Ty::new() : Ty[Content?]), id=1, name="t", kind=Settable, default=() => {
+            None
+          }),
+          field_of((Ty::new() : Ty[Content?]), id=2, name="b", kind=Settable, default=() => {
+            None
+          }),
+          field_of((Ty::new() : Ty[Content?]), id=3, name="tl", kind=Settable, default=() => {
+            None
+          }),
+          field_of((Ty::new() : Ty[Content?]), id=4, name="bl", kind=Settable, default=() => {
+            None
+          }),
+          field_of((Ty::new() : Ty[Content?]), id=5, name="tr", kind=Settable, default=() => {
+            None
+          }),
+          field_of((Ty::new() : Ty[Content?]), id=6, name="br", kind=Settable, default=() => {
+            None
+          }),
         ],
       )
       math_attach_elem_cell.val = Some(e)
@@ -2957,7 +2933,7 @@ pub fn equation_elem() -> Element {
             id=1,
             name="numbering",
             kind=Settable,
-            default=equation_elem_numbering_default,
+            default=() => None,
           ),
           field_of(
             (Ty::new() : Ty[Value]),
@@ -2973,13 +2949,9 @@ pub fn equation_elem() -> Element {
             kind=Settable,
             default=equation_elem_supplement_default,
           ),
-          field_of(
-            (Ty::new() : Ty[String?]),
-            id=4,
-            name="alt",
-            kind=Settable,
-            default=equation_elem_alt_default,
-          ),
+          field_of((Ty::new() : Ty[String?]), id=4, name="alt", kind=Settable, default=() => {
+            None
+          }),
           field_of(
             (Ty::new() : Ty[Content]),
             id=5,
@@ -3026,7 +2998,7 @@ pub fn equation_elem() -> Element {
             name="italic",
             kind=Ghost,
             internal=true,
-            default=equation_elem_italic_default,
+            default=() => None,
           ),
           field_of(
             (Ty::new() : Ty[Value]),
@@ -3656,7 +3628,7 @@ pub fn root_elem() -> Element {
             name="index",
             kind=Settable,
             positional=true,
-            default=root_elem_index_default,
+            default=() => None,
           ),
           field_of(
             (Ty::new() : Ty[Content]),
@@ -3780,7 +3752,7 @@ pub fn underbrace_elem() -> Element {
             name="annotation",
             kind=Settable,
             positional=true,
-            default=underbrace_elem_annotation_default,
+            default=() => None,
           ),
         ],
       )
@@ -3826,7 +3798,7 @@ pub fn overbrace_elem() -> Element {
             name="annotation",
             kind=Settable,
             positional=true,
-            default=overbrace_elem_annotation_default,
+            default=() => None,
           ),
         ],
       )
@@ -3872,7 +3844,7 @@ pub fn underbracket_elem() -> Element {
             name="annotation",
             kind=Settable,
             positional=true,
-            default=underbracket_elem_annotation_default,
+            default=() => None,
           ),
         ],
       )
@@ -3918,7 +3890,7 @@ pub fn overbracket_elem() -> Element {
             name="annotation",
             kind=Settable,
             positional=true,
-            default=overbracket_elem_annotation_default,
+            default=() => None,
           ),
         ],
       )
@@ -3964,7 +3936,7 @@ pub fn underparen_elem() -> Element {
             name="annotation",
             kind=Settable,
             positional=true,
-            default=underparen_elem_annotation_default,
+            default=() => None,
           ),
         ],
       )
@@ -4010,7 +3982,7 @@ pub fn overparen_elem() -> Element {
             name="annotation",
             kind=Settable,
             positional=true,
-            default=overparen_elem_annotation_default,
+            default=() => None,
           ),
         ],
       )
@@ -4056,7 +4028,7 @@ pub fn undershell_elem() -> Element {
             name="annotation",
             kind=Settable,
             positional=true,
-            default=undershell_elem_annotation_default,
+            default=() => None,
           ),
         ],
       )
@@ -4102,7 +4074,7 @@ pub fn overshell_elem() -> Element {
             name="annotation",
             kind=Settable,
             positional=true,
-            default=overshell_elem_annotation_default,
+            default=() => None,
           ),
         ],
       )
@@ -4410,7 +4382,7 @@ pub fn cite_elem() -> Element {
             id=1,
             name="supplement",
             kind=Settable,
-            default=cite_elem_supplement_default,
+            default=() => None,
           ),
           field_of(
             (Ty::new() : Ty[Value]),
@@ -4560,7 +4532,7 @@ pub fn document_elem() -> Element {
             id=2,
             name="title",
             kind=Settable,
-            default=document_elem_title_default,
+            default=() => None,
           ),
           field_of(
             (Ty::new() : Ty[Value]),
@@ -4574,7 +4546,7 @@ pub fn document_elem() -> Element {
             id=4,
             name="description",
             kind=Settable,
-            default=document_elem_description_default,
+            default=() => None,
           ),
           field_of(
             (Ty::new() : Ty[Value]),
@@ -4867,13 +4839,9 @@ pub fn figure_elem() -> Element {
             positional=true,
             required=true,
           ),
-          field_of(
-            (Ty::new() : Ty[String?]),
-            id=1,
-            name="alt",
-            kind=Settable,
-            default=figure_elem_alt_default,
-          ),
+          field_of((Ty::new() : Ty[String?]), id=1, name="alt", kind=Settable, default=() => {
+            None
+          }),
           field_of(
             (Ty::new() : Ty[Value]),
             id=2,
@@ -5282,7 +5250,7 @@ pub fn heading_elem() -> Element {
             id=3,
             name="numbering",
             kind=Settable,
-            default=heading_elem_numbering_default,
+            default=() => None,
           ),
           field_of(
             (Ty::new() : Ty[Value]),
@@ -6010,7 +5978,7 @@ pub fn par_line_elem() -> Element {
             id=0,
             name="numbering",
             kind=Ghost,
-            default=par_line_elem_numbering_default,
+            default=() => None,
           ),
           field_of(
             (Ty::new() : Ty[Value]),
@@ -6420,7 +6388,7 @@ pub fn table_elem() -> Element {
             name="summary",
             kind=Settable,
             internal=true,
-            default=table_elem_summary_default,
+            default=() => None,
           ),
           field_of(
             (Ty::new() : Ty[Value]),
@@ -7890,7 +7858,7 @@ pub fn raw_elem() -> Element {
             id=2,
             name="lang",
             kind=Settable,
-            default=raw_elem_lang_default,
+            default=() => None,
           ),
           field_of(
             (Ty::new() : Ty[Value]),
@@ -8656,13 +8624,9 @@ pub fn image_elem() -> Element {
             kind=Settable,
             default=image_elem_height_default,
           ),
-          field_of(
-            (Ty::new() : Ty[String?]),
-            id=4,
-            name="alt",
-            kind=Settable,
-            default=image_elem_alt_default,
-          ),
+          field_of((Ty::new() : Ty[String?]), id=4, name="alt", kind=Settable, default=() => {
+            None
+          }),
           field_of((Ty::new() : Ty[Value]), id=5, name="page", kind=Settable, default=() => {
             Int(1L)
           }),
@@ -8947,7 +8911,7 @@ pub fn rect_elem() -> Element {
             name="body",
             kind=Settable,
             positional=true,
-            default=rect_elem_body_default,
+            default=() => None,
           ),
         ],
       )
@@ -9063,7 +9027,7 @@ pub fn square_elem() -> Element {
             name="body",
             kind=Settable,
             positional=true,
-            default=square_elem_body_default,
+            default=() => None,
           ),
         ],
       )
@@ -9167,7 +9131,7 @@ pub fn ellipse_elem() -> Element {
             name="body",
             kind=Settable,
             positional=true,
-            default=ellipse_elem_body_default,
+            default=() => None,
           ),
         ],
       )
@@ -9272,7 +9236,7 @@ pub fn circle_elem() -> Element {
             name="body",
             kind=Settable,
             positional=true,
-            default=circle_elem_body_default,
+            default=() => None,
           ),
         ],
       )
@@ -9374,7 +9338,7 @@ pub fn html_elem() -> Element {
             name="body",
             kind=Settable,
             positional=true,
-            default=html_elem_body_default,
+            default=() => None,
           ),
           field_of(
             (Ty::new() : Ty[Value]),
@@ -9397,7 +9361,7 @@ pub fn html_elem() -> Element {
             name="role",
             kind=Ghost,
             internal=true,
-            default=html_elem_role_default,
+            default=() => None,
           ),
         ],
       )
@@ -9564,14 +9528,14 @@ pub fn pdf_attach_elem() -> Element {
             id=3,
             name="mime-type",
             kind=Settable,
-            default=pdf_attach_elem_mime_type_default,
+            default=() => None,
           ),
           field_of(
             (Ty::new() : Ty[String?]),
             id=4,
             name="description",
             kind=Settable,
-            default=pdf_attach_elem_description_default,
+            default=() => None,
           ),
         ],
       )

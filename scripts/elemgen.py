@@ -106,6 +106,9 @@ def translate_default(rust_ty, mty, expr):
     """Translate a `#[default(expr)]` into a Value expression, or None."""
     e = expr.strip()
     if e == "":
+        if mty.endswith("?"):
+            # `Default::default()` of an `Option<T>`.
+            return "None"
         return TYPE_DEFAULTS.get(mty) if mty != "Value" else None
     if e in ("true", "false") and mty == "Bool":
         return f"Bool({e})"

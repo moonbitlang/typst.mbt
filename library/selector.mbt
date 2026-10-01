@@ -453,3 +453,10 @@ pub impl FromValue for ShowableSelector with fn from_value(v) {
   validate(selector, false)
   ShowableSelector(selector)
 }
+
+///|
+/// `LocatableSelector(HeadingElem::ELEM.select())` (default of
+/// `OutlineElem.target`).
+fn outline_elem_target_default() -> Value {
+  LocatableSelector(heading_elem().select()).into_value()
+}
