@@ -493,7 +493,7 @@ pub impl ToCss for Rel[Length] with fn emit(self, w) {
 }
 
 ///|
-pub impl ToCss for Paint with emit(self, w) {
+pub impl ToCss for Paint with fn emit(self, w) {
   match self {
     Solid(color) => w.emit(color)
     Gradient(_) => w.fail("gradient")
@@ -502,7 +502,7 @@ pub impl ToCss for Paint with emit(self, w) {
 }
 
 ///|
-pub impl ToCss for Color with emit(self, w) {
+pub impl ToCss for Color with fn emit(self, w) {
   // Convert to ProcessColor (spot colors use their fallback)
   let process = self.to_process()
   match process {
@@ -515,7 +515,7 @@ pub impl ToCss for Color with emit(self, w) {
 }
 
 ///|
-pub impl ToCss for Rgb with emit(self, w) {
+pub impl ToCss for Rgb with fn emit(self, w) {
   // `self.into_format::<u8, u8>()`
   let (r, g, b, a) = (
     f32_to_u8_stimulus(self.red),
@@ -547,7 +547,7 @@ pub impl ToCss for Rgb with emit(self, w) {
 }
 
 ///|
-pub impl ToCss for Oklab with emit(self, w) {
+pub impl ToCss for Oklab with fn emit(self, w) {
   w
   .call("oklab", Space)
   .arg(css_to_ratio(self.l.to_double()))
@@ -558,7 +558,7 @@ pub impl ToCss for Oklab with emit(self, w) {
 }
 
 ///|
-pub impl ToCss for Oklch with emit(self, w) {
+pub impl ToCss for Oklch with fn emit(self, w) {
   w
   .call("oklch", Space)
   .arg(css_to_ratio(self.l.to_double()))
@@ -569,7 +569,7 @@ pub impl ToCss for Oklch with emit(self, w) {
 }
 
 ///|
-pub impl ToCss for LinearRgb with emit(self, w) {
+pub impl ToCss for LinearRgb with fn emit(self, w) {
   w
   .call("color", Space)
   .arg("srgb-linear")
@@ -581,7 +581,7 @@ pub impl ToCss for LinearRgb with emit(self, w) {
 }
 
 ///|
-pub impl ToCss for Hsl with emit(self, w) {
+pub impl ToCss for Hsl with fn emit(self, w) {
   w
   .call("hsl", Space)
   .arg(css_to_angle(normalize_signed_angle(self.hue).to_double()))
