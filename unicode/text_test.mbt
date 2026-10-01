@@ -61,3 +61,33 @@ test "properties" {
   )
   inspect(is_word_character('é'.to_int()), content="true")
 }
+
+///|
+test "discard_space_between" {
+  // Discard
+  assert_true(@unicode.discard_space_between("漢", "漢"))
+  assert_true(@unicode.discard_space_between("1", "漢"))
+  assert_true(@unicode.discard_space_between("漢", "A"))
+  assert_true(@unicode.discard_space_between("漢。", "A"))
+  assert_true(@unicode.discard_space_between("A", "（漢"))
+  assert_true(@unicode.discard_space_between("A。", "B"))
+  assert_true(@unicode.discard_space_between("A", "（B"))
+  // Keep
+  assert_false(@unicode.discard_space_between("A", "B"))
+  assert_false(@unicode.discard_space_between("1", "2"))
+  assert_false(@unicode.discard_space_between("end.", "Begin"))
+  assert_false(@unicode.discard_space_between("가", "각"))
+  // Empty strings
+  assert_true(@unicode.discard_space_between("漢", ""))
+  assert_true(@unicode.discard_space_between("", "漢"))
+  assert_false(@unicode.discard_space_between("", ""))
+  assert_false(@unicode.discard_space_between("A", ""))
+  assert_false(@unicode.discard_space_between("", "A"))
+  // Spaces themselves don't get special treatment
+  assert_true(@unicode.discard_space_between("漢", " "))
+  assert_true(@unicode.discard_space_between(" ", "漢"))
+  assert_false(@unicode.discard_space_between(" ", " "))
+  assert_false(@unicode.discard_space_between("1", "㊗"))
+  assert_true(@unicode.discard_space_between("1", "㊕"))
+  assert_true(@unicode.discard_space_between("A", "\u{3099}"))
+}

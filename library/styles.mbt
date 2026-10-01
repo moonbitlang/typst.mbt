@@ -370,8 +370,13 @@ pub fn StyleChain::new(root : Styles) -> StyleChain {
 ///|
 /// An empty style chain.
 pub fn StyleChain::empty() -> StyleChain {
-  { head: [], tail: None, }
+  // All empty chains share their (empty) head so that they compare equal,
+  // like upstream's default chains do.
+  { head: empty_style_head, tail: None, }
 }
+
+///|
+let empty_style_head : Array[Style] = []
 
 ///|
 /// Make the given chainable the first link of this chain.
@@ -522,6 +527,129 @@ pub fn StyleChain::pop(self : StyleChain) -> StyleChain {
     Some(t) => t
     None => StyleChain::empty()
   }
+}
+
+///|
+/// Iterate over the links of the chain (innermost first) and count them.
+pub fn StyleChain::depth(self : StyleChain) -> Int {
+  let mut n = 0
+  let mut link : StyleChain? = Some(self)
+  while link is Some(l) {
+    n += 1
+    link = l.tail
+  }
+  n
+}
+
+///|
+/// Build owned styles from the first link up to the `len`-th link (exclusive)
+/// of the chain (upstream `StyleChain::suffix`).
+pub fn StyleChain::suffix(self : StyleChain, len : Int) -> Styles {
+  let items : Array[Style] = []
+  let take = self.depth() - len
+  let mut link : StyleChain? = Some(self)
+  let mut i = 0
+  while i < take && link is Some(l) {
+    for j = l.head.length() - 1; j >= 0; j = j - 1 {
+      items.push(l.head[j])
+    }
+    link = l.tail
+    i += 1
+  }
+  items.rev_in_place()
+  { items, }
+}
+
+///|
+/// Determine the shared trunk of a collection of style chains (upstream
+/// `StyleChain::trunk`).
+pub fn StyleChain::trunk(chains : ArrayView[StyleChain]) -> StyleChain? {
+  // Determine shared style depth and first span.
+  guard chains is [first, .. rest] else { return None }
+  let mut trunk = first
+  let mut depth = trunk.depth()
+  for chain in rest {
+    let mut chain = chain
+    let len = chain.depth()
+    if len < depth {
+      for _ in 0..<(depth - len) {
+        trunk = trunk.pop()
+      }
+      depth = len
+    } else if len > depth {
+      for _ in 0..<(len - depth) {
+        chain = chain.pop()
+      }
+    }
+    while depth > 0 && chain != trunk {
+      trunk = trunk.pop()
+      chain = chain.pop()
+      depth -= 1
+    }
+  }
+  Some(trunk)
+}
+
+///|
+/// Determines the shared trunk of a list of elements.
+///
+/// This will ignore styles for tags (conceptually, they just don't exist).
+pub fn StyleChain::trunk_from_pairs(
+  pairs : ArrayView[(Content, StyleChain)],
+) -> StyleChain? {
+  StyleChain::trunk(
+    pairs.iter().filter(p => !p.0.is_(tag_elem())).map(p => p.1).collect(),
+  )
+}
+
+///|
+/// A copy of this chain with its own identity (upstream: lifetime-extending
+/// a chain in an arena yields a new address, so links chained onto the copy
+/// are not equal to links chained onto the original).
+pub fn StyleChain::fresh(self : StyleChain) -> StyleChain {
+  { head: self.head, tail: self.tail, }
+}
+
+///|
+/// The number of styles in the first link of the chain.
+pub fn StyleChain::head_len(self : StyleChain) -> Int {
+  self.head.length()
+}
+
+///|
+/// Determines the styles used for content that it at the root, outside of
+/// the user-controlled content (e.g. page marginals and footnotes). This
+/// applies to both paged and HTML export (upstream `Styles::root`).
+///
+/// Other styles are only kept if they are `outside && (initial ||
+/// liftable)`.
+pub fn Styles::root(
+  children : ArrayView[(Content, StyleChain)],
+  initial : StyleChain,
+) -> Styles {
+  // Determine the shared styles (excluding tags).
+  let base = StyleChain::trunk_from_pairs(children).unwrap_or(initial).to_map()
+
+  // Determine the initial styles that are also shared by everything. We can't
+  // use `StyleChain::trunk` because it currently doesn't deal with partially
+  // shared links (where a subslice matches).
+  let init = initial.to_map()
+  let mut trunk_len = 0
+  while trunk_len < init.items.length() &&
+        trunk_len < base.items.length() &&
+        init.items[trunk_len] == base.items[trunk_len] {
+    trunk_len += 1
+  }
+
+  // Filter the base styles according to our rules.
+  let items = []
+  for i, style in base.items {
+    let initial = i < trunk_len
+    if style.outside() && (initial || style.liftable()) {
+      items.push(style)
+    }
+  }
+  { items, }
 }
 
 ///|

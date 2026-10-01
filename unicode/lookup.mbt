@@ -182,3 +182,19 @@ pub fn default_math_class(c : Char) -> MathClass? {
     Some(math_classes[v])
   }
 }
+
+///|
+/// Whether to discard an inferred space between two strings (codex
+/// `space_discarding::discard_space_between`). This is `true` when the inner
+/// character of _either_ string is unambiguously from a writing system which
+/// does not use space characters (Chinese, Japanese, Yi and ideographic
+/// punctuation). Otherwise the inferred space should be kept.
+pub fn discard_space_between(before : StringView, after : StringView) -> Bool {
+  // Get the inner characters first since we often need to check both.
+  let before_c = before.rev_iter().head()
+  let after_c = after.iter().head()
+  // Discard spaces if either character's writing system does not use spaces.
+  // Keep spaces if both character's writing system uses spaces.
+  (before_c is Some(c) && in_ranges(no_space_writing_table, c.to_int())) ||
+  (after_c is Some(c) && in_ranges(no_space_writing_table, c.to_int()))
+}

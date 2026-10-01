@@ -288,10 +288,8 @@ pub fn Content::field_by_name(
 /// materialized copy).
 pub fn Content::materialize(self : Content, styles : StyleChain) -> Content {
   let fields = self.fields.copy()
+  // Like upstream, this includes internal settable fields.
   for info in self.elem.fields() {
-    if info.internal {
-      continue
-    }
     if info.kind is Settable && fields[info.id] is None {
       fields[info.id] = Some(styles.get_value_with_local(self.elem, info, None))
     }

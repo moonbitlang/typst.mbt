@@ -39,6 +39,18 @@ fn pagebreak_shared_boundary() -> Content {
 }
 
 ///|
+/// Get the globally shared weak pagebreak element.
+pub fn PagebreakElem::shared_weak() -> Content {
+  pagebreak_shared_weak()
+}
+
+///|
+/// Get the globally shared boundary pagebreak element.
+pub fn PagebreakElem::shared_boundary() -> Content {
+  pagebreak_shared_boundary()
+}
+
+///|
 fn page_elem_paper_default() -> Value {
   Paper::a4().into_value()
 }

@@ -8,12 +8,37 @@ pub(all) struct Format {
   elem : Element
   /// The feature gating the format, if any.
   feature : Feature?
+  /// Registers the rules specific to this format.
+  rules : ((NativeRuleMap) -> Unit)?
 }
 
 ///|
 /// Create a new format with an associated format element.
 pub fn Format::new(elem : Element) -> Format {
-  { elem, feature: None, }
+  { elem, feature: None, rules: None, }
+}
+
+///|
+/// Add format specific rules that will be registered.
+pub fn Format::with_rules(
+  self : Format,
+  register : (NativeRuleMap) -> Unit,
+) -> Format {
+  { ..self, rules: Some(register), }
+}
+
+///|
+/// Register the rules specific to this format.
+pub fn Format::register_rules(self : Format, rules : NativeRuleMap) -> Unit {
+  if self.rules is Some(register) {
+    register(rules)
+  }
+}
+
+///|
+/// Get the default format options of this format.
+pub fn Format::default_options(self : Format) -> FormatOptions {
+  FormatOptions::new(self.elem)
 }
 
 ///|
@@ -99,4 +124,103 @@ pub fn Scope::prelude_path(self : Scope, path : Array[String]) -> Binding? {
     binding.with_feature(feature) |> ignore
   }
   Some(self.bind(path[path.length() - 1], binding))
+}
+
+///|
+/// The configured options of one export format: a value (and the span of
+/// the set rule it stems from) for each settable field of the format element
+/// (upstream: the format's `Options` struct of `SpannedValue`s, populated
+/// through `Populate`).
+pub struct FormatOptions {
+  /// The format element.
+  elem : Element
+  /// Values by field id (settable fields only).
+  priv values : Map[Int, @syntax.Spanned[Value]]
+}
+
+///|
+/// The default options of a format element: each settable field's value in
+/// an empty style chain, with a detached span.
+pub fn FormatOptions::new(elem : Element) -> FormatOptions {
+  let values = {}
+  let empty = StyleChain::empty()
+  for f in elem.fields() {
+    if !f.internal && f.kind is Settable {
+      values[f.id] = @syntax.Spanned::{
+        v: empty.get_value_with_local(elem, f, None),
+        span: @syntax.Span::detached(),
+      }
+    }
+  }
+  { elem, values }
+}
+
+///|
+/// Populate these options from the spanned styles. If a field has been set,
+/// this also updates its span.
+pub fn FormatOptions::populate(
+  self : FormatOptions,
+  styles : StyleChain,
+  span : @syntax.Span,
+) -> Unit {
+  for f in self.elem.fields() {
+    if !f.internal && f.kind is Settable && styles.has(self.elem, f.id) {
+      self.values[f.id] = @syntax.Spanned::{
+        v: styles.get_value_with_local(self.elem, f, None),
+        span,
+      }
+    }
+  }
+}
+
+///|
+/// The value of a field (by field id) together with the span of the set rule
+/// it stems from.
+pub fn FormatOptions::get(
+  self : FormatOptions,
+  id : Int,
+) -> @syntax.Spanned[Value]? {
+  self.values.get(id)
+}
+
+///|
+/// A list of format options that have been configured by the document.
+pub struct DocumentFormatOptions {
+  priv options : Array[FormatOptions]
+}
+
+///|
+/// Initialize default format options from a list of formats.
+pub fn DocumentFormatOptions::new(
+  formats : Array[Format],
+) -> DocumentFormatOptions {
+  { options: formats.map(f => f.default_options()) }
+}
+
+///|
+/// Get the options of a format element.
+pub fn DocumentFormatOptions::get(
+  self : DocumentFormatOptions,
+  elem : Element,
+) -> FormatOptions {
+  for o in self.options {
+    if o.elem == elem {
+      return o
+    }
+  }
+  abort(
+    "format `\{elem.name()}` not found\nhint: if you're a developer, you need to register `Library::formats`",
+  )
+}
+
+///|
+/// Populate the format options with details from the given styles.
+pub fn DocumentFormatOptions::populate(
+  self : DocumentFormatOptions,
+  styles : StyleChain,
+  span : @syntax.Span,
+) -> Unit {
+  for o in self.options {
+    o.populate(styles, span)
+  }
 }
