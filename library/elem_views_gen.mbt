@@ -952,7 +952,7 @@ pub fn BoxElem::set_baseline(v : BaselinePos) -> Style {
 }
 
 ///|
-pub fn BoxElem::fill(self : BoxElem, styles : StyleChain) -> Value {
+pub fn BoxElem::fill(self : BoxElem, styles : StyleChain) -> Paint? {
   let e = box_elem()
   view_cast(
     styles.get_value_with_local(
@@ -965,7 +965,7 @@ pub fn BoxElem::fill(self : BoxElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn BoxElem::fill_local(self : BoxElem) -> Value? {
+pub fn BoxElem::fill_local(self : BoxElem) -> Paint?? {
   match self.0.field_raw(box_elem_fill) {
     Some(v) => Some(view_cast(v, "box.fill"))
     None => None
@@ -973,22 +973,22 @@ pub fn BoxElem::fill_local(self : BoxElem) -> Value? {
 }
 
 ///|
-pub fn BoxElem::with_fill(self : BoxElem, v : Value) -> BoxElem {
+pub fn BoxElem::with_fill(self : BoxElem, v : Paint?) -> BoxElem {
   BoxElem(self.0.with_field(box_elem_fill, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn BoxElem::fill_in(styles : StyleChain) -> Value {
+pub fn BoxElem::fill_in(styles : StyleChain) -> Paint? {
   view_cast(styles.get_field(box_elem(), box_elem_fill), "box.fill")
 }
 
 ///|
-pub fn BoxElem::set_fill(v : Value) -> Style {
+pub fn BoxElem::set_fill(v : Paint?) -> Style {
   Property(Property::new(box_elem(), box_elem_fill, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn BoxElem::stroke(self : BoxElem, styles : StyleChain) -> Value {
+pub fn BoxElem::stroke(self : BoxElem, styles : StyleChain) -> Sides[Stroke??] {
   let e = box_elem()
   view_cast(
     styles.get_value_with_local(
@@ -1001,7 +1001,7 @@ pub fn BoxElem::stroke(self : BoxElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn BoxElem::stroke_local(self : BoxElem) -> Value? {
+pub fn BoxElem::stroke_local(self : BoxElem) -> Sides[Stroke??]? {
   match self.0.field_raw(box_elem_stroke) {
     Some(v) => Some(view_cast(v, "box.stroke"))
     None => None
@@ -1009,17 +1009,17 @@ pub fn BoxElem::stroke_local(self : BoxElem) -> Value? {
 }
 
 ///|
-pub fn BoxElem::with_stroke(self : BoxElem, v : Value) -> BoxElem {
+pub fn BoxElem::with_stroke(self : BoxElem, v : Sides[Stroke??]) -> BoxElem {
   BoxElem(self.0.with_field(box_elem_stroke, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn BoxElem::stroke_in(styles : StyleChain) -> Value {
+pub fn BoxElem::stroke_in(styles : StyleChain) -> Sides[Stroke??] {
   view_cast(styles.get_field(box_elem(), box_elem_stroke), "box.stroke")
 }
 
 ///|
-pub fn BoxElem::set_stroke(v : Value) -> Style {
+pub fn BoxElem::set_stroke(v : Sides[Stroke??]) -> Style {
   Property(Property::new(box_elem(), box_elem_stroke, IntoValue::into_value(v)))
 }
 
@@ -1401,7 +1401,7 @@ pub fn BlockElem::set_breakable(v : Bool) -> Style {
 }
 
 ///|
-pub fn BlockElem::fill(self : BlockElem, styles : StyleChain) -> Value {
+pub fn BlockElem::fill(self : BlockElem, styles : StyleChain) -> Paint? {
   let e = block_elem()
   view_cast(
     styles.get_value_with_local(
@@ -1414,7 +1414,7 @@ pub fn BlockElem::fill(self : BlockElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn BlockElem::fill_local(self : BlockElem) -> Value? {
+pub fn BlockElem::fill_local(self : BlockElem) -> Paint?? {
   match self.0.field_raw(block_elem_fill) {
     Some(v) => Some(view_cast(v, "block.fill"))
     None => None
@@ -1422,24 +1422,27 @@ pub fn BlockElem::fill_local(self : BlockElem) -> Value? {
 }
 
 ///|
-pub fn BlockElem::with_fill(self : BlockElem, v : Value) -> BlockElem {
+pub fn BlockElem::with_fill(self : BlockElem, v : Paint?) -> BlockElem {
   BlockElem(self.0.with_field(block_elem_fill, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn BlockElem::fill_in(styles : StyleChain) -> Value {
+pub fn BlockElem::fill_in(styles : StyleChain) -> Paint? {
   view_cast(styles.get_field(block_elem(), block_elem_fill), "block.fill")
 }
 
 ///|
-pub fn BlockElem::set_fill(v : Value) -> Style {
+pub fn BlockElem::set_fill(v : Paint?) -> Style {
   Property(
     Property::new(block_elem(), block_elem_fill, IntoValue::into_value(v)),
   )
 }
 
 ///|
-pub fn BlockElem::stroke(self : BlockElem, styles : StyleChain) -> Value {
+pub fn BlockElem::stroke(
+  self : BlockElem,
+  styles : StyleChain,
+) -> Sides[Stroke??] {
   let e = block_elem()
   view_cast(
     styles.get_value_with_local(
@@ -1452,7 +1455,7 @@ pub fn BlockElem::stroke(self : BlockElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn BlockElem::stroke_local(self : BlockElem) -> Value? {
+pub fn BlockElem::stroke_local(self : BlockElem) -> Sides[Stroke??]? {
   match self.0.field_raw(block_elem_stroke) {
     Some(v) => Some(view_cast(v, "block.stroke"))
     None => None
@@ -1460,17 +1463,20 @@ pub fn BlockElem::stroke_local(self : BlockElem) -> Value? {
 }
 
 ///|
-pub fn BlockElem::with_stroke(self : BlockElem, v : Value) -> BlockElem {
+pub fn BlockElem::with_stroke(
+  self : BlockElem,
+  v : Sides[Stroke??],
+) -> BlockElem {
   BlockElem(self.0.with_field(block_elem_stroke, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn BlockElem::stroke_in(styles : StyleChain) -> Value {
+pub fn BlockElem::stroke_in(styles : StyleChain) -> Sides[Stroke??] {
   view_cast(styles.get_field(block_elem(), block_elem_stroke), "block.stroke")
 }
 
 ///|
-pub fn BlockElem::set_stroke(v : Value) -> Style {
+pub fn BlockElem::set_stroke(v : Sides[Stroke??]) -> Style {
   Property(
     Property::new(block_elem(), block_elem_stroke, IntoValue::into_value(v)),
   )
@@ -2086,7 +2092,7 @@ pub fn GridElem::set_align(v : Celled[Smart[Alignment]]) -> Style {
 }
 
 ///|
-pub fn GridElem::fill(self : GridElem, styles : StyleChain) -> Value {
+pub fn GridElem::fill(self : GridElem, styles : StyleChain) -> Celled[Paint?] {
   let e = grid_elem()
   view_cast(
     styles.get_value_with_local(
@@ -2099,7 +2105,7 @@ pub fn GridElem::fill(self : GridElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn GridElem::fill_local(self : GridElem) -> Value? {
+pub fn GridElem::fill_local(self : GridElem) -> Celled[Paint?]? {
   match self.0.field_raw(grid_elem_fill) {
     Some(v) => Some(view_cast(v, "grid.fill"))
     None => None
@@ -2107,22 +2113,25 @@ pub fn GridElem::fill_local(self : GridElem) -> Value? {
 }
 
 ///|
-pub fn GridElem::with_fill(self : GridElem, v : Value) -> GridElem {
+pub fn GridElem::with_fill(self : GridElem, v : Celled[Paint?]) -> GridElem {
   GridElem(self.0.with_field(grid_elem_fill, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn GridElem::fill_in(styles : StyleChain) -> Value {
+pub fn GridElem::fill_in(styles : StyleChain) -> Celled[Paint?] {
   view_cast(styles.get_field(grid_elem(), grid_elem_fill), "grid.fill")
 }
 
 ///|
-pub fn GridElem::set_fill(v : Value) -> Style {
+pub fn GridElem::set_fill(v : Celled[Paint?]) -> Style {
   Property(Property::new(grid_elem(), grid_elem_fill, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn GridElem::stroke(self : GridElem, styles : StyleChain) -> Value {
+pub fn GridElem::stroke(
+  self : GridElem,
+  styles : StyleChain,
+) -> Celled[Sides[Stroke??]] {
   let e = grid_elem()
   view_cast(
     styles.get_value_with_local(
@@ -2135,7 +2144,7 @@ pub fn GridElem::stroke(self : GridElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn GridElem::stroke_local(self : GridElem) -> Value? {
+pub fn GridElem::stroke_local(self : GridElem) -> Celled[Sides[Stroke??]]? {
   match self.0.field_raw(grid_elem_stroke) {
     Some(v) => Some(view_cast(v, "grid.stroke"))
     None => None
@@ -2143,17 +2152,20 @@ pub fn GridElem::stroke_local(self : GridElem) -> Value? {
 }
 
 ///|
-pub fn GridElem::with_stroke(self : GridElem, v : Value) -> GridElem {
+pub fn GridElem::with_stroke(
+  self : GridElem,
+  v : Celled[Sides[Stroke??]],
+) -> GridElem {
   GridElem(self.0.with_field(grid_elem_stroke, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn GridElem::stroke_in(styles : StyleChain) -> Value {
+pub fn GridElem::stroke_in(styles : StyleChain) -> Celled[Sides[Stroke??]] {
   view_cast(styles.get_field(grid_elem(), grid_elem_stroke), "grid.stroke")
 }
 
 ///|
-pub fn GridElem::set_stroke(v : Value) -> Style {
+pub fn GridElem::set_stroke(v : Celled[Sides[Stroke??]]) -> Style {
   Property(
     Property::new(grid_elem(), grid_elem_stroke, IntoValue::into_value(v)),
   )
@@ -2579,7 +2591,7 @@ pub fn GridHLine::set_end(v : NonZeroUSize?) -> Style {
 }
 
 ///|
-pub fn GridHLine::stroke(self : GridHLine, styles : StyleChain) -> Value {
+pub fn GridHLine::stroke(self : GridHLine, styles : StyleChain) -> Stroke? {
   let e = grid_h_line_elem()
   view_cast(
     styles.get_value_with_local(
@@ -2592,7 +2604,7 @@ pub fn GridHLine::stroke(self : GridHLine, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn GridHLine::stroke_local(self : GridHLine) -> Value? {
+pub fn GridHLine::stroke_local(self : GridHLine) -> Stroke?? {
   match self.0.field_raw(grid_h_line_elem_stroke) {
     Some(v) => Some(view_cast(v, "hline.stroke"))
     None => None
@@ -2600,14 +2612,14 @@ pub fn GridHLine::stroke_local(self : GridHLine) -> Value? {
 }
 
 ///|
-pub fn GridHLine::with_stroke(self : GridHLine, v : Value) -> GridHLine {
+pub fn GridHLine::with_stroke(self : GridHLine, v : Stroke?) -> GridHLine {
   GridHLine(
     self.0.with_field(grid_h_line_elem_stroke, IntoValue::into_value(v)),
   )
 }
 
 ///|
-pub fn GridHLine::stroke_in(styles : StyleChain) -> Value {
+pub fn GridHLine::stroke_in(styles : StyleChain) -> Stroke? {
   view_cast(
     styles.get_field(grid_h_line_elem(), grid_h_line_elem_stroke),
     "hline.stroke",
@@ -2615,7 +2627,7 @@ pub fn GridHLine::stroke_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn GridHLine::set_stroke(v : Value) -> Style {
+pub fn GridHLine::set_stroke(v : Stroke?) -> Style {
   Property(
     Property::new(
       grid_h_line_elem(),
@@ -2835,7 +2847,7 @@ pub fn GridVLine::set_end(v : NonZeroUSize?) -> Style {
 }
 
 ///|
-pub fn GridVLine::stroke(self : GridVLine, styles : StyleChain) -> Value {
+pub fn GridVLine::stroke(self : GridVLine, styles : StyleChain) -> Stroke? {
   let e = grid_v_line_elem()
   view_cast(
     styles.get_value_with_local(
@@ -2848,7 +2860,7 @@ pub fn GridVLine::stroke(self : GridVLine, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn GridVLine::stroke_local(self : GridVLine) -> Value? {
+pub fn GridVLine::stroke_local(self : GridVLine) -> Stroke?? {
   match self.0.field_raw(grid_v_line_elem_stroke) {
     Some(v) => Some(view_cast(v, "vline.stroke"))
     None => None
@@ -2856,14 +2868,14 @@ pub fn GridVLine::stroke_local(self : GridVLine) -> Value? {
 }
 
 ///|
-pub fn GridVLine::with_stroke(self : GridVLine, v : Value) -> GridVLine {
+pub fn GridVLine::with_stroke(self : GridVLine, v : Stroke?) -> GridVLine {
   GridVLine(
     self.0.with_field(grid_v_line_elem_stroke, IntoValue::into_value(v)),
   )
 }
 
 ///|
-pub fn GridVLine::stroke_in(styles : StyleChain) -> Value {
+pub fn GridVLine::stroke_in(styles : StyleChain) -> Stroke? {
   view_cast(
     styles.get_field(grid_v_line_elem(), grid_v_line_elem_stroke),
     "vline.stroke",
@@ -2871,7 +2883,7 @@ pub fn GridVLine::stroke_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn GridVLine::set_stroke(v : Value) -> Style {
+pub fn GridVLine::set_stroke(v : Stroke?) -> Style {
   Property(
     Property::new(
       grid_v_line_elem(),
@@ -3230,7 +3242,7 @@ pub fn GridCell::set_align(v : Smart[Alignment]) -> Style {
 }
 
 ///|
-pub fn GridCell::fill(self : GridCell, styles : StyleChain) -> Value {
+pub fn GridCell::fill(self : GridCell, styles : StyleChain) -> Smart[Paint?] {
   let e = grid_cell_elem()
   view_cast(
     styles.get_value_with_local(
@@ -3243,7 +3255,7 @@ pub fn GridCell::fill(self : GridCell, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn GridCell::fill_local(self : GridCell) -> Value? {
+pub fn GridCell::fill_local(self : GridCell) -> Smart[Paint?]? {
   match self.0.field_raw(grid_cell_elem_fill) {
     Some(v) => Some(view_cast(v, "cell.fill"))
     None => None
@@ -3251,12 +3263,12 @@ pub fn GridCell::fill_local(self : GridCell) -> Value? {
 }
 
 ///|
-pub fn GridCell::with_fill(self : GridCell, v : Value) -> GridCell {
+pub fn GridCell::with_fill(self : GridCell, v : Smart[Paint?]) -> GridCell {
   GridCell(self.0.with_field(grid_cell_elem_fill, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn GridCell::fill_in(styles : StyleChain) -> Value {
+pub fn GridCell::fill_in(styles : StyleChain) -> Smart[Paint?] {
   view_cast(
     styles.get_field(grid_cell_elem(), grid_cell_elem_fill),
     "cell.fill",
@@ -3264,7 +3276,7 @@ pub fn GridCell::fill_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn GridCell::set_fill(v : Value) -> Style {
+pub fn GridCell::set_fill(v : Smart[Paint?]) -> Style {
   Property(
     Property::new(
       grid_cell_elem(),
@@ -3275,7 +3287,10 @@ pub fn GridCell::set_fill(v : Value) -> Style {
 }
 
 ///|
-pub fn GridCell::stroke(self : GridCell, styles : StyleChain) -> Value {
+pub fn GridCell::stroke(
+  self : GridCell,
+  styles : StyleChain,
+) -> Sides[Stroke??] {
   let e = grid_cell_elem()
   view_cast(
     styles.get_value_with_local(
@@ -3288,7 +3303,7 @@ pub fn GridCell::stroke(self : GridCell, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn GridCell::stroke_local(self : GridCell) -> Value? {
+pub fn GridCell::stroke_local(self : GridCell) -> Sides[Stroke??]? {
   match self.0.field_raw(grid_cell_elem_stroke) {
     Some(v) => Some(view_cast(v, "cell.stroke"))
     None => None
@@ -3296,12 +3311,12 @@ pub fn GridCell::stroke_local(self : GridCell) -> Value? {
 }
 
 ///|
-pub fn GridCell::with_stroke(self : GridCell, v : Value) -> GridCell {
+pub fn GridCell::with_stroke(self : GridCell, v : Sides[Stroke??]) -> GridCell {
   GridCell(self.0.with_field(grid_cell_elem_stroke, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn GridCell::stroke_in(styles : StyleChain) -> Value {
+pub fn GridCell::stroke_in(styles : StyleChain) -> Sides[Stroke??] {
   view_cast(
     styles.get_field(grid_cell_elem(), grid_cell_elem_stroke),
     "cell.stroke",
@@ -3309,7 +3324,7 @@ pub fn GridCell::stroke_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn GridCell::set_stroke(v : Value) -> Style {
+pub fn GridCell::set_stroke(v : Sides[Stroke??]) -> Style {
   Property(
     Property::new(
       grid_cell_elem(),
@@ -3785,12 +3800,12 @@ pub fn PageElem::set_columns(v : NonZeroUSize) -> Style {
 }
 
 ///|
-pub fn PageElem::fill_in(styles : StyleChain) -> Value {
+pub fn PageElem::fill_in(styles : StyleChain) -> Smart[Paint?] {
   view_cast(styles.get_field(page_elem(), page_elem_fill), "page.fill")
 }
 
 ///|
-pub fn PageElem::set_fill(v : Value) -> Style {
+pub fn PageElem::set_fill(v : Smart[Paint?]) -> Style {
   Property(Property::new(page_elem(), page_elem_fill, IntoValue::into_value(v)))
 }
 
@@ -6384,7 +6399,7 @@ pub fn CancelElem::set_angle(v : Value) -> Style {
 }
 
 ///|
-pub fn CancelElem::stroke(self : CancelElem, styles : StyleChain) -> Value {
+pub fn CancelElem::stroke(self : CancelElem, styles : StyleChain) -> Stroke {
   let e = cancel_elem()
   view_cast(
     styles.get_value_with_local(
@@ -6397,7 +6412,7 @@ pub fn CancelElem::stroke(self : CancelElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn CancelElem::stroke_local(self : CancelElem) -> Value? {
+pub fn CancelElem::stroke_local(self : CancelElem) -> Stroke? {
   match self.0.field_raw(cancel_elem_stroke) {
     Some(v) => Some(view_cast(v, "cancel.stroke"))
     None => None
@@ -6405,12 +6420,12 @@ pub fn CancelElem::stroke_local(self : CancelElem) -> Value? {
 }
 
 ///|
-pub fn CancelElem::with_stroke(self : CancelElem, v : Value) -> CancelElem {
+pub fn CancelElem::with_stroke(self : CancelElem, v : Stroke) -> CancelElem {
   CancelElem(self.0.with_field(cancel_elem_stroke, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn CancelElem::stroke_in(styles : StyleChain) -> Value {
+pub fn CancelElem::stroke_in(styles : StyleChain) -> Stroke {
   view_cast(
     styles.get_field(cancel_elem(), cancel_elem_stroke),
     "cancel.stroke",
@@ -6418,7 +6433,7 @@ pub fn CancelElem::stroke_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn CancelElem::set_stroke(v : Value) -> Style {
+pub fn CancelElem::set_stroke(v : Stroke) -> Style {
   Property(
     Property::new(cancel_elem(), cancel_elem_stroke, IntoValue::into_value(v)),
   )
@@ -14327,7 +14342,7 @@ pub fn TableElem::set_align(v : Celled[Smart[Alignment]]) -> Style {
 }
 
 ///|
-pub fn TableElem::fill(self : TableElem, styles : StyleChain) -> Value {
+pub fn TableElem::fill(self : TableElem, styles : StyleChain) -> Celled[Paint?] {
   let e = table_elem()
   view_cast(
     styles.get_value_with_local(
@@ -14340,7 +14355,7 @@ pub fn TableElem::fill(self : TableElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn TableElem::fill_local(self : TableElem) -> Value? {
+pub fn TableElem::fill_local(self : TableElem) -> Celled[Paint?]? {
   match self.0.field_raw(table_elem_fill) {
     Some(v) => Some(view_cast(v, "table.fill"))
     None => None
@@ -14348,24 +14363,27 @@ pub fn TableElem::fill_local(self : TableElem) -> Value? {
 }
 
 ///|
-pub fn TableElem::with_fill(self : TableElem, v : Value) -> TableElem {
+pub fn TableElem::with_fill(self : TableElem, v : Celled[Paint?]) -> TableElem {
   TableElem(self.0.with_field(table_elem_fill, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn TableElem::fill_in(styles : StyleChain) -> Value {
+pub fn TableElem::fill_in(styles : StyleChain) -> Celled[Paint?] {
   view_cast(styles.get_field(table_elem(), table_elem_fill), "table.fill")
 }
 
 ///|
-pub fn TableElem::set_fill(v : Value) -> Style {
+pub fn TableElem::set_fill(v : Celled[Paint?]) -> Style {
   Property(
     Property::new(table_elem(), table_elem_fill, IntoValue::into_value(v)),
   )
 }
 
 ///|
-pub fn TableElem::stroke(self : TableElem, styles : StyleChain) -> Value {
+pub fn TableElem::stroke(
+  self : TableElem,
+  styles : StyleChain,
+) -> Celled[Sides[Stroke??]] {
   let e = table_elem()
   view_cast(
     styles.get_value_with_local(
@@ -14378,7 +14396,7 @@ pub fn TableElem::stroke(self : TableElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn TableElem::stroke_local(self : TableElem) -> Value? {
+pub fn TableElem::stroke_local(self : TableElem) -> Celled[Sides[Stroke??]]? {
   match self.0.field_raw(table_elem_stroke) {
     Some(v) => Some(view_cast(v, "table.stroke"))
     None => None
@@ -14386,17 +14404,20 @@ pub fn TableElem::stroke_local(self : TableElem) -> Value? {
 }
 
 ///|
-pub fn TableElem::with_stroke(self : TableElem, v : Value) -> TableElem {
+pub fn TableElem::with_stroke(
+  self : TableElem,
+  v : Celled[Sides[Stroke??]],
+) -> TableElem {
   TableElem(self.0.with_field(table_elem_stroke, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn TableElem::stroke_in(styles : StyleChain) -> Value {
+pub fn TableElem::stroke_in(styles : StyleChain) -> Celled[Sides[Stroke??]] {
   view_cast(styles.get_field(table_elem(), table_elem_stroke), "table.stroke")
 }
 
 ///|
-pub fn TableElem::set_stroke(v : Value) -> Style {
+pub fn TableElem::set_stroke(v : Celled[Sides[Stroke??]]) -> Style {
   Property(
     Property::new(table_elem(), table_elem_stroke, IntoValue::into_value(v)),
   )
@@ -14866,7 +14887,7 @@ pub fn TableHLine::set_end(v : NonZeroUSize?) -> Style {
 }
 
 ///|
-pub fn TableHLine::stroke(self : TableHLine, styles : StyleChain) -> Value {
+pub fn TableHLine::stroke(self : TableHLine, styles : StyleChain) -> Stroke? {
   let e = table_h_line_elem()
   view_cast(
     styles.get_value_with_local(
@@ -14879,7 +14900,7 @@ pub fn TableHLine::stroke(self : TableHLine, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn TableHLine::stroke_local(self : TableHLine) -> Value? {
+pub fn TableHLine::stroke_local(self : TableHLine) -> Stroke?? {
   match self.0.field_raw(table_h_line_elem_stroke) {
     Some(v) => Some(view_cast(v, "hline.stroke"))
     None => None
@@ -14887,14 +14908,14 @@ pub fn TableHLine::stroke_local(self : TableHLine) -> Value? {
 }
 
 ///|
-pub fn TableHLine::with_stroke(self : TableHLine, v : Value) -> TableHLine {
+pub fn TableHLine::with_stroke(self : TableHLine, v : Stroke?) -> TableHLine {
   TableHLine(
     self.0.with_field(table_h_line_elem_stroke, IntoValue::into_value(v)),
   )
 }
 
 ///|
-pub fn TableHLine::stroke_in(styles : StyleChain) -> Value {
+pub fn TableHLine::stroke_in(styles : StyleChain) -> Stroke? {
   view_cast(
     styles.get_field(table_h_line_elem(), table_h_line_elem_stroke),
     "hline.stroke",
@@ -14902,7 +14923,7 @@ pub fn TableHLine::stroke_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn TableHLine::set_stroke(v : Value) -> Style {
+pub fn TableHLine::set_stroke(v : Stroke?) -> Style {
   Property(
     Property::new(
       table_h_line_elem(),
@@ -15127,7 +15148,7 @@ pub fn TableVLine::set_end(v : NonZeroUSize?) -> Style {
 }
 
 ///|
-pub fn TableVLine::stroke(self : TableVLine, styles : StyleChain) -> Value {
+pub fn TableVLine::stroke(self : TableVLine, styles : StyleChain) -> Stroke? {
   let e = table_v_line_elem()
   view_cast(
     styles.get_value_with_local(
@@ -15140,7 +15161,7 @@ pub fn TableVLine::stroke(self : TableVLine, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn TableVLine::stroke_local(self : TableVLine) -> Value? {
+pub fn TableVLine::stroke_local(self : TableVLine) -> Stroke?? {
   match self.0.field_raw(table_v_line_elem_stroke) {
     Some(v) => Some(view_cast(v, "vline.stroke"))
     None => None
@@ -15148,14 +15169,14 @@ pub fn TableVLine::stroke_local(self : TableVLine) -> Value? {
 }
 
 ///|
-pub fn TableVLine::with_stroke(self : TableVLine, v : Value) -> TableVLine {
+pub fn TableVLine::with_stroke(self : TableVLine, v : Stroke?) -> TableVLine {
   TableVLine(
     self.0.with_field(table_v_line_elem_stroke, IntoValue::into_value(v)),
   )
 }
 
 ///|
-pub fn TableVLine::stroke_in(styles : StyleChain) -> Value {
+pub fn TableVLine::stroke_in(styles : StyleChain) -> Stroke? {
   view_cast(
     styles.get_field(table_v_line_elem(), table_v_line_elem_stroke),
     "vline.stroke",
@@ -15163,7 +15184,7 @@ pub fn TableVLine::stroke_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn TableVLine::set_stroke(v : Value) -> Style {
+pub fn TableVLine::set_stroke(v : Stroke?) -> Style {
   Property(
     Property::new(
       table_v_line_elem(),
@@ -15543,7 +15564,7 @@ pub fn TableCell::set_align(v : Smart[Alignment]) -> Style {
 }
 
 ///|
-pub fn TableCell::fill(self : TableCell, styles : StyleChain) -> Value {
+pub fn TableCell::fill(self : TableCell, styles : StyleChain) -> Smart[Paint?] {
   let e = table_cell_elem()
   view_cast(
     styles.get_value_with_local(
@@ -15556,7 +15577,7 @@ pub fn TableCell::fill(self : TableCell, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn TableCell::fill_local(self : TableCell) -> Value? {
+pub fn TableCell::fill_local(self : TableCell) -> Smart[Paint?]? {
   match self.0.field_raw(table_cell_elem_fill) {
     Some(v) => Some(view_cast(v, "cell.fill"))
     None => None
@@ -15564,12 +15585,12 @@ pub fn TableCell::fill_local(self : TableCell) -> Value? {
 }
 
 ///|
-pub fn TableCell::with_fill(self : TableCell, v : Value) -> TableCell {
+pub fn TableCell::with_fill(self : TableCell, v : Smart[Paint?]) -> TableCell {
   TableCell(self.0.with_field(table_cell_elem_fill, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn TableCell::fill_in(styles : StyleChain) -> Value {
+pub fn TableCell::fill_in(styles : StyleChain) -> Smart[Paint?] {
   view_cast(
     styles.get_field(table_cell_elem(), table_cell_elem_fill),
     "cell.fill",
@@ -15577,7 +15598,7 @@ pub fn TableCell::fill_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn TableCell::set_fill(v : Value) -> Style {
+pub fn TableCell::set_fill(v : Smart[Paint?]) -> Style {
   Property(
     Property::new(
       table_cell_elem(),
@@ -15588,7 +15609,10 @@ pub fn TableCell::set_fill(v : Value) -> Style {
 }
 
 ///|
-pub fn TableCell::stroke(self : TableCell, styles : StyleChain) -> Value {
+pub fn TableCell::stroke(
+  self : TableCell,
+  styles : StyleChain,
+) -> Sides[Stroke??] {
   let e = table_cell_elem()
   view_cast(
     styles.get_value_with_local(
@@ -15601,7 +15625,7 @@ pub fn TableCell::stroke(self : TableCell, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn TableCell::stroke_local(self : TableCell) -> Value? {
+pub fn TableCell::stroke_local(self : TableCell) -> Sides[Stroke??]? {
   match self.0.field_raw(table_cell_elem_stroke) {
     Some(v) => Some(view_cast(v, "cell.stroke"))
     None => None
@@ -15609,12 +15633,15 @@ pub fn TableCell::stroke_local(self : TableCell) -> Value? {
 }
 
 ///|
-pub fn TableCell::with_stroke(self : TableCell, v : Value) -> TableCell {
+pub fn TableCell::with_stroke(
+  self : TableCell,
+  v : Sides[Stroke??],
+) -> TableCell {
   TableCell(self.0.with_field(table_cell_elem_stroke, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn TableCell::stroke_in(styles : StyleChain) -> Value {
+pub fn TableCell::stroke_in(styles : StyleChain) -> Sides[Stroke??] {
   view_cast(
     styles.get_field(table_cell_elem(), table_cell_elem_stroke),
     "cell.stroke",
@@ -15622,7 +15649,7 @@ pub fn TableCell::stroke_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn TableCell::set_stroke(v : Value) -> Style {
+pub fn TableCell::set_stroke(v : Sides[Stroke??]) -> Style {
   Property(
     Property::new(
       table_cell_elem(),
@@ -16161,7 +16188,7 @@ pub fn UnderlineElem::pack(self : UnderlineElem) -> Content {
 pub fn UnderlineElem::stroke(
   self : UnderlineElem,
   styles : StyleChain,
-) -> Value {
+) -> Smart[Stroke] {
   let e = underline_elem()
   view_cast(
     styles.get_value_with_local(
@@ -16174,7 +16201,7 @@ pub fn UnderlineElem::stroke(
 }
 
 ///|
-pub fn UnderlineElem::stroke_local(self : UnderlineElem) -> Value? {
+pub fn UnderlineElem::stroke_local(self : UnderlineElem) -> Smart[Stroke]? {
   match self.0.field_raw(underline_elem_stroke) {
     Some(v) => Some(view_cast(v, "underline.stroke"))
     None => None
@@ -16184,7 +16211,7 @@ pub fn UnderlineElem::stroke_local(self : UnderlineElem) -> Value? {
 ///|
 pub fn UnderlineElem::with_stroke(
   self : UnderlineElem,
-  v : Value,
+  v : Smart[Stroke],
 ) -> UnderlineElem {
   UnderlineElem(
     self.0.with_field(underline_elem_stroke, IntoValue::into_value(v)),
@@ -16192,7 +16219,7 @@ pub fn UnderlineElem::with_stroke(
 }
 
 ///|
-pub fn UnderlineElem::stroke_in(styles : StyleChain) -> Value {
+pub fn UnderlineElem::stroke_in(styles : StyleChain) -> Smart[Stroke] {
   view_cast(
     styles.get_field(underline_elem(), underline_elem_stroke),
     "underline.stroke",
@@ -16200,7 +16227,7 @@ pub fn UnderlineElem::stroke_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn UnderlineElem::set_stroke(v : Value) -> Style {
+pub fn UnderlineElem::set_stroke(v : Smart[Stroke]) -> Style {
   Property(
     Property::new(
       underline_elem(),
@@ -16463,7 +16490,10 @@ pub fn OverlineElem::pack(self : OverlineElem) -> Content {
 }
 
 ///|
-pub fn OverlineElem::stroke(self : OverlineElem, styles : StyleChain) -> Value {
+pub fn OverlineElem::stroke(
+  self : OverlineElem,
+  styles : StyleChain,
+) -> Smart[Stroke] {
   let e = overline_elem()
   view_cast(
     styles.get_value_with_local(
@@ -16476,7 +16506,7 @@ pub fn OverlineElem::stroke(self : OverlineElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn OverlineElem::stroke_local(self : OverlineElem) -> Value? {
+pub fn OverlineElem::stroke_local(self : OverlineElem) -> Smart[Stroke]? {
   match self.0.field_raw(overline_elem_stroke) {
     Some(v) => Some(view_cast(v, "overline.stroke"))
     None => None
@@ -16486,7 +16516,7 @@ pub fn OverlineElem::stroke_local(self : OverlineElem) -> Value? {
 ///|
 pub fn OverlineElem::with_stroke(
   self : OverlineElem,
-  v : Value,
+  v : Smart[Stroke],
 ) -> OverlineElem {
   OverlineElem(
     self.0.with_field(overline_elem_stroke, IntoValue::into_value(v)),
@@ -16494,7 +16524,7 @@ pub fn OverlineElem::with_stroke(
 }
 
 ///|
-pub fn OverlineElem::stroke_in(styles : StyleChain) -> Value {
+pub fn OverlineElem::stroke_in(styles : StyleChain) -> Smart[Stroke] {
   view_cast(
     styles.get_field(overline_elem(), overline_elem_stroke),
     "overline.stroke",
@@ -16502,7 +16532,7 @@ pub fn OverlineElem::stroke_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn OverlineElem::set_stroke(v : Value) -> Style {
+pub fn OverlineElem::set_stroke(v : Smart[Stroke]) -> Style {
   Property(
     Property::new(
       overline_elem(),
@@ -16755,7 +16785,10 @@ pub fn StrikeElem::pack(self : StrikeElem) -> Content {
 }
 
 ///|
-pub fn StrikeElem::stroke(self : StrikeElem, styles : StyleChain) -> Value {
+pub fn StrikeElem::stroke(
+  self : StrikeElem,
+  styles : StyleChain,
+) -> Smart[Stroke] {
   let e = strike_elem()
   view_cast(
     styles.get_value_with_local(
@@ -16768,7 +16801,7 @@ pub fn StrikeElem::stroke(self : StrikeElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn StrikeElem::stroke_local(self : StrikeElem) -> Value? {
+pub fn StrikeElem::stroke_local(self : StrikeElem) -> Smart[Stroke]? {
   match self.0.field_raw(strike_elem_stroke) {
     Some(v) => Some(view_cast(v, "strike.stroke"))
     None => None
@@ -16776,12 +16809,15 @@ pub fn StrikeElem::stroke_local(self : StrikeElem) -> Value? {
 }
 
 ///|
-pub fn StrikeElem::with_stroke(self : StrikeElem, v : Value) -> StrikeElem {
+pub fn StrikeElem::with_stroke(
+  self : StrikeElem,
+  v : Smart[Stroke],
+) -> StrikeElem {
   StrikeElem(self.0.with_field(strike_elem_stroke, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn StrikeElem::stroke_in(styles : StyleChain) -> Value {
+pub fn StrikeElem::stroke_in(styles : StyleChain) -> Smart[Stroke] {
   view_cast(
     styles.get_field(strike_elem(), strike_elem_stroke),
     "strike.stroke",
@@ -16789,7 +16825,7 @@ pub fn StrikeElem::stroke_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn StrikeElem::set_stroke(v : Value) -> Style {
+pub fn StrikeElem::set_stroke(v : Smart[Stroke]) -> Style {
   Property(
     Property::new(strike_elem(), strike_elem_stroke, IntoValue::into_value(v)),
   )
@@ -16969,7 +17005,7 @@ pub fn HighlightElem::pack(self : HighlightElem) -> Content {
 }
 
 ///|
-pub fn HighlightElem::fill(self : HighlightElem, styles : StyleChain) -> Value {
+pub fn HighlightElem::fill(self : HighlightElem, styles : StyleChain) -> Paint? {
   let e = highlight_elem()
   view_cast(
     styles.get_value_with_local(
@@ -16982,7 +17018,7 @@ pub fn HighlightElem::fill(self : HighlightElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn HighlightElem::fill_local(self : HighlightElem) -> Value? {
+pub fn HighlightElem::fill_local(self : HighlightElem) -> Paint?? {
   match self.0.field_raw(highlight_elem_fill) {
     Some(v) => Some(view_cast(v, "highlight.fill"))
     None => None
@@ -16992,7 +17028,7 @@ pub fn HighlightElem::fill_local(self : HighlightElem) -> Value? {
 ///|
 pub fn HighlightElem::with_fill(
   self : HighlightElem,
-  v : Value,
+  v : Paint?,
 ) -> HighlightElem {
   HighlightElem(
     self.0.with_field(highlight_elem_fill, IntoValue::into_value(v)),
@@ -17000,7 +17036,7 @@ pub fn HighlightElem::with_fill(
 }
 
 ///|
-pub fn HighlightElem::fill_in(styles : StyleChain) -> Value {
+pub fn HighlightElem::fill_in(styles : StyleChain) -> Paint? {
   view_cast(
     styles.get_field(highlight_elem(), highlight_elem_fill),
     "highlight.fill",
@@ -17008,7 +17044,7 @@ pub fn HighlightElem::fill_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn HighlightElem::set_fill(v : Value) -> Style {
+pub fn HighlightElem::set_fill(v : Paint?) -> Style {
   Property(
     Property::new(
       highlight_elem(),
@@ -17022,7 +17058,7 @@ pub fn HighlightElem::set_fill(v : Value) -> Style {
 pub fn HighlightElem::stroke(
   self : HighlightElem,
   styles : StyleChain,
-) -> Value {
+) -> Sides[Stroke??] {
   let e = highlight_elem()
   view_cast(
     styles.get_value_with_local(
@@ -17035,7 +17071,7 @@ pub fn HighlightElem::stroke(
 }
 
 ///|
-pub fn HighlightElem::stroke_local(self : HighlightElem) -> Value? {
+pub fn HighlightElem::stroke_local(self : HighlightElem) -> Sides[Stroke??]? {
   match self.0.field_raw(highlight_elem_stroke) {
     Some(v) => Some(view_cast(v, "highlight.stroke"))
     None => None
@@ -17045,7 +17081,7 @@ pub fn HighlightElem::stroke_local(self : HighlightElem) -> Value? {
 ///|
 pub fn HighlightElem::with_stroke(
   self : HighlightElem,
-  v : Value,
+  v : Sides[Stroke??],
 ) -> HighlightElem {
   HighlightElem(
     self.0.with_field(highlight_elem_stroke, IntoValue::into_value(v)),
@@ -17053,7 +17089,7 @@ pub fn HighlightElem::with_stroke(
 }
 
 ///|
-pub fn HighlightElem::stroke_in(styles : StyleChain) -> Value {
+pub fn HighlightElem::stroke_in(styles : StyleChain) -> Sides[Stroke??] {
   view_cast(
     styles.get_field(highlight_elem(), highlight_elem_stroke),
     "highlight.stroke",
@@ -17061,7 +17097,7 @@ pub fn HighlightElem::stroke_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn HighlightElem::set_stroke(v : Value) -> Style {
+pub fn HighlightElem::set_stroke(v : Sides[Stroke??]) -> Style {
   Property(
     Property::new(
       highlight_elem(),
@@ -17470,22 +17506,22 @@ pub fn TextElem::set_size(v : TextSize) -> Style {
 }
 
 ///|
-pub fn TextElem::fill_in(styles : StyleChain) -> Value {
+pub fn TextElem::fill_in(styles : StyleChain) -> Paint {
   view_cast(styles.get_field(text_elem(), text_elem_fill), "text.fill")
 }
 
 ///|
-pub fn TextElem::set_fill(v : Value) -> Style {
+pub fn TextElem::set_fill(v : Paint) -> Style {
   Property(Property::new(text_elem(), text_elem_fill, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn TextElem::stroke_in(styles : StyleChain) -> Value {
+pub fn TextElem::stroke_in(styles : StyleChain) -> Stroke? {
   view_cast(styles.get_field(text_elem(), text_elem_stroke), "text.stroke")
 }
 
 ///|
-pub fn TextElem::set_stroke(v : Value) -> Style {
+pub fn TextElem::set_stroke(v : Stroke?) -> Style {
   Property(
     Property::new(text_elem(), text_elem_stroke, IntoValue::into_value(v)),
   )
@@ -18994,7 +19030,7 @@ pub fn CurveElem::pack(self : CurveElem) -> Content {
 }
 
 ///|
-pub fn CurveElem::fill(self : CurveElem, styles : StyleChain) -> Value {
+pub fn CurveElem::fill(self : CurveElem, styles : StyleChain) -> Paint? {
   let e = curve_elem()
   view_cast(
     styles.get_value_with_local(
@@ -19007,7 +19043,7 @@ pub fn CurveElem::fill(self : CurveElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn CurveElem::fill_local(self : CurveElem) -> Value? {
+pub fn CurveElem::fill_local(self : CurveElem) -> Paint?? {
   match self.0.field_raw(curve_elem_fill) {
     Some(v) => Some(view_cast(v, "curve.fill"))
     None => None
@@ -19015,24 +19051,24 @@ pub fn CurveElem::fill_local(self : CurveElem) -> Value? {
 }
 
 ///|
-pub fn CurveElem::with_fill(self : CurveElem, v : Value) -> CurveElem {
+pub fn CurveElem::with_fill(self : CurveElem, v : Paint?) -> CurveElem {
   CurveElem(self.0.with_field(curve_elem_fill, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn CurveElem::fill_in(styles : StyleChain) -> Value {
+pub fn CurveElem::fill_in(styles : StyleChain) -> Paint? {
   view_cast(styles.get_field(curve_elem(), curve_elem_fill), "curve.fill")
 }
 
 ///|
-pub fn CurveElem::set_fill(v : Value) -> Style {
+pub fn CurveElem::set_fill(v : Paint?) -> Style {
   Property(
     Property::new(curve_elem(), curve_elem_fill, IntoValue::into_value(v)),
   )
 }
 
 ///|
-pub fn CurveElem::fill_rule(self : CurveElem, styles : StyleChain) -> Value {
+pub fn CurveElem::fill_rule(self : CurveElem, styles : StyleChain) -> FillRule {
   let e = curve_elem()
   view_cast(
     styles.get_value_with_local(
@@ -19045,7 +19081,7 @@ pub fn CurveElem::fill_rule(self : CurveElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn CurveElem::fill_rule_local(self : CurveElem) -> Value? {
+pub fn CurveElem::fill_rule_local(self : CurveElem) -> FillRule? {
   match self.0.field_raw(curve_elem_fill_rule) {
     Some(v) => Some(view_cast(v, "curve.fill-rule"))
     None => None
@@ -19053,12 +19089,12 @@ pub fn CurveElem::fill_rule_local(self : CurveElem) -> Value? {
 }
 
 ///|
-pub fn CurveElem::with_fill_rule(self : CurveElem, v : Value) -> CurveElem {
+pub fn CurveElem::with_fill_rule(self : CurveElem, v : FillRule) -> CurveElem {
   CurveElem(self.0.with_field(curve_elem_fill_rule, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn CurveElem::fill_rule_in(styles : StyleChain) -> Value {
+pub fn CurveElem::fill_rule_in(styles : StyleChain) -> FillRule {
   view_cast(
     styles.get_field(curve_elem(), curve_elem_fill_rule),
     "curve.fill-rule",
@@ -19066,14 +19102,17 @@ pub fn CurveElem::fill_rule_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn CurveElem::set_fill_rule(v : Value) -> Style {
+pub fn CurveElem::set_fill_rule(v : FillRule) -> Style {
   Property(
     Property::new(curve_elem(), curve_elem_fill_rule, IntoValue::into_value(v)),
   )
 }
 
 ///|
-pub fn CurveElem::stroke(self : CurveElem, styles : StyleChain) -> Value {
+pub fn CurveElem::stroke(
+  self : CurveElem,
+  styles : StyleChain,
+) -> Smart[Stroke?] {
   let e = curve_elem()
   view_cast(
     styles.get_value_with_local(
@@ -19086,7 +19125,7 @@ pub fn CurveElem::stroke(self : CurveElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn CurveElem::stroke_local(self : CurveElem) -> Value? {
+pub fn CurveElem::stroke_local(self : CurveElem) -> Smart[Stroke?]? {
   match self.0.field_raw(curve_elem_stroke) {
     Some(v) => Some(view_cast(v, "curve.stroke"))
     None => None
@@ -19094,24 +19133,27 @@ pub fn CurveElem::stroke_local(self : CurveElem) -> Value? {
 }
 
 ///|
-pub fn CurveElem::with_stroke(self : CurveElem, v : Value) -> CurveElem {
+pub fn CurveElem::with_stroke(
+  self : CurveElem,
+  v : Smart[Stroke?],
+) -> CurveElem {
   CurveElem(self.0.with_field(curve_elem_stroke, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn CurveElem::stroke_in(styles : StyleChain) -> Value {
+pub fn CurveElem::stroke_in(styles : StyleChain) -> Smart[Stroke?] {
   view_cast(styles.get_field(curve_elem(), curve_elem_stroke), "curve.stroke")
 }
 
 ///|
-pub fn CurveElem::set_stroke(v : Value) -> Style {
+pub fn CurveElem::set_stroke(v : Smart[Stroke?]) -> Style {
   Property(
     Property::new(curve_elem(), curve_elem_stroke, IntoValue::into_value(v)),
   )
 }
 
 ///|
-pub fn CurveElem::components(self : CurveElem) -> Value {
+pub fn CurveElem::components(self : CurveElem) -> Array[CurveComponent] {
   view_cast(
     self.0.field_raw(curve_elem_components).unwrap(),
     "curve.components",
@@ -19119,12 +19161,15 @@ pub fn CurveElem::components(self : CurveElem) -> Value {
 }
 
 ///|
-pub fn CurveElem::with_components(self : CurveElem, v : Value) -> CurveElem {
+pub fn CurveElem::with_components(
+  self : CurveElem,
+  v : Array[CurveComponent],
+) -> CurveElem {
   CurveElem(self.0.with_field(curve_elem_components, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn CurveElem::new(components_ : Value) -> CurveElem {
+pub fn CurveElem::new(components_ : Array[CurveComponent]) -> CurveElem {
   CurveElem(
     Content::new(curve_elem(), [
       (curve_elem_components, IntoValue::into_value(components_)),
@@ -19567,7 +19612,7 @@ pub fn CurveClose::pack(self : CurveClose) -> Content {
 }
 
 ///|
-pub fn CurveClose::mode(self : CurveClose, styles : StyleChain) -> Value {
+pub fn CurveClose::mode(self : CurveClose, styles : StyleChain) -> CloseMode {
   let e = curve_close_elem()
   view_cast(
     styles.get_value_with_local(
@@ -19580,7 +19625,7 @@ pub fn CurveClose::mode(self : CurveClose, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn CurveClose::mode_local(self : CurveClose) -> Value? {
+pub fn CurveClose::mode_local(self : CurveClose) -> CloseMode? {
   match self.0.field_raw(curve_close_elem_mode) {
     Some(v) => Some(view_cast(v, "close.mode"))
     None => None
@@ -19588,12 +19633,12 @@ pub fn CurveClose::mode_local(self : CurveClose) -> Value? {
 }
 
 ///|
-pub fn CurveClose::with_mode(self : CurveClose, v : Value) -> CurveClose {
+pub fn CurveClose::with_mode(self : CurveClose, v : CloseMode) -> CurveClose {
   CurveClose(self.0.with_field(curve_close_elem_mode, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn CurveClose::mode_in(styles : StyleChain) -> Value {
+pub fn CurveClose::mode_in(styles : StyleChain) -> CloseMode {
   view_cast(
     styles.get_field(curve_close_elem(), curve_close_elem_mode),
     "close.mode",
@@ -19601,7 +19646,7 @@ pub fn CurveClose::mode_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn CurveClose::set_mode(v : Value) -> Style {
+pub fn CurveClose::set_mode(v : CloseMode) -> Style {
   Property(
     Property::new(
       curve_close_elem(),
@@ -20153,7 +20198,7 @@ pub fn LineElem::set_angle(v : Angle) -> Style {
 }
 
 ///|
-pub fn LineElem::stroke(self : LineElem, styles : StyleChain) -> Value {
+pub fn LineElem::stroke(self : LineElem, styles : StyleChain) -> Stroke {
   let e = line_elem()
   view_cast(
     styles.get_value_with_local(
@@ -20166,7 +20211,7 @@ pub fn LineElem::stroke(self : LineElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn LineElem::stroke_local(self : LineElem) -> Value? {
+pub fn LineElem::stroke_local(self : LineElem) -> Stroke? {
   match self.0.field_raw(line_elem_stroke) {
     Some(v) => Some(view_cast(v, "line.stroke"))
     None => None
@@ -20174,17 +20219,17 @@ pub fn LineElem::stroke_local(self : LineElem) -> Value? {
 }
 
 ///|
-pub fn LineElem::with_stroke(self : LineElem, v : Value) -> LineElem {
+pub fn LineElem::with_stroke(self : LineElem, v : Stroke) -> LineElem {
   LineElem(self.0.with_field(line_elem_stroke, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn LineElem::stroke_in(styles : StyleChain) -> Value {
+pub fn LineElem::stroke_in(styles : StyleChain) -> Stroke {
   view_cast(styles.get_field(line_elem(), line_elem_stroke), "line.stroke")
 }
 
 ///|
-pub fn LineElem::set_stroke(v : Value) -> Style {
+pub fn LineElem::set_stroke(v : Stroke) -> Style {
   Property(
     Property::new(line_elem(), line_elem_stroke, IntoValue::into_value(v)),
   )
@@ -20215,7 +20260,7 @@ pub fn PolygonElem::pack(self : PolygonElem) -> Content {
 }
 
 ///|
-pub fn PolygonElem::fill(self : PolygonElem, styles : StyleChain) -> Value {
+pub fn PolygonElem::fill(self : PolygonElem, styles : StyleChain) -> Paint? {
   let e = polygon_elem()
   view_cast(
     styles.get_value_with_local(
@@ -20228,7 +20273,7 @@ pub fn PolygonElem::fill(self : PolygonElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn PolygonElem::fill_local(self : PolygonElem) -> Value? {
+pub fn PolygonElem::fill_local(self : PolygonElem) -> Paint?? {
   match self.0.field_raw(polygon_elem_fill) {
     Some(v) => Some(view_cast(v, "polygon.fill"))
     None => None
@@ -20236,24 +20281,27 @@ pub fn PolygonElem::fill_local(self : PolygonElem) -> Value? {
 }
 
 ///|
-pub fn PolygonElem::with_fill(self : PolygonElem, v : Value) -> PolygonElem {
+pub fn PolygonElem::with_fill(self : PolygonElem, v : Paint?) -> PolygonElem {
   PolygonElem(self.0.with_field(polygon_elem_fill, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn PolygonElem::fill_in(styles : StyleChain) -> Value {
+pub fn PolygonElem::fill_in(styles : StyleChain) -> Paint? {
   view_cast(styles.get_field(polygon_elem(), polygon_elem_fill), "polygon.fill")
 }
 
 ///|
-pub fn PolygonElem::set_fill(v : Value) -> Style {
+pub fn PolygonElem::set_fill(v : Paint?) -> Style {
   Property(
     Property::new(polygon_elem(), polygon_elem_fill, IntoValue::into_value(v)),
   )
 }
 
 ///|
-pub fn PolygonElem::fill_rule(self : PolygonElem, styles : StyleChain) -> Value {
+pub fn PolygonElem::fill_rule(
+  self : PolygonElem,
+  styles : StyleChain,
+) -> FillRule {
   let e = polygon_elem()
   view_cast(
     styles.get_value_with_local(
@@ -20266,7 +20314,7 @@ pub fn PolygonElem::fill_rule(self : PolygonElem, styles : StyleChain) -> Value 
 }
 
 ///|
-pub fn PolygonElem::fill_rule_local(self : PolygonElem) -> Value? {
+pub fn PolygonElem::fill_rule_local(self : PolygonElem) -> FillRule? {
   match self.0.field_raw(polygon_elem_fill_rule) {
     Some(v) => Some(view_cast(v, "polygon.fill-rule"))
     None => None
@@ -20276,7 +20324,7 @@ pub fn PolygonElem::fill_rule_local(self : PolygonElem) -> Value? {
 ///|
 pub fn PolygonElem::with_fill_rule(
   self : PolygonElem,
-  v : Value,
+  v : FillRule,
 ) -> PolygonElem {
   PolygonElem(
     self.0.with_field(polygon_elem_fill_rule, IntoValue::into_value(v)),
@@ -20284,7 +20332,7 @@ pub fn PolygonElem::with_fill_rule(
 }
 
 ///|
-pub fn PolygonElem::fill_rule_in(styles : StyleChain) -> Value {
+pub fn PolygonElem::fill_rule_in(styles : StyleChain) -> FillRule {
   view_cast(
     styles.get_field(polygon_elem(), polygon_elem_fill_rule),
     "polygon.fill-rule",
@@ -20292,7 +20340,7 @@ pub fn PolygonElem::fill_rule_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn PolygonElem::set_fill_rule(v : Value) -> Style {
+pub fn PolygonElem::set_fill_rule(v : FillRule) -> Style {
   Property(
     Property::new(
       polygon_elem(),
@@ -20303,7 +20351,10 @@ pub fn PolygonElem::set_fill_rule(v : Value) -> Style {
 }
 
 ///|
-pub fn PolygonElem::stroke(self : PolygonElem, styles : StyleChain) -> Value {
+pub fn PolygonElem::stroke(
+  self : PolygonElem,
+  styles : StyleChain,
+) -> Smart[Stroke?] {
   let e = polygon_elem()
   view_cast(
     styles.get_value_with_local(
@@ -20316,7 +20367,7 @@ pub fn PolygonElem::stroke(self : PolygonElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn PolygonElem::stroke_local(self : PolygonElem) -> Value? {
+pub fn PolygonElem::stroke_local(self : PolygonElem) -> Smart[Stroke?]? {
   match self.0.field_raw(polygon_elem_stroke) {
     Some(v) => Some(view_cast(v, "polygon.stroke"))
     None => None
@@ -20324,12 +20375,15 @@ pub fn PolygonElem::stroke_local(self : PolygonElem) -> Value? {
 }
 
 ///|
-pub fn PolygonElem::with_stroke(self : PolygonElem, v : Value) -> PolygonElem {
+pub fn PolygonElem::with_stroke(
+  self : PolygonElem,
+  v : Smart[Stroke?],
+) -> PolygonElem {
   PolygonElem(self.0.with_field(polygon_elem_stroke, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn PolygonElem::stroke_in(styles : StyleChain) -> Value {
+pub fn PolygonElem::stroke_in(styles : StyleChain) -> Smart[Stroke?] {
   view_cast(
     styles.get_field(polygon_elem(), polygon_elem_stroke),
     "polygon.stroke",
@@ -20337,7 +20391,7 @@ pub fn PolygonElem::stroke_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn PolygonElem::set_stroke(v : Value) -> Style {
+pub fn PolygonElem::set_stroke(v : Smart[Stroke?]) -> Style {
   Property(
     Property::new(polygon_elem(), polygon_elem_stroke, IntoValue::into_value(v)),
   )
@@ -20472,7 +20526,7 @@ pub fn RectElem::set_height(v : Sizing) -> Style {
 }
 
 ///|
-pub fn RectElem::fill(self : RectElem, styles : StyleChain) -> Value {
+pub fn RectElem::fill(self : RectElem, styles : StyleChain) -> Paint? {
   let e = rect_elem()
   view_cast(
     styles.get_value_with_local(
@@ -20485,7 +20539,7 @@ pub fn RectElem::fill(self : RectElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn RectElem::fill_local(self : RectElem) -> Value? {
+pub fn RectElem::fill_local(self : RectElem) -> Paint?? {
   match self.0.field_raw(rect_elem_fill) {
     Some(v) => Some(view_cast(v, "rect.fill"))
     None => None
@@ -20493,22 +20547,25 @@ pub fn RectElem::fill_local(self : RectElem) -> Value? {
 }
 
 ///|
-pub fn RectElem::with_fill(self : RectElem, v : Value) -> RectElem {
+pub fn RectElem::with_fill(self : RectElem, v : Paint?) -> RectElem {
   RectElem(self.0.with_field(rect_elem_fill, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn RectElem::fill_in(styles : StyleChain) -> Value {
+pub fn RectElem::fill_in(styles : StyleChain) -> Paint? {
   view_cast(styles.get_field(rect_elem(), rect_elem_fill), "rect.fill")
 }
 
 ///|
-pub fn RectElem::set_fill(v : Value) -> Style {
+pub fn RectElem::set_fill(v : Paint?) -> Style {
   Property(Property::new(rect_elem(), rect_elem_fill, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn RectElem::stroke(self : RectElem, styles : StyleChain) -> Value {
+pub fn RectElem::stroke(
+  self : RectElem,
+  styles : StyleChain,
+) -> Smart[Sides[Stroke??]] {
   let e = rect_elem()
   view_cast(
     styles.get_value_with_local(
@@ -20521,7 +20578,7 @@ pub fn RectElem::stroke(self : RectElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn RectElem::stroke_local(self : RectElem) -> Value? {
+pub fn RectElem::stroke_local(self : RectElem) -> Smart[Sides[Stroke??]]? {
   match self.0.field_raw(rect_elem_stroke) {
     Some(v) => Some(view_cast(v, "rect.stroke"))
     None => None
@@ -20529,17 +20586,20 @@ pub fn RectElem::stroke_local(self : RectElem) -> Value? {
 }
 
 ///|
-pub fn RectElem::with_stroke(self : RectElem, v : Value) -> RectElem {
+pub fn RectElem::with_stroke(
+  self : RectElem,
+  v : Smart[Sides[Stroke??]],
+) -> RectElem {
   RectElem(self.0.with_field(rect_elem_stroke, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn RectElem::stroke_in(styles : StyleChain) -> Value {
+pub fn RectElem::stroke_in(styles : StyleChain) -> Smart[Sides[Stroke??]] {
   view_cast(styles.get_field(rect_elem(), rect_elem_stroke), "rect.stroke")
 }
 
 ///|
-pub fn RectElem::set_stroke(v : Value) -> Style {
+pub fn RectElem::set_stroke(v : Smart[Sides[Stroke??]]) -> Style {
   Property(
     Property::new(rect_elem(), rect_elem_stroke, IntoValue::into_value(v)),
   )
@@ -20823,7 +20883,7 @@ pub fn SquareElem::set_height(v : Sizing) -> Style {
 }
 
 ///|
-pub fn SquareElem::fill(self : SquareElem, styles : StyleChain) -> Value {
+pub fn SquareElem::fill(self : SquareElem, styles : StyleChain) -> Paint? {
   let e = square_elem()
   view_cast(
     styles.get_value_with_local(
@@ -20836,7 +20896,7 @@ pub fn SquareElem::fill(self : SquareElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn SquareElem::fill_local(self : SquareElem) -> Value? {
+pub fn SquareElem::fill_local(self : SquareElem) -> Paint?? {
   match self.0.field_raw(square_elem_fill) {
     Some(v) => Some(view_cast(v, "square.fill"))
     None => None
@@ -20844,24 +20904,27 @@ pub fn SquareElem::fill_local(self : SquareElem) -> Value? {
 }
 
 ///|
-pub fn SquareElem::with_fill(self : SquareElem, v : Value) -> SquareElem {
+pub fn SquareElem::with_fill(self : SquareElem, v : Paint?) -> SquareElem {
   SquareElem(self.0.with_field(square_elem_fill, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn SquareElem::fill_in(styles : StyleChain) -> Value {
+pub fn SquareElem::fill_in(styles : StyleChain) -> Paint? {
   view_cast(styles.get_field(square_elem(), square_elem_fill), "square.fill")
 }
 
 ///|
-pub fn SquareElem::set_fill(v : Value) -> Style {
+pub fn SquareElem::set_fill(v : Paint?) -> Style {
   Property(
     Property::new(square_elem(), square_elem_fill, IntoValue::into_value(v)),
   )
 }
 
 ///|
-pub fn SquareElem::stroke(self : SquareElem, styles : StyleChain) -> Value {
+pub fn SquareElem::stroke(
+  self : SquareElem,
+  styles : StyleChain,
+) -> Smart[Sides[Stroke??]] {
   let e = square_elem()
   view_cast(
     styles.get_value_with_local(
@@ -20874,7 +20937,7 @@ pub fn SquareElem::stroke(self : SquareElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn SquareElem::stroke_local(self : SquareElem) -> Value? {
+pub fn SquareElem::stroke_local(self : SquareElem) -> Smart[Sides[Stroke??]]? {
   match self.0.field_raw(square_elem_stroke) {
     Some(v) => Some(view_cast(v, "square.stroke"))
     None => None
@@ -20882,12 +20945,15 @@ pub fn SquareElem::stroke_local(self : SquareElem) -> Value? {
 }
 
 ///|
-pub fn SquareElem::with_stroke(self : SquareElem, v : Value) -> SquareElem {
+pub fn SquareElem::with_stroke(
+  self : SquareElem,
+  v : Smart[Sides[Stroke??]],
+) -> SquareElem {
   SquareElem(self.0.with_field(square_elem_stroke, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn SquareElem::stroke_in(styles : StyleChain) -> Value {
+pub fn SquareElem::stroke_in(styles : StyleChain) -> Smart[Sides[Stroke??]] {
   view_cast(
     styles.get_field(square_elem(), square_elem_stroke),
     "square.stroke",
@@ -20895,7 +20961,7 @@ pub fn SquareElem::stroke_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn SquareElem::set_stroke(v : Value) -> Style {
+pub fn SquareElem::set_stroke(v : Smart[Sides[Stroke??]]) -> Style {
   Property(
     Property::new(square_elem(), square_elem_stroke, IntoValue::into_value(v)),
   )
@@ -21190,7 +21256,7 @@ pub fn EllipseElem::set_height(v : Sizing) -> Style {
 }
 
 ///|
-pub fn EllipseElem::fill(self : EllipseElem, styles : StyleChain) -> Value {
+pub fn EllipseElem::fill(self : EllipseElem, styles : StyleChain) -> Paint? {
   let e = ellipse_elem()
   view_cast(
     styles.get_value_with_local(
@@ -21203,7 +21269,7 @@ pub fn EllipseElem::fill(self : EllipseElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn EllipseElem::fill_local(self : EllipseElem) -> Value? {
+pub fn EllipseElem::fill_local(self : EllipseElem) -> Paint?? {
   match self.0.field_raw(ellipse_elem_fill) {
     Some(v) => Some(view_cast(v, "ellipse.fill"))
     None => None
@@ -21211,24 +21277,27 @@ pub fn EllipseElem::fill_local(self : EllipseElem) -> Value? {
 }
 
 ///|
-pub fn EllipseElem::with_fill(self : EllipseElem, v : Value) -> EllipseElem {
+pub fn EllipseElem::with_fill(self : EllipseElem, v : Paint?) -> EllipseElem {
   EllipseElem(self.0.with_field(ellipse_elem_fill, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn EllipseElem::fill_in(styles : StyleChain) -> Value {
+pub fn EllipseElem::fill_in(styles : StyleChain) -> Paint? {
   view_cast(styles.get_field(ellipse_elem(), ellipse_elem_fill), "ellipse.fill")
 }
 
 ///|
-pub fn EllipseElem::set_fill(v : Value) -> Style {
+pub fn EllipseElem::set_fill(v : Paint?) -> Style {
   Property(
     Property::new(ellipse_elem(), ellipse_elem_fill, IntoValue::into_value(v)),
   )
 }
 
 ///|
-pub fn EllipseElem::stroke(self : EllipseElem, styles : StyleChain) -> Value {
+pub fn EllipseElem::stroke(
+  self : EllipseElem,
+  styles : StyleChain,
+) -> Smart[Stroke?] {
   let e = ellipse_elem()
   view_cast(
     styles.get_value_with_local(
@@ -21241,7 +21310,7 @@ pub fn EllipseElem::stroke(self : EllipseElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn EllipseElem::stroke_local(self : EllipseElem) -> Value? {
+pub fn EllipseElem::stroke_local(self : EllipseElem) -> Smart[Stroke?]? {
   match self.0.field_raw(ellipse_elem_stroke) {
     Some(v) => Some(view_cast(v, "ellipse.stroke"))
     None => None
@@ -21249,12 +21318,15 @@ pub fn EllipseElem::stroke_local(self : EllipseElem) -> Value? {
 }
 
 ///|
-pub fn EllipseElem::with_stroke(self : EllipseElem, v : Value) -> EllipseElem {
+pub fn EllipseElem::with_stroke(
+  self : EllipseElem,
+  v : Smart[Stroke?],
+) -> EllipseElem {
   EllipseElem(self.0.with_field(ellipse_elem_stroke, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn EllipseElem::stroke_in(styles : StyleChain) -> Value {
+pub fn EllipseElem::stroke_in(styles : StyleChain) -> Smart[Stroke?] {
   view_cast(
     styles.get_field(ellipse_elem(), ellipse_elem_stroke),
     "ellipse.stroke",
@@ -21262,7 +21334,7 @@ pub fn EllipseElem::stroke_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn EllipseElem::set_stroke(v : Value) -> Style {
+pub fn EllipseElem::set_stroke(v : Smart[Stroke?]) -> Style {
   Property(
     Property::new(ellipse_elem(), ellipse_elem_stroke, IntoValue::into_value(v)),
   )
@@ -21510,7 +21582,7 @@ pub fn CircleElem::set_height(v : Sizing) -> Style {
 }
 
 ///|
-pub fn CircleElem::fill(self : CircleElem, styles : StyleChain) -> Value {
+pub fn CircleElem::fill(self : CircleElem, styles : StyleChain) -> Paint? {
   let e = circle_elem()
   view_cast(
     styles.get_value_with_local(
@@ -21523,7 +21595,7 @@ pub fn CircleElem::fill(self : CircleElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn CircleElem::fill_local(self : CircleElem) -> Value? {
+pub fn CircleElem::fill_local(self : CircleElem) -> Paint?? {
   match self.0.field_raw(circle_elem_fill) {
     Some(v) => Some(view_cast(v, "circle.fill"))
     None => None
@@ -21531,24 +21603,27 @@ pub fn CircleElem::fill_local(self : CircleElem) -> Value? {
 }
 
 ///|
-pub fn CircleElem::with_fill(self : CircleElem, v : Value) -> CircleElem {
+pub fn CircleElem::with_fill(self : CircleElem, v : Paint?) -> CircleElem {
   CircleElem(self.0.with_field(circle_elem_fill, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn CircleElem::fill_in(styles : StyleChain) -> Value {
+pub fn CircleElem::fill_in(styles : StyleChain) -> Paint? {
   view_cast(styles.get_field(circle_elem(), circle_elem_fill), "circle.fill")
 }
 
 ///|
-pub fn CircleElem::set_fill(v : Value) -> Style {
+pub fn CircleElem::set_fill(v : Paint?) -> Style {
   Property(
     Property::new(circle_elem(), circle_elem_fill, IntoValue::into_value(v)),
   )
 }
 
 ///|
-pub fn CircleElem::stroke(self : CircleElem, styles : StyleChain) -> Value {
+pub fn CircleElem::stroke(
+  self : CircleElem,
+  styles : StyleChain,
+) -> Smart[Stroke?] {
   let e = circle_elem()
   view_cast(
     styles.get_value_with_local(
@@ -21561,7 +21636,7 @@ pub fn CircleElem::stroke(self : CircleElem, styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn CircleElem::stroke_local(self : CircleElem) -> Value? {
+pub fn CircleElem::stroke_local(self : CircleElem) -> Smart[Stroke?]? {
   match self.0.field_raw(circle_elem_stroke) {
     Some(v) => Some(view_cast(v, "circle.stroke"))
     None => None
@@ -21569,12 +21644,15 @@ pub fn CircleElem::stroke_local(self : CircleElem) -> Value? {
 }
 
 ///|
-pub fn CircleElem::with_stroke(self : CircleElem, v : Value) -> CircleElem {
+pub fn CircleElem::with_stroke(
+  self : CircleElem,
+  v : Smart[Stroke?],
+) -> CircleElem {
   CircleElem(self.0.with_field(circle_elem_stroke, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn CircleElem::stroke_in(styles : StyleChain) -> Value {
+pub fn CircleElem::stroke_in(styles : StyleChain) -> Smart[Stroke?] {
   view_cast(
     styles.get_field(circle_elem(), circle_elem_stroke),
     "circle.stroke",
@@ -21582,7 +21660,7 @@ pub fn CircleElem::stroke_in(styles : StyleChain) -> Value {
 }
 
 ///|
-pub fn CircleElem::set_stroke(v : Value) -> Style {
+pub fn CircleElem::set_stroke(v : Smart[Stroke?]) -> Style {
   Property(
     Property::new(circle_elem(), circle_elem_stroke, IntoValue::into_value(v)),
   )
