@@ -12,6 +12,15 @@ test "absolutize keeps backslashes and parent components on Unix" {
 }
 
 ///|
+test "double backslashes are not UNC prefixes on Unix" {
+  if @platform.os() == Windows {
+    return
+  }
+  inspect(@platform.is_absolute("\\\\server\\share"), content="false")
+  inspect(@platform.join("/base", "\\\\x"), content="/base/\\\\x")
+}
+
+///|
 test "path helpers" {
   inspect(
     @platform.parent("/a/b/c.typ"),

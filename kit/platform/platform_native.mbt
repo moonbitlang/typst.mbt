@@ -301,3 +301,28 @@ pub fn arch() -> String {
     _ => "unknown"
   }
 }
+
+///|
+#borrow(code)
+extern "C" fn ffi_error_kind_name(code : Int) -> Bytes = "typst_platform_error_kind_name"
+
+///|
+/// Rust's `Debug` for an `io::Error` (`Os { code: .., kind: .., message: ..
+/// }` for OS errors, `Custom { kind: .., error: .. }` otherwise).
+pub fn rust_debug(err : IoError) -> String {
+  let IoError(_, text) = err
+  match text.rev_find(" (os error ") {
+    Some(i) if text.has_suffix(")") => {
+      let digits = text[i + 11:text.length() - 1].to_owned()
+      let mut code = 0
+      for c in digits {
+        code = code * 10 + (c.to_int() - '0'.to_int())
+      }
+      let kind = @utf8.decode_lossy(ffi_error_kind_name(code))
+      let message = text[:i].to_owned()
+      "Os { code: \{code}, kind: \{kind}, message: \{rust_debug_str(message)} }"
+    }
+    _ =>
+      "Custom { kind: \{kind_name(err.kind())}, error: \{rust_debug_str(text)} }"
+  }
+}

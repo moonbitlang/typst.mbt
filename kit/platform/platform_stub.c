@@ -410,3 +410,98 @@ int typst_platform_arch(void) {
   return 5;
 #endif
 }
+
+// The `Debug` name of Rust's `io::ErrorKind` for an errno value (std's
+// `decode_error_kind` on Unix).
+MOONBIT_FFI_EXPORT
+moonbit_bytes_t typst_platform_error_kind_name(int code) {
+  const char *name = "Uncategorized";
+  switch (code) {
+#ifdef E2BIG
+  case E2BIG: name = "ArgumentListTooLong"; break;
+#endif
+#ifdef EADDRINUSE
+  case EADDRINUSE: name = "AddrInUse"; break;
+#endif
+#ifdef EADDRNOTAVAIL
+  case EADDRNOTAVAIL: name = "AddrNotAvailable"; break;
+#endif
+#ifdef EBUSY
+  case EBUSY: name = "ResourceBusy"; break;
+#endif
+#ifdef ECONNABORTED
+  case ECONNABORTED: name = "ConnectionAborted"; break;
+#endif
+#ifdef ECONNREFUSED
+  case ECONNREFUSED: name = "ConnectionRefused"; break;
+#endif
+#ifdef ECONNRESET
+  case ECONNRESET: name = "ConnectionReset"; break;
+#endif
+#ifdef EDEADLK
+  case EDEADLK: name = "Deadlock"; break;
+#endif
+#ifdef EDQUOT
+  case EDQUOT: name = "QuotaExceeded"; break;
+#endif
+  case EEXIST: name = "AlreadyExists"; break;
+  case EFBIG: name = "FileTooLarge"; break;
+#ifdef EHOSTUNREACH
+  case EHOSTUNREACH: name = "HostUnreachable"; break;
+#endif
+  case EINTR: name = "Interrupted"; break;
+  case EINVAL: name = "InvalidInput"; break;
+  case EISDIR: name = "IsADirectory"; break;
+#ifdef ELOOP
+  case ELOOP: name = "FilesystemLoop"; break;
+#endif
+  case ENOENT: name = "NotFound"; break;
+  case ENOMEM: name = "OutOfMemory"; break;
+  case ENOSPC: name = "StorageFull"; break;
+#ifdef ENOSYS
+  case ENOSYS: name = "Unsupported"; break;
+#endif
+  case EMLINK: name = "TooManyLinks"; break;
+#ifdef ENAMETOOLONG
+  case ENAMETOOLONG: name = "InvalidFilename"; break;
+#endif
+#ifdef ENETDOWN
+  case ENETDOWN: name = "NetworkDown"; break;
+#endif
+#ifdef ENETUNREACH
+  case ENETUNREACH: name = "NetworkUnreachable"; break;
+#endif
+#ifdef ENOTCONN
+  case ENOTCONN: name = "NotConnected"; break;
+#endif
+  case ENOTDIR: name = "NotADirectory"; break;
+#ifdef ENOTEMPTY
+  case ENOTEMPTY: name = "DirectoryNotEmpty"; break;
+#endif
+  case EPIPE: name = "BrokenPipe"; break;
+  case EROFS: name = "ReadOnlyFilesystem"; break;
+  case ESPIPE: name = "NotSeekable"; break;
+#ifdef ESTALE
+  case ESTALE: name = "StaleNetworkFileHandle"; break;
+#endif
+#ifdef ETIMEDOUT
+  case ETIMEDOUT: name = "TimedOut"; break;
+#endif
+#ifdef ETXTBSY
+  case ETXTBSY: name = "ExecutableFileBusy"; break;
+#endif
+  case EXDEV: name = "CrossesDevices"; break;
+#ifdef EINPROGRESS
+  case EINPROGRESS: name = "InProgress"; break;
+#endif
+  case EACCES:
+  case EPERM: name = "PermissionDenied"; break;
+  default:
+#if defined(EWOULDBLOCK) && EWOULDBLOCK != EAGAIN
+    if (code == EWOULDBLOCK) { name = "WouldBlock"; break; }
+#endif
+    if (code == EAGAIN) { name = "WouldBlock"; }
+    break;
+  }
+  return typst_platform_copy(name, strlen(name));
+}

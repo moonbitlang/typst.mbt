@@ -346,3 +346,11 @@ pub fn os() -> Os {
 pub fn arch() -> String {
   "wasm32"
 }
+
+///|
+/// Rust's `Debug` for an `io::Error` (approximated: the host's errno values
+/// are not known here).
+pub fn rust_debug(err : IoError) -> String {
+  let IoError(_, text) = err
+  "Custom { kind: \{kind_name(err.kind())}, error: \{rust_debug_str(text)} }"
+}

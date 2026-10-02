@@ -124,8 +124,11 @@ fn print_eval_result(
             ).with_hint("`--format=raw` only supports strings and bytes"),
           )
       }
-      @platform.write_stdout_buffered(bytes) catch {
-        err => panic_exit("failed to write eval output: \{err}")
+      write_raw_stdout(bytes) catch {
+        err =>
+          panic_exit(
+            "failed to write eval output: \{@platform.rust_debug(err)}",
+          )
       }
     }
   }
@@ -197,4 +200,29 @@ impl @library.World for ExpressionWorld with fn font(self, index) {
 ///|
 impl @library.World for ExpressionWorld with fn today(self, offset) {
   @library.World::today(self.world, offset)
+}
+
+///|
+/// Writes bytes like `stdout().lock().write_all(..)` on Rust's line-buffered
+/// stdout (`LineWriter` with a 1024-byte buffer): everything up to the last
+/// newline is written and flushed, a shorter remainder stays buffered (it is
+/// flushed at exit, ignoring errors), a remainder that does not fit into the
+/// buffer is written directly.
+fn write_raw_stdout(bytes : Bytes) -> Unit raise @platform.IoError {
+  let mut last_newline = -1
+  for i in 0..<bytes.length() {
+    if bytes[i] == b'\n' {
+      last_newline = i
+    }
+  }
+  let head = bytes[:last_newline + 1].to_owned()
+  let tail = bytes[last_newline + 1:].to_owned()
+  if head.length() > 0 {
+    @platform.write_stdout(head)
+  }
+  if tail.length() >= 1024 {
+    @platform.write_stdout(tail)
+  } else if tail.length() > 0 {
+    @platform.write_stdout_buffered(tail)
+  }
 }

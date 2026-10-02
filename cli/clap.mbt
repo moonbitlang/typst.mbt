@@ -355,6 +355,7 @@ fn CommandSpec::parse(
   let positionals = []
   let mut subcommand = None
   let mut i = 0
+  let pending : Array[(ArgSpec, String)] = []
   let mut only_positional = false
   let find_long = (name : String) => self.args.search_by(a => a.long == name)
   let find_short = (c : Char) => self.args.search_by(a => a.short == Some(c))
@@ -364,9 +365,7 @@ fn CommandSpec::parse(
         "a value is required for '\{spec.display()}' but none was supplied\{possible_values(spec)}",
       )
     }
-    if spec.possible.length() > 0 &&
-      !spec.possible.contains(value) &&
-      !(spec.kind is LooseValue(_)) {
+    if spec.possible.length() > 0 && !spec.possible.contains(value) {
       raise Invalid(
         "invalid value '\{value}' for '\{spec.display()}'\n  [possible values: \{spec.possible.join(", ")}]",
       )
@@ -390,6 +389,11 @@ fn CommandSpec::parse(
     i += 1
     if only_positional || arg == "-" || !arg.has_prefix("-") {
       if self.subcommands.length() > 0 && !only_positional {
+        let known = arg == "help" ||
+          self.subcommands.iter().any(s => s.0 == arg || s.1.contains(arg))
+        if !known {
+          raise Usage("unrecognized subcommand '\{arg}'", self.usage())
+        }
         subcommand = Some((arg, argv[i:].to_owned()))
         break
       }
@@ -436,7 +440,9 @@ fn CommandSpec::parse(
             None =>
               if i < argv.length() &&
                 !(argv[i].has_prefix("-") && argv[i] != "-") {
-                push_value(spec, argv[i])
+                // Like clap, a separate value is only validated once the
+                // command's arguments are parsed.
+                pending.push((spec, argv[i]))
                 i += 1
               } else {
                 push_value(spec, missing)
@@ -483,12 +489,9 @@ fn CommandSpec::parse(
           counts[spec.id] = counts.get(spec.id).unwrap_or(0) + 1
         Value => {
           let rest = String::from_array(chars[k:])
-          let rest = if rest.has_prefix("=") {
-            rest[1:].to_owned()
-          } else {
-            rest
-          }
-          if rest != "" {
+          if rest.has_prefix("=") {
+            push_values(spec, rest[1:].to_owned())
+          } else if rest != "" {
             push_values(spec, rest)
           } else {
             if i >= argv.length() || (argv[i].has_prefix("-") && argv[i] != "-") {
@@ -503,6 +506,10 @@ fn CommandSpec::parse(
         }
       }
     }
+  }
+
+  for entry in pending {
+    push_value(entry.0, entry.1)
   }
 
   // Environment variable fallbacks.

@@ -140,14 +140,20 @@ pub fn is_absolute(path : String) -> Bool {
   if path.has_prefix("/") {
     return true
   }
-  if os() == Windows && path.length() >= 3 {
+  if os() != Windows {
+    return false
+  }
+  if path.length() >= 3 {
     let c = path.code_unit_at(0).to_int()
     let is_letter = (c >= 'a'.to_int() && c <= 'z'.to_int()) ||
       (c >= 'A'.to_int() && c <= 'Z'.to_int())
-    return is_letter &&
+    if is_letter &&
       path.code_unit_at(1) == ':' &&
-      is_separator(path.code_unit_at(2).to_int())
+      is_separator(path.code_unit_at(2).to_int()) {
+      return true
+    }
   }
+  // UNC paths.
   path.has_prefix("\\\\")
 }
 
@@ -256,4 +262,37 @@ pub fn exit(code : Int) -> Unit {
   flush_stdout()
   flush_stderr()
   @sys.exit(code)
+}
+
+///|
+/// The `Debug` name of a kind.
+fn kind_name(kind : ErrorKind) -> String {
+  match kind {
+    NotFound => "NotFound"
+    PermissionDenied => "PermissionDenied"
+    AlreadyExists => "AlreadyExists"
+    IsADirectory => "IsADirectory"
+    InvalidInput => "InvalidInput"
+    Unsupported => "Unsupported"
+    Other => "Other"
+  }
+}
+
+///|
+/// Rust's `Debug` for a `str` (quoted, with escapes).
+fn rust_debug_str(s : String) -> String {
+  let buf = StringBuilder()
+  buf.write_char('"')
+  for c in s {
+    match c {
+      '"' => buf.write_string("\\\"")
+      '\\' => buf.write_string("\\\\")
+      '\n' => buf.write_string("\\n")
+      '\r' => buf.write_string("\\r")
+      '\t' => buf.write_string("\\t")
+      _ => buf.write_char(c)
+    }
+  }
+  buf.write_char('"')
+  buf.to_string()
 }

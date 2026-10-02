@@ -64,6 +64,8 @@ pub fn read_range(String, Int64, Int) -> Bytes raise IoError
 
 pub fn read_stdin() -> Bytes raise IoError
 
+pub fn rust_debug(IoError) -> String
+
 pub fn separator() -> String
 
 pub fn stat_kind(String) -> FileKind raise IoError
