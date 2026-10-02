@@ -22,7 +22,7 @@ priv struct State {
 priv struct Cache {
   /// This fontdb is initialized from [`Options::fontdb`] and then populated
   /// over the course of conversion.
-  mut fontdb : FontDatabase
+  fontdb : FontDatabase
   cache_outline : Map[(Int, Int), TinyPath?]
   cache_colr : Map[(Int, Int), Tree?]
   cache_svg : Map[(Int, Int), Node?]

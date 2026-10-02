@@ -17,8 +17,6 @@ import {
   "moonbitlang/typst/unicode",
 }
 
-warnings = "-unused_mut"
-
 options(
   "native-stub": [ "sincos_stub.c" ],
   targets: {

@@ -138,6 +138,33 @@ pub fn FontDatabase::set_sans_serif_family(
 }
 
 ///|
+/// Sets the family that will be used by `Family::Cursive`.
+pub fn FontDatabase::set_cursive_family(
+  self : FontDatabase,
+  family : String,
+) -> Unit {
+  self.family_cursive = family
+}
+
+///|
+/// Sets the family that will be used by `Family::Fantasy`.
+pub fn FontDatabase::set_fantasy_family(
+  self : FontDatabase,
+  family : String,
+) -> Unit {
+  self.family_fantasy = family
+}
+
+///|
+/// Sets the family that will be used by `Family::Monospace`.
+pub fn FontDatabase::set_monospace_family(
+  self : FontDatabase,
+  family : String,
+) -> Unit {
+  self.family_monospace = family
+}
+
+///|
 /// Returns the generic family name or the `Family::Name` itself.
 pub fn FontDatabase::family_name(
   self : FontDatabase,

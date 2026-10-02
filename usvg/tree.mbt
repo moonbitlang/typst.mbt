@@ -895,9 +895,9 @@ pub struct Group {
   priv mut id : String
   priv mut transform : Transform
   priv mut abs_transform : Transform
-  priv mut opacity : Opacity
-  priv mut blend_mode : BlendMode
-  priv mut isolate : Bool
+  priv opacity : Opacity
+  priv blend_mode : BlendMode
+  priv isolate : Bool
   priv mut clip_path : ClipPath?
   /// Whether the group is a context element (i.e. a use node)
   priv mut is_context_element : Bool
