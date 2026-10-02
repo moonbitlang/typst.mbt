@@ -1,0 +1,117 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/linebreak"
+
+import {
+  "moonbitlang/core/debug",
+  "moonbitlang/typst/hypher",
+}
+
+// Values
+pub fn breakpoints(String, cj~ : Bool, hyphenate~ : Bool, lang_at~ : (Int) -> @hypher.Lang?, hyphenate_at~ : (Int) -> Bool, (Int, Breakpoint) -> Unit) -> Unit
+
+pub fn cj_segmenter() -> LineSegmenter
+
+pub fn default_segmenter() -> LineSegmenter
+
+pub fn line_break(Int) -> LineBreak
+
+// Errors
+
+// Types and methods
+pub(all) enum Breakpoint {
+  Normal
+  Mandatory
+  Hyphen(Int, Int)
+} derive(Eq, Hash, @debug.Debug)
+pub fn Breakpoint::is_hyphen(Self) -> Bool
+pub fn Breakpoint::trim(Self, Int, String) -> Trim
+
+pub(all) enum LineBreak {
+  Unknown
+  Ambiguous
+  Alphabetic
+  BreakBoth
+  BreakAfter
+  BreakBefore
+  MandatoryBreak
+  ContingentBreak
+  ClosePunctuation
+  CombiningMark
+  CarriageReturn
+  Exclamation
+  Glue
+  Hyphen
+  Ideographic
+  Inseparable
+  InfixNumeric
+  LineFeed
+  Nonstarter
+  Numeric
+  OpenPunctuation
+  PostfixNumeric
+  PrefixNumeric
+  Quotation
+  ComplexContext
+  Surrogate
+  Space
+  BreakSymbols
+  ZWSpace
+  NextLine
+  WordJoiner
+  H2
+  H3
+  JL
+  JT
+  JV
+  CloseParenthesis
+  ConditionalJapaneseStarter
+  HebrewLetter
+  RegionalIndicator
+  EBase
+  EModifier
+  ZWJ
+  Aksara
+  AksaraPrebase
+  AksaraStart
+  ViramaFinal
+  Virama
+  UnambiguousHyphen
+} derive(Eq, Hash, @debug.Debug)
+pub fn LineBreak::short_name(Self) -> String
+
+pub(all) struct LineBreakOptions {
+  strictness : LineBreakStrictness?
+  word_option : LineBreakWordOption?
+  ja_zh : Bool
+}
+pub fn LineBreakOptions::default() -> Self
+
+pub(all) enum LineBreakStrictness {
+  Loose
+  Normal
+  Strict
+  Anywhere
+} derive(Eq, @debug.Debug)
+
+pub(all) enum LineBreakWordOption {
+  Normal
+  BreakAll
+  KeepAll
+} derive(Eq, @debug.Debug)
+
+pub struct LineSegmenter {
+  // private fields
+}
+pub fn LineSegmenter::new_cj(LineBreakOptions) -> Self
+pub fn LineSegmenter::new_for_non_complex_scripts(LineBreakOptions) -> Self
+pub fn LineSegmenter::new_lstm(LineBreakOptions) -> Self
+pub fn LineSegmenter::segment_str(Self, String) -> Array[Int]
+
+pub(all) struct Trim {
+  layout : Int
+  shaping : Int
+} derive(Eq, @debug.Debug)
+
+// Type aliases
+
+// Traits

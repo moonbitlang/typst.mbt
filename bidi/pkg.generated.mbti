@@ -1,0 +1,179 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/bidi"
+
+import {
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub fn bidi_class(Char) -> BidiClass
+
+pub fn bidi_matched_opening_bracket(Int) -> BidiMatchedOpeningBracket?
+
+pub let char_alm : Int
+
+pub let char_fsi : Int
+
+pub let char_lre : Int
+
+pub let char_lri : Int
+
+pub let char_lrm : Int
+
+pub let char_lro : Int
+
+pub let char_pdf : Int
+
+pub let char_pdi : Int
+
+pub let char_rle : Int
+
+pub let char_rli : Int
+
+pub let char_rlm : Int
+
+pub let char_rlo : Int
+
+pub fn get_base_direction(String) -> Direction
+
+pub fn get_base_direction_full(String) -> Direction
+
+pub fn has_rtl(ArrayView[Level]) -> Bool
+
+pub fn is_rtl(BidiClass) -> Bool
+
+pub let ltr_level : Level
+
+pub let max_explicit_depth : Int
+
+pub let max_implicit_depth : Int
+
+pub fn removed_by_x9(BidiClass) -> Bool
+
+pub let rtl_level : Level
+
+pub let unicode_version : (Int, Int, Int)
+
+pub fn utf8_char_len(Int) -> Int
+
+// Errors
+
+// Types and methods
+pub(all) enum BidiClass {
+  AL
+  AN
+  B
+  BN
+  CS
+  EN
+  ES
+  ET
+  FSI
+  L
+  LRE
+  LRI
+  LRO
+  NSM
+  ON
+  PDF
+  PDI
+  R
+  RLE
+  RLI
+  RLO
+  S
+  WS
+} derive(Eq, Hash, @debug.Debug)
+
+pub struct BidiInfo {
+  text : String
+  utf8 : Utf8Text
+  original_classes : Array[BidiClass]
+  levels : Array[Level]
+  paragraphs : Array[ParagraphInfo]
+}
+pub fn BidiInfo::has_rtl(Self) -> Bool
+pub fn BidiInfo::new(String, Level?) -> Self
+pub fn BidiInfo::reorder_line(Self, ParagraphInfo, Range) -> String
+pub fn BidiInfo::reorder_visual(ArrayView[Level]) -> Array[Int]
+pub fn BidiInfo::reordered_levels(Self, ParagraphInfo, Range) -> Array[Level]
+pub fn BidiInfo::reordered_levels_per_char(Self, ParagraphInfo, Range) -> Array[Level]
+pub fn BidiInfo::visual_runs(Self, ParagraphInfo, Range) -> (Array[Level], Array[Range])
+
+pub(all) struct BidiMatchedOpeningBracket {
+  opening : Int
+  is_open : Bool
+} derive(Eq, @debug.Debug)
+
+pub(all) enum Direction {
+  Ltr
+  Rtl
+  Mixed
+} derive(Eq, @debug.Debug)
+
+pub struct InitialInfo {
+  text : String
+  original_classes : Array[BidiClass]
+  paragraphs : Array[ParagraphInfo]
+}
+pub fn InitialInfo::new(String, Level?) -> Self
+
+pub(all) struct Level(Int) derive(Compare, Eq, Hash, @debug.Debug)
+pub fn Level::bidi_class(Self) -> BidiClass
+pub fn Level::is_ltr(Self) -> Bool
+pub fn Level::is_rtl(Self) -> Bool
+pub fn Level::lower(Self, Int) -> Result[Self, LevelError]
+pub fn Level::ltr() -> Self
+pub fn Level::max_explicit_depth() -> Int
+pub fn Level::max_implicit_depth() -> Int
+pub fn Level::new(Int) -> Result[Self, LevelError]
+pub fn Level::new_explicit(Int) -> Result[Self, LevelError]
+pub fn Level::new_explicit_next_ltr(Self) -> Result[Self, LevelError]
+pub fn Level::new_explicit_next_rtl(Self) -> Result[Self, LevelError]
+pub fn Level::new_lowest_ge_rtl(Self) -> Result[Self, LevelError]
+pub fn Level::number(Self) -> Int
+pub fn Level::raise_level(Self, Int) -> Result[Self, LevelError]
+pub fn Level::raise_level_explicit(Self, Int) -> Result[Self, LevelError]
+pub fn Level::rtl() -> Self
+pub fn Level::vec(Array[Int]) -> Array[Self]
+
+pub(all) enum LevelError {
+  OutOfRangeNumber
+} derive(Eq, @debug.Debug)
+
+pub struct Paragraph {
+  info : BidiInfo
+  para : ParagraphInfo
+}
+pub fn Paragraph::direction(Self) -> Direction
+pub fn Paragraph::level_at(Self, Int) -> Level
+pub fn Paragraph::new(BidiInfo, ParagraphInfo) -> Self
+
+pub(all) struct ParagraphInfo {
+  range : Range
+  level : Level
+} derive(Eq, @debug.Debug)
+pub fn ParagraphInfo::len(Self) -> Int
+
+pub(all) struct Range {
+  start : Int
+  end : Int
+} derive(Compare, Eq, Hash, @debug.Debug)
+pub fn Range::contains(Self, Int) -> Bool
+pub fn Range::is_empty(Self) -> Bool
+pub fn Range::len(Self) -> Int
+
+pub struct Utf8Text {
+  text : String
+  cps : FixedArray[Int]
+}
+pub fn Utf8Text::char_at(Self, Int) -> Int?
+pub fn Utf8Text::char_indices(Self) -> Array[(Int, Int)]
+pub fn Utf8Text::is_char_boundary(Self, Int) -> Bool
+pub fn Utf8Text::len(Self) -> Int
+pub fn Utf8Text::new(String) -> Self
+pub fn Utf8Text::slice(Self, Int, Int) -> String
+
+// Type aliases
+
+// Traits
