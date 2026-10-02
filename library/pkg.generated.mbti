@@ -5962,7 +5962,7 @@ pub impl Default for FrameKind
 
 pub(all) struct FrameParent {
   location : Location
-  inherit : Inherit
+  inherit_ : Inherit
 } derive(Eq, Hash, @debug.Debug)
 pub fn FrameParent::new(Location, Inherit) -> Self
 

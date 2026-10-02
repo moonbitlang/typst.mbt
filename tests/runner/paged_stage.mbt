@@ -57,11 +57,7 @@ fn paged_report(rel : String, tc : TestCase) -> String {
     if text.is_empty() {
       []
     } else {
-      text
-      .trim_end(chars="\n")
-      .split("\n")
-      .map(l => l.to_owned())
-      .collect()
+      text.trim_end(chars="\n").split("\n").map(l => l.to_owned()).collect()
     }
   }
   match warned.output {

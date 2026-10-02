@@ -61,7 +61,11 @@ fn FrameEncoder::diagnostics(
   status : String,
   lines : Array[String],
 ) -> Unit {
-  self.record([json_str("diagnostics"), json_str(status), array(lines.map(json_str))])
+  self.record([
+    json_str("diagnostics"),
+    json_str(status),
+    array(lines.map(json_str)),
+  ])
 }
 
 ///|
@@ -121,7 +125,11 @@ fn FrameEncoder::format_options(
       if field.kind is (Settable | Ghost) {
         let v = format.get(field.id)
         fields.push(
-          array([json_str(field.name), json_str(v.v.repr()), (self.span_enc)(v.span)]),
+          array([
+            json_str(field.name),
+            json_str(v.v.repr()),
+            (self.span_enc)(v.span),
+          ]),
         )
       }
     }
@@ -132,7 +140,10 @@ fn FrameEncoder::format_options(
 
 ///|
 /// The id of some content, emitting its record if it is new.
-fn FrameEncoder::content(self : FrameEncoder, content : @library.Content) -> Int {
+fn FrameEncoder::content(
+  self : FrameEncoder,
+  content : @library.Content,
+) -> Int {
   let encoded = self.dumper.content(content)
   if self.contents.get(encoded) is Some(id) {
     return id
@@ -172,7 +183,11 @@ fn FrameEncoder::frames(
 }
 
 ///|
-fn FrameEncoder::frame(self : FrameEncoder, frame : @library.Frame, r : String) -> Unit {
+fn FrameEncoder::frame(
+  self : FrameEncoder,
+  frame : @library.Frame,
+  r : String,
+) -> Unit {
   let baseline = if frame.has_baseline() {
     abs_enc(frame.baseline())
   } else {
@@ -201,7 +216,9 @@ fn FrameEncoder::item(
   pos : @library.Point,
   item : @library.FrameItem,
 ) -> Unit {
-  let head = (kind : String) => [json_str(kind), json_str(r), i.to_string(), point_enc(pos)]
+  let head = (kind : String) => {
+    [json_str(kind), json_str(r), i.to_string(), point_enc(pos)]
+  }
   let deferred = []
   match item {
     Group(group) => {
@@ -222,7 +239,13 @@ fn FrameEncoder::item(
         None => "null"
       }
       let rec = head("group")
-      rec.append([json_str(child), transform_enc(group.transform), clip, label, parent])
+      rec.append([
+        json_str(child),
+        transform_enc(group.transform),
+        clip,
+        label,
+        parent,
+      ])
       self.record(rec)
       self.frame(group.frame, child)
     }
@@ -291,7 +314,11 @@ fn FrameEncoder::item(
       let dest = match dest {
         Url(url) => array([json_str("url"), json_str(url.0)])
         Position(pos) =>
-          array([json_str("position"), pos.page.0.to_string(), point_enc(pos.point)])
+          array([
+            json_str("position"),
+            pos.page.0.to_string(),
+            point_enc(pos.point),
+          ])
         Location(loc) =>
           array([json_str("location"), self.location(loc).to_string()])
       }
@@ -320,7 +347,10 @@ fn FrameEncoder::item(
 }
 
 ///|
-fn FrameEncoder::glyphs(self : FrameEncoder, text : @library.TextItem) -> String {
+fn FrameEncoder::glyphs(
+  self : FrameEncoder,
+  text : @library.TextItem,
+) -> String {
   array(
     text.glyphs.map(g => {
       array([
@@ -343,10 +373,7 @@ fn FrameEncoder::glyphs(self : FrameEncoder, text : @library.TextItem) -> String
 fn FrameEncoder::font(self : FrameEncoder, font : @library.FontInstance) -> Int {
   let inner = font.font()
   let variations = array(
-    font
-    .variations()
-    .0
-    .map(v => {
+    font.variations().0.map(v => {
       array([json_str(v.0.to_str_lossy()), f32_hex(Float::from_double(v.1.0))])
     }),
   )
