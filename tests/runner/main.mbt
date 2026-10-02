@@ -1,7 +1,7 @@
 // Differential test runner: compares the MoonBit port against reference
 // outputs dumped by the Rust oracle (see `scripts/goldens.sh`).
 //
-// Usage: moon run tests/runner -- <syntax|ast|eval|html|realize> [filter] [--verbose]
+// Usage: moon run tests/runner -- <syntax|ast|eval|html|realize|break> [filter] [--verbose]
 
 ///|
 let suite_dir = ".repos/typst/tests/suite"
@@ -27,6 +27,7 @@ fn main {
       run_stage("html", html_report, filter, verbose, select=tc => {
         tc.attrs.split(" ").any(a => a == "html")
       })
+    "break" => run_break_stage(filter, verbose)
     _ => {
       println("unknown stage: \{stage}")
       @sys.exit(2)
