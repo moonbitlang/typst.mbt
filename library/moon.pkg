@@ -25,4 +25,6 @@ import {
 
 import {
   "moonbitlang/core/double",
+  "moonbitlang/core/env",
+  "moonbitlang/x/fs",
 } for "test"
