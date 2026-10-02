@@ -5,7 +5,7 @@
 //! upstream results so that the MoonBit port can be checked against them
 //! without needing Rust at test time.
 //!
-//! Usage: `typst-oracle <syntax|ast|reparse|eval|html|realize|paged|svg> <suite-dir> <out-dir>`
+//! Usage: `typst-oracle <syntax|ast|reparse|eval|html|bundle|realize|paged|svg> <suite-dir> <out-dir>`
 //! or `typst-oracle fonts <out-file>`.
 
 use std::fmt::Write as _;
@@ -15,6 +15,7 @@ use typst_syntax::{DiagSpanKind, Source, SyntaxDiagnostic};
 
 mod ast_dump;
 mod breaking;
+mod bundle;
 mod collect;
 mod eval;
 mod font;
@@ -64,6 +65,21 @@ fn main() {
             std::env::set_current_dir(&root).unwrap();
             let rel = upstream.strip_prefix(&root).unwrap();
             html::dump_html(rel, &out);
+        }
+        Some("bundle") => {
+            // Paths are resolved relative to the upstream checkout.
+            let suite = PathBuf::from(&args[2]);
+            let out = std::path::absolute(PathBuf::from(&args[3])).unwrap();
+            let upstream = std::path::absolute(&suite).unwrap();
+            let root = upstream.ancestors().nth(2).unwrap().to_path_buf();
+            std::env::set_current_dir(&root).unwrap();
+            let rel = upstream.strip_prefix(&root).unwrap().to_path_buf();
+            std::thread::Builder::new()
+                .stack_size(1 << 30)
+                .spawn(move || bundle::dump_bundle(&rel, &out))
+                .unwrap()
+                .join()
+                .unwrap();
         }
         Some("realize") => {
             // Paths are resolved relative to the upstream checkout.
@@ -175,7 +191,7 @@ fn main() {
         }
         _ => {
             eprintln!(
-                "usage: typst-oracle <syntax|ast|reparse|eval|html|realize|paged|svg|shape|break> <suite-dir> <out-dir>\n       typst-oracle fonts <out-file>"
+                "usage: typst-oracle <syntax|ast|reparse|eval|html|bundle|realize|paged|svg|shape|break> <suite-dir> <out-dir>\n       typst-oracle fonts <out-file>"
             );
             std::process::exit(2);
         }

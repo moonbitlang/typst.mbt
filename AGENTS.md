@@ -85,3 +85,10 @@
   counts; the hash inputs are in `svg/hash.mbt`. `Angle::sin`/`cos` use the
   `libm` crate's algorithms (`library/libm_trig.mbt`), not `@math` (C libm on
   native), for bit-identical geometry.
+- Bundle export (`bundle/`, port of typst-bundle; `BundleFormat`/`AssetElem`
+  and the bundle-only rules live in `library/bundle_format.mbt`) is checked
+  by the `bundle` stage (`scripts/goldens.sh bundle`, oracle/src/bundle.rs):
+  per test the exported file list (path, kind, size, sha256) plus the text of
+  HTML/SVG documents and UTF-8 assets, and the diagnostics. PDF/PNG
+  exporters are plugged in as `BundleOptions.pdf`/`png` hooks; runner flag
+  `--stub-binary` stubs them to check everything but their bytes.

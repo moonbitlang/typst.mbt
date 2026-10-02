@@ -1,0 +1,68 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/bundle"
+
+import {
+  "moonbitlang/core/hashset",
+  "moonbitlang/typst/html",
+  "moonbitlang/typst/layout",
+  "moonbitlang/typst/library",
+  "moonbitlang/typst/svg",
+  "moonbitlang/typst/syntax",
+}
+
+// Values
+pub fn bundle(@library.Engine, @library.Content, @library.StyleChain) -> Bundle raise @library.SourceError
+
+pub fn export_bundle(Bundle, BundleOptions) -> @library.Warned[Result[Map[@syntax.VirtualPath, @library.BytesValue], Array[@library.SourceDiagnostic]]]
+
+// Errors
+
+// Types and methods
+pub struct Bundle {
+  files : Map[@syntax.VirtualPath, BundleFile]
+  bundle_introspector : BundleIntrospector
+  // private fields
+}
+pub impl @library.Output for Bundle
+
+pub(all) enum BundleDocument {
+  Paged(@layout.PagedDocument, PagedExtras)
+  Html(@html.HtmlDocument)
+}
+pub fn BundleDocument::info(Self) -> @library.DocumentInfo
+pub fn BundleDocument::options(Self) -> @library.DocumentFormatOptions
+
+pub(all) enum BundleFile {
+  Document(BundleDocument)
+  Asset(@library.BytesValue)
+}
+
+pub struct BundleIntrospector {
+  // private fields
+}
+pub fn BundleIntrospector::link_targets(Self) -> Map[@syntax.VirtualPath, @hashset.HashSet[@library.Location]]
+pub fn BundleIntrospector::set_anchors(Self, Map[@library.Location, String]) -> Unit
+pub impl Show for BundleIntrospector
+pub impl @library.IntrospectorBackend for BundleIntrospector
+
+pub(all) struct BundleOptions {
+  html : @html.HtmlOptions
+  pdf : ((@layout.PagedDocument, Array[(@library.Location, String)], @library.LateLinkResolver) -> @library.Warned[Result[Bytes, Array[@library.SourceDiagnostic]]])?
+  png : ((@layout.PagedDocument) -> Bytes raise @library.SourceError)?
+  svg : @svg.SvgOptions
+}
+pub impl Default for BundleOptions
+
+pub(all) struct PagedExtras {
+  format : @library.PagedFormat
+  mut anchors : Array[(@library.Location, String)]
+}
+
+// Type aliases
+pub type PdfExport = (@layout.PagedDocument, Array[(@library.Location, String)], @library.LateLinkResolver) -> @library.Warned[Result[Bytes, Array[@library.SourceDiagnostic]]]
+
+pub type PngExport = (@layout.PagedDocument) -> Bytes raise @library.SourceError
+
+pub type VirtualFs = Map[@syntax.VirtualPath, @library.BytesValue]
+
+// Traits

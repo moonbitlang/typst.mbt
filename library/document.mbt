@@ -46,6 +46,47 @@ pub impl FromValue for DocumentFormat with fn from_value(v) {
 }
 
 ///|
+/// The target that a document in this format is compiled for.
+pub fn DocumentFormat::target(self : DocumentFormat) -> Target {
+  match self {
+    Paged(_) => Paged
+    Html => Html
+  }
+}
+
+///|
+/// Tries to determine the document's format based on the format that was
+/// explicitly defined, or else the extension of the document's path.
+pub fn DocumentElem::determine_format(
+  self : DocumentElem,
+  styles : StyleChain,
+) -> DocumentFormat raise HintedError {
+  if self.format(styles) is Custom(format) {
+    return format
+  }
+  match document_format_from_path(self.path().into_inner()) {
+    Some(format) => format
+    None =>
+      bail_hinted("unknown document format", [
+        "try specifying the `format` explicitly",
+      ])
+  }
+}
+
+///|
+/// Derive the document format from the file extension of a path (upstream
+/// `determine_format_from_path` in `model/document.rs`).
+fn document_format_from_path(path : @syntax.VirtualPath) -> DocumentFormat? {
+  match path.extension() {
+    Some("pdf") => Some(Paged(Pdf))
+    Some("svg") => Some(Paged(Svg))
+    Some("png") => Some(Paged(Png))
+    Some("html") => Some(Html)
+    _ => None
+  }
+}
+
+///|
 /// Supported paged export formats for bundle documents.
 pub(all) enum PagedFormat {
   /// High-fidelity document and graphics format, with focus on exact

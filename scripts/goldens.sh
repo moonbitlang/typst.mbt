@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Regenerate reference outputs from upstream Typst (needs Rust).
-# Usage: scripts/goldens.sh [syntax|ast|reparse|eval|html|realize|fonts|font|paged|svg|shape|shape-hb|break ...]
+# Usage: scripts/goldens.sh [syntax|ast|reparse|eval|html|bundle|realize|fonts|font|paged|svg|shape|shape-hb|break ...]
 #
 # `reparse` applies seeded pseudo-random edits to every test body through
 # `Source::edit`/`Source::replace` and dumps the reparsed ranges and trees
@@ -16,6 +16,9 @@
 # The `break` stage additionally dumps the Unicode bidi conformance files
 # (BidiTest.txt, BidiCharacterTest.txt, Unicode 16.0) if BIDI_TEST_DATA
 # names a directory containing them.
+# `bundle` compiles every `bundle` test to a bundle and dumps the exported
+# files (paths, kinds, sizes, sha256, and the text of HTML/SVG/UTF-8 files;
+# see oracle/src/bundle.rs).
 set -euo pipefail
 cd "$(dirname "$0")/.."
 # Build from inside oracle/ so that its rust-toolchain.toml applies.
@@ -23,7 +26,7 @@ cd "$(dirname "$0")/.."
 ORACLE=oracle/target/release/typst-oracle
 SUITE=.repos/typst/tests/suite
 stages=("$@")
-[ ${#stages[@]} -eq 0 ] && stages=(syntax ast reparse eval html realize fonts font paged svg shape shape-hb break)
+[ ${#stages[@]} -eq 0 ] && stages=(syntax ast reparse eval html bundle realize fonts font paged svg shape shape-hb break)
 for stage in "${stages[@]}"; do
   if [ "$stage" = shape-hb ]; then
     # rustybuzz's own shaping tests (needs .repos/rustybuzz, see upstream.sh).
