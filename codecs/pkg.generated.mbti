@@ -42,7 +42,7 @@ pub fn webp_image_info(BytesView) -> ImageInfo raise ImageError
 
 pub fn zlib_compress(BytesView, level? : Int) -> Bytes
 
-pub fn zlib_decompress(BytesView) -> Bytes raise InflateError
+pub fn zlib_decompress(BytesView, verify_checksum? : Bool) -> Bytes raise InflateError
 
 // Errors
 pub(all) suberror ExifError {
