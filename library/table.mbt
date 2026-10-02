@@ -472,3 +472,43 @@ fn table_elem_stroke_default() -> Value {
   let stroke : Stroke?? = Some(Some(Stroke::default()))
   (CelledValue(Sides::splat(stroke)) : Celled[Sides[Stroke??]]).into_value()
 }
+
+///|
+/// `impl Synthesize for Packed<TableElem>`.
+fn table_elem_synthesize(
+  engine : Engine,
+  content : Content,
+  styles : StyleChain,
+) -> Content raise SourceError {
+  let elem = TableElem(content)
+  let grid = table_to_cellgrid(elem, engine, styles)
+  elem.with_grid(grid).pack()
+}
+
+///|
+/// Upstream `Default for Packed<TableCell>`.
+pub impl Default for TableCell with fn default() {
+  // Explicitly set colspan and rowspan to ensure they won't be
+  // overridden by set rules (default cells are created after
+  // colspans and rowspans are processed in the resolver)
+  TableCell::new(Content::empty())
+  .with_colspan(NonZeroUSize(1L))
+  .with_rowspan(NonZeroUSize(1L))
+}
+
+///|
+/// The internal `kind` field of the cell, taking styles into account
+/// (upstream `cell.kind.get(styles)`).
+pub fn TableCell::kind_in_chain(
+  self : TableCell,
+  styles : StyleChain,
+) -> Smart[TableCellKind] {
+  let e = table_cell_elem()
+  kind_from_value(
+    styles.get_value_with_local(
+      e,
+      e.fields()[table_cell_elem_kind],
+      self.0.field_raw(table_cell_elem_kind),
+    ),
+  )
+}

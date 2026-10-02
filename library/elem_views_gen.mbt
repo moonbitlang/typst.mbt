@@ -2410,7 +2410,7 @@ pub fn GridElem::with_children(
 }
 
 ///|
-pub fn GridElem::grid(self : GridElem) -> Value? {
+pub fn GridElem::grid(self : GridElem) -> CellGrid? {
   match self.0.field_raw(grid_elem_grid) {
     Some(v) => Some(view_cast(v, "grid.grid"))
     None => None
@@ -2418,7 +2418,7 @@ pub fn GridElem::grid(self : GridElem) -> Value? {
 }
 
 ///|
-pub fn GridElem::with_grid(self : GridElem, v : Value) -> GridElem {
+pub fn GridElem::with_grid(self : GridElem, v : CellGrid) -> GridElem {
   GridElem(self.0.with_field(grid_elem_grid, IntoValue::into_value(v)))
 }
 
@@ -15974,7 +15974,7 @@ pub fn TableElem::set_summary(v : String?) -> Style {
 }
 
 ///|
-pub fn TableElem::grid(self : TableElem) -> Value? {
+pub fn TableElem::grid(self : TableElem) -> CellGrid? {
   match self.0.field_raw(table_elem_grid) {
     Some(v) => Some(view_cast(v, "table.grid"))
     None => None
@@ -15982,7 +15982,7 @@ pub fn TableElem::grid(self : TableElem) -> Value? {
 }
 
 ///|
-pub fn TableElem::with_grid(self : TableElem, v : Value) -> TableElem {
+pub fn TableElem::with_grid(self : TableElem, v : CellGrid) -> TableElem {
   TableElem(self.0.with_field(table_elem_grid, IntoValue::into_value(v)))
 }
 

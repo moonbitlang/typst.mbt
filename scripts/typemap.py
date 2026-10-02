@@ -120,6 +120,7 @@ TYPEMAP = {
     "TableCell": "TableCell",
     "TableElem": "TableElem",
     "TableHeaderScope": "TableHeaderScope",
+    "Arc<CellGrid>": "CellGrid",
     # text/mod.rs, text/font/, text/lang.rs
     "FontList": "FontList",
     "FontStyle": "FontStyle",

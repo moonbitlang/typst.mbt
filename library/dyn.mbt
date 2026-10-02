@@ -40,6 +40,9 @@ pub(all) enum DynValue {
   /// `typst-html/src/css/encode.rs` (internal: the `css` field of HTML
   /// elements)
   HtmlCss(CssProperties)
+  /// `layout/grid/resolve.rs` (internal: the synthesized `grid` field of
+  /// grids and tables)
+  CellGrid(CellGrid)
 } derive(Eq)
 
 ///|
@@ -63,6 +66,9 @@ pub fn DynValue::ty(self : DynValue) -> Type {
     // Upstream's `css::Properties` has no Typst type; it is only stored in
     // an internal field.
     HtmlCss(_) => Type::dict()
+    // Upstream's `CellGrid` has no Typst type; it is only stored in an
+    // internal field.
+    CellGrid(_) => Type::content()
   }
 }
 
@@ -84,6 +90,7 @@ pub fn DynValue::repr(self : DynValue) -> String {
     StateUpdate(_) => "state.update(..)"
     Tag(tag) => tag.to_string()
     HtmlCss(p) => "css(\{repr_str(p.to_inline())})"
+    CellGrid(_) => "cellgrid(..)"
   }
 }
 

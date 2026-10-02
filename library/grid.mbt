@@ -401,3 +401,111 @@ fn grid_h_line_elem_stroke_default() -> Value {
 fn grid_v_line_elem_stroke_default() -> Value {
   IntoValue::into_value((Some(Stroke::default()) : Stroke?))
 }
+
+///|
+/// Resolve the value based on the cell position (upstream
+/// `Celled::resolve`). `default` is `T::default()`.
+pub fn[T : FromValue] Celled::resolve(
+  self : Celled[T],
+  engine : Engine,
+  styles : StyleChain,
+  x : Int,
+  y : Int,
+  default : T,
+) -> T raise SourceError {
+  match self {
+    CelledValue(value) => value
+    CelledFunc(func) => {
+      let value = func.call_values(engine, Context::new(styles~), [
+        Int(x.to_int64()),
+        Int(y.to_int64()),
+      ])
+      at(func.span(), () => value.cast())
+    }
+    CelledArray(array) =>
+      if array.is_empty() {
+        default
+      } else {
+        array[x % array.length()]
+      }
+  }
+}
+
+///|
+/// The result of resolving a `Celled`'s value according to styles.
+/// Holds resolved values which depend on each grid cell's position.
+/// When it is a closure, however, it is only resolved when the closure is
+/// called.
+///
+/// Upstream this is generic over `T: Resolve`; it is only ever used with the
+/// grid stroke (`Sides<Option<Option<Arc<Stroke>>>>`), so it is specialized
+/// here.
+pub struct ResolvedCelled(Celled[Sides[ResolvedStroke??]])
+
+///|
+/// Upstream `Resolve for Celled<T>`.
+pub fn ResolvedCelled::resolve_from(
+  celled : Celled[Sides[Stroke??]],
+  styles : StyleChain,
+) -> ResolvedCelled {
+  match celled {
+    CelledValue(value) =>
+      ResolvedCelled(CelledValue(resolve_sides_stroke(value, styles)))
+    CelledFunc(func) => ResolvedCelled(CelledFunc(func))
+    CelledArray(values) =>
+      ResolvedCelled(
+        CelledArray(values.map(v => resolve_sides_stroke(v, styles))),
+      )
+  }
+}
+
+///|
+/// Resolve the value based on the cell position.
+pub fn ResolvedCelled::resolve(
+  self : ResolvedCelled,
+  engine : Engine,
+  styles : StyleChain,
+  x : Int,
+  y : Int,
+) -> Sides[ResolvedStroke??] raise SourceError {
+  match self.0 {
+    CelledValue(value) => value
+    CelledFunc(func) => {
+      let value = func.call_values(engine, Context::new(styles~), [
+        Int(x.to_int64()),
+        Int(y.to_int64()),
+      ])
+      let sides : Sides[Stroke??] = at(func.span(), () => value.cast())
+      resolve_sides_stroke(sides, styles)
+    }
+    CelledArray(array) =>
+      if array.is_empty() {
+        Sides::splat(None)
+      } else {
+        array[x % array.length()]
+      }
+  }
+}
+
+///|
+/// `impl Synthesize for Packed<GridElem>`.
+fn grid_elem_synthesize(
+  engine : Engine,
+  content : Content,
+  styles : StyleChain,
+) -> Content raise SourceError {
+  let elem = GridElem(content)
+  let grid = grid_to_cellgrid(elem, engine, styles)
+  elem.with_grid(grid).pack()
+}
+
+///|
+/// Upstream `Default for Packed<GridCell>`.
+pub impl Default for GridCell with fn default() {
+  // Explicitly set colspan and rowspan to ensure they won't be
+  // overridden by set rules (default cells are created after
+  // colspans and rowspans are processed in the resolver)
+  GridCell::new(Content::empty())
+  .with_colspan(NonZeroUSize(1L))
+  .with_rowspan(NonZeroUSize(1L))
+}

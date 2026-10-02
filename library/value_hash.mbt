@@ -511,6 +511,10 @@ pub impl Fingerprint for DynValue with fn fingerprint(self, state) {
       state.write_discriminant(3)
       state.write(v)
     }
+    CellGrid(v) => {
+      state.write_discriminant(4)
+      state.write(v)
+    }
     Regex(v) => state.write_str(v.as_str())
     Alignment(v) => state.write_leaf(v.repr(), v)
     Dir(v) => state.write_leaf(v.repr(), v)

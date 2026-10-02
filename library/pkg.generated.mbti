@@ -1145,6 +1145,8 @@ pub let grid_header_elem_level : Int
 
 pub let grid_header_elem_repeat : Int
 
+pub fn grid_to_cellgrid(GridElem, Engine, StyleChain) -> CellGrid raise SourceError
+
 pub fn grid_v_line_elem() -> Element
 
 pub let grid_v_line_elem_end : Int
@@ -2435,6 +2437,8 @@ pub fn repr_rooted_path(@syntax.RootedPath) -> String
 
 pub fn repr_str(String) -> String
 
+pub fn[T : ResolvableCell] resolve_cellgrid(Axes[Array[Sizing]], Axes[Array[Sizing]], Array[ResolvableGridChild[T]], Celled[Paint?], Celled[Smart[Alignment]], Celled[Sides[Rel[Length]?]], ResolvedCelled, Engine, StyleChain, @syntax.Span) -> CellGrid raise SourceError
+
 pub fn resolve_color_space(Smart[ColorSpace], Array[Color]) -> ColorSpace
 
 pub fn resolve_equation(EquationElem, Engine, Locator, StyleChain) -> MathItem raise SourceError
@@ -2724,6 +2728,8 @@ pub let table_header_elem_children : Int
 pub let table_header_elem_level : Int
 
 pub let table_header_elem_repeat : Int
+
+pub fn table_to_cellgrid(TableElem, Engine, StyleChain) -> CellGrid raise SourceError
 
 pub fn table_v_line_elem() -> Element
 
@@ -4093,11 +4099,50 @@ pub(all) enum Category {
   Bundle
 } derive(Eq, Hash, @debug.Debug)
 
+pub(all) struct Cell {
+  body : Content
+  fill : Paint?
+  colspan : Int
+  rowspan : Int
+  stroke : Sides[ResolvedStroke?]
+  stroke_overridden : Sides[Bool]
+  breakable : Bool
+} derive(Eq)
+pub fn Cell::new(Content) -> Self
+
+pub(all) struct CellGrid {
+  entries : Array[Entry]
+  cols : Array[Sizing]
+  rows : Array[Sizing]
+  vlines : Array[Array[Line]]
+  hlines : Array[Array[Line]]
+  headers : Array[Repeatable[Header]]
+  footer : Repeatable[Footer]?
+  has_gutter : Bool
+} derive(Eq)
+pub fn CellGrid::cell(Self, Int, Int) -> Cell?
+pub fn CellGrid::effective_colspan_of_cell(Self, Cell) -> Int
+pub fn CellGrid::effective_parent_cell_position(Self, Int, Int) -> Axes[Int]?
+pub fn CellGrid::effective_rowspan_of_cell(Self, Cell) -> Int
+pub fn CellGrid::entry(Self, Int, Int) -> Entry?
+pub fn CellGrid::has_repeated_headers(Self) -> Bool
+pub fn CellGrid::is_gutter_track(Self, Int) -> Bool
+pub fn CellGrid::new(Axes[Array[Sizing]], Axes[Array[Sizing]], Array[Cell]) -> Self
+pub fn CellGrid::new_internal(Axes[Array[Sizing]], Axes[Array[Sizing]], Array[Array[Line]], Array[Array[Line]], Array[Repeatable[Header]], Repeatable[Footer]?, Array[Entry]) -> Self
+pub fn CellGrid::non_gutter_column_count(Self) -> Int
+pub fn CellGrid::non_gutter_row_count(Self) -> Int
+pub fn CellGrid::parent_cell_position(Self, Int, Int) -> Axes[Int]?
+pub impl Fingerprint for CellGrid
+pub impl FromValue for CellGrid
+pub impl IntoValue for CellGrid
+pub impl Reflect for CellGrid
+
 pub(all) enum Celled[T] {
   CelledValue(T)
   CelledFunc(Func)
   CelledArray(Array[T])
 } derive(Eq)
+pub fn[T : FromValue] Celled::resolve(Self[T], Engine, StyleChain, Int, Int, T) -> T raise SourceError
 pub impl[T : Default] Default for Celled[T]
 pub impl[T : Fold] Fold for Celled[T]
 pub impl[T : FromValue] FromValue for Celled[T]
@@ -5044,6 +5089,7 @@ pub(all) enum DynValue {
   StateUpdate(StateUpdate)
   Tag(Tag)
   HtmlCss(CssProperties)
+  CellGrid(CellGrid)
 } derive(Eq)
 pub fn DynValue::add_dyn(Self, Self) -> Value? raise HintedError
 pub fn DynValue::field(Self, String) -> Value??
@@ -5250,6 +5296,12 @@ pub fn[T] Engine::delay(Self, () -> T raise SourceError, T) -> T
 pub fn[T : Fingerprint] Engine::introspect(Self, Introspect[T]) -> T
 pub fn Engine::routines(Self) -> Routines
 pub fn Engine::with_route(Self, Route) -> Self
+
+pub(all) enum Entry {
+  Cell(Cell)
+  Merged(Int)
+} derive(Eq)
+pub fn Entry::as_cell(Self) -> Cell?
 
 pub struct EnumElem(Content)
 pub fn EnumElem::body_indent(Self, StyleChain) -> Length
@@ -5652,6 +5704,13 @@ pub impl FromValue for FontWeight
 pub impl IntoValue for FontWeight
 pub impl Reflect for FontWeight
 
+pub(all) struct Footer {
+  mut start : Int
+  mut end : Int
+  level : Int
+} derive(Eq)
+pub fn Footer::range(Self) -> RowRange
+
 pub(all) enum FootnoteBody {
   Content(Content)
   Reference(Label)
@@ -5950,10 +6009,12 @@ pub fn GridCell::x_local(Self) -> Smart[USize]?
 pub fn GridCell::y(Self, StyleChain) -> Smart[USize]
 pub fn GridCell::y_in(StyleChain) -> Smart[USize]
 pub fn GridCell::y_local(Self) -> Smart[USize]?
+pub impl Default for GridCell
 pub impl FromValue for GridCell
 pub impl IntoValue for GridCell
 pub impl NativeElement for GridCell
 pub impl Reflect for GridCell
+pub impl ResolvableCell for GridCell
 
 pub(all) enum GridChild {
   Header(Content)
@@ -5979,7 +6040,7 @@ pub fn GridElem::columns_local(Self) -> TrackSizings?
 pub fn GridElem::fill(Self, StyleChain) -> Celled[Paint?]
 pub fn GridElem::fill_in(StyleChain) -> Celled[Paint?]
 pub fn GridElem::fill_local(Self) -> Celled[Paint?]?
-pub fn GridElem::grid(Self) -> Value?
+pub fn GridElem::grid(Self) -> CellGrid?
 pub fn GridElem::inset(Self, StyleChain) -> Celled[Sides[Rel[Length]?]]
 pub fn GridElem::inset_in(StyleChain) -> Celled[Sides[Rel[Length]?]]
 pub fn GridElem::inset_local(Self) -> Celled[Sides[Rel[Length]?]]?
@@ -6008,7 +6069,7 @@ pub fn GridElem::with_children(Self, Array[GridChild]) -> Self
 pub fn GridElem::with_column_gutter(Self, TrackSizings) -> Self
 pub fn GridElem::with_columns(Self, TrackSizings) -> Self
 pub fn GridElem::with_fill(Self, Celled[Paint?]) -> Self
-pub fn GridElem::with_grid(Self, Value) -> Self
+pub fn GridElem::with_grid(Self, CellGrid) -> Self
 pub fn GridElem::with_inset(Self, Celled[Sides[Rel[Length]?]]) -> Self
 pub fn GridElem::with_row_gutter(Self, TrackSizings) -> Self
 pub fn GridElem::with_rows(Self, TrackSizings) -> Self
@@ -6152,6 +6213,12 @@ pub fn HElem::weak_local(Self) -> Bool?
 pub fn HElem::with_amount(Self, Spacing) -> Self
 pub fn HElem::with_weak(Self, Bool) -> Self
 pub impl NativeElement for HElem
+
+pub(all) struct Header {
+  mut range : RowRange
+  level : NonZeroU32
+  mut short_lived : Bool
+} derive(Eq)
 
 pub struct HeadingElem(Content)
 pub fn HeadingElem::body(Self) -> Content
@@ -6688,6 +6755,14 @@ pub fn LimitsElem::with_body(Self, Content) -> Self
 pub fn LimitsElem::with_inline(Self, Bool) -> Self
 pub impl NativeElement for LimitsElem
 
+pub(all) struct Line {
+  mut index : Int
+  start : Int
+  end : Int?
+  stroke : ResolvedStroke?
+  position : LinePosition
+} derive(Eq)
+
 pub(all) enum LineCap {
   Butt
   Round
@@ -6762,6 +6837,11 @@ pub(all) enum LineNumberingScope {
 pub impl FromValue for LineNumberingScope
 pub impl IntoValue for LineNumberingScope
 pub impl Reflect for LineNumberingScope
+
+pub(all) enum LinePosition {
+  Before
+  After
+} derive(Eq, Hash, @debug.Debug)
 
 pub(all) struct LinearGradient {
   stops : Array[(Color, Ratio)]
@@ -8713,6 +8793,12 @@ pub fn RepeatElem::with_gap(Self, Length) -> Self
 pub fn RepeatElem::with_justify(Self, Bool) -> Self
 pub impl NativeElement for RepeatElem
 
+pub(all) struct Repeatable[T] {
+  inner : T
+  repeated : Bool
+} derive(Eq)
+pub fn[T] Repeatable::as_repeated(Self[T]) -> T?
+
 pub(all) enum Replacement {
   Str(String)
   Func(Func)
@@ -8734,11 +8820,36 @@ pub(all) enum RepresentationError {
   TooLarge
 } derive(Eq, @debug.Debug)
 
+pub(all) enum ResolvableGridChild[T] {
+  Header(repeat~ : Bool, level~ : NonZeroU32, span~ : @syntax.Span, items~ : Array[ResolvableGridItem[T]])
+  Footer(repeat~ : Bool, span~ : @syntax.Span, items~ : Array[ResolvableGridItem[T]])
+  Item(ResolvableGridItem[T])
+}
+
+pub(all) enum ResolvableGridItem[T] {
+  HLine(ResolvableLine)
+  VLine(ResolvableLine)
+  Cell(T)
+}
+
+pub(all) struct ResolvableLine {
+  index : Smart[Int]
+  start : Int
+  end : Int?
+  stroke : ResolvedStroke?
+  span : @syntax.Span
+  position : LinePosition
+}
+
 pub(all) struct ResolvedAugment {
   hline : AugmentOffsets
   vline : AugmentOffsets
   stroke : Smart[ResolvedStroke]
 } derive(Eq)
+
+pub struct ResolvedCelled(Celled[Sides[ResolvedStroke??]])
+pub fn ResolvedCelled::resolve(Self, Engine, StyleChain, Int, Int) -> Sides[ResolvedStroke??] raise SourceError
+pub fn ResolvedCelled::resolve_from(Celled[Sides[Stroke??]], StyleChain) -> Self
 
 pub(all) enum ResolvedDashLength {
   LineWidth
@@ -8765,8 +8876,10 @@ pub(all) struct ResolvedStroke {
   dash : Smart[ResolvedDashPattern?]
   miter_limit : Smart[Ratio]
 } derive(Eq)
+pub fn ResolvedStroke::to_length_stroke(Self) -> Stroke
 pub fn ResolvedStroke::unwrap_or(Self, FixedStroke) -> FixedStroke
 pub fn ResolvedStroke::unwrap_or_default(Self) -> FixedStroke
+pub impl Fold for ResolvedStroke
 
 pub(all) struct Rgb {
   red : Float
@@ -8848,6 +8961,12 @@ pub(all) struct Routines {
   html_span_filled : (Content, Color) -> Content
 }
 pub fn Routines::new(eval_string~ : (Engine, Context, String, @syntax.Span, @syntax.SyntaxMode, Scope) -> Value raise SourceError, eval_closure~ : (Func, Closure, Engine, Context, Args) -> Value raise SourceError, rules? : () -> NativeRuleMap, realize? : (RealizationKind, Engine, SplitLocator, Content, StyleChain) -> Array[(Content, StyleChain)] raise SourceError, layout_frame? : (Engine, Content, Locator, StyleChain, LayoutRegion) -> Frame raise SourceError, html_mathml_body? : (Content, StyleChain) -> Content??, html_span_filled? : (Content, Color) -> Content) -> Self
+
+pub(all) struct RowRange {
+  start : Int
+  end : Int
+} derive(Eq, Hash, @debug.Debug)
+pub fn RowRange::contains(Self, Int) -> Bool
 
 pub(all) enum RowType {
   RowArray
@@ -9768,6 +9887,7 @@ pub fn TableCell::is_repeated_in(StyleChain) -> Bool
 pub fn TableCell::is_repeated_local(Self) -> Bool?
 pub fn TableCell::kind(Self) -> Smart[TableCellKind]?
 pub fn TableCell::kind_in(StyleChain) -> Value
+pub fn TableCell::kind_in_chain(Self, StyleChain) -> Smart[TableCellKind]
 pub fn TableCell::kind_local(Self) -> Value?
 pub fn TableCell::new(Content) -> Self
 pub fn TableCell::of(Content) -> Self?
@@ -9807,10 +9927,12 @@ pub fn TableCell::x_local(Self) -> Smart[USize]?
 pub fn TableCell::y(Self, StyleChain) -> Smart[USize]
 pub fn TableCell::y_in(StyleChain) -> Smart[USize]
 pub fn TableCell::y_local(Self) -> Smart[USize]?
+pub impl Default for TableCell
 pub impl FromValue for TableCell
 pub impl IntoValue for TableCell
 pub impl NativeElement for TableCell
 pub impl Reflect for TableCell
+pub impl ResolvableCell for TableCell
 
 pub(all) enum TableCellKind {
   Header(NonZeroU32, TableHeaderScope)
@@ -9843,7 +9965,7 @@ pub fn TableElem::columns_local(Self) -> TrackSizings?
 pub fn TableElem::fill(Self, StyleChain) -> Celled[Paint?]
 pub fn TableElem::fill_in(StyleChain) -> Celled[Paint?]
 pub fn TableElem::fill_local(Self) -> Celled[Paint?]?
-pub fn TableElem::grid(Self) -> Value?
+pub fn TableElem::grid(Self) -> CellGrid?
 pub fn TableElem::inset(Self, StyleChain) -> Celled[Sides[Rel[Length]?]]
 pub fn TableElem::inset_in(StyleChain) -> Celled[Sides[Rel[Length]?]]
 pub fn TableElem::inset_local(Self) -> Celled[Sides[Rel[Length]?]]?
@@ -9876,7 +9998,7 @@ pub fn TableElem::with_children(Self, Array[TableChild]) -> Self
 pub fn TableElem::with_column_gutter(Self, TrackSizings) -> Self
 pub fn TableElem::with_columns(Self, TrackSizings) -> Self
 pub fn TableElem::with_fill(Self, Celled[Paint?]) -> Self
-pub fn TableElem::with_grid(Self, Value) -> Self
+pub fn TableElem::with_grid(Self, CellGrid) -> Self
 pub fn TableElem::with_inset(Self, Celled[Sides[Rel[Length]?]]) -> Self
 pub fn TableElem::with_row_gutter(Self, TrackSizings) -> Self
 pub fn TableElem::with_rows(Self, TrackSizings) -> Self
@@ -10852,6 +10974,16 @@ pub impl Reflect for @syntax.SyntaxMode
 pub impl Reflect for @time.Month
 pub impl Reflect for @unicode.MathClass
 pub impl[A : Reflect, B : Reflect] Reflect for (A, B)
+
+pub(open) trait ResolvableCell {
+  fn resolve_cell(Self, Int, Int, Paint?, Smart[Alignment], Sides[Rel[Length]?], Sides[ResolvedStroke??], Bool, StyleChain, Smart[TableCellKind]) -> Cell
+  fn cell_x(Self, StyleChain) -> Smart[Int]
+  fn cell_y(Self, StyleChain) -> Smart[Int]
+  fn cell_colspan(Self, StyleChain) -> Int
+  fn cell_rowspan(Self, StyleChain) -> Int
+  fn cell_span(Self) -> @syntax.Span
+  fn default_cell() -> Self
+}
 
 pub(open) trait ToCss {
   fn emit(Self, CssWriter) -> Unit
