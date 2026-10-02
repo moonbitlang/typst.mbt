@@ -444,6 +444,35 @@ pub struct RawSyntax {
 let raw_syntax_cache : Array[(Bytes, RawSyntax)] = []
 
 ///|
+/// Records the derived data of a source, replacing an earlier entry for an
+/// equal source (the most recently parsed one wins when a relative path is
+/// used from different files).
+fn[S : Eq, D] record_derived(
+  table : Array[(S, D)],
+  source : S,
+  derived : D,
+) -> Unit {
+  for i, entry in table {
+    if entry.0 == source {
+      table.remove(i) |> ignore
+      break
+    }
+  }
+  table.push((source, derived))
+}
+
+///|
+/// Looks up the derived data of a source.
+fn[S : Eq, D] lookup_derived(table : Array[(S, D)], source : S) -> D? {
+  for entry in table {
+    if entry.0 == source {
+      return Some(entry.1)
+    }
+  }
+  None
+}
+
+///|
 /// The derived syntaxes of data sources, recorded when the `syntaxes` field
 /// is parsed (upstream stores them in the field as a `Derived`).
 let raw_syntaxes_derived : Array[(Array[DataSource], Array[RawSyntax])] = []
@@ -456,7 +485,7 @@ fn RawSyntax::load(
 ) -> Array[RawSyntax] raise SourceError {
   let loaded = load_many({ v: sources.v.0, span: sources.span, }, world)
   let list = loaded.map(data => within(data, () => RawSyntax::decode(data.data)))
-  raw_syntaxes_derived.push((sources.v.0, list))
+  record_derived(raw_syntaxes_derived, sources.v.0, list)
   list
 }
 
@@ -496,8 +525,8 @@ fn RawSyntax::find(
   let derived = if sources.is_empty() {
     []
   } else {
-    match raw_syntaxes_derived.iter().find_first(e => e.0 == sources) {
-      Some(e) => e.1
+    match lookup_derived(raw_syntaxes_derived, sources) {
+      Some(derived) => derived
       None =>
         RawSyntax::load(engine.world, {
           v: OneOrMultiple(sources),
@@ -561,7 +590,7 @@ fn RawTheme::load(
 ) -> RawTheme raise SourceError {
   let loaded = source.v.load(source.span, world)
   let theme = within(loaded, () => RawTheme::decode(loaded.data))
-  raw_theme_derived.push((source.v, theme))
+  record_derived(raw_theme_derived, source.v, theme)
   theme
 }
 
@@ -587,8 +616,8 @@ fn RawTheme::derived(
   source : DataSource,
   span : @syntax.Span,
 ) -> RawTheme? {
-  match raw_theme_derived.iter().find_first(e => e.0 == source) {
-    Some(e) => Some(e.1)
+  match lookup_derived(raw_theme_derived, source) {
+    Some(theme) => Some(theme)
     None =>
       try RawTheme::load(engine.world, { v: source, span, }) catch {
         _ => None

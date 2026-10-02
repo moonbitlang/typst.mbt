@@ -615,6 +615,160 @@ fn gen_loading(root: &PathBuf, assets: &std::path::Path) {
     std::fs::write(root.join("syntect/two_face/loading_gen_wbtest.mbt"), out).unwrap();
 }
 
+/// Extracts the string literals of each `#[test]` function of a Rust file.
+fn test_literals(src: &str) -> Vec<Vec<String>> {
+    let start = src.find("#[cfg(test)]").unwrap_or(0);
+    let src = &src[start..];
+    let mut out = Vec::new();
+    for body in src.split("#[test]").skip(1) {
+        let b = body.as_bytes();
+        let mut lits = Vec::new();
+        let mut i = 0;
+        while i < b.len() {
+            if b[i] == b'/' && b.get(i + 1) == Some(&b'/') {
+                while i < b.len() && b[i] != b'\n' {
+                    i += 1;
+                }
+                continue;
+            }
+            if b[i] == b'\'' {
+                // A char literal or a lifetime: skip `'x'` / `'\x'`.
+                if b.get(i + 2) == Some(&b'\'') {
+                    i += 3;
+                    continue;
+                }
+                if b.get(i + 1) == Some(&b'\\') {
+                    let mut j = i + 2;
+                    while j < b.len() && b[j] != b'\'' {
+                        j += 1;
+                    }
+                    i = j + 1;
+                    continue;
+                }
+                i += 1;
+                continue;
+            }
+            if b[i] == b'r' && (b.get(i + 1) == Some(&b'#') || b.get(i + 1) == Some(&b'"')) {
+                let mut j = i + 1;
+                let mut hashes = 0;
+                while b.get(j) == Some(&b'#') {
+                    hashes += 1;
+                    j += 1;
+                }
+                if b.get(j) != Some(&b'"') {
+                    i += 1;
+                    continue;
+                }
+                let close = format!("\"{}", "#".repeat(hashes));
+                let content_start = j + 1;
+                let end = body[content_start..].find(&close).unwrap() + content_start;
+                lits.push(body[content_start..end].to_string());
+                i = end + close.len();
+                continue;
+            }
+            if b[i] == b'"' {
+                let mut s = String::new();
+                let mut j = i + 1;
+                let chars: Vec<char> = body[j..].chars().collect();
+                let mut k = 0;
+                while k < chars.len() && chars[k] != '"' {
+                    if chars[k] == '\\' {
+                        k += 1;
+                        match chars[k] {
+                            'n' => s.push('\n'),
+                            't' => s.push('\t'),
+                            'r' => s.push('\r'),
+                            '0' => s.push('\0'),
+                            '\\' => s.push('\\'),
+                            '"' => s.push('"'),
+                            '\'' => s.push('\''),
+                            'u' => {
+                                let close = chars[k..].iter().position(|&c| c == '}').unwrap();
+                                let hex: String = chars[k + 2..k + close].iter().collect();
+                                s.push(char::from_u32(u32::from_str_radix(&hex, 16).unwrap()).unwrap());
+                                k += close;
+                            }
+                            '\n' => {
+                                while k + 1 < chars.len() && chars[k + 1].is_whitespace() {
+                                    k += 1;
+                                }
+                            }
+                            c => panic!("unknown escape {c}"),
+                        }
+                    } else {
+                        s.push(chars[k]);
+                    }
+                    k += 1;
+                }
+                j += chars[..k].iter().map(|c| c.len_utf8()).sum::<usize>();
+                lits.push(s);
+                i = j + 1;
+                continue;
+            }
+            i += 1;
+        }
+        out.push(lits);
+    }
+    out
+}
+
+/// Runs the inline syntaxes of syntect's own parser and YAML loading tests
+/// over the other string literals of each test.
+fn gen_parser_tests(root: &PathBuf) {
+    use syntect::parsing::{ParseState, SyntaxDefinition, SyntaxSetBuilder};
+    let registry = PathBuf::from(std::env::var("HOME").unwrap())
+        .join(".cargo/registry/src/index.crates.io-1949cf8c6b5b557f/syntect-5.3.0/src/parsing");
+    let mut cases: Vec<(String, Vec<String>)> = Vec::new();
+    for file in ["parser.rs", "yaml_load.rs"] {
+        let src = std::fs::read_to_string(registry.join(file)).unwrap();
+        for lits in test_literals(&src) {
+            let (syntaxes, lines): (Vec<String>, Vec<String>) =
+                lits.into_iter().partition(|l| l.contains("contexts:"));
+            let lines: Vec<String> = lines.into_iter().filter(|l| l.len() < 200).collect();
+            for syntax in syntaxes {
+                cases.push((syntax, lines.clone()));
+            }
+        }
+    }
+    let mut out = String::new();
+    out.push_str(
+        "// Generated by `oracle/src/bin/gen_syntect.rs parser`: the inline\n\
+         // syntaxes of syntect 5.3.0's parser and YAML loading tests, run over the\n\
+         // other string literals of each test. Do not edit by hand!\n\n",
+    );
+    out.push_str("///|\nlet parser_cases : Array[(String, Array[String], String)] = [\n");
+    for (syntax, lines) in &cases {
+        let mut expected = String::new();
+        for newlines in [false, true] {
+            match SyntaxDefinition::load_from_str(syntax, newlines, None) {
+                Err(e) => writeln!(expected, "error {e}").unwrap(),
+                Ok(def) => {
+                    let mut builder = SyntaxSetBuilder::new();
+                    builder.add(def);
+                    let set = builder.build();
+                    let mut state = ParseState::new(&set.syntaxes()[0]);
+                    for line in lines {
+                        let line = if newlines { format!("{line}\n") } else { line.clone() };
+                        match state.parse_line(&line, &set) {
+                            Ok(ops) => {
+                                let ops: Vec<String> =
+                                    ops.iter().map(|(i, op)| format!("{i}:{op:?}")).collect();
+                                writeln!(expected, "ops {}", ops.join(" ")).unwrap();
+                            }
+                            Err(e) => writeln!(expected, "error {e}").unwrap(),
+                        }
+                    }
+                }
+            }
+        }
+        let lines_lit: Vec<String> = lines.iter().map(|l| lit(l)).collect();
+        writeln!(out, "  ({}, [{}], {}),", lit(syntax), lines_lit.join(", "), lit(&expected))
+            .unwrap();
+    }
+    out.push_str("]\n");
+    std::fs::write(root.join("syntect/parser_gen_wbtest.mbt"), out).unwrap();
+}
+
 fn main() {
     let mut args = std::env::args().skip(1);
     let mode = args.next().expect("mode");
@@ -622,6 +776,7 @@ fn main() {
     match mode.as_str() {
         "data" => gen_data(&root),
         "tests" => gen_tests(&root),
+        "parser" => gen_parser_tests(&root),
         "loading" => {
             let assets = PathBuf::from(args.next().expect("typst-dev-assets files dir"));
             gen_loading(&root, &assets)
