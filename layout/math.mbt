@@ -530,7 +530,7 @@ fn layout_math_box(
   styles : @library.StyleChain,
   props : @library.MathProperties,
 ) -> Unit raise @library.SourceError {
-  let frame = bridge_layout_box(
+  let frame = layout_box(
     item.elem,
     ctx.engine,
     item.locator.relayout(),
@@ -596,7 +596,7 @@ fn get_font(
   styles : @library.StyleChain,
   span : @syntax.Span,
 ) -> @library.FontInstance raise @library.SourceError {
-  let variant = bridge_variant(styles)
+  let variant = @library.variant(styles)
   let size = @library.TextElem::size_in(styles).resolve(styles)
   let variations = @library.TextElem::variations_in(styles)
   for family in math_families(styles) {

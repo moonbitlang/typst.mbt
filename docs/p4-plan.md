@@ -374,6 +374,36 @@ Hang, Arab, Hebr, Deva, Cyrl, Grek, Thai, Ethi, Zzzz; all 49 fonts used),
 `shape-hb` 2250/2250, plus the rustybuzz unit tests for feature parsing and
 tags (`moon test shape`).
 
+## Status: work unit F (inline layout)
+
+**Layout package** (files named after `typst-layout/src/inline`):
+`inline.mbt` (mod.rs: `layout_par`, `layout_inline`, `ParSituation`,
+configuration), `inline_collect.mbt`, `inline_prepare.mbt`,
+`inline_shaping.mbt`, `inline_linebreak.mbt` (simple + Knuth-Plass; break
+opportunities come from the `linebreak` package), `inline_line.mbt`,
+`inline_deco.mbt` (with the kurbo segment/line intersection it needs),
+`inline_finalize.mbt`, `inline_box.mbt` (`layout_box`). The paragraph text
+is stored once as a UTF-8 indexed `Utf8Str` (`inline_text.mbt`); substrings
+are `Utf8Slice`s. Inline-private types that clash with flow's names are
+prefixed (`InlineItem`, `InlineConfig`, `InlineCollector`,
+`collect_inline`). `Glyphs` keeps upstream's `Cow` semantics (shared until
+`to_mut`). `libm_native.mbt` binds the C libm (`cbrt`, `atan2`, `sin`,
+`cos`) like `svg/` for kurbo's `solve_cubic`.
+
+**Shared with math:** `rusty(font)` (cached `@shape.Face` per
+`FontInstance`, upstream `FontInstance::rusty`), `create_shape_plan`
+(memoized per font/direction/script/language/features), `features`,
+`language`, `SharedShapingContext`, `get_font_and_covers` (families are a
+`FamilyIter`), `layout_box`, `layout_inline`. Library: `families`,
+`variant`, `FontFamily::covers`/`Covers::as_regex`,
+`ScriptKind::{default_metrics, read_metrics, feature}`,
+`JustificationLimits::{spacing_limits, tracking_limits}`.
+
+**Result:** `paged` 338 -> 1683/2299, `svg` 384 -> 1709. Every remaining
+paged failure outside math (452), raw highlighting (~85: highlighted
+bodies and raw text spans), bibliography/citations (~50) and PDF/SVG image
+loading is a single grid/table stroke span (`table-tags-unstable-functions`).
+
 ## Status: work unit I (math layout)
 
 **Layout package**, one file per upstream module of

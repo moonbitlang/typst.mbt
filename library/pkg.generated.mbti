@@ -942,6 +942,8 @@ pub let equation_elem_variant : Int
 
 pub fn exp10(Int) -> Double
 
+pub fn families(StyleChain) -> Array[FontFamily]
+
 pub fn[T : FromValue + IntoValue] field_of(Ty[T], id~ : Int, name~ : String, docs? : String, kind~ : FieldKind, positional? : Bool, required? : Bool, variadic? : Bool, internal? : Bool, default? : () -> Value, fold? : (Value, Value) -> Value, parse? : (Engine, Args, ParseLocals) -> Value? raise SourceError, output? : (Value) -> Value) -> FieldInfo
 
 pub fn fields_field(Value, String) -> Value raise HintedError
@@ -3240,6 +3242,8 @@ pub let v_elem_weak : Int
 
 pub fn validate_utf8(BytesView) -> Utf8Error?
 
+pub fn variant(StyleChain) -> FontVariant
+
 pub fn vec_elem() -> Element
 
 pub let vec_elem_align : Int
@@ -4698,6 +4702,7 @@ pub(all) enum Covers {
   LatinInCjk
   Regex(Regex)
 } derive(Eq, Hash)
+pub fn Covers::as_regex(Self) -> Regex
 pub impl FromValue for Covers
 pub impl IntoValue for Covers
 pub impl Reflect for Covers
@@ -5874,6 +5879,7 @@ pub(all) struct FontFamily {
   covers : Covers?
 } derive(Eq, Hash)
 pub fn FontFamily::as_str(Self) -> String
+pub fn FontFamily::covers(Self) -> Regex?
 pub fn FontFamily::new(String) -> Self
 pub fn FontFamily::with_coverage(String, Covers?) -> Self
 pub impl FromValue for FontFamily
@@ -7105,6 +7111,8 @@ pub(all) struct JustificationLimits {
   spacing : Limits[Rel[Length]]?
   tracking : Limits[Length]?
 } derive(Eq, Hash)
+pub fn JustificationLimits::spacing_limits(Self) -> Limits[Rel[Length]]
+pub fn JustificationLimits::tracking_limits(Self) -> Limits[Length]
 pub impl Default for JustificationLimits
 pub impl Fold for JustificationLimits
 pub impl FromValue for JustificationLimits
@@ -9749,6 +9757,9 @@ pub(all) enum ScriptKind {
   Sub
   Super
 } derive(Eq, Hash, @debug.Debug)
+pub fn ScriptKind::default_metrics(Self) -> ScriptMetrics
+pub fn ScriptKind::feature(Self) -> String
+pub fn ScriptKind::read_metrics(Self, FontMetrics) -> ScriptMetrics
 
 pub(all) struct ScriptMetrics {
   width : Em

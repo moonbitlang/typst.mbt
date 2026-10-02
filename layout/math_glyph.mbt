@@ -36,7 +36,7 @@ fn GlyphFragment::synthetic(
   GlyphFragment::base(
     engine.world,
     styles,
-    bridge_features(styles),
+    features(styles),
     c.to_string(),
     class,
     math_size,
@@ -98,7 +98,7 @@ fn GlyphFragment::planned(
   math_size : @library.MathSize,
   stretch : @library.Stretch,
 ) -> PlannedGlyph? {
-  let features = bridge_features(styles)
+  let features = features(styles)
   let shape = (feats : Array[@shape.Feature]) => {
     GlyphFragment::base(world, styles, feats, text, class, math_size)
   }

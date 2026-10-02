@@ -10,9 +10,9 @@ fn math_shape(
 ) -> (@library.FontInstance, Array[@library.Glyph])? {
   math_shape_impl(
     world,
-    bridge_variant(styles),
+    @library.variant(styles),
     features,
-    bridge_language(styles),
+    language(styles),
     @library.TextElem::fallback_in(styles),
     text,
     math_families(styles),
@@ -46,7 +46,7 @@ fn math_shape_impl(
     size,
     variations,
   }
-  math_shape_text(ctx, text, families.iter())
+  math_shape_text(ctx, text, FamilyIter::new(families))
   match ctx.font {
     Some(font) => Some((font, ctx.glyphs))
     None => None
@@ -129,6 +129,41 @@ priv struct MathShapingContext {
 }
 
 ///|
+impl SharedShapingContext for MathShapingContext with fn world(self) {
+  self.world
+}
+
+///|
+impl SharedShapingContext for MathShapingContext with fn used(self) {
+  self.used
+}
+
+///|
+impl SharedShapingContext for MathShapingContext with fn first(self) {
+  self.used.get(0)
+}
+
+///|
+impl SharedShapingContext for MathShapingContext with fn variant(self) {
+  self.variant
+}
+
+///|
+impl SharedShapingContext for MathShapingContext with fn fallback(self) {
+  self.fallback
+}
+
+///|
+impl SharedShapingContext for MathShapingContext with fn size(self) {
+  self.size
+}
+
+///|
+impl SharedShapingContext for MathShapingContext with fn variations(self) {
+  self.variations
+}
+
+///|
 /// `0..text.len().saturating_as()` as a `u16` range end.
 fn math_range_end(text : String) -> UInt16 {
   let len = @syntax.utf8_len(text)
@@ -140,7 +175,7 @@ fn math_range_end(text : String) -> UInt16 {
 fn math_shape_text(
   ctx : MathShapingContext,
   text : String,
-  families : Iter[@library.FontFamily],
+  families : FamilyIter,
 ) -> Unit {
   let shape_tofus = (
     ctx : MathShapingContext,
@@ -161,7 +196,7 @@ fn math_shape_text(
     }
     ctx.font = Some(font)
   }
-  guard bridge_get_font_and_covers(ctx, text, families, shape_tofus)
+  guard get_font_and_covers(ctx, text, families, shape_tofus)
     is Some((font, covers)) else {
     return
   }
@@ -175,14 +210,14 @@ fn math_shape_text(
   )
   buffer.set_direction(LeftToRight)
   buffer.set_flags(@shape.BUFFER_FLAG_REMOVE_DEFAULT_IGNORABLES)
-  let plan = bridge_create_shape_plan(
+  let plan = create_shape_plan(
     font,
     buffer.direction(),
     buffer.script(),
     buffer.language(),
-    ctx.features,
+    ctx.features[:],
   )
-  let buffer = @shape.shape_with_plan(bridge_rusty(font), plan, buffer)
+  let buffer = @shape.shape_with_plan(rusty(font), plan, buffer)
   // Because we will only ever shape single grapheme clusters, we will
   // (incorrectly) assume that the output from the shaper is a single cluster
   // that spans the entire range of the given text. The only problem this
