@@ -58,9 +58,8 @@ fn SVGRenderer::render_glyph(
     )
     let key = {
       let h = @library.SipHasher128::new()
-      h.write_discriminant(0)
-      self.hash_font(h, text.font)
-      h.write_u32(glyph_id.to_uint())
+      hash_font(h, text.font)
+      hash_u16(h, glyph_id.to_uint())
       hash_ratio(h, scale)
       h.finish128()
     }
@@ -82,9 +81,8 @@ fn SVGRenderer::render_glyph(
     // size is a bit of a waste.
     let key = {
       let h = @library.SipHasher128::new()
-      h.write_discriminant(1)
-      self.hash_font(h, text.font)
-      h.write_u32(glyph_id.to_uint())
+      hash_font(h, text.font)
+      hash_u16(h, glyph_id.to_uint())
       h.finish128()
     }
     let (id, frame) = self.glyphs.insert_with_val(key, () => {

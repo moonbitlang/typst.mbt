@@ -164,14 +164,14 @@ fn solve_cubic(
   if d < 0.0 {
     let sq = (-0.25 * d).sqrt()
     let r = -0.5 * de
-    let t1 = @math.cbrt(r + sq) + @math.cbrt(r - sq)
+    let t1 = libm_cbrt(r + sq) + libm_cbrt(r - sq)
     result.push(t1 - c2)
   } else if d == 0.0 {
     let t1 = copysign((-d0).sqrt(), de)
     result.push(t1 - c2)
     result.push(-2.0 * t1 - c2)
   } else {
-    let th = @math.atan2(d.sqrt(), -de) * onethird
+    let th = libm_atan2(d.sqrt(), -de) * onethird
     // (th_cos, th_sin) is called "CubicRoot"
     let th_sin = @math.sin(th)
     let th_cos = @math.cos(th)
@@ -205,7 +205,7 @@ fn solve_itp(
   let mut b = b
   let mut ya = ya
   let mut yb = yb
-  let n1_2 = f64_max(@math.log2((b - a) / epsilon).ceil() - 1.0, 0.0).to_int()
+  let n1_2 = f64_max(libm_log2((b - a) / epsilon).ceil() - 1.0, 0.0).to_int()
   let nmax = n0 + n1_2
   let mut scaled_epsilon = epsilon * (1UL << nmax).to_double()
   while b - a > 2.0 * epsilon {
@@ -603,7 +603,7 @@ fn CubicOffset::draw_arc(
   _self : CubicOffset,
   rec : OffsetRec,
 ) -> (Double, Double) {
-  let th = @math.atan2(rec.utan1.cross(rec.utan0), rec.utan1.dot(rec.utan0))
+  let th = libm_atan2(rec.utan1.cross(rec.utan0), rec.utan1.dot(rec.utan0))
   let a = 2.0 / 3.0 / (1.0 + @math.cos(0.5 * th)) * 2.0 * @math.sin(0.5 * th)
   let b = -a
   (a, b)
@@ -743,7 +743,7 @@ fn CubicOffset::find_subdivision_point(
   for i in 0..<(tangents.length() - 1) {
     let tan0 = tangents[i]
     let tan1 = tangents[i + 1]
-    let th = @math.atan2(tan0.cross(tan1), tan0.dot(tan1))
+    let th = libm_atan2(tan0.cross(tan1), tan0.dot(tan1))
     sum += th.abs()
     arc_angles.push(th)
   }

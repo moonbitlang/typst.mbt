@@ -559,11 +559,11 @@ fn arc_to_cubic_beziers(
   }
   let scaled_err = 1.0 / tolerance
   // Number of subdivisions per ellipse based on error tolerance.
-  let n_err = f64_max(@math.pow(1.1163 * scaled_err, 1.0 / 6.0), 3.999_999)
+  let n_err = f64_max(libm_pow(1.1163 * scaled_err, 1.0 / 6.0), 3.999_999)
   let n = (n_err * sweep_angle.abs() * (1.0 / (2.0 * @math.PI))).ceil()
   let angle_step = sweep_angle / n
   let n = n.to_int()
-  let arm_len = 4.0 / 3.0 * @math.tan((0.25 * angle_step).abs()) * sign
+  let arm_len = 4.0 / 3.0 * libm_tan((0.25 * angle_step).abs()) * sign
   let mut angle0 = start_angle
   let mut p0 = sample_unit_circle(angle0)
   for _ in 0..<n {
@@ -683,7 +683,7 @@ fn StrokeCtx::do_join(self : StrokeCtx, style : KStroke, tan0 : KPoint) -> Unit 
     let cd = tan0
     let cross = ab.cross(cd)
     let dot = ab.dot(cd)
-    let hypot = @math.hypot(cross, dot)
+    let hypot = libm_hypot(cross, dot)
     if dot <= 0.0 || cross.abs() >= hypot * self.join_thresh {
       match style.join {
         JBevel => {
@@ -691,7 +691,7 @@ fn StrokeCtx::do_join(self : StrokeCtx, style : KStroke, tan0 : KPoint) -> Unit 
           self.backward_path.line_to(p0.add(norm))
         }
         JMiter => {
-          if 2.0 * hypot < (hypot + dot) * @math.pow(style.miter_limit, 2.0) {
+          if 2.0 * hypot < (hypot + dot) * style.miter_limit * style.miter_limit {
             let last_scale = 0.5 * style.width / ab.hypot()
             let last_norm = ({ x: -ab.y, y: ab.x, } : KPoint).scale(last_scale)
             if cross > 0.0 {
@@ -714,7 +714,7 @@ fn StrokeCtx::do_join(self : StrokeCtx, style : KStroke, tan0 : KPoint) -> Unit 
           self.backward_path.line_to(p0.add(norm))
         }
         JRound => {
-          let angle = @math.atan2(cross, dot)
+          let angle = libm_atan2(cross, dot)
           if angle > 0.0 {
             self.backward_path.line_to(p0.add(norm))
             round_join(self.forward_path, tolerance, p0, norm, angle)

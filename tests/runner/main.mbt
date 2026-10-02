@@ -154,7 +154,9 @@ fn run_stage(
   }
   println("\{dump_name}: \{passed} passed, \{failed} failed")
   if canonicalize is Some(_) {
-    println("\{dump_name}: \{raw_passed} byte-identical before canonicalization")
+    println(
+      "\{dump_name}: \{raw_passed} byte-identical before canonicalization",
+    )
   }
 }
 

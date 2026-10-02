@@ -76,8 +76,7 @@ fn SVGRenderer::push_gradient(
   }
   let key = {
     let h = @library.SipHasher128::new()
-    h.write_u32(gradient_id.kind.to_int().reinterpret_as_uint())
-    h.write_u128(gradient_id.hash)
+    hash_dedup_id(h, gradient_id)
     hash_transform(h, ts)
     h.finish128()
   }
@@ -125,8 +124,7 @@ fn SVGRenderer::push_tiling(
   let tiling_ref : TilingRef = { id: tiling_id, transform, }
   let key = {
     let h = @library.SipHasher128::new()
-    h.write_u32(tiling_id.kind.to_int().reinterpret_as_uint())
-    h.write_u128(tiling_id.hash)
+    hash_dedup_id(h, tiling_id)
     hash_transform(h, transform)
     h.finish128()
   }

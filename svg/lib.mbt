@@ -1,11 +1,8 @@
 // Port of `typst-svg/src/lib.rs`: rendering of Typst documents into SVG
 // images.
 //
-// The `<defs>` IDs are hash-derived like upstream (`DedupId`), but the
-// hashes are computed with this port's own hash inputs (see `dedup_key`
-// helpers below), so they differ from upstream's `typst_utils::hash128`
-// values. The differential tests compare SVGs after canonically renaming the
-// IDs (see `canonicalize_ids`).
+// The `<defs>` IDs are hash-derived like upstream (`DedupId`); the hash
+// inputs reproduce upstream's `Hash` byte streams (see `hash.mbt`).
 
 ///|
 /// Settings for SVG export (upstream `SvgOptions<Partial>`).
@@ -226,8 +223,6 @@ priv struct SVGRenderer {
   /// Deduplicated tilings with transform matrices. They use a reference
   /// (`href`) to a "source" tiling instead of being defined inline.
   tiling_refs : Deduplicator[TilingRef]
-  /// Interned fonts, the hash input of a font in glyph keys.
-  fonts : Map[@library.FontInstance, Int]
 }
 
 ///|
@@ -288,7 +283,6 @@ fn SVGRenderer::with_options(
     conic_subgradients: Deduplicator::new('s'),
     tilings: Deduplicator::new('t'),
     tiling_refs: Deduplicator::new('p'),
-    fonts: {},
   }
 }
 
@@ -598,216 +592,4 @@ pub impl SvgDisplay for DedupId with fn fmt(self, f) {
     start += 1
   }
   f.push_str(digits.unsafe_substring(start~, end=digits.length()))
-}
-
-// Hash inputs of the deduplication keys. They mirror the structure of
-// upstream's keys (and thus which values are deduplicated) but not their
-// exact `Hash` byte streams.
-
-///|
-fn hash_abs(h : @library.SipHasher128, v : @library.Abs) -> Unit {
-  h.write_f64(v.to_raw())
-}
-
-///|
-fn hash_ratio(h : @library.SipHasher128, v : @library.Ratio) -> Unit {
-  h.write_f64(v.get())
-}
-
-///|
-fn hash_angle(h : @library.SipHasher128, v : @library.Angle) -> Unit {
-  h.write_f64(v.to_raw())
-}
-
-///|
-fn hash_point(h : @library.SipHasher128, p : @library.Point) -> Unit {
-  hash_abs(h, p.x)
-  hash_abs(h, p.y)
-}
-
-///|
-fn hash_size(
-  h : @library.SipHasher128,
-  s : @library.Axes[@library.Abs],
-) -> Unit {
-  hash_abs(h, s.x)
-  hash_abs(h, s.y)
-}
-
-///|
-fn hash_transform(h : @library.SipHasher128, ts : @library.Transform) -> Unit {
-  hash_ratio(h, ts.sx)
-  hash_ratio(h, ts.ky)
-  hash_ratio(h, ts.kx)
-  hash_ratio(h, ts.sy)
-  hash_abs(h, ts.tx)
-  hash_abs(h, ts.ty)
-}
-
-///|
-fn hash_curve(h : @library.SipHasher128, curve : @library.Curve) -> Unit {
-  let items = curve.items()
-  h.write_usize(items.length())
-  for item in items {
-    match item {
-      Move(p) => {
-        h.write_discriminant(0)
-        hash_point(h, p)
-      }
-      Line(p) => {
-        h.write_discriminant(1)
-        hash_point(h, p)
-      }
-      Cubic(p1, p2, p3) => {
-        h.write_discriminant(2)
-        hash_point(h, p1)
-        hash_point(h, p2)
-        hash_point(h, p3)
-      }
-      Close => h.write_discriminant(3)
-    }
-  }
-}
-
-///|
-fn hash_color(h : @library.SipHasher128, color : @library.Color) -> Unit {
-  match color {
-    Process(c) => {
-      // Upstream: the discriminant and the bits of `to_vec4`.
-      h.write_discriminant(0)
-      h.write_discriminant(
-        match c {
-          Luma(_) => 0
-          Oklab(_) => 1
-          Oklch(_) => 2
-          Rgb(_) => 3
-          LinearRgb(_) => 4
-          Cmyk(_) => 5
-          Hsl(_) => 6
-          Hsv(_) => 7
-        },
-      )
-      for x in c.to_vec4() {
-        h.write_u32(x.reinterpret_as_uint())
-      }
-    }
-    Spot(c) => {
-      h.write_discriminant(1)
-      h.write_str(c.repr())
-    }
-  }
-}
-
-///|
-fn hash_relative(
-  h : @library.SipHasher128,
-  relative : @library.Smart[@library.RelativeTo],
-) -> Unit {
-  match relative {
-    Auto => h.write_discriminant(0)
-    Custom(Self_) => h.write_discriminant(1)
-    Custom(Parent) => h.write_discriminant(2)
-  }
-}
-
-///|
-fn hash_space(h : @library.SipHasher128, space : @library.ColorSpace) -> Unit {
-  match space {
-    Process(s) => {
-      h.write_discriminant(0)
-      h.write_discriminant(
-        match s {
-          Oklab => 0
-          Oklch => 1
-          Srgb => 2
-          D65Gray => 3
-          LinearRgb => 4
-          Hsl => 5
-          Hsv => 6
-          Cmyk => 7
-        },
-      )
-    }
-    Spot(_) => {
-      h.write_discriminant(1)
-      h.write_str(
-        @library.Color::Spot({
-          colorant: space_colorant(space),
-          tint: @library.Ratio::one(),
-        }).repr(),
-      )
-    }
-  }
-}
-
-///|
-fn space_colorant(space : @library.ColorSpace) -> @library.SpotColorant {
-  guard space is Spot(c) else { abort("not a spot color space") }
-  c
-}
-
-///|
-fn hash_gradient(
-  h : @library.SipHasher128,
-  gradient : @library.Gradient,
-) -> Unit {
-  let stops = (stops : Array[(@library.Color, @library.Ratio)]) => {
-    h.write_usize(stops.length())
-    for stop in stops {
-      hash_color(h, stop.0)
-      hash_ratio(h, stop.1)
-    }
-  }
-  match gradient {
-    Linear(g) => {
-      h.write_discriminant(0)
-      stops(g.stops)
-      hash_angle(h, g.angle)
-      hash_space(h, g.space)
-      hash_relative(h, g.relative)
-      h.write_bool(g.anti_alias)
-    }
-    Radial(g) => {
-      h.write_discriminant(1)
-      stops(g.stops)
-      hash_ratio(h, g.center.x)
-      hash_ratio(h, g.center.y)
-      hash_ratio(h, g.radius)
-      hash_ratio(h, g.focal_center.x)
-      hash_ratio(h, g.focal_center.y)
-      hash_ratio(h, g.focal_radius)
-      hash_space(h, g.space)
-      hash_relative(h, g.relative)
-      h.write_bool(g.anti_alias)
-    }
-    Conic(g) => {
-      h.write_discriminant(2)
-      stops(g.stops)
-      hash_angle(h, g.angle)
-      hash_ratio(h, g.center.x)
-      hash_ratio(h, g.center.y)
-      hash_space(h, g.space)
-      hash_relative(h, g.relative)
-      h.write_bool(g.anti_alias)
-    }
-  }
-}
-
-///|
-/// The hash input of a font: its index among the fonts seen by the
-/// renderer (upstream hashes the font data, index and variations).
-fn SVGRenderer::hash_font(
-  self : SVGRenderer,
-  h : @library.SipHasher128,
-  font : @library.FontInstance,
-) -> Unit {
-  let index = match self.fonts.get(font) {
-    Some(i) => i
-    None => {
-      let i = self.fonts.length()
-      self.fonts[font] = i
-      i
-    }
-  }
-  h.write_usize(index)
 }

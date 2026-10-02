@@ -7,13 +7,15 @@
 //
 // The goldens are upstream's raw SVGs. Their `<defs>` IDs (`g…`, `c…`, `f…`,
 // `r…`, `s…`, `t…`, `p…` followed by uppercase hex digits) are derived from
-// `typst_utils::hash128` of upstream's `Hash` impls, which this port does not
-// reproduce byte-for-byte. Both sides are therefore canonicalized with
-// [canonicalize_svg_ids] before comparing: every defined ID and all of its
-// references are renamed to `<kind>_<n>` in order of first occurrence in the
-// document. Geometry, paints, element order and labels are compared as is
-// ("canonical SVG parity"). The runner additionally reports how many
-// outputs are byte-identical without canonicalization.
+// `typst_utils::hash128` of upstream's `Hash` impls. The port reproduces
+// these hash streams (`svg/hash.mbt`), but a hash also changes with any
+// last-bit difference of a hashed float that the printed output rounds away.
+// The comparison therefore canonicalizes both sides with
+// [canonicalize_svg_ids] first: every defined ID and all of its references
+// are renamed to `<kind>_<n>` in order of first occurrence in the document
+// ("canonical SVG parity": geometry, paints, element order and labels are
+// compared as is). The runner additionally reports how many outputs are
+// byte-identical without canonicalization ("raw parity").
 
 ///|
 /// Compile a single test case and export it to SVG.
