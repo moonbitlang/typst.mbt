@@ -782,16 +782,39 @@ fn image_rule(
 }
 
 ///|
-/// TODO: Upstream resolves the equation (`math::ir::resolve_equation`),
-/// converts it to MathML nodes (`mathml::convert_math_to_nodes`) and wraps
-/// them in a `<math>` element (with `display="block"` and `BlockElem` for
-/// block equations); the math IR is not ported yet.
 fn equation_rule(
   elem : @library.EquationElem,
-  _ : @library.Engine,
-  _ : @library.StyleChain,
+  engine : @library.Engine,
+  styles : @library.StyleChain,
 ) -> @library.Content raise @library.SourceError {
-  unported(elem, "`resolve_equation`")
+  let content = elem.pack()
+  let item = @library.resolve_equation(
+    elem,
+    engine,
+    @library.Locator::synthesize(content.location().unwrap()),
+    styles,
+  )
+  let block = elem.block(styles)
+  let body = convert_math_to_nodes(item, engine, styles, block)
+  let math = html_elem(
+      @library.tag_mathml_math,
+      @library.Content::sequence(body),
+    )
+    .with_optional_attr(
+      @library.attr_mathml_display,
+      if block {
+        Some("block")
+      } else {
+        None
+      },
+    )
+    .pack()
+    .spanned(content.span())
+  if block {
+    block_packed(math)
+  } else {
+    math
+  }
 }
 
 ///|
