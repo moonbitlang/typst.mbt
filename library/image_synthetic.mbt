@@ -31,7 +31,13 @@ pub fn SvgImage::synthetic(
   width : Double,
   height : Double,
 ) -> SvgImage {
-  { data, width, height, }
+  let tree = @usvg.Tree::from_str(
+    "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1\" height=\"1\"/>",
+    @usvg.Options::default(),
+  ) catch {
+    _ => abort("unreachable")
+  }
+  { data, width, height, fonts: [], tree }
 }
 
 ///|
