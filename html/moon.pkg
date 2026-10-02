@@ -11,6 +11,10 @@ import {
   "moonbitlang/typst/syntax",
 } for "test"
 
+import {
+  "moonbitlang/typst/eval",
+} for "wbtest"
+
 // Native show rules share the `ShowFn` signature, which may raise, even if
 // most of them don't.
 
