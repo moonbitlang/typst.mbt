@@ -38,3 +38,8 @@ quote = "1"
 proc-macro2 = "1"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
+# Bibliography stack (same versions as typst-library's lock).
+hayagriva = "=0.10.1"
+citationberg = "=0.7.0"
+biblatex = "=0.12.0"
+quick-xml = { version = "=0.38.4", features = ["serialize", "overlapped-lists"] }
