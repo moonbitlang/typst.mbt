@@ -1,7 +1,13 @@
 // Port of rustybuzz 0.20.1 `src/hb/common.rs` `mod tests_features`.
 
 ///|
-fn check_feature(text : String, tag : String, value : UInt, start : UInt, end : UInt) -> Unit raise {
+fn check_feature(
+  text : String,
+  tag : String,
+  value : UInt,
+  start : UInt,
+  end : UInt,
+) -> Unit raise {
   let f = @shape.Feature::from_str(text).unwrap()
   assert_eq(f.tag, @otf.Tag::from_str(tag))
   assert_eq(f.value, value)
