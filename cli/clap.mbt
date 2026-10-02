@@ -48,6 +48,8 @@ priv struct ArgSpec {
   empty : EmptyMode
   /// The option's value parser, run when a value is consumed.
   validate : ((String) -> Unit raise CliError)?
+  /// Whether the option may occur multiple times (`ArgAction::Append`).
+  multiple : Bool
 }
 
 ///|
@@ -71,6 +73,7 @@ fn flag(
     hidden,
     empty: Required,
     validate: None,
+    multiple: false,
   }
 }
 
@@ -85,6 +88,7 @@ fn opt(
   hidden? : Bool = false,
   empty? : EmptyMode = Required,
   validate? : (String) -> Unit raise CliError,
+  multiple? : Bool = false,
   help~ : String,
 ) -> ArgSpec {
   {
@@ -100,6 +104,7 @@ fn opt(
     hidden,
     empty,
     validate,
+    multiple,
   }
 }
 
@@ -124,6 +129,7 @@ fn opt_optional(
     hidden,
     empty: Required,
     validate: None,
+    multiple: false,
   }
 }
 
@@ -157,33 +163,15 @@ priv struct Matches {
   positionals : Array[String]
   /// The subcommand name and its remaining arguments.
   subcommand : (String, Array[String])?
-  /// Separate values of optional-value options that are not validated yet
-  /// (see `Matches::resolve_pending`).
-  pending : Array[(ArgSpec, String)]
+  /// The parse state, for values pending until after a subcommand.
+  state : ParseState
 }
 
 ///|
-/// Validates and records the pending values (clap does this after parsing a
-/// following subcommand).
+/// Parses the values that are pending after a subcommand (clap does this
+/// after parsing the subcommand's arguments).
 fn Matches::resolve_pending(self : Matches) -> Unit raise CliError {
-  for entry in self.pending {
-    let (spec, value) = entry
-    if value == "" && spec.empty is Required {
-      raise Invalid(
-        "a value is required for '\{spec.display()}' but none was supplied\{possible_values(spec)}",
-      )
-    }
-    if spec.possible.length() > 0 && !spec.possible.contains(value) {
-      raise Invalid(
-        "invalid value '\{value}' for '\{spec.display()}'\n  [possible values: \{spec.possible.join(", ")}]",
-      )
-    }
-    match self.values.get(spec.id) {
-      Some(list) => list.push(value)
-      None => self.values[spec.id] = [value]
-    }
-  }
-  self.pending.clear()
+  self.state.resolve_pending()
 }
 
 ///|
@@ -379,57 +367,52 @@ fn CommandSpec::render_help(self : CommandSpec) -> String {
 ///|
 /// Parses arguments for a command. Subcommand dispatch stops at the first
 /// positional when the command has subcommands.
+///
+/// Like clap, a separate option value (`--opt value`) is only parsed when the
+/// next known option or positional is processed, at the end of the
+/// arguments or, for a value given before a subcommand, after the
+/// subcommand's arguments were parsed (`Matches::resolve_pending`). Unknown
+/// options are reported before pending values are parsed.
 fn CommandSpec::parse(
   self : CommandSpec,
   argv : Array[String],
 ) -> Matches raise CliError {
-  let values : Map[String, Array[String]] = Map([])
-  let counts : Map[String, Int] = Map([])
+  let state : ParseState = {
+    spec: self,
+    values: Map([]),
+    counts: Map([]),
+    occurrences: Map([]),
+    used: [],
+    pending: [],
+  }
   let positionals = []
   let mut subcommand = None
   let mut i = 0
-  let pending : Array[(ArgSpec, String)] = []
-  let used : Array[String] = []
-  let unexpected = (arg : String) => {
+  let mut only_positional = false
+  let unexpected = (arg : String, long : Bool) => {
     let tip = if self.positionals.is_empty() {
       ""
     } else {
       "\n\n  tip: to pass '\{arg}' as a value, use '-- \{arg}'"
     }
-    Usage(
-      "unexpected argument '\{arg}' found\{tip}",
-      self.smart_usage(used, positionals.length()),
-    )
+    // clap shows the usage of the used arguments for unknown long options
+    // and the generic usage for unknown short options.
+    let usage = if long {
+      self.smart_usage(state.used_ids(), positionals.length())
+    } else {
+      self.usage()
+    }
+    Usage("unexpected argument '\{arg}' found\{tip}", usage)
   }
-  let mut only_positional = false
   let find_long = (name : String) => self.args.search_by(a => a.long == name)
   let find_short = (c : Char) => self.args.search_by(a => a.short == Some(c))
-  let push_value = (spec : ArgSpec, value : String) => {
-    if value == "" && spec.empty is Required {
-      raise Invalid(
-        "a value is required for '\{spec.display()}' but none was supplied\{possible_values(spec)}",
-      )
-    }
-    if spec.validate is Some(validate) {
-      validate(value)
-    }
-    if spec.possible.length() > 0 && !spec.possible.contains(value) {
-      raise Invalid(
-        "invalid value '\{value}' for '\{spec.display()}'\n  [possible values: \{spec.possible.join(", ")}]",
-      )
-    }
-    match values.get(spec.id) {
-      Some(list) => list.push(value)
-      None => values[spec.id] = [value]
-    }
-  }
-  let push_values = (spec : ArgSpec, value : String) => {
-    match spec.delimiter {
-      Some(d) =>
-        for part in value.split(d.to_string()) {
-          push_value(spec, part.to_owned())
-        }
-      None => push_value(spec, value)
+  let separate_value = () => {
+    if i < argv.length() && !(argv[i].has_prefix("-") && argv[i] != "-") {
+      let value = argv[i]
+      i += 1
+      Some(value)
+    } else {
+      None
     }
   }
   while i < argv.length() {
@@ -445,18 +428,15 @@ fn CommandSpec::parse(
         subcommand = Some((arg, argv[i:].to_owned()))
         break
       }
+      state.resolve_pending()
       positionals.push(arg)
       continue
     }
     if arg == "--" {
+      state.resolve_pending()
       only_positional = true
       continue
     }
-    // A pending value is resolved before the next option.
-    for entry in pending {
-      push_value(entry.0, entry.1)
-    }
-    pending.clear()
     if arg.has_prefix("--") {
       let body = arg[2:].to_owned()
       let (name, attached) = match body.find("=") {
@@ -464,57 +444,32 @@ fn CommandSpec::parse(
         None => (body, None)
       }
       if name == "help" {
+        state.resolve_pending()
         raise Display(self.help(long=true))
       }
       if name == "version" && self.subcommands.length() > 0 {
+        state.resolve_pending()
         raise Display(version_line() + "\n")
       }
-      guard find_long(name) is Some(index) else { raise unexpected(arg) }
+      guard find_long(name) is Some(index) else { raise unexpected(arg, true) }
+      state.resolve_pending()
       let spec = self.args[index]
-      if !used.contains(spec.id) {
-        used.push(spec.id)
-      }
       match spec.kind {
         Flag => {
-          if attached is Some(_) {
+          if attached is Some(value) {
             raise Usage(
-              "unexpected value '\{attached.unwrap()}' for '\{spec.display()}' found; no more were expected",
+              "unexpected value '\{value}' for '\{spec.display()}' found; no more were expected",
               self.usage(),
             )
           }
-          counts[spec.id] = counts.get(spec.id).unwrap_or(0) + 1
+          state.flag(spec)
         }
-        OptionalValue(missing) => push_value(spec, attached.unwrap_or(missing))
-        LooseValue(missing) =>
+        OptionalValue(missing) =>
+          state.occurrence(spec, Some(attached.unwrap_or(missing)), true)
+        LooseValue(_) | Value =>
           match attached {
-            Some(value) => push_value(spec, value)
-            None =>
-              if i < argv.length() &&
-                !(argv[i].has_prefix("-") && argv[i] != "-") {
-                // Like clap, a separate value is only validated once the
-                // command's arguments are parsed.
-                pending.push((spec, argv[i]))
-                i += 1
-              } else {
-                ignore(missing)
-                raise Invalid(
-                  "a value is required for '\{spec.display()}' but none was supplied\{possible_values(spec)}",
-                )
-              }
-          }
-        Value =>
-          match attached {
-            Some(value) => push_values(spec, value)
-            None => {
-              if i >= argv.length() ||
-                (argv[i].has_prefix("-") && argv[i] != "-") {
-                raise Invalid(
-                  "a value is required for '\{spec.display()}' but none was supplied\{possible_values(spec)}",
-                )
-              }
-              push_values(spec, argv[i])
-              i += 1
-            }
+            Some(value) => state.occurrence(spec, Some(value), true)
+            None => state.occurrence(spec, separate_value(), false)
           }
       }
       continue
@@ -526,45 +481,36 @@ fn CommandSpec::parse(
       let c = chars[k]
       k += 1
       if c == 'h' {
+        state.resolve_pending()
         raise Display(self.help(long=false))
       }
       if c == 'V' && self.subcommands.length() > 0 {
+        state.resolve_pending()
         raise Display(version_line() + "\n")
       }
-      guard find_short(c) is Some(index) else { raise unexpected("-\{c}") }
-      let spec = self.args[index]
-      if !used.contains(spec.id) {
-        used.push(spec.id)
+      guard find_short(c) is Some(index) else {
+        raise unexpected("-\{c}", false)
       }
+      state.resolve_pending()
+      let spec = self.args[index]
       match spec.kind {
-        Flag | OptionalValue(_) | LooseValue(_) =>
-          counts[spec.id] = counts.get(spec.id).unwrap_or(0) + 1
+        Flag | OptionalValue(_) | LooseValue(_) => state.flag(spec)
         Value => {
           let rest = String::from_array(chars[k:])
           if rest.has_prefix("=") {
-            push_values(spec, rest[1:].to_owned())
+            state.occurrence(spec, Some(rest[1:].to_owned()), true)
           } else if rest != "" {
-            push_values(spec, rest)
+            state.occurrence(spec, Some(rest), true)
           } else {
-            if i >= argv.length() || (argv[i].has_prefix("-") && argv[i] != "-") {
-              raise Invalid(
-                "a value is required for '\{spec.display()}' but none was supplied\{possible_values(spec)}",
-              )
-            }
-            push_values(spec, argv[i])
-            i += 1
+            state.occurrence(spec, separate_value(), false)
           }
           break
         }
       }
     }
   }
-
   if subcommand is None {
-    for entry in pending {
-      push_value(entry.0, entry.1)
-    }
-    pending.clear()
+    state.resolve_pending()
   }
 
   // Environment variable fallbacks.
@@ -573,10 +519,10 @@ fn CommandSpec::parse(
     guard @platform.env_var(env) is Some(value) else { continue }
     match spec.kind {
       Flag =>
-        if !counts.contains(spec.id) {
+        if !state.counts.contains(spec.id) {
           // clap's `BoolValueParser`.
           match value {
-            "true" => counts[spec.id] = 1
+            "true" => state.counts[spec.id] = 1
             "false" => ()
             "" =>
               raise Invalid(
@@ -588,7 +534,11 @@ fn CommandSpec::parse(
               )
           }
         }
-      _ => if !values.contains(spec.id) { push_values(spec, value) }
+      _ =>
+        if !state.values.contains(spec.id) &&
+          !state.pending.iter().any(p => p.0.id == spec.id) {
+          state.push_values(spec, value)
+        }
     }
   }
   if positionals.length() > self.positionals.length() {
@@ -597,7 +547,156 @@ fn CommandSpec::parse(
       self.usage(),
     )
   }
-  { values, counts, positionals, subcommand, pending, }
+  {
+    values: state.values,
+    counts: state.counts,
+    positionals,
+    subcommand,
+    state,
+  }
+}
+
+///|
+/// The state of parsing a command's arguments.
+priv struct ParseState {
+  spec : CommandSpec
+  values : Map[String, Array[String]]
+  counts : Map[String, Int]
+  /// How often each option occurred.
+  occurrences : Map[String, Int]
+  /// The options in the order of their first occurrence.
+  used : Array[String]
+  /// Separate values (or their absence) that are not parsed yet.
+  pending : Array[(ArgSpec, String?)]
+}
+
+///|
+/// The options that count as used for clap's usage: present with a value
+/// (a repeated single-value option restarts and is not present until its
+/// new value is parsed).
+fn ParseState::used_ids(self : ParseState) -> Array[String] {
+  self.used.filter(id => {
+    match self.pending.iter().find_first(p => p.0.id == id) {
+      Some((spec, value)) =>
+        value is Some(_) &&
+        (spec.multiple || self.occurrences.get(id).unwrap_or(0) <= 1)
+      None => true
+    }
+  })
+}
+
+///|
+/// Records an occurrence of an option.
+fn ParseState::start(self : ParseState, spec : ArgSpec) -> Unit raise CliError {
+  let n = self.occurrences.get(spec.id).unwrap_or(0) + 1
+  self.occurrences[spec.id] = n
+  if !self.used.contains(spec.id) {
+    self.used.push(spec.id)
+  }
+}
+
+///|
+/// The error for a repeated single-value option.
+fn ParseState::check_repeat(
+  self : ParseState,
+  spec : ArgSpec,
+) -> Unit raise CliError {
+  if !spec.multiple && self.values.contains(spec.id) {
+    raise Usage(
+      "the argument '\{spec.display()}' cannot be used multiple times",
+      self.spec.usage(),
+    )
+  }
+}
+
+///|
+/// A flag occurrence.
+fn ParseState::flag(self : ParseState, spec : ArgSpec) -> Unit raise CliError {
+  self.start(spec)
+  if self.counts.contains(spec.id) {
+    raise Usage(
+      "the argument '\{spec.display()}' cannot be used multiple times",
+      self.spec.usage(),
+    )
+  }
+  self.counts[spec.id] = 1
+}
+
+///|
+/// An option occurrence: an attached value is parsed immediately, a
+/// separate one (or its absence) when pending values are resolved.
+fn ParseState::occurrence(
+  self : ParseState,
+  spec : ArgSpec,
+  value : String?,
+  attached : Bool,
+) -> Unit raise CliError {
+  self.start(spec)
+  if attached {
+    self.check_repeat(spec)
+    self.push_values(spec, value.unwrap())
+  } else {
+    self.pending.push((spec, value))
+  }
+}
+
+///|
+/// Parses the pending values.
+fn ParseState::resolve_pending(self : ParseState) -> Unit raise CliError {
+  let pending = self.pending.copy()
+  self.pending.clear()
+  for entry in pending {
+    let (spec, value) = entry
+    guard value is Some(value) else {
+      raise Invalid(
+        "a value is required for '\{spec.display()}' but none was supplied\{possible_values(spec)}",
+      )
+    }
+    self.check_repeat(spec)
+    self.push_values(spec, value)
+  }
+}
+
+///|
+/// Parses and records a value (split at the option's delimiter).
+fn ParseState::push_values(
+  self : ParseState,
+  spec : ArgSpec,
+  value : String,
+) -> Unit raise CliError {
+  match spec.delimiter {
+    Some(d) =>
+      for part in value.split(d.to_string()) {
+        self.push_value(spec, part.to_owned())
+      }
+    None => self.push_value(spec, value)
+  }
+}
+
+///|
+/// Parses and records a single value (clap's value parser).
+fn ParseState::push_value(
+  self : ParseState,
+  spec : ArgSpec,
+  value : String,
+) -> Unit raise CliError {
+  if value == "" && spec.empty is Required {
+    raise Invalid(
+      "a value is required for '\{spec.display()}' but none was supplied\{possible_values(spec)}",
+    )
+  }
+  if spec.validate is Some(validate) {
+    validate(value)
+  }
+  if spec.possible.length() > 0 && !spec.possible.contains(value) {
+    raise Invalid(
+      "invalid value '\{value}' for '\{spec.display()}'\n  [possible values: \{spec.possible.join(", ")}]",
+    )
+  }
+  match self.values.get(spec.id) {
+    Some(list) => list.push(value)
+    None => self.values[spec.id] = [value]
+  }
 }
 
 ///|
@@ -620,8 +719,9 @@ fn missing(spec : CommandSpec, name : String) -> CliError {
 }
 
 ///|
-/// clap's usage for errors once arguments were used: the used options and
-/// the required (or already given) positionals.
+/// clap's usage for errors once arguments were used: the used options (in
+/// the order of their first occurrence) and the positionals (required or
+/// given ones as `<NAME>`, others as `[NAME]`).
 fn CommandSpec::smart_usage(
   self : CommandSpec,
   used : Array[String],
@@ -632,15 +732,20 @@ fn CommandSpec::smart_usage(
   }
   let buf = StringBuilder()
   buf.write_string(self.path)
-  for arg in self.args {
-    if used.contains(arg.id) {
+  for id in used {
+    if self.args.iter().find_first(a => a.id == id) is Some(arg) {
       buf.write_string(" \{arg.display()}")
     }
   }
   for i, pos in self.positionals {
     if pos.required || i < num_positionals {
       buf.write_string(" <\{pos.name}>")
+    } else {
+      buf.write_string(" [\{pos.name}]")
     }
+  }
+  if self.subcommands.length() > 0 {
+    buf.write_string(" <COMMAND>")
   }
   buf.to_string()
 }

@@ -396,6 +396,7 @@ fn world_specs() -> Array[ArgSpec] {
       short='i',
       validate=v => parse_input_pair(v) |> ignore,
       empty=Pass,
+      multiple=true,
       help="Add a string key-value pair visible through `sys.inputs`",
     ),
     ..font_specs(),
@@ -420,6 +421,7 @@ fn font_specs() -> Array[ArgSpec] {
       env="TYPST_FONT_PATHS",
       delimiter=env_path_sep(),
       empty=Pass,
+      multiple=true,
       help="Adds additional directories that are recursively searched for fonts",
     ),
     flag(
@@ -470,6 +472,7 @@ fn process_specs() -> Array[ArgSpec] {
       env="TYPST_FEATURES",
       delimiter=',',
       possible=["html", "bundle", "a11y-extras"],
+      multiple=true,
       help="Enables in-development features that may be changed or removed at any time",
     ),
     opt(
@@ -505,6 +508,7 @@ fn compile_spec(path : String, about : String, watch : Bool) -> CommandSpec {
       delimiter=',',
       validate=v => parse_pages(v) |> ignore,
       empty=Pass,
+      multiple=true,
       help="Which pages to export. When unspecified, all pages are exported",
     ),
     opt(
@@ -512,6 +516,7 @@ fn compile_spec(path : String, about : String, watch : Bool) -> CommandSpec {
       "PDF_STANDARD",
       delimiter=',',
       possible=pdf_standard_names.map(p => p.0),
+      multiple=true,
       help="One (or multiple comma-separated) PDF standards that Typst will enforce conformance with",
     ),
     flag("no-pdf-tags", hidden=true, help=""),
