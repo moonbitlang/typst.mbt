@@ -14,12 +14,13 @@ priv struct DataUrl {
 ///|
 fn DataUrl::process(input : String) -> DataUrl? {
   let input = @utf8.encode(input)
-  let after_colon = pretend_parse_data_url(input)?
-  let (from_colon_to_comma, encoded_body_plus_fragment) = find_comma_before_fragment(
-    after_colon,
-  )?
+  guard pretend_parse_data_url(input) is Some(after_colon) else { return None }
+  guard find_comma_before_fragment(after_colon)
+    is Some((from_colon_to_comma, encoded_body_plus_fragment)) else {
+    return None
+  }
   let (mime_type, base64) = parse_data_url_header(from_colon_to_comma)
-  Some({ mime_type, base64, encoded_body_plus_fragment })
+  Some({ mime_type, base64, encoded_body_plus_fragment, })
 }
 
 ///|
@@ -68,9 +69,7 @@ fn find_comma_before_fragment(after_colon : Bytes) -> (Bytes, Bytes)? {
   for i in 0..<after_colon.length() {
     let byte = after_colon[i]
     if byte == b',' {
-      return Some(
-        (after_colon[0:i].to_bytes(), after_colon[i + 1:].to_bytes()),
-      )
+      return Some((after_colon[0:i].to_bytes(), after_colon[i + 1:].to_bytes()))
     }
     if byte == b'#' {
       break
@@ -80,7 +79,9 @@ fn find_comma_before_fragment(after_colon : Bytes) -> (Bytes, Bytes)? {
 }
 
 ///|
-fn parse_data_url_header(from_colon_to_comma : Bytes) -> ((String, String), Bool) {
+fn parse_data_url_header(
+  from_colon_to_comma : Bytes,
+) -> ((String, String), Bool) {
   let n = from_colon_to_comma.length()
   let mut s = 0
   let mut e = n
@@ -242,17 +243,18 @@ fn DataUrl::decode_to_vec(self : DataUrl) -> Bytes? {
   if self.base64 {
     let decoder = ForgivingBase64Decoder::new(body)
     let mut ok = true
-    decode_without_base64(self.encoded_body_plus_fragment, bytes => if ok &&
-      !decoder.feed(bytes) {
-      ok = false
+    decode_without_base64(self.encoded_body_plus_fragment, bytes => {
+      if ok && !decoder.feed(bytes) {
+        ok = false
+      }
     })
     if !ok || !decoder.finish() {
       return None
     }
   } else {
-    decode_without_base64(self.encoded_body_plus_fragment, bytes => body.write_bytesview(
-      bytes,
-    ))
+    decode_without_base64(self.encoded_body_plus_fragment, bytes => {
+      body.write_bytesview(bytes)
+    })
   }
   Some(body.to_bytes())
 }
@@ -283,8 +285,16 @@ fn decode_without_base64(
       }
       match byte {
         b'%' => {
-          let l = if i + 2 < bytes.length() { hex_digit(bytes[i + 2]) } else { None }
-          let h = if i + 1 < bytes.length() { hex_digit(bytes[i + 1]) } else { None }
+          let l = if i + 2 < bytes.length() {
+            hex_digit(bytes[i + 2])
+          } else {
+            None
+          }
+          let h = if i + 1 < bytes.length() {
+            hex_digit(bytes[i + 1])
+          } else {
+            None
+          }
           if (h, l) is (Some(h), Some(l)) {
             let one_byte = (h * 16 + l).to_byte()
             write_bytes(Bytes::from_array([one_byte])[:])
@@ -314,7 +324,7 @@ priv struct ForgivingBase64Decoder {
 
 ///|
 fn ForgivingBase64Decoder::new(out : @buffer.Buffer) -> ForgivingBase64Decoder {
-  { out, bit_buffer: 0, buffer_bit_length: 0, padding_symbols: 0 }
+  { out, bit_buffer: 0, buffer_bit_length: 0, padding_symbols: 0, }
 }
 
 ///|

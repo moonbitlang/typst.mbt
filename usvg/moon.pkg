@@ -11,7 +11,10 @@ import {
   "moonbitlang/typst/svgtypes",
   "moonbitlang/typst/simplecss",
   "moonbitlang/typst/tiny_skia_path",
+  "moonbitlang/typst/otf",
 }
+
+warnings = "-unused_mut"
 
 options(
   "native-stub": [ "sincos_stub.c" ],

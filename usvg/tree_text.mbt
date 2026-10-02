@@ -15,7 +15,7 @@ pub(all) enum FontStretch {
 } derive(Eq, Compare, Hash)
 
 ///|
-pub impl Default for FontStretch with default() {
+pub impl Default for FontStretch with fn default() {
   Normal
 }
 
@@ -48,18 +48,21 @@ pub(all) struct FontVariation {
 
 ///|
 /// Creates a new font variation.
-pub fn FontVariation::new(tag : FixedArray[Byte], value : Float) -> FontVariation {
-  { tag, value }
+pub fn FontVariation::new(
+  tag : FixedArray[Byte],
+  value : Float,
+) -> FontVariation {
+  { tag, value, }
 }
 
 ///|
-pub impl Eq for FontVariation with equal(self, other) {
+pub impl Eq for FontVariation with fn equal(self, other) {
   self.tag == other.tag &&
   self.value.reinterpret_as_uint() == other.value.reinterpret_as_uint()
 }
 
 ///|
-pub impl Hash for FontVariation with hash_combine(self, hasher) {
+pub impl Hash for FontVariation with fn hash_combine(self, hasher) {
   for b in self.tag {
     hasher.combine_byte(b)
   }
@@ -78,7 +81,7 @@ pub(all) enum FontStyle {
 } derive(Eq, Hash)
 
 ///|
-pub impl Default for FontStyle with default() {
+pub impl Default for FontStyle with fn default() {
   Normal
 }
 
@@ -142,7 +145,7 @@ pub(all) enum DominantBaseline {
 } derive(Eq)
 
 ///|
-pub impl Default for DominantBaseline with default() {
+pub impl Default for DominantBaseline with fn default() {
   Auto
 }
 
@@ -164,7 +167,7 @@ pub(all) enum AlignmentBaseline {
 } derive(Eq)
 
 ///|
-pub impl Default for AlignmentBaseline with default() {
+pub impl Default for AlignmentBaseline with fn default() {
   Auto
 }
 
@@ -178,7 +181,7 @@ pub(all) enum BaselineShift {
 } derive(Eq)
 
 ///|
-pub impl Default for BaselineShift with default() {
+pub impl Default for BaselineShift with fn default() {
   Baseline
 }
 
@@ -190,7 +193,7 @@ pub(all) enum LengthAdjust {
 } derive(Eq)
 
 ///|
-pub impl Default for LengthAdjust with default() {
+pub impl Default for LengthAdjust with fn default() {
   Spacing
 }
 
@@ -207,7 +210,7 @@ pub(all) enum FontOpticalSizing {
 } derive(Eq)
 
 ///|
-pub impl Default for FontOpticalSizing with default() {
+pub impl Default for FontOpticalSizing with fn default() {
   OpticalAuto
 }
 
@@ -296,7 +299,7 @@ pub struct TextSpan {
 
 ///|
 fn TextSpan::clone(self : TextSpan) -> TextSpan {
-  { ..self, decoration: self.decoration.clone() }
+  { ..self, decoration: self.decoration.clone(), }
 }
 
 ///|
@@ -426,7 +429,7 @@ pub(all) enum TextAnchor {
 } derive(Eq)
 
 ///|
-pub impl Default for TextAnchor with default() {
+pub impl Default for TextAnchor with fn default() {
   Start
 }
 
@@ -484,7 +487,7 @@ pub struct TextChunk {
 
 ///|
 fn TextChunk::clone(self : TextChunk) -> TextChunk {
-  { ..self, spans: self.spans.map(TextSpan::clone) }
+  { ..self, spans: self.spans.map(TextSpan::clone), }
 }
 
 ///|

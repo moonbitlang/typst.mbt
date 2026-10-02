@@ -50,52 +50,67 @@ fn imagesize_image_type(data : Bytes) -> ImageSizeType? {
 /// `imagesize::blob_size`: the `(width, height)` of an image.
 fn imagesize_blob_size(data : Bytes) -> (Int, Int)? {
   let n = data.length()
-  let u16_be = (pos : Int) => if pos + 2 <= n {
-    Some((data[pos].to_int() << 8) | data[pos + 1].to_int())
-  } else {
-    None
+  let u16_be = (pos : Int) => {
+    if pos + 2 <= n {
+      Some((data[pos].to_int() << 8) | data[pos + 1].to_int())
+    } else {
+      None
+    }
   }
-  let u16_le = (pos : Int) => if pos + 2 <= n {
-    Some((data[pos + 1].to_int() << 8) | data[pos].to_int())
-  } else {
-    None
+  let u16_le = (pos : Int) => {
+    if pos + 2 <= n {
+      Some((data[pos + 1].to_int() << 8) | data[pos].to_int())
+    } else {
+      None
+    }
   }
-  let u24_le = (pos : Int) => if pos + 3 <= n {
-    Some(
-      (data[pos + 2].to_int() << 16) |
-      (data[pos + 1].to_int() << 8) |
-      data[pos].to_int(),
-    )
-  } else {
-    None
+  let u24_le = (pos : Int) => {
+    if pos + 3 <= n {
+      Some(
+        (data[pos + 2].to_int() << 16) |
+        (data[pos + 1].to_int() << 8) |
+        data[pos].to_int(),
+      )
+    } else {
+      None
+    }
   }
-  let u32_be = (pos : Int) => if pos + 4 <= n {
-    Some(
-      (data[pos].to_uint() << 24) |
-      (data[pos + 1].to_uint() << 16) |
-      (data[pos + 2].to_uint() << 8) |
-      data[pos + 3].to_uint(),
-    )
-  } else {
-    None
+  let u32_be = (pos : Int) => {
+    if pos + 4 <= n {
+      Some(
+        (data[pos].to_uint() << 24) |
+        (data[pos + 1].to_uint() << 16) |
+        (data[pos + 2].to_uint() << 8) |
+        data[pos + 3].to_uint(),
+      )
+    } else {
+      None
+    }
   }
-  let u32_le = (pos : Int) => if pos + 4 <= n {
-    Some(
-      (data[pos + 3].to_uint() << 24) |
-      (data[pos + 2].to_uint() << 16) |
-      (data[pos + 1].to_uint() << 8) |
-      data[pos].to_uint(),
-    )
-  } else {
-    None
+  let u32_le = (pos : Int) => {
+    if pos + 4 <= n {
+      Some(
+        (data[pos + 3].to_uint() << 24) |
+        (data[pos + 2].to_uint() << 16) |
+        (data[pos + 1].to_uint() << 8) |
+        data[pos].to_uint(),
+      )
+    } else {
+      None
+    }
   }
-  match imagesize_image_type(data)? {
+  guard imagesize_image_type(data) is Some(ty) else { return None }
+  match ty {
     Png => {
-      let w = u32_be(0x10)?
-      let h = u32_be(0x14)?
+      guard u32_be(0x10) is Some(w) else { return None }
+      guard u32_be(0x14) is Some(h) else { return None }
       Some((w.reinterpret_as_int(), h.reinterpret_as_int()))
     }
-    Gif => Some((u16_le(6)?, u16_le(8)?))
+    Gif =>
+      match (u16_le(6), u16_le(8)) {
+        (Some(w), Some(h)) => Some((w, h))
+        _ => None
+      }
     Jpeg => {
       let mut pos = 2
       let mut depth = 0
@@ -125,15 +140,15 @@ fn imagesize_blob_size(data : Bytes) -> (Int, Int)? {
             return None
           }
         }
-        let page_size = u16_be(pos)?
+        guard u16_be(pos) is Some(page_size) else { return None }
         pos += 2
         pos = pos + page_size - 2
         if pos < 0 {
           return None
         }
       }
-      let h = u16_be(pos)?
-      let w = u16_be(pos + 2)?
+      guard u16_be(pos) is Some(h) else { return None }
+      guard u16_be(pos + 2) is Some(w) else { return None }
       Some((w, h))
     }
     Webp => {
@@ -141,9 +156,13 @@ fn imagesize_blob_size(data : Bytes) -> (Int, Int)? {
         return None
       }
       match data[15] {
-        b' ' => Some((u16_le(0x1A)?, u16_le(0x1C)?))
+        b' ' =>
+          match (u16_le(0x1A), u16_le(0x1C)) {
+            (Some(w), Some(h)) => Some((w, h))
+            _ => None
+          }
         b'L' => {
-          let dims = u32_le(0x15)?
+          guard u32_le(0x15) is Some(dims) else { return None }
           Some(
             (
               (dims & 0x3FFF).reinterpret_as_int() + 1,
@@ -151,7 +170,11 @@ fn imagesize_blob_size(data : Bytes) -> (Int, Int)? {
             ),
           )
         }
-        b'X' => Some((u24_le(0x18)? + 1, u24_le(0x1B)? + 1))
+        b'X' =>
+          match (u24_le(0x18), u24_le(0x1B)) {
+            (Some(w), Some(h)) => Some((w + 1, h + 1))
+            _ => None
+          }
         _ => None
       }
     }

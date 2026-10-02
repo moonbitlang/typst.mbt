@@ -28,9 +28,10 @@ pub(all) suberror UsvgError {
 }
 
 ///|
-pub impl Show for UsvgError with output(self, logger) {
+pub impl Show for UsvgError with fn output(self, logger) {
   match self {
-    NotAnUtf8Str => logger.write_string("provided data has not an UTF-8 encoding")
+    NotAnUtf8Str =>
+      logger.write_string("provided data has not an UTF-8 encoding")
     MalformedGZip =>
       logger.write_string("provided data has a malformed GZip content")
     ElementsLimitReached =>
@@ -43,7 +44,7 @@ pub impl Show for UsvgError with output(self, logger) {
 
 ///|
 /// Processing options.
-pub struct Options {
+pub(all) struct Options {
   /// Directory that will be used during relative paths resolving.
   ///
   /// Default: `None`
@@ -107,7 +108,7 @@ pub struct Options {
 }
 
 ///|
-pub impl Default for Options with default() {
+pub impl Default for Options with fn default() {
   {
     resources_dir: None,
     dpi: 96.0,
@@ -145,7 +146,10 @@ pub fn Tree::from_data(data : Bytes, opt : Options) -> Tree raise UsvgError {
 /// Similar to the `from_data` method, except that it ignores all `image` elements linking to
 /// external files, as required by the SVG specification when SVG files are loaded
 /// for `<image href="..." />` tags.
-pub fn Tree::from_data_nested(data : Bytes, opt : Options) -> Tree raise UsvgError {
+pub fn Tree::from_data_nested(
+  data : Bytes,
+  opt : Options,
+) -> Tree raise UsvgError {
   let nested_opt = {
     ..Options::default(),
     resources_dir: None,
@@ -172,7 +176,7 @@ pub fn Tree::from_data_nested(data : Bytes, opt : Options) -> Tree raise UsvgErr
 ///|
 /// Parses `Tree` from an SVG string.
 pub fn Tree::from_str(text : String, opt : Options) -> Tree raise UsvgError {
-  let xml_opt = { ..@xml.ParsingOptions::default(), allow_dtd: true }
+  let xml_opt = { ..@xml.ParsingOptions::default(), allow_dtd: true, }
   let doc = @xml.Document::parse_with_options(text, xml_opt) catch {
     e => raise ParsingFailed(e)
   }
@@ -181,7 +185,10 @@ pub fn Tree::from_str(text : String, opt : Options) -> Tree raise UsvgError {
 
 ///|
 /// Parses `Tree` from `roxmltree::Document`.
-pub fn Tree::from_xmltree(doc : @xml.Document, opt : Options) -> Tree raise UsvgError {
+pub fn Tree::from_xmltree(
+  doc : @xml.Document,
+  opt : Options,
+) -> Tree raise UsvgError {
   let doc = Document::parse_tree(doc, injected_stylesheet?=opt.style_sheet) catch {
     e => raise ParsingFailed(e)
   }

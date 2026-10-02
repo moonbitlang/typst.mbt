@@ -129,7 +129,7 @@ pub(all) enum ColorInterpolation {
 } derive(Eq)
 
 ///|
-pub impl Default for ColorInterpolation with default() {
+pub impl Default for ColorInterpolation with fn default() {
   LinearRGB
 }
 
@@ -162,7 +162,7 @@ pub(all) enum ColorMatrixKind {
 }
 
 ///|
-pub impl Default for ColorMatrixKind with default() {
+pub impl Default for ColorMatrixKind with fn default() {
   Matrix([
     1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0,
     0.0, 0.0, 1.0, 0.0,
@@ -288,12 +288,16 @@ fn ConvolveMatrixData::new(
     target_y >= rows {
     return None
   }
-  Some({ target_x, target_y, columns, rows, data })
+  Some({ target_x, target_y, columns, rows, data, })
 }
 
 ///|
 /// Returns a matrix value at the specified position.
-pub fn ConvolveMatrixData::get(self : ConvolveMatrixData, x : UInt, y : UInt) -> Float {
+pub fn ConvolveMatrixData::get(
+  self : ConvolveMatrixData,
+  x : UInt,
+  y : UInt,
+) -> Float {
   self.data[(y * self.columns + x).reinterpret_as_int()]
 }
 

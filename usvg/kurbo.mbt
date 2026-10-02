@@ -10,17 +10,17 @@ priv struct KPoint {
 
 ///|
 fn KPoint::add(self : KPoint, v : KPoint) -> KPoint {
-  { x: self.x + v.x, y: self.y + v.y }
+  { x: self.x + v.x, y: self.y + v.y, }
 }
 
 ///|
 fn KPoint::sub(self : KPoint, v : KPoint) -> KPoint {
-  { x: self.x - v.x, y: self.y - v.y }
+  { x: self.x - v.x, y: self.y - v.y, }
 }
 
 ///|
 fn KPoint::scale(self : KPoint, s : Double) -> KPoint {
-  { x: s * self.x, y: s * self.y }
+  { x: s * self.x, y: s * self.y, }
 }
 
 ///|
@@ -138,7 +138,7 @@ fn KArc::from_svg_arc(arc : KSvgArc) -> KArc? {
   }
   Some({
     center,
-    radii: { x: rx, y: ry },
+    radii: { x: rx, y: ry, },
     start_angle,
     sweep_angle,
     x_rotation: arc.x_rotation,
@@ -212,12 +212,16 @@ fn f64_as_usize(x : Double) -> Int {
 ///|
 /// Take the ellipse radii, how the radii are rotated, and the sweep angle, and return a point on
 /// the ellipse.
-fn sample_ellipse(radii : KPoint, x_rotation : Double, angle : Double) -> KPoint {
+fn sample_ellipse(
+  radii : KPoint,
+  x_rotation : Double,
+  angle : Double,
+) -> KPoint {
   let angle_sin = sincos_sin(angle)
   let angle_cos = sincos_cos(angle)
   let u = radii.x * angle_cos
   let v = radii.y * angle_sin
-  rotate_pt({ x: u, y: v }, x_rotation)
+  rotate_pt({ x: u, y: v, }, x_rotation)
 }
 
 ///|

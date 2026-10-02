@@ -50,12 +50,12 @@ priv struct BBox {
 
 ///|
 fn BBox::from_rect(r : Rect) -> BBox {
-  { left: r.left(), top: r.top(), right: r.right(), bottom: r.bottom() }
+  { left: r.left(), top: r.top(), right: r.right(), bottom: r.bottom(), }
 }
 
 ///|
 fn BBox::from_non_zero_rect(r : NonZeroRect) -> BBox {
-  { left: r.left(), top: r.top(), right: r.right(), bottom: r.bottom() }
+  { left: r.left(), top: r.top(), right: r.right(), bottom: r.bottom(), }
 }
 
 ///|
@@ -65,8 +65,8 @@ let f32_max : Float = Float::reinterpret_from_uint(0x7F7FFFFFU)
 let f32_min : Float = Float::reinterpret_from_uint(0xFF7FFFFFU)
 
 ///|
-impl Default for BBox with default() {
-  { left: f32_max, top: f32_max, right: f32_min, bottom: f32_min }
+impl Default for BBox with fn default() {
+  { left: f32_max, top: f32_max, right: f32_min, bottom: f32_min, }
 }
 
 ///|

@@ -2,7 +2,7 @@
 
 ///|
 /// XML writing options.
-pub struct WriteOptions {
+pub(all) struct WriteOptions {
   /// Used to add a custom prefix to each element ID during writing.
   id_prefix : String?
   /// Do not convert text into paths.
@@ -36,7 +36,7 @@ pub struct WriteOptions {
 }
 
 ///|
-pub impl Default for WriteOptions with default() {
+pub impl Default for WriteOptions with fn default() {
   {
     id_prefix: None,
     preserve_text: false,
@@ -77,7 +77,11 @@ fn writer_convert(tree : Tree, opt : WriteOptions) -> String {
 }
 
 ///|
-fn write_filters(tree : Tree, opt : WriteOptions, xml : @xmlwriter.XmlWriter) -> Unit {
+fn write_filters(
+  tree : Tree,
+  opt : WriteOptions,
+  xml : @xmlwriter.XmlWriter,
+) -> Unit {
   let written_fe_image_nodes : Array[String] = []
   for filter in tree.filters {
     for fe in filter.primitives {
@@ -159,14 +163,17 @@ fn write_filters(tree : Tree, opt : WriteOptions, xml : @xmlwriter.XmlWriter) ->
           xml.write_filter_primitive_attrs(filter.rect, fe)
           xml.write_filter_input(AId::In, composite.input1)
           xml.write_filter_input(AId::In2, composite.input2)
-          xml.write_svg_attribute(AId::Operator, match composite.operator {
-            Over => "over"
-            In => "in"
-            Out => "out"
-            Atop => "atop"
-            Xor => "xor"
-            Arithmetic(..) => "arithmetic"
-          })
+          xml.write_svg_attribute(
+            AId::Operator,
+            match composite.operator {
+              Over => "over"
+              In => "in"
+              Out => "out"
+              Atop => "atop"
+              Xor => "xor"
+              Arithmetic(..) => "arithmetic"
+            },
+          )
           if composite.operator is Arithmetic(k1~, k2~, k3~, k4~) {
             xml.write_svg_attribute(AId::K1, rust_display_f32(k1))
             xml.write_svg_attribute(AId::K2, rust_display_f32(k2))
@@ -227,7 +234,10 @@ fn write_filters(tree : Tree, opt : WriteOptions, xml : @xmlwriter.XmlWriter) ->
             }
             Saturate(value) => {
               xml.write_svg_attribute(AId::Type, "saturate")
-              xml.write_svg_attribute(AId::Values, rust_display_f32(value.get()))
+              xml.write_svg_attribute(
+                AId::Values,
+                rust_display_f32(value.get()),
+              )
             }
             HueRotate(angle) => {
               xml.write_svg_attribute(AId::Type, "hueRotate")
@@ -253,13 +263,22 @@ fn write_filters(tree : Tree, opt : WriteOptions, xml : @xmlwriter.XmlWriter) ->
             rust_display_f32(matrix.divisor.get()),
           )
           xml.write_svg_attribute(AId::Bias, rust_display_f32(matrix.bias))
-          xml.write_svg_attribute(AId::TargetX, matrix.matrix.target_x.to_string())
-          xml.write_svg_attribute(AId::TargetY, matrix.matrix.target_y.to_string())
-          xml.write_svg_attribute(AId::EdgeMode, match matrix.edge_mode {
-            EdgeNone => "none"
-            Duplicate => "duplicate"
-            Wrap => "wrap"
-          })
+          xml.write_svg_attribute(
+            AId::TargetX,
+            matrix.matrix.target_x.to_string(),
+          )
+          xml.write_svg_attribute(
+            AId::TargetY,
+            matrix.matrix.target_y.to_string(),
+          )
+          xml.write_svg_attribute(
+            AId::EdgeMode,
+            match matrix.edge_mode {
+              EdgeNone => "none"
+              Duplicate => "duplicate"
+              Wrap => "wrap"
+            },
+          )
           xml.write_svg_attribute(
             AId::PreserveAlpha,
             if matrix.preserve_alpha {
@@ -275,10 +294,13 @@ fn write_filters(tree : Tree, opt : WriteOptions, xml : @xmlwriter.XmlWriter) ->
           xml.write_filter_primitive_attrs(filter.rect, fe)
           xml.write_filter_input(AId::In, morphology.input)
           xml.write_svg_attribute(AId::Result, fe.result)
-          xml.write_svg_attribute(AId::Operator, match morphology.operator {
-            Erode => "erode"
-            Dilate => "dilate"
-          })
+          xml.write_svg_attribute(
+            AId::Operator,
+            match morphology.operator {
+              Erode => "erode"
+              Dilate => "dilate"
+            },
+          )
           xml.write_attribute(
             AId::Radius.to_str(),
             "\{rust_display_f32(morphology.radius_x.get())} \{rust_display_f32(morphology.radius_y.get())}",
@@ -292,15 +314,17 @@ fn write_filters(tree : Tree, opt : WriteOptions, xml : @xmlwriter.XmlWriter) ->
           xml.write_filter_input(AId::In2, map.input2)
           xml.write_svg_attribute(AId::Result, fe.result)
           xml.write_svg_attribute(AId::Scale, rust_display_f32(map.scale))
-          let write_channel = (c : ColorChannel, aid : AId) => xml.write_svg_attribute(
-            aid,
-            match c {
-              R => "R"
-              G => "G"
-              B => "B"
-              A => "A"
-            },
-          )
+          let write_channel = (c : ColorChannel, aid : AId) => {
+            xml.write_svg_attribute(
+              aid,
+              match c {
+                R => "R"
+                G => "G"
+                B => "B"
+                A => "A"
+              },
+            )
+          }
           write_channel(map.x_channel_selector, AId::XChannelSelector)
           write_channel(map.y_channel_selector, AId::YChannelSelector)
           xml.end_element()
@@ -326,10 +350,13 @@ fn write_filters(tree : Tree, opt : WriteOptions, xml : @xmlwriter.XmlWriter) ->
               "noStitch"
             },
           )
-          xml.write_svg_attribute(AId::Type, match turbulence.kind {
-            FractalNoise => "fractalNoise"
-            Turbulence => "turbulence"
-          })
+          xml.write_svg_attribute(
+            AId::Type,
+            match turbulence.kind {
+              FractalNoise => "fractalNoise"
+              Turbulence => "turbulence"
+            },
+          )
           xml.end_element()
         }
         DiffuseLighting(light) => {
@@ -475,8 +502,10 @@ fn has_text_paths(parent : Group) -> Bool {
       }
     }
     let mut need_path = false
-    node.subroots(subroot => if !need_path && has_text_paths(subroot) {
-      need_path = true
+    node.subroots(subroot => {
+      if !need_path && has_text_paths(subroot) {
+        need_path = true
+      }
     })
     if need_path {
       return true
@@ -554,9 +583,15 @@ fn write_element(
         Smooth =>
           xml.write_attribute(AId::Style.to_str(), "image-rendering:smooth")
         HighQuality =>
-          xml.write_attribute(AId::Style.to_str(), "image-rendering:high-quality")
+          xml.write_attribute(
+            AId::Style.to_str(),
+            "image-rendering:high-quality",
+          )
         CrispEdges =>
-          xml.write_attribute(AId::Style.to_str(), "image-rendering:crisp-edges")
+          xml.write_attribute(
+            AId::Style.to_str(),
+            "image-rendering:crisp-edges",
+          )
         Pixelated =>
           xml.write_attribute(AId::Style.to_str(), "image-rendering:pixelated")
       }
@@ -792,10 +827,13 @@ fn @xmlwriter.XmlWriter::write_units(
   def : Units,
 ) -> Unit {
   if units != def {
-    self.write_attribute(id.to_str(), match units {
-      UserSpaceOnUse => "userSpaceOnUse"
-      ObjectBoundingBox => "objectBoundingBox"
-    })
+    self.write_attribute(
+      id.to_str(),
+      match units {
+        UserSpaceOnUse => "userSpaceOnUse"
+        ObjectBoundingBox => "objectBoundingBox"
+      },
+    )
   }
 }
 
@@ -872,11 +910,14 @@ fn @xmlwriter.XmlWriter::write_filter_input(
   id : AId,
   input : FilterInput,
 ) -> Unit {
-  self.write_attribute(id.to_str(), match input {
-    SourceGraphic => "SourceGraphic"
-    SourceAlpha => "SourceAlpha"
-    Reference(s) => s
-  })
+  self.write_attribute(
+    id.to_str(),
+    match input {
+      SourceGraphic => "SourceGraphic"
+      SourceAlpha => "SourceAlpha"
+      Reference(s) => s
+    },
+  )
 }
 
 ///|
@@ -897,11 +938,13 @@ fn @xmlwriter.XmlWriter::write_filter_primitive_attrs(
   if parent_rect.height() != fe.rect.height() {
     self.write_svg_attribute(AId::Height, rust_display_f32(fe.rect.height()))
   }
-  self.write_attribute(AId::ColorInterpolationFilters.to_str(), match
-    fe.color_interpolation {
-    SRGB => "sRGB"
-    LinearRGB => "linearRGB"
-  })
+  self.write_attribute(
+    AId::ColorInterpolationFilters.to_str(),
+    match fe.color_interpolation {
+      SRGB => "sRGB"
+      LinearRGB => "linearRGB"
+    },
+  )
 }
 
 ///|
@@ -1015,7 +1058,10 @@ fn write_base_grad(
     xml.write_svg_attribute(AId::Offset, rust_display_f32(s.offset.get()))
     xml.write_color(AId::StopColor, s.color)
     if s.opacity != Opacity::one() {
-      xml.write_svg_attribute(AId::StopOpacity, rust_display_f32(s.opacity.get()))
+      xml.write_svg_attribute(
+        AId::StopOpacity,
+        rust_display_f32(s.opacity.get()),
+      )
     }
     xml.end_element()
   }
@@ -1041,7 +1087,8 @@ fn write_path(
     xml.write_svg_attribute(AId::PaintOrder, "stroke")
   }
   match path.rendering_mode {
-    OptimizeSpeed => xml.write_svg_attribute(AId::ShapeRendering, "optimizeSpeed")
+    OptimizeSpeed =>
+      xml.write_svg_attribute(AId::ShapeRendering, "optimizeSpeed")
     CrispEdges => xml.write_svg_attribute(AId::ShapeRendering, "crispEdges")
     GeometricPrecision => ()
   }
@@ -1118,7 +1165,10 @@ fn write_fill(
   if fill is Some(fill) {
     write_paint(AId::Fill, fill.paint, opt, xml)
     if fill.opacity != Opacity::one() {
-      xml.write_svg_attribute(AId::FillOpacity, rust_display_f32(fill.opacity.get()))
+      xml.write_svg_attribute(
+        AId::FillOpacity,
+        rust_display_f32(fill.opacity.get()),
+      )
     }
     if fill.rule != FillRule::default() {
       let name = if is_clip_path { AId::ClipRule } else { AId::FillRule }
@@ -1156,7 +1206,10 @@ fn write_stroke(
       )
     }
     if stroke.width.get() != 1.0 {
-      xml.write_svg_attribute(AId::StrokeWidth, rust_display_f32(stroke.width.get()))
+      xml.write_svg_attribute(
+        AId::StrokeWidth,
+        rust_display_f32(stroke.width.get()),
+      )
     }
     match stroke.linecap {
       Butt => ()
@@ -1214,9 +1267,18 @@ fn write_light_source(light : LightSource, xml : @xmlwriter.XmlWriter) -> Unit {
       xml.write_svg_attribute(AId::X, rust_display_f32(light.x))
       xml.write_svg_attribute(AId::Y, rust_display_f32(light.y))
       xml.write_svg_attribute(AId::Z, rust_display_f32(light.z))
-      xml.write_svg_attribute(AId::PointsAtX, rust_display_f32(light.points_at_x))
-      xml.write_svg_attribute(AId::PointsAtY, rust_display_f32(light.points_at_y))
-      xml.write_svg_attribute(AId::PointsAtZ, rust_display_f32(light.points_at_z))
+      xml.write_svg_attribute(
+        AId::PointsAtX,
+        rust_display_f32(light.points_at_x),
+      )
+      xml.write_svg_attribute(
+        AId::PointsAtY,
+        rust_display_f32(light.points_at_y),
+      )
+      xml.write_svg_attribute(
+        AId::PointsAtZ,
+        rust_display_f32(light.points_at_z),
+      )
       xml.write_svg_attribute(
         AId::SpecularExponent,
         rust_display_f32(light.specular_exponent.get()),
@@ -1264,19 +1326,20 @@ fn write_span(
   span : TextSpan,
 ) -> Unit {
   xml.start_svg_element(EId::Tspan)
-  let font_family_to_str = (font_family : @svgtypes.FontFamily) => match
-    font_family {
-    Monospace => "monospace"
-    Serif => "serif"
-    SansSerif => "sans-serif"
-    Cursive => "cursive"
-    Fantasy => "fantasy"
-    Named(s) =>
-      // Only quote if absolutely necessary
-      match (try? @svgtypes.parse_font_families(s)) {
-        Ok(_) => s
-        Err(_) => if opt.use_single_quote { "\"\{s}\"" } else { "'\{s}'" }
-      }
+  let font_family_to_str = (font_family : @svgtypes.FontFamily) => {
+    match font_family {
+      Monospace => "monospace"
+      Serif => "serif"
+      SansSerif => "sans-serif"
+      Cursive => "cursive"
+      Fantasy => "fantasy"
+      Named(s) =>
+        // Only quote if absolutely necessary
+        match (try? @svgtypes.parse_font_families(s)) {
+          Ok(_) => s
+          Err(_) => if opt.use_single_quote { "\"\{s}\"" } else { "'\{s}'" }
+        }
+    }
   }
   if !span.font.families.is_empty() {
     let families = span.font.families.map(font_family_to_str).join(", ")
@@ -1307,10 +1370,16 @@ fn write_span(
   xml.write_svg_attribute(AId::FontSize, rust_display_f32(span.font_size.get()))
   xml.write_visibility(span.visible)
   if span.letter_spacing != 0.0 {
-    xml.write_svg_attribute(AId::LetterSpacing, rust_display_f32(span.letter_spacing))
+    xml.write_svg_attribute(
+      AId::LetterSpacing,
+      rust_display_f32(span.letter_spacing),
+    )
   }
   if span.word_spacing != 0.0 {
-    xml.write_svg_attribute(AId::WordSpacing, rust_display_f32(span.word_spacing))
+    xml.write_svg_attribute(
+      AId::WordSpacing,
+      rust_display_f32(span.word_spacing),
+    )
   }
   if span.text_length is Some(text_length) {
     xml.write_svg_attribute(AId::TextLength, rust_display_f32(text_length))

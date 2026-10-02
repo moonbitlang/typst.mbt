@@ -2,7 +2,8 @@
 
 ///|
 fn shapes_convert(node : SvgNode, state : State) -> TinyPath? {
-  match node.tag_name()? {
+  guard node.tag_name() is Some(tag) else { return None }
+  match tag {
     EId::Rect => convert_rect(node, state)
     EId::Circle => convert_circle(node, state)
     EId::Ellipse => convert_ellipse(node, state)
@@ -16,7 +17,7 @@ fn shapes_convert(node : SvgNode, state : State) -> TinyPath? {
 
 ///|
 fn convert_path_data(node : SvgNode) -> TinyPath? {
-  let value : String = node.attribute(AId::D)?
+  guard (node.attribute(AId::D) : String?) is Some(value) else { return None }
   let builder = @tiny_skia_path.PathBuilder::new()
   let parser = @svgtypes.SimplifyingPathParser::from(value)
   while parser.next() is Some(segment) {
@@ -28,7 +29,12 @@ fn convert_path_data(node : SvgNode) -> TinyPath? {
       MoveTo(x~, y~) => builder.move_to(x.to_float(), y.to_float())
       LineTo(x~, y~) => builder.line_to(x.to_float(), y.to_float())
       Quadratic(x1~, y1~, x~, y~) =>
-        builder.quad_to(x1.to_float(), y1.to_float(), x.to_float(), y.to_float())
+        builder.quad_to(
+          x1.to_float(),
+          y1.to_float(),
+          x.to_float(),
+          y.to_float(),
+        )
       CurveTo(x1~, y1~, x2~, y2~, x~, y~) =>
         builder.cubic_to(
           x1.to_float(),
@@ -83,20 +89,22 @@ fn convert_rect(node : SvgNode, state : State) -> TinyPath? {
 
   // Conversion according to https://www.w3.org/TR/SVG11/shapes.html#RectElement
   let path = if approx_eq_ulps(rx, 0.0, 4) {
-    @tiny_skia_path.PathBuilder::from_rect(Rect::from_xywh(x, y, width, height)?)
+    guard Rect::from_xywh(x, y, width, height) is Some(r) else { return None }
+    @tiny_skia_path.PathBuilder::from_rect(r)
   } else {
     let builder = @tiny_skia_path.PathBuilder::new()
     builder.move_to(x + rx, y)
     builder.line_to(x + width - rx, y)
-    arc_to(builder, rx, ry, 0.0, false, true, x + width, y + ry)
+    builder.arc_to(rx, ry, 0.0, false, true, x + width, y + ry)
     builder.line_to(x + width, y + height - ry)
-    arc_to(builder, rx, ry, 0.0, false, true, x + width - rx, y + height)
+    builder.arc_to(rx, ry, 0.0, false, true, x + width - rx, y + height)
     builder.line_to(x + rx, y + height)
-    arc_to(builder, rx, ry, 0.0, false, true, x, y + height - ry)
+    builder.arc_to(rx, ry, 0.0, false, true, x, y + height - ry)
     builder.line_to(x, y + ry)
-    arc_to(builder, rx, ry, 0.0, false, true, x + rx, y)
+    builder.arc_to(rx, ry, 0.0, false, true, x + rx, y)
     builder.close()
-    builder.finish()?
+    guard builder.finish() is Some(path) else { return None }
+    path
   }
   Some(path)
 }
@@ -151,19 +159,22 @@ fn convert_line(node : SvgNode, state : State) -> TinyPath? {
 
 ///|
 fn convert_polyline(node : SvgNode) -> TinyPath? {
-  let builder = points_to_path(node, "Polyline")?
+  guard points_to_path(node, "Polyline") is Some(builder) else { return None }
   builder.finish()
 }
 
 ///|
 fn convert_polygon(node : SvgNode) -> TinyPath? {
-  let builder = points_to_path(node, "Polygon")?
+  guard points_to_path(node, "Polygon") is Some(builder) else { return None }
   builder.close()
   builder.finish()
 }
 
 ///|
-fn points_to_path(node : SvgNode, _eid : String) -> @tiny_skia_path.PathBuilder? {
+fn points_to_path(
+  node : SvgNode,
+  _eid : String,
+) -> @tiny_skia_path.PathBuilder? {
   let builder = @tiny_skia_path.PathBuilder::new()
   let text : String? = node.attribute(AId::Points)
   match text {
@@ -222,17 +233,17 @@ fn convert_ellipse(node : SvgNode, state : State) -> TinyPath? {
 fn ellipse_to_path(cx : Float, cy : Float, rx : Float, ry : Float) -> TinyPath? {
   let builder = @tiny_skia_path.PathBuilder::new()
   builder.move_to(cx + rx, cy)
-  arc_to(builder, rx, ry, 0.0, false, true, cx, cy + ry)
-  arc_to(builder, rx, ry, 0.0, false, true, cx - rx, cy)
-  arc_to(builder, rx, ry, 0.0, false, true, cx, cy - ry)
-  arc_to(builder, rx, ry, 0.0, false, true, cx + rx, cy)
+  builder.arc_to(rx, ry, 0.0, false, true, cx, cy + ry)
+  builder.arc_to(rx, ry, 0.0, false, true, cx - rx, cy)
+  builder.arc_to(rx, ry, 0.0, false, true, cx, cy - ry)
+  builder.arc_to(rx, ry, 0.0, false, true, cx + rx, cy)
   builder.close()
   builder.finish()
 }
 
 ///|
 /// `PathBuilderExt::arc_to`.
-fn arc_to(
+fn @tiny_skia_path.PathBuilder::arc_to(
   self : @tiny_skia_path.PathBuilder,
   rx : Float,
   ry : Float,
@@ -247,23 +258,25 @@ fn arc_to(
     None => return
   }
   let svg_arc : KSvgArc = {
-    from: { x: prev.x.to_double(), y: prev.y.to_double() },
-    to: { x: x.to_double(), y: y.to_double() },
-    radii: { x: rx.to_double(), y: ry.to_double() },
+    from: { x: prev.x.to_double(), y: prev.y.to_double(), },
+    to: { x: x.to_double(), y: y.to_double(), },
+    radii: { x: rx.to_double(), y: ry.to_double(), },
     x_rotation: x_axis_rotation.to_double() * (@math.PI / 180.0),
     large_arc,
     sweep,
   }
   match KArc::from_svg_arc(svg_arc) {
     Some(arc) =>
-      arc.to_cubic_beziers(0.1, (p1, p2, p) => self.cubic_to(
-        p1.x.to_float(),
-        p1.y.to_float(),
-        p2.x.to_float(),
-        p2.y.to_float(),
-        p.x.to_float(),
-        p.y.to_float(),
-      ))
+      arc.to_cubic_beziers(0.1, (p1, p2, p) => {
+        self.cubic_to(
+          p1.x.to_float(),
+          p1.y.to_float(),
+          p2.x.to_float(),
+          p2.y.to_float(),
+          p.x.to_float(),
+          p.y.to_float(),
+        )
+      })
     None => self.line_to(x, y)
   }
 }

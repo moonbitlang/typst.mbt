@@ -10,7 +10,10 @@ fn parse_svg_text_element(
 ) -> Unit raise @xml.XmlError {
   let space = if doc.get(parent_id).has_attribute(AId::Space) {
     get_xmlspace(doc, parent_id, XmlSpaceDefault)
-  } else if doc.get(parent_id).ancestors().find_first(n => n.has_attribute(AId::Space))
+  } else if doc
+    .get(parent_id)
+    .ancestors()
+    .find_first(n => n.has_attribute(AId::Space))
     is Some(node) {
     get_xmlspace(doc, node.id, XmlSpaceDefault)
   } else {
@@ -80,13 +83,17 @@ fn parse_svg_text_element_impl(
 
 ///|
 fn resolve_tref_text(xml : @xml.Document, href : String) -> String? {
-  let id = (try? @svgtypes.IRI::from_str(href)).to_option()?.0
+  guard (try? @svgtypes.IRI::from_str(href)) is Ok(iri) else { return None }
+  let id = iri.0
 
   // Find linked element in the original tree.
-  let node = xml.descendants().iter().find_first(n => n.attribute("id") == Some(id))?
+  guard xml.descendants().iter().find_first(n => n.attribute("id") == Some(id))
+    is Some(node) else {
+    return None
+  }
 
   // `tref` should be linked to an SVG element.
-  parse_tag_name(node)?
+  guard parse_tag_name(node) is Some(_) else { return None }
 
   // 'All character data within the referenced element, including character data enclosed
   // within additional markup, will be rendered.'
@@ -136,7 +143,9 @@ fn Document::text_of(self : Document, node_id : Int) -> String {
 ///|
 fn Document::remove_first_space(self : Document, node_id : Int) -> Unit {
   if self.nodes[node_id].kind is Text(text) {
-    self.nodes[node_id].kind = Text(text.unsafe_substring(start=1, end=text.length()))
+    self.nodes[node_id].kind = Text(
+      text.unsafe_substring(start=1, end=text.length()),
+    )
   }
 }
 
@@ -156,7 +165,11 @@ fn Document::remove_last_space(self : Document, node_id : Int) -> Unit {
 /// - 'xml:space' processing
 /// - tabs and newlines removing/replacing
 /// - spaces trimming
-fn trim_text_nodes(text_elem_id : Int, xmlspace : XmlSpace, doc : Document) -> Unit {
+fn trim_text_nodes(
+  text_elem_id : Int,
+  xmlspace : XmlSpace,
+  doc : Document,
+) -> Unit {
   let nodes = [] // TODO: allocate only once
   collect_text_nodes(doc.get(text_elem_id), 0, nodes)
 
@@ -235,15 +248,19 @@ fn trim_text_nodes(text_elem_id : Int, xmlspace : XmlSpace, doc : Document) -> U
         let text2 = doc.text_of(node2_id)
         // Only spaces are compared, so UTF-16 code units are equivalent to
         // upstream's UTF-8 bytes here.
-        let first = (t : String) => if t.is_empty() {
-          None
-        } else {
-          Some(t.unsafe_get(0))
+        let first = (t : String) => {
+          if t.is_empty() {
+            None
+          } else {
+            Some(t.unsafe_get(0))
+          }
         }
-        let last = (t : String) => if t.is_empty() {
-          None
-        } else {
-          Some(t.unsafe_get(t.length() - 1))
+        let last = (t : String) => {
+          if t.is_empty() {
+            None
+          } else {
+            Some(t.unsafe_get(t.length() - 1))
+          }
         }
         (first(text1), last(text1), first(text2), last(text2))
       }

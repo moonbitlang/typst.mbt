@@ -58,7 +58,7 @@ pub(all) enum Visibility {
 } derive(Eq)
 
 ///|
-pub impl Default for Visibility with default() {
+pub impl Default for Visibility with fn default() {
   Visible
 }
 
@@ -83,7 +83,7 @@ pub fn ShapeRendering::use_shape_antialiasing(self : ShapeRendering) -> Bool {
 }
 
 ///|
-pub impl Default for ShapeRendering with default() {
+pub impl Default for ShapeRendering with fn default() {
   GeometricPrecision
 }
 
@@ -98,7 +98,7 @@ pub(all) enum TextRendering {
 } derive(Eq)
 
 ///|
-pub impl Default for TextRendering with default() {
+pub impl Default for TextRendering with fn default() {
   OptimizeLegibility
 }
 
@@ -117,7 +117,7 @@ pub(all) enum ImageRendering {
 } derive(Eq)
 
 ///|
-pub impl Default for ImageRendering with default() {
+pub impl Default for ImageRendering with fn default() {
   OptimizeQuality
 }
 
@@ -145,12 +145,12 @@ pub(all) enum BlendMode {
 } derive(Eq)
 
 ///|
-pub impl Default for BlendMode with default() {
+pub impl Default for BlendMode with fn default() {
   Normal
 }
 
 ///|
-pub impl Show for BlendMode with output(self, logger) {
+pub impl Show for BlendMode with fn output(self, logger) {
   logger.write_string(
     match self {
       Normal => "normal"
@@ -184,7 +184,7 @@ pub(all) enum SpreadMethod {
 } derive(Eq)
 
 ///|
-pub impl Default for SpreadMethod with default() {
+pub impl Default for SpreadMethod with fn default() {
   Pad
 }
 
@@ -410,7 +410,7 @@ pub struct StrokeMiterlimit(Float)
 ///|
 /// Creates a new `StrokeMiterlimit` value.
 pub fn StrokeMiterlimit::new(n : Float) -> StrokeMiterlimit {
-  let n = if !(n >= 1.0) { 1.0 } else { n }
+  let n : Float = if !(n >= 1.0) { 1.0 } else { n }
   StrokeMiterlimit(n)
 }
 
@@ -421,12 +421,12 @@ pub fn StrokeMiterlimit::get(self : StrokeMiterlimit) -> Float {
 }
 
 ///|
-pub impl Default for StrokeMiterlimit with default() {
+pub impl Default for StrokeMiterlimit with fn default() {
   StrokeMiterlimit::new(4.0)
 }
 
 ///|
-pub impl Eq for StrokeMiterlimit with equal(self, other) {
+pub impl Eq for StrokeMiterlimit with fn equal(self, other) {
   approx_eq_ulps(self.0, other.0, 4)
 }
 
@@ -441,7 +441,7 @@ pub(all) enum LineCap {
 } derive(Eq)
 
 ///|
-pub impl Default for LineCap with default() {
+pub impl Default for LineCap with fn default() {
   Butt
 }
 
@@ -457,7 +457,7 @@ pub(all) enum LineJoin {
 } derive(Eq)
 
 ///|
-pub impl Default for LineJoin with default() {
+pub impl Default for LineJoin with fn default() {
   Miter
 }
 
@@ -562,7 +562,7 @@ pub(all) enum FillRule {
 } derive(Eq)
 
 ///|
-pub impl Default for FillRule with default() {
+pub impl Default for FillRule with fn default() {
   NonZero
 }
 
@@ -610,7 +610,7 @@ pub fn Fill::rule(self : Fill) -> FillRule {
 }
 
 ///|
-pub impl Default for Fill with default() {
+pub impl Default for Fill with fn default() {
   {
     paint: Color(Color::black()),
     opacity: Opacity::one(),
@@ -630,7 +630,7 @@ pub(all) struct Color {
 ///|
 /// Constructs a new `Color` from RGB values.
 pub fn Color::new_rgb(red : Int, green : Int, blue : Int) -> Color {
-  { red, green, blue }
+  { red, green, blue, }
 }
 
 ///|
@@ -657,7 +657,7 @@ pub(all) enum Paint {
 }
 
 ///|
-pub impl Eq for Paint with equal(self, other) {
+pub impl Eq for Paint with fn equal(self, other) {
   match (self, other) {
     (Color(lc), Color(rc)) => lc == rc
     (LinearGradient(lg1), LinearGradient(lg2)) => physical_equal(lg1, lg2)
@@ -724,7 +724,7 @@ pub(all) enum MaskType {
 } derive(Eq)
 
 ///|
-pub impl Default for MaskType with default() {
+pub impl Default for MaskType with fn default() {
   Luminance
 }
 
@@ -939,7 +939,11 @@ fn Group::empty() -> Group {
 ///|
 /// A deep copy of the group (upstream's `Clone`).
 fn Group::clone(self : Group) -> Group {
-  { ..self, filters: self.filters.copy(), children: self.children.map(Node::clone) }
+  {
+    ..self,
+    filters: self.filters.copy(),
+    children: self.children.map(Node::clone),
+  }
 }
 
 ///|
@@ -1106,7 +1110,7 @@ pub(all) enum PaintOrder {
 } derive(Eq)
 
 ///|
-pub impl Default for PaintOrder with default() {
+pub impl Default for PaintOrder with fn default() {
   FillAndStroke
 }
 
@@ -1157,23 +1161,29 @@ fn Path::new(
   data : TinyPath,
   abs_transform : Transform,
 ) -> Path? {
-  let bounding_box = data.compute_tight_bounds()?
+  guard data.compute_tight_bounds() is Some(bounding_box) else { return None }
   let stroke_bounding_box = Path::calculate_stroke_bbox(stroke, data).unwrap_or(
     bounding_box,
   )
-  let abs_bounding_box : Rect
-  let abs_stroke_bounding_box : Rect
-  if abs_transform.has_skew() {
+  let (abs_bounding_box, abs_stroke_bounding_box) = if abs_transform.has_skew() {
     // TODO: avoid re-alloc
-    let path2 = data.clone().transform(abs_transform)?
-    abs_bounding_box = path2.compute_tight_bounds()?
-    abs_stroke_bounding_box = Path::calculate_stroke_bbox(stroke, path2).unwrap_or(
+    guard data.clone().transform(abs_transform) is Some(path2) else {
+      return None
+    }
+    guard path2.compute_tight_bounds() is Some(abs_bounding_box) else {
+      return None
+    }
+    (
       abs_bounding_box,
+      Path::calculate_stroke_bbox(stroke, path2).unwrap_or(abs_bounding_box),
     )
   } else {
     // A transform without a skew can be performed just on a bbox.
-    abs_bounding_box = bounding_box.transform(abs_transform)?
-    abs_stroke_bounding_box = stroke_bounding_box.transform(abs_transform)?
+    guard bounding_box.transform(abs_transform) is Some(r1) else { return None }
+    guard stroke_bounding_box.transform(abs_transform) is Some(r2) else {
+      return None
+    }
+    (r1, r2)
   }
   Some({
     id,
@@ -1267,7 +1277,9 @@ pub fn Path::abs_stroke_bounding_box(self : Path) -> Rect {
 
 ///|
 fn Path::calculate_stroke_bbox(stroke : Stroke?, path : TinyPath) -> Rect? {
-  let stroke = { ..stroke?.to_tiny_skia(), dash: None }
+  guard stroke is Some(stroke) else { return None }
+  let stroke = stroke.to_tiny_skia()
+  stroke.dash = None
   // According to the spec, dash should not be accounted during bbox calculation.
 
   // TODO: avoid for round and bevel caps
@@ -1493,20 +1505,22 @@ pub fn Tree::fontdb(self : Tree) -> FontDatabase {
 
 ///|
 fn Tree::collect_paint_servers(self : Tree) -> Unit {
-  loop_over_paint_servers(self.root, paint => match paint {
-    Color(_) => ()
-    LinearGradient(lg) =>
-      if !self.linear_gradients.iter().any(other => physical_equal(lg, other)) {
-        self.linear_gradients.push(lg)
-      }
-    RadialGradient(rg) =>
-      if !self.radial_gradients.iter().any(other => physical_equal(rg, other)) {
-        self.radial_gradients.push(rg)
-      }
-    Pattern(patt) =>
-      if !self.patterns.iter().any(other => physical_equal(patt, other)) {
-        self.patterns.push(patt)
-      }
+  loop_over_paint_servers(self.root, paint => {
+    match paint {
+      Color(_) => ()
+      LinearGradient(lg) =>
+        if !self.linear_gradients.iter().any(other => physical_equal(lg, other)) {
+          self.linear_gradients.push(lg)
+        }
+      RadialGradient(rg) =>
+        if !self.radial_gradients.iter().any(other => physical_equal(rg, other)) {
+          self.radial_gradients.push(rg)
+        }
+      Pattern(patt) =>
+        if !self.patterns.iter().any(other => physical_equal(patt, other)) {
+          self.patterns.push(patt)
+        }
+    }
   })
 }
 
@@ -1569,7 +1583,10 @@ fn loop_over_paint_servers(parent : Group, f : (Paint) -> Unit) -> Unit {
 }
 
 ///|
-fn Group::collect_clip_paths(self : Group, clip_paths : Array[ClipPath]) -> Unit {
+fn Group::collect_clip_paths(
+  self : Group,
+  clip_paths : Array[ClipPath],
+) -> Unit {
   for node in self.children {
     if node is Group(g) {
       if g.clip_path is Some(clip) {
@@ -1681,7 +1698,9 @@ fn Group::calculate_bounding_boxes(self : Group) -> Unit? {
       }
     } else {
       // Not a group - no need to transform.
-      layer_bbox = layer_bbox.expand(BBox::from_rect(child.stroke_bounding_box()))
+      layer_bbox = layer_bbox.expand(
+        BBox::from_rect(child.stroke_bounding_box()),
+      )
     }
   }
 
@@ -1689,19 +1708,24 @@ fn Group::calculate_bounding_boxes(self : Group) -> Unit? {
   // calculate `layer_bounding_box after` it.
   if bbox.to_rect() is Some(bbox) {
     self.bounding_box = bbox
-    self.abs_bounding_box = abs_bbox.to_rect()?
-    self.stroke_bounding_box = stroke_bbox.to_rect()?
-    self.abs_stroke_bounding_box = abs_stroke_bbox.to_rect()?
+    guard abs_bbox.to_rect() is Some(r) else { return None }
+    self.abs_bounding_box = r
+    guard stroke_bbox.to_rect() is Some(r) else { return None }
+    self.stroke_bounding_box = r
+    guard abs_stroke_bbox.to_rect() is Some(r) else { return None }
+    self.abs_stroke_bounding_box = r
   }
 
   // Filter bbox has a higher priority than layers bbox.
   if self.filters_bounding_box() is Some(filter_bbox) {
     self.layer_bounding_box = filter_bbox
   } else {
-    self.layer_bounding_box = layer_bbox.to_non_zero_rect()?
+    guard layer_bbox.to_non_zero_rect() is Some(r) else { return None }
+    self.layer_bounding_box = r
   }
-  self.abs_layer_bounding_box = self.layer_bounding_box.transform(
-    self.abs_transform,
-  )?
+  guard self.layer_bounding_box.transform(self.abs_transform) is Some(r) else {
+    return None
+  }
+  self.abs_layer_bounding_box = r
   Some(())
 }

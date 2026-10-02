@@ -2,28 +2,13 @@
 // `src/text/*` and `src/parser/text.rs`).
 
 ///|
-pub struct FontDatabase {
-  priv faces : Array[Int]
-}
-
-///|
-pub fn FontDatabase::new() -> FontDatabase {
-  { faces: [] }
-}
-
-///|
-fn FontDatabase::clone(self : FontDatabase) -> FontDatabase {
-  { faces: self.faces.copy() }
-}
-
-///|
-pub struct FontResolver {
+pub(all) struct FontResolver {
   priv dummy : Int
 }
 
 ///|
-pub impl Default for FontResolver with default() {
-  { dummy: 0 }
+pub impl Default for FontResolver with fn default() {
+  { dummy: 0, }
 }
 
 ///|
@@ -61,11 +46,12 @@ fn RefCounter::text(self : RefCounter, text : Text) -> Unit {
     for span in chunk.spans {
       self.fill(span.fill)
       self.stroke(span.stroke)
-      for deco in [
-        span.decoration.underline,
-        span.decoration.overline,
-        span.decoration.line_through,
-      ] {
+      for
+        deco in [
+          span.decoration.underline,
+          span.decoration.overline,
+          span.decoration.line_through,
+        ] {
         if deco is Some(deco) {
           self.fill(deco.fill)
           self.stroke(deco.stroke)

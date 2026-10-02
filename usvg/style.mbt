@@ -1,7 +1,7 @@
 // Port of `usvg` 0.47.0 `src/parser/style.rs`: fill and stroke resolving.
 
 ///|
-impl FromValue for LineCap with parse(_, _, value) {
+impl FromValue for LineCap with fn parse(_, _, value) {
   match value {
     "butt" => Some(Butt)
     "round" => Some(Round)
@@ -11,7 +11,7 @@ impl FromValue for LineCap with parse(_, _, value) {
 }
 
 ///|
-impl FromValue for LineJoin with parse(_, _, value) {
+impl FromValue for LineJoin with fn parse(_, _, value) {
   match value {
     "miter" => Some(Miter)
     "miter-clip" => Some(MiterClip)
@@ -22,7 +22,7 @@ impl FromValue for LineJoin with parse(_, _, value) {
 }
 
 ///|
-impl FromValue for FillRule with parse(_, _, value) {
+impl FromValue for FillRule with fn parse(_, _, value) {
   match value {
     "nonzero" => Some(NonZero)
     "evenodd" => Some(EvenOdd)
@@ -51,8 +51,20 @@ fn resolve_fill(
     .ancestors()
     .find_first(n => n.has_attribute(AId::Fill))
     is Some(n) {
-    let value : String = n.attribute(AId::Fill)?
-    convert_paint(node, value, AId::Fill, has_bbox, state, sub_opacity, cache)?
+    guard (n.attribute(AId::Fill) : String?) is Some(value) else { return None }
+    guard convert_paint(
+        node,
+        value,
+        AId::Fill,
+        has_bbox,
+        state,
+        sub_opacity,
+        cache,
+      )
+      is Some(r) else {
+      return None
+    }
+    r
   } else {
     (Color(Color::black()), None)
   }
@@ -83,18 +95,34 @@ fn resolve_stroke(
     .ancestors()
     .find_first(n => n.has_attribute(AId::Stroke))
     is Some(n) {
-    let value : String = n.attribute(AId::Stroke)?
-    convert_paint(node, value, AId::Stroke, has_bbox, state, sub_opacity, cache)?
+    guard (n.attribute(AId::Stroke) : String?) is Some(value) else {
+      return None
+    }
+    guard convert_paint(
+        node,
+        value,
+        AId::Stroke,
+        has_bbox,
+        state,
+        sub_opacity,
+        cache,
+      )
+      is Some(r) else {
+      return None
+    }
+    r
   } else {
     return None
   }
-  let width = node.resolve_valid_length(AId::StrokeWidth, state, 1.0)?
+  guard node.resolve_valid_length(AId::StrokeWidth, state, 1.0) is Some(width) else {
+    return None
+  }
 
   // Must be bigger than 1.
   let miterlimit : Float = node
     .find_attribute(AId::StrokeMiterlimit)
     .unwrap_or(4.0)
-  let miterlimit = if miterlimit < 1.0 { 1.0 } else { miterlimit }
+  let miterlimit : Float = if miterlimit < 1.0 { 1.0 } else { miterlimit }
   let miterlimit = StrokeMiterlimit::new(miterlimit)
   let stroke_opacity : Opacity = node
     .find_attribute(AId::StrokeOpacity)
@@ -106,10 +134,12 @@ fn resolve_stroke(
     miterlimit,
     opacity: sub_opacity.val * stroke_opacity,
     width,
-    linecap: node.find_attribute(AId::StrokeLinecap).unwrap_or(LineCap::default()),
+    linecap: node
+    .find_attribute(AId::StrokeLinecap)
+    .unwrap_or(LineCap::default()),
     linejoin: node
-      .find_attribute(AId::StrokeLinejoin)
-      .unwrap_or(LineJoin::default()),
+    .find_attribute(AId::StrokeLinejoin)
+    .unwrap_or(LineJoin::default()),
     context_element,
   }
   Some(stroke)
@@ -153,12 +183,12 @@ fn convert_paint(
       let svg_color : @svgtypes.Color = node
         .find_attribute(AId::Color)
         .unwrap_or(@svgtypes.Color::black())
-      let (color, alpha) = split_alpha(svg_color)
+      let (color, alpha) = svg_color.split_alpha()
       opacity.val = alpha
       Some((Color(color), None))
     }
     Color(svg_color) => {
-      let (color, alpha) = split_alpha(svg_color)
+      let (color, alpha) = svg_color.split_alpha()
       opacity.val = alpha
       Some((Color(color), None))
     }
@@ -200,18 +230,19 @@ fn from_fallback(
   fallback : @svgtypes.PaintFallback?,
   opacity : Ref[Opacity],
 ) -> Paint? {
-  match fallback? {
+  guard fallback is Some(fallback) else { return None }
+  match fallback {
     None => None
     CurrentColor => {
       let svg_color : @svgtypes.Color = node
         .find_attribute(AId::Color)
         .unwrap_or(@svgtypes.Color::black())
-      let (color, alpha) = split_alpha(svg_color)
+      let (color, alpha) = svg_color.split_alpha()
       opacity.val = alpha
       Some(Color(color))
     }
     Color(svg_color) => {
-      let (color, alpha) = split_alpha(svg_color)
+      let (color, alpha) = svg_color.split_alpha()
       opacity.val = alpha
       Some(Color(color))
     }
@@ -222,10 +253,13 @@ fn from_fallback(
 // Prepare the 'stroke-dasharray' according to:
 // https://www.w3.org/TR/SVG11/painting.html#StrokeDasharrayProperty
 fn conv_dasharray(node : SvgNode, state : State) -> Array[Float]? {
-  let node = node
-    .ancestors()
-    .find_first(n => n.has_attribute(AId::StrokeDasharray))?
-  let list = convert_list(node, AId::StrokeDasharray, state)?
+  guard node.ancestors().find_first(n => n.has_attribute(AId::StrokeDasharray))
+    is Some(node) else {
+    return None
+  }
+  guard convert_list(node, AId::StrokeDasharray, state) is Some(list) else {
+    return None
+  }
 
   // `A negative value is an error`
   if list.iter().any(n => is_sign_negative_f32(n)) {
@@ -234,9 +268,9 @@ fn conv_dasharray(node : SvgNode, state : State) -> Array[Float]? {
 
   // `If the sum of the values is zero, then the stroke is rendered
   // as if a value of none were specified.`
-  {
-    // no Iter::sum(), because of f64
+  // no Iter::sum(), because of f64
 
+  {
     let mut sum : Float = 0.0
     for n in list {
       sum += n

@@ -164,7 +164,13 @@ fn SvgNode::convert_length(
   state : State,
   def : @svgtypes.Length,
 ) -> Float {
-  convert_length(self.attribute(aid).unwrap_or(def), self, aid, object_units, state)
+  convert_length(
+    self.attribute(aid).unwrap_or(def),
+    self,
+    aid,
+    object_units,
+    state,
+  )
 }
 
 ///|
@@ -179,7 +185,9 @@ fn SvgNode::convert_user_length(
 
 ///|
 fn SvgNode::parse_viewbox(self : SvgNode) -> NonZeroRect? {
-  let vb : @svgtypes.ViewBox = self.attribute(AId::ViewBox)?
+  guard (self.attribute(AId::ViewBox) : @svgtypes.ViewBox?) is Some(vb) else {
+    return None
+  }
   NonZeroRect::from_xywh(
     vb.x.to_float(),
     vb.y.to_float(),
@@ -222,7 +230,10 @@ fn SvgNode::try_convert_length(
   object_units : Units,
   state : State,
 ) -> Float? {
-  Some(convert_length(self.attribute(aid)?, self, aid, object_units, state))
+  guard (self.attribute(aid) : @svgtypes.Length?) is Some(length) else {
+    return None
+  }
+  Some(convert_length(length, self, aid, object_units, state))
 }
 
 ///|
@@ -255,7 +266,7 @@ fn SvgNode::is_visible_element(self : SvgNode, opt : Options) -> Bool {
 }
 
 ///|
-fn split_alpha(self : @svgtypes.Color) -> (Color, Opacity) {
+fn @svgtypes.Color::split_alpha(self : @svgtypes.Color) -> (Color, Opacity) {
   (
     Color::new_rgb(self.red.to_int(), self.green.to_int(), self.blue.to_int()),
     Opacity::new_u8(self.alpha.to_int()),
@@ -275,9 +286,9 @@ fn convert_doc(svg_doc : Document, opt : Options) -> Tree raise UsvgError {
   guard size is Some(size) else { raise InvalidSize }
   let view_box : ViewBox = {
     rect: svg.parse_viewbox().unwrap_or(size.to_non_zero_rect(0.0, 0.0)),
-    aspect: svg.attribute(AId::PreserveAspectRatio).unwrap_or(
-      @svgtypes.AspectRatio::default(),
-    ),
+    aspect: svg
+    .attribute(AId::PreserveAspectRatio)
+    .unwrap_or(@svgtypes.AspectRatio::default()),
   }
   let background_color = {
     let s : String? = svg.attribute(AId::BackgroundColor)
@@ -336,7 +347,8 @@ fn convert_doc(svg_doc : Document, opt : Options) -> Tree raise UsvgError {
   } else {
     let g = Group::empty()
     if background_color is Some(background_color) {
-      if background_path(background_color, view_box.rect.to_rect()) is Some(path) {
+      if background_path(background_color, view_box.rect.to_rect())
+        is Some(path) {
         g.children.push(Path(path))
       }
     }
@@ -373,6 +385,12 @@ fn convert_doc(svg_doc : Document, opt : Options) -> Tree raise UsvgError {
 ///|
 fn background_path(background_color : @svgtypes.Color, area : Rect) -> Path? {
   let path = @tiny_skia_path.PathBuilder::from_rect(area)
+  guard NormalizedF32::new(
+      Float::from_int(background_color.alpha.to_int()) / 255.0,
+    )
+    is Some(opacity) else {
+    return None
+  }
   let fill : Fill = {
     ..Fill::default(),
     paint: Color(
@@ -382,11 +400,9 @@ fn background_path(background_color : @svgtypes.Color, area : Rect) -> Path? {
         background_color.blue.to_int(),
       ),
     ),
-    opacity: NormalizedF32::new(
-      Float::from_int(background_color.alpha.to_int()) / 255.0,
-    )?,
+    opacity,
   }
-  let path = Path::new_simple(path)?
+  guard Path::new_simple(path) is Some(path) else { return None }
   path.fill = Some(fill)
   Some(path)
 }
@@ -406,8 +422,10 @@ fn resolve_svg_size(svg : SvgNode, opt : Options) -> (Size?, Bool) {
   let mut width : @svgtypes.Length = svg.attribute(AId::Width).unwrap_or(def)
   let mut height : @svgtypes.Length = svg.attribute(AId::Height).unwrap_or(def)
   let view_box = svg.parse_viewbox()
-  let restore_viewbox = if (width.unit == @svgtypes.LengthUnit::Percent ||
-    height.unit == @svgtypes.LengthUnit::Percent) &&
+  let restore_viewbox = if (
+      width.unit == @svgtypes.LengthUnit::Percent ||
+      height.unit == @svgtypes.LengthUnit::Percent
+    ) &&
     view_box is None {
     // Apply the percentages to the fallback size.
     if width.unit == @svgtypes.LengthUnit::Percent {
@@ -427,7 +445,7 @@ fn resolve_svg_size(svg : SvgNode, opt : Options) -> (Size?, Bool) {
     false
   }
   let size = if view_box is Some(vbox) {
-    let state = { ..state, view_box: vbox }
+    let state = { ..state, view_box: vbox, }
     let w = if width.unit == @svgtypes.LengthUnit::Percent {
       vbox.width() * (width.number.to_float() / 100.0)
     } else {
@@ -604,12 +622,12 @@ priv enum Isolation {
 } derive(Eq)
 
 ///|
-impl Default for Isolation with default() {
+impl Default for Isolation with fn default() {
   Auto
 }
 
 ///|
-impl FromValue for Isolation with parse(_, _, value) {
+impl FromValue for Isolation with fn parse(_, _, value) {
   match value {
     "auto" => Some(Auto)
     "isolate" => Some(Isolate)
@@ -776,7 +794,7 @@ fn convert_path(
     if f.context_element is Some(PathNode(context_transform, context_bbox)) {
       let paint = Ref::new(f.paint)
       process_paint(
-        { get: () => paint.val, set: p => paint.val = p },
+        { get: () => paint.val, set: p => paint.val = p, },
         true,
         context_transform,
         context_bbox.map(r => r.to_rect()),
@@ -785,14 +803,14 @@ fn convert_path(
         cache,
       )
       |> ignore
-      fill = Some({ ..f, paint: paint.val, context_element: None })
+      fill = Some({ ..f, paint: paint.val, context_element: None, })
     }
   }
   if stroke is Some(s) {
     if s.context_element is Some(PathNode(context_transform, context_bbox)) {
       let paint = Ref::new(s.paint)
       process_paint(
-        { get: () => paint.val, set: p => paint.val = p },
+        { get: () => paint.val, set: p => paint.val = p, },
         true,
         context_transform,
         context_bbox.map(r => r.to_rect()),
@@ -801,12 +819,15 @@ fn convert_path(
         cache,
       )
       |> ignore
-      stroke = Some({ ..s, paint: paint.val, context_element: None })
+      stroke = Some({ ..s, paint: paint.val, context_element: None, })
     }
   }
   let mut marker = None
   if marker_is_valid(node) && visibility == Visible {
-    let marker_group = { ..Group::empty(), abs_transform: parent.abs_transform }
+    let marker_group = {
+      ..Group::empty(),
+      abs_transform: parent.abs_transform,
+    }
     let bbox = match tiny_skia_path.compute_tight_bounds() {
       Some(r) => r.to_non_zero_rect()
       None => None
@@ -865,12 +886,12 @@ fn append_single_paint_path(
   match paint_order_kind {
     Fill =>
       if path.fill is Some(_) {
-        let fill_path = { ..path.clone(), stroke: None, id: "" }
+        let fill_path = { ..path.clone(), stroke: None, id: "", }
         parent.children.push(Path(fill_path))
       }
     Stroke =>
       if path.stroke is Some(_) {
-        let stroke_path = { ..path.clone(), fill: None, id: "" }
+        let stroke_path = { ..path.clone(), fill: None, id: "", }
         parent.children.push(Path(stroke_path))
       }
     _ => ()

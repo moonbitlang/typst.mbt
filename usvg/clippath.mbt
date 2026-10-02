@@ -13,7 +13,10 @@ fn clippath_convert(
   }
 
   // The whole clip path should be ignored when a transform is invalid.
-  let mut transform = resolve_clip_path_transform(node, state)?
+  guard resolve_clip_path_transform(node, state) is Some(transform_) else {
+    return None
+  }
+  let mut transform = transform_
   let units : Units = node
     .attribute(AId::ClipPathUnits)
     .unwrap_or(UserSpaceOnUse)
@@ -51,7 +54,8 @@ fn clippath_convert(
       return None
     }
   }
-  let mut id = NonEmptyString::new(node.element_id())?
+  guard NonEmptyString::new(node.element_id()) is Some(id_) else { return None }
+  let mut id = id_
   // Generate ID only when we're parsing `objectBoundingBox` clip for the second time.
   if !cacheable && cache.clip_paths.contains(id.get()) {
     id = cache.gen_clip_path_id()
@@ -64,7 +68,7 @@ fn clippath_convert(
     clip_path,
     root: Group::empty(),
   }
-  let clip_state = { ..state, parent_clip_path: Some(node) }
+  let clip_state = { ..state, parent_clip_path: Some(node), }
   convert_clip_path_elements(node, clip_state, cache, clip.root)
   if clip.root.has_children() {
     clip.root.calculate_bounding_boxes() |> ignore

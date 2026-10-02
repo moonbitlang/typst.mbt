@@ -43,8 +43,9 @@ fn paint_server_convert(
 
 ///|
 fn convert_linear(node : SvgNode, state : State) -> ServerOrColor? {
-  let id = NonEmptyString::new(node.element_id())?
-  let stops = convert_stops(find_gradient_with_stops(node)?)
+  guard NonEmptyString::new(node.element_id()) is Some(id) else { return None }
+  guard find_gradient_with_stops(node) is Some(grad) else { return None }
+  let stops = convert_stops(grad)
   if stops.length() < 2 {
     return stops_to_color(stops)
   }
@@ -75,8 +76,9 @@ fn convert_linear(node : SvgNode, state : State) -> ServerOrColor? {
 
 ///|
 fn convert_radial(node : SvgNode, state : State) -> ServerOrColor? {
-  let id = NonEmptyString::new(node.element_id())?
-  let stops = convert_stops(find_gradient_with_stops(node)?)
+  guard NonEmptyString::new(node.element_id()) is Some(id) else { return None }
+  guard find_gradient_with_stops(node) is Some(grad) else { return None }
+  let stops = convert_stops(grad)
   if stops.length() < 2 {
     return stops_to_color(stops)
   }
@@ -136,29 +138,42 @@ fn convert_radial(node : SvgNode, state : State) -> ServerOrColor? {
     fx,
     fy,
     fr: PositiveF32::new(fr).unwrap_or(PositiveF32::zero()),
-    base: { id, units, transform, spread_method, stops },
+    base: { id, units, transform, spread_method, stops, },
   }
   Some(Server(RadialGradient(gradient)))
 }
 
 ///|
-fn convert_pattern(node : SvgNode, state : State, cache : Cache) -> ServerOrColor? {
-  let node_with_children = find_pattern_with_children(node)?
-  let id = NonEmptyString::new(node.element_id())?
+fn convert_pattern(
+  node : SvgNode,
+  state : State,
+  cache : Cache,
+) -> ServerOrColor? {
+  guard find_pattern_with_children(node) is Some(node_with_children) else {
+    return None
+  }
+  guard NonEmptyString::new(node.element_id()) is Some(id) else { return None }
   let view_box = {
     let n1 = resolve_attr(node, AId::ViewBox)
     let n2 = resolve_attr(node, AId::PreserveAspectRatio)
     n1
     .parse_viewbox()
-    .map(vb => ({
-      rect: vb,
-      aspect: n2
-        .attribute(AId::PreserveAspectRatio)
-        .unwrap_or(@svgtypes.AspectRatio::default()),
-    } : ViewBox))
+    .map(vb => {
+      (
+        {
+          rect: vb,
+          aspect: n2
+          .attribute(AId::PreserveAspectRatio)
+          .unwrap_or(@svgtypes.AspectRatio::default()),
+        } : ViewBox)
+    })
   }
   let units = convert_units(node, AId::PatternUnits, ObjectBoundingBox)
-  let content_units = convert_units(node, AId::PatternContentUnits, UserSpaceOnUse)
+  let content_units = convert_units(
+    node,
+    AId::PatternContentUnits,
+    UserSpaceOnUse,
+  )
   let transform = node.resolve_transform(AId::PatternTransform, state)
   let rect = NonZeroRect::from_xywh(
     resolve_number(node, AId::X, units, state, @svgtypes.Length::zero()),
@@ -167,7 +182,7 @@ fn convert_pattern(node : SvgNode, state : State, cache : Cache) -> ServerOrColo
     resolve_number(node, AId::Height, units, state, @svgtypes.Length::zero()),
   )
   // Upstream warns: Pattern '{}' has an invalid size. Skipped.
-  let rect = rect?
+  guard rect is Some(rect) else { return None }
   let patt : Pattern = {
     uid: gen_uid(),
     id,
@@ -266,22 +281,18 @@ fn convert_stops(grad : SvgNode) -> Array[Stop] {
       prev_offset = @svgtypes.Length::new_number(offset)
       let offset = f32_bound(0.0, offset.to_float(), 1.0)
       let stop_color : String? = stop.attribute(AId::StopColor)
-      let (color, opacity) = split_alpha(
-        match stop_color {
-          Some("currentColor") =>
-            stop
-            .find_attribute(AId::Color)
-            .unwrap_or(@svgtypes.Color::black())
-          Some(value) =>
-            match (try? @svgtypes.Color::from_str(value)) {
-              Ok(c) => c
-              Err(_) =>
-                // Upstream warns: Failed to parse stop-color value.
-                @svgtypes.Color::black()
-            }
-          _ => @svgtypes.Color::black()
-        },
-      )
+      let (color, opacity) = (match stop_color {
+        Some("currentColor") =>
+          stop.find_attribute(AId::Color).unwrap_or(@svgtypes.Color::black())
+        Some(value) =>
+          match (try? @svgtypes.Color::from_str(value)) {
+            Ok(c) => c
+            Err(_) =>
+              // Upstream warns: Failed to parse stop-color value.
+              @svgtypes.Color::black()
+          }
+        _ => @svgtypes.Color::black()
+      }).split_alpha()
       let stop_opacity : Opacity = stop
         .attribute(AId::StopOpacity)
         .unwrap_or(Opacity::one())
@@ -307,7 +318,8 @@ fn convert_stops(grad : SvgNode) -> Array[Stop] {
       let offset1 = stops[i + 0].offset.get()
       let offset2 = stops[i + 1].offset.get()
       let offset3 = stops[i + 2].offset.get()
-      if approx_eq_ulps(offset1, offset2, 4) && approx_eq_ulps(offset2, offset3, 4) {
+      if approx_eq_ulps(offset1, offset2, 4) &&
+        approx_eq_ulps(offset2, offset3, 4) {
         // Remove offset in the middle.
         stops.remove(i + 1) |> ignore
       } else {
@@ -537,12 +549,12 @@ priv struct StrokeSlot {
 
 ///|
 fn Path::fill_slot(self : Path) -> FillSlot {
-  { get: () => self.fill, set: f => self.fill = f }
+  { get: () => self.fill, set: f => self.fill = f, }
 }
 
 ///|
 fn Path::stroke_slot(self : Path) -> StrokeSlot {
-  { get: () => self.stroke, set: s => self.stroke = s }
+  { get: () => self.stroke, set: s => self.stroke = s, }
 }
 
 ///|
@@ -592,12 +604,20 @@ fn node_to_user_coordinates(
       if g.mask is Some(mask) {
         if cache.is_unique(mask.uid) {
           update_paint_servers(
-            mask.root, context_transform, context_bbox, None, cache,
+            mask.root,
+            context_transform,
+            context_bbox,
+            None,
+            cache,
           )
           if mask.mask is Some(sub_mask) {
             if cache.is_unique(sub_mask.uid) {
               update_paint_servers(
-                sub_mask.root, context_transform, context_bbox, None, cache,
+                sub_mask.root,
+                context_transform,
+                context_bbox,
+                None,
+                cache,
               )
             }
           }
@@ -608,7 +628,11 @@ fn node_to_user_coordinates(
           for primitive in filter.primitives {
             if primitive.kind is Image(image) {
               update_paint_servers(
-                image.root, context_transform, context_bbox, None, cache,
+                image.root,
+                context_transform,
+                context_bbox,
+                None,
+                cache,
               )
             }
           }
@@ -640,7 +664,11 @@ fn node_to_user_coordinates(
     Image(image) =>
       if image.kind is SVG(tree) {
         update_paint_servers(
-          tree.root, context_transform, context_bbox, None, cache,
+          tree.root,
+          context_transform,
+          context_bbox,
+          None,
+          cache,
         )
       }
     Text(text) => {
@@ -658,7 +686,7 @@ fn node_to_user_coordinates(
       for chunk in text.chunks {
         for span in chunk.spans {
           process_fill(
-            { get: () => span.fill, set: f => span.fill = f },
+            { get: () => span.fill, set: f => span.fill = f, },
             text.abs_transform,
             context_transform,
             context_bbox,
@@ -666,7 +694,7 @@ fn node_to_user_coordinates(
             cache,
           )
           process_stroke(
-            { get: () => span.stroke, set: s => span.stroke = s },
+            { get: () => span.stroke, set: s => span.stroke = s, },
             text.abs_transform,
             context_transform,
             context_bbox,
@@ -697,7 +725,7 @@ fn node_to_user_coordinates(
       // 2.
       for span in text.layouted {
         process_fill(
-          { get: () => span.fill, set: f => span.fill = f },
+          { get: () => span.fill, set: f => span.fill = f, },
           text.abs_transform,
           context_transform,
           context_bbox,
@@ -705,7 +733,7 @@ fn node_to_user_coordinates(
           cache,
         )
         process_stroke(
-          { get: () => span.stroke, set: s => span.stroke = s },
+          { get: () => span.stroke, set: s => span.stroke = s, },
           text.abs_transform,
           context_transform,
           context_bbox,
@@ -763,12 +791,12 @@ fn process_fill(
   cache : Cache,
 ) -> Unit {
   let mut ok = false
-  if fill.get() is Some(f) {
+  if (fill.get)() is Some(f) {
     // Path context elements (i.e. for  markers) have already been resolved,
     // so we only care about use nodes.
     let slot : PaintSlot = {
-      get: () => fill.get().unwrap().paint,
-      set: p => fill.set(Some({ ..fill.get().unwrap(), paint: p })),
+      get: () => (fill.get)().unwrap().paint,
+      set: p => (fill.set)(Some({ ..(fill.get)().unwrap(), paint: p, })),
     }
     ok = process_paint(
       slot,
@@ -781,7 +809,7 @@ fn process_fill(
     )
   }
   if !ok {
-    fill.set(None)
+    (fill.set)(None)
   }
 }
 
@@ -795,12 +823,12 @@ fn process_stroke(
   cache : Cache,
 ) -> Unit {
   let mut ok = false
-  if stroke.get() is Some(s) {
+  if (stroke.get)() is Some(s) {
     // Path context elements (i.e. for  markers) have already been resolved,
     // so we only care about use nodes.
     let slot : PaintSlot = {
-      get: () => stroke.get().unwrap().paint,
-      set: p => stroke.set(Some({ ..stroke.get().unwrap(), paint: p })),
+      get: () => (stroke.get)().unwrap().paint,
+      set: p => (stroke.set)(Some({ ..(stroke.get)().unwrap(), paint: p, })),
     }
     ok = process_paint(
       slot,
@@ -813,7 +841,7 @@ fn process_stroke(
     )
   }
   if !ok {
-    stroke.set(None)
+    (stroke.set)(None)
   }
 }
 
@@ -833,15 +861,15 @@ fn process_context_paint(
   // do we do that? We calculate CxB^(-1), which will overall then have
   // the same effect as A. How do we calculate B^(-1)?
   // --> (A^(-1)xC)^(-1)
-  let rev_transform = context_transform
-    .invert()?
-    .pre_concat(path_transform)
-    .invert()?
-  match paint.get() {
+  guard context_transform.invert() is Some(inv) else { return None }
+  guard inv.pre_concat(path_transform).invert() is Some(rev_transform) else {
+    return None
+  }
+  match (paint.get)() {
     Color(_) => ()
     LinearGradient(lg) => {
       let transform = lg.base.transform.post_concat(rev_transform)
-      paint.set(
+      (paint.set)(
         LinearGradient({
           uid: gen_uid(),
           x1: lg.x1,
@@ -860,7 +888,7 @@ fn process_context_paint(
     }
     RadialGradient(rg) => {
       let transform = rg.base.transform.post_concat(rev_transform)
-      paint.set(
+      (paint.set)(
         RadialGradient({
           uid: gen_uid(),
           cx: rg.cx,
@@ -881,7 +909,7 @@ fn process_context_paint(
     }
     Pattern(pat) => {
       let transform = pat.transform.post_concat(rev_transform)
-      paint.set(
+      (paint.set)(
         Pattern({
           uid: gen_uid(),
           id: cache.gen_pattern_id(),
@@ -909,8 +937,8 @@ fn process_paint(
   cache : Cache,
 ) -> Bool {
   let mut replaced = false
-  if paint.get().units() == ObjectBoundingBox ||
-    paint.get().content_units() == ObjectBoundingBox {
+  if (paint.get)().units() == ObjectBoundingBox ||
+    (paint.get)().content_units() == ObjectBoundingBox {
     let bbox = if has_context {
       guard context_bbox is Some(bbox) else { return false }
       bbox
@@ -922,7 +950,7 @@ fn process_paint(
       None => return false
     }
   }
-  if paint.get() is Pattern(patt) {
+  if (paint.get)() is Pattern(patt) {
     if replaced || cache.is_unique(patt.uid) {
       update_paint_servers(patt.root, Transform::default(), None, None, cache)
     }
@@ -945,7 +973,7 @@ fn process_text_decoration(
     process_fill(
       {
         get: () => get().unwrap().fill,
-        set: f => set(Some({ ..get().unwrap(), fill: f })),
+        set: f => set(Some({ ..get().unwrap(), fill: f, })),
       },
       Transform::default(),
       Transform::default(),
@@ -956,7 +984,7 @@ fn process_text_decoration(
     process_stroke(
       {
         get: () => get().unwrap().stroke,
-        set: s => set(Some({ ..get().unwrap(), stroke: s })),
+        set: s => set(Some({ ..get().unwrap(), stroke: s, })),
       },
       Transform::default(),
       Transform::default(),
@@ -976,11 +1004,11 @@ fn paint_to_user_coordinates(
   cache : Cache,
 ) -> Bool? {
   // Upstream warns: {} on zero-sized shapes is not allowed.
-  let bbox = bbox.to_non_zero_rect()?
+  guard bbox.to_non_zero_rect() is Some(bbox) else { return None }
 
   // `Arc::get_mut()` allow us to modify some paint servers in-place.
   // This reduces the amount of cloning and preserves the original ID as well.
-  match paint.get() {
+  match (paint.get)() {
     Color(_) => Some(false) // unreachable
     LinearGradient(lg) => {
       let transform = lg.base.transform.post_concat(Transform::from_bbox(bbox))
@@ -989,7 +1017,7 @@ fn paint_to_user_coordinates(
         lg.base.units = UserSpaceOnUse
         Some(false)
       } else {
-        paint.set(
+        (paint.set)(
           LinearGradient({
             uid: gen_uid(),
             x1: lg.x1,
@@ -1015,7 +1043,7 @@ fn paint_to_user_coordinates(
         rg.base.units = UserSpaceOnUse
         Some(false)
       } else {
-        paint.set(
+        (paint.set)(
           RadialGradient({
             uid: gen_uid(),
             cx: rg.cx,
@@ -1074,7 +1102,7 @@ fn paint_to_user_coordinates(
         if patt.view_box is Some(view_box) {
           push_pattern_transform(new_patt, view_box.to_transform(rect.size()))
         }
-        paint.set(Pattern(new_patt))
+        (paint.set)(Pattern(new_patt))
         Some(true)
       }
     }
@@ -1135,7 +1163,7 @@ priv struct RefCounter {
 
 ///|
 fn RefCounter::new() -> RefCounter {
-  { counts: {} }
+  { counts: {}, }
 }
 
 ///|

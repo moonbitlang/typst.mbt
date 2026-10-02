@@ -10,18 +10,18 @@ let features : Array[String] = [
    "http://www.w3.org/TR/SVG11/feature#ConditionalProcessing", "http://www.w3.org/TR/SVG11/feature#Image",
   "http://www.w3.org/TR/SVG11/feature#Style",
   // "http://www.w3.org/TR/SVG11/feature#ViewportAttribute", // `clip` and `overflow`, not yet
-  "http://www.w3.org/TR/SVG11/feature#Shape", "http://www.w3.org/TR/SVG11/feature#Text",
+   "http://www.w3.org/TR/SVG11/feature#Shape", "http://www.w3.org/TR/SVG11/feature#Text",
   "http://www.w3.org/TR/SVG11/feature#BasicText", "http://www.w3.org/TR/SVG11/feature#PaintAttribute", // no color-interpolation and color-rendering
    "http://www.w3.org/TR/SVG11/feature#BasicPaintAttribute", // no color-interpolation
    "http://www.w3.org/TR/SVG11/feature#OpacityAttribute", "http://www.w3.org/TR/SVG11/feature#GraphicsAttribute",
   "http://www.w3.org/TR/SVG11/feature#BasicGraphicsAttribute", "http://www.w3.org/TR/SVG11/feature#Marker",
   // "http://www.w3.org/TR/SVG11/feature#ColorProfile", // not yet
-  "http://www.w3.org/TR/SVG11/feature#Gradient", "http://www.w3.org/TR/SVG11/feature#Pattern",
+   "http://www.w3.org/TR/SVG11/feature#Gradient", "http://www.w3.org/TR/SVG11/feature#Pattern",
   "http://www.w3.org/TR/SVG11/feature#Clip", "http://www.w3.org/TR/SVG11/feature#BasicClip",
   "http://www.w3.org/TR/SVG11/feature#Mask", "http://www.w3.org/TR/SVG11/feature#Filter",
   "http://www.w3.org/TR/SVG11/feature#BasicFilter",
   // only xlink:href
-  "http://www.w3.org/TR/SVG11/feature#XlinkAttribute",
+   "http://www.w3.org/TR/SVG11/feature#XlinkAttribute",
   // "http://www.w3.org/TR/SVG11/feature#Font",
   // "http://www.w3.org/TR/SVG11/feature#BasicFont",
 ]
@@ -33,7 +33,10 @@ fn switch_convert(
   cache : Cache,
   parent : Group,
 ) -> Unit? {
-  let child = node.children().find_first(n => is_condition_passed(n, state.opt))?
+  guard node.children().find_first(n => is_condition_passed(n, state.opt))
+    is Some(child) else {
+    return None
+  }
   if convert_group(node, state, false, cache, parent, (cache, g) => {
       convert_element(child, state, cache, g)
     })

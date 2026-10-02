@@ -77,12 +77,15 @@ pub fn FontDatabase::new() -> FontDatabase {
 ///|
 /// A copy of the database (upstream's copy-on-write `Arc::make_mut`).
 pub fn FontDatabase::clone(self : FontDatabase) -> FontDatabase {
-  { ..self, faces: self.faces.copy() }
+  { ..self, faces: self.faces.copy(), }
 }
 
 ///|
 /// Pushes a user-provided `FaceInfo` to the database.
-pub fn FontDatabase::push_face_info(self : FontDatabase, info : FaceInfo) -> FontId {
+pub fn FontDatabase::push_face_info(
+  self : FontDatabase,
+  info : FaceInfo,
+) -> FontId {
   let id = self.faces.length()
   self.faces.push({ ..info, id, })
   id
@@ -115,7 +118,10 @@ pub fn FontDatabase::is_empty(self : FontDatabase) -> Bool {
 
 ///|
 /// Sets the family that will be used by `Family::Serif`.
-pub fn FontDatabase::set_serif_family(self : FontDatabase, family : String) -> Unit {
+pub fn FontDatabase::set_serif_family(
+  self : FontDatabase,
+  family : String,
+) -> Unit {
   self.family_serif = family
 }
 
@@ -158,8 +164,9 @@ pub(all) struct FontQuery {
 pub fn FontDatabase::query(self : FontDatabase, query : FontQuery) -> FontId? {
   for family in query.families {
     let name = self.family_name(family)
-    let candidates = self.faces.filter(face => face.families.iter().any(f => f.0 ==
-      name))
+    let candidates = self.faces.filter(face => {
+      face.families.iter().any(f => f.0 == name)
+    })
     if !candidates.is_empty() {
       if find_best_match(candidates, query) is Some(index) {
         return Some(candidates[index].id)
@@ -188,7 +195,7 @@ pub fn[T] FontDatabase::with_face_data(
   id : FontId,
   p : (Bytes, UInt) -> T,
 ) -> T? {
-  let face = self.face(id)?
+  guard self.face(id) is Some(face) else { return None }
   Some(p(face.source, face.index))
 }
 
@@ -215,38 +222,52 @@ fn find_best_match(candidates : Array[FaceInfo], query : FontQuery) -> Int? {
 
   // Step 4a (`font-stretch`).
   let q = query.stretch.to_number()
-  let matches = matching_set.iter().any(index => candidates[index].stretch ==
-    query.stretch)
+  let matches = matching_set
+    .iter()
+    .any(index => candidates[index].stretch == query.stretch)
   let matching_stretch = if matches {
     // Exact match.
     query.stretch
   } else if q <= FontStretch::Normal.to_number() {
     // Closest stretch, first checking narrower values and then wider values.
-    let narrower = matching_set.filter(index => candidates[index].stretch.to_number() <
-      q)
-    match min_by_key(narrower, index => q - candidates[index].stretch.to_number()) {
+    let narrower = matching_set.filter(index => {
+      candidates[index].stretch.to_number() < q
+    })
+    match
+      min_by_key(narrower, index => q - candidates[index].stretch.to_number()) {
       Some(matching_index) => candidates[matching_index].stretch
       None => {
-        let matching_index = min_by_key(matching_set, index => candidates[index].stretch.to_number() -
-          q)?
+        guard min_by_key(matching_set, index => {
+            candidates[index].stretch.to_number() - q
+          })
+          is Some(matching_index) else {
+          return None
+        }
         candidates[matching_index].stretch
       }
     }
   } else {
     // Closest stretch, first checking wider values and then narrower values.
-    let wider = matching_set.filter(index => candidates[index].stretch.to_number() >
-      q)
-    match min_by_key(wider, index => candidates[index].stretch.to_number() - q) {
+    let wider = matching_set.filter(index => {
+      candidates[index].stretch.to_number() > q
+    })
+    match
+      min_by_key(wider, index => candidates[index].stretch.to_number() - q) {
       Some(matching_index) => candidates[matching_index].stretch
       None => {
-        let matching_index = min_by_key(matching_set, index => q -
-          candidates[index].stretch.to_number())?
+        guard min_by_key(matching_set, index => {
+            q - candidates[index].stretch.to_number()
+          })
+          is Some(matching_index) else {
+          return None
+        }
         candidates[matching_index].stretch
       }
     }
   }
-  matching_set = matching_set.filter(index => candidates[index].stretch ==
-    matching_stretch)
+  matching_set = matching_set.filter(index => {
+    candidates[index].stretch == matching_stretch
+  })
 
   // Step 4b (`font-style`).
   let style_preference = match query.style {
@@ -254,20 +275,26 @@ fn find_best_match(candidates : Array[FaceInfo], query : FontQuery) -> Int? {
     Oblique => [DbStyle::Oblique, DbStyle::Italic, DbStyle::Normal]
     Normal => [DbStyle::Normal, DbStyle::Oblique, DbStyle::Italic]
   }
-  let matching_style = style_preference
+  guard style_preference
     .iter()
-    .find_first(query_style => matching_set.iter().any(index => candidates[index].style ==
-      query_style))?
-  matching_set = matching_set.filter(index => candidates[index].style ==
-    matching_style)
+    .find_first(query_style => {
+      matching_set.iter().any(index => candidates[index].style == query_style)
+    })
+    is Some(matching_style) else {
+    return None
+  }
+  matching_set = matching_set.filter(index => {
+    candidates[index].style == matching_style
+  })
 
   // Step 4c (`font-weight`).
   //
   // The spec doesn't say what to do if the weight is between 400 and 500 exclusive, so we
   // just use 450 as the cutoff.
   let weight = query.weight
-  let matching_weight = if matching_set.iter().any(index => candidates[index].weight ==
-    weight) {
+  let matching_weight = if matching_set
+    .iter()
+    .any(index => candidates[index].weight == weight) {
     weight
   } else if weight >= 400 &&
     weight < 450 &&
@@ -281,12 +308,18 @@ fn find_best_match(candidates : Array[FaceInfo], query : FontQuery) -> Int? {
     400
   } else if weight <= 500 {
     // Closest weight, first checking thinner values and then fatter ones.
-    let thinner = matching_set.filter(index => candidates[index].weight <= weight)
+    let thinner = matching_set.filter(index => {
+      candidates[index].weight <= weight
+    })
     match min_by_key(thinner, index => weight - candidates[index].weight) {
       Some(matching_index) => candidates[matching_index].weight
       None => {
-        let matching_index = min_by_key(matching_set, index => candidates[index].weight -
-          weight)?
+        guard min_by_key(matching_set, index => {
+            candidates[index].weight - weight
+          })
+          is Some(matching_index) else {
+          return None
+        }
         candidates[matching_index].weight
       }
     }
@@ -296,14 +329,19 @@ fn find_best_match(candidates : Array[FaceInfo], query : FontQuery) -> Int? {
     match min_by_key(fatter, index => candidates[index].weight - weight) {
       Some(matching_index) => candidates[matching_index].weight
       None => {
-        let matching_index = min_by_key(matching_set, index => weight -
-          candidates[index].weight)?
+        guard min_by_key(matching_set, index => {
+            weight - candidates[index].weight
+          })
+          is Some(matching_index) else {
+          return None
+        }
         candidates[matching_index].weight
       }
     }
   }
-  matching_set = matching_set.filter(index => candidates[index].weight ==
-    matching_weight)
+  matching_set = matching_set.filter(index => {
+    candidates[index].weight == matching_weight
+  })
 
   // Ignore step 4d (`font-size`).
 
@@ -314,8 +352,12 @@ fn find_best_match(candidates : Array[FaceInfo], query : FontQuery) -> Int? {
 ///|
 /// Parses the face metadata (upstream `parse_face_info`).
 fn parse_face_info(data : Bytes, index : UInt) -> FaceInfo? {
-  let face = (try? @otf.Face::parse(data[:], index)).to_option()?
-  let (families, post_script_name) = parse_face_names(face)?
+  guard (try? @otf.Face::parse(data[:], index)).to_option() is Some(face) else {
+    return None
+  }
+  guard parse_face_names(face) is Some((families, post_script_name)) else {
+    return None
+  }
   let (style, weight, stretch) = match face.tables().os2 {
     Some(table) => {
       let style = match table.style() {
@@ -338,18 +380,25 @@ fn parse_face_info(data : Bytes, index : UInt) -> FaceInfo? {
     }
     None => (DbStyle::Normal, 400, FontStretch::Normal)
   }
-  let (monospaced, italic) = match face.raw_face().table(@otf.Tag::from_bytes(b"post")) {
+  let (monospaced, italic) = match
+    face.raw_face().table(@otf.Tag::from_bytes(b"post")) {
     Some(post) => {
-      let zero4 = (start : Int) => post.length() >= start + 4 &&
+      let zero4 = (start : Int) => {
+        post.length() >= start + 4 &&
         post[start] == 0 &&
         post[start + 1] == 0 &&
         post[start + 2] == 0 &&
         post[start + 3] == 0
+      }
       (!zero4(12), !zero4(4))
     }
     None => (false, false)
   }
-  let style = if style == DbStyle::Normal && italic { DbStyle::Italic } else { style }
+  let style = if style == DbStyle::Normal && italic {
+    DbStyle::Italic
+  } else {
+    style
+  }
   Some({
     id: 0,
     source: data,
@@ -414,12 +463,14 @@ fn parse_face_names(
   }
   let mut post_script_name = None
   for name in names.iter() {
-    if name.name_id.to_int() == 6 && (name.is_unicode() || name_is_mac_roman(name)) {
+    if name.name_id.to_int() == 6 &&
+      (name.is_unicode() || name_is_mac_roman(name)) {
       post_script_name = name_to_unicode(name)
       break
     }
   }
-  Some((families, post_script_name?))
+  guard post_script_name is Some(post_script_name) else { return None }
+  Some((families, post_script_name))
 }
 
 ///|

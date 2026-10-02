@@ -15,7 +15,7 @@ pub struct Document {
 ///|
 /// Returns the root node.
 pub fn Document::root(self : Document) -> SvgNode {
-  { id: 0, doc: self }
+  { id: 0, doc: self, }
 }
 
 ///|
@@ -34,13 +34,13 @@ pub fn Document::descendants(self : Document) -> Iter[SvgNode] {
 ///|
 /// Returns an element by ID.
 pub fn Document::element_by_id(self : Document, id : String) -> SvgNode? {
-  let node_id = self.links.get(id)?
+  guard self.links.get(id) is Some(node_id) else { return None }
   Some(self.get(node_id))
 }
 
 ///|
 fn Document::get(self : Document, id : Int) -> SvgNode {
-  { id, doc: self }
+  { id, doc: self, }
 }
 
 ///|
@@ -77,7 +77,7 @@ pub struct SvgNode {
 }
 
 ///|
-pub impl Eq for SvgNode with equal(self, other) {
+pub impl Eq for SvgNode with fn equal(self, other) {
   self.id == other.id && physical_equal(self.doc, other.doc)
 }
 
@@ -134,7 +134,7 @@ fn SvgNode::raw_attribute(self : SvgNode, aid : AId) -> String? {
 ///|
 /// Returns an attribute value.
 pub fn[T : FromValue] SvgNode::attribute(self : SvgNode, aid : AId) -> T? {
-  let value = self.raw_attribute(aid)?
+  guard self.raw_attribute(aid) is Some(value) else { return None }
   // These AId have an initial value of none
   let is_possible_none = aid
     is (AId::Mask
@@ -159,19 +159,20 @@ pub fn[T : FromValue] SvgNode::attribute(self : SvgNode, aid : AId) -> T? {
 ///
 /// Same as `SvgNode::attribute`, but doesn't show a warning.
 pub fn[T : FromValue] SvgNode::try_attribute(self : SvgNode, aid : AId) -> T? {
-  let value = self.raw_attribute(aid)?
+  guard self.raw_attribute(aid) is Some(value) else { return None }
   T::parse(self, aid, value)
 }
 
 ///|
 fn SvgNode::node_attribute(self : SvgNode, aid : AId) -> SvgNode? {
-  let value : String = self.attribute(aid)?
+  guard (self.attribute(aid) : String?) is Some(value) else { return None }
   let id = if aid == AId::Href {
     (try? @svgtypes.IRI::from_str(value)).map(v => v.0).to_option()
   } else {
     (try? @svgtypes.FuncIRI::from_str(value)).map(v => v.0).to_option()
   }
-  self.document().element_by_id(id?)
+  guard id is Some(id) else { return None }
+  self.document().element_by_id(id)
 }
 
 ///|
@@ -214,7 +215,8 @@ fn SvgNode::attribute_id(self : SvgNode, aid : AId) -> Int? {
 /// For non-inheritable attributes checks only the current node and the parent one.
 /// As per SVG spec.
 pub fn[T : FromValue] SvgNode::find_attribute(self : SvgNode, aid : AId) -> T? {
-  self.find_attribute_impl(aid)?.attribute(aid)
+  guard self.find_attribute_impl(aid) is Some(n) else { return None }
+  n.attribute(aid)
 }
 
 ///|
@@ -230,7 +232,7 @@ fn SvgNode::find_attribute_impl(self : SvgNode, aid : AId) -> SvgNode? {
     Some(self)
   } else {
     // Non-inheritable attributes can inherit a value only from a direct parent.
-    let n = self.parent_element()?
+    guard self.parent_element() is Some(n) else { return None }
     if n.has_attribute(aid) {
       Some(n)
     } else {
@@ -437,7 +439,8 @@ fn AId::is_presentation(self : AId) -> Bool {
   self
   is (AId::AlignmentBaseline
   | AId::BaselineShift
-  | AId::BackgroundColor // non-standard SVG attribute
+  | AId::BackgroundColor
+  // non-standard SVG attribute
   | AId::ClipPath
   | AId::ClipRule
   | AId::Color
@@ -454,8 +457,10 @@ fn AId::is_presentation(self : AId) -> Bool {
   | AId::FloodColor
   | AId::FloodOpacity
   | AId::FontFamily
-  | AId::FontKerning // technically not presentation
-  | AId::FontOpticalSizing // technically not presentation
+  | AId::FontKerning
+  // technically not presentation
+  | AId::FontOpticalSizing
+  // technically not presentation
   | AId::FontSize
   | AId::FontSizeAdjust
   | AId::FontStretch
@@ -466,7 +471,8 @@ fn AId::is_presentation(self : AId) -> Bool {
   | AId::GlyphOrientationHorizontal
   | AId::GlyphOrientationVertical
   | AId::ImageRendering
-  | AId::Isolation // technically not presentation
+  | AId::Isolation
+  // technically not presentation
   | AId::LetterSpacing
   | AId::LightingColor
   | AId::MarkerEnd
@@ -474,7 +480,8 @@ fn AId::is_presentation(self : AId) -> Bool {
   | AId::MarkerStart
   | AId::Mask
   | AId::MaskType
-  | AId::MixBlendMode // technically not presentation
+  | AId::MixBlendMode
+  // technically not presentation
   | AId::Opacity
   | AId::Overflow
   | AId::PaintOrder
@@ -595,28 +602,30 @@ pub(open) trait FromValue {
   /// Parses an attribute value.
   ///
   /// When `None` is returned, the attribute value will be logged as a parsing failure.
-  parse(node : SvgNode, aid : AId, value : String) -> Self?
+  fn parse(node : SvgNode, aid : AId, value : String) -> Self?
 }
 
 ///|
-pub impl FromValue for String with parse(_, _, value) {
+pub impl FromValue for String with fn parse(_, _, value) {
   Some(value)
 }
 
 ///|
-pub impl FromValue for Float with parse(_, _, value) {
+pub impl FromValue for Float with fn parse(_, _, value) {
   (try? @svgtypes.Number::from_str(value)).map(v => v.0.to_float()).to_option()
 }
 
 ///|
-pub impl FromValue for @svgtypes.Length with parse(_, _, value) {
+pub impl FromValue for @svgtypes.Length with fn parse(_, _, value) {
   (try? @svgtypes.Length::from_str(value)).to_option()
 }
 
 ///|
 // TODO: to svgtypes?
-pub impl FromValue for Opacity with parse(_, _, value) {
-  let length = (try? @svgtypes.Length::from_str(value)).to_option()?
+pub impl FromValue for Opacity with fn parse(_, _, value) {
+  guard (try? @svgtypes.Length::from_str(value)).to_option() is Some(length) else {
+    return None
+  }
   if length.unit == @svgtypes.LengthUnit::Percent {
     Some(Opacity::new_clamped(length.number.to_float() / 100.0))
   } else if length.unit == @svgtypes.LengthUnit::None {
@@ -627,7 +636,7 @@ pub impl FromValue for Opacity with parse(_, _, value) {
 }
 
 ///|
-pub impl FromValue for Transform with parse(_, _, value) {
+pub impl FromValue for Transform with fn parse(_, _, value) {
   let ts = @svgtypes.Transform::from_str(value) catch { _ => return None }
   let ts = Transform::from_row(
     ts.a.to_float(),
@@ -645,17 +654,17 @@ pub impl FromValue for Transform with parse(_, _, value) {
 }
 
 ///|
-pub impl FromValue for @svgtypes.TransformOrigin with parse(_, _, value) {
+pub impl FromValue for @svgtypes.TransformOrigin with fn parse(_, _, value) {
   (try? @svgtypes.TransformOrigin::from_str(value)).to_option()
 }
 
 ///|
-pub impl FromValue for @svgtypes.ViewBox with parse(_, _, value) {
+pub impl FromValue for @svgtypes.ViewBox with fn parse(_, _, value) {
   (try? @svgtypes.ViewBox::from_str(value)).to_option()
 }
 
 ///|
-pub impl FromValue for Units with parse(_, _, value) {
+pub impl FromValue for Units with fn parse(_, _, value) {
   match value {
     "userSpaceOnUse" => Some(UserSpaceOnUse)
     "objectBoundingBox" => Some(ObjectBoundingBox)
@@ -664,37 +673,37 @@ pub impl FromValue for Units with parse(_, _, value) {
 }
 
 ///|
-pub impl FromValue for @svgtypes.AspectRatio with parse(_, _, value) {
+pub impl FromValue for @svgtypes.AspectRatio with fn parse(_, _, value) {
   (try? @svgtypes.AspectRatio::from_str(value)).to_option()
 }
 
 ///|
-pub impl FromValue for @svgtypes.PaintOrder with parse(_, _, value) {
+pub impl FromValue for @svgtypes.PaintOrder with fn parse(_, _, value) {
   (try? @svgtypes.PaintOrder::from_str(value)).to_option()
 }
 
 ///|
-pub impl FromValue for @svgtypes.Color with parse(_, _, value) {
+pub impl FromValue for @svgtypes.Color with fn parse(_, _, value) {
   (try? @svgtypes.Color::from_str(value)).to_option()
 }
 
 ///|
-pub impl FromValue for @svgtypes.Angle with parse(_, _, value) {
+pub impl FromValue for @svgtypes.Angle with fn parse(_, _, value) {
   (try? @svgtypes.Angle::from_str(value)).to_option()
 }
 
 ///|
-pub impl FromValue for @svgtypes.EnableBackground with parse(_, _, value) {
+pub impl FromValue for @svgtypes.EnableBackground with fn parse(_, _, value) {
   (try? @svgtypes.EnableBackground::from_str(value)).to_option()
 }
 
 ///|
-pub impl FromValue for @svgtypes.Paint with parse(_, _, value) {
+pub impl FromValue for @svgtypes.Paint with fn parse(_, _, value) {
   (try? @svgtypes.Paint::from_str(value)).to_option()
 }
 
 ///|
-pub impl FromValue for Array[Float] with parse(_, _, value) {
+pub impl FromValue for Array[Float] with fn parse(_, _, value) {
   let list = []
   let p = @svgtypes.NumberListParser::from(value)
   while p.next() is Some(n) {
@@ -707,20 +716,7 @@ pub impl FromValue for Array[Float] with parse(_, _, value) {
 }
 
 ///|
-pub impl FromValue for Array[@svgtypes.Length] with parse(_, _, value) {
-  let list = []
-  let p = @svgtypes.LengthListParser::from(value)
-  while p.next() is Some(n) {
-    match n {
-      Ok(n) => list.push(n)
-      Err(_) => return None
-    }
-  }
-  Some(list)
-}
-
-///|
-pub impl FromValue for Visibility with parse(_, _, value) {
+pub impl FromValue for Visibility with fn parse(_, _, value) {
   match value {
     "visible" => Some(Visible)
     "hidden" => Some(Hidden)
@@ -730,7 +726,7 @@ pub impl FromValue for Visibility with parse(_, _, value) {
 }
 
 ///|
-pub impl FromValue for SpreadMethod with parse(_, _, value) {
+pub impl FromValue for SpreadMethod with fn parse(_, _, value) {
   match value {
     "pad" => Some(Pad)
     "reflect" => Some(Reflect)
@@ -740,7 +736,7 @@ pub impl FromValue for SpreadMethod with parse(_, _, value) {
 }
 
 ///|
-pub impl FromValue for ShapeRendering with parse(_, _, value) {
+pub impl FromValue for ShapeRendering with fn parse(_, _, value) {
   match value {
     "optimizeSpeed" => Some(ShapeRendering::OptimizeSpeed)
     "crispEdges" => Some(ShapeRendering::CrispEdges)
@@ -750,7 +746,7 @@ pub impl FromValue for ShapeRendering with parse(_, _, value) {
 }
 
 ///|
-pub impl FromValue for TextRendering with parse(_, _, value) {
+pub impl FromValue for TextRendering with fn parse(_, _, value) {
   match value {
     "optimizeSpeed" => Some(TextRendering::OptimizeSpeed)
     "auto" | "optimizeLegibility" => Some(TextRendering::OptimizeLegibility)
@@ -760,7 +756,7 @@ pub impl FromValue for TextRendering with parse(_, _, value) {
 }
 
 ///|
-pub impl FromValue for ImageRendering with parse(_, _, value) {
+pub impl FromValue for ImageRendering with fn parse(_, _, value) {
   match value {
     "auto" | "optimizeQuality" => Some(ImageRendering::OptimizeQuality)
     "optimizeSpeed" => Some(ImageRendering::OptimizeSpeed)
@@ -773,7 +769,7 @@ pub impl FromValue for ImageRendering with parse(_, _, value) {
 }
 
 ///|
-pub impl FromValue for BlendMode with parse(_, _, value) {
+pub impl FromValue for BlendMode with fn parse(_, _, value) {
   match value {
     "normal" => Some(BlendMode::Normal)
     "multiply" => Some(BlendMode::Multiply)
@@ -796,11 +792,12 @@ pub impl FromValue for BlendMode with parse(_, _, value) {
 }
 
 ///|
-pub impl FromValue for SvgNode with parse(node, aid, value) {
+pub impl FromValue for SvgNode with fn parse(node, aid, value) {
   let id = if aid == AId::Href {
     (try? @svgtypes.IRI::from_str(value)).map(v => v.0).to_option()
   } else {
     (try? @svgtypes.FuncIRI::from_str(value)).map(v => v.0).to_option()
   }
-  node.document().element_by_id(id?)
+  guard id is Some(id) else { return None }
+  node.document().element_by_id(id)
 }

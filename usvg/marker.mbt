@@ -30,9 +30,9 @@ fn marker_convert(
   parent : Group,
 ) -> Unit {
   let list = [
-    (AId::MarkerStart, MarkerStart),
-    (AId::MarkerMid, MarkerMiddle),
-    (AId::MarkerEnd, MarkerEnd),
+    (AId::MarkerStart, KindStart),
+    (AId::MarkerMid, KindMiddle),
+    (AId::MarkerEnd, KindEnd),
   ]
   for item in list {
     let (aid, kind) = item
@@ -57,9 +57,9 @@ fn marker_convert(
 
 ///|
 priv enum MarkerKind {
-  MarkerStart
-  MarkerMiddle
-  MarkerEnd
+  KindStart
+  KindMiddle
+  KindEnd
 }
 
 ///|
@@ -79,16 +79,22 @@ fn resolve_marker(
   cache : Cache,
   parent : Group,
 ) -> Unit? {
-  let stroke_scale = stroke_scale(shape_node, marker_node, state)?.get()
-  let r = convert_marker_rect(marker_node, state)?
+  guard stroke_scale(shape_node, marker_node, state) is Some(stroke_scale) else {
+    return None
+  }
+  let stroke_scale = stroke_scale.get()
+  guard convert_marker_rect(marker_node, state) is Some(r) else { return None }
   let view_box = marker_node
     .parse_viewbox()
-    .map(vb => ({
-      rect: vb,
-      aspect: marker_node
-        .attribute(AId::PreserveAspectRatio)
-        .unwrap_or(@svgtypes.AspectRatio::default()),
-    } : ViewBox))
+    .map(vb => {
+      (
+        {
+          rect: vb,
+          aspect: marker_node
+          .attribute(AId::PreserveAspectRatio)
+          .unwrap_or(@svgtypes.AspectRatio::default()),
+        } : ViewBox)
+    })
   let has_overflow = {
     let overflow : String? = marker_node.attribute(AId::Overflow)
     // `overflow` is `hidden` by default.
@@ -101,9 +107,12 @@ fn resolve_marker(
       r.size().to_non_zero_rect(0.0, 0.0)
     }
     let clip_path = ClipPath::empty(cache.gen_clip_path_id())
-    let path = Path::new_simple(
-      @tiny_skia_path.PathBuilder::from_rect(clip_rect.to_rect()),
-    )?
+    guard Path::new_simple(
+        @tiny_skia_path.PathBuilder::from_rect(clip_rect.to_rect()),
+      )
+      is Some(path) else {
+      return None
+    }
     path.fill = Some(Fill::default())
     clip_path.root.children.push(Path(path))
     Some(clip_path)
@@ -154,7 +163,10 @@ fn resolve_marker(
       ts = ts.pre_rotate(angle)
     }
     if view_box is Some(vbox) {
-      let size = Size::from_wh(r.width() * stroke_scale, r.height() * stroke_scale).unwrap()
+      let size = Size::from_wh(
+        r.width() * stroke_scale,
+        r.height() * stroke_scale,
+      ).unwrap()
       let vbox_ts = vbox.to_transform(size)
       let (sx, sy) = vbox_ts.get_scale()
       ts = ts.pre_scale(sx, sy)
@@ -204,11 +216,8 @@ fn draw_markers(
   draw_marker : (@tiny_skia_path.Point, Int) -> Unit,
 ) -> Unit {
   match kind {
-    MarkerStart =>
-      if path.get(0) is Some(MoveTo(p)) {
-        draw_marker(p, 0)
-      }
-    MarkerMiddle => {
+    KindStart => if path.get(0) is Some(MoveTo(p)) { draw_marker(p, 0) }
+    KindMiddle => {
       let total = path.length() - 1
       let mut i = 1
       while i < total {
@@ -225,7 +234,7 @@ fn draw_markers(
         i += 1
       }
     }
-    MarkerEnd => {
+    KindEnd => {
       let idx = path.length() - 1
       match path.last() {
         Some(LineTo(p)) => draw_marker(p, idx)
@@ -456,7 +465,10 @@ fn calc_angle(
 }
 
 ///|
-fn get_subpath_start(segments : Array[Segment], idx : Int) -> @tiny_skia_path.Point {
+fn get_subpath_start(
+  segments : Array[Segment],
+  idx : Int,
+) -> @tiny_skia_path.Point {
   let offset = segments.length() - idx
   // `segments.iter().rev().skip(offset)`
   let mut i = segments.length() - 1 - offset
@@ -470,7 +482,10 @@ fn get_subpath_start(segments : Array[Segment], idx : Int) -> @tiny_skia_path.Po
 }
 
 ///|
-fn get_prev_vertex(segments : Array[Segment], idx : Int) -> @tiny_skia_path.Point {
+fn get_prev_vertex(
+  segments : Array[Segment],
+  idx : Int,
+) -> @tiny_skia_path.Point {
   match segments[idx - 1] {
     MoveTo(p) => p
     LineTo(p) => p

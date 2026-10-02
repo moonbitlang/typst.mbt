@@ -29,7 +29,12 @@ fn f32_bits(x : Float) -> String {
 
 ///|
 fn usvg_rect_bits(r : @tiny_skia_path.Rect) -> Array[String] {
-  [f32_bits(r.left()), f32_bits(r.top()), f32_bits(r.right()), f32_bits(r.bottom())]
+  [
+    f32_bits(r.left()),
+    f32_bits(r.top()),
+    f32_bits(r.right()),
+    f32_bits(r.bottom()),
+  ]
 }
 
 ///|
@@ -55,9 +60,11 @@ fn json_string_field(obj : Map[String, Json], key : String) -> String? {
 fn json_strings(obj : Map[String, Json], key : String) -> Array[String] {
   match obj.get(key) {
     Some(Array(items)) =>
-      items.filter_map(i => match i {
-        String(s) => Some(s)
-        _ => None
+      items.filter_map(i => {
+        match i {
+          String(s) => Some(s)
+          _ => None
+        }
       })
     _ => []
   }
@@ -109,12 +116,22 @@ fn run_usvg_stage(filter : String?, verbose : Bool) -> Unit {
     let diffs = []
     match (try? @usvg.Tree::from_data(data, usvg_base_options())) {
       Ok(tree) => {
-        usvg_check(diffs, "error", json_string_field(obj, "error").unwrap_or(""), "")
+        usvg_check(
+          diffs,
+          "error",
+          json_string_field(obj, "error").unwrap_or(""),
+          "",
+        )
         let size = [
           f32_bits(tree.size().width()),
           f32_bits(tree.size().height()),
         ]
-        usvg_check(diffs, "size", json_strings(obj, "size").join(" "), size.join(" "))
+        usvg_check(
+          diffs,
+          "size",
+          json_strings(obj, "size").join(" "),
+          size.join(" "),
+        )
         usvg_check(
           diffs,
           "bbox",
@@ -134,7 +151,12 @@ fn run_usvg_stage(filter : String?, verbose : Bool) -> Unit {
           usvg_rect_bits(tree.root().stroke_bounding_box()).join(" "),
         )
         let svg = tree.to_string(@usvg.WriteOptions::default())
-        usvg_check(diffs, "svg", json_string_field(obj, "svg").unwrap_or(""), svg)
+        usvg_check(
+          diffs,
+          "svg",
+          json_string_field(obj, "svg").unwrap_or(""),
+          svg,
+        )
         actual_dump.write_string("=== \{name}\n\{svg}\n")
       }
       Err(e) => {
@@ -187,9 +209,7 @@ fn run_usvg_stage(filter : String?, verbose : Bool) -> Unit {
         let bytes = @fs.read_file_to_bytes(assets + "/fonts/" + font) catch {
           _ => b""
         }
-        let face = @otf.Face::parse(bytes[:], 0) catch {
-          _ => continue
-        }
+        let face = @otf.Face::parse(bytes[:], 0) catch { _ => continue }
         fonts[font] = face
         face
       }
@@ -198,7 +218,12 @@ fn run_usvg_stage(filter : String?, verbose : Bool) -> Unit {
     let result = usvg_glyph(face, gid)
     match result {
       Some((svg, bbox)) => {
-        usvg_check(diffs, "svg", json_string_field(obj, "svg").unwrap_or(""), svg)
+        usvg_check(
+          diffs,
+          "svg",
+          json_string_field(obj, "svg").unwrap_or(""),
+          svg,
+        )
         usvg_check(
           diffs,
           "bbox",
@@ -206,10 +231,7 @@ fn run_usvg_stage(filter : String?, verbose : Bool) -> Unit {
           usvg_rect_bits(bbox).join(" "),
         )
       }
-      None =>
-        if obj.get("error") is None {
-          diffs.push("unexpected error")
-        }
+      None => if obj.get("error") is None { diffs.push("unexpected error") }
     }
     if diffs.is_empty() {
       glyph_passed += 1
@@ -237,14 +259,23 @@ fn run_usvg_stage(filter : String?, verbose : Bool) -> Unit {
 ///|
 /// Typst's `draw_svg_glyph` up to the bounding box (before `fixup_svg`).
 fn usvg_glyph(face : @otf.Face, gid : Int) -> (String, @tiny_skia_path.Rect)? {
-  let doc = face.glyph_svg_image(@otf.GlyphId(gid.to_uint16()))?
+  guard face.glyph_svg_image(@otf.GlyphId(gid.to_uint16())) is Some(doc) else {
+    return None
+  }
   let mut data = doc.data.to_bytes()
   if data.length() >= 2 && data[0] == b'\x1f' && data[1] == b'\x8b' {
     data = @codecs.gzip_decompress(data[:]) catch { _ => return None }
   }
-  let xml = (try? @utf8.decode(data[:])).to_option()?
-  let document = (try? @xml.Document::parse(xml)).to_option()?
-  let tree = (try? @usvg.Tree::from_xmltree(document, @usvg.Options::default())).to_option()?
+  guard (try? @utf8.decode(data[:])).to_option() is Some(xml) else {
+    return None
+  }
+  guard (try? @xml.Document::parse(xml)).to_option() is Some(document) else {
+    return None
+  }
+  guard (try? @usvg.Tree::from_xmltree(document, @usvg.Options::default())).to_option()
+    is Some(tree) else {
+    return None
+  }
   let svg = tree.to_string({
     ..@usvg.WriteOptions::default(),
     indent: None,

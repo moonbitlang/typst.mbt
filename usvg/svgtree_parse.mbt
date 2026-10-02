@@ -49,7 +49,7 @@ fn Document::append_attribute(
   value : String,
   important : Bool,
 ) -> Unit {
-  self.attrs.push({ name, value, important })
+  self.attrs.push({ name, value, important, })
 }
 
 ///|
@@ -57,7 +57,7 @@ fn svgtree_parse(
   xml : @xml.Document,
   injected_stylesheet : String?,
 ) -> Document raise @xml.XmlError {
-  let doc : Document = { nodes: [], attrs: [], links: {} }
+  let doc : Document = { nodes: [], attrs: [], links: {}, }
 
   // build a map of id -> node for resolve_href
   let id_map : Map[String, @xml.Node] = {}
@@ -70,7 +70,12 @@ fn svgtree_parse(
   }
 
   // Add a root node.
-  doc.nodes.push({ parent: None, next_sibling: None, children: None, kind: Root })
+  doc.nodes.push({
+    parent: None,
+    next_sibling: None,
+    children: None,
+    kind: Root,
+  })
   let style_sheet = resolve_css(xml, injected_stylesheet)
   parse_xml_node_children(
     xml.root(),
@@ -232,7 +237,8 @@ fn parse_svg_element(
       attr.value() is ("smooth" | "high-quality" | "crisp-edges" | "pixelated") {
       continue
     }
-    append_attribute(parent_id, tag_name, aid, attr.value(), false, doc) |> ignore
+    append_attribute(parent_id, tag_name, aid, attr.value(), false, doc)
+    |> ignore
   }
   let insert_attribute = (aid : AId, value : String, important : Bool) => {
     // Check that attribute already exists.
@@ -395,14 +401,22 @@ fn resolve_inherit(parent_id : Int, aid : AId, doc : Document) -> Bool {
     if node_id is Some(node_id) {
       if doc.get(node_id).attributes().iter().find_first(a => a.name == aid)
         is Some(attr) {
-        doc.attrs.push({ name: aid, value: attr.value, important: attr.important })
+        doc.attrs.push({
+          name: aid,
+          value: attr.value,
+          important: attr.important,
+        })
         return true
       }
     }
-  } else if doc.get(parent_id).attributes().iter().find_first(a => a.name == aid)
+  } else if doc
+    .get(parent_id)
+    .attributes()
+    .iter()
+    .find_first(a => a.name == aid)
     is Some(attr) {
     // Non-inheritable attributes can inherit a value only from a direct parent.
-    doc.attrs.push({ name: aid, value: attr.value, important: attr.important })
+    doc.attrs.push({ name: aid, value: attr.value, important: attr.important, })
     return true
   }
 
@@ -452,13 +466,22 @@ fn resolve_inherit(parent_id : Int, aid : AId, doc : Document) -> Bool {
 }
 
 ///|
-fn resolve_href(node : @xml.Node, id_map : Map[String, @xml.Node]) -> @xml.Node? {
+fn resolve_href(
+  node : @xml.Node,
+  id_map : Map[String, @xml.Node],
+) -> @xml.Node? {
   let link_value = match node.attribute("href", ns=xlink_ns) {
     Some(v) => v
-    None => node.attribute("href")?
+    None =>
+      match node.attribute("href") {
+        Some(v) => v
+        None => return None
+      }
   }
-  let link_id = (try? @svgtypes.IRI::from_str(link_value)).to_option()?.0
-  id_map.get(link_id)
+  guard (try? @svgtypes.IRI::from_str(link_value)) is Ok(link_id) else {
+    return None
+  }
+  id_map.get(link_id.0)
 }
 
 ///|
@@ -566,22 +589,22 @@ fn resolve_css(
 priv struct XmlNode(@xml.Node)
 
 ///|
-impl @simplecss.Element for XmlNode with parent_element(self) {
+impl @simplecss.Element for XmlNode with fn parent_element(self) {
   self.0.parent_element().map(XmlNode(_))
 }
 
 ///|
-impl @simplecss.Element for XmlNode with prev_sibling_element(self) {
+impl @simplecss.Element for XmlNode with fn prev_sibling_element(self) {
   self.0.prev_sibling_element().map(XmlNode(_))
 }
 
 ///|
-impl @simplecss.Element for XmlNode with has_local_name(self, local_name) {
+impl @simplecss.Element for XmlNode with fn has_local_name(self, local_name) {
   self.0.tag_name().name() == local_name
 }
 
 ///|
-impl @simplecss.Element for XmlNode with attribute_matches(
+impl @simplecss.Element for XmlNode with fn attribute_matches(
   self,
   local_name,
   operator,
@@ -593,7 +616,7 @@ impl @simplecss.Element for XmlNode with attribute_matches(
 }
 
 ///|
-impl @simplecss.Element for XmlNode with pseudo_class_matches(self, class) {
+impl @simplecss.Element for XmlNode with fn pseudo_class_matches(self, class) {
   match class {
     @simplecss.PseudoClass::FirstChild => self.0.prev_sibling_element() is None
     // TODO: lang
@@ -637,7 +660,8 @@ fn find_recursive_pattern(aid : AId, doc : Document) -> Int? {
               Some(v) => v
               None => continue
             }
-            if (try? @svgtypes.Paint::from_str(value2)) is Ok(FuncIRI(link_id2, _)) {
+            if (try? @svgtypes.Paint::from_str(value2))
+              is Ok(FuncIRI(link_id2, _)) {
               if link_id2 == pattern_node.element_id() {
                 return Some(node2.id)
               }

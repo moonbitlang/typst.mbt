@@ -11,7 +11,9 @@ fn mask_convert(
   if node.tag_name() != Some(EId::Mask) {
     return None
   }
-  let units : Units = node.attribute(AId::MaskUnits).unwrap_or(ObjectBoundingBox)
+  let units : Units = node
+    .attribute(AId::MaskUnits)
+    .unwrap_or(ObjectBoundingBox)
   let content_units : Units = node
     .attribute(AId::MaskContentUnits)
     .unwrap_or(UserSpaceOnUse)
@@ -54,7 +56,8 @@ fn mask_convert(
     ),
   )
   // Upstream warns: Mask '{}' has an invalid size. Skipped.
-  let mut rect = rect?
+  guard rect is Some(rect_) else { return None }
+  let mut rect = rect_
   let mut mask_all = false
   if units == ObjectBoundingBox {
     if object_bbox is Some(bbox) {
@@ -66,7 +69,8 @@ fn mask_convert(
       mask_all = true
     }
   }
-  let mut id = NonEmptyString::new(node.element_id())?
+  guard NonEmptyString::new(node.element_id()) is Some(id_) else { return None }
+  let mut id = id_
   // Generate ID only when we're parsing `objectBoundingBox` mask for the second time.
   if !cacheable && cache.masks.contains(id.get()) {
     id = cache.gen_mask_id()
@@ -123,8 +127,8 @@ fn mask_convert(
     g.abs_transform = g.transform
     subroot = Some(g)
   }
+  // Prefer `subroot` to `mask.root`.
   {
-    // Prefer `subroot` to `mask.root`.
     let real_root = subroot.unwrap_or(mask.root)
     convert_children(node, state, cache, real_root)
 

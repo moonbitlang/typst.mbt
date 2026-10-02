@@ -67,7 +67,7 @@ pub fn NormalizedF32::to_u8(self : NormalizedF32) -> Int {
 }
 
 ///|
-pub impl Mul for NormalizedF32 with mul(self, rhs) {
+pub impl Mul for NormalizedF32 with fn mul(self, rhs) {
   NormalizedF32::new_clamped(self.0 * rhs.0)
 }
 
