@@ -1,0 +1,12 @@
+/CIDSystemInfo << /Registry (Adobe) /Ordering (Japan1) /Supplement 2 >> def
+/CMapName /Synth def
+3 beginbfchar
+<0041> <0061>
+<0041> <0062>
+<0042> <0063>
+endbfchar
+3 beginbfrange
+<0040> <0050> <0070>
+<0045> <0046> [<0078> <0079>]
+<0000> <FFFF> <0020>
+endbfrange

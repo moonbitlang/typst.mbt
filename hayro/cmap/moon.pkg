@@ -1,2 +1,13 @@
 import {
+  "moonbitlang/typst/hayro/postscript" @hayro_postscript,
+  "moonbitlang/core/debug",
 }
+
+import {
+  "moonbitlang/x/fs",
+  "moonbitlang/typst/hayro/syntax" @hayro_syntax,
+} for "test"
+
+// `CodespaceRange` is kept (like upstream) but never read.
+
+warnings = "-unused_field"
