@@ -17,7 +17,7 @@ fn run_font_stage(filter : String?, verbose : Bool) -> Unit {
         continue
       }
       let text = StringBuilder::new()
-      font_dump_face(text, index, data, face_index)
+      font_dump_face(text, index, bytes, face_index)
       let actual = text.to_string()
       if dump_actual.val {
         let out = "_build/actual/font/\{name}.txt"
@@ -37,6 +37,26 @@ fn run_font_stage(filter : String?, verbose : Bool) -> Unit {
         }
       }
       index += 1
+    }
+  }
+  if filter is None || filter == Some("book") {
+    let actual = font_dump_book()
+    if dump_actual.val {
+      let out = "_build/actual/font/book.txt"
+      ensure_parent_dir(out)
+      @fs.write_string_to_file(out, actual) catch {
+        _ => ()
+      }
+    }
+    let expected = read(golden_dir + "/font/book.txt")
+    if actual == expected {
+      passed += 1
+    } else {
+      failed += 1
+      println("FAIL font book")
+      if verbose {
+        println(first_diff(expected, actual))
+      }
     }
   }
   println("font: \{passed} passed, \{failed} failed")
@@ -237,9 +257,10 @@ fn is_sample(gid : Int, count : Int) -> Bool {
 fn font_dump_face(
   out : StringBuilder,
   index : Int,
-  data : BytesView,
+  bytes : Bytes,
   face_index : UInt,
 ) -> Unit {
+  let data = bytes[:]
   out.write_string(
     "font \{index} face \{face_index} len \{data.length()} fnv \{hex16(fnv_bytes(data))}\n",
   )
@@ -293,6 +314,7 @@ fn font_dump_face(
   font_dump_layout(out, face)
   font_dump_math(out, face)
   font_dump_colr(out, face)
+  font_dump_typst(out, bytes, face_index)
 
   // Variations.
   let axes = face.variation_axes().iter().to_array()

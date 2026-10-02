@@ -21,6 +21,7 @@ import {
   "moonbitlang/typst/time",
   "moonbitlang/typst/html_assets",
   "moonbitlang/typst/codecs",
+  "moonbitlang/typst/otf",
 }
 
 import {

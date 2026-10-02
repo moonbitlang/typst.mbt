@@ -30,6 +30,7 @@ pub fn dump_font(out: &Path) {
             index += 1;
         }
     }
+    dump_book(out);
     eprintln!("dumped {index} faces");
 }
 
@@ -164,7 +165,7 @@ fn is_sample(gid: u16, count: u16) -> bool {
     gid < 40 || gid % 397 == 0 || gid + 1 == count
 }
 
-fn dump_face(out: &mut String, index: usize, data: &[u8], face_index: u32) {
+fn dump_face(out: &mut String, index: usize, data: &'static [u8], face_index: u32) {
     writeln!(
         out,
         "font {index} face {face_index} len {} fnv {:016x}",
@@ -243,6 +244,7 @@ fn dump_face(out: &mut String, index: usize, data: &[u8], face_index: u32) {
     dump_layout(out, &face);
     dump_math(out, &face);
     dump_colr(out, &face);
+    dump_typst(out, data, face_index);
 
     // Variations.
     let axes: Vec<_> = face.variation_axes().into_iter().collect();
@@ -1029,4 +1031,301 @@ fn dump_colr(out: &mut String, face: &Face) {
         let line = format!("{} {}", res.is_some(), rec.0);
         blocks.push(gid, &line);
     }
+}
+
+// ---------------------------------------------------------------------------
+// The Typst font layer (`typst-library/src/text/font`).
+
+fn em(v: typst::layout::Em) -> String {
+    format!("{}", v.get())
+}
+
+fn font_style(s: typst::text::FontStyle) -> &'static str {
+    match s {
+        typst::text::FontStyle::Normal => "normal",
+        typst::text::FontStyle::Italic => "italic",
+        typst::text::FontStyle::Oblique => "oblique",
+    }
+}
+
+fn variant(v: typst::text::FontVariant) -> String {
+    format!(
+        "{} {} {}",
+        font_style(v.style),
+        v.weight.to_number(),
+        (v.stretch.to_ratio().get() * 1000.0).round() as i64
+    )
+}
+
+fn line(m: &typst::text::LineMetrics) -> String {
+    format!("{} {}", em(m.position), em(m.thickness))
+}
+
+fn script(m: &Option<typst::text::ScriptMetrics>) -> String {
+    match m {
+        Some(m) => format!(
+            "{} {} {} {}",
+            em(m.width),
+            em(m.height),
+            em(m.horizontal_offset),
+            em(m.vertical_offset)
+        ),
+        None => "-".into(),
+    }
+}
+
+fn variations(v: &typst::text::FontVariations) -> String {
+    v.0.iter()
+        .map(|(tag, value)| format!("{}={}", esc(&tag.to_string()), f(value.0)))
+        .collect::<Vec<_>>()
+        .join(",")
+}
+
+fn dump_instance(out: &mut String, inst: &typst::text::FontInstance) {
+    let m = inst.metrics();
+    writeln!(
+        out,
+        "typst metrics {} asc {} cap {} x {} desc {} strike {} under {} over {} sub {} sup {}",
+        m.units_per_em,
+        em(m.ascender),
+        em(m.cap_height),
+        em(m.x_height),
+        em(m.descender),
+        line(&m.strikethrough),
+        line(&m.underline),
+        line(&m.overline),
+        script(&m.subscript),
+        script(&m.superscript)
+    )
+    .unwrap();
+    let c = inst.math();
+    let values = [
+        c.space_width,
+        c.display_operator_min_height,
+        c.axis_height,
+        c.accent_base_height,
+        c.flattened_accent_base_height,
+        c.subscript_shift_down,
+        c.subscript_top_max,
+        c.subscript_baseline_drop_min,
+        c.superscript_shift_up,
+        c.superscript_shift_up_cramped,
+        c.superscript_bottom_min,
+        c.superscript_baseline_drop_max,
+        c.sub_superscript_gap_min,
+        c.superscript_bottom_max_with_subscript,
+        c.space_after_script,
+        c.upper_limit_gap_min,
+        c.upper_limit_baseline_rise_min,
+        c.lower_limit_gap_min,
+        c.lower_limit_baseline_drop_min,
+        c.stack_top_shift_up,
+        c.stack_top_display_style_shift_up,
+        c.stack_bottom_shift_down,
+        c.stack_bottom_display_style_shift_down,
+        c.stack_gap_min,
+        c.stack_display_style_gap_min,
+        c.stretch_stack_top_shift_up,
+        c.stretch_stack_bottom_shift_down,
+        c.stretch_stack_gap_above_min,
+        c.stretch_stack_gap_below_min,
+        c.fraction_numerator_shift_up,
+        c.fraction_numerator_display_style_shift_up,
+        c.fraction_denominator_shift_down,
+        c.fraction_denominator_display_style_shift_down,
+        c.fraction_numerator_gap_min,
+        c.fraction_num_display_style_gap_min,
+        c.fraction_rule_thickness,
+        c.fraction_denominator_gap_min,
+        c.fraction_denom_display_style_gap_min,
+        c.skewed_fraction_vertical_gap,
+        c.skewed_fraction_horizontal_gap,
+        c.overbar_vertical_gap,
+        c.overbar_rule_thickness,
+        c.overbar_extra_ascender,
+        c.underbar_vertical_gap,
+        c.underbar_rule_thickness,
+        c.underbar_extra_descender,
+        c.radical_vertical_gap,
+        c.radical_display_style_vertical_gap,
+        c.radical_rule_thickness,
+        c.radical_extra_ascender,
+        c.radical_kern_before_degree,
+        c.radical_kern_after_degree,
+    ];
+    writeln!(
+        out,
+        "typst math {} {} {} {}",
+        c.script_percent_scale_down,
+        c.script_script_percent_scale_down,
+        c.radical_degree_bottom_raise_percent,
+        values.into_iter().map(em).collect::<Vec<_>>().join(" ")
+    )
+    .unwrap();
+    let mut adv = String::new();
+    let count = inst.ttf().number_of_glyphs().min(512);
+    for gid in 0..count {
+        write!(
+            adv,
+            "{}:{}:{};",
+            opt(inst.x_advance(gid).map(em)),
+            opt(inst.y_advance(gid).map(em)),
+            rect(inst.ttf().glyph_bounding_box(GlyphId(gid)))
+        )
+        .unwrap();
+    }
+    writeln!(out, "typst advances fnv {:016x}", fnv(adv.as_bytes())).unwrap();
+}
+
+fn dump_typst(out: &mut String, data: &'static [u8], face_index: u32) {
+    use typst::foundations::Bytes;
+    use typst::layout::Abs;
+    use typst::text::{
+        Font, FontFlags, FontStretch, FontStyle, FontVariant, FontVariations, FontWeight,
+    };
+    let Some(font) = Font::new(Bytes::new(data), face_index) else {
+        writeln!(out, "typst -").unwrap();
+        return;
+    };
+    let info = font.info();
+    let mut flags = vec![];
+    for (flag, name) in [
+        (FontFlags::MONOSPACE, "monospace"),
+        (FontFlags::SERIF, "serif"),
+        (FontFlags::MATH, "math"),
+        (FontFlags::VARIABLE, "variable"),
+    ] {
+        if info.flags.contains(flag) {
+            flags.push(name);
+        }
+    }
+    writeln!(
+        out,
+        "typst family \"{}\" variant {} flags [{}] postscript {}",
+        esc(&info.family),
+        variant(info.variant),
+        flags.join(","),
+        match font.post_script_name() {
+            Some(n) => format!("\"{}\"", esc(&n)),
+            None => "-".into(),
+        }
+    )
+    .unwrap();
+    for axis in &info.axes {
+        writeln!(
+            out,
+            "typst axis {} {} {} {}",
+            esc(&axis.tag.to_string()),
+            f(axis.min.0),
+            f(axis.max.0),
+            f(axis.default.0)
+        )
+        .unwrap();
+    }
+    let mut cov = String::new();
+    let mut n = 0;
+    for c in info.coverage.iter() {
+        write!(cov, "{c};").unwrap();
+        n += 1;
+    }
+    let mut probe = String::new();
+    for c in (0..0x30000).step_by(7) {
+        probe.push(if info.coverage.contains(c) { '1' } else { '0' });
+    }
+    writeln!(
+        out,
+        "typst coverage {n} fnv {:016x} probe {:016x}",
+        fnv(cov.as_bytes()),
+        fnv(probe.as_bytes())
+    )
+    .unwrap();
+
+    let size = Abs::pt(11.0);
+    let plain = FontVariations::default();
+    let inst = font.clone().instantiate(info.variant, size, &plain);
+    writeln!(out, "typst instance default {}", variations(inst.variations())).unwrap();
+    dump_instance(out, &inst);
+    if info.flags.contains(FontFlags::VARIABLE) {
+        let variants = [
+            ("bold", FontVariant::new(FontStyle::Normal, FontWeight::BOLD, FontStretch::NORMAL)),
+            (
+                "light-italic-condensed",
+                FontVariant::new(FontStyle::Italic, FontWeight::LIGHT, FontStretch::CONDENSED),
+            ),
+            (
+                "black-oblique-expanded",
+                FontVariant::new(FontStyle::Oblique, FontWeight::BLACK, FontStretch::EXPANDED),
+            ),
+        ];
+        for (label, v) in variants {
+            for pt in [6.0, 11.0, 72.0] {
+                let inst = font.clone().instantiate(v, Abs::pt(pt), &plain);
+                writeln!(out, "typst instance {label} {pt} {}", variations(inst.variations()))
+                    .unwrap();
+                dump_instance(out, &inst);
+            }
+        }
+    }
+}
+
+/// Dumps the font book's selection and fallback behaviour.
+pub fn dump_book(out: &Path) {
+    use typst::foundations::Bytes;
+    use typst::text::{Font, FontBook, FontStretch, FontStyle, FontVariant, FontWeight};
+    let fonts: Vec<Font> = test_fonts()
+        .into_iter()
+        .flat_map(|data| Font::iter(Bytes::new(data)))
+        .collect();
+    let book = FontBook::from_fonts(&fonts);
+    let mut text = String::new();
+    for (family, ids) in book.families() {
+        writeln!(
+            text,
+            "family \"{}\" {}",
+            esc(family),
+            ids.map(|i| i.to_string()).collect::<Vec<_>>().join(",")
+        )
+        .unwrap();
+    }
+    let styles = [FontStyle::Normal, FontStyle::Italic, FontStyle::Oblique];
+    let weights = [100, 300, 400, 450, 500, 700, 900];
+    let stretches = [500, 750, 1000, 1250, 2000];
+    let mut variants: Vec<FontVariant> = vec![];
+    for &style in &styles {
+        for &w in &weights {
+            for &st in &stretches {
+                variants.push(FontVariant::new(
+                    style,
+                    FontWeight::from_number(w),
+                    FontStretch::from_ratio(typst::layout::Ratio::new(st as f64 / 1000.0)),
+                ));
+            }
+        }
+    }
+    for (family, _) in book.families() {
+        let lower = family.to_lowercase();
+        let picks: Vec<String> = variants
+            .iter()
+            .map(|&v| opt(book.select(&lower, v)))
+            .collect();
+        writeln!(text, "select \"{}\" {}", esc(family), picks.join(",")).unwrap();
+    }
+    let samples = [
+        "A", "  x", "\u{200B}é", "α", "Ж", "א", "ا", "क", "ก", "中", "한", "あ", "😀", "∑", "⨀",
+        "𝔸", "♠", "\u{1F1E9}", "ﬁ", "€", "🏳️", "∫", "⟨", "ℏ",
+    ];
+    let likes: Vec<Option<usize>> =
+        [None, Some(0), Some(13), Some(20), Some(44), Some(60), Some(83)].to_vec();
+    let fallback_variants = [variants[14], variants[28], variants[50], variants[80]];
+    for sample in samples {
+        let mut picks = vec![];
+        for like in &likes {
+            for &v in &fallback_variants {
+                let like = like.and_then(|i| book.info(i));
+                picks.push(opt(book.select_fallback(like, v, sample)));
+            }
+        }
+        writeln!(text, "fallback \"{}\" {}", esc(sample), picks.join(",")).unwrap();
+    }
+    std::fs::write(out.join("book.txt"), text).unwrap();
 }
