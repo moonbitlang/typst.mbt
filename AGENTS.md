@@ -101,3 +101,8 @@
   `pdftags-check` (our readers on upstream's PDFs, saved by the oracle with
   `ORACLE_SAVE_PDF=<dir>`; pass `--upstream-pdfs=<dir>`). Upstream PDF byte
   hashes are not a goal.
+- PDF images: `hayro/syntax` (hayro-syntax port; MoonBit has no `?` for
+  `Option`, so upstream `x?` becomes `guard x is Some(v) else { return None }`)
+  loads them (`library/image_pdf.mbt`); `hayro/write` (hayro-write) extracts
+  pages that `pdf/image.mbt` embeds as XObjects. `hayro/syntax/oracle_test.mbt`
+  is generated from the real crate (`oracle/src/bin/gen_hayro_syntax_tests.rs`).
