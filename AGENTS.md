@@ -15,6 +15,9 @@
   (into `push_frame`, `GroupItem::new`, a `Fragment`, ...). `Regions` are
   immutable (`regions = regions.next()`). Layout output is checked with the
   `paged` stage (`typst-frame-v1`, spec in `oracle/src/paged.rs`).
+  Bidi (`bidi/`), line breaking (`linebreak/`, ICU4X + Typst's
+  `breakpoints`), hyphenation (`hypher/`) and word-bound tables are
+  generated from the locked crates by `scripts/gen_breaking.sh`.
 - Before committing: `moon fmt && moon info && moon check`, run the runner.
 - Run unit tests in parallel: `moon test --target native -j16` (24 cores;
   builds are dominated by the serial `library` package, so `-j` mainly

@@ -14,6 +14,7 @@ use std::path::{Path, PathBuf};
 use typst_syntax::{DiagSpanKind, Source, SyntaxDiagnostic};
 
 mod ast_dump;
+mod breaking;
 mod collect;
 mod eval;
 mod fonts;
@@ -94,6 +95,11 @@ fn main() {
                 .join()
                 .unwrap();
         }
+        Some("break") => {
+            let suite = PathBuf::from(&args[2]);
+            let out = PathBuf::from(&args[3]);
+            breaking::dump_break(&suite, &out);
+        }
         Some("parse") => {
             // Debugging aid: parse a single file and print the tree.
             let text = std::fs::read_to_string(&args[2]).unwrap();
@@ -106,7 +112,7 @@ fn main() {
         }
         _ => {
             eprintln!(
-                "usage: typst-oracle <syntax|ast|eval|html|realize|paged> <suite-dir> <out-dir>\n       typst-oracle fonts <out-file>"
+                "usage: typst-oracle <syntax|ast|eval|html|realize|paged|break> <suite-dir> <out-dir>\n       typst-oracle fonts <out-file>"
             );
             std::process::exit(2);
         }

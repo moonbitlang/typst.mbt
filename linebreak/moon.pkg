@@ -1,0 +1,9 @@
+import {
+  "moonbitlang/typst/unicode",
+  "moonbitlang/typst/hypher",
+  "moonbitlang/typst/syntax",
+}
+
+import {
+  "moonbitlang/core/encoding/utf8",
+} for "test"
