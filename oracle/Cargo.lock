@@ -2648,6 +2648,7 @@ dependencies = [
  "unicode-script",
  "unicode-segmentation",
  "unscanny",
+ "yaml-rust",
 ]
 
 [[package]]
