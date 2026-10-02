@@ -1,0 +1,12 @@
+import {
+  "moonbitlang/core/math",
+}
+
+warnings = "-deprecated"
+
+options(
+  targets: {
+    "libm_native.mbt": [ "native" ],
+    "libm_other.mbt": [ "not", "native" ],
+  },
+)
