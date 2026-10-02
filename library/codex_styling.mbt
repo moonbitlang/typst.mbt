@@ -106,8 +106,7 @@ pub fn MathStyle::select(
       Italic
     (_, false, None) if styling_is_latin(c) || styling_is_lower_greek(c) =>
       Italic
-    (_, true, Some(false)) if styling_is_latin(c) || styling_is_greek(c) =>
-      Bold
+    (_, true, Some(false)) if styling_is_latin(c) || styling_is_greek(c) => Bold
     (_, true, Some(true)) if styling_is_latin(c) || styling_is_greek(c) =>
       BoldItalic
     (_, true, None) if styling_is_latin(c) || styling_is_lower_greek(c) =>

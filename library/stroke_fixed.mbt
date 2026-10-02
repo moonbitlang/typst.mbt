@@ -38,7 +38,10 @@ pub(all) enum ResolvedDashLength {
 ///|
 /// Resolve the length, taking the thickness into account (upstream
 /// `DashLength::finish`).
-pub fn ResolvedDashLength::finish(self : ResolvedDashLength, width : Abs) -> Abs {
+pub fn ResolvedDashLength::finish(
+  self : ResolvedDashLength,
+  width : Abs,
+) -> Abs {
   match self {
     LineWidth => width
     Length(l) => l
@@ -58,7 +61,8 @@ pub fn Stroke::resolve(self : Stroke, styles : StyleChain) -> ResolvedStroke {
         array: dash.array.map(l => {
           match l {
             DashLength::LineWidth => ResolvedDashLength::LineWidth
-            DashLength::Length(l) => ResolvedDashLength::Length(l.resolve(styles))
+            DashLength::Length(l) =>
+              ResolvedDashLength::Length(l.resolve(styles))
           }
         }),
         phase: dash.phase.resolve(styles),
@@ -128,7 +132,7 @@ pub(all) struct FixedDashPattern {
 ///|
 /// Create a stroke from a paint and a thickness.
 pub fn FixedStroke::from_pair(paint : Paint, thickness : Abs) -> FixedStroke {
-  { ..FixedStroke::default(), paint, thickness }
+  { ..FixedStroke::default(), paint, thickness, }
 }
 
 ///|

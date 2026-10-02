@@ -312,13 +312,17 @@ fn equation_elem_script_scale_default() -> Value {
 ///|
 /// Sets flac OpenType feature.
 pub fn style_flac() -> Style {
-  TextElem::set_features(FontFeatures([(OpenTypeTag::from_bytes_lossy("flac"), 1L)]))
+  TextElem::set_features(
+    FontFeatures([(OpenTypeTag::from_bytes_lossy("flac"), 1L)]),
+  )
 }
 
 ///|
 /// Sets dtls OpenType feature.
 pub fn style_dtls() -> Style {
-  TextElem::set_features(FontFeatures([(OpenTypeTag::from_bytes_lossy("dtls"), 1L)]))
+  TextElem::set_features(
+    FontFeatures([(OpenTypeTag::from_bytes_lossy("dtls"), 1L)]),
+  )
 }
 
 ///|

@@ -26,7 +26,8 @@ pub fn MathLimits::for_char_with_class(
   class : @unicode.MathClass?,
 ) -> MathLimits {
   match class {
-    Some(Large) => if is_integral_char(c) {
+    Some(Large) =>
+      if is_integral_char(c) {
         MathLimits::Never
       } else {
         MathLimits::Display
