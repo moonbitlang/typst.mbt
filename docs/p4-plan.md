@@ -422,13 +422,15 @@ with other layouters in the package carry a `math` infix
 (`layout_math_table`, `layout_math_line`, `layout_math_text`, ...). The
 equation stubs in `stubs.mbt` are gone.
 
-**Temporary bridge** (`math_inline_bridge.mbt`): faithful copies of the
-inline-layout items math uses (`rusty`, `create_shape_plan`,
-`get_font_and_covers`, `layout_box`, `text::{features, language, variant}`)
-under `bridge_` names, until unit F lands; math text runs
-(`layout_math_text`) already call `layout_inline`.
+Math shaping uses the inline layout API (`rusty`, `create_shape_plan`,
+`features`, `language`, `get_font_and_covers` via a `SharedShapingContext`
+impl for `MathShapingContext`, `layout_box`, `layout_inline`); the math
+font families (`typst_library::math::families`, with New Computer Modern
+Math first in the fallback list) are `math_families` in `math.mbt`.
+`Augment`'s cast accepts the `stroke: auto` its own `into_value` writes
+(field values round-trip through `Value` here).
 
-**Result:** `paged` 338 → 532, `svg` 384 → 573. Every failing `math/` test
-(212 of the 403 paged headers) fails only because it needs inline layout
-(paragraph text, text in math, equation numbers, inline equations);
-eval/realize/html unchanged.
+**Result:** `paged` 1766 → 2223, `svg` 1772 → 2220 (on top of unit F).
+All 403 `math/` paged tests match; the 4 `math/` SVG failures are color
+emoji glyphs in the SVG exporter (paged output identical). eval/realize/html
+unchanged.
