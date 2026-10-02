@@ -3,6 +3,7 @@ import {
   "moonbitlang/typst/layout",
   "moonbitlang/typst/syntax",
   "moonbitlang/typst/svg",
+  "moonbitlang/typst/otf",
   "moonbitlang/typst/codecs",
   "moonbitlang/typst/unicode",
   "moonbitlang/pdflite/export",

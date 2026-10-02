@@ -51,7 +51,16 @@ fn pdf_replay_report(rel : String, tc : TestCase) -> String {
   let warned = make_live(doc)
   match warned.output {
     Err(_) => "export-error\n"
-    Ok(bytes) => pdf_extract(bytes)
+    Ok(bytes) => {
+      if pdf_save_dir.val is Some(dir) {
+        let path = "\{dir}/\{rel.unsafe_substring(start=0, end=rel.length() - 4)}/\{tc.name}.pdf"
+        ensure_parent_dir(path)
+        @fs.write_bytes_to_file(path, bytes) catch {
+          _ => ()
+        }
+      }
+      pdf_extract(bytes)
+    }
   }
 }
 

@@ -76,8 +76,10 @@ fn convert_raster(
   let width = raster.width().reinterpret_as_int()
   let height = raster.height().reinterpret_as_int()
   if raster.format() == Exchange(Jpg) {
-    let colorspace : @export.ImageColorspace = match raster.color() {
-      L8 | La8 | L16 | La16 => Luma
+    let (components, adobe) = jpeg_components(raster.data())
+    let colorspace : @export.ImageColorspace = match components {
+      1 => Luma
+      4 => Cmyk
       _ => Rgb
     }
     return Ok({
@@ -88,7 +90,7 @@ fn convert_raster(
       data: Jpeg(raster.data()),
       icc: raster.icc(),
       interpolate,
-      inverted_cmyk: false,
+      inverted_cmyk: adobe,
     })
   }
   // The decoded pixels (decoding PNGs here if the image was not decoded).
@@ -211,4 +213,53 @@ fn exif_transform(
     Some(8) => with_flipping(true, false)
     _ => no_flipping(false, false)
   }
+}
+
+///|
+/// The number of components of a JPEG image (from its frame header) and
+/// whether it has an Adobe `APP14` marker.
+fn jpeg_components(data : Bytes) -> (Int, Bool) {
+  let mut i = 2
+  let mut adobe = false
+  while i + 4 <= data.length() {
+    if data[i] != b'\xFF' {
+      i += 1
+      continue
+    }
+    let marker = data[i + 1].to_int()
+    if marker == 0xFF {
+      i += 1
+      continue
+    }
+    if marker == 0xD8 || (marker >= 0xD0 && marker <= 0xD7) || marker == 0x01 {
+      i += 2
+      continue
+    }
+    let len = (data[i + 2].to_int() << 8) | data[i + 3].to_int()
+    if marker == 0xEE &&
+      i + 9 <= data.length() &&
+      data[i + 4] == b'A' &&
+      data[i + 5] == b'd' &&
+      data[i + 6] == b'o' &&
+      data[i + 7] == b'b' &&
+      data[i + 8] == b'e' {
+      adobe = true
+    }
+    // SOF markers (except DHT, JPG and DAC).
+    if marker >= 0xC0 &&
+      marker <= 0xCF &&
+      marker != 0xC4 &&
+      marker != 0xC8 &&
+      marker != 0xCC {
+      if i + 9 < data.length() {
+        return (data[i + 9].to_int(), adobe)
+      }
+      return (3, adobe)
+    }
+    if marker == 0xDA {
+      break
+    }
+    i += 2 + len
+  }
+  (3, adobe)
 }

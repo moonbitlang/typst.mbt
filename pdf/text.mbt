@@ -101,7 +101,12 @@ fn build_font(
 ) -> @export.Font raise @library.SourceError {
   let font = typst_font.font()
   match @export.Font::new(font.data(), font.index().reinterpret_as_int()) {
-    Some(f) => f
+    Some(f) => {
+      if color_glyph_hook(typst_font) is Some(hook) {
+        f.set_color_glyphs(hook)
+      }
+      f
+    }
     None =>
       raise @library.SourceError([
         @library.SourceDiagnostic::error_at(
