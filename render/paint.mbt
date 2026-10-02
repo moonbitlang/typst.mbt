@@ -4,10 +4,10 @@
 ///|
 /// Sampling of a paint (solid colors, gradients and tilings) for glyph
 /// bitmaps: returns the packed premultiplied color at the pixel position.
-priv struct PaintSampler((UInt, UInt) -> UInt)
+priv struct PaintSampler((UInt, UInt) -> UInt raise RenderPanic)
 
 ///|
-fn PaintSampler::sample(self : PaintSampler, x : UInt, y : UInt) -> UInt {
+fn PaintSampler::sample(self : PaintSampler, x : UInt, y : UInt) -> UInt raise RenderPanic {
   (self.0)(x, y)
 }
 
@@ -26,7 +26,7 @@ fn gradient_sampler(
   state : State,
   item_size : @library.Axes[@library.Abs],
   on_text : Bool,
-) -> PaintSampler {
+) -> PaintSampler raise RenderPanic {
   let relative = gradient.unwrap_relative(on_text)
   let container_size = match relative {
     Self_ => item_size
@@ -34,7 +34,7 @@ fn gradient_sampler(
   }
   let fill_transform = match relative {
     Self_ => @path.Transform::identity()
-    Parent => state.container_transform.invert().unwrap()
+    Parent => must(state.container_transform.invert())
   }
   let transform_to_parent = fill_transform
   let cw = to_f32(container_size.x)
@@ -59,11 +59,11 @@ fn tiling_sampler(
   pixmap : @skia.Pixmap,
   state : State,
   on_text : Bool,
-) -> PaintSampler {
+) -> PaintSampler raise RenderPanic {
   let relative = tiling.unwrap_relative(on_text)
   let fill_transform = match relative {
     Self_ => @path.Transform::identity()
-    Parent => state.container_transform.invert().unwrap()
+    Parent => must(state.container_transform.invert())
   }
   let pattern_transform = to_sk_transform(tiling_transform(tiling))
   let size = tiling.size.add_size(tiling.spacing)
@@ -86,7 +86,7 @@ fn tiling_sampler(
     )
 
     // Sample the tilings
-    pixmap.pixel(x, y).unwrap().0
+    must(pixmap.pixel(x, y)).0
   })
 }
 
@@ -106,15 +106,17 @@ fn gradient_pixmap(
   width : UInt,
   height : UInt,
   gradient_map : (@library.Point, @library.Axes[@library.Ratio])?,
-) -> @skia.Pixmap {
+) -> @skia.Pixmap raise RenderPanic {
   let (offset, scale) = match gradient_map {
     Some(m) => m
     None => (@library.Point::zero(), @library.Axes::splat(@library.Ratio::one()))
   }
-  let pixmap = @skia.Pixmap::new(
-    if width > 1 { width } else { 1 },
-    if height > 1 { height } else { 1 },
-  ).unwrap()
+  let pixmap = must(
+    @skia.Pixmap::new(
+      if width > 1 { width } else { 1 },
+      if height > 1 { height } else { 1 },
+    ),
+  )
   let pixels = pixmap.pixels()
   let w = width.reinterpret_as_int()
   let h = height.reinterpret_as_int()
@@ -154,7 +156,7 @@ fn to_sk_paint(
   on_text : Bool,
   shape : @library.Shape?,
   include_stroke_in_bbox : Bool,
-) -> @skia.Paint {
+) -> @skia.Paint raise RenderPanic {
   let (item_size, fill_transform, gradient_map) = match shape {
     Some(shape) => {
       let bbox = @svg.shape_bbox(shape, include_stroke_in_bbox)
@@ -209,7 +211,7 @@ fn to_sk_paint(
       let fill_transform = match relative {
         Self_ => fill_transform.unwrap_or(@path.Transform::identity())
         Parent =>
-          state.container_transform.post_concat(state.transform.invert().unwrap())
+          state.container_transform.post_concat(must(state.transform.invert()))
       }
       let gradient_map = match relative {
         Self_ => gradient_map
@@ -248,7 +250,7 @@ fn to_sk_paint(
       let fill_transform = match relative {
         Self_ => fill_transform.unwrap_or(@path.Transform::identity())
         Parent =>
-          state.container_transform.post_concat(state.transform.invert().unwrap())
+          state.container_transform.post_concat(must(state.transform.invert()))
       }
       let canvas = render_tiling_frame(state, tilings)
       let base_offset : @library.Point = match relative {
@@ -280,9 +282,9 @@ fn to_sk_paint(
 }
 
 ///|
-fn to_sk_color(color : @library.ProcessColor) -> @skia.Color {
+fn to_sk_color(color : @library.ProcessColor) -> @skia.Color raise RenderPanic {
   let c = color.to_rgb()
-  @skia.Color::from_rgba(c.red, c.green, c.blue, c.alpha).unwrap()
+  must(@skia.Color::from_rgba(c.red, c.green, c.blue, c.alpha))
 }
 
 ///|
@@ -310,12 +312,14 @@ fn f32_to_u8_stimulus(x : Float) -> Int {
 }
 
 ///|
-fn render_tiling_frame(state : State, tilings : @library.Tiling) -> @skia.Pixmap {
+fn render_tiling_frame(state : State, tilings : @library.Tiling) -> @skia.Pixmap raise RenderPanic {
   let size = tilings.size.add_size(tilings.spacing)
-  let canvas = @skia.Pixmap::new(
-    @path.f32_to_u32(@path.roundf(to_f32(size.x) * state.pixel_per_pt)),
-    @path.f32_to_u32(@path.roundf(to_f32(size.y) * state.pixel_per_pt)),
-  ).unwrap()
+  let canvas = must(
+    @skia.Pixmap::new(
+      @path.f32_to_u32(@path.roundf(to_f32(size.x) * state.pixel_per_pt)),
+      @path.f32_to_u32(@path.roundf(to_f32(size.y) * state.pixel_per_pt)),
+    ),
+  )
 
   // Render the tilings into a new canvas.
   let ts = @path.Transform::from_scale(state.pixel_per_pt, state.pixel_per_pt)
@@ -414,4 +418,19 @@ fn correct_aspect_ratio(
   @library.Angle::rad(
     libm_atan2(angle.sin() / aspect_ratio.get().abs(), angle.cos()),
   ).normalized()
+}
+
+///|
+/// A panic of upstream's renderer (an `unwrap` of `None`), which aborts the
+/// rendering of the document.
+pub suberror RenderPanic {
+  RenderPanic(String)
+} derive(Debug)
+
+///|
+fn[T] must(x : T?) -> T raise RenderPanic {
+  match x {
+    Some(v) => v
+    None => raise RenderPanic("called `Option::unwrap()` on a `None` value")
+  }
 }

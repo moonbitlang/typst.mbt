@@ -2,7 +2,7 @@
 
 ///|
 /// Render a geometrical shape into the canvas.
-fn render_shape(canvas : @skia.Pixmap, state : State, shape : @library.Shape) -> Unit {
+fn render_shape(canvas : @skia.Pixmap, state : State, shape : @library.Shape) -> Unit raise RenderPanic {
   let ts = state.transform
   let path = match shape.geometry {
     Line(target) => {

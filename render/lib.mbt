@@ -82,7 +82,7 @@ pub let svg_image_renderer : Ref[
 ///
 /// This renders the page at the given number of pixels per inch and returns
 /// the resulting `tiny-skia` pixel buffer.
-pub fn render(page : @layout.Page, opts : CompleteRenderOptions) -> @skia.Pixmap {
+pub fn render(page : @layout.Page, opts : CompleteRenderOptions) -> @skia.Pixmap raise RenderPanic {
   let bleed = if opts.render_bleed {
     page.bleed
   } else {
@@ -98,7 +98,7 @@ pub fn render(page : @layout.Page, opts : CompleteRenderOptions) -> @skia.Pixmap
   )
   let ts = @path.Transform::from_scale(pixel_per_pt, pixel_per_pt)
   let state = State::new(size, ts, pixel_per_pt)
-  let canvas = @skia.Pixmap::new(pxw, pxh).unwrap()
+  let canvas = must(@skia.Pixmap::new(pxw, pxh))
   if page.fill_or_white() is Some(fill) {
     if fill is Solid(color) {
       canvas.fill(to_sk_color(color.to_process()))
@@ -120,7 +120,7 @@ pub fn render_merged(
   opts : RenderOptions,
   gap : @library.Abs,
   fill : @library.Color?,
-) -> @skia.Pixmap {
+) -> @skia.Pixmap raise RenderPanic {
   let opts = opts.resolve(PngFormatOptions::get(document.options()))
   let pixmaps = document.pages().map(page => render(page, opts))
   let pixel_per_pt = opts.format.ppi.to_float() / 72.0
@@ -136,7 +136,7 @@ pub fn render_merged(
   }
   let n = pixmaps.length()
   pxh += gap * (if n > 0 { n - 1 } else { 0 }).reinterpret_as_uint()
-  let canvas = @skia.Pixmap::new(pxw, pxh).unwrap()
+  let canvas = must(@skia.Pixmap::new(pxw, pxh))
   if fill is Some(fill) {
     canvas.fill(to_sk_color(fill.to_process()))
   }
@@ -222,7 +222,7 @@ fn render_frame(
   canvas : @skia.Pixmap,
   state : State,
   frame : @library.Frame,
-) -> Unit {
+) -> Unit raise RenderPanic {
   for entry in frame.items() {
     let (pos, item) = entry
     match item {
@@ -244,7 +244,7 @@ fn render_group(
   state : State,
   pos : @library.Point,
   group : @library.GroupItem,
-) -> Unit {
+) -> Unit raise RenderPanic {
   let sk_transform = to_sk_transform(group.transform)
   let state = match group.frame.kind() {
     Soft => state.pre_translate(pos).pre_concat(sk_transform)
@@ -253,7 +253,7 @@ fn render_group(
       .pre_translate(pos)
       .pre_concat(sk_transform)
       .pre_concat_container(
-        state.transform.post_concat(state.container_transform.invert().unwrap()),
+        state.transform.post_concat(must(state.container_transform.invert())),
       )
       .pre_concat_container(
         to_sk_transform(@library.Transform::translate(pos.x, pos.y)),

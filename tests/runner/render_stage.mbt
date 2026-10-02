@@ -141,7 +141,14 @@ fn harness_render(
     format: { ppi: Some(ppi.to_double()) },
     render_bleed: false,
   }
-  let pixmap = @render.render_merged(document, opts, gap, Some(@library.color_black))
+  let pixmap = @render.render_merged(
+    document,
+    opts,
+    gap,
+    Some(@library.color_black),
+  ) catch {
+    _ => return None
+  }
   let gap = @skpath.roundf(pixel_per_pt * gap.to_pt().to_float())
   let mut y : Float = 0.0
   for page in document.pages() {

@@ -2,7 +2,7 @@
 
 ///|
 /// Render a text run into the canvas.
-fn render_text(canvas : @skia.Pixmap, state : State, text : @library.TextItem) -> Unit {
+fn render_text(canvas : @skia.Pixmap, state : State, text : @library.TextItem) -> Unit raise RenderPanic {
   let mut x = @library.Abs::zero()
   let mut y = @library.Abs::zero()
   for glyph in text.glyphs {
@@ -77,7 +77,7 @@ fn render_outline_glyph(
   state : State,
   text : @library.TextItem,
   id : UInt16,
-) -> Unit {
+) -> Unit raise RenderPanic {
   let ts = state.transform
   let ppem = to_f32(text.size) * ts.sy
 
@@ -157,7 +157,7 @@ fn write_bitmap(
   bitmap : @pixglyph.Bitmap,
   state : State,
   sampler : PaintSampler,
-) -> Unit {
+) -> Unit raise RenderPanic {
   // If we have a clip mask we first render to a pixmap that we then blend
   // with our canvas
   if state.mask is Some(_) {
