@@ -369,18 +369,18 @@ fn gradient_sample_at(
       let py = radial.center.y.get()
       let qx = radial.focal_center.x.get()
       let qy = radial.focal_center.y.get()
-      if libm_hypot(zx - qx, zy - qy) < fr {
+      if kurbo_hypot(zx - qx, zy - qy) < fr {
         0.0
-      } else if libm_hypot(zx - px, zy - py) > cr {
+      } else if kurbo_hypot(zx - px, zy - py) > cr {
         1.0
       } else {
-        let len = libm_hypot(zx - qx, zy - qy)
+        let len = kurbo_hypot(zx - qx, zy - qy)
         let ux = (zx - qx) / len
         let uy = (zy - qy) / len
         let az = (qx - px) * ux + (qy - py) * uy
         let rho = cr * cr - ((qx - px) * (qx - px) + (qy - py) * (qy - py))
         let bz = (az * az + rho).sqrt() - az
-        (libm_hypot(zx - qx, zy - qy) - fr) / (bz - fr)
+        (kurbo_hypot(zx - qx, zy - qy) - fr) / (bz - fr)
       }
     }
     Conic(conic) => {
@@ -392,7 +392,7 @@ fn gradient_sample_at(
       // Transform the angle computed from the ratio positions back
       // into the screen space, to correct for the aspect ratio.
       let sample_angle = correct_aspect_ratio(
-        @library.Angle::rad(libm_atan2(y, x)),
+        @library.Angle::atan2(y, x),
         @library.Ratio::new((width / height).to_double()),
       )
 
@@ -410,13 +410,20 @@ fn gradient_sample_at(
 }
 
 ///|
-/// `Gradient::correct_aspect_ratio`.
+/// `kurbo::Vec2::hypot` (`hypot2().sqrt()`).
+fn kurbo_hypot(x : Double, y : Double) -> Double {
+  (x * x + y * y).sqrt()
+}
+
+///|
+/// `Gradient::correct_aspect_ratio` (`Angle::atan2` uses the `libm` crate,
+/// i.e. musl, like `@math.atan2`).
 fn correct_aspect_ratio(
   angle : @library.Angle,
   aspect_ratio : @library.Ratio,
 ) -> @library.Angle {
   @library.Angle::rad(
-    libm_atan2(angle.sin() / aspect_ratio.get().abs(), angle.cos()),
+    @math.atan2(angle.sin() / aspect_ratio.get().abs(), angle.cos()),
   ).normalized()
 }
 

@@ -82,7 +82,7 @@ pub fn Paint::is_solid_color(self : Paint) -> Bool {
 ///
 /// Returns `None` when there is nothing to fill or in case of a numeric
 /// overflow.
-pub fn Pixmap::fill_rect(
+fn Pixmap::fill_rect_impl(
   self : Pixmap,
   rect : @path.Rect,
   paint : Paint,
@@ -106,13 +106,13 @@ pub fn Pixmap::fill_rect(
     }
   } else {
     let path = @path.PathBuilder::from_rect(rect)
-    self.fill_path(path, paint, Winding, transform, mask)
+    self.fill_path_impl(path, paint, Winding, transform, mask)
   }
 }
 
 ///|
 /// Draws a filled path onto the pixmap.
-pub fn Pixmap::fill_path(
+fn Pixmap::fill_path_impl(
   self : Pixmap,
   path : @path.Path,
   paint : Paint,
@@ -204,7 +204,7 @@ pub fn Pixmap::fill_path(
     }
     let paint = paint.clone()
     paint.shader = paint.shader.transform(transform)
-    self.fill_path(path, paint, fill_rule, @path.Transform::identity(), mask)
+    self.fill_path_impl(path, paint, fill_rule, @path.Transform::identity(), mask)
   }
 }
 
@@ -224,7 +224,7 @@ pub fn Pixmap::fill_path(
 /// Also, if a `stroke` has a dash array, then path will be converted into
 /// a dashed path first and then stroked. Which means a yet another
 /// allocation.
-pub fn Pixmap::stroke_path(
+fn Pixmap::stroke_path_impl(
   self : Pixmap,
   path : @path.Path,
   paint : Paint,
@@ -333,7 +333,7 @@ pub fn Pixmap::stroke_path(
         // path stroking failed
         return
     }
-    self.fill_path(path, paint, Winding, transform, mask)
+    self.fill_path_impl(path, paint, Winding, transform, mask)
   }
 }
 
@@ -360,7 +360,7 @@ fn stroke_hairline(
 /// Draws a `Pixmap` on top of the current `Pixmap`.
 ///
 /// The same as filling a rectangle with a `pixmap` pattern.
-pub fn Pixmap::draw_pixmap(
+fn Pixmap::draw_pixmap_impl(
   self : Pixmap,
   x : Int,
   y : Int,
@@ -393,7 +393,7 @@ pub fn Pixmap::draw_pixmap(
     force_hq_pipeline: false, // Pattern will use hq anyway.
     colorspace: Linear,
   }
-  self.fill_rect(rect, paint, transform, mask)
+  self.fill_rect_impl(rect, paint, transform, mask)
 }
 
 ///|
@@ -554,4 +554,113 @@ fn DrawTiler::next(self : DrawTiler) -> ScreenIntRect? {
     return r
   }
   None
+}
+
+///|
+/// Draws a filled rectangle onto the pixmap.
+///
+/// This function is usually slower than filling a rectangular path, but it
+/// produces better results. Mainly it doesn't suffer from weird clipping of
+/// horizontal/vertical edges.
+pub fn Pixmap::fill_rect(
+  self : Pixmap,
+  rect : @path.Rect,
+  paint : Paint,
+  transform : @path.Transform,
+  mask : Mask?,
+) -> Unit {
+  if trace_hook.val is Some(f) {
+    f(
+      "TSK fill_rect \{fbits(rect.left())},\{fbits(rect.top())},\{fbits(rect.right())},\{fbits(rect.bottom())} \{trace_paint(paint)} \{trace_ts(transform)} \{trace_mask(mask)}",
+    )
+  }
+  self.fill_rect_impl(rect, paint, transform, mask)
+  self.trace_result()
+}
+
+///|
+/// Draws a filled path onto the pixmap.
+pub fn Pixmap::fill_path(
+  self : Pixmap,
+  path : @path.Path,
+  paint : Paint,
+  fill_rule : FillRule,
+  transform : @path.Transform,
+  mask : Mask?,
+) -> Unit {
+  if trace_hook.val is Some(f) {
+    let rule = match fill_rule {
+      Winding => "Winding"
+      EvenOdd => "EvenOdd"
+    }
+    f(
+      "TSK fill_path \{trace_path(path)} \{rule} \{trace_paint(paint)} \{trace_ts(transform)} \{trace_mask(mask)}",
+    )
+  }
+  self.fill_path_impl(path, paint, fill_rule, transform, mask)
+  self.trace_result()
+}
+
+///|
+/// Strokes a path.
+///
+/// Stroking is implemented using two separate algorithms:
+///
+/// 1. If a stroke width is wider than 1px (after applying the
+///    transformation), a path will be converted into a stroked path and then
+///    filled using `fill_path`.
+/// 2. If a stroke width is thinner than 1px (after applying the
+///    transformation), we will use hairline stroking, which doesn't involve
+///    a separate path allocation.
+///
+/// Also, if a `stroke` has a dash array, then path will be converted into
+/// a dashed path first and then stroked.
+pub fn Pixmap::stroke_path(
+  self : Pixmap,
+  path : @path.Path,
+  paint : Paint,
+  stroke : @path.Stroke,
+  transform : @path.Transform,
+  mask : Mask?,
+) -> Unit {
+  if trace_hook.val is Some(f) {
+    let cap = match stroke.line_cap {
+      Butt => "Butt"
+      Round => "Round"
+      Square => "Square"
+    }
+    let join = match stroke.line_join {
+      Miter => "Miter"
+      MiterClip => "MiterClip"
+      Round => "Round"
+      Bevel => "Bevel"
+    }
+    f(
+      "TSK stroke_path \{trace_path(path)} w=\{fbits(stroke.width)} \{cap} \{join} ml=\{fbits(stroke.miter_limit)} dash=\{stroke.dash is Some(_)} \{trace_paint(paint)} \{trace_ts(transform)} \{trace_mask(mask)}",
+    )
+  }
+  self.stroke_path_impl(path, paint, stroke, transform, mask)
+  self.trace_result()
+}
+
+///|
+/// Draws a `Pixmap` on top of the current `Pixmap`.
+///
+/// The same as filling a rectangle with a `pixmap` pattern.
+pub fn Pixmap::draw_pixmap(
+  self : Pixmap,
+  x : Int,
+  y : Int,
+  pixmap : Pixmap,
+  paint : PixmapPaint,
+  transform : @path.Transform,
+  mask : Mask?,
+) -> Unit {
+  if trace_hook.val is Some(f) {
+    f(
+      "TSK draw_pixmap \{x} \{y} \{pixmap.width()}x\{pixmap.height()} \{hex64(trace_fnv(pixmap.data()))} \{trace_ts(transform)} \{trace_mask(mask)}",
+    )
+  }
+  self.draw_pixmap_impl(x, y, pixmap, paint, transform, mask)
+  self.trace_result()
 }

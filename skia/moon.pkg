@@ -2,6 +2,7 @@ import {
   "moonbitlang/typst/skia/path",
   "moonbitlang/typst/codecs",
   "moonbitlang/core/math",
+  "moonbitlang/core/buffer",
 }
 
 warnings = "-deprecated"

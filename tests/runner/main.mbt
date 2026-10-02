@@ -64,6 +64,9 @@ fn main {
     // harness (see `render_stage.mbt`).
     "render" => {
       for a in args {
+        if a == "--tsk-log" {
+          @skia.trace_hook.val = Some(line => println(line))
+        }
         if a.has_prefix("--raw=") {
           render_raw_dir.val = Some(a.to_string().substring(start=6))
         }
