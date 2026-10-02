@@ -109,6 +109,14 @@ fn convert_node(node : @xml.Node, input : Bytes) -> XNode {
 
 ///|
 fn parse_xml(xml : String) -> XNode raise DeErr {
+  // quick-xml accepts whitespace before the XML declaration, roxmltree does
+  // not.
+  let mut start = 0
+  while start < xml.length() &&
+        xml.code_unit_at(start) is (' ' | '\t' | '\r' | '\n') {
+    start += 1
+  }
+  let xml = if start > 0 { xml[start:].to_owned() } else { xml }
   let doc = @xml.Document::parse(xml) catch {
     e => raise DeErr(e.to_string(), "")
   }

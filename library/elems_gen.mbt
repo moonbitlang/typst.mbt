@@ -4089,6 +4089,7 @@ pub fn bibliography_elem() -> Element {
             kind=Required,
             positional=true,
             required=true,
+            parse=bibliography_elem_sources_parse,
           ),
           field_of(
             (Ty::new() : Ty[Smart[Content?]]),
@@ -4106,6 +4107,7 @@ pub fn bibliography_elem() -> Element {
             name="style",
             kind=Settable,
             default=bibliography_elem_style_default,
+            parse=bibliography_elem_style_parse,
           ),
           field_of(
             (Ty::new() : Ty[Smart[LocatableSelector]]),
@@ -4286,6 +4288,7 @@ pub fn cite_elem() -> Element {
             name="style",
             kind=Settable,
             default=cite_elem_style_default,
+            parse=cite_elem_style_parse,
           ),
           field_of(
             (Ty::new() : Ty[Lang]),

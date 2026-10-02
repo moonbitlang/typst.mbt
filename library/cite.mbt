@@ -104,3 +104,32 @@ fn cite_elem_synthesize(
 fn cite_elem_style_default() -> Value {
   Auto
 }
+
+///|
+/// `#[parse]` of `CiteElem::style`.
+fn cite_elem_style_parse(
+  engine : Engine,
+  args : Args,
+  _locals : ParseLocals,
+) -> Value? raise SourceError {
+  let source : @syntax.Spanned[Smart[CslSource]]? = args.named_spanned("style")
+  match source {
+    Some({ v: Custom(source), span, }) => {
+      let (source, _) = CslStyle::load(engine, { v: source, span, })
+      Some(Smart::Custom(source).into_value())
+    }
+    Some({ v: Auto, .. }) => Some(Auto)
+    None => None
+  }
+}
+
+///|
+/// Realizes the citation group (upstream `Packed<CiteGroup>::realize`).
+pub fn CiteGroup::realize(
+  self : CiteGroup,
+  engine : Engine,
+) -> Content raise SourceError {
+  let loc = self.0.location().unwrap()
+  let span = self.0.span()
+  Works::generate(engine, span).citation(loc, span)
+}

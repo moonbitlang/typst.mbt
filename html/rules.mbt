@@ -621,30 +621,75 @@ fn ref_rule(
 }
 
 ///|
-/// TODO: Upstream realizes the citation group (`CiteGroup::realize`) with
-/// the `doc-biblioref` role; bibliographies are not ported yet.
 fn cite_group_rule(
   elem : @library.CiteGroup,
-  _ : @library.Engine,
+  engine : @library.Engine,
   _ : @library.StyleChain,
 ) -> @library.Content raise @library.SourceError {
-  unported(elem, "`CiteGroup::realize`")
+  elem
+  .realize(engine)
+  .styled(@library.HtmlElem::set_role(Some("doc-biblioref")))
 }
 
 ///|
-/// TODO: Upstream builds a `<section role="doc-bibliography">` from the
-/// generated works (`Works::generate`); bibliographies are not ported yet.
-///
 /// For the bibliography, we have a few elements that should be styled (e.g.
 /// indent), but inline styles are not apprioriate because they couldn't be
 /// properly overridden. For those, we currently emit classes so that a user
 /// can style them with CSS, but do not emit any styles ourselves.
 fn bibliography_rule(
   elem : @library.BibliographyElem,
-  _ : @library.Engine,
-  _ : @library.StyleChain,
+  engine : @library.Engine,
+  styles : @library.StyleChain,
 ) -> @library.Content raise @library.SourceError {
-  unported(elem, "`Works::generate`")
+  let loc = elem.pack().location().unwrap()
+  let span = elem.pack().span()
+  let works = @library.Works::generate(engine, span)
+  let bibliography = works.bibliography(loc, span)
+  let items = bibliography.entries.map(entry => {
+    let mut realized = entry.body
+    if entry.prefix is Some(prefix) {
+      let mut prefix = prefix
+      // If we have a link back to the first citation referencing this
+      // entry, attach the appropriate role.
+      if prefix.is_(@library.direct_link_elem()) {
+        prefix = prefix.styled(
+          @library.HtmlElem::set_role(Some("doc-backlink")),
+        )
+      }
+      let wrapped = html_elem(@library.tag_span, prefix)
+        .with_attr(@library.attr_class, "prefix")
+        .pack()
+        .spanned(span)
+      let separator = @library.SpaceElem::shared()
+      realized = @library.Content::sequence([wrapped, separator, realized])
+    }
+    html_elem(@library.tag_li, realized)
+    .pack()
+    .located(entry.backlink)
+    .spanned(span)
+  })
+  let title = elem.realize_title(styles)
+  let list = html_elem(@library.tag_ul, @library.Content::sequence(items))
+    .with_css(@library.CssProperties::new().with_("list-style-type", "none"))
+    .pack()
+    .spanned(span)
+  block_packed(
+    html_elem(
+      @library.tag_section,
+      title.unwrap_or(@library.Content::empty()).add(list),
+    )
+    .with_attr(@library.attr_role, "doc-bibliography")
+    .with_optional_attr(
+      @library.attr_class,
+      if bibliography.hanging_indent {
+        Some("hanging-indent")
+      } else {
+        None
+      },
+    )
+    .pack()
+    .spanned(span),
+  )
 }
 
 ///|

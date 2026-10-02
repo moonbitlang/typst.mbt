@@ -20,6 +20,8 @@ import {
   "moonbitlang/typst/data/yaml",
   "moonbitlang/typst/time",
   "moonbitlang/typst/html_assets",
+  "moonbitlang/typst/bib/hayagriva",
+  "moonbitlang/typst/bib/citationberg",
 }
 
 import {

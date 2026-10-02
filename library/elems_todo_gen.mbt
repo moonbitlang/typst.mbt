@@ -1,17 +1,5 @@
 // Generated stubs for element hooks that are not ported yet.
 
-// TODO: port `#[parse]` of BibliographyElem.sources as `bibliography_elem_sources_parse`.
-
-///|
-/// TODO: port `{ let default = ArchivedStyle::InstituteOfElectricalAndElectronicsEngineers; Derived::new(CslSource::Named(default, None), CslStyle::from_archived(default)) }` (BibliographyElem.style).
-fn bibliography_elem_style_default() -> Value {
-  None
-}
-
-// TODO: port `#[parse]` of BibliographyElem.style as `bibliography_elem_style_parse`.
-
-// TODO: port `#[parse]` of CiteElem.style as `cite_elem_style_parse`.
-
 ///|
 /// TODO: port `Default::default() of SmallVec<[Decoration; 1]>` (TextElem.deco).
 fn text_elem_deco_default() -> Value {
