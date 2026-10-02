@@ -6,6 +6,10 @@ import {
   "moonbitlang/typst/codecs",
   "moonbitlang/x/codec/base64",
   "moonbitlang/core/math",
+  "moonbitlang/core/encoding/utf8",
+  "moonbitlang/typst/hayro/interpret" @hayro_interpret,
+  "moonbitlang/typst/hayro/svg" @hayro_svg,
+  "moonbitlang/typst/typst_assets/pdf" @pdf_fonts,
 }
 
 options(
