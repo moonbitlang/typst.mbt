@@ -312,9 +312,9 @@ fn Frame::inline(self : Frame, layer : Int, pos : Point, frame : Frame) -> Unit 
   // so that the moved frame's items are not aliased.
   let sink = self.make_mut()
   let moved = frame.items.map(entry => (entry.0 + pos, entry.1.clone()))
-  let items = sink[:layer].to_array()
+  let items = sink[:layer].to_owned()
   items.append(moved)
-  items.append(sink[layer:].to_array())
+  items.append(sink[layer:].to_owned())
   self.items = items
 }
 
@@ -633,13 +633,13 @@ pub(all) struct FrameParent {
   /// The location of the parent element.
   location : Location
   /// Whether the child has inherited the parent's styles.
-  inherit : Inherit
+  inherit_ : Inherit
 } derive(Eq, Hash, Debug)
 
 ///|
 /// Create a new frame parent.
-pub fn FrameParent::new(location : Location, inherit : Inherit) -> FrameParent {
-  { location, inherit, }
+pub fn FrameParent::new(location : Location, inherit_ : Inherit) -> FrameParent {
+  { location, inherit_, }
 }
 
 ///|

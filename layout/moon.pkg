@@ -1,9 +1,3 @@
 import {
   "moonbitlang/typst/library",
-  "moonbitlang/typst/syntax",
 }
-
-import {
-  "moonbitlang/typst/library",
-  "moonbitlang/typst/syntax",
-} for "test"
