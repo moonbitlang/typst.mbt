@@ -230,7 +230,11 @@ fn hash_lines(lines : StringBuilder) -> String {
 
 ///|
 /// Mirrors the oracle's `otf` command.
-pub fn dump_otf(data : BytesView, index : Int) -> String {
+pub fn dump_otf(
+  data : BytesView,
+  index : Int,
+  hinted? : Bool = false,
+) -> String {
   let out = StringBuilder()
   let font = @read_fonts.FontRef::from_index(data, index) catch {
     e => {
@@ -341,6 +345,25 @@ pub fn dump_otf(data : BytesView, index : Int) -> String {
     Err(_) => 0
   }
   out.write_string("num_glyphs \{num_glyphs}\n")
+  let instance = if hinted {
+    try
+      @skrifa.HintingInstance::new(
+        outlines,
+        @skrifa.Size::new(1000.0),
+        @skrifa.LocationRef::default(),
+        { engine: Interpreter, target: Mono, },
+      )
+    catch {
+      e => {
+        out.write_string("hinting error \{e}\n")
+        None
+      }
+    } noraise {
+      i => Some(i)
+    }
+  } else {
+    None
+  }
   for gid in 0..<(num_glyphs + 1) {
     let glyph = @font_types.GlyphId::from_int(gid)
     let aw = match gm.advance_width(glyph) {
@@ -352,10 +375,14 @@ pub fn dump_otf(data : BytesView, index : Int) -> String {
       continue
     }
     let pen = TextPen::new()
-    let settings = @skrifa.DrawSettings::unhinted(
-      @skrifa.Size::new(1000.0),
-      @skrifa.LocationRef::default(),
-    )
+    let settings = match instance {
+      Some(i) => @skrifa.DrawSettings::hinted(i, false)
+      None =>
+        @skrifa.DrawSettings::unhinted(
+          @skrifa.Size::new(1000.0),
+          @skrifa.LocationRef::default(),
+        )
+    }
     try outline.draw(settings, pen) catch {
       e => out.write_string("glyph \{gid} aw \{aw} error \{e}\n")
     } noraise {

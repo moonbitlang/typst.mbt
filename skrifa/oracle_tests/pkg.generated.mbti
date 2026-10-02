@@ -8,7 +8,7 @@ import {
 // Values
 pub fn dump_cff(BytesView) -> String
 
-pub fn dump_otf(BytesView, Int) -> String
+pub fn dump_otf(BytesView, Int, hinted? : Bool) -> String
 
 pub fn dump_t1(BytesView) -> String
 
