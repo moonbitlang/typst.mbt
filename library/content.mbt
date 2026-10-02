@@ -328,7 +328,7 @@ pub fn Content::fields(self : Content) -> Dict {
     }
     match self.field_raw(info.id) {
       Some(v) if info.kind is (Required | Synthesized | Settable) =>
-        dict.insert(info.name, v.shared())
+        dict.insert(info.name, info.to_output(v).shared())
       _ => ()
     }
   }
@@ -351,7 +351,7 @@ pub fn Content::repr(self : Content) -> String {
         }
         match self.field_raw(info.id) {
           Some(v) if info.kind is (Required | Synthesized | Settable) =>
-            fields.push("\{info.name}: \{v.repr()}")
+            fields.push("\{info.name}: \{info.to_output(v).repr()}")
           _ => ()
         }
       }
