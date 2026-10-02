@@ -734,7 +734,7 @@ fn assemble(
         if ascent_descent(font, glyph.id) is Some((a, d)) {
           acc = match acc {
             None => Some((a, d))
-            Some((ma, md)) => Some((em_max(ma, a), em_max(md, d)))
+            Some((ma, md)) => Some((math_em_max(ma, a), math_em_max(md, d)))
           }
         }
       }
@@ -753,7 +753,7 @@ fn assemble(
         let adv = font.x_advance(glyph.id).unwrap_or(@library.Em::zero())
         max = match max {
           None => Some(adv)
-          Some(m) => Some(em_max(m, adv))
+          Some(m) => Some(math_em_max(m, adv))
         }
       }
       base.size = {
@@ -791,7 +791,7 @@ fn assembly_parts(
 
 ///|
 /// Rust's `Ord::max` for `Em` (ties return the second value).
-fn em_max(a : @library.Em, b : @library.Em) -> @library.Em {
+fn math_em_max(a : @library.Em, b : @library.Em) -> @library.Em {
   if a > b {
     a
   } else {
