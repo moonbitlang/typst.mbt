@@ -2616,6 +2616,7 @@ dependencies = [
  "icu_provider",
  "icu_provider_blob",
  "icu_segmenter",
+ "image",
  "image-webp",
  "indexmap",
  "parking_lot",

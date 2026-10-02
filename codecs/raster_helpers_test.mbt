@@ -30,3 +30,37 @@ fn gif_case(b64 : String) -> String {
   let h = webp_fnv1a(frame.rgba).to_string(radix=16)
   "\{frame.width}x\{frame.height} at \{frame.left},\{frame.top} \{String::make(16 - h.length(), '0')}\{h}"
 }
+
+///|
+/// Decodes a base64-encoded image like upstream `RasterImage::new` decodes
+/// it with the `image` crate: `<width>x<height> <color type> <FNV-1a of the
+/// buffer> icc=<length of the non-empty ICC profile or none>` or `error:
+/// <message>`. Mirrors `decode` in `oracle/src/bin/gen_image_golden.rs`.
+fn image_case(format : String, b64 : String) -> String {
+  let data = @base64.decode(b64) catch { _ => return "bad base64" }
+  let (info, buf) = try {
+    match format {
+      "gif" => @codecs.decode_gif_image(data)
+      "webp" => @codecs.decode_webp_image(data)
+      _ => abort("unknown format")
+    }
+  } catch {
+    @codecs.ImageError(msg) => return "error: \{msg}"
+  }
+  let h = webp_fnv1a(buf).to_string(radix=16)
+  let color = match info.color {
+    L8 => "L8"
+    La8 => "La8"
+    Rgb8 => "Rgb8"
+    Rgba8 => "Rgba8"
+    L16 => "L16"
+    La16 => "La16"
+    Rgb16 => "Rgb16"
+    Rgba16 => "Rgba16"
+  }
+  let icc = match info.icc {
+    Some(icc) if !icc.is_empty() => icc.length().to_string()
+    _ => "none"
+  }
+  "\{info.width}x\{info.height} \{color} \{String::make(16 - h.length(), '0')}\{h} icc=\{icc}"
+}

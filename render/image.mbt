@@ -60,8 +60,7 @@ fn build_texture(
   match image.kind() {
     Raster(raster) => {
       guard @skia.Pixmap::new(w, h) is Some(texture) else { return None }
-      // TODO: the pixels of JPEG, GIF and WebP images are not decoded yet.
-      guard raster.dynamic() is Some(dynamic) else { return None }
+      let dynamic = raster.dynamic()
       let rgba = if w == dynamic.width && h == dynamic.height {
         // Small optimization to not allocate in case image is not resized.
         @codecs.to_rgba8(

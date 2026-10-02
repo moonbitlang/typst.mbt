@@ -33,7 +33,10 @@
 # `raster` regenerates codecs/{webp,gif}_oracle_test.mbt: the WebP and GIF
 # corpora (oracle/src/bin/{webp,gif}_corpus.txt, made by
 # scripts/gen_{webp,gif}_corpus.py) decoded with image-webp and gif
-# (oracle/src/bin/gen_raster_golden.rs).
+# (oracle/src/bin/gen_raster_golden.rs), and codecs/image_oracle_test.mbt:
+# those corpora and oracle/src/bin/image_corpus.txt (made by
+# scripts/gen_image_corpus.py) decoded with the `image` crate like upstream
+# `RasterImage::new` (oracle/src/bin/gen_image_golden.rs).
 # `bundle` compiles every `bundle` test to a bundle and dumps the exported
 # files (paths, kinds, sizes, sha256, and the text of HTML/SVG/UTF-8 files;
 # see oracle/src/bundle.rs).
@@ -64,6 +67,7 @@ for stage in "${stages[@]}"; do
   fi
   if [ "$stage" = raster ]; then
     (cd oracle && cargo run --release -q --bin gen_raster_golden -- ../codecs)
+    (cd oracle && cargo run --release -q --bin gen_image_golden -- ../codecs)
     moon fmt
     continue
   fi

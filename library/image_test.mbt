@@ -58,19 +58,15 @@ fn raster_summary(data : Bytes, format : String) -> String {
     Rgba16 => "Rgba16"
   }
   let summary = "w=\{image.width()} h=\{image.height()} dpi=\{dpi} rot=\{rot} icc=\{icc} color=\{color}"
-  match image.dynamic() {
-    Some(dynamic) => {
-      // FNV-1a-style hash of the samples (with the offset basis of the probe).
-      let mut h = 1469598103934665603UL
-      for b in dynamic.buf {
-        h = (h ^ b.to_uint64()) * 1099511628211UL
-      }
-      let hex = h.to_string(radix=16)
-      let hex = String::make(16 - hex.length(), '0') + hex
-      summary + " pixels=\{dynamic.buf.length()}/\{hex}"
-    }
-    None => summary
+  let dynamic = image.dynamic()
+  // FNV-1a-style hash of the samples (with the offset basis of the probe).
+  let mut h = 1469598103934665603UL
+  for b in dynamic.buf {
+    h = (h ^ b.to_uint64()) * 1099511628211UL
   }
+  let hex = h.to_string(radix=16)
+  let hex = String::make(16 - hex.length(), '0') + hex
+  summary + " pixels=\{dynamic.buf.length()}/\{hex}"
 }
 
 ///|
@@ -133,7 +129,10 @@ test "decode the images of the test suite like upstream" {
 
 ///|
 /// Expectations produced with upstream Typst (`RasterImage::plain`,
-/// `SvgImage::new`) on the `typst-dev-assets` images.
+/// `SvgImage::new`) on the `typst-dev-assets` images. The pixel hashes of
+/// the GIF and WebP images were added later; their buffers are checked
+/// against the real `image` crate by the `dev-assets` cases of
+/// `codecs/image_oracle_test.mbt`.
 let image_vectors : Array[(String, String, String)] = [
   (
     "bad.svg", "svg", "err failed to parse SVG (found closing tag 'g' instead of 'style')",
@@ -297,7 +296,9 @@ let image_vectors : Array[(String, String, String)] = [
   (
     "small.gif", "Jpg", "err failed to decode image (Format error decoding Jpeg: Error parsing image. Illegal start bytes:4749)",
   ),
-  ("small.gif", "Gif", "w=19 h=12 dpi=None rot=None icc=None color=Rgba8"),
+  (
+    "small.gif", "Gif", "w=19 h=12 dpi=None rot=None icc=None color=Rgba8 pixels=912/4a0bda7eb9d0adcf",
+  ),
   (
     "small.gif", "Webp", "err failed to decode image (Format error decoding WebP: Invalid Chunk header: [52, 49, 46, 46])",
   ),
@@ -347,7 +348,9 @@ let image_vectors : Array[(String, String, String)] = [
   (
     "small.webp", "Gif", "err failed to decode image (Format error decoding Gif: malformed GIF header)",
   ),
-  ("small.webp", "Webp", "w=35 h=12 dpi=None rot=None icc=None color=Rgb8"),
+  (
+    "small.webp", "Webp", "w=35 h=12 dpi=None rot=None icc=None color=Rgb8 pixels=1260/c93ae67618404047",
+  ),
   ("tetrahedron.svg", "svg", "32.0 32.0"),
   (
     "tiger.jpg", "Png", "err failed to decode image (Format error decoding Png: Invalid PNG signature.)",

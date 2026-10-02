@@ -3,7 +3,8 @@
 // real images come from the decoders.
 
 ///|
-/// A raster image with the given metadata (not decoded; test use only).
+/// A raster image with the given metadata and transparent pixels (not
+/// decoded; test use only).
 pub fn RasterImage::synthetic(
   data : Bytes,
   format : RasterFormat,
@@ -17,7 +18,13 @@ pub fn RasterImage::synthetic(
     width,
     height,
     color: Rgba8,
-    dynamic: None,
+    // Transparent pixels.
+    dynamic: {
+      width,
+      height,
+      color: Rgba8,
+      buf: Bytes::make((width * height * 4).reinterpret_as_int(), b'\x00'),
+    },
     exif_rotation: None,
     icc: None,
     dpi,

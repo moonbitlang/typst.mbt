@@ -10,11 +10,15 @@ pub fn crc32(Array[BytesView]) -> UInt
 
 pub fn decode_gif_first_frame(BytesView) -> GifFrame? raise ImageError
 
+pub fn decode_gif_image(BytesView) -> (ImageInfo, Bytes) raise ImageError
+
 pub fn decode_jpeg(BytesView) -> (ImageInfo, Bytes) raise ImageError
 
 pub fn decode_png(BytesView) -> (ImageInfo, Bytes) raise ImageError
 
 pub fn decode_webp(BytesView) -> WebpImage raise ImageError
+
+pub fn decode_webp_image(BytesView) -> (ImageInfo, Bytes) raise ImageError
 
 pub fn encode_png(BytesView, Int, Int, PngColorType) -> Bytes
 

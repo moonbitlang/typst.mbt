@@ -29,14 +29,23 @@ pub impl IntoValue for TableElem with fn into_value(self) {
 
 ///|
 pub impl FromValue for TableElem with fn from_value(value) {
+  // Upstream `v.unpack::<Self>()`.
   if Content::castable(value) {
     let v : Content = Content::from_value(value)
     if v.is_(table_elem()) {
-      return TableElem(v)
+      return TableElem(unpack_content(v))
     }
     bail("expected table")
   }
   raise HintedError(Content::input().error(value))
+}
+
+///|
+/// Upstream `Content::unpack`, as seen once the element is packed again:
+/// the element's fields without the content's span, label, location and
+/// lifecycle (so the content gets the span of the call that packs it).
+fn unpack_content(content : Content) -> Content {
+  Content::from_fields(content.elem, content.fields)
 }
 
 ///|
@@ -211,8 +220,9 @@ pub fn TableCell::new(body : Content) -> TableCell {
 ///|
 /// Upstream `From<Content> for TableCell`.
 pub fn TableCell::from_content(value : Content) -> TableCell {
+  // Upstream `value.unpack::<Self>().unwrap_or_else(Self::new)`.
   if value.is_(table_cell_elem()) {
-    TableCell(value)
+    TableCell(unpack_content(value))
   } else {
     TableCell::new(value)
   }

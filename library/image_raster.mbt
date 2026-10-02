@@ -1,12 +1,8 @@
 // Port of `typst-library/src/visualize/image/raster.rs`: `RasterImage`.
 //
-// Exchange formats (PNG, JPEG, GIF, WebP) are read by the header parsers of
-// the `codecs` package (ports of the `image` crate's decoders' header
-// handling and of `kamadak-exif`), which yield everything upstream observes
-// without the pixels: dimensions, color type, ICC profile, EXIF orientation
-// and pixel density. Decoding the pixels of exchange formats (needed for PNG
-// export and for re-encoding) is only ported for PNG; `RasterImage::dynamic`
-// returns `None` for the other exchange formats.
+// Exchange formats (PNG, JPEG, GIF, WebP) are decoded by the `codecs`
+// package (ports of the decoders the `image` crate uses, driven like
+// `image::DynamicImage::from_decoder`, and of `kamadak-exif`).
 
 ///|
 /// Decoded pixels (upstream `image::DynamicImage`): 8-bit or 16-bit
@@ -29,7 +25,7 @@ pub struct RasterImage {
   /// The pixel height after applying the EXIF rotation.
   priv height : UInt
   priv color : @codecs.ColorType
-  priv dynamic : DynamicImage?
+  priv dynamic : DynamicImage
   priv exif_rotation : UInt?
   priv icc : Bytes?
   priv dpi : Double?
@@ -60,15 +56,15 @@ pub fn RasterImage::new(
 ) -> RasterImage raise HintedError {
   match format {
     Exchange(format) => {
-      let (info, pixels) = decode_exchange(data, format) catch {
+      let (info, buf) = decode_exchange(data, format) catch {
         @codecs.ImageError(err) => bail(format_image_error(err))
       }
-      let mut dynamic = pixels.map(buf => {
+      let mut dynamic = {
         width: info.width,
         height: info.height,
         color: info.color,
         buf,
-      })
+      }
       let icc = match icc {
         Custom(icc) => Some(icc)
         Auto =>
@@ -91,7 +87,7 @@ pub fn RasterImage::new(
           width = info.height
           height = info.width
         }
-        dynamic = dynamic.map(dynamic => dynamic.apply_rotation(rotation))
+        dynamic = dynamic.apply_rotation(rotation)
         exif_rot = Some(rotation)
       }
 
@@ -138,7 +134,7 @@ pub fn RasterImage::new(
         width,
         height,
         color,
-        dynamic: Some(dynamic),
+        dynamic,
         exif_rotation: None,
         icc: icc.custom(),
         dpi: None,
@@ -205,10 +201,7 @@ pub fn RasterImage::dpi(self : RasterImage) -> Double? {
 
 ///|
 /// Access the underlying dynamic image.
-///
-/// TODO: Only available for pixel formats and PNG; the pixels of JPEG, GIF
-/// and WebP images are not decoded yet.
-pub fn RasterImage::dynamic(self : RasterImage) -> DynamicImage? {
+pub fn RasterImage::dynamic(self : RasterImage) -> DynamicImage {
   self.dynamic
 }
 
@@ -219,23 +212,18 @@ pub fn RasterImage::icc(self : RasterImage) -> Bytes? {
 }
 
 ///|
-/// Reads the header of an image in an exchange format and decodes its pixels
-/// where that is ported (PNG).
+/// Decodes an image in an exchange format with the decoder upstream picks
+/// (`JpegDecoder`, `PngDecoder`, `GifDecoder` or `WebPDecoder`): the header
+/// information (dimensions, color type and ICC profile) and the pixels.
 fn decode_exchange(
   data : Bytes,
   format : ExchangeFormat,
-) -> (@codecs.ImageInfo, Bytes?) raise @codecs.ImageError {
+) -> (@codecs.ImageInfo, Bytes) raise @codecs.ImageError {
   match format {
-    Png => {
-      let (info, pixels) = @codecs.decode_png(data[:])
-      (info, Some(pixels))
-    }
-    Jpg => {
-      let (info, pixels) = @codecs.decode_jpeg(data[:])
-      (info, Some(pixels))
-    }
-    Gif => (@codecs.gif_image_info(data[:]), None)
-    Webp => (@codecs.webp_image_info(data[:]), None)
+    Jpg => @codecs.decode_jpeg(data[:])
+    Png => @codecs.decode_png(data[:])
+    Gif => @codecs.decode_gif_image(data[:])
+    Webp => @codecs.decode_webp_image(data[:])
   }
 }
 

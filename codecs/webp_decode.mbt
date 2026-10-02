@@ -787,10 +787,8 @@ fn WebpParser::read_image(
 }
 
 ///|
-/// Decodes a WebP image like `WebPDecoder::new` followed by `read_image`
-/// (the first frame of an animation, composited on a transparent canvas).
-pub fn decode_webp(data : BytesView) -> WebpImage raise ImageError {
-  let parser : WebpParser = {
+fn WebpParser::new(data : BytesView) -> WebpParser {
+  {
     data,
     pos: 0L,
     chunks: [],
@@ -801,6 +799,13 @@ pub fn decode_webp(data : BytesView) -> WebpImage raise ImageError {
     has_alpha: false,
     num_frames: 0,
   }
+}
+
+///|
+/// Decodes a WebP image like `WebPDecoder::new` followed by `read_image`
+/// (the first frame of an animation, composited on a transparent canvas).
+pub fn decode_webp(data : BytesView) -> WebpImage raise ImageError {
+  let parser = WebpParser::new(data)
   try {
     parser.read_data()
     let bpp = if parser.has_alpha { 4 } else { 3 }
@@ -814,5 +819,48 @@ pub fn decode_webp(data : BytesView) -> WebpImage raise ImageError {
     }
   } catch {
     ImageError(msg) => decoding_error("WebP", msg)
+  }
+}
+
+///|
+/// Decodes a WebP image like upstream `image::DynamicImage::from_decoder`
+/// with an `image::codecs::webp::WebPDecoder`: RGBA pixels if the image has
+/// alpha, RGB pixels otherwise, plus the ICC profile (`icc_profile`, whose
+/// errors upstream `RasterImage::new` ignores). I/O errors are reported as
+/// is and other errors as WebP decoding errors
+/// (`ImageError::from_webp_decode`).
+pub fn decode_webp_image(
+  data : BytesView,
+) -> (ImageInfo, Bytes) raise ImageError {
+  let parser = WebpParser::new(data)
+  try {
+    parser.read_data()
+    // `read_chunk(ICCP, ..)`: `read_exact` of the chunk's range.
+    let icc = match parser.chunk(b"ICCP") {
+      Some(range) if range.end <= data.length().to_int64() =>
+        Some(data[range.start.to_int():range.end.to_int()].to_owned())
+      _ => None
+    }
+    let bpp = if parser.has_alpha { 4 } else { 3 }
+    let buf = FixedArray::make(parser.width * parser.height * bpp, b'\x00')
+    parser.read_image(buf)
+    let info = {
+      width: parser.width.reinterpret_as_uint(),
+      height: parser.height.reinterpret_as_uint(),
+      color: if parser.has_alpha {
+        Rgba8
+      } else {
+        Rgb8
+      },
+      icc,
+    }
+    (info, Bytes::from_fixedarray(buf))
+  } catch {
+    ImageError(msg) =>
+      if msg == webp_eof {
+        raise ImageError("failed to fill whole buffer")
+      } else {
+        decoding_error("WebP", msg)
+      }
   }
 }

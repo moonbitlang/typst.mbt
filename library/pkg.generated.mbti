@@ -9159,7 +9159,7 @@ pub struct RasterImage {
 pub fn RasterImage::color(Self) -> @codecs.ColorType
 pub fn RasterImage::data(Self) -> Bytes
 pub fn RasterImage::dpi(Self) -> Double?
-pub fn RasterImage::dynamic(Self) -> DynamicImage?
+pub fn RasterImage::dynamic(Self) -> DynamicImage
 pub fn RasterImage::exif_rotation(Self) -> UInt?
 pub fn RasterImage::format(Self) -> RasterFormat
 pub fn RasterImage::height(Self) -> UInt
