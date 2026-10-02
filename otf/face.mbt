@@ -219,6 +219,10 @@ pub(all) struct FaceTables {
   vhea : VheaTable?
   vmtx : HmtxTable?
   vorg : VorgTable?
+  gdef : GdefTable?
+  gpos : LayoutTable?
+  gsub : LayoutTable?
+  math : MathTable?
   ankr : AnkrTable?
   feat : FeatTable?
   kerx : KerxTable?
@@ -438,6 +442,10 @@ fn Face::parse_tables(
     vhea: and_then(raw_tables.vhea, VheaTable::parse),
     vmtx,
     vorg: and_then(raw_tables.vorg, VorgTable::parse),
+    gdef: and_then(raw_tables.gdef, GdefTable::parse),
+    gpos: and_then(raw_tables.gpos, LayoutTable::parse),
+    gsub: and_then(raw_tables.gsub, LayoutTable::parse),
+    math: and_then(raw_tables.math, MathTable::parse),
     ankr: and_then(raw_tables.ankr, data => {
       AnkrTable::parse(maxp.number_of_glyphs, data)
     }),
