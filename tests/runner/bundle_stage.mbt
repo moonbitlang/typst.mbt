@@ -10,13 +10,13 @@
 let bundle_stub_binary : Ref[Bool] = Ref::new(false)
 
 ///|
-/// The export options of the upstream test runner (PDF and PNG export are
-/// not wired up yet, see `bundle/export.mbt`).
+/// The export options of the upstream test runner (PDF export is not wired
+/// up yet, see `bundle/export.mbt`).
 fn bundle_options() -> @bundle.BundleOptions {
   let (pdf, png) : (@bundle.PdfExport?, @bundle.PngExport?) = if bundle_stub_binary.val {
     (Some((_, _, _) => { output: Ok(b""), warnings: [], }), Some(_ => b""))
   } else {
-    (None, None)
+    (None, Some(bundle_png_export))
   }
   {
     html: { format: { pretty: Some(true), }, },
@@ -24,6 +24,24 @@ fn bundle_options() -> @bundle.BundleOptions {
     png,
     svg: { render_bleed: false, format: { pretty: Some(true), }, },
   }
+}
+
+///|
+/// PNG export with the upstream test runner's render options (`ppi: 72`),
+/// as upstream `typst_bundle::export_png`.
+fn bundle_png_export(
+  doc : @layout.PagedDocument,
+) -> Bytes raise @library.SourceError {
+  let opts : @render.RenderOptions = {
+    format: { ppi: Some(72.0), },
+    render_bleed: false,
+  }
+  let options = opts.resolve(@render.PngFormatOptions::get(doc.options()))
+  let pixmap = @render.render(doc.pages()[0], options) catch {
+    @render.RenderPanic(msg) =>
+      @library.bail_at(@syntax.Span::detached(), "render panic: " + msg)
+  }
+  pixmap.encode_png()
 }
 
 ///|

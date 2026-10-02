@@ -56,14 +56,9 @@ fn Adler32::new() -> Adler32 {
 
 ///|
 fn Adler32::write(self : Adler32, data : BytesView) -> Unit {
-  let mut a = self.a
-  let mut b = self.b
-  for byte in data {
-    a = (a + byte.to_uint()) % 65521
-    b = (b + a) % 65521
-  }
-  self.a = a
-  self.b = b
+  let v = adler32((self.b << 16) | self.a, data)
+  self.a = v & 0xffff
+  self.b = v >> 16
 }
 
 ///|

@@ -169,14 +169,16 @@ fn Pixmap::rect(self : Pixmap) -> ScreenIntRect {
 }
 
 ///|
-/// Encodes pixmap into a PNG data (demultiplied RGBA, 8 bits).
-///
-/// TODO: upstream compresses with the `png` crate's default (`Balanced`,
-/// i.e. zlib level 6 through `zlib-rs`); the port uses the encoder in
-/// `codecs`, so the image data is identical but the compressed bytes are not.
+/// Encodes pixmap into a PNG data (demultiplied RGBA, 8 bits), with the `png`
+/// crate's default settings (adaptive filter, zlib level 6).
 pub fn Pixmap::encode_png(self : Pixmap) -> Bytes {
   let demultiplied_data = self.take_demultiplied()
-  @codecs.encode_png(demultiplied_data[:], self.width(), self.height(), Rgba)
+  @codecs.encode_png_balanced(
+    demultiplied_data[:],
+    self.width(),
+    self.height(),
+    Rgba,
+  )
 }
 
 ///|
