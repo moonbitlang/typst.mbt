@@ -48,6 +48,10 @@ unicode-bidi = "0.3.18"
 unicode-segmentation = "1.12"
 hypher = "0.1.8"
 rustybuzz = "0.20"
+# The Unicode crates rustybuzz uses (gen_shape_unicode).
+unicode-ccc = "0.4"
+unicode-bidi-mirroring = "0.4"
+unicode-properties = { version = "0.1", default-features = false, features = ["general-category"] }
 
 # Record every shaping call Typst makes (for the `shape` stage); see
 # rustybuzz-tap/Cargo.toml.

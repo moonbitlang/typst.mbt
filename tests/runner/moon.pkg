@@ -8,6 +8,7 @@ import {
   "moonbitlang/typst/html",
   "moonbitlang/typst/layout",
   "moonbitlang/typst/otf",
+  "moonbitlang/typst/shape",
   "moonbitlang/core/hashset",
   "moonbitlang/core/json",
   "moonbitlang/core/string",
