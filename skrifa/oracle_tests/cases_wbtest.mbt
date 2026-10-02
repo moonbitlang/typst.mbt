@@ -76,6 +76,10 @@ let cases : Array[(String, String, String, String, Int, UInt64, Int, UInt64)] = 
     0x0000000000000000UL, 4980496, 0x40adbc27f97eb6efUL,
   ),
   (
+    "DejaVuSansMono.ttf.otfh", "otfh", "assets", "fonts/DejaVuSansMono.ttf", -1,
+    0x0000000000000000UL, 2422982, 0x5323194fe541bc0fUL,
+  ),
+  (
     "font_cid_1.0.cff", "cff", "hayro", "hayro-tests/pdfs/custom/font_cid_1.pdf",
     2447, 0x293794be47f76bb7UL, 17411, 0x4254c560203a07beUL,
   ),
@@ -96,8 +100,16 @@ let cases : Array[(String, String, String, String, Int, UInt64, Int, UInt64)] = 
     97982, 0xa0ac4e9de92abca5UL, 566110, 0x4939ff105fe749b6UL,
   ),
   (
+    "font_cid_2.1.otfh", "otfh", "hayro", "hayro-tests/pdfs/custom/font_cid_2.pdf",
+    97982, 0xa0ac4e9de92abca5UL, 566110, 0x4939ff105fe749b6UL,
+  ),
+  (
     "font_cid_3.0.otf", "otf", "hayro", "hayro-tests/pdfs/custom/font_cid_3.pdf",
     15968, 0xa4e4cab77ba5af7fUL, 72395, 0xf5be163f444d29caUL,
+  ),
+  (
+    "font_cid_3.0.otfh", "otfh", "hayro", "hayro-tests/pdfs/custom/font_cid_3.pdf",
+    15968, 0xa4e4cab77ba5af7fUL, 72395, 0x0ee4409408789b2cUL,
   ),
   (
     "font_cid_4.0.cff", "cff", "hayro", "hayro-tests/pdfs/custom/font_cid_4.pdf",
@@ -168,16 +180,32 @@ let cases : Array[(String, String, String, String, Int, UInt64, Int, UInt64)] = 
     34716, 0xf45394ca2c67f229UL, 66092, 0x0e15eb931aa59974UL,
   ),
   (
+    "font_cid_6.0.otfh", "otfh", "hayro", "hayro-tests/pdfs/custom/font_cid_6.pdf",
+    34716, 0xf45394ca2c67f229UL, 66092, 0x8e26082c27703306UL,
+  ),
+  (
     "font_cid_7.0.otf", "otf", "hayro", "hayro-tests/pdfs/custom/font_cid_7.pdf",
     34112, 0x4e3784d5a19a9e8eUL, 41026, 0x7cd14c8cc7d5352eUL,
+  ),
+  (
+    "font_cid_7.0.otfh", "otfh", "hayro", "hayro-tests/pdfs/custom/font_cid_7.pdf",
+    34112, 0x4e3784d5a19a9e8eUL, 41026, 0x723b3b8f95c098b8UL,
   ),
   (
     "font_truetype_3.0.otf", "otf", "hayro", "hayro-tests/pdfs/custom/font_truetype_3.pdf",
     15668, 0x669480f5134f9293UL, 61461, 0x2b1bf711c1dd7fb0UL,
   ),
   (
+    "font_truetype_3.0.otfh", "otfh", "hayro", "hayro-tests/pdfs/custom/font_truetype_3.pdf",
+    15668, 0x669480f5134f9293UL, 61461, 0x69b253b5de4e2207UL,
+  ),
+  (
     "font_truetype_4.0.otf", "otf", "hayro", "hayro-tests/pdfs/custom/font_truetype_4.pdf",
     12644, 0x6129d63848bd97e3UL, 35827, 0xc1ecea3c03901247UL,
+  ),
+  (
+    "font_truetype_4.0.otfh", "otfh", "hayro", "hayro-tests/pdfs/custom/font_truetype_4.pdf",
+    12644, 0x6129d63848bd97e3UL, 35827, 0x05542a024b9bb711UL,
   ),
   (
     "font_truetype_6.0.cff", "cff", "hayro", "hayro-tests/pdfs/custom/font_truetype_6.pdf",
@@ -192,7 +220,15 @@ let cases : Array[(String, String, String, String, Int, UInt64, Int, UInt64)] = 
     23380, 0x71c38afdb99c8900UL, 71953, 0xa78704376bf0f140UL,
   ),
   (
+    "font_truetype_6.1.otfh", "otfh", "hayro", "hayro-tests/pdfs/custom/font_truetype_6.pdf",
+    23380, 0x71c38afdb99c8900UL, 71953, 0x40e8e701b64c305dUL,
+  ),
+  (
     "font_truetype_6.2.otf", "otf", "hayro", "hayro-tests/pdfs/custom/font_truetype_6.pdf",
+    38612, 0x001d58c62dc79a13UL, 175775, 0x9f767dca14b946b5UL,
+  ),
+  (
+    "font_truetype_6.2.otfh", "otfh", "hayro", "hayro-tests/pdfs/custom/font_truetype_6.pdf",
     38612, 0x001d58c62dc79a13UL, 175775, 0x9f767dca14b946b5UL,
   ),
   (
@@ -208,6 +244,10 @@ let cases : Array[(String, String, String, String, Int, UInt64, Int, UInt64)] = 
     11708, 0xa8f98e86cfd08facUL, 36036, 0x5cb0050433f5200dUL,
   ),
   (
+    "font_truetype_6.4.otfh", "otfh", "hayro", "hayro-tests/pdfs/custom/font_truetype_6.pdf",
+    11708, 0xa8f98e86cfd08facUL, 36036, 0x7f1fb5a9b356cf00UL,
+  ),
+  (
     "font_truetype_6.5.cff", "cff", "hayro", "hayro-tests/pdfs/custom/font_truetype_6.pdf",
     572, 0x51f31f647784792aUL, 465, 0x0b17fda219a17319UL,
   ),
@@ -220,7 +260,15 @@ let cases : Array[(String, String, String, String, Int, UInt64, Int, UInt64)] = 
     23540, 0x33b16ea15cb8342dUL, 46792, 0x3311a7c4bc1bd124UL,
   ),
   (
+    "font_truetype_7.0.otfh", "otfh", "hayro", "hayro-tests/pdfs/custom/font_truetype_7.pdf",
+    23540, 0x33b16ea15cb8342dUL, 46792, 0x1ecd0e3577611491UL,
+  ),
+  (
     "font_truetype_7.1.otf", "otf", "hayro", "hayro-tests/pdfs/custom/font_truetype_7.pdf",
+    2980, 0x8e771338a5b22638UL, 5503, 0x80a6f6dd1886d117UL,
+  ),
+  (
+    "font_truetype_7.1.otfh", "otfh", "hayro", "hayro-tests/pdfs/custom/font_truetype_7.pdf",
     2980, 0x8e771338a5b22638UL, 5503, 0x80a6f6dd1886d117UL,
   ),
   (
@@ -228,28 +276,56 @@ let cases : Array[(String, String, String, String, Int, UInt64, Int, UInt64)] = 
     12592, 0x420dafed56dcbda8UL, 37894, 0x21dca421e0916938UL,
   ),
   (
+    "font_truetype_7.2.otfh", "otfh", "hayro", "hayro-tests/pdfs/custom/font_truetype_7.pdf",
+    12592, 0x420dafed56dcbda8UL, 37894, 0xfce299b3c05eb901UL,
+  ),
+  (
     "font_truetype_7.3.otf", "otf", "hayro", "hayro-tests/pdfs/custom/font_truetype_7.pdf",
     31236, 0xfce95c4c0132e3e1UL, 112102, 0xe4bc6f63bd1b2e34UL,
+  ),
+  (
+    "font_truetype_7.3.otfh", "otfh", "hayro", "hayro-tests/pdfs/custom/font_truetype_7.pdf",
+    31236, 0xfce95c4c0132e3e1UL, 112102, 0x5297cbaacc9e5451UL,
   ),
   (
     "font_truetype_7.4.otf", "otf", "hayro", "hayro-tests/pdfs/custom/font_truetype_7.pdf",
     5788, 0x9906bebfd336629eUL, 15877, 0x1c0e038b5f99f6c4UL,
   ),
   (
+    "font_truetype_7.4.otfh", "otfh", "hayro", "hayro-tests/pdfs/custom/font_truetype_7.pdf",
+    5788, 0x9906bebfd336629eUL, 15877, 0xd3d89162896155f7UL,
+  ),
+  (
     "font_truetype_7.5.otf", "otf", "hayro", "hayro-tests/pdfs/custom/font_truetype_7.pdf",
     3080, 0x80ed91360ef2a7e9UL, 5586, 0xfd07d6ef272f5750UL,
+  ),
+  (
+    "font_truetype_7.5.otfh", "otfh", "hayro", "hayro-tests/pdfs/custom/font_truetype_7.pdf",
+    3080, 0x80ed91360ef2a7e9UL, 5586, 0x1cf515d6ccadae5cUL,
   ),
   (
     "font_truetype_7.6.otf", "otf", "hayro", "hayro-tests/pdfs/custom/font_truetype_7.pdf",
     21948, 0xa6672de5b1b854d5UL, 58119, 0x87a701d9924b136bUL,
   ),
   (
+    "font_truetype_7.6.otfh", "otfh", "hayro", "hayro-tests/pdfs/custom/font_truetype_7.pdf",
+    21948, 0xa6672de5b1b854d5UL, 58119, 0xc7c1523408607b9aUL,
+  ),
+  (
     "font_truetype_7.7.otf", "otf", "hayro", "hayro-tests/pdfs/custom/font_truetype_7.pdf",
+    22664, 0x8b25e0d878584d35UL, 41221, 0x56808f3201ef44dfUL,
+  ),
+  (
+    "font_truetype_7.7.otfh", "otfh", "hayro", "hayro-tests/pdfs/custom/font_truetype_7.pdf",
     22664, 0x8b25e0d878584d35UL, 41221, 0x56808f3201ef44dfUL,
   ),
   (
     "font_truetype_8.0.otf", "otf", "hayro", "hayro-tests/pdfs/custom/font_truetype_8.pdf",
     76252, 0xb399335d8d169fe0UL, 153270, 0x287cf25c76377596UL,
+  ),
+  (
+    "font_truetype_8.0.otfh", "otfh", "hayro", "hayro-tests/pdfs/custom/font_truetype_8.pdf",
+    76252, 0xb399335d8d169fe0UL, 153270, 0xbd0f7cf958e8efb5UL,
   ),
   (
     "font_type1_1.0.t1", "t1", "hayro", "hayro-tests/pdfs/custom/font_type1_1.pdf",
@@ -520,6 +596,10 @@ let cases : Array[(String, String, String, String, Int, UInt64, Int, UInt64)] = 
     128288, 0xd0377d17683c4253UL, 742160, 0xa14f145169cac170UL,
   ),
   (
+    "font_vertical.0.otfh", "otfh", "hayro", "hayro-tests/pdfs/custom/font_vertical.pdf",
+    128288, 0xd0377d17683c4253UL, 742160, 0x11d0e9fbad1091e3UL,
+  ),
+  (
     "fonts_type1_latex.0.t1", "t1", "hayro", "hayro-tests/pdfs/custom/fonts_type1_latex.pdf",
     13564, 0xabd3425ff45cd2b0UL, 37533, 0x6475dce1d0d0f1afUL,
   ),
@@ -664,39 +744,83 @@ let cases : Array[(String, String, String, String, Int, UInt64, Int, UInt64)] = 
     11540, 0x0836b50327fe0bbaUL, 26, 0x0fd6da694ab689b8UL,
   ),
   (
+    "pdftc_900k_0319_page_1.0.otf", "otf", "hayro", "hayro-tests/pdfs/custom/pdftc_900k_0319_page_1.pdf",
+    304776, 0x240d9b2889f70c09UL, 2070529, 0xc6e302e9ec057a68UL,
+  ),
+  (
+    "pdftc_900k_0319_page_1.0.otfh", "otfh", "hayro", "hayro-tests/pdfs/custom/pdftc_900k_0319_page_1.pdf",
+    304776, 0x240d9b2889f70c09UL, 2070529, 0xed11967b255c7f78UL,
+  ),
+  (
     "diagrams.0.otf", "otf", "devassets", "images/diagrams.pdf", 10912, 0xf1c517b2dd58db9eUL,
     10650, 0x1fbb15c590d7865dUL,
+  ),
+  (
+    "diagrams.0.otfh", "otfh", "devassets", "images/diagrams.pdf", 10912, 0xf1c517b2dd58db9eUL,
+    10650, 0x6ed0acabce60c87cUL,
   ),
   (
     "diagrams.1.otf", "otf", "devassets", "images/diagrams.pdf", 22528, 0x4b7dff369bdf3a7aUL,
     48007, 0xff6b947e9767d8c7UL,
   ),
   (
+    "diagrams.1.otfh", "otfh", "devassets", "images/diagrams.pdf", 22528, 0x4b7dff369bdf3a7aUL,
+    48007, 0x70dc9fba2ede0977UL,
+  ),
+  (
     "diagrams.2.otf", "otf", "devassets", "images/diagrams.pdf", 15920, 0x179fdcf081271208UL,
     9363, 0x5f72290794c2422bUL,
+  ),
+  (
+    "diagrams.2.otfh", "otfh", "devassets", "images/diagrams.pdf", 15920, 0x179fdcf081271208UL,
+    9363, 0x0dac1cd7aa1145e3UL,
   ),
   (
     "diagrams.3.otf", "otf", "devassets", "images/diagrams.pdf", 18664, 0x9716edb1970b05a9UL,
     5688, 0xa10c95738f877366UL,
   ),
   (
+    "diagrams.3.otfh", "otfh", "devassets", "images/diagrams.pdf", 18664, 0x9716edb1970b05a9UL,
+    5688, 0xa614e4b16827730cUL,
+  ),
+  (
     "diagrams.4.otf", "otf", "devassets", "images/diagrams.pdf", 18956, 0x4db05ab590343aa2UL,
     6200, 0xeeb8d272f811c712UL,
+  ),
+  (
+    "diagrams.4.otfh", "otfh", "devassets", "images/diagrams.pdf", 18956, 0x4db05ab590343aa2UL,
+    6200, 0x48740973d5786cdaUL,
   ),
   (
     "diagrams.5.otf", "otf", "devassets", "images/diagrams.pdf", 18876, 0x60b84ee78fad2c56UL,
     6504, 0xe5b4fb447caa340cUL,
   ),
   (
+    "diagrams.5.otfh", "otfh", "devassets", "images/diagrams.pdf", 18876, 0x60b84ee78fad2c56UL,
+    6504, 0x65a52b4c14aa37ccUL,
+  ),
+  (
     "diagrams.6.otf", "otf", "devassets", "images/diagrams.pdf", 18816, 0xf7492dbc1626e17bUL,
     5756, 0xb1f22a9492f28a81UL,
+  ),
+  (
+    "diagrams.6.otfh", "otfh", "devassets", "images/diagrams.pdf", 18816, 0xf7492dbc1626e17bUL,
+    5756, 0xdaa6401584c998bcUL,
   ),
   (
     "diagrams.7.otf", "otf", "devassets", "images/diagrams.pdf", 25188, 0x23331591a7286706UL,
     15926, 0xbceec397702cbc1cUL,
   ),
   (
+    "diagrams.7.otfh", "otfh", "devassets", "images/diagrams.pdf", 25188, 0x23331591a7286706UL,
+    15926, 0xeb4f1257d30ea744UL,
+  ),
+  (
     "diagrams.8.otf", "otf", "devassets", "images/diagrams.pdf", 33672, 0xc9b63563db552908UL,
     19525, 0x16db0840c6110781UL,
+  ),
+  (
+    "diagrams.8.otfh", "otfh", "devassets", "images/diagrams.pdf", 33672, 0xc9b63563db552908UL,
+    19525, 0xcb432aeab965a998UL,
   ),
 ]

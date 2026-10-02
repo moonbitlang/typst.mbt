@@ -1,0 +1,52 @@
+// Opcode tables from read-fonts 0.39.2 `src/tables/glyf/bytecode/opcode.rs`.
+
+///|
+let opcode_names : FixedArray[String] = [
+  "SVTCA[y]", "SVTCA[x]", "SPVTCA[y]", "SPVTCA[x]", "SFVTCA[y]", "SFVTCA[x]", "SPVTL[||]",
+  "SPVTL[+]", "SFVTL[||]", "SFVTL[+]", "SPVFS", "SFVFS", "GPV", "GFV", "SFVTPV",
+  "ISECT", "SRP0", "SRP1", "SRP2", "SZP0", "SZP1", "SZP2", "SZPS", "SLOOP", "RTG",
+  "RTHG", "SMD", "ELSE", "JMPR", "SCVTCI", "SSWCI", "SSW", "DUP", "POP", "CLEAR",
+  "SWAP", "DEPTH", "CINDEX", "MINDEX", "ALIGNPTS", "INS_$28", "UTP", "LOOPCALL",
+  "CALL", "FDEF", "ENDF", "MDAP[]", "MDAP[rnd]", "IUP[y]", "IUP[x]", "SHP[rp2]",
+  "SHP[rp1]", "SHC[rp2]", "SHC[rp1]", "SHZ[rp2]", "SHZ[rp1]", "SHPIX", "IP", "MSIRP[]",
+  "MSIRP[rp0]", "ALIGNRP", "RTDG", "MIAP[]", "MIAP[rnd]", "NPUSHB", "NPUSHW", "WS",
+  "RS", "WCVTP", "RCVT", "GC[curr]", "GC[orig]", "SCFS", "MD[curr]", "MD[orig]",
+  "MPPEM", "MPS", "FLIPON", "FLIPOFF", "DEBUG", "LT", "LTEQ", "GT", "GTEQ", "EQ",
+  "NEQ", "ODD", "EVEN", "IF", "EIF", "AND", "OR", "NOT", "DELTAP1", "SDB", "SDS",
+  "ADD", "SUB", "DIV", "MUL", "ABS", "NEG", "FLOOR", "CEILING", "ROUND[G]", "ROUND[B]",
+  "ROUND[W]", "ROUND[]", "NROUND[G]", "NROUND[B]", "NROUND[W]", "NROUND[]", "WCVTF",
+  "DELTAP2", "DELTAP3", "DELTAC1", "DELTAC2", "DELTAC3", "SROUND", "S45ROUND", "JROT",
+  "JROF", "ROFF", "INS_$7B", "RUTG", "RDTG", "SANGW", "AA", "FLIPPT", "FLIPRGON",
+  "FLIPRGOFF", "INS_$83", "INS_$84", "SCANCTRL", "SDPVTL[||]", "SDPVTL[+]", "GETINFO",
+  "IDEF", "ROLL", "MAX", "MIN", "SCANTYPE", "INSTCTRL", "INS_$8F", "INS_$90", "GETVARIATION",
+  "GETDATA", "INS_$93", "INS_$94", "INS_$95", "INS_$96", "INS_$97", "INS_$98", "INS_$99",
+  "INS_$9A", "INS_$9B", "INS_$9C", "INS_$9D", "INS_$9E", "INS_$9F", "INS_$A0", "INS_$A1",
+  "INS_$A2", "INS_$A3", "INS_$A4", "INS_$A5", "INS_$A6", "INS_$A7", "INS_$A8", "INS_$A9",
+  "INS_$AA", "INS_$AB", "INS_$AC", "INS_$AD", "INS_$AE", "INS_$AF", "PUSHB[0]", "PUSHB[1]",
+  "PUSHB[2]", "PUSHB[3]", "PUSHB[4]", "PUSHB[5]", "PUSHB[6]", "PUSHB[7]", "PUSHW[0]",
+  "PUSHW[1]", "PUSHW[2]", "PUSHW[3]", "PUSHW[4]", "PUSHW[5]", "PUSHW[6]", "PUSHW[7]",
+  "MDRP[G]", "MDRP[B]", "MDRP[W]", "MDRP[]", "MDRP[rG]", "MDRP[rB]", "MDRP[rW]",
+  "MDRP[r]", "MDRP[mG]", "MDRP[mB]", "MDRP[mW]", "MDRP[m]", "MDRP[mrG]", "MDRP[mrB]",
+  "MDRP[mrW]", "MDRP[mr]", "MDRP[pG]", "MDRP[pB]", "MDRP[pW]", "MDRP[p]", "MDRP[prG]",
+  "MDRP[prB]", "MDRP[prW]", "MDRP[pr]", "MDRP[pmG]", "MDRP[pmB]", "MDRP[pmW]", "MDRP[pm]",
+  "MDRP[pmrG]", "MDRP[pmrB]", "MDRP[pmrW]", "MDRP[pmr]", "MIRP[G]", "MIRP[B]", "MIRP[W]",
+  "MIRP[]", "MIRP[rG]", "MIRP[rB]", "MIRP[rW]", "MIRP[r]", "MIRP[mG]", "MIRP[mB]",
+  "MIRP[mW]", "MIRP[m]", "MIRP[mrG]", "MIRP[mrB]", "MIRP[mrW]", "MIRP[mr]", "MIRP[pG]",
+  "MIRP[pB]", "MIRP[pW]", "MIRP[p]", "MIRP[prG]", "MIRP[prB]", "MIRP[prW]", "MIRP[pr]",
+  "MIRP[pmG]", "MIRP[pmB]", "MIRP[pmW]", "MIRP[pm]", "MIRP[pmrG]", "MIRP[pmrB]",
+  "MIRP[pmrW]", "MIRP[pmr]",
+]
+
+///|
+let opcode_lengths : FixedArray[Int] = [
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, -1, -2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 3, 5, 7, 9,
+  11, 13, 15, 17, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+]

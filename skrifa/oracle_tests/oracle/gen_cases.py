@@ -26,9 +26,11 @@ for f in sorted(glob.glob('target/assets/fonts/Foxit*.pfb')):
     cases.append((base + '.cff', 'cff', 'assets', 'fonts/' + base, -1, 0, f))
 for f in ['DejaVuSansMono.ttf', 'DejaVuSansMono-Bold.ttf', 'LibertinusSerif-Regular.otf', 'NewCM10-Regular.otf']:
     cases.append((f + '.otf', 'otf', 'assets', 'fonts/' + f, -1, 0, 'target/assets/fonts/' + f))
+for f in ['DejaVuSansMono.ttf']:
+    cases.append((f + '.otfh', 'otfh', 'assets', 'fonts/' + f, -1, 0, 'target/assets/fonts/' + f))
 
 pdfs = sorted(glob.glob('target/hayro/hayro-tests/pdfs/custom/font_*.pdf')) + \
-    ['target/hayro/hayro-tests/pdfs/custom/fonts_type1_latex.pdf', 'target/devassets/images/diagrams.pdf']
+    ['target/hayro/hayro-tests/pdfs/custom/fonts_type1_latex.pdf', 'target/hayro/hayro-tests/pdfs/custom/pdftc_900k_0319_page_1.pdf', 'target/devassets/images/diagrams.pdf']
 for pdf in pdfs:
     b = os.path.basename(pdf)[:-4]
     if pdf.startswith('target/hayro/'):
@@ -41,7 +43,7 @@ for pdf in pdfs:
     for fn in sorted(os.listdir(d), key=lambda s: int(s.split('.')[0])):
         i, key = fn.split('.')
         data = open(os.path.join(d, fn), 'rb').read()
-        kinds = {'FontFile': ['t1', 'cff'], 'FontFile2': ['otf'], 'FontFile3': ['cff', 'otf']}[key]
+        kinds = {'FontFile': ['t1', 'cff'], 'FontFile2': ['otf', 'otfh'], 'FontFile3': ['cff', 'otf']}[key]
         for kind in kinds:
             cases.append((f'{b}.{i}.{kind}', kind, root, rel, len(data), fnv(data), os.path.join(d, fn)))
 
@@ -50,7 +52,7 @@ rows = []
 for (name, kind, root, rel, slen, sfnv, local) in cases:
     out_path = os.path.join(OUT_DIR, name + '.txt')
     if only is None or name in only or os.path.exists(out_path) is False:
-        res = subprocess.run([ORACLE, kind, local], capture_output=True)
+        res = subprocess.run([ORACLE, {'otfh': 'otf-hinted'}.get(kind, kind), local], capture_output=True)
         if res.returncode != 0:
             print('oracle failed', name, res.stderr.decode()[:300], file=sys.stderr)
             continue
