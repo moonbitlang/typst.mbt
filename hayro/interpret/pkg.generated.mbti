@@ -3,6 +3,7 @@ package "moonbitlang/typst/hayro/interpret"
 
 import {
   "moonbitlang/core/debug",
+  "moonbitlang/typst/font_types",
   "moonbitlang/typst/hayro/cmap",
   "moonbitlang/typst/hayro/interpret/function",
   "moonbitlang/typst/hayro/syntax",
@@ -193,10 +194,6 @@ pub enum Glyph {
 }
 pub fn Glyph::as_unicode(Self) -> @cmap.BfString?
 
-pub(all) struct GlyphId(UInt) derive(Eq, Hash, @debug.Debug)
-pub fn GlyphId::new(UInt) -> Self
-pub fn GlyphId::to_u32(Self) -> UInt
-
 pub struct GlyphIdentifier {
   // private fields
 }
@@ -271,13 +268,24 @@ pub(all) enum MaskType {
   Alpha
 } derive(Eq, @debug.Debug)
 
+pub(all) struct OutlineFontData {
+  data : Bytes
+  cache_key : U128
+  postscript_name : String?
+  weight : UInt?
+  is_italic : Bool
+  is_serif : Bool
+  is_monospace : Bool
+}
+
 pub struct OutlineGlyph {
   // private fields
 }
 pub fn OutlineGlyph::advance_width(Self) -> Float?
 pub fn OutlineGlyph::as_unicode(Self) -> @cmap.BfString?
 pub fn OutlineGlyph::font_cache_key(Self) -> U128
-pub fn OutlineGlyph::glyph_id(Self) -> GlyphId
+pub fn OutlineGlyph::font_data(Self) -> OutlineFontData?
+pub fn OutlineGlyph::glyph_id(Self) -> @font_types.GlyphId
 pub fn OutlineGlyph::identifier(Self) -> GlyphIdentifier
 pub fn OutlineGlyph::outline(Self) -> @kurbo.BezPath
 
@@ -351,6 +359,8 @@ pub(all) enum StandardFont {
   ZapfDingBats
   Symbol
 } derive(Eq, @debug.Debug)
+pub fn StandardFont::as_str(Self) -> String
+pub fn StandardFont::postscript_name(Self) -> String
 
 type State
 
@@ -404,6 +414,8 @@ pub type CMapResolverFn = (@cmap.CMapName) -> Bytes?
 pub type ColorComponents = Array[Float]
 
 pub type FontResolverFn = (FontQuery) -> (Bytes, Int)?
+
+pub using @font_types {type GlyphId}
 
 pub type WarningSinkFn = (InterpreterWarning) -> Unit
 

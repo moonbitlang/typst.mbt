@@ -107,46 +107,180 @@ fn read_encoding(dict : @hayro_syntax.Dict) -> (Encoding, Map[Int, String]) {
 }
 
 ///|
-/// A TrueType font.
-///
-/// TODO: not ported yet (needs `skrifa`); such fonts fail to load.
 priv struct TrueTypeFont {
   cache_key : U128
+  kind : TrueTypeKind
+  to_unicode : @cmap.CMap?
+}
+
+///|
+priv enum TrueTypeKind {
+  Embedded(EmbeddedKind)
+  Standard(StandardKind)
 }
 
 ///|
 fn TrueTypeFont::new(
-  _dict : @hayro_syntax.Dict,
-  _font_resolver : FontResolverFn,
-  _cmap_resolver : CMapResolverFn,
+  dict : @hayro_syntax.Dict,
+  font_resolver : FontResolverFn,
+  cmap_resolver : CMapResolverFn,
 ) -> TrueTypeFont? {
-  None
+  let cache_key = CacheKey::cache_key(dict)
+  let to_unicode = read_to_unicode(dict, cmap_resolver)
+  if EmbeddedKind::new(dict) is Some(embedded) {
+    return Some(TrueTypeFont::{
+      cache_key,
+      kind: Embedded(embedded),
+      to_unicode,
+    })
+  }
+  let fallback = () => {
+    let fallback_query = FallbackFontQuery::new(dict)
+    let standard_font = fallback_query.pick_standard_font()
+    // warn!("unable to load TrueType font {}, falling back to {}", ...);
+    match
+      StandardKind::new_with_standard(dict, standard_font, true, font_resolver) {
+      Some(s) =>
+        Some(TrueTypeFont::{
+          cache_key,
+          kind: TrueTypeKind::Standard(s),
+          to_unicode,
+        })
+      None => None
+    }
+  }
+  match StandardKind::new(dict, font_resolver) {
+    Some(standard) =>
+      Some(TrueTypeFont::{
+        cache_key,
+        kind: TrueTypeKind::Standard(standard),
+        to_unicode,
+      })
+    None => fallback()
+  }
 }
 
 ///|
 fn TrueTypeFont::outline_glyph(
-  _self : TrueTypeFont,
-  _glyph : GlyphId,
+  self : TrueTypeFont,
+  glyph : GlyphId,
 ) -> @kurbo.BezPath {
-  @kurbo.BezPath::new()
+  match self.kind {
+    Embedded(e) => e.outline_glyph(glyph)
+    Standard(s) => s.outline_glyph(glyph)
+  }
 }
 
 ///|
-fn TrueTypeFont::map_code(_self : TrueTypeFont, _code : Byte) -> GlyphId {
-  glyph_id_notdef
+fn TrueTypeFont::font_data(self : TrueTypeFont) -> Bytes? {
+  match self.kind {
+    Embedded(e) => Some(e.base_font.font_data())
+    Standard(_) => None
+  }
 }
 
 ///|
-fn TrueTypeFont::glyph_width(_self : TrueTypeFont, _code : Byte) -> Float {
-  0.0
+fn TrueTypeFont::postscript_name(self : TrueTypeFont) -> String? {
+  match self.kind {
+    Embedded(e) => e.postscript_name
+    Standard(_) => None
+  }
+}
+
+///|
+fn TrueTypeFont::weight(self : TrueTypeFont) -> UInt? {
+  match self.kind {
+    Embedded(e) => {
+      let weight = f32_as_u32(rust_round_f32(e.base_font.weight())).reinterpret_as_uint()
+      if weight > 0 {
+        Some(weight)
+      } else {
+        None
+      }
+    }
+    Standard(s) => Some(if s.is_bold() { 700 } else { 400 })
+  }
+}
+
+///|
+fn TrueTypeFont::is_italic(self : TrueTypeFont) -> Bool {
+  match self.kind {
+    Embedded(e) => {
+      // Check PDF font flags first
+      if e.font_flags is Some(flags) && (flags & FONT_FLAG_ITALIC) != 0 {
+        return true
+      }
+      // Check skrifa font attributes
+      !e.base_font.style_is_normal()
+    }
+    Standard(s) => s.is_italic()
+  }
+}
+
+///|
+fn TrueTypeFont::is_serif(self : TrueTypeFont) -> Bool {
+  match self.kind {
+    Embedded(e) => e.font_flags is Some(f) && (f & FONT_FLAG_SERIF) != 0
+    Standard(s) => s.is_serif()
+  }
+}
+
+///|
+fn TrueTypeFont::is_monospace(self : TrueTypeFont) -> Bool {
+  match self.kind {
+    Embedded(e) => {
+      // Check PDF font flags first
+      if e.font_flags is Some(flags) && (flags & FONT_FLAG_FIXED_PITCH) != 0 {
+        return true
+      }
+      // Check skrifa font metrics
+      e.base_font.is_monospace()
+    }
+    Standard(s) => s.is_monospace()
+  }
+}
+
+///|
+fn TrueTypeFont::map_code(self : TrueTypeFont, code : Byte) -> GlyphId {
+  match self.kind {
+    Embedded(e) => e.map_code(code)
+    Standard(s) => s.map_code(code)
+  }
+}
+
+///|
+fn TrueTypeFont::glyph_width(self : TrueTypeFont, code : Byte) -> Float {
+  match self.kind {
+    Embedded(e) => e.glyph_width(code)
+    Standard(s) => s.glyph_width(code).unwrap_or(0.0)
+  }
 }
 
 ///|
 fn TrueTypeFont::char_code_to_unicode(
-  _self : TrueTypeFont,
-  _code : UInt,
+  self : TrueTypeFont,
+  code : UInt,
 ) -> @cmap.BfString? {
-  None
+  if self.to_unicode is Some(to_unicode) &&
+    to_unicode.lookup_bf_string(code) is Some(c) {
+    return Some(c)
+  }
+  let c = match self.kind {
+    Embedded(e) =>
+      match e.code_to_name(code.to_byte()) {
+        Some(name) => glyph_name_to_unicode(name)
+        None => None
+      }
+    Standard(s) => s.char_code_to_unicode(code.to_byte())
+  }
+  // TODO: The test PDFs below fail (but mutool can render them correctly).
+  // There is likely some other strategy that requires processing the font tables
+  // hayro-tests/pdfs/custom/font_truetype_7.pdf
+  // hayro-tests/pdfs/custom/font_truetype_6.pdf
+  match c {
+    Some(c) => Some(Char(c))
+    None => None
+  }
 }
 
 ///|
@@ -155,228 +289,201 @@ impl CacheKey for TrueTypeFont with fn cache_key(self) {
 }
 
 ///|
-/// A Type1 font. TODO: not ported yet (needs `skrifa`).
-priv struct Type1Font {
-  cache_key : U128
+priv struct EmbeddedKind {
+  base_font : OpenTypeFontBlob
+  widths : Array[Width]
+  missing_width : Float
+  font_flags : UInt?
+  glyph_names : Map[String, GlyphId]
+  encoding : Encoding
+  // Only used for PDFs that mistakenly embed a
+  // CFF font.
+  cff_blob : CffFontBlob?
+  differences : Map[Int, String]
+  cached_mappings : Map[Int, GlyphId]
+  /// PostScript name from the PDF.
+  postscript_name : String?
 }
 
 ///|
-fn Type1Font::new(
-  _dict : @hayro_syntax.Dict,
-  _font_resolver : FontResolverFn,
-  _cmap_resolver : CMapResolverFn,
-) -> Type1Font? {
-  None
+fn EmbeddedKind::new(dict : @hayro_syntax.Dict) -> EmbeddedKind? {
+  let descriptor = (dict.get("FontDescriptor") : @hayro_syntax.Dict?).unwrap_or(
+    @hayro_syntax.Dict::empty(),
+  )
+  let font_flags = match (descriptor.get("Flags") : UInt?) {
+    Some(bits) => font_flags_from_bits(bits)
+    None => None
+  }
+  guard read_widths(dict, descriptor) is Some((widths, missing_width)) else {
+    return None
+  }
+  let (encoding, differences) = read_encoding(dict)
+  guard (descriptor.get("FontFile2") : @hayro_syntax.Stream?) is Some(s) &&
+    s.decoded() is Ok(d) &&
+    OpenTypeFontBlob::new(d.to_bytes(), 0) is Some(base_font) else {
+    return None
+  }
+  let glyph_names = base_font.glyph_names()
+  let cff_font_blob = base_font.cff_blob()
+  let postscript_name = match (dict.get("BaseFont") : @hayro_syntax.Name?) {
+    Some(n) => Some(strip_subset_prefix(n.as_str()))
+    None => None
+  }
+  Some({
+    base_font,
+    differences,
+    cff_blob: cff_font_blob,
+    widths,
+    missing_width,
+    glyph_names,
+    font_flags,
+    encoding,
+    cached_mappings: {},
+    postscript_name,
+  })
 }
 
 ///|
-fn Type1Font::new_standard(
-  _font : StandardFont,
-  _resolver : FontResolverFn,
-) -> Type1Font? {
-  None
-}
-
-///|
-fn Type1Font::map_code(_self : Type1Font, _code : Byte) -> GlyphId {
-  glyph_id_notdef
-}
-
-///|
-fn Type1Font::outline_glyph(
-  _self : Type1Font,
-  _glyph : GlyphId,
-) -> @kurbo.BezPath {
-  @kurbo.BezPath::new()
-}
-
-///|
-fn Type1Font::glyph_width(_self : Type1Font, _code : Byte) -> Float? {
-  None
-}
-
-///|
-fn Type1Font::char_code_to_unicode(
-  _self : Type1Font,
-  _code : UInt,
-) -> @cmap.BfString? {
-  None
-}
-
-///|
-impl CacheKey for Type1Font with fn cache_key(self) {
-  self.cache_key
-}
-
-///|
-/// A Type0 (CID) font. TODO: not ported yet (needs `skrifa`).
-priv struct Type0Font {
-  cache_key : U128
-}
-
-///|
-fn Type0Font::new(
-  _dict : @hayro_syntax.Dict,
-  _font_resolver : FontResolverFn,
-  _cmap_resolver : CMapResolverFn,
-) -> Type0Font? {
-  None
-}
-
-///|
-fn Type0Font::map_code(_self : Type0Font, _code : UInt) -> GlyphId {
-  glyph_id_notdef
-}
-
-///|
-fn Type0Font::outline_glyph(
-  _self : Type0Font,
-  _glyph : GlyphId,
-  _code : UInt,
-) -> @kurbo.BezPath {
-  @kurbo.BezPath::new()
-}
-
-///|
-fn Type0Font::code_advance(_self : Type0Font, _code : UInt) -> @kurbo.Vec2 {
-  @kurbo.vec2_zero
-}
-
-///|
-fn Type0Font::origin_displacement(
-  _self : Type0Font,
-  _code : UInt,
-) -> @kurbo.Vec2 {
-  @kurbo.vec2_zero
-}
-
-///|
-fn Type0Font::read_code(
-  _self : Type0Font,
-  _bytes : Bytes,
-  _offset : Int,
-) -> (UInt, Int) {
-  (0, 1)
-}
-
-///|
-fn Type0Font::is_horizontal(_self : Type0Font) -> Bool {
-  true
-}
-
-///|
-fn Type0Font::char_code_to_unicode(
-  _self : Type0Font,
-  _code : UInt,
-) -> @cmap.BfString? {
-  None
-}
-
-///|
-impl CacheKey for Type0Font with fn cache_key(self) {
-  self.cache_key
-}
-
-///|
-/// A glyph ID (TEMPORARY until `font_types` is merged).
-pub(all) struct GlyphId(UInt) derive(Eq, Hash, Debug)
-
-///|
-pub fn GlyphId::new(v : UInt) -> GlyphId {
-  GlyphId(v)
-}
-
-///|
-pub fn GlyphId::to_u32(self : GlyphId) -> UInt {
-  self.0
-}
-
-///|
-let glyph_id_notdef : GlyphId = GlyphId(0)
-
-///|
-priv enum OutlineFont {
-  Type1(Type1Font)
-  TrueType(TrueTypeFont)
-  Type0(Type0Font)
-}
-
-///|
-impl CacheKey for OutlineFont with fn cache_key(self) {
-  match self {
-    Type1(f) => CacheKey::cache_key(f)
-    TrueType(t) => CacheKey::cache_key(t)
-    Type0(t0) => CacheKey::cache_key(t0)
+fn EmbeddedKind::is_non_symbolic(self : EmbeddedKind) -> Bool {
+  match self.font_flags {
+    Some(f) => (f & FONT_FLAG_NON_SYMBOLIC) != 0
+    None => false
   }
 }
 
 ///|
-fn OutlineFont::outline_glyph(
-  self : OutlineFont,
+fn EmbeddedKind::code_to_name(self : EmbeddedKind, code : Byte) -> String? {
+  match self.differences.get(code.to_int()) {
+    Some(s) => Some(s)
+    None =>
+      match self.encoding.map_code(code) {
+        Some(s) => Some(s)
+        // See PDFJS-6410 - PDF has no base encoding, so let's fallback to
+        // standard here.
+        None => standard_get(code)
+      }
+  }
+}
+
+///|
+fn EmbeddedKind::outline_glyph(
+  self : EmbeddedKind,
   glyph : GlyphId,
-  code : UInt,
 ) -> @kurbo.BezPath {
-  match self {
-    Type1(t) => t.outline_glyph(glyph)
-    TrueType(t) => t.outline_glyph(glyph)
-    Type0(t) => t.outline_glyph(glyph, code)
+  self.base_font.outline_glyph(glyph)
+}
+
+///|
+fn not_notdef(g : GlyphId?) -> GlyphId? {
+  match g {
+    Some(g) if g != glyph_id_notdef => Some(g)
+    _ => None
   }
 }
 
 ///|
-fn OutlineFont::char_code_to_unicode(
-  self : OutlineFont,
-  char_code : UInt,
-) -> @cmap.BfString? {
-  match self {
-    Type1(t) => t.char_code_to_unicode(char_code)
-    TrueType(t) => t.char_code_to_unicode(char_code)
-    Type0(t) => t.char_code_to_unicode(char_code)
+fn EmbeddedKind::map_code(self : EmbeddedKind, code : Byte) -> GlyphId {
+  if self.cached_mappings.get(code.to_int()) is Some(glyph) {
+    return glyph
+  }
+  if self.cff_blob is Some(blob) {
+    return match self.code_to_name(code) {
+      Some(name) => blob.glyph_index_by_name(name).unwrap_or(glyph_id_notdef)
+      None => glyph_id_notdef
+    }
+  }
+  let mut glyph : GlyphId? = None
+  if self.is_non_symbolic() {
+    guard self.code_to_name(code) is Some(lookup) else {
+      return glyph_id_notdef
+    }
+    if self.base_font.cmap_records() is Some(records) {
+      for record in records {
+        if record.platform_id == 3 &&
+          record.encoding_id == 1 &&
+          record.subtable is Some(subtable) &&
+          glyph is None {
+          let c = match glyph_names_get(lookup) {
+            Some(n) => n.iter().next()
+            None => unicode_from_name(lookup)
+          }
+          glyph = match c {
+            Some(c) => not_notdef(subtable(c.to_uint()))
+            None => None
+          }
+        }
+      }
+      for record in records {
+        if record.platform_id == 1 &&
+          record.encoding_id == 0 &&
+          record.subtable is Some(subtable) &&
+          glyph is None {
+          let c = match mac_os_roman_get_inverse(lookup) {
+            Some(c) => Some(c)
+            None => mac_roman_get_inverse(lookup)
+          }
+          glyph = match c {
+            Some(c) => not_notdef(subtable(c.to_uint()))
+            None => None
+          }
+        }
+      }
+    }
+    if glyph is None {
+      if self.glyph_names.get(lookup) is Some(gid) {
+        glyph = Some(gid)
+      } else if glyph_num_string(lookup) is Some(gid) {
+        glyph = Some(GlyphId::new(gid))
+      }
+    }
+  } else if self.base_font.cmap_records() is Some(records) {
+    for record in records {
+      if record.platform_id == 3 &&
+        (record.encoding_id == 0 || record.encoding_id == 1) {
+        if record.subtable is Some(subtable) {
+          for offset in [0x0000U, 0xF000, 0xF100, 0xF200] {
+            glyph = match glyph {
+              Some(g) => not_notdef(Some(g))
+              None => not_notdef(subtable(code.to_uint() + offset))
+            }
+          }
+        }
+      } else if (record.platform_id == 1 || record.platform_id == 0) &&
+        record.encoding_id == 0 &&
+        record.subtable is Some(subtable) {
+        glyph = match glyph {
+          Some(g) => not_notdef(Some(g))
+          None => not_notdef(subtable(code.to_uint()))
+        }
+      }
+    }
+  }
+  let glyph = glyph.unwrap_or(glyph_id_notdef)
+  self.cached_mappings[code.to_int()] = glyph
+  glyph
+}
+
+///|
+fn EmbeddedKind::glyph_width(self : EmbeddedKind, code : Byte) -> Float {
+  match self.widths.get(code.to_int()) {
+    Some(Value(w)) => w
+    Some(Missing) => self.missing_width
+    _ =>
+      // warn_none: "failed to find advance width for code {code}"
+      self.base_font.advance_width(self.map_code(code)).unwrap_or(0.0)
   }
 }
 
 ///|
-/// Get the advance width for a glyph by character code.
-fn OutlineFont::glyph_advance_width(
-  self : OutlineFont,
-  char_code : UInt,
-) -> Float? {
-  match self {
-    Type1(t) => t.glyph_width(char_code.to_byte())
-    TrueType(t) => Some(t.glyph_width(char_code.to_byte()))
-    Type0(t) => Some(t.code_advance(char_code).x.to_float())
+/// Rust's `f32::round` (half away from zero).
+fn rust_round_f32(x : Float) -> Float {
+  if x.is_nan() || x.is_inf() {
+    return x
+  }
+  let t = x.trunc()
+  if (x - t).abs() >= 0.5 {
+    t + (if x < 0.0 { -1.0 } else { 1.0 })
+  } else {
+    t
   }
 }
-
-///|
-/// The 14 standard fonts of PDF.
-pub(all) enum StandardFont {
-  /// Helvetica.
-  Helvetica
-  /// Helvetica Bold.
-  HelveticaBold
-  /// Helvetica Oblique.
-  HelveticaOblique
-  /// Helvetica Bold Oblique.
-  HelveticaBoldOblique
-  /// Courier.
-  Courier
-  /// Courier Bold.
-  CourierBold
-  /// Courier Oblique.
-  CourierOblique
-  /// Courier Bold Oblique.
-  CourierBoldOblique
-  /// Times Roman.
-  TimesRoman
-  /// Times Bold.
-  TimesBold
-  /// Times Italic.
-  TimesItalic
-  /// Times Bold Italic.
-  TimesBoldItalic
-  /// Zapf Dingbats - a decorative symbol font.
-  ZapfDingBats
-  /// Symbol - a mathematical symbol font.
-  Symbol
-} derive(Eq, Debug)
