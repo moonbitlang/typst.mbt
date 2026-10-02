@@ -74,7 +74,7 @@ pub fn ParseState::new(syntax : SyntaxReference) -> ParseState {
     prototypes: [],
     captures: None,
   }
-  { stack: [start_state], first_line: true, proto_starts: [] }
+  { stack: [start_state], first_line: true, proto_starts: [], }
 }
 
 ///|
@@ -119,9 +119,9 @@ pub fn ParseState::parse_line_indexed(
   let non_consuming_push_at = Ref::new((0, 0))
   let text = SearchText::new(line)
   while self.parse_next_token(
-      text, syntax_set, match_start, search_cache, regions, non_consuming_push_at,
-      res,
-    ) {
+          text, syntax_set, match_start, search_cache, regions, non_consuming_push_at,
+          res,
+        ) {
 
   }
   res
@@ -364,9 +364,13 @@ fn ParseState::exec_pattern(
           continue
         }
         for scope in scopes {
-          map.push(((cap_start, -(cap_end - cap_start)), ScopeStackOp::Push(scope)))
+          map.push(
+            ((cap_start, -(cap_end - cap_start)), ScopeStackOp::Push(scope)),
+          )
         }
-        map.push(((cap_end, @int.min_value), ScopeStackOp::Pop(scopes.length())))
+        map.push(
+          ((cap_end, @int.min_value), ScopeStackOp::Pop(scopes.length())),
+        )
       }
     }
     let map = stable_sort_by(map, (a, b) => a.0.compare(b.0))
@@ -445,11 +449,13 @@ fn ParseState::push_meta_ops(
           }
         }
       } else {
-        let repush = (is_set &&
-          (
-            !cur_context.meta_scope.is_empty() ||
-            !cur_context.meta_content_scope.is_empty()
-          )) ||
+        let repush = (
+            is_set &&
+            (
+              !cur_context.meta_scope.is_empty() ||
+              !cur_context.meta_content_scope.is_empty()
+            )
+          ) ||
           context_refs
           .iter()
           .any(r => {
@@ -573,7 +579,7 @@ fn ParseState::perform_op(
         None
       }
     }
-    self.stack.push({ context: context_id, prototypes: proto_ids, captures })
+    self.stack.push({ context: context_id, prototypes: proto_ids, captures, })
   }
   true
 }

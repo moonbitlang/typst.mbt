@@ -20,7 +20,15 @@ pub fn context_elem() -> Element {
         keywords=[],
         capabilities=["Construct", "Locatable"],
         fields=[
-        field_of((Ty::new() : Ty[Func]), id=0, name="func", kind=Required, positional=true, required=true, internal=true),
+          field_of(
+            (Ty::new() : Ty[Func]),
+            id=0,
+            name="func",
+            kind=Required,
+            positional=true,
+            required=true,
+            internal=true,
+          ),
         ],
       )
       context_elem_cell.val = Some(e)
@@ -49,7 +57,14 @@ pub fn symbol_elem() -> Element {
         keywords=[],
         capabilities=["Repr", "PlainText"],
         fields=[
-        field_of((Ty::new() : Ty[String]), id=0, name="text", kind=Required, positional=true, required=true),
+          field_of(
+            (Ty::new() : Ty[String]),
+            id=0,
+            name="text",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
         ],
       )
       symbol_elem_cell.val = Some(e)
@@ -78,7 +93,13 @@ pub fn target_elem() -> Element {
         keywords=[],
         capabilities=[],
         fields=[
-        field_of((Ty::new() : Ty[Target]), id=0, name="target", kind=Settable, default=target_elem_target_default),
+          field_of(
+            (Ty::new() : Ty[Target]),
+            id=0,
+            name="target",
+            kind=Settable,
+            default=target_elem_target_default,
+          ),
         ],
       )
       target_elem_cell.val = Some(e)
@@ -106,8 +127,23 @@ pub fn counter_update_elem() -> Element {
         keywords=[],
         capabilities=["Construct", "Locatable", "Count"],
         fields=[
-        field_of((Ty::new() : Ty[CounterKey]), id=0, name="key", kind=Required, positional=true, required=true),
-        field_of((Ty::new() : Ty[CounterUpdate]), id=1, name="update", kind=Required, positional=true, required=true, internal=true),
+          field_of(
+            (Ty::new() : Ty[CounterKey]),
+            id=0,
+            name="key",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
+          field_of(
+            (Ty::new() : Ty[CounterUpdate]),
+            id=1,
+            name="update",
+            kind=Required,
+            positional=true,
+            required=true,
+            internal=true,
+          ),
         ],
       )
       counter_update_elem_cell.val = Some(e)
@@ -139,9 +175,33 @@ pub fn counter_display_elem() -> Element {
         keywords=[],
         capabilities=["Construct", "Unqueriable", "Locatable"],
         fields=[
-        field_of((Ty::new() : Ty[Counter]), id=0, name="counter", kind=Required, positional=true, required=true, internal=true),
-        field_of((Ty::new() : Ty[Smart[Numbering]]), id=1, name="numbering", kind=Required, positional=true, required=true, internal=true),
-        field_of((Ty::new() : Ty[Bool]), id=2, name="both", kind=Required, positional=true, required=true, internal=true),
+          field_of(
+            (Ty::new() : Ty[Counter]),
+            id=0,
+            name="counter",
+            kind=Required,
+            positional=true,
+            required=true,
+            internal=true,
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[Numbering]]),
+            id=1,
+            name="numbering",
+            kind=Required,
+            positional=true,
+            required=true,
+            internal=true,
+          ),
+          field_of(
+            (Ty::new() : Ty[Bool]),
+            id=2,
+            name="both",
+            kind=Required,
+            positional=true,
+            required=true,
+            internal=true,
+          ),
         ],
       )
       counter_display_elem_cell.val = Some(e)
@@ -176,7 +236,14 @@ pub fn metadata_elem() -> Element {
         keywords=[],
         capabilities=["Locatable"],
         fields=[
-        field_of((Ty::new() : Ty[Value]), id=0, name="value", kind=Required, positional=true, required=true),
+          field_of(
+            (Ty::new() : Ty[Value]),
+            id=0,
+            name="value",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
         ],
       )
       metadata_elem_cell.val = Some(e)
@@ -204,8 +271,23 @@ pub fn state_update_elem() -> Element {
         keywords=[],
         capabilities=["Construct", "Locatable"],
         fields=[
-        field_of((Ty::new() : Ty[String]), id=0, name="key", kind=Required, positional=true, required=true),
-        field_of((Ty::new() : Ty[StateUpdate]), id=1, name="update", kind=Required, positional=true, required=true, internal=true),
+          field_of(
+            (Ty::new() : Ty[String]),
+            id=0,
+            name="key",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
+          field_of(
+            (Ty::new() : Ty[StateUpdate]),
+            id=1,
+            name="update",
+            kind=Required,
+            positional=true,
+            required=true,
+            internal=true,
+          ),
         ],
       )
       state_update_elem_cell.val = Some(e)
@@ -237,7 +319,15 @@ pub fn tag_elem() -> Element {
         keywords=[],
         capabilities=["Construct", "Unlabellable"],
         fields=[
-        field_of((Ty::new() : Ty[Tag]), id=0, name="tag", kind=Required, positional=true, required=true, internal=true),
+          field_of(
+            (Ty::new() : Ty[Tag]),
+            id=0,
+            name="tag",
+            kind=Required,
+            positional=true,
+            required=true,
+            internal=true,
+          ),
         ],
       )
       tag_elem_cell.val = Some(e)
@@ -266,8 +356,23 @@ pub fn align_elem() -> Element {
         keywords=[],
         capabilities=[],
         fields=[
-        field_of((Ty::new() : Ty[Alignment]), id=0, name="alignment", kind=Settable, positional=true, default=align_elem_alignment_default, fold=fold_of((Ty::new() : Ty[Alignment]))),
-        field_of((Ty::new() : Ty[Content]), id=1, name="body", kind=Required, positional=true, required=true),
+          field_of(
+            (Ty::new() : Ty[Alignment]),
+            id=0,
+            name="alignment",
+            kind=Settable,
+            positional=true,
+            default=align_elem_alignment_default,
+            fold=fold_of((Ty::new() : Ty[Alignment])),
+          ),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=1,
+            name="body",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
         ],
       )
       align_elem_cell.val = Some(e)
@@ -298,11 +403,43 @@ pub fn columns_elem() -> Element {
         keywords=[],
         capabilities=[],
         fields=[
-        field_of((Ty::new() : Ty[NonZeroUSize]), id=0, name="count", kind=Settable, positional=true, default=() => Int(2L)),
-        field_of((Ty::new() : Ty[Rel[Length]]), id=1, name="gutter", kind=Settable, default=() => Relative(Rel::from_ratio(Ratio::new(0.04)))),
-        field_of((Ty::new() : Ty[Bool]), id=2, name="balanced", kind=Settable, default=() => Bool(false)),
-        field_of((Ty::new() : Ty[Content?]), id=3, name="separator", kind=Settable, default=() => None),
-        field_of((Ty::new() : Ty[Content]), id=4, name="body", kind=Required, positional=true, required=true),
+          field_of(
+            (Ty::new() : Ty[NonZeroUSize]),
+            id=0,
+            name="count",
+            kind=Settable,
+            positional=true,
+            default=() => Int(2L),
+          ),
+          field_of(
+            (Ty::new() : Ty[Rel[Length]]),
+            id=1,
+            name="gutter",
+            kind=Settable,
+            default=() => Relative(Rel::from_ratio(Ratio::new(0.04))),
+          ),
+          field_of(
+            (Ty::new() : Ty[Bool]),
+            id=2,
+            name="balanced",
+            kind=Settable,
+            default=() => Bool(false),
+          ),
+          field_of(
+            (Ty::new() : Ty[Content?]),
+            id=3,
+            name="separator",
+            kind=Settable,
+            default=() => None,
+          ),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=4,
+            name="body",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
         ],
       )
       columns_elem_cell.val = Some(e)
@@ -342,7 +479,9 @@ pub fn colbreak_elem() -> Element {
         keywords=[],
         capabilities=[],
         fields=[
-        field_of((Ty::new() : Ty[Bool]), id=0, name="weak", kind=Settable, default=() => Bool(false)),
+          field_of((Ty::new() : Ty[Bool]), id=0, name="weak", kind=Settable, default=() => {
+            Bool(false)
+          }),
         ],
       )
       colbreak_elem_cell.val = Some(e)
@@ -370,16 +509,73 @@ pub fn box_elem() -> Element {
         keywords=[],
         capabilities=[],
         fields=[
-        field_of((Ty::new() : Ty[Sizing]), id=0, name="width", kind=Settable, default=box_elem_width_default),
-        field_of((Ty::new() : Ty[Smart[Rel[Length]]]), id=1, name="height", kind=Settable, default=() => Auto),
-        field_of((Ty::new() : Ty[BaselinePos]), id=2, name="baseline", kind=Settable, default=box_elem_baseline_default),
-        field_of((Ty::new() : Ty[Paint?]), id=3, name="fill", kind=Settable, default=() => None),
-        field_of((Ty::new() : Ty[Sides[Stroke??]]), id=4, name="stroke", kind=Settable, default=() => Dict(Dict::new()), fold=fold_of((Ty::new() : Ty[Sides[Stroke??]]))),
-        field_of((Ty::new() : Ty[Corners[Rel[Length]?]]), id=5, name="radius", kind=Settable, default=() => Dict(Dict::new()), fold=fold_of((Ty::new() : Ty[Corners[Rel[Length]?]]))),
-        field_of((Ty::new() : Ty[Sides[Rel[Length]?]]), id=6, name="inset", kind=Settable, default=() => Dict(Dict::new()), fold=fold_of((Ty::new() : Ty[Sides[Rel[Length]?]]))),
-        field_of((Ty::new() : Ty[Sides[Rel[Length]?]]), id=7, name="outset", kind=Settable, default=() => Dict(Dict::new()), fold=fold_of((Ty::new() : Ty[Sides[Rel[Length]?]]))),
-        field_of((Ty::new() : Ty[Bool]), id=8, name="clip", kind=Settable, default=() => Bool(false)),
-        field_of((Ty::new() : Ty[Content?]), id=9, name="body", kind=Settable, positional=true, default=() => None),
+          field_of(
+            (Ty::new() : Ty[Sizing]),
+            id=0,
+            name="width",
+            kind=Settable,
+            default=box_elem_width_default,
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[Rel[Length]]]),
+            id=1,
+            name="height",
+            kind=Settable,
+            default=() => Auto,
+          ),
+          field_of(
+            (Ty::new() : Ty[BaselinePos]),
+            id=2,
+            name="baseline",
+            kind=Settable,
+            default=box_elem_baseline_default,
+          ),
+          field_of((Ty::new() : Ty[Paint?]), id=3, name="fill", kind=Settable, default=() => {
+            None
+          }),
+          field_of(
+            (Ty::new() : Ty[Sides[Stroke??]]),
+            id=4,
+            name="stroke",
+            kind=Settable,
+            default=() => Dict(Dict::new()),
+            fold=fold_of((Ty::new() : Ty[Sides[Stroke??]])),
+          ),
+          field_of(
+            (Ty::new() : Ty[Corners[Rel[Length]?]]),
+            id=5,
+            name="radius",
+            kind=Settable,
+            default=() => Dict(Dict::new()),
+            fold=fold_of((Ty::new() : Ty[Corners[Rel[Length]?]])),
+          ),
+          field_of(
+            (Ty::new() : Ty[Sides[Rel[Length]?]]),
+            id=6,
+            name="inset",
+            kind=Settable,
+            default=() => Dict(Dict::new()),
+            fold=fold_of((Ty::new() : Ty[Sides[Rel[Length]?]])),
+          ),
+          field_of(
+            (Ty::new() : Ty[Sides[Rel[Length]?]]),
+            id=7,
+            name="outset",
+            kind=Settable,
+            default=() => Dict(Dict::new()),
+            fold=fold_of((Ty::new() : Ty[Sides[Rel[Length]?]])),
+          ),
+          field_of((Ty::new() : Ty[Bool]), id=8, name="clip", kind=Settable, default=() => {
+            Bool(false)
+          }),
+          field_of(
+            (Ty::new() : Ty[Content?]),
+            id=9,
+            name="body",
+            kind=Settable,
+            positional=true,
+            default=() => None,
+          ),
         ],
       )
       box_elem_cell.val = Some(e)
@@ -434,7 +630,15 @@ pub fn inline_elem() -> Element {
         keywords=[],
         capabilities=["Construct"],
         fields=[
-        field_of((Ty::new() : Ty[InlineCallback]), id=0, name="body", kind=Required, positional=true, required=true, internal=true),
+          field_of(
+            (Ty::new() : Ty[InlineCallback]),
+            id=0,
+            name="body",
+            kind=Required,
+            positional=true,
+            required=true,
+            internal=true,
+          ),
         ],
       )
       inline_elem_cell.val = Some(e)
@@ -463,20 +667,103 @@ pub fn block_elem() -> Element {
         keywords=[],
         capabilities=[],
         fields=[
-        field_of((Ty::new() : Ty[Smart[Rel[Length]]]), id=0, name="width", kind=Settable, default=() => Auto),
-        field_of((Ty::new() : Ty[Sizing]), id=1, name="height", kind=Settable, default=block_elem_height_default),
-        field_of((Ty::new() : Ty[Bool]), id=2, name="breakable", kind=Settable, default=() => Bool(true)),
-        field_of((Ty::new() : Ty[Paint?]), id=3, name="fill", kind=Settable, default=() => None),
-        field_of((Ty::new() : Ty[Sides[Stroke??]]), id=4, name="stroke", kind=Settable, default=() => Dict(Dict::new()), fold=fold_of((Ty::new() : Ty[Sides[Stroke??]]))),
-        field_of((Ty::new() : Ty[Corners[Rel[Length]?]]), id=5, name="radius", kind=Settable, default=() => Dict(Dict::new()), fold=fold_of((Ty::new() : Ty[Corners[Rel[Length]?]]))),
-        field_of((Ty::new() : Ty[Sides[Rel[Length]?]]), id=6, name="inset", kind=Settable, default=() => Dict(Dict::new()), fold=fold_of((Ty::new() : Ty[Sides[Rel[Length]?]]))),
-        field_of((Ty::new() : Ty[Sides[Rel[Length]?]]), id=7, name="outset", kind=Settable, default=() => Dict(Dict::new()), fold=fold_of((Ty::new() : Ty[Sides[Rel[Length]?]]))),
-        field_of((Ty::new() : Ty[Smart[Spacing]]), id=8, name="spacing", kind=External, default=() => Length(Length::from_em(Em::new(1.2)))),
-        field_of((Ty::new() : Ty[Smart[Spacing]]), id=9, name="above", kind=Settable, default=() => Auto, parse=block_elem_above_parse),
-        field_of((Ty::new() : Ty[Smart[Spacing]]), id=10, name="below", kind=Settable, default=() => Auto, parse=block_elem_below_parse),
-        field_of((Ty::new() : Ty[Bool]), id=11, name="clip", kind=Settable, default=() => Bool(false)),
-        field_of((Ty::new() : Ty[Bool]), id=12, name="sticky", kind=Settable, default=() => Bool(false)),
-        field_of((Ty::new() : Ty[BlockBody?]), id=13, name="body", kind=Settable, positional=true, default=() => None),
+          field_of(
+            (Ty::new() : Ty[Smart[Rel[Length]]]),
+            id=0,
+            name="width",
+            kind=Settable,
+            default=() => Auto,
+          ),
+          field_of(
+            (Ty::new() : Ty[Sizing]),
+            id=1,
+            name="height",
+            kind=Settable,
+            default=block_elem_height_default,
+          ),
+          field_of(
+            (Ty::new() : Ty[Bool]),
+            id=2,
+            name="breakable",
+            kind=Settable,
+            default=() => Bool(true),
+          ),
+          field_of((Ty::new() : Ty[Paint?]), id=3, name="fill", kind=Settable, default=() => {
+            None
+          }),
+          field_of(
+            (Ty::new() : Ty[Sides[Stroke??]]),
+            id=4,
+            name="stroke",
+            kind=Settable,
+            default=() => Dict(Dict::new()),
+            fold=fold_of((Ty::new() : Ty[Sides[Stroke??]])),
+          ),
+          field_of(
+            (Ty::new() : Ty[Corners[Rel[Length]?]]),
+            id=5,
+            name="radius",
+            kind=Settable,
+            default=() => Dict(Dict::new()),
+            fold=fold_of((Ty::new() : Ty[Corners[Rel[Length]?]])),
+          ),
+          field_of(
+            (Ty::new() : Ty[Sides[Rel[Length]?]]),
+            id=6,
+            name="inset",
+            kind=Settable,
+            default=() => Dict(Dict::new()),
+            fold=fold_of((Ty::new() : Ty[Sides[Rel[Length]?]])),
+          ),
+          field_of(
+            (Ty::new() : Ty[Sides[Rel[Length]?]]),
+            id=7,
+            name="outset",
+            kind=Settable,
+            default=() => Dict(Dict::new()),
+            fold=fold_of((Ty::new() : Ty[Sides[Rel[Length]?]])),
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[Spacing]]),
+            id=8,
+            name="spacing",
+            kind=External,
+            default=() => Length(Length::from_em(Em::new(1.2))),
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[Spacing]]),
+            id=9,
+            name="above",
+            kind=Settable,
+            default=() => Auto,
+            parse=block_elem_above_parse,
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[Spacing]]),
+            id=10,
+            name="below",
+            kind=Settable,
+            default=() => Auto,
+            parse=block_elem_below_parse,
+          ),
+          field_of((Ty::new() : Ty[Bool]), id=11, name="clip", kind=Settable, default=() => {
+            Bool(false)
+          }),
+          field_of(
+            (Ty::new() : Ty[Bool]),
+            id=12,
+            name="sticky",
+            kind=Settable,
+            default=() => Bool(false),
+          ),
+          field_of(
+            (Ty::new() : Ty[BlockBody?]),
+            id=13,
+            name="body",
+            kind=Settable,
+            positional=true,
+            default=() => None,
+          ),
         ],
       )
       block_elem_cell.val = Some(e)
@@ -543,17 +830,89 @@ pub fn grid_elem() -> Element {
         keywords=[],
         capabilities=["Synthesize", "Tagged"],
         fields=[
-        field_of((Ty::new() : Ty[TrackSizings]), id=0, name="columns", kind=Settable, default=grid_elem_columns_default),
-        field_of((Ty::new() : Ty[TrackSizings]), id=1, name="rows", kind=Settable, default=grid_elem_rows_default),
-        field_of((Ty::new() : Ty[TrackSizings]), id=2, name="gutter", kind=External, default=grid_elem_gutter_default),
-        field_of((Ty::new() : Ty[TrackSizings]), id=3, name="column-gutter", kind=Settable, default=grid_elem_column_gutter_default, parse=grid_elem_column_gutter_parse),
-        field_of((Ty::new() : Ty[TrackSizings]), id=4, name="row-gutter", kind=Settable, default=grid_elem_row_gutter_default, parse=grid_elem_row_gutter_parse),
-        field_of((Ty::new() : Ty[Celled[Sides[Rel[Length]?]]]), id=5, name="inset", kind=Settable, default=grid_elem_inset_default, fold=fold_of((Ty::new() : Ty[Celled[Sides[Rel[Length]?]]]))),
-        field_of((Ty::new() : Ty[Celled[Smart[Alignment]]]), id=6, name="align", kind=Settable, default=grid_elem_align_default),
-        field_of((Ty::new() : Ty[Celled[Paint?]]), id=7, name="fill", kind=Settable, default=grid_elem_fill_default),
-        field_of((Ty::new() : Ty[Celled[Sides[Stroke??]]]), id=8, name="stroke", kind=Settable, default=grid_elem_stroke_default, fold=fold_of((Ty::new() : Ty[Celled[Sides[Stroke??]]]))),
-        field_of((Ty::new() : Ty[GridChild]), id=9, name="children", kind=Required, positional=true, required=true, variadic=true),
-        field_of((Ty::new() : Ty[CellGrid]), id=10, name="grid", kind=Synthesized, internal=true),
+          field_of(
+            (Ty::new() : Ty[TrackSizings]),
+            id=0,
+            name="columns",
+            kind=Settable,
+            default=grid_elem_columns_default,
+          ),
+          field_of(
+            (Ty::new() : Ty[TrackSizings]),
+            id=1,
+            name="rows",
+            kind=Settable,
+            default=grid_elem_rows_default,
+          ),
+          field_of(
+            (Ty::new() : Ty[TrackSizings]),
+            id=2,
+            name="gutter",
+            kind=External,
+            default=grid_elem_gutter_default,
+          ),
+          field_of(
+            (Ty::new() : Ty[TrackSizings]),
+            id=3,
+            name="column-gutter",
+            kind=Settable,
+            default=grid_elem_column_gutter_default,
+            parse=grid_elem_column_gutter_parse,
+          ),
+          field_of(
+            (Ty::new() : Ty[TrackSizings]),
+            id=4,
+            name="row-gutter",
+            kind=Settable,
+            default=grid_elem_row_gutter_default,
+            parse=grid_elem_row_gutter_parse,
+          ),
+          field_of(
+            (Ty::new() : Ty[Celled[Sides[Rel[Length]?]]]),
+            id=5,
+            name="inset",
+            kind=Settable,
+            default=grid_elem_inset_default,
+            fold=fold_of((Ty::new() : Ty[Celled[Sides[Rel[Length]?]]])),
+          ),
+          field_of(
+            (Ty::new() : Ty[Celled[Smart[Alignment]]]),
+            id=6,
+            name="align",
+            kind=Settable,
+            default=grid_elem_align_default,
+          ),
+          field_of(
+            (Ty::new() : Ty[Celled[Paint?]]),
+            id=7,
+            name="fill",
+            kind=Settable,
+            default=grid_elem_fill_default,
+          ),
+          field_of(
+            (Ty::new() : Ty[Celled[Sides[Stroke??]]]),
+            id=8,
+            name="stroke",
+            kind=Settable,
+            default=grid_elem_stroke_default,
+            fold=fold_of((Ty::new() : Ty[Celled[Sides[Stroke??]]])),
+          ),
+          field_of(
+            (Ty::new() : Ty[GridChild]),
+            id=9,
+            name="children",
+            kind=Required,
+            positional=true,
+            required=true,
+            variadic=true,
+          ),
+          field_of(
+            (Ty::new() : Ty[CellGrid]),
+            id=10,
+            name="grid",
+            kind=Synthesized,
+            internal=true,
+          ),
         ],
       )
       grid_elem_cell.val = Some(e)
@@ -612,9 +971,25 @@ pub fn grid_header_elem() -> Element {
         keywords=[],
         capabilities=[],
         fields=[
-        field_of((Ty::new() : Ty[Bool]), id=0, name="repeat", kind=Settable, default=() => Bool(true)),
-        field_of((Ty::new() : Ty[NonZeroU32]), id=1, name="level", kind=Settable, default=() => Int(1L)),
-        field_of((Ty::new() : Ty[GridItem]), id=2, name="children", kind=Required, positional=true, required=true, variadic=true),
+          field_of((Ty::new() : Ty[Bool]), id=0, name="repeat", kind=Settable, default=() => {
+            Bool(true)
+          }),
+          field_of(
+            (Ty::new() : Ty[NonZeroU32]),
+            id=1,
+            name="level",
+            kind=Settable,
+            default=() => Int(1L),
+          ),
+          field_of(
+            (Ty::new() : Ty[GridItem]),
+            id=2,
+            name="children",
+            kind=Required,
+            positional=true,
+            required=true,
+            variadic=true,
+          ),
         ],
       )
       grid_header_elem_cell.val = Some(e)
@@ -648,8 +1023,18 @@ pub fn grid_footer_elem() -> Element {
         keywords=[],
         capabilities=[],
         fields=[
-        field_of((Ty::new() : Ty[Bool]), id=0, name="repeat", kind=Settable, default=() => Bool(true)),
-        field_of((Ty::new() : Ty[GridItem]), id=1, name="children", kind=Required, positional=true, required=true, variadic=true),
+          field_of((Ty::new() : Ty[Bool]), id=0, name="repeat", kind=Settable, default=() => {
+            Bool(true)
+          }),
+          field_of(
+            (Ty::new() : Ty[GridItem]),
+            id=1,
+            name="children",
+            kind=Required,
+            positional=true,
+            required=true,
+            variadic=true,
+          ),
         ],
       )
       grid_footer_elem_cell.val = Some(e)
@@ -680,11 +1065,38 @@ pub fn grid_h_line_elem() -> Element {
         keywords=[],
         capabilities=[],
         fields=[
-        field_of((Ty::new() : Ty[Smart[USize]]), id=0, name="y", kind=Settable, default=() => Auto),
-        field_of((Ty::new() : Ty[USize]), id=1, name="start", kind=Settable, default=() => Int(0L)),
-        field_of((Ty::new() : Ty[NonZeroUSize?]), id=2, name="end", kind=Settable, default=() => None),
-        field_of((Ty::new() : Ty[Stroke?]), id=3, name="stroke", kind=Settable, default=grid_h_line_elem_stroke_default, fold=fold_of((Ty::new() : Ty[Stroke?]))),
-        field_of((Ty::new() : Ty[OuterVAlignment]), id=4, name="position", kind=Settable, default=() => Dyn(Alignment(Alignment::V(VAlignment::Top)))),
+          field_of(
+            (Ty::new() : Ty[Smart[USize]]),
+            id=0,
+            name="y",
+            kind=Settable,
+            default=() => Auto,
+          ),
+          field_of((Ty::new() : Ty[USize]), id=1, name="start", kind=Settable, default=() => {
+            Int(0L)
+          }),
+          field_of(
+            (Ty::new() : Ty[NonZeroUSize?]),
+            id=2,
+            name="end",
+            kind=Settable,
+            default=() => None,
+          ),
+          field_of(
+            (Ty::new() : Ty[Stroke?]),
+            id=3,
+            name="stroke",
+            kind=Settable,
+            default=grid_h_line_elem_stroke_default,
+            fold=fold_of((Ty::new() : Ty[Stroke?])),
+          ),
+          field_of(
+            (Ty::new() : Ty[OuterVAlignment]),
+            id=4,
+            name="position",
+            kind=Settable,
+            default=() => Dyn(Alignment(Alignment::V(VAlignment::Top))),
+          ),
         ],
       )
       grid_h_line_elem_cell.val = Some(e)
@@ -724,11 +1136,38 @@ pub fn grid_v_line_elem() -> Element {
         keywords=[],
         capabilities=[],
         fields=[
-        field_of((Ty::new() : Ty[Smart[USize]]), id=0, name="x", kind=Settable, default=() => Auto),
-        field_of((Ty::new() : Ty[USize]), id=1, name="start", kind=Settable, default=() => Int(0L)),
-        field_of((Ty::new() : Ty[NonZeroUSize?]), id=2, name="end", kind=Settable, default=() => None),
-        field_of((Ty::new() : Ty[Stroke?]), id=3, name="stroke", kind=Settable, default=grid_v_line_elem_stroke_default, fold=fold_of((Ty::new() : Ty[Stroke?]))),
-        field_of((Ty::new() : Ty[OuterHAlignment]), id=4, name="position", kind=Settable, default=() => Dyn(Alignment(Alignment::H(HAlignment::Start)))),
+          field_of(
+            (Ty::new() : Ty[Smart[USize]]),
+            id=0,
+            name="x",
+            kind=Settable,
+            default=() => Auto,
+          ),
+          field_of((Ty::new() : Ty[USize]), id=1, name="start", kind=Settable, default=() => {
+            Int(0L)
+          }),
+          field_of(
+            (Ty::new() : Ty[NonZeroUSize?]),
+            id=2,
+            name="end",
+            kind=Settable,
+            default=() => None,
+          ),
+          field_of(
+            (Ty::new() : Ty[Stroke?]),
+            id=3,
+            name="stroke",
+            kind=Settable,
+            default=grid_v_line_elem_stroke_default,
+            fold=fold_of((Ty::new() : Ty[Stroke?])),
+          ),
+          field_of(
+            (Ty::new() : Ty[OuterHAlignment]),
+            id=4,
+            name="position",
+            kind=Settable,
+            default=() => Dyn(Alignment(Alignment::H(HAlignment::Start))),
+          ),
         ],
       )
       grid_v_line_elem_cell.val = Some(e)
@@ -768,17 +1207,87 @@ pub fn grid_cell_elem() -> Element {
         keywords=[],
         capabilities=[],
         fields=[
-        field_of((Ty::new() : Ty[Content]), id=0, name="body", kind=Required, positional=true, required=true),
-        field_of((Ty::new() : Ty[Smart[USize]]), id=1, name="x", kind=Settable, default=() => Auto),
-        field_of((Ty::new() : Ty[Smart[USize]]), id=2, name="y", kind=Settable, default=() => Auto),
-        field_of((Ty::new() : Ty[NonZeroUSize]), id=3, name="colspan", kind=Settable, default=() => Int(1L)),
-        field_of((Ty::new() : Ty[NonZeroUSize]), id=4, name="rowspan", kind=Settable, default=() => Int(1L)),
-        field_of((Ty::new() : Ty[Smart[Sides[Rel[Length]?]]]), id=5, name="inset", kind=Settable, default=() => Auto),
-        field_of((Ty::new() : Ty[Smart[Alignment]]), id=6, name="align", kind=Settable, default=() => Auto),
-        field_of((Ty::new() : Ty[Smart[Paint?]]), id=7, name="fill", kind=Settable, default=() => Auto),
-        field_of((Ty::new() : Ty[Sides[Stroke??]]), id=8, name="stroke", kind=Settable, default=() => Dict(Dict::new()), fold=fold_of((Ty::new() : Ty[Sides[Stroke??]]))),
-        field_of((Ty::new() : Ty[Smart[Bool]]), id=9, name="breakable", kind=Settable, default=() => Auto),
-        field_of((Ty::new() : Ty[Bool]), id=10, name="is-repeated", kind=Settable, internal=true, default=() => Bool(false), parse=grid_cell_elem_is_repeated_parse),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=0,
+            name="body",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[USize]]),
+            id=1,
+            name="x",
+            kind=Settable,
+            default=() => Auto,
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[USize]]),
+            id=2,
+            name="y",
+            kind=Settable,
+            default=() => Auto,
+          ),
+          field_of(
+            (Ty::new() : Ty[NonZeroUSize]),
+            id=3,
+            name="colspan",
+            kind=Settable,
+            default=() => Int(1L),
+          ),
+          field_of(
+            (Ty::new() : Ty[NonZeroUSize]),
+            id=4,
+            name="rowspan",
+            kind=Settable,
+            default=() => Int(1L),
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[Sides[Rel[Length]?]]]),
+            id=5,
+            name="inset",
+            kind=Settable,
+            default=() => Auto,
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[Alignment]]),
+            id=6,
+            name="align",
+            kind=Settable,
+            default=() => Auto,
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[Paint?]]),
+            id=7,
+            name="fill",
+            kind=Settable,
+            default=() => Auto,
+          ),
+          field_of(
+            (Ty::new() : Ty[Sides[Stroke??]]),
+            id=8,
+            name="stroke",
+            kind=Settable,
+            default=() => Dict(Dict::new()),
+            fold=fold_of((Ty::new() : Ty[Sides[Stroke??]])),
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[Bool]]),
+            id=9,
+            name="breakable",
+            kind=Settable,
+            default=() => Auto,
+          ),
+          field_of(
+            (Ty::new() : Ty[Bool]),
+            id=10,
+            name="is-repeated",
+            kind=Settable,
+            internal=true,
+            default=() => Bool(false),
+            parse=grid_cell_elem_is_repeated_parse,
+          ),
         ],
       )
       grid_cell_elem_cell.val = Some(e)
@@ -836,8 +1345,22 @@ pub fn hide_elem() -> Element {
         keywords=[],
         capabilities=["Tagged"],
         fields=[
-        field_of((Ty::new() : Ty[Content]), id=0, name="body", kind=Required, positional=true, required=true),
-        field_of((Ty::new() : Ty[Bool]), id=1, name="hidden", kind=Ghost, internal=true, default=() => Bool(false)),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=0,
+            name="body",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
+          field_of(
+            (Ty::new() : Ty[Bool]),
+            id=1,
+            name="hidden",
+            kind=Ghost,
+            internal=true,
+            default=() => Bool(false),
+          ),
         ],
       )
       hide_elem_cell.val = Some(e)
@@ -868,7 +1391,14 @@ pub fn layout_elem() -> Element {
         keywords=[],
         capabilities=["Locatable"],
         fields=[
-        field_of((Ty::new() : Ty[Func]), id=0, name="func", kind=Required, positional=true, required=true),
+          field_of(
+            (Ty::new() : Ty[Func]),
+            id=0,
+            name="func",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
         ],
       )
       layout_elem_cell.val = Some(e)
@@ -896,14 +1426,67 @@ pub fn pad_elem() -> Element {
         keywords=[],
         capabilities=[],
         fields=[
-        field_of((Ty::new() : Ty[Rel[Length]]), id=0, name="left", kind=Settable, default=() => Relative(Rel::zero()), parse=pad_elem_left_parse),
-        field_of((Ty::new() : Ty[Rel[Length]]), id=1, name="top", kind=Settable, default=() => Relative(Rel::zero()), parse=pad_elem_top_parse),
-        field_of((Ty::new() : Ty[Rel[Length]]), id=2, name="right", kind=Settable, default=() => Relative(Rel::zero()), parse=pad_elem_right_parse),
-        field_of((Ty::new() : Ty[Rel[Length]]), id=3, name="bottom", kind=Settable, default=() => Relative(Rel::zero()), parse=pad_elem_bottom_parse),
-        field_of((Ty::new() : Ty[Rel[Length]]), id=4, name="x", kind=External, default=() => Relative(Rel::zero())),
-        field_of((Ty::new() : Ty[Rel[Length]]), id=5, name="y", kind=External, default=() => Relative(Rel::zero())),
-        field_of((Ty::new() : Ty[Rel[Length]]), id=6, name="rest", kind=External, default=() => Relative(Rel::zero())),
-        field_of((Ty::new() : Ty[Content]), id=7, name="body", kind=Required, positional=true, required=true),
+          field_of(
+            (Ty::new() : Ty[Rel[Length]]),
+            id=0,
+            name="left",
+            kind=Settable,
+            default=() => Relative(Rel::zero()),
+            parse=pad_elem_left_parse,
+          ),
+          field_of(
+            (Ty::new() : Ty[Rel[Length]]),
+            id=1,
+            name="top",
+            kind=Settable,
+            default=() => Relative(Rel::zero()),
+            parse=pad_elem_top_parse,
+          ),
+          field_of(
+            (Ty::new() : Ty[Rel[Length]]),
+            id=2,
+            name="right",
+            kind=Settable,
+            default=() => Relative(Rel::zero()),
+            parse=pad_elem_right_parse,
+          ),
+          field_of(
+            (Ty::new() : Ty[Rel[Length]]),
+            id=3,
+            name="bottom",
+            kind=Settable,
+            default=() => Relative(Rel::zero()),
+            parse=pad_elem_bottom_parse,
+          ),
+          field_of(
+            (Ty::new() : Ty[Rel[Length]]),
+            id=4,
+            name="x",
+            kind=External,
+            default=() => Relative(Rel::zero()),
+          ),
+          field_of(
+            (Ty::new() : Ty[Rel[Length]]),
+            id=5,
+            name="y",
+            kind=External,
+            default=() => Relative(Rel::zero()),
+          ),
+          field_of(
+            (Ty::new() : Ty[Rel[Length]]),
+            id=6,
+            name="rest",
+            kind=External,
+            default=() => Relative(Rel::zero()),
+          ),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=7,
+            name="body",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
         ],
       )
       pad_elem_cell.val = Some(e)
@@ -952,30 +1535,152 @@ pub fn page_elem() -> Element {
         keywords=[],
         capabilities=["Construct"],
         fields=[
-        field_of((Ty::new() : Ty[Paper]), id=0, name="paper", kind=External, default=page_elem_paper_default),
-        field_of((Ty::new() : Ty[Smart[Length]]), id=1, name="width", kind=Ghost, default=page_elem_width_default, parse=page_elem_width_parse),
-        field_of((Ty::new() : Ty[Smart[Length]]), id=2, name="height", kind=Ghost, default=page_elem_height_default, parse=page_elem_height_parse),
-        field_of((Ty::new() : Ty[Bool]), id=3, name="flipped", kind=Ghost, default=() => Bool(false)),
-        field_of((Ty::new() : Ty[Smart[Margin[Smart[Rel[Length]]]]]), id=4, name="margin", kind=Ghost, default=() => Auto, fold=page_elem_margin_fold),
-        field_of((Ty::new() : Ty[Margin[Rel[Length]]]), id=5, name="bleed", kind=Ghost, default=page_elem_bleed_default),
-        field_of((Ty::new() : Ty[Smart[PageBinding]]), id=6, name="binding", kind=Ghost, default=() => Auto),
-        field_of((Ty::new() : Ty[NonZeroUSize]), id=7, name="columns", kind=Ghost, default=() => Int(1L)),
-        field_of((Ty::new() : Ty[Smart[Paint?]]), id=8, name="fill", kind=Ghost, default=() => Auto),
-        field_of((Ty::new() : Ty[Numbering?]), id=9, name="numbering", kind=Ghost, default=() => None),
-        field_of((Ty::new() : Ty[Smart[Content?]]), id=10, name="supplement", kind=Ghost, default=() => Auto),
-        field_of((Ty::new() : Ty[SpecificAlignment[HAlignment, OuterVAlignment]]), id=11, name="number-align", kind=Ghost, default=() => Dyn(Alignment(Alignment::Both(HAlignment::Center, VAlignment::Bottom)))),
-        field_of((Ty::new() : Ty[Smart[Content?]]), id=12, name="header", kind=Ghost, default=() => Auto),
-        field_of((Ty::new() : Ty[Rel[Length]]), id=13, name="header-ascent", kind=Ghost, default=() => Relative(Rel::from_ratio(Ratio::new(0.3)))),
-        field_of((Ty::new() : Ty[Smart[Content?]]), id=14, name="footer", kind=Ghost, default=() => Auto),
-        field_of((Ty::new() : Ty[Rel[Length]]), id=15, name="footer-descent", kind=Ghost, default=() => Relative(Rel::from_ratio(Ratio::new(0.3)))),
-        field_of((Ty::new() : Ty[Content?]), id=16, name="background", kind=Ghost, default=() => None),
-        field_of((Ty::new() : Ty[Content?]), id=17, name="foreground", kind=Ghost, default=() => None),
-        field_of((Ty::new() : Ty[Content]), id=18, name="body", kind=Required, positional=true, required=true),
+          field_of(
+            (Ty::new() : Ty[Paper]),
+            id=0,
+            name="paper",
+            kind=External,
+            default=page_elem_paper_default,
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[Length]]),
+            id=1,
+            name="width",
+            kind=Ghost,
+            default=page_elem_width_default,
+            parse=page_elem_width_parse,
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[Length]]),
+            id=2,
+            name="height",
+            kind=Ghost,
+            default=page_elem_height_default,
+            parse=page_elem_height_parse,
+          ),
+          field_of((Ty::new() : Ty[Bool]), id=3, name="flipped", kind=Ghost, default=() => {
+            Bool(false)
+          }),
+          field_of(
+            (Ty::new() : Ty[Smart[Margin[Smart[Rel[Length]]]]]),
+            id=4,
+            name="margin",
+            kind=Ghost,
+            default=() => Auto,
+            fold=page_elem_margin_fold,
+          ),
+          field_of(
+            (Ty::new() : Ty[Margin[Rel[Length]]]),
+            id=5,
+            name="bleed",
+            kind=Ghost,
+            default=page_elem_bleed_default,
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[PageBinding]]),
+            id=6,
+            name="binding",
+            kind=Ghost,
+            default=() => Auto,
+          ),
+          field_of(
+            (Ty::new() : Ty[NonZeroUSize]),
+            id=7,
+            name="columns",
+            kind=Ghost,
+            default=() => Int(1L),
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[Paint?]]),
+            id=8,
+            name="fill",
+            kind=Ghost,
+            default=() => Auto,
+          ),
+          field_of(
+            (Ty::new() : Ty[Numbering?]),
+            id=9,
+            name="numbering",
+            kind=Ghost,
+            default=() => None,
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[Content?]]),
+            id=10,
+            name="supplement",
+            kind=Ghost,
+            default=() => Auto,
+          ),
+          field_of(
+            (Ty::new() : Ty[SpecificAlignment[HAlignment, OuterVAlignment]]),
+            id=11,
+            name="number-align",
+            kind=Ghost,
+            default=() => {
+              Dyn(
+                Alignment(
+                  Alignment::Both(HAlignment::Center, VAlignment::Bottom),
+                ),
+              )
+            },
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[Content?]]),
+            id=12,
+            name="header",
+            kind=Ghost,
+            default=() => Auto,
+          ),
+          field_of(
+            (Ty::new() : Ty[Rel[Length]]),
+            id=13,
+            name="header-ascent",
+            kind=Ghost,
+            default=() => Relative(Rel::from_ratio(Ratio::new(0.3))),
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[Content?]]),
+            id=14,
+            name="footer",
+            kind=Ghost,
+            default=() => Auto,
+          ),
+          field_of(
+            (Ty::new() : Ty[Rel[Length]]),
+            id=15,
+            name="footer-descent",
+            kind=Ghost,
+            default=() => Relative(Rel::from_ratio(Ratio::new(0.3))),
+          ),
+          field_of(
+            (Ty::new() : Ty[Content?]),
+            id=16,
+            name="background",
+            kind=Ghost,
+            default=() => None,
+          ),
+          field_of(
+            (Ty::new() : Ty[Content?]),
+            id=17,
+            name="foreground",
+            kind=Ghost,
+            default=() => None,
+          ),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=18,
+            name="body",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
         ],
       )
       page_elem_cell.val = Some(e)
       page_elem_init(e)
-      e.hooks().local_name = Some((lang, region) => localized_str(lang, region, page_elem_local_name_key()))
+      e.hooks().local_name = Some((lang, region) => {
+        localized_str(lang, region, page_elem_local_name_key())
+      })
       e
     }
   }
@@ -1054,9 +1759,21 @@ pub fn pagebreak_elem() -> Element {
         keywords=[],
         capabilities=[],
         fields=[
-        field_of((Ty::new() : Ty[Bool]), id=0, name="weak", kind=Settable, default=() => Bool(false)),
-        field_of((Ty::new() : Ty[Parity?]), id=1, name="to", kind=Settable, default=() => None),
-        field_of((Ty::new() : Ty[Bool]), id=2, name="boundary", kind=Settable, internal=true, default=() => Bool(false), parse=pagebreak_elem_boundary_parse),
+          field_of((Ty::new() : Ty[Bool]), id=0, name="weak", kind=Settable, default=() => {
+            Bool(false)
+          }),
+          field_of((Ty::new() : Ty[Parity?]), id=1, name="to", kind=Settable, default=() => {
+            None
+          }),
+          field_of(
+            (Ty::new() : Ty[Bool]),
+            id=2,
+            name="boundary",
+            kind=Settable,
+            internal=true,
+            default=() => Bool(false),
+            parse=pagebreak_elem_boundary_parse,
+          ),
         ],
       )
       pagebreak_elem_cell.val = Some(e)
@@ -1090,13 +1807,53 @@ pub fn place_elem() -> Element {
         keywords=[],
         capabilities=["Unqueriable", "Locatable", "Tagged"],
         fields=[
-        field_of((Ty::new() : Ty[Smart[Alignment]]), id=0, name="alignment", kind=Settable, positional=true, default=() => Dyn(Alignment(alignment_start))),
-        field_of((Ty::new() : Ty[PlacementScope]), id=1, name="scope", kind=Settable, default=place_elem_scope_default),
-        field_of((Ty::new() : Ty[Bool]), id=2, name="float", kind=Settable, default=() => Bool(false)),
-        field_of((Ty::new() : Ty[Length]), id=3, name="clearance", kind=Settable, default=() => Length(Length::from_em(Em::new(1.5)))),
-        field_of((Ty::new() : Ty[Rel[Length]]), id=4, name="dx", kind=Settable, default=() => Relative(Rel::zero())),
-        field_of((Ty::new() : Ty[Rel[Length]]), id=5, name="dy", kind=Settable, default=() => Relative(Rel::zero())),
-        field_of((Ty::new() : Ty[Content]), id=6, name="body", kind=Required, positional=true, required=true),
+          field_of(
+            (Ty::new() : Ty[Smart[Alignment]]),
+            id=0,
+            name="alignment",
+            kind=Settable,
+            positional=true,
+            default=() => Dyn(Alignment(alignment_start)),
+          ),
+          field_of(
+            (Ty::new() : Ty[PlacementScope]),
+            id=1,
+            name="scope",
+            kind=Settable,
+            default=place_elem_scope_default,
+          ),
+          field_of((Ty::new() : Ty[Bool]), id=2, name="float", kind=Settable, default=() => {
+            Bool(false)
+          }),
+          field_of(
+            (Ty::new() : Ty[Length]),
+            id=3,
+            name="clearance",
+            kind=Settable,
+            default=() => Length(Length::from_em(Em::new(1.5))),
+          ),
+          field_of(
+            (Ty::new() : Ty[Rel[Length]]),
+            id=4,
+            name="dx",
+            kind=Settable,
+            default=() => Relative(Rel::zero()),
+          ),
+          field_of(
+            (Ty::new() : Ty[Rel[Length]]),
+            id=5,
+            name="dy",
+            kind=Settable,
+            default=() => Relative(Rel::zero()),
+          ),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=6,
+            name="body",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
         ],
       )
       place_elem_cell.val = Some(e)
@@ -1141,9 +1898,7 @@ pub fn flush_elem() -> Element {
         docs="Asks the layout algorithm to place pending floating elements before continuing with the content.",
         keywords=[],
         capabilities=[],
-        fields=[
-
-        ],
+        fields=[],
       )
       flush_elem_cell.val = Some(e)
       e
@@ -1167,9 +1922,24 @@ pub fn repeat_elem() -> Element {
         keywords=[],
         capabilities=["Tagged"],
         fields=[
-        field_of((Ty::new() : Ty[Content]), id=0, name="body", kind=Required, positional=true, required=true),
-        field_of((Ty::new() : Ty[Length]), id=1, name="gap", kind=Settable, default=() => Length(Length::zero())),
-        field_of((Ty::new() : Ty[Bool]), id=2, name="justify", kind=Settable, default=() => Bool(true)),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=0,
+            name="body",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
+          field_of((Ty::new() : Ty[Length]), id=1, name="gap", kind=Settable, default=() => {
+            Length(Length::zero())
+          }),
+          field_of(
+            (Ty::new() : Ty[Bool]),
+            id=2,
+            name="justify",
+            kind=Settable,
+            default=() => Bool(true),
+          ),
         ],
       )
       repeat_elem_cell.val = Some(e)
@@ -1203,8 +1973,17 @@ pub fn h_elem() -> Element {
         keywords=[],
         capabilities=[],
         fields=[
-        field_of((Ty::new() : Ty[Spacing]), id=0, name="amount", kind=Required, positional=true, required=true),
-        field_of((Ty::new() : Ty[Bool]), id=1, name="weak", kind=Settable, default=() => Bool(false)),
+          field_of(
+            (Ty::new() : Ty[Spacing]),
+            id=0,
+            name="amount",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
+          field_of((Ty::new() : Ty[Bool]), id=1, name="weak", kind=Settable, default=() => {
+            Bool(false)
+          }),
         ],
       )
       h_elem_cell.val = Some(e)
@@ -1235,9 +2014,26 @@ pub fn v_elem() -> Element {
         keywords=[],
         capabilities=[],
         fields=[
-        field_of((Ty::new() : Ty[Spacing]), id=0, name="amount", kind=Required, positional=true, required=true),
-        field_of((Ty::new() : Ty[Bool]), id=1, name="weak", kind=Settable, default=() => Bool(false)),
-        field_of((Ty::new() : Ty[Bool]), id=2, name="attach", kind=Settable, internal=true, default=() => Bool(false), parse=v_elem_attach_parse),
+          field_of(
+            (Ty::new() : Ty[Spacing]),
+            id=0,
+            name="amount",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
+          field_of((Ty::new() : Ty[Bool]), id=1, name="weak", kind=Settable, default=() => {
+            Bool(false)
+          }),
+          field_of(
+            (Ty::new() : Ty[Bool]),
+            id=2,
+            name="attach",
+            kind=Settable,
+            internal=true,
+            default=() => Bool(false),
+            parse=v_elem_attach_parse,
+          ),
         ],
       )
       v_elem_cell.val = Some(e)
@@ -1271,9 +2067,25 @@ pub fn stack_elem() -> Element {
         keywords=[],
         capabilities=[],
         fields=[
-        field_of((Ty::new() : Ty[Dir]), id=0, name="dir", kind=Settable, default=() => Dyn(Dir(Dir::TTB))),
-        field_of((Ty::new() : Ty[Spacing?]), id=1, name="spacing", kind=Settable, default=() => None),
-        field_of((Ty::new() : Ty[StackChild]), id=2, name="children", kind=Required, positional=true, required=true, variadic=true),
+          field_of((Ty::new() : Ty[Dir]), id=0, name="dir", kind=Settable, default=() => {
+            Dyn(Dir(Dir::TTB))
+          }),
+          field_of(
+            (Ty::new() : Ty[Spacing?]),
+            id=1,
+            name="spacing",
+            kind=Settable,
+            default=() => None,
+          ),
+          field_of(
+            (Ty::new() : Ty[StackChild]),
+            id=2,
+            name="children",
+            kind=Required,
+            positional=true,
+            required=true,
+            variadic=true,
+          ),
         ],
       )
       stack_elem_cell.val = Some(e)
@@ -1307,9 +2119,28 @@ pub fn move_elem() -> Element {
         keywords=[],
         capabilities=[],
         fields=[
-        field_of((Ty::new() : Ty[Rel[Length]]), id=0, name="dx", kind=Settable, default=() => Relative(Rel::zero())),
-        field_of((Ty::new() : Ty[Rel[Length]]), id=1, name="dy", kind=Settable, default=() => Relative(Rel::zero())),
-        field_of((Ty::new() : Ty[Content]), id=2, name="body", kind=Required, positional=true, required=true),
+          field_of(
+            (Ty::new() : Ty[Rel[Length]]),
+            id=0,
+            name="dx",
+            kind=Settable,
+            default=() => Relative(Rel::zero()),
+          ),
+          field_of(
+            (Ty::new() : Ty[Rel[Length]]),
+            id=1,
+            name="dy",
+            kind=Settable,
+            default=() => Relative(Rel::zero()),
+          ),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=2,
+            name="body",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
         ],
       )
       move_elem_cell.val = Some(e)
@@ -1343,10 +2174,39 @@ pub fn rotate_elem() -> Element {
         keywords=[],
         capabilities=[],
         fields=[
-        field_of((Ty::new() : Ty[Angle]), id=0, name="angle", kind=Settable, positional=true, default=() => Angle(Angle::zero())),
-        field_of((Ty::new() : Ty[Alignment]), id=1, name="origin", kind=Settable, default=() => Dyn(Alignment(Alignment::Both(HAlignment::Center, VAlignment::Horizon))), fold=fold_of((Ty::new() : Ty[Alignment]))),
-        field_of((Ty::new() : Ty[Bool]), id=2, name="reflow", kind=Settable, default=() => Bool(false)),
-        field_of((Ty::new() : Ty[Content]), id=3, name="body", kind=Required, positional=true, required=true),
+          field_of(
+            (Ty::new() : Ty[Angle]),
+            id=0,
+            name="angle",
+            kind=Settable,
+            positional=true,
+            default=() => Angle(Angle::zero()),
+          ),
+          field_of(
+            (Ty::new() : Ty[Alignment]),
+            id=1,
+            name="origin",
+            kind=Settable,
+            default=() => {
+              Dyn(
+                Alignment(
+                  Alignment::Both(HAlignment::Center, VAlignment::Horizon),
+                ),
+              )
+            },
+            fold=fold_of((Ty::new() : Ty[Alignment])),
+          ),
+          field_of((Ty::new() : Ty[Bool]), id=2, name="reflow", kind=Settable, default=() => {
+            Bool(false)
+          }),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=3,
+            name="body",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
         ],
       )
       rotate_elem_cell.val = Some(e)
@@ -1383,12 +2243,55 @@ pub fn scale_elem() -> Element {
         keywords=[],
         capabilities=[],
         fields=[
-        field_of((Ty::new() : Ty[Smart[ScaleAmount]]), id=0, name="factor", kind=External, positional=true, default=scale_elem_factor_default),
-        field_of((Ty::new() : Ty[Smart[ScaleAmount]]), id=1, name="x", kind=Settable, default=scale_elem_x_default, parse=scale_elem_x_parse),
-        field_of((Ty::new() : Ty[Smart[ScaleAmount]]), id=2, name="y", kind=Settable, default=scale_elem_y_default, parse=scale_elem_y_parse),
-        field_of((Ty::new() : Ty[Alignment]), id=3, name="origin", kind=Settable, default=() => Dyn(Alignment(Alignment::Both(HAlignment::Center, VAlignment::Horizon))), fold=fold_of((Ty::new() : Ty[Alignment]))),
-        field_of((Ty::new() : Ty[Bool]), id=4, name="reflow", kind=Settable, default=() => Bool(false)),
-        field_of((Ty::new() : Ty[Content]), id=5, name="body", kind=Required, positional=true, required=true),
+          field_of(
+            (Ty::new() : Ty[Smart[ScaleAmount]]),
+            id=0,
+            name="factor",
+            kind=External,
+            positional=true,
+            default=scale_elem_factor_default,
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[ScaleAmount]]),
+            id=1,
+            name="x",
+            kind=Settable,
+            default=scale_elem_x_default,
+            parse=scale_elem_x_parse,
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[ScaleAmount]]),
+            id=2,
+            name="y",
+            kind=Settable,
+            default=scale_elem_y_default,
+            parse=scale_elem_y_parse,
+          ),
+          field_of(
+            (Ty::new() : Ty[Alignment]),
+            id=3,
+            name="origin",
+            kind=Settable,
+            default=() => {
+              Dyn(
+                Alignment(
+                  Alignment::Both(HAlignment::Center, VAlignment::Horizon),
+                ),
+              )
+            },
+            fold=fold_of((Ty::new() : Ty[Alignment])),
+          ),
+          field_of((Ty::new() : Ty[Bool]), id=4, name="reflow", kind=Settable, default=() => {
+            Bool(false)
+          }),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=5,
+            name="body",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
         ],
       )
       scale_elem_cell.val = Some(e)
@@ -1431,11 +2334,37 @@ pub fn skew_elem() -> Element {
         keywords=[],
         capabilities=[],
         fields=[
-        field_of((Ty::new() : Ty[Angle]), id=0, name="ax", kind=Settable, default=() => Angle(Angle::zero())),
-        field_of((Ty::new() : Ty[Angle]), id=1, name="ay", kind=Settable, default=() => Angle(Angle::zero())),
-        field_of((Ty::new() : Ty[Alignment]), id=2, name="origin", kind=Settable, default=() => Dyn(Alignment(Alignment::Both(HAlignment::Center, VAlignment::Horizon))), fold=fold_of((Ty::new() : Ty[Alignment]))),
-        field_of((Ty::new() : Ty[Bool]), id=3, name="reflow", kind=Settable, default=() => Bool(false)),
-        field_of((Ty::new() : Ty[Content]), id=4, name="body", kind=Required, positional=true, required=true),
+          field_of((Ty::new() : Ty[Angle]), id=0, name="ax", kind=Settable, default=() => {
+            Angle(Angle::zero())
+          }),
+          field_of((Ty::new() : Ty[Angle]), id=1, name="ay", kind=Settable, default=() => {
+            Angle(Angle::zero())
+          }),
+          field_of(
+            (Ty::new() : Ty[Alignment]),
+            id=2,
+            name="origin",
+            kind=Settable,
+            default=() => {
+              Dyn(
+                Alignment(
+                  Alignment::Both(HAlignment::Center, VAlignment::Horizon),
+                ),
+              )
+            },
+            fold=fold_of((Ty::new() : Ty[Alignment])),
+          ),
+          field_of((Ty::new() : Ty[Bool]), id=3, name="reflow", kind=Settable, default=() => {
+            Bool(false)
+          }),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=4,
+            name="body",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
         ],
       )
       skew_elem_cell.val = Some(e)
@@ -1475,10 +2404,36 @@ pub fn accent_elem() -> Element {
         keywords=[],
         capabilities=["Mathy"],
         fields=[
-        field_of((Ty::new() : Ty[Content]), id=0, name="base", kind=Required, positional=true, required=true),
-        field_of((Ty::new() : Ty[Accent]), id=1, name="accent", kind=Required, positional=true, required=true),
-        field_of((Ty::new() : Ty[Rel[Length]]), id=2, name="size", kind=Settable, default=() => Relative(Rel::one())),
-        field_of((Ty::new() : Ty[Bool]), id=3, name="dotless", kind=Settable, default=() => Bool(true)),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=0,
+            name="base",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
+          field_of(
+            (Ty::new() : Ty[Accent]),
+            id=1,
+            name="accent",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
+          field_of(
+            (Ty::new() : Ty[Rel[Length]]),
+            id=2,
+            name="size",
+            kind=Settable,
+            default=() => Relative(Rel::one()),
+          ),
+          field_of(
+            (Ty::new() : Ty[Bool]),
+            id=3,
+            name="dotless",
+            kind=Settable,
+            default=() => Bool(true),
+          ),
         ],
       )
       accent_elem_cell.val = Some(e)
@@ -1515,13 +2470,32 @@ pub fn math_attach_elem() -> Element {
         keywords=[],
         capabilities=["Mathy"],
         fields=[
-        field_of((Ty::new() : Ty[Content]), id=0, name="base", kind=Required, positional=true, required=true),
-        field_of((Ty::new() : Ty[Content?]), id=1, name="t", kind=Settable, default=() => None),
-        field_of((Ty::new() : Ty[Content?]), id=2, name="b", kind=Settable, default=() => None),
-        field_of((Ty::new() : Ty[Content?]), id=3, name="tl", kind=Settable, default=() => None),
-        field_of((Ty::new() : Ty[Content?]), id=4, name="bl", kind=Settable, default=() => None),
-        field_of((Ty::new() : Ty[Content?]), id=5, name="tr", kind=Settable, default=() => None),
-        field_of((Ty::new() : Ty[Content?]), id=6, name="br", kind=Settable, default=() => None),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=0,
+            name="base",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
+          field_of((Ty::new() : Ty[Content?]), id=1, name="t", kind=Settable, default=() => {
+            None
+          }),
+          field_of((Ty::new() : Ty[Content?]), id=2, name="b", kind=Settable, default=() => {
+            None
+          }),
+          field_of((Ty::new() : Ty[Content?]), id=3, name="tl", kind=Settable, default=() => {
+            None
+          }),
+          field_of((Ty::new() : Ty[Content?]), id=4, name="bl", kind=Settable, default=() => {
+            None
+          }),
+          field_of((Ty::new() : Ty[Content?]), id=5, name="tr", kind=Settable, default=() => {
+            None
+          }),
+          field_of((Ty::new() : Ty[Content?]), id=6, name="br", kind=Settable, default=() => {
+            None
+          }),
         ],
       )
       math_attach_elem_cell.val = Some(e)
@@ -1567,7 +2541,14 @@ pub fn primes_elem() -> Element {
         keywords=[],
         capabilities=["Mathy"],
         fields=[
-        field_of((Ty::new() : Ty[USize]), id=0, name="count", kind=Required, positional=true, required=true),
+          field_of(
+            (Ty::new() : Ty[USize]),
+            id=0,
+            name="count",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
         ],
       )
       primes_elem_cell.val = Some(e)
@@ -1595,7 +2576,14 @@ pub fn scripts_elem() -> Element {
         keywords=[],
         capabilities=["Mathy"],
         fields=[
-        field_of((Ty::new() : Ty[Content]), id=0, name="body", kind=Required, positional=true, required=true),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=0,
+            name="body",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
         ],
       )
       scripts_elem_cell.val = Some(e)
@@ -1623,8 +2611,17 @@ pub fn limits_elem() -> Element {
         keywords=[],
         capabilities=["Mathy"],
         fields=[
-        field_of((Ty::new() : Ty[Content]), id=0, name="body", kind=Required, positional=true, required=true),
-        field_of((Ty::new() : Ty[Bool]), id=1, name="inline", kind=Settable, default=() => Bool(true)),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=0,
+            name="body",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
+          field_of((Ty::new() : Ty[Bool]), id=1, name="inline", kind=Settable, default=() => {
+            Bool(true)
+          }),
         ],
       )
       limits_elem_cell.val = Some(e)
@@ -1655,8 +2652,21 @@ pub fn stretch_elem() -> Element {
         keywords=[],
         capabilities=["Mathy"],
         fields=[
-        field_of((Ty::new() : Ty[Content]), id=0, name="body", kind=Required, positional=true, required=true),
-        field_of((Ty::new() : Ty[Rel[Length]]), id=1, name="size", kind=Settable, default=() => Relative(Rel::one())),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=0,
+            name="body",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
+          field_of(
+            (Ty::new() : Ty[Rel[Length]]),
+            id=1,
+            name="size",
+            kind=Settable,
+            default=() => Relative(Rel::one()),
+          ),
         ],
       )
       stretch_elem_cell.val = Some(e)
@@ -1687,13 +2697,53 @@ pub fn cancel_elem() -> Element {
         keywords=[],
         capabilities=["Mathy"],
         fields=[
-        field_of((Ty::new() : Ty[Content]), id=0, name="body", kind=Required, positional=true, required=true),
-        field_of((Ty::new() : Ty[Rel[Length]]), id=1, name="length", kind=Settable, default=cancel_elem_length_default),
-        field_of((Ty::new() : Ty[Bool]), id=2, name="inverted", kind=Settable, default=() => Bool(false)),
-        field_of((Ty::new() : Ty[Bool]), id=3, name="cross", kind=Settable, default=() => Bool(false)),
-        field_of((Ty::new() : Ty[Smart[CancelAngle]]), id=4, name="angle", kind=Settable, default=() => Auto),
-        field_of((Ty::new() : Ty[Stroke]), id=5, name="stroke", kind=Settable, default=cancel_elem_stroke_default, fold=fold_of((Ty::new() : Ty[Stroke]))),
-        field_of((Ty::new() : Ty[Bool]), id=6, name="background", kind=Settable, default=() => Bool(false)),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=0,
+            name="body",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
+          field_of(
+            (Ty::new() : Ty[Rel[Length]]),
+            id=1,
+            name="length",
+            kind=Settable,
+            default=cancel_elem_length_default,
+          ),
+          field_of(
+            (Ty::new() : Ty[Bool]),
+            id=2,
+            name="inverted",
+            kind=Settable,
+            default=() => Bool(false),
+          ),
+          field_of((Ty::new() : Ty[Bool]), id=3, name="cross", kind=Settable, default=() => {
+            Bool(false)
+          }),
+          field_of(
+            (Ty::new() : Ty[Smart[CancelAngle]]),
+            id=4,
+            name="angle",
+            kind=Settable,
+            default=() => Auto,
+          ),
+          field_of(
+            (Ty::new() : Ty[Stroke]),
+            id=5,
+            name="stroke",
+            kind=Settable,
+            default=cancel_elem_stroke_default,
+            fold=fold_of((Ty::new() : Ty[Stroke])),
+          ),
+          field_of(
+            (Ty::new() : Ty[Bool]),
+            id=6,
+            name="background",
+            kind=Settable,
+            default=() => Bool(false),
+          ),
         ],
       )
       cancel_elem_cell.val = Some(e)
@@ -1737,27 +2787,113 @@ pub fn equation_elem() -> Element {
         title="Equation",
         docs="A mathematical equation.",
         keywords=[],
-        capabilities=["Locatable", "Tagged", "Synthesize", "ShowSet", "Count", "LocalName", "Refable", "Outlinable"],
+        capabilities=[
+          "Locatable", "Tagged", "Synthesize", "ShowSet", "Count", "LocalName", "Refable",
+          "Outlinable",
+        ],
         fields=[
-        field_of((Ty::new() : Ty[Bool]), id=0, name="block", kind=Settable, default=() => Bool(false)),
-        field_of((Ty::new() : Ty[Numbering?]), id=1, name="numbering", kind=Settable, default=() => None),
-        field_of((Ty::new() : Ty[SpecificAlignment[OuterHAlignment, VAlignment]]), id=2, name="number-align", kind=Settable, default=() => Dyn(Alignment(Alignment::Both(HAlignment::End, VAlignment::Horizon)))),
-        field_of((Ty::new() : Ty[Smart[Supplement?]]), id=3, name="supplement", kind=Settable, default=() => Auto),
-        field_of((Ty::new() : Ty[String?]), id=4, name="alt", kind=Settable, default=() => None),
-        field_of((Ty::new() : Ty[Content]), id=5, name="body", kind=Required, positional=true, required=true),
-        field_of((Ty::new() : Ty[MathSize]), id=6, name="size", kind=Ghost, internal=true, default=equation_elem_size_default),
-        field_of((Ty::new() : Ty[MathVariant?]), id=7, name="variant", kind=Ghost, internal=true, default=() => None),
-        field_of((Ty::new() : Ty[Bool]), id=8, name="cramped", kind=Ghost, internal=true, default=() => Bool(false)),
-        field_of((Ty::new() : Ty[Bool]), id=9, name="bold", kind=Ghost, internal=true, default=() => Bool(false)),
-        field_of((Ty::new() : Ty[Bool?]), id=10, name="italic", kind=Ghost, internal=true, default=() => None),
-        field_of((Ty::new() : Ty[(I16, I16)]), id=11, name="script-scale", kind=Ghost, internal=true, default=equation_elem_script_scale_default),
-        field_of((Ty::new() : Ty[Locale]), id=12, name="locale", kind=Synthesized, internal=true),
+          field_of((Ty::new() : Ty[Bool]), id=0, name="block", kind=Settable, default=() => {
+            Bool(false)
+          }),
+          field_of(
+            (Ty::new() : Ty[Numbering?]),
+            id=1,
+            name="numbering",
+            kind=Settable,
+            default=() => None,
+          ),
+          field_of(
+            (Ty::new() : Ty[SpecificAlignment[OuterHAlignment, VAlignment]]),
+            id=2,
+            name="number-align",
+            kind=Settable,
+            default=() => {
+              Dyn(
+                Alignment(Alignment::Both(HAlignment::End, VAlignment::Horizon)),
+              )
+            },
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[Supplement?]]),
+            id=3,
+            name="supplement",
+            kind=Settable,
+            default=() => Auto,
+          ),
+          field_of((Ty::new() : Ty[String?]), id=4, name="alt", kind=Settable, default=() => {
+            None
+          }),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=5,
+            name="body",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
+          field_of(
+            (Ty::new() : Ty[MathSize]),
+            id=6,
+            name="size",
+            kind=Ghost,
+            internal=true,
+            default=equation_elem_size_default,
+          ),
+          field_of(
+            (Ty::new() : Ty[MathVariant?]),
+            id=7,
+            name="variant",
+            kind=Ghost,
+            internal=true,
+            default=() => None,
+          ),
+          field_of(
+            (Ty::new() : Ty[Bool]),
+            id=8,
+            name="cramped",
+            kind=Ghost,
+            internal=true,
+            default=() => Bool(false),
+          ),
+          field_of(
+            (Ty::new() : Ty[Bool]),
+            id=9,
+            name="bold",
+            kind=Ghost,
+            internal=true,
+            default=() => Bool(false),
+          ),
+          field_of(
+            (Ty::new() : Ty[Bool?]),
+            id=10,
+            name="italic",
+            kind=Ghost,
+            internal=true,
+            default=() => None,
+          ),
+          field_of(
+            (Ty::new() : Ty[(I16, I16)]),
+            id=11,
+            name="script-scale",
+            kind=Ghost,
+            internal=true,
+            default=equation_elem_script_scale_default,
+          ),
+          field_of(
+            (Ty::new() : Ty[Locale]),
+            id=12,
+            name="locale",
+            kind=Synthesized,
+            internal=true,
+          ),
         ],
       )
       equation_elem_cell.val = Some(e)
       e.hooks().synthesize = Some(equation_elem_synthesize)
       e.hooks().show_set = Some(equation_elem_show_set)
-      e.hooks().local_name = Some((lang, region) => localized_str(lang, region, equation_elem_local_name_key()))
+      e.hooks().local_name = Some((lang, region) => {
+        localized_str(lang, region, equation_elem_local_name_key())
+      })
       e
     }
   }
@@ -1818,11 +2954,47 @@ pub fn frac_elem() -> Element {
         keywords=[],
         capabilities=["Mathy"],
         fields=[
-        field_of((Ty::new() : Ty[Content]), id=0, name="num", kind=Required, positional=true, required=true),
-        field_of((Ty::new() : Ty[Content]), id=1, name="denom", kind=Required, positional=true, required=true),
-        field_of((Ty::new() : Ty[FracStyle]), id=2, name="style", kind=Settable, default=frac_elem_style_default),
-        field_of((Ty::new() : Ty[Bool]), id=3, name="num-deparenthesized", kind=Settable, internal=true, default=() => Bool(false), parse=frac_elem_num_deparenthesized_parse),
-        field_of((Ty::new() : Ty[Bool]), id=4, name="denom-deparenthesized", kind=Settable, internal=true, default=() => Bool(false), parse=frac_elem_denom_deparenthesized_parse),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=0,
+            name="num",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=1,
+            name="denom",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
+          field_of(
+            (Ty::new() : Ty[FracStyle]),
+            id=2,
+            name="style",
+            kind=Settable,
+            default=frac_elem_style_default,
+          ),
+          field_of(
+            (Ty::new() : Ty[Bool]),
+            id=3,
+            name="num-deparenthesized",
+            kind=Settable,
+            internal=true,
+            default=() => Bool(false),
+            parse=frac_elem_num_deparenthesized_parse,
+          ),
+          field_of(
+            (Ty::new() : Ty[Bool]),
+            id=4,
+            name="denom-deparenthesized",
+            kind=Settable,
+            internal=true,
+            default=() => Bool(false),
+            parse=frac_elem_denom_deparenthesized_parse,
+          ),
         ],
       )
       frac_elem_cell.val = Some(e)
@@ -1862,8 +3034,24 @@ pub fn binom_elem() -> Element {
         keywords=[],
         capabilities=["Mathy"],
         fields=[
-        field_of((Ty::new() : Ty[Content]), id=0, name="upper", kind=Required, positional=true, required=true),
-        field_of((Ty::new() : Ty[Content]), id=1, name="lower", kind=Required, positional=true, required=true, variadic=true, parse=binom_elem_lower_parse),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=0,
+            name="upper",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=1,
+            name="lower",
+            kind=Required,
+            positional=true,
+            required=true,
+            variadic=true,
+            parse=binom_elem_lower_parse,
+          ),
         ],
       )
       binom_elem_cell.val = Some(e)
@@ -1894,8 +3082,22 @@ pub fn lr_elem() -> Element {
         keywords=[],
         capabilities=["Mathy"],
         fields=[
-        field_of((Ty::new() : Ty[Rel[Length]]), id=0, name="size", kind=Settable, default=() => Relative(Rel::one())),
-        field_of((Ty::new() : Ty[Content]), id=1, name="body", kind=Required, positional=true, required=true, parse=lr_elem_body_parse),
+          field_of(
+            (Ty::new() : Ty[Rel[Length]]),
+            id=0,
+            name="size",
+            kind=Settable,
+            default=() => Relative(Rel::one()),
+          ),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=1,
+            name="body",
+            kind=Required,
+            positional=true,
+            required=true,
+            parse=lr_elem_body_parse,
+          ),
         ],
       )
       lr_elem_cell.val = Some(e)
@@ -1926,7 +3128,14 @@ pub fn mid_elem() -> Element {
         keywords=[],
         capabilities=["Mathy"],
         fields=[
-        field_of((Ty::new() : Ty[Content]), id=0, name="body", kind=Required, positional=true, required=true),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=0,
+            name="body",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
         ],
       )
       mid_elem_cell.val = Some(e)
@@ -1954,10 +3163,36 @@ pub fn vec_elem() -> Element {
         keywords=[],
         capabilities=["Mathy"],
         fields=[
-        field_of((Ty::new() : Ty[DelimiterPair]), id=0, name="delim", kind=Settable, default=vec_elem_delim_default),
-        field_of((Ty::new() : Ty[HAlignment]), id=1, name="align", kind=Settable, default=() => Dyn(Alignment(Alignment::H(HAlignment::Center)))),
-        field_of((Ty::new() : Ty[Rel[Length]]), id=2, name="gap", kind=Settable, default=vec_elem_gap_default),
-        field_of((Ty::new() : Ty[Content]), id=3, name="children", kind=Required, positional=true, required=true, variadic=true),
+          field_of(
+            (Ty::new() : Ty[DelimiterPair]),
+            id=0,
+            name="delim",
+            kind=Settable,
+            default=vec_elem_delim_default,
+          ),
+          field_of(
+            (Ty::new() : Ty[HAlignment]),
+            id=1,
+            name="align",
+            kind=Settable,
+            default=() => Dyn(Alignment(Alignment::H(HAlignment::Center))),
+          ),
+          field_of(
+            (Ty::new() : Ty[Rel[Length]]),
+            id=2,
+            name="gap",
+            kind=Settable,
+            default=vec_elem_gap_default,
+          ),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=3,
+            name="children",
+            kind=Required,
+            positional=true,
+            required=true,
+            variadic=true,
+          ),
         ],
       )
       vec_elem_cell.val = Some(e)
@@ -1994,13 +3229,61 @@ pub fn mat_elem() -> Element {
         keywords=[],
         capabilities=["Mathy"],
         fields=[
-        field_of((Ty::new() : Ty[DelimiterPair]), id=0, name="delim", kind=Settable, default=mat_elem_delim_default),
-        field_of((Ty::new() : Ty[HAlignment]), id=1, name="align", kind=Settable, default=() => Dyn(Alignment(Alignment::H(HAlignment::Center)))),
-        field_of((Ty::new() : Ty[Augment?]), id=2, name="augment", kind=Settable, default=() => None, fold=fold_of((Ty::new() : Ty[Augment?]))),
-        field_of((Ty::new() : Ty[Rel[Length]]), id=3, name="gap", kind=External, default=() => Relative(Rel::zero())),
-        field_of((Ty::new() : Ty[Rel[Length]]), id=4, name="row-gap", kind=Settable, default=mat_elem_row_gap_default, parse=mat_elem_row_gap_parse),
-        field_of((Ty::new() : Ty[Rel[Length]]), id=5, name="column-gap", kind=Settable, default=mat_elem_column_gap_default, parse=mat_elem_column_gap_parse),
-        field_of((Ty::new() : Ty[Array[Content]]), id=6, name="rows", kind=Required, positional=true, required=true, variadic=true, parse=mat_elem_rows_parse),
+          field_of(
+            (Ty::new() : Ty[DelimiterPair]),
+            id=0,
+            name="delim",
+            kind=Settable,
+            default=mat_elem_delim_default,
+          ),
+          field_of(
+            (Ty::new() : Ty[HAlignment]),
+            id=1,
+            name="align",
+            kind=Settable,
+            default=() => Dyn(Alignment(Alignment::H(HAlignment::Center))),
+          ),
+          field_of(
+            (Ty::new() : Ty[Augment?]),
+            id=2,
+            name="augment",
+            kind=Settable,
+            default=() => None,
+            fold=fold_of((Ty::new() : Ty[Augment?])),
+          ),
+          field_of(
+            (Ty::new() : Ty[Rel[Length]]),
+            id=3,
+            name="gap",
+            kind=External,
+            default=() => Relative(Rel::zero()),
+          ),
+          field_of(
+            (Ty::new() : Ty[Rel[Length]]),
+            id=4,
+            name="row-gap",
+            kind=Settable,
+            default=mat_elem_row_gap_default,
+            parse=mat_elem_row_gap_parse,
+          ),
+          field_of(
+            (Ty::new() : Ty[Rel[Length]]),
+            id=5,
+            name="column-gap",
+            kind=Settable,
+            default=mat_elem_column_gap_default,
+            parse=mat_elem_column_gap_parse,
+          ),
+          field_of(
+            (Ty::new() : Ty[Array[Content]]),
+            id=6,
+            name="rows",
+            kind=Required,
+            positional=true,
+            required=true,
+            variadic=true,
+            parse=mat_elem_rows_parse,
+          ),
         ],
       )
       mat_elem_cell.val = Some(e)
@@ -2046,10 +3329,36 @@ pub fn cases_elem() -> Element {
         keywords=[],
         capabilities=["Mathy"],
         fields=[
-        field_of((Ty::new() : Ty[DelimiterPair]), id=0, name="delim", kind=Settable, default=cases_elem_delim_default),
-        field_of((Ty::new() : Ty[Bool]), id=1, name="reverse", kind=Settable, default=() => Bool(false)),
-        field_of((Ty::new() : Ty[Rel[Length]]), id=2, name="gap", kind=Settable, default=cases_elem_gap_default),
-        field_of((Ty::new() : Ty[Content]), id=3, name="children", kind=Required, positional=true, required=true, variadic=true),
+          field_of(
+            (Ty::new() : Ty[DelimiterPair]),
+            id=0,
+            name="delim",
+            kind=Settable,
+            default=cases_elem_delim_default,
+          ),
+          field_of(
+            (Ty::new() : Ty[Bool]),
+            id=1,
+            name="reverse",
+            kind=Settable,
+            default=() => Bool(false),
+          ),
+          field_of(
+            (Ty::new() : Ty[Rel[Length]]),
+            id=2,
+            name="gap",
+            kind=Settable,
+            default=cases_elem_gap_default,
+          ),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=3,
+            name="children",
+            kind=Required,
+            positional=true,
+            required=true,
+            variadic=true,
+          ),
         ],
       )
       cases_elem_cell.val = Some(e)
@@ -2085,9 +3394,7 @@ pub fn align_point_elem() -> Element {
         docs="A math alignment point: `&`, `&&`.",
         keywords=[],
         capabilities=["Mathy"],
-        fields=[
-
-        ],
+        fields=[],
       )
       align_point_elem_cell.val = Some(e)
       e
@@ -2111,8 +3418,22 @@ pub fn class_elem() -> Element {
         keywords=[],
         capabilities=["Mathy"],
         fields=[
-        field_of((Ty::new() : Ty[@unicode.MathClass]), id=0, name="class", kind=Required, positional=true, required=true),
-        field_of((Ty::new() : Ty[Content]), id=1, name="body", kind=Required, positional=true, required=true),
+          field_of(
+            (Ty::new() : Ty[@unicode.MathClass]),
+            id=0,
+            name="class",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=1,
+            name="body",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
         ],
       )
       class_elem_cell.val = Some(e)
@@ -2143,8 +3464,17 @@ pub fn op_elem() -> Element {
         keywords=[],
         capabilities=["Mathy"],
         fields=[
-        field_of((Ty::new() : Ty[Content]), id=0, name="text", kind=Required, positional=true, required=true),
-        field_of((Ty::new() : Ty[Bool]), id=1, name="limits", kind=Settable, default=() => Bool(false)),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=0,
+            name="text",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
+          field_of((Ty::new() : Ty[Bool]), id=1, name="limits", kind=Settable, default=() => {
+            Bool(false)
+          }),
         ],
       )
       op_elem_cell.val = Some(e)
@@ -2175,8 +3505,22 @@ pub fn root_elem() -> Element {
         keywords=[],
         capabilities=["Mathy"],
         fields=[
-        field_of((Ty::new() : Ty[Content?]), id=0, name="index", kind=Settable, positional=true, default=() => None),
-        field_of((Ty::new() : Ty[Content]), id=1, name="radicand", kind=Required, positional=true, required=true),
+          field_of(
+            (Ty::new() : Ty[Content?]),
+            id=0,
+            name="index",
+            kind=Settable,
+            positional=true,
+            default=() => None,
+          ),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=1,
+            name="radicand",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
         ],
       )
       root_elem_cell.val = Some(e)
@@ -2207,7 +3551,14 @@ pub fn math_underline_elem() -> Element {
         keywords=[],
         capabilities=["Mathy"],
         fields=[
-        field_of((Ty::new() : Ty[Content]), id=0, name="body", kind=Required, positional=true, required=true),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=0,
+            name="body",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
         ],
       )
       math_underline_elem_cell.val = Some(e)
@@ -2235,7 +3586,14 @@ pub fn math_overline_elem() -> Element {
         keywords=[],
         capabilities=["Mathy"],
         fields=[
-        field_of((Ty::new() : Ty[Content]), id=0, name="body", kind=Required, positional=true, required=true),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=0,
+            name="body",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
         ],
       )
       math_overline_elem_cell.val = Some(e)
@@ -2263,8 +3621,22 @@ pub fn underbrace_elem() -> Element {
         keywords=[],
         capabilities=["Mathy"],
         fields=[
-        field_of((Ty::new() : Ty[Content]), id=0, name="body", kind=Required, positional=true, required=true),
-        field_of((Ty::new() : Ty[Content?]), id=1, name="annotation", kind=Settable, positional=true, default=() => None),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=0,
+            name="body",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
+          field_of(
+            (Ty::new() : Ty[Content?]),
+            id=1,
+            name="annotation",
+            kind=Settable,
+            positional=true,
+            default=() => None,
+          ),
         ],
       )
       underbrace_elem_cell.val = Some(e)
@@ -2295,8 +3667,22 @@ pub fn overbrace_elem() -> Element {
         keywords=[],
         capabilities=["Mathy"],
         fields=[
-        field_of((Ty::new() : Ty[Content]), id=0, name="body", kind=Required, positional=true, required=true),
-        field_of((Ty::new() : Ty[Content?]), id=1, name="annotation", kind=Settable, positional=true, default=() => None),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=0,
+            name="body",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
+          field_of(
+            (Ty::new() : Ty[Content?]),
+            id=1,
+            name="annotation",
+            kind=Settable,
+            positional=true,
+            default=() => None,
+          ),
         ],
       )
       overbrace_elem_cell.val = Some(e)
@@ -2327,8 +3713,22 @@ pub fn underbracket_elem() -> Element {
         keywords=[],
         capabilities=["Mathy"],
         fields=[
-        field_of((Ty::new() : Ty[Content]), id=0, name="body", kind=Required, positional=true, required=true),
-        field_of((Ty::new() : Ty[Content?]), id=1, name="annotation", kind=Settable, positional=true, default=() => None),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=0,
+            name="body",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
+          field_of(
+            (Ty::new() : Ty[Content?]),
+            id=1,
+            name="annotation",
+            kind=Settable,
+            positional=true,
+            default=() => None,
+          ),
         ],
       )
       underbracket_elem_cell.val = Some(e)
@@ -2359,8 +3759,22 @@ pub fn overbracket_elem() -> Element {
         keywords=[],
         capabilities=["Mathy"],
         fields=[
-        field_of((Ty::new() : Ty[Content]), id=0, name="body", kind=Required, positional=true, required=true),
-        field_of((Ty::new() : Ty[Content?]), id=1, name="annotation", kind=Settable, positional=true, default=() => None),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=0,
+            name="body",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
+          field_of(
+            (Ty::new() : Ty[Content?]),
+            id=1,
+            name="annotation",
+            kind=Settable,
+            positional=true,
+            default=() => None,
+          ),
         ],
       )
       overbracket_elem_cell.val = Some(e)
@@ -2391,8 +3805,22 @@ pub fn underparen_elem() -> Element {
         keywords=[],
         capabilities=["Mathy"],
         fields=[
-        field_of((Ty::new() : Ty[Content]), id=0, name="body", kind=Required, positional=true, required=true),
-        field_of((Ty::new() : Ty[Content?]), id=1, name="annotation", kind=Settable, positional=true, default=() => None),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=0,
+            name="body",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
+          field_of(
+            (Ty::new() : Ty[Content?]),
+            id=1,
+            name="annotation",
+            kind=Settable,
+            positional=true,
+            default=() => None,
+          ),
         ],
       )
       underparen_elem_cell.val = Some(e)
@@ -2423,8 +3851,22 @@ pub fn overparen_elem() -> Element {
         keywords=[],
         capabilities=["Mathy"],
         fields=[
-        field_of((Ty::new() : Ty[Content]), id=0, name="body", kind=Required, positional=true, required=true),
-        field_of((Ty::new() : Ty[Content?]), id=1, name="annotation", kind=Settable, positional=true, default=() => None),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=0,
+            name="body",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
+          field_of(
+            (Ty::new() : Ty[Content?]),
+            id=1,
+            name="annotation",
+            kind=Settable,
+            positional=true,
+            default=() => None,
+          ),
         ],
       )
       overparen_elem_cell.val = Some(e)
@@ -2455,8 +3897,22 @@ pub fn undershell_elem() -> Element {
         keywords=[],
         capabilities=["Mathy"],
         fields=[
-        field_of((Ty::new() : Ty[Content]), id=0, name="body", kind=Required, positional=true, required=true),
-        field_of((Ty::new() : Ty[Content?]), id=1, name="annotation", kind=Settable, positional=true, default=() => None),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=0,
+            name="body",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
+          field_of(
+            (Ty::new() : Ty[Content?]),
+            id=1,
+            name="annotation",
+            kind=Settable,
+            positional=true,
+            default=() => None,
+          ),
         ],
       )
       undershell_elem_cell.val = Some(e)
@@ -2487,8 +3943,22 @@ pub fn overshell_elem() -> Element {
         keywords=[],
         capabilities=["Mathy"],
         fields=[
-        field_of((Ty::new() : Ty[Content]), id=0, name="body", kind=Required, positional=true, required=true),
-        field_of((Ty::new() : Ty[Content?]), id=1, name="annotation", kind=Settable, positional=true, default=() => None),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=0,
+            name="body",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
+          field_of(
+            (Ty::new() : Ty[Content?]),
+            id=1,
+            name="annotation",
+            kind=Settable,
+            positional=true,
+            default=() => None,
+          ),
         ],
       )
       overshell_elem_cell.val = Some(e)
@@ -2519,8 +3989,21 @@ pub fn artifact_elem() -> Element {
         keywords=[],
         capabilities=["Tagged"],
         fields=[
-        field_of((Ty::new() : Ty[ArtifactKind]), id=0, name="kind", kind=Settable, default=artifact_elem_kind_default),
-        field_of((Ty::new() : Ty[Content]), id=1, name="body", kind=Required, positional=true, required=true),
+          field_of(
+            (Ty::new() : Ty[ArtifactKind]),
+            id=0,
+            name="kind",
+            kind=Settable,
+            default=artifact_elem_kind_default,
+          ),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=1,
+            name="body",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
         ],
       )
       artifact_elem_cell.val = Some(e)
@@ -2551,8 +4034,23 @@ pub fn pdf_marker_tag_elem() -> Element {
         keywords=[],
         capabilities=["Construct", "Tagged"],
         fields=[
-        field_of((Ty::new() : Ty[Content]), id=0, name="body", kind=Required, positional=true, required=true),
-        field_of((Ty::new() : Ty[PdfMarkerTagKind]), id=1, name="kind", kind=Required, positional=true, required=true, internal=true),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=0,
+            name="body",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
+          field_of(
+            (Ty::new() : Ty[PdfMarkerTagKind]),
+            id=1,
+            name="kind",
+            kind=Required,
+            positional=true,
+            required=true,
+            internal=true,
+          ),
         ],
       )
       pdf_marker_tag_elem_cell.val = Some(e)
@@ -2583,20 +4081,69 @@ pub fn bibliography_elem() -> Element {
         keywords=[],
         capabilities=["Locatable", "Synthesize", "ShowSet", "LocalName"],
         fields=[
-        field_of((Ty::new() : Ty[OneOrMultiple[DataSource]]), id=0, name="sources", kind=Required, positional=true, required=true, parse=bibliography_elem_sources_parse),
-        field_of((Ty::new() : Ty[Smart[Content?]]), id=1, name="title", kind=Settable, default=() => Auto),
-        field_of((Ty::new() : Ty[Bool]), id=2, name="full", kind=Settable, default=() => Bool(false)),
-        field_of((Ty::new() : Ty[Value]), id=3, name="style", kind=Settable, default=bibliography_elem_style_default, parse=bibliography_elem_style_parse),
-        field_of((Ty::new() : Ty[Smart[LocatableSelector]]), id=4, name="target", kind=Settable, default=() => Auto),
-        field_of((Ty::new() : Ty[Smart[String]?]), id=5, name="group", kind=Settable, default=() => Auto),
-        field_of((Ty::new() : Ty[Lang]), id=6, name="lang", kind=Synthesized, internal=true),
-        field_of((Ty::new() : Ty[Region?]), id=7, name="region", kind=Synthesized, internal=true),
+          field_of(
+            (Ty::new() : Ty[OneOrMultiple[DataSource]]),
+            id=0,
+            name="sources",
+            kind=Required,
+            positional=true,
+            required=true,
+            parse=bibliography_elem_sources_parse,
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[Content?]]),
+            id=1,
+            name="title",
+            kind=Settable,
+            default=() => Auto,
+          ),
+          field_of((Ty::new() : Ty[Bool]), id=2, name="full", kind=Settable, default=() => {
+            Bool(false)
+          }),
+          field_of(
+            (Ty::new() : Ty[Value]),
+            id=3,
+            name="style",
+            kind=Settable,
+            default=bibliography_elem_style_default,
+            parse=bibliography_elem_style_parse,
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[LocatableSelector]]),
+            id=4,
+            name="target",
+            kind=Settable,
+            default=() => Auto,
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[String]?]),
+            id=5,
+            name="group",
+            kind=Settable,
+            default=() => Auto,
+          ),
+          field_of(
+            (Ty::new() : Ty[Lang]),
+            id=6,
+            name="lang",
+            kind=Synthesized,
+            internal=true,
+          ),
+          field_of(
+            (Ty::new() : Ty[Region?]),
+            id=7,
+            name="region",
+            kind=Synthesized,
+            internal=true,
+          ),
         ],
       )
       bibliography_elem_cell.val = Some(e)
       e.hooks().synthesize = Some(bibliography_elem_synthesize)
       e.hooks().show_set = Some(bibliography_elem_show_set)
-      e.hooks().local_name = Some((lang, region) => localized_str(lang, region, bibliography_elem_local_name_key()))
+      e.hooks().local_name = Some((lang, region) => {
+        localized_str(lang, region, bibliography_elem_local_name_key())
+      })
       e
     }
   }
@@ -2642,7 +4189,14 @@ pub fn csl_light_elem() -> Element {
         keywords=[],
         capabilities=[],
         fields=[
-        field_of((Ty::new() : Ty[Content]), id=0, name="body", kind=Required, positional=true, required=true),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=0,
+            name="body",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
         ],
       )
       csl_light_elem_cell.val = Some(e)
@@ -2670,7 +4224,14 @@ pub fn csl_indent_elem() -> Element {
         keywords=[],
         capabilities=[],
         fields=[
-        field_of((Ty::new() : Ty[Content]), id=0, name="body", kind=Required, positional=true, required=true),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=0,
+            name="body",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
         ],
       )
       csl_indent_elem_cell.val = Some(e)
@@ -2698,12 +4259,50 @@ pub fn cite_elem() -> Element {
         keywords=[],
         capabilities=["Locatable", "Synthesize"],
         fields=[
-        field_of((Ty::new() : Ty[Label]), id=0, name="key", kind=Required, positional=true, required=true),
-        field_of((Ty::new() : Ty[Content?]), id=1, name="supplement", kind=Settable, default=() => None),
-        field_of((Ty::new() : Ty[CitationForm?]), id=2, name="form", kind=Settable, default=cite_elem_form_default),
-        field_of((Ty::new() : Ty[Value]), id=3, name="style", kind=Settable, default=cite_elem_style_default, parse=cite_elem_style_parse),
-        field_of((Ty::new() : Ty[Lang]), id=4, name="lang", kind=Synthesized, internal=true),
-        field_of((Ty::new() : Ty[Region?]), id=5, name="region", kind=Synthesized, internal=true),
+          field_of(
+            (Ty::new() : Ty[Label]),
+            id=0,
+            name="key",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
+          field_of(
+            (Ty::new() : Ty[Content?]),
+            id=1,
+            name="supplement",
+            kind=Settable,
+            default=() => None,
+          ),
+          field_of(
+            (Ty::new() : Ty[CitationForm?]),
+            id=2,
+            name="form",
+            kind=Settable,
+            default=cite_elem_form_default,
+          ),
+          field_of(
+            (Ty::new() : Ty[Value]),
+            id=3,
+            name="style",
+            kind=Settable,
+            default=cite_elem_style_default,
+            parse=cite_elem_style_parse,
+          ),
+          field_of(
+            (Ty::new() : Ty[Lang]),
+            id=4,
+            name="lang",
+            kind=Synthesized,
+            internal=true,
+          ),
+          field_of(
+            (Ty::new() : Ty[Region?]),
+            id=5,
+            name="region",
+            kind=Synthesized,
+            internal=true,
+          ),
         ],
       )
       cite_elem_cell.val = Some(e)
@@ -2747,7 +4346,14 @@ pub fn cite_group_elem() -> Element {
         keywords=[],
         capabilities=["Locatable"],
         fields=[
-        field_of((Ty::new() : Ty[Array[Content]]), id=0, name="children", kind=Required, positional=true, required=true),
+          field_of(
+            (Ty::new() : Ty[Array[Content]]),
+            id=0,
+            name="children",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
         ],
       )
       cite_group_elem_cell.val = Some(e)
@@ -2774,9 +4380,7 @@ pub fn divider_elem() -> Element {
         docs="A thematic break that separates sections of content.",
         keywords=[],
         capabilities=["ShowSet"],
-        fields=[
-
-        ],
+        fields=[],
       )
       divider_elem_cell.val = Some(e)
       e.hooks().show_set = Some(divider_elem_show_set)
@@ -2801,14 +4405,64 @@ pub fn document_elem() -> Element {
         keywords=[],
         capabilities=["Locatable", "ShowSet"],
         fields=[
-        field_of((Ty::new() : Ty[BundlePath]), id=0, name="path", kind=Required, positional=true, required=true),
-        field_of((Ty::new() : Ty[Smart[DocumentFormat]]), id=1, name="format", kind=Settable, default=() => Auto),
-        field_of((Ty::new() : Ty[Content?]), id=2, name="title", kind=Settable, default=() => None),
-        field_of((Ty::new() : Ty[OneOrMultiple[String]]), id=3, name="author", kind=Settable, default=document_elem_author_default),
-        field_of((Ty::new() : Ty[Content?]), id=4, name="description", kind=Settable, default=() => None),
-        field_of((Ty::new() : Ty[OneOrMultiple[String]]), id=5, name="keywords", kind=Settable, default=document_elem_keywords_default),
-        field_of((Ty::new() : Ty[Smart[Datetime?]]), id=6, name="date", kind=Settable, default=() => Auto),
-        field_of((Ty::new() : Ty[Content]), id=7, name="body", kind=Required, positional=true, required=true),
+          field_of(
+            (Ty::new() : Ty[BundlePath]),
+            id=0,
+            name="path",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[DocumentFormat]]),
+            id=1,
+            name="format",
+            kind=Settable,
+            default=() => Auto,
+          ),
+          field_of(
+            (Ty::new() : Ty[Content?]),
+            id=2,
+            name="title",
+            kind=Settable,
+            default=() => None,
+          ),
+          field_of(
+            (Ty::new() : Ty[OneOrMultiple[String]]),
+            id=3,
+            name="author",
+            kind=Settable,
+            default=document_elem_author_default,
+          ),
+          field_of(
+            (Ty::new() : Ty[Content?]),
+            id=4,
+            name="description",
+            kind=Settable,
+            default=() => None,
+          ),
+          field_of(
+            (Ty::new() : Ty[OneOrMultiple[String]]),
+            id=5,
+            name="keywords",
+            kind=Settable,
+            default=document_elem_keywords_default,
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[Datetime?]]),
+            id=6,
+            name="date",
+            kind=Settable,
+            default=() => Auto,
+          ),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=7,
+            name="body",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
         ],
       )
       document_elem_cell.val = Some(e)
@@ -2858,7 +4512,14 @@ pub fn emph_elem() -> Element {
         keywords=["italic"],
         capabilities=["Locatable", "Tagged"],
         fields=[
-        field_of((Ty::new() : Ty[Content]), id=0, name="body", kind=Required, positional=true, required=true),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=0,
+            name="body",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
         ],
       )
       emph_elem_cell.val = Some(e)
@@ -2886,17 +4547,79 @@ pub fn enum_elem() -> Element {
         keywords=[],
         capabilities=["Locatable", "Tagged"],
         fields=[
-        field_of((Ty::new() : Ty[Bool]), id=0, name="tight", kind=Settable, default=() => Bool(true)),
-        field_of((Ty::new() : Ty[Numbering]), id=1, name="numbering", kind=Settable, default=enum_elem_numbering_default),
-        field_of((Ty::new() : Ty[Smart[U64]]), id=2, name="start", kind=Settable, default=() => Auto),
-        field_of((Ty::new() : Ty[Bool]), id=3, name="full", kind=Settable, default=() => Bool(false)),
-        field_of((Ty::new() : Ty[Bool]), id=4, name="reversed", kind=Settable, default=() => Bool(false)),
-        field_of((Ty::new() : Ty[Length]), id=5, name="indent", kind=Settable, default=() => Length(Length::zero())),
-        field_of((Ty::new() : Ty[Length]), id=6, name="body-indent", kind=Settable, default=() => Length(Length::from_em(Em::new(0.5)))),
-        field_of((Ty::new() : Ty[Smart[Length]]), id=7, name="spacing", kind=Settable, default=() => Auto),
-        field_of((Ty::new() : Ty[Alignment]), id=8, name="number-align", kind=Settable, default=enum_elem_number_align_default),
-        field_of((Ty::new() : Ty[EnumItem]), id=9, name="children", kind=Required, positional=true, required=true, variadic=true),
-        field_of((Ty::new() : Ty[Array[U64]]), id=10, name="parents", kind=Ghost, internal=true, default=() => Array(Arr::new()), fold=enum_elem_parents_fold),
+          field_of((Ty::new() : Ty[Bool]), id=0, name="tight", kind=Settable, default=() => {
+            Bool(true)
+          }),
+          field_of(
+            (Ty::new() : Ty[Numbering]),
+            id=1,
+            name="numbering",
+            kind=Settable,
+            default=enum_elem_numbering_default,
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[U64]]),
+            id=2,
+            name="start",
+            kind=Settable,
+            default=() => Auto,
+          ),
+          field_of((Ty::new() : Ty[Bool]), id=3, name="full", kind=Settable, default=() => {
+            Bool(false)
+          }),
+          field_of(
+            (Ty::new() : Ty[Bool]),
+            id=4,
+            name="reversed",
+            kind=Settable,
+            default=() => Bool(false),
+          ),
+          field_of(
+            (Ty::new() : Ty[Length]),
+            id=5,
+            name="indent",
+            kind=Settable,
+            default=() => Length(Length::zero()),
+          ),
+          field_of(
+            (Ty::new() : Ty[Length]),
+            id=6,
+            name="body-indent",
+            kind=Settable,
+            default=() => Length(Length::from_em(Em::new(0.5))),
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[Length]]),
+            id=7,
+            name="spacing",
+            kind=Settable,
+            default=() => Auto,
+          ),
+          field_of(
+            (Ty::new() : Ty[Alignment]),
+            id=8,
+            name="number-align",
+            kind=Settable,
+            default=enum_elem_number_align_default,
+          ),
+          field_of(
+            (Ty::new() : Ty[EnumItem]),
+            id=9,
+            name="children",
+            kind=Required,
+            positional=true,
+            required=true,
+            variadic=true,
+          ),
+          field_of(
+            (Ty::new() : Ty[Array[U64]]),
+            id=10,
+            name="parents",
+            kind=Ghost,
+            internal=true,
+            default=() => Array(Arr::new()),
+            fold=enum_elem_parents_fold,
+          ),
         ],
       )
       enum_elem_cell.val = Some(e)
@@ -2954,8 +4677,22 @@ pub fn enum_item_elem() -> Element {
         keywords=[],
         capabilities=["Tagged"],
         fields=[
-        field_of((Ty::new() : Ty[Smart[U64]]), id=0, name="number", kind=Settable, positional=true, default=() => Auto),
-        field_of((Ty::new() : Ty[Content]), id=1, name="body", kind=Required, positional=true, required=true),
+          field_of(
+            (Ty::new() : Ty[Smart[U64]]),
+            id=0,
+            name="number",
+            kind=Settable,
+            positional=true,
+            default=() => Auto,
+          ),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=1,
+            name="body",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
         ],
       )
       enum_item_elem_cell.val = Some(e)
@@ -2984,20 +4721,86 @@ pub fn figure_elem() -> Element {
         title="Figure",
         docs="A figure with an optional caption.",
         keywords=[],
-        capabilities=["Locatable", "Tagged", "Synthesize", "Count", "ShowSet", "Refable", "Outlinable"],
+        capabilities=[
+          "Locatable", "Tagged", "Synthesize", "Count", "ShowSet", "Refable", "Outlinable",
+        ],
         fields=[
-        field_of((Ty::new() : Ty[Content]), id=0, name="body", kind=Required, positional=true, required=true),
-        field_of((Ty::new() : Ty[String?]), id=1, name="alt", kind=Settable, default=() => None),
-        field_of((Ty::new() : Ty[Smart[VAlignment]?]), id=2, name="placement", kind=Settable, default=() => None),
-        field_of((Ty::new() : Ty[PlacementScope]), id=3, name="scope", kind=Settable, default=figure_elem_scope_default),
-        field_of((Ty::new() : Ty[FigureCaption?]), id=4, name="caption", kind=Settable, default=() => None),
-        field_of((Ty::new() : Ty[Smart[FigureKind]]), id=5, name="kind", kind=Settable, default=() => Auto),
-        field_of((Ty::new() : Ty[Smart[Supplement?]]), id=6, name="supplement", kind=Settable, default=() => Auto),
-        field_of((Ty::new() : Ty[Numbering?]), id=7, name="numbering", kind=Settable, default=figure_elem_numbering_default),
-        field_of((Ty::new() : Ty[Length]), id=8, name="gap", kind=Settable, default=() => Length(Length::from_em(Em::new(0.65)))),
-        field_of((Ty::new() : Ty[Bool]), id=9, name="outlined", kind=Settable, default=() => Bool(true)),
-        field_of((Ty::new() : Ty[Counter?]), id=10, name="counter", kind=Synthesized),
-        field_of((Ty::new() : Ty[Locale]), id=11, name="locale", kind=Synthesized, internal=true),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=0,
+            name="body",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
+          field_of((Ty::new() : Ty[String?]), id=1, name="alt", kind=Settable, default=() => {
+            None
+          }),
+          field_of(
+            (Ty::new() : Ty[Smart[VAlignment]?]),
+            id=2,
+            name="placement",
+            kind=Settable,
+            default=() => None,
+          ),
+          field_of(
+            (Ty::new() : Ty[PlacementScope]),
+            id=3,
+            name="scope",
+            kind=Settable,
+            default=figure_elem_scope_default,
+          ),
+          field_of(
+            (Ty::new() : Ty[FigureCaption?]),
+            id=4,
+            name="caption",
+            kind=Settable,
+            default=() => None,
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[FigureKind]]),
+            id=5,
+            name="kind",
+            kind=Settable,
+            default=() => Auto,
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[Supplement?]]),
+            id=6,
+            name="supplement",
+            kind=Settable,
+            default=() => Auto,
+          ),
+          field_of(
+            (Ty::new() : Ty[Numbering?]),
+            id=7,
+            name="numbering",
+            kind=Settable,
+            default=figure_elem_numbering_default,
+          ),
+          field_of((Ty::new() : Ty[Length]), id=8, name="gap", kind=Settable, default=() => {
+            Length(Length::from_em(Em::new(0.65)))
+          }),
+          field_of(
+            (Ty::new() : Ty[Bool]),
+            id=9,
+            name="outlined",
+            kind=Settable,
+            default=() => Bool(true),
+          ),
+          field_of(
+            (Ty::new() : Ty[Counter?]),
+            id=10,
+            name="counter",
+            kind=Synthesized,
+          ),
+          field_of(
+            (Ty::new() : Ty[Locale]),
+            id=11,
+            name="locale",
+            kind=Synthesized,
+            internal=true,
+          ),
         ],
       )
       figure_elem_cell.val = Some(e)
@@ -3060,14 +4863,59 @@ pub fn figure_caption_elem() -> Element {
         keywords=[],
         capabilities=["Locatable", "Tagged", "Synthesize"],
         fields=[
-        field_of((Ty::new() : Ty[OuterVAlignment]), id=0, name="position", kind=Settable, default=() => Dyn(Alignment(Alignment::V(VAlignment::Bottom)))),
-        field_of((Ty::new() : Ty[Smart[Content]]), id=1, name="separator", kind=Settable, default=() => Auto),
-        field_of((Ty::new() : Ty[Content]), id=2, name="body", kind=Required, positional=true, required=true),
-        field_of((Ty::new() : Ty[FigureKind]), id=3, name="kind", kind=Synthesized),
-        field_of((Ty::new() : Ty[Content?]), id=4, name="supplement", kind=Synthesized),
-        field_of((Ty::new() : Ty[Numbering?]), id=5, name="numbering", kind=Synthesized),
-        field_of((Ty::new() : Ty[Counter?]), id=6, name="counter", kind=Synthesized),
-        field_of((Ty::new() : Ty[Location?]), id=7, name="figure-location", kind=Synthesized, internal=true),
+          field_of(
+            (Ty::new() : Ty[OuterVAlignment]),
+            id=0,
+            name="position",
+            kind=Settable,
+            default=() => Dyn(Alignment(Alignment::V(VAlignment::Bottom))),
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[Content]]),
+            id=1,
+            name="separator",
+            kind=Settable,
+            default=() => Auto,
+          ),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=2,
+            name="body",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
+          field_of(
+            (Ty::new() : Ty[FigureKind]),
+            id=3,
+            name="kind",
+            kind=Synthesized,
+          ),
+          field_of(
+            (Ty::new() : Ty[Content?]),
+            id=4,
+            name="supplement",
+            kind=Synthesized,
+          ),
+          field_of(
+            (Ty::new() : Ty[Numbering?]),
+            id=5,
+            name="numbering",
+            kind=Synthesized,
+          ),
+          field_of(
+            (Ty::new() : Ty[Counter?]),
+            id=6,
+            name="counter",
+            kind=Synthesized,
+          ),
+          field_of(
+            (Ty::new() : Ty[Location?]),
+            id=7,
+            name="figure-location",
+            kind=Synthesized,
+            internal=true,
+          ),
         ],
       )
       figure_caption_elem_cell.val = Some(e)
@@ -3117,12 +4965,27 @@ pub fn footnote_elem() -> Element {
         keywords=[],
         capabilities=["Locatable", "Tagged", "Count"],
         fields=[
-        field_of((Ty::new() : Ty[Numbering]), id=0, name="numbering", kind=Settable, default=footnote_elem_numbering_default),
-        field_of((Ty::new() : Ty[FootnoteBody]), id=1, name="body", kind=Required, positional=true, required=true),
+          field_of(
+            (Ty::new() : Ty[Numbering]),
+            id=0,
+            name="numbering",
+            kind=Settable,
+            default=footnote_elem_numbering_default,
+          ),
+          field_of(
+            (Ty::new() : Ty[FootnoteBody]),
+            id=1,
+            name="body",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
         ],
       )
       footnote_elem_cell.val = Some(e)
-      e.hooks().local_name = Some((lang, region) => localized_str(lang, region, footnote_elem_local_name_key()))
+      e.hooks().local_name = Some((lang, region) => {
+        localized_str(lang, region, footnote_elem_local_name_key())
+      })
       e
     }
   }
@@ -3150,11 +5013,38 @@ pub fn footnote_entry_elem() -> Element {
         keywords=[],
         capabilities=["Locatable", "Tagged", "ShowSet"],
         fields=[
-        field_of((Ty::new() : Ty[FootnoteElem]), id=0, name="note", kind=Required, positional=true, required=true),
-        field_of((Ty::new() : Ty[Content]), id=1, name="separator", kind=Settable, default=footnote_entry_elem_separator_default),
-        field_of((Ty::new() : Ty[Length]), id=2, name="clearance", kind=Settable, default=() => Length(Length::from_em(Em::new(1.0)))),
-        field_of((Ty::new() : Ty[Length]), id=3, name="gap", kind=Settable, default=() => Length(Length::from_em(Em::new(0.5)))),
-        field_of((Ty::new() : Ty[Length]), id=4, name="indent", kind=Settable, default=() => Length(Length::from_em(Em::new(1.0)))),
+          field_of(
+            (Ty::new() : Ty[FootnoteElem]),
+            id=0,
+            name="note",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=1,
+            name="separator",
+            kind=Settable,
+            default=footnote_entry_elem_separator_default,
+          ),
+          field_of(
+            (Ty::new() : Ty[Length]),
+            id=2,
+            name="clearance",
+            kind=Settable,
+            default=() => Length(Length::from_em(Em::new(1.0))),
+          ),
+          field_of((Ty::new() : Ty[Length]), id=3, name="gap", kind=Settable, default=() => {
+            Length(Length::from_em(Em::new(0.5)))
+          }),
+          field_of(
+            (Ty::new() : Ty[Length]),
+            id=4,
+            name="indent",
+            kind=Settable,
+            default=() => Length(Length::from_em(Em::new(1.0))),
+          ),
         ],
       )
       footnote_entry_elem_cell.val = Some(e)
@@ -3194,9 +5084,7 @@ pub fn footnote_container_elem() -> Element {
         docs="In HTML export, this is inserted at the end of the body to display footnotes. In the future, we can expose this to allow customizing where the footnotes appear. It could also be exposed for paged export.",
         keywords=[],
         capabilities=["Locatable"],
-        fields=[
-
-        ],
+        fields=[],
       )
       footnote_container_elem_cell.val = Some(e)
       e
@@ -3219,9 +5107,7 @@ pub fn footnote_marker_elem() -> Element {
         docs="This is an empty element inserted by the HTML footnote rule to indicate the presence of the default footnote rule. It's only used by the error in `FootnoteContainer::unsupported_with_custom_dom` and could be removed if that's not needed anymore.",
         keywords=[],
         capabilities=["Locatable"],
-        fields=[
-
-        ],
+        fields=[],
       )
       footnote_marker_elem_cell.val = Some(e)
       e
@@ -3243,24 +5129,90 @@ pub fn heading_elem() -> Element {
         title="Heading",
         docs="A section heading.",
         keywords=[],
-        capabilities=["Locatable", "Tagged", "Synthesize", "Count", "ShowSet", "LocalName", "Refable", "Outlinable"],
+        capabilities=[
+          "Locatable", "Tagged", "Synthesize", "Count", "ShowSet", "LocalName", "Refable",
+          "Outlinable",
+        ],
         fields=[
-        field_of((Ty::new() : Ty[Smart[NonZeroUSize]]), id=0, name="level", kind=Settable, default=() => Auto),
-        field_of((Ty::new() : Ty[NonZeroUSize]), id=1, name="depth", kind=Settable, default=() => Int(1L)),
-        field_of((Ty::new() : Ty[USize]), id=2, name="offset", kind=Settable, default=() => Int(0L)),
-        field_of((Ty::new() : Ty[Numbering?]), id=3, name="numbering", kind=Settable, default=() => None),
-        field_of((Ty::new() : Ty[Smart[Supplement?]]), id=4, name="supplement", kind=Settable, default=() => Auto),
-        field_of((Ty::new() : Ty[Bool]), id=5, name="outlined", kind=Settable, default=() => Bool(true)),
-        field_of((Ty::new() : Ty[Smart[Bool]]), id=6, name="bookmarked", kind=Settable, default=() => Auto),
-        field_of((Ty::new() : Ty[Smart[Length]]), id=7, name="hanging-indent", kind=Settable, default=() => Auto),
-        field_of((Ty::new() : Ty[Content]), id=8, name="body", kind=Required, positional=true, required=true),
-        field_of((Ty::new() : Ty[String]), id=9, name="numbers", kind=Synthesized, internal=true),
+          field_of(
+            (Ty::new() : Ty[Smart[NonZeroUSize]]),
+            id=0,
+            name="level",
+            kind=Settable,
+            default=() => Auto,
+          ),
+          field_of(
+            (Ty::new() : Ty[NonZeroUSize]),
+            id=1,
+            name="depth",
+            kind=Settable,
+            default=() => Int(1L),
+          ),
+          field_of(
+            (Ty::new() : Ty[USize]),
+            id=2,
+            name="offset",
+            kind=Settable,
+            default=() => Int(0L),
+          ),
+          field_of(
+            (Ty::new() : Ty[Numbering?]),
+            id=3,
+            name="numbering",
+            kind=Settable,
+            default=() => None,
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[Supplement?]]),
+            id=4,
+            name="supplement",
+            kind=Settable,
+            default=() => Auto,
+          ),
+          field_of(
+            (Ty::new() : Ty[Bool]),
+            id=5,
+            name="outlined",
+            kind=Settable,
+            default=() => Bool(true),
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[Bool]]),
+            id=6,
+            name="bookmarked",
+            kind=Settable,
+            default=() => Auto,
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[Length]]),
+            id=7,
+            name="hanging-indent",
+            kind=Settable,
+            default=() => Auto,
+          ),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=8,
+            name="body",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
+          field_of(
+            (Ty::new() : Ty[String]),
+            id=9,
+            name="numbers",
+            kind=Synthesized,
+            internal=true,
+          ),
         ],
       )
       heading_elem_cell.val = Some(e)
       e.hooks().synthesize = Some(heading_elem_synthesize)
       e.hooks().show_set = Some(heading_elem_show_set)
-      e.hooks().local_name = Some((lang, region) => localized_str(lang, region, heading_elem_local_name_key()))
+      e.hooks().local_name = Some((lang, region) => {
+        localized_str(lang, region, heading_elem_local_name_key())
+      })
       e
     }
   }
@@ -3312,9 +5264,32 @@ pub fn link_elem() -> Element {
         keywords=[],
         capabilities=["Locatable"],
         fields=[
-        field_of((Ty::new() : Ty[LinkTarget]), id=0, name="dest", kind=Required, positional=true, required=true, parse=link_elem_dest_parse),
-        field_of((Ty::new() : Ty[Content]), id=1, name="body", kind=Required, positional=true, required=true, parse=link_elem_body_parse),
-        field_of((Ty::new() : Ty[Destination?]), id=2, name="current", kind=Ghost, internal=true, default=() => None),
+          field_of(
+            (Ty::new() : Ty[LinkTarget]),
+            id=0,
+            name="dest",
+            kind=Required,
+            positional=true,
+            required=true,
+            parse=link_elem_dest_parse,
+          ),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=1,
+            name="body",
+            kind=Required,
+            positional=true,
+            required=true,
+            parse=link_elem_body_parse,
+          ),
+          field_of(
+            (Ty::new() : Ty[Destination?]),
+            id=2,
+            name="current",
+            kind=Ghost,
+            internal=true,
+            default=() => None,
+          ),
         ],
       )
       link_elem_cell.val = Some(e)
@@ -3349,9 +5324,33 @@ pub fn direct_link_elem() -> Element {
         keywords=[],
         capabilities=["Construct"],
         fields=[
-        field_of((Ty::new() : Ty[Location]), id=0, name="loc", kind=Required, positional=true, required=true, internal=true),
-        field_of((Ty::new() : Ty[Content]), id=1, name="body", kind=Required, positional=true, required=true, internal=true),
-        field_of((Ty::new() : Ty[String?]), id=2, name="alt", kind=Required, positional=true, required=true, internal=true),
+          field_of(
+            (Ty::new() : Ty[Location]),
+            id=0,
+            name="loc",
+            kind=Required,
+            positional=true,
+            required=true,
+            internal=true,
+          ),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=1,
+            name="body",
+            kind=Required,
+            positional=true,
+            required=true,
+            internal=true,
+          ),
+          field_of(
+            (Ty::new() : Ty[String?]),
+            id=2,
+            name="alt",
+            kind=Required,
+            positional=true,
+            required=true,
+            internal=true,
+          ),
         ],
       )
       direct_link_elem_cell.val = Some(e)
@@ -3385,8 +5384,24 @@ pub fn link_marker_elem() -> Element {
         keywords=[],
         capabilities=["Tagged", "Construct"],
         fields=[
-        field_of((Ty::new() : Ty[Content]), id=0, name="body", kind=Required, positional=true, required=true, internal=true),
-        field_of((Ty::new() : Ty[String?]), id=1, name="alt", kind=Required, positional=true, required=true, internal=true),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=0,
+            name="body",
+            kind=Required,
+            positional=true,
+            required=true,
+            internal=true,
+          ),
+          field_of(
+            (Ty::new() : Ty[String?]),
+            id=1,
+            name="alt",
+            kind=Required,
+            positional=true,
+            required=true,
+            internal=true,
+          ),
         ],
       )
       link_marker_elem_cell.val = Some(e)
@@ -3417,14 +5432,62 @@ pub fn list_elem() -> Element {
         keywords=[],
         capabilities=["Locatable", "Tagged"],
         fields=[
-        field_of((Ty::new() : Ty[Bool]), id=0, name="tight", kind=Settable, default=() => Bool(true)),
-        field_of((Ty::new() : Ty[ListMarker]), id=1, name="marker", kind=Settable, default=list_elem_marker_default),
-        field_of((Ty::new() : Ty[Length]), id=2, name="indent", kind=Settable, default=() => Length(Length::zero())),
-        field_of((Ty::new() : Ty[Length]), id=3, name="body-indent", kind=Settable, default=() => Length(Length::from_em(Em::new(0.5)))),
-        field_of((Ty::new() : Ty[Smart[Length]]), id=4, name="spacing", kind=Settable, default=() => Auto),
-        field_of((Ty::new() : Ty[Alignment]), id=5, name="marker-align", kind=Settable, default=list_elem_marker_align_default),
-        field_of((Ty::new() : Ty[ListItem]), id=6, name="children", kind=Required, positional=true, required=true, variadic=true),
-        field_of((Ty::new() : Ty[Depth]), id=7, name="depth", kind=Ghost, internal=true, default=list_elem_depth_default, fold=list_elem_depth_fold),
+          field_of((Ty::new() : Ty[Bool]), id=0, name="tight", kind=Settable, default=() => {
+            Bool(true)
+          }),
+          field_of(
+            (Ty::new() : Ty[ListMarker]),
+            id=1,
+            name="marker",
+            kind=Settable,
+            default=list_elem_marker_default,
+          ),
+          field_of(
+            (Ty::new() : Ty[Length]),
+            id=2,
+            name="indent",
+            kind=Settable,
+            default=() => Length(Length::zero()),
+          ),
+          field_of(
+            (Ty::new() : Ty[Length]),
+            id=3,
+            name="body-indent",
+            kind=Settable,
+            default=() => Length(Length::from_em(Em::new(0.5))),
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[Length]]),
+            id=4,
+            name="spacing",
+            kind=Settable,
+            default=() => Auto,
+          ),
+          field_of(
+            (Ty::new() : Ty[Alignment]),
+            id=5,
+            name="marker-align",
+            kind=Settable,
+            default=list_elem_marker_align_default,
+          ),
+          field_of(
+            (Ty::new() : Ty[ListItem]),
+            id=6,
+            name="children",
+            kind=Required,
+            positional=true,
+            required=true,
+            variadic=true,
+          ),
+          field_of(
+            (Ty::new() : Ty[Depth]),
+            id=7,
+            name="depth",
+            kind=Ghost,
+            internal=true,
+            default=list_elem_depth_default,
+            fold=list_elem_depth_fold,
+          ),
         ],
       )
       list_elem_cell.val = Some(e)
@@ -3473,7 +5536,14 @@ pub fn list_item_elem() -> Element {
         keywords=[],
         capabilities=["Tagged"],
         fields=[
-        field_of((Ty::new() : Ty[Content]), id=0, name="body", kind=Required, positional=true, required=true),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=0,
+            name="body",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
         ],
       )
       list_item_elem_cell.val = Some(e)
@@ -3501,15 +5571,41 @@ pub fn outline_elem() -> Element {
         keywords=["Table of Contents", "toc"],
         capabilities=["ShowSet", "LocalName", "Locatable", "Tagged"],
         fields=[
-        field_of((Ty::new() : Ty[Smart[Content?]]), id=0, name="title", kind=Settable, default=() => Auto),
-        field_of((Ty::new() : Ty[LocatableSelector]), id=1, name="target", kind=Settable, default=outline_elem_target_default),
-        field_of((Ty::new() : Ty[NonZeroUSize?]), id=2, name="depth", kind=Settable, default=() => None),
-        field_of((Ty::new() : Ty[Smart[OutlineIndent]]), id=3, name="indent", kind=Settable, default=() => Auto),
+          field_of(
+            (Ty::new() : Ty[Smart[Content?]]),
+            id=0,
+            name="title",
+            kind=Settable,
+            default=() => Auto,
+          ),
+          field_of(
+            (Ty::new() : Ty[LocatableSelector]),
+            id=1,
+            name="target",
+            kind=Settable,
+            default=outline_elem_target_default,
+          ),
+          field_of(
+            (Ty::new() : Ty[NonZeroUSize?]),
+            id=2,
+            name="depth",
+            kind=Settable,
+            default=() => None,
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[OutlineIndent]]),
+            id=3,
+            name="indent",
+            kind=Settable,
+            default=() => Auto,
+          ),
         ],
       )
       outline_elem_cell.val = Some(e)
       e.hooks().show_set = Some(outline_elem_show_set)
-      e.hooks().local_name = Some((lang, region) => localized_str(lang, region, outline_elem_local_name_key()))
+      e.hooks().local_name = Some((lang, region) => {
+        localized_str(lang, region, outline_elem_local_name_key())
+      })
       e
     }
   }
@@ -3543,10 +5639,37 @@ pub fn outline_entry_elem() -> Element {
         keywords=[],
         capabilities=["Locatable", "Tagged"],
         fields=[
-        field_of((Ty::new() : Ty[NonZeroUSize]), id=0, name="level", kind=Required, positional=true, required=true),
-        field_of((Ty::new() : Ty[Content]), id=1, name="element", kind=Required, positional=true, required=true),
-        field_of((Ty::new() : Ty[Content?]), id=2, name="fill", kind=Settable, default=outline_entry_elem_fill_default),
-        field_of((Ty::new() : Ty[OutlineElem?]), id=3, name="parent", kind=Ghost, internal=true, default=() => None),
+          field_of(
+            (Ty::new() : Ty[NonZeroUSize]),
+            id=0,
+            name="level",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=1,
+            name="element",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
+          field_of(
+            (Ty::new() : Ty[Content?]),
+            id=2,
+            name="fill",
+            kind=Settable,
+            default=outline_entry_elem_fill_default,
+          ),
+          field_of(
+            (Ty::new() : Ty[OutlineElem?]),
+            id=3,
+            name="parent",
+            kind=Ghost,
+            internal=true,
+            default=() => None,
+          ),
         ],
       )
       outline_entry_elem_cell.val = Some(e)
@@ -3583,9 +5706,32 @@ pub fn prefix_info_elem() -> Element {
         keywords=[],
         capabilities=["Construct", "Unqueriable", "Locatable"],
         fields=[
-        field_of((Ty::new() : Ty[Location]), id=0, name="key", kind=Required, positional=true, required=true),
-        field_of((Ty::new() : Ty[NonZeroUSize]), id=1, name="level", kind=Required, positional=true, required=true, internal=true),
-        field_of((Ty::new() : Ty[Abs]), id=2, name="inset", kind=Required, positional=true, required=true, internal=true),
+          field_of(
+            (Ty::new() : Ty[Location]),
+            id=0,
+            name="key",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
+          field_of(
+            (Ty::new() : Ty[NonZeroUSize]),
+            id=1,
+            name="level",
+            kind=Required,
+            positional=true,
+            required=true,
+            internal=true,
+          ),
+          field_of(
+            (Ty::new() : Ty[Abs]),
+            id=2,
+            name="inset",
+            kind=Required,
+            positional=true,
+            required=true,
+            internal=true,
+          ),
         ],
       )
       prefix_info_elem_cell.val = Some(e)
@@ -3619,14 +5765,65 @@ pub fn par_elem() -> Element {
         keywords=[],
         capabilities=["Locatable", "Tagged"],
         fields=[
-        field_of((Ty::new() : Ty[Length]), id=0, name="leading", kind=Settable, default=() => Length(Length::from_em(Em::new(0.65)))),
-        field_of((Ty::new() : Ty[Length]), id=1, name="spacing", kind=Settable, default=() => Length(Length::from_em(Em::new(1.2)))),
-        field_of((Ty::new() : Ty[Bool]), id=2, name="justify", kind=Settable, default=() => Bool(false)),
-        field_of((Ty::new() : Ty[JustificationLimits]), id=3, name="justification-limits", kind=Settable, default=par_elem_justification_limits_default, fold=par_elem_justification_limits_fold),
-        field_of((Ty::new() : Ty[Smart[Linebreaks]]), id=4, name="linebreaks", kind=Settable, default=() => Auto),
-        field_of((Ty::new() : Ty[FirstLineIndent]), id=5, name="first-line-indent", kind=Settable, default=par_elem_first_line_indent_default, fold=par_elem_first_line_indent_fold),
-        field_of((Ty::new() : Ty[Length]), id=6, name="hanging-indent", kind=Settable, default=() => Length(Length::zero())),
-        field_of((Ty::new() : Ty[Content]), id=7, name="body", kind=Required, positional=true, required=true),
+          field_of(
+            (Ty::new() : Ty[Length]),
+            id=0,
+            name="leading",
+            kind=Settable,
+            default=() => Length(Length::from_em(Em::new(0.65))),
+          ),
+          field_of(
+            (Ty::new() : Ty[Length]),
+            id=1,
+            name="spacing",
+            kind=Settable,
+            default=() => Length(Length::from_em(Em::new(1.2))),
+          ),
+          field_of(
+            (Ty::new() : Ty[Bool]),
+            id=2,
+            name="justify",
+            kind=Settable,
+            default=() => Bool(false),
+          ),
+          field_of(
+            (Ty::new() : Ty[JustificationLimits]),
+            id=3,
+            name="justification-limits",
+            kind=Settable,
+            default=par_elem_justification_limits_default,
+            fold=par_elem_justification_limits_fold,
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[Linebreaks]]),
+            id=4,
+            name="linebreaks",
+            kind=Settable,
+            default=() => Auto,
+          ),
+          field_of(
+            (Ty::new() : Ty[FirstLineIndent]),
+            id=5,
+            name="first-line-indent",
+            kind=Settable,
+            default=par_elem_first_line_indent_default,
+            fold=par_elem_first_line_indent_fold,
+          ),
+          field_of(
+            (Ty::new() : Ty[Length]),
+            id=6,
+            name="hanging-indent",
+            kind=Settable,
+            default=() => Length(Length::zero()),
+          ),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=7,
+            name="body",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
         ],
       )
       par_elem_cell.val = Some(e)
@@ -3674,9 +5871,7 @@ pub fn parbreak_elem() -> Element {
         docs="A paragraph break.",
         keywords=[],
         capabilities=["Unlabellable"],
-        fields=[
-
-        ],
+        fields=[],
       )
       parbreak_elem_cell.val = Some(e)
       e
@@ -3700,11 +5895,41 @@ pub fn par_line_elem() -> Element {
         keywords=["line numbering"],
         capabilities=["Construct", "Locatable"],
         fields=[
-        field_of((Ty::new() : Ty[Numbering?]), id=0, name="numbering", kind=Ghost, default=() => None),
-        field_of((Ty::new() : Ty[Smart[HAlignment]]), id=1, name="number-align", kind=Ghost, default=() => Auto),
-        field_of((Ty::new() : Ty[OuterHAlignment]), id=2, name="number-margin", kind=Ghost, default=() => Dyn(Alignment(Alignment::H(HAlignment::Start)))),
-        field_of((Ty::new() : Ty[Smart[Length]]), id=3, name="number-clearance", kind=Ghost, default=() => Auto),
-        field_of((Ty::new() : Ty[LineNumberingScope]), id=4, name="numbering-scope", kind=Ghost, default=par_line_elem_numbering_scope_default),
+          field_of(
+            (Ty::new() : Ty[Numbering?]),
+            id=0,
+            name="numbering",
+            kind=Ghost,
+            default=() => None,
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[HAlignment]]),
+            id=1,
+            name="number-align",
+            kind=Ghost,
+            default=() => Auto,
+          ),
+          field_of(
+            (Ty::new() : Ty[OuterHAlignment]),
+            id=2,
+            name="number-margin",
+            kind=Ghost,
+            default=() => Dyn(Alignment(Alignment::H(HAlignment::Start))),
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[Length]]),
+            id=3,
+            name="number-clearance",
+            kind=Ghost,
+            default=() => Auto,
+          ),
+          field_of(
+            (Ty::new() : Ty[LineNumberingScope]),
+            id=4,
+            name="numbering-scope",
+            kind=Ghost,
+            default=par_line_elem_numbering_scope_default,
+          ),
         ],
       )
       par_line_elem_cell.val = Some(e)
@@ -3744,10 +5969,42 @@ pub fn par_line_marker_elem() -> Element {
         keywords=[],
         capabilities=["Construct", "Unqueriable", "Locatable", "Count"],
         fields=[
-        field_of((Ty::new() : Ty[Numbering]), id=0, name="numbering", kind=Required, positional=true, required=true, internal=true),
-        field_of((Ty::new() : Ty[Smart[HAlignment]]), id=1, name="number-align", kind=Required, positional=true, required=true, internal=true),
-        field_of((Ty::new() : Ty[OuterHAlignment]), id=2, name="number-margin", kind=Required, positional=true, required=true, internal=true),
-        field_of((Ty::new() : Ty[Smart[Length]]), id=3, name="number-clearance", kind=Required, positional=true, required=true, internal=true),
+          field_of(
+            (Ty::new() : Ty[Numbering]),
+            id=0,
+            name="numbering",
+            kind=Required,
+            positional=true,
+            required=true,
+            internal=true,
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[HAlignment]]),
+            id=1,
+            name="number-align",
+            kind=Required,
+            positional=true,
+            required=true,
+            internal=true,
+          ),
+          field_of(
+            (Ty::new() : Ty[OuterHAlignment]),
+            id=2,
+            name="number-margin",
+            kind=Required,
+            positional=true,
+            required=true,
+            internal=true,
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[Length]]),
+            id=3,
+            name="number-clearance",
+            kind=Required,
+            positional=true,
+            required=true,
+            internal=true,
+          ),
         ],
       )
       par_line_marker_elem_cell.val = Some(e)
@@ -3784,11 +6041,40 @@ pub fn quote_elem() -> Element {
         keywords=[],
         capabilities=["Locatable", "Tagged", "ShowSet"],
         fields=[
-        field_of((Ty::new() : Ty[Bool]), id=0, name="block", kind=Settable, default=() => Bool(false)),
-        field_of((Ty::new() : Ty[Smart[Bool]]), id=1, name="quotes", kind=Settable, default=() => Auto),
-        field_of((Ty::new() : Ty[Attribution?]), id=2, name="attribution", kind=Settable, default=() => None),
-        field_of((Ty::new() : Ty[Content]), id=3, name="body", kind=Required, positional=true, required=true),
-        field_of((Ty::new() : Ty[Depth]), id=4, name="depth", kind=Ghost, internal=true, default=quote_elem_depth_default, fold=quote_elem_depth_fold),
+          field_of((Ty::new() : Ty[Bool]), id=0, name="block", kind=Settable, default=() => {
+            Bool(false)
+          }),
+          field_of(
+            (Ty::new() : Ty[Smart[Bool]]),
+            id=1,
+            name="quotes",
+            kind=Settable,
+            default=() => Auto,
+          ),
+          field_of(
+            (Ty::new() : Ty[Attribution?]),
+            id=2,
+            name="attribution",
+            kind=Settable,
+            default=() => None,
+          ),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=3,
+            name="body",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
+          field_of(
+            (Ty::new() : Ty[Depth]),
+            id=4,
+            name="depth",
+            kind=Ghost,
+            internal=true,
+            default=quote_elem_depth_default,
+            fold=quote_elem_depth_fold,
+          ),
         ],
       )
       quote_elem_cell.val = Some(e)
@@ -3829,11 +6115,40 @@ pub fn ref_elem() -> Element {
         keywords=[],
         capabilities=["Locatable", "Tagged", "Synthesize"],
         fields=[
-        field_of((Ty::new() : Ty[Label]), id=0, name="target", kind=Required, positional=true, required=true),
-        field_of((Ty::new() : Ty[Smart[Supplement?]]), id=1, name="supplement", kind=Settable, default=() => Auto),
-        field_of((Ty::new() : Ty[RefForm]), id=2, name="form", kind=Settable, default=ref_elem_form_default),
-        field_of((Ty::new() : Ty[CiteElem?]), id=3, name="citation", kind=Synthesized),
-        field_of((Ty::new() : Ty[Content?]), id=4, name="element", kind=Synthesized),
+          field_of(
+            (Ty::new() : Ty[Label]),
+            id=0,
+            name="target",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[Supplement?]]),
+            id=1,
+            name="supplement",
+            kind=Settable,
+            default=() => Auto,
+          ),
+          field_of(
+            (Ty::new() : Ty[RefForm]),
+            id=2,
+            name="form",
+            kind=Settable,
+            default=ref_elem_form_default,
+          ),
+          field_of(
+            (Ty::new() : Ty[CiteElem?]),
+            id=3,
+            name="citation",
+            kind=Synthesized,
+          ),
+          field_of(
+            (Ty::new() : Ty[Content?]),
+            id=4,
+            name="element",
+            kind=Synthesized,
+          ),
         ],
       )
       ref_elem_cell.val = Some(e)
@@ -3874,8 +6189,17 @@ pub fn strong_elem() -> Element {
         keywords=["bold", "weight"],
         capabilities=["Locatable", "Tagged"],
         fields=[
-        field_of((Ty::new() : Ty[Int64]), id=0, name="delta", kind=Settable, default=() => Int(300L)),
-        field_of((Ty::new() : Ty[Content]), id=1, name="body", kind=Required, positional=true, required=true),
+          field_of((Ty::new() : Ty[Int64]), id=0, name="delta", kind=Settable, default=() => {
+            Int(300L)
+          }),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=1,
+            name="body",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
         ],
       )
       strong_elem_cell.val = Some(e)
@@ -3904,25 +6228,109 @@ pub fn table_elem() -> Element {
         title="Table",
         docs="A table of items.",
         keywords=[],
-        capabilities=["Locatable", "Tagged", "Synthesize", "LocalName", "Figurable"],
+        capabilities=[
+          "Locatable", "Tagged", "Synthesize", "LocalName", "Figurable",
+        ],
         fields=[
-        field_of((Ty::new() : Ty[TrackSizings]), id=0, name="columns", kind=Settable, default=table_elem_columns_default),
-        field_of((Ty::new() : Ty[TrackSizings]), id=1, name="rows", kind=Settable, default=table_elem_rows_default),
-        field_of((Ty::new() : Ty[TrackSizings]), id=2, name="gutter", kind=External, default=table_elem_gutter_default),
-        field_of((Ty::new() : Ty[TrackSizings]), id=3, name="column-gutter", kind=Settable, default=table_elem_column_gutter_default, parse=table_elem_column_gutter_parse),
-        field_of((Ty::new() : Ty[TrackSizings]), id=4, name="row-gutter", kind=Settable, default=table_elem_row_gutter_default, parse=table_elem_row_gutter_parse),
-        field_of((Ty::new() : Ty[Celled[Sides[Rel[Length]?]]]), id=5, name="inset", kind=Settable, default=table_elem_inset_default, fold=fold_of((Ty::new() : Ty[Celled[Sides[Rel[Length]?]]]))),
-        field_of((Ty::new() : Ty[Celled[Smart[Alignment]]]), id=6, name="align", kind=Settable, default=table_elem_align_default),
-        field_of((Ty::new() : Ty[Celled[Paint?]]), id=7, name="fill", kind=Settable, default=table_elem_fill_default),
-        field_of((Ty::new() : Ty[Celled[Sides[Stroke??]]]), id=8, name="stroke", kind=Settable, default=table_elem_stroke_default, fold=fold_of((Ty::new() : Ty[Celled[Sides[Stroke??]]]))),
-        field_of((Ty::new() : Ty[TableChild]), id=9, name="children", kind=Required, positional=true, required=true, variadic=true),
-        field_of((Ty::new() : Ty[String?]), id=10, name="summary", kind=Settable, internal=true, default=() => None, parse=table_elem_summary_parse),
-        field_of((Ty::new() : Ty[CellGrid]), id=11, name="grid", kind=Synthesized, internal=true),
+          field_of(
+            (Ty::new() : Ty[TrackSizings]),
+            id=0,
+            name="columns",
+            kind=Settable,
+            default=table_elem_columns_default,
+          ),
+          field_of(
+            (Ty::new() : Ty[TrackSizings]),
+            id=1,
+            name="rows",
+            kind=Settable,
+            default=table_elem_rows_default,
+          ),
+          field_of(
+            (Ty::new() : Ty[TrackSizings]),
+            id=2,
+            name="gutter",
+            kind=External,
+            default=table_elem_gutter_default,
+          ),
+          field_of(
+            (Ty::new() : Ty[TrackSizings]),
+            id=3,
+            name="column-gutter",
+            kind=Settable,
+            default=table_elem_column_gutter_default,
+            parse=table_elem_column_gutter_parse,
+          ),
+          field_of(
+            (Ty::new() : Ty[TrackSizings]),
+            id=4,
+            name="row-gutter",
+            kind=Settable,
+            default=table_elem_row_gutter_default,
+            parse=table_elem_row_gutter_parse,
+          ),
+          field_of(
+            (Ty::new() : Ty[Celled[Sides[Rel[Length]?]]]),
+            id=5,
+            name="inset",
+            kind=Settable,
+            default=table_elem_inset_default,
+            fold=fold_of((Ty::new() : Ty[Celled[Sides[Rel[Length]?]]])),
+          ),
+          field_of(
+            (Ty::new() : Ty[Celled[Smart[Alignment]]]),
+            id=6,
+            name="align",
+            kind=Settable,
+            default=table_elem_align_default,
+          ),
+          field_of(
+            (Ty::new() : Ty[Celled[Paint?]]),
+            id=7,
+            name="fill",
+            kind=Settable,
+            default=table_elem_fill_default,
+          ),
+          field_of(
+            (Ty::new() : Ty[Celled[Sides[Stroke??]]]),
+            id=8,
+            name="stroke",
+            kind=Settable,
+            default=table_elem_stroke_default,
+            fold=fold_of((Ty::new() : Ty[Celled[Sides[Stroke??]]])),
+          ),
+          field_of(
+            (Ty::new() : Ty[TableChild]),
+            id=9,
+            name="children",
+            kind=Required,
+            positional=true,
+            required=true,
+            variadic=true,
+          ),
+          field_of(
+            (Ty::new() : Ty[String?]),
+            id=10,
+            name="summary",
+            kind=Settable,
+            internal=true,
+            default=() => None,
+            parse=table_elem_summary_parse,
+          ),
+          field_of(
+            (Ty::new() : Ty[CellGrid]),
+            id=11,
+            name="grid",
+            kind=Synthesized,
+            internal=true,
+          ),
         ],
       )
       table_elem_cell.val = Some(e)
       e.hooks().synthesize = Some(table_elem_synthesize)
-      e.hooks().local_name = Some((lang, region) => localized_str(lang, region, table_elem_local_name_key()))
+      e.hooks().local_name = Some((lang, region) => {
+        localized_str(lang, region, table_elem_local_name_key())
+      })
       e
     }
   }
@@ -3980,9 +6388,25 @@ pub fn table_header_elem() -> Element {
         keywords=[],
         capabilities=[],
         fields=[
-        field_of((Ty::new() : Ty[Bool]), id=0, name="repeat", kind=Settable, default=() => Bool(true)),
-        field_of((Ty::new() : Ty[NonZeroU32]), id=1, name="level", kind=Settable, default=() => Int(1L)),
-        field_of((Ty::new() : Ty[TableItem]), id=2, name="children", kind=Required, positional=true, required=true, variadic=true),
+          field_of((Ty::new() : Ty[Bool]), id=0, name="repeat", kind=Settable, default=() => {
+            Bool(true)
+          }),
+          field_of(
+            (Ty::new() : Ty[NonZeroU32]),
+            id=1,
+            name="level",
+            kind=Settable,
+            default=() => Int(1L),
+          ),
+          field_of(
+            (Ty::new() : Ty[TableItem]),
+            id=2,
+            name="children",
+            kind=Required,
+            positional=true,
+            required=true,
+            variadic=true,
+          ),
         ],
       )
       table_header_elem_cell.val = Some(e)
@@ -4016,8 +6440,18 @@ pub fn table_footer_elem() -> Element {
         keywords=[],
         capabilities=[],
         fields=[
-        field_of((Ty::new() : Ty[Bool]), id=0, name="repeat", kind=Settable, default=() => Bool(true)),
-        field_of((Ty::new() : Ty[TableItem]), id=1, name="children", kind=Required, positional=true, required=true, variadic=true),
+          field_of((Ty::new() : Ty[Bool]), id=0, name="repeat", kind=Settable, default=() => {
+            Bool(true)
+          }),
+          field_of(
+            (Ty::new() : Ty[TableItem]),
+            id=1,
+            name="children",
+            kind=Required,
+            positional=true,
+            required=true,
+            variadic=true,
+          ),
         ],
       )
       table_footer_elem_cell.val = Some(e)
@@ -4048,11 +6482,38 @@ pub fn table_h_line_elem() -> Element {
         keywords=[],
         capabilities=[],
         fields=[
-        field_of((Ty::new() : Ty[Smart[USize]]), id=0, name="y", kind=Settable, default=() => Auto),
-        field_of((Ty::new() : Ty[USize]), id=1, name="start", kind=Settable, default=() => Int(0L)),
-        field_of((Ty::new() : Ty[NonZeroUSize?]), id=2, name="end", kind=Settable, default=() => None),
-        field_of((Ty::new() : Ty[Stroke?]), id=3, name="stroke", kind=Settable, default=table_h_line_elem_stroke_default, fold=fold_of((Ty::new() : Ty[Stroke?]))),
-        field_of((Ty::new() : Ty[OuterVAlignment]), id=4, name="position", kind=Settable, default=() => Dyn(Alignment(Alignment::V(VAlignment::Top)))),
+          field_of(
+            (Ty::new() : Ty[Smart[USize]]),
+            id=0,
+            name="y",
+            kind=Settable,
+            default=() => Auto,
+          ),
+          field_of((Ty::new() : Ty[USize]), id=1, name="start", kind=Settable, default=() => {
+            Int(0L)
+          }),
+          field_of(
+            (Ty::new() : Ty[NonZeroUSize?]),
+            id=2,
+            name="end",
+            kind=Settable,
+            default=() => None,
+          ),
+          field_of(
+            (Ty::new() : Ty[Stroke?]),
+            id=3,
+            name="stroke",
+            kind=Settable,
+            default=table_h_line_elem_stroke_default,
+            fold=fold_of((Ty::new() : Ty[Stroke?])),
+          ),
+          field_of(
+            (Ty::new() : Ty[OuterVAlignment]),
+            id=4,
+            name="position",
+            kind=Settable,
+            default=() => Dyn(Alignment(Alignment::V(VAlignment::Top))),
+          ),
         ],
       )
       table_h_line_elem_cell.val = Some(e)
@@ -4092,11 +6553,38 @@ pub fn table_v_line_elem() -> Element {
         keywords=[],
         capabilities=[],
         fields=[
-        field_of((Ty::new() : Ty[Smart[USize]]), id=0, name="x", kind=Settable, default=() => Auto),
-        field_of((Ty::new() : Ty[USize]), id=1, name="start", kind=Settable, default=() => Int(0L)),
-        field_of((Ty::new() : Ty[NonZeroUSize?]), id=2, name="end", kind=Settable, default=() => None),
-        field_of((Ty::new() : Ty[Stroke?]), id=3, name="stroke", kind=Settable, default=table_v_line_elem_stroke_default, fold=fold_of((Ty::new() : Ty[Stroke?]))),
-        field_of((Ty::new() : Ty[OuterHAlignment]), id=4, name="position", kind=Settable, default=() => Dyn(Alignment(Alignment::H(HAlignment::Start)))),
+          field_of(
+            (Ty::new() : Ty[Smart[USize]]),
+            id=0,
+            name="x",
+            kind=Settable,
+            default=() => Auto,
+          ),
+          field_of((Ty::new() : Ty[USize]), id=1, name="start", kind=Settable, default=() => {
+            Int(0L)
+          }),
+          field_of(
+            (Ty::new() : Ty[NonZeroUSize?]),
+            id=2,
+            name="end",
+            kind=Settable,
+            default=() => None,
+          ),
+          field_of(
+            (Ty::new() : Ty[Stroke?]),
+            id=3,
+            name="stroke",
+            kind=Settable,
+            default=table_v_line_elem_stroke_default,
+            fold=fold_of((Ty::new() : Ty[Stroke?])),
+          ),
+          field_of(
+            (Ty::new() : Ty[OuterHAlignment]),
+            id=4,
+            name="position",
+            kind=Settable,
+            default=() => Dyn(Alignment(Alignment::H(HAlignment::Start))),
+          ),
         ],
       )
       table_v_line_elem_cell.val = Some(e)
@@ -4136,18 +6624,96 @@ pub fn table_cell_elem() -> Element {
         keywords=[],
         capabilities=[],
         fields=[
-        field_of((Ty::new() : Ty[Content]), id=0, name="body", kind=Required, positional=true, required=true),
-        field_of((Ty::new() : Ty[Smart[USize]]), id=1, name="x", kind=Settable, default=() => Auto),
-        field_of((Ty::new() : Ty[Smart[USize]]), id=2, name="y", kind=Settable, default=() => Auto),
-        field_of((Ty::new() : Ty[NonZeroUSize]), id=3, name="colspan", kind=Settable, default=() => Int(1L)),
-        field_of((Ty::new() : Ty[NonZeroUSize]), id=4, name="rowspan", kind=Settable, default=() => Int(1L)),
-        field_of((Ty::new() : Ty[Smart[Sides[Rel[Length]?]]]), id=5, name="inset", kind=Settable, default=() => Auto),
-        field_of((Ty::new() : Ty[Smart[Alignment]]), id=6, name="align", kind=Settable, default=() => Auto),
-        field_of((Ty::new() : Ty[Smart[Paint?]]), id=7, name="fill", kind=Settable, default=() => Auto),
-        field_of((Ty::new() : Ty[Sides[Stroke??]]), id=8, name="stroke", kind=Settable, default=() => Dict(Dict::new()), fold=fold_of((Ty::new() : Ty[Sides[Stroke??]]))),
-        field_of((Ty::new() : Ty[Smart[Bool]]), id=9, name="breakable", kind=Settable, default=() => Auto),
-        field_of((Ty::new() : Ty[Value]), id=10, name="kind", kind=Settable, internal=true, default=table_cell_elem_kind_default, parse=table_cell_elem_kind_parse),
-        field_of((Ty::new() : Ty[Bool]), id=11, name="is-repeated", kind=Settable, internal=true, default=() => Bool(false), parse=table_cell_elem_is_repeated_parse),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=0,
+            name="body",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[USize]]),
+            id=1,
+            name="x",
+            kind=Settable,
+            default=() => Auto,
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[USize]]),
+            id=2,
+            name="y",
+            kind=Settable,
+            default=() => Auto,
+          ),
+          field_of(
+            (Ty::new() : Ty[NonZeroUSize]),
+            id=3,
+            name="colspan",
+            kind=Settable,
+            default=() => Int(1L),
+          ),
+          field_of(
+            (Ty::new() : Ty[NonZeroUSize]),
+            id=4,
+            name="rowspan",
+            kind=Settable,
+            default=() => Int(1L),
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[Sides[Rel[Length]?]]]),
+            id=5,
+            name="inset",
+            kind=Settable,
+            default=() => Auto,
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[Alignment]]),
+            id=6,
+            name="align",
+            kind=Settable,
+            default=() => Auto,
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[Paint?]]),
+            id=7,
+            name="fill",
+            kind=Settable,
+            default=() => Auto,
+          ),
+          field_of(
+            (Ty::new() : Ty[Sides[Stroke??]]),
+            id=8,
+            name="stroke",
+            kind=Settable,
+            default=() => Dict(Dict::new()),
+            fold=fold_of((Ty::new() : Ty[Sides[Stroke??]])),
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[Bool]]),
+            id=9,
+            name="breakable",
+            kind=Settable,
+            default=() => Auto,
+          ),
+          field_of(
+            (Ty::new() : Ty[Value]),
+            id=10,
+            name="kind",
+            kind=Settable,
+            internal=true,
+            default=table_cell_elem_kind_default,
+            parse=table_cell_elem_kind_parse,
+          ),
+          field_of(
+            (Ty::new() : Ty[Bool]),
+            id=11,
+            name="is-repeated",
+            kind=Settable,
+            internal=true,
+            default=() => Bool(false),
+            parse=table_cell_elem_is_repeated_parse,
+          ),
         ],
       )
       table_cell_elem_cell.val = Some(e)
@@ -4208,13 +6774,54 @@ pub fn terms_elem() -> Element {
         keywords=[],
         capabilities=["Locatable", "Tagged"],
         fields=[
-        field_of((Ty::new() : Ty[Bool]), id=0, name="tight", kind=Settable, default=() => Bool(true)),
-        field_of((Ty::new() : Ty[Content]), id=1, name="separator", kind=Settable, default=terms_elem_separator_default),
-        field_of((Ty::new() : Ty[Length]), id=2, name="indent", kind=Settable, default=() => Length(Length::zero())),
-        field_of((Ty::new() : Ty[Length]), id=3, name="hanging-indent", kind=Settable, default=() => Length(Length::from_em(Em::new(2.0)))),
-        field_of((Ty::new() : Ty[Smart[Length]]), id=4, name="spacing", kind=Settable, default=() => Auto),
-        field_of((Ty::new() : Ty[TermItem]), id=5, name="children", kind=Required, positional=true, required=true, variadic=true),
-        field_of((Ty::new() : Ty[Bool]), id=6, name="within", kind=Ghost, internal=true, default=() => Bool(false)),
+          field_of((Ty::new() : Ty[Bool]), id=0, name="tight", kind=Settable, default=() => {
+            Bool(true)
+          }),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=1,
+            name="separator",
+            kind=Settable,
+            default=terms_elem_separator_default,
+          ),
+          field_of(
+            (Ty::new() : Ty[Length]),
+            id=2,
+            name="indent",
+            kind=Settable,
+            default=() => Length(Length::zero()),
+          ),
+          field_of(
+            (Ty::new() : Ty[Length]),
+            id=3,
+            name="hanging-indent",
+            kind=Settable,
+            default=() => Length(Length::from_em(Em::new(2.0))),
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[Length]]),
+            id=4,
+            name="spacing",
+            kind=Settable,
+            default=() => Auto,
+          ),
+          field_of(
+            (Ty::new() : Ty[TermItem]),
+            id=5,
+            name="children",
+            kind=Required,
+            positional=true,
+            required=true,
+            variadic=true,
+          ),
+          field_of(
+            (Ty::new() : Ty[Bool]),
+            id=6,
+            name="within",
+            kind=Ghost,
+            internal=true,
+            default=() => Bool(false),
+          ),
         ],
       )
       terms_elem_cell.val = Some(e)
@@ -4260,8 +6867,22 @@ pub fn term_item_elem() -> Element {
         keywords=[],
         capabilities=["Tagged"],
         fields=[
-        field_of((Ty::new() : Ty[Content]), id=0, name="term", kind=Required, positional=true, required=true),
-        field_of((Ty::new() : Ty[Content]), id=1, name="description", kind=Required, positional=true, required=true),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=0,
+            name="term",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=1,
+            name="description",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
         ],
       )
       term_item_elem_cell.val = Some(e)
@@ -4292,7 +6913,14 @@ pub fn title_elem() -> Element {
         keywords=[],
         capabilities=["Locatable", "Tagged", "ShowSet"],
         fields=[
-        field_of((Ty::new() : Ty[Smart[Content]]), id=0, name="body", kind=Settable, positional=true, default=() => Auto),
+          field_of(
+            (Ty::new() : Ty[Smart[Content]]),
+            id=0,
+            name="body",
+            kind=Settable,
+            positional=true,
+            default=() => Auto,
+          ),
         ],
       )
       title_elem_cell.val = Some(e)
@@ -4321,12 +6949,46 @@ pub fn underline_elem() -> Element {
         keywords=[],
         capabilities=["Locatable", "Tagged"],
         fields=[
-        field_of((Ty::new() : Ty[Smart[Stroke]]), id=0, name="stroke", kind=Settable, default=() => Auto, fold=fold_of((Ty::new() : Ty[Smart[Stroke]]))),
-        field_of((Ty::new() : Ty[Smart[Length]]), id=1, name="offset", kind=Settable, default=() => Auto),
-        field_of((Ty::new() : Ty[Length]), id=2, name="extent", kind=Settable, default=() => Length(Length::zero())),
-        field_of((Ty::new() : Ty[Bool]), id=3, name="evade", kind=Settable, default=() => Bool(true)),
-        field_of((Ty::new() : Ty[Bool]), id=4, name="background", kind=Settable, default=() => Bool(false)),
-        field_of((Ty::new() : Ty[Content]), id=5, name="body", kind=Required, positional=true, required=true),
+          field_of(
+            (Ty::new() : Ty[Smart[Stroke]]),
+            id=0,
+            name="stroke",
+            kind=Settable,
+            default=() => Auto,
+            fold=fold_of((Ty::new() : Ty[Smart[Stroke]])),
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[Length]]),
+            id=1,
+            name="offset",
+            kind=Settable,
+            default=() => Auto,
+          ),
+          field_of(
+            (Ty::new() : Ty[Length]),
+            id=2,
+            name="extent",
+            kind=Settable,
+            default=() => Length(Length::zero()),
+          ),
+          field_of((Ty::new() : Ty[Bool]), id=3, name="evade", kind=Settable, default=() => {
+            Bool(true)
+          }),
+          field_of(
+            (Ty::new() : Ty[Bool]),
+            id=4,
+            name="background",
+            kind=Settable,
+            default=() => Bool(false),
+          ),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=5,
+            name="body",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
         ],
       )
       underline_elem_cell.val = Some(e)
@@ -4369,12 +7031,46 @@ pub fn overline_elem() -> Element {
         keywords=[],
         capabilities=["Locatable", "Tagged"],
         fields=[
-        field_of((Ty::new() : Ty[Smart[Stroke]]), id=0, name="stroke", kind=Settable, default=() => Auto, fold=fold_of((Ty::new() : Ty[Smart[Stroke]]))),
-        field_of((Ty::new() : Ty[Smart[Length]]), id=1, name="offset", kind=Settable, default=() => Auto),
-        field_of((Ty::new() : Ty[Length]), id=2, name="extent", kind=Settable, default=() => Length(Length::zero())),
-        field_of((Ty::new() : Ty[Bool]), id=3, name="evade", kind=Settable, default=() => Bool(true)),
-        field_of((Ty::new() : Ty[Bool]), id=4, name="background", kind=Settable, default=() => Bool(false)),
-        field_of((Ty::new() : Ty[Content]), id=5, name="body", kind=Required, positional=true, required=true),
+          field_of(
+            (Ty::new() : Ty[Smart[Stroke]]),
+            id=0,
+            name="stroke",
+            kind=Settable,
+            default=() => Auto,
+            fold=fold_of((Ty::new() : Ty[Smart[Stroke]])),
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[Length]]),
+            id=1,
+            name="offset",
+            kind=Settable,
+            default=() => Auto,
+          ),
+          field_of(
+            (Ty::new() : Ty[Length]),
+            id=2,
+            name="extent",
+            kind=Settable,
+            default=() => Length(Length::zero()),
+          ),
+          field_of((Ty::new() : Ty[Bool]), id=3, name="evade", kind=Settable, default=() => {
+            Bool(true)
+          }),
+          field_of(
+            (Ty::new() : Ty[Bool]),
+            id=4,
+            name="background",
+            kind=Settable,
+            default=() => Bool(false),
+          ),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=5,
+            name="body",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
         ],
       )
       overline_elem_cell.val = Some(e)
@@ -4417,11 +7113,43 @@ pub fn strike_elem() -> Element {
         keywords=[],
         capabilities=["Locatable", "Tagged"],
         fields=[
-        field_of((Ty::new() : Ty[Smart[Stroke]]), id=0, name="stroke", kind=Settable, default=() => Auto, fold=fold_of((Ty::new() : Ty[Smart[Stroke]]))),
-        field_of((Ty::new() : Ty[Smart[Length]]), id=1, name="offset", kind=Settable, default=() => Auto),
-        field_of((Ty::new() : Ty[Length]), id=2, name="extent", kind=Settable, default=() => Length(Length::zero())),
-        field_of((Ty::new() : Ty[Bool]), id=3, name="background", kind=Settable, default=() => Bool(false)),
-        field_of((Ty::new() : Ty[Content]), id=4, name="body", kind=Required, positional=true, required=true),
+          field_of(
+            (Ty::new() : Ty[Smart[Stroke]]),
+            id=0,
+            name="stroke",
+            kind=Settable,
+            default=() => Auto,
+            fold=fold_of((Ty::new() : Ty[Smart[Stroke]])),
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[Length]]),
+            id=1,
+            name="offset",
+            kind=Settable,
+            default=() => Auto,
+          ),
+          field_of(
+            (Ty::new() : Ty[Length]),
+            id=2,
+            name="extent",
+            kind=Settable,
+            default=() => Length(Length::zero()),
+          ),
+          field_of(
+            (Ty::new() : Ty[Bool]),
+            id=3,
+            name="background",
+            kind=Settable,
+            default=() => Bool(false),
+          ),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=4,
+            name="body",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
         ],
       )
       strike_elem_cell.val = Some(e)
@@ -4461,13 +7189,58 @@ pub fn highlight_elem() -> Element {
         keywords=[],
         capabilities=["Locatable", "Tagged"],
         fields=[
-        field_of((Ty::new() : Ty[Paint?]), id=0, name="fill", kind=Settable, default=highlight_elem_fill_default),
-        field_of((Ty::new() : Ty[Sides[Stroke??]]), id=1, name="stroke", kind=Settable, default=() => Dict(Dict::new()), fold=fold_of((Ty::new() : Ty[Sides[Stroke??]]))),
-        field_of((Ty::new() : Ty[TopEdge]), id=2, name="top-edge", kind=Settable, default=highlight_elem_top_edge_default),
-        field_of((Ty::new() : Ty[BottomEdge]), id=3, name="bottom-edge", kind=Settable, default=highlight_elem_bottom_edge_default),
-        field_of((Ty::new() : Ty[Length]), id=4, name="extent", kind=Settable, default=() => Length(Length::zero())),
-        field_of((Ty::new() : Ty[Corners[Rel[Length]?]]), id=5, name="radius", kind=Settable, default=() => Dict(Dict::new()), fold=fold_of((Ty::new() : Ty[Corners[Rel[Length]?]]))),
-        field_of((Ty::new() : Ty[Content]), id=6, name="body", kind=Required, positional=true, required=true),
+          field_of(
+            (Ty::new() : Ty[Paint?]),
+            id=0,
+            name="fill",
+            kind=Settable,
+            default=highlight_elem_fill_default,
+          ),
+          field_of(
+            (Ty::new() : Ty[Sides[Stroke??]]),
+            id=1,
+            name="stroke",
+            kind=Settable,
+            default=() => Dict(Dict::new()),
+            fold=fold_of((Ty::new() : Ty[Sides[Stroke??]])),
+          ),
+          field_of(
+            (Ty::new() : Ty[TopEdge]),
+            id=2,
+            name="top-edge",
+            kind=Settable,
+            default=highlight_elem_top_edge_default,
+          ),
+          field_of(
+            (Ty::new() : Ty[BottomEdge]),
+            id=3,
+            name="bottom-edge",
+            kind=Settable,
+            default=highlight_elem_bottom_edge_default,
+          ),
+          field_of(
+            (Ty::new() : Ty[Length]),
+            id=4,
+            name="extent",
+            kind=Settable,
+            default=() => Length(Length::zero()),
+          ),
+          field_of(
+            (Ty::new() : Ty[Corners[Rel[Length]?]]),
+            id=5,
+            name="radius",
+            kind=Settable,
+            default=() => Dict(Dict::new()),
+            fold=fold_of((Ty::new() : Ty[Corners[Rel[Length]?]])),
+          ),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=6,
+            name="body",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
         ],
       )
       highlight_elem_cell.val = Some(e)
@@ -4513,7 +7286,13 @@ pub fn linebreak_elem() -> Element {
         keywords=[],
         capabilities=[],
         fields=[
-        field_of((Ty::new() : Ty[Bool]), id=0, name="justify", kind=Settable, default=() => Bool(false)),
+          field_of(
+            (Ty::new() : Ty[Bool]),
+            id=0,
+            name="justify",
+            kind=Settable,
+            default=() => Bool(false),
+          ),
         ],
       )
       linebreak_elem_cell.val = Some(e)
@@ -4541,48 +7320,304 @@ pub fn text_elem() -> Element {
         keywords=[],
         capabilities=["Debug", "Construct", "PlainText", "Repr"],
         fields=[
-        field_of((Ty::new() : Ty[FontList]), id=0, name="font", kind=Ghost, default=text_elem_font_default, parse=text_elem_font_parse),
-        field_of((Ty::new() : Ty[Bool]), id=1, name="fallback", kind=Ghost, default=() => Bool(true)),
-        field_of((Ty::new() : Ty[FontStyle]), id=2, name="style", kind=Ghost, default=text_elem_style_default),
-        field_of((Ty::new() : Ty[FontWeight]), id=3, name="weight", kind=Ghost, default=text_elem_weight_default),
-        field_of((Ty::new() : Ty[FontStretch]), id=4, name="stretch", kind=Ghost, default=text_elem_stretch_default),
-        field_of((Ty::new() : Ty[TextSize]), id=5, name="size", kind=Ghost, default=text_elem_size_default, fold=text_elem_size_fold, parse=text_elem_size_parse),
-        field_of((Ty::new() : Ty[Paint]), id=6, name="fill", kind=Ghost, default=text_elem_fill_default, parse=text_elem_fill_parse),
-        field_of((Ty::new() : Ty[Stroke?]), id=7, name="stroke", kind=Ghost, default=() => None),
-        field_of((Ty::new() : Ty[Length]), id=8, name="tracking", kind=Ghost, default=() => Length(Length::zero())),
-        field_of((Ty::new() : Ty[Rel[Length]]), id=9, name="spacing", kind=Ghost, default=() => Relative(Rel::one())),
-        field_of((Ty::new() : Ty[Smart[Never?]]), id=10, name="cjk-latin-spacing", kind=Ghost, default=() => Auto),
-        field_of((Ty::new() : Ty[Length]), id=11, name="baseline", kind=Ghost, default=() => Length(Length::zero())),
-        field_of((Ty::new() : Ty[Bool]), id=12, name="overhang", kind=Ghost, default=() => Bool(true)),
-        field_of((Ty::new() : Ty[TopEdge]), id=13, name="top-edge", kind=Ghost, default=text_elem_top_edge_default),
-        field_of((Ty::new() : Ty[BottomEdge]), id=14, name="bottom-edge", kind=Ghost, default=text_elem_bottom_edge_default),
-        field_of((Ty::new() : Ty[Lang]), id=15, name="lang", kind=Ghost, default=text_elem_lang_default),
-        field_of((Ty::new() : Ty[Region?]), id=16, name="region", kind=Ghost, default=() => None),
-        field_of((Ty::new() : Ty[Smart[WritingScript]]), id=17, name="script", kind=Ghost, default=() => Auto),
-        field_of((Ty::new() : Ty[TextDir]), id=18, name="dir", kind=Ghost, default=text_elem_dir_default),
-        field_of((Ty::new() : Ty[Smart[Bool]]), id=19, name="hyphenate", kind=Ghost, default=() => Auto),
-        field_of((Ty::new() : Ty[Costs]), id=20, name="costs", kind=Ghost, default=text_elem_costs_default, fold=text_elem_costs_fold, output=text_elem_costs_output),
-        field_of((Ty::new() : Ty[Bool]), id=21, name="kerning", kind=Ghost, default=() => Bool(true)),
-        field_of((Ty::new() : Ty[Alternates]), id=22, name="alternates", kind=Ghost, default=text_elem_alternates_default),
-        field_of((Ty::new() : Ty[StylisticSets]), id=23, name="stylistic-set", kind=Ghost, default=text_elem_stylistic_set_default),
-        field_of((Ty::new() : Ty[Bool]), id=24, name="ligatures", kind=Ghost, default=() => Bool(true)),
-        field_of((Ty::new() : Ty[Bool]), id=25, name="discretionary-ligatures", kind=Ghost, default=() => Bool(false)),
-        field_of((Ty::new() : Ty[Bool]), id=26, name="historical-ligatures", kind=Ghost, default=() => Bool(false)),
-        field_of((Ty::new() : Ty[Smart[NumberType]]), id=27, name="number-type", kind=Ghost, default=() => Auto),
-        field_of((Ty::new() : Ty[Smart[NumberWidth]]), id=28, name="number-width", kind=Ghost, default=() => Auto),
-        field_of((Ty::new() : Ty[Bool]), id=29, name="slashed-zero", kind=Ghost, default=() => Bool(false)),
-        field_of((Ty::new() : Ty[Bool]), id=30, name="fractions", kind=Ghost, default=() => Bool(false)),
-        field_of((Ty::new() : Ty[FontFeatures]), id=31, name="features", kind=Ghost, default=text_elem_features_default, fold=text_elem_features_fold),
-        field_of((Ty::new() : Ty[FontVariations]), id=32, name="variations", kind=Ghost, default=text_elem_variations_default, fold=text_elem_variations_fold),
-        field_of((Ty::new() : Ty[Content]), id=33, name="body", kind=Required, positional=true, required=true),
-        field_of((Ty::new() : Ty[String]), id=34, name="text", kind=Required, positional=true, required=true),
-        field_of((Ty::new() : Ty[USize]), id=35, name="span-offset", kind=Ghost, internal=true, default=() => Int(0L)),
-        field_of((Ty::new() : Ty[WeightDelta]), id=36, name="delta", kind=Ghost, internal=true, default=text_elem_delta_default, fold=text_elem_delta_fold),
-        field_of((Ty::new() : Ty[ItalicToggle]), id=37, name="emph", kind=Ghost, internal=true, default=text_elem_emph_default, fold=text_elem_emph_fold),
-        field_of((Ty::new() : Ty[Array[Decoration]]), id=38, name="deco", kind=Ghost, internal=true, default=() => Array(Arr::new()), fold=text_elem_deco_fold),
-        field_of((Ty::new() : Ty[Case?]), id=39, name="case", kind=Ghost, internal=true, default=() => None),
-        field_of((Ty::new() : Ty[Smallcaps?]), id=40, name="smallcaps", kind=Ghost, internal=true, default=() => None),
-        field_of((Ty::new() : Ty[ShiftSettings?]), id=41, name="shift-settings", kind=Ghost, internal=true, default=() => None),
+          field_of(
+            (Ty::new() : Ty[FontList]),
+            id=0,
+            name="font",
+            kind=Ghost,
+            default=text_elem_font_default,
+            parse=text_elem_font_parse,
+          ),
+          field_of((Ty::new() : Ty[Bool]), id=1, name="fallback", kind=Ghost, default=() => {
+            Bool(true)
+          }),
+          field_of(
+            (Ty::new() : Ty[FontStyle]),
+            id=2,
+            name="style",
+            kind=Ghost,
+            default=text_elem_style_default,
+          ),
+          field_of(
+            (Ty::new() : Ty[FontWeight]),
+            id=3,
+            name="weight",
+            kind=Ghost,
+            default=text_elem_weight_default,
+          ),
+          field_of(
+            (Ty::new() : Ty[FontStretch]),
+            id=4,
+            name="stretch",
+            kind=Ghost,
+            default=text_elem_stretch_default,
+          ),
+          field_of(
+            (Ty::new() : Ty[TextSize]),
+            id=5,
+            name="size",
+            kind=Ghost,
+            default=text_elem_size_default,
+            fold=text_elem_size_fold,
+            parse=text_elem_size_parse,
+          ),
+          field_of(
+            (Ty::new() : Ty[Paint]),
+            id=6,
+            name="fill",
+            kind=Ghost,
+            default=text_elem_fill_default,
+            parse=text_elem_fill_parse,
+          ),
+          field_of((Ty::new() : Ty[Stroke?]), id=7, name="stroke", kind=Ghost, default=() => {
+            None
+          }),
+          field_of(
+            (Ty::new() : Ty[Length]),
+            id=8,
+            name="tracking",
+            kind=Ghost,
+            default=() => Length(Length::zero()),
+          ),
+          field_of(
+            (Ty::new() : Ty[Rel[Length]]),
+            id=9,
+            name="spacing",
+            kind=Ghost,
+            default=() => Relative(Rel::one()),
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[Never?]]),
+            id=10,
+            name="cjk-latin-spacing",
+            kind=Ghost,
+            default=() => Auto,
+          ),
+          field_of(
+            (Ty::new() : Ty[Length]),
+            id=11,
+            name="baseline",
+            kind=Ghost,
+            default=() => Length(Length::zero()),
+          ),
+          field_of((Ty::new() : Ty[Bool]), id=12, name="overhang", kind=Ghost, default=() => {
+            Bool(true)
+          }),
+          field_of(
+            (Ty::new() : Ty[TopEdge]),
+            id=13,
+            name="top-edge",
+            kind=Ghost,
+            default=text_elem_top_edge_default,
+          ),
+          field_of(
+            (Ty::new() : Ty[BottomEdge]),
+            id=14,
+            name="bottom-edge",
+            kind=Ghost,
+            default=text_elem_bottom_edge_default,
+          ),
+          field_of(
+            (Ty::new() : Ty[Lang]),
+            id=15,
+            name="lang",
+            kind=Ghost,
+            default=text_elem_lang_default,
+          ),
+          field_of(
+            (Ty::new() : Ty[Region?]),
+            id=16,
+            name="region",
+            kind=Ghost,
+            default=() => None,
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[WritingScript]]),
+            id=17,
+            name="script",
+            kind=Ghost,
+            default=() => Auto,
+          ),
+          field_of(
+            (Ty::new() : Ty[TextDir]),
+            id=18,
+            name="dir",
+            kind=Ghost,
+            default=text_elem_dir_default,
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[Bool]]),
+            id=19,
+            name="hyphenate",
+            kind=Ghost,
+            default=() => Auto,
+          ),
+          field_of(
+            (Ty::new() : Ty[Costs]),
+            id=20,
+            name="costs",
+            kind=Ghost,
+            default=text_elem_costs_default,
+            fold=text_elem_costs_fold,
+            output=text_elem_costs_output,
+          ),
+          field_of((Ty::new() : Ty[Bool]), id=21, name="kerning", kind=Ghost, default=() => {
+            Bool(true)
+          }),
+          field_of(
+            (Ty::new() : Ty[Alternates]),
+            id=22,
+            name="alternates",
+            kind=Ghost,
+            default=text_elem_alternates_default,
+          ),
+          field_of(
+            (Ty::new() : Ty[StylisticSets]),
+            id=23,
+            name="stylistic-set",
+            kind=Ghost,
+            default=text_elem_stylistic_set_default,
+          ),
+          field_of(
+            (Ty::new() : Ty[Bool]),
+            id=24,
+            name="ligatures",
+            kind=Ghost,
+            default=() => Bool(true),
+          ),
+          field_of(
+            (Ty::new() : Ty[Bool]),
+            id=25,
+            name="discretionary-ligatures",
+            kind=Ghost,
+            default=() => Bool(false),
+          ),
+          field_of(
+            (Ty::new() : Ty[Bool]),
+            id=26,
+            name="historical-ligatures",
+            kind=Ghost,
+            default=() => Bool(false),
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[NumberType]]),
+            id=27,
+            name="number-type",
+            kind=Ghost,
+            default=() => Auto,
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[NumberWidth]]),
+            id=28,
+            name="number-width",
+            kind=Ghost,
+            default=() => Auto,
+          ),
+          field_of(
+            (Ty::new() : Ty[Bool]),
+            id=29,
+            name="slashed-zero",
+            kind=Ghost,
+            default=() => Bool(false),
+          ),
+          field_of(
+            (Ty::new() : Ty[Bool]),
+            id=30,
+            name="fractions",
+            kind=Ghost,
+            default=() => Bool(false),
+          ),
+          field_of(
+            (Ty::new() : Ty[FontFeatures]),
+            id=31,
+            name="features",
+            kind=Ghost,
+            default=text_elem_features_default,
+            fold=text_elem_features_fold,
+          ),
+          field_of(
+            (Ty::new() : Ty[FontVariations]),
+            id=32,
+            name="variations",
+            kind=Ghost,
+            default=text_elem_variations_default,
+            fold=text_elem_variations_fold,
+          ),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=33,
+            name="body",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
+          field_of(
+            (Ty::new() : Ty[String]),
+            id=34,
+            name="text",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
+          field_of(
+            (Ty::new() : Ty[USize]),
+            id=35,
+            name="span-offset",
+            kind=Ghost,
+            internal=true,
+            default=() => Int(0L),
+          ),
+          field_of(
+            (Ty::new() : Ty[WeightDelta]),
+            id=36,
+            name="delta",
+            kind=Ghost,
+            internal=true,
+            default=text_elem_delta_default,
+            fold=text_elem_delta_fold,
+          ),
+          field_of(
+            (Ty::new() : Ty[ItalicToggle]),
+            id=37,
+            name="emph",
+            kind=Ghost,
+            internal=true,
+            default=text_elem_emph_default,
+            fold=text_elem_emph_fold,
+          ),
+          field_of(
+            (Ty::new() : Ty[Array[Decoration]]),
+            id=38,
+            name="deco",
+            kind=Ghost,
+            internal=true,
+            default=() => Array(Arr::new()),
+            fold=text_elem_deco_fold,
+          ),
+          field_of(
+            (Ty::new() : Ty[Case?]),
+            id=39,
+            name="case",
+            kind=Ghost,
+            internal=true,
+            default=() => None,
+          ),
+          field_of(
+            (Ty::new() : Ty[Smallcaps?]),
+            id=40,
+            name="smallcaps",
+            kind=Ghost,
+            internal=true,
+            default=() => None,
+          ),
+          field_of(
+            (Ty::new() : Ty[ShiftSettings?]),
+            id=41,
+            name="shift-settings",
+            kind=Ghost,
+            internal=true,
+            default=() => None,
+          ),
         ],
       )
       text_elem_cell.val = Some(e)
@@ -4732,22 +7767,74 @@ pub fn raw_elem() -> Element {
         title="Raw Text / Code",
         docs="Raw text with optional syntax highlighting.",
         keywords=[],
-        capabilities=["Synthesize", "Locatable", "Tagged", "ShowSet", "LocalName", "Figurable", "PlainText"],
+        capabilities=[
+          "Synthesize", "Locatable", "Tagged", "ShowSet", "LocalName", "Figurable",
+          "PlainText",
+        ],
         fields=[
-        field_of((Ty::new() : Ty[RawContent]), id=0, name="text", kind=Required, positional=true, required=true),
-        field_of((Ty::new() : Ty[Bool]), id=1, name="block", kind=Settable, default=() => Bool(false)),
-        field_of((Ty::new() : Ty[String?]), id=2, name="lang", kind=Settable, default=() => None),
-        field_of((Ty::new() : Ty[HAlignment]), id=3, name="align", kind=Settable, default=() => Dyn(Alignment(Alignment::H(HAlignment::Start)))),
-        field_of((Ty::new() : Ty[OneOrMultiple[DataSource]]), id=4, name="syntaxes", kind=Settable, default=raw_elem_syntaxes_default, fold=fold_of((Ty::new() : Ty[OneOrMultiple[DataSource]])), parse=raw_elem_syntaxes_parse),
-        field_of((Ty::new() : Ty[Smart[DataSource?]]), id=5, name="theme", kind=Settable, default=() => Auto, parse=raw_elem_theme_parse),
-        field_of((Ty::new() : Ty[USize]), id=6, name="tab-size", kind=Settable, default=() => Int(2L)),
-        field_of((Ty::new() : Ty[Array[RawLine]]), id=7, name="lines", kind=Synthesized),
+          field_of(
+            (Ty::new() : Ty[RawContent]),
+            id=0,
+            name="text",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
+          field_of((Ty::new() : Ty[Bool]), id=1, name="block", kind=Settable, default=() => {
+            Bool(false)
+          }),
+          field_of(
+            (Ty::new() : Ty[String?]),
+            id=2,
+            name="lang",
+            kind=Settable,
+            default=() => None,
+          ),
+          field_of(
+            (Ty::new() : Ty[HAlignment]),
+            id=3,
+            name="align",
+            kind=Settable,
+            default=() => Dyn(Alignment(Alignment::H(HAlignment::Start))),
+          ),
+          field_of(
+            (Ty::new() : Ty[OneOrMultiple[DataSource]]),
+            id=4,
+            name="syntaxes",
+            kind=Settable,
+            default=raw_elem_syntaxes_default,
+            fold=fold_of((Ty::new() : Ty[OneOrMultiple[DataSource]])),
+            parse=raw_elem_syntaxes_parse,
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[DataSource?]]),
+            id=5,
+            name="theme",
+            kind=Settable,
+            default=() => Auto,
+            parse=raw_elem_theme_parse,
+          ),
+          field_of(
+            (Ty::new() : Ty[USize]),
+            id=6,
+            name="tab-size",
+            kind=Settable,
+            default=() => Int(2L),
+          ),
+          field_of(
+            (Ty::new() : Ty[Array[RawLine]]),
+            id=7,
+            name="lines",
+            kind=Synthesized,
+          ),
         ],
       )
       raw_elem_cell.val = Some(e)
       e.hooks().synthesize = Some(raw_elem_synthesize)
       e.hooks().show_set = Some(raw_elem_show_set)
-      e.hooks().local_name = Some((lang, region) => localized_str(lang, region, raw_elem_local_name_key()))
+      e.hooks().local_name = Some((lang, region) => {
+        localized_str(lang, region, raw_elem_local_name_key())
+      })
       e
     }
   }
@@ -4793,10 +7880,38 @@ pub fn raw_line_elem() -> Element {
         keywords=[],
         capabilities=["Tagged", "PlainText"],
         fields=[
-        field_of((Ty::new() : Ty[Int64]), id=0, name="number", kind=Required, positional=true, required=true),
-        field_of((Ty::new() : Ty[Int64]), id=1, name="count", kind=Required, positional=true, required=true),
-        field_of((Ty::new() : Ty[String]), id=2, name="text", kind=Required, positional=true, required=true),
-        field_of((Ty::new() : Ty[Content]), id=3, name="body", kind=Required, positional=true, required=true),
+          field_of(
+            (Ty::new() : Ty[Int64]),
+            id=0,
+            name="number",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
+          field_of(
+            (Ty::new() : Ty[Int64]),
+            id=1,
+            name="count",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
+          field_of(
+            (Ty::new() : Ty[String]),
+            id=2,
+            name="text",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=3,
+            name="body",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
         ],
       )
       raw_line_elem_cell.val = Some(e)
@@ -4833,10 +7948,35 @@ pub fn sub_elem() -> Element {
         keywords=[],
         capabilities=["Tagged"],
         fields=[
-        field_of((Ty::new() : Ty[Bool]), id=0, name="typographic", kind=Settable, default=() => Bool(true)),
-        field_of((Ty::new() : Ty[Smart[Length]]), id=1, name="baseline", kind=Settable, default=() => Auto),
-        field_of((Ty::new() : Ty[Smart[TextSize]]), id=2, name="size", kind=Settable, default=() => Auto),
-        field_of((Ty::new() : Ty[Content]), id=3, name="body", kind=Required, positional=true, required=true),
+          field_of(
+            (Ty::new() : Ty[Bool]),
+            id=0,
+            name="typographic",
+            kind=Settable,
+            default=() => Bool(true),
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[Length]]),
+            id=1,
+            name="baseline",
+            kind=Settable,
+            default=() => Auto,
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[TextSize]]),
+            id=2,
+            name="size",
+            kind=Settable,
+            default=() => Auto,
+          ),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=3,
+            name="body",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
         ],
       )
       sub_elem_cell.val = Some(e)
@@ -4873,10 +8013,35 @@ pub fn super_elem() -> Element {
         keywords=[],
         capabilities=["Tagged"],
         fields=[
-        field_of((Ty::new() : Ty[Bool]), id=0, name="typographic", kind=Settable, default=() => Bool(true)),
-        field_of((Ty::new() : Ty[Smart[Length]]), id=1, name="baseline", kind=Settable, default=() => Auto),
-        field_of((Ty::new() : Ty[Smart[TextSize]]), id=2, name="size", kind=Settable, default=() => Auto),
-        field_of((Ty::new() : Ty[Content]), id=3, name="body", kind=Required, positional=true, required=true),
+          field_of(
+            (Ty::new() : Ty[Bool]),
+            id=0,
+            name="typographic",
+            kind=Settable,
+            default=() => Bool(true),
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[Length]]),
+            id=1,
+            name="baseline",
+            kind=Settable,
+            default=() => Auto,
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[TextSize]]),
+            id=2,
+            name="size",
+            kind=Settable,
+            default=() => Auto,
+          ),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=3,
+            name="body",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
         ],
       )
       super_elem_cell.val = Some(e)
@@ -4913,8 +8078,17 @@ pub fn smallcaps_elem() -> Element {
         keywords=[],
         capabilities=[],
         fields=[
-        field_of((Ty::new() : Ty[Bool]), id=0, name="all", kind=Settable, default=() => Bool(false)),
-        field_of((Ty::new() : Ty[Content]), id=1, name="body", kind=Required, positional=true, required=true),
+          field_of((Ty::new() : Ty[Bool]), id=0, name="all", kind=Settable, default=() => {
+            Bool(false)
+          }),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=1,
+            name="body",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
         ],
       )
       smallcaps_elem_cell.val = Some(e)
@@ -4945,10 +8119,30 @@ pub fn smart_quote_elem() -> Element {
         keywords=[],
         capabilities=["PlainText"],
         fields=[
-        field_of((Ty::new() : Ty[Bool]), id=0, name="double", kind=Settable, default=() => Bool(true)),
-        field_of((Ty::new() : Ty[Bool]), id=1, name="enabled", kind=Settable, default=() => Bool(true)),
-        field_of((Ty::new() : Ty[Bool]), id=2, name="alternative", kind=Settable, default=() => Bool(false)),
-        field_of((Ty::new() : Ty[Smart[SmartQuoteDict]]), id=3, name="quotes", kind=Settable, default=() => Auto),
+          field_of((Ty::new() : Ty[Bool]), id=0, name="double", kind=Settable, default=() => {
+            Bool(true)
+          }),
+          field_of(
+            (Ty::new() : Ty[Bool]),
+            id=1,
+            name="enabled",
+            kind=Settable,
+            default=() => Bool(true),
+          ),
+          field_of(
+            (Ty::new() : Ty[Bool]),
+            id=2,
+            name="alternative",
+            kind=Settable,
+            default=() => Bool(false),
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[SmartQuoteDict]]),
+            id=3,
+            name="quotes",
+            kind=Settable,
+            default=() => Auto,
+          ),
         ],
       )
       smart_quote_elem_cell.val = Some(e)
@@ -4985,7 +8179,16 @@ pub fn space_elem() -> Element {
         keywords=[],
         capabilities=["Unlabellable", "PlainText", "Repr", "PartialEq"],
         fields=[
-        field_of((Ty::new() : Ty[Bool]), id=0, name="had-newline", kind=Required, positional=true, required=true, internal=true, parse=space_elem_had_newline_parse),
+          field_of(
+            (Ty::new() : Ty[Bool]),
+            id=0,
+            name="had-newline",
+            kind=Required,
+            positional=true,
+            required=true,
+            internal=true,
+            parse=space_elem_had_newline_parse,
+          ),
         ],
       )
       space_elem_cell.val = Some(e)
@@ -5014,10 +8217,33 @@ pub fn curve_elem() -> Element {
         keywords=[],
         capabilities=[],
         fields=[
-        field_of((Ty::new() : Ty[Paint?]), id=0, name="fill", kind=Settable, default=() => None),
-        field_of((Ty::new() : Ty[FillRule]), id=1, name="fill-rule", kind=Settable, default=() => Str("non-zero")),
-        field_of((Ty::new() : Ty[Smart[Stroke?]]), id=2, name="stroke", kind=Settable, default=() => Auto, fold=fold_of((Ty::new() : Ty[Smart[Stroke?]]))),
-        field_of((Ty::new() : Ty[CurveComponent]), id=3, name="components", kind=Required, positional=true, required=true, variadic=true),
+          field_of((Ty::new() : Ty[Paint?]), id=0, name="fill", kind=Settable, default=() => {
+            None
+          }),
+          field_of(
+            (Ty::new() : Ty[FillRule]),
+            id=1,
+            name="fill-rule",
+            kind=Settable,
+            default=() => Str("non-zero"),
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[Stroke?]]),
+            id=2,
+            name="stroke",
+            kind=Settable,
+            default=() => Auto,
+            fold=fold_of((Ty::new() : Ty[Smart[Stroke?]])),
+          ),
+          field_of(
+            (Ty::new() : Ty[CurveComponent]),
+            id=3,
+            name="components",
+            kind=Required,
+            positional=true,
+            required=true,
+            variadic=true,
+          ),
         ],
       )
       curve_elem_cell.val = Some(e)
@@ -5054,8 +8280,21 @@ pub fn curve_move_elem() -> Element {
         keywords=[],
         capabilities=[],
         fields=[
-        field_of((Ty::new() : Ty[Axes[Rel[Length]]]), id=0, name="start", kind=Required, positional=true, required=true),
-        field_of((Ty::new() : Ty[Bool]), id=1, name="relative", kind=Settable, default=() => Bool(false)),
+          field_of(
+            (Ty::new() : Ty[Axes[Rel[Length]]]),
+            id=0,
+            name="start",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
+          field_of(
+            (Ty::new() : Ty[Bool]),
+            id=1,
+            name="relative",
+            kind=Settable,
+            default=() => Bool(false),
+          ),
         ],
       )
       curve_move_elem_cell.val = Some(e)
@@ -5086,8 +8325,21 @@ pub fn curve_line_elem() -> Element {
         keywords=[],
         capabilities=[],
         fields=[
-        field_of((Ty::new() : Ty[Axes[Rel[Length]]]), id=0, name="end", kind=Required, positional=true, required=true),
-        field_of((Ty::new() : Ty[Bool]), id=1, name="relative", kind=Settable, default=() => Bool(false)),
+          field_of(
+            (Ty::new() : Ty[Axes[Rel[Length]]]),
+            id=0,
+            name="end",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
+          field_of(
+            (Ty::new() : Ty[Bool]),
+            id=1,
+            name="relative",
+            kind=Settable,
+            default=() => Bool(false),
+          ),
         ],
       )
       curve_line_elem_cell.val = Some(e)
@@ -5118,9 +8370,29 @@ pub fn curve_quad_elem() -> Element {
         keywords=[],
         capabilities=[],
         fields=[
-        field_of((Ty::new() : Ty[Smart[Axes[Rel[Length]]?]]), id=0, name="control", kind=Required, positional=true, required=true),
-        field_of((Ty::new() : Ty[Axes[Rel[Length]]]), id=1, name="end", kind=Required, positional=true, required=true),
-        field_of((Ty::new() : Ty[Bool]), id=2, name="relative", kind=Settable, default=() => Bool(false)),
+          field_of(
+            (Ty::new() : Ty[Smart[Axes[Rel[Length]]?]]),
+            id=0,
+            name="control",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
+          field_of(
+            (Ty::new() : Ty[Axes[Rel[Length]]]),
+            id=1,
+            name="end",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
+          field_of(
+            (Ty::new() : Ty[Bool]),
+            id=2,
+            name="relative",
+            kind=Settable,
+            default=() => Bool(false),
+          ),
         ],
       )
       curve_quad_elem_cell.val = Some(e)
@@ -5154,10 +8426,37 @@ pub fn curve_cubic_elem() -> Element {
         keywords=[],
         capabilities=[],
         fields=[
-        field_of((Ty::new() : Ty[Smart[Axes[Rel[Length]]]?]), id=0, name="control-start", kind=Required, positional=true, required=true),
-        field_of((Ty::new() : Ty[Axes[Rel[Length]]?]), id=1, name="control-end", kind=Required, positional=true, required=true),
-        field_of((Ty::new() : Ty[Axes[Rel[Length]]]), id=2, name="end", kind=Required, positional=true, required=true),
-        field_of((Ty::new() : Ty[Bool]), id=3, name="relative", kind=Settable, default=() => Bool(false)),
+          field_of(
+            (Ty::new() : Ty[Smart[Axes[Rel[Length]]]?]),
+            id=0,
+            name="control-start",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
+          field_of(
+            (Ty::new() : Ty[Axes[Rel[Length]]?]),
+            id=1,
+            name="control-end",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
+          field_of(
+            (Ty::new() : Ty[Axes[Rel[Length]]]),
+            id=2,
+            name="end",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
+          field_of(
+            (Ty::new() : Ty[Bool]),
+            id=3,
+            name="relative",
+            kind=Settable,
+            default=() => Bool(false),
+          ),
         ],
       )
       curve_cubic_elem_cell.val = Some(e)
@@ -5194,7 +8493,13 @@ pub fn curve_close_elem() -> Element {
         keywords=[],
         capabilities=[],
         fields=[
-        field_of((Ty::new() : Ty[CloseMode]), id=0, name="mode", kind=Settable, default=() => Str("smooth")),
+          field_of(
+            (Ty::new() : Ty[CloseMode]),
+            id=0,
+            name="mode",
+            kind=Settable,
+            default=() => Str("smooth"),
+          ),
         ],
       )
       curve_close_elem_cell.val = Some(e)
@@ -5220,23 +8525,86 @@ pub fn image_elem() -> Element {
         title="Image",
         docs="A raster or vector graphic.",
         keywords=[],
-        capabilities=["Locatable", "Tagged", "Synthesize", "LocalName", "Figurable"],
+        capabilities=[
+          "Locatable", "Tagged", "Synthesize", "LocalName", "Figurable",
+        ],
         fields=[
-        field_of((Ty::new() : Ty[DataSource]), id=0, name="source", kind=Required, positional=true, required=true, parse=image_elem_source_parse),
-        field_of((Ty::new() : Ty[Smart[ImageFormat]]), id=1, name="format", kind=Settable, default=() => Auto),
-        field_of((Ty::new() : Ty[Smart[Rel[Length]]]), id=2, name="width", kind=Settable, default=() => Auto),
-        field_of((Ty::new() : Ty[Sizing]), id=3, name="height", kind=Settable, default=image_elem_height_default),
-        field_of((Ty::new() : Ty[String?]), id=4, name="alt", kind=Settable, default=() => None),
-        field_of((Ty::new() : Ty[NonZeroUSize]), id=5, name="page", kind=Settable, default=() => Int(1L)),
-        field_of((Ty::new() : Ty[ImageFit]), id=6, name="fit", kind=Settable, default=image_elem_fit_default),
-        field_of((Ty::new() : Ty[Smart[ImageScaling]]), id=7, name="scaling", kind=Settable, default=() => Auto),
-        field_of((Ty::new() : Ty[Smart[DataSource]]), id=8, name="icc", kind=Settable, default=() => Auto, parse=image_elem_icc_parse),
-        field_of((Ty::new() : Ty[Locale]), id=9, name="locale", kind=Synthesized, internal=true),
+          field_of(
+            (Ty::new() : Ty[DataSource]),
+            id=0,
+            name="source",
+            kind=Required,
+            positional=true,
+            required=true,
+            parse=image_elem_source_parse,
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[ImageFormat]]),
+            id=1,
+            name="format",
+            kind=Settable,
+            default=() => Auto,
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[Rel[Length]]]),
+            id=2,
+            name="width",
+            kind=Settable,
+            default=() => Auto,
+          ),
+          field_of(
+            (Ty::new() : Ty[Sizing]),
+            id=3,
+            name="height",
+            kind=Settable,
+            default=image_elem_height_default,
+          ),
+          field_of((Ty::new() : Ty[String?]), id=4, name="alt", kind=Settable, default=() => {
+            None
+          }),
+          field_of(
+            (Ty::new() : Ty[NonZeroUSize]),
+            id=5,
+            name="page",
+            kind=Settable,
+            default=() => Int(1L),
+          ),
+          field_of(
+            (Ty::new() : Ty[ImageFit]),
+            id=6,
+            name="fit",
+            kind=Settable,
+            default=image_elem_fit_default,
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[ImageScaling]]),
+            id=7,
+            name="scaling",
+            kind=Settable,
+            default=() => Auto,
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[DataSource]]),
+            id=8,
+            name="icc",
+            kind=Settable,
+            default=() => Auto,
+            parse=image_elem_icc_parse,
+          ),
+          field_of(
+            (Ty::new() : Ty[Locale]),
+            id=9,
+            name="locale",
+            kind=Synthesized,
+            internal=true,
+          ),
         ],
       )
       image_elem_cell.val = Some(e)
       e.hooks().synthesize = Some(image_elem_synthesize)
-      e.hooks().local_name = Some((lang, region) => localized_str(lang, region, image_elem_local_name_key()))
+      e.hooks().local_name = Some((lang, region) => {
+        localized_str(lang, region, image_elem_local_name_key())
+      })
       e
     }
   }
@@ -5288,11 +8656,44 @@ pub fn line_elem() -> Element {
         keywords=[],
         capabilities=[],
         fields=[
-        field_of((Ty::new() : Ty[Axes[Rel[Length]]]), id=0, name="start", kind=Settable, default=() => Array(Arr::from_array([Relative(Rel::zero()), Relative(Rel::zero())]))),
-        field_of((Ty::new() : Ty[Axes[Rel[Length]]?]), id=1, name="end", kind=Settable, default=() => None),
-        field_of((Ty::new() : Ty[Rel[Length]]), id=2, name="length", kind=Settable, default=() => Relative(Rel::from_abs(Length::from_abs(Abs::pt(30.0))))),
-        field_of((Ty::new() : Ty[Angle]), id=3, name="angle", kind=Settable, default=() => Angle(Angle::zero())),
-        field_of((Ty::new() : Ty[Stroke]), id=4, name="stroke", kind=Settable, default=() => Dyn(Stroke(Stroke::default())), fold=fold_of((Ty::new() : Ty[Stroke]))),
+          field_of(
+            (Ty::new() : Ty[Axes[Rel[Length]]]),
+            id=0,
+            name="start",
+            kind=Settable,
+            default=() => {
+              Array(
+                Arr::from_array([Relative(Rel::zero()), Relative(Rel::zero())]),
+              )
+            },
+          ),
+          field_of(
+            (Ty::new() : Ty[Axes[Rel[Length]]?]),
+            id=1,
+            name="end",
+            kind=Settable,
+            default=() => None,
+          ),
+          field_of(
+            (Ty::new() : Ty[Rel[Length]]),
+            id=2,
+            name="length",
+            kind=Settable,
+            default=() => {
+              Relative(Rel::from_abs(Length::from_abs(Abs::pt(30.0))))
+            },
+          ),
+          field_of((Ty::new() : Ty[Angle]), id=3, name="angle", kind=Settable, default=() => {
+            Angle(Angle::zero())
+          }),
+          field_of(
+            (Ty::new() : Ty[Stroke]),
+            id=4,
+            name="stroke",
+            kind=Settable,
+            default=() => Dyn(Stroke(Stroke::default())),
+            fold=fold_of((Ty::new() : Ty[Stroke])),
+          ),
         ],
       )
       line_elem_cell.val = Some(e)
@@ -5332,10 +8733,33 @@ pub fn polygon_elem() -> Element {
         keywords=[],
         capabilities=[],
         fields=[
-        field_of((Ty::new() : Ty[Paint?]), id=0, name="fill", kind=Settable, default=() => None),
-        field_of((Ty::new() : Ty[FillRule]), id=1, name="fill-rule", kind=Settable, default=() => Str("non-zero")),
-        field_of((Ty::new() : Ty[Smart[Stroke?]]), id=2, name="stroke", kind=Settable, default=() => Auto, fold=fold_of((Ty::new() : Ty[Smart[Stroke?]]))),
-        field_of((Ty::new() : Ty[Axes[Rel[Length]]]), id=3, name="vertices", kind=Required, positional=true, required=true, variadic=true),
+          field_of((Ty::new() : Ty[Paint?]), id=0, name="fill", kind=Settable, default=() => {
+            None
+          }),
+          field_of(
+            (Ty::new() : Ty[FillRule]),
+            id=1,
+            name="fill-rule",
+            kind=Settable,
+            default=() => Str("non-zero"),
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[Stroke?]]),
+            id=2,
+            name="stroke",
+            kind=Settable,
+            default=() => Auto,
+            fold=fold_of((Ty::new() : Ty[Smart[Stroke?]])),
+          ),
+          field_of(
+            (Ty::new() : Ty[Axes[Rel[Length]]]),
+            id=3,
+            name="vertices",
+            kind=Required,
+            positional=true,
+            required=true,
+            variadic=true,
+          ),
         ],
       )
       polygon_elem_cell.val = Some(e)
@@ -5372,14 +8796,63 @@ pub fn rect_elem() -> Element {
         keywords=[],
         capabilities=[],
         fields=[
-        field_of((Ty::new() : Ty[Smart[Rel[Length]]]), id=0, name="width", kind=Settable, default=() => Auto),
-        field_of((Ty::new() : Ty[Sizing]), id=1, name="height", kind=Settable, default=rect_elem_height_default),
-        field_of((Ty::new() : Ty[Paint?]), id=2, name="fill", kind=Settable, default=() => None),
-        field_of((Ty::new() : Ty[Smart[Sides[Stroke??]]]), id=3, name="stroke", kind=Settable, default=() => Auto, fold=fold_of((Ty::new() : Ty[Smart[Sides[Stroke??]]]))),
-        field_of((Ty::new() : Ty[Corners[Rel[Length]?]]), id=4, name="radius", kind=Settable, default=() => Dict(Dict::new()), fold=fold_of((Ty::new() : Ty[Corners[Rel[Length]?]]))),
-        field_of((Ty::new() : Ty[Sides[Rel[Length]?]]), id=5, name="inset", kind=Settable, default=rect_elem_inset_default, fold=fold_of((Ty::new() : Ty[Sides[Rel[Length]?]]))),
-        field_of((Ty::new() : Ty[Sides[Rel[Length]?]]), id=6, name="outset", kind=Settable, default=() => Dict(Dict::new()), fold=fold_of((Ty::new() : Ty[Sides[Rel[Length]?]]))),
-        field_of((Ty::new() : Ty[Content?]), id=7, name="body", kind=Settable, positional=true, default=() => None),
+          field_of(
+            (Ty::new() : Ty[Smart[Rel[Length]]]),
+            id=0,
+            name="width",
+            kind=Settable,
+            default=() => Auto,
+          ),
+          field_of(
+            (Ty::new() : Ty[Sizing]),
+            id=1,
+            name="height",
+            kind=Settable,
+            default=rect_elem_height_default,
+          ),
+          field_of((Ty::new() : Ty[Paint?]), id=2, name="fill", kind=Settable, default=() => {
+            None
+          }),
+          field_of(
+            (Ty::new() : Ty[Smart[Sides[Stroke??]]]),
+            id=3,
+            name="stroke",
+            kind=Settable,
+            default=() => Auto,
+            fold=fold_of((Ty::new() : Ty[Smart[Sides[Stroke??]]])),
+          ),
+          field_of(
+            (Ty::new() : Ty[Corners[Rel[Length]?]]),
+            id=4,
+            name="radius",
+            kind=Settable,
+            default=() => Dict(Dict::new()),
+            fold=fold_of((Ty::new() : Ty[Corners[Rel[Length]?]])),
+          ),
+          field_of(
+            (Ty::new() : Ty[Sides[Rel[Length]?]]),
+            id=5,
+            name="inset",
+            kind=Settable,
+            default=rect_elem_inset_default,
+            fold=fold_of((Ty::new() : Ty[Sides[Rel[Length]?]])),
+          ),
+          field_of(
+            (Ty::new() : Ty[Sides[Rel[Length]?]]),
+            id=6,
+            name="outset",
+            kind=Settable,
+            default=() => Dict(Dict::new()),
+            fold=fold_of((Ty::new() : Ty[Sides[Rel[Length]?]])),
+          ),
+          field_of(
+            (Ty::new() : Ty[Content?]),
+            id=7,
+            name="body",
+            kind=Settable,
+            positional=true,
+            default=() => None,
+          ),
         ],
       )
       rect_elem_cell.val = Some(e)
@@ -5428,15 +8901,72 @@ pub fn square_elem() -> Element {
         keywords=[],
         capabilities=[],
         fields=[
-        field_of((Ty::new() : Ty[Smart[Length]]), id=0, name="size", kind=External, default=() => Auto),
-        field_of((Ty::new() : Ty[Smart[Rel[Length]]]), id=1, name="width", kind=Settable, default=() => Auto, parse=square_elem_width_parse),
-        field_of((Ty::new() : Ty[Sizing]), id=2, name="height", kind=Settable, default=square_elem_height_default, parse=square_elem_height_parse),
-        field_of((Ty::new() : Ty[Paint?]), id=3, name="fill", kind=Settable, default=() => None),
-        field_of((Ty::new() : Ty[Smart[Sides[Stroke??]]]), id=4, name="stroke", kind=Settable, default=() => Auto, fold=fold_of((Ty::new() : Ty[Smart[Sides[Stroke??]]]))),
-        field_of((Ty::new() : Ty[Corners[Rel[Length]?]]), id=5, name="radius", kind=Settable, default=() => Dict(Dict::new()), fold=fold_of((Ty::new() : Ty[Corners[Rel[Length]?]]))),
-        field_of((Ty::new() : Ty[Sides[Rel[Length]?]]), id=6, name="inset", kind=Settable, default=square_elem_inset_default, fold=fold_of((Ty::new() : Ty[Sides[Rel[Length]?]]))),
-        field_of((Ty::new() : Ty[Sides[Rel[Length]?]]), id=7, name="outset", kind=Settable, default=() => Dict(Dict::new()), fold=fold_of((Ty::new() : Ty[Sides[Rel[Length]?]]))),
-        field_of((Ty::new() : Ty[Content?]), id=8, name="body", kind=Settable, positional=true, default=() => None),
+          field_of(
+            (Ty::new() : Ty[Smart[Length]]),
+            id=0,
+            name="size",
+            kind=External,
+            default=() => Auto,
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[Rel[Length]]]),
+            id=1,
+            name="width",
+            kind=Settable,
+            default=() => Auto,
+            parse=square_elem_width_parse,
+          ),
+          field_of(
+            (Ty::new() : Ty[Sizing]),
+            id=2,
+            name="height",
+            kind=Settable,
+            default=square_elem_height_default,
+            parse=square_elem_height_parse,
+          ),
+          field_of((Ty::new() : Ty[Paint?]), id=3, name="fill", kind=Settable, default=() => {
+            None
+          }),
+          field_of(
+            (Ty::new() : Ty[Smart[Sides[Stroke??]]]),
+            id=4,
+            name="stroke",
+            kind=Settable,
+            default=() => Auto,
+            fold=fold_of((Ty::new() : Ty[Smart[Sides[Stroke??]]])),
+          ),
+          field_of(
+            (Ty::new() : Ty[Corners[Rel[Length]?]]),
+            id=5,
+            name="radius",
+            kind=Settable,
+            default=() => Dict(Dict::new()),
+            fold=fold_of((Ty::new() : Ty[Corners[Rel[Length]?]])),
+          ),
+          field_of(
+            (Ty::new() : Ty[Sides[Rel[Length]?]]),
+            id=6,
+            name="inset",
+            kind=Settable,
+            default=square_elem_inset_default,
+            fold=fold_of((Ty::new() : Ty[Sides[Rel[Length]?]])),
+          ),
+          field_of(
+            (Ty::new() : Ty[Sides[Rel[Length]?]]),
+            id=7,
+            name="outset",
+            kind=Settable,
+            default=() => Dict(Dict::new()),
+            fold=fold_of((Ty::new() : Ty[Sides[Rel[Length]?]])),
+          ),
+          field_of(
+            (Ty::new() : Ty[Content?]),
+            id=8,
+            name="body",
+            kind=Settable,
+            positional=true,
+            default=() => None,
+          ),
         ],
       )
       square_elem_cell.val = Some(e)
@@ -5488,13 +9018,55 @@ pub fn ellipse_elem() -> Element {
         keywords=[],
         capabilities=[],
         fields=[
-        field_of((Ty::new() : Ty[Smart[Rel[Length]]]), id=0, name="width", kind=Settable, default=() => Auto),
-        field_of((Ty::new() : Ty[Sizing]), id=1, name="height", kind=Settable, default=ellipse_elem_height_default),
-        field_of((Ty::new() : Ty[Paint?]), id=2, name="fill", kind=Settable, default=() => None),
-        field_of((Ty::new() : Ty[Smart[Stroke?]]), id=3, name="stroke", kind=Settable, default=() => Auto, fold=fold_of((Ty::new() : Ty[Smart[Stroke?]]))),
-        field_of((Ty::new() : Ty[Sides[Rel[Length]?]]), id=4, name="inset", kind=Settable, default=ellipse_elem_inset_default, fold=fold_of((Ty::new() : Ty[Sides[Rel[Length]?]]))),
-        field_of((Ty::new() : Ty[Sides[Rel[Length]?]]), id=5, name="outset", kind=Settable, default=() => Dict(Dict::new()), fold=fold_of((Ty::new() : Ty[Sides[Rel[Length]?]]))),
-        field_of((Ty::new() : Ty[Content?]), id=6, name="body", kind=Settable, positional=true, default=() => None),
+          field_of(
+            (Ty::new() : Ty[Smart[Rel[Length]]]),
+            id=0,
+            name="width",
+            kind=Settable,
+            default=() => Auto,
+          ),
+          field_of(
+            (Ty::new() : Ty[Sizing]),
+            id=1,
+            name="height",
+            kind=Settable,
+            default=ellipse_elem_height_default,
+          ),
+          field_of((Ty::new() : Ty[Paint?]), id=2, name="fill", kind=Settable, default=() => {
+            None
+          }),
+          field_of(
+            (Ty::new() : Ty[Smart[Stroke?]]),
+            id=3,
+            name="stroke",
+            kind=Settable,
+            default=() => Auto,
+            fold=fold_of((Ty::new() : Ty[Smart[Stroke?]])),
+          ),
+          field_of(
+            (Ty::new() : Ty[Sides[Rel[Length]?]]),
+            id=4,
+            name="inset",
+            kind=Settable,
+            default=ellipse_elem_inset_default,
+            fold=fold_of((Ty::new() : Ty[Sides[Rel[Length]?]])),
+          ),
+          field_of(
+            (Ty::new() : Ty[Sides[Rel[Length]?]]),
+            id=5,
+            name="outset",
+            kind=Settable,
+            default=() => Dict(Dict::new()),
+            fold=fold_of((Ty::new() : Ty[Sides[Rel[Length]?]])),
+          ),
+          field_of(
+            (Ty::new() : Ty[Content?]),
+            id=6,
+            name="body",
+            kind=Settable,
+            positional=true,
+            default=() => None,
+          ),
         ],
       )
       ellipse_elem_cell.val = Some(e)
@@ -5540,14 +9112,64 @@ pub fn circle_elem() -> Element {
         keywords=[],
         capabilities=[],
         fields=[
-        field_of((Ty::new() : Ty[Length]), id=0, name="radius", kind=External, default=() => Length(Length::zero())),
-        field_of((Ty::new() : Ty[Smart[Rel[Length]]]), id=1, name="width", kind=Settable, default=() => Auto, parse=circle_elem_width_parse),
-        field_of((Ty::new() : Ty[Sizing]), id=2, name="height", kind=Settable, default=circle_elem_height_default, parse=circle_elem_height_parse),
-        field_of((Ty::new() : Ty[Paint?]), id=3, name="fill", kind=Settable, default=() => None),
-        field_of((Ty::new() : Ty[Smart[Stroke?]]), id=4, name="stroke", kind=Settable, default=() => Auto, fold=fold_of((Ty::new() : Ty[Smart[Stroke?]]))),
-        field_of((Ty::new() : Ty[Sides[Rel[Length]?]]), id=5, name="inset", kind=Settable, default=circle_elem_inset_default, fold=fold_of((Ty::new() : Ty[Sides[Rel[Length]?]]))),
-        field_of((Ty::new() : Ty[Sides[Rel[Length]?]]), id=6, name="outset", kind=Settable, default=() => Dict(Dict::new()), fold=fold_of((Ty::new() : Ty[Sides[Rel[Length]?]]))),
-        field_of((Ty::new() : Ty[Content?]), id=7, name="body", kind=Settable, positional=true, default=() => None),
+          field_of(
+            (Ty::new() : Ty[Length]),
+            id=0,
+            name="radius",
+            kind=External,
+            default=() => Length(Length::zero()),
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[Rel[Length]]]),
+            id=1,
+            name="width",
+            kind=Settable,
+            default=() => Auto,
+            parse=circle_elem_width_parse,
+          ),
+          field_of(
+            (Ty::new() : Ty[Sizing]),
+            id=2,
+            name="height",
+            kind=Settable,
+            default=circle_elem_height_default,
+            parse=circle_elem_height_parse,
+          ),
+          field_of((Ty::new() : Ty[Paint?]), id=3, name="fill", kind=Settable, default=() => {
+            None
+          }),
+          field_of(
+            (Ty::new() : Ty[Smart[Stroke?]]),
+            id=4,
+            name="stroke",
+            kind=Settable,
+            default=() => Auto,
+            fold=fold_of((Ty::new() : Ty[Smart[Stroke?]])),
+          ),
+          field_of(
+            (Ty::new() : Ty[Sides[Rel[Length]?]]),
+            id=5,
+            name="inset",
+            kind=Settable,
+            default=circle_elem_inset_default,
+            fold=fold_of((Ty::new() : Ty[Sides[Rel[Length]?]])),
+          ),
+          field_of(
+            (Ty::new() : Ty[Sides[Rel[Length]?]]),
+            id=6,
+            name="outset",
+            kind=Settable,
+            default=() => Dict(Dict::new()),
+            fold=fold_of((Ty::new() : Ty[Sides[Rel[Length]?]])),
+          ),
+          field_of(
+            (Ty::new() : Ty[Content?]),
+            id=7,
+            name="body",
+            kind=Settable,
+            positional=true,
+            default=() => None,
+          ),
         ],
       )
       circle_elem_cell.val = Some(e)
@@ -5596,7 +9218,9 @@ pub fn html_format_elem() -> Element {
         keywords=[],
         capabilities=["Construct"],
         fields=[
-        field_of((Ty::new() : Ty[Bool]), id=0, name="pretty", kind=Settable, default=() => Bool(false)),
+          field_of((Ty::new() : Ty[Bool]), id=0, name="pretty", kind=Settable, default=() => {
+            Bool(false)
+          }),
         ],
       )
       html_format_elem_cell.val = Some(e)
@@ -5625,12 +9249,54 @@ pub fn html_elem() -> Element {
         keywords=[],
         capabilities=[],
         fields=[
-        field_of((Ty::new() : Ty[HtmlTag]), id=0, name="tag", kind=Required, positional=true, required=true),
-        field_of((Ty::new() : Ty[HtmlAttrs]), id=1, name="attrs", kind=Settable, default=html_elem_attrs_default, fold=html_elem_attrs_fold),
-        field_of((Ty::new() : Ty[Content?]), id=2, name="body", kind=Settable, positional=true, default=() => None),
-        field_of((Ty::new() : Ty[CssProperties]), id=3, name="css", kind=Settable, internal=true, default=html_elem_css_default, parse=html_elem_css_parse),
-        field_of((Ty::new() : Ty[Location]), id=4, name="parent", kind=Synthesized, internal=true),
-        field_of((Ty::new() : Ty[String?]), id=5, name="role", kind=Ghost, internal=true, default=() => None),
+          field_of(
+            (Ty::new() : Ty[HtmlTag]),
+            id=0,
+            name="tag",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
+          field_of(
+            (Ty::new() : Ty[HtmlAttrs]),
+            id=1,
+            name="attrs",
+            kind=Settable,
+            default=html_elem_attrs_default,
+            fold=html_elem_attrs_fold,
+          ),
+          field_of(
+            (Ty::new() : Ty[Content?]),
+            id=2,
+            name="body",
+            kind=Settable,
+            positional=true,
+            default=() => None,
+          ),
+          field_of(
+            (Ty::new() : Ty[CssProperties]),
+            id=3,
+            name="css",
+            kind=Settable,
+            internal=true,
+            default=html_elem_css_default,
+            parse=html_elem_css_parse,
+          ),
+          field_of(
+            (Ty::new() : Ty[Location]),
+            id=4,
+            name="parent",
+            kind=Synthesized,
+            internal=true,
+          ),
+          field_of(
+            (Ty::new() : Ty[String?]),
+            id=5,
+            name="role",
+            kind=Ghost,
+            internal=true,
+            default=() => None,
+          ),
         ],
       )
       html_elem_cell.val = Some(e)
@@ -5673,7 +9339,14 @@ pub fn frame_elem() -> Element {
         keywords=[],
         capabilities=[],
         fields=[
-        field_of((Ty::new() : Ty[Content]), id=0, name="body", kind=Required, positional=true, required=true),
+          field_of(
+            (Ty::new() : Ty[Content]),
+            id=0,
+            name="body",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
         ],
       )
       frame_elem_cell.val = Some(e)
@@ -5701,10 +9374,30 @@ pub fn pdf_format_elem() -> Element {
         keywords=[],
         capabilities=["Construct"],
         fields=[
-        field_of((Ty::new() : Ty[PageRanges?]), id=0, name="pages", kind=Settable, default=() => None),
-        field_of((Ty::new() : Ty[PdfStandards]), id=1, name="standard", kind=Settable, default=pdf_format_elem_standard_default),
-        field_of((Ty::new() : Ty[Smart[Bool]]), id=2, name="tagged", kind=Settable, default=() => Auto),
-        field_of((Ty::new() : Ty[Bool]), id=3, name="pretty", kind=Settable, default=() => Bool(false)),
+          field_of(
+            (Ty::new() : Ty[PageRanges?]),
+            id=0,
+            name="pages",
+            kind=Settable,
+            default=() => None,
+          ),
+          field_of(
+            (Ty::new() : Ty[PdfStandards]),
+            id=1,
+            name="standard",
+            kind=Settable,
+            default=pdf_format_elem_standard_default,
+          ),
+          field_of(
+            (Ty::new() : Ty[Smart[Bool]]),
+            id=2,
+            name="tagged",
+            kind=Settable,
+            default=() => Auto,
+          ),
+          field_of((Ty::new() : Ty[Bool]), id=3, name="pretty", kind=Settable, default=() => {
+            Bool(false)
+          }),
         ],
       )
       pdf_format_elem_cell.val = Some(e)
@@ -5741,11 +9434,45 @@ pub fn pdf_attach_elem() -> Element {
         keywords=["embed"],
         capabilities=["Locatable"],
         fields=[
-        field_of((Ty::new() : Ty[PathOrStr]), id=0, name="path", kind=Required, positional=true, required=true, parse=pdf_attach_elem_path_parse),
-        field_of((Ty::new() : Ty[BytesValue]), id=1, name="data", kind=Required, positional=true, required=true, parse=pdf_attach_elem_data_parse),
-        field_of((Ty::new() : Ty[AttachedFileRelationship?]), id=2, name="relationship", kind=Settable, default=() => None),
-        field_of((Ty::new() : Ty[String?]), id=3, name="mime-type", kind=Settable, default=() => None),
-        field_of((Ty::new() : Ty[String?]), id=4, name="description", kind=Settable, default=() => None),
+          field_of(
+            (Ty::new() : Ty[PathOrStr]),
+            id=0,
+            name="path",
+            kind=Required,
+            positional=true,
+            required=true,
+            parse=pdf_attach_elem_path_parse,
+          ),
+          field_of(
+            (Ty::new() : Ty[BytesValue]),
+            id=1,
+            name="data",
+            kind=Required,
+            positional=true,
+            required=true,
+            parse=pdf_attach_elem_data_parse,
+          ),
+          field_of(
+            (Ty::new() : Ty[AttachedFileRelationship?]),
+            id=2,
+            name="relationship",
+            kind=Settable,
+            default=() => None,
+          ),
+          field_of(
+            (Ty::new() : Ty[String?]),
+            id=3,
+            name="mime-type",
+            kind=Settable,
+            default=() => None,
+          ),
+          field_of(
+            (Ty::new() : Ty[String?]),
+            id=4,
+            name="description",
+            kind=Settable,
+            default=() => None,
+          ),
         ],
       )
       pdf_attach_elem_cell.val = Some(e)
@@ -5785,7 +9512,9 @@ pub fn svg_format_elem() -> Element {
         keywords=[],
         capabilities=["Construct"],
         fields=[
-        field_of((Ty::new() : Ty[Bool]), id=0, name="pretty", kind=Settable, default=() => Bool(false)),
+          field_of((Ty::new() : Ty[Bool]), id=0, name="pretty", kind=Settable, default=() => {
+            Bool(false)
+          }),
         ],
       )
       svg_format_elem_cell.val = Some(e)
@@ -5813,7 +9542,13 @@ pub fn png_format_elem() -> Element {
         keywords=[],
         capabilities=["Construct"],
         fields=[
-        field_of((Ty::new() : Ty[Scalar]), id=0, name="ppi", kind=Settable, default=png_format_elem_ppi_default),
+          field_of(
+            (Ty::new() : Ty[Scalar]),
+            id=0,
+            name="ppi",
+            kind=Settable,
+            default=png_format_elem_ppi_default,
+          ),
         ],
       )
       png_format_elem_cell.val = Some(e)
@@ -5840,9 +9575,7 @@ pub fn bundle_format_elem() -> Element {
         docs="Typst's bundle export format (experimental).",
         keywords=[],
         capabilities=["Construct"],
-        fields=[
-
-        ],
+        fields=[],
       )
       bundle_format_elem_cell.val = Some(e)
       e
@@ -5866,8 +9599,22 @@ pub fn asset_elem() -> Element {
         keywords=[],
         capabilities=["Locatable"],
         fields=[
-        field_of((Ty::new() : Ty[BundlePath]), id=0, name="path", kind=Required, positional=true, required=true),
-        field_of((Ty::new() : Ty[AssetData]), id=1, name="data", kind=Required, positional=true, required=true),
+          field_of(
+            (Ty::new() : Ty[BundlePath]),
+            id=0,
+            name="path",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
+          field_of(
+            (Ty::new() : Ty[AssetData]),
+            id=1,
+            name="data",
+            kind=Required,
+            positional=true,
+            required=true,
+          ),
         ],
       )
       asset_elem_cell.val = Some(e)

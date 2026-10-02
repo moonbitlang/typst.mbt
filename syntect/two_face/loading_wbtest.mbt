@@ -120,7 +120,9 @@ test "theme loading matches syntect" {
   let failures = []
   for case in theme_loading_cases {
     let (xml, expected) = case
-    let actual = try @syntect.ThemeSet::load_from_reader(@utf8.encode(xml)) catch {
+    let actual = try
+      @syntect.ThemeSet::load_from_reader(@utf8.encode(xml))
+    catch {
       e => "error \{e}\n"
     } noraise {
       theme => describe_theme(theme)

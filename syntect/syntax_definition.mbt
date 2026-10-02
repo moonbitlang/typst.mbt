@@ -182,7 +182,7 @@ pub fn MatchIter::next(self : MatchIter) -> (Context, Int)? {
 /// It recursively follows include directives. Can only be run on contexts
 /// that have already been linked up.
 pub fn context_iter(syntax_set : SyntaxSet, context : Context) -> MatchIter {
-  { syntax_set, ctx_stack: [context], index_stack: [0] }
+  { syntax_set, ctx_stack: [context], index_stack: [0], }
 }
 
 ///|
@@ -211,7 +211,9 @@ pub fn ContextReference::resolve(
 
 ///|
 /// get the context ID this reference points to
-pub fn ContextReference::id(self : ContextReference) -> ContextId raise ParsingError {
+pub fn ContextReference::id(
+  self : ContextReference,
+) -> ContextId raise ParsingError {
   match self {
     Direct(context_id) => context_id
     _ => raise UnresolvedContextReference(self)

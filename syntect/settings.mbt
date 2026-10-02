@@ -71,7 +71,9 @@ fn write_json_str(logger : &Logger, s : String) -> Unit {
       c if c.to_int() < 0x20 => {
         let hex = c.to_int().to_string(radix=16)
         logger.write_string("\\u")
-        logger.write_string("0000".unsafe_substring(start=0, end=4 - hex.length()))
+        logger.write_string(
+          "0000".unsafe_substring(start=0, end=4 - hex.length()),
+        )
         logger.write_string(hex)
       }
       c => logger.write_char(c)
@@ -119,13 +121,10 @@ priv enum PlistEvent {
 ///|
 pub fn read_plist(bytes : Bytes) -> Settings raise SettingsError {
   // A plist is binary if it starts with magic bytes.
-  if bytes.length() >= 8 &&
-    bytes[0:8] == b"bplist00"[:] {
+  if bytes.length() >= 8 && bytes[0:8] == b"bplist00"[:] {
     raise Plist("binary property lists are not supported")
   }
-  let text = @utf8.decode(bytes) catch {
-    _ => raise Plist("invalid UTF-8")
-  }
+  let text = @utf8.decode(bytes) catch { _ => raise Plist("invalid UTF-8") }
   let options : @xml.ParsingOptions = {
     ..@xml.ParsingOptions::default(),
     allow_dtd: true,
@@ -173,7 +172,8 @@ pub fn read_plist(bytes : Bytes) -> Settings raise SettingsError {
       }
       EndCollection => raise Plist("unexpected end of collection")
       Boolean(b) => Bool(b)
-      Data => raise Plist("invalid type: byte array, expected any valid JSON value")
+      Data =>
+        raise Plist("invalid type: byte array, expected any valid JSON value")
       Date(s) => String(s)
       Integer(s) => Number(s)
       Real(f) =>
@@ -327,12 +327,18 @@ fn is_rfc3339(s : String) -> Bool {
     }
     true
   }
-  let at = (i : Int, c : Char) => i < s.length() && s.code_unit_at(i).to_int() == c.to_int()
+  let at = (i : Int, c : Char) => {
+    i < s.length() && s.code_unit_at(i).to_int() == c.to_int()
+  }
   if !(digits(0, 4) && at(4, '-') && digits(5, 2) && at(7, '-') && digits(8, 2)) {
     return false
   }
-  if !((at(10, 'T') || at(10, 't')) && digits(11, 2) && at(13, ':') && digits(14, 2) &&
-    at(16, ':') && digits(17, 2)) {
+  if !((at(10, 'T') || at(10, 't')) &&
+    digits(11, 2) &&
+    at(13, ':') &&
+    digits(14, 2) &&
+    at(16, ':') &&
+    digits(17, 2)) {
     return false
   }
   let mut i = 19
@@ -466,7 +472,7 @@ fn parse_rust_f64(s : String) -> Double? {
   if i != n {
     return None
   }
-  @string.parse_double(s) catch {
+  try @string.parse_double(s) catch {
     _ => None
   } noraise {
     f => Some(f)
@@ -498,7 +504,7 @@ fn parse_rust_i64(s : String) -> Int64? {
     return None
   }
   let text = if neg { "-" + digits.to_string() } else { digits.to_string() }
-  @string.parse_int64(text) catch {
+  try @string.parse_int64(text) catch {
     _ => None
   } noraise {
     v => Some(v)
@@ -512,7 +518,7 @@ fn parse_rust_u64(s : String) -> UInt64? {
   if digits.is_empty() || !digits.iter().all(c => c >= '0' && c <= '9') {
     return None
   }
-  @string.parse_uint64(digits) catch {
+  try @string.parse_uint64(digits) catch {
     _ => None
   } noraise {
     v => Some(v)

@@ -28,7 +28,9 @@ pub fn ScopeSelector::does_match(
 ) -> MatchPower? {
   // if there are any exclusions, and any one of them matches, then this
   // selector doesn't match
-  if self.excludes.iter().any(sel => sel.is_empty() || sel.does_match(stack) is Some(_)) {
+  if self.excludes
+    .iter()
+    .any(sel => sel.is_empty() || sel.does_match(stack) is Some(_)) {
     return None
   }
   if self.path.is_empty() {
@@ -57,7 +59,9 @@ pub fn ScopeSelector::extract_scopes(self : ScopeSelector) -> Array[Scope] {
 ///|
 /// Parses a scope stack followed optionally by (one or more) " -" and then a
 /// scope stack to exclude
-pub fn ScopeSelector::from_str(s : StringView) -> ScopeSelector raise ParseScopeError {
+pub fn ScopeSelector::from_str(
+  s : StringView,
+) -> ScopeSelector raise ParseScopeError {
   let excludes = []
   let mut path_str : StringView = ""
   for i, selector in s.split(" -").collect() {
@@ -67,7 +71,7 @@ pub fn ScopeSelector::from_str(s : StringView) -> ScopeSelector raise ParseScope
       excludes.push(ScopeStack::from_str(selector))
     }
   }
-  { path: ScopeStack::from_str(path_str), excludes }
+  { path: ScopeStack::from_str(path_str), excludes, }
 }
 
 ///|
@@ -92,10 +96,12 @@ pub fn ScopeSelectors::does_match(
 
 ///|
 /// Parses a series of selectors separated by commas or pipes
-pub fn ScopeSelectors::from_str(s : StringView) -> ScopeSelectors raise ParseScopeError {
+pub fn ScopeSelectors::from_str(
+  s : StringView,
+) -> ScopeSelectors raise ParseScopeError {
   let selectors = []
   let mut start = 0
-  for i in 0..=s.length() {
+  for i in 0..<=s.length() {
     if i == s.length() || s.code_unit_at(i) == ',' || s.code_unit_at(i) == '|' {
       selectors.push(ScopeSelector::from_str(s[start:i]))
       start = i + 1

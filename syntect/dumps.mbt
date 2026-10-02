@@ -71,7 +71,7 @@ fn Decoder::scopes(self : Decoder, table : Array[Scope]) -> Array[Scope] {
 fn Decoder::context_id(self : Decoder) -> ContextId {
   let syntax_index = self.int()
   let context_index = self.int()
-  { syntax_index, context_index }
+  { syntax_index, context_index, }
 }
 
 ///|
@@ -185,7 +185,7 @@ pub fn SyntaxSet::from_compact(
   header : String,
   contexts : FixedArray[String],
 ) -> SyntaxSet {
-  let d : Decoder = { s: header, pos: 0 }
+  let d : Decoder = { s: header, pos: 0, }
   let nscopes = d.int()
   let table = Array::makei(nscopes, _ => {
     Scope::new(d.str()) catch {
@@ -210,10 +210,10 @@ pub fn SyntaxSet::from_compact(
       hidden~,
       variables={},
       loader=() => {
-        let cd : Decoder = { s: contexts[i], pos: 0 }
+        let cd : Decoder = { s: contexts[i], pos: 0, }
         let contexts = Array::makei(ncontexts, _ => cd.context(table))
         {
-          context_ids: { "__start": { syntax_index: i, context_index: start } },
+          context_ids: { "__start": { syntax_index: i, context_index: start, } },
           contexts,
         }
       },

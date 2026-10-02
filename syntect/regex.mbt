@@ -31,7 +31,7 @@ pub struct SearchText {
 
 ///|
 pub fn SearchText::new(index : ByteIndex) -> SearchText {
-  { index, text: @fancy.Text::new(index.text()) }
+  { index, text: @fancy.Text::new(index.text()), }
 }
 
 ///|
@@ -66,11 +66,11 @@ pub fn SearchText::next_char_offset(self : SearchText, start : Int) -> Int? {
 /// Note that the regex compilation happens on first use, which is why this
 /// method does not return a result.
 pub fn Regex::new(regex_str : String) -> Regex {
-  { regex_str, regex: None }
+  { regex_str, regex: None, }
 }
 
 ///|
-fn compile(regex_str : String) -> @fancy.Regex raise @fancy.RegexError {
+fn compile(regex_str : String) -> @fancy.Regex raise @fancy.FancyError {
   @fancy.RegexBuilder::new(regex_str).oniguruma_mode(true).build()
 }
 
@@ -130,7 +130,7 @@ pub fn Regex::search_text(
   let haystack = if end == text.len() {
     text.text
   } else {
-    SearchText::new(ByteIndex::new(text.index.slice(0, end))).text
+    text.text.prefix(end)
   }
   let captures = regex.captures_from_pos_text(haystack, begin) catch {
     _ => return false
@@ -162,16 +162,19 @@ fn Regex::regex(self : Regex) -> @fancy.Regex {
 
 ///|
 pub fn Region::new() -> Region {
-  { positions: [] }
+  { positions: [], }
 }
 
 ///|
 pub fn Region::clone(self : Region) -> Region {
-  { positions: self.positions.copy() }
+  { positions: self.positions.copy(), }
 }
 
 ///|
-fn Region::init_from_captures(self : Region, captures : @fancy.Captures) -> Unit {
+fn Region::init_from_captures(
+  self : Region,
+  captures : @fancy.Captures,
+) -> Unit {
   self.positions.clear()
   for i in 0..<captures.len() {
     let pos = captures.get(i).map(m => (m.start(), m.end()))

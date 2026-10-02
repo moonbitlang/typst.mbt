@@ -16,7 +16,7 @@ fn test_raw_theme() -> @syntect.Theme {
       scope: @syntect.ScopeSelectors::from_str(scope) catch {
         _ => abort("bad scope")
       },
-      style: { foreground: fg.map(color), background: None, font_style: fs },
+      style: { foreground: fg.map(color), background: None, font_style: fs, },
     }
   }
 
@@ -36,13 +36,21 @@ fn test_raw_theme() -> @syntect.Theme {
       item("markup.raw", Some("#6b6b6f"), None),
       item("string.other.math.typst", None, None),
       item("punctuation.definition.math", Some("#198810"), None),
-      item("keyword.operator.math, punctuation.math.typst", Some("#1d6c76"), None),
+      item(
+        "keyword.operator.math, punctuation.math.typst",
+        Some("#1d6c76"),
+        None,
+      ),
       item("markup.heading, entity.name.section", None, Some(bold)),
       item("markup.heading.typst", None, Some(bold | underline)),
       item("punctuation.definition.list", Some("#8b41b1"), None),
       item("markup.list.term", None, Some(bold)),
       item("entity.name.label, markup.other.reference", Some("#1d6c76"), None),
-      item("keyword, constant.language, variable.language", Some("#d73948"), None),
+      item(
+        "keyword, constant.language, variable.language",
+        Some("#d73948"),
+        None,
+      ),
       item("storage.type, storage.modifier", Some("#d73948"), None),
       item("constant", Some("#b60157"), None),
       item("string", Some("#198810"), None),

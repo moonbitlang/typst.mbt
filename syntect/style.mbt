@@ -53,26 +53,26 @@ pub(all) struct FontStyle {
 
 ///|
 /// Bold font style
-pub let font_style_bold : FontStyle = { bits: 1 }
+pub let font_style_bold : FontStyle = { bits: 1, }
 
 ///|
 /// Underline font style
-pub let font_style_underline : FontStyle = { bits: 2 }
+pub let font_style_underline : FontStyle = { bits: 2, }
 
 ///|
 /// Italic font style
-pub let font_style_italic : FontStyle = { bits: 4 }
+pub let font_style_italic : FontStyle = { bits: 4, }
 
 ///|
 /// Returns an empty set of flags.
 pub fn FontStyle::empty() -> FontStyle {
-  { bits: 0 }
+  { bits: 0, }
 }
 
 ///|
 /// Returns the set containing all flags.
 pub fn FontStyle::all() -> FontStyle {
-  { bits: 7 }
+  { bits: 7, }
 }
 
 ///|
@@ -96,7 +96,7 @@ pub fn FontStyle::contains(self : FontStyle, other : FontStyle) -> Bool {
 ///|
 /// Returns the union of between the flags in `self` and `other`.
 pub fn FontStyle::union(self : FontStyle, other : FontStyle) -> FontStyle {
-  { bits: self.bits | other.bits }
+  { bits: self.bits | other.bits, }
 }
 
 ///|
@@ -139,11 +139,11 @@ pub impl Show for FontStyle with fn output(self, logger) {
 
 ///|
 /// Black color (`#000000`)
-pub let color_black : Color = { r: 0x00, g: 0x00, b: 0x00, a: 0xFF }
+pub let color_black : Color = { r: 0x00, g: 0x00, b: 0x00, a: 0xFF, }
 
 ///|
 /// White color (`#FFFFFF`)
-pub let color_white : Color = { r: 0xFF, g: 0xFF, b: 0xFF, a: 0xFF }
+pub let color_white : Color = { r: 0xFF, g: 0xFF, b: 0xFF, a: 0xFF, }
 
 ///|
 /// Upstream's `Debug` (`Color { r/g/b/a: 0/0/0/255 }`).
@@ -172,14 +172,30 @@ pub fn StyleModifier::apply(
   other : StyleModifier,
 ) -> StyleModifier {
   {
-    foreground: if other.foreground is Some(_) { other.foreground } else { self.foreground },
-    background: if other.background is Some(_) { other.background } else { self.background },
-    font_style: if other.font_style is Some(_) { other.font_style } else { self.font_style },
+    foreground: if other.foreground is Some(_) {
+      other.foreground
+    } else {
+      self.foreground
+    },
+    background: if other.background is Some(_) {
+      other.background
+    } else {
+      self.background
+    },
+    font_style: if other.font_style is Some(_) {
+      other.font_style
+    } else {
+      self.font_style
+    },
   }
 }
 
 ///|
 /// Upstream's `Default for Style`.
 pub fn Style::default_style() -> Style {
-  { foreground: color_black, background: color_white, font_style: FontStyle::empty() }
+  {
+    foreground: color_black,
+    background: color_white,
+    font_style: FontStyle::empty(),
+  }
 }

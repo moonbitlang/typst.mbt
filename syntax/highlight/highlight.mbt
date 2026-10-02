@@ -55,9 +55,28 @@ pub(all) enum Tag {
 ///|
 /// The list of all tags, in the same order as they are defined.
 pub let tag_list : FixedArray[Tag] = [
-  Comment, Punctuation, Escape, Strong, Emph, Link, Raw, Label, Ref, Heading, ListMarker,
-  ListTerm, MathDelimiter, MathOperator, MathGroupingParens, Keyword, Operator,
-  Number, String, Function, Interpolated, Error,
+  Comment,
+  Punctuation,
+  Escape,
+  Strong,
+  Emph,
+  Link,
+  Raw,
+  Label,
+  Ref,
+  Heading,
+  ListMarker,
+  ListTerm,
+  MathDelimiter,
+  MathOperator,
+  MathGroupingParens,
+  Keyword,
+  Operator,
+  Number,
+  String,
+  Function,
+  Interpolated,
+  Error,
 ]
 
 ///|
@@ -303,15 +322,14 @@ fn highlight_ident(node : @syntax.LinkedNode) -> Tag? {
   if next_leaf is Some(next) &&
     node.range().1 == next.offset() &&
     (
-      // Either at a paren, followed by arguments...
+    // Either at a paren, followed by arguments...
       (
         next.kind() == LeftParen &&
-        (next.parent_kind() is Some(Args | MathArgs | Params))
+        next.parent_kind() is Some(Args | MathArgs | Params)
       ) ||
-      // ...or at a bracket, followed by content
       (
-        next.kind() == LeftBracket &&
-        next.parent_kind() == Some(ContentBlock)
+      // ...or at a bracket, followed by content
+        next.kind() == LeftBracket && next.parent_kind() == Some(ContentBlock)
       )
     ) {
     return Some(Function)

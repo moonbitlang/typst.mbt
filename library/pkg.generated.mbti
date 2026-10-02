@@ -14,6 +14,7 @@ import {
   "moonbitlang/typst/otf",
   "moonbitlang/typst/regex",
   "moonbitlang/typst/syntax",
+  "moonbitlang/typst/syntect",
   "moonbitlang/typst/time",
   "moonbitlang/typst/unicode",
 }
@@ -2410,6 +2411,10 @@ pub let raw_line_elem_count : Int
 pub let raw_line_elem_number : Int
 
 pub let raw_line_elem_text : Int
+
+pub fn raw_syntaxes() -> @syntect.SyntaxSet
+
+pub fn raw_theme() -> @syntect.Theme
 
 pub fn rect_elem() -> Element
 
@@ -9164,8 +9169,10 @@ pub impl Reflect for RatioOrAngle
 
 pub(all) enum RawContent {
   Text(String)
-} derive(Eq, Hash, @debug.Debug)
+  Lines(Array[(String, @syntax.Span)])
+} derive(Hash, @debug.Debug)
 pub fn RawContent::get(Self) -> String
+pub impl Eq for RawContent
 pub impl FromValue for RawContent
 pub impl IntoValue for RawContent
 pub impl Reflect for RawContent
@@ -9235,6 +9242,15 @@ pub(all) enum RawMathItem {
 }
 pub fn RawMathItem::into_item(Self) -> MathItem?
 pub fn RawMathItem::is_ignorant(Self) -> Bool
+
+pub struct RawSyntax {
+  // private fields
+}
+
+pub struct RawTheme {
+  // private fields
+}
+pub fn RawTheme::get(Self) -> @syntect.Theme
 
 pub(all) enum Readable {
   Str(String)

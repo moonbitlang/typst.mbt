@@ -73,7 +73,7 @@ pub fn ByteIndex::new(text : String) -> ByteIndex {
     i = next
   }
   map[b] = text.length()
-  { text, map }
+  { text, map, }
 }
 
 ///|

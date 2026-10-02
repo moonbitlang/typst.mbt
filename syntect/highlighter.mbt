@@ -58,24 +58,28 @@ pub fn ranged_highlight(
     let m_path = state.path
     let m_styles = state.styles
     let m_caches = state.single_caches
-    m_path.apply_with_hook(command, (op, cur_stack) => match op {
-      Push(_) => {
-        // we can push multiple times so this might have changed
-        let new_cache = match m_caches.last() {
-          Some(prev_cache) =>
-            highlighter.update_single_cache_for_push(prev_cache, cur_stack)
-          None =>
-            highlighter.update_single_cache_for_push(
-              ScoredStyle::from_style(highlighter.get_default()),
-              cur_stack,
-            )
+    m_path.apply_with_hook(command, (op, cur_stack) => {
+      match op {
+        Push(_) => {
+          // we can push multiple times so this might have changed
+          let new_cache = match m_caches.last() {
+            Some(prev_cache) =>
+              highlighter.update_single_cache_for_push(prev_cache, cur_stack)
+            None =>
+              highlighter.update_single_cache_for_push(
+                ScoredStyle::from_style(highlighter.get_default()),
+                cur_stack,
+              )
+          }
+          m_styles.push(
+            highlighter.finalize_style_with_multis(new_cache, cur_stack),
+          )
+          m_caches.push(new_cache)
         }
-        m_styles.push(highlighter.finalize_style_with_multis(new_cache, cur_stack))
-        m_caches.push(new_cache)
-      }
-      Pop => {
-        m_styles.pop() |> ignore
-        m_caches.pop() |> ignore
+        Pop => {
+          m_styles.pop() |> ignore
+          m_caches.pop() |> ignore
+        }
       }
     }) catch {
       _ => break
@@ -119,7 +123,7 @@ pub fn HighlightState::new(
     styles.push(highlighter.finalize_style_with_multis(new_cache, prefix))
     single_caches.push(new_cache)
   }
-  { styles, single_caches, path: initial_stack }
+  { styles, single_caches, path: initial_stack, }
 }
 
 ///|
@@ -192,7 +196,7 @@ pub fn Highlighter::new(theme : Theme) -> Highlighter {
   let single_selectors = stable_sort_by(single_selectors, (a, b) => {
     b.0.len().compare(a.0.len())
   })
-  { theme, single_selectors, multi_selectors }
+  { theme, single_selectors, multi_selectors, }
 }
 
 ///|
@@ -254,7 +258,10 @@ pub fn Highlighter::style_for_stack(
 ) -> Style {
   let mut single_cache = ScoredStyle::from_style(self.get_default())
   for i in 0..<stack.length() {
-    single_cache = self.update_single_cache_for_push(single_cache, stack[0:i + 1])
+    single_cache = self.update_single_cache_for_push(
+      single_cache,
+      stack[0:i + 1],
+    )
   }
   self.finalize_style_with_multis(single_cache, stack)
 }

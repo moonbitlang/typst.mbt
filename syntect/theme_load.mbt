@@ -23,7 +23,8 @@ pub(all) suberror ParseThemeError {
 ///|
 pub impl Show for ParseThemeError with fn output(self, logger) {
   match self {
-    IncorrectUnderlineOption => logger.write_string("Incorrect underline option")
+    IncorrectUnderlineOption =>
+      logger.write_string("Incorrect underline option")
     IncorrectFontStyle(s) => logger.write_string("Incorrect font style: \{s}")
     IncorrectColor => logger.write_string("Incorrect color")
     IncorrectSyntax => logger.write_string("Incorrect syntax")
@@ -43,7 +44,9 @@ pub impl Show for ParseThemeError with fn output(self, logger) {
 }
 
 ///|
-pub fn UnderlineOption::from_str(s : String) -> UnderlineOption raise ParseThemeError {
+pub fn UnderlineOption::from_str(
+  s : String,
+) -> UnderlineOption raise ParseThemeError {
   match s {
     "underline" => Underline
     "stippled_underline" => StippledUnderline
@@ -90,8 +93,9 @@ pub fn Color::from_str(s : String) -> Color raise ParseThemeError {
     d.push(to_digit16(char))
   }
   match d.length() {
-    3 => { r: d[0], g: d[1], b: d[2], a: 255 }
-    6 => { r: d[0] * 16 + d[1], g: d[2] * 16 + d[3], b: d[4] * 16 + d[5], a: 255 }
+    3 => { r: d[0], g: d[1], b: d[2], a: 255, }
+    6 =>
+      { r: d[0] * 16 + d[1], g: d[2] * 16 + d[3], b: d[4] * 16 + d[5], a: 255, }
     8 =>
       {
         r: d[0] * 16 + d[1],
@@ -145,11 +149,13 @@ fn StyleModifier::parse_settings(
     None => None
     _ => raise IncorrectColor
   }
-  { foreground, background, font_style }
+  { foreground, background, font_style, }
 }
 
 ///|
-fn ThemeItem::parse_settings(settings : Settings) -> ThemeItem raise ParseThemeError {
+fn ThemeItem::parse_settings(
+  settings : Settings,
+) -> ThemeItem raise ParseThemeError {
   guard settings is Object(obj) else { raise ColorShemeScopeIsNotObject }
   let scope = match obj.get("scope") {
     Some(String(value)) =>
@@ -162,7 +168,7 @@ fn ThemeItem::parse_settings(settings : Settings) -> ThemeItem raise ParseThemeE
     Some(settings) => StyleModifier::parse_settings(settings)
     None => raise IncorrectSettings
   }
-  { scope, style }
+  { scope, style, }
 }
 
 ///|
@@ -172,14 +178,14 @@ fn ThemeSettings::parse_settings(
   let settings : ThemeSettings = ThemeSettings::default()
   guard json is Object(obj) else { raise ColorShemeSettingsIsNotObject }
   fn color(value : Settings) -> Color? {
-    Color::parse_settings(value) catch {
+    try Color::parse_settings(value) catch {
       _ => None
     } noraise {
       c => Some(c)
     }
   }
   fn underline(value : Settings) -> UnderlineOption? {
-    UnderlineOption::parse_settings(value) catch {
+    try UnderlineOption::parse_settings(value) catch {
       _ => None
     } noraise {
       u => Some(u)
@@ -188,46 +194,40 @@ fn ThemeSettings::parse_settings(
   let mut s = settings
   for key, value in obj {
     s = match key {
-      "foreground" => { ..s, foreground: color(value) }
-      "background" => { ..s, background: color(value) }
-      "caret" => { ..s, caret: color(value) }
-      "lineHighlight" => { ..s, line_highlight: color(value) }
-      "misspelling" => { ..s, misspelling: color(value) }
-      "minimapBorder" => { ..s, minimap_border: color(value) }
-      "accent" => { ..s, accent: color(value) }
-      "popupCss" => { ..s, popup_css: value.as_str() }
-      "phantomCss" => { ..s, phantom_css: value.as_str() }
+      "foreground" => { ..s, foreground: color(value), }
+      "background" => { ..s, background: color(value), }
+      "caret" => { ..s, caret: color(value), }
+      "lineHighlight" => { ..s, line_highlight: color(value), }
+      "misspelling" => { ..s, misspelling: color(value), }
+      "minimapBorder" => { ..s, minimap_border: color(value), }
+      "accent" => { ..s, accent: color(value), }
+      "popupCss" => { ..s, popup_css: value.as_str(), }
+      "phantomCss" => { ..s, phantom_css: value.as_str(), }
       "bracketContentsForeground" =>
-        { ..s, bracket_contents_foreground: color(value) }
+        { ..s, bracket_contents_foreground: color(value), }
       "bracketContentsOptions" =>
-        { ..s, bracket_contents_options: underline(value) }
-      "bracketsForeground" =>
-        { ..s, brackets_foreground: color(value) }
-      "bracketsBackground" =>
-        { ..s, brackets_background: color(value) }
-      "bracketsOptions" =>
-        { ..s, brackets_options: underline(value) }
-      "tagsForeground" => { ..s, tags_foreground: color(value) }
-      "tagsOptions" => { ..s, tags_options: underline(value) }
-      "highlight" => { ..s, highlight: color(value) }
-      "findHighlight" => { ..s, find_highlight: color(value) }
+        { ..s, bracket_contents_options: underline(value), }
+      "bracketsForeground" => { ..s, brackets_foreground: color(value), }
+      "bracketsBackground" => { ..s, brackets_background: color(value), }
+      "bracketsOptions" => { ..s, brackets_options: underline(value), }
+      "tagsForeground" => { ..s, tags_foreground: color(value), }
+      "tagsOptions" => { ..s, tags_options: underline(value), }
+      "highlight" => { ..s, highlight: color(value), }
+      "findHighlight" => { ..s, find_highlight: color(value), }
       "findHighlightForeground" =>
-        { ..s, find_highlight_foreground: color(value) }
-      "gutter" => { ..s, gutter: color(value) }
-      "gutterForeground" =>
-        { ..s, gutter_foreground: color(value) }
-      "selection" => { ..s, selection: color(value) }
-      "selectionForeground" =>
-        { ..s, selection_foreground: color(value) }
-      "selectionBorder" => { ..s, selection_border: color(value) }
-      "inactiveSelection" =>
-        { ..s, inactive_selection: color(value) }
+        { ..s, find_highlight_foreground: color(value), }
+      "gutter" => { ..s, gutter: color(value), }
+      "gutterForeground" => { ..s, gutter_foreground: color(value), }
+      "selection" => { ..s, selection: color(value), }
+      "selectionForeground" => { ..s, selection_foreground: color(value), }
+      "selectionBorder" => { ..s, selection_border: color(value), }
+      "inactiveSelection" => { ..s, inactive_selection: color(value), }
       "inactiveSelectionForeground" =>
-        { ..s, inactive_selection_foreground: color(value) }
-      "guide" => { ..s, guide: color(value) }
-      "activeGuide" => { ..s, active_guide: color(value) }
-      "stackGuide" => { ..s, stack_guide: color(value) }
-      "shadow" => { ..s, shadow: color(value) }
+        { ..s, inactive_selection_foreground: color(value), }
+      "guide" => { ..s, guide: color(value), }
+      "activeGuide" => { ..s, active_guide: color(value), }
+      "stackGuide" => { ..s, stack_guide: color(value), }
+      "shadow" => { ..s, shadow: color(value), }
       _ => s // E.g. "shadowWidth" and "invisibles" are ignored
     }
   }
@@ -235,7 +235,9 @@ fn ThemeSettings::parse_settings(
 }
 
 ///|
-pub fn Theme::parse_settings(settings : Settings) -> Theme raise ParseThemeError {
+pub fn Theme::parse_settings(
+  settings : Settings,
+) -> Theme raise ParseThemeError {
   guard settings is Object(obj) else { raise IncorrectSyntax }
   let name = match obj.get("name") {
     Some(String(name)) => Some(name)
@@ -261,7 +263,7 @@ pub fn Theme::parse_settings(settings : Settings) -> Theme raise ParseThemeError
   }
   if obj.get("gutterSettings") is Some(Object(obj)) {
     for key, value in obj {
-      let color : Color? = Color::parse_settings(value) catch {
+      let color : Color? = try Color::parse_settings(value) catch {
         _ => None
       } noraise {
         c => Some(c)
@@ -292,13 +294,13 @@ pub fn Theme::parse_settings(settings : Settings) -> Theme raise ParseThemeError
   let scopes = []
   for i in 1..<items.length() {
     // TODO option to disable best effort parsing and bubble up warnings
-    ThemeItem::parse_settings(items[i]) catch {
+    try ThemeItem::parse_settings(items[i]) catch {
       _ => ()
     } noraise {
       item => scopes.push(item)
     }
   }
-  { name, author, settings, scopes }
+  { name, author, settings, scopes, }
 }
 
 ///|

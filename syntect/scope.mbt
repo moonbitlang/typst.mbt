@@ -119,12 +119,12 @@ fn pack_as_u16s(atoms : Array[Int]) -> Scope raise ParseScopeError {
       b = b | (small << shift)
     }
   }
-  { a, b }
+  { a, b, }
 }
 
 ///|
 fn ScopeRepository::new() -> ScopeRepository {
-  { atoms: [], atom_index_map: {} }
+  { atoms: [], atom_index_map: {}, }
 }
 
 ///|
@@ -134,7 +134,7 @@ pub fn ScopeRepository::build(
   s : StringView,
 ) -> Scope raise ParseScopeError {
   if s.is_empty() {
-    return { a: 0, b: 0 }
+    return { a: 0, b: 0, }
   }
   let parts = s
     .trim_end(chars=".")
@@ -149,7 +149,10 @@ pub fn ScopeRepository::build(
 
 ///|
 /// Return the string for a scope.
-pub fn ScopeRepository::to_string(self : ScopeRepository, scope : Scope) -> String {
+pub fn ScopeRepository::to_string(
+  self : ScopeRepository,
+  scope : Scope,
+) -> String {
   let s = StringBuilder()
   for i in 0..<8 {
     let atom_number = scope.atom_at(i)
@@ -177,7 +180,10 @@ fn ScopeRepository::atom_to_index(self : ScopeRepository, atom : String) -> Int 
 
 ///|
 /// Return the string for an atom number returned by `Scope::atom_at`.
-pub fn ScopeRepository::atom_str(self : ScopeRepository, atom_number : Int) -> String {
+pub fn ScopeRepository::atom_str(
+  self : ScopeRepository,
+  atom_number : Int,
+) -> String {
   self.atoms[atom_number - 1]
 }
 
@@ -203,11 +209,7 @@ pub fn Scope::atom_at(self : Scope, index : Int) -> Int {
 
 ///|
 fn Scope::missing_atoms(self : Scope) -> Int {
-  let trail = if self.b == 0 {
-    self.a.ctz() + 64
-  } else {
-    self.b.ctz()
-  }
+  let trail = if self.b == 0 { self.a.ctz() + 64 } else { self.b.ctz() }
   trail / 16
 }
 
@@ -267,14 +269,14 @@ pub(all) struct MatchPower(Double) derive(Eq, Compare, Debug)
 
 ///|
 pub fn ScopeStack::new() -> ScopeStack {
-  { clear_stack: [], scopes: [] }
+  { clear_stack: [], scopes: [], }
 }
 
 ///|
 /// Note: creating a ScopeStack with this doesn't contain information on what
 /// to do when `clear_scopes` contexts end.
 pub fn ScopeStack::from_vec(v : Array[Scope]) -> ScopeStack {
-  { clear_stack: [], scopes: v }
+  { clear_stack: [], scopes: v, }
 }
 
 ///|

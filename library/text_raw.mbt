@@ -10,18 +10,70 @@
 ///|
 /// The content of the raw text.
 ///
-/// Upstream also has a `Lines` variant (lines with their spans) created by
-/// the evaluator for raw blocks; it is stored as its joined text here.
+/// The evaluator creates `Lines` for raw blocks upstream. Here, the element's
+/// field stores the joined text (a `Value`), and the lines with their spans
+/// are recovered from the raw syntax node the element was created from when
+/// highlighting (see `RawElem::content`).
 pub(all) enum RawContent {
   /// From a string.
   Text(String)
-} derive(Eq, Hash, Debug)
+  /// From lines of text.
+  Lines(Array[(String, @syntax.Span)])
+} derive(Hash, Debug)
 
 ///|
 /// Returns or synthesizes the text content of the raw text.
 pub fn RawContent::get(self : RawContent) -> String {
   match self {
     Text(text) => text
+    Lines(lines) =>
+      if lines.length() <= 1 {
+        match lines.get(0) {
+          Some((line, _)) => line
+          None => ""
+        }
+      } else {
+        lines.map(l => l.0).join("\n")
+      }
+  }
+}
+
+///|
+pub impl Eq for RawContent with fn equal(self, other) {
+  match (self, other) {
+    (Text(a), Text(b)) => a == b
+    (Lines(_), Text(text)) | (Text(text), Lines(_)) =>
+      text ==
+      (match self {
+        Lines(_) => self.get()
+        Text(_) => other.get()
+      })
+    (Lines(a), Lines(b)) =>
+      a.length() == b.length() &&
+      a.iter().zip(b.iter()).all(p => p.0.0 == p.1.0)
+  }
+}
+
+///|
+/// The raw content of the element: `Lines` with the spans of the raw
+/// syntax node's lines if the element was created from raw syntax (as by
+/// upstream's evaluator), otherwise the text.
+fn RawElem::content(self : RawElem, engine : Engine) -> RawContent {
+  let text = self.text()
+  let span = self.0.span()
+  guard span.id() is Some(id) else { return text }
+  let source = engine.world.source(id) catch { _ => return text }
+  guard @syntax.LinkedNode::new(source.root()).find(span) is Some(node) &&
+    node.kind() == Raw &&
+    (@ast.Raw::from_untyped(node.get()) : @ast.Raw?) is Some(raw) else {
+    return text
+  }
+  let lines = raw.lines().map(line => (line.get(), line.span())).collect()
+  let lines : RawContent = Lines(lines)
+  if lines == text {
+    lines
+  } else {
+    text
   }
 }
 
@@ -99,7 +151,7 @@ fn RawElem::highlight(
 ) -> Array[RawLine] {
   let elem = self
   let routines = engine.routines()
-  let lines = raw_preprocess(elem.text(), styles, elem.0.span())
+  let lines = raw_preprocess(elem.content(engine), styles, elem.0.span())
   let count = lines.length().to_int64()
   let lang = match elem.lang(styles) {
     Some(s) => Some(@unicode.to_lowercase(s))
@@ -275,7 +327,12 @@ fn raw_to_typst(color : @syntect.Color) -> Color {
 /// Upstream `to_syn`: a Typst color as a syntect color.
 fn raw_to_syn(color : Color) -> @syntect.Color {
   let c = color.to_vec4_u8()
-  { r: c[0].to_byte(), g: c[1].to_byte(), b: c[2].to_byte(), a: c[3].to_byte() }
+  {
+    r: c[0].to_byte(),
+    g: c[1].to_byte(),
+    b: c[2].to_byte(),
+    a: c[3].to_byte(),
+  }
 }
 
 ///|
@@ -337,11 +394,7 @@ pub fn raw_theme() -> @syntect.Theme {
       item("markup.heading.typst", None, Some(bold | underline)),
       item("punctuation.definition.list", Some("#8b41b1"), None),
       item("markup.list.term", None, Some(bold)),
-      item(
-        "entity.name.label, markup.other.reference",
-        Some("#1d6c76"),
-        None,
-      ),
+      item("entity.name.label, markup.other.reference", Some("#1d6c76"), None),
       item(
         "keyword, constant.language, variable.language",
         Some("#d73948"),
@@ -350,25 +403,13 @@ pub fn raw_theme() -> @syntect.Theme {
       item("storage.type, storage.modifier", Some("#d73948"), None),
       item("constant", Some("#b60157"), None),
       item("string", Some("#198810"), None),
-      item(
-        "entity.name, variable.function, support",
-        Some("#4b69c6"),
-        None,
-      ),
+      item("entity.name, variable.function, support", Some("#4b69c6"), None),
       item("support.macro", Some("#16718d"), None),
       item("meta.annotation", Some("#301414"), None),
       item("entity.other, meta.interpolation", Some("#8b41b1"), None),
       item("meta.diff.range", Some("#8b41b1"), None),
-      item(
-        "markup.inserted, meta.diff.header.to-file",
-        Some("#198810"),
-        None,
-      ),
-      item(
-        "markup.deleted, meta.diff.header.from-file",
-        Some("#d73948"),
-        None,
-      ),
+      item("markup.inserted, meta.diff.header.to-file", Some("#198810"), None),
+      item("markup.deleted, meta.diff.header.from-file", Some("#d73948"), None),
       item(
         "meta.mapping.key.json string.quoted.double.json",
         Some("#4b69c6"),
@@ -413,7 +454,7 @@ fn RawSyntax::load(
   world : &World,
   sources : @syntax.Spanned[OneOrMultiple[DataSource]],
 ) -> Array[RawSyntax] raise SourceError {
-  let loaded = load_many({ v: sources.v.0, span: sources.span }, world)
+  let loaded = load_many({ v: sources.v.0, span: sources.span, }, world)
   let list = loaded.map(data => within(data, () => RawSyntax::decode(data.data)))
   raw_syntaxes_derived.push((sources.v.0, list))
   list
@@ -432,7 +473,7 @@ fn RawSyntax::decode(bytes : Bytes) -> RawSyntax raise LoadErr {
   }
   let builder = @syntect.SyntaxSetBuilder::new()
   builder.add(syntax)
-  let syntax = { set: builder.build() }
+  let syntax = { set: builder.build(), }
   raw_syntax_cache.push((bytes, syntax))
   syntax
 }
@@ -458,7 +499,10 @@ fn RawSyntax::find(
     match raw_syntaxes_derived.iter().find_first(e => e.0 == sources) {
       Some(e) => e.1
       None =>
-        RawSyntax::load(engine.world, { v: OneOrMultiple(sources), span: elem.0.span() }) catch {
+        RawSyntax::load(engine.world, {
+          v: OneOrMultiple(sources),
+          span: elem.0.span(),
+        }) catch {
           _ => []
         }
     }
@@ -546,7 +590,7 @@ fn RawTheme::derived(
   match raw_theme_derived.iter().find_first(e => e.0 == source) {
     Some(e) => Some(e.1)
     None =>
-      RawTheme::load(engine.world, { v: source, span }) catch {
+      try RawTheme::load(engine.world, { v: source, span, }) catch {
         _ => None
       } noraise {
         theme => Some(theme)
@@ -596,8 +640,8 @@ fn raw_elem_theme_parse(
 ) -> Value? raise SourceError {
   let theme : @syntax.Spanned[Smart[DataSource?]]? = args.named_spanned("theme")
   match theme {
-    Some({ v: Custom(Some(source)), span }) => {
-      RawTheme::load(engine.world, { v: source, span }) |> ignore
+    Some({ v: Custom(Some(source)), span, }) => {
+      RawTheme::load(engine.world, { v: source, span, }) |> ignore
       Some(Smart::Custom(Some(source)).into_value())
     }
     Some({ v: Custom(None), .. }) => Some(Smart::Custom(None).into_value())
@@ -708,6 +752,9 @@ fn raw_preprocess(
   styles : StyleChain,
   span : @syntax.Span,
 ) -> Array[(String, @syntax.Span)] {
+  if text is Lines(lines) && lines.iter().all(l => !l.0.contains("\t")) {
+    return lines.copy()
+  }
   let mut text = text.get()
   if text.contains("\t") {
     let tab_size = RawElem::tab_size_in(styles).0.to_int()

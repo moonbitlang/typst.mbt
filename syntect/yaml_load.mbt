@@ -138,7 +138,7 @@ fn parse_top_level(
   let variables = {}
   if try_key(h, "variables", x => x.as_hash()) is Some(map) {
     for entry in map.iter() {
-    let (key, value) = entry
+      let (key, value) = entry
       if (key.as_str(), value.as_str()) is (Some(key_str), Some(val_str)) {
         variables[key_str] = val_str
       }
@@ -322,7 +322,8 @@ fn parse_match_pattern(
     None
   }
   let mut has_captures = false
-  let operation : MatchOperation = if try_key(map, "pop", x => Some(x)) is Some(_) {
+  let operation : MatchOperation = if try_key(map, "pop", x => Some(x))
+    is Some(_) {
     // Thanks @wbond for letting me know this is the correct way to check for
     // captures
     let text = ByteIndex::new(regex_str)
@@ -339,11 +340,13 @@ fn parse_match_pattern(
     commands.insert(
       @yaml_rust.Yaml::String("meta_include_prototype"),
       @yaml_rust.Yaml::Boolean(false),
-    ) |> ignore
+    )
+    |> ignore
     embed_escape_context_yaml.push(@yaml_rust.Yaml::Hash(commands))
     if try_key(map, "embed_scope", x => Some(x)) is Some(s) {
       commands = @yaml_rust.new_hash()
-      commands.insert(@yaml_rust.Yaml::String("meta_content_scope"), s) |> ignore
+      commands.insert(@yaml_rust.Yaml::String("meta_content_scope"), s)
+      |> ignore
       embed_escape_context_yaml.push(@yaml_rust.Yaml::Hash(commands))
     }
     if try_key(map, "escape", x => Some(x)) is Some(v) {
@@ -352,17 +355,14 @@ fn parse_match_pattern(
       match_map.insert(
         @yaml_rust.Yaml::String("pop"),
         @yaml_rust.Yaml::Boolean(true),
-      ) |> ignore
+      )
+      |> ignore
       if try_key(map, "escape_captures", x => Some(x)) is Some(y) {
         match_map.insert(@yaml_rust.Yaml::String("captures"), y) |> ignore
       }
       embed_escape_context_yaml.push(@yaml_rust.Yaml::Hash(match_map))
       let escape_context = parse_context(
-        embed_escape_context_yaml,
-        state,
-        contexts,
-        false,
-        namer,
+        embed_escape_context_yaml, state, contexts, false, namer,
       )
       Push([
         Inline(escape_context),
@@ -374,7 +374,8 @@ fn parse_match_pattern(
   } else {
     None
   }
-  let with_prototype = if try_key(map, "with_prototype", x => x.as_vec()) is Some(v) {
+  let with_prototype = if try_key(map, "with_prototype", x => x.as_vec())
+    is Some(v) {
     // should a with_prototype include the prototype? I don't think so.
     let subname = parse_context(v, state, contexts, true, namer)
     Some(ContextReference::Inline(subname))
@@ -389,11 +390,13 @@ fn parse_match_pattern(
     match_map.insert(
       @yaml_rust.Yaml::String("match"),
       @yaml_rust.Yaml::String("(?=\{v_str})"),
-    ) |> ignore
+    )
+    |> ignore
     match_map.insert(
       @yaml_rust.Yaml::String("pop"),
       @yaml_rust.Yaml::Boolean(true),
-    ) |> ignore
+    )
+    |> ignore
     let pattern = parse_match_pattern(match_map, state, contexts, namer)
     if pattern.has_captures {
       context.uses_backrefs = true
@@ -427,9 +430,7 @@ fn parse_pushargs(
             match inner.get(0) {
               Some(first) => first.as_hash() is Some(_)
               None =>
-                abort(
-                  "index out of bounds: the len is 0 but the index is 0",
-                )
+                abort("index out of bounds: the len is 0 but the index is 0")
             }
           None => false
         })
@@ -449,7 +450,10 @@ fn parse_pushargs(
 }
 
 ///|
-fn parse_regex(raw_regex : String, state : ParserState) -> String raise ParseSyntaxError {
+fn parse_regex(
+  raw_regex : String,
+  state : ParserState,
+) -> String raise ParseSyntaxError {
   let regex = resolve_variables(raw_regex, state)
   let regex = replace_posix_char_classes(regex)
   let regex = if state.lines_include_newline {
@@ -512,7 +516,9 @@ fn parse_captures(
     if (key.as_i64(), value.as_str()) is (Some(key_int), Some(val_str)) {
       // `key_int as usize`: negative keys wrap around and never match.
       if key_int >= 0L && valid_indexes.contains(key_int.to_int()) {
-        captures.push((key_int.to_int(), str_to_scopes(val_str, state.scope_repo)))
+        captures.push(
+          (key_int.to_int(), str_to_scopes(val_str, state.scope_repo)),
+        )
       }
     }
   }
@@ -535,13 +541,31 @@ fn add_initial_contexts(
     _ => abort("start context")
   }
   let yaml = yaml_docs[0]
-  let start_yaml = yaml.as_hash().unwrap().get(@yaml_rust.Yaml::String("__start")).unwrap().as_vec().unwrap()
-  parse_context(start_yaml, state, contexts, false, ContextNamer::new("__start"))
+  let start_yaml = yaml
+    .as_hash()
+    .unwrap()
+    .get(@yaml_rust.Yaml::String("__start"))
+    .unwrap()
+    .as_vec()
+    .unwrap()
+  parse_context(
+    start_yaml,
+    state,
+    contexts,
+    false,
+    ContextNamer::new("__start"),
+  )
   |> ignore
   if contexts.get("__start") is Some(start) {
     start.meta_content_scope = [top_level_scope]
   }
-  let main_yaml = yaml.as_hash().unwrap().get(@yaml_rust.Yaml::String("__main")).unwrap().as_vec().unwrap()
+  let main_yaml = yaml
+    .as_hash()
+    .unwrap()
+    .get(@yaml_rust.Yaml::String("__main"))
+    .unwrap()
+    .as_vec()
+    .unwrap()
   parse_context(main_yaml, state, contexts, false, ContextNamer::new("__main"))
   |> ignore
   let main = contexts["main"]
@@ -570,7 +594,7 @@ priv struct ContextNamer {
 
 ///|
 fn ContextNamer::new(name : String) -> ContextNamer {
-  { name, anonymous_index: None }
+  { name, anonymous_index: None, }
 }
 
 ///|
@@ -672,7 +696,10 @@ fn regex_for_no_newlines(regex : String) -> String {
           // Replacing `\n` with `$` in `\n?` or `\n+` would make parsing
           // later fail with "target of repeat operator is invalid"
           let c3 = parser.peek()
-          if c2 == b'n' && c3 != Some(b'?') && c3 != Some(b'+') && c3 != Some(b'*') {
+          if c2 == b'n' &&
+            c3 != Some(b'?') &&
+            c3 != Some(b'+') &&
+            c3 != Some(b'*') {
             result.push(b'$')
           } else {
             result.push(c)
@@ -790,7 +817,7 @@ priv struct RegexScanner {
 
 ///|
 fn RegexScanner::new(s : String) -> RegexScanner {
-  { bytes: @utf8.encode(s), index: 0 }
+  { bytes: @utf8.encode(s), index: 0, }
 }
 
 ///|
@@ -804,7 +831,9 @@ fn RegexScanner::next(self : RegexScanner) -> Unit {
 }
 
 ///|
-fn RegexScanner::parse_character_class(self : RegexScanner) -> (Array[Byte], Bool) {
+fn RegexScanner::parse_character_class(
+  self : RegexScanner,
+) -> (Array[Byte], Bool) {
   let content = []
   let mut negated = false
   let mut nesting = 0

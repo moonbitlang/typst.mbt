@@ -48,7 +48,7 @@ pub struct SyntaxSetBuilder {
 
 ///|
 pub fn SyntaxSet::new() -> SyntaxSet {
-  { syntaxes: [], path_syntaxes: [], first_line_cache: None }
+  { syntaxes: [], path_syntaxes: [], first_line_cache: None, }
 }
 
 ///|
@@ -57,7 +57,7 @@ pub fn SyntaxSet::new() -> SyntaxSet {
 pub fn SyntaxSet::from_lazy_syntaxes(
   syntaxes : Array[SyntaxReference],
 ) -> SyntaxSet {
-  { syntaxes, path_syntaxes: [], first_line_cache: None }
+  { syntaxes, path_syntaxes: [], first_line_cache: None, }
 }
 
 ///|
@@ -114,7 +114,9 @@ pub fn SyntaxSet::find_syntax_by_extension(
 ) -> SyntaxReference? {
   self.syntaxes
   .rev_iter()
-  .find_first(s => s.file_extensions.iter().any(e => eq_ignore_ascii_case(e, extension)))
+  .find_first(s => {
+    s.file_extensions.iter().any(e => eq_ignore_ascii_case(e, extension))
+  })
 }
 
 ///|
@@ -132,7 +134,9 @@ pub fn SyntaxSet::find_syntax_by_token(
   if ext_res is Some(_) {
     return ext_res
   }
-  self.syntaxes.rev_iter().find_first(syntax => eq_ignore_ascii_case(syntax.name, s))
+  self.syntaxes
+  .rev_iter()
+  .find_first(syntax => eq_ignore_ascii_case(syntax.name, s))
 }
 
 ///|
@@ -224,7 +228,7 @@ fn SyntaxReference::get_lazy_contexts(self : SyntaxReference) -> LazyContexts {
 
 ///|
 pub fn SyntaxSetBuilder::new() -> SyntaxSetBuilder {
-  { syntaxes: [], path_syntaxes: [] }
+  { syntaxes: [], path_syntaxes: [], }
 }
 
 ///|
@@ -281,7 +285,7 @@ pub fn SyntaxSetBuilder::build(self : SyntaxSetBuilder) -> SyntaxSet {
     for entry in contexts {
       let (name, context) = entry
       let context_index = all_contexts[syntax_index].length()
-      context_ids[name] = { syntax_index, context_index }
+      context_ids[name] = { syntax_index, context_index, }
       all_contexts[syntax_index].push(context)
     }
     let syntax : SyntaxReference = {
@@ -335,8 +339,10 @@ pub fn SyntaxSetBuilder::build(self : SyntaxSetBuilder) -> SyntaxSet {
         if !context.uses_backrefs &&
           context.patterns
           .iter()
-          .any(pattern => pattern is Include(Direct(id)) &&
-            all_contexts[id.syntax_index][id.context_index].uses_backrefs) {
+          .any(pattern => {
+            pattern is Include(Direct(id)) &&
+            all_contexts[id.syntax_index][id.context_index].uses_backrefs
+          }) {
           context.uses_backrefs = true
           // look for contexts including this context
           found_more_backref_includes = true
@@ -350,7 +356,7 @@ pub fn SyntaxSetBuilder::build(self : SyntaxSetBuilder) -> SyntaxSet {
       contexts: all_contexts[i],
     })
   }
-  { syntaxes, path_syntaxes, first_line_cache: None }
+  { syntaxes, path_syntaxes, first_line_cache: None, }
 }
 
 ///|
@@ -365,7 +371,8 @@ fn recursively_mark_no_prototype(
   if !first_time {
     return
   }
-  for pattern in all_contexts[context_id.syntax_index][context_id.context_index].patterns {
+  for
+    pattern in all_contexts[context_id.syntax_index][context_id.context_index].patterns {
     match pattern {
       // Apparently inline blocks also don't include the prototype when
       // within the prototype. This is really weird, but necessary to run the
@@ -421,7 +428,9 @@ fn link_context(
   for i, pattern in context.patterns {
     context.patterns[i] = match pattern {
       Match(match_pat) =>
-        Match(link_match_pat(match_pat, syntax_index, all_context_ids, syntaxes))
+        Match(
+          link_match_pat(match_pat, syntax_index, all_context_ids, syntaxes),
+        )
       Include(context_ref) =>
         Include(link_ref(context_ref, syntax_index, all_context_ids, syntaxes))
     }
@@ -524,7 +533,7 @@ fn link_match_pat(
     op => op
   }
   let with_prototype = match_pat.with_prototype.map(link)
-  { ..match_pat, operation, with_prototype }
+  { ..match_pat, operation, with_prototype, }
 }
 
 ///|
