@@ -181,22 +181,46 @@ def translate_alignment(e):
     return None
 
 
-# MoonBit types with a `Fold` impl.
-FOLD_TYPES = {"Bool", "Length", "Rel[Length]", "Alignment", "Stroke", "Augment"}
+# MoonBit types with a `Fold` impl, collected from the handwritten library
+# files: plain types, generic types whose impl requires `T : Fold`, and
+# generic types that fold for any `T`.
+def fold_impls():
+    plain, needs_inner, any_inner = set(), set(), set()
+    for fn in os.listdir(LIB):
+        if not fn.endswith(".mbt") or fn.endswith("_gen.mbt"):
+            continue
+        src = open(os.path.join(LIB, fn)).read()
+        for m in re.finditer(r"^pub impl(\[([^\]]*)\])? Fold for (\w+)", src, re.M):
+            bounds, name = m.group(2), m.group(3)
+            if bounds is None:
+                plain.add(name)
+            elif "Fold" in bounds:
+                needs_inner.add(name)
+            else:
+                any_inner.add(name)
+    # `impl[T : Fold] Fold for T?` is the `Option` impl.
+    needs_inner.discard("T")
+    return plain, needs_inner, any_inner
+
+
+FOLD_PLAIN, FOLD_NEEDS_INNER, FOLD_ANY_INNER = fold_impls()
 
 
 def foldable(mty):
     """Whether the MoonBit type implements `Fold`."""
-    if mty in FOLD_TYPES:
+    if mty in FOLD_PLAIN or mty == "Rel[Length]" and "Rel" in FOLD_PLAIN:
         return True
     if mty.endswith("?"):
         return foldable(mty[:-1])
-    m = re.fullmatch(r"(?:Smart|Celled)\[(.*)\]", mty)
+    m = re.fullmatch(r"(\w+)\[(.*)\]", mty)
     if m:
-        return foldable(m.group(1))
-    m = re.fullmatch(r"(?:Sides|Corners)\[(.*)\?\]", mty)
-    if m:
-        return foldable(m.group(1))
+        head, inner = m.group(1), m.group(2)
+        if head in FOLD_ANY_INNER:
+            return True
+        if head in FOLD_NEEDS_INNER:
+            if head in ("Sides", "Corners", "Margin") and inner.endswith("?"):
+                inner = inner[:-1]
+            return foldable(inner)
     return False
 
 
@@ -293,6 +317,9 @@ def main():
                     args.append(f"parse={fname}")
                 else:
                     todo.append(f"// TODO: port `#[parse]` of {e['ident']}.{f['ident']} as `{fname}`.\n")
+            fname = f"{var}_{snake(f['ident'])}_output"
+            if fname in defined:
+                args.append(f"output={fname}")
             fields.append(f"    field_of({', '.join(args)}),")
         caps = ", ".join(mbt_str(c) for c in e["capabilities"])
         kws = ", ".join(mbt_str(k) for k in e["keywords"])

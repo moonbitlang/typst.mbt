@@ -239,7 +239,7 @@ pub fn Content::get(
     None => stored
   }
   match value {
-    Some(v) => v.shared()
+    Some(v) => info.to_output(v).shared()
     None => raise Unset
   }
 }

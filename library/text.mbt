@@ -1006,14 +1006,22 @@ pub impl Reflect for Costs with fn castable(v) {
 
 ///|
 pub impl IntoValue for Costs with fn into_value(self) {
-  Dict(
-    Dict::from_pairs([
-      ("hyphenation", Ratio(self.hyphenation())),
-      ("runt", Ratio(self.runt())),
-      ("widow", Ratio(self.widow())),
-      ("orphan", Ratio(self.orphan())),
-    ]),
-  )
+  // Only the entries that were set, so that the stored field value keeps
+  // which costs were given (required for folding). Users see the full
+  // dictionary of upstream's cast via `text_elem_costs_output`.
+  let pairs = []
+  for
+    (key, v) in [
+      ("hyphenation", self.hyphenation),
+      ("runt", self.runt),
+      ("widow", self.widow),
+      ("orphan", self.orphan),
+    ] {
+    if v is Some(ratio) {
+      pairs.push((key, Value::Ratio(ratio)))
+    }
+  }
+  Dict(Dict::from_pairs(pairs))
 }
 
 ///|
@@ -1032,6 +1040,20 @@ pub impl FromValue for Costs with fn from_value(v) {
     }
     v => raise HintedError(Costs::input().error(v))
   }
+}
+
+///|
+/// Upstream's cast of `Costs` into a value: all four costs.
+fn text_elem_costs_output(v : Value) -> Value {
+  let costs : Costs = Costs::from_value(v) catch { _ => return v }
+  Dict(
+    Dict::from_pairs([
+      ("hyphenation", Ratio(costs.hyphenation())),
+      ("runt", Ratio(costs.runt())),
+      ("widow", Ratio(costs.widow())),
+      ("orphan", Ratio(costs.orphan())),
+    ]),
+  )
 }
 
 ///|
