@@ -1,0 +1,187 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/kurbo"
+
+import {
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub fn f64_max(Double, Double) -> Double
+
+pub fn f64_min(Double, Double) -> Double
+
+pub let point_zero : Point
+
+pub let rect_zero : Rect
+
+pub fn segments(Array[PathEl]) -> Array[PathSeg]
+
+pub fn solve_quadratic(Double, Double, Double) -> Array[Double]
+
+pub let vec2_zero : Vec2
+
+// Errors
+
+// Types and methods
+pub(all) struct Affine(FixedArray[Double]) derive(@debug.Debug)
+pub fn Affine::apply(Self, Point) -> Point
+pub fn Affine::as_coeffs(Self) -> FixedArray[Double]
+pub fn Affine::determinant(Self) -> Double
+pub fn Affine::identity() -> Self
+pub fn Affine::inverse(Self) -> Self
+pub fn Affine::is_finite(Self) -> Bool
+pub fn Affine::new(FixedArray[Double]) -> Self
+pub fn Affine::pre_scale(Self, Double) -> Self
+pub fn Affine::pre_translate(Self, Vec2) -> Self
+pub fn Affine::scale(Double) -> Self
+pub fn Affine::scale_non_uniform(Double, Double) -> Self
+pub fn Affine::then_scale(Self, Double) -> Self
+pub fn Affine::then_translate(Self, Vec2) -> Self
+pub fn Affine::transform_rect_bbox(Self, Rect) -> Rect
+pub fn Affine::translate(Double, Double) -> Self
+pub fn Affine::translate_vec(Vec2) -> Self
+pub fn Affine::translation(Self) -> Vec2
+pub impl Default for Affine
+pub impl Eq for Affine
+pub impl Mul for Affine
+
+pub struct BezPath {
+  // private fields
+} derive(Eq, @debug.Debug)
+pub fn BezPath::bounding_box(Self) -> Rect
+pub fn BezPath::clone(Self) -> Self
+pub fn BezPath::close_path(Self) -> Unit
+pub fn BezPath::curve_to(Self, Point, Point, Point) -> Unit
+pub fn BezPath::elements(Self) -> Array[PathEl]
+pub fn BezPath::extend_path(Self, Self) -> Unit
+pub fn BezPath::from_vec(Array[PathEl]) -> Self
+pub fn BezPath::is_empty(Self) -> Bool
+pub fn BezPath::line_to(Self, Point) -> Unit
+pub fn BezPath::move_to(Self, Point) -> Unit
+pub fn BezPath::new() -> Self
+pub fn BezPath::push(Self, PathEl) -> Unit
+pub fn BezPath::quad_to(Self, Point, Point) -> Unit
+pub fn BezPath::segments(Self) -> Array[PathSeg]
+pub fn BezPath::transform(Self, Affine) -> Self
+pub fn BezPath::truncate(Self, Int) -> Unit
+
+pub(all) enum Cap {
+  Butt
+  Square
+  Round
+} derive(Eq, Hash, @debug.Debug)
+
+pub(all) struct CubicBez {
+  p0 : Point
+  p1 : Point
+  p2 : Point
+  p3 : Point
+} derive(Eq, @debug.Debug)
+pub fn CubicBez::bounding_box(Self) -> Rect
+pub fn CubicBez::eval(Self, Double) -> Point
+pub fn CubicBez::extrema(Self) -> Array[Double]
+pub fn CubicBez::new(Point, Point, Point, Point) -> Self
+pub fn CubicBez::transform(Self, Affine) -> Self
+
+pub(all) enum Join {
+  Bevel
+  Miter
+  Round
+} derive(Eq, Hash, @debug.Debug)
+
+pub(all) struct Line {
+  p0 : Point
+  p1 : Point
+} derive(Eq, @debug.Debug)
+pub fn Line::eval(Self, Double) -> Point
+pub fn Line::new(Point, Point) -> Self
+
+pub(all) enum PathEl {
+  MoveTo(Point)
+  LineTo(Point)
+  QuadTo(Point, Point)
+  CurveTo(Point, Point, Point)
+  ClosePath
+} derive(Eq, @debug.Debug)
+pub fn PathEl::is_finite(Self) -> Bool
+pub fn PathEl::transform(Self, Affine) -> Self
+
+pub(all) enum PathSeg {
+  Line(Line)
+  Quad(QuadBez)
+  Cubic(CubicBez)
+} derive(Eq, @debug.Debug)
+pub fn PathSeg::bounding_box(Self) -> Rect
+pub fn PathSeg::end(Self) -> Point
+pub fn PathSeg::eval(Self, Double) -> Point
+pub fn PathSeg::extrema(Self) -> Array[Double]
+pub fn PathSeg::start(Self) -> Point
+
+pub(all) struct Point {
+  x : Double
+  y : Double
+} derive(Eq, @debug.Debug)
+pub fn Point::add_vec(Self, Vec2) -> Self
+pub fn Point::is_finite(Self) -> Bool
+pub fn Point::lerp(Self, Self, Double) -> Self
+pub fn Point::midpoint(Self, Self) -> Self
+pub fn Point::new(Double, Double) -> Self
+pub fn Point::sub(Self, Self) -> Vec2
+pub fn Point::sub_vec(Self, Vec2) -> Self
+pub fn Point::to_vec2(Self) -> Vec2
+
+pub(all) struct QuadBez {
+  p0 : Point
+  p1 : Point
+  p2 : Point
+} derive(Eq, @debug.Debug)
+pub fn QuadBez::eval(Self, Double) -> Point
+pub fn QuadBez::extrema(Self) -> Array[Double]
+pub fn QuadBez::new(Point, Point, Point) -> Self
+
+pub(all) struct Rect {
+  x0 : Double
+  y0 : Double
+  x1 : Double
+  y1 : Double
+} derive(Eq, @debug.Debug)
+pub fn Rect::abs(Self) -> Self
+pub fn Rect::area(Self) -> Double
+pub fn Rect::bounding_box(Self) -> Self
+pub fn Rect::from_points(Point, Point) -> Self
+pub fn Rect::height(Self) -> Double
+pub fn Rect::inflate(Self, Double, Double) -> Self
+pub fn Rect::intersect(Self, Self) -> Self
+pub fn Rect::is_finite(Self) -> Bool
+pub fn Rect::is_zero_area(Self) -> Bool
+pub fn Rect::max_x(Self) -> Double
+pub fn Rect::max_y(Self) -> Double
+pub fn Rect::min_x(Self) -> Double
+pub fn Rect::min_y(Self) -> Double
+pub fn Rect::new(Double, Double, Double, Double) -> Self
+pub fn Rect::path_elements(Self) -> Array[PathEl]
+pub fn Rect::to_path(Self, Double) -> BezPath
+pub fn Rect::union(Self, Self) -> Self
+pub fn Rect::union_pt(Self, Point) -> Self
+pub fn Rect::width(Self) -> Double
+pub impl Default for Rect
+
+pub(all) struct Vec2 {
+  x : Double
+  y : Double
+} derive(Eq, @debug.Debug)
+pub fn Vec2::cross(Self, Self) -> Double
+pub fn Vec2::dot(Self, Self) -> Double
+pub fn Vec2::hypot(Self) -> Double
+pub fn Vec2::hypot2(Self) -> Double
+pub fn Vec2::lerp(Self, Self, Double) -> Self
+pub fn Vec2::new(Double, Double) -> Self
+pub fn Vec2::scale(Self, Double) -> Self
+pub fn Vec2::to_point(Self) -> Point
+pub impl Add for Vec2
+pub impl Neg for Vec2
+pub impl Sub for Vec2
+
+// Type aliases
+
+// Traits

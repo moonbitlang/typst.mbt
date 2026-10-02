@@ -1,0 +1,3 @@
+import {
+  "moonbitlang/typst/hayro/syntax" @hayro_syntax,
+}

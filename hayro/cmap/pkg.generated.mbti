@@ -1,0 +1,61 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/hayro/cmap"
+
+import {
+  "moonbitlang/core/debug",
+}
+
+// Values
+
+// Errors
+
+// Types and methods
+pub(all) enum BfString {
+  Char(Char)
+  String(String)
+} derive(Eq, @debug.Debug)
+
+pub struct CMap {
+  // private fields
+}
+pub fn CMap::identity_h() -> Self
+pub fn CMap::identity_v() -> Self
+pub fn CMap::lookup_bf_string(Self, UInt) -> BfString?
+pub fn CMap::lookup_cid_code(Self, UInt, Int) -> UInt?
+pub fn CMap::metadata(Self) -> Metadata
+pub fn CMap::parse(BytesView, (CMapName) -> Bytes?) -> Self?
+
+pub(all) enum CMapName {
+  IdentityH
+  IdentityV
+  AdobeIdentityUcs2
+  Other(Bytes)
+} derive(Eq, @debug.Debug)
+pub fn CMapName::from_bytes(BytesView) -> Self
+
+pub(all) struct CharacterCollection {
+  family : CidFamily
+  supplement : Int
+} derive(Eq, @debug.Debug)
+
+pub(all) enum CidFamily {
+  AdobeIdentity
+  Other
+} derive(Eq, @debug.Debug)
+pub fn CidFamily::from_registry_ordering(BytesView, BytesView) -> Self
+pub fn CidFamily::ucs2_cmap(Self) -> CMapName?
+
+pub(all) struct Metadata {
+  character_collection : CharacterCollection?
+  name : Bytes?
+  writing_mode : WritingMode?
+}
+
+pub(all) enum WritingMode {
+  Horizontal
+  Vertical
+} derive(Eq, @debug.Debug)
+
+// Type aliases
+
+// Traits

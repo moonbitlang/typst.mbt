@@ -1,0 +1,439 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/hayro/interpret"
+
+import {
+  "moonbitlang/core/debug",
+  "moonbitlang/typst/hayro/cmap",
+  "moonbitlang/typst/hayro/interpret/function",
+  "moonbitlang/typst/hayro/syntax",
+  "moonbitlang/typst/kurbo",
+}
+
+// Values
+pub let alpha_color_black : AlphaColor
+
+pub let alpha_color_transparent : AlphaColor
+
+pub let alpha_color_white : AlphaColor
+
+pub fn f32_as_u32(Float) -> Int
+
+pub fn f32_as_u8(Float) -> Byte
+
+pub fn f32_clamp(Float, Float, Float) -> Float
+
+pub fn f32_is_nearly_equal(Float, Float) -> Bool
+
+pub fn f32_is_nearly_greater_or_equal(Float, Float) -> Bool
+
+pub fn f32_is_nearly_less_or_equal(Float, Float) -> Bool
+
+pub fn f32_is_nearly_zero(Float) -> Bool
+
+pub fn f32_max(Float, Float) -> Float
+
+pub fn f32_min(Float, Float) -> Float
+
+pub fn f64_as_u32(Double) -> Int
+
+pub fn f64_is_nearly_equal(Double, Double) -> Bool
+
+pub fn f64_is_nearly_greater_or_equal(Double, Double) -> Bool
+
+pub fn f64_is_nearly_less_or_equal(Double, Double) -> Bool
+
+pub fn f64_is_nearly_zero(Double) -> Bool
+
+pub fn fast_bounding_box(@kurbo.BezPath) -> @kurbo.Rect
+
+pub fn hash128((Hasher128) -> Unit) -> U128
+
+pub fn hash128_keys(Array[U128]) -> U128
+
+pub fn interpret(@syntax.TypedIter, @syntax.Resources, Context, &Device) -> Unit
+
+pub fn interpret_page(@syntax.Page, Context, &Device) -> Unit
+
+pub fn[T : CacheKey, U : CacheKey] pair_cache_key(T, U) -> U128
+
+pub fn powf(Float, Float) -> Float
+
+pub fn powi(Float, Int) -> Float
+
+pub fn rect_to_kurbo(@syntax.Rect) -> @kurbo.Rect
+
+pub fn transform_to_kurbo(@syntax.Transform) -> @kurbo.Affine
+
+// Errors
+
+// Types and methods
+pub(all) enum ActiveTransferFunction {
+  Single(@function.Function)
+  Four(FixedArray[@function.Function])
+}
+pub fn ActiveTransferFunction::apply(Self, AlphaColor) -> AlphaColor
+
+pub(all) struct AlphaColor {
+  // private fields
+}
+pub fn AlphaColor::components(Self) -> FixedArray[Float]
+pub fn AlphaColor::from_rgb8(Byte, Byte, Byte) -> Self
+pub fn AlphaColor::from_rgba8(Byte, Byte, Byte, Byte) -> Self
+pub fn AlphaColor::new(FixedArray[Float]) -> Self
+pub fn AlphaColor::premultiplied(Self) -> FixedArray[Float]
+pub fn AlphaColor::to_rgba8(Self) -> FixedArray[Byte]
+
+pub(all) enum BlendMode {
+  Normal
+  Multiply
+  Screen
+  Overlay
+  Darken
+  Lighten
+  ColorDodge
+  ColorBurn
+  HardLight
+  SoftLight
+  Difference
+  Exclusion
+  Hue
+  Saturation
+  Color
+  Luminosity
+} derive(Eq, Hash, @debug.Debug)
+pub impl Default for BlendMode
+
+pub struct Cache {
+  // private fields
+}
+pub fn Cache::new() -> Self
+
+pub(all) struct ClipPath {
+  path : @kurbo.BezPath
+  fill : FillRule
+}
+pub impl CacheKey for ClipPath
+
+pub struct Color {
+  // private fields
+}
+pub fn Color::from_rgba(AlphaColor) -> Self
+pub fn Color::to_rgba(Self) -> AlphaColor
+
+pub struct ColorSpace {
+  // private fields
+}
+pub fn ColorSpace::to_rgba(Self, ArrayView[Float], Float, Bool) -> AlphaColor
+
+pub struct Context {
+  // private fields
+}
+pub fn Context::new(@kurbo.Affine, @kurbo.Rect, InterpreterCache, @syntax.XRef, InterpreterSettings) -> Self
+
+pub(all) enum DrawMode {
+  Fill(FillRule)
+  Stroke(StrokeProps)
+  FillAndStroke(FillRule, StrokeProps)
+  Invisible
+}
+
+pub(all) struct DrawProps {
+  transform : @kurbo.Affine
+  paint : Paint
+  soft_mask : SoftMask?
+  blend_mode : BlendMode
+}
+
+pub struct DummyDevice {
+  // private fields
+}
+pub fn DummyDevice::new() -> Self
+pub impl Device for DummyDevice
+
+pub(all) struct FallbackFontQuery {
+  mut post_script_name : String?
+  mut font_name : String?
+  mut font_family : String?
+  mut font_stretch : FontStretch
+  mut font_weight : UInt
+  mut is_fixed_pitch : Bool
+  mut is_serif : Bool
+  mut is_italic : Bool
+  mut is_bold : Bool
+  mut is_small_cap : Bool
+  mut character_collection : @cmap.CharacterCollection?
+}
+pub fn FallbackFontQuery::pick_standard_font(Self) -> StandardFont
+
+pub(all) enum FillRule {
+  NonZero
+  EvenOdd
+} derive(Eq, Hash, @debug.Debug)
+
+pub(all) enum FontQuery {
+  Standard(StandardFont)
+  Fallback(FallbackFontQuery)
+}
+
+pub(all) enum FontStretch {
+  Normal
+  UltraCondensed
+  ExtraCondensed
+  Condensed
+  SemiCondensed
+  SemiExpanded
+  Expanded
+  ExtraExpanded
+  UltraExpanded
+} derive(Eq, @debug.Debug)
+
+pub enum Glyph {
+  Outline(OutlineGlyph)
+  Type3(Type3Glyph)
+}
+pub fn Glyph::as_unicode(Self) -> @cmap.BfString?
+
+pub(all) struct GlyphId(UInt) derive(Eq, Hash, @debug.Debug)
+pub fn GlyphId::new(UInt) -> Self
+pub fn GlyphId::to_u32(Self) -> UInt
+
+pub struct GlyphIdentifier {
+  // private fields
+}
+pub impl CacheKey for GlyphIdentifier
+
+type GraphicsState
+
+pub struct Hasher128 {
+  // private fields
+}
+pub fn Hasher128::finish128(Self) -> U128
+pub fn Hasher128::new() -> Self
+pub fn Hasher128::write_bytes(Self, BytesView) -> Unit
+pub fn Hasher128::write_f32(Self, Float) -> Unit
+pub fn Hasher128::write_f64(Self, Double) -> Unit
+pub fn Hasher128::write_str(Self, StringView) -> Unit
+pub fn Hasher128::write_u128(Self, U128) -> Unit
+pub fn Hasher128::write_u32(Self, UInt) -> Unit
+pub fn Hasher128::write_u64(Self, UInt64) -> Unit
+pub fn Hasher128::write_u8(Self, Byte) -> Unit
+pub fn Hasher128::write_usize(Self, Int) -> Unit
+
+pub enum Image {
+  Stencil(StencilImage)
+  Raster(RasterImage)
+}
+pub impl CacheKey for Image
+
+pub(all) enum ImageData {
+  Rgb(RgbData)
+  Luma(LumaData)
+}
+pub fn ImageData::height(Self) -> Int
+pub fn ImageData::interpolate(Self) -> Bool
+pub fn ImageData::scale_factors(Self) -> (Float, Float)
+pub fn ImageData::width(Self) -> Int
+
+pub(all) struct ImageDrawProps {
+  transform : @kurbo.Affine
+  soft_mask : SoftMask?
+  blend_mode : BlendMode
+}
+
+pub struct InterpreterCache {
+  // private fields
+}
+pub fn InterpreterCache::new() -> Self
+pub impl Default for InterpreterCache
+
+pub(all) struct InterpreterSettings {
+  font_resolver : (FontQuery) -> (Bytes, Int)?
+  cmap_resolver : (@cmap.CMapName) -> Bytes?
+  warning_sink : (InterpreterWarning) -> Unit
+  render_annotations : Bool
+}
+
+pub(all) enum InterpreterWarning {
+  UnsupportedFont
+  ImageDecodeFailure
+} derive(Eq, @debug.Debug)
+
+pub(all) struct LumaData {
+  data : Bytes
+  width : Int
+  height : Int
+  interpolate : Bool
+  scale_factors : (Float, Float)
+}
+
+pub(all) enum MaskType {
+  Luminosity
+  Alpha
+} derive(Eq, @debug.Debug)
+
+pub struct OutlineGlyph {
+  // private fields
+}
+pub fn OutlineGlyph::advance_width(Self) -> Float?
+pub fn OutlineGlyph::as_unicode(Self) -> @cmap.BfString?
+pub fn OutlineGlyph::font_cache_key(Self) -> U128
+pub fn OutlineGlyph::glyph_id(Self) -> GlyphId
+pub fn OutlineGlyph::identifier(Self) -> GlyphIdentifier
+pub fn OutlineGlyph::outline(Self) -> @kurbo.BezPath
+
+pub(all) enum Paint {
+  Color(Color)
+  Pattern(Pattern)
+}
+pub impl CacheKey for Paint
+
+pub(all) enum Pattern {
+  Shading(ShadingPattern)
+  Tiling(TilingPattern)
+}
+pub impl CacheKey for Pattern
+
+pub struct RasterImage {
+  // private fields
+}
+pub fn RasterImage::stream(Self) -> @syntax.Stream
+pub fn RasterImage::with_rgba(Self, (ImageData, LumaData?) -> Unit, (Int, Int)?) -> Unit
+pub impl CacheKey for RasterImage
+
+pub(all) struct RgbData {
+  data : Bytes
+  width : Int
+  height : Int
+  interpolate : Bool
+  scale_factors : (Float, Float)
+}
+
+pub(all) struct Shading {
+  color_space : ColorSpace
+  clip_path : @kurbo.BezPath?
+  background : Array[Float]?
+  // private fields
+}
+pub impl CacheKey for Shading
+
+pub(all) struct ShadingPattern {
+  shading : Shading
+  matrix : @kurbo.Affine
+  opacity : Float
+  transfer_function : ActiveTransferFunction?
+}
+pub impl CacheKey for ShadingPattern
+
+pub struct SoftMask {
+  // private fields
+}
+pub fn SoftMask::background_color(Self) -> Color
+pub fn SoftMask::id(Self) -> @syntax.ObjectIdentifier
+pub fn SoftMask::interpret(Self, &Device) -> Unit
+pub fn SoftMask::mask_type(Self) -> MaskType
+pub fn SoftMask::transfer_function(Self) -> TransferFunction?
+pub impl Eq for SoftMask
+pub impl CacheKey for SoftMask
+
+pub(all) enum StandardFont {
+  Helvetica
+  HelveticaBold
+  HelveticaOblique
+  HelveticaBoldOblique
+  Courier
+  CourierBold
+  CourierOblique
+  CourierBoldOblique
+  TimesRoman
+  TimesBold
+  TimesItalic
+  TimesBoldItalic
+  ZapfDingBats
+  Symbol
+} derive(Eq, @debug.Debug)
+
+type State
+
+pub struct StencilImage {
+  // private fields
+}
+pub fn StencilImage::with_stencil(Self, (LumaData, Paint) -> Unit, (Int, Int)?) -> Unit
+pub impl CacheKey for StencilImage
+
+pub(all) struct StrokeProps {
+  line_width : Float
+  line_cap : @kurbo.Cap
+  line_join : @kurbo.Join
+  miter_limit : Float
+  dash_array : Array[Float]
+  dash_offset : Float
+}
+pub impl Default for StrokeProps
+
+type TextState
+
+pub(all) struct TilingPattern {
+  bbox : @kurbo.Rect
+  x_step : Float
+  y_step : Float
+  matrix : @kurbo.Affine
+  // private fields
+}
+pub fn TilingPattern::interpret(Self, &Device, @kurbo.Affine, Bool) -> Unit?
+pub impl CacheKey for TilingPattern
+
+pub struct TransferFunction(@function.Function)
+pub fn TransferFunction::apply(Self, Float) -> Float
+
+pub struct Type3Glyph {
+  // private fields
+}
+pub fn Type3Glyph::as_unicode(Self) -> @cmap.BfString?
+pub fn Type3Glyph::interpret(Self, &Device, @kurbo.Affine, @kurbo.Affine, Paint) -> Unit
+pub impl CacheKey for Type3Glyph
+
+pub(all) struct U128 {
+  hi : UInt64
+  lo : UInt64
+} derive(Compare, Default, Eq, Hash, @debug.Debug)
+pub impl CacheKey for U128
+
+// Type aliases
+pub type CMapResolverFn = (@cmap.CMapName) -> Bytes?
+
+pub type ColorComponents = Array[Float]
+
+pub type FontResolverFn = (FontQuery) -> (Bytes, Int)?
+
+pub type WarningSinkFn = (InterpreterWarning) -> Unit
+
+// Traits
+pub(open) trait CacheKey {
+  fn cache_key(Self) -> U128
+}
+pub impl CacheKey for Bool
+pub impl CacheKey for @syntax.Dict
+pub impl[T : CacheKey] CacheKey for @syntax.MaybeRef[T]
+pub impl CacheKey for @syntax.Name
+pub impl CacheKey for @syntax.Number
+pub impl CacheKey for @syntax.ObjRef
+pub impl CacheKey for @syntax.Object
+pub impl CacheKey for @syntax.PdfArray
+pub impl CacheKey for @syntax.PdfString
+pub impl CacheKey for @syntax.Stream
+pub impl CacheKey for @kurbo.Affine
+pub impl CacheKey for @kurbo.Rect
+
+pub(open) trait Device {
+  fn draw_path(Self, @kurbo.BezPath, DrawProps, DrawMode) -> Unit
+  fn push_clip_path(Self, ClipPath) -> Unit
+  fn push_clip_rect(Self, @kurbo.Rect) -> Unit = _
+  fn push_transparency_group(Self, Float, SoftMask?, BlendMode) -> Unit
+  fn draw_glyph(Self, Glyph, @kurbo.Affine, DrawProps, DrawMode) -> Unit
+  fn draw_image(Self, Image, ImageDrawProps) -> Unit
+  fn pop_clip(Self) -> Unit
+  fn pop_transparency_group(Self) -> Unit
+  fn draw_rect(Self, @kurbo.Rect, DrawProps, DrawMode) -> Unit = _
+  fn begin_marked_content(Self, Bytes, Int?) -> Unit = _
+  fn end_marked_content(Self) -> Unit = _
+}

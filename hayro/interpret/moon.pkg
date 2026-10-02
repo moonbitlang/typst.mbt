@@ -1,0 +1,14 @@
+import {
+  "moonbitlang/typst/hayro/syntax" @hayro_syntax,
+  "moonbitlang/typst/hayro/interpret/function",
+  "moonbitlang/typst/hayro/cmap",
+  "moonbitlang/typst/kurbo",
+  "moonbitlang/core/hashset",
+  "moonbitlang/typst/moxcms",
+  "moonbitlang/x/codec/base64",
+  "moonbitlang/core/math",
+  "moonbitlang/core/double",
+  "moonbitlang/core/cmp",
+}
+
+warnings = "-deprecated"

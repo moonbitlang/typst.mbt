@@ -1,0 +1,29 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/hayro/svg"
+
+import {
+  "moonbitlang/typst/hayro/interpret",
+  "moonbitlang/typst/hayro/syntax",
+}
+
+// Values
+pub fn convert(@syntax.Page, RenderCache, @interpret.InterpreterSettings, SvgRenderSettings) -> String
+
+// Errors
+
+// Types and methods
+pub struct RenderCache {
+  // private fields
+}
+pub fn RenderCache::new() -> Self
+
+pub(all) struct SvgRenderSettings {
+  bg_color : FixedArray[Byte]
+}
+pub impl Default for SvgRenderSettings
+
+type SvgRenderer
+
+// Type aliases
+
+// Traits

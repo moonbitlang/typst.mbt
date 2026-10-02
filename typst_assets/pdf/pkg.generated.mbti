@@ -1,0 +1,39 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/typst_assets/pdf"
+
+// Values
+pub fn ding_bats() -> Bytes
+
+pub fn fixed() -> Bytes
+
+pub fn fixed_bold() -> Bytes
+
+pub fn fixed_bold_italic() -> Bytes
+
+pub fn fixed_italic() -> Bytes
+
+pub fn sans() -> Bytes
+
+pub fn sans_bold() -> Bytes
+
+pub fn sans_bold_italic() -> Bytes
+
+pub fn sans_italic() -> Bytes
+
+pub fn serif() -> Bytes
+
+pub fn serif_bold() -> Bytes
+
+pub fn serif_bold_italic() -> Bytes
+
+pub fn serif_italic() -> Bytes
+
+pub fn symbol() -> Bytes
+
+// Errors
+
+// Types and methods
+
+// Type aliases
+
+// Traits
