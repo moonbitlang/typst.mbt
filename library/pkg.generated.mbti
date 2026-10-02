@@ -10798,7 +10798,7 @@ pub impl IntoValue for TextSize
 pub impl Reflect for TextSize
 
 pub(all) struct Tiling {
-  body : Content
+  frame : Frame
   size : Axes[Abs]
   spacing : Axes[Abs]
   offset : Axes[Abs]

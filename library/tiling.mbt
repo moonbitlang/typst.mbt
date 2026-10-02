@@ -120,7 +120,7 @@ fn impl_tiling_construct(
     offset.x.resolve(styles).relative_to(size.x + spacing.x),
     offset.y.resolve(styles).relative_to(size.y + spacing.y),
   )
-  { frame, size, spacing, offset, angle: angle_.v, relative: relative_ }
+  { frame, size, spacing, offset, angle: angle_.v, relative: relative_, }
 }
 
 ///|
