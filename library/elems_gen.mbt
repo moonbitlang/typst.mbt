@@ -3250,6 +3250,7 @@ pub fn mat_elem() -> Element {
             kind=Settable,
             default=() => None,
             fold=fold_of((Ty::new() : Ty[Augment?])),
+            output=mat_elem_augment_output,
           ),
           field_of(
             (Ty::new() : Ty[Rel[Length]]),

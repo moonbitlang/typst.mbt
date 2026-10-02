@@ -19,4 +19,5 @@ warnings = "-implicit_impl_as_method"
 import {
   "moonbitlang/x@0.5.5",
   "moonbitlang/pdflite@0.3.1",
+  "moonbit-community/flate@0.8.1",
 }

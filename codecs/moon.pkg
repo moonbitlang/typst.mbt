@@ -1,4 +1,7 @@
 import {
+  "moonbit-community/flate",
+  "moonbit-community/flate/zlib",
+  "moonbit-community/flate/gzip",
   "moonbitlang/core/cmp",
   "moonbitlang/core/math",
 }

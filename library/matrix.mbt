@@ -256,19 +256,46 @@ pub impl Reflect for Augment with fn castable(v) {
 
 ///|
 pub impl IntoValue for Augment with fn into_value(self) {
-  // if the stroke is auto and there is only one vertical line,
+  // The stored form of the field: like upstream's cast, but without the
+  // `stroke` entry when it is `auto` (upstream's cast writes `stroke: auto`,
+  // which its own `FromValue` rejects; it stores the Rust value instead).
+  // Users see upstream's form via `augment_output`.
   if self.stroke.is_auto() &&
     self.hline.0.is_empty() &&
     self.vline.0.length() == 1 {
     return Int(self.vline.0[0])
   }
+  let pairs = [
+    ("hline", self.hline.into_value()),
+    ("vline", self.vline.into_value()),
+  ]
+  if self.stroke is Custom(stroke) {
+    pairs.push(("stroke", stroke.into_value()))
+  }
+  Dict(Dict::from_pairs(pairs))
+}
+
+///|
+/// Upstream's cast of `Augment` into a value (shown to users).
+fn augment_output(v : Value) -> Value {
+  let augment : Augment = Augment::from_value(v) catch { _ => return v }
+  if augment.stroke.is_auto() &&
+    augment.hline.0.is_empty() &&
+    augment.vline.0.length() == 1 {
+    return Int(augment.vline.0[0])
+  }
   Dict(
     Dict::from_pairs([
-      ("hline", self.hline.into_value()),
-      ("vline", self.vline.into_value()),
-      ("stroke", self.stroke.into_value()),
+      ("hline", augment.hline.into_value()),
+      ("vline", augment.vline.into_value()),
+      ("stroke", augment.stroke.into_value()),
     ]),
   )
+}
+
+///|
+fn mat_elem_augment_output(v : Value) -> Value {
+  augment_output(v)
 }
 
 ///|
@@ -288,13 +315,8 @@ pub impl FromValue for Augment with fn from_value(v) {
       }
       let hline = take("hline")
       let vline = take("vline")
-      // Upstream stores the field as a Rust value; here it round-trips
-      // through `into_value`, which writes `stroke: auto`, so accept it.
       let stroke : Smart[Stroke] = if dict.contains("stroke") {
-        match dict.take("stroke") {
-          Auto => Auto
-          v => Custom(v.cast())
-        }
+        Custom(dict.take("stroke").cast())
       } else {
         Auto
       }
