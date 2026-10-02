@@ -262,6 +262,46 @@ fails until unit G lands, and `PagedDocument::new` uses an empty
 introspector until `PagedIntrospector` is ported.
 
 **Known gaps.** Kurbo-based bounding boxes (`Curve::bbox`,
-`Geometry::bbox`) are not ported; `Tiling` has no laid-out frame yet, so
-the MoonBit encoder emits `null` for tiling frame ids; the HTML frame
-traversals (`discover_frame`, `traverse_frame`) are still TODOs.
+`Geometry::bbox`) are not ported; the HTML frame traversals
+(`discover_frame`, `traverse_frame`) are still TODOs. (Tilings now carry
+their laid-out frame, see units E + G.)
+
+## Status: work units E (primitive layout) + G (flow/pages)
+
+**Layout package** (`layout/`, files named after `typst-layout/src`):
+`flow.mbt` (`layout_frame`, `layout_fragment`, `layout_columns`,
+`layout_flow`, configuration, `Work`), `flow_collect.mbt`,
+`flow_compose.mbt` (columns, floats, footnotes, line numbers),
+`flow_distribute.mbt`, `flow_block.mbt`; `pages.mbt` (`layout_document`,
+`layout_document_for_bundle`), `pages_collect.mbt`, `pages_run.mbt`,
+`pages_finalize.mbt`; `document.mbt`, `introspect.mbt`
+(`PagedIntrospector`); `rules.mbt` (`register`, all paged show rules);
+`shapes.mbt`, `transforms.mbt`, `pad.mbt`, `stack.mbt`, `repeat.mbt`,
+`image.mbt`, `lists.mbt`, `modifiers.mbt`; `kurbo.mbt` (cubic bounding
+boxes); `resolve.mbt` (helpers for upstream's generic `Resolve`). The typst
+driver registers the rules and installs `layout_frame` in `Routines`.
+
+Upstream's `RelayoutStop`/`InsertionStop`/`Stop` control flow is raised as
+one error type (`FlowStop`) next to `SourceError`; memoized functions are
+plain calls that keep upstream's `LocatorLink` boundaries; `CachedCell`
+compares inputs bitwise (upstream compares hashes).
+
+**Temporary stubs** (`layout/stubs.mbt`, upstream signatures, they bail
+with "… layout is not yet ported"): `layout_par`, `layout_inline` and
+`ParSituation` (unit F), `layout_grid`/`layout_table` (unit H),
+`layout_equation_block`/`layout_equation_inline` (unit I). The citation and
+bibliography rules bail until `CiteGroup::realize`/`Works::generate` exist.
+
+**Library additions:** block/inline layout callbacks (`BlockBody::
+SingleLayouter`/`MultiLayouter`, `InlineCallback`, `InlineItem`, stored as
+internal `DynValue`s), `Decoration`/`DecoLine` (`TextElem::deco`),
+`Destination::alt_text`, `ManualPageCounter`, `OutlineEntry::page`/
+`indented`, content constructors (`aligned`, `padded`, `linked`, …),
+`measure()`/`layout()`, tiling frames, `pdf.attach` paged rule. Fixed
+`Abs::max` (ties return the second value, like `Ord::max`) and
+`Frame::inline` (zero positions keep item positions unchanged), both
+visible through signed zeros.
+
+**Result:** `paged` 315/2299. Of the failures, ~1290 need inline layout,
+~270 math, ~340 grid/table; `python3 scripts/classify_paged.py
+[--text-free] [--list]` buckets them (run the stage with `--dump` first).

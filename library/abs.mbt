@@ -111,7 +111,9 @@ pub fn Abs::min(self : Abs, other : Abs) -> Abs {
 
 ///|
 pub fn Abs::max(self : Abs, other : Abs) -> Abs {
-  if self.to_raw() >= other.to_raw() {
+  // Like Rust's `Ord::max`, this returns `other` on ties (relevant for
+  // signed zeros).
+  if self.to_raw() > other.to_raw() {
     self
   } else {
     other

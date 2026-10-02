@@ -221,7 +221,14 @@ pub fn html_format() -> Format {
 ///|
 /// `typst_pdf::FORMAT`.
 pub fn pdf_format() -> Format {
-  Format::new(pdf_format_elem())
+  Format::new(pdf_format_elem()).with_rules(pdf_register)
+}
+
+///|
+/// Registers show rules for PDF specific elements (upstream
+/// `typst_pdf::format::register`).
+fn pdf_register(rules : NativeRuleMap) -> Unit {
+  rules.register(Paged, (_ : PdfAttachElem, _, _) => Content::empty())
 }
 
 ///|

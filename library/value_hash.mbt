@@ -100,8 +100,10 @@ pub impl Fingerprint for Value with fn fingerprint(self, state) {
     }
     Tiling(v) => {
       state.write_discriminant(12)
-      state.write(v.body)
+      // Upstream hashes the laid out frame; frames have no fingerprint, so
+      // only its size and item count are written.
       state.write_str(v.repr())
+      state.write_usize(v.frame.items().length())
     }
     Symbol(v) => {
       state.write_discriminant(13)
@@ -513,6 +515,22 @@ pub impl Fingerprint for DynValue with fn fingerprint(self, state) {
     }
     CellGrid(v) => {
       state.write_discriminant(4)
+      state.write(v)
+    }
+    InlineCallback(v) => {
+      state.write_discriminant(5)
+      state.write(v.captured())
+    }
+    BlockSingleCallback(v) => {
+      state.write_discriminant(6)
+      state.write(v.captured())
+    }
+    BlockMultiCallback(v) => {
+      state.write_discriminant(7)
+      state.write(v.captured())
+    }
+    Decoration(v) => {
+      state.write_discriminant(8)
       state.write(v)
     }
     Regex(v) => state.write_str(v.as_str())

@@ -534,14 +534,10 @@ fn FrameEncoder::paint(
         g.anti_alias.to_string(),
       ])
     Tiling(tiling) => {
-      // TODO(layout): tilings do not have a laid out frame yet (see
-      // `library/tiling.mbt`); once they do, push `(frame, r)` to `deferred`
-      // and emit `r` instead of `null`.
-      ignore(r)
-      ignore(deferred)
+      deferred.push((tiling.frame.clone(), r))
       array([
         json_str("tiling"),
-        "null",
+        json_str(r),
         size_enc(tiling.size),
         size_enc(tiling.spacing),
         size_enc(tiling.offset),

@@ -13,18 +13,6 @@ fn bibliography_elem_style_default() -> Value {
 // TODO: port `#[parse]` of CiteElem.style as `cite_elem_style_parse`.
 
 ///|
-/// TODO: port `Default::default() of SmallVec<[Decoration; 1]>` (TextElem.deco).
-fn text_elem_deco_default() -> Value {
-  None
-}
-
-///|
-/// TODO: fold for `SmallVec<[Decoration; 1]>` (TextElem.deco).
-fn text_elem_deco_fold(inner : Value, _outer : Value) -> Value {
-  inner
-}
-
-///|
 /// TODO: fold for `Derived<OneOrMultiple<DataSource>, Vec<RawSyntax>>` (RawElem.syntaxes).
 fn raw_elem_syntaxes_fold(inner : Value, _outer : Value) -> Value {
   inner

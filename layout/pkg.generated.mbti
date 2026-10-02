@@ -2,15 +2,119 @@
 package "moonbitlang/typst/layout"
 
 import {
+  "moonbitlang/core/debug",
+  "moonbitlang/core/hashset",
   "moonbitlang/typst/library",
+  "moonbitlang/typst/syntax",
 }
 
 // Values
+pub fn clip_rect(@library.Axes[@library.Abs], @library.Corners[@library.Rel[@library.Abs]], @library.Sides[@library.FixedStroke?], @library.Sides[@library.Rel[@library.Abs]]) -> @library.Curve
+
+pub fn fill_and_stroke(@library.Frame, @library.Paint?, @library.Sides[@library.FixedStroke?], @library.Sides[@library.Rel[@library.Abs]], @library.Corners[@library.Rel[@library.Abs]], @syntax.Span) -> Unit
+
+pub fn grow(@library.Frame, @library.Sides[@library.Rel[@library.Abs]]) -> Unit
+
+pub fn[R : FrameModify] layout_and_modify(@library.StyleChain, (@library.StyleChain) -> R raise @library.SourceError) -> R raise @library.SourceError
+
+pub fn layout_circle(@library.CircleElem, @library.Engine, @library.Locator, @library.StyleChain, @library.LayoutRegion) -> @library.Frame raise @library.SourceError
+
+pub fn layout_columns(@library.ColumnsElem, @library.Engine, @library.Locator, @library.StyleChain, @library.Regions) -> @library.Fragment raise @library.SourceError
+
+pub fn layout_curve(@library.CurveElem, @library.Engine, @library.Locator, @library.StyleChain, @library.LayoutRegion) -> @library.Frame raise @library.SourceError
+
 pub fn layout_document(@library.Engine, @library.Content, @library.StyleChain) -> PagedDocument raise @library.SourceError
+
+pub fn layout_document_for_bundle(@library.Engine, @library.Content, @library.Locator, @library.StyleChain) -> PagedDocument raise @library.SourceError
+
+pub fn layout_ellipse(@library.EllipseElem, @library.Engine, @library.Locator, @library.StyleChain, @library.LayoutRegion) -> @library.Frame raise @library.SourceError
+
+pub fn layout_enum(@library.EnumElem, @library.Engine, @library.Locator, @library.StyleChain, @library.Regions) -> @library.Fragment raise @library.SourceError
+
+pub fn layout_equation_block(@library.EquationElem, @library.Engine, @library.Locator, @library.StyleChain, @library.Regions) -> @library.Fragment raise @library.SourceError
+
+pub fn layout_equation_inline(@library.EquationElem, @library.Engine, @library.Locator, @library.StyleChain, @library.Axes[@library.Abs]) -> Array[@library.InlineItem] raise @library.SourceError
+
+pub fn layout_flow(@library.Engine, ArrayView[(@library.Content, @library.StyleChain)], @library.SplitLocator, @library.StyleChain, @library.Regions, ColumnOptions, FlowMode) -> @library.Fragment raise @library.SourceError
+
+pub fn layout_fragment(@library.Engine, @library.Content, @library.Locator, @library.StyleChain, @library.Regions) -> @library.Fragment raise @library.SourceError
+
+pub fn layout_frame(@library.Engine, @library.Content, @library.Locator, @library.StyleChain, @library.LayoutRegion) -> @library.Frame raise @library.SourceError
+
+pub fn layout_grid(@library.GridElem, @library.Engine, @library.Locator, @library.StyleChain, @library.Regions) -> @library.Fragment raise @library.SourceError
+
+pub fn layout_image(@library.ImageElem, @library.Engine, @library.Locator, @library.StyleChain, @library.LayoutRegion) -> @library.Frame raise @library.SourceError
+
+pub fn layout_inline(@library.Engine, ArrayView[(@library.Content, @library.StyleChain)], @library.SplitLocator, @library.StyleChain, @library.Axes[@library.Abs], Bool) -> @library.Fragment raise @library.SourceError
+
+pub fn layout_line(@library.LineElem, @library.Engine, @library.Locator, @library.StyleChain, @library.LayoutRegion) -> @library.Frame raise @library.SourceError
+
+pub fn layout_list(@library.ListElem, @library.Engine, @library.Locator, @library.StyleChain, @library.Regions) -> @library.Fragment raise @library.SourceError
+
+pub fn layout_move(@library.MoveElem, @library.Engine, @library.Locator, @library.StyleChain, @library.LayoutRegion) -> @library.Frame raise @library.SourceError
+
+pub fn layout_multi_block(@library.BlockElem, @library.Engine, @library.Locator, @library.StyleChain, @library.Regions) -> @library.Fragment raise @library.SourceError
+
+pub fn layout_pad(@library.PadElem, @library.Engine, @library.Locator, @library.StyleChain, @library.Regions) -> @library.Fragment raise @library.SourceError
+
+pub fn layout_par(@library.ParElem, @library.Engine, @library.Locator, @library.StyleChain, @library.Axes[@library.Abs], Bool, ParSituation) -> @library.Fragment raise @library.SourceError
+
+pub fn layout_polygon(@library.PolygonElem, @library.Engine, @library.Locator, @library.StyleChain, @library.LayoutRegion) -> @library.Frame raise @library.SourceError
+
+pub fn layout_rect(@library.RectElem, @library.Engine, @library.Locator, @library.StyleChain, @library.LayoutRegion) -> @library.Frame raise @library.SourceError
+
+pub fn layout_repeat(@library.RepeatElem, @library.Engine, @library.Locator, @library.StyleChain, @library.LayoutRegion) -> @library.Frame raise @library.SourceError
+
+pub fn layout_rotate(@library.RotateElem, @library.Engine, @library.Locator, @library.StyleChain, @library.LayoutRegion) -> @library.Frame raise @library.SourceError
+
+pub fn layout_scale(@library.ScaleElem, @library.Engine, @library.Locator, @library.StyleChain, @library.LayoutRegion) -> @library.Frame raise @library.SourceError
+
+pub fn layout_single_block(@library.BlockElem, @library.Engine, @library.Locator, @library.StyleChain, @library.LayoutRegion) -> @library.Frame raise @library.SourceError
+
+pub fn layout_skew(@library.SkewElem, @library.Engine, @library.Locator, @library.StyleChain, @library.LayoutRegion) -> @library.Frame raise @library.SourceError
+
+pub fn layout_square(@library.SquareElem, @library.Engine, @library.Locator, @library.StyleChain, @library.LayoutRegion) -> @library.Frame raise @library.SourceError
+
+pub fn layout_stack(@library.StackElem, @library.Engine, @library.Locator, @library.StyleChain, @library.Regions) -> @library.Fragment raise @library.SourceError
+
+pub fn layout_stack_internal(Array[StackLayoutChild], @syntax.Span, @library.Spacing?, @library.Dir, @library.Engine, @library.Locator, @library.StyleChain, @library.Regions) -> @library.Fragment raise @library.SourceError
+
+pub fn layout_table(@library.TableElem, @library.Engine, @library.Locator, @library.StyleChain, @library.Regions) -> @library.Fragment raise @library.SourceError
+
+pub fn[T : FrameModify] modified(T, FrameModifiers) -> T
+
+pub fn modify_text(@library.Frame, @library.StyleChain) -> Unit
+
+pub fn register(@library.NativeRuleMap) -> Unit
+
+pub fn shrink(@library.Axes[@library.Abs], @library.Sides[@library.Rel[@library.Abs]]) -> @library.Axes[@library.Abs]
+
+pub fn shrink_multiple(@library.Axes[@library.Abs], @library.Abs, Array[@library.Abs], @library.Abs?, @library.Sides[@library.Rel[@library.Abs]]) -> (@library.Axes[@library.Abs], @library.Abs, Array[@library.Abs], @library.Abs?)
+
+pub fn styled_rect(@library.Axes[@library.Abs], @library.Corners[@library.Rel[@library.Abs]], @library.Paint?, @library.Sides[@library.FixedStroke?]) -> Array[@library.Shape]
 
 // Errors
 
 // Types and methods
+pub(all) struct ColumnOptions {
+  count : Int
+  balanced : Bool
+  gutter : @library.Rel[@library.Abs]
+  separator : @library.Content?
+}
+
+pub(all) enum FlowMode {
+  Root
+  Block
+  Inline
+} derive(Eq, @debug.Debug)
+pub fn FlowMode::from_kind(@library.FragmentKind) -> Self
+
+pub struct FrameModifiers {
+  // private fields
+}
+pub fn FrameModifiers::get_in(@library.StyleChain) -> Self
+
 pub(all) struct Page {
   frame : @library.Frame
   bleed : @library.Sides[@library.Abs]
@@ -30,9 +134,36 @@ pub fn PagedDocument::info_mut(Self) -> @library.DocumentInfo
 pub fn PagedDocument::introspector(Self) -> @library.Introspector
 pub fn PagedDocument::new(Array[Page], @library.DocumentInfo, @library.DocumentFormatOptions) -> Self
 pub fn PagedDocument::options(Self) -> @library.DocumentFormatOptions
+pub fn PagedDocument::paged_introspector(Self) -> PagedIntrospector
 pub fn PagedDocument::pages(Self) -> ArrayView[Page]
 pub impl @library.Output for PagedDocument
+
+pub struct PagedIntrospector {
+  // private fields
+}
+pub fn PagedIntrospector::elements(Self) -> @library.ElementIntrospector[@library.PagedPosition]
+pub fn PagedIntrospector::frame_link_targets(Self) -> @hashset.HashSet[@library.Location]
+pub fn PagedIntrospector::new(ArrayView[Page]) -> Self
+pub fn PagedIntrospector::position(Self, @library.Location) -> @library.PagedPosition?
+pub impl Show for PagedIntrospector
+pub impl @library.IntrospectorBackend for PagedIntrospector
+
+pub(all) enum ParSituation {
+  First
+  Consecutive
+  Other
+} derive(Eq, Hash, @debug.Debug)
+
+pub enum StackLayoutChild {
+  StackChild(@library.StackChild)
+  CustomLayouter((@library.Engine, @library.StyleChain, @library.Regions) -> @library.Fragment raise @library.SourceError)
+}
 
 // Type aliases
 
 // Traits
+pub(open) trait FrameModify {
+  fn modify(Self, FrameModifiers) -> Unit
+}
+pub impl FrameModify for @library.Fragment
+pub impl FrameModify for @library.Frame

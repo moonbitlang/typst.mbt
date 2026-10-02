@@ -153,6 +153,7 @@ TYPEMAP = {
     "PlacementScope": "PlacementScope",
     "ScaleAmount": "ScaleAmount",
     "BlockBody": "BlockBody",
+    "callbacks::InlineCallback": "InlineCallback",
     "BaselinePos": "BaselinePos",
     "StackChild": "StackChild",
     # model/*.rs
@@ -164,6 +165,7 @@ TYPEMAP = {
     "Packed<FigureCaption>": "FigureCaption",
     "Packed<FootnoteElem>": "FootnoteElem",
     "SmallVec<[u64; 4]>": "Array[U64]",
+    "SmallVec<[Decoration; 1]>": "Array[Decoration]",
     "FigureKind": "FigureKind",
     "Supplement": "Supplement",
     "RefForm": "RefForm",

@@ -43,6 +43,13 @@ pub(all) enum DynValue {
   /// `layout/grid/resolve.rs` (internal: the synthesized `grid` field of
   /// grids and tables)
   CellGrid(CellGrid)
+  /// `layout/container.rs` (internal: the callback bodies of inline and
+  /// block elements, cast to `auto` upstream)
+  InlineCallback(InlineCallback)
+  BlockSingleCallback(BlockSingleCallback)
+  BlockMultiCallback(BlockMultiCallback)
+  /// `text/deco.rs` (internal: the values of `TextElem::deco`)
+  Decoration(Decoration)
 } derive(Eq)
 
 ///|
@@ -69,6 +76,12 @@ pub fn DynValue::ty(self : DynValue) -> Type {
     // Upstream's `CellGrid` has no Typst type; it is only stored in an
     // internal field.
     CellGrid(_) => Type::content()
+    // Upstream casts layout callbacks to `auto`.
+    InlineCallback(_) | BlockSingleCallback(_) | BlockMultiCallback(_) =>
+      Type::auto()
+    // Upstream's `Decoration` has no Typst type; it is only stored in an
+    // internal style property.
+    Decoration(_) => Type::content()
   }
 }
 
@@ -91,6 +104,8 @@ pub fn DynValue::repr(self : DynValue) -> String {
     Tag(tag) => tag.to_string()
     HtmlCss(p) => "css(\{repr_str(p.to_inline())})"
     CellGrid(_) => "cellgrid(..)"
+    InlineCallback(_) | BlockSingleCallback(_) | BlockMultiCallback(_) => "auto"
+    Decoration(_) => "decoration(..)"
   }
 }
 

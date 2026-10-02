@@ -308,10 +308,16 @@ fn Frame::inline(self : Frame, layer : Int, pos : Point, frame : Frame) -> Unit 
     return
   }
 
-  // Transfer the items, adjusting their positions. Group items are cloned
-  // so that the moved frame's items are not aliased.
+  // Transfer the items, adjusting their positions unless the position is
+  // zero (upstream then transfers them unchanged, which matters for signed
+  // zeros). Group items are cloned so that the moved frame's items are not
+  // aliased.
   let sink = self.make_mut()
-  let moved = frame.items.map(entry => (entry.0 + pos, entry.1.clone()))
+  let moved = if pos.is_zero() {
+    frame.items.map(entry => (entry.0, entry.1.clone()))
+  } else {
+    frame.items.map(entry => (entry.0 + pos, entry.1.clone()))
+  }
   let items = sink[:layer].to_owned()
   items.append(moved)
   items.append(sink[layer:].to_owned())

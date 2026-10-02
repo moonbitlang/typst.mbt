@@ -1,3 +1,5 @@
 import {
   "moonbitlang/typst/library",
+  "moonbitlang/typst/syntax",
+  "moonbitlang/core/hashset",
 }

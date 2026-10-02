@@ -1,14 +1,10 @@
 // Port of `typst-library/src/visualize/tiling.rs`.
-//
-// TODO(layout): upstream lays out the tile body into a `Frame` when the
-// tiling is constructed. Until layout is ported, the body is stored instead
-// and tilings with an automatic size cannot be constructed.
 
 ///|
 /// A repeating tiling fill.
 pub(all) struct Tiling {
-  /// The tile's body (upstream: the laid out frame).
-  body : Content
+  /// The tile's laid out body.
+  frame : Frame
   /// The size of the tile.
   size : Axes[Abs]
   /// The spacing between tiles.
@@ -56,7 +52,6 @@ fn impl_tiling_construct(
   relative_ : Smart[RelativeTo],
   body_ : Content,
 ) -> Tiling raise SourceError {
-  ignore(engine)
   let size_span = size_.span
   if size_.v is Custom(size) {
     // Ensure that sizes are absolute.
@@ -96,20 +91,36 @@ fn impl_tiling_construct(
     bail_at(angle_.span, "tile angle must be finite")
   }
 
-  // The size of the frame.
-  let size = match size_.v {
-    Custom(size) => Axes::new(size.x.abs, size.y.abs)
-    // TODO(layout): lay out the body to determine the tile size, and check
-    // that it is non-zero ("tile size must be non-zero", hint "try setting
-    // the size manually").
-    Auto => bail_at(span, "tilings with automatic size are not yet supported")
+  // The size of the frame
+  let size = size_.v.map(l => l.map(a => a.abs))
+  let region = size.unwrap_or(Axes::splat(Abs::inf()))
+
+  // Layout the tiling.
+  let locator = Locator::root()
+  let styles = StyleChain::new(engine.library.styles)
+  let pod = LayoutRegion::new(region, Axes::splat(false))
+  let frame = (engine.routines().layout_frame)(
+    engine, body_, locator, styles, pod,
+  )
+
+  // Set the size of the frame if the size is enforced.
+  if size is Custom(size) {
+    frame.set_size(size)
   }
+
+  // Check that the frame is non-zero.
+  if frame.width().is_zero() || frame.height().is_zero() {
+    bail_at(span, "tile size must be non-zero", hints=[
+      "try setting the size manually",
+    ])
+  }
+  let size = frame.size()
   let spacing = Axes::new(spacing.x.abs, spacing.y.abs)
   let offset = Axes::new(
-    offset.x.map(l => l.abs).relative_to(size.x + spacing.x),
-    offset.y.map(l => l.abs).relative_to(size.y + spacing.y),
+    offset.x.resolve(styles).relative_to(size.x + spacing.x),
+    offset.y.resolve(styles).relative_to(size.y + spacing.y),
   )
-  { body: body_, size, spacing, offset, angle: angle_.v, relative: relative_, }
+  { frame, size, spacing, offset, angle: angle_.v, relative: relative_, }
 }
 
 ///|

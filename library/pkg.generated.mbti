@@ -3286,6 +3286,7 @@ pub(all) struct Abs(Scalar) derive(Compare, Default, Eq, Hash)
 pub fn Abs::abs(Self) -> Self
 pub fn Abs::approx_empty(Self) -> Bool
 pub fn Abs::approx_eq(Self, Self) -> Bool
+pub fn Abs::clamp(Self, Self, Self) -> Self
 pub fn Abs::cm(Double) -> Self
 pub fn Abs::div_by(Self, Double) -> Self
 pub fn Abs::fits(Self, Self) -> Bool
@@ -3301,6 +3302,7 @@ pub fn Abs::ratio_to(Self, Self) -> Double
 pub fn Abs::raw(Double) -> Self
 pub fn Abs::repr(Self) -> String
 pub fn Abs::signum(Self) -> Double
+pub fn Abs::sum(Iter[Self]) -> Self
 pub fn Abs::times(Self, Double) -> Self
 pub fn Abs::to_cm(Self) -> Double
 pub fn Abs::to_inches(Self) -> Double
@@ -3410,6 +3412,7 @@ pub fn Alignment::fix(Self, Dir) -> Axes[FixedAlignment]
 pub fn Alignment::from_side(Side) -> Self
 pub fn Alignment::inv(Self) -> Self
 pub fn Alignment::repr(Self) -> String
+pub fn Alignment::resolve(Self, StyleChain) -> Axes[FixedAlignment]
 pub fn Alignment::x(Self) -> HAlignment?
 pub fn Alignment::y(Self) -> VAlignment?
 pub impl Default for Alignment
@@ -3663,19 +3666,28 @@ pub fn Axes::add_size(Self[Abs], Self[Abs]) -> Self[Abs]
 pub fn[T] Axes::all(Self[T], (T) -> Bool) -> Bool
 pub fn[T] Axes::any(Self[T], (T) -> Bool) -> Bool
 pub fn Axes::aspect_ratio(Self[Abs]) -> Ratio
+pub fn Axes::bitand(Self[Bool], Self[Bool]) -> Self[Bool]
+pub fn Axes::bitor(Self[Bool], Self[Bool]) -> Self[Bool]
 pub fn Axes::div_by(Self[Abs], Double) -> Self[Abs]
 pub fn Axes::fits(Self[Abs], Self[Abs]) -> Bool
 pub fn[T] Axes::get(Self[T], Axis) -> T
 pub fn Axes::is_finite_size(Self[Abs]) -> Bool
 pub fn Axes::is_zero_size(Self[Abs]) -> Bool
 pub fn[T, U] Axes::map(Self[T], (T) -> U) -> Self[U]
+pub fn[T : Compare] Axes::max(Self[T], Self[T]) -> Self[T]
+pub fn[T : Compare] Axes::max_by_side(Self[T]) -> T
+pub fn[T : Compare] Axes::min(Self[T], Self[T]) -> Self[T]
+pub fn[T : Compare] Axes::min_by_side(Self[T]) -> T
 pub fn Axes::neg_size(Self[Abs]) -> Self[Abs]
 pub fn[T] Axes::new(T, T) -> Self[T]
+pub fn Axes::relative_to(Self[Rel[Abs]], Self[Abs]) -> Self[Abs]
+pub fn[T] Axes::select(Self[Bool], Self[T], Self[T]) -> Self[T]
 pub fn[T] Axes::splat(T) -> Self[T]
 pub fn Axes::sub_size(Self[Abs], Self[Abs]) -> Self[Abs]
 pub fn Axes::times(Self[Abs], Double) -> Self[Abs]
 pub fn Axes::to_point(Self[Abs]) -> Point
 pub fn[T] Axes::unwrap_or_smart(Self[Smart[T]], Self[T]) -> Self[T]
+pub fn[T] Axes::with_axis_value(Self[T], Axis, T) -> Self[T]
 pub fn Axes::zero_size() -> Self[Abs]
 pub fn[T, U] Axes::zip(Self[T], Self[U]) -> Self[(T, U)]
 pub fn[T, V, U] Axes::zip_map(Self[T], Self[V], (T, V) -> U) -> Self[U]
@@ -3807,6 +3819,8 @@ pub impl NativeElement for BinomElem
 
 pub(all) enum BlockBody {
   Content(Content)
+  SingleLayouter(BlockSingleCallback)
+  MultiLayouter(BlockMultiCallback)
 } derive(Eq)
 pub impl Default for BlockBody
 pub impl FromValue for BlockBody
@@ -3838,12 +3852,15 @@ pub fn BlockElem::height_local(Self) -> Sizing?
 pub fn BlockElem::inset(Self, StyleChain) -> Sides[Rel[Length]?]
 pub fn BlockElem::inset_in(StyleChain) -> Sides[Rel[Length]?]
 pub fn BlockElem::inset_local(Self) -> Sides[Rel[Length]?]?
+pub fn[T : NativeElement] BlockElem::multi_layouter(T, (T, Engine, Locator, StyleChain, Regions) -> Fragment raise SourceError) -> Self
+pub fn BlockElem::multi_layouter_content(Content, (Content, Engine, Locator, StyleChain, Regions) -> Fragment raise SourceError) -> Self
 pub fn BlockElem::new() -> Self
 pub fn BlockElem::of(Content) -> Self?
 pub fn BlockElem::outset(Self, StyleChain) -> Sides[Rel[Length]?]
 pub fn BlockElem::outset_in(StyleChain) -> Sides[Rel[Length]?]
 pub fn BlockElem::outset_local(Self) -> Sides[Rel[Length]?]?
 pub fn BlockElem::pack(Self) -> Content
+pub fn BlockElem::packed(Content) -> Content
 pub fn BlockElem::radius(Self, StyleChain) -> Corners[Rel[Length]?]
 pub fn BlockElem::radius_in(StyleChain) -> Corners[Rel[Length]?]
 pub fn BlockElem::radius_local(Self) -> Corners[Rel[Length]?]?
@@ -3860,6 +3877,7 @@ pub fn BlockElem::set_radius(Corners[Rel[Length]?]) -> Style
 pub fn BlockElem::set_sticky(Bool) -> Style
 pub fn BlockElem::set_stroke(Sides[Stroke??]) -> Style
 pub fn BlockElem::set_width(Smart[Rel[Length]]) -> Style
+pub fn[T : NativeElement] BlockElem::single_layouter(T, (T, Engine, Locator, StyleChain, LayoutRegion) -> Frame raise SourceError) -> Self
 pub fn BlockElem::sticky(Self, StyleChain) -> Bool
 pub fn BlockElem::sticky_in(StyleChain) -> Bool
 pub fn BlockElem::sticky_local(Self) -> Bool?
@@ -3883,6 +3901,22 @@ pub fn BlockElem::with_sticky(Self, Bool) -> Self
 pub fn BlockElem::with_stroke(Self, Sides[Stroke??]) -> Self
 pub fn BlockElem::with_width(Self, Smart[Rel[Length]]) -> Self
 pub impl NativeElement for BlockElem
+
+pub struct BlockMultiCallback {
+  // private fields
+}
+pub fn BlockMultiCallback::call(Self, Engine, Locator, StyleChain, Regions) -> Fragment raise SourceError
+pub fn BlockMultiCallback::captured(Self) -> Content
+pub fn[T : NativeElement] BlockMultiCallback::new(T, (T, Engine, Locator, StyleChain, Regions) -> Fragment raise SourceError) -> Self
+pub impl Eq for BlockMultiCallback
+
+pub struct BlockSingleCallback {
+  // private fields
+}
+pub fn BlockSingleCallback::call(Self, Engine, Locator, StyleChain, LayoutRegion) -> Frame raise SourceError
+pub fn BlockSingleCallback::captured(Self) -> Content
+pub fn[T : NativeElement] BlockSingleCallback::new(T, (T, Engine, Locator, StyleChain, LayoutRegion) -> Frame raise SourceError) -> Self
+pub impl Eq for BlockSingleCallback
 
 pub(all) enum BottomEdge {
   Metric(BottomEdgeMetric)
@@ -4421,8 +4455,11 @@ pub struct Content {
   // private fields
 }
 pub fn Content::add(Self, Self) -> Self
+pub fn Content::aligned(Self, Alignment) -> Self
+pub fn Content::artifact(Self, ArtifactKind) -> Self
 pub fn Content::can(Self, String) -> Bool
 pub fn Content::elem(Self) -> Element
+pub fn Content::emph(Self) -> Self
 pub fn Content::empty() -> Self
 pub fn Content::field(Self, Int) -> Value raise HintedError
 pub fn Content::field_by_name(Self, String) -> Value raise HintedError
@@ -4440,11 +4477,14 @@ pub fn Content::is_guarded(Self, Int) -> Bool
 pub fn Content::is_prepared(Self) -> Bool
 pub fn Content::label(Self) -> Label?
 pub fn Content::labelled(Self, Label) -> Self
+pub fn Content::linked(Self, Destination, String?) -> Self
 pub fn Content::located(Self, Location) -> Self
 pub fn Content::location(Self) -> Location?
 pub fn Content::mark_prepared(Self) -> Self
 pub fn Content::materialize(Self, StyleChain) -> Self
+pub fn Content::moved(Self, Axes[Rel[Length]]) -> Self
 pub fn Content::new(Element, ArrayView[(Int, Value)]) -> Self
+pub fn Content::padded(Self, Sides[Rel[Length]]) -> Self
 pub fn Content::plain_text(Self) -> String
 pub fn Content::query_first_naive(Self, Selector) -> Self?
 pub fn Content::repeat(Self, Int) -> Self
@@ -4454,11 +4494,13 @@ pub fn Content::sequence_recursive_for_each(Self, (Self) -> Unit) -> Unit
 pub fn Content::set(Self, Element, Int, Value) -> Self
 pub fn Content::span(Self) -> @syntax.Span
 pub fn Content::spanned(Self, @syntax.Span) -> Self
+pub fn Content::strong(Self) -> Self
 pub fn Content::styled(Self, Style) -> Self
 pub fn Content::styled_with_map(Self, Styles) -> Self
 pub fn[T : NativeElement] Content::to_packed(Self) -> T?
 pub fn Content::to_sequence(Self) -> Array[Self]?
 pub fn Content::traverse(Self, (Self) -> Bool) -> Bool
+pub fn Content::underlined(Self) -> Self
 pub fn Content::with_field(Self, Int, Value) -> Self
 pub fn Content::without_field(Self, Int) -> Self
 pub impl Eq for Content
@@ -4539,6 +4581,7 @@ pub fn Counter::of(Element) -> Self
 pub fn Counter::repr(Self) -> String
 pub fn Counter::select(Self, Introspector, Location) -> Selector
 pub fn Counter::select_any() -> Selector
+pub fn Counter::update(Self, @syntax.Span, CounterUpdate) -> Content
 pub impl Fingerprint for Counter
 pub impl FromValue for Counter
 pub impl IntoValue for Counter
@@ -4909,6 +4952,22 @@ pub impl FromValue for Decimal
 pub impl IntoValue for Decimal
 pub impl Reflect for Decimal
 
+pub(all) enum DecoLine {
+  Underline(stroke~ : ResolvedStroke, offset~ : Smart[Abs], evade~ : Bool, background~ : Bool)
+  Strikethrough(stroke~ : ResolvedStroke, offset~ : Smart[Abs], background~ : Bool)
+  Overline(stroke~ : ResolvedStroke, offset~ : Smart[Abs], evade~ : Bool, background~ : Bool)
+  Highlight(fill~ : Paint?, stroke~ : Sides[FixedStroke?], top_edge~ : TopEdge, bottom_edge~ : BottomEdge, radius~ : Corners[Rel[Abs]])
+} derive(Eq)
+
+pub(all) struct Decoration {
+  line : DecoLine
+  extent : Abs
+} derive(Eq)
+pub impl Fingerprint for Decoration
+pub impl FromValue for Decoration
+pub impl IntoValue for Decoration
+pub impl Reflect for Decoration
+
 pub(all) struct Delimiter(Char) derive(Eq, Hash)
 pub fn Delimiter::default() -> Self
 pub impl FromValue for Delimiter
@@ -4947,6 +5006,7 @@ pub(all) enum Destination {
   Position(PagedPosition)
   Location(Location)
 } derive(Eq)
+pub fn Destination::alt_text(Self, Engine, StyleChain, @syntax.Span) -> String raise SourceError
 pub fn Destination::of_value(Value) -> Self
 pub impl FromValue for Destination
 pub impl IntoValue for Destination
@@ -5132,6 +5192,10 @@ pub(all) enum DynValue {
   Tag(Tag)
   HtmlCss(CssProperties)
   CellGrid(CellGrid)
+  InlineCallback(InlineCallback)
+  BlockSingleCallback(BlockSingleCallback)
+  BlockMultiCallback(BlockMultiCallback)
+  Decoration(Decoration)
 } derive(Eq)
 pub fn DynValue::add_dyn(Self, Self) -> Value? raise HintedError
 pub fn DynValue::field(Self, String) -> Value??
@@ -6382,6 +6446,7 @@ pub(all) enum HAlignment {
 pub fn HAlignment::fix(Self, Dir) -> FixedAlignment
 pub fn HAlignment::inv(Self) -> Self
 pub fn HAlignment::repr(Self) -> String
+pub fn HAlignment::resolve(Self, StyleChain) -> FixedAlignment
 pub fn HAlignment::try_from(Alignment) -> Self raise HintedError
 pub impl Default for HAlignment
 pub impl AlignmentComponent for HAlignment
@@ -6785,13 +6850,31 @@ pub(all) enum Inherit {
   No
 } derive(Eq, Hash, @debug.Debug)
 
+pub struct InlineCallback {
+  // private fields
+}
+pub fn InlineCallback::call(Self, Engine, Locator, StyleChain, Axes[Abs]) -> Array[InlineItem] raise SourceError
+pub fn InlineCallback::captured(Self) -> Content
+pub fn[T : NativeElement] InlineCallback::new(T, (T, Engine, Locator, StyleChain, Axes[Abs]) -> Array[InlineItem] raise SourceError) -> Self
+pub impl Eq for InlineCallback
+pub impl FromValue for InlineCallback
+pub impl IntoValue for InlineCallback
+pub impl Reflect for InlineCallback
+
 pub struct InlineElem(Content)
-pub fn InlineElem::body(Self) -> Value
-pub fn InlineElem::new(Value) -> Self
+pub fn InlineElem::body(Self) -> InlineCallback
+pub fn InlineElem::layout(Self, Engine, Locator, StyleChain, Axes[Abs]) -> Array[InlineItem] raise SourceError
+pub fn[T : NativeElement] InlineElem::layouter(T, (T, Engine, Locator, StyleChain, Axes[Abs]) -> Array[InlineItem] raise SourceError) -> Self
+pub fn InlineElem::new(InlineCallback) -> Self
 pub fn InlineElem::of(Content) -> Self?
 pub fn InlineElem::pack(Self) -> Content
-pub fn InlineElem::with_body(Self, Value) -> Self
+pub fn InlineElem::with_body(Self, InlineCallback) -> Self
 pub impl NativeElement for InlineElem
+
+pub(all) enum InlineItem {
+  Space(Abs, Bool)
+  Frame(Frame)
+}
 
 pub(all) enum InnerHtmlPosition {
   Frame(Point)
@@ -7287,6 +7370,15 @@ pub fn Luma::from_oklch(Oklch) -> Self
 pub fn Luma::from_rgb(Rgb) -> Self
 pub fn Luma::lighten(Self, Float) -> Self
 pub impl Eq for Luma
+
+pub struct ManualPageCounter {
+  // private fields
+}
+pub fn ManualPageCounter::logical(Self) -> Int64
+pub fn ManualPageCounter::new() -> Self
+pub fn ManualPageCounter::physical(Self) -> Int
+pub fn ManualPageCounter::step(Self) -> Unit
+pub fn ManualPageCounter::visit(Self, Engine, Frame) -> Unit raise SourceError
 
 pub(all) struct Margin[T] {
   sides : Sides[T?]
@@ -7889,6 +7981,7 @@ pub(all) enum OuterHAlignment {
   End
 } derive(Eq, Hash, @debug.Debug)
 pub fn OuterHAlignment::fix(Self, Dir) -> FixedAlignment
+pub fn OuterHAlignment::resolve(Self, StyleChain) -> FixedAlignment
 pub fn OuterHAlignment::to_h(Self) -> HAlignment
 pub fn OuterHAlignment::try_from(Alignment) -> Self raise HintedError
 pub impl Default for OuterHAlignment
@@ -7950,10 +8043,12 @@ pub fn OutlineEntry::element_location(Self) -> Location raise HintedError
 pub fn OutlineEntry::fill(Self, StyleChain) -> Content?
 pub fn OutlineEntry::fill_in(StyleChain) -> Content?
 pub fn OutlineEntry::fill_local(Self) -> Content??
+pub fn OutlineEntry::indented(Self, Engine, Context, @syntax.Span, Content?, Content, Length) -> Content raise SourceError
 pub fn OutlineEntry::level(Self) -> NonZeroUSize
 pub fn OutlineEntry::new(NonZeroUSize, Content) -> Self
 pub fn OutlineEntry::of(Content) -> Self?
 pub fn OutlineEntry::pack(Self) -> Content
+pub fn OutlineEntry::page(Self, Engine, Context, @syntax.Span) -> Content raise SourceError
 pub fn OutlineEntry::parent_in(StyleChain) -> OutlineElem?
 pub fn OutlineEntry::prefix(Self, Engine, Context, @syntax.Span) -> Content? raise SourceError
 pub fn OutlineEntry::set_fill(Content?) -> Style
@@ -9079,6 +9174,7 @@ pub fn[T : Numeric] Rel::one() -> Self[T]
 pub fn Rel::partial_cmp_length(Self[Length], Self[Length]) -> Int?
 pub fn[T : Numeric] Rel::relative_to(Self[T], T) -> T
 pub fn Rel::repr_length(Self[Length]) -> String
+pub fn Rel::resolve(Self[Length], StyleChain) -> Self[Abs]
 pub fn[T : Numeric] Rel::times(Self[T], Double) -> Self[T]
 pub fn Rel::try_div_length(Self[Length], Self[Length]) -> Double?
 pub fn[T : Numeric] Rel::zero() -> Self[T]
@@ -9204,6 +9300,7 @@ pub(all) struct ResolvedStroke {
 pub fn ResolvedStroke::to_length_stroke(Self) -> Stroke
 pub fn ResolvedStroke::unwrap_or(Self, FixedStroke) -> FixedStroke
 pub fn ResolvedStroke::unwrap_or_default(Self) -> FixedStroke
+pub impl Default for ResolvedStroke
 pub impl Fold for ResolvedStroke
 
 pub(all) struct Rgb {
@@ -9495,12 +9592,16 @@ pub(all) struct Sides[T] {
 } derive(Default, Eq, Hash, @debug.Debug)
 pub fn[T] Sides::get(Self[T], Side) -> T
 pub fn[T : Eq] Sides::is_uniform(Self[T]) -> Bool
+pub fn[T : Numeric] Sides::is_zero(Self[T]) -> Bool
 pub fn[T] Sides::iter(Self[T]) -> Iter[T]
 pub fn[T, U] Sides::map(Self[T], (T) -> U) -> Self[U]
 pub fn[T, U] Sides::map_corners(Self[T], (T, T) -> U) -> Corners[U]
 pub fn[T] Sides::new(T, T, T, T) -> Self[T]
+pub fn Sides::relative_to(Self[Rel[Abs]], Axes[Abs]) -> Self[Abs]
 pub fn[T] Sides::splat(T) -> Self[T]
+pub fn[T : Add] Sides::sum_by_axis(Self[T]) -> Axes[T]
 pub fn[T] Sides::unwrap_or(Self[T?], T) -> Self[T]
+pub fn[T] Sides::with_side(Self[T], Side, T) -> Self[T]
 pub fn[T, U] Sides::zip(Self[T], Self[U]) -> Self[(T, U)]
 pub impl[T : Fold] Fold for Sides[T?]
 pub impl[T : FromValue] FromValue for Sides[T?]
@@ -10568,6 +10669,7 @@ pub fn TermsElem::within_in(StyleChain) -> Bool
 pub impl NativeElement for TermsElem
 
 pub(all) struct TextDir(Smart[Dir]) derive(Eq, Hash)
+pub fn TextDir::resolve(Self, StyleChain) -> Dir
 pub impl FromValue for TextDir
 pub impl IntoValue for TextDir
 pub impl Reflect for TextDir
@@ -10579,7 +10681,7 @@ pub fn TextElem::bottom_edge_in(StyleChain) -> BottomEdge
 pub fn TextElem::case_in(StyleChain) -> Case?
 pub fn TextElem::cjk_latin_spacing_in(StyleChain) -> Smart[Never?]
 pub fn TextElem::costs_in(StyleChain) -> Costs
-pub fn TextElem::deco_in(StyleChain) -> Value
+pub fn TextElem::deco_in(StyleChain) -> Array[Decoration]
 pub fn TextElem::delta_in(StyleChain) -> WeightDelta
 pub fn TextElem::dir_in(StyleChain) -> TextDir
 pub fn TextElem::discretionary_ligatures_in(StyleChain) -> Bool
@@ -10609,7 +10711,7 @@ pub fn TextElem::set_bottom_edge(BottomEdge) -> Style
 pub fn TextElem::set_case(Case?) -> Style
 pub fn TextElem::set_cjk_latin_spacing(Smart[Never?]) -> Style
 pub fn TextElem::set_costs(Costs) -> Style
-pub fn TextElem::set_deco(Value) -> Style
+pub fn TextElem::set_deco(Array[Decoration]) -> Style
 pub fn TextElem::set_delta(WeightDelta) -> Style
 pub fn TextElem::set_dir(TextDir) -> Style
 pub fn TextElem::set_discretionary_ligatures(Bool) -> Style
@@ -10696,7 +10798,7 @@ pub impl IntoValue for TextSize
 pub impl Reflect for TextSize
 
 pub(all) struct Tiling {
-  body : Content
+  frame : Frame
   size : Axes[Abs]
   spacing : Axes[Abs]
   offset : Axes[Abs]
@@ -11062,6 +11164,7 @@ pub fn VAlignment::fix(Self, Dir) -> FixedAlignment
 pub fn VAlignment::inv(Self) -> Self
 pub fn VAlignment::position(Self, Abs) -> Abs
 pub fn VAlignment::repr(Self) -> String
+pub fn VAlignment::resolve(Self, StyleChain) -> FixedAlignment
 pub fn VAlignment::try_from(Alignment) -> Self raise HintedError
 pub impl Default for VAlignment
 pub impl AlignmentComponent for VAlignment
