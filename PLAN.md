@@ -9,8 +9,9 @@
 | P1 syntax (typed AST, Lines) | **done** | 3792/3792 suite cases: AST semantic dump + `Lines` conversions identical (`ast` stage) |
 | P1 syntax (reparser, highlight) | todo | |
 | P2 eval (typst-eval) | **done** | VM, closures, imports, rules, math; `eval` stage runs end to end |
-| P2 library (value level) | **done** | 3753/3792 `eval` stage cases identical (2026-10-02). Remaining 39 need later phases: `layout`/`measure` (layout), plugins (WASM, out of scope), font warnings (fonts), bibliography/CSL (hayagriva), auto-sized tilings (layout) |
-| P3 realize + introspection + HTML export | in progress | `realize` stage 3666/3792; `html` stage 475/508 (2026-10-02). Remaining html: bibliography (hayagriva port in progress), frames via layout, measure, raw highlighting, PDF images |
+| P2 library (value level) | **done** | 3777/3792 `eval` stage cases identical (2026-10-03). Remaining 15: plugins (WASM, out of scope), inline layout (P4), raw syntax highlighting |
+| P3 realize + introspection + HTML export | **done** | `realize` 3724/3792, `html` 498/508 (2026-10-03). Remaining html: frames via SVG export (P4), inline layout (P4), raw highlighting, PDF images |
+| P4 fonts, shaping, layout, export | in progress | `font` 86/86, `break` 12734/12734, `paged` 338/2299 (inline + math layout pending; shaping in progress); see docs/p4-plan.md |
 
 Run `scripts/upstream.sh && scripts/goldens.sh && moon run tests/runner --target native -- syntax`
 (and `-- ast`, `-- eval`). `python3 scripts/classify.py eval 60` buckets the
