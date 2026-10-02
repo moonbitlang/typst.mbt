@@ -16,7 +16,7 @@ pub fn PageRanges::new(ranges : Array[PageRangesPart]) -> PageRanges {
 ///|
 /// `impl From<i32> for PageRanges`.
 pub fn PageRanges::from_int(value : Int) -> PageRanges {
-  { ranges: [SinglePage(Numeric::new(value))] }
+  { ranges: [SinglePage(Numeric::new(value))], }
 }
 
 ///|
@@ -75,16 +75,21 @@ pub fn[W : FmtWrite] PageRanges::fmt(self : PageRanges, f : W) -> Unit {
 }
 
 ///|
-pub impl Show for PageRanges with output(self, logger) {
+pub impl Show for PageRanges with fn output(self, logger) {
   logger.write_string(fmt_to_string(b => self.fmt(b)))
 }
 
 ///|
 /// `impl FromStr for PageRanges`.
-pub fn PageRanges::from_str(s : String) -> Result[PageRanges, PageRangesPartErr] {
+pub fn PageRanges::from_str(
+  s : String,
+) -> Result[PageRanges, PageRangesPartErr] {
   // Split input into different ranges separated by `&` or `,`
   let ranges = []
-  for part in group_by(s, (c, d) => !(c == ',' || c == '&' || d == ',' || d == '&')) {
+  for
+    part in group_by(s, (c, d) => {
+      !(c == ',' || c == '&' || d == ',' || d == '&')
+    }) {
     match PageRangesPart::from_str(part) {
       Ok(p) => ranges.push(p)
       Err(e) => return Err(e)
@@ -131,7 +136,10 @@ pub fn PageRangesPart::end(self : PageRangesPart) -> Numeric? {
 
 ///|
 /// Order the values according to CSL rules.
-pub fn PageRangesPart::csl_cmp(self : PageRangesPart, other : PageRangesPart) -> Int {
+pub fn PageRangesPart::csl_cmp(
+  self : PageRangesPart,
+  other : PageRangesPart,
+) -> Int {
   match (self, other) {
     (Ampersand, Ampersand) => 0
     (Ampersand, _) => -1
@@ -177,7 +185,7 @@ pub fn[W : FmtWrite] PageRangesPart::fmt(self : PageRangesPart, f : W) -> Unit {
 }
 
 ///|
-pub impl Show for PageRangesPart with output(self, logger) {
+pub impl Show for PageRangesPart with fn output(self, logger) {
   logger.write_string(fmt_to_string(b => self.fmt(b)))
 }
 
@@ -193,7 +201,7 @@ pub(all) enum PageRangesPartErr {
 } derive(Eq, Debug)
 
 ///|
-pub impl Show for PageRangesPartErr with output(self, logger) {
+pub impl Show for PageRangesPartErr with fn output(self, logger) {
   logger.write_string(
     match self {
       Malformed => "page range string malformed"
@@ -205,14 +213,18 @@ pub impl Show for PageRangesPartErr with output(self, logger) {
 
 ///|
 /// `impl FromStr for PageRangesPart`.
-pub fn PageRangesPart::from_str(s : String) -> Result[PageRangesPart, PageRangesPartErr] {
+pub fn PageRangesPart::from_str(
+  s : String,
+) -> Result[PageRangesPart, PageRangesPartErr] {
   let s = @unscanny.trim(s)
   if s.is_empty() {
     return Err(Empty)
   }
-  let num = (x : String) => match Numeric::from_str(x) {
-    Ok(n) => Ok(n)
-    Err(e) => Err(PageRangesPartErr::NumericErr(e))
+  let num = (x : String) => {
+    match Numeric::from_str(x) {
+      Ok(n) => Ok(n)
+      Err(e) => Err(PageRangesPartErr::NumericErr(e))
+    }
   }
   if s == "&" {
     Ok(Ampersand)

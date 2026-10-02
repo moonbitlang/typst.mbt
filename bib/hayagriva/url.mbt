@@ -11,7 +11,7 @@ pub(all) struct Url {
 } derive(Eq, Hash, Debug)
 
 ///|
-pub impl Show for Url with output(self, logger) {
+pub impl Show for Url with fn output(self, logger) {
   logger.write_string(self.serialization)
 }
 
@@ -28,7 +28,7 @@ pub(all) enum UrlParseError {
 } derive(Eq, Debug)
 
 ///|
-pub impl Show for UrlParseError with output(self, logger) {
+pub impl Show for UrlParseError with fn output(self, logger) {
   logger.write_string(
     match self {
       EmptyHost => "empty host"
@@ -60,7 +60,11 @@ fn is_special_scheme(scheme : String) -> Bool {
 
 ///|
 /// Percent-encode a char (as UTF-8) if `in_set` says so.
-fn percent_encode_char(out : StringBuilder, c : Char, in_set : (Int) -> Bool) -> Unit {
+fn percent_encode_char(
+  out : StringBuilder,
+  c : Char,
+  in_set : (Int) -> Bool,
+) -> Unit {
   let n = c.to_int()
   if n < 0x80 {
     if in_set(n) {
@@ -140,9 +144,11 @@ pub fn Url::parse(input : String) -> Result[Url, UrlParseError] {
     return Err(RelativeUrlWithoutBase)
   }
   while i < chars.length() &&
-        (chars[i].is_ascii_alphabetic() ||
-        chars[i].is_ascii_digit() ||
-        chars[i] is ('+' | '-' | '.')) {
+        (
+          chars[i].is_ascii_alphabetic() ||
+          chars[i].is_ascii_digit() ||
+          chars[i] is ('+' | '-' | '.')
+        ) {
     i += 1
   }
   if i >= chars.length() || chars[i] != ':' {
@@ -194,7 +200,11 @@ pub fn Url::parse(input : String) -> Result[Url, UrlParseError] {
           colon = k
         }
       }
-      let user = if colon >= 0 { userinfo[0:colon].to_owned() } else { userinfo }
+      let user = if colon >= 0 {
+        userinfo[0:colon].to_owned()
+      } else {
+        userinfo
+      }
       let pass = if colon >= 0 { userinfo[colon + 1:].to_owned() } else { [] }
       if !user.is_empty() || !pass.is_empty() {
         for c in user {
@@ -230,7 +240,11 @@ pub fn Url::parse(input : String) -> Result[Url, UrlParseError] {
     } else {
       host_part
     }
-    let port_chars = if colon >= 0 { host_part[colon + 1:].to_owned() } else { [] }
+    let port_chars = if colon >= 0 {
+      host_part[colon + 1:].to_owned()
+    } else {
+      []
+    }
     if special && host_chars.is_empty() && scheme != "file" {
       return Err(EmptyHost)
     }
@@ -315,11 +329,15 @@ pub fn Url::parse(input : String) -> Result[Url, UrlParseError] {
     pos += 1
     out.write_char('?')
     while pos < rest.length() && rest[pos] != '#' {
-      percent_encode_char(out, rest[pos], if special {
-        special_query_set
-      } else {
-        query_set
-      })
+      percent_encode_char(
+        out,
+        rest[pos],
+        if special {
+          special_query_set
+        } else {
+          query_set
+        },
+      )
       pos += 1
     }
   }
@@ -332,31 +350,29 @@ pub fn Url::parse(input : String) -> Result[Url, UrlParseError] {
       pos += 1
     }
   }
-  Ok({ serialization: out.to_string() })
+  Ok({ serialization: out.to_string(), })
 }
 
 ///|
 fn is_forbidden_host_char(c : Char) -> Bool {
   c
-  is (
-    '\u{0}'
-    | '\t'
-    | '\n'
-    | '\r'
-    | ' '
-    | '#'
-    | '/'
-    | ':'
-    | '<'
-    | '>'
-    | '?'
-    | '@'
-    | '['
-    | '\\'
-    | ']'
-    | '^'
-    | '|'
-  )
+  is ('\u{0}'
+  | '\t'
+  | '\n'
+  | '\r'
+  | ' '
+  | '#'
+  | '/'
+  | ':'
+  | '<'
+  | '>'
+  | '?'
+  | '@'
+  | '['
+  | '\\'
+  | ']'
+  | '^'
+  | '|')
 }
 
 ///|
@@ -417,7 +433,10 @@ fn parse_host(input : String, special : Bool) -> Result[String, UrlParseError] {
   let ascii = domain_to_ascii(@unscanny.to_lowercase(domain))
   guard ascii is Some(ascii) else { return Err(IdnaError) }
   for c in ascii {
-    if is_forbidden_host_char(c) || c == '%' || c.to_int() < 0x20 || c == '\u{7f}' {
+    if is_forbidden_host_char(c) ||
+      c == '%' ||
+      c.to_int() < 0x20 ||
+      c == '\u{7f}' {
       return Err(InvalidDomainCharacter)
     }
   }
@@ -432,9 +451,11 @@ fn parse_host(input : String, special : Bool) -> Result[String, UrlParseError] {
     labels[labels.length() - 1]
   }
   if !last.is_empty() &&
-    (last.iter().all(c => c.is_ascii_digit()) ||
-    last.has_prefix("0x") ||
-    last.has_prefix("0X")) {
+    (
+      last.iter().all(c => c.is_ascii_digit()) ||
+      last.has_prefix("0x") ||
+      last.has_prefix("0X")
+    ) {
     return parse_ipv4(labels)
   }
   Ok(ascii)

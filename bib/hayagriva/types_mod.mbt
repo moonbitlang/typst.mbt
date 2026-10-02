@@ -130,7 +130,7 @@ pub fn EntryType::from_str(s : String) -> Result[EntryType, String] {
 }
 
 ///|
-pub impl Show for EntryType with output(self, logger) {
+pub impl Show for EntryType with fn output(self, logger) {
   for t in entry_type_names {
     if t.0 == self {
       logger.write_string(t.1)
@@ -178,7 +178,7 @@ pub fn[T] MaybeTyped::as_typed(self : MaybeTyped[T]) -> T? {
 }
 
 ///|
-pub impl[T : Show] Show for MaybeTyped[T] with output(self, logger) {
+pub impl[T : Show] Show for MaybeTyped[T] with fn output(self, logger) {
   match self {
     Typed(t) => t.output(logger)
     String(s) => logger.write_string(s)
@@ -270,20 +270,22 @@ pub(all) struct QualifiedUrl {
 ///|
 /// Create a new qualified URL.
 pub fn QualifiedUrl::new(value : Url, visit_date : Date?) -> QualifiedUrl {
-  { value, visit_date }
+  { value, visit_date, }
 }
 
 ///|
 /// `impl FromStr for QualifiedUrl`.
-pub fn QualifiedUrl::from_str(s : String) -> Result[QualifiedUrl, UrlParseError] {
+pub fn QualifiedUrl::from_str(
+  s : String,
+) -> Result[QualifiedUrl, UrlParseError] {
   match Url::parse(s) {
-    Ok(value) => Ok({ value, visit_date: None })
+    Ok(value) => Ok({ value, visit_date: None, })
     Err(e) => Err(e)
   }
 }
 
 ///|
-pub impl Show for QualifiedUrl with output(self, logger) {
+pub impl Show for QualifiedUrl with fn output(self, logger) {
   logger.write_string(self.value.serialization)
 }
 
@@ -298,15 +300,20 @@ pub(all) struct Publisher {
 
 ///|
 /// Create a new publisher.
-pub fn Publisher::new(name : FormatString?, location : FormatString?) -> Publisher {
-  { name, location }
+pub fn Publisher::new(
+  name : FormatString?,
+  location : FormatString?,
+) -> Publisher {
+  { name, location, }
 }
 
 ///|
 /// Creates a new publisher with `s` as its name and no location.
-pub fn Publisher::from_str(s : String) -> Result[Publisher, ChunkedStrParseError] {
+pub fn Publisher::from_str(
+  s : String,
+) -> Result[Publisher, ChunkedStrParseError] {
   match FormatString::from_str(s) {
-    Ok(f) => Ok({ name: Some(f), location: None })
+    Ok(f) => Ok({ name: Some(f), location: None, })
     Err(e) => Err(e)
   }
 }
@@ -317,7 +324,7 @@ pub fn Publisher::from_str(s : String) -> Result[Publisher, ChunkedStrParseError
 pub(all) struct SerialNumber(Map[String, String]) derive(Eq, Debug)
 
 ///|
-pub impl Hash for SerialNumber with hash_combine(self, hasher) {
+pub impl Hash for SerialNumber with fn hash_combine(self, hasher) {
   for k in self.sorted_keys() {
     hasher.combine_string(k)
     hasher.combine_string(self.0.get(k).unwrap())

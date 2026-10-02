@@ -12,7 +12,7 @@ pub(all) struct YamlLoadError {
 } derive(Eq, Debug)
 
 ///|
-pub impl Show for YamlLoadError with output(self, logger) {
+pub impl Show for YamlLoadError with fn output(self, logger) {
   logger.write_string(self.message)
 }
 
@@ -45,10 +45,10 @@ fn invalid_type(d : @serde.Data, expected : String) -> De {
 /// Parse a bibliography from a YAML string.
 pub fn from_yaml_str(s : String) -> Result[Library, YamlLoadError] {
   let data = @yaml.parse(@utf8.encode(s)) catch {
-    @yaml.YamlError(message~, location~) => return Err({ message, location })
+    @yaml.YamlError(message~, location~) => return Err({ message, location, })
   }
   try de_library(data) catch {
-    De(message) => Err({ message, location: None })
+    De(message) => Err({ message, location: None, })
   } noraise {
     lib => Ok(lib)
   }
@@ -107,7 +107,7 @@ fn NakedEntry::into_entry(
   }
   let parents = self.parents.map(p => p.into_entry(key, Some(entry_type)))
   let e = self.fields
-  { ..e, key, entry_type, parents }
+  { ..e, key, entry_type, parents, }
 }
 
 ///|
@@ -140,7 +140,10 @@ fn de_naked_entry(data : @serde.Data) -> NakedEntry raise De {
       "parent" =>
         parents = match v {
           Seq(items) => items.map(de_naked_entry)
-          None => raise De("data did not match any variant of untagged enum OneOrMany")
+          None =>
+            raise De(
+              "data did not match any variant of untagged enum OneOrMany",
+            )
           _ =>
             [
               de_naked_entry(v) catch {
@@ -170,7 +173,8 @@ fn de_naked_entry(data : @serde.Data) -> NakedEntry raise De {
       "time-range" => e.time_range_ = de_opt(v, de_maybe_duration_range)
       "runtime" => e.runtime_ = de_opt(v, de_maybe_duration)
       "url" => e.url_ = de_opt(v, de_qualified_url)
-      "serial-number" | "serial" => e.serial_number_ = de_opt(v, de_serial_number)
+      "serial-number" | "serial" =>
+        e.serial_number_ = de_opt(v, de_serial_number)
       "language" => e.language_ = de_opt(v, de_language)
       "archive" => e.archive_ = de_opt(v, de_format_string)
       "archive-location" => e.archive_location_ = de_opt(v, de_format_string)
@@ -181,7 +185,7 @@ fn de_naked_entry(data : @serde.Data) -> NakedEntry raise De {
       _ => ()
     }
   }
-  { entry_type, parents, fields: e }
+  { entry_type, parents, fields: e, }
 }
 
 ///|
@@ -267,7 +271,7 @@ fn de_format_string(d : @serde.Data) -> FormatString raise De {
           }
         }
         guard value is Some(value) else { raise De("missing field `value`") }
-        Some(FormatString::{ value, short })
+        Some(FormatString::{ value, short, })
       } catch {
         _ => None
       }
@@ -332,7 +336,7 @@ fn de_person(d : @serde.Data) -> Person raise De {
         }
       }
       guard name is Some(name) else { raise De("missing field `name`") }
-      { name, given_name, prefix, suffix, comma_suffix, alias_ }
+      { name, given_name, prefix, suffix, comma_suffix, alias_, }
     }
     _ =>
       raise invalid_type(d, "a name string or a dictionary with a \"name\" key")
@@ -366,7 +370,7 @@ fn de_persons_with_roles(d : @serde.Data) -> PersonsWithRoles raise De {
   }
   guard names is Some(names) else { raise De("missing field `names`") }
   guard role is Some(role) else { raise De("missing field `role`") }
-  { names, role }
+  { names, role, }
 }
 
 ///|
@@ -389,16 +393,19 @@ fn de_date(d : @serde.Data) -> Date raise De {
       let mut day = None
       let mut approximate = false
       let mut season = None
-      let u8 = (v : @serde.Data) => match v {
-        Int(i) if i >= 0L && i <= 255L => i.to_int()
-        _ => raise invalid_type(v, "u8")
+      let u8 = (v : @serde.Data) => {
+        match v {
+          Int(i) if i >= 0L && i <= 255L => i.to_int()
+          _ => raise invalid_type(v, "u8")
+        }
       }
       for pair in pairs {
         let (k, v) = pair
         match k {
           "year" =>
             year = match v {
-              Int(i) if i >= -2147483648L && i <= 2147483647L => Some(i.to_int())
+              Int(i) if i >= -2147483648L && i <= 2147483647L =>
+                Some(i.to_int())
               _ => raise invalid_type(v, "i32")
             }
           "month" => month = de_opt(v, u8)
@@ -446,7 +453,7 @@ fn de_publisher(d : @serde.Data) -> Publisher raise De {
           _ => ()
         }
       }
-      { name, location }
+      { name, location, }
     }
     _ =>
       raise invalid_type(
@@ -515,8 +522,7 @@ fn de_page_ranges(d : @serde.Data) -> PageRanges raise De {
         Ok(p) => p
         Err(e) => raise De(e.to_string())
       }
-    _ =>
-      raise invalid_type(d, "pages, page ranges, ampersands, and commas")
+    _ => raise invalid_type(d, "pages, page ranges, ampersands, and commas")
   }
 }
 
@@ -562,7 +568,7 @@ fn de_duration_range(d : @serde.Data) -> DurationRange raise De {
       }
       guard start is Some(start) else { raise De("missing field `start`") }
       guard end is Some(end) else { raise De("missing field `end`") }
-      { start, end }
+      { start, end, }
     }
     _ =>
       raise invalid_type(
@@ -572,7 +578,9 @@ fn de_duration_range(d : @serde.Data) -> DurationRange raise De {
 }
 
 ///|
-fn de_maybe_duration_range(d : @serde.Data) -> MaybeTyped[DurationRange] raise De {
+fn de_maybe_duration_range(
+  d : @serde.Data,
+) -> MaybeTyped[DurationRange] raise De {
   de_maybe_typed(d, de_duration_range)
 }
 
@@ -607,7 +615,7 @@ fn de_qualified_url(d : @serde.Data) -> QualifiedUrl raise De {
         }
       }
       guard value is Some(value) else { raise De("missing field `value`") }
-      { value, visit_date }
+      { value, visit_date, }
     }
     _ =>
       raise invalid_type(
@@ -676,7 +684,7 @@ pub(all) enum BibLaTeXError {
 } derive(Eq, Debug)
 
 ///|
-pub impl Show for BibLaTeXError with output(self, logger) {
+pub impl Show for BibLaTeXError with fn output(self, logger) {
   match self {
     Parse(err) => logger.write_string("biblatex parse error: \{err}")
     Type(err) => logger.write_string("biblatex type error: \{err}")
@@ -685,7 +693,9 @@ pub impl Show for BibLaTeXError with output(self, logger) {
 
 ///|
 /// Parse a bibliography from a BibLaTeX source string.
-pub fn from_biblatex_str(biblatex : String) -> Result[Library, Array[BibLaTeXError]] {
+pub fn from_biblatex_str(
+  biblatex : String,
+) -> Result[Library, Array[BibLaTeXError]] {
   match @biblatex.Bibliography::parse(biblatex) {
     Err(e) => Err([Parse(e)])
     Ok(bibliography) =>

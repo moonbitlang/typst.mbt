@@ -31,7 +31,11 @@ pub fn Selector::matches(self : Selector, entry : Entry) -> Bool {
 
 ///|
 /// Applies the selector and returns the bound element if there was a match.
-pub fn Selector::bound(self : Selector, entry : Entry, bound : String) -> Entry? {
+pub fn Selector::bound(
+  self : Selector,
+  entry : Entry,
+  bound : String,
+) -> Entry? {
   match self.apply(entry) {
     Some(hm) => hm.get(bound)
     None => None
@@ -136,9 +140,7 @@ fn Selector::apply_any(
       match expr.apply_any(entries) {
         Some((bound, es)) =>
           if !es.is_empty() {
-            if es
-              .iter()
-              .any(e => attributes.iter().all(arg => e.has(arg))) {
+            if es.iter().any(e => attributes.iter().all(arg => e.has(arg))) {
               Some((bound, es))
             } else {
               None

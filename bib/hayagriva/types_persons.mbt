@@ -15,7 +15,7 @@ pub fn PersonsWithRoles::new(
   names : Array[Person],
   role : PersonRole,
 ) -> PersonsWithRoles {
-  { names, role }
+  { names, role, }
 }
 
 ///|
@@ -124,7 +124,7 @@ pub(all) enum PersonError {
 } derive(Eq, Debug)
 
 ///|
-pub impl Show for PersonError with output(self, logger) {
+pub impl Show for PersonError with fn output(self, logger) {
   logger.write_string(
     match self {
       TooManyParts => "too many parts"
@@ -138,7 +138,9 @@ pub impl Show for PersonError with output(self, logger) {
 /// This function expects a list of strings with its length between one and
 /// three. The first part will be interpreted as the `<prefix> <Name>`, the
 /// second part as the given name and the third part as the suffix.
-pub fn Person::from_strings(parts : Array[String]) -> Result[Person, PersonError] {
+pub fn Person::from_strings(
+  parts : Array[String],
+) -> Result[Person, PersonError] {
   if parts.is_empty() {
     return Err(Empty)
   } else if parts.length() > 3 {
@@ -193,7 +195,7 @@ pub fn Person::from_strings(parts : Array[String]) -> Result[Person, PersonError
   if prefix is Some(_) {
     name = @unscanny.trim_start(name)
   }
-  Ok({ name, given_name, prefix, suffix, comma_suffix: false, alias_: None })
+  Ok({ name, given_name, prefix, suffix, comma_suffix: false, alias_: None, })
 }
 
 ///|
@@ -499,14 +501,18 @@ pub fn Person::csl_cmp(
   }
   if demote_particle {
     chain([
-      () => @unscanny.compare_str(
-        @unscanny.to_lowercase(self.name_without_particle()),
-        @unscanny.to_lowercase(other.name_without_particle()),
-      ),
-      () => compare_opt_str(
-        self.name_particles().map(c => @unscanny.to_lowercase(c)),
-        other.name_particles().map(c => @unscanny.to_lowercase(c)),
-      ),
+      () => {
+        @unscanny.compare_str(
+          @unscanny.to_lowercase(self.name_without_particle()),
+          @unscanny.to_lowercase(other.name_without_particle()),
+        )
+      },
+      () => {
+        compare_opt_str(
+          self.name_particles().map(c => @unscanny.to_lowercase(c)),
+          other.name_particles().map(c => @unscanny.to_lowercase(c)),
+        )
+      },
       () => compare_opt_str(given_a, given_b),
       () => compare_opt_str(suffix_a, suffix_b),
     ])

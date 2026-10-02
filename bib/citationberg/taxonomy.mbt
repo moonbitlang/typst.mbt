@@ -27,7 +27,7 @@ pub fn Variable::is_number_of_variable(self : Variable) -> Bool {
 }
 
 ///|
-pub impl Show for Variable with output(self, logger) {
+pub impl Show for Variable with fn output(self, logger) {
   match self {
     Standard(v) => logger.write_string(v.to_string())
     Number(v) => logger.write_string(v.to_string())
@@ -173,7 +173,7 @@ pub fn StandardVariable::from_str(s : String) -> StandardVariable? {
 }
 
 ///|
-pub impl Show for StandardVariable with output(self, logger) {
+pub impl Show for StandardVariable with fn output(self, logger) {
   let s = match self {
     ArchivePlace => "archive_place"
     _ => {
@@ -211,7 +211,9 @@ pub fn NumberOrPageVariable::from_str(s : String) -> NumberOrPageVariable? {
 }
 
 ///|
-pub fn NumberOrPageVariable::to_variable(self : NumberOrPageVariable) -> Variable {
+pub fn NumberOrPageVariable::to_variable(
+  self : NumberOrPageVariable,
+) -> Variable {
   match self {
     Page(p) => Page(p)
     Number(n) => Number(n)
@@ -244,7 +246,7 @@ pub fn PageVariable::from_str(s : String) -> PageVariable? {
 }
 
 ///|
-pub impl Show for PageVariable with output(_, logger) {
+pub impl Show for PageVariable with fn output(_, logger) {
   logger.write_string("page")
 }
 
@@ -305,7 +307,7 @@ pub fn NumberVariable::from_str(s : String) -> NumberVariable? {
 }
 
 ///|
-pub impl Show for NumberVariable with output(self, logger) {
+pub impl Show for NumberVariable with fn output(self, logger) {
   for p in number_variable_names {
     if p.0 == self {
       logger.write_string(p.1)
@@ -353,7 +355,7 @@ pub fn DateVariable::from_str(s : String) -> DateVariable? {
 }
 
 ///|
-pub impl Show for DateVariable with output(self, logger) {
+pub impl Show for DateVariable with fn output(self, logger) {
   for p in date_variable_names {
     if p.0 == self {
       logger.write_string(p.1)
@@ -439,7 +441,7 @@ pub fn NameVariable::from_str(s : String) -> NameVariable? {
 }
 
 ///|
-pub impl Show for NameVariable with output(self, logger) {
+pub impl Show for NameVariable with fn output(self, logger) {
   for p in name_variable_names {
     if p.0 == self {
       logger.write_string(p.1)
@@ -670,7 +672,7 @@ pub fn Kind::from_str(s : String) -> Kind? {
 }
 
 ///|
-pub impl Show for Kind with output(self, logger) {
+pub impl Show for Kind with fn output(self, logger) {
   for p in kind_names {
     if p.0 == self {
       logger.write_string(p.1)
@@ -922,7 +924,7 @@ pub(all) enum TermConversionError {
 } derive(Eq, Hash, Debug)
 
 ///|
-pub impl Show for TermConversionError with output(self, logger) {
+pub impl Show for TermConversionError with fn output(self, logger) {
   match self {
     OutOfRange => logger.write_string("value out of range")
     Unknown => logger.write_string("unknown term")
@@ -957,7 +959,9 @@ fn parse_u8_term(s : String) -> Result[Int, TermConversionError] {
 }
 
 ///|
-pub fn OtherTerm::from_str(value : String) -> Result[OtherTerm, TermConversionError] {
+pub fn OtherTerm::from_str(
+  value : String,
+) -> Result[OtherTerm, TermConversionError] {
   if value.strip_prefix("month-") is Some(month) {
     let n = match parse_u8_term(month.to_owned()) {
       Ok(n) => n
@@ -1110,7 +1114,7 @@ fn pad2(i : Int) -> String {
 }
 
 ///|
-pub impl Show for OtherTerm with output(self, logger) {
+pub impl Show for OtherTerm with fn output(self, logger) {
   let s = match self {
     Ordinal => "ordinal"
     OpenQuote => "open-quote"

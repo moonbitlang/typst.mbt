@@ -27,15 +27,17 @@ fn date_from_tex(date : @biblatex.Date) -> Date {
   let approximate = date.uncertain || date.approximate
   match date.value {
     At(x) | After(x) | Before(x) =>
-      { year: x.year, month: x.month, day: x.day, approximate, season: None }
+      { year: x.year, month: x.month, day: x.day, approximate, season: None, }
     Between(_, x) =>
-      { year: x.year, month: x.month, day: x.day, approximate, season: None }
+      { year: x.year, month: x.month, day: x.day, approximate, season: None, }
   }
 }
 
 ///|
 /// `impl From<&[Spanned<Chunk>]> for ChunkedString`.
-fn chunked_from_tex(chunks : ArrayView[@biblatex.Spanned[@biblatex.Chunk]]) -> ChunkedString {
+fn chunked_from_tex(
+  chunks : ArrayView[@biblatex.Spanned[@biblatex.Chunk]],
+) -> ChunkedString {
   let res = ChunkedString::new()
   for chunk in chunks {
     match chunk.v {
@@ -49,8 +51,10 @@ fn chunked_from_tex(chunks : ArrayView[@biblatex.Spanned[@biblatex.Chunk]]) -> C
 
 ///|
 /// `impl From<&[Spanned<Chunk>]> for FormatString`.
-fn format_from_tex(chunks : ArrayView[@biblatex.Spanned[@biblatex.Chunk]]) -> FormatString {
-  { value: chunked_from_tex(chunks), short: None }
+fn format_from_tex(
+  chunks : ArrayView[@biblatex.Spanned[@biblatex.Chunk]],
+) -> FormatString {
+  { value: chunked_from_tex(chunks), short: None, }
 }
 
 ///|
@@ -73,7 +77,10 @@ fn numeric_from_permissive(
 }
 
 ///|
-fn ed_role(role : @biblatex.EditorType, entry_type : @biblatex.EntryType) -> PersonRole? {
+fn ed_role(
+  role : @biblatex.EditorType,
+  entry_type : @biblatex.EntryType,
+) -> PersonRole? {
   match role {
     Editor => None
     Compiler => Some(Compiler)
@@ -278,8 +285,11 @@ fn entry_from_biblatex_impl(entry : @biblatex.Entry) -> Entry raise TexErr {
     let title = chunked_from_tex(title)
     match map_res(entry.short_title()) {
       Some(short_title) =>
-        item.title_ = Some({ value: title, short: Some(chunked_from_tex(short_title)) })
-      None => item.title_ = Some({ value: title, short: None })
+        item.title_ = Some({
+          value: title,
+          short: Some(chunked_from_tex(short_title)),
+        })
+      None => item.title_ = Some({ value: title, short: None, })
     }
   }
 
@@ -298,9 +308,11 @@ fn entry_from_biblatex_impl(entry : @biblatex.Entry) -> Entry raise TexErr {
     }
   }
   if entry.entry_type is (Proceedings | MvProceedings | InProceedings) &&
-    (map_res(entry.event_date()) is Some(_) ||
-    map_res(entry.eventtitle()) is Some(_) ||
-    map_res(entry.venue()) is Some(_)) {
+    (
+      map_res(entry.event_date()) is Some(_) ||
+      map_res(entry.eventtitle()) is Some(_) ||
+      map_res(entry.venue()) is Some(_)
+    ) {
     let conference = Entry::new(entry.key, Conference)
     if map_res(entry.event_date()) is Some(Typed(d)) {
       conference.date_ = Some(date_from_tex(d))
@@ -409,7 +421,7 @@ fn entry_from_biblatex_impl(entry : @biblatex.Entry) -> Entry raise TexErr {
       Some(Typed(d)) => Some(date_from_tex(d))
       _ => None
     }
-    item.url_ = Some({ value: url, visit_date: date })
+    item.url_ = Some({ value: url, visit_date: date, })
   }
   match map_res(entry.publisher()) {
     Some(pubs) => {
@@ -571,5 +583,5 @@ fn comma_list(items : Array[@biblatex.Chunks]) -> FormatString {
     }
     value.extend_chunks(chunked_from_tex(entity))
   }
-  { value, short: None }
+  { value, short: None, }
 }

@@ -67,11 +67,13 @@ pub(all) enum StyleValidationError {
 } derive(Eq, Debug)
 
 ///|
-pub impl Show for StyleValidationError with output(self, logger) {
+pub impl Show for StyleValidationError with fn output(self, logger) {
   logger.write_string(
     match self {
-      MissingCitation => "root element is missing `cs:citation` child despite having a `cs:bibliography`"
-      MissingParent => "`cs:link` tag with `independent-parent` as a `rel` attribute is missing but no `cs:citation` was defined"
+      MissingCitation =>
+        "root element is missing `cs:citation` child despite having a `cs:bibliography`"
+      MissingParent =>
+        "`cs:link` tag with `independent-parent` as a `rel` attribute is missing but no `cs:citation` was defined"
       MissingClassAttr => "`cs:style` tag is missing the `class` attribute"
     },
   )
@@ -105,7 +107,7 @@ pub fn LocaleCode::en_us() -> LocaleCode {
 }
 
 ///|
-pub impl Show for LocaleCode with output(self, logger) {
+pub impl Show for LocaleCode with fn output(self, logger) {
   logger.write_string(self.0)
 }
 
@@ -183,7 +185,8 @@ pub fn LocaleCode::extensions(self : LocaleCode) -> Array[String] {
 ///|
 /// Check whether the language is English.
 pub fn LocaleCode::is_english(self : LocaleCode) -> Bool {
-  self.0.has_prefix("en") && (self.0.length() == 2 || self.0[2:].has_prefix("-"))
+  self.0.has_prefix("en") &&
+  (self.0.length() == 2 || self.0[2:].has_prefix("-"))
 }
 
 ///|
@@ -270,7 +273,7 @@ pub(all) enum PageRangeFormat {
 } derive(Eq, Hash, Debug)
 
 ///|
-pub impl Default for PageRangeFormat with default() {
+pub impl Default for PageRangeFormat with fn default() {
   Expanded
 }
 
@@ -280,7 +283,7 @@ pub impl Default for PageRangeFormat with default() {
 /// Closely follows the Haskell implementation of pandoc.
 pub fn PageRangeFormat::format(
   self : PageRangeFormat,
-  buf : StringBuilder,
+  buf : (String) -> Unit,
   start : String,
   end : String,
   separator : String?,
@@ -301,27 +304,34 @@ pub fn PageRangeFormat::format(
     let y = if x_len <= y_len { y } else { x[:x_len - y_len].to_owned() + y }
 
     // Write what stays the same early
-    buf.write_string(pref + x + separator)
+    buf(pref)
+    buf(x)
+    buf(separator)
     match self {
       Chicago15 | Chicago16 if x_len < 3 || x.has_suffix("00") =>
         // For `x` < 100 or multiples of 100, write all digits.
-        buf.write_string(y)
+        buf(y)
       Chicago15 | Chicago16 if x[x_len - 2:].has_prefix("0") =>
         // For 1 < `x` % 100 < 10, use changed part only.
         minimal(buf, 1, x, y)
       Chicago15 if x_len == 4 && changed_digits(x, y) >= 3 =>
         // If `x` has 4 digits and 3 change, write all digits.
-        buf.write_string(y)
+        buf(y)
       Chicago15 | Chicago16 =>
         // Otherwise (for Chicago), write at least 2 digits.
         minimal(buf, 2, x, y)
-      Expanded => buf.write_string(pref + y)
+      Expanded => {
+        buf(pref)
+        buf(y)
+      }
       Minimal => minimal(buf, 1, x, y)
       MinimalTwo => minimal(buf, 2, x, y)
     }
   } else {
     // Prefix is different, write entire range.
-    buf.write_string(start + separator + end)
+    buf(start)
+    buf(separator)
+    buf(end)
   }
 }
 
@@ -350,10 +360,15 @@ fn changed_digits(x : String, y : String) -> Int {
 ///|
 /// Writes the minimal digits that have changed from `x` to `y`---but at
 /// minimum `thresh` digits---to `buf`.
-fn minimal(buf : StringBuilder, thresh : Int, x : String, y : String) -> Unit {
+fn minimal(
+  buf : (String) -> Unit,
+  thresh : Int,
+  x : String,
+  y : String,
+) -> Unit {
   if y.length() > x.length() {
     // y is no abbrev. write it
-    buf.write_string(y)
+    buf(y)
     return
   }
   let xc = @unscanny.chars(x)
@@ -370,9 +385,9 @@ fn minimal(buf : StringBuilder, thresh : Int, x : String, y : String) -> Unit {
   }
   let ys = ys.to_string()
   if ys.length() < thresh && y.length() >= thresh {
-    buf.write_string(y[y.length() - thresh:].to_owned())
+    buf(y[y.length() - thresh:].to_owned())
   } else {
-    buf.write_string(ys)
+    buf(ys)
   }
 }
 
@@ -380,7 +395,8 @@ fn minimal(buf : StringBuilder, thresh : Int, x : String, y : String) -> Unit {
 /// Split `s` into the maximal suffix that is only digits and a prefix.
 fn split_max_digit_suffix(s : String) -> (String, String) {
   let mut idx = s.length()
-  while idx > 0 && s.code_unit_at(idx - 1).to_int() >= '0'.to_int() &&
+  while idx > 0 &&
+        s.code_unit_at(idx - 1).to_int() >= '0'.to_int() &&
         s.code_unit_at(idx - 1).to_int() <= '9'.to_int() {
     idx -= 1
   }
@@ -838,7 +854,9 @@ pub fn Layout::new(
 
 ///|
 /// Return a layout with default settings and the given elements.
-pub fn Layout::with_elements(elements : Array[LayoutRenderingElement]) -> Layout {
+pub fn Layout::with_elements(
+  elements : Array[LayoutRenderingElement],
+) -> Layout {
   Layout::new(elements, Formatting::default(), None, None)
 }
 
@@ -857,7 +875,7 @@ pub fn Layout::to_formatting(self : Layout) -> Formatting {
 ///|
 /// Obtain the `Affixes`.
 pub fn Layout::to_affixes(self : Layout) -> Affixes {
-  { prefix: self.prefix, suffix: self.suffix }
+  { prefix: self.prefix, suffix: self.suffix, }
 }
 
 ///|
@@ -1074,7 +1092,7 @@ pub(all) enum DateParts {
 } derive(Eq, Hash, Debug)
 
 ///|
-pub impl Default for DateParts with default() {
+pub impl Default for DateParts with fn default() {
   YearMonthDay
 }
 
@@ -1164,7 +1182,8 @@ pub fn DateStrongAnyForm::for_name(
     Day => Day(form.map(f => f.form_for_day()).unwrap_or(DateDayForm::Numeric))
     Month =>
       Month(form.map(f => f.form_for_month()).unwrap_or(DateMonthForm::Long))
-    Year => Year(form.map(f => f.form_for_year()).unwrap_or(LongShortForm::Long))
+    Year =>
+      Year(form.map(f => f.form_for_year()).unwrap_or(LongShortForm::Long))
   }
 }
 
@@ -1441,7 +1460,7 @@ pub fn Names::to_formatting(self : Names) -> Formatting {
 ///|
 /// Obtain the `Affixes`.
 pub fn Names::to_affixes(self : Names) -> Affixes {
-  { prefix: self.prefix, suffix: self.suffix }
+  { prefix: self.prefix, suffix: self.suffix, }
 }
 
 ///|
@@ -1536,7 +1555,7 @@ pub(all) struct Name {
 } derive(Eq, Debug)
 
 ///|
-pub impl Default for Name with default() {
+pub impl Default for Name with fn default() {
   {
     delimiter: None,
     form: None,
@@ -1571,7 +1590,10 @@ pub fn Name::name_part_family(self : Name) -> NamePart? {
 
 ///|
 /// Retrieve the [`NameOptions`] for this name.
-pub fn Name::options(self : Name, inherited : InheritableNameOptions) -> NameOptions {
+pub fn Name::options(
+  self : Name,
+  inherited : InheritableNameOptions,
+) -> NameOptions {
   let applied = inherited.apply(self.options_)
   {
     and_: applied.and_,
@@ -1642,7 +1664,7 @@ pub(all) struct InheritableNameOptions {
 } derive(Eq, Debug)
 
 ///|
-pub impl Default for InheritableNameOptions with default() {
+pub impl Default for InheritableNameOptions with fn default() {
   {
     and_: None,
     name_delimiter: None,
@@ -1730,7 +1752,10 @@ pub fn InheritableNameOptions::apply(
     name_form: or_opt(child.name_form, self.name_form),
     initialize: or_opt(child.initialize, self.initialize),
     initialize_with: or_opt(child.initialize_with, self.initialize_with),
-    name_as_sort_order: or_opt(child.name_as_sort_order, self.name_as_sort_order),
+    name_as_sort_order: or_opt(
+      child.name_as_sort_order,
+      self.name_as_sort_order,
+    ),
     sort_separator: or_opt(child.sort_separator, self.sort_separator),
   }
 }
@@ -1943,7 +1968,7 @@ pub fn Group::to_formatting(self : Group) -> Formatting {
 ///|
 /// Obtain the `Affixes`.
 pub fn Group::to_affixes(self : Group) -> Affixes {
-  { prefix: self.prefix, suffix: self.suffix }
+  { prefix: self.prefix, suffix: self.suffix, }
 }
 
 ///|
@@ -2152,7 +2177,11 @@ pub fn LocaleFile::to_locale(self : LocaleFile) -> Locale {
 
 ///|
 /// Get a term translation.
-pub fn Locale::term(self : Locale, term : Term, form : TermForm) -> LocalizedTerm? {
+pub fn Locale::term(
+  self : Locale,
+  term : Term,
+  form : TermForm,
+) -> LocalizedTerm? {
   match self.terms {
     Some(terms) => {
       for t in terms.terms {
@@ -2196,19 +2225,19 @@ fn OrdinalLookup::new(terms : Array[LocalizedTerm]) -> OrdinalLookup {
   if !defines_ordinal {
     // Contains OtherTerm::OrdinalN(1) - OtherTerm::OrdinalN(4)
     legacy_behavior = true
-    for n in 1..=4 {
+    for n in 1..<=4 {
       if !terms.iter().any(t => t.name == Other(OrdinalN(n))) {
         legacy_behavior = false
       }
     }
   }
-  { terms, legacy_behavior }
+  { terms, legacy_behavior, }
 }
 
 ///|
 /// Create an empty lookup that will never return matches.
 pub fn OrdinalLookup::empty() -> OrdinalLookup {
-  { terms: [], legacy_behavior: false }
+  { terms: [], legacy_behavior: false, }
 }
 
 ///|
@@ -2456,7 +2485,7 @@ pub(all) struct Formatting {
 } derive(Eq, Hash, Debug)
 
 ///|
-pub impl Default for Formatting with default() {
+pub impl Default for Formatting with fn default() {
   {
     font_style: None,
     font_variant: None,
@@ -2498,7 +2527,7 @@ pub(all) enum FontStyle {
 } derive(Eq, Hash, Debug)
 
 ///|
-pub impl Default for FontStyle with default() {
+pub impl Default for FontStyle with fn default() {
   Normal
 }
 
@@ -2512,7 +2541,7 @@ pub(all) enum FontVariant {
 } derive(Eq, Hash, Debug)
 
 ///|
-pub impl Default for FontVariant with default() {
+pub impl Default for FontVariant with fn default() {
   Normal
 }
 
@@ -2528,7 +2557,7 @@ pub(all) enum FontWeight {
 } derive(Eq, Hash, Debug)
 
 ///|
-pub impl Default for FontWeight with default() {
+pub impl Default for FontWeight with fn default() {
   Normal
 }
 
@@ -2542,7 +2571,7 @@ pub(all) enum TextDecoration {
 } derive(Eq, Hash, Debug)
 
 ///|
-pub impl Default for TextDecoration with default() {
+pub impl Default for TextDecoration with fn default() {
   None_
 }
 
@@ -2560,7 +2589,7 @@ pub(all) enum VerticalAlign {
 } derive(Eq, Hash, Debug)
 
 ///|
-pub impl Default for VerticalAlign with default() {
+pub impl Default for VerticalAlign with fn default() {
   None_
 }
 
@@ -2574,8 +2603,8 @@ pub(all) struct Affixes {
 } derive(Eq, Hash, Debug)
 
 ///|
-pub impl Default for Affixes with default() {
-  { prefix: None, suffix: None }
+pub impl Default for Affixes with fn default() {
+  { prefix: None, suffix: None, }
 }
 
 ///|

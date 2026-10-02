@@ -17,7 +17,7 @@ pub(all) struct XmlDeError {
 } derive(Eq, Debug)
 
 ///|
-pub impl Show for XmlDeError with output(self, logger) {
+pub impl Show for XmlDeError with fn output(self, logger) {
   logger.write_string("Deserialization error occured")
   if self.path is Some(path) {
     logger.write_string(" at `\{path}`")
@@ -71,7 +71,9 @@ fn qualified_tag_name(node : @xml.Node) -> String {
 
 ///|
 fn convert_node(node : @xml.Node) -> XNode {
-  let attrs = node.attributes().map(a => (qualified_attr_name(node, a), a.value()))
+  let attrs = node
+    .attributes()
+    .map(a => (qualified_attr_name(node, a), a.value()))
   let children : Array[XChild] = []
   let text = StringBuilder()
   let mut has_text = false
@@ -92,7 +94,7 @@ fn convert_node(node : @xml.Node) -> XNode {
   if has_text {
     children.push(Text(text.to_string()))
   }
-  { tag: qualified_tag_name(node), attrs, children }
+  { tag: qualified_tag_name(node), attrs, children, }
 }
 
 ///|
@@ -153,7 +155,11 @@ fn XNode::elem(self : XNode, tag : String, path : String) -> XNode? raise DeErr 
 
 ///|
 /// A required single element.
-fn XNode::req_elem(self : XNode, tag : String, path : String) -> XNode raise DeErr {
+fn XNode::req_elem(
+  self : XNode,
+  tag : String,
+  path : String,
+) -> XNode raise DeErr {
   match self.elem(tag, path) {
     Some(e) => e
     None => raise DeErr("missing field `\{tag}`", path)
@@ -163,9 +169,11 @@ fn XNode::req_elem(self : XNode, tag : String, path : String) -> XNode raise DeE
 ///|
 /// The children that are not named fields (`$value`).
 fn XNode::value_children(self : XNode, fields : Array[String]) -> Array[XChild] {
-  self.children.filter(c => match c {
-    Elem(e) => !fields.contains(e.tag)
-    Text(t) => !is_blank(t)
+  self.children.filter(c => {
+    match c {
+      Elem(e) => !fields.contains(e.tag)
+      Text(t) => !is_blank(t)
+    }
   })
 }
 
@@ -223,10 +231,7 @@ fn[T] enum_attr(
       match parse(v) {
         Some(x) => Some(x)
         None =>
-          raise DeErr(
-            "unknown variant `\{v}`",
-            join_path(path, "@" + name),
-          )
+          raise DeErr("unknown variant `\{v}`", join_path(path, "@" + name))
       }
     None => None
   }
@@ -730,17 +735,22 @@ fn de_formatting(n : XNode, path : String) -> Formatting raise DeErr {
     text_decoration: enum_attr(
       n, "text-decoration", path, text_decoration_from_str,
     ),
-    vertical_align: enum_attr(n, "vertical-align", path, vertical_align_from_str),
+    vertical_align: enum_attr(
+      n, "vertical-align", path, vertical_align_from_str,
+    ),
   }
 }
 
 ///|
 fn de_affixes(n : XNode) -> Affixes {
-  { prefix: n.attr("prefix"), suffix: n.attr("suffix") }
+  { prefix: n.attr("prefix"), suffix: n.attr("suffix"), }
 }
 
 ///|
-fn de_name_options(n : XNode, path : String) -> InheritableNameOptions raise DeErr {
+fn de_name_options(
+  n : XNode,
+  path : String,
+) -> InheritableNameOptions raise DeErr {
   {
     and_: enum_attr(n, "and", path, name_and_from_str),
     name_delimiter: n.attr("name-delimiter"),
@@ -767,7 +777,10 @@ fn de_name_options(n : XNode, path : String) -> InheritableNameOptions raise DeE
 }
 
 ///|
-fn de_settings(n : XNode, path : String) -> IndependentStyleSettings raise DeErr {
+fn de_settings(
+  n : XNode,
+  path : String,
+) -> IndependentStyleSettings raise DeErr {
   {
     class: req_enum_attr(n, "class", path, style_class_from_str),
     initialize_with_hyphen: bool_attr(n, "initialize-with-hyphen").unwrap_or(
@@ -819,7 +832,7 @@ fn de_info_link(n : XNode, path : String) -> InfoLink raise DeErr {
 ///|
 fn de_timestamp(n : XNode, path : String) -> Timestamp raise DeErr {
   match n.text_content() {
-    Some(t) => { raw: t }
+    Some(t) => { raw: t, }
     None => raise DeErr("missing field `$text`", path)
   }
 }
@@ -838,8 +851,8 @@ fn de_license(n : XNode, path : String) -> License raise DeErr {
 
 ///|
 fn de_category(n : XNode, path : String) -> StyleCategory raise DeErr {
-  if n.attr("citation-format") is Some(s) && citation_format_from_str(s)
-    is Some(f) {
+  if n.attr("citation-format") is Some(s) &&
+    citation_format_from_str(s) is Some(f) {
     return CitationFormat(f)
   }
   if n.attr("field") is Some(s) && field_from_str(s) is Some(f) {
@@ -860,27 +873,24 @@ fn de_info(n : XNode, path : String) -> StyleInfo raise DeErr {
   }
   {
     authors: n
-      .elems("author")
-      .mapi((i, e) => de_attribution(e, join_path(path, "author[\{i}]"))),
+    .elems("author")
+    .mapi((i, e) => de_attribution(e, join_path(path, "author[\{i}]"))),
     contributors: n
-      .elems("contributor")
-      .mapi((i, e) => de_attribution(e, join_path(path, "contributor[\{i}]"))),
+    .elems("contributor")
+    .mapi((i, e) => de_attribution(e, join_path(path, "contributor[\{i}]"))),
     category: n
-      .elems("category")
-      .mapi((i, e) => de_category(e, join_path(path, "category[\{i}]"))),
+    .elems("category")
+    .mapi((i, e) => de_category(e, join_path(path, "category[\{i}]"))),
     field: n
-      .elems("field")
-      .mapi((i, e) => {
-        let s = e.string_value(path)
-        match field_from_str(s) {
-          Some(f) => f
-          None =>
-            raise DeErr(
-              "unknown variant `\{s}`",
-              join_path(path, "field[\{i}]"),
-            )
-        }
-      }),
+    .elems("field")
+    .mapi((i, e) => {
+      let s = e.string_value(path)
+      match field_from_str(s) {
+        Some(f) => f
+        None =>
+          raise DeErr("unknown variant `\{s}`", join_path(path, "field[\{i}]"))
+      }
+    }),
     id: n.req_elem("id", path).string_value(join_path(path, "id")),
     issn: n.elems("issn").map(e => e.string_value(join_path(path, "issn"))),
     eissn: match n.elem("eissn", path) {
@@ -892,8 +902,8 @@ fn de_info(n : XNode, path : String) -> StyleInfo raise DeErr {
       None => None
     },
     link: n
-      .elems("link")
-      .mapi((i, e) => de_info_link(e, join_path(path, "link[\{i}]"))),
+    .elems("link")
+    .mapi((i, e) => de_info_link(e, join_path(path, "link[\{i}]"))),
     published: match n.elem("published", path) {
       Some(e) => Some(de_timestamp(e, join_path(path, "published")))
       None => None
@@ -903,10 +913,7 @@ fn de_info(n : XNode, path : String) -> StyleInfo raise DeErr {
       None => None
     },
     summary: opt("summary", de_local_string),
-    title: de_local_string(
-      n.req_elem("title", path),
-      join_path(path, "title"),
-    ),
+    title: de_local_string(n.req_elem("title", path), join_path(path, "title")),
     title_short: opt("title-short", de_local_string),
     updated: match n.elem("updated", path) {
       Some(e) => Some(de_timestamp(e, join_path(path, "updated")))
@@ -925,7 +932,8 @@ fn de_sort(n : XNode, path : String) -> Sort raise DeErr {
       let sort_direction = enum_attr(e, "sort", p, sort_direction_from_str).unwrap_or(
         Ascending,
       )
-      if e.attr("variable") is Some(v) && Variable::from_str(v) is Some(variable) {
+      if e.attr("variable") is Some(v) &&
+        Variable::from_str(v) is Some(variable) {
         SortKey::Variable(variable~, sort_direction~)
       } else if e.attr("macro") is Some(name) {
         MacroName(
@@ -957,7 +965,9 @@ fn de_layout(n : XNode, path : String) -> Layout raise DeErr {
     text_decoration: enum_attr(
       n, "text-decoration", path, text_decoration_from_str,
     ),
-    vertical_align: enum_attr(n, "vertical-align", path, vertical_align_from_str),
+    vertical_align: enum_attr(
+      n, "vertical-align", path, vertical_align_from_str,
+    ),
     prefix: n.attr("prefix"),
     suffix: n.attr("suffix"),
     delimiter: n.attr("delimiter"),
@@ -987,7 +997,10 @@ fn de_rendering_elements(
 }
 
 ///|
-fn de_rendering_element(e : XNode, path : String) -> LayoutRenderingElement raise DeErr {
+fn de_rendering_element(
+  e : XNode,
+  path : String,
+) -> LayoutRenderingElement raise DeErr {
   let p = join_path(path, e.tag)
   match e.tag {
     "text" => Text(de_text(e, p))
@@ -1057,8 +1070,8 @@ fn de_date(n : XNode, path : String) -> Date raise DeErr {
     form: enum_attr(n, "form", path, date_form_from_str),
     parts: enum_attr(n, "date-parts", path, date_parts_from_str),
     date_part: n
-      .elems("date-part")
-      .mapi((i, e) => de_date_part(e, join_path(path, "date-part[\{i}]"))),
+    .elems("date-part")
+    .mapi((i, e) => de_date_part(e, join_path(path, "date-part[\{i}]"))),
     formatting: de_formatting(n, path),
     affixes: de_affixes(n),
     delimiter: n.attr("delimiter"),
@@ -1103,8 +1116,7 @@ fn de_names(n : XNode, path : String) -> Names raise DeErr {
           match e.tag {
             "name" => NamesChild::Name(de_name(e, join_path(p, "name")))
             "et-al" => EtAl(de_et_al(e, join_path(p, "et-al")))
-            "label" =>
-              Label(de_variableless_label(e, join_path(p, "label")))
+            "label" => Label(de_variableless_label(e, join_path(p, "label")))
             "substitute" =>
               Substitute(de_substitute(e, join_path(p, "substitute")))
             tag =>
@@ -1122,9 +1134,7 @@ fn de_names(n : XNode, path : String) -> Names raise DeErr {
     }
   }
   {
-    variable: list_attr(n, "variable", path, NameVariable::from_str).unwrap_or(
-      [],
-    ),
+    variable: list_attr(n, "variable", path, NameVariable::from_str).unwrap_or([]),
     children,
     delimiter_: n.attr("delimiter"),
     and_: enum_attr(n, "and", path, name_and_from_str),
@@ -1152,7 +1162,9 @@ fn de_names(n : XNode, path : String) -> Names raise DeErr {
     text_decoration: enum_attr(
       n, "text-decoration", path, text_decoration_from_str,
     ),
-    vertical_align: enum_attr(n, "vertical-align", path, vertical_align_from_str),
+    vertical_align: enum_attr(
+      n, "vertical-align", path, vertical_align_from_str,
+    ),
     prefix: n.attr("prefix"),
     suffix: n.attr("suffix"),
     display: enum_attr(n, "display", path, display_from_str),
@@ -1165,8 +1177,8 @@ fn de_name(n : XNode, path : String) -> Name raise DeErr {
     delimiter: n.attr("delimiter"),
     form: enum_attr(n, "form", path, name_form_from_str),
     parts: n
-      .elems("name-part")
-      .mapi((i, e) => de_name_part(e, join_path(path, "name-part[\{i}]"))),
+    .elems("name-part")
+    .mapi((i, e) => de_name_part(e, join_path(path, "name-part[\{i}]"))),
     options_: de_name_options(n, path),
     formatting: de_formatting(n, path),
     affixes: de_affixes(n),
@@ -1196,11 +1208,14 @@ fn de_substitute(n : XNode, path : String) -> Substitute raise DeErr {
   if n.value_children([]).is_empty() {
     raise DeErr("missing field `$value`", path)
   }
-  { children: de_rendering_elements(n, [], join_path(path, "$value")) }
+  { children: de_rendering_elements(n, [], join_path(path, "$value")), }
 }
 
 ///|
-fn de_variableless_label(n : XNode, path : String) -> VariablelessLabel raise DeErr {
+fn de_variableless_label(
+  n : XNode,
+  path : String,
+) -> VariablelessLabel raise DeErr {
   {
     form: enum_attr(n, "form", path, term_form_from_str).unwrap_or(Long),
     plural: enum_attr(n, "plural", path, label_pluralize_from_str).unwrap_or(
@@ -1234,7 +1249,9 @@ fn de_group(n : XNode, path : String) -> Group raise DeErr {
     text_decoration: enum_attr(
       n, "text-decoration", path, text_decoration_from_str,
     ),
-    vertical_align: enum_attr(n, "vertical-align", path, vertical_align_from_str),
+    vertical_align: enum_attr(
+      n, "vertical-align", path, vertical_align_from_str,
+    ),
     prefix: n.attr("prefix"),
     suffix: n.attr("suffix"),
     delimiter: n.attr("delimiter"),
@@ -1247,15 +1264,15 @@ fn de_choose(n : XNode, path : String) -> Choose raise DeErr {
   {
     if_: de_choose_branch(n.req_elem("if", path), join_path(path, "if")),
     else_if: n
-      .elems("else-if")
-      .mapi((i, e) => de_choose_branch(e, join_path(path, "else-if[\{i}]"))),
+    .elems("else-if")
+    .mapi((i, e) => de_choose_branch(e, join_path(path, "else-if[\{i}]"))),
     otherwise: match n.elem("else", path) {
       Some(e) => {
         let p = join_path(path, "else")
         if e.value_children([]).is_empty() {
           raise DeErr("missing field `$value`", p)
         }
-        Some({ children: de_rendering_elements(e, [], join_path(p, "$value")) })
+        Some({ children: de_rendering_elements(e, [], join_path(p, "$value")), })
       }
       None => None
     },
@@ -1268,7 +1285,10 @@ fn de_choose_branch(n : XNode, path : String) -> ChooseBranch raise DeErr {
     disambiguate: bool_attr(n, "disambiguate"),
     is_numeric: list_attr(n, "is-numeric", path, Variable::from_str),
     is_uncertain_date: list_attr(
-      n, "is-uncertain-date", path, DateVariable::from_str,
+      n,
+      "is-uncertain-date",
+      path,
+      DateVariable::from_str,
     ),
     locator: list_attr(n, "locator", path, Locator::from_str),
     position: list_attr(n, "position", path, test_position_from_str),
@@ -1346,8 +1366,8 @@ fn de_bibliography(n : XNode, path : String) -> Bibliography raise DeErr {
 fn de_locale_info(n : XNode, path : String) -> LocaleInfo raise DeErr {
   {
     translators: n
-      .elems("translator")
-      .mapi((i, e) => de_attribution(e, join_path(path, "translator[\{i}]"))),
+    .elems("translator")
+    .mapi((i, e) => de_attribution(e, join_path(path, "translator[\{i}]"))),
     rights: match n.elem("rights", path) {
       Some(e) => Some(de_license(e, join_path(path, "rights")))
       None => None
@@ -1385,7 +1405,9 @@ fn de_terms(n : XNode, path : String) -> Terms raise DeErr {
   if es.is_empty() {
     raise DeErr("missing field `term`", path)
   }
-  { terms: es.mapi((i, e) => de_localized_term(e, join_path(path, "term[\{i}]"))) }
+  {
+    terms: es.mapi((i, e) => de_localized_term(e, join_path(path, "term[\{i}]"))),
+  }
 }
 
 ///|
@@ -1408,7 +1430,9 @@ fn de_locale(n : XNode, path : String) -> Locale raise DeErr {
       Some(e) => Some(de_terms(e, join_path(path, "terms")))
       None => None
     },
-    date: n.elems("date").mapi((i, e) => de_date(e, join_path(path, "date[\{i}]"))),
+    date: n
+    .elems("date")
+    .mapi((i, e) => de_date(e, join_path(path, "date[\{i}]"))),
     style_options: match n.elem("style-options", path) {
       Some(e) => Some(de_locale_options(e))
       None => None
@@ -1503,6 +1527,7 @@ fn RawStyle::to_style(self : RawStyle) -> Result[Style, StyleValidationError] {
 }
 
 ///|
+
 ///|
 fn de_settings_opt(n : XNode) -> IndependentStyleSettings? {
   try de_settings(n, "") catch {
@@ -1524,7 +1549,7 @@ fn de_style(xml : String) -> Style raise DeErr {
 ///|
 fn to_xml_error(e : DeErr) -> XmlDeError {
   let DeErr(message, path) = e
-  { message, path: Some(if path.is_empty() { "." } else { path }) }
+  { message, path: Some(if path.is_empty() { "." } else { path }), }
 }
 
 ///|
@@ -1539,7 +1564,9 @@ pub fn Style::from_xml(xml : String) -> Result[Style, XmlDeError] {
 
 ///|
 /// Create an independent style from an XML string.
-pub fn IndependentStyle::from_xml(xml : String) -> Result[IndependentStyle, XmlDeError] {
+pub fn IndependentStyle::from_xml(
+  xml : String,
+) -> Result[IndependentStyle, XmlDeError] {
   match Style::from_xml(xml) {
     Ok(Independent(i)) => Ok(i)
     Ok(Dependent(_)) =>
@@ -1553,7 +1580,9 @@ pub fn IndependentStyle::from_xml(xml : String) -> Result[IndependentStyle, XmlD
 
 ///|
 /// Create a dependent style from an XML string.
-pub fn DependentStyle::from_xml(xml : String) -> Result[DependentStyle, XmlDeError] {
+pub fn DependentStyle::from_xml(
+  xml : String,
+) -> Result[DependentStyle, XmlDeError] {
   match Style::from_xml(xml) {
     Ok(Dependent(d)) => Ok(d)
     Ok(Independent(_)) =>

@@ -14,13 +14,17 @@ pub(all) struct Numeric {
 ///|
 /// Creates a new `Numeric` from a number.
 pub fn Numeric::new(value : Int) -> Numeric {
-  { value: Number(value), prefix: None, suffix: None }
+  { value: Number(value), prefix: None, suffix: None, }
 }
 
 ///|
 /// Creates a new `Numeric` from a range.
 pub fn Numeric::from_range(start : Int, end : Int) -> Numeric {
-  { value: Set([(start, Some(Hyphen)), (end, None)]), prefix: None, suffix: None }
+  {
+    value: Set([(start, Some(Hyphen)), (end, None)]),
+    prefix: None,
+    suffix: None,
+  }
 }
 
 ///|
@@ -75,7 +79,7 @@ pub fn[W : FmtWrite] Numeric::fmt(self : Numeric, buf : W) -> Unit {
 }
 
 ///|
-pub impl Show for Numeric with output(self, logger) {
+pub impl Show for Numeric with fn output(self, logger) {
   logger.write_string(fmt_to_string(b => self.fmt(b)))
 }
 
@@ -88,26 +92,28 @@ pub fn[W : FmtWrite] Numeric::with_form(
   gender : @citationberg.GrammarGender?,
   ords : @citationberg.OrdinalLookup,
 ) -> Unit {
-  let format = (n : Int) => match form {
-    Ordinal => {
-      fmt_int(buf, n.to_int64())
-      buf.write_str(ords.lookup(n, gender).unwrap_or(""))
-    }
-    LongOrdinal =>
-      match ords.lookup_long(n) {
-        Some(s) => buf.write_str(s)
-        None => {
-          fmt_int(buf, n.to_int64())
-          buf.write_str(ords.lookup(n, gender).unwrap_or(""))
-        }
-      }
-    Roman =>
-      if n >= 1 && n <= 3999 {
-        buf.write_str(roman_lower(n))
-      } else {
+  let format = (n : Int) => {
+    match form {
+      Ordinal => {
         fmt_int(buf, n.to_int64())
+        buf.write_str(ords.lookup(n, gender).unwrap_or(""))
       }
-    Numeric => fmt_int(buf, n.to_int64())
+      LongOrdinal =>
+        match ords.lookup_long(n) {
+          Some(s) => buf.write_str(s)
+          None => {
+            fmt_int(buf, n.to_int64())
+            buf.write_str(ords.lookup(n, gender).unwrap_or(""))
+          }
+        }
+      Roman =>
+        if n >= 1 && n <= 3999 {
+          buf.write_str(roman_lower(n))
+        } else {
+          fmt_int(buf, n.to_int64())
+        }
+      Numeric => fmt_int(buf, n.to_int64())
+    }
   }
   match self.value {
     Number(n) => format(n)
@@ -260,14 +266,24 @@ pub fn Numeric::from_str(value : String) -> Result[Numeric, NumericError] {
     _ => Number(value)
   }
   s.eat_whitespace() |> ignore
-  let post = s.eat_while(c => !@unscanny.is_numeric(c) && !@unscanny.is_whitespace(c))
+  let post = s.eat_while(c => {
+    !@unscanny.is_numeric(c) && !@unscanny.is_whitespace(c)
+  })
   if !s.after().is_empty() {
     return Err(UnexpectedCharactersAfterPostfix)
   }
   Ok({
     value,
-    prefix: if prefix.is_empty() { None } else { Some(prefix) },
-    suffix: if post.is_empty() { None } else { Some(space_after_value + post) },
+    prefix: if prefix.is_empty() {
+      None
+    } else {
+      Some(prefix)
+    },
+    suffix: if post.is_empty() {
+      None
+    } else {
+      Some(space_after_value + post)
+    },
   })
 }
 
@@ -286,7 +302,7 @@ pub(all) enum NumericError {
 } derive(Eq, Debug)
 
 ///|
-pub impl Show for NumericError with output(self, logger) {
+pub impl Show for NumericError with fn output(self, logger) {
   logger.write_string(
     match self {
       NoNumber => "no number found"
@@ -378,7 +394,10 @@ pub fn NumericDelimiter::as_char(self : NumericDelimiter) -> Char {
 
 ///|
 /// `Display for NumericDelimiter` into a writer.
-pub fn[W : FmtWrite] NumericDelimiter::fmt(self : NumericDelimiter, f : W) -> Unit {
+pub fn[W : FmtWrite] NumericDelimiter::fmt(
+  self : NumericDelimiter,
+  f : W,
+) -> Unit {
   match self {
     Comma => f.write_str(", ")
     Ampersand => f.write_str(" & ")
@@ -387,7 +406,7 @@ pub fn[W : FmtWrite] NumericDelimiter::fmt(self : NumericDelimiter, f : W) -> Un
 }
 
 ///|
-pub impl Show for NumericDelimiter with output(self, logger) {
+pub impl Show for NumericDelimiter with fn output(self, logger) {
   logger.write_string(fmt_to_string(b => self.fmt(b)))
 }
 
@@ -398,7 +417,9 @@ fn is_delimiter(c : Char) -> Bool {
 
 ///|
 /// `impl FromStr for NumericDelimiter`.
-pub fn NumericDelimiter::from_str(s : String) -> Result[NumericDelimiter, NumericError] {
+pub fn NumericDelimiter::from_str(
+  s : String,
+) -> Result[NumericDelimiter, NumericError] {
   guard @unscanny.first_char(s) is Some(first_char) else {
     return Err(MissingDelimiter)
   }
@@ -411,7 +432,9 @@ pub fn NumericDelimiter::from_str(s : String) -> Result[NumericDelimiter, Numeri
 
 ///|
 /// `impl TryFrom<char> for NumericDelimiter`.
-pub fn NumericDelimiter::try_from_char(c : Char) -> Result[NumericDelimiter, NumericError] {
+pub fn NumericDelimiter::try_from_char(
+  c : Char,
+) -> Result[NumericDelimiter, NumericError] {
   match c {
     ',' => Ok(Comma)
     '&' => Ok(Ampersand)

@@ -18,11 +18,13 @@ pub(all) struct Date {
 ///|
 /// Order two dates according to the CSL specification.
 pub fn Date::csl_cmp(self : Date, other : Date) -> Int {
-  let ord_fn = (a : Int?, b : Int?) => match (a, b) {
-    (Some(a), Some(b)) => compare_int(a, b)
-    (Some(_), None) => 1
-    (None, Some(_)) => -1
-    (None, None) => compare_bool(self.approximate, other.approximate)
+  let ord_fn = (a : Int?, b : Int?) => {
+    match (a, b) {
+      (Some(a), Some(b)) => compare_int(a, b)
+      (Some(_), None) => 1
+      (None, Some(_)) => -1
+      (None, None) => compare_bool(self.approximate, other.approximate)
+    }
   }
   let c = compare_int(self.year, other.year)
   if c != 0 {
@@ -56,7 +58,7 @@ pub(all) enum DateError {
 } derive(Eq, Debug)
 
 ///|
-pub impl Show for DateError with output(self, logger) {
+pub impl Show for DateError with fn output(self, logger) {
   match self {
     UnknownFormat => logger.write_string("date format unknown")
     MonthOutOfBounds => logger.write_string("month not in interval 1-12")
@@ -103,13 +105,13 @@ pub fn Date::from_str(source : String) -> Result[Date, DateError] {
   if !s.done() {
     return Err(UnknownFormat)
   }
-  Ok({ year, month: None, day: None, approximate: approx, season: None })
+  Ok({ year, month: None, day: None, approximate: approx, season: None, })
 }
 
 ///|
 /// Get a date from an integer.
 pub fn Date::from_year(year : Int) -> Date {
-  { year, month: None, day: None, approximate: false, season: None }
+  { year, month: None, day: None, approximate: false, season: None, }
 }
 
 ///|
@@ -154,7 +156,7 @@ pub fn Date::display_year(self : Date) -> String {
 }
 
 ///|
-pub impl Show for Date with output(self, logger) {
+pub impl Show for Date with fn output(self, logger) {
   if self.approximate {
     logger.write_char('~')
   }
@@ -193,7 +195,7 @@ pub(all) enum DurationError {
 } derive(Eq, Hash, Debug)
 
 ///|
-pub impl Show for DurationError with output(self, logger) {
+pub impl Show for DurationError with fn output(self, logger) {
   logger.write_string(
     match self {
       Malformed => "duration string malformed"
@@ -307,7 +309,7 @@ fn Duration::scan(
   if hours >= 24 || minutes >= 60 || seconds >= 60 || milliseconds >= 1000 {
     return Err(TooLarge)
   }
-  Ok({ days, hours, minutes, seconds, milliseconds })
+  Ok({ days, hours, minutes, seconds, milliseconds, })
 }
 
 ///|
@@ -344,7 +346,7 @@ pub fn Duration::from_str(s : String) -> Result[Duration, DurationError] {
 }
 
 ///|
-pub impl Show for Duration with output(self, logger) {
+pub impl Show for Duration with fn output(self, logger) {
   if self.days > 0 {
     logger.write_string("\{self.days}:")
   }
@@ -373,11 +375,13 @@ pub(all) struct DurationRange {
 ///|
 /// Create a new duration range.
 pub fn DurationRange::new(start : Duration, end : Duration?) -> DurationRange {
-  { start, end: end.unwrap_or(start) }
+  { start, end: end.unwrap_or(start), }
 }
 
 ///|
-fn DurationRange::scan(s : @unscanny.Scanner) -> Result[DurationRange, DurationError] {
+fn DurationRange::scan(
+  s : @unscanny.Scanner,
+) -> Result[DurationRange, DurationError] {
   let start = match Duration::scan(s, false) {
     Ok(d) => d
     Err(e) => return Err(e)
@@ -392,13 +396,13 @@ fn DurationRange::scan(s : @unscanny.Scanner) -> Result[DurationRange, DurationE
     }
   }
   match Duration::scan(s, true) {
-    Ok(end) => Ok({ start, end })
+    Ok(end) => Ok({ start, end, })
     Err(e) => Err(e)
   }
 }
 
 ///|
-pub impl Show for DurationRange with output(self, logger) {
+pub impl Show for DurationRange with fn output(self, logger) {
   logger.write_string(self.start.to_string())
   if self.start != self.end {
     logger.write_string("-" + self.end.to_string())
@@ -407,7 +411,9 @@ pub impl Show for DurationRange with output(self, logger) {
 
 ///|
 /// `impl FromStr for DurationRange`.
-pub fn DurationRange::from_str(s : String) -> Result[DurationRange, DurationError] {
+pub fn DurationRange::from_str(
+  s : String,
+) -> Result[DurationRange, DurationError] {
   DurationRange::scan(@unscanny.Scanner::new(s))
 }
 
@@ -471,7 +477,9 @@ fn parse_u8_digits(s : @unscanny.Scanner, min : Int, max : Int) -> Int? {
 
 ///|
 fn parse_month(s : @unscanny.Scanner) -> Result[Int, DateError] {
-  guard parse_u8_digits(s, 1, 2) is Some(month) else { return Err(UnknownFormat) }
+  guard parse_u8_digits(s, 1, 2) is Some(month) else {
+    return Err(UnknownFormat)
+  }
   if !(month >= 1 && month <= 12) {
     return Err(MonthOutOfBounds)
   }
@@ -488,7 +496,9 @@ fn parse_day(s : @unscanny.Scanner) -> Result[Int, DateError] {
 }
 
 ///|
-fn parse_month_with_year(s : @unscanny.Scanner) -> Result[(Int, Int), DateError] {
+fn parse_month_with_year(
+  s : @unscanny.Scanner,
+) -> Result[(Int, Int), DateError] {
   let year = match parse_year(s) {
     Ok(y) => y
     Err(e) => return Err(e)

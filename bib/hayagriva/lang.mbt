@@ -33,7 +33,7 @@ pub(all) struct TitleCase {
 } derive(Eq, Hash, Debug)
 
 ///|
-pub impl Default for TitleCase with default() {
+pub impl Default for TitleCase with fn default() {
   {
     always_capitalize_after_punctuation: true,
     always_capitalize_last_word: false,
@@ -67,7 +67,7 @@ pub(all) struct SentenceCase {
 } derive(Eq, Hash, Debug)
 
 ///|
-pub impl Default for SentenceCase with default() {
+pub impl Default for SentenceCase with fn default() {
   {
     capitalize_words_with_caps_inside: true,
     do_not_format_after_dot: true,
@@ -99,7 +99,7 @@ pub(all) enum Case {
 } derive(Eq, Hash, Debug)
 
 ///|
-pub impl Default for Case with default() {
+pub impl Default for Case with fn default() {
   NoTransform
 }
 
@@ -135,7 +135,11 @@ priv enum CharClass {
 } derive(Eq)
 
 ///|
-fn CharClass::step(self : CharClass, c : Char, hyphen_separates : Bool) -> CharClass {
+fn CharClass::step(
+  self : CharClass,
+  c : Char,
+  hyphen_separates : Bool,
+) -> CharClass {
   match c {
     '.' | '?' | '!' | '…' | '‽' | '。' | ':' =>
       if self.is_in_word() {
@@ -218,7 +222,11 @@ fn WordData::new(
     Some({
       start: buf_before,
       end: buf_now,
-      case_: if start_was_upper { AllUpper } else { Lowercase },
+      case_: if start_was_upper {
+        AllUpper
+      } else {
+        Lowercase
+      },
       follows_punctuation: prev_class.is_new_subclause(),
       start_was_upper,
     })
@@ -245,7 +253,11 @@ fn WordData::feed(
     return Some({
       start: buf_before,
       end: buf_now,
-      case_: if start_was_upper { AllUpper } else { Lowercase },
+      case_: if start_was_upper {
+        AllUpper
+      } else {
+        Lowercase
+      },
       follows_punctuation: prev_class.is_new_subclause(),
       start_was_upper,
     })
@@ -443,7 +455,13 @@ pub fn CaseFolder::push(self : CaseFolder, c : Char) -> Unit {
       new_data
     }
     None =>
-      WordData::new(c, old_buf_len, self.buf.length(), prev_class, self.char_class)
+      WordData::new(
+        c,
+        old_buf_len,
+        self.buf.length(),
+        prev_class,
+        self.char_class,
+      )
   }
   self.pristine = self.pristine && @unscanny.is_whitespace(c)
 }
@@ -481,8 +499,10 @@ fn CaseFolder::process_word(self : CaseFolder) -> Unit {
 
         // Do not lowercase if the word follows punctuation.
         lookup = lookup &&
-          (!config.always_capitalize_after_punctuation ||
-          !data.follows_punctuation)
+          (
+            !config.always_capitalize_after_punctuation ||
+            !data.follows_punctuation
+          )
         if config.always_capitalize_min_len is Some(min_len) {
           // Do not lowercase if word is too long.
           lookup = lookup &&
@@ -653,12 +673,12 @@ pub fn CaseFolder::mark_changed(self : CaseFolder) -> Unit {
 }
 
 ///|
-pub impl FmtWrite for CaseFolder with write_str(self, s) {
+pub impl FmtWrite for CaseFolder with fn write_str(self, s) {
   self.push_str(s)
 }
 
 ///|
-pub impl FmtWrite for CaseFolder with write_char(self, c) {
+pub impl FmtWrite for CaseFolder with fn write_char(self, c) {
   self.push(c)
 }
 

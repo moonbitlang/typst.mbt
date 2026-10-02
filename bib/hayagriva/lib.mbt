@@ -9,7 +9,7 @@ pub struct Library {
 ///|
 /// Construct a new, empty bibliography library.
 pub fn Library::new() -> Library {
-  { entries: [] }
+  { entries: [], }
 }
 
 ///|
@@ -112,8 +112,12 @@ pub fn LanguageIdentifier::parse(s : String) -> LanguageIdentifier? {
   let lang = parts[0]
   let language = if lang == "und" {
     "und"
-  } else if all_alpha(lang) && (lang.length() == 2 || lang.length() == 3 ||
-    (lang.length() >= 5 && lang.length() <= 8)) {
+  } else if all_alpha(lang) &&
+    (
+      lang.length() == 2 ||
+      lang.length() == 3 ||
+      (lang.length() >= 5 && lang.length() <= 8)
+    ) {
     @unscanny.to_ascii_lowercase(lang)
   } else {
     return None
@@ -124,31 +128,37 @@ pub fn LanguageIdentifier::parse(s : String) -> LanguageIdentifier? {
   let variants = []
   if i < parts.length() && parts[i].length() == 4 && all_alpha(parts[i]) {
     let p = @unscanny.to_ascii_lowercase(parts[i])
-    script = Some(@unscanny.to_ascii_uppercase(p[0:1].to_owned()) + p[1:].to_owned())
+    script = Some(
+      @unscanny.to_ascii_uppercase(p[0:1].to_owned()) + p[1:].to_owned(),
+    )
     i += 1
   }
   if i < parts.length() &&
-    ((parts[i].length() == 2 && all_alpha(parts[i])) ||
-    (parts[i].length() == 3 && all_digit(parts[i]))) {
+    (
+      (parts[i].length() == 2 && all_alpha(parts[i])) ||
+      (parts[i].length() == 3 && all_digit(parts[i]))
+    ) {
     region = Some(@unscanny.to_ascii_uppercase(parts[i]))
     i += 1
   }
   while i < parts.length() {
     let p = parts[i]
     let ok = all_alnum(p) &&
-      ((p.length() >= 5 && p.length() <= 8) ||
-      (p.length() == 4 && p.iter().take(1).all(c => c.is_ascii_digit())))
+      (
+        (p.length() >= 5 && p.length() <= 8) ||
+        (p.length() == 4 && p.iter().take(1).all(c => c.is_ascii_digit()))
+      )
     if !ok {
       return None
     }
     variants.push(@unscanny.to_ascii_lowercase(p))
     i += 1
   }
-  Some({ language, script, region, variants })
+  Some({ language, script, region, variants, })
 }
 
 ///|
-pub impl Show for LanguageIdentifier with output(self, logger) {
+pub impl Show for LanguageIdentifier with fn output(self, logger) {
   logger.write_string(self.language)
   if self.script is Some(s) {
     logger.write_string("-" + s)
@@ -455,7 +465,10 @@ pub fn Entry::parents(self : Entry) -> Array[Entry] {
 ///|
 /// Get and parse the `affiliated` field and only return persons of a given
 /// role.
-pub fn Entry::affiliated_with_role(self : Entry, role : PersonRole) -> Array[Person] {
+pub fn Entry::affiliated_with_role(
+  self : Entry,
+  role : PersonRole,
+) -> Array[Person] {
   let out = []
   if self.affiliated_ is Some(affs) {
     for p in affs {

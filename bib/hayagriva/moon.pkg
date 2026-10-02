@@ -7,4 +7,5 @@ import {
   "moonbitlang/typst/data/yaml",
   "moonbitlang/core/encoding/utf8",
   "moonbitlang/core/string",
+  "moonbitlang/core/debug",
 }

@@ -7,8 +7,8 @@
 ///|
 /// Rust's `std::fmt::Write`.
 pub(open) trait FmtWrite {
-  write_str(Self, String) -> Unit
-  write_char(Self, Char) -> Unit
+  fn write_str(Self, String) -> Unit
+  fn write_char(Self, Char) -> Unit
 }
 
 ///|
@@ -19,7 +19,7 @@ pub struct StrBuf {
 
 ///|
 pub fn StrBuf::new() -> StrBuf {
-  { buf: StringBuilder() }
+  { buf: StringBuilder(), }
 }
 
 ///|
@@ -28,12 +28,12 @@ pub fn StrBuf::to_string(self : StrBuf) -> String {
 }
 
 ///|
-pub impl FmtWrite for StrBuf with write_str(self, s) {
+pub impl FmtWrite for StrBuf with fn write_str(self, s) {
   self.buf.write_string(s)
 }
 
 ///|
-pub impl FmtWrite for StrBuf with write_char(self, c) {
+pub impl FmtWrite for StrBuf with fn write_char(self, c) {
   self.buf.write_char(c)
 }
 

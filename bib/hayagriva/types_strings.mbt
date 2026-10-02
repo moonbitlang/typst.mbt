@@ -14,13 +14,13 @@ pub(all) struct FormatString {
 ///|
 /// Creates a new empty `FormatStr`.
 pub fn FormatString::new() -> FormatString {
-  { value: ChunkedString::new(), short: None }
+  { value: ChunkedString::new(), short: None, }
 }
 
 ///|
 /// Creates a new `FormatStr` for the value string.
 pub fn FormatString::with_value(value : String) -> FormatString {
-  { value: ChunkedString::from_chunk(StringChunk::normal(value)), short: None }
+  { value: ChunkedString::from_chunk(StringChunk::normal(value)), short: None, }
 }
 
 ///|
@@ -63,15 +63,17 @@ pub fn FormatString::select(
 }
 
 ///|
-pub impl Show for FormatString with output(self, logger) {
+pub impl Show for FormatString with fn output(self, logger) {
   logger.write_string(self.value.to_string())
 }
 
 ///|
 /// `impl FromStr for FormatString`.
-pub fn FormatString::from_str(s : String) -> Result[FormatString, ChunkedStrParseError] {
+pub fn FormatString::from_str(
+  s : String,
+) -> Result[FormatString, ChunkedStrParseError] {
   match ChunkedString::from_str(s) {
-    Ok(value) => Ok({ value, short: None })
+    Ok(value) => Ok({ value, short: None, })
     Err(e) => Err(e)
   }
 }
@@ -101,7 +103,7 @@ pub fn ChunkedString::from_string(s : String) -> ChunkedString {
 ///|
 /// A deep copy of the string.
 pub fn ChunkedString::copy(self : ChunkedString) -> ChunkedString {
-  ChunkedString(self.0.map(c => { value: c.value, kind: c.kind }))
+  ChunkedString(self.0.map(c => { value: c.value, kind: c.kind, }))
 }
 
 ///|
@@ -131,7 +133,10 @@ pub fn ChunkedString::push_char(
 
 ///|
 /// Appends a chunk to the end of the string.
-pub fn ChunkedString::push_chunk(self : ChunkedString, chunk : StringChunk) -> Unit {
+pub fn ChunkedString::push_chunk(
+  self : ChunkedString,
+  chunk : StringChunk,
+) -> Unit {
   self.0.push(chunk)
 }
 
@@ -176,7 +181,10 @@ pub fn ChunkedString::is_empty(self : ChunkedString) -> Bool {
 
 ///|
 /// Extend with another `ChunkedString`.
-pub fn ChunkedString::extend_chunks(self : ChunkedString, other : ChunkedString) -> Unit {
+pub fn ChunkedString::extend_chunks(
+  self : ChunkedString,
+  other : ChunkedString,
+) -> Unit {
   self.0.append(other.0)
 }
 
@@ -245,7 +253,7 @@ fn is_chunk_control(c : Char) -> Bool {
 pub(all) struct ChunkedStrParseError(Int) derive(Eq, Debug)
 
 ///|
-pub impl Show for ChunkedStrParseError with output(self, logger) {
+pub impl Show for ChunkedStrParseError with fn output(self, logger) {
   logger.write_string("unmatched closing brace at position \{self.0}")
 }
 
@@ -287,17 +295,17 @@ pub fn ChunkedString::from_str(
 }
 
 ///|
-pub impl FmtWrite for ChunkedString with write_str(self, s) {
+pub impl FmtWrite for ChunkedString with fn write_str(self, s) {
   self.push_str(s, Normal)
 }
 
 ///|
-pub impl FmtWrite for ChunkedString with write_char(self, c) {
+pub impl FmtWrite for ChunkedString with fn write_char(self, c) {
   self.push_char(c, Normal)
 }
 
 ///|
-pub impl Show for ChunkedString with output(self, logger) {
+pub impl Show for ChunkedString with fn output(self, logger) {
   for chunk in self.0 {
     logger.write_string(chunk.to_string())
   }
@@ -315,25 +323,25 @@ pub(all) struct StringChunk {
 ///|
 /// Creates a new `StrChunk` from a string and a kind.
 pub fn StringChunk::new(value : String, kind : ChunkKind) -> StringChunk {
-  { value, kind }
+  { value, kind, }
 }
 
 ///|
 /// Creates a new `StrChunk` with the `ChunkKind::Normal` kind.
 pub fn StringChunk::normal(value : String) -> StringChunk {
-  { value, kind: Normal }
+  { value, kind: Normal, }
 }
 
 ///|
 /// Creates a new `StrChunk` with the `ChunkKind::Verbatim` kind.
 pub fn StringChunk::verbatim(value : String) -> StringChunk {
-  { value, kind: Verbatim }
+  { value, kind: Verbatim, }
 }
 
 ///|
 /// Creates a new `StrChunk` with the `ChunkKind::Math` kind.
 pub fn StringChunk::math(value : String) -> StringChunk {
-  { value, kind: Math }
+  { value, kind: Math, }
 }
 
 ///|
@@ -349,7 +357,7 @@ pub fn StringChunk::is_empty(self : StringChunk) -> Bool {
 }
 
 ///|
-pub impl Show for StringChunk with output(self, logger) {
+pub impl Show for StringChunk with fn output(self, logger) {
   if self.kind == Math {
     logger.write_string("$" + self.value + "$")
   } else {
@@ -359,7 +367,10 @@ pub impl Show for StringChunk with output(self, logger) {
 
 ///|
 /// Writes the chunk as a parenthesized string.
-fn[W : FmtWrite] StringChunk::fmt_serialized(self : StringChunk, buf : W) -> Unit {
+fn[W : FmtWrite] StringChunk::fmt_serialized(
+  self : StringChunk,
+  buf : W,
+) -> Unit {
   fn write_escaped(val : StringChunk, buf : W) -> Unit {
     for c in val.value {
       if is_chunk_control(c) {
