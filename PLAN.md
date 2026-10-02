@@ -10,9 +10,9 @@
 | P1 syntax (highlight) | **done** | `syntax/highlight` (`Tag`, `highlight`, `highlight_html`); used for `typ`/`typc`/`typm` raw blocks |
 | P1 syntax (reparser) | **done** | `Source::edit`/`replace` + `reparse`: 3792/3792 `reparse` stage (8 seeded edits per test body: returned ranges, tree, span numbering, `Lines` identical), upstream reparser unit tests |
 | P2 eval (typst-eval) | **done** | VM, closures, imports, rules, math; `eval` stage runs end to end |
-| P2 library (value level) | **done** | 3782/3792 `eval` (2026-10-03). Remaining 10: plugins (WASM, out of scope), PDF images |
-| P3 realize + introspection + HTML export | **done** | `realize` 3788/3792, `html` 507/508 (2026-10-03). Remaining: PDF images, plugins |
-| P4 fonts, shaping, layout, export | layout **done**; export in progress | `paged` 2283/2299 (frame trees identical), `svg` 2269/2299 (byte-identical), `font` 86/86, `shape` 4598/4598, `shape-hb` 2250/2250, `break` 12734/12734 (2026-10-03). Remaining: usvg (SVG glyphs + SVG image errors), PDF images, bundle target, PDF export (in progress), PNG render (not started); see docs/p4-plan.md |
+| P2 library (value level) | **done** | 3782/3792 `eval` (2026-10-03). Remaining 10: WASM plugins (out of scope) |
+| P3 realize + introspection + HTML export | **done** | `realize` 3788/3792, `html` 508/508 (2026-10-03) |
+| P4 fonts, shaping, layout, export | **nearly done** | `paged` 2298/2299, `svg` 2299/2299 (byte-identical), `pdf-semantic` 2298/2299, `pdftags` 133/133, `render` 2295/2299 (exact pixmaps; 1958/1958 vs reference PNGs), `bundle` 39/39, `font` 86/86, `shape` 4598/4598, `shape-hb` 2250/2250, `break` 12734/12734, `resvg` 1723/1723 (2026-10-03). Remaining: PNG of PDF images (hayro render/vello_cpu, in progress), GIF/WebP raster images + one table-tag span (in progress); see docs/p4-plan.md |
 
 Run `scripts/upstream.sh && scripts/goldens.sh && moon run tests/runner --target native -- syntax`
 (and `-- ast`, `-- reparse`, `-- eval`). `python3 scripts/classify.py eval 60` buckets the
