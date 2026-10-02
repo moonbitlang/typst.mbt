@@ -2624,6 +2624,7 @@ dependencies = [
  "sha2",
  "syn 2.0.98",
  "syntect",
+ "tiny-skia",
  "ttf-parser",
  "two-face",
  "typst",

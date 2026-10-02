@@ -24,6 +24,7 @@ typst-realize = { path = "../.repos/typst/crates/typst-realize" }
 typst-pdf = { path = "../.repos/typst/crates/typst-pdf" }
 typst-svg = { path = "../.repos/typst/crates/typst-svg" }
 typst-render = { path = "../.repos/typst/crates/typst-render" }
+tiny-skia = "0.12"
 typst-bundle = { path = "../.repos/typst/crates/typst-bundle" }
 typst-kit = { path = "../.repos/typst/crates/typst-kit", features = ["datetime"] }
 typst-assets = { git = "https://github.com/typst/typst-assets", rev = "94dcb99", features = ["fonts"] }

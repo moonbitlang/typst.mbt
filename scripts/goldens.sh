@@ -9,7 +9,9 @@
 # `font` dumps what ttf-parser reports for every face (oracle/src/font.rs);
 # `paged` dumps every paged test in the `typst-frame-v1` format (see
 # oracle/src/paged.rs); `svg` dumps the raw upstream SVG of every paged test
-# (pretty, merged pages, 1pt gap; see oracle/src/svg.rs).
+# (pretty, merged pages, 1pt gap; see oracle/src/svg.rs); `render` dumps the
+# size and SHA-256 of the raster image the upstream harness renders for every
+# paged test (oracle/src/render.rs).
 # `shape` dumps every text run Typst shapes while
 # compiling the paged tests, with rustybuzz's output (oracle/src/shape.rs);
 # `shape-hb` extracts rustybuzz's own shaping test suite.
@@ -26,7 +28,7 @@ cd "$(dirname "$0")/.."
 ORACLE=oracle/target/release/typst-oracle
 SUITE=.repos/typst/tests/suite
 stages=("$@")
-[ ${#stages[@]} -eq 0 ] && stages=(syntax ast reparse eval html bundle realize fonts font paged svg shape shape-hb break)
+[ ${#stages[@]} -eq 0 ] && stages=(syntax ast reparse eval html bundle realize fonts font paged svg render shape shape-hb break)
 for stage in "${stages[@]}"; do
   if [ "$stage" = shape-hb ]; then
     # rustybuzz's own shaping tests (needs .repos/rustybuzz, see upstream.sh).
