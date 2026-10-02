@@ -21,10 +21,7 @@ fn morphology_apply(
     f32_to_u32(@skia.ceilf(rx)) * 2,
     width.reinterpret_as_uint(),
   ).reinterpret_as_int()
-  let rows = umin(
-    f32_to_u32(@skia.ceilf(ry)) * 2,
-    height.reinterpret_as_uint(),
-  ).reinterpret_as_int()
+  let rows = umin(f32_to_u32(@skia.ceilf(ry)) * 2, height.reinterpret_as_uint()).reinterpret_as_int()
   let target_x = f32_to_u32(@skia.floorf(Float::from_int(columns) / 2.0)).reinterpret_as_int()
   let target_y = f32_to_u32(@skia.floorf(Float::from_int(rows) / 2.0)).reinterpret_as_int()
   let width_max = width - 1

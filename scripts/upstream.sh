@@ -23,3 +23,15 @@ if [ ! -f ".repos/rustybuzz/VERSION-$RB_VERSION" ]; then
   touch ".repos/rustybuzz/VERSION-$RB_VERSION"
 fi
 echo "rustybuzz at $RB_VERSION"
+
+# resvg sources and its regression suite (SVG files, fonts, resources and
+# reference PNGs) at the version locked by the oracle, for the `resvg` stage.
+RESVG_VERSION=$(grep -A1 '^name = "resvg"' oracle/Cargo.lock | sed -n 's/^version = "\(.*\)"/\1/p')
+if [ ! -f ".repos/resvg/VERSION-$RESVG_VERSION" ]; then
+  rm -rf .repos/resvg
+  mkdir -p .repos/resvg
+  curl -sL "https://github.com/linebender/resvg/archive/refs/tags/v$RESVG_VERSION.tar.gz" \
+    | tar xz -C .repos/resvg --strip-components=1
+  touch ".repos/resvg/VERSION-$RESVG_VERSION"
+fi
+echo "resvg at $RESVG_VERSION"

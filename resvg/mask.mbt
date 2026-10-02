@@ -15,9 +15,9 @@ fn mask_apply(
   let w = pixmap.width().reinterpret_as_uint()
   let h = pixmap.height().reinterpret_as_uint()
   let mask_pixmap = @skia.Pixmap::new(w, h).unwrap()
+  // TODO: only when needed
+  // Mask has to be clipped by mask.region
   {
-    // TODO: only when needed
-    // Mask has to be clipped by mask.region
     let alpha_mask = @skia.Mask::new(w, h).unwrap()
     alpha_mask.fill_path(
       @path.PathBuilder::from_rect(mask.rect().to_rect()),

@@ -3,7 +3,6 @@ package "moonbitlang/typst/render"
 
 import {
   "moonbitlang/core/debug",
-  "moonbitlang/core/ref",
   "moonbitlang/typst/layout",
   "moonbitlang/typst/library",
   "moonbitlang/typst/skia",
@@ -13,8 +12,6 @@ import {
 pub fn render(@layout.Page, CompleteRenderOptions) -> @skia.Pixmap raise RenderPanic
 
 pub fn render_merged(@layout.PagedDocument, RenderOptions, @library.Abs, @library.Color?) -> @skia.Pixmap raise RenderPanic
-
-pub let svg_image_renderer : @ref.Ref[((@library.SvgImage, @skia.Pixmap, UInt, UInt) -> Unit)?]
 
 // Errors
 pub suberror RenderPanic {

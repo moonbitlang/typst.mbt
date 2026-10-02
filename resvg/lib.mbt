@@ -13,7 +13,7 @@ pub fn render(
   transform : @path.Transform,
   pixmap : @skia.Pixmap,
 ) -> Unit {
-  let ctx = { max_bbox: max_bbox_for(pixmap) }
+  let ctx = { max_bbox: max_bbox_for(pixmap), }
   render_nodes(tree.root(), ctx, transform, pixmap)
 }
 
@@ -35,7 +35,7 @@ pub fn render_node(
   pixmap : @skia.Pixmap,
 ) -> Unit? {
   guard node.abs_layer_bounding_box() is Some(bbox) else { return None }
-  let ctx = { max_bbox: max_bbox_for(pixmap) }
+  let ctx = { max_bbox: max_bbox_for(pixmap), }
   let transform = transform.pre_translate(-bbox.x(), -bbox.y())
   render_node_inner(node, ctx, transform, pixmap)
   Some(())

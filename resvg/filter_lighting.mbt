@@ -44,7 +44,7 @@ fn Vector3::length(self : Vector3) -> Float {
 fn Vector3::normalized(self : Vector3) -> Vector3? {
   let length = self.length()
   if !@path.approx_eq_ulps(length, 0.0, 4) {
-    Some({ x: self.x / length, y: self.y / length, z: self.z / length })
+    Some({ x: self.x / length, y: self.y / length, z: self.z / length, })
   } else {
     None
   }
@@ -52,12 +52,12 @@ fn Vector3::normalized(self : Vector3) -> Vector3? {
 
 ///|
 fn Vector3::add(self : Vector3, rhs : Vector3) -> Vector3 {
-  { x: self.x + rhs.x, y: self.y + rhs.y, z: self.z + rhs.z }
+  { x: self.x + rhs.x, y: self.y + rhs.y, z: self.z + rhs.z, }
 }
 
 ///|
 fn Vector3::sub(self : Vector3, rhs : Vector3) -> Vector3 {
-  { x: self.x - rhs.x, y: self.y - rhs.y, z: self.z - rhs.z }
+  { x: self.x - rhs.x, y: self.y - rhs.y, z: self.z - rhs.z, }
 }
 
 ///|
@@ -67,10 +67,15 @@ priv struct Normal {
 }
 
 ///|
-fn Normal::new(factor_x : Float, factor_y : Float, nx : Int, ny : Int) -> Normal {
+fn Normal::new(
+  factor_x : Float,
+  factor_y : Float,
+  nx : Int,
+  ny : Int,
+) -> Normal {
   {
-    factor: { x: factor_x, y: factor_y },
-    normal: { x: Float::from_int(-nx), y: Float::from_int(-ny) },
+    factor: { x: factor_x, y: factor_y, },
+    normal: { x: Float::from_int(-nx), y: Float::from_int(-ny), },
   }
 }
 
@@ -97,9 +102,9 @@ fn diffuse_lighting(
       light_vector.z
     } else {
       let s = fe.surface_scale / 255.0
-      let n : Vector2 = { x: normal.normal.x * s, y: normal.normal.y * s }
-      let n : Vector2 = { x: n.x * normal.factor.x, y: n.y * normal.factor.y }
-      let normal : Vector3 = { x: n.x, y: n.y, z: 1.0 }
+      let n : Vector2 = { x: normal.normal.x * s, y: normal.normal.y * s, }
+      let n : Vector2 = { x: n.x * normal.factor.x, y: n.y * normal.factor.y, }
+      let normal : Vector3 = { x: n.x, y: n.y, z: 1.0, }
       normal.dot(light_vector) / normal.length()
     }
     fe.diffuse_constant * k
@@ -134,7 +139,7 @@ fn specular_lighting(
 ) -> Unit {
   guard! src.width() == dest.width() && src.height() == dest.height()
   let light_factor = fn(normal : Normal, light_vector : Vector3) -> Float {
-    let h = light_vector.add({ x: 0.0, y: 0.0, z: 1.0 })
+    let h = light_vector.add({ x: 0.0, y: 0.0, z: 1.0, })
     let h_length = h.length()
     if @path.approx_eq_ulps(h_length, 0.0, 4) {
       return 0.0
@@ -148,9 +153,9 @@ fn specular_lighting(
       }
     } else {
       let s = fe.surface_scale / 255.0
-      let n : Vector2 = { x: normal.normal.x * s, y: normal.normal.y * s }
-      let n : Vector2 = { x: n.x * normal.factor.x, y: n.y * normal.factor.y }
-      let normal : Vector3 = { x: n.x, y: n.y, z: 1.0 }
+      let n : Vector2 = { x: normal.normal.x * s, y: normal.normal.y * s, }
+      let n : Vector2 = { x: n.x * normal.factor.x, y: n.y * normal.factor.y, }
+      let normal : Vector3 = { x: n.x, y: n.y, z: 1.0, }
       let n_dot_h = normal.dot(h) / normal.length() / h_length
       if @path.approx_eq_ulps(fe.specular_exponent, 1.0, 4) {
         n_dot_h
@@ -207,23 +212,33 @@ fn lighting_apply(
         z: sincosf_sin(elevation),
       }
     }
-    _ => { x: 1.0, y: 1.0, z: 1.0 }
+    _ => { x: 1.0, y: 1.0, z: 1.0, }
   }
   let calc = fn(nx : Int, ny : Int, normal : Normal) {
     match light_source {
       DistantLight(_) => ()
       PointLight(light) => {
-        let nz = Float::from_int(alpha_at(src_data, width, nx, ny)) / 255.0 *
+        let nz = Float::from_int(alpha_at(src_data, width, nx, ny)) /
+          255.0 *
           surface_scale
-        let origin : Vector3 = { x: light.x, y: light.y, z: light.z }
-        let v = origin.sub({ x: Float::from_int(nx), y: Float::from_int(ny), z: nz })
+        let origin : Vector3 = { x: light.x, y: light.y, z: light.z, }
+        let v = origin.sub({
+          x: Float::from_int(nx),
+          y: Float::from_int(ny),
+          z: nz,
+        })
         light_vector = v.normalized().unwrap_or(v)
       }
       SpotLight(light) => {
-        let nz = Float::from_int(alpha_at(src_data, width, nx, ny)) / 255.0 *
+        let nz = Float::from_int(alpha_at(src_data, width, nx, ny)) /
+          255.0 *
           surface_scale
-        let origin : Vector3 = { x: light.x, y: light.y, z: light.z }
-        let v = origin.sub({ x: Float::from_int(nx), y: Float::from_int(ny), z: nz })
+        let origin : Vector3 = { x: light.x, y: light.y, z: light.z, }
+        let v = origin.sub({
+          x: Float::from_int(nx),
+          y: Float::from_int(ny),
+          z: nz,
+        })
         light_vector = v.normalized().unwrap_or(v)
       }
     }
@@ -267,7 +282,7 @@ fn light_color(
   match light {
     DistantLight(_) | PointLight(_) => lighting_color
     SpotLight(light) => {
-      let origin : Vector3 = { x: light.x, y: light.y, z: light.z }
+      let origin : Vector3 = { x: light.x, y: light.y, z: light.z, }
       let direction : Vector3 = {
         x: light.points_at_x,
         y: light.points_at_y,

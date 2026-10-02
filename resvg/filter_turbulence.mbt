@@ -80,11 +80,7 @@ fn turbulence_apply(
         lattice_selector,
         gradient,
       )
-      let n = if fractal_noise {
-        (n * 255.0 + 255.0) / 2.0
-      } else {
-        n * 255.0
-      }
+      let n = if fractal_noise { (n * 255.0 + 255.0) / 2.0 } else { n * 255.0 }
       f32_to_u8(f32_bound(0.0, n.to_float(), 255.0) + 0.5)
     }
     let r = turb(0)
@@ -122,10 +118,8 @@ fn turbulence_init(seed : Int) -> (FixedArray[Int], FixedArray[Double]) {
         gradient[gi(k, i, j)] = (seed % (b_size + b_size) - b_size).to_double() /
           b_size.to_double()
       }
-      let s = (
-        gradient[gi(k, i, 0)] * gradient[gi(k, i, 0)] +
-        gradient[gi(k, i, 1)] * gradient[gi(k, i, 1)]
-      ).sqrt()
+      let s = (gradient[gi(k, i, 0)] * gradient[gi(k, i, 0)] +
+      gradient[gi(k, i, 1)] * gradient[gi(k, i, 1)]).sqrt()
       gradient[gi(k, i, 0)] /= s
       gradient[gi(k, i, 1)] /= s
     }
@@ -199,7 +193,7 @@ fn turbulence(
     let wrap_y = f64_to_i32(
       tile_y * base_freq_y + perlin_n.to_double() + height.to_double(),
     )
-    Some({ width, height, wrap_x, wrap_y })
+    Some({ width, height, wrap_x, wrap_y, })
   } else {
     None
   }

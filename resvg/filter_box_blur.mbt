@@ -15,7 +15,11 @@ let box_blur_steps : Int = 5
 /// # Allocations
 ///
 /// This method will allocate a copy of the `src` image as a back buffer.
-fn box_blur_apply(sigma_x : Double, sigma_y : Double, src : @skia.Pixmap) -> Unit {
+fn box_blur_apply(
+  sigma_x : Double,
+  sigma_y : Double,
+  src : @skia.Pixmap,
+) -> Unit {
   let boxes_horz = create_box_gauss(sigma_x.to_float())
   let boxes_vert = create_box_gauss(sigma_y.to_float())
   let width = src.width()
@@ -47,10 +51,12 @@ fn create_box_gauss(sigma : Float) -> FixedArray[Int] {
     let wl_float = Float::from_int(wl)
     let c4 : Float = 4.0
     let c3 : Float = 3.0
-    let m_ideal = (c12 * sigma * sigma -
-      n_float * wl_float * wl_float -
-      c4 * n_float * wl_float -
-      c3 * n_float) /
+    let m_ideal = (
+        c12 * sigma * sigma -
+        n_float * wl_float * wl_float -
+        c4 * n_float * wl_float -
+        c3 * n_float
+      ) /
       (-c4 * wl_float - c4)
     let m = f32_to_usize(@skia.roundf(m_ideal))
     let sizes = FixedArray::make(box_blur_steps, 0)
@@ -101,7 +107,13 @@ fn box_round(x : Float) -> Float {
 }
 
 ///|
-fn box_px(val_r : Int, val_g : Int, val_b : Int, val_a : Int, iarr : Float) -> UInt {
+fn box_px(
+  val_r : Int,
+  val_g : Int,
+  val_b : Int,
+  val_a : Int,
+  iarr : Float,
+) -> UInt {
   px_pack(
     f32_to_u8(box_round(Float::from_int(val_r) * iarr)),
     f32_to_u8(box_round(Float::from_int(val_g) * iarr)),

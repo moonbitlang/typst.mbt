@@ -41,9 +41,7 @@ fn draw_children(
         }
 
         // We could use any values here. They will not be used anyway.
-        let ctx = {
-          max_bbox: @path.IntRect::from_xywh(0, 0, 1, 1).unwrap(),
-        }
+        let ctx = { max_bbox: @path.IntRect::from_xywh(0, 0, 1, 1).unwrap(), }
         fill_path(path, mode, ctx, transform, pixmap) |> ignore
       }
       Text(text) => draw_children(text.flattened(), mode, transform, pixmap)

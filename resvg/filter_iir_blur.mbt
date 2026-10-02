@@ -43,7 +43,11 @@ priv struct BlurData {
 /// # Allocations
 ///
 /// This method will allocate a 2x `src` buffer.
-fn iir_blur_apply(sigma_x : Double, sigma_y : Double, src : @skia.Pixmap) -> Unit {
+fn iir_blur_apply(
+  sigma_x : Double,
+  sigma_y : Double,
+  src : @skia.Pixmap,
+) -> Unit {
   let buf_size = src.width() * src.height()
   let buf = FixedArray::make(buf_size, 0.0)
   let d = {
