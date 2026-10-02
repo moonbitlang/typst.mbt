@@ -43,7 +43,7 @@ pub impl Show for ParseSyntaxError with fn output(self, logger) {
 
 ///|
 fn[R] get_key(
-  map : @yaml_rust.YamlHash,
+  map : @yaml_rust.LinkedHashMap[@yaml_rust.Yaml, @yaml_rust.Yaml],
   key : String,
   f : (@yaml_rust.Yaml) -> R?,
 ) -> R raise ParseSyntaxError {
@@ -60,7 +60,7 @@ fn[R] get_key(
 ///|
 /// `get_key(..).ok()`.
 fn[R] try_key(
-  map : @yaml_rust.YamlHash,
+  map : @yaml_rust.LinkedHashMap[@yaml_rust.Yaml, @yaml_rust.Yaml],
   key : String,
   f : (@yaml_rust.Yaml) -> R?,
 ) -> R? {
@@ -137,7 +137,7 @@ fn parse_top_level(
   guard doc.as_hash() is Some(h) else { raise TypeMismatch }
   let variables = {}
   if try_key(h, "variables", x => x.as_hash()) is Some(map) {
-    for entry in map.entries() {
+    for entry in map.iter() {
     let (key, value) = entry
       if (key.as_str(), value.as_str()) is (Some(key_str), Some(val_str)) {
         variables[key_str] = val_str
@@ -186,11 +186,11 @@ fn parse_top_level(
 
 ///|
 fn parse_contexts(
-  map : @yaml_rust.YamlHash,
+  map : @yaml_rust.LinkedHashMap[@yaml_rust.Yaml, @yaml_rust.Yaml],
   state : ParserState,
 ) -> Map[String, Context] raise ParseSyntaxError {
   let contexts = {}
-  for entry in map.entries() {
+  for entry in map.iter() {
     let (key, value) = entry
     if (key.as_str(), value.as_vec()) is (Some(name), Some(val_vec)) {
       let is_prototype = name == "prototype"
@@ -305,7 +305,7 @@ fn file_stem(path : String) -> String? {
 
 ///|
 fn parse_match_pattern(
-  map : @yaml_rust.YamlHash,
+  map : @yaml_rust.LinkedHashMap[@yaml_rust.Yaml, @yaml_rust.Yaml],
   state : ParserState,
   contexts : Map[String, Context],
   namer : ContextNamer,
@@ -335,26 +335,26 @@ fn parse_match_pattern(
   } else if try_key(map, "embed", x => Some(x)) is Some(y) {
     // Same as push so we translate it to what it would be
     let embed_escape_context_yaml = []
-    let mut commands = @yaml_rust.YamlHash::new()
+    let mut commands = @yaml_rust.new_hash()
     commands.insert(
       @yaml_rust.Yaml::String("meta_include_prototype"),
       @yaml_rust.Yaml::Boolean(false),
-    )
+    ) |> ignore
     embed_escape_context_yaml.push(@yaml_rust.Yaml::Hash(commands))
     if try_key(map, "embed_scope", x => Some(x)) is Some(s) {
-      commands = @yaml_rust.YamlHash::new()
-      commands.insert(@yaml_rust.Yaml::String("meta_content_scope"), s)
+      commands = @yaml_rust.new_hash()
+      commands.insert(@yaml_rust.Yaml::String("meta_content_scope"), s) |> ignore
       embed_escape_context_yaml.push(@yaml_rust.Yaml::Hash(commands))
     }
     if try_key(map, "escape", x => Some(x)) is Some(v) {
-      let match_map = @yaml_rust.YamlHash::new()
-      match_map.insert(@yaml_rust.Yaml::String("match"), v)
+      let match_map = @yaml_rust.new_hash()
+      match_map.insert(@yaml_rust.Yaml::String("match"), v) |> ignore
       match_map.insert(
         @yaml_rust.Yaml::String("pop"),
         @yaml_rust.Yaml::Boolean(true),
-      )
+      ) |> ignore
       if try_key(map, "escape_captures", x => Some(x)) is Some(y) {
-        match_map.insert(@yaml_rust.Yaml::String("captures"), y)
+        match_map.insert(@yaml_rust.Yaml::String("captures"), y) |> ignore
       }
       embed_escape_context_yaml.push(@yaml_rust.Yaml::Hash(match_map))
       let escape_context = parse_context(
@@ -381,7 +381,7 @@ fn parse_match_pattern(
   } else if try_key(map, "escape", x => Some(x)) is Some(v) {
     let subname = namer.next()
     let context = Context::new(false)
-    let match_map = @yaml_rust.YamlHash::new()
+    let match_map = @yaml_rust.new_hash()
     let v_str = match v.as_str() {
       Some(s) => s
       None => abort("called `Option::unwrap()` on a `None` value")
@@ -389,11 +389,11 @@ fn parse_match_pattern(
     match_map.insert(
       @yaml_rust.Yaml::String("match"),
       @yaml_rust.Yaml::String("(?=\{v_str})"),
-    )
+    ) |> ignore
     match_map.insert(
       @yaml_rust.Yaml::String("pop"),
       @yaml_rust.Yaml::Boolean(true),
-    )
+    ) |> ignore
     let pattern = parse_match_pattern(match_map, state, contexts, namer)
     if pattern.has_captures {
       context.uses_backrefs = true
@@ -501,13 +501,13 @@ fn try_compile_regex(regex_str : String) -> Unit raise ParseSyntaxError {
 
 ///|
 fn parse_captures(
-  map : @yaml_rust.YamlHash,
+  map : @yaml_rust.LinkedHashMap[@yaml_rust.Yaml, @yaml_rust.Yaml],
   regex_str : String,
   state : ParserState,
 ) -> CaptureMapping raise ParseSyntaxError {
   let valid_indexes = get_consuming_capture_indexes(regex_str)
   let captures = []
-  for entry in map.entries() {
+  for entry in map.iter() {
     let (key, value) = entry
     if (key.as_i64(), value.as_str()) is (Some(key_int), Some(val_str)) {
       // `key_int as usize`: negative keys wrap around and never match.

@@ -299,12 +299,333 @@ fn gen_data(root: &PathBuf) {
     std::fs::write(root.join("syntect/two_face/syntaxes_gen.mbt"), out).unwrap();
 }
 
+/// Code samples for the highlighting tests: (language token, code).
+fn samples() -> Vec<(String, String)> {
+    let mut out: Vec<(String, String)> = vec![
+        ("rust".into(), "/// A state machine.\n#[derive(Debug)]\nenum State<'a> { A(u8), B(&'a str) }\n\nfn advance(state: State<'_>) -> State<'_> {\n    unimplemented!(\"state machine\")\n}\nlet r = r#\"raw \"string\"\"#; // comment\nimpl<T: Clone + 'static> Foo for Bar<T> where T: Debug { const X: u32 = 0x1F_u32; }".into()),
+        ("py".into(), "import this\n\ndef hi():\n    print(\"Hi!\")\n\n@decorator\nclass Foo(Bar, metaclass=Meta):\n    \"\"\"Doc\n    string\"\"\"\n    x: int = 1_000 + 0b1010 # comment\n    f = lambda a, *b, **c: f\"{a!r:>10} {b}\"".into()),
+        ("cpp".into(), "#include <iostream>\n\nint main() {\n  std::cout << \"Hello, world!\";\n}\ntemplate <typename T> class Vec : public Base<T> { T* data; /* block\n comment */ };\n#define MAX(a, b) ((a) > (b) ? (a) : (b))".into()),
+        ("c".into(), "#include <stdio.h>\nstatic const char *s = \"a\\tb\\n\";\nint main(int argc, char **argv) {\n  for (int i = 0; i < 10; i++) printf(\"%d\\n\", i);\n  return 0;\n}".into()),
+        ("html".into(), "<!DOCTYPE html>\n<html>\n  <head>\n    <meta charset=\"utf-8\">\n    <style>body { color: red; }</style>\n    <script>let x = 1 + 2; console.log(`x=${x}`);</script>\n  </head>\n  <body>\n    <h1>Topic</h1>\n    <p>The Hypertext Markup Language &amp; more.</p>\n  </body>\n</html>".into()),
+        ("js".into(), "const a = [1, 2, 3].map((x) => x * 2);\nfunction* gen() { yield* other(); }\nclass A extends B { #priv = 1; static get x() { return /ab+c/gi.test('abc'); } }\nexport default async function () { await fetch(`/api/${id}`); }".into()),
+        ("ts".into(), "interface Foo<T> { bar?: T; readonly baz: string[] }\ntype U = A | B & C;\nenum Color { Red = 1, Green }\nfunction f(this: Window, ...args: any[]): void {}".into()),
+        ("json".into(), "{\n  \"key\": [1, 2.5e-3, true, null],\n  \"nested\": {\"a\": \"b\\\"c\"}\n}".into()),
+        ("yaml".into(), "%YAML 1.2\n---\nname: lang\nfile_extensions:\n  - a\nscope: source # comment\ncontexts:\n  main:\n    - match: '\\b(if|else)\\b'\n      scope: keyword.control\nanchors: &a\n  b: *a\nmulti: |\n  text".into()),
+        ("toml".into(), "[package]\nname = \"typst\"\nversion = \"0.1.0\" # comment\n[[bin]]\ndate = 1979-05-27T07:32:00Z\narr = [ 1, 2, 3 ]\ninline = { x = 1, y = 'lit' }".into()),
+        ("sh".into(), "#!/bin/bash\nfor f in *.txt; do\n  echo \"$f ${f%.txt}\" | grep -E '^a' > /dev/null 2>&1\ndone\nif [[ -n $VAR ]]; then exit 1; fi\nfunction f() { local x=$(( 1 + 2 )); }".into()),
+        ("go".into(), "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tch := make(chan int, 10)\n\tgo func() { ch <- 42 }()\n\tfmt.Println(<-ch, `raw`)\n}".into()),
+        ("java".into(), "package a.b;\nimport java.util.*;\n@Override\npublic class Main<T extends Comparable<T>> implements Runnable {\n  private static final int X = 0xFF;\n  public void run() { System.out.println(\"hi\" + 'c'); }\n}".into()),
+        ("cs".into(), "using System;\nnamespace N {\n  public record R(int X);\n  class C { public string P { get; set; } = $\"x{1}\"; }\n}".into()),
+        ("rb".into(), "module Bob::Wow::Troll::Five; 5; end\ndef foo(a, *b, &blk) = a + 1\nputs \"#{x} and #{y}\" if x =~ /ab+/\n%w[a b c].each { |x| p x }".into()),
+        ("php".into(), "<?php\nnamespace App;\nclass A { public function f(int $x): ?string { return \"$x {$this->y}\"; } }\necho <<<EOT\nheredoc $x\nEOT;\n?>".into()),
+        ("css".into(), "@media (max-width: 600px) {\n  .a > #b:hover::before { color: #fff; margin: 0 auto !important; }\n}\n:root { --x: calc(1px + 2em); }".into()),
+        ("md".into(), "# Heading\n\nSome *emph* and **strong** and `code`.\n\n- item\n- [link](http://example.com)\n\n```rust\nfn main() {}\n```\n> quote".into()),
+        ("diff".into(), "--- a/file\n+++ b/file\n@@ -1,3 +1,3 @@\n context\n-removed\n+added".into()),
+        ("sql".into(), "SELECT a, COUNT(*) AS n FROM t WHERE x = 'y' AND z > 1.5 GROUP BY a; -- comment\nCREATE TABLE t (id INT PRIMARY KEY);".into()),
+        ("hs".into(), "module Main where\nimport Data.List (sort)\nmain :: IO ()\nmain = do\n  let xs = [x * 2 | x <- [1..10], odd x]\n  print $ sort xs -- comment\n{- block -}".into()),
+        ("tex".into(), "\\documentclass{article}\n\\begin{document}\n$x^2 + \\alpha$ % comment\n\\section{Intro}\\label{sec}\n\\end{document}".into()),
+        ("lua".into(), "local function f(a, ...)\n  return a .. 'x', #t, [[long\nstring]]\nend\n-- comment\n--[[ block ]]".into()),
+        ("swift".into(), "import UIKit\nstruct S: Codable { var x: Int? = nil; func f() throws -> String { \"\\(x)\" } }".into()),
+        ("kt".into(), "fun main() { val x = listOf(1, 2).map { it * 2 }; println(\"$x ${x.size}\") }\ndata class P(val a: Int)".into()),
+        ("scala".into(), "object Main extends App { val x: List[Int] = List(1, 2); x.foreach(println) }\ncase class A(b: String)".into()),
+        ("xml".into(), "<?xml version=\"1.0\"?>\n<!DOCTYPE note>\n<note a=\"1\"><![CDATA[x < y]]><!-- c --></note>".into()),
+        ("dockerfile".into(), "FROM rust:1.80 AS build\nRUN cargo build --release \\\n  && strip target/release/x\nCOPY --from=build /x /x\nENTRYPOINT [\"/x\"]".into()),
+        ("makefile".into(), "all: main.o\n\t$(CC) -o $@ $^ $(LDFLAGS)\n%.o: %.c\n\t@echo \"building $<\"".into()),
+        ("zig".into(), "const std = @import(\"std\");\npub fn main() !void { var x: u32 = 0; x +%= 1; }".into()),
+        ("nix".into(), "{ pkgs ? import <nixpkgs> {} }: pkgs.mkShell { buildInputs = [ pkgs.hello ]; shellHook = ''\n  echo hi\n''; }".into()),
+        ("ps1".into(), "function Get-X { param([string]$Name) Write-Host \"Hi $Name\" -ForegroundColor Red } # c".into()),
+        ("r".into(), "x <- c(1, 2, 3)\nf <- function(a, b = 2) { a + b } # comment\nlibrary(ggplot2)".into()),
+        ("pl".into(), "my @a = (1, 2); my %h = (a => 1);\nprint \"$a[0]\\n\" if $s =~ s/foo/bar/g;".into()),
+        ("ex".into(), "defmodule M do\n  def f(x) when is_integer(x), do: x |> Kernel.+(1)\n  @attr :atom\nend".into()),
+        ("erl".into(), "-module(m).\n-export([f/1]).\nf(X) when X > 0 -> {ok, X};\nf(_) -> error.".into()),
+        ("clj".into(), "(defn f [x] (let [y (* x 2)] (println \"y\" y))) ; comment\n#{:a 1}".into()),
+        ("ml".into(), "let rec f x = match x with | [] -> 0 | _ :: t -> 1 + f t (* comment *)".into()),
+        ("fs".into(), "let f x = x + 1 // c\ntype R = { A: int }\n[<EntryPoint>]\nlet main _ = 0".into()),
+        ("d".into(), "import std.stdio;\nvoid main() { writeln(\"hi\"); auto x = [1, 2]; }".into()),
+        ("dart".into(), "void main() { var x = <int>[1, 2]; print('${x.length} items'); }".into()),
+        ("sexp".into(), "(defun f (x) (+ x 1))".into()),
+        ("txt".into(), "plain text".into()),
+        ("tsv".into(), "a\tb\tc\n1\t2\t3".into()),
+        ("csv".into(), "a,b,\"c,d\"\n1,2,3".into()),
+        ("ini".into(), "[section]\nkey = value ; comment\n# other".into()),
+        ("vim".into(), "set nocompatible\nlet g:x = 1 \" comment\nfunction! F()\nendfunction".into()),
+        ("asm".into(), "mov eax, 1 ; comment\nlabel:\n  jmp label".into()),
+        ("graphql".into(), "query Q($id: ID!) { user(id: $id) { name @include(if: true) } }".into()),
+        ("proto".into(), "syntax = \"proto3\";\nmessage M { repeated int32 x = 1; }".into()),
+        ("bat".into(), "@echo off\nset X=1\nif %X%==1 echo yes\nREM comment".into()),
+        ("wgsl".into(), "@vertex fn main(@builtin(vertex_index) i: u32) -> @builtin(position) vec4<f32> { return vec4<f32>(0.0); }".into()),
+        ("unicode-rs".into(), "".into()),
+    ];
+    out.retain(|(l, _)| l != "unicode-rs");
+    out.push(("rs".into(), "let s = \"héllo wörld — ✓ 🎉\"; // ünïcödé ✓\nfn größe() -> char { 'ß' }".into()));
+    // A generic snippet for every syntax with an extension, to exercise all
+    // grammars at least shallowly.
+    let generic = "foo(bar, 'baz', \"qux\") // comment\n# comment -- other ; x\n<tag attr=\"x\">{a: [1, 2.5e3, 0x1F]}</tag>\n  if (a == b && c != d) { return -1; } else x = y + z * 2\n\tlet $var = @at `tick` \\esc";
+    let set = two_face::syntax::extra_no_newlines();
+    for syntax in set.syntaxes() {
+        if let Some(ext) = syntax.file_extensions.first() {
+            out.push((ext.clone(), generic.into()));
+        }
+    }
+    out
+}
+
+fn gen_tests(root: &PathBuf) {
+    use syntect::easy::HighlightLines;
+    use syntect::parsing::ParseState;
+    let set = &*typst_library::text::RAW_SYNTAXES;
+    let theme = &*typst_library::text::RAW_THEME;
+    let mut out = String::new();
+    out.push_str(
+        "// Generated by `oracle/src/bin/gen_syntect.rs tests`: highlighting of\n\
+         // samples with syntect 5.3.0, two-face 0.4.5's syntaxes and Typst's\n\
+         // `RAW_THEME`. Do not edit by hand!\n\n",
+    );
+    out.push_str("///|\nlet highlight_cases : Array[(String, String, String)] = [\n");
+    for (token, code) in samples() {
+        let Some(syntax) = set.find_syntax_by_token(&token) else {
+            continue;
+        };
+        let mut expected = String::new();
+        writeln!(expected, "syntax {}", syntax.name).unwrap();
+        let mut hl = HighlightLines::new(syntax, theme);
+        let mut ps = ParseState::new(syntax);
+        for line in typst_syntax::split_newlines(&code) {
+            match ps.parse_line(line, set) {
+                Ok(ops) => {
+                    let ops: Vec<String> = ops.iter().map(|(i, op)| format!("{i}:{op:?}")).collect();
+                    writeln!(expected, "ops {}", ops.join(" ")).unwrap();
+                }
+                Err(e) => writeln!(expected, "ops error {e}").unwrap(),
+            }
+            match hl.highlight_line(line, set) {
+                Ok(pieces) => {
+                    let pieces: Vec<String> = pieces
+                        .iter()
+                        .map(|(style, s)| {
+                            let c = style.foreground;
+                            format!(
+                                "{:02x}{:02x}{:02x}{:02x}/{}/{s:?}",
+                                c.r,
+                                c.g,
+                                c.b,
+                                c.a,
+                                style.font_style.bits()
+                            )
+                        })
+                        .collect();
+                    writeln!(expected, "line {}", pieces.join(" ")).unwrap();
+                }
+                Err(e) => writeln!(expected, "line error {e}").unwrap(),
+            }
+        }
+        writeln!(out, "  ({}, {}, {}),", lit(&token), lit(&code), lit(&expected)).unwrap();
+    }
+    out.push_str("]\n");
+    std::fs::write(root.join("syntect/two_face/highlight_gen_wbtest.mbt"), out).unwrap();
+}
+
+/// Custom `.sublime-syntax` files for the loading tests.
+fn syntax_samples(assets: &std::path::Path) -> Vec<(String, String)> {
+    let sexp = std::fs::read_to_string(assets.join("syntaxes/SExpressions.sublime-syntax")).unwrap();
+    let head = "%YAML 1.2\n---\nname: lang\nfile_extensions:\n  - a\nscope: source\n";
+    let mut v = vec![(sexp, "(define (f x) ; comment\n  (+ x 1.5 \"str\"\"ing\")) #| block |# #;(skip) )".to_string())];
+    let bodies = [
+        "contexts:\n  main:\n    - match: '\\'\n",
+        "contexts:\n  main:\n    - match: ''\n",
+        "contexts:\n  main:\n    - match: '(a)(b)?'\n      captures:\n        1: x.a\n        2: x.b\n",
+        "contexts:\n  other:\n    - match: 'a'\n",
+        "contexts:\n  main: 1\n",
+        "contexts:\n  main:\n    - 1\n",
+        "contexts:\n  main:\n    - match: 'a'\n      scope: a.b.c.d.e.f.g.h.i\n",
+        "contexts:\n  main:\n    - match: '(?<!x)a+'\n      push: [inner, inner2]\n  inner:\n    - meta_scope: meta.inner\n    - match: '\\d'\n      scope: constant.numeric\n    - match: '$'\n      pop: true\n  inner2:\n    - meta_content_scope: meta.inner2\n    - match: 'b'\n      pop: true\n",
+        "variables:\n  ident: '[A-Za-z_]\\w*'\n  num: '\\d+'\ncontexts:\n  main:\n    - match: '\\b({{ident}})\\s*(=)\\s*({{num}})'\n      captures:\n        1: variable.other\n        2: keyword.operator\n        3: constant.numeric\n    - match: '\"'\n      push: string\n  string:\n    - meta_scope: string.quoted\n    - match: '\\\\.'\n      scope: constant.character.escape\n    - match: '\"'\n      pop: true\n",
+        "contexts:\n  main:\n    - match: '<<(\\w+)'\n      push: heredoc\n  heredoc:\n    - meta_scope: string.unquoted.heredoc\n    - match: '^\\1$'\n      pop: true\n",
+        "contexts:\n  prototype:\n    - match: '#.*$'\n      scope: comment.line\n  main:\n    - match: '\\('\n      push: paren\n    - match: '\\w+'\n      scope: keyword\n  paren:\n    - clear_scopes: 1\n    - meta_scope: meta.paren\n    - match: '\\)'\n      pop: true\n    - include: main\n",
+        "contexts:\n  main:\n    - match: '```'\n      embed: scope:source.rust\n      embed_scope: markup.raw\n      escape: '```'\n",
+        "contexts:\n  main:\n    - match: '\\{'\n      set: block\n      with_prototype:\n        - match: '!'\n          scope: invalid\n  block:\n    - meta_content_scope: meta.block\n    - match: '\\}'\n      set: main\n    - match: 'x'\n      scope: variable\n",
+        "contexts:\n  main:\n    - include: nonexistent\n    - match: 'a'\n      push: missing\n",
+        "contexts:\n  main:\n    - match: 'a'\n      embed: other\n",
+        "contexts:\n  main:\n    - match: '[[:alpha:]]+'\n      scope: word\n    - match: '\\n'\n      scope: newline\n    - match: '[\\n;]'\n      scope: sep\n",
+        "contexts:\n  main:\n    - match: '(?x) a  # comment\n        b'\n      scope: ab\n",
+        "contexts:\n  main:\n    - match: '\\p{Lu}\\w*'\n      scope: entity.name\n    - match: '(?i)select'\n      scope: keyword\n",
+        "contexts:\n  main:\n    - match: '(?=a)'\n      push: x\n  x:\n    - match: '(?=a)'\n      pop: true\n    - match: 'a'\n      scope: a\n",
+        "contexts:\n  main:\n    - match: 'a(?'\n",
+        "contexts:\n  main:\n    - match: '\\k<x>'\n",
+        "hidden: true\ncontexts:\n  main:\n    - match: 'x'\n",
+    ];
+    for b in bodies {
+        v.push((format!("{head}{b}"), "a = 12 \"s\\\"x\" (b) a ```fn``` {x!} <<EOF\ntext\nEOF\nSelect Foo ab # c\naab".into()));
+    }
+    v.push(("".into(), "x".into()));
+    v.push(("name: [unclosed\n".into(), "x".into()));
+    v.push(("- a\n- b\n".into(), "x".into()));
+    v.push(("name: x\ncontexts:\n  main: []\n".into(), "x".into()));
+    v.push(("name: x\nscope: source.x\n".into(), "x".into()));
+    v.push(("name: x\nscope: source.x\ncontexts:\n  main:\n    - match: 'a'\n      embed: b\n".into(), "x".into()));
+    v.push(("scope: source.x\ncontexts:\n  main:\n    - match: \"\\t\"\n".into(), "x".into()));
+    v
+}
+
+/// Theme files for the loading tests.
+fn theme_samples(assets: &std::path::Path) -> Vec<String> {
+    let halcyon = std::fs::read_to_string(assets.join("themes/halcyon.tmTheme")).unwrap();
+    let plist = |body: &str| {
+        format!("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<plist version=\"1.0\">\n{body}\n</plist>")
+    };
+    vec![
+        halcyon,
+        plist("<dict><key>name</key><string>T</string><key>settings</key><array><dict><key>settings</key><dict><key>foreground</key><string>#abc</string><key>background</key><string>#11223344</string></dict></dict><dict><key>scope</key><string>string, comment - comment.line</string><key>settings</key><dict><key>fontStyle</key><string>bold italic</string><key>foreground</key><string>#ff0000</string></dict></dict><dict><key>scope</key><string>keyword</string><key>settings</key><dict><key>fontStyle</key><string>weird</string></dict></dict></array></dict>"),
+        plist("<dict><key>settings</key><array/></dict>"),
+        plist("<dict><key>name</key><integer>1</integer><key>settings</key><array><dict><key>settings</key><dict/></dict></array></dict>"),
+        plist("<array/>"),
+        plist("<dict><key>settings</key><array><dict><key>settings</key><dict><key>foreground</key><string>red</string></dict></dict></array></dict>"),
+        plist("<dict><key>settings</key><array><dict><key>settings</key><dict/></dict></array><key>gutterSettings</key><dict><key>background</key><string>#123456</string></dict></dict>"),
+        plist("<dict><key>settings</key><array><dict><key>settings</key><dict/></dict><dict><key>scope</key><string>a</string><key>settings</key><dict><key>foreground</key><string>#12345</string></dict></dict></array><key>x</key><real>1.5</real><key>y</key><true/><key>z</key><date>2001-01-01T00:00:00Z</date></dict>"),
+        plist("<dict><key>settings</key><array><dict><key>settings</key><dict/></dict></array><key>d</key><data>AAAA</data></dict>"),
+        plist("<dict><key>settings</key><array><dict><key>settings</key><dict/></dict></array><key>i</key><integer>abc</integer></dict>"),
+        plist("<dict><key>settings</key><unknown/></dict>"),
+        "not xml at all".into(),
+        "<plist><dict><key>a</key></plist>".into(),
+        "".into(),
+    ]
+}
+
+fn describe_theme(theme: &syntect::highlighting::Theme) -> String {
+    let c = |c: Option<syntect::highlighting::Color>| match c {
+        Some(c) => format!("{:02x}{:02x}{:02x}{:02x}", c.r, c.g, c.b, c.a),
+        None => "-".into(),
+    };
+    let mut out = String::new();
+    writeln!(out, "name {:?} author {:?}", theme.name, theme.author).unwrap();
+    let s = &theme.settings;
+    writeln!(
+        out,
+        "settings fg {} bg {} caret {} gutter {} gutter_fg {} line {} popup {:?}",
+        c(s.foreground),
+        c(s.background),
+        c(s.caret),
+        c(s.gutter),
+        c(s.gutter_foreground),
+        c(s.line_highlight),
+        s.popup_css
+    )
+    .unwrap();
+    for item in &theme.scopes {
+        let sels: Vec<String> = item
+            .scope
+            .selectors
+            .iter()
+            .map(|sel| {
+                let path: Vec<String> = sel.path.scopes.iter().map(|s| s.build_string()).collect();
+                let ex: Vec<String> = sel
+                    .excludes
+                    .iter()
+                    .map(|e| e.scopes.iter().map(|s| s.build_string()).collect::<Vec<_>>().join(" "))
+                    .collect();
+                format!("{}|{}", path.join(" "), ex.join(","))
+            })
+            .collect();
+        writeln!(
+            out,
+            "item {} fg {} bg {} fs {:?}",
+            sels.join(";"),
+            c(item.style.foreground),
+            c(item.style.background),
+            item.style.font_style.map(|f| f.bits())
+        )
+        .unwrap();
+    }
+    out
+}
+
+fn gen_loading(root: &PathBuf, assets: &std::path::Path) {
+    use syntect::easy::HighlightLines;
+    use syntect::parsing::{SyntaxDefinition, SyntaxSetBuilder};
+    let mut out = String::new();
+    out.push_str(
+        "// Generated by `oracle/src/bin/gen_syntect.rs loading`: loading of\n\
+         // `.sublime-syntax` and `.tmTheme` files with syntect 5.3.0. Do not\n\
+         // edit by hand!\n\n",
+    );
+    out.push_str("///|\nlet syntax_loading_cases : Array[(String, String, String)] = [\n");
+    let theme = &*typst_library::text::RAW_THEME;
+    for (yaml, code) in syntax_samples(assets) {
+        let mut expected = String::new();
+        match SyntaxDefinition::load_from_str(&yaml, false, None) {
+            Err(e) => {
+                writeln!(expected, "error {e}").unwrap();
+                if let syntect::parsing::ParseSyntaxError::InvalidYaml(se) = &e {
+                    let m = se.marker();
+                    writeln!(expected, "at {} {} {}", m.index(), m.line(), m.col()).unwrap();
+                }
+            }
+            Ok(def) => {
+                let mut builder = SyntaxSetBuilder::new();
+                builder.add(def);
+                let set = builder.build();
+                let syntax = &set.syntaxes()[0];
+                writeln!(
+                    expected,
+                    "syntax {:?} {:?} {} hidden={}",
+                    syntax.name,
+                    syntax.file_extensions,
+                    syntax.scope.build_string(),
+                    syntax.hidden
+                )
+                .unwrap();
+                let mut hl = HighlightLines::new(syntax, theme);
+                for line in typst_syntax::split_newlines(&code) {
+                    match hl.highlight_line(line, &set) {
+                        Ok(pieces) => {
+                            let pieces: Vec<String> = pieces
+                                .iter()
+                                .map(|(style, s)| {
+                                    let c = style.foreground;
+                                    format!(
+                                        "{:02x}{:02x}{:02x}{:02x}/{}/{s:?}",
+                                        c.r,
+                                        c.g,
+                                        c.b,
+                                        c.a,
+                                        style.font_style.bits()
+                                    )
+                                })
+                                .collect();
+                            writeln!(expected, "line {}", pieces.join(" ")).unwrap();
+                        }
+                        Err(e) => writeln!(expected, "line error {e}").unwrap(),
+                    }
+                }
+            }
+        }
+        writeln!(out, "  ({}, {}, {}),", lit(&yaml), lit(&code), lit(&expected)).unwrap();
+    }
+    out.push_str("]\n\n");
+    out.push_str("///|\nlet theme_loading_cases : Array[(String, String)] = [\n");
+    for xml in theme_samples(assets) {
+        let mut cursor = std::io::Cursor::new(xml.as_bytes());
+        let expected = match syntect::highlighting::ThemeSet::load_from_reader(&mut cursor) {
+            Ok(theme) => describe_theme(&theme),
+            Err(e) => format!("error {e}\n"),
+        };
+        writeln!(out, "  ({}, {}),", lit(&xml), lit(&expected)).unwrap();
+    }
+    out.push_str("]\n");
+    std::fs::write(root.join("syntect/two_face/loading_gen_wbtest.mbt"), out).unwrap();
+}
+
 fn main() {
     let mut args = std::env::args().skip(1);
     let mode = args.next().expect("mode");
     let root = PathBuf::from(args.next().unwrap_or_else(|| "..".into()));
     match mode.as_str() {
         "data" => gen_data(&root),
+        "tests" => gen_tests(&root),
+        "loading" => {
+            let assets = PathBuf::from(args.next().expect("typst-dev-assets files dir"));
+            gen_loading(&root, &assets)
+        }
         other => panic!("unknown mode {other}"),
     }
 }

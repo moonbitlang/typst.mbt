@@ -1,0 +1,9 @@
+import {
+  "moonbitlang/typst/syntect",
+}
+
+import {
+  "moonbitlang/typst/syntax",
+  "moonbitlang/typst/unicode",
+  "moonbitlang/core/encoding/utf8",
+} for "wbtest"
