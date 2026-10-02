@@ -394,6 +394,7 @@ fn world_specs() -> Array[ArgSpec] {
       "input",
       "key=value",
       short='i',
+      validate=v => parse_input_pair(v) |> ignore,
       empty=Pass,
       help="Add a string key-value pair visible through `sys.inputs`",
     ),
@@ -403,6 +404,7 @@ fn world_specs() -> Array[ArgSpec] {
       "creation-timestamp",
       "UNIX_TIMESTAMP",
       env="SOURCE_DATE_EPOCH",
+      validate=v => parse_timestamp(v) |> ignore,
       empty=Pass,
       help="The document's creation date formatted as a UNIX timestamp",
     ),
@@ -458,6 +460,7 @@ fn process_specs() -> Array[ArgSpec] {
       "jobs",
       "JOBS",
       short='j',
+      validate=v => parse_jobs(v) |> ignore,
       empty=Pass,
       help="Number of parallel jobs spawned during compilation (only 1 is supported)",
     ),
@@ -500,6 +503,7 @@ fn compile_spec(path : String, about : String, watch : Bool) -> CommandSpec {
       "pages",
       "PAGES",
       delimiter=',',
+      validate=v => parse_pages(v) |> ignore,
       empty=Pass,
       help="Which pages to export. When unspecified, all pages are exported",
     ),
@@ -520,6 +524,7 @@ fn compile_spec(path : String, about : String, watch : Bool) -> CommandSpec {
     opt(
       "ppi",
       "PPI",
+      validate=v => parse_ppi(v) |> ignore,
       empty=Pass,
       help="The PPI (pixels per inch) to use for PNG export [default: 144]",
     ),
@@ -527,6 +532,7 @@ fn compile_spec(path : String, about : String, watch : Bool) -> CommandSpec {
     opt(
       "deps",
       "PATH",
+      validate=v => parse_output(v, "--deps <PATH>") |> ignore,
       empty=Pass,
       help="File path to which a list of current compilation's dependencies will be written. Use `-` to write to stdout",
     ),
@@ -767,6 +773,7 @@ fn parse_args(argv : Array[String]) -> CliArguments raise CliError {
           opt(
             "in",
             "IN",
+            validate=v => parse_input(v, "--in <IN>") |> ignore,
             empty=Pass,
             help="A file in whose context to evaluate the code. Use `-` to read input from stdin",
           ),
@@ -929,6 +936,7 @@ fn parse_args(argv : Array[String]) -> CliArguments raise CliError {
       }
     other => raise Usage("unrecognized subcommand '\{other}'", spec.usage())
   }
+  matches.resolve_pending()
   let color = match matches.value("color") {
     None | Some("auto") => Auto
     Some("always") => Always
@@ -1023,18 +1031,7 @@ fn compile_args(
     .all("pdf-standard")
     .map(v => pdf_standard_names.iter().find_first(p => p.0 == v).unwrap().1)
   let ppi = match m.value("ppi") {
-    Some(v) =>
-      match @library.rust_parse_f64(v) {
-        Some(x) => Some(x)
-        None if v == "" =>
-          raise Invalid(
-            "invalid value '' for '--ppi <PPI>': cannot parse float from empty string",
-          )
-        None =>
-          raise Invalid(
-            "invalid value '\{v}' for '--ppi <PPI>': invalid float literal",
-          )
-      }
+    Some(v) => Some(parse_ppi(v))
     None => None
   }
   let deps_format : DepsFormat = match m.value("deps-format") {
@@ -1079,31 +1076,10 @@ fn compile_args(
 fn world_args(m : Matches) -> WorldArgs raise CliError {
   let inputs = []
   for raw in m.all("input") {
-    // `typst_utils::parse_sys_input_pair`
-    guard raw.find("=") is Some(eq) else {
-      raise Invalid(
-        "invalid value '\{raw}' for '--input <key=value>': input must be a key and a value separated by an equal sign",
-      )
-    }
-    let key = @kit.rust_trim(raw[:eq].to_owned())
-    if key == "" {
-      raise Invalid(
-        "invalid value '\{raw}' for '--input <key=value>': the key was missing or empty",
-      )
-    }
-    let val = @kit.rust_trim(raw[eq + 1:].to_owned())
-    inputs.push((key, val))
+    inputs.push(parse_input_pair(raw))
   }
   let creation_timestamp = match m.value("creation-timestamp") {
-    Some(v) =>
-      Some(
-        parse_i64(v) catch {
-          @kit.StrError(msg) =>
-            raise Invalid(
-              "invalid value '\{v}' for '--creation-timestamp <UNIX_TIMESTAMP>': \{msg}",
-            )
-        },
-      )
+    Some(v) => Some(parse_timestamp(v))
     None => None
   }
   {
@@ -1139,14 +1115,7 @@ fn package_args(m : Matches) -> PackageArgs {
 ///|
 fn process_args(m : Matches) -> ProcessArgs raise CliError {
   let jobs = match m.value("jobs") {
-    Some(v) =>
-      match parse_usize(v) {
-        Some(n) => Some(n)
-        None =>
-          raise Invalid(
-            "invalid value '\{v}' for '--jobs <JOBS>': \{if v == "" { "cannot parse integer from empty string" } else { "invalid digit found in string" }}",
-          )
-      }
+    Some(v) => Some(parse_jobs(v))
     None => None
   }
   let features = []
@@ -1167,4 +1136,61 @@ fn process_args(m : Matches) -> ProcessArgs raise CliError {
       Human
     },
   }
+}
+
+///|
+/// The value parser of `--jobs` (`usize`).
+fn parse_jobs(v : String) -> Int raise CliError {
+  match parse_usize(v) {
+    Some(n) => n
+    None =>
+      raise Invalid(
+        "invalid value '\{v}' for '--jobs <JOBS>': \{if v == "" { "cannot parse integer from empty string" } else { "invalid digit found in string" }}",
+      )
+  }
+}
+
+///|
+/// The value parser of `--ppi` (`f64`).
+fn parse_ppi(v : String) -> Double raise CliError {
+  match @library.rust_parse_f64(v) {
+    Some(x) => x
+    None if v == "" =>
+      raise Invalid(
+        "invalid value '' for '--ppi <PPI>': cannot parse float from empty string",
+      )
+    None =>
+      raise Invalid(
+        "invalid value '\{v}' for '--ppi <PPI>': invalid float literal",
+      )
+  }
+}
+
+///|
+/// The value parser of `--creation-timestamp` (`i64`).
+fn parse_timestamp(v : String) -> Int64 raise CliError {
+  parse_i64(v) catch {
+    @kit.StrError(msg) =>
+      raise Invalid(
+        "invalid value '\{v}' for '--creation-timestamp <UNIX_TIMESTAMP>': \{msg}",
+      )
+  }
+}
+
+///|
+/// The value parser of `--input` (`typst_utils::parse_sys_input_pair`).
+fn parse_input_pair(raw : String) -> (String, String) raise CliError {
+  guard raw.find("=") is Some(eq) else {
+    raise Invalid(
+      "invalid value '\{raw}' for '--input <key=value>': input must be a key and a value separated by an equal sign",
+    )
+  }
+  let key = @kit.rust_trim(raw[:eq].to_owned())
+  if key == "" {
+    raise Invalid(
+      "invalid value '\{raw}' for '--input <key=value>': the key was missing or empty",
+    )
+  }
+  let val = @kit.rust_trim(raw[eq + 1:].to_owned())
+  (key, val)
 }

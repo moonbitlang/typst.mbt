@@ -46,6 +46,8 @@ priv struct ArgSpec {
   possible : Array[String]
   hidden : Bool
   empty : EmptyMode
+  /// The option's value parser, run when a value is consumed.
+  validate : ((String) -> Unit raise CliError)?
 }
 
 ///|
@@ -68,6 +70,7 @@ fn flag(
     possible: [],
     hidden,
     empty: Required,
+    validate: None,
   }
 }
 
@@ -81,6 +84,7 @@ fn opt(
   possible? : Array[String] = [],
   hidden? : Bool = false,
   empty? : EmptyMode = Required,
+  validate? : (String) -> Unit raise CliError,
   help~ : String,
 ) -> ArgSpec {
   {
@@ -95,6 +99,7 @@ fn opt(
     possible,
     hidden,
     empty,
+    validate,
   }
 }
 
@@ -118,6 +123,7 @@ fn opt_optional(
     possible: ["true", "false"],
     hidden,
     empty: Required,
+    validate: None,
   }
 }
 
@@ -151,6 +157,33 @@ priv struct Matches {
   positionals : Array[String]
   /// The subcommand name and its remaining arguments.
   subcommand : (String, Array[String])?
+  /// Separate values of optional-value options that are not validated yet
+  /// (see `Matches::resolve_pending`).
+  pending : Array[(ArgSpec, String)]
+}
+
+///|
+/// Validates and records the pending values (clap does this after parsing a
+/// following subcommand).
+fn Matches::resolve_pending(self : Matches) -> Unit raise CliError {
+  for entry in self.pending {
+    let (spec, value) = entry
+    if value == "" && spec.empty is Required {
+      raise Invalid(
+        "a value is required for '\{spec.display()}' but none was supplied\{possible_values(spec)}",
+      )
+    }
+    if spec.possible.length() > 0 && !spec.possible.contains(value) {
+      raise Invalid(
+        "invalid value '\{value}' for '\{spec.display()}'\n  [possible values: \{spec.possible.join(", ")}]",
+      )
+    }
+    match self.values.get(spec.id) {
+      Some(list) => list.push(value)
+      None => self.values[spec.id] = [value]
+    }
+  }
+  self.pending.clear()
 }
 
 ///|
@@ -356,6 +389,18 @@ fn CommandSpec::parse(
   let mut subcommand = None
   let mut i = 0
   let pending : Array[(ArgSpec, String)] = []
+  let used : Array[String] = []
+  let unexpected = (arg : String) => {
+    let tip = if self.positionals.is_empty() {
+      ""
+    } else {
+      "\n\n  tip: to pass '\{arg}' as a value, use '-- \{arg}'"
+    }
+    Usage(
+      "unexpected argument '\{arg}' found\{tip}",
+      self.smart_usage(used, positionals.length()),
+    )
+  }
   let mut only_positional = false
   let find_long = (name : String) => self.args.search_by(a => a.long == name)
   let find_short = (c : Char) => self.args.search_by(a => a.short == Some(c))
@@ -364,6 +409,9 @@ fn CommandSpec::parse(
       raise Invalid(
         "a value is required for '\{spec.display()}' but none was supplied\{possible_values(spec)}",
       )
+    }
+    if spec.validate is Some(validate) {
+      validate(value)
     }
     if spec.possible.length() > 0 && !spec.possible.contains(value) {
       raise Invalid(
@@ -404,6 +452,11 @@ fn CommandSpec::parse(
       only_positional = true
       continue
     }
+    // A pending value is resolved before the next option.
+    for entry in pending {
+      push_value(entry.0, entry.1)
+    }
+    pending.clear()
     if arg.has_prefix("--") {
       let body = arg[2:].to_owned()
       let (name, attached) = match body.find("=") {
@@ -416,13 +469,11 @@ fn CommandSpec::parse(
       if name == "version" && self.subcommands.length() > 0 {
         raise Display(version_line() + "\n")
       }
-      guard find_long(name) is Some(index) else {
-        raise Usage(
-          "unexpected argument '\{arg}' found\n\n  tip: to pass '\{arg}' as a value, use '-- \{arg}'",
-          self.usage(),
-        )
-      }
+      guard find_long(name) is Some(index) else { raise unexpected(arg) }
       let spec = self.args[index]
+      if !used.contains(spec.id) {
+        used.push(spec.id)
+      }
       match spec.kind {
         Flag => {
           if attached is Some(_) {
@@ -445,7 +496,10 @@ fn CommandSpec::parse(
                 pending.push((spec, argv[i]))
                 i += 1
               } else {
-                push_value(spec, missing)
+                ignore(missing)
+                raise Invalid(
+                  "a value is required for '\{spec.display()}' but none was supplied\{possible_values(spec)}",
+                )
               }
           }
         Value =>
@@ -477,13 +531,11 @@ fn CommandSpec::parse(
       if c == 'V' && self.subcommands.length() > 0 {
         raise Display(version_line() + "\n")
       }
-      guard find_short(c) is Some(index) else {
-        raise Usage(
-          "unexpected argument '-\{c}' found\n\n  tip: to pass '-\{c}' as a value, use '-- -\{c}'",
-          self.usage(),
-        )
-      }
+      guard find_short(c) is Some(index) else { raise unexpected("-\{c}") }
       let spec = self.args[index]
+      if !used.contains(spec.id) {
+        used.push(spec.id)
+      }
       match spec.kind {
         Flag | OptionalValue(_) | LooseValue(_) =>
           counts[spec.id] = counts.get(spec.id).unwrap_or(0) + 1
@@ -508,8 +560,11 @@ fn CommandSpec::parse(
     }
   }
 
-  for entry in pending {
-    push_value(entry.0, entry.1)
+  if subcommand is None {
+    for entry in pending {
+      push_value(entry.0, entry.1)
+    }
+    pending.clear()
   }
 
   // Environment variable fallbacks.
@@ -542,7 +597,7 @@ fn CommandSpec::parse(
       self.usage(),
     )
   }
-  { values, counts, positionals, subcommand, }
+  { values, counts, positionals, subcommand, pending, }
 }
 
 ///|
@@ -562,4 +617,30 @@ fn missing(spec : CommandSpec, name : String) -> CliError {
     "the following required arguments were not provided:\n  <\{name}>",
     spec.required_usage(),
   )
+}
+
+///|
+/// clap's usage for errors once arguments were used: the used options and
+/// the required (or already given) positionals.
+fn CommandSpec::smart_usage(
+  self : CommandSpec,
+  used : Array[String],
+  num_positionals : Int,
+) -> String {
+  if used.is_empty() && num_positionals == 0 {
+    return self.usage()
+  }
+  let buf = StringBuilder()
+  buf.write_string(self.path)
+  for arg in self.args {
+    if used.contains(arg.id) {
+      buf.write_string(" \{arg.display()}")
+    }
+  }
+  for i, pos in self.positionals {
+    if pos.required || i < num_positionals {
+      buf.write_string(" <\{pos.name}>")
+    }
+  }
+  buf.to_string()
 }
