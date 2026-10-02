@@ -428,6 +428,7 @@ pub struct SweepGradient {
 ///|
 // TODO: Make API nicer so that variable coordinates don't
 // need to be passed by the caller (same for radial and linear gradient)
+
 ///|
 /// Returns an iterator over the stops of the sweep gradient. Stops need to be sorted
 /// manually by the caller.
@@ -778,6 +779,7 @@ pub fn ColrTable::clip_box(
 // This method should only be called from outside, not from within `colr.mbt`.
 // From inside, you always should call paint_impl, so that the recursion stack can
 // be passed on and any kind of recursion can be prevented.
+
 ///|
 /// Paints the color glyph.
 pub fn ColrTable::paint(
