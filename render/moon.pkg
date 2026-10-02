@@ -1,0 +1,13 @@
+import {
+  "moonbitlang/typst/library",
+  "moonbitlang/typst/layout",
+  "moonbitlang/typst/svg",
+  "moonbitlang/typst/skia",
+  "moonbitlang/typst/tiny_skia_path" @path,
+  "moonbitlang/typst/pixglyph",
+  "moonbitlang/typst/codecs",
+  "moonbitlang/typst/otf",
+  "moonbitlang/core/math",
+}
+
+warnings = "-deprecated"

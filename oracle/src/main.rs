@@ -29,6 +29,7 @@ mod reparse;
 mod shape;
 mod svg;
 mod usvg_images;
+mod render;
 mod world;
 
 fn main() {
@@ -173,6 +174,21 @@ fn main() {
                 .join()
                 .unwrap();
         }
+        Some("render") => {
+            // Paths are resolved relative to the upstream checkout.
+            let suite = PathBuf::from(&args[2]);
+            let out = std::path::absolute(PathBuf::from(&args[3])).unwrap();
+            let upstream = std::path::absolute(&suite).unwrap();
+            let root = upstream.ancestors().nth(2).unwrap().to_path_buf();
+            std::env::set_current_dir(&root).unwrap();
+            let rel = upstream.strip_prefix(&root).unwrap().to_path_buf();
+            std::thread::Builder::new()
+                .stack_size(1 << 30)
+                .spawn(move || render::dump_render(&rel, &out))
+                .unwrap()
+                .join()
+                .unwrap();
+        }
         Some(stage @ ("pdf-semantic" | "pdftags")) => {
             // Paths are resolved relative to the upstream checkout.
             let kind = if stage == "pdftags" {
@@ -245,7 +261,7 @@ fn main() {
         }
         _ => {
             eprintln!(
-                "usage: typst-oracle <syntax|ast|reparse|eval|html|bundle|realize|paged|svg|usvg-images|shape|break> <suite-dir> <out-dir>\n       typst-oracle fonts <out-file>"
+                "usage: typst-oracle <syntax|ast|reparse|eval|html|bundle|realize|paged|svg|render|usvg-images|shape|break> <suite-dir> <out-dir>\n       typst-oracle fonts <out-file>"
             );
             std::process::exit(2);
         }

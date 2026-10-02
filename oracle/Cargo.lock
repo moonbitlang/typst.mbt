@@ -2632,6 +2632,7 @@ dependencies = [
  "svgtypes",
  "syn 2.0.98",
  "syntect",
+ "tiny-skia",
  "tiny-skia-path",
  "ttf-parser",
  "two-face",

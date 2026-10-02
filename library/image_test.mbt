@@ -193,7 +193,9 @@ let image_vectors : Array[(String, String, String)] = [
   (
     "f2t.jpg", "Png", "err failed to decode image (Format error decoding Png: Invalid PNG signature.)",
   ),
-  ("f2t.jpg", "Jpg", "w=48 h=80 dpi=220.0 rot=1 icc=None color=L8"),
+  (
+    "f2t.jpg", "Jpg", "w=48 h=80 dpi=220.0 rot=1 icc=None color=L8 pixels=3840/f91a16a34c13a783",
+  ),
   (
     "f2t.jpg", "Gif", "err failed to decode image (Format error decoding Gif: malformed GIF header)",
   ),
@@ -216,7 +218,7 @@ let image_vectors : Array[(String, String, String)] = [
     "glacier.jpg", "Png", "err failed to decode image (Format error decoding Png: Invalid PNG signature.)",
   ),
   (
-    "glacier.jpg", "Jpg", "w=4272 h=2848 dpi=72.0 rot=None icc=524/21397 color=Rgb8",
+    "glacier.jpg", "Jpg", "w=4272 h=2848 dpi=72.0 rot=None icc=524/21397 color=Rgb8 pixels=36499968/5cf39aa176dd57a5",
   ),
   (
     "glacier.jpg", "Gif", "err failed to decode image (Format error decoding Gif: malformed GIF header)",
@@ -240,7 +242,7 @@ let image_vectors : Array[(String, String, String)] = [
     "heron.jpg", "Png", "err failed to decode image (Format error decoding Png: Invalid PNG signature.)",
   ),
   (
-    "heron.jpg", "Jpg", "w=2048 h=1302 dpi=None rot=None icc=456/25828 color=Rgb8",
+    "heron.jpg", "Jpg", "w=2048 h=1302 dpi=None rot=None icc=456/25828 color=Rgb8 pixels=7999488/7fbd4e66c1777225",
   ),
   (
     "heron.jpg", "Gif", "err failed to decode image (Format error decoding Gif: malformed GIF header)",
@@ -253,7 +255,9 @@ let image_vectors : Array[(String, String, String)] = [
   (
     "lynx.jpg", "Png", "err failed to decode image (Format error decoding Png: Invalid PNG signature.)",
   ),
-  ("lynx.jpg", "Jpg", "w=1000 h=1498 dpi=72.0 rot=1 icc=None color=Rgb8"),
+  (
+    "lynx.jpg", "Jpg", "w=1000 h=1498 dpi=72.0 rot=1 icc=None color=Rgb8 pixels=4494000/baf4a61519f94282",
+  ),
   (
     "lynx.jpg", "Gif", "err failed to decode image (Format error decoding Gif: malformed GIF header)",
   ),
@@ -263,7 +267,9 @@ let image_vectors : Array[(String, String, String)] = [
   (
     "molecular.jpg", "Png", "err failed to decode image (Format error decoding Png: Invalid PNG signature.)",
   ),
-  ("molecular.jpg", "Jpg", "w=2819 h=2091 dpi=72.0 rot=1 icc=None color=Rgb8"),
+  (
+    "molecular.jpg", "Jpg", "w=2819 h=2091 dpi=72.0 rot=1 icc=None color=Rgb8 pixels=17683587/d0796b9045020595",
+  ),
   (
     "molecular.jpg", "Gif", "err failed to decode image (Format error decoding Gif: malformed GIF header)",
   ),
@@ -298,7 +304,9 @@ let image_vectors : Array[(String, String, String)] = [
   (
     "small.jpeg", "Png", "err failed to decode image (Format error decoding Png: Invalid PNG signature.)",
   ),
-  ("small.jpeg", "Jpg", "w=31 h=12 dpi=93.98 rot=None icc=None color=Rgb8"),
+  (
+    "small.jpeg", "Jpg", "w=31 h=12 dpi=93.98 rot=None icc=None color=Rgb8 pixels=1116/79d6ccfd9c2588c6",
+  ),
   (
     "small.jpeg", "Gif", "err failed to decode image (Format error decoding Gif: malformed GIF header)",
   ),
@@ -308,7 +316,9 @@ let image_vectors : Array[(String, String, String)] = [
   (
     "small.jpg", "Png", "err failed to decode image (Format error decoding Png: Invalid PNG signature.)",
   ),
-  ("small.jpg", "Jpg", "w=24 h=12 dpi=93.98 rot=None icc=None color=Rgb8"),
+  (
+    "small.jpg", "Jpg", "w=24 h=12 dpi=93.98 rot=None icc=None color=Rgb8 pixels=864/4cbc171bbe02fb84",
+  ),
   (
     "small.jpg", "Gif", "err failed to decode image (Format error decoding Gif: malformed GIF header)",
   ),
@@ -343,7 +353,7 @@ let image_vectors : Array[(String, String, String)] = [
     "tiger.jpg", "Png", "err failed to decode image (Format error decoding Png: Invalid PNG signature.)",
   ),
   (
-    "tiger.jpg", "Jpg", "w=1024 h=670 dpi=72.0 rot=None icc=3144/259021 color=Rgb8",
+    "tiger.jpg", "Jpg", "w=1024 h=670 dpi=72.0 rot=None icc=3144/259021 color=Rgb8 pixels=2058240/b0b19b86e1259402",
   ),
   (
     "tiger.jpg", "Gif", "err failed to decode image (Format error decoding Gif: malformed GIF header)",
@@ -354,7 +364,9 @@ let image_vectors : Array[(String, String, String)] = [
   (
     "typing.jpg", "Png", "err failed to decode image (Format error decoding Png: Invalid PNG signature.)",
   ),
-  ("typing.jpg", "Jpg", "w=1766 h=1766 dpi=72.0 rot=1 icc=None color=Rgb8"),
+  (
+    "typing.jpg", "Jpg", "w=1766 h=1766 dpi=72.0 rot=1 icc=None color=Rgb8 pixels=9356268/983a1d6bd7f13761",
+  ),
   (
     "typing.jpg", "Gif", "err failed to decode image (Format error decoding Gif: malformed GIF header)",
   ),
