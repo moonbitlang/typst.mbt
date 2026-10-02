@@ -131,8 +131,10 @@ fn collapse_transition(
   } else if content.is_(@library.linebreak_elem()) ||
     // We want to collapse spaces that would otherwise be protected and show
     // up as spans with `white-space: pre-wrap`.
-    (@library.HtmlElem::of(content) is Some(elem) &&
-    elem.tag().is_whitespace_collapsing()) {
+    (
+      @library.HtmlElem::of(content) is Some(elem) &&
+      elem.tag().is_whitespace_collapsing()
+    ) {
     for_destructive(state)
   } else if @library.SpaceElem::of(content) is Some(elem) {
     for_space(state, elem.had_newline())
@@ -188,7 +190,10 @@ fn for_destructive(state : SpaceState) -> (SpaceAction, SpaceState) {
 ///
 /// If any space in a group of spaces had a newline, we treat all spaces in that
 /// group as having a newline.
-fn for_space(state : SpaceState, had_newline : Bool) -> (SpaceAction, SpaceState) {
+fn for_space(
+  state : SpaceState,
+  had_newline : Bool,
+) -> (SpaceAction, SpaceState) {
   match state {
     Destructive => (Skip, Destructive)
     Supportive(text=prev_text) => (Keep, Space(prev_text~, had_newline~))
@@ -200,7 +205,10 @@ fn for_space(state : SpaceState, had_newline : Bool) -> (SpaceAction, SpaceState
 ///|
 /// The state transition for a supportive element. `text` should be empty if
 /// this is not a textual element.
-fn for_supportive(state : SpaceState, text : String) -> (SpaceAction, SpaceState) {
+fn for_supportive(
+  state : SpaceState,
+  text : String,
+) -> (SpaceAction, SpaceState) {
   if state is Space(prev_text~, had_newline=true) &&
     @unicode.discard_space_between(prev_text, text) {
     (Discard, Supportive(text~))

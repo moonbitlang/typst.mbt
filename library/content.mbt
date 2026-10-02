@@ -18,6 +18,9 @@ pub struct Content {
   /// Manages the element during realization: bit 0 = prepared, bit n =
   /// guarded against the n-th show rule recipe.
   lifecycle : Array[Int]
+  /// The lazily computed hash of the field data (upstream: the `hash` in the
+  /// content header). Shared by all copies with the same `fields`.
+  priv data_hash : Ref[U128?]
 }
 
 ///|
@@ -33,6 +36,7 @@ pub fn Content::from_fields(
     label: None,
     location: None,
     lifecycle: [],
+    data_hash: Ref::new(None),
   }
 }
 
@@ -52,7 +56,7 @@ pub fn Content::new(
 
 ///|
 fn Content::with_fields(self : Content, fields : FixedArray[Value?]) -> Content {
-  { ..self, fields, }
+  { ..self, fields, data_hash: Ref::new(None), }
 }
 
 ///|

@@ -34,12 +34,24 @@ use crate::world::{TestWorld, parse_features};
 /// Dump realization results for every test below `suite`.
 pub fn dump_realize(suite: &Path, out: &Path) {
     let mut count = 0;
+    let filter = std::env::var("ORACLE_FILTER").ok();
     for file in collect::typ_files(suite) {
         let rel = file.strip_prefix(suite).unwrap();
+        if let Some(f) = &filter
+            && !rel.to_string_lossy().contains(f.as_str())
+        {
+            continue;
+        }
+        if std::env::var("ORACLE_VERBOSE").is_ok() {
+            eprintln!("{}", rel.display());
+        }
         let text = std::fs::read_to_string(&file).unwrap();
         let mut report = String::new();
         for test in collect::split_tests(&text) {
             writeln!(report, "=== {}", test.name).unwrap();
+            if std::env::var("ORACLE_VERBOSE").is_ok() {
+                eprintln!("  {}", test.name);
+            }
             report.push_str(&realize_report(&file, &test));
             count += 1;
         }
@@ -87,13 +99,16 @@ pub fn realize_report(path: &Path, test: &collect::TestCase) -> String {
         let mut dumper = Dumper::default();
         let mut subsink = Sink::new();
         let introspector = EmptyIntrospector;
+        // Like in `layout_document`/`html_document`, realization happens
+        // in a nested route (otherwise depth checks never fail).
+        let root = Route::default();
         let mut engine = Engine {
             library: &library,
             world: tracked,
             introspector: Protected::new(introspector.track()),
             traced: traced.track(),
             sink: subsink.track_mut(),
-            route: Route::default(),
+            route: Route::extend(root.track()).unnested(),
         };
         let arenas = Arenas::default();
         let mut info = DocumentInfo::default();

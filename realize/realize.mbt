@@ -212,7 +212,11 @@ fn Grouped::end(self : Grouped) -> State {
 
 ///|
 /// Handles an arbitrary piece of content during realization.
-fn visit(s : State, content : Content, styles : StyleChain) -> Unit raise SourceError {
+fn visit(
+  s : State,
+  content : Content,
+  styles : StyleChain,
+) -> Unit raise SourceError {
   // Tags can always simply be pushed.
   if content.is_(@library.tag_elem()) {
     s.sink.push((content, styles))
@@ -301,7 +305,9 @@ fn visit_kind_rules(
   } else {
     // Transparently wrap mathy content into equations.
     if content.can("Mathy") && !content.is_(@library.equation_elem()) {
-      let eq = @library.EquationElem::new(content).pack().spanned(content.span())
+      let eq = @library.EquationElem::new(content)
+        .pack()
+        .spanned(content.span())
       visit(s, eq, styles)
       return true
     }
@@ -331,7 +337,7 @@ fn visit_show_rules(
   styles : StyleChain,
 ) -> Bool raise SourceError {
   // Determines whether and how to proceed with show rule application.
-  guard verdict(s.engine, content, styles) is Some({ prepared, map, step }) else {
+  guard verdict(s.engine, content, styles) is Some({ prepared, map, step, }) else {
     return false
   }
 
@@ -432,7 +438,8 @@ fn verdict(engine : Engine, elem : Content, styles : StyleChain) -> Verdict? {
     r += 1
 
     // We're not interested in recipes that don't match.
-    guard recipe.selector is Some(selector) && selector.matches(elem, Some(styles)) else {
+    guard recipe.selector is Some(selector) &&
+      selector.matches(elem, Some(styles)) else {
       continue
     }
 
@@ -485,16 +492,20 @@ fn verdict(engine : Engine, elem : Content, styles : StyleChain) -> Verdict? {
   // If there's no nothing to do, there is also no verdict.
   if step is None &&
     map.is_empty() &&
-    (prepared ||
-    (elem.label() is None &&
-    elem.location() is None &&
-    !elem.can("ShowSet") &&
-    !elem.elem().is_locatable() &&
-    !elem.elem().is_tagged() &&
-    !elem.can("Synthesize"))) {
+    (
+      prepared ||
+      (
+        elem.label() is None &&
+        elem.location() is None &&
+        !elem.can("ShowSet") &&
+        !elem.elem().is_locatable() &&
+        !elem.elem().is_tagged() &&
+        !elem.can("Synthesize")
+      )
+    ) {
     return None
   }
-  Some({ prepared, map, step })
+  Some({ prepared, map, step, })
 }
 
 ///|
@@ -552,7 +563,9 @@ fn prepare(
   // when queried.
   let tags = elem
     .location()
-    .map(loc => (@library.Tag::Start(elem, flags), @library.Tag::End(loc, key, flags)))
+    .map(loc => {
+      (@library.Tag::Start(elem, flags), @library.Tag::End(loc, key, flags))
+    })
 
   // Ensure that this preparation only runs once by marking the element as
   // prepared.
@@ -688,7 +701,9 @@ fn visit_grouping_rules(
   content : Content,
   styles : StyleChain,
 ) -> Bool raise SourceError {
-  let matching = s.rules.iter().find_first(rule => (rule.effect)(content) is Trigger)
+  let matching = s.rules
+    .iter()
+    .find_first(rule => (rule.effect)(content) is Trigger)
 
   // Try to continue or finish an existing grouping.
   let mut i = 0
@@ -736,7 +751,11 @@ fn visit_grouping_rules(
 ///|
 /// Some elements don't make it to the sink depending on the realization kind
 /// and current state.
-fn visit_filter_rules(s : State, content : Content, styles : StyleChain) -> Bool {
+fn visit_filter_rules(
+  s : State,
+  content : Content,
+  styles : StyleChain,
+) -> Bool {
   if s.kind is (Par | Math) {
     return false
   }
@@ -810,7 +829,10 @@ fn finish_interrupted(s : State, local_ : Styles) -> Unit raise SourceError {
 
 ///|
 /// Finishes groupings while `f` returns `true`.
-fn finish_grouping_while(s : State, f : (State) -> Bool) -> Unit raise SourceError {
+fn finish_grouping_while(
+  s : State,
+  f : (State) -> Bool,
+) -> Unit raise SourceError {
   // Finishing of a group may result in new content and new grouping. This
   // can, in theory, go on for a bit. To prevent it from becoming an infinite
   // loop, we keep track of the iteration count.
@@ -923,7 +945,10 @@ fn finish_grouping(
     // destructed anyways, there isn't really a problem. So we try to
     // anticipate that and destruct it eagerly.
     if rule.kind is Par {
-      let kept = s.sink[end:].iter().filter(p => !p.0.is_(@library.space_elem())).collect()
+      let kept = s.sink[end:]
+        .iter()
+        .filter(p => !p.0.is_(@library.space_elem()))
+        .collect()
       s.sink.truncate(end)
       s.sink.append(kept)
     }
@@ -985,7 +1010,7 @@ fn finish_grouping(
   }
 
   // Execute the grouping's finisher rule.
-  rule.finish({ s, start })
+  rule.finish({ s, start, })
 
   // Visit the tags and staged elements again.
   for pair in tags {
@@ -1071,8 +1096,9 @@ let par : GroupingRule = {
       Interrupt
     }
   },
-  interrupt: elem => elem == @library.par_elem() ||
-    elem == @library.align_elem(),
+  interrupt: elem => {
+    elem == @library.par_elem() || elem == @library.align_elem()
+  },
 }
 
 ///|
@@ -1091,9 +1117,11 @@ let cites : GroupingRule = {
       Interrupt
     }
   },
-  interrupt: elem => elem == @library.cite_group_elem() ||
+  interrupt: elem => {
+    elem == @library.cite_group_elem() ||
     elem == @library.par_elem() ||
-    elem == @library.align_elem(),
+    elem == @library.align_elem()
+  },
 }
 
 ///|
@@ -1156,7 +1184,7 @@ fn list_like_grouping(
 /// - if that's not possible because another grouping is active, temporarily
 ///   disables textual grouping and revisits the elements.
 fn finish_textual(grouped : Grouped) -> Unit raise SourceError {
-  let { s, start } = grouped
+  let { s, start, } = grouped
   let mut start = start
 
   // Try to find a regex match in the grouped textual elements. Returns early
@@ -1247,43 +1275,64 @@ fn finish_cites(grouped : Grouped) -> Unit raise SourceError {
 ///|
 /// Builds the `ListElem` from `ListItem`s.
 fn finish_list(grouped : Grouped) -> Unit raise SourceError {
-  finish_list_like(grouped, @library.list_item_elem(), (item, local_) => {
-    let item = @library.ListItem::of(item).unwrap()
-    item.with_body(item.body().styled_with_map(local_)).pack()
-  }, (children, tight) => {
-    @library.ListElem::new(children.map(c => @library.ListItem::of(c).unwrap()))
-    .with_tight(tight)
-    .pack()
-  })
+  finish_list_like(
+    grouped,
+    @library.list_item_elem(),
+    (item, local_) => {
+      let item = @library.ListItem::of(item).unwrap()
+      item.with_body(item.body().styled_with_map(local_)).pack()
+    },
+    (children, tight) => {
+      @library.ListElem::new(
+        children.map(c => @library.ListItem::of(c).unwrap()),
+      )
+      .with_tight(tight)
+      .pack()
+    },
+  )
 }
 
 ///|
 /// Builds the `EnumElem` from `EnumItem`s.
 fn finish_enum(grouped : Grouped) -> Unit raise SourceError {
-  finish_list_like(grouped, @library.enum_item_elem(), (item, local_) => {
-    let item = @library.EnumItem::of(item).unwrap()
-    item.with_body(item.body().styled_with_map(local_)).pack()
-  }, (children, tight) => {
-    @library.EnumElem::new(children.map(c => @library.EnumItem::of(c).unwrap()))
-    .with_tight(tight)
-    .pack()
-  })
+  finish_list_like(
+    grouped,
+    @library.enum_item_elem(),
+    (item, local_) => {
+      let item = @library.EnumItem::of(item).unwrap()
+      item.with_body(item.body().styled_with_map(local_)).pack()
+    },
+    (children, tight) => {
+      @library.EnumElem::new(
+        children.map(c => @library.EnumItem::of(c).unwrap()),
+      )
+      .with_tight(tight)
+      .pack()
+    },
+  )
 }
 
 ///|
 /// Builds the `TermsElem` from `TermItem`s.
 fn finish_terms(grouped : Grouped) -> Unit raise SourceError {
-  finish_list_like(grouped, @library.term_item_elem(), (item, local_) => {
-    let item = @library.TermItem::of(item).unwrap()
-    item
-    .with_term(item.term().styled_with_map(local_))
-    .with_description(item.description().styled_with_map(local_))
-    .pack()
-  }, (children, tight) => {
-    @library.TermsElem::new(children.map(c => @library.TermItem::of(c).unwrap()))
-    .with_tight(tight)
-    .pack()
-  })
+  finish_list_like(
+    grouped,
+    @library.term_item_elem(),
+    (item, local_) => {
+      let item = @library.TermItem::of(item).unwrap()
+      item
+      .with_term(item.term().styled_with_map(local_))
+      .with_description(item.description().styled_with_map(local_))
+      .pack()
+    },
+    (children, tight) => {
+      @library.TermsElem::new(
+        children.map(c => @library.TermItem::of(c).unwrap()),
+      )
+      .with_tight(tight)
+      .pack()
+    },
+  )
 }
 
 ///|
@@ -1302,7 +1351,6 @@ fn finish_list_like(
     .iter()
     .filter(pair => pair.0.is_(item_elem))
     .map(pair => pair.1)
-    .collect()
   let trunk = StyleChain::trunk(styles).unwrap()
   let trunk_depth = trunk.depth()
   let children = []
@@ -1388,7 +1436,7 @@ fn find_regex_match_in_elems(elems : ArrayView[Pair]) -> RegexMatch? {
   if leftmost is None {
     leftmost = find_regex_match_in_str(buf.join(""), current)
   }
-  leftmost.map(m => { ..m, offset: base + m.offset })
+  leftmost.map(m => { ..m, offset: base + m.offset, })
 }
 
 ///|
@@ -1441,7 +1489,7 @@ fn find_regex_match_in_str(text : String, styles : StyleChain) -> RegexMatch? {
   }
   leftmost.map(found => {
     let (m, id, recipe) = found
-    { offset: m.start, text: m.text, id, recipe, styles }
+    { offset: m.start, text: m.text, id, recipe, styles, }
   })
 }
 
@@ -1512,8 +1560,10 @@ fn visit_regex_match(
     if m is Some({ text, styles, id, recipe, .. }) {
       m = None
       let matched_text = if match_end <= elem_end &&
-        (content.is_(@library.text_elem()) ||
-        content.is_(@library.symbol_elem())) {
+        (
+          content.is_(@library.text_elem()) ||
+          content.is_(@library.symbol_elem())
+        ) {
         // If the match is fully contained within one sliceable element,
         // we slice it to retain its element type and span/label.
         slice_textual(content, match_start - elem_start, match_end - elem_start)

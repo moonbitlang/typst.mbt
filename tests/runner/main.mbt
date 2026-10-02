@@ -21,6 +21,7 @@ fn main {
       run_stage("syntax", (_, tc) => syntax_report(tc.body), filter, verbose)
     "ast" => run_stage("ast", (_, tc) => ast_report(tc.body), filter, verbose)
     "eval" => run_stage("eval", eval_report, filter, verbose)
+    "realize" => run_stage("realize", realize_report, filter, verbose)
     _ => {
       println("unknown stage: \{stage}")
       @sys.exit(2)
