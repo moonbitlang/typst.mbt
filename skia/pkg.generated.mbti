@@ -1,0 +1,368 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/skia"
+
+import {
+  "moonbitlang/core/debug",
+  "moonbitlang/typst/codecs",
+  "moonbitlang/typst/skia/path",
+}
+
+// Values
+pub let alpha_u8_opaque : Int
+
+pub let alpha_u8_transparent : Int
+
+pub let bytes_per_pixel : Int
+
+pub let color_black : Color
+
+pub let color_transparent : Color
+
+pub let color_white : Color
+
+pub fn f32_to_u16(Float) -> Int
+
+pub fn f32_to_u8(Float) -> Int
+
+pub let premultiplied_color_u8_transparent : PremultipliedColorU8
+
+pub fn premultiply_u8(Int, Int) -> Int
+
+// Errors
+
+// Types and methods
+type AAMaskCtx
+
+type AlphaRuns
+
+type AntiHairBlitter
+
+type BasicEdgeBuilder
+
+pub(all) enum BlendMode {
+  Clear
+  Source
+  Destination
+  SourceOver
+  DestinationOver
+  SourceIn
+  DestinationIn
+  SourceOut
+  DestinationOut
+  SourceAtop
+  DestinationAtop
+  Xor
+  Plus
+  Modulate
+  Screen
+  Overlay
+  Darken
+  Lighten
+  ColorDodge
+  ColorBurn
+  HardLight
+  SoftLight
+  Difference
+  Exclusion
+  Multiply
+  Hue
+  Saturation
+  Color
+  Luminosity
+} derive(Eq, @debug.Debug)
+pub impl Default for BlendMode
+
+type BlitMask
+
+type BlitterKind
+
+pub(all) struct Color {
+  r : Float
+  g : Float
+  b : Float
+  a : Float
+} derive(Eq, @debug.Debug)
+pub fn Color::alpha(Self) -> Float
+pub fn Color::apply_opacity(Self, Float) -> Self
+pub fn Color::blue(Self) -> Float
+pub fn Color::from_rgba(Float, Float, Float, Float) -> Self?
+pub fn Color::from_rgba8(Int, Int, Int, Int) -> Self
+pub fn Color::from_rgba_unchecked(Float, Float, Float, Float) -> Self
+pub fn Color::green(Self) -> Float
+pub fn Color::is_opaque(Self) -> Bool
+pub fn Color::premultiply(Self) -> PremultipliedColor
+pub fn Color::red(Self) -> Float
+pub fn Color::to_color_u8(Self) -> ColorU8
+pub fn Color::with_alpha(Self, Float) -> Self
+
+pub(all) enum ColorSpace {
+  Linear
+  Gamma2
+  SimpleSRGB
+  FullSRGBGamma
+} derive(Eq, @debug.Debug)
+pub impl Default for ColorSpace
+
+pub(all) struct ColorU8(UInt) derive(Eq, @debug.Debug)
+pub fn ColorU8::alpha(Self) -> Int
+pub fn ColorU8::blue(Self) -> Int
+pub fn ColorU8::from_rgba(Int, Int, Int, Int) -> Self
+pub fn ColorU8::green(Self) -> Int
+pub fn ColorU8::is_opaque(Self) -> Bool
+pub fn ColorU8::premultiply(Self) -> PremultipliedColorU8
+pub fn ColorU8::red(Self) -> Int
+
+type Combine derive(Eq)
+
+type Context
+
+type Cubic64
+
+type DrawTiler
+
+type Edge
+
+type EdgeClipper
+
+type EdgeClipperIter
+
+type EdgeKind derive(Eq)
+
+type EvenlySpaced2StopGradientCtx
+
+pub(all) enum FillRule {
+  Winding
+  EvenOdd
+} derive(Eq, @debug.Debug)
+pub impl Default for FillRule
+
+pub(all) enum FilterQuality {
+  Nearest
+  Bilinear
+  Bicubic
+} derive(Eq, @debug.Debug)
+
+type FixedRect
+
+type FocalData derive(Eq)
+
+pub(all) struct Gradient {
+  stops : Array[GradientStop]
+  tile_mode : SpreadMode
+  transform : @path.Transform
+  points_to_unit : @path.Transform
+  colors_are_opaque : Bool
+  has_uniform_stops : Bool
+}
+
+type GradientColor derive(Eq)
+
+type GradientCtx
+
+pub(all) struct GradientStop {
+  position : Float
+  color : Color
+} derive(Eq)
+pub fn GradientStop::new(Float, Color) -> Self
+
+type GradientType
+
+type HighpPipeline
+
+pub(all) struct LinearGradient {
+  base : Gradient
+}
+pub fn LinearGradient::new(@path.Point, @path.Point, Array[GradientStop], SpreadMode, @path.Transform) -> Shader?
+
+type LowpPipeline
+
+pub struct Mask {
+  data : FixedArray[Byte]
+  size : @path.IntSize
+}
+pub fn Mask::clear(Self) -> Unit
+pub fn Mask::clone(Self) -> Self
+pub fn Mask::data(Self) -> FixedArray[Byte]
+pub fn Mask::fill_path(Self, @path.Path, FillRule, Bool, @path.Transform) -> Unit
+pub fn Mask::from_pixmap(Pixmap, MaskType) -> Self
+pub fn Mask::from_vec(FixedArray[Byte], @path.IntSize) -> Self?
+pub fn Mask::height(Self) -> Int
+pub fn Mask::intersect_path(Self, @path.Path, FillRule, Bool, @path.Transform) -> Unit
+pub fn Mask::invert(Self) -> Unit
+pub fn Mask::new(UInt, UInt) -> Self?
+pub fn Mask::size(Self) -> @path.IntSize
+pub fn Mask::width(Self) -> Int
+
+type MaskCtx
+
+pub(all) enum MaskType {
+  Alpha
+  Luminance
+} derive(Eq, @debug.Debug)
+
+pub(all) struct Paint {
+  mut shader : Shader
+  mut blend_mode : BlendMode
+  mut anti_alias : Bool
+  mut colorspace : ColorSpace
+  mut force_hq_pipeline : Bool
+}
+pub fn Paint::clone(Self) -> Self
+pub fn Paint::is_solid_color(Self) -> Bool
+pub fn Paint::set_color(Self, Color) -> Unit
+pub fn Paint::set_color_rgba8(Self, Int, Int, Int, Int) -> Unit
+pub impl Default for Paint
+
+type PathEdge
+
+type PathEdgeIter
+
+pub(all) struct Pattern {
+  pixmap : Pixmap
+  quality : FilterQuality
+  spread_mode : SpreadMode
+  opacity : Float
+  transform : @path.Transform
+}
+pub fn Pattern::new(Pixmap, SpreadMode, FilterQuality, Float, @path.Transform) -> Shader
+
+pub struct Pixmap {
+  data : FixedArray[UInt]
+  size : @path.IntSize
+}
+pub fn Pixmap::apply_mask(Self, Mask) -> Unit
+pub fn Pixmap::clone(Self) -> Self
+pub fn Pixmap::clone_rect(Self, @path.IntRect) -> Self?
+pub fn Pixmap::data(Self) -> Bytes
+pub fn Pixmap::decode_png(BytesView) -> Self raise @codecs.ImageError
+pub fn Pixmap::draw_pixmap(Self, Int, Int, Self, PixmapPaint, @path.Transform, Mask?) -> Unit
+pub fn Pixmap::encode_png(Self) -> Bytes
+pub fn Pixmap::fill(Self, Color) -> Unit
+pub fn Pixmap::fill_path(Self, @path.Path, Paint, FillRule, @path.Transform, Mask?) -> Unit
+pub fn Pixmap::fill_rect(Self, @path.Rect, Paint, @path.Transform, Mask?) -> Unit
+pub fn Pixmap::from_bytes(BytesView, UInt, UInt) -> Self?
+pub fn Pixmap::from_vec(FixedArray[UInt], @path.IntSize) -> Self?
+pub fn Pixmap::height(Self) -> Int
+pub fn Pixmap::new(UInt, UInt) -> Self?
+pub fn Pixmap::pixel(Self, UInt, UInt) -> PremultipliedColorU8?
+pub fn Pixmap::pixels(Self) -> FixedArray[UInt]
+pub fn Pixmap::size(Self) -> @path.IntSize
+pub fn Pixmap::stroke_path(Self, @path.Path, Paint, @path.Stroke, @path.Transform, Mask?) -> Unit
+pub fn Pixmap::take_demultiplied(Self) -> Bytes
+pub fn Pixmap::width(Self) -> Int
+
+pub(all) struct PixmapPaint {
+  opacity : Float
+  blend_mode : BlendMode
+  quality : FilterQuality
+}
+pub impl Default for PixmapPaint
+
+type Point64 derive(Eq)
+
+pub(all) struct PremultipliedColor {
+  r : Float
+  g : Float
+  b : Float
+  a : Float
+} derive(Eq, @debug.Debug)
+pub fn PremultipliedColor::alpha(Self) -> Float
+pub fn PremultipliedColor::blue(Self) -> Float
+pub fn PremultipliedColor::demultiply(Self) -> Color
+pub fn PremultipliedColor::green(Self) -> Float
+pub fn PremultipliedColor::red(Self) -> Float
+pub fn PremultipliedColor::to_color_u8(Self) -> PremultipliedColorU8
+
+pub(all) struct PremultipliedColorU8(UInt) derive(Eq, @debug.Debug)
+pub fn PremultipliedColorU8::alpha(Self) -> Int
+pub fn PremultipliedColorU8::blue(Self) -> Int
+pub fn PremultipliedColorU8::demultiply(Self) -> ColorU8
+pub fn PremultipliedColorU8::from_rgba(Int, Int, Int, Int) -> Self?
+pub fn PremultipliedColorU8::from_rgba_unchecked(Int, Int, Int, Int) -> Self
+pub fn PremultipliedColorU8::green(Self) -> Int
+pub fn PremultipliedColorU8::is_opaque(Self) -> Bool
+pub fn PremultipliedColorU8::red(Self) -> Int
+
+pub(all) struct RadialGradient {
+  base : Gradient
+  // private fields
+}
+pub fn RadialGradient::new(@path.Point, Float, @path.Point, Float, Array[GradientStop], SpreadMode, @path.Transform) -> Shader?
+
+type RasterPipeline
+
+type RasterPipelineBlitter
+
+type RasterPipelineBuilder
+
+type RectClipBlitter
+
+type SamplerCtx
+
+pub struct ScreenIntRect {
+  x : Int
+  y : Int
+  width : Int
+  height : Int
+} derive(Eq, @debug.Debug)
+pub fn ScreenIntRect::bottom(Self) -> Int
+pub fn ScreenIntRect::contains(Self, Self) -> Bool
+pub fn ScreenIntRect::from_xywh(UInt, UInt, UInt, UInt) -> Self?
+pub fn ScreenIntRect::height(Self) -> Int
+pub fn ScreenIntRect::left(Self) -> Int
+pub fn ScreenIntRect::right(Self) -> Int
+pub fn ScreenIntRect::size(Self) -> @path.IntSize
+pub fn ScreenIntRect::to_int_rect(Self) -> @path.IntRect
+pub fn ScreenIntRect::to_rect(Self) -> @path.Rect
+pub fn ScreenIntRect::top(Self) -> Int
+pub fn ScreenIntRect::width(Self) -> Int
+pub fn ScreenIntRect::x(Self) -> Int
+pub fn ScreenIntRect::y(Self) -> Int
+
+type SearchAxis derive(Eq)
+
+pub(all) enum Shader {
+  SolidColor(Color)
+  LinearGradient(LinearGradient)
+  RadialGradient(RadialGradient)
+  SweepGradient(SweepGradient)
+  Pattern(Pattern)
+}
+pub fn Shader::apply_opacity(Self, Float) -> Self
+pub fn Shader::is_opaque(Self) -> Bool
+pub fn Shader::transform(Self, @path.Transform) -> Self
+
+type ShiftedIntRect
+
+pub(all) enum SpreadMode {
+  Pad
+  Reflect
+  Repeat
+} derive(Eq, @debug.Debug)
+pub impl Default for SpreadMode
+
+type Stage derive(Eq, @debug.Debug)
+
+type SubMaskRef
+
+type SubPixmapMut
+
+type SuperBlitter
+
+pub(all) struct SweepGradient {
+  base : Gradient
+  t0 : Float
+  t1 : Float
+}
+pub fn SweepGradient::new(@path.Point, Float, Float, Array[GradientStop], SpreadMode, @path.Transform) -> Shader?
+
+type TileCtx
+
+type TwoPointConicalGradientCtx
+
+type UniformColorCtx
+
+// Type aliases
+
+// Traits
+trait Blitter
