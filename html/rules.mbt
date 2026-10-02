@@ -534,37 +534,90 @@ fn footnote_entry_rule(
 }
 
 ///|
-/// TODO: Upstream builds a `<nav role="doc-toc">` with the outline's title
-/// and nested `<ol>`s of the entries (`OutlineElem::realize_title`,
-/// `realize_tree`), which are not ported yet.
 fn outline_rule(
   elem : @library.OutlineElem,
-  _ : @library.Engine,
-  _ : @library.StyleChain,
+  engine : @library.Engine,
+  styles : @library.StyleChain,
 ) -> @library.Content raise @library.SourceError {
-  unported(elem, "`OutlineElem::realize_tree`")
+  let title = elem.realize_title(styles)
+  let tree = elem.realize_tree(engine, styles)
+  let list = outline_convert_list(tree)
+  block_packed(
+    html_elem(
+      @library.tag_nav,
+      title.unwrap_or(@library.Content::empty()).add(list),
+    )
+    .with_attr(@library.attr_role, "doc-toc")
+    .pack()
+    .spanned(elem.pack().span()),
+  )
 }
 
 ///|
-/// TODO: Upstream links the entry body (with a `<span class="prefix">` for
-/// the numbering prefix) to the element's location (`OutlineEntry::body`,
-/// `prefix`, `element_location`), which are not ported yet.
+fn outline_convert_list(
+  list : Array[@library.OutlineNode[@library.OutlineEntry]],
+) -> @library.Content {
+  // The Digital Publishing ARIA spec also proposed to add `role="directory"`
+  // to the `<ol>` element, but this role is deprecated, so we don't do that.
+  // The elements are already easily selectable via `nav[role="doc-toc"] ol`.
+  html_elem(
+    @library.tag_ol,
+    @library.Content::sequence(list.map(outline_convert_node)),
+  )
+  .with_css(@library.CssProperties::new().with_("list-style-type", "none"))
+  .pack()
+}
+
+///|
+fn outline_convert_node(
+  node : @library.OutlineNode[@library.OutlineEntry],
+) -> @library.Content {
+  let body = if !node.children.is_empty() {
+    // The `<div>` is not technically necessary, but otherwise it auto-wraps
+    // in a `<p>`, which results in bad spacing. Perhaps, we can remove this
+    // in the future. See also:
+    // <https://github.com/typst/typst/issues/5907>
+    html_elem(@library.tag_div, node.entry.pack())
+    .pack()
+    .add(outline_convert_list(node.children))
+  } else {
+    node.entry.pack()
+  }
+  html_elem(@library.tag_li, body).pack()
+}
+
+///|
 fn outline_entry_rule(
   elem : @library.OutlineEntry,
-  _ : @library.Engine,
-  _ : @library.StyleChain,
+  engine : @library.Engine,
+  styles : @library.StyleChain,
 ) -> @library.Content raise @library.SourceError {
-  unported(elem, "`OutlineEntry::body`")
+  let span = elem.pack().span()
+  let context = @library.Context::new(styles~)
+  let mut realized = @library.at(span, () => elem.body())
+  if elem.prefix(engine, context, span) is Some(prefix) {
+    let wrapped = html_elem(@library.tag_span, prefix)
+      .with_attr(@library.attr_class, "prefix")
+      .pack()
+      .spanned(span)
+    let separator = match @library.FigureElem::of(elem.element()) {
+      Some(elem) => elem.resolve_separator(styles)
+      None => @library.SpaceElem::shared()
+    }
+    realized = @library.Content::sequence([wrapped, separator, realized])
+  }
+  let loc = @library.at(span, () => elem.element_location())
+  let dest = @library.Destination::Location(loc)
+  @library.LinkElem::new(Dest(dest), realized).pack()
 }
 
 ///|
-/// TODO: Upstream calls `RefElem::realize`, which is not ported yet.
 fn ref_rule(
   elem : @library.RefElem,
-  _ : @library.Engine,
-  _ : @library.StyleChain,
+  engine : @library.Engine,
+  styles : @library.StyleChain,
 ) -> @library.Content raise @library.SourceError {
-  unported(elem, "`RefElem::realize`")
+  elem.realize(engine, styles)
 }
 
 ///|

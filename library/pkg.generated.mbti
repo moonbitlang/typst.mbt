@@ -5671,6 +5671,7 @@ pub fn FootnoteElem::alt_text(StyleChain, String) -> String
 pub fn FootnoteElem::body(Self) -> FootnoteBody
 pub fn FootnoteElem::body_content(Self) -> Content?
 pub fn FootnoteElem::declaration_location(Self, Engine) -> Location raise HintedError
+pub fn FootnoteElem::into_ref(Self, Label) -> Self
 pub fn FootnoteElem::is_ref(Self) -> Bool
 pub fn FootnoteElem::new(FootnoteBody) -> Self
 pub fn FootnoteElem::numbering(Self, StyleChain) -> Numbering
@@ -7616,6 +7617,9 @@ pub fn OutlineElem::indent_local(Self) -> Smart[OutlineIndent]?
 pub fn OutlineElem::new() -> Self
 pub fn OutlineElem::of(Content) -> Self?
 pub fn OutlineElem::pack(Self) -> Content
+pub fn OutlineElem::realize_flat(Self, Engine, StyleChain) -> Array[OutlineEntry] raise SourceError
+pub fn OutlineElem::realize_title(Self, StyleChain) -> Content?
+pub fn OutlineElem::realize_tree(Self, Engine, StyleChain) -> Array[OutlineNode[OutlineEntry]] raise SourceError
 pub fn OutlineElem::set_depth(NonZeroUSize?) -> Style
 pub fn OutlineElem::set_indent(Smart[OutlineIndent]) -> Style
 pub fn OutlineElem::set_target(LocatableSelector) -> Style
@@ -7636,6 +7640,7 @@ pub impl NativeElement for OutlineElem
 pub impl Reflect for OutlineElem
 
 pub struct OutlineEntry(Content)
+pub fn OutlineEntry::body(Self) -> Content raise HintedError
 pub fn OutlineEntry::build_inner(Self, Context, @syntax.Span, Content, Content) -> Content raise SourceError
 pub fn OutlineEntry::element(Self) -> Content
 pub fn OutlineEntry::element_location(Self) -> Location raise HintedError
@@ -7647,6 +7652,7 @@ pub fn OutlineEntry::new(NonZeroUSize, Content) -> Self
 pub fn OutlineEntry::of(Content) -> Self?
 pub fn OutlineEntry::pack(Self) -> Content
 pub fn OutlineEntry::parent_in(StyleChain) -> OutlineElem?
+pub fn OutlineEntry::prefix(Self, Engine, Context, @syntax.Span) -> Content? raise SourceError
 pub fn OutlineEntry::set_fill(Content?) -> Style
 pub fn OutlineEntry::set_parent(OutlineElem?) -> Style
 pub fn OutlineEntry::with_element(Self, Content) -> Self
@@ -7664,6 +7670,13 @@ pub(all) enum OutlineIndent {
 pub impl FromValue for OutlineIndent
 pub impl IntoValue for OutlineIndent
 pub impl Reflect for OutlineIndent
+
+pub(all) struct OutlineNode[T] {
+  entry : T
+  level : NonZeroUSize
+  children : Array[OutlineNode[T]]
+}
+pub fn[T] OutlineNode::build_tree(ArrayView[(T, NonZeroUSize, Bool)]) -> Array[Self[T]]
 
 pub struct OverbraceElem(Content)
 pub fn OverbraceElem::annotation(Self, StyleChain) -> Content?
@@ -8619,6 +8632,7 @@ pub fn RefElem::form_local(Self) -> RefForm?
 pub fn RefElem::new(Label) -> Self
 pub fn RefElem::of(Content) -> Self?
 pub fn RefElem::pack(Self) -> Content
+pub fn RefElem::realize(Self, Engine, StyleChain) -> Content raise SourceError
 pub fn RefElem::set_form(RefForm) -> Style
 pub fn RefElem::set_supplement(Smart[Supplement?]) -> Style
 pub fn RefElem::supplement(Self, StyleChain) -> Smart[Supplement?]
