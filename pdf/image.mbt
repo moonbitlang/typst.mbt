@@ -1,8 +1,11 @@
 // Port of `typst-pdf/src/image.rs`.
 //
-// TODO: SVG images (upstream draws them with `krilla-svg`) and PDF images
-// (embedded pages) are not ported yet; they are skipped. GIF and WebP
-// images are not decoded by the library yet and are skipped as well.
+// SVG images are drawn with the port of `krilla-svg` (`svg*.mbt`); PDF
+// images are embedded as form XObjects extracted with the port of
+// `hayro-write` (`hayro/write`), like krilla's `draw_pdf_page`.
+//
+// TODO: GIF and WebP images are not decoded by the library yet and are
+// skipped.
 
 ///|
 fn handle_image(
@@ -44,7 +47,21 @@ fn handle_image(
       }
       surface.pop()
     }
-    Svg(_) | Pdf(_) => ()
+    Svg(svg) =>
+      if to_export_size(size) is Some(size) {
+        draw_svg(
+          surface,
+          svg.tree(),
+          size,
+          { ..SvgSettings::default(), embed_text: true, },
+          gc.svg_fonts,
+        )
+        |> ignore
+      }
+    Pdf(pdf) =>
+      if to_export_size(size) is Some(size) {
+        draw_pdf_page(gc, surface, pdf, size, span)
+      }
   }
   if started {
     surface.end_tagged()
@@ -54,9 +71,112 @@ fn handle_image(
 }
 
 ///|
+/// Draw a page of a PDF (krilla's `Surface::draw_pdf_page`; the page is
+/// extracted with the port of `hayro-write`).
+fn draw_pdf_page(
+  gc : GlobalContext,
+  surface : @export.Surface,
+  image : @library.PdfImage,
+  size : @export.Size,
+  span : @syntax.Span,
+) -> Unit raise @library.SourceError {
+  let document = image.document()
+  let pdf = document.pdf()
+  let page_idx = image.page_index()
+  let doc_key = bytes_key(document.data())
+
+  // krilla checks the version when serializing the embedded document.
+  let pdf_version = convert_hayro_pdf_version(pdf.version())
+  if gc.options.version() < pdf_version {
+    let embedded = pdf_version.as_str()
+    let target = gc.options.version().as_str()
+    raise @library.SourceError([
+      @library.SourceDiagnostic::error_at(
+        span, "the version of the PDF is too high",
+      ).with_hints([
+        "the current export target is \{target}, while the PDF has version \{embedded}",
+        "raise the export target to \{embedded} or higher",
+        "or preprocess the PDF to convert it to a lower version",
+      ]),
+    ])
+  }
+
+  // If the user provided an invalid page index, we will detect this later on anyway, so
+  // just use dummy dimensions here.
+  let (page_width, page_height) = match pdf.pages().get(page_idx) {
+    Some(p) => p.render_dimensions()
+    None => (Float::from_int(1), Float::from_int(1))
+  }
+  let page_width = page_width.to_double()
+  let page_height = page_height.to_double()
+  let transform = @export.Transform::from_scale(
+    size.width / page_width,
+    size.height / page_height,
+  )
+  // We applied a transform to invert the y-axis initially, but since the embedded PDF also uses
+  // a y-up coordinate system, we need to "invert" this.
+  surface.push_transform(transform)
+  surface.push_transform(
+    @export.Transform::from_row(1.0, 0.0, 0.0, -1.0, 0.0, page_height),
+  )
+  surface.draw_external_xobject({
+    key: "\{doc_key}:\{page_idx}",
+    bbox: @export.Rect::from_xywh(0.0, 0.0, page_width, page_height).unwrap(),
+    write: (root, new_ref, put) => {
+      // All pages of a document share one extraction context, so that
+      // shared objects are written once (like krilla, which extracts all
+      // queries of a document together).
+      let ctx = match gc.pdf_extractions.get(doc_key) {
+        Some(ctx) => ctx
+        None => {
+          let ctx = @hayro_write.ExtractionContext::new(
+            pdf,
+            new_ref,
+            put,
+            page_tree_parent_ref=surface.page_tree_ref(),
+          )
+          gc.pdf_extractions[doc_key] = ctx
+          ctx
+        }
+      }
+      ctx.extract_query_into(
+        @hayro_write.ExtractionQuery::new_xobject(page_idx),
+        root,
+      )
+      |> ignore
+      ctx.write_dependencies()
+    },
+  })
+  surface.pop()
+  surface.pop()
+}
+
+///|
+fn convert_hayro_pdf_version(
+  version : @hayro_syntax.PdfVersion,
+) -> @export.PdfVersion {
+  match version {
+    // Those are obviously not right, but we don't support versions lower than 1.4 in krilla.
+    // Since we only need this conversion to detect version mismatches (in which case the
+    // version of the embedded PDF has to be higher than 1.4), this hack is sufficient for our
+    // purposes.
+    Pdf10 | Pdf11 | Pdf12 | Pdf13 | Pdf14 => Pdf14
+    Pdf15 => Pdf15
+    Pdf16 => Pdf16
+    Pdf17 => Pdf17
+    Pdf20 => Pdf20
+  }
+}
+
+///|
 /// A key identifying the raster data of an image.
 fn raster_key(raster : @library.RasterImage) -> String {
-  let data = raster.data()
+  bytes_key(raster.data())
+}
+
+///|
+/// A key identifying image data.
+fn bytes_key(data : Bytes) -> String {
   // FNV-1a over the data.
   let mut h = 0xcbf29ce484222325UL
   for b in data {
@@ -76,25 +196,9 @@ fn convert_raster(
   let width = raster.width().reinterpret_as_int()
   let height = raster.height().reinterpret_as_int()
   if raster.format() == Exchange(Jpg) {
-    let (components, adobe, dims) = jpeg_components(raster.data())
-    // The image is embedded as is, so use the dimensions of the frame (the
-    // raster's dimensions have the EXIF orientation applied).
-    let (width, height) = dims.unwrap_or((width, height))
-    let colorspace : @export.ImageColorspace = match components {
-      1 => Luma
-      4 => Cmyk
-      _ => Rgb
-    }
-    return Ok({
-      key,
-      width,
-      height,
-      colorspace,
-      data: Jpeg(raster.data()),
-      icc: raster.icc(),
-      interpolate,
-      inverted_cmyk: adobe,
-    })
+    return Ok(
+      convert_jpeg(key, raster.data(), width, height, raster.icc(), interpolate),
+    )
   }
   // The decoded pixels (decoding PNGs here if the image was not decoded).
   let (color, buf) : (@codecs.ColorType, Bytes) = match raster.dynamic() {
@@ -109,51 +213,8 @@ fn convert_raster(
         return Err(None)
       }
   }
-  let channels = color.channel_count()
-  let sixteen = color is (L16 | La16 | Rgb16 | Rgba16)
-  let has_alpha = color is (La8 | Rgba8 | La16 | Rgba16)
-  let has_color = channels >= 3
-  let bpc = if sixteen { 2 } else { 1 }
-  let n = width * height
-  if buf.length() < n * channels * bpc {
-    return Err(Some("image data is truncated"))
-  }
-  let color_buf = Array::make(n * (if has_color { 3 } else { 1 }), b'\x00')
-  let alpha_buf = Array::make(if has_alpha { n } else { 0 }, b'\x00')
-  let color_channels = if has_color { 3 } else { 1 }
-  for p in 0..<n {
-    let base = p * channels * bpc
-    for c in 0..<color_channels {
-      // 16-bit samples are big-endian; keep the high byte.
-      color_buf[p * color_channels + c] = buf[base + c * bpc]
-    }
-    if has_alpha {
-      alpha_buf[p] = buf[base + (channels - 1) * bpc]
-    }
-  }
   // The ICC profile is only kept for 8-bit images that are used as is.
-  let icc = if sixteen { None } else { raster.icc() }
-  Ok({
-    key,
-    width,
-    height,
-    colorspace: if has_color {
-      Rgb
-    } else {
-      Luma
-    },
-    data: Samples(
-      Bytes::from_array(color_buf),
-      if has_alpha {
-        Some(Bytes::from_array(alpha_buf))
-      } else {
-        None
-      },
-    ),
-    icc,
-    interpolate,
-    inverted_cmyk: false,
-  })
+  convert_samples(key, width, height, color, buf, raster.icc(), interpolate)
 }
 
 ///|
@@ -267,4 +328,92 @@ fn jpeg_components(data : Bytes) -> (Int, Bool, (Int, Int)?) {
     i += 2 + len
   }
   (3, adobe, None)
+}
+
+///|
+/// Convert decoded pixels into an image.
+fn convert_samples(
+  key : String,
+  width : Int,
+  height : Int,
+  color : @codecs.ColorType,
+  buf : Bytes,
+  icc : Bytes?,
+  interpolate : Bool,
+) -> Result[@export.Image, String?] {
+  let channels = color.channel_count()
+  let sixteen = color is (L16 | La16 | Rgb16 | Rgba16)
+  let has_alpha = color is (La8 | Rgba8 | La16 | Rgba16)
+  let has_color = channels >= 3
+  let bpc = if sixteen { 2 } else { 1 }
+  let n = width * height
+  if buf.length() < n * channels * bpc {
+    return Err(Some("image data is truncated"))
+  }
+  let color_buf = Array::make(n * (if has_color { 3 } else { 1 }), b'\x00')
+  let alpha_buf = Array::make(if has_alpha { n } else { 0 }, b'\x00')
+  let color_channels = if has_color { 3 } else { 1 }
+  for p in 0..<n {
+    let base = p * channels * bpc
+    for c in 0..<color_channels {
+      // 16-bit samples are big-endian; keep the high byte.
+      color_buf[p * color_channels + c] = buf[base + c * bpc]
+    }
+    if has_alpha {
+      alpha_buf[p] = buf[base + (channels - 1) * bpc]
+    }
+  }
+  let icc = if sixteen { None } else { icc }
+  Ok({
+    key,
+    width,
+    height,
+    colorspace: if has_color {
+      Rgb
+    } else {
+      Luma
+    },
+    data: Samples(
+      Bytes::from_array(color_buf),
+      if has_alpha {
+        Some(Bytes::from_array(alpha_buf))
+      } else {
+        None
+      },
+    ),
+    icc,
+    interpolate,
+    inverted_cmyk: false,
+  })
+}
+
+///|
+/// Embed a JPEG image as is.
+fn convert_jpeg(
+  key : String,
+  data : Bytes,
+  width : Int,
+  height : Int,
+  icc : Bytes?,
+  interpolate : Bool,
+) -> @export.Image {
+  let (components, adobe, dims) = jpeg_components(data)
+  // The image is embedded as is, so use the dimensions of the frame (the
+  // raster's dimensions have the EXIF orientation applied).
+  let (width, height) = dims.unwrap_or((width, height))
+  let colorspace : @export.ImageColorspace = match components {
+    1 => Luma
+    4 => Cmyk
+    _ => Rgb
+  }
+  {
+    key,
+    width,
+    height,
+    colorspace,
+    data: Jpeg(data),
+    icc,
+    interpolate,
+    inverted_cmyk: adobe,
+  }
 }

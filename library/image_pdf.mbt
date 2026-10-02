@@ -1,10 +1,5 @@
 // Port of `typst-library/src/visualize/image/pdf.rs`: `PdfDocument` and
-// `PdfImage`.
-//
-// TODO: Upstream reads PDFs with `hayro-syntax`. No PDF reader is ported
-// yet, so `PdfDocument::new` fails with a "not yet ported" error. A port
-// needs the page count, each page's render dimensions (crop box within the
-// media box, rotated) and whether the document has optional content groups.
+// `PdfImage`, on top of the `hayro-syntax` port.
 
 ///|
 /// An error while loading a PDF (upstream `hayro_syntax::LoadPdfError`).
@@ -13,23 +8,22 @@ pub(all) suberror LoadPdfError {
   Decryption
   /// The PDF is invalid.
   Invalid
-  /// Loading needs functionality that is not ported yet.
-  Unported(String)
 } derive(Debug)
 
 ///|
 /// A PDF document.
 pub struct PdfDocument {
+  /// The parsed document (`None` only for synthetic test documents).
+  priv pdf : @hayro_syntax.Pdf?
   priv data : Bytes
-  /// The render dimensions (width, height) of each page.
+  /// The render dimensions of the pages.
   priv pages : Array[(Float, Float)]
-  priv optional_content_groups : Bool
 }
 
 ///|
 /// A PDF document is identified by its data.
 pub impl Eq for PdfDocument with fn equal(self, other) {
-  self.data == other.data
+  physical_equal(self.data, other.data) || self.data == other.data
 }
 
 ///|
@@ -38,10 +32,42 @@ pub impl Hash for PdfDocument with fn hash_combine(self, hasher) {
 }
 
 ///|
+/// Cache of loaded documents (upstream memoizes `PdfDocument::new`).
+let pdf_document_cache : Map[Bytes, PdfDocument] = Map::new()
+
+///|
 /// Loads a PDF document.
 pub fn PdfDocument::new(data : Bytes) -> PdfDocument raise LoadPdfError {
-  ignore(data)
-  raise Unported("PDF images are not yet ported (needs a PDF reader)")
+  if pdf_document_cache.get(data) is Some(doc) {
+    return doc
+  }
+  let pdf = match @hayro_syntax.Pdf::new(data) {
+    Ok(pdf) => pdf
+    Err(Decryption(_)) => raise Decryption
+    Err(Invalid) => raise Invalid
+  }
+  let pages = pdf.pages().iter().map(p => p.render_dimensions()).collect()
+  let doc = { pdf: Some(pdf), data, pages, }
+  pdf_document_cache[data] = doc
+  doc
+}
+
+///|
+/// A document with the given page sizes that is not parsed (test use only).
+pub fn PdfDocument::synthetic(
+  data : Bytes,
+  pages : Array[(Float, Float)],
+) -> PdfDocument {
+  { pdf: None, data, pages, }
+}
+
+///|
+/// Returns the underlying PDF document.
+pub fn PdfDocument::pdf(self : PdfDocument) -> @hayro_syntax.Pdf {
+  match self.pdf {
+    Some(pdf) => pdf
+    None => abort("synthetic PDF document")
+  }
 }
 
 ///|
@@ -60,7 +86,7 @@ pub fn PdfDocument::num_pages(self : PdfDocument) -> Int {
 /// Whether the document has optional content groups (upstream
 /// `pdf.xref().has_optional_content_groups()`).
 pub fn PdfDocument::has_optional_content_groups(self : PdfDocument) -> Bool {
-  self.optional_content_groups
+  self.pdf is Some(pdf) && pdf.xref().has_optional_content_groups()
 }
 
 ///|
@@ -88,10 +114,9 @@ pub impl Hash for PdfImage with fn hash_combine(self, hasher) {
 ///
 /// Returns `None` if the page index is not valid.
 pub fn PdfImage::new(document : PdfDocument, page_index : Int) -> PdfImage? {
-  if page_index < 0 || page_index >= document.pages.length() {
+  guard document.pages.get(page_index) is Some((width, height)) else {
     return None
   }
-  let (width, height) = document.pages[page_index]
   Some({ document, page_index, width, height, })
 }
 
@@ -99,6 +124,12 @@ pub fn PdfImage::new(document : PdfDocument, page_index : Int) -> PdfImage? {
 /// Returns the underlying Typst PDF document.
 pub fn PdfImage::document(self : PdfImage) -> PdfDocument {
   self.document
+}
+
+///|
+/// Returns the PDF page of the image.
+pub fn PdfImage::page(self : PdfImage) -> @hayro_syntax.Page {
+  self.document.pdf().pages()[self.page_index]
 }
 
 ///|

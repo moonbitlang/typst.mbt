@@ -1,0 +1,5 @@
+import {
+  "moonbitlang/x/codec/base64",
+}
+
+warnings = "-deprecated"

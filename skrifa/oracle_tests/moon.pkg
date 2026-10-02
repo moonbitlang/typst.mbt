@@ -1,0 +1,14 @@
+import {
+  "moonbitlang/typst/font_types",
+  "moonbitlang/typst/read_fonts",
+  "moonbitlang/typst/read_fonts/ps",
+  "moonbitlang/typst/skrifa",
+  "moonbitlang/core/buffer",
+}
+
+import {
+  "moonbitlang/typst/hayro/syntax",
+  "moonbitlang/x/fs",
+} for "wbtest"
+
+supported_targets = "native"

@@ -1,0 +1,23 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/hayro/interpret/function"
+
+import {
+  "moonbitlang/typst/hayro/syntax",
+}
+
+// Values
+pub fn interpolate(Float, Float, Float, Float, Float) -> Float
+
+// Errors
+
+// Types and methods
+pub struct Function {
+  // private fields
+}
+pub fn Function::eval(Self, Array[Float]) -> Array[Float]?
+pub fn Function::new(@syntax.Object) -> Self?
+pub fn Function::stitching_bounds(Self) -> Array[Float]
+
+// Type aliases
+
+// Traits

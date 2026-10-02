@@ -48,7 +48,6 @@ pub fn PdfImage::synthetic(
   pages : Array[(Float, Float)],
   page_index : Int,
 ) -> PdfImage {
-  let document = { data, pages, optional_content_groups: false, }
-  let (width, height) = pages[page_index]
-  { document, page_index, width, height, }
+  let document = PdfDocument::synthetic(data, pages)
+  PdfImage::new(document, page_index).unwrap()
 }

@@ -1,0 +1,12 @@
+import {
+  "moonbitlang/typst/moxcms/pxfm",
+  "moonbitlang/core/encoding/utf8",
+  "moonbitlang/core/math",
+  "moonbitlang/core/cmp",
+}
+
+import {
+  "moonbitlang/x/fs",
+  "moonbitlang/core/encoding/utf8",
+  "moonbitlang/core/cmp",
+} for "test"

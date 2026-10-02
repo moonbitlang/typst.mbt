@@ -98,10 +98,9 @@ pub(all) suberror WebImageError {
 ///|
 /// Prepare an image for embedding in SVG or HTML.
 ///
-/// TODO: Not ported yet: PDF images (upstream renders the page to SVG with
-/// `hayro_svg`) and pixel images with an ICC profile (upstream embeds it as
-/// an `iCCP` chunk compressed with `flate2`'s default level). These raise a
-/// [WebImageError].
+/// TODO: Not ported yet: pixel images with an ICC profile (upstream embeds it
+/// as an `iCCP` chunk compressed with `flate2`'s default level). These raise
+/// a [WebImageError].
 pub fn WebImage::new(image : @library.Image) -> WebImage raise WebImageError {
   let (format, data) = match image.kind() {
     Raster(raster) =>
@@ -142,10 +141,7 @@ pub fn WebImage::new(image : @library.Image) -> WebImage raise WebImageError {
         }
       }
     Svg(svg) => (WebImageFormat::Svg, svg.data())
-    Pdf(_) =>
-      raise WebImageError(
-        "converting PDF images to SVG is not yet ported (needs `hayro_svg`)",
-      )
+    Pdf(pdf) => (WebImageFormat::Svg, @utf8.encode(pdf_to_svg(pdf)))
   }
   { format, data, }
 }
@@ -156,4 +152,47 @@ pub fn WebImage::new(image : @library.Image) -> WebImage raise WebImageError {
 /// The format of the URL is `data:{mime};base64,`.
 pub fn WebImage::to_base64_url(self : WebImage) -> String {
   "data:\{self.format.mime()};base64," + @base64.encode(self.data[:])
+}
+
+///|
+/// Select the substitute for one of the 14 PDF standard fonts
+/// (`typst_assets::pdf`).
+fn select_standard_font(font : @hayro_interpret.StandardFont) -> (Bytes, Int)? {
+  let bytes = match font {
+    Helvetica => @pdf_fonts.sans()
+    HelveticaBold => @pdf_fonts.sans_bold()
+    HelveticaOblique => @pdf_fonts.sans_italic()
+    HelveticaBoldOblique => @pdf_fonts.sans_bold_italic()
+    Courier => @pdf_fonts.fixed()
+    CourierBold => @pdf_fonts.fixed_bold()
+    CourierOblique => @pdf_fonts.fixed_italic()
+    CourierBoldOblique => @pdf_fonts.fixed_bold_italic()
+    TimesRoman => @pdf_fonts.serif()
+    TimesBold => @pdf_fonts.serif_bold()
+    TimesItalic => @pdf_fonts.serif_italic()
+    TimesBoldItalic => @pdf_fonts.serif_bold_italic()
+    ZapfDingBats => @pdf_fonts.ding_bats()
+    Symbol => @pdf_fonts.symbol()
+  }
+  Some((bytes, 0))
+}
+
+///|
+// Keep this in sync with `typst-png`!
+fn pdf_to_svg(pdf : @library.PdfImage) -> String {
+  let interpreter_settings : @hayro_interpret.InterpreterSettings = {
+    font_resolver: query => {
+      match query {
+        Standard(s) => select_standard_font(s)
+        Fallback(f) => select_standard_font(f.pick_standard_font())
+      }
+    },
+    cmap_resolver: _ => None,
+    warning_sink: _ => (),
+    render_annotations: false,
+  }
+  let cache = @hayro_svg.RenderCache::new()
+  @hayro_svg.convert(pdf.page(), cache, interpreter_settings, {
+    bg_color: [0, 0, 0, 0],
+  })
 }

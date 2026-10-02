@@ -1,0 +1,10 @@
+import {
+  "moonbitlang/core/bigint",
+}
+
+options(
+  targets: {
+    "fma_native.mbt": [ "native" ],
+    "fma_other.mbt": [ "not", "native" ],
+  },
+)

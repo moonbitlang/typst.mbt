@@ -40,6 +40,60 @@ pub fn zlib_decompress(
 }
 
 ///|
+/// Decompresses a zlib (or, if `!zlib`, a raw DEFLATE) stream like
+/// `flate2`'s `read_to_end` (used by hayro-syntax): input that ends
+/// prematurely yields the output decoded so far (a truncated stream is not an
+/// error), while corrupt data and a wrong checksum are errors.
+pub fn inflate_read_to_end(
+  data : BytesView,
+  zlib~ : Bool,
+) -> Bytes raise InflateError {
+  let mut input = data
+  if zlib {
+    if data.length() < 2 {
+      return b""
+    }
+    let cmf = data[0].to_int()
+    let flg = data[1].to_int()
+    if (cmf & 0x0F) != 8 || (cmf * 256 + flg) % 31 != 0 || (flg & 0x20) != 0 {
+      raise InflateError("invalid zlib header")
+    }
+    input = data[2:]
+  }
+  let inflater = @flate.Inflater::Inflater()
+  let out = Buffer()
+  let chunk = FixedArray::make(65536, b'\x00')
+  let mut done = false
+  while true {
+    let status = inflater.step_into(input, chunk) catch {
+      @flate.InflateError(_, msg) => raise InflateError(msg)
+    }
+    for i in 0..<inflater.last_produced() {
+      out.write_byte(chunk[i])
+    }
+    input = input[inflater.last_consumed():]
+    match status {
+      Done => {
+        done = true
+        break
+      }
+      NeedMoreOutput => continue
+      // Truncated stream: keep what was decoded.
+      NeedMoreInput => break
+    }
+  }
+  let out = out.to_bytes()
+  if zlib && done && input.length() >= 4 {
+    let checksum = Adler32::new()
+    checksum.write(out[:])
+    if checksum.finish() != u32_be(input, 0) {
+      raise InflateError("wrong checksum")
+    }
+  }
+  out
+}
+
+///|
 /// Decompresses a gzip stream, validating the CRC-32 and the size.
 pub fn gzip_decompress(data : BytesView) -> Bytes raise InflateError {
   @gzip.gunzip(data.to_owned()) catch {
