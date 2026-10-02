@@ -1,0 +1,72 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/hypher"
+
+import {
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub fn hyphenate(String, Lang) -> Array[String]
+
+pub fn hyphenate_bounded(String, Lang, Int, Int) -> Array[String]
+
+// Errors
+
+// Types and methods
+pub(all) enum Lang {
+  Afrikaans
+  Albanian
+  Assamese
+  Belarusian
+  Bengali
+  Bulgarian
+  Catalan
+  Croatian
+  Czech
+  Danish
+  Dutch
+  English
+  Estonian
+  Finnish
+  French
+  Galician
+  Georgian
+  German
+  Greek
+  Gujarati
+  Hindi
+  Hungarian
+  Icelandic
+  Italian
+  Kannada
+  Kurmanji
+  Latin
+  Lithuanian
+  Malayalam
+  Marathi
+  Mongolian
+  Norwegian
+  Oriya
+  Panjabi
+  Polish
+  Portuguese
+  Russian
+  Sanskrit
+  Serbian
+  Slovak
+  Slovenian
+  Spanish
+  Swedish
+  Tamil
+  Telugu
+  Turkish
+  Turkmen
+  Ukrainian
+} derive(Eq, Hash, @debug.Debug)
+pub fn Lang::bounds(Self) -> (Int, Int)
+pub fn Lang::from_iso(String) -> Self?
+pub fn Lang::hyphenation_character(Self) -> Char?
+
+// Type aliases
+
+// Traits
