@@ -487,6 +487,22 @@ instancing (krilla instantiates variable fonts), SVG-in-OpenType glyphs
 (outline fallback), CFF subsetting, ICC-based colors/output intents for
 PDF/A, GIF/WebP decoding.
 
+**krilla-svg** (`pdf/svg*.mbt`, port of krilla-svg 0.8.1: `svg` (lib:
+`draw_svg`, `render_svg_glyph`), `svg_group`, `svg_path`, `svg_clip_path`,
+`svg_mask`, `svg_image`, `svg_text`, `svg_filter`, `svg_util`) draws SVG
+images (`handle_image`) and SVG-table glyphs (color glyph hook: COLR, then
+SVG, then bitmap). SVG text uses exporter fonts shared with Typst text
+(`SvgFontCache`, keyed by font data identity + index, like krilla's
+font-info dedup). Deviations: filters are not rasterized (no resvg port;
+`svg_rasterize_filter` hook draws nothing; no test uses SVG filters),
+variable fonts use the default instance, outlined glyphs (paint-order
+stroke-then-fill) are drawn from the plain outline (no color glyphs),
+16-bit PNGs are reduced to 8 bits, indexed PNGs are expanded to RGB
+(krilla keeps the palette), GIF/WebP images are skipped. `pdf-semantic`
+2271 → 2294 (remaining: `image-svg-linked-many-formats` (GIF, WebP,
+indexed PNG) and the four PDF-image tests); `pdf-semantic-replay` is
+unchanged (the replay uses placeholder SVG trees).
+
 ## Status: usvg port (SVG images and SVG glyphs)
 
 **Packages** (ports of the crates at the versions in `oracle/Cargo.lock`):
