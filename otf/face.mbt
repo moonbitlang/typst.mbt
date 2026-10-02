@@ -460,6 +460,16 @@ fn Face::parse_tables(
 }
 
 ///|
+/// Clones the face (the variation coordinates are copied).
+pub fn Face::clone(self : Face) -> Face {
+  {
+    raw_face: self.raw_face,
+    tables: self.tables,
+    coordinates: self.coordinates.copy(),
+  }
+}
+
+///|
 /// Returns low-level face tables.
 pub fn Face::tables(self : Face) -> FaceTables {
   self.tables

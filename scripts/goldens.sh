@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Regenerate reference outputs from upstream Typst (needs Rust).
-# Usage: scripts/goldens.sh [syntax|ast|eval|html|realize ...]
+# Usage: scripts/goldens.sh [syntax|ast|eval|html|realize|font ...]
 set -euo pipefail
 cd "$(dirname "$0")/.."
 # Build from inside oracle/ so that its rust-toolchain.toml applies.

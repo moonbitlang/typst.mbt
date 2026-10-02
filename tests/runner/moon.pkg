@@ -6,6 +6,8 @@ import {
   "moonbitlang/typst/realize",
   "moonbitlang/typst/typst",
   "moonbitlang/typst/html",
+  "moonbitlang/typst/otf",
+  "moonbitlang/core/hashset",
   "moonbitlang/core/string",
   "moonbitlang/typst/unicode",
   "moonbitlang/x/fs",

@@ -29,6 +29,7 @@ typst-kit = { path = "../.repos/typst/crates/typst-kit", features = ["datetime"]
 typst-assets = { git = "https://github.com/typst/typst-assets", rev = "94dcb99", features = ["fonts"] }
 typst-dev-assets = { git = "https://github.com/typst/typst-dev-assets", rev = "e26d7ca" }
 comemo = "*"
+ttf-parser = "0.25.1"
 ecow = "*"
 parking_lot = "*"
 rustc-hash = "*"

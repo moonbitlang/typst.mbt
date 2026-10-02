@@ -15,6 +15,7 @@ use typst_syntax::{DiagSpanKind, Source, SyntaxDiagnostic};
 mod ast_dump;
 mod collect;
 mod eval;
+mod font;
 mod html;
 mod realize;
 mod world;
@@ -67,6 +68,11 @@ fn main() {
                 .unwrap()
                 .join()
                 .unwrap();
+        }
+        Some("font") => {
+            // Only the output directory is used.
+            let out = PathBuf::from(&args[3]);
+            font::dump_font(&out);
         }
         Some("parse") => {
             // Debugging aid: parse a single file and print the tree.

@@ -2547,6 +2547,7 @@ dependencies = [
  "serde",
  "serde_json",
  "syn 2.0.98",
+ "ttf-parser",
  "typst",
  "typst-assets",
  "typst-bundle",
