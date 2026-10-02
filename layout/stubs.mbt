@@ -1,6 +1,6 @@
 // TEMPORARY stubs for the parts of `typst-layout` that are ported by other
-// work units: inline layout (`inline/*`, unit F), grid layout (`grid/*`,
-// unit H) and math layout (`math/*`, unit I). Their signatures follow
+// work units: inline layout (`inline/*`, unit F) and math layout
+// (`math/*`, unit I). Their signatures follow
 // upstream so that the real ports can replace them one by one; delete each
 // stub (and finally this file) when its port lands.
 
@@ -57,36 +57,6 @@ pub fn layout_inline(
     None => @syntax.Span::detached()
   }
   @library.bail_at(span, "inline layout is not yet ported")
-}
-
-///|
-/// Layout the grid (upstream `grid::layout_grid`).
-///
-/// TODO(grid): replaced by the grid layout port (unit H).
-pub fn layout_grid(
-  elem : @library.GridElem,
-  engine : @library.Engine,
-  locator : @library.Locator,
-  styles : @library.StyleChain,
-  regions : @library.Regions,
-) -> @library.Fragment raise @library.SourceError {
-  ignore((engine, locator, styles, regions))
-  @library.bail_at(elem.pack().span(), "grid layout is not yet ported")
-}
-
-///|
-/// Layout the table (upstream `grid::layout_table`).
-///
-/// TODO(grid): replaced by the grid layout port (unit H).
-pub fn layout_table(
-  elem : @library.TableElem,
-  engine : @library.Engine,
-  locator : @library.Locator,
-  styles : @library.StyleChain,
-  regions : @library.Regions,
-) -> @library.Fragment raise @library.SourceError {
-  ignore((engine, locator, styles, regions))
-  @library.bail_at(elem.pack().span(), "table layout is not yet ported")
 }
 
 ///|

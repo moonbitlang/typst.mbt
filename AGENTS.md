@@ -62,5 +62,8 @@
 - MoonBit's `String::compare` (and `Array[String]::sort`) orders by length
   first. Use `compare_str` (code-point = Rust `str` order) wherever upstream
   sorts or compares strings.
+- MoonBit's `Array::sort_by`/`sort_by_key` are unstable; Rust's `sort_by`/
+  `sort_by_key` are stable. Where ties are distinguishable, break them by
+  original index (or use `stable_sort` on `Compare` types).
 - Measure with `moon run tests/runner --target native -- eval --dump`, then
   `python3 scripts/classify.py eval 60` for the biggest failure buckets.
