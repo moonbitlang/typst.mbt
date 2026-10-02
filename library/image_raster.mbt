@@ -230,7 +230,10 @@ fn decode_exchange(
       let (info, pixels) = @codecs.decode_png(data[:])
       (info, Some(pixels))
     }
-    Jpg => (@codecs.jpeg_image_info(data[:]), None)
+    Jpg => {
+      let (info, pixels) = @codecs.decode_jpeg(data[:])
+      (info, Some(pixels))
+    }
     Gif => (@codecs.gif_image_info(data[:]), None)
     Webp => (@codecs.webp_image_info(data[:]), None)
   }

@@ -1,7 +1,15 @@
 import {
   "moonbitlang/core/cmp",
+  "moonbitlang/core/math",
 }
 
 import {
   "moonbitlang/core/encoding/utf8",
 } for "test"
+
+options(
+  targets: {
+    "imageops_libm_native.mbt": [ "native" ],
+    "imageops_libm_other.mbt": [ "not", "native" ],
+  },
+)

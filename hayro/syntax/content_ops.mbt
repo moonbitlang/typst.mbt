@@ -1,5 +1,5 @@
 // Port of `hayro-syntax/src/content/ops.rs` and `ops_generated.rs`
-// (converted from upstream by a one-off script): content stream operators.
+// (converted from upstream by scripts/gen_hayro_ops.py): content operators.
 
 ///|
 /// A typed content stream instruction.
@@ -404,5 +404,84 @@ pub fn TypedInstruction::dispatch(
     }
     "EMC" => Some(EndMarkedContent)
     _ => Some(Fallback(instruction.operator))
+  }
+}
+
+///|
+/// The name of the instruction variant.
+pub fn TypedInstruction::name(self : TypedInstruction) -> String {
+  match self {
+    BeginCompatibility => "BeginCompatibility"
+    EndCompatibility => "EndCompatibility"
+    SaveState => "SaveState"
+    RestoreState => "RestoreState"
+    Transform(_, _, _, _, _, _) => "Transform"
+    LineWidth(_) => "LineWidth"
+    LineCap(_) => "LineCap"
+    LineJoin(_) => "LineJoin"
+    MiterLimit(_) => "MiterLimit"
+    DashPattern(_, _) => "DashPattern"
+    RenderingIntent(_) => "RenderingIntent"
+    FlatnessTolerance(_) => "FlatnessTolerance"
+    SetGraphicsState(_) => "SetGraphicsState"
+    MoveTo(_, _) => "MoveTo"
+    LineTo(_, _) => "LineTo"
+    CubicTo(_, _, _, _, _, _) => "CubicTo"
+    CubicStartTo(_, _, _, _) => "CubicStartTo"
+    CubicEndTo(_, _, _, _) => "CubicEndTo"
+    ClosePath => "ClosePath"
+    RectPath(_, _, _, _) => "RectPath"
+    StrokePath => "StrokePath"
+    CloseAndStrokePath => "CloseAndStrokePath"
+    FillPathNonZero => "FillPathNonZero"
+    FillPathNonZeroCompatibility => "FillPathNonZeroCompatibility"
+    FillPathEvenOdd => "FillPathEvenOdd"
+    FillAndStrokeNonZero => "FillAndStrokeNonZero"
+    FillAndStrokeEvenOdd => "FillAndStrokeEvenOdd"
+    CloseFillAndStrokeNonZero => "CloseFillAndStrokeNonZero"
+    CloseFillAndStrokeEvenOdd => "CloseFillAndStrokeEvenOdd"
+    EndPath => "EndPath"
+    ClipNonZero => "ClipNonZero"
+    ClipEvenOdd => "ClipEvenOdd"
+    ColorSpaceStroke(_) => "ColorSpaceStroke"
+    ColorSpaceNonStroke(_) => "ColorSpaceNonStroke"
+    StrokeColor(_) => "StrokeColor"
+    StrokeColorNamed(_, _) => "StrokeColorNamed"
+    NonStrokeColor(_) => "NonStrokeColor"
+    NonStrokeColorNamed(_, _) => "NonStrokeColorNamed"
+    StrokeColorDeviceGray(_) => "StrokeColorDeviceGray"
+    NonStrokeColorDeviceGray(_) => "NonStrokeColorDeviceGray"
+    StrokeColorDeviceRgb(_, _, _) => "StrokeColorDeviceRgb"
+    NonStrokeColorDeviceRgb(_, _, _) => "NonStrokeColorDeviceRgb"
+    StrokeColorCmyk(_, _, _, _) => "StrokeColorCmyk"
+    NonStrokeColorCmyk(_, _, _, _) => "NonStrokeColorCmyk"
+    Shading(_) => "Shading"
+    XObject(_) => "XObject"
+    InlineImage(_) => "InlineImage"
+    CharacterSpacing(_) => "CharacterSpacing"
+    WordSpacing(_) => "WordSpacing"
+    HorizontalScaling(_) => "HorizontalScaling"
+    TextLeading(_) => "TextLeading"
+    TextFont(_, _) => "TextFont"
+    TextRenderingMode(_) => "TextRenderingMode"
+    TextRise(_) => "TextRise"
+    BeginText => "BeginText"
+    EndText => "EndText"
+    NextLine(_, _) => "NextLine"
+    NextLineAndSetLeading(_, _) => "NextLineAndSetLeading"
+    SetTextMatrix(_, _, _, _, _, _) => "SetTextMatrix"
+    NextLineUsingLeading => "NextLineUsingLeading"
+    ShowText(_) => "ShowText"
+    NextLineAndShowText(_) => "NextLineAndShowText"
+    ShowTextWithParameters(_, _, _) => "ShowTextWithParameters"
+    ShowTexts(_) => "ShowTexts"
+    ColorGlyph(_, _) => "ColorGlyph"
+    ShapeGlyph(_, _, _, _, _, _) => "ShapeGlyph"
+    MarkedContentPoint(_) => "MarkedContentPoint"
+    MarkedContentPointWithProperties(_, _) => "MarkedContentPointWithProperties"
+    BeginMarkedContent(_) => "BeginMarkedContent"
+    BeginMarkedContentWithProperties(_, _) => "BeginMarkedContentWithProperties"
+    EndMarkedContent => "EndMarkedContent"
+    Fallback(_) => "Fallback"
   }
 }

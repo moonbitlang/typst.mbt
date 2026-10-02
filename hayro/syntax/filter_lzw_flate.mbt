@@ -7,12 +7,13 @@
 /// Upstream (with the `unsafe` feature) tries a zlib stream, then a raw
 /// deflate stream and then pdf.js' lenient decoder.
 pub fn flate_decode(data : BytesView, params : Dict) -> Bytes? {
-  let decoded = @codecs.zlib_decompress(data) catch {
+  // `flate2`'s `ZlibDecoder`/`DeflateDecoder` with `read_to_end`.
+  let decoded = @codecs.inflate_read_to_end(data, zlib=true) catch {
     _ =>
-      @codecs.inflate_raw_lenient(data, 0, lenient=false) catch {
+      @codecs.inflate_read_to_end(data, zlib=false) catch {
         _ =>
           // flate stream is broken, decoding with fallback
-          match flate_fallback(data) {
+          match flate_fallback_decode(data) {
             Some(d) => d
             None => return None
           }
@@ -20,29 +21,6 @@ pub fn flate_decode(data : BytesView, params : Dict) -> Bytes? {
   }
   let params = PredictorParams::from_params(params)
   apply_predictor(decoded, params)
-}
-
-///|
-/// pdf.js' lenient flate decoder: skips a zlib header and returns whatever
-/// could be decoded.
-fn flate_fallback(data : BytesView) -> Bytes? {
-  if data.length() < 2 {
-    return None
-  }
-  let cmf = data[0].to_int()
-  let flg = data[1].to_int()
-  if (cmf & 0x0f) != 0x08 {
-    return None
-  }
-  if ((cmf << 8) + flg) % 31 != 0 {
-    return None
-  }
-  if (flg & 0x20) != 0 {
-    return None
-  }
-  Some(@codecs.inflate_raw_lenient(data, 2, lenient=true)) catch {
-    _ => None
-  }
 }
 
 ///|

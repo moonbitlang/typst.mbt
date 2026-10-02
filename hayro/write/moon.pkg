@@ -1,0 +1,7 @@
+import {
+  "moonbitlang/typst/hayro/syntax" @hayro_syntax,
+  "moonbitlang/typst/codecs",
+  "moonbitlang/pdflite/export",
+}
+
+warnings = "-deprecated"

@@ -9,6 +9,8 @@ import {
   "moonbitlang/typst/bundle",
   "moonbitlang/typst/layout",
   "moonbitlang/typst/svg",
+  "moonbitlang/typst/render",
+  "moonbitlang/typst/skia",
   "moonbitlang/typst/pdf",
   "moonbitlang/pdflite",
   "moonbitlang/pdflite/core" @pdfcore,

@@ -10,7 +10,7 @@ pub(open) trait ObjectLike: Readable {
 
 ///|
 /// A primitive PDF object.
-pub enum Object {
+pub(all) enum Object {
   /// A null object.
   Null
   /// A boolean object.

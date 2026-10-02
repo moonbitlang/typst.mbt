@@ -2,14 +2,20 @@
 // modules `colr`, `bitmap` and `outline`, on top of the `otf` port of
 // ttf-parser).
 //
-// TODO: SVG glyphs (krilla-svg's `render_svg_glyph`) need an SVG renderer;
-// they fall back to the glyph outline like krilla does when drawing fails.
+// SVG glyphs are drawn with krilla-svg's `render_svg_glyph` (`svg.mbt`);
+// glyphs fall back to the glyph outline like krilla does when drawing fails.
 
 ///|
 /// The color glyph hook of a font (krilla `should_outline` and
 /// `draw_color_glyph`).
 fn color_glyph_hook(font : @library.FontInstance) -> @export.ColorGlyphs? {
   guard font.ttf() is Some(ttf) else { return None }
+  color_glyph_hook_face(ttf)
+}
+
+///|
+/// The color glyph hook of a parsed font face.
+fn color_glyph_hook_face(ttf : @otf.Face) -> @export.ColorGlyphs? {
   let tables = ttf.tables()
   let can_be_cid = tables.glyf is Some(_) ||
     tables.cff is Some(_) ||
@@ -28,6 +34,7 @@ fn color_glyph_hook(font : @library.FontInstance) -> @export.ColorGlyphs? {
     draw: (g, context_color, surface) => {
       let gid = @otf.GlyphId(g.to_uint16())
       let drawn = draw_colr_glyph(ttf, gid, context_color, surface) ||
+        draw_svg_glyph(ttf, gid, context_color, surface) ||
         draw_bitmap_glyph(ttf, gid, surface)
       if !drawn {
         // Fall back to the outline (filled with black).
