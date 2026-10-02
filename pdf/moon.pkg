@@ -1,0 +1,12 @@
+import {
+  "moonbitlang/typst/library",
+  "moonbitlang/typst/layout",
+  "moonbitlang/typst/syntax",
+  "moonbitlang/typst/svg",
+  "moonbitlang/typst/codecs",
+  "moonbitlang/typst/unicode",
+  "moonbitlang/pdflite/export",
+  "moonbitlang/core/math",
+}
+
+warnings = "-deprecated"

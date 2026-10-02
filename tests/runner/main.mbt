@@ -1,7 +1,7 @@
 // Differential test runner: compares the MoonBit port against reference
 // outputs dumped by the Rust oracle (see `scripts/goldens.sh`).
 //
-// Usage: moon run tests/runner -- <syntax|ast|eval|html|realize|paged|svg|svg-replay|font|break> [filter] [--verbose]
+// Usage: moon run tests/runner -- <syntax|ast|eval|html|realize|paged|svg|svg-replay|pdf-semantic|pdf-semantic-replay|pdf-extract-check|pdftags|font|break> [filter] [--verbose]
 
 ///|
 let suite_dir = ".repos/typst/tests/suite"
@@ -21,6 +21,14 @@ fn main {
   let verbose = args.contains("--verbose") || args.contains("-v")
   dump_actual.val = args.contains("--dump")
   trace_tests.val = args.contains("--trace")
+  for a in args {
+    if a.has_prefix("--upstream-pdfs=") {
+      upstream_pdf_dir.val = Some(a.unsafe_substring(start=16, end=a.length()))
+    }
+    if a.has_prefix("--save-pdf=") {
+      pdf_save_dir.val = Some(a.unsafe_substring(start=11, end=a.length()))
+    }
+  }
   let filter = args[2:].iter().find_first(a => !a.has_prefix("-"))
   match stage {
     "syntax" =>
@@ -71,6 +79,45 @@ fn main {
         canonicalize=canonicalize_svg_ids,
         dump_name="svg-replay",
       )
+    // Export to PDF and compare the extracted semantics (see
+    // `oracle/src/pdf_semantic.rs`).
+    "pdf-semantic" =>
+      run_stage(
+        "pdf-semantic",
+        pdf_semantic_report,
+        filter,
+        verbose,
+        select=tc => is_paged(tc.attrs),
+        skip_file=text => text.has_prefix("// SKIP"),
+        matches=pdf_semantic_matches,
+      )
+    // Export upstream's laid-out documents (decoded from the `paged`
+    // goldens) to PDF, independently of layout.
+    "pdf-semantic-replay" =>
+      run_stage(
+        "pdf-semantic",
+        pdf_replay_report,
+        filter,
+        verbose,
+        select=tc => is_paged(tc.attrs),
+        skip_file=text => text.has_prefix("// SKIP"),
+        canonicalize=pdf_replay_canonicalize,
+        matches=pdf_semantic_matches,
+        dump_name="pdf-semantic-replay",
+      )
+    // Check the MoonBit extractor against the oracle's on upstream's PDFs
+    // (saved by the oracle with `ORACLE_SAVE_PDF=<dir>`; pass the
+    // directory as `--upstream-pdfs=<dir>`).
+    "pdf-extract-check" =>
+      run_stage(
+        "pdf-semantic",
+        pdf_extract_check_report,
+        filter,
+        verbose,
+        select=tc => is_paged(tc.attrs),
+        skip_file=text => text.has_prefix("// SKIP"),
+        dump_name="pdf-extract-check",
+      )
     _ => {
       println("unknown stage: \{stage}")
       @sys.exit(2)
@@ -88,6 +135,7 @@ fn run_stage(
   skip_file? : (String) -> Bool = _ => false,
   canonicalize? : (String) -> String,
   dump_name? : String = stage,
+  matches? : (String, String) -> Bool,
 ) -> Unit {
   let mut passed = 0
   // With `canonicalize`, both sides are compared after canonicalization;
@@ -127,7 +175,11 @@ fn run_stage(
         Some(f) => (f(expected), f(actual))
         None => (expected, actual)
       }
-      if actual == expected {
+      let ok = match matches {
+        Some(m) => m(expected, actual)
+        None => actual == expected
+      }
+      if ok {
         passed += 1
       } else {
         failed += 1

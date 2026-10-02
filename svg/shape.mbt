@@ -199,7 +199,10 @@ fn convert_curve(
 ///|
 /// The bounding box of the shape, optionally taking the stroke into account
 /// (upstream `Shape::bbox`).
-fn shape_bbox(shape : @library.Shape, include_stroke : Bool) -> @library.Rect {
+pub fn shape_bbox(
+  shape : @library.Shape,
+  include_stroke : Bool,
+) -> @library.Rect {
   geometry_bbox(
     shape.geometry,
     if include_stroke {
