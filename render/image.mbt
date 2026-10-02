@@ -102,10 +102,12 @@ fn build_texture(
     }
     Svg(svg) => {
       guard @skia.Pixmap::new(w, h) is Some(texture) else { return None }
-      match svg_image_renderer.val {
-        Some(f) => f(svg, texture, w, h)
-        None => ()
-      }
+      let tree = svg.tree()
+      let ts = @path.Transform::from_scale(
+        @skia.u32_to_f32(w) / tree.size().width(),
+        @skia.u32_to_f32(h) / tree.size().height(),
+      )
+      @resvg.render(tree, ts, texture)
       Some(texture)
     }
     Pdf(_) =>
