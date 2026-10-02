@@ -10,10 +10,11 @@ import {
 }
 
 import {
+  "moonbitlang/typst/hayro/svg" @hayro_svg,
+  "moonbitlang/typst/typst_assets/pdf" @pdf_fonts,
   "moonbitlang/x/fs",
   "moonbitlang/core/encoding/utf8",
   "moonbitlang/core/string",
-  "moonbitlang/typst/typst_assets/pdf" @pdf_fonts,
 } for "test"
 
 warnings = "-deprecated"
