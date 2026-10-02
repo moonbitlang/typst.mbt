@@ -293,15 +293,14 @@ pub fn library_builder(
 pub let routines : @library.Routines = {
   rules: () => {
     let rules = @library.NativeRuleMap::new()
-    // TODO(driver): `@layout.register(rules)` once layout is ported.
+    @layout.register(rules)
     @html.register(rules)
     rules
   },
   eval_string: @eval.routines_eval_string(),
   eval_closure: @eval.routines_eval_closure(),
   realize: @realize.realize,
-  // TODO(driver): `@layout.layout_frame` once layout is ported.
-  layout_frame: stub_layout_frame,
+  layout_frame: @layout.layout_frame,
   html_mathml_body: @html.html_mathml_body,
   html_span_filled: @html.html_span_filled,
 }

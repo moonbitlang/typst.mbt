@@ -10,11 +10,17 @@ let suite_dir = ".repos/typst/tests/suite"
 let golden_dir = "tests/golden"
 
 ///|
+/// Whether to print each test's name before running it (to find tests that
+/// crash the runner).
+let trace_tests : Ref[Bool] = Ref::new(false)
+
+///|
 fn main {
   let args = @env.args()
   let stage = args.get(1).unwrap_or("syntax")
   let verbose = args.contains("--verbose") || args.contains("-v")
   dump_actual.val = args.contains("--dump")
+  trace_tests.val = args.contains("--trace")
   let filter = args[2:].iter().find_first(a => !a.has_prefix("-"))
   match stage {
     "syntax" =>
@@ -76,6 +82,9 @@ fn run_stage(
     for tc in split_tests(text) {
       if !select(tc) || (filter is Some(f) && !tc.name.contains(f)) {
         continue
+      }
+      if trace_tests.val {
+        println("TRACE \{rel} :: \{tc.name}")
       }
       let actual = report(rel, tc)
       dump.write_string("=== \{tc.name}\n\{actual}")

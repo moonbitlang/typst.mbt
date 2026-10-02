@@ -1435,17 +1435,20 @@ pub impl NativeElement for InlineElem with fn into_content(self) {
 }
 
 ///|
-pub fn InlineElem::body(self : InlineElem) -> Value {
+pub fn InlineElem::body(self : InlineElem) -> InlineCallback {
   view_cast(self.0.field_raw(inline_elem_body).unwrap(), "inline.body")
 }
 
 ///|
-pub fn InlineElem::with_body(self : InlineElem, v : Value) -> InlineElem {
+pub fn InlineElem::with_body(
+  self : InlineElem,
+  v : InlineCallback,
+) -> InlineElem {
   InlineElem(self.0.with_field(inline_elem_body, IntoValue::into_value(v)))
 }
 
 ///|
-pub fn InlineElem::new(body_ : Value) -> InlineElem {
+pub fn InlineElem::new(body_ : InlineCallback) -> InlineElem {
   InlineElem(
     Content::new(inline_elem(), [
       (inline_elem_body, IntoValue::into_value(body_)),
@@ -19640,12 +19643,12 @@ pub fn TextElem::set_emph(v : ItalicToggle) -> Style {
 }
 
 ///|
-pub fn TextElem::deco_in(styles : StyleChain) -> Value {
+pub fn TextElem::deco_in(styles : StyleChain) -> Array[Decoration] {
   view_cast(styles.get_field(text_elem(), text_elem_deco), "text.deco")
 }
 
 ///|
-pub fn TextElem::set_deco(v : Value) -> Style {
+pub fn TextElem::set_deco(v : Array[Decoration]) -> Style {
   Property(Property::new(text_elem(), text_elem_deco, IntoValue::into_value(v)))
 }
 

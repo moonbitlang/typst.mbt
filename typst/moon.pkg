@@ -4,5 +4,6 @@ import {
   "moonbitlang/typst/eval",
   "moonbitlang/typst/realize",
   "moonbitlang/typst/html",
+  "moonbitlang/typst/layout",
   "moonbitlang/core/hashset",
 }

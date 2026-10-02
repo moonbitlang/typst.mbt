@@ -7,21 +7,26 @@ pub struct PagedDocument {
   priv info : @library.DocumentInfo
   priv options : @library.DocumentFormatOptions
   priv introspector : @library.Introspector
+  priv paged_introspector : PagedIntrospector
 }
 
 ///|
 /// Creates a new paged document from its parts.
 ///
 /// Internally builds the introspector.
-///
-/// TODO(introspect): upstream builds a `PagedIntrospector` from the pages;
-/// until `introspect.rs` is ported, the document has an empty introspector.
 pub fn PagedDocument::new(
   pages : Array[Page],
   info : @library.DocumentInfo,
   options : @library.DocumentFormatOptions,
 ) -> PagedDocument {
-  { pages, info, options, introspector: @library.Introspector::empty(), }
+  let paged_introspector = PagedIntrospector::new(pages[:])
+  {
+    pages,
+    info,
+    options,
+    introspector: @library.Introspector::new(paged_introspector),
+    paged_introspector,
+  }
 }
 
 ///|
@@ -57,6 +62,15 @@ pub fn PagedDocument::introspector(
   self : PagedDocument,
 ) -> @library.Introspector {
   self.introspector
+}
+
+///|
+/// The document's paged introspector (upstream `introspector()` returns the
+/// `Arc<PagedIntrospector>`).
+pub fn PagedDocument::paged_introspector(
+  self : PagedDocument,
+) -> PagedIntrospector {
+  self.paged_introspector
 }
 
 ///|

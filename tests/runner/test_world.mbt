@@ -425,14 +425,26 @@ fn define_test_globals(scope : @library.Scope) -> Unit {
   |> ignore
   scope.define_func(
     @library.native_func("bounds", (_, _, args) => {
-      let _ : @library.Content = args.expect("content")
+      let content : @library.Content = args.expect("content")
       args.take().finish()
       // Upstream wraps the content in a block with a custom multi-layouter
-      // body, which reprs as `block(body: auto)`.
+      // body (`layout_bounds`), which reprs as `block(body: auto)`.
       Content(
-        @library.Content::new(@library.block_elem(), [
-          (@library.block_elem_body, Auto),
-        ]),
+        @library.BlockElem::multi_layouter_content(content, (
+          body,
+          engine,
+          locator,
+          styles,
+          regions,
+        ) => {
+          let fragment = @layout.layout_fragment(
+            engine, body, locator, styles, regions,
+          )
+          for frame in fragment.iter() {
+            frame.mark_box_in_place()
+          }
+          fragment
+        }).pack(),
       )
     }),
   )
