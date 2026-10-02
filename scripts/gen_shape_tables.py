@@ -89,7 +89,40 @@ def gen_emoji():
     out += emit_ints('emoji_extended_pictographic_table', 'Extended_Pictographic ranges `[lo, hi]` (gen-unicode-is-emoji-ext-pict.py).', ranges, 8)
     open(os.path.join(OUT, 'unicode_emoji_gen.mbt'), 'w').write(out)
 
+# --- AAT layout (aat_layout.rs) ------------------------------------------------
+
+
+def gen_aat_layout():
+    """Feature type/selector constants and `feature_mappings` of
+    `aat_layout.rs`. Only the constants used by the mapping table or by the
+    ported AAT modules (`aat_map.rs`, `aat_layout_morx_table.rs`) are emitted."""
+    src = read('aat_layout.rs')
+    consts = re.findall(r'^pub const (HB_AAT_LAYOUT_FEATURE_(?:TYPE|SELECTOR)_\w+): u8 = (\d+);', src, re.M)
+    values = dict(consts)
+    assert len(values) == len(consts), 'duplicate constants'
+    body = body_of(src, 'pub const feature_mappings')
+    rows = re.findall(r'hb_aat_feature_mapping_t::new\(b"(.{4})", (\w+), (\w+), (\w+)\),', body)
+    assert len(rows) == body.count('hb_aat_feature_mapping_t::new('), 'feature mapping rows'
+    used = set()
+    for row in rows:
+        used.update(x for x in row[1:] if x in values)
+    for name in ('aat_map.rs', 'aat_layout_morx_table.rs'):
+        used.update(n for n in re.findall(r'HB_AAT_LAYOUT_FEATURE_\w+', read(name)))
+    assert used <= set(values), used - set(values)
+    out = HEADER % 'aat_layout.rs'
+    for name, value in consts:
+        if name in used:
+            out += '///|\nconst %s : Int = %s\n\n' % (name, value)
+    out += '///|\n/// Mapping from OpenType feature tags to AAT feature names and selectors.\n///\n'
+    out += '/// Table data courtesy of Apple.\n/// Converted from mnemonics to integers when moving to this file.\n'
+    out += 'let feature_mappings : FixedArray[AatFeatureMapping] = [\n'
+    for tag, a, b, c in rows:
+        out += '  AatFeatureMapping::new("%s", %s, %s, %s),\n' % (tag, a, b, c)
+    out += ']\n'
+    open(os.path.join(OUT, 'aat_layout_gen.mbt'), 'w').write(out)
+
 
 if __name__ == '__main__':
     gen_unicode_norm()
     gen_emoji()
+    gen_aat_layout()
