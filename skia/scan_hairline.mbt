@@ -243,11 +243,7 @@ fn extend_pts(
 ) -> Unit {
   // The area of a circle is PI*R*R. For a unit circle, R=1/2, and the cap
   // covers half of that.
-  let cap_outset : Float = if line_cap == Square {
-    0.5
-  } else {
-    @path.float_pi / 8.0
-  }
+  let cap_outset : Float = if line_cap == Square { 0.5 } else { float_pi / 8.0 }
   let n = points.length()
   if prev_verb == Move {
     let first = points[0]
@@ -269,7 +265,7 @@ fn extend_pts(
       tangent = @path.Point::from_xy(1.0, 0.0)
       controls = n - 1 // If all points are equal, move all but one.
     } else {
-      tangent = tangent.normalize().unwrap_or(@path.Point::zero())
+      tangent = pt_normalize(tangent)
     }
     offset = 0
     while true {
@@ -307,7 +303,7 @@ fn extend_pts(
       tangent = @path.Point::from_xy(-1.0, 0.0)
       controls = n - 1
     } else {
-      tangent = tangent.normalize().unwrap_or(@path.Point::zero())
+      tangent = pt_normalize(tangent)
     }
     offset = n - 1
     while true {
@@ -353,14 +349,14 @@ fn hair_quad(
 ///|
 /// `compute_nocheck_quad_bounds` / `compute_nocheck_cubic_bounds`.
 fn compute_nocheck_bounds(points : Array[@path.Point]) -> @path.Rect? {
-  let mut min = points[0]
+  let mut min = points[0].to_f32x2()
   let mut max = min
   for i in 1..<points.length() {
-    let pair = points[i]
+    let pair = points[i].to_f32x2()
     min = min.min(pair)
     max = max.max(pair)
   }
-  @path.Rect::from_ltrb(min.x, min.y, max.x, max.y)
+  @path.Rect::from_ltrb(min.x(), min.y(), max.x(), max.y())
 }
 
 ///|
@@ -391,12 +387,12 @@ fn hair_quad2(
   let lines = 1 << level
   let tmp = Array::make(lines + 1, @path.Point::zero())
   tmp[0] = points[0]
-  let mut t = @path.Point::zero()
-  let dt = @path.Point::splat((1.0 : Float) / Float::from_int(lines))
+  let mut t = @path.F32x2::default()
+  let dt = @path.F32x2::splat((1.0 : Float) / Float::from_int(lines))
   for i in 1..<lines {
     t = t + dt
     let v = (coeff.a * t + coeff.b) * t + coeff.c
-    tmp[i] = v
+    tmp[i] = @path.Point::from_xy(v.x(), v.y())
   }
   tmp[lines] = points[2]
   line_proc(tmp[:], clip, blitter)
@@ -421,14 +417,14 @@ fn compute_quad_level(points : Array[@path.Point]) -> Int {
 fn compute_int_quad_dist(points : Array[@path.Point]) -> UInt {
   // compute the vector between the control point ([1]) and the middle of the
   // line connecting the start and end ([0] and [2])
-  let dx = @path.fabs(@path.half(points[0].x + points[2].x) - points[1].x)
-  let dy = @path.fabs(@path.half(points[0].y + points[2].y) - points[1].y)
+  let dx = fabs(half(points[0].x + points[2].x) - points[1].x)
+  let dy = fabs(half(points[0].y + points[2].y) - points[1].y)
 
   // convert to whole pixel values (use ceiling to be conservative).
   // assign to unsigned so we can safely add 1/2 of the smaller and still fit
   // in u32, since T::saturate_from() returns 31 bits at most.
-  let idx = @path.i32_saturate_from(@path.ceilf(dx)).reinterpret_as_uint()
-  let idy = @path.i32_saturate_from(@path.ceilf(dy)).reinterpret_as_uint()
+  let idx = i32_saturate_from(ceilf(dx)).reinterpret_as_uint()
+  let idy = i32_saturate_from(ceilf(dy)).reinterpret_as_uint()
 
   // use the cheap approx for distance
   if idx > idy {
@@ -463,7 +459,7 @@ fn hair_cubic(
     hair_cubic2(points, clip, line_proc, blitter)
   } else {
     let tmp = Array::make(13, @path.Point::zero())
-    let t_values = @path.new_t_values()
+    let t_values = ts_new_t_values()
     let count = chop_cubic_at_max_curvature(points[:], t_values, tmp)
     for i in 0..<count {
       let offset = i * 3
@@ -509,12 +505,14 @@ fn hair_cubic2(
     (1 << max_cubic_subdivide_level) + 1,
     @path.Point::zero(),
   )
-  let dt = @path.Point::splat((1.0 : Float) / Float::from_int(lines))
-  let mut t = @path.Point::zero()
+  let dt = @path.F32x2::splat((1.0 : Float) / Float::from_int(lines))
+  let mut t = @path.F32x2::default()
   tmp[0] = points[0]
   for i in 1..<lines {
     t = t + dt
-    tmp[i] = ((coeff.a * t + coeff.b) * t + coeff.c) * t + coeff.d
+    tmp[i] = @path.Point::from_f32x2(
+      ((coeff.a * t + coeff.b) * t + coeff.c) * t + coeff.d,
+    )
   }
   let mut all_finite = true
   for p in tmp {
@@ -533,12 +531,12 @@ fn hair_cubic2(
 
 ///|
 fn compute_cubic_segments(points : Array[@path.Point]) -> Int {
-  let p0 = points[0]
-  let p1 = points[1]
-  let p2 = points[2]
-  let p3 = points[3]
-  let one_third = @path.Point::splat((1.0 : Float) / 3.0)
-  let two_third = @path.Point::splat((2.0 : Float) / 3.0)
+  let p0 = points[0].to_f32x2()
+  let p1 = points[1].to_f32x2()
+  let p2 = points[2].to_f32x2()
+  let p3 = points[3].to_f32x2()
+  let one_third = @path.F32x2::splat((1.0 : Float) / 3.0)
+  let two_third = @path.F32x2::splat((2.0 : Float) / 3.0)
   let p13 = one_third * p3 + two_third * p0
   let p23 = one_third * p0 + two_third * p3
   let diff = (p1 - p13).abs().max((p2 - p23).abs()).max_component()

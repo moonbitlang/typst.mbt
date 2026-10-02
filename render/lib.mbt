@@ -93,11 +93,11 @@ pub fn render(
   }
   let size = page.frame.size().add_size(bleed.sum_by_axis())
   let pixel_per_pt = opts.format.ppi.to_float() / 72.0
-  let pxw = @path.f32_to_u32(
-    @path.fmax(@path.roundf(pixel_per_pt * to_f32(size.x)), 1.0),
+  let pxw = @skia.f32_to_u32(
+    @skia.fmax(@skia.roundf(pixel_per_pt * to_f32(size.x)), 1.0),
   )
-  let pxh = @path.f32_to_u32(
-    @path.fmax(@path.roundf(pixel_per_pt * to_f32(size.y)), 1.0),
+  let pxh = @skia.f32_to_u32(
+    @skia.fmax(@skia.roundf(pixel_per_pt * to_f32(size.y)), 1.0),
   )
   let ts = @path.Transform::from_scale(pixel_per_pt, pixel_per_pt)
   let state = State::new(size, ts, pixel_per_pt)
@@ -127,7 +127,7 @@ pub fn render_merged(
   let opts = opts.resolve(PngFormatOptions::get(document.options()))
   let pixmaps = document.pages().map(page => render(page, opts))
   let pixel_per_pt = opts.format.ppi.to_float() / 72.0
-  let gap = @path.f32_to_u32(@path.roundf(pixel_per_pt * to_f32(gap)))
+  let gap = @skia.f32_to_u32(@skia.roundf(pixel_per_pt * to_f32(gap)))
   let mut pxw = 0U
   let mut pxh = 0U
   for pixmap in pixmaps {

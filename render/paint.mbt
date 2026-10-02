@@ -82,11 +82,11 @@ fn tiling_sampler(
     let point = transform_to_parent.map_point(
       @path.Point::from_xy(Float::from_uint(x), Float::from_uint(y)),
     )
-    let x = @path.f32_to_u32(
-      @path.floorf(@path.rem_euclid(point.x * pixel_per_pt, size_x)),
+    let x = @skia.f32_to_u32(
+      @skia.floorf(@skia.rem_euclid(point.x * pixel_per_pt, size_x)),
     )
-    let y = @path.f32_to_u32(
-      @path.floorf(@path.rem_euclid(point.y * pixel_per_pt, size_y)),
+    let y = @skia.f32_to_u32(
+      @skia.floorf(@skia.rem_euclid(point.y * pixel_per_pt, size_y)),
     )
 
     // Sample the tilings
@@ -228,13 +228,13 @@ fn to_sk_paint(
         Self_ => gradient_map
         Parent => None
       }
-      let width = @path.f32_to_u32(
-        @path.ceilf(@path.fabs(to_f32(container_size.x)) * state.pixel_per_pt),
+      let width = @skia.f32_to_u32(
+        @skia.ceilf(@skia.fabs(to_f32(container_size.x)) * state.pixel_per_pt),
       )
-      let height = @path.f32_to_u32(
-        @path.ceilf(@path.fabs(to_f32(container_size.y)) * state.pixel_per_pt),
+      let height = @skia.f32_to_u32(
+        @skia.ceilf(@skia.fabs(to_f32(container_size.y)) * state.pixel_per_pt),
       )
-      let min = @path.f32_to_u32(@path.ceilf(state.pixel_per_pt))
+      let min = @skia.f32_to_u32(@skia.ceilf(state.pixel_per_pt))
       let pixmap = gradient_pixmap(
         gradient,
         if width > min {
@@ -322,7 +322,7 @@ fn to_sk_color_u8(color : @library.ProcessColor) -> @skia.ColorU8 {
 /// 255, clamps and rounds half to even.
 fn f32_to_u8_stimulus(x : Float) -> Int {
   let max : Float = 255.0
-  let scaled = @path.fmin(x * max, max)
+  let scaled = @skia.fmin(x * max, max)
   let f = scaled + Float::reinterpret_from_uint(0x4b00_0000)
   let bits = f.reinterpret_as_uint()
   let c23 : UInt = 0x4b00_0000
@@ -338,8 +338,8 @@ fn render_tiling_frame(
   let size = tilings.size.add_size(tilings.spacing)
   let canvas = must(
     @skia.Pixmap::new(
-      @path.f32_to_u32(@path.roundf(to_f32(size.x) * state.pixel_per_pt)),
-      @path.f32_to_u32(@path.roundf(to_f32(size.y) * state.pixel_per_pt)),
+      @skia.f32_to_u32(@skia.roundf(to_f32(size.x) * state.pixel_per_pt)),
+      @skia.f32_to_u32(@skia.roundf(to_f32(size.y) * state.pixel_per_pt)),
     ),
   )
 

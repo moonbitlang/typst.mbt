@@ -10,8 +10,8 @@ fn chop_quad_at_x_extrema(
   let mut b = src[1].x
   let c = src[2].x
   if is_not_monotonic(a, b, c) {
-    if @path.valid_unit_divide(a - b, a - b - b + c) is Some(t_value) {
-      @path.chop_quad_at(src, t_value, dst)
+    if ts_valid_unit_divide(a - b, a - b - b + c) is Some(t_value) {
+      ts_chop_quad_at(src, t_value, dst)
 
       // flatten double quad extrema
       dst[1] = { x: dst[2].x, y: dst[1].y, }
@@ -21,7 +21,7 @@ fn chop_quad_at_x_extrema(
 
     // if we get here, we need to force dst to be monotonic, even though
     // we couldn't compute a unit_divide value (probably underflow).
-    b = if @path.fabs(a - b) < @path.fabs(b - c) { a } else { c }
+    b = if fabs(a - b) < fabs(b - c) { a } else { c }
   }
   dst[0] = @path.Point::from_xy(a, src[0].y)
   dst[1] = @path.Point::from_xy(b, src[1].y)
@@ -38,8 +38,8 @@ fn chop_quad_at_y_extrema(
   let mut b = src[1].y
   let c = src[2].y
   if is_not_monotonic(a, b, c) {
-    if @path.valid_unit_divide(a - b, a - b - b + c) is Some(t_value) {
-      @path.chop_quad_at(src, t_value, dst)
+    if ts_valid_unit_divide(a - b, a - b - b + c) is Some(t_value) {
+      ts_chop_quad_at(src, t_value, dst)
 
       // flatten double quad extrema
       dst[1] = { x: dst[1].x, y: dst[2].y, }
@@ -49,7 +49,7 @@ fn chop_quad_at_y_extrema(
 
     // if we get here, we need to force dst to be monotonic, even though
     // we couldn't compute a unit_divide value (probably underflow).
-    b = if @path.fabs(a - b) < @path.fabs(b - c) { a } else { c }
+    b = if fabs(a - b) < fabs(b - c) { a } else { c }
   }
   dst[0] = @path.Point::from_xy(src[0].x, a)
   dst[1] = @path.Point::from_xy(src[1].x, b)
@@ -72,7 +72,7 @@ fn chop_cubic_at_x_extrema(
   src : ArrayView[@path.Point],
   dst : Array[@path.Point],
 ) -> Int {
-  let t_values = @path.new_t_values()
+  let t_values = ts_new_t_values()
   let n = find_cubic_extrema(src[0].x, src[1].x, src[2].x, src[3].x, t_values)
   chop_cubic_at(src, t_values, n, dst, 0)
   if n != 0 {
@@ -92,7 +92,7 @@ fn chop_cubic_at_y_extrema(
   src : ArrayView[@path.Point],
   dst : Array[@path.Point],
 ) -> Int {
-  let t_values = @path.new_t_values()
+  let t_values = ts_new_t_values()
   let n = find_cubic_extrema(src[0].y, src[1].y, src[2].y, src[3].y, t_values)
   chop_cubic_at(src, t_values, n, dst, 0)
   if n != 0 {
@@ -124,7 +124,7 @@ fn find_cubic_extrema(
   let na = d - a + (3.0 : Float) * (b - c)
   let nb = (2.0 : Float) * (a - b - b + c)
   let nc = b - a
-  @path.find_unit_quad_roots(na, nb, nc, t_values)
+  ts_find_unit_quad_roots(na, nb, nc, t_values)
 }
 
 ///|
@@ -157,7 +157,7 @@ fn chop_cubic_at(
     let mut src = src
     let mut dst_offset = dst_base
     for i in 0..<t_len {
-      @path.chop_cubic_at2(src, t, dst, dst_offset)
+      ts_chop_cubic_at2(src, t, dst, dst_offset)
       if i == t_len - 1 {
         break
       }
@@ -170,7 +170,7 @@ fn chop_cubic_at(
       src = tmp[:]
 
       // watch out in case the renormalized t isn't in range
-      let n = @path.valid_unit_divide(
+      let n = ts_valid_unit_divide(
         t_values[i + 1] - t_values[i],
         1.0 - t_values[i],
       )
@@ -195,14 +195,14 @@ fn chop_cubic_at_max_curvature(
   dst : Array[@path.Point],
 ) -> Int {
   let roots : Array[Float] = [0.0, 0.0, 0.0]
-  let n = @path.find_cubic_max_curvature(src, roots)
+  let n = ts_find_cubic_max_curvature(src, roots)
 
   // Throw out values not inside 0..1.
   let mut count = 0
   for i in 0..<n {
     let root = roots[i]
     if (0.0 : Float) < root && root < 1.0 {
-      t_values[count] = @path.normalized_f32_exclusive_bounded(root)
+      t_values[count] = normalized_f32_exclusive_bounded(root)
       count += 1
     }
   }

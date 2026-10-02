@@ -23,10 +23,10 @@ fn render_shape(
         // Because this operation is expensive according to tiny-skia's
         // docs, we prefer to not apply it if not needed
         let transform = @path.Transform::from_scale(
-          @path.signum(w),
-          @path.signum(h),
+          @skia.signum(w),
+          @skia.signum(h),
         )
-        @path.Rect::from_xywh(0.0, 0.0, @path.fabs(w), @path.fabs(h))
+        @path.Rect::from_xywh(0.0, 0.0, @skia.fabs(w), @skia.fabs(h))
         .bind(rect => rect.transform(transform))
         .map(rect => @path.PathBuilder::from_rect(rect))
       } else {

@@ -114,9 +114,7 @@ pub fn Shader::apply_opacity(self : Shader, opacity : Float) -> Shader {
     Pattern(p) =>
       Pattern({
         ..p,
-        opacity: @path.normalized_f32(
-          p.opacity * @path.bound(opacity, 0.0, 1.0),
-        ).unwrap(),
+        opacity: normalized_f32(p.opacity * bound(opacity, 0.0, 1.0)).unwrap(),
       })
   }
 }
@@ -183,7 +181,7 @@ pub fn Pattern::new(
     pixmap,
     spread_mode,
     quality,
-    opacity: @path.normalized_f32_clamped(opacity),
+    opacity: normalized_f32_clamped(opacity),
     transform,
   })
 }
@@ -206,7 +204,7 @@ fn Pattern::push_stages(
   }
   if quality == Bilinear {
     if ts.is_translate() {
-      if ts.tx == @path.truncf(ts.tx) && ts.ty == @path.truncf(ts.ty) {
+      if ts.tx == truncf(ts.tx) && ts.ty == truncf(ts.ty) {
         // When the matrix is just an integer translate, bilerp == nearest
         // neighbor.
         quality = Nearest

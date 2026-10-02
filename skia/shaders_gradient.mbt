@@ -18,7 +18,7 @@ pub(all) struct GradientStop {
 ///
 /// `position` will be clamped to a 0..=1 range.
 pub fn GradientStop::new(position : Float, color : Color) -> GradientStop {
-  { position: @path.normalized_f32_clamped(position), color, }
+  { position: normalized_f32_clamped(position), color, }
 }
 
 ///|
@@ -67,11 +67,11 @@ fn Gradient::new(
       // The last one must be zero.
       1.0
     } else {
-      @path.bound(stops[i].position, prev, 1.0)
+      bound(stops[i].position, prev, 1.0)
     }
     has_uniform_stops = has_uniform_stops &&
-      @path.is_nearly_equal(uniform_step, curr - prev)
-    stops[i] = { ..stops[i], position: @path.normalized_f32_clamped(curr), }
+      is_nearly_equal(uniform_step, curr - prev)
+    stops[i] = { ..stops[i], position: normalized_f32_clamped(curr), }
     prev = curr
   }
   {
@@ -177,13 +177,13 @@ fn Gradient::push_stages(
             c_l.a - f.a * t_l,
           ),
         )
-        ctx.t_values.push(@path.normalized_f32_clamped(t_l))
+        ctx.t_values.push(normalized_f32_clamped(t_l))
       }
       t_l = t_r
       c_l = c_r
     }
     ctx.push_const_color(c_l)
-    ctx.t_values.push(@path.normalized_f32_clamped(t_l))
+    ctx.t_values.push(normalized_f32_clamped(t_l))
     ctx.len = ctx.factors.length()
 
     // Will with zeros until we have enough data to fit into F32x16.
@@ -248,10 +248,10 @@ pub fn LinearGradient::new(
     return Some(SolidColor(stops[0].color))
   }
   let length = (end - start).length()
-  if !@path.is_finite(length) {
+  if !is_finite(length) {
     return None
   }
-  if @path.is_nearly_zero_within_tolerance(length, degenerate_threshold) {
+  if is_nearly_zero_within_tolerance(length, degenerate_threshold) {
     // Degenerate gradient, the only tricky complication is when in clamp
     // mode, the limit of the gradient approaches two half planes of solid
     // color (first and last). However, they are divided by the line
@@ -301,8 +301,8 @@ fn points_to_unit_ts(
 ) -> @path.Transform? {
   let vec = end - start
   let mag = vec.length()
-  let inv = if mag != 0.0 { @path.invert(mag) } else { 0.0 }
-  let vec = vec.scaled(inv)
+  let inv = if mag != 0.0 { invert(mag) } else { 0.0 }
+  let vec = vec.scale(inv)
   let mut ts = ts_from_sin_cos_at(-vec.y, vec.x, start.x, start.y)
   ts = ts.post_translate(-start.x, -start.y)
   ts = ts.post_scale(inv, inv)
@@ -403,7 +403,7 @@ fn FocalData::set(
   let mut matrix = matrix
   let mut is_swapped = false
   let mut focal_x = r0 / (r0 - r1)
-  if @path.is_nearly_zero(focal_x - 1.0) {
+  if is_nearly_zero(focal_x - 1.0) {
     // swap r0, r1
     matrix = matrix.post_translate(-1.0, 0.0).post_scale(-1.0, 1.0)
     let t = r0
@@ -422,7 +422,7 @@ fn FocalData::set(
     return None
   }
   matrix = matrix.post_concat(focal_matrix)
-  let r1 = r1 / @path.fabs((1.0 : Float) - focal_x) // focalMatrix has a scale of 1/(1-f).
+  let r1 = r1 / fabs((1.0 : Float) - focal_x) // focalMatrix has a scale of 1/(1-f).
   let fd : FocalData = { r1, focal_x, is_swapped, }
 
   // The following transformations are just to accelerate the shader
@@ -432,19 +432,19 @@ fn FocalData::set(
   } else {
     matrix = matrix.post_scale(
       fd.r1 / (fd.r1 * fd.r1 - 1.0),
-      (1.0 : Float) / @path.fabs(fd.r1 * fd.r1 - 1.0).sqrt(),
+      (1.0 : Float) / fabs(fd.r1 * fd.r1 - 1.0).sqrt(),
     )
   }
   matrix = matrix.post_scale(
-    @path.fabs((1.0 : Float) - focal_x),
-    @path.fabs((1.0 : Float) - focal_x),
+    fabs((1.0 : Float) - focal_x),
+    fabs((1.0 : Float) - focal_x),
   ) // scale |1 - f|
   Some((fd, matrix))
 }
 
 ///|
 fn FocalData::is_focal_on_circle(self : FocalData) -> Bool {
-  @path.is_nearly_zero((1.0 : Float) - self.r1)
+  is_nearly_zero((1.0 : Float) - self.r1)
 }
 
 ///|
@@ -454,7 +454,7 @@ fn FocalData::is_well_behaved(self : FocalData) -> Bool {
 
 ///|
 fn FocalData::is_natively_focal(self : FocalData) -> Bool {
-  @path.is_nearly_zero(self.focal_x)
+  is_nearly_zero(self.focal_x)
 }
 
 ///|
@@ -504,11 +504,11 @@ pub fn RadialGradient::new(
   }
   guard transform.invert() is Some(_) else { return None }
   let length = (start_point - end_point).length()
-  if !@path.is_finite(length) {
+  if !is_finite(length) {
     return None
   }
-  if @path.is_nearly_zero_within_tolerance(length, degenerate_threshold) {
-    if @path.is_nearly_equal_within_tolerance(
+  if is_nearly_zero_within_tolerance(length, degenerate_threshold) {
+    if is_nearly_equal_within_tolerance(
         start_radius, end_radius, degenerate_threshold,
       ) {
       // Degenerate case, where the interpolation region area approaches
@@ -538,7 +538,7 @@ pub fn RadialGradient::new(
       // TODO: Consider making a degenerate gradient
       return None
     }
-    if @path.is_nearly_zero_within_tolerance(start_radius, degenerate_threshold) {
+    if is_nearly_zero_within_tolerance(start_radius, degenerate_threshold) {
       // If the center positions are the same, then the gradient
       // is the radial variant of a 2 pt conical gradient,
       // an actual radial gradient (startRadius == 0),
@@ -564,7 +564,7 @@ fn RadialGradient::new_radial_unchecked(
   mode : SpreadMode,
   transform : @path.Transform,
 ) -> Shader? {
-  let inv = @path.invert(radius)
+  let inv = invert(radius)
   let points_to_unit = @path.Transform::from_translate(-center.x, -center.y).post_scale(
     inv, inv,
   )
@@ -589,7 +589,7 @@ fn RadialGradient::push_stages(
       } else {
         let d_radius = radius2 - radius1
         // For concentric gradients: t = t * scale + bias
-        let p0 = @path.fmax(radius1, radius2) / d_radius
+        let p0 = fmax(radius1, radius2) / d_radius
         let p1 = -radius1 / d_radius
         (p0, p1)
       }
@@ -663,15 +663,15 @@ fn create_radial(
 ) -> Shader? {
   let mut gradient_type : GradientType = Radial(0.0, 0.0)
   let mut gradient_matrix = @path.Transform::identity()
-  if @path.is_nearly_zero((c0 - c1).length()) {
-    if @path.is_nearly_zero(@path.fmax(r0, r1)) || @path.is_nearly_equal(r0, r1) {
+  if is_nearly_zero((c0 - c1).length()) {
+    if is_nearly_zero(fmax(r0, r1)) || is_nearly_equal(r0, r1) {
       // Degenerate case; avoid dividing by zero. Should have been caught
       // by caller but just in case, recheck here.
       return None
     }
 
     // Concentric case: we can pretend we're radial (with a tiny twist).
-    let scale = (1.0 : Float) / @path.fmax(r0, r1)
+    let scale = (1.0 : Float) / fmax(r0, r1)
     gradient_matrix = @path.Transform::from_translate(-c1.x, -c1.y).post_scale(
       scale, scale,
     )
@@ -680,7 +680,7 @@ fn create_radial(
     guard map_to_unit_x(c0, c1) is Some(m) else { return None }
     gradient_matrix = m
     let d_center = (c0 - c1).length()
-    gradient_type = if @path.is_nearly_zero(r0 - r1) {
+    gradient_type = if is_nearly_zero(r0 - r1) {
       let scaled_r0 = r0 / d_center
       Strip(scaled_r0)
     } else {
@@ -763,9 +763,7 @@ pub fn SweepGradient::new(
   transform : @path.Transform,
 ) -> Shader? {
   let mut mode = mode
-  if !@path.is_finite(start_angle) ||
-    !@path.is_finite(end_angle) ||
-    start_angle > end_angle {
+  if !is_finite(start_angle) || !is_finite(end_angle) || start_angle > end_angle {
     return None
   }
   match stops.length() {
@@ -774,7 +772,7 @@ pub fn SweepGradient::new(
     _ => ()
   }
   guard transform.invert() is Some(_) else { return None }
-  if @path.is_nearly_equal_within_tolerance(
+  if is_nearly_equal_within_tolerance(
       start_angle, end_angle, degenerate_threshold,
     ) {
     if mode == Pad && end_angle > degenerate_threshold {

@@ -12,7 +12,7 @@ fn vmax(a : Float, b : Float) -> Float {
     a
   } else if b > a {
     b
-  } else if @path.is_sign_negative(a) {
+  } else if is_sign_negative(a) {
     b
   } else {
     a
@@ -30,7 +30,7 @@ fn vmin(a : Float, b : Float) -> Float {
     a
   } else if b < a {
     b
-  } else if @path.is_sign_negative(a) {
+  } else if is_sign_negative(a) {
     a
   } else {
     b
@@ -52,7 +52,7 @@ fn vtrunc_int(x : Float) -> Int {
 ///|
 /// `vcvtnq_s32_f32`: round to nearest even, saturating, NaN maps to 0.
 fn vround_int(x : Float) -> Int {
-  @path.rintf(x).to_int()
+  rintf(x).to_int()
 }
 
 ///|
@@ -65,14 +65,14 @@ fn vfloor8(x : Float) -> Float {
 ///|
 /// `f32x16::floor` (rounding round trip, used by lowp).
 fn vfloor16(x : Float) -> Float {
-  let roundtrip = @path.rintf(x)
+  let roundtrip = rintf(x)
   roundtrip - (if roundtrip > x { 1.0 } else { 0.0 })
 }
 
 ///|
 /// `f32x8::abs` (sign bit cleared).
 fn vabs(x : Float) -> Float {
-  @path.fabs(x)
+  fabs(x)
 }
 
 ///|
@@ -99,7 +99,7 @@ fn vpowf(x : Float, exp : Float) -> Float {
   a = a - f * (1.490129070 : Float)
   a += (27.728023300 : Float) / ((4.84252568 : Float) - f)
   a *= Float::from_int(1 << 23)
-  let inf_bits = Float::from_uint(@path.f32_infinity.reinterpret_as_uint())
+  let inf_bits = Float::from_uint(f32_infinity.reinterpret_as_uint())
   let r = Float::reinterpret_from_int(vround_int(vmin(vmax(a, 0.0), inf_bits)))
   if x == 0.0 || x == 1.0 {
     x
@@ -164,7 +164,7 @@ fn frecps(a : Float, b : Float) -> Float {
   if (a.is_inf() && b == 0.0) || (a == 0.0 && b.is_inf()) {
     2.0
   } else {
-    @path.fmaf(-a, b, 2.0)
+    fmaf(-a, b, 2.0)
   }
 }
 

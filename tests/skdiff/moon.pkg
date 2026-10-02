@@ -1,6 +1,6 @@
 import {
   "moonbitlang/typst/skia",
-  "moonbitlang/typst/skia/path",
+  "moonbitlang/typst/tiny_skia_path" @path,
   "moonbitlang/core/env",
   "moonbitlang/core/string",
 }

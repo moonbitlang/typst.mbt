@@ -129,8 +129,8 @@ fn line_clip(
 /// Returns X coordinate of intersection with horizontal line at Y.
 fn sect_with_horizontal(src : ArrayView[@path.Point], y : Float) -> Float {
   let dy = src[1].y - src[0].y
-  if @path.is_nearly_zero(dy) {
-    @path.ave(src[0].x, src[1].x)
+  if is_nearly_zero(dy) {
+    ave(src[0].x, src[1].x)
   } else {
     // need the extra precision so we don't compute a value that exceeds
     // our original limits
@@ -161,8 +161,8 @@ fn sect_clamp_with_vertical(src : ArrayView[@path.Point], x : Float) -> Float {
 /// Returns Y coordinate of intersection with vertical line at X.
 fn sect_with_vertical(src : ArrayView[@path.Point], x : Float) -> Float {
   let dx = src[1].x - src[0].x
-  if @path.is_nearly_zero(dx) {
-    @path.ave(src[0].y, src[1].y)
+  if is_nearly_zero(dx) {
+    ave(src[0].y, src[1].y)
   } else {
     // need the extra precision so we don't compute a value that exceeds
     // our original limits
@@ -219,10 +219,10 @@ fn line_intersect(
   clip : @path.Rect,
 ) -> FixedArray[@path.Point]? {
   let bounds = @path.Rect::from_ltrb(
-    @path.fmin(src[0].x, src[1].x),
-    @path.fmin(src[0].y, src[1].y),
-    @path.fmax(src[0].x, src[1].x),
-    @path.fmax(src[0].y, src[1].y),
+    fmin(src[0].x, src[1].x),
+    fmin(src[0].y, src[1].y),
+    fmax(src[0].x, src[1].x),
+    fmax(src[0].y, src[1].y),
   )
   if bounds is Some(bounds) {
     if contains_no_empty_check(clip, bounds) {

@@ -101,7 +101,7 @@ let conservative_round_bias : Double = 0.5 + 1.5 / 64.0
 /// from a float rect.
 fn round_down_to_int(x : Float) -> Int {
   let xx = x.to_double() - conservative_round_bias
-  @path.i32_saturate_from_f64(xx.ceil())
+  i32_saturate_from_f64(xx.ceil())
 }
 
 ///|
@@ -111,7 +111,7 @@ fn round_down_to_int(x : Float) -> Int {
 /// float rect.
 fn round_up_to_int(x : Float) -> Int {
   let xx = x.to_double() + conservative_round_bias
-  @path.i32_saturate_from_f64(xx.floor())
+  i32_saturate_from_f64(xx.floor())
 }
 
 ///|

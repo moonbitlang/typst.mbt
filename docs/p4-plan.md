@@ -534,9 +534,9 @@ argument's span (see the deviation note in `library/image.mbt`).
 
 ## Status: raster export (tiny-skia + typst-render)
 
-**Packages.** `skia/path` is a port of `tiny-skia-path` 0.12.0 (point,
-rect/size, transform, path, path builder, path geometry, stroker, dash);
-`skia` ports `tiny-skia` 0.12.0 (fixed point, edges and edge builder, edge
+**Packages.** `skia` uses `tiny_skia_path` (the port of `tiny-skia-path`
+0.12.0 shared with `usvg`; the crate-private `Scalar` helpers live in
+`skia/float.mbt`, small adapters in `skia/path_compat.mbt`) and ports `tiny-skia` 0.12.0 (fixed point, edges and edge builder, edge
 and line clipping, `path64` cubic intersections, non-AA and supersampled AA
 path filling, hairlines (incl. anti-aliased), alpha runs, the highp (f32x8)
 and lowp (u16x16) raster pipelines with all stages exactly as tiny-skia
@@ -559,7 +559,7 @@ installed once usvg/resvg are ported); PDF images (hayro) are skipped.
 tiny-skia 0.12) draws random scenes (paths, hairlines, strokes, dashes,
 rects, pixmaps, all shaders/blend modes/color spaces, masks): all pixel
 hashes are identical; `skia/scene_wbtest.mbt` keeps 40 recorded hashes.
-The stroker/dasher matched on 176k random cases, pixglyph on 168k
+pixglyph matched on 168k
 rasterizations, resizing on 9.7k cases.
 
 **Render stage.** `scripts/goldens.sh render` (oracle/src/render.rs) dumps

@@ -1,4 +1,5 @@
-// Port of `tiny-skia-path/src/scalar.rs` and `floating_point.rs`, plus the
+// Helpers of `tiny-skia-path/src/scalar.rs` and `floating_point.rs`
+// (the `Scalar` trait and friends, crate-private upstream), plus the
 // Rust `f32` primitives (`min`, `max`, `as` casts, ...) with their exact
 // semantics.
 //

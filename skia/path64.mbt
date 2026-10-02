@@ -9,20 +9,18 @@ let dbl_epsilon : Double = 2.220446049250313e-16
 let dbl_epsilon_err : Double = dbl_epsilon * 4.0
 
 ///|
-let flt_epsilon_half : Double = (@path.f32_epsilon / 2.0).to_double()
+let flt_epsilon_half : Double = (f32_epsilon / 2.0).to_double()
 
 ///|
-let flt_epsilon_cubed : Double = (@path.f32_epsilon *
-@path.f32_epsilon *
-@path.f32_epsilon).to_double()
+let flt_epsilon_cubed : Double = (f32_epsilon * f32_epsilon * f32_epsilon).to_double()
 
 ///|
-let flt_epsilon_inverse : Double = 1.0 / @path.f32_epsilon.to_double()
+let flt_epsilon_inverse : Double = 1.0 / f32_epsilon.to_double()
 
 ///|
 /// Works just like SkTPin, returning `max` for NaN/inf
 fn bound64(x : Double, min : Double, max : Double) -> Double {
-  @path.dmax(@path.dmin(max, x), min)
+  dmax(dmin(max, x), min)
 }
 
 ///|
@@ -67,7 +65,7 @@ fn approximately_zero_half(x : Double) -> Bool {
 
 ///|
 fn approximately_zero_when_compared_to(x : Double, other : Double) -> Bool {
-  x == 0.0 || x.abs() < (other * @path.f32_epsilon.to_double()).abs()
+  x == 0.0 || x.abs() < (other * f32_epsilon.to_double()).abs()
 }
 
 ///|
@@ -84,12 +82,12 @@ fn approximately_equal_half(x : Double, other : Double) -> Bool {
 
 ///|
 fn almost_dequal_ulps64(x : Double, other : Double) -> Bool {
-  let max = @path.scalar_max.to_double()
+  let max = scalar_max.to_double()
   if x.abs() < max && other.abs() < max {
-    @path.almost_dequal_ulps(x.to_float(), other.to_float())
+    almost_dequal_ulps(x.to_float(), other.to_float())
   } else {
-    (x - other).abs() / @path.dmax(x.abs(), other.abs()) <
-    (@path.f32_epsilon * 16.0).to_double()
+    (x - other).abs() / dmax(x.abs(), other.abs()) <
+    (f32_epsilon * 16.0).to_double()
   }
 }
 
@@ -311,7 +309,7 @@ fn Cubic64::binary_search(
   let mut calc_pos = cubic_at_t.axis_coord(x_axis)
   let mut calc_dist = calc_pos - axis_intercept
   while true {
-    let prior_t = @path.dmax(min, t - step)
+    let prior_t = dmax(min, t - step)
     let less_pt = self.point_at_t(prior_t)
     if approximately_equal_half(less_pt.x, cubic_at_t.x) &&
       approximately_equal_half(less_pt.y, cubic_at_t.y) {

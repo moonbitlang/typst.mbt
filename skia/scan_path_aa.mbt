@@ -23,10 +23,10 @@ fn scan_path_aa_fill_path(
   // this method rounds out first and then converts into a Rect.
   let b = path.bounds()
   let ir = @path.Rect::from_ltrb(
-    @path.floorf(b.left()),
-    @path.floorf(b.top()),
-    @path.ceilf(b.right()),
-    @path.ceilf(b.bottom()),
+    floorf(b.left()),
+    floorf(b.top()),
+    ceilf(b.right()),
+    ceilf(b.bottom()),
   ).bind(r => r.round_out())
   guard ir is Some(ir) else { return }
 

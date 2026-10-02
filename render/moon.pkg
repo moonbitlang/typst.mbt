@@ -3,7 +3,7 @@ import {
   "moonbitlang/typst/layout",
   "moonbitlang/typst/svg",
   "moonbitlang/typst/skia",
-  "moonbitlang/typst/skia/path",
+  "moonbitlang/typst/tiny_skia_path" @path,
   "moonbitlang/typst/pixglyph",
   "moonbitlang/typst/codecs",
   "moonbitlang/typst/otf",

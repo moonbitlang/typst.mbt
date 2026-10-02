@@ -80,7 +80,7 @@ fn musl_sinf(x : Float) -> Float {
     return k_sinf(if sign { x64 + s4_pio2 } else { x64 - s4_pio2 })
   }
   // sin(Inf or NaN) is NaN; general argument reduction is not ported.
-  @path.sinf(x)
+  @skia.sinf(x)
 }
 
 ///|
@@ -121,7 +121,7 @@ fn musl_cosf(x : Float) -> Float {
     }
   }
   // cos(Inf or NaN) is NaN; general argument reduction is not ported.
-  @path.cosf(x)
+  @skia.cosf(x)
 }
 
 ///|
@@ -163,7 +163,7 @@ fn musl_atanf(x : Float) -> Float {
     }
     -1
   } else {
-    x = @path.fabs(x)
+    x = @skia.fabs(x)
     if ix < 0x3f980000 {
       // |x| < 1.1875
       if ix < 0x3f300000 {
@@ -258,7 +258,7 @@ fn musl_atan2f(y : Float, x : Float) -> Float {
     // |y/x| < 0x1p-26, x < 0
     0.0
   } else {
-    musl_atanf(@path.fabs(y / x))
+    musl_atanf(@skia.fabs(y / x))
   }
   match m {
     0 => z // atan(+,+)

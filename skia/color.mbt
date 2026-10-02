@@ -217,10 +217,10 @@ pub let color_white : Color = { r: 1.0, g: 1.0, b: 1.0, a: 1.0, }
 ///|
 /// Creates a new color from 4 components. All values must be in 0..=1 range.
 pub fn Color::from_rgba(r : Float, g : Float, b : Float, a : Float) -> Color? {
-  guard @path.normalized_f32(r) is Some(r) else { return None }
-  guard @path.normalized_f32(g) is Some(g) else { return None }
-  guard @path.normalized_f32(b) is Some(b) else { return None }
-  guard @path.normalized_f32(a) is Some(a) else { return None }
+  guard normalized_f32(r) is Some(r) else { return None }
+  guard normalized_f32(g) is Some(g) else { return None }
+  guard normalized_f32(b) is Some(b) else { return None }
+  guard normalized_f32(a) is Some(a) else { return None }
   Some({ r, g, b, a, })
 }
 
@@ -275,16 +275,13 @@ pub fn Color::alpha(self : Color) -> Float {
 ///|
 /// Returns the color with the alpha set (clamped to 0..=1).
 pub fn Color::with_alpha(self : Color, c : Float) -> Color {
-  { ..self, a: @path.normalized_f32_clamped(c), }
+  { ..self, a: normalized_f32_clamped(c), }
 }
 
 ///|
 /// Shifts color's opacity. Essentially, multiplies color's alpha by opacity.
 pub fn Color::apply_opacity(self : Color, opacity : Float) -> Color {
-  {
-    ..self,
-    a: @path.normalized_f32_clamped(self.a * @path.bound(opacity, 0.0, 1.0)),
-  }
+  { ..self, a: normalized_f32_clamped(self.a * bound(opacity, 0.0, 1.0)), }
 }
 
 ///|
@@ -300,9 +297,9 @@ pub fn Color::premultiply(self : Color) -> PremultipliedColor {
     { r: self.r, g: self.g, b: self.b, a: self.a, }
   } else {
     {
-      r: @path.normalized_f32_clamped(self.r * self.a),
-      g: @path.normalized_f32_clamped(self.g * self.a),
-      b: @path.normalized_f32_clamped(self.b * self.a),
+      r: normalized_f32_clamped(self.r * self.a),
+      g: normalized_f32_clamped(self.g * self.a),
+      b: normalized_f32_clamped(self.b * self.a),
       a: self.a,
     }
   }
@@ -351,9 +348,9 @@ pub fn PremultipliedColor::demultiply(self : PremultipliedColor) -> Color {
     color_transparent
   } else {
     {
-      r: @path.normalized_f32_clamped(self.r / a),
-      g: @path.normalized_f32_clamped(self.g / a),
-      b: @path.normalized_f32_clamped(self.b / a),
+      r: normalized_f32_clamped(self.r / a),
+      g: normalized_f32_clamped(self.g / a),
+      b: normalized_f32_clamped(self.b / a),
       a,
     }
   }
@@ -407,15 +404,15 @@ fn ColorSpace::expand_channel(self : ColorSpace, x : Float) -> Float {
   match self {
     Linear => x
     // `NormalizedF32 * NormalizedF32` clamps.
-    Gamma2 => @path.normalized_f32_clamped(x * x)
-    SimpleSRGB => @path.normalized_f32_clamped(approx_powf(x, 2.2))
+    Gamma2 => normalized_f32_clamped(x * x)
+    SimpleSRGB => normalized_f32_clamped(approx_powf(x, 2.2))
     FullSRGBGamma => {
       let x = if x <= 0.04045 {
         x / 12.92
       } else {
         approx_powf((x + 0.055) / 1.055, 2.4)
       }
-      @path.normalized_f32_clamped(x)
+      normalized_f32_clamped(x)
     }
   }
 }

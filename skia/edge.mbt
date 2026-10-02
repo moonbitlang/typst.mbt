@@ -72,10 +72,10 @@ fn Edge::line_default() -> Edge {
 /// `LineEdge::new`.
 fn Edge::new_line(p0 : @path.Point, p1 : @path.Point, shift : Int) -> Edge? {
   let scale = Float::from_int(1 << (shift + 6))
-  let mut x0 = @path.f32_to_i32(p0.x * scale)
-  let mut y0 = @path.f32_to_i32(p0.y * scale)
-  let mut x1 = @path.f32_to_i32(p1.x * scale)
-  let mut y1 = @path.f32_to_i32(p1.y * scale)
+  let mut x0 = f32_to_i32(p0.x * scale)
+  let mut y0 = f32_to_i32(p0.y * scale)
+  let mut x1 = f32_to_i32(p1.x * scale)
+  let mut y1 = f32_to_i32(p1.y * scale)
   let mut winding = 1
   if y0 > y1 {
     let tx = x0
@@ -153,12 +153,12 @@ fn Edge::new_quadratic(points : ArrayView[@path.Point], shift : Int) -> Edge? {
 fn Edge::new_quadratic2(points : ArrayView[@path.Point], shift : Int) -> Edge? {
   let mut shift = shift
   let scale = Float::from_int(1 << (shift + 6))
-  let mut x0 = @path.f32_to_i32(points[0].x * scale)
-  let mut y0 = @path.f32_to_i32(points[0].y * scale)
-  let x1 = @path.f32_to_i32(points[1].x * scale)
-  let y1 = @path.f32_to_i32(points[1].y * scale)
-  let mut x2 = @path.f32_to_i32(points[2].x * scale)
-  let mut y2 = @path.f32_to_i32(points[2].y * scale)
+  let mut x0 = f32_to_i32(points[0].x * scale)
+  let mut y0 = f32_to_i32(points[0].y * scale)
+  let x1 = f32_to_i32(points[1].x * scale)
+  let y1 = f32_to_i32(points[1].y * scale)
+  let mut x2 = f32_to_i32(points[2].x * scale)
+  let mut y2 = f32_to_i32(points[2].y * scale)
   let mut winding = 1
   if y0 > y2 {
     let tx = x0
@@ -301,14 +301,14 @@ fn Edge::new_cubic2(
   sort_y : Bool,
 ) -> Edge? {
   let scale = Float::from_int(1 << (shift + 6))
-  let mut x0 = @path.f32_to_i32(points[0].x * scale)
-  let mut y0 = @path.f32_to_i32(points[0].y * scale)
-  let mut x1 = @path.f32_to_i32(points[1].x * scale)
-  let mut y1 = @path.f32_to_i32(points[1].y * scale)
-  let mut x2 = @path.f32_to_i32(points[2].x * scale)
-  let mut y2 = @path.f32_to_i32(points[2].y * scale)
-  let mut x3 = @path.f32_to_i32(points[3].x * scale)
-  let mut y3 = @path.f32_to_i32(points[3].y * scale)
+  let mut x0 = f32_to_i32(points[0].x * scale)
+  let mut y0 = f32_to_i32(points[0].y * scale)
+  let mut x1 = f32_to_i32(points[1].x * scale)
+  let mut y1 = f32_to_i32(points[1].y * scale)
+  let mut x2 = f32_to_i32(points[2].x * scale)
+  let mut y2 = f32_to_i32(points[2].y * scale)
+  let mut x3 = f32_to_i32(points[3].x * scale)
+  let mut y3 = f32_to_i32(points[3].y * scale)
   let mut winding = 1
   if sort_y && y0 > y3 {
     let t = x0

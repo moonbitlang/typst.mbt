@@ -19,9 +19,9 @@ fn render_image(
 
   // To avoid division by 0, choose the one of { sin, cos } that is
   // further from 0.
-  let prefer_sin = @path.fabs(musl_sinf(theta)) >
+  let prefer_sin = @skia.fabs(musl_sinf(theta)) >
     (0.70710678118654752440 : Float)
-  let scale_x = @path.fabs(
+  let scale_x = @skia.fabs(
     if prefer_sin {
       ts.kx / musl_sinf(theta)
     } else {
@@ -29,10 +29,10 @@ fn render_image(
     },
   )
   let aspect = image.width().to_float() / image.height().to_float()
-  let w = @path.f32_to_u32(
-    @path.ceilf(scale_x * @path.fmax(view_width, aspect * view_height)),
+  let w = @skia.f32_to_u32(
+    @skia.ceilf(scale_x * @skia.fmax(view_width, aspect * view_height)),
   )
-  let h = @path.f32_to_u32(@path.ceilf(Float::from_uint(w) / aspect))
+  let h = @skia.f32_to_u32(@skia.ceilf(Float::from_uint(w) / aspect))
   guard build_texture(image, w, h) is Some(pixmap) else { return }
   let paint_scale_x = view_width / Float::from_int(pixmap.width())
   let paint_scale_y = view_height / Float::from_int(pixmap.height())

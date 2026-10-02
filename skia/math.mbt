@@ -30,19 +30,19 @@ fn approx_powf(x : Float, y : Float) -> Float {
     (1.498030302 : Float) * m -
     (1.725879990 : Float) / ((0.3520887068 : Float) + m)
   let x = log2_x * y
-  let f = x - @path.floorf(x)
+  let f = x - floorf(x)
   let mut a = x + (121.274057500 : Float)
   a -= f * (1.490129070 : Float)
   a += (27.728023300 : Float) / ((4.84252568 : Float) - f)
   a *= Float::from_int(1 << 23)
-  if a < Float::from_uint(@path.f32_infinity.reinterpret_as_uint()) {
+  if a < Float::from_uint(f32_infinity.reinterpret_as_uint()) {
     if a > 0.0 {
-      Float::reinterpret_from_uint(@path.f32_to_u32(@path.roundf(a)))
+      Float::reinterpret_from_uint(f32_to_u32(roundf(a)))
     } else {
       0.0
     }
   } else {
-    @path.f32_infinity
+    f32_infinity
   }
 }
 
@@ -58,7 +58,7 @@ fn fdot6_from_i32(n : Int) -> Int {
 
 ///|
 fn fdot6_from_f32(n : Float) -> Int {
-  @path.f32_to_i32(n * 64.0)
+  f32_to_i32(n * 64.0)
 }
 
 ///|
@@ -120,7 +120,7 @@ let fdot16_one : Int = 1 << 16
 /// `from_f32` seems to lack a rounding step. For all fixed-point values, this
 /// version is as accurate as possible for (fixed -> float -> fixed).
 fn fdot16_from_f32(x : Float) -> Int {
-  @path.i32_saturate_from(x * Float::from_int(fdot16_one))
+  i32_saturate_from(x * Float::from_int(fdot16_one))
 }
 
 ///|

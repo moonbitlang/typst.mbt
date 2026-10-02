@@ -11,7 +11,6 @@ import {
   "moonbitlang/typst/svg",
   "moonbitlang/typst/render",
   "moonbitlang/typst/skia",
-  "moonbitlang/typst/skia/path" @skpath,
   "moonbitlang/typst/pdf",
   "moonbitlang/pdflite",
   "moonbitlang/pdflite/core" @pdfcore,

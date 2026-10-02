@@ -67,7 +67,7 @@ pub fn Mask::from_pixmap(pixmap : Pixmap, mask_type : MaskType) -> Mask {
         } else {
           v
         }
-        data[i] = f32_to_u8(@path.ceilf(v)).to_byte()
+        data[i] = f32_to_u8(ceilf(v)).to_byte()
       }
   }
   { data, size: pixmap.size, }
@@ -185,8 +185,8 @@ pub fn Mask::fill_path(
 
     // Skip empty paths and horizontal/vertical lines.
     let path_bounds = path.bounds()
-    if @path.is_nearly_zero(path_bounds.width()) ||
-      @path.is_nearly_zero(path_bounds.height()) {
+    if is_nearly_zero(path_bounds.width()) ||
+      is_nearly_zero(path_bounds.height()) {
       // empty paths and horizontal/vertical lines cannot be filled
       return
     }

@@ -125,8 +125,8 @@ fn Pixmap::fill_path_impl(
 
     // Skip empty paths and horizontal/vertical lines.
     let path_bounds = path.bounds()
-    if @path.is_nearly_zero(path_bounds.width()) ||
-      @path.is_nearly_zero(path_bounds.height()) {
+    if is_nearly_zero(path_bounds.width()) ||
+      is_nearly_zero(path_bounds.height()) {
       // empty paths and horizontal/vertical lines cannot be filled
       return
     }
@@ -262,7 +262,7 @@ fn Pixmap::stroke_path_impl(
       // This is the old technique, which we preserve for now so
       // we don't change previous results (testing)
       // the new way seems fine, its just (a tiny bit) different.
-      let scale = @path.f32_to_i32(coverage * 256.0)
+      let scale = f32_to_i32(coverage * 256.0)
       let new_alpha = (255 * scale) >> 8
       paint.shader = paint.shader.apply_opacity(
         Float::from_int(new_alpha) / 255.0,
@@ -438,14 +438,14 @@ fn treat_as_hairline(
   ts : @path.Transform,
 ) -> Float? {
   fn fast_len(p : @path.Point) -> Float {
-    let mut x = @path.fabs(p.x)
-    let mut y = @path.fabs(p.y)
+    let mut x = fabs(p.x)
+    let mut y = fabs(p.y)
     if x < y {
       let t = x
       x = y
       y = t
     }
-    x + @path.half(y)
+    x + half(y)
   }
 
   if stroke.width == 0.0 {
@@ -467,7 +467,7 @@ fn treat_as_hairline(
   let len0 = fast_len(points[0])
   let len1 = fast_len(points[1])
   if len0 <= 1.0 && len1 <= 1.0 {
-    return Some(@path.ave(len0, len1))
+    return Some(ave(len0, len1))
   }
   None
 }
@@ -477,7 +477,7 @@ fn is_too_big_for_math(path : @path.Path) -> Bool {
   // This value is just a guess. smaller is safer, but we don't want to reject
   // largish paths that we don't have to.
   let scale_down_to_allow_for_small_multiplies : Float = 0.25
-  let max = @path.scalar_max * scale_down_to_allow_for_small_multiplies
+  let max = scalar_max * scale_down_to_allow_for_small_multiplies
   let b = path.bounds()
 
   // use ! expression so we return true if bounds contains NaN

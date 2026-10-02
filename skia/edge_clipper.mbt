@@ -132,11 +132,11 @@ fn EdgeClipper::clip_mono_quad(
   // are we partially to the left
   if pts[0].x < self.clip.left() {
     if chop_mono_quad_at_x(pts, self.clip.left()) is Some(t) {
-      @path.chop_quad_at(pts[:], t, tmp)
+      ts_chop_quad_at(pts[:], t, tmp)
       self.push_vline(self.clip.left(), tmp[0].y, tmp[2].y, reverse)
       // clamp to clean up imprecise numerics in the chop
       tmp[2] = { x: self.clip.left(), y: tmp[2].y, }
-      tmp[3] = { x: @path.fmax(tmp[3].x, self.clip.left()), y: tmp[3].y, }
+      tmp[3] = { x: fmax(tmp[3].x, self.clip.left()), y: tmp[3].y, }
       pts[0] = tmp[2]
       pts[1] = tmp[3]
     } else {
@@ -150,17 +150,17 @@ fn EdgeClipper::clip_mono_quad(
   // are we partially to the right
   if pts[2].x > self.clip.right() {
     if chop_mono_quad_at_x(pts, self.clip.right()) is Some(t) {
-      @path.chop_quad_at(pts[:], t, tmp)
+      ts_chop_quad_at(pts[:], t, tmp)
       // clamp to clean up imprecise numerics in the chop
-      tmp[1] = { x: @path.fmin(tmp[1].x, self.clip.right()), y: tmp[1].y, }
+      tmp[1] = { x: fmin(tmp[1].x, self.clip.right()), y: tmp[1].y, }
       tmp[2] = { x: self.clip.right(), y: tmp[2].y, }
       self.push_quad([tmp[0], tmp[1], tmp[2]], reverse)
       self.push_vline(self.clip.right(), tmp[2].y, tmp[4].y, reverse)
     } else {
       // if chopMonoQuadAtY failed, then we may have hit inexact numerics
       // so we just clamp against the right
-      pts[1] = { x: @path.fmin(pts[1].x, self.clip.right()), y: pts[1].y, }
-      pts[2] = { x: @path.fmin(pts[2].x, self.clip.right()), y: pts[2].y, }
+      pts[1] = { x: fmin(pts[1].x, self.clip.right()), y: pts[1].y, }
+      pts[2] = { x: fmin(pts[2].x, self.clip.right()), y: pts[2].y, }
       self.push_quad(pts, reverse)
     }
   } else {
@@ -277,7 +277,7 @@ fn EdgeClipper::clip_mono_cubic(
     // Since we can't trust the numerics of
     // the chopper, we force those conditions now
     tmp[3] = { x: self.clip.left(), y: tmp[3].y, }
-    tmp[4] = { x: @path.fmax(tmp[4].x, self.clip.left()), y: tmp[4].y, }
+    tmp[4] = { x: fmax(tmp[4].x, self.clip.left()), y: tmp[4].y, }
     pts[0] = tmp[3]
     pts[1] = tmp[4]
     pts[2] = tmp[5]
@@ -288,7 +288,7 @@ fn EdgeClipper::clip_mono_cubic(
     let tmp = Array::make(7, @path.Point::zero())
     chop_mono_cubic_at_x(pts, self.clip.right(), tmp)
     tmp[3] = { x: self.clip.right(), y: tmp[3].y, }
-    tmp[2] = { x: @path.fmin(tmp[2].x, self.clip.right()), y: tmp[2].y, }
+    tmp[2] = { x: fmin(tmp[2].x, self.clip.right()), y: tmp[2].y, }
     self.push_cubic([tmp[0], tmp[1], tmp[2], tmp[3]], reverse)
     self.push_vline(self.clip.right(), tmp[3].y, tmp[6].y, reverse)
   } else {
@@ -385,10 +385,10 @@ fn chop_quad_in_y(clip : @path.Rect, pts : Array[@path.Point]) -> Unit {
   if pts[0].y < clip.top() {
     if chop_mono_quad_at_y(pts, clip.top()) is Some(t) {
       // take the 2nd chopped quad
-      @path.chop_quad_at(pts[:], t, tmp)
+      ts_chop_quad_at(pts[:], t, tmp)
       // clamp to clean up imprecise numerics in the chop
       tmp[2] = { x: tmp[2].x, y: clip.top(), }
-      tmp[3] = { x: tmp[3].x, y: @path.fmax(tmp[3].y, clip.top()), }
+      tmp[3] = { x: tmp[3].x, y: fmax(tmp[3].y, clip.top()), }
       pts[0] = tmp[2]
       pts[1] = tmp[3]
     } else {
@@ -405,9 +405,9 @@ fn chop_quad_in_y(clip : @path.Rect, pts : Array[@path.Point]) -> Unit {
   // are we partially below
   if pts[2].y > clip.bottom() {
     if chop_mono_quad_at_y(pts, clip.bottom()) is Some(t) {
-      @path.chop_quad_at(pts[:], t, tmp)
+      ts_chop_quad_at(pts[:], t, tmp)
       // clamp to clean up imprecise numerics in the chop
-      tmp[1] = { x: tmp[1].x, y: @path.fmin(tmp[1].y, clip.bottom()), }
+      tmp[1] = { x: tmp[1].x, y: fmin(tmp[1].y, clip.bottom()), }
       tmp[2] = { x: tmp[2].x, y: clip.bottom(), }
       pts[1] = tmp[1]
       pts[2] = tmp[2]
@@ -446,8 +446,8 @@ fn chop_mono_quad_at(
   let a = c0 - c1 - c1 + c2
   let b = (2.0 : Float) * (c1 - c0)
   let c = c0 - target
-  let roots = @path.new_t_values()
-  let count = @path.find_unit_quad_roots(a, b, c, roots)
+  let roots = ts_new_t_values()
+  let count = ts_find_unit_quad_roots(a, b, c, roots)
   if count != 0 {
     Some(roots[0])
   } else {
@@ -497,7 +497,7 @@ fn chop_cubic_in_y(clip : @path.Rect, pts : Array[@path.Point]) -> Unit {
     // Since we can't trust the numerics of the chopper, we force those
     // conditions now
     tmp[3] = { x: tmp[3].x, y: clip.top(), }
-    tmp[4] = { x: tmp[4].x, y: @path.fmax(tmp[4].y, clip.top()), }
+    tmp[4] = { x: tmp[4].x, y: fmax(tmp[4].y, clip.top()), }
     pts[0] = tmp[3]
     pts[1] = tmp[4]
     pts[2] = tmp[5]
@@ -508,7 +508,7 @@ fn chop_cubic_in_y(clip : @path.Rect, pts : Array[@path.Point]) -> Unit {
     let tmp = Array::make(7, @path.Point::zero())
     chop_mono_cubic_at_y(pts, clip.bottom(), tmp)
     tmp[3] = { x: tmp[3].x, y: clip.bottom(), }
-    tmp[2] = { x: tmp[2].x, y: @path.fmin(tmp[2].y, clip.bottom()), }
+    tmp[2] = { x: tmp[2].x, y: fmin(tmp[2].y, clip.bottom()), }
     pts[1] = tmp[1]
     pts[2] = tmp[2]
     pts[3] = tmp[3]
@@ -525,7 +525,7 @@ fn chop_mono_cubic_at_x(
     return
   }
   let src_values : FixedArray[Float] = [src[0].x, src[1].x, src[2].x, src[3].x]
-  @path.chop_cubic_at2(src[:], mono_cubic_closest_t(src_values, x), dst, 0)
+  ts_chop_cubic_at2(src[:], mono_cubic_closest_t(src_values, x), dst, 0)
 }
 
 ///|
@@ -538,7 +538,7 @@ fn chop_mono_cubic_at_y(
     return
   }
   let src_values : FixedArray[Float] = [src[0].y, src[1].y, src[2].y, src[3].y]
-  @path.chop_cubic_at2(src[:], mono_cubic_closest_t(src_values, y), dst, 0)
+  ts_chop_cubic_at2(src[:], mono_cubic_closest_t(src_values, y), dst, 0)
 }
 
 ///|
@@ -553,10 +553,10 @@ fn mono_cubic_closest_t(src : FixedArray[Float], x : Float) -> Float {
   let b = (3.0 : Float) * (src[2] - src[1] - src[1] + d)
   let c = (3.0 : Float) * (src[1] - d)
   x -= d
-  let mut closest = @path.scalar_max
+  let mut closest = scalar_max
   while true {
     let loc = ((a * t + b) * t + c) * t
-    let dist = @path.fabs(loc - x)
+    let dist = fabs(loc - x)
     if closest > dist {
       closest = dist
       best_t = t
@@ -568,5 +568,5 @@ fn mono_cubic_closest_t(src : FixedArray[Float], x : Float) -> Float {
       break
     }
   }
-  @path.normalized_f32_exclusive(best_t).unwrap()
+  normalized_f32_exclusive(best_t).unwrap()
 }

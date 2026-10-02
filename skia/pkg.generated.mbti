@@ -5,15 +5,27 @@ import {
   "moonbitlang/core/debug",
   "moonbitlang/core/ref",
   "moonbitlang/typst/codecs",
-  "moonbitlang/typst/skia/path",
+  "moonbitlang/typst/tiny_skia_path",
 }
 
 // Values
+pub fn acosf(Float) -> Float
+
+pub fn almost_dequal_ulps(Float, Float) -> Bool
+
 pub let alpha_u8_opaque : Int
 
 pub let alpha_u8_transparent : Int
 
+pub fn atan2f(Float, Float) -> Float
+
+pub fn ave(Float, Float) -> Float
+
+pub fn bound(Float, Float, Float) -> Float
+
 pub let bytes_per_pixel : Int
+
+pub fn ceilf(Float) -> Float
 
 pub let color_black : Color
 
@@ -21,15 +33,127 @@ pub let color_transparent : Color
 
 pub let color_white : Color
 
+pub fn cosf(Float) -> Float
+
+pub fn dmax(Double, Double) -> Double
+
+pub fn dmin(Double, Double) -> Double
+
+pub fn f32_as_2s_compliment(Float) -> Int
+
+pub let f32_epsilon : Float
+
+pub let f32_infinity : Float
+
+pub let f32_max : Float
+
+pub let f32_nan : Float
+
+pub let f32_neg_infinity : Float
+
+pub fn f32_to_i32(Float) -> Int
+
 pub fn f32_to_u16(Float) -> Int
 
+pub fn f32_to_u32(Float) -> UInt
+
 pub fn f32_to_u8(Float) -> Int
+
+pub fn fabs(Float) -> Float
+
+pub fn finite_f32(Float) -> Float?
+
+pub let float_pi : Float
+
+pub fn floorf(Float) -> Float
+
+pub fn fmaf(Float, Float, Float) -> Float
+
+pub fn fmax(Float, Float) -> Float
+
+pub fn fmin(Float, Float) -> Float
+
+pub fn fmodf(Float, Float) -> Float
+
+pub fn half(Float) -> Float
+
+pub fn i32_saturate_ceil(Float) -> Int
+
+pub fn i32_saturate_floor(Float) -> Int
+
+pub fn i32_saturate_from(Float) -> Int
+
+pub fn i32_saturate_from_f64(Double) -> Int
+
+pub fn i32_saturate_round(Float) -> Int
+
+pub fn i32_saturating_add(Int, Int) -> Int
+
+pub fn i32_saturating_sub(Int, Int) -> Int
+
+pub fn i32_to_f32(Int) -> Float
+
+pub fn invert(Float) -> Float
+
+pub fn is_finite(Float) -> Bool
+
+pub fn is_finite_f64(Double) -> Bool
+
+pub fn is_nearly_equal(Float, Float) -> Bool
+
+pub fn is_nearly_equal_within_tolerance(Float, Float, Float) -> Bool
+
+pub fn is_nearly_zero(Float) -> Bool
+
+pub fn is_nearly_zero_within_tolerance(Float, Float) -> Bool
+
+pub fn is_sign_negative(Float) -> Bool
+
+pub fn non_zero_positive_f32(Float) -> Float?
+
+pub fn normalized_f32(Float) -> Float?
+
+pub fn normalized_f32_clamped(Float) -> Float
+
+pub fn normalized_f32_exclusive(Float) -> Float?
+
+pub fn normalized_f32_exclusive_bounded(Float) -> Float
+
+pub let normalized_f32_exclusive_half : Float
+
+pub fn powf(Float, Float) -> Float
 
 pub let premultiplied_color_u8_transparent : PremultipliedColorU8
 
 pub fn premultiply_u8(Int, Int) -> Int
 
+pub fn rem_euclid(Float, Float) -> Float
+
+pub fn rintf(Float) -> Float
+
+pub fn roundf(Float) -> Float
+
+pub let scalar_max : Float
+
+pub let scalar_nearly_zero : Float
+
+pub let scalar_root_2_over_2 : Float
+
+pub fn signum(Float) -> Float
+
+pub fn sinf(Float) -> Float
+
+pub fn sqr(Float) -> Float
+
+pub fn tanf(Float) -> Float
+
+pub fn to_radians(Float) -> Float
+
 pub let trace_hook : @ref.Ref[((String) -> Unit)?]
+
+pub fn truncf(Float) -> Float
+
+pub fn u32_to_f32(UInt) -> Float
 
 // Errors
 
@@ -124,8 +248,8 @@ type FocalData derive(Eq)
 pub(all) struct Gradient {
   stops : Array[GradientStop]
   tile_mode : SpreadMode
-  transform : @path.Transform
-  points_to_unit : @path.Transform
+  transform : @tiny_skia_path.Transform
+  points_to_unit : @tiny_skia_path.Transform
   colors_are_opaque : Bool
   has_uniform_stops : Bool
 }
@@ -143,23 +267,23 @@ type GradientType
 pub(all) struct LinearGradient {
   base : Gradient
 }
-pub fn LinearGradient::new(@path.Point, @path.Point, Array[GradientStop], SpreadMode, @path.Transform) -> Shader?
+pub fn LinearGradient::new(@tiny_skia_path.Point, @tiny_skia_path.Point, Array[GradientStop], SpreadMode, @tiny_skia_path.Transform) -> Shader?
 
 pub struct Mask {
   data : FixedArray[Byte]
-  size : @path.IntSize
+  size : @tiny_skia_path.IntSize
 }
 pub fn Mask::clear(Self) -> Unit
 pub fn Mask::clone(Self) -> Self
 pub fn Mask::data(Self) -> FixedArray[Byte]
-pub fn Mask::fill_path(Self, @path.Path, FillRule, Bool, @path.Transform) -> Unit
+pub fn Mask::fill_path(Self, @tiny_skia_path.Path, FillRule, Bool, @tiny_skia_path.Transform) -> Unit
 pub fn Mask::from_pixmap(Pixmap, MaskType) -> Self
-pub fn Mask::from_vec(FixedArray[Byte], @path.IntSize) -> Self?
+pub fn Mask::from_vec(FixedArray[Byte], @tiny_skia_path.IntSize) -> Self?
 pub fn Mask::height(Self) -> Int
-pub fn Mask::intersect_path(Self, @path.Path, FillRule, Bool, @path.Transform) -> Unit
+pub fn Mask::intersect_path(Self, @tiny_skia_path.Path, FillRule, Bool, @tiny_skia_path.Transform) -> Unit
 pub fn Mask::invert(Self) -> Unit
 pub fn Mask::new(UInt, UInt) -> Self?
-pub fn Mask::size(Self) -> @path.IntSize
+pub fn Mask::size(Self) -> @tiny_skia_path.IntSize
 pub fn Mask::width(Self) -> Int
 
 pub(all) enum MaskType {
@@ -185,32 +309,32 @@ pub(all) struct Pattern {
   quality : FilterQuality
   spread_mode : SpreadMode
   opacity : Float
-  transform : @path.Transform
+  transform : @tiny_skia_path.Transform
 }
-pub fn Pattern::new(Pixmap, SpreadMode, FilterQuality, Float, @path.Transform) -> Shader
+pub fn Pattern::new(Pixmap, SpreadMode, FilterQuality, Float, @tiny_skia_path.Transform) -> Shader
 
 pub struct Pixmap {
   data : FixedArray[UInt]
-  size : @path.IntSize
+  size : @tiny_skia_path.IntSize
 }
 pub fn Pixmap::apply_mask(Self, Mask) -> Unit
 pub fn Pixmap::clone(Self) -> Self
-pub fn Pixmap::clone_rect(Self, @path.IntRect) -> Self?
+pub fn Pixmap::clone_rect(Self, @tiny_skia_path.IntRect) -> Self?
 pub fn Pixmap::data(Self) -> Bytes
 pub fn Pixmap::decode_png(BytesView) -> Self raise @codecs.ImageError
-pub fn Pixmap::draw_pixmap(Self, Int, Int, Self, PixmapPaint, @path.Transform, Mask?) -> Unit
+pub fn Pixmap::draw_pixmap(Self, Int, Int, Self, PixmapPaint, @tiny_skia_path.Transform, Mask?) -> Unit
 pub fn Pixmap::encode_png(Self) -> Bytes
 pub fn Pixmap::fill(Self, Color) -> Unit
-pub fn Pixmap::fill_path(Self, @path.Path, Paint, FillRule, @path.Transform, Mask?) -> Unit
-pub fn Pixmap::fill_rect(Self, @path.Rect, Paint, @path.Transform, Mask?) -> Unit
+pub fn Pixmap::fill_path(Self, @tiny_skia_path.Path, Paint, FillRule, @tiny_skia_path.Transform, Mask?) -> Unit
+pub fn Pixmap::fill_rect(Self, @tiny_skia_path.Rect, Paint, @tiny_skia_path.Transform, Mask?) -> Unit
 pub fn Pixmap::from_bytes(BytesView, UInt, UInt) -> Self?
-pub fn Pixmap::from_vec(FixedArray[UInt], @path.IntSize) -> Self?
+pub fn Pixmap::from_vec(FixedArray[UInt], @tiny_skia_path.IntSize) -> Self?
 pub fn Pixmap::height(Self) -> Int
 pub fn Pixmap::new(UInt, UInt) -> Self?
 pub fn Pixmap::pixel(Self, UInt, UInt) -> PremultipliedColorU8?
 pub fn Pixmap::pixels(Self) -> FixedArray[UInt]
-pub fn Pixmap::size(Self) -> @path.IntSize
-pub fn Pixmap::stroke_path(Self, @path.Path, Paint, @path.Stroke, @path.Transform, Mask?) -> Unit
+pub fn Pixmap::size(Self) -> @tiny_skia_path.IntSize
+pub fn Pixmap::stroke_path(Self, @tiny_skia_path.Path, Paint, @tiny_skia_path.Stroke, @tiny_skia_path.Transform, Mask?) -> Unit
 pub fn Pixmap::take_demultiplied(Self) -> Bytes
 pub fn Pixmap::width(Self) -> Int
 
@@ -250,7 +374,7 @@ pub(all) struct RadialGradient {
   base : Gradient
   // private fields
 }
-pub fn RadialGradient::new(@path.Point, Float, @path.Point, Float, Array[GradientStop], SpreadMode, @path.Transform) -> Shader?
+pub fn RadialGradient::new(@tiny_skia_path.Point, Float, @tiny_skia_path.Point, Float, Array[GradientStop], SpreadMode, @tiny_skia_path.Transform) -> Shader?
 
 pub struct ScreenIntRect {
   x : Int
@@ -264,9 +388,9 @@ pub fn ScreenIntRect::from_xywh(UInt, UInt, UInt, UInt) -> Self?
 pub fn ScreenIntRect::height(Self) -> Int
 pub fn ScreenIntRect::left(Self) -> Int
 pub fn ScreenIntRect::right(Self) -> Int
-pub fn ScreenIntRect::size(Self) -> @path.IntSize
-pub fn ScreenIntRect::to_int_rect(Self) -> @path.IntRect
-pub fn ScreenIntRect::to_rect(Self) -> @path.Rect
+pub fn ScreenIntRect::size(Self) -> @tiny_skia_path.IntSize
+pub fn ScreenIntRect::to_int_rect(Self) -> @tiny_skia_path.IntRect
+pub fn ScreenIntRect::to_rect(Self) -> @tiny_skia_path.Rect
 pub fn ScreenIntRect::top(Self) -> Int
 pub fn ScreenIntRect::width(Self) -> Int
 pub fn ScreenIntRect::x(Self) -> Int
@@ -283,7 +407,7 @@ pub(all) enum Shader {
 }
 pub fn Shader::apply_opacity(Self, Float) -> Self
 pub fn Shader::is_opaque(Self) -> Bool
-pub fn Shader::transform(Self, @path.Transform) -> Self
+pub fn Shader::transform(Self, @tiny_skia_path.Transform) -> Self
 
 pub(all) enum SpreadMode {
   Pad
@@ -299,7 +423,7 @@ pub(all) struct SweepGradient {
   t0 : Float
   t1 : Float
 }
-pub fn SweepGradient::new(@path.Point, Float, Float, Array[GradientStop], SpreadMode, @path.Transform) -> Shader?
+pub fn SweepGradient::new(@tiny_skia_path.Point, Float, Float, Array[GradientStop], SpreadMode, @tiny_skia_path.Transform) -> Shader?
 
 // Type aliases
 

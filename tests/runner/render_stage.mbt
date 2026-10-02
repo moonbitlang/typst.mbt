@@ -149,15 +149,15 @@ fn harness_render(
   ) catch {
     _ => return None
   }
-  let gap = @skpath.roundf(pixel_per_pt * gap.to_pt().to_float())
+  let gap = @skia.roundf(pixel_per_pt * gap.to_pt().to_float())
   let mut y : Float = 0.0
   for page in document.pages() {
-    let ts = @skpath.Transform::from_scale(pixel_per_pt, pixel_per_pt).post_translate(
+    let ts = @tiny_skia_path.Transform::from_scale(pixel_per_pt, pixel_per_pt).post_translate(
       0.0, y,
     )
     render_links(pixmap, ts, page.frame)
-    y += @skpath.fmax(
-        @skpath.roundf(pixel_per_pt * page.frame.height().to_pt().to_float()),
+    y += @skia.fmax(
+        @skia.roundf(pixel_per_pt * page.frame.height().to_pt().to_float()),
         1.0,
       ) +
       gap
@@ -169,7 +169,7 @@ fn harness_render(
 /// Draw extra boxes for links so we can see whether they are there.
 fn render_links(
   canvas : @skia.Pixmap,
-  ts : @skpath.Transform,
+  ts : @tiny_skia_path.Transform,
   frame : @library.Frame,
 ) -> Unit {
   for entry in frame.items() {
@@ -186,7 +186,7 @@ fn render_links(
       Link(_, size) => {
         let w = size.x.to_pt().to_float()
         let h = size.y.to_pt().to_float()
-        let rect = @skpath.Rect::from_xywh(0.0, 0.0, w, h).unwrap()
+        let rect = @tiny_skia_path.Rect::from_xywh(0.0, 0.0, w, h).unwrap()
         let paint = @skia.Paint::default()
         paint.set_color_rgba8(40, 54, 99, 40)
         canvas.fill_rect(rect, paint, ts, None)
@@ -198,8 +198,10 @@ fn render_links(
 
 ///|
 /// Convert a Typst transform to a tiny-skia transform.
-fn harness_sk_transform(transform : @library.Transform) -> @skpath.Transform {
-  @skpath.Transform::from_row(
+fn harness_sk_transform(
+  transform : @library.Transform,
+) -> @tiny_skia_path.Transform {
+  @tiny_skia_path.Transform::from_row(
     transform.sx.get().to_float(),
     transform.ky.get().to_float(),
     transform.kx.get().to_float(),
