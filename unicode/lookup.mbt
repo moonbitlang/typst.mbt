@@ -205,3 +205,13 @@ pub fn discard_space_between(before : StringView, after : StringView) -> Bool {
   (before_c is Some(c) && in_ranges(no_space_writing_table, c.to_int())) ||
   (after_c is Some(c) && in_ranges(no_space_writing_table, c.to_int()))
 }
+
+///|
+/// The displayed width of a character in columns, like `unicode-width`
+/// 0.1.14's `UnicodeWidthChar::width` (`None` for control characters).
+pub fn char_width(c : Char) -> Int? {
+  match in_valued(char_width_table, c.to_int(), 2) {
+    0 => None
+    v => Some(v - 1)
+  }
+}

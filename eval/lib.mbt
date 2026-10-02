@@ -77,6 +77,40 @@ pub fn eval_string(
   if !span.is_detached() {
     root.synthesize(span)
   }
+  eval_root(engine, context, root, mode, scope)
+}
+
+///|
+/// Evaluate a string as code with mapped spans (upstream `eval_string` with
+/// `SpanMode::Mapped` and the identity mapper over the whole text): the
+/// string is the content of the file `id`, so that diagnostics point into
+/// it.
+pub fn eval_string_mapped(
+  engine : @library.Engine,
+  context : @library.Context,
+  string : String,
+  id : @syntax.FileId,
+  mode : @syntax.SyntaxMode,
+  scope : @library.Scope,
+) -> @library.Value raise @library.SourceError {
+  let root = match mode {
+    Code => @syntax.parse_code(string)
+    Markup => @syntax.parse(string)
+    Math => @syntax.parse_math(string)
+  }
+  root.synthesize_ranges(id)
+  eval_root(engine, context, root, mode, scope)
+}
+
+///|
+/// Evaluate a parsed string (the rest of `eval_string`).
+fn eval_root(
+  engine : @library.Engine,
+  context : @library.Context,
+  root : @syntax.SyntaxNode,
+  mode : @syntax.SyntaxMode,
+  scope : @library.Scope,
+) -> @library.Value raise @library.SourceError {
 
   // Check for well-formedness.
   let (errors, warnings) = root.errors_and_warnings()

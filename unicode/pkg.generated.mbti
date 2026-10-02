@@ -20,6 +20,8 @@ pub fn char_to_lowercase(Char) -> String
 
 pub fn char_to_uppercase(Char) -> String
 
+pub fn char_width(Char) -> Int?
+
 pub fn chars_with_case_variants(Int, Int) -> Array[Int]
 
 pub fn decode_at(StringView, Int) -> (Int, Int)

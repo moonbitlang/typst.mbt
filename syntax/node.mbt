@@ -796,6 +796,42 @@ fn next_power_of_two(n : Int) -> Int {
 }
 
 ///|
+/// Set a raw range span for each node, like upstream `synthesize_mapped`
+/// with the identity mapper `RangeMapper::new(Some(0..len))` (the text is
+/// the whole file `id`): every node receives the range span of its own
+/// range and sub-ranges are kept.
+pub fn SyntaxNode::synthesize_ranges(self : SyntaxNode, id : FileId) -> Unit {
+  self.synthesize_ranges_at(0, id)
+}
+
+///|
+fn SyntaxNode::synthesize_ranges_at(
+  self : SyntaxNode,
+  offset : Int,
+  id : FileId,
+) -> Unit {
+  let len = self.len()
+  self.span = Span::from_range(id, offset, offset + len)
+  let mut data = self.data
+  while true {
+    match data {
+      Leaf(_, _, _) => break
+      Inner(inner, _) => {
+        inner.upper = self.span.number()
+        let mut off = offset
+        for child in inner.children {
+          child.synthesize_ranges_at(off, id)
+          off += child.len()
+        }
+        break
+      }
+      Error(_) => break
+      Warning(w, _) => data = w.child
+    }
+  }
+}
+
+///|
 /// Set a synthetic span for the node and all its descendants, and add hints
 /// with the original indices to any syntax errors or warnings.
 pub fn SyntaxNode::synthesize(self : SyntaxNode, span : Span) -> Unit {
