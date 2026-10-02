@@ -429,6 +429,21 @@ pub fn StyleChain::links(self : StyleChain) -> Array[Array[Style]] {
 }
 
 ///|
+/// Build owned styles from the suffix (all but the outermost `len` links) of
+/// the chain.
+pub fn StyleChain::suffix(self : StyleChain, len : Int) -> Styles {
+  let links = self.links()
+  let take = if links.length() > len { links.length() - len } else { 0 }
+  let items = []
+  for i = take - 1; i >= 0; i = i - 1 {
+    for style in links[i] {
+      items.push(style)
+    }
+  }
+  { items, }
+}
+
+///|
 /// Iterate over all values for the given property in the chain.
 fn StyleChain::properties(
   self : StyleChain,
