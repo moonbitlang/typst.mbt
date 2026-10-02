@@ -1,4 +1,5 @@
 import {
   "moonbitlang/typst/data/xml",
   "moonbitlang/typst/bib/unscanny",
+  "moonbitlang/core/encoding/utf8",
 }

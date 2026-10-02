@@ -286,7 +286,8 @@ pub fn BibliographyDriver::finish(
         Some(t) => {
           prev = Some(t)
           map.set(name_elem, t + 1)
-          t
+          // `and_modify` runs before the value is read.
+          t + 1
         }
         None => {
           group_idx += 1

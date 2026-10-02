@@ -34,6 +34,9 @@ priv suberror DeErr {
 priv struct XNode {
   tag : String
   attrs : Array[(String, String)]
+  /// Attribute values before entity expansion (quick-xml splits list values
+  /// on whitespace before unescaping the items).
+  raw_attrs : Array[(String, String)]
   children : Array[XChild]
 }
 
@@ -70,10 +73,17 @@ fn qualified_tag_name(node : @xml.Node) -> String {
 }
 
 ///|
-fn convert_node(node : @xml.Node) -> XNode {
+fn convert_node(node : @xml.Node, input : Bytes) -> XNode {
   let attrs = node
     .attributes()
     .map(a => (qualified_attr_name(node, a), a.value()))
+  let raw_attrs = node
+    .attributes()
+    .map(a => {
+      let (start, end) = a.range_value()
+      let raw = @utf8.decode_lossy(input[start:end])
+      (qualified_attr_name(node, a), raw)
+    })
   let children : Array[XChild] = []
   let text = StringBuilder()
   let mut has_text = false
@@ -87,14 +97,14 @@ fn convert_node(node : @xml.Node) -> XNode {
         text.reset()
         has_text = false
       }
-      children.push(Elem(convert_node(child)))
+      children.push(Elem(convert_node(child, input)))
     }
     // Comments and processing instructions do not interrupt text.
   }
   if has_text {
     children.push(Text(text.to_string()))
   }
-  { tag: qualified_tag_name(node), attrs, children, }
+  { tag: qualified_tag_name(node), attrs, raw_attrs, children, }
 }
 
 ///|
@@ -102,7 +112,7 @@ fn parse_xml(xml : String) -> XNode raise DeErr {
   let doc = @xml.Document::parse(xml) catch {
     e => raise DeErr(e.to_string(), "")
   }
-  convert_node(doc.root_element())
+  convert_node(doc.root_element(), @utf8.encode(xml))
 }
 
 ///|
@@ -114,6 +124,76 @@ fn join_path(path : String, seg : String) -> String {
   } else {
     path + "." + seg
   }
+}
+
+///|
+fn XNode::raw_attr(self : XNode, name : String) -> String? {
+  for a in self.raw_attrs {
+    if a.0 == name {
+      return Some(a.1)
+    }
+  }
+  None
+}
+
+///|
+/// Expand the predefined entities and character references in `s`.
+fn unescape_xml(s : String) -> String {
+  if !s.contains("&") {
+    return s
+  }
+  let out = StringBuilder()
+  let chars = s.to_array()
+  let mut i = 0
+  while i < chars.length() {
+    let c = chars[i]
+    if c == '&' {
+      let mut j = i + 1
+      while j < chars.length() && chars[j] != ';' {
+        j += 1
+      }
+      if j < chars.length() {
+        let name = String::from_array(chars[i + 1:j])
+        let rep : Char? = match name {
+          "amp" => Some('&')
+          "lt" => Some('<')
+          "gt" => Some('>')
+          "quot" => Some('"')
+          "apos" => Some('\'')
+          _ =>
+            if name.has_prefix("#x") {
+              let mut v = 0
+              for d in name[2:] {
+                v = v * 16 +
+                  (match d {
+                    '0'..='9' => d.to_int() - '0'.to_int()
+                    'a'..='f' => d.to_int() - 'a'.to_int() + 10
+                    'A'..='F' => d.to_int() - 'A'.to_int() + 10
+                    _ => 0
+                  })
+              }
+              Some(Int::unsafe_to_char(v))
+            } else if name.has_prefix("#") {
+              let mut v = 0
+              for d in name[1:] {
+                v = v * 10 + (d.to_int() - '0'.to_int())
+              }
+              Some(Int::unsafe_to_char(v))
+            } else {
+              None
+            }
+        }
+        if rep is Some(r) {
+          out.write_char(r)
+          i = j + 1
+          continue
+        }
+      }
+    }
+    out.write_char(c)
+    i += 1
+  }
+  out.to_string()
 }
 
 ///|
@@ -298,13 +378,14 @@ fn[T] list_attr(
   path : String,
   parse : (String) -> T?,
 ) -> Array[T]? raise DeErr {
-  match n.attr(name) {
+  match n.raw_attr(name) {
     Some(s) => {
       let out = []
       for item in @unscanny.split_by(s, c => c is (' ' | '\t' | '\r' | '\n')) {
         if item.is_empty() {
           continue
         }
+        let item = unescape_xml(item)
         match parse(item) {
           Some(v) => out.push(v)
           None =>
