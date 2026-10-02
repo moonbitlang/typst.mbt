@@ -303,7 +303,7 @@ pub(all) struct HintingParams {
 } derive(Eq, @debug.Debug)
 pub fn HintingParams::default() -> Self
 
-pub enum Index {
+pub(all) enum Index {
   Empty
   Format1(Index1)
 }
@@ -429,6 +429,49 @@ pub struct TransformSink {
 pub fn TransformSink::from_matrix_scale(&CommandSink, @font_types.FontMatrix, @font_types.Fixed?) -> Self
 pub fn TransformSink::new(&CommandSink, Transform) -> Self
 pub impl CommandSink for TransformSink
+
+pub struct Type1Encoding {
+  // private fields
+}
+pub fn Type1Encoding::glyph_name(Self, Byte) -> String?
+pub fn Type1Encoding::map(Self, Byte) -> @font_types.GlyphId?
+pub fn Type1Encoding::predefined(Self) -> PredefinedEncoding?
+
+pub struct Type1Font {
+  mut name : String?
+  mut full_name : String?
+  mut family_name : String?
+  mut weight : String?
+  mut bbox : @font_types.BoundingBox[@font_types.Fixed]
+  mut italic_angle : Int
+  mut is_fixed_pitch : Bool
+  mut underline_position : Int
+  mut underline_thickness : Int
+  mut matrix : ScaledFontMatrix
+  mut weight_vector : Array[@font_types.Fixed]
+  // private fields
+}
+pub fn Type1Font::bbox(Self) -> @font_types.BoundingBox[@font_types.Fixed]
+pub fn Type1Font::draw(Self, @font_types.GlyphId, Float?, &@read_fonts.OutlinePen) -> Float? raise PsError
+pub fn Type1Font::encoding(Self) -> Type1Encoding?
+pub fn Type1Font::evaluate_charstring(Self, @font_types.GlyphId, &CommandSink) -> @font_types.Fixed? raise PsError
+pub fn Type1Font::family_name(Self) -> String?
+pub fn Type1Font::full_name(Self) -> String?
+pub fn Type1Font::glyph_name(Self, @font_types.GlyphId) -> String?
+pub fn Type1Font::glyph_names(Self) -> Array[(@font_types.GlyphId, String)]
+pub fn Type1Font::is_fixed_pitch(Self) -> Bool
+pub fn Type1Font::italic_angle(Self) -> Int
+pub fn Type1Font::matrix(Self) -> @font_types.FontMatrix
+pub fn Type1Font::name(Self) -> String?
+pub fn Type1Font::new(BytesView) -> Self raise PsError
+pub fn Type1Font::num_glyphs(Self) -> Int
+pub fn Type1Font::remapped_gid(Self, @font_types.GlyphId) -> @font_types.GlyphId
+pub fn Type1Font::transform(Self, Float?) -> Transform
+pub fn Type1Font::underline_position(Self) -> Int
+pub fn Type1Font::underline_thickness(Self) -> Int
+pub fn Type1Font::upem(Self) -> Int
+pub fn Type1Font::weight(Self) -> String?
+pub impl CharstringContext for Type1Font
 
 // Type aliases
 
