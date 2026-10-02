@@ -1,0 +1,24 @@
+import {
+  "moonbitlang/typst/syntax",
+  "moonbitlang/typst/library",
+  "moonbitlang/typst/eval",
+  "moonbitlang/typst/typst",
+  "moonbitlang/typst/layout",
+  "moonbitlang/typst/html",
+  "moonbitlang/typst/svg",
+  "moonbitlang/typst/render",
+  "moonbitlang/typst/pdf",
+  "moonbitlang/typst/bundle",
+  "moonbitlang/typst/data/serde",
+  "moonbitlang/typst/data/json" @tjson,
+  "moonbitlang/typst/data/yaml",
+  "moonbitlang/typst/kit",
+  "moonbitlang/typst/kit/platform",
+  "moonbitlang/core/encoding/utf8",
+}
+
+pkgtype(kind: "executable")
+
+import {
+  "moonbitlang/core/env",
+} for "wbtest"
