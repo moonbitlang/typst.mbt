@@ -8,6 +8,8 @@ import {
 // Values
 pub fn crc32(Array[BytesView]) -> UInt
 
+pub fn decode_png(BytesView) -> (ImageInfo, Bytes) raise ImageError
+
 pub fn encode_png(BytesView, Int, Int, PngColorType) -> Bytes
 
 pub let exif_tag_orientation : Int

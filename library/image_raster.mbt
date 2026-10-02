@@ -5,11 +5,12 @@
 // handling and of `kamadak-exif`), which yield everything upstream observes
 // without the pixels: dimensions, color type, ICC profile, EXIF orientation
 // and pixel density. Decoding the pixels of exchange formats (needed for PNG
-// export and for re-encoding) is not ported yet; `RasterImage::dynamic`
-// returns `None` for them.
+// export and for re-encoding) is only ported for PNG; `RasterImage::dynamic`
+// returns `None` for the other exchange formats.
 
 ///|
-/// Decoded pixels (upstream `image::DynamicImage`): 8-bit samples in
+/// Decoded pixels (upstream `image::DynamicImage`): 8-bit or 16-bit
+/// (little-endian) samples in
 /// row-major order with `color.channel_count()` channels.
 pub struct DynamicImage {
   width : UInt
@@ -59,15 +60,15 @@ pub fn RasterImage::new(
 ) -> RasterImage raise HintedError {
   match format {
     Exchange(format) => {
-      let decode = match format {
-        Jpg => @codecs.jpeg_image_info
-        Png => @codecs.png_image_info
-        Gif => @codecs.gif_image_info
-        Webp => @codecs.webp_image_info
-      }
-      let info = decode(data[:]) catch {
+      let (info, pixels) = decode_exchange(data, format) catch {
         @codecs.ImageError(err) => bail(format_image_error(err))
       }
+      let mut dynamic = pixels.map(buf => {
+        width: info.width,
+        height: info.height,
+        color: info.color,
+        buf,
+      })
       let icc = match icc {
         Custom(icc) => Some(icc)
         Auto =>
@@ -90,6 +91,7 @@ pub fn RasterImage::new(
           width = info.height
           height = info.width
         }
+        dynamic = dynamic.map(dynamic => dynamic.apply_rotation(rotation))
         exif_rot = Some(rotation)
       }
 
@@ -101,7 +103,7 @@ pub fn RasterImage::new(
         width,
         height,
         color: info.color,
-        dynamic: None,
+        dynamic,
         exif_rotation: exif_rot,
         icc,
         dpi,
@@ -204,8 +206,8 @@ pub fn RasterImage::dpi(self : RasterImage) -> Double? {
 ///|
 /// Access the underlying dynamic image.
 ///
-/// TODO: Only available for pixel formats; the pixels of exchange formats
-/// are not decoded yet.
+/// TODO: Only available for pixel formats and PNG; the pixels of JPEG, GIF
+/// and WebP images are not decoded yet.
 pub fn RasterImage::dynamic(self : RasterImage) -> DynamicImage? {
   self.dynamic
 }
@@ -214,6 +216,174 @@ pub fn RasterImage::dynamic(self : RasterImage) -> DynamicImage? {
 /// Access the ICC profile, if any.
 pub fn RasterImage::icc(self : RasterImage) -> Bytes? {
   self.icc
+}
+
+///|
+/// Reads the header of an image in an exchange format and decodes its pixels
+/// where that is ported (PNG).
+fn decode_exchange(
+  data : Bytes,
+  format : ExchangeFormat,
+) -> (@codecs.ImageInfo, Bytes?) raise @codecs.ImageError {
+  match format {
+    Png => {
+      let (info, pixels) = @codecs.decode_png(data[:])
+      (info, Some(pixels))
+    }
+    Jpg => (@codecs.jpeg_image_info(data[:]), None)
+    Gif => (@codecs.gif_image_info(data[:]), None)
+    Webp => (@codecs.webp_image_info(data[:]), None)
+  }
+}
+
+///|
+/// The number of bytes per pixel.
+fn DynamicImage::bytes_per_pixel(self : DynamicImage) -> Int {
+  let bytes = match self.color {
+    L8 | La8 | Rgb8 | Rgba8 => 1
+    L16 | La16 | Rgb16 | Rgba16 => 2
+  }
+  self.color.channel_count() * bytes
+}
+
+///|
+/// Remaps the pixels: `f(x, y)` returns the source pixel of the target pixel
+/// `(x, y)` in an image of the given size.
+fn DynamicImage::remap(
+  self : DynamicImage,
+  width : UInt,
+  height : UInt,
+  f : (Int, Int) -> (Int, Int),
+) -> DynamicImage {
+  let bpp = self.bytes_per_pixel()
+  let w = width.reinterpret_as_int()
+  let sw = self.width.reinterpret_as_int()
+  let buf = Bytes::makei(self.buf.length(), i => {
+    let p = i / bpp
+    let (sx, sy) = f(p % w, p / w)
+    self.buf[(sy * sw + sx) * bpp + i % bpp]
+  })
+  { width, height, color: self.color, buf, }
+}
+
+///|
+/// Apply an EXIF rotation to a dynamic image.
+///
+/// Like upstream, flips and 180° rotations are done in place through
+/// `GenericImage` for `DynamicImage`, which passes every swapped pixel
+/// through `Rgba<u8>`: 16-bit samples of those pixels are rounded to 8 bits
+/// (lossless for 8-bit images). The 90° rotations are exact.
+fn DynamicImage::apply_rotation(
+  self : DynamicImage,
+  rotation : UInt,
+) -> DynamicImage {
+  let w = self.width.reinterpret_as_int()
+  let h = self.height.reinterpret_as_int()
+  // Clockwise.
+  let rotate90 = (img : DynamicImage) => {
+    img.remap(img.height, img.width, (x, y) => (y, h - 1 - x))
+  }
+  let rotate270 = (img : DynamicImage) => {
+    img.remap(img.height, img.width, (x, y) => (w - 1 - y, x))
+  }
+  match rotation {
+    2 => self.swap_in_place(flip_horizontal_pairs(w, h))
+    3 => self.swap_in_place(rotate180_pairs(w, h))
+    4 => self.swap_in_place(flip_vertical_pairs(w, h))
+    5 => rotate270(self.swap_in_place(flip_horizontal_pairs(w, h)))
+    6 => rotate90(self)
+    7 => rotate90(self.swap_in_place(flip_horizontal_pairs(w, h)))
+    8 => rotate270(self)
+    _ => self
+  }
+}
+
+///|
+/// The pixel pairs swapped by upstream `flip_horizontal_in_place`.
+fn flip_horizontal_pairs(w : Int, h : Int) -> Array[((Int, Int), (Int, Int))] {
+  let pairs = []
+  for y in 0..<h {
+    for x in 0..<(w / 2) {
+      pairs.push(((x, y), (w - x - 1, y)))
+    }
+  }
+  pairs
+}
+
+///|
+/// The pixel pairs swapped by upstream `flip_vertical_in_place`.
+fn flip_vertical_pairs(w : Int, h : Int) -> Array[((Int, Int), (Int, Int))] {
+  let pairs = []
+  for y in 0..<(h / 2) {
+    for x in 0..<w {
+      pairs.push(((x, y), (x, h - y - 1)))
+    }
+  }
+  pairs
+}
+
+///|
+/// The pixel pairs swapped by upstream `rotate180_in_place`.
+fn rotate180_pairs(w : Int, h : Int) -> Array[((Int, Int), (Int, Int))] {
+  let pairs = []
+  for y in 0..<(h / 2) {
+    for x in 0..<w {
+      pairs.push(((x, y), (w - x - 1, h - y - 1)))
+    }
+  }
+  if h % 2 != 0 {
+    let middle = h / 2
+    for x in 0..<(w / 2) {
+      pairs.push(((x, middle), (w - x - 1, middle)))
+    }
+  }
+  pairs
+}
+
+///|
+/// Swaps pixel pairs through `Rgba<u8>` (upstream `get_pixel`/`put_pixel`
+/// of `GenericImage for DynamicImage`).
+fn DynamicImage::swap_in_place(
+  self : DynamicImage,
+  pairs : Array[((Int, Int), (Int, Int))],
+) -> DynamicImage {
+  let bpp = self.bytes_per_pixel()
+  let sixteen = bpp / self.color.channel_count() == 2
+  let w = self.width.reinterpret_as_int()
+  let buf = FixedArray::makei(self.buf.length(), i => self.buf[i])
+  // A sample after a roundtrip through `u8`.
+  let quantize = (lo : Byte, hi : Byte) => {
+    let v = lo.to_int() | (hi.to_int() << 8)
+    let v8 = (v + 128) / 257
+    let v = (v8 << 8) | v8
+    (v.to_byte(), (v >> 8).to_byte())
+  }
+  let read = (x : Int, y : Int) => {
+    let start = (y * w + x) * bpp
+    let pixel = FixedArray::makei(bpp, k => buf[start + k])
+    if sixteen {
+      for k = 0; k < bpp; k = k + 2 {
+        let (lo, hi) = quantize(pixel[k], pixel[k + 1])
+        pixel[k] = lo
+        pixel[k + 1] = hi
+      }
+    }
+    pixel
+  }
+  let write = (x : Int, y : Int, pixel : FixedArray[Byte]) => {
+    let start = (y * w + x) * bpp
+    for k in 0..<bpp {
+      buf[start + k] = pixel[k]
+    }
+  }
+  for pair in pairs {
+    let ((x1, y1), (x2, y2)) = pair
+    let p1 = read(x1, y1)
+    let p2 = read(x2, y2)
+    write(x2, y2, p1)
+    write(x1, y1, p2)
+  }
+  { ..self, buf: Bytes::makei(buf.length(), i => buf[i]), }
 }
 
 ///|
