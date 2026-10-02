@@ -1,0 +1,16 @@
+import {
+  "moonbitlang/typst/syntax",
+  "moonbitlang/typst/library",
+  "moonbitlang/typst/otf",
+  "moonbitlang/typst/unicode",
+  "moonbitlang/typst/data/xml",
+  "moonbitlang/typst/kit/platform",
+  "moonbitlang/typst/typst_assets/fonts" @assets_fonts,
+  "moonbitlang/core/cmp",
+  "moonbitlang/core/hashset",
+  "moonbitlang/core/encoding/utf8",
+}
+
+import {
+  "moonbitlang/core/debug",
+} for "test"

@@ -1,0 +1,19 @@
+import {
+  "moonbitlang/core/env",
+  "moonbitlang/core/buffer",
+  "moonbitlang/core/encoding/utf8",
+  "moonbitlang/x/fs",
+  "moonbitlang/x/sys",
+}
+
+import {
+  "moonbitlang/core/debug",
+} for "test"
+
+options(
+  "native-stub": [ "platform_stub.c" ],
+  targets: {
+    "platform_native.mbt": [ "native", "llvm" ],
+    "platform_wasm.mbt": [ "wasm", "wasm-gc" ],
+  },
+)
