@@ -715,15 +715,13 @@ fn preprocess_text_indic(
 ///|
 fn decompose_indic(_ctx : NormalizeContext, ab : Int) -> (Int, Int)? {
   // Don't decompose these.
+  //   U+0931 DEVANAGARI LETTER RRA
+  //   https://github.com/harfbuzz/harfbuzz/issues/779
+  //   U+09DC BENGALI LETTER RRA
+  //   U+09DD BENGALI LETTER RHA
+  //   U+0B94 TAMIL LETTER AU
   match ab {
-    0x0931
-     // DEVANAGARI LETTER RRA
-    // https://github.com/harfbuzz/harfbuzz/issues/779
-    | 0x09DC
-     // BENGALI LETTER RRA
-    | 0x09DD
-     // BENGALI LETTER RHA
-    | 0x0B94 => return None // TAMIL LETTER AU
+    0x0931 | 0x09DC | 0x09DD | 0x0B94 => return None
     _ => ()
   }
   decompose(ab)
