@@ -403,3 +403,34 @@ prefixed (`InlineItem`, `InlineConfig`, `InlineCollector`,
 paged failure outside math (452), raw highlighting (~85: highlighted
 bodies and raw text spans), bibliography/citations (~50) and PDF/SVG image
 loading is a single grid/table stroke span (`table-tags-unstable-functions`).
+
+## Status: work unit I (math layout)
+
+**Layout package**, one file per upstream module of
+`typst-layout/src/math`: `math.mbt` (`mod.rs`: `layout_equation_inline`,
+`layout_equation_block` with region breaking and equation numbers,
+`MathContext`, item dispatch, font stack with script-scale styles),
+`math_fragment.mbt` (`MathFragment`, `FrameFragment`, math kerning lookup),
+`math_glyph.mbt` (`GlyphFragment`: shaping plan with `flac`/`ssty` feature
+fallback, italics correction, top accent attachment, extended shapes,
+stretching via MATH variants and assemblies), `math_shaping.mbt`,
+`math_run.mbt` (multiline rows, alignment points, inline line-break items),
+`math_scripts.mbt`, `math_fraction.mbt`, `math_fenced.mbt`,
+`math_radical.mbt`, `math_accent.mbt`, `math_cancel.mbt`, `math_line.mbt`,
+`math_table.mbt` and `math_text.mbt`. Functions whose upstream names clash
+with other layouters in the package carry a `math` infix
+(`layout_math_table`, `layout_math_line`, `layout_math_text`, ...). The
+equation stubs in `stubs.mbt` are gone.
+
+Math shaping uses the inline layout API (`rusty`, `create_shape_plan`,
+`features`, `language`, `get_font_and_covers` via a `SharedShapingContext`
+impl for `MathShapingContext`, `layout_box`, `layout_inline`); the math
+font families (`typst_library::math::families`, with New Computer Modern
+Math first in the fallback list) are `math_families` in `math.mbt`.
+`Augment`'s cast accepts the `stroke: auto` its own `into_value` writes
+(field values round-trip through `Value` here).
+
+**Result:** `paged` 1766 → 2223, `svg` 1772 → 2220 (on top of unit F).
+All 403 `math/` paged tests match; the 4 `math/` SVG failures are color
+emoji glyphs in the SVG exporter (paged output identical). eval/realize/html
+unchanged.
