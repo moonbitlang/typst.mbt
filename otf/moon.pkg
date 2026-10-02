@@ -1,0 +1,6 @@
+import {
+  "moonbitlang/core/math",
+  "moonbitlang/core/encoding/utf8",
+}
+
+warnings = "-unused_type_variable"
