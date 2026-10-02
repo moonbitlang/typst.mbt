@@ -11,4 +11,8 @@ test "trunk over three chains" {
   assert_true(t2 == b)
   let t3 = StyleChain::trunk([b, b, c].iter()).unwrap()
   assert_true(t3 == a)
+  let t4 = StyleChain::trunk([b, c].iter()).unwrap()
+  assert_true(t4 == a)
+  let t5 = StyleChain::trunk([b, b, b, c].iter()).unwrap()
+  assert_true(t5 == a)
 }

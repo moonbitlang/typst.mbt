@@ -97,3 +97,10 @@ fn cite_elem_synthesize(
   .with_region(TextElem::region_in(styles))
   .pack()
 }
+
+///|
+/// `Default::default()` of `Smart<Derived<CslSource, CslStyle>>`
+/// (CiteElem.style).
+fn cite_elem_style_default() -> Value {
+  Auto
+}

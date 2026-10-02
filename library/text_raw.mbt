@@ -66,3 +66,9 @@ fn raw_elem_show_set(content : Content, styles : StyleChain) -> Styles {
 fn raw_elem_local_name_key() -> String {
   "raw"
 }
+
+///|
+/// `Default::default()` of the raw syntaxes (RawElem.syntaxes): no sources.
+fn raw_elem_syntaxes_default() -> Value {
+  (OneOrMultiple([]) : OneOrMultiple[DataSource]).into_value()
+}

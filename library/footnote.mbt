@@ -200,3 +200,16 @@ fn footnote_entry_elem_show_set(
 fn footnote_elem_local_name_key() -> String {
   "footnote"
 }
+
+///|
+/// The default separator of footnote entries (FootnoteEntry.separator).
+fn footnote_entry_elem_separator_default() -> Value {
+  LineElem::new()
+  .with_length(Rel::from_ratio(Ratio::new(0.3)))
+  .with_stroke({
+    ..Stroke::default(),
+    thickness: Custom(Length::from_em(Em::new(0.05))),
+  })
+  .pack()
+  .into_value()
+}

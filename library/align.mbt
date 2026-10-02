@@ -749,3 +749,9 @@ fn prelude_layout(global : Scope) -> Unit {
   global.define("horizon", Dyn(Alignment(alignment_horizon))) |> ignore
   global.define("bottom", Dyn(Alignment(alignment_bottom))) |> ignore
 }
+
+///|
+/// `Default::default()` of `Alignment` (AlignElem.alignment).
+fn align_elem_alignment_default() -> Value {
+  Alignment::default().into_value()
+}
