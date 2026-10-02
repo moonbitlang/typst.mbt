@@ -27,16 +27,32 @@ pub struct Regex {
 /// Compile a regular expression. Errors are formatted like the `Display` of
 /// the `regex` crate's error.
 pub fn Regex::new(pattern : String) -> Regex raise RegexError {
+  Regex::new_with(pattern)
+}
+
+///|
+/// Compile a regular expression with the given default flags (upstream
+/// `regex_automata::util::syntax::Config`): they can be changed in the
+/// pattern with `(?flags)` as usual.
+pub fn Regex::new_with(
+  pattern : String,
+  case_insensitive? : Bool = false,
+  multi_line? : Bool = false,
+  dot_matches_new_line? : Bool = false,
+  ignore_whitespace? : Bool = false,
+  unicode? : Bool = true,
+) -> Regex raise RegexError {
   let parser = Parser::new(pattern)
+  parser.ignore_whitespace = ignore_whitespace
   let ast = parser.parse()
   let translator : Translator = {
     pattern,
     flags: {
-      case_insensitive: None,
-      multi_line: None,
-      dot_matches_new_line: None,
+      case_insensitive: if case_insensitive { Some(true) } else { None },
+      multi_line: if multi_line { Some(true) } else { None },
+      dot_matches_new_line: if dot_matches_new_line { Some(true) } else { None },
       swap_greed: None,
-      unicode: None,
+      unicode: if unicode { None } else { Some(false) },
       crlf: None,
     },
     names: [],
@@ -47,6 +63,29 @@ pub fn Regex::new(pattern : String) -> Regex raise RegexError {
     translator.names.get(i).unwrap_or(None)
   })
   { pattern, nfa: compile(hir, group_len), names, }
+}
+
+///|
+/// The number of capture groups, including the implicit group 0.
+pub fn Regex::group_len(self : Regex) -> Int {
+  self.nfa.group_len
+}
+
+///|
+/// Low-level search (like `regex_automata`'s `search_slots` with
+/// `Input::new(hay).span(start..)`): find the leftmost-first match starting
+/// at or after char position `start` (exactly at `start` if `anchored`),
+/// seeing the text before `start` for look-around assertions. The slots of
+/// the first `slots.length() / 2` groups (char positions, -1 if unset) are
+/// written to `slots`, which must have an even length of at least 2.
+pub fn Regex::search_slots(
+  self : Regex,
+  hay : Haystack,
+  start : Int,
+  anchored~ : Bool,
+  slots : FixedArray[Int],
+) -> Bool {
+  self.nfa.search(hay, start, anchored, slots)
 }
 
 ///|
@@ -139,7 +178,12 @@ fn make_captures(
 ///|
 /// Search starting at the char position `at`.
 fn Regex::search(self : Regex, hay : Haystack, at : Int) -> FixedArray[Int]? {
-  self.nfa.search(hay, at)
+  let slots = FixedArray::make(2 * self.nfa.group_len, -1)
+  if self.nfa.search(hay, at, false, slots) {
+    Some(slots)
+  } else {
+    None
+  }
 }
 
 ///|
@@ -181,7 +225,7 @@ pub fn Regex::captures(self : Regex, s : String) -> Captures? {
 /// `Searcher::advance`, including its handling of empty matches).
 fn Regex::all_slots(self : Regex, hay : Haystack) -> Array[FixedArray[Int]] {
   let out = []
-  let len = hay.chars.length()
+  let len = hay.len
   let mut start = 0
   let mut last_match_end : Int? = None
   while start <= len {
