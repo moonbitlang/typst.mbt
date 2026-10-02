@@ -67,3 +67,12 @@
   original index (or use `stable_sort` on `Compare` types).
 - Measure with `moon run tests/runner --target native -- eval --dump`, then
   `python3 scripts/classify.py eval 60` for the biggest failure buckets.
+- SVG export (`svg/`, port of typst-svg) is checked by two stages against
+  the raw upstream SVGs (`scripts/goldens.sh svg`, pretty, merged pages, 1pt
+  gap): `svg` compiles and exports each paged test; `svg-replay` exports
+  upstream's laid-out frames decoded from the `paged` goldens, so it tests
+  the exporter independently of layout. Both compare after canonically
+  renaming `<defs>` IDs and also report byte-identical (raw hash parity)
+  counts; the hash inputs are in `svg/hash.mbt`. `Angle::sin`/`cos` use the
+  `libm` crate's algorithms (`library/libm_trig.mbt`), not `@math` (C libm on
+  native), for bit-identical geometry.

@@ -1,8 +1,4 @@
 // Port of `typst-html/src/encode.rs`: encodes an HTML DOM into a string.
-//
-// The late link resolver (upstream `LateLinkResolver`) is only used to
-// resolve links in frames (SVG) and cross-document links in bundles; neither
-// is supported yet, so the writer doesn't carry one.
 
 ///|
 /// Settings for HTML export (upstream `HtmlOptions<Partial>`).
@@ -36,7 +32,11 @@ pub fn html(
   let options = options.resolve(
     @library.HtmlFormatOptions::get(document.options()),
   )
-  html_encode(document.root(), pretty=options.format.pretty.v)
+  let link_resolver = @library.LateLinkResolver::new(
+    None,
+    @library.Introspector::new(document.introspector()),
+  )
+  html_encode(document.root(), pretty=options.format.pretty.v, link_resolver~)
 }
 
 ///|
@@ -47,18 +47,22 @@ pub fn html(
 pub fn html_in_bundle(
   root : HtmlElement,
   options : CompleteHtmlOptions,
+  link_resolver : @library.LateLinkResolver,
 ) -> String raise @library.SourceError {
-  html_encode(root, pretty=options.format.pretty.v)
+  html_encode(root, pretty=options.format.pretty.v, link_resolver~)
 }
 
 ///|
 /// Encodes an HTML root element into a string (upstream `html_impl`, the
 /// shared implementation of `html` and `html_in_bundle`).
+///
+/// Without a `link_resolver`, location links in frames are not resolved.
 pub fn html_encode(
   root : HtmlElement,
   pretty? : Bool = false,
+  link_resolver? : @library.LateLinkResolver,
 ) -> String raise @library.SourceError {
-  let w = Writer::new(pretty)
+  let w = Writer::new(link_resolver, pretty)
   w.buf.write_string("<!DOCTYPE html>")
   write_indent(w)
   write_element(w, root)
@@ -75,14 +79,20 @@ priv struct Writer {
   buf : StringBuilder
   /// The current indentation level
   mut level : Int
+  /// Used to resolve links between the document and contained frames as
+  /// well as cross-document links in bundle export.
+  link_resolver : @library.LateLinkResolver?
   /// Whether pretty printing is enabled.
   mut pretty : Bool
 }
 
 ///|
 /// Creates a new writer.
-fn Writer::new(pretty : Bool) -> Writer {
-  { buf: StringBuilder(), level: 0, pretty, }
+fn Writer::new(
+  link_resolver : @library.LateLinkResolver?,
+  pretty : Bool,
+) -> Writer {
+  { buf: StringBuilder(), level: 0, link_resolver, pretty, }
 }
 
 ///|
@@ -485,15 +495,43 @@ fn unencodable(c : Char) -> String {
 
 ///|
 /// Encode a laid out frame into the writer.
-///
-/// TODO: Upstream embeds the frame as an inline SVG via
-/// `typst_svg::svg_in_html` (indenting its lines when pretty printing).
-/// Frames can't be produced yet as layout isn't ported (the `layout_frame`
-/// routine fails before a frame reaches the DOM), and SVG export isn't
-/// either.
-fn write_frame(
-  _w : Writer,
-  frame : HtmlFrame,
-) -> Unit raise @library.SourceError {
-  @library.bail_at(frame.span, "SVG export is not available")
+fn write_frame(w : Writer, frame : HtmlFrame) -> Unit {
+  let svg = @svg.svg_in_html(
+    frame.inner,
+    frame.text_size,
+    w.pretty,
+    frame.id,
+    frame.css.to_inline(),
+    frame.anchors,
+    w.link_resolver,
+  )
+  if w.pretty {
+    // Indent the SVG after generation. This ensures the frame is cached no
+    // matter the current indentation of the outer HTML.
+    for i, line in svg_lines(svg) {
+      if i != 0 {
+        write_indent(w)
+      }
+      w.buf.write_string(line)
+    }
+  } else {
+    w.buf.write_string(svg)
+  }
+}
+
+///|
+/// Rust's `str::lines`: split at `\n` (dropping a preceding `\r`), without
+/// a trailing empty line.
+fn svg_lines(s : String) -> Array[String] {
+  let lines = s.split("\n").map(l => l.to_owned()).collect()
+  if lines.last() is Some("") {
+    lines.pop() |> ignore
+  }
+  lines.map(l => {
+    if l.has_suffix("\r") {
+      l.unsafe_substring(start=0, end=l.length() - 1)
+    } else {
+      l
+    }
+  })
 }

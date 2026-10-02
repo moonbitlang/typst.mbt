@@ -1,7 +1,7 @@
 // Differential test runner: compares the MoonBit port against reference
 // outputs dumped by the Rust oracle (see `scripts/goldens.sh`).
 //
-// Usage: moon run tests/runner -- <syntax|ast|eval|html|realize|paged|font|break> [filter] [--verbose]
+// Usage: moon run tests/runner -- <syntax|ast|eval|html|realize|paged|svg|svg-replay|font|break> [filter] [--verbose]
 
 ///|
 let suite_dir = ".repos/typst/tests/suite"
@@ -46,6 +46,31 @@ fn main {
         tc.attrs.split(" ").any(a => a == "html")
       })
     "break" => run_break_stage(filter, verbose)
+    // Like `paged`, but exported to SVG and compared after canonically
+    // renaming the hash-derived `<defs>` IDs.
+    "svg" =>
+      run_stage(
+        "svg",
+        svg_report,
+        filter,
+        verbose,
+        select=tc => is_paged(tc.attrs),
+        skip_file=text => text.has_prefix("// SKIP"),
+        canonicalize=canonicalize_svg_ids,
+      )
+    // The SVG export of upstream's laid-out documents (decoded from the
+    // `paged` goldens), independently of layout.
+    "svg-replay" =>
+      run_stage(
+        "svg",
+        svg_replay_report,
+        filter,
+        verbose,
+        select=tc => is_paged(tc.attrs),
+        skip_file=text => text.has_prefix("// SKIP"),
+        canonicalize=canonicalize_svg_ids,
+        dump_name="svg-replay",
+      )
     _ => {
       println("unknown stage: \{stage}")
       @sys.exit(2)
@@ -61,8 +86,13 @@ fn run_stage(
   verbose : Bool,
   select? : (TestCase) -> Bool = _ => true,
   skip_file? : (String) -> Bool = _ => false,
+  canonicalize? : (String) -> String,
+  dump_name? : String = stage,
 ) -> Unit {
   let mut passed = 0
+  // With `canonicalize`, both sides are compared after canonicalization;
+  // byte-identical outputs are counted separately.
+  let mut raw_passed = 0
   let mut failed = 0
   let failures = []
   for file in typ_files(suite_dir) {
@@ -91,6 +121,13 @@ fn run_stage(
       dump.write_string("=== \{tc.name}\n\{actual}")
       let expected = golden.get(tc.name).unwrap_or("<missing golden>")
       if actual == expected {
+        raw_passed += 1
+      }
+      let (expected, actual) = match canonicalize {
+        Some(f) => (f(expected), f(actual))
+        None => (expected, actual)
+      }
+      if actual == expected {
         passed += 1
       } else {
         failed += 1
@@ -98,7 +135,7 @@ fn run_stage(
       }
     }
     if dump_actual.val && dump.to_string() != "" {
-      let out = "_build/actual/\{stage}/" +
+      let out = "_build/actual/\{dump_name}/" +
         rel.unsafe_substring(start=0, end=rel.length() - 4) +
         ".txt"
       ensure_parent_dir(out)
@@ -115,7 +152,12 @@ fn run_stage(
       println(first_diff(expected, actual))
     }
   }
-  println("\{stage}: \{passed} passed, \{failed} failed")
+  println("\{dump_name}: \{passed} passed, \{failed} failed")
+  if canonicalize is Some(_) {
+    println(
+      "\{dump_name}: \{raw_passed} byte-identical before canonicalization",
+    )
+  }
 }
 
 ///|

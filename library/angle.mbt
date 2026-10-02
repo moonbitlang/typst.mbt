@@ -105,13 +105,15 @@ pub fn Angle::abs(self : Angle) -> Angle {
 }
 
 ///|
+/// (Upstream uses the `libm` crate, see `libm_trig.mbt`.)
 pub fn Angle::sin(self : Angle) -> Double {
-  @math.sin(self.to_rad())
+  libm_sin(self.to_rad())
 }
 
 ///|
+/// (Upstream uses the `libm` crate, see `libm_trig.mbt`.)
 pub fn Angle::cos(self : Angle) -> Double {
-  @math.cos(self.to_rad())
+  libm_cos(self.to_rad())
 }
 
 ///|

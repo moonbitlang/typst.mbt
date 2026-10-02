@@ -107,20 +107,30 @@ fn traverse(
 
 ///|
 /// Traverses a frame embedded in HTML.
-///
-/// TODO: Upstream walks the frame's items: for a start tag of a targeted
-/// element whose position is `InnerHtmlPosition::Frame(point)`, it assigns
-/// `generator.identify(elem.label())` as the element's ID and pushes
-/// `(point, id)` to `anchors`, recursing into groups. Frames are
-/// placeholders without items until layout is ported.
 fn traverse_frame(
-  _work : Work,
-  _targets : @hashset.HashSet[@library.Location],
-  _generator : @library.AnchorGenerator,
-  _frame : @library.Frame,
-  _anchors : Array[(@library.Point, String)],
+  work : Work,
+  targets : @hashset.HashSet[@library.Location],
+  generator : @library.AnchorGenerator,
+  frame : @library.Frame,
+  anchors : Array[(@library.Point, String)],
 ) -> Unit {
-  ()
+  for entry in frame.items() {
+    match entry.1 {
+      Tag(Start(elem, _)) => {
+        let loc = elem.location().unwrap()
+        if targets.contains(loc) &&
+          generator.introspector().position(loc) is Some(Html(position)) &&
+          position.details() is Some(Frame(point)) {
+          let id = generator.identify(elem.label())
+          work.ids[loc] = id
+          anchors.push((point, id))
+        }
+      }
+      Group(group) =>
+        traverse_frame(work, targets, generator, group.frame, anchors)
+      _ => ()
+    }
+  }
 }
 
 ///|

@@ -3,11 +3,23 @@ package "moonbitlang/typst/svg"
 
 import {
   "moonbitlang/core/debug",
+  "moonbitlang/typst/layout",
   "moonbitlang/typst/library",
+  "moonbitlang/typst/xmlwriter",
 }
 
 // Values
 pub fn convert_image_scaling(@library.Smart[@library.ImageScaling]) -> String?
+
+pub fn format_num(Double) -> String
+
+pub fn svg(@layout.Page, CompleteSvgOptions) -> String
+
+pub fn svg_in_bundle(@layout.Page, CompleteSvgOptions, ArrayView[(@library.Point, String)], @library.LateLinkResolver) -> String
+
+pub fn svg_in_html(@library.Frame, @library.Abs, Bool, String?, String, ArrayView[(@library.Point, String)], @library.LateLinkResolver?) -> String
+
+pub fn svg_merged(@layout.PagedDocument, SvgOptions, @library.Abs) -> String
 
 // Errors
 pub(all) suberror WebImageError {
@@ -15,6 +27,72 @@ pub(all) suberror WebImageError {
 } derive(@debug.Debug)
 
 // Types and methods
+pub(all) struct CompleteSvgOptions {
+  render_bleed : Bool
+  format : SvgFormatOptions
+} derive(Eq)
+
+pub(all) struct DedupId {
+  kind : Char
+  hash : @library.U128
+} derive(Eq, Hash)
+pub impl SvgDisplay for DedupId
+
+pub struct LazySvgElem {
+  // private fields
+}
+pub fn LazySvgElem::finish(Self) -> Unit
+pub fn LazySvgElem::init(Self) -> SvgElem
+pub fn LazySvgElem::lazy_(Self) -> SvgElem
+pub fn LazySvgElem::new(SvgElem, String) -> Self
+
+pub(all) struct PartialSvgFormatOptions {
+  pretty : Bool?
+} derive(Default, Eq)
+pub fn PartialSvgFormatOptions::resolve(Self, SvgFormatOptions) -> SvgFormatOptions
+
+pub struct SvgElem {
+  // private fields
+}
+pub fn[T : SvgDisplay] SvgElem::attr(Self, String, T) -> Self
+pub fn SvgElem::attr_with(Self, String, (SvgFormatter) -> Unit) -> Self
+pub fn SvgElem::elem(Self, String) -> Self
+pub fn SvgElem::end(Self) -> Unit
+pub fn SvgElem::lazy_elem(Self, String) -> LazySvgElem
+pub fn SvgElem::new(@xmlwriter.XmlWriter, String) -> Self
+
+pub(all) struct SvgFormatOptions {
+  pretty : @library.SpannedValue[Bool]
+} derive(Eq)
+pub fn SvgFormatOptions::get(@library.DocumentFormatOptions) -> Self
+
+pub struct SvgFormatter {
+  // private fields
+}
+pub fn SvgFormatter::new() -> Self
+pub fn[T : SvgDisplay] SvgFormatter::push(Self, T) -> Unit
+pub fn SvgFormatter::push_char(Self, Char) -> Unit
+pub fn SvgFormatter::push_int(Self, Int64) -> Unit
+pub fn SvgFormatter::push_num(Self, Double) -> Unit
+pub fn SvgFormatter::push_nums(Self, ArrayView[Double]) -> Unit
+pub fn SvgFormatter::push_str(Self, String) -> Unit
+pub fn SvgFormatter::to_string(Self) -> String
+
+pub(all) struct SvgIdRef(DedupId)
+pub impl SvgDisplay for SvgIdRef
+
+pub(all) struct SvgOptions {
+  render_bleed : Bool
+  format : PartialSvgFormatOptions
+} derive(Default, Eq)
+pub fn SvgOptions::resolve(Self, SvgFormatOptions) -> CompleteSvgOptions
+
+pub(all) struct SvgTransform(@library.Transform)
+pub impl SvgDisplay for SvgTransform
+
+pub(all) struct SvgUrl(DedupId)
+pub impl SvgDisplay for SvgUrl
+
 pub(all) struct WebImage {
   format : WebImageFormat
   data : Bytes
@@ -35,3 +113,10 @@ pub fn WebImageFormat::mime(Self) -> String
 // Type aliases
 
 // Traits
+pub(open) trait SvgDisplay {
+  fn fmt(Self, SvgFormatter) -> Unit
+}
+pub impl SvgDisplay for Char
+pub impl SvgDisplay for Double
+pub impl SvgDisplay for String
+pub impl SvgDisplay for @library.Color
