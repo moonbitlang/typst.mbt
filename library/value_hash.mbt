@@ -100,8 +100,10 @@ pub impl Fingerprint for Value with fn fingerprint(self, state) {
     }
     Tiling(v) => {
       state.write_discriminant(12)
-      state.write(v.body)
+      // Upstream hashes the laid out frame; frames have no fingerprint, so
+      // only its size and item count are written.
       state.write_str(v.repr())
+      state.write_usize(v.frame.items().length())
     }
     Symbol(v) => {
       state.write_discriminant(13)
