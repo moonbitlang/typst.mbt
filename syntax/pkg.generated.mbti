@@ -514,6 +514,7 @@ pub fn SyntaxNode::placeholder(SyntaxKind) -> Self
 pub fn SyntaxNode::span(Self) -> Span
 pub fn SyntaxNode::spanless_eq(Self, Self) -> Bool
 pub fn SyntaxNode::synthesize(Self, Span) -> Unit
+pub fn SyntaxNode::synthesize_ranges(Self, FileId) -> Unit
 
 pub(all) struct SyntaxSet {
   a : UInt64

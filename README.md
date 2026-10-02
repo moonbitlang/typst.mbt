@@ -14,7 +14,39 @@ MoonBit. See [PLAN.md](PLAN.md) for scope, architecture and status.
 | `svg/` | Port of `typst-svg` (so far: `WebImage` data URLs) |
 | `oracle/` | Rust crate dumping upstream reference outputs (goldens) |
 | `tests/runner/` | Differential runner comparing the port against the goldens |
+| `kit/`, `kit/platform/` | Port of `typst-kit` (files, packages, fonts, diagnostics) and OS access for native and wasm |
+| `cli/` | Port of `typst-cli`: the `typst` command line |
+| `typst_assets/fonts/` | The fonts embedded into the CLI (generated) |
 | `scripts/` | `upstream.sh` (pinned checkout), `goldens.sh` (regenerate goldens) |
+
+## Command-line interface
+
+`cli/` is a port of `typst-cli` (on `kit/`, a port of `typst-kit`) that
+compiles documents from the file system. It builds for `native`, `wasm-gc`
+and `wasm` (the wasm builds run in `moonrun`):
+
+```sh
+moon run cli --target native --release -- compile input.typ output.pdf
+moon run cli --target wasm-gc -- compile input.typ 'page-{p}.svg'
+moon run cli --target native -- compile --format html --features html in.typ
+moon run cli --target native -- eval 'query(heading).len()' --in input.typ
+moon run cli --target native -- fonts --variants
+```
+
+Supported: `compile`/`c` (PDF, PNG, SVG, HTML, bundle; `--root`, `--input`,
+`--font-path`, `--ignore-system-fonts`, `--ignore-embedded-fonts`,
+`--pages`, `--ppi`, `--pretty`, `--pdf-standard`, `--pdf-tagged`,
+`--creation-timestamp`/`SOURCE_DATE_EPOCH`, `--features`, `--deps`,
+`--diagnostic-format`, `-` for stdin/stdout), `eval`, `query`, `fonts`,
+`info`, `init` (templates from local package directories) and the
+environment variables of upstream. Packages are served from the package
+data (`@local`, …) and cache directories; downloading packages from Typst
+Universe, `watch`, `update`, `completions`, `--open` and `--timings` are
+not supported. The embedded fonts are those of upstream (Libertinus Serif,
+New Computer Modern, DejaVu Sans Mono). On wasm, system font discovery
+reads every font file through moonrun's host API (slow; use
+`--ignore-system-fonts`), symlinks cannot be detected, the local time zone
+is UTC and only text can be written to stdout.
 
 ## Testing
 

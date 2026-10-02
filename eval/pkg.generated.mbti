@@ -18,6 +18,8 @@ pub fn eval_source(&@library.World, @library.Library, @library.Traced, @library.
 
 pub fn eval_string(@library.Engine, @library.Context, String, @syntax.Span, @syntax.SyntaxMode, @library.Scope) -> @library.Value raise @library.SourceError
 
+pub fn eval_string_mapped(@library.Engine, @library.Context, String, @syntax.FileId, @syntax.SyntaxMode, @library.Scope) -> @library.Value raise @library.SourceError
+
 pub fn hint_if_shadowed_std(Vm, @ast.Expr, @library.HintedString) -> @library.HintedString
 
 pub fn import_(@library.Engine, String, @syntax.Span) -> @library.Module raise @library.SourceError

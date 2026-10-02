@@ -150,3 +150,21 @@
   `scripts/gen_hayro_render_pdfs.py` (blend modes, masks, images, gradients,
   strokes) at scales 1 and 0.37 (synthetic PDFs also 1.7);
   `hayro/render/cli` dumps raw pixmaps for diffs.
+- CLI: `cli/` ports `typst-cli` (`moon run cli --target native|wasm-gc|wasm
+  -- compile in.typ out.pdf`), `kit/` ports `typst-kit` (FileStore/FsRoot,
+  local `SystemPackages`, lazy `FontStore`, fontdb-like discovery that probes
+  large font files with ranged reads, `codespan-reporting` 0.11.1 renderer in
+  `kit/codespan.mbt`). All OS access goes through `kit/platform` (native C
+  stub with errno-based `io::Error` texts; moonrun host imports on wasm).
+  Generated: `cli/help_gen.mbt` (`scripts/gen_cli_help.py <upstream typst
+  binary>`), `unicode/width_tables_gen.mbt` (`gen_unicode_width`). The
+  embedded fonts are committed as files (`typst_assets/fonts/files/`,
+  typst-assets 94dcb99 with its LICENSE/NOTICE); a moon `pre-build` step
+  (`typst_assets/fonts/gen-fonts`, POSIX sh; `gen-fonts.ps1` on Windows)
+  generates the ignored `fonts_gen.c` (a native stub, compiled once, so
+  release builds don't recompile 10 MB of font data) and
+  `fonts_wasm_gen.mbt` (base64, wasm targets) on the first build.
+  Check against an upstream CLI (`cargo +1.97.1 build --release -p
+  typst-cli` in `.repos/typst`): SVG/HTML/PNG pixels, diagnostics, help,
+  `fonts --variants`, `query`/`eval`/`info` output are identical; outputs
+  must also be identical across native, wasm-gc and wasm.

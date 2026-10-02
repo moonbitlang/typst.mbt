@@ -1,0 +1,37 @@
+// The font data is generated from `files/` (in the order of upstream's
+// `typst_assets::fonts()`) by `gen-fonts` (`gen-fonts.ps1` on Windows).
+formatter(ignore: [ "fonts_wasm_gen.mbt" ])
+
+options(
+  "pre-build": [
+    {
+      "input": [
+        "files/LibertinusSerif-Regular.otf",
+        "files/LibertinusSerif-Bold.otf",
+        "files/LibertinusSerif-Italic.otf",
+        "files/LibertinusSerif-BoldItalic.otf",
+        "files/LibertinusSerif-Semibold.otf",
+        "files/LibertinusSerif-SemiboldItalic.otf",
+        "files/NewCMMath-Bold.otf",
+        "files/NewCMMath-Book.otf",
+        "files/NewCMMath-Regular.otf",
+        "files/NewCM10-Regular.otf",
+        "files/NewCM10-Bold.otf",
+        "files/NewCM10-Italic.otf",
+        "files/NewCM10-BoldItalic.otf",
+        "files/DejaVuSansMono-Bold.ttf",
+        "files/DejaVuSansMono-BoldOblique.ttf",
+        "files/DejaVuSansMono-Oblique.ttf",
+        "files/DejaVuSansMono.ttf",
+      ],
+      "output": [ "fonts_gen.c", "fonts_wasm_gen.mbt" ],
+      "command": "typst_assets/fonts/gen-fonts $output $input",
+    },
+  ],
+  "native-stub": [ "fonts_stub.c", "fonts_gen.c" ],
+  targets: {
+    "fonts_native.mbt": [ "native", "llvm" ],
+    "fonts_wasm.mbt": [ "wasm", "wasm-gc" ],
+    "fonts_wasm_gen.mbt": [ "wasm", "wasm-gc" ],
+  },
+)

@@ -1,0 +1,13 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/typst_assets/fonts"
+
+// Values
+pub fn fonts() -> Array[Bytes]
+
+// Errors
+
+// Types and methods
+
+// Type aliases
+
+// Traits

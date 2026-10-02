@@ -28,12 +28,29 @@ goldens with `scripts/goldens.sh <stage>` (needs Rust; builds `oracle/`).
 - [ ] **WASM plugins** (`foundations/plugin.typ`, 10 eval + 4 realize
   cases): port a WebAssembly runtime equivalent to upstream's `wasmi` plus
   `typst-library/src/foundations/plugin.rs`.
-- [ ] **CLI and a real file-system `World`**: today the engine is only
-  driven by `tests/runner`. Port the relevant parts of `typst-cli` /
-  `typst-kit` (file resolution, font discovery incl. system fonts via a
-  `fontdb`-like adapter, package downloads/cache, `sys.inputs`, export
-  options for PDF/SVG/PNG/HTML/bundle) so `.typ` files can be compiled
-  outside the harness.
+- [x] **CLI and a real file-system `World`** (`cli/`, `kit/`; see README):
+  `compile`/`eval`/`query`/`fonts`/`info`/`init` on native, wasm-gc and
+  wasm, checked against the upstream CLI. Remaining:
+  - [ ] package downloads from Typst Universe (needs an HTTP client; today a
+    missing `@preview` package is reported as not found), and `init` of
+    unversioned `@preview` templates (needs the package index);
+  - [ ] `watch` (needs file system events or polling + sleep), the HTTP
+    server, `--open`, `--timings`, `completions`, `update`;
+  - [ ] wasm: system font discovery reads whole files byte by byte through
+    moonrun's host API (~15 s for macOS' fonts; ranged reads would need a
+    host API), no symlink detection (duplicate faces, no cycle protection),
+    no local time zone (UTC), no binary stdout, no `realpath`: paths are
+    only made absolute (`..` is left to the host), so spellings that differ
+    by symlinks (`/etc` vs. `/private/etc`) are not recognized as the same
+    root, `..` after a symlink inside an explicit `--root` is resolved
+    lexically by `VirtualPath`, and diagnostics may show `dir/../file.typ`
+    where native shows `file.typ`;
+  - [ ] clap's "similar value/argument" tips in argument errors; colored
+    greeting; `--deps` lists dependencies in first-access order (upstream:
+    hash map order);
+  - [ ] Linux fontconfig: only `<dir>`/`<include>`/`<reset-dirs>` are
+    interpreted; Windows support of `kit/platform` is untested and uses the
+    narrow (ANSI code page) C file APIs, so non-ASCII paths need wide APIs.
 - [ ] **PDF image filters in `hayro/syntax`**: DCT (JPEG), JPX (JPEG 2000),
   JBIG2 and CCITT streams inside embedded PDFs are not decoded (36 hayro
   corpus files are `#skip`ped in `hayro/render/testdata/corpus.txt`; no
