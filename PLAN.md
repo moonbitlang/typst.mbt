@@ -8,14 +8,14 @@
 | P1 syntax (lexer, parser, nodes, spans, LinkedNode) | **done** | 3792/3792 suite cases: tree + diagnostics byte-identical |
 | P1 syntax (typed AST, Lines) | **done** | 3792/3792 suite cases: AST semantic dump + `Lines` conversions identical (`ast` stage) |
 | P1 syntax (highlight) | **done** | `syntax/highlight` (`Tag`, `highlight`, `highlight_html`); used for `typ`/`typc`/`typm` raw blocks |
-| P1 syntax (reparser) | todo | |
+| P1 syntax (reparser) | **done** | `Source::edit`/`replace` + `reparse`: 3792/3792 `reparse` stage (8 seeded edits per test body: returned ranges, tree, span numbering, `Lines` identical), upstream reparser unit tests |
 | P2 eval (typst-eval) | **done** | VM, closures, imports, rules, math; `eval` stage runs end to end |
 | P2 library (value level) | **done** | 3778/3792 `eval` (2026-10-03). Remaining 14: plugins (WASM, out of scope), inline layout (P4) |
 | P3 realize + introspection + HTML export | **done** | `realize` 3778/3792, `html` 504/508 (2026-10-03). Remaining: inline layout (P4), PDF images |
 | P4 fonts, shaping, layout, export | in progress | `font` 86/86, `break` 12734/12734, `shape` 4598/4598 + `shape-hb` 2250/2250, `svg-replay` 2254/2299 (byte-identical), `paged` 339/2299 and `svg` 384/2299 (inline + math layout in progress, PDF in progress); see docs/p4-plan.md |
 
 Run `scripts/upstream.sh && scripts/goldens.sh && moon run tests/runner --target native -- syntax`
-(and `-- ast`, `-- eval`). `python3 scripts/classify.py eval 60` buckets the
+(and `-- ast`, `-- reparse`, `-- eval`). `python3 scripts/classify.py eval 60` buckets the
 remaining `eval` failures.
 
 Upstream reference: `.repos/typst` @ `e58a63af0` (2026-09-30). Pin this; port

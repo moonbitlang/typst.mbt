@@ -1,7 +1,7 @@
 // Differential test runner: compares the MoonBit port against reference
 // outputs dumped by the Rust oracle (see `scripts/goldens.sh`).
 //
-// Usage: moon run tests/runner -- <syntax|ast|eval|html|realize|paged|svg|svg-replay|font|break|shape|shape-hb> [filter] [--verbose]
+// Usage: moon run tests/runner -- <syntax|ast|reparse|eval|html|realize|paged|svg|svg-replay|font|break|shape|shape-hb> [filter] [--verbose]
 
 ///|
 let suite_dir = ".repos/typst/tests/suite"
@@ -26,6 +26,8 @@ fn main {
     "syntax" =>
       run_stage("syntax", (_, tc) => syntax_report(tc.body), filter, verbose)
     "ast" => run_stage("ast", (_, tc) => ast_report(tc.body), filter, verbose)
+    "reparse" =>
+      run_stage("reparse", (_, tc) => reparse_report(tc.body), filter, verbose)
     "eval" => run_stage("eval", eval_report, filter, verbose)
     "realize" => run_stage("realize", realize_report, filter, verbose)
     // Like the oracle, only the tests that upstream compiles to a paged
