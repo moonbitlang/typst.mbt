@@ -4136,6 +4136,22 @@ pub fn bibliography_elem() -> Element {
             kind=Synthesized,
             internal=true,
           ),
+          field_of(
+            (Ty::new() : Ty[Value]),
+            id=8,
+            name="sources-derived",
+            kind=Settable,
+            internal=true,
+            parse=(_, _, locals) => locals.get("sources-derived"),
+          ),
+          field_of(
+            (Ty::new() : Ty[Value]),
+            id=9,
+            name="style-derived",
+            kind=Settable,
+            internal=true,
+            parse=(_, _, locals) => locals.get("style-derived"),
+          ),
         ],
       )
       bibliography_elem_cell.val = Some(e)
@@ -4172,6 +4188,12 @@ pub let bibliography_elem_lang : Int = 6
 
 ///|
 pub let bibliography_elem_region : Int = 7
+
+///|
+pub let bibliography_elem_sources_derived : Int = 8
+
+///|
+pub let bibliography_elem_style_derived : Int = 9
 
 ///|
 let csl_light_elem_cell : Ref[Element?] = Ref::new(None)
@@ -4303,6 +4325,14 @@ pub fn cite_elem() -> Element {
             kind=Synthesized,
             internal=true,
           ),
+          field_of(
+            (Ty::new() : Ty[Value]),
+            id=6,
+            name="style-derived",
+            kind=Settable,
+            internal=true,
+            parse=(_, _, locals) => locals.get("style-derived"),
+          ),
         ],
       )
       cite_elem_cell.val = Some(e)
@@ -4329,6 +4359,9 @@ pub let cite_elem_lang : Int = 4
 
 ///|
 pub let cite_elem_region : Int = 5
+
+///|
+pub let cite_elem_style_derived : Int = 6
 
 ///|
 let cite_group_elem_cell : Ref[Element?] = Ref::new(None)
@@ -7827,6 +7860,22 @@ pub fn raw_elem() -> Element {
             name="lines",
             kind=Synthesized,
           ),
+          field_of(
+            (Ty::new() : Ty[Value]),
+            id=8,
+            name="syntaxes-derived",
+            kind=Settable,
+            internal=true,
+            parse=(_, _, locals) => locals.get("syntaxes-derived"),
+          ),
+          field_of(
+            (Ty::new() : Ty[Value]),
+            id=9,
+            name="theme-derived",
+            kind=Settable,
+            internal=true,
+            parse=(_, _, locals) => locals.get("theme-derived"),
+          ),
         ],
       )
       raw_elem_cell.val = Some(e)
@@ -7863,6 +7912,12 @@ pub let raw_elem_tab_size : Int = 6
 
 ///|
 pub let raw_elem_lines : Int = 7
+
+///|
+pub let raw_elem_syntaxes_derived : Int = 8
+
+///|
+pub let raw_elem_theme_derived : Int = 9
 
 ///|
 let raw_line_elem_cell : Ref[Element?] = Ref::new(None)
@@ -8599,6 +8654,22 @@ pub fn image_elem() -> Element {
             kind=Synthesized,
             internal=true,
           ),
+          field_of(
+            (Ty::new() : Ty[Value]),
+            id=10,
+            name="source-derived",
+            kind=Settable,
+            internal=true,
+            parse=(_, _, locals) => locals.get("source-derived"),
+          ),
+          field_of(
+            (Ty::new() : Ty[Value]),
+            id=11,
+            name="icc-derived",
+            kind=Settable,
+            internal=true,
+            parse=(_, _, locals) => locals.get("icc-derived"),
+          ),
         ],
       )
       image_elem_cell.val = Some(e)
@@ -8640,6 +8711,12 @@ pub let image_elem_icc : Int = 8
 
 ///|
 pub let image_elem_locale : Int = 9
+
+///|
+pub let image_elem_source_derived : Int = 10
+
+///|
+pub let image_elem_icc_derived : Int = 11
 
 ///|
 let line_elem_cell : Ref[Element?] = Ref::new(None)
@@ -9474,6 +9551,14 @@ pub fn pdf_attach_elem() -> Element {
             kind=Settable,
             default=() => None,
           ),
+          field_of(
+            (Ty::new() : Ty[Value]),
+            id=5,
+            name="path-derived",
+            kind=Settable,
+            internal=true,
+            parse=(_, _, locals) => locals.get("path-derived"),
+          ),
         ],
       )
       pdf_attach_elem_cell.val = Some(e)
@@ -9496,6 +9581,9 @@ pub let pdf_attach_elem_mime_type : Int = 3
 
 ///|
 pub let pdf_attach_elem_description : Int = 4
+
+///|
+pub let pdf_attach_elem_path_derived : Int = 5
 
 ///|
 let svg_format_elem_cell : Ref[Element?] = Ref::new(None)
