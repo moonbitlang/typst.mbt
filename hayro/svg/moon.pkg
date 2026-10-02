@@ -9,4 +9,12 @@ import {
   "moonbitlang/core/cmp",
 }
 
+import {
+  "moonbitlang/typst/hayro/svg" @hayro_svg,
+  "moonbitlang/typst/typst_assets/pdf" @pdf_fonts,
+  "moonbitlang/x/fs",
+  "moonbitlang/core/encoding/utf8",
+  "moonbitlang/core/string",
+} for "test"
+
 warnings = "-deprecated"
