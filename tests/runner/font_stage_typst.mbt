@@ -183,6 +183,7 @@ fn font_dump_typst(
     "typst instance default \{variations_str(inst.variations())}\n",
   )
   dump_instance(out, inst)
+  dump_color_frames(out, inst)
   if info.flags.contains(@library.font_flags_variable) {
     let variants = [
       (
@@ -299,4 +300,59 @@ fn font_dump_book() -> String {
     text.write_string("fallback \"\{esc(sample)}\" \{picks.join(",")}\n")
   }
   text.to_string()
+}
+
+///|
+fn abs_pt(v : @library.Abs) -> String {
+  @library.rust_display_f64(v.to_pt())
+}
+
+///|
+/// Dumps the color glyph frames (`text::color::glyph_frame`) of a face.
+fn dump_color_frames(out : StringBuilder, inst : @library.FontInstance) -> Unit {
+  let count = inst.ttf().unwrap().number_of_glyphs().to_int()
+  let text = StringBuilder::new()
+  let mut n = 0
+  for gid in 0..<count {
+    let g = gid.to_uint16()
+    if @library.should_outline(inst, g) {
+      continue
+    }
+    // SVG-table glyphs need usvg (not ported yet, see
+    // library/font_color.mbt), so they are not compared.
+    let ttf = inst.ttf().unwrap()
+    let og = @otf.GlyphId(g)
+    if ttf.glyph_svg_image(og) is Some(_) &&
+      !ttf.is_color_glyph(og) &&
+      !(ttf.glyph_raster_image(og, 0xFFFF) is Some(img) && img.format == PNG) {
+      continue
+    }
+    n += 1
+    let line = match @library.glyph_frame(inst, g) {
+      None => "\{gid} -"
+      Some(frame) =>
+        match frame.item {
+          Tofu(pos, _) =>
+            "\{gid} \{abs_pt(frame.upem)} tofu \{abs_pt(pos.x)} \{abs_pt(pos.y)}"
+          Image(pos, image, size) => {
+            let (kind, data) = match image.kind() {
+              Raster(r) => ("raster", r.data())
+              Svg(s) => ("svg", s.data())
+              _ => ("other", Bytes::new(0))
+            }
+            "\{gid} \{abs_pt(frame.upem)} \{kind} \{abs_pt(pos.x)} \{abs_pt(pos.y)} \{abs_pt(size.x)} \{abs_pt(size.y)} \{data.length()} \{hex16(fnv_bytes(data[:]))}"
+          }
+        }
+    }
+    if n <= 12 || gid % 97 == 0 {
+      out.write_string("typst glyph_frame \{line}\n")
+    }
+    text.write_string(line)
+    text.write_char('\n')
+  }
+  if n > 0 {
+    out.write_string(
+      "typst glyph_frames \{n} fnv \{hex16(fnv(text.to_string()))}\n",
+    )
+  }
 }

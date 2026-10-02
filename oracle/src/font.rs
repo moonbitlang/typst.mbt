@@ -1245,6 +1245,7 @@ fn dump_typst(out: &mut String, data: &'static [u8], face_index: u32) {
     let inst = font.clone().instantiate(info.variant, size, &plain);
     writeln!(out, "typst instance default {}", variations(inst.variations())).unwrap();
     dump_instance(out, &inst);
+    dump_color_frames(out, &inst);
     if info.flags.contains(FontFlags::VARIABLE) {
         let variants = [
             ("bold", FontVariant::new(FontStyle::Normal, FontWeight::BOLD, FontStretch::NORMAL)),
@@ -1328,4 +1329,67 @@ pub fn dump_book(out: &Path) {
         writeln!(text, "fallback \"{}\" {}", esc(sample), picks.join(",")).unwrap();
     }
     std::fs::write(out.join("book.txt"), text).unwrap();
+}
+
+fn abs(v: typst::layout::Abs) -> String {
+    format!("{}", v.to_pt())
+}
+
+/// Dumps the color glyph frames (`text::color::glyph_frame`) of a face.
+fn dump_color_frames(out: &mut String, inst: &typst::text::FontInstance) {
+    use typst::text::color::{GlyphFrameItem, glyph_frame, should_outline};
+    use typst::visualize::ImageKind;
+    let count = inst.ttf().number_of_glyphs();
+    let mut text = String::new();
+    let mut n = 0;
+    for gid in 0..count {
+        if should_outline(inst, GlyphId(gid)) {
+            continue;
+        }
+        // SVG-table glyphs need usvg (not ported yet, see
+        // library/font_color.mbt), so they are not compared.
+        let ttf = inst.ttf();
+        if ttf.glyph_svg_image(GlyphId(gid)).is_some()
+            && !ttf.is_color_glyph(GlyphId(gid))
+            && !ttf
+                .glyph_raster_image(GlyphId(gid), u16::MAX)
+                .is_some_and(|img| img.format == ttf_parser::RasterImageFormat::PNG)
+        {
+            continue;
+        }
+        n += 1;
+        let line = match glyph_frame(inst, gid) {
+            None => format!("{gid} -"),
+            Some(frame) => match frame.item {
+                GlyphFrameItem::Tofu(pos, _) => {
+                    format!("{gid} {} tofu {} {}", abs(frame.upem), abs(pos.x), abs(pos.y))
+                }
+                GlyphFrameItem::Image(pos, image, size) => {
+                    let (kind, data) = match image.kind() {
+                        ImageKind::Raster(r) => ("raster", r.data().clone()),
+                        ImageKind::Svg(s) => ("svg", s.data().clone()),
+                        _ => ("other", typst::foundations::Bytes::new(vec![])),
+                    };
+                    format!(
+                        "{gid} {} {kind} {} {} {} {} {} {:016x}",
+                        abs(frame.upem),
+                        abs(pos.x),
+                        abs(pos.y),
+                        abs(size.x),
+                        abs(size.y),
+                        data.len(),
+                        fnv(&data)
+                    )
+                }
+            },
+        };
+        if n <= 12 || gid % 97 == 0 {
+            writeln!(out, "typst glyph_frame {line}").unwrap();
+        }
+        text.push_str(&line);
+        text.push('\n');
+    }
+    if n > 0 {
+        writeln!(out, "typst glyph_frames {n} fnv {:016x}", fnv(text.as_bytes())).unwrap();
+    }
 }

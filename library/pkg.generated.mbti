@@ -1087,6 +1087,8 @@ pub fn get_accent_func(String) -> Func?
 
 pub fn get_lr_wrapper_func(String) -> Func?
 
+pub fn glyph_frame(FontInstance, UInt16) -> GlyphFrame?
+
 pub fn grid_cell_elem() -> Element
 
 pub let grid_cell_elem_align : Int
@@ -2485,6 +2487,8 @@ pub fn round_with_precision(Double, Int) -> Double
 
 pub fn rust_debug_f64(Double) -> String
 
+pub fn rust_display_f32(Float) -> String
+
 pub fn rust_display_f64(Double) -> String
 
 pub fn rust_fixed_f64(Double, Int) -> String
@@ -2524,6 +2528,8 @@ pub let scripts_elem_body : Int
 pub fn separated_list(ArrayView[String], String) -> String
 
 pub fn sequence_elem() -> Element
+
+pub fn should_outline(FontInstance, UInt16) -> Bool
 
 pub let sink_max_values : Int
 
@@ -6205,6 +6211,19 @@ pub(all) struct Glyph {
   span : (@syntax.Span, UInt16)
 } derive(Eq, Hash)
 pub fn Glyph::range(Self) -> (Int, Int)
+
+pub(all) struct GlyphFrame {
+  upem : Abs
+  item : GlyphFrameItem
+}
+pub fn GlyphFrame::size(Self) -> Axes[Abs]
+pub fn GlyphFrame::to_frame(Self) -> Frame
+
+pub(all) enum GlyphFrameItem {
+  Tofu(Point, Shape)
+  Image(Point, Image, Axes[Abs])
+}
+pub fn GlyphFrameItem::pos(Self) -> Point
 
 pub struct GlyphItem {
   text : String

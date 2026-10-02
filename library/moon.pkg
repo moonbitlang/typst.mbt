@@ -22,6 +22,7 @@ import {
   "moonbitlang/typst/html_assets",
   "moonbitlang/typst/codecs",
   "moonbitlang/typst/otf",
+  "moonbitlang/typst/xmlwriter",
 }
 
 import {

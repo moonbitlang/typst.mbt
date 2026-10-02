@@ -1,0 +1,41 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/xmlwriter"
+
+import {
+  "moonbitlang/core/debug",
+}
+
+// Values
+
+// Errors
+
+// Types and methods
+pub(all) enum Indent {
+  None
+  Spaces(Int)
+  Tabs
+} derive(Eq, @debug.Debug)
+
+pub(all) struct Options {
+  use_single_quote : Bool
+  indent : Indent
+  attributes_indent : Indent
+} derive(@debug.Debug)
+pub impl Default for Options
+
+pub struct XmlWriter {
+  // private fields
+}
+pub fn XmlWriter::end_document(Self) -> String
+pub fn XmlWriter::end_element(Self) -> Unit
+pub fn XmlWriter::new(Options) -> Self
+pub fn XmlWriter::set_preserve_whitespaces(Self, Bool) -> Unit
+pub fn XmlWriter::start_element(Self, String) -> Unit
+pub fn XmlWriter::write_attribute(Self, String, String) -> Unit
+pub fn XmlWriter::write_comment(Self, String) -> Unit
+pub fn XmlWriter::write_declaration(Self) -> Unit
+pub fn XmlWriter::write_text(Self, String) -> Unit
+
+// Type aliases
+
+// Traits
