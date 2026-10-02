@@ -45,6 +45,7 @@ fn StripStorage::extend(self : StripStorage, other : StripStorage) -> Unit {
 priv struct StripGenerator {
   line_buf : Array[Line]
   flatten_ctx : FlattenCtx
+  stroke_ctx : @kurbo.StrokeCtx
   temp_storage : StripStorage
   tiles : Tiles
   width : Int
@@ -57,6 +58,7 @@ fn StripGenerator::new(width : Int, height : Int) -> StripGenerator {
     line_buf: [],
     tiles: Tiles::new(height),
     flatten_ctx: FlattenCtx::new(),
+    stroke_ctx: @kurbo.StrokeCtx::new(),
     temp_storage: StripStorage::new(Replace),
     width,
     height,
@@ -87,7 +89,7 @@ fn StripGenerator::generate_filled_path(
 fn StripGenerator::generate_stroked_path(
   self : StripGenerator,
   path : Array[@kurbo.PathEl],
-  stroke : StrokeStyle,
+  stroke : @kurbo.Stroke,
   transform : @kurbo.Affine,
   aliasing_threshold : Int?,
   strip_storage : StripStorage,
@@ -102,7 +104,7 @@ fn StripGenerator::generate_stroked_path(
   // transform.
   let c = transform.as_coeffs()
   let tolerance = TOL / dmax(dmax(c[0].abs(), c[3].abs()), 1.0)
-  let expanded = expand_stroke(path, stroke, tolerance)
+  let expanded = expand_stroke(path, stroke, tolerance, self.stroke_ctx)
   fill(expanded, transform, self.line_buf, self.flatten_ctx, cull_bbox)
   self.generate_with_clip(aliasing_threshold, strip_storage, NonZero, clip_path)
 }

@@ -1,0 +1,9 @@
+import {
+  "moonbitlang/typst/hayro/syntax" @hayro_syntax,
+  "moonbitlang/typst/hayro/interpret",
+  "moonbitlang/typst/kurbo",
+  "moonbitlang/typst/vello_cpu",
+  "moonbitlang/typst/pic_scale",
+}
+
+warnings = "-deprecated"

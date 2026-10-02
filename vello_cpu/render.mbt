@@ -16,7 +16,7 @@ pub struct RenderContext {
   // The current rendering state (`RenderState`).
   priv mut paint : PaintType
   priv mut paint_transform : @kurbo.Affine
-  priv mut stroke : StrokeStyle
+  priv mut stroke : @kurbo.Stroke
   priv mut transform : @kurbo.Affine
   priv mut fill_rule : Fill
   priv mut blend_mode : BlendMode
@@ -229,13 +229,13 @@ pub fn RenderContext::pop_layer(self : RenderContext) -> Unit {
 
 ///|
 /// Set the current stroke.
-pub fn RenderContext::set_stroke(self : RenderContext, stroke : StrokeStyle) -> Unit {
+pub fn RenderContext::set_stroke(self : RenderContext, stroke : @kurbo.Stroke) -> Unit {
   self.stroke = stroke
 }
 
 ///|
 /// Get the current stroke.
-pub fn RenderContext::stroke(self : RenderContext) -> StrokeStyle {
+pub fn RenderContext::stroke(self : RenderContext) -> @kurbo.Stroke {
   self.stroke
 }
 

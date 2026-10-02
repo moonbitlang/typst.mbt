@@ -9,6 +9,10 @@ import {
   "moonbitlang/typst/codecs",
   "moonbitlang/typst/otf",
   "moonbitlang/core/math",
+  "moonbitlang/typst/hayro/interpret" @hayro_interpret,
+  "moonbitlang/typst/hayro/render" @hayro_render,
+  "moonbitlang/typst/vello_cpu",
+  "moonbitlang/typst/typst_assets/pdf" @pdf_fonts,
 }
 
 warnings = "-deprecated"
