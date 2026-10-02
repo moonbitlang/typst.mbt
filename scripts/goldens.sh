@@ -28,7 +28,8 @@
 # names a directory containing them.
 # `resvg` renders resvg's own regression suite (.repos/resvg, see upstream.sh)
 # with the real crate and dumps the size and SHA-256 of every pixmap
-# (oracle/src/bin/gen_resvg_golden.rs).
+# (oracle/src/bin/gen_resvg_golden.rs); it also regenerates resvg/oracle_test.mbt
+# from oracle/src/bin/resvg_corpus.txt.
 # `bundle` compiles every `bundle` test to a bundle and dumps the exported
 # files (paths, kinds, sizes, sha256, and the text of HTML/SVG/UTF-8 files;
 # see oracle/src/bundle.rs).
@@ -60,6 +61,8 @@ for stage in "${stages[@]}"; do
   if [ "$stage" = resvg ]; then
     rm -rf tests/golden/resvg
     (cd oracle && cargo run --release -q --bin gen_resvg_golden -- ../.repos/resvg/crates/resvg/tests ../tests/golden/resvg)
+    mv tests/golden/resvg/oracle_test.mbt resvg/oracle_test.mbt
+    moon fmt
     continue
   fi
   if [ "$stage" = fonts ]; then
