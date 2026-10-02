@@ -113,6 +113,8 @@ fn opt_optional(
   id : String,
   value_name : String,
   missing : String,
+  possible? : Array[String] = [],
+  empty? : EmptyMode = Required,
   hidden? : Bool = false,
   help~ : String,
 ) -> ArgSpec {
@@ -125,9 +127,9 @@ fn opt_optional(
     delimiter: None,
     value_name,
     help,
-    possible: ["true", "false"],
+    possible,
     hidden,
-    empty: Required,
+    empty,
     validate: None,
     multiple: false,
   }
@@ -139,6 +141,8 @@ priv struct PosSpec {
   name : String
   required : Bool
   help : String
+  /// The positional's value parser, run when the value is consumed.
+  validate : ((String) -> Unit raise CliError)?
 }
 
 ///|
@@ -172,6 +176,7 @@ priv struct Matches {
 /// after parsing the subcommand's arguments).
 fn Matches::resolve_pending(self : Matches) -> Unit raise CliError {
   self.state.resolve_pending()
+  self.state.apply_env()
 }
 
 ///|
@@ -429,6 +434,10 @@ fn CommandSpec::parse(
         break
       }
       state.resolve_pending()
+      if positionals.length() < self.positionals.length() &&
+        self.positionals[positionals.length()].validate is Some(validate) {
+        validate(arg)
+      }
       positionals.push(arg)
       continue
     }
@@ -443,12 +452,18 @@ fn CommandSpec::parse(
         Some(eq) => (body[:eq].to_owned(), Some(body[eq + 1:].to_owned()))
         None => (body, None)
       }
-      if name == "help" {
+      if name == "help" || (name == "version" && self.subcommands.length() > 0) {
         state.resolve_pending()
-        raise Display(self.help(long=true))
-      }
-      if name == "version" && self.subcommands.length() > 0 {
-        state.resolve_pending()
+        if attached is Some(value) {
+          state.used.push(name)
+          raise Usage(
+            "unexpected value '\{value}' for '--\{name}' found; no more were expected",
+            self.smart_usage(state.used_ids(), positionals.length()),
+          )
+        }
+        if name == "help" {
+          raise Display(self.help(long=true))
+        }
         raise Display(version_line() + "\n")
       }
       guard find_long(name) is Some(index) else { raise unexpected(arg, true) }
@@ -457,9 +472,10 @@ fn CommandSpec::parse(
       match spec.kind {
         Flag => {
           if attached is Some(value) {
+            state.start(spec)
             raise Usage(
               "unexpected value '\{value}' for '\{spec.display()}' found; no more were expected",
-              self.usage(),
+              self.smart_usage(state.used_ids(), positionals.length()),
             )
           }
           state.flag(spec)
@@ -513,33 +529,10 @@ fn CommandSpec::parse(
     state.resolve_pending()
   }
 
-  // Environment variable fallbacks.
-  for spec in self.args {
-    guard spec.env is Some(env) else { continue }
-    guard @platform.env_var(env) is Some(value) else { continue }
-    match spec.kind {
-      Flag =>
-        if !state.counts.contains(spec.id) {
-          // clap's `BoolValueParser`.
-          match value {
-            "true" => state.counts[spec.id] = 1
-            "false" => ()
-            "" =>
-              raise Invalid(
-                "a value is required for '\{spec.display()}' but none was supplied\n  [possible values: true, false]",
-              )
-            _ =>
-              raise Invalid(
-                "invalid value '\{value}' for '\{spec.display()}'\n  [possible values: true, false]",
-              )
-          }
-        }
-      _ =>
-        if !state.values.contains(spec.id) &&
-          !state.pending.iter().any(p => p.0.id == spec.id) {
-          state.push_values(spec, value)
-        }
-    }
+  // Environment variable fallbacks (for a command with a subcommand, after
+  // the subcommand's arguments were parsed, like pending values).
+  if subcommand is None {
+    state.apply_env()
   }
   if positionals.length() > self.positionals.length() {
     raise Usage(
@@ -735,6 +728,8 @@ fn CommandSpec::smart_usage(
   for id in used {
     if self.args.iter().find_first(a => a.id == id) is Some(arg) {
       buf.write_string(" \{arg.display()}")
+    } else if id == "help" || id == "version" {
+      buf.write_string(" --\{id}")
     }
   }
   for i, pos in self.positionals {
@@ -748,4 +743,36 @@ fn CommandSpec::smart_usage(
     buf.write_string(" <COMMAND>")
   }
   buf.to_string()
+}
+
+///|
+/// Applies the environment variable fallbacks of the options.
+fn ParseState::apply_env(self : ParseState) -> Unit raise CliError {
+  for spec in self.spec.args {
+    guard spec.env is Some(env) else { continue }
+    guard @platform.env_var(env) is Some(value) else { continue }
+    match spec.kind {
+      Flag =>
+        if !self.counts.contains(spec.id) {
+          // clap's `BoolValueParser`.
+          match value {
+            "true" => self.counts[spec.id] = 1
+            "false" => ()
+            "" =>
+              raise Invalid(
+                "a value is required for '\{spec.display()}' but none was supplied\n  [possible values: true, false]",
+              )
+            _ =>
+              raise Invalid(
+                "invalid value '\{value}' for '\{spec.display()}'\n  [possible values: true, false]",
+              )
+          }
+        }
+      _ =>
+        if !self.values.contains(spec.id) &&
+          !self.pending.iter().any(p => p.0.id == spec.id) {
+          self.push_values(spec, value)
+        }
+    }
+  }
 }
