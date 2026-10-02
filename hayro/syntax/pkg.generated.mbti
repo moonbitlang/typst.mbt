@@ -1,0 +1,612 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/hayro/syntax"
+
+import {
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub let a4 : Rect
+
+pub fn ascii_85_decode(BytesView) -> Bytes?
+
+pub fn ascii_hex_decode(BytesView) -> Bytes?
+
+pub fn bit_mask(Int) -> UInt
+
+pub fn bytes_contain(BytesView, Byte) -> Bool
+
+pub fn compare_latin1(String, String) -> Int
+
+pub fn decode_hex_digit(Byte) -> Byte?
+
+pub fn dict_or_stream(Object) -> (Dict, Stream?)?
+
+pub fn find_needle(BytesView, Bytes) -> Int?
+
+pub fn findr_needle(BytesView, Bytes) -> Int?
+
+pub fn flate_decode(BytesView, Dict) -> Bytes?
+
+pub fn[T : Readable] from_bytes(BytesView) -> T?
+
+pub fn is_eol_character(Byte) -> Bool
+
+pub fn is_nearly_zero(Float) -> Bool
+
+pub fn is_regular_character(Byte) -> Bool
+
+pub fn is_white_space_character(Byte) -> Bool
+
+pub fn latin1_bytes(String) -> Bytes
+
+pub fn latin1_string(BytesView) -> String
+
+pub fn lzw_decode(BytesView, Dict) -> Bytes?
+
+pub fn run_length_decode(BytesView) -> Bytes?
+
+pub fn skip_name_like(Reader, Bool) -> Unit?
+
+// Errors
+
+// Types and methods
+pub struct BitReader {
+  data : BytesView
+  // private fields
+}
+pub fn BitReader::align(Self) -> Unit
+pub fn BitReader::at_end(Self) -> Bool
+pub fn BitReader::bit_pos(Self) -> Int
+pub fn BitReader::byte_pos(Self) -> Int
+pub fn BitReader::clone(Self) -> Self
+pub fn BitReader::cur_byte(Self) -> Byte?
+pub fn BitReader::cur_pos(Self) -> Int
+pub fn BitReader::new(BytesView) -> Self
+pub fn BitReader::new_with(BytesView, Int) -> Self
+pub fn BitReader::peak(Self, Int) -> UInt?
+pub fn BitReader::read(Self, Int) -> UInt?
+pub fn BitReader::tail(Self) -> BytesView
+
+pub struct BitWriter {
+  // private fields
+}
+pub fn BitWriter::align(Self) -> Unit
+pub fn BitWriter::cur_pos(Self) -> Int
+pub fn BitWriter::new(FixedArray[Byte], Int, Int) -> Self
+pub fn BitWriter::write(Self, UInt) -> Unit?
+
+pub(all) enum DecodeFailure {
+  ImageDecode
+  StreamDecode
+  Decryption
+  Unknown
+} derive(Eq, @debug.Debug)
+
+pub(all) enum DecryptionError {
+  MissingIDEntry
+  PasswordProtected
+  InvalidEncryption
+  UnsupportedAlgorithm
+} derive(Eq, @debug.Debug)
+
+pub(all) enum DecryptionTarget {
+  String
+  Stream
+} derive(Eq, @debug.Debug)
+
+pub struct Dict {
+  // private fields
+}
+pub fn Dict::contains_key(Self, String) -> Bool
+pub fn Dict::ctx(Self) -> ReaderContext
+pub fn Dict::data(Self) -> BytesView
+pub fn Dict::empty() -> Self
+pub fn Dict::entries(Self) -> Array[(Name, MaybeRef[Object])]
+pub fn[T : ObjectLike] Dict::get(Self, String) -> T?
+pub fn[T : ObjectLike] Dict::get_fixed(Self, String, Int) -> Array[T]?
+pub fn[T : Readable] Dict::get_raw(Self, String) -> MaybeRef[T]?
+pub fn Dict::get_ref(Self, String) -> ObjRef?
+pub fn Dict::is_empty(Self) -> Bool
+pub fn Dict::keys(Self) -> Array[Name]
+pub fn Dict::len(Self) -> Int
+pub fn Dict::obj_id(Self) -> ObjectIdentifier?
+pub impl Default for Dict
+pub impl Eq for Dict
+pub impl Show for Dict
+pub impl ObjectLike for Dict
+pub impl Readable for Dict
+pub impl Skippable for Dict
+
+pub(all) enum Filter {
+  AsciiHexDecode
+  Ascii85Decode
+  LzwDecode
+  FlateDecode
+  RunLengthDecode
+  CcittFaxDecode
+  Jbig2Decode
+  DctDecode
+  JpxDecode
+  Crypt
+} derive(Eq, @debug.Debug)
+pub fn Filter::apply(Self, BytesView, Dict, ImageDecodeParams) -> Result[FilterResult, DecodeFailure]
+pub fn Filter::from_name(Name) -> Self?
+
+pub(all) struct FilterResult {
+  data : BytesView
+  image_data : ImageData?
+}
+pub fn FilterResult::from_data(Bytes) -> Self
+
+pub struct FlexArrayIter {
+  // private fields
+}
+pub fn[T : ObjectLike] FlexArrayIter::next(Self) -> T?
+
+pub(all) enum ImageColorSpace {
+  Gray
+  Rgb
+  Cmyk
+  Unknown(Int)
+} derive(Eq, @debug.Debug)
+
+pub(all) struct ImageData {
+  alpha : Bytes?
+  color_space : ImageColorSpace?
+  bits_per_component : Int
+  width : Int
+  height : Int
+}
+
+pub(all) struct ImageDecodeParams {
+  is_indexed : Bool
+  bpc : Int?
+  num_components : Int?
+  target_dimension : (Int, Int)?
+  width : Int
+  height : Int
+}
+pub fn ImageDecodeParams::default() -> Self
+
+pub struct IndirectObject[T] {
+  // private fields
+}
+pub fn[T] IndirectObject::get(Self[T]) -> T
+pub fn[T] IndirectObject::id(Self[T]) -> ObjectIdentifier
+pub impl[T : Readable] Readable for IndirectObject[T]
+pub impl[T : Skippable] Skippable for IndirectObject[T]
+
+pub(all) struct InlineImageDict(Dict)
+pub fn InlineImageDict::get_dict(Self) -> Dict
+pub impl Readable for InlineImageDict
+
+pub struct Instruction {
+  operands : Array[Object]
+  operator : Name
+}
+
+pub(all) enum LoadPdfError {
+  Decryption(DecryptionError)
+  Invalid
+} derive(Eq, @debug.Debug)
+
+pub(all) enum MaybeRef[T] {
+  Ref(ObjRef)
+  NotRef(T)
+}
+pub fn[T] MaybeRef::as_obj_ref(Self[T]) -> ObjRef?
+pub fn[T : ObjectLike] MaybeRef::resolve(Self[T], ReaderContext) -> T?
+pub impl[T : Readable] Readable for MaybeRef[T]
+pub impl[T : Skippable] Skippable for MaybeRef[T]
+
+pub(all) struct Name(String) derive(Eq, Hash)
+pub fn Name::as_bytes(Self) -> Bytes
+pub fn Name::as_str(Self) -> String
+pub fn Name::from_string(String) -> Self
+pub fn Name::new(BytesView) -> Self?
+pub fn Name::new_escaped(BytesView) -> Self?
+pub fn Name::new_unescaped(BytesView) -> Self
+pub fn Name::raw(Self) -> String
+pub impl Compare for Name
+pub impl Show for Name
+pub impl ObjectLike for Name
+pub impl Readable for Name
+pub impl Skippable for Name
+
+pub(all) enum Number {
+  Real(Double)
+  Integer(Int64)
+} derive(Eq, @debug.Debug)
+pub fn Number::as_f32(Self) -> Float
+pub fn Number::as_f64(Self) -> Double
+pub fn Number::as_i64(Self) -> Int64
+pub fn Number::from_f32(Float) -> Self
+pub fn Number::from_i32(Int) -> Self
+pub impl ObjectLike for Number
+pub impl Readable for Number
+pub impl Skippable for Number
+
+pub(all) struct ObjRef {
+  obj_number : Int
+  gen_number : Int
+} derive(Compare, Eq, Hash, @debug.Debug)
+pub fn ObjRef::new(Int, Int) -> Self
+pub fn ObjRef::to_id(Self) -> ObjectIdentifier
+pub impl Readable for ObjRef
+pub impl Skippable for ObjRef
+
+pub enum Object {
+  Null
+  Boolean(Bool)
+  Number(Number)
+  String(PdfString)
+  Name(Name)
+  Dict(Dict)
+  Array(PdfArray)
+  Stream(Stream)
+}
+pub fn[T : ObjectLike] Object::cast(Self) -> T?
+pub fn Object::into_array(Self) -> PdfArray?
+pub fn Object::into_bool(Self) -> Bool?
+pub fn Object::into_dict(Self) -> Dict?
+pub fn Object::into_f32(Self) -> Float?
+pub fn Object::into_i32(Self) -> Int?
+pub fn Object::into_name(Self) -> Name?
+pub fn Object::into_number(Self) -> Number?
+pub fn Object::into_stream(Self) -> Stream?
+pub fn Object::into_string(Self) -> PdfString?
+pub impl Eq for Object
+pub impl ObjectLike for Object
+pub impl Readable for Object
+pub impl Skippable for Object
+
+pub(all) struct ObjectIdentifier {
+  obj_number : Int
+  gen_number : Int
+} derive(Compare, Eq, Hash, @debug.Debug)
+pub fn ObjectIdentifier::new(Int, Int) -> Self
+pub fn ObjectIdentifier::to_ref(Self) -> ObjRef
+pub impl Readable for ObjectIdentifier
+pub impl Skippable for ObjectIdentifier
+
+pub struct Page {
+  // private fields
+}
+pub fn Page::base_dimensions(Self) -> (Float, Float)
+pub fn Page::crop_box(Self) -> Rect
+pub fn Page::initial_transform(Self, Bool) -> Transform
+pub fn Page::intersected_crop_box(Self) -> Rect
+pub fn Page::media_box(Self) -> Rect
+pub fn Page::operations(Self) -> UntypedIter
+pub fn Page::page_stream(Self) -> BytesView?
+pub fn Page::raw(Self) -> Dict
+pub fn Page::render_dimensions(Self) -> (Float, Float)
+pub fn Page::resources(Self) -> Resources
+pub fn Page::rotation(Self) -> Rotation
+pub fn Page::typed_operations(Self) -> TypedIter
+pub fn Page::xref(Self) -> XRef
+
+pub struct Pages {
+  // private fields
+}
+#alias("_[_]")
+pub fn Pages::at(Self, Int) -> Page
+pub fn Pages::get(Self, Int) -> Page?
+pub fn Pages::iter(Self) -> Iter[Page]
+pub fn Pages::length(Self) -> Int
+pub fn Pages::xref(Self) -> XRef
+
+pub struct Pdf {
+  // private fields
+}
+pub fn Pdf::data(Self) -> Bytes
+pub fn Pdf::len(Self) -> Int
+pub fn Pdf::new(Bytes) -> Result[Self, LoadPdfError]
+pub fn Pdf::new_with_password(Bytes, String) -> Result[Self, LoadPdfError]
+pub fn Pdf::objects(Self) -> Array[Object]
+pub fn Pdf::pages(Self) -> Pages
+pub fn Pdf::version(Self) -> PdfVersion
+pub fn Pdf::xref(Self) -> XRef
+
+pub struct PdfArray {
+  // private fields
+}
+pub fn PdfArray::data(Self) -> BytesView
+pub fn PdfArray::empty() -> Self
+pub fn PdfArray::flex_iter(Self) -> FlexArrayIter
+pub fn[T : ObjectLike] PdfArray::iter(Self) -> Iter[T]
+pub fn PdfArray::raw_iter(Self) -> Iter[MaybeRef[Object]]
+pub fn[T : ObjectLike] PdfArray::to_fixed(Self, Int) -> Array[T]?
+pub fn[T : ObjectLike] PdfArray::to_vec(Self) -> Array[T]
+pub impl Eq for PdfArray
+pub impl Show for PdfArray
+pub impl ObjectLike for PdfArray
+pub impl Readable for PdfArray
+pub impl Skippable for PdfArray
+
+pub(all) struct PdfString(Bytes) derive(Eq, Hash)
+pub fn PdfString::as_bytes(Self) -> Bytes
+pub impl Show for PdfString
+pub impl ObjectLike for PdfString
+pub impl Readable for PdfString
+pub impl Skippable for PdfString
+
+pub(all) enum PdfVersion {
+  Pdf10
+  Pdf11
+  Pdf12
+  Pdf13
+  Pdf14
+  Pdf15
+  Pdf16
+  Pdf17
+  Pdf20
+} derive(Compare, Eq, @debug.Debug)
+pub fn PdfVersion::as_str(Self) -> String
+pub fn PdfVersion::from_bytes(BytesView) -> Self?
+
+pub struct Reader {
+  data : BytesView
+  mut offset : Int
+}
+pub fn Reader::at_end(Self) -> Bool
+pub fn Reader::clone(Self) -> Self
+pub fn Reader::eat(Self, (Byte) -> Bool) -> Byte?
+pub fn Reader::forward(Self) -> Unit
+pub fn Reader::forward_if(Self, (Byte) -> Bool) -> Unit?
+pub fn Reader::forward_tag(Self, Bytes) -> Unit?
+pub fn Reader::forward_while(Self, (Byte) -> Bool) -> Unit
+pub fn Reader::forward_while_1(Self, (Byte) -> Bool) -> Unit?
+pub fn Reader::is_empty(Self) -> Bool
+pub fn Reader::jump(Self, Int) -> Unit
+pub fn Reader::jump_to_end(Self) -> Unit
+pub fn Reader::len(Self) -> Int
+pub fn Reader::new(BytesView) -> Self
+pub fn Reader::new_with(BytesView, Int) -> Self
+pub fn Reader::offset(Self) -> Int
+pub fn Reader::peek_byte(Self) -> Byte?
+pub fn Reader::peek_bytes(Self, Int) -> BytesView?
+pub fn Reader::peek_tag(Self, Bytes) -> Unit?
+pub fn Reader::range(Self, Int, Int) -> BytesView?
+pub fn[T : Readable] Reader::read(Self, ReaderContext) -> T?
+pub fn Reader::read_byte(Self) -> Byte?
+pub fn Reader::read_bytes(Self, Int) -> BytesView?
+pub fn Reader::read_u16(Self) -> Int?
+pub fn Reader::read_u32(Self) -> UInt?
+pub fn Reader::read_white_space(Self) -> Unit?
+pub fn[T : Readable] Reader::read_with_context(Self, ReaderContext) -> T?
+pub fn[T : Readable] Reader::read_without_context(Self) -> T?
+pub fn Reader::skip(Self, (Self, Bool) -> Unit?, Bool) -> BytesView?
+pub fn Reader::skip_bytes(Self, Int) -> Unit?
+pub fn Reader::skip_eol_characters(Self) -> Unit
+pub fn Reader::skip_white_spaces(Self) -> Unit
+pub fn Reader::skip_white_spaces_and_comments(Self) -> Unit
+pub fn Reader::tail(Self) -> BytesView?
+
+pub struct ReaderContext {
+  // private fields
+}
+pub fn ReaderContext::dummy() -> Self
+pub fn ReaderContext::dummy_ref() -> Self
+pub fn ReaderContext::in_content_stream(Self) -> Bool
+pub fn ReaderContext::in_object_stream(Self) -> Bool
+pub fn ReaderContext::new(XRef, Bool) -> Self
+pub fn ReaderContext::obj_number(Self) -> ObjectIdentifier?
+pub fn ReaderContext::parent_chain_contains(Self, ObjectIdentifier) -> Bool
+pub fn ReaderContext::with_in_content_stream(Self, Bool) -> Self
+pub fn ReaderContext::with_in_object_stream(Self, Bool) -> Self
+pub fn ReaderContext::with_obj_number(Self, ObjectIdentifier) -> Self
+pub fn ReaderContext::with_parent(Self, ObjectIdentifier) -> Self
+pub fn ReaderContext::xref(Self) -> XRef
+
+pub(all) struct Rect {
+  x0 : Double
+  y0 : Double
+  x1 : Double
+  y1 : Double
+} derive(Eq, @debug.Debug)
+pub fn Rect::height(Self) -> Double
+pub fn Rect::intersect(Self, Self) -> Self
+pub fn Rect::new(Double, Double, Double, Double) -> Self
+pub fn Rect::width(Self) -> Double
+pub impl ObjectLike for Rect
+pub impl Readable for Rect
+
+pub struct Resources {
+  ext_g_states : Dict
+  fonts : Dict
+  properties : Dict
+  color_spaces : Dict
+  x_objects : Dict
+  patterns : Dict
+  shadings : Dict
+  // private fields
+}
+pub fn Resources::from_parent(Dict, Self) -> Self
+pub fn Resources::get_color_space(Self, Name) -> Object?
+pub fn Resources::get_ext_g_state(Self, Name) -> Dict?
+pub fn Resources::get_font(Self, Name) -> Dict?
+pub fn Resources::get_pattern(Self, Name) -> Object?
+pub fn Resources::get_shading(Self, Name) -> Object?
+pub fn Resources::get_x_object(Self, Name) -> Stream?
+pub fn Resources::new(Dict, Self?, ReaderContext) -> Self
+pub fn Resources::parent(Self) -> Self?
+
+pub(all) enum Rotation {
+  NoRotation
+  Horizontal
+  Flipped
+  FlippedHorizontal
+} derive(Eq, @debug.Debug)
+
+pub struct Stream {
+  // private fields
+}
+pub fn Stream::decoded(Self) -> Result[BytesView, DecodeFailure]
+pub fn Stream::decoded_image(Self, ImageDecodeParams) -> Result[FilterResult, DecodeFailure]
+pub fn Stream::dict(Self) -> Dict
+pub fn Stream::filters(Self) -> Array[Filter]
+pub fn Stream::new(BytesView, Dict) -> Self
+pub fn Stream::obj_id(Self) -> ObjectIdentifier
+pub fn Stream::raw_data(Self) -> BytesView
+pub impl Eq for Stream
+pub impl Show for Stream
+pub impl ObjectLike for Stream
+pub impl Readable for Stream
+pub impl Skippable for Stream
+
+pub(all) struct Transform(FixedArray[Double]) derive(Eq, @debug.Debug)
+pub fn Transform::as_coeffs(Self) -> FixedArray[Double]
+pub fn Transform::identity() -> Self
+pub fn Transform::new(FixedArray[Double]) -> Self
+pub fn Transform::rotate_ccw_90() -> Self
+pub fn Transform::rotate_cw_90() -> Self
+pub fn Transform::scale(Double) -> Self
+pub fn Transform::translate(Double, Double) -> Self
+pub impl Mul for Transform
+
+pub(all) enum TypedInstruction {
+  BeginCompatibility
+  EndCompatibility
+  SaveState
+  RestoreState
+  Transform(Number, Number, Number, Number, Number, Number)
+  LineWidth(Number)
+  LineCap(Number)
+  LineJoin(Number)
+  MiterLimit(Number)
+  DashPattern(PdfArray, Number)
+  RenderingIntent(Name)
+  FlatnessTolerance(Number)
+  SetGraphicsState(Name)
+  MoveTo(Number, Number)
+  LineTo(Number, Number)
+  CubicTo(Number, Number, Number, Number, Number, Number)
+  CubicStartTo(Number, Number, Number, Number)
+  CubicEndTo(Number, Number, Number, Number)
+  ClosePath
+  RectPath(Number, Number, Number, Number)
+  StrokePath
+  CloseAndStrokePath
+  FillPathNonZero
+  FillPathNonZeroCompatibility
+  FillPathEvenOdd
+  FillAndStrokeNonZero
+  FillAndStrokeEvenOdd
+  CloseFillAndStrokeNonZero
+  CloseFillAndStrokeEvenOdd
+  EndPath
+  ClipNonZero
+  ClipEvenOdd
+  ColorSpaceStroke(Name)
+  ColorSpaceNonStroke(Name)
+  StrokeColor(Array[Number])
+  StrokeColorNamed(Array[Number], Name?)
+  NonStrokeColor(Array[Number])
+  NonStrokeColorNamed(Array[Number], Name?)
+  StrokeColorDeviceGray(Number)
+  NonStrokeColorDeviceGray(Number)
+  StrokeColorDeviceRgb(Number, Number, Number)
+  NonStrokeColorDeviceRgb(Number, Number, Number)
+  StrokeColorCmyk(Number, Number, Number, Number)
+  NonStrokeColorCmyk(Number, Number, Number, Number)
+  Shading(Name)
+  XObject(Name)
+  InlineImage(Stream)
+  CharacterSpacing(Number)
+  WordSpacing(Number)
+  HorizontalScaling(Number)
+  TextLeading(Number)
+  TextFont(Name, Number)
+  TextRenderingMode(Number)
+  TextRise(Number)
+  BeginText
+  EndText
+  NextLine(Number, Number)
+  NextLineAndSetLeading(Number, Number)
+  SetTextMatrix(Number, Number, Number, Number, Number, Number)
+  NextLineUsingLeading
+  ShowText(PdfString)
+  NextLineAndShowText(PdfString)
+  ShowTextWithParameters(Number, Number, PdfString)
+  ShowTexts(PdfArray)
+  ColorGlyph(Number, Number)
+  ShapeGlyph(Number, Number, Number, Number, Number, Number)
+  MarkedContentPoint(Name)
+  MarkedContentPointWithProperties(Name, Object)
+  BeginMarkedContent(Name)
+  BeginMarkedContentWithProperties(Name, Object)
+  EndMarkedContent
+  Fallback(Name)
+}
+pub fn TypedInstruction::dispatch(Instruction) -> Self?
+
+pub struct TypedIter {
+  // private fields
+}
+pub fn TypedIter::clone(Self) -> Self
+pub fn TypedIter::from_untyped(UntypedIter) -> Self
+pub fn TypedIter::new(BytesView) -> Self
+pub fn TypedIter::next(Self) -> TypedInstruction?
+
+pub struct UntypedIter {
+  // private fields
+}
+pub fn UntypedIter::clone(Self) -> Self
+pub fn UntypedIter::empty() -> Self
+pub fn UntypedIter::new(BytesView) -> Self
+pub fn UntypedIter::next(Self) -> Instruction?
+
+pub(all) struct Vector[T](Array[T])
+pub impl[T : ObjectLike] ObjectLike for Vector[T]
+pub impl[T : ObjectLike] Readable for Vector[T]
+
+pub struct XRef {
+  // private fields
+}
+pub fn XRef::decrypt(Self, ObjectIdentifier, BytesView, DecryptionTarget) -> Bytes?
+pub fn XRef::dummy() -> Self
+pub fn[T : ObjectLike] XRef::get(Self, ObjectIdentifier) -> T?
+pub fn[T : ObjectLike] XRef::get_with(Self, ObjectIdentifier, ReaderContext) -> T?
+pub fn XRef::has_optional_content_groups(Self) -> Bool
+pub fn XRef::len(Self) -> Int
+pub fn XRef::needs_decryption(Self, ReaderContext) -> Bool
+pub fn XRef::objects(Self) -> Array[Object]
+pub fn XRef::root_id(Self) -> ObjectIdentifier
+
+// Type aliases
+
+// Traits
+pub(open) trait ObjectLike : Readable {
+  fn from_object(Object) -> Self?
+}
+pub impl ObjectLike for Bool
+pub impl ObjectLike for Byte
+pub impl ObjectLike for Int
+pub impl ObjectLike for Int64
+pub impl ObjectLike for UInt
+pub impl ObjectLike for UInt16
+pub impl ObjectLike for UInt64
+pub impl ObjectLike for Float
+pub impl ObjectLike for Double
+
+pub(open) trait Readable {
+  fn read(Reader, ReaderContext) -> Self?
+}
+pub impl Readable for Bool
+pub impl Readable for Byte
+pub impl Readable for Int
+pub impl Readable for Int64
+pub impl Readable for UInt
+pub impl Readable for UInt16
+pub impl Readable for UInt64
+pub impl Readable for Float
+pub impl Readable for Double
+
+pub(open) trait Skippable {
+  fn skip(Reader, Bool) -> Unit?
+}
+pub impl Skippable for Bool
+pub impl Skippable for Int
+pub impl Skippable for Float

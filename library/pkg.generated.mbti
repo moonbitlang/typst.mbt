@@ -13,7 +13,6 @@ import {
   "moonbitlang/typst/data/yaml",
   "moonbitlang/typst/otf",
   "moonbitlang/typst/regex",
-  "moonbitlang/typst/syntax",
   "moonbitlang/typst/syntect",
   "moonbitlang/typst/time",
   "moonbitlang/typst/unicode",
@@ -79,7 +78,7 @@ pub let asset_elem_path : Int
 
 pub fn asset_unsupported_rule(AssetElem, Engine, StyleChain) -> Content raise SourceError
 
-pub fn[T] at(@syntax.Span, () -> T raise HintedError) -> T raise SourceError
+pub fn[T] at(@moonbitlang/typst/syntax.Span, () -> T raise HintedError) -> T raise SourceError
 
 pub let attr_abbr : HtmlAttr
 
@@ -503,7 +502,7 @@ pub let attr_writingsuggestions : HtmlAttr
 
 pub fn[T] bail(String) -> T raise HintedError
 
-pub fn[T] bail_at(@syntax.Span, String, hints? : ArrayView[String]) -> T raise SourceError
+pub fn[T] bail_at(@moonbitlang/typst/syntax.Span, String, hints? : ArrayView[String]) -> T raise SourceError
 
 pub fn[T] bail_diag(SourceDiagnostic) -> T raise SourceError
 
@@ -833,7 +832,7 @@ pub let default_superscript_metrics : ScriptMetrics
 
 pub let delim_short_fall : Em
 
-pub fn determine_format_from_path(@syntax.VirtualPath) -> ImageFormat?
+pub fn determine_format_from_path(@moonbitlang/typst/syntax.VirtualPath) -> ImageFormat?
 
 pub fn direct_link_elem() -> Element
 
@@ -867,7 +866,7 @@ pub let document_elem_path : Int
 
 pub let document_elem_title : Int
 
-pub fn document_introspection(Location, @syntax.Span) -> Introspect[Location?]
+pub fn document_introspection(Location, @moonbitlang/typst/syntax.Span) -> Introspect[Location?]
 
 pub fn document_unsupported_rule(DocumentElem, Engine, StyleChain) -> Content raise SourceError
 
@@ -1369,7 +1368,7 @@ pub fn linebreak_elem() -> Element
 
 pub let linebreak_elem_justify : Int
 
-pub fn link_anchor_introspection(Location, @syntax.Span) -> Introspect[String?]
+pub fn link_anchor_introspection(Location, @moonbitlang/typst/syntax.Span) -> Introspect[String?]
 
 pub fn link_elem() -> Element
 
@@ -1407,7 +1406,7 @@ pub fn list_item_elem() -> Element
 
 pub let list_item_elem_body : Int
 
-pub fn load_many(@syntax.Spanned[Array[DataSource]], &World) -> Array[Loaded] raise SourceError
+pub fn load_many(@moonbitlang/typst/syntax.Spanned[Array[DataSource]], &World) -> Array[Loaded] raise SourceError
 
 pub fn localized_str(String, String?, String) -> String
 
@@ -2239,11 +2238,11 @@ pub let page_elem_supplement : Int
 
 pub let page_elem_width : Int
 
-pub fn page_introspection(Location, @syntax.Span) -> Introspect[NonZeroUSize?]
+pub fn page_introspection(Location, @moonbitlang/typst/syntax.Span) -> Introspect[NonZeroUSize?]
 
-pub fn page_numbering_introspection(Location, @syntax.Span) -> Introspect[Numbering?]
+pub fn page_numbering_introspection(Location, @moonbitlang/typst/syntax.Span) -> Introspect[Numbering?]
 
-pub fn page_supplement_introspection(Location, @syntax.Span) -> Introspect[Content]
+pub fn page_supplement_introspection(Location, @moonbitlang/typst/syntax.Span) -> Introspect[Content]
 
 pub fn pagebreak_elem() -> Element
 
@@ -2295,7 +2294,7 @@ pub let par_line_marker_elem_numbering : Int
 
 pub fn parbreak_elem() -> Element
 
-pub fn path_introspection(Location, @syntax.Span) -> Introspect[@syntax.VirtualPath?]
+pub fn path_introspection(Location, @moonbitlang/typst/syntax.Span) -> Introspect[@moonbitlang/typst/syntax.VirtualPath?]
 
 pub fn pdf_attach_elem() -> Element
 
@@ -2365,7 +2364,7 @@ pub let polygon_elem_vertices : Int
 
 pub fn pos(Value) -> Value raise HintedError
 
-pub fn position_introspection(Location, @syntax.Span) -> Introspect[DocumentPosition?]
+pub fn position_introspection(Location, @moonbitlang/typst/syntax.Span) -> Introspect[DocumentPosition?]
 
 pub fn prefix_info_elem() -> Element
 
@@ -2385,13 +2384,13 @@ pub fn primes_elem() -> Element
 
 pub let primes_elem_count : Int
 
-pub fn query_first_introspection(Selector, @syntax.Span) -> Introspect[Content?]
+pub fn query_first_introspection(Selector, @moonbitlang/typst/syntax.Span) -> Introspect[Content?]
 
-pub fn query_introspection(Selector, @syntax.Span) -> Introspect[Array[Content]]
+pub fn query_introspection(Selector, @moonbitlang/typst/syntax.Span) -> Introspect[Array[Content]]
 
-pub fn query_label_introspection(Label, @syntax.Span) -> Introspect[Result[Content, HintedString]]
+pub fn query_label_introspection(Label, @moonbitlang/typst/syntax.Span) -> Introspect[Result[Content, HintedString]]
 
-pub fn query_unique_introspection(Selector, @syntax.Span) -> Introspect[Result[Content, HintedString]]
+pub fn query_unique_introspection(Selector, @moonbitlang/typst/syntax.Span) -> Introspect[Result[Content, HintedString]]
 
 pub fn quote_elem() -> Element
 
@@ -2487,11 +2486,11 @@ pub fn repr_float(Double) -> String
 
 pub fn repr_int(Int64) -> String
 
-pub fn repr_rooted_path(@syntax.RootedPath) -> String
+pub fn repr_rooted_path(@moonbitlang/typst/syntax.RootedPath) -> String
 
 pub fn repr_str(String) -> String
 
-pub fn[T : ResolvableCell] resolve_cellgrid(Axes[Array[Sizing]], Axes[Array[Sizing]], Array[ResolvableGridChild[T]], Celled[Paint?], Celled[Smart[Alignment]], Celled[Sides[Rel[Length]?]], ResolvedCelled, Engine, StyleChain, @syntax.Span) -> CellGrid raise SourceError
+pub fn[T : ResolvableCell] resolve_cellgrid(Axes[Array[Sizing]], Axes[Array[Sizing]], Array[ResolvableGridChild[T]], Celled[Paint?], Celled[Smart[Alignment]], Celled[Sides[Rel[Length]?]], ResolvedCelled, Engine, StyleChain, @moonbitlang/typst/syntax.Span) -> CellGrid raise SourceError
 
 pub fn resolve_color_space(Smart[ColorSpace], Array[Color]) -> ColorSpace
 
@@ -3209,7 +3208,7 @@ pub fn[T : ToCss] to_css(T, sink? : (HintedString) -> Unit) -> String
 
 pub fn to_style(Char, MathStyle) -> String
 
-pub fn[T] trace((@syntax.DiagSpan) -> (Int, Int)?, () -> Tracepoint, @syntax.Span, () -> T raise SourceError) -> T raise SourceError
+pub fn[T] trace((@moonbitlang/typst/syntax.DiagSpan) -> (Int, Int)?, () -> Tracepoint, @moonbitlang/typst/syntax.Span, () -> T raise SourceError) -> T raise SourceError
 
 pub let typst_version : (Int, Int, Int)
 
@@ -3279,7 +3278,7 @@ pub let vec_elem_gap : Int
 
 pub fn[T] within(Loaded, () -> T raise LoadErr) -> T raise SourceError
 
-pub fn world_range(&World, @syntax.DiagSpan) -> (Int, Int)?
+pub fn world_range(&World, @moonbitlang/typst/syntax.DiagSpan) -> (Int, Int)?
 
 // Errors
 pub(all) suberror FieldAccessError {
@@ -3295,7 +3294,7 @@ pub(all) suberror FileError {
   IsDirectory
   NotSource
   InvalidUtf8
-  Realize(@syntax.RealizeError)
+  Realize(@moonbitlang/typst/syntax.RealizeError)
   Package(PackageError)
   Other(String?)
 } derive(Eq, Hash, @debug.Debug)
@@ -3320,12 +3319,11 @@ pub(all) suberror LoadErr {
 pub(all) suberror LoadPdfError {
   Decryption
   Invalid
-  Unported(String)
 } derive(@debug.Debug)
 
 pub(all) suberror PackageError {
-  NotFound(@syntax.PackageSpec)
-  VersionNotFound(@syntax.PackageSpec, @syntax.PackageVersion)
+  NotFound(@moonbitlang/typst/syntax.PackageSpec)
+  VersionNotFound(@moonbitlang/typst/syntax.PackageSpec, @moonbitlang/typst/syntax.PackageVersion)
   NetworkFailed(String?)
   MalformedArchive(String?)
   Other(String?)
@@ -3553,43 +3551,43 @@ pub fn Archival::max(Self) -> PdfVersion
 pub fn Archival::min(Self) -> PdfVersion?
 
 pub(all) struct Arg {
-  span : @syntax.Span
+  span : @moonbitlang/typst/syntax.Span
   name : String?
-  value : @syntax.Spanned[Value]
+  value : @moonbitlang/typst/syntax.Spanned[Value]
 }
 
 pub(all) struct Args {
-  mut span : @syntax.Span
+  mut span : @moonbitlang/typst/syntax.Span
   items : Array[Arg]
 }
 pub fn[T : FromValue] Args::all(Self) -> Array[T] raise SourceError
-pub fn[T : FromValue] Args::all_spanned(Self) -> Array[@syntax.Spanned[T]] raise SourceError
+pub fn[T : FromValue] Args::all_spanned(Self) -> Array[@moonbitlang/typst/syntax.Spanned[T]] raise SourceError
 pub fn Args::all_with(Self, (Value) -> Value raise HintedError) -> Array[Value] raise SourceError
 pub fn Args::consume(Self, Int) -> Array[Arg] raise SourceError
 pub fn Args::copy(Self) -> Self
 pub fn[T : FromValue] Args::eat(Self) -> T? raise SourceError
-pub fn Args::eat_spanned(Self) -> @syntax.Spanned[Value]?
-pub fn[T : FromValue] Args::eat_spanned_cast(Self) -> @syntax.Spanned[T]? raise SourceError
+pub fn Args::eat_spanned(Self) -> @moonbitlang/typst/syntax.Spanned[Value]?
+pub fn[T : FromValue] Args::eat_spanned_cast(Self) -> @moonbitlang/typst/syntax.Spanned[T]? raise SourceError
 pub fn[T : FromValue] Args::expect(Self, String) -> T raise SourceError
-pub fn[T : FromValue] Args::expect_spanned(Self, String) -> @syntax.Spanned[T] raise SourceError
+pub fn[T : FromValue] Args::expect_spanned(Self, String) -> @moonbitlang/typst/syntax.Spanned[T] raise SourceError
 pub fn Args::expect_with(Self, String, (Value) -> Value raise HintedError) -> Value raise SourceError
 pub fn Args::field(Self, String) -> Value raise HintedError
 pub fn[T : FromValue] Args::find(Self) -> T? raise SourceError
-pub fn[T : FromValue] Args::find_spanned(Self) -> @syntax.Spanned[T]? raise SourceError
+pub fn[T : FromValue] Args::find_spanned(Self) -> @moonbitlang/typst/syntax.Spanned[T]? raise SourceError
 pub fn Args::find_with(Self, (Value) -> Bool, (Value) -> Value raise HintedError) -> Value? raise SourceError
 pub fn Args::finish(Self) -> Unit raise SourceError
-pub fn Args::insert(Self, Int, @syntax.Span, Value) -> Unit
+pub fn Args::insert(Self, Int, @moonbitlang/typst/syntax.Span, Value) -> Unit
 pub fn Args::is_empty(Self) -> Bool
 pub fn Args::merge(Self, Self) -> Self
 pub fn[T : FromValue] Args::named(Self, String) -> T? raise SourceError
 pub fn[T : FromValue] Args::named_or_find(Self, String) -> T? raise SourceError
-pub fn[T : FromValue] Args::named_spanned(Self, String) -> @syntax.Spanned[T]? raise SourceError
+pub fn[T : FromValue] Args::named_spanned(Self, String) -> @moonbitlang/typst/syntax.Spanned[T]? raise SourceError
 pub fn Args::named_with(Self, String, (Value) -> Value raise HintedError) -> Value? raise SourceError
-pub fn Args::new(@syntax.Span, ArrayView[Value]) -> Self
-pub fn Args::push(Self, @syntax.Span, Value) -> Unit
+pub fn Args::new(@moonbitlang/typst/syntax.Span, ArrayView[Value]) -> Self
+pub fn Args::push(Self, @moonbitlang/typst/syntax.Span, Value) -> Unit
 pub fn Args::remaining(Self) -> Int
 pub fn Args::repr(Self) -> String
-pub fn Args::spanned(Self, @syntax.Span) -> Self
+pub fn Args::spanned(Self, @moonbitlang/typst/syntax.Span) -> Self
 pub fn Args::take(Self) -> Self
 pub fn Args::to_named(Self) -> Dict
 pub fn Args::to_pos(Self) -> Arr
@@ -3691,7 +3689,7 @@ pub(all) enum Attribution {
   Content(Content)
   Label(Label)
 } derive(Eq)
-pub fn Attribution::realize(Self, @syntax.Span) -> Content
+pub fn Attribution::realize(Self, @moonbitlang/typst/syntax.Span) -> Content
 pub impl FromValue for Attribution
 pub impl IntoValue for Attribution
 pub impl Reflect for Attribution
@@ -3806,7 +3804,7 @@ pub fn BibliographyElem::full_local(Self) -> Bool?
 pub fn BibliographyElem::group(Self, StyleChain) -> Smart[String]?
 pub fn BibliographyElem::group_in(StyleChain) -> Smart[String]?
 pub fn BibliographyElem::group_local(Self) -> Smart[String]??
-pub fn BibliographyElem::has(Engine, Label, @syntax.Span) -> Bool
+pub fn BibliographyElem::has(Engine, Label, @moonbitlang/typst/syntax.Span) -> Bool
 pub fn BibliographyElem::keys(&World, Introspector) -> Array[(Label, String?)]
 pub fn BibliographyElem::lang(Self) -> Lang?
 pub fn BibliographyElem::new(OneOrMultiple[DataSource]) -> Self
@@ -3841,7 +3839,7 @@ pub impl NativeElement for BibliographyElem
 
 pub struct Binding {
   mut value : Value
-  span : @syntax.Span
+  span : @moonbitlang/typst/syntax.Span
   // private fields
 }
 pub fn Binding::capture(Self, Capturer) -> Self
@@ -3851,7 +3849,7 @@ pub fn Binding::copy(Self) -> Self
 pub fn Binding::deprecation(Self) -> Deprecation?
 pub fn Binding::detached(Value) -> Self
 pub fn Binding::feature(Self) -> Feature?
-pub fn Binding::new(Value, @syntax.Span) -> Self
+pub fn Binding::new(Value, @moonbitlang/typst/syntax.Span) -> Self
 pub fn Binding::read(Self, BindingGuard, String) -> Value raise HintedError
 pub fn Binding::set_value(Self, Value) -> Unit
 pub fn Binding::with_category(Self, Category) -> Self
@@ -4074,9 +4072,9 @@ pub fn BundleFormat::of(Content) -> Self?
 pub fn BundleFormat::pack(Self) -> Content
 pub impl NativeElement for BundleFormat
 
-pub struct BundlePath(@syntax.VirtualPath) derive(Eq, Hash)
-pub fn BundlePath::into_inner(Self) -> @syntax.VirtualPath
-pub fn BundlePath::new(@syntax.VirtualPath) -> Self raise HintedError
+pub struct BundlePath(@moonbitlang/typst/syntax.VirtualPath) derive(Eq, Hash)
+pub fn BundlePath::into_inner(Self) -> @moonbitlang/typst/syntax.VirtualPath
+pub fn BundlePath::new(@moonbitlang/typst/syntax.VirtualPath) -> Self raise HintedError
 pub impl FromValue for BundlePath
 pub impl IntoValue for BundlePath
 pub impl Reflect for BundlePath
@@ -4150,7 +4148,7 @@ pub struct CancelItem {
   background : Bool
   angle : Smart[CancelAngle]
 }
-pub fn CancelItem::create(MathItem, Rel[Abs], FixedStroke, Bool, Bool, Bool, Smart[CancelAngle], StyleChain, @syntax.Span) -> MathItem
+pub fn CancelItem::create(MathItem, Rel[Abs], FixedStroke, Bool, Bool, Bool, Smart[CancelAngle], StyleChain, @moonbitlang/typst/syntax.Span) -> MathItem
 
 pub(all) enum Capturer {
   Function
@@ -4411,8 +4409,8 @@ pub(all) struct Closure {
 pub fn Closure::name(Self) -> String?
 
 pub(all) enum ClosureNode {
-  Closure(@syntax.SyntaxNode)
-  Context(@syntax.SyntaxNode)
+  Closure(@moonbitlang/typst/syntax.SyntaxNode)
+  Context(@moonbitlang/typst/syntax.SyntaxNode)
 }
 
 pub(all) struct Cmyk {
@@ -4520,7 +4518,7 @@ pub fn ConicGradient::repr(Self) -> String
 pub struct Content {
   elem : Element
   fields : FixedArray[Value?]
-  span : @syntax.Span
+  span : @moonbitlang/typst/syntax.Span
   label : Label?
   location : Location?
   lifecycle : Array[Int]
@@ -4564,8 +4562,8 @@ pub fn Content::repr(Self) -> String
 pub fn Content::sequence(ArrayView[Self]) -> Self
 pub fn Content::sequence_recursive_for_each(Self, (Self) -> Unit) -> Unit
 pub fn Content::set(Self, Element, Int, Value) -> Self
-pub fn Content::span(Self) -> @syntax.Span
-pub fn Content::spanned(Self, @syntax.Span) -> Self
+pub fn Content::span(Self) -> @moonbitlang/typst/syntax.Span
+pub fn Content::spanned(Self, @moonbitlang/typst/syntax.Span) -> Self
 pub fn Content::strong(Self) -> Self
 pub fn Content::styled(Self, Style) -> Self
 pub fn Content::styled_with_map(Self, Styles) -> Self
@@ -4646,14 +4644,14 @@ pub impl IntoValue for Costs
 pub impl Reflect for Costs
 
 pub(all) struct Counter(CounterKey) derive(Eq)
-pub fn Counter::display_at(Self, Engine, Location, StyleChain, Numbering, @syntax.Span) -> Content raise SourceError
+pub fn Counter::display_at(Self, Engine, Location, StyleChain, Numbering, @moonbitlang/typst/syntax.Span) -> Content raise SourceError
 pub fn Counter::is_page(Self) -> Bool
 pub fn Counter::new(CounterKey) -> Self
 pub fn Counter::of(Element) -> Self
 pub fn Counter::repr(Self) -> String
 pub fn Counter::select(Self, Introspector, Location) -> Selector
 pub fn Counter::select_any() -> Selector
-pub fn Counter::update(Self, @syntax.Span, CounterUpdate) -> Content
+pub fn Counter::update(Self, @moonbitlang/typst/syntax.Span, CounterUpdate) -> Content
 pub impl Fingerprint for Counter
 pub impl FromValue for Counter
 pub impl IntoValue for Counter
@@ -4684,7 +4682,7 @@ pub impl Reflect for CounterKey
 
 pub(all) struct CounterState(Array[Int64]) derive(Eq)
 pub fn CounterState::copy(Self) -> Self
-pub fn CounterState::display(Self, Engine, Context, @syntax.Span, Numbering) -> Value raise SourceError
+pub fn CounterState::display(Self, Engine, Context, @moonbitlang/typst/syntax.Span, Numbering) -> Value raise SourceError
 pub fn CounterState::first(Self) -> Int64
 pub fn CounterState::init(Bool) -> Self
 pub fn CounterState::step(Self, Int, Int64) -> Unit
@@ -4760,7 +4758,7 @@ pub struct CslStyle {
 pub fn CslStyle::from_archived(@hayagriva.ArchivedStyle) -> Self
 pub fn CslStyle::from_data(Bytes) -> Self raise LoadErr
 pub fn CslStyle::get(Self) -> @citationberg.IndependentStyle
-pub fn CslStyle::load(Engine, @syntax.Spanned[CslSource]) -> (CslSource, Self) raise SourceError
+pub fn CslStyle::load(Engine, @moonbitlang/typst/syntax.Spanned[CslSource]) -> (CslSource, Self) raise SourceError
 
 pub(all) enum CssDisplay {
   Block
@@ -4972,7 +4970,7 @@ pub(all) enum DataSource {
   Path(PathOrStr)
   Bytes(Bytes)
 } derive(Eq, Hash)
-pub fn DataSource::load(Self, @syntax.Span, &World) -> Loaded raise SourceError
+pub fn DataSource::load(Self, @moonbitlang/typst/syntax.Span, &World) -> Loaded raise SourceError
 pub impl FromValue for DataSource
 pub impl IntoValue for DataSource
 pub impl Reflect for DataSource
@@ -5102,7 +5100,7 @@ pub(all) enum Destination {
   Position(PagedPosition)
   Location(Location)
 } derive(Eq)
-pub fn Destination::alt_text(Self, Engine, StyleChain, @syntax.Span) -> String raise SourceError
+pub fn Destination::alt_text(Self, Engine, StyleChain, @moonbitlang/typst/syntax.Span) -> String raise SourceError
 pub fn Destination::of_value(Value) -> Self
 pub impl FromValue for Destination
 pub impl IntoValue for Destination
@@ -5228,7 +5226,7 @@ pub struct DocumentFormatOptions(Array[FormatOptions])
 pub fn DocumentFormatOptions::copy(Self) -> Self
 pub fn DocumentFormatOptions::get(Self, Element) -> FormatOptions
 pub fn DocumentFormatOptions::new(formats? : Array[Format]) -> Self
-pub fn DocumentFormatOptions::populate(Self, StyleChain, @syntax.Span) -> Unit
+pub fn DocumentFormatOptions::populate(Self, StyleChain, @moonbitlang/typst/syntax.Span) -> Unit
 pub impl Fingerprint for DocumentFormatOptions
 
 pub(all) struct DocumentInfo {
@@ -5284,7 +5282,7 @@ pub(all) enum DynValue {
   State(State)
   Location(Location)
   Selector(Selector)
-  RootedPath(@syntax.RootedPath)
+  RootedPath(@moonbitlang/typst/syntax.RootedPath)
   CounterUpdate(CounterUpdate)
   StateUpdate(StateUpdate)
   Tag(Tag)
@@ -5314,7 +5312,7 @@ pub struct DynamicImage {
 pub struct EarlyLinkResolver {
   // private fields
 }
-pub fn EarlyLinkResolver::new(Location, @syntax.Span) -> Self
+pub fn EarlyLinkResolver::new(Location, @moonbitlang/typst/syntax.Span) -> Self
 pub fn EarlyLinkResolver::resolve(Self, Engine, Location) -> ResolvedLink raise HintedError
 
 pub struct Element(ElementData)
@@ -5503,7 +5501,7 @@ pub(all) struct Engine {
   sink : Sink
   route : Route
 }
-pub fn Engine::binding_guard(Self, @syntax.Span) -> BindingGuard
+pub fn Engine::binding_guard(Self, @moonbitlang/typst/syntax.Span) -> BindingGuard
 pub fn[T] Engine::delay(Self, () -> T raise SourceError, T) -> T
 pub fn[T : Fingerprint] Engine::introspect(Self, Introspect[T]) -> T
 pub fn Engine::routines(Self) -> Routines
@@ -5678,7 +5676,7 @@ pub struct FencedItem {
   body : FencedBody
   balanced : Bool
 }
-pub fn FencedItem::create(MathItem?, MathItem?, FencedBody, Bool, StyleChain, @syntax.Span) -> MathItem
+pub fn FencedItem::create(MathItem?, MathItem?, FencedBody, Bool, StyleChain, @moonbitlang/typst/syntax.Span) -> MathItem
 
 pub struct FieldInfo {
   id : Int
@@ -6131,7 +6129,7 @@ pub struct FormatOptions {
 pub fn FormatOptions::copy(Self) -> Self
 pub fn FormatOptions::default_for(Element) -> Self
 pub fn FormatOptions::get(Self, Int) -> SpannedValue[Value]
-pub fn FormatOptions::populate(Self, StyleChain, @syntax.Span) -> Unit
+pub fn FormatOptions::populate(Self, StyleChain, @moonbitlang/typst/syntax.Span) -> Unit
 pub impl Fingerprint for FormatOptions
 
 pub(all) struct Fr(Scalar) derive(Compare, Default, Eq, Hash)
@@ -6194,7 +6192,7 @@ pub struct FractionItem {
   line : Bool
   padding : Em
 }
-pub fn FractionItem::create(MathItem, MathItem, Bool, Em, StyleChain, @syntax.Span) -> MathItem
+pub fn FractionItem::create(MathItem, MathItem, Bool, Em, StyleChain, @moonbitlang/typst/syntax.Span) -> MathItem
 
 pub struct Fragment(Array[Frame])
 pub fn Fragment::as_slice(Self) -> ArrayView[Frame]
@@ -6270,8 +6268,8 @@ pub impl NativeElement for FrameElem
 pub(all) enum FrameItem {
   Group(GroupItem)
   Text(TextItem)
-  Shape(Shape, @syntax.Span)
-  Image(Image, Axes[Abs], @syntax.Span)
+  Shape(Shape, @moonbitlang/typst/syntax.Span)
+  Image(Image, Axes[Abs], @moonbitlang/typst/syntax.Span)
   Link(Destination, Axes[Abs])
   Tag(Tag)
 } derive(Eq)
@@ -6293,7 +6291,7 @@ pub fn FrameParent::new(Location, Inherit) -> Self
 
 pub struct Func {
   inner : FuncInner
-  span : @syntax.Span
+  span : @moonbitlang/typst/syntax.Span
 }
 pub fn Func::call(Self, Engine, Context, Args) -> Value raise SourceError
 pub fn Func::call_values(Self, Engine, Context, ArrayView[Value]) -> Value raise SourceError
@@ -6306,8 +6304,8 @@ pub fn Func::name(Self) -> String?
 pub fn Func::native(NativeFuncData) -> Self
 pub fn Func::repr(Self) -> String
 pub fn Func::scope(Self) -> Scope?
-pub fn Func::span(Self) -> @syntax.Span
-pub fn Func::spanned(Self, @syntax.Span) -> Self
+pub fn Func::span(Self) -> @moonbitlang/typst/syntax.Span
+pub fn Func::spanned(Self, @moonbitlang/typst/syntax.Span) -> Self
 pub fn Func::title(Self) -> String?
 pub fn Func::to_element(Self) -> Element?
 pub fn Func::to_native(Self) -> NativeFuncData?
@@ -6342,7 +6340,7 @@ pub(all) struct Glyph {
   y_offset : Em
   range_start : UInt16
   range_end : UInt16
-  span : (@syntax.Span, UInt16)
+  span : (@moonbitlang/typst/syntax.Span, UInt16)
 } derive(Eq, Hash)
 pub fn Glyph::range(Self) -> (Int, Int)
 
@@ -6366,7 +6364,7 @@ pub struct GlyphItem {
   mut mid_stretched : Bool?
   mut flac : Bool
 }
-pub fn GlyphItem::create(String, StyleChain, @syntax.Span) -> MathItem
+pub fn GlyphItem::create(String, StyleChain, @moonbitlang/typst/syntax.Span) -> MathItem
 
 pub(all) struct GlyphRect {
   x_min : Int
@@ -6778,8 +6776,8 @@ pub(all) struct HintedString {
   hints : Array[String]
 } derive(Eq, Hash, @debug.Debug)
 pub fn HintedString::hint(Self, String) -> Unit
-pub fn HintedString::into_error_at(Self, @syntax.Span) -> SourceDiagnostic
-pub fn HintedString::into_warning_at(Self, @syntax.Span) -> SourceDiagnostic
+pub fn HintedString::into_error_at(Self, @moonbitlang/typst/syntax.Span) -> SourceDiagnostic
+pub fn HintedString::into_warning_at(Self, @moonbitlang/typst/syntax.Span) -> SourceDiagnostic
 pub fn HintedString::new(String) -> Self
 pub fn HintedString::with_hint(Self, String) -> Self
 pub impl Fingerprint for HintedString
@@ -7116,7 +7114,7 @@ pub fn Introspector::page(Self, Location) -> NonZeroUSize?
 pub fn Introspector::page_numbering(Self, Location) -> Numbering?
 pub fn Introspector::page_supplement(Self, Location) -> Content?
 pub fn Introspector::pages(Self, Location) -> NonZeroUSize?
-pub fn Introspector::path(Self, Location) -> @syntax.VirtualPath?
+pub fn Introspector::path(Self, Location) -> @moonbitlang/typst/syntax.VirtualPath?
 pub fn Introspector::position(Self, Location) -> DocumentPosition?
 pub fn Introspector::query(Self, Selector) -> Array[Content]
 pub fn Introspector::query_count_before(Self, Selector, Location) -> Int
@@ -7165,7 +7163,7 @@ pub impl Reflect for Lang
 pub struct LateLinkResolver {
   // private fields
 }
-pub fn LateLinkResolver::new(@syntax.VirtualPath?, Introspector) -> Self
+pub fn LateLinkResolver::new(@moonbitlang/typst/syntax.VirtualPath?, Introspector) -> Self
 pub fn LateLinkResolver::resolve(Self, Location) -> ResolvedLink?
 
 pub struct LayoutElem(Content)
@@ -7323,7 +7321,7 @@ pub struct LineItem {
   base : MathItem
   position : MathPosition
 }
-pub fn LineItem::create(MathItem, MathPosition, StyleChain, @syntax.Span) -> MathItem
+pub fn LineItem::create(MathItem, MathPosition, StyleChain, @moonbitlang/typst/syntax.Span) -> MathItem
 
 pub(all) enum LineJoin {
   Miter
@@ -7425,7 +7423,7 @@ pub(all) enum LinkTarget {
   Label(Label)
 } derive(Eq)
 pub fn LinkTarget::of_value(Value) -> Self
-pub fn LinkTarget::resolve_early(Self, Engine, @syntax.Span) -> Destination raise SourceError
+pub fn LinkTarget::resolve_early(Self, Engine, @moonbitlang/typst/syntax.Span) -> Destination raise SourceError
 pub fn LinkTarget::resolve_late(Self, &IntrospectorBackend) -> Destination raise HintedError
 pub impl FromValue for LinkTarget
 pub impl IntoValue for LinkTarget
@@ -7500,15 +7498,15 @@ pub fn LoadError::text(ReportTextPos, String, String) -> Self
 pub fn LoadError::within(Self, Loaded) -> SourceDiagnostic
 
 pub(all) enum LoadSource {
-  Path(@syntax.FileId)
+  Path(@moonbitlang/typst/syntax.FileId)
   Bytes
 } derive(Eq, Hash)
 
 pub(all) struct Loaded {
-  source : @syntax.Spanned[LoadSource]
+  source : @moonbitlang/typst/syntax.Spanned[LoadSource]
   data : Bytes
 } derive(Eq, Hash)
-pub fn Loaded::new(@syntax.Spanned[LoadSource], Bytes) -> Self
+pub fn Loaded::new(@moonbitlang/typst/syntax.Spanned[LoadSource], Bytes) -> Self
 pub impl Fingerprint for Loaded
 
 pub(all) struct Locale {
@@ -7524,7 +7522,7 @@ pub impl IntoValue for Locale
 pub impl Reflect for Locale
 
 pub(all) struct LocatableSelector(Selector) derive(Eq)
-pub fn LocatableSelector::resolve_unique(Self, Engine, Context, @syntax.Span) -> Location raise SourceError
+pub fn LocatableSelector::resolve_unique(Self, Engine, Context, @moonbitlang/typst/syntax.Span) -> Location raise SourceError
 pub impl FromValue for LocatableSelector
 pub impl IntoValue for LocatableSelector
 pub impl Reflect for LocatableSelector
@@ -7532,7 +7530,7 @@ pub impl Reflect for LocatableSelector
 pub(all) struct Location(U128) derive(Eq, Hash, @debug.Debug)
 pub fn Location::hash(Self) -> U128
 pub fn Location::new(U128) -> Self
-pub fn Location::page_numbering(Self, Engine, @syntax.Span) -> Numbering?
+pub fn Location::page_numbering(Self, Engine, @moonbitlang/typst/syntax.Span) -> Numbering?
 pub fn Location::repr(Self) -> String
 pub fn Location::variant(Self, Int) -> Self
 pub impl Show for Location
@@ -7557,7 +7555,7 @@ pub impl Show for Locator
 pub struct LocatorLink {
   // private fields
 }
-pub fn LocatorLink::measure(Location, @syntax.Span) -> Self
+pub fn LocatorLink::measure(Location, @moonbitlang/typst/syntax.Span) -> Self
 pub fn LocatorLink::new(Locator) -> Self
 
 pub struct LrElem(Content)
@@ -7784,7 +7782,7 @@ pub fn MathItem::set_stretch_font_size(Self, Abs, Axis) -> Unit
 pub fn MathItem::set_stretch_relative_to(Self, Abs, Axis) -> Unit
 pub fn MathItem::set_y_stretch(Self, StretchInfo) -> Unit
 pub fn MathItem::size(Self) -> MathSize?
-pub fn MathItem::span(Self) -> @syntax.Span
+pub fn MathItem::span(Self) -> @moonbitlang/typst/syntax.Span
 pub fn MathItem::styles(Self) -> StyleChain?
 pub fn MathItem::update_stretch(Self, StretchInfo) -> Unit
 pub fn MathItem::with_multiline_centering(Self) -> Self
@@ -7844,10 +7842,10 @@ pub struct MathProperties {
   mut lspace : Em?
   mut rspace : Em?
   mut align_form_infix : Bool
-  span : @syntax.Span
+  span : @moonbitlang/typst/syntax.Span
 }
 pub fn MathProperties::class(Self) -> @unicode.MathClass
-pub fn MathProperties::default(StyleChain, @syntax.Span) -> Self
+pub fn MathProperties::default(StyleChain, @moonbitlang/typst/syntax.Span) -> Self
 
 pub(all) enum MathSize {
   ScriptScript
@@ -7895,13 +7893,13 @@ pub struct MathTableItem {
   align : FixedAlignment
   alternator : LeftRightAlternator
 }
-pub fn MathTableItem::create(Array[Array[AlignedRow]], Axes[Rel[Abs]], ResolvedAugment?, FixedAlignment, LeftRightAlternator, StyleChain, @syntax.Span) -> MathItem
+pub fn MathTableItem::create(Array[Array[AlignedRow]], Axes[Rel[Abs]], ResolvedAugment?, FixedAlignment, LeftRightAlternator, StyleChain, @moonbitlang/typst/syntax.Span) -> MathItem
 
 pub struct MathTextItem {
   text : String
   locator : Locator
 }
-pub fn MathTextItem::create(String, StyleChain, @syntax.Span, Locator) -> MathItem
+pub fn MathTextItem::create(String, StyleChain, @moonbitlang/typst/syntax.Span, Locator) -> MathItem
 
 pub struct MathUnderlineElem(Content)
 pub fn MathUnderlineElem::body(Self) -> Content
@@ -7963,13 +7961,13 @@ pub struct Module {
 pub fn Module::anonymous(Scope) -> Self
 pub fn Module::content(Self) -> Content
 pub fn Module::field(Self, String, BindingGuard) -> Value raise HintedError
-pub fn Module::file_id(Self) -> @syntax.FileId?
+pub fn Module::file_id(Self) -> @moonbitlang/typst/syntax.FileId?
 pub fn Module::name(Self) -> String?
 pub fn Module::new(String, Scope) -> Self
 pub fn Module::repr(Self) -> String
 pub fn Module::scope(Self) -> Scope
 pub fn Module::with_content(Self, Content) -> Self
-pub fn Module::with_file_id(Self, @syntax.FileId) -> Self
+pub fn Module::with_file_id(Self, @moonbitlang/typst/syntax.FileId) -> Self
 pub fn Module::with_name(Self, String) -> Self
 pub fn Module::with_scope(Self, Scope) -> Self
 pub impl Eq for Module
@@ -8122,7 +8120,7 @@ pub impl Reflect for Num
 pub struct NumberItem {
   text : String
 }
-pub fn NumberItem::create(String, StyleChain, @syntax.Span) -> MathItem
+pub fn NumberItem::create(String, StyleChain, @moonbitlang/typst/syntax.Span) -> MathItem
 
 pub(all) enum NumberType {
   Lining
@@ -8144,7 +8142,7 @@ pub(all) enum Numbering {
   Pattern(NumberingPattern)
   Func(Func)
 } derive(Eq)
-pub fn Numbering::apply(Self, Engine, Context, @syntax.Span, ArrayView[Int64]) -> Value raise SourceError
+pub fn Numbering::apply(Self, Engine, Context, @moonbitlang/typst/syntax.Span, ArrayView[Int64]) -> Value raise SourceError
 pub fn Numbering::trimmed(Self) -> Self
 pub impl Fingerprint for Numbering
 pub impl FromValue for Numbering
@@ -8156,8 +8154,8 @@ pub(all) struct NumberingPattern {
   suffix : String
   // private fields
 } derive(Eq)
-pub fn NumberingPattern::apply(Self, (Engine, @syntax.Span)?, ArrayView[Int64]) -> String raise HintedError
-pub fn NumberingPattern::apply_kth(Self, Engine, @syntax.Span, Int, Int64) -> String
+pub fn NumberingPattern::apply(Self, (Engine, @moonbitlang/typst/syntax.Span)?, ArrayView[Int64]) -> String raise HintedError
+pub fn NumberingPattern::apply_kth(Self, Engine, @moonbitlang/typst/syntax.Span, Int, Int64) -> String
 pub fn NumberingPattern::from_str(String) -> Self raise HintedError
 pub fn NumberingPattern::num_pieces(Self) -> Int
 pub fn NumberingPattern::to_string(Self) -> String
@@ -8310,20 +8308,20 @@ pub impl Reflect for OutlineElem
 
 pub struct OutlineEntry(Content)
 pub fn OutlineEntry::body(Self) -> Content raise HintedError
-pub fn OutlineEntry::build_inner(Self, Context, @syntax.Span, Content, Content) -> Content raise SourceError
+pub fn OutlineEntry::build_inner(Self, Context, @moonbitlang/typst/syntax.Span, Content, Content) -> Content raise SourceError
 pub fn OutlineEntry::element(Self) -> Content
 pub fn OutlineEntry::element_location(Self) -> Location raise HintedError
 pub fn OutlineEntry::fill(Self, StyleChain) -> Content?
 pub fn OutlineEntry::fill_in(StyleChain) -> Content?
 pub fn OutlineEntry::fill_local(Self) -> Content??
-pub fn OutlineEntry::indented(Self, Engine, Context, @syntax.Span, Content?, Content, Length) -> Content raise SourceError
+pub fn OutlineEntry::indented(Self, Engine, Context, @moonbitlang/typst/syntax.Span, Content?, Content, Length) -> Content raise SourceError
 pub fn OutlineEntry::level(Self) -> NonZeroUSize
 pub fn OutlineEntry::new(NonZeroUSize, Content) -> Self
 pub fn OutlineEntry::of(Content) -> Self?
 pub fn OutlineEntry::pack(Self) -> Content
-pub fn OutlineEntry::page(Self, Engine, Context, @syntax.Span) -> Content raise SourceError
+pub fn OutlineEntry::page(Self, Engine, Context, @moonbitlang/typst/syntax.Span) -> Content raise SourceError
 pub fn OutlineEntry::parent_in(StyleChain) -> OutlineElem?
-pub fn OutlineEntry::prefix(Self, Engine, Context, @syntax.Span) -> Content? raise SourceError
+pub fn OutlineEntry::prefix(Self, Engine, Context, @moonbitlang/typst/syntax.Span) -> Content? raise SourceError
 pub fn OutlineEntry::set_fill(Content?) -> Style
 pub fn OutlineEntry::set_parent(OutlineElem?) -> Style
 pub fn OutlineEntry::with_element(Self, Content) -> Self
@@ -8706,11 +8704,11 @@ pub(all) struct PartialHtmlFormatOptions {
 pub fn PartialHtmlFormatOptions::resolve(Self, HtmlFormatOptions) -> HtmlFormatOptions
 
 pub(all) enum PathOrStr {
-  Path(@syntax.RootedPath)
+  Path(@moonbitlang/typst/syntax.RootedPath)
   Str(String)
 } derive(Eq, Hash)
-pub fn PathOrStr::resolve(Self, @syntax.FileId) -> @syntax.RootedPath raise HintedError
-pub fn PathOrStr::resolve_if_some(Self, @syntax.FileId?) -> @syntax.RootedPath raise HintedError
+pub fn PathOrStr::resolve(Self, @moonbitlang/typst/syntax.FileId) -> @moonbitlang/typst/syntax.RootedPath raise HintedError
+pub fn PathOrStr::resolve_if_some(Self, @moonbitlang/typst/syntax.FileId?) -> @moonbitlang/typst/syntax.RootedPath raise HintedError
 pub impl FromValue for PathOrStr
 pub impl IntoValue for PathOrStr
 pub impl Reflect for PathOrStr
@@ -8752,6 +8750,8 @@ pub fn PdfDocument::data(Self) -> Bytes
 pub fn PdfDocument::has_optional_content_groups(Self) -> Bool
 pub fn PdfDocument::new(Bytes) -> Self raise LoadPdfError
 pub fn PdfDocument::num_pages(Self) -> Int
+pub fn PdfDocument::pdf(Self) -> @moonbitlang/typst/hayro/syntax.Pdf
+pub fn PdfDocument::synthetic(Bytes, Array[(Float, Float)]) -> Self
 pub impl Eq for PdfDocument
 pub impl Hash for PdfDocument
 
@@ -8761,6 +8761,7 @@ pub struct PdfImage {
 pub fn PdfImage::document(Self) -> PdfDocument
 pub fn PdfImage::height(Self) -> Float
 pub fn PdfImage::new(PdfDocument, Int) -> Self?
+pub fn PdfImage::page(Self) -> @moonbitlang/typst/hayro/syntax.Page
 pub fn PdfImage::page_index(Self) -> Int
 pub fn PdfImage::synthetic(Bytes, Array[(Float, Float)], Int) -> Self
 pub fn PdfImage::width(Self) -> Float
@@ -9036,14 +9037,14 @@ pub(all) enum ProcessColor {
 pub fn ProcessColor::alpha(Self) -> Float?
 pub fn ProcessColor::components(Self, Bool) -> Arr
 pub fn ProcessColor::darken(Self, Ratio) -> Self
-pub fn ProcessColor::desaturate(Self, @syntax.Span, Ratio) -> Self raise SourceError
+pub fn ProcessColor::desaturate(Self, @moonbitlang/typst/syntax.Span, Ratio) -> Self raise SourceError
 pub fn ProcessColor::from_str(String) -> Result[Self, String]
 pub fn ProcessColor::from_u32(UInt) -> Self
 pub fn ProcessColor::from_u8(Int, Int, Int, Int) -> Self
 pub fn ProcessColor::lighten(Self, Ratio) -> Self
 pub fn ProcessColor::negate(Self, ProcessColorSpace) -> Self
 pub fn ProcessColor::repr(Self) -> String
-pub fn ProcessColor::saturate(Self, @syntax.Span, Ratio) -> Self raise SourceError
+pub fn ProcessColor::saturate(Self, @moonbitlang/typst/syntax.Span, Ratio) -> Self raise SourceError
 pub fn ProcessColor::space(Self) -> ProcessColorSpace
 pub fn ProcessColor::to_cmyk(Self) -> Cmyk
 pub fn ProcessColor::to_hex(Self) -> String
@@ -9083,7 +9084,7 @@ pub struct Property {
   elem : Element
   id : Int
   value : Value
-  span : @syntax.Span
+  span : @moonbitlang/typst/syntax.Span
   liftable : Bool
   outside : Bool
 }
@@ -9142,7 +9143,7 @@ pub struct RadicalItem {
   index : MathItem?
   sqrt : MathItem
 }
-pub fn RadicalItem::create(MathItem, MathItem?, MathItem, StyleChain, @syntax.Span) -> MathItem
+pub fn RadicalItem::create(MathItem, MathItem?, MathItem, StyleChain, @moonbitlang/typst/syntax.Span) -> MathItem
 
 pub(all) enum RasterFormat {
   Exchange(ExchangeFormat)
@@ -9210,7 +9211,7 @@ pub impl Reflect for RatioOrAngle
 
 pub(all) enum RawContent {
   Text(String)
-  Lines(Array[(String, @syntax.Span)])
+  Lines(Array[(String, @moonbitlang/typst/syntax.Span)])
 } derive(Hash, @debug.Debug)
 pub fn RawContent::get(Self) -> String
 pub impl Eq for RawContent
@@ -9314,11 +9315,11 @@ pub(all) enum RealizationKind {
 pub struct Recipe {
   selector : Selector?
   transform : Transformation
-  span : @syntax.Span
+  span : @moonbitlang/typst/syntax.Span
   outside : Bool
 }
 pub fn Recipe::apply(Self, Engine, Context, Content) -> Content raise SourceError
-pub fn Recipe::new(Selector?, Transformation, @syntax.Span) -> Self
+pub fn Recipe::new(Selector?, Transformation, @moonbitlang/typst/syntax.Span) -> Self
 pub impl Eq for Recipe
 
 pub(all) struct Rect {
@@ -9537,8 +9538,8 @@ pub(all) enum RepresentationError {
 } derive(Eq, @debug.Debug)
 
 pub(all) enum ResolvableGridChild[T] {
-  Header(repeat~ : Bool, level~ : NonZeroU32, span~ : @syntax.Span, items~ : Array[ResolvableGridItem[T]])
-  Footer(repeat~ : Bool, span~ : @syntax.Span, items~ : Array[ResolvableGridItem[T]])
+  Header(repeat~ : Bool, level~ : NonZeroU32, span~ : @moonbitlang/typst/syntax.Span, items~ : Array[ResolvableGridItem[T]])
+  Footer(repeat~ : Bool, span~ : @moonbitlang/typst/syntax.Span, items~ : Array[ResolvableGridItem[T]])
   Item(ResolvableGridItem[T])
 }
 
@@ -9553,7 +9554,7 @@ pub(all) struct ResolvableLine {
   start : Int
   end : Int?
   stroke : ResolvedStroke?
-  span : @syntax.Span
+  span : @moonbitlang/typst/syntax.Span
   position : LinePosition
 }
 
@@ -9580,7 +9581,7 @@ pub(all) struct ResolvedDashPattern {
 
 pub(all) enum ResolvedLink {
   Local(anchor~ : String)
-  Cross(from~ : @syntax.VirtualPath, to~ : @syntax.VirtualPath, anchor~ : String)
+  Cross(from~ : @moonbitlang/typst/syntax.VirtualPath, to~ : @moonbitlang/typst/syntax.VirtualPath, anchor~ : String)
 } derive(Eq)
 pub fn ResolvedLink::into_relative_uri(Self) -> String raise HintedError
 
@@ -9659,25 +9660,25 @@ pub fn Route::check_call_depth(Self) -> Unit raise HintedError
 pub fn Route::check_html_depth(Self) -> Unit raise HintedError
 pub fn Route::check_layout_depth(Self) -> Unit raise HintedError
 pub fn Route::check_show_depth(Self) -> Unit raise HintedError
-pub fn Route::contains(Self, @syntax.FileId) -> Bool
+pub fn Route::contains(Self, @moonbitlang/typst/syntax.FileId) -> Bool
 pub fn Route::decrease(Self) -> Unit
 pub fn Route::extend(Self) -> Self
 pub fn Route::increase(Self) -> Unit
 pub fn Route::root() -> Self
 pub fn Route::unnested(Self) -> Self
-pub fn Route::with_id(Self, @syntax.FileId) -> Self
+pub fn Route::with_id(Self, @moonbitlang/typst/syntax.FileId) -> Self
 pub fn Route::within(Self, Int) -> Bool
 
 pub(all) struct Routines {
   rules : () -> NativeRuleMap
-  eval_string : (Engine, Context, String, @syntax.Span, @syntax.SyntaxMode, Scope) -> Value raise SourceError
+  eval_string : (Engine, Context, String, @moonbitlang/typst/syntax.Span, @moonbitlang/typst/syntax.SyntaxMode, Scope) -> Value raise SourceError
   eval_closure : (Func, Closure, Engine, Context, Args) -> Value raise SourceError
   realize : (RealizationKind, Engine, SplitLocator, Content, StyleChain) -> Array[(Content, StyleChain)] raise SourceError
   layout_frame : (Engine, Content, Locator, StyleChain, LayoutRegion) -> Frame raise SourceError
   html_mathml_body : (Content, StyleChain) -> Content??
   html_span_filled : (Content, Color) -> Content
 }
-pub fn Routines::new(eval_string~ : (Engine, Context, String, @syntax.Span, @syntax.SyntaxMode, Scope) -> Value raise SourceError, eval_closure~ : (Func, Closure, Engine, Context, Args) -> Value raise SourceError, rules? : () -> NativeRuleMap, realize? : (RealizationKind, Engine, SplitLocator, Content, StyleChain) -> Array[(Content, StyleChain)] raise SourceError, layout_frame? : (Engine, Content, Locator, StyleChain, LayoutRegion) -> Frame raise SourceError, html_mathml_body? : (Content, StyleChain) -> Content??, html_span_filled? : (Content, Color) -> Content) -> Self
+pub fn Routines::new(eval_string~ : (Engine, Context, String, @moonbitlang/typst/syntax.Span, @moonbitlang/typst/syntax.SyntaxMode, Scope) -> Value raise SourceError, eval_closure~ : (Func, Closure, Engine, Context, Args) -> Value raise SourceError, rules? : () -> NativeRuleMap, realize? : (RealizationKind, Engine, SplitLocator, Content, StyleChain) -> Array[(Content, StyleChain)] raise SourceError, layout_frame? : (Engine, Content, Locator, StyleChain, LayoutRegion) -> Frame raise SourceError, html_mathml_body? : (Content, StyleChain) -> Content??, html_span_filled? : (Content, Color) -> Content) -> Self
 
 pub(all) struct RowRange {
   start : Int
@@ -9917,7 +9918,7 @@ pub(all) struct Sink {
   introspections : Array[Introspection]
   delayed : Array[SourceDiagnostic]
   warnings : Array[SourceDiagnostic]
-  warnings_set : @hashset.HashSet[(@syntax.DiagSpan, String)]
+  warnings_set : @hashset.HashSet[(@moonbitlang/typst/syntax.DiagSpan, String)]
   values : Array[(Value, Styles?)]
 }
 pub fn Sink::delayed_error(Self, SourceDiagnostic) -> Unit
@@ -9996,7 +9997,7 @@ pub struct SkewedFractionItem {
   denominator : MathItem
   slash : MathItem
 }
-pub fn SkewedFractionItem::create(MathItem, MathItem, MathItem, StyleChain, @syntax.Span) -> MathItem
+pub fn SkewedFractionItem::create(MathItem, MathItem, MathItem, StyleChain, @moonbitlang/typst/syntax.Span) -> MathItem
 
 pub(all) enum Smallcaps {
   Minuscules
@@ -10121,21 +10122,21 @@ pub impl Reflect for SmartTodayOffset
 
 pub(all) struct SourceDiagnostic {
   severity : Severity
-  span : @syntax.DiagSpan
+  span : @moonbitlang/typst/syntax.DiagSpan
   message : String
-  trace : Array[@syntax.Spanned[Tracepoint]]
-  hints : Array[@syntax.DiagSpanned[String]]
+  trace : Array[@moonbitlang/typst/syntax.Spanned[Tracepoint]]
+  hints : Array[@moonbitlang/typst/syntax.DiagSpanned[String]]
 } derive(Eq, Hash, @debug.Debug)
-pub fn SourceDiagnostic::error(@syntax.DiagSpan, String) -> Self
-pub fn SourceDiagnostic::error_at(@syntax.Span, String) -> Self
-pub fn SourceDiagnostic::from_syntax(@syntax.SyntaxDiagnostic) -> Self
+pub fn SourceDiagnostic::error(@moonbitlang/typst/syntax.DiagSpan, String) -> Self
+pub fn SourceDiagnostic::error_at(@moonbitlang/typst/syntax.Span, String) -> Self
+pub fn SourceDiagnostic::from_syntax(@moonbitlang/typst/syntax.SyntaxDiagnostic) -> Self
 pub fn SourceDiagnostic::hint(Self, String) -> Unit
-pub fn SourceDiagnostic::spanned_hint(Self, String, @syntax.DiagSpan) -> Unit
-pub fn SourceDiagnostic::warning(@syntax.DiagSpan, String) -> Self
-pub fn SourceDiagnostic::warning_at(@syntax.Span, String) -> Self
+pub fn SourceDiagnostic::spanned_hint(Self, String, @moonbitlang/typst/syntax.DiagSpan) -> Unit
+pub fn SourceDiagnostic::warning(@moonbitlang/typst/syntax.DiagSpan, String) -> Self
+pub fn SourceDiagnostic::warning_at(@moonbitlang/typst/syntax.Span, String) -> Self
 pub fn SourceDiagnostic::with_hint(Self, String) -> Self
 pub fn SourceDiagnostic::with_hints(Self, ArrayView[String]) -> Self
-pub fn SourceDiagnostic::with_tracepoint(Self, Tracepoint, @syntax.Span) -> Self
+pub fn SourceDiagnostic::with_tracepoint(Self, Tracepoint, @moonbitlang/typst/syntax.Span) -> Self
 pub impl Fingerprint for SourceDiagnostic
 
 pub struct SpaceElem(Content)
@@ -10162,7 +10163,7 @@ pub impl Reflect for Spacing
 
 pub(all) struct SpannedValue[T] {
   v : T
-  span : @syntax.Span
+  span : @moonbitlang/typst/syntax.Span
 } derive(Eq)
 pub fn[T] SpannedValue::detached(T) -> Self[T]
 
@@ -10181,7 +10182,7 @@ pub struct SplitLocator {
 }
 pub fn[K : Fingerprint] SplitLocator::next(Self, K) -> Locator
 pub fn SplitLocator::next_inner(Self, U128) -> Locator
-pub fn SplitLocator::next_location(Self, Engine, U128, @syntax.Span) -> Location
+pub fn SplitLocator::next_location(Self, Engine, U128, @moonbitlang/typst/syntax.Span) -> Location
 
 pub(all) struct SpotColor {
   colorant : SpotColorant
@@ -10453,7 +10454,7 @@ pub fn Style::liftable(Self) -> Bool
 pub fn Style::outside(Self) -> Bool
 pub fn Style::property(Self) -> Property?
 pub fn Style::recipe(Self) -> Recipe?
-pub fn Style::span(Self) -> @syntax.Span
+pub fn Style::span(Self) -> @moonbitlang/typst/syntax.Span
 pub impl Fingerprint for Style
 
 pub struct StyleChain {
@@ -10501,7 +10502,7 @@ pub fn Styles::outside(Self) -> Self
 pub fn Styles::push(Self, Style) -> Unit
 pub fn Styles::root(ArrayView[(Content, StyleChain)], StyleChain) -> Self
 pub fn Styles::set(Self, Element, Int, Value) -> Unit
-pub fn Styles::spanned(Self, @syntax.Span) -> Self
+pub fn Styles::spanned(Self, @moonbitlang/typst/syntax.Span) -> Self
 pub fn Styles::unset(Self) -> Unit
 pub impl Eq for Styles
 pub impl Fingerprint for Styles
@@ -10591,7 +10592,7 @@ pub fn SvgImage::new(Bytes) -> Self raise LoadErr
 pub fn SvgImage::synthetic(Bytes, Double, Double) -> Self
 pub fn SvgImage::tree(Self) -> @usvg.Tree
 pub fn SvgImage::width(Self) -> Double
-pub fn SvgImage::with_fonts_images(Bytes, &World, Array[String], @syntax.FileId?) -> (Self, Array[HintedString]) raise LoadErr
+pub fn SvgImage::with_fonts_images(Bytes, &World, Array[String], @moonbitlang/typst/syntax.FileId?) -> (Self, Array[HintedString]) raise LoadErr
 pub impl Eq for SvgImage
 pub impl Hash for SvgImage
 
@@ -11216,9 +11217,9 @@ pub impl FromValue for TopEdgeMetric
 pub impl IntoValue for TopEdgeMetric
 pub impl Reflect for TopEdgeMetric
 
-pub(all) struct Traced(@syntax.Span?)
-pub fn Traced::get(Self, @syntax.FileId) -> @syntax.Span?
-pub fn Traced::new(traced? : @syntax.Span) -> Self
+pub(all) struct Traced(@moonbitlang/typst/syntax.Span?)
+pub fn Traced::get(Self, @moonbitlang/typst/syntax.FileId) -> @moonbitlang/typst/syntax.Span?
+pub fn Traced::new(traced? : @moonbitlang/typst/syntax.Span) -> Self
 
 pub(all) enum Tracepoint {
   Call(String?)
@@ -11571,7 +11572,7 @@ pub fn Value::numeric(Double, NumericUnit) -> Self
 pub fn Value::repr(Self) -> String
 pub fn Value::scope(Self) -> Scope?
 pub fn Value::shared(Self) -> Self
-pub fn Value::spanned(Self, @syntax.Span) -> Self
+pub fn Value::spanned(Self, @moonbitlang/typst/syntax.Span) -> Self
 pub fn Value::to_serde(Self, Bool) -> @serde.Data
 pub fn Value::ty(Self) -> Type
 pub impl Eq for Value
@@ -11663,9 +11664,9 @@ pub impl Reflect for WeightedColor
 pub struct Works {
   // private fields
 }
-pub fn Works::bibliography(Self, Location, @syntax.Span) -> RenderedBibliography raise SourceError
-pub fn Works::citation(Self, Location, @syntax.Span) -> Content raise SourceError
-pub fn Works::generate(Engine, @syntax.Span) -> Self raise SourceError
+pub fn Works::bibliography(Self, Location, @moonbitlang/typst/syntax.Span) -> RenderedBibliography raise SourceError
+pub fn Works::citation(Self, Location, @moonbitlang/typst/syntax.Span) -> Content raise SourceError
+pub fn Works::generate(Engine, @moonbitlang/typst/syntax.Span) -> Self raise SourceError
 
 pub(all) struct WritingScript(String) derive(Compare, Eq, Hash, @debug.Debug)
 pub fn WritingScript::as_str(Self) -> String
@@ -11679,7 +11680,7 @@ pub type NativeFn = (Engine, Context, Args) -> Value raise SourceError
 
 pub type Pair = (Content, StyleChain)
 
-pub using @syntax {type RootedPath}
+pub using @moonbitlang/typst/syntax {type RootedPath}
 
 pub type ShowFn[T] = (T, Engine, StyleChain) -> Content raise SourceError
 
@@ -11707,8 +11708,8 @@ pub impl Fingerprint for String
 pub impl[T : Fingerprint] Fingerprint for T?
 pub impl[T : Fingerprint, E : Fingerprint] Fingerprint for Result[T, E]
 pub impl[T : Fingerprint] Fingerprint for Array[T]
-pub impl Fingerprint for @syntax.Span
-pub impl Fingerprint for @syntax.VirtualPath
+pub impl Fingerprint for @moonbitlang/typst/syntax.Span
+pub impl Fingerprint for @moonbitlang/typst/syntax.VirtualPath
 pub impl[A : Fingerprint, B : Fingerprint] Fingerprint for (A, B)
 pub impl[A : Fingerprint, B : Fingerprint, C : Fingerprint] Fingerprint for (A, B, C)
 pub impl[A : Fingerprint, B : Fingerprint, C : Fingerprint, D : Fingerprint] Fingerprint for (A, B, C, D)
@@ -11746,8 +11747,8 @@ pub impl FromValue for Double
 pub impl FromValue for String
 pub impl[T : FromValue] FromValue for T?
 pub impl[T : FromValue] FromValue for Array[T]
-pub impl FromValue for @syntax.RootedPath
-pub impl FromValue for @syntax.SyntaxMode
+pub impl FromValue for @moonbitlang/typst/syntax.RootedPath
+pub impl FromValue for @moonbitlang/typst/syntax.SyntaxMode
 pub impl FromValue for @time.Month
 pub impl FromValue for @unicode.MathClass
 pub impl[A : FromValue, B : FromValue] FromValue for (A, B)
@@ -11762,8 +11763,8 @@ pub impl IntoValue for Double
 pub impl IntoValue for String
 pub impl[T : IntoValue] IntoValue for T?
 pub impl[T : IntoValue] IntoValue for Array[T]
-pub impl IntoValue for @syntax.RootedPath
-pub impl IntoValue for @syntax.SyntaxMode
+pub impl IntoValue for @moonbitlang/typst/syntax.RootedPath
+pub impl IntoValue for @moonbitlang/typst/syntax.SyntaxMode
 pub impl IntoValue for @time.Month
 pub impl IntoValue for @unicode.MathClass
 pub impl[A : IntoValue, B : IntoValue] IntoValue for (A, B)
@@ -11784,7 +11785,7 @@ pub(open) trait IntrospectorBackend {
   fn page_supplement(Self, Location) -> Content?
   fn anchor(Self, Location) -> String?
   fn document(Self, Location) -> Location?
-  fn path(Self, Location) -> @syntax.VirtualPath?
+  fn path(Self, Location) -> @moonbitlang/typst/syntax.VirtualPath?
 }
 
 pub(open) trait NativeElement {
@@ -11818,8 +11819,8 @@ pub impl Reflect for Double
 pub impl Reflect for String
 pub impl[T : Reflect] Reflect for T?
 pub impl[T : Reflect] Reflect for Array[T]
-pub impl Reflect for @syntax.RootedPath
-pub impl Reflect for @syntax.SyntaxMode
+pub impl Reflect for @moonbitlang/typst/syntax.RootedPath
+pub impl Reflect for @moonbitlang/typst/syntax.SyntaxMode
 pub impl Reflect for @time.Month
 pub impl Reflect for @unicode.MathClass
 pub impl[A : Reflect, B : Reflect] Reflect for (A, B)
@@ -11830,7 +11831,7 @@ pub(open) trait ResolvableCell {
   fn cell_y(Self, StyleChain) -> Smart[Int]
   fn cell_colspan(Self, StyleChain) -> Int
   fn cell_rowspan(Self, StyleChain) -> Int
-  fn cell_span(Self) -> @syntax.Span
+  fn cell_span(Self) -> @moonbitlang/typst/syntax.Span
   fn default_cell() -> Self
 }
 
@@ -11841,9 +11842,9 @@ pub impl ToCss for String
 
 pub(open) trait World {
   fn library(Self) -> Library
-  fn main(Self) -> @syntax.FileId
-  fn source(Self, @syntax.FileId) -> @syntax.Source raise FileError
-  fn file(Self, @syntax.FileId) -> Bytes raise FileError
+  fn main(Self) -> @moonbitlang/typst/syntax.FileId
+  fn source(Self, @moonbitlang/typst/syntax.FileId) -> @moonbitlang/typst/syntax.Source raise FileError
+  fn file(Self, @moonbitlang/typst/syntax.FileId) -> Bytes raise FileError
   fn book(Self) -> FontBook = _
   fn font(Self, Int) -> Font? = _
   fn today(Self, Duration?) -> Datetime?
