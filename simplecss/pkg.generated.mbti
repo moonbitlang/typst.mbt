@@ -1,0 +1,114 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/simplecss"
+
+import {
+  "moonbitlang/core/debug",
+}
+
+// Values
+
+// Errors
+pub(all) suberror CssError {
+  UnexpectedEndOfStream
+  InvalidIdent(TextPos)
+  InvalidComment(TextPos)
+  InvalidValue(TextPos)
+  InvalidByte(expected~ : Byte, actual~ : Byte, pos~ : TextPos)
+  SelectorMissing
+  UnexpectedSelector
+  UnexpectedCombinator
+  InvalidAttributeSelector
+  InvalidLanguagePseudoClass
+} derive(Eq, @debug.Debug)
+pub impl Show for CssError
+
+// Types and methods
+pub(all) enum AttributeOperator {
+  Exists
+  Matches(String)
+  Contains(String)
+  StartsWith(String)
+} derive(Eq, @debug.Debug)
+pub fn AttributeOperator::matches(Self, String) -> Bool
+
+pub(all) struct Declaration {
+  name : String
+  value : String
+  important : Bool
+} derive(Eq, @debug.Debug)
+
+pub struct DeclarationTokenizer {
+  // private fields
+}
+pub fn DeclarationTokenizer::from(String) -> Self
+pub fn DeclarationTokenizer::iter(Self) -> Iter[Declaration]
+pub fn DeclarationTokenizer::next(Self) -> Declaration?
+
+pub(all) enum PseudoClass {
+  FirstChild
+  Link
+  Visited
+  Hover
+  Active
+  Focus
+  Lang(String)
+} derive(Eq, @debug.Debug)
+pub impl Show for PseudoClass
+
+pub(all) struct Rule {
+  selector : Selector
+  mut declarations : Array[Declaration]
+} derive(@debug.Debug)
+
+type Selector derive(@debug.Debug)
+pub fn[E : Element] Selector::matches(Self, E) -> Bool
+pub fn Selector::parse(String) -> Self?
+pub fn Selector::specificity(Self) -> FixedArray[Byte]
+pub impl Show for Selector
+
+pub(all) enum SelectorToken {
+  UniversalSelector
+  TypeSelector(String)
+  ClassSelector(String)
+  IdSelector(String)
+  AttributeSelector(String, AttributeOperator)
+  PseudoClass(String)
+  LangPseudoClass(String)
+  DescendantCombinator
+  ChildCombinator
+  AdjacentCombinator
+} derive(Eq, @debug.Debug)
+
+pub struct SelectorTokenizer {
+  // private fields
+}
+pub fn SelectorTokenizer::from(String) -> Self
+pub fn SelectorTokenizer::iter(Self) -> Iter[Result[SelectorToken, CssError]]
+pub fn SelectorTokenizer::next(Self) -> Result[SelectorToken, CssError]?
+
+pub(all) struct StyleSheet {
+  mut rules : Array[Rule]
+} derive(@debug.Debug)
+pub fn StyleSheet::default() -> Self
+pub fn StyleSheet::new() -> Self
+pub fn StyleSheet::parse(String) -> Self
+pub fn StyleSheet::parse_more(Self, String) -> Unit
+pub impl Show for StyleSheet
+
+pub(all) struct TextPos {
+  row : UInt
+  col : UInt
+} derive(Eq, @debug.Debug)
+pub fn TextPos::new(UInt, UInt) -> Self
+pub impl Show for TextPos
+
+// Type aliases
+
+// Traits
+pub(open) trait Element {
+  fn parent_element(Self) -> Self?
+  fn prev_sibling_element(Self) -> Self?
+  fn has_local_name(Self, String) -> Bool
+  fn attribute_matches(Self, String, AttributeOperator) -> Bool
+  fn pseudo_class_matches(Self, PseudoClass) -> Bool
+}
