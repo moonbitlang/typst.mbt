@@ -1,0 +1,96 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/read_fonts"
+
+import {
+  "moonbitlang/core/debug",
+  "moonbitlang/typst/font_types",
+}
+
+// Values
+
+// Errors
+pub(all) suberror ReadError {
+  OutOfBounds
+  InvalidFormat(Int64)
+  InvalidSfnt(UInt)
+  InvalidTtc(@font_types.Tag)
+  InvalidCollectionIndex(UInt)
+  InvalidArrayLen
+  ValidationError
+  NullOffset
+  TableIsMissing(@font_types.Tag)
+  MetricIsMissing(@font_types.Tag)
+  MalformedData(String)
+}
+pub impl Show for ReadError
+
+// Types and methods
+pub(all) struct Cursor {
+  data : FontData
+  mut pos : Int
+}
+pub fn Cursor::advance_by(Self, Int) -> Unit
+pub fn Cursor::is_empty(Self) -> Bool
+pub fn Cursor::position(Self) -> Int raise ReadError
+pub fn Cursor::read_array(Self, Int, Int) -> FontData raise ReadError
+pub fn Cursor::read_i16(Self) -> Int raise ReadError
+pub fn Cursor::read_i32(Self) -> Int raise ReadError
+pub fn Cursor::read_i8(Self) -> Int raise ReadError
+pub fn Cursor::read_u16(Self) -> Int raise ReadError
+pub fn Cursor::read_u24(Self) -> Int raise ReadError
+pub fn Cursor::read_u32(Self) -> UInt raise ReadError
+pub fn Cursor::read_u8(Self) -> Int raise ReadError
+pub fn Cursor::remaining(Self) -> FontData?
+pub fn Cursor::remaining_bytes(Self) -> Int
+
+pub(all) struct FontData {
+  bytes : BytesView
+}
+pub fn FontData::as_bytes(Self) -> BytesView
+pub fn FontData::cursor(Self) -> Cursor
+pub fn FontData::empty() -> Self
+pub fn FontData::get(Self, Int, Int) -> BytesView?
+pub fn FontData::is_empty(Self) -> Bool
+pub fn FontData::len(Self) -> Int
+pub fn FontData::new(BytesView) -> Self
+pub fn FontData::read_array(Self, Int, Int, Int) -> Self raise ReadError
+pub fn FontData::read_f2dot14(Self, Int) -> @font_types.F2Dot14 raise ReadError
+pub fn FontData::read_fixed(Self, Int) -> @font_types.Fixed raise ReadError
+pub fn FontData::read_i16(Self, Int) -> Int raise ReadError
+pub fn FontData::read_i32(Self, Int) -> Int raise ReadError
+pub fn FontData::read_i8(Self, Int) -> Int raise ReadError
+pub fn FontData::read_u16(Self, Int) -> Int raise ReadError
+pub fn FontData::read_u24(Self, Int) -> Int raise ReadError
+pub fn FontData::read_u32(Self, Int) -> UInt raise ReadError
+pub fn FontData::read_u8(Self, Int) -> Int raise ReadError
+pub fn FontData::slice(Self, Int, Int) -> Self?
+pub fn FontData::split_off(Self, Int) -> Self?
+
+pub(all) struct NullPen {
+}
+pub impl OutlinePen for NullPen
+
+pub(all) enum PathElement {
+  MoveTo(x~ : Float, y~ : Float)
+  LineTo(x~ : Float, y~ : Float)
+  QuadTo(cx0~ : Float, cy0~ : Float, x~ : Float, y~ : Float)
+  CurveTo(cx0~ : Float, cy0~ : Float, cx1~ : Float, cy1~ : Float, x~ : Float, y~ : Float)
+  Close
+} derive(Eq, @debug.Debug)
+
+pub(all) struct RecordingPen {
+  elements : Array[PathElement]
+}
+pub fn RecordingPen::new() -> Self
+pub impl OutlinePen for RecordingPen
+
+// Type aliases
+
+// Traits
+pub(open) trait OutlinePen {
+  fn move_to(Self, Float, Float) -> Unit
+  fn line_to(Self, Float, Float) -> Unit
+  fn quad_to(Self, Float, Float, Float, Float) -> Unit
+  fn curve_to(Self, Float, Float, Float, Float, Float, Float) -> Unit
+  fn close(Self) -> Unit
+}
