@@ -4,6 +4,7 @@ import {
   "moonbitlang/typst/unicode",
   "moonbitlang/typst/html_assets",
   "moonbitlang/core/hashset",
+  "moonbitlang/typst/svg",
 }
 
 import {

@@ -1,7 +1,8 @@
-// Port of the eval-level parts of `typst-library/src/visualize/image/mod.rs`
-// and `raster.rs`: the `ImageElem` field hooks and the format, fit and
-// scaling types. Decoding (`RasterImage`, `SvgImage`, `PdfImage`) is a
-// layout concern and not ported yet.
+// Port of `typst-library/src/visualize/image/mod.rs` and the format types of
+// `raster.rs`: the `ImageElem` field hooks, `ImageElem::decode`, `Image` and
+// the format, fit and scaling types. The decoders live in `image_raster.mbt`
+// (`RasterImage`), `image_svg.mbt` (`SvgImage`) and `image_pdf.mbt`
+// (`PdfImage`).
 
 // ImageElem field hooks.
 
@@ -10,7 +11,8 @@
 /// missing files are reported at construction.
 ///
 /// The field stores the source (the user-visible part of
-/// `Derived<DataSource, Loaded>`); the loaded data is not kept.
+/// `Derived<DataSource, Loaded>`); the loaded data is not kept and
+/// [ImageElem::decode] loads it again.
 fn image_elem_source_parse(
   engine : Engine,
   args : Args,
@@ -38,6 +40,241 @@ fn image_elem_icc_parse(
     None => None
   }
 }
+
+///|
+/// Decodes the image.
+///
+/// Deviation: upstream keeps the data loaded at construction (with the span
+/// of the `source` argument) in the field. Here the source is loaded again,
+/// with the element's span standing in for the argument's span; this only
+/// affects the span of decoding errors for byte sources and of binary
+/// (PDF) load errors.
+pub fn ImageElem::decode(
+  self : ImageElem,
+  engine : Engine,
+  styles : StyleChain,
+) -> Image raise SourceError {
+  let span = self.0.span()
+  let source = self.source()
+  let loaded = source.load(span, engine.world)
+  let format = at(span, () => self.determine_format(styles, loaded))
+
+  // Construct the image itself.
+  let kind = match format {
+    Raster(format) => {
+      let icc = match self.icc(styles) {
+        Custom(icc) => Smart::Custom(icc.load(span, engine.world).data)
+        Auto => Smart::Auto
+      }
+      ImageKind::Raster(
+        at(span, () => RasterImage::new(loaded.data, format, icc)),
+      )
+    }
+    Vector(Svg) => {
+      // Identify the SVG file in case contained hrefs need to be resolved.
+      let svg_file = match source {
+        Path(path) =>
+          Some(path.resolve_if_some(span.id()).intern()) catch {
+            _ => None
+          }
+        Bytes(_) => span.id()
+      }
+
+      // Decode and check whether the image contains a `<foreignObject>`
+      // element which does not have a fallback rendering and, therefore,
+      // will be ignored by Typst.
+      let (output, warnings) = within(loaded, () => {
+        SvgImage::with_fonts_images(loaded.data, engine.world, [], svg_file)
+      })
+      for warning in warnings {
+        engine.sink.warn(warning.into_warning_at(span))
+      }
+      ImageKind::Svg(output)
+    }
+    Vector(Pdf) => {
+      let document = PdfDocument::new(loaded.data) catch {
+        Decryption =>
+          bail_diag(
+            LoadError::binary(
+              "failed to load PDF", "the PDF is encrypted or password-protected",
+            )
+            .within(loaded)
+            .with_hint("such PDFs are currently not supported")
+            .with_hint("preprocess the PDF to remove the encryption"),
+          )
+        Invalid =>
+          bail_diag(
+            LoadError::binary(
+              "failed to load PDF", "the PDF could not be loaded",
+            )
+            .within(loaded)
+            .with_hint("perhaps the PDF file is malformed"),
+          )
+        Unported(what) => bail_at(span, what)
+      }
+
+      // See https://github.com/LaurenzV/hayro/issues/141.
+      if document.has_optional_content_groups() {
+        engine.sink.warn(
+          SourceDiagnostic::warning(
+            @syntax.DiagSpan::from_span(span),
+            "PDF contains optional content groups",
+          ).with_hints([
+            "the image might display incorrectly in PDF export", "preprocess the PDF to flatten or remove optional content groups",
+          ]),
+        )
+      }
+
+      // The user provides the page number start from 1, but further down the
+      // pipeline, page numbers are 0-based.
+      let page_num = self.page(styles).get().to_int()
+      let page_idx = page_num - 1
+      let num_pages = document.num_pages()
+      guard PdfImage::new(document, page_idx) is Some(pdf_image) else {
+        let s = if num_pages == 1 { "" } else { "s" }
+        bail_diag(
+          LoadError::binary(
+            "failed to load PDF",
+            "page \{page_num} does not exist",
+          )
+          .within(loaded)
+          .with_hint("the document only has \{num_pages} page\{s}"),
+        )
+      }
+      ImageKind::Pdf(pdf_image)
+    }
+  }
+  Image::new(kind, self.alt(styles), self.scaling(styles))
+}
+
+///|
+/// Tries to determine the image format based on the format that was
+/// explicitly defined, or else the extension, or else the data.
+fn ImageElem::determine_format(
+  self : ImageElem,
+  styles : StyleChain,
+  loaded : Loaded,
+) -> ImageFormat raise HintedError {
+  if self.format(styles) is Custom(v) {
+    return v
+  }
+  if self.source() is Path(path) {
+    let id = Some(path.resolve_if_some(self.0.span().id())) catch { _ => None }
+    if id is Some(id) &&
+      determine_format_from_path(id.intern().vpath()) is Some(format) {
+      return format
+    }
+  }
+  match ImageFormat::detect(loaded.data) {
+    Some(format) => format
+    None => bail("unknown image format")
+  }
+}
+
+///|
+/// A loaded raster or vector image.
+pub struct Image {
+  /// The decoded image.
+  priv kind : ImageKind
+  /// A text describing the image.
+  priv alt : String?
+  /// The scaling algorithm to use.
+  priv scaling : Smart[ImageScaling]
+} derive(Eq, Hash)
+
+///|
+/// When scaling an image to it's natural size, we default to this DPI if the
+/// image doesn't contain DPI metadata.
+pub let image_default_dpi : Double = 72.0
+
+///|
+/// Should always be the same as the default DPI used by usvg.
+pub let image_usvg_default_dpi : Double = 96.0
+
+///|
+/// Create an image from a `RasterImage`, `SvgImage` or `PdfImage`.
+pub fn Image::new(
+  kind : ImageKind,
+  alt : String?,
+  scaling : Smart[ImageScaling],
+) -> Image {
+  { kind, alt, scaling, }
+}
+
+///|
+/// Create an image with optional properties set to the default.
+pub fn Image::plain(kind : ImageKind) -> Image {
+  Image::new(kind, None, Auto)
+}
+
+///|
+/// The format of the image.
+pub fn Image::format(self : Image) -> ImageFormat {
+  match self.kind {
+    Raster(raster) => Raster(raster.format())
+    Svg(_) => Vector(Svg)
+    Pdf(_) => Vector(Pdf)
+  }
+}
+
+///|
+/// The width of the image in pixels.
+pub fn Image::width(self : Image) -> Double {
+  match self.kind {
+    Raster(raster) => raster.width().to_double()
+    Svg(svg) => svg.width()
+    Pdf(pdf) => pdf.width().to_double()
+  }
+}
+
+///|
+/// The height of the image in pixels.
+pub fn Image::height(self : Image) -> Double {
+  match self.kind {
+    Raster(raster) => raster.height().to_double()
+    Svg(svg) => svg.height()
+    Pdf(pdf) => pdf.height().to_double()
+  }
+}
+
+///|
+/// The image's pixel density in pixels per inch, if known.
+pub fn Image::dpi(self : Image) -> Double? {
+  match self.kind {
+    Raster(raster) => raster.dpi()
+    Svg(_) => Some(image_usvg_default_dpi)
+    Pdf(_) => Some(image_default_dpi)
+  }
+}
+
+///|
+/// A text describing the image.
+pub fn Image::alt(self : Image) -> String? {
+  self.alt
+}
+
+///|
+/// The image scaling algorithm to use for this image.
+pub fn Image::scaling(self : Image) -> Smart[ImageScaling] {
+  self.scaling
+}
+
+///|
+/// The decoded image.
+pub fn Image::kind(self : Image) -> ImageKind {
+  self.kind
+}
+
+///|
+/// A kind of image.
+pub(all) enum ImageKind {
+  /// A raster image.
+  Raster(RasterImage)
+  /// An SVG image.
+  Svg(SvgImage)
+  /// A PDF image.
+  Pdf(PdfImage)
+} derive(Eq, Hash)
 
 ///|
 fn image_elem_height_default() -> Value {

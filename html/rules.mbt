@@ -986,17 +986,72 @@ fn raw_line_rule(
 }
 
 ///|
-/// TODO: Upstream decodes the image (`ImageElem::decode`) and embeds it as a
-/// base64 data URL (`typst_svg::WebImage`) in an `<img>` with `alt`,
-/// `width`, `height` attributes and CSS sizing; image decoding is not ported
-/// yet.
 // Also check `PATCHED_IMAGE_RULE` in `docs/src/main.rs` when editing this.
 fn image_rule(
   elem : @library.ImageElem,
-  _ : @library.Engine,
-  _ : @library.StyleChain,
+  engine : @library.Engine,
+  styles : @library.StyleChain,
 ) -> @library.Content raise @library.SourceError {
-  unported(elem, "`ImageElem::decode`")
+  let span = elem.into_content().span()
+  let image = elem.decode(engine, styles)
+  let attrs = @library.HtmlAttrs::new()
+  let src = @library.at(span, () => {
+    @svg.WebImage::new(image).to_base64_url() catch {
+      @svg.WebImageError(msg) => @library.bail(msg)
+    }
+  })
+  attrs.push(@library.attr_src, src)
+  if elem.alt(styles) is Some(alt) {
+    attrs.push(@library.attr_alt, alt)
+  }
+
+  // The `width` and `height` properties on the HTML element are only used to
+  // reserve space while the browser is fetching. They are integers. Still, in
+  // case of fractional image sizes, rounding is better than nothing and will
+  // not disrupt the aspect ratio of the final image.
+  let cast = (v : Double) => saturating_i64(@library.rust_round(v)).to_string()
+  attrs.push(@library.attr_width, cast(image.width()))
+  attrs.push(@library.attr_height, cast(image.height()))
+  let css = @library.CssProperties::build(engine.binding_guard(span).emit)
+
+  // TODO: Exclude in semantic profile.
+  if @svg.convert_image_scaling(image.scaling()) is Some(value) {
+    css.push("image-rendering", value)
+  }
+
+  // TODO: Exclude in semantic profile?
+  match elem.width(styles) {
+    Auto => ()
+    Custom(rel) => css.push("width", rel)
+  }
+
+  // TODO: Exclude in semantic profile?
+  match elem.height(styles) {
+    Auto => ()
+    Rel(rel) => css.push("height", rel)
+    Fr(_) => ()
+  }
+  block_packed(
+    @library.HtmlElem::new(@library.tag_img)
+    .with_attrs(attrs)
+    .with_css(css.finish())
+    .pack()
+    .spanned(span),
+  )
+}
+
+///|
+/// Rust's `f64::saturating_as::<i64>()` (NaN becomes zero).
+fn saturating_i64(v : Double) -> Int64 {
+  if v.is_nan() {
+    0L
+  } else if v >= 9223372036854775807.0 {
+    9223372036854775807L
+  } else if v <= -9223372036854775808.0 {
+    -9223372036854775808L
+  } else {
+    v.to_int64()
+  }
 }
 
 ///|

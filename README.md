@@ -10,6 +10,8 @@ MoonBit. See [PLAN.md](PLAN.md) for scope, architecture and status.
 | `syntax/` | Port of `typst-syntax`: lexer, parser, syntax nodes, spans, `Lines`, paths and file ids (`path.rs`), packages and manifests (`package.rs`) |
 | `syntax/ast/` | Typed AST over the syntax tree (`ast.rs`) |
 | `unicode/` | Unicode property tables generated from the Rust crates upstream uses |
+| `codecs/` | Image codecs upstream gets from crates: PNG decode/encode (`png`, `fdeflate`), JPEG/GIF/WebP headers (`zune-jpeg`, `gif`, `image-webp`), EXIF (`kamadak-exif`), inflate |
+| `svg/` | Port of `typst-svg` (so far: `WebImage` data URLs) |
 | `oracle/` | Rust crate dumping upstream reference outputs (goldens) |
 | `tests/runner/` | Differential runner comparing the port against the goldens |
 | `scripts/` | `upstream.sh` (pinned checkout), `goldens.sh` (regenerate goldens) |

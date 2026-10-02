@@ -20,8 +20,11 @@ import {
   "moonbitlang/typst/data/yaml",
   "moonbitlang/typst/time",
   "moonbitlang/typst/html_assets",
+  "moonbitlang/typst/codecs",
 }
 
 import {
   "moonbitlang/core/double",
+  "moonbitlang/core/env",
+  "moonbitlang/x/fs",
 } for "test"
