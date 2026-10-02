@@ -321,6 +321,19 @@ def main():
             if fname in defined:
                 args.append(f"output={fname}")
             fields.append(f"    field_of({', '.join(args)}),")
+        # Companions of `Derived<S, D>` fields: upstream stores the derived
+        # (loaded) data next to the source; we store the source in the field
+        # and the loaded data in an internal `<field>-derived` field, filled
+        # by the field's `#[parse]` hook through `ParseLocals` under the key
+        # `<field>-derived` (see `DynValue::Loaded`).
+        derived = [f for f in e["fields"] if "Derived<" in f["ty"]]
+        for k, f in enumerate(derived):
+            dname = f"{f['name']}-derived"
+            fields.append(
+                f"    field_of((Ty::new() : Ty[Value]), id={len(e['fields']) + k}, "
+                f"name={mbt_str(dname)}, kind=Settable, internal=true, "
+                f"parse=(_, _, locals) => locals.get({mbt_str(dname)})),"
+            )
         caps = ", ".join(mbt_str(c) for c in e["capabilities"])
         kws = ", ".join(mbt_str(k) for k in e["keywords"])
         init_hook = f"{var}_init"
@@ -347,6 +360,8 @@ def main():
         # Field id constants.
         for i, f in enumerate(e["fields"]):
             out.append(f"///|\npub let {var}_{snake(f['ident'])} : Int = {i}\n")
+        for k, f in enumerate(f for f in e["fields"] if "Derived<" in f["ty"]):
+            out.append(f"///|\npub let {var}_{snake(f['ident'])}_derived : Int = {len(e['fields']) + k}\n")
     header = "// Unmapped field types (stored untyped as `Value`):\n" + "".join(
         f"//   {n:3} {t}\n" for t, n in sorted(unmapped.items(), key=lambda x: -x[1])
     )

@@ -435,6 +435,103 @@ All 403 `math/` paged tests match; the 4 `math/` SVG failures are color
 emoji glyphs in the SVG exporter (paged output identical). eval/realize/html
 unchanged.
 
+## Status: work unit J (PDF export)
+
+**Backend:** pdflite's new `export` package (office.mbt branch
+`typst-pdf-export`, worktree `../office.mbt-typst-pdf`) is a port of the
+parts of krilla typst-pdf uses: object serialization (classic xref, flate
+streams), `Surface` (transforms, clips, masks, opacity, isolated groups,
+blend modes), paints (solid incl. Separation spot colors, axial/radial
+shadings, PostScript-function sweep/repeat/reflect gradients, translucent
+gradient stops via luminosity soft masks, tiling patterns), text (CID fonts
+CID=GID with glyf subsetting keeping GIDs, CFF/CFF2 embedded whole as
+`FontFile3/OpenType`, `ToUnicode`, krilla's `ActualText` glyph spanner,
+Type 3 fonts for color glyphs), images (8-bit samples + `SMask`, ICC,
+JPEG passthrough incl. inverted Adobe CMYK), link annotations (quad
+points), XYZ/named destinations, outlines, page labels, Info + XMP
+metadata, embedded files/AF, tagged PDF (`StructTreeRoot`, `ParentTree`,
+`IDTree`, `RoleMap`, MCIDs/MCR/OBJR, attributes) and krilla's validation
+tables for PDF/A and PDF/UA. pdflite now depends on `moonbitlang/x@0.5.5`;
+typst.mbt links it through `moon.work` (member
+`../office.mbt-typst-pdf/pdflite`; `.claude/worktrees/office.mbt-typst-pdf`
+is a symlink so the relative path also resolves from agent worktrees).
+
+**Port:** `pdf/` mirrors typst-pdf: `lib`, `format` (`PdfFormatOptions`),
+`convert`, `text`, `shape`, `paint`, `image`, `color_glyph` (COLR v0/v1
+painting, PNG bitmap glyphs, outline fallback), `link`, `outline`,
+`metadata`, `attach`, `util` and the whole tags module (`tags`,
+`tags_groups`, `tags_tree`, `tags_build`, `tags_text`, `tags_context`
+(context/{mod,list,outline,figure,grid}), `tags_table`, `tags_resolve`
+(resolve + accumulator), `tags_util`). Bundles use it through
+`BundleOptions.pdf` (runner: `bundle_options`).
+
+**Stages:** `pdf-semantic` (oracle `pdf_semantic.rs`: a canonical dump of
+version/info/catalog/XMP/page labels, per page the positioned text runs
+(ToUnicode-decoded), filled/stroked paths, images, shadings and
+annotations, then destinations, outline and attachments; numbers compared
+within 0.02), `pdf-semantic-replay` (exports upstream's frames decoded from
+the `paged` goldens, untagged), `pdf-extract-check` (MoonBit extractor on
+upstream's PDFs, saved by the oracle with `ORACLE_SAVE_PDF`, passed as
+`--upstream-pdfs=<dir>`), `pdftags` (upstream's `tests/src/pdftags.rs`
+YAML, ported in `tests/runner/pdftags.mbt`) and `pdftags-check` (formatter
+on upstream's PDFs). Internal errors carry upstream's caller location
+(`crates/typst-pdf/src/...:line:col`); the oracle now strips its absolute
+`.repos/typst/` prefix (`canonical_internal_error`).
+
+**Result:** `pdf-semantic` 2271/2299, `pdftags` 133/133, `pdftags-check`
+133/133, `pdf-extract-check` 2299/2299, `pdf-semantic-replay` 2261/2299,
+`bundle` 38/39. Visual check (poppler `pdftoppm` 72 dpi, page matches if
+≤0.5% of pixels differ): 2054/2141. The `pdf-semantic` failures are SVG
+images (no usvg port yet) and PDF images; other gaps: variable font
+instancing (krilla instantiates variable fonts), SVG-in-OpenType glyphs
+(outline fallback), CFF subsetting, ICC-based colors/output intents for
+PDF/A, GIF/WebP decoding.
+
+## Status: usvg port (SVG images and SVG glyphs)
+
+**Packages** (ports of the crates at the versions in `oracle/Cargo.lock`):
+`simplecss/` (simplecss 0.2), `svgtypes/` (svgtypes 0.15, incl. the kurbo
+arc pieces it needs), `tiny_skia_path/` (tiny-skia-path 0.11 geometry:
+`Path`, `PathBuilder`, `Transform`, `Rect`, bounds; plus `strict-num`) and
+`usvg/` (usvg 0.47): the svgtree (`svgtree*.mbt`, reusing the roxmltree port
+in `data/xml`), the converter (`converter.mbt`, `style.mbt`, `units.mbt`,
+`shapes.mbt`, `use_node.mbt`, `switch.mbt`, `clippath.mbt`, `mask.mbt`,
+`marker.mbt`, `paint_server.mbt`, `filter.mbt`, `image.mbt`), text
+(`text.mbt` parsing, `text_layout.mbt` shaping via `@shape`/`@bidi`,
+`text_flatten.mbt` outlines/COLR/SVG/bitmap glyphs, `text_colr.mbt`) with a
+`fontdb` subset (`fontdb.mbt`), kurbo pieces for `arc_to` and text-on-path
+(`kurbo*.mbt`), and the writer (`writer.mbt`, `Tree::to_string`). f32
+arithmetic matches Rust bit for bit: libm via FFI (`libm_*.mbt`, with
+`__sincos_stret` on Apple like LLVM merges `sin`/`cos`), `powi`, Rust f32
+`Display` (`rust_fmt.mbt`). `Arc::get_mut` in `paint_server.mbt` is emulated
+with reference counting over the tree (`RefCounter`).
+
+**Wiring:** `library/image_svg.mbt` (`SvgImage::with_fonts_images` with
+Typst's font resolver over the font book and the linked-image resolver,
+exact error messages), `library/font_color.mbt` (`draw_svg_glyph` +
+`fixup_svg`). Image decoding now passes the text font families like
+upstream.
+
+**Tests:** `scripts/goldens.sh usvg` (`oracle/src/bin/gen_usvg_golden.rs`):
+dev-assets SVGs + `usvg_corpus.txt` trees, `usvg_text_corpus.txt` text
+layouts, and every SVG-table glyph of the test fonts, compared by runner
+stage `usvg`; the same cases are generated as `usvg/oracle_test.mbt`.
+`scripts/goldens.sh usvg-images` (`oracle/src/usvg_images.rs`) dumps the
+tree of every SVG image placed by a paged test (runner stage
+`usvg-images`).
+
+**Deviations:** the default string href resolver returns `None` (Typst
+always overrides it); `imagesize` only knows JPEG/PNG/GIF/WebP (the
+formats usvg accepts); fontdb's generic `fantasy` default is fixed.
+
+**Result:** `svg` 2269 → 2294/2299 (all SVG-table color glyphs), `svg-replay`
+2254 → 2279, `paged` 2283 (unchanged; image sizes were already right),
+`usvg` 93/93 trees + text layouts and 3360/3360 glyphs, `usvg-images`
+342/342. The remaining SVG-image paged failures (`image-svg-linked-*`,
+`image-decode-bad-svg`) only differ in the error span: `ImageElem::decode`
+reloads the source with the element span instead of the `source`
+argument's span (see the deviation note in `library/image.mbt`).
+
 ## Status: raster export (tiny-skia + typst-render)
 
 **Packages.** `skia/path` is a port of `tiny-skia-path` 0.12.0 (point,

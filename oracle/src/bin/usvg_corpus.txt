@@ -1,0 +1,380 @@
+=== shapes-basic
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="100">
+  <rect x="10" y="10" width="50" height="30" fill="red"/>
+  <circle cx="100" cy="50" r="20" fill="green" stroke="black" stroke-width="3"/>
+  <ellipse cx="150" cy="50" rx="30" ry="10" fill="blue"/>
+  <line x1="0" y1="0" x2="200" y2="100" stroke="purple"/>
+  <polyline points="10,90 20,80 30,90 40,80" fill="none" stroke="black"/>
+  <polygon points="150,10 190,10 170,40" fill="orange"/>
+</svg>
+=== shapes-rounded-rect
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100">
+  <rect x="5" y="5" width="90" height="40" rx="10" fill="#abc"/>
+  <rect x="5" y="55" width="90" height="40" rx="80" ry="5" fill="#def"/>
+  <rect x="5" y="55" width="0" height="40" fill="red"/>
+  <rect x="5" y="55" width="10" height="10" rx="-3" ry="4" fill="red"/>
+</svg>
+=== path-commands
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <path d="M10 10 L 90 10 Q 90 50 50 50 T 10 90 C 20 20 80 80 90 90 S 50 10 10 10 Z m 5 5 h 10 v 10 h -10 z"/>
+  <path d="M10,50 A 20 30 45 1 0 60 50 a 10 10 0 0 1 20 0" fill="none" stroke="black"/>
+  <path d="M 1 2 L" fill="none" stroke="black"/>
+  <path d="M10-20A5.5.3-4 110-.1" stroke="red"/>
+</svg>
+=== transforms
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100">
+  <g transform="translate(10 20) scale(2)">
+    <rect width="10" height="10" transform="rotate(30 5 5)"/>
+    <rect width="10" height="10" transform="skewX(20)" fill="red"/>
+  </g>
+  <g transform="matrix(1 0 0 1 0 0)"><circle r="5" cx="50" cy="50"/></g>
+  <rect width="10" height="10" transform="scale(0)"/>
+  <rect width="10" height="10" transform="rotate(45)" transform-origin="5 5"/>
+</svg>
+=== groups-opacity-ids
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100">
+  <g id="g1" opacity="0.5"><rect id="r1" width="10" height="10"/></g>
+  <g><g><rect width="20" height="20" fill-opacity="50%" stroke-opacity="0.3" stroke="red"/></g></g>
+  <g style="mix-blend-mode:multiply;isolation:isolate"><rect width="5" height="5"/></g>
+  <g display="none"><rect width="50" height="50"/></g>
+  <rect width="50" height="50" visibility="hidden"/>
+</svg>
+=== viewbox-aspect
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="100" viewBox="0 0 50 50" preserveAspectRatio="xMaxYMin slice">
+  <rect width="50" height="50" fill="green"/>
+</svg>
+=== viewbox-none
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="100" viewBox="10 10 50 50" preserveAspectRatio="none">
+  <rect x="10" y="10" width="50" height="50"/>
+</svg>
+=== size-percent-no-viewbox
+<svg xmlns="http://www.w3.org/2000/svg">
+  <rect x="10" y="20" width="300" height="40"/>
+</svg>
+=== size-units
+<svg xmlns="http://www.w3.org/2000/svg" width="10mm" height="1in" font-size="20">
+  <rect width="2em" height="3ex" x="1cm" y="2pt"/>
+  <rect width="1pc" height="10%" x="50%"/>
+</svg>
+=== size-invalid
+<svg xmlns="http://www.w3.org/2000/svg" width="0" height="100"><rect width="1" height="1"/></svg>
+=== no-root
+<sv height="140" width="500"><ellipse cx="200" cy="80" rx="100" ry="50"/></sv>
+=== bad-xml
+<svg xmlns="http://www.w3.org/2000/svg"><rect></svg>
+=== empty-svg
+<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"/>
+=== linear-gradient
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100">
+  <defs>
+    <linearGradient id="lg1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="red"/>
+      <stop offset="50%" stop-color="green" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="blue"/>
+    </linearGradient>
+    <linearGradient id="lg2" href="#lg1" gradientUnits="userSpaceOnUse" x1="10" x2="90" spreadMethod="reflect" gradientTransform="rotate(10)"/>
+  </defs>
+  <rect width="50" height="50" fill="url(#lg1)"/>
+  <rect x="50" width="50" height="50" fill="url(#lg2)"/>
+  <rect y="50" width="50" height="50" fill="url(#lg1)" stroke="url(#lg2)"/>
+</svg>
+=== radial-gradient
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100">
+  <radialGradient id="rg" cx="0.5" cy="0.5" r="0.4" fx="0.3" fy="0.3" spreadMethod="repeat">
+    <stop offset="0" stop-color="#fff"/>
+    <stop offset="0.7" stop-color="#000"/>
+    <stop offset="0.7" stop-color="#f00"/>
+    <stop offset="0.7" stop-color="#0f0"/>
+    <stop offset="1" stop-color="#00f"/>
+  </radialGradient>
+  <radialGradient id="rg0" r="0"><stop offset="0" stop-color="red"/><stop offset="1" stop-color="yellow"/></radialGradient>
+  <radialGradient id="rg1"><stop offset="0" stop-color="red"/></radialGradient>
+  <circle cx="50" cy="50" r="40" fill="url(#rg)"/>
+  <rect width="10" height="10" fill="url(#rg0)"/>
+  <rect x="20" width="10" height="10" fill="url(#rg1)"/>
+  <rect x="40" width="10" height="10" fill="url(#missing) green"/>
+  <line x2="100" y2="0" stroke="url(#rg)"/>
+</svg>
+=== gradient-shared-obb
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100">
+  <linearGradient id="lg"><stop offset="0" stop-color="red"/><stop offset="1" stop-color="blue"/></linearGradient>
+  <rect width="10" height="10" fill="url(#lg)"/>
+  <rect x="20" width="30" height="10" fill="url(#lg)"/>
+  <rect x="60" width="30" height="30" fill="url(#lg)"/>
+</svg>
+=== gradient-stops-zeros
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100">
+  <linearGradient id="lg">
+    <stop offset="0" stop-color="red"/>
+    <stop offset="0" stop-color="green"/>
+    <stop offset="0.5" stop-color="blue"/>
+    <stop offset="0.4" stop-color="yellow"/>
+    <stop offset="2" stop-color="black"/>
+  </linearGradient>
+  <rect width="100" height="100" fill="url(#lg)"/>
+</svg>
+=== pattern
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100">
+  <pattern id="p1" width="0.25" height="0.25">
+    <rect width="5" height="5" fill="red"/>
+  </pattern>
+  <pattern id="p2" patternUnits="userSpaceOnUse" width="20" height="20" viewBox="0 0 10 10" patternTransform="rotate(45)">
+    <circle cx="5" cy="5" r="4" fill="blue"/>
+  </pattern>
+  <pattern id="p3" patternContentUnits="objectBoundingBox" width="0.5" height="0.5">
+    <rect width="0.25" height="0.25" fill="green"/>
+  </pattern>
+  <pattern id="p4" href="#p1" x="0.1"/>
+  <rect width="50" height="50" fill="url(#p1)"/>
+  <rect x="50" width="50" height="50" fill="url(#p2)"/>
+  <rect y="50" width="50" height="50" fill="url(#p3)" stroke="url(#p4)"/>
+</svg>
+=== clip-path
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100">
+  <clipPath id="c1"><circle cx="50" cy="50" r="40"/></clipPath>
+  <clipPath id="c2" clipPathUnits="objectBoundingBox" transform="scale(0.5)"><rect width="1" height="1"/></clipPath>
+  <clipPath id="c3" clip-path="url(#c1)"><rect width="60" height="60" clip-rule="evenodd"/><text>hi</text></clipPath>
+  <rect width="100" height="100" clip-path="url(#c1)"/>
+  <rect x="10" y="10" width="40" height="40" clip-path="url(#c2)" fill="red"/>
+  <rect x="20" y="20" width="40" height="40" clip-path="url(#c2)" fill="green"/>
+  <g clip-path="url(#c3)"><rect width="100" height="100" fill="blue"/></g>
+  <rect clip-path="url(#nonexistent)" width="5" height="5"/>
+</svg>
+=== mask
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100">
+  <mask id="m1"><rect width="100" height="100" fill="white" opacity="0.5"/></mask>
+  <mask id="m2" maskUnits="userSpaceOnUse" maskContentUnits="objectBoundingBox" x="0" y="0" width="100" height="100" mask-type="alpha">
+    <rect width="0.5" height="0.5" fill="white"/>
+  </mask>
+  <mask id="m3" mask="url(#m1)"><circle cx="50" cy="50" r="30" fill="white"/></mask>
+  <rect width="100" height="100" mask="url(#m1)"/>
+  <rect width="80" height="80" mask="url(#m2)" fill="red"/>
+  <rect width="80" height="80" mask="url(#m3)" fill="green"/>
+  <line x2="10" mask="url(#m1)" stroke="black"/>
+</svg>
+=== mask-with-gradient
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100">
+  <linearGradient id="g"><stop offset="0" stop-color="white"/><stop offset="1" stop-color="black"/></linearGradient>
+  <mask id="m"><rect width="100" height="100" fill="url(#g)"/></mask>
+  <rect width="100" height="100" mask="url(#m)" fill="blue"/>
+  <rect x="10" width="80" height="100" mask="url(#m)" fill="red"/>
+</svg>
+=== filters
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100">
+  <filter id="f1"><feGaussianBlur stdDeviation="2"/></filter>
+  <filter id="f2" x="0" y="0" width="1" height="1" filterUnits="objectBoundingBox">
+    <feOffset dx="3" dy="4" result="off"/>
+    <feFlood flood-color="red" flood-opacity="0.5"/>
+    <feComposite in="SourceGraphic" in2="off" operator="arithmetic" k1="1" k2="0.5"/>
+    <feBlend mode="screen" in2="SourceAlpha"/>
+    <feMerge><feMergeNode in="off"/><feMergeNode/></feMerge>
+    <feTile/>
+  </filter>
+  <filter id="f3" primitiveUnits="objectBoundingBox">
+    <feColorMatrix type="saturate" values="0.3"/>
+    <feColorMatrix type="hueRotate" values="90"/>
+    <feColorMatrix type="luminanceToAlpha"/>
+    <feColorMatrix values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 1 0"/>
+    <feComponentTransfer><feFuncR type="table" tableValues="0 1"/><feFuncG type="linear" slope="2"/><feFuncB type="gamma" exponent="2"/><feFuncA type="discrete"/></feComponentTransfer>
+    <feMorphology operator="dilate" radius="0.1 0"/>
+    <feDropShadow dx="0.1" stdDeviation="0.05"/>
+  </filter>
+  <filter id="f4">
+    <feConvolveMatrix order="3" kernelMatrix="1 0 0 0 1 0 0 0 1" edgeMode="wrap" preserveAlpha="true"/>
+    <feTurbulence baseFrequency="0.05 0.1" numOctaves="2" seed="3.7" stitchTiles="stitch" type="fractalNoise"/>
+    <feDisplacementMap in2="SourceGraphic" scale="10" xChannelSelector="R" yChannelSelector="G"/>
+    <feDiffuseLighting surfaceScale="2" lighting-color="yellow"><feDistantLight azimuth="45" elevation="30"/></feDiffuseLighting>
+    <feSpecularLighting specularExponent="10"><fePointLight x="10" y="20" z="30"/></feSpecularLighting>
+    <feSpecularLighting><feSpotLight x="1" y="2" z="3" pointsAtX="4" limitingConeAngle="30"/></feSpecularLighting>
+  </filter>
+  <rect width="50" height="50" filter="url(#f1)"/>
+  <rect x="50" width="50" height="50" filter="url(#f2)" fill="green"/>
+  <rect y="50" width="50" height="50" filter="url(#f3)"/>
+  <rect x="50" y="50" width="50" height="50" filter="url(#f4) url(#f1)"/>
+  <rect width="5" height="5" filter="url(#missing)"/>
+</svg>
+=== filter-functions
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100">
+  <rect width="20" height="20" filter="blur(2) drop-shadow(1px 2px 3px red) brightness(1.5) contrast(50%)"/>
+  <rect x="25" width="20" height="20" filter="grayscale(1) hue-rotate(90deg) invert(0.3) opacity(0.5) sepia(1) saturate(2)"/>
+  <rect x="50" width="20" height="20" filter="drop-shadow(2px 2px)" color="blue"/>
+  <rect x="75" width="20" height="20" filter="blur(nonsense)"/>
+</svg>
+=== fe-image
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="100" height="100">
+  <rect id="r" width="20" height="20" fill="red"/>
+  <filter id="f"><feImage xlink:href="#r"/></filter>
+  <rect x="30" width="40" height="40" filter="url(#f)"/>
+</svg>
+=== markers
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100">
+  <marker id="m" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+    <circle cx="3" cy="3" r="2" fill="red"/>
+  </marker>
+  <marker id="m2" viewBox="0 0 10 10" markerWidth="4" markerHeight="4" orient="auto-start-reverse" markerUnits="userSpaceOnUse" overflow="visible">
+    <path d="M0 0 L10 5 L0 10z" fill="context-stroke"/>
+  </marker>
+  <marker id="m3" orient="30"><rect width="2" height="2" fill="context-fill"/></marker>
+  <path d="M10 10 L50 10 Q 60 40 90 90 C 80 80 20 80 10 90 Z" fill="none" stroke="black" stroke-width="2" marker-start="url(#m)" marker-mid="url(#m)" marker-end="url(#m2)"/>
+  <polyline points="10,50 30,60 50,50" stroke="blue" fill="yellow" style="marker: url(#m3)" paint-order="markers stroke"/>
+  <polyline points="10,70 30,80 50,70" stroke="blue" fill="none" marker-mid="url(#m2)" paint-order="stroke markers fill"/>
+</svg>
+=== use-symbol
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="100" height="100">
+  <defs>
+    <symbol id="s" viewBox="0 0 10 10"><rect width="10" height="10" fill="context-fill"/></symbol>
+    <g id="g"><circle cx="5" cy="5" r="5"/></g>
+    <svg id="sv" width="20" height="20" viewBox="0 0 10 10"><rect width="10" height="10" fill="red"/></svg>
+  </defs>
+  <use xlink:href="#s" x="10" y="10" width="20" height="20" fill="green"/>
+  <use href="#g" x="40" y="40" fill="blue" transform="scale(2)"/>
+  <use href="#sv" x="60" y="60" width="30"/>
+  <use href="#missing"/>
+  <use id="u1" href="#u1"/>
+</svg>
+=== use-context-gradient
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100">
+  <linearGradient id="lg"><stop offset="0" stop-color="red"/><stop offset="1" stop-color="blue"/></linearGradient>
+  <defs><rect id="r" width="20" height="20" fill="context-fill" stroke="context-stroke"/></defs>
+  <use href="#r" fill="url(#lg)" stroke="url(#lg)" transform="translate(10 10)"/>
+  <use href="#r" fill="url(#lg)" x="50" y="50"/>
+</svg>
+=== nested-svg
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100">
+  <svg x="10" y="10" width="50" height="50" viewBox="0 0 10 10">
+    <rect width="20" height="20" fill="red"/>
+  </svg>
+  <svg x="60" y="60" overflow="visible"><circle r="5"/></svg>
+</svg>
+=== switch
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100">
+  <switch>
+    <rect requiredExtensions="http://example.org" width="10" height="10" fill="red"/>
+    <rect requiredFeatures="http://www.w3.org/TR/SVG11/feature#Shape" systemLanguage="de, en-US" width="20" height="20" fill="green"/>
+    <rect width="30" height="30"/>
+  </switch>
+  <switch>
+    <foreignObject width="10" height="10"/>
+    <rect width="40" height="40"/>
+  </switch>
+</svg>
+=== css
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100">
+  <style>
+    rect { fill: red; stroke: blue !important }
+    .a { fill: green }
+    #b { fill: yellow; stroke-width: 3 }
+    g > rect:first-child { opacity: 0.5 }
+    [data-x="1"] { fill: purple }
+    circle { font: italic bold 12px serif }
+  </style>
+  <style type="text/foo">rect { fill: black }</style>
+  <rect width="10" height="10"/>
+  <rect class="a" x="10" width="10" height="10" style="stroke: black"/>
+  <rect id="b" x="20" width="10" height="10" fill="black"/>
+  <g><rect x="30" width="10" height="10"/><rect x="40" width="10" height="10" data-x="1"/></g>
+  <circle r="3" cx="50" cy="50" style="marker:none; fill: inherit"/>
+</svg>
+=== inherit
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" fill="green" stroke="red">
+  <g stroke-width="5" opacity="0.5">
+    <rect width="10" height="10" stroke-width="inherit" opacity="inherit" fill="inherit"/>
+    <rect x="20" width="10" height="10" stroke-dasharray="inherit" stroke-linejoin="inherit" clip-path="inherit"/>
+  </g>
+</svg>
+=== stroke-props
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100">
+  <path d="M10 10 L90 10 L90 90" fill="none" stroke="black" stroke-width="7" stroke-linecap="round" stroke-linejoin="bevel" stroke-miterlimit="0.5" stroke-dasharray="5 3 1" stroke-dashoffset="2"/>
+  <path d="M10 20 L50 50 L10 80" fill="none" stroke="black" stroke-width="5" stroke-linecap="square" stroke-linejoin="miter-clip" stroke-miterlimit="10"/>
+  <path d="M60 20 L80 50 L60 80" fill="none" stroke="black" stroke-width="5" stroke-linejoin="round" stroke-dasharray="0 0"/>
+  <path d="M20 20 L30 30" stroke="black" stroke-width="0"/>
+  <path d="M20 20 L30 30" stroke="black" stroke-dasharray="-1 2"/>
+  <rect x="40" y="40" width="20" height="20" fill-rule="evenodd" stroke="green" paint-order="stroke"/>
+</svg>
+=== skewed-stroke-bbox
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100">
+  <g transform="skewX(30) rotate(10)">
+    <path d="M10 10 C 20 0 40 60 50 10" fill="none" stroke="black" stroke-width="4"/>
+  </g>
+</svg>
+=== colors
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" color="teal">
+  <rect width="10" height="10" fill="currentColor"/>
+  <rect x="10" width="10" height="10" fill="rgba(255, 0, 0, 0.5)"/>
+  <rect x="20" width="10" height="10" fill="hsl(120, 100%, 50%)"/>
+  <rect x="30" width="10" height="10" fill="#ABCDEF80"/>
+  <rect x="40" width="10" height="10" fill="transparent"/>
+  <rect x="50" width="10" height="10" fill="nonsense"/>
+  <rect x="60" width="10" height="10" fill="none" stroke="nonsense"/>
+  <rect x="70" width="10" height="10" fill="RED"/>
+</svg>
+=== images-data
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="100" height="100">
+  <image width="20" height="20" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="/>
+  <image x="30" width="30" preserveAspectRatio="xMidYMid slice" height="10" href="data:image/svg+xml;utf8,&lt;svg xmlns='http://www.w3.org/2000/svg' width='10' height='20'&gt;&lt;rect width='5' height='5'/&gt;&lt;/svg&gt;"/>
+  <image x="60" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPjxjaXJjbGUgcj0iMiIgY3g9IjIiIGN5PSIyIi8+PC9zdmc+" image-rendering="optimizeSpeed"/>
+  <image y="60" width="10" href="image.png"/>
+  <image y="60" x="20" height="10" href="data:text/plain;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" style="image-rendering:pixelated"/>
+</svg>
+=== background-color
+<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" background-color="rgba(0,0,255,0.5)">
+  <rect width="10" height="10"/>
+</svg>
+=== recursive-links
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100">
+  <clipPath id="c1"><rect width="10" height="10" clip-path="url(#c1)"/></clipPath>
+  <mask id="m1"><rect width="10" height="10" mask="url(#m2)"/></mask>
+  <mask id="m2"><rect width="10" height="10" mask="url(#m1)"/></mask>
+  <pattern id="p" width="10" height="10" patternUnits="userSpaceOnUse"><rect width="5" height="5" fill="url(#p)"/></pattern>
+  <rect width="50" height="50" clip-path="url(#c1)" mask="url(#m1)" fill="url(#p)"/>
+</svg>
+=== shape-rendering
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" shape-rendering="crispEdges">
+  <rect width="10" height="10"/>
+  <rect x="20" width="10" height="10" shape-rendering="optimizeSpeed"/>
+  <rect x="40" width="10" height="10" shape-rendering="auto"/>
+</svg>
+=== text-without-fonts
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100">
+  <text x="10" y="20" font-size="12">Hello <tspan fill="red">World</tspan></text>
+  <rect width="10" height="10"/>
+</svg>
+=== gzip-like-header
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><!-- comment --><?pi data?><rect width="10" height="10"/></svg>
+=== dtd-entities
+<?xml version="1.0"?>
+<!DOCTYPE svg [ <!ENTITY red "#ff0000"> ]>
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect width="10" height="10" fill="&red;"/></svg>
+=== namespaced
+<s:svg xmlns:s="http://www.w3.org/2000/svg" xmlns:o="http://other" width="100" height="100">
+  <s:rect width="10" height="10" o:fill="red"/>
+  <o:rect width="20" height="20"/>
+</s:svg>
+=== arcs-rotated
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200">
+  <path d="M 50 50 A 30 50 -45 0 1 150 150" fill="none" stroke="black"/>
+  <path d="M 50 150 A 1 1 0 1 1 150 50" fill="none" stroke="red"/>
+  <path d="M 10 10 A 0 10 0 0 0 20 20" fill="none" stroke="green"/>
+  <ellipse cx="100" cy="100" rx="0.001" ry="40"/>
+  <circle cx="50" cy="150" r="33.3333"/>
+</svg>
+=== quad-curves-markers
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100">
+  <marker id="m" markerWidth="3" markerHeight="3"><rect width="3" height="3"/></marker>
+  <path d="M10 10 Q 50 90 90 10 M 10 50 L 20 50 z" stroke="black" fill="none" marker-start="url(#m)" marker-mid="url(#m)" marker-end="url(#m)"/>
+</svg>
+=== deep-groups
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100">
+  <g transform="translate(5 5)"><g opacity="0.9"><g transform="rotate(5)" id="x"><g><rect width="10" height="10" transform="translate(1 1)"/></g></g></g></g>
+</svg>
+=== a-element
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100">
+  <a href="https://example.org"><rect width="10" height="10"/></a>
+</svg>
+=== pattern-in-mask-shared
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100">
+  <pattern id="p" width="0.5" height="0.5"><rect width="5" height="5" fill="white"/></pattern>
+  <mask id="m" maskUnits="userSpaceOnUse" x="0" y="0" width="100" height="100"><rect width="100" height="100" fill="url(#p)"/></mask>
+  <rect width="40" height="40" mask="url(#m)"/>
+  <rect x="50" width="40" height="40" mask="url(#m)"/>
+</svg>

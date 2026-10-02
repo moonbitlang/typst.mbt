@@ -1,0 +1,1246 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/usvg"
+
+import {
+  "moonbitlang/typst/data/xml",
+  "moonbitlang/typst/otf",
+  "moonbitlang/typst/svgtypes",
+  "moonbitlang/typst/tiny_skia_path",
+  "moonbitlang/typst/xmlwriter",
+}
+
+// Values
+pub fn decompress_svgz(Bytes) -> Bytes raise UsvgError
+
+pub fn svg_paint_order_to_usvg(@svgtypes.PaintOrder) -> PaintOrder
+
+// Errors
+pub(all) suberror UsvgError {
+  NotAnUtf8Str
+  MalformedGZip
+  ElementsLimitReached
+  InvalidSize
+  ParsingFailed(@xml.XmlError)
+}
+pub impl Show for UsvgError
+
+// Types and methods
+pub(all) enum AId {
+  AlignmentBaseline
+  Amplitude
+  Azimuth
+  BackgroundColor
+  BaseFrequency
+  BaselineShift
+  Bias
+  Class
+  Clip
+  ClipPath
+  ClipRule
+  ClipPathUnits
+  Color
+  ColorInterpolation
+  ColorInterpolationFilters
+  ColorProfile
+  ColorRendering
+  Cx
+  Cy
+  D
+  DiffuseConstant
+  Direction
+  Display
+  Divisor
+  DominantBaseline
+  Dx
+  Dy
+  EdgeMode
+  Elevation
+  EnableBackground
+  Exponent
+  Fill
+  FillOpacity
+  FillRule
+  Filter
+  FilterUnits
+  FloodColor
+  FloodOpacity
+  Font
+  FontFamily
+  FontFeatureSettings
+  FontKerning
+  FontOpticalSizing
+  FontSize
+  FontSizeAdjust
+  FontStretch
+  FontStyle
+  FontSynthesis
+  FontVariant
+  FontVariantCaps
+  FontVariantEastAsian
+  FontVariantLigatures
+  FontVariantNumeric
+  FontVariantPosition
+  FontVariationSettings
+  FontWeight
+  Fr
+  Fx
+  Fy
+  GlyphOrientationHorizontal
+  GlyphOrientationVertical
+  GradientTransform
+  GradientUnits
+  Height
+  Href
+  Id
+  ImageRendering
+  In
+  In2
+  InlineSize
+  Intercept
+  Isolation
+  K1
+  K2
+  K3
+  K4
+  KernelMatrix
+  KernelUnitLength
+  Kerning
+  LengthAdjust
+  LetterSpacing
+  LightingColor
+  LimitingConeAngle
+  LineHeight
+  MarkerEnd
+  MarkerMid
+  MarkerStart
+  MarkerHeight
+  MarkerUnits
+  MarkerWidth
+  Mask
+  MaskBorder
+  MaskBorderMode
+  MaskBorderOutset
+  MaskBorderRepeat
+  MaskBorderSlice
+  MaskBorderSource
+  MaskBorderWidth
+  MaskClip
+  MaskComposite
+  MaskImage
+  MaskMode
+  MaskOrigin
+  MaskPosition
+  MaskSize
+  MaskType
+  MaskContentUnits
+  MaskUnits
+  MixBlendMode
+  Mode
+  NumOctaves
+  Offset
+  Opacity
+  Operator
+  Order
+  Orient
+  Overflow
+  PaintOrder
+  Path
+  PathLength
+  PatternContentUnits
+  PatternTransform
+  PatternUnits
+  Points
+  PointsAtX
+  PointsAtY
+  PointsAtZ
+  PreserveAlpha
+  PreserveAspectRatio
+  PrimitiveUnits
+  R
+  Radius
+  RefX
+  RefY
+  RequiredExtensions
+  RequiredFeatures
+  Result
+  Rotate
+  Rx
+  Ry
+  Scale
+  Seed
+  ShapeImageThreshold
+  ShapeInside
+  ShapeMargin
+  ShapePadding
+  ShapeRendering
+  ShapeSubtract
+  Side
+  Slope
+  Space
+  SpecularConstant
+  SpecularExponent
+  SpreadMethod
+  StartOffset
+  StdDeviation
+  StitchTiles
+  StopColor
+  StopOpacity
+  Stroke
+  StrokeDasharray
+  StrokeDashoffset
+  StrokeLinecap
+  StrokeLinejoin
+  StrokeMiterlimit
+  StrokeOpacity
+  StrokeWidth
+  Style
+  SurfaceScale
+  SystemLanguage
+  TableValues
+  TargetX
+  TargetY
+  TextAlign
+  TextAlignLast
+  TextAnchor
+  TextDecoration
+  TextDecorationColor
+  TextDecorationFill
+  TextDecorationLine
+  TextDecorationStroke
+  TextDecorationStyle
+  TextIndent
+  TextOrientation
+  TextOverflow
+  TextRendering
+  TextUnderlinePosition
+  TextLength
+  Transform
+  TransformBox
+  TransformOrigin
+  Type
+  UnicodeBidi
+  UnicodeRange
+  Values
+  VectorEffect
+  ViewBox
+  Visibility
+  WhiteSpace
+  Width
+  WordSpacing
+  WritingMode
+  X
+  X1
+  X2
+  XChannelSelector
+  Y
+  Y1
+  Y2
+  YChannelSelector
+  Z
+} derive(Eq, Hash)
+pub fn AId::debug_name(Self) -> String
+pub fn AId::from_str(String) -> Self?
+pub fn AId::to_str(Self) -> String
+
+pub(all) enum AlignmentBaseline {
+  Auto
+  Baseline
+  BeforeEdge
+  TextBeforeEdge
+  Middle
+  Central
+  AfterEdge
+  TextAfterEdge
+  Ideographic
+  Alphabetic
+  Hanging
+  Mathematical
+} derive(Eq)
+pub impl Default for AlignmentBaseline
+
+pub struct Attribute {
+  name : AId
+  mut value : String
+  important : Bool
+}
+
+pub struct BaseGradient {
+  // private fields
+}
+
+pub(all) enum BaselineShift {
+  Baseline
+  Subscript
+  Superscript
+  Number(Float)
+} derive(Eq)
+pub impl Default for BaselineShift
+
+pub(all) enum BlendMode {
+  Normal
+  Multiply
+  Screen
+  Overlay
+  Darken
+  Lighten
+  ColorDodge
+  ColorBurn
+  HardLight
+  SoftLight
+  Difference
+  Exclusion
+  Hue
+  Saturation
+  Color
+  Luminosity
+} derive(Eq)
+pub impl Default for BlendMode
+pub impl Show for BlendMode
+pub impl FromValue for BlendMode
+
+pub struct ClipPath {
+  // private fields
+}
+pub fn ClipPath::clip_path(Self) -> Self?
+pub fn ClipPath::id(Self) -> String
+pub fn ClipPath::root(Self) -> Group
+pub fn ClipPath::transform(Self) -> @tiny_skia_path.Transform
+
+pub(all) struct Color {
+  red : Int
+  green : Int
+  blue : Int
+} derive(Eq)
+pub fn Color::black() -> Self
+pub fn Color::new_rgb(Int, Int, Int) -> Self
+pub fn Color::white() -> Self
+
+pub(all) enum ColorChannel {
+  R
+  G
+  B
+  A
+} derive(Eq)
+
+pub(all) enum ColorInterpolation {
+  SRGB
+  LinearRGB
+} derive(Eq)
+pub impl Default for ColorInterpolation
+
+pub(all) enum ColorMatrixKind {
+  Matrix(Array[Float])
+  Saturate(PositiveF32)
+  HueRotate(Float)
+  LuminanceToAlpha
+}
+pub impl Default for ColorMatrixKind
+
+pub(all) enum CompositeOperator {
+  Over
+  In
+  Out
+  Atop
+  Xor
+  Arithmetic(k1~ : Float, k2~ : Float, k3~ : Float, k4~ : Float)
+} derive(Eq)
+
+pub(all) struct ConvolveMatrixData {
+  target_x : UInt
+  target_y : UInt
+  columns : UInt
+  rows : UInt
+  data : Array[Float]
+}
+pub fn ConvolveMatrixData::get(Self, UInt, UInt) -> Float
+
+pub(all) enum DbStyle {
+  Normal
+  Italic
+  Oblique
+} derive(Eq)
+
+pub(all) struct DistantLight {
+  azimuth : Float
+  elevation : Float
+}
+
+pub struct Document {
+  // private fields
+}
+pub fn Document::descendants(Self) -> Iter[SvgNode]
+pub fn Document::element_by_id(Self, String) -> SvgNode?
+pub fn Document::parse_tree(@xml.Document, injected_stylesheet? : String) -> Self raise @xml.XmlError
+pub fn Document::root(Self) -> SvgNode
+pub fn Document::root_element(Self) -> SvgNode
+
+pub(all) enum DominantBaseline {
+  Auto
+  UseScript
+  NoChange
+  ResetSize
+  Ideographic
+  Alphabetic
+  Hanging
+  Mathematical
+  Central
+  Middle
+  TextAfterEdge
+  TextBeforeEdge
+} derive(Eq)
+pub impl Default for DominantBaseline
+
+pub(all) enum EId {
+  A
+  Circle
+  ClipPath
+  Defs
+  Ellipse
+  FeBlend
+  FeColorMatrix
+  FeComponentTransfer
+  FeComposite
+  FeConvolveMatrix
+  FeDiffuseLighting
+  FeDisplacementMap
+  FeDistantLight
+  FeDropShadow
+  FeFlood
+  FeFuncA
+  FeFuncB
+  FeFuncG
+  FeFuncR
+  FeGaussianBlur
+  FeImage
+  FeMerge
+  FeMergeNode
+  FeMorphology
+  FeOffset
+  FePointLight
+  FeSpecularLighting
+  FeSpotLight
+  FeTile
+  FeTurbulence
+  Filter
+  G
+  Image
+  Line
+  LinearGradient
+  Marker
+  Mask
+  Path
+  Pattern
+  Polygon
+  Polyline
+  RadialGradient
+  Rect
+  Stop
+  Style
+  Svg
+  Switch
+  Symbol
+  Text
+  TextPath
+  Tref
+  Tspan
+  Use
+} derive(Eq, Hash)
+pub fn EId::debug_name(Self) -> String
+pub fn EId::from_str(String) -> Self?
+pub fn EId::is_gradient(Self) -> Bool
+pub fn EId::is_graphic(Self) -> Bool
+pub fn EId::is_paint_server(Self) -> Bool
+pub fn EId::to_str(Self) -> String
+
+pub(all) enum EdgeMode {
+  EdgeNone
+  Duplicate
+  Wrap
+} derive(Eq)
+
+pub(all) struct FaceInfo {
+  mut id : Int
+  source : Bytes
+  index : UInt
+  families : Array[(String, @otf.Language)]
+  post_script_name : String
+  style : DbStyle
+  weight : Int
+  stretch : FontStretch
+  monospaced : Bool
+}
+
+pub(all) struct FeBlend {
+  input1 : FilterInput
+  input2 : FilterInput
+  mode : BlendMode
+}
+
+pub(all) struct FeColorMatrix {
+  input : FilterInput
+  kind : ColorMatrixKind
+}
+
+pub(all) struct FeComponentTransfer {
+  input : FilterInput
+  func_r : TransferFunction
+  func_g : TransferFunction
+  func_b : TransferFunction
+  func_a : TransferFunction
+}
+
+pub(all) struct FeComposite {
+  input1 : FilterInput
+  input2 : FilterInput
+  operator : CompositeOperator
+}
+
+pub(all) struct FeConvolveMatrix {
+  input : FilterInput
+  matrix : ConvolveMatrixData
+  divisor : NonZeroF32
+  bias : Float
+  edge_mode : EdgeMode
+  preserve_alpha : Bool
+}
+
+pub(all) struct FeDiffuseLighting {
+  input : FilterInput
+  surface_scale : Float
+  diffuse_constant : Float
+  lighting_color : Color
+  light_source : LightSource
+}
+
+pub(all) struct FeDisplacementMap {
+  input1 : FilterInput
+  input2 : FilterInput
+  scale : Float
+  x_channel_selector : ColorChannel
+  y_channel_selector : ColorChannel
+}
+
+pub(all) struct FeDropShadow {
+  input : FilterInput
+  dx : Float
+  dy : Float
+  std_dev_x : PositiveF32
+  std_dev_y : PositiveF32
+  color : Color
+  opacity : NormalizedF32
+}
+
+pub(all) struct FeFlood {
+  color : Color
+  opacity : NormalizedF32
+}
+
+pub(all) struct FeGaussianBlur {
+  input : FilterInput
+  std_dev_x : PositiveF32
+  std_dev_y : PositiveF32
+}
+
+pub(all) struct FeImage {
+  root : Group
+}
+pub fn FeImage::root(Self) -> Group
+
+pub(all) struct FeMerge {
+  inputs : Array[FilterInput]
+}
+
+pub(all) struct FeMorphology {
+  input : FilterInput
+  operator : MorphologyOperator
+  radius_x : PositiveF32
+  radius_y : PositiveF32
+}
+
+pub(all) struct FeOffset {
+  input : FilterInput
+  dx : Float
+  dy : Float
+}
+
+pub(all) struct FeSpecularLighting {
+  input : FilterInput
+  surface_scale : Float
+  specular_constant : Float
+  specular_exponent : Float
+  lighting_color : Color
+  light_source : LightSource
+}
+
+pub(all) struct FeTile {
+  input : FilterInput
+}
+
+pub(all) struct FeTurbulence {
+  base_frequency_x : PositiveF32
+  base_frequency_y : PositiveF32
+  num_octaves : UInt
+  seed : Int
+  stitch_tiles : Bool
+  kind : TurbulenceKind
+}
+
+pub struct Fill {
+  // private fields
+}
+pub fn Fill::opacity(Self) -> NormalizedF32
+pub fn Fill::paint(Self) -> Paint
+pub fn Fill::rule(Self) -> FillRule
+pub impl Default for Fill
+
+pub(all) enum FillRule {
+  NonZero
+  EvenOdd
+} derive(Eq)
+pub impl Default for FillRule
+
+pub struct Filter {
+  // private fields
+}
+pub fn Filter::id(Self) -> String
+pub fn Filter::primitives(Self) -> Array[Primitive]
+pub fn Filter::rect(Self) -> @tiny_skia_path.NonZeroRect
+
+pub(all) enum FilterInput {
+  SourceGraphic
+  SourceAlpha
+  Reference(String)
+} derive(Eq)
+
+pub(all) enum FilterKind {
+  Blend(FeBlend)
+  ColorMatrix(FeColorMatrix)
+  ComponentTransfer(FeComponentTransfer)
+  Composite(FeComposite)
+  ConvolveMatrix(FeConvolveMatrix)
+  DiffuseLighting(FeDiffuseLighting)
+  DisplacementMap(FeDisplacementMap)
+  DropShadow(FeDropShadow)
+  Flood(FeFlood)
+  GaussianBlur(FeGaussianBlur)
+  Image(FeImage)
+  Merge(FeMerge)
+  Morphology(FeMorphology)
+  Offset(FeOffset)
+  SpecularLighting(FeSpecularLighting)
+  Tile(FeTile)
+  Turbulence(FeTurbulence)
+}
+pub fn FilterKind::has_input(Self, FilterInput) -> Bool
+
+pub struct Font {
+  // private fields
+} derive(Eq)
+pub fn Font::families(Self) -> Array[@svgtypes.FontFamily]
+pub fn Font::stretch(Self) -> FontStretch
+pub fn Font::style(Self) -> FontStyle
+pub fn Font::variations(Self) -> Array[FontVariation]
+pub fn Font::weight(Self) -> Int
+
+pub struct FontDatabase {
+  // private fields
+}
+pub fn FontDatabase::clone(Self) -> Self
+pub fn FontDatabase::face(Self, Int) -> FaceInfo?
+pub fn FontDatabase::faces(Self) -> Array[FaceInfo]
+pub fn FontDatabase::family_name(Self, @svgtypes.FontFamily) -> String
+pub fn FontDatabase::is_empty(Self) -> Bool
+pub fn FontDatabase::len(Self) -> Int
+pub fn FontDatabase::load_font_data(Self, Bytes) -> Unit
+pub fn FontDatabase::new() -> Self
+pub fn FontDatabase::push_face_info(Self, FaceInfo) -> Int
+pub fn FontDatabase::query(Self, FontQuery) -> Int?
+pub fn FontDatabase::set_cursive_family(Self, String) -> Unit
+pub fn FontDatabase::set_fantasy_family(Self, String) -> Unit
+pub fn FontDatabase::set_monospace_family(Self, String) -> Unit
+pub fn FontDatabase::set_sans_serif_family(Self, String) -> Unit
+pub fn FontDatabase::set_serif_family(Self, String) -> Unit
+pub fn[T] FontDatabase::with_face_data(Self, Int, (Bytes, UInt) -> T) -> T?
+
+pub(all) enum FontOpticalSizing {
+  OpticalAuto
+  OpticalNone
+} derive(Eq)
+pub impl Default for FontOpticalSizing
+
+pub(all) struct FontQuery {
+  families : Array[@svgtypes.FontFamily]
+  weight : Int
+  stretch : FontStretch
+  style : DbStyle
+}
+
+pub(all) struct FontResolver {
+  select_font : (Font, FontDatabase) -> Int?
+  select_fallback : (Char, Array[Int], FontDatabase) -> Int?
+}
+pub fn FontResolver::default_fallback_selector() -> (Char, Array[Int], FontDatabase) -> Int?
+pub fn FontResolver::default_font_selector() -> (Font, FontDatabase) -> Int?
+pub impl Default for FontResolver
+
+pub(all) enum FontStretch {
+  UltraCondensed
+  ExtraCondensed
+  Condensed
+  SemiCondensed
+  Normal
+  SemiExpanded
+  Expanded
+  ExtraExpanded
+  UltraExpanded
+} derive(Compare, Eq, Hash)
+pub fn FontStretch::to_number(Self) -> Int
+pub impl Default for FontStretch
+
+pub(all) enum FontStyle {
+  Normal
+  Italic
+  Oblique
+} derive(Eq, Hash)
+pub impl Default for FontStyle
+
+pub(all) struct FontVariation {
+  tag : FixedArray[Byte]
+  value : Float
+}
+pub fn FontVariation::new(FixedArray[Byte], Float) -> Self
+pub impl Eq for FontVariation
+pub impl Hash for FontVariation
+
+pub struct Group {
+  // private fields
+}
+pub fn Group::abs_bounding_box(Self) -> @tiny_skia_path.Rect
+pub fn Group::abs_layer_bounding_box(Self) -> @tiny_skia_path.NonZeroRect
+pub fn Group::abs_stroke_bounding_box(Self) -> @tiny_skia_path.Rect
+pub fn Group::abs_transform(Self) -> @tiny_skia_path.Transform
+pub fn Group::blend_mode(Self) -> BlendMode
+pub fn Group::bounding_box(Self) -> @tiny_skia_path.Rect
+pub fn Group::children(Self) -> Array[Node]
+pub fn Group::clip_path(Self) -> ClipPath?
+pub fn Group::filters(Self) -> Array[Filter]
+pub fn Group::filters_bounding_box(Self) -> @tiny_skia_path.NonZeroRect?
+pub fn Group::has_children(Self) -> Bool
+pub fn Group::id(Self) -> String
+pub fn Group::isolate(Self) -> Bool
+pub fn Group::layer_bounding_box(Self) -> @tiny_skia_path.NonZeroRect
+pub fn Group::mask(Self) -> Mask?
+pub fn Group::opacity(Self) -> NormalizedF32
+pub fn Group::should_isolate(Self) -> Bool
+pub fn Group::stroke_bounding_box(Self) -> @tiny_skia_path.Rect
+pub fn Group::transform(Self) -> @tiny_skia_path.Transform
+
+pub struct Image {
+  // private fields
+}
+pub fn Image::abs_bounding_box(Self) -> @tiny_skia_path.Rect
+pub fn Image::abs_transform(Self) -> @tiny_skia_path.Transform
+pub fn Image::bounding_box(Self) -> @tiny_skia_path.Rect
+pub fn Image::id(Self) -> String
+pub fn Image::is_visible(Self) -> Bool
+pub fn Image::kind(Self) -> ImageKind
+pub fn Image::rendering_mode(Self) -> ImageRendering
+pub fn Image::size(Self) -> @tiny_skia_path.Size
+
+pub(all) struct ImageHrefResolver {
+  resolve_data : (String, Bytes, Options) -> ImageKind?
+  resolve_string : (String, Options) -> ImageKind?
+}
+pub fn ImageHrefResolver::default_data_resolver() -> (String, Bytes, Options) -> ImageKind?
+pub fn ImageHrefResolver::default_string_resolver() -> (String, Options) -> ImageKind?
+pub impl Default for ImageHrefResolver
+
+pub(all) enum ImageKind {
+  JPEG(Bytes)
+  PNG(Bytes)
+  GIF(Bytes)
+  WEBP(Bytes)
+  SVG(Tree)
+}
+
+pub(all) enum ImageRendering {
+  OptimizeQuality
+  OptimizeSpeed
+  Smooth
+  HighQuality
+  CrispEdges
+  Pixelated
+} derive(Eq)
+pub impl Default for ImageRendering
+pub impl FromValue for ImageRendering
+
+pub struct LayoutSpan {
+  paint_order : PaintOrder
+  font_size : NonZeroPositiveF32
+  variations : Array[FontVariation]
+  font_optical_sizing : FontOpticalSizing
+  visible : Bool
+  positioned_glyphs : Array[PositionedGlyph]
+  underline : Path?
+  overline : Path?
+  line_through : Path?
+  // private fields
+}
+pub fn LayoutSpan::fill(Self) -> Fill?
+pub fn LayoutSpan::stroke(Self) -> Stroke?
+
+pub(all) enum LengthAdjust {
+  Spacing
+  SpacingAndGlyphs
+} derive(Eq)
+pub impl Default for LengthAdjust
+
+pub(all) enum LightSource {
+  DistantLight(DistantLight)
+  PointLight(PointLight)
+  SpotLight(SpotLight)
+}
+
+pub(all) enum LineCap {
+  Butt
+  Round
+  Square
+} derive(Eq)
+pub impl Default for LineCap
+
+pub(all) enum LineJoin {
+  Miter
+  MiterClip
+  Round
+  Bevel
+} derive(Eq)
+pub impl Default for LineJoin
+
+pub struct LinearGradient {
+  // private fields
+}
+pub fn LinearGradient::id(Self) -> String
+pub fn LinearGradient::spread_method(Self) -> SpreadMethod
+pub fn LinearGradient::stops(Self) -> Array[Stop]
+pub fn LinearGradient::transform(Self) -> @tiny_skia_path.Transform
+pub fn LinearGradient::x1(Self) -> Float
+pub fn LinearGradient::x2(Self) -> Float
+pub fn LinearGradient::y1(Self) -> Float
+pub fn LinearGradient::y2(Self) -> Float
+
+pub struct Mask {
+  // private fields
+}
+pub fn Mask::id(Self) -> String
+pub fn Mask::kind(Self) -> MaskType
+pub fn Mask::mask(Self) -> Self?
+pub fn Mask::rect(Self) -> @tiny_skia_path.NonZeroRect
+pub fn Mask::root(Self) -> Group
+
+pub(all) enum MaskType {
+  Luminance
+  Alpha
+} derive(Eq)
+pub impl Default for MaskType
+
+pub(all) enum MorphologyOperator {
+  Erode
+  Dilate
+} derive(Eq)
+
+pub(all) enum Node {
+  Group(Group)
+  Path(Path)
+  Image(Image)
+  Text(Text)
+}
+pub fn Node::abs_bounding_box(Self) -> @tiny_skia_path.Rect
+pub fn Node::abs_layer_bounding_box(Self) -> @tiny_skia_path.NonZeroRect?
+pub fn Node::abs_stroke_bounding_box(Self) -> @tiny_skia_path.Rect
+pub fn Node::abs_transform(Self) -> @tiny_skia_path.Transform
+pub fn Node::bounding_box(Self) -> @tiny_skia_path.Rect
+pub fn Node::id(Self) -> String
+pub fn Node::stroke_bounding_box(Self) -> @tiny_skia_path.Rect
+pub fn Node::subroots(Self, (Group) -> Unit) -> Unit
+
+pub struct NonZeroF32(Float)
+pub fn NonZeroF32::get(Self) -> Float
+pub fn NonZeroF32::new(Float) -> Self?
+
+#alias(StrokeWidth)
+pub struct NonZeroPositiveF32(Float) derive(Eq)
+pub fn NonZeroPositiveF32::get(Self) -> Float
+pub fn NonZeroPositiveF32::new(Float) -> Self?
+
+#alias(Opacity)
+#alias(StopOffset)
+pub struct NormalizedF32(Float) derive(Eq)
+pub fn NormalizedF32::get(Self) -> Float
+pub fn NormalizedF32::new(Float) -> Self?
+pub fn NormalizedF32::new_clamped(Float) -> Self
+pub fn NormalizedF32::new_u8(Int) -> Self
+pub fn NormalizedF32::one() -> Self
+pub fn NormalizedF32::to_u8(Self) -> Int
+pub fn NormalizedF32::zero() -> Self
+pub impl Mul for NormalizedF32
+pub impl FromValue for NormalizedF32
+
+pub(all) struct Options {
+  resources_dir : String?
+  dpi : Float
+  font_family : String
+  font_size : Float
+  languages : Array[String]
+  shape_rendering : ShapeRendering
+  text_rendering : TextRendering
+  image_rendering : ImageRendering
+  default_size : @tiny_skia_path.Size
+  image_href_resolver : ImageHrefResolver
+  font_resolver : FontResolver
+  fontdb : FontDatabase
+  style_sheet : String?
+}
+pub impl Default for Options
+
+pub(all) enum Paint {
+  Color(Color)
+  LinearGradient(LinearGradient)
+  RadialGradient(RadialGradient)
+  Pattern(Pattern)
+}
+pub impl Eq for Paint
+
+pub(all) enum PaintOrder {
+  FillAndStroke
+  StrokeAndFill
+} derive(Eq)
+pub impl Default for PaintOrder
+
+pub struct Path {
+  // private fields
+}
+pub fn Path::abs_bounding_box(Self) -> @tiny_skia_path.Rect
+pub fn Path::abs_stroke_bounding_box(Self) -> @tiny_skia_path.Rect
+pub fn Path::abs_transform(Self) -> @tiny_skia_path.Transform
+pub fn Path::bounding_box(Self) -> @tiny_skia_path.Rect
+pub fn Path::data(Self) -> @tiny_skia_path.Path
+pub fn Path::fill(Self) -> Fill?
+pub fn Path::id(Self) -> String
+pub fn Path::is_visible(Self) -> Bool
+pub fn Path::paint_order(Self) -> PaintOrder
+pub fn Path::rendering_mode(Self) -> ShapeRendering
+pub fn Path::stroke(Self) -> Stroke?
+pub fn Path::stroke_bounding_box(Self) -> @tiny_skia_path.Rect
+
+pub struct Pattern {
+  // private fields
+}
+pub fn Pattern::id(Self) -> String
+pub fn Pattern::rect(Self) -> @tiny_skia_path.NonZeroRect
+pub fn Pattern::root(Self) -> Group
+pub fn Pattern::transform(Self) -> @tiny_skia_path.Transform
+
+pub(all) struct PointLight {
+  x : Float
+  y : Float
+  z : Float
+}
+
+pub struct PositionedGlyph {
+  id : Int
+  text : String
+  font : Int
+  // private fields
+}
+pub fn PositionedGlyph::cbdt_transform(Self, Float, Float, Float, Float) -> @tiny_skia_path.Transform
+pub fn PositionedGlyph::colr_transform(Self) -> @tiny_skia_path.Transform
+pub fn PositionedGlyph::font_size(Self) -> Float
+pub fn PositionedGlyph::outline_transform(Self) -> @tiny_skia_path.Transform
+pub fn PositionedGlyph::sbix_transform(Self, Float, Float, Float, Float, Float, Float) -> @tiny_skia_path.Transform
+pub fn PositionedGlyph::svg_transform(Self) -> @tiny_skia_path.Transform
+pub fn PositionedGlyph::transform(Self) -> @tiny_skia_path.Transform
+
+pub struct PositiveF32(Float) derive(Eq)
+pub fn PositiveF32::get(Self) -> Float
+pub fn PositiveF32::new(Float) -> Self?
+pub fn PositiveF32::zero() -> Self
+
+pub struct Primitive {
+  // private fields
+}
+pub fn Primitive::color_interpolation(Self) -> ColorInterpolation
+pub fn Primitive::kind(Self) -> FilterKind
+pub fn Primitive::rect(Self) -> @tiny_skia_path.NonZeroRect
+pub fn Primitive::result(Self) -> String
+
+pub struct RadialGradient {
+  // private fields
+}
+pub fn RadialGradient::cx(Self) -> Float
+pub fn RadialGradient::cy(Self) -> Float
+pub fn RadialGradient::fr(Self) -> PositiveF32
+pub fn RadialGradient::fx(Self) -> Float
+pub fn RadialGradient::fy(Self) -> Float
+pub fn RadialGradient::id(Self) -> String
+pub fn RadialGradient::r(Self) -> PositiveF32
+pub fn RadialGradient::spread_method(Self) -> SpreadMethod
+pub fn RadialGradient::stops(Self) -> Array[Stop]
+pub fn RadialGradient::transform(Self) -> @tiny_skia_path.Transform
+
+pub(all) enum ShapeRendering {
+  OptimizeSpeed
+  CrispEdges
+  GeometricPrecision
+} derive(Eq)
+pub fn ShapeRendering::use_shape_antialiasing(Self) -> Bool
+pub impl Default for ShapeRendering
+pub impl FromValue for ShapeRendering
+
+pub(all) struct SpotLight {
+  x : Float
+  y : Float
+  z : Float
+  points_at_x : Float
+  points_at_y : Float
+  points_at_z : Float
+  specular_exponent : PositiveF32
+  limiting_cone_angle : Float?
+}
+
+pub(all) enum SpreadMethod {
+  Pad
+  Reflect
+  Repeat
+} derive(Eq)
+pub impl Default for SpreadMethod
+pub impl FromValue for SpreadMethod
+
+pub struct Stop {
+  // private fields
+}
+pub fn Stop::color(Self) -> Color
+pub fn Stop::offset(Self) -> NormalizedF32
+pub fn Stop::opacity(Self) -> NormalizedF32
+
+pub struct Stroke {
+  // private fields
+}
+pub fn Stroke::dasharray(Self) -> Array[Float]?
+pub fn Stroke::dashoffset(Self) -> Float
+pub fn Stroke::linecap(Self) -> LineCap
+pub fn Stroke::linejoin(Self) -> LineJoin
+pub fn Stroke::miterlimit(Self) -> StrokeMiterlimit
+pub fn Stroke::opacity(Self) -> NormalizedF32
+pub fn Stroke::paint(Self) -> Paint
+pub fn Stroke::to_tiny_skia(Self) -> @tiny_skia_path.Stroke
+pub fn Stroke::width(Self) -> NonZeroPositiveF32
+
+pub struct StrokeMiterlimit(Float)
+pub fn StrokeMiterlimit::get(Self) -> Float
+pub fn StrokeMiterlimit::new(Float) -> Self
+pub impl Default for StrokeMiterlimit
+pub impl Eq for StrokeMiterlimit
+
+pub struct SvgNode {
+  // private fields
+}
+pub fn SvgNode::ancestors(Self) -> Iter[Self]
+pub fn[T : FromValue] SvgNode::attribute(Self, AId) -> T?
+pub fn SvgNode::attributes(Self) -> ArrayView[Attribute]
+pub fn SvgNode::children(Self) -> Iter[Self]
+pub fn SvgNode::descendants(Self) -> Iter[Self]
+pub fn SvgNode::document(Self) -> Document
+pub fn SvgNode::element_id(Self) -> String
+pub fn[T : FromValue] SvgNode::find_attribute(Self, AId) -> T?
+pub fn SvgNode::first_child(Self) -> Self?
+pub fn SvgNode::first_element_child(Self) -> Self?
+pub fn SvgNode::has_attribute(Self, AId) -> Bool
+pub fn SvgNode::has_children(Self) -> Bool
+pub fn SvgNode::href_iter(Self) -> Iter[Self]
+pub fn SvgNode::is_element(Self) -> Bool
+pub fn SvgNode::is_text(Self) -> Bool
+pub fn SvgNode::last_child(Self) -> Self?
+pub fn SvgNode::next_sibling(Self) -> Self?
+pub fn SvgNode::parent(Self) -> Self?
+pub fn SvgNode::parent_element(Self) -> Self?
+pub fn SvgNode::tag_name(Self) -> EId?
+pub fn SvgNode::text(Self) -> String
+pub fn[T : FromValue] SvgNode::try_attribute(Self, AId) -> T?
+pub impl Eq for SvgNode
+pub impl FromValue for SvgNode
+
+pub struct Text {
+  // private fields
+}
+pub fn Text::abs_bounding_box(Self) -> @tiny_skia_path.Rect
+pub fn Text::abs_stroke_bounding_box(Self) -> @tiny_skia_path.Rect
+pub fn Text::abs_transform(Self) -> @tiny_skia_path.Transform
+pub fn Text::bounding_box(Self) -> @tiny_skia_path.Rect
+pub fn Text::chunks(Self) -> Array[TextChunk]
+pub fn Text::dx(Self) -> Array[Float]
+pub fn Text::dy(Self) -> Array[Float]
+pub fn Text::flattened(Self) -> Group
+pub fn Text::id(Self) -> String
+pub fn Text::layouted(Self) -> Array[LayoutSpan]
+pub fn Text::rendering_mode(Self) -> TextRendering
+pub fn Text::rotate(Self) -> Array[Float]
+pub fn Text::stroke_bounding_box(Self) -> @tiny_skia_path.Rect
+pub fn Text::writing_mode(Self) -> WritingMode
+
+pub(all) enum TextAnchor {
+  Start
+  Middle
+  End
+} derive(Eq)
+pub impl Default for TextAnchor
+
+pub struct TextChunk {
+  // private fields
+}
+pub fn TextChunk::anchor(Self) -> TextAnchor
+pub fn TextChunk::spans(Self) -> Array[TextSpan]
+pub fn TextChunk::text(Self) -> String
+pub fn TextChunk::text_flow(Self) -> TextFlow
+pub fn TextChunk::x(Self) -> Float?
+pub fn TextChunk::y(Self) -> Float?
+
+pub struct TextDecoration {
+  // private fields
+}
+pub fn TextDecoration::line_through(Self) -> TextDecorationStyle?
+pub fn TextDecoration::overline(Self) -> TextDecorationStyle?
+pub fn TextDecoration::underline(Self) -> TextDecorationStyle?
+
+pub struct TextDecorationStyle {
+  // private fields
+}
+pub fn TextDecorationStyle::fill(Self) -> Fill?
+pub fn TextDecorationStyle::stroke(Self) -> Stroke?
+
+pub(all) enum TextFlow {
+  Linear
+  Path(TextPath)
+}
+
+pub struct TextPath {
+  // private fields
+}
+pub fn TextPath::id(Self) -> String
+pub fn TextPath::path(Self) -> @tiny_skia_path.Path
+pub fn TextPath::start_offset(Self) -> Float
+
+pub(all) enum TextRendering {
+  OptimizeSpeed
+  OptimizeLegibility
+  GeometricPrecision
+} derive(Eq)
+pub impl Default for TextRendering
+pub impl FromValue for TextRendering
+
+pub struct TextSpan {
+  // private fields
+}
+pub fn TextSpan::alignment_baseline(Self) -> AlignmentBaseline
+pub fn TextSpan::apply_kerning(Self) -> Bool
+pub fn TextSpan::baseline_shift(Self) -> Array[BaselineShift]
+pub fn TextSpan::decoration(Self) -> TextDecoration
+pub fn TextSpan::dominant_baseline(Self) -> DominantBaseline
+pub fn TextSpan::end(Self) -> Int
+pub fn TextSpan::fill(Self) -> Fill?
+pub fn TextSpan::font(Self) -> Font
+pub fn TextSpan::font_optical_sizing(Self) -> FontOpticalSizing
+pub fn TextSpan::font_size(Self) -> NonZeroPositiveF32
+pub fn TextSpan::is_visible(Self) -> Bool
+pub fn TextSpan::length_adjust(Self) -> LengthAdjust
+pub fn TextSpan::letter_spacing(Self) -> Float
+pub fn TextSpan::paint_order(Self) -> PaintOrder
+pub fn TextSpan::small_caps(Self) -> Bool
+pub fn TextSpan::start(Self) -> Int
+pub fn TextSpan::stroke(Self) -> Stroke?
+pub fn TextSpan::text_length(Self) -> Float?
+pub fn TextSpan::word_spacing(Self) -> Float
+
+pub(all) enum TransferFunction {
+  Identity
+  Table(Array[Float])
+  Discrete(Array[Float])
+  Linear(slope~ : Float, intercept~ : Float)
+  Gamma(amplitude~ : Float, exponent~ : Float, offset~ : Float)
+}
+
+pub struct Tree {
+  // private fields
+}
+pub fn Tree::clip_paths(Self) -> Array[ClipPath]
+pub fn Tree::filters(Self) -> Array[Filter]
+pub fn Tree::fontdb(Self) -> FontDatabase
+pub fn Tree::from_data(Bytes, Options) -> Self raise UsvgError
+pub fn Tree::from_data_nested(Bytes, Options) -> Self raise UsvgError
+pub fn Tree::from_str(String, Options) -> Self raise UsvgError
+pub fn Tree::from_xmltree(@xml.Document, Options) -> Self raise UsvgError
+pub fn Tree::has_defs_nodes(Self) -> Bool
+pub fn Tree::has_text_nodes(Self) -> Bool
+pub fn Tree::linear_gradients(Self) -> Array[LinearGradient]
+pub fn Tree::masks(Self) -> Array[Mask]
+pub fn Tree::node_by_id(Self, String) -> Node?
+pub fn Tree::patterns(Self) -> Array[Pattern]
+pub fn Tree::radial_gradients(Self) -> Array[RadialGradient]
+pub fn Tree::root(Self) -> Group
+pub fn Tree::size(Self) -> @tiny_skia_path.Size
+pub fn Tree::to_string(Self, WriteOptions) -> String
+
+pub(all) enum TurbulenceKind {
+  FractalNoise
+  Turbulence
+} derive(Eq)
+
+pub(all) enum Units {
+  UserSpaceOnUse
+  ObjectBoundingBox
+} derive(Eq)
+pub impl FromValue for Units
+
+pub(all) enum Visibility {
+  Visible
+  Hidden
+  Collapse
+} derive(Eq)
+pub impl Default for Visibility
+pub impl FromValue for Visibility
+
+pub(all) struct WriteOptions {
+  id_prefix : String?
+  preserve_text : Bool
+  coordinates_precision : Int
+  transforms_precision : Int
+  use_single_quote : Bool
+  indent : @xmlwriter.Indent
+  attributes_indent : @xmlwriter.Indent
+}
+pub impl Default for WriteOptions
+
+pub(all) enum WritingMode {
+  LeftToRight
+  TopToBottom
+} derive(Eq)
+
+// Type aliases
+pub type FontId = Int
+
+// Traits
+pub(open) trait FromValue {
+  fn parse(SvgNode, AId, String) -> Self?
+}
+pub impl FromValue for Float
+pub impl FromValue for String
+pub impl FromValue for Array[Float]
+pub impl FromValue for @svgtypes.Angle
+pub impl FromValue for @svgtypes.AspectRatio
+pub impl FromValue for @svgtypes.Color
+pub impl FromValue for @svgtypes.EnableBackground
+pub impl FromValue for @svgtypes.Length
+pub impl FromValue for @svgtypes.Paint
+pub impl FromValue for @svgtypes.PaintOrder
+pub impl FromValue for @svgtypes.TransformOrigin
+pub impl FromValue for @svgtypes.ViewBox
+pub impl FromValue for @tiny_skia_path.Transform

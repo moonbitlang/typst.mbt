@@ -1,0 +1,13 @@
+import {
+  "moonbitlang/core/math",
+  "moonbitlang/core/float",
+  "moonbitlang/core/double",
+}
+
+options(
+  "native-stub": [ "sincos_stub.c" ],
+  targets: {
+    "libm_native.mbt": [ "native" ],
+    "libm_other.mbt": [ "not", "native" ],
+  },
+)

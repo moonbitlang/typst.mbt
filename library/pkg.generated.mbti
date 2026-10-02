@@ -17,6 +17,7 @@ import {
   "moonbitlang/typst/syntect",
   "moonbitlang/typst/time",
   "moonbitlang/typst/unicode",
+  "moonbitlang/typst/usvg",
 }
 
 // Values
@@ -520,7 +521,11 @@ pub let bibliography_elem_region : Int
 
 pub let bibliography_elem_sources : Int
 
+pub let bibliography_elem_sources_derived : Int
+
 pub let bibliography_elem_style : Int
+
+pub let bibliography_elem_style_derived : Int
 
 pub let bibliography_elem_target : Int
 
@@ -667,6 +672,8 @@ pub let cite_elem_lang : Int
 pub let cite_elem_region : Int
 
 pub let cite_elem_style : Int
+
+pub let cite_elem_style_derived : Int
 
 pub let cite_elem_supplement : Int
 
@@ -1278,6 +1285,8 @@ pub let image_elem_height : Int
 
 pub let image_elem_icc : Int
 
+pub let image_elem_icc_derived : Int
+
 pub let image_elem_locale : Int
 
 pub let image_elem_page : Int
@@ -1285,6 +1294,8 @@ pub let image_elem_page : Int
 pub let image_elem_scaling : Int
 
 pub let image_elem_source : Int
+
+pub let image_elem_source_derived : Int
 
 pub let image_elem_width : Int
 
@@ -2296,6 +2307,8 @@ pub let pdf_attach_elem_mime_type : Int
 
 pub let pdf_attach_elem_path : Int
 
+pub let pdf_attach_elem_path_derived : Int
+
 pub let pdf_attach_elem_relationship : Int
 
 pub fn pdf_format() -> Format
@@ -2404,11 +2417,15 @@ pub let raw_elem_lines : Int
 
 pub let raw_elem_syntaxes : Int
 
+pub let raw_elem_syntaxes_derived : Int
+
 pub let raw_elem_tab_size : Int
 
 pub let raw_elem_text : Int
 
 pub let raw_elem_theme : Int
+
+pub let raw_elem_theme_derived : Int
 
 pub fn raw_line_elem() -> Element
 
@@ -5277,6 +5294,7 @@ pub(all) enum DynValue {
   BlockSingleCallback(BlockSingleCallback)
   BlockMultiCallback(BlockMultiCallback)
   Decoration(Decoration)
+  Loaded(Loaded)
 } derive(Eq)
 pub fn DynValue::add_dyn(Self, Self) -> Value? raise HintedError
 pub fn DynValue::field(Self, String) -> Value??
@@ -7491,6 +7509,7 @@ pub(all) struct Loaded {
   data : Bytes
 } derive(Eq, Hash)
 pub fn Loaded::new(@syntax.Spanned[LoadSource], Bytes) -> Self
+pub impl Fingerprint for Loaded
 
 pub(all) struct Locale {
   lang : Lang
@@ -10570,6 +10589,7 @@ pub fn SvgImage::data(Self) -> Bytes
 pub fn SvgImage::height(Self) -> Double
 pub fn SvgImage::new(Bytes) -> Self raise LoadErr
 pub fn SvgImage::synthetic(Bytes, Double, Double) -> Self
+pub fn SvgImage::tree(Self) -> @usvg.Tree
 pub fn SvgImage::width(Self) -> Double
 pub fn SvgImage::with_fonts_images(Bytes, &World, Array[String], @syntax.FileId?) -> (Self, Array[HintedString]) raise LoadErr
 pub impl Eq for SvgImage

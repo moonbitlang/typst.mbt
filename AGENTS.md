@@ -92,3 +92,12 @@
   HTML/SVG documents and UTF-8 assets, and the diagnostics. PDF/PNG
   exporters are plugged in as `BundleOptions.pdf`/`png` hooks; runner flag
   `--stub-binary` stubs them to check everything but their bytes.
+- PDF export (`pdf/`, port of typst-pdf) runs on pdflite's `export` package
+  (office.mbt, linked via `moon.work` member `../office.mbt-typst-pdf/pdflite`;
+  krilla-specific behavior lives there, Typst semantics such as the tag tree
+  stay in `pdf/`). Stages: `pdf-semantic` (canonical PDF dump, numbers within
+  0.02), `pdftags` (upstream's tag-tree YAML), `pdf-semantic-replay`
+  (upstream frames from the `paged` goldens), and `pdf-extract-check` /
+  `pdftags-check` (our readers on upstream's PDFs, saved by the oracle with
+  `ORACLE_SAVE_PDF=<dir>`; pass `--upstream-pdfs=<dir>`). Upstream PDF byte
+  hashes are not a goal.

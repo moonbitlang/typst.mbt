@@ -1,7 +1,7 @@
 // Differential test runner: compares the MoonBit port against reference
 // outputs dumped by the Rust oracle (see `scripts/goldens.sh`).
 //
-// Usage: moon run tests/runner -- <syntax|ast|reparse|eval|html|bundle|realize|paged|svg|svg-replay|font|break|shape|shape-hb> [filter] [--verbose]
+// Usage: moon run tests/runner -- <syntax|ast|reparse|eval|html|bundle|realize|paged|svg|svg-replay|pdf-semantic|pdf-semantic-replay|pdf-extract-check|pdftags|pdftags-check|font|break|shape|shape-hb|usvg|usvg-images> [filter] [--verbose]
 
 ///|
 let suite_dir = ".repos/typst/tests/suite"
@@ -21,6 +21,14 @@ fn main {
   let verbose = args.contains("--verbose") || args.contains("-v")
   dump_actual.val = args.contains("--dump")
   trace_tests.val = args.contains("--trace")
+  for a in args {
+    if a.has_prefix("--upstream-pdfs=") {
+      upstream_pdf_dir.val = Some(a.unsafe_substring(start=16, end=a.length()))
+    }
+    if a.has_prefix("--save-pdf=") {
+      pdf_save_dir.val = Some(a.unsafe_substring(start=11, end=a.length()))
+    }
+  }
   bundle_stub_binary.val = args.contains("--stub-binary")
   let filter = args[2:].iter().find_first(a => !a.has_prefix("-"))
   match stage {
@@ -106,7 +114,86 @@ fn main {
         canonicalize=canonicalize_svg_ids,
         dump_name="svg-replay",
       )
+    // Export to PDF and compare the extracted semantics (see
+    // `oracle/src/pdf_semantic.rs`).
+    "pdf-semantic" =>
+      run_stage(
+        "pdf-semantic",
+        pdf_semantic_report,
+        filter,
+        verbose,
+        select=tc => is_paged(tc.attrs),
+        skip_file=text => text.has_prefix("// SKIP"),
+        canonicalize=canonicalize_internal_errors,
+        matches=pdf_semantic_matches,
+      )
+    // Export upstream's laid-out documents (decoded from the `paged`
+    // goldens) to PDF, independently of layout.
+    "pdf-semantic-replay" =>
+      run_stage(
+        "pdf-semantic",
+        pdf_replay_report,
+        filter,
+        verbose,
+        select=tc => is_paged(tc.attrs),
+        skip_file=text => text.has_prefix("// SKIP"),
+        canonicalize=pdf_replay_canonicalize,
+        matches=pdf_semantic_matches,
+        dump_name="pdf-semantic-replay",
+      )
+    // Check the MoonBit extractor against the oracle's on upstream's PDFs
+    // (saved by the oracle with `ORACLE_SAVE_PDF=<dir>`; pass the
+    // directory as `--upstream-pdfs=<dir>`).
+    "pdf-extract-check" =>
+      run_stage(
+        "pdf-semantic",
+        pdf_extract_check_report,
+        filter,
+        verbose,
+        select=tc => is_paged(tc.attrs),
+        skip_file=text => text.has_prefix("// SKIP"),
+        dump_name="pdf-extract-check",
+      )
+    // Export the `pdftags` test cases to PDF and format their tag trees
+    // (see `oracle/src/pdftags.rs`).
+    "pdftags" =>
+      run_stage(
+        "pdftags",
+        pdftags_report,
+        filter,
+        verbose,
+        select=tc => is_pdftags(tc.attrs),
+        skip_file=text => text.has_prefix("// SKIP"),
+        canonicalize=canonicalize_internal_errors,
+      )
+    // Check the MoonBit tag tree formatter against the oracle's on
+    // upstream's PDFs (see `pdf-extract-check`).
+    "pdftags-check" =>
+      run_stage(
+        "pdftags",
+        pdftags_check_report,
+        filter,
+        verbose,
+        select=tc => is_pdftags(tc.attrs),
+        skip_file=text => text.has_prefix("// SKIP"),
+        dump_name="pdftags-check",
+      )
     "shape" => run_shape_stage(filter, verbose)
+    "usvg" => run_usvg_stage(filter, verbose)
+    // The usvg trees of the SVG images placed by the paged tests; tests
+    // without SVG images have no golden entry.
+    "usvg-images" =>
+      run_stage(
+        "usvg-images",
+        usvg_images_report,
+        filter,
+        verbose,
+        select=tc => is_paged(tc.attrs),
+        skip_file=text => {
+          text.has_prefix("// SKIP") || !text.to_lower().contains("svg")
+        },
+        missing="",
+      )
     "shape-hb" => run_shape_hb_stage(filter, verbose)
     _ => {
       println("unknown stage: \{stage}")
@@ -125,6 +212,8 @@ fn run_stage(
   skip_file? : (String) -> Bool = _ => false,
   canonicalize? : (String) -> String,
   dump_name? : String = stage,
+  matches? : (String, String) -> Bool,
+  missing? : String = "<missing golden>",
 ) -> Unit {
   let mut passed = 0
   // With `canonicalize`, both sides are compared after canonicalization;
@@ -156,7 +245,7 @@ fn run_stage(
       }
       let actual = report(rel, tc)
       dump.write_string("=== \{tc.name}\n\{actual}")
-      let expected = golden.get(tc.name).unwrap_or("<missing golden>")
+      let expected = golden.get(tc.name).unwrap_or(missing)
       if actual == expected {
         raw_passed += 1
       }
@@ -164,7 +253,11 @@ fn run_stage(
         Some(f) => (f(expected), f(actual))
         None => (expected, actual)
       }
-      if actual == expected {
+      let ok = match matches {
+        Some(m) => m(expected, actual)
+        None => actual == expected
+      }
+      if ok {
         passed += 1
       } else {
         failed += 1

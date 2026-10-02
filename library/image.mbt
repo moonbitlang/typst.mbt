@@ -16,10 +16,11 @@
 fn image_elem_source_parse(
   engine : Engine,
   args : Args,
-  _locals : ParseLocals,
+  locals : ParseLocals,
 ) -> Value? raise SourceError {
   let source : @syntax.Spanned[DataSource] = args.expect_spanned("source")
-  let _loaded = source.v.load(source.span, engine.world)
+  let loaded = source.v.load(source.span, engine.world)
+  locals.set("source-derived", Some(Dyn(Loaded(loaded))))
   Some(source.v.into_value())
 }
 
@@ -28,12 +29,13 @@ fn image_elem_source_parse(
 fn image_elem_icc_parse(
   engine : Engine,
   args : Args,
-  _locals : ParseLocals,
+  locals : ParseLocals,
 ) -> Value? raise SourceError {
   let icc : @syntax.Spanned[Smart[DataSource]]? = args.named_spanned("icc")
   match icc {
     Some({ v: Custom(source), span, }) => {
-      let _loaded = source.load(span, engine.world)
+      let loaded = source.load(span, engine.world)
+      locals.set("icc-derived", Some(Dyn(Loaded(loaded))))
       Some(source.into_value())
     }
     Some({ v: Auto, .. }) => Some(Auto)
@@ -56,14 +58,30 @@ pub fn ImageElem::decode(
 ) -> Image raise SourceError {
   let span = self.0.span()
   let source = self.source()
-  let loaded = source.load(span, engine.world)
+  // The data loaded when the element was constructed (upstream
+  // `self.source.derived`), whose span is the `source` argument's.
+  let loaded = match self.0.field_raw(image_elem_source_derived) {
+    Some(Dyn(Loaded(loaded))) => loaded
+    _ => source.load(span, engine.world)
+  }
   let format = at(span, () => self.determine_format(styles, loaded))
 
   // Construct the image itself.
   let kind = match format {
     Raster(format) => {
       let icc = match self.icc(styles) {
-        Custom(icc) => Smart::Custom(icc.load(span, engine.world).data)
+        Custom(icc) => {
+          let e = image_elem()
+          let stored = styles.get_value_with_local(
+            e,
+            e.fields()[image_elem_icc_derived],
+            self.0.field_raw(image_elem_icc_derived),
+          )
+          match stored {
+            Dyn(Loaded(loaded)) => Smart::Custom(loaded.data)
+            _ => Smart::Custom(icc.load(span, engine.world).data)
+          }
+        }
         Auto => Smart::Auto
       }
       ImageKind::Raster(
@@ -84,7 +102,12 @@ pub fn ImageElem::decode(
       // element which does not have a fallback rendering and, therefore,
       // will be ignored by Typst.
       let (output, warnings) = within(loaded, () => {
-        SvgImage::with_fonts_images(loaded.data, engine.world, [], svg_file)
+        SvgImage::with_fonts_images(
+          loaded.data,
+          engine.world,
+          families(styles).map(f => f.as_str()),
+          svg_file,
+        )
       })
       for warning in warnings {
         engine.sink.warn(warning.into_warning_at(span))

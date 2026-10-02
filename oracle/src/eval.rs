@@ -108,13 +108,28 @@ pub fn write_diag(out: &mut String, world: &TestWorld, main: FileId, diag: &Sour
         out,
         "{severity} {} {:?}",
         locate(world, main, diag.span.get()),
-        diag.message.as_str()
+        canonical_internal_error(diag.message.as_str())
     )
     .unwrap();
     for hint in &diag.hints {
         writeln!(out, "  hint {} {:?}", locate(world, main, hint.span.get()), hint.v.as_str())
             .unwrap();
     }
+}
+
+/// Internal errors name the Rust source location they occurred at; since the
+/// oracle builds Typst from `.repos/typst`, that location is an absolute path.
+/// Make it relative to the Typst repository like in upstream's test suite.
+pub fn canonical_internal_error(msg: &str) -> String {
+    const MARKER: &str = "(occurred at ";
+    const REPO: &str = ".repos/typst/";
+    if let Some(at) = msg.find(MARKER) {
+        let rest = &msg[at + MARKER.len()..];
+        if let Some(repo) = rest.find(REPO) {
+            return format!("{}{}", &msg[..at + MARKER.len()], &rest[repo + REPO.len()..]);
+        }
+    }
+    msg.to_string()
 }
 
 /// Render a diagnostic span as `start..end` (main file) or `path:start..end`.

@@ -1,0 +1,4 @@
+members = [
+  ".",
+  "../office.mbt/pdflite",
+]
