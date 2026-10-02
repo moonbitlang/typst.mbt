@@ -1,0 +1,32 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/hayro/render"
+
+import {
+  "moonbitlang/typst/hayro/interpret",
+  "moonbitlang/typst/hayro/syntax",
+  "moonbitlang/typst/vello_cpu",
+}
+
+// Values
+pub fn render(@syntax.Page, RenderCache, @interpret.InterpreterSettings, RenderSettings) -> @vello_cpu.Pixmap
+
+// Errors
+
+// Types and methods
+pub struct RenderCache {
+  // private fields
+}
+pub fn RenderCache::new() -> Self
+
+pub(all) struct RenderSettings {
+  x_scale : Float
+  y_scale : Float
+  width : Int?
+  height : Int?
+  bg_color : @vello_cpu.AlphaColor
+}
+pub impl Default for RenderSettings
+
+// Type aliases
+
+// Traits

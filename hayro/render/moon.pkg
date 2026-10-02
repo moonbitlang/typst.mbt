@@ -1,0 +1,16 @@
+import {
+  "moonbitlang/typst/hayro/syntax" @hayro_syntax,
+  "moonbitlang/typst/hayro/interpret",
+  "moonbitlang/typst/kurbo",
+  "moonbitlang/typst/vello_cpu",
+  "moonbitlang/typst/pic_scale",
+  "moonbitlang/core/cmp",
+}
+
+warnings = "-deprecated"
+
+import {
+  "moonbitlang/typst/typst_assets/pdf" @pdf_fonts,
+  "moonbitlang/x/fs",
+  "moonbitlang/core/string",
+} for "test"

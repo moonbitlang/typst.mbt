@@ -1,0 +1,17 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/pic_scale"
+
+// Values
+pub fn resize_planar_u8(Bytes, Int, Int, Int, Int) -> Bytes
+
+pub fn resize_rgb_u8(Bytes, Int, Int, Int, Int) -> Bytes
+
+pub fn resize_rgba_u8_premultiplied(Bytes, Int, Int, Int, Int) -> Bytes
+
+// Errors
+
+// Types and methods
+
+// Type aliases
+
+// Traits

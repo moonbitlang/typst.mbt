@@ -109,8 +109,74 @@ fn build_texture(
       @resvg.render(tree, ts, texture)
       Some(texture)
     }
-    Pdf(_) =>
-      // TODO: PDF images need `hayro`.
-      None
+    Pdf(pdf) => build_pdf_texture(pdf, w, h)
   }
+}
+
+///|
+/// Select the substitute for one of the 14 PDF standard fonts
+/// (`typst_assets::pdf`).
+fn select_standard_font(font : @hayro_interpret.StandardFont) -> (Bytes, Int)? {
+  let bytes = match font {
+    Helvetica => @pdf_fonts.sans()
+    HelveticaBold => @pdf_fonts.sans_bold()
+    HelveticaOblique => @pdf_fonts.sans_italic()
+    HelveticaBoldOblique => @pdf_fonts.sans_bold_italic()
+    Courier => @pdf_fonts.fixed()
+    CourierBold => @pdf_fonts.fixed_bold()
+    CourierOblique => @pdf_fonts.fixed_italic()
+    CourierBoldOblique => @pdf_fonts.fixed_bold_italic()
+    TimesRoman => @pdf_fonts.serif()
+    TimesBold => @pdf_fonts.serif_bold()
+    TimesItalic => @pdf_fonts.serif_italic()
+    TimesBoldItalic => @pdf_fonts.serif_bold_italic()
+    ZapfDingBats => @pdf_fonts.ding_bats()
+    Symbol => @pdf_fonts.symbol()
+  }
+  Some((bytes, 0))
+}
+
+///|
+// Keep this in sync with `typst-svg`!
+fn build_pdf_texture(
+  pdf : @library.PdfImage,
+  w : UInt,
+  h : UInt,
+) -> @skia.Pixmap? {
+  let interpreter_settings : @hayro_interpret.InterpreterSettings = {
+    font_resolver: query => {
+      match query {
+        Standard(s) => select_standard_font(s)
+        Fallback(f) => select_standard_font(f.pick_standard_font())
+      }
+    },
+    // Fairly niche and enabling hayro's embedded cmap would add a
+    // considerable amount of data.
+    cmap_resolver: _ => None,
+    warning_sink: _ => (),
+    // We want to render like it prints, so no annotations.
+    render_annotations: false,
+  }
+  // `w as u16` / `h as u16`.
+  let w16 = (w & 0xFFFF).reinterpret_as_int()
+  let h16 = (h & 0xFFFF).reinterpret_as_int()
+  let render_settings : @hayro_render.RenderSettings = {
+    x_scale: @skia.u32_to_f32(w) / pdf.width(),
+    y_scale: @skia.u32_to_f32(h) / pdf.height(),
+    width: Some(w16),
+    height: Some(h16),
+    bg_color: @vello_cpu.transparent,
+  }
+  let cache = @hayro_render.RenderCache::new()
+  let hayro_pix = @hayro_render.render(
+    pdf.page(),
+    cache,
+    interpreter_settings,
+    render_settings,
+  )
+  let bytes = hayro_pix.data()
+  guard w16.reinterpret_as_uint() == w && h16.reinterpret_as_uint() == h else {
+    return None
+  }
+  @skia.Pixmap::from_bytes(Bytes::from_array(bytes)[:], w, h)
 }

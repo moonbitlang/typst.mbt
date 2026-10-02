@@ -1,0 +1,14 @@
+import {
+  "moonbitlang/typst/kurbo",
+  "moonbitlang/core/double",
+  "moonbitlang/core/float",
+}
+
+warnings = "-deprecated"
+
+options(
+  targets: {
+    "libm_native.mbt": [ "native" ],
+    "libm_other.mbt": [ "not", "native" ],
+  },
+)

@@ -1,0 +1,188 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/vello_cpu"
+
+import {
+  "moonbitlang/typst/kurbo",
+}
+
+// Values
+pub let black : AlphaColor
+
+pub fn components_to_rgba8(FixedArray[Float]) -> FixedArray[Int]
+
+pub let transparent : AlphaColor
+
+pub let white : AlphaColor
+
+// Errors
+
+// Types and methods
+pub(all) struct AlphaColor {
+  components : FixedArray[Float]
+}
+pub fn AlphaColor::from_rgba8(Int, Int, Int, Int) -> Self
+pub fn AlphaColor::new(FixedArray[Float]) -> Self
+pub fn AlphaColor::premultiply(Self) -> FixedArray[Float]
+
+pub(all) struct BlendMode {
+  mix : Mix
+  compose : Compose
+} derive(Eq)
+pub fn BlendMode::is_destructive(Self) -> Bool
+pub fn BlendMode::new(Mix, Compose) -> Self
+pub impl Default for BlendMode
+
+pub(all) struct ColorStop {
+  offset : Float
+  color : AlphaColor
+}
+
+pub(all) enum Compose {
+  Clear
+  Copy
+  Dest
+  SrcOver
+  DestOver
+  SrcIn
+  DestIn
+  SrcOut
+  DestOut
+  SrcAtop
+  DestAtop
+  Xor
+  Plus
+  PlusLighter
+} derive(Eq)
+
+pub(all) enum Extend {
+  Pad
+  Repeat
+  Reflect
+} derive(Eq)
+
+pub(all) enum Fill {
+  NonZero
+  EvenOdd
+} derive(Eq)
+
+pub(all) struct Gradient {
+  kind : GradientKind
+  extend_mode : Extend
+  stops : Array[ColorStop]
+}
+pub fn Gradient::new_linear(@kurbo.Point, @kurbo.Point) -> Self
+pub fn Gradient::new_two_point_radial(@kurbo.Point, Float, @kurbo.Point, Float) -> Self
+pub fn Gradient::with_extend(Self, Extend) -> Self
+pub fn Gradient::with_stops(Self, Array[ColorStop]) -> Self
+
+pub(all) enum GradientKind {
+  Linear(start~ : @kurbo.Point, end~ : @kurbo.Point)
+  Radial(start_center~ : @kurbo.Point, start_radius~ : Float, end_center~ : @kurbo.Point, end_radius~ : Float)
+}
+
+pub(all) struct Image {
+  image : ImageSource
+  sampler : ImageSampler
+}
+
+pub(all) enum ImageQuality {
+  Low
+  Medium
+  High
+} derive(Eq)
+
+pub(all) struct ImageSampler {
+  x_extend : Extend
+  y_extend : Extend
+  quality : ImageQuality
+  alpha : Float
+} derive(Eq)
+
+pub(all) enum ImageSource {
+  Pixmap(Pixmap)
+}
+
+pub struct Mask {
+  // private fields
+}
+pub fn Mask::from_parts(FixedArray[Byte], Int, Int) -> Self
+pub fn Mask::height(Self) -> Int
+pub fn Mask::new_alpha(Pixmap) -> Self
+pub fn Mask::new_luminance(Pixmap) -> Self
+pub fn Mask::sample(Self, Int, Int) -> Int
+pub fn Mask::width(Self) -> Int
+
+pub(all) enum Mix {
+  Normal
+  Multiply
+  Screen
+  Overlay
+  Darken
+  Lighten
+  ColorDodge
+  ColorBurn
+  HardLight
+  SoftLight
+  Difference
+  Exclusion
+  Hue
+  Saturation
+  Color
+  Luminosity
+} derive(Eq)
+
+pub(all) enum PaintType {
+  Solid(AlphaColor)
+  Gradient(Gradient)
+  Image(Image)
+}
+
+pub struct Pixmap {
+  width : Int
+  height : Int
+  buf : FixedArray[Byte]
+  may_have_transparency : Bool
+}
+pub fn Pixmap::data(Self) -> FixedArray[Byte]
+pub fn Pixmap::from_parts(FixedArray[Byte], Int, Int) -> Self
+pub fn Pixmap::from_parts_with_opacity(FixedArray[Byte], Int, Int, Bool) -> Self
+pub fn Pixmap::height(Self) -> Int
+pub fn Pixmap::may_have_transparency(Self) -> Bool
+pub fn Pixmap::new(Int, Int) -> Self
+pub fn Pixmap::width(Self) -> Int
+
+pub struct RenderContext {
+  // private fields
+}
+pub fn RenderContext::blend_mode(Self) -> BlendMode
+pub fn RenderContext::fill_path(Self, @kurbo.BezPath) -> Unit
+pub fn RenderContext::fill_rect(Self, @kurbo.Rect) -> Unit
+pub fn RenderContext::fill_rule(Self) -> Fill
+pub fn RenderContext::flush(Self) -> Unit
+pub fn RenderContext::height(Self) -> Int
+pub fn RenderContext::new(Int, Int) -> Self
+pub fn RenderContext::pop_clip_path(Self) -> Unit
+pub fn RenderContext::pop_layer(Self) -> Unit
+pub fn RenderContext::push_clip_path(Self, @kurbo.BezPath) -> Unit
+pub fn RenderContext::push_layer(Self, BlendMode?, Float?, Mask?) -> Unit
+pub fn RenderContext::push_mask_layer(Self, Mask) -> Unit
+pub fn RenderContext::render(Self, Pixmap) -> Unit
+pub fn RenderContext::reset_mask(Self) -> Unit
+pub fn RenderContext::set_aliasing_threshold(Self, Int?) -> Unit
+pub fn RenderContext::set_blend_mode(Self, BlendMode) -> Unit
+pub fn RenderContext::set_fill_rule(Self, Fill) -> Unit
+pub fn RenderContext::set_mask(Self, Mask) -> Unit
+pub fn RenderContext::set_paint(Self, PaintType) -> Unit
+pub fn RenderContext::set_paint_transform(Self, @kurbo.Affine) -> Unit
+pub fn RenderContext::set_stroke(Self, @kurbo.Stroke) -> Unit
+pub fn RenderContext::set_transform(Self, @kurbo.Affine) -> Unit
+pub fn RenderContext::stroke(Self) -> @kurbo.Stroke
+pub fn RenderContext::stroke_path(Self, @kurbo.BezPath) -> Unit
+pub fn RenderContext::transform(Self) -> @kurbo.Affine
+pub fn RenderContext::width(Self) -> Int
+
+type Strip derive(Eq)
+
+// Type aliases
+
+// Traits

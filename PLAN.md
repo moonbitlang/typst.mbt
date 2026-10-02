@@ -12,7 +12,7 @@
 | P2 eval (typst-eval) | **done** | VM, closures, imports, rules, math; `eval` stage runs end to end |
 | P2 library (value level) | **done** | 3782/3792 `eval` (2026-10-03). Remaining 10: WASM plugins (out of scope) |
 | P3 realize + introspection + HTML export | **done** | `realize` 3788/3792, `html` 508/508 (2026-10-03) |
-| P4 fonts, shaping, layout, export | **nearly done** | `paged` 2299/2299, `svg` 2299/2299 (byte-identical), `pdf-semantic` 2299/2299, `pdftags` 133/133, `render` 2295/2299 (exact pixmaps; 1958/1958 vs reference PNGs), `bundle` 39/39, `font` 86/86, `shape` 4598/4598, `shape-hb` 2250/2250, `break` 12734/12734, `resvg` 1723/1723 (2026-10-03). Remaining: PNG of PDF images (hayro render/vello_cpu, in progress); see docs/p4-plan.md |
+| P4 fonts, shaping, layout, export | **done** | `paged` 2299/2299, `svg` 2299/2299 (byte-identical), `pdf-semantic` 2299/2299, `pdftags` 133/133, `render` 2299/2299 (exact pixmaps), `bundle` 39/39, `font` 86/86, `shape` 4598/4598, `shape-hb` 2250/2250, `break` 12734/12734, `resvg` 1723/1723 (2026-10-03). Known gaps outside the suite: PDF image filters DCT/JPX/JBIG2/CCITT inside embedded PDFs; see docs/p4-plan.md |
 
 Run `scripts/upstream.sh && scripts/goldens.sh && moon run tests/runner --target native -- syntax`
 (and `-- ast`, `-- reparse`, `-- eval`). `python3 scripts/classify.py eval 60` buckets the

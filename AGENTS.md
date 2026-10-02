@@ -124,3 +124,29 @@
   loads them (`library/image_pdf.mbt`); `hayro/write` (hayro-write) extracts
   pages that `pdf/image.mbt` embeds as XObjects. `hayro/syntax/oracle_test.mbt`
   is generated from the real crate (`oracle/src/bin/gen_hayro_syntax_tests.rs`).
+- Image downsampling for hayro's renderer: `pic_scale/` is a bit-exact port
+  of pic-scale 0.7.12 (`Scaler::new(CatmullRom)`, u8 planar/RGB/RGBA with
+  premultiplied alpha) as it runs on aarch64 with `rdm` (NEON lanes emulated,
+  incl. Rust's `sort_unstable_by` for the weight quantization). Checked by
+  `pic_scale/oracle_wbtest.mbt` against `testdata/oracle.tsv`; regenerate
+  on Apple silicon with `cargo run --release --offline --bin
+  gen_pic_scale_tests > ../pic_scale/testdata/oracle.tsv` (in `oracle/`).
+- `kurbo/` stroke expansion (`stroke.mbt`, `offset.mbt`, `arc.mbt`) is
+  bit-exact with kurbo 0.13.1 on native (libm externs incl. `__sincos_stret`
+  where LLVM merges sin/cos; `powi` as LLVM expands it). Oracle:
+  `kurbo/testdata/stroke_oracle.tsv` from `gen_kurbo_stroke_tests` (command
+  in its header), checked by `kurbo/stroke_oracle_test.mbt`.
+- PNG export of PDF images (`render/image.mbt` `build_pdf_texture`) uses
+  `hayro/render` (port of the `hayro` crate: a `@hayro_interpret.Device` on
+  vello_cpu, `pic_scale` for image downsampling) on `vello_cpu/` (port of
+  vello_cpu/vello_common at rev 8442ef4 as hayro uses it: single-threaded
+  `u8` pipeline; filters, layer clip paths, text and the depth buffer, which
+  only culls work behind opaque fills, are not ported; SIMD code is ported
+  lane by lane with NEON semantics: `madd` is a fused `fmaf`, `vmin`/`vmax`
+  propagate NaN, `fminnm`/`fmaxnm` are Rust's scalar `min`/`max`).
+  `hayro/render/oracle_test.mbt` compares pixmap hashes with `hayro::render`
+  (`oracle/src/bin/gen_hayro_render_tests.rs`, command in its header) on the
+  hayro corpus, dev-assets PDFs and the synthetic PDFs of
+  `scripts/gen_hayro_render_pdfs.py` (blend modes, masks, images, gradients,
+  strokes) at scales 1 and 0.37 (synthetic PDFs also 1.7);
+  `hayro/render/cli` dumps raw pixmaps for diffs.

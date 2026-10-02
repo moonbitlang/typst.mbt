@@ -1,2 +1,17 @@
 import {
+  "moonbitlang/core/math",
 }
+
+import {
+  "moonbitlang/x/fs",
+} for "test"
+
+options(
+  "native-stub": [ "sincos_stub.c" ],
+  targets: {
+    "libm_native.mbt": [ "native" ],
+    "libm_other.mbt": [ "not", "native" ],
+    // Bit-exact only with the platform libm.
+    "stroke_oracle_test.mbt": [ "native" ],
+  },
+)

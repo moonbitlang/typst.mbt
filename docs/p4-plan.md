@@ -671,3 +671,51 @@ decoded by image-webp and gif).
 **Result:** `resvg` 1723/1723 (bit-identical pixmaps), WebP corpus 168/168,
 GIF corpus 33/33, `render` 2248 → 2295/2299 (the rest are PDF images) and
 1958/1958 reference PNGs, `bundle` 38 → 39/39.
+
+## Status: hayro rendering (PNG export of PDF images)
+
+typst-render rasterizes PDF images with the `hayro` crate (hayro 0.7.0 at
+d8e24e2), which draws through `vello_cpu` (vello rev 8442ef4) and resizes
+images with `pic-scale` 0.7.12. Ports:
+
+- `vello_cpu/`: vello_common + vello_cpu as hayro uses them (features
+  `std, png, u8_pipeline`, single-threaded `RenderContext`): flattening
+  (kurbo quads, the SIMD cubic flattener), analytic-AA tiles and strips,
+  fast rects, clip contexts (strip intersection), command recording and
+  coarse bucketing, the `U8Kernel` fine rasterizer (solid/gradient/image
+  painters incl. bilinear/bicubic/nearest, LUT gradients with undefined
+  radial regions, compose modes, all 16 blend modes with the `f32`
+  fallback for the non-separable ones, masks, opacity layers) and gradient/
+  image encoding. fearless_simd's NEON lane semantics are emulated per lane
+  (fused `vfmaq`, NaN-propagating `vmin/vmax`, `vmaxnm` for `max_precise`,
+  saturating `vcvt`, truncating narrows, wrapping `u16` arithmetic). Not
+  ported (unused by hayro): filters, layer clip paths, text, multithreading,
+  the `f32` pipeline, and the depth buffer (it only skips work hidden behind
+  opaque fills, which overwrite the pixels below, so the output is equal).
+- `kurbo/` stroke expansion (`stroke_with`, dashing, cubic offsets) and
+  `pic_scale/` (the NEON+rdm u8 paths), each with its own oracle test.
+- `hayro/render/`: `render`, `RenderCache`, `RenderSettings` and the
+  `Renderer` device (images with soft masks of other sizes, stencils with
+  color/pattern paints, Type3 glyph padding, native SVG gradients or shading
+  textures, tiling patterns, soft masks with backdrops and transfer
+  functions, the minimum stroke width).
+- `render/image.mbt`: `build_pdf_texture` with Typst's font resolver.
+
+Tests: `hayro/render/oracle_test.mbt` compares size and FNV hash of 674
+pixmaps with `hayro::render` (Typst settings, scales 1 and 0.37, plus 1.7
+for the synthetic PDFs): all
+pages (up to 4 per file) of the hayro corpus (`custom`, `load`, `other`),
+the dev-assets PDF images and 5 synthetic PDFs
+(`scripts/gen_hayro_render_pdfs.py`: blend modes in and outside groups,
+luminosity/alpha soft masks with transfer functions and backdrops, images
+up/down-scaled and skewed with same- and other-size soft masks, stencils,
+all gradient extend combinations for axial/concentric/focal/strip radial
+shadings, dashes/joins/caps/thin strokes, even-odd clips). 36 corpus files
+are skipped (`#skip` in `testdata/corpus.txt`) because their images use
+filters hayro/syntax does not port yet (DCT, JPX, JBIG2, CCITT).
+
+**Result:** `render` 2295 → 2299/2299 (exact pixmaps; 1961/1962 reference
+PNGs: `image-pdf-multiple-pages` exceeds the tolerance against its
+reference PNG, as upstream's own pixmap on this machine does), hayro render
+oracle 674/674, `svg` 2299/2299, `paged` 2298/2299, `bundle` 39/39
+(unchanged).
