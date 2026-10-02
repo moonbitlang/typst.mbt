@@ -179,6 +179,98 @@ def gen_use_table():
     open(os.path.join(OUT, 'ot_shaper_use_table_gen.mbt'), 'w').write(out)
 
 
+# --- Indic family: ot_shaper_indic_table.rs and the Ragel machines ---------
+
+def indic_constants():
+    """`ot_category_t` / `ot_position_t` values from ot_shaper_indic.rs."""
+    src = read('ot_shaper_indic.rs')
+    consts = {}
+    for name, val in re.findall(r'pub const (\w+): u8 = (\w+);', src):
+        consts[name] = int(val) if val.isdigit() else consts[val]
+    return consts
+
+
+def gen_indic_table():
+    src = read('ot_shaper_indic_table.rs')
+    consts = indic_constants()
+    alias = dict((a, n) for n, a in re.findall(r'use (\w+)\s+as (_\w+);', src))
+    for a, n in alias.items():
+        assert n in consts, n
+    i = src.index('const TABLE: &[(SyllabicCategory, MatraCategory)] = &[')
+    j = src.index('\n];', i)
+    body = src[i:j]
+    lines = []
+    count = 0
+    for line in body.split('\n')[1:]:
+        line = line.strip()
+        if not line:
+            continue
+        m = re.fullmatch(r'/\* ([0-9A-F]+) \*/\s*(.*)', line)
+        if m:
+            pairs = re.findall(r'\((_\w+),\s*(_\w+)\)', m.group(2))
+            assert len(pairs) == m.group(2).count('('), line
+            count += len(pairs)
+            lines.append('  // %s\n  %s\n' % (m.group(1), ' '.join(
+                '(%s, %s),' % (alias[c], alias[p]) for c, p in pairs)))
+            continue
+        m = re.fullmatch(r'/\* (.+) \*/', line)
+        assert m, line
+        lines.append('\n  // %s\n\n' % m.group(1))
+    offsets = re.findall(r'const (OFFSET_\w+): usize = (\d+);', src)
+    out = HEADER % 'ot_shaper_indic_table.rs'
+    out += '///|\n/// `(SyllabicCategory, MatraCategory)` per code point of the covered ranges.\n'
+    out += 'let indic_table : FixedArray[(Int, Int)] = [\n'
+    out += ''.join(lines)
+    out += ']\n\n'
+    for name, val in offsets:
+        out += '///|\nconst %s : Int = %s\n\n' % (name, val)
+    # get_categories
+    i = src.index('pub fn get_categories(u: u32)')
+    j = src.index('\n}', i)
+    fbody = src[i:j]
+    code = ['///|\nfn get_categories(u : Int) -> (Int, Int) {\n', '  match u >> 12 {\n']
+    for line in fbody.split('\n')[2:]:
+        if line == '    }':  # end of `match u >> 12`
+            continue
+        line = line.strip()
+        if not line or line == '_ => {}':
+            continue
+        if line == '(_OT_X, _POS_X)':
+            break
+        if line == '}':
+            code.append('    }\n')
+            continue
+        m = re.fullmatch(r'(0x[0-9A-F]+) => \{', line)
+        if m:
+            code.append('    %s => {\n' % m.group(1))
+            continue
+        m = re.fullmatch(r'if u == (0x[0-9A-F]+) \{ return \((_\w+), (_\w+)\); \}', line)
+        if m:
+            code.append('      if u == %s {\n        return (%s, %s)\n      }\n' % (
+                m.group(1), alias[m.group(2)], alias[m.group(3)]))
+            continue
+        m = re.fullmatch(r'if \((0x[0-9A-F]+)\.\.=(0x[0-9A-F]+)\)\.contains\(&u\) \{ return TABLE\[u as usize - (0x[0-9A-F]+) \+ (OFFSET_\w+)\]; \}', line)
+        assert m, line
+        assert m.group(1) == m.group(3)
+        code.append('      if u >= %s && u <= %s {\n        return indic_table[u - %s + %s]\n      }\n' % (
+            m.group(1), m.group(2), m.group(1), m.group(4)))
+    code.append('    _ => ()\n  }\n  (OT_X, POS_END)\n}\n')
+    out += ''.join(code)
+    open(os.path.join(OUT, 'ot_shaper_indic_table_gen.mbt'), 'w').write(out)
+
+
+def gen_machine(name):
+    """Data tables of the Ragel-generated `ot_shaper_<name>_machine.rs`."""
+    src = read('ot_shaper_%s_machine.rs' % name)
+    out = HEADER % ('ot_shaper_%s_machine.rs' % name)
+    for var, typ, n, body in re.findall(r'static (\w+): \[(\w+); (\d+)\] = \[([^\]]*)\];', src):
+        vals = [v.strip() for v in body.split(',') if v.strip()]
+        assert len(vals) == int(n), var
+        out += emit_ints(var.lstrip('_'), '`%s: [%s; %s]`' % (var, typ, n), vals, 20)
+    for var, val in re.findall(r'static (\w+): i32 = (-?\d+);', src):
+        out += '///|\nlet %s : Int = %s\n\n' % (var, val)
+    open(os.path.join(OUT, 'ot_shaper_%s_machine_gen.mbt' % name), 'w').write(out)
+
 # --- tag_table.rs (HarfBuzz gen-tag-table.py output) -------------------------
 
 def tag_lit(b):
@@ -324,6 +416,9 @@ if __name__ == '__main__':
     gen_emoji()
     gen_ragel_machine('ot_shaper_use_machine.rs', 'ot_shaper_use_machine_gen.mbt')
     gen_use_table()
+    gen_indic_table()
+    for name in ['indic', 'khmer', 'myanmar']:
+        gen_machine(name)
     gen_tag_table()
     gen_arabic_table()
     gen_aat_layout()
