@@ -68,7 +68,10 @@ fn tree_case(name: &str, source: serde_json::Value, data: &[u8]) -> serde_json::
 
 /// Parses `usvg_corpus.txt`: cases separated by `=== name` lines.
 fn corpus() -> Vec<(String, String)> {
-    let text = include_str!("usvg_corpus.txt");
+    parse_cases(include_str!("usvg_corpus.txt"))
+}
+
+fn parse_cases(text: &str) -> Vec<(String, String)> {
     let mut cases = Vec::new();
     let mut name: Option<String> = None;
     let mut body = String::new();
@@ -87,6 +90,25 @@ fn corpus() -> Vec<(String, String)> {
         cases.push((prev, body));
     }
     cases
+}
+
+/// The fonts (of `typst-dev-assets`) loaded for the text cases, in order.
+const TEXT_FONTS: &[&str] = &[
+    "DejaVuSans.ttf",
+    "NotoSans-Regular.ttf",
+    "NotoSansArabic-Regular.ttf",
+    "NotoSerifHebrew-Regular.ttf",
+    "TwitterColorEmoji.ttf",
+    "NotoColorEmoji-Regular-COLR.subset.ttf",
+    "NotoColorEmoji-Regular-CBDT.subset.ttf",
+    "Roboto-Regular.ttf",
+    "MonaSansVF[wdth,wght,opsz,ital].ttf",
+    "IBMPlexSans-Bold.ttf",
+    "IBMPlexSans-Regular.ttf",
+];
+
+fn text_corpus() -> Vec<(String, String)> {
+    parse_cases(include_str!("usvg_text_corpus.txt"))
 }
 
 fn glyph_case(font: &str, face: &ttf_parser::Face, gid: u16) -> Option<serde_json::Value> {
@@ -141,6 +163,39 @@ fn main() {
         lines.push(tree_case(&name, json!({ "text": body }), body.as_bytes()).to_string());
     }
     std::fs::write(out.join("trees.jsonl"), lines.join("\n") + "\n").unwrap();
+
+    // Text (with fonts loaded into the font database).
+    let mut db = fontdb::Database::new();
+    for name in TEXT_FONTS {
+        db.load_font_data(std::fs::read(assets.join("fonts").join(name)).unwrap());
+    }
+    let db = std::sync::Arc::new(db);
+    let mut lines = Vec::new();
+    for (name, body) in text_corpus() {
+        let opts = usvg::Options {
+            font_family: "DejaVu Sans".into(),
+            fontdb: db.clone(),
+            ..base_options()
+        };
+        let line = match usvg::Tree::from_data(body.as_bytes(), &opts) {
+            Ok(tree) => json!({
+                "name": name,
+                "source": { "text": body },
+                "size": [bits(tree.size().width()), bits(tree.size().height())],
+                "bbox": rect_bits(tree.root().bounding_box()),
+                "abs_bbox": rect_bits(tree.root().abs_bounding_box()),
+                "stroke_bbox": rect_bits(tree.root().stroke_bounding_box()),
+                "svg": tree.to_string(&usvg::WriteOptions::default()),
+                "svg_preserve": tree.to_string(&usvg::WriteOptions {
+                    preserve_text: true,
+                    ..Default::default()
+                }),
+            }),
+            Err(e) => json!({ "name": name, "source": { "text": body }, "error": error_string(&e) }),
+        };
+        lines.push(line.to_string());
+    }
+    std::fs::write(out.join("text.jsonl"), lines.join("\n") + "\n").unwrap();
 
     // Glyphs.
     let mut lines = Vec::new();

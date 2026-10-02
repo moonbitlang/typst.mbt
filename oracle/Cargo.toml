@@ -71,6 +71,7 @@ simplecss = "=0.2.2"
 svgtypes = "=0.16.1"
 # The SVG simplifier typst-library uses (gen_usvg_golden).
 usvg = "=0.47.0"
+fontdb = "=0.23.0"
 roxmltree = "=0.21.1"
 flate2 = "1"
 # tiny-skia-path (gen_tiny_skia_path_tests).

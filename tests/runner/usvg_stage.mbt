@@ -22,6 +22,15 @@ fn usvg_base_options() -> @usvg.Options {
 }
 
 ///|
+/// The fonts loaded for the text cases (`TEXT_FONTS` of the oracle).
+let usvg_text_fonts : Array[String] = [
+  "DejaVuSans.ttf", "NotoSans-Regular.ttf", "NotoSansArabic-Regular.ttf", "NotoSerifHebrew-Regular.ttf",
+  "TwitterColorEmoji.ttf", "NotoColorEmoji-Regular-COLR.subset.ttf", "NotoColorEmoji-Regular-CBDT.subset.ttf",
+  "Roboto-Regular.ttf", "MonaSansVF[wdth,wght,opsz,ital].ttf", "IBMPlexSans-Bold.ttf",
+  "IBMPlexSans-Regular.ttf",
+]
+
+///|
 fn f32_bits(x : Float) -> String {
   let h = x.reinterpret_as_uint().to_string(radix=16)
   String::make(8 - h.length(), '0') + h
@@ -174,6 +183,107 @@ fn run_usvg_stage(filter : String?, verbose : Bool) -> Unit {
     } else {
       failed += 1
       println("FAIL usvg tree \{name}")
+      if verbose {
+        for d in diffs {
+          println(d)
+        }
+      }
+    }
+  }
+
+  // Text (with fonts loaded into the font database, like the oracle).
+  let db = @usvg.FontDatabase::new()
+  for name in usvg_text_fonts {
+    let bytes = @fs.read_file_to_bytes(assets + "/fonts/" + name) catch {
+      _ => b""
+    }
+    db.load_font_data(bytes)
+  }
+  for line in read(golden_dir + "/usvg/text.jsonl").split("\n") {
+    if line.is_empty() {
+      continue
+    }
+    let obj = match (try? @json.parse(line.to_string())) {
+      Ok(Object(obj)) => obj
+      _ => continue
+    }
+    let name = json_string_field(obj, "name").unwrap_or("")
+    if filter is Some(f) && !name.contains(f) {
+      continue
+    }
+    let data = match obj.get("source") {
+      Some(Object(src)) =>
+        @utf8.encode(json_string_field(src, "text").unwrap_or(""))
+      _ => b""
+    }
+    let opts = {
+      ..usvg_base_options(),
+      font_family: "DejaVu Sans",
+      fontdb: db,
+    }
+    let diffs = []
+    match (try? @usvg.Tree::from_data(data, opts)) {
+      Ok(tree) => {
+        usvg_check(
+          diffs,
+          "error",
+          json_string_field(obj, "error").unwrap_or(""),
+          "",
+        )
+        let size = [
+          f32_bits(tree.size().width()),
+          f32_bits(tree.size().height()),
+        ]
+        usvg_check(
+          diffs,
+          "size",
+          json_strings(obj, "size").join(" "),
+          size.join(" "),
+        )
+        usvg_check(
+          diffs,
+          "bbox",
+          json_strings(obj, "bbox").join(" "),
+          usvg_rect_bits(tree.root().bounding_box()).join(" "),
+        )
+        usvg_check(
+          diffs,
+          "stroke_bbox",
+          json_strings(obj, "stroke_bbox").join(" "),
+          usvg_rect_bits(tree.root().stroke_bounding_box()).join(" "),
+        )
+        let svg = tree.to_string(@usvg.WriteOptions::default())
+        usvg_check(
+          diffs,
+          "svg",
+          json_string_field(obj, "svg").unwrap_or(""),
+          svg,
+        )
+        let svg2 = tree.to_string({
+          ..@usvg.WriteOptions::default(),
+          preserve_text: true,
+        })
+        usvg_check(
+          diffs,
+          "svg_preserve",
+          json_string_field(obj, "svg_preserve").unwrap_or(""),
+          svg2,
+        )
+        actual_dump.write_string("=== \{name}\n\{svg}\n\{svg2}\n")
+      }
+      Err(e) =>
+        usvg_check(
+          diffs,
+          "error",
+          json_string_field(obj, "error").unwrap_or(""),
+          usvg_error_string(e),
+        )
+    }
+    if diffs.is_empty() {
+      passed += 1
+    } else {
+      failed += 1
+      println("FAIL usvg text \{name}")
       if verbose {
         for d in diffs {
           println(d)
