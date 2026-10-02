@@ -1071,3 +1071,10 @@ pub impl IntoValue for Never with fn into_value(self) {
 pub impl FromValue for Never with fn from_value(v) {
   raise HintedError(Never::input().error(v))
 }
+
+///|
+/// Default of `TextElem::fill` (upstream
+/// `#[default(Color::BLACK.into())]`).
+fn text_elem_fill_default() -> Value {
+  Paint::Solid(color_black).into_value()
+}
