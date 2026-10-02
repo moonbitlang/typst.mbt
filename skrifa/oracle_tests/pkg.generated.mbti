@@ -10,6 +10,8 @@ pub fn dump_cff(BytesView) -> String
 
 pub fn dump_otf(BytesView, Int) -> String
 
+pub fn dump_t1(BytesView) -> String
+
 pub fn fnv(BytesView) -> UInt64
 
 pub fn fnv_str(String) -> UInt64

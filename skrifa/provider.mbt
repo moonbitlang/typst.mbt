@@ -46,3 +46,40 @@ pub impl MetadataProvider for FontRef with fn charmap(self) {
 pub impl MetadataProvider for FontRef with fn outline_glyphs(self) {
   OutlineGlyphCollection::new(self)
 }
+
+///|
+/// Returns the primary attributes for font classification (free function
+/// form of `MetadataProvider::attributes`).
+pub fn attributes(font : FontRef) -> Attributes {
+  Attributes::new(font)
+}
+
+///|
+/// Returns the global font metrics (`MetadataProvider::metrics`).
+pub fn metrics(font : FontRef, size : Size, location : LocationRef) -> Metrics {
+  Metrics::new(font, size, location)
+}
+
+///|
+/// Returns the glyph specific metrics (`MetadataProvider::glyph_metrics`).
+pub fn glyph_metrics(
+  font : FontRef,
+  size : Size,
+  location : LocationRef,
+) -> GlyphMetrics {
+  GlyphMetrics::new(font, size, location)
+}
+
+///|
+/// Returns the character to nominal glyph identifier mapping
+/// (`MetadataProvider::charmap`).
+pub fn charmap(font : FontRef) -> Charmap {
+  Charmap::new(font)
+}
+
+///|
+/// Returns the collection of scalable glyph outlines
+/// (`MetadataProvider::outline_glyphs`).
+pub fn outline_glyphs(font : FontRef) -> OutlineGlyphCollection {
+  OutlineGlyphCollection::new(font)
+}

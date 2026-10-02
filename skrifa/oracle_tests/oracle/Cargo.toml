@@ -1,0 +1,9 @@
+[package]
+name = "skrifa-oracle"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[dependencies]
+hayro-syntax = { git = "https://github.com/LaurenzV/hayro", rev = "d8e24e29eda62581e1ea15497effb2a884fb1608", default-features = false }
+skrifa = "=0.42.1"

@@ -13,6 +13,16 @@ pub const GLYF_COMPOSITE_RECURSION_LIMIT : Int = 32
 
 pub const PHANTOM_POINT_COUNT : Int = 4
 
+pub fn attributes(@read_fonts.FontRef) -> Attributes
+
+pub fn charmap(@read_fonts.FontRef) -> Charmap
+
+pub fn glyph_metrics(@read_fonts.FontRef, Size, LocationRef) -> GlyphMetrics
+
+pub fn metrics(@read_fonts.FontRef, Size, LocationRef) -> Metrics
+
+pub fn outline_glyphs(@read_fonts.FontRef) -> OutlineGlyphCollection
+
 // Errors
 pub(all) suberror DrawError {
   NoSources

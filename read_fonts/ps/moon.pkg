@@ -1,4 +1,5 @@
 import {
   "moonbitlang/typst/font_types",
   "moonbitlang/typst/read_fonts",
+  "moonbitlang/core/encoding/utf8",
 }

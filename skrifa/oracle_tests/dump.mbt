@@ -399,3 +399,46 @@ fn[T] res(
     v => Ok(v)
   }
 }
+
+///|
+/// Mirrors the oracle's `t1` command.
+pub fn dump_t1(data : BytesView) -> String {
+  let out = StringBuilder()
+  let font = @ps.Type1Font::new(data) catch {
+    e => {
+      out.write_string("error \{e}\n")
+      return out.to_string()
+    }
+  }
+  out.write_string("num_glyphs \{font.num_glyphs()} upem \{font.upem()}\n")
+  for item in font.glyph_names() {
+    let (gid, name) = item
+    out.write_string("name \{gid.to_u32()} \{name}\n")
+  }
+  match font.encoding() {
+    Some(enc) =>
+      for code in 0..<256 {
+        let g = match enc.map(code.to_byte()) {
+          Some(g) => g.to_u32().to_int64()
+          None => -1L
+        }
+        let n = enc.glyph_name(code.to_byte()).unwrap_or("-")
+        if g >= 0L || n != "-" {
+          out.write_string("enc \{code} \{g} \{n}\n")
+        }
+      }
+    None => out.write_string("no encoding\n")
+  }
+  for gid in 0..<font.num_glyphs() {
+    let pen = TextPen::new()
+    let glyph = @font_types.GlyphId::from_int(gid)
+    try font.draw(glyph, Some(1000.0), pen) catch {
+      e => out.write_string("glyph \{gid} error \{e}\n")
+    } noraise {
+      Some(w) => out.write_string("glyph \{gid} w \{hex_f32(w)}\n")
+      None => out.write_string("glyph \{gid} w -\n")
+    }
+    out.write_string(pen.to_string())
+  }
+  out.to_string()
+}
