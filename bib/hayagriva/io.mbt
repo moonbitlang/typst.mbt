@@ -1,13 +1,20 @@
 // Port of `hayagriva/src/io.rs` and of the `serde::Deserialize`
 // implementations of the hayagriva data model (`Library`, `NakedEntry` and
-// the field types), applied to the generic YAML data tree.
+// the field types), applied to the located YAML node tree of `data/yaml`.
+//
+// Errors are attributed like `serde_yaml::error::fix_mark` does: a custom
+// error gets the mark and path of the innermost node whose `serde_yaml`
+// `deserialize_*` call was active when it was raised ([at_node]). Untagged
+// enums (`MaybeTyped`, `OneOrMany`, `Choice`) report their final error after
+// the node's own `deserialize_any` returned, so it is attributed to the
+// enclosing node.
 
 ///|
 /// An error from loading a YAML bibliography (upstream `serde_yaml::Error`).
 pub(all) struct YamlLoadError {
-  /// The error message.
+  /// The error message (upstream `Display`).
   message : String
-  /// The location of a YAML syntax error, if any.
+  /// The location of the error, if any (upstream `location()`).
   location : @yaml.Location?
 } derive(Eq, Debug)
 
@@ -18,7 +25,37 @@ pub impl Show for YamlLoadError with fn output(self, logger) {
 
 ///|
 priv suberror De {
+  /// A custom error that has not been attributed to a node yet.
   De(String)
+  /// An error with its final message and location.
+  DeAt(String, @yaml.Location?)
+}
+
+///|
+/// Run a deserializer for a node, attributing unmarked errors to it.
+fn[T] at_node(n : @yaml.YamlNode, f : () -> T raise De) -> T raise De {
+  f() catch {
+    De(msg) => {
+      let @yaml.YamlError(message~, location~) = n.error(msg)
+      raise DeAt(message, location)
+    }
+    err => raise err
+  }
+}
+
+///|
+/// The parse error that ended the document, if a deserializer reads past
+/// the children of an incomplete node.
+let current_parse_error : Ref[@yaml.YamlError?] = { val: None, }
+
+///|
+/// The children of a container node; reading past the present children of
+/// an incomplete node reports the document's parse error.
+fn check_complete(n : @yaml.YamlNode) -> Unit raise De {
+  if n.incomplete && current_parse_error.val is Some(err) {
+    let @yaml.YamlError(message~, location~) = err
+    raise DeAt(message, location)
+  }
 }
 
 ///|
@@ -37,49 +74,59 @@ fn unexpected(d : @serde.Data) -> String {
 }
 
 ///|
-fn invalid_type(d : @serde.Data, expected : String) -> De {
-  De("invalid type: \{unexpected(d)}, expected \{expected}")
+fn invalid_type(n : @yaml.YamlNode, expected : String) -> De {
+  De("invalid type: \{unexpected(n.data)}, expected \{expected}")
+}
+
+///|
+/// The key/value pairs of a mapping node.
+fn map_entries(n : @yaml.YamlNode) -> Array[(String, @yaml.YamlNode)] {
+  match n.data {
+    Map(pairs) => pairs.mapi((i, pair) => (pair.0, n.children[i]))
+    _ => []
+  }
 }
 
 ///|
 /// Parse a bibliography from a YAML string.
 pub fn from_yaml_str(s : String) -> Result[Library, YamlLoadError] {
-  let data = @yaml.parse(@utf8.encode(s)) catch {
+  let nodes = @yaml.parse_nodes(@utf8.encode(s)) catch {
     @yaml.YamlError(message~, location~) => return Err({ message, location, })
   }
-  try de_library(data) catch {
+  current_parse_error.val = nodes.error
+  let result = try at_node(nodes.root, () => de_library(nodes.root)) catch {
     De(message) => Err({ message, location: None, })
+    DeAt(message, location) => Err({ message, location, })
   } noraise {
     lib => Ok(lib)
   }
-}
-
-///|
-fn data_key(d : @serde.Data) -> String {
-  match d {
-    Str(s) => s
-    Int(i) => i.to_string()
-    Float(f) => @serde.format_display(f)
-    Bool(b) => b.to_string()
-    None => "~"
-    _ => ""
+  current_parse_error.val = None
+  match (result, nodes.error) {
+    (Ok(_), Some(@yaml.YamlError(message~, location~))) =>
+      Err({ message, location, })
+    _ => result
   }
 }
 
 ///|
-fn de_library(data : @serde.Data) -> Library raise De {
-  guard data is Map(pairs) else {
-    raise invalid_type(data, "a map between cite keys and entries")
+fn de_library(n : @yaml.YamlNode) -> Library raise De {
+  guard n.data is Map(_) || n.empty else {
+    raise invalid_type(n, "a map between cite keys and entries")
   }
   let entries : Array[Entry] = []
-  for pair in pairs {
+  for pair in map_entries(n) {
     let (key, value) = pair
     if entries.iter().any(e => e.key == key) {
       raise De("duplicate key \{key}")
     }
-    let naked = de_naked_entry(value)
-    entries.push(naked.into_entry(key, None))
+    // Convert immediately so errors report the correct position
+    let entry = at_node(value, () => {
+      let naked = de_naked_entry(value)
+      naked.into_entry(key, None)
+    })
+    entries.push(entry)
   }
+  check_complete(n)
   Library::from_entries(entries)
 }
 
@@ -111,15 +158,36 @@ fn NakedEntry::into_entry(
 }
 
 ///|
-fn de_naked_entry(data : @serde.Data) -> NakedEntry raise De {
-  guard data is Map(pairs) else {
-    raise invalid_type(data, "a map representing a bibliography entry")
+/// `Option<T>`: YAML null deserializes to `None`.
+fn[T] de_opt(
+  n : @yaml.YamlNode,
+  f : (@yaml.YamlNode) -> T raise De,
+) -> T? raise De {
+  match n.data {
+    None => None
+    _ => Some(f(n))
+  }
+}
+
+///|
+/// A field value deserialized with its own `serde_yaml` call.
+fn[T] de_field(
+  n : @yaml.YamlNode,
+  f : (@yaml.YamlNode) -> T raise De,
+) -> T? raise De {
+  de_opt(n, n => at_node(n, () => f(n)))
+}
+
+///|
+fn de_naked_entry(n : @yaml.YamlNode) -> NakedEntry raise De {
+  guard n.data is Map(_) || n.empty else {
+    raise invalid_type(n, "a map representing a bibliography entry")
   }
   let e = Entry::new("", Misc)
   let mut entry_type = None
   let mut parents = []
   let seen : Array[String] = []
-  for pair in pairs {
+  for pair in map_entries(n) {
     let (k, v) = pair
     let canonical = if k == "serial" { "serial-number" } else { k }
     if seen.contains(canonical) {
@@ -128,18 +196,36 @@ fn de_naked_entry(data : @serde.Data) -> NakedEntry raise De {
     seen.push(canonical)
     match k {
       "type" =>
-        entry_type = match v {
-          None => None
-          Str(s) =>
-            match EntryType::from_str(s) {
-              Ok(t) => Some(t)
-              Err(msg) => raise De(msg)
-            }
-          _ => raise invalid_type(v, "string or map")
-        }
+        entry_type = de_field(v, v => {
+          match v.data {
+            Str(s) =>
+              match EntryType::from_str(s) {
+                Ok(t) => t
+                Err(msg) => raise De(msg)
+              }
+            _ => raise invalid_type(v, "string or map")
+          }
+        })
       "parent" =>
-        parents = match v {
-          Seq(items) => items.map(de_naked_entry)
+        // Untagged `OneOrMany<NakedEntry>`.
+        parents = match v.data {
+          Seq(_) => {
+            let items = []
+            let ok = try {
+              for child in v.children {
+                items.push(de_naked_entry(child))
+              }
+              true
+            } catch {
+              _ => false
+            }
+            if !ok {
+              raise De(
+                "data did not match any variant of untagged enum OneOrMany",
+              )
+            }
+            items
+          }
           None =>
             raise De(
               "data did not match any variant of untagged enum OneOrMany",
@@ -154,88 +240,100 @@ fn de_naked_entry(data : @serde.Data) -> NakedEntry raise De {
               },
             ]
         }
-      "title" => e.title_ = de_opt(v, de_format_string)
-      "author" => e.authors_ = de_opt(v, d => de_one_or_many(d, de_person))
-      "date" => e.date_ = de_opt(v, de_date)
-      "editor" => e.editors_ = de_opt(v, d => de_one_or_many(d, de_person))
+      "title" => e.title_ = de_field(v, de_format_string)
+      "author" =>
+        e.authors_ = de_field(v, d => de_one_or_many(d, de_person, "person"))
+      "date" => e.date_ = de_field(v, de_date)
+      "editor" =>
+        e.editors_ = de_field(v, d => de_one_or_many(d, de_person, "person"))
       "affiliated" =>
-        e.affiliated_ = de_opt(v, d => de_one_or_many(d, de_persons_with_roles))
-      "publisher" => e.publisher_ = de_opt(v, de_publisher)
-      "location" => e.location_ = de_opt(v, de_format_string)
-      "organization" => e.organization_ = de_opt(v, de_format_string)
+        e.affiliated_ = de_field(v, d => {
+          de_one_or_many(d, de_persons_with_roles, "struct PersonsWithRoles")
+        })
+      "publisher" => e.publisher_ = de_field(v, de_publisher)
+      "location" => e.location_ = de_field(v, de_format_string)
+      "organization" => e.organization_ = de_field(v, de_format_string)
       "issue" => e.issue_ = de_opt(v, de_maybe_numeric)
       "chapter" => e.chapter_ = de_opt(v, de_maybe_numeric)
       "volume" => e.volume_ = de_opt(v, de_maybe_numeric)
-      "volume-total" => e.volume_total_ = de_opt(v, de_numeric)
+      "volume-total" => e.volume_total_ = de_field(v, de_numeric)
       "edition" => e.edition_ = de_opt(v, de_maybe_numeric)
       "page-range" => e.page_range_ = de_opt(v, de_maybe_page_ranges)
-      "page-total" => e.page_total_ = de_opt(v, de_numeric)
+      "page-total" => e.page_total_ = de_field(v, de_numeric)
       "time-range" => e.time_range_ = de_opt(v, de_maybe_duration_range)
       "runtime" => e.runtime_ = de_opt(v, de_maybe_duration)
-      "url" => e.url_ = de_opt(v, de_qualified_url)
+      "url" => e.url_ = de_field(v, de_qualified_url)
       "serial-number" | "serial" =>
         e.serial_number_ = de_opt(v, de_serial_number)
-      "language" => e.language_ = de_opt(v, de_language)
-      "archive" => e.archive_ = de_opt(v, de_format_string)
-      "archive-location" => e.archive_location_ = de_opt(v, de_format_string)
-      "call-number" => e.call_number_ = de_opt(v, de_format_string)
-      "note" => e.note_ = de_opt(v, de_format_string)
-      "abstract" => e.abstract__ = de_opt(v, de_format_string)
-      "genre" => e.genre_ = de_opt(v, de_format_string)
+      "language" => e.language_ = de_field(v, de_language)
+      "archive" => e.archive_ = de_field(v, de_format_string)
+      "archive-location" => e.archive_location_ = de_field(v, de_format_string)
+      "call-number" => e.call_number_ = de_field(v, de_format_string)
+      "note" => e.note_ = de_field(v, de_format_string)
+      "abstract" => e.abstract__ = de_field(v, de_format_string)
+      "genre" => e.genre_ = de_field(v, de_format_string)
       _ => ()
     }
   }
+  check_complete(n)
   { entry_type, parents, fields: e, }
-}
-
-///|
-/// `Option<T>`: YAML null deserializes to `None`.
-fn[T] de_opt(d : @serde.Data, f : (@serde.Data) -> T raise De) -> T? raise De {
-  match d {
-    None => None
-    _ => Some(f(d))
-  }
 }
 
 ///|
 /// `deserialize_one_or_many_opt` (`MapOneOrMany`).
 fn[T] de_one_or_many(
-  d : @serde.Data,
-  f : (@serde.Data) -> T raise De,
+  n : @yaml.YamlNode,
+  f : (@yaml.YamlNode) -> T raise De,
+  _what : String,
 ) -> Array[T] raise De {
-  match d {
-    Str(_) | Map(_) | Int(_) => [f(d)]
-    Seq(items) => items.map(f)
-    _ => raise invalid_type(d, "a map, a string, or a list")
+  match n.data {
+    Str(_) | Map(_) | Int(_) => [f(n)]
+    Seq(_) => {
+      let out = []
+      for child in n.children {
+        out.push(at_node(child, () => f(child)))
+      }
+      check_complete(n)
+      out
+    }
+    _ => raise invalid_type(n, "a map, a string, or a list")
   }
 }
 
 ///|
-fn de_chunked_string(d : @serde.Data) -> ChunkedString raise De {
-  match d {
+fn de_chunked_string(n : @yaml.YamlNode) -> ChunkedString raise De {
+  match n.data {
     Str(s) =>
       match ChunkedString::from_str(s) {
         Ok(c) => c
         Err(e) => raise De(e.to_string())
       }
-    Map(pairs) => {
+    Map(_) => {
       let mut value = None
       let mut verbatim = false
-      for pair in pairs {
-        match pair.0 {
+      for pair in map_entries(n) {
+        let (k, v) = pair
+        match k {
           "value" =>
-            value = match pair.1 {
-              Str(s) => Some(s)
-              other => raise invalid_type(other, "a string")
-            }
+            value = Some(
+              at_node(v, () => {
+                match v.data {
+                  Str(s) => s
+                  _ => raise invalid_type(v, "a string")
+                }
+              }),
+            )
           "verbatim" =>
-            verbatim = match pair.1 {
-              Bool(b) => b
-              other => raise invalid_type(other, "a boolean")
-            }
+            verbatim = at_node(v, () => {
+              match v.data {
+                Bool(b) => b
+                _ => raise invalid_type(v, "a boolean")
+              }
+            })
           _ => ()
         }
       }
+      check_complete(n)
       guard value is Some(value) else { raise De("missing field `value`") }
       if verbatim {
         ChunkedString::from_chunk(StringChunk::verbatim(value))
@@ -246,27 +344,29 @@ fn de_chunked_string(d : @serde.Data) -> ChunkedString raise De {
         }
       }
     }
-    _ => raise invalid_type(d, "a formattable string")
+    _ => raise invalid_type(n, "a formattable string")
   }
 }
 
 ///|
-fn de_format_string(d : @serde.Data) -> FormatString raise De {
-  match d {
+fn de_format_string(n : @yaml.YamlNode) -> FormatString raise De {
+  match n.data {
     Str(s) =>
       match FormatString::from_str(s) {
         Ok(f) => f
         Err(e) => raise De(e.to_string())
       }
-    Map(pairs) => {
+    Map(_) => {
       // Untagged: `Full { value, short }` or `Val(ChunkedString)`.
+      check_complete(n)
       let full = try {
         let mut value = None
         let mut short = None
-        for pair in pairs {
-          match pair.0 {
-            "value" => value = Some(de_chunked_string(pair.1))
-            "short" => short = de_opt(pair.1, de_chunked_string)
+        for pair in map_entries(n) {
+          let (k, v) = pair
+          match k {
+            "value" => value = Some(de_chunked_string(v))
+            "short" => short = de_opt(v, de_chunked_string)
             _ => ()
           }
         }
@@ -279,7 +379,7 @@ fn de_format_string(d : @serde.Data) -> FormatString raise De {
         Some(f) => f
         None =>
           FormatString::{
-            value: de_chunked_string(d) catch {
+            value: de_chunked_string(n) catch {
               _ =>
                 raise De(
                   "data did not match any variant of untagged enum Inner",
@@ -291,91 +391,101 @@ fn de_format_string(d : @serde.Data) -> FormatString raise De {
     }
     _ =>
       raise invalid_type(
-        d, "a formattable string or a dictionary with an optional short version",
+        n, "a formattable string or a dictionary with an optional short version",
       )
   }
 }
 
 ///|
-fn de_string(d : @serde.Data) -> String raise De {
-  match d {
+fn de_string(n : @yaml.YamlNode) -> String raise De {
+  match n.data {
     Str(s) => s
-    _ => raise invalid_type(d, "a string")
+    _ => raise invalid_type(n, "a string")
   }
 }
 
 ///|
-fn de_person(d : @serde.Data) -> Person raise De {
-  match d {
+fn de_person(n : @yaml.YamlNode) -> Person raise De {
+  match n.data {
     Str(s) =>
       match Person::from_str(s) {
         Ok(p) => p
         Err(e) => raise De(e.to_string())
       }
-    Map(pairs) => {
+    Map(_) => {
       let mut name = None
       let mut given_name = None
       let mut prefix = None
       let mut suffix = None
       let mut comma_suffix = false
       let mut alias_ = None
-      for pair in pairs {
+      for pair in map_entries(n) {
         let (k, v) = pair
         match k {
-          "name" => name = Some(de_string(v))
-          "given-name" => given_name = de_opt(v, de_string)
-          "prefix" => prefix = de_opt(v, de_string)
-          "suffix" => suffix = de_opt(v, de_string)
+          "name" => name = Some(at_node(v, () => de_string(v)))
+          "given-name" => given_name = de_field(v, de_string)
+          "prefix" => prefix = de_field(v, de_string)
+          "suffix" => suffix = de_field(v, de_string)
           "comma-suffix" =>
-            comma_suffix = match v {
-              Bool(b) => b
-              _ => raise invalid_type(v, "a boolean")
-            }
-          "alias" => alias_ = de_opt(v, de_string)
+            comma_suffix = at_node(v, () => {
+              match v.data {
+                Bool(b) => b
+                _ => raise invalid_type(v, "a boolean")
+              }
+            })
+          "alias" => alias_ = de_field(v, de_string)
           _ => ()
         }
       }
+      check_complete(n)
       guard name is Some(name) else { raise De("missing field `name`") }
       { name, given_name, prefix, suffix, comma_suffix, alias_, }
     }
     _ =>
-      raise invalid_type(d, "a name string or a dictionary with a \"name\" key")
+      raise invalid_type(n, "a name string or a dictionary with a \"name\" key")
   }
 }
 
 ///|
-fn de_persons_with_roles(d : @serde.Data) -> PersonsWithRoles raise De {
-  guard d is Map(pairs) else {
-    raise invalid_type(d, "struct PersonsWithRoles")
+fn de_persons_with_roles(n : @yaml.YamlNode) -> PersonsWithRoles raise De {
+  guard n.data is Map(_) || n.empty else {
+    raise invalid_type(n, "struct PersonsWithRoles")
   }
   let mut names = None
   let mut role = None
-  for pair in pairs {
-    match pair.0 {
-      "names" => names = Some(de_one_or_many(pair.1, de_person))
+  for pair in map_entries(n) {
+    let (k, v) = pair
+    match k {
+      "names" =>
+        names = Some(at_node(v, () => de_one_or_many(v, de_person, "person")))
       "role" =>
-        role = match pair.1 {
-          Str(s) =>
-            match PersonRole::from_str(s) {
-              Some(r) => Some(r)
-              None =>
-                raise De(
-                  "unknown variant `\{s}`, expected one of `translator`, `afterword`, `foreword`, `introduction`, `annotator`, `commentator`, `holder`, `compiler`, `founder`, `collaborator`, `organizer`, `cast-member`, `composer`, `producer`, `executive-producer`, `writer`, `cinematography`, `director`, `illustrator`, `narrator`",
-                )
+        role = Some(
+          at_node(v, () => {
+            match v.data {
+              Str(s) =>
+                match PersonRole::from_str(s) {
+                  Some(r) => r
+                  None =>
+                    raise De(
+                      "unknown variant `\{s}`, expected one of `translator`, `afterword`, `foreword`, `introduction`, `annotator`, `commentator`, `holder`, `compiler`, `founder`, `collaborator`, `organizer`, `cast-member`, `composer`, `producer`, `executive-producer`, `writer`, `cinematography`, `director`, `illustrator`, `narrator`",
+                    )
+                }
+              _ => raise invalid_type(v, "enum PersonRole")
             }
-          other => raise invalid_type(other, "enum PersonRole")
-        }
+          }),
+        )
       _ => ()
     }
   }
+  check_complete(n)
   guard names is Some(names) else { raise De("missing field `names`") }
   guard role is Some(role) else { raise De("missing field `role`") }
   { names, role, }
 }
 
 ///|
-fn de_date(d : @serde.Data) -> Date raise De {
-  match d {
+fn de_date(n : @yaml.YamlNode) -> Date raise De {
+  match n.data {
     Str(s) =>
       match Date::from_str(s) {
         Ok(d) => d
@@ -387,38 +497,44 @@ fn de_date(d : @serde.Data) -> Date raise De {
       } else {
         raise De("year out of bounds")
       }
-    Map(pairs) => {
+    Map(_) => {
       let mut year = None
       let mut month = None
       let mut day = None
       let mut approximate = false
       let mut season = None
-      let u8 = (v : @serde.Data) => {
-        match v {
+      let u8 = (v : @yaml.YamlNode) => {
+        match v.data {
           Int(i) if i >= 0L && i <= 255L => i.to_int()
           _ => raise invalid_type(v, "u8")
         }
       }
-      for pair in pairs {
+      for pair in map_entries(n) {
         let (k, v) = pair
         match k {
           "year" =>
-            year = match v {
-              Int(i) if i >= -2147483648L && i <= 2147483647L =>
-                Some(i.to_int())
-              _ => raise invalid_type(v, "i32")
-            }
-          "month" => month = de_opt(v, u8)
-          "day" => day = de_opt(v, u8)
+            year = Some(
+              at_node(v, () => {
+                match v.data {
+                  Int(i) if i >= -2147483648L && i <= 2147483647L => i.to_int()
+                  _ => raise invalid_type(v, "i32")
+                }
+              }),
+            )
+          "month" => month = de_field(v, u8)
+          "day" => day = de_field(v, u8)
           "approximate" =>
-            approximate = match v {
-              Bool(b) => b
-              _ => raise invalid_type(v, "a boolean")
-            }
-          "season" => season = de_opt(v, u8)
+            approximate = at_node(v, () => {
+              match v.data {
+                Bool(b) => b
+                _ => raise invalid_type(v, "a boolean")
+              }
+            })
+          "season" => season = de_field(v, u8)
           _ => ()
         }
       }
+      check_complete(n)
       guard year is Some(year) else { raise De("missing field `year`") }
       {
         year,
@@ -431,40 +547,42 @@ fn de_date(d : @serde.Data) -> Date raise De {
         },
       }
     }
-    _ => raise invalid_type(d, "a date in the format YYYY-MM-DD")
+    _ => raise invalid_type(n, "a date in the format YYYY-MM-DD")
   }
 }
 
 ///|
-fn de_publisher(d : @serde.Data) -> Publisher raise De {
-  match d {
+fn de_publisher(n : @yaml.YamlNode) -> Publisher raise De {
+  match n.data {
     Str(s) =>
       match Publisher::from_str(s) {
         Ok(p) => p
         Err(e) => raise De(e.to_string())
       }
-    Map(pairs) => {
+    Map(_) => {
       let mut name = None
       let mut location = None
-      for pair in pairs {
-        match pair.0 {
-          "name" => name = de_opt(pair.1, de_format_string)
-          "location" => location = de_opt(pair.1, de_format_string)
+      for pair in map_entries(n) {
+        let (k, v) = pair
+        match k {
+          "name" => name = de_field(v, de_format_string)
+          "location" => location = de_field(v, de_format_string)
           _ => ()
         }
       }
+      check_complete(n)
       { name, location, }
     }
     _ =>
       raise invalid_type(
-        d, "FormatString string or dictionary with \"name\" and \"location\"",
+        n, "FormatString string or dictionary with \"name\" and \"location\"",
       )
   }
 }
 
 ///|
-fn de_numeric(d : @serde.Data) -> Numeric raise De {
-  match d {
+fn de_numeric(n : @yaml.YamlNode) -> Numeric raise De {
+  match n.data {
     Int(i) =>
       if i >= -2147483648L && i <= 2147483647L {
         Numeric::new(i.to_int())
@@ -479,19 +597,20 @@ fn de_numeric(d : @serde.Data) -> Numeric raise De {
         Err(e) => raise De(e.to_string())
       }
     _ =>
-      raise invalid_type(d, "a numeric value with optional prefix and suffix")
+      raise invalid_type(n, "a numeric value with optional prefix and suffix")
   }
 }
 
 ///|
 /// `MaybeTyped<T>` (untagged: typed first, then string).
 fn[T] de_maybe_typed(
-  d : @serde.Data,
-  typed : (@serde.Data) -> T raise De,
+  n : @yaml.YamlNode,
+  typed : (@yaml.YamlNode) -> T raise De,
 ) -> MaybeTyped[T] raise De {
-  try typed(d) catch {
+  check_complete(n)
+  try typed(n) catch {
     _ =>
-      match d {
+      match n.data {
         Str(s) => String(s)
         _ =>
           raise De("data did not match any variant of untagged enum MaybeTyped")
@@ -502,13 +621,13 @@ fn[T] de_maybe_typed(
 }
 
 ///|
-fn de_maybe_numeric(d : @serde.Data) -> MaybeTyped[Numeric] raise De {
-  de_maybe_typed(d, de_numeric)
+fn de_maybe_numeric(n : @yaml.YamlNode) -> MaybeTyped[Numeric] raise De {
+  de_maybe_typed(n, de_numeric)
 }
 
 ///|
-fn de_page_ranges(d : @serde.Data) -> PageRanges raise De {
-  match d {
+fn de_page_ranges(n : @yaml.YamlNode) -> PageRanges raise De {
+  match n.data {
     Int(i) =>
       if i >= -2147483648L && i <= 2147483647L {
         PageRanges::from_int(i.to_int())
@@ -522,104 +641,108 @@ fn de_page_ranges(d : @serde.Data) -> PageRanges raise De {
         Ok(p) => p
         Err(e) => raise De(e.to_string())
       }
-    _ => raise invalid_type(d, "pages, page ranges, ampersands, and commas")
+    _ => raise invalid_type(n, "pages, page ranges, ampersands, and commas")
   }
 }
 
 ///|
-fn de_maybe_page_ranges(d : @serde.Data) -> MaybeTyped[PageRanges] raise De {
-  de_maybe_typed(d, de_page_ranges)
+fn de_maybe_page_ranges(n : @yaml.YamlNode) -> MaybeTyped[PageRanges] raise De {
+  de_maybe_typed(n, de_page_ranges)
 }
 
 ///|
-fn de_duration(d : @serde.Data) -> Duration raise De {
-  match d {
+fn de_duration(n : @yaml.YamlNode) -> Duration raise De {
+  match n.data {
     Str(s) =>
       match Duration::from_str(s) {
         Ok(v) => v
         Err(e) => raise De(e.to_string())
       }
-    _ => raise invalid_type(d, "a borrowed string")
+    _ => raise invalid_type(n, "a borrowed string")
   }
 }
 
 ///|
-fn de_maybe_duration(d : @serde.Data) -> MaybeTyped[Duration] raise De {
-  de_maybe_typed(d, de_duration)
+fn de_maybe_duration(n : @yaml.YamlNode) -> MaybeTyped[Duration] raise De {
+  de_maybe_typed(n, de_duration)
 }
 
 ///|
-fn de_duration_range(d : @serde.Data) -> DurationRange raise De {
-  match d {
+fn de_duration_range(n : @yaml.YamlNode) -> DurationRange raise De {
+  match n.data {
     Str(s) =>
       match DurationRange::from_str(s) {
         Ok(v) => v
         Err(e) => raise De(e.to_string())
       }
-    Map(pairs) => {
+    Map(_) => {
       let mut start = None
       let mut end = None
-      for pair in pairs {
-        match pair.0 {
-          "start" => start = Some(de_duration(pair.1))
-          "end" => end = Some(de_duration(pair.1))
+      for pair in map_entries(n) {
+        let (k, v) = pair
+        match k {
+          "start" => start = Some(at_node(v, () => de_duration(v)))
+          "end" => end = Some(at_node(v, () => de_duration(v)))
           _ => ()
         }
       }
+      check_complete(n)
       guard start is Some(start) else { raise De("missing field `start`") }
       guard end is Some(end) else { raise De("missing field `end`") }
       { start, end, }
     }
     _ =>
       raise invalid_type(
-        d, "two durations separated by a hyphen or a map with a `from` and `to` field",
+        n, "two durations separated by a hyphen or a map with a `from` and `to` field",
       )
   }
 }
 
 ///|
 fn de_maybe_duration_range(
-  d : @serde.Data,
+  n : @yaml.YamlNode,
 ) -> MaybeTyped[DurationRange] raise De {
-  de_maybe_typed(d, de_duration_range)
+  de_maybe_typed(n, de_duration_range)
 }
 
 ///|
-fn de_url(d : @serde.Data) -> Url raise De {
-  match d {
+fn de_url(n : @yaml.YamlNode) -> Url raise De {
+  match n.data {
     Str(s) =>
       match Url::parse(s) {
         Ok(u) => u
         Err(e) => raise De(e.to_string())
       }
-    _ => raise invalid_type(d, "a string representing an URL")
+    _ => raise invalid_type(n, "a string representing an URL")
   }
 }
 
 ///|
-fn de_qualified_url(d : @serde.Data) -> QualifiedUrl raise De {
-  match d {
+fn de_qualified_url(n : @yaml.YamlNode) -> QualifiedUrl raise De {
+  match n.data {
     Str(s) =>
       match QualifiedUrl::from_str(s) {
         Ok(u) => u
         Err(e) => raise De(e.to_string())
       }
-    Map(pairs) => {
+    Map(_) => {
       let mut value = None
       let mut visit_date = None
-      for pair in pairs {
-        match pair.0 {
-          "value" => value = Some(de_url(pair.1))
-          "date" => visit_date = de_opt(pair.1, de_date)
+      for pair in map_entries(n) {
+        let (k, v) = pair
+        match k {
+          "value" => value = Some(at_node(v, () => de_url(v)))
+          "date" => visit_date = de_field(v, de_date)
           _ => ()
         }
       }
+      check_complete(n)
       guard value is Some(value) else { raise De("missing field `value`") }
       { value, visit_date, }
     }
     _ =>
       raise invalid_type(
-        d, "URL string or dictionary with keys \"url\" and \"date\"",
+        n, "URL string or dictionary with keys \"url\" and \"date\"",
       )
   }
 }
@@ -636,8 +759,9 @@ fn string_or_number(d : @serde.Data) -> String? {
 }
 
 ///|
-fn de_serial_number(d : @serde.Data) -> SerialNumber raise De {
-  match d {
+fn de_serial_number(n : @yaml.YamlNode) -> SerialNumber raise De {
+  check_complete(n)
+  match n.data {
     Map(pairs) => {
       let map : Map[String, String] = Map([])
       for pair in pairs {
@@ -650,7 +774,7 @@ fn de_serial_number(d : @serde.Data) -> SerialNumber raise De {
       SerialNumber(map)
     }
     _ =>
-      match string_or_number(d) {
+      match string_or_number(n.data) {
         Some(s) => {
           let map : Map[String, String] = Map([])
           map.set("serial", s)
@@ -663,14 +787,14 @@ fn de_serial_number(d : @serde.Data) -> SerialNumber raise De {
 }
 
 ///|
-fn de_language(d : @serde.Data) -> LanguageIdentifier raise De {
-  match d {
+fn de_language(n : @yaml.YamlNode) -> LanguageIdentifier raise De {
+  match n.data {
     Str(s) =>
       match LanguageIdentifier::parse(s) {
         Some(l) => l
         None => raise De("Invalid subtag")
       }
-    _ => raise invalid_type(d, "a string")
+    _ => raise invalid_type(n, "a string")
   }
 }
 

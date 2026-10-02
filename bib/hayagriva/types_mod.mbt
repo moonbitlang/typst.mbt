@@ -115,7 +115,7 @@ let entry_type_names : Array[(EntryType, String, String)] = [
 ///|
 /// The serde variant names (for error messages).
 fn entry_type_expected() -> String {
-  entry_type_names.map(t => "`\{t.1}`").join(", ")
+  entry_type_names.map(t => "`\{t.2}`, `\{t.1}`").join(", ")
 }
 
 ///|

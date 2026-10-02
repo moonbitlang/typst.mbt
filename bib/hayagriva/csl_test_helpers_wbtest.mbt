@@ -20,6 +20,64 @@ fn run_csl_case(
       Err(e) => abort("yaml parse error: \{e.message}")
     }
   }
+  run_csl_library(library, style_name, spec)
+}
+
+///|
+/// Load a library and dump either the error or the full bibliography in two
+/// styles (mirrors `load_dump` of the generator).
+fn load_case(kind : String, src : String) -> String {
+  let library = if kind == "bib" {
+    match from_biblatex_str(src) {
+      Ok(l) => l
+      Err(errs) => {
+        let out = StringBuilder()
+        for e in errs {
+          match e {
+            Parse(e) =>
+              out.write_string(
+                "parse error: \{e.kind} @ \{e.span.start}..\{e.span.end}\n",
+              )
+            Type(e) =>
+              out.write_string(
+                "type error: \{e.kind} @ \{e.span.start}..\{e.span.end}\n",
+              )
+          }
+        }
+        return out.to_string()
+      }
+    }
+  } else {
+    match from_yaml_str(src) {
+      Ok(l) => l
+      Err(e) => {
+        let loc = match e.location {
+          Some(l) => "\{l.index}:\{l.line}:\{l.column}"
+          None => "-"
+        }
+        return "yaml error: \{e.message} @ \{loc}\n"
+      }
+    }
+  }
+  let keys = library.keys()
+  let out = StringBuilder()
+  out.write_string("entries: \{keys.join(", ")}\n")
+  if keys.is_empty() {
+    return out.to_string()
+  }
+  for name in ["apa", "ieee", "chicago-notes"] {
+    out.write_string("== \{name}\n")
+    out.write_string(run_csl_library(library, name, keys.join("|")))
+  }
+  out.to_string()
+}
+
+///|
+fn run_csl_library(
+  library : Library,
+  style_name : String,
+  spec : String,
+) -> String {
   let style = match ArchivedStyle::by_name(style_name) {
     Some(s) =>
       match s.get() {
