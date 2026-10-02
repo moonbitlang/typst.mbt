@@ -3,9 +3,11 @@
 
 Usage: python3 scripts/gen_hayro_svg_tests.py <oracle-binary> <pdf>[@page] ...
 
-The oracle binary is a small Rust program that prints
+The oracle binary is the small Rust program in `hayro/svg/oracle/` (copy
+it with `oracle/Cargo.lock` and `oracle/rust-toolchain.toml` into a scratch
+directory and run `cargo build --release --offline`); it prints
 `hayro_svg::convert(page, ...)` with Typst's settings for
-`<oracle> svg <pdf> <page>` (see the hayro-svg port's notes). PDF paths are
+`<oracle> svg <pdf> <page>`. PDF paths are
 recorded relative to the module root (use the `target/hayro` and
 `target/devassets` symlinks). Writes `hayro/svg/testdata/expected.tsv` with
 the length and FNV-1a 64 hash of each SVG.

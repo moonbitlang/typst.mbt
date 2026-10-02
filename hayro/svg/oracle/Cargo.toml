@@ -1,0 +1,14 @@
+[package]
+name = "hayro-oracle"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[dependencies]
+hayro-svg = { git = "https://github.com/LaurenzV/hayro", rev = "d8e24e29eda62581e1ea15497effb2a884fb1608", default-features = false }
+hayro-interpret = { git = "https://github.com/LaurenzV/hayro", rev = "d8e24e29eda62581e1ea15497effb2a884fb1608", default-features = false }
+hayro-syntax = { git = "https://github.com/LaurenzV/hayro", rev = "d8e24e29eda62581e1ea15497effb2a884fb1608", default-features = false }
+typst-assets = { git = "https://github.com/typst/typst-assets", rev = "94dcb99", features = ["fonts"] }
+skrifa = "=0.42.1"
+moxcms = "=0.8.1"
+kurbo = "=0.13.1"
