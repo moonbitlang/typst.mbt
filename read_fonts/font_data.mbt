@@ -199,7 +199,10 @@ pub fn FontData::read_array(
   size : Int,
 ) -> FontData raise ReadError {
   let len = n.to_int64() * size.to_int64()
-  if offset < 0 || len > (self.bytes.length() - offset).to_int64() {
+  if offset < 0 ||
+    n < 0 ||
+    offset > self.bytes.length() ||
+    len > (self.bytes.length() - offset).to_int64() {
     raise OutOfBounds
   }
   { bytes: self.bytes[offset:offset + len.to_int()], }

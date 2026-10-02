@@ -303,7 +303,7 @@ pub(all) struct HintingParams {
 } derive(Eq, @debug.Debug)
 pub fn HintingParams::default() -> Self
 
-pub enum Index {
+pub(all) enum Index {
   Empty
   Format1(Index1)
 }

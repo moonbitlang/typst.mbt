@@ -127,7 +127,7 @@ fn read_offset(
 
 ///|
 /// Common type for uniform access to CFF index formats.
-pub enum Index {
+pub(all) enum Index {
   Empty
   Format1(Index1)
 }

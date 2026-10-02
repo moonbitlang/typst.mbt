@@ -39,7 +39,7 @@ pub fn fnv(data : BytesView) -> UInt64 {
 pub fn fnv_str(s : String) -> UInt64 {
   // The oracle hashes UTF-8; dumps are ASCII except for glyph names which
   // are printed as Latin-1 chars (`b as char`), so encode as UTF-8.
-  let buf = @buffer.new()
+  let buf = Buffer()
   for c in s {
     let c = c.to_int()
     if c < 0x80 {
@@ -221,4 +221,181 @@ pub fn dump_cff(data : BytesView) -> String {
     out.write_string(pen.to_string())
   }
   out.to_string()
+}
+
+///|
+fn hash_lines(lines : StringBuilder) -> String {
+  hex_u64(fnv_str(lines.to_string()))
+}
+
+///|
+/// Mirrors the oracle's `otf` command.
+pub fn dump_otf(data : BytesView, index : Int) -> String {
+  let out = StringBuilder()
+  let font = @read_fonts.FontRef::from_index(data, index) catch {
+    e => {
+      out.write_string("error \{e}\n")
+      return out.to_string()
+    }
+  }
+  match res(() => font.post()) {
+    Ok(post) => {
+      let (maj, min) = post.version().to_major_minor()
+      out.write_string("post \{maj} \{min}\n")
+      if post.glyph_name_index() is Some(idx) {
+        out.write_string(
+          "post_idx " + idx.map(i => i.to_string()).join(" ") + "\n",
+        )
+      }
+      if post.string_data() is Some(sd) {
+        for e in sd {
+          match e {
+            Ok(s) => out.write_string("post_str \{s}\n")
+            Err(e) => out.write_string("post_str_err \{e}\n")
+          }
+        }
+      }
+    }
+    Err(e) => out.write_string("post error \{e}\n")
+  }
+  match res(() => font.cff()) {
+    Ok(cff) => {
+      let d = cff.offset_data()
+      out.write_string("cff \{d.length()} \{hex_u64(fnv(d))}\n")
+    }
+    Err(e) => out.write_string("cff error \{e}\n")
+  }
+  match res(() => font.cmap()) {
+    Ok(cmap) => {
+      for record in cmap.encoding_records() {
+        out.write_string(
+          "cmap \{debug_platform(record.platform_id())} \{record.encoding_id()}",
+        )
+        match res(() => record.subtable(cmap.offset_data())) {
+          Ok(sub) => {
+            let h = StringBuilder()
+            let mut n = 0
+            for c in 0U..<0x11000U {
+              if sub.map_codepoint(c) is Some(g) {
+                h.write_string("\{c} \{g.to_u32()}\n")
+                n += 1
+              }
+            }
+            out.write_string(" fmt \{sub.format()} n \{n} h \{hash_lines(h)}\n")
+          }
+          Err(e) => out.write_string(" error \{e}\n")
+        }
+      }
+      let h = StringBuilder()
+      let mut n = 0
+      for c in 0U..<0x11000U {
+        if cmap.map_codepoint(c) is Some(g) {
+          h.write_string("\{c} \{g.to_u32()}\n")
+          n += 1
+        }
+      }
+      out.write_string("cmap_map n \{n} h \{hash_lines(h)}\n")
+    }
+    Err(e) => out.write_string("cmap error \{e}\n")
+  }
+  {
+    let cm = @skrifa.Charmap::new(font)
+    let h = StringBuilder()
+    let mut n = 0
+    for c in 0U..<0x11000U {
+      if c >= 0xD800U && c <= 0xDFFFU {
+        continue
+      }
+      if cm.map(c) is Some(g) {
+        h.write_string("\{c} \{g.to_u32()}\n")
+        n += 1
+      }
+    }
+    out.write_string("charmap n \{n} h \{hash_lines(h)}\n")
+  }
+  let attrs = @skrifa.Attributes::new(font)
+  let style = match attrs.style {
+    Normal => "Normal"
+    Italic => "Italic"
+    Oblique(None) => "Oblique(None)"
+    Oblique(Some(a)) => "Oblique(\{hex_f32(a)})"
+  }
+  out.write_string(
+    "attrs weight \{hex_f32(attrs.weight.value())} style \{style} stretch \{hex_f32(attrs.stretch.ratio())}\n",
+  )
+  let m = @skrifa.Metrics::new(
+    font,
+    @skrifa.Size::unscaled(),
+    @skrifa.LocationRef::default(),
+  )
+  out.write_string("metrics upem \{m.units_per_em} mono \{m.is_monospace}\n")
+  let outlines = @skrifa.OutlineGlyphCollection::new(font)
+  out.write_string("require_interpreter \{outlines.require_interpreter()}\n")
+  let gm = @skrifa.GlyphMetrics::new(
+    font,
+    @skrifa.Size::new(1000.0),
+    @skrifa.LocationRef::default(),
+  )
+  let num_glyphs = match res(() => font.maxp()) {
+    Ok(m) => m.num_glyphs()
+    Err(_) => 0
+  }
+  out.write_string("num_glyphs \{num_glyphs}\n")
+  for gid in 0..<(num_glyphs + 1) {
+    let glyph = @font_types.GlyphId::from_int(gid)
+    let aw = match gm.advance_width(glyph) {
+      Some(w) => hex_f32(w)
+      None => "-"
+    }
+    guard outlines.get(glyph) is Some(outline) else {
+      out.write_string("glyph \{gid} aw \{aw} none\n")
+      continue
+    }
+    let pen = TextPen::new()
+    let settings = @skrifa.DrawSettings::unhinted(
+      @skrifa.Size::new(1000.0),
+      @skrifa.LocationRef::default(),
+    )
+    try outline.draw(settings, pen) catch {
+      e => out.write_string("glyph \{gid} aw \{aw} error \{e}\n")
+    } noraise {
+      _ => out.write_string("glyph \{gid} aw \{aw}\n")
+    }
+    out.write_string(pen.to_string())
+  }
+  out.to_string()
+}
+
+///|
+fn debug_platform(p : @read_fonts.PlatformId) -> String {
+  match p {
+    Unicode => "Unicode"
+    Macintosh => "Macintosh"
+    ISO => "ISO"
+    Windows => "Windows"
+    Custom => "Custom"
+    Unknown => "Unknown"
+  }
+}
+
+///|
+/// Runs `f`, returning `None` on error (Rust `.ok()`).
+fn[T] ok(f : () -> T raise) -> T? {
+  try f() catch {
+    _ => None
+  } noraise {
+    v => Some(v)
+  }
+}
+
+///|
+/// Runs `f`, capturing the result.
+fn[T] res(
+  f : () -> T raise @read_fonts.ReadError,
+) -> Result[T, @read_fonts.ReadError] {
+  try f() catch {
+    e => Err(e)
+  } noraise {
+    v => Ok(v)
+  }
 }
