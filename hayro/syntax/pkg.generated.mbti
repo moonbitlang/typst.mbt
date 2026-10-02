@@ -236,7 +236,7 @@ pub fn ObjRef::to_id(Self) -> ObjectIdentifier
 pub impl Readable for ObjRef
 pub impl Skippable for ObjRef
 
-pub enum Object {
+pub(all) enum Object {
   Null
   Boolean(Bool)
   Number(Number)
@@ -541,6 +541,7 @@ pub(all) enum TypedInstruction {
   Fallback(Name)
 }
 pub fn TypedInstruction::dispatch(Instruction) -> Self?
+pub fn TypedInstruction::name(Self) -> String
 
 pub struct TypedIter {
   // private fields
