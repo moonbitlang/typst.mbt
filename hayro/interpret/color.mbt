@@ -767,12 +767,10 @@ fn Lab::new(dict : @hayro_syntax.Dict) -> Lab? {
   let profile = @moxcms.ColorProfile::new_from_slice(lab_icc()[:]) catch {
     _ => return None
   }
-  profile.set_white_point(
-    @moxcms.Xyzd::new(
-      white_point[0].to_double(),
-      white_point[1].to_double(),
-      white_point[2].to_double(),
-    ),
+  profile.white_point = @moxcms.Xyzd::new(
+    white_point[0].to_double(),
+    white_point[1].to_double(),
+    white_point[2].to_double(),
   )
   guard ICCProfile::new_from_src_profile(
       profile, false,
@@ -1016,16 +1014,14 @@ fn ICCProfile::new_from_src_profile(
       return None
   }
   let dest_profile = @moxcms.ColorProfile::new_srgb()
-  let transform_u8 = src_profile
-    .clone()
-    .create_transform_8bit(
-      src_layout,
-      dest_profile,
-      Rgb,
-      @moxcms.TransformOptions::default(),
-    ) catch {
-      _ => return None
-    }
+  let transform_u8 = src_profile.create_transform_8bit(
+    src_layout,
+    dest_profile,
+    Rgb,
+    @moxcms.TransformOptions::default(),
+  ) catch {
+    _ => return None
+  }
   Some({
     src_profile,
     src_layout,
@@ -1051,17 +1047,15 @@ fn ICCProfile::transform_f32(self : ICCProfile) -> @moxcms.TransformF32Executor 
     Some(t) => t
     None => {
       let dest_profile = @moxcms.ColorProfile::new_srgb()
-      let t = self.src_profile
-        .clone()
-        .create_transform_f32(
-          self.src_layout,
-          dest_profile,
-          Rgb,
-          @moxcms.TransformOptions::default(),
-        ) catch {
-          // Since the u8 version was valid, hopefully this should never panic?
-          _ => abort("failed to create f32 transform")
-        }
+      let t = self.src_profile.create_transform_f32(
+        self.src_layout,
+        dest_profile,
+        Rgb,
+        @moxcms.TransformOptions::default(),
+      ) catch {
+        // Since the u8 version was valid, hopefully this should never panic?
+        _ => abort("failed to create f32 transform")
+      }
       self.transform_f32 = Some(t)
       t
     }
@@ -1105,7 +1099,7 @@ impl ToRgb for ICCProfile with fn convert_u8(self, input, output) {
       output[i] = input[i]
     }
   } else {
-    self.transform_u8.transform(input, output) catch {
+    self.transform_u8.transform(Array::from_iter(input.iter())[:], output) catch {
       _ => return None
     }
   }
