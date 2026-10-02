@@ -22,24 +22,6 @@ let hangul_shaper : OtShaper = placeholder_shaper("hangul")
 let hebrew_shaper : OtShaper = placeholder_shaper("hebrew")
 
 ///|
-let indic_shaper : OtShaper = placeholder_shaper("indic")
-
-///|
-priv struct IndicShapePlan {}
-
-///|
-let khmer_shaper : OtShaper = placeholder_shaper("khmer")
-
-///|
-priv struct KhmerShapePlan {}
-
-///|
-let myanmar_shaper : OtShaper = placeholder_shaper("myanmar")
-
-///|
-let myanmar_zawgyi_shaper : OtShaper = placeholder_shaper("myanmar_zawgyi")
-
-///|
 let universal_shaper : OtShaper = placeholder_shaper("universal")
 
 ///|
