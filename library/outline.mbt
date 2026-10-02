@@ -504,3 +504,27 @@ fn determine_prefix_widths(elems : Array[Content]) -> Array[Abs?] {
   }
   widths
 }
+
+///|
+/// Upstream `ShowSet for Packed<OutlineElem>`.
+fn outline_elem_show_set(content : Content, styles : StyleChain) -> Styles {
+  let out = Styles::new()
+  out.push(HeadingElem::set_outlined(false))
+  out.push(HeadingElem::set_numbering(None))
+  out.push(ParElem::set_justify(false))
+  out.push(
+    BlockElem::set_above(
+      Custom(Spacing::from_length(ParElem::leading_in(styles))),
+    ),
+  )
+  // Makes the outline itself available to its entries. Should be
+  // superseded by a proper ancestry mechanism in the future.
+  out.push(OutlineEntry::set_parent(Some(OutlineElem(content))))
+  out
+}
+
+///|
+/// Upstream `LocalName for Packed<OutlineElem>`.
+fn outline_elem_local_name_key() -> String {
+  "outline"
+}

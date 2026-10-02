@@ -581,3 +581,19 @@ pub impl FromValue for PixelEncoding with fn from_value(v) {
     v => raise HintedError(PixelEncoding::input().error(v))
   }
 }
+
+///|
+/// Upstream `Synthesize for Packed<ImageElem>`.
+fn image_elem_synthesize(
+  _engine : Engine,
+  content : Content,
+  styles : StyleChain,
+) -> Content raise SourceError {
+  ImageElem(content).with_locale(Locale::get_in(styles)).pack()
+}
+
+///|
+/// Upstream `LocalName for Packed<ImageElem>`.
+fn image_elem_local_name_key() -> String {
+  "figure"
+}

@@ -5,12 +5,13 @@
 /// Determine the shared trunk of a collection of style chains.
 pub fn StyleChain::trunk(chains : Iter[StyleChain]) -> StyleChain? {
   // Determine shared style depth and first span.
-  let mut trunk = match chains.head() {
+  // Note: `Iter::head` consumes the first element.
+  let mut trunk = match chains.next() {
     Some(first) => first
     None => return None
   }
   let mut depth = trunk.links().length()
-  for chain in chains.drop(1) {
+  for chain in chains {
     let mut chain = chain
     let len = chain.links().length()
     if len < depth {

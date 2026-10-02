@@ -446,3 +446,29 @@ fn table_cell_elem_stroke_default() -> Value {
 fn table_cell_elem_kind_default() -> Value {
   kind_to_value(Auto)
 }
+
+///|
+/// Upstream `LocalName for Packed<TableElem>`.
+fn table_elem_local_name_key() -> String {
+  "table"
+}
+
+///|
+/// `Some(Arc::new(Stroke::default()))` (TableHLine.stroke).
+fn table_h_line_elem_stroke_default() -> Value {
+  IntoValue::into_value((Some(Stroke::default()) : Stroke?))
+}
+
+///|
+/// `Some(Arc::new(Stroke::default()))` (TableVLine.stroke).
+fn table_v_line_elem_stroke_default() -> Value {
+  IntoValue::into_value((Some(Stroke::default()) : Stroke?))
+}
+
+///|
+/// `Celled::Value(Sides::splat(Some(Some(Arc::new(Stroke::default())))))`
+/// (TableElem.stroke).
+fn table_elem_stroke_default() -> Value {
+  let stroke : Stroke?? = Some(Some(Stroke::default()))
+  (CelledValue(Sides::splat(stroke)) : Celled[Sides[Stroke??]]).into_value()
+}

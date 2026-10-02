@@ -84,3 +84,23 @@ pub impl FromValue for CitationForm with fn from_value(v) {
   }
   raise HintedError(CitationForm::input().error(v))
 }
+
+///|
+/// Upstream `Synthesize for Packed<CiteElem>`.
+fn cite_elem_synthesize(
+  _engine : Engine,
+  content : Content,
+  styles : StyleChain,
+) -> Content raise SourceError {
+  CiteElem(content)
+  .with_lang(TextElem::lang_in(styles))
+  .with_region(TextElem::region_in(styles))
+  .pack()
+}
+
+///|
+/// `Default::default()` of `Smart<Derived<CslSource, CslStyle>>`
+/// (CiteElem.style).
+fn cite_elem_style_default() -> Value {
+  Auto
+}

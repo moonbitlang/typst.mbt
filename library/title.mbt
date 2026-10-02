@@ -19,3 +19,18 @@ pub fn TitleElem::resolve_body(
     Custom(body) => body
   }
 }
+
+///|
+/// Upstream `ShowSet for Packed<TitleElem>`.
+fn title_elem_show_set(_content : Content, _styles : StyleChain) -> Styles {
+  let size = Em::new(1.7)
+  let above = Em::new(1.125)
+  let below = Em::new(0.75)
+  let out = Styles::new()
+  out.push(TextElem::set_size(TextSize(Length::from_em(size))))
+  out.push(TextElem::set_weight(font_weight_bold))
+  out.push(BlockElem::set_above(Custom(Spacing::from_em(above))))
+  out.push(BlockElem::set_below(Custom(Spacing::from_em(below))))
+  out.push(BlockElem::set_sticky(true))
+  out
+}

@@ -1,7 +1,7 @@
 // Differential test runner: compares the MoonBit port against reference
 // outputs dumped by the Rust oracle (see `scripts/goldens.sh`).
 //
-// Usage: moon run tests/runner -- <syntax|ast|eval|html> [filter] [--verbose]
+// Usage: moon run tests/runner -- <syntax|ast|eval|html|realize> [filter] [--verbose]
 
 ///|
 let suite_dir = ".repos/typst/tests/suite"
@@ -21,6 +21,7 @@ fn main {
       run_stage("syntax", (_, tc) => syntax_report(tc.body), filter, verbose)
     "ast" => run_stage("ast", (_, tc) => ast_report(tc.body), filter, verbose)
     "eval" => run_stage("eval", eval_report, filter, verbose)
+    "realize" => run_stage("realize", realize_report, filter, verbose)
     // Like the oracle, only tests that target HTML.
     "html" =>
       run_stage("html", html_report, filter, verbose, select=tc => {

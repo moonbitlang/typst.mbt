@@ -95,14 +95,7 @@ pub impl FromValue for FootnoteElem with fn from_value(v) {
 /// The alternative text of a footnote number: the footnote's local name
 /// followed by the number.
 pub fn FootnoteElem::alt_text(styles : StyleChain, num : String) -> String {
-  // TODO: Upstream uses `Packed::<FootnoteElem>::local_name_in(styles)`;
-  // local names are not ported yet, so this falls back to English.
-  let local_name = footnote_elem()
-    .local_name(
-      TextElem::lang_in(styles).as_str(),
-      TextElem::region_in(styles).map(r => r.as_str()),
-    )
-    .unwrap_or("Footnote")
+  let local_name = footnote_elem().local_name_in(styles)
   "\{local_name} \{num}"
 }
 
@@ -188,4 +181,35 @@ pub fn FootnoteEntry::realize(
   let sup = SuperElem::new(link).pack().spanned(span)
   let body = note.body_content().unwrap()
   (sup, body)
+}
+
+///|
+/// Upstream `ShowSet for Packed<FootnoteEntry>`.
+fn footnote_entry_elem_show_set(
+  _content : Content,
+  _styles : StyleChain,
+) -> Styles {
+  let out = Styles::new()
+  out.push(ParElem::set_leading(Length::from_em(Em::new(0.5))))
+  out.push(TextElem::set_size(TextSize(Length::from_em(Em::new(0.85)))))
+  out
+}
+
+///|
+/// Upstream `LocalName for Packed<FootnoteElem>`.
+fn footnote_elem_local_name_key() -> String {
+  "footnote"
+}
+
+///|
+/// The default separator of footnote entries (FootnoteEntry.separator).
+fn footnote_entry_elem_separator_default() -> Value {
+  LineElem::new()
+  .with_length(Rel::from_ratio(Ratio::new(0.3)))
+  .with_stroke({
+    ..Stroke::default(),
+    thickness: Custom(Length::from_em(Em::new(0.05))),
+  })
+  .pack()
+  .into_value()
 }

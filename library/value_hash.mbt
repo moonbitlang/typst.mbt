@@ -293,11 +293,21 @@ pub impl Fingerprint for Content with fn fingerprint(self, state) {
   let lifecycle = self.lifecycle.copy()
   lifecycle.sort()
   state.write(lifecycle)
-  // Data.
-  state.write_usize(self.fields.length())
-  for field in self.fields {
-    state.write(field)
+  // Data (hashed once and cached, like upstream).
+  let data = match self.data_hash.val {
+    Some(h) => h
+    None => {
+      let inner = SipHasher128::new()
+      inner.write_usize(self.fields.length())
+      for field in self.fields {
+        inner.write(field)
+      }
+      let h = inner.finish128()
+      self.data_hash.val = Some(h)
+      h
+    }
   }
+  state.write_u128(data)
   state.write(self.span)
 }
 

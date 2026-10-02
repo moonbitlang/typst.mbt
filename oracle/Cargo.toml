@@ -20,6 +20,7 @@ typst-eval = { path = "../.repos/typst/crates/typst-eval" }
 typst-library = { path = "../.repos/typst/crates/typst-library" }
 typst-layout = { path = "../.repos/typst/crates/typst-layout" }
 typst-html = { path = "../.repos/typst/crates/typst-html" }
+typst-realize = { path = "../.repos/typst/crates/typst-realize" }
 typst-pdf = { path = "../.repos/typst/crates/typst-pdf" }
 typst-svg = { path = "../.repos/typst/crates/typst-svg" }
 typst-render = { path = "../.repos/typst/crates/typst-render" }

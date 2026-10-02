@@ -161,6 +161,16 @@ fn main() {
         &ranges(|c| debug_escapes(c, "")),
     );
 
+    // Characters whose writing system does not use spaces, as determined by
+    // `codex::space_discarding` (its `writing_system_spacing` is private, but
+    // `discard_space_between(c, "")` is true exactly for those characters).
+    emit_set(
+        &mut out,
+        "no_space_writing_table",
+        "Characters with `WritingSystemSpacing::No` (codex `space_discarding`).",
+        &ranges(|c| codex::space_discarding::discard_space_between(&c.to_string(), "")),
+    );
+
     // Scripts.
     let mut script_names: BTreeMap<String, u32> = BTreeMap::new();
     for c in chars() {

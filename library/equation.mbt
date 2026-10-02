@@ -1,14 +1,30 @@
 // Parts of `typst-library/src/math/equation.rs` (the element itself is
-// generated).
+// generated): the `Synthesize`, `ShowSet` and `LocalName` impls (wired into
+// the element's hooks by `scripts/elemgen.py`).
 
 ///|
-fn equation_elem_init(e : Element) -> Unit {
-  e.hooks().show_set = Some(equation_show_set)
+/// Upstream `Synthesize for Packed<EquationElem>`.
+fn equation_elem_synthesize(
+  engine : Engine,
+  content : Content,
+  styles : StyleChain,
+) -> Content raise SourceError {
+  let elem = EquationElem(content)
+  let supplement = match elem.supplement(styles) {
+    Auto => TextElem::packed(equation_elem().local_name_in(styles))
+    Custom(None) => Content::empty()
+    Custom(Some(supplement)) =>
+      supplement.resolve(engine, styles, [Content(content)])
+  }
+  elem
+  .with_supplement(Custom(Some(Content(supplement))))
+  .with_locale(Locale::get_in(styles))
+  .pack()
 }
 
 ///|
 /// Upstream `ShowSet for Packed<EquationElem>`.
-fn equation_show_set(content : Content, styles : StyleChain) -> Styles {
+fn equation_elem_show_set(content : Content, styles : StyleChain) -> Styles {
   let elem = EquationElem(content)
   let out = Styles::new()
   if elem.block(styles) {
@@ -24,4 +40,10 @@ fn equation_show_set(content : Content, styles : StyleChain) -> Styles {
     TextElem::set_font(FontList([FontFamily::new("New Computer Modern Math")])),
   )
   out
+}
+
+///|
+/// Upstream `LocalName for Packed<EquationElem>`.
+fn equation_elem_local_name_key() -> String {
+  "equation"
 }

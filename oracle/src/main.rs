@@ -16,6 +16,7 @@ mod ast_dump;
 mod collect;
 mod eval;
 mod html;
+mod realize;
 mod world;
 
 fn main() {
@@ -51,6 +52,22 @@ fn main() {
             let rel = upstream.strip_prefix(&root).unwrap();
             html::dump_html(rel, &out);
         }
+        Some("realize") => {
+            // Paths are resolved relative to the upstream checkout.
+            let suite = PathBuf::from(&args[2]);
+            let out = std::path::absolute(PathBuf::from(&args[3])).unwrap();
+            let upstream = std::path::absolute(&suite).unwrap();
+            let root = upstream.ancestors().nth(2).unwrap().to_path_buf();
+            std::env::set_current_dir(&root).unwrap();
+            let rel = upstream.strip_prefix(&root).unwrap();
+            let rel = rel.to_path_buf();
+            std::thread::Builder::new()
+                .stack_size(1 << 30)
+                .spawn(move || realize::dump_realize(&rel, &out))
+                .unwrap()
+                .join()
+                .unwrap();
+        }
         Some("parse") => {
             // Debugging aid: parse a single file and print the tree.
             let text = std::fs::read_to_string(&args[2]).unwrap();
@@ -62,7 +79,7 @@ fn main() {
             print!("{}", ast_dump::ast_report(&text));
         }
         _ => {
-            eprintln!("usage: typst-oracle <syntax|ast|eval|html> <suite-dir> <out-dir>");
+            eprintln!("usage: typst-oracle <syntax|ast|eval|html|realize> <suite-dir> <out-dir>");
             std::process::exit(2);
         }
     }

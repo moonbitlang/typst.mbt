@@ -18,6 +18,9 @@ pub struct Content {
   /// Manages the element during realization: bit 0 = prepared, bit n =
   /// guarded against the n-th show rule recipe.
   lifecycle : Array[Int]
+  /// The lazily computed hash of the field data (upstream: the `hash` in the
+  /// content header). Shared by all copies with the same `fields`.
+  priv data_hash : Ref[U128?]
 }
 
 ///|
@@ -33,6 +36,7 @@ pub fn Content::from_fields(
     label: None,
     location: None,
     lifecycle: [],
+    data_hash: Ref::new(None),
   }
 }
 
@@ -52,7 +56,7 @@ pub fn Content::new(
 
 ///|
 fn Content::with_fields(self : Content, fields : FixedArray[Value?]) -> Content {
-  { ..self, fields, }
+  { ..self, fields, data_hash: Ref::new(None), }
 }
 
 ///|
@@ -288,10 +292,8 @@ pub fn Content::field_by_name(
 /// materialized copy).
 pub fn Content::materialize(self : Content, styles : StyleChain) -> Content {
   let fields = self.fields.copy()
+  // Like upstream, this includes internal settable fields.
   for info in self.elem.fields() {
-    if info.internal {
-      continue
-    }
     if info.kind is Settable && fields[info.id] is None {
       fields[info.id] = Some(styles.get_value_with_local(self.elem, info, None))
     }
@@ -522,6 +524,30 @@ pub fn Content::traverse(self : Content, f : (Content) -> Bool) -> Bool {
     }
   }
   true
+}
+
+///|
+/// Queries the content tree for the first element that match the given
+/// selector.
+///
+/// This is a *naive hack* because contextual content and elements produced
+/// in `show` rules will not be included in the results. It's used should
+/// be avoided.
+pub fn Content::query_first_naive(
+  self : Content,
+  selector : Selector,
+) -> Content? {
+  let mut found : Content? = None
+  self.traverse(element => {
+    if selector.matches(element, None) {
+      found = Some(element)
+      false
+    } else {
+      true
+    }
+  })
+  |> ignore
+  found
 }
 
 ///|

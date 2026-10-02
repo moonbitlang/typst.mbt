@@ -237,6 +237,34 @@ pub fn DocumentInfo::copy(self : DocumentInfo) -> DocumentInfo {
 }
 
 ///|
+/// Upstream `ShowSet for Packed<DocumentElem>`.
+fn document_elem_show_set(content : Content, _styles : StyleChain) -> Styles {
+  // Here, we make explicit document properties contextually available.
+  // This is mostly relevant for bundle export as document elements are
+  // not directly supported in other targets.
+  //
+  // Making the properties available like this is inconsistent with normal
+  // elements, but consistent with `page` and necessary to make the
+  // `title` element work.
+  //
+  // Nonetheless, it's fairly hacky and the whole thing should probably be
+  // revisited at some point. Also see
+  // <https://github.com/typst/typst/issues/6721>.
+  let styles = Styles::new()
+  for
+    id in [
+      document_elem_format, document_elem_title, document_elem_author, document_elem_description,
+      document_elem_keywords, document_elem_date,
+    ] {
+    // `copy_into`: copy the element's own value, if it is set.
+    if content.field_raw(id) is Some(value) {
+      styles.set(document_elem(), id, value)
+    }
+  }
+  styles
+}
+
+///|
 fn document_elem_author_default() -> Value {
   (OneOrMultiple::default() : OneOrMultiple[String]).into_value()
 }

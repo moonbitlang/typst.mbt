@@ -11,6 +11,18 @@ pub(all) enum Spacing {
 } derive(Eq, Hash)
 
 ///|
+/// Spacing from a length (upstream `From<Length> for Spacing`).
+pub fn Spacing::from_length(length : Length) -> Spacing {
+  Rel(Rel::new(Ratio::zero(), length))
+}
+
+///|
+/// Spacing from an em length (upstream `From<Em> for Spacing`).
+pub fn Spacing::from_em(em : Em) -> Spacing {
+  Spacing::from_length(Length::from_em(em))
+}
+
+///|
 /// Whether this is fractional spacing.
 pub fn Spacing::is_fractional(self : Spacing) -> Bool {
   self is Fr(_)

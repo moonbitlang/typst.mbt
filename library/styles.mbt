@@ -370,8 +370,13 @@ pub fn StyleChain::new(root : Styles) -> StyleChain {
 ///|
 /// An empty style chain.
 pub fn StyleChain::empty() -> StyleChain {
-  { head: [], tail: None, }
+  // All empty chains share their (empty) head so that they compare equal,
+  // like upstream's default chains do.
+  { head: empty_style_head, tail: None, }
 }
+
+///|
+let empty_style_head : Array[Style] = []
 
 ///|
 /// Make the given chainable the first link of this chain.
@@ -537,6 +542,32 @@ pub fn StyleChain::pop(self : StyleChain) -> StyleChain {
     Some(t) => t
     None => StyleChain::empty()
   }
+}
+
+///|
+/// Iterate over the links of the chain (innermost first) and count them.
+pub fn StyleChain::depth(self : StyleChain) -> Int {
+  let mut n = 0
+  let mut link : StyleChain? = Some(self)
+  while link is Some(l) {
+    n += 1
+    link = l.tail
+  }
+  n
+}
+
+///|
+/// A copy of this chain with its own identity (upstream: lifetime-extending
+/// a chain in an arena yields a new address, so links chained onto the copy
+/// are not equal to links chained onto the original).
+pub fn StyleChain::fresh(self : StyleChain) -> StyleChain {
+  { head: self.head, tail: self.tail, }
+}
+
+///|
+/// The number of styles in the first link of the chain.
+pub fn StyleChain::head_len(self : StyleChain) -> Int {
+  self.head.length()
 }
 
 ///|

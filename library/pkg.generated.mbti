@@ -1363,6 +1363,8 @@ pub let list_item_elem_body : Int
 
 pub fn load_many(@syntax.Spanned[Array[DataSource]], &World) -> Array[Loaded] raise SourceError
 
+pub fn localized_str(String, String?, String) -> String
+
 pub fn lr_elem() -> Element
 
 pub let lr_elem_body : Int
@@ -3696,6 +3698,7 @@ pub fn BibliographyElem::full_local(Self) -> Bool?
 pub fn BibliographyElem::group(Self, StyleChain) -> Smart[String]?
 pub fn BibliographyElem::group_in(StyleChain) -> Smart[String]?
 pub fn BibliographyElem::group_local(Self) -> Smart[String]??
+pub fn BibliographyElem::has(Engine, Label, @syntax.Span) -> Bool
 pub fn BibliographyElem::lang(Self) -> Lang?
 pub fn BibliographyElem::new(OneOrMultiple[DataSource]) -> Self
 pub fn BibliographyElem::of(Content) -> Self?
@@ -4348,6 +4351,7 @@ pub struct Content {
   label : Label?
   location : Location?
   lifecycle : Array[Int]
+  // private fields
 }
 pub fn Content::add(Self, Self) -> Self
 pub fn Content::can(Self, String) -> Bool
@@ -4375,6 +4379,7 @@ pub fn Content::mark_prepared(Self) -> Self
 pub fn Content::materialize(Self, StyleChain) -> Self
 pub fn Content::new(Element, ArrayView[(Int, Value)]) -> Self
 pub fn Content::plain_text(Self) -> String
+pub fn Content::query_first_naive(Self, Selector) -> Self?
 pub fn Content::repeat(Self, Int) -> Self
 pub fn Content::repr(Self) -> String
 pub fn Content::sequence(ArrayView[Self]) -> Self
@@ -5067,6 +5072,7 @@ pub fn Element::is_locatable(Self) -> Bool
 pub fn Element::is_tagged(Self) -> Bool
 pub fn Element::is_unqueriable(Self) -> Bool
 pub fn Element::local_name(Self, String, String?) -> String?
+pub fn Element::local_name_in(Self, StyleChain) -> String
 pub fn Element::name(Self) -> String
 pub fn Element::new(name~ : String, title~ : String, docs? : String, keywords? : Array[String], capabilities? : Array[String], fields~ : Array[FieldInfo]) -> Self
 pub fn Element::params(Self) -> Array[ParamInfo]
@@ -5720,9 +5726,13 @@ pub impl NativeElement for FootnoteMarker
 pub(all) struct Format {
   elem : Element
   feature : Feature?
+  rules : ((NativeRuleMap) -> Unit)?
 }
+pub fn Format::default_options(Self) -> FormatOptions
 pub fn Format::new(Element) -> Self
+pub fn Format::register_rules(Self, NativeRuleMap) -> Unit
 pub fn Format::with_feature(Self, Feature) -> Self
+pub fn Format::with_rules(Self, (NativeRuleMap) -> Unit) -> Self
 
 pub struct FormatOptions {
   elem : Element
@@ -6639,8 +6649,10 @@ pub(all) struct Library {
   global : Module
   math : Module
   styles : Styles
+  rules : NativeRuleMap
   std : Binding
   mut features : Features
+  formats : Array[Format]
 }
 pub fn Library::builder(Routines, Array[Format]) -> LibraryBuilder
 
@@ -7839,6 +7851,8 @@ pub fn PagebreakElem::pack(Self) -> Content
 pub fn PagebreakElem::set_boundary(Bool) -> Style
 pub fn PagebreakElem::set_to(Parity?) -> Style
 pub fn PagebreakElem::set_weak(Bool) -> Style
+pub fn PagebreakElem::shared_boundary() -> Content
+pub fn PagebreakElem::shared_weak() -> Content
 pub fn PagebreakElem::to(Self, StyleChain) -> Parity?
 pub fn PagebreakElem::to_in(StyleChain) -> Parity?
 pub fn PagebreakElem::to_local(Self) -> Parity??
@@ -9281,6 +9295,8 @@ pub(all) enum Spacing {
   Rel(Rel[Length])
   Fr(Fr)
 } derive(Eq, Hash)
+pub fn Spacing::from_em(Em) -> Self
+pub fn Spacing::from_length(Length) -> Self
 pub fn Spacing::is_fractional(Self) -> Bool
 pub fn Spacing::is_zero(Self) -> Bool
 pub impl FromValue for Spacing
@@ -9578,11 +9594,14 @@ pub struct StyleChain {
 }
 pub fn StyleChain::chain(Self, Styles) -> Self
 pub fn StyleChain::chain_one(Self, Style) -> Self
+pub fn StyleChain::depth(Self) -> Int
 pub fn StyleChain::empty() -> Self
 pub fn StyleChain::entries(Self) -> Iter[Style]
+pub fn StyleChain::fresh(Self) -> Self
 pub fn StyleChain::get_field(Self, Element, Int) -> Value
 pub fn StyleChain::get_value_with_local(Self, Element, FieldInfo, Value?) -> Value
 pub fn StyleChain::has(Self, Element, Int) -> Bool
+pub fn StyleChain::head_len(Self) -> Int
 pub fn StyleChain::links(Self) -> Array[Array[Style]]
 pub fn StyleChain::new(Styles) -> Self
 pub fn StyleChain::pop(Self) -> Self
@@ -9679,6 +9698,7 @@ pub(all) enum Supplement {
   Content(Content)
   Func(Func)
 } derive(Eq)
+pub fn Supplement::resolve(Self, Engine, StyleChain, ArrayView[Value]) -> Content raise SourceError
 pub impl FromValue for Supplement
 pub impl IntoValue for Supplement
 pub impl Reflect for Supplement

@@ -84,3 +84,16 @@ fn quote_elem_depth_default() -> Value {
 fn quote_elem_depth_fold(inner : Value, outer : Value) -> Value {
   fold_of((Ty::new() : Ty[Depth]))(inner, outer)
 }
+
+///|
+/// Upstream `ShowSet for Packed<QuoteElem>`.
+fn quote_elem_show_set(content : Content, styles : StyleChain) -> Styles {
+  let out = Styles::new()
+  if QuoteElem(content).block(styles) {
+    out.push(PadElem::set_left(Rel::from_abs(Length::from_em(Em::new(1.0)))))
+    out.push(PadElem::set_right(Rel::from_abs(Length::from_em(Em::new(1.0)))))
+    out.push(BlockElem::set_above(Custom(Spacing::from_em(Em::new(2.4)))))
+    out.push(BlockElem::set_below(Custom(Spacing::from_em(Em::new(1.8)))))
+  }
+  out
+}

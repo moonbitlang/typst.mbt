@@ -389,3 +389,15 @@ fn grid_cell_elem_fill_default() -> Value {
 fn grid_cell_elem_stroke_default() -> Value {
   Dict(Dict::new())
 }
+
+///|
+/// `Some(Arc::new(Stroke::default()))` (GridHLine.stroke).
+fn grid_h_line_elem_stroke_default() -> Value {
+  IntoValue::into_value((Some(Stroke::default()) : Stroke?))
+}
+
+///|
+/// `Some(Arc::new(Stroke::default()))` (GridVLine.stroke).
+fn grid_v_line_elem_stroke_default() -> Value {
+  IntoValue::into_value((Some(Stroke::default()) : Stroke?))
+}

@@ -157,12 +157,37 @@ pub(all) struct Format {
   elem : Element
   /// The feature gating the format, if any.
   feature : Feature?
+  /// Registers the rules specific to this format.
+  rules : ((NativeRuleMap) -> Unit)?
 }
 
 ///|
 /// Create a new format with an associated format element.
 pub fn Format::new(elem : Element) -> Format {
-  { elem, feature: None, }
+  { elem, feature: None, rules: None, }
+}
+
+///|
+/// Add format specific rules that will be registered.
+pub fn Format::with_rules(
+  self : Format,
+  register : (NativeRuleMap) -> Unit,
+) -> Format {
+  { ..self, rules: Some(register), }
+}
+
+///|
+/// Register the rules specific to this format.
+pub fn Format::register_rules(self : Format, rules : NativeRuleMap) -> Unit {
+  if self.rules is Some(register) {
+    register(rules)
+  }
+}
+
+///|
+/// Get the default format options of this format.
+pub fn Format::default_options(self : Format) -> FormatOptions {
+  FormatOptions::default_for(self.elem)
 }
 
 ///|

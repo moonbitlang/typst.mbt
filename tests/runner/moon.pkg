@@ -3,6 +3,7 @@ import {
   "moonbitlang/typst/syntax/ast",
   "moonbitlang/typst/library",
   "moonbitlang/typst/eval",
+  "moonbitlang/typst/realize",
   "moonbitlang/typst/typst",
   "moonbitlang/typst/html",
   "moonbitlang/core/string",

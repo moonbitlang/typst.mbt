@@ -39,6 +39,18 @@ fn pagebreak_shared_boundary() -> Content {
 }
 
 ///|
+/// Get the globally shared weak pagebreak element.
+pub fn PagebreakElem::shared_weak() -> Content {
+  pagebreak_shared_weak()
+}
+
+///|
+/// Get the globally shared boundary pagebreak element.
+pub fn PagebreakElem::shared_boundary() -> Content {
+  pagebreak_shared_boundary()
+}
+
+///|
 fn page_elem_paper_default() -> Value {
   Paper::a4().into_value()
 }
@@ -674,3 +686,9 @@ let papers : Array[(String, Double, Double)] = [
   ("presentation-16-9", 297.0, 167.0625),
   ("presentation-4-3", 280.0, 210.0),
 ]
+
+///|
+/// Upstream `LocalName for PageElem`.
+fn page_elem_local_name_key() -> String {
+  "page"
+}

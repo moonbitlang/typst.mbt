@@ -212,3 +212,11 @@ pub fn UrlContactScheme::as_str(self : UrlContactScheme) -> String {
     Tel => "tel:"
   }
 }
+
+///|
+/// Upstream `ShowSet for Packed<LinkElem>`.
+fn link_elem_show_set(_content : Content, _styles : StyleChain) -> Styles {
+  let out = Styles::new()
+  out.push(TextElem::set_hyphenate(Custom(false)))
+  out
+}

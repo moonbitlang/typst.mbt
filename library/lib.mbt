@@ -447,12 +447,18 @@ pub fn LibraryBuilder::build(self : LibraryBuilder) -> Library {
     f(global)
   }
   let global = Module::new("global", global)
+  let rules = (self.routines.rules)()
+  for format in self.formats {
+    format.register_rules(rules)
+  }
   {
     routines: self.routines,
     global,
     math,
     styles: Styles::new(),
+    rules,
     std: Binding::detached(Module(global)),
     features: self.features,
+    formats: self.formats,
   }
 }

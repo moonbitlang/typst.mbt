@@ -28,6 +28,8 @@ pub fn decode_before(StringView, Int) -> (Int, Int)
 
 pub fn default_math_class(Char) -> MathClass?
 
+pub fn discard_space_between(StringView, StringView) -> Bool
+
 pub fn general_category_ranges(String) -> Array[(Int, Int)]?
 
 pub fn grapheme_end(StringView, Int) -> Int

@@ -1,0 +1,17 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/realize"
+
+import {
+  "moonbitlang/typst/library",
+}
+
+// Values
+pub fn realize(@library.RealizationKind, @library.Engine, @library.SplitLocator, @library.Content, @library.StyleChain) -> Array[(@library.Content, @library.StyleChain)] raise @library.SourceError
+
+// Errors
+
+// Types and methods
+
+// Type aliases
+
+// Traits

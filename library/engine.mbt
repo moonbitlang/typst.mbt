@@ -127,10 +127,14 @@ pub(all) struct Library {
   /// The default style properties (for page size, font selection, and
   /// everything else configurable via set and show rules).
   styles : Styles
+  /// The built-in show rules.
+  rules : NativeRuleMap
   /// The standard library as a value. Used to provide the `std` module.
   std : Binding
   /// In-development features that were enabled.
   mut features : Features
+  /// Registered export formats.
+  formats : Array[Format]
 }
 
 ///|

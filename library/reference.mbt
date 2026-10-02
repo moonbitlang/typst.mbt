@@ -43,6 +43,21 @@ pub impl FromValue for Supplement with fn from_value(v) {
 }
 
 ///|
+/// Tries to resolve the supplement into its content.
+pub fn Supplement::resolve(
+  self : Supplement,
+  engine : Engine,
+  styles : StyleChain,
+  args : ArrayView[Value],
+) -> Content raise SourceError {
+  match self {
+    Content(content) => content
+    Func(func) =>
+      func.call_values(engine, Context::new(styles~), args).display()
+  }
+}
+
+///|
 /// The form of the reference.
 pub(all) enum RefForm {
   /// Produces a textual reference to a label.
@@ -94,4 +109,39 @@ pub impl FromValue for RefForm with fn from_value(v) {
 ///|
 fn ref_elem_form_default() -> Value {
   RefForm::default().into_value()
+}
+
+///|
+/// Upstream `Synthesize for Packed<RefElem>`.
+fn ref_elem_synthesize(
+  engine : Engine,
+  content : Content,
+  styles : StyleChain,
+) -> Content raise SourceError {
+  let span = content.span()
+  let elem = RefElem(content)
+  let citation = to_citation(elem, engine, styles)
+  let elem = elem.with_citation(Some(citation)).with_element(None)
+  if !BibliographyElem::has(engine, elem.target(), span) &&
+    engine.introspect(query_label_introspection(elem.target(), span))
+    is Ok(found) {
+    return elem.with_element(Some(found)).pack()
+  }
+  elem.pack()
+}
+
+///|
+/// Turn a reference into a citation.
+fn to_citation(
+  reference : RefElem,
+  engine : Engine,
+  styles : StyleChain,
+) -> CiteElem raise SourceError {
+  let elem = CiteElem::new(reference.target()).with_supplement(
+    match reference.supplement(styles) {
+      Custom(Some(Content(content))) => Some(content)
+      _ => None
+    },
+  )
+  CiteElem(cite_elem_synthesize(engine, elem.pack(), styles))
 }
