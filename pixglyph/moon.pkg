@@ -1,0 +1,10 @@
+import {
+  "moonbitlang/typst/otf",
+}
+
+options(
+  targets: {
+    "libm_native.mbt": [ "native" ],
+    "libm_other.mbt": [ "not", "native" ],
+  },
+)
