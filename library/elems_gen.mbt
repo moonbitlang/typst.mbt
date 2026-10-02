@@ -2887,6 +2887,7 @@ pub fn equation_elem() -> Element {
         ],
       )
       equation_elem_cell.val = Some(e)
+      equation_elem_init(e)
       e
     }
   }
