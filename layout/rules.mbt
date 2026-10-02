@@ -588,39 +588,104 @@ fn ref_rule(
 }
 
 ///|
-/// TODO(bibliography): upstream realizes the citation group
-/// (`CiteGroup::realize`); bibliographies are ported separately.
 fn cite_group_rule(
   elem : @library.CiteGroup,
-  _ : @library.Engine,
+  engine : @library.Engine,
   _ : @library.StyleChain,
 ) -> @library.Content raise @library.SourceError {
-  unported(elem, "`CiteGroup::realize`")
+  elem.realize(engine)
 }
 
 ///|
-/// TODO(bibliography): upstream builds the bibliography from the generated
-/// works (`Works::generate`); bibliographies are ported separately.
 fn bibliography_rule(
   elem : @library.BibliographyElem,
-  _ : @library.Engine,
-  _ : @library.StyleChain,
+  engine : @library.Engine,
+  styles : @library.StyleChain,
 ) -> @library.Content raise @library.SourceError {
-  unported(elem, "`Works::generate`")
-}
+  let column_gutter = @library.Em::new(0.65)
+  let indent = @library.Em::new(1.5)
+  let loc = elem.pack().location().unwrap()
+  let span = elem.pack().span()
+  let seq : Array[@library.Content] = []
+  if elem.realize_title(styles) is Some(title) {
+    seq.push(title)
+  }
+  let works = @library.Works::generate(engine, span)
+  let bibliography = works.bibliography(loc, span)
+  if bibliography.entries.iter().any(entry => entry.prefix is Some(_)) {
+    let row_gutter = @library.ParElem::spacing_in(styles)
+    let cells : Array[@library.GridChild] = []
+    for entry in bibliography.entries {
+      let prefix = @library.pdf_marker_tag(
+        ListItemLabel,
+        entry.prefix
+        .unwrap_or(@library.Content::empty())
+        .located(entry.backlink),
+      )
+      cells.push(
+        Item(Cell(@library.GridCell::new(prefix).pack().spanned(span))),
+      )
+      let reference = @library.pdf_marker_tag(BibEntry, entry.body)
+      cells.push(
+        Item(Cell(@library.GridCell::new(reference).pack().spanned(span))),
+      )
+    }
+    let grid = @library.GridElem::new(cells)
+      .with_columns(@library.TrackSizings([Auto, Auto]))
+      .with_column_gutter(
+        @library.TrackSizings([
+          Rel(@library.Rel::from_abs(@library.Length::from_em(column_gutter))),
+        ]),
+      )
+      .with_row_gutter(
+        @library.TrackSizings([Rel(@library.Rel::from_abs(row_gutter))]),
+      )
+    let mut packed = grid.pack().spanned(span)
+    if packed.elem().hooks().synthesize is Some(synthesize) {
+      packed = synthesize(engine, packed, styles)
+    }
+    // Directly build the block element to avoid the show step for the grid
+    // element. This will not generate introspection tags for the element.
+    let block = @library.BlockElem::multi_layouter(
+      @library.GridElem::of(packed).unwrap(),
+      layout_grid,
+    ).pack()
 
-///|
-/// A rule whose port is pending: it fails with an error instead of silently
-/// producing wrong output.
-fn[T : @library.NativeElement] unported(
-  elem : T,
-  what : String,
-) -> @library.Content raise @library.SourceError {
-  let content = elem.into_content()
-  @library.bail_at(
-    content.span(),
-    "TODO: paged export of `\{content.elem().name()}` is not ported yet (needs \{what})",
-  )
+    // TODO(accessibility): infer list numbering from style?
+    seq.push(@library.pdf_marker_tag(Bibliography(true), block))
+  } else {
+    let body : Array[@library.Content] = []
+    for entry in bibliography.entries {
+      let realized = @library.pdf_marker_tag(
+        BibEntry,
+        entry.body.located(entry.backlink),
+      )
+      let block = if bibliography.hanging_indent {
+        let indent = @library.Length::from_em(indent)
+        let body = @library.HElem::new(Rel(@library.Rel::from_abs(-indent)))
+          .pack()
+          .add(realized)
+        let inset = @library.Sides::splat(None).with_side(
+          @library.TextElem::dir_in(styles).resolve(styles).start(),
+          Some(@library.Rel::from_abs(indent)),
+        )
+        @library.BlockElem::new()
+        .with_inset(inset)
+        .with_body(Some(Content(body)))
+        .pack()
+      } else {
+        @library.BlockElem::packed(realized)
+      }
+      body.push(block.spanned(span))
+    }
+    seq.push(
+      @library.pdf_marker_tag(
+        Bibliography(false),
+        @library.Content::sequence(body),
+      ),
+    )
+  }
+  @library.Content::sequence(seq)
 }
 
 ///|
