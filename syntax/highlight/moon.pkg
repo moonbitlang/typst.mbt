@@ -1,0 +1,8 @@
+import {
+  "moonbitlang/typst/syntax",
+  "moonbitlang/typst/syntax/ast",
+}
+
+import {
+  "moonbitlang/core/debug",
+} for "wbtest"

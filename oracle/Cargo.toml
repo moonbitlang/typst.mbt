@@ -53,3 +53,7 @@ citationberg = "=0.7.0"
 biblatex = "=0.12.0"
 quick-xml = { version = "=0.38.4", features = ["serialize", "overlapped-lists"] }
 icu_collator = "=2.3.1"
+# Raw highlighting (same versions/features as typst-library, plus `dump-load`
+# to decode two-face's packed syntax set).
+syntect = { version = "=5.3.0", default-features = false, features = ["parsing", "regex-fancy", "plist-load", "yaml-load", "dump-load"] }
+two-face = { version = "=0.4.5", default-features = false, features = ["syntect-fancy"] }
