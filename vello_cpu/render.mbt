@@ -74,13 +74,17 @@ fn RenderContext::encode_current_paint(self : RenderContext) -> Paint {
 }
 
 ///|
-fn RenderContext::effective_path_transform(self : RenderContext) -> @kurbo.Affine {
+fn RenderContext::effective_path_transform(
+  self : RenderContext,
+) -> @kurbo.Affine {
   // The root transform stack only contains the identity (no filter layers).
   @kurbo.Affine::identity() * self.transform
 }
 
 ///|
-fn RenderContext::effective_paint_transform(self : RenderContext) -> @kurbo.Affine {
+fn RenderContext::effective_paint_transform(
+  self : RenderContext,
+) -> @kurbo.Affine {
   self.effective_path_transform() * self.paint_transform
 }
 
@@ -102,7 +106,10 @@ fn RenderContext::record_fill(
 
 ///|
 /// Fill a path.
-pub fn RenderContext::fill_path(self : RenderContext, path : @kurbo.BezPath) -> Unit {
+pub fn RenderContext::fill_path(
+  self : RenderContext,
+  path : @kurbo.BezPath,
+) -> Unit {
   let paint = self.encode_current_paint()
   let transform = self.effective_path_transform()
   let clip_path = self.clip_state.get()
@@ -120,7 +127,10 @@ pub fn RenderContext::fill_path(self : RenderContext, path : @kurbo.BezPath) -> 
 
 ///|
 /// Stroke a path.
-pub fn RenderContext::stroke_path(self : RenderContext, path : @kurbo.BezPath) -> Unit {
+pub fn RenderContext::stroke_path(
+  self : RenderContext,
+  path : @kurbo.BezPath,
+) -> Unit {
   let paint = self.encode_current_paint()
   let transform = self.effective_path_transform()
   let clip_path = self.clip_state.get()
@@ -138,7 +148,10 @@ pub fn RenderContext::stroke_path(self : RenderContext, path : @kurbo.BezPath) -
 
 ///|
 /// Fill a rectangle.
-pub fn RenderContext::fill_rect(self : RenderContext, rect : @kurbo.Rect) -> Unit {
+pub fn RenderContext::fill_rect(
+  self : RenderContext,
+  rect : @kurbo.Rect,
+) -> Unit {
   let paint = self.encode_current_paint()
   let transform = self.effective_path_transform()
   let clip_path = self.clip_state.get()
@@ -200,12 +213,15 @@ pub fn RenderContext::push_layer(
   }
   let blend_mode = blend_mode.unwrap_or(BlendMode::default())
   let opacity = opacity.unwrap_or(1.0)
-  self.recorder.push_layer({ blend_mode, opacity, mask })
+  self.recorder.push_layer({ blend_mode, opacity, mask, })
 }
 
 ///|
 /// Push a new mask layer.
-pub fn RenderContext::push_mask_layer(self : RenderContext, mask : Mask) -> Unit {
+pub fn RenderContext::push_mask_layer(
+  self : RenderContext,
+  mask : Mask,
+) -> Unit {
   self.push_layer(None, None, Some(mask))
 }
 
@@ -229,7 +245,10 @@ pub fn RenderContext::pop_layer(self : RenderContext) -> Unit {
 
 ///|
 /// Set the current stroke.
-pub fn RenderContext::set_stroke(self : RenderContext, stroke : @kurbo.Stroke) -> Unit {
+pub fn RenderContext::set_stroke(
+  self : RenderContext,
+  stroke : @kurbo.Stroke,
+) -> Unit {
   self.stroke = stroke
 }
 
@@ -241,7 +260,10 @@ pub fn RenderContext::stroke(self : RenderContext) -> @kurbo.Stroke {
 
 ///|
 /// Set the current paint.
-pub fn RenderContext::set_paint(self : RenderContext, paint : PaintType) -> Unit {
+pub fn RenderContext::set_paint(
+  self : RenderContext,
+  paint : PaintType,
+) -> Unit {
   self.paint = paint
 }
 
@@ -271,7 +293,10 @@ pub fn RenderContext::set_paint_transform(
 
 ///|
 /// Set the current fill rule.
-pub fn RenderContext::set_fill_rule(self : RenderContext, fill_rule : Fill) -> Unit {
+pub fn RenderContext::set_fill_rule(
+  self : RenderContext,
+  fill_rule : Fill,
+) -> Unit {
   self.fill_rule = fill_rule
 }
 

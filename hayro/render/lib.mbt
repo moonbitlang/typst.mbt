@@ -14,7 +14,7 @@ pub struct RenderCache {
 ///|
 /// Create a new render cache.
 pub fn RenderCache::new() -> RenderCache {
-  { interpreter_cache: @interpret.InterpreterCache::new(), outline_cache: {} }
+  { interpreter_cache: @interpret.InterpreterCache::new(), outline_cache: {}, }
 }
 
 ///|
@@ -101,7 +101,7 @@ pub fn render(
   let clip_path = @interpret.rect_to_kurbo(page.intersected_crop_box())
     .to_path(0.1)
     .transform(initial_transform)
-  @interpret.Device::push_clip_path(device, { path: clip_path, fill: NonZero })
+  @interpret.Device::push_clip_path(device, { path: clip_path, fill: NonZero, })
   @interpret.Device::push_transparency_group(device, 1.0, None, Normal)
   @interpret.interpret_page(page, state, device)
   @interpret.Device::pop_transparency_group(device)

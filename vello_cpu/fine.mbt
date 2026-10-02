@@ -31,7 +31,7 @@ priv struct Fine {
 fn Fine::new(buffer_width : Int) -> Fine {
   let scratch_len = buffer_width * TILE_HEIGHT_COMPONENTS
   {
-    buffer_span: { x: 0, width: buffer_width },
+    buffer_span: { x: 0, width: buffer_width, },
     blend_buffers: [FixedArray::make(scratch_len, b'\x00')],
     buffer_pool: [],
     paint_buf: FixedArray::make(0, b'\x00'),
@@ -118,8 +118,7 @@ fn Fine::run_cmd(
       let attrs = bucketer.paint_fill_attrs[attrs_idx]
       guard cmd_span.intersect(self.buffer_span) is Some(span) else { return }
       let alphas = match alpha_idx {
-        Some(alpha_idx) =>
-          Some(alpha_idx + (span.x - cmd_span.x) * TILE_HEIGHT)
+        Some(alpha_idx) => Some(alpha_idx + (span.x - cmd_span.x) * TILE_HEIGHT)
         None => None
       }
       self.paint_fill(span, attrs, resources, alphas)
@@ -148,8 +147,7 @@ fn Fine::run_cmd(
       guard cmd_span.intersect(self.buffer_span) is Some(span) else { return }
       let attrs = bucketer.layer_fill_attrs[attrs_idx]
       let alphas = match alpha_idx {
-        Some(alpha_idx) =>
-          Some(alpha_idx + (span.x - cmd_span.x) * TILE_HEIGHT)
+        Some(alpha_idx) => Some(alpha_idx + (span.x - cmd_span.x) * TILE_HEIGHT)
         None => None
       }
       self.layer_fill(row_y, span, attrs, resources, alphas)
@@ -217,7 +215,15 @@ fn Fine::layer_fill(
   let start = span.x * TILE_HEIGHT_COMPONENTS
   let len = span.width * TILE_HEIGHT_COMPONENTS
   if attrs.blend_mode.is_default() {
-    alpha_composite_buffer(target, start, len, source, start, resources.alphas, alphas)
+    alpha_composite_buffer(
+      target,
+      start,
+      len,
+      source,
+      start,
+      resources.alphas,
+      alphas,
+    )
   } else {
     blend(
       target,
@@ -333,7 +339,15 @@ fn Fine::indexed_fill(
       attrs.mask is Some(_) {
       painter(color_buf, 0, len)
       if default_blend && attrs.mask is None {
-        alpha_composite_buffer(dest, start, len, color_buf, 0, resources.alphas, alphas)
+        alpha_composite_buffer(
+          dest,
+          start,
+          len,
+          color_buf,
+          0,
+          resources.alphas,
+          alphas,
+        )
       } else {
         blend(
           dest,
@@ -381,7 +395,9 @@ fn Fine::indexed_fill(
           // Axis-aligned with filtering - use optimized plain painters
           if image.sampler.quality == Medium {
             (buf, off, n) => {
-              paint_plain_bilinear(image, pixmap, sampler_x, sampler_y, buf, off, n)
+              paint_plain_bilinear(
+                image, pixmap, sampler_x, sampler_y, buf, off, n,
+              )
             }
           } else {
             (buf, off, n) => {
@@ -481,9 +497,8 @@ fn alpha_composite_solid(
           let base = start + ch * 64 + p * 4
           for c in 0..<4 {
             let bg = dest[base + c].to_int()
-            dest[base + c] = (
-              ((norm_mul(bg, one_minus_alpha) & 0xFF) + src[c]) & 0xFF
-            ).to_byte()
+            dest[base + c] = (((norm_mul(bg, one_minus_alpha) & 0xFF) + src[c]) &
+            0xFF).to_byte()
           }
         }
       }
@@ -531,10 +546,10 @@ fn alpha_composite_buffer(
           let base = start + ch * 32 + p * 4
           for c in 0..<4 {
             let bg = dest[base + c].to_int()
-            dest[base + c] = (
-              ((norm_mul(bg, one_minus_alpha) & 0xFF) + src[sbase + c].to_int()) &
-              0xFF
-            ).to_byte()
+            dest[base + c] = ((
+              (norm_mul(bg, one_minus_alpha) & 0xFF) + src[sbase + c].to_int()
+            ) &
+            0xFF).to_byte()
           }
         }
       }
@@ -579,15 +594,19 @@ fn blend(
       // The mask samples of the two columns of this chunk.
       let mask_samples = FixedArray::make(8, 255)
       if mask is Some(m) {
-        let sample = (x : Int, y : Int) => if x < m.width() && y < m.height() {
-          m.sample(x, y)
-        } else {
-          255
+        let sample = (x : Int, y : Int) => {
+          if x < m.width() && y < m.height() {
+            m.sample(x, y)
+          } else {
+            255
+          }
         }
         for k in 0..<4 {
           mask_samples[k] = sample(start_x, (start_y + k) & 0xFFFF)
-          mask_samples[4 + k] = sample((start_x + 1) & 0xFFFF, (start_y + k) &
-            0xFFFF)
+          mask_samples[4 + k] = sample(
+            (start_x + 1) & 0xFFFF,
+            (start_y + k) & 0xFFFF,
+          )
         }
         start_x = (start_x + 2) & 0xFFFF
       }

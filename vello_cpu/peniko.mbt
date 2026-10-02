@@ -6,7 +6,7 @@
 pub(all) enum Fill {
   NonZero
   EvenOdd
-} derive(Eq, Show)
+} derive(Eq)
 
 ///|
 /// Describes how a paint is extended beyond its natural bounds.
@@ -14,7 +14,7 @@ pub(all) enum Extend {
   Pad
   Repeat
   Reflect
-} derive(Eq, Show)
+} derive(Eq)
 
 ///|
 /// Image quality for the sampler.
@@ -22,7 +22,7 @@ pub(all) enum ImageQuality {
   Low
   Medium
   High
-} derive(Eq, Show)
+} derive(Eq)
 
 ///|
 /// Parameters which specify how to sample an image.
@@ -31,7 +31,7 @@ pub(all) struct ImageSampler {
   y_extend : Extend
   quality : ImageQuality
   alpha : Float
-} derive(Eq, Show)
+} derive(Eq)
 
 ///|
 /// Defines the color mixing function for a blend operation.
@@ -52,7 +52,7 @@ pub(all) enum Mix {
   Saturation
   Color
   Luminosity
-} derive(Eq, Show)
+} derive(Eq)
 
 ///|
 /// Defines the layer composition function for a blend operation.
@@ -71,23 +71,23 @@ pub(all) enum Compose {
   Xor
   Plus
   PlusLighter
-} derive(Eq, Show)
+} derive(Eq)
 
 ///|
 /// Blend mode consisting of color mixing and composition functions.
 pub(all) struct BlendMode {
   mix : Mix
   compose : Compose
-} derive(Eq, Show)
+} derive(Eq)
 
 ///|
 pub fn BlendMode::new(mix : Mix, compose : Compose) -> BlendMode {
-  { mix, compose }
+  { mix, compose, }
 }
 
 ///|
 pub impl Default for BlendMode with fn default() {
-  { mix: Normal, compose: SrcOver }
+  { mix: Normal, compose: SrcOver, }
 }
 
 ///|
@@ -114,7 +114,7 @@ pub(all) struct AlphaColor {
 
 ///|
 pub fn AlphaColor::new(components : FixedArray[Float]) -> AlphaColor {
-  { components: [components[0], components[1], components[2], components[3]] }
+  { components: [components[0], components[1], components[2], components[3]], }
 }
 
 ///|
@@ -138,15 +138,15 @@ fn u8_to_unit_color(x : Int) -> Float {
 
 ///|
 /// The fully transparent color.
-pub let transparent : AlphaColor = { components: [0.0, 0.0, 0.0, 0.0] }
+pub let transparent : AlphaColor = { components: [0.0, 0.0, 0.0, 0.0], }
 
 ///|
 /// Opaque black.
-pub let black : AlphaColor = { components: [0.0, 0.0, 0.0, 1.0] }
+pub let black : AlphaColor = { components: [0.0, 0.0, 0.0, 1.0], }
 
 ///|
 /// Opaque white.
-pub let white : AlphaColor = { components: [1.0, 1.0, 1.0, 1.0] }
+pub let white : AlphaColor = { components: [1.0, 1.0, 1.0, 1.0], }
 
 ///|
 /// `AlphaColor::premultiply`, giving the components of a `PremulColor`.
@@ -205,7 +205,7 @@ pub(all) enum GradientKind {
 /// `peniko` defaults, which is all hayro uses).
 pub(all) struct Gradient {
   kind : GradientKind
-  extend : Extend
+  extend_mode : Extend
   stops : Array[ColorStop]
 }
 
@@ -215,7 +215,7 @@ pub fn Gradient::new_linear(
   start : @kurbo.Point,
   end : @kurbo.Point,
 ) -> Gradient {
-  { kind: Linear(start~, end~), extend: Pad, stops: [] }
+  { kind: Linear(start~, end~), extend_mode: Pad, stops: [], }
 }
 
 ///|
@@ -228,17 +228,20 @@ pub fn Gradient::new_two_point_radial(
 ) -> Gradient {
   {
     kind: Radial(start_center~, start_radius~, end_center~, end_radius~),
-    extend: Pad,
+    extend_mode: Pad,
     stops: [],
   }
 }
 
 ///|
-pub fn Gradient::with_extend(self : Gradient, extend : Extend) -> Gradient {
-  { ..self, extend, }
+pub fn Gradient::with_extend(self : Gradient, extend_mode : Extend) -> Gradient {
+  { ..self, extend_mode, }
 }
 
 ///|
-pub fn Gradient::with_stops(self : Gradient, stops : Array[ColorStop]) -> Gradient {
-  { ..self, stops: stops.copy() }
+pub fn Gradient::with_stops(
+  self : Gradient,
+  stops : Array[ColorStop],
+) -> Gradient {
+  { ..self, stops: stops.copy(), }
 }

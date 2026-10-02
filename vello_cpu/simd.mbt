@@ -214,18 +214,6 @@ fn f32(x : Double) -> Float {
 }
 
 ///|
-/// `u16 + u16` (wrapping, as in Rust release builds).
-fn u16_add(a : Int, b : Int) -> Int {
-  (a + b) & 0xFFFF
-}
-
-///|
-/// `u16 - u16` (wrapping).
-fn u16_sub(a : Int, b : Int) -> Int {
-  (a - b) & 0xFFFF
-}
-
-///|
 /// `u16::saturating_sub`.
 fn u16_sat_sub(a : Int, b : Int) -> Int {
   if a > b {

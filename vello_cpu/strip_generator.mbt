@@ -7,7 +7,7 @@ priv enum GenerationMode {
   Replace
   /// Append generated strips to the existing ones.
   Append
-} derive(Eq)
+}
 
 ///|
 /// A storage for storing strip-related data.
@@ -21,7 +21,7 @@ priv struct StripStorage {
 
 ///|
 fn StripStorage::new(generation_mode : GenerationMode) -> StripStorage {
-  { strips: [], alphas: [], generation_mode }
+  { strips: [], alphas: [], generation_mode, }
 }
 
 ///|
@@ -31,7 +31,7 @@ fn StripStorage::clear(self : StripStorage) -> Unit {
 }
 
 ///|
-fn StripStorage::extend(self : StripStorage, other : StripStorage) -> Unit {
+fn StripStorage::append(self : StripStorage, other : StripStorage) -> Unit {
   for s in other.strips {
     self.strips.push(s)
   }
@@ -81,7 +81,9 @@ fn StripGenerator::generate_filled_path(
     None => RectU16::new(0, 0, self.width, self.height)
   }
   fill(path, transform, self.line_buf, self.flatten_ctx, cull_bbox)
-  self.generate_with_clip(aliasing_threshold, strip_storage, fill_rule, clip_path)
+  self.generate_with_clip(
+    aliasing_threshold, strip_storage, fill_rule, clip_path,
+  )
 }
 
 ///|
@@ -126,7 +128,9 @@ fn StripGenerator::generate_with_clip(
   let tiles = self.tiles
   let line_buf = self.line_buf
   render_with_clip(self.temp_storage, strip_storage, clip_path, (strips, alphas) => {
-    render_strips(tiles, strips, alphas, fill_rule, aliasing_threshold, line_buf)
+    render_strips(
+      tiles, strips, alphas, fill_rule, aliasing_threshold, line_buf,
+    )
   })
 }
 

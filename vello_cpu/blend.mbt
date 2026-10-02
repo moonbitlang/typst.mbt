@@ -38,11 +38,7 @@ fn compose(
       let i = p * 4 + c
       let a = norm_mul(src_c[i], fa) & 0xFF
       let b = norm_mul(fb, bg_c[i]) & 0xFF
-      let mut res = if sat {
-        min_int(a + b, 255)
-      } else {
-        (a + b) & 0xFF
-      }
+      let mut res = if sat { min_int(a + b, 255) } else { (a + b) & 0xFF }
       if alpha_mask is Some(alpha_mask) {
         let m = alpha_mask[p]
         let m_inv = (255 - m) & 0xFF
@@ -57,12 +53,28 @@ fn compose(
 
 ///|
 /// Mix `src_c` with `bg_c` in place (`blend::mix`).
-fn mix(src_c : FixedArray[Int], bg_c : FixedArray[Int], blend_mode : BlendMode) -> Unit {
+fn mix(
+  src_c : FixedArray[Int],
+  bg_c : FixedArray[Int],
+  blend_mode : BlendMode,
+) -> Unit {
   match blend_mode.mix {
     Normal => ()
-    Multiply | Screen | Overlay | Darken | Lighten | HardLight | Difference
+    Multiply
+    | Screen
+    | Overlay
+    | Darken
+    | Lighten
+    | HardLight
+    | Difference
     | Exclusion => u8_mix(src_c, bg_c, blend_mode.mix)
-    ColorDodge | ColorBurn | SoftLight | Luminosity | Color | Hue | Saturation => {
+    ColorDodge
+    | ColorBurn
+    | SoftLight
+    | Luminosity
+    | Color
+    | Hue
+    | Saturation =>
       // Fallback for blend modes that aren't supported in u8.
       for p in 0..<8 {
         let src = FixedArray::make(4, (0.0 : Float))
@@ -76,7 +88,6 @@ fn mix(src_c : FixedArray[Int], bg_c : FixedArray[Int], blend_mode : BlendMode) 
           src_c[p * 4 + c] = f32_to_u8_lane(madd(255.0, src[c], 0.5))
         }
       }
-    }
   }
 }
 
@@ -178,15 +189,36 @@ fn hard_light_inner(
 
 ///|
 /// `highp::blend::mix` on a single unpremultiplied-to-be pixel.
-fn highp_mix(src : FixedArray[Float], bg : FixedArray[Float], mix : Mix) -> Unit {
+fn highp_mix(
+  src : FixedArray[Float],
+  bg : FixedArray[Float],
+  mix : Mix,
+) -> Unit {
   let src_a = src[3]
   let bg_a = bg[3]
-  let cs : Array[Float] = [unpremul(src[0], src_a), unpremul(src[1], src_a), unpremul(src[2], src_a)]
-  let cb : Array[Float] = [unpremul(bg[0], bg_a), unpremul(bg[1], bg_a), unpremul(bg[2], bg_a)]
+  let cs : Array[Float] = [
+    unpremul(src[0], src_a),
+    unpremul(src[1], src_a),
+    unpremul(src[2], src_a),
+  ]
+  let cb : Array[Float] = [
+    unpremul(bg[0], bg_a),
+    unpremul(bg[1], bg_a),
+    unpremul(bg[2], bg_a),
+  ]
   let m : Array[Float] = match mix {
     Normal => [cs[0], cs[1], cs[2]]
-    Multiply | Screen | Overlay | Darken | Lighten | ColorDodge | ColorBurn
-    | HardLight | SoftLight | Difference | Exclusion =>
+    Multiply
+    | Screen
+    | Overlay
+    | Darken
+    | Lighten
+    | ColorDodge
+    | ColorBurn
+    | HardLight
+    | SoftLight
+    | Difference
+    | Exclusion =>
       [
         separable(mix, cs[0], cb[0]),
         separable(mix, cs[1], cb[1]),

@@ -42,7 +42,7 @@ priv struct CommandRecorder {
 
 ///|
 fn CommandRecorder::new() -> CommandRecorder {
-  { root_cmds: [], layers: [], layer_stack: [] }
+  { root_cmds: [], layers: [], layer_stack: [], }
 }
 
 ///|
@@ -59,11 +59,16 @@ fn CommandRecorder::push_fill(
   blend_mode : BlendMode,
   mask : Mask?,
 ) -> Unit {
-  self.root_cmds.push(Fill(strip_start~, strip_end~, paint~, blend_mode~, mask~))
+  self.root_cmds.push(
+    Fill(strip_start~, strip_end~, paint~, blend_mode~, mask~),
+  )
 }
 
 ///|
-fn CommandRecorder::push_layer(self : CommandRecorder, props : LayerProps) -> Unit {
+fn CommandRecorder::push_layer(
+  self : CommandRecorder,
+  props : LayerProps,
+) -> Unit {
   let id = self.layers.length()
   self.layers.push(props)
   self.root_cmds.push(PushLayer(id))
@@ -85,7 +90,7 @@ priv struct Span {
   x : Int
   /// The horizontal span width in pixels.
   width : Int
-} derive(Eq)
+}
 
 ///|
 /// Returns the exclusive horizontal end position in pixels.
@@ -95,10 +100,10 @@ fn Span::pixel_end(self : Span) -> Int {
 
 ///|
 /// Extends this span to include another span.
-fn Span::extend(self : Span, other : Span) -> Span {
+fn Span::union(self : Span, other : Span) -> Span {
   let x = min_int(self.x, other.x)
   let end = max_int(self.pixel_end(), other.pixel_end())
-  { x, width: u16_sat_sub(end, x) }
+  { x, width: u16_sat_sub(end, x), }
 }
 
 ///|
@@ -107,7 +112,7 @@ fn Span::intersect(self : Span, other : Span) -> Span? {
   let x = max_int(self.x, other.x)
   let end = min_int(self.pixel_end(), other.pixel_end())
   if x < end {
-    Some({ x, width: end - x })
+    Some({ x, width: end - x, })
   } else {
     None
   }
@@ -161,13 +166,14 @@ priv struct RowState {
 
 ///|
 fn RowState::new() -> RowState {
-  { render_cmds: [], layer_depth: 0, layer_stack: [] }
+  { render_cmds: [], layer_depth: 0, layer_stack: [], }
 }
 
 ///|
 fn RowState::push_cmd(self : RowState, cmd : RenderCmd) -> Unit {
   match cmd {
-    PaintFill(span~, ..) | LayerFill(span~, ..) => self.include_current_span(span)
+    PaintFill(span~, ..) | LayerFill(span~, ..) =>
+      self.include_current_span(span)
     PushBuf(_) | PopBuf => ()
   }
   self.render_cmds.push(cmd)
@@ -177,7 +183,7 @@ fn RowState::push_cmd(self : RowState, cmd : RenderCmd) -> Unit {
 fn RowState::push_buf(self : RowState) -> Unit {
   let push_cmd_idx = self.render_cmds.length()
   self.render_cmds.push(PushBuf(None))
-  self.layer_stack.push({ push_cmd_idx, span: None })
+  self.layer_stack.push({ push_cmd_idx, span: None, })
   self.layer_depth += 1
 }
 
@@ -195,7 +201,7 @@ fn RowState::pop_buf(self : RowState) -> Unit {
 fn RowState::include_current_span(self : RowState, span : Span) -> Unit {
   if self.layer_stack.last() is Some(layer) {
     layer.span = match layer.span {
-      Some(layer_span) => Some(layer_span.extend(span))
+      Some(layer_span) => Some(layer_span.union(span))
       None => Some(span)
     }
   }
@@ -245,7 +251,7 @@ fn CommandBucketer::from_wh(width : Int, height : Int) -> CommandBucketer {
 
 ///|
 fn bbox_span(bbox : RectU16) -> Span {
-  { x: bbox.x0, width: u16_sat_sub(bbox.x1, bbox.x0) }
+  { x: bbox.x0, width: u16_sat_sub(bbox.x1, bbox.x0), }
 }
 
 ///|
@@ -254,7 +260,10 @@ fn CommandBucketer::width(self : CommandBucketer) -> Int {
 }
 
 ///|
-fn CommandBucketer::ensure_row_layers(self : CommandBucketer, row_idx : Int) -> Unit {
+fn CommandBucketer::ensure_row_layers(
+  self : CommandBucketer,
+  row_idx : Int,
+) -> Unit {
   let row = self.rows[row_idx]
   let layer_depth = row.layer_depth
   if layer_depth == self.active_layers.length() {
@@ -276,7 +285,7 @@ fn CommandBucketer::bucket_commands(
   for cmd in cmds {
     match cmd {
       Fill(strip_start~, strip_end~, paint~, blend_mode~, mask~) => {
-        let attrs = { paint, blend_mode, mask }
+        let attrs = { paint, blend_mode, mask, }
         self.generate_fill(strips, strip_start, strip_end, attrs)
       }
       PushLayer(id) => self.push_layer(layers[id])
@@ -286,7 +295,10 @@ fn CommandBucketer::bucket_commands(
 }
 
 ///|
-fn CommandBucketer::push_layer(self : CommandBucketer, props : LayerProps) -> Unit {
+fn CommandBucketer::push_layer(
+  self : CommandBucketer,
+  props : LayerProps,
+) -> Unit {
   let parent_bbox = self.clip_bboxes[self.clip_bboxes.length() - 1]
   // Once again, this need to be snapped because fine rasterization assumes
   // tile-alignment.
@@ -371,7 +383,7 @@ fn CommandBucketer::generate_fill(
       self.ensure_row_layers(row_idx)
       self.rows[row_idx].push_cmd(
         PaintFill(
-          span={ x: clipped_x0, width: clipped_x1 - clipped_x0 },
+          span={ x: clipped_x0, width: clipped_x1 - clipped_x0, },
           alpha_idx=Some(strip.alpha_idx() + (clipped_x0 - x0) * TILE_HEIGHT),
           attrs_idx~,
         ),
@@ -384,7 +396,7 @@ fn CommandBucketer::generate_fill(
         self.ensure_row_layers(row_idx)
         self.rows[row_idx].push_cmd(
           PaintFill(
-            span={ x: fill_x0, width: fill_x1 - fill_x0 },
+            span={ x: fill_x0, width: fill_x1 - fill_x0, },
             alpha_idx=None,
             attrs_idx~,
           ),

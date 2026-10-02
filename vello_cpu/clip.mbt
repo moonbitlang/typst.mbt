@@ -14,7 +14,7 @@ priv struct ClipData {
 
 ///|
 /// Borrowed data of a stripped path.
-struct PathDataRef {
+priv struct PathDataRef {
   strips : Array[Strip]
   strip_start : Int
   strip_end : Int
@@ -35,12 +35,10 @@ fn PathDataRef::strips_len(self : PathDataRef) -> Int {
 }
 
 ///|
-fn PathDataRef::alpha(self : PathDataRef, i : Int) -> Byte {
-  self.alphas[self.alpha_start + i]
-}
-
-///|
-fn ClipData::to_path_data_ref(self : ClipData, storage : StripStorage) -> PathDataRef {
+fn ClipData::to_path_data_ref(
+  self : ClipData,
+  storage : StripStorage,
+) -> PathDataRef {
   {
     strips: storage.strips,
     strip_start: min_int(self.strip_start, storage.strips.length()),
@@ -66,13 +64,6 @@ fn ClipContext::new() -> ClipContext {
     temp_storage: StripStorage::new(Replace),
     clip_stack: [],
   }
-}
-
-///|
-fn ClipContext::reset(self : ClipContext) -> Unit {
-  self.clip_stack.clear()
-  self.storage.clear()
-  self.temp_storage.clear()
 }
 
 ///|
@@ -109,7 +100,7 @@ fn ClipContext::push_clip(
       bbox
     }
   }
-  let clip_data = { alpha_start, strip_start, bbox }
+  let clip_data = { alpha_start, strip_start, bbox, }
   let existing_clip = self.get()
   strip_generator.generate_filled_path(
     clip_path,
@@ -119,7 +110,7 @@ fn ClipContext::push_clip(
     self.temp_storage,
     existing_clip,
   )
-  self.storage.extend(self.temp_storage)
+  self.storage.append(self.temp_storage)
   self.clip_stack.push(clip_data)
 }
 
@@ -260,7 +251,10 @@ fn intersect(
             }
             // Two strips, we need to multiply the opacity masks from both
             // paths.
-            (StripRegion(s1_start, _, s1_alphas, s1_off), StripRegion(s2_start, _, s2_alphas, s2_off)) => {
+            (
+              StripRegion(s1_start, _, s1_alphas, s1_off),
+              StripRegion(s2_start, _, s2_alphas, s2_off),
+            ) => {
               if should_create_new_strip(strip_state, target.alphas, start) {
                 flush_strip(strip_state, target.strips, cur_y)
                 start_strip(strip_state, target.alphas, start, false)
@@ -295,7 +289,12 @@ fn intersect(
   }
   if !has_sentinel {
     target.strips.push(
-      Strip::new(65535, (end_y * TILE_HEIGHT) & 0xFFFF, target.alphas.length(), false),
+      Strip::new(
+        65535,
+        (end_y * TILE_HEIGHT) & 0xFFFF,
+        target.alphas.length(),
+        false,
+      ),
     )
   }
 }
@@ -394,7 +393,7 @@ fn RowIterator::new(
   while input.strip(cur_idx.val).strip_y() < strip_y {
     cur_idx.val += 1
   }
-  { input, cur_idx, strip_y, on_strip: true }
+  { input, cur_idx, strip_y, on_strip: true, }
 }
 
 ///|
@@ -499,7 +498,7 @@ fn start_strip(
   x : Int,
   fill_gap : Bool,
 ) -> Unit {
-  strip_data.val = Some({ x, alpha_idx: alphas.length(), fill_gap })
+  strip_data.val = Some({ x, alpha_idx: alphas.length(), fill_gap, })
 }
 
 ///|
@@ -520,26 +519,18 @@ fn should_create_new_strip(
 }
 
 ///|
-/// Raw data of a previously pushed clip path.
-priv struct RawClip {
-  path : Array[@kurbo.PathEl]
-  fill_rule : Fill
-  transform : @kurbo.Affine
-  aliasing_threshold : Int?
-}
-
-///|
 /// State for managing clip paths (`vello_cpu::clip::ClipState`).
+///
+/// Filter surfaces are not supported, so the raw clip paths that upstream
+/// keeps to rebuild the clip context for a shifted viewport are not needed.
 priv struct ClipState {
   /// The currently active clip context.
   context : ClipContext
-  /// Raw data of the currently active stack of clip paths.
-  raw_clips : Array[RawClip]
 }
 
 ///|
 fn ClipState::new() -> ClipState {
-  { context: ClipContext::new(), raw_clips: [] }
+  { context: ClipContext::new(), }
 }
 
 ///|
@@ -556,23 +547,18 @@ fn ClipState::push_clip(
   transform : @kurbo.Affine,
   aliasing_threshold : Int?,
 ) -> Unit {
-  let path = path.elements().copy()
   // `self.active_shift() * transform`, with the identity shift.
   let clip_transform = @kurbo.Affine::identity() * transform
   self.context.push_clip(
-    path, strip_generator, fill_rule, clip_transform, aliasing_threshold,
+    path.elements(),
+    strip_generator,
+    fill_rule,
+    clip_transform,
+    aliasing_threshold,
   )
-  self.raw_clips.push({ path, fill_rule, transform, aliasing_threshold })
 }
 
 ///|
 fn ClipState::pop_clip(self : ClipState) -> Unit {
-  guard self.raw_clips.pop() is Some(_) else { abort("clip stack underflowed") }
   self.context.pop_clip()
-}
-
-///|
-fn ClipState::reset(self : ClipState) -> Unit {
-  self.context.reset()
-  self.raw_clips.clear()
 }

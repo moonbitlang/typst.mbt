@@ -33,27 +33,6 @@ priv enum EncodedPaint {
 }
 
 ///|
-/// Returns whether this encoded paint may produce non-opaque pixels.
-fn EncodedPaint::may_have_transparency(self : EncodedPaint) -> Bool {
-  match self {
-    Gradient(gradient) => gradient.may_have_transparency
-    Image(image) => image.may_have_transparency
-  }
-}
-
-///|
-/// Returns whether this paint may produce non-opaque pixels.
-fn Paint::may_have_transparency(
-  self : Paint,
-  encoded_paints : Array[EncodedPaint],
-) -> Bool {
-  match self {
-    Solid(color) => !color.is_opaque()
-    Indexed(index) => encoded_paints[index].may_have_transparency()
-  }
-}
-
-///|
 /// Encode the gradient and push it into a vector of encoded paints, returning
 /// the corresponding paint in the process.
 fn Gradient::encode_into(
@@ -65,18 +44,19 @@ fn Gradient::encode_into(
   if validate_gradient(self) is Some(paint) {
     return paint
   }
-  let mut may_have_transparency = self.stops.iter().any(s => s.color.components[3] !=
-    1.0)
+  let mut may_have_transparency = self.stops
+    .iter()
+    .any(s => s.color.components[3] != 1.0)
   let mut stops = self.stops
   let first_stop = stops[0]
   let last_stop = stops[stops.length() - 1]
   if first_stop.offset != 0.0 || last_stop.offset != 1.0 {
     let vec = stops.copy()
     if first_stop.offset != 0.0 {
-      vec.insert(0, { offset: 0.0, color: first_stop.color })
+      vec.insert(0, { offset: 0.0, color: first_stop.color, })
     }
     if last_stop.offset != 1.0 {
-      vec.push({ offset: 1.0, color: last_stop.color })
+      vec.push({ offset: 1.0, color: last_stop.color, })
     }
     stops = vec
   }
@@ -148,7 +128,7 @@ fn Gradient::encode_into(
     x_advance,
     y_advance,
     ranges,
-    extend: self.extend,
+    extend_mode: self.extend_mode,
     may_have_transparency,
     u8_lut: None,
     f32_lut: None,
@@ -193,13 +173,13 @@ fn validate_gradient(gradient : Gradient) -> Paint? {
   if !in_range(last.offset) {
     return first
   }
-  let degenerate_point = (p1 : @kurbo.Point, p2 : @kurbo.Point) => f32(
-      (p1.x - p2.x).abs(),
-    ) <=
-    DEGENERATE_THRESHOLD &&
+  let degenerate_point = (p1 : @kurbo.Point, p2 : @kurbo.Point) => {
+    f32((p1.x - p2.x).abs()) <= DEGENERATE_THRESHOLD &&
     f32((p1.y - p2.y).abs()) <= DEGENERATE_THRESHOLD
-  let degenerate_val = (v1 : Float, v2 : Float) => (v2 - v1).abs() <=
-    DEGENERATE_THRESHOLD
+  }
+  let degenerate_val = (v1 : Float, v2 : Float) => {
+    (v2 - v1).abs() <= DEGENERATE_THRESHOLD
+  }
   match gradient.kind {
     Linear(start~, end~) =>
       // Start and end points must not be too close together.
@@ -260,7 +240,7 @@ fn encode_stops(stops : Array[ColorStop]) -> Array[GradientRange] {
       scale[k] = (c1[k] - c0[k]) / x1_minus_x0
       bias[k] = c0[k] - x0 * scale[k]
     }
-    ranges.push({ x1, bias, scale })
+    ranges.push({ x1, bias, scale, })
   }
   ranges
 }
@@ -268,7 +248,14 @@ fn encode_stops(stops : Array[ColorStop]) -> Array[GradientRange] {
 ///|
 fn x_y_advances(transform : @kurbo.Affine) -> (@kurbo.Vec2, @kurbo.Vec2) {
   let c = transform.as_coeffs()
-  let scale_skew_transform = @kurbo.Affine::new([c[0], c[1], c[2], c[3], 0.0, 0.0])
+  let scale_skew_transform = @kurbo.Affine::new([
+    c[0],
+    c[1],
+    c[2],
+    c[3],
+    0.0,
+    0.0,
+  ])
   let x_advance = scale_skew_transform.apply(@kurbo.Point::new(1.0, 0.0))
   let y_advance = scale_skew_transform.apply(@kurbo.Point::new(0.0, 1.0))
   (x_advance.to_vec2(), y_advance.to_vec2())
@@ -296,7 +283,7 @@ fn Image::encode_into(
     f32_is_nearly_zero(f32(c[4] - c[4].floor())) &&
     f32_is_nearly_zero(f32(c[5] - c[5].floor())) &&
     sampler.quality == Medium {
-    sampler = { ..sampler, quality: Low }
+    sampler = { ..sampler, quality: Low, }
   }
   let transform = transform.inverse()
   let (x_advance, y_advance) = x_y_advances(transform)
@@ -382,7 +369,7 @@ fn FocalData::create(
   )
   matrix = focal_matrix * matrix
   let fr1 = r1 / ((1.0 : Float) - f_focal_x).abs()
-  let data = { fr1, f_focal_x, f_is_swapped: swapped }
+  let data = { fr1, f_focal_x, f_is_swapped: swapped, }
   if data.is_focal_on_circle() {
     matrix = matrix.then_scale(0.5)
   } else {
@@ -478,7 +465,7 @@ priv struct EncodedGradient {
   /// The color ranges of the gradient.
   ranges : Array[GradientRange]
   /// The extend of the gradient.
-  extend : Extend
+  extend_mode : Extend
   /// Whether the gradient requires `source_over` compositing.
   may_have_transparency : Bool
   mut u8_lut : GradientLut?
@@ -614,7 +601,7 @@ fn GradientLut::new(ranges : Array[GradientRange], as_u8 : Bool) -> GradientLut 
     }
     prev_idx = max_idx
   }
-  { lut_u8, lut_f32, len: lut_size, scale }
+  { lut_u8, lut_f32, len: lut_size, scale, }
 }
 
 ///|
@@ -635,7 +622,10 @@ fn determine_lut_size(ranges : Array[GradientRange]) -> Int {
   for range in ranges {
     let x1 = range.x1
     let res = next_power_of_two(
-      min_int(f32_as_usize(((1.0 : Float) / (x1 - last_x1)).ceil()), MAX_GRADIENT_LUT_SIZE),
+      min_int(
+        f32_as_usize(((1.0 : Float) / (x1 - last_x1)).ceil()),
+        MAX_GRADIENT_LUT_SIZE,
+      ),
     )
     min_size = max_int(min_size, res)
     last_x1 = x1

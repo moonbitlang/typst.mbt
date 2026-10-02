@@ -4,6 +4,7 @@ import {
   "moonbitlang/typst/kurbo",
   "moonbitlang/typst/vello_cpu",
   "moonbitlang/typst/pic_scale",
+  "moonbitlang/core/cmp",
 }
 
 warnings = "-deprecated"

@@ -17,22 +17,22 @@ const TOL_2 : Double = 0.0625
 
 ///|
 /// A point with `f32` coordinates.
-struct FPoint {
+priv struct FPoint {
   x : Float
   y : Float
-} derive(Eq, Show)
+}
 
 ///|
 fn FPoint::from_kurbo(p : @kurbo.Point) -> FPoint {
-  { x: f32(p.x), y: f32(p.y) }
+  { x: f32(p.x), y: f32(p.y), }
 }
 
 ///|
 /// A line.
-struct Line {
+priv struct Line {
   p0 : FPoint
   p1 : FPoint
-} derive(Show)
+}
 
 ///|
 /// Flatten a filled Bézier path into line segments.
@@ -50,8 +50,7 @@ fn fill(
   line_buf.clear()
   let lb = FlattenerCallback::{
     line_buf,
-    start: { x: 0.0, y: 0.0 },
-    p0: { x: 0.0, y: 0.0 },
+    p0: { x: 0.0, y: 0.0, },
     is_nan: false,
   }
   flatten_impl(path, affine, lb, flatten_ctx, cull_bbox)
@@ -64,24 +63,28 @@ fn fill(
 ///|
 priv struct FlattenerCallback {
   line_buf : Array[Line]
-  mut start : FPoint
   mut p0 : FPoint
   mut is_nan : Bool
 }
 
 ///|
-fn FlattenerCallback::move_to(self : FlattenerCallback, p : @kurbo.Point) -> Unit {
+fn FlattenerCallback::move_to(
+  self : FlattenerCallback,
+  p : @kurbo.Point,
+) -> Unit {
   self.is_nan = self.is_nan || p.x.is_nan() || p.y.is_nan()
   let p = FPoint::from_kurbo(p)
-  self.start = p
   self.p0 = p
 }
 
 ///|
-fn FlattenerCallback::line_to(self : FlattenerCallback, p : @kurbo.Point) -> Unit {
+fn FlattenerCallback::line_to(
+  self : FlattenerCallback,
+  p : @kurbo.Point,
+) -> Unit {
   self.is_nan = self.is_nan || p.x.is_nan() || p.y.is_nan()
   let p = FPoint::from_kurbo(p)
-  self.line_buf.push({ p0: self.p0, p1: p })
+  self.line_buf.push({ p0: self.p0, p1: p, })
   self.p0 = p
 }
 
@@ -119,7 +122,6 @@ fn flatten_impl(
   flatten_ctx : FlattenCtx,
   cull_bbox : RectU16,
 ) -> Unit {
-  flatten_ctx.flattened_cubics_len = 0
   // For the culling performed here to be correct, the top y coordinate of
   // the cull bbox must be aligned to strip row boundaries.
   let left = cull_bbox.x0.to_double()
@@ -203,7 +205,10 @@ fn flatten_impl(
           let pts = flatten_ctx.flattened_cubics
           for k in 1..<max {
             callback.line_to(
-              @kurbo.Point::new(pts[k * 2].to_double(), pts[k * 2 + 1].to_double()),
+              @kurbo.Point::new(
+                pts[k * 2].to_double(),
+                pts[k * 2 + 1].to_double(),
+              ),
             )
           }
         }
@@ -320,7 +325,7 @@ fn quad_estimate_subdiv(q : @kurbo.QuadBez, sqrt_tol : Double) -> FlattenParams 
   let u0 = approx_parabola_inv_integral(a0)
   let u2 = approx_parabola_inv_integral(a2)
   let uscale = 1.0 / (u2 - u0)
-  { a0, a2, u0, uscale, val }
+  { a0, a2, u0, uscale, val, }
 }
 
 ///|
@@ -339,7 +344,7 @@ const MAX_QUADS : Int = 16
 ///|
 /// The context needed for flattening curves. Points are stored as
 /// interleaved `x, y` floats.
-struct FlattenCtx {
+priv struct FlattenCtx {
   even_pts : FixedArray[Float]
   odd_pts : FixedArray[Float]
   a0 : FixedArray[Float]
@@ -350,7 +355,6 @@ struct FlattenCtx {
   mut n_quads : Int
   /// Reusable buffer for flattened cubic points.
   mut flattened_cubics : FixedArray[Float]
-  mut flattened_cubics_len : Int
 }
 
 ///|
@@ -365,7 +369,6 @@ fn FlattenCtx::new() -> FlattenCtx {
     val: FixedArray::make(MAX_QUADS, 0.0),
     n_quads: 0,
     flattened_cubics: FixedArray::make(64, 0.0),
-    flattened_cubics_len: 0,
   }
 }
 
@@ -640,9 +643,6 @@ fn flatten_cubic_simd(
   ctx.flattened_cubics[n * 2 + 1] = ctx.even_pts[n_quads * 2 + 1]
   n + 1
 }
-
-///|
-const TO_QUAD_TOL_D : Double = 0.1
 
 ///|
 let to_quad_tol : Float = 0.1

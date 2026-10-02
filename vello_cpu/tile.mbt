@@ -1,32 +1,12 @@
 // Port of `vello_common/src/tile.rs` (analytic anti-aliasing only).
 
 ///|
-/// T-op bit
-const T_BIT : UInt = 0b00001
-
-///|
-/// B-ottom bit
-const B_BIT : UInt = 0b00010
-
-///|
-/// L-eft bit
-const L_BIT : UInt = 0b00100
-
-///|
-/// R-ight bit
-const R_BIT : UInt = 0b01000
-
-///|
 /// W-inding bit
 const W_BIT : UInt = 0b10000
 
 ///|
 /// Shift amount corresponding to the winding bit.
 const WINDING_SHIFT : Int = 4
-
-///|
-/// Mask for all intersection and winding bits (Bits 0-4).
-const INTERSECTION_MASK : UInt = 0b11111
 
 ///|
 /// Shift amount corresponding to the intersection bits.
@@ -53,7 +33,12 @@ const TILE_HEIGHT : Int = 4
 const TILE_SENTINEL : UInt64 = 0xFFFFFFFF00000000
 
 ///|
-fn tile_new(x : Int, y : Int, line_idx : Int, intersection_mask : UInt) -> UInt64 {
+fn tile_new(
+  x : Int,
+  y : Int,
+  line_idx : Int,
+  intersection_mask : UInt,
+) -> UInt64 {
   (y.to_uint64() << 48) |
   (x.to_uint64() << 32) |
   ((line_idx.reinterpret_as_uint() << INT_MASK_SHIFT) | intersection_mask).to_uint64()
@@ -122,7 +107,7 @@ fn tile_same_row(a : UInt64, b : UInt64) -> Bool {
 
 ///|
 /// A logical grouping of arrays used for culled tile processing.
-struct CulledWindings {
+priv struct CulledWindings {
   /// Fractional winding coverage for each individual scanline in a row
   /// (`Tile::HEIGHT` floats per row).
   partial : FixedArray[Float]
@@ -159,16 +144,22 @@ fn CulledWindings::reset(self : CulledWindings) -> Unit {
 
 ///|
 /// `i16 += i16` (wrapping).
-fn CulledWindings::add_coarse(self : CulledWindings, row : Int, d : Int) -> Unit {
+fn CulledWindings::add_coarse(
+  self : CulledWindings,
+  row : Int,
+  d : Int,
+) -> Unit {
   let v = (self.coarse[row] + d) & 0xFFFF
   self.coarse[row] = if v >= 0x8000 { v - 0x10000 } else { v }
 }
 
 ///|
 /// Marks if a row was culled early for faster traversal in strip generation.
-fn CulledWindings::mark_row_active(self : CulledWindings, row_idx : Int) -> Unit {
-  self.active[row_idx >> 5] = self.active[row_idx >> 5] |
-    (1U << (row_idx & 31))
+fn CulledWindings::mark_row_active(
+  self : CulledWindings,
+  row_idx : Int,
+) -> Unit {
+  self.active[row_idx >> 5] = self.active[row_idx >> 5] | (1U << (row_idx & 31))
 }
 
 ///|
@@ -199,11 +190,7 @@ fn CulledWindings::mark_row_range_active(
       self.active[w] = 0xFFFFFFFFU
     }
     let end_shift = ((end_row - 1) & 31) + 1
-    let mask = if end_shift == 32 {
-      0xFFFFFFFFU
-    } else {
-      (1U << end_shift) - 1
-    }
+    let mask = if end_shift == 32 { 0xFFFFFFFFU } else { (1U << end_shift) - 1 }
     self.active[end_word] = self.active[end_word] | mask
   }
 }
@@ -253,7 +240,7 @@ fn CulledWindings::for_active_rows_in_range(
 
 ///|
 /// Handles the tiling of paths.
-struct Tiles {
+priv struct Tiles {
   tile_buf : Array[UInt64]
   mut sorted : Bool
   /// Auxiliary data tracking row windings and active rows for early culling.
@@ -262,7 +249,7 @@ struct Tiles {
 
 ///|
 fn Tiles::new(height : Int) -> Tiles {
-  { tile_buf: [], sorted: false, windings: CulledWindings::new(height) }
+  { tile_buf: [], sorted: false, windings: CulledWindings::new(height), }
 }
 
 ///|
@@ -414,11 +401,7 @@ fn Tiles::make_tiles_analytic_aa(
         windings.mark_row_active(y_end_middle)
         windings.add_coarse(y_end_middle, dir)
         windings.add_partial(
-          y_end_middle,
-          line_top_y,
-          line_bottom_y,
-          f_dir,
-          f_dir,
+          y_end_middle, line_top_y, line_bottom_y, f_dir, f_dir,
         )
       }
       windings.culled = true
@@ -489,7 +472,10 @@ fn Tiles::make_tiles_analytic_aa(
           let row_top_x = p0_x + (row_top_y - p0_y) * x_slope
           let row_bottom_x = p0_x + (row_bottom_y - p0_y) * x_slope
           let row_left_x = fmaxnm(fminnm(row_top_x, row_bottom_x), line_left_x)
-          let row_right_x = fminnm(fmaxnm(row_top_x, row_bottom_x), line_right_x)
+          let row_right_x = fminnm(
+            fmaxnm(row_top_x, row_bottom_x),
+            line_right_x,
+          )
           if row_left_x < 0.0 {
             windings.culled = true
             if row_right_x < 0.0 {
@@ -521,11 +507,7 @@ fn Tiles::make_tiles_analytic_aa(
               if off_screen_top_y < off_screen_bottom_y {
                 windings.mark_row_active(y_idx)
                 windings.add_partial(
-                  y_idx,
-                  off_screen_top_y,
-                  off_screen_bottom_y,
-                  f_dir,
-                  0.0,
+                  y_idx, off_screen_top_y, off_screen_bottom_y, f_dir, 0.0,
                 )
               }
             }

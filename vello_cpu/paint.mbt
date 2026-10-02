@@ -1,23 +1,17 @@
 // Port of `vello_common/src/paint.rs`.
 
 ///|
-/// A premultiplied color, cached in both `u8` and `f32` form.
-struct PremulColor {
+/// A premultiplied color, cached in `u8` form (the `f32` form is only used
+/// by the `f32` pipeline).
+priv struct PremulColor {
   premul_u8 : FixedArray[Int]
-  premul_f32 : FixedArray[Float]
 }
 
 ///|
 /// Create a new premultiplied color from an alpha color.
 fn PremulColor::from_alpha_color(color : AlphaColor) -> PremulColor {
   let premul = color.premultiply()
-  { premul_u8: components_to_rgba8(premul), premul_f32: premul }
-}
-
-///|
-/// Whether the color is opaque.
-fn PremulColor::is_opaque(self : PremulColor) -> Bool {
-  self.premul_f32[3] == 1.0
+  { premul_u8: components_to_rgba8(premul), }
 }
 
 ///|

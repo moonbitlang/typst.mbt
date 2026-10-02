@@ -19,7 +19,9 @@ fn calculate_t_vals(
   start_x : Double,
   start_y : Double,
 ) -> Unit {
-  let mut cur_pos = gradient.transform.apply(@kurbo.Point::new(start_x, start_y))
+  let mut cur_pos = gradient.transform.apply(
+    @kurbo.Point::new(start_x, start_y),
+  )
   let x_advances = (f32(gradient.x_advance.x), f32(gradient.x_advance.y))
   let y_advances = (f32(gradient.y_advance.x), f32(gradient.y_advance.y))
   let kind = gradient.kind
@@ -101,8 +103,8 @@ fn simd_fract(x : Float) -> Float {
 
 ///|
 /// `apply_extend` for one lane.
-fn gradient_apply_extend(val : Float, extend : Extend) -> Float {
-  match extend {
+fn gradient_apply_extend(val : Float, extend_mode : Extend) -> Float {
+  match extend_mode {
     Pad => vmin(vmax(val, 0.0), 1.0)
     Repeat => simd_fract(val - val.floor())
     // See Skia's `SkRasterPipeline_opts.h`.
@@ -128,13 +130,13 @@ fn paint_gradient_u8(
 ) -> Unit {
   let lut = gradient.u8_lut()
   let scale_factor = lut.scale
-  let extend = gradient.extend
+  let extend_mode = gradient.extend_mode
   let lut_u8 = lut.lut_u8
   // 64 bytes (16 pixels) per iteration.
   let mut p = 0
   while (p + 16) * 4 <= n {
     for k in 0..<16 {
-      let t = gradient_apply_extend(t_vals[p + k], extend)
+      let t = gradient_apply_extend(t_vals[p + k], extend_mode)
       let idx = f32_as_u32(t * scale_factor).reinterpret_as_int()
       let o = off + (p + k) * 4
       buf[o] = lut_u8[idx * 4]
@@ -159,19 +161,21 @@ fn paint_gradient_f32_lut(
   let lut = gradient.f32_lut()
   let scale_factor = lut.scale
   let max_index = lut.len - 1
-  let extend = gradient.extend
+  let extend_mode = gradient.extend_mode
   let lut_f32 = lut.lut_f32
   // 32 bytes (8 pixels) per iteration.
   let mut p = 0
   while (p + 8) * 4 <= n {
     for k in 0..<8 {
       let pos = t_vals[p + k]
-      let t = gradient_apply_extend(pos, extend)
+      let t = gradient_apply_extend(pos, extend_mode)
       let valid = pos == pos
       let o = off + (p + k) * 4
-      if valid {
+      if valid || !gradient.has_undefined {
         let index = f32_as_u32(t * scale_factor)
-        let idx = if index.reinterpret_as_int() > max_index || index > 0x7FFFFFFFU {
+        let index = if valid { index } else { 0xFFFFFFFFU }
+        let idx = if index.reinterpret_as_int() > max_index ||
+          index > 0x7FFFFFFFU {
           max_index
         } else {
           index.reinterpret_as_int()
@@ -194,9 +198,7 @@ fn paint_gradient_f32_lut(
 /// Common data used by different image painters.
 priv struct ImagePainterData {
   mut cur_pos : @kurbo.Point
-  image : EncodedImage
   pixmap : Pixmap
-  x_advances : (Float, Float)
   y_advances : (Float, Float)
   height : Float
   height_inv : Float
@@ -217,9 +219,7 @@ fn ImagePainterData::new(
   let start_pos = image.transform.apply(@kurbo.Point::new(start_x, start_y))
   {
     cur_pos: start_pos,
-    image,
     pixmap,
-    x_advances: (f32(image.x_advance.x), f32(image.x_advance.y)),
     y_advances: (f32(image.y_advance.x), f32(image.y_advance.y)),
     width,
     height,
@@ -232,15 +232,24 @@ fn ImagePainterData::new(
 ///|
 /// `sample` for one lane: the packed pixel at the (already extended)
 /// position.
-fn ImagePainterData::sample(self : ImagePainterData, x : Float, y : Float) -> UInt {
+fn ImagePainterData::sample(
+  self : ImagePainterData,
+  x : Float,
+  y : Float,
+) -> UInt {
   let idx = f32_as_u32(x) + f32_as_u32(y) * self.width_u32
   self.pixmap.sample_idx(idx)
 }
 
 ///|
 /// `extend` for one lane.
-fn image_extend(val : Float, extend : Extend, max : Float, inv_max : Float) -> Float {
-  match extend {
+fn image_extend(
+  val : Float,
+  extend_mode : Extend,
+  max : Float,
+  inv_max : Float,
+) -> Float {
+  match extend_mode {
     // Note that max should be exclusive, so subtract one to enforce that.
     Pad => vmax(vmin(val, max - 1.0), 0.0)
     Repeat =>
@@ -301,7 +310,11 @@ fn paint_plain_nn(
         data.width,
         data.width_inv,
       )
-      store_pixel(buf, off + col * 16 + r * 4, data.sample(x_pos, y_positions[r]))
+      store_pixel(
+        buf,
+        off + col * 16 + r * 4,
+        data.sample(x_pos, y_positions[r]),
+      )
       cur_x_pos[r] = cur_x_pos[r] + advance
     }
   }
@@ -535,7 +548,13 @@ let mf : FixedArray[FixedArray[Float]] = {
 ///|
 /// Calculate a weight based on the fractional value t and the cubic
 /// coefficients.
-fn single_weight(t : Float, a : Float, b : Float, c : Float, d : Float) -> Float {
+fn single_weight(
+  t : Float,
+  a : Float,
+  b : Float,
+  c : Float,
+  d : Float,
+) -> Float {
   madd(madd(madd(t, d, c), t, b), t, a)
 }
 

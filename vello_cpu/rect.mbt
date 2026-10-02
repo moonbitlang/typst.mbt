@@ -57,7 +57,9 @@ fn render_rect(
         let x_cov = rect_coverage(col, rect_x0, rect_x1)
         for c in 0..<4 {
           for r in 0..<4 {
-            alpha_buf.push(f32_as_u8(x_cov[c] * y_cov[r] * 255.0 + 0.5).to_byte())
+            alpha_buf.push(
+              f32_as_u8(x_cov[c] * y_cov[r] * 255.0 + 0.5).to_byte(),
+            )
           }
         }
         col += TILE_WIDTH
@@ -88,7 +90,11 @@ fn render_rect(
 ///|
 /// Compute fractional pixel coverage for 4 consecutive pixels starting at
 /// `start`.
-fn rect_coverage(start : Int, rect_lo : Float, rect_hi : Float) -> FixedArray[Float] {
+fn rect_coverage(
+  start : Int,
+  rect_lo : Float,
+  rect_hi : Float,
+) -> FixedArray[Float] {
   let cov = FixedArray::make(4, (0.0 : Float))
   for i in 0..<4 {
     let px = Float::from_int(start + i)

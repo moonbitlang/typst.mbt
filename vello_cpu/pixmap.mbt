@@ -38,7 +38,7 @@ pub fn Pixmap::from_parts_with_opacity(
   guard data.length() == width * height * 4 else {
     abort("Expected `data` to have length of exactly `width * height`")
   }
-  { width, height, buf: data, may_have_transparency }
+  { width, height, buf: data, may_have_transparency, }
 }
 
 ///|
@@ -85,12 +85,6 @@ fn Pixmap::sample_idx(self : Pixmap, idx : UInt) -> UInt {
 }
 
 ///|
-/// The alpha of the pixel at `(x, y)`.
-fn Pixmap::sample_alpha(self : Pixmap, x : Int, y : Int) -> Int {
-  self.buf[(self.width * y + x) * 4 + 3].to_int()
-}
-
-///|
 /// A mask (alpha or luminance) with one byte per pixel.
 pub struct Mask {
   priv data : FixedArray[Byte]
@@ -112,11 +106,15 @@ pub fn Mask::new_luminance(pixmap : Pixmap) -> Mask {
 
 ///|
 /// Create a new mask from the given alpha data.
-pub fn Mask::from_parts(data : FixedArray[Byte], width : Int, height : Int) -> Mask {
+pub fn Mask::from_parts(
+  data : FixedArray[Byte],
+  width : Int,
+  height : Int,
+) -> Mask {
   guard data.length() == width * height else {
     abort("`data` should have `width * height` length")
   }
-  { data, width, height }
+  { data, width, height, }
 }
 
 ///|
@@ -137,7 +135,7 @@ fn Mask::new_with(pixmap : Pixmap, alpha_mask : Bool) -> Mask {
       data[i] = f32_as_u8(luma * 255.0 + 0.5).to_byte()
     }
   }
-  { data, width: pixmap.width, height: pixmap.height }
+  { data, width: pixmap.width, height: pixmap.height, }
 }
 
 ///|

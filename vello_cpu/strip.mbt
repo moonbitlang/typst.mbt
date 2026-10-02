@@ -9,7 +9,7 @@ struct Strip {
   y : Int
   /// Packed alpha index (bits 0..=30) and fill gap flag (bit 31).
   packed_alpha_idx_fill_gap : UInt
-} derive(Eq, Show)
+} derive(Eq)
 
 ///|
 /// The bit mask for `fill_gap` packed into `packed_alpha_idx_fill_gap`.
@@ -21,7 +21,7 @@ fn Strip::new(x : Int, y : Int, alpha_idx : Int, fill_gap : Bool) -> Strip {
   let alpha_idx = alpha_idx.reinterpret_as_uint()
   guard (alpha_idx & FILL_GAP_MASK) == 0 else { abort("`alpha_idx` too large") }
   let fill_gap : UInt = if fill_gap { FILL_GAP_MASK } else { 0 }
-  { x, y, packed_alpha_idx_fill_gap: alpha_idx | fill_gap }
+  { x, y, packed_alpha_idx_fill_gap: alpha_idx | fill_gap, }
 }
 
 ///|
@@ -100,9 +100,11 @@ fn render_strips(
   if !has_culled_tiles && tiles.is_empty() {
     return
   }
-  let should_fill = (winding : Int) => match fill_rule {
-    NonZero => winding != 0
-    EvenOdd => winding % 2 != 0
+  let should_fill = (winding : Int) => {
+    match fill_rule {
+      NonZero => winding != 0
+      EvenOdd => winding % 2 != 0
+    }
   }
   // Helper to handle "captive strips".
   let emit_captive_strip = (
@@ -174,7 +176,7 @@ fn render_strips(
   )
   let n_tiles = tiles.len()
   let acc = FixedArray::make(4, (0.0 : Float))
-  for tile_idx in 0..=n_tiles {
+  for tile_idx in 0..<=n_tiles {
     let tile = if tile_idx < n_tiles {
       tiles.tile_buf[tile_idx]
     } else {

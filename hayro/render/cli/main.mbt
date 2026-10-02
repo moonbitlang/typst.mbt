@@ -36,7 +36,11 @@ fn main {
   let out = args[1]
   let path = args[2]
   let page = @string.parse_int(args[3]) catch { _ => 0 }
-  let scale = Float::from_double(@string.parse_double(args[4]) catch { _ => 1.0 })
+  let scale = Float::from_double(
+    @string.parse_double(args[4]) catch {
+      _ => 1.0
+    },
+  )
   let data = @fs.read_file_to_bytes(path) catch {
     _ => {
       println("\{path}: read error")
@@ -62,13 +66,18 @@ fn main {
     warning_sink: _ => (),
     render_annotations: false,
   }
-  let pix = @hayro_render.render(p, @hayro_render.RenderCache::new(), settings, {
-    x_scale: scale,
-    y_scale: scale,
-    width: None,
-    height: None,
-    bg_color: @vello_cpu.transparent,
-  })
+  let pix = @hayro_render.render(
+    p,
+    @hayro_render.RenderCache::new(),
+    settings,
+    {
+      x_scale: scale,
+      y_scale: scale,
+      width: None,
+      height: None,
+      bg_color: @vello_cpu.transparent,
+    },
+  )
   @fs.write_bytes_to_file(out, Bytes::from_array(pix.data())) catch {
     _ => println("\{out}: write error")
   }

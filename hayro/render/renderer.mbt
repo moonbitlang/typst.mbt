@@ -33,7 +33,9 @@ priv enum RenderImageData {
 }
 
 ///|
-fn RenderImageData::from_image_data(value : @interpret.ImageData) -> RenderImageData {
+fn RenderImageData::from_image_data(
+  value : @interpret.ImageData,
+) -> RenderImageData {
   match value {
     Rgb(rgb) => Rgb(rgb)
     Luma(luma) => Luma(luma)
@@ -133,7 +135,9 @@ fn Renderer::set_stroke_properties(
   let mut line_width = fmaxnm(stroke_props.line_width, 0.01)
   let transformed_width = line_width * min_factor
   // Only enforce line width if not inside of pattern or type 3 glyph.
-  if transformed_width < threshold && !self.inside_pattern && !self.in_type3_glyph {
+  if transformed_width < threshold &&
+    !self.inside_pattern &&
+    !self.in_type3_glyph {
     line_width = line_width / transformed_width
     line_width = line_width * threshold
   }
@@ -259,9 +263,11 @@ fn Renderer::draw_image_impl(
   let mut img_height = image_data.height()
   let interpolate = image_data.interpolate()
   if alpha_data is Some(a) &&
-    (a.width != img_width ||
-    a.height != img_height ||
-    a.interpolate != interpolate) {
+    (
+      a.width != img_width ||
+      a.height != img_height ||
+      a.interpolate != interpolate
+    ) {
     return self.draw_image_with_alpha_mask(image_data, a)
   }
   let mut quality : @vello_cpu.ImageQuality = if interpolate {
@@ -292,10 +298,12 @@ fn Renderer::draw_image_impl(
   } else {
     (img_width, img_height)
   }
-  let resize_transform = () => @kurbo.Affine::scale_non_uniform(
-    img_width.to_double() / new_width.to_double(),
-    img_height.to_double() / new_height.to_double(),
-  )
+  let resize_transform = () => {
+    @kurbo.Affine::scale_non_uniform(
+      img_width.to_double() / new_width.to_double(),
+      img_height.to_double() / new_height.to_double(),
+    )
+  }
   // For luma images without alpha, we can resize as single-channel and
   // expand to RGBA afterwards, which is ~4x faster.
   let mut rgba_data : FixedArray[Byte] = match (image_data, alpha_data) {
@@ -304,7 +312,12 @@ fn Renderer::draw_image_impl(
         alpha.data
       } else {
         let resized_alpha = resize_image_data(
-          alpha.data, img_width, img_height, new_width, new_height, Luma,
+          alpha.data,
+          img_width,
+          img_height,
+          new_width,
+          new_height,
+          Luma,
         )
         additional_transform = resize_transform()
         img_width = new_width
@@ -326,7 +339,12 @@ fn Renderer::draw_image_impl(
         luma.data
       } else {
         let resized = resize_image_data(
-          luma.data, img_width, img_height, new_width, new_height, Luma,
+          luma.data,
+          img_width,
+          img_height,
+          new_width,
+          new_height,
+          Luma,
         )
         additional_transform = resize_transform()
         img_width = new_width
@@ -349,10 +367,20 @@ fn Renderer::draw_image_impl(
         (luma.data, alpha.data)
       } else {
         let resized_luma = resize_image_data(
-          luma.data, img_width, img_height, new_width, new_height, Luma,
+          luma.data,
+          img_width,
+          img_height,
+          new_width,
+          new_height,
+          Luma,
         )
         let resized_alpha = resize_image_data(
-          alpha.data, img_width, img_height, new_width, new_height, Luma,
+          alpha.data,
+          img_width,
+          img_height,
+          new_width,
+          new_height,
+          Luma,
         )
         additional_transform = resize_transform()
         img_width = new_width
@@ -372,7 +400,12 @@ fn Renderer::draw_image_impl(
     }
     (Rgb(rgb), None) if needs_resize => {
       let resized = resize_image_data(
-        rgb.data, img_width, img_height, new_width, new_height, Rgb,
+        rgb.data,
+        img_width,
+        img_height,
+        new_width,
+        new_height,
+        Rgb,
       )
       additional_transform = resize_transform()
       img_width = new_width
@@ -479,7 +512,9 @@ fn Renderer::draw_image_impl(
     let padded_image = FixedArray::make(new_w * new_h * 4, b'\x00')
     for y in 0..<img_height {
       for x in 0..<(img_width * 4) {
-        padded_image[((y + 2) * new_w + 2) * 4 + x] = rgba_data[y * img_width * 4 +
+        padded_image[((y + 2) * new_w + 2) * 4 + x] = rgba_data[y *
+          img_width *
+          4 +
           x]
       }
     }
@@ -535,7 +570,7 @@ fn Renderer::draw_pixmap(
   let height = pixmap.height()
   let image : @vello_cpu.Image = {
     image: Pixmap(pixmap),
-    sampler: { x_extend: Pad, y_extend: Pad, quality, alpha: 1.0 },
+    sampler: { x_extend: Pad, y_extend: Pad, quality, alpha: 1.0, },
   }
   self.ctx.set_transform(transform)
   self.ctx.set_paint(Image(image))
@@ -545,7 +580,10 @@ fn Renderer::draw_pixmap(
 }
 
 ///|
-fn Renderer::apply_soft_mask(self : Renderer, mask : @interpret.SoftMask?) -> Unit {
+fn Renderer::apply_soft_mask(
+  self : Renderer,
+  mask : @interpret.SoftMask?,
+) -> Unit {
   match mask {
     Some(m) => {
       let mask = self.cached_soft_mask(m)
@@ -572,7 +610,10 @@ fn Renderer::cached_soft_mask(
 }
 
 ///|
-fn Renderer::apply_draw_props(self : Renderer, props : @interpret.DrawProps) -> Unit {
+fn Renderer::apply_draw_props(
+  self : Renderer,
+  props : @interpret.DrawProps,
+) -> Unit {
   self.ctx.set_transform(props.transform)
   self.apply_soft_mask(props.soft_mask)
   self.ctx.set_blend_mode(convert_blend_mode(props.blend_mode))
@@ -635,7 +676,10 @@ fn Renderer::set_paint(
         Shading(s) => {
           clip_path = s.shading.clip_path
           let encoded = s.encode()
-          let mut bbox = path_bbox().to_path(0.0).transform(path_transform).bounding_box()
+          let mut bbox = path_bbox()
+            .to_path(0.0)
+            .transform(path_transform)
+            .bounding_box()
           if is_stroke {
             // Try to account for stroke in bbox.
             let (a1, a2) = x_y_advances(path_transform)
@@ -837,7 +881,7 @@ fn Renderer::fill_glyph(
   match glyph {
     Outline(o) => {
       let base_outline = self.cached_outline(o)
-      let props = { ..props, transform: props.transform * glyph_transform }
+      let props = { ..props, transform: props.transform * glyph_transform, }
       self.fill_path(base_outline, props, NonZero)
     }
     Type3(s) => {
@@ -1142,7 +1186,7 @@ fn render_shading_texture(
   let (x_advance, y_advance) = x_y_advances(shading_pattern.base_transform)
   let buf = FixedArray::make(width * height * 4, b'\x00')
   let mut start_point = (shading_pattern.base_transform *
-    @kurbo.Affine::translate(0.5, 0.5)).apply(
+  @kurbo.Affine::translate(0.5, 0.5)).apply(
     @kurbo.Point::new(path_bbox.x0, path_bbox.y0),
   )
   let mut may_have_transparency = false
@@ -1248,7 +1292,14 @@ fn max_factor(transform : @kurbo.Affine) -> Float {
 ///|
 fn x_y_advances(transform : @kurbo.Affine) -> (@kurbo.Vec2, @kurbo.Vec2) {
   let c = transform.as_coeffs()
-  let scale_skew_transform = @kurbo.Affine::new([c[0], c[1], c[2], c[3], 0.0, 0.0])
+  let scale_skew_transform = @kurbo.Affine::new([
+    c[0],
+    c[1],
+    c[2],
+    c[3],
+    0.0,
+    0.0,
+  ])
   let x_advance = scale_skew_transform.apply(@kurbo.Point::new(1.0, 0.0))
   let y_advance = scale_skew_transform.apply(@kurbo.Point::new(0.0, 1.0))
   (x_advance.to_vec2(), y_advance.to_vec2())
@@ -1263,7 +1314,9 @@ fn convert_fill_rule(fill_rule : @interpret.FillRule) -> @vello_cpu.Fill {
 }
 
 ///|
-fn convert_blend_mode(blend_mode : @interpret.BlendMode) -> @vello_cpu.BlendMode {
+fn convert_blend_mode(
+  blend_mode : @interpret.BlendMode,
+) -> @vello_cpu.BlendMode {
   let mix : @vello_cpu.Mix = match blend_mode {
     Normal => Normal
     Multiply => Multiply
