@@ -65,6 +65,9 @@ rustybuzz = "0.20"
 unicode-ccc = "0.4"
 unicode-bidi-mirroring = "0.4"
 unicode-properties = { version = "0.1", default-features = false, features = ["general-category"] }
+# tiny-skia-path (gen_tiny_skia_path_tests).
+tiny-skia-path = "=0.12.0"
+strict-num = "=0.1.1"
 
 # Record every shaping call Typst makes (for the `shape` stage); see
 # rustybuzz-tap/Cargo.toml.
