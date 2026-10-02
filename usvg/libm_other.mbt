@@ -36,6 +36,11 @@ fn libm_acos(x : Double) -> Double {
 }
 
 ///|
+fn libm_log2(x : Double) -> Double {
+  @math.log2(x)
+}
+
+///|
 fn libm_asin(x : Double) -> Double {
   @math.asin(x)
 }

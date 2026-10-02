@@ -1,9 +1,5 @@
 // Port of `typst-library/src/text/font/color.rs`: utilities for color font
 // handling.
-//
-// Not ported yet: `draw_svg_glyph` (SVG-table glyphs) needs a port of usvg's
-// tree simplification and serialization (`usvg::Tree::to_string`); such
-// glyphs currently fall back to a tofu frame.
 
 ///|
 /// Whether this glyph should be rendered via simple outlining instead of via
@@ -268,16 +264,187 @@ fn colr_glyph_to_svg(font : FontInstance, glyph_id : @otf.GlyphId) -> String? {
 
 ///|
 /// Draws an SVG glyph in a frame.
-///
-/// TODO: Upstream decompresses SVGZ, simplifies the document with usvg
-/// (`usvg::Tree::from_xmltree` + `to_string`), computes its bounding box and
-/// fixes up the size attributes (`fixup_svg`). This needs a port of usvg's
-/// tree; until then SVG glyphs are drawn as tofus.
 fn draw_svg_glyph(
-  _font : FontInstance,
-  _glyph_id : @otf.GlyphId,
+  font : FontInstance,
+  glyph_id : @otf.GlyphId,
 ) -> GlyphFrameItem? {
-  None
+  // TODO: Our current conversion of the SVG table works for Twitter Color Emoji,
+  // but might not work for others. See also: https://github.com/RazrFalcon/resvg/pull/776
+  guard font.ttf() is Some(ttf) else { return None }
+  guard ttf.glyph_svg_image(glyph_id) is Some(doc) else { return None }
+  let mut data = doc.data.to_bytes()
+
+  // Decompress SVGZ.
+  if data.length() >= 2 && data[0] == b'\x1f' && data[1] == b'\x8b' {
+    data = @codecs.gzip_decompress(data[:]) catch { _ => return None }
+  }
+
+  // Parse and simplify the SVG.
+  guard bytes_to_str(data[:]) is Some(xml) else { return None }
+  let document = @xml.Document::parse(xml) catch { _ => return None }
+  let opts = @usvg.Options::default()
+  let tree = @usvg.Tree::from_xmltree(document, opts) catch { _ => return None }
+  let data = tree.to_string({
+    ..@usvg.WriteOptions::default(),
+    indent: None,
+    attributes_indent: None,
+  })
+
+  // The SVG coordinates and the font coordinates are not the same: the Y axis
+  // is mirrored. But the origin of the axes are the same (which means that
+  // the horizontal axis in the SVG document corresponds to the baseline). See
+  // the reference for more details:
+  // https://learn.microsoft.com/en-us/typography/opentype/spec/svg#coordinate-systems-and-glyph-metrics
+  //
+  // Using this SVG directly can result in a cropped glyph. In order to avoid
+  // clipping issues, we apply a translate transform so the top-left corner of
+  // the bounding box is moved into the origin (0, 0) to make it fully fit
+  // into the view port defined by `viewBox="0 0 width height"`, like a
+  // conventional SVG.
+  let bbox = tree.root().bounding_box()
+  let view_box = Rect::new(
+    Point::new(
+      Abs::pt(bbox.left().to_double()),
+      Abs::pt(bbox.top().to_double()),
+    ),
+    Point::new(
+      Abs::pt(bbox.right().to_double()),
+      Abs::pt(bbox.bottom().to_double()),
+    ),
+  )
+  let data = fixup_svg(data, view_box)
+  let svg = SvgImage::new(@utf8.encode(data)) catch { _ => return None }
+  let image = Image::plain(Svg(svg))
+  let position = Point::new(view_box.min.x, view_box.min.y)
+  let size = view_box.size()
+  Some(Image(position, image, size))
+}
+
+///|
+/// Replace or insert the size attributes (viewBox, width and height), and
+/// insert a group with a transform that translates the `viewBox` so that the
+/// top-left point is at the origin (0, 0).
+///
+/// Works on the UTF-16 string like upstream on the UTF-8 one; all scanned
+/// syntax is ASCII.
+fn fixup_svg(svg : String, view_box : Rect) -> String {
+  let mut viewbox_range : (Int, Int)? = None
+  let mut width_range : (Int, Int)? = None
+  let mut height_range : (Int, Int)? = None
+  let n = svg.length()
+  let mut cursor = 0
+  // `s.eat_until("<svg"); s.expect("<svg")`
+  match svg.find("<svg") {
+    Some(i) => cursor = i + 4
+    None => abort("expected <svg")
+  }
+  let svg_attr_start = cursor
+  let is_ws = (c : Int) => c is (0x20 | 0x09 | 0x0A | 0x0D)
+  while true {
+    // `!s.eat_if('>') && !s.done()`
+    if cursor < n && svg.unsafe_get(cursor).to_int() == '>'.to_int() {
+      cursor += 1
+      break
+    }
+    if cursor >= n {
+      break
+    }
+    // `s.eat_whitespace()` (Unicode whitespace; the writer only emits ASCII).
+    while cursor < n && is_ws(svg.unsafe_get(cursor).to_int()) {
+      cursor += 1
+    }
+    let start = cursor
+    // `s.eat_until('=')`
+    while cursor < n && svg.unsafe_get(cursor).to_int() != '='.to_int() {
+      cursor += 1
+    }
+    let attr_name = svg
+      .unsafe_substring(start~, end=cursor)
+      .trim(chars=" \t\n\r")
+    // Eat the equal sign and the quote.
+    if cursor < n {
+      cursor += 1
+    } else {
+      abort("expected =")
+    }
+    while cursor < n && svg.unsafe_get(cursor).to_int() != '"'.to_int() {
+      cursor += 1
+    }
+    if cursor < n {
+      cursor += 1
+    } else {
+      abort("expected \"")
+    }
+    while true {
+      if cursor < n && svg.unsafe_get(cursor).to_int() == '"'.to_int() {
+        cursor += 1
+        break
+      }
+      if cursor >= n {
+        break
+      }
+      cursor += 1
+    }
+    match attr_name.to_string() {
+      "viewBox" => viewbox_range = Some((start, cursor))
+      "width" => width_range = Some((start, cursor))
+      "height" => height_range = Some((start, cursor))
+      _ => ()
+    }
+  }
+  let svg_body_start = cursor
+  guard svg.rev_find("</svg>") is Some(svg_body_end) else { return svg }
+  let mut svg = svg.unsafe_substring(start=0, end=svg_body_end) +
+    "</g>" +
+    svg.unsafe_substring(start=svg_body_end, end=n)
+  svg = svg.unsafe_substring(start=0, end=svg_body_start) +
+    "<g transform=\"translate(\{rust_display_f64(-view_box.min.x.to_pt())} \{rust_display_f64(-view_box.min.y.to_pt())})\">" +
+    svg.unsafe_substring(start=svg_body_start, end=svg.length())
+  let size = view_box.size()
+  let edits = [
+    (
+      viewbox_range,
+      "viewBox=\"0 0 \{rust_display_f64(size.x.to_pt())} \{rust_display_f64(size.y.to_pt())}\"",
+    ),
+    (width_range, "width=\"\{rust_display_f64(size.x.to_pt())}\""),
+    (height_range, "height=\"\{rust_display_f64(size.y.to_pt())}\""),
+  ]
+
+  // Sort edits by ranges; missing ranges will be moved to the start (a
+  // stable sort by the range start).
+  let indexed = edits.mapi((i, e) => (i, e))
+  indexed.sort_by((a, b) => {
+    let key = (e : ((Int, Int)?, String)) => {
+      match e.0 {
+        Some((s, _)) => s
+        None => -1
+      }
+    }
+    let c = key(a.1).compare(key(b.1))
+    if c != 0 {
+      c
+    } else {
+      a.0.compare(b.0)
+    }
+  })
+
+  // Replace or insert the attribute. Iterate in reverse, so the modifying the
+  // string doesn't affect the ranges of the edits that are applied later on.
+  for i = indexed.length() - 1; i >= 0; i = i - 1 {
+    let (range, str) = indexed[i].1
+    match range {
+      Some((s, e)) =>
+        svg = svg.unsafe_substring(start=0, end=s) +
+          str +
+          svg.unsafe_substring(start=e, end=svg.length())
+      None =>
+        svg = svg.unsafe_substring(start=0, end=svg_attr_start) +
+          " " +
+          str +
+          svg.unsafe_substring(start=svg_attr_start, end=svg.length())
+    }
+  }
+  svg
 }
 
 ///|

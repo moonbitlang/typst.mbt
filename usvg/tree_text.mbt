@@ -277,7 +277,7 @@ pub fn TextDecoration::line_through(
 /// Spans do not overlap inside a text chunk.
 pub struct TextSpan {
   priv start : Int
-  priv end : Int
+  priv mut end : Int
   priv mut fill : Fill?
   priv mut stroke : Stroke?
   priv paint_order : PaintOrder
@@ -482,7 +482,7 @@ pub struct TextChunk {
   priv anchor : TextAnchor
   priv spans : Array[TextSpan]
   priv text_flow : TextFlow
-  priv text : String
+  priv mut text : String
 }
 
 ///|

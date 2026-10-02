@@ -23,6 +23,9 @@ extern "C" fn libm_sqrt(x : Double) -> Double = "sqrt"
 extern "C" fn libm_acos(x : Double) -> Double = "acos"
 
 ///|
+extern "C" fn libm_log2(x : Double) -> Double = "log2"
+
+///|
 extern "C" fn libm_asin(x : Double) -> Double = "asin"
 
 ///|

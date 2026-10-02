@@ -46,6 +46,8 @@ pub(all) struct FaceInfo {
 /// A font database.
 pub struct FontDatabase {
   priv faces : Array[FaceInfo]
+  // Parsed faces (upstream parses the data in every `with_face_data` call).
+  priv parsed : Map[FontId, @otf.Face?]
   priv mut family_serif : String
   priv mut family_sans_serif : String
   priv mut family_cursive : String
@@ -66,6 +68,7 @@ pub struct FontDatabase {
 pub fn FontDatabase::new() -> FontDatabase {
   {
     faces: [],
+    parsed: {},
     family_serif: "Times New Roman",
     family_sans_serif: "Arial",
     family_cursive: "Comic Sans MS",
@@ -77,7 +80,7 @@ pub fn FontDatabase::new() -> FontDatabase {
 ///|
 /// A copy of the database (upstream's copy-on-write `Arc::make_mut`).
 pub fn FontDatabase::clone(self : FontDatabase) -> FontDatabase {
-  { ..self, faces: self.faces.copy(), }
+  { ..self, faces: self.faces.copy(), parsed: {}, }
 }
 
 ///|

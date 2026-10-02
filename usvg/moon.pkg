@@ -12,6 +12,9 @@ import {
   "moonbitlang/typst/simplecss",
   "moonbitlang/typst/tiny_skia_path",
   "moonbitlang/typst/otf",
+  "moonbitlang/typst/shape",
+  "moonbitlang/typst/bidi",
+  "moonbitlang/typst/unicode",
 }
 
 warnings = "-unused_mut"
