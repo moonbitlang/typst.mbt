@@ -1,0 +1,9 @@
+[package]
+name = "moxcms-oracle"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[dependencies]
+moxcms = "=0.8.1"
+pxfm = "=0.1.30"

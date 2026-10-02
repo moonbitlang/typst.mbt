@@ -140,9 +140,9 @@ fn fma_exact(a : Double, b : Double, c : Double) -> Double {
 }
 
 ///|
-/// Fused multiply-add `a * b + c` with a single rounding (Rust
+/// Software fused multiply-add `a * b + c` with a single rounding (Rust
 /// `f64::mul_add`).
-pub fn fma(a : Double, b : Double, c : Double) -> Double {
+pub fn soft_fma(a : Double, b : Double, c : Double) -> Double {
   if a.is_nan() || b.is_nan() || c.is_nan() || a.is_inf() || b.is_inf() {
     return a * b + c
   }
@@ -164,7 +164,12 @@ pub fn fma(a : Double, b : Double, c : Double) -> Double {
     return fma_exact(a, b, c)
   }
   let ep = ea + eb
-  if ep < -900 || ep > 900 || ec < -900 || ec > 900 {
+  if ep < -900 ||
+    ep > 900 ||
+    ec < -900 ||
+    ec > 900 ||
+    ea.abs() > 1000 ||
+    eb.abs() > 1000 {
     return fma_exact(a, b, c)
   }
   // Boldo & Melquiond, "Emulation of FMA and correctly-rounded sums: proved
@@ -179,8 +184,9 @@ pub fn fma(a : Double, b : Double, c : Double) -> Double {
 }
 
 ///|
-/// Fused multiply-add `a * b + c` in single precision (Rust `f32::mul_add`).
-pub fn fmaf(a : Float, b : Float, c : Float) -> Float {
+/// Software fused multiply-add `a * b + c` in single precision (Rust
+/// `f32::mul_add`).
+pub fn soft_fmaf(a : Float, b : Float, c : Float) -> Float {
   // The product of two floats is exact in double precision; rounding the sum
   // to odd in double precision and then to nearest in single precision gives
   // the correctly rounded result.
