@@ -6,6 +6,7 @@ import {
   "moonbitlang/typst/font_types",
   "moonbitlang/typst/read_fonts",
   "moonbitlang/typst/read_fonts/ps",
+  "moonbitlang/typst/skrifa",
   "moonbitlang/core/encoding/utf8",
   "moonbitlang/core/hashset",
   "moonbitlang/typst/moxcms",

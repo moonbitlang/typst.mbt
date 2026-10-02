@@ -19,49 +19,50 @@ fn glyph_name_from_bytes(bytes : BytesView) -> String? {
 
 ///|
 /// A font blob for type 1 fonts.
-///
-/// TODO: not ported yet (needs `read_fonts::ps::type1`); such fonts fail to
-/// load.
 priv struct Type1FontBlob {
-  dummy : Unit
+  table : @ps.Type1Font
 }
 
 ///|
-fn Type1FontBlob::new(_data : Bytes) -> Type1FontBlob? {
-  None
+fn Type1FontBlob::new(data : Bytes) -> Type1FontBlob? {
+  let table = @ps.Type1Font::new(data[:]) catch { _ => return None }
+  Some({ table, })
 }
 
 ///|
 fn Type1FontBlob::outline_glyph(
-  _self : Type1FontBlob,
-  _gid : GlyphId,
+  self : Type1FontBlob,
+  gid : GlyphId,
 ) -> @kurbo.BezPath {
-  @kurbo.BezPath::new()
+  let path = OutlinePath::new()
+  let _ = self.table.draw(gid, Some(units_per_em), path) catch { _ => None }
+  path.take()
 }
 
 ///|
-fn Type1FontBlob::glyph_names(
-  _self : Type1FontBlob,
-) -> Array[(GlyphId, String)] {
-  []
+fn Type1FontBlob::glyph_names(self : Type1FontBlob) -> Array[(GlyphId, String)] {
+  self.table.glyph_names()
 }
 
 ///|
-fn Type1FontBlob::encoding_map(_self : Type1FontBlob, _code : Byte) -> GlyphId? {
-  None
+/// `table().encoding().and_then(|e| e.map(code))`.
+fn Type1FontBlob::encoding_map(self : Type1FontBlob, code : Byte) -> GlyphId? {
+  match self.table.encoding() {
+    Some(e) => e.map(code)
+    None => None
+  }
 }
 
 ///|
+/// `table().encoding().and_then(|e| e.glyph_name(code))`.
 fn Type1FontBlob::encoding_glyph_name(
-  _self : Type1FontBlob,
-  _code : Byte,
+  self : Type1FontBlob,
+  code : Byte,
 ) -> String? {
-  None
-}
-
-///|
-fn Type1FontBlob::has_encoding(_self : Type1FontBlob) -> Bool {
-  false
+  match self.table.encoding() {
+    Some(e) => e.glyph_name(code)
+    None => None
+  }
 }
 
 ///|
@@ -173,15 +174,69 @@ fn CffFontBlob::is_cid(self : CffFontBlob) -> Bool {
 
 ///|
 /// A font blob for OpenType fonts.
-///
-/// TODO: not ported yet (needs `skrifa`); such fonts fail to load.
 priv struct OpenTypeFontBlob {
   data : Bytes
+  font_ref : @read_fonts.FontRef
+  outline_glyphs : @skrifa.OutlineGlyphCollection
+  hinting_instance : @skrifa.HintingInstance?
+  glyph_metrics : @skrifa.GlyphMetrics
+  cff_blob : CffFontBlob?
 }
 
 ///|
-fn OpenTypeFontBlob::new(_data : Bytes, _index : Int) -> OpenTypeFontBlob? {
-  None
+fn OpenTypeFontBlob::new(data : Bytes, index : Int) -> OpenTypeFontBlob? {
+  // Check first whether the font is valid.
+  let f = @read_fonts.FontRef::from_index(data[:], index) catch {
+    _ => return None
+  }
+  // Reject fonts with invalid post table version, fixes pdf.js issue 9462. Not sure if there
+  // is a better fix, for some reason skrifa accepts the font which is completely invalid.
+  let invalid = match (try? f.post()) {
+    Ok(p) =>
+      !(p.version().to_major_minor() is ((1, 0) | (2, 0) | (2, 5) | (3, 0)))
+    Err(_) => false
+  }
+  if invalid {
+    return None
+  }
+
+  // We store this separately because we want to be able to cache the subfonts
+  // of a CFF OpenType font, which is not possible using the current skrifa API.
+  // Hopefully there will be some way in the future.
+  let cff_blob = match (try? f.cff()) {
+    Ok(cff) => CffFontBlob::new(cff.offset_data().to_bytes())
+    Err(_) => None
+  }
+  let outline_glyphs = @skrifa.outline_glyphs(f)
+  let hinting_instance = if outline_glyphs.require_interpreter() {
+    try
+      @skrifa.HintingInstance::new(
+        outline_glyphs,
+        @skrifa.Size::new(units_per_em),
+        @skrifa.LocationRef::default(),
+        { engine: Interpreter, target: Mono, },
+      )
+    catch {
+      _ => None
+    } noraise {
+      h => Some(h)
+    }
+  } else {
+    None
+  }
+  let glyph_metrics = @skrifa.glyph_metrics(
+    f,
+    @skrifa.Size::new(units_per_em),
+    @skrifa.LocationRef::default(),
+  )
+  Some({
+    data,
+    font_ref: f,
+    outline_glyphs,
+    hinting_instance,
+    glyph_metrics,
+    cff_blob,
+  })
 }
 
 ///|
@@ -191,34 +246,93 @@ fn OpenTypeFontBlob::font_data(self : OpenTypeFontBlob) -> Bytes {
 
 ///|
 fn OpenTypeFontBlob::glyph_names(
-  _self : OpenTypeFontBlob,
+  self : OpenTypeFontBlob,
 ) -> Map[String, GlyphId] {
-  {}
+  // Note: We don't call the `glyph_name` method provided by read-fonts because
+  // calling it repeatedly is very slow.
+  let glyph_names = {}
+  guard (try? self.font_ref.post()) is Ok(post) else { return glyph_names }
+  match post.version().to_major_minor() {
+    (1, 0) =>
+      for gid, name in @read_fonts.default_glyph_names {
+        glyph_names[name] = GlyphId::new(gid.reinterpret_as_uint())
+      }
+    (2, 0) => {
+      guard post.glyph_name_index() is Some(name_indices) else {
+        return glyph_names
+      }
+      guard post.string_data() is Some(string_data) else { return glyph_names }
+      let custom_names : Array[String?] = string_data.map(entry => {
+        match entry {
+          Ok(name) => Some(name)
+          Err(_) => None
+        }
+      })
+      let defaults = @read_fonts.default_glyph_names
+      for gid, idx in name_indices {
+        let name = if idx < defaults.length() {
+          Some(defaults[idx])
+        } else {
+          match custom_names.get(idx - defaults.length()) {
+            Some(n) => n
+            None => None
+          }
+        }
+        if name is Some(name) {
+          glyph_names[name] = GlyphId::new(gid.reinterpret_as_uint())
+        }
+      }
+    }
+    _ => ()
+  }
+  glyph_names
 }
 
 ///|
 fn OpenTypeFontBlob::outline_glyph(
-  _self : OpenTypeFontBlob,
-  _glyph : GlyphId,
+  self : OpenTypeFontBlob,
+  glyph : GlyphId,
 ) -> @kurbo.BezPath {
-  @kurbo.BezPath::new()
+  if self.cff_blob is Some(cff_blob) {
+    return cff_blob.outline_glyph(glyph)
+  }
+  let path = OutlinePath::new()
+  let draw_settings = match self.hinting_instance {
+    // Note: We always hint at the font size `UNITS_PER_EM`, which obviously isn't very useful. We don't do this
+    // for better text quality (right now), but instead because there are some PDFs with obscure fonts that
+    // actually render wrongly if hinting is disabled!
+    Some(instance) => @skrifa.DrawSettings::hinted(instance, false)
+    None =>
+      @skrifa.DrawSettings::unhinted(
+        @skrifa.Size::new(units_per_em),
+        @skrifa.LocationRef::default(),
+      )
+  }
+  guard self.outline_glyphs.get(glyph) is Some(outline) else {
+    return @kurbo.BezPath::new()
+  }
+  let _ = try? outline.draw(draw_settings, path)
+  path.take()
 }
 
 ///|
 fn OpenTypeFontBlob::advance_width(
-  _self : OpenTypeFontBlob,
-  _glyph : GlyphId,
+  self : OpenTypeFontBlob,
+  glyph : GlyphId,
 ) -> Float? {
-  None
+  self.glyph_metrics.advance_width(glyph)
 }
 
 ///|
 /// `font_ref().cmap().ok()?.map_codepoint(code)`.
 fn OpenTypeFontBlob::map_codepoint(
-  _self : OpenTypeFontBlob,
-  _code : UInt,
+  self : OpenTypeFontBlob,
+  code : UInt,
 ) -> GlyphId? {
-  None
+  match (try? self.font_ref.cmap()) {
+    Ok(c) => c.map_codepoint(code)
+    Err(_) => None
+  }
 }
 
 ///|
@@ -234,46 +348,70 @@ priv struct CmapRecord {
 /// The encoding records of the `cmap` table (`None` if there is no valid
 /// `cmap` table).
 fn OpenTypeFontBlob::cmap_records(
-  _self : OpenTypeFontBlob,
+  self : OpenTypeFontBlob,
 ) -> Array[CmapRecord]? {
-  None
+  guard (try? self.font_ref.cmap()) is Ok(cmap) else { return None }
+  Some(
+    cmap
+    .encoding_records()
+    .map(record => {
+      let platform_id = match record.platform_id() {
+        Unicode => 0
+        Macintosh => 1
+        ISO => 2
+        Windows => 3
+        Custom => 4
+        Unknown => 5
+      }
+      let subtable : ((UInt) -> GlyphId?)? = match
+        (try? record.subtable(cmap.offset_data())) {
+        Ok(st) => Some(c => st.map_codepoint(c))
+        Err(_) => None
+      }
+      { platform_id, encoding_id: record.encoding_id(), subtable, }
+    }),
+  )
 }
 
 ///|
 /// The blob of the font's `CFF` table, if any.
-fn OpenTypeFontBlob::cff_blob(_self : OpenTypeFontBlob) -> CffFontBlob? {
-  None
+fn OpenTypeFontBlob::cff_blob(self : OpenTypeFontBlob) -> CffFontBlob? {
+  match (try? self.font_ref.cff()) {
+    Ok(cff) => CffFontBlob::new(cff.offset_data().to_bytes())
+    Err(_) => None
+  }
 }
 
 ///|
 /// `font_ref().attributes().weight.value()`.
-fn OpenTypeFontBlob::weight(_self : OpenTypeFontBlob) -> Float {
-  400.0
+fn OpenTypeFontBlob::weight(self : OpenTypeFontBlob) -> Float {
+  @skrifa.attributes(self.font_ref).weight.value()
 }
 
 ///|
 /// `font_ref().attributes().style == Style::Normal`.
-fn OpenTypeFontBlob::style_is_normal(_self : OpenTypeFontBlob) -> Bool {
-  true
+fn OpenTypeFontBlob::style_is_normal(self : OpenTypeFontBlob) -> Bool {
+  @skrifa.attributes(self.font_ref).style == Normal
 }
 
 ///|
 /// `font_ref().metrics(Size::unscaled(), LocationRef::default()).is_monospace`.
-fn OpenTypeFontBlob::is_monospace(_self : OpenTypeFontBlob) -> Bool {
-  false
+fn OpenTypeFontBlob::is_monospace(self : OpenTypeFontBlob) -> Bool {
+  @skrifa.metrics(
+    self.font_ref,
+    @skrifa.Size::unscaled(),
+    @skrifa.LocationRef::default(),
+  ).is_monospace
 }
 
 ///|
 /// `font_ref().charmap().map(c)`.
-fn OpenTypeFontBlob::charmap_map(
-  _self : OpenTypeFontBlob,
-  _c : Char,
-) -> GlyphId? {
-  None
+fn OpenTypeFontBlob::charmap_map(self : OpenTypeFontBlob, c : Char) -> GlyphId? {
+  @skrifa.charmap(self.font_ref).map_char(c)
 }
 
 ///|
 /// Whether the data is a valid OpenType font (`FontRef::from_index(data, 0).is_ok()`).
-fn is_open_type(_data : Bytes) -> Bool {
-  false
+fn is_open_type(data : Bytes) -> Bool {
+  (try? @read_fonts.FontRef::from_index(data[:], 0)) is Ok(_)
 }
