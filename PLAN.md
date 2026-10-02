@@ -10,9 +10,9 @@
 | P1 syntax (highlight) | **done** | `syntax/highlight` (`Tag`, `highlight`, `highlight_html`); used for `typ`/`typc`/`typm` raw blocks |
 | P1 syntax (reparser) | **done** | `Source::edit`/`replace` + `reparse`: 3792/3792 `reparse` stage (8 seeded edits per test body: returned ranges, tree, span numbering, `Lines` identical), upstream reparser unit tests |
 | P2 eval (typst-eval) | **done** | VM, closures, imports, rules, math; `eval` stage runs end to end |
-| P2 library (value level) | **done** | 3778/3792 `eval` (2026-10-03). Remaining 14: plugins (WASM, out of scope), inline layout (P4) |
-| P3 realize + introspection + HTML export | **done** | `realize` 3778/3792, `html` 504/508 (2026-10-03). Remaining: inline layout (P4), PDF images |
-| P4 fonts, shaping, layout, export | in progress | `font` 86/86, `break` 12734/12734, `shape` 4598/4598 + `shape-hb` 2250/2250, `svg-replay` 2254/2299 (byte-identical), `paged` 339/2299 and `svg` 384/2299 (inline + math layout in progress, PDF in progress); see docs/p4-plan.md |
+| P2 library (value level) | **done** | 3782/3792 `eval` (2026-10-03). Remaining 10: plugins (WASM, out of scope), PDF images |
+| P3 realize + introspection + HTML export | **done** | `realize` 3788/3792, `html` 507/508 (2026-10-03). Remaining: PDF images, plugins |
+| P4 fonts, shaping, layout, export | layout **done**; export in progress | `paged` 2283/2299 (frame trees identical), `svg` 2269/2299 (byte-identical), `font` 86/86, `shape` 4598/4598, `shape-hb` 2250/2250, `break` 12734/12734 (2026-10-03). Remaining: usvg (SVG glyphs + SVG image errors), PDF images, bundle target, PDF export (in progress), PNG render (not started); see docs/p4-plan.md |
 
 Run `scripts/upstream.sh && scripts/goldens.sh && moon run tests/runner --target native -- syntax`
 (and `-- ast`, `-- reparse`, `-- eval`). `python3 scripts/classify.py eval 60` buckets the
