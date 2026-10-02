@@ -123,8 +123,33 @@ let inflate_clcl_order : FixedArray[Int] = [
 /// Decompresses a raw DEFLATE stream starting at `pos`. Returns the output
 /// and the position after the stream.
 fn inflate_raw(data : BytesView, pos : Int) -> (Bytes, Int) raise InflateError {
-  let r = { data, pos, bit_buf: 0, bit_count: 0, }
   let out : Array[Byte] = []
+  inflate_raw_into(data, pos, out)
+}
+
+///|
+/// Decompresses a raw DEFLATE stream starting at `pos`. If `lenient`, a
+/// broken or truncated stream yields the output decoded so far instead of
+/// an error (like pdf.js' flate stream, used by hayro).
+pub fn inflate_raw_lenient(
+  data : BytesView,
+  pos : Int,
+  lenient~ : Bool,
+) -> Bytes raise InflateError {
+  let out : Array[Byte] = []
+  let _ = inflate_raw_into(data, pos, out) catch {
+    e => if lenient { return Bytes::from_array(out[:]) } else { raise e }
+  }
+  Bytes::from_array(out[:])
+}
+
+///|
+fn inflate_raw_into(
+  data : BytesView,
+  pos : Int,
+  out : Array[Byte],
+) -> (Bytes, Int) raise InflateError {
+  let r = { data, pos, bit_buf: 0, bit_count: 0, }
   let mut last = false
   while !last {
     last = r.bits(1) == 1

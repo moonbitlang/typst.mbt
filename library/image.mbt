@@ -115,7 +115,6 @@ pub fn ImageElem::decode(
             .within(loaded)
             .with_hint("perhaps the PDF file is malformed"),
           )
-        Unported(what) => bail_at(span, what)
       }
 
       // See https://github.com/LaurenzV/hayro/issues/141.
