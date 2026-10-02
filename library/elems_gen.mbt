@@ -1679,6 +1679,9 @@ pub fn page_elem() -> Element {
       )
       page_elem_cell.val = Some(e)
       page_elem_init(e)
+      e.hooks().local_name = Some((lang, region) => {
+        localized_str(lang, region, page_elem_local_name_key())
+      })
       e
     }
   }
@@ -2887,7 +2890,11 @@ pub fn equation_elem() -> Element {
         ],
       )
       equation_elem_cell.val = Some(e)
-      equation_elem_init(e)
+      e.hooks().synthesize = Some(equation_elem_synthesize)
+      e.hooks().show_set = Some(equation_elem_show_set)
+      e.hooks().local_name = Some((lang, region) => {
+        localized_str(lang, region, equation_elem_local_name_key())
+      })
       e
     }
   }
@@ -4131,6 +4138,11 @@ pub fn bibliography_elem() -> Element {
         ],
       )
       bibliography_elem_cell.val = Some(e)
+      e.hooks().synthesize = Some(bibliography_elem_synthesize)
+      e.hooks().show_set = Some(bibliography_elem_show_set)
+      e.hooks().local_name = Some((lang, region) => {
+        localized_str(lang, region, bibliography_elem_local_name_key())
+      })
       e
     }
   }
@@ -4292,6 +4304,7 @@ pub fn cite_elem() -> Element {
         ],
       )
       cite_elem_cell.val = Some(e)
+      e.hooks().synthesize = Some(cite_elem_synthesize)
       e
     }
   }
@@ -4368,6 +4381,7 @@ pub fn divider_elem() -> Element {
         fields=[],
       )
       divider_elem_cell.val = Some(e)
+      e.hooks().show_set = Some(divider_elem_show_set)
       e
     }
   }
@@ -4450,6 +4464,7 @@ pub fn document_elem() -> Element {
         ],
       )
       document_elem_cell.val = Some(e)
+      e.hooks().show_set = Some(document_elem_show_set)
       e
     }
   }
@@ -4787,6 +4802,8 @@ pub fn figure_elem() -> Element {
         ],
       )
       figure_elem_cell.val = Some(e)
+      e.hooks().synthesize = Some(figure_elem_synthesize)
+      e.hooks().show_set = Some(figure_elem_show_set)
       e
     }
   }
@@ -4900,6 +4917,7 @@ pub fn figure_caption_elem() -> Element {
         ],
       )
       figure_caption_elem_cell.val = Some(e)
+      e.hooks().synthesize = Some(figure_caption_elem_synthesize)
       e
     }
   }
@@ -4963,6 +4981,9 @@ pub fn footnote_elem() -> Element {
         ],
       )
       footnote_elem_cell.val = Some(e)
+      e.hooks().local_name = Some((lang, region) => {
+        localized_str(lang, region, footnote_elem_local_name_key())
+      })
       e
     }
   }
@@ -5025,6 +5046,7 @@ pub fn footnote_entry_elem() -> Element {
         ],
       )
       footnote_entry_elem_cell.val = Some(e)
+      e.hooks().show_set = Some(footnote_entry_elem_show_set)
       e
     }
   }
@@ -5269,6 +5291,7 @@ pub fn link_elem() -> Element {
         ],
       )
       link_elem_cell.val = Some(e)
+      e.hooks().show_set = Some(link_elem_show_set)
       e
     }
   }
@@ -5577,6 +5600,10 @@ pub fn outline_elem() -> Element {
         ],
       )
       outline_elem_cell.val = Some(e)
+      e.hooks().show_set = Some(outline_elem_show_set)
+      e.hooks().local_name = Some((lang, region) => {
+        localized_str(lang, region, outline_elem_local_name_key())
+      })
       e
     }
   }
@@ -6049,6 +6076,7 @@ pub fn quote_elem() -> Element {
         ],
       )
       quote_elem_cell.val = Some(e)
+      e.hooks().show_set = Some(quote_elem_show_set)
       e
     }
   }
@@ -6296,6 +6324,9 @@ pub fn table_elem() -> Element {
         ],
       )
       table_elem_cell.val = Some(e)
+      e.hooks().local_name = Some((lang, region) => {
+        localized_str(lang, region, table_elem_local_name_key())
+      })
       e
     }
   }
@@ -6889,6 +6920,7 @@ pub fn title_elem() -> Element {
         ],
       )
       title_elem_cell.val = Some(e)
+      e.hooks().show_set = Some(title_elem_show_set)
       e
     }
   }
@@ -7791,6 +7823,10 @@ pub fn raw_elem() -> Element {
         ],
       )
       raw_elem_cell.val = Some(e)
+      e.hooks().show_set = Some(raw_elem_show_set)
+      e.hooks().local_name = Some((lang, region) => {
+        localized_str(lang, region, raw_elem_local_name_key())
+      })
       e
     }
   }
@@ -8557,6 +8593,10 @@ pub fn image_elem() -> Element {
         ],
       )
       image_elem_cell.val = Some(e)
+      e.hooks().synthesize = Some(image_elem_synthesize)
+      e.hooks().local_name = Some((lang, region) => {
+        localized_str(lang, region, image_elem_local_name_key())
+      })
       e
     }
   }

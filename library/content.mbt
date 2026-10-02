@@ -527,6 +527,30 @@ pub fn Content::traverse(self : Content, f : (Content) -> Bool) -> Bool {
 }
 
 ///|
+/// Queries the content tree for the first element that match the given
+/// selector.
+///
+/// This is a *naive hack* because contextual content and elements produced
+/// in `show` rules will not be included in the results. It's used should
+/// be avoided.
+pub fn Content::query_first_naive(
+  self : Content,
+  selector : Selector,
+) -> Content? {
+  let mut found : Content? = None
+  self.traverse(element => {
+    if selector.matches(element, None) {
+      found = Some(element)
+      false
+    } else {
+      true
+    }
+  })
+  |> ignore
+  found
+}
+
+///|
 /// Extracts the plain text of this content.
 pub fn Content::plain_text(self : Content) -> String {
   let buf = StringBuilder()

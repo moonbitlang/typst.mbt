@@ -446,3 +446,9 @@ fn table_cell_elem_stroke_default() -> Value {
 fn table_cell_elem_kind_default() -> Value {
   kind_to_value(Auto)
 }
+
+///|
+/// Upstream `LocalName for Packed<TableElem>`.
+fn table_elem_local_name_key() -> String {
+  "table"
+}

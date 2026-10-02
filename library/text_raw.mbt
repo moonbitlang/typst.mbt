@@ -44,3 +44,25 @@ pub impl IntoValue for RawContent with fn into_value(self) {
 pub impl FromValue for RawContent with fn from_value(v) {
   Text(FromValue::from_value(v))
 }
+
+///|
+/// Upstream `ShowSet for Packed<RawElem>`.
+fn raw_elem_show_set(content : Content, styles : StyleChain) -> Styles {
+  let out = Styles::new()
+  out.push(TextElem::set_overhang(false))
+  out.push(TextElem::set_lang(lang_english))
+  out.push(TextElem::set_hyphenate(Custom(false)))
+  out.push(TextElem::set_size(TextSize(Length::from_em(Em::new(0.8)))))
+  out.push(TextElem::set_font(FontList([FontFamily::new("DejaVu Sans Mono")])))
+  out.push(TextElem::set_cjk_latin_spacing(Custom(None)))
+  if RawElem(content).block(styles) {
+    out.push(ParElem::set_justify(false))
+  }
+  out
+}
+
+///|
+/// Upstream `LocalName for Packed<RawElem>`.
+fn raw_elem_local_name_key() -> String {
+  "raw"
+}

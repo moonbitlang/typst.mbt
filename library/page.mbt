@@ -686,3 +686,9 @@ let papers : Array[(String, Double, Double)] = [
   ("presentation-16-9", 297.0, 167.0625),
   ("presentation-4-3", 280.0, 210.0),
 ]
+
+///|
+/// Upstream `LocalName for PageElem`.
+fn page_elem_local_name_key() -> String {
+  "page"
+}

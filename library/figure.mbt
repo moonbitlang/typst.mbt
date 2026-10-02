@@ -166,3 +166,113 @@ fn FigureCaption::local_separator_in(styles : StyleChain) -> Content {
       )
   }
 }
+
+///|
+/// Upstream `Synthesize for Packed<FigureElem>`.
+fn figure_elem_synthesize(
+  engine : Engine,
+  content : Content,
+  styles : StyleChain,
+) -> Content raise SourceError {
+  let span = content.span()
+  let location = content.location()
+  let elem = FigureElem(content)
+  let numbering = elem.numbering(styles)
+
+  // Determine the figure's kind.
+  let kind = match elem.kind(styles) {
+    Custom(kind) => kind
+    Auto =>
+      match elem.body().query_first_naive(Selector::can("Figurable")) {
+        Some(found) => FigureKind::Elem(found.func())
+        None => FigureKind::Elem(image_elem())
+      }
+  }
+
+  // Resolve the supplement.
+  let supplement = match elem.supplement(styles) {
+    Auto => {
+      // Default to the local name for the kind, if available.
+      let name = match kind {
+        Elem(func) =>
+          func
+          .local_name(
+            TextElem::lang_in(styles).as_str(),
+            TextElem::region_in(styles).map(r => r.as_str()),
+          )
+          .map(TextElem::packed)
+        Name(_) => None
+      }
+      if numbering is Some(_) && name is None {
+        bail_at(span, "please specify the figure's supplement")
+      }
+      Some(name.unwrap_or(Content::empty()))
+    }
+    Custom(None) => None
+    Custom(Some(supplement)) => {
+      // Resolve the supplement with the first descendant of the kind or
+      // just the body, if none was found.
+      let descendant = match kind {
+        Elem(func) => elem.body().query_first_naive(Elem(func, None))
+        Name(_) => None
+      }
+      let target = descendant.unwrap_or(elem.body())
+      Some(supplement.resolve(engine, styles, [Content(target)]))
+    }
+  }
+
+  // Construct the figure's counter.
+  let counter = Counter::new(
+    Selector(Elem(figure_elem(), Some([(figure_elem_kind, kind.into_value())]))),
+  )
+
+  // Fill the figure's caption.
+  let caption = match elem.caption(styles) {
+    Some(caption) => {
+      let synthesized = figure_caption_elem_synthesize(
+        engine,
+        caption.0,
+        styles,
+      )
+      Some(
+        FigureCaption(synthesized)
+        .with_kind(kind)
+        .with_supplement(supplement)
+        .with_numbering(numbering)
+        .with_counter(Some(counter))
+        .with_figure_location(location),
+      )
+    }
+    None => None
+  }
+  elem
+  .with_kind(Custom(kind))
+  .with_supplement(Custom(supplement.map(s => Supplement::Content(s))))
+  .with_counter(Some(counter))
+  .with_caption(caption)
+  .with_locale(Locale::get_in(styles))
+  .pack()
+}
+
+///|
+/// Upstream `ShowSet for Packed<FigureElem>`.
+fn figure_elem_show_set(_content : Content, _styles : StyleChain) -> Styles {
+  // Still allows breakable figures with
+  // `show figure: set block(breakable: true)`.
+  let map = Styles::new()
+  map.push(BlockElem::set_breakable(false))
+  map.push(AlignElem::set_alignment(alignment_center))
+  map
+}
+
+///|
+/// Upstream `Synthesize for Packed<FigureCaption>`.
+fn figure_caption_elem_synthesize(
+  _engine : Engine,
+  content : Content,
+  styles : StyleChain,
+) -> Content raise SourceError {
+  let caption = FigureCaption(content)
+  let separator = caption.resolve_separator(styles)
+  caption.with_separator(Custom(separator)).pack()
+}
