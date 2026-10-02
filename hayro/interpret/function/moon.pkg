@@ -1,0 +1,22 @@
+import {
+  "moonbitlang/typst/hayro/syntax" @hayro_syntax,
+  "moonbitlang/core/math",
+  "moonbitlang/core/cmp",
+}
+
+import {
+  "moonbitlang/x/fs",
+  "moonbitlang/core/float",
+  "moonbitlang/core/string",
+} for "wbtest"
+
+// `@math` is only used by the non-native fallbacks.
+
+warnings = "-unused_package"
+
+options(
+  targets: {
+    "libm_native.mbt": [ "native" ],
+    "libm_nonnative.mbt": [ "not", "native" ],
+  },
+)

@@ -1,0 +1,193 @@
+target/hayro/hayro-tests/pdfs/custom/arabiccidtruetype-pdf.pdf #0 40 34677d5996cb5b4f meta 5454312b30 - Custom(5454312b30,5434325556) 0
+target/hayro/hayro-tests/pdfs/custom/arabiccidtruetype-pdf.pdf #1 40 a021df9ae45560ff meta 5454332b30 - Custom(5454332b30,5434325556) 0
+target/hayro/hayro-tests/pdfs/custom/arabiccidtruetype-pdf.pdf #2 40 7e11eedf38c9eddf meta 5454352b30 - Custom(5454352b30,5434325556) 0
+target/hayro/hayro-tests/pdfs/custom/arabiccidtruetype-pdf.pdf #3 40 817eec597729375f meta 5454372b30 - Custom(5454372b30,5434325556) 0
+target/hayro/hayro-tests/pdfs/custom/color_space_lab.pdf #0 91 f6b99f3fc8ef119b meta 437573746f6d H AdobeIdentity 0
+target/hayro/hayro-tests/pdfs/custom/font_cid_1.pdf #0 40 525d94bf2408174b meta 433a - Custom(41646f6265,554353) 0
+target/hayro/hayro-tests/pdfs/custom/font_cid_2.pdf #0 65 a43c81163b5cc841 meta 2d4c6962726172792d466f6e74732d4d6963726f736f66742d46616e67736f6e672e7474662c3030302d5554463136 - Custom(41646f6265,554353) 0
+target/hayro/hayro-tests/pdfs/custom/font_cid_3.pdf #0 202 59690584473ed3ef meta  - Custom(41646f6265,554353) 0
+target/hayro/hayro-tests/pdfs/custom/font_cid_4.pdf #0 150 f7aa2272fed6f150 meta 2d7573722d6c6f63616c2d7465786c6976652d323031352d7465786d662d646973742d666f6e74732d6f70656e747970652d7075626c69632d6c6962657274696e652d4c696e4c6962657274696e655f522e6f74662c3030302d5554463136 - Custom(41646f6265,554353) 0
+target/hayro/hayro-tests/pdfs/custom/font_cid_4.pdf #1 22 34614719c5371afb meta 2d7573722d6c6f63616c2d7465786c6976652d323031352d7465786d662d646973742d666f6e74732d6f70656e747970652d7075626c69632d6c6962657274696e652d4c696e4c6962657274696e655f52422e6f74662c3030302d5554463136 - Custom(41646f6265,554353) 0
+target/hayro/hayro-tests/pdfs/custom/font_cid_4.pdf #2 40 bdd62b9eea755be5 meta 2d7573722d6c6f63616c2d7465786c6976652d323031352d7465786d662d646973742d666f6e74732d6f70656e747970652d7075626c69632d6c6962657274696e652d4c696e4c6962657274696e655f4d2e6f74662c3030302d5554463136 - Custom(41646f6265,554353) 0
+target/hayro/hayro-tests/pdfs/custom/font_cid_4.pdf #3 19 b1f38be8bb9df9cf meta 2d7573722d6c6f63616c2d7465786c6976652d323031352d7465786d662d646973742d666f6e74732d6f70656e747970652d7075626c69632d6c6962657274696e652d4c696e4c6962657274696e655f52492e6f74662c3030302d5554463136 - Custom(41646f6265,554353) 0
+target/hayro/hayro-tests/pdfs/custom/font_cid_5.pdf #0 269 6aaaf653e00e855a meta 2d55736572732d6d616965756c2d4c6962726172792d466f6e74732d4c696e4c6962657274696e655f522e6f74662c3030302d5554463136 - Custom(41646f6265,554353) 0
+target/hayro/hayro-tests/pdfs/custom/font_cid_5.pdf #1 46 5ccabe7287a6fe69 meta 2d7573722d6c6f63616c2d7465786c6976652d323031352d7465786d662d646973742d666f6e74732d6f70656e747970652d7075626c69632d6c6d2d6c6d6d6f6e6f392d726567756c61722e6f74662c3030302d5554463136 - Custom(41646f6265,554353) 0
+target/hayro/hayro-tests/pdfs/custom/font_cid_5.pdf #2 47 9ab1d98d393a3a25 meta 2d55736572732d6d616965756c2d4c6962726172792d466f6e74732d4c696e4c6962657274696e655f525a2e6f74662c3030302d5554463136 - Custom(41646f6265,554353) 0
+target/hayro/hayro-tests/pdfs/custom/font_cid_6.pdf #0 193 27fc1f0e60841cec meta 41646f62652d4964656e746974792d554353 H Custom(41646f6265,554353) 0
+target/hayro/hayro-tests/pdfs/custom/font_cid_7.pdf #0 130 819dede103956e55 meta 41646f62652d4964656e746974792d554353 - Custom(41646f6265,554353) 0
+target/hayro/hayro-tests/pdfs/custom/font_standard_2.pdf #0 1 7394c371d5fc2f03 none
+target/hayro/hayro-tests/pdfs/custom/font_truetype_4.pdf #0 136 83bb4cd0c1323fa8 meta  - Custom(2f41514d4953512b424e617a616e696e,2f41514d4953512b424e617a616e696e) 0
+target/hayro/hayro-tests/pdfs/custom/font_truetype_6.pdf #0 1 7394c371d5fc2f03 none
+target/hayro/hayro-tests/pdfs/custom/font_truetype_6.pdf #1 16 f3d104806ad5a2d2 meta - - -
+target/hayro/hayro-tests/pdfs/custom/font_type1_1.pdf #0 1 7394c371d5fc2f03 none
+target/hayro/hayro-tests/pdfs/custom/font_type1_11.pdf #0 1 7394c371d5fc2f03 none
+target/hayro/hayro-tests/pdfs/custom/font_type1_11.pdf #1 1 7394c371d5fc2f03 none
+target/hayro/hayro-tests/pdfs/custom/font_type1_11.pdf #2 1 7394c371d5fc2f03 none
+target/hayro/hayro-tests/pdfs/custom/font_type1_11.pdf #3 1 7394c371d5fc2f03 none
+target/hayro/hayro-tests/pdfs/custom/font_type1_11.pdf #4 1 7394c371d5fc2f03 none
+target/hayro/hayro-tests/pdfs/custom/font_type1_11.pdf #5 1 7394c371d5fc2f03 none
+target/hayro/hayro-tests/pdfs/custom/font_type1_12.pdf #0 1 7394c371d5fc2f03 none
+target/hayro/hayro-tests/pdfs/custom/font_type1_12.pdf #1 1 7394c371d5fc2f03 none
+target/hayro/hayro-tests/pdfs/custom/font_type1_12.pdf #2 1 7394c371d5fc2f03 none
+target/hayro/hayro-tests/pdfs/custom/font_type1_12.pdf #3 1 7394c371d5fc2f03 none
+target/hayro/hayro-tests/pdfs/custom/font_type1_12.pdf #4 1 7394c371d5fc2f03 none
+target/hayro/hayro-tests/pdfs/custom/font_type1_2.pdf #0 1 7394c371d5fc2f03 none
+target/hayro/hayro-tests/pdfs/custom/font_type1_6.pdf #0 1 7394c371d5fc2f03 none
+target/hayro/hayro-tests/pdfs/custom/font_type1_6.pdf #1 1 7394c371d5fc2f03 none
+target/hayro/hayro-tests/pdfs/custom/font_type1_6.pdf #2 1 7394c371d5fc2f03 none
+target/hayro/hayro-tests/pdfs/custom/font_type1_6.pdf #3 1 7394c371d5fc2f03 none
+target/hayro/hayro-tests/pdfs/custom/font_type1_6.pdf #4 1 7394c371d5fc2f03 none
+target/hayro/hayro-tests/pdfs/custom/font_type1_6.pdf #5 1 7394c371d5fc2f03 none
+target/hayro/hayro-tests/pdfs/custom/font_type1_6.pdf #6 1 7394c371d5fc2f03 none
+target/hayro/hayro-tests/pdfs/custom/font_type1_cff_3.pdf #0 97 aefef1bb9074e76b meta 523136 - -
+target/hayro/hayro-tests/pdfs/custom/font_type1_cff_3.pdf #1 1 7394c371d5fc2f03 none
+target/hayro/hayro-tests/pdfs/custom/font_type1_cff_3.pdf #2 4 b012192e735f2b68 meta 523138 - -
+target/hayro/hayro-tests/pdfs/custom/font_type1_cff_3.pdf #3 1 7394c371d5fc2f03 none
+target/hayro/hayro-tests/pdfs/custom/font_type1_cff_6.pdf #0 79 c29fad4bcc2c4d99 meta 523131 - -
+target/hayro/hayro-tests/pdfs/custom/font_type1_cff_6.pdf #1 1 7394c371d5fc2f03 none
+target/hayro/hayro-tests/pdfs/custom/font_type3_filled_glyphs.pdf #0 142 ed1beaf1a4370a94 meta 437573746f6d H AdobeIdentity 0
+target/hayro/hayro-tests/pdfs/custom/font_type3_filled_glyphs.pdf #1 10 ff0981b8257b0050 meta 437573746f6d H AdobeIdentity 0
+target/hayro/hayro-tests/pdfs/custom/font_type3_shape_glyphs.pdf #0 1 b7b9c9e167c98267 meta 437573746f6d H AdobeIdentity 0
+target/hayro/hayro-tests/pdfs/custom/font_type3_stroked_glyphs.pdf #0 97 6dd06ffabc4b1692 meta 437573746f6d H AdobeIdentity 0
+target/hayro/hayro-tests/pdfs/custom/font_type3_stroked_glyphs.pdf #1 10 ff0981b8257b0050 meta 437573746f6d H AdobeIdentity 0
+target/hayro/hayro-tests/pdfs/custom/font_type3_widths_with_matrix.pdf #0 4 cb75e200420643be meta 523335 - -
+target/hayro/hayro-tests/pdfs/custom/font_type3_widths_with_matrix.pdf #1 1 7394c371d5fc2f03 none
+target/hayro/hayro-tests/pdfs/custom/font_vertical.pdf #0 79 c6a05337becd4504 meta 433a - Custom(41646f6265,554353) 0
+target/hayro/hayro-tests/pdfs/custom/fonts_type1_latex.pdf #0 754 37f370e6afbcec52 meta 5465582d65632d6c6d7231322d6c6d2d65632d30 - Custom(546558,65632d6c6d7231322d6c6d2d6563) 0
+target/hayro/hayro-tests/pdfs/custom/fonts_type1_latex.pdf #1 735 bed832b7189a8aca meta 5465582d70746d7238722d38722d30 - Custom(546558,70746d7238722d3872) 0
+target/hayro/hayro-tests/pdfs/custom/fonts_type1_latex.pdf #2 735 1f366f6b7cb368fe meta 5465582d7068767238722d38722d30 - Custom(546558,7068767238722d3872) 0
+target/hayro/hayro-tests/pdfs/custom/fonts_type1_latex.pdf #3 735 f143927ee6eed444 meta 5465582d7063727238722d38722d30 - Custom(546558,7063727238722d3872) 0
+target/hayro/hayro-tests/pdfs/custom/fonts_type1_latex.pdf #4 735 2e70fec3b5c70b5c meta 5465582d70706c7238722d38722d30 - Custom(546558,70706c7238722d3872) 0
+target/hayro/hayro-tests/pdfs/custom/fonts_type1_latex.pdf #5 735 420ed83ea82cb48c meta 5465582d6675747238722d38722d30 - Custom(546558,6675747238722d3872) 0
+target/hayro/hayro-tests/pdfs/custom/fonts_type1_latex.pdf #6 735 58291241c430c16c meta 5465582d6263687238722d38722d30 - Custom(546558,6263687238722d3872) 0
+target/hayro/hayro-tests/pdfs/custom/fonts_type1_latex.pdf #7 735 542da4e6328f45b4 meta 5465582d6676737238722d38722d30 - Custom(546558,6676737238722d3872) 0
+target/hayro/hayro-tests/pdfs/custom/fonts_type1_latex.pdf #8 754 7cf22998c98299fe meta 5465582d65632d71746d722d712d65632d30 - Custom(546558,65632d71746d722d712d6563) 0
+target/hayro/hayro-tests/pdfs/custom/fonts_type1_latex.pdf #9 754 0f5bb6123245b514 meta 5465582d65632d71626b722d712d65632d30 - Custom(546558,65632d71626b722d712d6563) 0
+target/hayro/hayro-tests/pdfs/custom/fonts_type1_latex.pdf #10 754 ec0233362fe6349c meta 5465582d65632d71706c722d712d65632d30 - Custom(546558,65632d71706c722d712d6563) 0
+target/hayro/hayro-tests/pdfs/custom/fonts_type1_latex.pdf #11 754 ae4f4950a8ba0faa meta 5465582d65632d716876722d712d65632d30 - Custom(546558,65632d716876722d712d6563) 0
+target/hayro/hayro-tests/pdfs/custom/fonts_type1_latex.pdf #12 754 5b240e3afb17d6a6 meta 5465582d65632d716373722d712d65632d30 - Custom(546558,65632d716373722d712d6563) 0
+target/hayro/hayro-tests/pdfs/custom/fonts_type1_latex.pdf #13 754 e0e1ab58c668fc8c meta 5465582d65632d716372722d712d65632d30 - Custom(546558,65632d716372722d712d6563) 0
+target/hayro/hayro-tests/pdfs/custom/fonts_type1_latex.pdf #14 736 cc76c0df628bde36 meta 5465582d74312d7a6934722d302d69342d74312d302d30 - Custom(546558,74312d7a6934722d302d69342d74312d30) 0
+target/hayro/hayro-tests/pdfs/custom/fonts_type1_latex.pdf #15 754 c67f1da034b3d668 meta 5465582d65632d716167722d712d65632d30 - Custom(546558,65632d716167722d712d6563) 0
+target/hayro/hayro-tests/pdfs/custom/fonts_type1_latex.pdf #16 754 cf436574fc439a42 meta 5465582d65632d717a636d692d712d65632d30 - Custom(546558,65632d717a636d692d712d6563) 0
+target/hayro/hayro-tests/pdfs/custom/fonts_type1_latex.pdf #17 754 93207936d6113a28 meta 5465582d6563726d313230302d636d2d73757065722d74312d30 - Custom(546558,6563726d313230302d636d2d73757065722d7431) 0
+target/hayro/hayro-tests/pdfs/custom/fonts_type1_latex.pdf #18 735 30d7b21d3a66b81c meta 5465582d727478706876722d38722d30 - Custom(546558,727478706876722d3872) 0
+target/hayro/hayro-tests/pdfs/custom/image_inline_3.pdf #0 1 7394c371d5fc2f03 none
+target/hayro/hayro-tests/pdfs/custom/image_inline_6.pdf #0 1 7394c371d5fc2f03 none
+target/hayro/hayro-tests/pdfs/custom/image_inline_6.pdf #1 1 7394c371d5fc2f03 none
+target/hayro/hayro-tests/pdfs/custom/image_inline_7.pdf #0 22 01648374237b588b meta 52323134 - -
+target/hayro/hayro-tests/pdfs/custom/image_inline_7.pdf #1 1 7394c371d5fc2f03 none
+target/hayro/hayro-tests/pdfs/custom/image_inline_7.pdf #2 1 7394c371d5fc2f03 none
+target/hayro/hayro-tests/pdfs/custom/image_inline_8.pdf #0 277 d6364652e2f2e0ea meta  - Custom(2f414d48554e462b4e617a616e696e2c426f6c64,2f414d48554e462b4e617a616e696e2c426f6c64) 0
+target/hayro/hayro-tests/pdfs/custom/image_inline_8.pdf #1 46 5ec696129865e452 meta  - Custom(2f414d48554e472b465f6e617a616e696e426f6c64,2f414d48554e472b465f6e617a616e696e426f6c64) 0
+target/hayro/hayro-tests/pdfs/custom/image_inline_8.pdf #2 4 7a62b1752c9a6827 meta  - Custom(2f414d48554e482b4e617a616e696e,2f414d48554e482b4e617a616e696e) 0
+target/hayro/hayro-tests/pdfs/custom/image_inline_8.pdf #3 4 c66bd40a755d52df meta  - Custom(2f414d48554e492b4e617a616e696e2c4974616c6963,2f414d48554e492b4e617a616e696e2c4974616c6963) 0
+target/hayro/hayro-tests/pdfs/custom/image_mask_missing_bpc.pdf #0 13 3776df97c931d1bc meta  - Custom(2f424a4a464b532b42546974722c426f6c64,2f424a4a464b532b42546974722c426f6c64) 0
+target/hayro/hayro-tests/pdfs/custom/image_mask_missing_bpc.pdf #1 283 dcf9178ab0160bc5 meta  - Custom(2f424a4a464b542b424e617a616e696e,2f424a4a464b542b424e617a616e696e) 0
+target/hayro/hayro-tests/pdfs/custom/image_mask_missing_bpc.pdf #2 85 207f229ea389c98b meta  - Custom(2f424a4a464b522b54696d65734e6577526f6d616e,2f424a4a464b522b54696d65734e6577526f6d616e) 0
+target/hayro/hayro-tests/pdfs/custom/image_mask_missing_bpc.pdf #3 25 681ccbc0d333043d meta  - Custom(2f424a4a464b552b424e617a616e696e2c426f6c64,2f424a4a464b552b424e617a616e696e2c426f6c64) 0
+target/hayro/hayro-tests/pdfs/custom/issue11.pdf #0 25 d8f0e775de633365 meta 437573746f6d H AdobeIdentity 0
+target/hayro/hayro-tests/pdfs/custom/issue175.pdf #0 148 8e8251be63d7b096 meta 41646f62652d4964656e746974792d554353 - Custom(2841646f626529,2855435329) 0
+target/hayro/hayro-tests/pdfs/custom/issue41.pdf #0 85 cc7619ce08fe6100 meta 4e594e5150514d797269616450726f2d426f6c642d55434d6170 - Custom(63616c6c6173,4e594e5150514d797269616450726f2d426f6c642d55434d6170) 0
+target/hayro/hayro-tests/pdfs/custom/issue41.pdf #1 1 7394c371d5fc2f03 none
+target/hayro/hayro-tests/pdfs/custom/issue41.pdf #2 28 77a2e74abf4afa84 meta 5658564e594c4d544d492d55434d6170 - Custom(63616c6c6173,5658564e594c4d544d492d55434d6170) 0
+target/hayro/hayro-tests/pdfs/custom/issue41.pdf #3 1 7394c371d5fc2f03 none
+target/hayro/hayro-tests/pdfs/custom/issue41.pdf #4 61 e08915b1df0c6813 meta 4e4750494e4d4d5453594e2d55434d6170 - Custom(63616c6c6173,4e4750494e4d4d5453594e2d55434d6170) 0
+target/hayro/hayro-tests/pdfs/custom/issue41.pdf #5 1 7394c371d5fc2f03 none
+target/hayro/hayro-tests/pdfs/custom/issue_panic_with_clip.pdf #0 173 c7ba1a263e235f9b meta 2d55736572732d636c617564696f2d4c6962726172792d466f6e74732d746578677972657465726d65732d726567756c61722e6f74662c3030302d5554463136 - Custom(41646f6265,554353) 0
+target/hayro/hayro-tests/pdfs/custom/issue_panic_with_clip.pdf #1 59 20c6f25d1655188e meta 2d55736572732d636c617564696f2d4c6962726172792d466f6e74732d746578677972657465726d65732d626f6c642e6f74662c3030302d5554463136 - Custom(41646f6265,554353) 0
+target/hayro/hayro-tests/pdfs/custom/issue_stream_abbreviations.pdf #0 289 25acfff5a4b7ef7f meta  - Custom(2f41524f5752532b4e617a616e696e2c426f6c64,2f41524f5752532b4e617a616e696e2c426f6c64) 0
+target/hayro/hayro-tests/pdfs/custom/issue_stream_abbreviations.pdf #1 19 10ec3594d4636b0f meta  - Custom(2f41524f5752542b465f6e617a616e696e426f6c64,2f41524f5752542b465f6e617a616e696e426f6c64) 0
+target/hayro/hayro-tests/pdfs/custom/mask_in_type3_glyph.pdf #0 4 e6793aba9242449e meta 437573746f6d H AdobeIdentity 0
+target/hayro/hayro-tests/pdfs/custom/path_rendering_dash_array_0_phase.pdf #0 1 7394c371d5fc2f03 none
+target/hayro/hayro-tests/pdfs/custom/pattern_shading_on_text.pdf #0 52 b6bd14ac4f85c0ac meta 437573746f6d H AdobeIdentity 0
+target/hayro/hayro-tests/pdfs/custom/pattern_shading_type1_1.pdf #0 115 f181757979077337 meta 41646f62652d4964656e746974792d554353 - Custom(41646f6265,554353) 0
+target/hayro/hayro-tests/pdfs/custom/pattern_shading_type1_2.pdf #0 112 1fe91f84cc69fe2c meta 41646f62652d4964656e746974792d554353 - Custom(41646f6265,554353) 0
+target/hayro/hayro-tests/pdfs/custom/pattern_shading_type1_3.pdf #0 115 f181757979077337 meta 41646f62652d4964656e746974792d554353 - Custom(41646f6265,554353) 0
+target/hayro/hayro-tests/pdfs/custom/pattern_shading_type1_4.pdf #0 112 1fe91f84cc69fe2c meta 41646f62652d4964656e746974792d554353 - Custom(41646f6265,554353) 0
+target/hayro/hayro-tests/pdfs/custom/pattern_shading_type2_many.pdf #0 61 8ded62ea24d30055 meta 437573746f6d H AdobeIdentity 0
+target/hayro/hayro-tests/pdfs/custom/pattern_tiling_with_text.pdf #0 13 c9c67c9b4dfcfaab meta 437573746f6d H AdobeIdentity 0
+target/hayro/hayro-tests/pdfs/custom/pdftc_100k_1071.pdf #0 447 1b154162d23a138d meta 474f4e4d44432b5454372b30 - Custom(474f4e4d44432b5454372b30,5434325556) 0
+target/hayro/hayro-tests/pdfs/custom/pdftc_100k_1894.pdf #0 4 c909f4e620b0d326 meta 4172657653616e734d6174684f4d4c2d5554463136 - Custom(41646f6265,554353) 0
+target/hayro/hayro-tests/pdfs/custom/pdftc_100k_1894.pdf #1 7 6706b8a610e9a194 meta 5a4a555651542b4d61746844657369676e2d43482d426f6c642d4d6174684974616c69632d31302d5554463136 - Custom(41646f6265,554353) 0
+target/hayro/hayro-tests/pdfs/custom/pdftc_900k_0007_page_4.pdf #0 262 f68c217bef0398c3 meta 5454362b30 - Custom(5454362b30,5434325556) 0
+target/hayro/hayro-tests/pdfs/custom/pdftc_900k_0007_page_4.pdf #1 100 ab686b7c839c488b meta 545431302b30 - Custom(545431302b30,5434325556) 0
+target/hayro/hayro-tests/pdfs/custom/pdftc_900k_0007_page_4.pdf #2 10 faa817bffe97e4c0 meta 545431312b30 - Custom(545431312b30,5434325556) 0
+target/hayro/hayro-tests/pdfs/custom/pdftc_900k_0007_page_4.pdf #3 4 7dc6e5a8c769612b meta 5454312b30 - Custom(5454312b30,5434325556) 0
+target/hayro/hayro-tests/pdfs/custom/pdftc_900k_0319_page_1.pdf #0 1541 2f532fe5b2aae81c meta 5454332b30 - Custom(5454332b30,5434325556) 0
+target/hayro/hayro-tests/pdfs/custom/pdftc_900k_0584_page_1.pdf #0 550 7a0060dfd865b613 meta 5048585252442b417269616c2c426f6c64 - Custom(5048585252442b417269616c2c426f6c64,5434325556) 0
+target/hayro/hayro-tests/pdfs/custom/pdftc_900k_0907.pdf #0 181 a9b36e7dc86001ff meta  - Custom(2f41455a57564a2b424e617a616e696e,2f41455a57564a2b424e617a616e696e) 0
+target/hayro/hayro-tests/pdfs/custom/pdftc_900k_0907.pdf #1 58 33c1f44d7a8d1f04 meta  - Custom(2f41455a57564b2b424e617a616e696e2c426f6c64,2f41455a57564b2b424e617a616e696e2c426f6c64) 0
+target/hayro/hayro-tests/pdfs/custom/pdftc_900k_0907.pdf #2 112 41eecbbc729742c5 meta  - Custom(2f41455a57564c2b4259656b616e,2f41455a57564c2b4259656b616e) 0
+target/hayro/hayro-tests/pdfs/custom/pdftc_900k_0930_reduced.pdf #0 202 4d8b635ad24e3f9a meta 54696d65734e6577526f6d616e2b332b32 - Custom(54696d65734e6577526f6d616e2b332b32,54696d65734e6577526f6d616e2b332b32) 0
+target/hayro/hayro-tests/pdfs/custom/pdftc_900k_0930_reduced.pdf #1 289 25fe2501ecbe18e2 meta 54696d65734e6577526f6d616e2b362b312c426f6c64 - Custom(54696d65734e6577526f6d616e2b362b312c426f6c64,54696d65734e6577526f6d616e2b362b312c426f6c64) 0
+target/hayro/hayro-tests/pdfs/custom/pdftc_900k_0930_reduced.pdf #2 31 bd2d0d45cb3fd243 meta 547261646974696f6e616c4172616269632b312b31 - Custom(547261646974696f6e616c4172616269632b312b31,547261646974696f6e616c4172616269632b312b31) 0
+target/hayro/hayro-tests/pdfs/custom/pdftc_900k_0930_reduced.pdf #3 289 29dc9b7a2ca112fe meta 54696d65734e6577526f6d616e2b332b31 - Custom(54696d65734e6577526f6d616e2b332b31,54696d65734e6577526f6d616e2b332b31) 0
+target/hayro/hayro-tests/pdfs/custom/pdftc_900k_0930_reduced.pdf #4 4 afdb422b3cdfacc8 meta 4c6f7475732b322b31 - Custom(4c6f7475732b322b31,4c6f7475732b322b31) 0
+target/hayro/hayro-tests/pdfs/custom/pdftc_900k_0930_reduced.pdf #5 109 b91de7943dd8357c meta 54696d65734e6577526f6d616e2b362b322c426f6c64 - Custom(54696d65734e6577526f6d616e2b362b322c426f6c64,54696d65734e6577526f6d616e2b362b322c426f6c64) 0
+target/hayro/hayro-tests/pdfs/custom/pdftc_900k_1016_page_3.pdf #0 22 5a4afee2e05b3bc2 meta 4141455741452b4e617a616e696e426f6c642c426f6c64 - Custom(2f4141455741452b4e617a616e696e426f6c642c426f6c64,2f4141455741452b4e617a616e696e426f6c642c426f6c64) 0
+target/hayro/hayro-tests/pdfs/custom/pdftc_900k_1016_page_3.pdf #1 79 70f10b417dac3f83 meta 414145574f472b424e617a616e696e426f6c642c426f6c64 - Custom(2f414145574f472b424e617a616e696e426f6c642c426f6c64,2f414145574f472b424e617a616e696e426f6c642c426f6c64) 0
+target/hayro/hayro-tests/pdfs/custom/pdftc_900k_1016_page_3.pdf #2 4 67fc125c8f9cf8a6 meta 414147594a482b57696e6764696e677332 - Custom(2f414147594a482b57696e6764696e677332,2f414147594a482b57696e6764696e677332) 0
+target/hayro/hayro-tests/pdfs/custom/pdftc_900k_1016_page_3.pdf #3 127 8cb5a5262573ba2c meta 414154474f442b4259656b616e - Custom(2f414154474f442b4259656b616e,2f414154474f442b4259656b616e) 0
+target/hayro/hayro-tests/pdfs/custom/pdftc_900k_1016_page_3.pdf #4 64 9b72dec4538c4639 meta 4141484546492b53796d626f6c - Custom(2f4141484546492b53796d626f6c,2f4141484546492b53796d626f6c) 0
+target/hayro/hayro-tests/pdfs/custom/pdftc_900k_1016_page_3.pdf #5 232 cd5ca4d36a10e1aa meta 414142474f422b424e617a616e696e - Custom(2f414142474f422b424e617a616e696e,2f414142474f422b424e617a616e696e) 0
+target/hayro/hayro-tests/pdfs/custom/rendering_conflation_artifacts.pdf #0 1 6164e54279b0cb27 meta - - -
+target/hayro/hayro-tests/pdfs/custom/shading_operator_1.pdf #0 1 7394c371d5fc2f03 none
+target/hayro/hayro-tests/pdfs/custom/shading_operator_1.pdf #1 1 7394c371d5fc2f03 none
+target/hayro/hayro-tests/pdfs/custom/stream_ccit_not_enough_data.pdf #0 1 7394c371d5fc2f03 none
+target/hayro/hayro-tests/pdfs/custom/stream_jpx_1.pdf #0 10 4309b079c32ffb92 meta 523135 - -
+target/hayro/hayro-tests/pdfs/custom/stream_jpx_1.pdf #1 1 7394c371d5fc2f03 none
+target/hayro/hayro-tests/pdfs/custom/stream_jpx_1.pdf #2 1 7394c371d5fc2f03 none
+target/hayro/hayro-tests/pdfs/custom/stroke_properties.pdf #0 64 c47a47e3e268e7cb meta 41646f62652d4964656e746974792d554353 - Custom(41646f6265,554353) 0
+target/hayro/hayro-tests/pdfs/custom/stroke_properties.pdf #1 82 c32f79900c056377 meta 41646f62652d4964656e746974792d554353 - Custom(41646f6265,554353) 0
+target/hayro/hayro-tests/pdfs/custom/text_rendering_3.pdf #0 1 7394c371d5fc2f03 none
+target/hayro/hayro-tests/pdfs/custom/text_rendering_5.pdf #0 1 7394c371d5fc2f03 none
+target/hayro/hayro-tests/pdfs/custom/text_rendering_5.pdf #1 1 7394c371d5fc2f03 none
+target/hayro/hayro-tests/pdfs/custom/text_rendering_5.pdf #2 1 7394c371d5fc2f03 none
+target/hayro/hayro-tests/pdfs/custom/tile_clamp_bug.pdf #0 172 0236b492def8e2fb meta 41646f62652d4964656e746974792d554353 - Custom(41646f6265,554353) 0
+target/hayro/hayro-tests/pdfs/custom/tile_clamp_bug.pdf #1 13 d100b87340b119b0 meta 41646f62652d4964656e746974792d554353 - Custom(41646f6265,554353) 0
+target/hayro/hayro-tests/pdfs/custom/tile_clamp_bug.pdf #2 10 3538051cca01c683 meta 41646f62652d4964656e746974792d554353 - Custom(41646f6265,554353) 0
+target/hayro/hayro-tests/pdfs/custom/tile_clamp_bug.pdf #3 31 fa41786fcc4510c8 meta 41646f62652d4964656e746974792d554353 - Custom(41646f6265,554353) 0
+target/hayro/hayro-tests/pdfs/custom/tile_clamp_bug.pdf #4 115 be05315bdd87aa4a meta 41646f62652d4964656e746974792d554353 - Custom(41646f6265,554353) 0
+target/hayro/hayro-tests/pdfs/custom/tile_clamp_bug.pdf #5 103 205c2cae7811418f meta 41646f62652d4964656e746974792d554353 - Custom(41646f6265,554353) 0
+target/hayro/hayro-tests/pdfs/custom/tile_clamp_bug.pdf #6 70 c1e0dbe49c7be8e4 meta 41646f62652d4964656e746974792d554353 - Custom(41646f6265,554353) 0
+target/hayro/hayro-tests/pdfs/custom/tile_clamp_bug.pdf #7 64 36ece2b7bc1f5925 meta 41646f62652d4964656e746974792d554353 - Custom(41646f6265,554353) 0
+target/hayro/hayro-tests/pdfs/custom/xref_f2_len_8.pdf #0 4 294d4eb4bc9452fb meta 5454372b30 - Custom(5454372b30,5434325556) 0
+target/hayro/hayro-tests/pdfs/custom/xref_invalid_offsets.pdf #0 56 b88bd65d72be623c meta 437573746f6d H AdobeIdentity 0
+target/hayro/hayro-tests/pdfs/load/issue153.pdf #0 88 84c5d49676cd8460 meta 4d61736f6e526567756c61722b30 - Custom(4d61736f6e526567756c61722b30,54315556) 0
+target/hayro/hayro-tests/pdfs/load/issue153.pdf #1 1 7394c371d5fc2f03 none
+target/hayro/hayro-tests/pdfs/load/issue153.pdf #2 148 927adf82afd226e1 meta 456c6174616e2d4d656469756d2b30 - Custom(456c6174616e2d4d656469756d2b30,54315556) 0
+target/hayro/hayro-tests/pdfs/load/issue153.pdf #3 1 7394c371d5fc2f03 none
+target/hayro/hayro-tests/pdfs/load/issue153.pdf #4 160 68ef3fb9c2f0bf0e meta 456c6174616e2d426f6c642b30 - Custom(456c6174616e2d426f6c642b30,54315556) 0
+target/hayro/hayro-tests/pdfs/load/issue153.pdf #5 1 7394c371d5fc2f03 none
+target/hayro/hayro-tests/pdfs/load/issue153.pdf #6 238 2b052189174452ba meta 456c6174616e2d426f6f6b2b30 - Custom(456c6174616e2d426f6f6b2b30,54315556) 0
+target/hayro/hayro-tests/pdfs/load/issue153.pdf #7 1 7394c371d5fc2f03 none
+target/hayro/hayro-tests/pdfs/load/issue204.pdf #0 163 39c5ead0b4cfd42c meta 4141414141412b46362b30 - Custom(4141414141412b46362b30,54315556) 0
+target/hayro/hayro-tests/pdfs/load/issue204.pdf #1 1 7394c371d5fc2f03 none
+target/hayro/hayro-tests/pdfs/load/issue204.pdf #2 244 711a9860ad218acd meta 4141414141412b46352b30 - Custom(4141414141412b46352b30,54315556) 0
+target/hayro/hayro-tests/pdfs/load/issue204.pdf #3 1 7394c371d5fc2f03 none
+target/hayro/hayro-tests/pdfs/load/issue204.pdf #4 127 8b5f8b8489e79299 meta 4141414141412b4631312b30 - Custom(4141414141412b4631312b30,54315556) 0
+target/hayro/hayro-tests/pdfs/load/issue204.pdf #5 1 7394c371d5fc2f03 none
+target/hayro/hayro-tests/pdfs/load/issue204.pdf #6 10 57369dc1b4884161 meta 4141414141412b46382b30 - Custom(4141414141412b46382b30,54315556) 0
+target/hayro/hayro-tests/pdfs/load/issue204.pdf #7 1 7394c371d5fc2f03 none
+target/hayro/hayro-tests/pdfs/load/issue204.pdf #8 247 6856a6b580a28614 meta 4141414141412b4631322b30 - Custom(4141414141412b4631322b30,54315556) 0
+target/hayro/hayro-tests/pdfs/load/issue204.pdf #9 1 7394c371d5fc2f03 none
+target/hayro/hayro-tests/pdfs/load/issue204.pdf #10 250 4a140ccfed540cd0 meta 4141414141412b4631332b30 - Custom(4141414141412b4631332b30,54315556) 0
+target/hayro/hayro-tests/pdfs/load/issue204.pdf #11 1 7394c371d5fc2f03 none
+target/hayro/hayro-tests/pdfs/load/issue356.pdf #0 13 4a7495797f8999b4 meta 41646f62652d4964656e746974792d554353 - Custom(41646f6265,554353) 0
+target/hayro/hayro-tests/pdfs/load/issue391.pdf #0 127237 0b44786ce8c49556 meta 41646f62652d4964656e746974792d554353 - Custom(41646f6265,554353) 0
+target/hayro/hayro-tests/pdfs/load/issue391.pdf #1 4 c42d7f1e6bfc80fb meta 636d61705f3330363237343230 - Custom(50444658435669657765723230,4964656e7469747930) 0
+target/hayro/hayro-tests/pdfs/load/issue391.pdf #2 39 6630148446a314ee meta 636d61705f3330363234353732 - Custom(50444658435669657765723230,4964656e7469747930) 0
+target/hayro/hayro-tests/pdfs/load/issue50.pdf #0 1 7394c371d5fc2f03 none
+target/hayro/hayro-tests/pdfs/load/issue52.pdf #0 1 7394c371d5fc2f03 none
+target/hayro/hayro-tests/pdfs/load/issue83.pdf #0 1 7394c371d5fc2f03 none
+target/hayro/hayro-tests/pdfs/load/issue83.pdf #1 1 7394c371d5fc2f03 none
+target/devassets/images/diagrams.pdf #0 22 2ed607e88d672a33 meta 41646f62652d4964656e746974792d554353 - Custom(41646f6265,554353) 0
+target/devassets/images/diagrams.pdf #1 136 0004181ec02cc966 meta 41646f62652d4964656e746974792d554353 - Custom(41646f6265,554353) 0
+target/devassets/images/diagrams.pdf #2 28 7642e1c317d9da60 meta 41646f62652d4964656e746974792d554353 - Custom(41646f6265,554353) 0
+target/devassets/images/diagrams.pdf #3 19 ff6b6f2852aa4719 meta 41646f62652d4964656e746974792d554353 - Custom(41646f6265,554353) 0
+target/devassets/images/diagrams.pdf #4 19 ccbab2c1ede7523f meta 41646f62652d4964656e746974792d554353 - Custom(41646f6265,554353) 0
+target/devassets/images/diagrams.pdf #5 19 1b0d4c8cf02b85c9 meta 41646f62652d4964656e746974792d554353 - Custom(41646f6265,554353) 0
+target/devassets/images/diagrams.pdf #6 19 eb1f13c9ad98696b meta 41646f62652d4964656e746974792d554353 - Custom(41646f6265,554353) 0
+target/devassets/images/diagrams.pdf #7 70 8571bbdfe101e55b meta 41646f62652d4964656e746974792d554353 - Custom(41646f6265,554353) 0
+target/devassets/images/diagrams.pdf #8 85 423bbb9a48cead14 meta 41646f62652d4964656e746974792d554353 - Custom(41646f6265,554353) 0

@@ -1,0 +1,12 @@
+%!PS comment
+/CIDSystemInfo 3 dict dup begin /Registry /Adobe def /Ordering (Korea1) def /Supplement 6.7 def end def
+/CMapName /lit#20name def
+/WMode 2 def
+1 begincodespacerange (\000) (\377) endcodespacerange
+2 begincidchar
+(A) 65
+(\101\102) 66
+endcidchar
+1 beginbfchar
+(a) <00E9>
+endbfchar

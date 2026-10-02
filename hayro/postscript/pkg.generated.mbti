@@ -1,0 +1,73 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/hayro/postscript"
+
+import {
+  "moonbitlang/core/debug",
+}
+
+// Values
+
+// Errors
+
+// Types and methods
+pub struct Name {
+  // private fields
+} derive(Eq, @debug.Debug)
+pub fn Name::as_str(Self) -> String?
+pub fn Name::data(Self) -> BytesView
+pub fn Name::decode(Self) -> Result[Bytes, PsError]
+pub fn Name::decode_into(Self, Array[Byte]) -> Result[Unit, PsError]
+pub fn Name::is_literal(Self) -> Bool
+pub impl Show for Name
+
+pub(all) enum Number {
+  Integer(Int)
+  Real(Float)
+} derive(Eq, @debug.Debug)
+pub fn Number::as_f32(Self) -> Float
+pub fn Number::as_f64(Self) -> Double
+pub fn Number::as_i32(Self) -> Int
+pub impl Show for Number
+
+pub(all) enum Object {
+  Number(Number)
+  Name(Name)
+  String(PsString)
+  Array(PsArray)
+} derive(Eq, @debug.Debug)
+pub impl Show for Object
+
+pub struct PsArray {
+  // private fields
+} derive(Eq, @debug.Debug)
+pub fn PsArray::objects(Self) -> Scanner
+pub impl Show for PsArray
+
+pub(all) enum PsError {
+  SyntaxError
+  LimitCheck
+  UnsupportedType
+} derive(Eq, @debug.Debug)
+pub impl Show for PsError
+
+pub struct PsString {
+  // private fields
+} derive(Eq, @debug.Debug)
+pub fn PsString::decode(Self) -> Result[Bytes, PsError]
+pub fn PsString::decode_into(Self, Array[Byte]) -> Result[Unit, PsError]
+pub impl Show for PsString
+
+pub struct Scanner {
+  // private fields
+}
+pub fn Scanner::at_end(Self) -> Bool
+pub fn Scanner::new(BytesView) -> Self
+pub fn Scanner::parse_array(Self) -> Result[PsArray, PsError]
+pub fn Scanner::parse_name(Self) -> Result[Name, PsError]
+pub fn Scanner::parse_number(Self) -> Result[Number, PsError]
+pub fn Scanner::parse_object(Self) -> Result[Object, PsError]
+pub fn Scanner::parse_string(Self) -> Result[PsString, PsError]
+
+// Type aliases
+
+// Traits

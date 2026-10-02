@@ -1,0 +1,145 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/hayro/cmap"
+
+import {
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub fn load_embedded(CMapName) -> Bytes?
+
+// Errors
+
+// Types and methods
+pub(all) enum BfString {
+  Char(Char)
+  String(String)
+} derive(Eq, @debug.Debug)
+pub impl Show for BfString
+
+pub struct Bundle {
+  // private fields
+}
+pub fn Bundle::load_embedded(Self, CMapName) -> Bytes?
+pub fn Bundle::new(Bytes) -> Self?
+
+pub struct CMap {
+  // private fields
+}
+pub fn CMap::identity_h() -> Self
+pub fn CMap::identity_v() -> Self
+pub fn CMap::lookup_bf_string(Self, UInt) -> BfString?
+pub fn CMap::lookup_cid_code(Self, UInt, Int) -> UInt?
+pub fn CMap::metadata(Self) -> Metadata
+pub fn CMap::parse(BytesView, (CMapName) -> Bytes?) -> Self?
+pub fn CMap::parse_with_bundle(BytesView, (CMapName) -> Bytes?, Bundle) -> Self?
+
+pub(all) enum CMapName {
+  N83pvRksjH
+  N90msRksjH
+  N90msRksjV
+  N90mspRksjH
+  N90mspRksjV
+  N90pvRksjH
+  AddRksjH
+  AddRksjV
+  AdobeCns1Ucs2
+  AdobeGb1Ucs2
+  AdobeJapan1Ucs2
+  AdobeKorea1Ucs2
+  B5pcH
+  B5pcV
+  CnsEucH
+  CnsEucV
+  ETenB5H
+  ETenB5V
+  ETenmsB5H
+  ETenmsB5V
+  EucH
+  EucV
+  ExtRksjH
+  ExtRksjV
+  GbEucH
+  GbEucV
+  GbkEucH
+  GbkEucV
+  Gbk2kH
+  Gbk2kV
+  GbkpEucH
+  GbkpEucV
+  GbpcEucH
+  GbpcEucV
+  H
+  HKscsB5H
+  HKscsB5V
+  IdentityH
+  IdentityV
+  KscEucH
+  KscEucV
+  KscmsUhcH
+  KscmsUhcHwH
+  KscmsUhcHwV
+  KscmsUhcV
+  KscpcEucH
+  UniCnsUcs2H
+  UniCnsUcs2V
+  UniCnsUtf16H
+  UniCnsUtf16V
+  UniGbUcs2H
+  UniGbUcs2V
+  UniGbUtf16H
+  UniGbUtf16V
+  UniJisUcs2H
+  UniJisUcs2HwH
+  UniJisUcs2HwV
+  UniJisUcs2V
+  UniJisUtf16H
+  UniJisUtf16V
+  UniKsUcs2H
+  UniKsUcs2V
+  UniKsUtf16H
+  UniKsUtf16V
+  V
+  Custom(BytesView)
+} derive(Eq, @debug.Debug)
+pub fn CMapName::from_bytes(BytesView) -> Self
+pub fn CMapName::to_bytes(Self) -> BytesView
+
+pub(all) struct CharacterCollection {
+  family : CidFamily
+  supplement : Int
+} derive(Eq, @debug.Debug)
+pub impl Show for CharacterCollection
+
+pub(all) enum CidFamily {
+  AdobeJapan1
+  AdobeGB1
+  AdobeCNS1
+  AdobeKorea1
+  AdobeIdentity
+  Custom(registry~ : Bytes, ordering~ : Bytes)
+} derive(Eq, @debug.Debug)
+pub fn CidFamily::from_registry_ordering(BytesView, BytesView) -> Self
+pub fn CidFamily::ucs2_cmap(Self) -> CMapName?
+pub fn CidFamily::unicode_cmap(Self) -> CMapName?
+pub impl Show for CidFamily
+
+type HuffmanTable
+
+pub(all) struct Metadata {
+  character_collection : CharacterCollection?
+  name : Bytes?
+  writing_mode : WritingMode?
+} derive(Eq, @debug.Debug)
+
+pub(all) enum WritingMode {
+  Horizontal
+  Vertical
+} derive(Eq, @debug.Debug)
+pub impl Default for WritingMode
+pub impl Show for WritingMode
+
+// Type aliases
+pub type Cid = UInt
+
+// Traits
