@@ -70,14 +70,6 @@ pub fn RenderOptions::resolve(
 }
 
 ///|
-/// Renders an SVG image into a texture (upstream
-/// `resvg::render(tree, ts, &mut texture.as_mut())`). Installed once `usvg`
-/// and `resvg` are ported; until then SVG images and glyphs are skipped.
-pub let svg_image_renderer : Ref[
-  ((@library.SvgImage, @skia.Pixmap, UInt, UInt) -> Unit)?,
-] = Ref::new(None)
-
-///|
 /// Export a page into a raster image.
 ///
 /// This renders the page at the given number of pixels per inch and returns

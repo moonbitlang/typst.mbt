@@ -8,9 +8,13 @@ import {
 // Values
 pub fn crc32(Array[BytesView]) -> UInt
 
+pub fn decode_gif_first_frame(BytesView) -> GifFrame? raise ImageError
+
 pub fn decode_jpeg(BytesView) -> (ImageInfo, Bytes) raise ImageError
 
 pub fn decode_png(BytesView) -> (ImageInfo, Bytes) raise ImageError
+
+pub fn decode_webp(BytesView) -> WebpImage raise ImageError
 
 pub fn encode_png(BytesView, Int, Int, PngColorType) -> Bytes
 
@@ -110,6 +114,16 @@ pub(all) enum FilterType {
   Lanczos3
 } derive(Eq, Hash, @debug.Debug)
 
+pub(all) struct GifFrame {
+  screen_width : Int
+  screen_height : Int
+  left : Int
+  top : Int
+  width : Int
+  height : Int
+  rgba : Bytes
+}
+
 pub(all) struct ImageInfo {
   width : UInt
   height : UInt
@@ -153,6 +167,13 @@ pub fn StoredOnlyCompressor::compressed_size(Int) -> Int
 pub fn StoredOnlyCompressor::finish(Self) -> Bytes
 pub fn StoredOnlyCompressor::new() -> Self
 pub fn StoredOnlyCompressor::write_data(Self, BytesView) -> Unit
+
+pub(all) struct WebpImage {
+  width : Int
+  height : Int
+  has_alpha : Bool
+  data : Bytes
+}
 
 pub struct ZlibEncoder {
   // private fields

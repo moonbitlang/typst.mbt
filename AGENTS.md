@@ -97,6 +97,12 @@
   `hayro_svg::convert` on the hayro test corpus (`hayro/svg/oracle/`,
   `scripts/gen_hayro_svg_tests.py`); `hayro/svg/cli` converts PDFs for
   ad-hoc diffs. Rasterizers implement `@hayro_interpret.Device`.
+- SVG rasterization (`resvg/`, port of resvg 0.47 on `usvg` + `skia`) is
+  checked by the `resvg` stage (`scripts/goldens.sh resvg`): resvg's own
+  regression suite (`.repos/resvg`, fetched by `scripts/upstream.sh`),
+  pixmap hashes compared with the real crate. Raster decoders for it live
+  in `codecs/` (GIF, WebP); `scripts/goldens.sh raster` regenerates their
+  oracle tests.
 - Bundle export (`bundle/`, port of typst-bundle; `BundleFormat`/`AssetElem`
   and the bundle-only rules live in `library/bundle_format.mbt`) is checked
   by the `bundle` stage (`scripts/goldens.sh bundle`, oracle/src/bundle.rs):

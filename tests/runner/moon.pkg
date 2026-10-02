@@ -23,6 +23,7 @@ import {
   "moonbitlang/typst/otf",
   "moonbitlang/typst/shape",
   "moonbitlang/typst/usvg",
+  "moonbitlang/typst/resvg",
   "moonbitlang/typst/tiny_skia_path",
   "moonbitlang/typst/codecs",
   "moonbitlang/typst/data/xml",

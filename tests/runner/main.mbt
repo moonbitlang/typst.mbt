@@ -1,7 +1,7 @@
 // Differential test runner: compares the MoonBit port against reference
 // outputs dumped by the Rust oracle (see `scripts/goldens.sh`).
 //
-// Usage: moon run tests/runner -- <syntax|ast|reparse|eval|html|bundle|realize|paged|svg|svg-replay|pdf-semantic|pdf-semantic-replay|pdf-extract-check|pdftags|pdftags-check|font|break|shape|shape-hb|usvg|usvg-images> [filter] [--verbose]
+// Usage: moon run tests/runner -- <syntax|ast|reparse|eval|html|bundle|realize|paged|svg|svg-replay|pdf-semantic|pdf-semantic-replay|pdf-extract-check|pdftags|pdftags-check|font|break|shape|shape-hb|usvg|usvg-images|resvg> [filter] [--verbose]
 
 ///|
 let suite_dir = ".repos/typst/tests/suite"
@@ -180,6 +180,14 @@ fn main {
       )
     "shape" => run_shape_stage(filter, verbose)
     "usvg" => run_usvg_stage(filter, verbose)
+    "resvg" => {
+      for a in args {
+        if a.has_prefix("--raw=") {
+          resvg_raw_dir.val = Some(a.to_string().substring(start=6))
+        }
+      }
+      run_resvg_stage(filter, verbose)
+    }
     // The usvg trees of the SVG images placed by the paged tests; tests
     // without SVG images have no golden entry.
     "usvg-images" =>
