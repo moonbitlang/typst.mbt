@@ -22,6 +22,7 @@ mod fonts;
 mod html;
 mod paged;
 mod realize;
+mod shape;
 mod svg;
 mod world;
 
@@ -102,6 +103,21 @@ fn main() {
                 .join()
                 .unwrap();
         }
+        Some("shape") => {
+            // Paths are resolved relative to the upstream checkout.
+            let suite = PathBuf::from(&args[2]);
+            let out = std::path::absolute(PathBuf::from(&args[3])).unwrap();
+            let upstream = std::path::absolute(&suite).unwrap();
+            let root = upstream.ancestors().nth(2).unwrap().to_path_buf();
+            std::env::set_current_dir(&root).unwrap();
+            let rel = upstream.strip_prefix(&root).unwrap().to_path_buf();
+            std::thread::Builder::new()
+                .stack_size(1 << 30)
+                .spawn(move || shape::dump_shape(&rel, &out))
+                .unwrap()
+                .join()
+                .unwrap();
+        }
         Some("svg") => {
             // Paths are resolved relative to the upstream checkout.
             let suite = PathBuf::from(&args[2]);
@@ -134,7 +150,7 @@ fn main() {
         }
         _ => {
             eprintln!(
-                "usage: typst-oracle <syntax|ast|eval|html|realize|paged|svg|break> <suite-dir> <out-dir>\n       typst-oracle fonts <out-file>"
+                "usage: typst-oracle <syntax|ast|eval|html|realize|paged|svg|shape|break> <suite-dir> <out-dir>\n       typst-oracle fonts <out-file>"
             );
             std::process::exit(2);
         }

@@ -1323,6 +1323,21 @@ pub fn Face::set_variation(self : Face, axis : Tag, value : Float) -> Unit? {
 }
 
 ///|
+/// Sets the normalized variation coordinates directly (an extension, not in
+/// ttf-parser; used to reproduce recorded faces in tests). Extra values are
+/// ignored, missing ones are left unchanged.
+pub fn Face::set_normalized_coordinates(
+  self : Face,
+  coords : Array[Int],
+) -> Unit {
+  for i, c in coords {
+    if i < self.coordinates.length() {
+      self.coordinates[i] = NormalizedCoordinate(c.to_int16())
+    }
+  }
+}
+
+///|
 /// Returns the current normalized variation coordinates.
 pub fn Face::variation_coordinates(
   self : Face,

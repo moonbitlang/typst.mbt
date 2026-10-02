@@ -328,3 +328,48 @@ blocks, `lorem(n)` by tall blocks), dumped with the oracle and compared with
 the runner run from that tree: all 304 cases whose upstream dump is
 text-free match bit-exactly, in both variants (the remaining ones need
 inline/math layout or bibliography).
+
+## Status: work unit C (shaping)
+
+**Package `shape/`**: a faithful port of rustybuzz 0.20.1 (the version
+locked by Typst; sources fetched into `.repos/rustybuzz` by
+`scripts/upstream.sh`), one file per rustybuzz module: buffer, common, face
+(`hb_font_t` over `@otf.Face`), set_digest, ot_map, ot_shape(_plan),
+ot_shape_normalize, ot_shape_fallback, ot_layout(_common, _gsubgpos,
+_gsub_table, _gpos_table), kerning (legacy `kern` incl. state machines),
+paint_extents (COLRv1 glyph extents), tag + tag_table, the complex shapers
+(Arabic incl. stch and Mongolian, Hebrew, Thai incl. PUA fallback, Hangul,
+Indic, Khmer, Myanmar incl. Zawgyi, USE, syllabic, vowel constraints) and
+the AAT layout (morx, kerx, trak, aat_map). WASM shaping is not ported
+(rustybuzz feature not enabled by Typst). Public API as used by Typst:
+`Face::from_face`/`from_slice`, `UnicodeBuffer`, `ShapePlan::new`,
+`shape_with_plan`/`shape`, `GlyphBuffer::glyph_infos`/`glyph_positions`,
+`GlyphInfo::unsafe_to_break`, `Feature`, `Script::from_iso15924_tag`,
+`Language::from_str`, `BUFFER_FLAG_*`. Building a `Face` parses all
+GSUB/GPOS lookups (like rustybuzz); callers should cache it per
+`FontInstance`, and shape plans per (font, direction, script, language,
+features) like upstream's memoized `create_shape_plan`.
+
+**Tables** are generated, never transcribed: `oracle/src/bin/
+gen_shape_unicode.rs` writes `unicode/shaping_tables_gen.mbt`
+(General_Category, Script as rustybuzz maps it, ccc, bidi mirroring, from
+the exact crates rustybuzz uses); `scripts/gen_shape_tables.py` converts
+rustybuzz's own generated data/code (normalization, emoji, Arabic joining,
+Indic/USE categories, Ragel machines, tag table, AAT feature mappings) into
+`shape/*_gen.mbt`.
+
+**Oracle stage `shape`**: the oracle patches rustybuzz with a tap crate
+(`oracle/rustybuzz-tap`, compiling the pristine sources from
+`.repos/rustybuzz`) that records every `shape_with_plan` call while the
+paged suite compiles; `scripts/goldens.sh shape` dumps the 4598 unique runs
+per font to `tests/golden/shape/` (font book index, normalized variation
+coordinates, plan direction/script/language/features, buffer script and
+flags, text; output glyph ids, clusters, glyph flags, advances, offsets).
+**Stage `shape-hb`**: rustybuzz's own test suite (2250 HarfBuzz shaping
+tests incl. AOTS, text-rendering-tests, in-house, macOS system fonts),
+extracted by `scripts/goldens.sh shape-hb` (`scripts/shape_hb_tests.py`).
+
+**Result:** `shape` 4598/4598 (all scripts: Latn, Math, Hani, Hira, Kana,
+Hang, Arab, Hebr, Deva, Cyrl, Grek, Thai, Ethi, Zzzz; all 49 fonts used),
+`shape-hb` 2250/2250, plus the rustybuzz unit tests for feature parsing and
+tags (`moon test shape`).
