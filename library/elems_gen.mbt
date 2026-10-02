@@ -7824,6 +7824,7 @@ pub fn raw_elem() -> Element {
         ],
       )
       raw_elem_cell.val = Some(e)
+      e.hooks().synthesize = Some(raw_elem_synthesize)
       e.hooks().show_set = Some(raw_elem_show_set)
       e.hooks().local_name = Some((lang, region) => {
         localized_str(lang, region, raw_elem_local_name_key())
