@@ -244,10 +244,6 @@ fn test_library() -> @library.Library {
   match test_library_cell.val {
     Some(lib) => lib
     None => {
-      let routines = @library.Routines::new(
-        eval_string=@eval.routines_eval_string(),
-        eval_closure=@eval.routines_eval_closure(),
-      )
       let formats = [
         @library.html_format(),
         @library.pdf_format(),
@@ -255,14 +251,32 @@ fn test_library() -> @library.Library {
         @library.png_format(),
         @library.bundle_format(),
       ]
-      let lib = @library.Library::builder(routines, formats)
+      let lib = @typst.library_builder(formats)
+        .with_features(@library.Features::all())
         .with_global(define_test_globals)
         .build()
       define_test_colors(lib)
+      define_test_styles(lib)
       test_library_cell.val = Some(lib)
       lib
     }
   }
+}
+
+///|
+/// Set the test styles (small pages, like upstream's test world).
+fn define_test_styles(lib : @library.Library) -> Unit {
+  let pt = (v : Double) => @library.Length::from_abs(@library.Abs::pt(v))
+  lib.styles.push(@library.PageElem::set_width(Custom(pt(120.0))))
+  lib.styles.push(@library.PageElem::set_height(Auto))
+  lib.styles.push(
+    @library.PageElem::set_margin(
+      Custom(
+        @library.Margin::splat(Some(Custom(@library.Rel::from_abs(pt(10.0))))),
+      ),
+    ),
+  )
+  lib.styles.push(@library.TextElem::set_size(@library.TextSize(pt(10.0))))
 }
 
 ///|
@@ -451,7 +465,7 @@ fn eval_report(rel : String, tc : TestCase) -> String {
   catch {
     @library.SourceError(errors) => {
       out.write_string("err\n")
-      for diag in deduplicate(errors) {
+      for diag in @typst.deduplicate(errors) {
         write_source_diag(out, world, id, diag)
       }
     }
@@ -481,22 +495,6 @@ fn parse_features(attrs : String) -> @library.Features? {
     }
   }
   None
-}
-
-///|
-fn deduplicate(
-  diags : Array[@library.SourceDiagnostic],
-) -> Array[@library.SourceDiagnostic] {
-  let seen : Map[String, Unit] = {}
-  let out = []
-  for d in diags {
-    let key = "\{d.span.span.0}/\{d.span.extra}/\{d.message}"
-    if !seen.contains(key) {
-      seen[key] = ()
-      out.push(d)
-    }
-  }
-  out
 }
 
 ///|
@@ -545,4 +543,55 @@ fn locate(
     let p = id.vpath().get_without_slash()
     "\{@unicode.rust_debug_str(p)}:\{start}..\{end}"
   }
+}
+
+///|
+/// Compile a test case to HTML in the oracle's report format (see
+/// `oracle/src/html.rs`).
+fn html_report(rel : String, tc : TestCase) -> String {
+  let source = TestWorld::main_source("tests/suite/" + rel, tc.body)
+  let main_id = source.id()
+  let library = test_library()
+  let library = match parse_features(tc.attrs) {
+    Some(f) => { ..library, features: f, }
+    None => library
+  }
+  let world : TestWorld = { main: source, library, }
+  let warned : @library.Warned[
+    Result[@html.HtmlDocument, Array[@library.SourceDiagnostic]],
+  ] = @typst.compile(world)
+  let out = StringBuilder()
+  match warned.output {
+    Ok(doc) =>
+      try
+        @html.html(doc, {
+          format: @library.PartialHtmlFormatOptions::{ pretty: Some(true), },
+        })
+      catch {
+        @library.SourceError(errors) => {
+          out.write_string("err\n")
+          for diag in @typst.deduplicate(errors) {
+            write_source_diag(out, world, main_id, diag)
+          }
+        }
+      } noraise {
+        html => {
+          out.write_string("ok\n")
+          out.write_string(html)
+          if !html.has_suffix("\n") {
+            out.write_char('\n')
+          }
+        }
+      }
+    Err(errors) => {
+      out.write_string("err\n")
+      for diag in errors {
+        write_source_diag(out, world, main_id, diag)
+      }
+    }
+  }
+  for diag in @typst.deduplicate(warned.warnings) {
+    write_source_diag(out, world, main_id, diag)
+  }
+  out.to_string()
 }
