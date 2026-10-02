@@ -46,6 +46,20 @@ test "help subcommand" {
 }
 
 ///|
+test "large page ranges" {
+  inspect(
+    parse_result(["compile", "a.typ", "--pages=2147483648-2147483647"]),
+    content="invalid: invalid value '2147483648-2147483647' for '--pages <PAGES>': page range must end at a page after the start",
+  )
+  inspect(
+    parse_result(["compile", "a.typ", "--pages=2147483647-99999999999"]),
+    content=(
+      #|other color=auto
+    ),
+  )
+}
+
+///|
 test "large numbers" {
   inspect(
     parse_result(["compile", "--pages=2147483648", "--help"]),

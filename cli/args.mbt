@@ -284,19 +284,21 @@ fn parse_pages(value : String) -> @library.PageRange raise CliError {
   match parts {
     [] | [""] => raise err("page range must not be empty")
     [single_page] => {
-      let page_number = parse_page_number(single_page, err)
+      let page_number = saturate(parse_page_number(single_page, err))
       { start: Some(page_number), end: Some(page_number), }
     }
     ["", ""] => raise err("page range must have start or end")
-    [start, ""] => { start: Some(parse_page_number(start, err)), end: None, }
-    ["", end] => { start: None, end: Some(parse_page_number(end, err)), }
+    [start, ""] =>
+      { start: Some(saturate(parse_page_number(start, err))), end: None, }
+    ["", end] =>
+      { start: None, end: Some(saturate(parse_page_number(end, err))), }
     [start, end] => {
       let start = parse_page_number(start, err)
       let end = parse_page_number(end, err)
       if start > end {
         raise err("page range must end at a page after the start")
       }
-      { start: Some(start), end: Some(end), }
+      { start: Some(saturate(start)), end: Some(saturate(end)), }
     }
     _ => raise err("page range must have a single hyphen")
   }
@@ -307,20 +309,30 @@ fn parse_pages(value : String) -> @library.PageRange raise CliError {
 fn parse_page_number(
   value : String,
   err : (String) -> CliError,
-) -> Int raise CliError {
+) -> UInt64 raise CliError {
   if value == "0" {
     raise err("page numbers start at one")
   }
   match parse_usize(value) {
-    Some(n) if n > 0 => n
+    Some(n) if n > 0UL => n
     _ => raise err("not a valid page number")
   }
 }
 
 ///|
-/// Rust's `usize::from_str` (64-bit). Values that do not fit into an `Int`
-/// saturate (they are only used as page numbers and job counts).
-fn parse_usize(value : String) -> Int? {
+/// A page number or job count as an `Int` (values beyond `Int` saturate;
+/// no document has that many pages).
+fn saturate(n : UInt64) -> Int {
+  if n > 2147483647UL {
+    2147483647
+  } else {
+    n.to_int()
+  }
+}
+
+///|
+/// Rust's `usize::from_str` (64-bit).
+fn parse_usize(value : String) -> UInt64? {
   let value = if value.has_prefix("+") { value[1:].to_owned() } else { value }
   if value == "" {
     return None
@@ -336,7 +348,7 @@ fn parse_usize(value : String) -> Int? {
     }
     n = n * 10UL + digit
   }
-  Some(if n > 2147483647UL { 2147483647 } else { n.to_int() })
+  Some(n)
 }
 
 ///|
@@ -1167,7 +1179,7 @@ fn process_args(m : Matches) -> ProcessArgs raise CliError {
 /// The value parser of `--jobs` (`usize`).
 fn parse_jobs(v : String) -> Int raise CliError {
   match parse_usize(v) {
-    Some(n) => n
+    Some(n) => saturate(n)
     None =>
       raise Invalid(
         "invalid value '\{v}' for '--jobs <JOBS>': \{usize_error(v)}",
