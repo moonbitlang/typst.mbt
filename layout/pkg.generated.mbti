@@ -5,17 +5,28 @@ import {
   "moonbitlang/core/debug",
   "moonbitlang/core/hashset",
   "moonbitlang/typst/library",
+  "moonbitlang/typst/shape",
   "moonbitlang/typst/syntax",
 }
 
 // Values
 pub fn clip_rect(@library.Axes[@library.Abs], @library.Corners[@library.Rel[@library.Abs]], @library.Sides[@library.FixedStroke?], @library.Sides[@library.Rel[@library.Abs]]) -> @library.Curve
 
+pub fn create_shape_plan(@library.FontInstance, @shape.Direction, @shape.Script, @shape.Language?, ArrayView[@shape.Feature]) -> @shape.ShapePlan
+
+pub fn features(@library.StyleChain) -> Array[@shape.Feature]
+
 pub fn fill_and_stroke(@library.Frame, @library.Paint?, @library.Sides[@library.FixedStroke?], @library.Sides[@library.Rel[@library.Abs]], @library.Corners[@library.Rel[@library.Abs]], @syntax.Span) -> Unit
+
+pub fn[C : SharedShapingContext] get_font_and_covers(C, String, FamilyIter, (C, String, @library.FontInstance) -> Unit) -> (@library.FontInstance, @library.Regex?)?
 
 pub fn grow(@library.Frame, @library.Sides[@library.Rel[@library.Abs]]) -> Unit
 
+pub fn language(@library.StyleChain) -> @shape.Language
+
 pub fn[R : FrameModify] layout_and_modify(@library.StyleChain, (@library.StyleChain) -> R raise @library.SourceError) -> R raise @library.SourceError
+
+pub fn layout_box(@library.BoxElem, @library.Engine, @library.Locator, @library.StyleChain, @library.Axes[@library.Abs]) -> @library.Frame raise @library.SourceError
 
 pub fn layout_cell(@library.Cell, @library.Engine, @library.Locator, @library.StyleChain, @library.Regions, Bool) -> @library.Fragment raise @library.SourceError
 
@@ -89,6 +100,8 @@ pub fn modify_text(@library.Frame, @library.StyleChain) -> Unit
 
 pub fn register(@library.NativeRuleMap) -> Unit
 
+pub fn rusty(@library.FontInstance) -> @shape.Face
+
 pub fn shrink(@library.Axes[@library.Abs], @library.Sides[@library.Rel[@library.Abs]]) -> @library.Axes[@library.Abs]
 
 pub fn shrink_multiple(@library.Axes[@library.Abs], @library.Abs, Array[@library.Abs], @library.Abs?, @library.Sides[@library.Rel[@library.Abs]]) -> (@library.Axes[@library.Abs], @library.Abs, Array[@library.Abs], @library.Abs?)
@@ -104,6 +117,13 @@ pub(all) struct ColumnOptions {
   gutter : @library.Rel[@library.Abs]
   separator : @library.Content?
 }
+
+pub struct FamilyIter {
+  // private fields
+}
+pub fn FamilyIter::clone(Self) -> Self
+pub fn FamilyIter::new(Array[@library.FontFamily]) -> Self
+pub fn FamilyIter::next(Self) -> @library.FontFamily?
 
 pub(all) enum FlowMode {
   Root
@@ -169,3 +189,13 @@ pub(open) trait FrameModify {
 }
 pub impl FrameModify for @library.Fragment
 pub impl FrameModify for @library.Frame
+
+pub(open) trait SharedShapingContext {
+  fn world(Self) -> &@library.World
+  fn used(Self) -> Array[@library.FontInstance]
+  fn first(Self) -> @library.FontInstance?
+  fn variant(Self) -> @library.FontVariant
+  fn fallback(Self) -> Bool
+  fn size(Self) -> @library.Abs
+  fn variations(Self) -> @library.FontVariations
+}
