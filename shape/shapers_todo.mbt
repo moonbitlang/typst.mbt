@@ -7,21 +7,6 @@ fn placeholder_shaper(name : String) -> OtShaper {
 }
 
 ///|
-let arabic_shaper : OtShaper = placeholder_shaper("arabic")
-
-///|
-priv struct ArabicShapePlan {}
-
-///|
-let thai_shaper : OtShaper = placeholder_shaper("thai")
-
-///|
-let hangul_shaper : OtShaper = placeholder_shaper("hangul")
-
-///|
-let hebrew_shaper : OtShaper = placeholder_shaper("hebrew")
-
-///|
 let indic_shaper : OtShaper = placeholder_shaper("indic")
 
 ///|
