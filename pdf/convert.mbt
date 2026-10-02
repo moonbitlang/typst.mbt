@@ -272,6 +272,8 @@ priv struct GlobalContext {
   fonts_backward : Array[(@export.Font, @library.FontInstance)]
   /// The fonts shared between Typst text and SVG images.
   svg_fonts : SvgFontCache
+  /// The extraction state of each embedded PDF document (by data key).
+  pdf_extractions : Map[String, @hayro_write.ExtractionContext]
   /// Mapping between images and their span.
   image_to_spans : Map[String, @syntax.Span]
   /// The spans of all images that appear in the document.
@@ -302,6 +304,7 @@ fn GlobalContext::new(
     fonts_forward: {},
     fonts_backward: [],
     svg_fonts: SvgFontCache::new(),
+    pdf_extractions: {},
     image_to_spans: {},
     image_spans: {},
     document,

@@ -648,6 +648,21 @@ fn decode_image(rec : Array[Json]) -> @library.ImageKind raise Unsupported {
       }
       return Svg(@library.SvgImage::synthetic(data, width, height))
     }
+    "pdf" => {
+      guard image_assets().get(sha) is Some(data) else {
+        raise Unsupported("unknown pdf image")
+      }
+      guard rec[4] is Number(page_index, ..) else {
+        raise Unsupported("pdf page index")
+      }
+      let document = @library.PdfDocument::new(data) catch {
+        _ => raise Unsupported("invalid pdf image")
+      }
+      guard @library.PdfImage::new(document, page_index.to_int()) is Some(image) else {
+        raise Unsupported("invalid pdf page")
+      }
+      return Pdf(image)
+    }
     _ => raise Unsupported("\{kind} image")
   }
   guard image_assets().get(sha) is Some(data) else {

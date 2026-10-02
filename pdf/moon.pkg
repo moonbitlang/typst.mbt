@@ -10,6 +10,8 @@ import {
   "moonbitlang/typst/tiny_skia_path",
   "moonbitlang/typst/unicode",
   "moonbitlang/pdflite/export",
+  "moonbitlang/typst/hayro/syntax" @hayro_syntax,
+  "moonbitlang/typst/hayro/write" @hayro_write,
   "moonbitlang/core/math",
 }
 

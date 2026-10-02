@@ -1,0 +1,48 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/hayro/write"
+
+import {
+  "moonbitlang/core/debug",
+  "moonbitlang/pdflite/export",
+  "moonbitlang/typst/hayro/syntax",
+}
+
+// Values
+pub fn extract(@syntax.Pdf, () -> Int, (Int, @export.Indirect) -> Unit, Array[ExtractionQuery]) -> Result[ExtractionResult, ExtractionError]
+
+// Errors
+
+// Types and methods
+pub struct ExtractionContext {
+  page_tree_parent_ref : Int
+  // private fields
+}
+pub fn ExtractionContext::extract_query(Self, ExtractionQuery) -> Result[Int, ExtractionError]
+pub fn ExtractionContext::extract_query_into(Self, ExtractionQuery, Int) -> Result[Unit, ExtractionError]
+pub fn ExtractionContext::new(@syntax.Pdf, () -> Int, (Int, @export.Indirect) -> Unit, page_tree_parent_ref? : Int) -> Self
+pub fn ExtractionContext::write_dependencies(Self) -> Unit
+
+pub(all) enum ExtractionError {
+  InvalidPageIndex(Int)
+} derive(Eq, @debug.Debug)
+
+pub(all) struct ExtractionQuery {
+  query_type : ExtractionQueryType
+  page_index : Int
+} derive(Eq, @debug.Debug)
+pub fn ExtractionQuery::new_page(Int) -> Self
+pub fn ExtractionQuery::new_xobject(Int) -> Self
+
+pub(all) enum ExtractionQueryType {
+  XObject
+  Page
+} derive(Eq, @debug.Debug)
+
+pub(all) struct ExtractionResult {
+  root_refs : Array[Result[Int, ExtractionError]]
+  page_tree_parent_ref : Int
+}
+
+// Type aliases
+
+// Traits

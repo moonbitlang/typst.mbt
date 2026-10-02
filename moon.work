@@ -1,4 +1,4 @@
 members = [
   ".",
-  "../office.mbt/pdflite",
+  "/Users/dii/git/office.mbt-pdf-images/pdflite",
 ]

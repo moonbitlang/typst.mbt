@@ -1,10 +1,11 @@
 // Port of `typst-pdf/src/image.rs`.
 //
-// SVG images are drawn with the port of `krilla-svg` (`svg*.mbt`).
+// SVG images are drawn with the port of `krilla-svg` (`svg*.mbt`); PDF
+// images are embedded as form XObjects extracted with the port of
+// `hayro-write` (`hayro/write`), like krilla's `draw_pdf_page`.
 //
-// TODO: PDF images (embedded pages) are not ported yet; they are skipped.
-// GIF and WebP images are not decoded by the library yet and are skipped as
-// well.
+// TODO: GIF and WebP images are not decoded by the library yet and are
+// skipped.
 
 ///|
 fn handle_image(
@@ -57,13 +58,114 @@ fn handle_image(
         )
         |> ignore
       }
-    Pdf(_) => ()
+    Pdf(pdf) =>
+      if to_export_size(size) is Some(size) {
+        draw_pdf_page(gc, surface, pdf, size, span)
+      }
   }
   if started {
     surface.end_tagged()
   }
   surface.pop()
   surface.reset_location()
+}
+
+///|
+/// Draw a page of a PDF (krilla's `Surface::draw_pdf_page`; the page is
+/// extracted with the port of `hayro-write`).
+fn draw_pdf_page(
+  gc : GlobalContext,
+  surface : @export.Surface,
+  image : @library.PdfImage,
+  size : @export.Size,
+  span : @syntax.Span,
+) -> Unit raise @library.SourceError {
+  let document = image.document()
+  let pdf = document.pdf()
+  let page_idx = image.page_index()
+  let doc_key = bytes_key(document.data())
+
+  // krilla checks the version when serializing the embedded document.
+  let pdf_version = convert_hayro_pdf_version(pdf.version())
+  if gc.options.version() < pdf_version {
+    let embedded = pdf_version.as_str()
+    let target = gc.options.version().as_str()
+    raise @library.SourceError([
+      @library.SourceDiagnostic::error_at(
+        span, "the version of the PDF is too high",
+      ).with_hints([
+        "the current export target is \{target}, while the PDF has version \{embedded}",
+        "raise the export target to \{embedded} or higher",
+        "or preprocess the PDF to convert it to a lower version",
+      ]),
+    ])
+  }
+
+  // If the user provided an invalid page index, we will detect this later on anyway, so
+  // just use dummy dimensions here.
+  let (page_width, page_height) = match pdf.pages().get(page_idx) {
+    Some(p) => p.render_dimensions()
+    None => (Float::from_int(1), Float::from_int(1))
+  }
+  let page_width = page_width.to_double()
+  let page_height = page_height.to_double()
+  let transform = @export.Transform::from_scale(
+    size.width / page_width,
+    size.height / page_height,
+  )
+  // We applied a transform to invert the y-axis initially, but since the embedded PDF also uses
+  // a y-up coordinate system, we need to "invert" this.
+  surface.push_transform(transform)
+  surface.push_transform(
+    @export.Transform::from_row(1.0, 0.0, 0.0, -1.0, 0.0, page_height),
+  )
+  surface.draw_external_xobject({
+    key: "\{doc_key}:\{page_idx}",
+    bbox: @export.Rect::from_xywh(0.0, 0.0, page_width, page_height).unwrap(),
+    write: (root, new_ref, put) => {
+      // All pages of a document share one extraction context, so that
+      // shared objects are written once (like krilla, which extracts all
+      // queries of a document together).
+      let ctx = match gc.pdf_extractions.get(doc_key) {
+        Some(ctx) => ctx
+        None => {
+          let ctx = @hayro_write.ExtractionContext::new(
+            pdf,
+            new_ref,
+            put,
+            page_tree_parent_ref=surface.page_tree_ref(),
+          )
+          gc.pdf_extractions[doc_key] = ctx
+          ctx
+        }
+      }
+      ctx.extract_query_into(
+        @hayro_write.ExtractionQuery::new_xobject(page_idx),
+        root,
+      )
+      |> ignore
+      ctx.write_dependencies()
+    },
+  })
+  surface.pop()
+  surface.pop()
+}
+
+///|
+fn convert_hayro_pdf_version(
+  version : @hayro_syntax.PdfVersion,
+) -> @export.PdfVersion {
+  match version {
+    // Those are obviously not right, but we don't support versions lower than 1.4 in krilla.
+    // Since we only need this conversion to detect version mismatches (in which case the
+    // version of the embedded PDF has to be higher than 1.4), this hack is sufficient for our
+    // purposes.
+    Pdf10 | Pdf11 | Pdf12 | Pdf13 | Pdf14 => Pdf14
+    Pdf15 => Pdf15
+    Pdf16 => Pdf16
+    Pdf17 => Pdf17
+    Pdf20 => Pdf20
+  }
 }
 
 ///|
