@@ -32,3 +32,29 @@ fn bibliography_elem_show_set(
 fn bibliography_elem_local_name_key() -> String {
   "bibliography"
 }
+
+///|
+/// Checks if this bibliography contains the given key.
+///
+/// TODO: The loaded bibliography data (`sources.derived`) is not ported yet,
+/// so no bibliography contains any key.
+pub fn BibliographyElem::has(
+  engine : Engine,
+  key : Label,
+  span : @syntax.Span,
+) -> Bool {
+  engine
+  .introspect(query_introspection(bibliography_elem().select(), span))
+  .iter()
+  .any(elem => BibliographyElem(elem).sources_has(key))
+}
+
+///|
+/// Whether the loaded sources contain the key (upstream
+/// `sources.derived.has(key)`; not ported yet).
+fn BibliographyElem::sources_has(
+  _self : BibliographyElem,
+  _key : Label,
+) -> Bool {
+  false
+}

@@ -6150,6 +6150,7 @@ pub fn ref_elem() -> Element {
         ],
       )
       ref_elem_cell.val = Some(e)
+      e.hooks().synthesize = Some(ref_elem_synthesize)
       e
     }
   }

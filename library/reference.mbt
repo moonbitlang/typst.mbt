@@ -110,3 +110,38 @@ pub impl FromValue for RefForm with fn from_value(v) {
 fn ref_elem_form_default() -> Value {
   RefForm::default().into_value()
 }
+
+///|
+/// Upstream `Synthesize for Packed<RefElem>`.
+fn ref_elem_synthesize(
+  engine : Engine,
+  content : Content,
+  styles : StyleChain,
+) -> Content raise SourceError {
+  let span = content.span()
+  let elem = RefElem(content)
+  let citation = to_citation(elem, engine, styles)
+  let elem = elem.with_citation(Some(citation)).with_element(None)
+  if !BibliographyElem::has(engine, elem.target(), span) &&
+    engine.introspect(query_label_introspection(elem.target(), span))
+    is Ok(found) {
+    return elem.with_element(Some(found)).pack()
+  }
+  elem.pack()
+}
+
+///|
+/// Turn a reference into a citation.
+fn to_citation(
+  reference : RefElem,
+  engine : Engine,
+  styles : StyleChain,
+) -> CiteElem raise SourceError {
+  let elem = CiteElem::new(reference.target()).with_supplement(
+    match reference.supplement(styles) {
+      Custom(Some(Content(content))) => Some(content)
+      _ => None
+    },
+  )
+  CiteElem(cite_elem_synthesize(engine, elem.pack(), styles))
+}
