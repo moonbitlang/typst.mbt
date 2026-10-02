@@ -892,7 +892,8 @@ fn parse_args(argv : Array[String]) -> CliArguments raise CliError {
         ],
         subcommands: [],
       }
-      spec.parse(rest) |> ignore
+      let m = spec.parse(rest)
+      check_update_conflicts(rest, m)
       Update
     }
     "completions" => {
@@ -1253,5 +1254,94 @@ fn usize_error(v : String) -> String {
     "number too large to fit in target type"
   } else {
     "invalid digit found in string"
+  }
+}
+
+///|
+/// clap's conflict validation of `update` (`--revert` conflicts with
+/// `--force` and `[VERSION]`): the first of the conflicting arguments on the
+/// command line is reported with the ones it conflicts with.
+fn check_update_conflicts(
+  argv : Array[String],
+  m : Matches,
+) -> Unit raise CliError {
+  // The used arguments in the order of their first occurrence.
+  let order : Array[String] = []
+  let note = (id : String) => if !order.contains(id) { order.push(id) }
+  let mut i = 0
+  let mut only_positional = false
+  while i < argv.length() {
+    let arg = argv[i]
+    i += 1
+    if !only_positional && arg == "--" {
+      only_positional = true
+    } else if !only_positional && arg.has_prefix("--") && arg != "--" {
+      let name = match arg.find("=") {
+        Some(eq) => arg[2:eq].to_owned()
+        None => arg[2:].to_owned()
+      }
+      match name {
+        "revert" | "force" => note(name)
+        "backup-path" => {
+          note(name)
+          if arg.find("=") is None {
+            i += 1
+          }
+        }
+        _ => ()
+      }
+    } else if only_positional || !arg.has_prefix("-") || arg == "-" {
+      note("version")
+    }
+  }
+  let present = (id : String) => {
+    match id {
+      "revert" => m.flag("revert")
+      "force" => m.flag("force")
+      "version" => m.positional(0) is Some(_)
+      _ => false
+    }
+  }
+  let conflicts = (a : String, b : String) => {
+    (a == "revert" && (b == "force" || b == "version")) ||
+    (b == "revert" && (a == "force" || a == "version"))
+  }
+  let display = (id : String) => {
+    match id {
+      "revert" => "--revert"
+      "force" => "--force"
+      "backup-path" => "--backup-path <FILE>"
+      _ => "[VERSION]"
+    }
+  }
+  for subject in order {
+    if !present(subject) {
+      continue
+    }
+    let others = order.filter(o => present(o) && conflicts(subject, o))
+    if others.is_empty() {
+      continue
+    }
+    let message = if others.length() == 1 {
+      "the argument '\{display(subject)}' cannot be used with '\{display(others[0])}'"
+    } else {
+      "the argument '\{display(subject)}' cannot be used with:" +
+      others.map(o => "\n  \{display(o)}").join("")
+    }
+    let usage = StringBuilder()
+    usage.write_string("typst update")
+    for id in order {
+      if id != "version" &&
+        !others.contains(id) &&
+        (id == "backup-path" || present(id)) {
+        usage.write_string(" \{display(id)}")
+      }
+    }
+    if order.contains("version") && !others.contains("version") {
+      usage.write_string(" <VERSION>")
+    } else {
+      usage.write_string(" [VERSION]")
+    }
+    raise Usage(message, usage.to_string())
   }
 }
