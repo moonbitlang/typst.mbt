@@ -76,6 +76,159 @@ fn OutlineIndent::resolve(
   }
 }
 
+///|
+/// Produces the heading for the outline, if any.
+pub fn OutlineElem::realize_title(
+  self : OutlineElem,
+  styles : StyleChain,
+) -> Content? {
+  let span = self.0.span()
+  let title = match self.title(styles) {
+    Custom(title) => title
+    Auto =>
+      Some(TextElem::packed(outline_elem().local_name_in(styles)).spanned(span))
+  }
+  title.map(title => {
+    HeadingElem::new(title).with_depth(NonZeroUSize(1)).pack().spanned(span)
+  })
+}
+
+///|
+/// Realizes the entries in a flat fashion.
+pub fn OutlineElem::realize_flat(
+  self : OutlineElem,
+  engine : Engine,
+  styles : StyleChain,
+) -> Array[OutlineEntry] raise SourceError {
+  let entries = []
+  for item in self.realize_iter(engine, styles) {
+    let (entry, _, included) = item
+    if included {
+      entries.push(entry)
+    }
+  }
+  entries
+}
+
+///|
+/// Realizes the entries in a tree fashion.
+pub fn OutlineElem::realize_tree(
+  self : OutlineElem,
+  engine : Engine,
+  styles : StyleChain,
+) -> Array[OutlineNode[OutlineEntry]] raise SourceError {
+  let flat = self.realize_iter(engine, styles)
+  OutlineNode::build_tree(flat)
+}
+
+///|
+/// Realizes the entries (upstream: as a lazy iterator; here eagerly, which
+/// is equivalent since every caller consumes all of them and stops at the
+/// first error).
+fn OutlineElem::realize_iter(
+  self : OutlineElem,
+  engine : Engine,
+  styles : StyleChain,
+) -> Array[(OutlineEntry, NonZeroUSize, Bool)] raise SourceError {
+  let span = self.0.span()
+  let elems = engine.introspect(
+    query_introspection(self.target(styles).0, span),
+  )
+  let depth = match self.depth(styles) {
+    Some(depth) => depth
+    None => NonZeroUSize(@int64.max_value)
+  }
+  let out = []
+  for elem in elems {
+    guard OutlinableElem::of(elem) is Some(outlinable) else {
+      bail_at(self.0.span(), "cannot outline \{elem.elem().name()}")
+    }
+    let level = outlinable.level()
+    let include = outlinable.outlined() && level <= depth
+    let entry = OutlineEntry(
+      OutlineEntry::new(level, elem).pack().spanned(span),
+    )
+    out.push((entry, level, include))
+  }
+  out
+}
+
+///|
+/// A node in a tree of outline entry.
+pub(all) struct OutlineNode[T] {
+  /// The entry itself.
+  entry : T
+  /// The entry's level.
+  level : NonZeroUSize
+  /// Its descendants.
+  children : Array[OutlineNode[T]]
+}
+
+///|
+/// Turns a flat list of entries into a tree.
+///
+/// Each entry in the iterator should be accompanied by
+/// - a level
+/// - a boolean indicating whether it is included (`true`) or skipped (`false`)
+pub fn[T] OutlineNode::build_tree(
+  flat : ArrayView[(T, NonZeroUSize, Bool)],
+) -> Array[OutlineNode[T]] {
+  // Stores the level of the topmost skipped ancestor of the next included
+  // heading.
+  let mut last_skipped_level : NonZeroUSize? = None
+  let tree : Array[OutlineNode[T]] = []
+  for item in flat {
+    let (entry, level, include) = item
+    if include {
+      let mut children = tree
+
+      // Descend the tree through the latest included heading of each level
+      // until either:
+      // - reaching a node whose children would be siblings of this heading
+      //   (=> add the current heading as a child of this node)
+      // - reaching a node with no children (=> this heading probably skipped
+      //   a few nesting levels in Typst, or one or more ancestors of this
+      //   heading weren't included, so add it as a child of this node, which
+      //   is its deepest included ancestor)
+      // - or, if the latest heading(s) was(/were) skipped, then stop if
+      //   reaching a node whose children would be siblings of the latest
+      //   skipped heading of lowest level (=> those skipped headings would be
+      //   ancestors of the current heading, so add it as a sibling of the
+      //   least deep skipped ancestor among them, as those ancestors weren't
+      //   added to the tree, and the current heading should not be mistakenly
+      //   added as a descendant of a siblibg of that ancestor.)
+      //
+      // That is, if you had an included heading of level N, a skipped heading
+      // of level N, a skipped heading of level N + 1, and then an included
+      // heading of level N + 2, that last one is included as a level N
+      // heading (taking the place of its topmost skipped ancestor), so that it
+      // is not mistakenly added as a descendant of the previous level N
+      // heading.
+      while children.last() is Some(last) &&
+            (match last_skipped_level {
+              None => true
+              Some(l) => last.level < l
+            }) &&
+            last.level < level {
+        children = last.children
+      }
+
+      // Since this heading was bookmarked, the next heading (if it is a
+      // child of this one) won't have a skipped direct ancestor.
+      last_skipped_level = None
+      children.push({ entry, level, children: [], })
+    } else if (match last_skipped_level {
+        None => true
+        Some(l) => level < l
+      }) {
+      // Only the topmost / lowest-level skipped heading matters when we have
+      // consecutive skipped headings, hence the condition above.
+      last_skipped_level = Some(level)
+    }
+  }
+  tree
+}
+
 // Outlinable (`trait Outlinable: Refable`), dispatched over the elements
 // implementing it.
 
@@ -137,6 +290,29 @@ fn OutlinableElem::numbering(self : OutlinableElem) -> Numbering? {
     Heading(elem) => elem.numbering(StyleChain::empty())
     Figure(elem) => elem.numbering(StyleChain::empty())
     Equation(elem) => elem.numbering(StyleChain::empty())
+  }
+}
+
+///|
+/// Upstream `Outlinable::outlined`: whether this element should be included
+/// in the outline.
+fn OutlinableElem::outlined(self : OutlinableElem) -> Bool {
+  let styles = StyleChain::empty()
+  match self {
+    Heading(elem) => elem.outlined(styles)
+    Figure(elem) =>
+      elem.outlined(styles) &&
+      (elem.caption(styles) is Some(_) || self.numbering() is Some(_))
+    Equation(elem) => elem.block(styles) && self.numbering() is Some(_)
+  }
+}
+
+///|
+/// Upstream `Outlinable::level`: the nesting level of this element.
+fn OutlinableElem::level(self : OutlinableElem) -> NonZeroUSize {
+  match self {
+    Heading(elem) => elem.resolve_level(StyleChain::empty())
+    Figure(_) | Equation(_) => NonZeroUSize(1)
   }
 }
 
@@ -286,6 +462,24 @@ fn impl_outline_entry_prefix(
     .counter()
     .display_at(engine, loc, styles, numbering, span)
   Some(outlinable.prefix(numbers))
+}
+
+///|
+/// Formats the element's numbering (if any).
+pub fn OutlineEntry::prefix(
+  self : OutlineEntry,
+  engine : Engine,
+  context : Context,
+  span : @syntax.Span,
+) -> Content? raise SourceError {
+  impl_outline_entry_prefix(self, engine, context, span)
+}
+
+///|
+/// The content which is displayed in place of the referred element at its
+/// entry in the outline.
+pub fn OutlineEntry::body(self : OutlineEntry) -> Content raise HintedError {
+  impl_outline_entry_body(self)
 }
 
 ///|

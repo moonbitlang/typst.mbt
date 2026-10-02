@@ -145,3 +145,136 @@ fn to_citation(
   )
   CiteElem(cite_elem_synthesize(engine, elem.pack(), styles))
 }
+
+///|
+/// Realize as a linked, textual reference.
+pub fn RefElem::realize(
+  self : RefElem,
+  engine : Engine,
+  styles : StyleChain,
+) -> Content raise SourceError {
+  let span = self.0.span()
+  let elem = engine.introspect(query_label_introspection(self.target(), span))
+  let form = self.form(styles)
+  if form == Page {
+    let elem = match elem {
+      Ok(elem) => elem
+      Err(err) => raise SourceError([err.into_error_at(span)])
+    }
+    let loc = elem.location().unwrap()
+    let numbering = match
+      engine.introspect(page_numbering_introspection(loc, span)) {
+      Some(numbering) => numbering
+      None =>
+        bail_at(span, "cannot reference without page numbering", hints=[
+          "you can enable page numbering with `#set page(numbering: \"1\")`",
+        ])
+    }
+    let supplement = engine.introspect(page_supplement_introspection(loc, span))
+    return realize_reference(
+      self,
+      engine,
+      styles,
+      Counter::new(Page),
+      numbering,
+      supplement,
+      elem,
+    )
+  }
+  // RefForm::Normal
+
+  if BibliographyElem::has(engine, self.target(), span) {
+    if elem is Ok(elem) {
+      bail_at(
+        span,
+        "label `\{self.target().repr()}` occurs both in the document and a bibliography",
+        hints=[
+          "change either the \{elem.elem().name()}'s label or the bibliography key to resolve the ambiguity",
+        ],
+      )
+    }
+    return to_citation(self, engine, styles).pack().spanned(span)
+  }
+  let elem = match elem {
+    Ok(elem) => elem
+    Err(err) => raise SourceError([err.into_error_at(span)])
+  }
+  if FootnoteElem::of(elem) is Some(footnote) {
+    return footnote.into_ref(self.target()).pack().spanned(span)
+  }
+  // Every referenceable element (`dyn Refable`) is also outlinable.
+  let refable = match OutlinableElem::of(elem) {
+    Some(refable) => refable
+    None =>
+      if elem.elem().can("Figurable") {
+        bail_at(
+          span,
+          "cannot reference \{elem.elem().name()} directly, try putting it into a figure",
+        )
+      } else {
+        bail_at(span, "cannot reference \{elem.elem().name()}")
+      }
+  }
+  let numbering = match refable.numbering() {
+    Some(numbering) => numbering
+    None => {
+      let name = elem.elem().name()
+      let set_name = if elem.elem() == equation_elem() {
+        "math.equation"
+      } else {
+        name
+      }
+      bail_at(span, "cannot reference \{name} without numbering", hints=[
+        "you can enable \{name} numbering with `#set \{set_name}(numbering: \"1.\")`",
+      ])
+    }
+  }
+  realize_reference(
+    self,
+    engine,
+    styles,
+    refable.counter(),
+    numbering,
+    refable.supplement(),
+    elem,
+  )
+}
+
+///|
+/// Show a reference.
+fn realize_reference(
+  reference : RefElem,
+  engine : Engine,
+  styles : StyleChain,
+  counter : Counter,
+  numbering : Numbering,
+  supplement : Content,
+  elem : Content,
+) -> Content raise SourceError {
+  let span = reference.0.span()
+  let loc = elem.location().unwrap()
+  let numbers = counter.display_at(
+    engine,
+    loc,
+    styles,
+    numbering.trimmed(),
+    span,
+  )
+  let supplement = match reference.supplement(styles) {
+    Auto => supplement
+    Custom(None) => Content::empty()
+    Custom(Some(supplement)) =>
+      supplement.resolve(engine, styles, [Content(elem)])
+  }
+  let alt = {
+    let supplement = supplement.plain_text()
+    let numbering = numbers.plain_text()
+    "\{supplement} \{numbering}"
+  }
+  let mut content = numbers
+  if !supplement.is_empty() {
+    content = supplement.add(TextElem::packed("\u{a0}")).add(content)
+  }
+  content = content.spanned(span)
+  DirectLinkElem::new(loc, content, Some(alt)).pack().spanned(span)
+}

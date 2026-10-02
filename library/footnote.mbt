@@ -100,6 +100,20 @@ pub fn FootnoteElem::alt_text(styles : StyleChain, num : String) -> String {
 }
 
 ///|
+/// Creates a new footnote referencing the footnote with the specified label,
+/// with the other fields from the current footnote cloned.
+pub fn FootnoteElem::into_ref(
+  self : FootnoteElem,
+  label : Label,
+) -> FootnoteElem {
+  // Only the fields are cloned (upstream clones the unpacked element), not
+  // the span, label, location or lifecycle.
+  let fields = self.0.fields.copy()
+  fields[footnote_elem_body] = Some(FootnoteBody::Reference(label).into_value())
+  FootnoteElem(Content::from_fields(footnote_elem(), fields))
+}
+
+///|
 /// Tests if this footnote is a reference to another footnote.
 pub fn FootnoteElem::is_ref(self : FootnoteElem) -> Bool {
   self.body() is Reference(_)
