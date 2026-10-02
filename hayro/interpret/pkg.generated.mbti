@@ -130,6 +130,14 @@ pub struct Context {
 }
 pub fn Context::new(@kurbo.Affine, @kurbo.Rect, InterpreterCache, @syntax.XRef, InterpreterSettings) -> Self
 
+pub struct CoonsPatch {
+  control_points : FixedArray[@kurbo.Point]
+  colors : FixedArray[Array[Float]]
+}
+pub fn CoonsPatch::interpolate(Self, @kurbo.Point) -> Array[Float]
+pub fn CoonsPatch::map_coordinate(Self, @kurbo.Point) -> @kurbo.Point
+pub fn CoonsPatch::to_triangles(Self, Array[Triangle]) -> Unit
+
 pub(all) enum DrawMode {
   Fill(FillRule)
   Stroke(StrokeProps)
@@ -149,6 +157,36 @@ pub struct DummyDevice {
 }
 pub fn DummyDevice::new() -> Self
 pub impl Device for DummyDevice
+
+pub struct EncodedDummyShading {
+}
+
+pub struct EncodedFunctionBasedShading {
+  // private fields
+}
+
+pub struct EncodedRadialAxialShading {
+  // private fields
+}
+pub fn EncodedRadialAxialShading::as_svg_gradient(Self, EncodedShadingPattern, @kurbo.Rect, Float) -> SvgGradient?
+
+pub struct EncodedSampledShading {
+  // private fields
+}
+
+pub struct EncodedShadingPattern {
+  base_transform : @kurbo.Affine
+  shading_type : EncodedShadingType
+  // private fields
+}
+pub fn EncodedShadingPattern::sample(Self, @kurbo.Point) -> FixedArray[Float]
+
+pub enum EncodedShadingType {
+  FunctionBased(EncodedFunctionBasedShading)
+  RadialAxial(EncodedRadialAxialShading)
+  Sampled(EncodedSampledShading)
+  Dummy(EncodedDummyShading)
+}
 
 pub(all) struct FallbackFontQuery {
   mut post_script_name : String?
@@ -309,6 +347,7 @@ pub(all) struct RgbData {
 }
 
 pub(all) struct Shading {
+  shading_type : ShadingType
   color_space : ColorSpace
   clip_path : @kurbo.BezPath?
   background : Array[Float]?
@@ -316,13 +355,29 @@ pub(all) struct Shading {
 }
 pub impl CacheKey for Shading
 
+pub(all) enum ShadingFunction {
+  Single(@function.Function)
+  Multiple(Array[@function.Function])
+}
+pub fn ShadingFunction::eval(Self, Array[Float]) -> Array[Float]?
+
 pub(all) struct ShadingPattern {
   shading : Shading
   matrix : @kurbo.Affine
   opacity : Float
   transfer_function : ActiveTransferFunction?
 }
+pub fn ShadingPattern::encode(Self) -> EncodedShadingPattern
 pub impl CacheKey for ShadingPattern
+
+pub(all) enum ShadingType {
+  FunctionBased(domain~ : FixedArray[Float], matrix~ : @kurbo.Affine, function~ : ShadingFunction)
+  RadialAxial(coords~ : FixedArray[Float], domain~ : FixedArray[Float], function~ : ShadingFunction, extend~ : FixedArray[Bool], axial~ : Bool)
+  TriangleMesh(triangles~ : Array[Triangle], function~ : ShadingFunction?)
+  CoonsPatchMesh(patches~ : Array[CoonsPatch], function~ : ShadingFunction?)
+  TensorProductPatchMesh(patches~ : Array[TensorProductPatch], function~ : ShadingFunction?)
+  Dummy
+}
 
 pub struct SoftMask {
   // private fields
@@ -370,6 +425,30 @@ pub(all) struct StrokeProps {
 }
 pub impl Default for StrokeProps
 
+pub struct SvgGradient {
+  kind : SvgGradientKind
+  transform : @kurbo.Affine
+  stops : Array[SvgGradientStop]
+}
+
+pub enum SvgGradientKind {
+  Linear(start~ : @kurbo.Point, end~ : @kurbo.Point)
+  Radial(start_center~ : @kurbo.Point, start_radius~ : Float, end_center~ : @kurbo.Point, end_radius~ : Float)
+}
+
+pub struct SvgGradientStop {
+  offset : Float
+  color : FixedArray[Float]
+}
+
+pub struct TensorProductPatch {
+  control_points : FixedArray[@kurbo.Point]
+  colors : FixedArray[Array[Float]]
+}
+pub fn TensorProductPatch::interpolate(Self, @kurbo.Point) -> Array[Float]
+pub fn TensorProductPatch::map_coordinate(Self, @kurbo.Point) -> @kurbo.Point
+pub fn TensorProductPatch::to_triangles(Self, Array[Triangle]) -> Unit
+
 type TextState
 
 pub(all) struct TilingPattern {
@@ -384,6 +463,23 @@ pub impl CacheKey for TilingPattern
 
 pub struct TransferFunction(@function.Function)
 pub fn TransferFunction::apply(Self, Float) -> Float
+
+pub struct Triangle {
+  p0 : TriangleVertex
+  p1 : TriangleVertex
+  p2 : TriangleVertex
+  // private fields
+}
+pub fn Triangle::bounding_box(Self) -> @kurbo.Rect
+pub fn Triangle::contains_point(Self, @kurbo.Point) -> Bool
+pub fn Triangle::interpolate(Self, @kurbo.Point) -> Array[Float]
+pub fn Triangle::new(TriangleVertex, TriangleVertex, TriangleVertex) -> Self
+
+pub struct TriangleVertex {
+  point : @kurbo.Point
+  colors : Array[Float]
+  // private fields
+}
 
 pub struct Type3Glyph {
   // private fields

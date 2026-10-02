@@ -165,6 +165,15 @@ pub fn Rect::is_finite(self : Rect) -> Bool {
 }
 
 ///|
+/// Returns `true` if `point` lies within `self`.
+pub fn Rect::contains(self : Rect, point : Point) -> Bool {
+  point.x >= self.x0 &&
+  point.x < self.x1 &&
+  point.y >= self.y0 &&
+  point.y < self.y1
+}
+
+///|
 pub impl Default for Rect with fn default() {
   rect_zero
 }
