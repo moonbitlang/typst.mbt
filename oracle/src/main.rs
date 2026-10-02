@@ -5,7 +5,7 @@
 //! upstream results so that the MoonBit port can be checked against them
 //! without needing Rust at test time.
 //!
-//! Usage: `typst-oracle <syntax|ast|eval|html|realize|paged> <suite-dir> <out-dir>`
+//! Usage: `typst-oracle <syntax|ast|eval|html|realize|paged|svg> <suite-dir> <out-dir>`
 //! or `typst-oracle fonts <out-file>`.
 
 use std::fmt::Write as _;
@@ -22,6 +22,7 @@ mod fonts;
 mod html;
 mod paged;
 mod realize;
+mod svg;
 mod world;
 
 fn main() {
@@ -101,6 +102,21 @@ fn main() {
                 .join()
                 .unwrap();
         }
+        Some("svg") => {
+            // Paths are resolved relative to the upstream checkout.
+            let suite = PathBuf::from(&args[2]);
+            let out = std::path::absolute(PathBuf::from(&args[3])).unwrap();
+            let upstream = std::path::absolute(&suite).unwrap();
+            let root = upstream.ancestors().nth(2).unwrap().to_path_buf();
+            std::env::set_current_dir(&root).unwrap();
+            let rel = upstream.strip_prefix(&root).unwrap().to_path_buf();
+            std::thread::Builder::new()
+                .stack_size(1 << 30)
+                .spawn(move || svg::dump_svg(&rel, &out))
+                .unwrap()
+                .join()
+                .unwrap();
+        }
         Some("break") => {
             let suite = PathBuf::from(&args[2]);
             let out = PathBuf::from(&args[3]);
@@ -118,7 +134,7 @@ fn main() {
         }
         _ => {
             eprintln!(
-                "usage: typst-oracle <syntax|ast|eval|html|realize|paged|break> <suite-dir> <out-dir>\n       typst-oracle fonts <out-file>"
+                "usage: typst-oracle <syntax|ast|eval|html|realize|paged|svg|break> <suite-dir> <out-dir>\n       typst-oracle fonts <out-file>"
             );
             std::process::exit(2);
         }

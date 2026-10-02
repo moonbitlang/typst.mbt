@@ -1,6 +1,36 @@
-// Port of `typst-svg/src/image.rs`: images prepared for the web platform
-// (`WebImage`) and the CSS `image-rendering` conversion. The SVG export of
-// image frame items (`SVGRenderer::render_image`) is not ported yet.
+// Port of `typst-svg/src/image.rs`: rendering of images, images prepared
+// for the web platform (`WebImage`) and the CSS `image-rendering`
+// conversion.
+
+///|
+/// Render an image element.
+fn SVGRenderer::render_image(
+  _self : SVGRenderer,
+  svg : SvgElem,
+  state : State,
+  image : @library.Image,
+  size : @library.Axes[@library.Abs],
+) -> Unit {
+  // TODO: Images whose web preparation isn't ported (see `WebImage::new`)
+  // are written with an empty data URL.
+  let url = WebImage::new(image).to_base64_url() catch { _ => "data:," }
+  let svg = svg.elem("image")
+  if !state.transform.is_identity() {
+    svg.attr("transform", SvgTransform(state.transform)) |> ignore
+  }
+  svg.attr("xlink:href", url) |> ignore
+  svg.attr("width", size.x.to_pt()) |> ignore
+  svg.attr("height", size.y.to_pt()) |> ignore
+  svg.attr("preserveAspectRatio", "none") |> ignore
+  if convert_image_scaling(image.scaling()) is Some(value) {
+    svg.attr_with("style", attr => {
+      attr.push_str("image-rendering: ")
+      attr.push_str(value)
+    })
+    |> ignore
+  }
+  svg.end()
+}
 
 ///|
 /// Converts an image scaling to a CSS `image-rendering` property value.

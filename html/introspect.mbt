@@ -263,7 +263,10 @@ fn HtmlIntrospectorBuilder::discover_nodes(
       }
       Frame(frame) => {
         current_position.push(dom_index)
-        self.discover_frame(frame.inner, current_position)
+        let base = current_position.copy()
+        self.discover_frame(frame.inner, @library.Transform::identity(), point => {
+          @library.HtmlPosition::new(base.copy()).in_frame(point)
+        })
         current_position.pop() |> ignore
       }
     }
@@ -272,17 +275,34 @@ fn HtmlIntrospectorBuilder::discover_nodes(
 
 ///|
 /// Discovers introspectibles in a frame.
-///
-/// TODO: Upstream walks the frame's items (with their transforms): tags are
-/// discovered at `HtmlPosition::new(current_position).in_frame(point)`,
-/// groups with a parent are wrapped in an insertion, and
-/// `FrameItem::Link(Destination::Location(loc))` adds `loc` to
-/// `frame_link_targets`. Frames are placeholders without items until layout
-/// is ported.
 fn HtmlIntrospectorBuilder::discover_frame(
-  _self : HtmlIntrospectorBuilder,
-  _frame : @library.Frame,
-  _current_position : Array[Int],
+  self : HtmlIntrospectorBuilder,
+  frame : @library.Frame,
+  ts : @library.Transform,
+  to_pos : (@library.Point) -> @library.HtmlPosition,
 ) -> Unit {
-  ()
+  for entry in frame.items() {
+    let (pos, item) = entry
+    match item {
+      Tag(tag) => self.elements.discover_tag(tag, to_pos(pos.transform(ts)))
+      Group(group) => {
+        let ts = ts
+          .pre_concat(@library.Transform::translate(pos.x, pos.y))
+          .pre_concat(group.transform)
+        match group.parent {
+          Some(parent) => {
+            self.elements.start_insertion()
+            self.discover_frame(group.frame, ts, to_pos)
+            self.elements.end_insertion(parent.location)
+          }
+          None => self.discover_frame(group.frame, ts, to_pos)
+        }
+      }
+      Link(dest, _) =>
+        if dest is Location(loc) {
+          self.frame_link_targets.add(loc)
+        }
+      Text(_) | Shape(_, _) | Image(_, _, _) => ()
+    }
+  }
 }

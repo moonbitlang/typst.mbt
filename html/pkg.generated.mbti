@@ -23,9 +23,9 @@ pub fn html_document(@library.Engine, @library.Content, @library.StyleChain) -> 
 
 pub fn html_document_for_bundle(@library.Engine, @library.Content, @library.Locator, @library.StyleChain) -> HtmlDocument raise @library.SourceError
 
-pub fn html_encode(HtmlElement, pretty? : Bool) -> String raise @library.SourceError
+pub fn html_encode(HtmlElement, pretty? : Bool, link_resolver? : @library.LateLinkResolver) -> String raise @library.SourceError
 
-pub fn html_in_bundle(HtmlElement, CompleteHtmlOptions) -> String raise @library.SourceError
+pub fn html_in_bundle(HtmlElement, CompleteHtmlOptions, @library.LateLinkResolver) -> String raise @library.SourceError
 
 pub fn html_inline_fragment(@library.Engine, @library.Content, @library.SplitLocator, @library.SmartQuoter, @library.StyleChain, Whitespace) -> Array[HtmlNode] raise @library.SourceError
 

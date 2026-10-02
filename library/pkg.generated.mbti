@@ -7092,6 +7092,12 @@ pub impl FromValue for Lang
 pub impl IntoValue for Lang
 pub impl Reflect for Lang
 
+pub struct LateLinkResolver {
+  // private fields
+}
+pub fn LateLinkResolver::new(@syntax.VirtualPath?, Introspector) -> Self
+pub fn LateLinkResolver::resolve(Self, Location) -> ResolvedLink?
+
 pub struct LayoutElem(Content)
 pub fn LayoutElem::func(Self) -> Func
 pub fn LayoutElem::new(Func) -> Self

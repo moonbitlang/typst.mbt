@@ -1,5 +1,9 @@
 import {
   "moonbitlang/typst/library",
+  "moonbitlang/typst/layout",
+  "moonbitlang/typst/otf",
+  "moonbitlang/typst/xmlwriter",
   "moonbitlang/typst/codecs",
   "moonbitlang/x/codec/base64",
+  "moonbitlang/core/math",
 }

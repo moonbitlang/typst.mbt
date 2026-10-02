@@ -314,3 +314,56 @@ pub fn link_anchor_introspection(
     )
   })
 }
+
+///|
+/// Resolves location links during export.
+///
+/// This is used in paged exports. Compared to the [EarlyLinkResolver], this
+/// one can save an introspection iteration as links don't need to be fully
+/// resolved during compilation. Keeping the location link unresolved will
+/// also be useful for tagging links in PDF 2.0 (linking to an element and not
+/// just a position).
+///
+/// The downside is that links could be silently broken in a non-converging
+/// scenario where HTML would instead generate an error, so it's a bit of a
+/// trade-off and not entirely clear whether this is the best way to do it.
+pub struct LateLinkResolver {
+  priv base : @syntax.VirtualPath?
+  priv introspector : Introspector
+}
+
+///|
+/// Creates a resolver.
+///
+/// - In single-document export, `base` should be `None`.
+/// - In bundle export, `base` should be the path of the document relative to
+///   which links shall be resolved.
+pub fn LateLinkResolver::new(
+  base : @syntax.VirtualPath?,
+  introspector : Introspector,
+) -> LateLinkResolver {
+  { base, introspector, }
+}
+
+///|
+/// Resolves a link to the given location.
+pub fn LateLinkResolver::resolve(
+  self : LateLinkResolver,
+  location : Location,
+) -> ResolvedLink? {
+  let from = self.base
+  let to = self.introspector.path(location)
+  guard self.introspector.anchor(location) is Some(anchor) else { return None }
+  // See `EarlyLinkResolver::resolve` for more details.
+  match (from, to) {
+    (None, None) => Some(Local(anchor~))
+    (Some(from), Some(to)) =>
+      if from == to {
+        Some(Local(anchor~))
+      } else {
+        Some(Cross(from~, to~, anchor~))
+      }
+    (Some(_), None) => None
+    (None, Some(_)) => None
+  }
+}
