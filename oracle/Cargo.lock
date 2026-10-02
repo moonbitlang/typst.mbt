@@ -2623,6 +2623,7 @@ dependencies = [
  "serde_json",
  "sha2",
  "simplecss",
+ "svgtypes",
  "syn 2.0.98",
  "syntect",
  "ttf-parser",

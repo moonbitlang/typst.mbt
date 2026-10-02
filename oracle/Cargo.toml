@@ -67,6 +67,8 @@ unicode-bidi-mirroring = "0.4"
 unicode-properties = { version = "0.1", default-features = false, features = ["general-category"] }
 # usvg's CSS parser (gen_simplecss_tests).
 simplecss = "=0.2.2"
+# SVG attribute parsers used by usvg (gen_svgtypes_tests).
+svgtypes = "=0.16.1"
 
 # Record every shaping call Typst makes (for the `shape` stage); see
 # rustybuzz-tap/Cargo.toml.

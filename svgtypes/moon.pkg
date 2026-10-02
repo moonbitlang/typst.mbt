@@ -1,0 +1,14 @@
+import {
+  "moonbitlang/core/encoding/utf8",
+  "moonbitlang/core/math",
+  "moonbitlang/core/string",
+  "moonbitlang/typst/unicode",
+}
+
+options(
+  "native-stub": [ "sincos_stub.c" ],
+  targets: {
+    "libm_native.mbt": [ "native" ],
+    "libm_other.mbt": [ "not", "native" ],
+  },
+)
