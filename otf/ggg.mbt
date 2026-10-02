@@ -164,3 +164,6 @@ pub fn ClassDefinition::get(self : ClassDefinition, glyph : GlyphId) -> Class {
 pub impl[T] FromSlice for LazyOffsetArray16[T] with fn parse_slice(data) {
   LazyOffsetArray16::parse(data)
 }
+
+///|
+extend Coverage with FromSlice::{parse_slice}

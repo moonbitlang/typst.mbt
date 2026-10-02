@@ -70,10 +70,8 @@ pub fn GdefTable::parse(data : BytesView) -> GdefTable? {
         if format == 1 {
           let count : UInt16? = s.read_opt()
           if count is Some(count) {
-            let array : Result[LazyArray16[Offset32], _] = try? s.read_array16(
-              count,
-            )
-            if array is Ok(array) {
+            let array : LazyArray16[Offset32]? = opt(() => s.read_array16(count))
+            if array is Some(array) {
               table.mark_glyph_coverage_offsets = Some((subdata, array))
             }
           }

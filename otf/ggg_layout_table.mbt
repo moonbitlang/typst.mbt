@@ -124,7 +124,9 @@ pub fn[T : RecordListItem] RecordList::find(
   self : RecordList[T],
   tag : Tag,
 ) -> T? {
-  guard self.records.binary_search_by(record => record.tag.compare(tag))
+  guard self.records.binary_search_by(record => {
+      Compare::compare(record.tag, tag)
+    })
     is Some((_, record)) else {
     return None
   }
@@ -141,7 +143,9 @@ pub fn[T : RecordListItem] RecordList::find(
 ///|
 /// Returns RecordList value index by [`Tag`].
 pub fn[T] RecordList::index(self : RecordList[T], tag : Tag) -> UInt16? {
-  self.records.binary_search_by(record => record.tag.compare(tag)).map(p => p.0)
+  self.records
+  .binary_search_by(record => Compare::compare(record.tag, tag))
+  .map(p => p.0)
 }
 
 ///|
