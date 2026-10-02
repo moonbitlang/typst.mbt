@@ -1,7 +1,7 @@
 // Differential test runner: compares the MoonBit port against reference
 // outputs dumped by the Rust oracle (see `scripts/goldens.sh`).
 //
-// Usage: moon run tests/runner -- <syntax|ast|eval|html|realize|font> [filter] [--verbose]
+// Usage: moon run tests/runner -- <syntax|ast|eval|html|realize|paged|font> [filter] [--verbose]
 
 ///|
 let suite_dir = ".repos/typst/tests/suite"
@@ -22,6 +22,17 @@ fn main {
     "ast" => run_stage("ast", (_, tc) => ast_report(tc.body), filter, verbose)
     "eval" => run_stage("eval", eval_report, filter, verbose)
     "realize" => run_stage("realize", realize_report, filter, verbose)
+    // Like the oracle, only the tests that upstream compiles to a paged
+    // document.
+    "paged" =>
+      run_stage(
+        "paged",
+        paged_report,
+        filter,
+        verbose,
+        select=tc => is_paged(tc.attrs),
+        skip_file=text => text.has_prefix("// SKIP"),
+      )
     "font" => run_font_stage(filter, verbose)
     // Like the oracle, only tests that target HTML.
     "html" =>
@@ -42,6 +53,7 @@ fn run_stage(
   filter : String?,
   verbose : Bool,
   select? : (TestCase) -> Bool = _ => true,
+  skip_file? : (String) -> Bool = _ => false,
 ) -> Unit {
   let mut passed = 0
   let mut failed = 0
@@ -56,6 +68,9 @@ fn run_stage(
       rel.unsafe_substring(start=0, end=rel.length() - 4) +
       ".txt"
     let text = read(file)
+    if skip_file(text) {
+      continue
+    }
     let golden = split_golden(read(golden_path))
     let dump = StringBuilder()
     for tc in split_tests(text) {

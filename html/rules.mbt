@@ -673,15 +673,180 @@ fn csl_indent_rule(
 }
 
 ///|
-/// TODO: Upstream converts the table's resolved cell grid (`elem.grid`, a
-/// `CellGrid`) into `<table>` with `<thead>`/`<tbody>`/`<tfoot>` sections
-/// (`show_cellgrid`, `show_cell`); grid resolution is not ported yet.
 fn table_rule(
   elem : @library.TableElem,
   _ : @library.Engine,
-  _ : @library.StyleChain,
+  styles : @library.StyleChain,
 ) -> @library.Content raise @library.SourceError {
-  unported(elem, "the resolved `CellGrid`")
+  let grid = elem.grid().unwrap()
+  show_cellgrid(grid, styles, elem.pack().span())
+}
+
+///|
+fn show_cellgrid(
+  grid : @library.CellGrid,
+  styles : @library.StyleChain,
+  span : @syntax.Span,
+) -> @library.Content {
+  let elem = (tag : @library.HtmlTag, body : @library.Content) => {
+    html_elem(tag, body).pack().spanned(span)
+  }
+  let columns = grid.non_gutter_column_count()
+  let rows : Array[ArrayView[@library.Entry]] = []
+  for i = 0; i < grid.entries.length(); i = i + columns {
+    let end = if i + columns < grid.entries.length() {
+      i + columns
+    } else {
+      grid.entries.length()
+    }
+    rows.push(grid.entries[i:end])
+  }
+  let tr = (tag : @library.HtmlTag, row : ArrayView[@library.Entry]) => {
+    let row = row
+      .iter()
+      .filter_map(entry => entry.as_cell())
+      .map(cell => show_cell(tag, cell, styles))
+      .to_array()
+    elem(@library.tag_tr, @library.Content::sequence(row))
+  }
+
+  // TODO(subfooters): similarly to headers, take consecutive footers from
+  // the end for 'tfoot'.
+  let footer = grid.footer.map(ft => {
+    // Convert from gutter to non-gutter coordinates. Use ceil as it might
+    // include the previous gutter row
+    // (cf. typst-library/layout/grid/resolve.rs).
+    let footer_start = if grid.has_gutter {
+      (ft.inner.start + 1) / 2
+    } else {
+      ft.inner.start
+    }
+    let drained = drain_from(rows, footer_start)
+    elem(
+      @library.tag_tfoot,
+      @library.Content::sequence(drained.map(row => tr(@library.tag_td, row))),
+    )
+  })
+
+  // Header range converting from gutter (doubled) to non-gutter coordinates.
+  let header_range = (hd : @library.Repeatable[@library.Header]) => {
+    let range = hd.inner.range
+    if grid.has_gutter {
+      // Use ceil as it might be `2 * row_amount - 1` if the header is at
+      // the end (cf. typst-library/layout/grid/resolve.rs).
+      @library.RowRange::{ start: range.start / 2, end: (range.end + 1) / 2, }
+    } else {
+      range
+    }
+  }
+
+  // Store all consecutive headers at the start in 'thead'. All remaining
+  // headers are just 'th' rows across the table body.
+  let mut consecutive_header_end = 0
+  let mut first_mid_table_header = 0
+  for hd in grid.headers {
+    let range = header_range(hd)
+    let is_consecutive = range.start == consecutive_header_end
+    consecutive_header_end = range.end
+    if !is_consecutive {
+      break
+    }
+    first_mid_table_header += 1
+  }
+  let (y_offset, header, rows) = if first_mid_table_header > 0 {
+    let removed_header_rows = header_range(
+        grid.headers[first_mid_table_header - 1],
+      ).end
+    let rest = drain_from(rows, removed_header_rows)
+    (
+      removed_header_rows,
+      Some(
+        elem(
+          @library.tag_thead,
+          @library.Content::sequence(rows.map(row => tr(@library.tag_th, row))),
+        ),
+      ),
+      rest,
+    )
+  } else {
+    (0, None, rows)
+  }
+
+  // TODO: Consider improving accessibility properties of multi-level headers
+  // inside tables in the future, e.g. indicating which columns they are
+  // relative to and so on. See also:
+  // https://www.w3.org/WAI/tutorials/tables/multi-level/
+  let mut next_header = first_mid_table_header
+  let body_rows = []
+  for relative_y, row in rows {
+    let y = relative_y + y_offset
+    let current_header_range = grid.headers
+      .get(next_header)
+      .map(h => header_range(h))
+    if current_header_range is Some(range) && range.contains(y) {
+      if y + 1 == range.end {
+        next_header += 1
+      }
+      body_rows.push(tr(@library.tag_th, row))
+    } else {
+      body_rows.push(tr(@library.tag_td, row))
+    }
+  }
+  let mut body = @library.Content::sequence(body_rows)
+  if header is Some(_) || footer is Some(_) {
+    body = elem(@library.tag_tbody, body)
+  }
+  let content = []
+  if header is Some(header) {
+    content.push(header)
+  }
+  content.push(body)
+  if footer is Some(footer) {
+    content.push(footer)
+  }
+  block_packed(elem(@library.tag_table, @library.Content::sequence(content)))
+}
+
+///|
+/// Removes and returns the elements from `at` on (upstream `drain(at..)`).
+fn[T] drain_from(rows : Array[T], at : Int) -> Array[T] {
+  let tail = []
+  for i in at..<rows.length() {
+    tail.push(rows[i])
+  }
+  while rows.length() > at {
+    rows.pop() |> ignore
+  }
+  tail
+}
+
+///|
+fn show_cell(
+  tag : @library.HtmlTag,
+  cell : @library.Cell,
+  styles : @library.StyleChain,
+) -> @library.Content {
+  let cell = cell.body
+  guard @library.TableCell::of(cell) is Some(cell) else { return cell }
+  let attrs = @library.HtmlAttrs::new()
+  let span = (n : @library.NonZeroUSize) => {
+    if n.get() != 1L {
+      Some(n.get().to_string())
+    } else {
+      None
+    }
+  }
+  if span(cell.colspan(styles)) is Some(colspan) {
+    attrs.push(@library.attr_colspan, colspan)
+  }
+  if span(cell.rowspan(styles)) is Some(rowspan) {
+    attrs.push(@library.attr_rowspan, rowspan)
+  }
+  @library.HtmlElem::new(tag)
+  .with_body(Some(cell.pack()))
+  .with_attrs(attrs)
+  .pack()
+  .spanned(cell.pack().span())
 }
 
 ///|
@@ -821,17 +986,72 @@ fn raw_line_rule(
 }
 
 ///|
-/// TODO: Upstream decodes the image (`ImageElem::decode`) and embeds it as a
-/// base64 data URL (`typst_svg::WebImage`) in an `<img>` with `alt`,
-/// `width`, `height` attributes and CSS sizing; image decoding is not ported
-/// yet.
 // Also check `PATCHED_IMAGE_RULE` in `docs/src/main.rs` when editing this.
 fn image_rule(
   elem : @library.ImageElem,
-  _ : @library.Engine,
-  _ : @library.StyleChain,
+  engine : @library.Engine,
+  styles : @library.StyleChain,
 ) -> @library.Content raise @library.SourceError {
-  unported(elem, "`ImageElem::decode`")
+  let span = elem.into_content().span()
+  let image = elem.decode(engine, styles)
+  let attrs = @library.HtmlAttrs::new()
+  let src = @library.at(span, () => {
+    @svg.WebImage::new(image).to_base64_url() catch {
+      @svg.WebImageError(msg) => @library.bail(msg)
+    }
+  })
+  attrs.push(@library.attr_src, src)
+  if elem.alt(styles) is Some(alt) {
+    attrs.push(@library.attr_alt, alt)
+  }
+
+  // The `width` and `height` properties on the HTML element are only used to
+  // reserve space while the browser is fetching. They are integers. Still, in
+  // case of fractional image sizes, rounding is better than nothing and will
+  // not disrupt the aspect ratio of the final image.
+  let cast = (v : Double) => saturating_i64(@library.rust_round(v)).to_string()
+  attrs.push(@library.attr_width, cast(image.width()))
+  attrs.push(@library.attr_height, cast(image.height()))
+  let css = @library.CssProperties::build(engine.binding_guard(span).emit)
+
+  // TODO: Exclude in semantic profile.
+  if @svg.convert_image_scaling(image.scaling()) is Some(value) {
+    css.push("image-rendering", value)
+  }
+
+  // TODO: Exclude in semantic profile?
+  match elem.width(styles) {
+    Auto => ()
+    Custom(rel) => css.push("width", rel)
+  }
+
+  // TODO: Exclude in semantic profile?
+  match elem.height(styles) {
+    Auto => ()
+    Rel(rel) => css.push("height", rel)
+    Fr(_) => ()
+  }
+  block_packed(
+    @library.HtmlElem::new(@library.tag_img)
+    .with_attrs(attrs)
+    .with_css(css.finish())
+    .pack()
+    .spanned(span),
+  )
+}
+
+///|
+/// Rust's `f64::saturating_as::<i64>()` (NaN becomes zero).
+fn saturating_i64(v : Double) -> Int64 {
+  if v.is_nan() {
+    0L
+  } else if v >= 9223372036854775807.0 {
+    9223372036854775807L
+  } else if v <= -9223372036854775808.0 {
+    -9223372036854775808L
+  } else {
+    v.to_int64()
+  }
 }
 
 ///|

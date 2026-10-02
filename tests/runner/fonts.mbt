@@ -1,48 +1,9 @@
 // The fonts of the test world, in the order of upstream's
 // `typst_assets::fonts().chain(typst_dev_assets::fonts())` (see
-// `oracle/src/world.rs`). The bytes are read from the cargo git checkouts of
-// the pinned typst-assets / typst-dev-assets revisions.
-
-///|
-/// `typst-assets` fonts (`typst_assets::fonts()`), relative to its `files/`.
-let typst_assets_fonts : Array[String] = [
-  "fonts/LibertinusSerif-Regular.otf", "fonts/LibertinusSerif-Bold.otf", "fonts/LibertinusSerif-Italic.otf",
-  "fonts/LibertinusSerif-BoldItalic.otf", "fonts/LibertinusSerif-Semibold.otf", "fonts/LibertinusSerif-SemiboldItalic.otf",
-  "fonts/NewCMMath-Bold.otf", "fonts/NewCMMath-Book.otf", "fonts/NewCMMath-Regular.otf",
-  "fonts/NewCM10-Regular.otf", "fonts/NewCM10-Bold.otf", "fonts/NewCM10-Italic.otf",
-  "fonts/NewCM10-BoldItalic.otf", "fonts/DejaVuSansMono-Bold.ttf", "fonts/DejaVuSansMono-BoldOblique.ttf",
-  "fonts/DejaVuSansMono-Oblique.ttf", "fonts/DejaVuSansMono.ttf",
-]
-
-///|
-/// `typst-dev-assets` fonts (`typst_dev_assets::fonts()`, i.e. the `FILES`
-/// entries starting with `fonts`), relative to its `files/`.
-let typst_dev_assets_fonts : Array[String] = [
-  "fonts/Asana-Math.otf", "fonts/Cantarell-VF.otf", "fonts/CascadiaCode-Regular.ttf",
-  "fonts/CascadiaMono-Bold.ttf", "fonts/CascadiaMono-Regular.ttf", "fonts/Concrete-Math.otf",
-  "fonts/DejaVuSans-Oblique.ttf", "fonts/DejaVuSans.ttf", "fonts/Fraunces-Italic[SOFT,WONK,opsz,wght].ttf",
-  "fonts/Fraunces[SOFT,WONK,opsz,wght].ttf", "fonts/Garamond-Math.otf", "fonts/HKGrotesk-BlackItalic.ttf",
-  "fonts/HKGrotesk-Bold.ttf", "fonts/HKGrotesk-BoldItalic.ttf", "fonts/HKGrotesk-ExtraBold.ttf",
-  "fonts/HKGrotesk-ExtraBoldItalic.ttf", "fonts/HKGrotesk-ExtraLight.ttf", "fonts/HKGrotesk-ExtraLightItalic.ttf",
-  "fonts/HKGrotesk-Italic.ttf", "fonts/HKGrotesk-Light.ttf", "fonts/HKGrotesk-LightItalic.ttf",
-  "fonts/HKGrotesk-Medium.ttf", "fonts/HKGrotesk-MediumItalic.ttf", "fonts/HKGrotesk-Regular.ttf",
-  "fonts/HKGrotesk-SemiBold.ttf", "fonts/HKGrotesk-SemiBoldItalic.ttf", "fonts/HKGrotesk-Thin.ttf",
-  "fonts/IBMPlexMath-Regular.otf", "fonts/IBMPlexSans-Bold.ttf", "fonts/IBMPlexSans-Light.ttf",
-  "fonts/IBMPlexSans-Medium.ttf", "fonts/IBMPlexSans-Regular.ttf", "fonts/IBMPlexSansCondensed-Regular.ttf",
-  "fonts/IBMPlexSansDevanagari-Regular.ttf", "fonts/IBMPlexSerif-Regular.ttf", "fonts/InriaSerif-Bold.ttf",
-  "fonts/InriaSerif-BoldItalic.ttf", "fonts/InriaSerif-Italic.ttf", "fonts/InriaSerif-Regular.ttf",
-  "fonts/LibertinusMath-Regular.otf", "fonts/MonaSansVF[wdth,wght,opsz,ital].ttf",
-  "fonts/NotoColorEmoji-Regular-CBDT.subset.ttf", "fonts/NotoColorEmoji-Regular-COLR.subset.ttf",
-  "fonts/NotoSans-Regular.ttf", "fonts/NotoSansArabic-Regular.ttf", "fonts/NotoSansMath-Regular.ttf",
-  "fonts/NotoSansSymbols2-Regular.ttf", "fonts/NotoSansThai-Regular.ttf", "fonts/NotoSerifCJKjp-Regular.otf",
-  "fonts/NotoSerifCJKkr-Regular.otf", "fonts/NotoSerifCJKsc-Bold.otf", "fonts/NotoSerifCJKsc-Regular.otf",
-  "fonts/NotoSerifCJKtc-Bold.otf", "fonts/NotoSerifCJKtc-Regular.otf", "fonts/NotoSerifHebrew-Bold.ttf",
-  "fonts/NotoSerifHebrew-Regular.ttf", "fonts/PTSans-Regular.ttf", "fonts/PennstanderMath-Regular.otf",
-  "fonts/Roboto-Regular.ttf", "fonts/RobotoFlex-VariableFont_GRAD,XOPQ,XTRA,YOPQ,YTAS,YTDE,YTFI,YTLC,YTUC,opsz,slnt,wdth,wght.ttf",
-  "fonts/STIXTwoMath-Regular.otf", "fonts/SourceSerif4-Regular.otf", "fonts/SourceSerif4Variable-Italic.otf",
-  "fonts/SourceSerif4Variable-Roman.otf", "fonts/TwitterColorEmoji.ttf", "fonts/Ubuntu-Regular.ttf",
-  "fonts/XITSMath-Regular.otf", "fonts/texgyrebonum-math.otf",
-]
+// `oracle/src/world.rs`), as recorded in the font manifest
+// `tests/golden/fonts.json` (written by `scripts/goldens.sh fonts`). The
+// bytes are read from the cargo git checkouts of the pinned typst-assets /
+// typst-dev-assets revisions.
 
 ///|
 /// The `files/` directory of a cargo git checkout whose name starts with
@@ -65,19 +26,34 @@ fn cargo_checkout_files(prefix : String) -> String {
 }
 
 ///|
-/// The raw data of all test-world font files, in order.
+/// The font files of the test world (`source/path` and data), in order.
+/// Collections appear once; their faces are split by the caller.
 fn test_font_files() -> Array[(String, Bytes)] {
   match test_font_files_cell.val {
     Some(files) => files
     None => {
       let files = []
-      let assets = cargo_checkout_files("typst-assets-")
-      for path in typst_assets_fonts {
-        files.push((path, read_bytes(assets + "/" + path)))
+      let manifest = @json.parse(read(golden_dir + "/fonts.json")) catch {
+        _ => abort("cannot parse \{golden_dir}/fonts.json")
       }
+      guard manifest is Object(obj) && obj.get("fonts") is Some(Array(fonts)) else {
+        abort("malformed font manifest")
+      }
+      let assets = cargo_checkout_files("typst-assets-")
       let dev = cargo_checkout_files("typst-dev-assets-")
-      for path in typst_dev_assets_fonts {
-        files.push((path, read_bytes(dev + "/" + path)))
+      for entry in fonts {
+        guard entry is Object(e) &&
+          e.get("source") is Some(String(source)) &&
+          e.get("path") is Some(String(path)) &&
+          e.get("face") is Some(Number(face, ..)) else {
+          abort("malformed font manifest entry")
+        }
+        // Only the first face of a collection introduces the file.
+        if face != 0.0 {
+          continue
+        }
+        let root = if source == "typst-assets" { assets } else { dev }
+        files.push((source + "/" + path, read_bytes(root + "/" + path)))
       }
       test_font_files_cell.val = Some(files)
       files

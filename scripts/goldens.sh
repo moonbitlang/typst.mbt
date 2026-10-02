@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 # Regenerate reference outputs from upstream Typst (needs Rust).
-# Usage: scripts/goldens.sh [syntax|ast|eval|html|realize|font ...]
+# Usage: scripts/goldens.sh [syntax|ast|eval|html|realize|fonts|font|paged ...]
+#
+# `fonts` writes the font manifest of the test world (tests/golden/fonts.json);
+# `font` dumps what ttf-parser reports for every face (oracle/src/font.rs);
+# `paged` dumps every paged test in the `typst-frame-v1` format (see
+# oracle/src/paged.rs).
 set -euo pipefail
 cd "$(dirname "$0")/.."
 # Build from inside oracle/ so that its rust-toolchain.toml applies.
@@ -8,8 +13,12 @@ cd "$(dirname "$0")/.."
 ORACLE=oracle/target/release/typst-oracle
 SUITE=.repos/typst/tests/suite
 stages=("$@")
-[ ${#stages[@]} -eq 0 ] && stages=(syntax ast eval html realize)
+[ ${#stages[@]} -eq 0 ] && stages=(syntax ast eval html realize fonts font paged)
 for stage in "${stages[@]}"; do
+  if [ "$stage" = fonts ]; then
+    "$ORACLE" fonts tests/golden/fonts.json
+    continue
+  fi
   rm -rf "tests/golden/$stage"
   "$ORACLE" "$stage" "$SUITE" "tests/golden/$stage"
 done

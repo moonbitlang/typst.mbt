@@ -10,7 +10,7 @@
 | P1 syntax (reparser, highlight) | todo | |
 | P2 eval (typst-eval) | **done** | VM, closures, imports, rules, math; `eval` stage runs end to end |
 | P2 library (value level) | **done** | 3753/3792 `eval` stage cases identical (2026-10-02). Remaining 39 need later phases: `layout`/`measure` (layout), plugins (WASM, out of scope), font warnings (fonts), bibliography/CSL (hayagriva), auto-sized tilings (layout) |
-| P3 realize + introspection + HTML export | in progress | `realize` stage 3628/3792; `html` stage 452/508 (2026-10-02). Remaining html: ref (19), tables/CellGrid (10), frames via layout (7), bibliography (7), image decoding (5), outline (5), measure (2), raw highlighting (1) |
+| P3 realize + introspection + HTML export | in progress | `realize` stage 3666/3792; `html` stage 475/508 (2026-10-02). Remaining html: bibliography (hayagriva port in progress), frames via layout, measure, raw highlighting, PDF images |
 
 Run `scripts/upstream.sh && scripts/goldens.sh && moon run tests/runner --target native -- syntax`
 (and `-- ast`, `-- eval`). `python3 scripts/classify.py eval 60` buckets the
@@ -53,7 +53,7 @@ hidden cost:
 | codex | symbol tables (`sym.arrow.r`…) | generate from upstream data |
 | regex | `regex()` type, show-rule selectors | `moonbitlang/regexp` (check its syntax coverage against Rust `regex`) |
 | serde_json / yaml / toml / csv / roxmltree / ciborium | `json()` / `yaml()` … loading | core `json`, `moonbit-community/toml`, `yaml` (only a subset, so it may need work), XML from `ooxml`, write csv/cbor |
-| png / image / jpeg-decoder | images | PNG: pdflite; JPEG: header-only + DCT passthrough to PDF; GIF/WebP later |
+| png / image / jpeg-decoder | images | `codecs/` package: PNG decode/encode (byte-identical with upstream), JPEG/GIF/WebP headers + EXIF; JPEG/GIF/WebP pixel decoding and PDF images (hayro) still TODO |
 | usvg / resvg | SVG images | later; P9 |
 | hayagriva + citationberg | bibliography / CSL | **defer** (very large); P9 |
 | syntect + two-face | raw code highlighting | **defer**; plain raw first, then a small TextMate-grammar engine |

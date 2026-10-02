@@ -913,7 +913,7 @@ fn handle_table(
 ///|
 /// Upstream `handle_text` (renamed; `convert.mbt` has its own).
 fn handle_math_text(
-  item : @library.TextItem,
+  item : @library.MathTextItem,
   ctx : MathContext,
   props : @library.MathProperties,
   position : NodePosition,

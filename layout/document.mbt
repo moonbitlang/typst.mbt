@@ -1,0 +1,127 @@
+// Port of `typst-layout/src/document.rs`.
+
+///|
+/// A finished document with metadata and page frames.
+pub struct PagedDocument {
+  priv pages : Array[Page]
+  priv info : @library.DocumentInfo
+  priv options : @library.DocumentFormatOptions
+  priv introspector : @library.Introspector
+}
+
+///|
+/// Creates a new paged document from its parts.
+///
+/// Internally builds the introspector.
+///
+/// TODO(introspect): upstream builds a `PagedIntrospector` from the pages;
+/// until `introspect.rs` is ported, the document has an empty introspector.
+pub fn PagedDocument::new(
+  pages : Array[Page],
+  info : @library.DocumentInfo,
+  options : @library.DocumentFormatOptions,
+) -> PagedDocument {
+  { pages, info, options, introspector: @library.Introspector::empty(), }
+}
+
+///|
+/// The document's finished pages.
+pub fn PagedDocument::pages(self : PagedDocument) -> ArrayView[Page] {
+  self.pages[:]
+}
+
+///|
+/// Details about the document.
+pub fn PagedDocument::info(self : PagedDocument) -> @library.DocumentInfo {
+  self.info
+}
+
+///|
+/// Details about the document, mutably (upstream `info_mut`; the document
+/// info is a mutable object).
+pub fn PagedDocument::info_mut(self : PagedDocument) -> @library.DocumentInfo {
+  self.info
+}
+
+///|
+/// The format options set by the document.
+pub fn PagedDocument::options(
+  self : PagedDocument,
+) -> @library.DocumentFormatOptions {
+  self.options
+}
+
+///|
+/// Provides the ability to execute queries on the document.
+pub fn PagedDocument::introspector(
+  self : PagedDocument,
+) -> @library.Introspector {
+  self.introspector
+}
+
+///|
+pub impl @library.Output for PagedDocument with fn introspector(self) {
+  self.introspector
+}
+
+///|
+pub impl @library.Output for PagedDocument with fn target() {
+  Paged
+}
+
+///|
+pub impl @library.Output for PagedDocument with fn create(
+  engine,
+  content,
+  styles,
+) {
+  layout_document(engine, content, styles)
+}
+
+///|
+/// A finished page.
+pub(all) struct Page {
+  /// The frame that defines the page.
+  frame : @library.Frame
+  /// The bleed amount to be added on each side of the page. The bleed is not
+  /// included in frame.
+  bleed : @library.Sides[@library.Abs]
+  /// How the page is filled.
+  ///
+  /// - When `None`, the background is transparent.
+  /// - When `Auto`, the background is transparent for PDF and white for
+  ///   raster and SVG targets.
+  ///
+  /// Exporters should access the resolved value of this property through
+  /// `fill_or_transparent()` or `fill_or_white()`.
+  fill : @library.Smart[@library.Paint?]
+  /// The page's numbering.
+  numbering : @library.Numbering?
+  /// The page's supplement.
+  supplement : @library.Content
+  /// The logical page number (controlled by `counter(page)` and may thus not
+  /// match the physical number).
+  number : UInt64
+}
+
+///|
+/// Get the configured background or `None` if it is `Auto`.
+///
+/// This is used in PDF export.
+pub fn Page::fill_or_transparent(self : Page) -> @library.Paint? {
+  match self.fill {
+    Auto => None
+    Custom(fill) => fill
+  }
+}
+
+///|
+/// Get the configured background or white if it is `Auto`.
+///
+/// This is used in raster and SVG export.
+pub fn Page::fill_or_white(self : Page) -> @library.Paint? {
+  match self.fill {
+    Auto => Some(Solid(@library.color_white))
+    Custom(fill) => fill
+  }
+}

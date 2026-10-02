@@ -1,32 +1,4 @@
-// Port of `typst-library/src/introspection/position.rs` (and the minimal
-// `Point` of `typst-library/src/layout/point.rs` it needs).
-
-///|
-/// A point in 2D (upstream `layout::Point`; minimal port).
-pub(all) struct Point {
-  /// The x coordinate.
-  x : Abs
-  /// The y coordinate.
-  y : Abs
-} derive(Eq, Hash, Default)
-
-///|
-/// Create a new point from x and y coordinates.
-pub fn Point::new(x : Abs, y : Abs) -> Point {
-  { x, y, }
-}
-
-///|
-/// The origin point.
-pub fn Point::zero() -> Point {
-  { x: Abs::zero(), y: Abs::zero(), }
-}
-
-///|
-pub impl Fingerprint for Point with fn fingerprint(self, state) {
-  state.write_f64(self.x.to_pt())
-  state.write_f64(self.y.to_pt())
-}
+// Port of `typst-library/src/introspection/position.rs`.
 
 ///|
 /// A position in a document.

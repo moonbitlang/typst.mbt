@@ -1,5 +1,67 @@
-// Port of `typst-library/src/visualize/shape.rs` (element field types and
-// `#[parse]` hooks; shape geometry is a layout concern).
+// Port of `typst-library/src/visualize/shape.rs`: element field types,
+// `#[parse]` hooks and the `Shape`/`Geometry` frame items (without the
+// kurbo-based bounding boxes).
+
+///|
+/// A geometric shape with optional fill and stroke.
+pub(all) struct Shape {
+  /// The shape's geometry.
+  geometry : Geometry
+  /// The shape's background fill.
+  fill : Paint?
+  /// The shape's fill rule.
+  fill_rule : FillRule
+  /// The shape's border stroke.
+  stroke : FixedStroke?
+} derive(Eq)
+
+///|
+/// A shape's geometry.
+pub(all) enum Geometry {
+  /// A line to a point (relative to its position).
+  Line(Point)
+  /// A rectangle with its origin in the topleft corner.
+  Rect(Axes[Abs])
+  /// A curve consisting of movements, lines, and Bézier segments.
+  Curve(Curve)
+} derive(Eq)
+
+///|
+/// Fill the geometry without a stroke.
+pub fn Geometry::filled(self : Geometry, fill : Paint) -> Shape {
+  {
+    geometry: self,
+    fill: Some(fill),
+    fill_rule: FillRule::default(),
+    stroke: None,
+  }
+}
+
+///|
+/// Stroke the geometry without a fill.
+pub fn Geometry::stroked(self : Geometry, stroke : FixedStroke) -> Shape {
+  {
+    geometry: self,
+    fill: None,
+    fill_rule: FillRule::default(),
+    stroke: Some(stroke),
+  }
+}
+
+///|
+/// Set the geometry's background fill and stroke.
+pub fn Geometry::filled_and_stroked(
+  self : Geometry,
+  fill : Paint,
+  stroke : FixedStroke,
+) -> Shape {
+  {
+    geometry: self,
+    fill: Some(fill),
+    fill_rule: FillRule::default(),
+    stroke: Some(stroke),
+  }
+}
 
 ///|
 /// A path filling rule.

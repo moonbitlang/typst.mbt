@@ -73,6 +73,44 @@ pub fn Stroke::resolve(self : Stroke, styles : StyleChain) -> ResolvedStroke {
 }
 
 ///|
+/// Upstream `Fold for Stroke<T>` at `T = Abs`.
+pub impl Fold for ResolvedStroke with fn fold(self, outer) {
+  {
+    paint: self.paint.or_(outer.paint),
+    thickness: self.thickness.or_(outer.thickness),
+    cap: self.cap.or_(outer.cap),
+    join: self.join.or_(outer.join),
+    dash: self.dash.or_(outer.dash),
+    miter_limit: self.miter_limit.or_(outer.miter_limit),
+  }
+}
+
+///|
+/// Convert back to a stroke with (already resolved) lengths (upstream
+/// `Stroke<Abs>::map(Length::from)`).
+pub fn ResolvedStroke::to_length_stroke(self : ResolvedStroke) -> Stroke {
+  {
+    paint: self.paint,
+    thickness: self.thickness.map(Length::from_abs),
+    cap: self.cap,
+    join: self.join,
+    dash: self.dash.map(dash => {
+      dash.map(dash => {
+        array: dash.array.map(l => {
+          match l {
+            ResolvedDashLength::LineWidth => DashLength::LineWidth
+            ResolvedDashLength::Length(l) =>
+              DashLength::Length(Length::from_abs(l))
+          }
+        }),
+        phase: Length::from_abs(dash.phase),
+      })
+    }),
+    miter_limit: self.miter_limit,
+  }
+}
+
+///|
 /// Unpack the stroke, filling missing fields from the `default`.
 pub fn ResolvedStroke::unwrap_or(
   self : ResolvedStroke,
