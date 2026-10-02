@@ -240,7 +240,13 @@ pub impl Fold for TextSize with fn fold(self, outer) {
 ///|
 /// Upstream `Resolve for TextSize`.
 pub fn TextSize::resolve(self : TextSize, styles : StyleChain) -> Abs {
-  self.0.resolve(styles)
+  let factor = match EquationElem::size_in(styles) {
+    Display | Text => 1.0
+    Script => EquationElem::script_scale_in(styles).0.0.to_double() / 100.0
+    ScriptScript =>
+      EquationElem::script_scale_in(styles).1.0.to_double() / 100.0
+  }
+  self.0.resolve(styles).times(factor)
 }
 
 ///|
@@ -1070,4 +1076,11 @@ pub impl IntoValue for Never with fn into_value(self) {
 ///|
 pub impl FromValue for Never with fn from_value(v) {
   raise HintedError(Never::input().error(v))
+}
+
+///|
+/// Default of `TextElem::fill` (upstream
+/// `#[default(Color::BLACK.into())]`).
+fn text_elem_fill_default() -> Value {
+  Paint::Solid(color_black).into_value()
 }

@@ -337,3 +337,22 @@ pub impl FromValue for AugmentOffsets with fn from_value(v) {
     v => raise HintedError(AugmentOffsets::input().error(v))
   }
 }
+
+///|
+/// Augmentation parameters whose stroke lengths have been resolved (upstream
+/// `Augment<Abs>`).
+pub(all) struct ResolvedAugment {
+  hline : AugmentOffsets
+  vline : AugmentOffsets
+  stroke : Smart[ResolvedStroke]
+} derive(Eq)
+
+///|
+/// Upstream `Resolve for Augment`.
+pub fn Augment::resolve(self : Augment, styles : StyleChain) -> ResolvedAugment {
+  {
+    hline: self.hline,
+    vline: self.vline,
+    stroke: self.stroke.map(s => s.resolve(styles)),
+  }
+}

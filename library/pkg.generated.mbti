@@ -25,6 +25,8 @@ pub let accent_elem_dotless : Int
 
 pub let accent_elem_size : Int
 
+pub let accent_short_fall : Em
+
 pub fn add(Value, Value) -> Value raise HintedError
 
 pub fn align_elem() -> Element
@@ -807,6 +809,8 @@ pub let decimal_zero : Decimal
 
 pub fn default_formats() -> Array[Format]
 
+pub let delim_short_fall : Em
+
 pub fn determine_format_from_path(@syntax.VirtualPath) -> ImageFormat?
 
 pub fn direct_link_elem() -> Element
@@ -1054,6 +1058,8 @@ pub let frac_elem_num : Int
 pub let frac_elem_num_deparenthesized : Int
 
 pub let frac_elem_style : Int
+
+pub let frac_padding : Em
 
 pub fn frame_elem() -> Element
 
@@ -2323,6 +2329,8 @@ pub fn pretty_array_like(ArrayView[String], Bool) -> String
 
 pub fn pretty_comma_list(ArrayView[String], Bool) -> String
 
+pub let prime_char : Char
+
 pub fn primes_elem() -> Element
 
 pub let primes_elem_count : Int
@@ -2426,6 +2434,8 @@ pub fn repr_rooted_path(@syntax.RootedPath) -> String
 pub fn repr_str(String) -> String
 
 pub fn resolve_color_space(Smart[ColorSpace], Array[Color]) -> ColorSpace
+
+pub fn resolve_equation(EquationElem, Engine, Locator, StyleChain) -> MathItem raise SourceError
 
 pub fn root_elem() -> Element
 
@@ -2586,6 +2596,20 @@ pub fn strong_elem() -> Element
 pub let strong_elem_body : Int
 
 pub let strong_elem_delta : Int
+
+pub fn style_cramped() -> Style
+
+pub fn style_dtls() -> Style
+
+pub fn style_flac() -> Style
+
+pub fn style_for_denominator(StyleChain) -> Styles
+
+pub fn style_for_numerator(StyleChain) -> Style
+
+pub fn style_for_subscript(StyleChain) -> Styles
+
+pub fn style_for_superscript(StyleChain) -> Style
 
 pub fn styled_elem() -> Element
 
@@ -3117,6 +3141,8 @@ pub let title_elem_body : Int
 
 pub fn[T : ToCss] to_css(T, sink? : (HintedString) -> Unit) -> String
 
+pub fn to_style(Char, MathStyle) -> String
+
 pub fn[T] trace((@syntax.DiagSpan) -> (Int, Int)?, () -> Tracepoint, @syntax.Span, () -> T raise SourceError) -> T raise SourceError
 
 pub let typst_version : (Int, Int, Int)
@@ -3285,6 +3311,7 @@ pub(all) enum AbsUnit {
 
 pub(all) struct Accent(Char) derive(Eq, Hash, @debug.Debug)
 pub fn Accent::combining(String) -> Self?
+pub fn Accent::is_bottom(Self) -> Bool
 pub fn Accent::normalize(String) -> Self?
 pub impl FromValue for Accent
 pub impl IntoValue for Accent
@@ -3309,6 +3336,15 @@ pub fn AccentElem::with_base(Self, Content) -> Self
 pub fn AccentElem::with_dotless(Self, Bool) -> Self
 pub fn AccentElem::with_size(Self, Rel[Length]) -> Self
 pub impl NativeElement for AccentElem
+
+pub struct AccentItem {
+  base : MathItem
+  accent : MathItem
+  position : MathPosition
+  dotless : Bool
+  exact_frame_width : Bool
+}
+pub fn AccentItem::create(MathItem, MathItem, MathPosition, Bool, Bool, StyleChain) -> MathItem
 
 pub(all) enum Accessibility {
   UA1
@@ -3335,6 +3371,14 @@ pub fn AlignPointElem::new() -> Self
 pub fn AlignPointElem::of(Content) -> Self?
 pub fn AlignPointElem::pack(Self) -> Content
 pub impl NativeElement for AlignPointElem
+
+pub struct AlignedRow(Array[MathItem])
+pub fn AlignedRow::get(Self, Int) -> MathItem?
+pub fn AlignedRow::is_empty(Self) -> Bool
+pub fn AlignedRow::items(Self) -> Array[MathItem]
+pub fn AlignedRow::iter(Self) -> Iter[MathItem]
+pub fn AlignedRow::len(Self) -> Int
+pub fn AlignedRow::new(Array[MathItem]) -> Self
 
 pub(all) enum Alignment {
   H(HAlignment)
@@ -3580,6 +3624,7 @@ pub(all) struct Augment {
   vline : AugmentOffsets
   stroke : Smart[Stroke]
 } derive(Eq)
+pub fn Augment::resolve(Self, StyleChain) -> ResolvedAugment
 pub impl Default for Augment
 pub impl Fold for Augment
 pub impl FromValue for Augment
@@ -3881,6 +3926,12 @@ pub fn BoxElem::with_stroke(Self, Sides[Stroke??]) -> Self
 pub fn BoxElem::with_width(Self, Sizing) -> Self
 pub impl NativeElement for BoxElem
 
+pub struct BoxItem {
+  elem : BoxElem
+  locator : Locator
+}
+pub fn BoxItem::create(BoxElem, StyleChain, Locator) -> MathItem
+
 pub struct BundleFormat(Content)
 pub fn BundleFormat::new() -> Self
 pub fn BundleFormat::of(Content) -> Self?
@@ -3953,6 +4004,17 @@ pub fn CancelElem::with_inverted(Self, Bool) -> Self
 pub fn CancelElem::with_length(Self, Rel[Length]) -> Self
 pub fn CancelElem::with_stroke(Self, Stroke) -> Self
 pub impl NativeElement for CancelElem
+
+pub struct CancelItem {
+  base : MathItem
+  length : Rel[Abs]
+  stroke : FixedStroke
+  cross : Bool
+  invert_first_line : Bool
+  background : Bool
+  angle : Smart[CancelAngle]
+}
+pub fn CancelItem::create(MathItem, Rel[Abs], FixedStroke, Bool, Bool, Bool, Smart[CancelAngle], StyleChain, @syntax.Span) -> MathItem
 
 pub(all) enum Capturer {
   Function
@@ -5312,6 +5374,12 @@ pub impl FromValue for ExchangeFormat
 pub impl IntoValue for ExchangeFormat
 pub impl Reflect for ExchangeFormat
 
+pub struct ExternalItem {
+  content : Content
+  locator : Locator
+}
+pub fn ExternalItem::create(Content, StyleChain, Locator) -> MathItem
+
 pub(all) enum Feature {
   Html
   Bundle
@@ -5325,6 +5393,22 @@ pub(all) struct Features(Array[Feature]) derive(Eq, Hash)
 pub fn Features::all() -> Self
 pub fn Features::is_enabled(Self, Feature) -> Bool
 pub fn Features::none() -> Self
+
+pub(all) enum FencedBody {
+  Owned(MathItem)
+  Shared(index~ : Int, sizing~ : SharedFenceSizing)
+}
+pub fn FencedBody::item(Self) -> MathItem
+pub fn FencedBody::shared(Int, SharedFenceSizing) -> Self
+pub fn FencedBody::sizing(Self) -> SharedFenceSizing?
+
+pub struct FencedItem {
+  open : MathItem?
+  close : MathItem?
+  body : FencedBody
+  balanced : Bool
+}
+pub fn FencedItem::create(MathItem?, MathItem?, FencedBody, Bool, StyleChain, @syntax.Span) -> MathItem
 
 pub struct FieldInfo {
   id : Int
@@ -5479,6 +5563,22 @@ pub(all) enum FixedAlignment {
 pub fn FixedAlignment::from_side(Side) -> Self
 pub fn FixedAlignment::inv(Self) -> Self
 pub fn FixedAlignment::position(Self, Abs) -> Abs
+
+pub(all) struct FixedDashPattern {
+  array : Array[Abs]
+  phase : Abs
+} derive(Eq)
+
+pub(all) struct FixedStroke {
+  paint : Paint
+  thickness : Abs
+  cap : LineCap
+  join : LineJoin
+  dash : FixedDashPattern?
+  miter_limit : Ratio
+} derive(Eq)
+pub fn FixedStroke::from_pair(Paint, Abs) -> Self
+pub impl Default for FixedStroke
 
 pub struct FlushElem(Content)
 pub fn FlushElem::new() -> Self
@@ -5688,6 +5788,14 @@ pub impl FromValue for FracStyle
 pub impl IntoValue for FracStyle
 pub impl Reflect for FracStyle
 
+pub struct FractionItem {
+  numerator : MathItem
+  denominator : MathItem
+  line : Bool
+  padding : Em
+}
+pub fn FractionItem::create(MathItem, MathItem, Bool, Em, StyleChain, @syntax.Span) -> MathItem
+
 pub(all) enum FragmentKind {
   Inline
   Block
@@ -5740,6 +5848,15 @@ pub(all) enum FuncInner {
   Closure(Closure)
   With(Func, Args)
 }
+
+pub struct GlyphItem {
+  text : String
+  mut class : @unicode.MathClass
+  mut stretch : Stretch
+  mut mid_stretched : Bool?
+  mut flac : Bool
+}
+pub fn GlyphItem::create(String, StyleChain, @syntax.Span) -> MathItem
 
 pub(all) enum Gradient {
   Linear(LinearGradient)
@@ -5990,6 +6107,11 @@ pub fn GridVLine::x(Self, StyleChain) -> Smart[USize]
 pub fn GridVLine::x_in(StyleChain) -> Smart[USize]
 pub fn GridVLine::x_local(Self) -> Smart[USize]?
 pub impl NativeElement for GridVLine
+
+pub struct GroupItem {
+  items : Array[MathItem]
+}
+pub fn GroupItem::create(Array[MathItem], StyleChain) -> MathItem
 
 pub(all) enum HAlignment {
   Start
@@ -6478,6 +6600,13 @@ pub(all) struct LayoutRegion {
 }
 pub fn LayoutRegion::new(Axes[Abs], Axes[Bool]) -> Self
 
+pub(all) enum LeftRightAlternator {
+  None_
+  Left
+  Right
+} derive(Eq, Hash, @debug.Debug)
+pub fn LeftRightAlternator::next(@ref.Ref[Self]) -> Self
+
 pub(all) struct Length {
   abs : Abs
   em : Em
@@ -6597,6 +6726,12 @@ pub fn LineElem::with_length(Self, Rel[Length]) -> Self
 pub fn LineElem::with_start(Self, Axes[Rel[Length]]) -> Self
 pub fn LineElem::with_stroke(Self, Stroke) -> Self
 pub impl NativeElement for LineElem
+
+pub struct LineItem {
+  base : MathItem
+  position : MathPosition
+}
+pub fn LineItem::create(MathItem, MathPosition, StyleChain, @syntax.Span) -> MathItem
 
 pub(all) enum LineJoin {
   Miter
@@ -6929,6 +7064,12 @@ pub fn MathAttachElem::with_tl(Self, Content?) -> Self
 pub fn MathAttachElem::with_tr(Self, Content?) -> Self
 pub impl NativeElement for MathAttachElem
 
+pub struct MathComponent {
+  kind : MathKind
+  props : MathProperties
+  styles : StyleChain
+}
+
 pub(all) struct MathDelimiter(Char?) derive(Eq, Hash, @debug.Debug)
 pub fn MathDelimiter::char(Char) -> Self raise HintedError
 pub fn MathDelimiter::find_matching(Self) -> Self
@@ -6939,6 +7080,72 @@ pub impl FromValue for MathDelimiter
 pub impl IntoValue for MathDelimiter
 pub impl Reflect for MathDelimiter
 
+pub(all) enum MathItem {
+  Comp(MathComponent)
+  Spacing(Length, Abs, Bool)
+  Space
+  Tag(Tag)
+}
+pub fn MathItem::as_slice(Self) -> ArrayView[Self]
+pub fn MathItem::class(Self) -> @unicode.MathClass
+pub fn MathItem::is_ignorant(Self) -> Bool
+pub fn MathItem::is_multiline(Self) -> Bool
+pub fn MathItem::is_spaced(Self) -> Bool
+pub fn MathItem::lclass(Self) -> @unicode.MathClass
+pub fn MathItem::limits(Self) -> MathLimits
+pub fn MathItem::mid_stretched(Self) -> Bool?
+pub fn MathItem::raw_class(Self) -> @unicode.MathClass?
+pub fn MathItem::rclass(Self) -> @unicode.MathClass
+pub fn MathItem::replace_stretch(Self, Stretch) -> Unit
+pub fn MathItem::set_class(Self, @unicode.MathClass) -> Unit
+pub fn MathItem::set_explicit_class(Self, @unicode.MathClass) -> Unit
+pub fn MathItem::set_flac(Self) -> Unit
+pub fn MathItem::set_limits(Self, MathLimits) -> Unit
+pub fn MathItem::set_lspace(Self, Em?) -> Unit
+pub fn MathItem::set_mid_stretched(Self, Bool?) -> Unit
+pub fn MathItem::set_rspace(Self, Em?) -> Unit
+pub fn MathItem::set_stretch(Self, Stretch) -> Unit
+pub fn MathItem::set_stretch_font_size(Self, Abs, Axis) -> Unit
+pub fn MathItem::set_stretch_relative_to(Self, Abs, Axis) -> Unit
+pub fn MathItem::set_y_stretch(Self, StretchInfo) -> Unit
+pub fn MathItem::size(Self) -> MathSize?
+pub fn MathItem::span(Self) -> @syntax.Span
+pub fn MathItem::styles(Self) -> StyleChain?
+pub fn MathItem::update_stretch(Self, StretchInfo) -> Unit
+pub fn MathItem::with_multiline_centering(Self) -> Self
+pub fn MathItem::wrap(Array[Self], StyleChain) -> Self
+
+pub(all) enum MathKind {
+  Group(GroupItem)
+  Multiline(MultilineItem)
+  Radical(RadicalItem)
+  Fenced(FencedItem)
+  Fraction(FractionItem)
+  SkewedFraction(SkewedFractionItem)
+  Table(MathTableItem)
+  Scripts(ScriptsItem)
+  Accented(AccentItem)
+  Cancel(CancelItem)
+  Line(LineItem)
+  Primes(PrimesItem)
+  Text(TextItem)
+  Number(NumberItem)
+  Glyph(GlyphItem)
+  Box(BoxItem)
+  Mathml(MathmlItem)
+  External(ExternalItem)
+}
+
+pub(all) enum MathLimits {
+  Never
+  Display
+  Always
+} derive(Eq, @debug.Debug)
+pub fn MathLimits::active(Self, StyleChain) -> Bool
+pub fn MathLimits::for_char(Char) -> Self
+pub fn MathLimits::for_char_with_class(Char, @unicode.MathClass?) -> Self
+pub fn MathLimits::for_class(@unicode.MathClass) -> Self
+
 pub struct MathOverlineElem(Content)
 pub fn MathOverlineElem::body(Self) -> Content
 pub fn MathOverlineElem::new(Content) -> Self
@@ -6946,6 +7153,26 @@ pub fn MathOverlineElem::of(Content) -> Self?
 pub fn MathOverlineElem::pack(Self) -> Content
 pub fn MathOverlineElem::with_body(Self, Content) -> Self
 pub impl NativeElement for MathOverlineElem
+
+pub(all) enum MathPosition {
+  Above
+  Below
+} derive(Eq, @debug.Debug)
+
+pub struct MathProperties {
+  mut limits : MathLimits
+  mut class : @unicode.MathClass?
+  size : MathSize
+  cramped : Bool
+  mut ignorant : Bool
+  mut spaced : Bool
+  mut lspace : Em?
+  mut rspace : Em?
+  mut align_form_infix : Bool
+  span : @syntax.Span
+}
+pub fn MathProperties::class(Self) -> @unicode.MathClass
+pub fn MathProperties::default(StyleChain, @syntax.Span) -> Self
 
 pub(all) enum MathSize {
   ScriptScript
@@ -6956,6 +7183,44 @@ pub(all) enum MathSize {
 pub impl FromValue for MathSize
 pub impl IntoValue for MathSize
 pub impl Reflect for MathSize
+
+pub(all) enum MathStyle {
+  Plain
+  Bold
+  Italic
+  BoldItalic
+  Script
+  BoldScript
+  Fraktur
+  BoldFraktur
+  SansSerif
+  SansSerifBold
+  SansSerifItalic
+  SansSerifBoldItalic
+  Monospace
+  Isolated
+  Initial
+  Tailed
+  Stretched
+  Looped
+  DoubleStruck
+  DoubleStruckItalic
+  Chancery
+  BoldChancery
+  Roundhand
+  BoldRoundhand
+  Hebrew
+} derive(Eq, Hash, @debug.Debug)
+pub fn MathStyle::select(Char, MathVariant?, Bool, Bool?) -> Self
+
+pub struct MathTableItem {
+  cells : Array[Array[AlignedRow]]
+  gap : Axes[Rel[Abs]]
+  augment : ResolvedAugment?
+  align : FixedAlignment
+  alternator : LeftRightAlternator
+}
+pub fn MathTableItem::create(Array[Array[AlignedRow]], Axes[Rel[Abs]], ResolvedAugment?, FixedAlignment, LeftRightAlternator, StyleChain, @syntax.Span) -> MathItem
 
 pub struct MathUnderlineElem(Content)
 pub fn MathUnderlineElem::body(Self) -> Content
@@ -6977,6 +7242,12 @@ pub(all) enum MathVariant {
 pub impl FromValue for MathVariant
 pub impl IntoValue for MathVariant
 pub impl Reflect for MathVariant
+
+pub struct MathmlItem {
+  elem : Content
+  body : MathItem?
+}
+pub fn MathmlItem::create(Content, MathItem?, StyleChain) -> MathItem
 
 pub struct MetadataElem(Content)
 pub fn MetadataElem::new(Value) -> Self
@@ -7039,6 +7310,12 @@ pub fn MoveElem::with_body(Self, Content) -> Self
 pub fn MoveElem::with_dx(Self, Rel[Length]) -> Self
 pub fn MoveElem::with_dy(Self, Rel[Length]) -> Self
 pub impl NativeElement for MoveElem
+
+pub struct MultilineItem {
+  rows : Array[AlignedRow]
+  mut centered : Bool
+}
+pub fn MultilineItem::create(Array[AlignedRow], StyleChain) -> MathItem
 
 pub(all) enum NamedNumeralSystem {
   Arabic
@@ -7160,6 +7437,11 @@ pub(all) enum Num {
 pub impl FromValue for Num
 pub impl IntoValue for Num
 pub impl Reflect for Num
+
+pub struct NumberItem {
+  text : String
+}
+pub fn NumberItem::create(String, StyleChain, @syntax.Span) -> MathItem
 
 pub(all) enum NumberType {
   Lining
@@ -7994,6 +8276,11 @@ pub fn PrimesElem::pack(Self) -> Content
 pub fn PrimesElem::with_count(Self, USize) -> Self
 pub impl NativeElement for PrimesElem
 
+pub struct PrimesItem {
+  count : Int
+}
+pub fn PrimesItem::create(Int, StyleChain) -> MathItem
+
 pub(all) enum ProcessColor {
   Luma(Luma)
   Oklab(Oklab)
@@ -8108,6 +8395,13 @@ pub(all) struct RadialGradient {
 } derive(Eq)
 pub fn RadialGradient::repr(Self) -> String
 
+pub struct RadicalItem {
+  radicand : MathItem
+  index : MathItem?
+  sqrt : MathItem
+}
+pub fn RadicalItem::create(MathItem, MathItem?, MathItem, StyleChain, @syntax.Span) -> MathItem
+
 pub(all) enum RasterFormat {
   Exchange(ExchangeFormat)
   Pixel(PixelFormat)
@@ -8219,6 +8513,14 @@ pub impl FromValue for RawLine
 pub impl IntoValue for RawLine
 pub impl NativeElement for RawLine
 pub impl Reflect for RawLine
+
+pub(all) enum RawMathItem {
+  Item(MathItem)
+  Linebreak
+  Align
+}
+pub fn RawMathItem::into_item(Self) -> MathItem?
+pub fn RawMathItem::is_ignorant(Self) -> Bool
 
 pub(all) enum Readable {
   Str(String)
@@ -8418,11 +8720,39 @@ pub(all) enum RepresentationError {
   TooLarge
 } derive(Eq, @debug.Debug)
 
+pub(all) struct ResolvedAugment {
+  hline : AugmentOffsets
+  vline : AugmentOffsets
+  stroke : Smart[ResolvedStroke]
+} derive(Eq)
+
+pub(all) enum ResolvedDashLength {
+  LineWidth
+  Length(Abs)
+} derive(Eq)
+pub fn ResolvedDashLength::finish(Self, Abs) -> Abs
+
+pub(all) struct ResolvedDashPattern {
+  array : Array[ResolvedDashLength]
+  phase : Abs
+} derive(Eq)
+
 pub(all) enum ResolvedLink {
   Local(anchor~ : String)
   Cross(from~ : @syntax.VirtualPath, to~ : @syntax.VirtualPath, anchor~ : String)
 } derive(Eq)
 pub fn ResolvedLink::into_relative_uri(Self) -> String raise HintedError
+
+pub(all) struct ResolvedStroke {
+  paint : Smart[Paint]
+  thickness : Smart[Abs]
+  cap : Smart[LineCap]
+  join : Smart[LineJoin]
+  dash : Smart[ResolvedDashPattern?]
+  miter_limit : Smart[Ratio]
+} derive(Eq)
+pub fn ResolvedStroke::unwrap_or(Self, FixedStroke) -> FixedStroke
+pub fn ResolvedStroke::unwrap_or_default(Self) -> FixedStroke
 
 pub(all) struct Rgb {
   red : Float
@@ -8613,6 +8943,17 @@ pub fn ScriptsElem::pack(Self) -> Content
 pub fn ScriptsElem::with_body(Self, Content) -> Self
 pub impl NativeElement for ScriptsElem
 
+pub struct ScriptsItem {
+  base : MathItem
+  top : MathItem?
+  bottom : MathItem?
+  top_left : MathItem?
+  bottom_left : MathItem?
+  top_right : MathItem?
+  bottom_right : MathItem?
+}
+pub fn ScriptsItem::create(MathItem, MathItem?, MathItem?, MathItem?, MathItem?, MathItem?, MathItem?, StyleChain) -> MathItem
+
 pub(all) enum Selector {
   Elem(Element, Array[(Int, Value)]?)
   Location(Location)
@@ -8643,6 +8984,12 @@ pub(all) enum Severity {
   Error
   Warning
 } derive(Eq, Hash, @debug.Debug)
+
+pub struct SharedFenceSizing {
+  // private fields
+}
+pub fn SharedFenceSizing::new(Array[MathItem], StyleChain) -> Self
+pub fn SharedFenceSizing::try_get_or_update(Self, (ArrayView[MathItem], StyleChain) -> Abs raise SourceError) -> Abs raise SourceError
 
 pub(all) struct ShiftSettings {
   typographic : Bool
@@ -8772,6 +9119,13 @@ pub fn SkewElem::with_body(Self, Content) -> Self
 pub fn SkewElem::with_origin(Self, Alignment) -> Self
 pub fn SkewElem::with_reflow(Self, Bool) -> Self
 pub impl NativeElement for SkewElem
+
+pub struct SkewedFractionItem {
+  numerator : MathItem
+  denominator : MathItem
+  slash : MathItem
+}
+pub fn SkewedFractionItem::create(MathItem, MathItem, MathItem, StyleChain, @syntax.Span) -> MathItem
 
 pub(all) enum Smallcaps {
   Minuscules
@@ -9105,6 +9459,20 @@ pub impl FromValue for StrSide
 pub impl IntoValue for StrSide
 pub impl Reflect for StrSide
 
+pub(all) struct Stretch {
+  x : StretchInfo?
+  y : StretchInfo?
+} derive(Eq, Hash)
+pub fn Stretch::font_size(Self, Abs, Axis) -> Self
+pub fn Stretch::is_explicit(Self, Axis) -> Bool
+pub fn Stretch::new() -> Self
+pub fn Stretch::relative_to(Self, Abs, Axis) -> Self
+pub fn Stretch::resolve(Self, Axis) -> StretchInfo?
+pub fn Stretch::resolve_requested(Self, Axis) -> Rel[Length]?
+pub fn Stretch::update(Self, StretchInfo) -> Self
+pub fn Stretch::with_x(Self, StretchInfo) -> Self
+pub fn Stretch::with_y(Self, StretchInfo) -> Self
+
 pub struct StretchElem(Content)
 pub fn StretchElem::body(Self) -> Content
 pub fn StretchElem::new(Content) -> Self
@@ -9117,6 +9485,20 @@ pub fn StretchElem::size_local(Self) -> Rel[Length]?
 pub fn StretchElem::with_body(Self, Content) -> Self
 pub fn StretchElem::with_size(Self, Rel[Length]) -> Self
 pub impl NativeElement for StretchElem
+
+pub(all) struct StretchInfo {
+  target : Rel[Abs]
+  buffer : Rel[Abs]?
+  explicit : Bool
+  requested_target : Rel[Length]?
+  short_fall : Em
+  relative_to : Abs?
+  font_size : Abs?
+} derive(Eq, Hash)
+pub fn StretchInfo::from_size(Rel[Length], Em, Abs) -> Self
+pub fn StretchInfo::mul(Self, Self) -> Self
+pub fn StretchInfo::new(Rel[Abs], Em) -> Self
+pub impl Default for StretchInfo
 
 pub struct StrikeElem(Content)
 pub fn StrikeElem::background(Self, StyleChain) -> Bool
@@ -9157,6 +9539,7 @@ pub(all) struct Stroke {
 pub fn Stroke::field(Self, String) -> Value?
 pub fn Stroke::from_pair(Paint, Length) -> Self
 pub fn Stroke::repr(Self) -> String
+pub fn Stroke::resolve(Self, StyleChain) -> ResolvedStroke
 pub impl Default for Stroke
 pub impl Fold for Stroke
 pub impl FromValue for Stroke
@@ -9204,6 +9587,7 @@ pub fn StyleChain::links(Self) -> Array[Array[Style]]
 pub fn StyleChain::new(Styles) -> Self
 pub fn StyleChain::pop(Self) -> Self
 pub fn StyleChain::recipes(Self) -> Iter[Recipe]
+pub fn StyleChain::suffix(Self, Int) -> Styles
 pub fn StyleChain::to_map(Self) -> Styles
 pub fn StyleChain::trunk(Iter[Self]) -> Self?
 pub fn StyleChain::trunk_from_pairs(ArrayView[(Content, Self)]) -> Self?
@@ -9790,6 +10174,12 @@ pub fn TextElem::variations_in(StyleChain) -> FontVariations
 pub fn TextElem::weight_in(StyleChain) -> FontWeight
 pub fn TextElem::with_text(Self, String) -> Self
 pub impl NativeElement for TextElem
+
+pub struct TextItem {
+  text : String
+  locator : Locator
+}
+pub fn TextItem::create(String, StyleChain, @syntax.Span, Locator) -> MathItem
 
 pub(all) struct TextSize(Length) derive(Eq, Hash)
 pub fn TextSize::resolve(Self, StyleChain) -> Abs

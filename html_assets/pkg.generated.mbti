@@ -14,6 +14,22 @@ pub let attrs_global : Int
 
 pub fn elems() -> Array[ElemInfo]
 
+pub fn is_fence(String) -> Bool
+
+pub fn is_separator(String) -> Bool
+
+pub fn is_stretch_axis_inline(Char) -> Bool
+
+pub let properties_largeop : Properties
+
+pub let properties_movablelimits : Properties
+
+pub let properties_stretchy : Properties
+
+pub let properties_symmetric : Properties
+
+pub fn will_auto_transform(String) -> Bool
+
 // Errors
 
 // Types and methods
@@ -32,6 +48,23 @@ pub struct ElemInfo {
 pub fn ElemInfo::attributes(Self) -> Array[AttrInfo]
 pub fn ElemInfo::get_attr(Self, String) -> AttrInfo?
 pub fn ElemInfo::new(String, String, Array[Int]) -> Self
+
+pub(all) enum Form {
+  Infix
+  Prefix
+  Postfix
+} derive(Eq, @debug.Debug)
+
+pub(all) struct OperatorInfo {
+  form : Form?
+  lspace : Double
+  rspace : Double
+  properties : Properties
+} derive(Eq, @debug.Debug)
+pub fn OperatorInfo::of(String, Form, Bool) -> Self
+
+pub(all) struct Properties(Int) derive(Eq, @debug.Debug)
+pub fn Properties::contains(Self, Self) -> Bool
 
 pub(all) enum Type {
   Presence

@@ -67,12 +67,6 @@ fn highlight_elem_fill_default() -> Value {
 }
 
 ///|
-/// TODO: port `Color::BLACK.into()` (TextElem.fill).
-fn text_elem_fill_default() -> Value {
-  None
-}
-
-///|
 /// TODO: port `Default::default() of SmallVec<[Decoration; 1]>` (TextElem.deco).
 fn text_elem_deco_default() -> Value {
   None

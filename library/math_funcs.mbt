@@ -308,3 +308,75 @@ pub impl[A : FromValue, B : FromValue] FromValue for (A, B) with fn from_value(
 fn equation_elem_script_scale_default() -> Value {
   IntoValue::into_value((I16(70L), I16(50L)))
 }
+
+///|
+/// Sets flac OpenType feature.
+pub fn style_flac() -> Style {
+  TextElem::set_features(
+    FontFeatures([(OpenTypeTag::from_bytes_lossy("flac"), 1L)]),
+  )
+}
+
+///|
+/// Sets dtls OpenType feature.
+pub fn style_dtls() -> Style {
+  TextElem::set_features(
+    FontFeatures([(OpenTypeTag::from_bytes_lossy("dtls"), 1L)]),
+  )
+}
+
+///|
+/// Styles something as cramped.
+///
+/// This is equivalent (in MathML Core) to the following CSS:
+/// `math-shift: compact;`
+pub fn style_cramped() -> Style {
+  EquationElem::set_cramped(true)
+}
+
+///|
+/// The style for superscripts in the current style.
+///
+/// This is equivalent (in MathML Core) to the following CSS:
+/// `math-style: compact; math-depth: add(1);`
+pub fn style_for_superscript(styles : StyleChain) -> Style {
+  EquationElem::set_size(
+    match EquationElem::size_in(styles) {
+      Display | Text => Script
+      Script | ScriptScript => ScriptScript
+    },
+  )
+}
+
+///|
+/// The style for subscripts in the current style.
+///
+/// This is equivalent (in MathML Core) to the following CSS:
+/// `math-style: compact; math-depth: add(1); math-shift: compact;`
+pub fn style_for_subscript(styles : StyleChain) -> Styles {
+  Styles::from_array([style_for_superscript(styles), style_cramped()])
+}
+
+///|
+/// The style for numerators in the current style.
+///
+/// This is equivalent (in MathML Core) to the following CSS:
+/// `math-style: compact; math-depth: auto-add;`
+pub fn style_for_numerator(styles : StyleChain) -> Style {
+  EquationElem::set_size(
+    match EquationElem::size_in(styles) {
+      Display => Text
+      Text => Script
+      Script | ScriptScript => ScriptScript
+    },
+  )
+}
+
+///|
+/// The style for denominators in the current style.
+///
+/// This is equivalent (in MathML Core) to the following CSS:
+/// `math-style: compact; math-depth: auto-add; math-shift: compact;`
+pub fn style_for_denominator(styles : StyleChain) -> Styles {
+  Styles::from_array([style_for_numerator(styles), style_cramped()])
+}

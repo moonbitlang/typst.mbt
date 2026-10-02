@@ -9,6 +9,8 @@ import {
 }
 
 // Values
+pub fn convert_math_to_nodes(@library.MathItem, @library.Engine, @library.StyleChain, Bool) -> Array[@library.Content] raise @library.SourceError
+
 pub fn convert_to_nodes(@library.Engine, @library.SplitLocator, ArrayView[(@library.Content, @library.StyleChain)], ConversionLevel, Whitespace) -> Array[HtmlNode] raise @library.SourceError
 
 pub fn create_link_anchors(HtmlDocument, @hashset.HashSet[@library.Location]) -> Map[@library.Location, String]

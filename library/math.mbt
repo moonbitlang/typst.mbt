@@ -152,3 +152,28 @@ pub impl FromValue for @unicode.MathClass with fn from_value(v) {
   }
   raise HintedError(input_of((Ty::new() : Ty[@unicode.MathClass])).error(v))
 }
+
+///|
+/// An iterator that alternates between the `Left` and `Right` values, if the
+/// initial value is not `None` (`None_` here; `None` would clash with
+/// `Option`/`Value`).
+pub(all) enum LeftRightAlternator {
+  None_
+  Left
+  Right
+} derive(Eq, Hash, Debug)
+
+///|
+/// Returns the current value and advances the alternator (upstream
+/// `Iterator::next`, which always yields).
+pub fn LeftRightAlternator::next(
+  self : Ref[LeftRightAlternator],
+) -> LeftRightAlternator {
+  let r = self.val
+  match self.val {
+    None_ => ()
+    Left => self.val = Right
+    Right => self.val = Left
+  }
+  r
+}
