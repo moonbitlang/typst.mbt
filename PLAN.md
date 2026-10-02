@@ -10,7 +10,7 @@
 | P1 syntax (reparser, highlight) | todo | |
 | P2 eval (typst-eval) | **done** | VM, closures, imports, rules, math; `eval` stage runs end to end |
 | P2 library (value level) | **done** | 3753/3792 `eval` stage cases identical (2026-10-02). Remaining 39 need later phases: `layout`/`measure` (layout), plugins (WASM, out of scope), font warnings (fonts), bibliography/CSL (hayagriva), auto-sized tilings (layout) |
-| P3 realize + introspection + HTML export | in progress | `html` stage: oracle + goldens ready (508 cases); see docs/p3-plan.md |
+| P3 realize + introspection + HTML export | in progress | `realize` stage 3628/3792; `html` stage 452/508 (2026-10-02). Remaining html: ref (19), tables/CellGrid (10), frames via layout (7), bibliography (7), image decoding (5), outline (5), measure (2), raw highlighting (1) |
 
 Run `scripts/upstream.sh && scripts/goldens.sh && moon run tests/runner --target native -- syntax`
 (and `-- ast`, `-- eval`). `python3 scripts/classify.py eval 60` buckets the
