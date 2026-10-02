@@ -14,6 +14,7 @@ import {
   "moonbitlang/typst/otf",
   "moonbitlang/typst/regex",
   "moonbitlang/typst/syntax",
+  "moonbitlang/typst/syntect",
   "moonbitlang/typst/time",
   "moonbitlang/typst/unicode",
 }
@@ -74,6 +75,8 @@ pub fn asset_elem() -> Element
 pub let asset_elem_data : Int
 
 pub let asset_elem_path : Int
+
+pub fn asset_unsupported_rule(AssetElem, Engine, StyleChain) -> Content raise SourceError
 
 pub fn[T] at(@syntax.Span, () -> T raise HintedError) -> T raise SourceError
 
@@ -581,9 +584,13 @@ pub let box_elem_stroke : Int
 
 pub let box_elem_width : Int
 
+pub fn bundle_document_unsupported_rule(DocumentElem, Engine, StyleChain) -> Content raise SourceError
+
 pub fn bundle_format() -> Format
 
 pub fn bundle_format_elem() -> Element
+
+pub fn bundle_register(NativeRuleMap) -> Unit
 
 pub fn bytes_as_str(BytesView) -> String raise LoadErr
 
@@ -940,6 +947,8 @@ pub let equation_elem_supplement : Int
 pub let equation_elem_variant : Int
 
 pub fn exp10(Int) -> Double
+
+pub fn families(StyleChain) -> Array[FontFamily]
 
 pub fn[T : FromValue + IntoValue] field_of(Ty[T], id~ : Int, name~ : String, docs? : String, kind~ : FieldKind, positional? : Bool, required? : Bool, variadic? : Bool, internal? : Bool, default? : () -> Value, fold? : (Value, Value) -> Value, parse? : (Engine, Args, ParseLocals) -> Value? raise SourceError, output? : (Value) -> Value) -> FieldInfo
 
@@ -2411,6 +2420,10 @@ pub let raw_line_elem_number : Int
 
 pub let raw_line_elem_text : Int
 
+pub fn raw_syntaxes() -> @syntect.SyntaxSet
+
+pub fn raw_theme() -> @syntect.Theme
+
 pub fn rect_elem() -> Element
 
 pub let rect_elem_body : Int
@@ -3234,6 +3247,8 @@ pub let v_elem_attach : Int
 pub let v_elem_weak : Int
 
 pub fn validate_utf8(BytesView) -> Utf8Error?
+
+pub fn variant(StyleChain) -> FontVariant
 
 pub fn vec_elem() -> Element
 
@@ -4693,6 +4708,7 @@ pub(all) enum Covers {
   LatinInCjk
   Regex(Regex)
 } derive(Eq, Hash)
+pub fn Covers::as_regex(Self) -> Regex
 pub impl FromValue for Covers
 pub impl IntoValue for Covers
 pub impl Reflect for Covers
@@ -5152,6 +5168,7 @@ pub fn DocumentElem::date_local(Self) -> Smart[Datetime?]?
 pub fn DocumentElem::description(Self, StyleChain) -> Content?
 pub fn DocumentElem::description_in(StyleChain) -> Content?
 pub fn DocumentElem::description_local(Self) -> Content??
+pub fn DocumentElem::determine_format(Self, StyleChain) -> DocumentFormat raise HintedError
 pub fn DocumentElem::format(Self, StyleChain) -> Smart[DocumentFormat]
 pub fn DocumentElem::format_in(StyleChain) -> Smart[DocumentFormat]
 pub fn DocumentElem::format_local(Self) -> Smart[DocumentFormat]?
@@ -5185,6 +5202,7 @@ pub(all) enum DocumentFormat {
   Paged(PagedFormat)
   Html
 } derive(Eq, Hash, @debug.Debug)
+pub fn DocumentFormat::target(Self) -> Target
 pub impl FromValue for DocumentFormat
 pub impl IntoValue for DocumentFormat
 pub impl Reflect for DocumentFormat
@@ -5869,6 +5887,7 @@ pub(all) struct FontFamily {
   covers : Covers?
 } derive(Eq, Hash)
 pub fn FontFamily::as_str(Self) -> String
+pub fn FontFamily::covers(Self) -> Regex?
 pub fn FontFamily::new(String) -> Self
 pub fn FontFamily::with_coverage(String, Covers?) -> Self
 pub impl FromValue for FontFamily
@@ -7100,6 +7119,8 @@ pub(all) struct JustificationLimits {
   spacing : Limits[Rel[Length]]?
   tracking : Limits[Length]?
 } derive(Eq, Hash)
+pub fn JustificationLimits::spacing_limits(Self) -> Limits[Rel[Length]]
+pub fn JustificationLimits::tracking_limits(Self) -> Limits[Length]
 pub impl Default for JustificationLimits
 pub impl Fold for JustificationLimits
 pub impl FromValue for JustificationLimits
@@ -9170,8 +9191,10 @@ pub impl Reflect for RatioOrAngle
 
 pub(all) enum RawContent {
   Text(String)
-} derive(Eq, Hash, @debug.Debug)
+  Lines(Array[(String, @syntax.Span)])
+} derive(Hash, @debug.Debug)
 pub fn RawContent::get(Self) -> String
+pub impl Eq for RawContent
 pub impl FromValue for RawContent
 pub impl IntoValue for RawContent
 pub impl Reflect for RawContent
@@ -9241,6 +9264,15 @@ pub(all) enum RawMathItem {
 }
 pub fn RawMathItem::into_item(Self) -> MathItem?
 pub fn RawMathItem::is_ignorant(Self) -> Bool
+
+pub struct RawSyntax {
+  // private fields
+}
+
+pub struct RawTheme {
+  // private fields
+}
+pub fn RawTheme::get(Self) -> @syntect.Theme
 
 pub(all) enum Readable {
   Str(String)
@@ -9733,6 +9765,9 @@ pub(all) enum ScriptKind {
   Sub
   Super
 } derive(Eq, Hash, @debug.Debug)
+pub fn ScriptKind::default_metrics(Self) -> ScriptMetrics
+pub fn ScriptKind::feature(Self) -> String
+pub fn ScriptKind::read_metrics(Self, FontMetrics) -> ScriptMetrics
 
 pub(all) struct ScriptMetrics {
   width : Em

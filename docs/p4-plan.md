@@ -328,3 +328,109 @@ blocks, `lorem(n)` by tall blocks), dumped with the oracle and compared with
 the runner run from that tree: all 304 cases whose upstream dump is
 text-free match bit-exactly, in both variants (the remaining ones need
 inline/math layout or bibliography).
+
+## Status: work unit C (shaping)
+
+**Package `shape/`**: a faithful port of rustybuzz 0.20.1 (the version
+locked by Typst; sources fetched into `.repos/rustybuzz` by
+`scripts/upstream.sh`), one file per rustybuzz module: buffer, common, face
+(`hb_font_t` over `@otf.Face`), set_digest, ot_map, ot_shape(_plan),
+ot_shape_normalize, ot_shape_fallback, ot_layout(_common, _gsubgpos,
+_gsub_table, _gpos_table), kerning (legacy `kern` incl. state machines),
+paint_extents (COLRv1 glyph extents), tag + tag_table, the complex shapers
+(Arabic incl. stch and Mongolian, Hebrew, Thai incl. PUA fallback, Hangul,
+Indic, Khmer, Myanmar incl. Zawgyi, USE, syllabic, vowel constraints) and
+the AAT layout (morx, kerx, trak, aat_map). WASM shaping is not ported
+(rustybuzz feature not enabled by Typst). Public API as used by Typst:
+`Face::from_face`/`from_slice`, `UnicodeBuffer`, `ShapePlan::new`,
+`shape_with_plan`/`shape`, `GlyphBuffer::glyph_infos`/`glyph_positions`,
+`GlyphInfo::unsafe_to_break`, `Feature`, `Script::from_iso15924_tag`,
+`Language::from_str`, `BUFFER_FLAG_*`. Building a `Face` parses all
+GSUB/GPOS lookups (like rustybuzz); callers should cache it per
+`FontInstance`, and shape plans per (font, direction, script, language,
+features) like upstream's memoized `create_shape_plan`.
+
+**Tables** are generated, never transcribed: `oracle/src/bin/
+gen_shape_unicode.rs` writes `unicode/shaping_tables_gen.mbt`
+(General_Category, Script as rustybuzz maps it, ccc, bidi mirroring, from
+the exact crates rustybuzz uses); `scripts/gen_shape_tables.py` converts
+rustybuzz's own generated data/code (normalization, emoji, Arabic joining,
+Indic/USE categories, Ragel machines, tag table, AAT feature mappings) into
+`shape/*_gen.mbt`.
+
+**Oracle stage `shape`**: the oracle patches rustybuzz with a tap crate
+(`oracle/rustybuzz-tap`, compiling the pristine sources from
+`.repos/rustybuzz`) that records every `shape_with_plan` call while the
+paged suite compiles; `scripts/goldens.sh shape` dumps the 4598 unique runs
+per font to `tests/golden/shape/` (font book index, normalized variation
+coordinates, plan direction/script/language/features, buffer script and
+flags, text; output glyph ids, clusters, glyph flags, advances, offsets).
+**Stage `shape-hb`**: rustybuzz's own test suite (2250 HarfBuzz shaping
+tests incl. AOTS, text-rendering-tests, in-house, macOS system fonts),
+extracted by `scripts/goldens.sh shape-hb` (`scripts/shape_hb_tests.py`).
+
+**Result:** `shape` 4598/4598 (all scripts: Latn, Math, Hani, Hira, Kana,
+Hang, Arab, Hebr, Deva, Cyrl, Grek, Thai, Ethi, Zzzz; all 49 fonts used),
+`shape-hb` 2250/2250, plus the rustybuzz unit tests for feature parsing and
+tags (`moon test shape`).
+
+## Status: work unit F (inline layout)
+
+**Layout package** (files named after `typst-layout/src/inline`):
+`inline.mbt` (mod.rs: `layout_par`, `layout_inline`, `ParSituation`,
+configuration), `inline_collect.mbt`, `inline_prepare.mbt`,
+`inline_shaping.mbt`, `inline_linebreak.mbt` (simple + Knuth-Plass; break
+opportunities come from the `linebreak` package), `inline_line.mbt`,
+`inline_deco.mbt` (with the kurbo segment/line intersection it needs),
+`inline_finalize.mbt`, `inline_box.mbt` (`layout_box`). The paragraph text
+is stored once as a UTF-8 indexed `Utf8Str` (`inline_text.mbt`); substrings
+are `Utf8Slice`s. Inline-private types that clash with flow's names are
+prefixed (`InlineItem`, `InlineConfig`, `InlineCollector`,
+`collect_inline`). `Glyphs` keeps upstream's `Cow` semantics (shared until
+`to_mut`). `libm_native.mbt` binds the C libm (`cbrt`, `atan2`, `sin`,
+`cos`) like `svg/` for kurbo's `solve_cubic`.
+
+**Shared with math:** `rusty(font)` (cached `@shape.Face` per
+`FontInstance`, upstream `FontInstance::rusty`), `create_shape_plan`
+(memoized per font/direction/script/language/features), `features`,
+`language`, `SharedShapingContext`, `get_font_and_covers` (families are a
+`FamilyIter`), `layout_box`, `layout_inline`. Library: `families`,
+`variant`, `FontFamily::covers`/`Covers::as_regex`,
+`ScriptKind::{default_metrics, read_metrics, feature}`,
+`JustificationLimits::{spacing_limits, tracking_limits}`.
+
+**Result:** `paged` 338 -> 1683/2299, `svg` 384 -> 1709. Every remaining
+paged failure outside math (452), raw highlighting (~85: highlighted
+bodies and raw text spans), bibliography/citations (~50) and PDF/SVG image
+loading is a single grid/table stroke span (`table-tags-unstable-functions`).
+
+## Status: work unit I (math layout)
+
+**Layout package**, one file per upstream module of
+`typst-layout/src/math`: `math.mbt` (`mod.rs`: `layout_equation_inline`,
+`layout_equation_block` with region breaking and equation numbers,
+`MathContext`, item dispatch, font stack with script-scale styles),
+`math_fragment.mbt` (`MathFragment`, `FrameFragment`, math kerning lookup),
+`math_glyph.mbt` (`GlyphFragment`: shaping plan with `flac`/`ssty` feature
+fallback, italics correction, top accent attachment, extended shapes,
+stretching via MATH variants and assemblies), `math_shaping.mbt`,
+`math_run.mbt` (multiline rows, alignment points, inline line-break items),
+`math_scripts.mbt`, `math_fraction.mbt`, `math_fenced.mbt`,
+`math_radical.mbt`, `math_accent.mbt`, `math_cancel.mbt`, `math_line.mbt`,
+`math_table.mbt` and `math_text.mbt`. Functions whose upstream names clash
+with other layouters in the package carry a `math` infix
+(`layout_math_table`, `layout_math_line`, `layout_math_text`, ...). The
+equation stubs in `stubs.mbt` are gone.
+
+Math shaping uses the inline layout API (`rusty`, `create_shape_plan`,
+`features`, `language`, `get_font_and_covers` via a `SharedShapingContext`
+impl for `MathShapingContext`, `layout_box`, `layout_inline`); the math
+font families (`typst_library::math::families`, with New Computer Modern
+Math first in the fallback list) are `math_families` in `math.mbt`.
+`Augment`'s cast accepts the `stroke: auto` its own `into_value` writes
+(field values round-trip through `Value` here).
+
+**Result:** `paged` 1766 → 2223, `svg` 1772 → 2220 (on top of unit F).
+All 403 `math/` paged tests match; the 4 `math/` SVG failures are color
+emoji glyphs in the SVG exporter (paged output identical). eval/realize/html
+unchanged.

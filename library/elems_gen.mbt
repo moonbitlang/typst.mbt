@@ -7804,6 +7804,7 @@ pub fn raw_elem() -> Element {
             kind=Settable,
             default=raw_elem_syntaxes_default,
             fold=fold_of((Ty::new() : Ty[OneOrMultiple[DataSource]])),
+            parse=raw_elem_syntaxes_parse,
           ),
           field_of(
             (Ty::new() : Ty[Smart[DataSource?]]),
@@ -7811,6 +7812,7 @@ pub fn raw_elem() -> Element {
             name="theme",
             kind=Settable,
             default=() => Auto,
+            parse=raw_elem_theme_parse,
           ),
           field_of(
             (Ty::new() : Ty[USize]),
@@ -9576,6 +9578,7 @@ pub fn bundle_format_elem() -> Element {
         fields=[],
       )
       bundle_format_elem_cell.val = Some(e)
+      bundle_format_elem_init(e)
       e
     }
   }

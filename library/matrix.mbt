@@ -288,8 +288,13 @@ pub impl FromValue for Augment with fn from_value(v) {
       }
       let hline = take("hline")
       let vline = take("vline")
+      // Upstream stores the field as a Rust value; here it round-trips
+      // through `into_value`, which writes `stroke: auto`, so accept it.
       let stroke : Smart[Stroke] = if dict.contains("stroke") {
-        Custom(dict.take("stroke").cast())
+        match dict.take("stroke") {
+          Auto => Auto
+          v => Custom(v.cast())
+        }
       } else {
         Auto
       }

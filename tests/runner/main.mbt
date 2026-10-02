@@ -1,7 +1,7 @@
 // Differential test runner: compares the MoonBit port against reference
 // outputs dumped by the Rust oracle (see `scripts/goldens.sh`).
 //
-// Usage: moon run tests/runner -- <syntax|ast|eval|html|realize|paged|svg|svg-replay|pdf-semantic|pdf-semantic-replay|pdf-extract-check|pdftags|pdftags-check|font|break> [filter] [--verbose]
+// Usage: moon run tests/runner -- <syntax|ast|reparse|eval|html|bundle|realize|paged|svg|svg-replay|pdf-semantic|pdf-semantic-replay|pdf-extract-check|pdftags|pdftags-check|font|break|shape|shape-hb> [filter] [--verbose]
 
 ///|
 let suite_dir = ".repos/typst/tests/suite"
@@ -29,11 +29,14 @@ fn main {
       pdf_save_dir.val = Some(a.unsafe_substring(start=11, end=a.length()))
     }
   }
+  bundle_stub_binary.val = args.contains("--stub-binary")
   let filter = args[2:].iter().find_first(a => !a.has_prefix("-"))
   match stage {
     "syntax" =>
       run_stage("syntax", (_, tc) => syntax_report(tc.body), filter, verbose)
     "ast" => run_stage("ast", (_, tc) => ast_report(tc.body), filter, verbose)
+    "reparse" =>
+      run_stage("reparse", (_, tc) => reparse_report(tc.body), filter, verbose)
     "eval" => run_stage("eval", eval_report, filter, verbose)
     "realize" => run_stage("realize", realize_report, filter, verbose)
     // Like the oracle, only the tests that upstream compiles to a paged
@@ -53,6 +56,17 @@ fn main {
       run_stage("html", html_report, filter, verbose, select=tc => {
         tc.attrs.split(" ").any(a => a == "html")
       })
+    // Like the oracle, only tests that target bundles. `--stub-binary`
+    // replaces the PDF and PNG exporters by stubs (see `bundle_stage.mbt`).
+    "bundle" =>
+      run_stage(
+        "bundle",
+        bundle_report,
+        filter,
+        verbose,
+        select=tc => tc.attrs.split(" ").any(a => a == "bundle"),
+        canonicalize=canonicalize_bundle,
+      )
     "break" => run_break_stage(filter, verbose)
     // Like `paged`, but exported to SVG and compared after canonically
     // renaming the hash-derived `<defs>` IDs.
@@ -141,6 +155,8 @@ fn main {
         skip_file=text => text.has_prefix("// SKIP"),
         dump_name="pdftags-check",
       )
+    "shape" => run_shape_stage(filter, verbose)
+    "shape-hb" => run_shape_hb_stage(filter, verbose)
     _ => {
       println("unknown stage: \{stage}")
       @sys.exit(2)

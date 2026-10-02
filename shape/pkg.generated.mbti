@@ -1,0 +1,582 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/shape"
+
+import {
+  "moonbitlang/core/debug",
+  "moonbitlang/typst/otf",
+}
+
+// Values
+pub const BUFFER_FLAG_BEGINNING_OF_TEXT : UInt = 0x00000001
+
+pub const BUFFER_FLAG_DEFINED : UInt = 0x000000FF
+
+pub const BUFFER_FLAG_DO_NOT_INSERT_DOTTED_CIRCLE : UInt = 0x00000010
+
+pub const BUFFER_FLAG_END_OF_TEXT : UInt = 0x00000002
+
+pub const BUFFER_FLAG_PRESERVE_DEFAULT_IGNORABLES : UInt = 0x00000004
+
+pub const BUFFER_FLAG_PRODUCE_SAFE_TO_INSERT_TATWEEL : UInt = 0x00000040
+
+pub const BUFFER_FLAG_PRODUCE_UNSAFE_TO_CONCAT : UInt = 0x00000040
+
+pub const BUFFER_FLAG_REMOVE_DEFAULT_IGNORABLES : UInt = 0x00000008
+
+pub const BUFFER_FLAG_VERIFY : UInt = 0x00000020
+
+pub const GC_CLOSE_PUNCTUATION : Int = 18
+
+pub const GC_CONNECT_PUNCTUATION : Int = 16
+
+pub const GC_CONTROL : Int = 0
+
+pub const GC_CURRENCY_SYMBOL : Int = 23
+
+pub const GC_DASH_PUNCTUATION : Int = 17
+
+pub const GC_DECIMAL_NUMBER : Int = 13
+
+pub const GC_ENCLOSING_MARK : Int = 11
+
+pub const GC_FINAL_PUNCTUATION : Int = 19
+
+pub const GC_FORMAT : Int = 1
+
+pub const GC_INITIAL_PUNCTUATION : Int = 20
+
+pub const GC_LETTER_NUMBER : Int = 14
+
+pub const GC_LINE_SEPARATOR : Int = 27
+
+pub const GC_LOWERCASE_LETTER : Int = 5
+
+pub const GC_MATH_SYMBOL : Int = 25
+
+pub const GC_MODIFIER_LETTER : Int = 6
+
+pub const GC_MODIFIER_SYMBOL : Int = 24
+
+pub const GC_NON_SPACING_MARK : Int = 12
+
+pub const GC_OPEN_PUNCTUATION : Int = 22
+
+pub const GC_OTHER_LETTER : Int = 7
+
+pub const GC_OTHER_NUMBER : Int = 15
+
+pub const GC_OTHER_PUNCTUATION : Int = 21
+
+pub const GC_OTHER_SYMBOL : Int = 26
+
+pub const GC_PARAGRAPH_SEPARATOR : Int = 28
+
+pub const GC_PRIVATE_USE : Int = 3
+
+pub const GC_SPACE_SEPARATOR : Int = 29
+
+pub const GC_SPACING_MARK : Int = 10
+
+pub const GC_SURROGATE : Int = 4
+
+pub const GC_TITLECASE_LETTER : Int = 8
+
+pub const GC_UNASSIGNED : Int = 2
+
+pub const GC_UPPERCASE_LETTER : Int = 9
+
+pub const GLYPH_FLAG_DEFINED : UInt = 0x00000007
+
+pub const HB_BUFFER_CLUSTER_LEVEL_CHARACTERS : Int = 2
+
+pub const HB_BUFFER_CLUSTER_LEVEL_DEFAULT : Int = 0
+
+pub const HB_BUFFER_CLUSTER_LEVEL_MONOTONE_CHARACTERS : Int = 1
+
+pub const HB_BUFFER_CLUSTER_LEVEL_MONOTONE_GRAPHEMES : Int = 0
+
+pub const HB_FEATURE_GLOBAL_END : UInt = 0xFFFFFFFF
+
+pub const HB_FEATURE_GLOBAL_START : UInt = 0
+
+pub const SAFE_TO_INSERT_TATWEEL : UInt = 0x00000004
+
+pub const SERIALIZE_GLYPH_EXTENTS : Int = 0b00001000
+
+pub const SERIALIZE_GLYPH_FLAGS : Int = 0b00010000
+
+pub const SERIALIZE_NO_ADVANCES : Int = 0b00100000
+
+pub const SERIALIZE_NO_CLUSTERS : Int = 0b00000001
+
+pub const SERIALIZE_NO_GLYPH_NAMES : Int = 0b00000100
+
+pub const SERIALIZE_NO_POSITIONS : Int = 0b00000010
+
+pub const UNSAFE_TO_BREAK : UInt = 0x00000001
+
+pub const UNSAFE_TO_CONCAT : UInt = 0x00000002
+
+pub let script_adlam : Script
+
+pub let script_ahom : Script
+
+pub let script_anatolian_hieroglyphs : Script
+
+pub let script_arabic : Script
+
+pub let script_armenian : Script
+
+pub let script_avestan : Script
+
+pub let script_balinese : Script
+
+pub let script_bamum : Script
+
+pub let script_bassa_vah : Script
+
+pub let script_batak : Script
+
+pub let script_bengali : Script
+
+pub let script_bhaiksuki : Script
+
+pub let script_bopomofo : Script
+
+pub let script_brahmi : Script
+
+pub let script_braille : Script
+
+pub let script_buginese : Script
+
+pub let script_buhid : Script
+
+pub let script_canadian_syllabics : Script
+
+pub let script_carian : Script
+
+pub let script_caucasian_albanian : Script
+
+pub let script_chakma : Script
+
+pub let script_cham : Script
+
+pub let script_cherokee : Script
+
+pub let script_chorasmian : Script
+
+pub let script_common : Script
+
+pub let script_coptic : Script
+
+pub let script_cuneiform : Script
+
+pub let script_cypriot : Script
+
+pub let script_cypro_minoan : Script
+
+pub let script_cyrillic : Script
+
+pub let script_deseret : Script
+
+pub let script_devanagari : Script
+
+pub let script_dives_akuru : Script
+
+pub let script_dogra : Script
+
+pub let script_duployan : Script
+
+pub let script_egyptian_hieroglyphs : Script
+
+pub let script_elbasan : Script
+
+pub let script_elymaic : Script
+
+pub let script_ethiopic : Script
+
+pub let script_garay : Script
+
+pub let script_georgian : Script
+
+pub let script_glagolitic : Script
+
+pub let script_gothic : Script
+
+pub let script_grantha : Script
+
+pub let script_greek : Script
+
+pub let script_gujarati : Script
+
+pub let script_gunjala_gondi : Script
+
+pub let script_gurmukhi : Script
+
+pub let script_gurung_khema : Script
+
+pub let script_han : Script
+
+pub let script_hangul : Script
+
+pub let script_hanifi_rohingya : Script
+
+pub let script_hanunoo : Script
+
+pub let script_hatran : Script
+
+pub let script_hebrew : Script
+
+pub let script_hiragana : Script
+
+pub let script_imperial_aramaic : Script
+
+pub let script_inherited : Script
+
+pub let script_inscriptional_pahlavi : Script
+
+pub let script_inscriptional_parthian : Script
+
+pub let script_javanese : Script
+
+pub let script_kaithi : Script
+
+pub let script_kannada : Script
+
+pub let script_katakana : Script
+
+pub let script_kawi : Script
+
+pub let script_kayah_li : Script
+
+pub let script_kharoshthi : Script
+
+pub let script_khitan_small_script : Script
+
+pub let script_khmer : Script
+
+pub let script_khojki : Script
+
+pub let script_khudawadi : Script
+
+pub let script_kirat_rai : Script
+
+pub let script_lao : Script
+
+pub let script_latin : Script
+
+pub let script_lepcha : Script
+
+pub let script_limbu : Script
+
+pub let script_linear_a : Script
+
+pub let script_linear_b : Script
+
+pub let script_lisu : Script
+
+pub let script_lycian : Script
+
+pub let script_lydian : Script
+
+pub let script_mahajani : Script
+
+pub let script_makasar : Script
+
+pub let script_malayalam : Script
+
+pub let script_mandaic : Script
+
+pub let script_manichaean : Script
+
+pub let script_marchen : Script
+
+pub let script_masaram_gondi : Script
+
+pub let script_medefaidrin : Script
+
+pub let script_meetei_mayek : Script
+
+pub let script_mende_kikakui : Script
+
+pub let script_meroitic_cursive : Script
+
+pub let script_meroitic_hieroglyphs : Script
+
+pub let script_miao : Script
+
+pub let script_modi : Script
+
+pub let script_mongolian : Script
+
+pub let script_mro : Script
+
+pub let script_multani : Script
+
+pub let script_myanmar : Script
+
+pub let script_myanmar_zawgyi : Script
+
+pub let script_nabataean : Script
+
+pub let script_nag_mundari : Script
+
+pub let script_nandinagari : Script
+
+pub let script_new_tai_lue : Script
+
+pub let script_newa : Script
+
+pub let script_nko : Script
+
+pub let script_nushu : Script
+
+pub let script_nyiakeng_puachue_hmong : Script
+
+pub let script_ogham : Script
+
+pub let script_ol_chiki : Script
+
+pub let script_ol_onal : Script
+
+pub let script_old_hungarian : Script
+
+pub let script_old_italic : Script
+
+pub let script_old_north_arabian : Script
+
+pub let script_old_permic : Script
+
+pub let script_old_persian : Script
+
+pub let script_old_sogdian : Script
+
+pub let script_old_south_arabian : Script
+
+pub let script_old_turkic : Script
+
+pub let script_old_uyghur : Script
+
+pub let script_oriya : Script
+
+pub let script_osage : Script
+
+pub let script_osmanya : Script
+
+pub let script_pahawh_hmong : Script
+
+pub let script_palmyrene : Script
+
+pub let script_pau_cin_hau : Script
+
+pub let script_phags_pa : Script
+
+pub let script_phoenician : Script
+
+pub let script_psalter_pahlavi : Script
+
+pub let script_rejang : Script
+
+pub let script_runic : Script
+
+pub let script_samaritan : Script
+
+pub let script_saurashtra : Script
+
+pub let script_script_math : Script
+
+pub let script_sharada : Script
+
+pub let script_shavian : Script
+
+pub let script_siddham : Script
+
+pub let script_signwriting : Script
+
+pub let script_sinhala : Script
+
+pub let script_sogdian : Script
+
+pub let script_sora_sompeng : Script
+
+pub let script_soyombo : Script
+
+pub let script_sundanese : Script
+
+pub let script_sunuwar : Script
+
+pub let script_syloti_nagri : Script
+
+pub let script_syriac : Script
+
+pub let script_tagalog : Script
+
+pub let script_tagbanwa : Script
+
+pub let script_tai_le : Script
+
+pub let script_tai_tham : Script
+
+pub let script_tai_viet : Script
+
+pub let script_takri : Script
+
+pub let script_tamil : Script
+
+pub let script_tangsa : Script
+
+pub let script_tangut : Script
+
+pub let script_telugu : Script
+
+pub let script_thaana : Script
+
+pub let script_thai : Script
+
+pub let script_tibetan : Script
+
+pub let script_tifinagh : Script
+
+pub let script_tirhuta : Script
+
+pub let script_todhri : Script
+
+pub let script_toto : Script
+
+pub let script_tulu_tigalari : Script
+
+pub let script_ugaritic : Script
+
+pub let script_unknown : Script
+
+pub let script_vai : Script
+
+pub let script_vithkuqi : Script
+
+pub let script_wancho : Script
+
+pub let script_warang_citi : Script
+
+pub let script_yezidi : Script
+
+pub let script_yi : Script
+
+pub let script_zanabazar_square : Script
+
+pub fn shape(Face, Array[Feature], UnicodeBuffer) -> GlyphBuffer
+
+pub fn shape_with_plan(Face, ShapePlan, UnicodeBuffer) -> GlyphBuffer
+
+// Errors
+
+// Types and methods
+type Buffer
+
+pub(all) enum Direction {
+  Invalid
+  LeftToRight
+  RightToLeft
+  TopToBottom
+  BottomToTop
+} derive(Eq, Hash, @debug.Debug)
+pub fn Direction::from_script(Script) -> Self?
+pub fn Direction::from_str(String) -> Self?
+pub fn Direction::is_backward(Self) -> Bool
+pub fn Direction::is_forward(Self) -> Bool
+pub fn Direction::is_horizontal(Self) -> Bool
+pub fn Direction::is_vertical(Self) -> Bool
+pub fn Direction::reverse(Self) -> Self
+pub impl Default for Direction
+
+type Face
+pub fn Face::from_face(@otf.Face) -> Self
+pub fn Face::from_slice(BytesView, UInt) -> Self?
+pub fn Face::set_pixels_per_em(Self, (Int, Int)?) -> Unit
+pub fn Face::set_points_per_em(Self, Float?) -> Unit
+pub fn Face::set_variation(Self, @otf.Tag, Float) -> Unit
+pub fn Face::set_variations(Self, Array[Variation]) -> Unit
+pub fn Face::ttf(Self) -> @otf.Face
+pub fn Face::units_per_em(Self) -> Int
+
+pub(all) struct Feature {
+  tag : @otf.Tag
+  value : UInt
+  start : UInt
+  end : UInt
+} derive(Eq, Hash, @debug.Debug)
+pub fn Feature::from_str(String) -> Self?
+pub fn Feature::is_global(Self) -> Bool
+pub fn Feature::new(@otf.Tag, UInt, start? : UInt, end? : UInt) -> Self
+
+pub struct GlyphBuffer(Buffer)
+pub fn GlyphBuffer::clear(Self) -> UnicodeBuffer
+pub fn GlyphBuffer::glyph_infos(Self) -> ArrayView[GlyphInfo]
+pub fn GlyphBuffer::glyph_positions(Self) -> ArrayView[GlyphPosition]
+pub fn GlyphBuffer::is_empty(Self) -> Bool
+pub fn GlyphBuffer::len(Self) -> Int
+pub fn GlyphBuffer::serialize(Self, Face, Int) -> String
+
+pub(all) struct GlyphInfo {
+  mut glyph_id : UInt
+  mut mask : UInt
+  mut cluster : UInt
+  mut var1 : UInt
+  mut var2 : UInt
+} derive(@debug.Debug)
+pub fn GlyphInfo::unsafe_to_break(Self) -> Bool
+
+pub(all) struct GlyphPosition {
+  mut x_advance : Int
+  mut y_advance : Int
+  mut x_offset : Int
+  mut y_offset : Int
+  mut var_ : UInt
+} derive(@debug.Debug)
+
+pub(all) struct Language(String) derive(Eq, Hash, @debug.Debug)
+pub fn Language::as_str(Self) -> String
+pub fn Language::from_str(String) -> Self?
+
+pub(all) struct Script(@otf.Tag) derive(Compare, Eq, Hash)
+pub fn Script::from_iso15924_tag(@otf.Tag) -> Self?
+pub fn Script::from_str(String) -> Self?
+pub fn Script::tag(Self) -> @otf.Tag
+pub impl Show for Script
+
+type ShapePlan
+pub fn ShapePlan::direction(Self) -> Direction
+pub fn ShapePlan::new(Face, Direction, Script?, Language?, Array[Feature]) -> Self
+pub fn ShapePlan::script(Self) -> Script?
+
+pub struct UnicodeBuffer(Buffer)
+pub fn UnicodeBuffer::add(Self, Int, UInt) -> Unit
+pub fn UnicodeBuffer::clear(Self) -> Unit
+pub fn UnicodeBuffer::cluster_level(Self) -> Int
+pub fn UnicodeBuffer::direction(Self) -> Direction
+pub fn UnicodeBuffer::flags(Self) -> UInt
+pub fn UnicodeBuffer::guess_segment_properties(Self) -> Unit
+pub fn UnicodeBuffer::is_empty(Self) -> Bool
+pub fn UnicodeBuffer::language(Self) -> Language?
+pub fn UnicodeBuffer::len(Self) -> Int
+pub fn UnicodeBuffer::new() -> Self
+pub fn UnicodeBuffer::push_str(Self, String) -> Unit
+pub fn UnicodeBuffer::reset_clusters(Self) -> Unit
+pub fn UnicodeBuffer::script(Self) -> Script
+pub fn UnicodeBuffer::set_cluster_level(Self, Int) -> Unit
+pub fn UnicodeBuffer::set_direction(Self, Direction) -> Unit
+pub fn UnicodeBuffer::set_flags(Self, UInt) -> Unit
+pub fn UnicodeBuffer::set_language(Self, Language) -> Unit
+pub fn UnicodeBuffer::set_not_found_variation_selector_glyph(Self, UInt) -> Unit
+pub fn UnicodeBuffer::set_post_context(Self, Array[Int]) -> Unit
+pub fn UnicodeBuffer::set_pre_context(Self, Array[Int]) -> Unit
+pub fn UnicodeBuffer::set_script(Self, Script) -> Unit
+
+pub(all) struct Variation {
+  tag : @otf.Tag
+  value : Float
+} derive(Eq, @debug.Debug)
+pub fn Variation::from_str(String) -> Self?
+
+// Type aliases
+
+// Traits

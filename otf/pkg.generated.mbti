@@ -518,6 +518,7 @@ pub fn Face::paint_color_glyph(Self, GlyphId, UInt16, RgbaColor, &ColrPainter) -
 pub fn Face::parse(BytesView, UInt) -> Self raise FaceParsingError
 pub fn Face::permissions(Self) -> Permissions?
 pub fn Face::raw_face(Self) -> RawFace
+pub fn Face::set_normalized_coordinates(Self, Array[Int]) -> Unit
 pub fn Face::set_variation(Self, Tag, Float) -> Unit?
 pub fn Face::strikeout_metrics(Self) -> LineMetrics?
 pub fn Face::style(Self) -> Style

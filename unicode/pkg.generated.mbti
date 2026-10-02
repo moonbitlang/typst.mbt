@@ -76,6 +76,14 @@ pub fn perl_space_ranges() -> Array[(Int, Int)]
 
 pub fn perl_word_ranges() -> Array[(Int, Int)]
 
+pub fn rb_combining_class(Int) -> Int
+
+pub fn rb_general_category(Int) -> Int
+
+pub fn rb_mirrored(Int) -> Int?
+
+pub fn rb_script_tag(Int) -> String
+
 pub fn rust_debug_char(Char) -> String
 
 pub fn rust_debug_str(StringView) -> String

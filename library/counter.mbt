@@ -699,11 +699,22 @@ pub impl FromValue for CounterKey with fn from_value(v) {
     let elem = Element::from_value(v)
     if elem == page_elem() {
       return Page
+    } else if elem.is_locatable() && elem.is_unqueriable() {
+      // Upstream stores `CounterKey` natively and never casts it back from a
+      // value. Internal counters on unqueriable elements (the line number
+      // counter on `ParLineMarker`) must survive the value round trip of
+      // the port's element fields. Users cannot name such elements.
+      return Selector(Elem(elem, None))
     } else {
       return Selector(LocatableSelector::from_value(elem.into_value()).0)
     }
   }
   if LocatableSelector::castable(v) {
+    // See above: internal counters on unqueriable elements.
+    let sel = Selector::from_value(v) catch { _ => Can("") }
+    if sel is Elem(elem, _) && elem.is_locatable() && elem.is_unqueriable() {
+      return Selector(sel)
+    }
     return Selector(LocatableSelector::from_value(v).0)
   }
   raise HintedError(CounterKey::input().error(v))

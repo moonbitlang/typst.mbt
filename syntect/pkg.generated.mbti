@@ -1,0 +1,477 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/syntect"
+
+import {
+  "moonbitlang/core/debug",
+  "moonbitlang/typst/data/yaml_rust",
+}
+
+// Values
+pub let atom_len_bits : Int
+
+pub let color_black : Color
+
+pub let color_white : Color
+
+pub fn compare_str(StringView, StringView) -> Int
+
+pub fn context_iter(SyntaxSet, Context) -> MatchIter
+
+pub fn eq_ignore_ascii_case(StringView, StringView) -> Bool
+
+pub let font_style_bold : FontStyle
+
+pub let font_style_italic : FontStyle
+
+pub let font_style_underline : FontStyle
+
+pub fn highlight_iter(HighlightState, Array[(Int, ScopeStackOp)], ByteIndex, Highlighter) -> Array[(Style, String)]
+
+pub fn ranged_highlight(HighlightState, Array[(Int, ScopeStackOp)], ByteIndex, Highlighter) -> Array[(Style, String, (Int, Int))]
+
+pub fn read_plist(Bytes) -> Settings raise SettingsError
+
+pub fn regex_syntax_escape(StringView) -> String
+
+pub fn regex_syntax_escape_into(StringView, StringBuilder) -> Unit
+
+pub fn rust_debug_str(StringView) -> String
+
+pub fn rust_trim(StringView) -> StringView
+
+pub fn split_whitespace(StringView) -> Array[StringView]
+
+pub fn[T] stable_sort_by(Array[T], (T, T) -> Int) -> Array[T]
+
+pub fn substitute_backrefs_in_regex(String, (Int) -> String?) -> String
+
+pub fn utf8_len(StringView) -> Int
+
+// Errors
+pub(all) suberror LoadingError {
+  ParseSyntax(ParseSyntaxError, String)
+  ParseTheme(ParseThemeError)
+  ReadSettings(SettingsError)
+}
+pub impl Show for LoadingError
+
+pub(all) suberror ParseScopeError {
+  TooLong
+  TooManyAtoms
+}
+pub impl Show for ParseScopeError
+
+pub(all) suberror ParseSyntaxError {
+  InvalidYaml(@yaml_rust.ScanError)
+  EmptyFile
+  MissingMandatoryKey(String)
+  RegexCompileError(String, String)
+  InvalidScope(ParseScopeError)
+  BadFileRef
+  MainMissing
+  TypeMismatch
+}
+pub impl Show for ParseSyntaxError
+
+pub(all) suberror ParseThemeError {
+  IncorrectUnderlineOption
+  IncorrectFontStyle(String)
+  IncorrectColor
+  IncorrectSyntax
+  IncorrectSettings
+  UndefinedSettings
+  UndefinedScopeSettings(String)
+  ColorShemeScopeIsNotObject
+  ColorShemeSettingsIsNotObject
+  ScopeSelectorIsNotString(String)
+  DuplicateSettings
+  ScopeParse(ParseScopeError)
+}
+pub impl Show for ParseThemeError
+
+pub(all) suberror ParsingError {
+  MissingMainContext
+  MissingContext(ContextId)
+  BadMatchIndex(Int)
+  UnresolvedContextReference(ContextReference)
+}
+pub impl Show for ParsingError
+
+pub(all) suberror ScopeError {
+  NoClearedScopesToRestore
+}
+pub impl Show for ScopeError
+
+pub(all) suberror SettingsError {
+  Plist(String)
+}
+pub impl Show for SettingsError
+
+pub(all) suberror SyntectError {
+  LoadingError(LoadingError)
+  ParsingError(ParsingError)
+  ScopeError(ScopeError)
+}
+pub impl Show for SyntectError
+
+// Types and methods
+pub(all) enum BasicScopeStackOp {
+  Push(Scope)
+  Pop
+} derive(Eq)
+
+pub struct ByteIndex {
+  // private fields
+}
+pub fn ByteIndex::len(Self) -> Int
+pub fn ByteIndex::new(String) -> Self
+pub fn ByteIndex::slice(Self, Int, Int) -> String
+pub fn ByteIndex::text(Self) -> String
+pub fn ByteIndex::utf16(Self, Int) -> Int
+
+pub(all) enum ClearAmount {
+  TopN(Int)
+  All
+} derive(Eq, @debug.Debug)
+
+pub(all) struct Color {
+  r : Byte
+  g : Byte
+  b : Byte
+  a : Byte
+} derive(Default, Eq, Hash)
+pub fn Color::from_str(String) -> Self raise ParseThemeError
+pub impl Show for Color
+
+pub(all) struct Context {
+  mut meta_scope : Array[Scope]
+  mut meta_content_scope : Array[Scope]
+  mut meta_include_prototype : Bool
+  mut clear_scopes : ClearAmount?
+  mut prototype : ContextId?
+  mut uses_backrefs : Bool
+  patterns : Array[Pattern]
+}
+pub fn Context::match_at(Self, Int) -> MatchPattern raise ParsingError
+pub fn Context::new(Bool) -> Self
+
+pub(all) struct ContextId {
+  syntax_index : Int
+  context_index : Int
+} derive(Eq, Hash, @debug.Debug)
+
+pub(all) enum ContextReference {
+  Named(String)
+  ByScope(scope~ : Scope, sub_context~ : String?, with_escape~ : Bool)
+  File(name~ : String, sub_context~ : String?, with_escape~ : Bool)
+  Inline(String)
+  Direct(ContextId)
+} derive(Eq)
+pub fn ContextReference::id(Self) -> ContextId raise ParsingError
+pub fn ContextReference::resolve(Self, SyntaxSet) -> Context raise ParsingError
+pub impl Show for ContextReference
+
+pub(all) struct FontStyle {
+  bits : Byte
+} derive(Compare, Default, Eq, Hash)
+pub fn FontStyle::all() -> Self
+pub fn FontStyle::bits(Self) -> Byte
+pub fn FontStyle::contains(Self, Self) -> Bool
+pub fn FontStyle::empty() -> Self
+pub fn FontStyle::from_str(String) -> Self raise ParseThemeError
+pub fn FontStyle::is_empty(Self) -> Bool
+pub fn FontStyle::union(Self, Self) -> Self
+pub impl BitOr for FontStyle
+pub impl Show for FontStyle
+
+pub struct HighlightLines {
+  // private fields
+}
+pub fn HighlightLines::highlight_line(Self, String, SyntaxSet) -> Array[(Style, String)] raise SyntectError
+pub fn HighlightLines::new(SyntaxReference, Theme) -> Self
+
+pub struct HighlightState {
+  path : ScopeStack
+  // private fields
+}
+pub fn HighlightState::new(Highlighter, ScopeStack) -> Self
+
+pub struct Highlighter {
+  // private fields
+}
+pub fn Highlighter::get_default(Self) -> Style
+pub fn Highlighter::new(Theme) -> Self
+pub fn Highlighter::style_for_stack(Self, ArrayView[Scope]) -> Style
+pub fn Highlighter::style_mod_for_stack(Self, ArrayView[Scope]) -> StyleModifier
+
+pub(all) struct LazyContexts {
+  context_ids : Map[String, ContextId]
+  contexts : Array[Context]
+}
+
+pub struct MatchIter {
+  // private fields
+}
+pub fn MatchIter::next(Self) -> (Context, Int)?
+
+pub(all) enum MatchOperation {
+  Push(Array[ContextReference])
+  Set(Array[ContextReference])
+  Pop
+  None
+}
+
+pub struct MatchPattern {
+  has_captures : Bool
+  regex : Regex
+  scope : Array[Scope]
+  captures : Array[(Int, Array[Scope])]?
+  operation : MatchOperation
+  with_prototype : ContextReference?
+  // private fields
+}
+pub fn MatchPattern::new(Bool, String, Array[Scope], Array[(Int, Array[Scope])]?, MatchOperation, ContextReference?) -> Self
+pub fn MatchPattern::regex(Self) -> Regex
+pub fn MatchPattern::regex_with_refs(Self, Region, ByteIndex) -> Regex
+
+pub(all) struct MatchPower(Double) derive(Compare, Eq, @debug.Debug)
+
+pub struct ParseState {
+  // private fields
+}
+pub fn ParseState::new(SyntaxReference) -> Self
+pub fn ParseState::parse_line(Self, String, SyntaxSet) -> Array[(Int, ScopeStackOp)] raise ParsingError
+pub fn ParseState::parse_line_indexed(Self, ByteIndex, SyntaxSet) -> Array[(Int, ScopeStackOp)] raise ParsingError
+
+pub(all) enum Pattern {
+  Match(MatchPattern)
+  Include(ContextReference)
+}
+
+pub struct Regex {
+  // private fields
+}
+pub fn Regex::is_match(Self, String) -> Bool
+pub fn Regex::new(String) -> Self
+pub fn Regex::regex_str(Self) -> String
+pub fn Regex::search(Self, ByteIndex, Int, Int, Region?) -> Bool
+pub fn Regex::search_text(Self, SearchText, Int, Int, Region?) -> Bool
+pub fn Regex::try_compile(String) -> String?
+
+pub struct Region {
+  // private fields
+} derive(Eq)
+pub fn Region::clone(Self) -> Self
+pub fn Region::new() -> Self
+pub fn Region::pos(Self, Int) -> (Int, Int)?
+
+pub(all) struct Scope {
+  a : UInt64
+  b : UInt64
+} derive(Compare, Default, Eq, Hash)
+pub fn Scope::atom_at(Self, Int) -> Int
+pub fn Scope::build_string(Self) -> String
+pub fn Scope::debug(Self) -> String
+pub fn Scope::is_empty(Self) -> Bool
+pub fn Scope::is_prefix_of(Self, Self) -> Bool
+pub fn Scope::len(Self) -> Int
+pub fn Scope::new(StringView) -> Self raise ParseScopeError
+pub impl Show for Scope
+
+pub struct ScopeRepository {
+  // private fields
+}
+pub fn ScopeRepository::atom_str(Self, Int) -> String
+pub fn ScopeRepository::build(Self, StringView) -> Scope raise ParseScopeError
+pub fn ScopeRepository::to_string(Self, Scope) -> String
+
+pub(all) struct ScopeSelector {
+  path : ScopeStack
+  excludes : Array[ScopeStack]
+} derive(Eq)
+pub fn ScopeSelector::does_match(Self, ArrayView[Scope]) -> MatchPower?
+pub fn ScopeSelector::extract_scopes(Self) -> Array[Scope]
+pub fn ScopeSelector::extract_single_scope(Self) -> Scope?
+pub fn ScopeSelector::from_str(StringView) -> Self raise ParseScopeError
+
+pub(all) struct ScopeSelectors {
+  selectors : Array[ScopeSelector]
+} derive(Eq)
+pub fn ScopeSelectors::does_match(Self, ArrayView[Scope]) -> MatchPower?
+pub fn ScopeSelectors::from_str(StringView) -> Self raise ParseScopeError
+
+pub(all) struct ScopeStack {
+  clear_stack : Array[Array[Scope]]
+  scopes : Array[Scope]
+} derive(Eq)
+pub fn ScopeStack::apply(Self, ScopeStackOp) -> Unit raise ScopeError
+pub fn ScopeStack::apply_with_hook(Self, ScopeStackOp, (BasicScopeStackOp, ArrayView[Scope]) -> Unit) -> Unit raise ScopeError
+pub fn ScopeStack::as_slice(Self) -> ArrayView[Scope]
+pub fn ScopeStack::bottom_n(Self, Int) -> ArrayView[Scope]
+pub fn ScopeStack::does_match(Self, ArrayView[Scope]) -> MatchPower?
+pub fn ScopeStack::from_str(StringView) -> Self raise ParseScopeError
+pub fn ScopeStack::from_vec(Array[Scope]) -> Self
+pub fn ScopeStack::is_empty(Self) -> Bool
+pub fn ScopeStack::len(Self) -> Int
+pub fn ScopeStack::new() -> Self
+pub fn ScopeStack::pop(Self) -> Unit
+pub fn ScopeStack::push(Self, Scope) -> Unit
+pub impl Show for ScopeStack
+
+pub(all) enum ScopeStackOp {
+  Push(Scope)
+  Pop(Int)
+  Clear(ClearAmount)
+  Restore
+  Noop
+} derive(Eq)
+
+pub(all) struct ScoredStyle {
+  foreground : (MatchPower, Color)
+  background : (MatchPower, Color)
+  font_style : (MatchPower, FontStyle)
+} derive(Eq)
+
+pub struct SearchText {
+  // private fields
+}
+pub fn SearchText::len(Self) -> Int
+pub fn SearchText::new(ByteIndex) -> Self
+pub fn SearchText::next_char_offset(Self, Int) -> Int?
+pub fn SearchText::text(Self) -> ByteIndex
+
+pub(all) enum Settings {
+  Null
+  Bool(Bool)
+  Number(String)
+  String(String)
+  Array(Array[Settings])
+  Object(Map[String, Settings])
+} derive(Eq)
+pub fn Settings::as_str(Self) -> String?
+pub impl Show for Settings
+
+pub(all) struct Style {
+  foreground : Color
+  background : Color
+  font_style : FontStyle
+} derive(Eq, Hash)
+pub fn Style::apply(Self, StyleModifier) -> Self
+pub fn Style::default_style() -> Self
+
+pub(all) struct StyleModifier {
+  foreground : Color?
+  background : Color?
+  font_style : FontStyle?
+} derive(Default, Eq)
+pub fn StyleModifier::apply(Self, Self) -> Self
+
+pub(all) struct SyntaxDefinition {
+  name : String
+  file_extensions : Array[String]
+  scope : Scope
+  first_line_match : String?
+  hidden : Bool
+  variables : Map[String, String]
+  contexts : Map[String, Context]
+}
+pub fn SyntaxDefinition::load_from_str(String, Bool, String?) -> Self raise ParseSyntaxError
+
+pub struct SyntaxReference {
+  name : String
+  file_extensions : Array[String]
+  scope : Scope
+  first_line_match : String?
+  hidden : Bool
+  variables : Map[String, String]
+  // private fields
+}
+pub fn SyntaxReference::context_ids(Self) -> Map[String, ContextId]
+pub fn SyntaxReference::new_lazy(name~ : String, file_extensions~ : Array[String], scope~ : Scope, first_line_match~ : String?, hidden~ : Bool, variables~ : Map[String, String], loader~ : () -> LazyContexts) -> Self
+
+pub struct SyntaxSet {
+  // private fields
+}
+pub fn SyntaxSet::find_syntax_by_extension(Self, String) -> SyntaxReference?
+pub fn SyntaxSet::find_syntax_by_first_line(Self, String) -> SyntaxReference?
+pub fn SyntaxSet::find_syntax_by_name(Self, String) -> SyntaxReference?
+pub fn SyntaxSet::find_syntax_by_scope(Self, Scope) -> SyntaxReference?
+pub fn SyntaxSet::find_syntax_by_token(Self, String) -> SyntaxReference?
+pub fn SyntaxSet::find_syntax_plain_text(Self) -> SyntaxReference
+pub fn SyntaxSet::from_compact(String, FixedArray[String]) -> Self
+pub fn SyntaxSet::from_lazy_syntaxes(Array[SyntaxReference]) -> Self
+pub fn SyntaxSet::get_context(Self, ContextId) -> Context raise ParsingError
+pub fn SyntaxSet::new() -> Self
+pub fn SyntaxSet::syntaxes(Self) -> Array[SyntaxReference]
+
+pub struct SyntaxSetBuilder {
+  // private fields
+}
+pub fn SyntaxSetBuilder::add(Self, SyntaxDefinition) -> Unit
+pub fn SyntaxSetBuilder::build(Self) -> SyntaxSet
+pub fn SyntaxSetBuilder::new() -> Self
+pub fn SyntaxSetBuilder::syntaxes(Self) -> Array[SyntaxDefinition]
+
+pub(all) struct Theme {
+  name : String?
+  author : String?
+  settings : ThemeSettings
+  scopes : Array[ThemeItem]
+}
+pub fn Theme::parse_settings(Settings) -> Self raise ParseThemeError
+
+pub(all) struct ThemeItem {
+  scope : ScopeSelectors
+  style : StyleModifier
+}
+
+pub(all) struct ThemeSet {
+  themes : Map[String, Theme]
+}
+pub fn ThemeSet::load_from_reader(Bytes) -> Theme raise LoadingError
+
+pub(all) struct ThemeSettings {
+  foreground : Color?
+  background : Color?
+  caret : Color?
+  line_highlight : Color?
+  misspelling : Color?
+  minimap_border : Color?
+  accent : Color?
+  popup_css : String?
+  phantom_css : String?
+  bracket_contents_foreground : Color?
+  bracket_contents_options : UnderlineOption?
+  brackets_foreground : Color?
+  brackets_background : Color?
+  brackets_options : UnderlineOption?
+  tags_foreground : Color?
+  tags_options : UnderlineOption?
+  highlight : Color?
+  find_highlight : Color?
+  find_highlight_foreground : Color?
+  gutter : Color?
+  gutter_foreground : Color?
+  selection : Color?
+  selection_foreground : Color?
+  selection_border : Color?
+  inactive_selection : Color?
+  inactive_selection_foreground : Color?
+  guide : Color?
+  active_guide : Color?
+  stack_guide : Color?
+  shadow : Color?
+} derive(Default)
+
+pub(all) enum UnderlineOption {
+  None
+  Underline
+  StippledUnderline
+  SquigglyUnderline
+} derive(Eq)
+pub fn UnderlineOption::from_str(String) -> Self raise ParseThemeError
+
+// Type aliases
+pub type CaptureMapping = Array[(Int, Array[Scope])]
+
+// Traits
