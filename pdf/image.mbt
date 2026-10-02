@@ -1,8 +1,10 @@
 // Port of `typst-pdf/src/image.rs`.
 //
-// TODO: SVG images (upstream draws them with `krilla-svg`) and PDF images
-// (embedded pages) are not ported yet; they are skipped. GIF and WebP
-// images are not decoded by the library yet and are skipped as well.
+// SVG images are drawn with the port of `krilla-svg` (`svg*.mbt`).
+//
+// TODO: PDF images (embedded pages) are not ported yet; they are skipped.
+// GIF and WebP images are not decoded by the library yet and are skipped as
+// well.
 
 ///|
 fn handle_image(
@@ -44,7 +46,18 @@ fn handle_image(
       }
       surface.pop()
     }
-    Svg(_) | Pdf(_) => ()
+    Svg(svg) =>
+      if to_export_size(size) is Some(size) {
+        draw_svg(
+          surface,
+          svg.tree(),
+          size,
+          { ..SvgSettings::default(), embed_text: true, },
+          gc.svg_fonts,
+        )
+        |> ignore
+      }
+    Pdf(_) => ()
   }
   if started {
     surface.end_tagged()
@@ -56,7 +69,12 @@ fn handle_image(
 ///|
 /// A key identifying the raster data of an image.
 fn raster_key(raster : @library.RasterImage) -> String {
-  let data = raster.data()
+  bytes_key(raster.data())
+}
+
+///|
+/// A key identifying image data.
+fn bytes_key(data : Bytes) -> String {
   // FNV-1a over the data.
   let mut h = 0xcbf29ce484222325UL
   for b in data {
@@ -76,25 +94,9 @@ fn convert_raster(
   let width = raster.width().reinterpret_as_int()
   let height = raster.height().reinterpret_as_int()
   if raster.format() == Exchange(Jpg) {
-    let (components, adobe, dims) = jpeg_components(raster.data())
-    // The image is embedded as is, so use the dimensions of the frame (the
-    // raster's dimensions have the EXIF orientation applied).
-    let (width, height) = dims.unwrap_or((width, height))
-    let colorspace : @export.ImageColorspace = match components {
-      1 => Luma
-      4 => Cmyk
-      _ => Rgb
-    }
-    return Ok({
-      key,
-      width,
-      height,
-      colorspace,
-      data: Jpeg(raster.data()),
-      icc: raster.icc(),
-      interpolate,
-      inverted_cmyk: adobe,
-    })
+    return Ok(
+      convert_jpeg(key, raster.data(), width, height, raster.icc(), interpolate),
+    )
   }
   // The decoded pixels (decoding PNGs here if the image was not decoded).
   let (color, buf) : (@codecs.ColorType, Bytes) = match raster.dynamic() {
@@ -109,51 +111,8 @@ fn convert_raster(
         return Err(None)
       }
   }
-  let channels = color.channel_count()
-  let sixteen = color is (L16 | La16 | Rgb16 | Rgba16)
-  let has_alpha = color is (La8 | Rgba8 | La16 | Rgba16)
-  let has_color = channels >= 3
-  let bpc = if sixteen { 2 } else { 1 }
-  let n = width * height
-  if buf.length() < n * channels * bpc {
-    return Err(Some("image data is truncated"))
-  }
-  let color_buf = Array::make(n * (if has_color { 3 } else { 1 }), b'\x00')
-  let alpha_buf = Array::make(if has_alpha { n } else { 0 }, b'\x00')
-  let color_channels = if has_color { 3 } else { 1 }
-  for p in 0..<n {
-    let base = p * channels * bpc
-    for c in 0..<color_channels {
-      // 16-bit samples are big-endian; keep the high byte.
-      color_buf[p * color_channels + c] = buf[base + c * bpc]
-    }
-    if has_alpha {
-      alpha_buf[p] = buf[base + (channels - 1) * bpc]
-    }
-  }
   // The ICC profile is only kept for 8-bit images that are used as is.
-  let icc = if sixteen { None } else { raster.icc() }
-  Ok({
-    key,
-    width,
-    height,
-    colorspace: if has_color {
-      Rgb
-    } else {
-      Luma
-    },
-    data: Samples(
-      Bytes::from_array(color_buf),
-      if has_alpha {
-        Some(Bytes::from_array(alpha_buf))
-      } else {
-        None
-      },
-    ),
-    icc,
-    interpolate,
-    inverted_cmyk: false,
-  })
+  convert_samples(key, width, height, color, buf, raster.icc(), interpolate)
 }
 
 ///|
@@ -267,4 +226,92 @@ fn jpeg_components(data : Bytes) -> (Int, Bool, (Int, Int)?) {
     i += 2 + len
   }
   (3, adobe, None)
+}
+
+///|
+/// Convert decoded pixels into an image.
+fn convert_samples(
+  key : String,
+  width : Int,
+  height : Int,
+  color : @codecs.ColorType,
+  buf : Bytes,
+  icc : Bytes?,
+  interpolate : Bool,
+) -> Result[@export.Image, String?] {
+  let channels = color.channel_count()
+  let sixteen = color is (L16 | La16 | Rgb16 | Rgba16)
+  let has_alpha = color is (La8 | Rgba8 | La16 | Rgba16)
+  let has_color = channels >= 3
+  let bpc = if sixteen { 2 } else { 1 }
+  let n = width * height
+  if buf.length() < n * channels * bpc {
+    return Err(Some("image data is truncated"))
+  }
+  let color_buf = Array::make(n * (if has_color { 3 } else { 1 }), b'\x00')
+  let alpha_buf = Array::make(if has_alpha { n } else { 0 }, b'\x00')
+  let color_channels = if has_color { 3 } else { 1 }
+  for p in 0..<n {
+    let base = p * channels * bpc
+    for c in 0..<color_channels {
+      // 16-bit samples are big-endian; keep the high byte.
+      color_buf[p * color_channels + c] = buf[base + c * bpc]
+    }
+    if has_alpha {
+      alpha_buf[p] = buf[base + (channels - 1) * bpc]
+    }
+  }
+  let icc = if sixteen { None } else { icc }
+  Ok({
+    key,
+    width,
+    height,
+    colorspace: if has_color {
+      Rgb
+    } else {
+      Luma
+    },
+    data: Samples(
+      Bytes::from_array(color_buf),
+      if has_alpha {
+        Some(Bytes::from_array(alpha_buf))
+      } else {
+        None
+      },
+    ),
+    icc,
+    interpolate,
+    inverted_cmyk: false,
+  })
+}
+
+///|
+/// Embed a JPEG image as is.
+fn convert_jpeg(
+  key : String,
+  data : Bytes,
+  width : Int,
+  height : Int,
+  icc : Bytes?,
+  interpolate : Bool,
+) -> @export.Image {
+  let (components, adobe, dims) = jpeg_components(data)
+  // The image is embedded as is, so use the dimensions of the frame (the
+  // raster's dimensions have the EXIF orientation applied).
+  let (width, height) = dims.unwrap_or((width, height))
+  let colorspace : @export.ImageColorspace = match components {
+    1 => Luma
+    4 => Cmyk
+    _ => Rgb
+  }
+  {
+    key,
+    width,
+    height,
+    colorspace,
+    data: Jpeg(data),
+    icc,
+    interpolate,
+    inverted_cmyk: adobe,
+  }
 }

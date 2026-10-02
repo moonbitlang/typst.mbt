@@ -270,6 +270,8 @@ priv struct GlobalContext {
   /// Cache the conversion between export and Typst fonts.
   fonts_forward : Map[@library.FontInstance, @export.Font]
   fonts_backward : Array[(@export.Font, @library.FontInstance)]
+  /// The fonts shared between Typst text and SVG images.
+  svg_fonts : SvgFontCache
   /// Mapping between images and their span.
   image_to_spans : Map[String, @syntax.Span]
   /// The spans of all images that appear in the document.
@@ -299,6 +301,7 @@ fn GlobalContext::new(
   {
     fonts_forward: {},
     fonts_backward: [],
+    svg_fonts: SvgFontCache::new(),
     image_to_spans: {},
     image_spans: {},
     document,

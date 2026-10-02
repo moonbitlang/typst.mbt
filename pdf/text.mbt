@@ -87,7 +87,23 @@ fn convert_font(
   match gc.fonts_forward.get(typst_font) {
     Some(font) => font
     None => {
-      let font = build_font(typst_font)
+      // Fonts without variations are shared with SVG images (krilla
+      // deduplicates fonts by their font info).
+      let font = if typst_font.variations().0.is_empty() {
+        let data = typst_font.font().data()
+        let index = typst_font.font().index().reinterpret_as_int()
+        match gc.svg_fonts.find(data, index) {
+          Some(Some(font)) => font
+          Some(None) => build_font(typst_font)
+          None => {
+            let font = build_font(typst_font)
+            gc.svg_fonts.insert(data, index, Some(font))
+            font
+          }
+        }
+      } else {
+        build_font(typst_font)
+      }
       gc.fonts_forward[typst_font] = font
       gc.fonts_backward.push((font, typst_font))
       font
