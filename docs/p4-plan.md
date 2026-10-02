@@ -524,7 +524,20 @@ own corpus (`hayro-tests/pdfs/{custom,load}`) and the dev-assets PDFs
 (object dump hashes, page boxes/dimensions/transforms, decoded content and
 operators). The replays now reconstruct PDF images and parse SVG assets.
 Deviations: image filters (DCT/JPX/JBIG2/CCITT) are not decoded (upstream
-`images` feature), document metadata (`Info`) is not parsed.
+`images` feature), document metadata (`Info`) is not parsed. Decryption
+(standard security handler, `crypto*.mbt`) is ported; all 360 oracle
+files match. SVG/HTML export of PDF images uses the hayro-interpret and
+hayro-svg ports (`hayro/interpret`, `hayro/svg`, `svg/image.mbt`
+`pdf_to_svg`). PNG export of PDF images is still missing: it needs a
+rasterizer implementing `@hayro_interpret.Device` (upstream uses hayro's
+vello_cpu renderer) behind `render/image.mbt`'s `Pdf` case.
+
+**Result (PDF/SVG images):** `pdf-semantic` 2271 → 2298/2299 (left:
+`image-svg-linked-many-formats`: GIF/WebP decoding, indexed PNGs), `paged`
+image-pdf 5/5, `svg` 2295 → 2299/2299, `svg-replay` 2279 → 2283, `html`
+507 → 508/508, `pdf-semantic-replay` 2261 → 2277, `bundle` 39/39,
+`pdftags` 133/133, `render` unchanged (2248; the four PDF-image tests need
+the rasterizer).
 
 ## Status: usvg port (SVG images and SVG glyphs)
 
