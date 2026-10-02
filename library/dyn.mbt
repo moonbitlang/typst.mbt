@@ -50,6 +50,9 @@ pub(all) enum DynValue {
   BlockMultiCallback(BlockMultiCallback)
   /// `text/deco.rs` (internal: the values of `TextElem::deco`)
   Decoration(Decoration)
+  /// The loaded data of a `Derived` field (stored in its generated internal
+  /// `<field>-derived` companion field; upstream `Derived::derived`).
+  Loaded(Loaded)
 } derive(Eq)
 
 ///|
@@ -82,6 +85,7 @@ pub fn DynValue::ty(self : DynValue) -> Type {
     // Upstream's `Decoration` has no Typst type; it is only stored in an
     // internal style property.
     Decoration(_) => Type::content()
+    Loaded(_) => Type::bytes()
   }
 }
 
@@ -106,6 +110,7 @@ pub fn DynValue::repr(self : DynValue) -> String {
     CellGrid(_) => "cellgrid(..)"
     InlineCallback(_) | BlockSingleCallback(_) | BlockMultiCallback(_) => "auto"
     Decoration(_) => "decoration(..)"
+    Loaded(_) => "loaded(..)"
   }
 }
 

@@ -161,3 +161,17 @@ pub impl FromValue for Readable with fn from_value(v) {
     raise HintedError(cast_error((Ty::new() : Ty[Readable]), v))
   }
 }
+
+///|
+pub impl Fingerprint for Loaded with fn fingerprint(self, state) {
+  match self.source.v {
+    Path(id) => {
+      state.write_discriminant(0)
+      state.write_u32(id.into_raw().to_uint())
+    }
+    Bytes => state.write_discriminant(1)
+  }
+  state.write_u64(self.source.span.0)
+  state.write_usize(self.data.length())
+  state.write_bytes(self.data)
+}
