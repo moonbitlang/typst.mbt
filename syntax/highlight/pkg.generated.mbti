@@ -1,0 +1,48 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/syntax/highlight"
+
+import {
+  "moonbitlang/core/debug",
+  "moonbitlang/typst/syntax",
+}
+
+// Values
+pub fn highlight(@syntax.LinkedNode) -> Tag?
+
+pub fn highlight_html(@syntax.SyntaxNode) -> String
+
+pub let tag_list : FixedArray[Tag]
+
+// Errors
+
+// Types and methods
+pub(all) enum Tag {
+  Comment
+  Punctuation
+  Escape
+  Strong
+  Emph
+  Link
+  Raw
+  Label
+  Ref
+  Heading
+  ListMarker
+  ListTerm
+  MathDelimiter
+  MathOperator
+  MathGroupingParens
+  Keyword
+  Operator
+  Number
+  String
+  Function
+  Interpolated
+  Error
+} derive(Eq, Hash, @debug.Debug)
+pub fn Tag::css_class(Self) -> String
+pub fn Tag::tm_scope(Self) -> String
+
+// Type aliases
+
+// Traits

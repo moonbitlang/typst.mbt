@@ -2603,6 +2603,7 @@ dependencies = [
  "codex",
  "comemo",
  "ecow",
+ "fancy-regex",
  "hayagriva",
  "hypher",
  "icu_collator",
@@ -2622,7 +2623,9 @@ dependencies = [
  "serde_json",
  "sha2",
  "syn 2.0.98",
+ "syntect",
  "ttf-parser",
+ "two-face",
  "typst",
  "typst-assets",
  "typst-bundle",
@@ -2648,6 +2651,7 @@ dependencies = [
  "unicode-script",
  "unicode-segmentation",
  "unscanny",
+ "yaml-rust",
 ]
 
 [[package]]
