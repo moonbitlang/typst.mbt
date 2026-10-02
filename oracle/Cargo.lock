@@ -2541,6 +2541,7 @@ dependencies = [
  "comemo",
  "ecow",
  "hayagriva",
+ "icu_collator",
  "parking_lot",
  "proc-macro2",
  "quick-xml 0.38.4",
