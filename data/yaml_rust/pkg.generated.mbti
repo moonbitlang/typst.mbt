@@ -1,0 +1,183 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/data/yaml_rust"
+
+import {
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub fn new_hash() -> LinkedHashMap[Yaml, Yaml]
+
+// Errors
+pub(all) suberror ScanError {
+  ScanError(mark~ : Marker, info~ : String)
+} derive(Eq, @debug.Debug)
+pub fn ScanError::info(Self) -> String
+pub fn ScanError::marker(Self) -> Marker
+pub fn ScanError::new(Marker, String) -> Self
+pub impl Show for ScanError
+
+// Types and methods
+pub(all) enum Event {
+  Nothing
+  StreamStart
+  StreamEnd
+  DocumentStart
+  DocumentEnd
+  Alias(Int)
+  Scalar(String, TScalarStyle, Int, TokenType?)
+  SequenceStart(Int)
+  SequenceEnd
+  MappingStart(Int)
+  MappingEnd
+} derive(Eq, @debug.Debug)
+
+pub struct LinkedHashMap[K, V] {
+  // private fields
+}
+pub fn[K : Hash + Eq, V] LinkedHashMap::contains_key(Self[K, V], K) -> Bool
+pub fn[K, V] LinkedHashMap::copy(Self[K, V]) -> Self[K, V]
+pub fn[K : Hash + Eq, V] LinkedHashMap::get(Self[K, V], K) -> V?
+pub fn[K : Hash + Eq, V] LinkedHashMap::insert(Self[K, V], K, V) -> V?
+pub fn[K, V] LinkedHashMap::is_empty(Self[K, V]) -> Bool
+pub fn[K, V] LinkedHashMap::iter(Self[K, V]) -> Iter[(K, V)]
+pub fn[K, V] LinkedHashMap::iter2(Self[K, V]) -> Iter2[K, V]
+pub fn[K, V] LinkedHashMap::keys(Self[K, V]) -> Iter[K]
+pub fn[K, V] LinkedHashMap::len(Self[K, V]) -> Int
+pub fn[K : Hash + Eq, V] LinkedHashMap::new() -> Self[K, V]
+pub fn[K : Hash + Eq, V] LinkedHashMap::remove(Self[K, V], K) -> V?
+pub fn[K, V] LinkedHashMap::to_array(Self[K, V]) -> Array[(K, V)]
+pub fn[K, V] LinkedHashMap::values(Self[K, V]) -> Iter[V]
+pub impl[K : Compare, V : Compare] Compare for LinkedHashMap[K, V]
+pub impl[K : Eq, V : Eq] Eq for LinkedHashMap[K, V]
+pub impl[K : Hash, V : Hash] Hash for LinkedHashMap[K, V]
+pub impl[K : Show, V : Show] Show for LinkedHashMap[K, V]
+pub impl[K : @debug.Debug, V : @debug.Debug] @debug.Debug for LinkedHashMap[K, V]
+
+pub struct Marker {
+  // private fields
+} derive(Eq, @debug.Debug)
+pub fn Marker::col(Self) -> Int
+pub fn Marker::index(Self) -> Int
+pub fn Marker::line(Self) -> Int
+
+pub struct Parser {
+  // private fields
+}
+pub fn[R : MarkedEventReceiver] Parser::load(Self, R, Bool) -> Unit raise ScanError
+pub fn Parser::new(String) -> Self
+pub fn Parser::next(Self) -> (Event, Marker) raise ScanError
+pub fn Parser::peek(Self) -> (Event, Marker) raise ScanError
+
+pub struct Scanner {
+  // private fields
+}
+pub fn Scanner::fetch_more_tokens(Self) -> Unit raise ScanError
+pub fn Scanner::fetch_next_token(Self) -> Unit raise ScanError
+pub fn Scanner::get_error(Self) -> ScanError?
+pub fn Scanner::mark(Self) -> Marker
+pub fn Scanner::new(String) -> Self
+pub fn Scanner::next(Self) -> Token?
+pub fn Scanner::next_token(Self) -> Token? raise ScanError
+pub fn Scanner::stream_ended(Self) -> Bool
+pub fn Scanner::stream_started(Self) -> Bool
+
+pub(all) enum TEncoding {
+  Utf8
+} derive(Eq, @debug.Debug)
+
+pub(all) enum TScalarStyle {
+  Any
+  Plain
+  SingleQuoted
+  DoubleQuoted
+  Literal
+  Foled
+} derive(Eq, @debug.Debug)
+
+pub(all) struct Token(Marker, TokenType) derive(Eq, @debug.Debug)
+
+pub(all) enum TokenType {
+  NoToken
+  StreamStart(TEncoding)
+  StreamEnd
+  VersionDirective(UInt, UInt)
+  TagDirective(String, String)
+  DocumentStart
+  DocumentEnd
+  BlockSequenceStart
+  BlockMappingStart
+  BlockEnd
+  FlowSequenceStart
+  FlowSequenceEnd
+  FlowMappingStart
+  FlowMappingEnd
+  BlockEntry
+  FlowEntry
+  Key
+  Value
+  Alias(String)
+  Anchor(String)
+  Tag(String, String)
+  Scalar(TScalarStyle, String)
+} derive(Eq, @debug.Debug)
+
+pub(all) enum Yaml {
+  Real(String)
+  Integer(Int64)
+  String(String)
+  Boolean(Bool)
+  Array(Array[Yaml])
+  Hash(LinkedHashMap[Yaml, Yaml])
+  Alias(Int)
+  Null
+  BadValue
+} derive(Eq, Hash, @debug.Debug)
+pub fn Yaml::as_bool(Self) -> Bool?
+pub fn Yaml::as_f64(Self) -> Double?
+pub fn Yaml::as_hash(Self) -> LinkedHashMap[Self, Self]?
+pub fn Yaml::as_i64(Self) -> Int64?
+pub fn Yaml::as_str(Self) -> String?
+pub fn Yaml::as_vec(Self) -> Array[Self]?
+#alias("_[_]")
+pub fn[I : YamlIndex] Yaml::at(Self, I) -> Self
+pub fn Yaml::from_str(String) -> Self
+pub fn Yaml::into_bool(Self) -> Bool?
+pub fn Yaml::into_f64(Self) -> Double?
+pub fn Yaml::into_hash(Self) -> LinkedHashMap[Self, Self]?
+pub fn Yaml::into_i64(Self) -> Int64?
+pub fn Yaml::into_iter(Self) -> Iter[Self]
+pub fn Yaml::into_string(Self) -> String?
+pub fn Yaml::into_vec(Self) -> Array[Self]?
+pub fn Yaml::is_array(Self) -> Bool
+pub fn Yaml::is_badvalue(Self) -> Bool
+pub fn Yaml::is_null(Self) -> Bool
+pub impl Compare for Yaml
+pub impl Show for Yaml
+
+pub struct YamlEmitter {
+  // private fields
+}
+pub fn YamlEmitter::compact(Self, Bool) -> Unit
+pub fn YamlEmitter::dump(Self, Yaml) -> Unit
+pub fn YamlEmitter::is_compact(Self) -> Bool
+pub fn YamlEmitter::new(StringBuilder) -> Self
+
+pub struct YamlLoader {
+  // private fields
+}
+pub fn YamlLoader::load_from_str(String) -> Array[Yaml] raise ScanError
+pub impl MarkedEventReceiver for YamlLoader
+
+// Type aliases
+
+// Traits
+pub(open) trait MarkedEventReceiver {
+  fn on_event(Self, Event, Marker) -> Unit
+}
+
+pub(open) trait YamlIndex {
+  fn index_into(Self, Yaml) -> Yaml
+}
+pub impl YamlIndex for Int
+pub impl YamlIndex for String
