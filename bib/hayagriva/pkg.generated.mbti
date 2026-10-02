@@ -1,0 +1,819 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/bib/hayagriva"
+
+import {
+  "moonbitlang/core/debug",
+  "moonbitlang/typst/bib/biblatex",
+  "moonbitlang/typst/bib/citationberg",
+  "moonbitlang/typst/data/yaml",
+}
+
+// Values
+pub fn entry_from_biblatex(@biblatex.Entry) -> Result[Entry, @biblatex.TypeError]
+
+pub fn from_biblatex(@biblatex.Bibliography) -> Result[Library, Array[@biblatex.TypeError]]
+
+pub fn from_biblatex_str(String) -> Result[Library, Array[BibLaTeXError]]
+
+pub fn from_yaml_str(String) -> Result[Library, YamlLoadError]
+
+pub fn group_by(String, (Char, Char) -> Bool) -> Array[String]
+
+pub fn is_cjk(Char) -> Bool
+
+pub fn locales() -> Array[@citationberg.Locale]
+
+pub fn rust_binary_search(Array[String], String) -> Bool
+
+pub fn simplify_children(ElemChildren) -> ElemChildren
+
+pub fn standalone_citation(CitationRequest) -> ElemChildren
+
+pub fn[W : FmtWrite] write_year(Int, Bool, W, String, String) -> Unit
+
+// Errors
+
+// Types and methods
+pub(all) struct Alphanumerical {
+  letters : Int
+} derive(Eq, Hash, @debug.Debug)
+pub fn Alphanumerical::citation(Self, Entry) -> String
+pub fn Alphanumerical::new() -> Self
+
+pub(all) enum ArchivedStyle {
+  Alphanumeric
+  AmericanAnthropologicalAssociation
+  AmericanChemicalSociety
+  AmericanGeophysicalUnion
+  AmericanInstituteOfAeronauticsAndAstronautics
+  AmericanInstituteOfPhysics
+  AmericanMedicalAssociation
+  AmericanMeteorologicalSociety
+  AmericanPhysicsSociety
+  AmericanPhysiologicalSociety
+  AmericanPoliticalScienceAssociation
+  AmericanPsychologicalAssociation
+  AmericanSocietyForMicrobiology
+  AmericanSocietyOfCivilEngineers
+  AmericanSocietyOfMechanicalEngineers
+  AmericanSociologicalAssociation
+  AngewandteChemie
+  AnnualReviews
+  AnnualReviewsAuthorDate
+  AssociacaoBrasileiraDeNormasTecnicas
+  AssociationForComputingMachinery
+  BiomedCentral
+  BristolUniversityPress
+  BritishMedicalJournal
+  Cell
+  ChicagoAuthorDate
+  ChicagoNotes
+  ChicagoShortenedNotes
+  Copernicus
+  CseCitationSequenceBrackets8thEdition
+  CseNameYear
+  CurrentOpinion
+  DeutscheGesellschaftFuerPsychologie
+  DeutscheSprache
+  ElsevierHarvard
+  ElsevierVancouver
+  ElsevierWithTitles
+  Frontiers
+  FutureMedicine
+  FutureScience
+  Gb77142005Numeric
+  Gb77142015AuthorDate
+  Gb77142015Note
+  Gb77142015Numeric
+  GostR7052008Numeric
+  HarvardCiteThemRight
+  InstituteOfElectricalAndElectronicsEngineers
+  InstituteOfPhysicsNumeric
+  Iso690AuthorDate
+  Iso690Numeric
+  Karger
+  MaryAnnLiebertVancouver
+  ModernHumanitiesResearchAssociationNotes
+  ModernLanguageAssociation
+  MultidisciplinaryDigitalPublishingInstitute
+  Nature
+  NlmCitationSequence
+  NlmCitationSequenceSuperscript
+  Pensoft
+  PublicLibraryOfScience
+  RoyalSocietyOfChemistry
+  SageVancouver
+  Sist02
+  Spie
+  SpringerBasic
+  SpringerBasicAuthorDate
+  SpringerFachzeitschriftenMedizinPsychologie
+  SpringerHumanitiesAuthorDate
+  SpringerLectureNotesInComputerScience
+  SpringerMathphys
+  SpringerSocpsychAuthorDate
+  SpringerVancouver
+  TaylorAndFrancisChicagoAuthorDate
+  TaylorAndFrancisNationalLibraryOfMedicine
+  TheInstitutionOfEngineeringAndTechnology
+  TheLancet
+  Thieme
+  Trends
+  TurabianAuthorDate
+  TurabianFullnote8
+} derive(Eq, Hash, @debug.Debug)
+pub fn ArchivedStyle::all() -> Array[Self]
+pub fn ArchivedStyle::by_id(String) -> Self?
+pub fn ArchivedStyle::by_name(String) -> Self?
+pub fn ArchivedStyle::csl_id(Self) -> String
+pub fn ArchivedStyle::display_name(Self) -> String
+pub fn ArchivedStyle::get(Self) -> @citationberg.Style
+pub fn ArchivedStyle::names(Self) -> Array[String]
+
+pub(all) enum BibLaTeXError {
+  Parse(@biblatex.ParseError)
+  Type(@biblatex.TypeError)
+} derive(Eq, @debug.Debug)
+pub impl Show for BibLaTeXError
+
+pub struct BibliographyDriver {
+  // private fields
+}
+pub fn BibliographyDriver::citation(Self, CitationRequest) -> Unit
+pub fn BibliographyDriver::finish(Self, BibliographyRequest) -> Rendered
+pub fn BibliographyDriver::new() -> Self
+pub fn BibliographyDriver::with_citation_number_offset(Self, Int) -> Self
+
+pub(all) struct BibliographyItem {
+  key : String
+  first_field : ElemChild?
+  content : ElemChildren
+} derive(@debug.Debug)
+
+pub(all) struct BibliographyRequest {
+  style : @citationberg.IndependentStyle
+  locale : @citationberg.LocaleCode?
+  locale_files : Array[@citationberg.Locale]
+}
+
+pub(all) enum Brackets {
+  Round
+  Square
+  None_
+} derive(Eq, @debug.Debug)
+pub fn Brackets::left(Self) -> Char?
+pub fn Brackets::right(Self) -> Char?
+
+pub(all) enum BufWriteFormat {
+  Plain
+  VT100
+  Html
+} derive(Eq, @debug.Debug)
+
+pub(all) enum Case {
+  Title(TitleCase)
+  Sentence(SentenceCase)
+  Uppercase
+  Lowercase
+  NoTransform
+  FirstUpper
+  AllUpper
+} derive(Eq, Hash, @debug.Debug)
+pub fn Case::from_text_case(@citationberg.TextCase) -> Self
+pub fn Case::transform(Self, String) -> String
+pub impl Default for Case
+
+pub struct CaseFolder {
+  // private fields
+}
+pub fn CaseFolder::buf_string(Self) -> String
+pub fn CaseFolder::case(Self) -> Case
+pub fn CaseFolder::ends_with(Self, Char) -> Bool
+pub fn CaseFolder::finish(Self) -> String
+pub fn CaseFolder::has_content(Self) -> Bool
+pub fn CaseFolder::is_empty(Self) -> Bool
+pub fn CaseFolder::len(Self) -> Int
+pub fn CaseFolder::mark_changed(Self) -> Unit
+pub fn CaseFolder::new() -> Self
+pub fn CaseFolder::prevent_trimming(Self) -> Unit
+pub fn CaseFolder::push(Self, Char) -> Unit
+pub fn CaseFolder::push_str(Self, String) -> Unit
+pub fn CaseFolder::push_verbatim(Self, String) -> Unit
+pub fn CaseFolder::reconfigure(Self, Case) -> Unit
+pub fn CaseFolder::set_buf_string(Self, String) -> Unit
+pub fn CaseFolder::with_config(Case) -> Self
+pub impl FmtWrite for CaseFolder
+
+pub(all) enum ChunkKind {
+  Normal
+  Verbatim
+  Math
+} derive(Eq, Hash, @debug.Debug)
+
+pub(all) struct ChunkedStrParseError(Int) derive(Eq, @debug.Debug)
+pub impl Show for ChunkedStrParseError
+
+pub(all) struct ChunkedString(Array[StringChunk]) derive(Eq, Hash, @debug.Debug)
+pub fn ChunkedString::copy(Self) -> Self
+pub fn ChunkedString::extend_chunks(Self, Self) -> Unit
+pub fn[W : FmtWrite] ChunkedString::fmt_serialized(Self, W) -> Unit
+pub fn ChunkedString::fold_case(Self, CaseFolder) -> Unit
+pub fn ChunkedString::format_sentence_case(Self, SentenceCase) -> String
+pub fn ChunkedString::format_title_case(Self, TitleCase) -> String
+pub fn ChunkedString::from_chunk(StringChunk) -> Self
+pub fn ChunkedString::from_str(String) -> Result[Self, ChunkedStrParseError]
+pub fn ChunkedString::from_string(String) -> Self
+pub fn ChunkedString::is_empty(Self) -> Bool
+pub fn ChunkedString::len(Self) -> Int
+pub fn ChunkedString::new() -> Self
+pub fn ChunkedString::push_char(Self, Char, ChunkKind) -> Unit
+pub fn ChunkedString::push_chunk(Self, StringChunk) -> Unit
+pub fn ChunkedString::push_str(Self, String, ChunkKind) -> Unit
+pub fn ChunkedString::to_lowercase(Self) -> String
+pub fn ChunkedString::to_str(Self) -> String
+pub fn ChunkedString::to_uppercase(Self) -> String
+pub impl Show for ChunkedString
+pub impl FmtWrite for ChunkedString
+
+pub struct CitationItem {
+  entry : Entry
+  locator : SpecificLocator?
+  locale : @citationberg.LocaleCode?
+  hidden : Bool
+  purpose : CitePurpose?
+  // private fields
+}
+pub fn CitationItem::new(Entry, SpecificLocator?, @citationberg.LocaleCode?, Bool, CitePurpose?) -> Self
+pub fn CitationItem::with_entry(Entry) -> Self
+pub fn CitationItem::with_locator(Entry, SpecificLocator?) -> Self
+
+pub struct CitationRequest {
+  items : Array[CitationItem]
+  locale : @citationberg.LocaleCode?
+  locale_files : Array[@citationberg.Locale]
+  // private fields
+}
+pub fn CitationRequest::from_items(Array[CitationItem], @citationberg.IndependentStyle, Array[@citationberg.Locale]) -> Self
+pub fn CitationRequest::new(Array[CitationItem], @citationberg.IndependentStyle, @citationberg.LocaleCode?, Array[@citationberg.Locale], Int?) -> Self
+
+pub(all) enum CitePurpose {
+  Author
+  Year
+  Full
+  Prose
+} derive(Eq, Hash, @debug.Debug)
+
+pub(all) struct Date {
+  year : Int
+  month : Int?
+  day : Int?
+  approximate : Bool
+  season : @citationberg.Season?
+} derive(Eq, Hash, @debug.Debug)
+pub fn Date::csl_cmp(Self, Self) -> Int
+pub fn Date::display_year(Self) -> String
+pub fn Date::display_year_opt(Self, Bool, Bool, Bool, Bool) -> String
+pub fn Date::from_str(String) -> Result[Self, DateError]
+pub fn Date::from_year(Int) -> Self
+pub impl Show for Date
+
+pub(all) enum DateError {
+  UnknownFormat
+  MonthOutOfBounds
+  DayOutOfBounds(Int)
+} derive(Eq, @debug.Debug)
+pub impl Show for DateError
+
+pub(all) struct Duration {
+  days : Int
+  hours : Int
+  minutes : Int
+  seconds : Int
+  milliseconds : Int
+} derive(Eq, Hash, @debug.Debug)
+pub fn Duration::cmp(Self, Self) -> Int
+pub fn Duration::from_str(String) -> Result[Self, DurationError]
+pub impl Show for Duration
+
+pub(all) enum DurationError {
+  Malformed
+  TooLarge
+} derive(Eq, Hash, @debug.Debug)
+pub impl Show for DurationError
+
+pub(all) struct DurationRange {
+  start : Duration
+  end : Duration
+} derive(Eq, Hash, @debug.Debug)
+pub fn DurationRange::from_str(String) -> Result[Self, DurationError]
+pub fn DurationRange::new(Duration, Duration?) -> Self
+pub impl Show for DurationRange
+
+pub(all) struct Elem {
+  mut children : ElemChildren
+  display : @citationberg.Display?
+  meta : ElemMeta?
+} derive(Eq, Hash, @debug.Debug)
+pub fn Elem::copy(Self) -> Self
+pub impl Show for Elem
+
+pub(all) enum ElemChild {
+  Text(Formatted)
+  Elem(Elem)
+  Markup(String)
+  Link(text~ : Formatted, url~ : String)
+  Transparent(cite_idx~ : Int, format~ : Formatting)
+} derive(Eq, Hash, @debug.Debug)
+pub fn ElemChild::copy(Self) -> Self
+pub fn[W : FmtWrite] ElemChild::write_buf(Self, W, BufWriteFormat) -> Unit
+pub impl Show for ElemChild
+
+pub(all) struct ElemChildren(Array[ElemChild]) derive(Eq, Hash, @debug.Debug)
+pub fn ElemChildren::copy(Self) -> Self
+pub fn ElemChildren::find_elem_by(Self, (Elem) -> Bool) -> Elem?
+pub fn ElemChildren::find_meta(Self, ElemMeta) -> Elem?
+pub fn ElemChildren::find_names(Self) -> Elem?
+pub fn ElemChildren::find_names_mut(Self) -> Elem?
+pub fn ElemChildren::has_content(Self) -> Bool
+pub fn ElemChildren::is_empty(Self) -> Bool
+pub fn ElemChildren::last_text(Self) -> Formatted?
+pub fn ElemChildren::new() -> Self
+pub fn ElemChildren::remove_any_meta(Self) -> ElemChild?
+pub fn ElemChildren::to_plain(Self) -> String
+pub fn[W : FmtWrite] ElemChildren::write_buf(Self, W, BufWriteFormat) -> Unit
+pub impl Show for ElemChildren
+
+pub(all) enum ElemMeta {
+  Names(Array[(Array[Person], @citationberg.NameVariable)])
+  Date
+  Text
+  Number
+  Label
+  CitationNumber
+  Name(@citationberg.NameVariable, Int)
+  Entry(Int)
+  CitationLabel
+} derive(Eq, Hash, @debug.Debug)
+
+pub(all) struct Entry {
+  key : String
+  mut entry_type : EntryType
+  mut title_ : FormatString?
+  mut authors_ : Array[Person]?
+  mut date_ : Date?
+  mut editors_ : Array[Person]?
+  mut affiliated_ : Array[PersonsWithRoles]?
+  mut publisher_ : Publisher?
+  mut location_ : FormatString?
+  mut organization_ : FormatString?
+  mut issue_ : MaybeTyped[Numeric]?
+  mut chapter_ : MaybeTyped[Numeric]?
+  mut volume_ : MaybeTyped[Numeric]?
+  mut volume_total_ : Numeric?
+  mut edition_ : MaybeTyped[Numeric]?
+  mut page_range_ : MaybeTyped[PageRanges]?
+  mut page_total_ : Numeric?
+  mut time_range_ : MaybeTyped[DurationRange]?
+  mut runtime_ : MaybeTyped[Duration]?
+  mut url_ : QualifiedUrl?
+  mut serial_number_ : SerialNumber?
+  mut language_ : LanguageIdentifier?
+  mut archive_ : FormatString?
+  mut archive_location_ : FormatString?
+  mut call_number_ : FormatString?
+  mut note_ : FormatString?
+  mut abstract__ : FormatString?
+  mut genre_ : FormatString?
+  mut parents : Array[Entry]
+} derive(Eq, Hash, @debug.Debug)
+pub fn Entry::abstract_(Self) -> FormatString?
+pub fn Entry::add_affiliated_persons(Self, Array[Person], PersonRole) -> Unit
+pub fn Entry::add_parent(Self, Self) -> Unit
+pub fn Entry::affiliated(Self) -> Array[PersonsWithRoles]?
+pub fn Entry::affiliated_with_role(Self, PersonRole) -> Array[Person]
+pub fn Entry::archive(Self) -> FormatString?
+pub fn Entry::archive_location(Self) -> FormatString?
+pub fn Entry::arxiv(Self) -> String?
+pub fn Entry::authors(Self) -> Array[Person]?
+pub fn Entry::bound_select(Self, Selector, String) -> Self?
+pub fn Entry::call_number(Self) -> FormatString?
+pub fn Entry::chapter(Self) -> MaybeTyped[Numeric]?
+pub fn Entry::date(Self) -> Date?
+pub fn Entry::date_any(Self) -> Date?
+pub fn Entry::dfs_parent(Self, EntryType) -> Self?
+pub fn Entry::doi(Self) -> String?
+pub fn Entry::edition(Self) -> MaybeTyped[Numeric]?
+pub fn Entry::editors(Self) -> Array[Person]?
+pub fn Entry::entry_type(Self) -> EntryType
+pub fn Entry::genre(Self) -> FormatString?
+pub fn Entry::get_collection(Self) -> Self?
+pub fn Entry::get_container(Self) -> Self?
+pub fn Entry::get_full(Self) -> Self
+pub fn Entry::get_original(Self) -> Self?
+pub fn Entry::has(Self, String) -> Bool
+pub fn Entry::is_english(Self) -> Bool?
+pub fn Entry::isbn(Self) -> String?
+pub fn Entry::issn(Self) -> String?
+pub fn Entry::issue(Self) -> MaybeTyped[Numeric]?
+pub fn Entry::key(Self) -> String
+pub fn Entry::keyed_serial_number(Self, String) -> String?
+pub fn Entry::language(Self) -> LanguageIdentifier?
+pub fn Entry::location(Self) -> FormatString?
+pub fn[T] Entry::map(Self, (Self) -> T?) -> T?
+pub fn[T] Entry::map_parents(Self, (Self) -> T?) -> T?
+pub fn Entry::matches_entry_type(Self, @citationberg.Kind) -> Bool
+pub fn Entry::new(String, EntryType) -> Self
+pub fn Entry::note(Self) -> FormatString?
+pub fn Entry::organization(Self) -> FormatString?
+pub fn Entry::page_range(Self) -> MaybeTyped[PageRanges]?
+pub fn Entry::page_total(Self) -> Numeric?
+pub fn Entry::parents(Self) -> Array[Self]
+pub fn Entry::pmcid(Self) -> String?
+pub fn Entry::pmid(Self) -> String?
+pub fn Entry::publisher(Self) -> Publisher?
+pub fn Entry::resolve_date_variable(Self, @citationberg.DateVariable) -> Date?
+pub fn Entry::resolve_name_variable(Self, @citationberg.NameVariable) -> Array[Person]
+pub fn Entry::resolve_number_variable(Self, @citationberg.NumberVariable) -> MaybeTyped[Numeric]?
+pub fn Entry::resolve_page_variable(Self, @citationberg.PageVariable) -> MaybeTyped[PageRanges]?
+pub fn Entry::resolve_standard_variable(Self, @citationberg.LongShortForm, @citationberg.StandardVariable) -> ChunkedString?
+pub fn Entry::runtime(Self) -> MaybeTyped[Duration]?
+pub fn Entry::serial_number(Self) -> SerialNumber?
+pub fn Entry::set_keyed_serial_number(Self, String, String) -> Unit
+pub fn Entry::time_range(Self) -> MaybeTyped[DurationRange]?
+pub fn Entry::title(Self) -> FormatString?
+pub fn Entry::url(Self) -> QualifiedUrl?
+pub fn Entry::url_any(Self) -> QualifiedUrl?
+pub fn Entry::volume(Self) -> MaybeTyped[Numeric]?
+pub fn Entry::volume_total(Self) -> Numeric?
+
+pub(all) enum EntryType {
+  Article
+  Chapter
+  Entry
+  Anthos
+  Report
+  Thesis
+  Web
+  Scene
+  Artwork
+  Patent
+  Case
+  Newspaper
+  Legislation
+  Manuscript
+  Post
+  Misc
+  Performance
+  Periodical
+  Proceedings
+  Book
+  Blog
+  Reference
+  Conference
+  Anthology
+  Repository
+  Thread
+  Video
+  Audio
+  Exhibition
+  Original
+} derive(Eq, Hash, @debug.Debug)
+pub fn EntryType::default_parent(Self) -> Self
+pub fn EntryType::from_str(String) -> Result[Self, String]
+pub impl Show for EntryType
+
+pub(all) struct FormatString {
+  value : ChunkedString
+  short : ChunkedString?
+} derive(Eq, Hash, @debug.Debug)
+pub fn FormatString::format_sentence_case(Self, SentenceCase) -> String
+pub fn FormatString::format_title_case(Self, TitleCase) -> String
+pub fn FormatString::from_str(String) -> Result[Self, ChunkedStrParseError]
+pub fn FormatString::new() -> Self
+pub fn FormatString::select(Self, @citationberg.LongShortForm) -> ChunkedString
+pub fn FormatString::with_short(String, String) -> Self
+pub fn FormatString::with_value(String) -> Self
+pub impl Show for FormatString
+
+pub(all) struct Formatted {
+  mut text : String
+  formatting : Formatting
+} derive(Eq, Hash, @debug.Debug)
+
+pub(all) struct Formatting {
+  font_style : @citationberg.FontStyle
+  font_variant : @citationberg.FontVariant
+  font_weight : @citationberg.FontWeight
+  text_decoration : @citationberg.TextDecoration
+  vertical_align : @citationberg.VerticalAlign
+} derive(Eq, Hash, @debug.Debug)
+pub fn Formatting::add_text(Self, String) -> Formatted
+pub fn Formatting::apply(Self, @citationberg.Formatting) -> Self
+pub impl Default for Formatting
+
+pub(all) struct LanguageIdentifier {
+  language : String
+  script : String?
+  region : String?
+  variants : Array[String]
+} derive(Eq, Hash, @debug.Debug)
+pub fn LanguageIdentifier::parse(String) -> Self?
+pub impl Show for LanguageIdentifier
+
+pub struct Library {
+  // private fields
+}
+pub fn Library::entries(Self) -> Array[Entry]
+pub fn Library::from_entries(Array[Entry]) -> Self
+pub fn Library::get(Self, String) -> Entry?
+pub fn Library::is_empty(Self) -> Bool
+pub fn Library::iter(Self) -> Iter[Entry]
+pub fn Library::keys(Self) -> Array[String]
+pub fn Library::length(Self) -> Int
+pub fn Library::new() -> Self
+pub fn Library::nth(Self, Int) -> Entry?
+pub fn Library::push(Self, Entry) -> Unit
+
+pub(all) enum LocatorPayload {
+  Str(String)
+  Transparent(TransparentLocator)
+} derive(Eq)
+
+pub(all) enum MaybeTyped[T] {
+  Typed(T)
+  String(String)
+} derive(Eq, Hash, @debug.Debug)
+pub fn[T] MaybeTyped::as_typed(Self[T]) -> T?
+pub fn MaybeTyped::duration_from_str(String) -> Self[Duration]
+pub fn MaybeTyped::duration_range_from_str(String) -> Self[DurationRange]
+pub fn MaybeTyped::numeric_csl_cmp(Self[Numeric], Self[Numeric]) -> Int
+pub fn MaybeTyped::numeric_from_str(String) -> Self[Numeric]
+pub fn MaybeTyped::page_ranges_csl_cmp(Self[PageRanges], Self[PageRanges]) -> Int
+pub fn MaybeTyped::page_ranges_from_str(String) -> Self[PageRanges]
+pub fn[T : Show] MaybeTyped::to_str(Self[T]) -> String
+pub impl[T : Show] Show for MaybeTyped[T]
+
+pub(all) struct Numeric {
+  value : NumericValue
+  prefix : String?
+  suffix : String?
+} derive(Eq, Hash, @debug.Debug)
+pub fn Numeric::csl_cmp(Self, Self) -> Int
+pub fn[W : FmtWrite] Numeric::fmt(Self, W) -> Unit
+pub fn[W : FmtWrite] Numeric::fmt_value(Self, W, Bool) -> Unit
+pub fn Numeric::from_range(Int, Int) -> Self
+pub fn Numeric::from_str(String) -> Result[Self, NumericError]
+pub fn Numeric::is_plural(Self, Bool) -> Bool
+pub fn Numeric::new(Int) -> Self
+pub fn Numeric::nth(Self, Int) -> Int?
+pub fn Numeric::single_number(Self) -> Int?
+pub fn Numeric::will_transform(Self) -> Bool
+pub fn[W : FmtWrite] Numeric::with_form(Self, W, @citationberg.NumberForm, @citationberg.GrammarGender?, @citationberg.OrdinalLookup) -> Unit
+pub impl Show for Numeric
+
+pub(all) enum NumericDelimiter {
+  Comma
+  Ampersand
+  Hyphen
+} derive(Eq, Hash, @debug.Debug)
+pub fn NumericDelimiter::as_char(Self) -> Char
+pub fn[W : FmtWrite] NumericDelimiter::fmt(Self, W) -> Unit
+pub fn NumericDelimiter::from_str(String) -> Result[Self, NumericError]
+pub fn NumericDelimiter::try_from_char(Char) -> Result[Self, NumericError]
+pub impl Show for NumericDelimiter
+
+pub(all) enum NumericError {
+  NoNumber
+  UnexpectedCharactersAfterPostfix
+  NotADelimiter
+  MissingDelimiter
+} derive(Eq, @debug.Debug)
+pub impl Show for NumericError
+
+pub(all) enum NumericValue {
+  Number(Int)
+  Set(Array[(Int, NumericDelimiter?)])
+} derive(Eq, Hash, @debug.Debug)
+pub fn NumericValue::len(Self) -> Int
+
+pub(all) struct PageRanges {
+  ranges : Array[PageRangesPart]
+} derive(Eq, Hash, @debug.Debug)
+pub fn PageRanges::csl_cmp(Self, Self) -> Int
+pub fn PageRanges::first(Self) -> Numeric?
+pub fn[W : FmtWrite] PageRanges::fmt(Self, W) -> Unit
+pub fn PageRanges::from_int(Int) -> Self
+pub fn PageRanges::from_str(String) -> Result[Self, PageRangesPartErr]
+pub fn PageRanges::is_plural(Self) -> Bool
+pub fn PageRanges::new(Array[PageRangesPart]) -> Self
+pub impl Show for PageRanges
+
+pub(all) enum PageRangesPart {
+  Ampersand
+  Comma
+  EscapedRange(Numeric, Numeric)
+  SinglePage(Numeric)
+  Range(Numeric, Numeric)
+} derive(Eq, Hash, @debug.Debug)
+pub fn PageRangesPart::csl_cmp(Self, Self) -> Int
+pub fn PageRangesPart::end(Self) -> Numeric?
+pub fn[W : FmtWrite] PageRangesPart::fmt(Self, W) -> Unit
+pub fn PageRangesPart::from_str(String) -> Result[Self, PageRangesPartErr]
+pub fn PageRangesPart::start(Self) -> Numeric?
+pub impl Show for PageRangesPart
+
+pub(all) enum PageRangesPartErr {
+  Malformed
+  Empty
+  NumericErr(NumericError)
+} derive(Eq, @debug.Debug)
+pub impl Show for PageRangesPartErr
+
+pub(all) struct Person {
+  name : String
+  given_name : String?
+  prefix : String?
+  suffix : String?
+  comma_suffix : Bool
+  alias_ : String?
+} derive(Eq, Hash, @debug.Debug)
+pub fn Person::csl_cmp(Self, Self, @citationberg.LongShortForm, Bool) -> Int
+pub fn[W : FmtWrite] Person::first_name_with_delimiter(Self, W, String?) -> Unit
+pub fn Person::from_str(String) -> Result[Self, PersonError]
+pub fn Person::from_strings(Array[String]) -> Result[Self, PersonError]
+pub fn Person::given_first(Self, Bool) -> String
+pub fn[W : FmtWrite] Person::initials(Self, W, String?, Bool) -> Unit
+pub fn Person::is_cjk(Self) -> Bool
+pub fn Person::is_institutional(Self) -> Bool
+pub fn Person::name_first(Self, Bool, Bool) -> String
+pub fn Person::name_particle(Self) -> String?
+pub fn Person::name_particles(Self) -> String?
+pub fn Person::name_without_article(Self) -> String
+pub fn Person::name_without_particle(Self) -> String
+
+pub(all) enum PersonError {
+  TooManyParts
+  Empty
+  UnknownRole
+} derive(Eq, @debug.Debug)
+pub impl Show for PersonError
+
+pub(all) enum PersonRole {
+  Translator
+  Afterword
+  Foreword
+  Introduction
+  Annotator
+  Commentator
+  Holder
+  Compiler
+  Founder
+  Collaborator
+  Organizer
+  CastMember
+  Composer
+  Producer
+  ExecutiveProducer
+  Writer
+  Cinematography
+  Director
+  Illustrator
+  Narrator
+  Unknown(String)
+} derive(Eq, Hash, @debug.Debug)
+pub fn PersonRole::from_str(String) -> Self?
+
+pub(all) struct PersonsWithRoles {
+  names : Array[Person]
+  role : PersonRole
+} derive(Eq, Hash, @debug.Debug)
+pub fn PersonsWithRoles::new(Array[Person], PersonRole) -> Self
+
+pub(all) struct Publisher {
+  name : FormatString?
+  location : FormatString?
+} derive(Eq, Hash, @debug.Debug)
+pub fn Publisher::from_str(String) -> Result[Self, ChunkedStrParseError]
+pub fn Publisher::new(FormatString?, FormatString?) -> Self
+
+pub(all) struct QualifiedUrl {
+  value : Url
+  visit_date : Date?
+} derive(Eq, Hash, @debug.Debug)
+pub fn QualifiedUrl::from_str(String) -> Result[Self, UrlParseError]
+pub fn QualifiedUrl::new(Url, Date?) -> Self
+pub impl Show for QualifiedUrl
+
+pub(all) struct Rendered {
+  bibliography : RenderedBibliography?
+  citations : Array[RenderedCitation]
+} derive(@debug.Debug)
+
+pub(all) struct RenderedBibliography {
+  hanging_indent : Bool
+  second_field_align : @citationberg.SecondFieldAlign?
+  line_spacing : Int
+  entry_spacing : Int
+  items : Array[BibliographyItem]
+} derive(@debug.Debug)
+
+pub(all) struct RenderedCitation {
+  note_number : Int?
+  citation : ElemChildren
+} derive(@debug.Debug)
+
+pub(all) enum Selector {
+  Wildcard
+  Entry(EntryType)
+  Neg(Selector)
+  Binding(String, Selector)
+  Attr(Selector, Array[String])
+  Alt(Array[Selector])
+  Multi(Array[Selector])
+  Ancestrage(Selector, Selector)
+} derive(Eq, @debug.Debug)
+pub fn Selector::apply(Self, Entry) -> Map[String, Entry]?
+pub fn Selector::bound(Self, Entry, String) -> Entry?
+pub fn Selector::matches(Self, Entry) -> Bool
+
+pub(all) struct SentenceCase {
+  capitalize_words_with_caps_inside : Bool
+  do_not_format_after_dot : Bool
+  keep_all_uppercase_words : Bool
+  use_exception_dictionary : Bool
+  trim_start : Bool
+  trim_end : Bool
+} derive(Eq, Hash, @debug.Debug)
+pub impl Default for SentenceCase
+
+pub(all) struct SerialNumber(Map[String, String]) derive(Eq, @debug.Debug)
+pub fn SerialNumber::get(Self, String) -> String?
+pub fn SerialNumber::sorted_keys(Self) -> Array[String]
+pub impl Hash for SerialNumber
+
+pub(all) struct SpecificLocator(@citationberg.Locator, LocatorPayload) derive(Eq)
+
+pub struct StrBuf {
+  // private fields
+}
+pub fn StrBuf::new() -> Self
+pub fn StrBuf::to_string(Self) -> String
+pub impl FmtWrite for StrBuf
+
+pub(all) struct StringChunk {
+  mut value : String
+  kind : ChunkKind
+} derive(Eq, Hash, @debug.Debug)
+pub fn StringChunk::is_empty(Self) -> Bool
+pub fn StringChunk::len(Self) -> Int
+pub fn StringChunk::math(String) -> Self
+pub fn StringChunk::new(String, ChunkKind) -> Self
+pub fn StringChunk::normal(String) -> Self
+pub fn StringChunk::verbatim(String) -> Self
+pub impl Show for StringChunk
+
+pub(all) struct TitleCase {
+  always_capitalize_after_punctuation : Bool
+  always_capitalize_last_word : Bool
+  always_capitalize_min_len : Int?
+  hyphen_word_separator : Bool
+  keep_all_uppercase_words : Bool
+  use_exception_dictionary : Bool
+  trim_start : Bool
+  trim_end : Bool
+} derive(Eq, Hash, @debug.Debug)
+pub impl Default for TitleCase
+
+pub(all) struct TransparentLocator(String) derive(Eq)
+pub fn TransparentLocator::new(String) -> Self
+
+pub(all) struct Url {
+  serialization : String
+} derive(Eq, Hash, @debug.Debug)
+pub fn Url::parse(String) -> Result[Self, UrlParseError]
+pub impl Show for Url
+
+pub(all) enum UrlParseError {
+  EmptyHost
+  IdnaError
+  InvalidPort
+  InvalidIpv4Address
+  InvalidIpv6Address
+  InvalidDomainCharacter
+  RelativeUrlWithoutBase
+} derive(Eq, @debug.Debug)
+pub impl Show for UrlParseError
+
+pub(all) struct YamlLoadError {
+  message : String
+  location : @yaml.Location?
+} derive(Eq, @debug.Debug)
+pub impl Show for YamlLoadError
+
+// Type aliases
+
+// Traits
+pub(open) trait FmtWrite {
+  fn write_str(Self, String) -> Unit
+  fn write_char(Self, Char) -> Unit
+}

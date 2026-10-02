@@ -5,6 +5,8 @@ import {
   "moonbitlang/core/debug",
   "moonbitlang/core/hashset",
   "moonbitlang/core/ref",
+  "moonbitlang/typst/bib/citationberg",
+  "moonbitlang/typst/bib/hayagriva",
   "moonbitlang/typst/data/serde",
   "moonbitlang/typst/data/xml",
   "moonbitlang/typst/data/yaml",
@@ -3691,7 +3693,17 @@ pub impl FromValue for BaselinePos
 pub impl IntoValue for BaselinePos
 pub impl Reflect for BaselinePos
 
+pub struct Bibliography {
+  // private fields
+}
+pub fn Bibliography::get(Self, Label) -> @hayagriva.Entry?
+pub fn Bibliography::has(Self, Label) -> Bool
+pub fn Bibliography::iter(Self) -> Iter[(Label, @hayagriva.Entry)]
+pub impl Show for Bibliography
+
 pub struct BibliographyElem(Content)
+pub fn BibliographyElem::csl_style(Self, &World) -> CslStyle
+pub fn BibliographyElem::database(Self, &World) -> Bibliography
 pub fn BibliographyElem::full(Self, StyleChain) -> Bool
 pub fn BibliographyElem::full_in(StyleChain) -> Bool
 pub fn BibliographyElem::full_local(Self) -> Bool?
@@ -3699,10 +3711,12 @@ pub fn BibliographyElem::group(Self, StyleChain) -> Smart[String]?
 pub fn BibliographyElem::group_in(StyleChain) -> Smart[String]?
 pub fn BibliographyElem::group_local(Self) -> Smart[String]??
 pub fn BibliographyElem::has(Engine, Label, @syntax.Span) -> Bool
+pub fn BibliographyElem::keys(&World, Introspector) -> Array[(Label, String?)]
 pub fn BibliographyElem::lang(Self) -> Lang?
 pub fn BibliographyElem::new(OneOrMultiple[DataSource]) -> Self
 pub fn BibliographyElem::of(Content) -> Self?
 pub fn BibliographyElem::pack(Self) -> Content
+pub fn BibliographyElem::realize_title(Self, StyleChain) -> Content?
 pub fn BibliographyElem::region(Self) -> Region??
 pub fn BibliographyElem::set_full(Bool) -> Style
 pub fn BibliographyElem::set_group(Smart[String]?) -> Style
@@ -4207,6 +4221,7 @@ pub fn CiteGroup::children(Self) -> Array[Content]
 pub fn CiteGroup::new(Array[Content]) -> Self
 pub fn CiteGroup::of(Content) -> Self?
 pub fn CiteGroup::pack(Self) -> Content
+pub fn CiteGroup::realize(Self, Engine) -> Content raise SourceError
 pub fn CiteGroup::with_children(Self, Array[Content]) -> Self
 pub impl NativeElement for CiteGroup
 
@@ -4555,6 +4570,22 @@ pub fn CslLightElem::of(Content) -> Self?
 pub fn CslLightElem::pack(Self) -> Content
 pub fn CslLightElem::with_body(Self, Content) -> Self
 pub impl NativeElement for CslLightElem
+
+pub(all) enum CslSource {
+  Named(@hayagriva.ArchivedStyle, String?)
+  Normal(DataSource)
+} derive(Eq, Hash)
+pub impl FromValue for CslSource
+pub impl IntoValue for CslSource
+pub impl Reflect for CslSource
+
+pub struct CslStyle {
+  // private fields
+}
+pub fn CslStyle::from_archived(@hayagriva.ArchivedStyle) -> Self
+pub fn CslStyle::from_data(Bytes) -> Self raise LoadErr
+pub fn CslStyle::get(Self) -> @citationberg.IndependentStyle
+pub fn CslStyle::load(Engine, @syntax.Spanned[CslSource]) -> (CslSource, Self) raise SourceError
 
 pub(all) enum CssDisplay {
   Block
@@ -8709,6 +8740,17 @@ pub impl FromValue for RelativeTo
 pub impl IntoValue for RelativeTo
 pub impl Reflect for RelativeTo
 
+pub(all) struct RenderedBibliography {
+  entries : Array[RenderedEntry]
+  hanging_indent : Bool
+}
+
+pub(all) struct RenderedEntry {
+  prefix : Content?
+  body : Content
+  backlink : Location
+}
+
 pub struct RepeatElem(Content)
 pub fn RepeatElem::body(Self) -> Content
 pub fn RepeatElem::gap(Self, StyleChain) -> Length
@@ -10728,6 +10770,13 @@ pub fn WeightedColor::new(Color, Double) -> Self
 pub impl FromValue for WeightedColor
 pub impl IntoValue for WeightedColor
 pub impl Reflect for WeightedColor
+
+pub struct Works {
+  // private fields
+}
+pub fn Works::bibliography(Self, Location, @syntax.Span) -> RenderedBibliography raise SourceError
+pub fn Works::citation(Self, Location, @syntax.Span) -> Content raise SourceError
+pub fn Works::generate(Engine, @syntax.Span) -> Self raise SourceError
 
 pub(all) struct WritingScript(String) derive(Compare, Eq, Hash, @debug.Debug)
 pub fn WritingScript::as_str(Self) -> String
