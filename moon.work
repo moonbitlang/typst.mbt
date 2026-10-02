@@ -1,4 +1,4 @@
 members = [
   ".",
-  "../office.mbt-typst-pdf/pdflite",
+  "../office.mbt/pdflite",
 ]
