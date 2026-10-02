@@ -318,23 +318,25 @@ fn parse_page_number(
 }
 
 ///|
-/// Rust's `usize::from_str` (limited to `Int`).
+/// Rust's `usize::from_str` (64-bit). Values that do not fit into an `Int`
+/// saturate (they are only used as page numbers and job counts).
 fn parse_usize(value : String) -> Int? {
   let value = if value.has_prefix("+") { value[1:].to_owned() } else { value }
   if value == "" {
     return None
   }
-  let mut n = 0L
+  let mut n = 0UL
   for c in value {
     if c < '0' || c > '9' {
       return None
     }
-    n = n * 10L + (c.to_int() - '0'.to_int()).to_int64()
-    if n > 2147483647L {
+    let digit = (c.to_int() - '0'.to_int()).to_uint64()
+    if n > (18446744073709551615UL - digit) / 10UL {
       return None
     }
+    n = n * 10UL + digit
   }
-  Some(n.to_int())
+  Some(if n > 2147483647UL { 2147483647 } else { n.to_int() })
 }
 
 ///|
@@ -932,24 +934,30 @@ fn parse_args(argv : Array[String]) -> CliArguments raise CliError {
     "help" =>
       match rest {
         [] => raise Display(spec.help())
-        [sub, ..] =>
-          match sub {
-            "compile" | "c" =>
-              raise Display(
-                compile_spec(
-                  "typst compile", "Compiles an input file into a supported output format",
-                  false,
-                ).help(),
+        [sub, .. more] => {
+          if sub == "help" {
+            if more is [next, ..] {
+              raise Usage(
+                "unrecognized subcommand '\{next}'",
+                "typst help [COMMAND]...",
               )
-            "watch" | "w" =>
-              raise Display(
-                compile_spec(
-                  "typst watch", "Watches an input file and recompiles on changes",
-                  true,
-                ).help(),
-              )
-            _ => parse_args([sub, "--help"]).command
+            }
+            raise Display(
+              "Print this message or the help of the given subcommand(s)\n\nUsage: typst help [COMMAND]...\n",
+            )
           }
+          guard spec.subcommands
+            .iter()
+            .find_first(s => s.0 == sub || s.1.contains(sub))
+            is Some((key, _, _, _)) else {
+            raise Usage("unrecognized subcommand '\{sub}'", spec.usage())
+          }
+          let sub_spec = { ..spec, key, subcommands: [], }
+          if more is [next, ..] {
+            raise Usage("unrecognized subcommand '\{next}'", sub_spec.usage())
+          }
+          raise Display(sub_spec.help())
+        }
       }
     other => raise Usage("unrecognized subcommand '\{other}'", spec.usage())
   }
@@ -1162,7 +1170,7 @@ fn parse_jobs(v : String) -> Int raise CliError {
     Some(n) => n
     None =>
       raise Invalid(
-        "invalid value '\{v}' for '--jobs <JOBS>': \{if v == "" { "cannot parse integer from empty string" } else { "invalid digit found in string" }}",
+        "invalid value '\{v}' for '--jobs <JOBS>': \{usize_error(v)}",
       )
   }
 }
@@ -1224,49 +1232,14 @@ fn parse_shell(v : String) -> Unit raise CliError {
 }
 
 ///|
-/// The value parser of the version of `update` (`semver::Version`; the
-/// common errors of the semver crate).
-fn parse_semver(v : String) -> Unit raise CliError {
-  let err = (msg : String) => {
-    Invalid("invalid value '\{v}' for '[VERSION]': \{msg}")
-  }
+/// The message of Rust's `ParseIntError` for an invalid `usize`.
+fn usize_error(v : String) -> String {
+  let digits = if v.has_prefix("+") { v[1:].to_owned() } else { v }
   if v == "" {
-    raise err("empty string, expected a semver version")
-  }
-  let chars = v.to_array()
-  let mut i = 0
-  let positions = ["major", "minor", "patch"]
-  for k, pos in positions {
-    if k > 0 {
-      if i >= chars.length() {
-        raise err(
-          "unexpected end of input while parsing \{positions[k - 1]} version number",
-        )
-      }
-      if chars[i] != '.' {
-        raise err(
-          "unexpected character '\{chars[i]}' after \{positions[k - 1]} version number",
-        )
-      }
-      i += 1
-    }
-    let start = i
-    while i < chars.length() && chars[i] >= '0' && chars[i] <= '9' {
-      i += 1
-    }
-    if i == start {
-      if i >= chars.length() {
-        raise err("unexpected end of input while parsing \{pos} version number")
-      }
-      raise err(
-        "unexpected character '\{chars[i]}' while parsing \{pos} version number",
-      )
-    }
-    if i - start > 1 && chars[start] == '0' {
-      raise err("invalid leading zero in \{pos} version number")
-    }
-  }
-  if i < chars.length() && chars[i] != '-' && chars[i] != '+' {
-    raise err("unexpected character '\{chars[i]}' after patch version number")
+    "cannot parse integer from empty string"
+  } else if digits != "" && digits.iter().all(c => c >= '0' && c <= '9') {
+    "number too large to fit in target type"
+  } else {
+    "invalid digit found in string"
   }
 }

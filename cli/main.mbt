@@ -70,6 +70,11 @@ fn print_clap_error(message : String, usage : String?) -> Unit {
   out.write("\n")
   if usage is Some(usage) {
     out.writeln("Usage: \{usage}")
+    // clap's `help` subcommand has no `--help` flag to point to.
+    if usage.has_prefix("typst help ") {
+      flush_terminal(out)
+      return
+    }
     out.write("\n")
   }
   out.writeln("For more information, try '--help'.")
