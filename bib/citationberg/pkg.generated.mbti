@@ -1,0 +1,1173 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/bib/citationberg"
+
+import {
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub let citation_default_cite_group_delimiter : String
+
+pub let date_part_default_delimiter : String
+
+// Errors
+
+// Types and methods
+pub(all) struct Affixes {
+  prefix : String?
+  suffix : String?
+} derive(Eq, Hash, @debug.Debug)
+pub impl Default for Affixes
+
+pub(all) enum BaseLanguage {
+  Iso639_1(String)
+  Iana(String)
+  Unregistered(String)
+} derive(Eq, @debug.Debug)
+pub fn BaseLanguage::as_str(Self) -> String
+
+pub(all) struct Bibliography {
+  sort : Sort?
+  layout : Layout
+  hanging_indent : Bool
+  second_field_align : SecondFieldAlign?
+  line_spacing : Int
+  entry_spacing : Int
+  subsequent_author_substitute : String?
+  subsequent_author_substitute_rule : SubsequentAuthorSubstituteRule
+  name_options : InheritableNameOptions
+} derive(Eq, @debug.Debug)
+pub fn Bibliography::with_layout(Layout) -> Self
+
+pub(all) struct Choose {
+  if_ : ChooseBranch
+  else_if : Array[ChooseBranch]
+  otherwise : ElseBranch?
+} derive(Eq, @debug.Debug)
+pub fn Choose::branches(Self) -> Array[ChooseBranch]
+pub fn Choose::find_variable_element(Self, Variable, Array[CslMacro]) -> LayoutRenderingElement?
+
+pub(all) struct ChooseBranch {
+  disambiguate : Bool?
+  is_numeric : Array[Variable]?
+  is_uncertain_date : Array[DateVariable]?
+  locator : Array[Locator]?
+  position : Array[TestPosition]?
+  type_ : Array[Kind]?
+  variable : Array[Variable]?
+  match_ : ChooseMatch
+  children : Array[LayoutRenderingElement]
+} derive(Eq, @debug.Debug)
+pub fn ChooseBranch::test_(Self) -> ChooseTest?
+
+pub(all) enum ChooseMatch {
+  All
+  Any
+  None_
+} derive(Eq, Hash, @debug.Debug)
+pub fn ChooseMatch::test_(Self, Iter[Bool]) -> Bool
+
+pub(all) enum ChooseTest {
+  Disambiguate
+  IsNumeric(Array[Variable])
+  IsUncertainDate(Array[DateVariable])
+  Locator(Array[Locator])
+  Position(Array[TestPosition])
+  Type(Array[Kind])
+  Variable(Array[Variable])
+} derive(Eq, @debug.Debug)
+
+pub(all) struct Citation {
+  sort : Sort?
+  layout : Layout
+  disambiguate_add_givenname : Bool
+  givenname_disambiguation_rule : DisambiguationRule
+  disambiguate_add_names : Bool
+  disambiguate_add_year_suffix : Bool
+  cite_group_delimiter : String?
+  collapse : Collapse?
+  year_suffix_delimiter : String?
+  after_collapse_delimiter : String?
+  near_note_distance : Int
+  name_options : InheritableNameOptions
+} derive(Eq, @debug.Debug)
+pub fn Citation::get_after_collapse_delimiter(Self) -> String
+pub fn Citation::get_year_suffix_delimiter(Self) -> String
+pub fn Citation::with_layout(Layout) -> Self
+
+pub(all) enum CitationFormat {
+  AuthorDate
+  Author
+  Numeric
+  Label
+  Note
+} derive(Eq, Hash, @debug.Debug)
+
+pub(all) enum Collapse {
+  CitationNumber
+  Year
+  YearSuffix
+  YearSuffixRanged
+} derive(Eq, Hash, @debug.Debug)
+
+pub(all) struct CslMacro {
+  name : String
+  children : Array[LayoutRenderingElement]
+} derive(Eq, @debug.Debug)
+
+pub(all) struct Date {
+  variable : DateVariable?
+  form : DateForm?
+  parts : DateParts?
+  date_part : Array[DatePart]
+  formatting : Formatting
+  affixes : Affixes
+  delimiter : String?
+  display : Display?
+  text_case : TextCase?
+} derive(Eq, @debug.Debug)
+pub fn Date::is_localized(Self) -> Bool
+
+pub(all) enum DateAnyForm {
+  Numeric
+  NumericLeadingZeros
+  Ordinal
+  Long
+  Short
+} derive(Eq, Hash, @debug.Debug)
+pub fn DateAnyForm::form_for_day(Self) -> DateDayForm
+pub fn DateAnyForm::form_for_month(Self) -> DateMonthForm
+pub fn DateAnyForm::form_for_year(Self) -> LongShortForm
+
+pub(all) enum DateDayForm {
+  Numeric
+  NumericLeadingZeros
+  Ordinal
+} derive(Eq, Hash, @debug.Debug)
+
+pub(all) enum DateForm {
+  Numeric
+  Text
+} derive(Eq, Hash, @debug.Debug)
+
+pub(all) enum DateMonthForm {
+  Long
+  Short
+  Numeric
+  NumericLeadingZeros
+} derive(Eq, Hash, @debug.Debug)
+
+pub(all) struct DatePart {
+  name : DatePartName
+  form_ : DateAnyForm?
+  range_delimiter : String?
+  formatting : Formatting
+  affixes : Affixes
+  strip_periods : Bool
+  text_case : TextCase?
+} derive(Eq, @debug.Debug)
+pub fn DatePart::form(Self) -> DateStrongAnyForm
+
+pub(all) enum DatePartName {
+  Day
+  Month
+  Year
+} derive(Eq, Hash, @debug.Debug)
+
+pub(all) enum DateParts {
+  Year
+  YearMonth
+  YearMonthDay
+} derive(Eq, Hash, @debug.Debug)
+pub fn DateParts::has_day(Self) -> Bool
+pub fn DateParts::has_month(Self) -> Bool
+pub impl Default for DateParts
+
+pub(all) enum DateStrongAnyForm {
+  Day(DateDayForm)
+  Month(DateMonthForm)
+  Year(LongShortForm)
+} derive(Eq, Hash, @debug.Debug)
+pub fn DateStrongAnyForm::for_name(DatePartName, DateAnyForm?) -> Self
+
+pub(all) enum DateVariable {
+  Accessed
+  AvailableDate
+  EventDate
+  Issued
+  OriginalDate
+  Submitted
+} derive(Eq, Hash, @debug.Debug)
+pub fn DateVariable::from_str(String) -> Self?
+pub impl Show for DateVariable
+
+pub(all) enum DelimiterBehavior {
+  Contextual
+  AfterInvertedName
+  Always
+  Never
+} derive(Eq, Hash, @debug.Debug)
+
+pub(all) enum DemoteNonDroppingParticle {
+  Never
+  SortOnly
+  DisplayAndSort
+} derive(Eq, Hash, @debug.Debug)
+
+pub(all) struct DependentStyle {
+  info : StyleInfo
+  default_locale : LocaleCode?
+  version : String
+  parent_link : InfoLink
+} derive(Eq, @debug.Debug)
+pub fn DependentStyle::from_xml(String) -> Result[Self, XmlDeError]
+
+pub(all) enum DisambiguationRule {
+  AllNames
+  AllNamesWithInitials
+  PrimaryName
+  PrimaryNameWithInitials
+  ByCite
+} derive(Eq, Hash, @debug.Debug)
+pub fn DisambiguationRule::allows_full_first_names(Self) -> Bool
+pub fn DisambiguationRule::allows_multiple_names(Self) -> Bool
+
+pub(all) enum Display {
+  Block
+  LeftMargin
+  RightInline
+  Indent
+} derive(Eq, Hash, @debug.Debug)
+
+pub(all) struct ElseBranch {
+  children : Array[LayoutRenderingElement]
+} derive(Eq, @debug.Debug)
+
+pub(all) struct EtAl {
+  term : EtAlTerm
+  formatting : Formatting
+} derive(Eq, @debug.Debug)
+
+pub(all) enum EtAlTerm {
+  EtAl
+  AndOthers
+} derive(Eq, Hash, @debug.Debug)
+pub fn EtAlTerm::to_term(Self) -> Term
+
+pub(all) enum Field {
+  Anthropology
+  Astronomy
+  Biology
+  Botany
+  Chemistry
+  Communications
+  Engineering
+  GenericBase
+  Geography
+  Geology
+  History
+  Humanities
+  Law
+  Linguistics
+  Literature
+  Math
+  Medicine
+  Philosophy
+  Physics
+  PoliticalScience
+  Psychology
+  Science
+  SocialScience
+  Sociology
+  Theology
+  Zoology
+} derive(Eq, Hash, @debug.Debug)
+
+pub(all) enum FontStyle {
+  Normal
+  Italic
+} derive(Eq, Hash, @debug.Debug)
+pub impl Default for FontStyle
+
+pub(all) enum FontVariant {
+  Normal
+  SmallCaps
+} derive(Eq, Hash, @debug.Debug)
+pub impl Default for FontVariant
+
+pub(all) enum FontWeight {
+  Normal
+  Bold
+  Light
+} derive(Eq, Hash, @debug.Debug)
+pub impl Default for FontWeight
+
+pub(all) struct Formatting {
+  font_style : FontStyle?
+  font_variant : FontVariant?
+  font_weight : FontWeight?
+  text_decoration : TextDecoration?
+  vertical_align : VerticalAlign?
+} derive(Eq, Hash, @debug.Debug)
+pub fn Formatting::apply(Self, Self) -> Self
+pub fn Formatting::is_empty(Self) -> Bool
+pub impl Default for Formatting
+
+pub(all) enum GrammarGender {
+  Feminine
+  Masculine
+} derive(Eq, Hash, @debug.Debug)
+
+pub(all) struct Group {
+  children : Array[LayoutRenderingElement]
+  font_style : FontStyle?
+  font_variant : FontVariant?
+  font_weight : FontWeight?
+  text_decoration : TextDecoration?
+  vertical_align : VerticalAlign?
+  prefix : String?
+  suffix : String?
+  delimiter : String?
+  display : Display?
+} derive(Eq, @debug.Debug)
+pub fn Group::to_affixes(Self) -> Affixes
+pub fn Group::to_formatting(Self) -> Formatting
+
+pub(all) struct IndependentStyle {
+  info : StyleInfo
+  default_locale : LocaleCode?
+  version : String
+  citation : Citation
+  bibliography : Bibliography?
+  settings : IndependentStyleSettings
+  macros : Array[CslMacro]
+  locale : Array[Locale]
+} derive(Eq, @debug.Debug)
+pub fn IndependentStyle::from_xml(String) -> Result[Self, XmlDeError]
+
+pub(all) struct IndependentStyleSettings {
+  class : StyleClass
+  initialize_with_hyphen : Bool
+  page_range_format : PageRangeFormat?
+  demote_non_dropping_particle : DemoteNonDroppingParticle
+  options : InheritableNameOptions
+} derive(Eq, @debug.Debug)
+
+pub(all) struct InfoLink {
+  href : String
+  rel : InfoLinkRel
+  description : String?
+  locale : LocaleCode?
+} derive(Eq, @debug.Debug)
+
+pub(all) enum InfoLinkRel {
+  Zelf
+  Template
+  Documentation
+  IndependentParent
+} derive(Eq, Hash, @debug.Debug)
+
+pub(all) struct InheritableNameOptions {
+  and_ : NameAnd?
+  name_delimiter : String?
+  names_delimiter : String?
+  delimiter_precedes_et_al : DelimiterBehavior?
+  delimiter_precedes_last : DelimiterBehavior?
+  et_al_min : Int?
+  et_al_use_first : Int?
+  et_al_subsequent_min : Int?
+  et_al_subsequent_use_first : Int?
+  et_al_use_last : Bool?
+  name_form : NameForm?
+  initialize : Bool?
+  initialize_with : String?
+  name_as_sort_order : NameAsSortOrder?
+  sort_separator : String?
+} derive(Eq, @debug.Debug)
+pub fn InheritableNameOptions::apply(Self, Self) -> Self
+pub impl Default for InheritableNameOptions
+
+pub(all) enum Kind {
+  Article
+  ArticleJournal
+  ArticleMagazine
+  ArticleNewspaper
+  Bill
+  Book
+  Broadcast
+  Chapter
+  Classic
+  Collection
+  Dataset
+  Document
+  Entry
+  EntryDictionary
+  EntryEncyclopedia
+  Event
+  Figure
+  Graphic
+  Hearing
+  Interview
+  LegalCase
+  Legislation
+  Manuscript
+  Map
+  MotionPicture
+  MusicalScore
+  Pamphlet
+  PaperConference
+  Patent
+  Performance
+  Periodical
+  PersonalCommunication
+  Post
+  PostWeblog
+  Regulation
+  Report
+  Review
+  ReviewBook
+  Software
+  Song
+  Speech
+  Standard
+  Thesis
+  Treaty
+  Webpage
+} derive(Eq, Hash, @debug.Debug)
+pub fn Kind::from_str(String) -> Self?
+pub impl Show for Kind
+
+pub(all) struct Label {
+  variable : NumberOrPageVariable
+  label : VariablelessLabel
+} derive(Eq, @debug.Debug)
+
+pub(all) enum LabelPluralize {
+  Contextual
+  Always
+  Never
+} derive(Eq, Hash, @debug.Debug)
+
+pub(all) struct Layout {
+  elements : Array[LayoutRenderingElement]
+  font_style : FontStyle?
+  font_variant : FontVariant?
+  font_weight : FontWeight?
+  text_decoration : TextDecoration?
+  vertical_align : VerticalAlign?
+  prefix : String?
+  suffix : String?
+  delimiter : String?
+} derive(Eq, @debug.Debug)
+pub fn Layout::find_variable_element(Self, Variable, Array[CslMacro]) -> LayoutRenderingElement?
+pub fn Layout::new(Array[LayoutRenderingElement], Formatting, Affixes?, String?) -> Self
+pub fn Layout::to_affixes(Self) -> Affixes
+pub fn Layout::to_formatting(Self) -> Formatting
+pub fn Layout::with_elements(Array[LayoutRenderingElement]) -> Self
+
+pub(all) enum LayoutRenderingElement {
+  Text(Text)
+  Date(Date)
+  Number(Number)
+  Names(Names)
+  Label(Label)
+  Group(Group)
+  Choose(Choose)
+} derive(Eq, @debug.Debug)
+pub fn LayoutRenderingElement::find_variable_element(Self, Variable, Array[CslMacro]) -> Self?
+
+pub(all) struct License {
+  name : String
+  license : String?
+  lang : LocaleCode?
+} derive(Eq, @debug.Debug)
+
+pub(all) struct LocalString {
+  lang : LocaleCode?
+  value : String
+} derive(Eq, @debug.Debug)
+
+pub(all) struct Locale {
+  lang : LocaleCode?
+  info : LocaleInfo?
+  terms : Terms?
+  date : Array[Date]
+  style_options : LocaleOptions?
+} derive(Eq, @debug.Debug)
+pub fn Locale::ordinals(Self) -> OrdinalLookup?
+pub fn Locale::term(Self, Term, TermForm) -> LocalizedTerm?
+
+pub(all) struct LocaleCode(String) derive(Eq, Hash, @debug.Debug)
+pub fn LocaleCode::en_us() -> Self
+pub fn LocaleCode::extensions(Self) -> Array[String]
+pub fn LocaleCode::fallback(Self) -> Self?
+pub fn LocaleCode::is_english(Self) -> Bool
+pub fn LocaleCode::parse_base(Self) -> BaseLanguage?
+pub impl Show for LocaleCode
+
+pub(all) struct LocaleFile {
+  version : String
+  lang : LocaleCode
+  info : LocaleInfo?
+  terms : Terms?
+  date : Array[Date]
+  style_options : LocaleOptions?
+} derive(Eq, @debug.Debug)
+pub fn LocaleFile::from_xml(String) -> Result[Self, XmlDeError]
+pub fn LocaleFile::to_locale(Self) -> Locale
+
+pub(all) struct LocaleInfo {
+  translators : Array[StyleAttribution]
+  rights : License?
+  updated : Timestamp?
+} derive(Eq, @debug.Debug)
+
+pub(all) struct LocaleOptions {
+  limit_day_ordinals_to_day_1 : Bool?
+  punctuation_in_quote : Bool?
+} derive(Eq, @debug.Debug)
+
+pub(all) struct LocalizedTerm {
+  name : Term
+  localization : String?
+  single_ : String?
+  multiple_ : String?
+  form : TermForm
+  match_ : OrdinalMatch?
+  gender : GrammarGender?
+  gender_form : GrammarGender?
+} derive(Eq, @debug.Debug)
+pub fn LocalizedTerm::multiple(Self) -> String?
+pub fn LocalizedTerm::single(Self) -> String?
+
+pub(all) enum Locator {
+  Act
+  Appendix
+  ArticleLocator
+  Book
+  Canon
+  Chapter
+  Column
+  Elocation
+  Equation
+  Figure
+  Folio
+  Issue
+  Line
+  Note
+  Opus
+  Page
+  Paragraph
+  Part
+  Rule
+  Scene
+  Section
+  SubVerbo
+  Supplement
+  Table
+  Timestamp
+  Title
+  TitleLocator
+  Verse
+  Volume
+  Custom
+} derive(Eq, Hash, @debug.Debug)
+pub fn Locator::from_str(String) -> Self?
+
+pub(all) enum LongShortForm {
+  Long
+  Short
+} derive(Eq, Hash, @debug.Debug)
+
+pub(all) struct Name {
+  delimiter : String?
+  form : NameForm?
+  parts : Array[NamePart]
+  options_ : InheritableNameOptions
+  formatting : Formatting
+  affixes : Affixes
+} derive(Eq, @debug.Debug)
+pub fn Name::name_part_family(Self) -> NamePart?
+pub fn Name::name_part_given(Self) -> NamePart?
+pub fn Name::options(Self, InheritableNameOptions) -> NameOptions
+pub impl Default for Name
+
+pub(all) enum NameAnd {
+  Text
+  Symbol
+} derive(Eq, Hash, @debug.Debug)
+
+pub(all) enum NameAsSortOrder {
+  First
+  All
+} derive(Eq, Hash, @debug.Debug)
+
+pub(all) enum NameForm {
+  Long
+  Short
+  Count
+} derive(Eq, Hash, @debug.Debug)
+
+pub(all) enum NameLabelPosition {
+  AfterName
+  BeforeName
+} derive(Eq, Hash, @debug.Debug)
+
+pub(all) struct NameOptions {
+  and_ : NameAnd?
+  delimiter : String
+  delimiter_precedes_et_al : DelimiterBehavior
+  delimiter_precedes_last : DelimiterBehavior
+  et_al_min : Int?
+  et_al_use_first : Int?
+  et_al_subsequent_min : Int?
+  et_al_subsequent_use_first : Int?
+  et_al_use_last : Bool
+  form : NameForm
+  initialize : Bool
+  initialize_with : String?
+  name_as_sort_order : NameAsSortOrder?
+  sort_separator : String
+}
+pub fn NameOptions::is_suppressed(Self, Int, Int, Bool) -> Bool
+
+pub(all) struct NamePart {
+  name : NamePartName
+  formatting : Formatting
+  affixes : Affixes
+  text_case : TextCase?
+} derive(Eq, @debug.Debug)
+
+pub(all) enum NamePartName {
+  Given
+  Family
+} derive(Eq, Hash, @debug.Debug)
+
+pub(all) enum NameVariable {
+  Author
+  Chair
+  CollectionEditor
+  Compiler
+  Composer
+  ContainerAuthor
+  Contributor
+  Curator
+  Director
+  Editor
+  EditorialDirector
+  EditorTranslator
+  ExecutiveProducer
+  Guest
+  Host
+  Illustrator
+  Interviewer
+  Narrator
+  Organizer
+  OriginalAuthor
+  Performer
+  Producer
+  Recipient
+  ReviewedAuthor
+  ScriptWriter
+  SeriesCreator
+  Translator
+} derive(Eq, Hash, @debug.Debug)
+pub fn NameVariable::from_str(String) -> Self?
+pub impl Show for NameVariable
+
+pub(all) struct Names {
+  variable : Array[NameVariable]
+  children : Array[NamesChild]
+  delimiter_ : String?
+  and_ : NameAnd?
+  delimiter_precedes_et_al : DelimiterBehavior?
+  delimiter_precedes_last : DelimiterBehavior?
+  et_al_min : Int?
+  et_al_use_first : Int?
+  et_al_subsequent_min : Int?
+  et_al_subsequent_use_first : Int?
+  et_al_use_last : Bool?
+  name_form : NameForm?
+  initialize : Bool?
+  initialize_with : String?
+  name_as_sort_order : NameAsSortOrder?
+  sort_separator : String?
+  font_style : FontStyle?
+  font_variant : FontVariant?
+  font_weight : FontWeight?
+  text_decoration : TextDecoration?
+  vertical_align : VerticalAlign?
+  prefix : String?
+  suffix : String?
+  display : Display?
+} derive(Eq, @debug.Debug)
+pub fn Names::delimiter(Self, InheritableNameOptions) -> String
+pub fn Names::et_al(Self) -> EtAl?
+pub fn Names::from_names_substitute(Self, Self) -> Self
+pub fn Names::label(Self) -> (VariablelessLabel, NameLabelPosition)?
+pub fn Names::name(Self) -> Name?
+pub fn Names::options(Self) -> InheritableNameOptions
+pub fn Names::substitute(Self) -> Substitute?
+pub fn Names::to_affixes(Self) -> Affixes
+pub fn Names::to_formatting(Self) -> Formatting
+pub fn Names::with_variables(Array[NameVariable]) -> Self
+
+pub(all) enum NamesChild {
+  Name(Name)
+  EtAl(EtAl)
+  Label(VariablelessLabel)
+  Substitute(Substitute)
+} derive(Eq, @debug.Debug)
+
+pub(all) struct Number {
+  variable : NumberOrPageVariable
+  form : NumberForm
+  formatting : Formatting
+  affixes : Affixes
+  display : Display?
+  text_case : TextCase?
+} derive(Eq, @debug.Debug)
+
+pub(all) enum NumberForm {
+  Numeric
+  Ordinal
+  LongOrdinal
+  Roman
+} derive(Eq, Hash, @debug.Debug)
+
+pub(all) enum NumberOrPageVariable {
+  Page(PageVariable)
+  Number(NumberVariable)
+} derive(Eq, Hash, @debug.Debug)
+pub fn NumberOrPageVariable::from_str(String) -> Self?
+pub fn NumberOrPageVariable::to_term(Self) -> Term
+pub fn NumberOrPageVariable::to_variable(Self) -> Variable
+
+pub(all) enum NumberVariable {
+  ChapterNumber
+  CitationNumber
+  CollectionNumber
+  Edition
+  FirstReferenceNoteNumber
+  Issue
+  Locator
+  Number
+  NumberOfPages
+  NumberOfVolumes
+  PageFirst
+  PartNumber
+  PrintingNumber
+  Section
+  SupplementNumber
+  Version
+  Volume
+} derive(Eq, Hash, @debug.Debug)
+pub fn NumberVariable::from_str(String) -> Self?
+pub fn NumberVariable::is_number_of_variable(Self) -> Bool
+pub impl Show for NumberVariable
+
+pub struct OrdinalLookup {
+  // private fields
+}
+pub fn OrdinalLookup::empty() -> Self
+pub fn OrdinalLookup::lookup(Self, Int, GrammarGender?) -> String?
+pub fn OrdinalLookup::lookup_long(Self, Int) -> String?
+
+pub(all) enum OrdinalMatch {
+  LastDigit
+  LastTwoDigits
+  WholeNumber
+} derive(Eq, Hash, @debug.Debug)
+
+pub(all) enum OtherTerm {
+  Month01
+  Month02
+  Month03
+  Month04
+  Month05
+  Month06
+  Month07
+  Month08
+  Month09
+  Month10
+  Month11
+  Month12
+  Ordinal
+  OrdinalN(Int)
+  LongOrdinal(Int)
+  OpenQuote
+  CloseQuote
+  OpenInnerQuote
+  CloseInnerQuote
+  PageRangeDelimiter
+  Colon
+  Comma
+  Semicolon
+  Season01
+  Season02
+  Season03
+  Season04
+  Anthropology
+  Astronomy
+  Biology
+  Botany
+  Chemistry
+  Engineering
+  GenericBase
+  Geography
+  Geology
+  History
+  Humanities
+  Literature
+  Math
+  Medicine
+  Philosophy
+  Physics
+  Psychology
+  Sociology
+  Science
+  PoliticalScience
+  SocialScience
+  Theology
+  Zoology
+  Accessed
+  Ad
+  AdvanceOnlinePublication
+  Album
+  And
+  AndOthers
+  Anonymous
+  At
+  AudioRecording
+  AvailableAt
+  Bc
+  Bce
+  By
+  Ce
+  Circa
+  Cited
+  EtAl
+  Film
+  Forthcoming
+  From
+  Henceforth
+  Ibid
+  In
+  InPress
+  Internet
+  Interview
+  Letter
+  LocCit
+  NoDate
+  NoPlace
+  NoPublisher
+  On
+  Online
+  OpCit
+  OriginalWorkPublished
+  PersonalCommunication
+  Podcast
+  PodcastEpisode
+  Preprint
+  PresentedAt
+  RadioBroadcast
+  RadioSeries
+  RadioSeriesEpisode
+  Reference
+  Retrieved
+  ReviewOf
+  Scale
+  SpecialIssue
+  SpecialSection
+  TelevisionBroadcast
+  TelevisionSeries
+  TelevisionSeriesEpisode
+  Video
+  WorkingPaper
+} derive(Eq, Hash, @debug.Debug)
+pub fn OtherTerm::from_str(String) -> Result[Self, TermConversionError]
+pub fn OtherTerm::is_n_ordinal(Self) -> Bool
+pub fn OtherTerm::is_ordinal(Self) -> Bool
+pub fn OtherTerm::month(Int) -> Self?
+pub fn OtherTerm::season(Season) -> Self
+pub impl Show for OtherTerm
+
+pub(all) enum PageRangeFormat {
+  Chicago15
+  Chicago16
+  Expanded
+  Minimal
+  MinimalTwo
+} derive(Eq, Hash, @debug.Debug)
+pub fn PageRangeFormat::format(Self, (String) -> Unit, String, String, String?) -> Unit
+pub impl Default for PageRangeFormat
+
+pub(all) enum PageVariable {
+  Page
+} derive(Eq, Hash, @debug.Debug)
+pub fn PageVariable::from_str(String) -> Self?
+pub impl Show for PageVariable
+
+pub(all) enum RenderingElement {
+  Layout(Layout)
+  Other(LayoutRenderingElement)
+} derive(Eq, @debug.Debug)
+
+pub(all) enum Season {
+  Spring
+  Summer
+  Autumn
+  Winter
+} derive(Eq, Hash, @debug.Debug)
+pub fn Season::to_csl_number(Self) -> Int
+pub fn Season::try_from_csl_number(Int) -> Self?
+
+pub(all) enum SecondFieldAlign {
+  Margin
+  Flush
+} derive(Eq, Hash, @debug.Debug)
+
+pub(all) struct Sort {
+  keys : Array[SortKey]
+} derive(Eq, @debug.Debug)
+
+pub(all) enum SortDirection {
+  Ascending
+  Descending
+} derive(Eq, Hash, @debug.Debug)
+
+pub(all) enum SortKey {
+  Variable(variable~ : Variable, sort_direction~ : SortDirection)
+  MacroName(name~ : String, names_min~ : Int?, names_use_first~ : Int?, names_use_last~ : Bool?, sort_direction~ : SortDirection)
+} derive(Eq, @debug.Debug)
+pub fn SortKey::sort_direction(Self) -> SortDirection
+
+pub(all) enum StandardVariable {
+  Abstract
+  Annote
+  Archive
+  ArchiveCollection
+  ArchiveLocation
+  ArchivePlace
+  Authority
+  CallNumber
+  CitationKey
+  CitationLabel
+  CollectionTitle
+  ContainerTitle
+  ContainerTitleShort
+  Dimensions
+  Division
+  DOI
+  Event
+  EventTitle
+  EventPlace
+  Genre
+  ISBN
+  ISSN
+  Jurisdiction
+  Keyword
+  Language
+  License
+  Medium
+  Note
+  OriginalPublisher
+  OriginalPublisherPlace
+  OriginalTitle
+  PartTitle
+  PMCID
+  PMID
+  Publisher
+  PublisherPlace
+  References
+  ReviewedGenre
+  ReviewedTitle
+  Scale
+  Source
+  Status
+  Title
+  TitleShort
+  URL
+  VolumeTitle
+  YearSuffix
+} derive(Eq, Hash, @debug.Debug)
+pub fn StandardVariable::from_str(String) -> Self?
+pub impl Show for StandardVariable
+
+pub(all) enum Style {
+  Independent(IndependentStyle)
+  Dependent(DependentStyle)
+} derive(Eq, @debug.Debug)
+pub fn Style::from_xml(String) -> Result[Self, XmlDeError]
+pub fn Style::info(Self) -> StyleInfo
+
+pub(all) struct StyleAttribution {
+  name : String
+  email : String?
+  uri : String?
+} derive(Eq, @debug.Debug)
+
+pub(all) enum StyleCategory {
+  CitationFormat(CitationFormat)
+  Field(Field)
+} derive(Eq, @debug.Debug)
+
+pub(all) enum StyleClass {
+  InText
+  Note
+} derive(Eq, Hash, @debug.Debug)
+
+pub(all) struct StyleInfo {
+  authors : Array[StyleAttribution]
+  contributors : Array[StyleAttribution]
+  category : Array[StyleCategory]
+  field : Array[Field]
+  id : String
+  issn : Array[String]
+  eissn : String?
+  issnl : String?
+  link : Array[InfoLink]
+  published : Timestamp?
+  rights : License?
+  summary : LocalString?
+  title : LocalString
+  title_short : LocalString?
+  updated : Timestamp?
+} derive(Eq, @debug.Debug)
+
+pub(all) enum StyleValidationError {
+  MissingCitation
+  MissingParent
+  MissingClassAttr
+} derive(Eq, @debug.Debug)
+pub impl Show for StyleValidationError
+
+pub(all) enum SubsequentAuthorSubstituteRule {
+  CompleteAll
+  CompleteEach
+  PartialEach
+  PartialFirst
+} derive(Eq, Hash, @debug.Debug)
+
+pub(all) struct Substitute {
+  children : Array[LayoutRenderingElement]
+} derive(Eq, @debug.Debug)
+
+pub(all) enum Term {
+  Kind(Kind)
+  NameVariable(NameVariable)
+  NumberVariable(NumberVariable)
+  PageVariable
+  Locator(Locator)
+  Other(OtherTerm)
+} derive(Eq, Hash, @debug.Debug)
+pub fn Term::from_str(String) -> Self?
+pub fn Term::is_gendered(Self) -> Bool
+pub fn Term::is_lexically_same(Self, Self) -> Bool
+pub fn Term::is_n_ordinal(Self) -> Bool
+pub fn Term::is_ordinal(Self) -> Bool
+pub fn Term::term_fallback(Self) -> Self
+
+pub(all) enum TermConversionError {
+  OutOfRange
+  Unknown
+} derive(Eq, Hash, @debug.Debug)
+pub impl Show for TermConversionError
+
+pub(all) enum TermForm {
+  Long
+  Short
+  Verb
+  VerbShort
+  Symbol
+} derive(Eq, Hash, @debug.Debug)
+pub fn TermForm::fallback(Self) -> Self?
+
+pub(all) struct Terms {
+  terms : Array[LocalizedTerm]
+} derive(Eq, @debug.Debug)
+
+pub(all) enum TestPosition {
+  First
+  Subsequent
+  IbidWithLocator
+  Ibid
+  NearNote
+} derive(Eq, Hash, @debug.Debug)
+
+pub(all) struct Text {
+  target : TextTarget
+  formatting : Formatting
+  affixes : Affixes
+  display : Display?
+  quotes : Bool
+  strip_periods : Bool
+  text_case : TextCase?
+} derive(Eq, @debug.Debug)
+pub fn Text::find_variable_element(Self, Variable, Array[CslMacro]) -> LayoutRenderingElement?
+pub fn Text::with_target(TextTarget) -> Self
+
+pub(all) enum TextCase {
+  Lowercase
+  Uppercase
+  CapitalizeFirst
+  CapitalizeAll
+  SentenceCase
+  TitleCase
+} derive(Eq, Hash, @debug.Debug)
+pub fn TextCase::is_language_independent(Self) -> Bool
+
+pub(all) enum TextDecoration {
+  None_
+  Underline
+} derive(Eq, Hash, @debug.Debug)
+pub impl Default for TextDecoration
+
+pub(all) enum TextTarget {
+  Variable(var_~ : Variable, form~ : LongShortForm)
+  Macro(name~ : String)
+  Term(term~ : Term, form~ : TermForm, plural~ : Bool)
+  Value(val~ : String)
+} derive(Eq, @debug.Debug)
+
+pub(all) struct Timestamp {
+  raw : String
+} derive(Eq, @debug.Debug)
+
+pub(all) enum Variable {
+  Standard(StandardVariable)
+  Page(PageVariable)
+  Number(NumberVariable)
+  Date(DateVariable)
+  Name(NameVariable)
+} derive(Eq, Hash, @debug.Debug)
+pub fn Variable::from_str(String) -> Self?
+pub fn Variable::is_number_of_variable(Self) -> Bool
+pub impl Show for Variable
+
+pub(all) struct VariablelessLabel {
+  form : TermForm
+  plural : LabelPluralize
+  formatting : Formatting
+  affixes : Affixes
+  text_case : TextCase?
+  strip_periods : Bool
+} derive(Eq, @debug.Debug)
+
+pub(all) enum VerticalAlign {
+  None_
+  Baseline
+  Sup
+  Sub
+} derive(Eq, Hash, @debug.Debug)
+pub impl Default for VerticalAlign
+
+pub(all) struct XmlDeError {
+  message : String
+  path : String?
+} derive(Eq, @debug.Debug)
+pub impl Show for XmlDeError
+
+// Type aliases
+
+// Traits

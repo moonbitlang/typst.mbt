@@ -1,0 +1,519 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/bib/biblatex"
+
+import {
+  "moonbitlang/core/debug",
+  "moonbitlang/typst/bib/unscanny",
+}
+
+// Values
+pub const DETACHED : Int = 2147483647
+
+pub fn chunk_chars(ArrayView[Spanned[Chunk]]) -> Array[(Char, Bool)]
+
+pub fn chunks_list_to_chunks(Array[Array[Spanned[Chunk]]]) -> Array[Spanned[Chunk]]
+
+pub fn chunks_span(ArrayView[Spanned[Chunk]]) -> Span
+
+pub fn chunks_to_biblatex_string(ArrayView[Spanned[Chunk]], Bool) -> String
+
+pub fn clone_chunks(ArrayView[Spanned[Chunk]]) -> Array[Spanned[Chunk]]
+
+pub fn count_num_char(ArrayView[Spanned[Chunk]], Char) -> Int
+
+pub fn date_to_chunks(Date) -> Array[Spanned[Chunk]]
+
+pub fn format_sentence(ArrayView[Spanned[Chunk]]) -> String
+
+pub fn format_verbatim(ArrayView[Spanned[Chunk]]) -> String
+
+pub fn get_month_for_abbr(String) -> (String, Int)?
+
+pub fn i64_to_chunks(Int64) -> Array[Spanned[Chunk]]
+
+pub fn is_escapable(Char, Bool, Bool) -> Bool
+
+pub fn is_id_continue(Char) -> Bool
+
+pub fn is_id_start(Char) -> Bool
+
+pub fn is_key(Char) -> Bool
+
+pub fn is_verbatim_field(String) -> Bool
+
+pub fn join_chunk_list(ArrayView[Spanned[Chunk]], String) -> Array[Spanned[Chunk]]
+
+pub fn parse_chunks_list(ArrayView[Spanned[Chunk]]) -> Result[Array[Array[Spanned[Chunk]]], TypeError]
+
+pub fn parse_colon(@unscanny.Scanner) -> Result[Unit, TypeError]
+
+pub fn parse_date(ArrayView[Spanned[Chunk]]) -> Result[Date, TypeError]
+
+pub fn parse_editor_type(ArrayView[Spanned[Chunk]]) -> Result[EditorType, TypeError]
+
+pub fn parse_field(String, Array[Spanned[RawChunk]], Map[String, Array[Spanned[RawChunk]]]) -> Result[Array[Spanned[Chunk]], ParseError]
+
+pub fn parse_gender(ArrayView[Spanned[Chunk]]) -> Result[Gender, TypeError]
+
+pub fn parse_hyphen(@unscanny.Scanner) -> Result[Unit, TypeError]
+
+pub fn parse_i64(ArrayView[Spanned[Chunk]]) -> Result[Int64, TypeError]
+
+pub fn parse_language(ArrayView[Spanned[Chunk]]) -> Result[Language, TypeError]
+
+pub fn parse_languages(ArrayView[Spanned[Chunk]]) -> Result[Array[PermissiveType[Language]], TypeError]
+
+pub fn parse_pagination(ArrayView[Spanned[Chunk]]) -> Result[Pagination, TypeError]
+
+pub fn[T] parse_permissive(ArrayView[Spanned[Chunk]], (ArrayView[Spanned[Chunk]]) -> Result[T, TypeError]) -> PermissiveType[T]
+
+pub fn parse_persons(ArrayView[Spanned[Chunk]]) -> Result[Array[Person], TypeError]
+
+pub fn parse_range(ArrayView[Spanned[Chunk]]) -> Result[IntRange, TypeError]
+
+pub fn parse_ranges(ArrayView[Spanned[Chunk]]) -> Result[Array[IntRange], TypeError]
+
+pub fn parse_roman(String) -> Int?
+
+pub fn parse_string(ArrayView[Spanned[Chunk]]) -> Result[String, TypeError]
+
+pub fn parse_string_list(ArrayView[Spanned[Chunk]]) -> Result[Array[String], TypeError]
+
+pub fn[T] permissive_to_chunks(PermissiveType[T], (T) -> Array[Spanned[Chunk]]) -> Array[Spanned[Chunk]]
+
+pub fn ranges_to_chunks(Array[IntRange]) -> Array[Spanned[Chunk]]
+
+pub fn split_at_normal_char(ArrayView[Spanned[Chunk]], Char, Bool) -> (Array[Spanned[Chunk]], Array[Spanned[Chunk]])
+
+pub fn split_token_lists(ArrayView[Spanned[Chunk]], String) -> Array[Array[Spanned[Chunk]]]
+
+pub fn split_token_lists_with_kw(ArrayView[Spanned[Chunk]], String) -> Array[Array[Spanned[Chunk]]]
+
+pub fn split_values(ArrayView[Spanned[Chunk]], Int, Int) -> (Array[Spanned[Chunk]], Array[Spanned[Chunk]])
+
+pub fn string_list_to_chunks(Array[String]) -> Array[Spanned[Chunk]]
+
+pub fn string_to_chunks(String) -> Array[Spanned[Chunk]]
+
+// Errors
+
+// Types and methods
+pub struct Bibliography {
+  // private fields
+}
+pub fn Bibliography::entries(Self) -> Array[Entry]
+pub fn Bibliography::from_raw(RawBibliography) -> Result[Self, ParseError]
+pub fn Bibliography::get(Self, String) -> Entry?
+pub fn Bibliography::insert(Self, Entry) -> Entry?
+pub fn Bibliography::is_empty(Self) -> Bool
+pub fn Bibliography::iter(Self) -> Iter[Entry]
+pub fn Bibliography::keys(Self) -> Array[String]
+pub fn Bibliography::length(Self) -> Int
+pub fn Bibliography::new() -> Self
+pub fn Bibliography::parse(String) -> Result[Self, ParseError]
+
+pub(all) enum Chunk {
+  Normal(String)
+  Verbatim(String)
+  Math(String)
+} derive(Eq, @debug.Debug)
+pub fn Chunk::get(Self) -> String
+pub fn Chunk::to_biblatex_string(Self, Bool) -> String
+
+pub(all) struct Date {
+  value : DateValue
+  uncertain : Bool
+  approximate : Bool
+} derive(Eq, @debug.Debug)
+pub fn Date::parse(ArrayView[Spanned[Chunk]]) -> Result[Self, TypeError]
+pub fn Date::parse_three_fields(ArrayView[Spanned[Chunk]], ArrayView[Spanned[Chunk]]?, ArrayView[Spanned[Chunk]]?) -> Result[Self, TypeError]
+
+pub(all) enum DateValue {
+  At(Datetime)
+  After(Datetime)
+  Before(Datetime)
+  Between(Datetime, Datetime)
+} derive(Eq, @debug.Debug)
+
+pub(all) struct Datetime {
+  year : Int
+  month : Int?
+  day : Int?
+  time : Time?
+} derive(Eq, @debug.Debug)
+pub impl Show for Datetime
+
+pub(all) enum EditorType {
+  Editor
+  Compiler
+  Founder
+  Continuator
+  Redactor
+  Reviser
+  Collaborator
+  Organizer
+  Director
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+pub impl Show for EditorType
+
+pub(all) struct Entry {
+  key : String
+  entry_type : EntryType
+  fields : Map[String, Array[Spanned[Chunk]]]
+}
+pub fn Entry::abstract_(Self) -> Result[Array[Spanned[Chunk]], RetrievalError]
+pub fn Entry::addendum(Self) -> Result[Array[Spanned[Chunk]], RetrievalError]
+pub fn Entry::address(Self) -> Result[Array[Spanned[Chunk]], RetrievalError]
+pub fn Entry::afterword(Self) -> Result[Array[Person], RetrievalError]
+pub fn Entry::annotation(Self) -> Result[Array[Spanned[Chunk]], RetrievalError]
+pub fn Entry::annotator(Self) -> Result[Array[Person], RetrievalError]
+pub fn Entry::author(Self) -> Result[Array[Person], RetrievalError]
+pub fn Entry::author_type(Self) -> Result[String, RetrievalError]
+pub fn Entry::book_author(Self) -> Result[Array[Person], RetrievalError]
+pub fn Entry::book_pagination(Self) -> Result[Pagination, RetrievalError]
+pub fn Entry::book_subtitle(Self) -> Result[Array[Spanned[Chunk]], RetrievalError]
+pub fn Entry::book_title(Self) -> Result[Array[Spanned[Chunk]], RetrievalError]
+pub fn Entry::book_title_addon(Self) -> Result[Array[Spanned[Chunk]], RetrievalError]
+pub fn Entry::chapter(Self) -> Result[Array[Spanned[Chunk]], RetrievalError]
+pub fn Entry::commentator(Self) -> Result[Array[Person], RetrievalError]
+pub fn Entry::copy(Self) -> Self
+pub fn Entry::date(Self) -> Result[PermissiveType[Date], RetrievalError]
+pub fn Entry::doi(Self) -> Result[String, RetrievalError]
+pub fn Entry::edition(Self) -> Result[PermissiveType[Int64], RetrievalError]
+pub fn Entry::editors(Self) -> Result[Array[(Array[Person], EditorType)], TypeError]
+pub fn Entry::eid(Self) -> Result[Array[Spanned[Chunk]], RetrievalError]
+pub fn Entry::entry_subtype(Self) -> Result[Array[Spanned[Chunk]], RetrievalError]
+pub fn Entry::eprint(Self) -> Result[String, RetrievalError]
+pub fn Entry::eprint_class(Self) -> Result[Array[Spanned[Chunk]], RetrievalError]
+pub fn Entry::eprint_type(Self) -> Result[Array[Spanned[Chunk]], RetrievalError]
+pub fn Entry::event_date(Self) -> Result[PermissiveType[Date], RetrievalError]
+pub fn Entry::eventtitle(Self) -> Result[Array[Spanned[Chunk]], RetrievalError]
+pub fn Entry::eventtitle_addon(Self) -> Result[Array[Spanned[Chunk]], RetrievalError]
+pub fn Entry::file(Self) -> Result[String, RetrievalError]
+pub fn Entry::foreword(Self) -> Result[Array[Person], RetrievalError]
+pub fn Entry::gender(Self) -> Result[Gender, RetrievalError]
+pub fn Entry::get(Self, String) -> Array[Spanned[Chunk]]?
+pub fn[T] Entry::get_as(Self, String, (ArrayView[Spanned[Chunk]]) -> Result[T, TypeError]) -> Result[T, RetrievalError]
+pub fn Entry::holder(Self) -> Result[Array[Person], RetrievalError]
+pub fn Entry::how_published(Self) -> Result[Array[Spanned[Chunk]], RetrievalError]
+pub fn Entry::index_title(Self) -> Result[Array[Spanned[Chunk]], RetrievalError]
+pub fn Entry::institution(Self) -> Result[Array[Spanned[Chunk]], RetrievalError]
+pub fn Entry::introduction(Self) -> Result[Array[Person], RetrievalError]
+pub fn Entry::isan(Self) -> Result[Array[Spanned[Chunk]], RetrievalError]
+pub fn Entry::isbn(Self) -> Result[Array[Spanned[Chunk]], RetrievalError]
+pub fn Entry::ismn(Self) -> Result[Array[Spanned[Chunk]], RetrievalError]
+pub fn Entry::isrn(Self) -> Result[Array[Spanned[Chunk]], RetrievalError]
+pub fn Entry::issn(Self) -> Result[Array[Spanned[Chunk]], RetrievalError]
+pub fn Entry::issue(Self) -> Result[Array[Spanned[Chunk]], RetrievalError]
+pub fn Entry::issue_subtitle(Self) -> Result[Array[Spanned[Chunk]], RetrievalError]
+pub fn Entry::issue_title(Self) -> Result[Array[Spanned[Chunk]], RetrievalError]
+pub fn Entry::issue_title_addon(Self) -> Result[Array[Spanned[Chunk]], RetrievalError]
+pub fn Entry::iswc(Self) -> Result[Array[Spanned[Chunk]], RetrievalError]
+pub fn Entry::journal(Self) -> Result[Array[Spanned[Chunk]], RetrievalError]
+pub fn Entry::journal_subtitle(Self) -> Result[Array[Spanned[Chunk]], RetrievalError]
+pub fn Entry::journal_title(Self) -> Result[Array[Spanned[Chunk]], RetrievalError]
+pub fn Entry::journal_title_addon(Self) -> Result[Array[Spanned[Chunk]], RetrievalError]
+pub fn Entry::keywords(Self) -> Result[Array[Spanned[Chunk]], RetrievalError]
+pub fn Entry::label(Self) -> Result[Array[Spanned[Chunk]], RetrievalError]
+pub fn Entry::langid(Self) -> Result[PermissiveType[Language], RetrievalError]
+pub fn Entry::language(Self) -> Result[Array[PermissiveType[Language]], RetrievalError]
+pub fn Entry::library(Self) -> Result[Array[Spanned[Chunk]], RetrievalError]
+pub fn Entry::location(Self) -> Result[Array[Spanned[Chunk]], RetrievalError]
+pub fn Entry::main_subtitle(Self) -> Result[Array[Spanned[Chunk]], RetrievalError]
+pub fn Entry::main_title(Self) -> Result[Array[Spanned[Chunk]], RetrievalError]
+pub fn Entry::main_title_addon(Self) -> Result[Array[Spanned[Chunk]], RetrievalError]
+pub fn Entry::name_addon(Self) -> Result[Array[Spanned[Chunk]], RetrievalError]
+pub fn Entry::new(String, EntryType) -> Self
+pub fn Entry::note(Self) -> Result[Array[Spanned[Chunk]], RetrievalError]
+pub fn Entry::number(Self) -> Result[Array[Spanned[Chunk]], RetrievalError]
+pub fn Entry::options(Self) -> Result[Array[Spanned[Chunk]], RetrievalError]
+pub fn Entry::organization(Self) -> Result[Array[Array[Spanned[Chunk]]], RetrievalError]
+pub fn Entry::orig_date(Self) -> Result[PermissiveType[Date], RetrievalError]
+pub fn Entry::orig_language(Self) -> Result[Array[String], RetrievalError]
+pub fn Entry::orig_location(Self) -> Result[Array[Array[Spanned[Chunk]]], RetrievalError]
+pub fn Entry::page_total(Self) -> Result[Array[Spanned[Chunk]], RetrievalError]
+pub fn Entry::pages(Self) -> Result[PermissiveType[Array[IntRange]], RetrievalError]
+pub fn Entry::pagination(Self) -> Result[Pagination, RetrievalError]
+pub fn Entry::parents(Self) -> Result[Array[String], TypeError]
+pub fn Entry::part(Self) -> Result[Array[Spanned[Chunk]], RetrievalError]
+pub fn Entry::publisher(Self) -> Result[Array[Array[Spanned[Chunk]]], RetrievalError]
+pub fn Entry::pubstate(Self) -> Result[Array[Spanned[Chunk]], RetrievalError]
+pub fn Entry::remove(Self, String) -> Array[Spanned[Chunk]]?
+pub fn Entry::reprint_title(Self) -> Result[Array[Spanned[Chunk]], RetrievalError]
+pub fn Entry::school(Self) -> Result[Array[Spanned[Chunk]], RetrievalError]
+pub fn Entry::series(Self) -> Result[Array[Spanned[Chunk]], RetrievalError]
+pub fn Entry::set(Self, String, Array[Spanned[Chunk]]) -> Unit
+pub fn Entry::set_date(Self, PermissiveType[Date]) -> Unit
+pub fn Entry::short_author(Self) -> Result[Array[Person], RetrievalError]
+pub fn Entry::short_editor(Self) -> Result[Array[Person], RetrievalError]
+pub fn Entry::short_journal(Self) -> Result[Array[Spanned[Chunk]], RetrievalError]
+pub fn Entry::short_series(Self) -> Result[Array[Spanned[Chunk]], RetrievalError]
+pub fn Entry::short_title(Self) -> Result[Array[Spanned[Chunk]], RetrievalError]
+pub fn Entry::shorthand(Self) -> Result[Array[Spanned[Chunk]], RetrievalError]
+pub fn Entry::shorthand_intro(Self) -> Result[Array[Spanned[Chunk]], RetrievalError]
+pub fn Entry::sort_key(Self) -> Result[String, RetrievalError]
+pub fn Entry::sorted_keys(Self) -> Array[String]
+pub fn Entry::subtitle(Self) -> Result[Array[Spanned[Chunk]], RetrievalError]
+pub fn Entry::title(Self) -> Result[Array[Spanned[Chunk]], RetrievalError]
+pub fn Entry::title_addon(Self) -> Result[Array[Spanned[Chunk]], RetrievalError]
+pub fn Entry::translator(Self) -> Result[Array[Person], RetrievalError]
+pub fn Entry::type_(Self) -> Result[String, RetrievalError]
+pub fn Entry::url(Self) -> Result[String, RetrievalError]
+pub fn Entry::url_date(Self) -> Result[PermissiveType[Date], RetrievalError]
+pub fn Entry::venue(Self) -> Result[Array[Spanned[Chunk]], RetrievalError]
+pub fn Entry::version(Self) -> Result[Array[Spanned[Chunk]], RetrievalError]
+pub fn Entry::volume(Self) -> Result[PermissiveType[Int64], RetrievalError]
+pub fn Entry::volumes(Self) -> Result[Int64, RetrievalError]
+
+pub(all) enum EntryType {
+  Article
+  Book
+  Booklet
+  InBook
+  InCollection
+  InProceedings
+  Manual
+  MastersThesis
+  PhdThesis
+  Misc
+  Proceedings
+  TechReport
+  Unpublished
+  MvBook
+  BookInBook
+  SuppBook
+  Periodical
+  SuppPeriodical
+  Collection
+  MvCollection
+  SuppCollection
+  Reference
+  MvReference
+  InReference
+  MvProceedings
+  Report
+  Patent
+  Thesis
+  Online
+  Software
+  Dataset
+  Set
+  XData
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+pub fn EntryType::is_collection(Self) -> Bool
+pub fn EntryType::is_multi_volume(Self) -> Bool
+pub fn EntryType::new(String) -> Self
+pub fn EntryType::to_biblatex(Self) -> Self
+pub fn EntryType::to_bibtex(Self) -> Self
+pub impl Show for EntryType
+
+pub(all) enum Gender {
+  SingularFemale
+  SingularMale
+  SingularNeuter
+  PluralFemale
+  PluralMale
+  PluralNeuter
+} derive(Eq, @debug.Debug)
+pub fn Gender::coalesce(Array[Self]) -> Self?
+pub fn Gender::plural(Self) -> Self
+pub fn Gender::singular(Self) -> Self
+pub impl Show for Gender
+
+pub(all) struct IntRange(Int64, Int64) derive(Eq, @debug.Debug)
+
+pub(all) enum Language {
+  Basque
+  Bulgarian
+  Catalan
+  Croatian
+  Czech
+  Danish
+  Dutch
+  EnglishUS
+  EnglishUK
+  EnglishCA
+  EnglishAUS
+  EnglishNZ
+  Estonian
+  Finnish
+  French
+  German
+  GermanAT
+  GermanCH
+  GermanNew
+  GermanATNew
+  GermanCHNew
+  Greek
+  Hungarian
+  Icelandic
+  Italian
+  Latvian
+  Lithuanian
+  Marathi
+  NorwegianBokmal
+  NorwegainNynorsk
+  Polish
+  PortugueseBR
+  Portuguese
+  Romanian
+  Russian
+  SerbianLatin
+  SerbianCyrillic
+  Slovak
+  Slovene
+  Spanish
+  Swedish
+  Turkish
+  Ukrainian
+} derive(Eq, @debug.Debug)
+pub fn Language::from_str(String) -> Self?
+pub fn Language::to_langid(Self) -> String
+pub impl Show for Language
+
+pub(all) enum Pagination {
+  Page
+  Column
+  Line
+  Verse
+  Section
+  Paragraph
+} derive(Eq, @debug.Debug)
+pub impl Show for Pagination
+
+pub(all) struct Pair {
+  key : Spanned[String]
+  value : Spanned[Array[Spanned[RawChunk]]]
+}
+
+pub(all) struct ParseError {
+  span : Span
+  kind : ParseErrorKind
+} derive(Eq, @debug.Debug)
+pub fn ParseError::new(Span, ParseErrorKind) -> Self
+pub impl Show for ParseError
+
+pub(all) enum ParseErrorKind {
+  UnexpectedEof
+  Unexpected(Token)
+  Expected(Token)
+  UnknownAbbreviation(String)
+  MalformedCommand
+  DuplicateKey(String)
+  ResolutionError(TypeErrorKind)
+} derive(Eq, @debug.Debug)
+pub impl Show for ParseErrorKind
+
+pub(all) enum PermissiveType[T] {
+  Typed(T)
+  Chunks(Array[Spanned[Chunk]])
+} derive(Eq, @debug.Debug)
+
+pub(all) struct Person {
+  name : String
+  given_name : String
+  prefix : String
+  suffix : String
+  id : String?
+  prefix_initials : String?
+  given_initials : String?
+  use_prefix : Bool?
+} derive(Eq, @debug.Debug)
+pub fn Person::parse(ArrayView[Spanned[Chunk]]) -> Self
+pub impl Show for Person
+
+pub(all) struct RawBibliography {
+  mut preamble : String
+  entries : Array[Spanned[RawEntry]]
+  abbreviations : Array[Pair]
+}
+pub fn RawBibliography::parse(String) -> Result[Self, ParseError]
+
+pub(all) enum RawChunk {
+  Normal(String)
+  Abbreviation(String)
+} derive(Eq, @debug.Debug)
+
+pub(all) struct RawEntry {
+  key : Spanned[String]
+  kind : Spanned[String]
+  fields : Array[Pair]
+}
+
+pub(all) enum RetrievalError {
+  Missing(String)
+  TypeError(TypeError)
+} derive(Eq, @debug.Debug)
+pub impl Show for RetrievalError
+
+pub(all) struct Span {
+  start : Int
+  end : Int
+} derive(Eq, @debug.Debug)
+pub fn Span::is_empty(Self) -> Bool
+pub fn Span::new(Int, Int) -> Self
+
+pub(all) struct Spanned[T] {
+  mut v : T
+  mut span : Span
+} derive(Eq, @debug.Debug)
+pub fn[T] Spanned::detached(T) -> Self[T]
+pub fn[T] Spanned::is_detached(Self[T]) -> Bool
+pub fn[T] Spanned::new(T, Span) -> Self[T]
+pub fn[T] Spanned::zero(T) -> Self[T]
+
+pub(all) struct Time {
+  hour : Int
+  minute : Int
+  second : Int
+  offset : TimeOffset?
+} derive(Eq, @debug.Debug)
+
+pub(all) enum TimeOffset {
+  Utc
+  Offset(positive~ : Bool, hours~ : Int, minutes~ : Int)
+} derive(Eq, @debug.Debug)
+
+pub(all) enum Token {
+  Identifier
+  OpeningBrace
+  ClosingBrace
+  Comma
+  QuotationMark
+  Equals
+  DecimalPoint
+} derive(Eq, @debug.Debug)
+pub impl Show for Token
+
+pub(all) struct TypeError {
+  span : Span
+  kind : TypeErrorKind
+} derive(Eq, @debug.Debug)
+pub fn TypeError::new(Span, TypeErrorKind) -> Self
+pub impl Show for TypeError
+
+pub(all) enum TypeErrorKind {
+  UndefinedRange
+  DayOutOfRange
+  MonthOutOfRange
+  InvalidNumber
+  MissingNumber
+  WrongNumberOfDigits
+  InvalidFormat
+  UnknownGender
+  InvalidIntegerRange
+  UnknownPagination
+  UnknownEditorType
+  UnknownLangId
+  YearZeroCE
+} derive(Eq, @debug.Debug)
+pub impl Show for TypeErrorKind
+
+// Type aliases
+pub type Chunks = Array[Spanned[Chunk]]
+
+pub type Field = Array[Spanned[RawChunk]]
+
+// Traits

@@ -2600,16 +2600,21 @@ dependencies = [
 name = "typst-oracle"
 version = "0.1.0"
 dependencies = [
+ "biblatex",
+ "citationberg",
  "codex",
  "comemo",
  "ecow",
+ "hayagriva",
  "hypher",
+ "icu_collator",
  "icu_properties",
  "icu_provider",
  "icu_provider_blob",
  "icu_segmenter",
  "parking_lot",
  "proc-macro2",
+ "quick-xml 0.38.4",
  "quote",
  "regex",
  "regex-syntax",

@@ -1,0 +1,112 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/bib/unscanny"
+
+// Values
+pub fn char_count(StringView) -> Int
+
+pub fn char_len_utf8(Char) -> Int
+
+pub fn char_to_lowercase(Char) -> String
+
+pub fn char_to_uppercase(Char) -> String
+
+pub fn chars(StringView) -> Array[Char]
+
+pub fn compare_str(StringView, StringView) -> Int
+
+pub fn compose(Char, Char) -> Char?
+
+pub fn count_char(StringView, Char) -> Int
+
+pub fn find_byte(StringView, StringView) -> Int?
+
+pub fn first_char(StringView) -> Char?
+
+pub fn is_alphabetic(Char) -> Bool
+
+pub fn is_alphanumeric(Char) -> Bool
+
+pub fn is_control(Char) -> Bool
+
+pub fn is_lowercase(Char) -> Bool
+
+pub fn is_numeric(Char) -> Bool
+
+pub fn is_uppercase(Char) -> Bool
+
+pub fn is_whitespace(Char) -> Bool
+
+pub fn last_char(StringView) -> Char?
+
+pub fn len_utf8(StringView) -> Int
+
+pub fn parse_i32(StringView) -> Int?
+
+pub fn parse_i64(StringView) -> Int64?
+
+pub fn parse_int_in(StringView, Int64, Int64) -> Int64?
+
+pub fn parse_u32(StringView) -> Int64?
+
+pub fn parse_u8(StringView) -> Int?
+
+pub fn split(StringView, StringView) -> Array[String]
+
+pub fn split_by(StringView, (Char) -> Bool) -> Array[String]
+
+pub fn split_whitespace(StringView) -> Array[String]
+
+pub fn to_ascii_lowercase(StringView) -> String
+
+pub fn to_ascii_uppercase(StringView) -> String
+
+pub fn to_lowercase(StringView) -> String
+
+pub fn to_uppercase(StringView) -> String
+
+pub fn trim(StringView) -> String
+
+pub fn trim_end(StringView) -> String
+
+pub fn trim_start(StringView) -> String
+
+// Errors
+
+// Types and methods
+pub struct Scanner {
+  // private fields
+}
+pub fn Scanner::after(Self) -> String
+pub fn Scanner::at_char(Self, Char) -> Bool
+pub fn Scanner::at_fn(Self, (Char) -> Bool) -> Bool
+pub fn Scanner::at_str(Self, StringView) -> Bool
+pub fn Scanner::before(Self) -> String
+pub fn Scanner::cursor(Self) -> Int
+pub fn Scanner::done(Self) -> Bool
+pub fn Scanner::eat(Self) -> Char?
+pub fn Scanner::eat_if(Self, Char) -> Bool
+pub fn Scanner::eat_if_any(Self, Array[Char]) -> Bool
+pub fn Scanner::eat_if_fn(Self, (Char) -> Bool) -> Bool
+pub fn Scanner::eat_if_str(Self, StringView) -> Bool
+pub fn Scanner::eat_until(Self, (Char) -> Bool) -> String
+pub fn Scanner::eat_until_any(Self, Array[Char]) -> String
+pub fn Scanner::eat_until_char(Self, Char) -> String
+pub fn Scanner::eat_until_str(Self, StringView) -> String
+pub fn Scanner::eat_while(Self, (Char) -> Bool) -> String
+pub fn Scanner::eat_while_char(Self, Char) -> String
+pub fn Scanner::eat_while_str(Self, StringView) -> String
+pub fn Scanner::eat_whitespace(Self) -> String
+pub fn Scanner::from(Self, Int) -> String
+pub fn Scanner::get(Self, Int, Int) -> String
+pub fn Scanner::jump(Self, Int) -> Unit
+pub fn Scanner::locate(Self, Int) -> Int
+pub fn Scanner::new(StringView) -> Self
+pub fn Scanner::peek(Self) -> Char?
+pub fn Scanner::scout(Self, Int) -> Char?
+pub fn Scanner::string(Self) -> String
+pub fn Scanner::to(Self, Int) -> String
+pub fn Scanner::uneat(Self) -> Char?
+
+// Type aliases
+
+// Traits

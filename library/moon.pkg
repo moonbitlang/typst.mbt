@@ -23,6 +23,8 @@ import {
   "moonbitlang/typst/codecs",
   "moonbitlang/typst/otf",
   "moonbitlang/typst/xmlwriter",
+  "moonbitlang/typst/bib/hayagriva",
+  "moonbitlang/typst/bib/citationberg",
 }
 
 import {

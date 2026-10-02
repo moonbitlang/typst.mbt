@@ -9,6 +9,8 @@ import {
 // Values
 pub fn parse(Bytes) -> @serde.Data raise YamlError
 
+pub fn parse_nodes(Bytes) -> YamlNodes raise YamlError
+
 pub fn to_string(@serde.Data) -> String raise YamlError
 
 // Errors
@@ -22,6 +24,21 @@ pub(all) struct Location {
   line : Int
   column : Int
 } derive(Eq, @debug.Debug)
+
+pub(all) struct YamlNode {
+  data : @serde.Data
+  location : Location
+  path : String
+  children : Array[YamlNode]
+  incomplete : Bool
+  empty : Bool
+}
+pub fn YamlNode::error(Self, String) -> YamlError
+
+pub(all) struct YamlNodes {
+  root : YamlNode
+  error : YamlError?
+}
 
 // Type aliases
 

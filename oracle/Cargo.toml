@@ -47,3 +47,9 @@ icu_provider_blob = "2.3"
 unicode-bidi = "0.3.18"
 unicode-segmentation = "1.12"
 hypher = "0.1.8"
+# Bibliography stack (same versions as typst-library's lock).
+hayagriva = "=0.10.1"
+citationberg = "=0.7.0"
+biblatex = "=0.12.0"
+quick-xml = { version = "=0.38.4", features = ["serialize", "overlapped-lists"] }
+icu_collator = "=2.3.1"
