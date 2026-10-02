@@ -55,6 +55,30 @@ fn GifReader::bytes(self : GifReader, n : Int) -> BytesView raise ImageError {
 /// Decodes the first frame (`DecodeOptions::read_info` followed by
 /// `read_next_frame`). Returns `None` when the file has no frame.
 pub fn decode_gif_first_frame(data : BytesView) -> GifFrame? raise ImageError {
+  gif_decode_first(data, image_crate=false).frame
+}
+
+///|
+/// The logical screen, the ICC profile read by `read_info` and the first
+/// frame of a GIF.
+priv struct GifFirst {
+  screen_width : Int
+  screen_height : Int
+  icc : Bytes?
+  frame : GifFrame?
+}
+
+///|
+/// Decodes the header and the first frame. With `image_crate`, the frame is
+/// read like `image::codecs::gif::GifDecoder::read_image` does
+/// (`next_frame_info` + `read_into_buffer`, so without the `gif` crate's
+/// memory limit, but with the `image` crate's default allocation limit for
+/// frames that do not span the logical screen); otherwise like
+/// `read_next_frame`.
+fn gif_decode_first(
+  data : BytesView,
+  image_crate~ : Bool,
+) -> GifFirst raise ImageError {
   let err = (msg : String) => decoding_error("Gif", msg)
   let r = { data, pos: 0, }
   let version = r.bytes(6)
@@ -77,15 +101,17 @@ pub fn decode_gif_first_frame(data : BytesView) -> GifFrame? raise ImageError {
   // descriptor).
   let mut transparent : Int? = None
   let mut has_frame = false
+  let mut icc : Buffer? = None
+  let first = (frame : GifFrame?) => {
+    screen_width,
+    screen_height,
+    icc: icc.map(buf => buf.to_bytes()),
+    frame,
+  }
   while true {
-    if r.pos >= r.data.length() {
-      // `read_info` hits the end of the stream before the header end, or
-      // `next_frame_info` before a frame.
-      if !has_frame {
-        err("file does not contain any image data")
-      }
-      return None
-    }
+    // The streaming decoder needs a byte at every block start, so the end of
+    // the stream there is an `UnexpectedEof` (in `read_info` or
+    // `next_frame_info`).
     let block = r.byte()
     match block {
       0x21 => {
@@ -96,12 +122,28 @@ pub fn decode_gif_first_frame(data : BytesView) -> GifFrame? raise ImageError {
           err("unknown extension block encountered")
         }
         let mut last : BytesView = b""[:]
+        // Application extensions before the first image are read by
+        // `read_info` (`read_application_extension`), which collects the
+        // ICC profile.
+        let mut first_block = true
+        let mut is_icc = false
         while true {
           let len = r.byte()
           if len == 0 {
             break
           }
           last = r.bytes(len)
+          if label == 0xFF {
+            if first_block {
+              is_icc = last == b"ICCRGBG1012"
+              if is_icc {
+                icc = Some(Buffer())
+              }
+            } else if is_icc && icc is Some(buf) {
+              buf.write_bytesview(last)
+            }
+          }
+          first_block = false
         }
         if label == 0xF9 {
           // `read_control_extension` on the last sub-block.
@@ -144,37 +186,96 @@ pub fn decode_gif_first_frame(data : BytesView) -> GifFrame? raise ImageError {
                 )
             }
         }
-        // `check_buffer_size` against the 50 MB memory limit.
         let pixel_bytes = width.to_int64() * height.to_int64() * 4L
-        if pixel_bytes > 50_000_000L {
+        if image_crate {
+          // `GifDecoder::read_image` decodes frames that do not span the
+          // logical screen into a separate buffer, reserved against the
+          // default allocation limit (512 MiB) of `Limits::default()`.
+          let spans = left == 0 &&
+            width == screen_width &&
+            top + height <= screen_height
+          if !spans && pixel_bytes > 512L * 1024L * 1024L {
+            raise ImageError("Memory limit exceeded")
+          }
+        } else if pixel_bytes > 50_000_000L {
+          // `check_buffer_size` against the 50 MB memory limit.
           raise ImageError("Memory limit reached")
         }
-        if pixel_bytes == 0L {
+        // `fill_buffer` rejects empty buffers; an interlaced frame without
+        // rows reads nothing.
+        if pixel_bytes == 0L && !(interlaced && height == 0) {
           err("odd-sized buffer")
         }
         let rgba = gif_decode_pixels(
           r, min_code_size, width, height, interlaced, palette, transparent,
         )
-        return Some({
-          screen_width,
-          screen_height,
-          left,
-          top,
-          width,
-          height,
-          rgba,
-        })
+        return first(
+          Some({ screen_width, screen_height, left, top, width, height, rgba, }),
+        )
       }
       0x3B => {
-        if !has_frame {
-          err("file does not contain any image data")
+        // Right after the header (whose last state consumes the block type),
+        // the `BlockStart` state that emits `HeaderEnd` needs one more byte.
+        // After an extension, the trailer is not consumed before.
+        if !has_frame && r.pos >= r.data.length() {
+          err("Unexpected End of File")
         }
-        return None
+        return first(None)
       }
-      _ => err("unknown block type encountered")
+      _ => {
+        // `BlockStart` needs a byte before it rejects the block.
+        if r.pos >= r.data.length() {
+          err("Unexpected End of File")
+        }
+        err("unknown block type encountered")
+      }
     }
   }
-  None
+  first(None)
+}
+
+///|
+/// Decodes a GIF like upstream `image::DynamicImage::from_decoder` with an
+/// `image::codecs::gif::GifDecoder` (`ColorOutput::RGBA`): an RGBA image of
+/// the logical screen size with the first frame placed at its position
+/// (pixels outside the frame are transparent black, parts of the frame
+/// outside the screen are cut off), plus the ICC profile (upstream
+/// `GifDecoder::icc_profile`).
+pub fn decode_gif_image(
+  data : BytesView,
+) -> (ImageInfo, Bytes) raise ImageError {
+  let first = gif_decode_first(data, image_crate=true)
+  guard first.frame is Some(frame) else {
+    // `ParameterErrorKind::NoMoreData`.
+    raise ImageError("The end of the image has been reached")
+  }
+  let width = first.screen_width
+  let height = first.screen_height
+  let buf = FixedArray::make(width * height * 4, b'\x00')
+  for y in 0..<frame.height {
+    let sy = frame.top + y
+    if sy >= height {
+      break
+    }
+    for x in 0..<frame.width {
+      let sx = frame.left + x
+      if sx >= width {
+        break
+      }
+      let src = (y * frame.width + x) * 4
+      let dst = (sy * width + sx) * 4
+      for k in 0..<4 {
+        buf[dst + k] = frame.rgba[src + k]
+      }
+    }
+  }
+  let info = {
+    width: width.reinterpret_as_uint(),
+    height: height.reinterpret_as_uint(),
+    color: Rgba8,
+    icc: first.icc,
+  }
+  (info, Bytes::from_fixedarray(buf))
 }
 
 ///|

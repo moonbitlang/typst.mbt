@@ -3,9 +3,6 @@
 // SVG images are drawn with the port of `krilla-svg` (`svg*.mbt`); PDF
 // images are embedded as form XObjects extracted with the port of
 // `hayro-write` (`hayro/write`), like krilla's `draw_pdf_page`.
-//
-// TODO: GIF and WebP images are not decoded by the library yet and are
-// skipped.
 
 ///|
 fn handle_image(
@@ -34,7 +31,7 @@ fn handle_image(
             surface.draw_image(image, size)
           }
         }
-        Err(Some(err)) => {
+        Err(err) => {
           surface.pop()
           raise @library.SourceError([
             @library.SourceDiagnostic::error_at(
@@ -43,7 +40,6 @@ fn handle_image(
             ),
           ])
         }
-        Err(None) => ()
       }
       surface.pop()
     }
@@ -186,12 +182,11 @@ fn bytes_key(data : Bytes) -> String {
 }
 
 ///|
-/// Convert a raster image. `Err(None)` means the format cannot be embedded
-/// yet.
+/// Convert a raster image.
 fn convert_raster(
   raster : @library.RasterImage,
   interpolate : Bool,
-) -> Result[@export.Image, String?] {
+) -> Result[@export.Image, String] {
   let key = raster_key(raster)
   let width = raster.width().reinterpret_as_int()
   let height = raster.height().reinterpret_as_int()
@@ -200,21 +195,17 @@ fn convert_raster(
       convert_jpeg(key, raster.data(), width, height, raster.icc(), interpolate),
     )
   }
-  // The decoded pixels (decoding PNGs here if the image was not decoded).
-  let (color, buf) : (@codecs.ColorType, Bytes) = match raster.dynamic() {
-    Some(dynamic) => (dynamic.color, dynamic.buf)
-    None =>
-      if raster.format() == Exchange(Png) {
-        let (info, pixels) = @codecs.decode_png(raster.data()[:]) catch {
-          _ => return Err(Some("failed to decode PNG"))
-        }
-        (info.color, pixels)
-      } else {
-        return Err(None)
-      }
-  }
+  let dynamic = raster.dynamic()
   // The ICC profile is only kept for 8-bit images that are used as is.
-  convert_samples(key, width, height, color, buf, raster.icc(), interpolate)
+  convert_samples(
+    key,
+    width,
+    height,
+    dynamic.color,
+    dynamic.buf,
+    raster.icc(),
+    interpolate,
+  )
 }
 
 ///|
@@ -331,7 +322,9 @@ fn jpeg_components(data : Bytes) -> (Int, Bool, (Int, Int)?) {
 }
 
 ///|
-/// Convert decoded pixels into an image.
+/// Convert decoded pixels into an image (upstream `PdfRasterImage`: the
+/// color channels as 8-bit luma or RGB, the alpha channel if the image has
+/// one, and the ICC profile for 8-bit images).
 fn convert_samples(
   key : String,
   width : Int,
@@ -340,7 +333,7 @@ fn convert_samples(
   buf : Bytes,
   icc : Bytes?,
   interpolate : Bool,
-) -> Result[@export.Image, String?] {
+) -> Result[@export.Image, String] {
   let channels = color.channel_count()
   let sixteen = color is (L16 | La16 | Rgb16 | Rgba16)
   let has_alpha = color is (La8 | Rgba8 | La16 | Rgba16)
@@ -348,19 +341,26 @@ fn convert_samples(
   let bpc = if sixteen { 2 } else { 1 }
   let n = width * height
   if buf.length() < n * channels * bpc {
-    return Err(Some("image data is truncated"))
+    return Err("image data is truncated")
   }
   let color_buf = Array::make(n * (if has_color { 3 } else { 1 }), b'\x00')
   let alpha_buf = Array::make(if has_alpha { n } else { 0 }, b'\x00')
   let color_channels = if has_color { 3 } else { 1 }
+  let sample = (i : Int) => {
+    if sixteen {
+      // Little-endian 16-bit samples are converted like `to_rgb8`.
+      u16_to_u8(buf[i].to_int() | (buf[i + 1].to_int() << 8))
+    } else {
+      buf[i]
+    }
+  }
   for p in 0..<n {
     let base = p * channels * bpc
     for c in 0..<color_channels {
-      // 16-bit samples are big-endian; keep the high byte.
-      color_buf[p * color_channels + c] = buf[base + c * bpc]
+      color_buf[p * color_channels + c] = sample(base + c * bpc)
     }
     if has_alpha {
-      alpha_buf[p] = buf[base + (channels - 1) * bpc]
+      alpha_buf[p] = sample(base + (channels - 1) * bpc)
     }
   }
   let icc = if sixteen { None } else { icc }
@@ -416,4 +416,11 @@ fn convert_jpeg(
     interpolate,
     inverted_cmyk: adobe,
   }
+}
+
+///|
+/// Converts a 16-bit sample to 8 bits (upstream `image`'s
+/// `FromPrimitive<u16> for u8`: `round(c * 255 / 65535)`).
+fn u16_to_u8(c : Int) -> Byte {
+  ((c + 128) / 257).to_byte()
 }

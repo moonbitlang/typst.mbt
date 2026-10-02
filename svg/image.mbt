@@ -121,9 +121,7 @@ pub fn WebImage::new(image : @library.Image) -> WebImage raise WebImageError {
               "embedding ICC profiles in PNG images is not yet ported",
             )
           }
-          guard raster.dynamic() is Some(dynamic) else {
-            abort("pixel images are always decoded")
-          }
+          let dynamic = raster.dynamic()
           let color : @codecs.PngColorType = match dynamic.color {
             L8 => Grayscale
             La8 => GrayscaleAlpha
