@@ -1,7 +1,7 @@
 // Differential test runner: compares the MoonBit port against reference
 // outputs dumped by the Rust oracle (see `scripts/goldens.sh`).
 //
-// Usage: moon run tests/runner -- <syntax|ast|eval|html> [filter] [--verbose]
+// Usage: moon run tests/runner -- <syntax|ast|eval|html|realize> [filter] [--verbose]
 
 ///|
 let suite_dir = ".repos/typst/tests/suite"
