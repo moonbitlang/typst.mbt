@@ -41,6 +41,7 @@ const HB_OT_SHAPE_ZERO_WIDTH_MARKS_BY_GDEF_LATE : Int = 2
 priv enum ShaperData {
   NoData
   Arabic(ArabicShapePlan)
+  Hangul(HangulShapePlan)
   Indic(IndicShapePlan)
   Khmer(KhmerShapePlan)
   Use(UniversalShapePlan)
