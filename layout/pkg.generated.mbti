@@ -17,6 +17,8 @@ pub fn grow(@library.Frame, @library.Sides[@library.Rel[@library.Abs]]) -> Unit
 
 pub fn[R : FrameModify] layout_and_modify(@library.StyleChain, (@library.StyleChain) -> R raise @library.SourceError) -> R raise @library.SourceError
 
+pub fn layout_cell(@library.Cell, @library.Engine, @library.Locator, @library.StyleChain, @library.Regions, Bool) -> @library.Fragment raise @library.SourceError
+
 pub fn layout_circle(@library.CircleElem, @library.Engine, @library.Locator, @library.StyleChain, @library.LayoutRegion) -> @library.Frame raise @library.SourceError
 
 pub fn layout_columns(@library.ColumnsElem, @library.Engine, @library.Locator, @library.StyleChain, @library.Regions) -> @library.Fragment raise @library.SourceError
