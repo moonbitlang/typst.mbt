@@ -140,7 +140,7 @@ pub fn decode_png(data : BytesView) -> (ImageInfo, Bytes) raise ImageError {
   if info.color_type is Indexed && chunks.palette is None {
     decoding_error("Png", "Palette required, but not found.")
   }
-  let raw = zlib_decompress(chunks.idat[:]) catch {
+  let raw = zlib_decompress(chunks.idat[:], verify_checksum=false) catch {
     InflateError(err) => decoding_error("Png", "Corrupt deflate stream. \{err}")
   }
   let width = info.width.reinterpret_as_int()
