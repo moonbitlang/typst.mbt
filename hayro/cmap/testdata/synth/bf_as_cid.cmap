@@ -1,0 +1,9 @@
+/CMapName /X def
+/WMode 1 def
+2 beginbfchar
+<0041> <0042>
+<0043> <00440045>
+endbfchar
+1 begincidrange
+<00> <0f> 100
+endcidrange

@@ -1,0 +1,15 @@
+hayro/cmap/testdata/synth/bad_array.cmap #0 1 7394c371d5fc2f03 none
+hayro/cmap/testdata/synth/bad_code.cmap #0 1 7394c371d5fc2f03 none
+hayro/cmap/testdata/synth/bad_hex.cmap #0 1 7394c371d5fc2f03 none
+hayro/cmap/testdata/synth/bf_as_cid.cmap #0 21 413275f27b194dcc meta 58 V -
+hayro/cmap/testdata/synth/bf_overflow.cmap #0 565 6b81d50f9b6957db meta 53796e7468 - AdobeJapan1 2
+hayro/cmap/testdata/synth/cid_overflow.cmap #0 503 8dccf918a73e573a meta 53796e7468 - AdobeJapan1 2
+hayro/cmap/testdata/synth/codespace_mismatch.cmap #0 1 7394c371d5fc2f03 none
+hayro/cmap/testdata/synth/empty_dst.cmap #0 1 7394c371d5fc2f03 none
+hayro/cmap/testdata/synth/literal_codes.cmap #0 6 18cce3951ee5d818 meta 6c6974206e616d65 - AdobeKorea1 6
+hayro/cmap/testdata/synth/many.cmap #0 37102 74bd7b28c99c4c78 meta 53796e7468 - AdobeJapan1 2
+hayro/cmap/testdata/synth/negative_cid.cmap #0 1 7394c371d5fc2f03 none
+hayro/cmap/testdata/synth/odd_dst.cmap #0 56 712df9c096c12b2f meta 53796e7468 - AdobeJapan1 2
+hayro/cmap/testdata/synth/overlap_bf.cmap #0 208 75a16e3435810d8a meta 53796e7468 - AdobeJapan1 2
+hayro/cmap/testdata/synth/overlap_cid.cmap #0 373 0412983976b063d0 meta 53796e7468 - AdobeJapan1 2
+hayro/cmap/testdata/synth/procedure.cmap #0 1 7394c371d5fc2f03 none
