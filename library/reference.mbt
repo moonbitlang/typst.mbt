@@ -43,6 +43,21 @@ pub impl FromValue for Supplement with fn from_value(v) {
 }
 
 ///|
+/// Tries to resolve the supplement into its content.
+pub fn Supplement::resolve(
+  self : Supplement,
+  engine : Engine,
+  styles : StyleChain,
+  args : ArrayView[Value],
+) -> Content raise SourceError {
+  match self {
+    Content(content) => content
+    Func(func) =>
+      func.call_values(engine, Context::new(styles~), args).display()
+  }
+}
+
+///|
 /// The form of the reference.
 pub(all) enum RefForm {
   /// Produces a textual reference to a label.

@@ -200,7 +200,7 @@ fn Dumper::style(self : Dumper, style : @library.Style) -> String {
       let elem = p.elem
       let (name, v) = match elem.field(p.id) {
         Some(info) => {
-          let v = if info.kind is Settable {
+          let v = if info.kind is (Settable | Ghost) {
             let single = @library.StyleChain::new(
               @library.Styles::from_array([style]),
             )

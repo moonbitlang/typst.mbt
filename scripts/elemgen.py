@@ -8,7 +8,11 @@ rules and field access glue. This script generates the equivalent data tables
 * `<elem>_<field>_default() -> Value`  for `#[default(..)]` expressions that
   cannot be translated mechanically,
 * `<elem>_<field>_parse(Engine, Args, ParseLocals) -> Value? raise SourceError` for
-  `#[parse(..)]` fields.
+  `#[parse(..)]` fields,
+* capability impls, wired into the element's hooks when defined:
+  `<elem>_synthesize(Engine, Content, StyleChain) -> Content raise SourceError`
+  (`Synthesize`), `<elem>_show_set(Content, StyleChain) -> Styles`
+  (`ShowSet`) and `<elem>_local_name_key() -> String` (`LocalName::KEY`).
 
 Any such hook that is not defined in a handwritten `library/*.mbt` file gets a
 stub in `library/elems_todo_gen.mbt`, so the package always compiles; the stub
@@ -294,6 +298,12 @@ def main():
         kws = ", ".join(mbt_str(k) for k in e["keywords"])
         init_hook = f"{var}_init"
         init_call = f"      {init_hook}(e)\n" if init_hook in defined else ""
+        if f"{var}_synthesize" in defined:
+            init_call += f"      e.hooks().synthesize = Some({var}_synthesize)\n"
+        if f"{var}_show_set" in defined:
+            init_call += f"      e.hooks().show_set = Some({var}_show_set)\n"
+        if f"{var}_local_name_key" in defined:
+            init_call += f"      e.hooks().local_name = Some((lang, region) => localized_str(lang, region, {var}_local_name_key()))\n"
         out.append(
             f"///|\nlet {var}_cell : Ref[Element?] = Ref::new(None)\n\n"
             f"///|\n/// {e['doc'] or e['title']} (upstream `{e['ident']}`, {e['file']})\n"
