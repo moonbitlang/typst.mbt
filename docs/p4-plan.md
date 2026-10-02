@@ -434,3 +434,43 @@ Math first in the fallback list) are `math_families` in `math.mbt`.
 All 403 `math/` paged tests match; the 4 `math/` SVG failures are color
 emoji glyphs in the SVG exporter (paged output identical). eval/realize/html
 unchanged.
+
+## Status: raster export (tiny-skia + typst-render)
+
+**Packages.** `skia/path` is a port of `tiny-skia-path` 0.12.0 (point,
+rect/size, transform, path, path builder, path geometry, stroker, dash);
+`skia` ports `tiny-skia` 0.12.0 (fixed point, edges and edge builder, edge
+and line clipping, `path64` cubic intersections, non-AA and supersampled AA
+path filling, hairlines (incl. anti-aliased), alpha runs, the highp (f32x8)
+and lowp (u16x16) raster pipelines with all stages exactly as tiny-skia
+selects them, blend modes, solid/linear/radial/sweep/pattern shaders, color
+spaces, masks, pixmaps). SIMD types are emulated per lane with the semantics
+they have on the oracle machine (aarch64 NEON): NaN-propagating
+`vmax`/`vmin`, ties-to-even `vcvtnq`, the trunc-based `f32x8::floor`,
+`FRECPE`/`FRECPS` for `recip_fast`, wrapping u16 arithmetic. Rust's stable
+`sort_by` is a merge sort (`stable_sort_by`). `pixglyph/` ports pixglyph
+0.6.1; `codecs/imageops_sample.mbt` ports the `image` crate's
+`resize_exact` (Nearest/Triangle/CatmullRom/Gaussian/Lanczos3) and the
+RGBA8 view. `render/` ports `typst-render` (pages, merged pages, groups with
+hard/soft frames and clip masks, outline/bitmap glyphs, glyph frames,
+shapes, gradients sampled into textures, tilings, raster images). Upstream
+`unwrap` panics surface as `RenderPanic`. SVG images and SVG/COLR glyphs
+are rendered through the `render.svg_image_renderer` hook (resvg, to be
+installed once usvg/resvg are ported); PDF images (hayro) are skipped.
+
+**Verification.** `tests/skdiff` (mirrored by a Rust program over
+tiny-skia 0.12) draws random scenes (paths, hairlines, strokes, dashes,
+rects, pixmaps, all shaders/blend modes/color spaces, masks): all pixel
+hashes are identical; `skia/scene_wbtest.mbt` keeps 40 recorded hashes.
+The stroker/dasher matched on 176k random cases, pixglyph on 168k
+rasterizations, resizing on 9.7k cases.
+
+**Render stage.** `scripts/goldens.sh render` (oracle/src/render.rs) dumps
+the size and SHA-256 of the pixmap the upstream harness renders
+(`tests/src/output.rs`: `render_merged` at 1 px/pt, 1pt black gap, link
+boxes); `moon run tests/runner --target native -- render` compares them
+byte-exactly and additionally compares against `tests/ref/render/*.png`
+with the upstream per-byte tolerance (`tolerance(n)`, default 1).
+`--raw=<dir>` (runner) and `ORACLE_RENDER_RAW=<dir>` (oracle) dump the raw
+RGBA; `--tsk-log` (runner) traces the tiny-skia calls in the format of a
+logging build of tiny-skia, for locating differences.
