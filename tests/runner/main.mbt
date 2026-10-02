@@ -68,6 +68,27 @@ fn main {
         canonicalize=canonicalize_bundle,
       )
     "break" => run_break_stage(filter, verbose)
+    // Like `paged`, but rendered to a raster image like the upstream test
+    // harness (see `render_stage.mbt`).
+    "render" => {
+      for a in args {
+        if a == "--tsk-log" {
+          @skia.trace_hook.val = Some(line => println(line))
+        }
+        if a.has_prefix("--raw=") {
+          render_raw_dir.val = Some(a.to_string().substring(start=6))
+        }
+      }
+      run_stage(
+        "render",
+        render_report,
+        filter,
+        verbose,
+        select=tc => is_paged(tc.attrs),
+        skip_file=text => text.has_prefix("// SKIP"),
+      )
+      report_render_refs(verbose)
+    }
     // Like `paged`, but exported to SVG and compared after canonically
     // renaming the hash-derived `<defs>` IDs.
     "svg" =>

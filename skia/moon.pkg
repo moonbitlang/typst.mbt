@@ -1,0 +1,15 @@
+import {
+  "moonbitlang/typst/tiny_skia_path" @path,
+  "moonbitlang/typst/codecs",
+  "moonbitlang/core/math",
+  "moonbitlang/core/buffer",
+}
+
+warnings = "-deprecated"
+
+options(
+  targets: {
+    "libm_native.mbt": [ "native" ],
+    "libm_other.mbt": [ "not", "native" ],
+  },
+)

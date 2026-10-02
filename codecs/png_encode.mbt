@@ -1,7 +1,9 @@
 // Port of the parts of the `png` crate's encoder (v0.18.1, `src/encoder.rs`,
 // `src/filter/mod.rs`, `src/filter/paeth.rs`) that the `image` crate's
 // `PngEncoder` uses with its default settings (`CompressionType::Fast` =
-// `DeflateCompression::FdeflateUltraFast`, `FilterType::Adaptive`).
+// `DeflateCompression::FdeflateUltraFast`, `FilterType::Adaptive`), and that
+// `png::Encoder` uses with its own defaults (`Compression::Balanced` =
+// `DeflateCompression::Level(6)` through flate2/zlib-rs, `Filter::Adaptive`).
 
 ///|
 /// The color type of a PNG image.
@@ -92,13 +94,25 @@ let png_signature : Bytes = b"\x89PNG\r\n\x1a\n"
 /// Encodes 8-bit image data as a PNG (upstream: `image::codecs::png::
 /// PngEncoder::new(..).write_image(..)`).
 ///
-/// The ICC profile chunk (`iCCP`) is not supported: upstream compresses it
-/// with `flate2`'s default level, which is not ported.
+/// The ICC profile chunk (`iCCP`) is not supported (upstream compresses it
+/// with `flate2`'s default level, see [zlib_compress]).
 pub fn encode_png(
   data : BytesView,
   width : Int,
   height : Int,
   color : PngColorType,
+) -> Bytes {
+  write_png(width, height, color, encode_image_data(data, width, height, color))
+}
+
+///|
+/// Writes the PNG signature, the IHDR chunk, the compressed image data and
+/// the IEND chunk.
+fn write_png(
+  width : Int,
+  height : Int,
+  color : PngColorType,
+  zlib_encoded : Bytes,
 ) -> Bytes {
   let w = Buffer()
   w.write_bytes(png_signature)
@@ -112,10 +126,71 @@ pub fn encode_png(
   ihdr[8] = b'\x08' // bit depth
   ihdr[9] = color.code().to_byte()
   write_chunk(w, b"IHDR", Bytes::makei(13, i => ihdr[i])[:])
-  let zlib_encoded = encode_image_data(data, width, height, color)
-  write_chunk(w, b"IDAT", zlib_encoded[:])
+  write_zlib_encoded_idat(w, zlib_encoded[:])
   write_chunk(w, b"IEND", b""[:])
   w.to_bytes()
+}
+
+///|
+/// The maximum length of an IDAT chunk (upstream `MAX_IDAT_CHUNK_LEN`).
+const MAX_IDAT_CHUNK_LEN : Int = 0x7FFFFFFF
+
+///|
+/// Upstream `Writer::write_zlib_encoded_idat`.
+fn write_zlib_encoded_idat(w : Buffer, zlib_encoded : BytesView) -> Unit {
+  let mut i = 0
+  while i < zlib_encoded.length() {
+    let n = @cmp.minimum(MAX_IDAT_CHUNK_LEN, zlib_encoded.length() - i)
+    write_chunk(w, b"IDAT", zlib_encoded[i:i + n])
+    i += n
+  }
+}
+
+///|
+/// Encodes 8-bit image data as a PNG with the `png` crate's default settings
+/// (upstream `png::Encoder::new(w, width, height)` with the given color type
+/// and `BitDepth::Eight`, then `write_header()` and `write_image_data(data)`):
+/// adaptive filtering and zlib level 6 (`Compression::Balanced`).
+pub fn encode_png_balanced(
+  data : BytesView,
+  width : Int,
+  height : Int,
+  color : PngColorType,
+) -> Bytes {
+  write_png(
+    width,
+    height,
+    color,
+    encode_image_data_level(data, width, height, color, 6),
+  )
+}
+
+///|
+/// Filters and compresses the image data (upstream
+/// `Writer::write_image_data` with `DeflateCompression::Level(level)`).
+fn encode_image_data_level(
+  data : BytesView,
+  width : Int,
+  height : Int,
+  color : PngColorType,
+  level : Int,
+) -> Bytes {
+  let bpp = color.samples()
+  let in_len = width * bpp
+  let mut prev = FixedArray::make(in_len, b'\x00')
+  let current = FixedArray::make(in_len + 1, b'\x00')
+  let line = FixedArray::make(in_len, b'\x00')
+  let zlib = ZlibEncoder::new(level)
+  for y in 0..<height {
+    for i in 0..<in_len {
+      line[i] = data[y * in_len + i]
+    }
+    let filter_type = adaptive_filter(bpp, prev, line, current)
+    zlib.write_all(Bytes::make(1, filter_type.to_byte())[:])
+    zlib.write_all(Bytes::makei(in_len, i => current[i + 1])[:])
+    prev = line.copy()
+  }
+  zlib.finish()
 }
 
 ///|

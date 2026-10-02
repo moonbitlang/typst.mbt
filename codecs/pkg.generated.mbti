@@ -8,9 +8,13 @@ import {
 // Values
 pub fn crc32(Array[BytesView]) -> UInt
 
+pub fn decode_jpeg(BytesView) -> (ImageInfo, Bytes) raise ImageError
+
 pub fn decode_png(BytesView) -> (ImageInfo, Bytes) raise ImageError
 
 pub fn encode_png(BytesView, Int, Int, PngColorType) -> Bytes
+
+pub fn encode_png_balanced(BytesView, Int, Int, PngColorType) -> Bytes
 
 pub let exif_tag_orientation : Int
 
@@ -32,7 +36,13 @@ pub fn read_exif_from_container(BytesView) -> Exif raise ExifError
 
 pub fn read_png_info(BytesView) -> PngInfo raise ImageError
 
+pub fn resize_exact(UInt, UInt, ColorType, Bytes, UInt, UInt, FilterType) -> Bytes
+
+pub fn to_rgba8(UInt, UInt, ColorType, Bytes) -> Bytes
+
 pub fn webp_image_info(BytesView) -> ImageInfo raise ImageError
+
+pub fn zlib_compress(BytesView, level? : Int) -> Bytes
 
 pub fn zlib_decompress(BytesView) -> Bytes raise InflateError
 
@@ -92,6 +102,14 @@ pub(all) enum ExifValue {
 } derive(@debug.Debug)
 pub fn ExifValue::get_uint(Self, Int) -> UInt?
 
+pub(all) enum FilterType {
+  Nearest
+  Triangle
+  CatmullRom
+  Gaussian
+  Lanczos3
+} derive(Eq, Hash, @debug.Debug)
+
 pub(all) struct ImageInfo {
   width : UInt
   height : UInt
@@ -135,6 +153,13 @@ pub fn StoredOnlyCompressor::compressed_size(Int) -> Int
 pub fn StoredOnlyCompressor::finish(Self) -> Bytes
 pub fn StoredOnlyCompressor::new() -> Self
 pub fn StoredOnlyCompressor::write_data(Self, BytesView) -> Unit
+
+pub struct ZlibEncoder {
+  // private fields
+}
+pub fn ZlibEncoder::finish(Self) -> Bytes
+pub fn ZlibEncoder::new(Int) -> Self
+pub fn ZlibEncoder::write_all(Self, BytesView) -> Unit
 
 // Type aliases
 

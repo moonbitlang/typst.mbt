@@ -17,7 +17,9 @@
 # the tests with a `pdftags` attribute.
 # `usvg-images` dumps
 # the usvg trees of the SVG images placed by paged tests
-# (oracle/src/usvg_images.rs).
+# (oracle/src/usvg_images.rs). `render` dumps the size and SHA-256 of the
+# raster image the upstream harness renders for every paged test
+# (oracle/src/render.rs).
 # `shape` dumps every text run Typst shapes while
 # compiling the paged tests, with rustybuzz's output (oracle/src/shape.rs);
 # `shape-hb` extracts rustybuzz's own shaping test suite.
@@ -34,7 +36,7 @@ cd "$(dirname "$0")/.."
 ORACLE=oracle/target/release/typst-oracle
 SUITE=.repos/typst/tests/suite
 stages=("$@")
-[ ${#stages[@]} -eq 0 ] && stages=(syntax ast reparse eval html bundle realize fonts font paged svg pdf-semantic pdftags shape shape-hb break usvg usvg-images)
+[ ${#stages[@]} -eq 0 ] && stages=(syntax ast reparse eval html bundle realize fonts font paged svg render pdf-semantic pdftags shape shape-hb break usvg usvg-images)
 for stage in "${stages[@]}"; do
   if [ "$stage" = shape-hb ]; then
     # rustybuzz's own shaping tests (needs .repos/rustybuzz, see upstream.sh).
