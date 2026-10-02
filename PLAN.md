@@ -10,9 +10,9 @@
 | P1 syntax (highlight) | **done** | `syntax/highlight` (`Tag`, `highlight`, `highlight_html`); used for `typ`/`typc`/`typm` raw blocks |
 | P1 syntax (reparser) | todo | |
 | P2 eval (typst-eval) | **done** | VM, closures, imports, rules, math; `eval` stage runs end to end |
-| P2 library (value level) | **done** | 3777/3792 `eval` stage cases identical (2026-10-03). Remaining 15: plugins (WASM, out of scope), inline layout (P4), raw syntax highlighting |
-| P3 realize + introspection + HTML export | **done** | `realize` 3724/3792, `html` 498/508 (2026-10-03). Remaining html: frames via SVG export (P4), inline layout (P4), raw highlighting, PDF images |
-| P4 fonts, shaping, layout, export | in progress | `font` 86/86, `break` 12734/12734, `paged` 338/2299 (inline + math layout pending; shaping in progress); see docs/p4-plan.md |
+| P2 library (value level) | **done** | 3778/3792 `eval` (2026-10-03). Remaining 14: plugins (WASM, out of scope), inline layout (P4) |
+| P3 realize + introspection + HTML export | **done** | `realize` 3778/3792, `html` 504/508 (2026-10-03). Remaining: inline layout (P4), PDF images |
+| P4 fonts, shaping, layout, export | in progress | `font` 86/86, `break` 12734/12734, `shape` 4598/4598 + `shape-hb` 2250/2250, `svg-replay` 2254/2299 (byte-identical), `paged` 339/2299 and `svg` 384/2299 (inline + math layout in progress, PDF in progress); see docs/p4-plan.md |
 
 Run `scripts/upstream.sh && scripts/goldens.sh && moon run tests/runner --target native -- syntax`
 (and `-- ast`, `-- eval`). `python3 scripts/classify.py eval 60` buckets the
