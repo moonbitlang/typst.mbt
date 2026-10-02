@@ -677,3 +677,37 @@ fn assert_type(
 fn is_pdftags(attrs : String) -> Bool {
   attrs.split(" ").any(a => a == "pdftags")
 }
+
+///|
+/// Internal errors name the Rust source location they occurred at, which is
+/// an absolute path in goldens dumped by older oracles. Make it relative to
+/// the Typst repository like in upstream's test suite (see
+/// `canonical_internal_error` in `oracle/src/eval.rs`).
+fn canonicalize_internal_errors(dump : String) -> String {
+  let marker = "(occurred at "
+  let repo = ".repos/typst/"
+  guard dump.find(marker) is Some(_) else { return dump }
+  let out = StringBuilder()
+  for i, line in dump.split("\n").collect() {
+    if i != 0 {
+      out.write_char('\n')
+    }
+    match line.find(marker) {
+      Some(at) => {
+        let head = line.view(end_offset=at + marker.length())
+        let rest = line.view(start_offset=at + marker.length())
+        match rest.find(repo) {
+          Some(r) => {
+            out.write_string(head.to_string())
+            out.write_string(
+              rest.view(start_offset=r + repo.length()).to_string(),
+            )
+          }
+          None => out.write_string(line.to_string())
+        }
+      }
+      None => out.write_string(line.to_string())
+    }
+  }
+  out.to_string()
+}

@@ -110,15 +110,18 @@ priv struct StackEntry {
 }
 
 ///|
+/// An internal error (upstream `panic_internal`, `assert_internal` and
+/// `expect_internal`); `loc` is the upstream caller location within
+/// `crates/typst-pdf/src`.
 fn internal_error(
   span : @syntax.Span,
   msg : String,
-  file : String,
+  loc : String,
 ) -> @library.SourceError {
   @library.SourceError([
     @library.SourceDiagnostic::error_at(
       span,
-      "internal error: \{msg} (occurred at crates/typst-pdf/src/\{file})",
+      "internal error: \{msg} (occurred at crates/typst-pdf/src/\{loc})",
     ).with_hint("please report this as a bug"),
   ])
 }
@@ -136,15 +139,21 @@ fn build_tree(
     raise internal_error(
       tree.groups.get(last.id).span,
       "tags weren't properly closed",
-      "tags/tree/build.rs",
+      "tags/tree/build.rs:191:9",
     )
   }
-  if !tree.unfinished_stacks.is_empty() ||
-    tree.progressions[0] != tree.progressions[tree.progressions.length() - 1] {
+  if !tree.unfinished_stacks.is_empty() {
     raise internal_error(
       @syntax.Span::detached(),
       "tags weren't properly closed",
-      "tags/tree/build.rs",
+      "tags/tree/build.rs:194:5",
+    )
+  }
+  if tree.progressions[0] != tree.progressions[tree.progressions.length() - 1] {
+    raise internal_error(
+      @syntax.Span::detached(),
+      "tags weren't properly closed",
+      "tags/tree/build.rs:196:5",
     )
   }
 
@@ -154,7 +163,7 @@ fn build_tree(
       raise internal_error(
         @syntax.Span::detached(),
         "parent group",
-        "tags/tree/build.rs",
+        "tags/tree/build.rs:206:14",
       )
     }
     if options.validators().ua is Some(a11y) && located.multiple_parents {

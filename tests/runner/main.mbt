@@ -103,6 +103,7 @@ fn main {
         verbose,
         select=tc => is_paged(tc.attrs),
         skip_file=text => text.has_prefix("// SKIP"),
+        canonicalize=canonicalize_internal_errors,
         matches=pdf_semantic_matches,
       )
     // Export upstream's laid-out documents (decoded from the `paged`
@@ -142,6 +143,7 @@ fn main {
         verbose,
         select=tc => is_pdftags(tc.attrs),
         skip_file=text => text.has_prefix("// SKIP"),
+        canonicalize=canonicalize_internal_errors,
       )
     // Check the MoonBit tag tree formatter against the oracle's on
     // upstream's PDFs (see `pdf-extract-check`).

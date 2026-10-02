@@ -485,9 +485,11 @@ fn resolve_cell_header_ids(
 fn table_cell_id(table_id : Int, x : Int, y : Int) -> Bytes {
   // 32 bytes is the maximum length the ID string can have.
   let s = "\{table_id + 1}x\{x}y\{y}"
-  let buf = []
+  // krilla's `TagId::from` disambiguates ids provided by the user from ids
+  // automatically assigned to notes by prefixing them with a `U`.
+  let buf = [b'U']
   for c in s {
-    if buf.length() < 32 {
+    if buf.length() < 33 {
       buf.push(c.to_int().to_byte())
     }
   }

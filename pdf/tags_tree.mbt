@@ -81,15 +81,16 @@ fn Tree::parent_alt(self : Tree) -> Int? {
 fn Tree::assert_finished_traversal(
   self : Tree,
 ) -> Unit raise @library.SourceError {
-  if self.prog_cursor + 1 != self.progressions.length() ||
-    self.break_cursor != self.breaks.length() ||
-    self.unfinished_cursor != self.unfinished.length() {
-    raise @library.SourceError([
-      @library.SourceDiagnostic::error_at(
-        @syntax.Span::detached(),
-        "internal error: tree traversal didn't complete properly (occurred at crates/typst-pdf/src/tags/tree/mod.rs)",
-      ).with_hint("please report this as a bug"),
-    ])
+  let msg = "tree traversal didn't complete properly"
+  let detached = @syntax.Span::detached()
+  if self.prog_cursor + 1 != self.progressions.length() {
+    raise internal_error(detached, msg, "tags/tree/mod.rs:86:9")
+  }
+  if self.break_cursor != self.breaks.length() {
+    raise internal_error(detached, msg, "tags/tree/mod.rs:90:9")
+  }
+  if self.unfinished_cursor != self.unfinished.length() {
+    raise internal_error(detached, msg, "tags/tree/mod.rs:94:9")
   }
 }
 

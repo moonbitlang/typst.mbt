@@ -8146,6 +8146,7 @@ pub fn smart_quote_elem() -> Element {
         ],
       )
       smart_quote_elem_cell.val = Some(e)
+      smart_quote_elem_init(e)
       e
     }
   }

@@ -78,7 +78,7 @@ fn handle_link(
       raise @library.SourceError([
         @library.SourceDiagnostic::error_at(
           @syntax.Span::detached(),
-          "internal error: expected link ancestor in logical tree (occurred at crates/typst-pdf/src/link.rs)",
+          "internal error: expected link ancestor in logical tree (occurred at crates/typst-pdf/src/link.rs:107:10)",
         ).with_hint("please report this as a bug"),
       ])
   }

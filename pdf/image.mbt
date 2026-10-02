@@ -76,7 +76,10 @@ fn convert_raster(
   let width = raster.width().reinterpret_as_int()
   let height = raster.height().reinterpret_as_int()
   if raster.format() == Exchange(Jpg) {
-    let (components, adobe) = jpeg_components(raster.data())
+    let (components, adobe, dims) = jpeg_components(raster.data())
+    // The image is embedded as is, so use the dimensions of the frame (the
+    // raster's dimensions have the EXIF orientation applied).
+    let (width, height) = dims.unwrap_or((width, height))
     let colorspace : @export.ImageColorspace = match components {
       1 => Luma
       4 => Cmyk
@@ -216,9 +219,9 @@ fn exif_transform(
 }
 
 ///|
-/// The number of components of a JPEG image (from its frame header) and
-/// whether it has an Adobe `APP14` marker.
-fn jpeg_components(data : Bytes) -> (Int, Bool) {
+/// The number of components of a JPEG image (from its frame header),
+/// whether it has an Adobe `APP14` marker and the frame's width and height.
+fn jpeg_components(data : Bytes) -> (Int, Bool, (Int, Int)?) {
   let mut i = 2
   let mut adobe = false
   while i + 4 <= data.length() {
@@ -252,14 +255,16 @@ fn jpeg_components(data : Bytes) -> (Int, Bool) {
       marker != 0xC8 &&
       marker != 0xCC {
       if i + 9 < data.length() {
-        return (data[i + 9].to_int(), adobe)
+        let height = (data[i + 5].to_int() << 8) | data[i + 6].to_int()
+        let width = (data[i + 7].to_int() << 8) | data[i + 8].to_int()
+        return (data[i + 9].to_int(), adobe, Some((width, height)))
       }
-      return (3, adobe)
+      return (3, adobe, None)
     }
     if marker == 0xDA {
       break
     }
     i += 2 + len
   }
-  (3, adobe)
+  (3, adobe, None)
 }
