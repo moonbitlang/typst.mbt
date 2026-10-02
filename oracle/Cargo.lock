@@ -2598,6 +2598,7 @@ dependencies = [
 name = "typst-oracle"
 version = "0.1.0"
 dependencies = [
+ "base64",
  "biblatex",
  "citationberg",
  "codex",
@@ -2606,6 +2607,7 @@ dependencies = [
  "fancy-regex",
  "flate2",
  "fontdb",
+ "gif",
  "hayagriva",
  "hayro-syntax",
  "hypher",
@@ -2614,6 +2616,7 @@ dependencies = [
  "icu_provider",
  "icu_provider_blob",
  "icu_segmenter",
+ "image-webp",
  "indexmap",
  "parking_lot",
  "proc-macro2",

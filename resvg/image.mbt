@@ -140,9 +140,21 @@ fn rgb_to_pixmap(data : Bytes, pixmap : @skia.Pixmap) -> Unit {
 }
 
 ///|
-/// TODO: the `codecs` package has no WebP pixel decoder yet.
-fn decode_webp(_data : Bytes) -> @skia.Pixmap? {
-  None
+fn decode_webp(data : Bytes) -> @skia.Pixmap? {
+  let image = @codecs.decode_webp(data) catch { _ => return None }
+  guard @skia.Pixmap::new(
+      image.width.reinterpret_as_uint(),
+      image.height.reinterpret_as_uint(),
+    )
+    is Some(pixmap) else {
+    return None
+  }
+  if image.has_alpha {
+    rgba_to_pixmap(image.data, pixmap)
+  } else {
+    rgb_to_pixmap(image.data, pixmap)
+  }
+  Some(pixmap)
 }
 
 ///|

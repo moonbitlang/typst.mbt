@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Regenerate reference outputs from upstream Typst (needs Rust).
-# Usage: scripts/goldens.sh [syntax|ast|reparse|eval|html|bundle|realize|fonts|font|paged|svg|pdf-semantic|pdftags|shape|shape-hb|break|usvg|usvg-images|resvg ...]
+# Usage: scripts/goldens.sh [syntax|ast|reparse|eval|html|bundle|realize|fonts|font|paged|svg|pdf-semantic|pdftags|shape|shape-hb|break|usvg|usvg-images|resvg|raster ...]
 #
 # `reparse` applies seeded pseudo-random edits to every test body through
 # `Source::edit`/`Source::replace` and dumps the reparsed ranges and trees
@@ -30,6 +30,10 @@
 # with the real crate and dumps the size and SHA-256 of every pixmap
 # (oracle/src/bin/gen_resvg_golden.rs); it also regenerates resvg/oracle_test.mbt
 # from oracle/src/bin/resvg_corpus.txt.
+# `raster` regenerates codecs/{webp,gif}_oracle_test.mbt: the WebP and GIF
+# corpora (oracle/src/bin/{webp,gif}_corpus.txt, made by
+# scripts/gen_{webp,gif}_corpus.py) decoded with image-webp and gif
+# (oracle/src/bin/gen_raster_golden.rs).
 # `bundle` compiles every `bundle` test to a bundle and dumps the exported
 # files (paths, kinds, sizes, sha256, and the text of HTML/SVG/UTF-8 files;
 # see oracle/src/bundle.rs).
@@ -55,6 +59,11 @@ for stage in "${stages[@]}"; do
     assets=$(ls -d ~/.cargo/git/checkouts/typst-dev-assets-*/*/files | head -1)
     (cd oracle && cargo run --release -q --bin gen_usvg_golden -- "$assets" ../tests/golden/usvg)
     mv tests/golden/usvg/oracle_test.mbt usvg/oracle_test.mbt
+    moon fmt
+    continue
+  fi
+  if [ "$stage" = raster ]; then
+    (cd oracle && cargo run --release -q --bin gen_raster_golden -- ../codecs)
     moon fmt
     continue
   fi

@@ -14,6 +14,8 @@ pub fn decode_jpeg(BytesView) -> (ImageInfo, Bytes) raise ImageError
 
 pub fn decode_png(BytesView) -> (ImageInfo, Bytes) raise ImageError
 
+pub fn decode_webp(BytesView) -> WebpImage raise ImageError
+
 pub fn encode_png(BytesView, Int, Int, PngColorType) -> Bytes
 
 pub fn encode_png_balanced(BytesView, Int, Int, PngColorType) -> Bytes
@@ -163,6 +165,13 @@ pub fn StoredOnlyCompressor::compressed_size(Int) -> Int
 pub fn StoredOnlyCompressor::finish(Self) -> Bytes
 pub fn StoredOnlyCompressor::new() -> Self
 pub fn StoredOnlyCompressor::write_data(Self, BytesView) -> Unit
+
+pub(all) struct WebpImage {
+  width : Int
+  height : Int
+  has_alpha : Bool
+  data : Bytes
+}
 
 pub struct ZlibEncoder {
   // private fields
