@@ -23,9 +23,3 @@ let myanmar_shaper : OtShaper = placeholder_shaper("myanmar")
 
 ///|
 let myanmar_zawgyi_shaper : OtShaper = placeholder_shaper("myanmar_zawgyi")
-
-///|
-let universal_shaper : OtShaper = placeholder_shaper("universal")
-
-///|
-priv struct UniversalShapePlan {}

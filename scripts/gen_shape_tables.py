@@ -122,6 +122,63 @@ def gen_aat_layout():
     open(os.path.join(OUT, 'aat_layout_gen.mbt'), 'w').write(out)
 
 
+# --- Ragel state machines (`ot_shaper_*_machine.rs`) -------------------------
+
+
+def rust_static_arrays(src):
+    """All `static NAME: [T; N] = [...];` arrays of a Ragel-generated module, in
+    source order, as `(name, values)`."""
+    out = []
+    for m in re.finditer(r'static (\w+): \[(\w+); (\d+)\] = \[([^\]]*)\];', src):
+        name, _ty, n, body = m.groups()
+        values = [int(v) for v in re.findall(r'-?\d+', body)]
+        assert len(values) == int(n), name
+        out.append((name, values))
+    return out
+
+
+def rust_static_scalars(src):
+    return re.findall(r'static (\w+): i32 = (-?\d+);', src)
+
+
+def gen_ragel_machine(module, out_name):
+    """Writes the data tables of a Ragel machine; the driver is ported by hand.
+    Leading underscores of the Ragel names are dropped."""
+    src = read(module)
+    out = HEADER % module
+    for name, values in rust_static_arrays(src):
+        out += emit_ints(name.lstrip('_'), 'Ragel table `%s`.' % name, values, 16)
+    for name, value in rust_static_scalars(src):
+        out += '///|\nconst %s : Int = %s\n\n' % (name.upper(), value)
+    open(os.path.join(OUT, out_name), 'w').write(out)
+
+
+# --- USE table (`ot_shaper_use_table.rs`) ------------------------------------
+
+
+def use_categories():
+    """`category::*` constants of `ot_shaper_use.rs` (name -> value)."""
+    src = read('ot_shaper_use.rs')
+    cats = {}
+    for m in re.finditer(r'^\s*pub const (\w+): u8 = (\d+);', src, re.M):
+        cats[m.group(1)] = int(m.group(2))
+    return cats
+
+
+def gen_use_table():
+    src = read('ot_shaper_use_table.rs')
+    cats = use_categories()
+    out = HEADER % 'ot_shaper_use_table.rs'
+    for name in ('hb_use_u8', 'hb_use_u16'):
+        m = re.search(r'const %s: \[\w+; (\d+)\] =\s*\[([^\]]*)\];' % name, src)
+        values = []
+        for tok in re.findall(r'\w+', m.group(2)):
+            values.append(int(tok) if tok.isdigit() else cats[tok])
+        assert len(values) == int(m.group(1)), name
+        out += emit_ints(name[3:], '`%s` (packTab).' % name, values, 16)
+    open(os.path.join(OUT, 'ot_shaper_use_table_gen.mbt'), 'w').write(out)
+
+
 # --- tag_table.rs (HarfBuzz gen-tag-table.py output) -------------------------
 
 def tag_lit(b):
@@ -261,9 +318,12 @@ def gen_arabic_table():
     out += '    _ => ()\n  }\n  JOINING_TYPE_X\n}\n'
     open(os.path.join(OUT, 'ot_shaper_arabic_table_gen.mbt'), 'w').write(out)
 
+
 if __name__ == '__main__':
     gen_unicode_norm()
     gen_emoji()
+    gen_ragel_machine('ot_shaper_use_machine.rs', 'ot_shaper_use_machine_gen.mbt')
+    gen_use_table()
     gen_tag_table()
     gen_arabic_table()
     gen_aat_layout()
