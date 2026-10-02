@@ -14,6 +14,8 @@ pub fn decode_png(BytesView) -> (ImageInfo, Bytes) raise ImageError
 
 pub fn encode_png(BytesView, Int, Int, PngColorType) -> Bytes
 
+pub fn encode_png_balanced(BytesView, Int, Int, PngColorType) -> Bytes
+
 pub let exif_tag_orientation : Int
 
 pub let exif_tag_x_resolution : Int
@@ -37,6 +39,8 @@ pub fn resize_exact(UInt, UInt, ColorType, Bytes, UInt, UInt, FilterType) -> Byt
 pub fn to_rgba8(UInt, UInt, ColorType, Bytes) -> Bytes
 
 pub fn webp_image_info(BytesView) -> ImageInfo raise ImageError
+
+pub fn zlib_compress(BytesView, level? : Int) -> Bytes
 
 pub fn zlib_decompress(BytesView) -> Bytes raise InflateError
 
@@ -147,6 +151,13 @@ pub fn StoredOnlyCompressor::compressed_size(Int) -> Int
 pub fn StoredOnlyCompressor::finish(Self) -> Bytes
 pub fn StoredOnlyCompressor::new() -> Self
 pub fn StoredOnlyCompressor::write_data(Self, BytesView) -> Unit
+
+pub struct ZlibEncoder {
+  // private fields
+}
+pub fn ZlibEncoder::finish(Self) -> Bytes
+pub fn ZlibEncoder::new(Int) -> Self
+pub fn ZlibEncoder::write_all(Self, BytesView) -> Unit
 
 // Type aliases
 
