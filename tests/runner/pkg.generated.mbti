@@ -4,6 +4,7 @@ package "moonbitlang/typst/tests/runner"
 // Values
 
 // Errors
+type PdfTagsError
 
 // Types and methods
 

@@ -132,13 +132,14 @@ fn pdf_compile(
 /// Like upstream `Pdf::make_live`.
 fn make_live(
   doc : @layout.PagedDocument,
+  untagged? : Bool = false,
 ) -> @library.Warned[Result[Bytes, Array[@library.SourceDiagnostic]]] {
   let doc_opts = @pdf.PdfFormatOptions::get(doc.options())
   let standards = doc_opts.standard.v.standards()
   match standards {
-    [] => generate_pdf(doc, Some([]))
+    [] => generate_pdf(doc, Some([]), untagged~)
     [V_1_7, UA_1] => generate_pdf(doc, Some([UA_1]))
-    _ => generate_pdf(doc, None)
+    _ => generate_pdf(doc, None, untagged~)
   }
 }
 
@@ -146,6 +147,7 @@ fn make_live(
 fn generate_pdf(
   doc : @layout.PagedDocument,
   standards : Array[@library.PdfStandard]?,
+  untagged? : Bool = false,
 ) -> @library.Warned[Result[Bytes, Array[@library.SourceDiagnostic]]] {
   let standard = match standards {
     Some(s) =>
@@ -159,7 +161,15 @@ fn generate_pdf(
   let options : @pdf.PdfOptions = {
     ..@pdf.PdfOptions::default(),
     creator: Custom(Some("Typst Test Runner")),
-    format: { ..@pdf.PartialPdfFormatOptions::default(), standard, },
+    format: {
+      ..@pdf.PartialPdfFormatOptions::default(),
+      standard,
+      tagged: if untagged {
+        Some(Custom(false))
+      } else {
+        None
+      },
+    },
   }
   @pdf.pdf(doc, options)
 }

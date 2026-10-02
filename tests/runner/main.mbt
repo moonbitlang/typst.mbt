@@ -1,7 +1,7 @@
 // Differential test runner: compares the MoonBit port against reference
 // outputs dumped by the Rust oracle (see `scripts/goldens.sh`).
 //
-// Usage: moon run tests/runner -- <syntax|ast|eval|html|realize|paged|svg|svg-replay|pdf-semantic|pdf-semantic-replay|pdf-extract-check|pdftags|font|break> [filter] [--verbose]
+// Usage: moon run tests/runner -- <syntax|ast|eval|html|realize|paged|svg|svg-replay|pdf-semantic|pdf-semantic-replay|pdf-extract-check|pdftags|pdftags-check|font|break> [filter] [--verbose]
 
 ///|
 let suite_dir = ".repos/typst/tests/suite"
@@ -117,6 +117,29 @@ fn main {
         select=tc => is_paged(tc.attrs),
         skip_file=text => text.has_prefix("// SKIP"),
         dump_name="pdf-extract-check",
+      )
+    // Export the `pdftags` test cases to PDF and format their tag trees
+    // (see `oracle/src/pdftags.rs`).
+    "pdftags" =>
+      run_stage(
+        "pdftags",
+        pdftags_report,
+        filter,
+        verbose,
+        select=tc => is_pdftags(tc.attrs),
+        skip_file=text => text.has_prefix("// SKIP"),
+      )
+    // Check the MoonBit tag tree formatter against the oracle's on
+    // upstream's PDFs (see `pdf-extract-check`).
+    "pdftags-check" =>
+      run_stage(
+        "pdftags",
+        pdftags_check_report,
+        filter,
+        verbose,
+        select=tc => is_pdftags(tc.attrs),
+        skip_file=text => text.has_prefix("// SKIP"),
+        dump_name="pdftags-check",
       )
     _ => {
       println("unknown stage: \{stage}")

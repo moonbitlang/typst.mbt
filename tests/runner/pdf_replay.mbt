@@ -48,7 +48,9 @@ fn pdf_replay_report(rel : String, tc : TestCase) -> String {
     return "export-error\n"
   }
   doc.info_mut().title = Some(tc.name)
-  let warned = make_live(doc)
+  // The decoded frames have no introspection tags, so the logical tree
+  // can't be built; export untagged unless PDF/UA requires tags.
+  let warned = make_live(doc, untagged=true)
   match warned.output {
     Err(_) => "export-error\n"
     Ok(bytes) => {
