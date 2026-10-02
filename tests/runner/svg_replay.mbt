@@ -603,23 +603,29 @@ fn image_assets() -> Map[String, Bytes] {
     return m
   }
   let m = {}
-  fn walk(dir : String) {
+  fn walk(dir : String, rel : String) {
     let entries = (@fs.read_dir(dir) catch { _ => [][:] }).to_array()
     for entry in entries {
       let path = dir + "/" + entry
       let is_dir = @fs.is_dir(path) catch { _ => false }
       if is_dir {
-        walk(path)
+        walk(path, rel + "/" + entry)
       } else {
         let data = @fs.read_file_to_bytes(path) catch { _ => continue }
-        m[sha256_hex(data[:])] = data
+        let sha = sha256_hex(data[:])
+        m[sha] = data
+        // The first file with the data wins (like the `paged` dump, which
+        // only records the hash).
+        if !image_asset_paths.contains(sha) {
+          image_asset_paths[sha] = rel + "/" + entry
+        }
       }
     }
   }
 
   let root = dev_assets_root()
   for dir in ["images", "icons", "screenshots", "data", "text"] {
-    walk(root + "/" + dir)
+    walk(root + "/" + dir, "assets/" + dir)
   }
   image_assets_cell.val = Some(m)
   m
@@ -627,6 +633,41 @@ fn image_assets() -> Map[String, Bytes] {
 
 ///|
 let image_assets_cell : Ref[Map[String, Bytes]?] = Ref::new(None)
+
+///|
+/// The project-relative paths (`assets/...`) of the image assets, by hash.
+let image_asset_paths : Map[String, String] = {}
+
+///|
+/// Decode an SVG asset like `ImageElem::decode` does (with the default font
+/// families, since the frames don't record the text style at the image).
+fn decode_svg_asset(sha : String, data : Bytes) -> @library.SvgImage? {
+  let world : TestWorld = {
+    main: @syntax.Source::detached(""),
+    library: test_library(),
+  }
+  let svg_file = match image_asset_paths.get(sha) {
+    Some(path) =>
+      Some(
+        @syntax.RootedPath::new(
+          Project,
+          @syntax.VirtualPath::virtualize("", path),
+        ).intern(),
+      ) catch {
+        _ => None
+      }
+    None => None
+  }
+  let families = @library.families(@library.StyleChain::empty()).map(f => {
+    f.as_str()
+  })
+  let (image, _) = @library.SvgImage::with_fonts_images(
+    data, world, families, svg_file,
+  ) catch {
+    _ => return None
+  }
+  Some(image)
+}
 
 ///|
 /// Reconstruct an image from its `image-resource` record.
@@ -646,7 +687,13 @@ fn decode_image(rec : Array[Json]) -> @library.ImageKind raise Unsupported {
       guard image_assets().get(sha) is Some(data) else {
         raise Unsupported("unknown svg image")
       }
-      return Svg(@library.SvgImage::synthetic(data, width, height))
+      // Parse the tree for exporters that draw it (PDF); the SVG exporter
+      // only embeds the data.
+      match decode_svg_asset(sha, data) {
+        Some(svg) if svg.width() == width && svg.height() == height =>
+          return Svg(svg)
+        _ => return Svg(@library.SvgImage::synthetic(data, width, height))
+      }
     }
     "pdf" => {
       guard image_assets().get(sha) is Some(data) else {
