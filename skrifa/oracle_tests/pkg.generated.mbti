@@ -1,0 +1,31 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/skrifa/oracle_tests"
+
+import {
+  "moonbitlang/typst/read_fonts",
+}
+
+// Values
+pub fn dump_cff(BytesView) -> String
+
+pub fn fnv(BytesView) -> UInt64
+
+pub fn fnv_str(String) -> UInt64
+
+pub fn hex_f32(Float) -> String
+
+pub fn hex_u64(UInt64) -> String
+
+// Errors
+
+// Types and methods
+pub struct TextPen {
+  sb : StringBuilder
+}
+pub fn TextPen::new() -> Self
+pub fn TextPen::to_string(Self) -> String
+pub impl @read_fonts.OutlinePen for TextPen
+
+// Type aliases
+
+// Traits
