@@ -424,12 +424,12 @@ fn XRef::repair(self : XRef) -> Unit {
 pub fn XRef::needs_decryption(self : XRef, ctx : ReaderContext) -> Bool {
   match self.inner {
     None => false
-    Some(r) => {
-      let has_decryptor = match r.decryptor {
-        NoDecryptor => false
+    Some(r) =>
+      if r.decryptor is NoDecryptor {
+        false
+      } else {
+        !ctx.in_content_stream() && !ctx.in_object_stream()
       }
-      has_decryptor && !ctx.in_content_stream() && !ctx.in_object_stream()
-    }
   }
 }
 
