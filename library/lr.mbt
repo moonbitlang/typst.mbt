@@ -228,3 +228,8 @@ fn lr_elem_body_parse(
   }
   Some(Content(body))
 }
+
+///|
+/// How much less high scaled delimiters can be than what they wrap (upstream
+/// `DELIM_SHORT_FALL`).
+pub let delim_short_fall : Em = Em::new(0.1)

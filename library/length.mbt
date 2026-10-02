@@ -140,13 +140,8 @@ pub fn Em::resolve(self : Em, styles : StyleChain) -> Abs {
 
 ///|
 /// The resolved font size (upstream `styles.resolve(TextElem::size)`).
-///
-/// TODO: use the text module's `TextSize` resolution once it is ported.
 fn resolve_text_size(styles : StyleChain) -> Abs {
-  match styles.get_field(text_elem(), text_elem_size) {
-    Length(l) => l.abs + l.em.at(Abs::pt(11.0))
-    _ => Abs::pt(11.0)
-  }
+  TextElem::size_in(styles).resolve(styles)
 }
 
 ///|

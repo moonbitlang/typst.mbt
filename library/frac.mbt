@@ -63,3 +63,8 @@ pub impl FromValue for FracStyle with fn from_value(v) {
     v => raise HintedError(FracStyle::input().error(v))
   }
 }
+
+///|
+/// How much padding to add around each side of a fraction (upstream
+/// `FRAC_PADDING`).
+pub let frac_padding : Em = Em::new(0.1)

@@ -57,7 +57,7 @@ fn realize_report(rel : String, tc : TestCase) -> String {
     try @realize.realize(kind, engine, locator, content, styles) catch {
       @library.SourceError(errors) => {
         out.write_string("err\n")
-        for diag in deduplicate(errors) {
+        for diag in @typst.deduplicate(errors) {
           write_source_diag(out, world, id, diag)
         }
       }
@@ -81,14 +81,14 @@ fn realize_report(rel : String, tc : TestCase) -> String {
     let delayed = sink.take_delayed()
     if !delayed.is_empty() {
       out.write_string("delayed\n")
-      for diag in deduplicate(delayed) {
+      for diag in @typst.deduplicate(delayed) {
         write_source_diag(out, world, id, diag)
       }
     }
     let warnings = sink.warnings()
     if !warnings.is_empty() {
       out.write_string("warnings\n")
-      for diag in deduplicate(warnings) {
+      for diag in @typst.deduplicate(warnings) {
         write_source_diag(out, world, id, diag)
       }
     }

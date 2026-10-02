@@ -204,3 +204,18 @@ pub impl FromValue for Accent with fn from_value(v) {
   }
   raise HintedError(Accent::input().error(v))
 }
+
+///|
+/// How much the accent can be shorter than the base (upstream
+/// `ACCENT_SHORT_FALL`).
+pub let accent_short_fall : Em = Em::new(0.5)
+
+///|
+/// Whether this accent is a bottom accent or not.
+pub fn Accent::is_bottom(self : Accent) -> Bool {
+  if self.0 is ('⏟' | '⎵' | '⏝' | '⏡') {
+    return true
+  }
+  // `CanonicalCombiningClass::Below`.
+  @unicode.canonical_combining_class(self.0.to_int()) == 220
+}

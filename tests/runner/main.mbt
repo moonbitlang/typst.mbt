@@ -1,7 +1,7 @@
 // Differential test runner: compares the MoonBit port against reference
 // outputs dumped by the Rust oracle (see `scripts/goldens.sh`).
 //
-// Usage: moon run tests/runner -- <syntax|ast|eval> [filter] [--verbose]
+// Usage: moon run tests/runner -- <syntax|ast|eval|html> [filter] [--verbose]
 
 ///|
 let suite_dir = ".repos/typst/tests/suite"
@@ -22,6 +22,11 @@ fn main {
     "ast" => run_stage("ast", (_, tc) => ast_report(tc.body), filter, verbose)
     "eval" => run_stage("eval", eval_report, filter, verbose)
     "realize" => run_stage("realize", realize_report, filter, verbose)
+    // Like the oracle, only tests that target HTML.
+    "html" =>
+      run_stage("html", html_report, filter, verbose, select=tc => {
+        tc.attrs.split(" ").any(a => a == "html")
+      })
     _ => {
       println("unknown stage: \{stage}")
       @sys.exit(2)
@@ -35,6 +40,7 @@ fn run_stage(
   report : (String, TestCase) -> String,
   filter : String?,
   verbose : Bool,
+  select? : (TestCase) -> Bool = _ => true,
 ) -> Unit {
   let mut passed = 0
   let mut failed = 0
@@ -52,7 +58,7 @@ fn run_stage(
     let golden = split_golden(read(golden_path))
     let dump = StringBuilder()
     for tc in split_tests(text) {
-      if filter is Some(f) && !tc.name.contains(f) {
+      if !select(tc) || (filter is Some(f) && !tc.name.contains(f)) {
         continue
       }
       let actual = report(rel, tc)
@@ -65,7 +71,7 @@ fn run_stage(
         failures.push((rel, tc.name, expected, actual))
       }
     }
-    if dump_actual.val {
+    if dump_actual.val && dump.to_string() != "" {
       let out = "_build/actual/\{stage}/" +
         rel.unsafe_substring(start=0, end=rel.length() - 4) +
         ".txt"
