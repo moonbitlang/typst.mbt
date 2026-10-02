@@ -90,6 +90,55 @@ def gen_emoji():
     open(os.path.join(OUT, 'unicode_emoji_gen.mbt'), 'w').write(out)
 
 
+# ---------------------------------------------------------------------------
+# ot_shaper_arabic_table.rs: the Arabic joining-type table and its lookup.
+
+
+def gen_arabic_table():
+    src = read('ot_shaper_arabic_table.rs')
+    # Joining-type values (`hb_arabic_joining_type_t` discriminants).
+    m = re.search(r'pub enum hb_arabic_joining_type_t \{(.*?)\}', read('ot_shaper_arabic.rs'), re.S)
+    values = {}
+    for name, v in re.findall(r'^\s*(\w+) = (\d+),', m.group(1), re.M):
+        values[name] = int(v)
+    alias = {'A': 'GroupAlaph', 'DR': 'GroupDalathRish'}
+    for k in ('D', 'L', 'R', 'T', 'U', 'X'):
+        alias[k] = k
+    body = body_of(src, 'pub const JOINING_TABLE')
+    body = re.sub(r'/\*.*?\*/', '', body, flags=re.S)
+    table = [values[alias[t]] for t in re.findall(r'[A-Z]+', body)]
+    offsets = {}
+    for name, v in re.findall(r'const (JOINING_OFFSET_0X[0-9A-F]+): usize = (\d+);', src):
+        offsets[name] = int(v)
+    fn = src[src.index('pub fn joining_type'):]
+    arms = []
+    for block in re.finditer(r'(0x[0-9A-F]+) => \{(.*?)\n        \}', fn, re.S):
+        ranges = re.findall(
+            r'\((0x[0-9A-F]+)\.\.=(0x[0-9A-F]+)\)\.contains\(&u\) \{\s*'
+            r'return JOINING_TABLE\[u as usize - (0x[0-9A-F]+) \+ (JOINING_OFFSET_0X[0-9A-F]+)\]',
+            block.group(2))
+        assert ranges, block.group(0)
+        arms.append((block.group(1), ranges))
+    last = arms[-1][1][-1]
+    assert len(table) == offsets[last[3]] + int(last[1], 16) - int(last[0], 16) + 1, len(table)
+    out = HEADER % 'ot_shaper_arabic_table.rs'
+    out += emit_ints('joining_table',
+                     'Joining types (`hb_arabic_joining_type_t` values) of the covered ranges.',
+                     table, 32)
+    for name in sorted(offsets, key=lambda n: offsets[n]):
+        out += '///|\nconst %s : Int = %d\n\n' % (name, offsets[name])
+    out += '///|\nfn joining_type(u : Int) -> Int {\n  match u >> 12 {\n'
+    for key, ranges in arms:
+        out += '    %s => {\n' % key
+        for lo, hi, base, off in ranges:
+            assert lo == base
+            out += ('      if u >= %s && u <= %s {\n'
+                    '        return joining_table[u - %s + %s]\n      }\n') % (lo, hi, base, off)
+        out += '    }\n'
+    out += '    _ => ()\n  }\n  JOINING_TYPE_X\n}\n'
+    open(os.path.join(OUT, 'ot_shaper_arabic_table_gen.mbt'), 'w').write(out)
+
 if __name__ == '__main__':
     gen_unicode_norm()
     gen_emoji()
+    gen_arabic_table()
