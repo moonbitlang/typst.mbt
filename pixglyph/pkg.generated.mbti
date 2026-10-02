@@ -1,0 +1,30 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/pixglyph"
+
+import {
+  "moonbitlang/typst/otf",
+}
+
+// Values
+
+// Errors
+
+// Types and methods
+pub(all) struct Bitmap {
+  left : Int
+  top : Int
+  width : UInt
+  height : UInt
+  coverage : Bytes
+}
+pub impl Show for Bitmap
+
+pub struct Glyph {
+  // private fields
+}
+pub fn Glyph::load(@otf.Face, @otf.GlyphId) -> Self?
+pub fn Glyph::rasterize(Self, Float, Float, Float) -> Bitmap
+
+// Type aliases
+
+// Traits

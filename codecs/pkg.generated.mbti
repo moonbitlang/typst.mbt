@@ -30,6 +30,10 @@ pub fn read_exif_from_container(BytesView) -> Exif raise ExifError
 
 pub fn read_png_info(BytesView) -> PngInfo raise ImageError
 
+pub fn resize_exact(UInt, UInt, ColorType, Bytes, UInt, UInt, FilterType) -> Bytes
+
+pub fn to_rgba8(UInt, UInt, ColorType, Bytes) -> Bytes
+
 pub fn webp_image_info(BytesView) -> ImageInfo raise ImageError
 
 pub fn zlib_decompress(BytesView) -> Bytes raise InflateError
@@ -89,6 +93,14 @@ pub(all) enum ExifValue {
   Other
 } derive(@debug.Debug)
 pub fn ExifValue::get_uint(Self, Int) -> UInt?
+
+pub(all) enum FilterType {
+  Nearest
+  Triangle
+  CatmullRom
+  Gaussian
+  Lanczos3
+} derive(Eq, Hash, @debug.Debug)
 
 pub(all) struct ImageInfo {
   width : UInt
