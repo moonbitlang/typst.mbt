@@ -873,7 +873,7 @@ fn parse_args(argv : Array[String]) -> CliArguments raise CliError {
             name: "VERSION",
             required: false,
             help: "Which version to update to (defaults to latest)",
-            validate: None,
+            validate: Some(v => parse_semver(v)),
           },
         ],
         subcommands: [],
@@ -892,7 +892,7 @@ fn parse_args(argv : Array[String]) -> CliArguments raise CliError {
             name: "SHELL",
             required: true,
             help: "The shell to generate completions for",
-            validate: None,
+            validate: Some(v => parse_shell(v)),
           },
         ],
         subcommands: [],
@@ -1210,4 +1210,63 @@ fn parse_input_pair(raw : String) -> (String, String) raise CliError {
   }
   let val = @kit.rust_trim(raw[eq + 1:].to_owned())
   (key, val)
+}
+
+///|
+/// The value parser of the shell of `completions` (`ValueEnum`).
+fn parse_shell(v : String) -> Unit raise CliError {
+  let shells = ["bash", "elvish", "fish", "nushell", "powershell", "zsh"]
+  if !shells.contains(v) {
+    raise Invalid(
+      "invalid value '\{v}' for '<SHELL>'\n  [possible values: \{shells.join(", ")}]",
+    )
+  }
+}
+
+///|
+/// The value parser of the version of `update` (`semver::Version`; the
+/// common errors of the semver crate).
+fn parse_semver(v : String) -> Unit raise CliError {
+  let err = (msg : String) => {
+    Invalid("invalid value '\{v}' for '[VERSION]': \{msg}")
+  }
+  if v == "" {
+    raise err("empty string, expected a semver version")
+  }
+  let chars = v.to_array()
+  let mut i = 0
+  let positions = ["major", "minor", "patch"]
+  for k, pos in positions {
+    if k > 0 {
+      if i >= chars.length() {
+        raise err(
+          "unexpected end of input while parsing \{positions[k - 1]} version number",
+        )
+      }
+      if chars[i] != '.' {
+        raise err(
+          "unexpected character '\{chars[i]}' after \{positions[k - 1]} version number",
+        )
+      }
+      i += 1
+    }
+    let start = i
+    while i < chars.length() && chars[i] >= '0' && chars[i] <= '9' {
+      i += 1
+    }
+    if i == start {
+      if i >= chars.length() {
+        raise err("unexpected end of input while parsing \{pos} version number")
+      }
+      raise err(
+        "unexpected character '\{chars[i]}' while parsing \{pos} version number",
+      )
+    }
+    if i - start > 1 && chars[start] == '0' {
+      raise err("invalid leading zero in \{pos} version number")
+    }
+  }
+  if i < chars.length() && chars[i] != '-' && chars[i] != '+' {
+    raise err("unexpected character '\{chars[i]}' after patch version number")
+  }
 }

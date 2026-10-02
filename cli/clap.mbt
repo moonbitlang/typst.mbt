@@ -434,8 +434,11 @@ fn CommandSpec::parse(
         break
       }
       state.resolve_pending()
-      if positionals.length() < self.positionals.length() &&
-        self.positionals[positionals.length()].validate is Some(validate) {
+      // Excess positionals are rejected when consumed.
+      if positionals.length() >= self.positionals.length() {
+        raise Usage("unexpected argument '\{arg}' found", self.usage())
+      }
+      if self.positionals[positionals.length()].validate is Some(validate) {
         validate(arg)
       }
       positionals.push(arg)
