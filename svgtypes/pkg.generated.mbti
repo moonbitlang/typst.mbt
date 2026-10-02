@@ -1,0 +1,362 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/svgtypes"
+
+import {
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub fn parse_font_families(String) -> Array[FontFamily] raise SvgTypesError
+
+// Errors
+pub(all) suberror FilterValueListParserError {
+  PercentageValue(Int)
+  NegativeValue(Int)
+  InvalidAngle(Int)
+  MissingDropShadowOffset(Int)
+  InvalidUrl(Int)
+  StreamErrors(SvgTypesError)
+} derive(Eq, @debug.Debug)
+pub impl Show for FilterValueListParserError
+
+pub(all) suberror SvgTypesError {
+  UnexpectedEndOfStream
+  UnexpectedData(Int)
+  InvalidValue
+  InvalidIdent
+  InvalidChar(Array[Byte], Int)
+  InvalidString(Array[String], Int)
+  InvalidNumber(Int)
+} derive(Eq, @debug.Debug)
+pub impl Show for SvgTypesError
+
+pub(all) suberror TransformOriginError {
+  MissingParameters
+  InvalidParameters
+  ZIndexIsPercentage
+} derive(Eq, @debug.Debug)
+pub impl Show for TransformOriginError
+
+pub(all) suberror ViewBoxError {
+  InvalidNumber
+  InvalidSize
+} derive(Eq, @debug.Debug)
+pub impl Show for ViewBoxError
+
+// Types and methods
+pub(all) enum Align {
+  None
+  XMinYMin
+  XMidYMin
+  XMaxYMin
+  XMinYMid
+  XMidYMid
+  XMaxYMid
+  XMinYMax
+  XMidYMax
+  XMaxYMax
+} derive(Eq, Hash, @debug.Debug)
+
+pub(all) struct Angle {
+  number : Double
+  unit : AngleUnit
+} derive(Eq, @debug.Debug)
+pub fn Angle::from_str(String) -> Self raise SvgTypesError
+pub fn Angle::new(Double, AngleUnit) -> Self
+pub fn Angle::to_degrees(Self) -> Double
+
+pub(all) enum AngleUnit {
+  Degrees
+  Gradians
+  Radians
+  Turns
+} derive(Eq, Hash, @debug.Debug)
+
+pub(all) struct AspectRatio {
+  defer_ : Bool
+  align : Align
+  slice : Bool
+} derive(Eq, Hash, @debug.Debug)
+pub fn AspectRatio::from_str(String) -> Self raise SvgTypesError
+pub impl Default for AspectRatio
+
+pub(all) struct Color {
+  red : Byte
+  green : Byte
+  blue : Byte
+  alpha : Byte
+} derive(Eq, Hash, @debug.Debug)
+pub fn Color::black() -> Self
+pub fn Color::blue() -> Self
+pub fn Color::from_str(String) -> Self raise SvgTypesError
+pub fn Color::gray() -> Self
+pub fn Color::green() -> Self
+pub fn Color::new_rgb(Byte, Byte, Byte) -> Self
+pub fn Color::new_rgba(Byte, Byte, Byte, Byte) -> Self
+pub fn Color::red() -> Self
+pub fn Color::white() -> Self
+
+pub(all) enum DirectionalPosition {
+  Top
+  Center
+  Bottom
+  Right
+  Left
+} derive(Eq, Hash, @debug.Debug)
+pub fn DirectionalPosition::from_str(String) -> Self raise SvgTypesError
+pub fn DirectionalPosition::is_horizontal(Self) -> Bool
+pub fn DirectionalPosition::is_vertical(Self) -> Bool
+
+pub(all) enum EnableBackground {
+  Accumulate
+  New
+  NewWithRegion(x~ : Double, y~ : Double, width~ : Double, height~ : Double)
+} derive(Eq, @debug.Debug)
+pub fn EnableBackground::from_str(String) -> Self raise SvgTypesError
+
+pub(all) enum FilterValue {
+  Blur(Length)
+  DropShadow(color~ : Color?, dx~ : Length, dy~ : Length, std_dev~ : Length)
+  Brightness(Double)
+  Contrast(Double)
+  Grayscale(Double)
+  HueRotate(Angle)
+  Invert(Double)
+  Opacity(Double)
+  Sepia(Double)
+  Saturate(Double)
+  Url(String)
+} derive(Eq, @debug.Debug)
+
+pub struct FilterValueListParser {
+  // private fields
+}
+pub fn FilterValueListParser::from(String) -> Self
+pub fn FilterValueListParser::iter(Self) -> Iter[Result[FilterValue, FilterValueListParserError]]
+pub fn FilterValueListParser::next(Self) -> Result[FilterValue, FilterValueListParserError]?
+
+pub(all) enum FontFamily {
+  Serif
+  SansSerif
+  Cursive
+  Fantasy
+  Monospace
+  Named(String)
+} derive(Eq, Hash, @debug.Debug)
+pub impl Show for FontFamily
+
+pub(all) struct FontShorthand {
+  font_style : String?
+  font_variant : String?
+  font_weight : String?
+  font_stretch : String?
+  font_size : String
+  font_family : String
+} derive(Eq, Hash, @debug.Debug)
+pub fn FontShorthand::from_str(String) -> Self raise SvgTypesError
+
+pub(all) struct FuncIRI(String) derive(Eq, @debug.Debug)
+pub fn FuncIRI::from_str(String) -> Self raise SvgTypesError
+
+pub(all) struct IRI(String) derive(Eq, @debug.Debug)
+pub fn IRI::from_str(String) -> Self raise SvgTypesError
+
+pub(all) struct Length {
+  number : Double
+  unit : LengthUnit
+} derive(Eq, @debug.Debug)
+pub fn Length::from_directional_position(DirectionalPosition) -> Self
+pub fn Length::from_str(String) -> Self raise SvgTypesError
+pub fn Length::new(Double, LengthUnit) -> Self
+pub fn Length::new_number(Double) -> Self
+pub fn Length::zero() -> Self
+pub impl Default for Length
+
+pub struct LengthListParser(Stream)
+pub fn LengthListParser::from(String) -> Self
+pub fn LengthListParser::iter(Self) -> Iter[Result[Length, SvgTypesError]]
+pub fn LengthListParser::next(Self) -> Result[Length, SvgTypesError]?
+
+pub(all) enum LengthUnit {
+  None
+  Em
+  Ex
+  Px
+  In
+  Cm
+  Mm
+  Pt
+  Pc
+  Percent
+} derive(Eq, Hash, @debug.Debug)
+
+pub(all) struct Number(Double) derive(Eq, @debug.Debug)
+pub fn Number::from_str(String) -> Self raise SvgTypesError
+
+pub struct NumberListParser(Stream)
+pub fn NumberListParser::from(String) -> Self
+pub fn NumberListParser::iter(Self) -> Iter[Result[Double, SvgTypesError]]
+pub fn NumberListParser::next(Self) -> Result[Double, SvgTypesError]?
+
+pub(all) enum Paint {
+  None
+  Inherit
+  CurrentColor
+  Color(Color)
+  FuncIRI(String, PaintFallback?)
+  ContextFill
+  ContextStroke
+} derive(Eq, @debug.Debug)
+pub fn Paint::from_str(String) -> Self raise SvgTypesError
+
+pub(all) enum PaintFallback {
+  None
+  CurrentColor
+  Color(Color)
+} derive(Eq, @debug.Debug)
+
+pub(all) struct PaintOrder {
+  order : FixedArray[PaintOrderKind]
+} derive(Eq, @debug.Debug)
+pub fn PaintOrder::from_array(FixedArray[PaintOrderKind]) -> Self
+pub fn PaintOrder::from_str(String) -> Self
+pub impl Default for PaintOrder
+
+pub(all) enum PaintOrderKind {
+  Fill
+  Stroke
+  Markers
+} derive(Eq, Hash, @debug.Debug)
+
+pub struct PathParser {
+  // private fields
+}
+pub fn PathParser::from(String) -> Self
+pub fn PathParser::iter(Self) -> Iter[Result[PathSegment, SvgTypesError]]
+pub fn PathParser::next(Self) -> Result[PathSegment, SvgTypesError]?
+
+pub(all) enum PathSegment {
+  MoveTo(abs~ : Bool, x~ : Double, y~ : Double)
+  LineTo(abs~ : Bool, x~ : Double, y~ : Double)
+  HorizontalLineTo(abs~ : Bool, x~ : Double)
+  VerticalLineTo(abs~ : Bool, y~ : Double)
+  CurveTo(abs~ : Bool, x1~ : Double, y1~ : Double, x2~ : Double, y2~ : Double, x~ : Double, y~ : Double)
+  SmoothCurveTo(abs~ : Bool, x2~ : Double, y2~ : Double, x~ : Double, y~ : Double)
+  Quadratic(abs~ : Bool, x1~ : Double, y1~ : Double, x~ : Double, y~ : Double)
+  SmoothQuadratic(abs~ : Bool, x~ : Double, y~ : Double)
+  EllipticalArc(abs~ : Bool, rx~ : Double, ry~ : Double, x_axis_rotation~ : Double, large_arc~ : Bool, sweep~ : Bool, x~ : Double, y~ : Double)
+  ClosePath(abs~ : Bool)
+} derive(Eq, @debug.Debug)
+pub fn PathSegment::command(Self) -> Byte
+pub fn PathSegment::is_abs(Self) -> Bool
+
+pub struct PointsParser(Stream)
+pub fn PointsParser::from(String) -> Self
+pub fn PointsParser::iter(Self) -> Iter[(Double, Double)]
+pub fn PointsParser::next(Self) -> (Double, Double)?
+
+pub(all) enum SimplePathSegment {
+  MoveTo(x~ : Double, y~ : Double)
+  LineTo(x~ : Double, y~ : Double)
+  CurveTo(x1~ : Double, y1~ : Double, x2~ : Double, y2~ : Double, x~ : Double, y~ : Double)
+  Quadratic(x1~ : Double, y1~ : Double, x~ : Double, y~ : Double)
+  ClosePath
+} derive(Eq, @debug.Debug)
+
+pub struct SimplifyingPathParser {
+  // private fields
+}
+pub fn SimplifyingPathParser::from(String) -> Self
+pub fn SimplifyingPathParser::iter(Self) -> Iter[Result[SimplePathSegment, SvgTypesError]]
+pub fn SimplifyingPathParser::next(Self) -> Result[SimplePathSegment, SvgTypesError]?
+
+pub struct Stream {
+  // private fields
+}
+pub fn Stream::advance(Self, Int) -> Unit
+pub fn Stream::at_end(Self) -> Bool
+pub fn Stream::calc_char_pos(Self) -> Int
+pub fn Stream::calc_char_pos_at(Self, Int) -> Int
+pub fn Stream::clone(Self) -> Self
+pub fn Stream::consume_ascii_ident(Self) -> String
+pub fn Stream::consume_byte(Self, Byte) -> Unit raise SvgTypesError
+pub fn Stream::consume_bytes(Self, (Self, Byte) -> Bool) -> String
+pub fn Stream::consume_string(Self, Bytes) -> Unit raise SvgTypesError
+pub fn Stream::curr_byte(Self) -> Byte raise SvgTypesError
+pub fn Stream::curr_byte_unchecked(Self) -> Byte
+pub fn Stream::from(String) -> Self
+pub fn Stream::is_curr_byte_eq(Self, Byte) -> Bool
+pub fn Stream::jump_to_end(Self) -> Unit
+pub fn Stream::next_byte(Self) -> Byte raise SvgTypesError
+pub fn Stream::parse_angle(Self) -> Angle raise SvgTypesError
+pub fn Stream::parse_color(Self) -> Color raise SvgTypesError
+pub fn Stream::parse_directional_position(Self) -> DirectionalPosition raise SvgTypesError
+pub fn Stream::parse_font_families(Self) -> Array[FontFamily] raise SvgTypesError
+pub fn Stream::parse_func_iri(Self) -> String raise SvgTypesError
+pub fn Stream::parse_ident(Self) -> String raise SvgTypesError
+pub fn Stream::parse_iri(Self) -> String raise SvgTypesError
+pub fn Stream::parse_length(Self) -> Length raise SvgTypesError
+pub fn Stream::parse_list_length(Self) -> Length raise SvgTypesError
+pub fn Stream::parse_list_number(Self) -> Double raise SvgTypesError
+pub fn Stream::parse_list_number_or_percent(Self) -> Double raise SvgTypesError
+pub fn Stream::parse_number(Self) -> Double raise SvgTypesError
+pub fn Stream::parse_number_or_percent(Self) -> Double raise SvgTypesError
+pub fn Stream::parse_quoted_string(Self) -> String raise SvgTypesError
+pub fn Stream::pos(Self) -> Int
+pub fn Stream::skip_bytes(Self, (Self, Byte) -> Bool) -> Unit
+pub fn Stream::skip_digits(Self) -> Unit
+pub fn Stream::skip_spaces(Self) -> Unit
+pub fn Stream::slice_back(Self, Int) -> String
+pub fn Stream::slice_tail(Self) -> String
+pub fn Stream::starts_with(Self, Bytes) -> Bool
+pub fn Stream::text(Self) -> String
+pub fn Stream::try_parse_color(Self) -> Color?
+
+pub(all) struct Transform {
+  a : Double
+  b : Double
+  c : Double
+  d : Double
+  e : Double
+  f : Double
+} derive(Eq, @debug.Debug)
+pub fn Transform::from_str(String) -> Self raise SvgTypesError
+pub fn Transform::new(Double, Double, Double, Double, Double, Double) -> Self
+pub impl Default for Transform
+
+pub struct TransformListParser {
+  // private fields
+}
+pub fn TransformListParser::from(String) -> Self
+pub fn TransformListParser::iter(Self) -> Iter[Result[TransformListToken, SvgTypesError]]
+pub fn TransformListParser::next(Self) -> Result[TransformListToken, SvgTypesError]?
+
+pub(all) enum TransformListToken {
+  Matrix(a~ : Double, b~ : Double, c~ : Double, d~ : Double, e~ : Double, f~ : Double)
+  Translate(tx~ : Double, ty~ : Double)
+  Scale(sx~ : Double, sy~ : Double)
+  Rotate(angle~ : Double)
+  SkewX(angle~ : Double)
+  SkewY(angle~ : Double)
+} derive(Eq, @debug.Debug)
+
+pub(all) struct TransformOrigin {
+  x_offset : Length
+  y_offset : Length
+  z_offset : Length
+} derive(Eq, @debug.Debug)
+pub fn TransformOrigin::from_str(String) -> Self raise TransformOriginError
+pub fn TransformOrigin::new(Length, Length, Length) -> Self
+
+pub(all) struct ViewBox {
+  x : Double
+  y : Double
+  w : Double
+  h : Double
+} derive(Eq, @debug.Debug)
+pub fn ViewBox::from_str(String) -> Self raise ViewBoxError
+pub fn ViewBox::new(Double, Double, Double, Double) -> Self
+
+// Type aliases
+
+// Traits
