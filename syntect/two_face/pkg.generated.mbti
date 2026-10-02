@@ -1,0 +1,17 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/syntect/two_face"
+
+import {
+  "moonbitlang/typst/syntect",
+}
+
+// Values
+pub fn extra_no_newlines() -> @syntect.SyntaxSet
+
+// Errors
+
+// Types and methods
+
+// Type aliases
+
+// Traits

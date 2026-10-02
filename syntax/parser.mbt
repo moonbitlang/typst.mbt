@@ -694,6 +694,9 @@ fn code_primary(p : Parser, atomic : Bool) -> Unit {
 /// Reparses a full content or code block.
 fn reparse_block(text : String, start : Int, end : Int) -> SyntaxNode? {
   let p = Parser::new(text, start, Code)
+  guard p.at(LeftBracket) || p.at(LeftBrace) else {
+    abort("reparse_block must start at a block")
+  }
   block(p)
   if p.balanced && p.prev_end() == end && p.nodes.length() > 0 {
     Some(p.nodes[0])

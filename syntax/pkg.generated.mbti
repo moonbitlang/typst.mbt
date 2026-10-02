@@ -281,17 +281,19 @@ pub(all) enum Side {
 } derive(Eq, @debug.Debug)
 
 pub struct Source {
-  id : FileId
-  text : String
-  root : SyntaxNode
+  // private fields
 }
 pub fn Source::detached(String) -> Self
+pub fn Source::edit(Self, Int, Int, String) -> (Int, Int)
 pub fn Source::find(Self, Span) -> LinkedNode?
 pub fn Source::id(Self) -> FileId
+pub fn Source::lines(Self) -> Lines
 pub fn Source::new(FileId, String) -> Self
 pub fn Source::range(Self, SpanNumber, SubRange?) -> (Int, Int)?
+pub fn Source::replace(Self, String) -> (Int, Int)
 pub fn Source::root(Self) -> SyntaxNode
 pub fn Source::text(Self) -> String
+pub fn Source::with_root(FileId, String, SyntaxNode) -> Self
 
 pub(all) struct Span(UInt64) derive(Compare, Eq, Hash, @debug.Debug)
 pub fn Span::detached() -> Self

@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 # Regenerate reference outputs from upstream Typst (needs Rust).
-# Usage: scripts/goldens.sh [syntax|ast|eval|html|realize|fonts|font|paged|svg|shape|shape-hb|break ...]
+# Usage: scripts/goldens.sh [syntax|ast|reparse|eval|html|realize|fonts|font|paged|svg|shape|shape-hb|break ...]
 #
+# `reparse` applies seeded pseudo-random edits to every test body through
+# `Source::edit`/`Source::replace` and dumps the reparsed ranges and trees
+# (oracle/src/reparse.rs).
 # `fonts` writes the font manifest of the test world (tests/golden/fonts.json);
 # `font` dumps what ttf-parser reports for every face (oracle/src/font.rs);
 # `paged` dumps every paged test in the `typst-frame-v1` format (see
@@ -20,7 +23,7 @@ cd "$(dirname "$0")/.."
 ORACLE=oracle/target/release/typst-oracle
 SUITE=.repos/typst/tests/suite
 stages=("$@")
-[ ${#stages[@]} -eq 0 ] && stages=(syntax ast eval html realize fonts font paged svg shape shape-hb break)
+[ ${#stages[@]} -eq 0 ] && stages=(syntax ast reparse eval html realize fonts font paged svg shape shape-hb break)
 for stage in "${stages[@]}"; do
   if [ "$stage" = shape-hb ]; then
     # rustybuzz's own shaping tests (needs .repos/rustybuzz, see upstream.sh).

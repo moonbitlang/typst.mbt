@@ -1,0 +1,9 @@
+import {
+  "moonbitlang/typst/unicode",
+  "moonbitlang/typst/regex/fancy",
+  "moonbitlang/typst/data/yaml_rust",
+  "moonbitlang/typst/data/xml",
+  "moonbitlang/core/encoding/utf8",
+  "moonbitlang/core/string",
+  "moonbitlang/core/double",
+}

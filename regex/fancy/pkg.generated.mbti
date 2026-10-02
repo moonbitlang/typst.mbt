@@ -1,0 +1,346 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/regex/fancy"
+
+import {
+  "moonbitlang/core/debug",
+  "moonbitlang/typst/regex",
+}
+
+// Values
+pub const FLAG_CASEI : Int = 1
+
+pub const FLAG_DOTNL : Int = 4
+
+pub const FLAG_IGNORE_SPACE : Int = 16
+
+pub const FLAG_MULTI : Int = 2
+
+pub const FLAG_ONIGURUMA_MODE : Int = 64
+
+pub const FLAG_SWAP_GREED : Int = 8
+
+pub const FLAG_UNICODE : Int = 32
+
+pub const USIZE_MAX : Int = 0x7FFFFFFF
+
+pub fn analyze(ExprTree, Bool) -> Info raise FancyError
+
+pub fn can_compile_as_anchored(Expr) -> Bool
+
+pub fn compile(Info, Bool) -> Prog raise FancyError
+
+pub fn escape(String) -> String
+
+pub fn make_literal(String) -> Expr
+
+pub fn make_literal_case_insensitive(String, Bool) -> Expr
+
+pub fn optimize(ExprTree) -> Bool
+
+pub fn parse_decimal(Bytes, Int) -> (Int, Int)?
+
+pub fn parse_id(Bytes, Int, String, String, Bool) -> ParsedId?
+
+pub fn run_default(Prog, @regex.Haystack, Int) -> Array[Int]? raise FancyError
+
+pub fn run_trace(Prog, @regex.Haystack, Int) -> Array[Int]? raise FancyError
+
+// Errors
+pub(all) suberror FancyError {
+  ParseError(Int, ParseError)
+  CompileError(CompileError)
+  RuntimeError(RuntimeError)
+} derive(Eq, @debug.Debug)
+pub fn FancyError::to_string(Self) -> String
+pub impl Show for FancyError
+
+// Types and methods
+pub(all) enum Assertion {
+  StartText
+  EndText
+  StartLine(crlf~ : Bool)
+  EndLine(crlf~ : Bool)
+  LeftWordBoundary
+  RightWordBoundary
+  WordBoundary
+  NotWordBoundary
+} derive(Eq, @debug.Debug)
+
+pub struct BitSet {
+  // private fields
+} derive(Eq, @debug.Debug)
+pub fn BitSet::contains(Self, Int) -> Bool
+pub fn BitSet::insert(Self, Int) -> Bool
+pub fn BitSet::iter(Self) -> Iter[Int]
+pub fn BitSet::last(Self) -> Int?
+pub fn BitSet::new() -> Self
+
+pub struct CaptureMatches {
+  // private fields
+}
+pub fn CaptureMatches::iter(Self) -> Iter[Result[Captures, FancyError]]
+pub fn CaptureMatches::next(Self) -> Result[Captures, FancyError]?
+pub fn CaptureMatches::regex(Self) -> Regex
+pub fn CaptureMatches::text(Self) -> String
+
+pub struct Captures {
+  // private fields
+}
+pub fn Captures::at(Self, Int) -> String
+pub fn Captures::at_name(Self, String) -> String
+pub fn Captures::expand(Self, String, StringBuilder) -> Unit
+pub fn Captures::get(Self, Int) -> Match?
+pub fn Captures::iter(Self) -> Iter[Match?]
+pub fn Captures::len(Self) -> Int
+pub fn Captures::name(Self, String) -> Match?
+
+pub(all) enum CompileError {
+  InnerError(String)
+  LookBehindNotConst
+  InvalidGroupName
+  InvalidGroupNameBackref(String)
+  InvalidBackref(Int)
+  NamedBackrefOnly
+  FeatureNotYetSupported(String)
+  SubroutineCallTargetNotFound(String, Int)
+} derive(Eq, @debug.Debug)
+pub impl Show for CompileError
+
+pub struct Delegate {
+  inner : @regex.Regex
+  pattern : String
+  start_group : Int
+  end_group : Int
+  // private fields
+}
+
+pub struct Expander {
+  sub_char : Char
+  open : String
+  close : String
+  allow_undelimited_name : Bool
+} derive(@debug.Debug)
+pub fn Expander::append_expansion(Self, StringBuilder, String, Captures) -> Unit
+pub fn Expander::check(Self, String, Regex) -> Unit raise FancyError
+pub fn Expander::default() -> Self
+pub fn Expander::escape(Self, String) -> String
+pub fn Expander::expansion(Self, String, Captures) -> String
+pub fn Expander::python() -> Self
+
+pub(all) enum Expr {
+  Empty
+  Any(newline~ : Bool)
+  Assertion(Assertion)
+  Literal(val~ : String, casei~ : Bool)
+  Concat(Array[Expr])
+  Alt(Array[Expr])
+  Group(Expr)
+  LookAround(Expr, LookAround)
+  Repeat(child~ : Expr, lo~ : Int, hi~ : Int, greedy~ : Bool)
+  Delegate(inner~ : String, size~ : Int, casei~ : Bool)
+  Backref(group~ : Int, casei~ : Bool)
+  BackrefWithRelativeRecursionLevel(group~ : Int, relative_level~ : Int, casei~ : Bool)
+  AtomicGroup(Expr)
+  KeepOut
+  ContinueFromPreviousMatchEnd
+  BackrefExistsCondition(Int)
+  Conditional(condition~ : Expr, true_branch~ : Expr, false_branch~ : Expr)
+  SubroutineCall(Int)
+  UnresolvedNamedSubroutineCall(name~ : String, ix~ : Int)
+} derive(Eq, @debug.Debug)
+pub fn Expr::parse_tree(String) -> ExprTree raise FancyError
+pub fn Expr::parse_tree_with_flags(String, Int) -> ExprTree raise FancyError
+pub fn Expr::to_str(Self, StringBuilder, Int) -> Unit
+
+pub struct ExprTree {
+  mut expr : Expr
+  backrefs : BitSet
+  named_groups : Map[String, Int]
+  contains_subroutines : Bool
+  self_recursive : Bool
+} derive(@debug.Debug)
+
+pub struct Info {
+  start_group : Int
+  end_group : Int
+  min_size : Int
+  const_size : Bool
+  hard : Bool
+  expr : Expr
+  children : Array[Info]
+}
+
+pub(all) enum Insn {
+  End
+  Any
+  AnyNoNL
+  Assertion(Assertion)
+  Lit(String)
+  Split(Int, Int)
+  Jmp(Int)
+  Save(Int)
+  Save0(Int)
+  Restore(Int)
+  RepeatGr(lo~ : Int, hi~ : Int, next~ : Int, repeat~ : Int)
+  RepeatNg(lo~ : Int, hi~ : Int, next~ : Int, repeat~ : Int)
+  RepeatEpsilonGr(lo~ : Int, next~ : Int, repeat~ : Int, check~ : Int)
+  RepeatEpsilonNg(lo~ : Int, next~ : Int, repeat~ : Int, check~ : Int)
+  FailNegativeLookAround
+  GoBack(Int)
+  Backref(slot~ : Int, casei~ : Bool)
+  BeginAtomic
+  EndAtomic
+  Delegate(Delegate)
+  ContinueFromPreviousMatchEnd
+  BackrefExistsCondition(Int)
+}
+pub impl Show for Insn
+
+pub(all) enum LookAround {
+  LookAhead
+  LookAheadNeg
+  LookBehind
+  LookBehindNeg
+} derive(Eq, @debug.Debug)
+
+pub struct Match {
+  // private fields
+}
+pub fn Match::as_str(Self) -> String
+pub fn Match::end(Self) -> Int
+pub fn Match::range(Self) -> (Int, Int)
+pub fn Match::start(Self) -> Int
+pub impl Eq for Match
+pub impl Show for Match
+
+pub struct Matches {
+  // private fields
+}
+pub fn Matches::iter(Self) -> Iter[Result[Match, FancyError]]
+pub fn Matches::next(Self) -> Result[Match, FancyError]?
+pub fn Matches::regex(Self) -> Regex
+pub fn Matches::text(Self) -> String
+
+pub(all) enum ParseError {
+  GeneralParseError(String)
+  UnclosedOpenParen
+  InvalidRepeat
+  RecursionExceeded
+  TrailingBackslash
+  InvalidEscape(String)
+  UnclosedUnicodeName
+  InvalidHex
+  InvalidCodepointValue
+  InvalidClass
+  UnknownFlag(String)
+  NonUnicodeUnsupported
+  InvalidBackref
+  TargetNotRepeatable
+  InvalidGroupName
+  InvalidGroupNameBackref(String)
+} derive(Eq, @debug.Debug)
+pub impl Show for ParseError
+
+pub struct ParsedId {
+  id : String
+  relative : Int?
+  skip : Int
+} derive(Eq, @debug.Debug)
+
+pub struct Prog {
+  body : Array[Insn]
+  // private fields
+}
+pub fn Prog::debug_print(Self, StringBuilder) -> Unit
+
+pub struct Regex {
+  // private fields
+}
+pub fn Regex::as_str(Self) -> String
+pub fn Regex::capture_names(Self) -> Array[String?]
+pub fn Regex::captures(Self, String) -> Captures? raise FancyError
+pub fn Regex::captures_from_pos(Self, String, Int) -> Captures? raise FancyError
+pub fn Regex::captures_from_pos_text(Self, Text, Int) -> Captures? raise FancyError
+pub fn Regex::captures_iter(Self, String) -> CaptureMatches
+pub fn Regex::captures_iter_text(Self, Text) -> CaptureMatches
+pub fn Regex::captures_len(Self) -> Int
+pub fn Regex::debug_print(Self) -> String
+pub fn Regex::find(Self, String) -> Match? raise FancyError
+pub fn Regex::find_from_pos(Self, String, Int) -> Match? raise FancyError
+pub fn Regex::find_from_pos_text(Self, Text, Int) -> Match? raise FancyError
+pub fn Regex::find_iter(Self, String) -> Matches
+pub fn Regex::find_iter_text(Self, Text) -> Matches
+pub fn Regex::is_fancy(Self) -> Bool
+pub fn Regex::is_match(Self, String) -> Bool raise FancyError
+pub fn Regex::is_match_text(Self, Text) -> Bool raise FancyError
+pub fn Regex::new(String) -> Self raise FancyError
+pub fn Regex::replace(Self, String, Replacer) -> String
+pub fn Regex::replace_all(Self, String, Replacer) -> String
+pub fn Regex::replacen(Self, String, Int, Replacer) -> String
+pub fn Regex::split(Self, String) -> Split
+pub fn Regex::splitn(Self, String, Int) -> SplitN
+pub fn Regex::to_string(Self) -> String
+pub fn Regex::try_replacen(Self, String, Int, Replacer) -> String raise FancyError
+pub impl Show for Regex
+
+pub struct RegexBuilder {
+  // private fields
+}
+pub fn RegexBuilder::backtrack_limit(Self, Int) -> Self
+pub fn RegexBuilder::build(Self) -> Regex raise FancyError
+pub fn RegexBuilder::case_insensitive(Self, Bool) -> Self
+pub fn RegexBuilder::delegate_dfa_size_limit(Self, Int) -> Self
+pub fn RegexBuilder::delegate_size_limit(Self, Int) -> Self
+pub fn RegexBuilder::dot_matches_new_line(Self, Bool) -> Self
+pub fn RegexBuilder::ignore_whitespace(Self, Bool) -> Self
+pub fn RegexBuilder::multi_line(Self, Bool) -> Self
+pub fn RegexBuilder::new(String) -> Self
+pub fn RegexBuilder::oniguruma_mode(Self, Bool) -> Self
+pub fn RegexBuilder::unicode_mode(Self, Bool) -> Self
+pub fn RegexBuilder::verbose_mode(Self, Bool) -> Self
+
+pub(all) enum Replacer {
+  Expand(String)
+  NoExpand(String)
+  Func((Captures) -> String)
+}
+pub fn Replacer::no_expansion(Self) -> String?
+pub fn Replacer::replace_append(Self, Captures, StringBuilder) -> Unit
+
+pub(all) enum RuntimeError {
+  StackOverflow
+  BacktrackLimitExceeded
+} derive(Eq, @debug.Debug)
+pub impl Show for RuntimeError
+
+pub struct Split {
+  // private fields
+}
+pub fn Split::iter(Self) -> Iter[Result[String, FancyError]]
+pub fn Split::next(Self) -> Result[String, FancyError]?
+
+pub struct SplitN {
+  // private fields
+}
+pub fn SplitN::iter(Self) -> Iter[Result[String, FancyError]]
+pub fn SplitN::next(Self) -> Result[String, FancyError]?
+
+pub struct SyntaxConfig {
+  case_insensitive : Bool
+  multi_line : Bool
+  dot_matches_new_line : Bool
+  ignore_whitespace : Bool
+  unicode : Bool
+} derive(Eq, @debug.Debug)
+
+pub struct Text {
+  // private fields
+}
+pub fn Text::as_str(Self) -> String
+pub fn Text::len(Self) -> Int
+pub fn Text::new(String) -> Self
+pub fn Text::prefix(Self, Int) -> Self
+
+// Type aliases
+
+// Traits
