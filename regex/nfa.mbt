@@ -29,6 +29,12 @@ priv struct Nfa {
   start : Int
   /// The number of capture groups (including the implicit group 0).
   group_len : Int
+  /// The reusable search state.
+  cache : Ref[Cache?]
+  /// If the whole regex is a single char class (`Capture(0) -> Ranges ->
+  /// Capture(1) -> Match`), its ranges: searches then just scan for a char
+  /// in the class.
+  single_class : FixedArray[Int]?
 }
 
 ///|
@@ -259,23 +265,48 @@ fn compile(hir : Hir, group_len : Int) -> Nfa {
   let inner = c.c_cap(0, hir)
   let m = c.add(Match)
   c.patch(inner.end, m)
-  { states: c.states, start: inner.start, group_len, }
+  let single_class = match c.states[inner.start] {
+    Capture(0, next=a) =>
+      match c.states[a] {
+        Ranges(r, next=b) =>
+          match c.states[b] {
+            Capture(1, next=m2) if m2 == m => Some(r)
+            _ => None
+          }
+        _ => None
+      }
+    _ => None
+  }
+  {
+    states: c.states,
+    start: inner.start,
+    group_len,
+    cache: { val: None, },
+    single_class,
+  }
 }
 
 // The PikeVM.
 
 ///|
-/// A haystack: the chars of a string with their UTF-8 byte offsets.
-priv struct Haystack {
-  chars : Array[Int]
+/// A haystack: the chars of a string with their UTF-8 byte offsets. It can be
+/// built once and searched many times (with any number of regexes). A
+/// haystack may be a prefix view (see `Haystack::prefix`) of a longer one:
+/// then only the chars before `len` are visible, as if the string ended there.
+pub struct Haystack {
+  priv text : String
+  priv chars : Array[Int]
   /// UTF-8 byte offset of each char position (length `chars.length() + 1`).
-  bytes : Array[Int]
+  priv bytes : Array[Int]
   /// UTF-16 offset of each char position (length `chars.length() + 1`).
-  utf16 : Array[Int]
+  priv utf16 : Array[Int]
+  /// The number of visible chars.
+  priv len : Int
 }
 
 ///|
-fn Haystack::new(s : String) -> Haystack {
+/// Decode a string into a haystack.
+pub fn Haystack::new(s : String) -> Haystack {
   let chars = []
   let bytes = [0]
   let utf16 = [0]
@@ -297,13 +328,62 @@ fn Haystack::new(s : String) -> Haystack {
     utf16.push(next)
     i = next
   }
-  { chars, bytes, utf16, }
+  { text: s, chars, bytes, utf16, len: chars.length(), }
 }
 
 ///|
-/// The char position of a UTF-8 byte offset, if it is a char boundary.
-fn Haystack::char_pos(self : Haystack, byte : Int) -> Int? {
-  for lo = 0, hi = self.bytes.length(); lo < hi; {
+/// A view of the first `len` chars (as if the string ended there).
+pub fn Haystack::prefix(self : Haystack, len : Int) -> Haystack {
+  { ..self, len, }
+}
+
+///|
+/// The underlying (full) string.
+pub fn Haystack::text(self : Haystack) -> String {
+  self.text
+}
+
+///|
+/// The number of visible chars.
+pub fn Haystack::char_len(self : Haystack) -> Int {
+  self.len
+}
+
+///|
+/// The visible length in UTF-8 bytes.
+pub fn Haystack::byte_len(self : Haystack) -> Int {
+  self.bytes[self.len]
+}
+
+///|
+/// The char (Unicode scalar value) at char position `i`.
+pub fn Haystack::char_at(self : Haystack, i : Int) -> Int {
+  self.chars[i]
+}
+
+///|
+/// The UTF-8 byte offset of char position `i` (`0 <= i <= char_len`).
+pub fn Haystack::byte_offset(self : Haystack, i : Int) -> Int {
+  self.bytes[i]
+}
+
+///|
+/// The UTF-16 offset (into `text`) of char position `i`.
+pub fn Haystack::utf16_offset(self : Haystack, i : Int) -> Int {
+  self.utf16[i]
+}
+
+///|
+/// The substring between two char positions.
+pub fn Haystack::substring(self : Haystack, start : Int, end : Int) -> String {
+  self.text.unsafe_substring(start=self.utf16[start], end=self.utf16[end])
+}
+
+///|
+/// The char position of a UTF-8 byte offset, if it is a (visible) char
+/// boundary.
+pub fn Haystack::char_pos(self : Haystack, byte : Int) -> Int? {
+  for lo = 0, hi = self.len + 1; lo < hi; {
     let mid = lo + (hi - lo) / 2
     let k = self.bytes[mid]
     if byte < k {
@@ -329,7 +409,7 @@ fn is_word_ascii(c : Int) -> Bool {
 ///|
 /// Whether the assertion holds at char position `at`.
 fn Haystack::look_matches(self : Haystack, look : Look, at : Int) -> Bool {
-  let len = self.chars.length()
+  let len = self.len
   let before = (f : (Int) -> Bool) => at > 0 && f(self.chars[at - 1])
   let after = (f : (Int) -> Bool) => at < len && f(self.chars[at])
   let uni = @unicode.is_word_character
@@ -385,8 +465,9 @@ priv struct ActiveStates {
   dense : Array[Int]
   /// Whether a state is in the set.
   present : FixedArray[Bool]
-  /// The capture slots of each state.
-  slots : FixedArray[FixedArray[Int]]
+  /// The capture slots of each state (`nslots` per state, flattened).
+  slots : FixedArray[Int]
+  nslots : Int
 }
 
 ///|
@@ -394,7 +475,8 @@ fn ActiveStates::new(nstates : Int, nslots : Int) -> ActiveStates {
   {
     dense: [],
     present: FixedArray::make(nstates, false),
-    slots: FixedArray::makei(nstates, _ => FixedArray::make(nslots, -1)),
+    slots: FixedArray::make(nstates * nslots, -1),
+    nslots,
   }
 }
 
@@ -423,20 +505,51 @@ priv enum FollowEpsilon {
 }
 
 ///|
+/// The reusable search state of an NFA (upstream `pikevm::Cache`).
+priv struct Cache {
+  curr : ActiveStates
+  next : ActiveStates
+  stack : Array[FollowEpsilon]
+  scratch : FixedArray[Int]
+}
+
+///|
+fn Nfa::cache(self : Nfa, nslots : Int) -> Cache {
+  match self.cache.val {
+    Some(c) if c.curr.nslots == nslots => c
+    _ => {
+      let n = self.states.length()
+      let c = {
+        curr: ActiveStates::new(n, nslots),
+        next: ActiveStates::new(n, nslots),
+        stack: [],
+        scratch: FixedArray::make(nslots, -1),
+      }
+      self.cache.val = Some(c)
+      c
+    }
+  }
+}
+
+///|
 /// Compute the epsilon closure of `sid` at position `at` into `next`.
+/// `curr_slots` holds the current slot values; capture states whose slot is
+/// beyond the tracked slots are treated as epsilon transitions.
 fn Nfa::epsilon_closure(
   self : Nfa,
   hay : Haystack,
   stack : Array[FollowEpsilon],
   curr_slots : FixedArray[Int],
+  curr_base : Int,
   next : ActiveStates,
   at : Int,
   sid : Int,
 ) -> Unit {
+  let nslots = next.nslots
   stack.push(Explore(sid))
   while stack.pop() is Some(frame) {
     match frame {
-      RestoreCapture(slot, offset) => curr_slots[slot] = offset
+      RestoreCapture(slot, offset) => curr_slots[curr_base + slot] = offset
       Explore(sid) => {
         let mut sid = sid
         while true {
@@ -445,9 +558,9 @@ fn Nfa::epsilon_closure(
           }
           match self.states[sid] {
             Fail | Match | Ranges(_, ..) => {
-              let dst = next.slots[sid]
-              for i in 0..<curr_slots.length() {
-                dst[i] = curr_slots[i]
+              let dst = sid * nslots
+              for i in 0..<nslots {
+                next.slots[dst + i] = curr_slots[curr_base + i]
               }
               break
             }
@@ -467,8 +580,10 @@ fn Nfa::epsilon_closure(
               sid = alts[0]
             }
             Capture(slot, next~) => {
-              stack.push(RestoreCapture(slot, curr_slots[slot]))
-              curr_slots[slot] = at
+              if slot < nslots {
+                stack.push(RestoreCapture(slot, curr_slots[curr_base + slot]))
+                curr_slots[curr_base + slot] = at
+              }
               sid = next
             }
             Empty(next~) => sid = next
@@ -480,39 +595,74 @@ fn Nfa::epsilon_closure(
 }
 
 ///|
-/// Search for the leftmost-first match starting at char position `start`.
-/// Returns the capture slots (char positions, -1 if unset).
-fn Nfa::search(self : Nfa, hay : Haystack, start : Int) -> FixedArray[Int]? {
-  let n = self.states.length()
-  let nslots = 2 * self.group_len
-  let curr = ActiveStates::new(n, nslots)
-  let next = ActiveStates::new(n, nslots)
-  let mut curr = curr
-  let mut next = next
-  let stack = []
-  let scratch = FixedArray::make(nslots, -1)
-  let mut matched : FixedArray[Int]? = None
-  let len = hay.chars.length()
+/// Search for the leftmost-first match starting at char position `start`
+/// (anchored: only at `start`). On a match, the capture slots (char
+/// positions, -1 if unset) are written to `out` (whose length, at least 2,
+/// determines how many slots are tracked) and `true` is returned.
+fn Nfa::search(
+  self : Nfa,
+  hay : Haystack,
+  start : Int,
+  anchored : Bool,
+  out : FixedArray[Int],
+) -> Bool {
+  let nslots = out.length()
+  if self.single_class is Some(ranges) {
+    // Fast path: the leftmost match is the first char in the class.
+    let end = if anchored { start + 1 } else { hay.len }
+    for at in start..<end {
+      if at < hay.len && ranges_contain(ranges, hay.chars[at]) {
+        out[0] = at
+        out[1] = at + 1
+        for i in 2..<nslots {
+          out[i] = -1
+        }
+        return true
+      }
+    }
+    return false
+  }
+  let cache = self.cache(nslots)
+  let mut curr = cache.curr
+  let mut next = cache.next
+  curr.clear()
+  next.clear()
+  let stack = cache.stack
+  stack.clear()
+  let scratch = cache.scratch
+  let mut matched = false
+  let len = hay.len
   for at = start; at <= len; at = at + 1 {
-    if curr.dense.is_empty() && matched is Some(_) {
+    if curr.dense.is_empty() && (matched || (anchored && at > start)) {
       break
     }
     // Simulate the unanchored `(?s:.)*?` prefix.
-    if matched is None {
+    if !matched && (!anchored || at == start) {
       scratch.fill(-1)
-      self.epsilon_closure(hay, stack, scratch, curr, at, self.start)
+      self.epsilon_closure(hay, stack, scratch, 0, curr, at, self.start)
     }
     // Step over the char at `at`.
     for sid in curr.dense {
       match self.states[sid] {
         Match => {
-          matched = Some(curr.slots[sid].copy())
+          let base = sid * nslots
+          for i in 0..<nslots {
+            out[i] = curr.slots[base + i]
+          }
+          matched = true
           break
         }
         Ranges(ranges, next=to) =>
           if at < len && ranges_contain(ranges, hay.chars[at]) {
-            let slots = curr.slots[sid]
-            self.epsilon_closure(hay, stack, slots, next, at + 1, to)
+            self.epsilon_closure(
+              hay,
+              stack,
+              curr.slots,
+              sid * nslots,
+              next,
+              at + 1,
+              to,
+            )
           }
         _ => ()
       }
@@ -522,5 +672,7 @@ fn Nfa::search(self : Nfa, hay : Haystack, start : Int) -> FixedArray[Int]? {
     next = tmp
     next.clear()
   }
+  curr.clear()
+  next.clear()
   matched
 }

@@ -2605,6 +2605,7 @@ dependencies = [
  "codex",
  "comemo",
  "ecow",
+ "fancy-regex",
  "hayagriva",
  "hypher",
  "icu_collator",
