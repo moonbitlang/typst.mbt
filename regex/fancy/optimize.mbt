@@ -28,7 +28,7 @@ fn optimize_trailing_lookahead(tree : ExprTree) -> Bool {
       if root_concat_children.last() is Some(LookAround(inner, LookAhead)) {
         // take the rest of the children from the original Concat
         let group0_children = root_concat_children[:root_concat_children.length() -
-          1].to_owned()
+        1].to_owned()
         let group0 = Group(Concat(group0_children))
         // compose new Concat: [Group0, lookahead inner expr]
         tree.expr = Concat([group0, inner])

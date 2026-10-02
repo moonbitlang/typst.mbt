@@ -6,7 +6,10 @@
 /// Build with the generator's flag letters: `o` Oniguruma mode, `i`
 /// case-insensitive, `m` multi-line, `s` dot matches newline, `x` ignore
 /// whitespace, `b` backtrack limit 1000.
-fn build_with(pattern : String, flags : String) -> @fancy.Regex raise @fancy.FancyError {
+fn build_with(
+  pattern : String,
+  flags : String,
+) -> @fancy.Regex raise @fancy.FancyError {
   let b = @fancy.RegexBuilder::new(pattern)
   for f in flags {
     match f {
@@ -80,7 +83,7 @@ fn mid_boundary(text : @fancy.Text) -> Int {
 
 ///|
 fn describe_search(re : @fancy.Regex, text : @fancy.Text, pos : Int) -> String {
-  re.captures_from_pos_text(text, pos) catch {
+  try re.captures_from_pos_text(text, pos) catch {
     e => "err:\{e}"
   } noraise {
     Some(caps) => describe_caps(caps)
@@ -92,7 +95,7 @@ fn describe_search(re : @fancy.Regex, text : @fancy.Text, pos : Int) -> String {
 fn describe(re : @fancy.Regex, hay : String) -> String {
   let out = StringBuilder()
   let text = @fancy.Text::new(hay)
-  re.is_match_text(text) catch {
+  try re.is_match_text(text) catch {
     e => out.write_string("m=err:\{e}")
   } noraise {
     b => out.write_string("m=\{b}")
@@ -130,9 +133,7 @@ fn report(failures : Array[String], total : Int) -> Unit raise {
     } else {
       failures
     }
-    fail(
-      "\{failures.length()} of \{total} failed:\n" + shown.join("\n"),
-    )
+    fail("\{failures.length()} of \{total} failed:\n" + shown.join("\n"))
   }
 }
 
@@ -156,9 +157,7 @@ test "fancy-regex oracle" {
       }
     }
     if build != "ok" {
-      failures.push(
-        "build \{p} /\{flags}:\n  expected \{build}\n  actual   ok",
-      )
+      failures.push("build \{p} /\{flags}:\n  expected \{build}\n  actual   ok")
       continue
     }
     for h in hays {
@@ -180,7 +179,7 @@ test "syntect regexes build" {
   let failures = []
   for case in syntect_regexes {
     let (pattern, expected) = case
-    let actual = build_with(pattern, "o") catch {
+    let actual = try build_with(pattern, "o") catch {
       e => "error: \{e}"
     } noraise {
       _ => "ok"

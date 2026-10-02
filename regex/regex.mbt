@@ -48,11 +48,27 @@ pub fn Regex::new_with(
   let translator : Translator = {
     pattern,
     flags: {
-      case_insensitive: if case_insensitive { Some(true) } else { None },
-      multi_line: if multi_line { Some(true) } else { None },
-      dot_matches_new_line: if dot_matches_new_line { Some(true) } else { None },
+      case_insensitive: if case_insensitive {
+        Some(true)
+      } else {
+        None
+      },
+      multi_line: if multi_line {
+        Some(true)
+      } else {
+        None
+      },
+      dot_matches_new_line: if dot_matches_new_line {
+        Some(true)
+      } else {
+        None
+      },
       swap_greed: None,
-      unicode: if unicode { None } else { Some(false) },
+      unicode: if unicode {
+        None
+      } else {
+        Some(false)
+      },
       crlf: None,
     },
     names: [],

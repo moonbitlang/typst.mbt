@@ -175,17 +175,19 @@ pub struct Prog {
 
 ///|
 fn Prog::new(body : Array[Insn], n_saves : Int) -> Prog {
-  let lits = body.map(insn => match insn {
-    Lit(s) => {
-      let cs = []
-      for c in s {
-        cs.push(c.to_int())
+  let lits = body.map(insn => {
+    match insn {
+      Lit(s) => {
+        let cs = []
+        for c in s {
+          cs.push(c.to_int())
+        }
+        FixedArray::from_array(cs)
       }
-      FixedArray::from_array(cs)
+      _ => []
     }
-    _ => []
   })
-  { body, n_saves, lits, state: { val: None } }
+  { body, n_saves, lits, state: { val: None, }, }
 }
 
 ///|
@@ -394,7 +396,11 @@ fn State::backtrack_cut(self : State, count : Int) -> Unit {
 
 ///|
 /// Whether the chars of `literal` occur in `s` at `ix`.
-fn matches_literal(s : @regex.Haystack, ix : Int, literal : FixedArray[Int]) -> Bool {
+fn matches_literal(
+  s : @regex.Haystack,
+  ix : Int,
+  literal : FixedArray[Int],
+) -> Bool {
   let n = literal.length()
   if ix + n > s.char_len() {
     return false
@@ -492,7 +498,11 @@ fn is_word_char_at(s : @regex.Haystack, i : Int) -> Bool {
 ///|
 /// Whether `assertion` holds at char position `ix` (upstream: the
 /// `regex_automata` `LookMatcher`).
-fn assertion_matches(s : @regex.Haystack, assertion : Assertion, ix : Int) -> Bool {
+fn assertion_matches(
+  s : @regex.Haystack,
+  assertion : Assertion,
+  ix : Int,
+) -> Bool {
   let len = s.char_len()
   match assertion {
     StartText => ix == 0
@@ -507,10 +517,8 @@ fn assertion_matches(s : @regex.Haystack, assertion : Assertion, ix : Int) -> Bo
       ix == len ||
       s.char_at(ix) == '\r' ||
       (s.char_at(ix) == '\n' && (ix == 0 || s.char_at(ix - 1) != '\r'))
-    LeftWordBoundary =>
-      !is_word_char_at(s, ix - 1) && is_word_char_at(s, ix)
-    RightWordBoundary =>
-      is_word_char_at(s, ix - 1) && !is_word_char_at(s, ix)
+    LeftWordBoundary => !is_word_char_at(s, ix - 1) && is_word_char_at(s, ix)
+    RightWordBoundary => is_word_char_at(s, ix - 1) && !is_word_char_at(s, ix)
     WordBoundary => is_word_char_at(s, ix - 1) != is_word_char_at(s, ix)
     NotWordBoundary => is_word_char_at(s, ix - 1) == is_word_char_at(s, ix)
   }
@@ -567,12 +575,7 @@ fn run(
           }
           return Some(state.saves.copy())
         }
-        Any =>
-          if ix < len {
-            ix += 1
-          } else {
-            break
-          }
+        Any => if ix < len { ix += 1 } else { break }
         AnyNoNL =>
           if ix < len && s.char_at(ix) != '\n' {
             ix += 1

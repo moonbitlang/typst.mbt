@@ -31,6 +31,10 @@ priv struct Nfa {
   group_len : Int
   /// The reusable search state.
   cache : Ref[Cache?]
+  /// If the whole regex is a single char class (`Capture(0) -> Ranges ->
+  /// Capture(1) -> Match`), its ranges: searches then just scan for a char
+  /// in the class.
+  single_class : FixedArray[Int]?
 }
 
 ///|
@@ -261,7 +265,25 @@ fn compile(hir : Hir, group_len : Int) -> Nfa {
   let inner = c.c_cap(0, hir)
   let m = c.add(Match)
   c.patch(inner.end, m)
-  { states: c.states, start: inner.start, group_len, cache: { val: None } }
+  let single_class = match c.states[inner.start] {
+    Capture(0, next=a) =>
+      match c.states[a] {
+        Ranges(r, next=b) =>
+          match c.states[b] {
+            Capture(1, next=m2) if m2 == m => Some(r)
+            _ => None
+          }
+        _ => None
+      }
+    _ => None
+  }
+  {
+    states: c.states,
+    start: inner.start,
+    group_len,
+    cache: { val: None, },
+    single_class,
+  }
 }
 
 // The PikeVM.
@@ -306,7 +328,7 @@ pub fn Haystack::new(s : String) -> Haystack {
     utf16.push(next)
     i = next
   }
-  { text: s, chars, bytes, utf16, len: chars.length() }
+  { text: s, chars, bytes, utf16, len: chars.length(), }
 }
 
 ///|
@@ -585,6 +607,21 @@ fn Nfa::search(
   out : FixedArray[Int],
 ) -> Bool {
   let nslots = out.length()
+  if self.single_class is Some(ranges) {
+    // Fast path: the leftmost match is the first char in the class.
+    let end = if anchored { start + 1 } else { hay.len }
+    for at in start..<end {
+      if at < hay.len && ranges_contain(ranges, hay.chars[at]) {
+        out[0] = at
+        out[1] = at + 1
+        for i in 2..<nslots {
+          out[i] = -1
+        }
+        return true
+      }
+    }
+    return false
+  }
   let cache = self.cache(nslots)
   let mut curr = cache.curr
   let mut next = cache.next

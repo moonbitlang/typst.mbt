@@ -15,7 +15,7 @@ pub struct Expander {
 ///
 /// To write a literal `$` use `$$`.
 pub fn Expander::default() -> Expander {
-  { sub_char: '$', open: "{", close: "}", allow_undelimited_name: true }
+  { sub_char: '$', open: "{", close: "}", allow_undelimited_name: true, }
 }
 
 ///|
@@ -26,7 +26,7 @@ pub fn Expander::default() -> Expander {
 ///
 /// To write a literal `\` use `\\`.
 pub fn Expander::python() -> Expander {
-  { sub_char: '\\', open: "g<", close: ">", allow_undelimited_name: false }
+  { sub_char: '\\', open: "g<", close: ">", allow_undelimited_name: false, }
 }
 
 ///|
@@ -51,31 +51,35 @@ pub fn Expander::check(
   template : String,
   regex : Regex,
 ) -> Unit raise FancyError {
-  let on_group_num = (num : Int) => if num == 0 {
-    ()
-  } else if !regex.named_groups.is_empty() {
-    raise FancyError::CompileError(NamedBackrefOnly)
-  } else if num < regex.captures_len() {
-    ()
-  } else {
-    raise FancyError::CompileError(InvalidBackref(num))
+  let on_group_num = (num : Int) => {
+    if num == 0 {
+      ()
+    } else if !regex.named_groups.is_empty() {
+      raise FancyError::CompileError(NamedBackrefOnly)
+    } else if num < regex.captures_len() {
+      ()
+    } else {
+      raise FancyError::CompileError(InvalidBackref(num))
+    }
   }
-  self.exec(template, step => match step {
-    Char(_) => ()
-    GroupName(name) =>
-      if regex.named_groups.contains(name) {
-        ()
-      } else if parse_usize(name) is Some(num) {
-        on_group_num(num)
-      } else {
-        raise FancyError::CompileError(InvalidGroupNameBackref(name))
-      }
-    GroupNum(num) => on_group_num(num)
-    Error =>
-      raise FancyError::ParseError(
-        0,
-        GeneralParseError("parse error in template while expanding"),
-      )
+  self.exec(template, step => {
+    match step {
+      Char(_) => ()
+      GroupName(name) =>
+        if regex.named_groups.contains(name) {
+          ()
+        } else if parse_usize(name) is Some(num) {
+          on_group_num(num)
+        } else {
+          raise FancyError::CompileError(InvalidGroupNameBackref(name))
+        }
+      GroupNum(num) => on_group_num(num)
+      Error =>
+        raise FancyError::ParseError(
+          0,
+          GeneralParseError("parse error in template while expanding"),
+        )
+    }
   })
 }
 
@@ -112,19 +116,21 @@ pub fn Expander::append_expansion(
   template : String,
   captures : Captures,
 ) -> Unit {
-  self.exec(template, step => match step {
-    Char(c) => dst.write_char(c)
-    GroupName(name) =>
-      if captures.name(name) is Some(m) {
-        dst.write_string(m.as_str())
-      } else if parse_usize(name) is Some(num) && captures.get(num) is Some(m) {
-        dst.write_string(m.as_str())
-      }
-    GroupNum(num) =>
-      if captures.get(num) is Some(m) {
-        dst.write_string(m.as_str())
-      }
-    Error => ()
+  self.exec(template, step => {
+    match step {
+      Char(c) => dst.write_char(c)
+      GroupName(name) =>
+        if captures.name(name) is Some(m) {
+          dst.write_string(m.as_str())
+        } else if parse_usize(name) is Some(num) && captures.get(num) is Some(m) {
+          dst.write_string(m.as_str())
+        }
+      GroupNum(num) =>
+        if captures.get(num) is Some(m) {
+          dst.write_string(m.as_str())
+        }
+      Error => ()
+    }
   }) catch {
     _ => ()
   }
@@ -157,7 +163,7 @@ fn Expander::exec(
               None
             }
         })
-        is Some({ id, relative: None, skip }) {
+        is Some({ id, relative: None, skip, }) {
         f(GroupName(id))
         skip
       } else if parse_decimal(bytes, tail) is Some((end, num)) {

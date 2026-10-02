@@ -147,6 +147,12 @@ pub impl Show for RuntimeError with fn output(self, logger) {
 }
 
 ///|
+/// The upstream `Display` text.
+pub fn FancyError::to_string(self : FancyError) -> String {
+  "\{self}"
+}
+
+///|
 pub impl Show for FancyError with fn output(self, logger) {
   match self {
     ParseError(position, parse_error) =>

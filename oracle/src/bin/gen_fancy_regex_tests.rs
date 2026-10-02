@@ -16,7 +16,8 @@
 //! `captures_from_pos` at every char boundary (at most 16) and the
 //! `captures_iter` results.
 //!
-//! Usage: cargo run --release --bin gen_fancy_regex_tests -- <repo-root>
+//! Usage: cargo run --release --bin gen_fancy_regex_tests -- <repo-root>, then
+//! `moon fmt`.
 
 use std::collections::BTreeSet;
 use std::fmt::Write as _;

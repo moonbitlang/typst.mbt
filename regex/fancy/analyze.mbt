@@ -27,7 +27,10 @@ fn Info::push_literal(self : Info, buf : StringBuilder) -> Unit {
   match self.expr {
     // could be more paranoid about checking casei
     Literal(val~, ..) => buf.write_string(val)
-    Concat(_) => for child in self.children { child.push_literal(buf) }
+    Concat(_) =>
+      for child in self.children {
+        child.push_literal(buf)
+      }
     _ => abort("push_literal called on non-literal")
   }
 }
@@ -127,7 +130,7 @@ fn Analyzer::visit(self : Analyzer, expr : Expr) -> Info raise FancyError {
       min_size = child_info.min_size
       const_size = child_info.const_size
       // Store the group info for use by backrefs
-      self.group_info[group] = { min_size, const_size }
+      self.group_info[group] = { min_size, const_size, }
       // If there's a backref to this group, we potentially have to backtrack within the
       // group. E.g. with `(x|xy)\1` and input `xyxy`, `x` matches but then the backref
       // doesn't, so we have to backtrack and try `xy`.
@@ -247,7 +250,9 @@ pub fn analyze(
     group_ix: start_group,
     group_info: {},
   }
-  let analyzed : Result[Info, FancyError] = try analyzer.visit(tree.expr) catch {
+  let analyzed : Result[Info, FancyError] = try
+    analyzer.visit(tree.expr)
+  catch {
     e => Err(e)
   } noraise {
     info => Ok(info)

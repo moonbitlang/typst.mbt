@@ -18,7 +18,7 @@ pub struct BitSet {
 
 ///|
 pub fn BitSet::new() -> BitSet {
-  { items: [] }
+  { items: [], }
 }
 
 ///|
@@ -89,7 +89,10 @@ fn perr(ix : Int, e : ParseError) -> FancyError {
 }
 
 ///|
-fn Parser::parse_with_flags(re : String, flags : Int) -> ExprTree raise FancyError {
+fn Parser::parse_with_flags(
+  re : String,
+  flags : Int,
+) -> ExprTree raise FancyError {
   let p = Parser::new(re, flags)
   let (ix, expr) = p.parse_re(0, 0)
   if ix < p.re.length() {
@@ -237,7 +240,7 @@ fn Parser::parse_piece(
       '*' => (0, USIZE_MAX)
       '+' => (1, USIZE_MAX)
       '{' =>
-        self.parse_repeat(ix) catch {
+        try self.parse_repeat(ix) catch {
           _ =>
             // Invalid repeat syntax, which results in `{` being treated as a literal
             return (ix, child)
@@ -381,7 +384,7 @@ fn Parser::parse_named_backref(
   close : String,
   allow_relative : Bool,
 ) -> (Int, Expr) raise FancyError {
-  let { ix: end, group_ix, group_name, recursion_level } = self.parse_named_backref_or_subroutine(
+  let { ix: end, group_ix, group_name, recursion_level, } = self.parse_named_backref_or_subroutine(
     ix, open, close, allow_relative,
   )
   if group_ix is Some(group) {
@@ -414,7 +417,7 @@ fn Parser::parse_named_subroutine_call(
   close : String,
   allow_relative : Bool,
 ) -> (Int, Expr) raise FancyError {
-  let { ix: end, group_ix, group_name, recursion_level } = self.parse_named_backref_or_subroutine(
+  let { ix: end, group_ix, group_name, recursion_level, } = self.parse_named_backref_or_subroutine(
     ix, open, close, allow_relative,
   )
   if recursion_level is Some(_) {
@@ -446,7 +449,7 @@ fn Parser::parse_named_backref_or_subroutine(
   allow_relative : Bool,
 ) -> NamedBackrefOrSubroutine raise FancyError {
   if parse_id(self.re, ix, open, close, allow_relative)
-    is Some({ id, relative, skip }) {
+    is Some({ id, relative, skip, }) {
     let mut relative = relative
     let group = if self.named_groups.get(id) is Some(group) {
       Some(group)
@@ -555,10 +558,7 @@ fn Parser::parse_escape(
   } else if b == 'z' && !in_class {
     (end, Assertion(EndText))
   } else if b == 'Z' && !in_class {
-    (
-      end,
-      LookAround(Delegate(inner="\\n*$", size=0, casei=false), LookAhead),
-    )
+    (end, LookAround(Delegate(inner="\\n*$", size=0, casei=false), LookAhead))
   } else if b == 'b' && !in_class {
     if self.get(end) == '{' {
       // Support for \b{...} is not implemented yet
@@ -588,11 +588,7 @@ fn Parser::parse_escape(
   } else if (b | 32) is ('d' | 's' | 'w') {
     (
       end,
-      Delegate(
-        inner=self.slice(ix, end),
-        size=1,
-        casei=self.flag(FLAG_CASEI),
-      ),
+      Delegate(inner=self.slice(ix, end), size=1, casei=self.flag(FLAG_CASEI)),
     )
   } else if (b | 32) == 'h' {
     let s = if b == 'h' { "[0-9A-Fa-f]" } else { "[^0-9A-Fa-f]" }
@@ -622,11 +618,7 @@ fn Parser::parse_escape(
     }
     (
       end,
-      Delegate(
-        inner=self.slice(ix, end),
-        size=1,
-        casei=self.flag(FLAG_CASEI),
-      ),
+      Delegate(inner=self.slice(ix, end), size=1, casei=self.flag(FLAG_CASEI)),
     )
   } else if b == 'K' && !in_class {
     (end, KeepOut)
@@ -819,7 +811,7 @@ fn Parser::parse_group(
       ("'", "'")
     }
     if parse_id(self.re, ix + 1, open, close, false)
-      is Some({ id, relative: None, skip }) {
+      is Some({ id, relative: None, skip, }) {
       self.named_groups[id] = self.curr_group
       (None, skip + 1)
     } else {
@@ -829,7 +821,7 @@ fn Parser::parse_group(
     // Named capture group using Python syntax: (?P<name>...)
     self.curr_group += 1 // this is a capture group
     if parse_id(self.re, ix + 2, "<", ">", false)
-      is Some({ id, relative: None, skip }) {
+      is Some({ id, relative: None, skip, }) {
       self.named_groups[id] = self.curr_group
       (None, skip + 2)
     } else {
@@ -862,7 +854,10 @@ fn Parser::parse_group(
 }
 
 ///|
-fn Parser::check_for_close_paren(self : Parser, ix : Int) -> Int raise FancyError {
+fn Parser::check_for_close_paren(
+  self : Parser,
+  ix : Int,
+) -> Int raise FancyError {
   let ix = self.optional_whitespace(ix)
   if ix == self.len() {
     raise perr(ix, UnclosedOpenParen)
@@ -1078,13 +1073,19 @@ fn Parser::resolve_named_subroutine_calls(self : Parser, expr : Expr) -> Expr {
     Group(inner) => Group(self.resolve_named_subroutine_calls(inner))
     LookAround(inner, la) =>
       LookAround(self.resolve_named_subroutine_calls(inner), la)
-    AtomicGroup(inner) => AtomicGroup(self.resolve_named_subroutine_calls(inner))
+    AtomicGroup(inner) =>
+      AtomicGroup(self.resolve_named_subroutine_calls(inner))
     Concat(children) =>
       Concat(children.map(c => self.resolve_named_subroutine_calls(c)))
     Alt(children) =>
       Alt(children.map(c => self.resolve_named_subroutine_calls(c)))
     Repeat(child~, lo~, hi~, greedy~) =>
-      Repeat(child=self.resolve_named_subroutine_calls(child), lo~, hi~, greedy~)
+      Repeat(
+        child=self.resolve_named_subroutine_calls(child),
+        lo~,
+        hi~,
+        greedy~,
+      )
     Conditional(condition~, true_branch~, false_branch~) =>
       Conditional(
         condition=self.resolve_named_subroutine_calls(condition),
@@ -1292,8 +1293,24 @@ fn escape_into(text : String, buf : StringBuilder) -> Unit {
 /// regex-syntax's `is_meta_character`.
 fn is_meta_character(c : Char) -> Bool {
   c
-  is ('\\' | '.' | '+' | '*' | '?' | '(' | ')' | '|' | '[' | ']' | '{' | '}' | '^'
-  | '$' | '#' | '&' | '-' | '~')
+  is ('\\'
+  | '.'
+  | '+'
+  | '*'
+  | '?'
+  | '('
+  | ')'
+  | '|'
+  | '['
+  | ']'
+  | '{'
+  | '}'
+  | '^'
+  | '$'
+  | '#'
+  | '&'
+  | '-'
+  | '~')
 }
 
 ///|
@@ -1302,6 +1319,9 @@ pub fn make_literal(s : String) -> Expr {
 }
 
 ///|
-pub fn make_literal_case_insensitive(s : String, case_insensitive : Bool) -> Expr {
+pub fn make_literal_case_insensitive(
+  s : String,
+  case_insensitive : Bool,
+) -> Expr {
   Literal(val=s, casei=case_insensitive)
 }

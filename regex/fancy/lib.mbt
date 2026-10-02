@@ -29,7 +29,7 @@ pub struct Text {
 ///|
 /// Decode a string for searching.
 pub fn Text::new(s : String) -> Text {
-  { hay: @regex.Haystack::new(s) }
+  { hay: @regex.Haystack::new(s), }
 }
 
 ///|
@@ -37,7 +37,7 @@ pub fn Text::new(s : String) -> Text {
 /// boundary, otherwise the whole text is returned).
 pub fn Text::prefix(self : Text, end : Int) -> Text {
   match self.hay.char_pos(end) {
-    Some(n) => { hay: self.hay.prefix(n) }
+    Some(n) => { hay: self.hay.prefix(n), }
     None => self
   }
 }
@@ -138,7 +138,7 @@ fn RegexOptions::default() -> RegexOptions {
 
 ///|
 fn RegexOptions::clone(self : RegexOptions) -> RegexOptions {
-  { ..self }
+  { ..self, }
 }
 
 ///|
@@ -152,7 +152,7 @@ pub struct RegexBuilder {
 ///
 /// If the pattern is invalid, the call to `build` will fail later.
 pub fn RegexBuilder::new(pattern : String) -> RegexBuilder {
-  let builder = { options: RegexOptions::default() }
+  let builder = { options: RegexOptions::default(), }
   builder.options.pattern = pattern
   builder
 }
@@ -175,14 +175,17 @@ pub fn RegexBuilder::case_insensitive(
   self : RegexBuilder,
   yes : Bool,
 ) -> RegexBuilder {
-  self.options.syntaxc = { ..self.options.syntaxc, case_insensitive: yes }
+  self.options.syntaxc = { ..self.options.syntaxc, case_insensitive: yes, }
   self
 }
 
 ///|
 /// Enable multi-line regex
-pub fn RegexBuilder::multi_line(self : RegexBuilder, yes : Bool) -> RegexBuilder {
-  self.options.syntaxc = { ..self.options.syntaxc, multi_line: yes }
+pub fn RegexBuilder::multi_line(
+  self : RegexBuilder,
+  yes : Bool,
+) -> RegexBuilder {
+  self.options.syntaxc = { ..self.options.syntaxc, multi_line: yes, }
   self
 }
 
@@ -192,7 +195,7 @@ pub fn RegexBuilder::ignore_whitespace(
   self : RegexBuilder,
   yes : Bool,
 ) -> RegexBuilder {
-  self.options.syntaxc = { ..self.options.syntaxc, ignore_whitespace: yes }
+  self.options.syntaxc = { ..self.options.syntaxc, ignore_whitespace: yes, }
   self
 }
 
@@ -204,7 +207,7 @@ pub fn RegexBuilder::dot_matches_new_line(
   self : RegexBuilder,
   yes : Bool,
 ) -> RegexBuilder {
-  self.options.syntaxc = { ..self.options.syntaxc, dot_matches_new_line: yes }
+  self.options.syntaxc = { ..self.options.syntaxc, dot_matches_new_line: yes, }
   self
 }
 
@@ -216,7 +219,7 @@ pub fn RegexBuilder::verbose_mode(
   self : RegexBuilder,
   yes : Bool,
 ) -> RegexBuilder {
-  self.options.syntaxc = { ..self.options.syntaxc, ignore_whitespace: yes }
+  self.options.syntaxc = { ..self.options.syntaxc, ignore_whitespace: yes, }
   self
 }
 
@@ -226,7 +229,7 @@ pub fn RegexBuilder::unicode_mode(
   self : RegexBuilder,
   yes : Bool,
 ) -> RegexBuilder {
-  self.options.syntaxc = { ..self.options.syntaxc, unicode: yes }
+  self.options.syntaxc = { ..self.options.syntaxc, unicode: yes, }
   self
 }
 
@@ -301,6 +304,12 @@ priv enum RegexImpl {
 }
 
 ///|
+/// Returns the original regular expression.
+pub fn Regex::to_string(self : Regex) -> String {
+  self.as_str()
+}
+
+///|
 /// Shows the original regular expression.
 pub impl Show for Regex with fn output(self, logger) {
   logger.write_string(self.as_str())
@@ -318,7 +327,10 @@ pub fn Regex::new(re : String) -> Regex raise FancyError {
 
 ///|
 fn Regex::new_options(options : RegexOptions) -> Regex raise FancyError {
-  let tree = Expr::parse_tree_with_flags(options.pattern, options.compute_flags())
+  let tree = Expr::parse_tree_with_flags(
+    options.pattern,
+    options.compute_flags(),
+  )
 
   // try to optimize the expression tree
   let requires_capture_group_fixup = optimize(tree)
@@ -391,7 +403,7 @@ pub fn Regex::find_iter(self : Regex, text : String) -> Matches {
 ///|
 /// `find_iter` on a reusable `Text`.
 pub fn Regex::find_iter_text(self : Regex, text : Text) -> Matches {
-  { re: self, text, last_end: 0, last_match: None }
+  { re: self, text, last_end: 0, last_match: None, }
 }
 
 ///|
@@ -467,14 +479,17 @@ pub fn Regex::captures_iter(self : Regex, text : String) -> CaptureMatches {
 ///|
 /// `captures_iter` on a reusable `Text`.
 pub fn Regex::captures_iter_text(self : Regex, text : Text) -> CaptureMatches {
-  { inner: self.find_iter_text(text) }
+  { inner: self.find_iter_text(text), }
 }
 
 ///|
 /// Returns the capture groups for the first match in `text`.
 ///
 /// If no match is found, then `None` is returned.
-pub fn Regex::captures(self : Regex, text : String) -> Captures? raise FancyError {
+pub fn Regex::captures(
+  self : Regex,
+  text : String,
+) -> Captures? raise FancyError {
   self.captures_from_pos(text, 0)
 }
 
@@ -518,7 +533,7 @@ fn Regex::captures_from_char_pos(
       if inner.search_slots(text.hay, pos, anchored=false, slots) {
         let skip = if explicit_capture_group_0 { 2 } else { 0 }
         let saves = Array::makei(slots.length() - skip, i => slots[i + skip])
-        Some({ text, saves, named_groups })
+        Some({ text, saves, named_groups, })
       } else {
         None
       }
@@ -532,7 +547,7 @@ fn Regex::captures_from_char_pos(
             saves[i] = -1
           }
         }
-        { text, saves, named_groups }
+        { text, saves, named_groups, }
       })
     }
   }
@@ -589,7 +604,11 @@ pub fn Regex::replace(self : Regex, text : String, rep : Replacer) -> String {
 ///|
 /// Replaces all non-overlapping matches in `text` with the replacement
 /// provided. This is the same as calling `replacen` with `limit` set to `0`.
-pub fn Regex::replace_all(self : Regex, text : String, rep : Replacer) -> String {
+pub fn Regex::replace_all(
+  self : Regex,
+  text : String,
+  rep : Replacer,
+) -> String {
   self.replacen(text, 0, rep)
 }
 
@@ -681,7 +700,7 @@ pub fn Regex::try_replacen(
 /// *aren't* matched by the regex.
 pub fn Regex::split(self : Regex, target : String) -> Split {
   let text = Text::new(target)
-  { matches: self.find_iter_text(text), next_start: 0, target: text }
+  { matches: self.find_iter_text(text), next_start: 0, target: text, }
 }
 
 ///|
@@ -689,7 +708,7 @@ pub fn Regex::split(self : Regex, target : String) -> Split {
 ///
 /// The `N`th substring is the remaining part of the target.
 pub fn Regex::splitn(self : Regex, target : String, limit : Int) -> SplitN {
-  { splits: self.split(target), limit }
+  { splits: self.split(target), limit, }
 }
 
 ///|
@@ -702,7 +721,7 @@ pub struct Match {
 
 ///|
 fn Match::new(text : Text, start : Int, end : Int) -> Match {
-  { text, start_char: start, end_char: end }
+  { text, start_char: start, end_char: end, }
 }
 
 ///|
@@ -786,11 +805,13 @@ pub fn Matches::next(self : Matches) -> Result[Match, FancyError]? {
   } else {
     0
   }
-  let mat = self.re.find_from_pos_with_option_flags(
+  let mat = try
+    self.re.find_from_pos_with_option_flags(
       self.text,
       self.last_end,
       option_flags,
-    ) catch {
+    )
+  catch {
     error => {
       // Stop on first error: If an error is encountered, return it, and set the "last match position"
       // to the string length, so that the next next() call will return None, to prevent an infinite loop.
@@ -845,13 +866,15 @@ pub fn CaptureMatches::regex(self : CaptureMatches) -> Regex {
 ///|
 /// Adapted from the `regex` crate. Calls `captures_from_pos` repeatedly.
 /// Ignores empty matches immediately after a match.
-pub fn CaptureMatches::next(self : CaptureMatches) -> Result[Captures, FancyError]? {
+pub fn CaptureMatches::next(
+  self : CaptureMatches,
+) -> Result[Captures, FancyError]? {
   let m = self.inner
   let len = m.text.hay.char_len()
   if m.last_end > len {
     return None
   }
-  let captures = m.re.captures_from_char_pos(m.text, m.last_end) catch {
+  let captures = try m.re.captures_from_char_pos(m.text, m.last_end) catch {
     error => {
       // Stop on first error: If an error is encountered, return it, and set the "last match position"
       // to the string length, so that the next next() call will return None, to prevent an infinite loop.
@@ -908,7 +931,7 @@ pub fn Captures::get(self : Captures, i : Int) -> Match? {
     return None
   }
   let hi = self.saves[slot + 1]
-  Some({ text: self.text, start_char: lo, end_char: hi })
+  Some({ text: self.text, start_char: lo, end_char: hi, })
 }
 
 ///|
@@ -951,12 +974,14 @@ pub fn Captures::expand(
 /// regex. The first capture corresponds to the whole match.
 pub fn Captures::iter(self : Captures) -> Iter[Match?] {
   let mut i = 0
-  Iter::new(() => if i < self.len() {
-    let result = self.get(i)
-    i += 1
-    Some(result)
-  } else {
-    None
+  Iter::new(() => {
+    if i < self.len() {
+      let result = self.get(i)
+      i += 1
+      Some(result)
+    } else {
+      None
+    }
   })
 }
 

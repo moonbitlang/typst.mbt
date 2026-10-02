@@ -11,7 +11,7 @@ priv struct VMBuilder {
 
 ///|
 fn VMBuilder::new(max_group : Int) -> VMBuilder {
-  { prog: [], n_saves: max_group * 2 }
+  { prog: [], n_saves: max_group * 2, }
 }
 
 ///|
@@ -88,11 +88,15 @@ priv struct Compiler {
 
 ///|
 fn Compiler::new(max_group : Int) -> Compiler {
-  { b: VMBuilder::new(max_group), options: RegexOptions::default() }
+  { b: VMBuilder::new(max_group), options: RegexOptions::default(), }
 }
 
 ///|
-fn Compiler::visit(self : Compiler, info : Info, hard : Bool) -> Unit raise FancyError {
+fn Compiler::visit(
+  self : Compiler,
+  info : Info,
+  hard : Bool,
+) -> Unit raise FancyError {
   if !hard && !info.hard {
     // easy case, delegate entire subexpr
     return self.compile_delegate(info)
@@ -110,10 +114,9 @@ fn Compiler::visit(self : Compiler, info : Info, hard : Bool) -> Unit raise Fanc
     Concat(_) => self.compile_concat(info, hard)
     Alt(_) => {
       let count = info.children.length()
-      self.compile_alt(count, (compiler, i) => compiler.visit(
-        info.children[i],
-        hard,
-      ))
+      self.compile_alt(count, (compiler, i) => {
+        compiler.visit(info.children[i], hard)
+      })
     }
     Group(_) => {
       let group = info.start_group
@@ -140,10 +143,9 @@ fn Compiler::visit(self : Compiler, info : Info, hard : Bool) -> Unit raise Fanc
     KeepOut => self.b.add(Save(0))
     ContinueFromPreviousMatchEnd => self.b.add(ContinueFromPreviousMatchEnd)
     Conditional(_) =>
-      self.compile_conditional((compiler, i) => compiler.visit(
-        info.children[i],
-        hard,
-      ))
+      self.compile_conditional((compiler, i) => {
+        compiler.visit(info.children[i], hard)
+      })
     SubroutineCall(_) =>
       raise FancyError::CompileError(FeatureNotYetSupported("Subroutine Call"))
     UnresolvedNamedSubroutineCall(_) => abort("unreachable")
@@ -424,7 +426,10 @@ fn Compiler::compile_delegates(
 }
 
 ///|
-fn Compiler::compile_delegate(self : Compiler, info : Info) -> Unit raise FancyError {
+fn Compiler::compile_delegate(
+  self : Compiler,
+  info : Info,
+) -> Unit raise FancyError {
   let insn = if info.is_literal() {
     let val = StringBuilder()
     info.push_literal(val)
@@ -452,7 +457,6 @@ fn compile_inner(
     unicode=syntaxc.unicode,
   ) catch {
     @regex.RegexError(msg) => raise FancyError::CompileError(InnerError(msg))
-    _ => raise FancyError::CompileError(InnerError(""))
   }
 }
 
@@ -503,7 +507,10 @@ fn DelegateBuilder::new() -> DelegateBuilder {
 }
 
 ///|
-fn DelegateBuilder::push(self : DelegateBuilder, info : Info) -> DelegateBuilder {
+fn DelegateBuilder::push(
+  self : DelegateBuilder,
+  info : Info,
+) -> DelegateBuilder {
   // TODO: might want to detect case of a group with no captures
   //  inside, so we can run find() instead of captures()
   self.min_size = sat_add(self.min_size, info.min_size)
