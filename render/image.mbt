@@ -15,16 +15,16 @@ fn render_image(
   // For better-looking output, resize `image` to its final size before
   // painting it to `canvas`. For the math, see:
   // https://github.com/typst/typst/issues/1404#issuecomment-1598374652
-  let theta = @path.atan2f(-ts.kx, ts.sx)
+  let theta = musl_atan2f(-ts.kx, ts.sx)
 
   // To avoid division by 0, choose the one of { sin, cos } that is
   // further from 0.
-  let prefer_sin = @path.fabs(@path.sinf(theta)) > (0.70710678118654752440 : Float)
+  let prefer_sin = @path.fabs(musl_sinf(theta)) > (0.70710678118654752440 : Float)
   let scale_x = @path.fabs(
     if prefer_sin {
-      ts.kx / @path.sinf(theta)
+      ts.kx / musl_sinf(theta)
     } else {
-      ts.sx / @path.cosf(theta)
+      ts.sx / musl_cosf(theta)
     },
   )
   let aspect = image.width().to_float() / image.height().to_float()
