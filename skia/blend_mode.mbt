@@ -89,17 +89,17 @@ fn BlendMode::should_pre_scale_coverage(self : BlendMode) -> Bool {
   // SkBlendMode_SupportsCoverageAsAlpha().
   self
   is (Destination
-   // d              --> no sa term, ok!
+  // d              --> no sa term, ok!
   | DestinationOver
-   // d + s*inv(da)  --> no sa term, ok!
+  // d + s*inv(da)  --> no sa term, ok!
   | Plus
-   // clamp(s+d)     --> no sa term, ok!
+  // clamp(s+d)     --> no sa term, ok!
   | DestinationOut
-   // d * inv(sa)
+  // d * inv(sa)
   | SourceAtop
-   // s*da + d*inv(sa)
+  // s*da + d*inv(sa)
   | SourceOver
-   // s + d*inv(sa)
+  // s + d*inv(sa)
   | Xor) // s*inv(da) + d*inv(sa)
 }
 

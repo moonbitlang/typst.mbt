@@ -254,7 +254,7 @@ fn data_len_for_size(size : @path.IntSize) -> Int? {
 ///
 /// `offset` is the index of the region's top-left pixel in `pixels` (RGBA
 /// pixmaps) or `bytes` (masks); `real_width` is the row stride.
-struct SubPixmapMut {
+priv struct SubPixmapMut {
   pixels : FixedArray[UInt]
   bytes : FixedArray[Byte]
   offset : Int

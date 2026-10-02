@@ -147,7 +147,7 @@ fn Stage::has_lowp(self : Stage) -> Bool {
 }
 
 ///|
-struct AAMaskCtx {
+priv struct AAMaskCtx {
   pixels : FixedArray[Int] // [u8; 2]
   stride : Int // can be zero
   shift : Int // mask offset/position in pixmap coordinates
@@ -177,7 +177,7 @@ fn AAMaskCtx::copy_at_xy(
 }
 
 ///|
-struct MaskCtx {
+priv struct MaskCtx {
   data : FixedArray[Byte]
   offset : Int
   real_width : Int
@@ -194,14 +194,14 @@ fn MaskCtx::offset_of(self : MaskCtx, dx : Int, dy : Int) -> Int {
 }
 
 ///|
-struct SamplerCtx {
+priv struct SamplerCtx {
   mut spread_mode : SpreadMode
   mut inv_width : Float
   mut inv_height : Float
 }
 
 ///|
-struct UniformColorCtx {
+priv struct UniformColorCtx {
   mut r : Float
   mut g : Float
   mut b : Float
@@ -235,13 +235,13 @@ fn GradientColor::from_color(c : Color) -> GradientColor {
 }
 
 ///|
-struct EvenlySpaced2StopGradientCtx {
+priv struct EvenlySpaced2StopGradientCtx {
   mut factor : GradientColor
   mut bias : GradientColor
 }
 
 ///|
-struct GradientCtx {
+priv struct GradientCtx {
   mut len : Int
   factors : Array[GradientColor]
   biases : Array[GradientColor]
@@ -263,7 +263,7 @@ fn GradientCtx::push_const_color(
 }
 
 ///|
-struct TwoPointConicalGradientCtx {
+priv struct TwoPointConicalGradientCtx {
   // This context is used only in highp, where we use Tx4.
   mask : FixedArray[UInt] // u32x8
   mut p0 : Float
@@ -271,13 +271,13 @@ struct TwoPointConicalGradientCtx {
 }
 
 ///|
-struct TileCtx {
+priv struct TileCtx {
   mut scale : Float
   mut inv_scale : Float // cache of 1/scale
 }
 
 ///|
-struct Context {
+priv struct Context {
   mut current_coverage : Float
   sampler : SamplerCtx
   uniform_color : UniformColorCtx
@@ -310,7 +310,7 @@ fn Context::default() -> Context {
 }
 
 ///|
-struct RasterPipelineBuilder {
+priv struct RasterPipelineBuilder {
   stages : Array[Stage]
   mut force_hq_pipeline : Bool
   ctx : Context
@@ -385,7 +385,7 @@ fn RasterPipelineBuilder::compile(
 }
 
 ///|
-struct RasterPipeline {
+priv struct RasterPipeline {
   lowp : Bool
   stages : Array[Stage]
   ctx : Context

@@ -33,7 +33,7 @@ fn bundle_options() -> @bundle.BundleOptions {
 fn export_png(doc : @layout.PagedDocument) -> Bytes raise @library.SourceError {
   let options : @render.RenderOptions = {
     render_bleed: false,
-    format: { ppi: Some(72.0) },
+    format: { ppi: Some(72.0), },
   }
   let options = options.resolve(@render.PngFormatOptions::get(doc.options()))
   let pixmap = @render.render(doc.pages()[0], options) catch {

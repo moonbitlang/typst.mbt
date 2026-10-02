@@ -19,7 +19,8 @@ fn render_image(
 
   // To avoid division by 0, choose the one of { sin, cos } that is
   // further from 0.
-  let prefer_sin = @path.fabs(musl_sinf(theta)) > (0.70710678118654752440 : Float)
+  let prefer_sin = @path.fabs(musl_sinf(theta)) >
+    (0.70710678118654752440 : Float)
   let scale_x = @path.fabs(
     if prefer_sin {
       ts.kx / musl_sinf(theta)
@@ -51,7 +52,11 @@ fn render_image(
 
 ///|
 /// Prepare a texture for an image at a scaled size.
-fn build_texture(image : @library.Image, w : UInt, h : UInt) -> @skia.Pixmap? raise RenderPanic {
+fn build_texture(
+  image : @library.Image,
+  w : UInt,
+  h : UInt,
+) -> @skia.Pixmap? raise RenderPanic {
   match image.kind() {
     Raster(raster) => {
       guard @skia.Pixmap::new(w, h) is Some(texture) else { return None }
@@ -59,7 +64,12 @@ fn build_texture(image : @library.Image, w : UInt, h : UInt) -> @skia.Pixmap? ra
       guard raster.dynamic() is Some(dynamic) else { return None }
       let rgba = if w == dynamic.width && h == dynamic.height {
         // Small optimization to not allocate in case image is not resized.
-        @codecs.to_rgba8(dynamic.width, dynamic.height, dynamic.color, dynamic.buf)
+        @codecs.to_rgba8(
+          dynamic.width,
+          dynamic.height,
+          dynamic.color,
+          dynamic.buf,
+        )
       } else {
         let upscale = w > dynamic.width
         let filter : @codecs.FilterType = match image.scaling() {

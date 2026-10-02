@@ -3,6 +3,7 @@ package "moonbitlang/typst/skia"
 
 import {
   "moonbitlang/core/debug",
+  "moonbitlang/core/ref",
   "moonbitlang/typst/codecs",
   "moonbitlang/typst/skia/path",
 }
@@ -28,17 +29,11 @@ pub let premultiplied_color_u8_transparent : PremultipliedColorU8
 
 pub fn premultiply_u8(Int, Int) -> Int
 
+pub let trace_hook : @ref.Ref[((String) -> Unit)?]
+
 // Errors
 
 // Types and methods
-type AAMaskCtx
-
-type AlphaRuns
-
-type AntiHairBlitter
-
-type BasicEdgeBuilder
-
 pub(all) enum BlendMode {
   Clear
   Source
@@ -71,10 +66,6 @@ pub(all) enum BlendMode {
   Luminosity
 } derive(Eq, @debug.Debug)
 pub impl Default for BlendMode
-
-type BlitMask
-
-type BlitterKind
 
 pub(all) struct Color {
   r : Float
@@ -114,21 +105,7 @@ pub fn ColorU8::red(Self) -> Int
 
 type Combine derive(Eq)
 
-type Context
-
-type Cubic64
-
-type DrawTiler
-
-type Edge
-
-type EdgeClipper
-
-type EdgeClipperIter
-
 type EdgeKind derive(Eq)
-
-type EvenlySpaced2StopGradientCtx
 
 pub(all) enum FillRule {
   Winding
@@ -141,8 +118,6 @@ pub(all) enum FilterQuality {
   Bilinear
   Bicubic
 } derive(Eq, @debug.Debug)
-
-type FixedRect
 
 type FocalData derive(Eq)
 
@@ -157,8 +132,6 @@ pub(all) struct Gradient {
 
 type GradientColor derive(Eq)
 
-type GradientCtx
-
 pub(all) struct GradientStop {
   position : Float
   color : Color
@@ -167,14 +140,10 @@ pub fn GradientStop::new(Float, Color) -> Self
 
 type GradientType
 
-type HighpPipeline
-
 pub(all) struct LinearGradient {
   base : Gradient
 }
 pub fn LinearGradient::new(@path.Point, @path.Point, Array[GradientStop], SpreadMode, @path.Transform) -> Shader?
-
-type LowpPipeline
 
 pub struct Mask {
   data : FixedArray[Byte]
@@ -193,8 +162,6 @@ pub fn Mask::new(UInt, UInt) -> Self?
 pub fn Mask::size(Self) -> @path.IntSize
 pub fn Mask::width(Self) -> Int
 
-type MaskCtx
-
 pub(all) enum MaskType {
   Alpha
   Luminance
@@ -212,10 +179,6 @@ pub fn Paint::is_solid_color(Self) -> Bool
 pub fn Paint::set_color(Self, Color) -> Unit
 pub fn Paint::set_color_rgba8(Self, Int, Int, Int, Int) -> Unit
 pub impl Default for Paint
-
-type PathEdge
-
-type PathEdgeIter
 
 pub(all) struct Pattern {
   pixmap : Pixmap
@@ -289,16 +252,6 @@ pub(all) struct RadialGradient {
 }
 pub fn RadialGradient::new(@path.Point, Float, @path.Point, Float, Array[GradientStop], SpreadMode, @path.Transform) -> Shader?
 
-type RasterPipeline
-
-type RasterPipelineBlitter
-
-type RasterPipelineBuilder
-
-type RectClipBlitter
-
-type SamplerCtx
-
 pub struct ScreenIntRect {
   x : Int
   y : Int
@@ -332,8 +285,6 @@ pub fn Shader::apply_opacity(Self, Float) -> Self
 pub fn Shader::is_opaque(Self) -> Bool
 pub fn Shader::transform(Self, @path.Transform) -> Self
 
-type ShiftedIntRect
-
 pub(all) enum SpreadMode {
   Pad
   Reflect
@@ -343,12 +294,6 @@ pub impl Default for SpreadMode
 
 type Stage derive(Eq, @debug.Debug)
 
-type SubMaskRef
-
-type SubPixmapMut
-
-type SuperBlitter
-
 pub(all) struct SweepGradient {
   base : Gradient
   t0 : Float
@@ -356,13 +301,6 @@ pub(all) struct SweepGradient {
 }
 pub fn SweepGradient::new(@path.Point, Float, Float, Array[GradientStop], SpreadMode, @path.Transform) -> Shader?
 
-type TileCtx
-
-type TwoPointConicalGradientCtx
-
-type UniformColorCtx
-
 // Type aliases
 
 // Traits
-trait Blitter

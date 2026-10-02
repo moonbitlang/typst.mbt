@@ -15,7 +15,7 @@ enum EdgeKind {
 } derive(Eq)
 
 ///|
-struct Edge {
+priv struct Edge {
   kind : EdgeKind
   // LineEdge. Imitate a linked list.
   mut prev : Int

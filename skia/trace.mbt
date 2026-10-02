@@ -20,7 +20,9 @@ fn hex32(x : UInt) -> String {
   let digits = "0123456789abcdef"
   let sb = StringBuilder()
   for i = 7; i >= 0; i = i - 1 {
-    sb.write_char(digits[((x >> (i * 4)) & 0xF).reinterpret_as_int()].unsafe_to_char())
+    sb.write_char(
+      digits[((x >> (i * 4)) & 0xF).reinterpret_as_int()].unsafe_to_char(),
+    )
   }
   sb.to_string()
 }
@@ -77,7 +79,8 @@ fn trace_paint(p : Paint) -> String {
 ///|
 fn trace_mask(m : Mask?) -> String {
   match m {
-    Some(m) => "mask \{hex64(trace_fnv(Bytes::makei(m.data.length(), i => m.data[i])))}"
+    Some(m) =>
+      "mask \{hex64(trace_fnv(Bytes::makei(m.data.length(), i => m.data[i])))}"
     None => "nomask"
   }
 }

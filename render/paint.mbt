@@ -7,7 +7,11 @@
 priv struct PaintSampler((UInt, UInt) -> UInt raise RenderPanic)
 
 ///|
-fn PaintSampler::sample(self : PaintSampler, x : UInt, y : UInt) -> UInt raise RenderPanic {
+fn PaintSampler::sample(
+  self : PaintSampler,
+  x : UInt,
+  y : UInt,
+) -> UInt raise RenderPanic {
   (self.0)(x, y)
 }
 
@@ -46,9 +50,9 @@ fn gradient_sampler(
     )
 
     // Sample the gradient
-    to_sk_color_u8(gradient_sample_at(gradient, point.x, point.y, cw, ch).to_process())
-    .premultiply()
-    .0
+    to_sk_color_u8(
+      gradient_sample_at(gradient, point.x, point.y, cw, ch).to_process(),
+    ).premultiply().0
   })
 }
 
@@ -109,12 +113,21 @@ fn gradient_pixmap(
 ) -> @skia.Pixmap raise RenderPanic {
   let (offset, scale) = match gradient_map {
     Some(m) => m
-    None => (@library.Point::zero(), @library.Axes::splat(@library.Ratio::one()))
+    None =>
+      (@library.Point::zero(), @library.Axes::splat(@library.Ratio::one()))
   }
   let pixmap = must(
     @skia.Pixmap::new(
-      if width > 1 { width } else { 1 },
-      if height > 1 { height } else { 1 },
+      if width > 1 {
+        width
+      } else {
+        1
+      },
+      if height > 1 {
+        height
+      } else {
+        1
+      },
     ),
   )
   let pixels = pixmap.pixels()
@@ -137,8 +150,7 @@ fn gradient_pixmap(
       )
       pixels[y * w + x] = to_sk_color(color.to_process())
         .premultiply()
-        .to_color_u8()
-        .0
+        .to_color_u8().0
     }
   }
   pixmap
@@ -181,7 +193,7 @@ fn to_sk_paint(
           }
           Some(
             (
-              @library.Point::{ x: px.times(ppp), y: py.times(ppp) },
+              @library.Point::{ x: px.times(ppp), y: py.times(ppp), },
               @library.Axes::{
                 x: @library.Ratio::new(rect.x.signum()),
                 y: @library.Ratio::new(rect.y.signum()),
@@ -193,8 +205,7 @@ fn to_sk_paint(
       }
       (bbox.size(), Some(fill_transform), gradient_map)
     }
-    None =>
-      (@library.Axes::splat(@library.Abs::zero()), None, None)
+    None => (@library.Axes::splat(@library.Abs::zero()), None, None)
   }
   let sk_paint = @skia.Paint::default()
   match paint {
@@ -226,8 +237,16 @@ fn to_sk_paint(
       let min = @path.f32_to_u32(@path.ceilf(state.pixel_per_pt))
       let pixmap = gradient_pixmap(
         gradient,
-        if width > min { width } else { min },
-        if height > min { height } else { min },
+        if width > min {
+          width
+        } else {
+          min
+        },
+        if height > min {
+          height
+        } else {
+          min
+        },
         gradient_map,
       )
 
@@ -256,7 +275,7 @@ fn to_sk_paint(
       let base_offset : @library.Point = match relative {
         Self_ =>
           match gradient_map {
-            Some((offset, _)) => { x: -offset.x, y: -offset.y }
+            Some((offset, _)) => { x: -offset.x, y: -offset.y, }
             None => @library.Point::zero()
           }
         Parent => @library.Point::zero()
@@ -312,7 +331,10 @@ fn f32_to_u8_stimulus(x : Float) -> Int {
 }
 
 ///|
-fn render_tiling_frame(state : State, tilings : @library.Tiling) -> @skia.Pixmap raise RenderPanic {
+fn render_tiling_frame(
+  state : State,
+  tilings : @library.Tiling,
+) -> @skia.Pixmap raise RenderPanic {
   let size = tilings.size.add_size(tilings.spacing)
   let canvas = must(
     @skia.Pixmap::new(
@@ -351,7 +373,8 @@ fn gradient_sample_at(
       let sin = angle.sin()
       let cos = angle.cos()
       let factor = sin.abs() + cos.abs()
-      if angle.to_rad() > @math.PI / 2.0 && angle.to_rad() < 3.0 * @math.PI / 2.0 {
+      if angle.to_rad() > @math.PI / 2.0 &&
+        angle.to_rad() < 3.0 * @math.PI / 2.0 {
         x = (1.0 : Float) - x
       }
       if angle.to_rad() > @math.PI {
@@ -401,7 +424,9 @@ fn gradient_sample_at(
         @library.Angle::rad(@math.PI).to_raw() +
         sample_angle.to_raw() -
         conic.angle.to_raw(),
-      ).normalized().to_rad() /
+      )
+      .normalized()
+      .to_rad() /
       (2.0 * @math.PI)
     }
   }

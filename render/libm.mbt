@@ -45,7 +45,7 @@ fn k_cosf(x : Double) -> Float {
 fn musl_sinf(x : Float) -> Float {
   let x64 = x.to_double()
   let mut ix = x.reinterpret_as_uint()
-  let sign = (ix >> 31) != 0
+  let sign = ix >> 31 != 0
   ix = ix & 0x7fffffff
   if ix <= 0x3f490fda {
     // |x| ~<= pi/4
@@ -88,7 +88,7 @@ fn musl_sinf(x : Float) -> Float {
 fn musl_cosf(x : Float) -> Float {
   let x64 = x.to_double()
   let mut ix = x.reinterpret_as_uint()
-  let sign = (ix >> 31) != 0
+  let sign = ix >> 31 != 0
   ix = ix & 0x7fffffff
   if ix <= 0x3f490fda {
     // |x| ~<= pi/4
@@ -145,7 +145,7 @@ fn musl_atanf(x : Float) -> Float {
   let mut x = x
   let x1p_120 = Float::reinterpret_from_uint(0x03800000)
   let mut ix = x.reinterpret_as_uint()
-  let sign = (ix >> 31) != 0
+  let sign = ix >> 31 != 0
   ix = ix & 0x7fffffff
   if ix >= 0x4c800000 {
     // if |x| >= 2**26

@@ -1,0 +1,48 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/render"
+
+import {
+  "moonbitlang/core/debug",
+  "moonbitlang/core/ref",
+  "moonbitlang/typst/layout",
+  "moonbitlang/typst/library",
+  "moonbitlang/typst/skia",
+}
+
+// Values
+pub fn render(@layout.Page, CompleteRenderOptions) -> @skia.Pixmap raise RenderPanic
+
+pub fn render_merged(@layout.PagedDocument, RenderOptions, @library.Abs, @library.Color?) -> @skia.Pixmap raise RenderPanic
+
+pub let svg_image_renderer : @ref.Ref[((@library.SvgImage, @skia.Pixmap, UInt, UInt) -> Unit)?]
+
+// Errors
+pub suberror RenderPanic {
+  RenderPanic(String)
+} derive(@debug.Debug)
+
+// Types and methods
+pub(all) struct CompleteRenderOptions {
+  render_bleed : Bool
+  format : PngFormatOptions
+} derive(Eq)
+
+pub(all) struct PartialPngFormatOptions {
+  ppi : Double?
+} derive(Default, Eq)
+pub fn PartialPngFormatOptions::resolve(Self, PngFormatOptions) -> PngFormatOptions
+
+pub(all) struct PngFormatOptions {
+  ppi : Double
+} derive(Eq)
+pub fn PngFormatOptions::get(@library.DocumentFormatOptions) -> Self
+
+pub(all) struct RenderOptions {
+  render_bleed : Bool
+  format : PartialPngFormatOptions
+} derive(Default, Eq)
+pub fn RenderOptions::resolve(Self, PngFormatOptions) -> CompleteRenderOptions
+
+// Type aliases
+
+// Traits

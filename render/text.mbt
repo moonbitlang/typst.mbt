@@ -2,7 +2,11 @@
 
 ///|
 /// Render a text run into the canvas.
-fn render_text(canvas : @skia.Pixmap, state : State, text : @library.TextItem) -> Unit raise RenderPanic {
+fn render_text(
+  canvas : @skia.Pixmap,
+  state : State,
+  text : @library.TextItem,
+) -> Unit raise RenderPanic {
   let mut x = @library.Abs::zero()
   let mut y = @library.Abs::zero()
   for glyph in text.glyphs {
@@ -10,14 +14,14 @@ fn render_text(canvas : @skia.Pixmap, state : State, text : @library.TextItem) -
     let x_offset = x + glyph.x_offset.at(text.size)
     let y_offset = y + glyph.y_offset.at(text.size)
     if @library.should_outline(text.font, id) {
-      let state = state.pre_translate({ x: x_offset, y: -y_offset })
+      let state = state.pre_translate({ x: x_offset, y: -y_offset, })
       render_outline_glyph(canvas, state, text, id)
     } else {
       let upem = text.font.units_per_em()
       let text_scale = text.size.div_by(upem)
       let state = state
-        .pre_translate({ x: x_offset, y: -y_offset })
-        .pre_scale({ x: text_scale, y: text_scale })
+        .pre_translate({ x: x_offset, y: -y_offset, })
+        .pre_scale({ x: text_scale, y: text_scale, })
       if @library.glyph_frame(text.font, id) is Some(frame) {
         render_frame(canvas, state, frame.to_frame())
       }
@@ -222,7 +226,10 @@ fn write_bitmap(
         if cov == 0 {
           continue
         }
-        let color = sampler.sample(x.reinterpret_as_uint(), y.reinterpret_as_uint())
+        let color = sampler.sample(
+          x.reinterpret_as_uint(),
+          y.reinterpret_as_uint(),
+        )
         let pi = y * cw + x
         // Fast path if color is opaque.
         if cov == 255 && (color & 0xFF) == 0xFF {

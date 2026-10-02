@@ -138,7 +138,7 @@ fn harness_render(
   let gap = @library.Abs::pt(1.0)
   let ppi = pixel_per_pt * 72.0
   let opts : @render.RenderOptions = {
-    format: { ppi: Some(ppi.to_double()) },
+    format: { ppi: Some(ppi.to_double()), },
     render_bleed: false,
   }
   let pixmap = @render.render_merged(
@@ -157,9 +157,9 @@ fn harness_render(
     )
     render_links(pixmap, ts, page.frame)
     y += @skpath.fmax(
-      @skpath.roundf(pixel_per_pt * page.frame.height().to_pt().to_float()),
-      1.0,
-    ) +
+        @skpath.roundf(pixel_per_pt * page.frame.height().to_pt().to_float()),
+        1.0,
+      ) +
       gap
   }
   Some(pixmap)
@@ -174,7 +174,10 @@ fn render_links(
 ) -> Unit {
   for entry in frame.items() {
     let (pos, item) = entry
-    let ts = ts.pre_translate(pos.x.to_pt().to_float(), pos.y.to_pt().to_float())
+    let ts = ts.pre_translate(
+      pos.x.to_pt().to_float(),
+      pos.y.to_pt().to_float(),
+    )
     match item {
       Group(group) => {
         let ts = ts.pre_concat(harness_sk_transform(group.transform))

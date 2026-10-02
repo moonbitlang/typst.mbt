@@ -4,7 +4,7 @@
 let max_verbs : Int = 18
 
 ///|
-struct EdgeClipper {
+priv struct EdgeClipper {
   clip : @path.Rect
   can_cull_to_the_right : Bool
   edges : Array[PathEdge]
@@ -311,7 +311,7 @@ fn EdgeClipper::push_cubic(
 }
 
 ///|
-struct EdgeClipperIter {
+priv struct EdgeClipperIter {
   edge_iter : PathEdgeIter
   clip : @path.Rect
   can_cull_to_the_right : Bool

@@ -37,7 +37,7 @@ pub fn PartialPngFormatOptions::resolve(
   self : PartialPngFormatOptions,
   default : PngFormatOptions,
 ) -> PngFormatOptions {
-  { ppi: self.ppi.unwrap_or(default.ppi) }
+  { ppi: self.ppi.unwrap_or(default.ppi), }
 }
 
 ///|
@@ -66,7 +66,7 @@ pub fn RenderOptions::resolve(
   self : RenderOptions,
   doc : PngFormatOptions,
 ) -> CompleteRenderOptions {
-  { render_bleed: self.render_bleed, format: self.format.resolve(doc) }
+  { render_bleed: self.render_bleed, format: self.format.resolve(doc), }
 }
 
 ///|
@@ -82,7 +82,10 @@ pub let svg_image_renderer : Ref[
 ///
 /// This renders the page at the given number of pixels per inch and returns
 /// the resulting `tiny-skia` pixel buffer.
-pub fn render(page : @layout.Page, opts : CompleteRenderOptions) -> @skia.Pixmap raise RenderPanic {
+pub fn render(
+  page : @layout.Page,
+  opts : CompleteRenderOptions,
+) -> @skia.Pixmap raise RenderPanic {
   let bleed = if opts.render_bleed {
     page.bleed
   } else {
@@ -107,7 +110,7 @@ pub fn render(page : @layout.Page, opts : CompleteRenderOptions) -> @skia.Pixmap
       render_shape(canvas, state, rect)
     }
   }
-  let state = state.pre_translate({ x: bleed.left, y: bleed.top })
+  let state = state.pre_translate({ x: bleed.left, y: bleed.top, })
   render_frame(canvas, state, page.frame)
   canvas
 }
@@ -176,24 +179,30 @@ fn State::new(
   transform : @path.Transform,
   pixel_per_pt : Float,
 ) -> State {
-  { size, transform, container_transform: transform, pixel_per_pt, mask: None }
+  { size, transform, container_transform: transform, pixel_per_pt, mask: None, }
 }
 
 ///|
 /// Pre translate the current item's transform.
 fn State::pre_translate(self : State, pos : @library.Point) -> State {
-  { ..self, transform: self.transform.pre_translate(to_f32(pos.x), to_f32(pos.y)) }
+  {
+    ..self,
+    transform: self.transform.pre_translate(to_f32(pos.x), to_f32(pos.y)),
+  }
 }
 
 ///|
 fn State::pre_scale(self : State, scale : @library.Axes[@library.Abs]) -> State {
-  { ..self, transform: self.transform.pre_scale(to_f32(scale.x), to_f32(scale.y)) }
+  {
+    ..self,
+    transform: self.transform.pre_scale(to_f32(scale.x), to_f32(scale.y)),
+  }
 }
 
 ///|
 /// Pre concat the current item's transform.
 fn State::pre_concat(self : State, transform : @path.Transform) -> State {
-  { ..self, transform: self.transform.pre_concat(transform) }
+  { ..self, transform: self.transform.pre_concat(transform), }
 }
 
 ///|
@@ -201,7 +210,7 @@ fn State::pre_concat(self : State, transform : @path.Transform) -> State {
 ///
 /// If no mask is provided, the parent mask is used.
 fn State::with_mask(self : State, mask : @skia.Mask?) -> State {
-  { ..self, mask: if mask is Some(_) { mask } else { self.mask } }
+  { ..self, mask: if mask is Some(_) { mask } else { self.mask }, }
 }
 
 ///|
@@ -212,8 +221,14 @@ fn State::with_size(self : State, size : @library.Axes[@library.Abs]) -> State {
 
 ///|
 /// Pre concat the container's transform.
-fn State::pre_concat_container(self : State, transform : @path.Transform) -> State {
-  { ..self, container_transform: self.container_transform.pre_concat(transform) }
+fn State::pre_concat_container(
+  self : State,
+  transform : @path.Transform,
+) -> State {
+  {
+    ..self,
+    container_transform: self.container_transform.pre_concat(transform),
+  }
 }
 
 ///|

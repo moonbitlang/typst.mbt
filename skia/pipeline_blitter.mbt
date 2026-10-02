@@ -1,7 +1,7 @@
 // Port of `tiny-skia/src/pipeline/blitter.rs`.
 
 ///|
-struct RasterPipelineBlitter {
+priv struct RasterPipelineBlitter {
   mask : SubMaskRef?
   pixmap_src : Pixmap
   pixmap : SubPixmapMut

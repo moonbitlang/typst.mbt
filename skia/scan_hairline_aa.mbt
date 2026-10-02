@@ -1,7 +1,7 @@
 // Port of `tiny-skia/src/scan/hairline_aa.rs`.
 
 ///|
-struct FixedRect {
+priv struct FixedRect {
   left : Int
   top : Int
   right : Int
@@ -269,7 +269,7 @@ fn anti_hair_line_rgn(
 }
 
 ///|
-enum BlitterKind {
+priv enum BlitterKind {
   HLine
   Horish
   VLine
@@ -519,7 +519,7 @@ fn contribution_64(ordinate : Int) -> Int {
 ///|
 /// The four `AntiHairBlitter` implementations (HLine, Horish, VLine,
 /// Vertish).
-struct AntiHairBlitter {
+priv struct AntiHairBlitter {
   kind : BlitterKind
   blitter : &Blitter
 }
@@ -716,7 +716,7 @@ fn i32_to_alpha(a : Int) -> Int {
 }
 
 ///|
-struct RectClipBlitter {
+priv struct RectClipBlitter {
   blitter : &Blitter
   clip : ScreenIntRect
 }

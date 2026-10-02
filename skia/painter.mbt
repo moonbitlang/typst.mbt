@@ -204,7 +204,13 @@ fn Pixmap::fill_path_impl(
     }
     let paint = paint.clone()
     paint.shader = paint.shader.transform(transform)
-    self.fill_path_impl(path, paint, fill_rule, @path.Transform::identity(), mask)
+    self.fill_path_impl(
+      path,
+      paint,
+      fill_rule,
+      @path.Transform::identity(),
+      mask,
+    )
   }
 }
 
@@ -479,7 +485,7 @@ fn is_too_big_for_math(path : @path.Path) -> Bool {
 }
 
 ///|
-struct DrawTiler {
+priv struct DrawTiler {
   image_width : Int
   image_height : Int
   mut x_offset : Int

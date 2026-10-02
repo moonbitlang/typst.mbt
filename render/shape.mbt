@@ -2,7 +2,11 @@
 
 ///|
 /// Render a geometrical shape into the canvas.
-fn render_shape(canvas : @skia.Pixmap, state : State, shape : @library.Shape) -> Unit raise RenderPanic {
+fn render_shape(
+  canvas : @skia.Pixmap,
+  state : State,
+  shape : @library.Shape,
+) -> Unit raise RenderPanic {
   let ts = state.transform
   let path = match shape.geometry {
     Line(target) => {
@@ -26,9 +30,9 @@ fn render_shape(canvas : @skia.Pixmap, state : State, shape : @library.Shape) ->
         .bind(rect => rect.transform(transform))
         .map(rect => @path.PathBuilder::from_rect(rect))
       } else {
-        @path.Rect::from_xywh(0.0, 0.0, w, h).map(rect => @path.PathBuilder::from_rect(
-          rect,
-        ))
+        @path.Rect::from_xywh(0.0, 0.0, w, h).map(rect => {
+          @path.PathBuilder::from_rect(rect)
+        })
       }
     }
     Curve(curve) => convert_curve(curve)

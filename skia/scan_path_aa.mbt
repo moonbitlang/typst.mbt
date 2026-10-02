@@ -107,7 +107,7 @@ fn scan_path_aa_fill_path_impl(
 }
 
 ///|
-struct SuperBlitter {
+priv struct SuperBlitter {
   // BaseSuperBlitter
   real_blitter : &Blitter
   mut curr_iy : Int

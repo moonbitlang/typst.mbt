@@ -180,7 +180,7 @@ fn Point64::axis_coord(self : Point64, axis : SearchAxis) -> Double {
 let pi64 : Double = 3.141592653589793
 
 ///|
-struct Cubic64 {
+priv struct Cubic64 {
   points : FixedArray[Point64]
 }
 

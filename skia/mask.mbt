@@ -299,7 +299,7 @@ pub fn Mask::clear(self : Mask) -> Unit {
 
 ///|
 /// A view into a mask region.
-struct SubMaskRef {
+priv struct SubMaskRef {
   data : FixedArray[Byte]
   offset : Int
   size : @path.IntSize

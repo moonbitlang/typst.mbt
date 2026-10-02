@@ -5,7 +5,7 @@
 
 ///|
 /// Mask is used to describe alpha bitmaps.
-struct BlitMask {
+priv struct BlitMask {
   image : FixedArray[Int] // [u8; 2]
   bounds : ScreenIntRect
   row_bytes : Int
@@ -18,7 +18,7 @@ struct BlitMask {
 /// An object that implements Blitter contains all the context needed to
 /// generate pixels for the destination and how src/generated pixels map to
 /// the destination.
-trait Blitter {
+priv trait Blitter {
   /// Blits a horizontal run of one or more pixels.
   fn blit_h(Self, x : Int, y : Int, width : Int) -> Unit = _
   /// Blits a horizontal run of antialiased pixels.

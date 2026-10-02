@@ -10,7 +10,7 @@
 let highp_stage_width : Int = 8
 
 ///|
-struct HighpPipeline {
+priv struct HighpPipeline {
   pixmap_src : Pixmap
   pixmap_dst : SubPixmapMut
   ctx : Context

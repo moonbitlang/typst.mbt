@@ -8,7 +8,7 @@
 ///
 /// Sparseness allows us to independently compose several paths into the
 /// same AlphaRuns buffer.
-struct AlphaRuns {
+priv struct AlphaRuns {
   runs : FixedArray[Int]
   alpha : FixedArray[Int]
 }

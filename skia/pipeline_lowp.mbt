@@ -15,7 +15,7 @@
 let lowp_stage_width : Int = 16
 
 ///|
-struct LowpPipeline {
+priv struct LowpPipeline {
   pixmap : SubPixmapMut
   mask_ctx : MaskCtx
   aa_mask_ctx : AAMaskCtx

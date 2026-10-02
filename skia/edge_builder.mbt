@@ -8,7 +8,7 @@ enum Combine {
 } derive(Eq)
 
 ///|
-struct ShiftedIntRect {
+priv struct ShiftedIntRect {
   shifted : ScreenIntRect
   shift : Int
 }
@@ -38,7 +38,7 @@ fn ShiftedIntRect::recover(self : ShiftedIntRect) -> ScreenIntRect {
 }
 
 ///|
-struct BasicEdgeBuilder {
+priv struct BasicEdgeBuilder {
   edges : Array[Edge]
   clip_shift : Int
 }
@@ -236,7 +236,7 @@ fn edge_iter(path : @path.Path) -> PathEdgeIter {
 }
 
 ///|
-enum PathEdge {
+priv enum PathEdge {
   LineTo(@path.Point, @path.Point)
   QuadTo(@path.Point, @path.Point, @path.Point)
   CubicTo(@path.Point, @path.Point, @path.Point, @path.Point)
@@ -246,7 +246,7 @@ enum PathEdge {
 /// Lightweight variant of PathIter that only returns segments (e.g. lines
 /// and quads). Does not return Move or Close. Always "auto-closes" each
 /// contour.
-struct PathEdgeIter {
+priv struct PathEdgeIter {
   path : @path.Path
   mut verb_index : Int
   mut points_index : Int
