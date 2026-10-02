@@ -1,0 +1,26 @@
+import {
+  "moonbitlang/core/encoding/utf8",
+  "moonbitlang/core/math",
+  "moonbitlang/core/buffer",
+  "moonbitlang/core/bigint",
+  "moonbitlang/core/string",
+  "moonbitlang/x/codec/base64",
+  "moonbitlang/typst/data/xml",
+  "moonbitlang/typst/codecs",
+  "moonbitlang/typst/xmlwriter",
+  "moonbitlang/typst/svgtypes",
+  "moonbitlang/typst/simplecss",
+  "moonbitlang/typst/tiny_skia_path",
+  "moonbitlang/typst/otf",
+  "moonbitlang/typst/shape",
+  "moonbitlang/typst/bidi",
+  "moonbitlang/typst/unicode",
+}
+
+options(
+  "native-stub": [ "sincos_stub.c" ],
+  targets: {
+    "libm_native.mbt": [ "native" ],
+    "libm_other.mbt": [ "not", "native" ],
+  },
+)

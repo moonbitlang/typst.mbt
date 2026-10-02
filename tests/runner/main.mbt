@@ -1,7 +1,7 @@
 // Differential test runner: compares the MoonBit port against reference
 // outputs dumped by the Rust oracle (see `scripts/goldens.sh`).
 //
-// Usage: moon run tests/runner -- <syntax|ast|reparse|eval|html|bundle|realize|paged|svg|svg-replay|pdf-semantic|pdf-semantic-replay|pdf-extract-check|pdftags|pdftags-check|font|break|shape|shape-hb> [filter] [--verbose]
+// Usage: moon run tests/runner -- <syntax|ast|reparse|eval|html|bundle|realize|paged|svg|svg-replay|pdf-semantic|pdf-semantic-replay|pdf-extract-check|pdftags|pdftags-check|font|break|shape|shape-hb|usvg|usvg-images> [filter] [--verbose]
 
 ///|
 let suite_dir = ".repos/typst/tests/suite"
@@ -158,6 +158,21 @@ fn main {
         dump_name="pdftags-check",
       )
     "shape" => run_shape_stage(filter, verbose)
+    "usvg" => run_usvg_stage(filter, verbose)
+    // The usvg trees of the SVG images placed by the paged tests; tests
+    // without SVG images have no golden entry.
+    "usvg-images" =>
+      run_stage(
+        "usvg-images",
+        usvg_images_report,
+        filter,
+        verbose,
+        select=tc => is_paged(tc.attrs),
+        skip_file=text => {
+          text.has_prefix("// SKIP") || !text.to_lower().contains("svg")
+        },
+        missing="",
+      )
     "shape-hb" => run_shape_hb_stage(filter, verbose)
     _ => {
       println("unknown stage: \{stage}")
@@ -177,6 +192,7 @@ fn run_stage(
   canonicalize? : (String) -> String,
   dump_name? : String = stage,
   matches? : (String, String) -> Bool,
+  missing? : String = "<missing golden>",
 ) -> Unit {
   let mut passed = 0
   // With `canonicalize`, both sides are compared after canonicalization;
@@ -208,7 +224,7 @@ fn run_stage(
       }
       let actual = report(rel, tc)
       dump.write_string("=== \{tc.name}\n\{actual}")
-      let expected = golden.get(tc.name).unwrap_or("<missing golden>")
+      let expected = golden.get(tc.name).unwrap_or(missing)
       if actual == expected {
         raw_passed += 1
       }

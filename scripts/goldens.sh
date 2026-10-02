@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Regenerate reference outputs from upstream Typst (needs Rust).
-# Usage: scripts/goldens.sh [syntax|ast|reparse|eval|html|bundle|realize|fonts|font|paged|svg|pdf-semantic|pdftags|shape|shape-hb|break ...]
+# Usage: scripts/goldens.sh [syntax|ast|reparse|eval|html|bundle|realize|fonts|font|paged|svg|pdf-semantic|pdftags|shape|shape-hb|break|usvg|usvg-images ...]
 #
 # `reparse` applies seeded pseudo-random edits to every test body through
 # `Source::edit`/`Source::replace` and dumps the reparsed ranges and trees
@@ -15,6 +15,9 @@
 # ORACLE_SAVE_PDF=<dir> to also keep the PDFs for the runner's
 # `pdf-extract-check` stage); `pdftags` dumps upstream's `pdftags` YAML of
 # the tests with a `pdftags` attribute.
+# `usvg-images` dumps
+# the usvg trees of the SVG images placed by paged tests
+# (oracle/src/usvg_images.rs).
 # `shape` dumps every text run Typst shapes while
 # compiling the paged tests, with rustybuzz's output (oracle/src/shape.rs);
 # `shape-hb` extracts rustybuzz's own shaping test suite.
@@ -31,12 +34,22 @@ cd "$(dirname "$0")/.."
 ORACLE=oracle/target/release/typst-oracle
 SUITE=.repos/typst/tests/suite
 stages=("$@")
-[ ${#stages[@]} -eq 0 ] && stages=(syntax ast reparse eval html bundle realize fonts font paged svg pdf-semantic pdftags shape shape-hb break)
+[ ${#stages[@]} -eq 0 ] && stages=(syntax ast reparse eval html bundle realize fonts font paged svg pdf-semantic pdftags shape shape-hb break usvg usvg-images)
 for stage in "${stages[@]}"; do
   if [ "$stage" = shape-hb ]; then
     # rustybuzz's own shaping tests (needs .repos/rustybuzz, see upstream.sh).
     rm -rf tests/golden/shape-hb
     python3 scripts/shape_hb_tests.py .repos/rustybuzz tests/golden/shape-hb
+    continue
+  fi
+  if [ "$stage" = usvg ]; then
+    # The SVG simplifier (oracle/src/bin/gen_usvg_golden.rs): dev-assets SVGs,
+    # the usvg corpora and the SVG glyphs of the test fonts. Also regenerates
+    # usvg/oracle_test.mbt.
+    assets=$(ls -d ~/.cargo/git/checkouts/typst-dev-assets-*/*/files | head -1)
+    (cd oracle && cargo run --release -q --bin gen_usvg_golden -- "$assets" ../tests/golden/usvg)
+    mv tests/golden/usvg/oracle_test.mbt usvg/oracle_test.mbt
+    moon fmt
     continue
   fi
   if [ "$stage" = fonts ]; then

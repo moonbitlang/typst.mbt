@@ -486,3 +486,48 @@ images (no usvg port yet) and PDF images; other gaps: variable font
 instancing (krilla instantiates variable fonts), SVG-in-OpenType glyphs
 (outline fallback), CFF subsetting, ICC-based colors/output intents for
 PDF/A, GIF/WebP decoding.
+
+## Status: usvg port (SVG images and SVG glyphs)
+
+**Packages** (ports of the crates at the versions in `oracle/Cargo.lock`):
+`simplecss/` (simplecss 0.2), `svgtypes/` (svgtypes 0.15, incl. the kurbo
+arc pieces it needs), `tiny_skia_path/` (tiny-skia-path 0.11 geometry:
+`Path`, `PathBuilder`, `Transform`, `Rect`, bounds; plus `strict-num`) and
+`usvg/` (usvg 0.47): the svgtree (`svgtree*.mbt`, reusing the roxmltree port
+in `data/xml`), the converter (`converter.mbt`, `style.mbt`, `units.mbt`,
+`shapes.mbt`, `use_node.mbt`, `switch.mbt`, `clippath.mbt`, `mask.mbt`,
+`marker.mbt`, `paint_server.mbt`, `filter.mbt`, `image.mbt`), text
+(`text.mbt` parsing, `text_layout.mbt` shaping via `@shape`/`@bidi`,
+`text_flatten.mbt` outlines/COLR/SVG/bitmap glyphs, `text_colr.mbt`) with a
+`fontdb` subset (`fontdb.mbt`), kurbo pieces for `arc_to` and text-on-path
+(`kurbo*.mbt`), and the writer (`writer.mbt`, `Tree::to_string`). f32
+arithmetic matches Rust bit for bit: libm via FFI (`libm_*.mbt`, with
+`__sincos_stret` on Apple like LLVM merges `sin`/`cos`), `powi`, Rust f32
+`Display` (`rust_fmt.mbt`). `Arc::get_mut` in `paint_server.mbt` is emulated
+with reference counting over the tree (`RefCounter`).
+
+**Wiring:** `library/image_svg.mbt` (`SvgImage::with_fonts_images` with
+Typst's font resolver over the font book and the linked-image resolver,
+exact error messages), `library/font_color.mbt` (`draw_svg_glyph` +
+`fixup_svg`). Image decoding now passes the text font families like
+upstream.
+
+**Tests:** `scripts/goldens.sh usvg` (`oracle/src/bin/gen_usvg_golden.rs`):
+dev-assets SVGs + `usvg_corpus.txt` trees, `usvg_text_corpus.txt` text
+layouts, and every SVG-table glyph of the test fonts, compared by runner
+stage `usvg`; the same cases are generated as `usvg/oracle_test.mbt`.
+`scripts/goldens.sh usvg-images` (`oracle/src/usvg_images.rs`) dumps the
+tree of every SVG image placed by a paged test (runner stage
+`usvg-images`).
+
+**Deviations:** the default string href resolver returns `None` (Typst
+always overrides it); `imagesize` only knows JPEG/PNG/GIF/WebP (the
+formats usvg accepts); fontdb's generic `fantasy` default is fixed.
+
+**Result:** `svg` 2269 → 2294/2299 (all SVG-table color glyphs), `svg-replay`
+2254 → 2279, `paged` 2283 (unchanged; image sizes were already right),
+`usvg` 93/93 trees + text layouts and 3360/3360 glyphs, `usvg-images`
+342/342. The remaining SVG-image paged failures (`image-svg-linked-*`,
+`image-decode-bad-svg`) only differ in the error span: `ImageElem::decode`
+reloads the source with the element span instead of the `source`
+argument's span (see the deviation note in `library/image.mbt`).

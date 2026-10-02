@@ -17,6 +17,7 @@ import {
   "moonbitlang/typst/syntect",
   "moonbitlang/typst/time",
   "moonbitlang/typst/unicode",
+  "moonbitlang/typst/usvg",
 }
 
 // Values
@@ -10570,6 +10571,7 @@ pub fn SvgImage::data(Self) -> Bytes
 pub fn SvgImage::height(Self) -> Double
 pub fn SvgImage::new(Bytes) -> Self raise LoadErr
 pub fn SvgImage::synthetic(Bytes, Double, Double) -> Self
+pub fn SvgImage::tree(Self) -> @usvg.Tree
 pub fn SvgImage::width(Self) -> Double
 pub fn SvgImage::with_fonts_images(Bytes, &World, Array[String], @syntax.FileId?) -> (Self, Array[HintedString]) raise LoadErr
 pub impl Eq for SvgImage

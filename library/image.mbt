@@ -84,7 +84,12 @@ pub fn ImageElem::decode(
       // element which does not have a fallback rendering and, therefore,
       // will be ignored by Typst.
       let (output, warnings) = within(loaded, () => {
-        SvgImage::with_fonts_images(loaded.data, engine.world, [], svg_file)
+        SvgImage::with_fonts_images(
+          loaded.data,
+          engine.world,
+          families(styles).map(f => f.as_str()),
+          svg_file,
+        )
       })
       for warning in warnings {
         engine.sink.warn(warning.into_warning_at(span))
