@@ -8,7 +8,6 @@
 // - the usvg tree itself (needed for SVG rendering in layout/export);
 // - font resolution (`FontResolver`, only affects rendering and the font
 //   hash);
-// - decompression of SVGZ files (no inflate implementation yet);
 // - CSS-provided root sizes and `em` units relative to inherited CSS font
 //   sizes (only a plain `font-size` attribute on the root is considered).
 // Linked images are resolved for every `<image>` element, whereas usvg only
@@ -111,6 +110,7 @@ let xlink_ns = "http://www.w3.org/1999/xlink"
 /// A usvg error (upstream `usvg::Error`).
 priv suberror UsvgError {
   NotAnUtf8Str
+  MalformedGZip
   InvalidSize
   ParsingFailed(@xml.XmlError)
 }
@@ -120,6 +120,7 @@ priv suberror UsvgError {
 fn format_usvg_error(error : UsvgError) -> LoadError {
   let error = match error {
     NotAnUtf8Str => "file is not valid UTF-8"
+    MalformedGZip => "file is not compressed correctly"
     InvalidSize => "width, height, or viewbox is invalid"
     ParsingFailed(error) => return format_xml_like_error("SVG", error)
   }
@@ -130,15 +131,12 @@ fn format_usvg_error(error : UsvgError) -> LoadError {
 /// Parses the SVG's XML, with usvg's check that the root element is an
 /// `<svg>` element.
 fn svg_parse_document(data : Bytes) -> @xml.Document raise LoadErr {
-  if data.length() >= 2 && data[0] == b'\x1f' && data[1] == b'\x8b' {
-    // TODO: SVGZ decompression (`usvg::decompress_svgz`) is not ported.
-    raise LoadErr(
-      LoadError::text(
-        NoPos,
-        "failed to parse SVG",
-        "compressed SVGs are not yet ported",
-      ),
-    )
+  let data = if data.length() >= 2 && data[0] == b'\x1f' && data[1] == b'\x8b' {
+    @codecs.gzip_decompress(data[:]) catch {
+      _ => raise LoadErr(format_usvg_error(MalformedGZip))
+    }
+  } else {
+    data
   }
   guard bytes_to_str(data[:]) is Some(text) else {
     raise LoadErr(format_usvg_error(NotAnUtf8Str))

@@ -18,6 +18,8 @@ pub let exif_tag_y_resolution : Int
 
 pub fn gif_image_info(BytesView) -> ImageInfo raise ImageError
 
+pub fn gzip_decompress(BytesView) -> Bytes raise InflateError
+
 pub fn jpeg_image_info(BytesView) -> ImageInfo raise ImageError
 
 pub fn png_image_info(BytesView) -> ImageInfo raise ImageError
@@ -28,6 +30,8 @@ pub fn read_png_info(BytesView) -> PngInfo raise ImageError
 
 pub fn webp_image_info(BytesView) -> ImageInfo raise ImageError
 
+pub fn zlib_decompress(BytesView) -> Bytes raise InflateError
+
 // Errors
 pub(all) suberror ExifError {
   ExifError(String)
@@ -35,6 +39,10 @@ pub(all) suberror ExifError {
 
 pub(all) suberror ImageError {
   ImageError(String)
+} derive(@debug.Debug)
+
+pub(all) suberror InflateError {
+  InflateError(String)
 } derive(@debug.Debug)
 
 // Types and methods
@@ -112,7 +120,7 @@ pub(all) struct PngInfo {
   interlaced : Bool
   trns : Bool
   pixel_dims : PixelDimensions?
-  compressed_icc : Bytes?
+  icc_profile : Bytes?
 } derive(@debug.Debug)
 pub fn PngInfo::output_color_type(Self) -> ColorType
 

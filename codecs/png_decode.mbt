@@ -26,9 +26,8 @@ pub(all) struct PngInfo {
   trns : Bool
   /// The `pHYs` chunk.
   pixel_dims : PixelDimensions?
-  /// The raw (still compressed) data of the `iCCP` chunk after the profile
-  /// name and compression method.
-  compressed_icc : Bytes?
+  /// The decompressed ICC profile of the `iCCP` chunk.
+  icc_profile : Bytes?
 } derive(Debug)
 
 ///|
@@ -42,7 +41,8 @@ pub fn read_png_info(data : BytesView) -> PngInfo raise ImageError {
   let mut info : PngInfo? = None
   let mut pixel_dims = None
   let mut trns = false
-  let mut compressed_icc = None
+  let mut icc_profile = None
+  let mut have_iccp = false
   while true {
     if pos + 8 > data.length() {
       decoding_error("Png", "Unexpected end of data before image end.")
@@ -74,7 +74,7 @@ pub fn read_png_info(data : BytesView) -> PngInfo raise ImageError {
           interlaced: chunk[12] != b'\x00',
           trns: false,
           pixel_dims: None,
-          compressed_icc: None,
+          icc_profile: None,
         })
       }
       b"pHYs" =>
@@ -87,15 +87,11 @@ pub fn read_png_info(data : BytesView) -> PngInfo raise ImageError {
         }
       b"tRNS" => trns = true
       b"iCCP" =>
-        if compressed_icc is None {
-          // Profile name (1-79 bytes), null separator, compression method.
-          let mut i = 0
-          while i < chunk.length() && chunk[i] != b'\x00' {
-            i += 1
-          }
-          if i + 2 <= chunk.length() {
-            compressed_icc = Some(chunk[i + 2:].to_owned())
-          }
+        if !have_iccp {
+          have_iccp = true
+          // Errors in the chunk's contents are ignored (upstream
+          // `let _ = self.parse_iccp_raw()`).
+          icc_profile = parse_iccp(chunk)
         }
       b"IDAT" => break
       _ => ()
@@ -103,7 +99,34 @@ pub fn read_png_info(data : BytesView) -> PngInfo raise ImageError {
     pos = start + len + 4
   }
   guard info is Some(info) else { abort("unreachable") }
-  { ..info, trns, pixel_dims, compressed_icc, }
+  { ..info, trns, pixel_dims, icc_profile, }
+}
+
+///|
+/// Parses an `iCCP` chunk: a profile name (1-79 bytes), a null separator,
+/// the compression method (0) and the zlib-compressed profile (upstream
+/// `parse_iccp_raw`).
+fn parse_iccp(chunk : BytesView) -> Bytes? {
+  let mut i = 0
+  while true {
+    if i >= chunk.length() {
+      return None
+    }
+    let raw = chunk[i]
+    if (raw == b'\x00' && i == 0) || (raw != b'\x00' && i == 80) {
+      return None
+    }
+    if raw == b'\x00' {
+      break
+    }
+    i += 1
+  }
+  if i + 1 >= chunk.length() || chunk[i + 1] != b'\x00' {
+    return None
+  }
+  Some(zlib_decompress(chunk[i + 2:])) catch {
+    _ => None
+  }
 }
 
 ///|
@@ -134,15 +157,12 @@ pub fn PngInfo::output_color_type(self : PngInfo) -> ColorType {
 ///|
 /// Header information as reported by upstream `image::codecs::png::
 /// PngDecoder`.
-///
-/// TODO: The ICC profile is stored zlib-compressed in the `iCCP` chunk and
-/// is not decompressed (no inflate implementation yet), so it is `None`.
 pub fn png_image_info(data : BytesView) -> ImageInfo raise ImageError {
   let info = read_png_info(data)
   {
     width: info.width,
     height: info.height,
     color: info.output_color_type(),
-    icc: None,
+    icc: info.icc_profile,
   }
 }
