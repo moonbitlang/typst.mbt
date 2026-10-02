@@ -1,0 +1,8 @@
+import {
+  "moonbitlang/core/cmp",
+}
+
+import {
+  "moonbitlang/x/fs",
+  "moonbitlang/core/string",
+} for "wbtest"

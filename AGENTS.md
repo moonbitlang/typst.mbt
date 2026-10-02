@@ -124,3 +124,10 @@
   loads them (`library/image_pdf.mbt`); `hayro/write` (hayro-write) extracts
   pages that `pdf/image.mbt` embeds as XObjects. `hayro/syntax/oracle_test.mbt`
   is generated from the real crate (`oracle/src/bin/gen_hayro_syntax_tests.rs`).
+- Image downsampling for hayro's renderer: `pic_scale/` is a bit-exact port
+  of pic-scale 0.7.12 (`Scaler::new(CatmullRom)`, u8 planar/RGB/RGBA with
+  premultiplied alpha) as it runs on aarch64 with `rdm` (NEON lanes emulated,
+  incl. Rust's `sort_unstable_by` for the weight quantization). Checked by
+  `pic_scale/oracle_wbtest.mbt` against `testdata/oracle.tsv`; regenerate
+  on Apple silicon with `cargo run --release --offline --bin
+  gen_pic_scale_tests > ../pic_scale/testdata/oracle.tsv` (in `oracle/`).

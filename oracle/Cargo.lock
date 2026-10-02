@@ -2619,6 +2619,7 @@ dependencies = [
  "image-webp",
  "indexmap",
  "parking_lot",
+ "pic-scale",
  "proc-macro2",
  "quick-xml 0.38.4",
  "quote",
