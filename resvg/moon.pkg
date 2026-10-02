@@ -3,6 +3,7 @@ import {
   "moonbitlang/typst/skia",
   "moonbitlang/typst/tiny_skia_path" @path,
   "moonbitlang/typst/codecs",
+  "moonbitlang/core/cmp",
 }
 
 warnings = "-deprecated"

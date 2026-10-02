@@ -92,9 +92,51 @@ fn decode_jpeg(data : Bytes) -> @skia.Pixmap? {
 }
 
 ///|
-/// TODO: the `codecs` package has no GIF pixel decoder yet.
-fn decode_gif(_data : Bytes) -> @skia.Pixmap? {
-  None
+fn decode_gif(data : Bytes) -> @skia.Pixmap? {
+  let first_frame = @codecs.decode_gif_first_frame(data) catch {
+    _ => return None
+  }
+  guard first_frame is Some(first_frame) else { return None }
+  guard @path.IntSize::from_wh(
+      first_frame.width.reinterpret_as_uint(),
+      first_frame.height.reinterpret_as_uint(),
+    )
+    is Some(size) else {
+    return None
+  }
+  let (w, h) = size.dimensions()
+  guard @skia.Pixmap::new(w, h) is Some(pixmap) else { return None }
+  rgba_to_pixmap(first_frame.rgba, pixmap)
+  Some(pixmap)
+}
+
+///|
+fn rgba_to_pixmap(data : Bytes, pixmap : @skia.Pixmap) -> Unit {
+  let dst = pixmap.pixels()
+  let n = @cmp.minimum(data.length() / 4, dst.length())
+  for i in 0..<n {
+    let a = data[i * 4 + 3].to_int()
+    let af = a.to_double() / 255.0
+    let r = f64_to_u8(data[i * 4].to_int().to_double() * af + 0.5)
+    let g = f64_to_u8(data[i * 4 + 1].to_int().to_double() * af + 0.5)
+    let b = f64_to_u8(data[i * 4 + 2].to_int().to_double() * af + 0.5)
+    dst[i] = r.reinterpret_as_uint() |
+      (g.reinterpret_as_uint() << 8) |
+      (b.reinterpret_as_uint() << 16) |
+      (a.reinterpret_as_uint() << 24)
+  }
+}
+
+///|
+fn rgb_to_pixmap(data : Bytes, pixmap : @skia.Pixmap) -> Unit {
+  let dst = pixmap.pixels()
+  let n = @cmp.minimum(data.length() / 3, dst.length())
+  for i in 0..<n {
+    dst[i] = data[i * 3].to_uint() |
+      (data[i * 3 + 1].to_uint() << 8) |
+      (data[i * 3 + 2].to_uint() << 16) |
+      (255U << 24)
+  }
 }
 
 ///|

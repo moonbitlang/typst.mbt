@@ -8,6 +8,8 @@ import {
 // Values
 pub fn crc32(Array[BytesView]) -> UInt
 
+pub fn decode_gif_first_frame(BytesView) -> GifFrame? raise ImageError
+
 pub fn decode_jpeg(BytesView) -> (ImageInfo, Bytes) raise ImageError
 
 pub fn decode_png(BytesView) -> (ImageInfo, Bytes) raise ImageError
@@ -107,6 +109,16 @@ pub(all) enum FilterType {
   Gaussian
   Lanczos3
 } derive(Eq, Hash, @debug.Debug)
+
+pub(all) struct GifFrame {
+  screen_width : Int
+  screen_height : Int
+  left : Int
+  top : Int
+  width : Int
+  height : Int
+  rgba : Bytes
+}
 
 pub(all) struct ImageInfo {
   width : UInt
