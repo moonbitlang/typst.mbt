@@ -48,10 +48,70 @@ fn shortest_digits(x : Double) -> (String, Int) {
   } else {
     (frac | 0x10000000000000UL, biased - 1075)
   }
+  shortest_digits_decoded(
+    raw_mant,
+    raw_exp,
+    biased == 0,
+    raw_mant == 0x10000000000000UL,
+    x.abs(),
+  )
+}
+
+///|
+/// The shortest round-trip digits of an `f32` (see [shortest_digits]).
+fn shortest_digits_f32(x : Float) -> (String, Int) {
+  // `flt2dec::decode` for `f32`.
+  let bits = x.abs().reinterpret_as_uint()
+  let biased = ((bits >> 23) & 0xFF).reinterpret_as_int()
+  let frac = (bits & 0x7FFFFF).to_uint64()
+  let (raw_mant, raw_exp) = if biased == 0 {
+    (frac << 1, -150)
+  } else {
+    (frac | 0x800000UL, biased - 150)
+  }
+  shortest_digits_decoded(
+    raw_mant,
+    raw_exp,
+    biased == 0,
+    raw_mant == 0x800000UL,
+    x.abs().to_double(),
+  )
+}
+
+///|
+/// Rust's `impl Display for f32` (`{}`): shortest round-trip digits (for
+/// `f32`), never using exponent notation.
+pub fn rust_display_f32(x : Float) -> String {
+  if x.is_nan() {
+    return "NaN"
+  }
+  let neg = x.reinterpret_as_uint() >> 31 == 1
+  let sign = if neg { "-" } else { "" }
+  if x.is_inf() {
+    return sign + "inf"
+  }
+  if x == 0.0 {
+    return sign + "0"
+  }
+  let (digits, point) = shortest_digits_f32(x)
+  sign + place_point(digits, point, 0)
+}
+
+///|
+/// Dragon4 shortest digits of `raw_mant * 2^raw_exp` (Rust's
+/// `format_shortest` after `decode`); `approx` is the (absolute) value, used
+/// for the initial exponent estimate only.
+fn shortest_digits_decoded(
+  raw_mant : UInt64,
+  raw_exp : Int,
+  subnormal : Bool,
+  boundary : Bool,
+  approx : Double,
+) -> (String, Int) {
   let inclusive = (raw_mant & 1UL) == 0UL
-  let (mant, minus, plus, exp) = if biased == 0 {
+  let (mant, minus, plus, exp) = if subnormal {
     (raw_mant, 1, 1, raw_exp)
-  } else if raw_mant == 0x10000000000000UL {
+  } else if boundary {
     (raw_mant << 2, 1, 2, raw_exp - 2)
   } else {
     (raw_mant << 1, 1, 1, raw_exp - 1)
@@ -87,7 +147,7 @@ fn shortest_digits(x : Double) -> (String, Int) {
       below(s, upper * ten.pow(@bigint.BigInt::from_int(-k)))
     }
   }
-  let mut k = @math.log10(x.abs()).floor().to_int()
+  let mut k = @math.log10(approx).floor().to_int()
   while scaled_below(k) {
     k += 1
   }

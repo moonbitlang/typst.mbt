@@ -1,7 +1,7 @@
 // Differential test runner: compares the MoonBit port against reference
 // outputs dumped by the Rust oracle (see `scripts/goldens.sh`).
 //
-// Usage: moon run tests/runner -- <syntax|ast|eval|html|realize|paged|break> [filter] [--verbose]
+// Usage: moon run tests/runner -- <syntax|ast|eval|html|realize|paged|font|break> [filter] [--verbose]
 
 ///|
 let suite_dir = ".repos/typst/tests/suite"
@@ -39,6 +39,7 @@ fn main {
         select=tc => is_paged(tc.attrs),
         skip_file=text => text.has_prefix("// SKIP"),
       )
+    "font" => run_font_stage(filter, verbose)
     // Like the oracle, only tests that target HTML.
     "html" =>
       run_stage("html", html_report, filter, verbose, select=tc => {

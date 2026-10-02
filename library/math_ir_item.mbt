@@ -949,7 +949,7 @@ pub fn GlyphItem::create(
   let c = text.get_char(0).unwrap()
   let class = @unicode.default_math_class(c)
   let limits = MathLimits::for_char_with_class(c, class)
-  let kind = Glyph({
+  let kind = MathKind::Glyph({
     text,
     class: class.unwrap_or(Normal),
     stretch: Stretch::new(),

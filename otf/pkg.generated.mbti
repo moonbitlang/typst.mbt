@@ -1,0 +1,2321 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/otf"
+
+import {
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub let aat_class_deleted_glyph : Byte
+
+pub let aat_class_end_of_text : Byte
+
+pub let aat_class_out_of_bounds : Byte
+
+pub let aat_state_start_of_text : UInt16
+
+pub let empty_data : BytesView
+
+pub fn f32_as_i16(Float) -> Int16
+
+pub fn f32_as_i32(Float) -> Int
+
+pub fn f32_as_u16(Float) -> UInt16
+
+pub fn f32_as_u8(Float) -> Byte
+
+pub fn f32_bound(Float, Float, Float) -> Float
+
+pub fn f32_max_of(Float, Float) -> Float
+
+pub fn f32_min_of(Float, Float) -> Float
+
+pub fn fonts_in_collection(BytesView) -> UInt?
+
+pub fn i16_as_u16(Int16) -> UInt16
+
+pub fn i16_bound(Int16, Int16, Int16) -> Int16
+
+pub fn i16_saturating_add(Int16, Int16) -> Int16
+
+pub fn i16_try_from_int(Int) -> Int16?
+
+pub let name_id_compatible_full : UInt16
+
+pub let name_id_copyright_notice : UInt16
+
+pub let name_id_dark_background_palette : UInt16
+
+pub let name_id_description : UInt16
+
+pub let name_id_designer : UInt16
+
+pub let name_id_designer_url : UInt16
+
+pub let name_id_family : UInt16
+
+pub let name_id_full_name : UInt16
+
+pub let name_id_license : UInt16
+
+pub let name_id_license_url : UInt16
+
+pub let name_id_light_background_palette : UInt16
+
+pub let name_id_manufacturer : UInt16
+
+pub let name_id_post_script_cid : UInt16
+
+pub let name_id_post_script_name : UInt16
+
+pub let name_id_sample_text : UInt16
+
+pub let name_id_subfamily : UInt16
+
+pub let name_id_trademark : UInt16
+
+pub let name_id_typographic_family : UInt16
+
+pub let name_id_typographic_subfamily : UInt16
+
+pub let name_id_unique_id : UInt16
+
+pub let name_id_variations_post_script_name_prefix : UInt16
+
+pub let name_id_vendor_url : UInt16
+
+pub let name_id_version : UInt16
+
+pub let name_id_wws_family : UInt16
+
+pub let name_id_wws_subfamily : UInt16
+
+pub fn[T] opt(() -> T raise Malformed) -> T?
+
+pub fn[T] req(T?) -> T raise Malformed
+
+pub fn slice_from(BytesView, Int) -> BytesView?
+
+pub fn slice_from_r(BytesView, Int) -> BytesView raise Malformed
+
+pub fn slice_get(BytesView, Int, Int) -> BytesView?
+
+pub fn slice_r(BytesView, Int, Int) -> BytesView raise Malformed
+
+pub fn try_i16_from_f32(Float) -> Int16?
+
+pub fn try_i32_from_f32(Float) -> Int?
+
+pub fn try_u16_from_f32(Float) -> UInt16?
+
+pub fn try_u8_from_f32(Float) -> Byte?
+
+pub fn u16_as_i16(UInt16) -> Int16
+
+pub fn u16_checked_add(UInt16, UInt16) -> UInt16?
+
+pub fn u16_checked_mul(UInt16, UInt16) -> UInt16?
+
+pub fn u16_checked_sub(UInt16, UInt16) -> UInt16?
+
+pub fn u16_from_u8(Byte) -> UInt16
+
+pub fn u16_try_from_int(Int) -> UInt16?
+
+pub fn u16_try_from_u32(UInt) -> UInt16?
+
+pub fn u32_checked_add(UInt, UInt) -> UInt?
+
+pub fn u32_checked_sub(UInt, UInt) -> UInt?
+
+pub fn usize_checked_add(Int, Int) -> Int?
+
+pub fn usize_checked_sub(Int, Int) -> Int?
+
+pub fn utf8_to_string(BytesView) -> String?
+
+// Errors
+pub(all) suberror CFFError {
+  NoGlyph
+  ReadOutOfBounds
+  ZeroBBox
+  InvalidOperator
+  UnsupportedOperator
+  MissingEndChar
+  DataAfterEndChar
+  NestingLimitReached
+  ArgumentsStackLimitReached
+  InvalidArgumentsStackLength
+  BboxOverflow
+  MissingMoveTo
+  InvalidSubroutineIndex
+  NoLocalSubroutines
+  InvalidSeacCode
+  InvalidItemVariationDataIndex
+  InvalidNumberOfBlendOperands
+  BlendRegionsLimitReached
+} derive(Eq, @debug.Debug)
+
+pub(all) suberror FaceParsingError {
+  MalformedFont
+  UnknownMagic
+  FaceIndexOutOfBounds
+  NoHeadTable
+  NoHheaTable
+  NoMaxpTable
+} derive(Eq, @debug.Debug)
+pub impl Show for FaceParsingError
+
+pub suberror Malformed derive(@debug.Debug)
+
+// Types and methods
+type AatLookup
+pub fn AatLookup::parse(UInt16, BytesView) -> Self?
+pub fn AatLookup::value(Self, GlyphId) -> UInt16?
+
+type AatStateTable
+pub fn AatStateTable::class(Self, GlyphId) -> Byte?
+pub fn AatStateTable::entry(Self, UInt16, Byte) -> GenericStateEntry[Unit]?
+pub fn AatStateTable::kerning(Self, ValueOffset) -> Int16?
+pub fn AatStateTable::new_state(Self, UInt16) -> UInt16
+
+pub(all) struct AlternateSet {
+  alternates : LazyArray16[GlyphId]
+}
+pub impl FromSlice for AlternateSet
+
+pub(all) struct AlternateSubstitution {
+  coverage : Coverage
+  alternate_sets : LazyOffsetArray16[AlternateSet]
+}
+
+pub(all) struct Anchor {
+  x : Int16
+  y : Int16
+  x_device : Device?
+  y_device : Device?
+} derive(@debug.Debug)
+
+pub struct AnchorMatrix {
+  rows : UInt16
+  cols : UInt16
+  // private fields
+}
+pub fn AnchorMatrix::get(Self, UInt16, UInt16) -> Anchor?
+pub impl @debug.Debug for AnchorMatrix
+
+pub(all) struct AnkrPoint {
+  x : Int16
+  y : Int16
+} derive(Default, Eq, @debug.Debug)
+pub impl FromData for AnkrPoint
+
+type AnkrTable
+pub fn AnkrTable::parse(UInt16, BytesView) -> Self?
+pub fn AnkrTable::points(Self, GlyphId) -> LazyArray32[AnkrPoint]?
+
+pub(all) struct AvarTable {
+  segment_maps : SegmentMaps
+}
+pub fn AvarTable::map_coordinate(Self, Array[NormalizedCoordinate], Int) -> Unit?
+pub fn AvarTable::parse(BytesView) -> Self?
+
+pub(all) struct AxisValueMap {
+  from_coordinate : Int16
+  to_coordinate : Int16
+} derive(@debug.Debug)
+pub impl FromData for AxisValueMap
+
+type CbdtTable
+pub fn CbdtTable::get(Self, GlyphId, UInt16) -> RasterGlyphImage?
+pub fn CbdtTable::parse(CblcTable, BytesView) -> Self?
+
+type CblcTable
+pub fn CblcTable::parse(BytesView) -> Self?
+
+type Cff2Table
+pub fn Cff2Table::outline(Self, ArrayView[NormalizedCoordinate], GlyphId, &OutlineBuilder) -> Result[Rect, CFFError]
+pub fn Cff2Table::parse(BytesView) -> Self?
+
+type CffIndex
+
+type CffTable
+pub fn CffTable::glyph_cid(Self, GlyphId) -> UInt16?
+pub fn CffTable::glyph_index(Self, Byte) -> GlyphId?
+pub fn CffTable::glyph_index_by_name(Self, String) -> GlyphId?
+pub fn CffTable::glyph_name(Self, GlyphId) -> String?
+pub fn CffTable::glyph_width(Self, GlyphId) -> UInt16?
+pub fn CffTable::matrix(Self) -> Matrix
+pub fn CffTable::number_of_glyphs(Self) -> UInt16
+pub fn CffTable::outline(Self, GlyphId, &OutlineBuilder) -> Result[Rect, CFFError]
+pub fn CffTable::parse(BytesView) -> Self?
+
+pub(all) enum ChainedContextLookup {
+  Format1(coverage~ : Coverage, sets~ : LazyOffsetArray16[LazyOffsetArray16[ChainedSequenceRule]])
+  Format2(coverage~ : Coverage, backtrack_classes~ : ClassDefinition, input_classes~ : ClassDefinition, lookahead_classes~ : ClassDefinition, sets~ : LazyOffsetArray16[LazyOffsetArray16[ChainedSequenceRule]])
+  Format3(coverage~ : Coverage, backtrack_coverages~ : LazyOffsetArray16[Coverage], input_coverages~ : LazyOffsetArray16[Coverage], lookahead_coverages~ : LazyOffsetArray16[Coverage], lookups~ : LazyArray16[SequenceLookupRecord])
+}
+pub fn ChainedContextLookup::coverage(Self) -> Coverage
+
+pub(all) struct ChainedSequenceRule {
+  backtrack : LazyArray16[UInt16]
+  input : LazyArray16[UInt16]
+  lookahead : LazyArray16[UInt16]
+  lookups : LazyArray16[SequenceLookupRecord]
+}
+pub impl FromSlice for ChainedSequenceRule
+
+pub(all) enum ClassDefinition {
+  Format1(start~ : GlyphId, classes~ : LazyArray16[UInt16])
+  Format2(records~ : LazyArray16[RangeRecord])
+  Empty
+}
+pub fn ClassDefinition::get(Self, GlyphId) -> UInt16
+pub fn ClassDefinition::parse(BytesView) -> Self?
+
+type ClassMatrix
+pub fn ClassMatrix::get(Self, (UInt16, UInt16)) -> (ValueRecord, ValueRecord)?
+pub impl @debug.Debug for ClassMatrix
+
+pub(all) enum CmapFormat {
+  ByteEncodingTable(CmapSubtable0)
+  HighByteMappingThroughTable(CmapSubtable2)
+  SegmentMappingToDeltaValues(CmapSubtable4)
+  TrimmedTableMapping(CmapSubtable6)
+  MixedCoverage
+  TrimmedArray(CmapSubtable10)
+  SegmentedCoverage(CmapSubtable12)
+  ManyToOneRangeMappings(CmapSubtable13)
+  UnicodeVariationSequences(CmapSubtable14)
+}
+
+pub(all) struct CmapSubtable {
+  platform_id : PlatformId
+  encoding_id : UInt16
+  format : CmapFormat
+}
+pub fn CmapSubtable::codepoints(Self, (UInt) -> Unit) -> Unit
+pub fn CmapSubtable::glyph_index(Self, UInt) -> GlyphId?
+pub fn CmapSubtable::glyph_variation_index(Self, UInt, UInt) -> GlyphVariationResult?
+pub fn CmapSubtable::is_unicode(Self) -> Bool
+
+pub struct CmapSubtable0 {
+  glyph_ids : BytesView
+}
+pub fn CmapSubtable0::codepoints(Self, (UInt) -> Unit) -> Unit
+pub fn CmapSubtable0::glyph_index(Self, UInt) -> GlyphId?
+pub fn CmapSubtable0::parse(BytesView) -> Self?
+
+pub struct CmapSubtable10 {
+  first_code_point : UInt
+  glyphs : LazyArray32[GlyphId]
+}
+pub fn CmapSubtable10::codepoints(Self, (UInt) -> Unit) -> Unit
+pub fn CmapSubtable10::glyph_index(Self, UInt) -> GlyphId?
+pub fn CmapSubtable10::parse(BytesView) -> Self?
+
+pub struct CmapSubtable12 {
+  groups : LazyArray32[SequentialMapGroup]
+}
+pub fn CmapSubtable12::codepoints(Self, (UInt) -> Unit) -> Unit
+pub fn CmapSubtable12::glyph_index(Self, UInt) -> GlyphId?
+pub fn CmapSubtable12::parse(BytesView) -> Self?
+
+pub struct CmapSubtable13 {
+  groups : LazyArray32[SequentialMapGroup]
+}
+pub fn CmapSubtable13::codepoints(Self, (UInt) -> Unit) -> Unit
+pub fn CmapSubtable13::glyph_index(Self, UInt) -> GlyphId?
+pub fn CmapSubtable13::parse(BytesView) -> Self?
+
+pub struct CmapSubtable14 {
+  records : LazyArray32[VariationSelectorRecord]
+  data : BytesView
+}
+pub fn CmapSubtable14::glyph_index(Self, UInt, UInt) -> GlyphVariationResult?
+pub fn CmapSubtable14::parse(BytesView) -> Self?
+
+pub struct CmapSubtable2 {
+  sub_header_keys : LazyArray16[UInt16]
+  sub_headers_offset : Int
+  sub_headers : LazyArray16[SubHeaderRecord]
+  data : BytesView
+}
+pub fn CmapSubtable2::codepoints(Self, (UInt) -> Unit) -> Unit
+pub fn CmapSubtable2::glyph_index(Self, UInt) -> GlyphId?
+pub fn CmapSubtable2::parse(BytesView) -> Self?
+
+pub struct CmapSubtable4 {
+  start_codes : LazyArray16[UInt16]
+  end_codes : LazyArray16[UInt16]
+  id_deltas : LazyArray16[Int16]
+  id_range_offsets : LazyArray16[UInt16]
+  id_range_offset_pos : Int
+  data : BytesView
+}
+pub fn CmapSubtable4::codepoints(Self, (UInt) -> Unit) -> Unit
+pub fn CmapSubtable4::glyph_index(Self, UInt) -> GlyphId?
+pub fn CmapSubtable4::parse(BytesView) -> Self?
+
+pub struct CmapSubtable6 {
+  first_code_point : UInt16
+  glyphs : LazyArray16[GlyphId]
+}
+pub fn CmapSubtable6::codepoints(Self, (UInt) -> Unit) -> Unit
+pub fn CmapSubtable6::glyph_index(Self, UInt) -> GlyphId?
+pub fn CmapSubtable6::parse(BytesView) -> Self?
+
+type CmapSubtables
+pub fn CmapSubtables::get(Self, UInt16) -> CmapSubtable?
+pub fn CmapSubtables::is_empty(Self) -> Bool
+pub fn CmapSubtables::iter(Self) -> Iter[CmapSubtable]
+pub fn CmapSubtables::len(Self) -> UInt16
+pub impl Default for CmapSubtables
+
+pub struct CmapTable {
+  subtables : CmapSubtables
+}
+pub fn CmapTable::parse(BytesView) -> Self?
+
+type ColorLine
+
+pub(all) struct ColorStop {
+  stop_offset : Float
+  color : RgbaColor
+} derive(@debug.Debug)
+
+type ColrTable
+pub fn ColrTable::clip_box(Self, GlyphId, ArrayView[NormalizedCoordinate]) -> RectF?
+pub fn ColrTable::contains(Self, GlyphId) -> Bool
+pub fn ColrTable::is_simple(Self) -> Bool
+pub fn ColrTable::paint(Self, GlyphId, UInt16, &ColrPainter, ArrayView[NormalizedCoordinate], RgbaColor) -> Unit?
+pub fn ColrTable::parse(CpalTable, BytesView) -> Self?
+
+type ColrVariationData
+
+pub(all) enum CompositeMode {
+  Clear
+  Source
+  Destination
+  SourceOver
+  DestinationOver
+  SourceIn
+  DestinationIn
+  SourceOut
+  DestinationOut
+  SourceAtop
+  DestinationAtop
+  Xor
+  Plus
+  Screen
+  Overlay
+  Darken
+  Lighten
+  ColorDodge
+  ColorBurn
+  HardLight
+  SoftLight
+  Difference
+  Exclusion
+  Multiply
+  Hue
+  Saturation
+  Color
+  Luminosity
+} derive(Eq, @debug.Debug)
+pub impl FromData for CompositeMode
+
+pub(all) enum ContextLookup {
+  Format1(coverage~ : Coverage, sets~ : LazyOffsetArray16[LazyOffsetArray16[SequenceRule]])
+  Format2(coverage~ : Coverage, classes~ : ClassDefinition, sets~ : LazyOffsetArray16[LazyOffsetArray16[SequenceRule]])
+  Format3(coverage~ : Coverage, coverages~ : LazyOffsetArray16[Coverage], lookups~ : LazyArray16[SequenceLookupRecord])
+}
+pub fn ContextLookup::coverage(Self) -> Coverage
+
+pub(all) enum Coverage {
+  Format1(glyphs~ : LazyArray16[GlyphId])
+  Format2(records~ : LazyArray16[RangeRecord])
+}
+pub fn Coverage::contains(Self, GlyphId) -> Bool
+pub fn Coverage::get(Self, GlyphId) -> UInt16?
+pub fn Coverage::parse(BytesView) -> Self?
+pub impl FromSlice for Coverage
+
+type CpalTable
+pub fn CpalTable::get(Self, UInt16, UInt16) -> RgbaColor?
+pub fn CpalTable::palettes(Self) -> UInt16
+pub fn CpalTable::parse(BytesView) -> Self?
+
+pub(all) struct CursiveAdjustment {
+  coverage : Coverage
+  sets : CursiveAnchorSet
+}
+
+type CursiveAnchorSet
+pub fn CursiveAnchorSet::entry(Self, UInt16) -> Anchor?
+pub fn CursiveAnchorSet::exit(Self, UInt16) -> Anchor?
+pub fn CursiveAnchorSet::is_empty(Self) -> Bool
+pub fn CursiveAnchorSet::len(Self) -> UInt16
+pub impl @debug.Debug for CursiveAnchorSet
+
+type DeltaSetIndexMap
+pub fn DeltaSetIndexMap::map(Self, UInt) -> (UInt16, UInt16)?
+pub fn DeltaSetIndexMap::new(BytesView) -> Self
+
+pub(all) enum Device {
+  Hinting(HintingDevice)
+  Variation(VariationDevice)
+} derive(@debug.Debug)
+
+type ExtendedStateTable[T]
+pub fn[T] ExtendedStateTable::class(Self[T], GlyphId) -> UInt16?
+pub fn[T : FromData] ExtendedStateTable::entry(Self[T], UInt16, UInt16) -> GenericStateEntry[T]?
+pub fn[T] ExtendedStateTable::parse(UInt16, Stream) -> Self[T]?
+
+pub(all) struct F2DOT14(Int16) derive(Eq, @debug.Debug)
+pub fn F2DOT14::apply_float_delta(Self, Float) -> Float
+pub fn F2DOT14::to_f32(Self) -> Float
+pub impl FromData for F2DOT14
+
+type Face
+pub fn Face::ascender(Self) -> Int16
+pub fn Face::capital_height(Self) -> Int16?
+pub fn Face::clone(Self) -> Self
+pub fn Face::color_palettes(Self) -> UInt16?
+pub fn Face::descender(Self) -> Int16
+pub fn Face::from_raw_tables(RawFaceTables) -> Self raise FaceParsingError
+pub fn Face::global_bounding_box(Self) -> Rect
+pub fn Face::glyph_bounding_box(Self, GlyphId) -> Rect?
+pub fn Face::glyph_hor_advance(Self, GlyphId) -> UInt16?
+pub fn Face::glyph_hor_side_bearing(Self, GlyphId) -> Int16?
+pub fn Face::glyph_index(Self, Char) -> GlyphId?
+pub fn Face::glyph_index_by_name(Self, String) -> GlyphId?
+pub fn Face::glyph_name(Self, GlyphId) -> String?
+pub fn Face::glyph_phantom_points(Self, GlyphId) -> PhantomPoints?
+pub fn Face::glyph_raster_image(Self, GlyphId, UInt16) -> RasterGlyphImage?
+pub fn Face::glyph_svg_image(Self, GlyphId) -> SvgDocument?
+pub fn Face::glyph_variation_index(Self, Char, Char) -> GlyphId?
+pub fn Face::glyph_ver_advance(Self, GlyphId) -> UInt16?
+pub fn Face::glyph_ver_side_bearing(Self, GlyphId) -> Int16?
+pub fn Face::glyph_y_origin(Self, GlyphId) -> Int16?
+pub fn Face::has_non_default_variation_coordinates(Self) -> Bool
+pub fn Face::height(Self) -> Int16
+pub fn Face::is_bold(Self) -> Bool
+pub fn Face::is_color_glyph(Self, GlyphId) -> Bool
+pub fn Face::is_italic(Self) -> Bool
+pub fn Face::is_monospaced(Self) -> Bool
+pub fn Face::is_oblique(Self) -> Bool
+pub fn Face::is_outline_embedding_allowed(Self) -> Bool
+pub fn Face::is_regular(Self) -> Bool
+pub fn Face::is_subsetting_allowed(Self) -> Bool
+pub fn Face::is_variable(Self) -> Bool
+pub fn Face::italic_angle(Self) -> Float
+pub fn Face::line_gap(Self) -> Int16
+pub fn Face::names(Self) -> Names
+pub fn Face::number_of_glyphs(Self) -> UInt16
+pub fn Face::outline_glyph(Self, GlyphId, &OutlineBuilder) -> Rect?
+pub fn Face::paint_color_glyph(Self, GlyphId, UInt16, RgbaColor, &ColrPainter) -> Unit?
+pub fn Face::parse(BytesView, UInt) -> Self raise FaceParsingError
+pub fn Face::permissions(Self) -> Permissions?
+pub fn Face::raw_face(Self) -> RawFace
+pub fn Face::set_variation(Self, Tag, Float) -> Unit?
+pub fn Face::strikeout_metrics(Self) -> LineMetrics?
+pub fn Face::style(Self) -> Style
+pub fn Face::subscript_metrics(Self) -> ScriptMetrics?
+pub fn Face::superscript_metrics(Self) -> ScriptMetrics?
+pub fn Face::tables(Self) -> FaceTables
+pub fn Face::typographic_ascender(Self) -> Int16?
+pub fn Face::typographic_descender(Self) -> Int16?
+pub fn Face::typographic_line_gap(Self) -> Int16?
+pub fn Face::underline_metrics(Self) -> LineMetrics?
+pub fn Face::unicode_ranges(Self) -> UnicodeRanges
+pub fn Face::units_per_em(Self) -> UInt16
+pub fn Face::variation_axes(Self) -> LazyArray16[VariationAxis]
+pub fn Face::variation_coordinates(Self) -> ArrayView[NormalizedCoordinate]
+pub fn Face::vertical_ascender(Self) -> Int16?
+pub fn Face::vertical_descender(Self) -> Int16?
+pub fn Face::vertical_height(Self) -> Int16?
+pub fn Face::vertical_line_gap(Self) -> Int16?
+pub fn Face::weight(Self) -> Weight
+pub fn Face::width(Self) -> Width
+pub fn Face::x_height(Self) -> Int16?
+
+pub(all) struct FaceTables {
+  head : HeadTable
+  hhea : HheaTable
+  maxp : MaxpTable
+  bdat : CbdtTable?
+  cbdt : CbdtTable?
+  cff : CffTable?
+  cmap : CmapTable?
+  colr : ColrTable?
+  ebdt : CbdtTable?
+  glyf : GlyfTable?
+  hmtx : HmtxTable?
+  kern : KernTable?
+  name : NameTable?
+  os2 : Os2Table?
+  post : PostTable?
+  sbix : SbixTable?
+  stat : StatTable?
+  svg : SvgTable?
+  vhea : VheaTable?
+  vmtx : HmtxTable?
+  vorg : VorgTable?
+  gdef : GdefTable?
+  gpos : LayoutTable?
+  gsub : LayoutTable?
+  math : MathTable?
+  ankr : AnkrTable?
+  feat : FeatTable?
+  kerx : KerxTable?
+  morx : MorxTable?
+  trak : TrakTable?
+  avar : AvarTable?
+  cff2 : Cff2Table?
+  fvar : FvarTable?
+  gvar : GvarTable?
+  hvar : HvarTable?
+  mvar : MvarTable?
+  vvar : VvarTable?
+}
+
+pub(all) struct FeatTable {
+  names : FeatureNames
+}
+pub fn FeatTable::parse(BytesView) -> Self?
+
+pub(all) struct Feature {
+  tag : Tag
+  lookup_indices : LazyArray16[UInt16]
+}
+pub impl RecordListItem for Feature
+
+pub(all) struct FeatureName {
+  feature : UInt16
+  setting_names : LazyArray16[SettingName]
+  default_setting_index : Byte
+  exclusive : Bool
+  name_index : UInt16
+}
+
+type FeatureNames
+pub fn FeatureNames::find(Self, UInt16) -> FeatureName?
+pub fn FeatureNames::get(Self, UInt16) -> FeatureName?
+pub fn FeatureNames::into_iter(Self) -> FeatureNamesIter
+pub fn FeatureNames::is_empty(Self) -> Bool
+pub fn FeatureNames::iter(Self) -> Iter[FeatureName]
+pub fn FeatureNames::len(Self) -> UInt16
+
+type FeatureNamesIter
+pub fn FeatureNamesIter::next(Self) -> FeatureName?
+
+type FeatureVariations
+pub fn FeatureVariations::find_index(Self, ArrayView[NormalizedCoordinate]) -> UInt?
+pub fn FeatureVariations::find_substitute(Self, UInt16, UInt) -> Feature?
+
+pub(all) struct Fixed(Float) derive(Eq, @debug.Debug)
+pub fn Fixed::apply_float_delta(Self, Float) -> Float
+pub impl FromData for Fixed
+
+pub(all) struct FvarTable {
+  axes : LazyArray16[VariationAxis]
+}
+pub fn FvarTable::parse(BytesView) -> Self?
+
+type GdefTable
+pub fn GdefTable::glyph_class(Self, GlyphId) -> GlyphClass?
+pub fn GdefTable::glyph_mark_attachment_class(Self, GlyphId) -> UInt16
+pub fn GdefTable::glyph_variation_delta(Self, UInt16, UInt16, ArrayView[NormalizedCoordinate]) -> Float?
+pub fn GdefTable::has_glyph_classes(Self) -> Bool
+pub fn GdefTable::is_mark_glyph(Self, GlyphId, UInt16?) -> Bool
+pub fn GdefTable::parse(BytesView) -> Self?
+pub impl Default for GdefTable
+
+pub(all) struct GenericStateEntry[T] {
+  new_state : UInt16
+  flags : UInt16
+  extra : T
+}
+pub fn[T] GenericStateEntry::has_advance(Self[T]) -> Bool
+pub fn[T] GenericStateEntry::has_mark(Self[T]) -> Bool
+pub fn[T] GenericStateEntry::has_offset(Self[T]) -> Bool
+pub fn[T] GenericStateEntry::has_push(Self[T]) -> Bool
+pub fn[T] GenericStateEntry::has_reset(Self[T]) -> Bool
+pub fn[T] GenericStateEntry::value_offset(Self[T]) -> ValueOffset
+pub impl[T : FromData] FromData for GenericStateEntry[T]
+
+pub struct GlyfTable {
+  data : BytesView
+  loca_table : LocaTable
+}
+pub fn GlyfTable::bbox(Self, GlyphId) -> Rect?
+pub fn GlyfTable::get(Self, GlyphId) -> BytesView?
+pub fn GlyfTable::outline(Self, GlyphId, &OutlineBuilder) -> Rect?
+pub fn GlyfTable::parse(LocaTable, BytesView) -> Self?
+
+pub(all) struct GlyphAssembly {
+  italics_correction : MathValue
+  parts : LazyArray16[GlyphPart]
+}
+pub impl FromSlice for GlyphAssembly
+
+pub(all) enum GlyphClass {
+  Base
+  Ligature
+  Mark
+  Component
+} derive(Compare, Eq, Hash, @debug.Debug)
+
+pub(all) struct GlyphConstruction {
+  assembly : GlyphAssembly?
+  variants : LazyArray16[GlyphVariant]
+}
+pub impl FromSlice for GlyphConstruction
+
+type GlyphConstructions
+pub fn GlyphConstructions::get(Self, GlyphId) -> GlyphConstruction?
+pub impl @debug.Debug for GlyphConstructions
+
+pub(all) struct GlyphId(UInt16) derive(Compare, Default, Eq, Hash, @debug.Debug)
+pub impl FromData for GlyphId
+
+pub(all) struct GlyphPart {
+  glyph_id : GlyphId
+  start_connector_length : UInt16
+  end_connector_length : UInt16
+  full_advance : UInt16
+  part_flags : PartFlags
+} derive(@debug.Debug)
+pub impl FromData for GlyphPart
+
+pub(all) struct GlyphVariant {
+  variant_glyph : GlyphId
+  advance_measurement : UInt16
+} derive(@debug.Debug)
+pub impl FromData for GlyphVariant
+
+pub(all) enum GlyphVariationResult {
+  Found(GlyphId)
+  UseDefault
+} derive(Eq, @debug.Debug)
+
+pub(all) enum GradientExtend {
+  Pad
+  Repeat
+  Reflect
+} derive(Eq, @debug.Debug)
+pub impl FromData for GradientExtend
+
+type GradientStopsIter
+pub fn GradientStopsIter::copy(Self) -> Self
+pub fn GradientStopsIter::iter(Self) -> Iter[ColorStop]
+pub fn GradientStopsIter::next(Self) -> ColorStop?
+
+type GvarTable
+pub fn GvarTable::outline(Self, GlyfTable, ArrayView[NormalizedCoordinate], GlyphId, &OutlineBuilder) -> Rect?
+pub fn GvarTable::parse(BytesView) -> Self?
+pub fn GvarTable::phantom_points(Self, GlyfTable, ArrayView[NormalizedCoordinate], GlyphId) -> PhantomPoints?
+
+pub(all) struct HeadTable {
+  units_per_em : UInt16
+  global_bbox : Rect
+  index_to_location_format : IndexToLocationFormat
+} derive(@debug.Debug)
+pub fn HeadTable::parse(BytesView) -> Self?
+
+pub(all) struct HheaTable {
+  ascender : Int16
+  descender : Int16
+  line_gap : Int16
+  number_of_metrics : UInt16
+} derive(@debug.Debug)
+pub fn HheaTable::parse(BytesView) -> Self?
+
+type HintingDevice
+pub fn HintingDevice::x_delta(Self, UInt16, (UInt16, UInt16)?) -> Int?
+pub fn HintingDevice::y_delta(Self, UInt16, (UInt16, UInt16)?) -> Int?
+pub impl @debug.Debug for HintingDevice
+
+pub(all) struct HmtxMetrics {
+  advance : UInt16
+  side_bearing : Int16
+} derive(@debug.Debug)
+pub impl FromData for HmtxMetrics
+
+pub(all) struct HmtxTable {
+  metrics : LazyArray16[HmtxMetrics]
+  bearings : LazyArray16[Int16]
+  number_of_metrics : UInt16
+}
+pub fn HmtxTable::advance(Self, GlyphId) -> UInt16?
+pub fn HmtxTable::parse(UInt16, UInt16, BytesView) -> Self?
+pub fn HmtxTable::side_bearing(Self, GlyphId) -> Int16?
+
+type HvarTable
+pub fn HvarTable::advance_offset(Self, GlyphId, ArrayView[NormalizedCoordinate]) -> Float?
+pub fn HvarTable::left_side_bearing_offset(Self, GlyphId, ArrayView[NormalizedCoordinate]) -> Float?
+pub fn HvarTable::parse(BytesView) -> Self?
+pub fn HvarTable::right_side_bearing_offset(Self, GlyphId, ArrayView[NormalizedCoordinate]) -> Float?
+
+pub(all) enum IndexToLocationFormat {
+  Short
+  Long
+} derive(Eq, @debug.Debug)
+
+type ItemVariationStore
+pub fn ItemVariationStore::parse(Stream) -> Self?
+pub fn ItemVariationStore::parse_delta(Self, UInt16, UInt16, ArrayView[NormalizedCoordinate]) -> Float?
+pub fn ItemVariationStore::region_indices(Self, UInt16) -> LazyArray16[UInt16]?
+pub impl Default for ItemVariationStore
+
+pub(all) enum KernFormat {
+  Format0(KernSubtable0)
+  Format1(AatStateTable)
+  Format2(KernSubtable2)
+  Format3(KernSubtable3)
+}
+
+pub(all) struct KernSubtable {
+  horizontal : Bool
+  variable : Bool
+  has_cross_stream : Bool
+  has_state_machine : Bool
+  format : KernFormat
+}
+pub fn KernSubtable::glyphs_kerning(Self, GlyphId, GlyphId) -> Int16?
+
+pub(all) struct KernSubtable0 {
+  pairs : LazyArray16[KerningPair]
+}
+pub fn KernSubtable0::glyphs_kerning(Self, GlyphId, GlyphId) -> Int16?
+pub fn KernSubtable0::parse(BytesView) -> Self?
+
+type KernSubtable2
+pub fn KernSubtable2::glyphs_kerning(Self, GlyphId, GlyphId) -> Int16?
+pub fn KernSubtable2::parse(Byte, BytesView) -> Self?
+
+type KernSubtable3
+pub fn KernSubtable3::glyphs_kerning(Self, GlyphId, GlyphId) -> Int16?
+pub fn KernSubtable3::parse(BytesView) -> Self?
+
+type KernSubtables
+pub fn KernSubtables::into_iter(Self) -> KernSubtablesIter
+pub fn KernSubtables::is_empty(Self) -> Bool
+pub fn KernSubtables::iter(Self) -> Iter[KernSubtable]
+pub fn KernSubtables::len(Self) -> UInt
+
+type KernSubtablesIter
+pub fn KernSubtablesIter::next(Self) -> KernSubtable?
+
+pub(all) struct KernTable {
+  subtables : KernSubtables
+}
+pub fn KernTable::parse(BytesView) -> Self?
+
+pub(all) struct KerningPair {
+  pair : UInt
+  value : Int16
+} derive(@debug.Debug)
+pub fn KerningPair::left(Self) -> GlyphId
+pub fn KerningPair::right(Self) -> GlyphId
+pub impl FromData for KerningPair
+
+pub(all) struct KerxAnchorPoints(BytesView)
+pub fn KerxAnchorPoints::get(Self, UInt16) -> (UInt16, UInt16)?
+
+pub(all) struct KerxEntryData {
+  action_index : UInt16
+} derive(@debug.Debug)
+pub impl FromData for KerxEntryData
+
+pub(all) enum KerxFormat {
+  Format0(KerxSubtable0)
+  Format1(KerxSubtable1)
+  Format2(KerxSubtable2)
+  Format4(KerxSubtable4)
+  Format6(KerxSubtable6)
+}
+
+pub(all) struct KerxSubtable {
+  horizontal : Bool
+  variable : Bool
+  has_cross_stream : Bool
+  has_state_machine : Bool
+  tuple_count : UInt
+  format : KerxFormat
+}
+pub fn KerxSubtable::glyphs_kerning(Self, GlyphId, GlyphId) -> Int16?
+
+pub(all) struct KerxSubtable0 {
+  pairs : LazyArray32[KerningPair]
+}
+pub fn KerxSubtable0::glyphs_kerning(Self, GlyphId, GlyphId) -> Int16?
+
+pub struct KerxSubtable1 {
+  state_table : ExtendedStateTable[KerxEntryData]
+  actions_data : BytesView
+}
+pub fn KerxSubtable1::class(Self, GlyphId) -> UInt16?
+pub fn KerxSubtable1::entry(Self, UInt16, UInt16) -> GenericStateEntry[KerxEntryData]?
+pub fn KerxSubtable1::glyphs_kerning(Self, UInt16) -> Int16?
+
+pub(all) struct KerxSubtable2(BytesView)
+pub fn KerxSubtable2::glyphs_kerning(Self, GlyphId, GlyphId) -> Int16?
+
+pub struct KerxSubtable4 {
+  state_table : ExtendedStateTable[KerxEntryData]
+  anchor_points : KerxAnchorPoints
+}
+pub fn KerxSubtable4::class(Self, GlyphId) -> UInt16?
+pub fn KerxSubtable4::entry(Self, UInt16, UInt16) -> GenericStateEntry[KerxEntryData]?
+
+type KerxSubtable6
+pub fn KerxSubtable6::glyphs_kerning(Self, GlyphId, GlyphId) -> Int16?
+
+type KerxSubtables
+pub fn KerxSubtables::into_iter(Self) -> KerxSubtablesIter
+pub fn KerxSubtables::iter(Self) -> Iter[KerxSubtable]
+
+type KerxSubtablesIter
+pub fn KerxSubtablesIter::copy(Self) -> Self
+pub fn KerxSubtablesIter::next(Self) -> KerxSubtable?
+
+pub(all) struct KerxTable {
+  subtables : KerxSubtables
+}
+pub fn KerxTable::parse(UInt16, BytesView) -> Self?
+
+pub(all) enum Language {
+  Unknown
+  Afrikaans_SouthAfrica
+  Albanian_Albania
+  Alsatian_France
+  Amharic_Ethiopia
+  Arabic_Algeria
+  Arabic_Bahrain
+  Arabic_Egypt
+  Arabic_Iraq
+  Arabic_Jordan
+  Arabic_Kuwait
+  Arabic_Lebanon
+  Arabic_Libya
+  Arabic_Morocco
+  Arabic_Oman
+  Arabic_Qatar
+  Arabic_SaudiArabia
+  Arabic_Syria
+  Arabic_Tunisia
+  Arabic_UAE
+  Arabic_Yemen
+  Armenian_Armenia
+  Assamese_India
+  Azeri_Cyrillic_Azerbaijan
+  Azeri_Latin_Azerbaijan
+  Bashkir_Russia
+  Basque_Basque
+  Belarusian_Belarus
+  Bengali_Bangladesh
+  Bengali_India
+  Bosnian_Cyrillic_BosniaAndHerzegovina
+  Bosnian_Latin_BosniaAndHerzegovina
+  Breton_France
+  Bulgarian_Bulgaria
+  Catalan_Catalan
+  Chinese_HongKongSAR
+  Chinese_MacaoSAR
+  Chinese_PeoplesRepublicOfChina
+  Chinese_Singapore
+  Chinese_Taiwan
+  Corsican_France
+  Croatian_Croatia
+  Croatian_Latin_BosniaAndHerzegovina
+  Czech_CzechRepublic
+  Danish_Denmark
+  Dari_Afghanistan
+  Divehi_Maldives
+  Dutch_Belgium
+  Dutch_Netherlands
+  English_Australia
+  English_Belize
+  English_Canada
+  English_Caribbean
+  English_India
+  English_Ireland
+  English_Jamaica
+  English_Malaysia
+  English_NewZealand
+  English_RepublicOfThePhilippines
+  English_Singapore
+  English_SouthAfrica
+  English_TrinidadAndTobago
+  English_UnitedKingdom
+  English_UnitedStates
+  English_Zimbabwe
+  Estonian_Estonia
+  Faroese_FaroeIslands
+  Filipino_Philippines
+  Finnish_Finland
+  French_Belgium
+  French_Canada
+  French_France
+  French_Luxembourg
+  French_PrincipalityOfMonaco
+  French_Switzerland
+  Frisian_Netherlands
+  Galician_Galician
+  Georgian_Georgia
+  German_Austria
+  German_Germany
+  German_Liechtenstein
+  German_Luxembourg
+  German_Switzerland
+  Greek_Greece
+  Greenlandic_Greenland
+  Gujarati_India
+  Hausa_Latin_Nigeria
+  Hebrew_Israel
+  Hindi_India
+  Hungarian_Hungary
+  Icelandic_Iceland
+  Igbo_Nigeria
+  Indonesian_Indonesia
+  Inuktitut_Canada
+  Inuktitut_Latin_Canada
+  Irish_Ireland
+  IsiXhosa_SouthAfrica
+  IsiZulu_SouthAfrica
+  Italian_Italy
+  Italian_Switzerland
+  Japanese_Japan
+  Kannada_India
+  Kazakh_Kazakhstan
+  Khmer_Cambodia
+  Kiche_Guatemala
+  Kinyarwanda_Rwanda
+  Kiswahili_Kenya
+  Konkani_India
+  Korean_Korea
+  Kyrgyz_Kyrgyzstan
+  Lao_LaoPDR
+  Latvian_Latvia
+  Lithuanian_Lithuania
+  LowerSorbian_Germany
+  Luxembourgish_Luxembourg
+  Macedonian_NorthMacedonia
+  Malay_BruneiDarussalam
+  Malay_Malaysia
+  Malayalam_India
+  Maltese_Malta
+  Maori_NewZealand
+  Mapudungun_Chile
+  Marathi_India
+  Mohawk_Mohawk
+  Mongolian_Cyrillic_Mongolia
+  Mongolian_Traditional_PeoplesRepublicOfChina
+  Nepali_Nepal
+  Norwegian_Bokmal_Norway
+  Norwegian_Nynorsk_Norway
+  Occitan_France
+  Odia_India
+  Pashto_Afghanistan
+  Polish_Poland
+  Portuguese_Brazil
+  Portuguese_Portugal
+  Punjabi_India
+  Quechua_Bolivia
+  Quechua_Ecuador
+  Quechua_Peru
+  Romanian_Romania
+  Romansh_Switzerland
+  Russian_Russia
+  Sami_Inari_Finland
+  Sami_Lule_Norway
+  Sami_Lule_Sweden
+  Sami_Northern_Finland
+  Sami_Northern_Norway
+  Sami_Northern_Sweden
+  Sami_Skolt_Finland
+  Sami_Southern_Norway
+  Sami_Southern_Sweden
+  Sanskrit_India
+  Serbian_Cyrillic_BosniaAndHerzegovina
+  Serbian_Cyrillic_Serbia
+  Serbian_Latin_BosniaAndHerzegovina
+  Serbian_Latin_Serbia
+  SesothoSaLeboa_SouthAfrica
+  Setswana_SouthAfrica
+  Sinhala_SriLanka
+  Slovak_Slovakia
+  Slovenian_Slovenia
+  Spanish_Argentina
+  Spanish_Bolivia
+  Spanish_Chile
+  Spanish_Colombia
+  Spanish_CostaRica
+  Spanish_DominicanRepublic
+  Spanish_Ecuador
+  Spanish_ElSalvador
+  Spanish_Guatemala
+  Spanish_Honduras
+  Spanish_Mexico
+  Spanish_Nicaragua
+  Spanish_Panama
+  Spanish_Paraguay
+  Spanish_Peru
+  Spanish_PuertoRico
+  Spanish_ModernSort_Spain
+  Spanish_TraditionalSort_Spain
+  Spanish_UnitedStates
+  Spanish_Uruguay
+  Spanish_Venezuela
+  Swedish_Finland
+  Swedish_Sweden
+  Syriac_Syria
+  Tajik_Cyrillic_Tajikistan
+  Tamazight_Latin_Algeria
+  Tamil_India
+  Tatar_Russia
+  Telugu_India
+  Thai_Thailand
+  Tibetan_PRC
+  Turkish_Turkey
+  Turkmen_Turkmenistan
+  Uighur_PRC
+  Ukrainian_Ukraine
+  UpperSorbian_Germany
+  Urdu_IslamicRepublicOfPakistan
+  Uzbek_Cyrillic_Uzbekistan
+  Uzbek_Latin_Uzbekistan
+  Vietnamese_Vietnam
+  Welsh_UnitedKingdom
+  Wolof_Senegal
+  Yakut_Russia
+  Yi_PRC
+  Yoruba_Nigeria
+} derive(Eq, @debug.Debug)
+pub fn Language::primary_language(Self) -> String
+pub fn Language::region(Self) -> String
+pub impl Show for Language
+
+pub(all) struct LanguageSystem {
+  tag : Tag
+  required_feature : UInt16?
+  feature_indices : LazyArray16[UInt16]
+}
+pub impl RecordListItem for LanguageSystem
+
+pub(all) struct LayoutTable {
+  scripts : RecordList[Script]
+  features : RecordList[Feature]
+  lookups : LazyOffsetArray16[Lookup]
+  variations : FeatureVariations?
+}
+pub fn LayoutTable::parse(BytesView) -> Self?
+
+pub struct LazyArray16[T] {
+  data : BytesView
+}
+pub fn[T : FromData + Compare] LazyArray16::binary_search(Self[T], T) -> (UInt16, T)?
+pub fn[T : FromData] LazyArray16::binary_search_by(Self[T], (T) -> Int) -> (UInt16, T)?
+pub fn[T] LazyArray16::data(Self[T]) -> BytesView
+pub fn[T : FromData] LazyArray16::get(Self[T], UInt16) -> T?
+pub fn[T : FromData] LazyArray16::get_r(Self[T], UInt16) -> T raise Malformed
+pub fn[T : FromData] LazyArray16::is_empty(Self[T]) -> Bool
+pub fn[T : FromData] LazyArray16::iter(Self[T]) -> Iter[T]
+pub fn[T : FromData] LazyArray16::last(Self[T]) -> T?
+pub fn[T : FromData] LazyArray16::len(Self[T]) -> UInt16
+pub fn[T] LazyArray16::new(BytesView) -> Self[T]
+pub fn LazyArray16::range(Self[RangeRecord], GlyphId) -> RangeRecord?
+pub fn[T : FromData] LazyArray16::slice(Self[T], UInt16, UInt16) -> Self[T]?
+pub impl[T] Default for LazyArray16[T]
+
+pub struct LazyArray32[T] {
+  data : BytesView
+}
+pub fn[T : FromData + Compare] LazyArray32::binary_search(Self[T], T) -> (UInt, T)?
+pub fn[T : FromData] LazyArray32::binary_search_by(Self[T], (T) -> Int) -> (UInt, T)?
+pub fn[T : FromData] LazyArray32::get(Self[T], UInt) -> T?
+pub fn[T : FromData] LazyArray32::is_empty(Self[T]) -> Bool
+pub fn[T : FromData] LazyArray32::iter(Self[T]) -> Iter[T]
+pub fn[T : FromData] LazyArray32::len(Self[T]) -> UInt
+pub fn[T] LazyArray32::new(BytesView) -> Self[T]
+pub impl[T] Default for LazyArray32[T]
+
+pub struct LazyOffsetArray16[T] {
+  data : BytesView
+  offsets : LazyArray16[Offset16?]
+}
+pub fn[T : FromSlice] LazyOffsetArray16::get(Self[T], UInt16) -> T?
+pub fn[T] LazyOffsetArray16::is_empty(Self[T]) -> Bool
+pub fn[T : FromSlice] LazyOffsetArray16::iter(Self[T]) -> Iter[T]
+pub fn[T] LazyOffsetArray16::len(Self[T]) -> UInt16
+pub fn[T] LazyOffsetArray16::new(BytesView, LazyArray16[Offset16?]) -> Self[T]
+pub fn[T] LazyOffsetArray16::parse(BytesView) -> Self[T] raise Malformed
+pub impl[T] Default for LazyOffsetArray16[T]
+pub impl[T] FromSlice for LazyOffsetArray16[T]
+
+pub(all) struct Ligature {
+  glyph : GlyphId
+  components : LazyArray16[GlyphId]
+}
+pub impl FromSlice for Ligature
+
+type LigatureArray
+pub fn LigatureArray::get(Self, UInt16) -> AnchorMatrix?
+pub fn LigatureArray::is_empty(Self) -> Bool
+pub fn LigatureArray::len(Self) -> UInt16
+pub impl @debug.Debug for LigatureArray
+
+pub(all) struct LigatureSubstitution {
+  coverage : Coverage
+  ligature_sets : LazyOffsetArray16[LazyOffsetArray16[Ligature]]
+}
+
+pub(all) struct LineMetrics {
+  mut position : Int16
+  mut thickness : Int16
+} derive(Eq, @debug.Debug)
+
+pub struct LinearGradient {
+  x0 : Float
+  y0 : Float
+  x1 : Float
+  y1 : Float
+  x2 : Float
+  y2 : Float
+  extend : GradientExtend
+  variation_data : ColrVariationData
+  color_line : ColorLine
+}
+pub fn LinearGradient::stops(Self, UInt16, ArrayView[NormalizedCoordinate]) -> GradientStopsIter
+
+pub(all) enum LocaTable {
+  Short(LazyArray16[UInt16])
+  Long(LazyArray16[UInt])
+}
+pub fn LocaTable::glyph_range(Self, GlyphId) -> (Int, Int)?
+pub fn LocaTable::is_empty(Self) -> Bool
+pub fn LocaTable::len(Self) -> UInt16
+pub fn LocaTable::parse(UInt16, IndexToLocationFormat, BytesView) -> Self?
+
+pub(all) struct Lookup {
+  flags : LookupFlags
+  subtables : LookupSubtables
+  mark_filtering_set : UInt16?
+}
+pub impl FromSlice for Lookup
+
+pub(all) struct LookupFlags(UInt16) derive(Eq, @debug.Debug)
+pub fn LookupFlags::ignore_base_glyphs(Self) -> Bool
+pub fn LookupFlags::ignore_flags(Self) -> Bool
+pub fn LookupFlags::ignore_ligatures(Self) -> Bool
+pub fn LookupFlags::ignore_marks(Self) -> Bool
+pub fn LookupFlags::mark_attachment_type(Self) -> Byte
+pub fn LookupFlags::right_to_left(Self) -> Bool
+pub fn LookupFlags::use_mark_filtering_set(Self) -> Bool
+pub impl FromData for LookupFlags
+
+type LookupSubtables
+pub fn[T : LookupSubtable] LookupSubtables::get(Self, UInt16) -> T?
+pub fn[T] LookupSubtables::into_iter(Self) -> LookupSubtablesIter[T]
+pub fn LookupSubtables::is_empty(Self) -> Bool
+pub fn[T : LookupSubtable] LookupSubtables::iter(Self) -> Iter[T]
+pub fn LookupSubtables::len(Self) -> UInt16
+
+type LookupSubtablesIter[T]
+pub fn[T : LookupSubtable] LookupSubtablesIter::next(Self[T]) -> T?
+
+type MarkArray
+pub fn MarkArray::get(Self, UInt16) -> (UInt16, Anchor)?
+pub fn MarkArray::is_empty(Self) -> Bool
+pub fn MarkArray::len(Self) -> UInt16
+pub impl @debug.Debug for MarkArray
+
+pub(all) struct MarkToBaseAdjustment {
+  mark_coverage : Coverage
+  base_coverage : Coverage
+  marks : MarkArray
+  anchors : AnchorMatrix
+}
+
+pub(all) struct MarkToLigatureAdjustment {
+  mark_coverage : Coverage
+  ligature_coverage : Coverage
+  marks : MarkArray
+  ligature_array : LigatureArray
+}
+
+pub(all) struct MarkToMarkAdjustment {
+  mark1_coverage : Coverage
+  mark2_coverage : Coverage
+  marks : MarkArray
+  mark2_matrix : AnchorMatrix
+}
+
+type MathConstants
+pub fn MathConstants::accent_base_height(Self) -> MathValue
+pub fn MathConstants::axis_height(Self) -> MathValue
+pub fn MathConstants::delimited_sub_formula_min_height(Self) -> UInt16
+pub fn MathConstants::display_operator_min_height(Self) -> UInt16
+pub fn MathConstants::flattened_accent_base_height(Self) -> MathValue
+pub fn MathConstants::fraction_denom_display_style_gap_min(Self) -> MathValue
+pub fn MathConstants::fraction_denominator_display_style_shift_down(Self) -> MathValue
+pub fn MathConstants::fraction_denominator_gap_min(Self) -> MathValue
+pub fn MathConstants::fraction_denominator_shift_down(Self) -> MathValue
+pub fn MathConstants::fraction_num_display_style_gap_min(Self) -> MathValue
+pub fn MathConstants::fraction_numerator_display_style_shift_up(Self) -> MathValue
+pub fn MathConstants::fraction_numerator_gap_min(Self) -> MathValue
+pub fn MathConstants::fraction_numerator_shift_up(Self) -> MathValue
+pub fn MathConstants::fraction_rule_thickness(Self) -> MathValue
+pub fn MathConstants::lower_limit_baseline_drop_min(Self) -> MathValue
+pub fn MathConstants::lower_limit_gap_min(Self) -> MathValue
+pub fn MathConstants::math_leading(Self) -> MathValue
+pub fn MathConstants::overbar_extra_ascender(Self) -> MathValue
+pub fn MathConstants::overbar_rule_thickness(Self) -> MathValue
+pub fn MathConstants::overbar_vertical_gap(Self) -> MathValue
+pub fn MathConstants::radical_degree_bottom_raise_percent(Self) -> Int16
+pub fn MathConstants::radical_display_style_vertical_gap(Self) -> MathValue
+pub fn MathConstants::radical_extra_ascender(Self) -> MathValue
+pub fn MathConstants::radical_kern_after_degree(Self) -> MathValue
+pub fn MathConstants::radical_kern_before_degree(Self) -> MathValue
+pub fn MathConstants::radical_rule_thickness(Self) -> MathValue
+pub fn MathConstants::radical_vertical_gap(Self) -> MathValue
+pub fn MathConstants::script_percent_scale_down(Self) -> Int16
+pub fn MathConstants::script_script_percent_scale_down(Self) -> Int16
+pub fn MathConstants::skewed_fraction_horizontal_gap(Self) -> MathValue
+pub fn MathConstants::skewed_fraction_vertical_gap(Self) -> MathValue
+pub fn MathConstants::space_after_script(Self) -> MathValue
+pub fn MathConstants::stack_bottom_display_style_shift_down(Self) -> MathValue
+pub fn MathConstants::stack_bottom_shift_down(Self) -> MathValue
+pub fn MathConstants::stack_display_style_gap_min(Self) -> MathValue
+pub fn MathConstants::stack_gap_min(Self) -> MathValue
+pub fn MathConstants::stack_top_display_style_shift_up(Self) -> MathValue
+pub fn MathConstants::stack_top_shift_up(Self) -> MathValue
+pub fn MathConstants::stretch_stack_bottom_shift_down(Self) -> MathValue
+pub fn MathConstants::stretch_stack_gap_above_min(Self) -> MathValue
+pub fn MathConstants::stretch_stack_gap_below_min(Self) -> MathValue
+pub fn MathConstants::stretch_stack_top_shift_up(Self) -> MathValue
+pub fn MathConstants::sub_superscript_gap_min(Self) -> MathValue
+pub fn MathConstants::subscript_baseline_drop_min(Self) -> MathValue
+pub fn MathConstants::subscript_shift_down(Self) -> MathValue
+pub fn MathConstants::subscript_top_max(Self) -> MathValue
+pub fn MathConstants::superscript_baseline_drop_max(Self) -> MathValue
+pub fn MathConstants::superscript_bottom_max_with_subscript(Self) -> MathValue
+pub fn MathConstants::superscript_bottom_min(Self) -> MathValue
+pub fn MathConstants::superscript_shift_up(Self) -> MathValue
+pub fn MathConstants::superscript_shift_up_cramped(Self) -> MathValue
+pub fn MathConstants::underbar_extra_descender(Self) -> MathValue
+pub fn MathConstants::underbar_rule_thickness(Self) -> MathValue
+pub fn MathConstants::underbar_vertical_gap(Self) -> MathValue
+pub fn MathConstants::upper_limit_baseline_rise_min(Self) -> MathValue
+pub fn MathConstants::upper_limit_gap_min(Self) -> MathValue
+pub impl @debug.Debug for MathConstants
+pub impl FromSlice for MathConstants
+
+pub(all) struct MathGlyphInfo {
+  italic_corrections : MathValues?
+  top_accent_attachments : MathValues?
+  extended_shapes : Coverage?
+  kern_infos : MathKernInfos?
+}
+pub impl FromSlice for MathGlyphInfo
+
+type MathKern
+pub fn MathKern::count(Self) -> UInt16
+pub fn MathKern::height(Self, UInt16) -> MathValue?
+pub fn MathKern::kern(Self, UInt16) -> MathValue?
+pub impl @debug.Debug for MathKern
+pub impl FromSlice for MathKern
+
+pub(all) struct MathKernInfo {
+  top_right : MathKern?
+  top_left : MathKern?
+  bottom_right : MathKern?
+  bottom_left : MathKern?
+} derive(@debug.Debug)
+
+type MathKernInfos
+pub fn MathKernInfos::get(Self, GlyphId) -> MathKernInfo?
+pub impl @debug.Debug for MathKernInfos
+pub impl FromSlice for MathKernInfos
+
+pub(all) struct MathTable {
+  constants : MathConstants?
+  glyph_info : MathGlyphInfo?
+  variants : MathVariants?
+}
+pub fn MathTable::parse(BytesView) -> Self?
+
+pub(all) struct MathValue {
+  value : Int16
+  device : Device?
+} derive(@debug.Debug)
+
+type MathValues
+pub fn MathValues::get(Self, GlyphId) -> MathValue?
+pub impl @debug.Debug for MathValues
+pub impl FromSlice for MathValues
+
+pub(all) struct MathVariants {
+  min_connector_overlap : UInt16
+  vertical_constructions : GlyphConstructions
+  horizontal_constructions : GlyphConstructions
+}
+pub impl FromSlice for MathVariants
+
+pub(all) struct Matrix {
+  sx : Float
+  ky : Float
+  kx : Float
+  sy : Float
+  tx : Float
+  ty : Float
+} derive(Eq, @debug.Debug)
+pub impl Default for Matrix
+
+pub(all) struct MaxpTable {
+  number_of_glyphs : UInt16
+} derive(@debug.Debug)
+pub fn MaxpTable::parse(BytesView) -> Self?
+
+pub(all) struct MorxChain {
+  default_flags : UInt
+  features : LazyArray32[MorxFeature]
+  subtables : MorxSubtables
+}
+
+type MorxChains
+pub fn MorxChains::into_iter(Self) -> MorxChainsIter
+pub fn MorxChains::iter(Self) -> Iter[MorxChain]
+
+type MorxChainsIter
+pub fn MorxChainsIter::copy(Self) -> Self
+pub fn MorxChainsIter::next(Self) -> MorxChain?
+
+pub(all) struct MorxContextualEntryData {
+  mark_index : UInt16
+  current_index : UInt16
+} derive(@debug.Debug)
+pub impl FromData for MorxContextualEntryData
+
+pub struct MorxContextualSubtable {
+  state : ExtendedStateTable[MorxContextualEntryData]
+  offsets_data : BytesView
+  offsets : LazyArray32[Offset32]
+  number_of_glyphs : UInt16
+}
+pub fn MorxContextualSubtable::lookup(Self, UInt) -> AatLookup?
+
+pub(all) struct MorxCoverage(Byte) derive(@debug.Debug)
+pub fn MorxCoverage::is_all_directions(Self) -> Bool
+pub fn MorxCoverage::is_backwards(Self) -> Bool
+pub fn MorxCoverage::is_logical(Self) -> Bool
+pub fn MorxCoverage::is_vertical(Self) -> Bool
+
+pub(all) struct MorxFeature {
+  kind : UInt16
+  setting : UInt16
+  enable_flags : UInt
+  disable_flags : UInt
+} derive(@debug.Debug)
+pub impl FromData for MorxFeature
+
+pub(all) struct MorxInsertionEntryData {
+  current_insert_index : UInt16
+  marked_insert_index : UInt16
+} derive(@debug.Debug)
+pub impl FromData for MorxInsertionEntryData
+
+pub struct MorxInsertionSubtable {
+  state : ExtendedStateTable[MorxInsertionEntryData]
+  glyphs : LazyArray32[GlyphId]
+}
+
+pub struct MorxLigatureSubtable {
+  state : ExtendedStateTable[UInt16]
+  ligature_actions : LazyArray32[UInt]
+  components : LazyArray32[UInt16]
+  ligatures : LazyArray32[GlyphId]
+}
+
+pub(all) struct MorxSubtable {
+  kind : MorxSubtableKind
+  coverage : MorxCoverage
+  feature_flags : UInt
+}
+
+pub(all) enum MorxSubtableKind {
+  Rearrangement(ExtendedStateTable[Unit])
+  Contextual(MorxContextualSubtable)
+  Ligature(MorxLigatureSubtable)
+  NonContextual(AatLookup)
+  Insertion(MorxInsertionSubtable)
+}
+
+type MorxSubtables
+pub fn MorxSubtables::into_iter(Self) -> MorxSubtablesIter
+pub fn MorxSubtables::iter(Self) -> Iter[MorxSubtable]
+
+type MorxSubtablesIter
+pub fn MorxSubtablesIter::copy(Self) -> Self
+pub fn MorxSubtablesIter::next(Self) -> MorxSubtable?
+
+pub(all) struct MorxTable {
+  chains : MorxChains
+}
+pub fn MorxTable::parse(UInt16, BytesView) -> Self?
+
+pub(all) struct MultipleSubstitution {
+  coverage : Coverage
+  sequences : LazyOffsetArray16[Sequence]
+}
+
+type MvarTable
+pub fn MvarTable::metric_offset(Self, Tag, ArrayView[NormalizedCoordinate]) -> Float?
+pub fn MvarTable::parse(BytesView) -> Self?
+
+pub(all) struct Name {
+  platform_id : PlatformId
+  encoding_id : UInt16
+  language_id : UInt16
+  name_id : UInt16
+  name : BytesView
+}
+pub fn Name::is_unicode(Self) -> Bool
+pub fn Name::language(Self) -> Language
+pub fn Name::to_string(Self) -> String?
+
+pub struct NameTable {
+  names : Names
+}
+pub fn NameTable::parse(BytesView) -> Self?
+pub impl Default for NameTable
+
+type Names
+pub fn Names::get(Self, UInt16) -> Name?
+pub fn Names::is_empty(Self) -> Bool
+pub fn Names::iter(Self) -> Iter[Name]
+pub fn Names::len(Self) -> UInt16
+pub impl Default for Names
+
+pub struct NormalizedCoordinate(Int16) derive(Default, Eq, Hash, @debug.Debug)
+pub fn NormalizedCoordinate::from_f32(Float) -> Self
+pub fn NormalizedCoordinate::from_i16(Int16) -> Self
+pub fn NormalizedCoordinate::get(Self) -> Int16
+
+pub(all) struct Offset16(UInt16) derive(Eq, @debug.Debug)
+pub impl FromData for Offset16
+pub impl Offset for Offset16
+
+pub(all) struct Offset24(UInt) derive(Eq, @debug.Debug)
+pub impl FromData for Offset24
+pub impl Offset for Offset24
+
+pub(all) struct Offset32(UInt) derive(Eq, @debug.Debug)
+pub impl FromData for Offset32
+pub impl Offset for Offset32
+
+pub struct Os2Table {
+  version : Byte
+  data : BytesView
+}
+pub fn Os2Table::capital_height(Self) -> Int16?
+pub fn Os2Table::is_bold(Self) -> Bool
+pub fn Os2Table::is_outline_embedding_allowed(Self) -> Bool
+pub fn Os2Table::is_subsetting_allowed(Self) -> Bool
+pub fn Os2Table::parse(BytesView) -> Self?
+pub fn Os2Table::permissions(Self) -> Permissions?
+pub fn Os2Table::strikeout_metrics(Self) -> LineMetrics
+pub fn Os2Table::style(Self) -> Style
+pub fn Os2Table::subscript_metrics(Self) -> ScriptMetrics
+pub fn Os2Table::superscript_metrics(Self) -> ScriptMetrics
+pub fn Os2Table::typographic_ascender(Self) -> Int16
+pub fn Os2Table::typographic_descender(Self) -> Int16
+pub fn Os2Table::typographic_line_gap(Self) -> Int16
+pub fn Os2Table::unicode_ranges(Self) -> UnicodeRanges
+pub fn Os2Table::use_typographic_metrics(Self) -> Bool
+pub fn Os2Table::weight(Self) -> Weight
+pub fn Os2Table::width(Self) -> Width
+pub fn Os2Table::windows_ascender(Self) -> Int16
+pub fn Os2Table::windows_descender(Self) -> Int16
+pub fn Os2Table::x_height(Self) -> Int16?
+
+pub(all) enum Paint {
+  Solid(RgbaColor)
+  LinearGradient(LinearGradient)
+  RadialGradient(RadialGradient)
+  SweepGradient(SweepGradient)
+}
+
+pub(all) enum PairAdjustment {
+  Format1(coverage~ : Coverage, sets~ : PairSets)
+  Format2(coverage~ : Coverage, classes~ : (ClassDefinition, ClassDefinition), matrix~ : ClassMatrix)
+}
+pub fn PairAdjustment::coverage(Self) -> Coverage
+
+type PairSet
+pub fn PairSet::get(Self, GlyphId) -> (ValueRecord, ValueRecord)?
+pub impl @debug.Debug for PairSet
+
+type PairSets
+pub fn PairSets::get(Self, UInt16) -> PairSet?
+pub fn PairSets::is_empty(Self) -> Bool
+pub fn PairSets::len(Self) -> UInt16
+pub impl @debug.Debug for PairSets
+
+pub(all) struct PartFlags(UInt16) derive(Eq, @debug.Debug)
+pub fn PartFlags::extender(Self) -> Bool
+pub impl FromData for PartFlags
+
+pub(all) enum Permissions {
+  Installable
+  Restricted
+  PreviewAndPrint
+  Editable
+} derive(Compare, Eq, Hash, @debug.Debug)
+
+pub(all) struct PhantomPoints {
+  left : PointF
+  right : PointF
+  top : PointF
+  bottom : PointF
+} derive(@debug.Debug)
+
+pub(all) enum PlatformId {
+  Unicode
+  Macintosh
+  Iso
+  Windows
+  Custom
+} derive(Eq, @debug.Debug)
+pub impl FromData for PlatformId
+
+pub(all) struct PointF {
+  mut x : Float
+  mut y : Float
+} derive(Eq, @debug.Debug)
+
+pub(all) enum PositioningSubtable {
+  Single(SingleAdjustment)
+  Pair(PairAdjustment)
+  Cursive(CursiveAdjustment)
+  MarkToBase(MarkToBaseAdjustment)
+  MarkToLigature(MarkToLigatureAdjustment)
+  MarkToMark(MarkToMarkAdjustment)
+  Context(ContextLookup)
+  ChainContext(ChainedContextLookup)
+}
+pub fn PositioningSubtable::coverage(Self) -> Coverage
+pub impl LookupSubtable for PositioningSubtable
+
+pub struct PostNames {
+  data : BytesView
+  mut offset : Int
+}
+pub fn PostNames::next(Self) -> String?
+
+pub struct PostTable {
+  italic_angle : Float
+  underline_metrics : LineMetrics
+  is_monospaced : Bool
+  glyph_indexes : LazyArray16[UInt16]
+  names_data : BytesView
+}
+pub fn PostTable::glyph_index_by_name(Self, String) -> GlyphId?
+pub fn PostTable::glyph_name(Self, GlyphId) -> String?
+pub fn PostTable::names(Self) -> PostNames
+pub fn PostTable::parse(BytesView) -> Self?
+
+pub struct RadialGradient {
+  x0 : Float
+  y0 : Float
+  r0 : Float
+  r1 : Float
+  x1 : Float
+  y1 : Float
+  extend : GradientExtend
+  variation_data : ColrVariationData
+  color_line : ColorLine
+}
+pub fn RadialGradient::stops(Self, UInt16, ArrayView[NormalizedCoordinate]) -> GradientStopsIter
+
+pub(all) struct RangeRecord {
+  start : GlyphId
+  end : GlyphId
+  value : UInt16
+} derive(@debug.Debug)
+pub impl FromData for RangeRecord
+
+pub(all) struct RasterGlyphImage {
+  x : Int16
+  y : Int16
+  width : UInt16
+  height : UInt16
+  pixels_per_em : UInt16
+  format : RasterImageFormat
+  data : BytesView
+}
+
+pub(all) enum RasterImageFormat {
+  PNG
+  BitmapMono
+  BitmapMonoPacked
+  BitmapGray2
+  BitmapGray2Packed
+  BitmapGray4
+  BitmapGray4Packed
+  BitmapGray8
+  BitmapPremulBgra32
+} derive(Eq, @debug.Debug)
+
+pub(all) struct RawFace {
+  data : BytesView
+  table_records : LazyArray16[TableRecord]
+}
+pub fn RawFace::parse(BytesView, UInt) -> Self raise FaceParsingError
+pub fn RawFace::table(Self, Tag) -> BytesView?
+
+pub(all) struct RawFaceTables {
+  mut head : BytesView
+  mut hhea : BytesView
+  mut maxp : BytesView
+  mut bdat : BytesView?
+  mut bloc : BytesView?
+  mut cbdt : BytesView?
+  mut cblc : BytesView?
+  mut cff : BytesView?
+  mut cmap : BytesView?
+  mut colr : BytesView?
+  mut cpal : BytesView?
+  mut ebdt : BytesView?
+  mut eblc : BytesView?
+  mut glyf : BytesView?
+  mut hmtx : BytesView?
+  mut kern : BytesView?
+  mut loca : BytesView?
+  mut name : BytesView?
+  mut os2 : BytesView?
+  mut post : BytesView?
+  mut sbix : BytesView?
+  mut stat : BytesView?
+  mut svg : BytesView?
+  mut vhea : BytesView?
+  mut vmtx : BytesView?
+  mut vorg : BytesView?
+  mut gdef : BytesView?
+  mut gpos : BytesView?
+  mut gsub : BytesView?
+  mut math : BytesView?
+  mut ankr : BytesView?
+  mut feat : BytesView?
+  mut kerx : BytesView?
+  mut morx : BytesView?
+  mut trak : BytesView?
+  mut avar : BytesView?
+  mut cff2 : BytesView?
+  mut fvar : BytesView?
+  mut gvar : BytesView?
+  mut hvar : BytesView?
+  mut mvar : BytesView?
+  mut vvar : BytesView?
+}
+pub impl Default for RawFaceTables
+
+type RecordList[T]
+pub fn[T : RecordListItem] RecordList::find(Self[T], Tag) -> T?
+pub fn[T : RecordListItem] RecordList::get(Self[T], UInt16) -> T?
+pub fn[T] RecordList::index(Self[T], Tag) -> UInt16?
+pub fn[T] RecordList::into_iter(Self[T]) -> RecordListIter[T]
+pub fn[T] RecordList::is_empty(Self[T]) -> Bool
+pub fn[T : RecordListItem] RecordList::iter(Self[T]) -> Iter[T]
+pub fn[T] RecordList::len(Self[T]) -> UInt16
+
+type RecordListIter[T]
+pub fn[T : RecordListItem] RecordListIter::next(Self[T]) -> T?
+
+pub(all) struct Rect {
+  x_min : Int16
+  y_min : Int16
+  x_max : Int16
+  y_max : Int16
+} derive(Eq, Hash, @debug.Debug)
+pub fn Rect::height(Self) -> Int16
+pub fn Rect::width(Self) -> Int16
+
+#alias(ClipBox)
+pub(all) struct RectF {
+  mut x_min : Float
+  mut y_min : Float
+  mut x_max : Float
+  mut y_max : Float
+} derive(Eq, @debug.Debug)
+
+pub(all) struct ReverseChainSingleSubstitution {
+  coverage : Coverage
+  backtrack_coverages : LazyOffsetArray16[Coverage]
+  lookahead_coverages : LazyOffsetArray16[Coverage]
+  substitutes : LazyArray16[GlyphId]
+}
+
+pub(all) struct RgbaColor {
+  mut red : Byte
+  mut green : Byte
+  mut blue : Byte
+  mut alpha : Byte
+} derive(Eq, Hash, @debug.Debug)
+pub fn RgbaColor::new(Byte, Byte, Byte, Byte) -> Self
+
+pub struct SbixStrike {
+  pixels_per_em : UInt16
+  ppi : UInt16
+  offsets : LazyArray16[Offset32]
+  data : BytesView
+}
+pub fn SbixStrike::get(Self, GlyphId) -> RasterGlyphImage?
+pub fn SbixStrike::is_empty(Self) -> Bool
+pub fn SbixStrike::len(Self) -> UInt16
+
+type SbixStrikes
+pub fn SbixStrikes::get(Self, UInt) -> SbixStrike?
+pub fn SbixStrikes::into_iter(Self) -> SbixStrikesIter
+pub fn SbixStrikes::is_empty(Self) -> Bool
+pub fn SbixStrikes::iter(Self) -> Iter[SbixStrike]
+pub fn SbixStrikes::len(Self) -> UInt
+
+type SbixStrikesIter
+pub fn SbixStrikesIter::next(Self) -> SbixStrike?
+
+pub(all) struct SbixTable {
+  strikes : SbixStrikes
+}
+pub fn SbixTable::best_strike(Self, UInt16) -> SbixStrike?
+pub fn SbixTable::parse(UInt16, BytesView) -> Self?
+
+pub(all) struct Script {
+  tag : Tag
+  default_language : LanguageSystem?
+  languages : RecordList[LanguageSystem]
+}
+pub impl RecordListItem for Script
+
+pub(all) struct ScriptMetrics {
+  mut x_size : Int16
+  mut y_size : Int16
+  mut x_offset : Int16
+  mut y_offset : Int16
+} derive(Eq, Hash, @debug.Debug)
+
+type SegmentMaps
+pub fn SegmentMaps::is_empty(Self) -> Bool
+pub fn SegmentMaps::iter(Self) -> Iter[LazyArray16[AxisValueMap]]
+pub fn SegmentMaps::len(Self) -> UInt16
+
+pub(all) struct Sequence {
+  substitutes : LazyArray16[GlyphId]
+}
+pub impl FromSlice for Sequence
+
+pub(all) struct SequenceLookupRecord {
+  sequence_index : UInt16
+  lookup_list_index : UInt16
+} derive(@debug.Debug)
+pub impl FromData for SequenceLookupRecord
+
+pub(all) struct SequenceRule {
+  input : LazyArray16[UInt16]
+  lookups : LazyArray16[SequenceLookupRecord]
+}
+pub impl FromSlice for SequenceRule
+
+pub struct SequentialMapGroup {
+  start_char_code : UInt
+  end_char_code : UInt
+  start_glyph_id : UInt
+}
+pub impl FromData for SequentialMapGroup
+
+pub(all) struct SettingName {
+  setting : UInt16
+  name_index : UInt16
+} derive(@debug.Debug)
+pub impl FromData for SettingName
+
+pub(all) enum SingleAdjustment {
+  Format1(coverage~ : Coverage, value~ : ValueRecord)
+  Format2(coverage~ : Coverage, values~ : ValueRecordsArray)
+}
+pub fn SingleAdjustment::coverage(Self) -> Coverage
+
+pub(all) enum SingleSubstitution {
+  Format1(coverage~ : Coverage, delta~ : Int16)
+  Format2(coverage~ : Coverage, substitutes~ : LazyArray16[GlyphId])
+}
+pub fn SingleSubstitution::coverage(Self) -> Coverage
+
+pub(all) struct StatAxisRecord {
+  tag : Tag
+  name_id : UInt16
+  ordering : UInt16
+} derive(@debug.Debug)
+pub impl FromData for StatAxisRecord
+
+pub(all) struct StatAxisValue {
+  axis_index : UInt16
+  value : Fixed
+} derive(@debug.Debug)
+pub impl FromData for StatAxisValue
+
+pub(all) struct StatAxisValueFlags(UInt16)
+pub fn StatAxisValueFlags::elidable(Self) -> Bool
+pub fn StatAxisValueFlags::older_sibling_attribute(Self) -> Bool
+pub impl @debug.Debug for StatAxisValueFlags
+
+pub(all) enum StatAxisValueSubtable {
+  Format1(StatAxisValueSubtableFormat1)
+  Format2(StatAxisValueSubtableFormat2)
+  Format3(StatAxisValueSubtableFormat3)
+  Format4(StatAxisValueSubtableFormat4)
+}
+pub fn StatAxisValueSubtable::contains(Self, Fixed) -> Bool
+pub fn StatAxisValueSubtable::is_elidable(Self) -> Bool
+pub fn StatAxisValueSubtable::is_older_sibling(Self) -> Bool
+pub fn StatAxisValueSubtable::name_id(Self) -> UInt16
+pub fn StatAxisValueSubtable::value(Self) -> Fixed?
+
+pub(all) struct StatAxisValueSubtableFormat1 {
+  axis_index : UInt16
+  flags : StatAxisValueFlags
+  value_name_id : UInt16
+  value : Fixed
+} derive(@debug.Debug)
+pub impl FromData for StatAxisValueSubtableFormat1
+
+pub(all) struct StatAxisValueSubtableFormat2 {
+  axis_index : UInt16
+  flags : StatAxisValueFlags
+  value_name_id : UInt16
+  nominal_value : Fixed
+  range_min_value : Fixed
+  range_max_value : Fixed
+} derive(@debug.Debug)
+pub impl FromData for StatAxisValueSubtableFormat2
+
+pub(all) struct StatAxisValueSubtableFormat3 {
+  axis_index : UInt16
+  flags : StatAxisValueFlags
+  value_name_id : UInt16
+  value : Fixed
+  linked_value : Fixed
+} derive(@debug.Debug)
+pub impl FromData for StatAxisValueSubtableFormat3
+
+pub(all) struct StatAxisValueSubtableFormat4 {
+  flags : StatAxisValueFlags
+  value_name_id : UInt16
+  values : LazyArray16[StatAxisValue]
+}
+
+type StatAxisValueSubtables
+pub fn StatAxisValueSubtables::copy(Self) -> Self
+pub fn StatAxisValueSubtables::iter(Self) -> Iter[StatAxisValueSubtable]
+pub fn StatAxisValueSubtables::next(Self) -> StatAxisValueSubtable?
+
+pub struct StatTable {
+  axes : LazyArray16[StatAxisRecord]
+  fallback_name_id : UInt16?
+  version : UInt
+  data : BytesView
+  value_lookup_start : Offset32
+  value_offsets : LazyArray16[Offset16]
+}
+pub fn StatTable::parse(BytesView) -> Self?
+pub fn StatTable::subtable_for_axis(Self, Tag, Fixed?) -> StatAxisValueSubtable?
+pub fn StatTable::subtables(Self) -> StatAxisValueSubtables
+
+pub struct Stream {
+  data : BytesView
+  mut offset : Int
+}
+pub fn Stream::advance(Self, Int) -> Unit
+pub fn Stream::advance_checked(Self, Int) -> Unit raise Malformed
+pub fn Stream::at_end(Self) -> Bool
+pub fn Stream::copy(Self) -> Self
+pub fn Stream::data(Self) -> BytesView
+pub fn Stream::jump_to_end(Self) -> Unit
+pub fn Stream::new(BytesView) -> Self
+pub fn Stream::new_at(BytesView, Int) -> Self?
+pub fn Stream::new_at_r(BytesView, Int) -> Self raise Malformed
+pub fn Stream::offset(Self) -> Int
+pub fn[T : FromData] Stream::read(Self) -> T raise Malformed
+pub fn[T : FromData] Stream::read_array16(Self, UInt16) -> LazyArray16[T] raise Malformed
+pub fn[T : FromData] Stream::read_array32(Self, UInt) -> LazyArray32[T] raise Malformed
+pub fn[T : FromData] Stream::read_at(BytesView, Int) -> T raise Malformed
+pub fn Stream::read_at_offset16(Self, BytesView) -> BytesView raise Malformed
+pub fn Stream::read_bytes(Self, Int) -> BytesView raise Malformed
+pub fn Stream::read_f2dot14(Self) -> F2DOT14 raise Malformed
+pub fn Stream::read_i16(Self) -> Int16 raise Malformed
+pub fn Stream::read_i32(Self) -> Int raise Malformed
+pub fn Stream::read_i8(Self) -> Int raise Malformed
+pub fn[T : FromData] Stream::read_opt(Self) -> T?
+pub fn Stream::read_u16(Self) -> UInt16 raise Malformed
+pub fn Stream::read_u32(Self) -> UInt raise Malformed
+pub fn Stream::read_u8(Self) -> Byte raise Malformed
+pub fn Stream::tail(Self) -> BytesView?
+pub fn Stream::tail_r(Self) -> BytesView raise Malformed
+pub impl Default for Stream
+
+pub(all) struct StringId(UInt16) derive(Compare, Eq, @debug.Debug)
+pub impl FromData for StringId
+
+pub(all) enum Style {
+  Normal
+  Italic
+  Oblique
+} derive(Eq, Hash, @debug.Debug)
+pub impl Default for Style
+
+pub struct SubHeaderRecord {
+  first_code : UInt16
+  entry_count : UInt16
+  id_delta : Int16
+  id_range_offset : UInt16
+}
+pub impl FromData for SubHeaderRecord
+
+pub(all) enum SubstitutionSubtable {
+  Single(SingleSubstitution)
+  Multiple(MultipleSubstitution)
+  Alternate(AlternateSubstitution)
+  Ligature(LigatureSubstitution)
+  Context(ContextLookup)
+  ChainContext(ChainedContextLookup)
+  ReverseChainSingle(ReverseChainSingleSubstitution)
+}
+pub fn SubstitutionSubtable::coverage(Self) -> Coverage
+pub fn SubstitutionSubtable::is_reverse(Self) -> Bool
+pub impl LookupSubtable for SubstitutionSubtable
+
+pub(all) struct SvgDocument {
+  data : BytesView
+  start_glyph_id : GlyphId
+  end_glyph_id : GlyphId
+}
+pub fn SvgDocument::glyphs_range(Self) -> (GlyphId, GlyphId)
+
+type SvgDocumentsList
+pub fn SvgDocumentsList::find(Self, GlyphId) -> SvgDocument?
+pub fn SvgDocumentsList::get(Self, UInt16) -> SvgDocument?
+pub fn SvgDocumentsList::into_iter(Self) -> SvgDocumentsListIter
+pub fn SvgDocumentsList::is_empty(Self) -> Bool
+pub fn SvgDocumentsList::iter(Self) -> Iter[SvgDocument]
+pub fn SvgDocumentsList::len(Self) -> UInt16
+
+type SvgDocumentsListIter
+pub fn SvgDocumentsListIter::copy(Self) -> Self
+pub fn SvgDocumentsListIter::count(Self) -> Int
+pub fn SvgDocumentsListIter::next(Self) -> SvgDocument?
+
+pub(all) struct SvgTable {
+  documents : SvgDocumentsList
+}
+pub fn SvgTable::parse(BytesView) -> Self?
+
+pub struct SweepGradient {
+  center_x : Float
+  center_y : Float
+  start_angle : Float
+  end_angle : Float
+  extend : GradientExtend
+  variation_data : ColrVariationData
+  color_line : ColorLine
+}
+pub fn SweepGradient::stops(Self, UInt16, ArrayView[NormalizedCoordinate]) -> GradientStopsIter
+
+pub(all) struct TableRecord {
+  tag : Tag
+  check_sum : UInt
+  offset : UInt
+  length : UInt
+} derive(@debug.Debug)
+pub impl FromData for TableRecord
+
+pub(all) struct Tag(UInt) derive(Compare, Default, Eq, Hash)
+pub fn Tag::as_u32(Self) -> UInt
+pub fn Tag::from_bytes(Bytes) -> Self
+pub fn Tag::from_bytes_lossy(BytesView) -> Self
+pub fn Tag::from_str(String) -> Self
+pub fn Tag::is_null(Self) -> Bool
+pub fn Tag::to_bytes(Self) -> Bytes
+pub fn Tag::to_chars(Self) -> Array[Char]
+pub impl Show for Tag
+pub impl @debug.Debug for Tag
+pub impl FromData for Tag
+
+pub(all) struct Track {
+  value : Float
+  name_index : UInt16
+  values : LazyArray16[Int16]
+}
+
+pub(all) struct TrackData {
+  tracks : Tracks
+  sizes : LazyArray16[Fixed]
+}
+pub impl Default for TrackData
+
+type Tracks
+pub fn Tracks::get(Self, UInt16) -> Track?
+pub fn Tracks::into_iter(Self) -> TracksIter
+pub fn Tracks::is_empty(Self) -> Bool
+pub fn Tracks::iter(Self) -> Iter[Track]
+pub fn Tracks::len(Self) -> UInt16
+pub impl Default for Tracks
+
+type TracksIter
+pub fn TracksIter::next(Self) -> Track?
+
+pub(all) struct TrakTable {
+  horizontal : TrackData
+  vertical : TrackData
+}
+pub fn TrakTable::parse(BytesView) -> Self?
+
+pub(all) struct Transform {
+  a : Float
+  b : Float
+  c : Float
+  d : Float
+  e : Float
+  f : Float
+} derive(Eq)
+pub fn Transform::combine(Self, Self) -> Self
+pub fn Transform::is_default(Self) -> Bool
+pub fn Transform::new(Float, Float, Float, Float, Float, Float) -> Self
+pub fn Transform::new_rotate(Float) -> Self
+pub fn Transform::new_scale(Float, Float) -> Self
+pub fn Transform::new_skew(Float, Float) -> Self
+pub fn Transform::new_translate(Float, Float) -> Self
+pub impl Default for Transform
+pub impl @debug.Debug for Transform
+
+pub(all) struct U24(UInt) derive(Eq, @debug.Debug)
+pub impl FromData for U24
+
+pub struct UVSMappingRecord {
+  unicode_value : UInt
+  glyph_id : GlyphId
+}
+pub impl FromData for UVSMappingRecord
+
+pub struct UnicodeRangeRecord {
+  start_unicode_value : UInt
+  additional_count : Byte
+}
+pub impl FromData for UnicodeRangeRecord
+
+pub(all) struct UnicodeRanges {
+  lo : UInt64
+  hi : UInt64
+} derive(Default, Eq, @debug.Debug)
+pub fn UnicodeRanges::contains_char(Self, Char) -> Bool
+
+pub(all) struct ValueOffset(UInt16) derive(@debug.Debug)
+pub fn ValueOffset::next(Self) -> Self
+
+pub(all) struct ValueRecord {
+  x_placement : Int16
+  y_placement : Int16
+  x_advance : Int16
+  y_advance : Int16
+  x_placement_device : Device?
+  y_placement_device : Device?
+  x_advance_device : Device?
+  y_advance_device : Device?
+} derive(@debug.Debug)
+pub impl Default for ValueRecord
+
+type ValueRecordsArray
+pub fn ValueRecordsArray::get(Self, UInt16) -> ValueRecord?
+pub fn ValueRecordsArray::is_empty(Self) -> Bool
+pub fn ValueRecordsArray::len(Self) -> UInt16
+pub impl @debug.Debug for ValueRecordsArray
+
+pub(all) struct Variation {
+  axis : Tag
+  value : Float
+} derive(Eq, @debug.Debug)
+
+pub(all) struct VariationAxis {
+  tag : Tag
+  min_value : Float
+  def_value : Float
+  max_value : Float
+  name_id : UInt16
+  hidden : Bool
+} derive(Eq, @debug.Debug)
+pub fn VariationAxis::normalized_value(Self, Float) -> NormalizedCoordinate
+pub impl FromData for VariationAxis
+
+pub(all) struct VariationDevice {
+  outer_index : UInt16
+  inner_index : UInt16
+} derive(@debug.Debug)
+
+type VariationRegionList
+pub fn VariationRegionList::evaluate_region(Self, UInt16, ArrayView[NormalizedCoordinate]) -> Float
+
+pub struct VariationSelectorRecord {
+  var_selector : UInt
+  default_uvs_offset : Offset32?
+  non_default_uvs_offset : Offset32?
+}
+pub impl FromData for VariationSelectorRecord
+
+pub(all) struct VerticalOriginMetrics {
+  glyph_id : GlyphId
+  y : Int16
+} derive(@debug.Debug)
+pub impl FromData for VerticalOriginMetrics
+
+pub(all) struct VheaTable {
+  ascender : Int16
+  descender : Int16
+  line_gap : Int16
+  number_of_metrics : UInt16
+} derive(Default, @debug.Debug)
+pub fn VheaTable::parse(BytesView) -> Self?
+
+pub(all) struct VorgTable {
+  default_y : Int16
+  metrics : LazyArray16[VerticalOriginMetrics]
+}
+pub fn VorgTable::glyph_y_origin(Self, GlyphId) -> Int16
+pub fn VorgTable::parse(BytesView) -> Self?
+
+type VvarTable
+pub fn VvarTable::advance_offset(Self, GlyphId, ArrayView[NormalizedCoordinate]) -> Float?
+pub fn VvarTable::bottom_side_bearing_offset(Self, GlyphId, ArrayView[NormalizedCoordinate]) -> Float?
+pub fn VvarTable::parse(BytesView) -> Self?
+pub fn VvarTable::top_side_bearing_offset(Self, GlyphId, ArrayView[NormalizedCoordinate]) -> Float?
+pub fn VvarTable::vertical_origin_offset(Self, GlyphId, ArrayView[NormalizedCoordinate]) -> Float?
+
+pub(all) enum Weight {
+  Thin
+  ExtraLight
+  Light
+  Normal
+  Medium
+  SemiBold
+  Bold
+  ExtraBold
+  Black
+  Other(UInt16)
+} derive(Eq, Hash, @debug.Debug)
+pub fn Weight::from_u16(UInt16) -> Self
+pub fn Weight::to_number(Self) -> UInt16
+pub impl Default for Weight
+
+pub(all) enum Width {
+  UltraCondensed
+  ExtraCondensed
+  Condensed
+  SemiCondensed
+  Normal
+  SemiExpanded
+  Expanded
+  ExtraExpanded
+  UltraExpanded
+} derive(Compare, Eq, Hash, @debug.Debug)
+pub fn Width::to_number(Self) -> UInt16
+pub impl Default for Width
+
+// Type aliases
+pub type AlternateSets = LazyOffsetArray16[AlternateSet]
+
+pub type ChainedSequenceRuleSet = LazyOffsetArray16[ChainedSequenceRule]
+
+pub type ChainedSequenceRuleSets = LazyOffsetArray16[LazyOffsetArray16[ChainedSequenceRule]]
+
+pub type Class = UInt16
+
+pub type FeatureIndex = UInt16
+
+pub type FeatureList = RecordList[Feature]
+
+pub type LanguageIndex = UInt16
+
+pub type LanguageSystemList = RecordList[LanguageSystem]
+
+pub type LigatureSet = LazyOffsetArray16[Ligature]
+
+pub type LigatureSets = LazyOffsetArray16[LazyOffsetArray16[Ligature]]
+
+pub type LookupIndex = UInt16
+
+pub type LookupList = LazyOffsetArray16[Lookup]
+
+pub type ScriptIndex = UInt16
+
+pub type ScriptList = RecordList[Script]
+
+pub type SequenceList = LazyOffsetArray16[Sequence]
+
+pub type SequenceRuleSet = LazyOffsetArray16[SequenceRule]
+
+pub type SequenceRuleSets = LazyOffsetArray16[LazyOffsetArray16[SequenceRule]]
+
+pub type StateEntry = GenericStateEntry[Unit]
+
+pub type VariationIndex = UInt
+
+// Traits
+pub(open) trait ColrPainter {
+  fn outline_glyph(Self, GlyphId) -> Unit
+  fn paint(Self, Paint) -> Unit
+  fn push_clip(Self) -> Unit
+  fn push_clip_box(Self, RectF) -> Unit
+  fn pop_clip(Self) -> Unit
+  fn push_layer(Self, CompositeMode) -> Unit
+  fn pop_layer(Self) -> Unit
+  fn push_transform(Self, Transform) -> Unit
+  fn pop_transform(Self) -> Unit
+}
+
+pub(open) trait FromData {
+  fn size() -> Int
+  fn parse(BytesView) -> Self raise Malformed
+}
+pub impl FromData for Unit
+pub impl FromData for Byte
+pub impl FromData for Int
+pub impl FromData for Int16
+pub impl FromData for UInt
+pub impl FromData for UInt16
+pub impl FromData for UInt64
+pub impl[T : Offset] FromData for T?
+
+pub(open) trait FromSlice {
+  fn parse_slice(BytesView) -> Self raise Malformed
+}
+
+pub(open) trait LookupSubtable {
+  fn parse(BytesView, UInt16) -> Self raise Malformed
+}
+
+pub(open) trait Offset : FromData {
+  fn to_usize(Self) -> Int
+  fn is_null(Self) -> Bool
+}
+
+pub(open) trait OutlineBuilder {
+  fn move_to(Self, Float, Float) -> Unit
+  fn line_to(Self, Float, Float) -> Unit
+  fn quad_to(Self, Float, Float, Float, Float) -> Unit
+  fn curve_to(Self, Float, Float, Float, Float, Float, Float) -> Unit
+  fn close(Self) -> Unit
+}
+
+pub(open) trait RecordListItem {
+  fn parse(Tag, BytesView) -> Self raise Malformed
+}

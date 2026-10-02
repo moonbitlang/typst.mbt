@@ -9,6 +9,7 @@ import {
   "moonbitlang/typst/data/serde",
   "moonbitlang/typst/data/xml",
   "moonbitlang/typst/data/yaml",
+  "moonbitlang/typst/otf",
   "moonbitlang/typst/regex",
   "moonbitlang/typst/syntax",
   "moonbitlang/typst/time",
@@ -810,6 +811,10 @@ pub let decimal_zero : Decimal
 
 pub fn default_formats() -> Array[Format]
 
+pub let default_subscript_metrics : ScriptMetrics
+
+pub let default_superscript_metrics : ScriptMetrics
+
 pub let delim_short_fall : Em
 
 pub fn determine_format_from_path(@syntax.VirtualPath) -> ImageFormat?
@@ -984,11 +989,21 @@ pub let figure_elem_scope : Int
 
 pub let figure_elem_supplement : Int
 
+pub fn find_name(@otf.Face, UInt16) -> String?
+
 pub fn flush_elem() -> Element
 
 pub fn[T : FromValue + IntoValue + Fold] fold_of(Ty[T]) -> (Value, Value) -> Value
 
 pub fn[T : Fold] fold_or(T?, T?) -> T?
+
+pub let font_flags_math : FontFlags
+
+pub let font_flags_monospace : FontFlags
+
+pub let font_flags_serif : FontFlags
+
+pub let font_flags_variable : FontFlags
 
 pub let font_stretch_normal : FontStretch
 
@@ -1071,6 +1086,8 @@ pub fn geq(Value, Value) -> Value raise HintedError
 pub fn get_accent_func(String) -> Func?
 
 pub fn get_lr_wrapper_func(String) -> Func?
+
+pub fn glyph_frame(FontInstance, UInt16) -> GlyphFrame?
 
 pub fn grid_cell_elem() -> Element
 
@@ -2470,6 +2487,8 @@ pub fn round_with_precision(Double, Int) -> Double
 
 pub fn rust_debug_f64(Double) -> String
 
+pub fn rust_display_f32(Float) -> String
+
 pub fn rust_display_f64(Double) -> String
 
 pub fn rust_fixed_f64(Double, Int) -> String
@@ -2509,6 +2528,8 @@ pub let scripts_elem_body : Int
 pub fn separated_list(ArrayView[String], String) -> String
 
 pub fn sequence_elem() -> Element
+
+pub fn should_outline(FontInstance, UInt16) -> Bool
 
 pub let sink_max_values : Int
 
@@ -3706,6 +3727,9 @@ pub impl IntoValue for Axis
 pub impl Reflect for Axis
 
 pub(all) struct AxisValue(Double) derive(Eq, Hash, @debug.Debug)
+pub fn AxisValue::clamp(Self, FontAxis) -> Self
+pub fn AxisValue::get(Self) -> Float
+pub fn AxisValue::new(Float) -> Self
 pub impl FromValue for AxisValue
 pub impl IntoValue for AxisValue
 pub impl Reflect for AxisValue
@@ -3931,6 +3955,7 @@ pub(all) enum BottomEdgeMetric {
   Descender
   Bounds
 } derive(Eq, Hash, @debug.Debug)
+pub fn BottomEdgeMetric::to_vertical(Self) -> VerticalFontMetric?
 pub impl FromValue for BottomEdgeMetric
 pub impl IntoValue for BottomEdgeMetric
 pub impl Reflect for BottomEdgeMetric
@@ -4641,6 +4666,13 @@ pub fn CounterUpdateElem::update(Self) -> CounterUpdate
 pub fn CounterUpdateElem::with_key(Self, CounterKey) -> Self
 pub fn CounterUpdateElem::with_update(Self, CounterUpdate) -> Self
 pub impl NativeElement for CounterUpdateElem
+
+pub(all) struct Coverage(Array[UInt]) derive(Eq, Hash)
+pub fn Coverage::contains(Self, UInt) -> Bool
+pub fn Coverage::from_vec(Array[UInt]) -> Self
+pub fn Coverage::iter(Self) -> Iter[UInt]
+pub impl Default for Coverage
+pub impl Show for Coverage
 
 pub(all) enum Covers {
   LatinInCjk
@@ -5765,13 +5797,41 @@ pub struct Font {
 pub fn Font::data(Self) -> Bytes
 pub fn Font::face(Self) -> &FontFace
 pub fn Font::family(Self) -> String
+pub fn Font::from_data(Bytes, UInt) -> Self?
 pub fn Font::index(Self) -> UInt
+pub fn Font::info(Self) -> FontInfo
+pub fn Font::instantiate(Self, FontVariant, Abs, FontVariations) -> FontInstance
 pub fn Font::instantiate_with(Self, FontVariations) -> FontInstance
+pub fn Font::iter(Bytes) -> Array[Self]
 pub fn Font::new(Bytes, UInt, &FontFace) -> Self
 pub fn Font::post_script_name(Self) -> String?
+pub fn Font::ttf(Self) -> @otf.Face?
 pub impl Eq for Font
 pub impl Hash for Font
 pub impl Show for Font
+
+pub(all) struct FontAxis {
+  tag : OpenTypeTag
+  min : AxisValue
+  max : AxisValue
+  default : AxisValue
+} derive(Eq, Hash, @debug.Debug)
+
+pub struct FontBook {
+  // private fields
+}
+pub fn FontBook::contains_family(Self, String) -> Bool
+pub fn FontBook::families(Self) -> Array[(String, Array[Int])]
+pub fn FontBook::from_fonts(Array[Font]) -> Self
+pub fn FontBook::from_infos(Array[FontInfo]) -> Self
+pub fn FontBook::info(Self, Int) -> FontInfo?
+pub fn FontBook::len(Self) -> Int
+pub fn FontBook::new() -> Self
+pub fn FontBook::push(Self, FontInfo) -> Unit
+pub fn FontBook::select(Self, String, FontVariant) -> Int?
+pub fn FontBook::select_fallback(Self, FontInfo?, FontVariant, String) -> Int?
+pub fn FontBook::select_family(Self, String) -> Array[Int]
+pub impl Default for FontBook
 
 pub(all) struct FontFamily {
   name : String
@@ -5790,13 +5850,36 @@ pub impl FromValue for FontFeatures
 pub impl IntoValue for FontFeatures
 pub impl Reflect for FontFeatures
 
+pub(all) struct FontFlags(UInt) derive(Eq, Hash, @debug.Debug)
+pub fn FontFlags::contains(Self, Self) -> Bool
+pub fn FontFlags::empty() -> Self
+pub fn FontFlags::set(Self, Self, Bool) -> Self
+pub impl Show for FontFlags
+
+pub(all) struct FontInfo {
+  family : String
+  variant : FontVariant
+  flags : FontFlags
+  axes : Array[FontAxis]
+  coverage : Coverage
+} derive(Eq, Hash)
+pub fn FontInfo::from_ttf(@otf.Face) -> Self?
+pub fn FontInfo::is_last_resort(Self) -> Bool
+pub fn FontInfo::iter(Bytes) -> Array[Self]
+pub fn FontInfo::new(Bytes, UInt) -> Self?
+pub impl Show for FontInfo
+
 pub struct FontInstance {
   // private fields
 }
+pub fn FontInstance::edges(Self, TopEdge, BottomEdge, Abs, TextEdgeBounds) -> (Abs, Abs)
 pub fn FontInstance::face(Self) -> &FontInstanceFace
 pub fn FontInstance::font(Self) -> Font
 pub fn FontInstance::glyph_bounding_box(Self, UInt16) -> GlyphRect?
+pub fn FontInstance::math(Self) -> MathConstants
+pub fn FontInstance::metrics(Self) -> FontMetrics
 pub fn FontInstance::to_em(Self, Double) -> Em
+pub fn FontInstance::ttf(Self) -> @otf.Face?
 pub fn FontInstance::units_per_em(Self) -> Double
 pub fn FontInstance::variations(Self) -> FontVariations
 pub fn FontInstance::x_advance(Self, UInt16) -> Em?
@@ -5811,10 +5894,31 @@ pub impl FromValue for FontList
 pub impl IntoValue for FontList
 pub impl Reflect for FontList
 
+pub(all) struct FontMetrics {
+  units_per_em : Double
+  ascender : Em
+  cap_height : Em
+  x_height : Em
+  descender : Em
+  strikethrough : LineMetrics
+  underline : LineMetrics
+  overline : LineMetrics
+  subscript : ScriptMetrics?
+  superscript : ScriptMetrics?
+  // private fields
+}
+pub fn FontMetrics::from_ttf(@otf.Face) -> Self
+pub fn FontMetrics::vertical(Self, VerticalFontMetric) -> Em
+
 pub(all) struct FontStretch(Int) derive(Compare, Eq, Hash, @debug.Debug)
+pub fn FontStretch::distance(Self, Self) -> Ratio
+pub fn FontStretch::from_number(Int) -> Self
 pub fn FontStretch::from_ratio(Ratio) -> Self
+pub fn FontStretch::from_wdth(AxisValue) -> Self
 pub fn FontStretch::repr(Self) -> String
+pub fn FontStretch::round(Self) -> Self
 pub fn FontStretch::to_ratio(Self) -> Ratio
+pub fn FontStretch::to_wdth(Self) -> AxisValue
 pub impl Default for FontStretch
 pub impl FromValue for FontStretch
 pub impl IntoValue for FontStretch
@@ -5831,7 +5935,19 @@ pub impl FromValue for FontStyle
 pub impl IntoValue for FontStyle
 pub impl Reflect for FontStyle
 
+pub(all) struct FontVariant {
+  style : FontStyle
+  weight : FontWeight
+  stretch : FontStretch
+} derive(Compare, Eq, Hash)
+pub fn FontVariant::new(FontStyle, FontWeight, FontStretch) -> Self
+pub impl Default for FontVariant
+pub impl Show for FontVariant
+
 pub(all) struct FontVariations(Array[(OpenTypeTag, AxisValue)]) derive(Eq, Hash, @debug.Debug)
+pub fn FontVariations::chain(Self, Self) -> Self
+pub fn FontVariations::normalized(Self) -> Self
+pub fn FontVariations::resolve(Array[FontAxis], FontVariant, Abs) -> Self
 pub impl Default for FontVariations
 pub impl Fold for FontVariations
 pub impl FromValue for FontVariations
@@ -5841,8 +5957,10 @@ pub impl Reflect for FontVariations
 pub(all) struct FontWeight(Int) derive(Compare, Eq, Hash, @debug.Debug)
 pub fn FontWeight::distance(Self, Self) -> Int
 pub fn FontWeight::from_number(Int) -> Self
+pub fn FontWeight::from_wght(AxisValue) -> Self
 pub fn FontWeight::thicken(Self, Int) -> Self
 pub fn FontWeight::to_number(Self) -> Int
+pub fn FontWeight::to_wght(Self) -> AxisValue
 pub impl Default for FontWeight
 pub impl FromValue for FontWeight
 pub impl IntoValue for FontWeight
@@ -6159,6 +6277,19 @@ pub(all) struct Glyph {
   span : (@syntax.Span, UInt16)
 } derive(Eq, Hash)
 pub fn Glyph::range(Self) -> (Int, Int)
+
+pub(all) struct GlyphFrame {
+  upem : Abs
+  item : GlyphFrameItem
+}
+pub fn GlyphFrame::size(Self) -> Axes[Abs]
+pub fn GlyphFrame::to_frame(Self) -> Frame
+
+pub(all) enum GlyphFrameItem {
+  Tofu(Point, Shape)
+  Image(Point, Image, Axes[Abs])
+}
+pub fn GlyphFrameItem::pos(Self) -> Point
 
 pub struct GlyphItem {
   text : String
@@ -7128,6 +7259,11 @@ pub impl FromValue for LineJoin
 pub impl IntoValue for LineJoin
 pub impl Reflect for LineJoin
 
+pub(all) struct LineMetrics {
+  position : Em
+  thickness : Em
+} derive(Eq)
+
 pub(all) enum LineNumberingScope {
   Document
   Page
@@ -7467,6 +7603,64 @@ pub struct MathComponent {
   kind : MathKind
   props : MathProperties
   styles : StyleChain
+}
+
+pub(all) struct MathConstants {
+  space_width : Em
+  script_percent_scale_down : Int
+  script_script_percent_scale_down : Int
+  display_operator_min_height : Em
+  axis_height : Em
+  accent_base_height : Em
+  flattened_accent_base_height : Em
+  subscript_shift_down : Em
+  subscript_top_max : Em
+  subscript_baseline_drop_min : Em
+  superscript_shift_up : Em
+  superscript_shift_up_cramped : Em
+  superscript_bottom_min : Em
+  superscript_baseline_drop_max : Em
+  sub_superscript_gap_min : Em
+  superscript_bottom_max_with_subscript : Em
+  space_after_script : Em
+  upper_limit_gap_min : Em
+  upper_limit_baseline_rise_min : Em
+  lower_limit_gap_min : Em
+  lower_limit_baseline_drop_min : Em
+  stack_top_shift_up : Em
+  stack_top_display_style_shift_up : Em
+  stack_bottom_shift_down : Em
+  stack_bottom_display_style_shift_down : Em
+  stack_gap_min : Em
+  stack_display_style_gap_min : Em
+  stretch_stack_top_shift_up : Em
+  stretch_stack_bottom_shift_down : Em
+  stretch_stack_gap_above_min : Em
+  stretch_stack_gap_below_min : Em
+  fraction_numerator_shift_up : Em
+  fraction_numerator_display_style_shift_up : Em
+  fraction_denominator_shift_down : Em
+  fraction_denominator_display_style_shift_down : Em
+  fraction_numerator_gap_min : Em
+  fraction_num_display_style_gap_min : Em
+  fraction_rule_thickness : Em
+  fraction_denominator_gap_min : Em
+  fraction_denom_display_style_gap_min : Em
+  skewed_fraction_vertical_gap : Em
+  skewed_fraction_horizontal_gap : Em
+  overbar_vertical_gap : Em
+  overbar_rule_thickness : Em
+  overbar_extra_ascender : Em
+  underbar_vertical_gap : Em
+  underbar_rule_thickness : Em
+  underbar_extra_descender : Em
+  radical_vertical_gap : Em
+  radical_display_style_vertical_gap : Em
+  radical_rule_thickness : Em
+  radical_extra_ascender : Em
+  radical_kern_before_degree : Em
+  radical_kern_after_degree : Em
+  radical_degree_bottom_raise_percent : Double
 }
 
 pub(all) struct MathDelimiter(Char?) derive(Eq, Hash, @debug.Debug)
@@ -9492,6 +9686,13 @@ pub(all) enum ScriptKind {
   Super
 } derive(Eq, Hash, @debug.Debug)
 
+pub(all) struct ScriptMetrics {
+  width : Em
+  height : Em
+  horizontal_offset : Em
+  vertical_offset : Em
+} derive(Eq)
+
 pub struct ScriptsElem(Content)
 pub fn ScriptsElem::body(Self) -> Content
 pub fn ScriptsElem::new(Content) -> Self
@@ -9980,6 +10181,17 @@ pub fn StackElem::with_children(Self, Array[StackChild]) -> Self
 pub fn StackElem::with_dir(Self, Dir) -> Self
 pub fn StackElem::with_spacing(Self, Spacing?) -> Self
 pub impl NativeElement for StackElem
+
+pub(all) struct StandardAxes {
+  mut ital : FontAxis?
+  mut slnt : FontAxis?
+  mut wght : FontAxis?
+  mut wdth : FontAxis?
+  mut opsz : FontAxis?
+}
+pub fn StandardAxes::knows(OpenTypeTag) -> Bool
+pub fn StandardAxes::order(OpenTypeTag) -> Int
+pub fn StandardAxes::parse(Array[FontAxis]) -> Self
 
 pub(all) struct State {
   key : String
@@ -10676,6 +10888,12 @@ pub impl FromValue for TextDir
 pub impl IntoValue for TextDir
 pub impl Reflect for TextDir
 
+pub(all) enum TextEdgeBounds {
+  Zero
+  Glyph(UInt16)
+  Frame(Frame)
+}
+
 pub struct TextElem(Content)
 pub fn TextElem::alternates_in(StyleChain) -> Alternates
 pub fn TextElem::baseline_in(StyleChain) -> Length
@@ -10890,6 +11108,7 @@ pub(all) enum TopEdgeMetric {
   Baseline
   Bounds
 } derive(Eq, Hash, @debug.Debug)
+pub fn TopEdgeMetric::to_vertical(Self) -> VerticalFontMetric?
 pub impl FromValue for TopEdgeMetric
 pub impl IntoValue for TopEdgeMetric
 pub impl Reflect for TopEdgeMetric
@@ -11310,6 +11529,14 @@ pub(all) enum VersionComponents {
 pub impl FromValue for VersionComponents
 pub impl Reflect for VersionComponents
 
+pub(all) enum VerticalFontMetric {
+  Ascender
+  CapHeight
+  XHeight
+  Baseline
+  Descender
+} derive(Eq, Hash, @debug.Debug)
+
 pub(all) struct Warned[T] {
   output : T
   warnings : Array[SourceDiagnostic]
@@ -11386,6 +11613,8 @@ pub(open) trait FontFace {
   fn family(Self) -> String
   fn post_script_name(Self) -> String?
   fn instantiate(Self, FontVariations) -> &FontInstanceFace
+  fn info(Self) -> FontInfo = _
+  fn ttf(Self) -> @otf.Face? = _
 }
 
 pub(open) trait FontInstanceFace {
@@ -11393,6 +11622,8 @@ pub(open) trait FontInstanceFace {
   fn glyph_hor_advance(Self, UInt16) -> Int?
   fn glyph_ver_advance(Self, UInt16) -> Int?
   fn glyph_bounding_box(Self, UInt16) -> GlyphRect?
+  fn metrics(Self) -> FontMetrics = _
+  fn ttf(Self) -> @otf.Face? = _
 }
 
 pub(open) trait FromValue : Reflect {
@@ -11503,5 +11734,7 @@ pub(open) trait World {
   fn main(Self) -> @syntax.FileId
   fn source(Self, @syntax.FileId) -> @syntax.Source raise FileError
   fn file(Self, @syntax.FileId) -> Bytes raise FileError
+  fn book(Self) -> FontBook = _
+  fn font(Self, Int) -> Font? = _
   fn today(Self, Duration?) -> Datetime?
 }

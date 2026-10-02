@@ -17,6 +17,7 @@ mod ast_dump;
 mod breaking;
 mod collect;
 mod eval;
+mod font;
 mod fonts;
 mod html;
 mod paged;
@@ -71,6 +72,11 @@ fn main() {
                 .unwrap()
                 .join()
                 .unwrap();
+        }
+        Some("font") => {
+            // Only the output directory is used.
+            let out = PathBuf::from(&args[3]);
+            font::dump_font(&out);
         }
         Some("fonts") => {
             // The font manifest of the test world: `fonts <out-file>`.

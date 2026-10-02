@@ -195,14 +195,31 @@ fn text_elem_font_default() -> Value {
 
 ///|
 fn text_elem_font_parse(
-  _engine : Engine,
+  engine : Engine,
   args : Args,
   _locals : ParseLocals,
 ) -> Value? raise SourceError {
-  let font_list : FontList? = args.named("font")
-  // TODO: `check_font_list(engine, list)` warns about unknown font families
-  // ("unknown font family: {family}") once the font book is available.
-  font_list.map(list => list.into_value())
+  let font_list : @syntax.Spanned[FontList]? = args.named_spanned("font")
+  if font_list is Some(list) {
+    check_font_list(engine, list)
+  }
+  font_list.map(list => list.v.into_value())
+}
+
+///|
+/// Checks for font families that are not available.
+fn check_font_list(engine : Engine, list : @syntax.Spanned[FontList]) -> Unit {
+  let book = engine.world.book()
+  for family in list.v.0 {
+    if book.select_family(family.as_str()).is_empty() {
+      engine.sink.warn(
+        SourceDiagnostic::warning_at(
+          list.span,
+          "unknown font family: \{family.as_str()}",
+        ),
+      )
+    }
+  }
 }
 
 // FontStyle, FontWeight, FontStretch (see text_font.mbt)

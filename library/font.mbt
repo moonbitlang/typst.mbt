@@ -1,13 +1,10 @@
 // Port of `typst-library/src/text/font/mod.rs`: `Font` and `FontInstance`.
 //
-// Contract between the runtime types (P4 work unit A) and the OpenType
-// parser (unit B): font parsing is not ported yet, so a `Font` wraps an
-// OpenType backend behind the [FontFace] trait object and a `FontInstance`
-// wraps the instantiated backend behind [FontInstanceFace]. The backend
-// provides exactly the queries upstream answers with `ttf-parser`/
-// `rustybuzz`; unit B implements the traits for its face type and may add
-// `info()` (`FontInfo`) and `metrics()` (`FontMetrics`) accessors here once
-// those are ported. Everything that reads fonts (shaping, layout, exporters,
+// A `Font` wraps an OpenType backend behind the [FontFace] trait object and a
+// `FontInstance` wraps the instantiated backend behind [FontInstanceFace]. The
+// real backend is the `otf` package (a port of `ttf-parser`), see
+// [OtfFontFace]/[OtfInstanceFace] below and `Font::from_data`; tests may
+// provide fake faces. Everything that reads fonts (shaping, layout, exporters,
 // the frame dump) must go through these types.
 
 ///|
@@ -23,6 +20,26 @@ pub(open) trait FontFace {
   /// coordinates (upstream `Font::instantiate_impl`, which sets the
   /// variations on a `rustybuzz::Face`).
   fn instantiate(Self, FontVariations) -> &FontInstanceFace
+  /// The font's metadata (upstream `Font::info`).
+  fn info(Self) -> FontInfo = _
+  /// The underlying `ttf-parser` face, if the backend is `otf`.
+  fn ttf(Self) -> @otf.Face? = _
+}
+
+///|
+impl FontFace with fn info(self) {
+  {
+    family: self.family(),
+    variant: FontVariant::default(),
+    flags: FontFlags::empty(),
+    axes: [],
+    coverage: Coverage::default(),
+  }
+}
+
+///|
+impl FontFace with fn ttf(_) {
+  None
 }
 
 ///|
@@ -40,6 +57,36 @@ pub(open) trait FontInstanceFace {
   /// The bounding box of a glyph's outline in font units (upstream
   /// `glyph_bounding_box`).
   fn glyph_bounding_box(Self, UInt16) -> GlyphRect?
+  /// The instance's metrics (upstream `FontMetrics::from_ttf` of the
+  /// instantiated face).
+  fn metrics(Self) -> FontMetrics = _
+  /// The underlying `ttf-parser` face with the instance's variations, if the
+  /// backend is `otf`.
+  fn ttf(Self) -> @otf.Face? = _
+}
+
+///|
+impl FontInstanceFace with fn metrics(self) {
+  let zero = Em::zero()
+  let line : LineMetrics = { position: zero, thickness: zero, }
+  {
+    units_per_em: self.units_per_em(),
+    ascender: zero,
+    cap_height: zero,
+    x_height: zero,
+    descender: zero,
+    strikethrough: line,
+    underline: line,
+    overline: line,
+    subscript: None,
+    superscript: None,
+    math: Ref(None),
+  }
+}
+
+///|
+impl FontInstanceFace with fn ttf(_) {
+  None
 }
 
 ///|
@@ -72,6 +119,28 @@ pub fn Font::new(data : Bytes, index : UInt, face : &FontFace) -> Font {
 }
 
 ///|
+/// Parse a font from data and collection index (upstream `Font::new`).
+pub fn Font::from_data(data : Bytes, index : UInt) -> Font? {
+  let ttf = @otf.Face::parse(data[:], index) catch { _ => return None }
+  guard FontInfo::from_ttf(ttf) is Some(info) else { return None }
+  let face : OtfFontFace = { data, index, ttf, info, instances: {}, }
+  Some(Font::new(data, index, face))
+}
+
+///|
+/// Parse all fonts in the given data (upstream `Font::iter`).
+pub fn Font::iter(data : Bytes) -> Array[Font] {
+  let count = @otf.fonts_in_collection(data[:]).unwrap_or(1)
+  let out = []
+  for index in 0U..<count {
+    if Font::from_data(data, index) is Some(font) {
+      out.push(font)
+    }
+  }
+  out
+}
+
+///|
 /// The underlying buffer.
 pub fn Font::data(self : Font) -> Bytes {
   self.data
@@ -90,6 +159,18 @@ pub fn Font::face(self : Font) -> &FontFace {
 }
 
 ///|
+/// The font's metadata.
+pub fn Font::info(self : Font) -> FontInfo {
+  self.face.info()
+}
+
+///|
+/// The underlying `ttf-parser` face (without variations), if any.
+pub fn Font::ttf(self : Font) -> @otf.Face? {
+  self.face.ttf()
+}
+
+///|
 /// The typographic font family this font is part of (upstream
 /// `font.info().family`).
 pub fn Font::family(self : Font) -> String {
@@ -103,10 +184,24 @@ pub fn Font::post_script_name(self : Font) -> String? {
 }
 
 ///|
+/// Instantiates the font with specific text properties. The resulting
+/// type allows access to methods that depend on coordinates.
+pub fn Font::instantiate(
+  self : Font,
+  variant : FontVariant,
+  size : Abs,
+  custom : FontVariations,
+) -> FontInstance {
+  let axes = self.info().axes
+  let automatic = FontVariations::resolve(axes, variant, size)
+  let full = automatic.chain(custom).normalized()
+  self.instantiate_with(full)
+}
+
+///|
 /// Instantiates the font with specific variation coordinates. The resulting
 /// type allows access to methods that depend on coordinates (upstream
-/// `Font::instantiate_impl`; `instantiate`, which resolves the automatic
-/// variations, needs `FontInfo::axes`).
+/// `Font::instantiate_impl`).
 pub fn Font::instantiate_with(
   self : Font,
   variations : FontVariations,
@@ -128,9 +223,10 @@ pub impl Hash for Font with fn hash_combine(self, hasher) {
 }
 
 ///|
-/// Upstream `Debug for Font` (without the variant).
+/// Upstream `Debug for Font`: `Font({family}, {variant:?})`.
 pub impl Show for Font with fn output(self, logger) {
-  logger.write_string("Font(\{self.family()})")
+  let info = self.info()
+  logger.write_string("Font(\{info.family}, \{info.variant})")
 }
 
 ///|
@@ -162,6 +258,26 @@ pub fn FontInstance::variations(self : FontInstance) -> FontVariations {
 /// The instantiated face.
 pub fn FontInstance::face(self : FontInstance) -> &FontInstanceFace {
   self.face
+}
+
+///|
+/// The font's metrics.
+pub fn FontInstance::metrics(self : FontInstance) -> FontMetrics {
+  self.face.metrics()
+}
+
+///|
+/// The font's math constants.
+pub fn FontInstance::math(self : FontInstance) -> MathConstants {
+  let metrics = self.metrics()
+  match metrics.math.val {
+    Some(math) => math
+    None => {
+      let math = MathConstants::new(self)
+      metrics.math.val = Some(math)
+      math
+    }
+  }
 }
 
 ///|
@@ -198,6 +314,66 @@ pub fn FontInstance::glyph_bounding_box(
 }
 
 ///|
+/// A reference to the underlying `ttf-parser` face (with the instance's
+/// variations), if any.
+pub fn FontInstance::ttf(self : FontInstance) -> @otf.Face? {
+  self.face.ttf()
+}
+
+///|
+/// Resolve the top and bottom edges of text.
+pub fn FontInstance::edges(
+  self : FontInstance,
+  top_edge : TopEdge,
+  bottom_edge : BottomEdge,
+  font_size : Abs,
+  bounds : TextEdgeBounds,
+) -> (Abs, Abs) {
+  let cell : Ref[GlyphRect??] = Ref(None)
+  let bbox = (gid : UInt16, f : (GlyphRect) -> Int) => {
+    let rect = match cell.val {
+      Some(rect) => rect
+      None => {
+        let rect = self.glyph_bounding_box(gid)
+        cell.val = Some(rect)
+        rect
+      }
+    }
+    match rect {
+      Some(bbox) => self.to_em(f(bbox).to_double()).at(font_size)
+      None => Abs::zero()
+    }
+  }
+  let top = match top_edge {
+    Metric(metric) =>
+      match metric.to_vertical() {
+        Some(metric) => self.metrics().vertical(metric).at(font_size)
+        None =>
+          match bounds {
+            Zero => Abs::zero()
+            Frame(frame) => frame.ascent()
+            Glyph(gid) => bbox(gid, b => b.y_max)
+          }
+      }
+    Length(length) => length.at(font_size)
+  }
+  let bottom = match bottom_edge {
+    Metric(metric) =>
+      match metric.to_vertical() {
+        Some(metric) => -self.metrics().vertical(metric).at(font_size)
+        None =>
+          match bounds {
+            Zero => Abs::zero()
+            Frame(frame) => frame.descent()
+            Glyph(gid) => -bbox(gid, b => b.y_min)
+          }
+      }
+    Length(length) => -length.at(font_size)
+  }
+  (top, bottom)
+}
+
+///|
 pub impl Eq for FontInstance with fn equal(self, other) {
   self.font == other.font && self.variations == other.variations
 }
@@ -212,4 +388,114 @@ pub impl Hash for FontInstance with fn hash_combine(self, hasher) {
 /// Upstream `Debug for FontInstance` (abridged).
 pub impl Show for FontInstance with fn output(self, logger) {
   logger.write_string("FontInstance { font: \{self.font} }")
+}
+
+// ---------------------------------------------------------------------------
+// The `otf` backend.
+
+///|
+/// A font face backed by the `otf` package (upstream `FontInner`).
+priv struct OtfFontFace {
+  /// The raw font data.
+  data : Bytes
+  /// The font's index in the buffer.
+  index : UInt
+  /// The underlying ttf-parser face.
+  ttf : @otf.Face
+  /// Metadata about the font.
+  info : FontInfo
+  /// Memoized instances (upstream `#[comemo::memoize] instantiate_impl`).
+  instances : Map[FontVariations, OtfInstanceFace]
+}
+
+///|
+impl FontFace for OtfFontFace with fn family(self) {
+  self.info.family
+}
+
+///|
+impl FontFace for OtfFontFace with fn post_script_name(self) {
+  find_name(self.ttf, @otf.name_id_post_script_name)
+}
+
+///|
+impl FontFace for OtfFontFace with fn info(self) {
+  self.info
+}
+
+///|
+impl FontFace for OtfFontFace with fn ttf(self) {
+  Some(self.ttf)
+}
+
+///|
+impl FontFace for OtfFontFace with fn instantiate(self, variations) {
+  match self.instances.get(variations) {
+    Some(instance) => instance
+    None => {
+      // Upstream parses a fresh `rustybuzz::Face` and sets the variations.
+      let ttf = @otf.Face::parse(self.data[:], self.index) catch {
+        _ => abort("font data was parsed before")
+      }
+      for entry in variations.0 {
+        let (tag, value) = entry
+        ttf.set_variation(@otf.Tag::from_str(tag.0), value.get()) |> ignore
+      }
+      let instance : OtfInstanceFace = {
+        ttf,
+        metrics: FontMetrics::from_ttf(ttf),
+      }
+      self.instances[variations] = instance
+      instance
+    }
+  }
+}
+
+///|
+/// An instantiated `otf` face (upstream `FontInstanceInner`).
+priv struct OtfInstanceFace {
+  /// The face with the instance's variation coordinates applied.
+  ttf : @otf.Face
+  /// The font's metrics.
+  metrics : FontMetrics
+}
+
+///|
+impl FontInstanceFace for OtfInstanceFace with fn units_per_em(self) {
+  self.metrics.units_per_em
+}
+
+///|
+impl FontInstanceFace for OtfInstanceFace with fn glyph_hor_advance(self, glyph) {
+  self.ttf.glyph_hor_advance(@otf.GlyphId(glyph)).map(v => v.to_int())
+}
+
+///|
+impl FontInstanceFace for OtfInstanceFace with fn glyph_ver_advance(self, glyph) {
+  self.ttf.glyph_ver_advance(@otf.GlyphId(glyph)).map(v => v.to_int())
+}
+
+///|
+impl FontInstanceFace for OtfInstanceFace with fn glyph_bounding_box(
+  self,
+  glyph,
+) {
+  self.ttf
+  .glyph_bounding_box(@otf.GlyphId(glyph))
+  .map(r => GlyphRect::{
+    x_min: r.x_min.to_int(),
+    y_min: r.y_min.to_int(),
+    x_max: r.x_max.to_int(),
+    y_max: r.y_max.to_int(),
+  })
+}
+
+///|
+impl FontInstanceFace for OtfInstanceFace with fn metrics(self) {
+  self.metrics
+}
+
+///|
+impl FontInstanceFace for OtfInstanceFace with fn ttf(self) {
+  Some(self.ttf)
 }

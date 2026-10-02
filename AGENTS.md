@@ -18,6 +18,12 @@
   Bidi (`bidi/`), line breaking (`linebreak/`, ICU4X + Typst's
   `breakpoints`), hyphenation (`hypher/`) and word-bound tables are
   generated from the locked crates by `scripts/gen_breaking.sh`.
+- Fonts: `otf/` is a faithful port of `ttf-parser` 0.25.1 (`Face` with
+  upstream's accessors; `cmap::Subtable` -> `CmapSubtable` etc.). The Typst
+  font layer (`FontInfo`, `FontBook`, `FontMetrics`, `Font::from_data`,
+  `FontInstance`, color glyphs) lives in `library/font*.mbt`. The `font`
+  stage (`scripts/goldens.sh font`, oracle/src/font.rs) compares both for
+  all 85 test-world faces plus font-book selection/fallback.
 - Before committing: `moon fmt && moon info && moon check`, run the runner.
 - Run unit tests in parallel: `moon test --target native -j16` (24 cores).
 - Debug vs `--release` (native): a release rebuild takes ~80-95 s vs ~11 s
