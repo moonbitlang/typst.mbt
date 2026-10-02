@@ -124,3 +124,8 @@
   loads them (`library/image_pdf.mbt`); `hayro/write` (hayro-write) extracts
   pages that `pdf/image.mbt` embeds as XObjects. `hayro/syntax/oracle_test.mbt`
   is generated from the real crate (`oracle/src/bin/gen_hayro_syntax_tests.rs`).
+- `kurbo/` stroke expansion (`stroke.mbt`, `offset.mbt`, `arc.mbt`) is
+  bit-exact with kurbo 0.13.1 on native (libm externs incl. `__sincos_stret`
+  where LLVM merges sin/cos; `powi` as LLVM expands it). Oracle:
+  `kurbo/testdata/stroke_oracle.tsv` from `gen_kurbo_stroke_tests` (command
+  in its header), checked by `kurbo/stroke_oracle_test.mbt`.

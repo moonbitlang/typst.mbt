@@ -127,6 +127,64 @@ pub fn Vec2::hypot(self : Vec2) -> Double {
 }
 
 ///|
+/// Magnitude of vector (alias for `hypot`).
+pub fn Vec2::length(self : Vec2) -> Double {
+  self.hypot()
+}
+
+///|
+/// Magnitude squared of vector (alias for `hypot2`).
+pub fn Vec2::length_squared(self : Vec2) -> Double {
+  self.hypot2()
+}
+
+///|
+/// A unit vector of the given angle.
+///
+/// With `th` at zero, the result is the positive X unit vector, and
+/// at π/2, it is the positive Y unit vector. The angle is expressed
+/// in radians.
+pub fn Vec2::from_angle(th : Double) -> Vec2 {
+  let (th_sin, th_cos) = sin_cos(th)
+  { x: th_cos, y: th_sin, }
+}
+
+///|
+/// `Vec2 / f64`: like upstream, division by a scalar is implemented by
+/// multiplying by the reciprocal.
+fn Vec2::div_f64(self : Vec2, other : Double) -> Vec2 {
+  self.scale(1.0 / other)
+}
+
+///|
+/// Returns a vector of magnitude 1.0 with the same angle as `self`; i.e.
+/// a unit/direction vector.
+///
+/// This produces `NaN` values when the magnitude is `0`.
+pub fn Vec2::normalize(self : Vec2) -> Vec2 {
+  self.div_f64(self.hypot())
+}
+
+///|
+/// Turn by 90 degrees.
+///
+/// The rotation is clockwise in a Y-down coordinate system.
+pub fn Vec2::turn_90(self : Vec2) -> Vec2 {
+  { x: -self.y, y: self.x, }
+}
+
+///|
+/// Combine two vectors interpreted as rotation and scaling.
+///
+/// Interpret both vectors as a rotation and a scale, and combine
+/// their effects by adding the angles and multiplying the magnitudes.
+/// This operation is equivalent to multiplication when the vectors
+/// are interpreted as complex numbers. It is commutative.
+pub fn Vec2::rotate_scale(self : Vec2, rhs : Vec2) -> Vec2 {
+  { x: self.x * rhs.x - self.y * rhs.y, y: self.x * rhs.y + self.y * rhs.x, }
+}
+
+///|
 /// Dot product of two vectors.
 pub fn Vec2::dot(self : Vec2, other : Vec2) -> Double {
   self.x * other.x + self.y * other.y
