@@ -1,15 +1,16 @@
 import {
   "moonbitlang/typst/hayro/syntax" @hayro_syntax,
   "moonbitlang/typst/hayro/interpret",
-  "moonbitlang/typst/kurbo",
+  "moonbitlang/typst/hayro/render" @hayro_render,
   "moonbitlang/typst/vello_cpu",
-  "moonbitlang/typst/pic_scale",
-}
-
-warnings = "-deprecated"
-
-import {
   "moonbitlang/typst/typst_assets/pdf" @pdf_fonts,
   "moonbitlang/x/fs",
+  "moonbitlang/core/env",
   "moonbitlang/core/string",
-} for "test"
+}
+
+supported_targets = "native"
+
+pkgtype(kind: "executable")
+
+warnings = "-deprecated"

@@ -1,0 +1,264 @@
+%PDF-1.7
+%‚„œ”
+1 0 obj
+<< /Type /ExtGState /BM /Normal >>
+endobj
+2 0 obj
+<< /Type /ExtGState /BM /Normal /ca 0.6 /CA 0.6 >>
+endobj
+3 0 obj
+<< /Type /ExtGState /BM /Multiply >>
+endobj
+4 0 obj
+<< /Type /ExtGState /BM /Multiply /ca 0.6 /CA 0.6 >>
+endobj
+5 0 obj
+<< /Type /ExtGState /BM /Screen >>
+endobj
+6 0 obj
+<< /Type /ExtGState /BM /Screen /ca 0.6 /CA 0.6 >>
+endobj
+7 0 obj
+<< /Type /ExtGState /BM /Overlay >>
+endobj
+8 0 obj
+<< /Type /ExtGState /BM /Overlay /ca 0.6 /CA 0.6 >>
+endobj
+9 0 obj
+<< /Type /ExtGState /BM /Darken >>
+endobj
+10 0 obj
+<< /Type /ExtGState /BM /Darken /ca 0.6 /CA 0.6 >>
+endobj
+11 0 obj
+<< /Type /ExtGState /BM /Lighten >>
+endobj
+12 0 obj
+<< /Type /ExtGState /BM /Lighten /ca 0.6 /CA 0.6 >>
+endobj
+13 0 obj
+<< /Type /ExtGState /BM /ColorDodge >>
+endobj
+14 0 obj
+<< /Type /ExtGState /BM /ColorDodge /ca 0.6 /CA 0.6 >>
+endobj
+15 0 obj
+<< /Type /ExtGState /BM /ColorBurn >>
+endobj
+16 0 obj
+<< /Type /ExtGState /BM /ColorBurn /ca 0.6 /CA 0.6 >>
+endobj
+17 0 obj
+<< /Type /ExtGState /BM /HardLight >>
+endobj
+18 0 obj
+<< /Type /ExtGState /BM /HardLight /ca 0.6 /CA 0.6 >>
+endobj
+19 0 obj
+<< /Type /ExtGState /BM /SoftLight >>
+endobj
+20 0 obj
+<< /Type /ExtGState /BM /SoftLight /ca 0.6 /CA 0.6 >>
+endobj
+21 0 obj
+<< /Type /ExtGState /BM /Difference >>
+endobj
+22 0 obj
+<< /Type /ExtGState /BM /Difference /ca 0.6 /CA 0.6 >>
+endobj
+23 0 obj
+<< /Type /ExtGState /BM /Exclusion >>
+endobj
+24 0 obj
+<< /Type /ExtGState /BM /Exclusion /ca 0.6 /CA 0.6 >>
+endobj
+25 0 obj
+<< /Type /ExtGState /BM /Hue >>
+endobj
+26 0 obj
+<< /Type /ExtGState /BM /Hue /ca 0.6 /CA 0.6 >>
+endobj
+27 0 obj
+<< /Type /ExtGState /BM /Saturation >>
+endobj
+28 0 obj
+<< /Type /ExtGState /BM /Saturation /ca 0.6 /CA 0.6 >>
+endobj
+29 0 obj
+<< /Type /ExtGState /BM /Color >>
+endobj
+30 0 obj
+<< /Type /ExtGState /BM /Color /ca 0.6 /CA 0.6 >>
+endobj
+31 0 obj
+<< /Type /ExtGState /BM /Luminosity >>
+endobj
+32 0 obj
+<< /Type /ExtGState /BM /Luminosity /ca 0.6 /CA 0.6 >>
+endobj
+33 0 obj
+<< /Type /ExtGState /ca 0.5 >>
+endobj
+34 0 obj
+<< /ShadingType 2 /ColorSpace /DeviceRGB /Coords [0 0 400 0] /Function << /FunctionType 2 /Domain [0 1] /C0 [0.9 0.2 0.1] /C1 [0.1 0.4 0.9] /N 1 >> /Extend [true true] >>
+endobj
+35 0 obj
+<< /Type /XObject /Subtype /Form /BBox [0 0 400 200] /Group << /S /Transparency /I true /CS /DeviceRGB >> /Resources << /ExtGState << /B0 1 0 R /T0 2 0 R /B1 3 0 R /T1 4 0 R /B2 5 0 R /T2 6 0 R /B3 7 0 R /T3 8 0 R /B4 9 0 R /T4 10 0 R /B5 11 0 R /T5 12 0 R /B6 13 0 R /T6 14 0 R /B7 15 0 R /T7 16 0 R /B8 17 0 R /T8 18 0 R /B9 19 0 R /T9 20 0 R /B10 21 0 R /T10 22 0 R /B11 23 0 R /T11 24 0 R /B12 25 0 R /T12 26 0 R /B13 27 0 R /T13 28 0 R /B14 29 0 R /T14 30 0 R /B15 31 0 R /T15 32 0 R /H 33 0 R >> /Shading << /S0 34 0 R >> >> /Length 1213 >>
+stream
+q /T0 gs 0.1 0.7 0.9 rg 10 20 40 40 re f 1 0.3 0.3 rg 25 35 30 30 re f Q
+q /T1 gs 0.1 0.7 0.9 rg 58 20 40 40 re f 1 0.3 0.3 rg 73 35 30 30 re f Q
+q /T2 gs 0.1 0.7 0.9 rg 106 20 40 40 re f 1 0.3 0.3 rg 121 35 30 30 re f Q
+q /T3 gs 0.1 0.7 0.9 rg 154 20 40 40 re f 1 0.3 0.3 rg 169 35 30 30 re f Q
+q /T4 gs 0.1 0.7 0.9 rg 202 20 40 40 re f 1 0.3 0.3 rg 217 35 30 30 re f Q
+q /T5 gs 0.1 0.7 0.9 rg 250 20 40 40 re f 1 0.3 0.3 rg 265 35 30 30 re f Q
+q /T6 gs 0.1 0.7 0.9 rg 298 20 40 40 re f 1 0.3 0.3 rg 313 35 30 30 re f Q
+q /T7 gs 0.1 0.7 0.9 rg 346 20 40 40 re f 1 0.3 0.3 rg 361 35 30 30 re f Q
+q /T8 gs 0.1 0.7 0.9 rg 10 110 40 40 re f 1 0.3 0.3 rg 25 125 30 30 re f Q
+q /T9 gs 0.1 0.7 0.9 rg 58 110 40 40 re f 1 0.3 0.3 rg 73 125 30 30 re f Q
+q /T10 gs 0.1 0.7 0.9 rg 106 110 40 40 re f 1 0.3 0.3 rg 121 125 30 30 re f Q
+q /T11 gs 0.1 0.7 0.9 rg 154 110 40 40 re f 1 0.3 0.3 rg 169 125 30 30 re f Q
+q /T12 gs 0.1 0.7 0.9 rg 202 110 40 40 re f 1 0.3 0.3 rg 217 125 30 30 re f Q
+q /T13 gs 0.1 0.7 0.9 rg 250 110 40 40 re f 1 0.3 0.3 rg 265 125 30 30 re f Q
+q /T14 gs 0.1 0.7 0.9 rg 298 110 40 40 re f 1 0.3 0.3 rg 313 125 30 30 re f Q
+q /T15 gs 0.1 0.7 0.9 rg 346 110 40 40 re f 1 0.3 0.3 rg 361 125 30 30 re f Q
+endstream
+endobj
+36 0 obj
+<< /Type /XObject /Subtype /Form /BBox [0 0 400 200] /Group << /S /Transparency /I false /CS /DeviceRGB >> /Resources << /ExtGState << /B0 1 0 R /T0 2 0 R /B1 3 0 R /T1 4 0 R /B2 5 0 R /T2 6 0 R /B3 7 0 R /T3 8 0 R /B4 9 0 R /T4 10 0 R /B5 11 0 R /T5 12 0 R /B6 13 0 R /T6 14 0 R /B7 15 0 R /T7 16 0 R /B8 17 0 R /T8 18 0 R /B9 19 0 R /T9 20 0 R /B10 21 0 R /T10 22 0 R /B11 23 0 R /T11 24 0 R /B12 25 0 R /T12 26 0 R /B13 27 0 R /T13 28 0 R /B14 29 0 R /T14 30 0 R /B15 31 0 R /T15 32 0 R /H 33 0 R >> /Shading << /S0 34 0 R >> >> /Length 1213 >>
+stream
+q /T0 gs 0.1 0.7 0.9 rg 10 20 40 40 re f 1 0.3 0.3 rg 25 35 30 30 re f Q
+q /T1 gs 0.1 0.7 0.9 rg 58 20 40 40 re f 1 0.3 0.3 rg 73 35 30 30 re f Q
+q /T2 gs 0.1 0.7 0.9 rg 106 20 40 40 re f 1 0.3 0.3 rg 121 35 30 30 re f Q
+q /T3 gs 0.1 0.7 0.9 rg 154 20 40 40 re f 1 0.3 0.3 rg 169 35 30 30 re f Q
+q /T4 gs 0.1 0.7 0.9 rg 202 20 40 40 re f 1 0.3 0.3 rg 217 35 30 30 re f Q
+q /T5 gs 0.1 0.7 0.9 rg 250 20 40 40 re f 1 0.3 0.3 rg 265 35 30 30 re f Q
+q /T6 gs 0.1 0.7 0.9 rg 298 20 40 40 re f 1 0.3 0.3 rg 313 35 30 30 re f Q
+q /T7 gs 0.1 0.7 0.9 rg 346 20 40 40 re f 1 0.3 0.3 rg 361 35 30 30 re f Q
+q /T8 gs 0.1 0.7 0.9 rg 10 110 40 40 re f 1 0.3 0.3 rg 25 125 30 30 re f Q
+q /T9 gs 0.1 0.7 0.9 rg 58 110 40 40 re f 1 0.3 0.3 rg 73 125 30 30 re f Q
+q /T10 gs 0.1 0.7 0.9 rg 106 110 40 40 re f 1 0.3 0.3 rg 121 125 30 30 re f Q
+q /T11 gs 0.1 0.7 0.9 rg 154 110 40 40 re f 1 0.3 0.3 rg 169 125 30 30 re f Q
+q /T12 gs 0.1 0.7 0.9 rg 202 110 40 40 re f 1 0.3 0.3 rg 217 125 30 30 re f Q
+q /T13 gs 0.1 0.7 0.9 rg 250 110 40 40 re f 1 0.3 0.3 rg 265 125 30 30 re f Q
+q /T14 gs 0.1 0.7 0.9 rg 298 110 40 40 re f 1 0.3 0.3 rg 313 125 30 30 re f Q
+q /T15 gs 0.1 0.7 0.9 rg 346 110 40 40 re f 1 0.3 0.3 rg 361 125 30 30 re f Q
+endstream
+endobj
+37 0 obj
+<< /Type /Pages /Kids [39 0 R 41 0 R 43 0 R] /Count 3 >>
+endobj
+38 0 obj
+<<  /Length 3829 >>
+stream
+q 0 0 400 200 re W n /S0 sh Q
+q /H gs 0.2 0.8 0.3 rg 0 200 400 200 re f Q
+q /B0 gs 1 0.85 0.2 rg 10 20 40 40 re f 0.3 0.1 0.6 rg 20 50 30 30 re f 0.9 0.9 0.9 RG 3 w 10 20 m 50 80 l S Q
+q /T0 gs 1 0.85 0.2 rg 10 220 40 40 re f 0.3 0.1 0.6 rg 20 250 30 30 re f 0.9 0.9 0.9 RG 3 w 10 220 m 50 280 l S Q
+q /B1 gs 1 0.85 0.2 rg 58 20 40 40 re f 0.3 0.1 0.6 rg 68 50 30 30 re f 0.9 0.9 0.9 RG 3 w 58 20 m 98 80 l S Q
+q /T1 gs 1 0.85 0.2 rg 58 220 40 40 re f 0.3 0.1 0.6 rg 68 250 30 30 re f 0.9 0.9 0.9 RG 3 w 58 220 m 98 280 l S Q
+q /B2 gs 1 0.85 0.2 rg 106 20 40 40 re f 0.3 0.1 0.6 rg 116 50 30 30 re f 0.9 0.9 0.9 RG 3 w 106 20 m 146 80 l S Q
+q /T2 gs 1 0.85 0.2 rg 106 220 40 40 re f 0.3 0.1 0.6 rg 116 250 30 30 re f 0.9 0.9 0.9 RG 3 w 106 220 m 146 280 l S Q
+q /B3 gs 1 0.85 0.2 rg 154 20 40 40 re f 0.3 0.1 0.6 rg 164 50 30 30 re f 0.9 0.9 0.9 RG 3 w 154 20 m 194 80 l S Q
+q /T3 gs 1 0.85 0.2 rg 154 220 40 40 re f 0.3 0.1 0.6 rg 164 250 30 30 re f 0.9 0.9 0.9 RG 3 w 154 220 m 194 280 l S Q
+q /B4 gs 1 0.85 0.2 rg 202 20 40 40 re f 0.3 0.1 0.6 rg 212 50 30 30 re f 0.9 0.9 0.9 RG 3 w 202 20 m 242 80 l S Q
+q /T4 gs 1 0.85 0.2 rg 202 220 40 40 re f 0.3 0.1 0.6 rg 212 250 30 30 re f 0.9 0.9 0.9 RG 3 w 202 220 m 242 280 l S Q
+q /B5 gs 1 0.85 0.2 rg 250 20 40 40 re f 0.3 0.1 0.6 rg 260 50 30 30 re f 0.9 0.9 0.9 RG 3 w 250 20 m 290 80 l S Q
+q /T5 gs 1 0.85 0.2 rg 250 220 40 40 re f 0.3 0.1 0.6 rg 260 250 30 30 re f 0.9 0.9 0.9 RG 3 w 250 220 m 290 280 l S Q
+q /B6 gs 1 0.85 0.2 rg 298 20 40 40 re f 0.3 0.1 0.6 rg 308 50 30 30 re f 0.9 0.9 0.9 RG 3 w 298 20 m 338 80 l S Q
+q /T6 gs 1 0.85 0.2 rg 298 220 40 40 re f 0.3 0.1 0.6 rg 308 250 30 30 re f 0.9 0.9 0.9 RG 3 w 298 220 m 338 280 l S Q
+q /B7 gs 1 0.85 0.2 rg 346 20 40 40 re f 0.3 0.1 0.6 rg 356 50 30 30 re f 0.9 0.9 0.9 RG 3 w 346 20 m 386 80 l S Q
+q /T7 gs 1 0.85 0.2 rg 346 220 40 40 re f 0.3 0.1 0.6 rg 356 250 30 30 re f 0.9 0.9 0.9 RG 3 w 346 220 m 386 280 l S Q
+q /B8 gs 1 0.85 0.2 rg 10 110 40 40 re f 0.3 0.1 0.6 rg 20 140 30 30 re f 0.9 0.9 0.9 RG 3 w 10 110 m 50 170 l S Q
+q /T8 gs 1 0.85 0.2 rg 10 310 40 40 re f 0.3 0.1 0.6 rg 20 340 30 30 re f 0.9 0.9 0.9 RG 3 w 10 310 m 50 370 l S Q
+q /B9 gs 1 0.85 0.2 rg 58 110 40 40 re f 0.3 0.1 0.6 rg 68 140 30 30 re f 0.9 0.9 0.9 RG 3 w 58 110 m 98 170 l S Q
+q /T9 gs 1 0.85 0.2 rg 58 310 40 40 re f 0.3 0.1 0.6 rg 68 340 30 30 re f 0.9 0.9 0.9 RG 3 w 58 310 m 98 370 l S Q
+q /B10 gs 1 0.85 0.2 rg 106 110 40 40 re f 0.3 0.1 0.6 rg 116 140 30 30 re f 0.9 0.9 0.9 RG 3 w 106 110 m 146 170 l S Q
+q /T10 gs 1 0.85 0.2 rg 106 310 40 40 re f 0.3 0.1 0.6 rg 116 340 30 30 re f 0.9 0.9 0.9 RG 3 w 106 310 m 146 370 l S Q
+q /B11 gs 1 0.85 0.2 rg 154 110 40 40 re f 0.3 0.1 0.6 rg 164 140 30 30 re f 0.9 0.9 0.9 RG 3 w 154 110 m 194 170 l S Q
+q /T11 gs 1 0.85 0.2 rg 154 310 40 40 re f 0.3 0.1 0.6 rg 164 340 30 30 re f 0.9 0.9 0.9 RG 3 w 154 310 m 194 370 l S Q
+q /B12 gs 1 0.85 0.2 rg 202 110 40 40 re f 0.3 0.1 0.6 rg 212 140 30 30 re f 0.9 0.9 0.9 RG 3 w 202 110 m 242 170 l S Q
+q /T12 gs 1 0.85 0.2 rg 202 310 40 40 re f 0.3 0.1 0.6 rg 212 340 30 30 re f 0.9 0.9 0.9 RG 3 w 202 310 m 242 370 l S Q
+q /B13 gs 1 0.85 0.2 rg 250 110 40 40 re f 0.3 0.1 0.6 rg 260 140 30 30 re f 0.9 0.9 0.9 RG 3 w 250 110 m 290 170 l S Q
+q /T13 gs 1 0.85 0.2 rg 250 310 40 40 re f 0.3 0.1 0.6 rg 260 340 30 30 re f 0.9 0.9 0.9 RG 3 w 250 310 m 290 370 l S Q
+q /B14 gs 1 0.85 0.2 rg 298 110 40 40 re f 0.3 0.1 0.6 rg 308 140 30 30 re f 0.9 0.9 0.9 RG 3 w 298 110 m 338 170 l S Q
+q /T14 gs 1 0.85 0.2 rg 298 310 40 40 re f 0.3 0.1 0.6 rg 308 340 30 30 re f 0.9 0.9 0.9 RG 3 w 298 310 m 338 370 l S Q
+q /B15 gs 1 0.85 0.2 rg 346 110 40 40 re f 0.3 0.1 0.6 rg 356 140 30 30 re f 0.9 0.9 0.9 RG 3 w 346 110 m 386 170 l S Q
+q /T15 gs 1 0.85 0.2 rg 346 310 40 40 re f 0.3 0.1 0.6 rg 356 340 30 30 re f 0.9 0.9 0.9 RG 3 w 346 310 m 386 370 l S Q
+endstream
+endobj
+39 0 obj
+<< /Type /Page /Parent 37 0 R /MediaBox [0 0 400 400] /Resources << /ExtGState << /B0 1 0 R /T0 2 0 R /B1 3 0 R /T1 4 0 R /B2 5 0 R /T2 6 0 R /B3 7 0 R /T3 8 0 R /B4 9 0 R /T4 10 0 R /B5 11 0 R /T5 12 0 R /B6 13 0 R /T6 14 0 R /B7 15 0 R /T7 16 0 R /B8 17 0 R /T8 18 0 R /B9 19 0 R /T9 20 0 R /B10 21 0 R /T10 22 0 R /B11 23 0 R /T11 24 0 R /B12 25 0 R /T12 26 0 R /B13 27 0 R /T13 28 0 R /B14 29 0 R /T14 30 0 R /B15 31 0 R /T15 32 0 R /H 33 0 R >> /Shading << /S0 34 0 R >> >> /Contents 38 0 R >>
+endobj
+40 0 obj
+<<  /Length 79 >>
+stream
+q 0 0 400 200 re W n /S0 sh Q q /H gs /F0 Do Q q 1 0 0 1 5 5 cm /B3 gs /F0 Do Q
+endstream
+endobj
+41 0 obj
+<< /Type /Page /Parent 37 0 R /MediaBox [0 0 400 200] /Resources << /ExtGState << /B0 1 0 R /T0 2 0 R /B1 3 0 R /T1 4 0 R /B2 5 0 R /T2 6 0 R /B3 7 0 R /T3 8 0 R /B4 9 0 R /T4 10 0 R /B5 11 0 R /T5 12 0 R /B6 13 0 R /T6 14 0 R /B7 15 0 R /T7 16 0 R /B8 17 0 R /T8 18 0 R /B9 19 0 R /T9 20 0 R /B10 21 0 R /T10 22 0 R /B11 23 0 R /T11 24 0 R /B12 25 0 R /T12 26 0 R /B13 27 0 R /T13 28 0 R /B14 29 0 R /T14 30 0 R /B15 31 0 R /T15 32 0 R /H 33 0 R >> /Shading << /S0 34 0 R >> /XObject << /F0 35 0 R >> >> /Contents 40 0 R >>
+endobj
+42 0 obj
+<<  /Length 79 >>
+stream
+q 0 0 400 200 re W n /S0 sh Q q /H gs /F0 Do Q q 1 0 0 1 5 5 cm /B3 gs /F0 Do Q
+endstream
+endobj
+43 0 obj
+<< /Type /Page /Parent 37 0 R /MediaBox [0 0 400 200] /Resources << /ExtGState << /B0 1 0 R /T0 2 0 R /B1 3 0 R /T1 4 0 R /B2 5 0 R /T2 6 0 R /B3 7 0 R /T3 8 0 R /B4 9 0 R /T4 10 0 R /B5 11 0 R /T5 12 0 R /B6 13 0 R /T6 14 0 R /B7 15 0 R /T7 16 0 R /B8 17 0 R /T8 18 0 R /B9 19 0 R /T9 20 0 R /B10 21 0 R /T10 22 0 R /B11 23 0 R /T11 24 0 R /B12 25 0 R /T12 26 0 R /B13 27 0 R /T13 28 0 R /B14 29 0 R /T14 30 0 R /B15 31 0 R /T15 32 0 R /H 33 0 R >> /Shading << /S0 34 0 R >> /XObject << /F0 36 0 R >> >> /Contents 42 0 R >>
+endobj
+44 0 obj
+<< /Type /Catalog /Pages 37 0 R >>
+endobj
+xref
+0 45
+0000000000 65535 f 
+0000000015 00000 n 
+0000000065 00000 n 
+0000000131 00000 n 
+0000000183 00000 n 
+0000000251 00000 n 
+0000000301 00000 n 
+0000000367 00000 n 
+0000000418 00000 n 
+0000000485 00000 n 
+0000000535 00000 n 
+0000000602 00000 n 
+0000000654 00000 n 
+0000000722 00000 n 
+0000000777 00000 n 
+0000000848 00000 n 
+0000000902 00000 n 
+0000000972 00000 n 
+0000001026 00000 n 
+0000001096 00000 n 
+0000001150 00000 n 
+0000001220 00000 n 
+0000001275 00000 n 
+0000001346 00000 n 
+0000001400 00000 n 
+0000001470 00000 n 
+0000001518 00000 n 
+0000001582 00000 n 
+0000001637 00000 n 
+0000001708 00000 n 
+0000001758 00000 n 
+0000001824 00000 n 
+0000001879 00000 n 
+0000001950 00000 n 
+0000001997 00000 n 
+0000002184 00000 n 
+0000003978 00000 n 
+0000005773 00000 n 
+0000005846 00000 n 
+0000009729 00000 n 
+0000010244 00000 n 
+0000010375 00000 n 
+0000010916 00000 n 
+0000011047 00000 n 
+0000011588 00000 n 
+trailer
+<< /Size 45 /Root 44 0 R >>
+startxref
+11639
+%%EOF

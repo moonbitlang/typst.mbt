@@ -2609,6 +2609,7 @@ dependencies = [
  "fontdb",
  "gif",
  "hayagriva",
+ "hayro",
  "hayro-syntax",
  "hypher",
  "icu_collator",

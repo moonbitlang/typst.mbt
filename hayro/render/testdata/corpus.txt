@@ -1,0 +1,371 @@
+# PDFs rendered by oracle/src/bin/gen_hayro_render_tests.rs: path relative to
+# the module root, page index (`*` = the first 4 pages).
+# Lines starting with `#skip` use image filters that hayro/syntax does not port
+# yet (DCT, JPX, JBIG2, CCITT), so their images are missing.
+target/hayro/hayro-tests/pdfs/custom/InlineAbbreviations.pdf	*
+target/hayro/hayro-tests/pdfs/custom/OverlappingGlyphClipping.pdf	*
+target/hayro/hayro-tests/pdfs/custom/TextClippingModeChanges.pdf	*
+target/hayro/hayro-tests/pdfs/custom/andler-optimal-lot-size.pdf	*
+target/hayro/hayro-tests/pdfs/custom/animated-distributions.pdf	*
+target/hayro/hayro-tests/pdfs/custom/annotation_checkbox.pdf	*
+target/hayro/hayro-tests/pdfs/custom/arabiccidtruetype-pdf.pdf	*
+target/hayro/hayro-tests/pdfs/custom/blank_page_without_contents.pdf	*
+target/hayro/hayro-tests/pdfs/custom/catalog-in-objstm-aes.pdf	*
+target/hayro/hayro-tests/pdfs/custom/clip_path_evenodd.pdf	*
+target/hayro/hayro-tests/pdfs/custom/clip_path_nested.pdf	*
+target/hayro/hayro-tests/pdfs/custom/color_separation_3.pdf	*
+target/hayro/hayro-tests/pdfs/custom/color_space_icc_gray.pdf	*
+target/hayro/hayro-tests/pdfs/custom/color_space_icc_invalid_profile.pdf	*
+target/hayro/hayro-tests/pdfs/custom/color_space_icc_srgb.pdf	*
+target/hayro/hayro-tests/pdfs/custom/color_space_indexed.pdf	*
+target/hayro/hayro-tests/pdfs/custom/color_space_lab.pdf	*
+target/hayro/hayro-tests/pdfs/custom/color_space_separation_1.pdf	*
+target/hayro/hayro-tests/pdfs/custom/color_space_separation_2.pdf	*
+target/hayro/hayro-tests/pdfs/custom/devicen_none.pdf	*
+target/hayro/hayro-tests/pdfs/custom/encrypted_aes_128.pdf	*
+target/hayro/hayro-tests/pdfs/custom/encrypted_aes_256.pdf	*
+target/hayro/hayro-tests/pdfs/custom/encrypted_aes_256_hardened.pdf	*
+target/hayro/hayro-tests/pdfs/custom/encrypted_rc4_rev2.pdf	*
+target/hayro/hayro-tests/pdfs/custom/encrypted_rc4_rev3.pdf	*
+target/hayro/hayro-tests/pdfs/custom/fillrule_evenodd.pdf	*
+target/hayro/hayro-tests/pdfs/custom/filter_tiff_predictor_gray.pdf	*
+target/hayro/hayro-tests/pdfs/custom/fireworks.pdf	*
+target/hayro/hayro-tests/pdfs/custom/flate_predictor_bpc_1.pdf	*
+target/hayro/hayro-tests/pdfs/custom/flate_predictor_invalid.pdf	*
+target/hayro/hayro-tests/pdfs/custom/font_cid_1.pdf	*
+target/hayro/hayro-tests/pdfs/custom/font_cid_2.pdf	*
+target/hayro/hayro-tests/pdfs/custom/font_cid_3.pdf	*
+target/hayro/hayro-tests/pdfs/custom/font_cid_4.pdf	*
+target/hayro/hayro-tests/pdfs/custom/font_cid_5.pdf	*
+target/hayro/hayro-tests/pdfs/custom/font_cid_6.pdf	*
+target/hayro/hayro-tests/pdfs/custom/font_cid_7.pdf	*
+target/hayro/hayro-tests/pdfs/custom/font_standard_1.pdf	*
+target/hayro/hayro-tests/pdfs/custom/font_standard_2.pdf	*
+target/hayro/hayro-tests/pdfs/custom/font_standard_widths_array.pdf	*
+target/hayro/hayro-tests/pdfs/custom/font_truetype_1.pdf	*
+target/hayro/hayro-tests/pdfs/custom/font_truetype_2.pdf	*
+target/hayro/hayro-tests/pdfs/custom/font_truetype_3.pdf	*
+target/hayro/hayro-tests/pdfs/custom/font_truetype_4.pdf	*
+target/hayro/hayro-tests/pdfs/custom/font_truetype_5.pdf	*
+target/hayro/hayro-tests/pdfs/custom/font_truetype_6.pdf	*
+target/hayro/hayro-tests/pdfs/custom/font_truetype_7.pdf	*
+#skip target/hayro/hayro-tests/pdfs/custom/font_truetype_8.pdf	*
+target/hayro/hayro-tests/pdfs/custom/font_truetype_slow_post_lookup.pdf	*
+target/hayro/hayro-tests/pdfs/custom/font_type1_1.pdf	*
+target/hayro/hayro-tests/pdfs/custom/font_type1_10.pdf	*
+target/hayro/hayro-tests/pdfs/custom/font_type1_11.pdf	*
+target/hayro/hayro-tests/pdfs/custom/font_type1_12.pdf	*
+target/hayro/hayro-tests/pdfs/custom/font_type1_2.pdf	*
+target/hayro/hayro-tests/pdfs/custom/font_type1_3.pdf	*
+target/hayro/hayro-tests/pdfs/custom/font_type1_4.pdf	*
+target/hayro/hayro-tests/pdfs/custom/font_type1_5.pdf	*
+target/hayro/hayro-tests/pdfs/custom/font_type1_6.pdf	*
+target/hayro/hayro-tests/pdfs/custom/font_type1_7.pdf	*
+target/hayro/hayro-tests/pdfs/custom/font_type1_8.pdf	*
+target/hayro/hayro-tests/pdfs/custom/font_type1_9.pdf	*
+target/hayro/hayro-tests/pdfs/custom/font_type1_cff_1.pdf	*
+target/hayro/hayro-tests/pdfs/custom/font_type1_cff_2.pdf	*
+target/hayro/hayro-tests/pdfs/custom/font_type1_cff_3.pdf	*
+target/hayro/hayro-tests/pdfs/custom/font_type1_cff_4.pdf	*
+target/hayro/hayro-tests/pdfs/custom/font_type1_cff_5.pdf	*
+target/hayro/hayro-tests/pdfs/custom/font_type1_cff_6.pdf	*
+target/hayro/hayro-tests/pdfs/custom/font_type3_filled_glyphs.pdf	*
+target/hayro/hayro-tests/pdfs/custom/font_type3_shape_glyphs.pdf	*
+target/hayro/hayro-tests/pdfs/custom/font_type3_stroked_glyphs.pdf	*
+target/hayro/hayro-tests/pdfs/custom/font_type3_widths_with_matrix.pdf	*
+target/hayro/hayro-tests/pdfs/custom/font_vertical.pdf	*
+target/hayro/hayro-tests/pdfs/custom/fonts_type1_latex.pdf	*
+target/hayro/hayro-tests/pdfs/custom/function_type0_1.pdf	*
+target/hayro/hayro-tests/pdfs/custom/function_type0_2.pdf	*
+target/hayro/hayro-tests/pdfs/custom/gradient_on_rect.pdf	*
+target/hayro/hayro-tests/pdfs/custom/gradient_on_rotated_rect.pdf	*
+target/hayro/hayro-tests/pdfs/custom/image_1_bit_per_component.pdf	*
+#skip target/hayro/hayro-tests/pdfs/custom/image_ccit_1.pdf	*
+#skip target/hayro/hayro-tests/pdfs/custom/image_ccit_3.pdf	*
+#skip target/hayro/hayro-tests/pdfs/custom/image_ccit_4.pdf	*
+#skip target/hayro/hayro-tests/pdfs/custom/image_cmyk_icc_jpg.pdf	*
+#skip target/hayro/hayro-tests/pdfs/custom/image_cmyk_jpg.pdf	*
+#skip target/hayro/hayro-tests/pdfs/custom/image_inline_2.pdf	*
+#skip target/hayro/hayro-tests/pdfs/custom/image_inline_3.pdf	*
+target/hayro/hayro-tests/pdfs/custom/image_inline_4.pdf	*
+target/hayro/hayro-tests/pdfs/custom/image_inline_5.pdf	*
+target/hayro/hayro-tests/pdfs/custom/image_inline_6.pdf	*
+#skip target/hayro/hayro-tests/pdfs/custom/image_inline_7.pdf	*
+#skip target/hayro/hayro-tests/pdfs/custom/image_inline_8.pdf	*
+target/hayro/hayro-tests/pdfs/custom/image_interpolate.pdf	*
+#skip target/hayro/hayro-tests/pdfs/custom/image_jbig2_crash.pdf	*
+#skip target/hayro/hayro-tests/pdfs/custom/image_lab.pdf	*
+#skip target/hayro/hayro-tests/pdfs/custom/image_lab_2.pdf	*
+target/hayro/hayro-tests/pdfs/custom/image_luma16.pdf	*
+target/hayro/hayro-tests/pdfs/custom/image_luma8.pdf	*
+target/hayro/hayro-tests/pdfs/custom/image_luma8_icc.pdf	*
+#skip target/hayro/hayro-tests/pdfs/custom/image_luma8_jpg.pdf	*
+#skip target/hayro/hayro-tests/pdfs/custom/image_mask.pdf	*
+target/hayro/hayro-tests/pdfs/custom/image_mask_4.pdf	*
+target/hayro/hayro-tests/pdfs/custom/image_mask_hairline.pdf	*
+target/hayro/hayro-tests/pdfs/custom/image_mask_missing_bpc.pdf	*
+target/hayro/hayro-tests/pdfs/custom/image_rgb16.pdf	*
+target/hayro/hayro-tests/pdfs/custom/image_rgb8.pdf	*
+#skip target/hayro/hayro-tests/pdfs/custom/image_rgb8_decode.pdf	*
+#skip target/hayro/hayro-tests/pdfs/custom/image_rgb8_icc.pdf	*
+#skip target/hayro/hayro-tests/pdfs/custom/image_rgb8_icc_jpg.pdf	*
+#skip target/hayro/hayro-tests/pdfs/custom/image_rgb8_jpg.pdf	*
+target/hayro/hayro-tests/pdfs/custom/image_rgba16.pdf	*
+target/hayro/hayro-tests/pdfs/custom/image_rgba8.pdf	*
+target/hayro/hayro-tests/pdfs/custom/image_rgba8_icc.pdf	*
+target/hayro/hayro-tests/pdfs/custom/integration_coat_of_arms.pdf	*
+target/hayro/hayro-tests/pdfs/custom/integration_diagram.pdf	*
+target/hayro/hayro-tests/pdfs/custom/integration_matplotlib.pdf	*
+target/hayro/hayro-tests/pdfs/custom/integration_matplotlib_2.pdf	*
+target/hayro/hayro-tests/pdfs/custom/issue1023.pdf	*
+target/hayro/hayro-tests/pdfs/custom/issue11.pdf	*
+target/hayro/hayro-tests/pdfs/custom/issue175.pdf	*
+target/hayro/hayro-tests/pdfs/custom/issue41.pdf	*
+target/hayro/hayro-tests/pdfs/custom/issue44.pdf	*
+target/hayro/hayro-tests/pdfs/custom/issue53.pdf	*
+target/hayro/hayro-tests/pdfs/custom/issue629.pdf	*
+target/hayro/hayro-tests/pdfs/custom/issue968.pdf	*
+target/hayro/hayro-tests/pdfs/custom/issue994.pdf	*
+target/hayro/hayro-tests/pdfs/custom/issue_clipping_panic.pdf	*
+target/hayro/hayro-tests/pdfs/custom/issue_cmap_lookup.pdf	*
+target/hayro/hayro-tests/pdfs/custom/issue_cubic_start_end.pdf	*
+target/hayro/hayro-tests/pdfs/custom/issue_isolate_shading_transform.pdf	*
+#skip target/hayro/hayro-tests/pdfs/custom/issue_missing_jpeg_image.pdf	*
+target/hayro/hayro-tests/pdfs/custom/issue_panic_with_clip.pdf	*
+target/hayro/hayro-tests/pdfs/custom/issue_panic_with_nested_clip.pdf	*
+target/hayro/hayro-tests/pdfs/custom/issue_predictor_with_null.pdf	*
+target/hayro/hayro-tests/pdfs/custom/issue_scaled_glyph.pdf	*
+#skip target/hayro/hayro-tests/pdfs/custom/issue_stream_abbreviations.pdf	*
+target/hayro/hayro-tests/pdfs/custom/lopdf_issue_449_1.pdf	*
+target/hayro/hayro-tests/pdfs/custom/lopdf_issue_449_2.pdf	*
+target/hayro/hayro-tests/pdfs/custom/mask_alpha.pdf	*
+target/hayro/hayro-tests/pdfs/custom/mask_bc.pdf	*
+target/hayro/hayro-tests/pdfs/custom/mask_in_type3_glyph.pdf	*
+target/hayro/hayro-tests/pdfs/custom/mask_luminosity.pdf	*
+target/hayro/hayro-tests/pdfs/custom/metadata_in_object_stream_encrypted.pdf	*
+target/hayro/hayro-tests/pdfs/custom/page_media_box_bottom_left.pdf	*
+target/hayro/hayro-tests/pdfs/custom/page_media_box_bottom_right.pdf	*
+target/hayro/hayro-tests/pdfs/custom/page_media_box_top_left.pdf	*
+target/hayro/hayro-tests/pdfs/custom/page_media_box_top_right.pdf	*
+target/hayro/hayro-tests/pdfs/custom/page_media_box_zoomed_out.pdf	*
+target/hayro/hayro-tests/pdfs/custom/page_rotation_180.pdf	*
+target/hayro/hayro-tests/pdfs/custom/page_rotation_270.pdf	*
+target/hayro/hayro-tests/pdfs/custom/page_rotation_90.pdf	*
+target/hayro/hayro-tests/pdfs/custom/page_rotation_none.pdf	*
+target/hayro/hayro-tests/pdfs/custom/password_1.pdf	*
+target/hayro/hayro-tests/pdfs/custom/password_2.pdf	*
+target/hayro/hayro-tests/pdfs/custom/password_encrypted_aes_128.pdf	*
+target/hayro/hayro-tests/pdfs/custom/password_encrypted_aes_256.pdf	*
+target/hayro/hayro-tests/pdfs/custom/password_encrypted_rc4_128.pdf	*
+target/hayro/hayro-tests/pdfs/custom/password_encrypted_rc4_40.pdf	*
+target/hayro/hayro-tests/pdfs/custom/path_rendering_1.pdf	*
+target/hayro/hayro-tests/pdfs/custom/path_rendering_10.pdf	*
+target/hayro/hayro-tests/pdfs/custom/path_rendering_11.pdf	*
+target/hayro/hayro-tests/pdfs/custom/path_rendering_12.pdf	*
+target/hayro/hayro-tests/pdfs/custom/path_rendering_13.pdf	*
+target/hayro/hayro-tests/pdfs/custom/path_rendering_14.pdf	*
+target/hayro/hayro-tests/pdfs/custom/path_rendering_15.pdf	*
+target/hayro/hayro-tests/pdfs/custom/path_rendering_16.pdf	*
+target/hayro/hayro-tests/pdfs/custom/path_rendering_17.pdf	*
+target/hayro/hayro-tests/pdfs/custom/path_rendering_2.pdf	*
+target/hayro/hayro-tests/pdfs/custom/path_rendering_3.pdf	*
+target/hayro/hayro-tests/pdfs/custom/path_rendering_4.pdf	*
+target/hayro/hayro-tests/pdfs/custom/path_rendering_5.pdf	*
+target/hayro/hayro-tests/pdfs/custom/path_rendering_6.pdf	*
+target/hayro/hayro-tests/pdfs/custom/path_rendering_7.pdf	*
+target/hayro/hayro-tests/pdfs/custom/path_rendering_8.pdf	*
+target/hayro/hayro-tests/pdfs/custom/path_rendering_9.pdf	*
+target/hayro/hayro-tests/pdfs/custom/path_rendering_dash_array_0_phase.pdf	*
+target/hayro/hayro-tests/pdfs/custom/pattern_shading_background.pdf	*
+target/hayro/hayro-tests/pdfs/custom/pattern_shading_bbox.pdf	*
+target/hayro/hayro-tests/pdfs/custom/pattern_shading_on_text.pdf	*
+target/hayro/hayro-tests/pdfs/custom/pattern_shading_type0_7.pdf	*
+target/hayro/hayro-tests/pdfs/custom/pattern_shading_type0_transform.pdf	*
+target/hayro/hayro-tests/pdfs/custom/pattern_shading_type1_1.pdf	*
+target/hayro/hayro-tests/pdfs/custom/pattern_shading_type1_2.pdf	*
+target/hayro/hayro-tests/pdfs/custom/pattern_shading_type1_3.pdf	*
+target/hayro/hayro-tests/pdfs/custom/pattern_shading_type1_4.pdf	*
+target/hayro/hayro-tests/pdfs/custom/pattern_shading_type1_5.pdf	*
+target/hayro/hayro-tests/pdfs/custom/pattern_shading_type1_6.pdf	*
+target/hayro/hayro-tests/pdfs/custom/pattern_shading_type1_transform.pdf	*
+target/hayro/hayro-tests/pdfs/custom/pattern_shading_type2_1.pdf	*
+target/hayro/hayro-tests/pdfs/custom/pattern_shading_type2_2.pdf	*
+target/hayro/hayro-tests/pdfs/custom/pattern_shading_type2_3_stops.pdf	*
+target/hayro/hayro-tests/pdfs/custom/pattern_shading_type2_many.pdf	*
+target/hayro/hayro-tests/pdfs/custom/pattern_shading_type2_no_extend.pdf	*
+target/hayro/hayro-tests/pdfs/custom/pattern_shading_type2_no_extend_with_background.pdf	*
+target/hayro/hayro-tests/pdfs/custom/pattern_shading_type2_out_of_viewport.pdf	*
+target/hayro/hayro-tests/pdfs/custom/pattern_shading_type2_slanted.pdf	*
+target/hayro/hayro-tests/pdfs/custom/pattern_shading_type3_1.pdf	*
+target/hayro/hayro-tests/pdfs/custom/pattern_shading_type3_2.pdf	*
+target/hayro/hayro-tests/pdfs/custom/pattern_shading_type3_3.pdf	*
+target/hayro/hayro-tests/pdfs/custom/pattern_shading_type4_2.pdf	*
+target/hayro/hayro-tests/pdfs/custom/pattern_shading_type6_2.pdf	*
+target/hayro/hayro-tests/pdfs/custom/pattern_shading_type7_background.pdf	*
+target/hayro/hayro-tests/pdfs/custom/pattern_tiling_inner_transform.pdf	*
+target/hayro/hayro-tests/pdfs/custom/pattern_tiling_large_x_step.pdf	*
+target/hayro/hayro-tests/pdfs/custom/pattern_tiling_lines.pdf	*
+target/hayro/hayro-tests/pdfs/custom/pattern_tiling_nested.pdf	*
+target/hayro/hayro-tests/pdfs/custom/pattern_tiling_rotated.pdf	*
+target/hayro/hayro-tests/pdfs/custom/pattern_tiling_rotated_shape.pdf	*
+target/hayro/hayro-tests/pdfs/custom/pattern_tiling_simple.pdf	*
+target/hayro/hayro-tests/pdfs/custom/pattern_tiling_small.pdf	*
+target/hayro/hayro-tests/pdfs/custom/pattern_tiling_small_cell.pdf	*
+target/hayro/hayro-tests/pdfs/custom/pattern_tiling_small_x_and_y_step.pdf	*
+target/hayro/hayro-tests/pdfs/custom/pattern_tiling_small_x_step.pdf	*
+target/hayro/hayro-tests/pdfs/custom/pattern_tiling_stencil.pdf	*
+target/hayro/hayro-tests/pdfs/custom/pattern_tiling_with_text.pdf	*
+target/hayro/hayro-tests/pdfs/custom/pdftc_100k_0138.pdf	*
+target/hayro/hayro-tests/pdfs/custom/pdftc_100k_1071.pdf	*
+target/hayro/hayro-tests/pdfs/custom/pdftc_100k_1731.pdf	*
+target/hayro/hayro-tests/pdfs/custom/pdftc_100k_1894.pdf	*
+#skip target/hayro/hayro-tests/pdfs/custom/pdftc_900k_0007_page_4.pdf	*
+target/hayro/hayro-tests/pdfs/custom/pdftc_900k_0012_page_1.pdf	*
+target/hayro/hayro-tests/pdfs/custom/pdftc_900k_0140_page_3.pdf	*
+#skip target/hayro/hayro-tests/pdfs/custom/pdftc_900k_0156_page_2.pdf	*
+target/hayro/hayro-tests/pdfs/custom/pdftc_900k_0240_page_2.pdf	*
+target/hayro/hayro-tests/pdfs/custom/pdftc_900k_0319_page_1.pdf	*
+#skip target/hayro/hayro-tests/pdfs/custom/pdftc_900k_0584_page_1.pdf	*
+#skip target/hayro/hayro-tests/pdfs/custom/pdftc_900k_0907.pdf	*
+target/hayro/hayro-tests/pdfs/custom/pdftc_900k_0917_page_1_reduced.pdf	*
+target/hayro/hayro-tests/pdfs/custom/pdftc_900k_0930_reduced.pdf	*
+#skip target/hayro/hayro-tests/pdfs/custom/pdftc_900k_0974_page_1.pdf	*
+#skip target/hayro/hayro-tests/pdfs/custom/pdftc_900k_1016_page_3.pdf	*
+target/hayro/hayro-tests/pdfs/custom/rendering_conflation_artifacts.pdf	*
+target/hayro/hayro-tests/pdfs/custom/resvg_masking_clipPath_mixed_clip_rule.pdf	*
+target/hayro/hayro-tests/pdfs/custom/resvg_masking_clipPath_nested_clip_path.pdf	*
+target/hayro/hayro-tests/pdfs/custom/resvg_masking_clipPath_overlapped_shapes_with_evenodd.pdf	*
+target/hayro/hayro-tests/pdfs/custom/resvg_masking_clipPath_self_recursive.pdf	*
+target/hayro/hayro-tests/pdfs/custom/resvg_masking_mask_mask_on_self.pdf	*
+target/hayro/hayro-tests/pdfs/custom/resvg_masking_mask_mask_on_self_with_mask_type_alpha.pdf	*
+target/hayro/hayro-tests/pdfs/custom/resvg_masking_mask_mask_type_alpha.pdf	*
+target/hayro/hayro-tests/pdfs/custom/resvg_masking_mask_mask_type_luminance.pdf	*
+target/hayro/hayro-tests/pdfs/custom/resvg_masking_mask_recursive.pdf	*
+target/hayro/hayro-tests/pdfs/custom/resvg_masking_mask_recursive_on_child.pdf	*
+target/hayro/hayro-tests/pdfs/custom/resvg_masking_mask_recursive_on_self.pdf	*
+target/hayro/hayro-tests/pdfs/custom/resvg_masking_mask_self_recursive.pdf	*
+target/hayro/hayro-tests/pdfs/custom/resvg_masking_mask_transform_on_shape.pdf	*
+target/hayro/hayro-tests/pdfs/custom/resvg_masking_mask_with_clip_path.pdf	*
+target/hayro/hayro-tests/pdfs/custom/resvg_masking_mask_with_image.pdf	*
+target/hayro/hayro-tests/pdfs/custom/separation_none.pdf	*
+target/hayro/hayro-tests/pdfs/custom/shading_operator_1.pdf	*
+target/hayro/hayro-tests/pdfs/custom/shading_operator_2.pdf	*
+#skip target/hayro/hayro-tests/pdfs/custom/stream_ccit_not_enough_data.pdf	*
+target/hayro/hayro-tests/pdfs/custom/stream_flate_bpc_1.pdf	*
+#skip target/hayro/hayro-tests/pdfs/custom/stream_jpx_1.pdf	*
+#skip target/hayro/hayro-tests/pdfs/custom/stream_jpx_3.pdf	*
+#skip target/hayro/hayro-tests/pdfs/custom/stream_jpx_5.pdf	*
+#skip target/hayro/hayro-tests/pdfs/custom/stream_jpx_6.pdf	*
+target/hayro/hayro-tests/pdfs/custom/stroke_properties.pdf	*
+target/hayro/hayro-tests/pdfs/custom/text-fading.pdf	*
+target/hayro/hayro-tests/pdfs/custom/text_filled_complex_paint.pdf	*
+target/hayro/hayro-tests/pdfs/custom/text_no_explicit_font.pdf	*
+target/hayro/hayro-tests/pdfs/custom/text_rendering_1.pdf	*
+target/hayro/hayro-tests/pdfs/custom/text_rendering_2.pdf	*
+target/hayro/hayro-tests/pdfs/custom/text_rendering_3.pdf	*
+target/hayro/hayro-tests/pdfs/custom/text_rendering_4.pdf	*
+target/hayro/hayro-tests/pdfs/custom/text_rendering_5.pdf	*
+target/hayro/hayro-tests/pdfs/custom/text_rendering_clipping.pdf	*
+target/hayro/hayro-tests/pdfs/custom/text_rendering_stroking_clipping.pdf	*
+target/hayro/hayro-tests/pdfs/custom/text_stroked_complex_paint.pdf	*
+target/hayro/hayro-tests/pdfs/custom/text_with_rise.pdf	*
+#skip target/hayro/hayro-tests/pdfs/custom/tile_clamp_bug.pdf	*
+target/hayro/hayro-tests/pdfs/custom/type0_function_too_many_entries.pdf	*
+target/hayro/hayro-tests/pdfs/custom/xobject_1.pdf	*
+target/hayro/hayro-tests/pdfs/custom/xobject_matrix.pdf	*
+target/hayro/hayro-tests/pdfs/custom/xobject_with_fill_opacity.pdf	*
+target/hayro/hayro-tests/pdfs/custom/xref_f2_len_8.pdf	*
+target/hayro/hayro-tests/pdfs/custom/xref_invalid_offsets.pdf	*
+target/hayro/hayro-tests/pdfs/load/encrypted_oob_length.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue1051.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue1321.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue152.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue153.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue154.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue156.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue157.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue178.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue180.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue182.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue202.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue203.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue204.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue205.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue206.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue207.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue208.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue222.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue223.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue224.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue234.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue235.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue236.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue256.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue273_180b.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue323.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue324.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue325.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue351.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue352.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue355.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue356.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue357.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue372.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue388.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue389.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue390.pdf	*
+#skip target/hayro/hayro-tests/pdfs/load/issue391.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue409.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue472.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue50.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue506.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue507.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue513.pdf	*
+#skip target/hayro/hayro-tests/pdfs/load/issue514.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue515.pdf	*
+#skip target/hayro/hayro-tests/pdfs/load/issue52.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue520.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue538.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue54.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue55.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue56.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue563.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue564.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue577.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue578.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue579.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue585.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue61.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue62.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue63.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue645.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue67.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue675.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue676.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue677.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue678.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue679.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue68.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue680.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue681.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue682.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue683.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue684.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue705.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue716.pdf	*
+target/hayro/hayro-tests/pdfs/load/issue83.pdf	*
+target/hayro/hayro-tests/pdfs/load/page_tree_cycle.pdf	*
+target/hayro/hayro-tests/pdfs/load/xobject_cycle_two_forms.pdf	*
+target/hayro/hayro-tests/pdfs/other/issue188.pdf	*
+target/devassets/images/star.pdf	0
+target/devassets/images/matplotlib.pdf	0
+target/devassets/images/base14-fonts.pdf	0
+target/devassets/images/diagrams.pdf	0
+target/devassets/images/diagrams.pdf	1
+target/devassets/images/diagrams.pdf	2
+# Synthetic PDFs (scripts/gen_hayro_render_pdfs.py).
+hayro/render/testdata/pdfs/blend_modes.pdf	*
+hayro/render/testdata/pdfs/masks_and_groups.pdf	*
+hayro/render/testdata/pdfs/images.pdf	*
+hayro/render/testdata/pdfs/gradients.pdf	*
+hayro/render/testdata/pdfs/strokes.pdf	*
