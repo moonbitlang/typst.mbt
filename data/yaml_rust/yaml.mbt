@@ -381,13 +381,13 @@ pub impl Show for Yaml with fn output(self, logger) {
         if i > 0 {
           logger.write_string(", ")
         }
-        x.output(logger)
+        Show::output(x, logger)
       }
       logger.write_string("])")
     }
     Hash(h) => {
       logger.write_string("Hash(")
-      h.output(logger)
+      Show::output(h, logger)
       logger.write_char(')')
     }
     Alias(v) => logger.write_string("Alias(\{v})")
@@ -422,14 +422,14 @@ pub impl Compare for Yaml with fn compare(self, other) {
     (Array(a), Array(b)) => {
       let n = if a.length() < b.length() { a.length() } else { b.length() }
       for i in 0..<n {
-        let c = a[i].compare(b[i])
+        let c = Compare::compare(a[i], b[i])
         if c != 0 {
           return c
         }
       }
       a.length().compare(b.length())
     }
-    (Hash(a), Hash(b)) => a.compare(b)
+    (Hash(a), Hash(b)) => Compare::compare(a, b)
     (Alias(a), Alias(b)) => a.compare(b)
     _ => self.variant_index().compare(other.variant_index())
   }
