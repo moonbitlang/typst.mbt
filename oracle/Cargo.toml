@@ -47,3 +47,9 @@ icu_provider_blob = "2.3"
 unicode-bidi = "0.3.18"
 unicode-segmentation = "1.12"
 hypher = "0.1.8"
+rustybuzz = "0.20"
+
+# Record every shaping call Typst makes (for the `shape` stage); see
+# rustybuzz-tap/Cargo.toml.
+[patch.crates-io]
+rustybuzz = { path = "rustybuzz-tap" }

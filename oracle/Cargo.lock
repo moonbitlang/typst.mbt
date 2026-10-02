@@ -1882,8 +1882,6 @@ checksum = "cf54715a573b99ac80df0bc206da022bcd442c974952c7b9720069370852e21f"
 [[package]]
 name = "rustybuzz"
 version = "0.20.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fd3c7c96f8a08ee34eff8857b11b49b07d71d1c3f4e88f8a88d4c9e9f90b1702"
 dependencies = [
  "bitflags",
  "bytemuck",
@@ -2614,6 +2612,7 @@ dependencies = [
  "regex",
  "regex-syntax",
  "rustc-hash",
+ "rustybuzz",
  "serde",
  "serde_json",
  "sha2",
