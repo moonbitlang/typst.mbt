@@ -1,5 +1,21 @@
 import {
   "moonbitlang/typst/library",
   "moonbitlang/typst/syntax",
+  "moonbitlang/typst/unicode",
+  "moonbitlang/typst/otf",
+  "moonbitlang/typst/shape",
+  "moonbitlang/typst/bidi",
+  "moonbitlang/typst/linebreak",
+  "moonbitlang/typst/hypher",
   "moonbitlang/core/hashset",
+  "moonbitlang/core/math",
+  "moonbitlang/core/double",
+  "moonbitlang/core/cmp",
 }
+
+options(
+  targets: {
+    "libm_native.mbt": [ "native" ],
+    "libm_other.mbt": [ "not", "native" ],
+  },
+)
