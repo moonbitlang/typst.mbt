@@ -1233,6 +1233,8 @@ pub let html_format_elem_pretty : Int
 
 pub fn i64_from_str_radix(String, Int) -> Int64 raise IntErrorKind
 
+pub let image_default_dpi : Double
+
 pub fn image_elem() -> Element
 
 pub let image_elem_alt : Int
@@ -1254,6 +1256,8 @@ pub let image_elem_scaling : Int
 pub let image_elem_source : Int
 
 pub let image_elem_width : Int
+
+pub let image_usvg_default_dpi : Double
 
 pub fn in_(BindingGuard, Value, Value) -> Value raise HintedError
 
@@ -3642,13 +3646,24 @@ pub(all) struct Axes[T] {
   x : T
   y : T
 } derive(Default, Eq, Hash, @debug.Debug)
+pub fn Axes::add_size(Self[Abs], Self[Abs]) -> Self[Abs]
 pub fn[T] Axes::all(Self[T], (T) -> Bool) -> Bool
 pub fn[T] Axes::any(Self[T], (T) -> Bool) -> Bool
+pub fn Axes::aspect_ratio(Self[Abs]) -> Ratio
+pub fn Axes::div_by(Self[Abs], Double) -> Self[Abs]
+pub fn Axes::fits(Self[Abs], Self[Abs]) -> Bool
 pub fn[T] Axes::get(Self[T], Axis) -> T
+pub fn Axes::is_finite_size(Self[Abs]) -> Bool
+pub fn Axes::is_zero_size(Self[Abs]) -> Bool
 pub fn[T, U] Axes::map(Self[T], (T) -> U) -> Self[U]
+pub fn Axes::neg_size(Self[Abs]) -> Self[Abs]
 pub fn[T] Axes::new(T, T) -> Self[T]
 pub fn[T] Axes::splat(T) -> Self[T]
+pub fn Axes::sub_size(Self[Abs], Self[Abs]) -> Self[Abs]
+pub fn Axes::times(Self[Abs], Double) -> Self[Abs]
+pub fn Axes::to_point(Self[Abs]) -> Point
 pub fn[T] Axes::unwrap_or_smart(Self[Smart[T]], Self[T]) -> Self[T]
+pub fn Axes::zero_size() -> Self[Abs]
 pub fn[T, U] Axes::zip(Self[T], Self[U]) -> Self[(T, U)]
 pub fn[T, V, U] Axes::zip_map(Self[T], Self[V], (T, V) -> U) -> Self[U]
 pub impl[T : FromValue] FromValue for Axes[T]
@@ -4627,6 +4642,19 @@ pub struct CssWriter {
 pub fn CssWriter::fail(Self, String) -> Unit
 pub fn CssWriter::write(Self, String) -> Unit
 
+pub(all) struct Curve(Array[CurveItem]) derive(Default, Eq, Hash)
+pub fn Curve::close(Self) -> Unit
+pub fn Curve::copy(Self) -> Self
+pub fn Curve::cubic(Self, Point, Point, Point) -> Unit
+pub fn Curve::ellipse(Axes[Abs]) -> Self
+pub fn Curve::is_empty(Self) -> Bool
+pub fn Curve::items(Self) -> Array[CurveItem]
+pub fn Curve::line(Self, Point) -> Unit
+pub fn Curve::move_(Self, Point) -> Unit
+pub fn Curve::new() -> Self
+pub fn Curve::rect(Axes[Abs]) -> Self
+pub fn Curve::translate(Self, Point) -> Unit
+
 pub struct CurveClose(Content)
 pub fn CurveClose::mode(Self, StyleChain) -> CloseMode
 pub fn CurveClose::mode_in(StyleChain) -> CloseMode
@@ -4682,6 +4710,13 @@ pub fn CurveElem::with_fill(Self, Paint?) -> Self
 pub fn CurveElem::with_fill_rule(Self, FillRule) -> Self
 pub fn CurveElem::with_stroke(Self, Smart[Stroke?]) -> Self
 pub impl NativeElement for CurveElem
+
+pub(all) enum CurveItem {
+  Move(Point)
+  Line(Point)
+  Cubic(Point, Point, Point)
+  Close
+} derive(Eq, Hash)
 
 pub struct CurveLine(Content)
 pub fn CurveLine::end(Self) -> Axes[Rel[Length]]
@@ -5592,6 +5627,20 @@ pub fn FlushElem::of(Content) -> Self?
 pub fn FlushElem::pack(Self) -> Content
 pub impl NativeElement for FlushElem
 
+pub struct Font {
+  // private fields
+}
+pub fn Font::data(Self) -> Bytes
+pub fn Font::face(Self) -> &FontFace
+pub fn Font::family(Self) -> String
+pub fn Font::index(Self) -> UInt
+pub fn Font::instantiate_with(Self, FontVariations) -> FontInstance
+pub fn Font::new(Bytes, UInt, &FontFace) -> Self
+pub fn Font::post_script_name(Self) -> String?
+pub impl Eq for Font
+pub impl Hash for Font
+pub impl Show for Font
+
 pub(all) struct FontFamily {
   name : String
   covers : Covers?
@@ -5608,6 +5657,21 @@ pub impl Fold for FontFeatures
 pub impl FromValue for FontFeatures
 pub impl IntoValue for FontFeatures
 pub impl Reflect for FontFeatures
+
+pub struct FontInstance {
+  // private fields
+}
+pub fn FontInstance::face(Self) -> &FontInstanceFace
+pub fn FontInstance::font(Self) -> Font
+pub fn FontInstance::glyph_bounding_box(Self, UInt16) -> GlyphRect?
+pub fn FontInstance::to_em(Self, Double) -> Em
+pub fn FontInstance::units_per_em(Self) -> Double
+pub fn FontInstance::variations(Self) -> FontVariations
+pub fn FontInstance::x_advance(Self, UInt16) -> Em?
+pub fn FontInstance::y_advance(Self, UInt16) -> Em?
+pub impl Eq for FontInstance
+pub impl Hash for FontInstance
+pub impl Show for FontInstance
 
 pub(all) struct FontList(Array[FontFamily]) derive(Eq, Hash)
 pub fn FontList::new(Array[FontFamily]) -> Self raise HintedError
@@ -5807,16 +5871,68 @@ pub struct FractionItem {
 }
 pub fn FractionItem::create(MathItem, MathItem, Bool, Em, StyleChain, @syntax.Span) -> MathItem
 
+pub struct Fragment(Array[Frame])
+pub fn Fragment::as_slice(Self) -> ArrayView[Frame]
+pub fn Fragment::frame(Frame) -> Self
+pub fn Fragment::frames(Array[Frame]) -> Self
+pub fn Fragment::into_frame(Self) -> Frame
+pub fn Fragment::into_frames(Self) -> Array[Frame]
+pub fn Fragment::is_empty(Self) -> Bool
+pub fn Fragment::iter(Self) -> Iter[Frame]
+pub fn Fragment::len(Self) -> Int
+
 pub(all) enum FragmentKind {
   Inline
   Block
 } derive(Eq, Hash, @debug.Debug)
 
 pub struct Frame {
-  size : Axes[Abs]
+  // private fields
 }
-pub fn Frame::new(Axes[Abs]) -> Self
+pub fn Frame::ascent(Self) -> Abs
+pub fn Frame::baseline(Self) -> Abs
+pub fn Frame::clear(Self) -> Unit
+pub fn Frame::clear_baseline(Self) -> Unit
+pub fn Frame::clip(Self, Curve) -> Unit
+pub fn Frame::clone(Self) -> Self
+pub fn Frame::descent(Self) -> Abs
+pub fn Frame::fill(Self, Paint) -> Unit
+pub fn Frame::hard(Axes[Abs]) -> Self
+pub fn Frame::has_baseline(Self) -> Bool
+pub fn Frame::height(Self) -> Abs
+pub fn Frame::hide(Self) -> Unit
+pub fn Frame::insert(Self, Int, Point, FrameItem) -> Unit
+pub fn Frame::is_empty(Self) -> Bool
+pub fn Frame::items(Self) -> ArrayView[(Point, FrameItem)]
+pub fn Frame::kind(Self) -> FrameKind
+pub fn Frame::label(Self, Label) -> Unit
+pub fn Frame::layer(Self) -> Int
+pub fn Frame::mark_box(Self) -> Self
+pub fn Frame::mark_box_in_place(Self) -> Unit
+pub fn Frame::mark_line(Self, Abs) -> Unit
+pub fn Frame::mark_point(Self, Point) -> Unit
+pub fn Frame::new(Axes[Abs], FrameKind) -> Self
+pub fn Frame::prepend(Self, Point, FrameItem) -> Unit
+pub fn Frame::prepend_frame(Self, Point, Self) -> Unit
+pub fn Frame::prepend_multiple(Self, Iter[(Point, FrameItem)]) -> Unit
+pub fn Frame::push(Self, Point, FrameItem) -> Unit
+pub fn Frame::push_frame(Self, Point, Self) -> Unit
+pub fn Frame::push_multiple(Self, Iter[(Point, FrameItem)]) -> Unit
+pub fn Frame::resize(Self, Axes[Abs], Axes[FixedAlignment]) -> Point
+pub fn Frame::retain(Self, (FrameItem) -> Bool) -> Unit
+pub fn Frame::set_baseline(Self, Abs) -> Unit
+pub fn Frame::set_kind(Self, FrameKind) -> Unit
+pub fn Frame::set_parent(Self, FrameParent) -> Unit
+pub fn Frame::set_size(Self, Axes[Abs]) -> Unit
 pub fn Frame::size(Self) -> Axes[Abs]
+pub fn Frame::soft(Axes[Abs]) -> Self
+pub fn Frame::transform(Self, Transform) -> Unit
+pub fn Frame::translate(Self, Point) -> Unit
+pub fn Frame::translate_visual(Self, Point) -> Unit
+pub fn Frame::width(Self) -> Abs
+pub fn Frame::with_kind(Self, FrameKind) -> Self
+pub impl Default for Frame
+pub impl Eq for Frame
 
 pub struct FrameElem(Content)
 pub fn FrameElem::body(Self) -> Content
@@ -5825,6 +5941,30 @@ pub fn FrameElem::of(Content) -> Self?
 pub fn FrameElem::pack(Self) -> Content
 pub fn FrameElem::with_body(Self, Content) -> Self
 pub impl NativeElement for FrameElem
+
+pub(all) enum FrameItem {
+  Group(GroupItem)
+  Text(TextItem)
+  Shape(Shape, @syntax.Span)
+  Image(Image, Axes[Abs], @syntax.Span)
+  Link(Destination, Axes[Abs])
+  Tag(Tag)
+} derive(Eq)
+pub fn FrameItem::clone(Self) -> Self
+
+pub(all) enum FrameKind {
+  Soft
+  Hard
+} derive(Eq, Hash, @debug.Debug)
+pub fn FrameKind::is_hard(Self) -> Bool
+pub fn FrameKind::is_soft(Self) -> Bool
+pub impl Default for FrameKind
+
+pub(all) struct FrameParent {
+  location : Location
+  inherit : Inherit
+} derive(Eq, Hash, @debug.Debug)
+pub fn FrameParent::new(Location, Inherit) -> Self
 
 pub struct Func {
   inner : FuncInner
@@ -5860,6 +6000,27 @@ pub(all) enum FuncInner {
   With(Func, Args)
 }
 
+pub(all) enum Geometry {
+  Line(Point)
+  Rect(Axes[Abs])
+  Curve(Curve)
+} derive(Eq)
+pub fn Geometry::filled(Self, Paint) -> Shape
+pub fn Geometry::filled_and_stroked(Self, Paint, FixedStroke) -> Shape
+pub fn Geometry::stroked(Self, FixedStroke) -> Shape
+
+pub(all) struct Glyph {
+  id : UInt16
+  x_advance : Em
+  x_offset : Em
+  y_advance : Em
+  y_offset : Em
+  range_start : UInt16
+  range_end : UInt16
+  span : (@syntax.Span, UInt16)
+} derive(Eq, Hash)
+pub fn Glyph::range(Self) -> (Int, Int)
+
 pub struct GlyphItem {
   text : String
   mut class : @unicode.MathClass
@@ -5868,6 +6029,13 @@ pub struct GlyphItem {
   mut flac : Bool
 }
 pub fn GlyphItem::create(String, StyleChain, @syntax.Span) -> MathItem
+
+pub(all) struct GlyphRect {
+  x_min : Int
+  y_min : Int
+  x_max : Int
+  y_max : Int
+} derive(Eq, Hash, @debug.Debug)
 
 pub(all) enum Gradient {
   Linear(LinearGradient)
@@ -6119,10 +6287,15 @@ pub fn GridVLine::x_in(StyleChain) -> Smart[USize]
 pub fn GridVLine::x_local(Self) -> Smart[USize]?
 pub impl NativeElement for GridVLine
 
-pub struct GroupItem {
-  items : Array[MathItem]
-}
-pub fn GroupItem::create(Array[MathItem], StyleChain) -> MathItem
+pub(all) struct GroupItem {
+  mut frame : Frame
+  mut transform : Transform
+  mut clip : Curve?
+  mut label : Label?
+  mut parent : FrameParent?
+} derive(Eq)
+pub fn GroupItem::clone(Self) -> Self
+pub fn GroupItem::new(Frame) -> Self
 
 pub(all) enum HAlignment {
   Start
@@ -6430,6 +6603,19 @@ pub impl FromValue for I8
 pub impl IntoValue for I8
 pub impl Reflect for I8
 
+pub struct Image {
+  // private fields
+} derive(Eq)
+pub fn Image::alt(Self) -> String?
+pub fn Image::dpi(Self) -> Double?
+pub fn Image::format(Self) -> ImageFormat
+pub fn Image::height(Self) -> Double
+pub fn Image::kind(Self) -> ImageKind
+pub fn Image::new(ImageKind, String?, Smart[ImageScaling]) -> Self
+pub fn Image::plain(ImageKind) -> Self
+pub fn Image::scaling(Self) -> Smart[ImageScaling]
+pub fn Image::width(Self) -> Double
+
 pub struct ImageElem(Content)
 pub fn ImageElem::alt(Self, StyleChain) -> String?
 pub fn ImageElem::alt_in(StyleChain) -> String?
@@ -6498,6 +6684,12 @@ pub impl FromValue for ImageFormat
 pub impl IntoValue for ImageFormat
 pub impl Reflect for ImageFormat
 
+pub(all) enum ImageKind {
+  Raster(RasterImage)
+  Svg(SvgImage)
+  Pdf(PdfImage)
+} derive(Eq)
+
 pub(all) enum ImageScaling {
   Smooth
   Pixelated
@@ -6505,6 +6697,11 @@ pub(all) enum ImageScaling {
 pub impl FromValue for ImageScaling
 pub impl IntoValue for ImageScaling
 pub impl Reflect for ImageScaling
+
+pub(all) enum Inherit {
+  Yes
+  No
+} derive(Eq, Hash, @debug.Debug)
 
 pub struct InlineElem(Content)
 pub fn InlineElem::body(Self) -> Value
@@ -6608,7 +6805,7 @@ pub impl NativeElement for LayoutElem
 pub(all) struct LayoutRegion {
   size : Axes[Abs]
   expand : Axes[Bool]
-}
+} derive(Eq, Hash)
 pub fn LayoutRegion::new(Axes[Abs], Axes[Bool]) -> Self
 
 pub(all) enum LeftRightAlternator {
@@ -7093,6 +7290,11 @@ pub impl FromValue for MathDelimiter
 pub impl IntoValue for MathDelimiter
 pub impl Reflect for MathDelimiter
 
+pub struct MathGroupItem {
+  items : Array[MathItem]
+}
+pub fn MathGroupItem::create(Array[MathItem], StyleChain) -> MathItem
+
 pub(all) enum MathItem {
   Comp(MathComponent)
   Spacing(Length, Abs, Bool)
@@ -7129,7 +7331,7 @@ pub fn MathItem::with_multiline_centering(Self) -> Self
 pub fn MathItem::wrap(Array[Self], StyleChain) -> Self
 
 pub(all) enum MathKind {
-  Group(GroupItem)
+  Group(MathGroupItem)
   Multiline(MultilineItem)
   Radical(RadicalItem)
   Fenced(FencedItem)
@@ -7141,7 +7343,7 @@ pub(all) enum MathKind {
   Cancel(CancelItem)
   Line(LineItem)
   Primes(PrimesItem)
-  Text(TextItem)
+  Text(MathTextItem)
   Number(NumberItem)
   Glyph(GlyphItem)
   Box(BoxItem)
@@ -7234,6 +7436,12 @@ pub struct MathTableItem {
   alternator : LeftRightAlternator
 }
 pub fn MathTableItem::create(Array[Array[AlignedRow]], Axes[Rel[Abs]], ResolvedAugment?, FixedAlignment, LeftRightAlternator, StyleChain, @syntax.Span) -> MathItem
+
+pub struct MathTextItem {
+  text : String
+  locator : Locator
+}
+pub fn MathTextItem::create(String, StyleChain, @syntax.Span, Locator) -> MathItem
 
 pub struct MathUnderlineElem(Content)
 pub fn MathUnderlineElem::body(Self) -> Content
@@ -8074,6 +8282,26 @@ pub(all) struct PdfConfiguration {
   version : PdfVersion
 } derive(Eq, Hash, @debug.Debug)
 
+pub struct PdfDocument {
+  data : Bytes
+  num_pages : Int
+} derive(Eq)
+pub fn PdfDocument::data(Self) -> Bytes
+pub fn PdfDocument::new(Bytes, num_pages~ : Int) -> Self
+pub fn PdfDocument::num_pages(Self) -> Int
+
+pub struct PdfImage {
+  document : PdfDocument
+  page_index : Int
+  width : Float
+  height : Float
+} derive(Eq)
+pub fn PdfImage::document(Self) -> PdfDocument
+pub fn PdfImage::height(Self) -> Float
+pub fn PdfImage::new(PdfDocument, Int, width~ : Float, height~ : Float) -> Self
+pub fn PdfImage::page_index(Self) -> Int
+pub fn PdfImage::width(Self) -> Float
+
 pub(all) enum PdfMarkerTagKind {
   OutlineBody
   Bibliography(Bool)
@@ -8249,8 +8477,30 @@ pub(all) struct Point {
   x : Abs
   y : Abs
 } derive(Default, Eq, Hash)
+pub fn Point::div_by(Self, Double) -> Self
+pub fn Point::get(Self, Axis) -> Abs
+pub fn Point::hypot(Self) -> Abs
+pub fn Point::is_finite(Self) -> Bool
+pub fn Point::is_zero(Self) -> Bool
+pub fn Point::map(Self, (Abs) -> Abs) -> Self
+pub fn Point::max(Self, Self) -> Self
+pub fn Point::min(Self, Self) -> Self
 pub fn Point::new(Abs, Abs) -> Self
+pub fn Point::normalized(Self) -> Self
+pub fn Point::rot90ccw(Self) -> Self
+pub fn Point::splat(Abs) -> Self
+pub fn Point::times(Self, Double) -> Self
+pub fn Point::to_size(Self) -> Axes[Abs]
+pub fn Point::transform(Self, Transform) -> Self
+pub fn Point::transform_inf(Self, Transform) -> Self
+pub fn Point::with_axis(Self, Axis, Abs) -> Self
+pub fn Point::with_x(Abs) -> Self
+pub fn Point::with_y(Abs) -> Self
 pub fn Point::zero() -> Self
+pub impl Add for Point
+pub impl Neg for Point
+pub impl Show for Point
+pub impl Sub for Point
 pub impl Fingerprint for Point
 
 pub struct PolygonElem(Content)
@@ -8437,6 +8687,24 @@ pub impl FromValue for RasterFormat
 pub impl IntoValue for RasterFormat
 pub impl Reflect for RasterFormat
 
+pub struct RasterImage {
+  data : Bytes
+  format : RasterFormat
+  width : UInt
+  height : UInt
+  exif_rotation : UInt?
+  icc : Bytes?
+  dpi : Double?
+} derive(Eq)
+pub fn RasterImage::data(Self) -> Bytes
+pub fn RasterImage::dpi(Self) -> Double?
+pub fn RasterImage::exif_rotation(Self) -> UInt?
+pub fn RasterImage::format(Self) -> RasterFormat
+pub fn RasterImage::height(Self) -> UInt
+pub fn RasterImage::icc(Self) -> Bytes?
+pub fn RasterImage::new(Bytes, RasterFormat, width~ : UInt, height~ : UInt, exif_rotation? : UInt?, icc? : Bytes?, dpi? : Double?) -> Self
+pub fn RasterImage::width(Self) -> UInt
+
 pub(all) struct Ratio(Scalar) derive(Compare, Default, Eq, Hash)
 pub fn Ratio::abs(Self) -> Self
 pub fn Ratio::div_by(Self, Double) -> Self
@@ -8577,6 +8845,14 @@ pub fn Recipe::apply(Self, Engine, Context, Content) -> Content raise SourceErro
 pub fn Recipe::new(Selector?, Transformation, @syntax.Span) -> Self
 pub impl Eq for Recipe
 
+pub(all) struct Rect {
+  min : Point
+  max : Point
+} derive(Eq, Hash)
+pub fn Rect::from_pos_size(Point, Axes[Abs]) -> Self
+pub fn Rect::new(Point, Point) -> Self
+pub fn Rect::size(Self) -> Axes[Abs]
+
 pub struct RectElem(Content)
 pub fn RectElem::body(Self, StyleChain) -> Content?
 pub fn RectElem::body_in(StyleChain) -> Content?
@@ -8672,6 +8948,24 @@ pub fn Region::from_str(String) -> Self raise HintedError
 pub impl FromValue for Region
 pub impl IntoValue for Region
 pub impl Reflect for Region
+
+pub(all) struct Regions {
+  size : Axes[Abs]
+  expand : Axes[Bool]
+  full : Abs
+  backlog : ArrayView[Abs]
+  last : Abs?
+}
+pub fn Regions::base(Self) -> Axes[Abs]
+pub fn Regions::from_region(LayoutRegion) -> Self
+pub fn Regions::is_full(Self) -> Bool
+pub fn Regions::iter(Self) -> Iter[Axes[Abs]]
+pub fn Regions::map(Self, (Axes[Abs]) -> Axes[Abs]) -> Self
+pub fn Regions::may_break(Self) -> Bool
+pub fn Regions::may_progress(Self) -> Bool
+pub fn Regions::next(Self) -> Self
+pub fn Regions::repeat(Axes[Abs], Axes[Bool]) -> Self
+pub impl Show for Regions
 
 pub(all) struct Rel[T] {
   rel : Ratio
@@ -9012,6 +9306,13 @@ pub(all) enum Severity {
   Error
   Warning
 } derive(Eq, Hash, @debug.Debug)
+
+pub(all) struct Shape {
+  geometry : Geometry
+  fill : Paint?
+  fill_rule : FillRule
+  stroke : FixedStroke?
+} derive(Eq)
 
 pub struct SharedFenceSizing {
   // private fields
@@ -9728,6 +10029,15 @@ pub fn SvgFormat::set_pretty(Bool) -> Style
 pub fn SvgFormat::with_pretty(Self, Bool) -> Self
 pub impl NativeElement for SvgFormat
 
+pub struct SvgImage {
+  data : Bytes
+  size : Axes[Double]
+} derive(Eq)
+pub fn SvgImage::data(Self) -> Bytes
+pub fn SvgImage::height(Self) -> Double
+pub fn SvgImage::new(Bytes, Axes[Double]) -> Self
+pub fn SvgImage::width(Self) -> Double
+
 pub struct Symbol {
   // private fields
 } derive(Eq, Hash)
@@ -10209,11 +10519,32 @@ pub fn TextElem::weight_in(StyleChain) -> FontWeight
 pub fn TextElem::with_text(Self, String) -> Self
 pub impl NativeElement for TextElem
 
-pub struct TextItem {
+pub(all) struct TextItem {
+  font : FontInstance
+  size : Abs
+  fill : Paint
+  stroke : FixedStroke?
+  lang : Lang
+  region : Region?
   text : String
-  locator : Locator
+  glyphs : Array[Glyph]
+} derive(Eq)
+pub fn TextItem::bbox(Self) -> Rect
+pub fn TextItem::height(Self) -> Abs
+pub fn TextItem::width(Self) -> Abs
+pub impl Show for TextItem
+
+pub(all) struct TextItemView {
+  item : TextItem
+  glyph_start : Int
+  glyph_end : Int
 }
-pub fn TextItem::create(String, StyleChain, @syntax.Span, Locator) -> MathItem
+pub fn TextItemView::from_glyph_range(TextItem, Int, Int) -> Self
+pub fn TextItemView::full(TextItem) -> Self
+pub fn TextItemView::glyph_text(Self, Glyph) -> String
+pub fn TextItemView::glyphs(Self) -> ArrayView[Glyph]
+pub fn TextItemView::height(Self) -> Abs
+pub fn TextItemView::width(Self) -> Abs
 
 pub(all) struct TextSize(Length) derive(Eq, Hash)
 pub fn TextSize::resolve(Self, StyleChain) -> Abs
@@ -10334,6 +10665,29 @@ pub impl Default for TrackSizings
 pub impl FromValue for TrackSizings
 pub impl IntoValue for TrackSizings
 pub impl Reflect for TrackSizings
+
+pub(all) struct Transform {
+  sx : Ratio
+  ky : Ratio
+  kx : Ratio
+  sy : Ratio
+  tx : Abs
+  ty : Abs
+} derive(Eq, Hash)
+pub fn Transform::identity() -> Self
+pub fn Transform::invert(Self) -> Self?
+pub fn Transform::is_identity(Self) -> Bool
+pub fn Transform::is_only_scale(Self) -> Bool
+pub fn Transform::is_only_translate(Self) -> Bool
+pub fn Transform::post_concat(Self, Self) -> Self
+pub fn Transform::pre_concat(Self, Self) -> Self
+pub fn Transform::rotate(Angle) -> Self
+pub fn Transform::rotate_at(Angle, Abs, Abs) -> Self
+pub fn Transform::scale(Ratio, Ratio) -> Self
+pub fn Transform::scale_at(Ratio, Ratio, Abs, Abs) -> Self
+pub fn Transform::skew(Angle, Angle) -> Self
+pub fn Transform::translate(Abs, Abs) -> Self
+pub impl Default for Transform
 
 pub(all) enum Transformation {
   Content(Content)
@@ -10745,6 +11099,8 @@ pub using @syntax {type RootedPath}
 
 pub type ShowFn[T] = (T, Engine, StyleChain) -> Content raise SourceError
 
+pub type Size = Axes[Abs]
+
 pub type SymbolVariantData = (ModifierSet, String, String?)
 
 // Traits
@@ -10778,6 +11134,19 @@ pub(open) trait Fold {
 }
 pub impl Fold for Bool
 pub impl[T : Fold] Fold for T?
+
+pub(open) trait FontFace {
+  fn family(Self) -> String
+  fn post_script_name(Self) -> String?
+  fn instantiate(Self, FontVariations) -> &FontInstanceFace
+}
+
+pub(open) trait FontInstanceFace {
+  fn units_per_em(Self) -> Double
+  fn glyph_hor_advance(Self, UInt16) -> Int?
+  fn glyph_ver_advance(Self, UInt16) -> Int?
+  fn glyph_bounding_box(Self, UInt16) -> GlyphRect?
+}
 
 pub(open) trait FromValue : Reflect {
   fn from_value(Value) -> Self raise HintedError

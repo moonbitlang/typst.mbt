@@ -1,7 +1,7 @@
-// Port of the eval-level parts of `typst-library/src/visualize/image/mod.rs`
-// and `raster.rs`: the `ImageElem` field hooks and the format, fit and
-// scaling types. Decoding (`RasterImage`, `SvgImage`, `PdfImage`) is a
-// layout concern and not ported yet.
+// Port of `typst-library/src/visualize/image/mod.rs` and `raster.rs`: the
+// `ImageElem` field hooks, the format, fit and scaling types and the loaded
+// `Image` (see the contract at the end). Decoding (`RasterImage`,
+// `SvgImage`, `PdfImage`) is a layout concern and not ported yet.
 
 // ImageElem field hooks.
 
@@ -596,4 +596,308 @@ fn image_elem_synthesize(
 /// Upstream `LocalName for Packed<ImageElem>`.
 fn image_elem_local_name_key() -> String {
   "figure"
+}
+
+// The loaded image (`Image`, `ImageKind`) and the decoded image kinds of
+// `raster.rs`, `svg.rs` and `pdf.rs`.
+//
+// Contract: decoding is not ported yet. The decoders (layout work unit E)
+// construct the kinds with `RasterImage::new`, `SvgImage::new` and
+// `PdfImage::new` from the metadata they determined; the fields below are
+// the ones the frame dump and the exporters read. Decoded pixel data, the
+// usvg tree and the hayro document are to be added to the kinds as private
+// fields by the decoders.
+
+///|
+/// A loaded raster or vector image.
+///
+/// Values of this type are cheap to clone and immutable.
+pub struct Image {
+  /// The raw, undecoded image data.
+  priv kind : ImageKind
+  /// A text describing the image.
+  priv alt : String?
+  /// The scaling algorithm to use.
+  priv scaling : Smart[ImageScaling]
+} derive(Eq)
+
+///|
+/// When scaling an image to it's natural size, we default to this DPI if the
+/// image doesn't contain DPI metadata.
+pub let image_default_dpi : Double = 72.0
+
+///|
+/// Should always be the same as the default DPI used by usvg.
+pub let image_usvg_default_dpi : Double = 96.0
+
+///|
+/// Create an image from a `RasterImage`, `SvgImage` or `PdfImage`.
+pub fn Image::new(
+  kind : ImageKind,
+  alt : String?,
+  scaling : Smart[ImageScaling],
+) -> Image {
+  { kind, alt, scaling, }
+}
+
+///|
+/// Create an image with optional properties set to the default.
+pub fn Image::plain(kind : ImageKind) -> Image {
+  Image::new(kind, None, Auto)
+}
+
+///|
+/// The format of the image.
+pub fn Image::format(self : Image) -> ImageFormat {
+  match self.kind {
+    Raster(raster) => Raster(raster.format)
+    Svg(_) => Vector(Svg)
+    Pdf(_) => Vector(Pdf)
+  }
+}
+
+///|
+/// The width of the image in pixels.
+pub fn Image::width(self : Image) -> Double {
+  match self.kind {
+    Raster(raster) => raster.width.to_double()
+    Svg(svg) => svg.size.x
+    Pdf(pdf) => pdf.width.to_double()
+  }
+}
+
+///|
+/// The height of the image in pixels.
+pub fn Image::height(self : Image) -> Double {
+  match self.kind {
+    Raster(raster) => raster.height.to_double()
+    Svg(svg) => svg.size.y
+    Pdf(pdf) => pdf.height.to_double()
+  }
+}
+
+///|
+/// The image's pixel density in pixels per inch, if known.
+pub fn Image::dpi(self : Image) -> Double? {
+  match self.kind {
+    Raster(raster) => raster.dpi
+    Svg(_) => Some(image_usvg_default_dpi)
+    Pdf(_) => Some(image_default_dpi)
+  }
+}
+
+///|
+/// A text describing the image.
+pub fn Image::alt(self : Image) -> String? {
+  self.alt
+}
+
+///|
+/// The image scaling algorithm to use for this image.
+pub fn Image::scaling(self : Image) -> Smart[ImageScaling] {
+  self.scaling
+}
+
+///|
+/// The decoded image.
+pub fn Image::kind(self : Image) -> ImageKind {
+  self.kind
+}
+
+///|
+/// A kind of image.
+pub(all) enum ImageKind {
+  /// A raster image.
+  Raster(RasterImage)
+  /// An SVG image.
+  Svg(SvgImage)
+  /// A PDF image.
+  Pdf(PdfImage)
+} derive(Eq)
+
+///|
+/// A decoded raster image.
+pub struct RasterImage {
+  /// The raw, undecoded image data.
+  data : Bytes
+  /// The format of the image.
+  format : RasterFormat
+  /// The image's width in pixels.
+  width : UInt
+  /// The image's height in pixels.
+  height : UInt
+  /// The EXIF orientation (1-8), if any.
+  exif_rotation : UInt?
+  /// The ICC profile, if any.
+  icc : Bytes?
+  /// The image's pixel density in pixels per inch, if known.
+  dpi : Double?
+} derive(Eq)
+
+///|
+/// Create a raster image from its data and decoded metadata (decoding is not
+/// ported yet; see the contract above).
+pub fn RasterImage::new(
+  data : Bytes,
+  format : RasterFormat,
+  width~ : UInt,
+  height~ : UInt,
+  exif_rotation? : UInt? = None,
+  icc? : Bytes? = None,
+  dpi? : Double? = None,
+) -> RasterImage {
+  { data, format, width, height, exif_rotation, icc, dpi, }
+}
+
+///|
+/// The raw image data.
+pub fn RasterImage::data(self : RasterImage) -> Bytes {
+  self.data
+}
+
+///|
+/// The image's format.
+pub fn RasterImage::format(self : RasterImage) -> RasterFormat {
+  self.format
+}
+
+///|
+/// The image's pixel width.
+pub fn RasterImage::width(self : RasterImage) -> UInt {
+  self.width
+}
+
+///|
+/// The image's pixel height.
+pub fn RasterImage::height(self : RasterImage) -> UInt {
+  self.height
+}
+
+///|
+/// The EXIF orientation of the image, if any.
+pub fn RasterImage::exif_rotation(self : RasterImage) -> UInt? {
+  self.exif_rotation
+}
+
+///|
+/// The image's pixel density in pixels per inch, if known.
+pub fn RasterImage::dpi(self : RasterImage) -> Double? {
+  self.dpi
+}
+
+///|
+/// Access the ICC profile, if any.
+pub fn RasterImage::icc(self : RasterImage) -> Bytes? {
+  self.icc
+}
+
+///|
+/// A decoded SVG image.
+pub struct SvgImage {
+  /// The raw image data.
+  data : Bytes
+  /// The SVG's size in pixels.
+  size : Axes[Double]
+} derive(Eq)
+
+///|
+/// Create an SVG image from its data and size (decoding is not ported yet;
+/// see the contract above).
+pub fn SvgImage::new(data : Bytes, size : Axes[Double]) -> SvgImage {
+  { data, size, }
+}
+
+///|
+/// The raw image data.
+pub fn SvgImage::data(self : SvgImage) -> Bytes {
+  self.data
+}
+
+///|
+/// The SVG's width in pixels.
+pub fn SvgImage::width(self : SvgImage) -> Double {
+  self.size.x
+}
+
+///|
+/// The SVG's height in pixels.
+pub fn SvgImage::height(self : SvgImage) -> Double {
+  self.size.y
+}
+
+///|
+/// A PDF document.
+pub struct PdfDocument {
+  /// The raw document data.
+  data : Bytes
+  /// The number of pages in the PDF.
+  num_pages : Int
+} derive(Eq)
+
+///|
+/// Create a PDF document from its data and page count (loading is not
+/// ported yet; see the contract above).
+pub fn PdfDocument::new(data : Bytes, num_pages~ : Int) -> PdfDocument {
+  { data, num_pages, }
+}
+
+///|
+/// The raw document data.
+pub fn PdfDocument::data(self : PdfDocument) -> Bytes {
+  self.data
+}
+
+///|
+/// Return the number of pages in the PDF.
+pub fn PdfDocument::num_pages(self : PdfDocument) -> Int {
+  self.num_pages
+}
+
+///|
+/// A specific page of a PDF acting as an image.
+pub struct PdfImage {
+  /// The underlying document.
+  document : PdfDocument
+  /// The page index of the image.
+  page_index : Int
+  /// The page's render width.
+  width : Float
+  /// The page's render height.
+  height : Float
+} derive(Eq)
+
+///|
+/// Creates a new PDF image from a page's render dimensions (loading is not
+/// ported yet; see the contract above).
+pub fn PdfImage::new(
+  document : PdfDocument,
+  page_index : Int,
+  width~ : Float,
+  height~ : Float,
+) -> PdfImage {
+  { document, page_index, width, height, }
+}
+
+///|
+/// Returns the underlying Typst PDF document.
+pub fn PdfImage::document(self : PdfImage) -> PdfDocument {
+  self.document
+}
+
+///|
+/// Returns the width of the image.
+pub fn PdfImage::width(self : PdfImage) -> Float {
+  self.width
+}
+
+///|
+/// Returns the height of the image.
+pub fn PdfImage::height(self : PdfImage) -> Float {
+  self.height
+}
+
+///|
+/// Returns the page index of the image.
+pub fn PdfImage::page_index(self : PdfImage) -> Int {
+  self.page_index
 }

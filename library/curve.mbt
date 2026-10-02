@@ -1,5 +1,116 @@
-// Port of `typst-library/src/visualize/curve.rs` (element field types; the
-// `Curve` geometry is a layout concern).
+// Port of `typst-library/src/visualize/curve.rs`: element field types and
+// the `Curve` geometry (without the kurbo-based bounding box and hit tests).
+
+///|
+/// A curve consisting of movements, lines, and Bézier segments.
+pub(all) struct Curve(Array[CurveItem]) derive(Eq, Hash, Default)
+
+///|
+/// An item in a curve.
+pub(all) enum CurveItem {
+  Move(Point)
+  Line(Point)
+  Cubic(Point, Point, Point)
+  Close
+} derive(Eq, Hash)
+
+///|
+/// Creates an empty curve.
+pub fn Curve::new() -> Curve {
+  Curve([])
+}
+
+///|
+/// Creates a curve that describes a rectangle.
+pub fn Curve::rect(size : Axes[Abs]) -> Curve {
+  let z = Abs::zero()
+  let point = Point::new
+  let curve = Curve::new()
+  curve.move_(point(z, z))
+  curve.line(point(size.x, z))
+  curve.line(point(size.x, size.y))
+  curve.line(point(z, size.y))
+  curve.close()
+  curve
+}
+
+///|
+/// Creates a curve that describes an axis-aligned ellipse.
+pub fn Curve::ellipse(size : Axes[Abs]) -> Curve {
+  // https://stackoverflow.com/a/2007782
+  let z = Abs::zero()
+  let rx = size.x.div_by(2.0)
+  let ry = size.y.div_by(2.0)
+  let m = 0.551784
+  let mx = rx.times(m)
+  let my = ry.times(m)
+  let point = (x : Abs, y : Abs) => Point::new(x + rx, y + ry)
+  let curve = Curve::new()
+  curve.move_(point(-rx, z))
+  curve.cubic(point(-rx, -my), point(-mx, -ry), point(z, -ry))
+  curve.cubic(point(mx, -ry), point(rx, -my), point(rx, z))
+  curve.cubic(point(rx, my), point(mx, ry), point(z, ry))
+  curve.cubic(point(-mx, ry), point(-rx, my), point(-rx, z))
+  curve
+}
+
+///|
+/// Push a [`Move`](CurveItem::Move) item.
+pub fn Curve::move_(self : Curve, p : Point) -> Unit {
+  self.0.push(Move(p))
+}
+
+///|
+/// Push a [`Line`](CurveItem::Line) item.
+pub fn Curve::line(self : Curve, p : Point) -> Unit {
+  self.0.push(Line(p))
+}
+
+///|
+/// Push a [`Cubic`](CurveItem::Cubic) item.
+pub fn Curve::cubic(self : Curve, p1 : Point, p2 : Point, p3 : Point) -> Unit {
+  self.0.push(Cubic(p1, p2, p3))
+}
+
+///|
+/// Push a [`Close`](CurveItem::Close) item.
+pub fn Curve::close(self : Curve) -> Unit {
+  self.0.push(Close)
+}
+
+///|
+/// Check if the curve is empty.
+pub fn Curve::is_empty(self : Curve) -> Bool {
+  self.0.is_empty()
+}
+
+///|
+/// The items of the curve.
+pub fn Curve::items(self : Curve) -> Array[CurveItem] {
+  self.0
+}
+
+///|
+/// A copy of the curve (upstream `Clone`; curves are values upstream).
+pub fn Curve::copy(self : Curve) -> Curve {
+  Curve(self.0.copy())
+}
+
+///|
+/// Translate all points in this curve by the given offset.
+pub fn Curve::translate(self : Curve, offset : Point) -> Unit {
+  if offset.is_zero() {
+    return
+  }
+  for i, item in self.0 {
+    self.0[i] = match item {
+      Move(p) => Move(p + offset)
+      Line(p) => Line(p + offset)
+      Cubic(p1, p2, p3) => Cubic(p1 + offset, p2 + offset, p3 + offset)
+      Close => Close
+    }
+  }
+}
 
 ///|
 /// A component used for curve creation: one of the curve elements.
