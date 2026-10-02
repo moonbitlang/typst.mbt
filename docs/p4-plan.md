@@ -305,3 +305,26 @@ visible through signed zeros.
 **Result:** `paged` 315/2299. Of the failures, ~1290 need inline layout,
 ~270 math, ~340 grid/table; `python3 scripts/classify_paged.py
 [--text-free] [--list]` buckets them (run the stage with `--dump` first).
+## Status: work unit H (grid/table layout)
+
+**Layout package:** `grid.mbt` (`layout_grid`, `layout_table`,
+`layout_cell` with the manual cell tags), `grid_layouter.mbt`
+(`GridLayouter`: column measurement, auto/relative/fractional rows,
+multi-region rows, region finishing, fills and line rendering),
+`grid_rowspans.mbt` (rowspan layout, unbreakable row groups, rowspan
+simulation), `grid_repeated.mbt` (headers/subheaders/footers, orphan
+prevention), `grid_lines.mbt` (line segments and stroke priority). The
+`layout_grid`/`layout_table` stubs are gone. Upstream's lazy
+`generate_line_segments` iterator is collected eagerly (the stroke callback
+is pure); `Iterator::sum` over lengths starts at `-0.0` like Rust's float
+`Sum` (`abs_sum`), which is visible through signed zeros; the line sort uses
+the original index as tie breaker to stay stable.
+
+**Validation:** almost every grid/table suite test contains text, so
+`paged` only gains 21 tests (336/2299). To check the port without inline
+layout, the grid/table suite tests were rewritten text-free (innermost
+`[text]` markup replaced by fixed-size blocks or by stacks of line-like
+blocks, `lorem(n)` by tall blocks), dumped with the oracle and compared with
+the runner run from that tree: all 304 cases whose upstream dump is
+text-free match bit-exactly, in both variants (the remaining ones need
+inline/math layout or bibliography).
