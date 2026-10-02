@@ -22,6 +22,8 @@ pub fn gif_image_info(BytesView) -> ImageInfo raise ImageError
 
 pub fn gzip_decompress(BytesView) -> Bytes raise InflateError
 
+pub fn inflate_read_to_end(BytesView, zlib~ : Bool) -> Bytes raise InflateError
+
 pub fn jpeg_image_info(BytesView) -> ImageInfo raise ImageError
 
 pub fn png_image_info(BytesView) -> ImageInfo raise ImageError

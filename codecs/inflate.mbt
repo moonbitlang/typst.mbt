@@ -123,8 +123,54 @@ let inflate_clcl_order : FixedArray[Int] = [
 /// Decompresses a raw DEFLATE stream starting at `pos`. Returns the output
 /// and the position after the stream.
 fn inflate_raw(data : BytesView, pos : Int) -> (Bytes, Int) raise InflateError {
-  let r = { data, pos, bit_buf: 0, bit_count: 0, }
   let out : Array[Byte] = []
+  inflate_raw_into(data, pos, out)
+}
+
+///|
+/// Decompresses a zlib (or, if `!zlib`, a raw DEFLATE) stream like
+/// `flate2`'s `read_to_end`: input that ends prematurely yields the output
+/// decoded so far (a truncated stream is not an error), while corrupt data
+/// and a wrong checksum are errors.
+pub fn inflate_read_to_end(
+  data : BytesView,
+  zlib~ : Bool,
+) -> Bytes raise InflateError {
+  let mut pos = 0
+  if zlib {
+    if data.length() < 2 {
+      return b""
+    }
+    let cmf = data[0].to_int()
+    let flg = data[1].to_int()
+    if (cmf & 0x0F) != 8 || (cmf * 256 + flg) % 31 != 0 || (flg & 0x20) != 0 {
+      raise InflateError("invalid zlib header")
+    }
+    pos = 2
+  }
+  let out : Array[Byte] = []
+  let (_, end) = inflate_raw_into(data, pos, out) catch {
+    InflateError("unexpected end of stream") => return Bytes::from_array(out[:])
+    e => raise e
+  }
+  let out = Bytes::from_array(out[:])
+  if zlib && end + 4 <= data.length() {
+    let checksum = Adler32::new()
+    checksum.write(out[:])
+    if checksum.finish() != u32_be(data, end) {
+      raise InflateError("wrong checksum")
+    }
+  }
+  out
+}
+
+///|
+fn inflate_raw_into(
+  data : BytesView,
+  pos : Int,
+  out : Array[Byte],
+) -> (Bytes, Int) raise InflateError {
+  let r = { data, pos, bit_buf: 0, bit_count: 0, }
   let mut last = false
   while !last {
     last = r.bits(1) == 1
@@ -143,6 +189,10 @@ fn inflate_raw(data : BytesView, pos : Int) -> (Bytes, Int) raise InflateError {
         }
         r.pos += 4
         if r.pos + len > data.length() {
+          // Keep the available part (streaming decoders emit it).
+          for i in r.pos..<data.length() {
+            out.push(data[i])
+          }
           raise InflateError("unexpected end of stream")
         }
         for i in 0..<len {
