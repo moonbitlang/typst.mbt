@@ -9,4 +9,11 @@ import {
   "moonbitlang/core/cmp",
 }
 
+import {
+  "moonbitlang/x/fs",
+  "moonbitlang/core/encoding/utf8",
+  "moonbitlang/core/string",
+  "moonbitlang/typst/typst_assets/pdf" @pdf_fonts,
+} for "test"
+
 warnings = "-deprecated"
