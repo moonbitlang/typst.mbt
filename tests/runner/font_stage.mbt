@@ -290,6 +290,9 @@ fn font_dump_face(
   font_dump_kern(out, face)
   font_dump_cff(out, face)
   font_dump_glyphs(out, face, "")
+  font_dump_layout(out, face)
+  font_dump_math(out, face)
+  font_dump_colr(out, face)
 
   // Variations.
   let axes = face.variation_axes().iter().to_array()

@@ -240,6 +240,9 @@ fn dump_face(out: &mut String, index: usize, data: &[u8], face_index: u32) {
     dump_kern(out, &face);
     dump_cff(out, &face);
     dump_glyphs(out, &face, "");
+    dump_layout(out, &face);
+    dump_math(out, &face);
+    dump_colr(out, &face);
 
     // Variations.
     let axes: Vec<_> = face.variation_axes().into_iter().collect();
@@ -550,5 +553,480 @@ fn dump_glyphs(out: &mut String, face: &Face, label: &str) {
             block.clear();
             block_start = gid + 1;
         }
+    }
+}
+
+/// Accumulates per-glyph lines into hashed blocks of 256 glyphs, printing a
+/// sample of the lines in full.
+struct Blocks<'a> {
+    out: &'a mut String,
+    prefix: &'static str,
+    count: u16,
+    block: String,
+    start: u16,
+}
+
+impl<'a> Blocks<'a> {
+    fn new(out: &'a mut String, prefix: &'static str, count: u16) -> Self {
+        Self { out, prefix, count, block: String::new(), start: 0 }
+    }
+
+    fn push(&mut self, gid: u16, line: &str) {
+        if is_sample(gid, self.count) {
+            writeln!(self.out, "{} {gid} {line}", self.prefix).unwrap();
+        }
+        self.block.push_str(line);
+        self.block.push('\n');
+        if (gid + 1) % 256 == 0 || gid + 1 == self.count {
+            writeln!(
+                self.out,
+                "{}s {}..{gid} fnv {:016x}",
+                self.prefix,
+                self.start,
+                fnv(self.block.as_bytes())
+            )
+            .unwrap();
+            self.block.clear();
+            self.start = gid + 1;
+        }
+    }
+}
+
+fn glyph_class(c: Option<ttf_parser::gdef::GlyphClass>) -> &'static str {
+    use ttf_parser::gdef::GlyphClass::*;
+    match c {
+        Some(Base) => "Base",
+        Some(Ligature) => "Ligature",
+        Some(Mark) => "Mark",
+        Some(Component) => "Component",
+        None => "-",
+    }
+}
+
+fn join<T: std::fmt::Display>(items: impl IntoIterator<Item = T>) -> String {
+    items.into_iter().map(|i| i.to_string()).collect::<Vec<_>>().join(",")
+}
+
+fn dump_layout(out: &mut String, face: &Face) {
+    use ttf_parser::gpos::PositioningSubtable;
+    use ttf_parser::gsub::SubstitutionSubtable;
+    let count = face.number_of_glyphs();
+    if let Some(gdef) = face.tables().gdef {
+        writeln!(out, "gdef has_glyph_classes {}", gdef.has_glyph_classes()).unwrap();
+        let mut blocks = Blocks::new(out, "gdef glyph", count);
+        for gid in 0..count {
+            let g = GlyphId(gid);
+            let line = format!(
+                "{} {} {}",
+                glyph_class(gdef.glyph_class(g)),
+                gdef.glyph_mark_attachment_class(g),
+                gdef.is_mark_glyph(g, None)
+            );
+            blocks.push(gid, &line);
+        }
+    }
+    for (name, table) in [("gsub", face.tables().gsub), ("gpos", face.tables().gpos)] {
+        let Some(table) = table else { continue };
+        for script in table.scripts {
+            let mut langs = vec![];
+            if let Some(lang) = script.default_language {
+                langs.push(lang);
+            }
+            langs.extend(script.languages);
+            let mut text = format!("{name} script {}", esc(&script.tag.to_string()));
+            for lang in langs {
+                write!(
+                    text,
+                    " [{} req={} {}]",
+                    esc(&lang.tag.to_string()),
+                    opt(lang.required_feature),
+                    join(lang.feature_indices)
+                )
+                .unwrap();
+            }
+            writeln!(out, "{text}").unwrap();
+        }
+        for (i, feature) in table.features.into_iter().enumerate() {
+            writeln!(
+                out,
+                "{name} feature {i} {} {}",
+                esc(&feature.tag.to_string()),
+                join(feature.lookup_indices)
+            )
+            .unwrap();
+        }
+        writeln!(out, "{name} variations {}", table.variations.is_some()).unwrap();
+        for (i, lookup) in table.lookups.into_iter().enumerate() {
+            let mut kinds = vec![];
+            let mut text = String::new();
+            for k in 0..lookup.subtables.len() {
+                let coverage = if name == "gsub" {
+                    let Some(st) = lookup.subtables.get::<SubstitutionSubtable>(k) else {
+                        kinds.push("?");
+                        continue;
+                    };
+                    kinds.push(match st {
+                        SubstitutionSubtable::Single(_) => "Single",
+                        SubstitutionSubtable::Multiple(_) => "Multiple",
+                        SubstitutionSubtable::Alternate(_) => "Alternate",
+                        SubstitutionSubtable::Ligature(_) => "Ligature",
+                        SubstitutionSubtable::Context(_) => "Context",
+                        SubstitutionSubtable::ChainContext(_) => "ChainContext",
+                        SubstitutionSubtable::ReverseChainSingle(_) => "ReverseChainSingle",
+                    });
+                    st.coverage()
+                } else {
+                    let Some(st) = lookup.subtables.get::<PositioningSubtable>(k) else {
+                        kinds.push("?");
+                        continue;
+                    };
+                    kinds.push(match st {
+                        PositioningSubtable::Single(_) => "Single",
+                        PositioningSubtable::Pair(_) => "Pair",
+                        PositioningSubtable::Cursive(_) => "Cursive",
+                        PositioningSubtable::MarkToBase(_) => "MarkToBase",
+                        PositioningSubtable::MarkToLigature(_) => "MarkToLigature",
+                        PositioningSubtable::MarkToMark(_) => "MarkToMark",
+                        PositioningSubtable::Context(_) => "Context",
+                        PositioningSubtable::ChainContext(_) => "ChainContext",
+                    });
+                    st.coverage()
+                };
+                for gid in 0..count {
+                    if let Some(idx) = coverage.get(GlyphId(gid)) {
+                        write!(text, "{gid}:{idx};").unwrap();
+                    }
+                }
+                text.push('|');
+            }
+            writeln!(
+                out,
+                "{name} lookup {i} flags {} set {} subtables {} coverage {:016x}",
+                lookup.flags.0,
+                opt(lookup.mark_filtering_set),
+                kinds.join(","),
+                fnv(text.as_bytes())
+            )
+            .unwrap();
+        }
+    }
+}
+
+fn math_value(v: ttf_parser::math::MathValue) -> String {
+    format!("{}{}", v.value, if v.device.is_some() { "d" } else { "" })
+}
+
+fn math_construction(c: Option<ttf_parser::math::GlyphConstruction>) -> String {
+    let Some(c) = c else { return "-".into() };
+    let mut text = String::new();
+    for v in c.variants {
+        write!(text, "{}:{},", v.variant_glyph.0, v.advance_measurement).unwrap();
+    }
+    if let Some(a) = c.assembly {
+        write!(text, " asm {}", math_value(a.italics_correction)).unwrap();
+        for p in a.parts {
+            write!(
+                text,
+                " {}:{}:{}:{}:{}",
+                p.glyph_id.0,
+                p.start_connector_length,
+                p.end_connector_length,
+                p.full_advance,
+                p.part_flags.extender()
+            )
+            .unwrap();
+        }
+    }
+    text
+}
+
+fn math_kern(k: Option<ttf_parser::math::Kern>) -> String {
+    let Some(k) = k else { return "-".into() };
+    let mut text = format!("{}", k.count());
+    for i in 0..k.count() {
+        write!(text, ",{}", opt(k.height(i).map(math_value))).unwrap();
+    }
+    for i in 0..=k.count() {
+        write!(text, ",{}", opt(k.kern(i).map(math_value))).unwrap();
+    }
+    text
+}
+
+fn dump_math(out: &mut String, face: &Face) {
+    let Some(math) = face.tables().math else { return };
+    if let Some(c) = math.constants {
+        let values = [
+            c.math_leading(),
+            c.axis_height(),
+            c.accent_base_height(),
+            c.flattened_accent_base_height(),
+            c.subscript_shift_down(),
+            c.subscript_top_max(),
+            c.subscript_baseline_drop_min(),
+            c.superscript_shift_up(),
+            c.superscript_shift_up_cramped(),
+            c.superscript_bottom_min(),
+            c.superscript_baseline_drop_max(),
+            c.sub_superscript_gap_min(),
+            c.superscript_bottom_max_with_subscript(),
+            c.space_after_script(),
+            c.upper_limit_gap_min(),
+            c.upper_limit_baseline_rise_min(),
+            c.lower_limit_gap_min(),
+            c.lower_limit_baseline_drop_min(),
+            c.stack_top_shift_up(),
+            c.stack_top_display_style_shift_up(),
+            c.stack_bottom_shift_down(),
+            c.stack_bottom_display_style_shift_down(),
+            c.stack_gap_min(),
+            c.stack_display_style_gap_min(),
+            c.stretch_stack_top_shift_up(),
+            c.stretch_stack_bottom_shift_down(),
+            c.stretch_stack_gap_above_min(),
+            c.stretch_stack_gap_below_min(),
+            c.fraction_numerator_shift_up(),
+            c.fraction_numerator_display_style_shift_up(),
+            c.fraction_denominator_shift_down(),
+            c.fraction_denominator_display_style_shift_down(),
+            c.fraction_numerator_gap_min(),
+            c.fraction_num_display_style_gap_min(),
+            c.fraction_rule_thickness(),
+            c.fraction_denominator_gap_min(),
+            c.fraction_denom_display_style_gap_min(),
+            c.skewed_fraction_horizontal_gap(),
+            c.skewed_fraction_vertical_gap(),
+            c.overbar_vertical_gap(),
+            c.overbar_rule_thickness(),
+            c.overbar_extra_ascender(),
+            c.underbar_vertical_gap(),
+            c.underbar_rule_thickness(),
+            c.underbar_extra_descender(),
+            c.radical_vertical_gap(),
+            c.radical_display_style_vertical_gap(),
+            c.radical_rule_thickness(),
+            c.radical_extra_ascender(),
+            c.radical_kern_before_degree(),
+            c.radical_kern_after_degree(),
+        ];
+        writeln!(
+            out,
+            "math constants {} {} {} {} {} {}",
+            c.script_percent_scale_down(),
+            c.script_script_percent_scale_down(),
+            c.delimited_sub_formula_min_height(),
+            c.display_operator_min_height(),
+            c.radical_degree_bottom_raise_percent(),
+            values.into_iter().map(math_value).collect::<Vec<_>>().join(" ")
+        )
+        .unwrap();
+    }
+    if let Some(v) = math.variants {
+        writeln!(out, "math min_connector_overlap {}", v.min_connector_overlap).unwrap();
+    }
+    let count = face.number_of_glyphs();
+    let mut blocks = Blocks::new(out, "math glyph", count);
+    for gid in 0..count {
+        let g = GlyphId(gid);
+        let mut line = String::new();
+        if let Some(info) = math.glyph_info {
+            write!(
+                line,
+                "italic {} accent {} extended {} kern",
+                opt(info.italic_corrections.and_then(|v| v.get(g)).map(math_value)),
+                opt(info.top_accent_attachments.and_then(|v| v.get(g)).map(math_value)),
+                info.extended_shapes.map(|c| c.contains(g)).unwrap_or(false),
+            )
+            .unwrap();
+            match info.kern_infos.and_then(|k| k.get(g)) {
+                Some(k) => write!(
+                    line,
+                    " {} {} {} {}",
+                    math_kern(k.top_right),
+                    math_kern(k.top_left),
+                    math_kern(k.bottom_right),
+                    math_kern(k.bottom_left)
+                )
+                .unwrap(),
+                None => line.push_str(" -"),
+            }
+        }
+        if let Some(v) = math.variants {
+            write!(
+                line,
+                " vert {} horiz {}",
+                math_construction(v.vertical_constructions.get(g)),
+                math_construction(v.horizontal_constructions.get(g))
+            )
+            .unwrap();
+        }
+        blocks.push(gid, &line);
+    }
+}
+
+fn rgba(c: ttf_parser::RgbaColor) -> String {
+    format!("{},{},{},{}", c.red, c.green, c.blue, c.alpha)
+}
+
+struct ColrRecorder(String);
+
+impl ColrRecorder {
+    fn stops(
+        &mut self,
+        stops: ttf_parser::colr::GradientStopsIter,
+        extend: ttf_parser::colr::GradientExtend,
+    ) {
+        use ttf_parser::colr::GradientExtend::*;
+        let extend = match extend {
+            Pad => "pad",
+            Repeat => "repeat",
+            Reflect => "reflect",
+        };
+        write!(self.0, "{extend}").unwrap();
+        for stop in stops {
+            write!(self.0, " {}@{}", rgba(stop.color), f(stop.stop_offset)).unwrap();
+        }
+    }
+}
+
+fn composite_mode(mode: ttf_parser::colr::CompositeMode) -> &'static str {
+    use ttf_parser::colr::CompositeMode::*;
+    match mode {
+        Clear => "Clear",
+        Source => "Source",
+        Destination => "Destination",
+        SourceOver => "SourceOver",
+        DestinationOver => "DestinationOver",
+        SourceIn => "SourceIn",
+        DestinationIn => "DestinationIn",
+        SourceOut => "SourceOut",
+        DestinationOut => "DestinationOut",
+        SourceAtop => "SourceAtop",
+        DestinationAtop => "DestinationAtop",
+        Xor => "Xor",
+        Plus => "Plus",
+        Screen => "Screen",
+        Overlay => "Overlay",
+        Darken => "Darken",
+        Lighten => "Lighten",
+        ColorDodge => "ColorDodge",
+        ColorBurn => "ColorBurn",
+        HardLight => "HardLight",
+        SoftLight => "SoftLight",
+        Difference => "Difference",
+        Exclusion => "Exclusion",
+        Multiply => "Multiply",
+        Hue => "Hue",
+        Saturation => "Saturation",
+        Color => "Color",
+        Luminosity => "Luminosity",
+    }
+}
+
+impl<'a> ttf_parser::colr::Painter<'a> for ColrRecorder {
+    fn outline_glyph(&mut self, glyph_id: GlyphId) {
+        write!(self.0, "outline {};", glyph_id.0).unwrap();
+    }
+    fn paint(&mut self, paint: ttf_parser::colr::Paint<'a>) {
+        use ttf_parser::colr::Paint;
+        match paint {
+            Paint::Solid(c) => write!(self.0, "solid {};", rgba(c)).unwrap(),
+            Paint::LinearGradient(g) => {
+                write!(
+                    self.0,
+                    "linear {} {} {} {} {} {} ",
+                    f(g.x0),
+                    f(g.y0),
+                    f(g.x1),
+                    f(g.y1),
+                    f(g.x2),
+                    f(g.y2)
+                )
+                .unwrap();
+                self.stops(g.stops(0, &[]), g.extend);
+                self.0.push(';');
+            }
+            Paint::RadialGradient(g) => {
+                write!(
+                    self.0,
+                    "radial {} {} {} {} {} {} ",
+                    f(g.x0),
+                    f(g.y0),
+                    f(g.r0),
+                    f(g.r1),
+                    f(g.x1),
+                    f(g.y1)
+                )
+                .unwrap();
+                self.stops(g.stops(0, &[]), g.extend);
+                self.0.push(';');
+            }
+            Paint::SweepGradient(g) => {
+                write!(
+                    self.0,
+                    "sweep {} {} {} {} ",
+                    f(g.center_x),
+                    f(g.center_y),
+                    f(g.start_angle),
+                    f(g.end_angle)
+                )
+                .unwrap();
+                self.stops(g.stops(0, &[]), g.extend);
+                self.0.push(';');
+            }
+        }
+    }
+    fn push_clip(&mut self) {
+        self.0.push_str("clip;");
+    }
+    fn push_clip_box(&mut self, b: ttf_parser::colr::ClipBox) {
+        write!(
+            self.0,
+            "clipbox {} {} {} {};",
+            f(b.x_min),
+            f(b.y_min),
+            f(b.x_max),
+            f(b.y_max)
+        )
+        .unwrap();
+    }
+    fn pop_clip(&mut self) {
+        self.0.push_str("popclip;");
+    }
+    fn push_layer(&mut self, mode: ttf_parser::colr::CompositeMode) {
+        write!(self.0, "layer {};", composite_mode(mode)).unwrap();
+    }
+    fn pop_layer(&mut self) {
+        self.0.push_str("poplayer;");
+    }
+    fn push_transform(&mut self, t: ttf_parser::Transform) {
+        write!(
+            self.0,
+            "transform {} {} {} {} {} {};",
+            f(t.a),
+            f(t.b),
+            f(t.c),
+            f(t.d),
+            f(t.e),
+            f(t.f)
+        )
+        .unwrap();
+    }
+    fn pop_transform(&mut self) {
+        self.0.push_str("poptransform;");
+    }
+}
+
+fn dump_colr(out: &mut String, face: &Face) {
+    let Some(palettes) = face.color_palettes() else { return };
+    writeln!(out, "colr palettes {}", palettes).unwrap();
+    let count = face.number_of_glyphs();
+    let mut blocks = Blocks::new(out, "colr glyph", count);
+    for gid in 0..count {
+        let g = GlyphId(gid);
+        let mut rec = ColrRecorder(String::new());
+        let res =
+            face.paint_color_glyph(g, 0, ttf_parser::RgbaColor::new(1, 2, 3, 255), &mut rec);
+        let line = format!("{} {}", res.is_some(), rec.0);
+        blocks.push(gid, &line);
     }
 }
