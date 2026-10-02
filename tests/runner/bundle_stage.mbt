@@ -10,13 +10,23 @@
 let bundle_stub_binary : Ref[Bool] = Ref::new(false)
 
 ///|
-/// The export options of the upstream test runner (PDF and PNG export are
-/// not wired up yet, see `bundle/export.mbt`).
+/// The export options of the upstream test runner (PNG export is not wired
+/// up yet, see `bundle/export.mbt`).
 fn bundle_options() -> @bundle.BundleOptions {
   let (pdf, png) : (@bundle.PdfExport?, @bundle.PngExport?) = if bundle_stub_binary.val {
     (Some((_, _, _) => { output: Ok(b""), warnings: [], }), Some(_ => b""))
   } else {
-    (None, None)
+    let pdf_options : @pdf.PdfOptions = {
+      ..@pdf.PdfOptions::default(),
+      creator: Custom(Some("Typst Test Runner")),
+      format: { ..@pdf.PartialPdfFormatOptions::default(), standard: None, },
+    }
+    (
+      Some((doc, anchors, resolver) => {
+        @pdf.pdf_in_bundle(doc, pdf_options, anchors, resolver)
+      }),
+      None,
+    )
   }
   {
     html: { format: { pretty: Some(true), }, },
@@ -101,14 +111,16 @@ fn bundle_report(rel : String, tc : TestCase) -> String {
 ///|
 /// Canonicalizes a bundle report for comparison: SVG documents are compared
 /// by their text after canonically renaming the hash-derived `<defs>` IDs
-/// (like the `svg` stage), so their size and hash are dropped. With
-/// `--stub-binary`, the same holds for PDF and PNG documents.
+/// (like the `svg` stage), so their size and hash are dropped. The same
+/// holds for PDF documents, and with `--stub-binary` for PNG documents.
 fn canonicalize_bundle(report : String) -> String {
   let out = StringBuilder()
+  // PDF files are not expected to be byte-identical to upstream's (the
+  // exporter is checked by the `pdf-semantic` stage).
   let kinds = if bundle_stub_binary.val {
     ["svg", "pdf", "png"]
   } else {
-    ["svg"]
+    ["svg", "pdf"]
   }
   for line in report.split("\n") {
     let kind = kinds.search_by(k => line.find(" (\{k}, ") is Some(_))

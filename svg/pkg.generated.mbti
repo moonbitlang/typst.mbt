@@ -13,6 +13,8 @@ pub fn convert_image_scaling(@library.Smart[@library.ImageScaling]) -> String?
 
 pub fn format_num(Double) -> String
 
+pub fn shape_bbox(@library.Shape, Bool) -> @library.Rect
+
 pub fn svg(@layout.Page, CompleteSvgOptions) -> String
 
 pub fn svg_in_bundle(@layout.Page, CompleteSvgOptions, ArrayView[(@library.Point, String)], @library.LateLinkResolver) -> String

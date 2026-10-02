@@ -65,6 +65,10 @@ rustybuzz = "0.20"
 unicode-ccc = "0.4"
 unicode-bidi-mirroring = "0.4"
 unicode-properties = { version = "0.1", default-features = false, features = ["general-category"] }
+# PDF semantic extraction (same revisions as upstream's test harness).
+hayro-syntax = { git = "https://github.com/LaurenzV/hayro", rev = "d8e24e29eda62581e1ea15497effb2a884fb1608" }
+indexmap = "2"
+roxmltree = "0.21"
 
 # Record every shaping call Typst makes (for the `shape` stage); see
 # rustybuzz-tap/Cargo.toml.

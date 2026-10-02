@@ -1,0 +1,64 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/pdf"
+
+import {
+  "moonbitlang/typst/layout",
+  "moonbitlang/typst/library",
+}
+
+// Values
+pub fn pdf(@layout.PagedDocument, PdfOptions) -> @library.Warned[Result[Bytes, Array[@library.SourceDiagnostic]]]
+
+pub fn pdf_in_bundle(@layout.PagedDocument, PdfOptions, Array[(@library.Location, String)], @library.LateLinkResolver) -> @library.Warned[Result[Bytes, Array[@library.SourceDiagnostic]]]
+
+// Errors
+
+// Types and methods
+pub(all) struct CompletePdfOptions {
+  ident : @library.Smart[String]
+  creator : @library.Smart[String?]
+  timestamp : Timestamp?
+  format : PdfFormatOptions
+}
+
+pub(all) struct PartialPdfFormatOptions {
+  pages : @library.PageRanges??
+  standard : @library.PdfStandards?
+  tagged : @library.Smart[Bool]?
+  pretty : Bool?
+}
+pub fn PartialPdfFormatOptions::default() -> Self
+pub fn PartialPdfFormatOptions::resolve(Self, PdfFormatOptions) -> PdfFormatOptions
+
+pub(all) struct PdfFormatOptions {
+  pages : @library.SpannedValue[@library.PageRanges?]
+  standard : @library.SpannedValue[@library.PdfStandards]
+  tagged : @library.SpannedValue[@library.Smart[Bool]]
+  pretty : @library.SpannedValue[Bool]
+}
+pub fn PdfFormatOptions::get(@library.DocumentFormatOptions) -> Self
+
+pub(all) struct PdfOptions {
+  ident : @library.Smart[String]
+  creator : @library.Smart[String?]
+  timestamp : Timestamp?
+  format : PartialPdfFormatOptions
+}
+pub fn PdfOptions::default() -> Self
+pub fn PdfOptions::resolve(Self, PdfFormatOptions, Array[@library.SourceDiagnostic]) -> CompletePdfOptions raise @library.SourceError
+
+pub(all) struct Timestamp {
+  datetime : @library.Datetime
+  timezone : Timezone
+}
+pub fn Timestamp::new_local(@library.Datetime, Int) -> Self?
+pub fn Timestamp::new_utc(@library.Datetime) -> Self
+
+pub(all) enum Timezone {
+  UTC
+  Local(Int, Int)
+} derive(Eq)
+
+// Type aliases
+
+// Traits

@@ -349,3 +349,16 @@ pub impl FromValue for SmartQuoteDict with fn from_value(v) {
     v => raise HintedError(SmartQuoteDict::input().error(v))
   }
 }
+
+///|
+/// Custom capabilities of `SmartQuoteElem` (upstream `impl PlainText for
+/// Packed<SmartQuoteElem>`).
+fn smart_quote_elem_init(e : Element) -> Unit {
+  e.hooks().plain_text = Some((c, out) => {
+    let double = match c.field_raw(smart_quote_elem_double) {
+      Some(Bool(b)) => b
+      _ => true
+    }
+    out.write_string(SmartQuotes::fallback(double))
+  })
+}

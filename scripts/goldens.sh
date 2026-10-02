@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Regenerate reference outputs from upstream Typst (needs Rust).
-# Usage: scripts/goldens.sh [syntax|ast|reparse|eval|html|bundle|realize|fonts|font|paged|svg|shape|shape-hb|break ...]
+# Usage: scripts/goldens.sh [syntax|ast|reparse|eval|html|bundle|realize|fonts|font|paged|svg|pdf-semantic|pdftags|shape|shape-hb|break ...]
 #
 # `reparse` applies seeded pseudo-random edits to every test body through
 # `Source::edit`/`Source::replace` and dumps the reparsed ranges and trees
@@ -9,7 +9,12 @@
 # `font` dumps what ttf-parser reports for every face (oracle/src/font.rs);
 # `paged` dumps every paged test in the `typst-frame-v1` format (see
 # oracle/src/paged.rs); `svg` dumps the raw upstream SVG of every paged test
-# (pretty, merged pages, 1pt gap; see oracle/src/svg.rs).
+# (pretty, merged pages, 1pt gap; see oracle/src/svg.rs). `pdf-semantic`
+# exports every paged test to PDF like the upstream harness and dumps a
+# canonical description of the file (oracle/src/pdf_semantic.rs; set
+# ORACLE_SAVE_PDF=<dir> to also keep the PDFs for the runner's
+# `pdf-extract-check` stage); `pdftags` dumps upstream's `pdftags` YAML of
+# the tests with a `pdftags` attribute.
 # `shape` dumps every text run Typst shapes while
 # compiling the paged tests, with rustybuzz's output (oracle/src/shape.rs);
 # `shape-hb` extracts rustybuzz's own shaping test suite.
@@ -26,7 +31,7 @@ cd "$(dirname "$0")/.."
 ORACLE=oracle/target/release/typst-oracle
 SUITE=.repos/typst/tests/suite
 stages=("$@")
-[ ${#stages[@]} -eq 0 ] && stages=(syntax ast reparse eval html bundle realize fonts font paged svg shape shape-hb break)
+[ ${#stages[@]} -eq 0 ] && stages=(syntax ast reparse eval html bundle realize fonts font paged svg pdf-semantic pdftags shape shape-hb break)
 for stage in "${stages[@]}"; do
   if [ "$stage" = shape-hb ]; then
     # rustybuzz's own shaping tests (needs .repos/rustybuzz, see upstream.sh).

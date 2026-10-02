@@ -434,3 +434,55 @@ Math first in the fallback list) are `math_families` in `math.mbt`.
 All 403 `math/` paged tests match; the 4 `math/` SVG failures are color
 emoji glyphs in the SVG exporter (paged output identical). eval/realize/html
 unchanged.
+
+## Status: work unit J (PDF export)
+
+**Backend:** pdflite's new `export` package (office.mbt branch
+`typst-pdf-export`, worktree `../office.mbt-typst-pdf`) is a port of the
+parts of krilla typst-pdf uses: object serialization (classic xref, flate
+streams), `Surface` (transforms, clips, masks, opacity, isolated groups,
+blend modes), paints (solid incl. Separation spot colors, axial/radial
+shadings, PostScript-function sweep/repeat/reflect gradients, translucent
+gradient stops via luminosity soft masks, tiling patterns), text (CID fonts
+CID=GID with glyf subsetting keeping GIDs, CFF/CFF2 embedded whole as
+`FontFile3/OpenType`, `ToUnicode`, krilla's `ActualText` glyph spanner,
+Type 3 fonts for color glyphs), images (8-bit samples + `SMask`, ICC,
+JPEG passthrough incl. inverted Adobe CMYK), link annotations (quad
+points), XYZ/named destinations, outlines, page labels, Info + XMP
+metadata, embedded files/AF, tagged PDF (`StructTreeRoot`, `ParentTree`,
+`IDTree`, `RoleMap`, MCIDs/MCR/OBJR, attributes) and krilla's validation
+tables for PDF/A and PDF/UA. pdflite now depends on `moonbitlang/x@0.5.5`;
+typst.mbt links it through `moon.work` (member
+`../office.mbt-typst-pdf/pdflite`; `.claude/worktrees/office.mbt-typst-pdf`
+is a symlink so the relative path also resolves from agent worktrees).
+
+**Port:** `pdf/` mirrors typst-pdf: `lib`, `format` (`PdfFormatOptions`),
+`convert`, `text`, `shape`, `paint`, `image`, `color_glyph` (COLR v0/v1
+painting, PNG bitmap glyphs, outline fallback), `link`, `outline`,
+`metadata`, `attach`, `util` and the whole tags module (`tags`,
+`tags_groups`, `tags_tree`, `tags_build`, `tags_text`, `tags_context`
+(context/{mod,list,outline,figure,grid}), `tags_table`, `tags_resolve`
+(resolve + accumulator), `tags_util`). Bundles use it through
+`BundleOptions.pdf` (runner: `bundle_options`).
+
+**Stages:** `pdf-semantic` (oracle `pdf_semantic.rs`: a canonical dump of
+version/info/catalog/XMP/page labels, per page the positioned text runs
+(ToUnicode-decoded), filled/stroked paths, images, shadings and
+annotations, then destinations, outline and attachments; numbers compared
+within 0.02), `pdf-semantic-replay` (exports upstream's frames decoded from
+the `paged` goldens, untagged), `pdf-extract-check` (MoonBit extractor on
+upstream's PDFs, saved by the oracle with `ORACLE_SAVE_PDF`, passed as
+`--upstream-pdfs=<dir>`), `pdftags` (upstream's `tests/src/pdftags.rs`
+YAML, ported in `tests/runner/pdftags.mbt`) and `pdftags-check` (formatter
+on upstream's PDFs). Internal errors carry upstream's caller location
+(`crates/typst-pdf/src/...:line:col`); the oracle now strips its absolute
+`.repos/typst/` prefix (`canonical_internal_error`).
+
+**Result:** `pdf-semantic` 2271/2299, `pdftags` 133/133, `pdftags-check`
+133/133, `pdf-extract-check` 2299/2299, `pdf-semantic-replay` 2261/2299,
+`bundle` 38/39. Visual check (poppler `pdftoppm` 72 dpi, page matches if
+≤0.5% of pixels differ): 2054/2141. The `pdf-semantic` failures are SVG
+images (no usvg port yet) and PDF images; other gaps: variable font
+instancing (krilla instantiates variable fonts), SVG-in-OpenType glyphs
+(outline fallback), CFF subsetting, ICC-based colors/output intents for
+PDF/A, GIF/WebP decoding.
