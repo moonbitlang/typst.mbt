@@ -92,6 +92,10 @@ pub(open) trait World {
   /// For file locations for which [`source`](Self::source) succeeds, this
   /// should also succeed.
   fn file(Self, @syntax.FileId) -> Bytes raise FileError
+  /// Metadata about all known fonts.
+  fn book(Self) -> FontBook = _
+  /// Try to access the font with the given index in the font book.
+  fn font(Self, Int) -> Font? = _
   /// Get the current date.
   ///
   /// If no offset is specified, the local date should be chosen. Otherwise,
@@ -100,6 +104,17 @@ pub(open) trait World {
   /// If this function returns `None`, Typst's `datetime` function will
   /// return an error.
   fn today(Self, Duration?) -> Datetime?
+}
+
+///|
+/// Worlds without fonts have an empty font book.
+impl World with fn book(_) {
+  FontBook::new()
+}
+
+///|
+impl World with fn font(_, _) {
+  None
 }
 
 ///|

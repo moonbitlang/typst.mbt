@@ -65,6 +65,44 @@ fn test_font_files() -> Array[(String, Bytes)] {
 let test_font_files_cell : Ref[Array[(String, Bytes)]?] = Ref::new(None)
 
 ///|
+/// The fonts of the test world, in book order (upstream
+/// `TestBase::default`: `Font::iter` over every file).
+fn test_fonts() -> Array[@library.Font] {
+  match test_fonts_cell.val {
+    Some(fonts) => fonts
+    None => {
+      let fonts = []
+      for file in test_font_files() {
+        for font in @library.Font::iter(file.1) {
+          fonts.push(font)
+        }
+      }
+      test_fonts_cell.val = Some(fonts)
+      fonts
+    }
+  }
+}
+
+///|
+let test_fonts_cell : Ref[Array[@library.Font]?] = Ref::new(None)
+
+///|
+/// The font book of the test world.
+fn test_font_book() -> @library.FontBook {
+  match test_font_book_cell.val {
+    Some(book) => book
+    None => {
+      let book = @library.FontBook::from_fonts(test_fonts())
+      test_font_book_cell.val = Some(book)
+      book
+    }
+  }
+}
+
+///|
+let test_font_book_cell : Ref[@library.FontBook?] = Ref::new(None)
+
+///|
 fn read_bytes(path : String) -> Bytes {
   @fs.read_file_to_bytes(path) catch {
     _ => abort("cannot read font \{path}")

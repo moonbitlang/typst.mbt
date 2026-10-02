@@ -11610,5 +11610,7 @@ pub(open) trait World {
   fn main(Self) -> @syntax.FileId
   fn source(Self, @syntax.FileId) -> @syntax.Source raise FileError
   fn file(Self, @syntax.FileId) -> Bytes raise FileError
+  fn book(Self) -> FontBook = _
+  fn font(Self, Int) -> Font? = _
   fn today(Self, Duration?) -> Datetime?
 }

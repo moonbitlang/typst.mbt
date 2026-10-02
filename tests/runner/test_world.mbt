@@ -73,6 +73,16 @@ impl @library.World for TestWorld with fn file(self, id) {
 }
 
 ///|
+impl @library.World for TestWorld with fn book(_self) {
+  test_font_book()
+}
+
+///|
+impl @library.World for TestWorld with fn font(_self, index) {
+  test_fonts().get(index)
+}
+
+///|
 impl @library.World for TestWorld with fn today(_self, offset) {
   // Like upstream's test world: `typst_kit::datetime::Time::fixed` at
   // 1970-01-01 12:00:00 UTC, shifted by the offset.
