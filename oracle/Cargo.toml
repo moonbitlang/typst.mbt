@@ -89,6 +89,8 @@ tiny-skia-path = "=0.12.0"
 strict-num = "=0.1.1"
 # The image resampler hayro uses (gen_pic_scale_tests), with hayro's features.
 pic-scale = { version = "=0.7.12", default-features = false, features = ["neon", "rdm", "sse", "avx"] }
+# kurbo stroke expansion (gen_kurbo_stroke_tests); same version as hayro's.
+kurbo = "=0.13.1"
 
 # Record every shaping call Typst makes (for the `shape` stage); see
 # rustybuzz-tap/Cargo.toml.

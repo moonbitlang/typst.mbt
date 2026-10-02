@@ -131,3 +131,8 @@
   `pic_scale/oracle_wbtest.mbt` against `testdata/oracle.tsv`; regenerate
   on Apple silicon with `cargo run --release --offline --bin
   gen_pic_scale_tests > ../pic_scale/testdata/oracle.tsv` (in `oracle/`).
+- `kurbo/` stroke expansion (`stroke.mbt`, `offset.mbt`, `arc.mbt`) is
+  bit-exact with kurbo 0.13.1 on native (libm externs incl. `__sincos_stret`
+  where LLVM merges sin/cos; `powi` as LLVM expands it). Oracle:
+  `kurbo/testdata/stroke_oracle.tsv` from `gen_kurbo_stroke_tests` (command
+  in its header), checked by `kurbo/stroke_oracle_test.mbt`.

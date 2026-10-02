@@ -29,6 +29,18 @@ pub fn PathEl::is_finite(self : PathEl) -> Bool {
 }
 
 ///|
+/// Get the end point of the path element, if it exists.
+pub fn PathEl::end_point(self : PathEl) -> Point? {
+  match self {
+    MoveTo(p) => Some(p)
+    LineTo(p1) => Some(p1)
+    QuadTo(_, p2) => Some(p2)
+    CurveTo(_, _, p3) => Some(p3)
+    ClosePath => None
+  }
+}
+
+///|
 /// `Affine * PathEl`.
 pub fn PathEl::transform(self : PathEl, t : Affine) -> PathEl {
   match self {
@@ -103,6 +115,12 @@ pub fn BezPath::close_path(self : BezPath) -> Unit {
 /// Get the path elements.
 pub fn BezPath::elements(self : BezPath) -> Array[PathEl] {
   self.elements
+}
+
+///|
+/// Returns an iterator over the path's elements.
+pub fn BezPath::iter(self : BezPath) -> Iter[PathEl] {
+  self.elements.iter()
 }
 
 ///|
@@ -266,4 +284,96 @@ pub fn PathSeg::bounding_box(self : PathSeg) -> Rect {
     bbox = bbox.union_pt(self.eval(t))
   }
   bbox
+}
+
+///|
+/// Get a subsegment of the segment (`ParamCurve::subsegment(t0..t1)`).
+pub fn PathSeg::subsegment(self : PathSeg, t0 : Double, t1 : Double) -> PathSeg {
+  match self {
+    Line(line) => Line(line.subsegment(t0, t1))
+    Quad(quad) => Quad(quad.subsegment(t0, t1))
+    Cubic(cubic) => Cubic(cubic.subsegment(t0, t1))
+  }
+}
+
+///|
+/// The arc length of the segment (`ParamCurveArclen::arclen`).
+pub fn PathSeg::arclen(self : PathSeg, accuracy : Double) -> Double {
+  match self {
+    Line(line) => line.arclen(accuracy)
+    Quad(quad) => quad.arclen(accuracy)
+    Cubic(cubic) => cubic.arclen(accuracy)
+  }
+}
+
+///|
+/// Solve for the parameter that has the given arc length from the start
+/// (`ParamCurveArclen::inv_arclen`).
+pub fn PathSeg::inv_arclen(
+  self : PathSeg,
+  arclen : Double,
+  accuracy : Double,
+) -> Double {
+  match self {
+    Line(line) => line.inv_arclen(arclen, accuracy)
+    Quad(quad) => quad.inv_arclen(arclen, accuracy)
+    Cubic(cubic) => cubic.inv_arclen(arclen, accuracy)
+  }
+}
+
+///|
+/// Get the [`PathEl`] that is equivalent to discarding the segment start
+/// point.
+pub fn PathSeg::as_path_el(self : PathSeg) -> PathEl {
+  match self {
+    Line(line) => LineTo(line.p1)
+    Quad(q) => QuadTo(q.p1, q.p2)
+    Cubic(c) => CurveTo(c.p1, c.p2, c.p3)
+  }
+}
+
+///|
+/// Compute endpoint tangents of a path segment.
+///
+/// This version is robust to the path segment not being a regular curve.
+fn PathSeg::tangents(self : PathSeg) -> (Vec2, Vec2) {
+  let eps = 1.0e-12
+  match self {
+    Line(l) => {
+      let d = l.p1.sub(l.p0)
+      (d, d)
+    }
+    Quad(q) => {
+      let d01 = q.p1.sub(q.p0)
+      let d0 = if d01.hypot2() > eps { d01 } else { q.p2.sub(q.p0) }
+      let d12 = q.p2.sub(q.p1)
+      let d1 = if d12.hypot2() > eps { d12 } else { q.p2.sub(q.p0) }
+      (d0, d1)
+    }
+    Cubic(c) => {
+      let d01 = c.p1.sub(c.p0)
+      let d0 = if d01.hypot2() > eps {
+        d01
+      } else {
+        let d02 = c.p2.sub(c.p0)
+        if d02.hypot2() > eps {
+          d02
+        } else {
+          c.p3.sub(c.p0)
+        }
+      }
+      let d23 = c.p3.sub(c.p2)
+      let d1 = if d23.hypot2() > eps {
+        d23
+      } else {
+        let d13 = c.p3.sub(c.p1)
+        if d13.hypot2() > eps {
+          d13
+        } else {
+          c.p3.sub(c.p0)
+        }
+      }
+      (d0, d1)
+    }
+  }
 }
