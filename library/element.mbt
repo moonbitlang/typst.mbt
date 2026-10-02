@@ -53,6 +53,11 @@ pub struct FieldInfo {
   /// For fields with a `#[parse]` attribute: custom argument parsing. Returns
   /// `None` if the argument was not given.
   parse : ((Engine, Args, ParseLocals) -> Value? raise SourceError)?
+  /// Converts a stored value into the value shown to users, for field types
+  /// whose stored form must keep more information than their upstream
+  /// `IntoValue` (e.g. which `Costs` entries were set, so that folding
+  /// works). Upstream stores typed values and converts on access.
+  output : ((Value) -> Value)?
 }
 
 ///|
@@ -494,6 +499,7 @@ pub fn[T : FromValue + IntoValue] field_of(
   default? : () -> Value,
   fold? : (Value, Value) -> Value,
   parse? : (Engine, Args, ParseLocals) -> Value? raise SourceError,
+  output? : (Value) -> Value,
 ) -> FieldInfo {
   {
     id,
@@ -510,6 +516,16 @@ pub fn[T : FromValue + IntoValue] field_of(
     default,
     fold,
     parse,
+    output,
+  }
+}
+
+///|
+/// The value of a field as shown to users (see [FieldInfo::output]).
+pub fn FieldInfo::to_output(self : FieldInfo, value : Value) -> Value {
+  match self.output {
+    Some(f) => f(value)
+    None => value
   }
 }
 
@@ -522,7 +538,9 @@ pub fn Element::settable_field_accessor(
 ) -> ((StyleChain) -> Value)? {
   for f in self.0.fields {
     if f.name == name && !f.internal && f.kind is (Settable | Ghost) {
-      return Some(styles => styles.get_value_with_local(self, f, None))
+      return Some(styles => {
+        f.to_output(styles.get_value_with_local(self, f, None))
+      })
     }
   }
   None

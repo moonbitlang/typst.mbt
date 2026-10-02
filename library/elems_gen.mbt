@@ -7456,6 +7456,7 @@ pub fn text_elem() -> Element {
             kind=Ghost,
             default=text_elem_costs_default,
             fold=text_elem_costs_fold,
+            output=text_elem_costs_output,
           ),
           field_of((Ty::new() : Ty[Bool]), id=21, name="kerning", kind=Ghost, default=() => {
             Bool(true)
@@ -7799,7 +7800,7 @@ pub fn raw_elem() -> Element {
             name="syntaxes",
             kind=Settable,
             default=raw_elem_syntaxes_default,
-            fold=raw_elem_syntaxes_fold,
+            fold=fold_of((Ty::new() : Ty[OneOrMultiple[DataSource]])),
           ),
           field_of(
             (Ty::new() : Ty[Smart[DataSource?]]),

@@ -209,7 +209,9 @@ fn Dumper::style(self : Dumper, style : @library.Style) -> String {
             let single = @library.StyleChain::new(
               @library.Styles::from_array([style]),
             )
-            self.value(single.get_value_with_local(elem, info, None))
+            self.value(
+              info.to_output(single.get_value_with_local(elem, info, None)),
+            )
           } else {
             "?"
           }
