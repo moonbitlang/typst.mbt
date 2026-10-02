@@ -5,7 +5,7 @@
 //! upstream results so that the MoonBit port can be checked against them
 //! without needing Rust at test time.
 //!
-//! Usage: `typst-oracle <syntax|ast|eval|html|realize|paged|svg> <suite-dir> <out-dir>`
+//! Usage: `typst-oracle <syntax|ast|reparse|eval|html|realize|paged|svg> <suite-dir> <out-dir>`
 //! or `typst-oracle fonts <out-file>`.
 
 use std::fmt::Write as _;
@@ -22,6 +22,7 @@ mod fonts;
 mod html;
 mod paged;
 mod realize;
+mod reparse;
 mod shape;
 mod svg;
 mod world;
@@ -38,6 +39,11 @@ fn main() {
             let suite = PathBuf::from(&args[2]);
             let out = PathBuf::from(&args[3]);
             dump(&suite, &out, ast_dump::ast_report);
+        }
+        Some("reparse") => {
+            let suite = PathBuf::from(&args[2]);
+            let out = PathBuf::from(&args[3]);
+            dump(&suite, &out, reparse::reparse_report);
         }
         Some("eval") => {
             // Paths are resolved relative to the upstream checkout.
@@ -143,6 +149,25 @@ fn main() {
             let text = std::fs::read_to_string(&args[2]).unwrap();
             print!("{}", syntax_report(&text));
         }
+        Some("reparse-file") => {
+            // Debugging aid: dump the reparse stage for a single file.
+            let text = std::fs::read_to_string(&args[2]).unwrap();
+            print!("{}", reparse::reparse_report(&text));
+        }
+        Some("reparse-edit") => {
+            // Debugging aid: `reparse-edit <text> <start> <end> <with>` prints
+            // the reparsed range of a single edit (or `All`).
+            let mut source = Source::detached(args[2].as_str());
+            let range = source.edit(
+                args[3].parse().unwrap()..args[4].parse().unwrap(),
+                &args[5],
+            );
+            if range == (0..source.text().len()) {
+                println!("All");
+            } else {
+                println!("Incr({:?})", &source.text()[range]);
+            }
+        }
         Some("ast-file") => {
             // Debugging aid: dump the AST stage for a single file.
             let text = std::fs::read_to_string(&args[2]).unwrap();
@@ -150,7 +175,7 @@ fn main() {
         }
         _ => {
             eprintln!(
-                "usage: typst-oracle <syntax|ast|eval|html|realize|paged|svg|shape|break> <suite-dir> <out-dir>\n       typst-oracle fonts <out-file>"
+                "usage: typst-oracle <syntax|ast|reparse|eval|html|realize|paged|svg|shape|break> <suite-dir> <out-dir>\n       typst-oracle fonts <out-file>"
             );
             std::process::exit(2);
         }
