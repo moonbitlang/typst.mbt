@@ -1,5 +1,5 @@
 // Differential tests against `pxfm` 0.1.30 (expected hashes produced by the
-// oracle in the moxcms port's scratch directory, see moxcms/README.md).
+// oracle in moxcms/oracle).
 
 ///|
 priv struct Rng {
@@ -103,26 +103,50 @@ test "table sizes" {
 ///|
 test "fma matches exact big integer evaluation" {
   let rng = { state: 88172645U, }
-  let rnd = () => {
+  let rnd = (lo_e : UInt, range : UInt) => {
     let hi = rng.next().to_uint64()
     let lo = rng.next().to_uint64()
-    let e = (rng.next() % 200U).to_uint64() + 923UL // exponents in [-100, 99]
+    let e = (rng.next() % range + lo_e).to_uint64()
     let bits = (((hi << 32) | lo) & 0x800fffffffffffffUL) | (e << 52)
     bits.reinterpret_as_double()
   }
-  for _ in 0..<20000 {
-    let a = rnd()
-    let b = rnd()
-    let c = rnd()
-    assert_eq(
-      fma(a, b, c).reinterpret_as_uint64(),
-      fma_exact(a, b, c).reinterpret_as_uint64(),
-    )
+  for i in 0..<20000 {
+    // Exponents in [-100, 99], and over the whole range (incl. subnormals,
+    // overflow) every 8th iteration.
+    let (lo_e, range) = if i % 8 == 0 { (0U, 2047U) } else { (923U, 200U) }
+    let a = rnd(lo_e, range)
+    let b = rnd(lo_e, range)
+    let c = rnd(lo_e, range)
+    let want = fma_exact(a, b, c).reinterpret_as_uint64()
+    if !a.is_inf() && !b.is_inf() && !c.is_inf() && !(a * b).is_inf() {
+      assert_eq(fma(a, b, c).reinterpret_as_uint64(), want)
+      assert_eq(soft_fma(a, b, c).reinterpret_as_uint64(), want)
+    }
     // Heavy cancellation.
     let c2 = -(a * b)
-    assert_eq(
-      fma(a, b, c2).reinterpret_as_uint64(),
-      fma_exact(a, b, c2).reinterpret_as_uint64(),
+    if !c2.is_inf() && !a.is_inf() && !b.is_inf() {
+      let want = fma_exact(a, b, c2).reinterpret_as_uint64()
+      assert_eq(fma(a, b, c2).reinterpret_as_uint64(), want)
+      assert_eq(soft_fma(a, b, c2).reinterpret_as_uint64(), want)
+    }
+  }
+}
+
+///|
+test "software fmaf matches fmaf" {
+  let rng = { state: 2463534242U, }
+  for i in 0..<200000 {
+    let mask = if i % 4 == 0 { 0xffffffffU } else { 0x83ffffffU }
+    let bias = if i % 4 == 0 { 0U } else { 0x3c000000U }
+    let f = () => Float::reinterpret_from_uint((rng.next() & mask) | bias)
+    let a = f()
+    let b = f()
+    let c = f()
+    let want = fmaf(a, b, c)
+    let got = soft_fmaf(a, b, c)
+    assert_true(
+      got.reinterpret_as_uint() == want.reinterpret_as_uint() ||
+      (got.is_nan() && want.is_nan()),
     )
   }
 }

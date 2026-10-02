@@ -42,6 +42,10 @@ pub fn round_ties_even_f32(Float) -> Float
 
 pub fn round_ties_even_f64(Double) -> Double
 
+pub fn soft_fma(Double, Double, Double) -> Double
+
+pub fn soft_fmaf(Float, Float, Float) -> Float
+
 // Errors
 
 // Types and methods
