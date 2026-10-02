@@ -1,0 +1,51 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/moxcms/pxfm"
+
+// Values
+pub fn f32_as_i16(Float) -> Int
+
+pub fn f32_as_i32(Float) -> Int
+
+pub fn f32_as_u16(Float) -> Int
+
+pub fn f32_as_u32(Float) -> Int64
+
+pub fn f32_as_u8(Float) -> Int
+
+pub fn f64_as_i32(Double) -> Int
+
+pub fn f64_as_i64(Double) -> Int64
+
+pub fn f64_as_u16(Double) -> Int
+
+pub fn f_pow(Double, Double) -> Double
+
+pub fn f_powf(Float, Float) -> Float
+
+pub fn fma(Double, Double, Double) -> Double
+
+pub fn fmaf(Float, Float, Float) -> Float
+
+pub fn max_f32(Float, Float) -> Float
+
+pub fn max_f64(Double, Double) -> Double
+
+pub fn min_f32(Float, Float) -> Float
+
+pub fn min_f64(Double, Double) -> Double
+
+pub fn round_f32(Float) -> Float
+
+pub fn round_f64(Double) -> Double
+
+pub fn round_ties_even_f32(Float) -> Float
+
+pub fn round_ties_even_f64(Double) -> Double
+
+// Errors
+
+// Types and methods
+
+// Type aliases
+
+// Traits
