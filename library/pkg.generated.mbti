@@ -76,6 +76,8 @@ pub let asset_elem_data : Int
 
 pub let asset_elem_path : Int
 
+pub fn asset_unsupported_rule(AssetElem, Engine, StyleChain) -> Content raise SourceError
+
 pub fn[T] at(@syntax.Span, () -> T raise HintedError) -> T raise SourceError
 
 pub let attr_abbr : HtmlAttr
@@ -582,9 +584,13 @@ pub let box_elem_stroke : Int
 
 pub let box_elem_width : Int
 
+pub fn bundle_document_unsupported_rule(DocumentElem, Engine, StyleChain) -> Content raise SourceError
+
 pub fn bundle_format() -> Format
 
 pub fn bundle_format_elem() -> Element
+
+pub fn bundle_register(NativeRuleMap) -> Unit
 
 pub fn bytes_as_str(BytesView) -> String raise LoadErr
 
@@ -5162,6 +5168,7 @@ pub fn DocumentElem::date_local(Self) -> Smart[Datetime?]?
 pub fn DocumentElem::description(Self, StyleChain) -> Content?
 pub fn DocumentElem::description_in(StyleChain) -> Content?
 pub fn DocumentElem::description_local(Self) -> Content??
+pub fn DocumentElem::determine_format(Self, StyleChain) -> DocumentFormat raise HintedError
 pub fn DocumentElem::format(Self, StyleChain) -> Smart[DocumentFormat]
 pub fn DocumentElem::format_in(StyleChain) -> Smart[DocumentFormat]
 pub fn DocumentElem::format_local(Self) -> Smart[DocumentFormat]?
@@ -5195,6 +5202,7 @@ pub(all) enum DocumentFormat {
   Paged(PagedFormat)
   Html
 } derive(Eq, Hash, @debug.Debug)
+pub fn DocumentFormat::target(Self) -> Target
 pub impl FromValue for DocumentFormat
 pub impl IntoValue for DocumentFormat
 pub impl Reflect for DocumentFormat

@@ -1,7 +1,7 @@
 // Differential test runner: compares the MoonBit port against reference
 // outputs dumped by the Rust oracle (see `scripts/goldens.sh`).
 //
-// Usage: moon run tests/runner -- <syntax|ast|reparse|eval|html|realize|paged|svg|svg-replay|font|break|shape|shape-hb> [filter] [--verbose]
+// Usage: moon run tests/runner -- <syntax|ast|reparse|eval|html|bundle|realize|paged|svg|svg-replay|font|break|shape|shape-hb> [filter] [--verbose]
 
 ///|
 let suite_dir = ".repos/typst/tests/suite"
@@ -21,6 +21,7 @@ fn main {
   let verbose = args.contains("--verbose") || args.contains("-v")
   dump_actual.val = args.contains("--dump")
   trace_tests.val = args.contains("--trace")
+  bundle_stub_binary.val = args.contains("--stub-binary")
   let filter = args[2:].iter().find_first(a => !a.has_prefix("-"))
   match stage {
     "syntax" =>
@@ -47,6 +48,17 @@ fn main {
       run_stage("html", html_report, filter, verbose, select=tc => {
         tc.attrs.split(" ").any(a => a == "html")
       })
+    // Like the oracle, only tests that target bundles. `--stub-binary`
+    // replaces the PDF and PNG exporters by stubs (see `bundle_stage.mbt`).
+    "bundle" =>
+      run_stage(
+        "bundle",
+        bundle_report,
+        filter,
+        verbose,
+        select=tc => tc.attrs.split(" ").any(a => a == "bundle"),
+        canonicalize=canonicalize_bundle,
+      )
     "break" => run_break_stage(filter, verbose)
     // Like `paged`, but exported to SVG and compared after canonically
     // renaming the hash-derived `<defs>` IDs.

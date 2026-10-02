@@ -9578,6 +9578,7 @@ pub fn bundle_format_elem() -> Element {
         fields=[],
       )
       bundle_format_elem_cell.val = Some(e)
+      bundle_format_elem_init(e)
       e
     }
   }

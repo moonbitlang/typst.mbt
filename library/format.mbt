@@ -246,7 +246,9 @@ pub fn png_format() -> Format {
 ///|
 /// `typst_bundle::FORMAT`.
 pub fn bundle_format() -> Format {
-  Format::new(bundle_format_elem()).with_feature(Bundle)
+  Format::new(bundle_format_elem())
+  .with_feature(Bundle)
+  .with_rules(bundle_register)
 }
 
 ///|
