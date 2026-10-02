@@ -28,7 +28,10 @@ pub(all) struct RawFace {
 /// Set to 0 if unsure.
 ///
 /// While we do reuse `FaceParsingError`, `No*Table` errors will not be throws.
-pub fn RawFace::parse(data : BytesView, index : UInt) -> RawFace raise FaceParsingError {
+pub fn RawFace::parse(
+  data : BytesView,
+  index : UInt,
+) -> RawFace raise FaceParsingError {
   // https://docs.microsoft.com/en-us/typography/opentype/spec/otff#organization-of-an-opentype-font
 
   let s = Stream::new(data)
@@ -46,7 +49,8 @@ pub fn RawFace::parse(data : BytesView, index : UInt) -> RawFace raise FaceParsi
     }
     // Face offset is from the start of the font data,
     // so we have to adjust it to the current parser offset.
-    guard usize_checked_sub(face_offset.to_usize(), s.offset()) is Some(face_offset) else {
+    guard usize_checked_sub(face_offset.to_usize(), s.offset())
+      is Some(face_offset) else {
       raise MalformedFont
     }
     s.advance_checked(face_offset) catch {
@@ -70,7 +74,7 @@ pub fn RawFace::parse(data : BytesView, index : UInt) -> RawFace raise FaceParsi
   let table_records = s.read_array16(num_tables) catch {
     _ => raise MalformedFont
   }
-  { data, table_records }
+  { data, table_records, }
 }
 
 ///|
@@ -137,7 +141,7 @@ pub(all) struct RawFaceTables {
 }
 
 ///|
-pub impl Default for RawFaceTables with default() {
+pub impl Default for RawFaceTables with fn default() {
   {
     head: empty_data,
     hhea: empty_data,
@@ -197,16 +201,29 @@ pub(all) struct FaceTables {
   head : HeadTable
   hhea : HheaTable
   maxp : MaxpTable
+  bdat : CbdtTable?
+  cbdt : CbdtTable?
   cff : CffTable?
   cmap : CmapTable?
+  colr : ColrTable?
+  ebdt : CbdtTable?
   glyf : GlyfTable?
   hmtx : HmtxTable?
   kern : KernTable?
   name : NameTable?
   os2 : Os2Table?
   post : PostTable?
+  sbix : SbixTable?
+  stat : StatTable?
+  svg : SvgTable?
   vhea : VheaTable?
   vmtx : HmtxTable?
+  vorg : VorgTable?
+  ankr : AnkrTable?
+  feat : FeatTable?
+  kerx : KerxTable?
+  morx : MorxTable?
+  trak : TrakTable?
   avar : AvarTable?
   cff2 : Cff2Table?
   fvar : FvarTable?
@@ -241,7 +258,10 @@ struct Face {
 /// Required tables: `head`, `hhea` and `maxp`.
 ///
 /// If an optional table has invalid data it will be skipped.
-pub fn Face::parse(data : BytesView, index : UInt) -> Face raise FaceParsingError {
+pub fn Face::parse(
+  data : BytesView,
+  index : UInt,
+) -> Face raise FaceParsingError {
   let raw_face = RawFace::parse(data, index)
   let raw_tables = Face::collect_tables(raw_face)
   Face::new_with(raw_face, Face::parse_tables(raw_tables))
@@ -260,7 +280,7 @@ fn Face::new_with(raw_face : RawFace, tables : FaceTables) -> Face {
     }
     None => 0
   }
-  { raw_face, tables, coordinates: Array::make(len, NormalizedCoordinate(0)) }
+  { raw_face, tables, coordinates: Array::make(len, NormalizedCoordinate(0)), }
 }
 
 ///|
@@ -324,9 +344,11 @@ fn Face::collect_tables(raw_face : RawFace) -> RawFaceTables {
 
 ///|
 /// Creates a new `Face` from provided `RawFaceTables`.
-pub fn Face::from_raw_tables(raw_tables : RawFaceTables) -> Face raise FaceParsingError {
+pub fn Face::from_raw_tables(
+  raw_tables : RawFaceTables,
+) -> Face raise FaceParsingError {
   Face::new_with(
-    { data: empty_data, table_records: LazyArray16::default() },
+    { data: empty_data, table_records: LazyArray16::default(), },
     Face::parse_tables(raw_tables),
   )
 }
@@ -340,7 +362,9 @@ fn[T, U] and_then(x : T?, f : (T) -> U?) -> U? {
 }
 
 ///|
-fn Face::parse_tables(raw_tables : RawFaceTables) -> FaceTables raise FaceParsingError {
+fn Face::parse_tables(
+  raw_tables : RawFaceTables,
+) -> FaceTables raise FaceParsingError {
   guard HeadTable::parse(raw_tables.head) is Some(head) else {
     raise NoHeadTable
   }
@@ -350,28 +374,43 @@ fn Face::parse_tables(raw_tables : RawFaceTables) -> FaceTables raise FaceParsin
   guard MaxpTable::parse(raw_tables.maxp) is Some(maxp) else {
     raise NoMaxpTable
   }
-  let hmtx = and_then(raw_tables.hmtx, data => HmtxTable::parse(
-    hhea.number_of_metrics,
-    maxp.number_of_glyphs,
-    data,
-  ))
+  let hmtx = and_then(raw_tables.hmtx, data => {
+    HmtxTable::parse(hhea.number_of_metrics, maxp.number_of_glyphs, data)
+  })
   let vhea = and_then(raw_tables.vhea, VheaTable::parse)
   let vmtx = if vhea is Some(vhea) {
-    and_then(raw_tables.vmtx, data => HmtxTable::parse(
-      vhea.number_of_metrics,
-      maxp.number_of_glyphs,
-      data,
-    ))
+    and_then(raw_tables.vmtx, data => {
+      HmtxTable::parse(vhea.number_of_metrics, maxp.number_of_glyphs, data)
+    })
   } else {
     None
   }
-  let loca = and_then(raw_tables.loca, data => LocaTable::parse(
-    maxp.number_of_glyphs,
-    head.index_to_location_format,
-    data,
-  ))
+  let loca = and_then(raw_tables.loca, data => {
+    LocaTable::parse(maxp.number_of_glyphs, head.index_to_location_format, data)
+  })
   let glyf = if loca is Some(loca) {
     and_then(raw_tables.glyf, data => GlyfTable::parse(loca, data))
+  } else {
+    None
+  }
+  let bdat = if and_then(raw_tables.bloc, CblcTable::parse) is Some(bloc) {
+    and_then(raw_tables.bdat, data => CbdtTable::parse(bloc, data))
+  } else {
+    None
+  }
+  let cbdt = if and_then(raw_tables.cblc, CblcTable::parse) is Some(cblc) {
+    and_then(raw_tables.cbdt, data => CbdtTable::parse(cblc, data))
+  } else {
+    None
+  }
+  let ebdt = if and_then(raw_tables.eblc, CblcTable::parse) is Some(eblc) {
+    and_then(raw_tables.ebdt, data => CbdtTable::parse(eblc, data))
+  } else {
+    None
+  }
+  let cpal = and_then(raw_tables.cpal, CpalTable::parse)
+  let colr = if cpal is Some(cpal) {
+    and_then(raw_tables.colr, data => ColrTable::parse(cpal, data))
   } else {
     None
   }
@@ -379,16 +418,37 @@ fn Face::parse_tables(raw_tables : RawFaceTables) -> FaceTables raise FaceParsin
     head,
     hhea,
     maxp,
+    bdat,
+    cbdt,
     cff: and_then(raw_tables.cff, CffTable::parse),
     cmap: and_then(raw_tables.cmap, CmapTable::parse),
+    colr,
+    ebdt,
     glyf,
     hmtx,
     kern: and_then(raw_tables.kern, KernTable::parse),
     name: and_then(raw_tables.name, NameTable::parse),
     os2: and_then(raw_tables.os2, Os2Table::parse),
     post: and_then(raw_tables.post, PostTable::parse),
+    sbix: and_then(raw_tables.sbix, data => {
+      SbixTable::parse(maxp.number_of_glyphs, data)
+    }),
+    stat: and_then(raw_tables.stat, StatTable::parse),
+    svg: and_then(raw_tables.svg, SvgTable::parse),
     vhea: and_then(raw_tables.vhea, VheaTable::parse),
     vmtx,
+    vorg: and_then(raw_tables.vorg, VorgTable::parse),
+    ankr: and_then(raw_tables.ankr, data => {
+      AnkrTable::parse(maxp.number_of_glyphs, data)
+    }),
+    feat: and_then(raw_tables.feat, FeatTable::parse),
+    kerx: and_then(raw_tables.kerx, data => {
+      KerxTable::parse(maxp.number_of_glyphs, data)
+    }),
+    morx: and_then(raw_tables.morx, data => {
+      MorxTable::parse(maxp.number_of_glyphs, data)
+    }),
+    trak: and_then(raw_tables.trak, TrakTable::parse),
     avar: and_then(raw_tables.avar, AvarTable::parse),
     cff2: and_then(raw_tables.cff2, Cff2Table::parse),
     fvar: and_then(raw_tables.fvar, FvarTable::parse),
@@ -685,10 +745,9 @@ pub fn Face::units_per_em(self : Face) -> UInt16 {
 ///
 /// Returns `None` when OS/2 table is not present or when its version is < 2.
 pub fn Face::x_height(self : Face) -> Int16? {
-  and_then(self.tables.os2, os_2 => os_2.x_height()).map(v => self.apply_metrics_variation(
-    Tag::from_str("xhgt"),
-    v,
-  ))
+  and_then(self.tables.os2, os_2 => os_2.x_height()).map(v => {
+    self.apply_metrics_variation(Tag::from_str("xhgt"), v)
+  })
 }
 
 ///|
@@ -698,10 +757,9 @@ pub fn Face::x_height(self : Face) -> Int16? {
 ///
 /// Returns `None` when OS/2 table is not present or when its version is < 2.
 pub fn Face::capital_height(self : Face) -> Int16? {
-  and_then(self.tables.os2, os_2 => os_2.capital_height()).map(v => self.apply_metrics_variation(
-    Tag::from_str("cpht"),
-    v,
-  ))
+  and_then(self.tables.os2, os_2 => os_2.capital_height()).map(v => {
+    self.apply_metrics_variation(Tag::from_str("cpht"), v)
+  })
 }
 
 ///|
@@ -838,7 +896,9 @@ pub fn Face::is_outline_embedding_allowed(self : Face) -> Bool {
 ///|
 /// Returns [Unicode Ranges](https://docs.microsoft.com/en-us/typography/opentype/spec/os2#ur).
 pub fn Face::unicode_ranges(self : Face) -> UnicodeRanges {
-  self.tables.os2.map(t => t.unicode_ranges()).unwrap_or(UnicodeRanges::default())
+  self.tables.os2
+  .map(t => t.unicode_ranges())
+  .unwrap_or(UnicodeRanges::default())
 }
 
 ///|
@@ -1008,18 +1068,36 @@ pub fn Face::glyph_ver_side_bearing(self : Face, glyph_id : GlyphId) -> Int16? {
 }
 
 ///|
+/// Returns glyph's vertical origin according to
+/// [Vertical Origin Table](https://docs.microsoft.com/en-us/typography/opentype/spec/vorg).
+///
+/// This method is affected by variation axes.
+pub fn Face::glyph_y_origin(self : Face, glyph_id : GlyphId) -> Int16? {
+  guard self.tables.vorg is Some(vorg) else { return None }
+  let mut origin = Float::from_int(vorg.glyph_y_origin(glyph_id).to_int())
+  if self.is_variable() {
+    // Ignore variation offset when `vvar` is not set.
+    if self.tables.vvar is Some(vvar) {
+      if vvar.vertical_origin_offset(glyph_id, self.coords()) is Some(offset) {
+        // We can't use `round()` in `no_std`, so this is the next best thing.
+        origin += offset + 0.5
+      }
+    }
+  }
+  try_i16_from_f32(origin)
+}
+
+///|
 /// Returns glyph's name.
 ///
 /// Uses the `post` and `CFF` tables as sources.
 ///
 /// Returns `None` when no name is associated with a `glyph`.
 pub fn Face::glyph_name(self : Face, glyph_id : GlyphId) -> String? {
-  if and_then(self.tables.post, post => post.glyph_name(glyph_id))
-    is Some(name) {
+  if and_then(self.tables.post, post => post.glyph_name(glyph_id)) is Some(name) {
     return Some(name)
   }
-  if and_then(self.tables.cff, cff1 => cff1.glyph_name(glyph_id))
-    is Some(name) {
+  if and_then(self.tables.cff, cff1 => cff1.glyph_name(glyph_id)) is Some(name) {
     return Some(name)
   }
   None
@@ -1078,13 +1156,116 @@ pub fn Face::outline_glyph(
 ///
 /// This method is affected by variation axes.
 pub fn Face::glyph_bounding_box(self : Face, glyph_id : GlyphId) -> Rect? {
-  self.outline_glyph(glyph_id, DummyOutline::{  })
+  self.outline_glyph(glyph_id, DummyOutline::{ })
 }
 
 ///|
 /// Returns a bounding box that large enough to enclose any glyph from the face.
 pub fn Face::global_bounding_box(self : Face) -> Rect {
   self.tables.head.global_bbox
+}
+
+///|
+/// Returns a reference to a glyph's raster image.
+///
+/// A font can define a glyph using a raster or a vector image instead of a simple outline.
+/// Which is primarily used for emojis. This method should be used to access raster images.
+///
+/// `pixels_per_em` allows selecting a preferred image size. The chosen size will
+/// be closer to an upper one. So when font has 64px and 96px images and `pixels_per_em`
+/// is set to 72, 96px image will be returned.
+/// To get the largest image simply use `std::u16::MAX`.
+///
+/// Note that this method will return an encoded image. It should be decoded
+/// by the caller. We don't validate or preprocess it in any way.
+///
+/// Also, a font can contain both: images and outlines. So when this method returns `None`
+/// you should also try `outline_glyph()` afterwards.
+///
+/// There are multiple ways an image can be stored in a TrueType font
+/// and this method supports most of them.
+/// This includes `sbix`, `bloc` + `bdat`, `EBLC` + `EBDT`, `CBLC` + `CBDT`.
+/// And font's tables will be accesses in this specific order.
+pub fn Face::glyph_raster_image(
+  self : Face,
+  glyph_id : GlyphId,
+  pixels_per_em : UInt16,
+) -> RasterGlyphImage? {
+  if self.tables.sbix is Some(table) {
+    if table.best_strike(pixels_per_em) is Some(strike) {
+      return strike.get(glyph_id)
+    }
+  }
+  if self.tables.bdat is Some(bdat) {
+    return bdat.get(glyph_id, pixels_per_em)
+  }
+  if self.tables.ebdt is Some(ebdt) {
+    return ebdt.get(glyph_id, pixels_per_em)
+  }
+  if self.tables.cbdt is Some(cbdt) {
+    return cbdt.get(glyph_id, pixels_per_em)
+  }
+  None
+}
+
+///|
+/// Returns a reference to a glyph's SVG image.
+///
+/// A font can define a glyph using a raster or a vector image instead of a simple outline.
+/// Which is primarily used for emojis. This method should be used to access SVG images.
+///
+/// Note that this method will return just an SVG data. It should be rendered
+/// or even decompressed (in case of SVGZ) by the caller.
+/// We don't validate or preprocess it in any way.
+///
+/// Also, a font can contain both: images and outlines. So when this method returns `None`
+/// you should also try `outline_glyph()` afterwards.
+pub fn Face::glyph_svg_image(self : Face, glyph_id : GlyphId) -> SvgDocument? {
+  and_then(self.tables.svg, svg => svg.documents.find(glyph_id))
+}
+
+///|
+/// Returns `true` if the glyph can be colored/painted using the `COLR`+`CPAL` tables.
+///
+/// See `paint_color_glyph` for details.
+pub fn Face::is_color_glyph(self : Face, glyph_id : GlyphId) -> Bool {
+  self.tables.colr.map(colr => colr.contains(glyph_id)).unwrap_or(false)
+}
+
+///|
+/// Returns the number of palettes stored in the `COLR`+`CPAL` tables.
+///
+/// See `paint_color_glyph` for details.
+pub fn Face::color_palettes(self : Face) -> UInt16? {
+  self.tables.colr.map(colr => colr.palettes.palettes())
+}
+
+///|
+/// Paints a color glyph from the `COLR` table.
+///
+/// A font can have multiple palettes, which you can check via
+/// `color_palettes`.
+/// If unsure, just pass 0 to the `palette` argument, which is the default.
+///
+/// A font can define a glyph using layers of colored shapes instead of a
+/// simple outline. Which is primarily used for emojis. This method should
+/// be used to access glyphs defined in the `COLR` table.
+///
+/// Also, a font can contain both: a layered definition and outlines. So
+/// when this method returns `None` you should also try
+/// `outline_glyph` afterwards.
+///
+/// Returns `None` if the glyph has no `COLR` definition or if the glyph
+/// definition is malformed.
+pub fn Face::paint_color_glyph(
+  self : Face,
+  glyph_id : GlyphId,
+  palette : UInt16,
+  foreground_color : RgbaColor,
+  painter : &ColrPainter,
+) -> Unit? {
+  guard self.tables.colr is Some(colr) else { return None }
+  colr.paint(glyph_id, palette, painter, self.coords(), foreground_color)
 }
 
 ///|
@@ -1125,7 +1306,9 @@ pub fn Face::set_variation(self : Face, axis : Tag, value : Float) -> Unit? {
 
 ///|
 /// Returns the current normalized variation coordinates.
-pub fn Face::variation_coordinates(self : Face) -> ArrayView[NormalizedCoordinate] {
+pub fn Face::variation_coordinates(
+  self : Face,
+) -> ArrayView[NormalizedCoordinate] {
   self.coordinates[:]
 }
 
@@ -1139,7 +1322,10 @@ pub fn Face::has_non_default_variation_coordinates(self : Face) -> Bool {
 /// Parses glyph's phantom points.
 ///
 /// Available only for variable fonts with the `gvar` table.
-pub fn Face::glyph_phantom_points(self : Face, glyph_id : GlyphId) -> PhantomPoints? {
+pub fn Face::glyph_phantom_points(
+  self : Face,
+  glyph_id : GlyphId,
+) -> PhantomPoints? {
   guard self.tables.glyf is Some(glyf) else { return None }
   guard self.tables.gvar is Some(gvar) else { return None }
   gvar.phantom_points(glyf, self.coords(), glyph_id)
@@ -1153,7 +1339,11 @@ fn Face::metrics_var_offset(self : Face, tag : Tag) -> Float {
 }
 
 ///|
-fn Face::apply_metrics_variation(self : Face, tag : Tag, value : Int16) -> Int16 {
+fn Face::apply_metrics_variation(
+  self : Face,
+  tag : Tag,
+  value : Int16,
+) -> Int16 {
   if self.is_variable() {
     let v = Float::from_int(value.to_int()) + self.metrics_var_offset(tag)
     // TODO: Should probably round it, but f32::round is not available in core.
@@ -1180,7 +1370,7 @@ pub fn fonts_in_collection(data : BytesView) -> UInt? {
     return None
   }
   s.advance(4) // version
-  s.read_u32() catch {
+  try s.read_u32() catch {
     _ => None
   } noraise {
     v => Some(v)
