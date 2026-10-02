@@ -373,3 +373,32 @@ extracted by `scripts/goldens.sh shape-hb` (`scripts/shape_hb_tests.py`).
 Hang, Arab, Hebr, Deva, Cyrl, Grek, Thai, Ethi, Zzzz; all 49 fonts used),
 `shape-hb` 2250/2250, plus the rustybuzz unit tests for feature parsing and
 tags (`moon test shape`).
+
+## Status: work unit I (math layout)
+
+**Layout package**, one file per upstream module of
+`typst-layout/src/math`: `math.mbt` (`mod.rs`: `layout_equation_inline`,
+`layout_equation_block` with region breaking and equation numbers,
+`MathContext`, item dispatch, font stack with script-scale styles),
+`math_fragment.mbt` (`MathFragment`, `FrameFragment`, math kerning lookup),
+`math_glyph.mbt` (`GlyphFragment`: shaping plan with `flac`/`ssty` feature
+fallback, italics correction, top accent attachment, extended shapes,
+stretching via MATH variants and assemblies), `math_shaping.mbt`,
+`math_run.mbt` (multiline rows, alignment points, inline line-break items),
+`math_scripts.mbt`, `math_fraction.mbt`, `math_fenced.mbt`,
+`math_radical.mbt`, `math_accent.mbt`, `math_cancel.mbt`, `math_line.mbt`,
+`math_table.mbt` and `math_text.mbt`. Functions whose upstream names clash
+with other layouters in the package carry a `math` infix
+(`layout_math_table`, `layout_math_line`, `layout_math_text`, ...). The
+equation stubs in `stubs.mbt` are gone.
+
+**Temporary bridge** (`math_inline_bridge.mbt`): faithful copies of the
+inline-layout items math uses (`rusty`, `create_shape_plan`,
+`get_font_and_covers`, `layout_box`, `text::{features, language, variant}`)
+under `bridge_` names, until unit F lands; math text runs
+(`layout_math_text`) already call `layout_inline`.
+
+**Result:** `paged` 338 → 532, `svg` 384 → 573. Every failing `math/` test
+(212 of the 403 paged headers) fails only because it needs inline layout
+(paragraph text, text in math, equation numbers, inline equations);
+eval/realize/html unchanged.
