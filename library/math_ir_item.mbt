@@ -57,7 +57,7 @@ pub fn MathItem::wrap(items : Array[MathItem], styles : StyleChain) -> MathItem 
   if items.length() == 1 {
     items[0]
   } else {
-    GroupItem::create(items, styles)
+    MathGroupItem::create(items, styles)
   }
 }
 
@@ -344,7 +344,7 @@ pub struct MathComponent {
 /// The specific kind of a layoutable math item.
 pub(all) enum MathKind {
   /// A group of math items laid out horizontally.
-  Group(GroupItem)
+  Group(MathGroupItem)
   /// A multiline equation with items pre-split into rows and columns.
   Multiline(MultilineItem)
   /// A radical (square root or nth root).
@@ -368,7 +368,7 @@ pub(all) enum MathKind {
   /// Grouped prime symbols.
   Primes(PrimesItem)
   /// A text string.
-  Text(TextItem)
+  Text(MathTextItem)
   /// A number.
   Number(NumberItem)
   /// A single glyph (grapheme cluster).
@@ -486,15 +486,17 @@ fn math_component(
 }
 
 ///|
-/// A group of math items laid out horizontally.
-pub struct GroupItem {
+/// A group of math items laid out horizontally (upstream math IR
+/// `GroupItem`; renamed because `GroupItem` is the frame group of
+/// `layout/frame.rs`).
+pub struct MathGroupItem {
   /// The items in the group.
   items : Array[MathItem]
 }
 
 ///|
 /// Creates a new group item.
-pub fn GroupItem::create(
+pub fn MathGroupItem::create(
   items : Array[MathItem],
   styles : StyleChain,
 ) -> MathItem {
@@ -871,8 +873,9 @@ pub fn PrimesItem::create(count : Int, styles : StyleChain) -> MathItem {
 }
 
 ///|
-/// A text string.
-pub struct TextItem {
+/// A text string (upstream math IR `TextItem`; renamed because `TextItem` is
+/// the shaped text run of `text/item.rs`).
+pub struct MathTextItem {
   /// The text content.
   text : String
   /// The item's locator.
@@ -883,7 +886,7 @@ pub struct TextItem {
 /// Creates a new text item.
 ///
 /// The resulting item is spaced and has alphabetic math class.
-pub fn TextItem::create(
+pub fn MathTextItem::create(
   text : String,
   styles : StyleChain,
   span : @syntax.Span,

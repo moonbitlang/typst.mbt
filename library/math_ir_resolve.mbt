@@ -362,7 +362,12 @@ fn resolve_text(
     if num {
       NumberItem::create(styled_text, styles, span)
     } else {
-      TextItem::create(styled_text, local_styles, span, ctx.locator.next(span))
+      MathTextItem::create(
+        styled_text,
+        local_styles,
+        span,
+        ctx.locator.next(span),
+      )
     }
   }
 
@@ -1032,7 +1037,7 @@ fn resolve_lr(
       ctx.items.append(items)
     }
     Flat(items) => {
-      let body = GroupItem::create(items, styles)
+      let body = MathGroupItem::create(items, styles)
       let item = FencedItem::create(
         open,
         close,

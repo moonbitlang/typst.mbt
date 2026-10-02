@@ -211,18 +211,22 @@ fn info_line(info: &DocumentInfo) -> String {
 
 /// Dumps content and styles, numbering locations in order of appearance.
 #[derive(Default)]
-struct Dumper {
+pub struct Dumper {
     locations: FxHashMap<Location, usize>,
 }
 
 impl Dumper {
-    fn loc(&mut self, loc: Location) -> String {
+    /// The number of a location (assigned in order of appearance).
+    pub fn loc_id(&mut self, loc: Location) -> usize {
         let n = self.locations.len();
-        let id = *self.locations.entry(loc).or_insert(n);
-        format!("#{id}")
+        *self.locations.entry(loc).or_insert(n)
     }
 
-    fn content(&mut self, content: &Content) -> String {
+    fn loc(&mut self, loc: Location) -> String {
+        format!("#{}", self.loc_id(loc))
+    }
+
+    pub fn content(&mut self, content: &Content) -> String {
         if let Some(seq) = content.to_packed::<SequenceElem>() {
             let items: Vec<String> = seq.children.iter().map(|c| self.content(c)).collect();
             return format!("[{}]", items.join(", "));

@@ -5,7 +5,8 @@
 //! upstream results so that the MoonBit port can be checked against them
 //! without needing Rust at test time.
 //!
-//! Usage: `typst-oracle <syntax|ast> <suite-dir> <out-dir>`
+//! Usage: `typst-oracle <syntax|ast|eval|html|realize|paged> <suite-dir> <out-dir>`
+//! or `typst-oracle fonts <out-file>`.
 
 use std::fmt::Write as _;
 use std::path::{Path, PathBuf};
@@ -15,7 +16,9 @@ use typst_syntax::{DiagSpanKind, Source, SyntaxDiagnostic};
 mod ast_dump;
 mod collect;
 mod eval;
+mod fonts;
 mod html;
+mod paged;
 mod realize;
 mod world;
 
@@ -68,6 +71,29 @@ fn main() {
                 .join()
                 .unwrap();
         }
+        Some("fonts") => {
+            // The font manifest of the test world: `fonts <out-file>`.
+            let out = PathBuf::from(&args[2]);
+            std::fs::create_dir_all(out.parent().unwrap()).unwrap();
+            std::fs::write(&out, fonts::manifest()).unwrap();
+        }
+        Some("paged") => {
+            // Paths are resolved relative to the upstream checkout.
+            let suite = PathBuf::from(&args[2]);
+            let out = std::path::absolute(PathBuf::from(&args[3])).unwrap();
+            let revision = std::fs::read_to_string("UPSTREAM_REV").unwrap().trim().to_string();
+            let manifest_sha = fonts::sha256_hex(fonts::manifest().as_bytes());
+            let upstream = std::path::absolute(&suite).unwrap();
+            let root = upstream.ancestors().nth(2).unwrap().to_path_buf();
+            std::env::set_current_dir(&root).unwrap();
+            let rel = upstream.strip_prefix(&root).unwrap().to_path_buf();
+            std::thread::Builder::new()
+                .stack_size(1 << 30)
+                .spawn(move || paged::dump_paged(&rel, &out, &revision, &manifest_sha))
+                .unwrap()
+                .join()
+                .unwrap();
+        }
         Some("parse") => {
             // Debugging aid: parse a single file and print the tree.
             let text = std::fs::read_to_string(&args[2]).unwrap();
@@ -79,7 +105,9 @@ fn main() {
             print!("{}", ast_dump::ast_report(&text));
         }
         _ => {
-            eprintln!("usage: typst-oracle <syntax|ast|eval|html|realize> <suite-dir> <out-dir>");
+            eprintln!(
+                "usage: typst-oracle <syntax|ast|eval|html|realize|paged> <suite-dir> <out-dir>\n       typst-oracle fonts <out-file>"
+            );
             std::process::exit(2);
         }
     }

@@ -1,0 +1,38 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/layout"
+
+import {
+  "moonbitlang/typst/library",
+}
+
+// Values
+pub fn layout_document(@library.Engine, @library.Content, @library.StyleChain) -> PagedDocument raise @library.SourceError
+
+// Errors
+
+// Types and methods
+pub(all) struct Page {
+  frame : @library.Frame
+  bleed : @library.Sides[@library.Abs]
+  fill : @library.Smart[@library.Paint?]
+  numbering : @library.Numbering?
+  supplement : @library.Content
+  number : UInt64
+}
+pub fn Page::fill_or_transparent(Self) -> @library.Paint?
+pub fn Page::fill_or_white(Self) -> @library.Paint?
+
+pub struct PagedDocument {
+  // private fields
+}
+pub fn PagedDocument::info(Self) -> @library.DocumentInfo
+pub fn PagedDocument::info_mut(Self) -> @library.DocumentInfo
+pub fn PagedDocument::introspector(Self) -> @library.Introspector
+pub fn PagedDocument::new(Array[Page], @library.DocumentInfo, @library.DocumentFormatOptions) -> Self
+pub fn PagedDocument::options(Self) -> @library.DocumentFormatOptions
+pub fn PagedDocument::pages(Self) -> ArrayView[Page]
+pub impl @library.Output for PagedDocument
+
+// Type aliases
+
+// Traits

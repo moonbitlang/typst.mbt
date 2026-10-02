@@ -224,3 +224,44 @@ PDF gates: structural validation → positioned text/extraction → visual compa
 | Full-suite dependency tail | Track bibliography, highlighting, image interpretation and other unsupported features separately. A layout percentage must not conceal their contribution. |
 
 The immediate deliverable should be **the font manifest, versioned oracle schemas, and one real-font paragraph-to-page-to-SVG slice**. That establishes useful differential feedback before the large flow, grid and math ports begin.
+
+## Status: work unit A (contracts + oracle)
+
+**Oracle.** `scripts/goldens.sh fonts` writes `tests/golden/fonts.json`
+(`typst-fonts-v1`: one object per face in book order — 85 faces from 85
+files, no collections — with source, path, face index, SHA-256, size,
+family, PostScript name, upem and variant; see `oracle/src/fonts.rs`).
+`scripts/goldens.sh paged` dumps `tests/golden/paged/**` in
+`typst-frame-v1`. The format is specified precisely (all nested encodings)
+in the module docs of `oracle/src/paged.rs`; the MoonBit encoder
+(`tests/runner/frame_dump.mbt`) mirrors it record by record and the runner
+stage is `moon run tests/runner --target native -- paged`.
+
+**Selection audit.** Upstream compiles a paged document when
+`implied_stages().with_required()` contains `PAGED`: tests with a `paged`,
+`pdf` or `pdftags` attribute in files not starting with `// SKIP`
+(`tests/skip.txt` is empty). That is 2169 literal `paged` headers (none in
+a skipped file, no duplicate names) plus 130 `pdf`/`pdftags`-only tests,
+2299 in total, all of which the oracle dumps. The "2168" figure above could
+not be reproduced from the collector; 2169 is the `paged` count.
+
+**Runtime contracts** (`library`): `Frame` (copy-on-write: `Frame::clone`
+shares items and the first mutation copies them, cloning nested group
+frames; moved frames must not be reused), `FrameItem` (all six variants),
+`GroupItem`, `FrameParent`/`Inherit`, `FrameKind`, `LayoutRegion`/`Regions`
+(immutable; `next()` returns the advanced regions), `Fragment`, `Point`,
+`Size` (= `Axes[Abs]`, methods on `Axes[Abs]`), `Rect`, `Transform`,
+`Curve`/`CurveItem`, `Shape`/`Geometry`, `Image`/`ImageKind` with
+`RasterImage`/`SvgImage`/`PdfImage` built from decoded metadata,
+`TextItem`/`Glyph`/`TextItemView`, and `Font`/`FontInstance` backed by the
+`FontFace`/`FontInstanceFace` trait objects that unit B implements
+(`library/font.mbt`). The math IR's `TextItem`/`GroupItem` were renamed to
+`MathTextItem`/`MathGroupItem`. `PagedDocument` and `Page` live in the new
+`layout` package (`layout/document.mbt`); `layout_document` is a stub that
+fails until unit G lands, and `PagedDocument::new` uses an empty
+introspector until `PagedIntrospector` is ported.
+
+**Known gaps.** Kurbo-based bounding boxes (`Curve::bbox`,
+`Geometry::bbox`) are not ported; `Tiling` has no laid-out frame yet, so
+the MoonBit encoder emits `null` for tiling frame ids; the HTML frame
+traversals (`discover_frame`, `traverse_frame`) are still TODOs.

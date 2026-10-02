@@ -133,15 +133,20 @@ fn Dumper::new() -> Dumper {
 
 ///|
 fn Dumper::loc(self : Dumper, loc : @library.Location) -> String {
+  "#\{self.loc_id(loc)}"
+}
+
+///|
+/// The number of a location (assigned in order of appearance).
+fn Dumper::loc_id(self : Dumper, loc : @library.Location) -> Int {
   let n = self.locations.length()
-  let id = match self.locations.get(loc) {
+  match self.locations.get(loc) {
     Some(id) => id
     None => {
       self.locations[loc] = n
       n
     }
   }
-  "#\{id}"
 }
 
 ///|
