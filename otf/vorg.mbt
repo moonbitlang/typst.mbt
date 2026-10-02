@@ -57,7 +57,7 @@ pub fn VorgTable::parse(data : BytesView) -> VorgTable? {
 /// Returns glyph's Y origin.
 pub fn VorgTable::glyph_y_origin(self : VorgTable, glyph_id : GlyphId) -> Int16 {
   self.metrics
-  .binary_search_by(m => m.glyph_id.compare(glyph_id))
+  .binary_search_by(m => Compare::compare(m.glyph_id, glyph_id))
   .map(x => x.1.y)
   .unwrap_or(self.default_y)
 }

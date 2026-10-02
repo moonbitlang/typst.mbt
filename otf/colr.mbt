@@ -740,7 +740,7 @@ pub fn ColrTable::is_simple(self : ColrTable) -> Bool {
 ///|
 fn ColrTable::get_v0(self : ColrTable, glyph_id : GlyphId) -> BaseGlyphRecord? {
   self.base_glyphs
-  .binary_search_by(base => base.glyph_id.compare(glyph_id))
+  .binary_search_by(base => Compare::compare(base.glyph_id, glyph_id))
   .map(v => v.1)
 }
 
@@ -750,7 +750,7 @@ fn ColrTable::get_v1(
   glyph_id : GlyphId,
 ) -> BaseGlyphPaintRecord? {
   self.base_glyph_paints
-  .binary_search_by(base => base.glyph_id.compare(glyph_id))
+  .binary_search_by(base => Compare::compare(base.glyph_id, glyph_id))
   .map(v => v.1)
 }
 
