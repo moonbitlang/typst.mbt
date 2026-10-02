@@ -1,12 +1,14 @@
 //! Records the output of the real `hayro` renderer (the revision Typst uses,
 //! on vello_cpu) for `hayro/render/oracle_test.mbt`.
 //!
-//! Every page listed in the input file (lines `path<TAB>page`, where page
-//! `*` selects the first 4 pages; `#` comments allowed; paths relative to the module root, i.e. through the
+//! Every page listed in the input file (lines `path<TAB>page[<TAB>scales]`,
+//! where page `*` selects the first 4 pages and the optional scales are
+//! comma-separated; `#` comments allowed; paths relative to the module root, i.e. through the
 //! `target/hayro` and `target/devassets` symlinks) is rendered with Typst's
 //! settings (`typst-render`'s `build_pdf_texture`: the Foxit standard fonts
 //! of `typst-assets`, no cmaps, no annotations, transparent background) at
-//! each of the scales given on the command line, and one TSV line is printed
+//! each of the scales given on the command line (unless the line lists its
+//! own), and one TSV line is printed
 //! per rendering: `path page scale width height fnv1a64` where the hash is
 //! taken over the premultiplied RGBA8 pixels.
 //!
@@ -69,6 +71,11 @@ fn main() {
         let mut parts = line.split('\t');
         let path = parts.next().unwrap();
         let page_spec = parts.next().unwrap_or("0");
+        // An optional third column overrides the scales (comma-separated).
+        let scales: Vec<String> = match parts.next() {
+            Some(list) => list.split(',').map(str::to_string).collect(),
+            None => scales.clone(),
+        };
         let data = std::fs::read(root.join(path)).unwrap();
         let Ok(pdf) = Pdf::new(data) else {
             continue;

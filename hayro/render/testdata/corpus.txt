@@ -1,5 +1,6 @@
 # PDFs rendered by oracle/src/bin/gen_hayro_render_tests.rs: path relative to
-# the module root, page index (`*` = the first 4 pages).
+# the module root, page index (`*` = the first 4 pages), optional scales
+# (default: 1 and 0.37).
 # Lines starting with `#skip` use image filters that hayro/syntax does not port
 # yet (DCT, JPX, JBIG2, CCITT), so their images are missing.
 target/hayro/hayro-tests/pdfs/custom/InlineAbbreviations.pdf	*
@@ -364,8 +365,8 @@ target/devassets/images/diagrams.pdf	0
 target/devassets/images/diagrams.pdf	1
 target/devassets/images/diagrams.pdf	2
 # Synthetic PDFs (scripts/gen_hayro_render_pdfs.py).
-hayro/render/testdata/pdfs/blend_modes.pdf	*
-hayro/render/testdata/pdfs/masks_and_groups.pdf	*
-hayro/render/testdata/pdfs/images.pdf	*
-hayro/render/testdata/pdfs/gradients.pdf	*
-hayro/render/testdata/pdfs/strokes.pdf	*
+hayro/render/testdata/pdfs/blend_modes.pdf	*	1,0.37,1.7
+hayro/render/testdata/pdfs/masks_and_groups.pdf	*	1,0.37,1.7
+hayro/render/testdata/pdfs/images.pdf	*	1,0.37,1.7
+hayro/render/testdata/pdfs/gradients.pdf	*	1,0.37,1.7
+hayro/render/testdata/pdfs/strokes.pdf	*	1,0.37,1.7
