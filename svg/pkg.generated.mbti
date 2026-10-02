@@ -1,0 +1,37 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/svg"
+
+import {
+  "moonbitlang/core/debug",
+  "moonbitlang/typst/library",
+}
+
+// Values
+pub fn convert_image_scaling(@library.Smart[@library.ImageScaling]) -> String?
+
+// Errors
+pub(all) suberror WebImageError {
+  WebImageError(String)
+} derive(@debug.Debug)
+
+// Types and methods
+pub(all) struct WebImage {
+  format : WebImageFormat
+  data : Bytes
+} derive(Eq, @debug.Debug)
+pub fn WebImage::new(@library.Image) -> Self raise WebImageError
+pub fn WebImage::to_base64_url(Self) -> String
+
+pub(all) enum WebImageFormat {
+  Png
+  Jpg
+  Gif
+  Webp
+  Svg
+} derive(Eq, @debug.Debug)
+pub fn WebImageFormat::extension(Self) -> String
+pub fn WebImageFormat::mime(Self) -> String
+
+// Type aliases
+
+// Traits

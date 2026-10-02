@@ -5,6 +5,7 @@ import {
   "moonbitlang/core/debug",
   "moonbitlang/core/hashset",
   "moonbitlang/core/ref",
+  "moonbitlang/typst/codecs",
   "moonbitlang/typst/data/serde",
   "moonbitlang/typst/data/xml",
   "moonbitlang/typst/data/yaml",
@@ -1233,6 +1234,8 @@ pub let html_format_elem_pretty : Int
 
 pub fn i64_from_str_radix(String, Int) -> Int64 raise IntErrorKind
 
+pub let image_default_dpi : Double
+
 pub fn image_elem() -> Element
 
 pub let image_elem_alt : Int
@@ -1254,6 +1257,8 @@ pub let image_elem_scaling : Int
 pub let image_elem_source : Int
 
 pub let image_elem_width : Int
+
+pub let image_usvg_default_dpi : Double
 
 pub fn in_(BindingGuard, Value, Value) -> Value raise HintedError
 
@@ -3251,6 +3256,12 @@ pub(all) suberror LoadErr {
   LoadErr(LoadError)
 } derive(@debug.Debug)
 
+pub(all) suberror LoadPdfError {
+  Decryption
+  Invalid
+  Unported(String)
+} derive(@debug.Debug)
+
 pub(all) suberror PackageError {
   NotFound(@syntax.PackageSpec)
   VersionNotFound(@syntax.PackageSpec, @syntax.PackageVersion)
@@ -5053,6 +5064,13 @@ pub fn DynValue::repr(Self) -> String
 pub fn DynValue::ty(Self) -> Type
 pub impl Fingerprint for DynValue
 
+pub struct DynamicImage {
+  width : UInt
+  height : UInt
+  color : @codecs.ColorType
+  buf : Bytes
+} derive(Eq, Hash)
+
 pub struct EarlyLinkResolver {
   // private fields
 }
@@ -6429,10 +6447,24 @@ pub impl FromValue for I8
 pub impl IntoValue for I8
 pub impl Reflect for I8
 
+pub struct Image {
+  // private fields
+} derive(Eq, Hash)
+pub fn Image::alt(Self) -> String?
+pub fn Image::dpi(Self) -> Double?
+pub fn Image::format(Self) -> ImageFormat
+pub fn Image::height(Self) -> Double
+pub fn Image::kind(Self) -> ImageKind
+pub fn Image::new(ImageKind, String?, Smart[ImageScaling]) -> Self
+pub fn Image::plain(ImageKind) -> Self
+pub fn Image::scaling(Self) -> Smart[ImageScaling]
+pub fn Image::width(Self) -> Double
+
 pub struct ImageElem(Content)
 pub fn ImageElem::alt(Self, StyleChain) -> String?
 pub fn ImageElem::alt_in(StyleChain) -> String?
 pub fn ImageElem::alt_local(Self) -> String??
+pub fn ImageElem::decode(Self, Engine, StyleChain) -> Image raise SourceError
 pub fn ImageElem::fit(Self, StyleChain) -> ImageFit
 pub fn ImageElem::fit_in(StyleChain) -> ImageFit
 pub fn ImageElem::fit_local(Self) -> ImageFit?
@@ -6496,6 +6528,12 @@ pub fn ImageFormat::detect(Bytes) -> Self?
 pub impl FromValue for ImageFormat
 pub impl IntoValue for ImageFormat
 pub impl Reflect for ImageFormat
+
+pub(all) enum ImageKind {
+  Raster(RasterImage)
+  Svg(SvgImage)
+  Pdf(PdfImage)
+} derive(Eq, Hash)
 
 pub(all) enum ImageScaling {
   Smooth
@@ -8061,6 +8099,27 @@ pub(all) struct PdfConfiguration {
   version : PdfVersion
 } derive(Eq, Hash, @debug.Debug)
 
+pub struct PdfDocument {
+  // private fields
+}
+pub fn PdfDocument::data(Self) -> Bytes
+pub fn PdfDocument::has_optional_content_groups(Self) -> Bool
+pub fn PdfDocument::new(Bytes) -> Self raise LoadPdfError
+pub fn PdfDocument::num_pages(Self) -> Int
+pub impl Eq for PdfDocument
+pub impl Hash for PdfDocument
+
+pub struct PdfImage {
+  // private fields
+}
+pub fn PdfImage::document(Self) -> PdfDocument
+pub fn PdfImage::height(Self) -> Float
+pub fn PdfImage::new(PdfDocument, Int) -> Self?
+pub fn PdfImage::page_index(Self) -> Int
+pub fn PdfImage::width(Self) -> Float
+pub impl Eq for PdfImage
+pub impl Hash for PdfImage
+
 pub(all) enum PdfMarkerTagKind {
   OutlineBody
   Bibliography(Bool)
@@ -8423,6 +8482,23 @@ pub(all) enum RasterFormat {
 pub impl FromValue for RasterFormat
 pub impl IntoValue for RasterFormat
 pub impl Reflect for RasterFormat
+
+pub struct RasterImage {
+  // private fields
+}
+pub fn RasterImage::color(Self) -> @codecs.ColorType
+pub fn RasterImage::data(Self) -> Bytes
+pub fn RasterImage::dpi(Self) -> Double?
+pub fn RasterImage::dynamic(Self) -> DynamicImage?
+pub fn RasterImage::exif_rotation(Self) -> UInt?
+pub fn RasterImage::format(Self) -> RasterFormat
+pub fn RasterImage::height(Self) -> UInt
+pub fn RasterImage::icc(Self) -> Bytes?
+pub fn RasterImage::new(Bytes, RasterFormat, Smart[Bytes]) -> Self raise HintedError
+pub fn RasterImage::plain(Bytes, RasterFormat) -> Self raise HintedError
+pub fn RasterImage::width(Self) -> UInt
+pub impl Eq for RasterImage
+pub impl Hash for RasterImage
 
 pub(all) struct Ratio(Scalar) derive(Compare, Default, Eq, Hash)
 pub fn Ratio::abs(Self) -> Self
@@ -9713,6 +9789,17 @@ pub fn SvgFormat::pretty_local(Self) -> Bool?
 pub fn SvgFormat::set_pretty(Bool) -> Style
 pub fn SvgFormat::with_pretty(Self, Bool) -> Self
 pub impl NativeElement for SvgFormat
+
+pub struct SvgImage {
+  // private fields
+}
+pub fn SvgImage::data(Self) -> Bytes
+pub fn SvgImage::height(Self) -> Double
+pub fn SvgImage::new(Bytes) -> Self raise LoadErr
+pub fn SvgImage::width(Self) -> Double
+pub fn SvgImage::with_fonts_images(Bytes, &World, Array[String], @syntax.FileId?) -> (Self, Array[HintedString]) raise LoadErr
+pub impl Eq for SvgImage
+pub impl Hash for SvgImage
 
 pub struct Symbol {
   // private fields

@@ -1,0 +1,129 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/codecs"
+
+import {
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub fn crc32(Array[BytesView]) -> UInt
+
+pub fn encode_png(BytesView, Int, Int, PngColorType) -> Bytes
+
+pub let exif_tag_orientation : Int
+
+pub let exif_tag_x_resolution : Int
+
+pub let exif_tag_y_resolution : Int
+
+pub fn gif_image_info(BytesView) -> ImageInfo raise ImageError
+
+pub fn jpeg_image_info(BytesView) -> ImageInfo raise ImageError
+
+pub fn png_image_info(BytesView) -> ImageInfo raise ImageError
+
+pub fn read_exif_from_container(BytesView) -> Exif raise ExifError
+
+pub fn read_png_info(BytesView) -> PngInfo raise ImageError
+
+pub fn webp_image_info(BytesView) -> ImageInfo raise ImageError
+
+// Errors
+pub(all) suberror ExifError {
+  ExifError(String)
+} derive(@debug.Debug)
+
+pub(all) suberror ImageError {
+  ImageError(String)
+} derive(@debug.Debug)
+
+// Types and methods
+type Adler32
+
+pub(all) enum ColorType {
+  L8
+  La8
+  Rgb8
+  Rgba8
+  L16
+  La16
+  Rgb16
+  Rgba16
+} derive(Eq, Hash, @debug.Debug)
+pub fn ColorType::channel_count(Self) -> Int
+
+pub struct Compressor {
+  // private fields
+}
+pub fn Compressor::finish(Self) -> Bytes
+pub fn Compressor::new() -> Self
+pub fn Compressor::write_data(Self, BytesView) -> Unit
+
+pub struct Exif {
+  // private fields
+}
+pub fn Exif::get_field(Self, ExifContext, Int, Int) -> ExifValue?
+
+pub(all) enum ExifContext {
+  Tiff
+  Exif
+  Gps
+  Interop
+} derive(Eq, Hash, @debug.Debug)
+
+pub(all) enum ExifValue {
+  Byte(Array[UInt])
+  Short(Array[UInt])
+  Long(Array[UInt])
+  Rational(Array[(UInt, UInt)])
+  Other
+} derive(@debug.Debug)
+pub fn ExifValue::get_uint(Self, Int) -> UInt?
+
+pub(all) struct ImageInfo {
+  width : UInt
+  height : UInt
+  color : ColorType
+  icc : Bytes?
+} derive(@debug.Debug)
+
+pub(all) struct PixelDimensions {
+  xppu : UInt
+  yppu : UInt
+  meter : Bool
+} derive(Eq, @debug.Debug)
+
+pub(all) enum PngColorType {
+  Grayscale
+  Rgb
+  Indexed
+  GrayscaleAlpha
+  Rgba
+} derive(Eq, @debug.Debug)
+pub fn PngColorType::code(Self) -> Int
+pub fn PngColorType::from_code(Int) -> Self?
+pub fn PngColorType::samples(Self) -> Int
+
+pub(all) struct PngInfo {
+  width : UInt
+  height : UInt
+  bit_depth : Int
+  color_type : PngColorType
+  interlaced : Bool
+  trns : Bool
+  pixel_dims : PixelDimensions?
+  compressed_icc : Bytes?
+} derive(@debug.Debug)
+pub fn PngInfo::output_color_type(Self) -> ColorType
+
+pub struct StoredOnlyCompressor {
+  // private fields
+}
+pub fn StoredOnlyCompressor::compressed_size(Int) -> Int
+pub fn StoredOnlyCompressor::finish(Self) -> Bytes
+pub fn StoredOnlyCompressor::new() -> Self
+pub fn StoredOnlyCompressor::write_data(Self, BytesView) -> Unit
+
+// Type aliases
+
+// Traits
