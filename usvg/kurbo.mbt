@@ -79,8 +79,8 @@ fn KArc::from_svg_arc(arc : KSvgArc) -> KArc? {
   let mut rx = arc.radii.x.abs()
   let mut ry = arc.radii.y.abs()
   let xr = arc.x_rotation % (2.0 * k_pi)
-  let sin_phi = libm_sin(xr)
-  let cos_phi = libm_cos(xr)
+  let sin_phi = sincos_sin(xr)
+  let cos_phi = sincos_cos(xr)
   let hd_x = (arc.from.x - arc.to.x) * 0.5
   let hd_y = (arc.from.y - arc.to.y) * 0.5
   let hs_x = (arc.from.x + arc.to.x) * 0.5
@@ -213,8 +213,8 @@ fn f64_as_usize(x : Double) -> Int {
 /// Take the ellipse radii, how the radii are rotated, and the sweep angle, and return a point on
 /// the ellipse.
 fn sample_ellipse(radii : KPoint, x_rotation : Double, angle : Double) -> KPoint {
-  let angle_sin = libm_sin(angle)
-  let angle_cos = libm_cos(angle)
+  let angle_sin = sincos_sin(angle)
+  let angle_cos = sincos_cos(angle)
   let u = radii.x * angle_cos
   let v = radii.y * angle_sin
   rotate_pt({ x: u, y: v }, x_rotation)
@@ -223,8 +223,8 @@ fn sample_ellipse(radii : KPoint, x_rotation : Double, angle : Double) -> KPoint
 ///|
 /// Rotate `pt` about the origin by `angle` radians.
 fn rotate_pt(pt : KPoint, angle : Double) -> KPoint {
-  let angle_sin = libm_sin(angle)
-  let angle_cos = libm_cos(angle)
+  let angle_sin = sincos_sin(angle)
+  let angle_cos = sincos_cos(angle)
   {
     x: pt.x * angle_cos - pt.y * angle_sin,
     y: pt.x * angle_sin + pt.y * angle_cos,

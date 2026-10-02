@@ -74,6 +74,7 @@ fn main {
         dump_name="svg-replay",
       )
     "shape" => run_shape_stage(filter, verbose)
+    "usvg" => run_usvg_stage(filter, verbose)
     "shape-hb" => run_shape_hb_stage(filter, verbose)
     _ => {
       println("unknown stage: \{stage}")

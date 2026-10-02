@@ -2604,6 +2604,7 @@ dependencies = [
  "comemo",
  "ecow",
  "fancy-regex",
+ "flate2",
  "hayagriva",
  "hypher",
  "icu_collator",
@@ -2617,6 +2618,7 @@ dependencies = [
  "quote",
  "regex",
  "regex-syntax",
+ "roxmltree 0.21.1",
  "rustc-hash",
  "rustybuzz",
  "serde",
@@ -2653,6 +2655,7 @@ dependencies = [
  "unicode-script",
  "unicode-segmentation",
  "unscanny",
+ "usvg",
  "yaml-rust",
 ]
 

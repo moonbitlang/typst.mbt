@@ -69,6 +69,10 @@ unicode-properties = { version = "0.1", default-features = false, features = ["g
 simplecss = "=0.2.2"
 # SVG attribute parsers used by usvg (gen_svgtypes_tests).
 svgtypes = "=0.16.1"
+# The SVG simplifier typst-library uses (gen_usvg_golden).
+usvg = "=0.47.0"
+roxmltree = "=0.21.1"
+flate2 = "1"
 
 # Record every shaping call Typst makes (for the `shape` stage); see
 # rustybuzz-tap/Cargo.toml.
