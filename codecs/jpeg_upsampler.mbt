@@ -32,6 +32,30 @@ fn Slice::set(self : Slice, i : Int, v : Int) -> Unit {
 }
 
 ///|
+/// Panics unless the slice lies within its array. Functions that access a
+/// slice only below its length check this once and then use the unchecked
+/// accessors (performance).
+fn Slice::check(self : Slice) -> Unit {
+  guard self.off >= 0 &&
+    self.len >= 0 &&
+    self.off + self.len <= self.arr.length() else {
+    abort("slice out of bounds")
+  }
+}
+
+///|
+#inline
+fn Slice::uat(self : Slice, i : Int) -> Int {
+  self.arr.unsafe_get(self.off + i)
+}
+
+///|
+#inline
+fn Slice::uset(self : Slice, i : Int, v : Int) -> Unit {
+  self.arr.unsafe_set(self.off + i, v)
+}
+
+///|
 fn Slice::sub(self : Slice, start : Int, end : Int) -> Slice {
   { arr: self.arr, off: self.off + start, len: end - start, }
 }
@@ -72,10 +96,13 @@ fn upsample_horizontal(
   //         out[i * 2 + 1] = (sample + input[i + 1]) >> 2;
   //     }
   let n = @cmp.minimum((output.len - 2) / 2, input.len - 2)
+  // In bounds: `w + 2 < input.len` and `3 + 2 * w < output.len`.
+  input.check()
+  output.check()
   for w in 0..<n {
-    let sample = 3 * input.at(w + 1) + 2
-    output.set(2 + 2 * w, (sample + input.at(w)) >> 2)
-    output.set(3 + 2 * w, (sample + input.at(w + 2)) >> 2)
+    let sample = 3 * input.uat(w + 1) + 2
+    output.uset(2 + 2 * w, (sample + input.uat(w)) >> 2)
+    output.uset(3 + 2 * w, (sample + input.uat(w + 2)) >> 2)
   }
   // Get lengths
   let out_len = output.len - 2
@@ -101,15 +128,20 @@ fn upsample_vertical(
     raise Panic("upsample_vertical: assertion failed")
   }
   let middle = output.len / 2
+  // All indices are below the respective slice lengths.
+  input.check()
+  in_near.check()
+  in_far.check()
+  output.check()
   // for the first row, closest row is in_near
   let n = @cmp.minimum(input.len, @cmp.minimum(in_near.len, middle))
   for i in 0..<n {
-    output.set(i, (3 * input.at(i) + 2 + in_near.at(i)) >> 2)
+    output.uset(i, (3 * input.uat(i) + 2 + in_near.uat(i)) >> 2)
   }
   // for the second row, the closest row to input is in_far
   let n = @cmp.minimum(input.len, @cmp.minimum(in_far.len, output.len - middle))
   for i in 0..<n {
-    output.set(middle + i, (3 * input.at(i) + 2 + in_far.at(i)) >> 2)
+    output.uset(middle + i, (3 * input.uat(i) + 2 + in_far.uat(i)) >> 2)
   }
 }
 

@@ -44,19 +44,46 @@ fn ycbcr_to_rgb_16(
   out_pos : Int,
   num_components : Int,
 ) -> Unit {
+  // One bounds check per array for all 16 pixels (performance).
+  guard yo >= 0 &&
+    cbo >= 0 &&
+    cro >= 0 &&
+    out_pos >= 0 &&
+    (num_components == 3 || num_components == 4) &&
+    yo + 16 <= y.length() &&
+    cbo + 16 <= cb.length() &&
+    cro + 16 <= cr.length() &&
+    out_pos + 16 * num_components <= output.length() else {
+    for i in 0..<16 {
+      let cr = i16(cr[cro + i] - 128)
+      let cb = i16(cb[cbo + i] - 128)
+      let y0 = y[yo + i] * Y_CF + YUV_RND
+      let r = (y0 + cr * CR_CF) >> YUV_PREC
+      let g = (y0 + cr * C_G_CR_COEF_1 + cb * C_G_CB_COEF_2) >> YUV_PREC
+      let b = (y0 + cb * CB_CF) >> YUV_PREC
+      let o = out_pos + i * num_components
+      output[o] = clamp255(r).to_byte()
+      output[o + 1] = clamp255(g).to_byte()
+      output[o + 2] = clamp255(b).to_byte()
+      if num_components == 4 {
+        output[o + 3] = b'\xFF'
+      }
+    }
+    return
+  }
   for i in 0..<16 {
-    let cr = i16(cr[cro + i] - 128)
-    let cb = i16(cb[cbo + i] - 128)
-    let y0 = y[yo + i] * Y_CF + YUV_RND
+    let cr = i16(cr.unsafe_get(cro + i) - 128)
+    let cb = i16(cb.unsafe_get(cbo + i) - 128)
+    let y0 = y.unsafe_get(yo + i) * Y_CF + YUV_RND
     let r = (y0 + cr * CR_CF) >> YUV_PREC
     let g = (y0 + cr * C_G_CR_COEF_1 + cb * C_G_CB_COEF_2) >> YUV_PREC
     let b = (y0 + cb * CB_CF) >> YUV_PREC
     let o = out_pos + i * num_components
-    output[o] = clamp255(r).to_byte()
-    output[o + 1] = clamp255(g).to_byte()
-    output[o + 2] = clamp255(b).to_byte()
+    output.unsafe_set(o, clamp255(r).to_byte())
+    output.unsafe_set(o + 1, clamp255(g).to_byte())
+    output.unsafe_set(o + 2, clamp255(b).to_byte())
     if num_components == 4 {
-      output[o + 3] = b'\xFF'
+      output.unsafe_set(o + 3, b'\xFF')
     }
   }
 }
