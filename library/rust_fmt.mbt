@@ -37,6 +37,87 @@ pub fn exp10(n : Int) -> Double {
 /// two equally short candidates: when the remaining digits are exactly half
 /// way, it rounds up.
 fn shortest_digits(x : Double) -> (String, Int) {
+  match shortest_digits_fast(x) {
+    Some(res) => res
+    None => shortest_digits_dragon(x)
+  }
+}
+
+///|
+/// Fast path of [shortest_digits] (not upstream; performance): MoonBit's
+/// `Double::to_string` also prints the shortest round-trip digits, choosing
+/// the candidate closest to the exact value. The two only differ if two
+/// shortest candidates are equally close (Rust rounds up, MoonBit to even),
+/// which requires the shortest representation to have at least 16 digits:
+/// with `n` digits and last-digit weight `10^j`, a tie needs the rounding
+/// interval (about one ulp, at most `x * 2^-52`) to span `10^j`, so
+/// `10^(j + n) > x >= 10^j * 2^52`, i.e. `10^n > 2^52`. So results with at
+/// most 15 digits are taken as is, all others are recomputed exactly.
+fn shortest_digits_fast(x : Double) -> (String, Int)? {
+  let s = x.abs().to_string()
+  let len = s.length()
+  // Split off the exponent (`1e+21`, `5e-324`).
+  let mut mant_end = len
+  let mut exp10 = 0
+  for i in 0..<len {
+    if s.unsafe_get(i) == 'e' {
+      mant_end = i
+      let mut j = i + 1
+      let mut neg = false
+      if j < len && (s.unsafe_get(j) == '+' || s.unsafe_get(j) == '-') {
+        neg = s.unsafe_get(j) == '-'
+        j += 1
+      }
+      let mut e = 0
+      while j < len {
+        let d = s.unsafe_get(j).to_int() - '0'.to_int()
+        guard d >= 0 && d <= 9 else { return None }
+        e = e * 10 + d
+        j += 1
+      }
+      exp10 = if neg { -e } else { e }
+      break
+    }
+  }
+  // The digits without the point, and the number of integer digits.
+  let digits = StringBuilder()
+  let mut int_len = mant_end
+  let mut leading = 0
+  let mut seen_nonzero = false
+  let mut trailing_zeros = 0
+  for i in 0..<mant_end {
+    let c = s.unsafe_get(i)
+    if c == '.' {
+      int_len = i
+      continue
+    }
+    guard c >= '0' && c <= '9' else { return None }
+    if !seen_nonzero {
+      if c == '0' {
+        leading += 1
+        continue
+      }
+      seen_nonzero = true
+    }
+    if c == '0' {
+      trailing_zeros += 1
+    } else {
+      for _ in 0..<trailing_zeros {
+        digits.write_char('0')
+      }
+      trailing_zeros = 0
+      digits.write_char(c.unsafe_to_char())
+    }
+  }
+  let digits = digits.to_string()
+  guard digits.length() > 0 && digits.length() <= 15 else { return None }
+  Some((digits, int_len - leading + exp10))
+}
+
+///|
+/// The exact computation of [shortest_digits] (Rust's Dragon4 shortest
+/// mode).
+fn shortest_digits_dragon(x : Double) -> (String, Int) {
   // `flt2dec::decode`: the value is `mant * 2^exp`, its neighbors are
   // `(mant - minus) * 2^exp` and `(mant + plus) * 2^exp` (half way to the
   // adjacent floats), inclusive if the original mantissa is even.
