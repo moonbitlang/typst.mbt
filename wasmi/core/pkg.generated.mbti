@@ -1,0 +1,1371 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/wasmi/core"
+
+import {
+  "moonbitlang/core/bigint",
+  "moonbitlang/core/builtin",
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub fn cold() -> Unit
+
+pub fn f32_abs(Float) -> Float
+
+pub fn f32_add(Float, Float) -> Float
+
+pub fn f32_ceil(Float) -> Float
+
+pub fn f32_convert_i32_s(Int) -> Float
+
+pub fn f32_convert_i32_u(UInt) -> Float
+
+pub fn f32_convert_i64_s(Int64) -> Float
+
+pub fn f32_convert_i64_u(UInt64) -> Float
+
+pub fn f32_copysign(Float, Float) -> Float
+
+pub fn f32_demote_f64(Double) -> Float
+
+pub fn f32_div(Float, Float) -> Float
+
+pub fn f32_eq(Float, Float) -> Bool
+
+pub fn f32_floor(Float) -> Float
+
+pub fn f32_ge(Float, Float) -> Bool
+
+pub fn f32_gt(Float, Float) -> Bool
+
+pub fn f32_le(Float, Float) -> Bool
+
+pub fn f32_lt(Float, Float) -> Bool
+
+pub fn f32_max(Float, Float) -> Float
+
+pub fn f32_min(Float, Float) -> Float
+
+pub fn f32_mul(Float, Float) -> Float
+
+pub fn f32_ne(Float, Float) -> Bool
+
+pub fn f32_nearest(Float) -> Float
+
+pub fn f32_neg(Float) -> Float
+
+pub fn f32_reinterpret_i32(Int) -> Float
+
+pub fn f32_sqrt(Float) -> Float
+
+pub fn f32_sub(Float, Float) -> Float
+
+pub fn f32_trunc(Float) -> Float
+
+pub fn f32x4_abs(V128) -> V128
+
+pub fn f32x4_add(V128, V128) -> V128
+
+pub fn f32x4_ceil(V128) -> V128
+
+pub fn f32x4_convert_i32x4_s(V128) -> V128
+
+pub fn f32x4_convert_i32x4_u(V128) -> V128
+
+pub fn f32x4_demote_f64x2_zero(V128) -> V128
+
+pub fn f32x4_div(V128, V128) -> V128
+
+pub fn f32x4_eq(V128, V128) -> V128
+
+pub fn f32x4_extract_lane(V128, ImmLaneIdx4) -> Float
+
+pub fn f32x4_floor(V128) -> V128
+
+pub fn f32x4_ge(V128, V128) -> V128
+
+pub fn f32x4_gt(V128, V128) -> V128
+
+pub fn f32x4_le(V128, V128) -> V128
+
+pub fn f32x4_lt(V128, V128) -> V128
+
+pub fn f32x4_max(V128, V128) -> V128
+
+pub fn f32x4_min(V128, V128) -> V128
+
+pub fn f32x4_mul(V128, V128) -> V128
+
+pub fn f32x4_ne(V128, V128) -> V128
+
+pub fn f32x4_nearest(V128) -> V128
+
+pub fn f32x4_neg(V128) -> V128
+
+pub fn f32x4_pmax(V128, V128) -> V128
+
+pub fn f32x4_pmin(V128, V128) -> V128
+
+pub fn f32x4_relaxed_madd(V128, V128, V128) -> V128
+
+pub fn f32x4_relaxed_max(V128, V128) -> V128
+
+pub fn f32x4_relaxed_min(V128, V128) -> V128
+
+pub fn f32x4_relaxed_nmadd(V128, V128, V128) -> V128
+
+pub fn f32x4_replace_lane(V128, ImmLaneIdx4, Float) -> V128
+
+pub fn f32x4_splat(Float) -> V128
+
+pub fn f32x4_sqrt(V128) -> V128
+
+pub fn f32x4_sub(V128, V128) -> V128
+
+pub fn f32x4_trunc(V128) -> V128
+
+pub fn f64_abs(Double) -> Double
+
+pub fn f64_add(Double, Double) -> Double
+
+pub fn f64_ceil(Double) -> Double
+
+pub fn f64_convert_i32_s(Int) -> Double
+
+pub fn f64_convert_i32_u(UInt) -> Double
+
+pub fn f64_convert_i64_s(Int64) -> Double
+
+pub fn f64_convert_i64_u(UInt64) -> Double
+
+pub fn f64_copysign(Double, Double) -> Double
+
+pub fn f64_div(Double, Double) -> Double
+
+pub fn f64_eq(Double, Double) -> Bool
+
+pub fn f64_floor(Double) -> Double
+
+pub fn f64_ge(Double, Double) -> Bool
+
+pub fn f64_gt(Double, Double) -> Bool
+
+pub fn f64_le(Double, Double) -> Bool
+
+pub fn f64_lt(Double, Double) -> Bool
+
+pub fn f64_max(Double, Double) -> Double
+
+pub fn f64_min(Double, Double) -> Double
+
+pub fn f64_mul(Double, Double) -> Double
+
+pub fn f64_ne(Double, Double) -> Bool
+
+pub fn f64_nearest(Double) -> Double
+
+pub fn f64_neg(Double) -> Double
+
+pub fn f64_promote_f32(Float) -> Double
+
+pub fn f64_reinterpret_i64(Int64) -> Double
+
+pub fn f64_sqrt(Double) -> Double
+
+pub fn f64_sub(Double, Double) -> Double
+
+pub fn f64_trunc(Double) -> Double
+
+pub fn f64x2_abs(V128) -> V128
+
+pub fn f64x2_add(V128, V128) -> V128
+
+pub fn f64x2_ceil(V128) -> V128
+
+pub fn f64x2_convert_low_i32x4_s(V128) -> V128
+
+pub fn f64x2_convert_low_i32x4_u(V128) -> V128
+
+pub fn f64x2_div(V128, V128) -> V128
+
+pub fn f64x2_eq(V128, V128) -> V128
+
+pub fn f64x2_extract_lane(V128, ImmLaneIdx2) -> Double
+
+pub fn f64x2_floor(V128) -> V128
+
+pub fn f64x2_ge(V128, V128) -> V128
+
+pub fn f64x2_gt(V128, V128) -> V128
+
+pub fn f64x2_le(V128, V128) -> V128
+
+pub fn f64x2_lt(V128, V128) -> V128
+
+pub fn f64x2_max(V128, V128) -> V128
+
+pub fn f64x2_min(V128, V128) -> V128
+
+pub fn f64x2_mul(V128, V128) -> V128
+
+pub fn f64x2_ne(V128, V128) -> V128
+
+pub fn f64x2_nearest(V128) -> V128
+
+pub fn f64x2_neg(V128) -> V128
+
+pub fn f64x2_pmax(V128, V128) -> V128
+
+pub fn f64x2_pmin(V128, V128) -> V128
+
+pub fn f64x2_promote_low_f32x4(V128) -> V128
+
+pub fn f64x2_relaxed_madd(V128, V128, V128) -> V128
+
+pub fn f64x2_relaxed_max(V128, V128) -> V128
+
+pub fn f64x2_relaxed_min(V128, V128) -> V128
+
+pub fn f64x2_relaxed_nmadd(V128, V128, V128) -> V128
+
+pub fn f64x2_replace_lane(V128, ImmLaneIdx2, Double) -> V128
+
+pub fn f64x2_splat(Double) -> V128
+
+pub fn f64x2_sqrt(V128) -> V128
+
+pub fn f64x2_sub(V128, V128) -> V128
+
+pub fn f64x2_trunc(V128) -> V128
+
+pub fn i16x8_abs(V128) -> V128
+
+pub fn i16x8_add(V128, V128) -> V128
+
+pub fn i16x8_add_sat_s(V128, V128) -> V128
+
+pub fn i16x8_add_sat_u(V128, V128) -> V128
+
+pub fn i16x8_all_true(V128) -> Bool
+
+pub fn i16x8_avgr_u(V128, V128) -> V128
+
+pub fn i16x8_bitmask(V128) -> UInt
+
+pub fn i16x8_eq(V128, V128) -> V128
+
+pub fn i16x8_extadd_pairwise_i8x16_s(V128) -> V128
+
+pub fn i16x8_extadd_pairwise_i8x16_u(V128) -> V128
+
+pub fn i16x8_extend_high_i8x16_s(V128) -> V128
+
+pub fn i16x8_extend_high_i8x16_u(V128) -> V128
+
+pub fn i16x8_extend_low_i8x16_s(V128) -> V128
+
+pub fn i16x8_extend_low_i8x16_u(V128) -> V128
+
+pub fn i16x8_extmul_high_i8x16_s(V128, V128) -> V128
+
+pub fn i16x8_extmul_high_i8x16_u(V128, V128) -> V128
+
+pub fn i16x8_extmul_low_i8x16_s(V128, V128) -> V128
+
+pub fn i16x8_extmul_low_i8x16_u(V128, V128) -> V128
+
+pub fn i16x8_extract_lane_s(V128, ImmLaneIdx8) -> Int
+
+pub fn i16x8_extract_lane_u(V128, ImmLaneIdx8) -> UInt
+
+pub fn i16x8_ge_s(V128, V128) -> V128
+
+pub fn i16x8_ge_u(V128, V128) -> V128
+
+pub fn i16x8_gt_s(V128, V128) -> V128
+
+pub fn i16x8_gt_u(V128, V128) -> V128
+
+pub fn i16x8_le_s(V128, V128) -> V128
+
+pub fn i16x8_le_u(V128, V128) -> V128
+
+pub fn i16x8_lt_s(V128, V128) -> V128
+
+pub fn i16x8_lt_u(V128, V128) -> V128
+
+pub fn i16x8_max_s(V128, V128) -> V128
+
+pub fn i16x8_max_u(V128, V128) -> V128
+
+pub fn i16x8_min_s(V128, V128) -> V128
+
+pub fn i16x8_min_u(V128, V128) -> V128
+
+pub fn i16x8_mul(V128, V128) -> V128
+
+pub fn i16x8_narrow_i32x4_s(V128, V128) -> V128
+
+pub fn i16x8_narrow_i32x4_u(V128, V128) -> V128
+
+pub fn i16x8_ne(V128, V128) -> V128
+
+pub fn i16x8_neg(V128) -> V128
+
+pub fn i16x8_q15mulr_sat_s(V128, V128) -> V128
+
+pub fn i16x8_relaxed_dot_i8x16_i7x16_s(V128, V128) -> V128
+
+pub fn i16x8_relaxed_laneselect(V128, V128, V128) -> V128
+
+pub fn i16x8_relaxed_q15mulr_s(V128, V128) -> V128
+
+pub fn i16x8_replace_lane(V128, ImmLaneIdx8, Int) -> V128
+
+pub fn i16x8_shl(V128, UInt) -> V128
+
+pub fn i16x8_shr_s(V128, UInt) -> V128
+
+pub fn i16x8_shr_u(V128, UInt) -> V128
+
+pub fn i16x8_splat(Int) -> V128
+
+pub fn i16x8_sub(V128, V128) -> V128
+
+pub fn i16x8_sub_sat_s(V128, V128) -> V128
+
+pub fn i16x8_sub_sat_u(V128, V128) -> V128
+
+pub fn i32_add(Int, Int) -> Int
+
+pub fn i32_bitand(Int, Int) -> Int
+
+pub fn i32_bitor(Int, Int) -> Int
+
+pub fn i32_bitxor(Int, Int) -> Int
+
+pub fn i32_clz(Int) -> Int
+
+pub fn i32_ctz(Int) -> Int
+
+pub fn i32_div_s(Int, Int) -> Int raise TrapCode
+
+pub fn i32_div_u(UInt, UInt) -> UInt raise TrapCode
+
+pub fn i32_eq(Int, Int) -> Bool
+
+pub fn i32_eqz(Int) -> Bool
+
+pub fn i32_extend16_s(Int) -> Int
+
+pub fn i32_extend8_s(Int) -> Int
+
+pub fn i32_ge_s(Int, Int) -> Bool
+
+pub fn i32_ge_u(UInt, UInt) -> Bool
+
+pub fn i32_gt_s(Int, Int) -> Bool
+
+pub fn i32_gt_u(UInt, UInt) -> Bool
+
+pub fn i32_le_s(Int, Int) -> Bool
+
+pub fn i32_le_u(UInt, UInt) -> Bool
+
+pub fn i32_load16_s(FixedArray[Byte], Int, UInt64, UInt64) -> Int raise TrapCode
+
+pub fn i32_load16_s_at(FixedArray[Byte], Int, UInt64) -> Int raise TrapCode
+
+pub fn i32_load16_u(FixedArray[Byte], Int, UInt64, UInt64) -> Int raise TrapCode
+
+pub fn i32_load16_u_at(FixedArray[Byte], Int, UInt64) -> Int raise TrapCode
+
+pub fn i32_load8_s(FixedArray[Byte], Int, UInt64, UInt64) -> Int raise TrapCode
+
+pub fn i32_load8_s_at(FixedArray[Byte], Int, UInt64) -> Int raise TrapCode
+
+pub fn i32_load8_u(FixedArray[Byte], Int, UInt64, UInt64) -> Int raise TrapCode
+
+pub fn i32_load8_u_at(FixedArray[Byte], Int, UInt64) -> Int raise TrapCode
+
+pub fn i32_lt_s(Int, Int) -> Bool
+
+pub fn i32_lt_u(UInt, UInt) -> Bool
+
+pub fn i32_mul(Int, Int) -> Int
+
+pub fn i32_ne(Int, Int) -> Bool
+
+pub fn i32_popcnt(Int) -> Int
+
+pub fn i32_reinterpret_f32(Float) -> Int
+
+pub fn i32_rem_s(Int, Int) -> Int raise TrapCode
+
+pub fn i32_rem_u(UInt, UInt) -> UInt raise TrapCode
+
+pub fn i32_rotl(Int, Int) -> Int
+
+pub fn i32_rotr(Int, Int) -> Int
+
+pub fn i32_shl(Int, Int) -> Int
+
+pub fn i32_shr_s(Int, Int) -> Int
+
+pub fn i32_shr_u(Int, Int) -> Int
+
+pub fn i32_store16(FixedArray[Byte], Int, UInt64, UInt64, Int) -> Unit raise TrapCode
+
+pub fn i32_store16_at(FixedArray[Byte], Int, UInt64, Int) -> Unit raise TrapCode
+
+pub fn i32_store8(FixedArray[Byte], Int, UInt64, UInt64, Int) -> Unit raise TrapCode
+
+pub fn i32_store8_at(FixedArray[Byte], Int, UInt64, Int) -> Unit raise TrapCode
+
+pub fn i32_sub(Int, Int) -> Int
+
+pub fn i32_trunc_f32_s(Float) -> Int raise TrapCode
+
+pub fn i32_trunc_f32_u(Float) -> UInt raise TrapCode
+
+pub fn i32_trunc_f64_s(Double) -> Int raise TrapCode
+
+pub fn i32_trunc_f64_u(Double) -> UInt raise TrapCode
+
+pub fn i32_trunc_sat_f32_s(Float) -> Int
+
+pub fn i32_trunc_sat_f32_u(Float) -> UInt
+
+pub fn i32_trunc_sat_f64_s(Double) -> Int
+
+pub fn i32_trunc_sat_f64_u(Double) -> UInt
+
+pub fn i32_wrap_i64(Int64) -> Int
+
+pub fn i32x4_abs(V128) -> V128
+
+pub fn i32x4_add(V128, V128) -> V128
+
+pub fn i32x4_all_true(V128) -> Bool
+
+pub fn i32x4_bitmask(V128) -> UInt
+
+pub fn i32x4_dot_i16x8_s(V128, V128) -> V128
+
+pub fn i32x4_eq(V128, V128) -> V128
+
+pub fn i32x4_extadd_pairwise_i16x8_s(V128) -> V128
+
+pub fn i32x4_extadd_pairwise_i16x8_u(V128) -> V128
+
+pub fn i32x4_extend_high_i16x8_s(V128) -> V128
+
+pub fn i32x4_extend_high_i16x8_u(V128) -> V128
+
+pub fn i32x4_extend_low_i16x8_s(V128) -> V128
+
+pub fn i32x4_extend_low_i16x8_u(V128) -> V128
+
+pub fn i32x4_extmul_high_i16x8_s(V128, V128) -> V128
+
+pub fn i32x4_extmul_high_i16x8_u(V128, V128) -> V128
+
+pub fn i32x4_extmul_low_i16x8_s(V128, V128) -> V128
+
+pub fn i32x4_extmul_low_i16x8_u(V128, V128) -> V128
+
+pub fn i32x4_extract_lane(V128, ImmLaneIdx4) -> Int
+
+pub fn i32x4_ge_s(V128, V128) -> V128
+
+pub fn i32x4_ge_u(V128, V128) -> V128
+
+pub fn i32x4_gt_s(V128, V128) -> V128
+
+pub fn i32x4_gt_u(V128, V128) -> V128
+
+pub fn i32x4_le_s(V128, V128) -> V128
+
+pub fn i32x4_le_u(V128, V128) -> V128
+
+pub fn i32x4_lt_s(V128, V128) -> V128
+
+pub fn i32x4_lt_u(V128, V128) -> V128
+
+pub fn i32x4_max_s(V128, V128) -> V128
+
+pub fn i32x4_max_u(V128, V128) -> V128
+
+pub fn i32x4_min_s(V128, V128) -> V128
+
+pub fn i32x4_min_u(V128, V128) -> V128
+
+pub fn i32x4_mul(V128, V128) -> V128
+
+pub fn i32x4_ne(V128, V128) -> V128
+
+pub fn i32x4_neg(V128) -> V128
+
+pub fn i32x4_relaxed_dot_i8x16_i7x16_add_s(V128, V128, V128) -> V128
+
+pub fn i32x4_relaxed_laneselect(V128, V128, V128) -> V128
+
+pub fn i32x4_relaxed_trunc_f32x4_s(V128) -> V128
+
+pub fn i32x4_relaxed_trunc_f32x4_u(V128) -> V128
+
+pub fn i32x4_relaxed_trunc_f64x2_s_zero(V128) -> V128
+
+pub fn i32x4_relaxed_trunc_f64x2_u_zero(V128) -> V128
+
+pub fn i32x4_replace_lane(V128, ImmLaneIdx4, Int) -> V128
+
+pub fn i32x4_shl(V128, UInt) -> V128
+
+pub fn i32x4_shr_s(V128, UInt) -> V128
+
+pub fn i32x4_shr_u(V128, UInt) -> V128
+
+pub fn i32x4_splat(Int) -> V128
+
+pub fn i32x4_sub(V128, V128) -> V128
+
+pub fn i32x4_trunc_sat_f32x4_s(V128) -> V128
+
+pub fn i32x4_trunc_sat_f32x4_u(V128) -> V128
+
+pub fn i32x4_trunc_sat_f64x2_s_zero(V128) -> V128
+
+pub fn i32x4_trunc_sat_f64x2_u_zero(V128) -> V128
+
+pub fn i64_add(Int64, Int64) -> Int64
+
+pub fn i64_add128(Int64, Int64, Int64, Int64) -> (Int64, Int64)
+
+pub fn i64_bitand(Int64, Int64) -> Int64
+
+pub fn i64_bitor(Int64, Int64) -> Int64
+
+pub fn i64_bitxor(Int64, Int64) -> Int64
+
+pub fn i64_clz(Int64) -> Int64
+
+pub fn i64_ctz(Int64) -> Int64
+
+pub fn i64_div_s(Int64, Int64) -> Int64 raise TrapCode
+
+pub fn i64_div_u(UInt64, UInt64) -> UInt64 raise TrapCode
+
+pub fn i64_eq(Int64, Int64) -> Bool
+
+pub fn i64_eqz(Int64) -> Bool
+
+pub fn i64_extend16_s(Int64) -> Int64
+
+pub fn i64_extend32_s(Int64) -> Int64
+
+pub fn i64_extend8_s(Int64) -> Int64
+
+pub fn i64_extend_i32_s(Int) -> Int64
+
+pub fn i64_extend_i32_u(UInt) -> UInt64
+
+pub fn i64_ge_s(Int64, Int64) -> Bool
+
+pub fn i64_ge_u(UInt64, UInt64) -> Bool
+
+pub fn i64_gt_s(Int64, Int64) -> Bool
+
+pub fn i64_gt_u(UInt64, UInt64) -> Bool
+
+pub fn i64_le_s(Int64, Int64) -> Bool
+
+pub fn i64_le_u(UInt64, UInt64) -> Bool
+
+pub fn i64_load16_s(FixedArray[Byte], Int, UInt64, UInt64) -> Int64 raise TrapCode
+
+pub fn i64_load16_s_at(FixedArray[Byte], Int, UInt64) -> Int64 raise TrapCode
+
+pub fn i64_load16_u(FixedArray[Byte], Int, UInt64, UInt64) -> Int64 raise TrapCode
+
+pub fn i64_load16_u_at(FixedArray[Byte], Int, UInt64) -> Int64 raise TrapCode
+
+pub fn i64_load32_s(FixedArray[Byte], Int, UInt64, UInt64) -> Int64 raise TrapCode
+
+pub fn i64_load32_s_at(FixedArray[Byte], Int, UInt64) -> Int64 raise TrapCode
+
+pub fn i64_load32_u(FixedArray[Byte], Int, UInt64, UInt64) -> Int64 raise TrapCode
+
+pub fn i64_load32_u_at(FixedArray[Byte], Int, UInt64) -> Int64 raise TrapCode
+
+pub fn i64_load8_s(FixedArray[Byte], Int, UInt64, UInt64) -> Int64 raise TrapCode
+
+pub fn i64_load8_s_at(FixedArray[Byte], Int, UInt64) -> Int64 raise TrapCode
+
+pub fn i64_load8_u(FixedArray[Byte], Int, UInt64, UInt64) -> Int64 raise TrapCode
+
+pub fn i64_load8_u_at(FixedArray[Byte], Int, UInt64) -> Int64 raise TrapCode
+
+pub fn i64_lt_s(Int64, Int64) -> Bool
+
+pub fn i64_lt_u(UInt64, UInt64) -> Bool
+
+pub fn i64_mul(Int64, Int64) -> Int64
+
+pub fn i64_mul_wide_s(Int64, Int64) -> (Int64, Int64)
+
+pub fn i64_mul_wide_u(Int64, Int64) -> (Int64, Int64)
+
+pub fn i64_ne(Int64, Int64) -> Bool
+
+pub fn i64_popcnt(Int64) -> Int64
+
+pub fn i64_reinterpret_f64(Double) -> Int64
+
+pub fn i64_rem_s(Int64, Int64) -> Int64 raise TrapCode
+
+pub fn i64_rem_u(UInt64, UInt64) -> UInt64 raise TrapCode
+
+pub fn i64_rotl(Int64, Int64) -> Int64
+
+pub fn i64_rotr(Int64, Int64) -> Int64
+
+pub fn i64_shl(Int64, Int64) -> Int64
+
+pub fn i64_shr_s(Int64, Int64) -> Int64
+
+pub fn i64_shr_u(Int64, Int64) -> Int64
+
+pub fn i64_store16(FixedArray[Byte], Int, UInt64, UInt64, Int64) -> Unit raise TrapCode
+
+pub fn i64_store16_at(FixedArray[Byte], Int, UInt64, Int64) -> Unit raise TrapCode
+
+pub fn i64_store32(FixedArray[Byte], Int, UInt64, UInt64, Int64) -> Unit raise TrapCode
+
+pub fn i64_store32_at(FixedArray[Byte], Int, UInt64, Int64) -> Unit raise TrapCode
+
+pub fn i64_store8(FixedArray[Byte], Int, UInt64, UInt64, Int64) -> Unit raise TrapCode
+
+pub fn i64_store8_at(FixedArray[Byte], Int, UInt64, Int64) -> Unit raise TrapCode
+
+pub fn i64_sub(Int64, Int64) -> Int64
+
+pub fn i64_sub128(Int64, Int64, Int64, Int64) -> (Int64, Int64)
+
+pub fn i64_trunc_f32_s(Float) -> Int64 raise TrapCode
+
+pub fn i64_trunc_f32_u(Float) -> UInt64 raise TrapCode
+
+pub fn i64_trunc_f64_s(Double) -> Int64 raise TrapCode
+
+pub fn i64_trunc_f64_u(Double) -> UInt64 raise TrapCode
+
+pub fn i64_trunc_sat_f32_s(Float) -> Int64
+
+pub fn i64_trunc_sat_f32_u(Float) -> UInt64
+
+pub fn i64_trunc_sat_f64_s(Double) -> Int64
+
+pub fn i64_trunc_sat_f64_u(Double) -> UInt64
+
+pub fn i64x2_abs(V128) -> V128
+
+pub fn i64x2_add(V128, V128) -> V128
+
+pub fn i64x2_all_true(V128) -> Bool
+
+pub fn i64x2_bitmask(V128) -> UInt
+
+pub fn i64x2_eq(V128, V128) -> V128
+
+pub fn i64x2_extend_high_i32x4_s(V128) -> V128
+
+pub fn i64x2_extend_high_i32x4_u(V128) -> V128
+
+pub fn i64x2_extend_low_i32x4_s(V128) -> V128
+
+pub fn i64x2_extend_low_i32x4_u(V128) -> V128
+
+pub fn i64x2_extmul_high_i32x4_s(V128, V128) -> V128
+
+pub fn i64x2_extmul_high_i32x4_u(V128, V128) -> V128
+
+pub fn i64x2_extmul_low_i32x4_s(V128, V128) -> V128
+
+pub fn i64x2_extmul_low_i32x4_u(V128, V128) -> V128
+
+pub fn i64x2_extract_lane(V128, ImmLaneIdx2) -> Int64
+
+pub fn i64x2_ge_s(V128, V128) -> V128
+
+pub fn i64x2_gt_s(V128, V128) -> V128
+
+pub fn i64x2_le_s(V128, V128) -> V128
+
+pub fn i64x2_lt_s(V128, V128) -> V128
+
+pub fn i64x2_mul(V128, V128) -> V128
+
+pub fn i64x2_ne(V128, V128) -> V128
+
+pub fn i64x2_neg(V128) -> V128
+
+pub fn i64x2_relaxed_laneselect(V128, V128, V128) -> V128
+
+pub fn i64x2_replace_lane(V128, ImmLaneIdx2, Int64) -> V128
+
+pub fn i64x2_shl(V128, UInt) -> V128
+
+pub fn i64x2_shr_s(V128, UInt) -> V128
+
+pub fn i64x2_shr_u(V128, UInt) -> V128
+
+pub fn i64x2_splat(Int64) -> V128
+
+pub fn i64x2_sub(V128, V128) -> V128
+
+pub fn i8x16_abs(V128) -> V128
+
+pub fn i8x16_add(V128, V128) -> V128
+
+pub fn i8x16_add_sat_s(V128, V128) -> V128
+
+pub fn i8x16_add_sat_u(V128, V128) -> V128
+
+pub fn i8x16_all_true(V128) -> Bool
+
+pub fn i8x16_avgr_u(V128, V128) -> V128
+
+pub fn i8x16_bitmask(V128) -> UInt
+
+pub fn i8x16_eq(V128, V128) -> V128
+
+pub fn i8x16_extract_lane_s(V128, ImmLaneIdx16) -> Int
+
+pub fn i8x16_extract_lane_u(V128, ImmLaneIdx16) -> UInt
+
+pub fn i8x16_ge_s(V128, V128) -> V128
+
+pub fn i8x16_ge_u(V128, V128) -> V128
+
+pub fn i8x16_gt_s(V128, V128) -> V128
+
+pub fn i8x16_gt_u(V128, V128) -> V128
+
+pub fn i8x16_le_s(V128, V128) -> V128
+
+pub fn i8x16_le_u(V128, V128) -> V128
+
+pub fn i8x16_lt_s(V128, V128) -> V128
+
+pub fn i8x16_lt_u(V128, V128) -> V128
+
+pub fn i8x16_max_s(V128, V128) -> V128
+
+pub fn i8x16_max_u(V128, V128) -> V128
+
+pub fn i8x16_min_s(V128, V128) -> V128
+
+pub fn i8x16_min_u(V128, V128) -> V128
+
+pub fn i8x16_mul(V128, V128) -> V128
+
+pub fn i8x16_narrow_i16x8_s(V128, V128) -> V128
+
+pub fn i8x16_narrow_i16x8_u(V128, V128) -> V128
+
+pub fn i8x16_ne(V128, V128) -> V128
+
+pub fn i8x16_neg(V128) -> V128
+
+pub fn i8x16_popcnt(V128) -> V128
+
+pub fn i8x16_relaxed_laneselect(V128, V128, V128) -> V128
+
+pub fn i8x16_relaxed_swizzle(V128, V128) -> V128
+
+pub fn i8x16_replace_lane(V128, ImmLaneIdx16, Int) -> V128
+
+pub fn i8x16_shl(V128, UInt) -> V128
+
+pub fn i8x16_shr_s(V128, UInt) -> V128
+
+pub fn i8x16_shr_u(V128, UInt) -> V128
+
+pub fn i8x16_shuffle(V128, V128, FixedArray[ImmLaneIdx32]) -> V128
+
+pub fn i8x16_splat(Int) -> V128
+
+pub fn i8x16_sub(V128, V128) -> V128
+
+pub fn i8x16_sub_sat_s(V128, V128) -> V128
+
+pub fn i8x16_sub_sat_u(V128, V128) -> V128
+
+pub fn i8x16_swizzle(V128, V128) -> V128
+
+pub fn likely(Bool) -> Bool
+
+pub fn load32(FixedArray[Byte], Int, UInt64, UInt64) -> UInt raise TrapCode
+
+pub fn load32_at(FixedArray[Byte], Int, UInt64) -> UInt raise TrapCode
+
+pub fn load64(FixedArray[Byte], Int, UInt64, UInt64) -> UInt64 raise TrapCode
+
+pub fn load64_at(FixedArray[Byte], Int, UInt64) -> UInt64 raise TrapCode
+
+pub fn store32(FixedArray[Byte], Int, UInt64, UInt64, UInt) -> Unit raise TrapCode
+
+pub fn store32_at(FixedArray[Byte], Int, UInt64, UInt) -> Unit raise TrapCode
+
+pub fn store64(FixedArray[Byte], Int, UInt64, UInt64, UInt64) -> Unit raise TrapCode
+
+pub fn store64_at(FixedArray[Byte], Int, UInt64, UInt64) -> Unit raise TrapCode
+
+pub fn unlikely(Bool) -> Bool
+
+pub fn v128_and(V128, V128) -> V128
+
+pub fn v128_andnot(V128, V128) -> V128
+
+pub fn v128_any_true(V128) -> Bool
+
+pub fn v128_bitselect(V128, V128, V128) -> V128
+
+pub fn v128_load(FixedArray[Byte], Int, UInt64, UInt64) -> V128 raise TrapCode
+
+pub fn v128_load16_lane(FixedArray[Byte], Int, UInt64, UInt64, V128, ImmLaneIdx8) -> V128 raise TrapCode
+
+pub fn v128_load16_lane_at(FixedArray[Byte], Int, UInt64, V128, ImmLaneIdx8) -> V128 raise TrapCode
+
+pub fn v128_load16_splat(FixedArray[Byte], Int, UInt64, UInt64) -> V128 raise TrapCode
+
+pub fn v128_load16_splat_at(FixedArray[Byte], Int, UInt64) -> V128 raise TrapCode
+
+pub fn v128_load16x4_s(FixedArray[Byte], Int, UInt64, UInt64) -> V128 raise TrapCode
+
+pub fn v128_load16x4_s_at(FixedArray[Byte], Int, UInt64) -> V128 raise TrapCode
+
+pub fn v128_load16x4_u(FixedArray[Byte], Int, UInt64, UInt64) -> V128 raise TrapCode
+
+pub fn v128_load16x4_u_at(FixedArray[Byte], Int, UInt64) -> V128 raise TrapCode
+
+pub fn v128_load32_lane(FixedArray[Byte], Int, UInt64, UInt64, V128, ImmLaneIdx4) -> V128 raise TrapCode
+
+pub fn v128_load32_lane_at(FixedArray[Byte], Int, UInt64, V128, ImmLaneIdx4) -> V128 raise TrapCode
+
+pub fn v128_load32_splat(FixedArray[Byte], Int, UInt64, UInt64) -> V128 raise TrapCode
+
+pub fn v128_load32_splat_at(FixedArray[Byte], Int, UInt64) -> V128 raise TrapCode
+
+pub fn v128_load32_zero(FixedArray[Byte], Int, UInt64, UInt64) -> V128 raise TrapCode
+
+pub fn v128_load32_zero_at(FixedArray[Byte], Int, UInt64) -> V128 raise TrapCode
+
+pub fn v128_load32x2_s(FixedArray[Byte], Int, UInt64, UInt64) -> V128 raise TrapCode
+
+pub fn v128_load32x2_s_at(FixedArray[Byte], Int, UInt64) -> V128 raise TrapCode
+
+pub fn v128_load32x2_u(FixedArray[Byte], Int, UInt64, UInt64) -> V128 raise TrapCode
+
+pub fn v128_load32x2_u_at(FixedArray[Byte], Int, UInt64) -> V128 raise TrapCode
+
+pub fn v128_load64_lane(FixedArray[Byte], Int, UInt64, UInt64, V128, ImmLaneIdx2) -> V128 raise TrapCode
+
+pub fn v128_load64_lane_at(FixedArray[Byte], Int, UInt64, V128, ImmLaneIdx2) -> V128 raise TrapCode
+
+pub fn v128_load64_splat(FixedArray[Byte], Int, UInt64, UInt64) -> V128 raise TrapCode
+
+pub fn v128_load64_splat_at(FixedArray[Byte], Int, UInt64) -> V128 raise TrapCode
+
+pub fn v128_load64_zero(FixedArray[Byte], Int, UInt64, UInt64) -> V128 raise TrapCode
+
+pub fn v128_load64_zero_at(FixedArray[Byte], Int, UInt64) -> V128 raise TrapCode
+
+pub fn v128_load8_lane(FixedArray[Byte], Int, UInt64, UInt64, V128, ImmLaneIdx16) -> V128 raise TrapCode
+
+pub fn v128_load8_lane_at(FixedArray[Byte], Int, UInt64, V128, ImmLaneIdx16) -> V128 raise TrapCode
+
+pub fn v128_load8_splat(FixedArray[Byte], Int, UInt64, UInt64) -> V128 raise TrapCode
+
+pub fn v128_load8_splat_at(FixedArray[Byte], Int, UInt64) -> V128 raise TrapCode
+
+pub fn v128_load8x8_s(FixedArray[Byte], Int, UInt64, UInt64) -> V128 raise TrapCode
+
+pub fn v128_load8x8_s_at(FixedArray[Byte], Int, UInt64) -> V128 raise TrapCode
+
+pub fn v128_load8x8_u(FixedArray[Byte], Int, UInt64, UInt64) -> V128 raise TrapCode
+
+pub fn v128_load8x8_u_at(FixedArray[Byte], Int, UInt64) -> V128 raise TrapCode
+
+pub fn v128_load_at(FixedArray[Byte], Int, UInt64) -> V128 raise TrapCode
+
+pub fn v128_not(V128) -> V128
+
+pub fn v128_or(V128, V128) -> V128
+
+pub fn v128_store(FixedArray[Byte], Int, UInt64, UInt64, V128) -> Unit raise TrapCode
+
+pub fn v128_store16_lane(FixedArray[Byte], Int, UInt64, UInt64, V128, ImmLaneIdx8) -> Unit raise TrapCode
+
+pub fn v128_store16_lane_at(FixedArray[Byte], Int, UInt64, V128, ImmLaneIdx8) -> Unit raise TrapCode
+
+pub fn v128_store32_lane(FixedArray[Byte], Int, UInt64, UInt64, V128, ImmLaneIdx4) -> Unit raise TrapCode
+
+pub fn v128_store32_lane_at(FixedArray[Byte], Int, UInt64, V128, ImmLaneIdx4) -> Unit raise TrapCode
+
+pub fn v128_store64_lane(FixedArray[Byte], Int, UInt64, UInt64, V128, ImmLaneIdx2) -> Unit raise TrapCode
+
+pub fn v128_store64_lane_at(FixedArray[Byte], Int, UInt64, V128, ImmLaneIdx2) -> Unit raise TrapCode
+
+pub fn v128_store8_lane(FixedArray[Byte], Int, UInt64, UInt64, V128, ImmLaneIdx16) -> Unit raise TrapCode
+
+pub fn v128_store8_lane_at(FixedArray[Byte], Int, UInt64, V128, ImmLaneIdx16) -> Unit raise TrapCode
+
+pub fn v128_store_at(FixedArray[Byte], Int, UInt64, V128) -> Unit raise TrapCode
+
+pub fn v128_xor(V128, V128) -> V128
+
+// Errors
+pub(all) suberror FuelError {
+  FuelMeteringDisabled
+  OutOfFuel(required_fuel~ : UInt64)
+} derive(@debug.Debug)
+pub fn FuelError::fuel_metering_disabled() -> Self
+pub fn FuelError::out_of_fuel(UInt64) -> Self
+pub fn FuelError::to_string(Self) -> String
+pub impl Show for FuelError
+
+pub(all) suberror FuncTypeError {
+  TooManyFunctionParams
+  TooManyFunctionResults
+} derive(@debug.Debug)
+pub fn FuncTypeError::to_string(Self) -> String
+pub impl Show for FuncTypeError
+
+pub(all) suberror GlobalError {
+  ImmutableWrite
+  TypeMismatch
+} derive(@debug.Debug)
+pub fn GlobalError::to_string(Self) -> String
+pub impl Show for GlobalError
+
+pub(all) suberror InvalidTrapCode derive(@debug.Debug)
+
+pub(all) suberror LimiterError {
+  OutOfSystemMemory
+  OutOfBoundsGrowth
+  ResourceLimiterDeniedAllocation
+  OutOfFuel(required_fuel~ : UInt64)
+} derive(@debug.Debug)
+pub fn LimiterError::from_memory_error(MemoryError) -> Self
+pub fn LimiterError::from_table_error(TableError) -> Self
+pub fn LimiterError::to_string(Self) -> String
+pub impl Show for LimiterError
+
+pub(all) suberror MemoryError {
+  OutOfSystemMemory
+  OutOfBoundsGrowth
+  OutOfBoundsAccess
+  InvalidMemoryType
+  InvalidStaticBufferSize
+  ResourceLimiterDeniedAllocation
+  MinimumSizeOverflow
+  MaximumSizeOverflow
+  OutOfFuel(required_fuel~ : UInt64)
+} derive(@debug.Debug)
+pub fn MemoryError::from_limiter_error(LimiterError) -> Self
+pub fn MemoryError::to_string(Self) -> String
+pub impl Show for MemoryError
+
+pub(all) suberror OutOfBoundsLaneIdx derive(@debug.Debug)
+
+pub(all) suberror TableError {
+  OutOfSystemMemory
+  MinimumSizeOverflow
+  MaximumSizeOverflow
+  ResourceLimiterDeniedAllocation
+  GrowOutOfBounds
+  InitOutOfBounds
+  FillOutOfBounds
+  SetOutOfBounds
+  CopyOutOfBounds
+  ElementTypeMismatch
+  OutOfFuel(required_fuel~ : UInt64)
+} derive(@debug.Debug)
+pub fn TableError::from_fuel_error(FuelError) -> Self
+pub fn TableError::from_limiter_error(LimiterError) -> Self
+pub fn TableError::to_string(Self) -> String
+pub impl Show for TableError
+
+pub(all) suberror TrapCode {
+  UnreachableCodeReached
+  MemoryOutOfBounds
+  TableOutOfBounds
+  IndirectCallToNull
+  IntegerDivisionByZero
+  IntegerOverflow
+  BadConversionToInteger
+  StackOverflow
+  BadSignature
+  OutOfFuel
+  GrowthOperationLimited
+} derive(Eq, Hash, @debug.Debug)
+pub fn TrapCode::to_string(Self) -> String
+pub fn TrapCode::to_u8(Self) -> Byte
+pub fn TrapCode::trap_message(Self) -> String
+pub fn TrapCode::try_from_u8(Byte) -> Self raise InvalidTrapCode
+pub impl Show for TrapCode
+
+pub(all) suberror UntypedError {
+  InvalidLen
+} derive(@debug.Debug)
+pub fn UntypedError::invalid_len() -> Self
+pub fn UntypedError::to_string(Self) -> String
+pub impl Show for UntypedError
+
+// Types and methods
+pub struct ElementSegment {
+  // private fields
+}
+pub fn ElementSegment::as_ref(Self) -> ElementSegmentRef
+pub fn ElementSegment::drop_items(Self) -> Unit
+pub fn ElementSegment::items(Self) -> ArrayView[UntypedVal]
+pub fn ElementSegment::new(ValType, ArrayView[UntypedVal]) -> Self
+pub fn ElementSegment::size(Self) -> UInt
+pub fn ElementSegment::ty(Self) -> ValType
+
+pub struct ElementSegmentRef {
+  // private fields
+}
+pub fn ElementSegmentRef::items(Self) -> ArrayView[UntypedVal]
+pub fn ElementSegmentRef::size(Self) -> UInt
+pub fn ElementSegmentRef::ty(Self) -> ValType
+
+pub struct F32(UInt)
+pub fn F32::from_bits(UInt) -> Self
+pub fn F32::from_float(Float) -> Self
+pub fn F32::partial_cmp(Self, Self) -> Int?
+pub fn F32::to_bits(Self) -> UInt
+pub fn F32::to_float(Self) -> Float
+pub fn F32::to_string(Self) -> String
+pub impl Eq for F32
+pub impl Show for F32
+pub impl @debug.Debug for F32
+
+pub struct F64(UInt64)
+pub fn F64::from_bits(UInt64) -> Self
+pub fn F64::from_float(Double) -> Self
+pub fn F64::partial_cmp(Self, Self) -> Int?
+pub fn F64::to_bits(Self) -> UInt64
+pub fn F64::to_float(Self) -> Double
+pub fn F64::to_string(Self) -> String
+pub impl Eq for F64
+pub impl Show for F64
+pub impl @debug.Debug for F64
+
+pub struct Fuel {
+  mut remaining : UInt64
+  enabled : Bool
+  costs : FuelCostsProvider
+}
+pub fn Fuel::consume_fuel(Self, (FuelCostsProvider) -> UInt64) -> UInt64 raise FuelError
+pub fn Fuel::consume_fuel_if(Self, (FuelCostsProvider) -> UInt64) -> Unit raise FuelError
+pub fn Fuel::consume_fuel_unchecked(Self, UInt64) -> UInt64 raise FuelError
+pub fn Fuel::get_fuel(Self) -> UInt64 raise FuelError
+pub fn Fuel::new(Bool, FuelCostsProvider) -> Self
+pub fn Fuel::set_fuel(Self, UInt64) -> Unit raise FuelError
+
+pub struct FuelCostsProvider {
+  custom : &FuelCosts?
+}
+pub fn FuelCostsProvider::base(Self) -> UInt64
+pub fn FuelCostsProvider::call(Self) -> UInt64
+pub fn FuelCostsProvider::default() -> Self
+pub fn FuelCostsProvider::fuel_for_copying_bytes(Self, UInt64) -> UInt64
+pub fn FuelCostsProvider::fuel_for_copying_values(Self, UInt64) -> UInt64
+pub fn FuelCostsProvider::instance(Self) -> UInt64
+pub fn FuelCostsProvider::load(Self) -> UInt64
+pub fn FuelCostsProvider::new(&FuelCosts?) -> Self
+pub fn FuelCostsProvider::simd(Self) -> UInt64
+pub fn FuelCostsProvider::store(Self) -> UInt64
+pub impl Default for FuelCostsProvider
+pub impl Show for FuelCostsProvider
+
+pub struct FuncType {
+  len_params : Int
+  params_results : FixedArray[ValType]
+} derive(Eq, Hash)
+pub fn FuncType::len_params(Self) -> Int
+pub fn FuncType::len_results(Self) -> Int
+pub fn FuncType::new(ArrayView[ValType], ArrayView[ValType]) -> Self raise FuncTypeError
+pub fn FuncType::params(Self) -> ArrayView[ValType]
+pub fn FuncType::params_results(Self) -> (ArrayView[ValType], ArrayView[ValType])
+pub fn FuncType::results(Self) -> ArrayView[ValType]
+pub fn FuncType::to_string(Self) -> String
+pub impl Show for FuncType
+
+pub struct Global {
+  mut value : UntypedVal
+  ty : GlobalType
+}
+pub fn Global::get(Self) -> TypedVal
+pub fn Global::get_untyped(Self) -> UntypedVal
+pub fn Global::new(TypedVal, Mutability) -> Self
+pub fn Global::set(Self, TypedVal) -> Unit raise GlobalError
+pub fn Global::set_untyped(Self, UntypedVal) -> Unit
+pub fn Global::ty(Self) -> GlobalType
+
+pub struct GlobalType {
+  content : ValType
+  mutability : Mutability
+} derive(Eq, Hash, @debug.Debug)
+pub fn GlobalType::content(Self) -> ValType
+pub fn GlobalType::mutability(Self) -> Mutability
+pub fn GlobalType::new(ValType, Mutability) -> Self
+
+pub(all) struct ImmLaneIdx16(Byte) derive(Eq, Hash, @debug.Debug)
+pub fn ImmLaneIdx16::to_u8(Self) -> Byte
+pub fn ImmLaneIdx16::try_from(Byte) -> Self raise OutOfBoundsLaneIdx
+
+pub(all) struct ImmLaneIdx2(Byte) derive(Eq, Hash, @debug.Debug)
+pub fn ImmLaneIdx2::to_u8(Self) -> Byte
+pub fn ImmLaneIdx2::try_from(Byte) -> Self raise OutOfBoundsLaneIdx
+
+pub(all) struct ImmLaneIdx32(Byte) derive(Eq, Hash, @debug.Debug)
+pub fn ImmLaneIdx32::to_u8(Self) -> Byte
+pub fn ImmLaneIdx32::try_from(Byte) -> Self raise OutOfBoundsLaneIdx
+
+pub(all) struct ImmLaneIdx4(Byte) derive(Eq, Hash, @debug.Debug)
+pub fn ImmLaneIdx4::to_u8(Self) -> Byte
+pub fn ImmLaneIdx4::try_from(Byte) -> Self raise OutOfBoundsLaneIdx
+
+pub(all) struct ImmLaneIdx8(Byte) derive(Eq, Hash, @debug.Debug)
+pub fn ImmLaneIdx8::to_u8(Self) -> Byte
+pub fn ImmLaneIdx8::try_from(Byte) -> Self raise OutOfBoundsLaneIdx
+
+pub(all) enum IndexType {
+  I32
+  I64
+} derive(Eq, Hash, @debug.Debug)
+pub fn IndexType::is_64(Self) -> Bool
+pub fn IndexType::max_size(Self) -> @bigint.BigInt
+pub fn IndexType::min(Self, Self) -> Self
+pub fn IndexType::ty(Self) -> ValType
+
+pub struct Memory {
+  // private fields
+}
+pub fn Memory::data(Self) -> FixedArray[Byte]
+pub fn Memory::data_mut(Self) -> FixedArray[Byte]
+pub fn Memory::data_size(Self) -> Int
+pub fn Memory::dynamic_ty(Self) -> MemoryType
+pub fn Memory::grow(Self, UInt64, Fuel?, ResourceLimiterRef) -> UInt64 raise MemoryError
+pub fn Memory::new(MemoryType, ResourceLimiterRef) -> Self raise MemoryError
+pub fn Memory::new_static(MemoryType, ResourceLimiterRef, FixedArray[Byte]) -> Self raise MemoryError
+pub fn Memory::read(Self, UInt64, FixedArray[Byte]) -> Unit raise MemoryError
+pub fn Memory::size(Self) -> UInt64
+pub fn Memory::ty(Self) -> MemoryType
+pub fn Memory::write(Self, UInt64, BytesView) -> Unit raise MemoryError
+
+pub struct MemoryType {
+  // private fields
+} derive(Eq, Hash, @debug.Debug)
+pub fn MemoryType::builder() -> MemoryTypeBuilder
+pub fn MemoryType::index_ty(Self) -> IndexType
+pub fn MemoryType::is_64(Self) -> Bool
+pub fn MemoryType::is_subtype_of(Self, Self) -> Bool
+pub fn MemoryType::maximum(Self) -> UInt64?
+pub fn MemoryType::minimum(Self) -> UInt64
+pub fn MemoryType::page_size(Self) -> UInt
+pub fn MemoryType::page_size_log2(Self) -> Byte
+
+pub struct MemoryTypeBuilder {
+  // private fields
+}
+pub fn MemoryTypeBuilder::build(Self) -> MemoryType raise MemoryError
+pub fn MemoryTypeBuilder::default() -> Self
+pub fn MemoryTypeBuilder::max(Self, UInt64?) -> Self
+pub fn MemoryTypeBuilder::memory64(Self, Bool) -> Self
+pub fn MemoryTypeBuilder::min(Self, UInt64) -> Self
+pub fn MemoryTypeBuilder::page_size_log2(Self, Byte) -> Self
+pub impl Default for MemoryTypeBuilder
+
+pub(all) enum Mutability {
+  Const
+  Var
+} derive(Eq, Hash, @debug.Debug)
+pub fn Mutability::is_const(Self) -> Bool
+pub fn Mutability::is_mut(Self) -> Bool
+
+pub struct ResourceLimiterRef(&ResourceLimiter?)
+pub fn ResourceLimiterRef::as_resource_limiter(Self) -> &ResourceLimiter?
+pub fn ResourceLimiterRef::default() -> Self
+pub fn ResourceLimiterRef::from_limiter(&ResourceLimiter) -> Self
+pub impl Default for ResourceLimiterRef
+pub impl Show for ResourceLimiterRef
+
+pub struct Table {
+  // private fields
+}
+pub fn Table::copy(Self, UInt64, Self, UInt64, UInt64, Fuel?) -> Unit raise TableError
+pub fn Table::copy_within(Self, UInt64, UInt64, UInt64, Fuel?) -> Unit raise TableError
+pub fn Table::dynamic_ty(Self) -> TableType
+pub fn Table::fill(Self, UInt64, TypedVal, UInt64, Fuel?) -> Unit raise TableError
+pub fn Table::fill_untyped(Self, UInt64, UntypedVal, UInt64, Fuel?) -> Unit raise TableError
+pub fn Table::get(Self, UInt64) -> TypedVal?
+pub fn Table::get_untyped(Self, UInt64) -> UntypedVal?
+pub fn Table::grow(Self, UInt64, TypedVal, Fuel?, ResourceLimiterRef) -> UInt64 raise TableError
+pub fn Table::grow_untyped(Self, UInt64, UntypedVal, Fuel?, ResourceLimiterRef) -> UInt64 raise TableError
+pub fn Table::init(Self, ElementSegmentRef, UInt64, UInt, UInt, Fuel?) -> Unit raise TableError
+pub fn Table::new(TableType, TypedVal, ResourceLimiterRef) -> Self raise TableError
+pub fn Table::set(Self, UInt64, TypedVal) -> Unit raise TableError
+pub fn Table::set_untyped(Self, UInt64, UntypedVal) -> Unit raise TableError
+pub fn Table::size(Self) -> UInt64
+pub fn Table::ty(Self) -> TableType
+
+pub struct TableType {
+  // private fields
+} derive(Eq, Hash, @debug.Debug)
+pub fn TableType::element(Self) -> ValType
+pub fn TableType::index_ty(Self) -> IndexType
+pub fn TableType::is_64(Self) -> Bool
+pub fn TableType::is_subtype_of(Self, Self) -> Bool
+pub fn TableType::maximum(Self) -> UInt64?
+pub fn TableType::minimum(Self) -> UInt64
+pub fn TableType::new(ValType, UInt, UInt?) -> Self
+pub fn TableType::new64(ValType, UInt64, UInt64?) -> Self
+
+pub struct Trap {
+  reason : TrapReason
+}
+pub fn Trap::downcast_ref(Self) -> Error?
+pub fn Trap::from_host_error(Error) -> Self
+pub fn Trap::from_trap_code(TrapCode) -> Self
+pub fn Trap::i32_exit(Int) -> Self
+pub fn Trap::i32_exit_status(Self) -> Int?
+pub fn Trap::new(String) -> Self
+pub fn Trap::to_string(Self) -> String
+pub fn Trap::trap_code(Self) -> TrapCode?
+pub impl Show for Trap
+
+pub enum TrapReason {
+  InstructionTrap(TrapCode)
+  I32Exit(Int)
+  Message(String)
+  Host(Error)
+}
+
+pub struct TypedVal {
+  ty : ValType
+  value : UntypedVal
+} derive(Eq, @debug.Debug)
+pub fn TypedVal::from_bool(Bool) -> Self
+pub fn TypedVal::from_f32(Float) -> Self
+pub fn TypedVal::from_f64(Double) -> Self
+pub fn TypedVal::from_i32(Int) -> Self
+pub fn TypedVal::from_i64(Int64) -> Self
+pub fn TypedVal::from_u32(UInt) -> Self
+pub fn TypedVal::from_u64(UInt64) -> Self
+pub fn TypedVal::from_v128(V128) -> Self
+pub fn TypedVal::new(ValType, UntypedVal) -> Self
+pub fn TypedVal::to_bool(Self) -> Bool
+pub fn TypedVal::to_f32(Self) -> Float
+pub fn TypedVal::to_f64(Self) -> Double
+pub fn TypedVal::to_i32(Self) -> Int
+pub fn TypedVal::to_i64(Self) -> Int64
+pub fn TypedVal::to_u32(Self) -> UInt
+pub fn TypedVal::to_u64(Self) -> UInt64
+pub fn TypedVal::to_v128(Self) -> V128
+pub fn TypedVal::ty(Self) -> ValType
+pub fn TypedVal::untyped(Self) -> UntypedVal
+
+pub struct UntypedVal {
+  lo64 : UInt64
+  hi64 : UInt64
+} derive(Compare, Eq, Hash, @debug.Debug)
+pub fn UntypedVal::default() -> Self
+pub fn UntypedVal::from_bits64(UInt64) -> Self
+pub fn UntypedVal::from_bool(Bool) -> Self
+pub fn UntypedVal::from_f32(Float) -> Self
+pub fn UntypedVal::from_f64(Double) -> Self
+pub fn UntypedVal::from_i16(Int) -> Self
+pub fn UntypedVal::from_i32(Int) -> Self
+pub fn UntypedVal::from_i64(Int64) -> Self
+pub fn UntypedVal::from_i8(Int) -> Self
+pub fn UntypedVal::from_u32(UInt) -> Self
+pub fn UntypedVal::from_u64(UInt64) -> Self
+pub fn UntypedVal::from_v128(V128) -> Self
+pub fn UntypedVal::hi64(Self) -> UInt64
+pub fn UntypedVal::read_bool(Self) -> Bool
+pub fn UntypedVal::read_f32(Self) -> Float
+pub fn UntypedVal::read_f64(Self) -> Double
+pub fn UntypedVal::read_i16(Self) -> Int
+pub fn UntypedVal::read_i32(Self) -> Int
+pub fn UntypedVal::read_i64(Self) -> Int64
+pub fn UntypedVal::read_i8(Self) -> Int
+pub fn UntypedVal::read_u16(Self) -> Int
+pub fn UntypedVal::read_u32(Self) -> UInt
+pub fn UntypedVal::read_u64(Self) -> UInt64
+pub fn UntypedVal::read_u8(Self) -> Int
+pub fn UntypedVal::read_v128(Self) -> V128
+pub fn UntypedVal::to_bits64(Self) -> UInt64
+pub fn UntypedVal::write_bool(Self, Bool) -> Self
+pub fn UntypedVal::write_f32(Self, Float) -> Self
+pub fn UntypedVal::write_f64(Self, Double) -> Self
+pub fn UntypedVal::write_i16(Self, Int) -> Self
+pub fn UntypedVal::write_i32(Self, Int) -> Self
+pub fn UntypedVal::write_i64(Self, Int64) -> Self
+pub fn UntypedVal::write_i8(Self, Int) -> Self
+pub fn UntypedVal::write_u32(Self, UInt) -> Self
+pub fn UntypedVal::write_u64(Self, UInt64) -> Self
+pub fn UntypedVal::write_v128(Self, V128) -> Self
+pub impl Default for UntypedVal
+
+pub struct V128 {
+  lo : UInt64
+  hi : UInt64
+} derive(Eq, Hash, @debug.Debug)
+pub fn V128::from_le_bytes(ArrayView[Byte]) -> Self
+pub fn V128::from_lo_hi(UInt64, UInt64) -> Self
+pub fn V128::hi(Self) -> UInt64
+pub fn V128::lo(Self) -> UInt64
+pub fn V128::to_le_bytes(Self) -> FixedArray[Byte]
+
+pub(all) enum ValType {
+  I32
+  I64
+  F32
+  F64
+  V128
+  FuncRef
+  ExternRef
+} derive(Compare, Eq, Hash, @debug.Debug)
+pub fn ValType::is_num(Self) -> Bool
+pub fn ValType::is_ref(Self) -> Bool
+pub fn ValType::to_string(Self) -> String
+pub impl Show for ValType
+
+// Type aliases
+pub using @builtin {type Error as HostError}
+
+// Traits
+pub(open) trait FuelCosts {
+  fn base(Self) -> UInt64
+  fn load(Self) -> UInt64 = _
+  fn instance(Self) -> UInt64 = _
+  fn store(Self) -> UInt64 = _
+  fn call(Self) -> UInt64 = _
+  fn simd(Self) -> UInt64 = _
+  fn bytes_per_fuel(Self) -> UInt64
+}
+
+pub(open) trait ResourceLimiter {
+  fn memory_growing(Self, UInt64, UInt64, UInt64?) -> Bool raise LimiterError
+  fn table_growing(Self, UInt64, UInt64, UInt64?) -> Bool raise LimiterError
+  fn memory_grow_failed(Self, LimiterError) -> Unit = _
+  fn table_grow_failed(Self, LimiterError) -> Unit = _
+  fn instances(Self) -> UInt64
+  fn tables(Self) -> UInt64
+  fn memories(Self) -> UInt64
+}
