@@ -484,7 +484,10 @@ fn ModuleElementSegment::from_wasmparser(
     Functions(items) => {
       let out = []
       let iter = items.into_iter()
-      while wasm_err(fn() { iter.next() }) is Some(item) {
+      while wasm_err(fn() raise @moonbitlang/typst/wasmparser.BinaryReaderError {
+              iter.next()
+            })
+            is Some(item) {
         out.push(ConstExpr::new_funcref(item))
       }
       (out, FuncRef)
@@ -499,7 +502,10 @@ fn ModuleElementSegment::from_wasmparser(
       }
       let out = []
       let iter = items.into_iter()
-      while wasm_err(fn() { iter.next() }) is Some(item) {
+      while wasm_err(fn() raise @moonbitlang/typst/wasmparser.BinaryReaderError {
+              iter.next()
+            })
+            is Some(item) {
         out.push(ConstExpr::new(item))
       }
       (out, ty)

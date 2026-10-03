@@ -229,7 +229,12 @@ fn FuncTranslator::translate_unary_fallible(
   let input = self.stack.pop()
   if input is Immediate(input) {
     let input = input.val()
-    match (try? consteval(input)) {
+    match
+      (try consteval(input) catch {
+        e => Err(e)
+      } noraise {
+        v => Ok(v)
+      }) {
       Ok(result) => self.stack.push_immediate(result) |> ignore
       Err(trap) => self.translate_trap(trap)
     }
@@ -367,7 +372,12 @@ fn FuncTranslator::translate_binary_consteval_fallible(
 ) -> Unit raise WasmiError {
   let lhs = lhs.val()
   let rhs = rhs.val()
-  match (try? consteval(lhs, rhs)) {
+  match
+    (try consteval(lhs, rhs) catch {
+      e => Err(e)
+    } noraise {
+      v => Ok(v)
+    }) {
     Ok(value) => self.stack.push_immediate(value) |> ignore
     Err(trap) => self.translate_trap(trap)
   }

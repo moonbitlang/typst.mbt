@@ -285,7 +285,7 @@ fn FuncTranslator::translate_replace_lane(
   let value : Input[@wasmi_core.TypedVal] = self.make_input(value, fn(
     this,
     value,
-  ) {
+  ) raise WasmiError {
     if (op.value_to_imm)(value) {
       Immediate(value)
     } else {
@@ -577,10 +577,12 @@ fn FuncTranslator::translate_v128_store_lane(
       (ptr, offset)
     }
   }
-  if (try? self.translate_v128_store_lane_mem0(
+  if (self.translate_v128_store_lane_mem0(
       memory, ptr, offset, v128, lane, make_instr_offset8,
-    ))
-    is Ok(Some(_)) {
+    ) catch {
+      _ => None
+    })
+    is Some(_) {
     return
   }
   let (offset_hi, offset_lo) = @ir.Offset64::split(offset)
@@ -702,7 +704,7 @@ fn FuncTranslator::visit_v128_store8_lane(
     @ir.Op::v128_store8_lane,
     @ir.Op::v128_store8_lane_offset8,
     @ir.Op::v128_store8_lane_at,
-    fn(this, memarg, ptr, lane, v128) {
+    fn(this, memarg, ptr, lane, v128) raise WasmiError {
       let value = @wasmi_core.i8x16_extract_lane_s(
         v128,
         @wasmi_core.ImmLaneIdx16(lane.to_byte()),
@@ -728,7 +730,7 @@ fn FuncTranslator::visit_v128_store16_lane(
     @ir.Op::v128_store16_lane,
     @ir.Op::v128_store16_lane_offset8,
     @ir.Op::v128_store16_lane_at,
-    fn(this, memarg, ptr, lane, v128) {
+    fn(this, memarg, ptr, lane, v128) raise WasmiError {
       let value = @wasmi_core.i16x8_extract_lane_s(
         v128,
         @wasmi_core.ImmLaneIdx8(lane.to_byte()),
@@ -754,7 +756,7 @@ fn FuncTranslator::visit_v128_store32_lane(
     @ir.Op::v128_store32_lane,
     @ir.Op::v128_store32_lane_offset8,
     @ir.Op::v128_store32_lane_at,
-    fn(this, memarg, ptr, lane, v128) {
+    fn(this, memarg, ptr, lane, v128) raise WasmiError {
       let value = @wasmi_core.i32x4_extract_lane(
         v128,
         @wasmi_core.ImmLaneIdx4(lane.to_byte()),
@@ -780,7 +782,7 @@ fn FuncTranslator::visit_v128_store64_lane(
     @ir.Op::v128_store64_lane,
     @ir.Op::v128_store64_lane_offset8,
     @ir.Op::v128_store64_lane_at,
-    fn(this, memarg, ptr, lane, v128) {
+    fn(this, memarg, ptr, lane, v128) raise WasmiError {
       let value = @wasmi_core.i64x2_extract_lane(
         v128,
         @wasmi_core.ImmLaneIdx2(lane.to_byte()),

@@ -538,7 +538,7 @@ fn FuncTranslator::visit_i32_div_s(
     @ir.Op::i32_div_s,
     @ir.Op::i32_div_s_imm16_rhs,
     @ir.Op::i32_div_s_imm16_lhs,
-    fn(a, b) {
+    fn(a, b) raise @wasmi_core.TrapCode {
       @wasmi_core.TypedVal::from_i32(
         @wasmi_core.i32_div_s(a.to_i32(), b.to_i32()),
       )
@@ -555,7 +555,7 @@ fn FuncTranslator::visit_i32_div_u(
     @ir.Op::i32_div_u,
     @ir.Op::i32_div_u_imm16_rhs,
     @ir.Op::i32_div_u_imm16_lhs,
-    fn(a, b) {
+    fn(a, b) raise @wasmi_core.TrapCode {
       @wasmi_core.TypedVal::from_u32(
         @wasmi_core.i32_div_u(a.to_u32(), b.to_u32()),
       )
@@ -572,7 +572,7 @@ fn FuncTranslator::visit_i32_rem_s(
     @ir.Op::i32_rem_s,
     @ir.Op::i32_rem_s_imm16_rhs,
     @ir.Op::i32_rem_s_imm16_lhs,
-    fn(a, b) {
+    fn(a, b) raise @wasmi_core.TrapCode {
       @wasmi_core.TypedVal::from_i32(
         @wasmi_core.i32_rem_s(a.to_i32(), b.to_i32()),
       )
@@ -589,7 +589,7 @@ fn FuncTranslator::visit_i32_rem_u(
     @ir.Op::i32_rem_u,
     @ir.Op::i32_rem_u_imm16_rhs,
     @ir.Op::i32_rem_u_imm16_lhs,
-    fn(a, b) {
+    fn(a, b) raise @wasmi_core.TrapCode {
       @wasmi_core.TypedVal::from_u32(
         @wasmi_core.i32_rem_u(a.to_u32(), b.to_u32()),
       )
@@ -823,7 +823,7 @@ fn FuncTranslator::visit_i64_div_s(
     @ir.Op::i64_div_s,
     @ir.Op::i64_div_s_imm16_rhs,
     @ir.Op::i64_div_s_imm16_lhs,
-    fn(a, b) {
+    fn(a, b) raise @wasmi_core.TrapCode {
       @wasmi_core.TypedVal::from_i64(
         @wasmi_core.i64_div_s(a.to_i64(), b.to_i64()),
       )
@@ -840,7 +840,7 @@ fn FuncTranslator::visit_i64_div_u(
     @ir.Op::i64_div_u,
     @ir.Op::i64_div_u_imm16_rhs,
     @ir.Op::i64_div_u_imm16_lhs,
-    fn(a, b) {
+    fn(a, b) raise @wasmi_core.TrapCode {
       @wasmi_core.TypedVal::from_u64(
         @wasmi_core.i64_div_u(a.to_u64(), b.to_u64()),
       )
@@ -857,7 +857,7 @@ fn FuncTranslator::visit_i64_rem_s(
     @ir.Op::i64_rem_s,
     @ir.Op::i64_rem_s_imm16_rhs,
     @ir.Op::i64_rem_s_imm16_lhs,
-    fn(a, b) {
+    fn(a, b) raise @wasmi_core.TrapCode {
       @wasmi_core.TypedVal::from_i64(
         @wasmi_core.i64_rem_s(a.to_i64(), b.to_i64()),
       )
@@ -874,7 +874,7 @@ fn FuncTranslator::visit_i64_rem_u(
     @ir.Op::i64_rem_u,
     @ir.Op::i64_rem_u_imm16_rhs,
     @ir.Op::i64_rem_u_imm16_lhs,
-    fn(a, b) {
+    fn(a, b) raise @wasmi_core.TrapCode {
       @wasmi_core.TypedVal::from_u64(
         @wasmi_core.i64_rem_u(a.to_u64(), b.to_u64()),
       )
@@ -1298,7 +1298,9 @@ fn FuncTranslator::visit_i32_wrap_i64(
 fn FuncTranslator::visit_i32_trunc_f32_s(
   self : FuncTranslator,
 ) -> Unit raise WasmiError {
-  self.translate_unary_fallible(I32, @ir.Op::i32_trunc_f32_s, fn(a) {
+  self.translate_unary_fallible(I32, @ir.Op::i32_trunc_f32_s, fn(
+    a,
+  ) raise @wasmi_core.TrapCode {
     @wasmi_core.TypedVal::from_i32(@wasmi_core.i32_trunc_f32_s(a.to_f32()))
   })
 }
@@ -1307,7 +1309,9 @@ fn FuncTranslator::visit_i32_trunc_f32_s(
 fn FuncTranslator::visit_i32_trunc_f32_u(
   self : FuncTranslator,
 ) -> Unit raise WasmiError {
-  self.translate_unary_fallible(I32, @ir.Op::i32_trunc_f32_u, fn(a) {
+  self.translate_unary_fallible(I32, @ir.Op::i32_trunc_f32_u, fn(
+    a,
+  ) raise @wasmi_core.TrapCode {
     @wasmi_core.TypedVal::from_u32(@wasmi_core.i32_trunc_f32_u(a.to_f32()))
   })
 }
@@ -1316,7 +1320,9 @@ fn FuncTranslator::visit_i32_trunc_f32_u(
 fn FuncTranslator::visit_i32_trunc_f64_s(
   self : FuncTranslator,
 ) -> Unit raise WasmiError {
-  self.translate_unary_fallible(I32, @ir.Op::i32_trunc_f64_s, fn(a) {
+  self.translate_unary_fallible(I32, @ir.Op::i32_trunc_f64_s, fn(
+    a,
+  ) raise @wasmi_core.TrapCode {
     @wasmi_core.TypedVal::from_i32(@wasmi_core.i32_trunc_f64_s(a.to_f64()))
   })
 }
@@ -1325,7 +1331,9 @@ fn FuncTranslator::visit_i32_trunc_f64_s(
 fn FuncTranslator::visit_i32_trunc_f64_u(
   self : FuncTranslator,
 ) -> Unit raise WasmiError {
-  self.translate_unary_fallible(I32, @ir.Op::i32_trunc_f64_u, fn(a) {
+  self.translate_unary_fallible(I32, @ir.Op::i32_trunc_f64_u, fn(
+    a,
+  ) raise @wasmi_core.TrapCode {
     @wasmi_core.TypedVal::from_u32(@wasmi_core.i32_trunc_f64_u(a.to_f64()))
   })
 }
@@ -1352,7 +1360,9 @@ fn FuncTranslator::visit_i64_extend_i32_u(
 fn FuncTranslator::visit_i64_trunc_f32_s(
   self : FuncTranslator,
 ) -> Unit raise WasmiError {
-  self.translate_unary_fallible(I64, @ir.Op::i64_trunc_f32_s, fn(a) {
+  self.translate_unary_fallible(I64, @ir.Op::i64_trunc_f32_s, fn(
+    a,
+  ) raise @wasmi_core.TrapCode {
     @wasmi_core.TypedVal::from_i64(@wasmi_core.i64_trunc_f32_s(a.to_f32()))
   })
 }
@@ -1361,7 +1371,9 @@ fn FuncTranslator::visit_i64_trunc_f32_s(
 fn FuncTranslator::visit_i64_trunc_f32_u(
   self : FuncTranslator,
 ) -> Unit raise WasmiError {
-  self.translate_unary_fallible(I64, @ir.Op::i64_trunc_f32_u, fn(a) {
+  self.translate_unary_fallible(I64, @ir.Op::i64_trunc_f32_u, fn(
+    a,
+  ) raise @wasmi_core.TrapCode {
     @wasmi_core.TypedVal::from_u64(@wasmi_core.i64_trunc_f32_u(a.to_f32()))
   })
 }
@@ -1370,7 +1382,9 @@ fn FuncTranslator::visit_i64_trunc_f32_u(
 fn FuncTranslator::visit_i64_trunc_f64_s(
   self : FuncTranslator,
 ) -> Unit raise WasmiError {
-  self.translate_unary_fallible(I64, @ir.Op::i64_trunc_f64_s, fn(a) {
+  self.translate_unary_fallible(I64, @ir.Op::i64_trunc_f64_s, fn(
+    a,
+  ) raise @wasmi_core.TrapCode {
     @wasmi_core.TypedVal::from_i64(@wasmi_core.i64_trunc_f64_s(a.to_f64()))
   })
 }
@@ -1379,7 +1393,9 @@ fn FuncTranslator::visit_i64_trunc_f64_s(
 fn FuncTranslator::visit_i64_trunc_f64_u(
   self : FuncTranslator,
 ) -> Unit raise WasmiError {
-  self.translate_unary_fallible(I64, @ir.Op::i64_trunc_f64_u, fn(a) {
+  self.translate_unary_fallible(I64, @ir.Op::i64_trunc_f64_u, fn(
+    a,
+  ) raise @wasmi_core.TrapCode {
     @wasmi_core.TypedVal::from_u64(@wasmi_core.i64_trunc_f64_u(a.to_f64()))
   })
 }

@@ -140,7 +140,7 @@ pub fn[T] host_trampoline(
   ty : @wasmi_core.FuncType,
   func : (Caller[T], Array[Val], Array[Val]) -> Unit raise WasmiError,
 ) -> Trampoline {
-  fn(instance, inout) {
+  fn(instance, inout) raise WasmiError {
     let params = []
     for i, param_ty in ty.params() {
       params.push(store.inner.val_from_untyped(inout.params[i], param_ty))

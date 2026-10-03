@@ -172,7 +172,7 @@ pub fn InstrEncoder::try_fuse_select(
     // are not equal thus indicating that we cannot fuse the instructions.
     return None
   }
-  guard try_into_cmp_select_instr(last_instruction, fn() {
+  guard try_into_cmp_select_instr(last_instruction, fn() raise WasmiError {
       let select_result = stack.push_temp(ty, Some(last_instr))
       layout.temp_to_reg(select_result)
     })

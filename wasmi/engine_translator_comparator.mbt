@@ -808,7 +808,11 @@ pub fn[S : AllocConst] update_branch_offset(
       "expected a Wasmi `cmp`+`branch` instruction but found: \{instr.name()}",
     )
   }
-  let updated = try? offset.init(new_offset)
+  let updated = try offset.init(new_offset) catch {
+    e => Err(e)
+  } noraise {
+    v => Ok(v)
+  }
   match updated {
     Ok(offset16) =>
       match instr.set_branch_offset16(offset16) {

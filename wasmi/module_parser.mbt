@@ -68,7 +68,9 @@ fn ModuleParser::process_end(
     // This only checks if the number of code section entries and data segments match
     // their expected numbers thus we must avoid this check in header-only mode because
     // otherwise we will receive errors for unmatched data section entries.
-    wasm_err(fn() { validator.end(offset) |> ignore })
+    wasm_err(fn() raise @moonbitlang/typst/wasmparser.BinaryReaderError {
+      validator.end(offset) |> ignore
+    })
   }
 }
 
@@ -84,11 +86,16 @@ fn ModuleParser::process_types(
   header : ModuleHeaderBuilder,
 ) -> Unit raise WasmiError {
   if self.validator is Some(validator) {
-    wasm_err(fn() { validator.type_section(section) })
+    wasm_err(fn() raise @moonbitlang/typst/wasmparser.BinaryReaderError {
+      validator.type_section(section)
+    })
   }
   let limits = self.engine.config().get_enforced_limits()
   let iter = section.into_iter()
-  while wasm_err(fn() { iter.next() }) is Some(rec_group) {
+  while wasm_err(fn() raise @moonbitlang/typst/wasmparser.BinaryReaderError {
+          iter.next()
+        })
+        is Some(rec_group) {
     let ty = rec_group.into_types()[0]
     let func_ty = ty.unwrap_func()
     if limits.max_params is Some(limit) {
@@ -118,10 +125,15 @@ fn ModuleParser::process_imports(
   header : ModuleHeaderBuilder,
 ) -> Unit raise WasmiError {
   if self.validator is Some(validator) {
-    wasm_err(fn() { validator.import_section(section) })
+    wasm_err(fn() raise @moonbitlang/typst/wasmparser.BinaryReaderError {
+      validator.import_section(section)
+    })
   }
   let iter = section.into_iter()
-  while wasm_err(fn() { iter.next() }) is Some(imp) {
+  while wasm_err(fn() raise @moonbitlang/typst/wasmparser.BinaryReaderError {
+          iter.next()
+        })
+        is Some(imp) {
     let name = ImportName::new(imp.module_, imp.name)
     match imp.ty {
       Func(func_type_idx) => {
@@ -164,13 +176,18 @@ fn ModuleParser::process_functions(
     }
   }
   if self.validator is Some(validator) {
-    wasm_err(fn() { validator.function_section(section) })
+    wasm_err(fn() raise @moonbitlang/typst/wasmparser.BinaryReaderError {
+      validator.function_section(section)
+    })
   }
   header.engine_funcs = self.engine.alloc_funcs(
     section.count().reinterpret_as_int(),
   )
   let iter = section.into_iter()
-  while wasm_err(fn() { iter.next() }) is Some(func_type_idx) {
+  while wasm_err(fn() raise @moonbitlang/typst/wasmparser.BinaryReaderError {
+          iter.next()
+        })
+        is Some(func_type_idx) {
     let func_type = header.func_types[func_type_idx.reinterpret_as_int()]
     header.funcs.push(func_type)
   }
@@ -193,10 +210,15 @@ fn ModuleParser::process_tables(
     }
   }
   if self.validator is Some(validator) {
-    wasm_err(fn() { validator.table_section(section) })
+    wasm_err(fn() raise @moonbitlang/typst/wasmparser.BinaryReaderError {
+      validator.table_section(section)
+    })
   }
   let iter = section.into_iter()
-  while wasm_err(fn() { iter.next() }) is Some(table) {
+  while wasm_err(fn() raise @moonbitlang/typst/wasmparser.BinaryReaderError {
+          iter.next()
+        })
+        is Some(table) {
     guard table.init is RefNull
     header.tables.push(table_type_from_wasmparser(table.ty))
   }
@@ -219,10 +241,15 @@ fn ModuleParser::process_memories(
     }
   }
   if self.validator is Some(validator) {
-    wasm_err(fn() { validator.memory_section(section) })
+    wasm_err(fn() raise @moonbitlang/typst/wasmparser.BinaryReaderError {
+      validator.memory_section(section)
+    })
   }
   let iter = section.into_iter()
-  while wasm_err(fn() { iter.next() }) is Some(memory) {
+  while wasm_err(fn() raise @moonbitlang/typst/wasmparser.BinaryReaderError {
+          iter.next()
+        })
+        is Some(memory) {
     header.memories.push(memory_type_from_wasmparser(memory))
   }
 }
@@ -244,10 +271,15 @@ fn ModuleParser::process_globals(
     }
   }
   if self.validator is Some(validator) {
-    wasm_err(fn() { validator.global_section(section) })
+    wasm_err(fn() raise @moonbitlang/typst/wasmparser.BinaryReaderError {
+      validator.global_section(section)
+    })
   }
   let iter = section.into_iter()
-  while wasm_err(fn() { iter.next() }) is Some(global) {
+  while wasm_err(fn() raise @moonbitlang/typst/wasmparser.BinaryReaderError {
+          iter.next()
+        })
+        is Some(global) {
     header.globals.push(global_type_from_wasmparser(global.ty))
     header.globals_init.push(ConstExpr::new(global.init_expr))
   }
@@ -265,10 +297,15 @@ fn ModuleParser::process_exports(
   header : ModuleHeaderBuilder,
 ) -> Unit raise WasmiError {
   if self.validator is Some(validator) {
-    wasm_err(fn() { validator.export_section(section) })
+    wasm_err(fn() raise @moonbitlang/typst/wasmparser.BinaryReaderError {
+      validator.export_section(section)
+    })
   }
   let iter = section.into_iter()
-  while wasm_err(fn() { iter.next() }) is Some(export) {
+  while wasm_err(fn() raise @moonbitlang/typst/wasmparser.BinaryReaderError {
+          iter.next()
+        })
+        is Some(export) {
     let idx = ExternIdx::new(export.kind, export.index)
     header.exports.set(export.name, idx)
   }
@@ -287,7 +324,9 @@ fn ModuleParser::process_start(
   header : ModuleHeaderBuilder,
 ) -> Unit raise WasmiError {
   if self.validator is Some(validator) {
-    wasm_err(fn() { validator.start_section(func, range) })
+    wasm_err(fn() raise @moonbitlang/typst/wasmparser.BinaryReaderError {
+      validator.start_section(func, range)
+    })
   }
   if header.start is Some(old_start) {
     abort("encountered multiple start functions: \{old_start.0}, \{func}")
@@ -313,11 +352,16 @@ fn ModuleParser::process_element(
     }
   }
   if self.validator is Some(validator) {
-    wasm_err(fn() { validator.element_section(section) })
+    wasm_err(fn() raise @moonbitlang/typst/wasmparser.BinaryReaderError {
+      validator.element_section(section)
+    })
   }
   let segments = []
   let iter = section.into_iter()
-  while wasm_err(fn() { iter.next() }) is Some(segment) {
+  while wasm_err(fn() raise @moonbitlang/typst/wasmparser.BinaryReaderError {
+          iter.next()
+        })
+        is Some(segment) {
     segments.push(ModuleElementSegment::from_wasmparser(segment))
   }
   header.element_segments = segments
@@ -336,7 +380,9 @@ fn ModuleParser::process_data_count(
     }
   }
   if self.validator is Some(validator) {
-    wasm_err(fn() { validator.data_count_section(count, range) })
+    wasm_err(fn() raise @moonbitlang/typst/wasmparser.BinaryReaderError {
+      validator.data_count_section(count, range)
+    })
   }
 }
 
@@ -356,10 +402,15 @@ fn ModuleParser::process_data(
     // Note: data section does not belong to the Wasm module header.
     //
     // Also benchmarks show that validation of the data section can be very costly.
-    wasm_err(fn() { validator.data_section(section) })
+    wasm_err(fn() raise @moonbitlang/typst/wasmparser.BinaryReaderError {
+      validator.data_section(section)
+    })
   }
   let iter = section.into_iter()
-  while wasm_err(fn() { iter.next() }) is Some(segment) {
+  while wasm_err(fn() raise @moonbitlang/typst/wasmparser.BinaryReaderError {
+          iter.next()
+        })
+        is Some(segment) {
     data_segments.push(ModuleDataSegment::from_wasmparser(segment))
   }
 }
@@ -388,7 +439,9 @@ fn ModuleParser::process_code_start(
     }
   }
   if self.validator is Some(validator) {
-    wasm_err(fn() { validator.code_section_start(count, range) })
+    wasm_err(fn() raise @moonbitlang/typst/wasmparser.BinaryReaderError {
+      validator.code_section_start(count, range)
+    })
   }
 }
 
@@ -426,7 +479,11 @@ fn ModuleParser::process_code_entry(
   let offset = func_body.get_binary_reader().original_position()
   let func_to_validate = match self.validator {
     Some(validator) =>
-      Some(wasm_err(fn() { validator.code_section_entry(func_body) }))
+      Some(
+        wasm_err(fn() raise @moonbitlang/typst/wasmparser.BinaryReaderError {
+          validator.code_section_entry(func_body)
+        }),
+      )
     None => None
   }
   self.engine.translate_func(
@@ -441,7 +498,9 @@ fn ModuleParser::process_invalid_payload(
   payload : @wasmparser.Payload,
 ) -> Unit raise WasmiError {
   if self.validator is Some(validator) {
-    wasm_err(fn() { validator.payload(payload) |> ignore })
+    wasm_err(fn() raise @moonbitlang/typst/wasmparser.BinaryReaderError {
+      validator.payload(payload) |> ignore
+    })
   }
   abort("encountered unsupported, unexpected or malformed Wasm payload")
 }
@@ -456,7 +515,10 @@ fn ModuleParser::next_payload(
   self : ModuleParser,
   buffer : BytesView,
 ) -> (Int, @wasmparser.Payload) raise WasmiError {
-  match wasm_err(fn() { self.parser.parse(buffer, true) }) {
+  match
+    wasm_err(fn() raise @moonbitlang/typst/wasmparser.BinaryReaderError {
+      self.parser.parse(buffer, true)
+    }) {
     Parsed(consumed~, payload~) => (consumed, payload)
     NeedMoreData(_) =>
       // This is not possible since `eof` is always true.
@@ -491,7 +553,9 @@ fn ModuleParser::parse_buffered(
     let (consumed, payload) = self.next_payload(buffer)
     match payload {
       Version(num~, encoding~, range~) =>
-        wasm_err(fn() { self.validator().version(num, encoding, range) })
+        wasm_err(fn() raise @moonbitlang/typst/wasmparser.BinaryReaderError {
+          self.validator().version(num, encoding, range)
+        })
       TypeSection(section) => self.process_types(section, header_builder)
       ImportSection(section) => self.process_imports(section, header_builder)
       FunctionSection(section) =>

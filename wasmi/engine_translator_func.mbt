@@ -1406,7 +1406,12 @@ fn FuncTranslator::encode_br_if(
   }
   let instr = self.instrs.next_instr()
   let offset = self.labels.try_resolve_label(label, instr)
-  let instr = match (try? @ir.BranchOffset16::try_from(offset)) {
+  let instr = match
+    (try @ir.BranchOffset16::try_from(offset) catch {
+      e => Err(e)
+    } noraise {
+      v => Ok(v)
+    }) {
     Ok(offset) =>
       if branch_eqz {
         @ir.Op::branch_i32_eq_imm16(condition, @ir.Const16::from_i16(0), offset)

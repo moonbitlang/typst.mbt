@@ -300,7 +300,7 @@ def main():
         for name, fields in matching:
             others = [field_name(f[0], f[1]) for f in fields if f[1] != fname]
             binds = ", ".join(f"{o}~" for o in others)
-            pat = f"{name}({binds})" if others else f"{name}(..)"
+            pat = f"{name}({binds}, ..)" if others else f"{name}(..)"
             args = ", ".join([f"{fname}=new_value"] + [f"{o}~" for o in others])
             w(f"    {pat} => Some({name}({args}))")
         w("    _ => None")

@@ -12036,739 +12036,812 @@ pub fn Op::result_slot(self : Op) -> Slot? {
 /// Returns the instruction with its `result: Slot` field replaced, if it has one.
 pub fn Op::set_result(self : Op, new_value : Slot) -> Op? {
   match self {
-    Copy(value~) => Some(Copy(result=new_value, value~))
-    CopyImm32(value~) => Some(CopyImm32(result=new_value, value~))
-    CopyI64Imm32(value~) => Some(CopyI64Imm32(result=new_value, value~))
-    CopyF64Imm32(value~) => Some(CopyF64Imm32(result=new_value, value~))
-    SelectI32And(lhs~, rhs~) => Some(SelectI32And(result=new_value, lhs~, rhs~))
-    SelectI32AndImm16(lhs~, rhs~) =>
+    Copy(value~, ..) => Some(Copy(result=new_value, value~))
+    CopyImm32(value~, ..) => Some(CopyImm32(result=new_value, value~))
+    CopyI64Imm32(value~, ..) => Some(CopyI64Imm32(result=new_value, value~))
+    CopyF64Imm32(value~, ..) => Some(CopyF64Imm32(result=new_value, value~))
+    SelectI32And(lhs~, rhs~, ..) =>
+      Some(SelectI32And(result=new_value, lhs~, rhs~))
+    SelectI32AndImm16(lhs~, rhs~, ..) =>
       Some(SelectI32AndImm16(result=new_value, lhs~, rhs~))
-    SelectI32Or(lhs~, rhs~) => Some(SelectI32Or(result=new_value, lhs~, rhs~))
-    SelectI32OrImm16(lhs~, rhs~) =>
+    SelectI32Or(lhs~, rhs~, ..) =>
+      Some(SelectI32Or(result=new_value, lhs~, rhs~))
+    SelectI32OrImm16(lhs~, rhs~, ..) =>
       Some(SelectI32OrImm16(result=new_value, lhs~, rhs~))
-    SelectI32Eq(lhs~, rhs~) => Some(SelectI32Eq(result=new_value, lhs~, rhs~))
-    SelectI32EqImm16(lhs~, rhs~) =>
+    SelectI32Eq(lhs~, rhs~, ..) =>
+      Some(SelectI32Eq(result=new_value, lhs~, rhs~))
+    SelectI32EqImm16(lhs~, rhs~, ..) =>
       Some(SelectI32EqImm16(result=new_value, lhs~, rhs~))
-    SelectI32LtS(lhs~, rhs~) => Some(SelectI32LtS(result=new_value, lhs~, rhs~))
-    SelectI32LtSImm16Rhs(lhs~, rhs~) =>
+    SelectI32LtS(lhs~, rhs~, ..) =>
+      Some(SelectI32LtS(result=new_value, lhs~, rhs~))
+    SelectI32LtSImm16Rhs(lhs~, rhs~, ..) =>
       Some(SelectI32LtSImm16Rhs(result=new_value, lhs~, rhs~))
-    SelectI32LtU(lhs~, rhs~) => Some(SelectI32LtU(result=new_value, lhs~, rhs~))
-    SelectI32LtUImm16Rhs(lhs~, rhs~) =>
+    SelectI32LtU(lhs~, rhs~, ..) =>
+      Some(SelectI32LtU(result=new_value, lhs~, rhs~))
+    SelectI32LtUImm16Rhs(lhs~, rhs~, ..) =>
       Some(SelectI32LtUImm16Rhs(result=new_value, lhs~, rhs~))
-    SelectI32LeS(lhs~, rhs~) => Some(SelectI32LeS(result=new_value, lhs~, rhs~))
-    SelectI32LeSImm16Rhs(lhs~, rhs~) =>
+    SelectI32LeS(lhs~, rhs~, ..) =>
+      Some(SelectI32LeS(result=new_value, lhs~, rhs~))
+    SelectI32LeSImm16Rhs(lhs~, rhs~, ..) =>
       Some(SelectI32LeSImm16Rhs(result=new_value, lhs~, rhs~))
-    SelectI32LeU(lhs~, rhs~) => Some(SelectI32LeU(result=new_value, lhs~, rhs~))
-    SelectI32LeUImm16Rhs(lhs~, rhs~) =>
+    SelectI32LeU(lhs~, rhs~, ..) =>
+      Some(SelectI32LeU(result=new_value, lhs~, rhs~))
+    SelectI32LeUImm16Rhs(lhs~, rhs~, ..) =>
       Some(SelectI32LeUImm16Rhs(result=new_value, lhs~, rhs~))
-    SelectI64And(lhs~, rhs~) => Some(SelectI64And(result=new_value, lhs~, rhs~))
-    SelectI64AndImm16(lhs~, rhs~) =>
+    SelectI64And(lhs~, rhs~, ..) =>
+      Some(SelectI64And(result=new_value, lhs~, rhs~))
+    SelectI64AndImm16(lhs~, rhs~, ..) =>
       Some(SelectI64AndImm16(result=new_value, lhs~, rhs~))
-    SelectI64Or(lhs~, rhs~) => Some(SelectI64Or(result=new_value, lhs~, rhs~))
-    SelectI64OrImm16(lhs~, rhs~) =>
+    SelectI64Or(lhs~, rhs~, ..) =>
+      Some(SelectI64Or(result=new_value, lhs~, rhs~))
+    SelectI64OrImm16(lhs~, rhs~, ..) =>
       Some(SelectI64OrImm16(result=new_value, lhs~, rhs~))
-    SelectI64Eq(lhs~, rhs~) => Some(SelectI64Eq(result=new_value, lhs~, rhs~))
-    SelectI64EqImm16(lhs~, rhs~) =>
+    SelectI64Eq(lhs~, rhs~, ..) =>
+      Some(SelectI64Eq(result=new_value, lhs~, rhs~))
+    SelectI64EqImm16(lhs~, rhs~, ..) =>
       Some(SelectI64EqImm16(result=new_value, lhs~, rhs~))
-    SelectI64LtS(lhs~, rhs~) => Some(SelectI64LtS(result=new_value, lhs~, rhs~))
-    SelectI64LtSImm16Rhs(lhs~, rhs~) =>
+    SelectI64LtS(lhs~, rhs~, ..) =>
+      Some(SelectI64LtS(result=new_value, lhs~, rhs~))
+    SelectI64LtSImm16Rhs(lhs~, rhs~, ..) =>
       Some(SelectI64LtSImm16Rhs(result=new_value, lhs~, rhs~))
-    SelectI64LtU(lhs~, rhs~) => Some(SelectI64LtU(result=new_value, lhs~, rhs~))
-    SelectI64LtUImm16Rhs(lhs~, rhs~) =>
+    SelectI64LtU(lhs~, rhs~, ..) =>
+      Some(SelectI64LtU(result=new_value, lhs~, rhs~))
+    SelectI64LtUImm16Rhs(lhs~, rhs~, ..) =>
       Some(SelectI64LtUImm16Rhs(result=new_value, lhs~, rhs~))
-    SelectI64LeS(lhs~, rhs~) => Some(SelectI64LeS(result=new_value, lhs~, rhs~))
-    SelectI64LeSImm16Rhs(lhs~, rhs~) =>
+    SelectI64LeS(lhs~, rhs~, ..) =>
+      Some(SelectI64LeS(result=new_value, lhs~, rhs~))
+    SelectI64LeSImm16Rhs(lhs~, rhs~, ..) =>
       Some(SelectI64LeSImm16Rhs(result=new_value, lhs~, rhs~))
-    SelectI64LeU(lhs~, rhs~) => Some(SelectI64LeU(result=new_value, lhs~, rhs~))
-    SelectI64LeUImm16Rhs(lhs~, rhs~) =>
+    SelectI64LeU(lhs~, rhs~, ..) =>
+      Some(SelectI64LeU(result=new_value, lhs~, rhs~))
+    SelectI64LeUImm16Rhs(lhs~, rhs~, ..) =>
       Some(SelectI64LeUImm16Rhs(result=new_value, lhs~, rhs~))
-    SelectF32Eq(lhs~, rhs~) => Some(SelectF32Eq(result=new_value, lhs~, rhs~))
-    SelectF32Lt(lhs~, rhs~) => Some(SelectF32Lt(result=new_value, lhs~, rhs~))
-    SelectF32Le(lhs~, rhs~) => Some(SelectF32Le(result=new_value, lhs~, rhs~))
-    SelectF64Eq(lhs~, rhs~) => Some(SelectF64Eq(result=new_value, lhs~, rhs~))
-    SelectF64Lt(lhs~, rhs~) => Some(SelectF64Lt(result=new_value, lhs~, rhs~))
-    SelectF64Le(lhs~, rhs~) => Some(SelectF64Le(result=new_value, lhs~, rhs~))
-    RefFunc(func~) => Some(RefFunc(result=new_value, func~))
-    GlobalGet(global~) => Some(GlobalGet(result=new_value, global~))
-    Load32(offset_lo~) => Some(Load32(result=new_value, offset_lo~))
-    Load32At(address~) => Some(Load32At(result=new_value, address~))
-    Load32Offset16(ptr~, offset~) =>
+    SelectF32Eq(lhs~, rhs~, ..) =>
+      Some(SelectF32Eq(result=new_value, lhs~, rhs~))
+    SelectF32Lt(lhs~, rhs~, ..) =>
+      Some(SelectF32Lt(result=new_value, lhs~, rhs~))
+    SelectF32Le(lhs~, rhs~, ..) =>
+      Some(SelectF32Le(result=new_value, lhs~, rhs~))
+    SelectF64Eq(lhs~, rhs~, ..) =>
+      Some(SelectF64Eq(result=new_value, lhs~, rhs~))
+    SelectF64Lt(lhs~, rhs~, ..) =>
+      Some(SelectF64Lt(result=new_value, lhs~, rhs~))
+    SelectF64Le(lhs~, rhs~, ..) =>
+      Some(SelectF64Le(result=new_value, lhs~, rhs~))
+    RefFunc(func~, ..) => Some(RefFunc(result=new_value, func~))
+    GlobalGet(global~, ..) => Some(GlobalGet(result=new_value, global~))
+    Load32(offset_lo~, ..) => Some(Load32(result=new_value, offset_lo~))
+    Load32At(address~, ..) => Some(Load32At(result=new_value, address~))
+    Load32Offset16(ptr~, offset~, ..) =>
       Some(Load32Offset16(result=new_value, ptr~, offset~))
-    Load64(offset_lo~) => Some(Load64(result=new_value, offset_lo~))
-    Load64At(address~) => Some(Load64At(result=new_value, address~))
-    Load64Offset16(ptr~, offset~) =>
+    Load64(offset_lo~, ..) => Some(Load64(result=new_value, offset_lo~))
+    Load64At(address~, ..) => Some(Load64At(result=new_value, address~))
+    Load64Offset16(ptr~, offset~, ..) =>
       Some(Load64Offset16(result=new_value, ptr~, offset~))
-    I32Load8s(offset_lo~) => Some(I32Load8s(result=new_value, offset_lo~))
-    I32Load8sAt(address~) => Some(I32Load8sAt(result=new_value, address~))
-    I32Load8sOffset16(ptr~, offset~) =>
+    I32Load8s(offset_lo~, ..) => Some(I32Load8s(result=new_value, offset_lo~))
+    I32Load8sAt(address~, ..) => Some(I32Load8sAt(result=new_value, address~))
+    I32Load8sOffset16(ptr~, offset~, ..) =>
       Some(I32Load8sOffset16(result=new_value, ptr~, offset~))
-    I32Load8u(offset_lo~) => Some(I32Load8u(result=new_value, offset_lo~))
-    I32Load8uAt(address~) => Some(I32Load8uAt(result=new_value, address~))
-    I32Load8uOffset16(ptr~, offset~) =>
+    I32Load8u(offset_lo~, ..) => Some(I32Load8u(result=new_value, offset_lo~))
+    I32Load8uAt(address~, ..) => Some(I32Load8uAt(result=new_value, address~))
+    I32Load8uOffset16(ptr~, offset~, ..) =>
       Some(I32Load8uOffset16(result=new_value, ptr~, offset~))
-    I32Load16s(offset_lo~) => Some(I32Load16s(result=new_value, offset_lo~))
-    I32Load16sAt(address~) => Some(I32Load16sAt(result=new_value, address~))
-    I32Load16sOffset16(ptr~, offset~) =>
+    I32Load16s(offset_lo~, ..) => Some(I32Load16s(result=new_value, offset_lo~))
+    I32Load16sAt(address~, ..) => Some(I32Load16sAt(result=new_value, address~))
+    I32Load16sOffset16(ptr~, offset~, ..) =>
       Some(I32Load16sOffset16(result=new_value, ptr~, offset~))
-    I32Load16u(offset_lo~) => Some(I32Load16u(result=new_value, offset_lo~))
-    I32Load16uAt(address~) => Some(I32Load16uAt(result=new_value, address~))
-    I32Load16uOffset16(ptr~, offset~) =>
+    I32Load16u(offset_lo~, ..) => Some(I32Load16u(result=new_value, offset_lo~))
+    I32Load16uAt(address~, ..) => Some(I32Load16uAt(result=new_value, address~))
+    I32Load16uOffset16(ptr~, offset~, ..) =>
       Some(I32Load16uOffset16(result=new_value, ptr~, offset~))
-    I64Load8s(offset_lo~) => Some(I64Load8s(result=new_value, offset_lo~))
-    I64Load8sAt(address~) => Some(I64Load8sAt(result=new_value, address~))
-    I64Load8sOffset16(ptr~, offset~) =>
+    I64Load8s(offset_lo~, ..) => Some(I64Load8s(result=new_value, offset_lo~))
+    I64Load8sAt(address~, ..) => Some(I64Load8sAt(result=new_value, address~))
+    I64Load8sOffset16(ptr~, offset~, ..) =>
       Some(I64Load8sOffset16(result=new_value, ptr~, offset~))
-    I64Load8u(offset_lo~) => Some(I64Load8u(result=new_value, offset_lo~))
-    I64Load8uAt(address~) => Some(I64Load8uAt(result=new_value, address~))
-    I64Load8uOffset16(ptr~, offset~) =>
+    I64Load8u(offset_lo~, ..) => Some(I64Load8u(result=new_value, offset_lo~))
+    I64Load8uAt(address~, ..) => Some(I64Load8uAt(result=new_value, address~))
+    I64Load8uOffset16(ptr~, offset~, ..) =>
       Some(I64Load8uOffset16(result=new_value, ptr~, offset~))
-    I64Load16s(offset_lo~) => Some(I64Load16s(result=new_value, offset_lo~))
-    I64Load16sAt(address~) => Some(I64Load16sAt(result=new_value, address~))
-    I64Load16sOffset16(ptr~, offset~) =>
+    I64Load16s(offset_lo~, ..) => Some(I64Load16s(result=new_value, offset_lo~))
+    I64Load16sAt(address~, ..) => Some(I64Load16sAt(result=new_value, address~))
+    I64Load16sOffset16(ptr~, offset~, ..) =>
       Some(I64Load16sOffset16(result=new_value, ptr~, offset~))
-    I64Load16u(offset_lo~) => Some(I64Load16u(result=new_value, offset_lo~))
-    I64Load16uAt(address~) => Some(I64Load16uAt(result=new_value, address~))
-    I64Load16uOffset16(ptr~, offset~) =>
+    I64Load16u(offset_lo~, ..) => Some(I64Load16u(result=new_value, offset_lo~))
+    I64Load16uAt(address~, ..) => Some(I64Load16uAt(result=new_value, address~))
+    I64Load16uOffset16(ptr~, offset~, ..) =>
       Some(I64Load16uOffset16(result=new_value, ptr~, offset~))
-    I64Load32s(offset_lo~) => Some(I64Load32s(result=new_value, offset_lo~))
-    I64Load32sAt(address~) => Some(I64Load32sAt(result=new_value, address~))
-    I64Load32sOffset16(ptr~, offset~) =>
+    I64Load32s(offset_lo~, ..) => Some(I64Load32s(result=new_value, offset_lo~))
+    I64Load32sAt(address~, ..) => Some(I64Load32sAt(result=new_value, address~))
+    I64Load32sOffset16(ptr~, offset~, ..) =>
       Some(I64Load32sOffset16(result=new_value, ptr~, offset~))
-    I64Load32u(offset_lo~) => Some(I64Load32u(result=new_value, offset_lo~))
-    I64Load32uAt(address~) => Some(I64Load32uAt(result=new_value, address~))
-    I64Load32uOffset16(ptr~, offset~) =>
+    I64Load32u(offset_lo~, ..) => Some(I64Load32u(result=new_value, offset_lo~))
+    I64Load32uAt(address~, ..) => Some(I64Load32uAt(result=new_value, address~))
+    I64Load32uOffset16(ptr~, offset~, ..) =>
       Some(I64Load32uOffset16(result=new_value, ptr~, offset~))
-    I32Eq(lhs~, rhs~) => Some(I32Eq(result=new_value, lhs~, rhs~))
-    I32EqImm16(lhs~, rhs~) => Some(I32EqImm16(result=new_value, lhs~, rhs~))
-    I32Ne(lhs~, rhs~) => Some(I32Ne(result=new_value, lhs~, rhs~))
-    I32NeImm16(lhs~, rhs~) => Some(I32NeImm16(result=new_value, lhs~, rhs~))
-    I32LtS(lhs~, rhs~) => Some(I32LtS(result=new_value, lhs~, rhs~))
-    I32LtSImm16Lhs(lhs~, rhs~) =>
+    I32Eq(lhs~, rhs~, ..) => Some(I32Eq(result=new_value, lhs~, rhs~))
+    I32EqImm16(lhs~, rhs~, ..) => Some(I32EqImm16(result=new_value, lhs~, rhs~))
+    I32Ne(lhs~, rhs~, ..) => Some(I32Ne(result=new_value, lhs~, rhs~))
+    I32NeImm16(lhs~, rhs~, ..) => Some(I32NeImm16(result=new_value, lhs~, rhs~))
+    I32LtS(lhs~, rhs~, ..) => Some(I32LtS(result=new_value, lhs~, rhs~))
+    I32LtSImm16Lhs(lhs~, rhs~, ..) =>
       Some(I32LtSImm16Lhs(result=new_value, lhs~, rhs~))
-    I32LtSImm16Rhs(lhs~, rhs~) =>
+    I32LtSImm16Rhs(lhs~, rhs~, ..) =>
       Some(I32LtSImm16Rhs(result=new_value, lhs~, rhs~))
-    I32LtU(lhs~, rhs~) => Some(I32LtU(result=new_value, lhs~, rhs~))
-    I32LtUImm16Lhs(lhs~, rhs~) =>
+    I32LtU(lhs~, rhs~, ..) => Some(I32LtU(result=new_value, lhs~, rhs~))
+    I32LtUImm16Lhs(lhs~, rhs~, ..) =>
       Some(I32LtUImm16Lhs(result=new_value, lhs~, rhs~))
-    I32LtUImm16Rhs(lhs~, rhs~) =>
+    I32LtUImm16Rhs(lhs~, rhs~, ..) =>
       Some(I32LtUImm16Rhs(result=new_value, lhs~, rhs~))
-    I32LeS(lhs~, rhs~) => Some(I32LeS(result=new_value, lhs~, rhs~))
-    I32LeSImm16Lhs(lhs~, rhs~) =>
+    I32LeS(lhs~, rhs~, ..) => Some(I32LeS(result=new_value, lhs~, rhs~))
+    I32LeSImm16Lhs(lhs~, rhs~, ..) =>
       Some(I32LeSImm16Lhs(result=new_value, lhs~, rhs~))
-    I32LeSImm16Rhs(lhs~, rhs~) =>
+    I32LeSImm16Rhs(lhs~, rhs~, ..) =>
       Some(I32LeSImm16Rhs(result=new_value, lhs~, rhs~))
-    I32LeU(lhs~, rhs~) => Some(I32LeU(result=new_value, lhs~, rhs~))
-    I32LeUImm16Lhs(lhs~, rhs~) =>
+    I32LeU(lhs~, rhs~, ..) => Some(I32LeU(result=new_value, lhs~, rhs~))
+    I32LeUImm16Lhs(lhs~, rhs~, ..) =>
       Some(I32LeUImm16Lhs(result=new_value, lhs~, rhs~))
-    I32LeUImm16Rhs(lhs~, rhs~) =>
+    I32LeUImm16Rhs(lhs~, rhs~, ..) =>
       Some(I32LeUImm16Rhs(result=new_value, lhs~, rhs~))
-    I64Eq(lhs~, rhs~) => Some(I64Eq(result=new_value, lhs~, rhs~))
-    I64EqImm16(lhs~, rhs~) => Some(I64EqImm16(result=new_value, lhs~, rhs~))
-    I64Ne(lhs~, rhs~) => Some(I64Ne(result=new_value, lhs~, rhs~))
-    I64NeImm16(lhs~, rhs~) => Some(I64NeImm16(result=new_value, lhs~, rhs~))
-    I64LtS(lhs~, rhs~) => Some(I64LtS(result=new_value, lhs~, rhs~))
-    I64LtSImm16Lhs(lhs~, rhs~) =>
+    I64Eq(lhs~, rhs~, ..) => Some(I64Eq(result=new_value, lhs~, rhs~))
+    I64EqImm16(lhs~, rhs~, ..) => Some(I64EqImm16(result=new_value, lhs~, rhs~))
+    I64Ne(lhs~, rhs~, ..) => Some(I64Ne(result=new_value, lhs~, rhs~))
+    I64NeImm16(lhs~, rhs~, ..) => Some(I64NeImm16(result=new_value, lhs~, rhs~))
+    I64LtS(lhs~, rhs~, ..) => Some(I64LtS(result=new_value, lhs~, rhs~))
+    I64LtSImm16Lhs(lhs~, rhs~, ..) =>
       Some(I64LtSImm16Lhs(result=new_value, lhs~, rhs~))
-    I64LtSImm16Rhs(lhs~, rhs~) =>
+    I64LtSImm16Rhs(lhs~, rhs~, ..) =>
       Some(I64LtSImm16Rhs(result=new_value, lhs~, rhs~))
-    I64LtU(lhs~, rhs~) => Some(I64LtU(result=new_value, lhs~, rhs~))
-    I64LtUImm16Lhs(lhs~, rhs~) =>
+    I64LtU(lhs~, rhs~, ..) => Some(I64LtU(result=new_value, lhs~, rhs~))
+    I64LtUImm16Lhs(lhs~, rhs~, ..) =>
       Some(I64LtUImm16Lhs(result=new_value, lhs~, rhs~))
-    I64LtUImm16Rhs(lhs~, rhs~) =>
+    I64LtUImm16Rhs(lhs~, rhs~, ..) =>
       Some(I64LtUImm16Rhs(result=new_value, lhs~, rhs~))
-    I64LeS(lhs~, rhs~) => Some(I64LeS(result=new_value, lhs~, rhs~))
-    I64LeSImm16Lhs(lhs~, rhs~) =>
+    I64LeS(lhs~, rhs~, ..) => Some(I64LeS(result=new_value, lhs~, rhs~))
+    I64LeSImm16Lhs(lhs~, rhs~, ..) =>
       Some(I64LeSImm16Lhs(result=new_value, lhs~, rhs~))
-    I64LeSImm16Rhs(lhs~, rhs~) =>
+    I64LeSImm16Rhs(lhs~, rhs~, ..) =>
       Some(I64LeSImm16Rhs(result=new_value, lhs~, rhs~))
-    I64LeU(lhs~, rhs~) => Some(I64LeU(result=new_value, lhs~, rhs~))
-    I64LeUImm16Lhs(lhs~, rhs~) =>
+    I64LeU(lhs~, rhs~, ..) => Some(I64LeU(result=new_value, lhs~, rhs~))
+    I64LeUImm16Lhs(lhs~, rhs~, ..) =>
       Some(I64LeUImm16Lhs(result=new_value, lhs~, rhs~))
-    I64LeUImm16Rhs(lhs~, rhs~) =>
+    I64LeUImm16Rhs(lhs~, rhs~, ..) =>
       Some(I64LeUImm16Rhs(result=new_value, lhs~, rhs~))
-    F32Eq(lhs~, rhs~) => Some(F32Eq(result=new_value, lhs~, rhs~))
-    F32Ne(lhs~, rhs~) => Some(F32Ne(result=new_value, lhs~, rhs~))
-    F32Lt(lhs~, rhs~) => Some(F32Lt(result=new_value, lhs~, rhs~))
-    F32Le(lhs~, rhs~) => Some(F32Le(result=new_value, lhs~, rhs~))
-    F32NotLt(lhs~, rhs~) => Some(F32NotLt(result=new_value, lhs~, rhs~))
-    F32NotLe(lhs~, rhs~) => Some(F32NotLe(result=new_value, lhs~, rhs~))
-    F64Eq(lhs~, rhs~) => Some(F64Eq(result=new_value, lhs~, rhs~))
-    F64Ne(lhs~, rhs~) => Some(F64Ne(result=new_value, lhs~, rhs~))
-    F64Lt(lhs~, rhs~) => Some(F64Lt(result=new_value, lhs~, rhs~))
-    F64Le(lhs~, rhs~) => Some(F64Le(result=new_value, lhs~, rhs~))
-    F64NotLt(lhs~, rhs~) => Some(F64NotLt(result=new_value, lhs~, rhs~))
-    F64NotLe(lhs~, rhs~) => Some(F64NotLe(result=new_value, lhs~, rhs~))
-    I32Clz(input~) => Some(I32Clz(result=new_value, input~))
-    I32Ctz(input~) => Some(I32Ctz(result=new_value, input~))
-    I32Popcnt(input~) => Some(I32Popcnt(result=new_value, input~))
-    I32Add(lhs~, rhs~) => Some(I32Add(result=new_value, lhs~, rhs~))
-    I32AddImm16(lhs~, rhs~) => Some(I32AddImm16(result=new_value, lhs~, rhs~))
-    I32Sub(lhs~, rhs~) => Some(I32Sub(result=new_value, lhs~, rhs~))
-    I32SubImm16Lhs(lhs~, rhs~) =>
+    F32Eq(lhs~, rhs~, ..) => Some(F32Eq(result=new_value, lhs~, rhs~))
+    F32Ne(lhs~, rhs~, ..) => Some(F32Ne(result=new_value, lhs~, rhs~))
+    F32Lt(lhs~, rhs~, ..) => Some(F32Lt(result=new_value, lhs~, rhs~))
+    F32Le(lhs~, rhs~, ..) => Some(F32Le(result=new_value, lhs~, rhs~))
+    F32NotLt(lhs~, rhs~, ..) => Some(F32NotLt(result=new_value, lhs~, rhs~))
+    F32NotLe(lhs~, rhs~, ..) => Some(F32NotLe(result=new_value, lhs~, rhs~))
+    F64Eq(lhs~, rhs~, ..) => Some(F64Eq(result=new_value, lhs~, rhs~))
+    F64Ne(lhs~, rhs~, ..) => Some(F64Ne(result=new_value, lhs~, rhs~))
+    F64Lt(lhs~, rhs~, ..) => Some(F64Lt(result=new_value, lhs~, rhs~))
+    F64Le(lhs~, rhs~, ..) => Some(F64Le(result=new_value, lhs~, rhs~))
+    F64NotLt(lhs~, rhs~, ..) => Some(F64NotLt(result=new_value, lhs~, rhs~))
+    F64NotLe(lhs~, rhs~, ..) => Some(F64NotLe(result=new_value, lhs~, rhs~))
+    I32Clz(input~, ..) => Some(I32Clz(result=new_value, input~))
+    I32Ctz(input~, ..) => Some(I32Ctz(result=new_value, input~))
+    I32Popcnt(input~, ..) => Some(I32Popcnt(result=new_value, input~))
+    I32Add(lhs~, rhs~, ..) => Some(I32Add(result=new_value, lhs~, rhs~))
+    I32AddImm16(lhs~, rhs~, ..) =>
+      Some(I32AddImm16(result=new_value, lhs~, rhs~))
+    I32Sub(lhs~, rhs~, ..) => Some(I32Sub(result=new_value, lhs~, rhs~))
+    I32SubImm16Lhs(lhs~, rhs~, ..) =>
       Some(I32SubImm16Lhs(result=new_value, lhs~, rhs~))
-    I32Mul(lhs~, rhs~) => Some(I32Mul(result=new_value, lhs~, rhs~))
-    I32MulImm16(lhs~, rhs~) => Some(I32MulImm16(result=new_value, lhs~, rhs~))
-    I32DivS(lhs~, rhs~) => Some(I32DivS(result=new_value, lhs~, rhs~))
-    I32DivSImm16Rhs(lhs~, rhs~) =>
+    I32Mul(lhs~, rhs~, ..) => Some(I32Mul(result=new_value, lhs~, rhs~))
+    I32MulImm16(lhs~, rhs~, ..) =>
+      Some(I32MulImm16(result=new_value, lhs~, rhs~))
+    I32DivS(lhs~, rhs~, ..) => Some(I32DivS(result=new_value, lhs~, rhs~))
+    I32DivSImm16Rhs(lhs~, rhs~, ..) =>
       Some(I32DivSImm16Rhs(result=new_value, lhs~, rhs~))
-    I32DivSImm16Lhs(lhs~, rhs~) =>
+    I32DivSImm16Lhs(lhs~, rhs~, ..) =>
       Some(I32DivSImm16Lhs(result=new_value, lhs~, rhs~))
-    I32DivU(lhs~, rhs~) => Some(I32DivU(result=new_value, lhs~, rhs~))
-    I32DivUImm16Rhs(lhs~, rhs~) =>
+    I32DivU(lhs~, rhs~, ..) => Some(I32DivU(result=new_value, lhs~, rhs~))
+    I32DivUImm16Rhs(lhs~, rhs~, ..) =>
       Some(I32DivUImm16Rhs(result=new_value, lhs~, rhs~))
-    I32DivUImm16Lhs(lhs~, rhs~) =>
+    I32DivUImm16Lhs(lhs~, rhs~, ..) =>
       Some(I32DivUImm16Lhs(result=new_value, lhs~, rhs~))
-    I32RemS(lhs~, rhs~) => Some(I32RemS(result=new_value, lhs~, rhs~))
-    I32RemSImm16Rhs(lhs~, rhs~) =>
+    I32RemS(lhs~, rhs~, ..) => Some(I32RemS(result=new_value, lhs~, rhs~))
+    I32RemSImm16Rhs(lhs~, rhs~, ..) =>
       Some(I32RemSImm16Rhs(result=new_value, lhs~, rhs~))
-    I32RemSImm16Lhs(lhs~, rhs~) =>
+    I32RemSImm16Lhs(lhs~, rhs~, ..) =>
       Some(I32RemSImm16Lhs(result=new_value, lhs~, rhs~))
-    I32RemU(lhs~, rhs~) => Some(I32RemU(result=new_value, lhs~, rhs~))
-    I32RemUImm16Rhs(lhs~, rhs~) =>
+    I32RemU(lhs~, rhs~, ..) => Some(I32RemU(result=new_value, lhs~, rhs~))
+    I32RemUImm16Rhs(lhs~, rhs~, ..) =>
       Some(I32RemUImm16Rhs(result=new_value, lhs~, rhs~))
-    I32RemUImm16Lhs(lhs~, rhs~) =>
+    I32RemUImm16Lhs(lhs~, rhs~, ..) =>
       Some(I32RemUImm16Lhs(result=new_value, lhs~, rhs~))
-    I32BitAnd(lhs~, rhs~) => Some(I32BitAnd(result=new_value, lhs~, rhs~))
-    I32BitAndImm16(lhs~, rhs~) =>
+    I32BitAnd(lhs~, rhs~, ..) => Some(I32BitAnd(result=new_value, lhs~, rhs~))
+    I32BitAndImm16(lhs~, rhs~, ..) =>
       Some(I32BitAndImm16(result=new_value, lhs~, rhs~))
-    I32BitOr(lhs~, rhs~) => Some(I32BitOr(result=new_value, lhs~, rhs~))
-    I32BitOrImm16(lhs~, rhs~) =>
+    I32BitOr(lhs~, rhs~, ..) => Some(I32BitOr(result=new_value, lhs~, rhs~))
+    I32BitOrImm16(lhs~, rhs~, ..) =>
       Some(I32BitOrImm16(result=new_value, lhs~, rhs~))
-    I32BitXor(lhs~, rhs~) => Some(I32BitXor(result=new_value, lhs~, rhs~))
-    I32BitXorImm16(lhs~, rhs~) =>
+    I32BitXor(lhs~, rhs~, ..) => Some(I32BitXor(result=new_value, lhs~, rhs~))
+    I32BitXorImm16(lhs~, rhs~, ..) =>
       Some(I32BitXorImm16(result=new_value, lhs~, rhs~))
-    I32And(lhs~, rhs~) => Some(I32And(result=new_value, lhs~, rhs~))
-    I32AndImm16(lhs~, rhs~) => Some(I32AndImm16(result=new_value, lhs~, rhs~))
-    I32Or(lhs~, rhs~) => Some(I32Or(result=new_value, lhs~, rhs~))
-    I32OrImm16(lhs~, rhs~) => Some(I32OrImm16(result=new_value, lhs~, rhs~))
-    I32Nand(lhs~, rhs~) => Some(I32Nand(result=new_value, lhs~, rhs~))
-    I32NandImm16(lhs~, rhs~) => Some(I32NandImm16(result=new_value, lhs~, rhs~))
-    I32Nor(lhs~, rhs~) => Some(I32Nor(result=new_value, lhs~, rhs~))
-    I32NorImm16(lhs~, rhs~) => Some(I32NorImm16(result=new_value, lhs~, rhs~))
-    I32Shl(lhs~, rhs~) => Some(I32Shl(result=new_value, lhs~, rhs~))
-    I32ShlBy(lhs~, rhs~) => Some(I32ShlBy(result=new_value, lhs~, rhs~))
-    I32ShlImm16(lhs~, rhs~) => Some(I32ShlImm16(result=new_value, lhs~, rhs~))
-    I32ShrU(lhs~, rhs~) => Some(I32ShrU(result=new_value, lhs~, rhs~))
-    I32ShrUBy(lhs~, rhs~) => Some(I32ShrUBy(result=new_value, lhs~, rhs~))
-    I32ShrUImm16(lhs~, rhs~) => Some(I32ShrUImm16(result=new_value, lhs~, rhs~))
-    I32ShrS(lhs~, rhs~) => Some(I32ShrS(result=new_value, lhs~, rhs~))
-    I32ShrSBy(lhs~, rhs~) => Some(I32ShrSBy(result=new_value, lhs~, rhs~))
-    I32ShrSImm16(lhs~, rhs~) => Some(I32ShrSImm16(result=new_value, lhs~, rhs~))
-    I32Rotl(lhs~, rhs~) => Some(I32Rotl(result=new_value, lhs~, rhs~))
-    I32RotlBy(lhs~, rhs~) => Some(I32RotlBy(result=new_value, lhs~, rhs~))
-    I32RotlImm16(lhs~, rhs~) => Some(I32RotlImm16(result=new_value, lhs~, rhs~))
-    I32Rotr(lhs~, rhs~) => Some(I32Rotr(result=new_value, lhs~, rhs~))
-    I32RotrBy(lhs~, rhs~) => Some(I32RotrBy(result=new_value, lhs~, rhs~))
-    I32RotrImm16(lhs~, rhs~) => Some(I32RotrImm16(result=new_value, lhs~, rhs~))
-    I64Clz(input~) => Some(I64Clz(result=new_value, input~))
-    I64Ctz(input~) => Some(I64Ctz(result=new_value, input~))
-    I64Popcnt(input~) => Some(I64Popcnt(result=new_value, input~))
-    I64Add(lhs~, rhs~) => Some(I64Add(result=new_value, lhs~, rhs~))
-    I64AddImm16(lhs~, rhs~) => Some(I64AddImm16(result=new_value, lhs~, rhs~))
-    I64Sub(lhs~, rhs~) => Some(I64Sub(result=new_value, lhs~, rhs~))
-    I64SubImm16Lhs(lhs~, rhs~) =>
+    I32And(lhs~, rhs~, ..) => Some(I32And(result=new_value, lhs~, rhs~))
+    I32AndImm16(lhs~, rhs~, ..) =>
+      Some(I32AndImm16(result=new_value, lhs~, rhs~))
+    I32Or(lhs~, rhs~, ..) => Some(I32Or(result=new_value, lhs~, rhs~))
+    I32OrImm16(lhs~, rhs~, ..) => Some(I32OrImm16(result=new_value, lhs~, rhs~))
+    I32Nand(lhs~, rhs~, ..) => Some(I32Nand(result=new_value, lhs~, rhs~))
+    I32NandImm16(lhs~, rhs~, ..) =>
+      Some(I32NandImm16(result=new_value, lhs~, rhs~))
+    I32Nor(lhs~, rhs~, ..) => Some(I32Nor(result=new_value, lhs~, rhs~))
+    I32NorImm16(lhs~, rhs~, ..) =>
+      Some(I32NorImm16(result=new_value, lhs~, rhs~))
+    I32Shl(lhs~, rhs~, ..) => Some(I32Shl(result=new_value, lhs~, rhs~))
+    I32ShlBy(lhs~, rhs~, ..) => Some(I32ShlBy(result=new_value, lhs~, rhs~))
+    I32ShlImm16(lhs~, rhs~, ..) =>
+      Some(I32ShlImm16(result=new_value, lhs~, rhs~))
+    I32ShrU(lhs~, rhs~, ..) => Some(I32ShrU(result=new_value, lhs~, rhs~))
+    I32ShrUBy(lhs~, rhs~, ..) => Some(I32ShrUBy(result=new_value, lhs~, rhs~))
+    I32ShrUImm16(lhs~, rhs~, ..) =>
+      Some(I32ShrUImm16(result=new_value, lhs~, rhs~))
+    I32ShrS(lhs~, rhs~, ..) => Some(I32ShrS(result=new_value, lhs~, rhs~))
+    I32ShrSBy(lhs~, rhs~, ..) => Some(I32ShrSBy(result=new_value, lhs~, rhs~))
+    I32ShrSImm16(lhs~, rhs~, ..) =>
+      Some(I32ShrSImm16(result=new_value, lhs~, rhs~))
+    I32Rotl(lhs~, rhs~, ..) => Some(I32Rotl(result=new_value, lhs~, rhs~))
+    I32RotlBy(lhs~, rhs~, ..) => Some(I32RotlBy(result=new_value, lhs~, rhs~))
+    I32RotlImm16(lhs~, rhs~, ..) =>
+      Some(I32RotlImm16(result=new_value, lhs~, rhs~))
+    I32Rotr(lhs~, rhs~, ..) => Some(I32Rotr(result=new_value, lhs~, rhs~))
+    I32RotrBy(lhs~, rhs~, ..) => Some(I32RotrBy(result=new_value, lhs~, rhs~))
+    I32RotrImm16(lhs~, rhs~, ..) =>
+      Some(I32RotrImm16(result=new_value, lhs~, rhs~))
+    I64Clz(input~, ..) => Some(I64Clz(result=new_value, input~))
+    I64Ctz(input~, ..) => Some(I64Ctz(result=new_value, input~))
+    I64Popcnt(input~, ..) => Some(I64Popcnt(result=new_value, input~))
+    I64Add(lhs~, rhs~, ..) => Some(I64Add(result=new_value, lhs~, rhs~))
+    I64AddImm16(lhs~, rhs~, ..) =>
+      Some(I64AddImm16(result=new_value, lhs~, rhs~))
+    I64Sub(lhs~, rhs~, ..) => Some(I64Sub(result=new_value, lhs~, rhs~))
+    I64SubImm16Lhs(lhs~, rhs~, ..) =>
       Some(I64SubImm16Lhs(result=new_value, lhs~, rhs~))
-    I64Mul(lhs~, rhs~) => Some(I64Mul(result=new_value, lhs~, rhs~))
-    I64MulImm16(lhs~, rhs~) => Some(I64MulImm16(result=new_value, lhs~, rhs~))
-    I64DivS(lhs~, rhs~) => Some(I64DivS(result=new_value, lhs~, rhs~))
-    I64DivSImm16Rhs(lhs~, rhs~) =>
+    I64Mul(lhs~, rhs~, ..) => Some(I64Mul(result=new_value, lhs~, rhs~))
+    I64MulImm16(lhs~, rhs~, ..) =>
+      Some(I64MulImm16(result=new_value, lhs~, rhs~))
+    I64DivS(lhs~, rhs~, ..) => Some(I64DivS(result=new_value, lhs~, rhs~))
+    I64DivSImm16Rhs(lhs~, rhs~, ..) =>
       Some(I64DivSImm16Rhs(result=new_value, lhs~, rhs~))
-    I64DivSImm16Lhs(lhs~, rhs~) =>
+    I64DivSImm16Lhs(lhs~, rhs~, ..) =>
       Some(I64DivSImm16Lhs(result=new_value, lhs~, rhs~))
-    I64DivU(lhs~, rhs~) => Some(I64DivU(result=new_value, lhs~, rhs~))
-    I64DivUImm16Rhs(lhs~, rhs~) =>
+    I64DivU(lhs~, rhs~, ..) => Some(I64DivU(result=new_value, lhs~, rhs~))
+    I64DivUImm16Rhs(lhs~, rhs~, ..) =>
       Some(I64DivUImm16Rhs(result=new_value, lhs~, rhs~))
-    I64DivUImm16Lhs(lhs~, rhs~) =>
+    I64DivUImm16Lhs(lhs~, rhs~, ..) =>
       Some(I64DivUImm16Lhs(result=new_value, lhs~, rhs~))
-    I64RemS(lhs~, rhs~) => Some(I64RemS(result=new_value, lhs~, rhs~))
-    I64RemSImm16Rhs(lhs~, rhs~) =>
+    I64RemS(lhs~, rhs~, ..) => Some(I64RemS(result=new_value, lhs~, rhs~))
+    I64RemSImm16Rhs(lhs~, rhs~, ..) =>
       Some(I64RemSImm16Rhs(result=new_value, lhs~, rhs~))
-    I64RemSImm16Lhs(lhs~, rhs~) =>
+    I64RemSImm16Lhs(lhs~, rhs~, ..) =>
       Some(I64RemSImm16Lhs(result=new_value, lhs~, rhs~))
-    I64RemU(lhs~, rhs~) => Some(I64RemU(result=new_value, lhs~, rhs~))
-    I64RemUImm16Rhs(lhs~, rhs~) =>
+    I64RemU(lhs~, rhs~, ..) => Some(I64RemU(result=new_value, lhs~, rhs~))
+    I64RemUImm16Rhs(lhs~, rhs~, ..) =>
       Some(I64RemUImm16Rhs(result=new_value, lhs~, rhs~))
-    I64RemUImm16Lhs(lhs~, rhs~) =>
+    I64RemUImm16Lhs(lhs~, rhs~, ..) =>
       Some(I64RemUImm16Lhs(result=new_value, lhs~, rhs~))
-    I64BitAnd(lhs~, rhs~) => Some(I64BitAnd(result=new_value, lhs~, rhs~))
-    I64BitAndImm16(lhs~, rhs~) =>
+    I64BitAnd(lhs~, rhs~, ..) => Some(I64BitAnd(result=new_value, lhs~, rhs~))
+    I64BitAndImm16(lhs~, rhs~, ..) =>
       Some(I64BitAndImm16(result=new_value, lhs~, rhs~))
-    I64BitOr(lhs~, rhs~) => Some(I64BitOr(result=new_value, lhs~, rhs~))
-    I64BitOrImm16(lhs~, rhs~) =>
+    I64BitOr(lhs~, rhs~, ..) => Some(I64BitOr(result=new_value, lhs~, rhs~))
+    I64BitOrImm16(lhs~, rhs~, ..) =>
       Some(I64BitOrImm16(result=new_value, lhs~, rhs~))
-    I64BitXor(lhs~, rhs~) => Some(I64BitXor(result=new_value, lhs~, rhs~))
-    I64BitXorImm16(lhs~, rhs~) =>
+    I64BitXor(lhs~, rhs~, ..) => Some(I64BitXor(result=new_value, lhs~, rhs~))
+    I64BitXorImm16(lhs~, rhs~, ..) =>
       Some(I64BitXorImm16(result=new_value, lhs~, rhs~))
-    I64And(lhs~, rhs~) => Some(I64And(result=new_value, lhs~, rhs~))
-    I64AndImm16(lhs~, rhs~) => Some(I64AndImm16(result=new_value, lhs~, rhs~))
-    I64Or(lhs~, rhs~) => Some(I64Or(result=new_value, lhs~, rhs~))
-    I64OrImm16(lhs~, rhs~) => Some(I64OrImm16(result=new_value, lhs~, rhs~))
-    I64Nand(lhs~, rhs~) => Some(I64Nand(result=new_value, lhs~, rhs~))
-    I64NandImm16(lhs~, rhs~) => Some(I64NandImm16(result=new_value, lhs~, rhs~))
-    I64Nor(lhs~, rhs~) => Some(I64Nor(result=new_value, lhs~, rhs~))
-    I64NorImm16(lhs~, rhs~) => Some(I64NorImm16(result=new_value, lhs~, rhs~))
-    I64Shl(lhs~, rhs~) => Some(I64Shl(result=new_value, lhs~, rhs~))
-    I64ShlBy(lhs~, rhs~) => Some(I64ShlBy(result=new_value, lhs~, rhs~))
-    I64ShlImm16(lhs~, rhs~) => Some(I64ShlImm16(result=new_value, lhs~, rhs~))
-    I64ShrU(lhs~, rhs~) => Some(I64ShrU(result=new_value, lhs~, rhs~))
-    I64ShrUBy(lhs~, rhs~) => Some(I64ShrUBy(result=new_value, lhs~, rhs~))
-    I64ShrUImm16(lhs~, rhs~) => Some(I64ShrUImm16(result=new_value, lhs~, rhs~))
-    I64ShrS(lhs~, rhs~) => Some(I64ShrS(result=new_value, lhs~, rhs~))
-    I64ShrSBy(lhs~, rhs~) => Some(I64ShrSBy(result=new_value, lhs~, rhs~))
-    I64ShrSImm16(lhs~, rhs~) => Some(I64ShrSImm16(result=new_value, lhs~, rhs~))
-    I64Rotl(lhs~, rhs~) => Some(I64Rotl(result=new_value, lhs~, rhs~))
-    I64RotlBy(lhs~, rhs~) => Some(I64RotlBy(result=new_value, lhs~, rhs~))
-    I64RotlImm16(lhs~, rhs~) => Some(I64RotlImm16(result=new_value, lhs~, rhs~))
-    I64Rotr(lhs~, rhs~) => Some(I64Rotr(result=new_value, lhs~, rhs~))
-    I64RotrBy(lhs~, rhs~) => Some(I64RotrBy(result=new_value, lhs~, rhs~))
-    I64RotrImm16(lhs~, rhs~) => Some(I64RotrImm16(result=new_value, lhs~, rhs~))
-    I32WrapI64(input~) => Some(I32WrapI64(result=new_value, input~))
-    I32Extend8S(input~) => Some(I32Extend8S(result=new_value, input~))
-    I32Extend16S(input~) => Some(I32Extend16S(result=new_value, input~))
-    I64Extend8S(input~) => Some(I64Extend8S(result=new_value, input~))
-    I64Extend16S(input~) => Some(I64Extend16S(result=new_value, input~))
-    I64Extend32S(input~) => Some(I64Extend32S(result=new_value, input~))
-    F32Abs(input~) => Some(F32Abs(result=new_value, input~))
-    F32Neg(input~) => Some(F32Neg(result=new_value, input~))
-    F32Ceil(input~) => Some(F32Ceil(result=new_value, input~))
-    F32Floor(input~) => Some(F32Floor(result=new_value, input~))
-    F32Trunc(input~) => Some(F32Trunc(result=new_value, input~))
-    F32Nearest(input~) => Some(F32Nearest(result=new_value, input~))
-    F32Sqrt(input~) => Some(F32Sqrt(result=new_value, input~))
-    F32Add(lhs~, rhs~) => Some(F32Add(result=new_value, lhs~, rhs~))
-    F32Sub(lhs~, rhs~) => Some(F32Sub(result=new_value, lhs~, rhs~))
-    F32Mul(lhs~, rhs~) => Some(F32Mul(result=new_value, lhs~, rhs~))
-    F32Div(lhs~, rhs~) => Some(F32Div(result=new_value, lhs~, rhs~))
-    F32Min(lhs~, rhs~) => Some(F32Min(result=new_value, lhs~, rhs~))
-    F32Max(lhs~, rhs~) => Some(F32Max(result=new_value, lhs~, rhs~))
-    F32Copysign(lhs~, rhs~) => Some(F32Copysign(result=new_value, lhs~, rhs~))
-    F32CopysignImm(lhs~, rhs~) =>
+    I64And(lhs~, rhs~, ..) => Some(I64And(result=new_value, lhs~, rhs~))
+    I64AndImm16(lhs~, rhs~, ..) =>
+      Some(I64AndImm16(result=new_value, lhs~, rhs~))
+    I64Or(lhs~, rhs~, ..) => Some(I64Or(result=new_value, lhs~, rhs~))
+    I64OrImm16(lhs~, rhs~, ..) => Some(I64OrImm16(result=new_value, lhs~, rhs~))
+    I64Nand(lhs~, rhs~, ..) => Some(I64Nand(result=new_value, lhs~, rhs~))
+    I64NandImm16(lhs~, rhs~, ..) =>
+      Some(I64NandImm16(result=new_value, lhs~, rhs~))
+    I64Nor(lhs~, rhs~, ..) => Some(I64Nor(result=new_value, lhs~, rhs~))
+    I64NorImm16(lhs~, rhs~, ..) =>
+      Some(I64NorImm16(result=new_value, lhs~, rhs~))
+    I64Shl(lhs~, rhs~, ..) => Some(I64Shl(result=new_value, lhs~, rhs~))
+    I64ShlBy(lhs~, rhs~, ..) => Some(I64ShlBy(result=new_value, lhs~, rhs~))
+    I64ShlImm16(lhs~, rhs~, ..) =>
+      Some(I64ShlImm16(result=new_value, lhs~, rhs~))
+    I64ShrU(lhs~, rhs~, ..) => Some(I64ShrU(result=new_value, lhs~, rhs~))
+    I64ShrUBy(lhs~, rhs~, ..) => Some(I64ShrUBy(result=new_value, lhs~, rhs~))
+    I64ShrUImm16(lhs~, rhs~, ..) =>
+      Some(I64ShrUImm16(result=new_value, lhs~, rhs~))
+    I64ShrS(lhs~, rhs~, ..) => Some(I64ShrS(result=new_value, lhs~, rhs~))
+    I64ShrSBy(lhs~, rhs~, ..) => Some(I64ShrSBy(result=new_value, lhs~, rhs~))
+    I64ShrSImm16(lhs~, rhs~, ..) =>
+      Some(I64ShrSImm16(result=new_value, lhs~, rhs~))
+    I64Rotl(lhs~, rhs~, ..) => Some(I64Rotl(result=new_value, lhs~, rhs~))
+    I64RotlBy(lhs~, rhs~, ..) => Some(I64RotlBy(result=new_value, lhs~, rhs~))
+    I64RotlImm16(lhs~, rhs~, ..) =>
+      Some(I64RotlImm16(result=new_value, lhs~, rhs~))
+    I64Rotr(lhs~, rhs~, ..) => Some(I64Rotr(result=new_value, lhs~, rhs~))
+    I64RotrBy(lhs~, rhs~, ..) => Some(I64RotrBy(result=new_value, lhs~, rhs~))
+    I64RotrImm16(lhs~, rhs~, ..) =>
+      Some(I64RotrImm16(result=new_value, lhs~, rhs~))
+    I32WrapI64(input~, ..) => Some(I32WrapI64(result=new_value, input~))
+    I32Extend8S(input~, ..) => Some(I32Extend8S(result=new_value, input~))
+    I32Extend16S(input~, ..) => Some(I32Extend16S(result=new_value, input~))
+    I64Extend8S(input~, ..) => Some(I64Extend8S(result=new_value, input~))
+    I64Extend16S(input~, ..) => Some(I64Extend16S(result=new_value, input~))
+    I64Extend32S(input~, ..) => Some(I64Extend32S(result=new_value, input~))
+    F32Abs(input~, ..) => Some(F32Abs(result=new_value, input~))
+    F32Neg(input~, ..) => Some(F32Neg(result=new_value, input~))
+    F32Ceil(input~, ..) => Some(F32Ceil(result=new_value, input~))
+    F32Floor(input~, ..) => Some(F32Floor(result=new_value, input~))
+    F32Trunc(input~, ..) => Some(F32Trunc(result=new_value, input~))
+    F32Nearest(input~, ..) => Some(F32Nearest(result=new_value, input~))
+    F32Sqrt(input~, ..) => Some(F32Sqrt(result=new_value, input~))
+    F32Add(lhs~, rhs~, ..) => Some(F32Add(result=new_value, lhs~, rhs~))
+    F32Sub(lhs~, rhs~, ..) => Some(F32Sub(result=new_value, lhs~, rhs~))
+    F32Mul(lhs~, rhs~, ..) => Some(F32Mul(result=new_value, lhs~, rhs~))
+    F32Div(lhs~, rhs~, ..) => Some(F32Div(result=new_value, lhs~, rhs~))
+    F32Min(lhs~, rhs~, ..) => Some(F32Min(result=new_value, lhs~, rhs~))
+    F32Max(lhs~, rhs~, ..) => Some(F32Max(result=new_value, lhs~, rhs~))
+    F32Copysign(lhs~, rhs~, ..) =>
+      Some(F32Copysign(result=new_value, lhs~, rhs~))
+    F32CopysignImm(lhs~, rhs~, ..) =>
       Some(F32CopysignImm(result=new_value, lhs~, rhs~))
-    F64Abs(input~) => Some(F64Abs(result=new_value, input~))
-    F64Neg(input~) => Some(F64Neg(result=new_value, input~))
-    F64Ceil(input~) => Some(F64Ceil(result=new_value, input~))
-    F64Floor(input~) => Some(F64Floor(result=new_value, input~))
-    F64Trunc(input~) => Some(F64Trunc(result=new_value, input~))
-    F64Nearest(input~) => Some(F64Nearest(result=new_value, input~))
-    F64Sqrt(input~) => Some(F64Sqrt(result=new_value, input~))
-    F64Add(lhs~, rhs~) => Some(F64Add(result=new_value, lhs~, rhs~))
-    F64Sub(lhs~, rhs~) => Some(F64Sub(result=new_value, lhs~, rhs~))
-    F64Mul(lhs~, rhs~) => Some(F64Mul(result=new_value, lhs~, rhs~))
-    F64Div(lhs~, rhs~) => Some(F64Div(result=new_value, lhs~, rhs~))
-    F64Min(lhs~, rhs~) => Some(F64Min(result=new_value, lhs~, rhs~))
-    F64Max(lhs~, rhs~) => Some(F64Max(result=new_value, lhs~, rhs~))
-    F64Copysign(lhs~, rhs~) => Some(F64Copysign(result=new_value, lhs~, rhs~))
-    F64CopysignImm(lhs~, rhs~) =>
+    F64Abs(input~, ..) => Some(F64Abs(result=new_value, input~))
+    F64Neg(input~, ..) => Some(F64Neg(result=new_value, input~))
+    F64Ceil(input~, ..) => Some(F64Ceil(result=new_value, input~))
+    F64Floor(input~, ..) => Some(F64Floor(result=new_value, input~))
+    F64Trunc(input~, ..) => Some(F64Trunc(result=new_value, input~))
+    F64Nearest(input~, ..) => Some(F64Nearest(result=new_value, input~))
+    F64Sqrt(input~, ..) => Some(F64Sqrt(result=new_value, input~))
+    F64Add(lhs~, rhs~, ..) => Some(F64Add(result=new_value, lhs~, rhs~))
+    F64Sub(lhs~, rhs~, ..) => Some(F64Sub(result=new_value, lhs~, rhs~))
+    F64Mul(lhs~, rhs~, ..) => Some(F64Mul(result=new_value, lhs~, rhs~))
+    F64Div(lhs~, rhs~, ..) => Some(F64Div(result=new_value, lhs~, rhs~))
+    F64Min(lhs~, rhs~, ..) => Some(F64Min(result=new_value, lhs~, rhs~))
+    F64Max(lhs~, rhs~, ..) => Some(F64Max(result=new_value, lhs~, rhs~))
+    F64Copysign(lhs~, rhs~, ..) =>
+      Some(F64Copysign(result=new_value, lhs~, rhs~))
+    F64CopysignImm(lhs~, rhs~, ..) =>
       Some(F64CopysignImm(result=new_value, lhs~, rhs~))
-    I32TruncF32S(input~) => Some(I32TruncF32S(result=new_value, input~))
-    I32TruncF32U(input~) => Some(I32TruncF32U(result=new_value, input~))
-    I32TruncF64S(input~) => Some(I32TruncF64S(result=new_value, input~))
-    I32TruncF64U(input~) => Some(I32TruncF64U(result=new_value, input~))
-    I64TruncF32S(input~) => Some(I64TruncF32S(result=new_value, input~))
-    I64TruncF32U(input~) => Some(I64TruncF32U(result=new_value, input~))
-    I64TruncF64S(input~) => Some(I64TruncF64S(result=new_value, input~))
-    I64TruncF64U(input~) => Some(I64TruncF64U(result=new_value, input~))
-    I32TruncSatF32S(input~) => Some(I32TruncSatF32S(result=new_value, input~))
-    I32TruncSatF32U(input~) => Some(I32TruncSatF32U(result=new_value, input~))
-    I32TruncSatF64S(input~) => Some(I32TruncSatF64S(result=new_value, input~))
-    I32TruncSatF64U(input~) => Some(I32TruncSatF64U(result=new_value, input~))
-    I64TruncSatF32S(input~) => Some(I64TruncSatF32S(result=new_value, input~))
-    I64TruncSatF32U(input~) => Some(I64TruncSatF32U(result=new_value, input~))
-    I64TruncSatF64S(input~) => Some(I64TruncSatF64S(result=new_value, input~))
-    I64TruncSatF64U(input~) => Some(I64TruncSatF64U(result=new_value, input~))
-    F32DemoteF64(input~) => Some(F32DemoteF64(result=new_value, input~))
-    F64PromoteF32(input~) => Some(F64PromoteF32(result=new_value, input~))
-    F32ConvertI32S(input~) => Some(F32ConvertI32S(result=new_value, input~))
-    F32ConvertI32U(input~) => Some(F32ConvertI32U(result=new_value, input~))
-    F32ConvertI64S(input~) => Some(F32ConvertI64S(result=new_value, input~))
-    F32ConvertI64U(input~) => Some(F32ConvertI64U(result=new_value, input~))
-    F64ConvertI32S(input~) => Some(F64ConvertI32S(result=new_value, input~))
-    F64ConvertI32U(input~) => Some(F64ConvertI32U(result=new_value, input~))
-    F64ConvertI64S(input~) => Some(F64ConvertI64S(result=new_value, input~))
-    F64ConvertI64U(input~) => Some(F64ConvertI64U(result=new_value, input~))
-    TableGet(index~) => Some(TableGet(result=new_value, index~))
-    TableGetImm(index~) => Some(TableGetImm(result=new_value, index~))
-    TableSize(table~) => Some(TableSize(result=new_value, table~))
-    TableGrow(delta~, value~) =>
+    I32TruncF32S(input~, ..) => Some(I32TruncF32S(result=new_value, input~))
+    I32TruncF32U(input~, ..) => Some(I32TruncF32U(result=new_value, input~))
+    I32TruncF64S(input~, ..) => Some(I32TruncF64S(result=new_value, input~))
+    I32TruncF64U(input~, ..) => Some(I32TruncF64U(result=new_value, input~))
+    I64TruncF32S(input~, ..) => Some(I64TruncF32S(result=new_value, input~))
+    I64TruncF32U(input~, ..) => Some(I64TruncF32U(result=new_value, input~))
+    I64TruncF64S(input~, ..) => Some(I64TruncF64S(result=new_value, input~))
+    I64TruncF64U(input~, ..) => Some(I64TruncF64U(result=new_value, input~))
+    I32TruncSatF32S(input~, ..) =>
+      Some(I32TruncSatF32S(result=new_value, input~))
+    I32TruncSatF32U(input~, ..) =>
+      Some(I32TruncSatF32U(result=new_value, input~))
+    I32TruncSatF64S(input~, ..) =>
+      Some(I32TruncSatF64S(result=new_value, input~))
+    I32TruncSatF64U(input~, ..) =>
+      Some(I32TruncSatF64U(result=new_value, input~))
+    I64TruncSatF32S(input~, ..) =>
+      Some(I64TruncSatF32S(result=new_value, input~))
+    I64TruncSatF32U(input~, ..) =>
+      Some(I64TruncSatF32U(result=new_value, input~))
+    I64TruncSatF64S(input~, ..) =>
+      Some(I64TruncSatF64S(result=new_value, input~))
+    I64TruncSatF64U(input~, ..) =>
+      Some(I64TruncSatF64U(result=new_value, input~))
+    F32DemoteF64(input~, ..) => Some(F32DemoteF64(result=new_value, input~))
+    F64PromoteF32(input~, ..) => Some(F64PromoteF32(result=new_value, input~))
+    F32ConvertI32S(input~, ..) => Some(F32ConvertI32S(result=new_value, input~))
+    F32ConvertI32U(input~, ..) => Some(F32ConvertI32U(result=new_value, input~))
+    F32ConvertI64S(input~, ..) => Some(F32ConvertI64S(result=new_value, input~))
+    F32ConvertI64U(input~, ..) => Some(F32ConvertI64U(result=new_value, input~))
+    F64ConvertI32S(input~, ..) => Some(F64ConvertI32S(result=new_value, input~))
+    F64ConvertI32U(input~, ..) => Some(F64ConvertI32U(result=new_value, input~))
+    F64ConvertI64S(input~, ..) => Some(F64ConvertI64S(result=new_value, input~))
+    F64ConvertI64U(input~, ..) => Some(F64ConvertI64U(result=new_value, input~))
+    TableGet(index~, ..) => Some(TableGet(result=new_value, index~))
+    TableGetImm(index~, ..) => Some(TableGetImm(result=new_value, index~))
+    TableSize(table~, ..) => Some(TableSize(result=new_value, table~))
+    TableGrow(delta~, value~, ..) =>
       Some(TableGrow(result=new_value, delta~, value~))
-    MemorySize(memory~) => Some(MemorySize(result=new_value, memory~))
-    MemoryGrow(delta~) => Some(MemoryGrow(result=new_value, delta~))
-    I8x16Splat(value~) => Some(I8x16Splat(result=new_value, value~))
-    I16x8Splat(value~) => Some(I16x8Splat(result=new_value, value~))
-    I32x4Splat(value~) => Some(I32x4Splat(result=new_value, value~))
-    I64x2Splat(value~) => Some(I64x2Splat(result=new_value, value~))
-    F32x4Splat(value~) => Some(F32x4Splat(result=new_value, value~))
-    F64x2Splat(value~) => Some(F64x2Splat(result=new_value, value~))
-    I8x16ExtractLaneS(value~, lane~) =>
+    MemorySize(memory~, ..) => Some(MemorySize(result=new_value, memory~))
+    MemoryGrow(delta~, ..) => Some(MemoryGrow(result=new_value, delta~))
+    I8x16Splat(value~, ..) => Some(I8x16Splat(result=new_value, value~))
+    I16x8Splat(value~, ..) => Some(I16x8Splat(result=new_value, value~))
+    I32x4Splat(value~, ..) => Some(I32x4Splat(result=new_value, value~))
+    I64x2Splat(value~, ..) => Some(I64x2Splat(result=new_value, value~))
+    F32x4Splat(value~, ..) => Some(F32x4Splat(result=new_value, value~))
+    F64x2Splat(value~, ..) => Some(F64x2Splat(result=new_value, value~))
+    I8x16ExtractLaneS(value~, lane~, ..) =>
       Some(I8x16ExtractLaneS(result=new_value, value~, lane~))
-    I8x16ExtractLaneU(value~, lane~) =>
+    I8x16ExtractLaneU(value~, lane~, ..) =>
       Some(I8x16ExtractLaneU(result=new_value, value~, lane~))
-    I16x8ExtractLaneS(value~, lane~) =>
+    I16x8ExtractLaneS(value~, lane~, ..) =>
       Some(I16x8ExtractLaneS(result=new_value, value~, lane~))
-    I16x8ExtractLaneU(value~, lane~) =>
+    I16x8ExtractLaneU(value~, lane~, ..) =>
       Some(I16x8ExtractLaneU(result=new_value, value~, lane~))
-    I32x4ExtractLane(value~, lane~) =>
+    I32x4ExtractLane(value~, lane~, ..) =>
       Some(I32x4ExtractLane(result=new_value, value~, lane~))
-    I64x2ExtractLane(value~, lane~) =>
+    I64x2ExtractLane(value~, lane~, ..) =>
       Some(I64x2ExtractLane(result=new_value, value~, lane~))
-    F32x4ExtractLane(value~, lane~) =>
+    F32x4ExtractLane(value~, lane~, ..) =>
       Some(F32x4ExtractLane(result=new_value, value~, lane~))
-    F64x2ExtractLane(value~, lane~) =>
+    F64x2ExtractLane(value~, lane~, ..) =>
       Some(F64x2ExtractLane(result=new_value, value~, lane~))
-    I8x16ReplaceLane(input~, lane~) =>
+    I8x16ReplaceLane(input~, lane~, ..) =>
       Some(I8x16ReplaceLane(result=new_value, input~, lane~))
-    I8x16ReplaceLaneImm(input~, lane~, value~) =>
+    I8x16ReplaceLaneImm(input~, lane~, value~, ..) =>
       Some(I8x16ReplaceLaneImm(result=new_value, input~, lane~, value~))
-    I16x8ReplaceLane(input~, lane~) =>
+    I16x8ReplaceLane(input~, lane~, ..) =>
       Some(I16x8ReplaceLane(result=new_value, input~, lane~))
-    I16x8ReplaceLaneImm(input~, lane~) =>
+    I16x8ReplaceLaneImm(input~, lane~, ..) =>
       Some(I16x8ReplaceLaneImm(result=new_value, input~, lane~))
-    I32x4ReplaceLane(input~, lane~) =>
+    I32x4ReplaceLane(input~, lane~, ..) =>
       Some(I32x4ReplaceLane(result=new_value, input~, lane~))
-    I32x4ReplaceLaneImm(input~, lane~) =>
+    I32x4ReplaceLaneImm(input~, lane~, ..) =>
       Some(I32x4ReplaceLaneImm(result=new_value, input~, lane~))
-    I64x2ReplaceLane(input~, lane~) =>
+    I64x2ReplaceLane(input~, lane~, ..) =>
       Some(I64x2ReplaceLane(result=new_value, input~, lane~))
-    I64x2ReplaceLaneImm32(input~, lane~) =>
+    I64x2ReplaceLaneImm32(input~, lane~, ..) =>
       Some(I64x2ReplaceLaneImm32(result=new_value, input~, lane~))
-    F32x4ReplaceLane(input~, lane~) =>
+    F32x4ReplaceLane(input~, lane~, ..) =>
       Some(F32x4ReplaceLane(result=new_value, input~, lane~))
-    F32x4ReplaceLaneImm(input~, lane~) =>
+    F32x4ReplaceLaneImm(input~, lane~, ..) =>
       Some(F32x4ReplaceLaneImm(result=new_value, input~, lane~))
-    F64x2ReplaceLane(input~, lane~) =>
+    F64x2ReplaceLane(input~, lane~, ..) =>
       Some(F64x2ReplaceLane(result=new_value, input~, lane~))
-    F64x2ReplaceLaneImm32(input~, lane~) =>
+    F64x2ReplaceLaneImm32(input~, lane~, ..) =>
       Some(F64x2ReplaceLaneImm32(result=new_value, input~, lane~))
-    I8x16Shuffle(lhs~, rhs~) => Some(I8x16Shuffle(result=new_value, lhs~, rhs~))
-    I8x16Swizzle(input~, selector~) =>
+    I8x16Shuffle(lhs~, rhs~, ..) =>
+      Some(I8x16Shuffle(result=new_value, lhs~, rhs~))
+    I8x16Swizzle(input~, selector~, ..) =>
       Some(I8x16Swizzle(result=new_value, input~, selector~))
-    I8x16Add(lhs~, rhs~) => Some(I8x16Add(result=new_value, lhs~, rhs~))
-    I16x8Add(lhs~, rhs~) => Some(I16x8Add(result=new_value, lhs~, rhs~))
-    I32x4Add(lhs~, rhs~) => Some(I32x4Add(result=new_value, lhs~, rhs~))
-    I64x2Add(lhs~, rhs~) => Some(I64x2Add(result=new_value, lhs~, rhs~))
-    I8x16Sub(lhs~, rhs~) => Some(I8x16Sub(result=new_value, lhs~, rhs~))
-    I16x8Sub(lhs~, rhs~) => Some(I16x8Sub(result=new_value, lhs~, rhs~))
-    I32x4Sub(lhs~, rhs~) => Some(I32x4Sub(result=new_value, lhs~, rhs~))
-    I64x2Sub(lhs~, rhs~) => Some(I64x2Sub(result=new_value, lhs~, rhs~))
-    I16x8Mul(lhs~, rhs~) => Some(I16x8Mul(result=new_value, lhs~, rhs~))
-    I32x4Mul(lhs~, rhs~) => Some(I32x4Mul(result=new_value, lhs~, rhs~))
-    I64x2Mul(lhs~, rhs~) => Some(I64x2Mul(result=new_value, lhs~, rhs~))
-    I32x4DotI16x8S(lhs~, rhs~) =>
+    I8x16Add(lhs~, rhs~, ..) => Some(I8x16Add(result=new_value, lhs~, rhs~))
+    I16x8Add(lhs~, rhs~, ..) => Some(I16x8Add(result=new_value, lhs~, rhs~))
+    I32x4Add(lhs~, rhs~, ..) => Some(I32x4Add(result=new_value, lhs~, rhs~))
+    I64x2Add(lhs~, rhs~, ..) => Some(I64x2Add(result=new_value, lhs~, rhs~))
+    I8x16Sub(lhs~, rhs~, ..) => Some(I8x16Sub(result=new_value, lhs~, rhs~))
+    I16x8Sub(lhs~, rhs~, ..) => Some(I16x8Sub(result=new_value, lhs~, rhs~))
+    I32x4Sub(lhs~, rhs~, ..) => Some(I32x4Sub(result=new_value, lhs~, rhs~))
+    I64x2Sub(lhs~, rhs~, ..) => Some(I64x2Sub(result=new_value, lhs~, rhs~))
+    I16x8Mul(lhs~, rhs~, ..) => Some(I16x8Mul(result=new_value, lhs~, rhs~))
+    I32x4Mul(lhs~, rhs~, ..) => Some(I32x4Mul(result=new_value, lhs~, rhs~))
+    I64x2Mul(lhs~, rhs~, ..) => Some(I64x2Mul(result=new_value, lhs~, rhs~))
+    I32x4DotI16x8S(lhs~, rhs~, ..) =>
       Some(I32x4DotI16x8S(result=new_value, lhs~, rhs~))
-    I16x8RelaxedDotI8x16I7x16S(lhs~, rhs~) =>
+    I16x8RelaxedDotI8x16I7x16S(lhs~, rhs~, ..) =>
       Some(I16x8RelaxedDotI8x16I7x16S(result=new_value, lhs~, rhs~))
-    I32x4RelaxedDotI8x16I7x16AddS(lhs~, rhs~) =>
+    I32x4RelaxedDotI8x16I7x16AddS(lhs~, rhs~, ..) =>
       Some(I32x4RelaxedDotI8x16I7x16AddS(result=new_value, lhs~, rhs~))
-    F32x4RelaxedMadd(a~, b~) => Some(F32x4RelaxedMadd(result=new_value, a~, b~))
-    F32x4RelaxedNmadd(a~, b~) =>
+    F32x4RelaxedMadd(a~, b~, ..) =>
+      Some(F32x4RelaxedMadd(result=new_value, a~, b~))
+    F32x4RelaxedNmadd(a~, b~, ..) =>
       Some(F32x4RelaxedNmadd(result=new_value, a~, b~))
-    F64x2RelaxedMadd(a~, b~) => Some(F64x2RelaxedMadd(result=new_value, a~, b~))
-    F64x2RelaxedNmadd(a~, b~) =>
+    F64x2RelaxedMadd(a~, b~, ..) =>
+      Some(F64x2RelaxedMadd(result=new_value, a~, b~))
+    F64x2RelaxedNmadd(a~, b~, ..) =>
       Some(F64x2RelaxedNmadd(result=new_value, a~, b~))
-    I8x16Neg(input~) => Some(I8x16Neg(result=new_value, input~))
-    I16x8Neg(input~) => Some(I16x8Neg(result=new_value, input~))
-    I32x4Neg(input~) => Some(I32x4Neg(result=new_value, input~))
-    I64x2Neg(input~) => Some(I64x2Neg(result=new_value, input~))
-    I16x8ExtmulLowI8x16S(lhs~, rhs~) =>
+    I8x16Neg(input~, ..) => Some(I8x16Neg(result=new_value, input~))
+    I16x8Neg(input~, ..) => Some(I16x8Neg(result=new_value, input~))
+    I32x4Neg(input~, ..) => Some(I32x4Neg(result=new_value, input~))
+    I64x2Neg(input~, ..) => Some(I64x2Neg(result=new_value, input~))
+    I16x8ExtmulLowI8x16S(lhs~, rhs~, ..) =>
       Some(I16x8ExtmulLowI8x16S(result=new_value, lhs~, rhs~))
-    I16x8ExtmulHighI8x16S(lhs~, rhs~) =>
+    I16x8ExtmulHighI8x16S(lhs~, rhs~, ..) =>
       Some(I16x8ExtmulHighI8x16S(result=new_value, lhs~, rhs~))
-    I16x8ExtmulLowI8x16U(lhs~, rhs~) =>
+    I16x8ExtmulLowI8x16U(lhs~, rhs~, ..) =>
       Some(I16x8ExtmulLowI8x16U(result=new_value, lhs~, rhs~))
-    I16x8ExtmulHighI8x16U(lhs~, rhs~) =>
+    I16x8ExtmulHighI8x16U(lhs~, rhs~, ..) =>
       Some(I16x8ExtmulHighI8x16U(result=new_value, lhs~, rhs~))
-    I32x4ExtmulLowI16x8S(lhs~, rhs~) =>
+    I32x4ExtmulLowI16x8S(lhs~, rhs~, ..) =>
       Some(I32x4ExtmulLowI16x8S(result=new_value, lhs~, rhs~))
-    I32x4ExtmulHighI16x8S(lhs~, rhs~) =>
+    I32x4ExtmulHighI16x8S(lhs~, rhs~, ..) =>
       Some(I32x4ExtmulHighI16x8S(result=new_value, lhs~, rhs~))
-    I32x4ExtmulLowI16x8U(lhs~, rhs~) =>
+    I32x4ExtmulLowI16x8U(lhs~, rhs~, ..) =>
       Some(I32x4ExtmulLowI16x8U(result=new_value, lhs~, rhs~))
-    I32x4ExtmulHighI16x8U(lhs~, rhs~) =>
+    I32x4ExtmulHighI16x8U(lhs~, rhs~, ..) =>
       Some(I32x4ExtmulHighI16x8U(result=new_value, lhs~, rhs~))
-    I64x2ExtmulLowI32x4S(lhs~, rhs~) =>
+    I64x2ExtmulLowI32x4S(lhs~, rhs~, ..) =>
       Some(I64x2ExtmulLowI32x4S(result=new_value, lhs~, rhs~))
-    I64x2ExtmulHighI32x4S(lhs~, rhs~) =>
+    I64x2ExtmulHighI32x4S(lhs~, rhs~, ..) =>
       Some(I64x2ExtmulHighI32x4S(result=new_value, lhs~, rhs~))
-    I64x2ExtmulLowI32x4U(lhs~, rhs~) =>
+    I64x2ExtmulLowI32x4U(lhs~, rhs~, ..) =>
       Some(I64x2ExtmulLowI32x4U(result=new_value, lhs~, rhs~))
-    I64x2ExtmulHighI32x4U(lhs~, rhs~) =>
+    I64x2ExtmulHighI32x4U(lhs~, rhs~, ..) =>
       Some(I64x2ExtmulHighI32x4U(result=new_value, lhs~, rhs~))
-    I16x8ExtaddPairwiseI8x16S(input~) =>
+    I16x8ExtaddPairwiseI8x16S(input~, ..) =>
       Some(I16x8ExtaddPairwiseI8x16S(result=new_value, input~))
-    I16x8ExtaddPairwiseI8x16U(input~) =>
+    I16x8ExtaddPairwiseI8x16U(input~, ..) =>
       Some(I16x8ExtaddPairwiseI8x16U(result=new_value, input~))
-    I32x4ExtaddPairwiseI16x8S(input~) =>
+    I32x4ExtaddPairwiseI16x8S(input~, ..) =>
       Some(I32x4ExtaddPairwiseI16x8S(result=new_value, input~))
-    I32x4ExtaddPairwiseI16x8U(input~) =>
+    I32x4ExtaddPairwiseI16x8U(input~, ..) =>
       Some(I32x4ExtaddPairwiseI16x8U(result=new_value, input~))
-    I8x16AddSatS(lhs~, rhs~) => Some(I8x16AddSatS(result=new_value, lhs~, rhs~))
-    I8x16AddSatU(lhs~, rhs~) => Some(I8x16AddSatU(result=new_value, lhs~, rhs~))
-    I16x8AddSatS(lhs~, rhs~) => Some(I16x8AddSatS(result=new_value, lhs~, rhs~))
-    I16x8AddSatU(lhs~, rhs~) => Some(I16x8AddSatU(result=new_value, lhs~, rhs~))
-    I8x16SubSatS(lhs~, rhs~) => Some(I8x16SubSatS(result=new_value, lhs~, rhs~))
-    I8x16SubSatU(lhs~, rhs~) => Some(I8x16SubSatU(result=new_value, lhs~, rhs~))
-    I16x8SubSatS(lhs~, rhs~) => Some(I16x8SubSatS(result=new_value, lhs~, rhs~))
-    I16x8SubSatU(lhs~, rhs~) => Some(I16x8SubSatU(result=new_value, lhs~, rhs~))
-    I16x8Q15MulrSatS(lhs~, rhs~) =>
+    I8x16AddSatS(lhs~, rhs~, ..) =>
+      Some(I8x16AddSatS(result=new_value, lhs~, rhs~))
+    I8x16AddSatU(lhs~, rhs~, ..) =>
+      Some(I8x16AddSatU(result=new_value, lhs~, rhs~))
+    I16x8AddSatS(lhs~, rhs~, ..) =>
+      Some(I16x8AddSatS(result=new_value, lhs~, rhs~))
+    I16x8AddSatU(lhs~, rhs~, ..) =>
+      Some(I16x8AddSatU(result=new_value, lhs~, rhs~))
+    I8x16SubSatS(lhs~, rhs~, ..) =>
+      Some(I8x16SubSatS(result=new_value, lhs~, rhs~))
+    I8x16SubSatU(lhs~, rhs~, ..) =>
+      Some(I8x16SubSatU(result=new_value, lhs~, rhs~))
+    I16x8SubSatS(lhs~, rhs~, ..) =>
+      Some(I16x8SubSatS(result=new_value, lhs~, rhs~))
+    I16x8SubSatU(lhs~, rhs~, ..) =>
+      Some(I16x8SubSatU(result=new_value, lhs~, rhs~))
+    I16x8Q15MulrSatS(lhs~, rhs~, ..) =>
       Some(I16x8Q15MulrSatS(result=new_value, lhs~, rhs~))
-    I8x16MinS(lhs~, rhs~) => Some(I8x16MinS(result=new_value, lhs~, rhs~))
-    I8x16MinU(lhs~, rhs~) => Some(I8x16MinU(result=new_value, lhs~, rhs~))
-    I16x8MinS(lhs~, rhs~) => Some(I16x8MinS(result=new_value, lhs~, rhs~))
-    I16x8MinU(lhs~, rhs~) => Some(I16x8MinU(result=new_value, lhs~, rhs~))
-    I32x4MinS(lhs~, rhs~) => Some(I32x4MinS(result=new_value, lhs~, rhs~))
-    I32x4MinU(lhs~, rhs~) => Some(I32x4MinU(result=new_value, lhs~, rhs~))
-    I8x16MaxS(lhs~, rhs~) => Some(I8x16MaxS(result=new_value, lhs~, rhs~))
-    I8x16MaxU(lhs~, rhs~) => Some(I8x16MaxU(result=new_value, lhs~, rhs~))
-    I16x8MaxS(lhs~, rhs~) => Some(I16x8MaxS(result=new_value, lhs~, rhs~))
-    I16x8MaxU(lhs~, rhs~) => Some(I16x8MaxU(result=new_value, lhs~, rhs~))
-    I32x4MaxS(lhs~, rhs~) => Some(I32x4MaxS(result=new_value, lhs~, rhs~))
-    I32x4MaxU(lhs~, rhs~) => Some(I32x4MaxU(result=new_value, lhs~, rhs~))
-    I8x16AvgrU(lhs~, rhs~) => Some(I8x16AvgrU(result=new_value, lhs~, rhs~))
-    I16x8AvgrU(lhs~, rhs~) => Some(I16x8AvgrU(result=new_value, lhs~, rhs~))
-    I8x16Abs(input~) => Some(I8x16Abs(result=new_value, input~))
-    I16x8Abs(input~) => Some(I16x8Abs(result=new_value, input~))
-    I32x4Abs(input~) => Some(I32x4Abs(result=new_value, input~))
-    I64x2Abs(input~) => Some(I64x2Abs(result=new_value, input~))
-    I8x16Shl(lhs~, rhs~) => Some(I8x16Shl(result=new_value, lhs~, rhs~))
-    I8x16ShlBy(lhs~, rhs~) => Some(I8x16ShlBy(result=new_value, lhs~, rhs~))
-    I16x8Shl(lhs~, rhs~) => Some(I16x8Shl(result=new_value, lhs~, rhs~))
-    I16x8ShlBy(lhs~, rhs~) => Some(I16x8ShlBy(result=new_value, lhs~, rhs~))
-    I32x4Shl(lhs~, rhs~) => Some(I32x4Shl(result=new_value, lhs~, rhs~))
-    I32x4ShlBy(lhs~, rhs~) => Some(I32x4ShlBy(result=new_value, lhs~, rhs~))
-    I64x2Shl(lhs~, rhs~) => Some(I64x2Shl(result=new_value, lhs~, rhs~))
-    I64x2ShlBy(lhs~, rhs~) => Some(I64x2ShlBy(result=new_value, lhs~, rhs~))
-    I8x16ShrS(lhs~, rhs~) => Some(I8x16ShrS(result=new_value, lhs~, rhs~))
-    I8x16ShrSBy(lhs~, rhs~) => Some(I8x16ShrSBy(result=new_value, lhs~, rhs~))
-    I8x16ShrU(lhs~, rhs~) => Some(I8x16ShrU(result=new_value, lhs~, rhs~))
-    I8x16ShrUBy(lhs~, rhs~) => Some(I8x16ShrUBy(result=new_value, lhs~, rhs~))
-    I16x8ShrS(lhs~, rhs~) => Some(I16x8ShrS(result=new_value, lhs~, rhs~))
-    I16x8ShrSBy(lhs~, rhs~) => Some(I16x8ShrSBy(result=new_value, lhs~, rhs~))
-    I16x8ShrU(lhs~, rhs~) => Some(I16x8ShrU(result=new_value, lhs~, rhs~))
-    I16x8ShrUBy(lhs~, rhs~) => Some(I16x8ShrUBy(result=new_value, lhs~, rhs~))
-    I32x4ShrS(lhs~, rhs~) => Some(I32x4ShrS(result=new_value, lhs~, rhs~))
-    I32x4ShrSBy(lhs~, rhs~) => Some(I32x4ShrSBy(result=new_value, lhs~, rhs~))
-    I32x4ShrU(lhs~, rhs~) => Some(I32x4ShrU(result=new_value, lhs~, rhs~))
-    I32x4ShrUBy(lhs~, rhs~) => Some(I32x4ShrUBy(result=new_value, lhs~, rhs~))
-    I64x2ShrS(lhs~, rhs~) => Some(I64x2ShrS(result=new_value, lhs~, rhs~))
-    I64x2ShrSBy(lhs~, rhs~) => Some(I64x2ShrSBy(result=new_value, lhs~, rhs~))
-    I64x2ShrU(lhs~, rhs~) => Some(I64x2ShrU(result=new_value, lhs~, rhs~))
-    I64x2ShrUBy(lhs~, rhs~) => Some(I64x2ShrUBy(result=new_value, lhs~, rhs~))
-    V128And(lhs~, rhs~) => Some(V128And(result=new_value, lhs~, rhs~))
-    V128Or(lhs~, rhs~) => Some(V128Or(result=new_value, lhs~, rhs~))
-    V128Xor(lhs~, rhs~) => Some(V128Xor(result=new_value, lhs~, rhs~))
-    V128Andnot(lhs~, rhs~) => Some(V128Andnot(result=new_value, lhs~, rhs~))
-    V128Not(input~) => Some(V128Not(result=new_value, input~))
-    V128Bitselect(lhs~, rhs~) =>
+    I8x16MinS(lhs~, rhs~, ..) => Some(I8x16MinS(result=new_value, lhs~, rhs~))
+    I8x16MinU(lhs~, rhs~, ..) => Some(I8x16MinU(result=new_value, lhs~, rhs~))
+    I16x8MinS(lhs~, rhs~, ..) => Some(I16x8MinS(result=new_value, lhs~, rhs~))
+    I16x8MinU(lhs~, rhs~, ..) => Some(I16x8MinU(result=new_value, lhs~, rhs~))
+    I32x4MinS(lhs~, rhs~, ..) => Some(I32x4MinS(result=new_value, lhs~, rhs~))
+    I32x4MinU(lhs~, rhs~, ..) => Some(I32x4MinU(result=new_value, lhs~, rhs~))
+    I8x16MaxS(lhs~, rhs~, ..) => Some(I8x16MaxS(result=new_value, lhs~, rhs~))
+    I8x16MaxU(lhs~, rhs~, ..) => Some(I8x16MaxU(result=new_value, lhs~, rhs~))
+    I16x8MaxS(lhs~, rhs~, ..) => Some(I16x8MaxS(result=new_value, lhs~, rhs~))
+    I16x8MaxU(lhs~, rhs~, ..) => Some(I16x8MaxU(result=new_value, lhs~, rhs~))
+    I32x4MaxS(lhs~, rhs~, ..) => Some(I32x4MaxS(result=new_value, lhs~, rhs~))
+    I32x4MaxU(lhs~, rhs~, ..) => Some(I32x4MaxU(result=new_value, lhs~, rhs~))
+    I8x16AvgrU(lhs~, rhs~, ..) => Some(I8x16AvgrU(result=new_value, lhs~, rhs~))
+    I16x8AvgrU(lhs~, rhs~, ..) => Some(I16x8AvgrU(result=new_value, lhs~, rhs~))
+    I8x16Abs(input~, ..) => Some(I8x16Abs(result=new_value, input~))
+    I16x8Abs(input~, ..) => Some(I16x8Abs(result=new_value, input~))
+    I32x4Abs(input~, ..) => Some(I32x4Abs(result=new_value, input~))
+    I64x2Abs(input~, ..) => Some(I64x2Abs(result=new_value, input~))
+    I8x16Shl(lhs~, rhs~, ..) => Some(I8x16Shl(result=new_value, lhs~, rhs~))
+    I8x16ShlBy(lhs~, rhs~, ..) => Some(I8x16ShlBy(result=new_value, lhs~, rhs~))
+    I16x8Shl(lhs~, rhs~, ..) => Some(I16x8Shl(result=new_value, lhs~, rhs~))
+    I16x8ShlBy(lhs~, rhs~, ..) => Some(I16x8ShlBy(result=new_value, lhs~, rhs~))
+    I32x4Shl(lhs~, rhs~, ..) => Some(I32x4Shl(result=new_value, lhs~, rhs~))
+    I32x4ShlBy(lhs~, rhs~, ..) => Some(I32x4ShlBy(result=new_value, lhs~, rhs~))
+    I64x2Shl(lhs~, rhs~, ..) => Some(I64x2Shl(result=new_value, lhs~, rhs~))
+    I64x2ShlBy(lhs~, rhs~, ..) => Some(I64x2ShlBy(result=new_value, lhs~, rhs~))
+    I8x16ShrS(lhs~, rhs~, ..) => Some(I8x16ShrS(result=new_value, lhs~, rhs~))
+    I8x16ShrSBy(lhs~, rhs~, ..) =>
+      Some(I8x16ShrSBy(result=new_value, lhs~, rhs~))
+    I8x16ShrU(lhs~, rhs~, ..) => Some(I8x16ShrU(result=new_value, lhs~, rhs~))
+    I8x16ShrUBy(lhs~, rhs~, ..) =>
+      Some(I8x16ShrUBy(result=new_value, lhs~, rhs~))
+    I16x8ShrS(lhs~, rhs~, ..) => Some(I16x8ShrS(result=new_value, lhs~, rhs~))
+    I16x8ShrSBy(lhs~, rhs~, ..) =>
+      Some(I16x8ShrSBy(result=new_value, lhs~, rhs~))
+    I16x8ShrU(lhs~, rhs~, ..) => Some(I16x8ShrU(result=new_value, lhs~, rhs~))
+    I16x8ShrUBy(lhs~, rhs~, ..) =>
+      Some(I16x8ShrUBy(result=new_value, lhs~, rhs~))
+    I32x4ShrS(lhs~, rhs~, ..) => Some(I32x4ShrS(result=new_value, lhs~, rhs~))
+    I32x4ShrSBy(lhs~, rhs~, ..) =>
+      Some(I32x4ShrSBy(result=new_value, lhs~, rhs~))
+    I32x4ShrU(lhs~, rhs~, ..) => Some(I32x4ShrU(result=new_value, lhs~, rhs~))
+    I32x4ShrUBy(lhs~, rhs~, ..) =>
+      Some(I32x4ShrUBy(result=new_value, lhs~, rhs~))
+    I64x2ShrS(lhs~, rhs~, ..) => Some(I64x2ShrS(result=new_value, lhs~, rhs~))
+    I64x2ShrSBy(lhs~, rhs~, ..) =>
+      Some(I64x2ShrSBy(result=new_value, lhs~, rhs~))
+    I64x2ShrU(lhs~, rhs~, ..) => Some(I64x2ShrU(result=new_value, lhs~, rhs~))
+    I64x2ShrUBy(lhs~, rhs~, ..) =>
+      Some(I64x2ShrUBy(result=new_value, lhs~, rhs~))
+    V128And(lhs~, rhs~, ..) => Some(V128And(result=new_value, lhs~, rhs~))
+    V128Or(lhs~, rhs~, ..) => Some(V128Or(result=new_value, lhs~, rhs~))
+    V128Xor(lhs~, rhs~, ..) => Some(V128Xor(result=new_value, lhs~, rhs~))
+    V128Andnot(lhs~, rhs~, ..) => Some(V128Andnot(result=new_value, lhs~, rhs~))
+    V128Not(input~, ..) => Some(V128Not(result=new_value, input~))
+    V128Bitselect(lhs~, rhs~, ..) =>
       Some(V128Bitselect(result=new_value, lhs~, rhs~))
-    I8x16Popcnt(input~) => Some(I8x16Popcnt(result=new_value, input~))
-    V128AnyTrue(input~) => Some(V128AnyTrue(result=new_value, input~))
-    I8x16AllTrue(input~) => Some(I8x16AllTrue(result=new_value, input~))
-    I16x8AllTrue(input~) => Some(I16x8AllTrue(result=new_value, input~))
-    I32x4AllTrue(input~) => Some(I32x4AllTrue(result=new_value, input~))
-    I64x2AllTrue(input~) => Some(I64x2AllTrue(result=new_value, input~))
-    I8x16Bitmask(input~) => Some(I8x16Bitmask(result=new_value, input~))
-    I16x8Bitmask(input~) => Some(I16x8Bitmask(result=new_value, input~))
-    I32x4Bitmask(input~) => Some(I32x4Bitmask(result=new_value, input~))
-    I64x2Bitmask(input~) => Some(I64x2Bitmask(result=new_value, input~))
-    I8x16Eq(lhs~, rhs~) => Some(I8x16Eq(result=new_value, lhs~, rhs~))
-    I16x8Eq(lhs~, rhs~) => Some(I16x8Eq(result=new_value, lhs~, rhs~))
-    I32x4Eq(lhs~, rhs~) => Some(I32x4Eq(result=new_value, lhs~, rhs~))
-    I64x2Eq(lhs~, rhs~) => Some(I64x2Eq(result=new_value, lhs~, rhs~))
-    F32x4Eq(lhs~, rhs~) => Some(F32x4Eq(result=new_value, lhs~, rhs~))
-    F64x2Eq(lhs~, rhs~) => Some(F64x2Eq(result=new_value, lhs~, rhs~))
-    I8x16Ne(lhs~, rhs~) => Some(I8x16Ne(result=new_value, lhs~, rhs~))
-    I16x8Ne(lhs~, rhs~) => Some(I16x8Ne(result=new_value, lhs~, rhs~))
-    I32x4Ne(lhs~, rhs~) => Some(I32x4Ne(result=new_value, lhs~, rhs~))
-    I64x2Ne(lhs~, rhs~) => Some(I64x2Ne(result=new_value, lhs~, rhs~))
-    F32x4Ne(lhs~, rhs~) => Some(F32x4Ne(result=new_value, lhs~, rhs~))
-    F64x2Ne(lhs~, rhs~) => Some(F64x2Ne(result=new_value, lhs~, rhs~))
-    I8x16LtS(lhs~, rhs~) => Some(I8x16LtS(result=new_value, lhs~, rhs~))
-    I8x16LtU(lhs~, rhs~) => Some(I8x16LtU(result=new_value, lhs~, rhs~))
-    I16x8LtS(lhs~, rhs~) => Some(I16x8LtS(result=new_value, lhs~, rhs~))
-    I16x8LtU(lhs~, rhs~) => Some(I16x8LtU(result=new_value, lhs~, rhs~))
-    I32x4LtS(lhs~, rhs~) => Some(I32x4LtS(result=new_value, lhs~, rhs~))
-    I32x4LtU(lhs~, rhs~) => Some(I32x4LtU(result=new_value, lhs~, rhs~))
-    I64x2LtS(lhs~, rhs~) => Some(I64x2LtS(result=new_value, lhs~, rhs~))
-    F32x4Lt(lhs~, rhs~) => Some(F32x4Lt(result=new_value, lhs~, rhs~))
-    F64x2Lt(lhs~, rhs~) => Some(F64x2Lt(result=new_value, lhs~, rhs~))
-    I8x16LeS(lhs~, rhs~) => Some(I8x16LeS(result=new_value, lhs~, rhs~))
-    I8x16LeU(lhs~, rhs~) => Some(I8x16LeU(result=new_value, lhs~, rhs~))
-    I16x8LeS(lhs~, rhs~) => Some(I16x8LeS(result=new_value, lhs~, rhs~))
-    I16x8LeU(lhs~, rhs~) => Some(I16x8LeU(result=new_value, lhs~, rhs~))
-    I32x4LeS(lhs~, rhs~) => Some(I32x4LeS(result=new_value, lhs~, rhs~))
-    I32x4LeU(lhs~, rhs~) => Some(I32x4LeU(result=new_value, lhs~, rhs~))
-    I64x2LeS(lhs~, rhs~) => Some(I64x2LeS(result=new_value, lhs~, rhs~))
-    F32x4Le(lhs~, rhs~) => Some(F32x4Le(result=new_value, lhs~, rhs~))
-    F64x2Le(lhs~, rhs~) => Some(F64x2Le(result=new_value, lhs~, rhs~))
-    F32x4Neg(input~) => Some(F32x4Neg(result=new_value, input~))
-    F64x2Neg(input~) => Some(F64x2Neg(result=new_value, input~))
-    F32x4Abs(input~) => Some(F32x4Abs(result=new_value, input~))
-    F64x2Abs(input~) => Some(F64x2Abs(result=new_value, input~))
-    F32x4Min(lhs~, rhs~) => Some(F32x4Min(result=new_value, lhs~, rhs~))
-    F64x2Min(lhs~, rhs~) => Some(F64x2Min(result=new_value, lhs~, rhs~))
-    F32x4Max(lhs~, rhs~) => Some(F32x4Max(result=new_value, lhs~, rhs~))
-    F64x2Max(lhs~, rhs~) => Some(F64x2Max(result=new_value, lhs~, rhs~))
-    F32x4Pmin(lhs~, rhs~) => Some(F32x4Pmin(result=new_value, lhs~, rhs~))
-    F64x2Pmin(lhs~, rhs~) => Some(F64x2Pmin(result=new_value, lhs~, rhs~))
-    F32x4Pmax(lhs~, rhs~) => Some(F32x4Pmax(result=new_value, lhs~, rhs~))
-    F64x2Pmax(lhs~, rhs~) => Some(F64x2Pmax(result=new_value, lhs~, rhs~))
-    F32x4Add(lhs~, rhs~) => Some(F32x4Add(result=new_value, lhs~, rhs~))
-    F64x2Add(lhs~, rhs~) => Some(F64x2Add(result=new_value, lhs~, rhs~))
-    F32x4Sub(lhs~, rhs~) => Some(F32x4Sub(result=new_value, lhs~, rhs~))
-    F64x2Sub(lhs~, rhs~) => Some(F64x2Sub(result=new_value, lhs~, rhs~))
-    F32x4Div(lhs~, rhs~) => Some(F32x4Div(result=new_value, lhs~, rhs~))
-    F64x2Div(lhs~, rhs~) => Some(F64x2Div(result=new_value, lhs~, rhs~))
-    F32x4Mul(lhs~, rhs~) => Some(F32x4Mul(result=new_value, lhs~, rhs~))
-    F64x2Mul(lhs~, rhs~) => Some(F64x2Mul(result=new_value, lhs~, rhs~))
-    F32x4Sqrt(input~) => Some(F32x4Sqrt(result=new_value, input~))
-    F64x2Sqrt(input~) => Some(F64x2Sqrt(result=new_value, input~))
-    F32x4Ceil(input~) => Some(F32x4Ceil(result=new_value, input~))
-    F64x2Ceil(input~) => Some(F64x2Ceil(result=new_value, input~))
-    F32x4Floor(input~) => Some(F32x4Floor(result=new_value, input~))
-    F64x2Floor(input~) => Some(F64x2Floor(result=new_value, input~))
-    F32x4Trunc(input~) => Some(F32x4Trunc(result=new_value, input~))
-    F64x2Trunc(input~) => Some(F64x2Trunc(result=new_value, input~))
-    F32x4Nearest(input~) => Some(F32x4Nearest(result=new_value, input~))
-    F64x2Nearest(input~) => Some(F64x2Nearest(result=new_value, input~))
-    F32x4ConvertI32x4S(input~) =>
+    I8x16Popcnt(input~, ..) => Some(I8x16Popcnt(result=new_value, input~))
+    V128AnyTrue(input~, ..) => Some(V128AnyTrue(result=new_value, input~))
+    I8x16AllTrue(input~, ..) => Some(I8x16AllTrue(result=new_value, input~))
+    I16x8AllTrue(input~, ..) => Some(I16x8AllTrue(result=new_value, input~))
+    I32x4AllTrue(input~, ..) => Some(I32x4AllTrue(result=new_value, input~))
+    I64x2AllTrue(input~, ..) => Some(I64x2AllTrue(result=new_value, input~))
+    I8x16Bitmask(input~, ..) => Some(I8x16Bitmask(result=new_value, input~))
+    I16x8Bitmask(input~, ..) => Some(I16x8Bitmask(result=new_value, input~))
+    I32x4Bitmask(input~, ..) => Some(I32x4Bitmask(result=new_value, input~))
+    I64x2Bitmask(input~, ..) => Some(I64x2Bitmask(result=new_value, input~))
+    I8x16Eq(lhs~, rhs~, ..) => Some(I8x16Eq(result=new_value, lhs~, rhs~))
+    I16x8Eq(lhs~, rhs~, ..) => Some(I16x8Eq(result=new_value, lhs~, rhs~))
+    I32x4Eq(lhs~, rhs~, ..) => Some(I32x4Eq(result=new_value, lhs~, rhs~))
+    I64x2Eq(lhs~, rhs~, ..) => Some(I64x2Eq(result=new_value, lhs~, rhs~))
+    F32x4Eq(lhs~, rhs~, ..) => Some(F32x4Eq(result=new_value, lhs~, rhs~))
+    F64x2Eq(lhs~, rhs~, ..) => Some(F64x2Eq(result=new_value, lhs~, rhs~))
+    I8x16Ne(lhs~, rhs~, ..) => Some(I8x16Ne(result=new_value, lhs~, rhs~))
+    I16x8Ne(lhs~, rhs~, ..) => Some(I16x8Ne(result=new_value, lhs~, rhs~))
+    I32x4Ne(lhs~, rhs~, ..) => Some(I32x4Ne(result=new_value, lhs~, rhs~))
+    I64x2Ne(lhs~, rhs~, ..) => Some(I64x2Ne(result=new_value, lhs~, rhs~))
+    F32x4Ne(lhs~, rhs~, ..) => Some(F32x4Ne(result=new_value, lhs~, rhs~))
+    F64x2Ne(lhs~, rhs~, ..) => Some(F64x2Ne(result=new_value, lhs~, rhs~))
+    I8x16LtS(lhs~, rhs~, ..) => Some(I8x16LtS(result=new_value, lhs~, rhs~))
+    I8x16LtU(lhs~, rhs~, ..) => Some(I8x16LtU(result=new_value, lhs~, rhs~))
+    I16x8LtS(lhs~, rhs~, ..) => Some(I16x8LtS(result=new_value, lhs~, rhs~))
+    I16x8LtU(lhs~, rhs~, ..) => Some(I16x8LtU(result=new_value, lhs~, rhs~))
+    I32x4LtS(lhs~, rhs~, ..) => Some(I32x4LtS(result=new_value, lhs~, rhs~))
+    I32x4LtU(lhs~, rhs~, ..) => Some(I32x4LtU(result=new_value, lhs~, rhs~))
+    I64x2LtS(lhs~, rhs~, ..) => Some(I64x2LtS(result=new_value, lhs~, rhs~))
+    F32x4Lt(lhs~, rhs~, ..) => Some(F32x4Lt(result=new_value, lhs~, rhs~))
+    F64x2Lt(lhs~, rhs~, ..) => Some(F64x2Lt(result=new_value, lhs~, rhs~))
+    I8x16LeS(lhs~, rhs~, ..) => Some(I8x16LeS(result=new_value, lhs~, rhs~))
+    I8x16LeU(lhs~, rhs~, ..) => Some(I8x16LeU(result=new_value, lhs~, rhs~))
+    I16x8LeS(lhs~, rhs~, ..) => Some(I16x8LeS(result=new_value, lhs~, rhs~))
+    I16x8LeU(lhs~, rhs~, ..) => Some(I16x8LeU(result=new_value, lhs~, rhs~))
+    I32x4LeS(lhs~, rhs~, ..) => Some(I32x4LeS(result=new_value, lhs~, rhs~))
+    I32x4LeU(lhs~, rhs~, ..) => Some(I32x4LeU(result=new_value, lhs~, rhs~))
+    I64x2LeS(lhs~, rhs~, ..) => Some(I64x2LeS(result=new_value, lhs~, rhs~))
+    F32x4Le(lhs~, rhs~, ..) => Some(F32x4Le(result=new_value, lhs~, rhs~))
+    F64x2Le(lhs~, rhs~, ..) => Some(F64x2Le(result=new_value, lhs~, rhs~))
+    F32x4Neg(input~, ..) => Some(F32x4Neg(result=new_value, input~))
+    F64x2Neg(input~, ..) => Some(F64x2Neg(result=new_value, input~))
+    F32x4Abs(input~, ..) => Some(F32x4Abs(result=new_value, input~))
+    F64x2Abs(input~, ..) => Some(F64x2Abs(result=new_value, input~))
+    F32x4Min(lhs~, rhs~, ..) => Some(F32x4Min(result=new_value, lhs~, rhs~))
+    F64x2Min(lhs~, rhs~, ..) => Some(F64x2Min(result=new_value, lhs~, rhs~))
+    F32x4Max(lhs~, rhs~, ..) => Some(F32x4Max(result=new_value, lhs~, rhs~))
+    F64x2Max(lhs~, rhs~, ..) => Some(F64x2Max(result=new_value, lhs~, rhs~))
+    F32x4Pmin(lhs~, rhs~, ..) => Some(F32x4Pmin(result=new_value, lhs~, rhs~))
+    F64x2Pmin(lhs~, rhs~, ..) => Some(F64x2Pmin(result=new_value, lhs~, rhs~))
+    F32x4Pmax(lhs~, rhs~, ..) => Some(F32x4Pmax(result=new_value, lhs~, rhs~))
+    F64x2Pmax(lhs~, rhs~, ..) => Some(F64x2Pmax(result=new_value, lhs~, rhs~))
+    F32x4Add(lhs~, rhs~, ..) => Some(F32x4Add(result=new_value, lhs~, rhs~))
+    F64x2Add(lhs~, rhs~, ..) => Some(F64x2Add(result=new_value, lhs~, rhs~))
+    F32x4Sub(lhs~, rhs~, ..) => Some(F32x4Sub(result=new_value, lhs~, rhs~))
+    F64x2Sub(lhs~, rhs~, ..) => Some(F64x2Sub(result=new_value, lhs~, rhs~))
+    F32x4Div(lhs~, rhs~, ..) => Some(F32x4Div(result=new_value, lhs~, rhs~))
+    F64x2Div(lhs~, rhs~, ..) => Some(F64x2Div(result=new_value, lhs~, rhs~))
+    F32x4Mul(lhs~, rhs~, ..) => Some(F32x4Mul(result=new_value, lhs~, rhs~))
+    F64x2Mul(lhs~, rhs~, ..) => Some(F64x2Mul(result=new_value, lhs~, rhs~))
+    F32x4Sqrt(input~, ..) => Some(F32x4Sqrt(result=new_value, input~))
+    F64x2Sqrt(input~, ..) => Some(F64x2Sqrt(result=new_value, input~))
+    F32x4Ceil(input~, ..) => Some(F32x4Ceil(result=new_value, input~))
+    F64x2Ceil(input~, ..) => Some(F64x2Ceil(result=new_value, input~))
+    F32x4Floor(input~, ..) => Some(F32x4Floor(result=new_value, input~))
+    F64x2Floor(input~, ..) => Some(F64x2Floor(result=new_value, input~))
+    F32x4Trunc(input~, ..) => Some(F32x4Trunc(result=new_value, input~))
+    F64x2Trunc(input~, ..) => Some(F64x2Trunc(result=new_value, input~))
+    F32x4Nearest(input~, ..) => Some(F32x4Nearest(result=new_value, input~))
+    F64x2Nearest(input~, ..) => Some(F64x2Nearest(result=new_value, input~))
+    F32x4ConvertI32x4S(input~, ..) =>
       Some(F32x4ConvertI32x4S(result=new_value, input~))
-    F32x4ConvertI32x4U(input~) =>
+    F32x4ConvertI32x4U(input~, ..) =>
       Some(F32x4ConvertI32x4U(result=new_value, input~))
-    F64x2ConvertLowI32x4S(input~) =>
+    F64x2ConvertLowI32x4S(input~, ..) =>
       Some(F64x2ConvertLowI32x4S(result=new_value, input~))
-    F64x2ConvertLowI32x4U(input~) =>
+    F64x2ConvertLowI32x4U(input~, ..) =>
       Some(F64x2ConvertLowI32x4U(result=new_value, input~))
-    I32x4TruncSatF32x4S(input~) =>
+    I32x4TruncSatF32x4S(input~, ..) =>
       Some(I32x4TruncSatF32x4S(result=new_value, input~))
-    I32x4TruncSatF32x4U(input~) =>
+    I32x4TruncSatF32x4U(input~, ..) =>
       Some(I32x4TruncSatF32x4U(result=new_value, input~))
-    I32x4TruncSatF64x2SZero(input~) =>
+    I32x4TruncSatF64x2SZero(input~, ..) =>
       Some(I32x4TruncSatF64x2SZero(result=new_value, input~))
-    I32x4TruncSatF64x2UZero(input~) =>
+    I32x4TruncSatF64x2UZero(input~, ..) =>
       Some(I32x4TruncSatF64x2UZero(result=new_value, input~))
-    F32x4DemoteF64x2Zero(input~) =>
+    F32x4DemoteF64x2Zero(input~, ..) =>
       Some(F32x4DemoteF64x2Zero(result=new_value, input~))
-    F64x2PromoteLowF32x4(input~) =>
+    F64x2PromoteLowF32x4(input~, ..) =>
       Some(F64x2PromoteLowF32x4(result=new_value, input~))
-    I8x16NarrowI16x8S(lhs~, rhs~) =>
+    I8x16NarrowI16x8S(lhs~, rhs~, ..) =>
       Some(I8x16NarrowI16x8S(result=new_value, lhs~, rhs~))
-    I8x16NarrowI16x8U(lhs~, rhs~) =>
+    I8x16NarrowI16x8U(lhs~, rhs~, ..) =>
       Some(I8x16NarrowI16x8U(result=new_value, lhs~, rhs~))
-    I16x8NarrowI32x4S(lhs~, rhs~) =>
+    I16x8NarrowI32x4S(lhs~, rhs~, ..) =>
       Some(I16x8NarrowI32x4S(result=new_value, lhs~, rhs~))
-    I16x8NarrowI32x4U(lhs~, rhs~) =>
+    I16x8NarrowI32x4U(lhs~, rhs~, ..) =>
       Some(I16x8NarrowI32x4U(result=new_value, lhs~, rhs~))
-    I16x8ExtendLowI8x16S(input~) =>
+    I16x8ExtendLowI8x16S(input~, ..) =>
       Some(I16x8ExtendLowI8x16S(result=new_value, input~))
-    I16x8ExtendHighI8x16S(input~) =>
+    I16x8ExtendHighI8x16S(input~, ..) =>
       Some(I16x8ExtendHighI8x16S(result=new_value, input~))
-    I16x8ExtendLowI8x16U(input~) =>
+    I16x8ExtendLowI8x16U(input~, ..) =>
       Some(I16x8ExtendLowI8x16U(result=new_value, input~))
-    I16x8ExtendHighI8x16U(input~) =>
+    I16x8ExtendHighI8x16U(input~, ..) =>
       Some(I16x8ExtendHighI8x16U(result=new_value, input~))
-    I32x4ExtendLowI16x8S(input~) =>
+    I32x4ExtendLowI16x8S(input~, ..) =>
       Some(I32x4ExtendLowI16x8S(result=new_value, input~))
-    I32x4ExtendHighI16x8S(input~) =>
+    I32x4ExtendHighI16x8S(input~, ..) =>
       Some(I32x4ExtendHighI16x8S(result=new_value, input~))
-    I32x4ExtendLowI16x8U(input~) =>
+    I32x4ExtendLowI16x8U(input~, ..) =>
       Some(I32x4ExtendLowI16x8U(result=new_value, input~))
-    I32x4ExtendHighI16x8U(input~) =>
+    I32x4ExtendHighI16x8U(input~, ..) =>
       Some(I32x4ExtendHighI16x8U(result=new_value, input~))
-    I64x2ExtendLowI32x4S(input~) =>
+    I64x2ExtendLowI32x4S(input~, ..) =>
       Some(I64x2ExtendLowI32x4S(result=new_value, input~))
-    I64x2ExtendHighI32x4S(input~) =>
+    I64x2ExtendHighI32x4S(input~, ..) =>
       Some(I64x2ExtendHighI32x4S(result=new_value, input~))
-    I64x2ExtendLowI32x4U(input~) =>
+    I64x2ExtendLowI32x4U(input~, ..) =>
       Some(I64x2ExtendLowI32x4U(result=new_value, input~))
-    I64x2ExtendHighI32x4U(input~) =>
+    I64x2ExtendHighI32x4U(input~, ..) =>
       Some(I64x2ExtendHighI32x4U(result=new_value, input~))
-    V128Load(offset_lo~) => Some(V128Load(result=new_value, offset_lo~))
-    V128LoadAt(address~) => Some(V128LoadAt(result=new_value, address~))
-    V128LoadOffset16(ptr~, offset~) =>
+    V128Load(offset_lo~, ..) => Some(V128Load(result=new_value, offset_lo~))
+    V128LoadAt(address~, ..) => Some(V128LoadAt(result=new_value, address~))
+    V128LoadOffset16(ptr~, offset~, ..) =>
       Some(V128LoadOffset16(result=new_value, ptr~, offset~))
-    V128Load32Zero(offset_lo~) =>
+    V128Load32Zero(offset_lo~, ..) =>
       Some(V128Load32Zero(result=new_value, offset_lo~))
-    V128Load32ZeroAt(address~) =>
+    V128Load32ZeroAt(address~, ..) =>
       Some(V128Load32ZeroAt(result=new_value, address~))
-    V128Load32ZeroOffset16(ptr~, offset~) =>
+    V128Load32ZeroOffset16(ptr~, offset~, ..) =>
       Some(V128Load32ZeroOffset16(result=new_value, ptr~, offset~))
-    V128Load64Zero(offset_lo~) =>
+    V128Load64Zero(offset_lo~, ..) =>
       Some(V128Load64Zero(result=new_value, offset_lo~))
-    V128Load64ZeroAt(address~) =>
+    V128Load64ZeroAt(address~, ..) =>
       Some(V128Load64ZeroAt(result=new_value, address~))
-    V128Load64ZeroOffset16(ptr~, offset~) =>
+    V128Load64ZeroOffset16(ptr~, offset~, ..) =>
       Some(V128Load64ZeroOffset16(result=new_value, ptr~, offset~))
-    V128Load8Splat(offset_lo~) =>
+    V128Load8Splat(offset_lo~, ..) =>
       Some(V128Load8Splat(result=new_value, offset_lo~))
-    V128Load8SplatAt(address~) =>
+    V128Load8SplatAt(address~, ..) =>
       Some(V128Load8SplatAt(result=new_value, address~))
-    V128Load8SplatOffset16(ptr~, offset~) =>
+    V128Load8SplatOffset16(ptr~, offset~, ..) =>
       Some(V128Load8SplatOffset16(result=new_value, ptr~, offset~))
-    V128Load16Splat(offset_lo~) =>
+    V128Load16Splat(offset_lo~, ..) =>
       Some(V128Load16Splat(result=new_value, offset_lo~))
-    V128Load16SplatAt(address~) =>
+    V128Load16SplatAt(address~, ..) =>
       Some(V128Load16SplatAt(result=new_value, address~))
-    V128Load16SplatOffset16(ptr~, offset~) =>
+    V128Load16SplatOffset16(ptr~, offset~, ..) =>
       Some(V128Load16SplatOffset16(result=new_value, ptr~, offset~))
-    V128Load32Splat(offset_lo~) =>
+    V128Load32Splat(offset_lo~, ..) =>
       Some(V128Load32Splat(result=new_value, offset_lo~))
-    V128Load32SplatAt(address~) =>
+    V128Load32SplatAt(address~, ..) =>
       Some(V128Load32SplatAt(result=new_value, address~))
-    V128Load32SplatOffset16(ptr~, offset~) =>
+    V128Load32SplatOffset16(ptr~, offset~, ..) =>
       Some(V128Load32SplatOffset16(result=new_value, ptr~, offset~))
-    V128Load64Splat(offset_lo~) =>
+    V128Load64Splat(offset_lo~, ..) =>
       Some(V128Load64Splat(result=new_value, offset_lo~))
-    V128Load64SplatAt(address~) =>
+    V128Load64SplatAt(address~, ..) =>
       Some(V128Load64SplatAt(result=new_value, address~))
-    V128Load64SplatOffset16(ptr~, offset~) =>
+    V128Load64SplatOffset16(ptr~, offset~, ..) =>
       Some(V128Load64SplatOffset16(result=new_value, ptr~, offset~))
-    V128Load8x8S(offset_lo~) => Some(V128Load8x8S(result=new_value, offset_lo~))
-    V128Load8x8SAt(address~) => Some(V128Load8x8SAt(result=new_value, address~))
-    V128Load8x8SOffset16(ptr~, offset~) =>
+    V128Load8x8S(offset_lo~, ..) =>
+      Some(V128Load8x8S(result=new_value, offset_lo~))
+    V128Load8x8SAt(address~, ..) =>
+      Some(V128Load8x8SAt(result=new_value, address~))
+    V128Load8x8SOffset16(ptr~, offset~, ..) =>
       Some(V128Load8x8SOffset16(result=new_value, ptr~, offset~))
-    V128Load8x8U(offset_lo~) => Some(V128Load8x8U(result=new_value, offset_lo~))
-    V128Load8x8UAt(address~) => Some(V128Load8x8UAt(result=new_value, address~))
-    V128Load8x8UOffset16(ptr~, offset~) =>
+    V128Load8x8U(offset_lo~, ..) =>
+      Some(V128Load8x8U(result=new_value, offset_lo~))
+    V128Load8x8UAt(address~, ..) =>
+      Some(V128Load8x8UAt(result=new_value, address~))
+    V128Load8x8UOffset16(ptr~, offset~, ..) =>
       Some(V128Load8x8UOffset16(result=new_value, ptr~, offset~))
-    V128Load16x4S(offset_lo~) =>
+    V128Load16x4S(offset_lo~, ..) =>
       Some(V128Load16x4S(result=new_value, offset_lo~))
-    V128Load16x4SAt(address~) =>
+    V128Load16x4SAt(address~, ..) =>
       Some(V128Load16x4SAt(result=new_value, address~))
-    V128Load16x4SOffset16(ptr~, offset~) =>
+    V128Load16x4SOffset16(ptr~, offset~, ..) =>
       Some(V128Load16x4SOffset16(result=new_value, ptr~, offset~))
-    V128Load16x4U(offset_lo~) =>
+    V128Load16x4U(offset_lo~, ..) =>
       Some(V128Load16x4U(result=new_value, offset_lo~))
-    V128Load16x4UAt(address~) =>
+    V128Load16x4UAt(address~, ..) =>
       Some(V128Load16x4UAt(result=new_value, address~))
-    V128Load16x4UOffset16(ptr~, offset~) =>
+    V128Load16x4UOffset16(ptr~, offset~, ..) =>
       Some(V128Load16x4UOffset16(result=new_value, ptr~, offset~))
-    V128Load32x2S(offset_lo~) =>
+    V128Load32x2S(offset_lo~, ..) =>
       Some(V128Load32x2S(result=new_value, offset_lo~))
-    V128Load32x2SAt(address~) =>
+    V128Load32x2SAt(address~, ..) =>
       Some(V128Load32x2SAt(result=new_value, address~))
-    V128Load32x2SOffset16(ptr~, offset~) =>
+    V128Load32x2SOffset16(ptr~, offset~, ..) =>
       Some(V128Load32x2SOffset16(result=new_value, ptr~, offset~))
-    V128Load32x2U(offset_lo~) =>
+    V128Load32x2U(offset_lo~, ..) =>
       Some(V128Load32x2U(result=new_value, offset_lo~))
-    V128Load32x2UAt(address~) =>
+    V128Load32x2UAt(address~, ..) =>
       Some(V128Load32x2UAt(result=new_value, address~))
-    V128Load32x2UOffset16(ptr~, offset~) =>
+    V128Load32x2UOffset16(ptr~, offset~, ..) =>
       Some(V128Load32x2UOffset16(result=new_value, ptr~, offset~))
-    V128Load8Lane(offset_lo~) =>
+    V128Load8Lane(offset_lo~, ..) =>
       Some(V128Load8Lane(result=new_value, offset_lo~))
-    V128Load8LaneAt(address~) =>
+    V128Load8LaneAt(address~, ..) =>
       Some(V128Load8LaneAt(result=new_value, address~))
-    V128Load16Lane(offset_lo~) =>
+    V128Load16Lane(offset_lo~, ..) =>
       Some(V128Load16Lane(result=new_value, offset_lo~))
-    V128Load16LaneAt(address~) =>
+    V128Load16LaneAt(address~, ..) =>
       Some(V128Load16LaneAt(result=new_value, address~))
-    V128Load32Lane(offset_lo~) =>
+    V128Load32Lane(offset_lo~, ..) =>
       Some(V128Load32Lane(result=new_value, offset_lo~))
-    V128Load32LaneAt(address~) =>
+    V128Load32LaneAt(address~, ..) =>
       Some(V128Load32LaneAt(result=new_value, address~))
-    V128Load64Lane(offset_lo~) =>
+    V128Load64Lane(offset_lo~, ..) =>
       Some(V128Load64Lane(result=new_value, offset_lo~))
-    V128Load64LaneAt(address~) =>
+    V128Load64LaneAt(address~, ..) =>
       Some(V128Load64LaneAt(result=new_value, address~))
     _ => None
   }
@@ -12846,99 +12919,125 @@ pub fn Op::branch_offset16(self : Op) -> BranchOffset16? {
 /// Returns the instruction with its `offset: BranchOffset16` field replaced, if it has one.
 pub fn Op::set_branch_offset16(self : Op, new_value : BranchOffset16) -> Op? {
   match self {
-    BranchI32And(lhs~, rhs~) => Some(BranchI32And(offset=new_value, lhs~, rhs~))
-    BranchI32AndImm16(lhs~, rhs~) =>
+    BranchI32And(lhs~, rhs~, ..) =>
+      Some(BranchI32And(offset=new_value, lhs~, rhs~))
+    BranchI32AndImm16(lhs~, rhs~, ..) =>
       Some(BranchI32AndImm16(offset=new_value, lhs~, rhs~))
-    BranchI32Or(lhs~, rhs~) => Some(BranchI32Or(offset=new_value, lhs~, rhs~))
-    BranchI32OrImm16(lhs~, rhs~) =>
+    BranchI32Or(lhs~, rhs~, ..) =>
+      Some(BranchI32Or(offset=new_value, lhs~, rhs~))
+    BranchI32OrImm16(lhs~, rhs~, ..) =>
       Some(BranchI32OrImm16(offset=new_value, lhs~, rhs~))
-    BranchI32Nand(lhs~, rhs~) =>
+    BranchI32Nand(lhs~, rhs~, ..) =>
       Some(BranchI32Nand(offset=new_value, lhs~, rhs~))
-    BranchI32NandImm16(lhs~, rhs~) =>
+    BranchI32NandImm16(lhs~, rhs~, ..) =>
       Some(BranchI32NandImm16(offset=new_value, lhs~, rhs~))
-    BranchI32Nor(lhs~, rhs~) => Some(BranchI32Nor(offset=new_value, lhs~, rhs~))
-    BranchI32NorImm16(lhs~, rhs~) =>
+    BranchI32Nor(lhs~, rhs~, ..) =>
+      Some(BranchI32Nor(offset=new_value, lhs~, rhs~))
+    BranchI32NorImm16(lhs~, rhs~, ..) =>
       Some(BranchI32NorImm16(offset=new_value, lhs~, rhs~))
-    BranchI32Eq(lhs~, rhs~) => Some(BranchI32Eq(offset=new_value, lhs~, rhs~))
-    BranchI32EqImm16(lhs~, rhs~) =>
+    BranchI32Eq(lhs~, rhs~, ..) =>
+      Some(BranchI32Eq(offset=new_value, lhs~, rhs~))
+    BranchI32EqImm16(lhs~, rhs~, ..) =>
       Some(BranchI32EqImm16(offset=new_value, lhs~, rhs~))
-    BranchI32Ne(lhs~, rhs~) => Some(BranchI32Ne(offset=new_value, lhs~, rhs~))
-    BranchI32NeImm16(lhs~, rhs~) =>
+    BranchI32Ne(lhs~, rhs~, ..) =>
+      Some(BranchI32Ne(offset=new_value, lhs~, rhs~))
+    BranchI32NeImm16(lhs~, rhs~, ..) =>
       Some(BranchI32NeImm16(offset=new_value, lhs~, rhs~))
-    BranchI32LtS(lhs~, rhs~) => Some(BranchI32LtS(offset=new_value, lhs~, rhs~))
-    BranchI32LtSImm16Lhs(lhs~, rhs~) =>
+    BranchI32LtS(lhs~, rhs~, ..) =>
+      Some(BranchI32LtS(offset=new_value, lhs~, rhs~))
+    BranchI32LtSImm16Lhs(lhs~, rhs~, ..) =>
       Some(BranchI32LtSImm16Lhs(offset=new_value, lhs~, rhs~))
-    BranchI32LtSImm16Rhs(lhs~, rhs~) =>
+    BranchI32LtSImm16Rhs(lhs~, rhs~, ..) =>
       Some(BranchI32LtSImm16Rhs(offset=new_value, lhs~, rhs~))
-    BranchI32LtU(lhs~, rhs~) => Some(BranchI32LtU(offset=new_value, lhs~, rhs~))
-    BranchI32LtUImm16Lhs(lhs~, rhs~) =>
+    BranchI32LtU(lhs~, rhs~, ..) =>
+      Some(BranchI32LtU(offset=new_value, lhs~, rhs~))
+    BranchI32LtUImm16Lhs(lhs~, rhs~, ..) =>
       Some(BranchI32LtUImm16Lhs(offset=new_value, lhs~, rhs~))
-    BranchI32LtUImm16Rhs(lhs~, rhs~) =>
+    BranchI32LtUImm16Rhs(lhs~, rhs~, ..) =>
       Some(BranchI32LtUImm16Rhs(offset=new_value, lhs~, rhs~))
-    BranchI32LeS(lhs~, rhs~) => Some(BranchI32LeS(offset=new_value, lhs~, rhs~))
-    BranchI32LeSImm16Lhs(lhs~, rhs~) =>
+    BranchI32LeS(lhs~, rhs~, ..) =>
+      Some(BranchI32LeS(offset=new_value, lhs~, rhs~))
+    BranchI32LeSImm16Lhs(lhs~, rhs~, ..) =>
       Some(BranchI32LeSImm16Lhs(offset=new_value, lhs~, rhs~))
-    BranchI32LeSImm16Rhs(lhs~, rhs~) =>
+    BranchI32LeSImm16Rhs(lhs~, rhs~, ..) =>
       Some(BranchI32LeSImm16Rhs(offset=new_value, lhs~, rhs~))
-    BranchI32LeU(lhs~, rhs~) => Some(BranchI32LeU(offset=new_value, lhs~, rhs~))
-    BranchI32LeUImm16Lhs(lhs~, rhs~) =>
+    BranchI32LeU(lhs~, rhs~, ..) =>
+      Some(BranchI32LeU(offset=new_value, lhs~, rhs~))
+    BranchI32LeUImm16Lhs(lhs~, rhs~, ..) =>
       Some(BranchI32LeUImm16Lhs(offset=new_value, lhs~, rhs~))
-    BranchI32LeUImm16Rhs(lhs~, rhs~) =>
+    BranchI32LeUImm16Rhs(lhs~, rhs~, ..) =>
       Some(BranchI32LeUImm16Rhs(offset=new_value, lhs~, rhs~))
-    BranchI64And(lhs~, rhs~) => Some(BranchI64And(offset=new_value, lhs~, rhs~))
-    BranchI64AndImm16(lhs~, rhs~) =>
+    BranchI64And(lhs~, rhs~, ..) =>
+      Some(BranchI64And(offset=new_value, lhs~, rhs~))
+    BranchI64AndImm16(lhs~, rhs~, ..) =>
       Some(BranchI64AndImm16(offset=new_value, lhs~, rhs~))
-    BranchI64Or(lhs~, rhs~) => Some(BranchI64Or(offset=new_value, lhs~, rhs~))
-    BranchI64OrImm16(lhs~, rhs~) =>
+    BranchI64Or(lhs~, rhs~, ..) =>
+      Some(BranchI64Or(offset=new_value, lhs~, rhs~))
+    BranchI64OrImm16(lhs~, rhs~, ..) =>
       Some(BranchI64OrImm16(offset=new_value, lhs~, rhs~))
-    BranchI64Nand(lhs~, rhs~) =>
+    BranchI64Nand(lhs~, rhs~, ..) =>
       Some(BranchI64Nand(offset=new_value, lhs~, rhs~))
-    BranchI64NandImm16(lhs~, rhs~) =>
+    BranchI64NandImm16(lhs~, rhs~, ..) =>
       Some(BranchI64NandImm16(offset=new_value, lhs~, rhs~))
-    BranchI64Nor(lhs~, rhs~) => Some(BranchI64Nor(offset=new_value, lhs~, rhs~))
-    BranchI64NorImm16(lhs~, rhs~) =>
+    BranchI64Nor(lhs~, rhs~, ..) =>
+      Some(BranchI64Nor(offset=new_value, lhs~, rhs~))
+    BranchI64NorImm16(lhs~, rhs~, ..) =>
       Some(BranchI64NorImm16(offset=new_value, lhs~, rhs~))
-    BranchI64Eq(lhs~, rhs~) => Some(BranchI64Eq(offset=new_value, lhs~, rhs~))
-    BranchI64EqImm16(lhs~, rhs~) =>
+    BranchI64Eq(lhs~, rhs~, ..) =>
+      Some(BranchI64Eq(offset=new_value, lhs~, rhs~))
+    BranchI64EqImm16(lhs~, rhs~, ..) =>
       Some(BranchI64EqImm16(offset=new_value, lhs~, rhs~))
-    BranchI64Ne(lhs~, rhs~) => Some(BranchI64Ne(offset=new_value, lhs~, rhs~))
-    BranchI64NeImm16(lhs~, rhs~) =>
+    BranchI64Ne(lhs~, rhs~, ..) =>
+      Some(BranchI64Ne(offset=new_value, lhs~, rhs~))
+    BranchI64NeImm16(lhs~, rhs~, ..) =>
       Some(BranchI64NeImm16(offset=new_value, lhs~, rhs~))
-    BranchI64LtS(lhs~, rhs~) => Some(BranchI64LtS(offset=new_value, lhs~, rhs~))
-    BranchI64LtSImm16Lhs(lhs~, rhs~) =>
+    BranchI64LtS(lhs~, rhs~, ..) =>
+      Some(BranchI64LtS(offset=new_value, lhs~, rhs~))
+    BranchI64LtSImm16Lhs(lhs~, rhs~, ..) =>
       Some(BranchI64LtSImm16Lhs(offset=new_value, lhs~, rhs~))
-    BranchI64LtSImm16Rhs(lhs~, rhs~) =>
+    BranchI64LtSImm16Rhs(lhs~, rhs~, ..) =>
       Some(BranchI64LtSImm16Rhs(offset=new_value, lhs~, rhs~))
-    BranchI64LtU(lhs~, rhs~) => Some(BranchI64LtU(offset=new_value, lhs~, rhs~))
-    BranchI64LtUImm16Lhs(lhs~, rhs~) =>
+    BranchI64LtU(lhs~, rhs~, ..) =>
+      Some(BranchI64LtU(offset=new_value, lhs~, rhs~))
+    BranchI64LtUImm16Lhs(lhs~, rhs~, ..) =>
       Some(BranchI64LtUImm16Lhs(offset=new_value, lhs~, rhs~))
-    BranchI64LtUImm16Rhs(lhs~, rhs~) =>
+    BranchI64LtUImm16Rhs(lhs~, rhs~, ..) =>
       Some(BranchI64LtUImm16Rhs(offset=new_value, lhs~, rhs~))
-    BranchI64LeS(lhs~, rhs~) => Some(BranchI64LeS(offset=new_value, lhs~, rhs~))
-    BranchI64LeSImm16Lhs(lhs~, rhs~) =>
+    BranchI64LeS(lhs~, rhs~, ..) =>
+      Some(BranchI64LeS(offset=new_value, lhs~, rhs~))
+    BranchI64LeSImm16Lhs(lhs~, rhs~, ..) =>
       Some(BranchI64LeSImm16Lhs(offset=new_value, lhs~, rhs~))
-    BranchI64LeSImm16Rhs(lhs~, rhs~) =>
+    BranchI64LeSImm16Rhs(lhs~, rhs~, ..) =>
       Some(BranchI64LeSImm16Rhs(offset=new_value, lhs~, rhs~))
-    BranchI64LeU(lhs~, rhs~) => Some(BranchI64LeU(offset=new_value, lhs~, rhs~))
-    BranchI64LeUImm16Lhs(lhs~, rhs~) =>
+    BranchI64LeU(lhs~, rhs~, ..) =>
+      Some(BranchI64LeU(offset=new_value, lhs~, rhs~))
+    BranchI64LeUImm16Lhs(lhs~, rhs~, ..) =>
       Some(BranchI64LeUImm16Lhs(offset=new_value, lhs~, rhs~))
-    BranchI64LeUImm16Rhs(lhs~, rhs~) =>
+    BranchI64LeUImm16Rhs(lhs~, rhs~, ..) =>
       Some(BranchI64LeUImm16Rhs(offset=new_value, lhs~, rhs~))
-    BranchF32Eq(lhs~, rhs~) => Some(BranchF32Eq(offset=new_value, lhs~, rhs~))
-    BranchF32Ne(lhs~, rhs~) => Some(BranchF32Ne(offset=new_value, lhs~, rhs~))
-    BranchF32Lt(lhs~, rhs~) => Some(BranchF32Lt(offset=new_value, lhs~, rhs~))
-    BranchF32Le(lhs~, rhs~) => Some(BranchF32Le(offset=new_value, lhs~, rhs~))
-    BranchF32NotLt(lhs~, rhs~) =>
+    BranchF32Eq(lhs~, rhs~, ..) =>
+      Some(BranchF32Eq(offset=new_value, lhs~, rhs~))
+    BranchF32Ne(lhs~, rhs~, ..) =>
+      Some(BranchF32Ne(offset=new_value, lhs~, rhs~))
+    BranchF32Lt(lhs~, rhs~, ..) =>
+      Some(BranchF32Lt(offset=new_value, lhs~, rhs~))
+    BranchF32Le(lhs~, rhs~, ..) =>
+      Some(BranchF32Le(offset=new_value, lhs~, rhs~))
+    BranchF32NotLt(lhs~, rhs~, ..) =>
       Some(BranchF32NotLt(offset=new_value, lhs~, rhs~))
-    BranchF32NotLe(lhs~, rhs~) =>
+    BranchF32NotLe(lhs~, rhs~, ..) =>
       Some(BranchF32NotLe(offset=new_value, lhs~, rhs~))
-    BranchF64Eq(lhs~, rhs~) => Some(BranchF64Eq(offset=new_value, lhs~, rhs~))
-    BranchF64Ne(lhs~, rhs~) => Some(BranchF64Ne(offset=new_value, lhs~, rhs~))
-    BranchF64Lt(lhs~, rhs~) => Some(BranchF64Lt(offset=new_value, lhs~, rhs~))
-    BranchF64Le(lhs~, rhs~) => Some(BranchF64Le(offset=new_value, lhs~, rhs~))
-    BranchF64NotLt(lhs~, rhs~) =>
+    BranchF64Eq(lhs~, rhs~, ..) =>
+      Some(BranchF64Eq(offset=new_value, lhs~, rhs~))
+    BranchF64Ne(lhs~, rhs~, ..) =>
+      Some(BranchF64Ne(offset=new_value, lhs~, rhs~))
+    BranchF64Lt(lhs~, rhs~, ..) =>
+      Some(BranchF64Lt(offset=new_value, lhs~, rhs~))
+    BranchF64Le(lhs~, rhs~, ..) =>
+      Some(BranchF64Le(offset=new_value, lhs~, rhs~))
+    BranchF64NotLt(lhs~, rhs~, ..) =>
       Some(BranchF64NotLt(offset=new_value, lhs~, rhs~))
-    BranchF64NotLe(lhs~, rhs~) =>
+    BranchF64NotLe(lhs~, rhs~, ..) =>
       Some(BranchF64NotLe(offset=new_value, lhs~, rhs~))
     _ => None
   }
@@ -12959,7 +13058,7 @@ pub fn Op::branch_offset(self : Op) -> BranchOffset? {
 pub fn Op::set_branch_offset(self : Op, new_value : BranchOffset) -> Op? {
   match self {
     Branch(..) => Some(Branch(offset=new_value))
-    BranchTableTarget(results~) =>
+    BranchTableTarget(results~, ..) =>
       Some(BranchTableTarget(offset=new_value, results~))
     _ => None
   }
@@ -12987,19 +13086,20 @@ pub fn Op::results_span(self : Op) -> SlotSpan? {
 /// Returns the instruction with its `results: SlotSpan` field replaced, if it has one.
 pub fn Op::set_results_span(self : Op, new_value : SlotSpan) -> Op? {
   match self {
-    CopySpan(values~, len~) => Some(CopySpan(results=new_value, values~, len~))
-    CopyMany(values~) => Some(CopyMany(results=new_value, values~))
-    CallInternal0(func~) => Some(CallInternal0(results=new_value, func~))
-    CallInternal(func~) => Some(CallInternal(results=new_value, func~))
-    CallImported0(func~) => Some(CallImported0(results=new_value, func~))
-    CallImported(func~) => Some(CallImported(results=new_value, func~))
-    CallIndirect0(func_type~) =>
+    CopySpan(values~, len~, ..) =>
+      Some(CopySpan(results=new_value, values~, len~))
+    CopyMany(values~, ..) => Some(CopyMany(results=new_value, values~))
+    CallInternal0(func~, ..) => Some(CallInternal0(results=new_value, func~))
+    CallInternal(func~, ..) => Some(CallInternal(results=new_value, func~))
+    CallImported0(func~, ..) => Some(CallImported0(results=new_value, func~))
+    CallImported(func~, ..) => Some(CallImported(results=new_value, func~))
+    CallIndirect0(func_type~, ..) =>
       Some(CallIndirect0(results=new_value, func_type~))
-    CallIndirect0Imm16(func_type~) =>
+    CallIndirect0Imm16(func_type~, ..) =>
       Some(CallIndirect0Imm16(results=new_value, func_type~))
-    CallIndirect(func_type~) =>
+    CallIndirect(func_type~, ..) =>
       Some(CallIndirect(results=new_value, func_type~))
-    CallIndirectImm16(func_type~) =>
+    CallIndirectImm16(func_type~, ..) =>
       Some(CallIndirectImm16(results=new_value, func_type~))
     _ => None
   }
