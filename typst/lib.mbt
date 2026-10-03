@@ -99,58 +99,63 @@ fn[T : @library.Output] compile_impl(
     @library.Route::root(),
     main,
   ).content()
-  let history : Array[T] = []
-  let mut document : T? = None
+  // Layout results are memoized across the iterations (upstream: comemo;
+  // see `library/memo.mbt`).
+  let document = @library.with_layout_memo(() => {
+    let history : Array[T] = []
+    let mut document : T? = None
 
-  // Relayout until all introspections stabilize.
-  // If that doesn't happen within five attempts, we give up.
-  while true {
-    let introspector = match history.last() {
-      Some(doc) => doc.introspector()
-      None => empty_introspector
-    }
-    let constraint = @library.IntrospectionRecorder::new()
-    let subsink = @library.Sink::new()
-    let engine : @library.Engine = {
-      library,
-      world,
-      introspector: introspector.track_with(constraint),
-      traced,
-      sink: subsink,
-      route: @library.Route::root(),
-    }
-    let doc = T::create(engine, content, styles)
-    document = Some(doc)
-    if constraint.validate(doc.introspector()) {
-      sink.extend_from_sink(subsink)
-      break
-    }
-    if history.length() == @library.max_iters - 1 {
-      let introspectors = [empty_introspector]
-      for i in 1..<@library.max_iters {
-        introspectors.push(history[i - 1].introspector())
+    // Relayout until all introspections stabilize.
+    // If that doesn't happen within five attempts, we give up.
+    while true {
+      let introspector = match history.last() {
+        Some(doc) => doc.introspector()
+        None => empty_introspector
       }
-      introspectors.push(doc.introspector())
-      let warnings = @library.analyze(
+      let constraint = @library.IntrospectionRecorder::new()
+      let subsink = @library.Sink::new()
+      let engine : @library.Engine = {
+        library,
         world,
-        introspectors,
-        subsink.introspections(),
-      )
-      sink.extend_from_sink(subsink)
-      for warning in warnings {
-        sink.warn(warning)
+        introspector: introspector.track_with(constraint),
+        traced,
+        sink: subsink,
+        route: @library.Route::root(),
       }
-      break
+      let doc = T::create(engine, content, styles)
+      document = Some(doc)
+      if constraint.validate(doc.introspector()) {
+        sink.extend_from_sink(subsink)
+        break
+      }
+      if history.length() == @library.max_iters - 1 {
+        let introspectors = [empty_introspector]
+        for i in 1..<@library.max_iters {
+          introspectors.push(history[i - 1].introspector())
+        }
+        introspectors.push(doc.introspector())
+        let warnings = @library.analyze(
+          world,
+          introspectors,
+          subsink.introspections(),
+        )
+        sink.extend_from_sink(subsink)
+        for warning in warnings {
+          sink.warn(warning)
+        }
+        break
+      }
+      history.push(doc)
     }
-    history.push(doc)
-  }
+    document.unwrap()
+  })
 
   // Promote delayed errors.
   let delayed = sink.take_delayed()
   if !delayed.is_empty() {
     raise @library.SourceError(delayed)
   }
-  document.unwrap()
+  document
 }
 
 ///|

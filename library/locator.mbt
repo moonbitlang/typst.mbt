@@ -85,6 +85,16 @@ fn Locator::resolve(self : Locator) -> Resolved {
 }
 
 ///|
+/// A fingerprint of the fully resolved locator (not upstream: part of the
+/// memoization key of layout functions; see `memo.mbt`).
+pub fn Locator::memo_hash(self : Locator) -> U128 {
+  match self.resolve() {
+    Hash(hash) => hash128((0, hash))
+    Measure(base, span) => hash128((1, base, span))
+  }
+}
+
+///|
 /// Upstream `Debug for Locator`.
 pub impl Show for Locator with fn output(self, logger) {
   logger.write_string("Locator(")

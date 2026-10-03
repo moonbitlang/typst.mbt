@@ -359,12 +359,14 @@ pub struct StyleChain {
   head : Array[Style]
   /// The remaining links in the chain.
   tail : StyleChain?
+  /// The cached [StyleChain::memo_hash] (not upstream).
+  priv mut memo_hash : U128?
 }
 
 ///|
 /// Start a new style chain with root styles.
 pub fn StyleChain::new(root : Styles) -> StyleChain {
-  { head: root.items, tail: None, }
+  { head: root.items, tail: None, memo_hash: None, }
 }
 
 ///|
@@ -372,7 +374,7 @@ pub fn StyleChain::new(root : Styles) -> StyleChain {
 pub fn StyleChain::empty() -> StyleChain {
   // All empty chains share their (empty) head so that they compare equal,
   // like upstream's default chains do.
-  { head: empty_style_head, tail: None, }
+  { head: empty_style_head, tail: None, memo_hash: None, }
 }
 
 ///|
@@ -384,14 +386,42 @@ pub fn StyleChain::chain(self : StyleChain, local : Styles) -> StyleChain {
   if local.is_empty() {
     self
   } else {
-    { head: local.items, tail: Some(self), }
+    { head: local.items, tail: Some(self), memo_hash: None, }
   }
 }
 
 ///|
 /// Make a single style the first link of this chain.
 pub fn StyleChain::chain_one(self : StyleChain, style : Style) -> StyleChain {
-  { head: [style], tail: Some(self), }
+  { head: [style], tail: Some(self), memo_hash: None, }
+}
+
+///|
+/// A structural fingerprint of the chain: all styles of all links, including
+/// the link boundaries (not upstream: the memoization key of the chain; see
+/// `memo.mbt`). Cached per link, since links are not modified after they
+/// were chained.
+pub fn StyleChain::memo_hash(self : StyleChain) -> U128 {
+  match self.memo_hash {
+    Some(hash) => hash
+    None => {
+      let state = SipHasher128::new()
+      state.write_usize(self.head.length())
+      for style in self.head {
+        state.write(style)
+      }
+      match self.tail {
+        Some(tail) => {
+          state.write_discriminant(1)
+          state.write_u128(tail.memo_hash())
+        }
+        None => state.write_discriminant(0)
+      }
+      let hash = state.finish128()
+      self.memo_hash = Some(hash)
+      hash
+    }
+  }
 }
 
 ///|
@@ -586,7 +616,7 @@ pub fn StyleChain::depth(self : StyleChain) -> Int {
 /// a chain in an arena yields a new address, so links chained onto the copy
 /// are not equal to links chained onto the original).
 pub fn StyleChain::fresh(self : StyleChain) -> StyleChain {
-  { head: self.head, tail: self.tail, }
+  { head: self.head, tail: self.tail, memo_hash: self.memo_hash, }
 }
 
 ///|

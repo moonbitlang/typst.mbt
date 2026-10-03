@@ -11,7 +11,32 @@ pub fn layout_par(
   expand : Bool,
   situation : ParSituation,
 ) -> @library.Fragment raise @library.SourceError {
-  layout_par_impl(elem, engine, locator, styles, region, expand, situation)
+  if !@library.layout_memo_active() {
+    return layout_par_impl(
+      elem, engine, locator, styles, region, expand, situation,
+    )
+  }
+  // Upstream memoizes `layout_par_impl` with comemo (see
+  // `library/memo.mbt`).
+  let state = @library.SipHasher128::new()
+  state.write_str("layout_par")
+  state.write(elem.0)
+  state.write_u128(styles.memo_hash())
+  state.write_f64(region.x.to_raw())
+  state.write_f64(region.y.to_raw())
+  state.write_bool(expand)
+  state.write_discriminant(
+    match situation {
+      First => 0
+      Consecutive => 1
+      Other => 2
+    },
+  )
+  state.write_u128(locator.memo_hash())
+  state.write_u128(engine.route.memo_hash())
+  @library.memoized_layout(engine, state.finish128(), engine => {
+    layout_par_impl(elem, engine, locator, styles, region, expand, situation)
+  })
 }
 
 ///|

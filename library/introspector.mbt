@@ -507,6 +507,23 @@ pub fn IntrospectionRecorder::validate(
   true
 }
 
+///|
+/// Add the reads of this recorder to `other` (reads already recorded there
+/// are kept), as if they had been performed on `other`'s introspector.
+pub fn IntrospectionRecorder::merge_into(
+  self : IntrospectionRecorder,
+  other : IntrospectionRecorder,
+) -> Unit {
+  if physical_equal(self, other) {
+    return
+  }
+  for key, read in self.calls {
+    if !other.calls.contains(key) {
+      other.calls[key] = read
+    }
+  }
+}
+
 // The target-agnostic element introspector.
 
 ///|
