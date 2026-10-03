@@ -11,7 +11,7 @@ pub(all) struct StackLayout {
 
 ///|
 pub fn StackLayout::new() -> StackLayout {
-  { len_locals: 0, consts: ConstRegistry::new() }
+  { len_locals: 0, consts: ConstRegistry::new(), }
 }
 
 ///|
@@ -31,7 +31,10 @@ pub fn StackLayout::register_locals(
 
 ///|
 /// Returns the [`StackSpace`] of the [`Slot`].
-pub fn StackLayout::stack_space(self : StackLayout, slot : @ir.Slot) -> StackSpace {
+pub fn StackLayout::stack_space(
+  self : StackLayout,
+  slot : @ir.Slot,
+) -> StackSpace {
   let index = slot.0
   if index < 0 {
     return StackSpace::Const
@@ -103,7 +106,7 @@ pub fn StackLayout::len_consts(self : StackLayout) -> Int {
 }
 
 ///|
-pub impl AllocConst for StackLayout with alloc_const(self, value) {
+pub impl AllocConst for StackLayout with fn alloc_const(self, value) {
   self.const_to_reg(value)
 }
 
@@ -138,7 +141,7 @@ priv struct ConstRegistry {
 
 ///|
 fn ConstRegistry::new() -> ConstRegistry {
-  { const2idx: {}, idx2const: [], next_idx: ConstRegistry::first_index() }
+  { const2idx: {}, idx2const: [], next_idx: ConstRegistry::first_index(), }
 }
 
 ///|
@@ -186,7 +189,9 @@ fn ConstRegistry::alloc(
   value : @wasmi_core.UntypedVal,
 ) -> @ir.Slot raise WasmiError {
   if self.next_idx == ConstRegistry::last_index() {
-    raise WasmiError::from_translation(TranslationError::TooManyFuncLocalConstValues)
+    raise WasmiError::from_translation(
+      TranslationError::TooManyFuncLocalConstValues,
+    )
   }
   let key = (value.lo64, value.hi64)
   match self.const2idx.get(key) {

@@ -85,13 +85,13 @@ pub fn AnyConst16::try_from_u64(value : UInt64) -> AnyConst16? {
 ///|
 /// Upstream `From<AnyConst16> for i8`.
 pub fn AnyConst16::to_i8(self : AnyConst16) -> Int {
-  ((self.0 & 0xFF) << 24) >> 24
+  (self.0 & 0xFF) << 24 >> 24
 }
 
 ///|
 /// Upstream `From<AnyConst16> for i16`.
 pub fn AnyConst16::to_i16(self : AnyConst16) -> Int {
-  ((self.0 & 0xFFFF) << 16) >> 16
+  (self.0 & 0xFFFF) << 16 >> 16
 }
 
 ///|
@@ -190,7 +190,7 @@ pub fn Const16::try_from_u64(value : UInt64) -> Const16? {
 ///|
 /// Upstream `From<Const16<i32>> for i32`.
 pub fn Const16::to_i32(self : Const16) -> Int {
-  ((self.0 & 0xFFFF) << 16) >> 16
+  (self.0 & 0xFFFF) << 16 >> 16
 }
 
 ///|

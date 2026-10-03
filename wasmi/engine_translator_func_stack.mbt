@@ -48,9 +48,14 @@ pub(all) struct ImmediateOperand {
 ///|
 fn Operand::new(index : OperandIdx, operand : StackOperand) -> Operand {
   match operand {
-    Local(link) => Local({ operand_index: index, local_index: link.local_index, ty: link.ty })
-    Temp(ty~, instr~) => Temp({ operand_index: index, ty, instr })
-    Immediate(val~) => Immediate({ operand_index: index, val })
+    Local(link) =>
+      Local({
+        operand_index: index,
+        local_index: link.local_index,
+        ty: link.ty,
+      })
+    Temp(ty~, instr~) => Temp({ operand_index: index, ty, instr, })
+    Immediate(val~) => Immediate({ operand_index: index, val, })
   }
 }
 
@@ -183,7 +188,7 @@ priv struct OperandStack {
 
 ///|
 fn OperandStack::new() -> OperandStack {
-  { operands: [], local_heads: [], max_height: 0, len_locals: 0 }
+  { operands: [], local_heads: [], max_height: 0, len_locals: 0, }
 }
 
 ///|
@@ -244,7 +249,10 @@ fn OperandStack::depth_to_index(self : OperandStack, depth : Int) -> OperandIdx 
 }
 
 ///|
-fn OperandStack::push_operand(self : OperandStack, operand : Operand) -> OperandIdx {
+fn OperandStack::push_operand(
+  self : OperandStack,
+  operand : Operand,
+) -> OperandIdx {
   match operand {
     Local(operand) => self.push_local(operand.local_index, operand.ty)
     Temp(operand) => self.push_temp(operand.ty, operand.instr)
@@ -263,7 +271,7 @@ fn OperandStack::push_local(
   if next_local is Some(next_local) {
     self.update_prev_local(next_local, Some(operand_index))
   }
-  self.operands.push(Local({ local_index, ty, prev_local: None, next_local }))
+  self.operands.push(Local({ local_index, ty, prev_local: None, next_local, }))
   self.update_max_stack_height()
   self.len_locals += 1
   operand_index
@@ -325,7 +333,10 @@ fn OperandStack::get(self : OperandStack, depth : Int) -> Operand {
 }
 
 ///|
-fn OperandStack::get_at(self : OperandStack, index : OperandIdx) -> StackOperand {
+fn OperandStack::get_at(
+  self : OperandStack,
+  index : OperandIdx,
+) -> StackOperand {
   self.operands[index.0]
 }
 
@@ -393,7 +404,10 @@ fn OperandStack::preserve_all_locals(self : OperandStack) -> Array[Operand] {
 }
 
 ///|
-fn OperandStack::try_unlink_local(self : OperandStack, operand : StackOperand) -> Unit {
+fn OperandStack::try_unlink_local(
+  self : OperandStack,
+  operand : StackOperand,
+) -> Unit {
   guard operand is Local(link) else { return }
   self.unlink_local(link.local_index, link.prev_local, link.next_local)
 }
@@ -595,13 +609,17 @@ pub fn IfControlFrame::is_else_reachable(self : IfControlFrame) -> Bool {
 }
 
 ///|
-pub fn ElseControlFrame::reachability(self : ElseControlFrame) -> ElseReachability {
+pub fn ElseControlFrame::reachability(
+  self : ElseControlFrame,
+) -> ElseReachability {
   self.reachability
 }
 
 ///|
 /// Returns `true` if the end of the `then` branch is reachable.
-pub fn ElseControlFrame::is_end_of_then_reachable(self : ElseControlFrame) -> Bool {
+pub fn ElseControlFrame::is_end_of_then_reachable(
+  self : ElseControlFrame,
+) -> Bool {
   match self.reachability {
     Both(is_end_of_then_reachable~) | OnlyThen(is_end_of_then_reachable~) =>
       is_end_of_then_reachable
@@ -636,7 +654,7 @@ fn ControlStack::new() -> ControlStack {
   {
     frames: [],
     consume_fuel_instr: None,
-    else_operands: { ends: [], operands: [] },
+    else_operands: { ends: [], operands: [], },
     orphaned_else_operands: false,
   }
 }
@@ -747,7 +765,7 @@ pub fn AcquiredTarget::control_frame(self : AcquiredTarget) -> FrameBase {
 
 ///|
 /// The Wasm value stack during translation from Wasm to Wasmi bytecode.
-pub(all) struct Stack {
+pub(all) struct TranslatorStack {
   /// The underlying [`Engine`].
   priv engine : Engine
   /// The Wasm value stack.
@@ -757,37 +775,40 @@ pub(all) struct Stack {
 }
 
 ///|
-pub fn Stack::new(engine : Engine) -> Stack {
-  { engine, operands: OperandStack::new(), controls: ControlStack::new() }
+pub fn TranslatorStack::new(engine : Engine) -> TranslatorStack {
+  { engine, operands: OperandStack::new(), controls: ControlStack::new(), }
 }
 
 ///|
 /// Register `amount` local variables.
-pub fn Stack::register_locals(self : Stack, amount : Int) -> Unit raise WasmiError {
+pub fn TranslatorStack::register_locals(
+  self : TranslatorStack,
+  amount : Int,
+) -> Unit raise WasmiError {
   self.operands.register_locals(amount)
 }
 
 ///|
 /// Returns `true` if the control stack is empty.
-pub fn Stack::is_control_empty(self : Stack) -> Bool {
+pub fn TranslatorStack::is_control_empty(self : TranslatorStack) -> Bool {
   self.controls.is_empty()
 }
 
 ///|
 /// Returns the current height of the [`Stack`].
-pub fn Stack::height(self : Stack) -> Int {
+pub fn TranslatorStack::height(self : TranslatorStack) -> Int {
   self.operands.height()
 }
 
 ///|
 /// Returns the maximum height of the [`Stack`].
-pub fn Stack::max_height(self : Stack) -> Int {
+pub fn TranslatorStack::max_height(self : TranslatorStack) -> Int {
   self.operands.max_height()
 }
 
 ///|
 /// Truncates `self` to the target `height`.
-pub fn Stack::trunc(self : Stack, height : Int) -> Unit {
+pub fn TranslatorStack::trunc(self : TranslatorStack, height : Int) -> Unit {
   while self.height() > height {
     self.pop() |> ignore
   }
@@ -795,8 +816,8 @@ pub fn Stack::trunc(self : Stack, height : Int) -> Unit {
 
 ///|
 /// Pushes the function enclosing Wasm `block` onto the [`Stack`].
-pub fn Stack::push_func_block(
-  self : Stack,
+pub fn TranslatorStack::push_func_block(
+  self : TranslatorStack,
   ty : BlockType,
   label : LabelRef,
   consume_fuel : Instr?,
@@ -816,8 +837,8 @@ pub fn Stack::push_func_block(
 
 ///|
 /// Pushes a Wasm `block` onto the [`Stack`].
-pub fn Stack::push_block(
-  self : Stack,
+pub fn TranslatorStack::push_block(
+  self : TranslatorStack,
   ty : BlockType,
   label : LabelRef,
 ) -> Unit raise WasmiError {
@@ -839,8 +860,8 @@ pub fn Stack::push_block(
 
 ///|
 /// Pushes a Wasm `loop` onto the [`Stack`].
-pub fn Stack::push_loop(
-  self : Stack,
+pub fn TranslatorStack::push_loop(
+  self : TranslatorStack,
   ty : BlockType,
   label : LabelRef,
   consume_fuel : Instr?,
@@ -862,8 +883,8 @@ pub fn Stack::push_loop(
 
 ///|
 /// Pushes a Wasm `if` onto the [`Stack`].
-pub fn Stack::push_if(
-  self : Stack,
+pub fn TranslatorStack::push_if(
+  self : TranslatorStack,
   ty : BlockType,
   label : LabelRef,
   reachability : IfReachability,
@@ -898,8 +919,8 @@ pub fn Stack::push_if(
 
 ///|
 /// Pushes a Wasm `else` onto the [`Stack`].
-pub fn Stack::push_else(
-  self : Stack,
+pub fn TranslatorStack::push_else(
+  self : TranslatorStack,
   if_frame : IfControlFrame,
   is_end_of_then_reachable : Bool,
   consume_fuel : Instr?,
@@ -929,8 +950,8 @@ pub fn Stack::push_else(
 
 ///|
 /// Pushes an unreachable Wasm control onto the [`Stack`].
-pub fn Stack::push_unreachable(
-  self : Stack,
+pub fn TranslatorStack::push_unreachable(
+  self : TranslatorStack,
   kind : ControlFrameKind,
 ) -> Unit raise WasmiError {
   self.controls.frames.push(Unreachable(kind))
@@ -938,7 +959,7 @@ pub fn Stack::push_unreachable(
 
 ///|
 /// Pops the top-most control frame from the control stack and returns it.
-pub fn Stack::pop_control(self : Stack) -> ControlFrame {
+pub fn TranslatorStack::pop_control(self : TranslatorStack) -> ControlFrame {
   match self.controls.pop() {
     Some(frame) => frame
     None => abort("tried to pop control from empty control stack")
@@ -947,8 +968,8 @@ pub fn Stack::pop_control(self : Stack) -> ControlFrame {
 
 ///|
 /// Pushes the top-most `else` operands from the control stack onto the operand stack.
-pub fn Stack::push_else_operands(
-  self : Stack,
+pub fn TranslatorStack::push_else_operands(
+  self : TranslatorStack,
   frame : IfControlFrame,
 ) -> Unit raise WasmiError {
   match frame.reachability {
@@ -963,13 +984,19 @@ pub fn Stack::push_else_operands(
 
 ///|
 /// Returns a shared reference to the [`ControlFrame`] at `depth`.
-pub fn Stack::peek_control(self : Stack, depth : Int) -> ControlFrame {
+pub fn TranslatorStack::peek_control(
+  self : TranslatorStack,
+  depth : Int,
+) -> ControlFrame {
   self.controls.get(depth)
 }
 
 ///|
 /// Returns an exclusive reference to the [`ControlFrame`] at `depth`.
-pub fn Stack::peek_control_mut(self : Stack, depth : Int) -> AcquiredTarget {
+pub fn TranslatorStack::peek_control_mut(
+  self : TranslatorStack,
+  depth : Int,
+) -> AcquiredTarget {
   let is_root = self.controls.is_root(depth)
   let frame = self.controls.get(depth).base()
   if is_root {
@@ -981,14 +1008,17 @@ pub fn Stack::peek_control_mut(self : Stack, depth : Int) -> AcquiredTarget {
 
 ///|
 /// Pushes the [`Operand`] back to the [`Stack`].
-pub fn Stack::push_operand(self : Stack, operand : Operand) -> OperandIdx raise WasmiError {
+pub fn TranslatorStack::push_operand(
+  self : TranslatorStack,
+  operand : Operand,
+) -> OperandIdx raise WasmiError {
   self.operands.push_operand(operand)
 }
 
 ///|
 /// Pushes a local variable with index `local_idx` to the [`Stack`].
-pub fn Stack::push_local(
-  self : Stack,
+pub fn TranslatorStack::push_local(
+  self : TranslatorStack,
   local_index : LocalIdx,
   ty : @wasmi_core.ValType,
 ) -> OperandIdx raise WasmiError {
@@ -997,8 +1027,8 @@ pub fn Stack::push_local(
 
 ///|
 /// Pushes a temporary with type `ty` on the [`Stack`].
-pub fn Stack::push_temp(
-  self : Stack,
+pub fn TranslatorStack::push_temp(
+  self : TranslatorStack,
   ty : @wasmi_core.ValType,
   instr : Instr?,
 ) -> OperandIdx raise WasmiError {
@@ -1007,8 +1037,8 @@ pub fn Stack::push_temp(
 
 ///|
 /// Pushes an immediate `value` on the [`Stack`].
-pub fn Stack::push_immediate(
-  self : Stack,
+pub fn TranslatorStack::push_immediate(
+  self : TranslatorStack,
   value : @wasmi_core.TypedVal,
 ) -> OperandIdx raise WasmiError {
   self.operands.push_immediate(value)
@@ -1016,13 +1046,13 @@ pub fn Stack::push_immediate(
 
 ///|
 /// Peeks the [`Operand`] at `depth`.
-pub fn Stack::peek(self : Stack, depth : Int) -> Operand {
+pub fn TranslatorStack::peek(self : TranslatorStack, depth : Int) -> Operand {
   self.operands.get(depth)
 }
 
 ///|
 /// Peeks the 2 top-most [`Operand`]s.
-pub fn Stack::peek2(self : Stack) -> (Operand, Operand) {
+pub fn TranslatorStack::peek2(self : TranslatorStack) -> (Operand, Operand) {
   let v0 = self.peek(1)
   let v1 = self.peek(0)
   (v0, v1)
@@ -1030,7 +1060,9 @@ pub fn Stack::peek2(self : Stack) -> (Operand, Operand) {
 
 ///|
 /// Peeks the 3 top-most [`Operand`]s.
-pub fn Stack::peek3(self : Stack) -> (Operand, Operand, Operand) {
+pub fn TranslatorStack::peek3(
+  self : TranslatorStack,
+) -> (Operand, Operand, Operand) {
   let v0 = self.peek(2)
   let v1 = self.peek(1)
   let v2 = self.peek(0)
@@ -1039,19 +1071,22 @@ pub fn Stack::peek3(self : Stack) -> (Operand, Operand, Operand) {
 
 ///|
 /// Returns the top-most `len` operands from the stack (bottom to top).
-pub fn Stack::peek_n(self : Stack, len : Int) -> Array[Operand] {
+pub fn TranslatorStack::peek_n(
+  self : TranslatorStack,
+  len : Int,
+) -> Array[Operand] {
   self.operands.peek(len)
 }
 
 ///|
 /// Pops the top-most [`Operand`] from the [`Stack`].
-pub fn Stack::pop(self : Stack) -> Operand {
+pub fn TranslatorStack::pop(self : TranslatorStack) -> Operand {
   self.operands.pop()
 }
 
 ///|
 /// Pops the two top-most [`Operand`] from the [`Stack`].
-pub fn Stack::pop2(self : Stack) -> (Operand, Operand) {
+pub fn TranslatorStack::pop2(self : TranslatorStack) -> (Operand, Operand) {
   let o2 = self.pop()
   let o1 = self.pop()
   (o1, o2)
@@ -1059,7 +1094,9 @@ pub fn Stack::pop2(self : Stack) -> (Operand, Operand) {
 
 ///|
 /// Pops the three top-most [`Operand`] from the [`Stack`].
-pub fn Stack::pop3(self : Stack) -> (Operand, Operand, Operand) {
+pub fn TranslatorStack::pop3(
+  self : TranslatorStack,
+) -> (Operand, Operand, Operand) {
   let o3 = self.pop()
   let o2 = self.pop()
   let o1 = self.pop()
@@ -1068,7 +1105,11 @@ pub fn Stack::pop3(self : Stack) -> (Operand, Operand, Operand) {
 
 ///|
 /// Pops `len` operands from the stack and store them into `buffer`.
-pub fn Stack::pop_n(self : Stack, len : Int, buffer : Array[Operand]) -> Unit {
+pub fn TranslatorStack::pop_n(
+  self : TranslatorStack,
+  len : Int,
+  buffer : Array[Operand],
+) -> Unit {
   buffer.clear()
   for _ in 0..<len {
     buffer.push(self.pop())
@@ -1078,24 +1119,32 @@ pub fn Stack::pop_n(self : Stack, len : Int, buffer : Array[Operand]) -> Unit {
 
 ///|
 /// Preserve all locals on the [`Stack`] that refer to `local_index`.
-pub fn Stack::preserve_locals(self : Stack, local_index : LocalIdx) -> Array[OperandIdx] {
+pub fn TranslatorStack::preserve_locals(
+  self : TranslatorStack,
+  local_index : LocalIdx,
+) -> Array[OperandIdx] {
   self.operands.preserve_locals(local_index)
 }
 
 ///|
 /// Preserve all locals on the [`Stack`].
-pub fn Stack::preserve_all_locals(self : Stack) -> Array[Operand] {
+pub fn TranslatorStack::preserve_all_locals(
+  self : TranslatorStack,
+) -> Array[Operand] {
   self.operands.preserve_all_locals()
 }
 
 ///|
 /// Converts and returns the [`Operand`] at `depth` into a [`Operand::Temp`].
-pub fn Stack::operand_to_temp(self : Stack, depth : Int) -> Operand {
+pub fn TranslatorStack::operand_to_temp(
+  self : TranslatorStack,
+  depth : Int,
+) -> Operand {
   self.operands.operand_to_temp(depth)
 }
 
 ///|
 /// Returns the current [`Op::ConsumeFuel`] if fuel metering is enabled.
-pub fn Stack::consume_fuel_instr(self : Stack) -> Instr? {
+pub fn TranslatorStack::consume_fuel_instr(self : TranslatorStack) -> Instr? {
   self.controls.consume_fuel_instr
 }

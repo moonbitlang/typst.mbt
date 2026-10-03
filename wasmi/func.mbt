@@ -40,7 +40,7 @@ pub fn HostFuncEntity::new(
   let len_params = ty.len_params()
   let len_results = ty.len_results()
   let ty = engine.alloc_func_type(ty)
-  { len_params, len_results, ty, func }
+  { len_params, len_results, ty, func, }
 }
 
 ///|
@@ -84,7 +84,7 @@ pub struct Caller[T] {
 ///|
 /// Creates a new [`Caller`] from the given store context and [`Instance`] handle.
 pub fn[T] Caller::new(store : Store[T], instance : Instance?) -> Caller[T] {
-  { store, instance }
+  { store, instance, }
 }
 
 ///|
@@ -231,7 +231,10 @@ pub fn[T] Memory::new(
   store : Store[T],
   ty : @wasmi_core.MemoryType,
 ) -> Memory raise WasmiError {
-  let entity = @wasmi_core.Memory::new(ty, @wasmi_core.ResourceLimiterRef::default()) catch {
+  let entity = @wasmi_core.Memory::new(
+    ty,
+    @wasmi_core.ResourceLimiterRef::default(),
+  ) catch {
     e => raise Memory(e)
   }
   store.inner.alloc_memory(entity)
@@ -387,7 +390,7 @@ pub fn[T] Global::set(
 ///|
 /// Creates a new instance of `ExternRef` wrapping the given value.
 pub fn[T] ExternRef::new(store : Store[T], object : Any) -> ExternRef {
-  store.inner.alloc_extern_object({ data: object })
+  store.inner.alloc_extern_object({ data: object, })
 }
 
 ///|

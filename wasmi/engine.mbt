@@ -77,7 +77,7 @@ pub(all) enum EnforcedLimitsError {
 }
 
 ///|
-pub impl Show for EnforcedLimitsError with output(self, f) {
+pub impl Show for EnforcedLimitsError with fn output(self, f) {
   match self {
     TooManyGlobals(limit~) =>
       f.write_string(
@@ -256,7 +256,10 @@ pub fn Config::get_compilation_mode(self : Config) -> CompilationMode {
 
 ///|
 /// Sets the [`CompilationMode`] used for the [`Engine`].
-pub fn Config::compilation_mode(self : Config, mode : CompilationMode) -> Config {
+pub fn Config::compilation_mode(
+  self : Config,
+  mode : CompilationMode,
+) -> Config {
   self.compilation_mode = mode
   self
 }
@@ -361,7 +364,9 @@ pub fn BlockType::new(
     Empty => Empty
     Type(return_type) => Returns(WasmiValueType::from_wasmparser(return_type))
     FuncType(func_type_idx) =>
-      FuncType(res.get_func_type(FuncTypeIdx(func_type_idx.reinterpret_as_int())))
+      FuncType(
+        res.get_func_type(FuncTypeIdx(func_type_idx.reinterpret_as_int())),
+      )
   }
 }
 
@@ -392,9 +397,15 @@ pub fn BlockType::len_results(self : BlockType, engine : Engine) -> Int {
 
 ///|
 /// Returns the function type of the [`BlockType`] (upstream `func_type_with`).
-pub fn BlockType::func_type_of(self : BlockType, engine : Engine) -> @wasmi_core.FuncType {
+pub fn BlockType::func_type_of(
+  self : BlockType,
+  engine : Engine,
+) -> @wasmi_core.FuncType {
   match self {
-    Empty => @wasmi_core.FuncType::new([], []) catch { _ => abort("invalid func type") }
+    Empty =>
+      @wasmi_core.FuncType::new([], []) catch {
+        _ => abort("invalid func type")
+      }
     Returns(return_type) =>
       @wasmi_core.FuncType::new([], [return_type]) catch {
         _ => abort("invalid func type")
@@ -432,7 +443,7 @@ pub(all) struct EngineFuncSpan {
 ///|
 /// Creates an empty [`EngineFuncSpan`].
 pub fn EngineFuncSpan::empty() -> EngineFuncSpan {
-  { start: 0, end: 0 }
+  { start: 0, end: 0, }
 }
 
 ///|
@@ -452,7 +463,10 @@ pub fn EngineFuncSpan::get(self : EngineFuncSpan, n : Int) -> EngineFunc? {
 
 ///|
 /// Returns the position of the [`EngineFunc`] in `self`, if any.
-pub fn EngineFuncSpan::position(self : EngineFuncSpan, func : EngineFunc) -> Int? {
+pub fn EngineFuncSpan::position(
+  self : EngineFuncSpan,
+  func : EngineFunc,
+) -> Int? {
   if func.0 < self.start || func.0 >= self.end {
     return None
   }
@@ -461,7 +475,10 @@ pub fn EngineFuncSpan::position(self : EngineFuncSpan, func : EngineFunc) -> Int
 
 ///|
 /// Returns the n-th [`EngineFunc`] in `self`, panicking if out of bounds.
-pub fn EngineFuncSpan::get_or_panic(self : EngineFuncSpan, n : Int) -> EngineFunc {
+pub fn EngineFuncSpan::get_or_panic(
+  self : EngineFuncSpan,
+  n : Int,
+) -> EngineFunc {
   match self.get(n) {
     Some(f) => f
     None => abort("out of bounds `EngineFunc` index: \{n}")
@@ -525,12 +542,14 @@ pub fn CompiledFuncEntity::new(
   if instrs.length() == 0 {
     abort("compiled functions must have at least one instruction")
   }
-  { instrs, consts, len_stack_slots }
+  { instrs, consts, len_stack_slots, }
 }
 
 ///|
 /// Returns the [`Op`]s of the compiled function.
-pub fn CompiledFuncEntity::instrs(self : CompiledFuncEntity) -> FixedArray[@ir.Op] {
+pub fn CompiledFuncEntity::instrs(
+  self : CompiledFuncEntity,
+) -> FixedArray[@ir.Op] {
   self.instrs
 }
 
@@ -542,7 +561,9 @@ pub fn CompiledFuncEntity::len_stack_slots(self : CompiledFuncEntity) -> Int {
 
 ///|
 /// Returns the function local constant values of the compiled function.
-pub fn CompiledFuncEntity::consts(self : CompiledFuncEntity) -> Array[@wasmi_core.UntypedVal] {
+pub fn CompiledFuncEntity::consts(
+  self : CompiledFuncEntity,
+) -> Array[@wasmi_core.UntypedVal] {
   self.consts
 }
 
@@ -555,7 +576,7 @@ priv struct CodeMap {
 
 ///|
 fn CodeMap::new(config : Config) -> CodeMap {
-  { funcs: [], features: config.wasm_features() }
+  { funcs: [], features: config.wasm_features(), }
 }
 
 ///|
@@ -565,7 +586,7 @@ fn CodeMap::alloc_funcs(self : CodeMap, amount : Int) -> EngineFuncSpan {
   for _ in 0..<amount {
     self.funcs.push(Uninit)
   }
-  { start, end: self.funcs.length() }
+  { start, end: self.funcs.length(), }
 }
 
 ///|
@@ -589,12 +610,15 @@ fn CodeMap::init_func_as_uncompiled(
   module : ModuleHeader,
 ) -> Unit {
   guard self.funcs[func.0] is Uninit
-  self.funcs[func.0] = Uncompiled({ func_index: func_idx, bytes, module })
+  self.funcs[func.0] = Uncompiled({ func_index: func_idx, bytes, module, })
 }
 
 ///|
 /// Returns the [`CompiledFuncEntity`] of `func`, compiling it lazily if needed.
-fn CodeMap::get(self : CodeMap, func : EngineFunc) -> CompiledFuncEntity raise WasmiError {
+fn CodeMap::get(
+  self : CodeMap,
+  func : EngineFunc,
+) -> CompiledFuncEntity raise WasmiError {
   match self.funcs[func.0] {
     Compiled(entity) => entity
     Uncompiled(uncompiled) => {
@@ -609,7 +633,9 @@ fn CodeMap::get(self : CodeMap, func : EngineFunc) -> CompiledFuncEntity raise W
       compiled
     }
     FailedToCompile =>
-      raise WasmiError::from_translation(TranslationError::LazyCompilationFailed)
+      raise WasmiError::from_translation(
+        TranslationError::LazyCompilationFailed,
+      )
     Compiling | Uninit => abort("unexpected function state")
   }
 }
@@ -624,8 +650,11 @@ fn UncompiledFuncEntity::compile(
   self : UncompiledFuncEntity,
 ) -> CompiledFuncEntity raise WasmiError {
   let translator = FuncTranslator::new(self.func_index, self.module)
-  FuncTranslationDriver::new(0, self.bytes, self.module.engine_upgrade().config())
-  .translate(translator)
+  FuncTranslationDriver::new(
+    0,
+    self.bytes,
+    self.module.engine_upgrade().config(),
+  ).translate(translator)
 }
 
 // ---------------------------------------------------------------------------
@@ -633,7 +662,7 @@ fn UncompiledFuncEntity::compile(
 
 ///|
 /// The global counter of engines (upstream `EngineIdx::new`).
-let engine_counter : Ref[Int] = { val: 0 }
+let engine_counter : Ref[Int] = { val: 0, }
 
 ///|
 /// The Wasmi interpreter.
@@ -661,7 +690,7 @@ pub fn Engine::new(config : Config) -> Engine {
     idx,
     config,
     code_map: CodeMap::new(config),
-    func_types: { dedup: {}, func_types: [] },
+    func_types: { dedup: {}, func_types: [], },
     stacks: [],
   }
 }
@@ -743,9 +772,13 @@ pub fn Engine::translate_func(
     }
     (LazyTranslation, Some(func_to_validate)) => {
       validate_func_body(func_to_validate, offset, bytes, self.config)
-      self.code_map.init_func_as_uncompiled(engine_func, func_index, bytes, module)
+      self.code_map.init_func_as_uncompiled(
+        engine_func, func_index, bytes, module,
+      )
     }
     (_, _) =>
-      self.code_map.init_func_as_uncompiled(engine_func, func_index, bytes, module)
+      self.code_map.init_func_as_uncompiled(
+        engine_func, func_index, bytes, module,
+      )
   }
 }

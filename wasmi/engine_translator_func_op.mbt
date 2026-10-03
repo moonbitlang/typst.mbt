@@ -116,7 +116,11 @@ pub let i64_store32_op : StoreWrapOperator = {
   store_imm: @ir.Op::i64_store32_imm16,
   store_offset16: @ir.Op::i64_store32_offset16,
   store_offset16_imm: fn(ptr, offset, value) {
-    @ir.Op::i64_store32_offset16_imm16(ptr, offset, @ir.Const16::from_i16(value))
+    @ir.Op::i64_store32_offset16_imm16(
+      ptr,
+      offset,
+      @ir.Const16::from_i16(value),
+    )
   },
   store_at: @ir.Op::i64_store32_at,
   store_at_imm: fn(value, address) {

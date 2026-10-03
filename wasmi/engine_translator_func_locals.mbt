@@ -36,7 +36,7 @@ priv struct LocalGroup {
 
 ///|
 pub fn LocalsRegistry::new() -> LocalsRegistry {
-  { tys_first: [], tys_remaining: [], len_locals: 0 }
+  { tys_first: [], tys_remaining: [], len_locals: 0, }
 }
 
 ///|
@@ -86,7 +86,7 @@ pub fn LocalsRegistry::register(
   let remaining_amount = amount - push_to_first
   let remaining_index = (self.len() + amount - 1).reinterpret_as_uint()
   if remaining_amount > 0 {
-    self.tys_remaining.push({ max_index: remaining_index, ty })
+    self.tys_remaining.push({ max_index: remaining_index, ty, })
   }
   self.len_locals += amount
 }
@@ -95,7 +95,10 @@ pub fn LocalsRegistry::register(
 /// Returns the type of the `index` if any.
 ///
 /// Returns `None` if `index` does not refer to any local in `self`.
-pub fn LocalsRegistry::ty(self : LocalsRegistry, index : LocalIdx) -> @wasmi_core.ValType {
+pub fn LocalsRegistry::ty(
+  self : LocalsRegistry,
+  index : LocalIdx,
+) -> @wasmi_core.ValType {
   let index_sz = index.0.reinterpret_as_int()
   if index_sz >= 0 && index_sz < self.tys_first.length() {
     return self.tys_first[index_sz]

@@ -70,7 +70,9 @@ pub fn WasmiError::from_translation(error : TranslationError) -> WasmiError {
 }
 
 ///|
-pub fn WasmiError::from_wasm(error : @wasmparser.BinaryReaderError) -> WasmiError {
+pub fn WasmiError::from_wasm(
+  error : @wasmparser.BinaryReaderError,
+) -> WasmiError {
   Wasm(error)
 }
 
@@ -104,10 +106,11 @@ pub fn WasmiError::i32_exit_status(self : WasmiError) -> Int? {
 
 ///|
 /// Upstream `Display for ErrorKind`.
-pub impl Show for WasmiError with output(self, f) {
+pub impl Show for WasmiError with fn output(self, f) {
   match self {
     TrapCode(error) => f.write_string(error.trap_message())
-    I32ExitStatus(status) => f.write_string("Exited with i32 exit status \{status}\n")
+    I32ExitStatus(status) =>
+      f.write_string("Exited with i32 exit status \{status}\n")
     Message(message) => f.write_string(message)
     Host(error) => f.write_string(error.to_string())
     Global(error) => error.output(f)
@@ -143,7 +146,7 @@ pub(all) enum ReadError {
 } derive(Eq)
 
 ///|
-pub impl Show for ReadError with output(self, f) {
+pub impl Show for ReadError with fn output(self, f) {
   match self {
     EndOfStream => f.write_string("encountered unexpected end of stream")
     UnknownError => f.write_string("encountered unknown error")
@@ -166,7 +169,7 @@ pub(all) enum FuncError {
 } derive(Eq)
 
 ///|
-pub impl Show for FuncError with output(self, f) {
+pub impl Show for FuncError with fn output(self, f) {
   match self {
     ExportedFuncNotFound => f.write_string("could not find exported function")
     MismatchingParameterType =>

@@ -2420,7 +2420,12 @@ pub(all) enum Op {
   /// Followed by [`Op::Slot`] encoding `value`.
   I8x16ReplaceLane(result~ : Slot, input~ : Slot, lane~ : ImmLaneIdx)
   /// Variant of [`Op::I8x16ReplaceLane`] with imediate `value`.
-  I8x16ReplaceLaneImm(result~ : Slot, input~ : Slot, lane~ : ImmLaneIdx, value~ : Int)
+  I8x16ReplaceLaneImm(
+    result~ : Slot,
+    input~ : Slot,
+    lane~ : ImmLaneIdx,
+    value~ : Int
+  )
   /// Wasm `i16x8.replace_lane` instruction.
   ///
   /// # Encoding
@@ -2936,7 +2941,12 @@ pub(all) enum Op {
   /// # Note
   ///
   /// Operates on the default Wasm memory instance.
-  V128Store8LaneOffset8(ptr~ : Slot, value~ : Slot, offset~ : Offset8, lane~ : ImmLaneIdx)
+  V128Store8LaneOffset8(
+    ptr~ : Slot,
+    value~ : Slot,
+    offset~ : Offset8,
+    lane~ : ImmLaneIdx
+  )
   /// Variant of [`Op::V128Store8Lane`] with 32-bit immediate address.
   ///
   /// # Encoding
@@ -2959,7 +2969,12 @@ pub(all) enum Op {
   /// # Note
   ///
   /// Operates on the default Wasm memory instance.
-  V128Store16LaneOffset8(ptr~ : Slot, value~ : Slot, offset~ : Offset8, lane~ : ImmLaneIdx)
+  V128Store16LaneOffset8(
+    ptr~ : Slot,
+    value~ : Slot,
+    offset~ : Offset8,
+    lane~ : ImmLaneIdx
+  )
   /// Variant of [`Op::V128Store16Lane`] with 32-bit immediate address.
   ///
   /// # Encoding
@@ -2982,7 +2997,12 @@ pub(all) enum Op {
   /// # Note
   ///
   /// Operates on the default Wasm memory instance.
-  V128Store32LaneOffset8(ptr~ : Slot, value~ : Slot, offset~ : Offset8, lane~ : ImmLaneIdx)
+  V128Store32LaneOffset8(
+    ptr~ : Slot,
+    value~ : Slot,
+    offset~ : Offset8,
+    lane~ : ImmLaneIdx
+  )
   /// Variant of [`Op::V128Store32Lane`] with 32-bit immediate address.
   ///
   /// # Encoding
@@ -3005,7 +3025,12 @@ pub(all) enum Op {
   /// # Note
   ///
   /// Operates on the default Wasm memory instance.
-  V128Store64LaneOffset8(ptr~ : Slot, value~ : Slot, offset~ : Offset8, lane~ : ImmLaneIdx)
+  V128Store64LaneOffset8(
+    ptr~ : Slot,
+    value~ : Slot,
+    offset~ : Offset8,
+    lane~ : ImmLaneIdx
+  )
   /// Variant of [`Op::V128Store64Lane`] with 32-bit immediate address.
   ///
   /// # Encoding
@@ -3527,13 +3552,21 @@ pub fn Op::branch_cmp_fallback(lhs : Slot, rhs : Slot, params : Slot) -> Op {
 
 ///|
 /// Creates a new [`Op::BranchI32And`].
-pub fn Op::branch_i32_and(lhs : Slot, rhs : Slot, offset : BranchOffset16) -> Op {
+pub fn Op::branch_i32_and(
+  lhs : Slot,
+  rhs : Slot,
+  offset : BranchOffset16,
+) -> Op {
   BranchI32And(lhs~, rhs~, offset~)
 }
 
 ///|
 /// Creates a new [`Op::BranchI32AndImm16`].
-pub fn Op::branch_i32_and_imm16(lhs : Slot, rhs : Const16, offset : BranchOffset16) -> Op {
+pub fn Op::branch_i32_and_imm16(
+  lhs : Slot,
+  rhs : Const16,
+  offset : BranchOffset16,
+) -> Op {
   BranchI32AndImm16(lhs~, rhs~, offset~)
 }
 
@@ -3545,31 +3578,51 @@ pub fn Op::branch_i32_or(lhs : Slot, rhs : Slot, offset : BranchOffset16) -> Op 
 
 ///|
 /// Creates a new [`Op::BranchI32OrImm16`].
-pub fn Op::branch_i32_or_imm16(lhs : Slot, rhs : Const16, offset : BranchOffset16) -> Op {
+pub fn Op::branch_i32_or_imm16(
+  lhs : Slot,
+  rhs : Const16,
+  offset : BranchOffset16,
+) -> Op {
   BranchI32OrImm16(lhs~, rhs~, offset~)
 }
 
 ///|
 /// Creates a new [`Op::BranchI32Nand`].
-pub fn Op::branch_i32_nand(lhs : Slot, rhs : Slot, offset : BranchOffset16) -> Op {
+pub fn Op::branch_i32_nand(
+  lhs : Slot,
+  rhs : Slot,
+  offset : BranchOffset16,
+) -> Op {
   BranchI32Nand(lhs~, rhs~, offset~)
 }
 
 ///|
 /// Creates a new [`Op::BranchI32NandImm16`].
-pub fn Op::branch_i32_nand_imm16(lhs : Slot, rhs : Const16, offset : BranchOffset16) -> Op {
+pub fn Op::branch_i32_nand_imm16(
+  lhs : Slot,
+  rhs : Const16,
+  offset : BranchOffset16,
+) -> Op {
   BranchI32NandImm16(lhs~, rhs~, offset~)
 }
 
 ///|
 /// Creates a new [`Op::BranchI32Nor`].
-pub fn Op::branch_i32_nor(lhs : Slot, rhs : Slot, offset : BranchOffset16) -> Op {
+pub fn Op::branch_i32_nor(
+  lhs : Slot,
+  rhs : Slot,
+  offset : BranchOffset16,
+) -> Op {
   BranchI32Nor(lhs~, rhs~, offset~)
 }
 
 ///|
 /// Creates a new [`Op::BranchI32NorImm16`].
-pub fn Op::branch_i32_nor_imm16(lhs : Slot, rhs : Const16, offset : BranchOffset16) -> Op {
+pub fn Op::branch_i32_nor_imm16(
+  lhs : Slot,
+  rhs : Const16,
+  offset : BranchOffset16,
+) -> Op {
   BranchI32NorImm16(lhs~, rhs~, offset~)
 }
 
@@ -3581,7 +3634,11 @@ pub fn Op::branch_i32_eq(lhs : Slot, rhs : Slot, offset : BranchOffset16) -> Op 
 
 ///|
 /// Creates a new [`Op::BranchI32EqImm16`].
-pub fn Op::branch_i32_eq_imm16(lhs : Slot, rhs : Const16, offset : BranchOffset16) -> Op {
+pub fn Op::branch_i32_eq_imm16(
+  lhs : Slot,
+  rhs : Const16,
+  offset : BranchOffset16,
+) -> Op {
   BranchI32EqImm16(lhs~, rhs~, offset~)
 }
 
@@ -3593,91 +3650,151 @@ pub fn Op::branch_i32_ne(lhs : Slot, rhs : Slot, offset : BranchOffset16) -> Op 
 
 ///|
 /// Creates a new [`Op::BranchI32NeImm16`].
-pub fn Op::branch_i32_ne_imm16(lhs : Slot, rhs : Const16, offset : BranchOffset16) -> Op {
+pub fn Op::branch_i32_ne_imm16(
+  lhs : Slot,
+  rhs : Const16,
+  offset : BranchOffset16,
+) -> Op {
   BranchI32NeImm16(lhs~, rhs~, offset~)
 }
 
 ///|
 /// Creates a new [`Op::BranchI32LtS`].
-pub fn Op::branch_i32_lt_s(lhs : Slot, rhs : Slot, offset : BranchOffset16) -> Op {
+pub fn Op::branch_i32_lt_s(
+  lhs : Slot,
+  rhs : Slot,
+  offset : BranchOffset16,
+) -> Op {
   BranchI32LtS(lhs~, rhs~, offset~)
 }
 
 ///|
 /// Creates a new [`Op::BranchI32LtSImm16Lhs`].
-pub fn Op::branch_i32_lt_s_imm16_lhs(lhs : Const16, rhs : Slot, offset : BranchOffset16) -> Op {
+pub fn Op::branch_i32_lt_s_imm16_lhs(
+  lhs : Const16,
+  rhs : Slot,
+  offset : BranchOffset16,
+) -> Op {
   BranchI32LtSImm16Lhs(lhs~, rhs~, offset~)
 }
 
 ///|
 /// Creates a new [`Op::BranchI32LtSImm16Rhs`].
-pub fn Op::branch_i32_lt_s_imm16_rhs(lhs : Slot, rhs : Const16, offset : BranchOffset16) -> Op {
+pub fn Op::branch_i32_lt_s_imm16_rhs(
+  lhs : Slot,
+  rhs : Const16,
+  offset : BranchOffset16,
+) -> Op {
   BranchI32LtSImm16Rhs(lhs~, rhs~, offset~)
 }
 
 ///|
 /// Creates a new [`Op::BranchI32LtU`].
-pub fn Op::branch_i32_lt_u(lhs : Slot, rhs : Slot, offset : BranchOffset16) -> Op {
+pub fn Op::branch_i32_lt_u(
+  lhs : Slot,
+  rhs : Slot,
+  offset : BranchOffset16,
+) -> Op {
   BranchI32LtU(lhs~, rhs~, offset~)
 }
 
 ///|
 /// Creates a new [`Op::BranchI32LtUImm16Lhs`].
-pub fn Op::branch_i32_lt_u_imm16_lhs(lhs : Const16, rhs : Slot, offset : BranchOffset16) -> Op {
+pub fn Op::branch_i32_lt_u_imm16_lhs(
+  lhs : Const16,
+  rhs : Slot,
+  offset : BranchOffset16,
+) -> Op {
   BranchI32LtUImm16Lhs(lhs~, rhs~, offset~)
 }
 
 ///|
 /// Creates a new [`Op::BranchI32LtUImm16Rhs`].
-pub fn Op::branch_i32_lt_u_imm16_rhs(lhs : Slot, rhs : Const16, offset : BranchOffset16) -> Op {
+pub fn Op::branch_i32_lt_u_imm16_rhs(
+  lhs : Slot,
+  rhs : Const16,
+  offset : BranchOffset16,
+) -> Op {
   BranchI32LtUImm16Rhs(lhs~, rhs~, offset~)
 }
 
 ///|
 /// Creates a new [`Op::BranchI32LeS`].
-pub fn Op::branch_i32_le_s(lhs : Slot, rhs : Slot, offset : BranchOffset16) -> Op {
+pub fn Op::branch_i32_le_s(
+  lhs : Slot,
+  rhs : Slot,
+  offset : BranchOffset16,
+) -> Op {
   BranchI32LeS(lhs~, rhs~, offset~)
 }
 
 ///|
 /// Creates a new [`Op::BranchI32LeSImm16Lhs`].
-pub fn Op::branch_i32_le_s_imm16_lhs(lhs : Const16, rhs : Slot, offset : BranchOffset16) -> Op {
+pub fn Op::branch_i32_le_s_imm16_lhs(
+  lhs : Const16,
+  rhs : Slot,
+  offset : BranchOffset16,
+) -> Op {
   BranchI32LeSImm16Lhs(lhs~, rhs~, offset~)
 }
 
 ///|
 /// Creates a new [`Op::BranchI32LeSImm16Rhs`].
-pub fn Op::branch_i32_le_s_imm16_rhs(lhs : Slot, rhs : Const16, offset : BranchOffset16) -> Op {
+pub fn Op::branch_i32_le_s_imm16_rhs(
+  lhs : Slot,
+  rhs : Const16,
+  offset : BranchOffset16,
+) -> Op {
   BranchI32LeSImm16Rhs(lhs~, rhs~, offset~)
 }
 
 ///|
 /// Creates a new [`Op::BranchI32LeU`].
-pub fn Op::branch_i32_le_u(lhs : Slot, rhs : Slot, offset : BranchOffset16) -> Op {
+pub fn Op::branch_i32_le_u(
+  lhs : Slot,
+  rhs : Slot,
+  offset : BranchOffset16,
+) -> Op {
   BranchI32LeU(lhs~, rhs~, offset~)
 }
 
 ///|
 /// Creates a new [`Op::BranchI32LeUImm16Lhs`].
-pub fn Op::branch_i32_le_u_imm16_lhs(lhs : Const16, rhs : Slot, offset : BranchOffset16) -> Op {
+pub fn Op::branch_i32_le_u_imm16_lhs(
+  lhs : Const16,
+  rhs : Slot,
+  offset : BranchOffset16,
+) -> Op {
   BranchI32LeUImm16Lhs(lhs~, rhs~, offset~)
 }
 
 ///|
 /// Creates a new [`Op::BranchI32LeUImm16Rhs`].
-pub fn Op::branch_i32_le_u_imm16_rhs(lhs : Slot, rhs : Const16, offset : BranchOffset16) -> Op {
+pub fn Op::branch_i32_le_u_imm16_rhs(
+  lhs : Slot,
+  rhs : Const16,
+  offset : BranchOffset16,
+) -> Op {
   BranchI32LeUImm16Rhs(lhs~, rhs~, offset~)
 }
 
 ///|
 /// Creates a new [`Op::BranchI64And`].
-pub fn Op::branch_i64_and(lhs : Slot, rhs : Slot, offset : BranchOffset16) -> Op {
+pub fn Op::branch_i64_and(
+  lhs : Slot,
+  rhs : Slot,
+  offset : BranchOffset16,
+) -> Op {
   BranchI64And(lhs~, rhs~, offset~)
 }
 
 ///|
 /// Creates a new [`Op::BranchI64AndImm16`].
-pub fn Op::branch_i64_and_imm16(lhs : Slot, rhs : Const16, offset : BranchOffset16) -> Op {
+pub fn Op::branch_i64_and_imm16(
+  lhs : Slot,
+  rhs : Const16,
+  offset : BranchOffset16,
+) -> Op {
   BranchI64AndImm16(lhs~, rhs~, offset~)
 }
 
@@ -3689,31 +3806,51 @@ pub fn Op::branch_i64_or(lhs : Slot, rhs : Slot, offset : BranchOffset16) -> Op 
 
 ///|
 /// Creates a new [`Op::BranchI64OrImm16`].
-pub fn Op::branch_i64_or_imm16(lhs : Slot, rhs : Const16, offset : BranchOffset16) -> Op {
+pub fn Op::branch_i64_or_imm16(
+  lhs : Slot,
+  rhs : Const16,
+  offset : BranchOffset16,
+) -> Op {
   BranchI64OrImm16(lhs~, rhs~, offset~)
 }
 
 ///|
 /// Creates a new [`Op::BranchI64Nand`].
-pub fn Op::branch_i64_nand(lhs : Slot, rhs : Slot, offset : BranchOffset16) -> Op {
+pub fn Op::branch_i64_nand(
+  lhs : Slot,
+  rhs : Slot,
+  offset : BranchOffset16,
+) -> Op {
   BranchI64Nand(lhs~, rhs~, offset~)
 }
 
 ///|
 /// Creates a new [`Op::BranchI64NandImm16`].
-pub fn Op::branch_i64_nand_imm16(lhs : Slot, rhs : Const16, offset : BranchOffset16) -> Op {
+pub fn Op::branch_i64_nand_imm16(
+  lhs : Slot,
+  rhs : Const16,
+  offset : BranchOffset16,
+) -> Op {
   BranchI64NandImm16(lhs~, rhs~, offset~)
 }
 
 ///|
 /// Creates a new [`Op::BranchI64Nor`].
-pub fn Op::branch_i64_nor(lhs : Slot, rhs : Slot, offset : BranchOffset16) -> Op {
+pub fn Op::branch_i64_nor(
+  lhs : Slot,
+  rhs : Slot,
+  offset : BranchOffset16,
+) -> Op {
   BranchI64Nor(lhs~, rhs~, offset~)
 }
 
 ///|
 /// Creates a new [`Op::BranchI64NorImm16`].
-pub fn Op::branch_i64_nor_imm16(lhs : Slot, rhs : Const16, offset : BranchOffset16) -> Op {
+pub fn Op::branch_i64_nor_imm16(
+  lhs : Slot,
+  rhs : Const16,
+  offset : BranchOffset16,
+) -> Op {
   BranchI64NorImm16(lhs~, rhs~, offset~)
 }
 
@@ -3725,7 +3862,11 @@ pub fn Op::branch_i64_eq(lhs : Slot, rhs : Slot, offset : BranchOffset16) -> Op 
 
 ///|
 /// Creates a new [`Op::BranchI64EqImm16`].
-pub fn Op::branch_i64_eq_imm16(lhs : Slot, rhs : Const16, offset : BranchOffset16) -> Op {
+pub fn Op::branch_i64_eq_imm16(
+  lhs : Slot,
+  rhs : Const16,
+  offset : BranchOffset16,
+) -> Op {
   BranchI64EqImm16(lhs~, rhs~, offset~)
 }
 
@@ -3737,79 +3878,131 @@ pub fn Op::branch_i64_ne(lhs : Slot, rhs : Slot, offset : BranchOffset16) -> Op 
 
 ///|
 /// Creates a new [`Op::BranchI64NeImm16`].
-pub fn Op::branch_i64_ne_imm16(lhs : Slot, rhs : Const16, offset : BranchOffset16) -> Op {
+pub fn Op::branch_i64_ne_imm16(
+  lhs : Slot,
+  rhs : Const16,
+  offset : BranchOffset16,
+) -> Op {
   BranchI64NeImm16(lhs~, rhs~, offset~)
 }
 
 ///|
 /// Creates a new [`Op::BranchI64LtS`].
-pub fn Op::branch_i64_lt_s(lhs : Slot, rhs : Slot, offset : BranchOffset16) -> Op {
+pub fn Op::branch_i64_lt_s(
+  lhs : Slot,
+  rhs : Slot,
+  offset : BranchOffset16,
+) -> Op {
   BranchI64LtS(lhs~, rhs~, offset~)
 }
 
 ///|
 /// Creates a new [`Op::BranchI64LtSImm16Lhs`].
-pub fn Op::branch_i64_lt_s_imm16_lhs(lhs : Const16, rhs : Slot, offset : BranchOffset16) -> Op {
+pub fn Op::branch_i64_lt_s_imm16_lhs(
+  lhs : Const16,
+  rhs : Slot,
+  offset : BranchOffset16,
+) -> Op {
   BranchI64LtSImm16Lhs(lhs~, rhs~, offset~)
 }
 
 ///|
 /// Creates a new [`Op::BranchI64LtSImm16Rhs`].
-pub fn Op::branch_i64_lt_s_imm16_rhs(lhs : Slot, rhs : Const16, offset : BranchOffset16) -> Op {
+pub fn Op::branch_i64_lt_s_imm16_rhs(
+  lhs : Slot,
+  rhs : Const16,
+  offset : BranchOffset16,
+) -> Op {
   BranchI64LtSImm16Rhs(lhs~, rhs~, offset~)
 }
 
 ///|
 /// Creates a new [`Op::BranchI64LtU`].
-pub fn Op::branch_i64_lt_u(lhs : Slot, rhs : Slot, offset : BranchOffset16) -> Op {
+pub fn Op::branch_i64_lt_u(
+  lhs : Slot,
+  rhs : Slot,
+  offset : BranchOffset16,
+) -> Op {
   BranchI64LtU(lhs~, rhs~, offset~)
 }
 
 ///|
 /// Creates a new [`Op::BranchI64LtUImm16Lhs`].
-pub fn Op::branch_i64_lt_u_imm16_lhs(lhs : Const16, rhs : Slot, offset : BranchOffset16) -> Op {
+pub fn Op::branch_i64_lt_u_imm16_lhs(
+  lhs : Const16,
+  rhs : Slot,
+  offset : BranchOffset16,
+) -> Op {
   BranchI64LtUImm16Lhs(lhs~, rhs~, offset~)
 }
 
 ///|
 /// Creates a new [`Op::BranchI64LtUImm16Rhs`].
-pub fn Op::branch_i64_lt_u_imm16_rhs(lhs : Slot, rhs : Const16, offset : BranchOffset16) -> Op {
+pub fn Op::branch_i64_lt_u_imm16_rhs(
+  lhs : Slot,
+  rhs : Const16,
+  offset : BranchOffset16,
+) -> Op {
   BranchI64LtUImm16Rhs(lhs~, rhs~, offset~)
 }
 
 ///|
 /// Creates a new [`Op::BranchI64LeS`].
-pub fn Op::branch_i64_le_s(lhs : Slot, rhs : Slot, offset : BranchOffset16) -> Op {
+pub fn Op::branch_i64_le_s(
+  lhs : Slot,
+  rhs : Slot,
+  offset : BranchOffset16,
+) -> Op {
   BranchI64LeS(lhs~, rhs~, offset~)
 }
 
 ///|
 /// Creates a new [`Op::BranchI64LeSImm16Lhs`].
-pub fn Op::branch_i64_le_s_imm16_lhs(lhs : Const16, rhs : Slot, offset : BranchOffset16) -> Op {
+pub fn Op::branch_i64_le_s_imm16_lhs(
+  lhs : Const16,
+  rhs : Slot,
+  offset : BranchOffset16,
+) -> Op {
   BranchI64LeSImm16Lhs(lhs~, rhs~, offset~)
 }
 
 ///|
 /// Creates a new [`Op::BranchI64LeSImm16Rhs`].
-pub fn Op::branch_i64_le_s_imm16_rhs(lhs : Slot, rhs : Const16, offset : BranchOffset16) -> Op {
+pub fn Op::branch_i64_le_s_imm16_rhs(
+  lhs : Slot,
+  rhs : Const16,
+  offset : BranchOffset16,
+) -> Op {
   BranchI64LeSImm16Rhs(lhs~, rhs~, offset~)
 }
 
 ///|
 /// Creates a new [`Op::BranchI64LeU`].
-pub fn Op::branch_i64_le_u(lhs : Slot, rhs : Slot, offset : BranchOffset16) -> Op {
+pub fn Op::branch_i64_le_u(
+  lhs : Slot,
+  rhs : Slot,
+  offset : BranchOffset16,
+) -> Op {
   BranchI64LeU(lhs~, rhs~, offset~)
 }
 
 ///|
 /// Creates a new [`Op::BranchI64LeUImm16Lhs`].
-pub fn Op::branch_i64_le_u_imm16_lhs(lhs : Const16, rhs : Slot, offset : BranchOffset16) -> Op {
+pub fn Op::branch_i64_le_u_imm16_lhs(
+  lhs : Const16,
+  rhs : Slot,
+  offset : BranchOffset16,
+) -> Op {
   BranchI64LeUImm16Lhs(lhs~, rhs~, offset~)
 }
 
 ///|
 /// Creates a new [`Op::BranchI64LeUImm16Rhs`].
-pub fn Op::branch_i64_le_u_imm16_rhs(lhs : Slot, rhs : Const16, offset : BranchOffset16) -> Op {
+pub fn Op::branch_i64_le_u_imm16_rhs(
+  lhs : Slot,
+  rhs : Const16,
+  offset : BranchOffset16,
+) -> Op {
   BranchI64LeUImm16Rhs(lhs~, rhs~, offset~)
 }
 
@@ -3839,13 +4032,21 @@ pub fn Op::branch_f32_le(lhs : Slot, rhs : Slot, offset : BranchOffset16) -> Op 
 
 ///|
 /// Creates a new [`Op::BranchF32NotLt`].
-pub fn Op::branch_f32_not_lt(lhs : Slot, rhs : Slot, offset : BranchOffset16) -> Op {
+pub fn Op::branch_f32_not_lt(
+  lhs : Slot,
+  rhs : Slot,
+  offset : BranchOffset16,
+) -> Op {
   BranchF32NotLt(lhs~, rhs~, offset~)
 }
 
 ///|
 /// Creates a new [`Op::BranchF32NotLe`].
-pub fn Op::branch_f32_not_le(lhs : Slot, rhs : Slot, offset : BranchOffset16) -> Op {
+pub fn Op::branch_f32_not_le(
+  lhs : Slot,
+  rhs : Slot,
+  offset : BranchOffset16,
+) -> Op {
   BranchF32NotLe(lhs~, rhs~, offset~)
 }
 
@@ -3875,13 +4076,21 @@ pub fn Op::branch_f64_le(lhs : Slot, rhs : Slot, offset : BranchOffset16) -> Op 
 
 ///|
 /// Creates a new [`Op::BranchF64NotLt`].
-pub fn Op::branch_f64_not_lt(lhs : Slot, rhs : Slot, offset : BranchOffset16) -> Op {
+pub fn Op::branch_f64_not_lt(
+  lhs : Slot,
+  rhs : Slot,
+  offset : BranchOffset16,
+) -> Op {
   BranchF64NotLt(lhs~, rhs~, offset~)
 }
 
 ///|
 /// Creates a new [`Op::BranchF64NotLe`].
-pub fn Op::branch_f64_not_le(lhs : Slot, rhs : Slot, offset : BranchOffset16) -> Op {
+pub fn Op::branch_f64_not_le(
+  lhs : Slot,
+  rhs : Slot,
+  offset : BranchOffset16,
+) -> Op {
   BranchF64NotLe(lhs~, rhs~, offset~)
 }
 
@@ -4019,7 +4228,10 @@ pub fn Op::call_indirect_0(results : SlotSpan, func_type : FuncType) -> Op {
 
 ///|
 /// Creates a new [`Op::CallIndirect0Imm16`].
-pub fn Op::call_indirect_0_imm16(results : SlotSpan, func_type : FuncType) -> Op {
+pub fn Op::call_indirect_0_imm16(
+  results : SlotSpan,
+  func_type : FuncType,
+) -> Op {
   CallIndirect0Imm16(results~, func_type~)
 }
 
@@ -4079,7 +4291,11 @@ pub fn Op::select_i32_lt_s(result : Slot, lhs : Slot, rhs : Slot) -> Op {
 
 ///|
 /// Creates a new [`Op::SelectI32LtSImm16Rhs`].
-pub fn Op::select_i32_lt_s_imm16_rhs(result : Slot, lhs : Slot, rhs : Const16) -> Op {
+pub fn Op::select_i32_lt_s_imm16_rhs(
+  result : Slot,
+  lhs : Slot,
+  rhs : Const16,
+) -> Op {
   SelectI32LtSImm16Rhs(result~, lhs~, rhs~)
 }
 
@@ -4091,7 +4307,11 @@ pub fn Op::select_i32_lt_u(result : Slot, lhs : Slot, rhs : Slot) -> Op {
 
 ///|
 /// Creates a new [`Op::SelectI32LtUImm16Rhs`].
-pub fn Op::select_i32_lt_u_imm16_rhs(result : Slot, lhs : Slot, rhs : Const16) -> Op {
+pub fn Op::select_i32_lt_u_imm16_rhs(
+  result : Slot,
+  lhs : Slot,
+  rhs : Const16,
+) -> Op {
   SelectI32LtUImm16Rhs(result~, lhs~, rhs~)
 }
 
@@ -4103,7 +4323,11 @@ pub fn Op::select_i32_le_s(result : Slot, lhs : Slot, rhs : Slot) -> Op {
 
 ///|
 /// Creates a new [`Op::SelectI32LeSImm16Rhs`].
-pub fn Op::select_i32_le_s_imm16_rhs(result : Slot, lhs : Slot, rhs : Const16) -> Op {
+pub fn Op::select_i32_le_s_imm16_rhs(
+  result : Slot,
+  lhs : Slot,
+  rhs : Const16,
+) -> Op {
   SelectI32LeSImm16Rhs(result~, lhs~, rhs~)
 }
 
@@ -4115,7 +4339,11 @@ pub fn Op::select_i32_le_u(result : Slot, lhs : Slot, rhs : Slot) -> Op {
 
 ///|
 /// Creates a new [`Op::SelectI32LeUImm16Rhs`].
-pub fn Op::select_i32_le_u_imm16_rhs(result : Slot, lhs : Slot, rhs : Const16) -> Op {
+pub fn Op::select_i32_le_u_imm16_rhs(
+  result : Slot,
+  lhs : Slot,
+  rhs : Const16,
+) -> Op {
   SelectI32LeUImm16Rhs(result~, lhs~, rhs~)
 }
 
@@ -4163,7 +4391,11 @@ pub fn Op::select_i64_lt_s(result : Slot, lhs : Slot, rhs : Slot) -> Op {
 
 ///|
 /// Creates a new [`Op::SelectI64LtSImm16Rhs`].
-pub fn Op::select_i64_lt_s_imm16_rhs(result : Slot, lhs : Slot, rhs : Const16) -> Op {
+pub fn Op::select_i64_lt_s_imm16_rhs(
+  result : Slot,
+  lhs : Slot,
+  rhs : Const16,
+) -> Op {
   SelectI64LtSImm16Rhs(result~, lhs~, rhs~)
 }
 
@@ -4175,7 +4407,11 @@ pub fn Op::select_i64_lt_u(result : Slot, lhs : Slot, rhs : Slot) -> Op {
 
 ///|
 /// Creates a new [`Op::SelectI64LtUImm16Rhs`].
-pub fn Op::select_i64_lt_u_imm16_rhs(result : Slot, lhs : Slot, rhs : Const16) -> Op {
+pub fn Op::select_i64_lt_u_imm16_rhs(
+  result : Slot,
+  lhs : Slot,
+  rhs : Const16,
+) -> Op {
   SelectI64LtUImm16Rhs(result~, lhs~, rhs~)
 }
 
@@ -4187,7 +4423,11 @@ pub fn Op::select_i64_le_s(result : Slot, lhs : Slot, rhs : Slot) -> Op {
 
 ///|
 /// Creates a new [`Op::SelectI64LeSImm16Rhs`].
-pub fn Op::select_i64_le_s_imm16_rhs(result : Slot, lhs : Slot, rhs : Const16) -> Op {
+pub fn Op::select_i64_le_s_imm16_rhs(
+  result : Slot,
+  lhs : Slot,
+  rhs : Const16,
+) -> Op {
   SelectI64LeSImm16Rhs(result~, lhs~, rhs~)
 }
 
@@ -4199,7 +4439,11 @@ pub fn Op::select_i64_le_u(result : Slot, lhs : Slot, rhs : Slot) -> Op {
 
 ///|
 /// Creates a new [`Op::SelectI64LeUImm16Rhs`].
-pub fn Op::select_i64_le_u_imm16_rhs(result : Slot, lhs : Slot, rhs : Const16) -> Op {
+pub fn Op::select_i64_le_u_imm16_rhs(
+  result : Slot,
+  lhs : Slot,
+  rhs : Const16,
+) -> Op {
   SelectI64LeUImm16Rhs(result~, lhs~, rhs~)
 }
 
@@ -4319,7 +4563,11 @@ pub fn Op::i32_load8_s_at(result : Slot, address : Address32) -> Op {
 
 ///|
 /// Creates a new [`Op::I32Load8sOffset16`].
-pub fn Op::i32_load8_s_offset16(result : Slot, ptr : Slot, offset : Offset16) -> Op {
+pub fn Op::i32_load8_s_offset16(
+  result : Slot,
+  ptr : Slot,
+  offset : Offset16,
+) -> Op {
   I32Load8sOffset16(result~, ptr~, offset~)
 }
 
@@ -4337,7 +4585,11 @@ pub fn Op::i32_load8_u_at(result : Slot, address : Address32) -> Op {
 
 ///|
 /// Creates a new [`Op::I32Load8uOffset16`].
-pub fn Op::i32_load8_u_offset16(result : Slot, ptr : Slot, offset : Offset16) -> Op {
+pub fn Op::i32_load8_u_offset16(
+  result : Slot,
+  ptr : Slot,
+  offset : Offset16,
+) -> Op {
   I32Load8uOffset16(result~, ptr~, offset~)
 }
 
@@ -4355,7 +4607,11 @@ pub fn Op::i32_load16_s_at(result : Slot, address : Address32) -> Op {
 
 ///|
 /// Creates a new [`Op::I32Load16sOffset16`].
-pub fn Op::i32_load16_s_offset16(result : Slot, ptr : Slot, offset : Offset16) -> Op {
+pub fn Op::i32_load16_s_offset16(
+  result : Slot,
+  ptr : Slot,
+  offset : Offset16,
+) -> Op {
   I32Load16sOffset16(result~, ptr~, offset~)
 }
 
@@ -4373,7 +4629,11 @@ pub fn Op::i32_load16_u_at(result : Slot, address : Address32) -> Op {
 
 ///|
 /// Creates a new [`Op::I32Load16uOffset16`].
-pub fn Op::i32_load16_u_offset16(result : Slot, ptr : Slot, offset : Offset16) -> Op {
+pub fn Op::i32_load16_u_offset16(
+  result : Slot,
+  ptr : Slot,
+  offset : Offset16,
+) -> Op {
   I32Load16uOffset16(result~, ptr~, offset~)
 }
 
@@ -4391,7 +4651,11 @@ pub fn Op::i64_load8_s_at(result : Slot, address : Address32) -> Op {
 
 ///|
 /// Creates a new [`Op::I64Load8sOffset16`].
-pub fn Op::i64_load8_s_offset16(result : Slot, ptr : Slot, offset : Offset16) -> Op {
+pub fn Op::i64_load8_s_offset16(
+  result : Slot,
+  ptr : Slot,
+  offset : Offset16,
+) -> Op {
   I64Load8sOffset16(result~, ptr~, offset~)
 }
 
@@ -4409,7 +4673,11 @@ pub fn Op::i64_load8_u_at(result : Slot, address : Address32) -> Op {
 
 ///|
 /// Creates a new [`Op::I64Load8uOffset16`].
-pub fn Op::i64_load8_u_offset16(result : Slot, ptr : Slot, offset : Offset16) -> Op {
+pub fn Op::i64_load8_u_offset16(
+  result : Slot,
+  ptr : Slot,
+  offset : Offset16,
+) -> Op {
   I64Load8uOffset16(result~, ptr~, offset~)
 }
 
@@ -4427,7 +4695,11 @@ pub fn Op::i64_load16_s_at(result : Slot, address : Address32) -> Op {
 
 ///|
 /// Creates a new [`Op::I64Load16sOffset16`].
-pub fn Op::i64_load16_s_offset16(result : Slot, ptr : Slot, offset : Offset16) -> Op {
+pub fn Op::i64_load16_s_offset16(
+  result : Slot,
+  ptr : Slot,
+  offset : Offset16,
+) -> Op {
   I64Load16sOffset16(result~, ptr~, offset~)
 }
 
@@ -4445,7 +4717,11 @@ pub fn Op::i64_load16_u_at(result : Slot, address : Address32) -> Op {
 
 ///|
 /// Creates a new [`Op::I64Load16uOffset16`].
-pub fn Op::i64_load16_u_offset16(result : Slot, ptr : Slot, offset : Offset16) -> Op {
+pub fn Op::i64_load16_u_offset16(
+  result : Slot,
+  ptr : Slot,
+  offset : Offset16,
+) -> Op {
   I64Load16uOffset16(result~, ptr~, offset~)
 }
 
@@ -4463,7 +4739,11 @@ pub fn Op::i64_load32_s_at(result : Slot, address : Address32) -> Op {
 
 ///|
 /// Creates a new [`Op::I64Load32sOffset16`].
-pub fn Op::i64_load32_s_offset16(result : Slot, ptr : Slot, offset : Offset16) -> Op {
+pub fn Op::i64_load32_s_offset16(
+  result : Slot,
+  ptr : Slot,
+  offset : Offset16,
+) -> Op {
   I64Load32sOffset16(result~, ptr~, offset~)
 }
 
@@ -4481,7 +4761,11 @@ pub fn Op::i64_load32_u_at(result : Slot, address : Address32) -> Op {
 
 ///|
 /// Creates a new [`Op::I64Load32uOffset16`].
-pub fn Op::i64_load32_u_offset16(result : Slot, ptr : Slot, offset : Offset16) -> Op {
+pub fn Op::i64_load32_u_offset16(
+  result : Slot,
+  ptr : Slot,
+  offset : Offset16,
+) -> Op {
   I64Load32uOffset16(result~, ptr~, offset~)
 }
 
@@ -4529,7 +4813,11 @@ pub fn Op::i32_store_imm16(ptr : Slot, offset_lo : Offset64Lo) -> Op {
 
 ///|
 /// Creates a new [`Op::I32StoreOffset16Imm16`].
-pub fn Op::i32_store_offset16_imm16(ptr : Slot, offset : Offset16, value : Const16) -> Op {
+pub fn Op::i32_store_offset16_imm16(
+  ptr : Slot,
+  offset : Offset16,
+  value : Const16,
+) -> Op {
   I32StoreOffset16Imm16(ptr~, offset~, value~)
 }
 
@@ -4553,13 +4841,21 @@ pub fn Op::i32_store8_imm(ptr : Slot, offset_lo : Offset64Lo) -> Op {
 
 ///|
 /// Creates a new [`Op::I32Store8Offset16`].
-pub fn Op::i32_store8_offset16(ptr : Slot, offset : Offset16, value : Slot) -> Op {
+pub fn Op::i32_store8_offset16(
+  ptr : Slot,
+  offset : Offset16,
+  value : Slot,
+) -> Op {
   I32Store8Offset16(ptr~, offset~, value~)
 }
 
 ///|
 /// Creates a new [`Op::I32Store8Offset16Imm`].
-pub fn Op::i32_store8_offset16_imm(ptr : Slot, offset : Offset16, value : Int) -> Op {
+pub fn Op::i32_store8_offset16_imm(
+  ptr : Slot,
+  offset : Offset16,
+  value : Int,
+) -> Op {
   I32Store8Offset16Imm(ptr~, offset~, value~)
 }
 
@@ -4589,13 +4885,21 @@ pub fn Op::i32_store16_imm(ptr : Slot, offset_lo : Offset64Lo) -> Op {
 
 ///|
 /// Creates a new [`Op::I32Store16Offset16`].
-pub fn Op::i32_store16_offset16(ptr : Slot, offset : Offset16, value : Slot) -> Op {
+pub fn Op::i32_store16_offset16(
+  ptr : Slot,
+  offset : Offset16,
+  value : Slot,
+) -> Op {
   I32Store16Offset16(ptr~, offset~, value~)
 }
 
 ///|
 /// Creates a new [`Op::I32Store16Offset16Imm`].
-pub fn Op::i32_store16_offset16_imm(ptr : Slot, offset : Offset16, value : Int) -> Op {
+pub fn Op::i32_store16_offset16_imm(
+  ptr : Slot,
+  offset : Offset16,
+  value : Int,
+) -> Op {
   I32Store16Offset16Imm(ptr~, offset~, value~)
 }
 
@@ -4619,7 +4923,11 @@ pub fn Op::i64_store_imm16(ptr : Slot, offset_lo : Offset64Lo) -> Op {
 
 ///|
 /// Creates a new [`Op::I64StoreOffset16Imm16`].
-pub fn Op::i64_store_offset16_imm16(ptr : Slot, offset : Offset16, value : Const16) -> Op {
+pub fn Op::i64_store_offset16_imm16(
+  ptr : Slot,
+  offset : Offset16,
+  value : Const16,
+) -> Op {
   I64StoreOffset16Imm16(ptr~, offset~, value~)
 }
 
@@ -4643,13 +4951,21 @@ pub fn Op::i64_store8_imm(ptr : Slot, offset_lo : Offset64Lo) -> Op {
 
 ///|
 /// Creates a new [`Op::I64Store8Offset16`].
-pub fn Op::i64_store8_offset16(ptr : Slot, offset : Offset16, value : Slot) -> Op {
+pub fn Op::i64_store8_offset16(
+  ptr : Slot,
+  offset : Offset16,
+  value : Slot,
+) -> Op {
   I64Store8Offset16(ptr~, offset~, value~)
 }
 
 ///|
 /// Creates a new [`Op::I64Store8Offset16Imm`].
-pub fn Op::i64_store8_offset16_imm(ptr : Slot, offset : Offset16, value : Int) -> Op {
+pub fn Op::i64_store8_offset16_imm(
+  ptr : Slot,
+  offset : Offset16,
+  value : Int,
+) -> Op {
   I64Store8Offset16Imm(ptr~, offset~, value~)
 }
 
@@ -4679,13 +4995,21 @@ pub fn Op::i64_store16_imm(ptr : Slot, offset_lo : Offset64Lo) -> Op {
 
 ///|
 /// Creates a new [`Op::I64Store16Offset16`].
-pub fn Op::i64_store16_offset16(ptr : Slot, offset : Offset16, value : Slot) -> Op {
+pub fn Op::i64_store16_offset16(
+  ptr : Slot,
+  offset : Offset16,
+  value : Slot,
+) -> Op {
   I64Store16Offset16(ptr~, offset~, value~)
 }
 
 ///|
 /// Creates a new [`Op::I64Store16Offset16Imm`].
-pub fn Op::i64_store16_offset16_imm(ptr : Slot, offset : Offset16, value : Int) -> Op {
+pub fn Op::i64_store16_offset16_imm(
+  ptr : Slot,
+  offset : Offset16,
+  value : Int,
+) -> Op {
   I64Store16Offset16Imm(ptr~, offset~, value~)
 }
 
@@ -4715,13 +5039,21 @@ pub fn Op::i64_store32_imm16(ptr : Slot, offset_lo : Offset64Lo) -> Op {
 
 ///|
 /// Creates a new [`Op::I64Store32Offset16`].
-pub fn Op::i64_store32_offset16(ptr : Slot, offset : Offset16, value : Slot) -> Op {
+pub fn Op::i64_store32_offset16(
+  ptr : Slot,
+  offset : Offset16,
+  value : Slot,
+) -> Op {
   I64Store32Offset16(ptr~, offset~, value~)
 }
 
 ///|
 /// Creates a new [`Op::I64Store32Offset16Imm16`].
-pub fn Op::i64_store32_offset16_imm16(ptr : Slot, offset : Offset16, value : Const16) -> Op {
+pub fn Op::i64_store32_offset16_imm16(
+  ptr : Slot,
+  offset : Offset16,
+  value : Const16,
+) -> Op {
   I64Store32Offset16Imm16(ptr~, offset~, value~)
 }
 
@@ -5621,13 +5953,21 @@ pub fn Op::i64_sub128(results : FixedArray[Slot], lhs_lo : Slot) -> Op {
 
 ///|
 /// Creates a new [`Op::I64MulWideS`].
-pub fn Op::i64_mul_wide_s(results : FixedSlotSpan, lhs : Slot, rhs : Slot) -> Op {
+pub fn Op::i64_mul_wide_s(
+  results : FixedSlotSpan,
+  lhs : Slot,
+  rhs : Slot,
+) -> Op {
   I64MulWideS(results~, lhs~, rhs~)
 }
 
 ///|
 /// Creates a new [`Op::I64MulWideU`].
-pub fn Op::i64_mul_wide_u(results : FixedSlotSpan, lhs : Slot, rhs : Slot) -> Op {
+pub fn Op::i64_mul_wide_u(
+  results : FixedSlotSpan,
+  lhs : Slot,
+  rhs : Slot,
+) -> Op {
   I64MulWideU(results~, lhs~, rhs~)
 }
 
@@ -6239,121 +6579,202 @@ pub fn Op::f64x2_splat(result : Slot, value : Slot) -> Op {
 
 ///|
 /// Creates a new [`Op::I8x16ExtractLaneS`].
-pub fn Op::i8x16_extract_lane_s(result : Slot, value : Slot, lane : ImmLaneIdx) -> Op {
+pub fn Op::i8x16_extract_lane_s(
+  result : Slot,
+  value : Slot,
+  lane : ImmLaneIdx,
+) -> Op {
   I8x16ExtractLaneS(result~, value~, lane~)
 }
 
 ///|
 /// Creates a new [`Op::I8x16ExtractLaneU`].
-pub fn Op::i8x16_extract_lane_u(result : Slot, value : Slot, lane : ImmLaneIdx) -> Op {
+pub fn Op::i8x16_extract_lane_u(
+  result : Slot,
+  value : Slot,
+  lane : ImmLaneIdx,
+) -> Op {
   I8x16ExtractLaneU(result~, value~, lane~)
 }
 
 ///|
 /// Creates a new [`Op::I16x8ExtractLaneS`].
-pub fn Op::i16x8_extract_lane_s(result : Slot, value : Slot, lane : ImmLaneIdx) -> Op {
+pub fn Op::i16x8_extract_lane_s(
+  result : Slot,
+  value : Slot,
+  lane : ImmLaneIdx,
+) -> Op {
   I16x8ExtractLaneS(result~, value~, lane~)
 }
 
 ///|
 /// Creates a new [`Op::I16x8ExtractLaneU`].
-pub fn Op::i16x8_extract_lane_u(result : Slot, value : Slot, lane : ImmLaneIdx) -> Op {
+pub fn Op::i16x8_extract_lane_u(
+  result : Slot,
+  value : Slot,
+  lane : ImmLaneIdx,
+) -> Op {
   I16x8ExtractLaneU(result~, value~, lane~)
 }
 
 ///|
 /// Creates a new [`Op::I32x4ExtractLane`].
-pub fn Op::i32x4_extract_lane(result : Slot, value : Slot, lane : ImmLaneIdx) -> Op {
+pub fn Op::i32x4_extract_lane(
+  result : Slot,
+  value : Slot,
+  lane : ImmLaneIdx,
+) -> Op {
   I32x4ExtractLane(result~, value~, lane~)
 }
 
 ///|
 /// Creates a new [`Op::I64x2ExtractLane`].
-pub fn Op::i64x2_extract_lane(result : Slot, value : Slot, lane : ImmLaneIdx) -> Op {
+pub fn Op::i64x2_extract_lane(
+  result : Slot,
+  value : Slot,
+  lane : ImmLaneIdx,
+) -> Op {
   I64x2ExtractLane(result~, value~, lane~)
 }
 
 ///|
 /// Creates a new [`Op::F32x4ExtractLane`].
-pub fn Op::f32x4_extract_lane(result : Slot, value : Slot, lane : ImmLaneIdx) -> Op {
+pub fn Op::f32x4_extract_lane(
+  result : Slot,
+  value : Slot,
+  lane : ImmLaneIdx,
+) -> Op {
   F32x4ExtractLane(result~, value~, lane~)
 }
 
 ///|
 /// Creates a new [`Op::F64x2ExtractLane`].
-pub fn Op::f64x2_extract_lane(result : Slot, value : Slot, lane : ImmLaneIdx) -> Op {
+pub fn Op::f64x2_extract_lane(
+  result : Slot,
+  value : Slot,
+  lane : ImmLaneIdx,
+) -> Op {
   F64x2ExtractLane(result~, value~, lane~)
 }
 
 ///|
 /// Creates a new [`Op::I8x16ReplaceLane`].
-pub fn Op::i8x16_replace_lane(result : Slot, input : Slot, lane : ImmLaneIdx) -> Op {
+pub fn Op::i8x16_replace_lane(
+  result : Slot,
+  input : Slot,
+  lane : ImmLaneIdx,
+) -> Op {
   I8x16ReplaceLane(result~, input~, lane~)
 }
 
 ///|
 /// Creates a new [`Op::I8x16ReplaceLaneImm`].
-pub fn Op::i8x16_replace_lane_imm(result : Slot, input : Slot, lane : ImmLaneIdx, value : Int) -> Op {
+pub fn Op::i8x16_replace_lane_imm(
+  result : Slot,
+  input : Slot,
+  lane : ImmLaneIdx,
+  value : Int,
+) -> Op {
   I8x16ReplaceLaneImm(result~, input~, lane~, value~)
 }
 
 ///|
 /// Creates a new [`Op::I16x8ReplaceLane`].
-pub fn Op::i16x8_replace_lane(result : Slot, input : Slot, lane : ImmLaneIdx) -> Op {
+pub fn Op::i16x8_replace_lane(
+  result : Slot,
+  input : Slot,
+  lane : ImmLaneIdx,
+) -> Op {
   I16x8ReplaceLane(result~, input~, lane~)
 }
 
 ///|
 /// Creates a new [`Op::I16x8ReplaceLaneImm`].
-pub fn Op::i16x8_replace_lane_imm(result : Slot, input : Slot, lane : ImmLaneIdx) -> Op {
+pub fn Op::i16x8_replace_lane_imm(
+  result : Slot,
+  input : Slot,
+  lane : ImmLaneIdx,
+) -> Op {
   I16x8ReplaceLaneImm(result~, input~, lane~)
 }
 
 ///|
 /// Creates a new [`Op::I32x4ReplaceLane`].
-pub fn Op::i32x4_replace_lane(result : Slot, input : Slot, lane : ImmLaneIdx) -> Op {
+pub fn Op::i32x4_replace_lane(
+  result : Slot,
+  input : Slot,
+  lane : ImmLaneIdx,
+) -> Op {
   I32x4ReplaceLane(result~, input~, lane~)
 }
 
 ///|
 /// Creates a new [`Op::I32x4ReplaceLaneImm`].
-pub fn Op::i32x4_replace_lane_imm(result : Slot, input : Slot, lane : ImmLaneIdx) -> Op {
+pub fn Op::i32x4_replace_lane_imm(
+  result : Slot,
+  input : Slot,
+  lane : ImmLaneIdx,
+) -> Op {
   I32x4ReplaceLaneImm(result~, input~, lane~)
 }
 
 ///|
 /// Creates a new [`Op::I64x2ReplaceLane`].
-pub fn Op::i64x2_replace_lane(result : Slot, input : Slot, lane : ImmLaneIdx) -> Op {
+pub fn Op::i64x2_replace_lane(
+  result : Slot,
+  input : Slot,
+  lane : ImmLaneIdx,
+) -> Op {
   I64x2ReplaceLane(result~, input~, lane~)
 }
 
 ///|
 /// Creates a new [`Op::I64x2ReplaceLaneImm32`].
-pub fn Op::i64x2_replace_lane_imm32(result : Slot, input : Slot, lane : ImmLaneIdx) -> Op {
+pub fn Op::i64x2_replace_lane_imm32(
+  result : Slot,
+  input : Slot,
+  lane : ImmLaneIdx,
+) -> Op {
   I64x2ReplaceLaneImm32(result~, input~, lane~)
 }
 
 ///|
 /// Creates a new [`Op::F32x4ReplaceLane`].
-pub fn Op::f32x4_replace_lane(result : Slot, input : Slot, lane : ImmLaneIdx) -> Op {
+pub fn Op::f32x4_replace_lane(
+  result : Slot,
+  input : Slot,
+  lane : ImmLaneIdx,
+) -> Op {
   F32x4ReplaceLane(result~, input~, lane~)
 }
 
 ///|
 /// Creates a new [`Op::F32x4ReplaceLaneImm`].
-pub fn Op::f32x4_replace_lane_imm(result : Slot, input : Slot, lane : ImmLaneIdx) -> Op {
+pub fn Op::f32x4_replace_lane_imm(
+  result : Slot,
+  input : Slot,
+  lane : ImmLaneIdx,
+) -> Op {
   F32x4ReplaceLaneImm(result~, input~, lane~)
 }
 
 ///|
 /// Creates a new [`Op::F64x2ReplaceLane`].
-pub fn Op::f64x2_replace_lane(result : Slot, input : Slot, lane : ImmLaneIdx) -> Op {
+pub fn Op::f64x2_replace_lane(
+  result : Slot,
+  input : Slot,
+  lane : ImmLaneIdx,
+) -> Op {
   F64x2ReplaceLane(result~, input~, lane~)
 }
 
 ///|
 /// Creates a new [`Op::F64x2ReplaceLaneImm32`].
-pub fn Op::f64x2_replace_lane_imm32(result : Slot, input : Slot, lane : ImmLaneIdx) -> Op {
+pub fn Op::f64x2_replace_lane_imm32(
+  result : Slot,
+  input : Slot,
+  lane : ImmLaneIdx,
+) -> Op {
   F64x2ReplaceLaneImm32(result~, input~, lane~)
 }
 
@@ -6443,13 +6864,21 @@ pub fn Op::i32x4_dot_i16x8_s(result : Slot, lhs : Slot, rhs : Slot) -> Op {
 
 ///|
 /// Creates a new [`Op::I16x8RelaxedDotI8x16I7x16S`].
-pub fn Op::i16x8_relaxed_dot_i8x16_i7x16_s(result : Slot, lhs : Slot, rhs : Slot) -> Op {
+pub fn Op::i16x8_relaxed_dot_i8x16_i7x16_s(
+  result : Slot,
+  lhs : Slot,
+  rhs : Slot,
+) -> Op {
   I16x8RelaxedDotI8x16I7x16S(result~, lhs~, rhs~)
 }
 
 ///|
 /// Creates a new [`Op::I32x4RelaxedDotI8x16I7x16AddS`].
-pub fn Op::i32x4_relaxed_dot_i8x16_i7x16_add_s(result : Slot, lhs : Slot, rhs : Slot) -> Op {
+pub fn Op::i32x4_relaxed_dot_i8x16_i7x16_add_s(
+  result : Slot,
+  lhs : Slot,
+  rhs : Slot,
+) -> Op {
   I32x4RelaxedDotI8x16I7x16AddS(result~, lhs~, rhs~)
 }
 
@@ -6503,73 +6932,121 @@ pub fn Op::i64x2_neg(result : Slot, input : Slot) -> Op {
 
 ///|
 /// Creates a new [`Op::I16x8ExtmulLowI8x16S`].
-pub fn Op::i16x8_extmul_low_i8x16_s(result : Slot, lhs : Slot, rhs : Slot) -> Op {
+pub fn Op::i16x8_extmul_low_i8x16_s(
+  result : Slot,
+  lhs : Slot,
+  rhs : Slot,
+) -> Op {
   I16x8ExtmulLowI8x16S(result~, lhs~, rhs~)
 }
 
 ///|
 /// Creates a new [`Op::I16x8ExtmulHighI8x16S`].
-pub fn Op::i16x8_extmul_high_i8x16_s(result : Slot, lhs : Slot, rhs : Slot) -> Op {
+pub fn Op::i16x8_extmul_high_i8x16_s(
+  result : Slot,
+  lhs : Slot,
+  rhs : Slot,
+) -> Op {
   I16x8ExtmulHighI8x16S(result~, lhs~, rhs~)
 }
 
 ///|
 /// Creates a new [`Op::I16x8ExtmulLowI8x16U`].
-pub fn Op::i16x8_extmul_low_i8x16_u(result : Slot, lhs : Slot, rhs : Slot) -> Op {
+pub fn Op::i16x8_extmul_low_i8x16_u(
+  result : Slot,
+  lhs : Slot,
+  rhs : Slot,
+) -> Op {
   I16x8ExtmulLowI8x16U(result~, lhs~, rhs~)
 }
 
 ///|
 /// Creates a new [`Op::I16x8ExtmulHighI8x16U`].
-pub fn Op::i16x8_extmul_high_i8x16_u(result : Slot, lhs : Slot, rhs : Slot) -> Op {
+pub fn Op::i16x8_extmul_high_i8x16_u(
+  result : Slot,
+  lhs : Slot,
+  rhs : Slot,
+) -> Op {
   I16x8ExtmulHighI8x16U(result~, lhs~, rhs~)
 }
 
 ///|
 /// Creates a new [`Op::I32x4ExtmulLowI16x8S`].
-pub fn Op::i32x4_extmul_low_i16x8_s(result : Slot, lhs : Slot, rhs : Slot) -> Op {
+pub fn Op::i32x4_extmul_low_i16x8_s(
+  result : Slot,
+  lhs : Slot,
+  rhs : Slot,
+) -> Op {
   I32x4ExtmulLowI16x8S(result~, lhs~, rhs~)
 }
 
 ///|
 /// Creates a new [`Op::I32x4ExtmulHighI16x8S`].
-pub fn Op::i32x4_extmul_high_i16x8_s(result : Slot, lhs : Slot, rhs : Slot) -> Op {
+pub fn Op::i32x4_extmul_high_i16x8_s(
+  result : Slot,
+  lhs : Slot,
+  rhs : Slot,
+) -> Op {
   I32x4ExtmulHighI16x8S(result~, lhs~, rhs~)
 }
 
 ///|
 /// Creates a new [`Op::I32x4ExtmulLowI16x8U`].
-pub fn Op::i32x4_extmul_low_i16x8_u(result : Slot, lhs : Slot, rhs : Slot) -> Op {
+pub fn Op::i32x4_extmul_low_i16x8_u(
+  result : Slot,
+  lhs : Slot,
+  rhs : Slot,
+) -> Op {
   I32x4ExtmulLowI16x8U(result~, lhs~, rhs~)
 }
 
 ///|
 /// Creates a new [`Op::I32x4ExtmulHighI16x8U`].
-pub fn Op::i32x4_extmul_high_i16x8_u(result : Slot, lhs : Slot, rhs : Slot) -> Op {
+pub fn Op::i32x4_extmul_high_i16x8_u(
+  result : Slot,
+  lhs : Slot,
+  rhs : Slot,
+) -> Op {
   I32x4ExtmulHighI16x8U(result~, lhs~, rhs~)
 }
 
 ///|
 /// Creates a new [`Op::I64x2ExtmulLowI32x4S`].
-pub fn Op::i64x2_extmul_low_i32x4_s(result : Slot, lhs : Slot, rhs : Slot) -> Op {
+pub fn Op::i64x2_extmul_low_i32x4_s(
+  result : Slot,
+  lhs : Slot,
+  rhs : Slot,
+) -> Op {
   I64x2ExtmulLowI32x4S(result~, lhs~, rhs~)
 }
 
 ///|
 /// Creates a new [`Op::I64x2ExtmulHighI32x4S`].
-pub fn Op::i64x2_extmul_high_i32x4_s(result : Slot, lhs : Slot, rhs : Slot) -> Op {
+pub fn Op::i64x2_extmul_high_i32x4_s(
+  result : Slot,
+  lhs : Slot,
+  rhs : Slot,
+) -> Op {
   I64x2ExtmulHighI32x4S(result~, lhs~, rhs~)
 }
 
 ///|
 /// Creates a new [`Op::I64x2ExtmulLowI32x4U`].
-pub fn Op::i64x2_extmul_low_i32x4_u(result : Slot, lhs : Slot, rhs : Slot) -> Op {
+pub fn Op::i64x2_extmul_low_i32x4_u(
+  result : Slot,
+  lhs : Slot,
+  rhs : Slot,
+) -> Op {
   I64x2ExtmulLowI32x4U(result~, lhs~, rhs~)
 }
 
 ///|
 /// Creates a new [`Op::I64x2ExtmulHighI32x4U`].
-pub fn Op::i64x2_extmul_high_i32x4_u(result : Slot, lhs : Slot, rhs : Slot) -> Op {
+pub fn Op::i64x2_extmul_high_i32x4_u(
+  result : Slot,
+  lhs : Slot,
+  rhs : Slot,
+) -> Op {
   I64x2ExtmulHighI32x4U(result~, lhs~, rhs~)
 }
 
@@ -7523,7 +8000,11 @@ pub fn Op::v128_store(ptr : Slot, offset_lo : Offset64Lo) -> Op {
 
 ///|
 /// Creates a new [`Op::V128StoreOffset16`].
-pub fn Op::v128_store_offset16(ptr : Slot, offset : Offset16, value : Slot) -> Op {
+pub fn Op::v128_store_offset16(
+  ptr : Slot,
+  offset : Offset16,
+  value : Slot,
+) -> Op {
   V128StoreOffset16(ptr~, offset~, value~)
 }
 
@@ -7541,7 +8022,12 @@ pub fn Op::v128_store8_lane(ptr : Slot, offset_lo : Offset64Lo) -> Op {
 
 ///|
 /// Creates a new [`Op::V128Store8LaneOffset8`].
-pub fn Op::v128_store8_lane_offset8(ptr : Slot, value : Slot, offset : Offset8, lane : ImmLaneIdx) -> Op {
+pub fn Op::v128_store8_lane_offset8(
+  ptr : Slot,
+  value : Slot,
+  offset : Offset8,
+  lane : ImmLaneIdx,
+) -> Op {
   V128Store8LaneOffset8(ptr~, value~, offset~, lane~)
 }
 
@@ -7559,7 +8045,12 @@ pub fn Op::v128_store16_lane(ptr : Slot, offset_lo : Offset64Lo) -> Op {
 
 ///|
 /// Creates a new [`Op::V128Store16LaneOffset8`].
-pub fn Op::v128_store16_lane_offset8(ptr : Slot, value : Slot, offset : Offset8, lane : ImmLaneIdx) -> Op {
+pub fn Op::v128_store16_lane_offset8(
+  ptr : Slot,
+  value : Slot,
+  offset : Offset8,
+  lane : ImmLaneIdx,
+) -> Op {
   V128Store16LaneOffset8(ptr~, value~, offset~, lane~)
 }
 
@@ -7577,7 +8068,12 @@ pub fn Op::v128_store32_lane(ptr : Slot, offset_lo : Offset64Lo) -> Op {
 
 ///|
 /// Creates a new [`Op::V128Store32LaneOffset8`].
-pub fn Op::v128_store32_lane_offset8(ptr : Slot, value : Slot, offset : Offset8, lane : ImmLaneIdx) -> Op {
+pub fn Op::v128_store32_lane_offset8(
+  ptr : Slot,
+  value : Slot,
+  offset : Offset8,
+  lane : ImmLaneIdx,
+) -> Op {
   V128Store32LaneOffset8(ptr~, value~, offset~, lane~)
 }
 
@@ -7595,7 +8091,12 @@ pub fn Op::v128_store64_lane(ptr : Slot, offset_lo : Offset64Lo) -> Op {
 
 ///|
 /// Creates a new [`Op::V128Store64LaneOffset8`].
-pub fn Op::v128_store64_lane_offset8(ptr : Slot, value : Slot, offset : Offset8, lane : ImmLaneIdx) -> Op {
+pub fn Op::v128_store64_lane_offset8(
+  ptr : Slot,
+  value : Slot,
+  offset : Offset8,
+  lane : ImmLaneIdx,
+) -> Op {
   V128Store64LaneOffset8(ptr~, value~, offset~, lane~)
 }
 
@@ -7619,7 +8120,11 @@ pub fn Op::v128_load_at(result : Slot, address : Address32) -> Op {
 
 ///|
 /// Creates a new [`Op::V128LoadOffset16`].
-pub fn Op::v128_load_offset16(result : Slot, ptr : Slot, offset : Offset16) -> Op {
+pub fn Op::v128_load_offset16(
+  result : Slot,
+  ptr : Slot,
+  offset : Offset16,
+) -> Op {
   V128LoadOffset16(result~, ptr~, offset~)
 }
 
@@ -7637,7 +8142,11 @@ pub fn Op::v128_load32_zero_at(result : Slot, address : Address32) -> Op {
 
 ///|
 /// Creates a new [`Op::V128Load32ZeroOffset16`].
-pub fn Op::v128_load32_zero_offset16(result : Slot, ptr : Slot, offset : Offset16) -> Op {
+pub fn Op::v128_load32_zero_offset16(
+  result : Slot,
+  ptr : Slot,
+  offset : Offset16,
+) -> Op {
   V128Load32ZeroOffset16(result~, ptr~, offset~)
 }
 
@@ -7655,7 +8164,11 @@ pub fn Op::v128_load64_zero_at(result : Slot, address : Address32) -> Op {
 
 ///|
 /// Creates a new [`Op::V128Load64ZeroOffset16`].
-pub fn Op::v128_load64_zero_offset16(result : Slot, ptr : Slot, offset : Offset16) -> Op {
+pub fn Op::v128_load64_zero_offset16(
+  result : Slot,
+  ptr : Slot,
+  offset : Offset16,
+) -> Op {
   V128Load64ZeroOffset16(result~, ptr~, offset~)
 }
 
@@ -7673,7 +8186,11 @@ pub fn Op::v128_load8_splat_at(result : Slot, address : Address32) -> Op {
 
 ///|
 /// Creates a new [`Op::V128Load8SplatOffset16`].
-pub fn Op::v128_load8_splat_offset16(result : Slot, ptr : Slot, offset : Offset16) -> Op {
+pub fn Op::v128_load8_splat_offset16(
+  result : Slot,
+  ptr : Slot,
+  offset : Offset16,
+) -> Op {
   V128Load8SplatOffset16(result~, ptr~, offset~)
 }
 
@@ -7691,7 +8208,11 @@ pub fn Op::v128_load16_splat_at(result : Slot, address : Address32) -> Op {
 
 ///|
 /// Creates a new [`Op::V128Load16SplatOffset16`].
-pub fn Op::v128_load16_splat_offset16(result : Slot, ptr : Slot, offset : Offset16) -> Op {
+pub fn Op::v128_load16_splat_offset16(
+  result : Slot,
+  ptr : Slot,
+  offset : Offset16,
+) -> Op {
   V128Load16SplatOffset16(result~, ptr~, offset~)
 }
 
@@ -7709,7 +8230,11 @@ pub fn Op::v128_load32_splat_at(result : Slot, address : Address32) -> Op {
 
 ///|
 /// Creates a new [`Op::V128Load32SplatOffset16`].
-pub fn Op::v128_load32_splat_offset16(result : Slot, ptr : Slot, offset : Offset16) -> Op {
+pub fn Op::v128_load32_splat_offset16(
+  result : Slot,
+  ptr : Slot,
+  offset : Offset16,
+) -> Op {
   V128Load32SplatOffset16(result~, ptr~, offset~)
 }
 
@@ -7727,7 +8252,11 @@ pub fn Op::v128_load64_splat_at(result : Slot, address : Address32) -> Op {
 
 ///|
 /// Creates a new [`Op::V128Load64SplatOffset16`].
-pub fn Op::v128_load64_splat_offset16(result : Slot, ptr : Slot, offset : Offset16) -> Op {
+pub fn Op::v128_load64_splat_offset16(
+  result : Slot,
+  ptr : Slot,
+  offset : Offset16,
+) -> Op {
   V128Load64SplatOffset16(result~, ptr~, offset~)
 }
 
@@ -7745,7 +8274,11 @@ pub fn Op::v128_load8x8_s_at(result : Slot, address : Address32) -> Op {
 
 ///|
 /// Creates a new [`Op::V128Load8x8SOffset16`].
-pub fn Op::v128_load8x8_s_offset16(result : Slot, ptr : Slot, offset : Offset16) -> Op {
+pub fn Op::v128_load8x8_s_offset16(
+  result : Slot,
+  ptr : Slot,
+  offset : Offset16,
+) -> Op {
   V128Load8x8SOffset16(result~, ptr~, offset~)
 }
 
@@ -7763,7 +8296,11 @@ pub fn Op::v128_load8x8_u_at(result : Slot, address : Address32) -> Op {
 
 ///|
 /// Creates a new [`Op::V128Load8x8UOffset16`].
-pub fn Op::v128_load8x8_u_offset16(result : Slot, ptr : Slot, offset : Offset16) -> Op {
+pub fn Op::v128_load8x8_u_offset16(
+  result : Slot,
+  ptr : Slot,
+  offset : Offset16,
+) -> Op {
   V128Load8x8UOffset16(result~, ptr~, offset~)
 }
 
@@ -7781,7 +8318,11 @@ pub fn Op::v128_load16x4_s_at(result : Slot, address : Address32) -> Op {
 
 ///|
 /// Creates a new [`Op::V128Load16x4SOffset16`].
-pub fn Op::v128_load16x4_s_offset16(result : Slot, ptr : Slot, offset : Offset16) -> Op {
+pub fn Op::v128_load16x4_s_offset16(
+  result : Slot,
+  ptr : Slot,
+  offset : Offset16,
+) -> Op {
   V128Load16x4SOffset16(result~, ptr~, offset~)
 }
 
@@ -7799,7 +8340,11 @@ pub fn Op::v128_load16x4_u_at(result : Slot, address : Address32) -> Op {
 
 ///|
 /// Creates a new [`Op::V128Load16x4UOffset16`].
-pub fn Op::v128_load16x4_u_offset16(result : Slot, ptr : Slot, offset : Offset16) -> Op {
+pub fn Op::v128_load16x4_u_offset16(
+  result : Slot,
+  ptr : Slot,
+  offset : Offset16,
+) -> Op {
   V128Load16x4UOffset16(result~, ptr~, offset~)
 }
 
@@ -7817,7 +8362,11 @@ pub fn Op::v128_load32x2_s_at(result : Slot, address : Address32) -> Op {
 
 ///|
 /// Creates a new [`Op::V128Load32x2SOffset16`].
-pub fn Op::v128_load32x2_s_offset16(result : Slot, ptr : Slot, offset : Offset16) -> Op {
+pub fn Op::v128_load32x2_s_offset16(
+  result : Slot,
+  ptr : Slot,
+  offset : Offset16,
+) -> Op {
   V128Load32x2SOffset16(result~, ptr~, offset~)
 }
 
@@ -7835,7 +8384,11 @@ pub fn Op::v128_load32x2_u_at(result : Slot, address : Address32) -> Op {
 
 ///|
 /// Creates a new [`Op::V128Load32x2UOffset16`].
-pub fn Op::v128_load32x2_u_offset16(result : Slot, ptr : Slot, offset : Offset16) -> Op {
+pub fn Op::v128_load32x2_u_offset16(
+  result : Slot,
+  ptr : Slot,
+  offset : Offset16,
+) -> Op {
   V128Load32x2UOffset16(result~, ptr~, offset~)
 }
 
@@ -8644,7 +9197,9 @@ pub fn[V : VisitResults] Op::visit_results(self : Op, visitor : V) -> Op {
       Copy(result~, value~)
     }
     Copy2(results~, values~) => {
-      let results = FixedSlotSpan::from_span_unchecked(visitor.visit_result_regs(results.span(), Some(2)))
+      let results = FixedSlotSpan::from_span_unchecked(
+        visitor.visit_result_regs(results.span(), Some(2)),
+      )
       Copy2(results~, values~)
     }
     CopyImm32(result~, value~) => {
@@ -9568,11 +10123,15 @@ pub fn[V : VisitResults] Op::visit_results(self : Op, visitor : V) -> Op {
       I32WrapI64(result~, input~)
     }
     I64MulWideS(results~, lhs~, rhs~) => {
-      let results = FixedSlotSpan::from_span_unchecked(visitor.visit_result_regs(results.span(), Some(2)))
+      let results = FixedSlotSpan::from_span_unchecked(
+        visitor.visit_result_regs(results.span(), Some(2)),
+      )
       I64MulWideS(results~, lhs~, rhs~)
     }
     I64MulWideU(results~, lhs~, rhs~) => {
-      let results = FixedSlotSpan::from_span_unchecked(visitor.visit_result_regs(results.span(), Some(2)))
+      let results = FixedSlotSpan::from_span_unchecked(
+        visitor.visit_result_regs(results.span(), Some(2)),
+      )
       I64MulWideU(results~, lhs~, rhs~)
     }
     I32Extend8S(result~, input~) => {
@@ -11482,33 +12041,47 @@ pub fn Op::set_result(self : Op, new_value : Slot) -> Op? {
     CopyI64Imm32(value~) => Some(CopyI64Imm32(result=new_value, value~))
     CopyF64Imm32(value~) => Some(CopyF64Imm32(result=new_value, value~))
     SelectI32And(lhs~, rhs~) => Some(SelectI32And(result=new_value, lhs~, rhs~))
-    SelectI32AndImm16(lhs~, rhs~) => Some(SelectI32AndImm16(result=new_value, lhs~, rhs~))
+    SelectI32AndImm16(lhs~, rhs~) =>
+      Some(SelectI32AndImm16(result=new_value, lhs~, rhs~))
     SelectI32Or(lhs~, rhs~) => Some(SelectI32Or(result=new_value, lhs~, rhs~))
-    SelectI32OrImm16(lhs~, rhs~) => Some(SelectI32OrImm16(result=new_value, lhs~, rhs~))
+    SelectI32OrImm16(lhs~, rhs~) =>
+      Some(SelectI32OrImm16(result=new_value, lhs~, rhs~))
     SelectI32Eq(lhs~, rhs~) => Some(SelectI32Eq(result=new_value, lhs~, rhs~))
-    SelectI32EqImm16(lhs~, rhs~) => Some(SelectI32EqImm16(result=new_value, lhs~, rhs~))
+    SelectI32EqImm16(lhs~, rhs~) =>
+      Some(SelectI32EqImm16(result=new_value, lhs~, rhs~))
     SelectI32LtS(lhs~, rhs~) => Some(SelectI32LtS(result=new_value, lhs~, rhs~))
-    SelectI32LtSImm16Rhs(lhs~, rhs~) => Some(SelectI32LtSImm16Rhs(result=new_value, lhs~, rhs~))
+    SelectI32LtSImm16Rhs(lhs~, rhs~) =>
+      Some(SelectI32LtSImm16Rhs(result=new_value, lhs~, rhs~))
     SelectI32LtU(lhs~, rhs~) => Some(SelectI32LtU(result=new_value, lhs~, rhs~))
-    SelectI32LtUImm16Rhs(lhs~, rhs~) => Some(SelectI32LtUImm16Rhs(result=new_value, lhs~, rhs~))
+    SelectI32LtUImm16Rhs(lhs~, rhs~) =>
+      Some(SelectI32LtUImm16Rhs(result=new_value, lhs~, rhs~))
     SelectI32LeS(lhs~, rhs~) => Some(SelectI32LeS(result=new_value, lhs~, rhs~))
-    SelectI32LeSImm16Rhs(lhs~, rhs~) => Some(SelectI32LeSImm16Rhs(result=new_value, lhs~, rhs~))
+    SelectI32LeSImm16Rhs(lhs~, rhs~) =>
+      Some(SelectI32LeSImm16Rhs(result=new_value, lhs~, rhs~))
     SelectI32LeU(lhs~, rhs~) => Some(SelectI32LeU(result=new_value, lhs~, rhs~))
-    SelectI32LeUImm16Rhs(lhs~, rhs~) => Some(SelectI32LeUImm16Rhs(result=new_value, lhs~, rhs~))
+    SelectI32LeUImm16Rhs(lhs~, rhs~) =>
+      Some(SelectI32LeUImm16Rhs(result=new_value, lhs~, rhs~))
     SelectI64And(lhs~, rhs~) => Some(SelectI64And(result=new_value, lhs~, rhs~))
-    SelectI64AndImm16(lhs~, rhs~) => Some(SelectI64AndImm16(result=new_value, lhs~, rhs~))
+    SelectI64AndImm16(lhs~, rhs~) =>
+      Some(SelectI64AndImm16(result=new_value, lhs~, rhs~))
     SelectI64Or(lhs~, rhs~) => Some(SelectI64Or(result=new_value, lhs~, rhs~))
-    SelectI64OrImm16(lhs~, rhs~) => Some(SelectI64OrImm16(result=new_value, lhs~, rhs~))
+    SelectI64OrImm16(lhs~, rhs~) =>
+      Some(SelectI64OrImm16(result=new_value, lhs~, rhs~))
     SelectI64Eq(lhs~, rhs~) => Some(SelectI64Eq(result=new_value, lhs~, rhs~))
-    SelectI64EqImm16(lhs~, rhs~) => Some(SelectI64EqImm16(result=new_value, lhs~, rhs~))
+    SelectI64EqImm16(lhs~, rhs~) =>
+      Some(SelectI64EqImm16(result=new_value, lhs~, rhs~))
     SelectI64LtS(lhs~, rhs~) => Some(SelectI64LtS(result=new_value, lhs~, rhs~))
-    SelectI64LtSImm16Rhs(lhs~, rhs~) => Some(SelectI64LtSImm16Rhs(result=new_value, lhs~, rhs~))
+    SelectI64LtSImm16Rhs(lhs~, rhs~) =>
+      Some(SelectI64LtSImm16Rhs(result=new_value, lhs~, rhs~))
     SelectI64LtU(lhs~, rhs~) => Some(SelectI64LtU(result=new_value, lhs~, rhs~))
-    SelectI64LtUImm16Rhs(lhs~, rhs~) => Some(SelectI64LtUImm16Rhs(result=new_value, lhs~, rhs~))
+    SelectI64LtUImm16Rhs(lhs~, rhs~) =>
+      Some(SelectI64LtUImm16Rhs(result=new_value, lhs~, rhs~))
     SelectI64LeS(lhs~, rhs~) => Some(SelectI64LeS(result=new_value, lhs~, rhs~))
-    SelectI64LeSImm16Rhs(lhs~, rhs~) => Some(SelectI64LeSImm16Rhs(result=new_value, lhs~, rhs~))
+    SelectI64LeSImm16Rhs(lhs~, rhs~) =>
+      Some(SelectI64LeSImm16Rhs(result=new_value, lhs~, rhs~))
     SelectI64LeU(lhs~, rhs~) => Some(SelectI64LeU(result=new_value, lhs~, rhs~))
-    SelectI64LeUImm16Rhs(lhs~, rhs~) => Some(SelectI64LeUImm16Rhs(result=new_value, lhs~, rhs~))
+    SelectI64LeUImm16Rhs(lhs~, rhs~) =>
+      Some(SelectI64LeUImm16Rhs(result=new_value, lhs~, rhs~))
     SelectF32Eq(lhs~, rhs~) => Some(SelectF32Eq(result=new_value, lhs~, rhs~))
     SelectF32Lt(lhs~, rhs~) => Some(SelectF32Lt(result=new_value, lhs~, rhs~))
     SelectF32Le(lhs~, rhs~) => Some(SelectF32Le(result=new_value, lhs~, rhs~))
@@ -11519,72 +12092,100 @@ pub fn Op::set_result(self : Op, new_value : Slot) -> Op? {
     GlobalGet(global~) => Some(GlobalGet(result=new_value, global~))
     Load32(offset_lo~) => Some(Load32(result=new_value, offset_lo~))
     Load32At(address~) => Some(Load32At(result=new_value, address~))
-    Load32Offset16(ptr~, offset~) => Some(Load32Offset16(result=new_value, ptr~, offset~))
+    Load32Offset16(ptr~, offset~) =>
+      Some(Load32Offset16(result=new_value, ptr~, offset~))
     Load64(offset_lo~) => Some(Load64(result=new_value, offset_lo~))
     Load64At(address~) => Some(Load64At(result=new_value, address~))
-    Load64Offset16(ptr~, offset~) => Some(Load64Offset16(result=new_value, ptr~, offset~))
+    Load64Offset16(ptr~, offset~) =>
+      Some(Load64Offset16(result=new_value, ptr~, offset~))
     I32Load8s(offset_lo~) => Some(I32Load8s(result=new_value, offset_lo~))
     I32Load8sAt(address~) => Some(I32Load8sAt(result=new_value, address~))
-    I32Load8sOffset16(ptr~, offset~) => Some(I32Load8sOffset16(result=new_value, ptr~, offset~))
+    I32Load8sOffset16(ptr~, offset~) =>
+      Some(I32Load8sOffset16(result=new_value, ptr~, offset~))
     I32Load8u(offset_lo~) => Some(I32Load8u(result=new_value, offset_lo~))
     I32Load8uAt(address~) => Some(I32Load8uAt(result=new_value, address~))
-    I32Load8uOffset16(ptr~, offset~) => Some(I32Load8uOffset16(result=new_value, ptr~, offset~))
+    I32Load8uOffset16(ptr~, offset~) =>
+      Some(I32Load8uOffset16(result=new_value, ptr~, offset~))
     I32Load16s(offset_lo~) => Some(I32Load16s(result=new_value, offset_lo~))
     I32Load16sAt(address~) => Some(I32Load16sAt(result=new_value, address~))
-    I32Load16sOffset16(ptr~, offset~) => Some(I32Load16sOffset16(result=new_value, ptr~, offset~))
+    I32Load16sOffset16(ptr~, offset~) =>
+      Some(I32Load16sOffset16(result=new_value, ptr~, offset~))
     I32Load16u(offset_lo~) => Some(I32Load16u(result=new_value, offset_lo~))
     I32Load16uAt(address~) => Some(I32Load16uAt(result=new_value, address~))
-    I32Load16uOffset16(ptr~, offset~) => Some(I32Load16uOffset16(result=new_value, ptr~, offset~))
+    I32Load16uOffset16(ptr~, offset~) =>
+      Some(I32Load16uOffset16(result=new_value, ptr~, offset~))
     I64Load8s(offset_lo~) => Some(I64Load8s(result=new_value, offset_lo~))
     I64Load8sAt(address~) => Some(I64Load8sAt(result=new_value, address~))
-    I64Load8sOffset16(ptr~, offset~) => Some(I64Load8sOffset16(result=new_value, ptr~, offset~))
+    I64Load8sOffset16(ptr~, offset~) =>
+      Some(I64Load8sOffset16(result=new_value, ptr~, offset~))
     I64Load8u(offset_lo~) => Some(I64Load8u(result=new_value, offset_lo~))
     I64Load8uAt(address~) => Some(I64Load8uAt(result=new_value, address~))
-    I64Load8uOffset16(ptr~, offset~) => Some(I64Load8uOffset16(result=new_value, ptr~, offset~))
+    I64Load8uOffset16(ptr~, offset~) =>
+      Some(I64Load8uOffset16(result=new_value, ptr~, offset~))
     I64Load16s(offset_lo~) => Some(I64Load16s(result=new_value, offset_lo~))
     I64Load16sAt(address~) => Some(I64Load16sAt(result=new_value, address~))
-    I64Load16sOffset16(ptr~, offset~) => Some(I64Load16sOffset16(result=new_value, ptr~, offset~))
+    I64Load16sOffset16(ptr~, offset~) =>
+      Some(I64Load16sOffset16(result=new_value, ptr~, offset~))
     I64Load16u(offset_lo~) => Some(I64Load16u(result=new_value, offset_lo~))
     I64Load16uAt(address~) => Some(I64Load16uAt(result=new_value, address~))
-    I64Load16uOffset16(ptr~, offset~) => Some(I64Load16uOffset16(result=new_value, ptr~, offset~))
+    I64Load16uOffset16(ptr~, offset~) =>
+      Some(I64Load16uOffset16(result=new_value, ptr~, offset~))
     I64Load32s(offset_lo~) => Some(I64Load32s(result=new_value, offset_lo~))
     I64Load32sAt(address~) => Some(I64Load32sAt(result=new_value, address~))
-    I64Load32sOffset16(ptr~, offset~) => Some(I64Load32sOffset16(result=new_value, ptr~, offset~))
+    I64Load32sOffset16(ptr~, offset~) =>
+      Some(I64Load32sOffset16(result=new_value, ptr~, offset~))
     I64Load32u(offset_lo~) => Some(I64Load32u(result=new_value, offset_lo~))
     I64Load32uAt(address~) => Some(I64Load32uAt(result=new_value, address~))
-    I64Load32uOffset16(ptr~, offset~) => Some(I64Load32uOffset16(result=new_value, ptr~, offset~))
+    I64Load32uOffset16(ptr~, offset~) =>
+      Some(I64Load32uOffset16(result=new_value, ptr~, offset~))
     I32Eq(lhs~, rhs~) => Some(I32Eq(result=new_value, lhs~, rhs~))
     I32EqImm16(lhs~, rhs~) => Some(I32EqImm16(result=new_value, lhs~, rhs~))
     I32Ne(lhs~, rhs~) => Some(I32Ne(result=new_value, lhs~, rhs~))
     I32NeImm16(lhs~, rhs~) => Some(I32NeImm16(result=new_value, lhs~, rhs~))
     I32LtS(lhs~, rhs~) => Some(I32LtS(result=new_value, lhs~, rhs~))
-    I32LtSImm16Lhs(lhs~, rhs~) => Some(I32LtSImm16Lhs(result=new_value, lhs~, rhs~))
-    I32LtSImm16Rhs(lhs~, rhs~) => Some(I32LtSImm16Rhs(result=new_value, lhs~, rhs~))
+    I32LtSImm16Lhs(lhs~, rhs~) =>
+      Some(I32LtSImm16Lhs(result=new_value, lhs~, rhs~))
+    I32LtSImm16Rhs(lhs~, rhs~) =>
+      Some(I32LtSImm16Rhs(result=new_value, lhs~, rhs~))
     I32LtU(lhs~, rhs~) => Some(I32LtU(result=new_value, lhs~, rhs~))
-    I32LtUImm16Lhs(lhs~, rhs~) => Some(I32LtUImm16Lhs(result=new_value, lhs~, rhs~))
-    I32LtUImm16Rhs(lhs~, rhs~) => Some(I32LtUImm16Rhs(result=new_value, lhs~, rhs~))
+    I32LtUImm16Lhs(lhs~, rhs~) =>
+      Some(I32LtUImm16Lhs(result=new_value, lhs~, rhs~))
+    I32LtUImm16Rhs(lhs~, rhs~) =>
+      Some(I32LtUImm16Rhs(result=new_value, lhs~, rhs~))
     I32LeS(lhs~, rhs~) => Some(I32LeS(result=new_value, lhs~, rhs~))
-    I32LeSImm16Lhs(lhs~, rhs~) => Some(I32LeSImm16Lhs(result=new_value, lhs~, rhs~))
-    I32LeSImm16Rhs(lhs~, rhs~) => Some(I32LeSImm16Rhs(result=new_value, lhs~, rhs~))
+    I32LeSImm16Lhs(lhs~, rhs~) =>
+      Some(I32LeSImm16Lhs(result=new_value, lhs~, rhs~))
+    I32LeSImm16Rhs(lhs~, rhs~) =>
+      Some(I32LeSImm16Rhs(result=new_value, lhs~, rhs~))
     I32LeU(lhs~, rhs~) => Some(I32LeU(result=new_value, lhs~, rhs~))
-    I32LeUImm16Lhs(lhs~, rhs~) => Some(I32LeUImm16Lhs(result=new_value, lhs~, rhs~))
-    I32LeUImm16Rhs(lhs~, rhs~) => Some(I32LeUImm16Rhs(result=new_value, lhs~, rhs~))
+    I32LeUImm16Lhs(lhs~, rhs~) =>
+      Some(I32LeUImm16Lhs(result=new_value, lhs~, rhs~))
+    I32LeUImm16Rhs(lhs~, rhs~) =>
+      Some(I32LeUImm16Rhs(result=new_value, lhs~, rhs~))
     I64Eq(lhs~, rhs~) => Some(I64Eq(result=new_value, lhs~, rhs~))
     I64EqImm16(lhs~, rhs~) => Some(I64EqImm16(result=new_value, lhs~, rhs~))
     I64Ne(lhs~, rhs~) => Some(I64Ne(result=new_value, lhs~, rhs~))
     I64NeImm16(lhs~, rhs~) => Some(I64NeImm16(result=new_value, lhs~, rhs~))
     I64LtS(lhs~, rhs~) => Some(I64LtS(result=new_value, lhs~, rhs~))
-    I64LtSImm16Lhs(lhs~, rhs~) => Some(I64LtSImm16Lhs(result=new_value, lhs~, rhs~))
-    I64LtSImm16Rhs(lhs~, rhs~) => Some(I64LtSImm16Rhs(result=new_value, lhs~, rhs~))
+    I64LtSImm16Lhs(lhs~, rhs~) =>
+      Some(I64LtSImm16Lhs(result=new_value, lhs~, rhs~))
+    I64LtSImm16Rhs(lhs~, rhs~) =>
+      Some(I64LtSImm16Rhs(result=new_value, lhs~, rhs~))
     I64LtU(lhs~, rhs~) => Some(I64LtU(result=new_value, lhs~, rhs~))
-    I64LtUImm16Lhs(lhs~, rhs~) => Some(I64LtUImm16Lhs(result=new_value, lhs~, rhs~))
-    I64LtUImm16Rhs(lhs~, rhs~) => Some(I64LtUImm16Rhs(result=new_value, lhs~, rhs~))
+    I64LtUImm16Lhs(lhs~, rhs~) =>
+      Some(I64LtUImm16Lhs(result=new_value, lhs~, rhs~))
+    I64LtUImm16Rhs(lhs~, rhs~) =>
+      Some(I64LtUImm16Rhs(result=new_value, lhs~, rhs~))
     I64LeS(lhs~, rhs~) => Some(I64LeS(result=new_value, lhs~, rhs~))
-    I64LeSImm16Lhs(lhs~, rhs~) => Some(I64LeSImm16Lhs(result=new_value, lhs~, rhs~))
-    I64LeSImm16Rhs(lhs~, rhs~) => Some(I64LeSImm16Rhs(result=new_value, lhs~, rhs~))
+    I64LeSImm16Lhs(lhs~, rhs~) =>
+      Some(I64LeSImm16Lhs(result=new_value, lhs~, rhs~))
+    I64LeSImm16Rhs(lhs~, rhs~) =>
+      Some(I64LeSImm16Rhs(result=new_value, lhs~, rhs~))
     I64LeU(lhs~, rhs~) => Some(I64LeU(result=new_value, lhs~, rhs~))
-    I64LeUImm16Lhs(lhs~, rhs~) => Some(I64LeUImm16Lhs(result=new_value, lhs~, rhs~))
-    I64LeUImm16Rhs(lhs~, rhs~) => Some(I64LeUImm16Rhs(result=new_value, lhs~, rhs~))
+    I64LeUImm16Lhs(lhs~, rhs~) =>
+      Some(I64LeUImm16Lhs(result=new_value, lhs~, rhs~))
+    I64LeUImm16Rhs(lhs~, rhs~) =>
+      Some(I64LeUImm16Rhs(result=new_value, lhs~, rhs~))
     F32Eq(lhs~, rhs~) => Some(F32Eq(result=new_value, lhs~, rhs~))
     F32Ne(lhs~, rhs~) => Some(F32Ne(result=new_value, lhs~, rhs~))
     F32Lt(lhs~, rhs~) => Some(F32Lt(result=new_value, lhs~, rhs~))
@@ -11603,27 +12204,39 @@ pub fn Op::set_result(self : Op, new_value : Slot) -> Op? {
     I32Add(lhs~, rhs~) => Some(I32Add(result=new_value, lhs~, rhs~))
     I32AddImm16(lhs~, rhs~) => Some(I32AddImm16(result=new_value, lhs~, rhs~))
     I32Sub(lhs~, rhs~) => Some(I32Sub(result=new_value, lhs~, rhs~))
-    I32SubImm16Lhs(lhs~, rhs~) => Some(I32SubImm16Lhs(result=new_value, lhs~, rhs~))
+    I32SubImm16Lhs(lhs~, rhs~) =>
+      Some(I32SubImm16Lhs(result=new_value, lhs~, rhs~))
     I32Mul(lhs~, rhs~) => Some(I32Mul(result=new_value, lhs~, rhs~))
     I32MulImm16(lhs~, rhs~) => Some(I32MulImm16(result=new_value, lhs~, rhs~))
     I32DivS(lhs~, rhs~) => Some(I32DivS(result=new_value, lhs~, rhs~))
-    I32DivSImm16Rhs(lhs~, rhs~) => Some(I32DivSImm16Rhs(result=new_value, lhs~, rhs~))
-    I32DivSImm16Lhs(lhs~, rhs~) => Some(I32DivSImm16Lhs(result=new_value, lhs~, rhs~))
+    I32DivSImm16Rhs(lhs~, rhs~) =>
+      Some(I32DivSImm16Rhs(result=new_value, lhs~, rhs~))
+    I32DivSImm16Lhs(lhs~, rhs~) =>
+      Some(I32DivSImm16Lhs(result=new_value, lhs~, rhs~))
     I32DivU(lhs~, rhs~) => Some(I32DivU(result=new_value, lhs~, rhs~))
-    I32DivUImm16Rhs(lhs~, rhs~) => Some(I32DivUImm16Rhs(result=new_value, lhs~, rhs~))
-    I32DivUImm16Lhs(lhs~, rhs~) => Some(I32DivUImm16Lhs(result=new_value, lhs~, rhs~))
+    I32DivUImm16Rhs(lhs~, rhs~) =>
+      Some(I32DivUImm16Rhs(result=new_value, lhs~, rhs~))
+    I32DivUImm16Lhs(lhs~, rhs~) =>
+      Some(I32DivUImm16Lhs(result=new_value, lhs~, rhs~))
     I32RemS(lhs~, rhs~) => Some(I32RemS(result=new_value, lhs~, rhs~))
-    I32RemSImm16Rhs(lhs~, rhs~) => Some(I32RemSImm16Rhs(result=new_value, lhs~, rhs~))
-    I32RemSImm16Lhs(lhs~, rhs~) => Some(I32RemSImm16Lhs(result=new_value, lhs~, rhs~))
+    I32RemSImm16Rhs(lhs~, rhs~) =>
+      Some(I32RemSImm16Rhs(result=new_value, lhs~, rhs~))
+    I32RemSImm16Lhs(lhs~, rhs~) =>
+      Some(I32RemSImm16Lhs(result=new_value, lhs~, rhs~))
     I32RemU(lhs~, rhs~) => Some(I32RemU(result=new_value, lhs~, rhs~))
-    I32RemUImm16Rhs(lhs~, rhs~) => Some(I32RemUImm16Rhs(result=new_value, lhs~, rhs~))
-    I32RemUImm16Lhs(lhs~, rhs~) => Some(I32RemUImm16Lhs(result=new_value, lhs~, rhs~))
+    I32RemUImm16Rhs(lhs~, rhs~) =>
+      Some(I32RemUImm16Rhs(result=new_value, lhs~, rhs~))
+    I32RemUImm16Lhs(lhs~, rhs~) =>
+      Some(I32RemUImm16Lhs(result=new_value, lhs~, rhs~))
     I32BitAnd(lhs~, rhs~) => Some(I32BitAnd(result=new_value, lhs~, rhs~))
-    I32BitAndImm16(lhs~, rhs~) => Some(I32BitAndImm16(result=new_value, lhs~, rhs~))
+    I32BitAndImm16(lhs~, rhs~) =>
+      Some(I32BitAndImm16(result=new_value, lhs~, rhs~))
     I32BitOr(lhs~, rhs~) => Some(I32BitOr(result=new_value, lhs~, rhs~))
-    I32BitOrImm16(lhs~, rhs~) => Some(I32BitOrImm16(result=new_value, lhs~, rhs~))
+    I32BitOrImm16(lhs~, rhs~) =>
+      Some(I32BitOrImm16(result=new_value, lhs~, rhs~))
     I32BitXor(lhs~, rhs~) => Some(I32BitXor(result=new_value, lhs~, rhs~))
-    I32BitXorImm16(lhs~, rhs~) => Some(I32BitXorImm16(result=new_value, lhs~, rhs~))
+    I32BitXorImm16(lhs~, rhs~) =>
+      Some(I32BitXorImm16(result=new_value, lhs~, rhs~))
     I32And(lhs~, rhs~) => Some(I32And(result=new_value, lhs~, rhs~))
     I32AndImm16(lhs~, rhs~) => Some(I32AndImm16(result=new_value, lhs~, rhs~))
     I32Or(lhs~, rhs~) => Some(I32Or(result=new_value, lhs~, rhs~))
@@ -11653,27 +12266,39 @@ pub fn Op::set_result(self : Op, new_value : Slot) -> Op? {
     I64Add(lhs~, rhs~) => Some(I64Add(result=new_value, lhs~, rhs~))
     I64AddImm16(lhs~, rhs~) => Some(I64AddImm16(result=new_value, lhs~, rhs~))
     I64Sub(lhs~, rhs~) => Some(I64Sub(result=new_value, lhs~, rhs~))
-    I64SubImm16Lhs(lhs~, rhs~) => Some(I64SubImm16Lhs(result=new_value, lhs~, rhs~))
+    I64SubImm16Lhs(lhs~, rhs~) =>
+      Some(I64SubImm16Lhs(result=new_value, lhs~, rhs~))
     I64Mul(lhs~, rhs~) => Some(I64Mul(result=new_value, lhs~, rhs~))
     I64MulImm16(lhs~, rhs~) => Some(I64MulImm16(result=new_value, lhs~, rhs~))
     I64DivS(lhs~, rhs~) => Some(I64DivS(result=new_value, lhs~, rhs~))
-    I64DivSImm16Rhs(lhs~, rhs~) => Some(I64DivSImm16Rhs(result=new_value, lhs~, rhs~))
-    I64DivSImm16Lhs(lhs~, rhs~) => Some(I64DivSImm16Lhs(result=new_value, lhs~, rhs~))
+    I64DivSImm16Rhs(lhs~, rhs~) =>
+      Some(I64DivSImm16Rhs(result=new_value, lhs~, rhs~))
+    I64DivSImm16Lhs(lhs~, rhs~) =>
+      Some(I64DivSImm16Lhs(result=new_value, lhs~, rhs~))
     I64DivU(lhs~, rhs~) => Some(I64DivU(result=new_value, lhs~, rhs~))
-    I64DivUImm16Rhs(lhs~, rhs~) => Some(I64DivUImm16Rhs(result=new_value, lhs~, rhs~))
-    I64DivUImm16Lhs(lhs~, rhs~) => Some(I64DivUImm16Lhs(result=new_value, lhs~, rhs~))
+    I64DivUImm16Rhs(lhs~, rhs~) =>
+      Some(I64DivUImm16Rhs(result=new_value, lhs~, rhs~))
+    I64DivUImm16Lhs(lhs~, rhs~) =>
+      Some(I64DivUImm16Lhs(result=new_value, lhs~, rhs~))
     I64RemS(lhs~, rhs~) => Some(I64RemS(result=new_value, lhs~, rhs~))
-    I64RemSImm16Rhs(lhs~, rhs~) => Some(I64RemSImm16Rhs(result=new_value, lhs~, rhs~))
-    I64RemSImm16Lhs(lhs~, rhs~) => Some(I64RemSImm16Lhs(result=new_value, lhs~, rhs~))
+    I64RemSImm16Rhs(lhs~, rhs~) =>
+      Some(I64RemSImm16Rhs(result=new_value, lhs~, rhs~))
+    I64RemSImm16Lhs(lhs~, rhs~) =>
+      Some(I64RemSImm16Lhs(result=new_value, lhs~, rhs~))
     I64RemU(lhs~, rhs~) => Some(I64RemU(result=new_value, lhs~, rhs~))
-    I64RemUImm16Rhs(lhs~, rhs~) => Some(I64RemUImm16Rhs(result=new_value, lhs~, rhs~))
-    I64RemUImm16Lhs(lhs~, rhs~) => Some(I64RemUImm16Lhs(result=new_value, lhs~, rhs~))
+    I64RemUImm16Rhs(lhs~, rhs~) =>
+      Some(I64RemUImm16Rhs(result=new_value, lhs~, rhs~))
+    I64RemUImm16Lhs(lhs~, rhs~) =>
+      Some(I64RemUImm16Lhs(result=new_value, lhs~, rhs~))
     I64BitAnd(lhs~, rhs~) => Some(I64BitAnd(result=new_value, lhs~, rhs~))
-    I64BitAndImm16(lhs~, rhs~) => Some(I64BitAndImm16(result=new_value, lhs~, rhs~))
+    I64BitAndImm16(lhs~, rhs~) =>
+      Some(I64BitAndImm16(result=new_value, lhs~, rhs~))
     I64BitOr(lhs~, rhs~) => Some(I64BitOr(result=new_value, lhs~, rhs~))
-    I64BitOrImm16(lhs~, rhs~) => Some(I64BitOrImm16(result=new_value, lhs~, rhs~))
+    I64BitOrImm16(lhs~, rhs~) =>
+      Some(I64BitOrImm16(result=new_value, lhs~, rhs~))
     I64BitXor(lhs~, rhs~) => Some(I64BitXor(result=new_value, lhs~, rhs~))
-    I64BitXorImm16(lhs~, rhs~) => Some(I64BitXorImm16(result=new_value, lhs~, rhs~))
+    I64BitXorImm16(lhs~, rhs~) =>
+      Some(I64BitXorImm16(result=new_value, lhs~, rhs~))
     I64And(lhs~, rhs~) => Some(I64And(result=new_value, lhs~, rhs~))
     I64AndImm16(lhs~, rhs~) => Some(I64AndImm16(result=new_value, lhs~, rhs~))
     I64Or(lhs~, rhs~) => Some(I64Or(result=new_value, lhs~, rhs~))
@@ -11717,7 +12342,8 @@ pub fn Op::set_result(self : Op, new_value : Slot) -> Op? {
     F32Min(lhs~, rhs~) => Some(F32Min(result=new_value, lhs~, rhs~))
     F32Max(lhs~, rhs~) => Some(F32Max(result=new_value, lhs~, rhs~))
     F32Copysign(lhs~, rhs~) => Some(F32Copysign(result=new_value, lhs~, rhs~))
-    F32CopysignImm(lhs~, rhs~) => Some(F32CopysignImm(result=new_value, lhs~, rhs~))
+    F32CopysignImm(lhs~, rhs~) =>
+      Some(F32CopysignImm(result=new_value, lhs~, rhs~))
     F64Abs(input~) => Some(F64Abs(result=new_value, input~))
     F64Neg(input~) => Some(F64Neg(result=new_value, input~))
     F64Ceil(input~) => Some(F64Ceil(result=new_value, input~))
@@ -11732,7 +12358,8 @@ pub fn Op::set_result(self : Op, new_value : Slot) -> Op? {
     F64Min(lhs~, rhs~) => Some(F64Min(result=new_value, lhs~, rhs~))
     F64Max(lhs~, rhs~) => Some(F64Max(result=new_value, lhs~, rhs~))
     F64Copysign(lhs~, rhs~) => Some(F64Copysign(result=new_value, lhs~, rhs~))
-    F64CopysignImm(lhs~, rhs~) => Some(F64CopysignImm(result=new_value, lhs~, rhs~))
+    F64CopysignImm(lhs~, rhs~) =>
+      Some(F64CopysignImm(result=new_value, lhs~, rhs~))
     I32TruncF32S(input~) => Some(I32TruncF32S(result=new_value, input~))
     I32TruncF32U(input~) => Some(I32TruncF32U(result=new_value, input~))
     I32TruncF64S(input~) => Some(I32TruncF64S(result=new_value, input~))
@@ -11762,7 +12389,8 @@ pub fn Op::set_result(self : Op, new_value : Slot) -> Op? {
     TableGet(index~) => Some(TableGet(result=new_value, index~))
     TableGetImm(index~) => Some(TableGetImm(result=new_value, index~))
     TableSize(table~) => Some(TableSize(result=new_value, table~))
-    TableGrow(delta~, value~) => Some(TableGrow(result=new_value, delta~, value~))
+    TableGrow(delta~, value~) =>
+      Some(TableGrow(result=new_value, delta~, value~))
     MemorySize(memory~) => Some(MemorySize(result=new_value, memory~))
     MemoryGrow(delta~) => Some(MemoryGrow(result=new_value, delta~))
     I8x16Splat(value~) => Some(I8x16Splat(result=new_value, value~))
@@ -11771,28 +12399,49 @@ pub fn Op::set_result(self : Op, new_value : Slot) -> Op? {
     I64x2Splat(value~) => Some(I64x2Splat(result=new_value, value~))
     F32x4Splat(value~) => Some(F32x4Splat(result=new_value, value~))
     F64x2Splat(value~) => Some(F64x2Splat(result=new_value, value~))
-    I8x16ExtractLaneS(value~, lane~) => Some(I8x16ExtractLaneS(result=new_value, value~, lane~))
-    I8x16ExtractLaneU(value~, lane~) => Some(I8x16ExtractLaneU(result=new_value, value~, lane~))
-    I16x8ExtractLaneS(value~, lane~) => Some(I16x8ExtractLaneS(result=new_value, value~, lane~))
-    I16x8ExtractLaneU(value~, lane~) => Some(I16x8ExtractLaneU(result=new_value, value~, lane~))
-    I32x4ExtractLane(value~, lane~) => Some(I32x4ExtractLane(result=new_value, value~, lane~))
-    I64x2ExtractLane(value~, lane~) => Some(I64x2ExtractLane(result=new_value, value~, lane~))
-    F32x4ExtractLane(value~, lane~) => Some(F32x4ExtractLane(result=new_value, value~, lane~))
-    F64x2ExtractLane(value~, lane~) => Some(F64x2ExtractLane(result=new_value, value~, lane~))
-    I8x16ReplaceLane(input~, lane~) => Some(I8x16ReplaceLane(result=new_value, input~, lane~))
-    I8x16ReplaceLaneImm(input~, lane~, value~) => Some(I8x16ReplaceLaneImm(result=new_value, input~, lane~, value~))
-    I16x8ReplaceLane(input~, lane~) => Some(I16x8ReplaceLane(result=new_value, input~, lane~))
-    I16x8ReplaceLaneImm(input~, lane~) => Some(I16x8ReplaceLaneImm(result=new_value, input~, lane~))
-    I32x4ReplaceLane(input~, lane~) => Some(I32x4ReplaceLane(result=new_value, input~, lane~))
-    I32x4ReplaceLaneImm(input~, lane~) => Some(I32x4ReplaceLaneImm(result=new_value, input~, lane~))
-    I64x2ReplaceLane(input~, lane~) => Some(I64x2ReplaceLane(result=new_value, input~, lane~))
-    I64x2ReplaceLaneImm32(input~, lane~) => Some(I64x2ReplaceLaneImm32(result=new_value, input~, lane~))
-    F32x4ReplaceLane(input~, lane~) => Some(F32x4ReplaceLane(result=new_value, input~, lane~))
-    F32x4ReplaceLaneImm(input~, lane~) => Some(F32x4ReplaceLaneImm(result=new_value, input~, lane~))
-    F64x2ReplaceLane(input~, lane~) => Some(F64x2ReplaceLane(result=new_value, input~, lane~))
-    F64x2ReplaceLaneImm32(input~, lane~) => Some(F64x2ReplaceLaneImm32(result=new_value, input~, lane~))
+    I8x16ExtractLaneS(value~, lane~) =>
+      Some(I8x16ExtractLaneS(result=new_value, value~, lane~))
+    I8x16ExtractLaneU(value~, lane~) =>
+      Some(I8x16ExtractLaneU(result=new_value, value~, lane~))
+    I16x8ExtractLaneS(value~, lane~) =>
+      Some(I16x8ExtractLaneS(result=new_value, value~, lane~))
+    I16x8ExtractLaneU(value~, lane~) =>
+      Some(I16x8ExtractLaneU(result=new_value, value~, lane~))
+    I32x4ExtractLane(value~, lane~) =>
+      Some(I32x4ExtractLane(result=new_value, value~, lane~))
+    I64x2ExtractLane(value~, lane~) =>
+      Some(I64x2ExtractLane(result=new_value, value~, lane~))
+    F32x4ExtractLane(value~, lane~) =>
+      Some(F32x4ExtractLane(result=new_value, value~, lane~))
+    F64x2ExtractLane(value~, lane~) =>
+      Some(F64x2ExtractLane(result=new_value, value~, lane~))
+    I8x16ReplaceLane(input~, lane~) =>
+      Some(I8x16ReplaceLane(result=new_value, input~, lane~))
+    I8x16ReplaceLaneImm(input~, lane~, value~) =>
+      Some(I8x16ReplaceLaneImm(result=new_value, input~, lane~, value~))
+    I16x8ReplaceLane(input~, lane~) =>
+      Some(I16x8ReplaceLane(result=new_value, input~, lane~))
+    I16x8ReplaceLaneImm(input~, lane~) =>
+      Some(I16x8ReplaceLaneImm(result=new_value, input~, lane~))
+    I32x4ReplaceLane(input~, lane~) =>
+      Some(I32x4ReplaceLane(result=new_value, input~, lane~))
+    I32x4ReplaceLaneImm(input~, lane~) =>
+      Some(I32x4ReplaceLaneImm(result=new_value, input~, lane~))
+    I64x2ReplaceLane(input~, lane~) =>
+      Some(I64x2ReplaceLane(result=new_value, input~, lane~))
+    I64x2ReplaceLaneImm32(input~, lane~) =>
+      Some(I64x2ReplaceLaneImm32(result=new_value, input~, lane~))
+    F32x4ReplaceLane(input~, lane~) =>
+      Some(F32x4ReplaceLane(result=new_value, input~, lane~))
+    F32x4ReplaceLaneImm(input~, lane~) =>
+      Some(F32x4ReplaceLaneImm(result=new_value, input~, lane~))
+    F64x2ReplaceLane(input~, lane~) =>
+      Some(F64x2ReplaceLane(result=new_value, input~, lane~))
+    F64x2ReplaceLaneImm32(input~, lane~) =>
+      Some(F64x2ReplaceLaneImm32(result=new_value, input~, lane~))
     I8x16Shuffle(lhs~, rhs~) => Some(I8x16Shuffle(result=new_value, lhs~, rhs~))
-    I8x16Swizzle(input~, selector~) => Some(I8x16Swizzle(result=new_value, input~, selector~))
+    I8x16Swizzle(input~, selector~) =>
+      Some(I8x16Swizzle(result=new_value, input~, selector~))
     I8x16Add(lhs~, rhs~) => Some(I8x16Add(result=new_value, lhs~, rhs~))
     I16x8Add(lhs~, rhs~) => Some(I16x8Add(result=new_value, lhs~, rhs~))
     I32x4Add(lhs~, rhs~) => Some(I32x4Add(result=new_value, lhs~, rhs~))
@@ -11804,33 +12453,54 @@ pub fn Op::set_result(self : Op, new_value : Slot) -> Op? {
     I16x8Mul(lhs~, rhs~) => Some(I16x8Mul(result=new_value, lhs~, rhs~))
     I32x4Mul(lhs~, rhs~) => Some(I32x4Mul(result=new_value, lhs~, rhs~))
     I64x2Mul(lhs~, rhs~) => Some(I64x2Mul(result=new_value, lhs~, rhs~))
-    I32x4DotI16x8S(lhs~, rhs~) => Some(I32x4DotI16x8S(result=new_value, lhs~, rhs~))
-    I16x8RelaxedDotI8x16I7x16S(lhs~, rhs~) => Some(I16x8RelaxedDotI8x16I7x16S(result=new_value, lhs~, rhs~))
-    I32x4RelaxedDotI8x16I7x16AddS(lhs~, rhs~) => Some(I32x4RelaxedDotI8x16I7x16AddS(result=new_value, lhs~, rhs~))
+    I32x4DotI16x8S(lhs~, rhs~) =>
+      Some(I32x4DotI16x8S(result=new_value, lhs~, rhs~))
+    I16x8RelaxedDotI8x16I7x16S(lhs~, rhs~) =>
+      Some(I16x8RelaxedDotI8x16I7x16S(result=new_value, lhs~, rhs~))
+    I32x4RelaxedDotI8x16I7x16AddS(lhs~, rhs~) =>
+      Some(I32x4RelaxedDotI8x16I7x16AddS(result=new_value, lhs~, rhs~))
     F32x4RelaxedMadd(a~, b~) => Some(F32x4RelaxedMadd(result=new_value, a~, b~))
-    F32x4RelaxedNmadd(a~, b~) => Some(F32x4RelaxedNmadd(result=new_value, a~, b~))
+    F32x4RelaxedNmadd(a~, b~) =>
+      Some(F32x4RelaxedNmadd(result=new_value, a~, b~))
     F64x2RelaxedMadd(a~, b~) => Some(F64x2RelaxedMadd(result=new_value, a~, b~))
-    F64x2RelaxedNmadd(a~, b~) => Some(F64x2RelaxedNmadd(result=new_value, a~, b~))
+    F64x2RelaxedNmadd(a~, b~) =>
+      Some(F64x2RelaxedNmadd(result=new_value, a~, b~))
     I8x16Neg(input~) => Some(I8x16Neg(result=new_value, input~))
     I16x8Neg(input~) => Some(I16x8Neg(result=new_value, input~))
     I32x4Neg(input~) => Some(I32x4Neg(result=new_value, input~))
     I64x2Neg(input~) => Some(I64x2Neg(result=new_value, input~))
-    I16x8ExtmulLowI8x16S(lhs~, rhs~) => Some(I16x8ExtmulLowI8x16S(result=new_value, lhs~, rhs~))
-    I16x8ExtmulHighI8x16S(lhs~, rhs~) => Some(I16x8ExtmulHighI8x16S(result=new_value, lhs~, rhs~))
-    I16x8ExtmulLowI8x16U(lhs~, rhs~) => Some(I16x8ExtmulLowI8x16U(result=new_value, lhs~, rhs~))
-    I16x8ExtmulHighI8x16U(lhs~, rhs~) => Some(I16x8ExtmulHighI8x16U(result=new_value, lhs~, rhs~))
-    I32x4ExtmulLowI16x8S(lhs~, rhs~) => Some(I32x4ExtmulLowI16x8S(result=new_value, lhs~, rhs~))
-    I32x4ExtmulHighI16x8S(lhs~, rhs~) => Some(I32x4ExtmulHighI16x8S(result=new_value, lhs~, rhs~))
-    I32x4ExtmulLowI16x8U(lhs~, rhs~) => Some(I32x4ExtmulLowI16x8U(result=new_value, lhs~, rhs~))
-    I32x4ExtmulHighI16x8U(lhs~, rhs~) => Some(I32x4ExtmulHighI16x8U(result=new_value, lhs~, rhs~))
-    I64x2ExtmulLowI32x4S(lhs~, rhs~) => Some(I64x2ExtmulLowI32x4S(result=new_value, lhs~, rhs~))
-    I64x2ExtmulHighI32x4S(lhs~, rhs~) => Some(I64x2ExtmulHighI32x4S(result=new_value, lhs~, rhs~))
-    I64x2ExtmulLowI32x4U(lhs~, rhs~) => Some(I64x2ExtmulLowI32x4U(result=new_value, lhs~, rhs~))
-    I64x2ExtmulHighI32x4U(lhs~, rhs~) => Some(I64x2ExtmulHighI32x4U(result=new_value, lhs~, rhs~))
-    I16x8ExtaddPairwiseI8x16S(input~) => Some(I16x8ExtaddPairwiseI8x16S(result=new_value, input~))
-    I16x8ExtaddPairwiseI8x16U(input~) => Some(I16x8ExtaddPairwiseI8x16U(result=new_value, input~))
-    I32x4ExtaddPairwiseI16x8S(input~) => Some(I32x4ExtaddPairwiseI16x8S(result=new_value, input~))
-    I32x4ExtaddPairwiseI16x8U(input~) => Some(I32x4ExtaddPairwiseI16x8U(result=new_value, input~))
+    I16x8ExtmulLowI8x16S(lhs~, rhs~) =>
+      Some(I16x8ExtmulLowI8x16S(result=new_value, lhs~, rhs~))
+    I16x8ExtmulHighI8x16S(lhs~, rhs~) =>
+      Some(I16x8ExtmulHighI8x16S(result=new_value, lhs~, rhs~))
+    I16x8ExtmulLowI8x16U(lhs~, rhs~) =>
+      Some(I16x8ExtmulLowI8x16U(result=new_value, lhs~, rhs~))
+    I16x8ExtmulHighI8x16U(lhs~, rhs~) =>
+      Some(I16x8ExtmulHighI8x16U(result=new_value, lhs~, rhs~))
+    I32x4ExtmulLowI16x8S(lhs~, rhs~) =>
+      Some(I32x4ExtmulLowI16x8S(result=new_value, lhs~, rhs~))
+    I32x4ExtmulHighI16x8S(lhs~, rhs~) =>
+      Some(I32x4ExtmulHighI16x8S(result=new_value, lhs~, rhs~))
+    I32x4ExtmulLowI16x8U(lhs~, rhs~) =>
+      Some(I32x4ExtmulLowI16x8U(result=new_value, lhs~, rhs~))
+    I32x4ExtmulHighI16x8U(lhs~, rhs~) =>
+      Some(I32x4ExtmulHighI16x8U(result=new_value, lhs~, rhs~))
+    I64x2ExtmulLowI32x4S(lhs~, rhs~) =>
+      Some(I64x2ExtmulLowI32x4S(result=new_value, lhs~, rhs~))
+    I64x2ExtmulHighI32x4S(lhs~, rhs~) =>
+      Some(I64x2ExtmulHighI32x4S(result=new_value, lhs~, rhs~))
+    I64x2ExtmulLowI32x4U(lhs~, rhs~) =>
+      Some(I64x2ExtmulLowI32x4U(result=new_value, lhs~, rhs~))
+    I64x2ExtmulHighI32x4U(lhs~, rhs~) =>
+      Some(I64x2ExtmulHighI32x4U(result=new_value, lhs~, rhs~))
+    I16x8ExtaddPairwiseI8x16S(input~) =>
+      Some(I16x8ExtaddPairwiseI8x16S(result=new_value, input~))
+    I16x8ExtaddPairwiseI8x16U(input~) =>
+      Some(I16x8ExtaddPairwiseI8x16U(result=new_value, input~))
+    I32x4ExtaddPairwiseI16x8S(input~) =>
+      Some(I32x4ExtaddPairwiseI16x8S(result=new_value, input~))
+    I32x4ExtaddPairwiseI16x8U(input~) =>
+      Some(I32x4ExtaddPairwiseI16x8U(result=new_value, input~))
     I8x16AddSatS(lhs~, rhs~) => Some(I8x16AddSatS(result=new_value, lhs~, rhs~))
     I8x16AddSatU(lhs~, rhs~) => Some(I8x16AddSatU(result=new_value, lhs~, rhs~))
     I16x8AddSatS(lhs~, rhs~) => Some(I16x8AddSatS(result=new_value, lhs~, rhs~))
@@ -11839,7 +12509,8 @@ pub fn Op::set_result(self : Op, new_value : Slot) -> Op? {
     I8x16SubSatU(lhs~, rhs~) => Some(I8x16SubSatU(result=new_value, lhs~, rhs~))
     I16x8SubSatS(lhs~, rhs~) => Some(I16x8SubSatS(result=new_value, lhs~, rhs~))
     I16x8SubSatU(lhs~, rhs~) => Some(I16x8SubSatU(result=new_value, lhs~, rhs~))
-    I16x8Q15MulrSatS(lhs~, rhs~) => Some(I16x8Q15MulrSatS(result=new_value, lhs~, rhs~))
+    I16x8Q15MulrSatS(lhs~, rhs~) =>
+      Some(I16x8Q15MulrSatS(result=new_value, lhs~, rhs~))
     I8x16MinS(lhs~, rhs~) => Some(I8x16MinS(result=new_value, lhs~, rhs~))
     I8x16MinU(lhs~, rhs~) => Some(I8x16MinU(result=new_value, lhs~, rhs~))
     I16x8MinS(lhs~, rhs~) => Some(I16x8MinS(result=new_value, lhs~, rhs~))
@@ -11887,7 +12558,8 @@ pub fn Op::set_result(self : Op, new_value : Slot) -> Op? {
     V128Xor(lhs~, rhs~) => Some(V128Xor(result=new_value, lhs~, rhs~))
     V128Andnot(lhs~, rhs~) => Some(V128Andnot(result=new_value, lhs~, rhs~))
     V128Not(input~) => Some(V128Not(result=new_value, input~))
-    V128Bitselect(lhs~, rhs~) => Some(V128Bitselect(result=new_value, lhs~, rhs~))
+    V128Bitselect(lhs~, rhs~) =>
+      Some(V128Bitselect(result=new_value, lhs~, rhs~))
     I8x16Popcnt(input~) => Some(I8x16Popcnt(result=new_value, input~))
     V128AnyTrue(input~) => Some(V128AnyTrue(result=new_value, input~))
     I8x16AllTrue(input~) => Some(I8x16AllTrue(result=new_value, input~))
@@ -11958,79 +12630,146 @@ pub fn Op::set_result(self : Op, new_value : Slot) -> Op? {
     F64x2Trunc(input~) => Some(F64x2Trunc(result=new_value, input~))
     F32x4Nearest(input~) => Some(F32x4Nearest(result=new_value, input~))
     F64x2Nearest(input~) => Some(F64x2Nearest(result=new_value, input~))
-    F32x4ConvertI32x4S(input~) => Some(F32x4ConvertI32x4S(result=new_value, input~))
-    F32x4ConvertI32x4U(input~) => Some(F32x4ConvertI32x4U(result=new_value, input~))
-    F64x2ConvertLowI32x4S(input~) => Some(F64x2ConvertLowI32x4S(result=new_value, input~))
-    F64x2ConvertLowI32x4U(input~) => Some(F64x2ConvertLowI32x4U(result=new_value, input~))
-    I32x4TruncSatF32x4S(input~) => Some(I32x4TruncSatF32x4S(result=new_value, input~))
-    I32x4TruncSatF32x4U(input~) => Some(I32x4TruncSatF32x4U(result=new_value, input~))
-    I32x4TruncSatF64x2SZero(input~) => Some(I32x4TruncSatF64x2SZero(result=new_value, input~))
-    I32x4TruncSatF64x2UZero(input~) => Some(I32x4TruncSatF64x2UZero(result=new_value, input~))
-    F32x4DemoteF64x2Zero(input~) => Some(F32x4DemoteF64x2Zero(result=new_value, input~))
-    F64x2PromoteLowF32x4(input~) => Some(F64x2PromoteLowF32x4(result=new_value, input~))
-    I8x16NarrowI16x8S(lhs~, rhs~) => Some(I8x16NarrowI16x8S(result=new_value, lhs~, rhs~))
-    I8x16NarrowI16x8U(lhs~, rhs~) => Some(I8x16NarrowI16x8U(result=new_value, lhs~, rhs~))
-    I16x8NarrowI32x4S(lhs~, rhs~) => Some(I16x8NarrowI32x4S(result=new_value, lhs~, rhs~))
-    I16x8NarrowI32x4U(lhs~, rhs~) => Some(I16x8NarrowI32x4U(result=new_value, lhs~, rhs~))
-    I16x8ExtendLowI8x16S(input~) => Some(I16x8ExtendLowI8x16S(result=new_value, input~))
-    I16x8ExtendHighI8x16S(input~) => Some(I16x8ExtendHighI8x16S(result=new_value, input~))
-    I16x8ExtendLowI8x16U(input~) => Some(I16x8ExtendLowI8x16U(result=new_value, input~))
-    I16x8ExtendHighI8x16U(input~) => Some(I16x8ExtendHighI8x16U(result=new_value, input~))
-    I32x4ExtendLowI16x8S(input~) => Some(I32x4ExtendLowI16x8S(result=new_value, input~))
-    I32x4ExtendHighI16x8S(input~) => Some(I32x4ExtendHighI16x8S(result=new_value, input~))
-    I32x4ExtendLowI16x8U(input~) => Some(I32x4ExtendLowI16x8U(result=new_value, input~))
-    I32x4ExtendHighI16x8U(input~) => Some(I32x4ExtendHighI16x8U(result=new_value, input~))
-    I64x2ExtendLowI32x4S(input~) => Some(I64x2ExtendLowI32x4S(result=new_value, input~))
-    I64x2ExtendHighI32x4S(input~) => Some(I64x2ExtendHighI32x4S(result=new_value, input~))
-    I64x2ExtendLowI32x4U(input~) => Some(I64x2ExtendLowI32x4U(result=new_value, input~))
-    I64x2ExtendHighI32x4U(input~) => Some(I64x2ExtendHighI32x4U(result=new_value, input~))
+    F32x4ConvertI32x4S(input~) =>
+      Some(F32x4ConvertI32x4S(result=new_value, input~))
+    F32x4ConvertI32x4U(input~) =>
+      Some(F32x4ConvertI32x4U(result=new_value, input~))
+    F64x2ConvertLowI32x4S(input~) =>
+      Some(F64x2ConvertLowI32x4S(result=new_value, input~))
+    F64x2ConvertLowI32x4U(input~) =>
+      Some(F64x2ConvertLowI32x4U(result=new_value, input~))
+    I32x4TruncSatF32x4S(input~) =>
+      Some(I32x4TruncSatF32x4S(result=new_value, input~))
+    I32x4TruncSatF32x4U(input~) =>
+      Some(I32x4TruncSatF32x4U(result=new_value, input~))
+    I32x4TruncSatF64x2SZero(input~) =>
+      Some(I32x4TruncSatF64x2SZero(result=new_value, input~))
+    I32x4TruncSatF64x2UZero(input~) =>
+      Some(I32x4TruncSatF64x2UZero(result=new_value, input~))
+    F32x4DemoteF64x2Zero(input~) =>
+      Some(F32x4DemoteF64x2Zero(result=new_value, input~))
+    F64x2PromoteLowF32x4(input~) =>
+      Some(F64x2PromoteLowF32x4(result=new_value, input~))
+    I8x16NarrowI16x8S(lhs~, rhs~) =>
+      Some(I8x16NarrowI16x8S(result=new_value, lhs~, rhs~))
+    I8x16NarrowI16x8U(lhs~, rhs~) =>
+      Some(I8x16NarrowI16x8U(result=new_value, lhs~, rhs~))
+    I16x8NarrowI32x4S(lhs~, rhs~) =>
+      Some(I16x8NarrowI32x4S(result=new_value, lhs~, rhs~))
+    I16x8NarrowI32x4U(lhs~, rhs~) =>
+      Some(I16x8NarrowI32x4U(result=new_value, lhs~, rhs~))
+    I16x8ExtendLowI8x16S(input~) =>
+      Some(I16x8ExtendLowI8x16S(result=new_value, input~))
+    I16x8ExtendHighI8x16S(input~) =>
+      Some(I16x8ExtendHighI8x16S(result=new_value, input~))
+    I16x8ExtendLowI8x16U(input~) =>
+      Some(I16x8ExtendLowI8x16U(result=new_value, input~))
+    I16x8ExtendHighI8x16U(input~) =>
+      Some(I16x8ExtendHighI8x16U(result=new_value, input~))
+    I32x4ExtendLowI16x8S(input~) =>
+      Some(I32x4ExtendLowI16x8S(result=new_value, input~))
+    I32x4ExtendHighI16x8S(input~) =>
+      Some(I32x4ExtendHighI16x8S(result=new_value, input~))
+    I32x4ExtendLowI16x8U(input~) =>
+      Some(I32x4ExtendLowI16x8U(result=new_value, input~))
+    I32x4ExtendHighI16x8U(input~) =>
+      Some(I32x4ExtendHighI16x8U(result=new_value, input~))
+    I64x2ExtendLowI32x4S(input~) =>
+      Some(I64x2ExtendLowI32x4S(result=new_value, input~))
+    I64x2ExtendHighI32x4S(input~) =>
+      Some(I64x2ExtendHighI32x4S(result=new_value, input~))
+    I64x2ExtendLowI32x4U(input~) =>
+      Some(I64x2ExtendLowI32x4U(result=new_value, input~))
+    I64x2ExtendHighI32x4U(input~) =>
+      Some(I64x2ExtendHighI32x4U(result=new_value, input~))
     V128Load(offset_lo~) => Some(V128Load(result=new_value, offset_lo~))
     V128LoadAt(address~) => Some(V128LoadAt(result=new_value, address~))
-    V128LoadOffset16(ptr~, offset~) => Some(V128LoadOffset16(result=new_value, ptr~, offset~))
-    V128Load32Zero(offset_lo~) => Some(V128Load32Zero(result=new_value, offset_lo~))
-    V128Load32ZeroAt(address~) => Some(V128Load32ZeroAt(result=new_value, address~))
-    V128Load32ZeroOffset16(ptr~, offset~) => Some(V128Load32ZeroOffset16(result=new_value, ptr~, offset~))
-    V128Load64Zero(offset_lo~) => Some(V128Load64Zero(result=new_value, offset_lo~))
-    V128Load64ZeroAt(address~) => Some(V128Load64ZeroAt(result=new_value, address~))
-    V128Load64ZeroOffset16(ptr~, offset~) => Some(V128Load64ZeroOffset16(result=new_value, ptr~, offset~))
-    V128Load8Splat(offset_lo~) => Some(V128Load8Splat(result=new_value, offset_lo~))
-    V128Load8SplatAt(address~) => Some(V128Load8SplatAt(result=new_value, address~))
-    V128Load8SplatOffset16(ptr~, offset~) => Some(V128Load8SplatOffset16(result=new_value, ptr~, offset~))
-    V128Load16Splat(offset_lo~) => Some(V128Load16Splat(result=new_value, offset_lo~))
-    V128Load16SplatAt(address~) => Some(V128Load16SplatAt(result=new_value, address~))
-    V128Load16SplatOffset16(ptr~, offset~) => Some(V128Load16SplatOffset16(result=new_value, ptr~, offset~))
-    V128Load32Splat(offset_lo~) => Some(V128Load32Splat(result=new_value, offset_lo~))
-    V128Load32SplatAt(address~) => Some(V128Load32SplatAt(result=new_value, address~))
-    V128Load32SplatOffset16(ptr~, offset~) => Some(V128Load32SplatOffset16(result=new_value, ptr~, offset~))
-    V128Load64Splat(offset_lo~) => Some(V128Load64Splat(result=new_value, offset_lo~))
-    V128Load64SplatAt(address~) => Some(V128Load64SplatAt(result=new_value, address~))
-    V128Load64SplatOffset16(ptr~, offset~) => Some(V128Load64SplatOffset16(result=new_value, ptr~, offset~))
+    V128LoadOffset16(ptr~, offset~) =>
+      Some(V128LoadOffset16(result=new_value, ptr~, offset~))
+    V128Load32Zero(offset_lo~) =>
+      Some(V128Load32Zero(result=new_value, offset_lo~))
+    V128Load32ZeroAt(address~) =>
+      Some(V128Load32ZeroAt(result=new_value, address~))
+    V128Load32ZeroOffset16(ptr~, offset~) =>
+      Some(V128Load32ZeroOffset16(result=new_value, ptr~, offset~))
+    V128Load64Zero(offset_lo~) =>
+      Some(V128Load64Zero(result=new_value, offset_lo~))
+    V128Load64ZeroAt(address~) =>
+      Some(V128Load64ZeroAt(result=new_value, address~))
+    V128Load64ZeroOffset16(ptr~, offset~) =>
+      Some(V128Load64ZeroOffset16(result=new_value, ptr~, offset~))
+    V128Load8Splat(offset_lo~) =>
+      Some(V128Load8Splat(result=new_value, offset_lo~))
+    V128Load8SplatAt(address~) =>
+      Some(V128Load8SplatAt(result=new_value, address~))
+    V128Load8SplatOffset16(ptr~, offset~) =>
+      Some(V128Load8SplatOffset16(result=new_value, ptr~, offset~))
+    V128Load16Splat(offset_lo~) =>
+      Some(V128Load16Splat(result=new_value, offset_lo~))
+    V128Load16SplatAt(address~) =>
+      Some(V128Load16SplatAt(result=new_value, address~))
+    V128Load16SplatOffset16(ptr~, offset~) =>
+      Some(V128Load16SplatOffset16(result=new_value, ptr~, offset~))
+    V128Load32Splat(offset_lo~) =>
+      Some(V128Load32Splat(result=new_value, offset_lo~))
+    V128Load32SplatAt(address~) =>
+      Some(V128Load32SplatAt(result=new_value, address~))
+    V128Load32SplatOffset16(ptr~, offset~) =>
+      Some(V128Load32SplatOffset16(result=new_value, ptr~, offset~))
+    V128Load64Splat(offset_lo~) =>
+      Some(V128Load64Splat(result=new_value, offset_lo~))
+    V128Load64SplatAt(address~) =>
+      Some(V128Load64SplatAt(result=new_value, address~))
+    V128Load64SplatOffset16(ptr~, offset~) =>
+      Some(V128Load64SplatOffset16(result=new_value, ptr~, offset~))
     V128Load8x8S(offset_lo~) => Some(V128Load8x8S(result=new_value, offset_lo~))
     V128Load8x8SAt(address~) => Some(V128Load8x8SAt(result=new_value, address~))
-    V128Load8x8SOffset16(ptr~, offset~) => Some(V128Load8x8SOffset16(result=new_value, ptr~, offset~))
+    V128Load8x8SOffset16(ptr~, offset~) =>
+      Some(V128Load8x8SOffset16(result=new_value, ptr~, offset~))
     V128Load8x8U(offset_lo~) => Some(V128Load8x8U(result=new_value, offset_lo~))
     V128Load8x8UAt(address~) => Some(V128Load8x8UAt(result=new_value, address~))
-    V128Load8x8UOffset16(ptr~, offset~) => Some(V128Load8x8UOffset16(result=new_value, ptr~, offset~))
-    V128Load16x4S(offset_lo~) => Some(V128Load16x4S(result=new_value, offset_lo~))
-    V128Load16x4SAt(address~) => Some(V128Load16x4SAt(result=new_value, address~))
-    V128Load16x4SOffset16(ptr~, offset~) => Some(V128Load16x4SOffset16(result=new_value, ptr~, offset~))
-    V128Load16x4U(offset_lo~) => Some(V128Load16x4U(result=new_value, offset_lo~))
-    V128Load16x4UAt(address~) => Some(V128Load16x4UAt(result=new_value, address~))
-    V128Load16x4UOffset16(ptr~, offset~) => Some(V128Load16x4UOffset16(result=new_value, ptr~, offset~))
-    V128Load32x2S(offset_lo~) => Some(V128Load32x2S(result=new_value, offset_lo~))
-    V128Load32x2SAt(address~) => Some(V128Load32x2SAt(result=new_value, address~))
-    V128Load32x2SOffset16(ptr~, offset~) => Some(V128Load32x2SOffset16(result=new_value, ptr~, offset~))
-    V128Load32x2U(offset_lo~) => Some(V128Load32x2U(result=new_value, offset_lo~))
-    V128Load32x2UAt(address~) => Some(V128Load32x2UAt(result=new_value, address~))
-    V128Load32x2UOffset16(ptr~, offset~) => Some(V128Load32x2UOffset16(result=new_value, ptr~, offset~))
-    V128Load8Lane(offset_lo~) => Some(V128Load8Lane(result=new_value, offset_lo~))
-    V128Load8LaneAt(address~) => Some(V128Load8LaneAt(result=new_value, address~))
-    V128Load16Lane(offset_lo~) => Some(V128Load16Lane(result=new_value, offset_lo~))
-    V128Load16LaneAt(address~) => Some(V128Load16LaneAt(result=new_value, address~))
-    V128Load32Lane(offset_lo~) => Some(V128Load32Lane(result=new_value, offset_lo~))
-    V128Load32LaneAt(address~) => Some(V128Load32LaneAt(result=new_value, address~))
-    V128Load64Lane(offset_lo~) => Some(V128Load64Lane(result=new_value, offset_lo~))
-    V128Load64LaneAt(address~) => Some(V128Load64LaneAt(result=new_value, address~))
+    V128Load8x8UOffset16(ptr~, offset~) =>
+      Some(V128Load8x8UOffset16(result=new_value, ptr~, offset~))
+    V128Load16x4S(offset_lo~) =>
+      Some(V128Load16x4S(result=new_value, offset_lo~))
+    V128Load16x4SAt(address~) =>
+      Some(V128Load16x4SAt(result=new_value, address~))
+    V128Load16x4SOffset16(ptr~, offset~) =>
+      Some(V128Load16x4SOffset16(result=new_value, ptr~, offset~))
+    V128Load16x4U(offset_lo~) =>
+      Some(V128Load16x4U(result=new_value, offset_lo~))
+    V128Load16x4UAt(address~) =>
+      Some(V128Load16x4UAt(result=new_value, address~))
+    V128Load16x4UOffset16(ptr~, offset~) =>
+      Some(V128Load16x4UOffset16(result=new_value, ptr~, offset~))
+    V128Load32x2S(offset_lo~) =>
+      Some(V128Load32x2S(result=new_value, offset_lo~))
+    V128Load32x2SAt(address~) =>
+      Some(V128Load32x2SAt(result=new_value, address~))
+    V128Load32x2SOffset16(ptr~, offset~) =>
+      Some(V128Load32x2SOffset16(result=new_value, ptr~, offset~))
+    V128Load32x2U(offset_lo~) =>
+      Some(V128Load32x2U(result=new_value, offset_lo~))
+    V128Load32x2UAt(address~) =>
+      Some(V128Load32x2UAt(result=new_value, address~))
+    V128Load32x2UOffset16(ptr~, offset~) =>
+      Some(V128Load32x2UOffset16(result=new_value, ptr~, offset~))
+    V128Load8Lane(offset_lo~) =>
+      Some(V128Load8Lane(result=new_value, offset_lo~))
+    V128Load8LaneAt(address~) =>
+      Some(V128Load8LaneAt(result=new_value, address~))
+    V128Load16Lane(offset_lo~) =>
+      Some(V128Load16Lane(result=new_value, offset_lo~))
+    V128Load16LaneAt(address~) =>
+      Some(V128Load16LaneAt(result=new_value, address~))
+    V128Load32Lane(offset_lo~) =>
+      Some(V128Load32Lane(result=new_value, offset_lo~))
+    V128Load32LaneAt(address~) =>
+      Some(V128Load32LaneAt(result=new_value, address~))
+    V128Load64Lane(offset_lo~) =>
+      Some(V128Load64Lane(result=new_value, offset_lo~))
+    V128Load64LaneAt(address~) =>
+      Some(V128Load64LaneAt(result=new_value, address~))
     _ => None
   }
 }
@@ -12108,65 +12847,99 @@ pub fn Op::branch_offset16(self : Op) -> BranchOffset16? {
 pub fn Op::set_branch_offset16(self : Op, new_value : BranchOffset16) -> Op? {
   match self {
     BranchI32And(lhs~, rhs~) => Some(BranchI32And(offset=new_value, lhs~, rhs~))
-    BranchI32AndImm16(lhs~, rhs~) => Some(BranchI32AndImm16(offset=new_value, lhs~, rhs~))
+    BranchI32AndImm16(lhs~, rhs~) =>
+      Some(BranchI32AndImm16(offset=new_value, lhs~, rhs~))
     BranchI32Or(lhs~, rhs~) => Some(BranchI32Or(offset=new_value, lhs~, rhs~))
-    BranchI32OrImm16(lhs~, rhs~) => Some(BranchI32OrImm16(offset=new_value, lhs~, rhs~))
-    BranchI32Nand(lhs~, rhs~) => Some(BranchI32Nand(offset=new_value, lhs~, rhs~))
-    BranchI32NandImm16(lhs~, rhs~) => Some(BranchI32NandImm16(offset=new_value, lhs~, rhs~))
+    BranchI32OrImm16(lhs~, rhs~) =>
+      Some(BranchI32OrImm16(offset=new_value, lhs~, rhs~))
+    BranchI32Nand(lhs~, rhs~) =>
+      Some(BranchI32Nand(offset=new_value, lhs~, rhs~))
+    BranchI32NandImm16(lhs~, rhs~) =>
+      Some(BranchI32NandImm16(offset=new_value, lhs~, rhs~))
     BranchI32Nor(lhs~, rhs~) => Some(BranchI32Nor(offset=new_value, lhs~, rhs~))
-    BranchI32NorImm16(lhs~, rhs~) => Some(BranchI32NorImm16(offset=new_value, lhs~, rhs~))
+    BranchI32NorImm16(lhs~, rhs~) =>
+      Some(BranchI32NorImm16(offset=new_value, lhs~, rhs~))
     BranchI32Eq(lhs~, rhs~) => Some(BranchI32Eq(offset=new_value, lhs~, rhs~))
-    BranchI32EqImm16(lhs~, rhs~) => Some(BranchI32EqImm16(offset=new_value, lhs~, rhs~))
+    BranchI32EqImm16(lhs~, rhs~) =>
+      Some(BranchI32EqImm16(offset=new_value, lhs~, rhs~))
     BranchI32Ne(lhs~, rhs~) => Some(BranchI32Ne(offset=new_value, lhs~, rhs~))
-    BranchI32NeImm16(lhs~, rhs~) => Some(BranchI32NeImm16(offset=new_value, lhs~, rhs~))
+    BranchI32NeImm16(lhs~, rhs~) =>
+      Some(BranchI32NeImm16(offset=new_value, lhs~, rhs~))
     BranchI32LtS(lhs~, rhs~) => Some(BranchI32LtS(offset=new_value, lhs~, rhs~))
-    BranchI32LtSImm16Lhs(lhs~, rhs~) => Some(BranchI32LtSImm16Lhs(offset=new_value, lhs~, rhs~))
-    BranchI32LtSImm16Rhs(lhs~, rhs~) => Some(BranchI32LtSImm16Rhs(offset=new_value, lhs~, rhs~))
+    BranchI32LtSImm16Lhs(lhs~, rhs~) =>
+      Some(BranchI32LtSImm16Lhs(offset=new_value, lhs~, rhs~))
+    BranchI32LtSImm16Rhs(lhs~, rhs~) =>
+      Some(BranchI32LtSImm16Rhs(offset=new_value, lhs~, rhs~))
     BranchI32LtU(lhs~, rhs~) => Some(BranchI32LtU(offset=new_value, lhs~, rhs~))
-    BranchI32LtUImm16Lhs(lhs~, rhs~) => Some(BranchI32LtUImm16Lhs(offset=new_value, lhs~, rhs~))
-    BranchI32LtUImm16Rhs(lhs~, rhs~) => Some(BranchI32LtUImm16Rhs(offset=new_value, lhs~, rhs~))
+    BranchI32LtUImm16Lhs(lhs~, rhs~) =>
+      Some(BranchI32LtUImm16Lhs(offset=new_value, lhs~, rhs~))
+    BranchI32LtUImm16Rhs(lhs~, rhs~) =>
+      Some(BranchI32LtUImm16Rhs(offset=new_value, lhs~, rhs~))
     BranchI32LeS(lhs~, rhs~) => Some(BranchI32LeS(offset=new_value, lhs~, rhs~))
-    BranchI32LeSImm16Lhs(lhs~, rhs~) => Some(BranchI32LeSImm16Lhs(offset=new_value, lhs~, rhs~))
-    BranchI32LeSImm16Rhs(lhs~, rhs~) => Some(BranchI32LeSImm16Rhs(offset=new_value, lhs~, rhs~))
+    BranchI32LeSImm16Lhs(lhs~, rhs~) =>
+      Some(BranchI32LeSImm16Lhs(offset=new_value, lhs~, rhs~))
+    BranchI32LeSImm16Rhs(lhs~, rhs~) =>
+      Some(BranchI32LeSImm16Rhs(offset=new_value, lhs~, rhs~))
     BranchI32LeU(lhs~, rhs~) => Some(BranchI32LeU(offset=new_value, lhs~, rhs~))
-    BranchI32LeUImm16Lhs(lhs~, rhs~) => Some(BranchI32LeUImm16Lhs(offset=new_value, lhs~, rhs~))
-    BranchI32LeUImm16Rhs(lhs~, rhs~) => Some(BranchI32LeUImm16Rhs(offset=new_value, lhs~, rhs~))
+    BranchI32LeUImm16Lhs(lhs~, rhs~) =>
+      Some(BranchI32LeUImm16Lhs(offset=new_value, lhs~, rhs~))
+    BranchI32LeUImm16Rhs(lhs~, rhs~) =>
+      Some(BranchI32LeUImm16Rhs(offset=new_value, lhs~, rhs~))
     BranchI64And(lhs~, rhs~) => Some(BranchI64And(offset=new_value, lhs~, rhs~))
-    BranchI64AndImm16(lhs~, rhs~) => Some(BranchI64AndImm16(offset=new_value, lhs~, rhs~))
+    BranchI64AndImm16(lhs~, rhs~) =>
+      Some(BranchI64AndImm16(offset=new_value, lhs~, rhs~))
     BranchI64Or(lhs~, rhs~) => Some(BranchI64Or(offset=new_value, lhs~, rhs~))
-    BranchI64OrImm16(lhs~, rhs~) => Some(BranchI64OrImm16(offset=new_value, lhs~, rhs~))
-    BranchI64Nand(lhs~, rhs~) => Some(BranchI64Nand(offset=new_value, lhs~, rhs~))
-    BranchI64NandImm16(lhs~, rhs~) => Some(BranchI64NandImm16(offset=new_value, lhs~, rhs~))
+    BranchI64OrImm16(lhs~, rhs~) =>
+      Some(BranchI64OrImm16(offset=new_value, lhs~, rhs~))
+    BranchI64Nand(lhs~, rhs~) =>
+      Some(BranchI64Nand(offset=new_value, lhs~, rhs~))
+    BranchI64NandImm16(lhs~, rhs~) =>
+      Some(BranchI64NandImm16(offset=new_value, lhs~, rhs~))
     BranchI64Nor(lhs~, rhs~) => Some(BranchI64Nor(offset=new_value, lhs~, rhs~))
-    BranchI64NorImm16(lhs~, rhs~) => Some(BranchI64NorImm16(offset=new_value, lhs~, rhs~))
+    BranchI64NorImm16(lhs~, rhs~) =>
+      Some(BranchI64NorImm16(offset=new_value, lhs~, rhs~))
     BranchI64Eq(lhs~, rhs~) => Some(BranchI64Eq(offset=new_value, lhs~, rhs~))
-    BranchI64EqImm16(lhs~, rhs~) => Some(BranchI64EqImm16(offset=new_value, lhs~, rhs~))
+    BranchI64EqImm16(lhs~, rhs~) =>
+      Some(BranchI64EqImm16(offset=new_value, lhs~, rhs~))
     BranchI64Ne(lhs~, rhs~) => Some(BranchI64Ne(offset=new_value, lhs~, rhs~))
-    BranchI64NeImm16(lhs~, rhs~) => Some(BranchI64NeImm16(offset=new_value, lhs~, rhs~))
+    BranchI64NeImm16(lhs~, rhs~) =>
+      Some(BranchI64NeImm16(offset=new_value, lhs~, rhs~))
     BranchI64LtS(lhs~, rhs~) => Some(BranchI64LtS(offset=new_value, lhs~, rhs~))
-    BranchI64LtSImm16Lhs(lhs~, rhs~) => Some(BranchI64LtSImm16Lhs(offset=new_value, lhs~, rhs~))
-    BranchI64LtSImm16Rhs(lhs~, rhs~) => Some(BranchI64LtSImm16Rhs(offset=new_value, lhs~, rhs~))
+    BranchI64LtSImm16Lhs(lhs~, rhs~) =>
+      Some(BranchI64LtSImm16Lhs(offset=new_value, lhs~, rhs~))
+    BranchI64LtSImm16Rhs(lhs~, rhs~) =>
+      Some(BranchI64LtSImm16Rhs(offset=new_value, lhs~, rhs~))
     BranchI64LtU(lhs~, rhs~) => Some(BranchI64LtU(offset=new_value, lhs~, rhs~))
-    BranchI64LtUImm16Lhs(lhs~, rhs~) => Some(BranchI64LtUImm16Lhs(offset=new_value, lhs~, rhs~))
-    BranchI64LtUImm16Rhs(lhs~, rhs~) => Some(BranchI64LtUImm16Rhs(offset=new_value, lhs~, rhs~))
+    BranchI64LtUImm16Lhs(lhs~, rhs~) =>
+      Some(BranchI64LtUImm16Lhs(offset=new_value, lhs~, rhs~))
+    BranchI64LtUImm16Rhs(lhs~, rhs~) =>
+      Some(BranchI64LtUImm16Rhs(offset=new_value, lhs~, rhs~))
     BranchI64LeS(lhs~, rhs~) => Some(BranchI64LeS(offset=new_value, lhs~, rhs~))
-    BranchI64LeSImm16Lhs(lhs~, rhs~) => Some(BranchI64LeSImm16Lhs(offset=new_value, lhs~, rhs~))
-    BranchI64LeSImm16Rhs(lhs~, rhs~) => Some(BranchI64LeSImm16Rhs(offset=new_value, lhs~, rhs~))
+    BranchI64LeSImm16Lhs(lhs~, rhs~) =>
+      Some(BranchI64LeSImm16Lhs(offset=new_value, lhs~, rhs~))
+    BranchI64LeSImm16Rhs(lhs~, rhs~) =>
+      Some(BranchI64LeSImm16Rhs(offset=new_value, lhs~, rhs~))
     BranchI64LeU(lhs~, rhs~) => Some(BranchI64LeU(offset=new_value, lhs~, rhs~))
-    BranchI64LeUImm16Lhs(lhs~, rhs~) => Some(BranchI64LeUImm16Lhs(offset=new_value, lhs~, rhs~))
-    BranchI64LeUImm16Rhs(lhs~, rhs~) => Some(BranchI64LeUImm16Rhs(offset=new_value, lhs~, rhs~))
+    BranchI64LeUImm16Lhs(lhs~, rhs~) =>
+      Some(BranchI64LeUImm16Lhs(offset=new_value, lhs~, rhs~))
+    BranchI64LeUImm16Rhs(lhs~, rhs~) =>
+      Some(BranchI64LeUImm16Rhs(offset=new_value, lhs~, rhs~))
     BranchF32Eq(lhs~, rhs~) => Some(BranchF32Eq(offset=new_value, lhs~, rhs~))
     BranchF32Ne(lhs~, rhs~) => Some(BranchF32Ne(offset=new_value, lhs~, rhs~))
     BranchF32Lt(lhs~, rhs~) => Some(BranchF32Lt(offset=new_value, lhs~, rhs~))
     BranchF32Le(lhs~, rhs~) => Some(BranchF32Le(offset=new_value, lhs~, rhs~))
-    BranchF32NotLt(lhs~, rhs~) => Some(BranchF32NotLt(offset=new_value, lhs~, rhs~))
-    BranchF32NotLe(lhs~, rhs~) => Some(BranchF32NotLe(offset=new_value, lhs~, rhs~))
+    BranchF32NotLt(lhs~, rhs~) =>
+      Some(BranchF32NotLt(offset=new_value, lhs~, rhs~))
+    BranchF32NotLe(lhs~, rhs~) =>
+      Some(BranchF32NotLe(offset=new_value, lhs~, rhs~))
     BranchF64Eq(lhs~, rhs~) => Some(BranchF64Eq(offset=new_value, lhs~, rhs~))
     BranchF64Ne(lhs~, rhs~) => Some(BranchF64Ne(offset=new_value, lhs~, rhs~))
     BranchF64Lt(lhs~, rhs~) => Some(BranchF64Lt(offset=new_value, lhs~, rhs~))
     BranchF64Le(lhs~, rhs~) => Some(BranchF64Le(offset=new_value, lhs~, rhs~))
-    BranchF64NotLt(lhs~, rhs~) => Some(BranchF64NotLt(offset=new_value, lhs~, rhs~))
-    BranchF64NotLe(lhs~, rhs~) => Some(BranchF64NotLe(offset=new_value, lhs~, rhs~))
+    BranchF64NotLt(lhs~, rhs~) =>
+      Some(BranchF64NotLt(offset=new_value, lhs~, rhs~))
+    BranchF64NotLe(lhs~, rhs~) =>
+      Some(BranchF64NotLe(offset=new_value, lhs~, rhs~))
     _ => None
   }
 }
@@ -12186,7 +12959,8 @@ pub fn Op::branch_offset(self : Op) -> BranchOffset? {
 pub fn Op::set_branch_offset(self : Op, new_value : BranchOffset) -> Op? {
   match self {
     Branch(..) => Some(Branch(offset=new_value))
-    BranchTableTarget(results~) => Some(BranchTableTarget(offset=new_value, results~))
+    BranchTableTarget(results~) =>
+      Some(BranchTableTarget(offset=new_value, results~))
     _ => None
   }
 }
@@ -12219,10 +12993,14 @@ pub fn Op::set_results_span(self : Op, new_value : SlotSpan) -> Op? {
     CallInternal(func~) => Some(CallInternal(results=new_value, func~))
     CallImported0(func~) => Some(CallImported0(results=new_value, func~))
     CallImported(func~) => Some(CallImported(results=new_value, func~))
-    CallIndirect0(func_type~) => Some(CallIndirect0(results=new_value, func_type~))
-    CallIndirect0Imm16(func_type~) => Some(CallIndirect0Imm16(results=new_value, func_type~))
-    CallIndirect(func_type~) => Some(CallIndirect(results=new_value, func_type~))
-    CallIndirectImm16(func_type~) => Some(CallIndirectImm16(results=new_value, func_type~))
+    CallIndirect0(func_type~) =>
+      Some(CallIndirect0(results=new_value, func_type~))
+    CallIndirect0Imm16(func_type~) =>
+      Some(CallIndirect0Imm16(results=new_value, func_type~))
+    CallIndirect(func_type~) =>
+      Some(CallIndirect(results=new_value, func_type~))
+    CallIndirectImm16(func_type~) =>
+      Some(CallIndirectImm16(results=new_value, func_type~))
     _ => None
   }
 }

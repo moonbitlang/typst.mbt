@@ -62,7 +62,7 @@ priv struct LabelUser {
 
 ///|
 pub fn LabelRegistry::new() -> LabelRegistry {
-  { labels: [], users: [] }
+  { labels: [], users: [], }
 }
 
 ///|
@@ -131,7 +131,7 @@ pub fn LabelRegistry::try_resolve_label(
         e => raise WasmiError::from_ir(e)
       }
     Unpinned => {
-      self.users.push({ label, user })
+      self.users.push({ label, user, })
       @ir.BranchOffset::uninit()
     }
   }
@@ -139,7 +139,10 @@ pub fn LabelRegistry::try_resolve_label(
 
 ///|
 /// Resolves a `label` to its pinned [`Instr`].
-fn LabelRegistry::resolve_label(self : LabelRegistry, label : LabelRef) -> Instr {
+fn LabelRegistry::resolve_label(
+  self : LabelRegistry,
+  label : LabelRef,
+) -> Instr {
   match self.labels[label.0] {
     Pinned(instr) => instr
     Unpinned =>

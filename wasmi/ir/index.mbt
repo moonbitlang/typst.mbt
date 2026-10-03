@@ -57,7 +57,7 @@ pub fn Slot::try_from_u32(local_index : UInt) -> Slot raise IrError {
 ///|
 /// Wrapping `i16` addition (upstream `i16::wrapping_add_unsigned`).
 fn wrap_i16(value : Int) -> Int {
-  ((value & 0xFFFF) << 16) >> 16
+  (value & 0xFFFF) << 16 >> 16
 }
 
 ///|

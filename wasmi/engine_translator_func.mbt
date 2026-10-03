@@ -27,7 +27,7 @@ pub(all) struct FuncTranslator {
   /// reachability to `true` again.
   priv mut reachable : Bool
   /// Wasm value and control stack.
-  priv stack : Stack
+  priv stack : TranslatorStack
   /// Types of local variables and function parameters.
   priv locals : LocalsRegistry
   /// Wasm layout to map stack slots to Wasmi registers.
@@ -54,7 +54,7 @@ pub fn FuncTranslator::new(
     engine,
     module,
     reachable: true,
-    stack: Stack::new(engine),
+    stack: TranslatorStack::new(engine),
     locals: LocalsRegistry::new(),
     layout: StackLayout::new(),
     labels: LabelRegistry::new(),
@@ -81,7 +81,9 @@ pub fn FuncTranslator::translate_locals(
 ///|
 /// Upstream `WasmTranslator::finish`: finalizes the translation and returns
 /// the compiled function.
-pub fn FuncTranslator::finish(self : FuncTranslator) -> CompiledFuncEntity raise WasmiError {
+pub fn FuncTranslator::finish(
+  self : FuncTranslator,
+) -> CompiledFuncEntity raise WasmiError {
   // Note: `update_branch_offsets` might change `frame_size` so we need to compute it prior.
   //
   // Context:
@@ -97,7 +99,9 @@ pub fn FuncTranslator::finish(self : FuncTranslator) -> CompiledFuncEntity raise
 
 ///|
 /// Initializes the function body enclosing control block.
-fn FuncTranslator::init_func_body_block(self : FuncTranslator) -> Unit raise WasmiError {
+fn FuncTranslator::init_func_body_block(
+  self : FuncTranslator,
+) -> Unit raise WasmiError {
   let func_ty = self.module.get_type_of_func(self.func)
   let block_ty = BlockType::func_type(func_ty)
   let end_label = self.labels.new_label()
@@ -107,7 +111,9 @@ fn FuncTranslator::init_func_body_block(self : FuncTranslator) -> Unit raise Was
 
 ///|
 /// Initializes the function's parameters.
-fn FuncTranslator::init_func_params(self : FuncTranslator) -> Unit raise WasmiError {
+fn FuncTranslator::init_func_params(
+  self : FuncTranslator,
+) -> Unit raise WasmiError {
   for ty in self.func_type().params() {
     self.register_locals(1, ty)
   }
@@ -146,7 +152,9 @@ fn FuncTranslator::frame_size(self : FuncTranslator) -> Int? {
 /// # Panics
 ///
 /// If this is used before all branching labels have been pinned.
-fn FuncTranslator::update_branch_offsets(self : FuncTranslator) -> Unit raise WasmiError {
+fn FuncTranslator::update_branch_offsets(
+  self : FuncTranslator,
+) -> Unit raise WasmiError {
   for user_offset in self.labels.resolved_users() {
     let (user, offset) = user_offset
     let offset = match offset {
@@ -496,7 +504,10 @@ fn FuncTranslator::make_copy_imm_instr(
       }
     }
     F32 =>
-      @ir.Op::copy_imm32(result, @ir.AnyConst32::from_f32_bits(typed_f32_bits(value)))
+      @ir.Op::copy_imm32(
+        result,
+        @ir.AnyConst32::from_f32_bits(typed_f32_bits(value)),
+      )
     F64 =>
       match @ir.Const32::try_from_f64_bits(typed_f64_bits(value)) {
         Some(c) => @ir.Op::copy_f64imm32(result, c)
@@ -590,8 +601,7 @@ fn FuncTranslator::encode_copy_many(
       let result = results.head()
       self.encode_copy(result, val0, consume_fuel_instr) |> ignore
     }
-    [val0, val1] =>
-      self.encode_copy2(results, val0, val1, consume_fuel_instr)
+    [val0, val1] => self.encode_copy2(results, val0, val1, consume_fuel_instr)
     [val0, val1, .. rest] => {
       if FuncTranslator::try_form_regspan_of(values, self.layout)
         is Some(values) {
@@ -777,7 +787,9 @@ fn FuncTranslator::immediate_to_reg(
 
 ///|
 /// Pushes the `instr` to the function with the associated `fuel_costs`.
-fn FuncTranslator::preserve_all_locals(self : FuncTranslator) -> Unit raise WasmiError {
+fn FuncTranslator::preserve_all_locals(
+  self : FuncTranslator,
+) -> Unit raise WasmiError {
   let consume_fuel_instr = self.stack.consume_fuel_instr()
   for local in self.stack.preserve_all_locals() {
     let result = self.layout.temp_to_reg(local.index())
@@ -843,7 +855,10 @@ fn FuncTranslator::push_binary_instr_with_result(
 
 ///|
 /// Pushes an instruction parameter `param` to the list of instructions.
-fn FuncTranslator::push_param(self : FuncTranslator, param : @ir.Op) -> Unit raise WasmiError {
+fn FuncTranslator::push_param(
+  self : FuncTranslator,
+  param : @ir.Op,
+) -> Unit raise WasmiError {
   self.instrs.push_param(param)
 }
 
@@ -945,8 +960,7 @@ fn FuncTranslator::encode_return(
         Immediate(operand) => {
           let val = operand.val()
           match operand.ty() {
-            I32 =>
-              @ir.Op::return_imm32(@ir.AnyConst32::from_i32(val.to_i32()))
+            I32 => @ir.Op::return_imm32(@ir.AnyConst32::from_i32(val.to_i32()))
             I64 =>
               match @ir.Const32::try_from_i64(val.to_i64()) {
                 Some(value) => @ir.Op::return_i64imm32(value)
@@ -956,7 +970,9 @@ fn FuncTranslator::encode_return(
                 }
               }
             F32 =>
-              @ir.Op::return_imm32(@ir.AnyConst32::from_f32_bits(typed_f32_bits(val)))
+              @ir.Op::return_imm32(
+                @ir.AnyConst32::from_f32_bits(typed_f32_bits(val)),
+              )
             F64 =>
               match @ir.Const32::try_from_f64_bits(typed_f64_bits(val)) {
                 Some(value) => @ir.Op::return_f64imm32(value)
@@ -992,7 +1008,10 @@ fn FuncTranslator::encode_return(
 
 ///|
 /// Peeks `len` operands from the stack and store them into `self.operands`.
-fn FuncTranslator::peek_operands_into_buffer(self : FuncTranslator, len : Int) -> Unit {
+fn FuncTranslator::peek_operands_into_buffer(
+  self : FuncTranslator,
+  len : Int,
+) -> Unit {
   self.operands.clear()
   for operand in self.stack.peek_n(len) {
     self.operands.push(operand)

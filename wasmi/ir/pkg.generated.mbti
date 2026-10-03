@@ -1,0 +1,1776 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/wasmi/ir"
+
+import {
+  "moonbitlang/core/debug",
+  "moonbitlang/typst/wasmi/core",
+}
+
+// Values
+
+// Errors
+pub(all) suberror IrError {
+  StackSlotOutOfBounds
+  BranchOffsetOutOfBounds
+  ComparatorOutOfBounds
+  BlockFuelOutOfBounds
+} derive(Eq)
+pub impl Show for IrError
+
+pub(all) suberror OutOfBoundsConst derive(Eq, Show)
+
+// Types and methods
+pub(all) struct Address(UInt64) derive(Eq, Hash, @debug.Debug)
+pub fn Address::to_u64(Self) -> UInt64
+pub fn Address::try_from_u64(UInt64) -> Self?
+
+pub(all) struct Address32(UInt) derive(Eq, Hash, @debug.Debug)
+pub fn Address32::to_u64(Self) -> UInt64
+pub fn Address32::try_from_address(Address) -> Self?
+
+pub(all) struct AnyConst16(Int) derive(Eq, Hash, @debug.Debug)
+pub fn AnyConst16::from_i16(Int) -> Self
+pub fn AnyConst16::from_i8(Int) -> Self
+pub fn AnyConst16::from_u16(Int) -> Self
+pub fn AnyConst16::to_i16(Self) -> Int
+pub fn AnyConst16::to_i32(Self) -> Int
+pub fn AnyConst16::to_i64(Self) -> Int64
+pub fn AnyConst16::to_i8(Self) -> Int
+pub fn AnyConst16::to_u16(Self) -> Int
+pub fn AnyConst16::to_u32(Self) -> UInt
+pub fn AnyConst16::to_u64(Self) -> UInt64
+pub fn AnyConst16::try_from_i32(Int) -> Self?
+pub fn AnyConst16::try_from_i64(Int64) -> Self?
+pub fn AnyConst16::try_from_u32(UInt) -> Self?
+pub fn AnyConst16::try_from_u64(UInt64) -> Self?
+
+pub(all) struct AnyConst32(Int) derive(Eq, Hash, @debug.Debug)
+pub fn AnyConst32::from_bool(Bool) -> Self
+pub fn AnyConst32::from_f32(Float) -> Self
+pub fn AnyConst32::from_f32_bits(UInt) -> Self
+pub fn AnyConst32::from_i32(Int) -> Self
+pub fn AnyConst32::from_u32(UInt) -> Self
+pub fn AnyConst32::to_f32_bits(Self) -> UInt
+pub fn AnyConst32::to_f64_bits(Self) -> UInt64
+pub fn AnyConst32::to_i32(Self) -> Int
+pub fn AnyConst32::to_i64(Self) -> Int64
+pub fn AnyConst32::to_u32(Self) -> UInt
+pub fn AnyConst32::to_u64(Self) -> UInt64
+pub fn AnyConst32::try_from_f64_bits(UInt64) -> Self?
+pub fn AnyConst32::try_from_i64(Int64) -> Self?
+pub fn AnyConst32::try_from_u64(UInt64) -> Self?
+
+pub(all) struct BlockFuel(UInt) derive(Eq, Hash, @debug.Debug)
+pub fn BlockFuel::bump_by(Self, UInt64) -> Self raise IrError
+pub fn BlockFuel::from_u32(UInt) -> Self
+pub fn BlockFuel::to_u64(Self) -> UInt64
+pub fn BlockFuel::try_from_u64(UInt64) -> Self raise IrError
+
+pub(all) struct BoundedSlotSpan {
+  span : SlotSpan
+  len : Int
+} derive(Compare, Eq, Hash, @debug.Debug)
+pub fn BoundedSlotSpan::contains(Self, Slot) -> Bool
+pub fn BoundedSlotSpan::is_empty(Self) -> Bool
+pub fn BoundedSlotSpan::iter(Self) -> SlotSpanIter
+pub fn BoundedSlotSpan::len(Self) -> Int
+pub fn BoundedSlotSpan::new(SlotSpan, Int) -> Self
+pub fn BoundedSlotSpan::span(Self) -> SlotSpan
+
+pub(all) struct BranchOffset(Int) derive(Eq, Hash, @debug.Debug)
+pub fn BranchOffset::from_i32(Int) -> Self
+pub fn BranchOffset::from_src_to_dst(UInt, UInt) -> Self raise IrError
+pub fn BranchOffset::init(Self, Self) -> Self
+pub fn BranchOffset::is_init(Self) -> Bool
+pub fn BranchOffset::to_i32(Self) -> Int
+pub fn BranchOffset::uninit() -> Self
+
+pub(all) struct BranchOffset16(Int) derive(Eq, Hash, @debug.Debug)
+pub fn BranchOffset16::from_i16(Int) -> Self
+pub fn BranchOffset16::init(Self, BranchOffset) -> Self raise IrError
+pub fn BranchOffset16::is_init(Self) -> Bool
+pub fn BranchOffset16::to_branch_offset(Self) -> BranchOffset
+pub fn BranchOffset16::to_i16(Self) -> Int
+pub fn BranchOffset16::try_from(BranchOffset) -> Self raise IrError
+
+pub(all) enum Comparator {
+  I32Eq
+  I32Ne
+  I32LtS
+  I32LtU
+  I32LeS
+  I32LeU
+  I32And
+  I32Or
+  I32Nand
+  I32Nor
+  I64Eq
+  I64Ne
+  I64LtS
+  I64LtU
+  I64LeS
+  I64LeU
+  I64And
+  I64Or
+  I64Nand
+  I64Nor
+  F32Eq
+  F32Ne
+  F32Lt
+  F32Le
+  F32NotLt
+  F32NotLe
+  F64Eq
+  F64Ne
+  F64Lt
+  F64Le
+  F64NotLt
+  F64NotLe
+} derive(Eq, Hash, @debug.Debug)
+pub fn Comparator::to_u32(Self) -> UInt
+pub fn Comparator::try_from_u32(UInt) -> Self raise IrError
+
+pub(all) struct ComparatorAndOffset {
+  cmp : Comparator
+  offset : BranchOffset
+} derive(Eq, @debug.Debug)
+pub fn ComparatorAndOffset::as_u64(Self) -> UInt64
+pub fn ComparatorAndOffset::from_u64(UInt64) -> Self?
+pub fn ComparatorAndOffset::new(Comparator, BranchOffset) -> Self
+
+pub(all) struct Const16(Int) derive(Eq, Hash, @debug.Debug)
+pub fn Const16::cast(Self) -> Self
+pub fn Const16::from_i16(Int) -> Self
+pub fn Const16::from_u16(Int) -> Self
+pub fn Const16::is_zero(Self) -> Bool
+pub fn Const16::to_i32(Self) -> Int
+pub fn Const16::to_i64(Self) -> Int64
+pub fn Const16::to_u32(Self) -> UInt
+pub fn Const16::to_u64(Self) -> UInt64
+pub fn Const16::try_from_i32(Int) -> Self?
+pub fn Const16::try_from_i64(Int64) -> Self?
+pub fn Const16::try_from_u32(UInt) -> Self?
+pub fn Const16::try_from_u64(UInt64) -> Self?
+
+pub(all) struct Const32(Int) derive(Eq, Hash, @debug.Debug)
+pub fn Const32::cast(Self) -> Self
+pub fn Const32::from_f32_bits(UInt) -> Self
+pub fn Const32::from_i32(Int) -> Self
+pub fn Const32::from_u32(UInt) -> Self
+pub fn Const32::to_f32_bits(Self) -> UInt
+pub fn Const32::to_f64_bits(Self) -> UInt64
+pub fn Const32::to_i32(Self) -> Int
+pub fn Const32::to_i64(Self) -> Int64
+pub fn Const32::to_u32(Self) -> UInt
+pub fn Const32::to_u64(Self) -> UInt64
+pub fn Const32::try_from_f64_bits(UInt64) -> Self?
+pub fn Const32::try_from_i64(Int64) -> Self?
+pub fn Const32::try_from_u64(UInt64) -> Self?
+
+pub(all) struct Data(Int) derive(Compare, Eq, Hash, @debug.Debug)
+
+pub(all) struct Elem(Int) derive(Compare, Eq, Hash, @debug.Debug)
+
+pub(all) struct FixedSlotSpan(SlotSpan) derive(Compare, Eq, Hash, @debug.Debug)
+pub fn FixedSlotSpan::bounded(Self) -> BoundedSlotSpan
+pub fn FixedSlotSpan::contains(Self, Slot) -> Bool
+pub fn FixedSlotSpan::from_span_unchecked(SlotSpan) -> Self
+pub fn FixedSlotSpan::iter(Self) -> SlotSpanIter
+pub fn FixedSlotSpan::len(Self) -> Int
+pub fn FixedSlotSpan::new(SlotSpan, Int) -> Self raise IrError
+pub fn FixedSlotSpan::span(Self) -> SlotSpan
+pub fn FixedSlotSpan::to_array(Self) -> (Slot, Slot)
+
+pub(all) struct Func(Int) derive(Compare, Eq, Hash, @debug.Debug)
+
+pub(all) struct FuncType(Int) derive(Compare, Eq, Hash, @debug.Debug)
+
+pub(all) struct Global(Int) derive(Compare, Eq, Hash, @debug.Debug)
+
+pub(all) struct ImmLaneIdx(Int) derive(Eq, Hash, @debug.Debug)
+
+pub(all) struct InternalFunc(Int) derive(Compare, Eq, Hash, @debug.Debug)
+
+pub(all) struct Memory(Int) derive(Compare, Eq, Hash, @debug.Debug)
+pub fn Memory::is_default(Self) -> Bool
+
+pub(all) struct Offset16(Int) derive(Eq, Hash, @debug.Debug)
+pub fn Offset16::to_u64(Self) -> UInt64
+pub fn Offset16::try_from_u64(UInt64) -> Self?
+
+pub(all) struct Offset64(UInt64) derive(Eq, Hash, @debug.Debug)
+pub fn Offset64::combine(Offset64Hi, Offset64Lo) -> Self
+pub fn Offset64::split(UInt64) -> (Offset64Hi, Offset64Lo)
+pub fn Offset64::to_u64(Self) -> UInt64
+
+pub(all) struct Offset64Hi(UInt) derive(Eq, Hash, @debug.Debug)
+
+pub(all) struct Offset64Lo(UInt) derive(Eq, Hash, @debug.Debug)
+
+pub(all) struct Offset8(Int) derive(Eq, Hash, @debug.Debug)
+pub fn Offset8::to_u64(Self) -> UInt64
+pub fn Offset8::try_from_u64(UInt64) -> Self?
+
+pub(all) enum Op {
+  Trap(trap_code~ : @core.TrapCode)
+  ConsumeFuel(block_fuel~ : BlockFuel)
+  Return
+  ReturnSlot(value~ : Slot)
+  ReturnSlot2(values~ : FixedArray[Slot])
+  ReturnSlot3(values~ : FixedArray[Slot])
+  ReturnImm32(value~ : AnyConst32)
+  ReturnI64Imm32(value~ : Const32)
+  ReturnF64Imm32(value~ : Const32)
+  ReturnSpan(values~ : BoundedSlotSpan)
+  ReturnMany(values~ : FixedArray[Slot])
+  Branch(offset~ : BranchOffset)
+  BranchCmpFallback(lhs~ : Slot, rhs~ : Slot, params~ : Slot)
+  BranchI32And(lhs~ : Slot, rhs~ : Slot, offset~ : BranchOffset16)
+  BranchI32AndImm16(lhs~ : Slot, rhs~ : Const16, offset~ : BranchOffset16)
+  BranchI32Or(lhs~ : Slot, rhs~ : Slot, offset~ : BranchOffset16)
+  BranchI32OrImm16(lhs~ : Slot, rhs~ : Const16, offset~ : BranchOffset16)
+  BranchI32Nand(lhs~ : Slot, rhs~ : Slot, offset~ : BranchOffset16)
+  BranchI32NandImm16(lhs~ : Slot, rhs~ : Const16, offset~ : BranchOffset16)
+  BranchI32Nor(lhs~ : Slot, rhs~ : Slot, offset~ : BranchOffset16)
+  BranchI32NorImm16(lhs~ : Slot, rhs~ : Const16, offset~ : BranchOffset16)
+  BranchI32Eq(lhs~ : Slot, rhs~ : Slot, offset~ : BranchOffset16)
+  BranchI32EqImm16(lhs~ : Slot, rhs~ : Const16, offset~ : BranchOffset16)
+  BranchI32Ne(lhs~ : Slot, rhs~ : Slot, offset~ : BranchOffset16)
+  BranchI32NeImm16(lhs~ : Slot, rhs~ : Const16, offset~ : BranchOffset16)
+  BranchI32LtS(lhs~ : Slot, rhs~ : Slot, offset~ : BranchOffset16)
+  BranchI32LtSImm16Lhs(lhs~ : Const16, rhs~ : Slot, offset~ : BranchOffset16)
+  BranchI32LtSImm16Rhs(lhs~ : Slot, rhs~ : Const16, offset~ : BranchOffset16)
+  BranchI32LtU(lhs~ : Slot, rhs~ : Slot, offset~ : BranchOffset16)
+  BranchI32LtUImm16Lhs(lhs~ : Const16, rhs~ : Slot, offset~ : BranchOffset16)
+  BranchI32LtUImm16Rhs(lhs~ : Slot, rhs~ : Const16, offset~ : BranchOffset16)
+  BranchI32LeS(lhs~ : Slot, rhs~ : Slot, offset~ : BranchOffset16)
+  BranchI32LeSImm16Lhs(lhs~ : Const16, rhs~ : Slot, offset~ : BranchOffset16)
+  BranchI32LeSImm16Rhs(lhs~ : Slot, rhs~ : Const16, offset~ : BranchOffset16)
+  BranchI32LeU(lhs~ : Slot, rhs~ : Slot, offset~ : BranchOffset16)
+  BranchI32LeUImm16Lhs(lhs~ : Const16, rhs~ : Slot, offset~ : BranchOffset16)
+  BranchI32LeUImm16Rhs(lhs~ : Slot, rhs~ : Const16, offset~ : BranchOffset16)
+  BranchI64And(lhs~ : Slot, rhs~ : Slot, offset~ : BranchOffset16)
+  BranchI64AndImm16(lhs~ : Slot, rhs~ : Const16, offset~ : BranchOffset16)
+  BranchI64Or(lhs~ : Slot, rhs~ : Slot, offset~ : BranchOffset16)
+  BranchI64OrImm16(lhs~ : Slot, rhs~ : Const16, offset~ : BranchOffset16)
+  BranchI64Nand(lhs~ : Slot, rhs~ : Slot, offset~ : BranchOffset16)
+  BranchI64NandImm16(lhs~ : Slot, rhs~ : Const16, offset~ : BranchOffset16)
+  BranchI64Nor(lhs~ : Slot, rhs~ : Slot, offset~ : BranchOffset16)
+  BranchI64NorImm16(lhs~ : Slot, rhs~ : Const16, offset~ : BranchOffset16)
+  BranchI64Eq(lhs~ : Slot, rhs~ : Slot, offset~ : BranchOffset16)
+  BranchI64EqImm16(lhs~ : Slot, rhs~ : Const16, offset~ : BranchOffset16)
+  BranchI64Ne(lhs~ : Slot, rhs~ : Slot, offset~ : BranchOffset16)
+  BranchI64NeImm16(lhs~ : Slot, rhs~ : Const16, offset~ : BranchOffset16)
+  BranchI64LtS(lhs~ : Slot, rhs~ : Slot, offset~ : BranchOffset16)
+  BranchI64LtSImm16Lhs(lhs~ : Const16, rhs~ : Slot, offset~ : BranchOffset16)
+  BranchI64LtSImm16Rhs(lhs~ : Slot, rhs~ : Const16, offset~ : BranchOffset16)
+  BranchI64LtU(lhs~ : Slot, rhs~ : Slot, offset~ : BranchOffset16)
+  BranchI64LtUImm16Lhs(lhs~ : Const16, rhs~ : Slot, offset~ : BranchOffset16)
+  BranchI64LtUImm16Rhs(lhs~ : Slot, rhs~ : Const16, offset~ : BranchOffset16)
+  BranchI64LeS(lhs~ : Slot, rhs~ : Slot, offset~ : BranchOffset16)
+  BranchI64LeSImm16Lhs(lhs~ : Const16, rhs~ : Slot, offset~ : BranchOffset16)
+  BranchI64LeSImm16Rhs(lhs~ : Slot, rhs~ : Const16, offset~ : BranchOffset16)
+  BranchI64LeU(lhs~ : Slot, rhs~ : Slot, offset~ : BranchOffset16)
+  BranchI64LeUImm16Lhs(lhs~ : Const16, rhs~ : Slot, offset~ : BranchOffset16)
+  BranchI64LeUImm16Rhs(lhs~ : Slot, rhs~ : Const16, offset~ : BranchOffset16)
+  BranchF32Eq(lhs~ : Slot, rhs~ : Slot, offset~ : BranchOffset16)
+  BranchF32Ne(lhs~ : Slot, rhs~ : Slot, offset~ : BranchOffset16)
+  BranchF32Lt(lhs~ : Slot, rhs~ : Slot, offset~ : BranchOffset16)
+  BranchF32Le(lhs~ : Slot, rhs~ : Slot, offset~ : BranchOffset16)
+  BranchF32NotLt(lhs~ : Slot, rhs~ : Slot, offset~ : BranchOffset16)
+  BranchF32NotLe(lhs~ : Slot, rhs~ : Slot, offset~ : BranchOffset16)
+  BranchF64Eq(lhs~ : Slot, rhs~ : Slot, offset~ : BranchOffset16)
+  BranchF64Ne(lhs~ : Slot, rhs~ : Slot, offset~ : BranchOffset16)
+  BranchF64Lt(lhs~ : Slot, rhs~ : Slot, offset~ : BranchOffset16)
+  BranchF64Le(lhs~ : Slot, rhs~ : Slot, offset~ : BranchOffset16)
+  BranchF64NotLt(lhs~ : Slot, rhs~ : Slot, offset~ : BranchOffset16)
+  BranchF64NotLe(lhs~ : Slot, rhs~ : Slot, offset~ : BranchOffset16)
+  BranchTable0(index~ : Slot, len_targets~ : Int)
+  BranchTableSpan(index~ : Slot, len_targets~ : Int)
+  Copy(result~ : Slot, value~ : Slot)
+  Copy2(results~ : FixedSlotSpan, values~ : FixedArray[Slot])
+  CopyImm32(result~ : Slot, value~ : AnyConst32)
+  CopyI64Imm32(result~ : Slot, value~ : Const32)
+  CopyF64Imm32(result~ : Slot, value~ : Const32)
+  CopySpan(results~ : SlotSpan, values~ : SlotSpan, len~ : Int)
+  CopyMany(results~ : SlotSpan, values~ : FixedArray[Slot])
+  ReturnCallInternal0(func~ : InternalFunc)
+  ReturnCallInternal(func~ : InternalFunc)
+  ReturnCallImported0(func~ : Func)
+  ReturnCallImported(func~ : Func)
+  ReturnCallIndirect0(func_type~ : FuncType)
+  ReturnCallIndirect0Imm16(func_type~ : FuncType)
+  ReturnCallIndirect(func_type~ : FuncType)
+  ReturnCallIndirectImm16(func_type~ : FuncType)
+  CallInternal0(results~ : SlotSpan, func~ : InternalFunc)
+  CallInternal(results~ : SlotSpan, func~ : InternalFunc)
+  CallImported0(results~ : SlotSpan, func~ : Func)
+  CallImported(results~ : SlotSpan, func~ : Func)
+  CallIndirect0(results~ : SlotSpan, func_type~ : FuncType)
+  CallIndirect0Imm16(results~ : SlotSpan, func_type~ : FuncType)
+  CallIndirect(results~ : SlotSpan, func_type~ : FuncType)
+  CallIndirectImm16(results~ : SlotSpan, func_type~ : FuncType)
+  SelectI32And(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  SelectI32AndImm16(result~ : Slot, lhs~ : Slot, rhs~ : Const16)
+  SelectI32Or(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  SelectI32OrImm16(result~ : Slot, lhs~ : Slot, rhs~ : Const16)
+  SelectI32Eq(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  SelectI32EqImm16(result~ : Slot, lhs~ : Slot, rhs~ : Const16)
+  SelectI32LtS(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  SelectI32LtSImm16Rhs(result~ : Slot, lhs~ : Slot, rhs~ : Const16)
+  SelectI32LtU(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  SelectI32LtUImm16Rhs(result~ : Slot, lhs~ : Slot, rhs~ : Const16)
+  SelectI32LeS(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  SelectI32LeSImm16Rhs(result~ : Slot, lhs~ : Slot, rhs~ : Const16)
+  SelectI32LeU(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  SelectI32LeUImm16Rhs(result~ : Slot, lhs~ : Slot, rhs~ : Const16)
+  SelectI64And(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  SelectI64AndImm16(result~ : Slot, lhs~ : Slot, rhs~ : Const16)
+  SelectI64Or(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  SelectI64OrImm16(result~ : Slot, lhs~ : Slot, rhs~ : Const16)
+  SelectI64Eq(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  SelectI64EqImm16(result~ : Slot, lhs~ : Slot, rhs~ : Const16)
+  SelectI64LtS(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  SelectI64LtSImm16Rhs(result~ : Slot, lhs~ : Slot, rhs~ : Const16)
+  SelectI64LtU(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  SelectI64LtUImm16Rhs(result~ : Slot, lhs~ : Slot, rhs~ : Const16)
+  SelectI64LeS(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  SelectI64LeSImm16Rhs(result~ : Slot, lhs~ : Slot, rhs~ : Const16)
+  SelectI64LeU(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  SelectI64LeUImm16Rhs(result~ : Slot, lhs~ : Slot, rhs~ : Const16)
+  SelectF32Eq(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  SelectF32Lt(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  SelectF32Le(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  SelectF64Eq(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  SelectF64Lt(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  SelectF64Le(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  RefFunc(result~ : Slot, func~ : Func)
+  GlobalGet(result~ : Slot, global~ : Global)
+  GlobalSet(input~ : Slot, global~ : Global)
+  GlobalSetI32Imm16(input~ : Const16, global~ : Global)
+  GlobalSetI64Imm16(input~ : Const16, global~ : Global)
+  Load32(result~ : Slot, offset_lo~ : Offset64Lo)
+  Load32At(result~ : Slot, address~ : Address32)
+  Load32Offset16(result~ : Slot, ptr~ : Slot, offset~ : Offset16)
+  Load64(result~ : Slot, offset_lo~ : Offset64Lo)
+  Load64At(result~ : Slot, address~ : Address32)
+  Load64Offset16(result~ : Slot, ptr~ : Slot, offset~ : Offset16)
+  I32Load8s(result~ : Slot, offset_lo~ : Offset64Lo)
+  I32Load8sAt(result~ : Slot, address~ : Address32)
+  I32Load8sOffset16(result~ : Slot, ptr~ : Slot, offset~ : Offset16)
+  I32Load8u(result~ : Slot, offset_lo~ : Offset64Lo)
+  I32Load8uAt(result~ : Slot, address~ : Address32)
+  I32Load8uOffset16(result~ : Slot, ptr~ : Slot, offset~ : Offset16)
+  I32Load16s(result~ : Slot, offset_lo~ : Offset64Lo)
+  I32Load16sAt(result~ : Slot, address~ : Address32)
+  I32Load16sOffset16(result~ : Slot, ptr~ : Slot, offset~ : Offset16)
+  I32Load16u(result~ : Slot, offset_lo~ : Offset64Lo)
+  I32Load16uAt(result~ : Slot, address~ : Address32)
+  I32Load16uOffset16(result~ : Slot, ptr~ : Slot, offset~ : Offset16)
+  I64Load8s(result~ : Slot, offset_lo~ : Offset64Lo)
+  I64Load8sAt(result~ : Slot, address~ : Address32)
+  I64Load8sOffset16(result~ : Slot, ptr~ : Slot, offset~ : Offset16)
+  I64Load8u(result~ : Slot, offset_lo~ : Offset64Lo)
+  I64Load8uAt(result~ : Slot, address~ : Address32)
+  I64Load8uOffset16(result~ : Slot, ptr~ : Slot, offset~ : Offset16)
+  I64Load16s(result~ : Slot, offset_lo~ : Offset64Lo)
+  I64Load16sAt(result~ : Slot, address~ : Address32)
+  I64Load16sOffset16(result~ : Slot, ptr~ : Slot, offset~ : Offset16)
+  I64Load16u(result~ : Slot, offset_lo~ : Offset64Lo)
+  I64Load16uAt(result~ : Slot, address~ : Address32)
+  I64Load16uOffset16(result~ : Slot, ptr~ : Slot, offset~ : Offset16)
+  I64Load32s(result~ : Slot, offset_lo~ : Offset64Lo)
+  I64Load32sAt(result~ : Slot, address~ : Address32)
+  I64Load32sOffset16(result~ : Slot, ptr~ : Slot, offset~ : Offset16)
+  I64Load32u(result~ : Slot, offset_lo~ : Offset64Lo)
+  I64Load32uAt(result~ : Slot, address~ : Address32)
+  I64Load32uOffset16(result~ : Slot, ptr~ : Slot, offset~ : Offset16)
+  Store32(ptr~ : Slot, offset_lo~ : Offset64Lo)
+  Store32Offset16(ptr~ : Slot, offset~ : Offset16, value~ : Slot)
+  Store32At(value~ : Slot, address~ : Address32)
+  Store64(ptr~ : Slot, offset_lo~ : Offset64Lo)
+  Store64Offset16(ptr~ : Slot, offset~ : Offset16, value~ : Slot)
+  Store64At(value~ : Slot, address~ : Address32)
+  I32StoreImm16(ptr~ : Slot, offset_lo~ : Offset64Lo)
+  I32StoreOffset16Imm16(ptr~ : Slot, offset~ : Offset16, value~ : Const16)
+  I32StoreAtImm16(value~ : Const16, address~ : Address32)
+  I32Store8(ptr~ : Slot, offset_lo~ : Offset64Lo)
+  I32Store8Imm(ptr~ : Slot, offset_lo~ : Offset64Lo)
+  I32Store8Offset16(ptr~ : Slot, offset~ : Offset16, value~ : Slot)
+  I32Store8Offset16Imm(ptr~ : Slot, offset~ : Offset16, value~ : Int)
+  I32Store8At(value~ : Slot, address~ : Address32)
+  I32Store8AtImm(value~ : Int, address~ : Address32)
+  I32Store16(ptr~ : Slot, offset_lo~ : Offset64Lo)
+  I32Store16Imm(ptr~ : Slot, offset_lo~ : Offset64Lo)
+  I32Store16Offset16(ptr~ : Slot, offset~ : Offset16, value~ : Slot)
+  I32Store16Offset16Imm(ptr~ : Slot, offset~ : Offset16, value~ : Int)
+  I32Store16At(value~ : Slot, address~ : Address32)
+  I32Store16AtImm(value~ : Int, address~ : Address32)
+  I64StoreImm16(ptr~ : Slot, offset_lo~ : Offset64Lo)
+  I64StoreOffset16Imm16(ptr~ : Slot, offset~ : Offset16, value~ : Const16)
+  I64StoreAtImm16(value~ : Const16, address~ : Address32)
+  I64Store8(ptr~ : Slot, offset_lo~ : Offset64Lo)
+  I64Store8Imm(ptr~ : Slot, offset_lo~ : Offset64Lo)
+  I64Store8Offset16(ptr~ : Slot, offset~ : Offset16, value~ : Slot)
+  I64Store8Offset16Imm(ptr~ : Slot, offset~ : Offset16, value~ : Int)
+  I64Store8At(value~ : Slot, address~ : Address32)
+  I64Store8AtImm(value~ : Int, address~ : Address32)
+  I64Store16(ptr~ : Slot, offset_lo~ : Offset64Lo)
+  I64Store16Imm(ptr~ : Slot, offset_lo~ : Offset64Lo)
+  I64Store16Offset16(ptr~ : Slot, offset~ : Offset16, value~ : Slot)
+  I64Store16Offset16Imm(ptr~ : Slot, offset~ : Offset16, value~ : Int)
+  I64Store16At(value~ : Slot, address~ : Address32)
+  I64Store16AtImm(value~ : Int, address~ : Address32)
+  I64Store32(ptr~ : Slot, offset_lo~ : Offset64Lo)
+  I64Store32Imm16(ptr~ : Slot, offset_lo~ : Offset64Lo)
+  I64Store32Offset16(ptr~ : Slot, offset~ : Offset16, value~ : Slot)
+  I64Store32Offset16Imm16(ptr~ : Slot, offset~ : Offset16, value~ : Const16)
+  I64Store32At(value~ : Slot, address~ : Address32)
+  I64Store32AtImm16(value~ : Const16, address~ : Address32)
+  I32Eq(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I32EqImm16(result~ : Slot, lhs~ : Slot, rhs~ : Const16)
+  I32Ne(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I32NeImm16(result~ : Slot, lhs~ : Slot, rhs~ : Const16)
+  I32LtS(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I32LtSImm16Lhs(result~ : Slot, lhs~ : Const16, rhs~ : Slot)
+  I32LtSImm16Rhs(result~ : Slot, lhs~ : Slot, rhs~ : Const16)
+  I32LtU(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I32LtUImm16Lhs(result~ : Slot, lhs~ : Const16, rhs~ : Slot)
+  I32LtUImm16Rhs(result~ : Slot, lhs~ : Slot, rhs~ : Const16)
+  I32LeS(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I32LeSImm16Lhs(result~ : Slot, lhs~ : Const16, rhs~ : Slot)
+  I32LeSImm16Rhs(result~ : Slot, lhs~ : Slot, rhs~ : Const16)
+  I32LeU(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I32LeUImm16Lhs(result~ : Slot, lhs~ : Const16, rhs~ : Slot)
+  I32LeUImm16Rhs(result~ : Slot, lhs~ : Slot, rhs~ : Const16)
+  I64Eq(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I64EqImm16(result~ : Slot, lhs~ : Slot, rhs~ : Const16)
+  I64Ne(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I64NeImm16(result~ : Slot, lhs~ : Slot, rhs~ : Const16)
+  I64LtS(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I64LtSImm16Lhs(result~ : Slot, lhs~ : Const16, rhs~ : Slot)
+  I64LtSImm16Rhs(result~ : Slot, lhs~ : Slot, rhs~ : Const16)
+  I64LtU(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I64LtUImm16Lhs(result~ : Slot, lhs~ : Const16, rhs~ : Slot)
+  I64LtUImm16Rhs(result~ : Slot, lhs~ : Slot, rhs~ : Const16)
+  I64LeS(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I64LeSImm16Lhs(result~ : Slot, lhs~ : Const16, rhs~ : Slot)
+  I64LeSImm16Rhs(result~ : Slot, lhs~ : Slot, rhs~ : Const16)
+  I64LeU(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I64LeUImm16Lhs(result~ : Slot, lhs~ : Const16, rhs~ : Slot)
+  I64LeUImm16Rhs(result~ : Slot, lhs~ : Slot, rhs~ : Const16)
+  F32Eq(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  F32Ne(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  F32Lt(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  F32Le(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  F32NotLt(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  F32NotLe(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  F64Eq(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  F64Ne(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  F64Lt(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  F64Le(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  F64NotLt(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  F64NotLe(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I32Clz(result~ : Slot, input~ : Slot)
+  I32Ctz(result~ : Slot, input~ : Slot)
+  I32Popcnt(result~ : Slot, input~ : Slot)
+  I32Add(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I32AddImm16(result~ : Slot, lhs~ : Slot, rhs~ : Const16)
+  I32Sub(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I32SubImm16Lhs(result~ : Slot, lhs~ : Const16, rhs~ : Slot)
+  I32Mul(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I32MulImm16(result~ : Slot, lhs~ : Slot, rhs~ : Const16)
+  I32DivS(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I32DivSImm16Rhs(result~ : Slot, lhs~ : Slot, rhs~ : Const16)
+  I32DivSImm16Lhs(result~ : Slot, lhs~ : Const16, rhs~ : Slot)
+  I32DivU(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I32DivUImm16Rhs(result~ : Slot, lhs~ : Slot, rhs~ : Const16)
+  I32DivUImm16Lhs(result~ : Slot, lhs~ : Const16, rhs~ : Slot)
+  I32RemS(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I32RemSImm16Rhs(result~ : Slot, lhs~ : Slot, rhs~ : Const16)
+  I32RemSImm16Lhs(result~ : Slot, lhs~ : Const16, rhs~ : Slot)
+  I32RemU(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I32RemUImm16Rhs(result~ : Slot, lhs~ : Slot, rhs~ : Const16)
+  I32RemUImm16Lhs(result~ : Slot, lhs~ : Const16, rhs~ : Slot)
+  I32BitAnd(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I32BitAndImm16(result~ : Slot, lhs~ : Slot, rhs~ : Const16)
+  I32BitOr(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I32BitOrImm16(result~ : Slot, lhs~ : Slot, rhs~ : Const16)
+  I32BitXor(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I32BitXorImm16(result~ : Slot, lhs~ : Slot, rhs~ : Const16)
+  I32And(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I32AndImm16(result~ : Slot, lhs~ : Slot, rhs~ : Const16)
+  I32Or(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I32OrImm16(result~ : Slot, lhs~ : Slot, rhs~ : Const16)
+  I32Nand(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I32NandImm16(result~ : Slot, lhs~ : Slot, rhs~ : Const16)
+  I32Nor(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I32NorImm16(result~ : Slot, lhs~ : Slot, rhs~ : Const16)
+  I32Shl(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I32ShlBy(result~ : Slot, lhs~ : Slot, rhs~ : ShiftAmount)
+  I32ShlImm16(result~ : Slot, lhs~ : Const16, rhs~ : Slot)
+  I32ShrU(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I32ShrUBy(result~ : Slot, lhs~ : Slot, rhs~ : ShiftAmount)
+  I32ShrUImm16(result~ : Slot, lhs~ : Const16, rhs~ : Slot)
+  I32ShrS(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I32ShrSBy(result~ : Slot, lhs~ : Slot, rhs~ : ShiftAmount)
+  I32ShrSImm16(result~ : Slot, lhs~ : Const16, rhs~ : Slot)
+  I32Rotl(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I32RotlBy(result~ : Slot, lhs~ : Slot, rhs~ : ShiftAmount)
+  I32RotlImm16(result~ : Slot, lhs~ : Const16, rhs~ : Slot)
+  I32Rotr(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I32RotrBy(result~ : Slot, lhs~ : Slot, rhs~ : ShiftAmount)
+  I32RotrImm16(result~ : Slot, lhs~ : Const16, rhs~ : Slot)
+  I64Clz(result~ : Slot, input~ : Slot)
+  I64Ctz(result~ : Slot, input~ : Slot)
+  I64Popcnt(result~ : Slot, input~ : Slot)
+  I64Add(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I64AddImm16(result~ : Slot, lhs~ : Slot, rhs~ : Const16)
+  I64Sub(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I64SubImm16Lhs(result~ : Slot, lhs~ : Const16, rhs~ : Slot)
+  I64Mul(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I64MulImm16(result~ : Slot, lhs~ : Slot, rhs~ : Const16)
+  I64DivS(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I64DivSImm16Rhs(result~ : Slot, lhs~ : Slot, rhs~ : Const16)
+  I64DivSImm16Lhs(result~ : Slot, lhs~ : Const16, rhs~ : Slot)
+  I64DivU(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I64DivUImm16Rhs(result~ : Slot, lhs~ : Slot, rhs~ : Const16)
+  I64DivUImm16Lhs(result~ : Slot, lhs~ : Const16, rhs~ : Slot)
+  I64RemS(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I64RemSImm16Rhs(result~ : Slot, lhs~ : Slot, rhs~ : Const16)
+  I64RemSImm16Lhs(result~ : Slot, lhs~ : Const16, rhs~ : Slot)
+  I64RemU(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I64RemUImm16Rhs(result~ : Slot, lhs~ : Slot, rhs~ : Const16)
+  I64RemUImm16Lhs(result~ : Slot, lhs~ : Const16, rhs~ : Slot)
+  I64BitAnd(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I64BitAndImm16(result~ : Slot, lhs~ : Slot, rhs~ : Const16)
+  I64BitOr(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I64BitOrImm16(result~ : Slot, lhs~ : Slot, rhs~ : Const16)
+  I64BitXor(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I64BitXorImm16(result~ : Slot, lhs~ : Slot, rhs~ : Const16)
+  I64And(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I64AndImm16(result~ : Slot, lhs~ : Slot, rhs~ : Const16)
+  I64Or(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I64OrImm16(result~ : Slot, lhs~ : Slot, rhs~ : Const16)
+  I64Nand(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I64NandImm16(result~ : Slot, lhs~ : Slot, rhs~ : Const16)
+  I64Nor(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I64NorImm16(result~ : Slot, lhs~ : Slot, rhs~ : Const16)
+  I64Shl(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I64ShlBy(result~ : Slot, lhs~ : Slot, rhs~ : ShiftAmount)
+  I64ShlImm16(result~ : Slot, lhs~ : Const16, rhs~ : Slot)
+  I64ShrU(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I64ShrUBy(result~ : Slot, lhs~ : Slot, rhs~ : ShiftAmount)
+  I64ShrUImm16(result~ : Slot, lhs~ : Const16, rhs~ : Slot)
+  I64ShrS(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I64ShrSBy(result~ : Slot, lhs~ : Slot, rhs~ : ShiftAmount)
+  I64ShrSImm16(result~ : Slot, lhs~ : Const16, rhs~ : Slot)
+  I64Rotl(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I64RotlBy(result~ : Slot, lhs~ : Slot, rhs~ : ShiftAmount)
+  I64RotlImm16(result~ : Slot, lhs~ : Const16, rhs~ : Slot)
+  I64Rotr(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I64RotrBy(result~ : Slot, lhs~ : Slot, rhs~ : ShiftAmount)
+  I64RotrImm16(result~ : Slot, lhs~ : Const16, rhs~ : Slot)
+  I32WrapI64(result~ : Slot, input~ : Slot)
+  I64Add128(results~ : FixedArray[Slot], lhs_lo~ : Slot)
+  I64Sub128(results~ : FixedArray[Slot], lhs_lo~ : Slot)
+  I64MulWideS(results~ : FixedSlotSpan, lhs~ : Slot, rhs~ : Slot)
+  I64MulWideU(results~ : FixedSlotSpan, lhs~ : Slot, rhs~ : Slot)
+  I32Extend8S(result~ : Slot, input~ : Slot)
+  I32Extend16S(result~ : Slot, input~ : Slot)
+  I64Extend8S(result~ : Slot, input~ : Slot)
+  I64Extend16S(result~ : Slot, input~ : Slot)
+  I64Extend32S(result~ : Slot, input~ : Slot)
+  F32Abs(result~ : Slot, input~ : Slot)
+  F32Neg(result~ : Slot, input~ : Slot)
+  F32Ceil(result~ : Slot, input~ : Slot)
+  F32Floor(result~ : Slot, input~ : Slot)
+  F32Trunc(result~ : Slot, input~ : Slot)
+  F32Nearest(result~ : Slot, input~ : Slot)
+  F32Sqrt(result~ : Slot, input~ : Slot)
+  F32Add(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  F32Sub(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  F32Mul(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  F32Div(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  F32Min(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  F32Max(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  F32Copysign(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  F32CopysignImm(result~ : Slot, lhs~ : Slot, rhs~ : Sign)
+  F64Abs(result~ : Slot, input~ : Slot)
+  F64Neg(result~ : Slot, input~ : Slot)
+  F64Ceil(result~ : Slot, input~ : Slot)
+  F64Floor(result~ : Slot, input~ : Slot)
+  F64Trunc(result~ : Slot, input~ : Slot)
+  F64Nearest(result~ : Slot, input~ : Slot)
+  F64Sqrt(result~ : Slot, input~ : Slot)
+  F64Add(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  F64Sub(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  F64Mul(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  F64Div(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  F64Min(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  F64Max(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  F64Copysign(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  F64CopysignImm(result~ : Slot, lhs~ : Slot, rhs~ : Sign)
+  I32TruncF32S(result~ : Slot, input~ : Slot)
+  I32TruncF32U(result~ : Slot, input~ : Slot)
+  I32TruncF64S(result~ : Slot, input~ : Slot)
+  I32TruncF64U(result~ : Slot, input~ : Slot)
+  I64TruncF32S(result~ : Slot, input~ : Slot)
+  I64TruncF32U(result~ : Slot, input~ : Slot)
+  I64TruncF64S(result~ : Slot, input~ : Slot)
+  I64TruncF64U(result~ : Slot, input~ : Slot)
+  I32TruncSatF32S(result~ : Slot, input~ : Slot)
+  I32TruncSatF32U(result~ : Slot, input~ : Slot)
+  I32TruncSatF64S(result~ : Slot, input~ : Slot)
+  I32TruncSatF64U(result~ : Slot, input~ : Slot)
+  I64TruncSatF32S(result~ : Slot, input~ : Slot)
+  I64TruncSatF32U(result~ : Slot, input~ : Slot)
+  I64TruncSatF64S(result~ : Slot, input~ : Slot)
+  I64TruncSatF64U(result~ : Slot, input~ : Slot)
+  F32DemoteF64(result~ : Slot, input~ : Slot)
+  F64PromoteF32(result~ : Slot, input~ : Slot)
+  F32ConvertI32S(result~ : Slot, input~ : Slot)
+  F32ConvertI32U(result~ : Slot, input~ : Slot)
+  F32ConvertI64S(result~ : Slot, input~ : Slot)
+  F32ConvertI64U(result~ : Slot, input~ : Slot)
+  F64ConvertI32S(result~ : Slot, input~ : Slot)
+  F64ConvertI32U(result~ : Slot, input~ : Slot)
+  F64ConvertI64S(result~ : Slot, input~ : Slot)
+  F64ConvertI64U(result~ : Slot, input~ : Slot)
+  TableGet(result~ : Slot, index~ : Slot)
+  TableGetImm(result~ : Slot, index~ : Const32)
+  TableSize(result~ : Slot, table~ : Table)
+  TableSet(index~ : Slot, value~ : Slot)
+  TableSetAt(value~ : Slot, index~ : Const32)
+  TableCopy(dst~ : Slot, src~ : Slot, len~ : Slot)
+  TableInit(dst~ : Slot, src~ : Slot, len~ : Slot)
+  TableFill(dst~ : Slot, len~ : Slot, value~ : Slot)
+  TableGrow(result~ : Slot, delta~ : Slot, value~ : Slot)
+  ElemDrop(index~ : Elem)
+  DataDrop(index~ : Data)
+  MemorySize(result~ : Slot, memory~ : Memory)
+  MemoryGrow(result~ : Slot, delta~ : Slot)
+  MemoryCopy(dst~ : Slot, src~ : Slot, len~ : Slot)
+  MemoryFill(dst~ : Slot, value~ : Slot, len~ : Slot)
+  MemoryFillImm(dst~ : Slot, value~ : Int, len~ : Slot)
+  MemoryInit(dst~ : Slot, src~ : Slot, len~ : Slot)
+  TableIndex(index~ : Table)
+  MemoryIndex(index~ : Memory)
+  DataIndex(index~ : Data)
+  ElemIndex(index~ : Elem)
+  Const32(value~ : AnyConst32)
+  I64Const32(value~ : Const32)
+  F64Const32(value~ : Const32)
+  BranchTableTarget(results~ : SlotSpan, offset~ : BranchOffset)
+  Imm16AndImm32(imm16~ : AnyConst16, imm32~ : AnyConst32)
+  SlotAndImm32(slot~ : Slot, imm~ : AnyConst32)
+  SlotSpan(span~ : BoundedSlotSpan)
+  Slot(slot~ : Slot)
+  Slot2(slots~ : FixedArray[Slot])
+  Slot3(slots~ : FixedArray[Slot])
+  SlotList(regs~ : FixedArray[Slot])
+  CallIndirectParams(index~ : Slot, table~ : Table)
+  CallIndirectParamsImm16(index~ : Const16, table~ : Table)
+  I8x16Splat(result~ : Slot, value~ : Slot)
+  I16x8Splat(result~ : Slot, value~ : Slot)
+  I32x4Splat(result~ : Slot, value~ : Slot)
+  I64x2Splat(result~ : Slot, value~ : Slot)
+  F32x4Splat(result~ : Slot, value~ : Slot)
+  F64x2Splat(result~ : Slot, value~ : Slot)
+  I8x16ExtractLaneS(result~ : Slot, value~ : Slot, lane~ : ImmLaneIdx)
+  I8x16ExtractLaneU(result~ : Slot, value~ : Slot, lane~ : ImmLaneIdx)
+  I16x8ExtractLaneS(result~ : Slot, value~ : Slot, lane~ : ImmLaneIdx)
+  I16x8ExtractLaneU(result~ : Slot, value~ : Slot, lane~ : ImmLaneIdx)
+  I32x4ExtractLane(result~ : Slot, value~ : Slot, lane~ : ImmLaneIdx)
+  I64x2ExtractLane(result~ : Slot, value~ : Slot, lane~ : ImmLaneIdx)
+  F32x4ExtractLane(result~ : Slot, value~ : Slot, lane~ : ImmLaneIdx)
+  F64x2ExtractLane(result~ : Slot, value~ : Slot, lane~ : ImmLaneIdx)
+  I8x16ReplaceLane(result~ : Slot, input~ : Slot, lane~ : ImmLaneIdx)
+  I8x16ReplaceLaneImm(result~ : Slot, input~ : Slot, lane~ : ImmLaneIdx, value~ : Int)
+  I16x8ReplaceLane(result~ : Slot, input~ : Slot, lane~ : ImmLaneIdx)
+  I16x8ReplaceLaneImm(result~ : Slot, input~ : Slot, lane~ : ImmLaneIdx)
+  I32x4ReplaceLane(result~ : Slot, input~ : Slot, lane~ : ImmLaneIdx)
+  I32x4ReplaceLaneImm(result~ : Slot, input~ : Slot, lane~ : ImmLaneIdx)
+  I64x2ReplaceLane(result~ : Slot, input~ : Slot, lane~ : ImmLaneIdx)
+  I64x2ReplaceLaneImm32(result~ : Slot, input~ : Slot, lane~ : ImmLaneIdx)
+  F32x4ReplaceLane(result~ : Slot, input~ : Slot, lane~ : ImmLaneIdx)
+  F32x4ReplaceLaneImm(result~ : Slot, input~ : Slot, lane~ : ImmLaneIdx)
+  F64x2ReplaceLane(result~ : Slot, input~ : Slot, lane~ : ImmLaneIdx)
+  F64x2ReplaceLaneImm32(result~ : Slot, input~ : Slot, lane~ : ImmLaneIdx)
+  I8x16Shuffle(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I8x16Swizzle(result~ : Slot, input~ : Slot, selector~ : Slot)
+  I8x16Add(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I16x8Add(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I32x4Add(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I64x2Add(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I8x16Sub(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I16x8Sub(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I32x4Sub(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I64x2Sub(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I16x8Mul(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I32x4Mul(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I64x2Mul(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I32x4DotI16x8S(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I16x8RelaxedDotI8x16I7x16S(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I32x4RelaxedDotI8x16I7x16AddS(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  F32x4RelaxedMadd(result~ : Slot, a~ : Slot, b~ : Slot)
+  F32x4RelaxedNmadd(result~ : Slot, a~ : Slot, b~ : Slot)
+  F64x2RelaxedMadd(result~ : Slot, a~ : Slot, b~ : Slot)
+  F64x2RelaxedNmadd(result~ : Slot, a~ : Slot, b~ : Slot)
+  I8x16Neg(result~ : Slot, input~ : Slot)
+  I16x8Neg(result~ : Slot, input~ : Slot)
+  I32x4Neg(result~ : Slot, input~ : Slot)
+  I64x2Neg(result~ : Slot, input~ : Slot)
+  I16x8ExtmulLowI8x16S(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I16x8ExtmulHighI8x16S(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I16x8ExtmulLowI8x16U(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I16x8ExtmulHighI8x16U(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I32x4ExtmulLowI16x8S(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I32x4ExtmulHighI16x8S(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I32x4ExtmulLowI16x8U(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I32x4ExtmulHighI16x8U(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I64x2ExtmulLowI32x4S(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I64x2ExtmulHighI32x4S(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I64x2ExtmulLowI32x4U(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I64x2ExtmulHighI32x4U(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I16x8ExtaddPairwiseI8x16S(result~ : Slot, input~ : Slot)
+  I16x8ExtaddPairwiseI8x16U(result~ : Slot, input~ : Slot)
+  I32x4ExtaddPairwiseI16x8S(result~ : Slot, input~ : Slot)
+  I32x4ExtaddPairwiseI16x8U(result~ : Slot, input~ : Slot)
+  I8x16AddSatS(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I8x16AddSatU(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I16x8AddSatS(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I16x8AddSatU(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I8x16SubSatS(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I8x16SubSatU(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I16x8SubSatS(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I16x8SubSatU(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I16x8Q15MulrSatS(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I8x16MinS(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I8x16MinU(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I16x8MinS(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I16x8MinU(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I32x4MinS(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I32x4MinU(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I8x16MaxS(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I8x16MaxU(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I16x8MaxS(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I16x8MaxU(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I32x4MaxS(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I32x4MaxU(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I8x16AvgrU(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I16x8AvgrU(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I8x16Abs(result~ : Slot, input~ : Slot)
+  I16x8Abs(result~ : Slot, input~ : Slot)
+  I32x4Abs(result~ : Slot, input~ : Slot)
+  I64x2Abs(result~ : Slot, input~ : Slot)
+  I8x16Shl(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I8x16ShlBy(result~ : Slot, lhs~ : Slot, rhs~ : ShiftAmount)
+  I16x8Shl(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I16x8ShlBy(result~ : Slot, lhs~ : Slot, rhs~ : ShiftAmount)
+  I32x4Shl(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I32x4ShlBy(result~ : Slot, lhs~ : Slot, rhs~ : ShiftAmount)
+  I64x2Shl(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I64x2ShlBy(result~ : Slot, lhs~ : Slot, rhs~ : ShiftAmount)
+  I8x16ShrS(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I8x16ShrSBy(result~ : Slot, lhs~ : Slot, rhs~ : ShiftAmount)
+  I8x16ShrU(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I8x16ShrUBy(result~ : Slot, lhs~ : Slot, rhs~ : ShiftAmount)
+  I16x8ShrS(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I16x8ShrSBy(result~ : Slot, lhs~ : Slot, rhs~ : ShiftAmount)
+  I16x8ShrU(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I16x8ShrUBy(result~ : Slot, lhs~ : Slot, rhs~ : ShiftAmount)
+  I32x4ShrS(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I32x4ShrSBy(result~ : Slot, lhs~ : Slot, rhs~ : ShiftAmount)
+  I32x4ShrU(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I32x4ShrUBy(result~ : Slot, lhs~ : Slot, rhs~ : ShiftAmount)
+  I64x2ShrS(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I64x2ShrSBy(result~ : Slot, lhs~ : Slot, rhs~ : ShiftAmount)
+  I64x2ShrU(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I64x2ShrUBy(result~ : Slot, lhs~ : Slot, rhs~ : ShiftAmount)
+  V128And(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  V128Or(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  V128Xor(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  V128Andnot(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  V128Not(result~ : Slot, input~ : Slot)
+  V128Bitselect(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I8x16Popcnt(result~ : Slot, input~ : Slot)
+  V128AnyTrue(result~ : Slot, input~ : Slot)
+  I8x16AllTrue(result~ : Slot, input~ : Slot)
+  I16x8AllTrue(result~ : Slot, input~ : Slot)
+  I32x4AllTrue(result~ : Slot, input~ : Slot)
+  I64x2AllTrue(result~ : Slot, input~ : Slot)
+  I8x16Bitmask(result~ : Slot, input~ : Slot)
+  I16x8Bitmask(result~ : Slot, input~ : Slot)
+  I32x4Bitmask(result~ : Slot, input~ : Slot)
+  I64x2Bitmask(result~ : Slot, input~ : Slot)
+  I8x16Eq(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I16x8Eq(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I32x4Eq(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I64x2Eq(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  F32x4Eq(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  F64x2Eq(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I8x16Ne(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I16x8Ne(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I32x4Ne(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I64x2Ne(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  F32x4Ne(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  F64x2Ne(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I8x16LtS(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I8x16LtU(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I16x8LtS(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I16x8LtU(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I32x4LtS(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I32x4LtU(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I64x2LtS(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  F32x4Lt(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  F64x2Lt(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I8x16LeS(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I8x16LeU(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I16x8LeS(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I16x8LeU(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I32x4LeS(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I32x4LeU(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I64x2LeS(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  F32x4Le(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  F64x2Le(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  F32x4Neg(result~ : Slot, input~ : Slot)
+  F64x2Neg(result~ : Slot, input~ : Slot)
+  F32x4Abs(result~ : Slot, input~ : Slot)
+  F64x2Abs(result~ : Slot, input~ : Slot)
+  F32x4Min(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  F64x2Min(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  F32x4Max(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  F64x2Max(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  F32x4Pmin(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  F64x2Pmin(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  F32x4Pmax(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  F64x2Pmax(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  F32x4Add(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  F64x2Add(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  F32x4Sub(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  F64x2Sub(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  F32x4Div(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  F64x2Div(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  F32x4Mul(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  F64x2Mul(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  F32x4Sqrt(result~ : Slot, input~ : Slot)
+  F64x2Sqrt(result~ : Slot, input~ : Slot)
+  F32x4Ceil(result~ : Slot, input~ : Slot)
+  F64x2Ceil(result~ : Slot, input~ : Slot)
+  F32x4Floor(result~ : Slot, input~ : Slot)
+  F64x2Floor(result~ : Slot, input~ : Slot)
+  F32x4Trunc(result~ : Slot, input~ : Slot)
+  F64x2Trunc(result~ : Slot, input~ : Slot)
+  F32x4Nearest(result~ : Slot, input~ : Slot)
+  F64x2Nearest(result~ : Slot, input~ : Slot)
+  F32x4ConvertI32x4S(result~ : Slot, input~ : Slot)
+  F32x4ConvertI32x4U(result~ : Slot, input~ : Slot)
+  F64x2ConvertLowI32x4S(result~ : Slot, input~ : Slot)
+  F64x2ConvertLowI32x4U(result~ : Slot, input~ : Slot)
+  I32x4TruncSatF32x4S(result~ : Slot, input~ : Slot)
+  I32x4TruncSatF32x4U(result~ : Slot, input~ : Slot)
+  I32x4TruncSatF64x2SZero(result~ : Slot, input~ : Slot)
+  I32x4TruncSatF64x2UZero(result~ : Slot, input~ : Slot)
+  F32x4DemoteF64x2Zero(result~ : Slot, input~ : Slot)
+  F64x2PromoteLowF32x4(result~ : Slot, input~ : Slot)
+  I8x16NarrowI16x8S(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I8x16NarrowI16x8U(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I16x8NarrowI32x4S(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I16x8NarrowI32x4U(result~ : Slot, lhs~ : Slot, rhs~ : Slot)
+  I16x8ExtendLowI8x16S(result~ : Slot, input~ : Slot)
+  I16x8ExtendHighI8x16S(result~ : Slot, input~ : Slot)
+  I16x8ExtendLowI8x16U(result~ : Slot, input~ : Slot)
+  I16x8ExtendHighI8x16U(result~ : Slot, input~ : Slot)
+  I32x4ExtendLowI16x8S(result~ : Slot, input~ : Slot)
+  I32x4ExtendHighI16x8S(result~ : Slot, input~ : Slot)
+  I32x4ExtendLowI16x8U(result~ : Slot, input~ : Slot)
+  I32x4ExtendHighI16x8U(result~ : Slot, input~ : Slot)
+  I64x2ExtendLowI32x4S(result~ : Slot, input~ : Slot)
+  I64x2ExtendHighI32x4S(result~ : Slot, input~ : Slot)
+  I64x2ExtendLowI32x4U(result~ : Slot, input~ : Slot)
+  I64x2ExtendHighI32x4U(result~ : Slot, input~ : Slot)
+  V128Store(ptr~ : Slot, offset_lo~ : Offset64Lo)
+  V128StoreOffset16(ptr~ : Slot, offset~ : Offset16, value~ : Slot)
+  V128StoreAt(value~ : Slot, address~ : Address32)
+  V128Store8Lane(ptr~ : Slot, offset_lo~ : Offset64Lo)
+  V128Store8LaneOffset8(ptr~ : Slot, value~ : Slot, offset~ : Offset8, lane~ : ImmLaneIdx)
+  V128Store8LaneAt(value~ : Slot, address~ : Address32)
+  V128Store16Lane(ptr~ : Slot, offset_lo~ : Offset64Lo)
+  V128Store16LaneOffset8(ptr~ : Slot, value~ : Slot, offset~ : Offset8, lane~ : ImmLaneIdx)
+  V128Store16LaneAt(value~ : Slot, address~ : Address32)
+  V128Store32Lane(ptr~ : Slot, offset_lo~ : Offset64Lo)
+  V128Store32LaneOffset8(ptr~ : Slot, value~ : Slot, offset~ : Offset8, lane~ : ImmLaneIdx)
+  V128Store32LaneAt(value~ : Slot, address~ : Address32)
+  V128Store64Lane(ptr~ : Slot, offset_lo~ : Offset64Lo)
+  V128Store64LaneOffset8(ptr~ : Slot, value~ : Slot, offset~ : Offset8, lane~ : ImmLaneIdx)
+  V128Store64LaneAt(value~ : Slot, address~ : Address32)
+  V128Load(result~ : Slot, offset_lo~ : Offset64Lo)
+  V128LoadAt(result~ : Slot, address~ : Address32)
+  V128LoadOffset16(result~ : Slot, ptr~ : Slot, offset~ : Offset16)
+  V128Load32Zero(result~ : Slot, offset_lo~ : Offset64Lo)
+  V128Load32ZeroAt(result~ : Slot, address~ : Address32)
+  V128Load32ZeroOffset16(result~ : Slot, ptr~ : Slot, offset~ : Offset16)
+  V128Load64Zero(result~ : Slot, offset_lo~ : Offset64Lo)
+  V128Load64ZeroAt(result~ : Slot, address~ : Address32)
+  V128Load64ZeroOffset16(result~ : Slot, ptr~ : Slot, offset~ : Offset16)
+  V128Load8Splat(result~ : Slot, offset_lo~ : Offset64Lo)
+  V128Load8SplatAt(result~ : Slot, address~ : Address32)
+  V128Load8SplatOffset16(result~ : Slot, ptr~ : Slot, offset~ : Offset16)
+  V128Load16Splat(result~ : Slot, offset_lo~ : Offset64Lo)
+  V128Load16SplatAt(result~ : Slot, address~ : Address32)
+  V128Load16SplatOffset16(result~ : Slot, ptr~ : Slot, offset~ : Offset16)
+  V128Load32Splat(result~ : Slot, offset_lo~ : Offset64Lo)
+  V128Load32SplatAt(result~ : Slot, address~ : Address32)
+  V128Load32SplatOffset16(result~ : Slot, ptr~ : Slot, offset~ : Offset16)
+  V128Load64Splat(result~ : Slot, offset_lo~ : Offset64Lo)
+  V128Load64SplatAt(result~ : Slot, address~ : Address32)
+  V128Load64SplatOffset16(result~ : Slot, ptr~ : Slot, offset~ : Offset16)
+  V128Load8x8S(result~ : Slot, offset_lo~ : Offset64Lo)
+  V128Load8x8SAt(result~ : Slot, address~ : Address32)
+  V128Load8x8SOffset16(result~ : Slot, ptr~ : Slot, offset~ : Offset16)
+  V128Load8x8U(result~ : Slot, offset_lo~ : Offset64Lo)
+  V128Load8x8UAt(result~ : Slot, address~ : Address32)
+  V128Load8x8UOffset16(result~ : Slot, ptr~ : Slot, offset~ : Offset16)
+  V128Load16x4S(result~ : Slot, offset_lo~ : Offset64Lo)
+  V128Load16x4SAt(result~ : Slot, address~ : Address32)
+  V128Load16x4SOffset16(result~ : Slot, ptr~ : Slot, offset~ : Offset16)
+  V128Load16x4U(result~ : Slot, offset_lo~ : Offset64Lo)
+  V128Load16x4UAt(result~ : Slot, address~ : Address32)
+  V128Load16x4UOffset16(result~ : Slot, ptr~ : Slot, offset~ : Offset16)
+  V128Load32x2S(result~ : Slot, offset_lo~ : Offset64Lo)
+  V128Load32x2SAt(result~ : Slot, address~ : Address32)
+  V128Load32x2SOffset16(result~ : Slot, ptr~ : Slot, offset~ : Offset16)
+  V128Load32x2U(result~ : Slot, offset_lo~ : Offset64Lo)
+  V128Load32x2UAt(result~ : Slot, address~ : Address32)
+  V128Load32x2UOffset16(result~ : Slot, ptr~ : Slot, offset~ : Offset16)
+  V128Load8Lane(result~ : Slot, offset_lo~ : Offset64Lo)
+  V128Load8LaneAt(result~ : Slot, address~ : Address32)
+  V128Load16Lane(result~ : Slot, offset_lo~ : Offset64Lo)
+  V128Load16LaneAt(result~ : Slot, address~ : Address32)
+  V128Load32Lane(result~ : Slot, offset_lo~ : Offset64Lo)
+  V128Load32LaneAt(result~ : Slot, address~ : Address32)
+  V128Load64Lane(result~ : Slot, offset_lo~ : Offset64Lo)
+  V128Load64LaneAt(result~ : Slot, address~ : Address32)
+}
+pub fn Op::branch(BranchOffset) -> Self
+pub fn Op::branch_cmp_fallback(Slot, Slot, Slot) -> Self
+pub fn Op::branch_f32_eq(Slot, Slot, BranchOffset16) -> Self
+pub fn Op::branch_f32_le(Slot, Slot, BranchOffset16) -> Self
+pub fn Op::branch_f32_lt(Slot, Slot, BranchOffset16) -> Self
+pub fn Op::branch_f32_ne(Slot, Slot, BranchOffset16) -> Self
+pub fn Op::branch_f32_not_le(Slot, Slot, BranchOffset16) -> Self
+pub fn Op::branch_f32_not_lt(Slot, Slot, BranchOffset16) -> Self
+pub fn Op::branch_f64_eq(Slot, Slot, BranchOffset16) -> Self
+pub fn Op::branch_f64_le(Slot, Slot, BranchOffset16) -> Self
+pub fn Op::branch_f64_lt(Slot, Slot, BranchOffset16) -> Self
+pub fn Op::branch_f64_ne(Slot, Slot, BranchOffset16) -> Self
+pub fn Op::branch_f64_not_le(Slot, Slot, BranchOffset16) -> Self
+pub fn Op::branch_f64_not_lt(Slot, Slot, BranchOffset16) -> Self
+pub fn Op::branch_i32_and(Slot, Slot, BranchOffset16) -> Self
+pub fn Op::branch_i32_and_imm16(Slot, Const16, BranchOffset16) -> Self
+pub fn Op::branch_i32_eq(Slot, Slot, BranchOffset16) -> Self
+pub fn Op::branch_i32_eq_imm16(Slot, Const16, BranchOffset16) -> Self
+pub fn Op::branch_i32_le_s(Slot, Slot, BranchOffset16) -> Self
+pub fn Op::branch_i32_le_s_imm16_lhs(Const16, Slot, BranchOffset16) -> Self
+pub fn Op::branch_i32_le_s_imm16_rhs(Slot, Const16, BranchOffset16) -> Self
+pub fn Op::branch_i32_le_u(Slot, Slot, BranchOffset16) -> Self
+pub fn Op::branch_i32_le_u_imm16_lhs(Const16, Slot, BranchOffset16) -> Self
+pub fn Op::branch_i32_le_u_imm16_rhs(Slot, Const16, BranchOffset16) -> Self
+pub fn Op::branch_i32_lt_s(Slot, Slot, BranchOffset16) -> Self
+pub fn Op::branch_i32_lt_s_imm16_lhs(Const16, Slot, BranchOffset16) -> Self
+pub fn Op::branch_i32_lt_s_imm16_rhs(Slot, Const16, BranchOffset16) -> Self
+pub fn Op::branch_i32_lt_u(Slot, Slot, BranchOffset16) -> Self
+pub fn Op::branch_i32_lt_u_imm16_lhs(Const16, Slot, BranchOffset16) -> Self
+pub fn Op::branch_i32_lt_u_imm16_rhs(Slot, Const16, BranchOffset16) -> Self
+pub fn Op::branch_i32_nand(Slot, Slot, BranchOffset16) -> Self
+pub fn Op::branch_i32_nand_imm16(Slot, Const16, BranchOffset16) -> Self
+pub fn Op::branch_i32_ne(Slot, Slot, BranchOffset16) -> Self
+pub fn Op::branch_i32_ne_imm16(Slot, Const16, BranchOffset16) -> Self
+pub fn Op::branch_i32_nor(Slot, Slot, BranchOffset16) -> Self
+pub fn Op::branch_i32_nor_imm16(Slot, Const16, BranchOffset16) -> Self
+pub fn Op::branch_i32_or(Slot, Slot, BranchOffset16) -> Self
+pub fn Op::branch_i32_or_imm16(Slot, Const16, BranchOffset16) -> Self
+pub fn Op::branch_i64_and(Slot, Slot, BranchOffset16) -> Self
+pub fn Op::branch_i64_and_imm16(Slot, Const16, BranchOffset16) -> Self
+pub fn Op::branch_i64_eq(Slot, Slot, BranchOffset16) -> Self
+pub fn Op::branch_i64_eq_imm16(Slot, Const16, BranchOffset16) -> Self
+pub fn Op::branch_i64_le_s(Slot, Slot, BranchOffset16) -> Self
+pub fn Op::branch_i64_le_s_imm16_lhs(Const16, Slot, BranchOffset16) -> Self
+pub fn Op::branch_i64_le_s_imm16_rhs(Slot, Const16, BranchOffset16) -> Self
+pub fn Op::branch_i64_le_u(Slot, Slot, BranchOffset16) -> Self
+pub fn Op::branch_i64_le_u_imm16_lhs(Const16, Slot, BranchOffset16) -> Self
+pub fn Op::branch_i64_le_u_imm16_rhs(Slot, Const16, BranchOffset16) -> Self
+pub fn Op::branch_i64_lt_s(Slot, Slot, BranchOffset16) -> Self
+pub fn Op::branch_i64_lt_s_imm16_lhs(Const16, Slot, BranchOffset16) -> Self
+pub fn Op::branch_i64_lt_s_imm16_rhs(Slot, Const16, BranchOffset16) -> Self
+pub fn Op::branch_i64_lt_u(Slot, Slot, BranchOffset16) -> Self
+pub fn Op::branch_i64_lt_u_imm16_lhs(Const16, Slot, BranchOffset16) -> Self
+pub fn Op::branch_i64_lt_u_imm16_rhs(Slot, Const16, BranchOffset16) -> Self
+pub fn Op::branch_i64_nand(Slot, Slot, BranchOffset16) -> Self
+pub fn Op::branch_i64_nand_imm16(Slot, Const16, BranchOffset16) -> Self
+pub fn Op::branch_i64_ne(Slot, Slot, BranchOffset16) -> Self
+pub fn Op::branch_i64_ne_imm16(Slot, Const16, BranchOffset16) -> Self
+pub fn Op::branch_i64_nor(Slot, Slot, BranchOffset16) -> Self
+pub fn Op::branch_i64_nor_imm16(Slot, Const16, BranchOffset16) -> Self
+pub fn Op::branch_i64_or(Slot, Slot, BranchOffset16) -> Self
+pub fn Op::branch_i64_or_imm16(Slot, Const16, BranchOffset16) -> Self
+pub fn Op::branch_offset(Self) -> BranchOffset?
+pub fn Op::branch_offset16(Self) -> BranchOffset16?
+pub fn Op::branch_table_0(Slot, Int) -> Self
+pub fn Op::branch_table_span(Slot, Int) -> Self
+pub fn Op::branch_table_target(SlotSpan, BranchOffset) -> Self
+pub fn Op::call_imported(SlotSpan, Func) -> Self
+pub fn Op::call_imported_0(SlotSpan, Func) -> Self
+pub fn Op::call_indirect(SlotSpan, FuncType) -> Self
+pub fn Op::call_indirect_0(SlotSpan, FuncType) -> Self
+pub fn Op::call_indirect_0_imm16(SlotSpan, FuncType) -> Self
+pub fn Op::call_indirect_imm16(SlotSpan, FuncType) -> Self
+pub fn Op::call_indirect_params(Slot, Table) -> Self
+pub fn Op::call_indirect_params_imm16(Const16, Table) -> Self
+pub fn Op::call_internal(SlotSpan, InternalFunc) -> Self
+pub fn Op::call_internal_0(SlotSpan, InternalFunc) -> Self
+pub fn Op::const32(AnyConst32) -> Self
+pub fn Op::consume_fuel(BlockFuel) -> Self
+pub fn Op::copy(Slot, Slot) -> Self
+pub fn Op::copy2(FixedSlotSpan, FixedArray[Slot]) -> Self
+pub fn Op::copy2_ext(SlotSpan, Slot, Slot) -> Self
+pub fn Op::copy_f64imm32(Slot, Const32) -> Self
+pub fn Op::copy_i64imm32(Slot, Const32) -> Self
+pub fn Op::copy_imm32(Slot, AnyConst32) -> Self
+pub fn Op::copy_many(SlotSpan, FixedArray[Slot]) -> Self
+pub fn Op::copy_many_ext(SlotSpan, Slot, Slot) -> Self
+pub fn Op::copy_span(SlotSpan, SlotSpan, Int) -> Self
+pub fn Op::data_drop(Data) -> Self
+pub fn Op::data_index(Data) -> Self
+pub fn Op::elem_drop(Elem) -> Self
+pub fn Op::elem_index(Elem) -> Self
+pub fn Op::f32_abs(Slot, Slot) -> Self
+pub fn Op::f32_add(Slot, Slot, Slot) -> Self
+pub fn Op::f32_ceil(Slot, Slot) -> Self
+pub fn Op::f32_convert_i32_s(Slot, Slot) -> Self
+pub fn Op::f32_convert_i32_u(Slot, Slot) -> Self
+pub fn Op::f32_convert_i64_s(Slot, Slot) -> Self
+pub fn Op::f32_convert_i64_u(Slot, Slot) -> Self
+pub fn Op::f32_copysign(Slot, Slot, Slot) -> Self
+pub fn Op::f32_copysign_imm(Slot, Slot, Sign) -> Self
+pub fn Op::f32_demote_f64(Slot, Slot) -> Self
+pub fn Op::f32_div(Slot, Slot, Slot) -> Self
+pub fn Op::f32_eq(Slot, Slot, Slot) -> Self
+pub fn Op::f32_floor(Slot, Slot) -> Self
+pub fn Op::f32_le(Slot, Slot, Slot) -> Self
+pub fn Op::f32_lt(Slot, Slot, Slot) -> Self
+pub fn Op::f32_max(Slot, Slot, Slot) -> Self
+pub fn Op::f32_min(Slot, Slot, Slot) -> Self
+pub fn Op::f32_mul(Slot, Slot, Slot) -> Self
+pub fn Op::f32_ne(Slot, Slot, Slot) -> Self
+pub fn Op::f32_nearest(Slot, Slot) -> Self
+pub fn Op::f32_neg(Slot, Slot) -> Self
+pub fn Op::f32_not_le(Slot, Slot, Slot) -> Self
+pub fn Op::f32_not_lt(Slot, Slot, Slot) -> Self
+pub fn Op::f32_sqrt(Slot, Slot) -> Self
+pub fn Op::f32_sub(Slot, Slot, Slot) -> Self
+pub fn Op::f32_trunc(Slot, Slot) -> Self
+pub fn Op::f32x4_abs(Slot, Slot) -> Self
+pub fn Op::f32x4_add(Slot, Slot, Slot) -> Self
+pub fn Op::f32x4_ceil(Slot, Slot) -> Self
+pub fn Op::f32x4_convert_i32x4_s(Slot, Slot) -> Self
+pub fn Op::f32x4_convert_i32x4_u(Slot, Slot) -> Self
+pub fn Op::f32x4_demote_f64x2_zero(Slot, Slot) -> Self
+pub fn Op::f32x4_div(Slot, Slot, Slot) -> Self
+pub fn Op::f32x4_eq(Slot, Slot, Slot) -> Self
+pub fn Op::f32x4_extract_lane(Slot, Slot, ImmLaneIdx) -> Self
+pub fn Op::f32x4_floor(Slot, Slot) -> Self
+pub fn Op::f32x4_le(Slot, Slot, Slot) -> Self
+pub fn Op::f32x4_lt(Slot, Slot, Slot) -> Self
+pub fn Op::f32x4_max(Slot, Slot, Slot) -> Self
+pub fn Op::f32x4_min(Slot, Slot, Slot) -> Self
+pub fn Op::f32x4_mul(Slot, Slot, Slot) -> Self
+pub fn Op::f32x4_ne(Slot, Slot, Slot) -> Self
+pub fn Op::f32x4_nearest(Slot, Slot) -> Self
+pub fn Op::f32x4_neg(Slot, Slot) -> Self
+pub fn Op::f32x4_pmax(Slot, Slot, Slot) -> Self
+pub fn Op::f32x4_pmin(Slot, Slot, Slot) -> Self
+pub fn Op::f32x4_relaxed_madd(Slot, Slot, Slot) -> Self
+pub fn Op::f32x4_relaxed_nmadd(Slot, Slot, Slot) -> Self
+pub fn Op::f32x4_replace_lane(Slot, Slot, ImmLaneIdx) -> Self
+pub fn Op::f32x4_replace_lane_imm(Slot, Slot, ImmLaneIdx) -> Self
+pub fn Op::f32x4_splat(Slot, Slot) -> Self
+pub fn Op::f32x4_sqrt(Slot, Slot) -> Self
+pub fn Op::f32x4_sub(Slot, Slot, Slot) -> Self
+pub fn Op::f32x4_trunc(Slot, Slot) -> Self
+pub fn Op::f64_abs(Slot, Slot) -> Self
+pub fn Op::f64_add(Slot, Slot, Slot) -> Self
+pub fn Op::f64_ceil(Slot, Slot) -> Self
+pub fn Op::f64_convert_i32_s(Slot, Slot) -> Self
+pub fn Op::f64_convert_i32_u(Slot, Slot) -> Self
+pub fn Op::f64_convert_i64_s(Slot, Slot) -> Self
+pub fn Op::f64_convert_i64_u(Slot, Slot) -> Self
+pub fn Op::f64_copysign(Slot, Slot, Slot) -> Self
+pub fn Op::f64_copysign_imm(Slot, Slot, Sign) -> Self
+pub fn Op::f64_div(Slot, Slot, Slot) -> Self
+pub fn Op::f64_eq(Slot, Slot, Slot) -> Self
+pub fn Op::f64_floor(Slot, Slot) -> Self
+pub fn Op::f64_le(Slot, Slot, Slot) -> Self
+pub fn Op::f64_lt(Slot, Slot, Slot) -> Self
+pub fn Op::f64_max(Slot, Slot, Slot) -> Self
+pub fn Op::f64_min(Slot, Slot, Slot) -> Self
+pub fn Op::f64_mul(Slot, Slot, Slot) -> Self
+pub fn Op::f64_ne(Slot, Slot, Slot) -> Self
+pub fn Op::f64_nearest(Slot, Slot) -> Self
+pub fn Op::f64_neg(Slot, Slot) -> Self
+pub fn Op::f64_not_le(Slot, Slot, Slot) -> Self
+pub fn Op::f64_not_lt(Slot, Slot, Slot) -> Self
+pub fn Op::f64_promote_f32(Slot, Slot) -> Self
+pub fn Op::f64_sqrt(Slot, Slot) -> Self
+pub fn Op::f64_sub(Slot, Slot, Slot) -> Self
+pub fn Op::f64_trunc(Slot, Slot) -> Self
+pub fn Op::f64const32(Const32) -> Self
+pub fn Op::f64x2_abs(Slot, Slot) -> Self
+pub fn Op::f64x2_add(Slot, Slot, Slot) -> Self
+pub fn Op::f64x2_ceil(Slot, Slot) -> Self
+pub fn Op::f64x2_convert_low_i32x4_s(Slot, Slot) -> Self
+pub fn Op::f64x2_convert_low_i32x4_u(Slot, Slot) -> Self
+pub fn Op::f64x2_div(Slot, Slot, Slot) -> Self
+pub fn Op::f64x2_eq(Slot, Slot, Slot) -> Self
+pub fn Op::f64x2_extract_lane(Slot, Slot, ImmLaneIdx) -> Self
+pub fn Op::f64x2_floor(Slot, Slot) -> Self
+pub fn Op::f64x2_le(Slot, Slot, Slot) -> Self
+pub fn Op::f64x2_lt(Slot, Slot, Slot) -> Self
+pub fn Op::f64x2_max(Slot, Slot, Slot) -> Self
+pub fn Op::f64x2_min(Slot, Slot, Slot) -> Self
+pub fn Op::f64x2_mul(Slot, Slot, Slot) -> Self
+pub fn Op::f64x2_ne(Slot, Slot, Slot) -> Self
+pub fn Op::f64x2_nearest(Slot, Slot) -> Self
+pub fn Op::f64x2_neg(Slot, Slot) -> Self
+pub fn Op::f64x2_pmax(Slot, Slot, Slot) -> Self
+pub fn Op::f64x2_pmin(Slot, Slot, Slot) -> Self
+pub fn Op::f64x2_promote_low_f32x4(Slot, Slot) -> Self
+pub fn Op::f64x2_relaxed_madd(Slot, Slot, Slot) -> Self
+pub fn Op::f64x2_relaxed_nmadd(Slot, Slot, Slot) -> Self
+pub fn Op::f64x2_replace_lane(Slot, Slot, ImmLaneIdx) -> Self
+pub fn Op::f64x2_replace_lane_imm32(Slot, Slot, ImmLaneIdx) -> Self
+pub fn Op::f64x2_splat(Slot, Slot) -> Self
+pub fn Op::f64x2_sqrt(Slot, Slot) -> Self
+pub fn Op::f64x2_sub(Slot, Slot, Slot) -> Self
+pub fn Op::f64x2_trunc(Slot, Slot) -> Self
+pub fn Op::filter_imm16_and_offset_hi(Self) -> (AnyConst16, Offset64Hi)?
+pub fn Op::filter_lane_and_memory(Self) -> (Int, Memory)?
+pub fn Op::filter_register_and_lane(Self) -> (Slot, Int)?
+pub fn Op::filter_register_and_offset_hi(Self) -> (Slot, Offset64Hi)?
+pub fn Op::global_get(Slot, Global) -> Self
+pub fn Op::global_set(Slot, Global) -> Self
+pub fn Op::global_set_i32imm16(Const16, Global) -> Self
+pub fn Op::global_set_i64imm16(Const16, Global) -> Self
+pub fn Op::i16x8_abs(Slot, Slot) -> Self
+pub fn Op::i16x8_add(Slot, Slot, Slot) -> Self
+pub fn Op::i16x8_add_sat_s(Slot, Slot, Slot) -> Self
+pub fn Op::i16x8_add_sat_u(Slot, Slot, Slot) -> Self
+pub fn Op::i16x8_all_true(Slot, Slot) -> Self
+pub fn Op::i16x8_avgr_u(Slot, Slot, Slot) -> Self
+pub fn Op::i16x8_bitmask(Slot, Slot) -> Self
+pub fn Op::i16x8_eq(Slot, Slot, Slot) -> Self
+pub fn Op::i16x8_extadd_pairwise_i8x16_s(Slot, Slot) -> Self
+pub fn Op::i16x8_extadd_pairwise_i8x16_u(Slot, Slot) -> Self
+pub fn Op::i16x8_extend_high_i8x16_s(Slot, Slot) -> Self
+pub fn Op::i16x8_extend_high_i8x16_u(Slot, Slot) -> Self
+pub fn Op::i16x8_extend_low_i8x16_s(Slot, Slot) -> Self
+pub fn Op::i16x8_extend_low_i8x16_u(Slot, Slot) -> Self
+pub fn Op::i16x8_extmul_high_i8x16_s(Slot, Slot, Slot) -> Self
+pub fn Op::i16x8_extmul_high_i8x16_u(Slot, Slot, Slot) -> Self
+pub fn Op::i16x8_extmul_low_i8x16_s(Slot, Slot, Slot) -> Self
+pub fn Op::i16x8_extmul_low_i8x16_u(Slot, Slot, Slot) -> Self
+pub fn Op::i16x8_extract_lane_s(Slot, Slot, ImmLaneIdx) -> Self
+pub fn Op::i16x8_extract_lane_u(Slot, Slot, ImmLaneIdx) -> Self
+pub fn Op::i16x8_le_s(Slot, Slot, Slot) -> Self
+pub fn Op::i16x8_le_u(Slot, Slot, Slot) -> Self
+pub fn Op::i16x8_lt_s(Slot, Slot, Slot) -> Self
+pub fn Op::i16x8_lt_u(Slot, Slot, Slot) -> Self
+pub fn Op::i16x8_max_s(Slot, Slot, Slot) -> Self
+pub fn Op::i16x8_max_u(Slot, Slot, Slot) -> Self
+pub fn Op::i16x8_min_s(Slot, Slot, Slot) -> Self
+pub fn Op::i16x8_min_u(Slot, Slot, Slot) -> Self
+pub fn Op::i16x8_mul(Slot, Slot, Slot) -> Self
+pub fn Op::i16x8_narrow_i32x4_s(Slot, Slot, Slot) -> Self
+pub fn Op::i16x8_narrow_i32x4_u(Slot, Slot, Slot) -> Self
+pub fn Op::i16x8_ne(Slot, Slot, Slot) -> Self
+pub fn Op::i16x8_neg(Slot, Slot) -> Self
+pub fn Op::i16x8_q15mulr_sat_s(Slot, Slot, Slot) -> Self
+pub fn Op::i16x8_relaxed_dot_i8x16_i7x16_s(Slot, Slot, Slot) -> Self
+pub fn Op::i16x8_replace_lane(Slot, Slot, ImmLaneIdx) -> Self
+pub fn Op::i16x8_replace_lane_imm(Slot, Slot, ImmLaneIdx) -> Self
+pub fn Op::i16x8_shl(Slot, Slot, Slot) -> Self
+pub fn Op::i16x8_shl_by(Slot, Slot, ShiftAmount) -> Self
+pub fn Op::i16x8_shr_s(Slot, Slot, Slot) -> Self
+pub fn Op::i16x8_shr_s_by(Slot, Slot, ShiftAmount) -> Self
+pub fn Op::i16x8_shr_u(Slot, Slot, Slot) -> Self
+pub fn Op::i16x8_shr_u_by(Slot, Slot, ShiftAmount) -> Self
+pub fn Op::i16x8_splat(Slot, Slot) -> Self
+pub fn Op::i16x8_sub(Slot, Slot, Slot) -> Self
+pub fn Op::i16x8_sub_sat_s(Slot, Slot, Slot) -> Self
+pub fn Op::i16x8_sub_sat_u(Slot, Slot, Slot) -> Self
+pub fn Op::i32_add(Slot, Slot, Slot) -> Self
+pub fn Op::i32_add_imm16(Slot, Slot, Const16) -> Self
+pub fn Op::i32_and(Slot, Slot, Slot) -> Self
+pub fn Op::i32_and_imm16(Slot, Slot, Const16) -> Self
+pub fn Op::i32_bitand(Slot, Slot, Slot) -> Self
+pub fn Op::i32_bitand_imm16(Slot, Slot, Const16) -> Self
+pub fn Op::i32_bitor(Slot, Slot, Slot) -> Self
+pub fn Op::i32_bitor_imm16(Slot, Slot, Const16) -> Self
+pub fn Op::i32_bitxor(Slot, Slot, Slot) -> Self
+pub fn Op::i32_bitxor_imm16(Slot, Slot, Const16) -> Self
+pub fn Op::i32_clz(Slot, Slot) -> Self
+pub fn Op::i32_ctz(Slot, Slot) -> Self
+pub fn Op::i32_div_s(Slot, Slot, Slot) -> Self
+pub fn Op::i32_div_s_imm16_lhs(Slot, Const16, Slot) -> Self
+pub fn Op::i32_div_s_imm16_rhs(Slot, Slot, Const16) -> Self
+pub fn Op::i32_div_u(Slot, Slot, Slot) -> Self
+pub fn Op::i32_div_u_imm16_lhs(Slot, Const16, Slot) -> Self
+pub fn Op::i32_div_u_imm16_rhs(Slot, Slot, Const16) -> Self
+pub fn Op::i32_eq(Slot, Slot, Slot) -> Self
+pub fn Op::i32_eq_imm16(Slot, Slot, Const16) -> Self
+pub fn Op::i32_extend16_s(Slot, Slot) -> Self
+pub fn Op::i32_extend8_s(Slot, Slot) -> Self
+pub fn Op::i32_le_s(Slot, Slot, Slot) -> Self
+pub fn Op::i32_le_s_imm16_lhs(Slot, Const16, Slot) -> Self
+pub fn Op::i32_le_s_imm16_rhs(Slot, Slot, Const16) -> Self
+pub fn Op::i32_le_u(Slot, Slot, Slot) -> Self
+pub fn Op::i32_le_u_imm16_lhs(Slot, Const16, Slot) -> Self
+pub fn Op::i32_le_u_imm16_rhs(Slot, Slot, Const16) -> Self
+pub fn Op::i32_load16_s(Slot, Offset64Lo) -> Self
+pub fn Op::i32_load16_s_at(Slot, Address32) -> Self
+pub fn Op::i32_load16_s_offset16(Slot, Slot, Offset16) -> Self
+pub fn Op::i32_load16_u(Slot, Offset64Lo) -> Self
+pub fn Op::i32_load16_u_at(Slot, Address32) -> Self
+pub fn Op::i32_load16_u_offset16(Slot, Slot, Offset16) -> Self
+pub fn Op::i32_load8_s(Slot, Offset64Lo) -> Self
+pub fn Op::i32_load8_s_at(Slot, Address32) -> Self
+pub fn Op::i32_load8_s_offset16(Slot, Slot, Offset16) -> Self
+pub fn Op::i32_load8_u(Slot, Offset64Lo) -> Self
+pub fn Op::i32_load8_u_at(Slot, Address32) -> Self
+pub fn Op::i32_load8_u_offset16(Slot, Slot, Offset16) -> Self
+pub fn Op::i32_lt_s(Slot, Slot, Slot) -> Self
+pub fn Op::i32_lt_s_imm16_lhs(Slot, Const16, Slot) -> Self
+pub fn Op::i32_lt_s_imm16_rhs(Slot, Slot, Const16) -> Self
+pub fn Op::i32_lt_u(Slot, Slot, Slot) -> Self
+pub fn Op::i32_lt_u_imm16_lhs(Slot, Const16, Slot) -> Self
+pub fn Op::i32_lt_u_imm16_rhs(Slot, Slot, Const16) -> Self
+pub fn Op::i32_mul(Slot, Slot, Slot) -> Self
+pub fn Op::i32_mul_imm16(Slot, Slot, Const16) -> Self
+pub fn Op::i32_nand(Slot, Slot, Slot) -> Self
+pub fn Op::i32_nand_imm16(Slot, Slot, Const16) -> Self
+pub fn Op::i32_ne(Slot, Slot, Slot) -> Self
+pub fn Op::i32_ne_imm16(Slot, Slot, Const16) -> Self
+pub fn Op::i32_nor(Slot, Slot, Slot) -> Self
+pub fn Op::i32_nor_imm16(Slot, Slot, Const16) -> Self
+pub fn Op::i32_or(Slot, Slot, Slot) -> Self
+pub fn Op::i32_or_imm16(Slot, Slot, Const16) -> Self
+pub fn Op::i32_popcnt(Slot, Slot) -> Self
+pub fn Op::i32_rem_s(Slot, Slot, Slot) -> Self
+pub fn Op::i32_rem_s_imm16_lhs(Slot, Const16, Slot) -> Self
+pub fn Op::i32_rem_s_imm16_rhs(Slot, Slot, Const16) -> Self
+pub fn Op::i32_rem_u(Slot, Slot, Slot) -> Self
+pub fn Op::i32_rem_u_imm16_lhs(Slot, Const16, Slot) -> Self
+pub fn Op::i32_rem_u_imm16_rhs(Slot, Slot, Const16) -> Self
+pub fn Op::i32_rotl(Slot, Slot, Slot) -> Self
+pub fn Op::i32_rotl_by(Slot, Slot, ShiftAmount) -> Self
+pub fn Op::i32_rotl_imm16(Slot, Const16, Slot) -> Self
+pub fn Op::i32_rotr(Slot, Slot, Slot) -> Self
+pub fn Op::i32_rotr_by(Slot, Slot, ShiftAmount) -> Self
+pub fn Op::i32_rotr_imm16(Slot, Const16, Slot) -> Self
+pub fn Op::i32_shl(Slot, Slot, Slot) -> Self
+pub fn Op::i32_shl_by(Slot, Slot, ShiftAmount) -> Self
+pub fn Op::i32_shl_imm16(Slot, Const16, Slot) -> Self
+pub fn Op::i32_shr_s(Slot, Slot, Slot) -> Self
+pub fn Op::i32_shr_s_by(Slot, Slot, ShiftAmount) -> Self
+pub fn Op::i32_shr_s_imm16(Slot, Const16, Slot) -> Self
+pub fn Op::i32_shr_u(Slot, Slot, Slot) -> Self
+pub fn Op::i32_shr_u_by(Slot, Slot, ShiftAmount) -> Self
+pub fn Op::i32_shr_u_imm16(Slot, Const16, Slot) -> Self
+pub fn Op::i32_store16(Slot, Offset64Lo) -> Self
+pub fn Op::i32_store16_at(Slot, Address32) -> Self
+pub fn Op::i32_store16_at_imm(Int, Address32) -> Self
+pub fn Op::i32_store16_imm(Slot, Offset64Lo) -> Self
+pub fn Op::i32_store16_offset16(Slot, Offset16, Slot) -> Self
+pub fn Op::i32_store16_offset16_imm(Slot, Offset16, Int) -> Self
+pub fn Op::i32_store8(Slot, Offset64Lo) -> Self
+pub fn Op::i32_store8_at(Slot, Address32) -> Self
+pub fn Op::i32_store8_at_imm(Int, Address32) -> Self
+pub fn Op::i32_store8_imm(Slot, Offset64Lo) -> Self
+pub fn Op::i32_store8_offset16(Slot, Offset16, Slot) -> Self
+pub fn Op::i32_store8_offset16_imm(Slot, Offset16, Int) -> Self
+pub fn Op::i32_store_at_imm16(Const16, Address32) -> Self
+pub fn Op::i32_store_imm16(Slot, Offset64Lo) -> Self
+pub fn Op::i32_store_offset16_imm16(Slot, Offset16, Const16) -> Self
+pub fn Op::i32_sub(Slot, Slot, Slot) -> Self
+pub fn Op::i32_sub_imm16_lhs(Slot, Const16, Slot) -> Self
+pub fn Op::i32_trunc_f32_s(Slot, Slot) -> Self
+pub fn Op::i32_trunc_f32_u(Slot, Slot) -> Self
+pub fn Op::i32_trunc_f64_s(Slot, Slot) -> Self
+pub fn Op::i32_trunc_f64_u(Slot, Slot) -> Self
+pub fn Op::i32_trunc_sat_f32_s(Slot, Slot) -> Self
+pub fn Op::i32_trunc_sat_f32_u(Slot, Slot) -> Self
+pub fn Op::i32_trunc_sat_f64_s(Slot, Slot) -> Self
+pub fn Op::i32_trunc_sat_f64_u(Slot, Slot) -> Self
+pub fn Op::i32_wrap_i64(Slot, Slot) -> Self
+pub fn Op::i32x4_abs(Slot, Slot) -> Self
+pub fn Op::i32x4_add(Slot, Slot, Slot) -> Self
+pub fn Op::i32x4_all_true(Slot, Slot) -> Self
+pub fn Op::i32x4_bitmask(Slot, Slot) -> Self
+pub fn Op::i32x4_dot_i16x8_s(Slot, Slot, Slot) -> Self
+pub fn Op::i32x4_eq(Slot, Slot, Slot) -> Self
+pub fn Op::i32x4_extadd_pairwise_i16x8_s(Slot, Slot) -> Self
+pub fn Op::i32x4_extadd_pairwise_i16x8_u(Slot, Slot) -> Self
+pub fn Op::i32x4_extend_high_i16x8_s(Slot, Slot) -> Self
+pub fn Op::i32x4_extend_high_i16x8_u(Slot, Slot) -> Self
+pub fn Op::i32x4_extend_low_i16x8_s(Slot, Slot) -> Self
+pub fn Op::i32x4_extend_low_i16x8_u(Slot, Slot) -> Self
+pub fn Op::i32x4_extmul_high_i16x8_s(Slot, Slot, Slot) -> Self
+pub fn Op::i32x4_extmul_high_i16x8_u(Slot, Slot, Slot) -> Self
+pub fn Op::i32x4_extmul_low_i16x8_s(Slot, Slot, Slot) -> Self
+pub fn Op::i32x4_extmul_low_i16x8_u(Slot, Slot, Slot) -> Self
+pub fn Op::i32x4_extract_lane(Slot, Slot, ImmLaneIdx) -> Self
+pub fn Op::i32x4_le_s(Slot, Slot, Slot) -> Self
+pub fn Op::i32x4_le_u(Slot, Slot, Slot) -> Self
+pub fn Op::i32x4_lt_s(Slot, Slot, Slot) -> Self
+pub fn Op::i32x4_lt_u(Slot, Slot, Slot) -> Self
+pub fn Op::i32x4_max_s(Slot, Slot, Slot) -> Self
+pub fn Op::i32x4_max_u(Slot, Slot, Slot) -> Self
+pub fn Op::i32x4_min_s(Slot, Slot, Slot) -> Self
+pub fn Op::i32x4_min_u(Slot, Slot, Slot) -> Self
+pub fn Op::i32x4_mul(Slot, Slot, Slot) -> Self
+pub fn Op::i32x4_ne(Slot, Slot, Slot) -> Self
+pub fn Op::i32x4_neg(Slot, Slot) -> Self
+pub fn Op::i32x4_relaxed_dot_i8x16_i7x16_add_s(Slot, Slot, Slot) -> Self
+pub fn Op::i32x4_replace_lane(Slot, Slot, ImmLaneIdx) -> Self
+pub fn Op::i32x4_replace_lane_imm(Slot, Slot, ImmLaneIdx) -> Self
+pub fn Op::i32x4_shl(Slot, Slot, Slot) -> Self
+pub fn Op::i32x4_shl_by(Slot, Slot, ShiftAmount) -> Self
+pub fn Op::i32x4_shr_s(Slot, Slot, Slot) -> Self
+pub fn Op::i32x4_shr_s_by(Slot, Slot, ShiftAmount) -> Self
+pub fn Op::i32x4_shr_u(Slot, Slot, Slot) -> Self
+pub fn Op::i32x4_shr_u_by(Slot, Slot, ShiftAmount) -> Self
+pub fn Op::i32x4_splat(Slot, Slot) -> Self
+pub fn Op::i32x4_sub(Slot, Slot, Slot) -> Self
+pub fn Op::i32x4_trunc_sat_f32x4_s(Slot, Slot) -> Self
+pub fn Op::i32x4_trunc_sat_f32x4_u(Slot, Slot) -> Self
+pub fn Op::i32x4_trunc_sat_f64x2_s_zero(Slot, Slot) -> Self
+pub fn Op::i32x4_trunc_sat_f64x2_u_zero(Slot, Slot) -> Self
+pub fn Op::i64_add(Slot, Slot, Slot) -> Self
+pub fn Op::i64_add128(FixedArray[Slot], Slot) -> Self
+pub fn Op::i64_add_imm16(Slot, Slot, Const16) -> Self
+pub fn Op::i64_and(Slot, Slot, Slot) -> Self
+pub fn Op::i64_and_imm16(Slot, Slot, Const16) -> Self
+pub fn Op::i64_bitand(Slot, Slot, Slot) -> Self
+pub fn Op::i64_bitand_imm16(Slot, Slot, Const16) -> Self
+pub fn Op::i64_bitor(Slot, Slot, Slot) -> Self
+pub fn Op::i64_bitor_imm16(Slot, Slot, Const16) -> Self
+pub fn Op::i64_bitxor(Slot, Slot, Slot) -> Self
+pub fn Op::i64_bitxor_imm16(Slot, Slot, Const16) -> Self
+pub fn Op::i64_clz(Slot, Slot) -> Self
+pub fn Op::i64_ctz(Slot, Slot) -> Self
+pub fn Op::i64_div_s(Slot, Slot, Slot) -> Self
+pub fn Op::i64_div_s_imm16_lhs(Slot, Const16, Slot) -> Self
+pub fn Op::i64_div_s_imm16_rhs(Slot, Slot, Const16) -> Self
+pub fn Op::i64_div_u(Slot, Slot, Slot) -> Self
+pub fn Op::i64_div_u_imm16_lhs(Slot, Const16, Slot) -> Self
+pub fn Op::i64_div_u_imm16_rhs(Slot, Slot, Const16) -> Self
+pub fn Op::i64_eq(Slot, Slot, Slot) -> Self
+pub fn Op::i64_eq_imm16(Slot, Slot, Const16) -> Self
+pub fn Op::i64_extend16_s(Slot, Slot) -> Self
+pub fn Op::i64_extend32_s(Slot, Slot) -> Self
+pub fn Op::i64_extend8_s(Slot, Slot) -> Self
+pub fn Op::i64_le_s(Slot, Slot, Slot) -> Self
+pub fn Op::i64_le_s_imm16_lhs(Slot, Const16, Slot) -> Self
+pub fn Op::i64_le_s_imm16_rhs(Slot, Slot, Const16) -> Self
+pub fn Op::i64_le_u(Slot, Slot, Slot) -> Self
+pub fn Op::i64_le_u_imm16_lhs(Slot, Const16, Slot) -> Self
+pub fn Op::i64_le_u_imm16_rhs(Slot, Slot, Const16) -> Self
+pub fn Op::i64_load16_s(Slot, Offset64Lo) -> Self
+pub fn Op::i64_load16_s_at(Slot, Address32) -> Self
+pub fn Op::i64_load16_s_offset16(Slot, Slot, Offset16) -> Self
+pub fn Op::i64_load16_u(Slot, Offset64Lo) -> Self
+pub fn Op::i64_load16_u_at(Slot, Address32) -> Self
+pub fn Op::i64_load16_u_offset16(Slot, Slot, Offset16) -> Self
+pub fn Op::i64_load32_s(Slot, Offset64Lo) -> Self
+pub fn Op::i64_load32_s_at(Slot, Address32) -> Self
+pub fn Op::i64_load32_s_offset16(Slot, Slot, Offset16) -> Self
+pub fn Op::i64_load32_u(Slot, Offset64Lo) -> Self
+pub fn Op::i64_load32_u_at(Slot, Address32) -> Self
+pub fn Op::i64_load32_u_offset16(Slot, Slot, Offset16) -> Self
+pub fn Op::i64_load8_s(Slot, Offset64Lo) -> Self
+pub fn Op::i64_load8_s_at(Slot, Address32) -> Self
+pub fn Op::i64_load8_s_offset16(Slot, Slot, Offset16) -> Self
+pub fn Op::i64_load8_u(Slot, Offset64Lo) -> Self
+pub fn Op::i64_load8_u_at(Slot, Address32) -> Self
+pub fn Op::i64_load8_u_offset16(Slot, Slot, Offset16) -> Self
+pub fn Op::i64_lt_s(Slot, Slot, Slot) -> Self
+pub fn Op::i64_lt_s_imm16_lhs(Slot, Const16, Slot) -> Self
+pub fn Op::i64_lt_s_imm16_rhs(Slot, Slot, Const16) -> Self
+pub fn Op::i64_lt_u(Slot, Slot, Slot) -> Self
+pub fn Op::i64_lt_u_imm16_lhs(Slot, Const16, Slot) -> Self
+pub fn Op::i64_lt_u_imm16_rhs(Slot, Slot, Const16) -> Self
+pub fn Op::i64_mul(Slot, Slot, Slot) -> Self
+pub fn Op::i64_mul_imm16(Slot, Slot, Const16) -> Self
+pub fn Op::i64_mul_wide_s(FixedSlotSpan, Slot, Slot) -> Self
+pub fn Op::i64_mul_wide_u(FixedSlotSpan, Slot, Slot) -> Self
+pub fn Op::i64_nand(Slot, Slot, Slot) -> Self
+pub fn Op::i64_nand_imm16(Slot, Slot, Const16) -> Self
+pub fn Op::i64_ne(Slot, Slot, Slot) -> Self
+pub fn Op::i64_ne_imm16(Slot, Slot, Const16) -> Self
+pub fn Op::i64_nor(Slot, Slot, Slot) -> Self
+pub fn Op::i64_nor_imm16(Slot, Slot, Const16) -> Self
+pub fn Op::i64_or(Slot, Slot, Slot) -> Self
+pub fn Op::i64_or_imm16(Slot, Slot, Const16) -> Self
+pub fn Op::i64_popcnt(Slot, Slot) -> Self
+pub fn Op::i64_rem_s(Slot, Slot, Slot) -> Self
+pub fn Op::i64_rem_s_imm16_lhs(Slot, Const16, Slot) -> Self
+pub fn Op::i64_rem_s_imm16_rhs(Slot, Slot, Const16) -> Self
+pub fn Op::i64_rem_u(Slot, Slot, Slot) -> Self
+pub fn Op::i64_rem_u_imm16_lhs(Slot, Const16, Slot) -> Self
+pub fn Op::i64_rem_u_imm16_rhs(Slot, Slot, Const16) -> Self
+pub fn Op::i64_rotl(Slot, Slot, Slot) -> Self
+pub fn Op::i64_rotl_by(Slot, Slot, ShiftAmount) -> Self
+pub fn Op::i64_rotl_imm16(Slot, Const16, Slot) -> Self
+pub fn Op::i64_rotr(Slot, Slot, Slot) -> Self
+pub fn Op::i64_rotr_by(Slot, Slot, ShiftAmount) -> Self
+pub fn Op::i64_rotr_imm16(Slot, Const16, Slot) -> Self
+pub fn Op::i64_shl(Slot, Slot, Slot) -> Self
+pub fn Op::i64_shl_by(Slot, Slot, ShiftAmount) -> Self
+pub fn Op::i64_shl_imm16(Slot, Const16, Slot) -> Self
+pub fn Op::i64_shr_s(Slot, Slot, Slot) -> Self
+pub fn Op::i64_shr_s_by(Slot, Slot, ShiftAmount) -> Self
+pub fn Op::i64_shr_s_imm16(Slot, Const16, Slot) -> Self
+pub fn Op::i64_shr_u(Slot, Slot, Slot) -> Self
+pub fn Op::i64_shr_u_by(Slot, Slot, ShiftAmount) -> Self
+pub fn Op::i64_shr_u_imm16(Slot, Const16, Slot) -> Self
+pub fn Op::i64_store16(Slot, Offset64Lo) -> Self
+pub fn Op::i64_store16_at(Slot, Address32) -> Self
+pub fn Op::i64_store16_at_imm(Int, Address32) -> Self
+pub fn Op::i64_store16_imm(Slot, Offset64Lo) -> Self
+pub fn Op::i64_store16_offset16(Slot, Offset16, Slot) -> Self
+pub fn Op::i64_store16_offset16_imm(Slot, Offset16, Int) -> Self
+pub fn Op::i64_store32(Slot, Offset64Lo) -> Self
+pub fn Op::i64_store32_at(Slot, Address32) -> Self
+pub fn Op::i64_store32_at_imm16(Const16, Address32) -> Self
+pub fn Op::i64_store32_imm16(Slot, Offset64Lo) -> Self
+pub fn Op::i64_store32_offset16(Slot, Offset16, Slot) -> Self
+pub fn Op::i64_store32_offset16_imm16(Slot, Offset16, Const16) -> Self
+pub fn Op::i64_store8(Slot, Offset64Lo) -> Self
+pub fn Op::i64_store8_at(Slot, Address32) -> Self
+pub fn Op::i64_store8_at_imm(Int, Address32) -> Self
+pub fn Op::i64_store8_imm(Slot, Offset64Lo) -> Self
+pub fn Op::i64_store8_offset16(Slot, Offset16, Slot) -> Self
+pub fn Op::i64_store8_offset16_imm(Slot, Offset16, Int) -> Self
+pub fn Op::i64_store_at_imm16(Const16, Address32) -> Self
+pub fn Op::i64_store_imm16(Slot, Offset64Lo) -> Self
+pub fn Op::i64_store_offset16_imm16(Slot, Offset16, Const16) -> Self
+pub fn Op::i64_sub(Slot, Slot, Slot) -> Self
+pub fn Op::i64_sub128(FixedArray[Slot], Slot) -> Self
+pub fn Op::i64_sub_imm16_lhs(Slot, Const16, Slot) -> Self
+pub fn Op::i64_trunc_f32_s(Slot, Slot) -> Self
+pub fn Op::i64_trunc_f32_u(Slot, Slot) -> Self
+pub fn Op::i64_trunc_f64_s(Slot, Slot) -> Self
+pub fn Op::i64_trunc_f64_u(Slot, Slot) -> Self
+pub fn Op::i64_trunc_sat_f32_s(Slot, Slot) -> Self
+pub fn Op::i64_trunc_sat_f32_u(Slot, Slot) -> Self
+pub fn Op::i64_trunc_sat_f64_s(Slot, Slot) -> Self
+pub fn Op::i64_trunc_sat_f64_u(Slot, Slot) -> Self
+pub fn Op::i64const32(Const32) -> Self
+pub fn Op::i64x2_abs(Slot, Slot) -> Self
+pub fn Op::i64x2_add(Slot, Slot, Slot) -> Self
+pub fn Op::i64x2_all_true(Slot, Slot) -> Self
+pub fn Op::i64x2_bitmask(Slot, Slot) -> Self
+pub fn Op::i64x2_eq(Slot, Slot, Slot) -> Self
+pub fn Op::i64x2_extend_high_i32x4_s(Slot, Slot) -> Self
+pub fn Op::i64x2_extend_high_i32x4_u(Slot, Slot) -> Self
+pub fn Op::i64x2_extend_low_i32x4_s(Slot, Slot) -> Self
+pub fn Op::i64x2_extend_low_i32x4_u(Slot, Slot) -> Self
+pub fn Op::i64x2_extmul_high_i32x4_s(Slot, Slot, Slot) -> Self
+pub fn Op::i64x2_extmul_high_i32x4_u(Slot, Slot, Slot) -> Self
+pub fn Op::i64x2_extmul_low_i32x4_s(Slot, Slot, Slot) -> Self
+pub fn Op::i64x2_extmul_low_i32x4_u(Slot, Slot, Slot) -> Self
+pub fn Op::i64x2_extract_lane(Slot, Slot, ImmLaneIdx) -> Self
+pub fn Op::i64x2_le_s(Slot, Slot, Slot) -> Self
+pub fn Op::i64x2_lt_s(Slot, Slot, Slot) -> Self
+pub fn Op::i64x2_mul(Slot, Slot, Slot) -> Self
+pub fn Op::i64x2_ne(Slot, Slot, Slot) -> Self
+pub fn Op::i64x2_neg(Slot, Slot) -> Self
+pub fn Op::i64x2_replace_lane(Slot, Slot, ImmLaneIdx) -> Self
+pub fn Op::i64x2_replace_lane_imm32(Slot, Slot, ImmLaneIdx) -> Self
+pub fn Op::i64x2_shl(Slot, Slot, Slot) -> Self
+pub fn Op::i64x2_shl_by(Slot, Slot, ShiftAmount) -> Self
+pub fn Op::i64x2_shr_s(Slot, Slot, Slot) -> Self
+pub fn Op::i64x2_shr_s_by(Slot, Slot, ShiftAmount) -> Self
+pub fn Op::i64x2_shr_u(Slot, Slot, Slot) -> Self
+pub fn Op::i64x2_shr_u_by(Slot, Slot, ShiftAmount) -> Self
+pub fn Op::i64x2_splat(Slot, Slot) -> Self
+pub fn Op::i64x2_sub(Slot, Slot, Slot) -> Self
+pub fn Op::i8x16_abs(Slot, Slot) -> Self
+pub fn Op::i8x16_add(Slot, Slot, Slot) -> Self
+pub fn Op::i8x16_add_sat_s(Slot, Slot, Slot) -> Self
+pub fn Op::i8x16_add_sat_u(Slot, Slot, Slot) -> Self
+pub fn Op::i8x16_all_true(Slot, Slot) -> Self
+pub fn Op::i8x16_avgr_u(Slot, Slot, Slot) -> Self
+pub fn Op::i8x16_bitmask(Slot, Slot) -> Self
+pub fn Op::i8x16_eq(Slot, Slot, Slot) -> Self
+pub fn Op::i8x16_extract_lane_s(Slot, Slot, ImmLaneIdx) -> Self
+pub fn Op::i8x16_extract_lane_u(Slot, Slot, ImmLaneIdx) -> Self
+pub fn Op::i8x16_le_s(Slot, Slot, Slot) -> Self
+pub fn Op::i8x16_le_u(Slot, Slot, Slot) -> Self
+pub fn Op::i8x16_lt_s(Slot, Slot, Slot) -> Self
+pub fn Op::i8x16_lt_u(Slot, Slot, Slot) -> Self
+pub fn Op::i8x16_max_s(Slot, Slot, Slot) -> Self
+pub fn Op::i8x16_max_u(Slot, Slot, Slot) -> Self
+pub fn Op::i8x16_min_s(Slot, Slot, Slot) -> Self
+pub fn Op::i8x16_min_u(Slot, Slot, Slot) -> Self
+pub fn Op::i8x16_narrow_i16x8_s(Slot, Slot, Slot) -> Self
+pub fn Op::i8x16_narrow_i16x8_u(Slot, Slot, Slot) -> Self
+pub fn Op::i8x16_ne(Slot, Slot, Slot) -> Self
+pub fn Op::i8x16_neg(Slot, Slot) -> Self
+pub fn Op::i8x16_popcnt(Slot, Slot) -> Self
+pub fn Op::i8x16_replace_lane(Slot, Slot, ImmLaneIdx) -> Self
+pub fn Op::i8x16_replace_lane_imm(Slot, Slot, ImmLaneIdx, Int) -> Self
+pub fn Op::i8x16_shl(Slot, Slot, Slot) -> Self
+pub fn Op::i8x16_shl_by(Slot, Slot, ShiftAmount) -> Self
+pub fn Op::i8x16_shr_s(Slot, Slot, Slot) -> Self
+pub fn Op::i8x16_shr_s_by(Slot, Slot, ShiftAmount) -> Self
+pub fn Op::i8x16_shr_u(Slot, Slot, Slot) -> Self
+pub fn Op::i8x16_shr_u_by(Slot, Slot, ShiftAmount) -> Self
+pub fn Op::i8x16_shuffle(Slot, Slot, Slot) -> Self
+pub fn Op::i8x16_splat(Slot, Slot) -> Self
+pub fn Op::i8x16_sub(Slot, Slot, Slot) -> Self
+pub fn Op::i8x16_sub_sat_s(Slot, Slot, Slot) -> Self
+pub fn Op::i8x16_sub_sat_u(Slot, Slot, Slot) -> Self
+pub fn Op::i8x16_swizzle(Slot, Slot, Slot) -> Self
+pub fn Op::imm16_and_imm32(AnyConst16, AnyConst32) -> Self
+pub fn Op::imm16_and_offset_hi(AnyConst16, Offset64Hi) -> Self
+pub fn Op::lane_and_memory_index(Int, Memory) -> Self
+pub fn Op::load32(Slot, Offset64Lo) -> Self
+pub fn Op::load32_at(Slot, Address32) -> Self
+pub fn Op::load32_offset16(Slot, Slot, Offset16) -> Self
+pub fn Op::load64(Slot, Offset64Lo) -> Self
+pub fn Op::load64_at(Slot, Address32) -> Self
+pub fn Op::load64_offset16(Slot, Slot, Offset16) -> Self
+pub fn Op::memory_copy(Slot, Slot, Slot) -> Self
+pub fn Op::memory_fill(Slot, Slot, Slot) -> Self
+pub fn Op::memory_fill_imm(Slot, Int, Slot) -> Self
+pub fn Op::memory_grow(Slot, Slot) -> Self
+pub fn Op::memory_index(Memory) -> Self
+pub fn Op::memory_init(Slot, Slot, Slot) -> Self
+pub fn Op::memory_size(Slot, Memory) -> Self
+pub fn Op::name(Self) -> String
+pub fn Op::ref_func(Slot, Func) -> Self
+pub fn Op::result_slot(Self) -> Slot?
+pub fn Op::results_span(Self) -> SlotSpan?
+pub fn Op::return_() -> Self
+pub fn Op::return_call_imported(Func) -> Self
+pub fn Op::return_call_imported_0(Func) -> Self
+pub fn Op::return_call_indirect(FuncType) -> Self
+pub fn Op::return_call_indirect_0(FuncType) -> Self
+pub fn Op::return_call_indirect_0_imm16(FuncType) -> Self
+pub fn Op::return_call_indirect_imm16(FuncType) -> Self
+pub fn Op::return_call_internal(InternalFunc) -> Self
+pub fn Op::return_call_internal_0(InternalFunc) -> Self
+pub fn Op::return_f64imm32(Const32) -> Self
+pub fn Op::return_i64imm32(Const32) -> Self
+pub fn Op::return_imm32(AnyConst32) -> Self
+pub fn Op::return_many(FixedArray[Slot]) -> Self
+pub fn Op::return_many_ext(Slot, Slot, Slot) -> Self
+pub fn Op::return_reg(Slot) -> Self
+pub fn Op::return_reg2(FixedArray[Slot]) -> Self
+pub fn Op::return_reg2_ext(Slot, Slot) -> Self
+pub fn Op::return_reg3(FixedArray[Slot]) -> Self
+pub fn Op::return_reg3_ext(Slot, Slot, Slot) -> Self
+pub fn Op::return_span(BoundedSlotSpan) -> Self
+pub fn Op::select_f32_eq(Slot, Slot, Slot) -> Self
+pub fn Op::select_f32_le(Slot, Slot, Slot) -> Self
+pub fn Op::select_f32_lt(Slot, Slot, Slot) -> Self
+pub fn Op::select_f64_eq(Slot, Slot, Slot) -> Self
+pub fn Op::select_f64_le(Slot, Slot, Slot) -> Self
+pub fn Op::select_f64_lt(Slot, Slot, Slot) -> Self
+pub fn Op::select_i32_and(Slot, Slot, Slot) -> Self
+pub fn Op::select_i32_and_imm16(Slot, Slot, Const16) -> Self
+pub fn Op::select_i32_eq(Slot, Slot, Slot) -> Self
+pub fn Op::select_i32_eq_imm16(Slot, Slot, Const16) -> Self
+pub fn Op::select_i32_le_s(Slot, Slot, Slot) -> Self
+pub fn Op::select_i32_le_s_imm16_rhs(Slot, Slot, Const16) -> Self
+pub fn Op::select_i32_le_u(Slot, Slot, Slot) -> Self
+pub fn Op::select_i32_le_u_imm16_rhs(Slot, Slot, Const16) -> Self
+pub fn Op::select_i32_lt_s(Slot, Slot, Slot) -> Self
+pub fn Op::select_i32_lt_s_imm16_rhs(Slot, Slot, Const16) -> Self
+pub fn Op::select_i32_lt_u(Slot, Slot, Slot) -> Self
+pub fn Op::select_i32_lt_u_imm16_rhs(Slot, Slot, Const16) -> Self
+pub fn Op::select_i32_or(Slot, Slot, Slot) -> Self
+pub fn Op::select_i32_or_imm16(Slot, Slot, Const16) -> Self
+pub fn Op::select_i64_and(Slot, Slot, Slot) -> Self
+pub fn Op::select_i64_and_imm16(Slot, Slot, Const16) -> Self
+pub fn Op::select_i64_eq(Slot, Slot, Slot) -> Self
+pub fn Op::select_i64_eq_imm16(Slot, Slot, Const16) -> Self
+pub fn Op::select_i64_le_s(Slot, Slot, Slot) -> Self
+pub fn Op::select_i64_le_s_imm16_rhs(Slot, Slot, Const16) -> Self
+pub fn Op::select_i64_le_u(Slot, Slot, Slot) -> Self
+pub fn Op::select_i64_le_u_imm16_rhs(Slot, Slot, Const16) -> Self
+pub fn Op::select_i64_lt_s(Slot, Slot, Slot) -> Self
+pub fn Op::select_i64_lt_s_imm16_rhs(Slot, Slot, Const16) -> Self
+pub fn Op::select_i64_lt_u(Slot, Slot, Slot) -> Self
+pub fn Op::select_i64_lt_u_imm16_rhs(Slot, Slot, Const16) -> Self
+pub fn Op::select_i64_or(Slot, Slot, Slot) -> Self
+pub fn Op::select_i64_or_imm16(Slot, Slot, Const16) -> Self
+pub fn Op::set_branch_offset(Self, BranchOffset) -> Self?
+pub fn Op::set_branch_offset16(Self, BranchOffset16) -> Self?
+pub fn Op::set_result(Self, Slot) -> Self?
+pub fn Op::set_results_span(Self, SlotSpan) -> Self?
+pub fn Op::slot(Slot) -> Self
+pub fn Op::slot2(FixedArray[Slot]) -> Self
+pub fn Op::slot2_ext(Slot, Slot) -> Self
+pub fn Op::slot3(FixedArray[Slot]) -> Self
+pub fn Op::slot3_ext(Slot, Slot, Slot) -> Self
+pub fn Op::slot_and_imm32(Slot, AnyConst32) -> Self
+pub fn Op::slot_and_lane(Slot, Int) -> Self
+pub fn Op::slot_and_offset_hi(Slot, Offset64Hi) -> Self
+pub fn Op::slot_list(FixedArray[Slot]) -> Self
+pub fn Op::slot_list_ext(Slot, Slot, Slot) -> Self
+pub fn Op::slot_span(BoundedSlotSpan) -> Self
+pub fn Op::store32(Slot, Offset64Lo) -> Self
+pub fn Op::store32_at(Slot, Address32) -> Self
+pub fn Op::store32_offset16(Slot, Offset16, Slot) -> Self
+pub fn Op::store64(Slot, Offset64Lo) -> Self
+pub fn Op::store64_at(Slot, Address32) -> Self
+pub fn Op::store64_offset16(Slot, Offset16, Slot) -> Self
+pub fn Op::table_copy(Slot, Slot, Slot) -> Self
+pub fn Op::table_fill(Slot, Slot, Slot) -> Self
+pub fn Op::table_get(Slot, Slot) -> Self
+pub fn Op::table_get_imm(Slot, Const32) -> Self
+pub fn Op::table_grow(Slot, Slot, Slot) -> Self
+pub fn Op::table_index(Table) -> Self
+pub fn Op::table_init(Slot, Slot, Slot) -> Self
+pub fn Op::table_set(Slot, Slot) -> Self
+pub fn Op::table_set_at(Slot, Const32) -> Self
+pub fn Op::table_size(Slot, Table) -> Self
+pub fn Op::trap(@core.TrapCode) -> Self
+pub fn Op::v128_and(Slot, Slot, Slot) -> Self
+pub fn Op::v128_andnot(Slot, Slot, Slot) -> Self
+pub fn Op::v128_any_true(Slot, Slot) -> Self
+pub fn Op::v128_bitselect(Slot, Slot, Slot) -> Self
+pub fn Op::v128_load(Slot, Offset64Lo) -> Self
+pub fn Op::v128_load16_lane(Slot, Offset64Lo) -> Self
+pub fn Op::v128_load16_lane_at(Slot, Address32) -> Self
+pub fn Op::v128_load16_splat(Slot, Offset64Lo) -> Self
+pub fn Op::v128_load16_splat_at(Slot, Address32) -> Self
+pub fn Op::v128_load16_splat_offset16(Slot, Slot, Offset16) -> Self
+pub fn Op::v128_load16x4_s(Slot, Offset64Lo) -> Self
+pub fn Op::v128_load16x4_s_at(Slot, Address32) -> Self
+pub fn Op::v128_load16x4_s_offset16(Slot, Slot, Offset16) -> Self
+pub fn Op::v128_load16x4_u(Slot, Offset64Lo) -> Self
+pub fn Op::v128_load16x4_u_at(Slot, Address32) -> Self
+pub fn Op::v128_load16x4_u_offset16(Slot, Slot, Offset16) -> Self
+pub fn Op::v128_load32_lane(Slot, Offset64Lo) -> Self
+pub fn Op::v128_load32_lane_at(Slot, Address32) -> Self
+pub fn Op::v128_load32_splat(Slot, Offset64Lo) -> Self
+pub fn Op::v128_load32_splat_at(Slot, Address32) -> Self
+pub fn Op::v128_load32_splat_offset16(Slot, Slot, Offset16) -> Self
+pub fn Op::v128_load32_zero(Slot, Offset64Lo) -> Self
+pub fn Op::v128_load32_zero_at(Slot, Address32) -> Self
+pub fn Op::v128_load32_zero_offset16(Slot, Slot, Offset16) -> Self
+pub fn Op::v128_load32x2_s(Slot, Offset64Lo) -> Self
+pub fn Op::v128_load32x2_s_at(Slot, Address32) -> Self
+pub fn Op::v128_load32x2_s_offset16(Slot, Slot, Offset16) -> Self
+pub fn Op::v128_load32x2_u(Slot, Offset64Lo) -> Self
+pub fn Op::v128_load32x2_u_at(Slot, Address32) -> Self
+pub fn Op::v128_load32x2_u_offset16(Slot, Slot, Offset16) -> Self
+pub fn Op::v128_load64_lane(Slot, Offset64Lo) -> Self
+pub fn Op::v128_load64_lane_at(Slot, Address32) -> Self
+pub fn Op::v128_load64_splat(Slot, Offset64Lo) -> Self
+pub fn Op::v128_load64_splat_at(Slot, Address32) -> Self
+pub fn Op::v128_load64_splat_offset16(Slot, Slot, Offset16) -> Self
+pub fn Op::v128_load64_zero(Slot, Offset64Lo) -> Self
+pub fn Op::v128_load64_zero_at(Slot, Address32) -> Self
+pub fn Op::v128_load64_zero_offset16(Slot, Slot, Offset16) -> Self
+pub fn Op::v128_load8_lane(Slot, Offset64Lo) -> Self
+pub fn Op::v128_load8_lane_at(Slot, Address32) -> Self
+pub fn Op::v128_load8_splat(Slot, Offset64Lo) -> Self
+pub fn Op::v128_load8_splat_at(Slot, Address32) -> Self
+pub fn Op::v128_load8_splat_offset16(Slot, Slot, Offset16) -> Self
+pub fn Op::v128_load8x8_s(Slot, Offset64Lo) -> Self
+pub fn Op::v128_load8x8_s_at(Slot, Address32) -> Self
+pub fn Op::v128_load8x8_s_offset16(Slot, Slot, Offset16) -> Self
+pub fn Op::v128_load8x8_u(Slot, Offset64Lo) -> Self
+pub fn Op::v128_load8x8_u_at(Slot, Address32) -> Self
+pub fn Op::v128_load8x8_u_offset16(Slot, Slot, Offset16) -> Self
+pub fn Op::v128_load_at(Slot, Address32) -> Self
+pub fn Op::v128_load_offset16(Slot, Slot, Offset16) -> Self
+pub fn Op::v128_not(Slot, Slot) -> Self
+pub fn Op::v128_or(Slot, Slot, Slot) -> Self
+pub fn Op::v128_store(Slot, Offset64Lo) -> Self
+pub fn Op::v128_store16_lane(Slot, Offset64Lo) -> Self
+pub fn Op::v128_store16_lane_at(Slot, Address32) -> Self
+pub fn Op::v128_store16_lane_offset8(Slot, Slot, Offset8, ImmLaneIdx) -> Self
+pub fn Op::v128_store32_lane(Slot, Offset64Lo) -> Self
+pub fn Op::v128_store32_lane_at(Slot, Address32) -> Self
+pub fn Op::v128_store32_lane_offset8(Slot, Slot, Offset8, ImmLaneIdx) -> Self
+pub fn Op::v128_store64_lane(Slot, Offset64Lo) -> Self
+pub fn Op::v128_store64_lane_at(Slot, Address32) -> Self
+pub fn Op::v128_store64_lane_offset8(Slot, Slot, Offset8, ImmLaneIdx) -> Self
+pub fn Op::v128_store8_lane(Slot, Offset64Lo) -> Self
+pub fn Op::v128_store8_lane_at(Slot, Address32) -> Self
+pub fn Op::v128_store8_lane_offset8(Slot, Slot, Offset8, ImmLaneIdx) -> Self
+pub fn Op::v128_store_at(Slot, Address32) -> Self
+pub fn Op::v128_store_offset16(Slot, Offset16, Slot) -> Self
+pub fn Op::v128_xor(Slot, Slot, Slot) -> Self
+pub fn[V : VisitResults] Op::visit_results(Self, V) -> Self
+
+pub(all) struct ShiftAmount(Const16) derive(Eq, Hash, @debug.Debug)
+pub fn ShiftAmount::of_i32(Int) -> Self?
+pub fn ShiftAmount::of_i64(Int64) -> Self?
+pub fn ShiftAmount::of_u32(UInt, UInt) -> Self?
+pub fn ShiftAmount::to_i32(Self) -> Int
+pub fn ShiftAmount::to_i64(Self) -> Int64
+pub fn ShiftAmount::to_u32(Self) -> UInt
+
+pub(all) struct Sign(Bool) derive(Eq, Hash, @debug.Debug)
+pub fn Sign::from_f32_bits(UInt) -> Self
+pub fn Sign::from_f64_bits(UInt64) -> Self
+pub fn Sign::neg() -> Self
+pub fn Sign::pos() -> Self
+pub fn Sign::to_f32(Self) -> Float
+pub fn Sign::to_f64(Self) -> Double
+
+pub(all) struct Slot(Int) derive(Compare, Eq, Hash, @debug.Debug)
+pub fn Slot::is_const(Self) -> Bool
+pub fn Slot::next(Self) -> Self
+pub fn Slot::next_n(Self, Int) -> Self
+pub fn Slot::prev(Self) -> Self
+pub fn Slot::prev_n(Self, Int) -> Self
+pub fn Slot::try_from_u32(UInt) -> Self raise IrError
+
+pub(all) struct SlotSpan(Slot) derive(Compare, Eq, Hash, @debug.Debug)
+pub fn SlotSpan::has_overlapping_copies(Self, Self, Int) -> Bool
+pub fn SlotSpan::head(Self) -> Slot
+pub fn SlotSpan::iter(Self, Int) -> SlotSpanIter
+pub fn SlotSpan::iter_sized(Self, Int) -> SlotSpanIter
+pub fn SlotSpan::new(Slot) -> Self
+
+pub(all) struct SlotSpanIter {
+  mut next : Int
+  mut last : Int
+} derive(Eq, @debug.Debug)
+pub fn SlotSpanIter::copy(Self) -> Self
+pub fn SlotSpanIter::from_raw_parts(Slot, Slot) -> Self
+pub fn SlotSpanIter::has_overlapping_copies(Self, Self) -> Bool
+pub fn SlotSpanIter::is_empty(Self) -> Bool
+pub fn SlotSpanIter::len(Self) -> Int
+pub fn SlotSpanIter::len_as_u16(Self) -> Int
+pub fn SlotSpanIter::next(Self) -> Slot?
+pub fn SlotSpanIter::next_back(Self) -> Slot?
+pub fn SlotSpanIter::span(Self) -> SlotSpan
+
+pub(all) struct Table(Int) derive(Compare, Eq, Hash, @debug.Debug)
+
+// Type aliases
+
+// Traits
+pub(open) trait VisitResults {
+  fn visit_result_reg(Self, Slot) -> Slot
+  fn visit_result_regs(Self, SlotSpan, Int?) -> SlotSpan
+}

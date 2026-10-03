@@ -30,7 +30,10 @@ pub fn NumTy::val_type(self : NumTy) -> @wasmi_core.ValType {
 
 ///|
 /// Upstream `TryInto<Const16<T>>` (also for `NonZero<T>`).
-pub fn NumTy::const16(self : NumTy, value : @wasmi_core.TypedVal) -> @ir.Const16? {
+pub fn NumTy::const16(
+  self : NumTy,
+  value : @wasmi_core.TypedVal,
+) -> @ir.Const16? {
   match self {
     I32 => @ir.Const16::try_from_i32(value.to_i32())
     U32 => @ir.Const16::try_from_u32(value.to_u32())
@@ -179,8 +182,7 @@ fn FuncTranslator::try_make_fused_branch_cmp_instr(
     cmp_instr
   }
   let offset = self.labels.try_resolve_label(label, instr)
-  guard try_into_cmp_branch_instr(cmp_instr, offset, self.layout)
-    is Some(fused) else {
+  guard try_into_cmp_branch_instr(cmp_instr, offset, self.layout) is Some(fused) else {
     abort("cmp+branch fusion must succeed")
   }
   Some(fused)
@@ -256,7 +258,8 @@ fn FuncTranslator::translate_reinterpret(
     return
   }
   match self.stack.pop() {
-    Local(input) => self.stack.push_local(input.local_index(), result_ty) |> ignore
+    Local(input) =>
+      self.stack.push_local(input.local_index(), result_ty) |> ignore
     Temp(_) => self.stack.push_temp(result_ty, None) |> ignore
     Immediate(input) => {
       let value = consteval(input.val()) catch {
@@ -427,7 +430,9 @@ fn FuncTranslator::translate_binary_commutative(
       )
     }
     (lhs, rhs) =>
-      self.push_binary_instr_with_result(result_ty, lhs, rhs, make_rr, fuel_base)
+      self.push_binary_instr_with_result(
+        result_ty, lhs, rhs, make_rr, fuel_base,
+      )
   }
 }
 
@@ -787,7 +792,11 @@ fn FuncTranslator::translate_select(
       self.push_instr_with_result(
         ty,
         fn(result) {
-          @ir.Op::select_i32_eq_imm16(result, condition, @ir.Const16::from_i16(0))
+          @ir.Op::select_i32_eq_imm16(
+            result,
+            condition,
+            @ir.Const16::from_i16(0),
+          )
         },
         fuel_base,
       )
@@ -941,7 +950,9 @@ fn FuncTranslator::translate_load(
       // Case: we cannot use specialized encoding and thus have to fall back
       //       to the general case where `ptr` is zero and `offset` stores the
       //       `ptr+offset` address value.
-      let zero_ptr = self.layout.const_to_reg(@wasmi_core.UntypedVal::from_u64(0))
+      let zero_ptr = self.layout.const_to_reg(
+        @wasmi_core.UntypedVal::from_u64(0),
+      )
       (zero_ptr, address.to_u64())
     }
     ptr => {
@@ -986,10 +997,7 @@ fn fuel_store(costs : @wasmi_core.FuelCostsProvider) -> UInt64 {
 ///|
 /// Upstream `T::Param::try_from(T::Value::from(value).wrap())`: the store
 /// immediate if the (wrapped) `value` fits the operator's immediate type.
-fn store_param_of(
-  op : StoreWrapOperator,
-  value : @wasmi_core.TypedVal,
-) -> Int? {
+fn store_param_of(op : StoreWrapOperator, value : @wasmi_core.TypedVal) -> Int? {
   match op.kind {
     I32 => {
       let v = value.to_i32()
@@ -1007,10 +1015,10 @@ fn store_param_of(
         None
       }
     }
-    I32Wrap8 => Some(((value.to_i32() & 0xFF) << 24) >> 24)
-    I32Wrap16 => Some(((value.to_i32() & 0xFFFF) << 16) >> 16)
-    I64Wrap8 => Some(((value.to_i64().to_int() & 0xFF) << 24) >> 24)
-    I64Wrap16 => Some(((value.to_i64().to_int() & 0xFFFF) << 16) >> 16)
+    I32Wrap8 => Some((value.to_i32() & 0xFF) << 24 >> 24)
+    I32Wrap16 => Some((value.to_i32() & 0xFFFF) << 16 >> 16)
+    I64Wrap8 => Some((value.to_i64().to_int() & 0xFF) << 24 >> 24)
+    I64Wrap16 => Some((value.to_i64().to_int() & 0xFFFF) << 16 >> 16)
     I64Wrap32 => {
       let v = value.to_i64().to_int()
       if v >= -32768 && v <= 32767 {
@@ -1067,7 +1075,9 @@ fn FuncTranslator::encode_istore_wrap(
       // Case: we cannot use specialized encoding and thus have to fall back
       //       to the general case where `ptr` is zero and `offset` stores the
       //       `ptr+offset` address value.
-      let zero_ptr = self.layout.const_to_reg(@wasmi_core.UntypedVal::from_u64(0))
+      let zero_ptr = self.layout.const_to_reg(
+        @wasmi_core.UntypedVal::from_u64(0),
+      )
       (zero_ptr, address.to_u64())
     }
     ptr => {
@@ -1125,7 +1135,9 @@ fn FuncTranslator::encode_istore_wrap_at(
     Immediate(value) => {
       let value = value.val()
       match store_param_of(op, value) {
-        Some(param) => self.push_instr((op.store_at_imm)(param, address), fuel_store) |> ignore
+        Some(param) =>
+          self.push_instr((op.store_at_imm)(param, address), fuel_store)
+          |> ignore
         None => {
           let value = self.layout.const_to_reg(value.untyped())
           self.push_instr((op.store_at)(value, address), fuel_store) |> ignore
@@ -1161,7 +1173,10 @@ fn FuncTranslator::encode_istore_wrap_mem0(
       let value = value.val()
       match store_param_of(op, value) {
         Some(param) =>
-          self.push_instr((op.store_offset16_imm)(ptr, offset16, param), fuel_store)
+          self.push_instr(
+            (op.store_offset16_imm)(ptr, offset16, param),
+            fuel_store,
+          )
         None => {
           let value = self.layout.const_to_reg(value.untyped())
           self.push_instr((op.store_offset16)(ptr, offset16, value), fuel_store)
@@ -1203,7 +1218,9 @@ fn FuncTranslator::translate_store(
       if @ir.Address32::try_from_address(address) is Some(address) {
         return self.encode_fstore_at(memory, address, value, store_at)
       }
-      let zero_ptr = self.layout.const_to_reg(@wasmi_core.UntypedVal::from_u64(0))
+      let zero_ptr = self.layout.const_to_reg(
+        @wasmi_core.UntypedVal::from_u64(0),
+      )
       (zero_ptr, address.to_u64())
     }
     ptr => {
@@ -1244,7 +1261,9 @@ fn FuncTranslator::encode_fstore_at(
 
 ///|
 /// Returns the linear `memory` index and `offset` of the `memarg`.
-fn FuncTranslator::decode_memarg(memarg : @wasmparser.MemArg) -> (@ir.Memory, UInt64) {
+fn FuncTranslator::decode_memarg(
+  memarg : @wasmparser.MemArg,
+) -> (@ir.Memory, UInt64) {
   let memory = @ir.Memory(memarg.memory.reinterpret_as_int())
   (memory, memarg.offset)
 }

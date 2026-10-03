@@ -12,7 +12,9 @@ pub fn FuncTranslator::translate_unsupported_operator(
 }
 
 ///|
-fn FuncTranslator::visit_unreachable(self : FuncTranslator) -> Unit raise WasmiError {
+fn FuncTranslator::visit_unreachable(
+  self : FuncTranslator,
+) -> Unit raise WasmiError {
   if !self.reachable {
     return
   }
@@ -141,7 +143,10 @@ fn FuncTranslator::visit_end(self : FuncTranslator) -> Unit raise WasmiError {
 }
 
 ///|
-fn FuncTranslator::visit_br(self : FuncTranslator, depth : UInt) -> Unit raise WasmiError {
+fn FuncTranslator::visit_br(
+  self : FuncTranslator,
+  depth : UInt,
+) -> Unit raise WasmiError {
   if !self.reachable {
     return
   }
@@ -168,7 +173,10 @@ fn FuncTranslator::visit_br(self : FuncTranslator, depth : UInt) -> Unit raise W
 }
 
 ///|
-fn FuncTranslator::visit_br_if(self : FuncTranslator, depth : UInt) -> Unit raise WasmiError {
+fn FuncTranslator::visit_br_if(
+  self : FuncTranslator,
+  depth : UInt,
+) -> Unit raise WasmiError {
   if !self.reachable {
     return
   }
@@ -457,7 +465,8 @@ fn FuncTranslator::visit_global_set(
     input => {
       // Case: `global.set` with simple register input.
       let input = self.layout.operand_to_reg(input)
-      self.push_instr(@ir.Op::global_set(input, global), fuel_instance) |> ignore
+      self.push_instr(@ir.Op::global_set(input, global), fuel_instance)
+      |> ignore
       return
     }
   }
@@ -469,14 +478,20 @@ fn FuncTranslator::visit_global_set(
     I32 =>
       if @ir.Const16::try_from_i32(input.to_i32()) is Some(value) {
         // Case: `global.set` with 16-bit encoded `i32` value.
-        self.push_instr(@ir.Op::global_set_i32imm16(value, global), fuel_instance)
+        self.push_instr(
+          @ir.Op::global_set_i32imm16(value, global),
+          fuel_instance,
+        )
         |> ignore
         return
       }
     I64 =>
       if @ir.Const16::try_from_i64(input.to_i64()) is Some(value) {
         // Case: `global.set` with 16-bit encoded `i64` value.
-        self.push_instr(@ir.Op::global_set_i64imm16(value, global), fuel_instance)
+        self.push_instr(
+          @ir.Op::global_set_i64imm16(value, global),
+          fuel_instance,
+        )
         |> ignore
         return
       }
@@ -879,7 +894,9 @@ fn FuncTranslator::visit_f64_const(
 }
 
 ///|
-fn FuncTranslator::visit_i32_eqz(self : FuncTranslator) -> Unit raise WasmiError {
+fn FuncTranslator::visit_i32_eqz(
+  self : FuncTranslator,
+) -> Unit raise WasmiError {
   if !self.reachable {
     return
   }
@@ -888,7 +905,9 @@ fn FuncTranslator::visit_i32_eqz(self : FuncTranslator) -> Unit raise WasmiError
 }
 
 ///|
-fn FuncTranslator::visit_i64_eqz(self : FuncTranslator) -> Unit raise WasmiError {
+fn FuncTranslator::visit_i64_eqz(
+  self : FuncTranslator,
+) -> Unit raise WasmiError {
   if !self.reachable {
     return
   }
@@ -943,8 +962,12 @@ fn FuncTranslator::visit_memory_copy(
   let src = self.immediate_to_reg(src)
   let len = self.immediate_to_reg(len)
   self.push_instr(@ir.Op::memory_copy(dst, src, len), fuel_instance) |> ignore
-  self.push_param(@ir.Op::memory_index(@ir.Memory(dst_mem.reinterpret_as_int())))
-  self.push_param(@ir.Op::memory_index(@ir.Memory(src_mem.reinterpret_as_int())))
+  self.push_param(
+    @ir.Op::memory_index(@ir.Memory(dst_mem.reinterpret_as_int())),
+  )
+  self.push_param(
+    @ir.Op::memory_index(@ir.Memory(src_mem.reinterpret_as_int())),
+  )
 }
 
 ///|
@@ -1017,8 +1040,12 @@ fn FuncTranslator::visit_table_copy(
   let src = self.immediate_to_reg(src)
   let len = self.immediate_to_reg(len)
   self.push_instr(@ir.Op::table_copy(dst, src, len), fuel_instance) |> ignore
-  self.push_param(@ir.Op::table_index(@ir.Table(dst_table.reinterpret_as_int())))
-  self.push_param(@ir.Op::table_index(@ir.Table(src_table.reinterpret_as_int())))
+  self.push_param(
+    @ir.Op::table_index(@ir.Table(dst_table.reinterpret_as_int())),
+  )
+  self.push_param(
+    @ir.Op::table_index(@ir.Table(src_table.reinterpret_as_int())),
+  )
 }
 
 ///|
@@ -1048,7 +1075,9 @@ fn FuncTranslator::visit_ref_null(
 }
 
 ///|
-fn FuncTranslator::visit_ref_is_null(self : FuncTranslator) -> Unit raise WasmiError {
+fn FuncTranslator::visit_ref_is_null(
+  self : FuncTranslator,
+) -> Unit raise WasmiError {
   if !self.reachable {
     return
   }

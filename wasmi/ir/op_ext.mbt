@@ -87,7 +87,10 @@ pub fn Op::filter_register_and_lane(self : Op) -> (Slot, Int)? {
 
 ///|
 /// Creates a new [`Op::Imm16AndImm32`] from the given `value` and `offset_hi`.
-pub fn Op::imm16_and_offset_hi(value : AnyConst16, offset_hi : Offset64Hi) -> Op {
+pub fn Op::imm16_and_offset_hi(
+  value : AnyConst16,
+  offset_hi : Offset64Hi,
+) -> Op {
   Op::imm16_and_imm32(value, AnyConst32::from_u32(offset_hi.0))
 }
 
@@ -103,7 +106,10 @@ pub fn Op::filter_imm16_and_offset_hi(self : Op) -> (AnyConst16, Offset64Hi)? {
 ///|
 /// Creates a new [`Op::Imm16AndImm32`] from the given `lane` and `memory` index.
 pub fn Op::lane_and_memory_index(value : Int, memory : Memory) -> Op {
-  Op::imm16_and_imm32(AnyConst16::from_u16(value), AnyConst32::from_i32(memory.0))
+  Op::imm16_and_imm32(
+    AnyConst16::from_u16(value),
+    AnyConst32::from_i32(memory.0),
+  )
 }
 
 ///|

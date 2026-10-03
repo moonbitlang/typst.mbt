@@ -275,8 +275,12 @@ pub impl Fingerprint for Func with fn fingerprint(self, state) {
       closure.captured.fingerprint_with_depth(state, 1)
       state.write_usize(closure.num_pos_params)
     }
-    With(func, args) => {
+    Plugin(func) => {
       state.write_discriminant(3)
+      state.write(func)
+    }
+    With(func, args) => {
+      state.write_discriminant(4)
       state.write(func)
       state.write(args)
     }

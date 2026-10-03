@@ -32,7 +32,7 @@ pub fn InstrEncoder::new(engine : Engine) -> InstrEncoder {
   } else {
     None
   }
-  { instrs: [], fuel_costs, last_instr: None }
+  { instrs: [], fuel_costs, last_instr: None, }
 }
 
 ///|
@@ -151,7 +151,7 @@ pub fn InstrEncoder::try_fuse_select(
   ty : @wasmi_core.ValType,
   select_condition : @ir.Slot,
   layout : StackLayout,
-  stack : Stack,
+  stack : TranslatorStack,
 ) -> Bool? raise WasmiError {
   guard self.last_instr is Some(last_instr) else {
     // If there is no last instruction there is no comparison instruction to negate.
@@ -187,7 +187,10 @@ pub fn InstrEncoder::try_fuse_select(
 /// Pushes an [`Op`] parameter to the [`InstrEncoder`].
 ///
 /// The parameter is associated to the last pushed [`Op`].
-pub fn InstrEncoder::push_param(self : InstrEncoder, instruction : @ir.Op) -> Unit {
+pub fn InstrEncoder::push_param(
+  self : InstrEncoder,
+  instruction : @ir.Op,
+) -> Unit {
   self.instrs.push(instruction)
 }
 
@@ -199,7 +202,11 @@ pub fn InstrEncoder::get(self : InstrEncoder, instr : Instr) -> @ir.Op {
 
 ///|
 /// Replaces the [`Op`] associated to [`Instr`] (upstream `get_mut`).
-pub fn InstrEncoder::set(self : InstrEncoder, instr : Instr, op : @ir.Op) -> Unit {
+pub fn InstrEncoder::set(
+  self : InstrEncoder,
+  instr : Instr,
+  op : @ir.Op,
+) -> Unit {
   self.instrs[instr.into_usize()] = op
 }
 

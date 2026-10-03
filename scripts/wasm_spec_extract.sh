@@ -38,5 +38,9 @@ for dir in simd relaxed-simd bulk-memory multi-memory memory64 exceptions gc \
     extract "${dir//\//-}" "$wast"
   done
 done
+# Our own additions (tests/wasm/*.wast).
+for wast in tests/wasm/*.wast; do
+  extract extra "$wast"
+done
 echo "extracted $(find "$OUT" -name '*.json' | wc -l) files," \
   "skipped $(wc -l < "$OUT/skipped.txt")"

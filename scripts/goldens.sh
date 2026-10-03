@@ -88,6 +88,16 @@ for stage in "${stages[@]}"; do
       > tests/golden/wasm-spec/validate.tsv
     continue
   fi
+  if [ "$stage" = wasm-spec ]; then
+    # The WebAssembly spec test suite (WASM_TESTSUITE, default
+    # .repos/wasm-testsuite) run with the real wasmi 1.0.9
+    # (oracle/src/bin/gen_wasmi_spec.rs).
+    scripts/wasm_spec_extract.sh
+    rm -rf tests/golden/wasm-spec/expected
+    (cd oracle && cargo run --release -q --bin gen_wasmi_spec -- \
+      ../tests/golden/wasm-spec/corpus ../tests/golden/wasm-spec/expected)
+    continue
+  fi
   if [ "$stage" = fonts ]; then
     "$ORACLE" fonts tests/golden/fonts.json
     continue

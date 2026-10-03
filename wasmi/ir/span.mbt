@@ -70,7 +70,10 @@ pub fn FixedSlotSpan::to_array(self : FixedSlotSpan) -> (Slot, Slot) {
 /// # Errors
 ///
 /// If `span` cannot hold `n` slots (overflowing slot indices).
-pub fn FixedSlotSpan::new(span : SlotSpan, n : Int) -> FixedSlotSpan raise IrError {
+pub fn FixedSlotSpan::new(
+  span : SlotSpan,
+  n : Int,
+) -> FixedSlotSpan raise IrError {
   let head = span.head()
   if head.0 >= head.next_n(n).0 {
     raise IrError::StackSlotOutOfBounds
@@ -128,7 +131,7 @@ pub(all) struct BoundedSlotSpan {
 ///|
 /// Creates a new [`BoundedSlotSpan`] from the given `span` and `len`.
 pub fn BoundedSlotSpan::new(span : SlotSpan, len : Int) -> BoundedSlotSpan {
-  { span, len }
+  { span, len, }
 }
 
 ///|
@@ -178,7 +181,7 @@ pub(all) struct SlotSpanIter {
 ///|
 /// Creates a [`SlotSpanIter`] from then given raw `start` and `end` [`Slot`].
 pub fn SlotSpanIter::from_raw_parts(start : Slot, end : Slot) -> SlotSpanIter {
-  { next: start.0, last: end.0 }
+  { next: start.0, last: end.0, }
 }
 
 ///|
@@ -205,7 +208,7 @@ fn SlotSpanIter::new_u16(start : Slot, len : Int) -> SlotSpanIter {
   if last > 32767 {
     abort("overflowing register index for register span")
   }
-  { next: start.0, last }
+  { next: start.0, last, }
 }
 
 ///|
@@ -256,7 +259,7 @@ pub fn SlotSpanIter::next_back(self : SlotSpanIter) -> Slot? {
 ///|
 /// Returns a copy of the iterator (upstream `SlotSpanIter: Copy`).
 pub fn SlotSpanIter::copy(self : SlotSpanIter) -> SlotSpanIter {
-  { next: self.next, last: self.last }
+  { next: self.next, last: self.last, }
 }
 
 ///|

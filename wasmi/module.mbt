@@ -46,7 +46,8 @@ fn ExternIdx::new(kind : @wasmparser.ExternalKind, index : UInt) -> ExternIdx {
     Table => Table(TableIdx(index))
     Memory => Memory(MemoryIdx(index))
     Global => Global(GlobalIdx(index))
-    Tag => abort("wasmi does not support the `exception-handling` Wasm proposal")
+    Tag =>
+      abort("wasmi does not support the `exception-handling` Wasm proposal")
   }
 }
 
@@ -59,7 +60,7 @@ pub(all) struct ImportName {
 
 ///|
 pub fn ImportName::new(module : String, field : String) -> ImportName {
-  { module, field }
+  { module, field, }
 }
 
 ///|
@@ -73,7 +74,7 @@ pub fn ImportName::name(self : ImportName) -> String {
 }
 
 ///|
-pub impl Show for ImportName with output(self, f) {
+pub impl Show for ImportName with fn output(self, f) {
   f.write_string(self.module)
   f.write_string("::")
   f.write_string(self.field)
@@ -359,7 +360,7 @@ pub fn ConstExpr::new(expr : @wasmparser.ConstExpr) -> ConstExpr {
 ///|
 /// Create a new `ref.func x` [`ConstExpr`].
 pub fn ConstExpr::new_funcref(function_index : UInt) -> ConstExpr {
-  { op: FuncRef(function_index) }
+  { op: FuncRef(function_index), }
 }
 
 ///|
@@ -504,21 +505,27 @@ fn ModuleElementSegment::from_wasmparser(
       (out, ty)
     }
   }
-  { kind, ty, items }
+  { kind, ty, items, }
 }
 
 ///|
-pub fn ModuleElementSegment::kind(self : ModuleElementSegment) -> ElementSegmentKind {
+pub fn ModuleElementSegment::kind(
+  self : ModuleElementSegment,
+) -> ElementSegmentKind {
   self.kind
 }
 
 ///|
-pub fn ModuleElementSegment::ty(self : ModuleElementSegment) -> @wasmi_core.ValType {
+pub fn ModuleElementSegment::ty(
+  self : ModuleElementSegment,
+) -> @wasmi_core.ValType {
   self.ty
 }
 
 ///|
-pub fn ModuleElementSegment::items(self : ModuleElementSegment) -> Array[ConstExpr] {
+pub fn ModuleElementSegment::items(
+  self : ModuleElementSegment,
+) -> Array[ConstExpr] {
   self.items
 }
 
@@ -862,18 +869,18 @@ pub fn Module::imports(self : Module) -> Array[ImportType] {
       Func(name) => {
         let func_type = self.engine.resolve_func_type(header.funcs[funcs])
         funcs += 1
-        out.push({ name, ty: Func(func_type) })
+        out.push({ name, ty: Func(func_type), })
       }
       Table(name) => {
-        out.push({ name, ty: Table(header.tables[tables]) })
+        out.push({ name, ty: Table(header.tables[tables]), })
         tables += 1
       }
       Memory(name) => {
-        out.push({ name, ty: Memory(header.memories[memories]) })
+        out.push({ name, ty: Memory(header.memories[memories]), })
         memories += 1
       }
       Global(name) => {
-        out.push({ name, ty: Global(header.globals[globals]) })
+        out.push({ name, ty: Global(header.globals[globals]), })
         globals += 1
       }
     }

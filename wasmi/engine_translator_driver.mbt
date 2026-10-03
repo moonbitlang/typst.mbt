@@ -47,7 +47,9 @@ pub fn FuncTranslationDriver::translate(
     let op = reader.read() catch { e => raise WasmiError::from_wasm(e) }
     translator.visit_operator(op)
   }
-  reader.ensure_end() catch { e => raise WasmiError::from_wasm(e) }
+  reader.ensure_end() catch {
+    e => raise WasmiError::from_wasm(e)
+  }
   translator.finish()
 }
 

@@ -143,7 +143,7 @@ let i8x16_replace_lane_op : SimdReplaceLane = {
       result,
       input,
       lane,
-      ((value.to_i32() & 0xFF) << 24) >> 24,
+      (value.to_i32() & 0xFF) << 24 >> 24,
     )
   },
   replace_lane_imm_param: fn(_) { None },
@@ -167,7 +167,7 @@ let i16x8_replace_lane_op : SimdReplaceLane = {
   replace_lane_imm_param: fn(value) {
     Some(
       @ir.Op::const32(
-        @ir.AnyConst32::from_i32(((value.to_i32() & 0xFFFF) << 16) >> 16),
+        @ir.AnyConst32::from_i32((value.to_i32() & 0xFFFF) << 16 >> 16),
       ),
     )
   },
@@ -214,7 +214,9 @@ let i64x2_replace_lane_op : SimdReplaceLane = {
       None => abort("unreachable")
     }
   },
-  value_to_imm: fn(value) { @ir.Const32::try_from_i64(value.to_i64()) is Some(_) },
+  value_to_imm: fn(value) {
+    @ir.Const32::try_from_i64(value.to_i64()) is Some(_)
+  },
 }
 
 ///|
@@ -280,7 +282,10 @@ fn FuncTranslator::translate_replace_lane(
     return
   }
   let input = self.layout.operand_to_reg(input)
-  let value : Input[@wasmi_core.TypedVal] = self.make_input(value, fn(this, value) {
+  let value : Input[@wasmi_core.TypedVal] = self.make_input(value, fn(
+    this,
+    value,
+  ) {
     if (op.value_to_imm)(value) {
       Immediate(value)
     } else {
@@ -474,7 +479,9 @@ fn FuncTranslator::translate_v128_load_lane(
           result_ty, memory, x, lane, address, make_instr_at,
         )
       }
-      let zero_ptr = self.layout.const_to_reg(@wasmi_core.UntypedVal::from_u64(0))
+      let zero_ptr = self.layout.const_to_reg(
+        @wasmi_core.UntypedVal::from_u64(0),
+      )
       (zero_ptr, address.to_u64())
     }
     ptr => {
@@ -526,7 +533,13 @@ fn FuncTranslator::translate_v128_store_lane(
   make_instr : (@ir.Slot, @ir.Offset64Lo) -> @ir.Op,
   make_instr_offset8 : (@ir.Slot, @ir.Slot, @ir.Offset8, @ir.ImmLaneIdx) -> @ir.Op,
   make_instr_at : (@ir.Slot, @ir.Address32) -> @ir.Op,
-  translate_imm : (FuncTranslator, @wasmparser.MemArg, Operand, Int, @wasmi_core.V128) -> Unit raise WasmiError,
+  translate_imm : (
+    FuncTranslator,
+    @wasmparser.MemArg,
+    Operand,
+    Int,
+    @wasmi_core.V128,
+  ) -> Unit raise WasmiError,
 ) -> Unit raise WasmiError {
   if !self.reachable {
     return
@@ -554,7 +567,9 @@ fn FuncTranslator::translate_v128_store_lane(
       // Case: we cannot use specialized encoding and thus have to fall back
       //       to the general case where `ptr` is zero and `offset` stores the
       //       `ptr+offset` address value.
-      let zero_ptr = self.layout.const_to_reg(@wasmi_core.UntypedVal::from_u64(0))
+      let zero_ptr = self.layout.const_to_reg(
+        @wasmi_core.UntypedVal::from_u64(0),
+      )
       (zero_ptr, address.to_u64())
     }
     ptr => {
@@ -692,7 +707,9 @@ fn FuncTranslator::visit_v128_store8_lane(
         v128,
         @wasmi_core.ImmLaneIdx16(lane.to_byte()),
       )
-      let value = this.immediate_to_operand(@wasmi_core.TypedVal::from_i32(value))
+      let value = this.immediate_to_operand(
+        @wasmi_core.TypedVal::from_i32(value),
+      )
       this.encode_istore_wrap(i32_store8_op, memarg, ptr, value)
     },
   )
@@ -716,7 +733,9 @@ fn FuncTranslator::visit_v128_store16_lane(
         v128,
         @wasmi_core.ImmLaneIdx8(lane.to_byte()),
       )
-      let value = this.immediate_to_operand(@wasmi_core.TypedVal::from_i32(value))
+      let value = this.immediate_to_operand(
+        @wasmi_core.TypedVal::from_i32(value),
+      )
       this.encode_istore_wrap(i32_store16_op, memarg, ptr, value)
     },
   )
@@ -740,7 +759,9 @@ fn FuncTranslator::visit_v128_store32_lane(
         v128,
         @wasmi_core.ImmLaneIdx4(lane.to_byte()),
       )
-      let value = this.immediate_to_operand(@wasmi_core.TypedVal::from_i32(value))
+      let value = this.immediate_to_operand(
+        @wasmi_core.TypedVal::from_i32(value),
+      )
       this.encode_istore_wrap(i32_store_op, memarg, ptr, value)
     },
   )
@@ -764,7 +785,9 @@ fn FuncTranslator::visit_v128_store64_lane(
         v128,
         @wasmi_core.ImmLaneIdx2(lane.to_byte()),
       )
-      let value = this.immediate_to_operand(@wasmi_core.TypedVal::from_i64(value))
+      let value = this.immediate_to_operand(
+        @wasmi_core.TypedVal::from_i64(value),
+      )
       this.encode_istore_wrap(i64_store_op, memarg, ptr, value)
     },
   )

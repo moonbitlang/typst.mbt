@@ -30,6 +30,8 @@ import {
   "moonbitlang/typst/syntect",
   "moonbitlang/typst/syntect/two_face",
   "moonbitlang/typst/syntax/highlight",
+  "moonbitlang/typst/wasmi",
+  "moonbitlang/typst/wasmi/core" @wasmi_core,
 }
 
 import {

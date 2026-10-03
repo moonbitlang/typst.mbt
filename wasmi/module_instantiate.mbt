@@ -15,7 +15,10 @@ pub(all) enum InstantiationError {
     actual~ : @wasmi_core.GlobalType
   )
   /// Returned when a function has a mismatching type.
-  FuncTypeMismatch(expected~ : @wasmi_core.FuncType, actual~ : @wasmi_core.FuncType)
+  FuncTypeMismatch(
+    expected~ : @wasmi_core.FuncType,
+    actual~ : @wasmi_core.FuncType
+  )
   /// Returned when a table has a mismatching type.
   TableTypeMismatch(
     expected~ : @wasmi_core.TableType,
@@ -43,7 +46,7 @@ pub(all) enum InstantiationError {
 }
 
 ///|
-pub impl Show for InstantiationError with output(self, f) {
+pub impl Show for InstantiationError with fn output(self, f) {
   match self {
     InvalidNumberOfImports(required~, given~) =>
       f.write_string(
@@ -75,7 +78,8 @@ pub impl Show for InstantiationError with output(self, f) {
       )
     UnexpectedStartFn(index~) =>
       f.write_string("found an unexpected start function with index \{index}")
-    TooManyInstances => f.write_string("tried to instantiate too many instances")
+    TooManyInstances =>
+      f.write_string("tried to instantiate too many instances")
     TooManyTables => f.write_string("tried to instantiate too many tables")
     TooManyMemories =>
       f.write_string("tried to instantiate too many linear memories")
@@ -229,7 +233,11 @@ fn[T] Module::extract_functions(
   for i in len_imported..<header.funcs.length() {
     let func_type = header.funcs[i]
     let func_body = header.engine_funcs.get_or_panic(i - len_imported)
-    let wasm_func : WasmFuncEntity = { ty: func_type, body: func_body, instance: handle }
+    let wasm_func : WasmFuncEntity = {
+      ty: func_type,
+      body: func_body,
+      instance: handle,
+    }
     let func = store.inner.alloc_func(Wasm(wasm_func))
     builder.funcs.push(func)
   }
@@ -330,7 +338,10 @@ fn[T] Module::eval_init_expr(
 
 ///|
 /// Extracts the Wasm exports from the module and registers them into the [`Instance`].
-fn Module::extract_exports(self : Module, builder : InstanceEntityBuilder) -> Unit {
+fn Module::extract_exports(
+  self : Module,
+  builder : InstanceEntityBuilder,
+) -> Unit {
   for field, idx in self.header.exports {
     let external : Extern = match idx {
       Func(func_index) => Func(builder.get_func(func_index.0))
@@ -344,7 +355,10 @@ fn Module::extract_exports(self : Module, builder : InstanceEntityBuilder) -> Un
 
 ///|
 /// Extracts the optional start function for the build instance.
-fn Module::extract_start_fn(self : Module, builder : InstanceEntityBuilder) -> Unit {
+fn Module::extract_start_fn(
+  self : Module,
+  builder : InstanceEntityBuilder,
+) -> Unit {
   if self.header.start is Some(start_fn) {
     builder.set_start(start_fn)
   }
@@ -378,9 +392,7 @@ fn[T] Module::initialize_table_elements(
             ) {
             Some(v) => v
             None =>
-              abort(
-                "unexpected failed initialization of constant expression",
-              )
+              abort("unexpected failed initialization of constant expression")
           }
         })
       Declared => []
@@ -420,15 +432,15 @@ fn[T] Module::initialize_memory_data(
 ) -> Unit raise WasmiError {
   for segment in self.data_segments {
     let segment = match segment {
-      Active({ memory_index, offset, bytes }) => {
+      Active({ memory_index, offset, bytes, }) => {
         let memory = builder.get_memory(memory_index.0)
         let offset = Module::eval_init_expr(store, builder, offset).to_bits64()
         store.inner.resolve_memory(memory).write(offset, bytes[:]) catch {
           e => raise Memory(e)
         }
-        store.inner.alloc_data_segment({ bytes: None })
+        store.inner.alloc_data_segment({ bytes: None, })
       }
-      Passive(bytes) => store.inner.alloc_data_segment({ bytes: Some(bytes) })
+      Passive(bytes) => store.inner.alloc_data_segment({ bytes: Some(bytes), })
     }
     builder.data_segments.push(segment)
   }

@@ -16,14 +16,16 @@ pub(all) enum LinkerError {
 }
 
 ///|
-pub impl Show for LinkerError with output(self, f) {
+pub impl Show for LinkerError with fn output(self, f) {
   match self {
     DuplicateDefinition(import_name~) =>
       f.write_string(
         "encountered duplicate definition with name `\{import_name}`",
       )
     MissingDefinition(name~, ty~) =>
-      f.write_string("cannot find definition for import \{name} with type \{ty}")
+      f.write_string(
+        "cannot find definition for import \{name} with type \{ty}",
+      )
     InvalidTypeDefinition(name~, expected~, found~) =>
       f.write_string(
         "found definition for import \{name} with type \{expected} but found type \{found}",
@@ -94,7 +96,7 @@ pub struct Linker[T] {
 ///|
 /// Creates a new [`Linker`].
 pub fn[T] Linker::new(engine : Engine) -> Linker[T] {
-  { engine, definitions: {}, allow_shadowing: false }
+  { engine, definitions: {}, allow_shadowing: false, }
 }
 
 ///|
@@ -168,7 +170,11 @@ pub fn[T] Linker::func_new(
 ///
 /// - Returns `None` if this name was not previously defined in this [`Linker`].
 /// - Returns `None` if the definition is a [`Linker`] host function.
-pub fn[T] Linker::get(self : Linker[T], module : String, name : String) -> Extern? {
+pub fn[T] Linker::get(
+  self : Linker[T],
+  module : String,
+  name : String,
+) -> Extern? {
   match self.definitions.get((module, name)) {
     Some(Extern(item)) => Some(item)
     _ => None

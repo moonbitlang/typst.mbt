@@ -34,7 +34,7 @@ pub(all) enum TranslationError {
 }
 
 ///|
-pub impl Show for TranslationError with output(self, f) {
+pub impl Show for TranslationError with fn output(self, f) {
   match self {
     UnsupportedBlockType(error) =>
       f.write_string(
@@ -45,7 +45,9 @@ pub impl Show for TranslationError with output(self, f) {
         "encountered unsupported Wasm value type: \{debug_wasmparser_val_type(error)}",
       )
     BranchTableTargetsOutOfBounds =>
-      f.write_string("branch table targets are out of bounds for wasmi bytecode")
+      f.write_string(
+        "branch table targets are out of bounds for wasmi bytecode",
+      )
     BranchOffsetOutOfBounds =>
       f.write_string("branching offset is out of bounds for wasmi bytecode")
     BlockFuelOutOfBounds =>
@@ -63,7 +65,9 @@ pub impl Show for TranslationError with output(self, f) {
     ProviderSliceOverflow =>
       f.write_string("tried to allocate too many or too large provider slices")
     TooManyFuncLocalConstValues =>
-      f.write_string("tried to allocate too many function local constant values")
+      f.write_string(
+        "tried to allocate too many function local constant values",
+      )
     TooManyFunctionResults =>
       f.write_string("encountered function with too many function results")
     TooManyFunctionParams =>

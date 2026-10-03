@@ -9,14 +9,18 @@ priv struct RelinkVisitor {
 }
 
 ///|
-impl @ir.VisitResults for RelinkVisitor with visit_result_reg(self, slot) {
+impl @ir.VisitResults for RelinkVisitor with fn visit_result_reg(self, slot) {
   let (replaced, slot) = relink_simple(slot, self.new_result, self.old_result)
   self.replaced = replaced
   slot
 }
 
 ///|
-impl @ir.VisitResults for RelinkVisitor with visit_result_regs(_self, slots, _len) {
+impl @ir.VisitResults for RelinkVisitor with fn visit_result_regs(
+  _self,
+  slots,
+  _len,
+) {
   slots
 }
 
@@ -112,7 +116,7 @@ pub fn relink_result(
     }
     instr => {
       // Fallback: only relink results of instructions with statically known single results.
-      let visitor = { new_result, old_result, replaced: false }
+      let visitor = { new_result, old_result, replaced: false, }
       let relinked = instr.visit_results(visitor)
       if visitor.replaced {
         Some(relinked)

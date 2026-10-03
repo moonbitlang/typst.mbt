@@ -20,13 +20,13 @@ pub fn Sign::neg() -> Sign {
 /// Upstream `From<f32> for Sign<f32>` (given as bits): positive iff the sign
 /// bit is clear.
 pub fn Sign::from_f32_bits(bits : UInt) -> Sign {
-  Sign((bits >> 31) == 0)
+  Sign(bits >> 31 == 0)
 }
 
 ///|
 /// Upstream `From<f64> for Sign<f64>` (given as bits).
 pub fn Sign::from_f64_bits(bits : UInt64) -> Sign {
-  Sign((bits >> 63) == 0)
+  Sign(bits >> 63 == 0)
 }
 
 ///|
@@ -64,7 +64,9 @@ pub fn BranchOffset16::from_i16(offset : Int) -> BranchOffset16 {
 
 ///|
 /// Upstream `TryFrom<BranchOffset> for BranchOffset16`.
-pub fn BranchOffset16::try_from(offset : BranchOffset) -> BranchOffset16 raise IrError {
+pub fn BranchOffset16::try_from(
+  offset : BranchOffset,
+) -> BranchOffset16 raise IrError {
   let offset = offset.to_i32()
   if offset < -32768 || offset > 32767 {
     raise IrError::BranchOffsetOutOfBounds
@@ -203,7 +205,10 @@ pub fn BlockFuel::try_from_u64(index : UInt64) -> BlockFuel raise IrError {
 /// # Errors
 ///
 /// If the new fuel amount after this operation is out of bounds.
-pub fn BlockFuel::bump_by(self : BlockFuel, amount : UInt64) -> BlockFuel raise IrError {
+pub fn BlockFuel::bump_by(
+  self : BlockFuel,
+  amount : UInt64,
+) -> BlockFuel raise IrError {
   let new_amount = self.to_u64() + amount
   if new_amount < amount {
     raise IrError::BlockFuelOutOfBounds
@@ -256,9 +261,37 @@ pub(all) enum Comparator {
 
 ///|
 let comparators : FixedArray[Comparator] = [
-  I32Eq, I32Ne, I32LtS, I32LtU, I32LeS, I32LeU, I32And, I32Or, I32Nand, I32Nor,
-  I64Eq, I64Ne, I64LtS, I64LtU, I64LeS, I64LeU, I64And, I64Or, I64Nand, I64Nor,
-  F32Eq, F32Ne, F32Lt, F32Le, F32NotLt, F32NotLe, F64Eq, F64Ne, F64Lt, F64Le, F64NotLt,
+  I32Eq,
+  I32Ne,
+  I32LtS,
+  I32LtU,
+  I32LeS,
+  I32LeU,
+  I32And,
+  I32Or,
+  I32Nand,
+  I32Nor,
+  I64Eq,
+  I64Ne,
+  I64LtS,
+  I64LtU,
+  I64LeS,
+  I64LeU,
+  I64And,
+  I64Or,
+  I64Nand,
+  I64Nor,
+  F32Eq,
+  F32Ne,
+  F32Lt,
+  F32Le,
+  F32NotLt,
+  F32NotLe,
+  F64Eq,
+  F64Ne,
+  F64Lt,
+  F64Le,
+  F64NotLt,
   F64NotLe,
 ]
 
@@ -299,7 +332,7 @@ pub fn ComparatorAndOffset::new(
   cmp : Comparator,
   offset : BranchOffset,
 ) -> ComparatorAndOffset {
-  { cmp, offset }
+  { cmp, offset, }
 }
 
 ///|
@@ -311,7 +344,7 @@ pub fn ComparatorAndOffset::from_u64(value : UInt64) -> ComparatorAndOffset? {
   let lo = (value & 0xFFFF_FFFFUL).to_uint()
   let cmp = Comparator::try_from_u32(hi) catch { _ => return None }
   let offset = BranchOffset::from_i32(lo.reinterpret_as_int())
-  Some({ cmp, offset })
+  Some({ cmp, offset, })
 }
 
 ///|

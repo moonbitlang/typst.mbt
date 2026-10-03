@@ -8,7 +8,7 @@
 /// Implemented by visitors of the result slots of an [`Op`].
 pub(open) trait VisitResults {
   /// Visits a [`Slot`] storing the result of an [`Op`].
-  visit_result_reg(Self, Slot) -> Slot
+  fn visit_result_reg(Self, Slot) -> Slot
   /// Visits a [`SlotSpan`] storing the results of an [`Op`].
-  visit_result_regs(Self, SlotSpan, Int?) -> SlotSpan
+  fn visit_result_regs(Self, SlotSpan, Int?) -> SlotSpan
 }

@@ -17,7 +17,7 @@ pub(all) enum Extern {
 } derive(Eq)
 
 ///|
-pub impl Show for Extern with output(self, f) {
+pub impl Show for Extern with fn output(self, f) {
   match self {
     Global(g) => f.write_string("Global(\{g})")
     Table(t) => f.write_string("Table(\{t})")
@@ -127,7 +127,7 @@ pub fn debug_global_type(ty : @wasmi_core.GlobalType) -> String {
 
 ///|
 /// Upstream `Debug for ExternType`.
-pub impl Show for ExternType with output(self, f) {
+pub impl Show for ExternType with fn output(self, f) {
   match self {
     Global(ty) => f.write_string("Global(\{debug_global_type(ty)})")
     Table(ty) => f.write_string("Table(\{debug_table_type(ty)})")
@@ -178,7 +178,10 @@ pub fn InstanceEntity::is_initialized(self : InstanceEntity) -> Bool {
 
 ///|
 /// Returns the linear memory at the `index` if any.
-pub fn InstanceEntity::get_memory(self : InstanceEntity, index : Int) -> Memory? {
+pub fn InstanceEntity::get_memory(
+  self : InstanceEntity,
+  index : Int,
+) -> Memory? {
   self.memories.get(index)
 }
 
@@ -190,7 +193,10 @@ pub fn InstanceEntity::get_table(self : InstanceEntity, index : Int) -> Table? {
 
 ///|
 /// Returns the global variable at the `index` if any.
-pub fn InstanceEntity::get_global(self : InstanceEntity, index : Int) -> Global? {
+pub fn InstanceEntity::get_global(
+  self : InstanceEntity,
+  index : Int,
+) -> Global? {
   self.globals.get(index)
 }
 
@@ -229,7 +235,10 @@ pub fn InstanceEntity::get_element_segment(
 
 ///|
 /// Returns the value exported to the given `name` if any.
-pub fn InstanceEntity::get_export(self : InstanceEntity, name : String) -> Extern? {
+pub fn InstanceEntity::get_export(
+  self : InstanceEntity,
+  name : String,
+) -> Extern? {
   self.exports.get(name)
 }
 
@@ -255,7 +264,11 @@ pub fn[T] Instance::get_func_by_index(
 
 ///|
 /// Looks up an exported [`Func`] value by `name`.
-pub fn[T] Instance::get_func(self : Instance, store : Store[T], name : String) -> Func? {
+pub fn[T] Instance::get_func(
+  self : Instance,
+  store : Store[T],
+  name : String,
+) -> Func? {
   match self.get_export(store, name) {
     Some(e) => e.into_func()
     None => None
@@ -277,7 +290,11 @@ pub fn[T] Instance::get_global(
 
 ///|
 /// Looks up an exported [`Table`] value by `name`.
-pub fn[T] Instance::get_table(self : Instance, store : Store[T], name : String) -> Table? {
+pub fn[T] Instance::get_table(
+  self : Instance,
+  store : Store[T],
+  name : String,
+) -> Table? {
   match self.get_export(store, name) {
     Some(e) => e.into_table()
     None => None
@@ -299,7 +316,10 @@ pub fn[T] Instance::get_memory(
 
 ///|
 /// Returns the exports of the [`Instance`] in name (byte) order.
-pub fn[T] Instance::exports(self : Instance, store : Store[T]) -> Array[(String, Extern)] {
+pub fn[T] Instance::exports(
+  self : Instance,
+  store : Store[T],
+) -> Array[(String, Extern)] {
   let exports = store.inner.resolve_instance(self).exports
   let names = exports.keys().collect()
   names.sort_by(compare_utf8)
@@ -338,7 +358,10 @@ fn InstanceEntityBuilder::new(module : Module) -> InstanceEntityBuilder {
 
 ///|
 /// Sets the start function of the built instance.
-fn InstanceEntityBuilder::set_start(self : InstanceEntityBuilder, start_fn : FuncIdx) -> Unit {
+fn InstanceEntityBuilder::set_start(
+  self : InstanceEntityBuilder,
+  start_fn : FuncIdx,
+) -> Unit {
   match self.start_fn {
     Some(index) => abort("already set start function \{index.0}")
     None => self.start_fn = Some(start_fn)
@@ -352,7 +375,10 @@ fn InstanceEntityBuilder::get_start(self : InstanceEntityBuilder) -> FuncIdx? {
 }
 
 ///|
-fn InstanceEntityBuilder::get_memory(self : InstanceEntityBuilder, index : Int) -> Memory {
+fn InstanceEntityBuilder::get_memory(
+  self : InstanceEntityBuilder,
+  index : Int,
+) -> Memory {
   match self.memories.get(index) {
     Some(m) => m
     None => abort("missing `Memory` at index: \{index}")
@@ -360,7 +386,10 @@ fn InstanceEntityBuilder::get_memory(self : InstanceEntityBuilder, index : Int) 
 }
 
 ///|
-fn InstanceEntityBuilder::get_table(self : InstanceEntityBuilder, index : Int) -> Table {
+fn InstanceEntityBuilder::get_table(
+  self : InstanceEntityBuilder,
+  index : Int,
+) -> Table {
   match self.tables.get(index) {
     Some(t) => t
     None => abort("missing `Table` at index: \{index}")
@@ -368,7 +397,10 @@ fn InstanceEntityBuilder::get_table(self : InstanceEntityBuilder, index : Int) -
 }
 
 ///|
-fn InstanceEntityBuilder::get_global(self : InstanceEntityBuilder, index : Int) -> Global {
+fn InstanceEntityBuilder::get_global(
+  self : InstanceEntityBuilder,
+  index : Int,
+) -> Global {
   match self.globals.get(index) {
     Some(g) => g
     None => abort("missing `Global` at index: \{index}")
@@ -376,7 +408,10 @@ fn InstanceEntityBuilder::get_global(self : InstanceEntityBuilder, index : Int) 
 }
 
 ///|
-fn InstanceEntityBuilder::get_func(self : InstanceEntityBuilder, index : Int) -> Func {
+fn InstanceEntityBuilder::get_func(
+  self : InstanceEntityBuilder,
+  index : Int,
+) -> Func {
   match self.funcs.get(index) {
     Some(f) => f
     None => abort("missing `Func` at index: \{index}")
@@ -399,7 +434,9 @@ fn InstanceEntityBuilder::push_export(
 
 ///|
 /// Finishes constructing the [`InstanceEntity`].
-fn InstanceEntityBuilder::finish(self : InstanceEntityBuilder) -> InstanceEntity {
+fn InstanceEntityBuilder::finish(
+  self : InstanceEntityBuilder,
+) -> InstanceEntity {
   {
     initialized: true,
     func_types: self.func_types,

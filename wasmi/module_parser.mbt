@@ -19,7 +19,7 @@ priv struct ModuleParser {
 fn ModuleParser::new(engine : Engine) -> ModuleParser {
   let parser = @wasmparser.Parser::new(0)
   parser.set_features(engine.config().wasm_features())
-  { engine, validator: None, parser, engine_funcs: 0 }
+  { engine, validator: None, parser, engine_funcs: 0, }
 }
 
 ///|
@@ -41,7 +41,9 @@ pub fn Module::new(engine : Engine, wasm : Bytes) -> Module raise WasmiError {
 
 ///|
 /// Raises a wasmparser error as a wasmi [`WasmiError`].
-fn[R] wasm_err(f : () -> R raise @wasmparser.BinaryReaderError) -> R raise WasmiError {
+fn[R] wasm_err(
+  f : () -> R raise @wasmparser.BinaryReaderError,
+) -> R raise WasmiError {
   f() catch {
     e => raise Wasm(e)
   }
@@ -58,7 +60,10 @@ fn ModuleParser::validator(self : ModuleParser) -> @wasmparser.Validator {
 
 ///|
 /// Processes the end of the Wasm binary.
-fn ModuleParser::process_end(self : ModuleParser, offset : Int) -> Unit raise WasmiError {
+fn ModuleParser::process_end(
+  self : ModuleParser,
+  offset : Int,
+) -> Unit raise WasmiError {
   if self.validator is Some(validator) {
     // This only checks if the number of code section entries and data segments match
     // their expected numbers thus we must avoid this check in header-only mode because
@@ -137,9 +142,7 @@ fn ModuleParser::process_imports(
         header.globals.push(global_type_from_wasmparser(global_type))
       }
       Tag(_) =>
-        abort(
-          "wasmi does not support the `exception-handling` Wasm proposal",
-        )
+        abort("wasmi does not support the `exception-handling` Wasm proposal")
     }
   }
 }
@@ -163,7 +166,9 @@ fn ModuleParser::process_functions(
   if self.validator is Some(validator) {
     wasm_err(fn() { validator.function_section(section) })
   }
-  header.engine_funcs = self.engine.alloc_funcs(section.count().reinterpret_as_int())
+  header.engine_funcs = self.engine.alloc_funcs(
+    section.count().reinterpret_as_int(),
+  )
   let iter = section.into_iter()
   while wasm_err(fn() { iter.next() }) is Some(func_type_idx) {
     let func_type = header.func_types[func_type_idx.reinterpret_as_int()]
@@ -325,8 +330,7 @@ fn ModuleParser::process_data_count(
   count : UInt,
   range : @wasmparser.Range,
 ) -> Unit raise WasmiError {
-  if self.engine.config().get_enforced_limits().max_data_segments
-    is Some(limit) {
+  if self.engine.config().get_enforced_limits().max_data_segments is Some(limit) {
     if count > limit {
       raise Limits(TooManyDataSegments(limit~))
     }
@@ -343,8 +347,7 @@ fn ModuleParser::process_data(
   section : @wasmparser.SectionLimited[@wasmparser.Data],
   data_segments : Array[ModuleDataSegment],
 ) -> Unit raise WasmiError {
-  if self.engine.config().get_enforced_limits().max_data_segments
-    is Some(limit) {
+  if self.engine.config().get_enforced_limits().max_data_segments is Some(limit) {
     if section.count() > limit {
       raise Limits(TooManyDataSegments(limit~))
     }
@@ -391,7 +394,10 @@ fn ModuleParser::process_code_start(
 
 ///|
 /// Returns the next `FuncIdx` for processing of its function body.
-fn ModuleParser::next_func(self : ModuleParser, header : ModuleHeader) -> (FuncIdx, EngineFunc) {
+fn ModuleParser::next_func(
+  self : ModuleParser,
+  header : ModuleHeader,
+) -> (FuncIdx, EngineFunc) {
   let index = self.engine_funcs
   let engine_func = header.engine_funcs.get_or_panic(index)
   self.engine_funcs += 1
@@ -505,11 +511,10 @@ fn ModuleParser::parse_buffered(
       }
       DataSection(_) => break
       End(_) => break
-      CustomSection(reader) => {
+      CustomSection(reader) =>
         if !self.engine.config().get_ignore_custom_sections() {
           custom_sections.push((reader.name(), reader.data().to_bytes()))
         }
-      }
       unexpected => self.process_invalid_payload(unexpected)
     }
     buffer = buffer[consumed:]
@@ -557,5 +562,5 @@ fn ModuleParser::parse_buffered(
     }
     buffer = buffer[consumed:]
   }
-  { engine: self.engine, header, data_segments, custom_sections }
+  { engine: self.engine, header, data_segments, custom_sections, }
 }

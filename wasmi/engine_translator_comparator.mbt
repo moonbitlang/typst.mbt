@@ -14,7 +14,7 @@ pub(open) trait AllocConst {
   /// # Note
   ///
   /// Constant values allocated this way are deduplicated and return shared [`Slot`].
-  alloc_const(Self, @wasmi_core.UntypedVal) -> @ir.Slot raise WasmiError
+  fn alloc_const(Self, @wasmi_core.UntypedVal) -> @ir.Slot raise WasmiError
 }
 
 ///|
@@ -128,21 +128,32 @@ pub fn negate_cmp_instr(instr : @ir.Op) -> @ir.Op? {
     I32LtU(result~, lhs~, rhs~) => @ir.Op::i32_le_u(result, rhs, lhs)
     I32EqImm16(result~, lhs~, rhs~) => @ir.Op::i32_ne_imm16(result, lhs, rhs)
     I32NeImm16(result~, lhs~, rhs~) => @ir.Op::i32_eq_imm16(result, lhs, rhs)
-    I32LeSImm16Rhs(result~, lhs~, rhs~) => @ir.Op::i32_lt_s_imm16_lhs(result, rhs, lhs)
-    I32LeUImm16Rhs(result~, lhs~, rhs~) => @ir.Op::i32_lt_u_imm16_lhs(result, rhs, lhs)
-    I32LtSImm16Rhs(result~, lhs~, rhs~) => @ir.Op::i32_le_s_imm16_lhs(result, rhs, lhs)
-    I32LtUImm16Rhs(result~, lhs~, rhs~) => @ir.Op::i32_le_u_imm16_lhs(result, rhs, lhs)
-    I32LeSImm16Lhs(result~, lhs~, rhs~) => @ir.Op::i32_lt_s_imm16_rhs(result, rhs, lhs)
-    I32LeUImm16Lhs(result~, lhs~, rhs~) => @ir.Op::i32_lt_u_imm16_rhs(result, rhs, lhs)
-    I32LtSImm16Lhs(result~, lhs~, rhs~) => @ir.Op::i32_le_s_imm16_rhs(result, rhs, lhs)
-    I32LtUImm16Lhs(result~, lhs~, rhs~) => @ir.Op::i32_le_u_imm16_rhs(result, rhs, lhs)
+    I32LeSImm16Rhs(result~, lhs~, rhs~) =>
+      @ir.Op::i32_lt_s_imm16_lhs(result, rhs, lhs)
+    I32LeUImm16Rhs(result~, lhs~, rhs~) =>
+      @ir.Op::i32_lt_u_imm16_lhs(result, rhs, lhs)
+    I32LtSImm16Rhs(result~, lhs~, rhs~) =>
+      @ir.Op::i32_le_s_imm16_lhs(result, rhs, lhs)
+    I32LtUImm16Rhs(result~, lhs~, rhs~) =>
+      @ir.Op::i32_le_u_imm16_lhs(result, rhs, lhs)
+    I32LeSImm16Lhs(result~, lhs~, rhs~) =>
+      @ir.Op::i32_lt_s_imm16_rhs(result, rhs, lhs)
+    I32LeUImm16Lhs(result~, lhs~, rhs~) =>
+      @ir.Op::i32_lt_u_imm16_rhs(result, rhs, lhs)
+    I32LtSImm16Lhs(result~, lhs~, rhs~) =>
+      @ir.Op::i32_le_s_imm16_rhs(result, rhs, lhs)
+    I32LtUImm16Lhs(result~, lhs~, rhs~) =>
+      @ir.Op::i32_le_u_imm16_rhs(result, rhs, lhs)
     // i32 (and, or, xor)
     I32BitAnd(result~, lhs~, rhs~) => @ir.Op::i32_nand(result, lhs, rhs)
     I32BitOr(result~, lhs~, rhs~) => @ir.Op::i32_nor(result, lhs, rhs)
     I32BitXor(result~, lhs~, rhs~) => @ir.Op::i32_eq(result, lhs, rhs)
-    I32BitAndImm16(result~, lhs~, rhs~) => @ir.Op::i32_nand_imm16(result, lhs, rhs)
-    I32BitOrImm16(result~, lhs~, rhs~) => @ir.Op::i32_nor_imm16(result, lhs, rhs)
-    I32BitXorImm16(result~, lhs~, rhs~) => @ir.Op::i32_eq_imm16(result, lhs, rhs)
+    I32BitAndImm16(result~, lhs~, rhs~) =>
+      @ir.Op::i32_nand_imm16(result, lhs, rhs)
+    I32BitOrImm16(result~, lhs~, rhs~) =>
+      @ir.Op::i32_nor_imm16(result, lhs, rhs)
+    I32BitXorImm16(result~, lhs~, rhs~) =>
+      @ir.Op::i32_eq_imm16(result, lhs, rhs)
     I32And(result~, lhs~, rhs~) => @ir.Op::i32_nand(result, lhs, rhs)
     I32Or(result~, lhs~, rhs~) => @ir.Op::i32_nor(result, lhs, rhs)
     I32AndImm16(result~, lhs~, rhs~) => @ir.Op::i32_nand_imm16(result, lhs, rhs)
@@ -160,21 +171,32 @@ pub fn negate_cmp_instr(instr : @ir.Op) -> @ir.Op? {
     I64LtU(result~, lhs~, rhs~) => @ir.Op::i64_le_u(result, rhs, lhs)
     I64EqImm16(result~, lhs~, rhs~) => @ir.Op::i64_ne_imm16(result, lhs, rhs)
     I64NeImm16(result~, lhs~, rhs~) => @ir.Op::i64_eq_imm16(result, lhs, rhs)
-    I64LeSImm16Rhs(result~, lhs~, rhs~) => @ir.Op::i64_lt_s_imm16_lhs(result, rhs, lhs)
-    I64LeUImm16Rhs(result~, lhs~, rhs~) => @ir.Op::i64_lt_u_imm16_lhs(result, rhs, lhs)
-    I64LtSImm16Rhs(result~, lhs~, rhs~) => @ir.Op::i64_le_s_imm16_lhs(result, rhs, lhs)
-    I64LtUImm16Rhs(result~, lhs~, rhs~) => @ir.Op::i64_le_u_imm16_lhs(result, rhs, lhs)
-    I64LeSImm16Lhs(result~, lhs~, rhs~) => @ir.Op::i64_lt_s_imm16_rhs(result, rhs, lhs)
-    I64LeUImm16Lhs(result~, lhs~, rhs~) => @ir.Op::i64_lt_u_imm16_rhs(result, rhs, lhs)
-    I64LtSImm16Lhs(result~, lhs~, rhs~) => @ir.Op::i64_le_s_imm16_rhs(result, rhs, lhs)
-    I64LtUImm16Lhs(result~, lhs~, rhs~) => @ir.Op::i64_le_u_imm16_rhs(result, rhs, lhs)
+    I64LeSImm16Rhs(result~, lhs~, rhs~) =>
+      @ir.Op::i64_lt_s_imm16_lhs(result, rhs, lhs)
+    I64LeUImm16Rhs(result~, lhs~, rhs~) =>
+      @ir.Op::i64_lt_u_imm16_lhs(result, rhs, lhs)
+    I64LtSImm16Rhs(result~, lhs~, rhs~) =>
+      @ir.Op::i64_le_s_imm16_lhs(result, rhs, lhs)
+    I64LtUImm16Rhs(result~, lhs~, rhs~) =>
+      @ir.Op::i64_le_u_imm16_lhs(result, rhs, lhs)
+    I64LeSImm16Lhs(result~, lhs~, rhs~) =>
+      @ir.Op::i64_lt_s_imm16_rhs(result, rhs, lhs)
+    I64LeUImm16Lhs(result~, lhs~, rhs~) =>
+      @ir.Op::i64_lt_u_imm16_rhs(result, rhs, lhs)
+    I64LtSImm16Lhs(result~, lhs~, rhs~) =>
+      @ir.Op::i64_le_s_imm16_rhs(result, rhs, lhs)
+    I64LtUImm16Lhs(result~, lhs~, rhs~) =>
+      @ir.Op::i64_le_u_imm16_rhs(result, rhs, lhs)
     // i64 (and, or, xor)
     I64BitAnd(result~, lhs~, rhs~) => @ir.Op::i64_nand(result, lhs, rhs)
     I64BitOr(result~, lhs~, rhs~) => @ir.Op::i64_nor(result, lhs, rhs)
     I64BitXor(result~, lhs~, rhs~) => @ir.Op::i64_eq(result, lhs, rhs)
-    I64BitAndImm16(result~, lhs~, rhs~) => @ir.Op::i64_nand_imm16(result, lhs, rhs)
-    I64BitOrImm16(result~, lhs~, rhs~) => @ir.Op::i64_nor_imm16(result, lhs, rhs)
-    I64BitXorImm16(result~, lhs~, rhs~) => @ir.Op::i64_eq_imm16(result, lhs, rhs)
+    I64BitAndImm16(result~, lhs~, rhs~) =>
+      @ir.Op::i64_nand_imm16(result, lhs, rhs)
+    I64BitOrImm16(result~, lhs~, rhs~) =>
+      @ir.Op::i64_nor_imm16(result, lhs, rhs)
+    I64BitXorImm16(result~, lhs~, rhs~) =>
+      @ir.Op::i64_eq_imm16(result, lhs, rhs)
     I64And(result~, lhs~, rhs~) => @ir.Op::i64_nand(result, lhs, rhs)
     I64Or(result~, lhs~, rhs~) => @ir.Op::i64_nor(result, lhs, rhs)
     I64AndImm16(result~, lhs~, rhs~) => @ir.Op::i64_nand_imm16(result, lhs, rhs)
@@ -217,77 +239,81 @@ pub fn logicalize_cmp_instr(instr : @ir.Op) -> @ir.Op? {
     I32BitAnd(result~, lhs~, rhs~) => @ir.Op::i32_and(result, lhs, rhs)
     I32BitOr(result~, lhs~, rhs~) => @ir.Op::i32_or(result, lhs, rhs)
     I32BitXor(result~, lhs~, rhs~) => @ir.Op::i32_ne(result, lhs, rhs)
-    I32BitAndImm16(result~, lhs~, rhs~) => @ir.Op::i32_and_imm16(result, lhs, rhs)
+    I32BitAndImm16(result~, lhs~, rhs~) =>
+      @ir.Op::i32_and_imm16(result, lhs, rhs)
     I32BitOrImm16(result~, lhs~, rhs~) => @ir.Op::i32_or_imm16(result, lhs, rhs)
-    I32BitXorImm16(result~, lhs~, rhs~) => @ir.Op::i32_ne_imm16(result, lhs, rhs)
+    I32BitXorImm16(result~, lhs~, rhs~) =>
+      @ir.Op::i32_ne_imm16(result, lhs, rhs)
     // Bitwise -> Logical: i64
     I64BitAnd(result~, lhs~, rhs~) => @ir.Op::i64_and(result, lhs, rhs)
     I64BitOr(result~, lhs~, rhs~) => @ir.Op::i64_or(result, lhs, rhs)
     I64BitXor(result~, lhs~, rhs~) => @ir.Op::i64_ne(result, lhs, rhs)
-    I64BitAndImm16(result~, lhs~, rhs~) => @ir.Op::i64_and_imm16(result, lhs, rhs)
+    I64BitAndImm16(result~, lhs~, rhs~) =>
+      @ir.Op::i64_and_imm16(result, lhs, rhs)
     I64BitOrImm16(result~, lhs~, rhs~) => @ir.Op::i64_or_imm16(result, lhs, rhs)
-    I64BitXorImm16(result~, lhs~, rhs~) => @ir.Op::i64_ne_imm16(result, lhs, rhs)
+    I64BitXorImm16(result~, lhs~, rhs~) =>
+      @ir.Op::i64_ne_imm16(result, lhs, rhs)
     // Logical -> Logical
-    I32Eq(..) |
-    I32Ne(..) |
-    I32LeS(..) |
-    I32LeU(..) |
-    I32LtS(..) |
-    I32LtU(..) |
-    I32EqImm16(..) |
-    I32NeImm16(..) |
-    I32LeSImm16Rhs(..) |
-    I32LeUImm16Rhs(..) |
-    I32LtSImm16Rhs(..) |
-    I32LtUImm16Rhs(..) |
-    I32LeSImm16Lhs(..) |
-    I32LeUImm16Lhs(..) |
-    I32LtSImm16Lhs(..) |
-    I32LtUImm16Lhs(..) |
-    I32And(..) |
-    I32Or(..) |
-    I32AndImm16(..) |
-    I32OrImm16(..) |
-    I32Nand(..) |
-    I32Nor(..) |
-    I32NandImm16(..) |
-    I32NorImm16(..) |
-    I64Eq(..) |
-    I64Ne(..) |
-    I64LeS(..) |
-    I64LeU(..) |
-    I64LtS(..) |
-    I64LtU(..) |
-    I64EqImm16(..) |
-    I64NeImm16(..) |
-    I64LeSImm16Rhs(..) |
-    I64LeUImm16Rhs(..) |
-    I64LtSImm16Rhs(..) |
-    I64LtUImm16Rhs(..) |
-    I64LeSImm16Lhs(..) |
-    I64LeUImm16Lhs(..) |
-    I64LtSImm16Lhs(..) |
-    I64LtUImm16Lhs(..) |
-    I64And(..) |
-    I64Or(..) |
-    I64AndImm16(..) |
-    I64OrImm16(..) |
-    I64Nand(..) |
-    I64Nor(..) |
-    I64NandImm16(..) |
-    I64NorImm16(..) |
-    F32Eq(..) |
-    F32Ne(..) |
-    F32Lt(..) |
-    F32Le(..) |
-    F32NotLt(..) |
-    F32NotLe(..) |
-    F64Eq(..) |
-    F64Ne(..) |
-    F64Lt(..) |
-    F64Le(..) |
-    F64NotLt(..) |
-    F64NotLe(..) => instr
+    I32Eq(..)
+    | I32Ne(..)
+    | I32LeS(..)
+    | I32LeU(..)
+    | I32LtS(..)
+    | I32LtU(..)
+    | I32EqImm16(..)
+    | I32NeImm16(..)
+    | I32LeSImm16Rhs(..)
+    | I32LeUImm16Rhs(..)
+    | I32LtSImm16Rhs(..)
+    | I32LtUImm16Rhs(..)
+    | I32LeSImm16Lhs(..)
+    | I32LeUImm16Lhs(..)
+    | I32LtSImm16Lhs(..)
+    | I32LtUImm16Lhs(..)
+    | I32And(..)
+    | I32Or(..)
+    | I32AndImm16(..)
+    | I32OrImm16(..)
+    | I32Nand(..)
+    | I32Nor(..)
+    | I32NandImm16(..)
+    | I32NorImm16(..)
+    | I64Eq(..)
+    | I64Ne(..)
+    | I64LeS(..)
+    | I64LeU(..)
+    | I64LtS(..)
+    | I64LtU(..)
+    | I64EqImm16(..)
+    | I64NeImm16(..)
+    | I64LeSImm16Rhs(..)
+    | I64LeUImm16Rhs(..)
+    | I64LtSImm16Rhs(..)
+    | I64LtUImm16Rhs(..)
+    | I64LeSImm16Lhs(..)
+    | I64LeUImm16Lhs(..)
+    | I64LtSImm16Lhs(..)
+    | I64LtUImm16Lhs(..)
+    | I64And(..)
+    | I64Or(..)
+    | I64AndImm16(..)
+    | I64OrImm16(..)
+    | I64Nand(..)
+    | I64Nor(..)
+    | I64NandImm16(..)
+    | I64NorImm16(..)
+    | F32Eq(..)
+    | F32Ne(..)
+    | F32Lt(..)
+    | F32Le(..)
+    | F32NotLt(..)
+    | F32NotLe(..)
+    | F64Eq(..)
+    | F64Ne(..)
+    | F64Lt(..)
+    | F64Le(..)
+    | F64NotLt(..)
+    | F64NotLe(..) => instr
     _ => return None
   }
   Some(logicalized)
@@ -335,8 +361,7 @@ fn cmp_select_swap_operands(instr : @ir.Op) -> Bool {
     | F32NotLt(..)
     | F32NotLe(..)
     | F64NotLt(..)
-    | F64NotLe(..)
-      => true
+    | F64NotLe(..) => true
     _ => false
   }
 }
@@ -363,14 +388,22 @@ pub fn try_into_cmp_select_instr(
     I32LtU(lhs~, rhs~, ..) => @ir.Op::select_i32_lt_u(result, lhs, rhs)
     I32EqImm16(lhs~, rhs~, ..) => @ir.Op::select_i32_eq_imm16(result, lhs, rhs)
     I32NeImm16(lhs~, rhs~, ..) => @ir.Op::select_i32_eq_imm16(result, lhs, rhs)
-    I32LeSImm16Lhs(lhs~, rhs~, ..) => @ir.Op::select_i32_lt_s_imm16_rhs(result, rhs, lhs)
-    I32LeUImm16Lhs(lhs~, rhs~, ..) => @ir.Op::select_i32_lt_u_imm16_rhs(result, rhs, lhs)
-    I32LtSImm16Lhs(lhs~, rhs~, ..) => @ir.Op::select_i32_le_s_imm16_rhs(result, rhs, lhs)
-    I32LtUImm16Lhs(lhs~, rhs~, ..) => @ir.Op::select_i32_le_u_imm16_rhs(result, rhs, lhs)
-    I32LeSImm16Rhs(lhs~, rhs~, ..) => @ir.Op::select_i32_le_s_imm16_rhs(result, lhs, rhs)
-    I32LeUImm16Rhs(lhs~, rhs~, ..) => @ir.Op::select_i32_le_u_imm16_rhs(result, lhs, rhs)
-    I32LtSImm16Rhs(lhs~, rhs~, ..) => @ir.Op::select_i32_lt_s_imm16_rhs(result, lhs, rhs)
-    I32LtUImm16Rhs(lhs~, rhs~, ..) => @ir.Op::select_i32_lt_u_imm16_rhs(result, lhs, rhs)
+    I32LeSImm16Lhs(lhs~, rhs~, ..) =>
+      @ir.Op::select_i32_lt_s_imm16_rhs(result, rhs, lhs)
+    I32LeUImm16Lhs(lhs~, rhs~, ..) =>
+      @ir.Op::select_i32_lt_u_imm16_rhs(result, rhs, lhs)
+    I32LtSImm16Lhs(lhs~, rhs~, ..) =>
+      @ir.Op::select_i32_le_s_imm16_rhs(result, rhs, lhs)
+    I32LtUImm16Lhs(lhs~, rhs~, ..) =>
+      @ir.Op::select_i32_le_u_imm16_rhs(result, rhs, lhs)
+    I32LeSImm16Rhs(lhs~, rhs~, ..) =>
+      @ir.Op::select_i32_le_s_imm16_rhs(result, lhs, rhs)
+    I32LeUImm16Rhs(lhs~, rhs~, ..) =>
+      @ir.Op::select_i32_le_u_imm16_rhs(result, lhs, rhs)
+    I32LtSImm16Rhs(lhs~, rhs~, ..) =>
+      @ir.Op::select_i32_lt_s_imm16_rhs(result, lhs, rhs)
+    I32LtUImm16Rhs(lhs~, rhs~, ..) =>
+      @ir.Op::select_i32_lt_u_imm16_rhs(result, lhs, rhs)
     // i32 (and, or, xor)
     I32BitAnd(lhs~, rhs~, ..) => @ir.Op::select_i32_and(result, lhs, rhs)
     I32BitOr(lhs~, rhs~, ..) => @ir.Op::select_i32_or(result, lhs, rhs)
@@ -379,12 +412,17 @@ pub fn try_into_cmp_select_instr(
     I32Or(lhs~, rhs~, ..) => @ir.Op::select_i32_or(result, lhs, rhs)
     I32Nand(lhs~, rhs~, ..) => @ir.Op::select_i32_and(result, lhs, rhs)
     I32Nor(lhs~, rhs~, ..) => @ir.Op::select_i32_or(result, lhs, rhs)
-    I32BitAndImm16(lhs~, rhs~, ..) => @ir.Op::select_i32_and_imm16(result, lhs, rhs)
-    I32BitOrImm16(lhs~, rhs~, ..) => @ir.Op::select_i32_or_imm16(result, lhs, rhs)
-    I32BitXorImm16(lhs~, rhs~, ..) => @ir.Op::select_i32_eq_imm16(result, lhs, rhs)
-    I32AndImm16(lhs~, rhs~, ..) => @ir.Op::select_i32_and_imm16(result, lhs, rhs)
+    I32BitAndImm16(lhs~, rhs~, ..) =>
+      @ir.Op::select_i32_and_imm16(result, lhs, rhs)
+    I32BitOrImm16(lhs~, rhs~, ..) =>
+      @ir.Op::select_i32_or_imm16(result, lhs, rhs)
+    I32BitXorImm16(lhs~, rhs~, ..) =>
+      @ir.Op::select_i32_eq_imm16(result, lhs, rhs)
+    I32AndImm16(lhs~, rhs~, ..) =>
+      @ir.Op::select_i32_and_imm16(result, lhs, rhs)
     I32OrImm16(lhs~, rhs~, ..) => @ir.Op::select_i32_or_imm16(result, lhs, rhs)
-    I32NandImm16(lhs~, rhs~, ..) => @ir.Op::select_i32_and_imm16(result, lhs, rhs)
+    I32NandImm16(lhs~, rhs~, ..) =>
+      @ir.Op::select_i32_and_imm16(result, lhs, rhs)
     I32NorImm16(lhs~, rhs~, ..) => @ir.Op::select_i32_or_imm16(result, lhs, rhs)
     // i64
     I64Eq(lhs~, rhs~, ..) => @ir.Op::select_i64_eq(result, lhs, rhs)
@@ -395,14 +433,22 @@ pub fn try_into_cmp_select_instr(
     I64LtU(lhs~, rhs~, ..) => @ir.Op::select_i64_lt_u(result, lhs, rhs)
     I64EqImm16(lhs~, rhs~, ..) => @ir.Op::select_i64_eq_imm16(result, lhs, rhs)
     I64NeImm16(lhs~, rhs~, ..) => @ir.Op::select_i64_eq_imm16(result, lhs, rhs)
-    I64LeSImm16Lhs(lhs~, rhs~, ..) => @ir.Op::select_i64_lt_s_imm16_rhs(result, rhs, lhs)
-    I64LeUImm16Lhs(lhs~, rhs~, ..) => @ir.Op::select_i64_lt_u_imm16_rhs(result, rhs, lhs)
-    I64LtSImm16Lhs(lhs~, rhs~, ..) => @ir.Op::select_i64_le_s_imm16_rhs(result, rhs, lhs)
-    I64LtUImm16Lhs(lhs~, rhs~, ..) => @ir.Op::select_i64_le_u_imm16_rhs(result, rhs, lhs)
-    I64LeSImm16Rhs(lhs~, rhs~, ..) => @ir.Op::select_i64_le_s_imm16_rhs(result, lhs, rhs)
-    I64LeUImm16Rhs(lhs~, rhs~, ..) => @ir.Op::select_i64_le_u_imm16_rhs(result, lhs, rhs)
-    I64LtSImm16Rhs(lhs~, rhs~, ..) => @ir.Op::select_i64_lt_s_imm16_rhs(result, lhs, rhs)
-    I64LtUImm16Rhs(lhs~, rhs~, ..) => @ir.Op::select_i64_lt_u_imm16_rhs(result, lhs, rhs)
+    I64LeSImm16Lhs(lhs~, rhs~, ..) =>
+      @ir.Op::select_i64_lt_s_imm16_rhs(result, rhs, lhs)
+    I64LeUImm16Lhs(lhs~, rhs~, ..) =>
+      @ir.Op::select_i64_lt_u_imm16_rhs(result, rhs, lhs)
+    I64LtSImm16Lhs(lhs~, rhs~, ..) =>
+      @ir.Op::select_i64_le_s_imm16_rhs(result, rhs, lhs)
+    I64LtUImm16Lhs(lhs~, rhs~, ..) =>
+      @ir.Op::select_i64_le_u_imm16_rhs(result, rhs, lhs)
+    I64LeSImm16Rhs(lhs~, rhs~, ..) =>
+      @ir.Op::select_i64_le_s_imm16_rhs(result, lhs, rhs)
+    I64LeUImm16Rhs(lhs~, rhs~, ..) =>
+      @ir.Op::select_i64_le_u_imm16_rhs(result, lhs, rhs)
+    I64LtSImm16Rhs(lhs~, rhs~, ..) =>
+      @ir.Op::select_i64_lt_s_imm16_rhs(result, lhs, rhs)
+    I64LtUImm16Rhs(lhs~, rhs~, ..) =>
+      @ir.Op::select_i64_lt_u_imm16_rhs(result, lhs, rhs)
     // i64 (and, or, xor)
     I64BitAnd(lhs~, rhs~, ..) => @ir.Op::select_i64_and(result, lhs, rhs)
     I64BitOr(lhs~, rhs~, ..) => @ir.Op::select_i64_or(result, lhs, rhs)
@@ -411,12 +457,17 @@ pub fn try_into_cmp_select_instr(
     I64Or(lhs~, rhs~, ..) => @ir.Op::select_i64_or(result, lhs, rhs)
     I64Nand(lhs~, rhs~, ..) => @ir.Op::select_i64_and(result, lhs, rhs)
     I64Nor(lhs~, rhs~, ..) => @ir.Op::select_i64_or(result, lhs, rhs)
-    I64BitAndImm16(lhs~, rhs~, ..) => @ir.Op::select_i64_and_imm16(result, lhs, rhs)
-    I64BitOrImm16(lhs~, rhs~, ..) => @ir.Op::select_i64_or_imm16(result, lhs, rhs)
-    I64BitXorImm16(lhs~, rhs~, ..) => @ir.Op::select_i64_eq_imm16(result, lhs, rhs)
-    I64AndImm16(lhs~, rhs~, ..) => @ir.Op::select_i64_and_imm16(result, lhs, rhs)
+    I64BitAndImm16(lhs~, rhs~, ..) =>
+      @ir.Op::select_i64_and_imm16(result, lhs, rhs)
+    I64BitOrImm16(lhs~, rhs~, ..) =>
+      @ir.Op::select_i64_or_imm16(result, lhs, rhs)
+    I64BitXorImm16(lhs~, rhs~, ..) =>
+      @ir.Op::select_i64_eq_imm16(result, lhs, rhs)
+    I64AndImm16(lhs~, rhs~, ..) =>
+      @ir.Op::select_i64_and_imm16(result, lhs, rhs)
     I64OrImm16(lhs~, rhs~, ..) => @ir.Op::select_i64_or_imm16(result, lhs, rhs)
-    I64NandImm16(lhs~, rhs~, ..) => @ir.Op::select_i64_and_imm16(result, lhs, rhs)
+    I64NandImm16(lhs~, rhs~, ..) =>
+      @ir.Op::select_i64_and_imm16(result, lhs, rhs)
     I64NorImm16(lhs~, rhs~, ..) => @ir.Op::select_i64_or_imm16(result, lhs, rhs)
     // f32
     F32Eq(lhs~, rhs~, ..) => @ir.Op::select_f32_eq(result, lhs, rhs)
@@ -458,14 +509,22 @@ pub fn[S : AllocConst] try_into_cmp_branch_instr(
     I32LtU(lhs~, rhs~, ..) => @ir.Op::branch_i32_lt_u(lhs, rhs, offset)
     I32EqImm16(lhs~, rhs~, ..) => @ir.Op::branch_i32_eq_imm16(lhs, rhs, offset)
     I32NeImm16(lhs~, rhs~, ..) => @ir.Op::branch_i32_ne_imm16(lhs, rhs, offset)
-    I32LeSImm16Lhs(lhs~, rhs~, ..) => @ir.Op::branch_i32_le_s_imm16_lhs(lhs, rhs, offset)
-    I32LeUImm16Lhs(lhs~, rhs~, ..) => @ir.Op::branch_i32_le_u_imm16_lhs(lhs, rhs, offset)
-    I32LtSImm16Lhs(lhs~, rhs~, ..) => @ir.Op::branch_i32_lt_s_imm16_lhs(lhs, rhs, offset)
-    I32LtUImm16Lhs(lhs~, rhs~, ..) => @ir.Op::branch_i32_lt_u_imm16_lhs(lhs, rhs, offset)
-    I32LeSImm16Rhs(lhs~, rhs~, ..) => @ir.Op::branch_i32_le_s_imm16_rhs(lhs, rhs, offset)
-    I32LeUImm16Rhs(lhs~, rhs~, ..) => @ir.Op::branch_i32_le_u_imm16_rhs(lhs, rhs, offset)
-    I32LtSImm16Rhs(lhs~, rhs~, ..) => @ir.Op::branch_i32_lt_s_imm16_rhs(lhs, rhs, offset)
-    I32LtUImm16Rhs(lhs~, rhs~, ..) => @ir.Op::branch_i32_lt_u_imm16_rhs(lhs, rhs, offset)
+    I32LeSImm16Lhs(lhs~, rhs~, ..) =>
+      @ir.Op::branch_i32_le_s_imm16_lhs(lhs, rhs, offset)
+    I32LeUImm16Lhs(lhs~, rhs~, ..) =>
+      @ir.Op::branch_i32_le_u_imm16_lhs(lhs, rhs, offset)
+    I32LtSImm16Lhs(lhs~, rhs~, ..) =>
+      @ir.Op::branch_i32_lt_s_imm16_lhs(lhs, rhs, offset)
+    I32LtUImm16Lhs(lhs~, rhs~, ..) =>
+      @ir.Op::branch_i32_lt_u_imm16_lhs(lhs, rhs, offset)
+    I32LeSImm16Rhs(lhs~, rhs~, ..) =>
+      @ir.Op::branch_i32_le_s_imm16_rhs(lhs, rhs, offset)
+    I32LeUImm16Rhs(lhs~, rhs~, ..) =>
+      @ir.Op::branch_i32_le_u_imm16_rhs(lhs, rhs, offset)
+    I32LtSImm16Rhs(lhs~, rhs~, ..) =>
+      @ir.Op::branch_i32_lt_s_imm16_rhs(lhs, rhs, offset)
+    I32LtUImm16Rhs(lhs~, rhs~, ..) =>
+      @ir.Op::branch_i32_lt_u_imm16_rhs(lhs, rhs, offset)
     // i32 (and, or, xor)
     I32BitAnd(lhs~, rhs~, ..) => @ir.Op::branch_i32_and(lhs, rhs, offset)
     I32BitOr(lhs~, rhs~, ..) => @ir.Op::branch_i32_or(lhs, rhs, offset)
@@ -474,13 +533,19 @@ pub fn[S : AllocConst] try_into_cmp_branch_instr(
     I32Or(lhs~, rhs~, ..) => @ir.Op::branch_i32_or(lhs, rhs, offset)
     I32Nand(lhs~, rhs~, ..) => @ir.Op::branch_i32_nand(lhs, rhs, offset)
     I32Nor(lhs~, rhs~, ..) => @ir.Op::branch_i32_nor(lhs, rhs, offset)
-    I32BitAndImm16(lhs~, rhs~, ..) => @ir.Op::branch_i32_and_imm16(lhs, rhs, offset)
-    I32BitOrImm16(lhs~, rhs~, ..) => @ir.Op::branch_i32_or_imm16(lhs, rhs, offset)
-    I32BitXorImm16(lhs~, rhs~, ..) => @ir.Op::branch_i32_ne_imm16(lhs, rhs, offset)
-    I32AndImm16(lhs~, rhs~, ..) => @ir.Op::branch_i32_and_imm16(lhs, rhs, offset)
+    I32BitAndImm16(lhs~, rhs~, ..) =>
+      @ir.Op::branch_i32_and_imm16(lhs, rhs, offset)
+    I32BitOrImm16(lhs~, rhs~, ..) =>
+      @ir.Op::branch_i32_or_imm16(lhs, rhs, offset)
+    I32BitXorImm16(lhs~, rhs~, ..) =>
+      @ir.Op::branch_i32_ne_imm16(lhs, rhs, offset)
+    I32AndImm16(lhs~, rhs~, ..) =>
+      @ir.Op::branch_i32_and_imm16(lhs, rhs, offset)
     I32OrImm16(lhs~, rhs~, ..) => @ir.Op::branch_i32_or_imm16(lhs, rhs, offset)
-    I32NandImm16(lhs~, rhs~, ..) => @ir.Op::branch_i32_nand_imm16(lhs, rhs, offset)
-    I32NorImm16(lhs~, rhs~, ..) => @ir.Op::branch_i32_nor_imm16(lhs, rhs, offset)
+    I32NandImm16(lhs~, rhs~, ..) =>
+      @ir.Op::branch_i32_nand_imm16(lhs, rhs, offset)
+    I32NorImm16(lhs~, rhs~, ..) =>
+      @ir.Op::branch_i32_nor_imm16(lhs, rhs, offset)
     // i64
     I64Eq(lhs~, rhs~, ..) => @ir.Op::branch_i64_eq(lhs, rhs, offset)
     I64Ne(lhs~, rhs~, ..) => @ir.Op::branch_i64_ne(lhs, rhs, offset)
@@ -490,14 +555,22 @@ pub fn[S : AllocConst] try_into_cmp_branch_instr(
     I64LtU(lhs~, rhs~, ..) => @ir.Op::branch_i64_lt_u(lhs, rhs, offset)
     I64EqImm16(lhs~, rhs~, ..) => @ir.Op::branch_i64_eq_imm16(lhs, rhs, offset)
     I64NeImm16(lhs~, rhs~, ..) => @ir.Op::branch_i64_ne_imm16(lhs, rhs, offset)
-    I64LeSImm16Lhs(lhs~, rhs~, ..) => @ir.Op::branch_i64_le_s_imm16_lhs(lhs, rhs, offset)
-    I64LeUImm16Lhs(lhs~, rhs~, ..) => @ir.Op::branch_i64_le_u_imm16_lhs(lhs, rhs, offset)
-    I64LtSImm16Lhs(lhs~, rhs~, ..) => @ir.Op::branch_i64_lt_s_imm16_lhs(lhs, rhs, offset)
-    I64LtUImm16Lhs(lhs~, rhs~, ..) => @ir.Op::branch_i64_lt_u_imm16_lhs(lhs, rhs, offset)
-    I64LeSImm16Rhs(lhs~, rhs~, ..) => @ir.Op::branch_i64_le_s_imm16_rhs(lhs, rhs, offset)
-    I64LeUImm16Rhs(lhs~, rhs~, ..) => @ir.Op::branch_i64_le_u_imm16_rhs(lhs, rhs, offset)
-    I64LtSImm16Rhs(lhs~, rhs~, ..) => @ir.Op::branch_i64_lt_s_imm16_rhs(lhs, rhs, offset)
-    I64LtUImm16Rhs(lhs~, rhs~, ..) => @ir.Op::branch_i64_lt_u_imm16_rhs(lhs, rhs, offset)
+    I64LeSImm16Lhs(lhs~, rhs~, ..) =>
+      @ir.Op::branch_i64_le_s_imm16_lhs(lhs, rhs, offset)
+    I64LeUImm16Lhs(lhs~, rhs~, ..) =>
+      @ir.Op::branch_i64_le_u_imm16_lhs(lhs, rhs, offset)
+    I64LtSImm16Lhs(lhs~, rhs~, ..) =>
+      @ir.Op::branch_i64_lt_s_imm16_lhs(lhs, rhs, offset)
+    I64LtUImm16Lhs(lhs~, rhs~, ..) =>
+      @ir.Op::branch_i64_lt_u_imm16_lhs(lhs, rhs, offset)
+    I64LeSImm16Rhs(lhs~, rhs~, ..) =>
+      @ir.Op::branch_i64_le_s_imm16_rhs(lhs, rhs, offset)
+    I64LeUImm16Rhs(lhs~, rhs~, ..) =>
+      @ir.Op::branch_i64_le_u_imm16_rhs(lhs, rhs, offset)
+    I64LtSImm16Rhs(lhs~, rhs~, ..) =>
+      @ir.Op::branch_i64_lt_s_imm16_rhs(lhs, rhs, offset)
+    I64LtUImm16Rhs(lhs~, rhs~, ..) =>
+      @ir.Op::branch_i64_lt_u_imm16_rhs(lhs, rhs, offset)
     // i64 (and, or, xor)
     I64BitAnd(lhs~, rhs~, ..) => @ir.Op::branch_i64_and(lhs, rhs, offset)
     I64BitOr(lhs~, rhs~, ..) => @ir.Op::branch_i64_or(lhs, rhs, offset)
@@ -506,13 +579,19 @@ pub fn[S : AllocConst] try_into_cmp_branch_instr(
     I64Or(lhs~, rhs~, ..) => @ir.Op::branch_i64_or(lhs, rhs, offset)
     I64Nand(lhs~, rhs~, ..) => @ir.Op::branch_i64_nand(lhs, rhs, offset)
     I64Nor(lhs~, rhs~, ..) => @ir.Op::branch_i64_nor(lhs, rhs, offset)
-    I64BitAndImm16(lhs~, rhs~, ..) => @ir.Op::branch_i64_and_imm16(lhs, rhs, offset)
-    I64BitOrImm16(lhs~, rhs~, ..) => @ir.Op::branch_i64_or_imm16(lhs, rhs, offset)
-    I64BitXorImm16(lhs~, rhs~, ..) => @ir.Op::branch_i64_ne_imm16(lhs, rhs, offset)
-    I64AndImm16(lhs~, rhs~, ..) => @ir.Op::branch_i64_and_imm16(lhs, rhs, offset)
+    I64BitAndImm16(lhs~, rhs~, ..) =>
+      @ir.Op::branch_i64_and_imm16(lhs, rhs, offset)
+    I64BitOrImm16(lhs~, rhs~, ..) =>
+      @ir.Op::branch_i64_or_imm16(lhs, rhs, offset)
+    I64BitXorImm16(lhs~, rhs~, ..) =>
+      @ir.Op::branch_i64_ne_imm16(lhs, rhs, offset)
+    I64AndImm16(lhs~, rhs~, ..) =>
+      @ir.Op::branch_i64_and_imm16(lhs, rhs, offset)
     I64OrImm16(lhs~, rhs~, ..) => @ir.Op::branch_i64_or_imm16(lhs, rhs, offset)
-    I64NandImm16(lhs~, rhs~, ..) => @ir.Op::branch_i64_nand_imm16(lhs, rhs, offset)
-    I64NorImm16(lhs~, rhs~, ..) => @ir.Op::branch_i64_nor_imm16(lhs, rhs, offset)
+    I64NandImm16(lhs~, rhs~, ..) =>
+      @ir.Op::branch_i64_nand_imm16(lhs, rhs, offset)
+    I64NorImm16(lhs~, rhs~, ..) =>
+      @ir.Op::branch_i64_nor_imm16(lhs, rhs, offset)
     // f32
     F32Eq(lhs~, rhs~, ..) => @ir.Op::branch_f32_eq(lhs, rhs, offset)
     F32Ne(lhs~, rhs~, ..) => @ir.Op::branch_f32_ne(lhs, rhs, offset)
@@ -584,23 +663,31 @@ pub fn[S : AllocConst] try_into_cmp_branch_fallback_instr(
     | BranchI32NeImm16(lhs~, rhs~, ..)
     | BranchI32LtSImm16Rhs(lhs~, rhs~, ..)
     | BranchI32LeSImm16Rhs(lhs~, rhs~, ..) => {
-    let rhs = stack.alloc_const(@wasmi_core.UntypedVal::from_i32(rhs.to_i32()));
-    (lhs, rhs)
+      let rhs = stack.alloc_const(
+        @wasmi_core.UntypedVal::from_i32(rhs.to_i32()),
+      )
+      (lhs, rhs)
     }
     BranchI32LtSImm16Lhs(lhs~, rhs~, ..)
     | BranchI32LeSImm16Lhs(lhs~, rhs~, ..) => {
-    let lhs = stack.alloc_const(@wasmi_core.UntypedVal::from_i32(lhs.to_i32()));
-    (lhs, rhs)
+      let lhs = stack.alloc_const(
+        @wasmi_core.UntypedVal::from_i32(lhs.to_i32()),
+      )
+      (lhs, rhs)
     }
     BranchI32LtUImm16Rhs(lhs~, rhs~, ..)
     | BranchI32LeUImm16Rhs(lhs~, rhs~, ..) => {
-    let rhs = stack.alloc_const(@wasmi_core.UntypedVal::from_u32(rhs.to_u32()));
-    (lhs, rhs)
+      let rhs = stack.alloc_const(
+        @wasmi_core.UntypedVal::from_u32(rhs.to_u32()),
+      )
+      (lhs, rhs)
     }
     BranchI32LtUImm16Lhs(lhs~, rhs~, ..)
     | BranchI32LeUImm16Lhs(lhs~, rhs~, ..) => {
-    let lhs = stack.alloc_const(@wasmi_core.UntypedVal::from_u32(lhs.to_u32()));
-    (lhs, rhs)
+      let lhs = stack.alloc_const(
+        @wasmi_core.UntypedVal::from_u32(lhs.to_u32()),
+      )
+      (lhs, rhs)
     }
     BranchI64AndImm16(lhs~, rhs~, ..)
     | BranchI64OrImm16(lhs~, rhs~, ..)
@@ -610,23 +697,31 @@ pub fn[S : AllocConst] try_into_cmp_branch_fallback_instr(
     | BranchI64NeImm16(lhs~, rhs~, ..)
     | BranchI64LtSImm16Rhs(lhs~, rhs~, ..)
     | BranchI64LeSImm16Rhs(lhs~, rhs~, ..) => {
-    let rhs = stack.alloc_const(@wasmi_core.UntypedVal::from_i64(rhs.to_i64()));
-    (lhs, rhs)
+      let rhs = stack.alloc_const(
+        @wasmi_core.UntypedVal::from_i64(rhs.to_i64()),
+      )
+      (lhs, rhs)
     }
     BranchI64LtSImm16Lhs(lhs~, rhs~, ..)
     | BranchI64LeSImm16Lhs(lhs~, rhs~, ..) => {
-    let lhs = stack.alloc_const(@wasmi_core.UntypedVal::from_i64(lhs.to_i64()));
-    (lhs, rhs)
+      let lhs = stack.alloc_const(
+        @wasmi_core.UntypedVal::from_i64(lhs.to_i64()),
+      )
+      (lhs, rhs)
     }
     BranchI64LtUImm16Rhs(lhs~, rhs~, ..)
     | BranchI64LeUImm16Rhs(lhs~, rhs~, ..) => {
-    let rhs = stack.alloc_const(@wasmi_core.UntypedVal::from_u64(rhs.to_u64()));
-    (lhs, rhs)
+      let rhs = stack.alloc_const(
+        @wasmi_core.UntypedVal::from_u64(rhs.to_u64()),
+      )
+      (lhs, rhs)
     }
     BranchI64LtUImm16Lhs(lhs~, rhs~, ..)
     | BranchI64LeUImm16Lhs(lhs~, rhs~, ..) => {
-    let lhs = stack.alloc_const(@wasmi_core.UntypedVal::from_u64(lhs.to_u64()));
-    (lhs, rhs)
+      let lhs = stack.alloc_const(
+        @wasmi_core.UntypedVal::from_u64(lhs.to_u64()),
+      )
+      (lhs, rhs)
     }
     _ => return None
   }
@@ -645,18 +740,14 @@ fn try_into_cmp_br_comparator(instr : @ir.Op) -> @ir.Comparator? {
     // i32
     BranchI32Eq(..) | BranchI32EqImm16(..) => @ir.Comparator::I32Eq
     BranchI32Ne(..) | BranchI32NeImm16(..) => @ir.Comparator::I32Ne
-    BranchI32LtS(..)
-    | BranchI32LtSImm16Lhs(..)
-    | BranchI32LtSImm16Rhs(..) => @ir.Comparator::I32LtS
-    BranchI32LtU(..)
-    | BranchI32LtUImm16Lhs(..)
-    | BranchI32LtUImm16Rhs(..) => @ir.Comparator::I32LtU
-    BranchI32LeS(..)
-    | BranchI32LeSImm16Lhs(..)
-    | BranchI32LeSImm16Rhs(..) => @ir.Comparator::I32LeS
-    BranchI32LeU(..)
-    | BranchI32LeUImm16Lhs(..)
-    | BranchI32LeUImm16Rhs(..) => @ir.Comparator::I32LeU
+    BranchI32LtS(..) | BranchI32LtSImm16Lhs(..) | BranchI32LtSImm16Rhs(..) =>
+      @ir.Comparator::I32LtS
+    BranchI32LtU(..) | BranchI32LtUImm16Lhs(..) | BranchI32LtUImm16Rhs(..) =>
+      @ir.Comparator::I32LtU
+    BranchI32LeS(..) | BranchI32LeSImm16Lhs(..) | BranchI32LeSImm16Rhs(..) =>
+      @ir.Comparator::I32LeS
+    BranchI32LeU(..) | BranchI32LeUImm16Lhs(..) | BranchI32LeUImm16Rhs(..) =>
+      @ir.Comparator::I32LeU
     // i32 (and,or,xor)
     BranchI32And(..) => @ir.Comparator::I32And
     BranchI32Or(..) => @ir.Comparator::I32Or
@@ -665,18 +756,14 @@ fn try_into_cmp_br_comparator(instr : @ir.Op) -> @ir.Comparator? {
     // i64
     BranchI64Eq(..) | BranchI64EqImm16(..) => @ir.Comparator::I64Eq
     BranchI64Ne(..) | BranchI64NeImm16(..) => @ir.Comparator::I64Ne
-    BranchI64LtS(..)
-    | BranchI64LtSImm16Lhs(..)
-    | BranchI64LtSImm16Rhs(..) => @ir.Comparator::I64LtS
-    BranchI64LtU(..)
-    | BranchI64LtUImm16Lhs(..)
-    | BranchI64LtUImm16Rhs(..) => @ir.Comparator::I64LtU
-    BranchI64LeS(..)
-    | BranchI64LeSImm16Lhs(..)
-    | BranchI64LeSImm16Rhs(..) => @ir.Comparator::I64LeS
-    BranchI64LeU(..)
-    | BranchI64LeUImm16Lhs(..)
-    | BranchI64LeUImm16Rhs(..) => @ir.Comparator::I64LeU
+    BranchI64LtS(..) | BranchI64LtSImm16Lhs(..) | BranchI64LtSImm16Rhs(..) =>
+      @ir.Comparator::I64LtS
+    BranchI64LtU(..) | BranchI64LtUImm16Lhs(..) | BranchI64LtUImm16Rhs(..) =>
+      @ir.Comparator::I64LtU
+    BranchI64LeS(..) | BranchI64LeSImm16Lhs(..) | BranchI64LeSImm16Rhs(..) =>
+      @ir.Comparator::I64LeS
+    BranchI64LeU(..) | BranchI64LeUImm16Lhs(..) | BranchI64LeUImm16Rhs(..) =>
+      @ir.Comparator::I64LeU
     // f32
     BranchF32Eq(..) => @ir.Comparator::F32Eq
     BranchF32Ne(..) => @ir.Comparator::F32Ne
@@ -717,7 +804,9 @@ pub fn[S : AllocConst] update_branch_offset(
     _ => ()
   }
   guard instr.branch_offset16() is Some(offset) else {
-    abort("expected a Wasmi `cmp`+`branch` instruction but found: \{instr.name()}")
+    abort(
+      "expected a Wasmi `cmp`+`branch` instruction but found: \{instr.name()}",
+    )
   }
   let updated = try? offset.init(new_offset)
   match updated {
@@ -731,7 +820,9 @@ pub fn[S : AllocConst] update_branch_offset(
       //       since adjusting the 16-bit offset failed.
       guard try_into_cmp_branch_fallback_instr(instr, new_offset, stack)
         is Some(fallback) else {
-        abort("failed to create cmp+branch fallback instruction for: \{instr.name()}")
+        abort(
+          "failed to create cmp+branch fallback instruction for: \{instr.name()}",
+        )
       }
       fallback
     }

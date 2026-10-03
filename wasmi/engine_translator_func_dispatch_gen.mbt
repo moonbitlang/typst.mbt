@@ -19,7 +19,8 @@ pub fn FuncTranslator::visit_operator(
     BrTable(targets~) => self.visit_br_table(targets)
     Return => self.visit_return()
     Call(function_index~) => self.visit_call(function_index)
-    CallIndirect(type_index~, table_index~) => self.visit_call_indirect(type_index, table_index)
+    CallIndirect(type_index~, table_index~) =>
+      self.visit_call_indirect(type_index, table_index)
     Drop => self.visit_drop()
     Select => self.visit_select()
     LocalGet(local_index~) => self.visit_local_get(local_index)
@@ -186,13 +187,15 @@ pub fn FuncTranslator::visit_operator(
     I64Extend32S => self.visit_i64_extend32_s()
     RefEq => self.translate_unsupported_operator("RefEq")
     StructNew(..) => self.translate_unsupported_operator("StructNew")
-    StructNewDefault(..) => self.translate_unsupported_operator("StructNewDefault")
+    StructNewDefault(..) =>
+      self.translate_unsupported_operator("StructNewDefault")
     StructGet(..) => self.translate_unsupported_operator("StructGet")
     StructGetS(..) => self.translate_unsupported_operator("StructGetS")
     StructGetU(..) => self.translate_unsupported_operator("StructGetU")
     StructSet(..) => self.translate_unsupported_operator("StructSet")
     ArrayNew(..) => self.translate_unsupported_operator("ArrayNew")
-    ArrayNewDefault(..) => self.translate_unsupported_operator("ArrayNewDefault")
+    ArrayNewDefault(..) =>
+      self.translate_unsupported_operator("ArrayNewDefault")
     ArrayNewFixed(..) => self.translate_unsupported_operator("ArrayNewFixed")
     ArrayNewData(..) => self.translate_unsupported_operator("ArrayNewData")
     ArrayNewElem(..) => self.translate_unsupported_operator("ArrayNewElem")
@@ -206,9 +209,11 @@ pub fn FuncTranslator::visit_operator(
     ArrayInitData(..) => self.translate_unsupported_operator("ArrayInitData")
     ArrayInitElem(..) => self.translate_unsupported_operator("ArrayInitElem")
     RefTestNonNull(..) => self.translate_unsupported_operator("RefTestNonNull")
-    RefTestNullable(..) => self.translate_unsupported_operator("RefTestNullable")
+    RefTestNullable(..) =>
+      self.translate_unsupported_operator("RefTestNullable")
     RefCastNonNull(..) => self.translate_unsupported_operator("RefCastNonNull")
-    RefCastNullable(..) => self.translate_unsupported_operator("RefCastNullable")
+    RefCastNullable(..) =>
+      self.translate_unsupported_operator("RefCastNullable")
     BrOnCast(..) => self.translate_unsupported_operator("BrOnCast")
     BrOnCastFail(..) => self.translate_unsupported_operator("BrOnCastFail")
     AnyConvertExtern => self.translate_unsupported_operator("AnyConvertExtern")
@@ -230,7 +235,8 @@ pub fn FuncTranslator::visit_operator(
     MemoryFill(mem~) => self.visit_memory_fill(mem)
     TableInit(elem_index~, table~) => self.visit_table_init(elem_index, table)
     ElemDrop(elem_index~) => self.visit_elem_drop(elem_index)
-    TableCopy(dst_table~, src_table~) => self.visit_table_copy(dst_table, src_table)
+    TableCopy(dst_table~, src_table~) =>
+      self.visit_table_copy(dst_table, src_table)
     TypedSelect(ty~) => self.visit_typed_select(ty)
     RefNull(hty~) => self.visit_ref_null(hty)
     RefIsNull => self.visit_ref_is_null()
@@ -241,75 +247,136 @@ pub fn FuncTranslator::visit_operator(
     TableGrow(table~) => self.visit_table_grow(table)
     TableSize(table~) => self.visit_table_size(table)
     ReturnCall(function_index~) => self.visit_return_call(function_index)
-    ReturnCallIndirect(type_index~, table_index~) => self.visit_return_call_indirect(type_index, table_index)
+    ReturnCallIndirect(type_index~, table_index~) =>
+      self.visit_return_call_indirect(type_index, table_index)
     MemoryDiscard(..) => self.translate_unsupported_operator("MemoryDiscard")
-    MemoryAtomicNotify(..) => self.translate_unsupported_operator("MemoryAtomicNotify")
-    MemoryAtomicWait32(..) => self.translate_unsupported_operator("MemoryAtomicWait32")
-    MemoryAtomicWait64(..) => self.translate_unsupported_operator("MemoryAtomicWait64")
+    MemoryAtomicNotify(..) =>
+      self.translate_unsupported_operator("MemoryAtomicNotify")
+    MemoryAtomicWait32(..) =>
+      self.translate_unsupported_operator("MemoryAtomicWait32")
+    MemoryAtomicWait64(..) =>
+      self.translate_unsupported_operator("MemoryAtomicWait64")
     AtomicFence => self.translate_unsupported_operator("AtomicFence")
     I32AtomicLoad(..) => self.translate_unsupported_operator("I32AtomicLoad")
     I64AtomicLoad(..) => self.translate_unsupported_operator("I64AtomicLoad")
-    I32AtomicLoad8U(..) => self.translate_unsupported_operator("I32AtomicLoad8U")
-    I32AtomicLoad16U(..) => self.translate_unsupported_operator("I32AtomicLoad16U")
-    I64AtomicLoad8U(..) => self.translate_unsupported_operator("I64AtomicLoad8U")
-    I64AtomicLoad16U(..) => self.translate_unsupported_operator("I64AtomicLoad16U")
-    I64AtomicLoad32U(..) => self.translate_unsupported_operator("I64AtomicLoad32U")
+    I32AtomicLoad8U(..) =>
+      self.translate_unsupported_operator("I32AtomicLoad8U")
+    I32AtomicLoad16U(..) =>
+      self.translate_unsupported_operator("I32AtomicLoad16U")
+    I64AtomicLoad8U(..) =>
+      self.translate_unsupported_operator("I64AtomicLoad8U")
+    I64AtomicLoad16U(..) =>
+      self.translate_unsupported_operator("I64AtomicLoad16U")
+    I64AtomicLoad32U(..) =>
+      self.translate_unsupported_operator("I64AtomicLoad32U")
     I32AtomicStore(..) => self.translate_unsupported_operator("I32AtomicStore")
     I64AtomicStore(..) => self.translate_unsupported_operator("I64AtomicStore")
-    I32AtomicStore8(..) => self.translate_unsupported_operator("I32AtomicStore8")
-    I32AtomicStore16(..) => self.translate_unsupported_operator("I32AtomicStore16")
-    I64AtomicStore8(..) => self.translate_unsupported_operator("I64AtomicStore8")
-    I64AtomicStore16(..) => self.translate_unsupported_operator("I64AtomicStore16")
-    I64AtomicStore32(..) => self.translate_unsupported_operator("I64AtomicStore32")
-    I32AtomicRmwAdd(..) => self.translate_unsupported_operator("I32AtomicRmwAdd")
-    I64AtomicRmwAdd(..) => self.translate_unsupported_operator("I64AtomicRmwAdd")
-    I32AtomicRmw8AddU(..) => self.translate_unsupported_operator("I32AtomicRmw8AddU")
-    I32AtomicRmw16AddU(..) => self.translate_unsupported_operator("I32AtomicRmw16AddU")
-    I64AtomicRmw8AddU(..) => self.translate_unsupported_operator("I64AtomicRmw8AddU")
-    I64AtomicRmw16AddU(..) => self.translate_unsupported_operator("I64AtomicRmw16AddU")
-    I64AtomicRmw32AddU(..) => self.translate_unsupported_operator("I64AtomicRmw32AddU")
-    I32AtomicRmwSub(..) => self.translate_unsupported_operator("I32AtomicRmwSub")
-    I64AtomicRmwSub(..) => self.translate_unsupported_operator("I64AtomicRmwSub")
-    I32AtomicRmw8SubU(..) => self.translate_unsupported_operator("I32AtomicRmw8SubU")
-    I32AtomicRmw16SubU(..) => self.translate_unsupported_operator("I32AtomicRmw16SubU")
-    I64AtomicRmw8SubU(..) => self.translate_unsupported_operator("I64AtomicRmw8SubU")
-    I64AtomicRmw16SubU(..) => self.translate_unsupported_operator("I64AtomicRmw16SubU")
-    I64AtomicRmw32SubU(..) => self.translate_unsupported_operator("I64AtomicRmw32SubU")
-    I32AtomicRmwAnd(..) => self.translate_unsupported_operator("I32AtomicRmwAnd")
-    I64AtomicRmwAnd(..) => self.translate_unsupported_operator("I64AtomicRmwAnd")
-    I32AtomicRmw8AndU(..) => self.translate_unsupported_operator("I32AtomicRmw8AndU")
-    I32AtomicRmw16AndU(..) => self.translate_unsupported_operator("I32AtomicRmw16AndU")
-    I64AtomicRmw8AndU(..) => self.translate_unsupported_operator("I64AtomicRmw8AndU")
-    I64AtomicRmw16AndU(..) => self.translate_unsupported_operator("I64AtomicRmw16AndU")
-    I64AtomicRmw32AndU(..) => self.translate_unsupported_operator("I64AtomicRmw32AndU")
+    I32AtomicStore8(..) =>
+      self.translate_unsupported_operator("I32AtomicStore8")
+    I32AtomicStore16(..) =>
+      self.translate_unsupported_operator("I32AtomicStore16")
+    I64AtomicStore8(..) =>
+      self.translate_unsupported_operator("I64AtomicStore8")
+    I64AtomicStore16(..) =>
+      self.translate_unsupported_operator("I64AtomicStore16")
+    I64AtomicStore32(..) =>
+      self.translate_unsupported_operator("I64AtomicStore32")
+    I32AtomicRmwAdd(..) =>
+      self.translate_unsupported_operator("I32AtomicRmwAdd")
+    I64AtomicRmwAdd(..) =>
+      self.translate_unsupported_operator("I64AtomicRmwAdd")
+    I32AtomicRmw8AddU(..) =>
+      self.translate_unsupported_operator("I32AtomicRmw8AddU")
+    I32AtomicRmw16AddU(..) =>
+      self.translate_unsupported_operator("I32AtomicRmw16AddU")
+    I64AtomicRmw8AddU(..) =>
+      self.translate_unsupported_operator("I64AtomicRmw8AddU")
+    I64AtomicRmw16AddU(..) =>
+      self.translate_unsupported_operator("I64AtomicRmw16AddU")
+    I64AtomicRmw32AddU(..) =>
+      self.translate_unsupported_operator("I64AtomicRmw32AddU")
+    I32AtomicRmwSub(..) =>
+      self.translate_unsupported_operator("I32AtomicRmwSub")
+    I64AtomicRmwSub(..) =>
+      self.translate_unsupported_operator("I64AtomicRmwSub")
+    I32AtomicRmw8SubU(..) =>
+      self.translate_unsupported_operator("I32AtomicRmw8SubU")
+    I32AtomicRmw16SubU(..) =>
+      self.translate_unsupported_operator("I32AtomicRmw16SubU")
+    I64AtomicRmw8SubU(..) =>
+      self.translate_unsupported_operator("I64AtomicRmw8SubU")
+    I64AtomicRmw16SubU(..) =>
+      self.translate_unsupported_operator("I64AtomicRmw16SubU")
+    I64AtomicRmw32SubU(..) =>
+      self.translate_unsupported_operator("I64AtomicRmw32SubU")
+    I32AtomicRmwAnd(..) =>
+      self.translate_unsupported_operator("I32AtomicRmwAnd")
+    I64AtomicRmwAnd(..) =>
+      self.translate_unsupported_operator("I64AtomicRmwAnd")
+    I32AtomicRmw8AndU(..) =>
+      self.translate_unsupported_operator("I32AtomicRmw8AndU")
+    I32AtomicRmw16AndU(..) =>
+      self.translate_unsupported_operator("I32AtomicRmw16AndU")
+    I64AtomicRmw8AndU(..) =>
+      self.translate_unsupported_operator("I64AtomicRmw8AndU")
+    I64AtomicRmw16AndU(..) =>
+      self.translate_unsupported_operator("I64AtomicRmw16AndU")
+    I64AtomicRmw32AndU(..) =>
+      self.translate_unsupported_operator("I64AtomicRmw32AndU")
     I32AtomicRmwOr(..) => self.translate_unsupported_operator("I32AtomicRmwOr")
     I64AtomicRmwOr(..) => self.translate_unsupported_operator("I64AtomicRmwOr")
-    I32AtomicRmw8OrU(..) => self.translate_unsupported_operator("I32AtomicRmw8OrU")
-    I32AtomicRmw16OrU(..) => self.translate_unsupported_operator("I32AtomicRmw16OrU")
-    I64AtomicRmw8OrU(..) => self.translate_unsupported_operator("I64AtomicRmw8OrU")
-    I64AtomicRmw16OrU(..) => self.translate_unsupported_operator("I64AtomicRmw16OrU")
-    I64AtomicRmw32OrU(..) => self.translate_unsupported_operator("I64AtomicRmw32OrU")
-    I32AtomicRmwXor(..) => self.translate_unsupported_operator("I32AtomicRmwXor")
-    I64AtomicRmwXor(..) => self.translate_unsupported_operator("I64AtomicRmwXor")
-    I32AtomicRmw8XorU(..) => self.translate_unsupported_operator("I32AtomicRmw8XorU")
-    I32AtomicRmw16XorU(..) => self.translate_unsupported_operator("I32AtomicRmw16XorU")
-    I64AtomicRmw8XorU(..) => self.translate_unsupported_operator("I64AtomicRmw8XorU")
-    I64AtomicRmw16XorU(..) => self.translate_unsupported_operator("I64AtomicRmw16XorU")
-    I64AtomicRmw32XorU(..) => self.translate_unsupported_operator("I64AtomicRmw32XorU")
-    I32AtomicRmwXchg(..) => self.translate_unsupported_operator("I32AtomicRmwXchg")
-    I64AtomicRmwXchg(..) => self.translate_unsupported_operator("I64AtomicRmwXchg")
-    I32AtomicRmw8XchgU(..) => self.translate_unsupported_operator("I32AtomicRmw8XchgU")
-    I32AtomicRmw16XchgU(..) => self.translate_unsupported_operator("I32AtomicRmw16XchgU")
-    I64AtomicRmw8XchgU(..) => self.translate_unsupported_operator("I64AtomicRmw8XchgU")
-    I64AtomicRmw16XchgU(..) => self.translate_unsupported_operator("I64AtomicRmw16XchgU")
-    I64AtomicRmw32XchgU(..) => self.translate_unsupported_operator("I64AtomicRmw32XchgU")
-    I32AtomicRmwCmpxchg(..) => self.translate_unsupported_operator("I32AtomicRmwCmpxchg")
-    I64AtomicRmwCmpxchg(..) => self.translate_unsupported_operator("I64AtomicRmwCmpxchg")
-    I32AtomicRmw8CmpxchgU(..) => self.translate_unsupported_operator("I32AtomicRmw8CmpxchgU")
-    I32AtomicRmw16CmpxchgU(..) => self.translate_unsupported_operator("I32AtomicRmw16CmpxchgU")
-    I64AtomicRmw8CmpxchgU(..) => self.translate_unsupported_operator("I64AtomicRmw8CmpxchgU")
-    I64AtomicRmw16CmpxchgU(..) => self.translate_unsupported_operator("I64AtomicRmw16CmpxchgU")
-    I64AtomicRmw32CmpxchgU(..) => self.translate_unsupported_operator("I64AtomicRmw32CmpxchgU")
+    I32AtomicRmw8OrU(..) =>
+      self.translate_unsupported_operator("I32AtomicRmw8OrU")
+    I32AtomicRmw16OrU(..) =>
+      self.translate_unsupported_operator("I32AtomicRmw16OrU")
+    I64AtomicRmw8OrU(..) =>
+      self.translate_unsupported_operator("I64AtomicRmw8OrU")
+    I64AtomicRmw16OrU(..) =>
+      self.translate_unsupported_operator("I64AtomicRmw16OrU")
+    I64AtomicRmw32OrU(..) =>
+      self.translate_unsupported_operator("I64AtomicRmw32OrU")
+    I32AtomicRmwXor(..) =>
+      self.translate_unsupported_operator("I32AtomicRmwXor")
+    I64AtomicRmwXor(..) =>
+      self.translate_unsupported_operator("I64AtomicRmwXor")
+    I32AtomicRmw8XorU(..) =>
+      self.translate_unsupported_operator("I32AtomicRmw8XorU")
+    I32AtomicRmw16XorU(..) =>
+      self.translate_unsupported_operator("I32AtomicRmw16XorU")
+    I64AtomicRmw8XorU(..) =>
+      self.translate_unsupported_operator("I64AtomicRmw8XorU")
+    I64AtomicRmw16XorU(..) =>
+      self.translate_unsupported_operator("I64AtomicRmw16XorU")
+    I64AtomicRmw32XorU(..) =>
+      self.translate_unsupported_operator("I64AtomicRmw32XorU")
+    I32AtomicRmwXchg(..) =>
+      self.translate_unsupported_operator("I32AtomicRmwXchg")
+    I64AtomicRmwXchg(..) =>
+      self.translate_unsupported_operator("I64AtomicRmwXchg")
+    I32AtomicRmw8XchgU(..) =>
+      self.translate_unsupported_operator("I32AtomicRmw8XchgU")
+    I32AtomicRmw16XchgU(..) =>
+      self.translate_unsupported_operator("I32AtomicRmw16XchgU")
+    I64AtomicRmw8XchgU(..) =>
+      self.translate_unsupported_operator("I64AtomicRmw8XchgU")
+    I64AtomicRmw16XchgU(..) =>
+      self.translate_unsupported_operator("I64AtomicRmw16XchgU")
+    I64AtomicRmw32XchgU(..) =>
+      self.translate_unsupported_operator("I64AtomicRmw32XchgU")
+    I32AtomicRmwCmpxchg(..) =>
+      self.translate_unsupported_operator("I32AtomicRmwCmpxchg")
+    I64AtomicRmwCmpxchg(..) =>
+      self.translate_unsupported_operator("I64AtomicRmwCmpxchg")
+    I32AtomicRmw8CmpxchgU(..) =>
+      self.translate_unsupported_operator("I32AtomicRmw8CmpxchgU")
+    I32AtomicRmw16CmpxchgU(..) =>
+      self.translate_unsupported_operator("I32AtomicRmw16CmpxchgU")
+    I64AtomicRmw8CmpxchgU(..) =>
+      self.translate_unsupported_operator("I64AtomicRmw8CmpxchgU")
+    I64AtomicRmw16CmpxchgU(..) =>
+      self.translate_unsupported_operator("I64AtomicRmw16CmpxchgU")
+    I64AtomicRmw32CmpxchgU(..) =>
+      self.translate_unsupported_operator("I64AtomicRmw32CmpxchgU")
     V128Load(memarg~) => self.visit_v128_load(memarg)
     V128Load8x8S(memarg~) => self.visit_v128_load8x8_s(memarg)
     V128Load8x8U(memarg~) => self.visit_v128_load8x8_u(memarg)
@@ -324,14 +391,22 @@ pub fn FuncTranslator::visit_operator(
     V128Load32Zero(memarg~) => self.visit_v128_load32_zero(memarg)
     V128Load64Zero(memarg~) => self.visit_v128_load64_zero(memarg)
     V128Store(memarg~) => self.visit_v128_store(memarg)
-    V128Load8Lane(memarg~, lane~) => self.visit_v128_load8_lane(memarg, lane.to_int())
-    V128Load16Lane(memarg~, lane~) => self.visit_v128_load16_lane(memarg, lane.to_int())
-    V128Load32Lane(memarg~, lane~) => self.visit_v128_load32_lane(memarg, lane.to_int())
-    V128Load64Lane(memarg~, lane~) => self.visit_v128_load64_lane(memarg, lane.to_int())
-    V128Store8Lane(memarg~, lane~) => self.visit_v128_store8_lane(memarg, lane.to_int())
-    V128Store16Lane(memarg~, lane~) => self.visit_v128_store16_lane(memarg, lane.to_int())
-    V128Store32Lane(memarg~, lane~) => self.visit_v128_store32_lane(memarg, lane.to_int())
-    V128Store64Lane(memarg~, lane~) => self.visit_v128_store64_lane(memarg, lane.to_int())
+    V128Load8Lane(memarg~, lane~) =>
+      self.visit_v128_load8_lane(memarg, lane.to_int())
+    V128Load16Lane(memarg~, lane~) =>
+      self.visit_v128_load16_lane(memarg, lane.to_int())
+    V128Load32Lane(memarg~, lane~) =>
+      self.visit_v128_load32_lane(memarg, lane.to_int())
+    V128Load64Lane(memarg~, lane~) =>
+      self.visit_v128_load64_lane(memarg, lane.to_int())
+    V128Store8Lane(memarg~, lane~) =>
+      self.visit_v128_store8_lane(memarg, lane.to_int())
+    V128Store16Lane(memarg~, lane~) =>
+      self.visit_v128_store16_lane(memarg, lane.to_int())
+    V128Store32Lane(memarg~, lane~) =>
+      self.visit_v128_store32_lane(memarg, lane.to_int())
+    V128Store64Lane(memarg~, lane~) =>
+      self.visit_v128_store64_lane(memarg, lane.to_int())
     V128Const(value~) => self.visit_v128_const(value.bytes().to_fixedarray())
     I8x16Shuffle(lanes~) => self.visit_i8x16_shuffle(lanes)
     I8x16ExtractLaneS(lane~) => self.visit_i8x16_extract_lane_s(lane.to_int())
@@ -546,26 +621,37 @@ pub fn FuncTranslator::visit_operator(
     F64x2ConvertLowI32x4U => self.visit_f64x2_convert_low_i32x4_u()
     F32x4DemoteF64x2Zero => self.visit_f32x4_demote_f64x2_zero()
     F64x2PromoteLowF32x4 => self.visit_f64x2_promote_low_f32x4()
-    I8x16RelaxedSwizzle => self.translate_unsupported_operator("I8x16RelaxedSwizzle")
-    I32x4RelaxedTruncF32x4S => self.translate_unsupported_operator("I32x4RelaxedTruncF32x4S")
-    I32x4RelaxedTruncF32x4U => self.translate_unsupported_operator("I32x4RelaxedTruncF32x4U")
-    I32x4RelaxedTruncF64x2SZero => self.translate_unsupported_operator("I32x4RelaxedTruncF64x2SZero")
-    I32x4RelaxedTruncF64x2UZero => self.translate_unsupported_operator("I32x4RelaxedTruncF64x2UZero")
+    I8x16RelaxedSwizzle =>
+      self.translate_unsupported_operator("I8x16RelaxedSwizzle")
+    I32x4RelaxedTruncF32x4S =>
+      self.translate_unsupported_operator("I32x4RelaxedTruncF32x4S")
+    I32x4RelaxedTruncF32x4U =>
+      self.translate_unsupported_operator("I32x4RelaxedTruncF32x4U")
+    I32x4RelaxedTruncF64x2SZero =>
+      self.translate_unsupported_operator("I32x4RelaxedTruncF64x2SZero")
+    I32x4RelaxedTruncF64x2UZero =>
+      self.translate_unsupported_operator("I32x4RelaxedTruncF64x2UZero")
     F32x4RelaxedMadd => self.visit_f32x4_relaxed_madd()
     F32x4RelaxedNmadd => self.visit_f32x4_relaxed_nmadd()
     F64x2RelaxedMadd => self.visit_f64x2_relaxed_madd()
     F64x2RelaxedNmadd => self.visit_f64x2_relaxed_nmadd()
-    I8x16RelaxedLaneselect => self.translate_unsupported_operator("I8x16RelaxedLaneselect")
-    I16x8RelaxedLaneselect => self.translate_unsupported_operator("I16x8RelaxedLaneselect")
-    I32x4RelaxedLaneselect => self.translate_unsupported_operator("I32x4RelaxedLaneselect")
-    I64x2RelaxedLaneselect => self.translate_unsupported_operator("I64x2RelaxedLaneselect")
+    I8x16RelaxedLaneselect =>
+      self.translate_unsupported_operator("I8x16RelaxedLaneselect")
+    I16x8RelaxedLaneselect =>
+      self.translate_unsupported_operator("I16x8RelaxedLaneselect")
+    I32x4RelaxedLaneselect =>
+      self.translate_unsupported_operator("I32x4RelaxedLaneselect")
+    I64x2RelaxedLaneselect =>
+      self.translate_unsupported_operator("I64x2RelaxedLaneselect")
     F32x4RelaxedMin => self.translate_unsupported_operator("F32x4RelaxedMin")
     F32x4RelaxedMax => self.translate_unsupported_operator("F32x4RelaxedMax")
     F64x2RelaxedMin => self.translate_unsupported_operator("F64x2RelaxedMin")
     F64x2RelaxedMax => self.translate_unsupported_operator("F64x2RelaxedMax")
-    I16x8RelaxedQ15mulrS => self.translate_unsupported_operator("I16x8RelaxedQ15mulrS")
+    I16x8RelaxedQ15mulrS =>
+      self.translate_unsupported_operator("I16x8RelaxedQ15mulrS")
     I16x8RelaxedDotI8x16I7x16S => self.visit_i16x8_relaxed_dot_i8x16_i7x16_s()
-    I32x4RelaxedDotI8x16I7x16AddS => self.visit_i32x4_relaxed_dot_i8x16_i7x16_add_s()
+    I32x4RelaxedDotI8x16I7x16AddS =>
+      self.visit_i32x4_relaxed_dot_i8x16_i7x16_add_s()
     TryTable(..) => self.translate_unsupported_operator("TryTable")
     Throw(..) => self.translate_unsupported_operator("Throw")
     ThrowRef => self.translate_unsupported_operator("ThrowRef")
@@ -574,41 +660,72 @@ pub fn FuncTranslator::visit_operator(
     Rethrow(..) => self.translate_unsupported_operator("Rethrow")
     Delegate(..) => self.translate_unsupported_operator("Delegate")
     CatchAll => self.translate_unsupported_operator("CatchAll")
-    GlobalAtomicGet(..) => self.translate_unsupported_operator("GlobalAtomicGet")
-    GlobalAtomicSet(..) => self.translate_unsupported_operator("GlobalAtomicSet")
-    GlobalAtomicRmwAdd(..) => self.translate_unsupported_operator("GlobalAtomicRmwAdd")
-    GlobalAtomicRmwSub(..) => self.translate_unsupported_operator("GlobalAtomicRmwSub")
-    GlobalAtomicRmwAnd(..) => self.translate_unsupported_operator("GlobalAtomicRmwAnd")
-    GlobalAtomicRmwOr(..) => self.translate_unsupported_operator("GlobalAtomicRmwOr")
-    GlobalAtomicRmwXor(..) => self.translate_unsupported_operator("GlobalAtomicRmwXor")
-    GlobalAtomicRmwXchg(..) => self.translate_unsupported_operator("GlobalAtomicRmwXchg")
-    GlobalAtomicRmwCmpxchg(..) => self.translate_unsupported_operator("GlobalAtomicRmwCmpxchg")
+    GlobalAtomicGet(..) =>
+      self.translate_unsupported_operator("GlobalAtomicGet")
+    GlobalAtomicSet(..) =>
+      self.translate_unsupported_operator("GlobalAtomicSet")
+    GlobalAtomicRmwAdd(..) =>
+      self.translate_unsupported_operator("GlobalAtomicRmwAdd")
+    GlobalAtomicRmwSub(..) =>
+      self.translate_unsupported_operator("GlobalAtomicRmwSub")
+    GlobalAtomicRmwAnd(..) =>
+      self.translate_unsupported_operator("GlobalAtomicRmwAnd")
+    GlobalAtomicRmwOr(..) =>
+      self.translate_unsupported_operator("GlobalAtomicRmwOr")
+    GlobalAtomicRmwXor(..) =>
+      self.translate_unsupported_operator("GlobalAtomicRmwXor")
+    GlobalAtomicRmwXchg(..) =>
+      self.translate_unsupported_operator("GlobalAtomicRmwXchg")
+    GlobalAtomicRmwCmpxchg(..) =>
+      self.translate_unsupported_operator("GlobalAtomicRmwCmpxchg")
     TableAtomicGet(..) => self.translate_unsupported_operator("TableAtomicGet")
     TableAtomicSet(..) => self.translate_unsupported_operator("TableAtomicSet")
-    TableAtomicRmwXchg(..) => self.translate_unsupported_operator("TableAtomicRmwXchg")
-    TableAtomicRmwCmpxchg(..) => self.translate_unsupported_operator("TableAtomicRmwCmpxchg")
-    StructAtomicGet(..) => self.translate_unsupported_operator("StructAtomicGet")
-    StructAtomicGetS(..) => self.translate_unsupported_operator("StructAtomicGetS")
-    StructAtomicGetU(..) => self.translate_unsupported_operator("StructAtomicGetU")
-    StructAtomicSet(..) => self.translate_unsupported_operator("StructAtomicSet")
-    StructAtomicRmwAdd(..) => self.translate_unsupported_operator("StructAtomicRmwAdd")
-    StructAtomicRmwSub(..) => self.translate_unsupported_operator("StructAtomicRmwSub")
-    StructAtomicRmwAnd(..) => self.translate_unsupported_operator("StructAtomicRmwAnd")
-    StructAtomicRmwOr(..) => self.translate_unsupported_operator("StructAtomicRmwOr")
-    StructAtomicRmwXor(..) => self.translate_unsupported_operator("StructAtomicRmwXor")
-    StructAtomicRmwXchg(..) => self.translate_unsupported_operator("StructAtomicRmwXchg")
-    StructAtomicRmwCmpxchg(..) => self.translate_unsupported_operator("StructAtomicRmwCmpxchg")
+    TableAtomicRmwXchg(..) =>
+      self.translate_unsupported_operator("TableAtomicRmwXchg")
+    TableAtomicRmwCmpxchg(..) =>
+      self.translate_unsupported_operator("TableAtomicRmwCmpxchg")
+    StructAtomicGet(..) =>
+      self.translate_unsupported_operator("StructAtomicGet")
+    StructAtomicGetS(..) =>
+      self.translate_unsupported_operator("StructAtomicGetS")
+    StructAtomicGetU(..) =>
+      self.translate_unsupported_operator("StructAtomicGetU")
+    StructAtomicSet(..) =>
+      self.translate_unsupported_operator("StructAtomicSet")
+    StructAtomicRmwAdd(..) =>
+      self.translate_unsupported_operator("StructAtomicRmwAdd")
+    StructAtomicRmwSub(..) =>
+      self.translate_unsupported_operator("StructAtomicRmwSub")
+    StructAtomicRmwAnd(..) =>
+      self.translate_unsupported_operator("StructAtomicRmwAnd")
+    StructAtomicRmwOr(..) =>
+      self.translate_unsupported_operator("StructAtomicRmwOr")
+    StructAtomicRmwXor(..) =>
+      self.translate_unsupported_operator("StructAtomicRmwXor")
+    StructAtomicRmwXchg(..) =>
+      self.translate_unsupported_operator("StructAtomicRmwXchg")
+    StructAtomicRmwCmpxchg(..) =>
+      self.translate_unsupported_operator("StructAtomicRmwCmpxchg")
     ArrayAtomicGet(..) => self.translate_unsupported_operator("ArrayAtomicGet")
-    ArrayAtomicGetS(..) => self.translate_unsupported_operator("ArrayAtomicGetS")
-    ArrayAtomicGetU(..) => self.translate_unsupported_operator("ArrayAtomicGetU")
+    ArrayAtomicGetS(..) =>
+      self.translate_unsupported_operator("ArrayAtomicGetS")
+    ArrayAtomicGetU(..) =>
+      self.translate_unsupported_operator("ArrayAtomicGetU")
     ArrayAtomicSet(..) => self.translate_unsupported_operator("ArrayAtomicSet")
-    ArrayAtomicRmwAdd(..) => self.translate_unsupported_operator("ArrayAtomicRmwAdd")
-    ArrayAtomicRmwSub(..) => self.translate_unsupported_operator("ArrayAtomicRmwSub")
-    ArrayAtomicRmwAnd(..) => self.translate_unsupported_operator("ArrayAtomicRmwAnd")
-    ArrayAtomicRmwOr(..) => self.translate_unsupported_operator("ArrayAtomicRmwOr")
-    ArrayAtomicRmwXor(..) => self.translate_unsupported_operator("ArrayAtomicRmwXor")
-    ArrayAtomicRmwXchg(..) => self.translate_unsupported_operator("ArrayAtomicRmwXchg")
-    ArrayAtomicRmwCmpxchg(..) => self.translate_unsupported_operator("ArrayAtomicRmwCmpxchg")
+    ArrayAtomicRmwAdd(..) =>
+      self.translate_unsupported_operator("ArrayAtomicRmwAdd")
+    ArrayAtomicRmwSub(..) =>
+      self.translate_unsupported_operator("ArrayAtomicRmwSub")
+    ArrayAtomicRmwAnd(..) =>
+      self.translate_unsupported_operator("ArrayAtomicRmwAnd")
+    ArrayAtomicRmwOr(..) =>
+      self.translate_unsupported_operator("ArrayAtomicRmwOr")
+    ArrayAtomicRmwXor(..) =>
+      self.translate_unsupported_operator("ArrayAtomicRmwXor")
+    ArrayAtomicRmwXchg(..) =>
+      self.translate_unsupported_operator("ArrayAtomicRmwXchg")
+    ArrayAtomicRmwCmpxchg(..) =>
+      self.translate_unsupported_operator("ArrayAtomicRmwCmpxchg")
     RefI31Shared => self.translate_unsupported_operator("RefI31Shared")
     CallRef(..) => self.translate_unsupported_operator("CallRef")
     ReturnCallRef(..) => self.translate_unsupported_operator("ReturnCallRef")

@@ -14,7 +14,7 @@ pub(all) suberror IrError {
 } derive(Eq)
 
 ///|
-pub impl Show for IrError with output(self, logger) {
+pub impl Show for IrError with fn output(self, logger) {
   logger.write_string(
     match self {
       StackSlotOutOfBounds => "stack slot index out of bounds"

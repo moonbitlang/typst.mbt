@@ -8,7 +8,7 @@
 
 ///|
 /// The global counter of stores (upstream `StoreIdx::new`).
-let store_counter : Ref[Int] = { val: 0 }
+let store_counter : Ref[Int] = { val: 0, }
 
 ///|
 /// The inner store that owns all data not associated to the host state.
@@ -41,7 +41,10 @@ pub struct StoreInner {
 /// Creates a new [`StoreInner`] for the given [`Engine`].
 fn StoreInner::new(engine : Engine) -> StoreInner {
   let config = engine.config()
-  let fuel = @wasmi_core.Fuel::new(config.get_consume_fuel(), config.fuel_costs())
+  let fuel = @wasmi_core.Fuel::new(
+    config.get_consume_fuel(),
+    config.fuel_costs(),
+  )
   let store_idx = store_counter.val
   store_counter.val += 1
   {
@@ -77,7 +80,7 @@ pub struct Store[T] {
 ///|
 /// Creates a new store.
 pub fn[T] Store::new(engine : Engine, data : T) -> Store[T] {
-  { inner: StoreInner::new(engine), data }
+  { inner: StoreInner::new(engine), data, }
 }
 
 ///|
@@ -109,7 +112,7 @@ pub(all) struct Func {
 } derive(Eq, Hash)
 
 ///|
-pub impl Show for Func with output(self, f) {
+pub impl Show for Func with fn output(self, f) {
   f.write_string(
     "Func(GuardedEntity { guard_idx: StoreIdx(\{self.store}), entity_idx: FuncIdx(\{self.idx + 1}) })",
   )
@@ -123,7 +126,7 @@ pub(all) struct Memory {
 } derive(Eq, Hash)
 
 ///|
-pub impl Show for Memory with output(self, f) {
+pub impl Show for Memory with fn output(self, f) {
   f.write_string(
     "Memory(GuardedEntity { guard_idx: StoreIdx(\{self.store}), entity_idx: MemoryIdx(\{self.idx}) })",
   )
@@ -137,7 +140,7 @@ pub(all) struct Table {
 } derive(Eq, Hash)
 
 ///|
-pub impl Show for Table with output(self, f) {
+pub impl Show for Table with fn output(self, f) {
   f.write_string(
     "Table(GuardedEntity { guard_idx: StoreIdx(\{self.store}), entity_idx: TableIdx(\{self.idx}) })",
   )
@@ -151,7 +154,7 @@ pub(all) struct Global {
 } derive(Eq, Hash)
 
 ///|
-pub impl Show for Global with output(self, f) {
+pub impl Show for Global with fn output(self, f) {
   f.write_string(
     "Global(GuardedEntity { guard_idx: StoreIdx(\{self.store}), entity_idx: GlobalIdx(\{self.idx}) })",
   )
@@ -165,7 +168,7 @@ pub(all) struct Instance {
 } derive(Eq, Hash)
 
 ///|
-pub impl Show for Instance with output(self, f) {
+pub impl Show for Instance with fn output(self, f) {
   f.write_string(
     "Instance(GuardedEntity { guard_idx: StoreIdx(\{self.store}), entity_idx: InstanceIdx(\{self.idx}) })",
   )
@@ -193,7 +196,7 @@ pub(all) struct ExternRef {
 } derive(Eq, Hash)
 
 ///|
-pub impl Show for ExternRef with output(self, f) {
+pub impl Show for ExternRef with fn output(self, f) {
   f.write_string(
     "ExternRef(GuardedEntity { guard_idx: StoreIdx(\{self.store}), entity_idx: ExternRefIdx(\{self.idx + 1}) })",
   )
@@ -245,13 +248,16 @@ pub fn StoreInner::alloc_global(
   global : @wasmi_core.Global,
 ) -> Global {
   self.globals.push(global)
-  { store: self.store_idx, idx: self.globals.length() - 1 }
+  { store: self.store_idx, idx: self.globals.length() - 1, }
 }
 
 ///|
-pub fn StoreInner::alloc_table(self : StoreInner, table : @wasmi_core.Table) -> Table {
+pub fn StoreInner::alloc_table(
+  self : StoreInner,
+  table : @wasmi_core.Table,
+) -> Table {
   self.tables.push(table)
-  { store: self.store_idx, idx: self.tables.length() - 1 }
+  { store: self.store_idx, idx: self.tables.length() - 1, }
 }
 
 ///|
@@ -260,7 +266,7 @@ pub fn StoreInner::alloc_memory(
   memory : @wasmi_core.Memory,
 ) -> Memory {
   self.memories.push(memory)
-  { store: self.store_idx, idx: self.memories.length() - 1 }
+  { store: self.store_idx, idx: self.memories.length() - 1, }
 }
 
 ///|
@@ -269,7 +275,7 @@ pub fn StoreInner::alloc_data_segment(
   segment : DataSegmentEntity,
 ) -> DataSegment {
   self.datas.push(segment)
-  { store: self.store_idx, idx: self.datas.length() - 1 }
+  { store: self.store_idx, idx: self.datas.length() - 1, }
 }
 
 ///|
@@ -278,7 +284,7 @@ pub fn StoreInner::alloc_element_segment(
   segment : @wasmi_core.ElementSegment,
 ) -> ElementSegment {
   self.elems.push(segment)
-  { store: self.store_idx, idx: self.elems.length() - 1 }
+  { store: self.store_idx, idx: self.elems.length() - 1, }
 }
 
 ///|
@@ -287,14 +293,14 @@ pub fn StoreInner::alloc_extern_object(
   object : ExternRefEntity,
 ) -> ExternRef {
   self.extern_objects.push(object)
-  { store: self.store_idx, idx: self.extern_objects.length() - 1 }
+  { store: self.store_idx, idx: self.extern_objects.length() - 1, }
 }
 
 ///|
 /// Allocates a new uninitialized [`InstanceEntity`] and returns an [`Instance`] reference to it.
 pub fn StoreInner::alloc_instance(self : StoreInner) -> Instance {
   self.instances.push(InstanceEntity::uninitialized())
-  { store: self.store_idx, idx: self.instances.length() - 1 }
+  { store: self.store_idx, idx: self.instances.length() - 1, }
 }
 
 ///|
@@ -310,7 +316,7 @@ pub fn StoreInner::initialize_instance(
 ///|
 pub fn StoreInner::alloc_func(self : StoreInner, func : FuncEntity) -> Func {
   self.funcs.push(func)
-  { store: self.store_idx, idx: self.funcs.length() - 1 }
+  { store: self.store_idx, idx: self.funcs.length() - 1, }
 }
 
 ///|
@@ -331,7 +337,10 @@ pub fn StoreInner::resolve_global(
 }
 
 ///|
-pub fn StoreInner::resolve_table(self : StoreInner, table : Table) -> @wasmi_core.Table {
+pub fn StoreInner::resolve_table(
+  self : StoreInner,
+  table : Table,
+) -> @wasmi_core.Table {
   self.check_store(table.store)
   self.tables[table.idx]
 }
@@ -404,7 +413,10 @@ pub fn StoreInner::fuel(self : StoreInner) -> @wasmi_core.Fuel {
 
 ///|
 /// Encodes a nullable function reference as [`UntypedVal`] (`0` is `null`).
-pub fn StoreInner::funcref_to_untyped(self : StoreInner, func : Func?) -> @wasmi_core.UntypedVal {
+pub fn StoreInner::funcref_to_untyped(
+  self : StoreInner,
+  func : Func?,
+) -> @wasmi_core.UntypedVal {
   match func {
     None => @wasmi_core.UntypedVal::from_u64(0)
     Some(func) => {
@@ -424,7 +436,7 @@ pub fn StoreInner::funcref_from_untyped(
   if bits == 0 {
     None
   } else {
-    Some({ store: self.store_idx, idx: bits.to_int() - 1 })
+    Some({ store: self.store_idx, idx: bits.to_int() - 1, })
   }
 }
 
@@ -453,7 +465,7 @@ pub fn StoreInner::externref_from_untyped(
   if bits == 0 {
     None
   } else {
-    Some({ store: self.store_idx, idx: bits.to_int() - 1 })
+    Some({ store: self.store_idx, idx: bits.to_int() - 1, })
   }
 }
 
@@ -509,7 +521,10 @@ pub fn Val::ty(self : Val) -> @wasmi_core.ValType {
 
 ///|
 /// Converts the [`Val`] into an [`UntypedVal`].
-pub fn StoreInner::val_to_untyped(self : StoreInner, value : Val) -> @wasmi_core.UntypedVal {
+pub fn StoreInner::val_to_untyped(
+  self : StoreInner,
+  value : Val,
+) -> @wasmi_core.UntypedVal {
   match value {
     I32(v) => @wasmi_core.UntypedVal::from_i32(v)
     I64(v) => @wasmi_core.UntypedVal::from_i64(v)
@@ -541,6 +556,9 @@ pub fn StoreInner::val_from_untyped(
 
 ///|
 /// Converts the [`Val`] into a [`TypedVal`].
-pub fn StoreInner::val_to_typed(self : StoreInner, value : Val) -> @wasmi_core.TypedVal {
+pub fn StoreInner::val_to_typed(
+  self : StoreInner,
+  value : Val,
+) -> @wasmi_core.TypedVal {
   @wasmi_core.TypedVal::new(value.ty(), self.val_to_untyped(value))
 }
