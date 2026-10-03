@@ -202,12 +202,20 @@ pub fn NamedNumeralSystem::shorthand(self : NamedNumeralSystem) -> String? {
 pub fn NamedNumeralSystem::from_shorthand(
   shorthand : String,
 ) -> NamedNumeralSystem? {
+  shorthand_systems.get(shorthand)
+}
+
+///|
+/// The systems by shorthand (the first system with a given shorthand wins,
+/// like upstream's linear search over all systems).
+let shorthand_systems : Map[String, NamedNumeralSystem] = {
+  let map = {}
   for system in NamedNumeralSystem::all() {
-    if system.shorthand() == Some(shorthand) {
-      return Some(system)
+    if system.shorthand() is Some(shorthand) && !map.contains(shorthand) {
+      map[shorthand] = system
     }
   }
-  None
+  map
 }
 
 ///|
