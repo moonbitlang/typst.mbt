@@ -449,26 +449,35 @@ pub fn StyleChain::suffix(self : StyleChain, len : Int) -> Styles {
 }
 
 ///|
-/// Iterate over all values for the given property in the chain.
-fn StyleChain::properties(
+/// The innermost value of the given property in the chain, if any
+/// (`self.properties(elem, id).head()` without allocating an iterator).
+fn StyleChain::first_property(
   self : StyleChain,
   elem : Element,
   id : Int,
-) -> Iter[Value] {
-  self
-  .entries()
-  .filter_map(s => {
-    match s {
-      Property(p) if p.is_(elem, id) => Some(p.value)
-      _ => None
+) -> Value? {
+  let mut link = self
+  while true {
+    let head = link.head
+    for i = head.length() - 1; i >= 0; i = i - 1 {
+      if head.unsafe_get(i) is Property(p) &&
+        physical_equal(p.elem.0, elem.0) &&
+        p.id == id {
+        return Some(p.value)
+      }
     }
-  })
+    match link.tail {
+      Some(t) => link = t
+      None => break
+    }
+  }
+  None
 }
 
 ///|
 /// Whether the chain has a property for the given field.
 pub fn StyleChain::has(self : StyleChain, elem : Element, id : Int) -> Bool {
-  self.entries().any(s => s is Property(p) && p.is_(elem, id))
+  self.first_property(elem, id) is Some(_)
 }
 
 ///|
@@ -481,24 +490,36 @@ pub fn StyleChain::get_value_with_local(
   info : FieldInfo,
   local : Value?,
 ) -> Value {
-  let default = () => {
-    match info.default {
-      Some(f) => f()
-      None => None
-    }
-  }
   match info.fold {
     Some(fold) => {
+      // Fold all values in the chain, innermost first.
       let mut folded : Value? = None
-      for v in self.properties(elem, info.id) {
-        folded = match folded {
-          None => Some(v)
-          Some(inner) => Some(fold(inner, v))
+      let mut link = self
+      let id = info.id
+      while true {
+        let head = link.head
+        for i = head.length() - 1; i >= 0; i = i - 1 {
+          if head.unsafe_get(i) is Property(p) &&
+            physical_equal(p.elem.0, elem.0) &&
+            p.id == id {
+            folded = match folded {
+              None => Some(p.value)
+              Some(inner) => Some(fold(inner, p.value))
+            }
+          }
+        }
+        match link.tail {
+          Some(t) => link = t
+          None => break
         }
       }
+      let default = match info.default {
+        Some(f) => f()
+        None => None
+      }
       let mut res = match folded {
-        Some(f) => fold(f, default())
-        None => default()
+        Some(f) => fold(f, default)
+        None => default
       }
       if local is Some(value) {
         res = fold(value, res)
@@ -509,9 +530,13 @@ pub fn StyleChain::get_value_with_local(
       match local {
         Some(value) => value
         None =>
-          match self.properties(elem, info.id).head() {
+          match self.first_property(elem, info.id) {
             Some(v) => v
-            None => default()
+            None =>
+              match info.default {
+                Some(f) => f()
+                None => None
+              }
           }
       }
   }
