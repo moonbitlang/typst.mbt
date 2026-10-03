@@ -144,8 +144,11 @@ fn linebreak_optimized_bounded(
   let mut active = 0
   let mut prev_end = 0
   breakpoints(p, (end, breakpoint) => {
-    // Find the optimal predecessor.
-    let mut best : BoundedEntry? = None
+    // Find the optimal predecessor (`best`, kept in locals to not allocate
+    // an entry per candidate).
+    let mut best_line : Line? = None
+    let mut best_pred = 0
+    let mut best_total = 0.0
 
     // A lower bound for the cost of all following line attempts.
     let mut line_lower_bound : Double? = None
@@ -211,12 +214,11 @@ fn linebreak_optimized_bounded(
       }
 
       // If this attempt is better than what we had before, take it!
-      let better = match best {
-        None => true
-        Some(best) => best.total >= total
-      }
+      let better = best_line is None || best_total >= total
       if better {
-        best = Some({ pred: pred_index, total, line: attempt, end, })
+        best_line = Some(attempt)
+        best_pred = pred_index
+        best_total = total
       }
     }
 
@@ -225,8 +227,8 @@ fn linebreak_optimized_bounded(
     if breakpoint == Mandatory {
       active = table.length()
     }
-    if best is Some(best) {
-      table.push(best)
+    if best_line is Some(line) {
+      table.push({ pred: best_pred, total: best_total, line, end, })
     }
     prev_end = end
   })
@@ -285,8 +287,12 @@ fn linebreak_optimized_approximate(
   let mut active = 0
   let mut prev_end = 0
   breakpoints(p, (end, breakpoint) => {
-    // Find the optimal predecessor.
-    let mut best : ApproxEntry? = None
+    // Find the optimal predecessor (`best`, kept in locals to not allocate
+    // an entry per candidate).
+    let mut has_best = false
+    let mut best_pred = 0
+    let mut best_total = 0.0
+    let mut best_unbreakable = false
     for pred_index in active..<table.length() {
       let pred = table[pred_index]
       let start = pred.end
@@ -306,10 +312,7 @@ fn linebreak_optimized_approximate(
       // make it the desired width. We trim at the end to not take into
       // account trailing spaces. This is, again, only an approximation of
       // the real behaviour of `line`.
-      let trimmed_end = start +
-        p.text
-        .slice(start, end)
-        .trim_end_len(c => @unicode.is_whitespace(char_of(c)))
+      let trimmed_end = start + p.text.trim_end_whitespace_len(start, end)
       let line_ratio = raw_ratio(
         p,
         width,
@@ -340,12 +343,12 @@ fn linebreak_optimized_approximate(
       let total = pred.total + line_cost
 
       // If this attempt is better than what we had before, take it!
-      let better = match best {
-        None => true
-        Some(best) => best.total >= total
-      }
+      let better = !has_best || best_total >= total
       if better {
-        best = Some({ pred: pred_index, total, end, unbreakable, breakpoint, })
+        has_best = true
+        best_pred = pred_index
+        best_total = total
+        best_unbreakable = unbreakable
       }
     }
 
@@ -354,8 +357,14 @@ fn linebreak_optimized_approximate(
     if breakpoint == Mandatory {
       active = table.length()
     }
-    if best is Some(best) {
-      table.push(best)
+    if has_best {
+      table.push({
+        pred: best_pred,
+        total: best_total,
+        end,
+        unbreakable: best_unbreakable,
+        breakpoint,
+      })
     }
     prev_end = end
   })
