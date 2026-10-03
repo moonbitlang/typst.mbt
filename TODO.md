@@ -86,20 +86,14 @@ goldens with `scripts/goldens.sh <stage>` (needs Rust; builds `oracle/`).
   multiline strings, `\u` scalar validation, `[tool]` value validation) —
   switch it to the full `data/toml` port.
 
-### office.mbt (sibling repo `~/git/office.mbt`, used via `moon.work`)
-- [ ] **Push/publish**: office.mbt `main` is 11 commits ahead of
-  `origin/main` (pdflite `export` package for typst.mbt's PDF exporter:
-  glyph-ID text, subsetting, color spaces, shadings, Type 3 glyphs, tagged
-  PDF, external XObjects, PNG passthrough; `moonbitlang/x` 0.5.5). Nothing
-  has been pushed or published — needs the owner's go-ahead. After
-  publishing, typst.mbt can depend on the published pdflite instead of
-  `moon.work`.
+### office.mbt (pdflite, published on mooncakes)
+- [x] **Push/publish**: the export package and its follow-ups landed in
+  moonbitlang/office.mbt #591–#594 and ship in pdflite 0.3.4, which
+  typst.mbt now imports from mooncakes (no sibling checkout needed; an
+  untracked `moon.work` can still link a local office.mbt).
 - [ ] Bump `moonbit-community/flate` 0.8.1 → 0.8.4 in pdflite (faster);
   requires regenerating three byte-pinned fixtures (pdflite flate
   determinism test, a docx2html cram fixture, an mbtexcel snapshot).
 
 ### Housekeeping
-- [ ] Remove leftover agent worktrees under `.claude/worktrees/` (finished;
-  ~18 GB, mostly `_build`), e.g. `git worktree list` then
-  `git worktree remove --force <path>` for merged branches.
-- [ ] Delete merged local branches (`git branch --merged main`).
+- [x] Leftover agent worktrees and merged branches removed (2026-10-03).
