@@ -203,6 +203,9 @@ fn main {
         missing="",
       )
     "shape-hb" => run_shape_hb_stage(filter, verbose)
+    // wasmparser validation like wasmi's module parser (see
+    // `wasm_validate_stage.mbt`).
+    "wasm-validate" => run_wasm_validate_stage(filter, verbose)
     _ => {
       println("unknown stage: \{stage}")
       @sys.exit(2)
