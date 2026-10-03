@@ -64,8 +64,56 @@ pub fn layout_columns(
 }
 
 ///|
-/// The internal implementation of [layout_fragment].
+/// The internal implementation of [layout_fragment] (memoized like
+/// upstream's `#[comemo::memoize]`; see `library/memo.mbt`).
 fn layout_fragment_impl(
+  engine : @library.Engine,
+  content : @library.Content,
+  locator : @library.Locator,
+  styles : @library.StyleChain,
+  regions : @library.Regions,
+  column : ColumnOptions,
+) -> @library.Fragment raise @library.SourceError {
+  if !@library.layout_memo_active() {
+    return layout_fragment_compute(
+      engine, content, locator, styles, regions, column,
+    )
+  }
+  let state = @library.SipHasher128::new()
+  state.write_str("layout_fragment")
+  state.write(content)
+  state.write_u128(styles.memo_hash())
+  state.write_f64(regions.size.x.to_raw())
+  state.write_f64(regions.size.y.to_raw())
+  state.write_bool(regions.expand.x)
+  state.write_bool(regions.expand.y)
+  state.write_f64(regions.full.to_raw())
+  state.write_usize(regions.backlog.length())
+  for height in regions.backlog {
+    state.write_f64(height.to_raw())
+  }
+  match regions.last {
+    Some(last) => {
+      state.write_discriminant(1)
+      state.write_f64(last.to_raw())
+    }
+    None => state.write_discriminant(0)
+  }
+  state.write_usize(column.count)
+  state.write_bool(column.balanced)
+  state.write_f64(column.gutter.rel.get())
+  state.write_f64(column.gutter.abs.to_raw())
+  state.write(column.separator)
+  state.write_u128(locator.memo_hash())
+  state.write_u128(engine.route.memo_hash())
+  @library.memoized_layout(engine, state.finish128(), engine => {
+    layout_fragment_compute(engine, content, locator, styles, regions, column)
+  })
+}
+
+///|
+/// The uncached body of [layout_fragment_impl].
+fn layout_fragment_compute(
   engine : @library.Engine,
   content : @library.Content,
   locator : @library.Locator,
