@@ -12,6 +12,20 @@ const EARLY_EXIT_TRIGGER_LEVEL : Int = 5
 /// The number of equal leading bytes of `window[a..a + 256]` and
 /// `window[b..b + 256]` (upstream `compare256`).
 fn compare256(window : FixedArray[Byte], a : Int, b : Int) -> Int {
+  // Compare eight bytes at a time (like zlib-rs' `compare256_rust_u64`);
+  // the result is the same as comparing byte by byte.
+  if a >= 0 &&
+    b >= 0 &&
+    a + 256 <= window.length() &&
+    b + 256 <= window.length() {
+    for i = 0; i < 256; i = i + 8 {
+      let diff = read_u64_le(window, a + i) ^ read_u64_le(window, b + i)
+      if diff != 0 {
+        return i + diff.ctz() / 8
+      }
+    }
+    return 256
+  }
   for i in 0..<256 {
     if window[a + i] != window[b + i] {
       return i
