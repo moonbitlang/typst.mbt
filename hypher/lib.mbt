@@ -47,38 +47,49 @@ pub fn hyphenate_bounded(
   )
 
   // Start pattern matching at each character boundary.
+  // The trie is walked with plain addresses instead of `State` objects
+  // (upstream: `State` is a cheap borrowed view; allocating one per
+  // transition dominated hyphenation time).
+  let data = root.data
   for start in 0..<dotted.length() {
     if !is_char_boundary(dotted[start]) {
       continue
     }
-    let mut state = root
+    let mut addr = root.addr
     for k in start..<dotted.length() {
-      let b = dotted[k]
-      match state.transition(b) {
-        Some(next) => {
-          state = next
-          for pair in state.levels() {
-            let (offset, level) = pair
-            let split = start + offset
-
-            // Example
-            //
-            // Dotted: . h e l l o .
-            // Levels:    0 2 3 0
-            if split >= min_idx && split <= max_idx {
-              let slot = split - 2
-              if level > levels[slot] {
-                levels[slot] = level
-              }
-            }
+      let next = transition_addr(data, addr, dotted[k])
+      if next < 0 {
+        break
+      }
+      addr = next
+      // The levels of the new state.
+      let mut pos = addr
+      let b = data[pos].to_int()
+      if b >> 7 == 0 {
+        continue
+      }
+      pos += 1
+      if (b & 31) == 31 {
+        pos += 1
+      }
+      let levels_at = (data[pos].to_int() << 4) | (data[pos + 1].to_int() >> 4)
+      let levels_len = data[pos + 1].to_int() & 15
+      let mut offset = 0
+      for j in 0..<levels_len {
+        let packed = data[levels_at + j].to_int()
+        offset += packed / 10
+        let level = packed % 10
+        let split = start + offset
+        if split >= min_idx && split <= max_idx {
+          let slot = split - 2
+          if level > levels[slot] {
+            levels[slot] = level
           }
         }
-        None => break
       }
     }
   }
 
-  // Break into segments at odd levels.
   let syllables = []
   let mut cursor = 0
   for i in 0..<levels.length() {
@@ -107,10 +118,17 @@ fn lowercase_and_dot(word : String, len : Int) -> FixedArray[Int] {
   for i = 0; i < word.length(); {
     let (cp, next) = @unicode.decode_at(word, i)
     let mut c = cp
-    let lower = @unicode.char_to_lowercase(Int::unsafe_to_char(cp))
-    let (l, lnext) = @unicode.decode_at(lower, 0)
-    if lnext == lower.length() && utf8_len(l) == utf8_len(c) {
-      c = l
+    if cp < 0x80 {
+      // ASCII lowercases to a single ASCII char (fast path).
+      if cp >= 'A' && cp <= 'Z' {
+        c = cp + 32
+      }
+    } else {
+      let lower = @unicode.char_to_lowercase(Int::unsafe_to_char(cp))
+      let (l, lnext) = @unicode.decode_at(lower, 0)
+      if lnext == lower.length() && utf8_len(l) == utf8_len(c) {
+        c = l
+      }
     }
     offset = encode_char(dotted, offset, c)
     continue next
@@ -224,31 +242,30 @@ fn State::at(data : Bytes, addr : Int) -> State {
 ///|
 /// Return the state reached by following the transition labelled `b`.
 /// Returns `None` if there is no such state.
-fn State::transition(self : State, b : Int) -> State? {
-  for idx in 0..<self.count {
-    if self.data[self.trans_at + idx].to_int() == b {
-      let offset = self.targets_at + self.stride * idx
-      let delta = from_be_bytes(self.data, offset, self.stride)
-      let next = self.addr + delta
-      return Some(State::at(self.data, next))
+/// The address of the state reached from the state at `addr` with byte `b`,
+/// or `-1` if there is no such transition (`State::transition` on
+/// addresses).
+fn transition_addr(data : Bytes, addr : Int, b : Int) -> Int {
+  let mut pos = addr
+  let head = data[pos].to_int()
+  let stride = (head >> 5) & 3
+  let mut count = head & 31
+  pos += 1
+  if count == 31 {
+    count = data[pos].to_int()
+    pos += 1
+  }
+  if head >> 7 != 0 {
+    pos += 2
+  }
+  let trans_at = pos
+  let targets_at = pos + count
+  for idx in 0..<count {
+    if data[trans_at + idx].to_int() == b {
+      return addr + from_be_bytes(data, targets_at + stride * idx, stride)
     }
   }
-  None
-}
-
-///|
-/// Returns the levels contained in the state.
-fn State::levels(self : State) -> Array[(Int, Int)] {
-  let out = []
-  let mut offset = 0
-  for k in 0..<self.levels_len {
-    let packed = self.data[self.levels_at + k].to_int()
-    let dist = packed / 10
-    let level = packed % 10
-    offset += dist
-    out.push((offset, level))
-  }
-  out
+  -1
 }
 
 ///|
