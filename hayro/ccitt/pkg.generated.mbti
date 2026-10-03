@@ -1,0 +1,49 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/hayro/ccitt"
+
+import {
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub fn[D : Decoder] decode(BytesView, D, DecoderContext) -> Int raise DecodeError
+
+// Errors
+pub(all) suberror DecodeError {
+  UnexpectedEof
+  InvalidCode
+  LineLengthMismatch
+  Overflow
+} derive(Eq)
+pub impl Show for DecodeError
+
+// Types and methods
+pub(all) struct DecodeSettings {
+  columns : UInt
+  rows : UInt
+  end_of_block : Bool
+  end_of_line : Bool
+  rows_are_byte_aligned : Bool
+  encoding : EncodingMode
+  invert_black : Bool
+}
+
+pub struct DecoderContext {
+  // private fields
+}
+pub fn DecoderContext::new(DecodeSettings) -> Self
+
+pub(all) enum EncodingMode {
+  Group4
+  Group3_1D
+  Group3_2D(k~ : UInt)
+} derive(Eq, @debug.Debug)
+
+// Type aliases
+
+// Traits
+pub(open) trait Decoder {
+  fn push_pixel(Self, Bool) -> Unit
+  fn push_pixel_chunk(Self, Bool, UInt) -> Unit
+  fn next_line(Self) -> Unit
+}

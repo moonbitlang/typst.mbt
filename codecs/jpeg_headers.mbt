@@ -144,7 +144,16 @@ fn parse_start_of_frame(img : JpegDecoder) -> Unit raise DecodeErrors {
   // read and set the image width
   let img_width = img.stream.get_u16_be_err()
   img.width = img_width
-  // (the `image` crate sets no width/height limits)
+  if img_width > img.max_width {
+    raise Format(
+      "Image width \{img_width} greater than width limit \{img.max_width}. If use `set_limits` if you want to support huge images",
+    )
+  }
+  if img_height > img.max_height {
+    raise Format(
+      "Image height \{img_height} greater than height limit \{img.max_height}. If use `set_limits` if you want to support huge images",
+    )
+  }
 
   // Check image width or height is zero
   if img_width == 0 || img_height == 0 {

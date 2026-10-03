@@ -93,6 +93,11 @@ strict-num = "=0.1.1"
 pic-scale = { version = "=0.7.12", default-features = false, features = ["neon", "rdm", "sse", "avx"] }
 # The PDF renderer typst-render uses (gen_hayro_render_tests).
 hayro = { git = "https://github.com/LaurenzV/hayro", rev = "d8e24e29eda62581e1ea15497effb2a884fb1608", default-features = false }
+# The image codecs of hayro-syntax (gen_hayro_codec_tests), with the features
+# hayro-interpret enables (`simd`).
+hayro-jpeg2000 = { git = "https://github.com/LaurenzV/hayro", rev = "d8e24e29eda62581e1ea15497effb2a884fb1608", default-features = false, features = ["std", "simd"] }
+hayro-jbig2 = { git = "https://github.com/LaurenzV/hayro", rev = "d8e24e29eda62581e1ea15497effb2a884fb1608", default-features = false, features = ["std", "simd"] }
+hayro-ccitt = { git = "https://github.com/LaurenzV/hayro", rev = "d8e24e29eda62581e1ea15497effb2a884fb1608" }
 # kurbo stroke expansion (gen_kurbo_stroke_tests); same version as hayro's.
 kurbo = "=0.13.1"
 # The character widths codespan-reporting 0.11.1 uses (gen_unicode_width).

@@ -126,6 +126,18 @@
   loads them (`library/image_pdf.mbt`); `hayro/write` (hayro-write) extracts
   pages that `pdf/image.mbt` embeds as XObjects. `hayro/syntax/oracle_test.mbt`
   is generated from the real crate (`oracle/src/bin/gen_hayro_syntax_tests.rs`).
+  Image filters (`hayro/syntax/filter_{dct,ccitt,jbig2,jpx}.mbt`): DCT on the
+  zune-jpeg port in `codecs/` (public `JpegDecoder`/`DecoderOptions`),
+  `hayro/ccitt`, `hayro/jbig2`, `hayro/jpeg2000` (ports of hayro-ccitt/-jbig2/
+  -jpeg2000 with the `simd` paths emulated lane by lane, NEON semantics:
+  fused `fmaf` for `mul_add`). `hayro/syntax/codec_oracle_test.mbt` checks
+  `Stream::decoded_image` on every image stream of the corpus PDFs
+  (`gen_hayro_codec_tests streams`; `HAYRO_CODEC_STREAMS=<tsv>` checks a
+  recording of other, e.g. local, PDFs). Codec oracles against the real
+  crates (`gen_hayro_codec_tests jpx|ccitt|jbig2`) run on synthetic
+  fixtures: `scripts/gen_jpx_test_files.py` (OpenJPEG `opj_compress` +
+  hand-built JP2 boxes), `scripts/gen_ccitt_test_files.py` and
+  `scripts/gen_jbig2_test_files.py` (small T.4/T.6/T.88 encoders).
 - Image downsampling for hayro's renderer: `pic_scale/` is a bit-exact port
   of pic-scale 0.7.12 (`Scaler::new(CatmullRom)`, u8 planar/RGB/RGBA with
   premultiplied alpha) as it runs on aarch64 with `rdm` (NEON lanes emulated,

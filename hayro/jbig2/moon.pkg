@@ -1,0 +1,10 @@
+import {
+  "moonbitlang/typst/hayro/ccitt",
+}
+
+import {
+  "moonbitlang/x/fs",
+  "moonbitlang/core/buffer",
+} for "test"
+
+warnings = "-deprecated"

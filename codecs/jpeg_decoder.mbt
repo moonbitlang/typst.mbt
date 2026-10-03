@@ -11,16 +11,16 @@ const MAX_COMPONENTS : Int = 4
 /// The image color spaces the decoder deals with (upstream
 /// `zune_core::colorspace::ColorSpace`).
 ///
-/// Only the color spaces the JPEG decoder produces or the `image` crate
-/// requests are ported.
-priv enum ColorSpace {
+/// Only the color spaces the JPEG decoder produces or its users (the `image`
+/// crate, hayro-syntax's `DCTDecode` filter) request are ported.
+pub(all) enum ColorSpace {
   RGB
   YCbCr
   Luma
   YCCK
   CMYK
   MultiBand(Int)
-} derive(Eq)
+} derive(Eq, Debug)
 
 ///|
 /// Number of color channels present for a certain colorspace.
@@ -64,70 +64,74 @@ priv struct ExtendedXmpSegment {
 
 ///|
 /// A JPEG decoder instance.
-priv struct JpegDecoder {
+pub struct JpegDecoder {
   /// Image width (from the SOF).
-  mut width : Int
+  priv mut width : Int
   /// Image height (from the SOF).
-  mut height : Int
+  priv mut height : Int
   /// Number of components (from the SOF).
-  mut info_components : Int
+  priv mut info_components : Int
   /// Image sub-sampling ratio.
-  mut sample_ratio : SampleRatios
+  priv mut sample_ratio : SampleRatios
   /// Quantization tables.
-  qt_tables : FixedArray[FixedArray[Int]?]
+  priv qt_tables : FixedArray[FixedArray[Int]?]
   /// DC Huffman tables with a maximum of 4 tables for each component
-  dc_huffman_tables : FixedArray[HuffmanTable?]
+  priv dc_huffman_tables : FixedArray[HuffmanTable?]
   /// AC Huffman tables with a maximum of 4 tables for each component
-  ac_huffman_tables : FixedArray[HuffmanTable?]
+  priv ac_huffman_tables : FixedArray[HuffmanTable?]
   /// Image components
-  mut components : Array[Components]
+  priv mut components : Array[Components]
   /// maximum horizontal component of all channels in the image
-  mut h_max : Int
+  priv mut h_max : Int
   /// maximum vertical component of all channels in the image
-  mut v_max : Int
+  priv mut v_max : Int
   /// mcu's width (interleaved scans)
-  mut mcu_width : Int
+  priv mut mcu_width : Int
   /// MCU height (interleaved scans)
-  mut mcu_height : Int
+  priv mut mcu_height : Int
   /// Number of MCU's in the x plane
-  mut mcu_x : Int
+  priv mut mcu_x : Int
   /// Number of MCU's in the y plane
-  mut mcu_y : Int
+  priv mut mcu_y : Int
   /// Is the image interleaved?
-  mut is_interleaved : Bool
+  priv mut is_interleaved : Bool
   /// Image input colorspace
-  mut input_colorspace : ColorSpace
+  priv mut input_colorspace : ColorSpace
   /// Is the image progressive?
-  mut is_progressive : Bool
+  priv mut is_progressive : Bool
   /// Start of spectral scan
-  mut spec_start : Int
+  priv mut spec_start : Int
   /// End of spectral scan
-  mut spec_end : Int
+  priv mut spec_end : Int
   /// Successive approximation bit position high
-  mut succ_high : Int
+  priv mut succ_high : Int
   /// Successive approximation bit position low
-  mut succ_low : Int
+  priv mut succ_low : Int
   /// Number of components in the scan.
-  mut num_scans : Int
+  priv mut num_scans : Int
   /// For a scan, check if any component has vertical/horizontal sampling.
-  mut scan_subsampled : Bool
-  z_order : FixedArray[Int]
+  priv mut scan_subsampled : Bool
+  priv z_order : FixedArray[Int]
   /// restart markers
-  mut restart_interval : Int
+  priv mut restart_interval : Int
   /// MCUs until the next restart marker (`usize`, wrapping).
-  mut todo : Int
+  priv mut todo : Int
   /// The output colorspace (upstream `DecoderOptions::jpeg_get_out_colorspace`).
-  out_colorspace : ColorSpace
+  priv mut out_colorspace : ColorSpace
+  /// Maximum image width (upstream `DecoderOptions::max_width`).
+  priv mut max_width : Int
+  /// Maximum image height (upstream `DecoderOptions::max_height`).
+  priv mut max_height : Int
   /// byte-stream
-  stream : ZReader
+  priv stream : ZReader
   /// Indicate whether headers have been decoded
-  mut headers_decoded : Bool
-  mut seen_sof : Bool
-  icc_data : Array[ICCChunk]
-  mut is_mjpeg : Bool
-  mut coeff : Int
+  priv mut headers_decoded : Bool
+  priv mut seen_sof : Bool
+  priv icc_data : Array[ICCChunk]
+  priv mut is_mjpeg : Bool
+  priv mut coeff : Int
   /// Extended XMP segments
-  mut extended_xmp_segments : Array[ExtendedXmpSegment]
+  priv mut extended_xmp_segments : Array[ExtendedXmpSegment]
 }
 
 ///|
@@ -136,8 +140,53 @@ priv struct JpegDecoder {
 const MAX_SCANS : Int = 100
 
 ///|
-/// Create a new decoder (upstream `JpegDecoder::new_with_options` with the
-/// options of the `image` crate: non-strict mode, no dimension limits).
+/// The decoder options the port supports (upstream
+/// `zune_core::options::DecoderOptions`): the output colorspace and the
+/// dimension limits. Strict mode is always off and the maximum number of
+/// progressive scans is the default (100), as both users of the port leave
+/// them at their defaults.
+pub(all) struct DecoderOptions {
+  out_colorspace : ColorSpace
+  max_width : Int
+  max_height : Int
+}
+
+///|
+/// Upstream `DecoderOptions::default()`: RGB output, 16384 x 16384 limits.
+pub fn DecoderOptions::default() -> DecoderOptions {
+  { out_colorspace: RGB, max_width: 1 << 14, max_height: 1 << 14, }
+}
+
+///|
+/// Create a new decoder with the specified options (upstream
+/// `JpegDecoder::new_with_options`).
+pub fn JpegDecoder::new_with_options(
+  data : BytesView,
+  options : DecoderOptions,
+) -> JpegDecoder {
+  let decoder = JpegDecoder::new(data, options.out_colorspace)
+  decoder.max_width = options.max_width
+  decoder.max_height = options.max_height
+  decoder
+}
+
+///|
+/// Set decoder options (upstream `JpegDecoder::set_options`).
+///
+/// This can be used to set new options even after initialization but before
+/// decoding.
+pub fn JpegDecoder::set_options(
+  self : JpegDecoder,
+  options : DecoderOptions,
+) -> Unit {
+  self.out_colorspace = options.out_colorspace
+  self.max_width = options.max_width
+  self.max_height = options.max_height
+}
+
+///|
+/// Create a new decoder with the options of the `image` crate: non-strict
+/// mode, no dimension limits.
 fn JpegDecoder::new(
   data : BytesView,
   out_colorspace : ColorSpace,
@@ -170,6 +219,8 @@ fn JpegDecoder::new(
     restart_interval: 0,
     todo: 0x7fff_ffff,
     out_colorspace,
+    max_width: 0x7fff_ffff,
+    max_height: 0x7fff_ffff,
     stream: ZReader::new(data),
     headers_decoded: false,
     seen_sof: false,
@@ -231,7 +282,9 @@ fn JpegDecoder::reassemble_extended_xmp(self : JpegDecoder) -> Unit {
 
 ///|
 /// Decode the headers (upstream `decode_headers_internal`).
-fn JpegDecoder::decode_headers(self : JpegDecoder) -> Unit raise DecodeErrors {
+pub fn JpegDecoder::decode_headers(
+  self : JpegDecoder,
+) -> Unit raise DecodeErrors {
   if self.headers_decoded {
     return
   }
@@ -388,6 +441,49 @@ fn JpegDecoder::icc_profile(self : JpegDecoder) -> Bytes? {
     data.write_bytesview(ch.data)
   }
   Some(data.to_bytes())
+}
+
+///|
+/// Decode a buffer already in memory (upstream `JpegDecoder::decode`).
+pub fn JpegDecoder::decode(self : JpegDecoder) -> Bytes raise DecodeErrors {
+  self.decode_headers()
+  let size = self.output_buffer_size()
+  let out : FixedArray[Byte] = FixedArray::make(size, b'\x00')
+  self.decode_into(out)
+  Bytes::from_array(out)
+}
+
+///|
+/// Return the input colorspace of the image, or `None` if the headers
+/// weren't decoded (upstream `JpegDecoder::input_colorspace`).
+pub fn JpegDecoder::input_colorspace(self : JpegDecoder) -> ColorSpace? {
+  if self.headers_decoded {
+    Some(self.input_colorspace)
+  } else {
+    None
+  }
+}
+
+///|
+/// The number of components of the image (upstream `info().components`),
+/// or `None` if the headers weren't decoded.
+pub fn JpegDecoder::info_components(self : JpegDecoder) -> Int? {
+  if self.headers_decoded {
+    Some(self.info_components)
+  } else {
+    None
+  }
+}
+
+///|
+/// Image dimensions as a tuple of width and height, or `None` if the headers
+/// weren't decoded (upstream `JpegDecoder::dimensions`).
+pub fn JpegDecoder::dimensions(self : JpegDecoder) -> (Int, Int)? {
+  if self.headers_decoded {
+    Some((self.width, self.height))
+  } else {
+    None
+  }
 }
 
 ///|

@@ -1,0 +1,111 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/hayro/jbig2"
+
+// Values
+
+// Errors
+pub(all) suberror DecodeError {
+  Parse(ParseError)
+  Format(FormatError)
+  Segment(SegmentError)
+  Huffman(HuffmanError)
+  Region(RegionError)
+  Template(TemplateError)
+  Symbol(SymbolError)
+  Overflow(OverflowError)
+  Unsupported
+} derive(Eq)
+pub impl Show for DecodeError
+
+// Types and methods
+pub struct DecoderContext {
+  // private fields
+}
+pub fn DecoderContext::default() -> Self
+
+pub(all) enum FormatError {
+  InvalidHeader
+  ReservedBits
+  MissingPageInfo
+  UnknownPageHeight
+  EmptyPage
+} derive(Eq)
+pub impl Show for FormatError
+
+pub(all) enum HuffmanError {
+  InvalidCode
+  InvalidSelection
+  MissingTables
+  UnexpectedOob
+  ConflictingCodes
+  PrefixLengthTooLarge
+} derive(Eq)
+pub impl Show for HuffmanError
+
+pub struct Image {
+  // private fields
+}
+pub fn[D : Decoder] Image::decode(Self, D) -> Unit raise DecodeError
+pub fn[D : Decoder] Image::decode_with(Self, D, DecoderContext) -> Unit raise DecodeError
+pub fn Image::height(Self) -> UInt
+pub fn Image::new(BytesView) -> Self raise DecodeError
+pub fn Image::new_embedded(BytesView, BytesView?) -> Self raise DecodeError
+pub fn Image::width(Self) -> UInt
+
+pub(all) enum OverflowError {
+  BitmapDimension
+  GridDimension
+  PlacementCoordinate
+  ReferenceOffset
+  Index
+  SymbolCount
+} derive(Eq)
+pub impl Show for OverflowError
+
+pub(all) enum ParseError {
+  UnexpectedEof
+} derive(Eq)
+pub impl Show for ParseError
+
+pub(all) enum RegionError {
+  InvalidCombinationOperator
+  InvalidDimension
+  InvalidMmrData
+  GrayScaleOutOfRange
+} derive(Eq)
+pub impl Show for RegionError
+
+pub(all) enum SegmentError {
+  UnknownType
+  InvalidReferredCount
+  InvalidReference
+  MissingEndMarker
+  MissingPatternDictionary
+} derive(Eq)
+pub impl Show for SegmentError
+
+pub(all) enum SymbolError {
+  NoSymbols
+  TooManySymbols
+  OutOfRange
+  UnexpectedOob
+  Invalid
+  InvalidStripDelta
+  TooManyInstances
+} derive(Eq)
+pub impl Show for SymbolError
+
+pub(all) enum TemplateError {
+  Invalid
+  InvalidAtPixel
+} derive(Eq)
+pub impl Show for TemplateError
+
+// Type aliases
+
+// Traits
+pub(open) trait Decoder {
+  fn push_pixel(Self, Bool) -> Unit
+  fn push_pixel_chunk(Self, Bool, UInt) -> Unit
+  fn next_line(Self) -> Unit
+}

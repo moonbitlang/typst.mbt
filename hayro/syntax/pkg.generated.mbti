@@ -73,6 +73,7 @@ pub struct BitWriter {
 }
 pub fn BitWriter::align(Self) -> Unit
 pub fn BitWriter::cur_pos(Self) -> Int
+pub fn BitWriter::fill_bytes(Self, Byte, Int) -> Unit?
 pub fn BitWriter::new(FixedArray[Byte], Int, Int) -> Self
 pub fn BitWriter::write(Self, UInt) -> Unit?
 

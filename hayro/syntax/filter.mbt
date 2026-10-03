@@ -1,9 +1,7 @@
 // Port of `hayro-syntax/src/filter/mod.rs`: results from decoding filtered
-// data streams.
-//
-// Deviation: the image filters (DCT, JPX, JBIG2, CCITT) are not ported yet;
-// applying them fails with `DecodeFailure::ImageDecode` (like upstream
-// without the `images` feature).
+// data streams. The image filters (with upstream's `images` feature) are in
+// `filter_dct.mbt`, `filter_ccitt.mbt`, `filter_jbig2.mbt` and
+// `filter_jpx.mbt`.
 
 ///|
 /// A data filter.
@@ -48,13 +46,21 @@ pub fn Filter::from_name(name : Name) -> Filter? {
 }
 
 ///|
+/// `.ok_or(DecodeFailure::ImageDecode)`
+fn image_ok_or(r : FilterResult?) -> Result[FilterResult, DecodeFailure] {
+  match r {
+    Some(r) => Ok(r)
+    None => Err(ImageDecode)
+  }
+}
+
+///|
 pub fn Filter::apply(
   self : Filter,
   data : BytesView,
   params : Dict,
   image_params : ImageDecodeParams,
 ) -> Result[FilterResult, DecodeFailure] {
-  ignore(image_params)
   let ok_or = (r : Bytes?) => {
     match r {
       Some(d) => Ok(FilterResult::from_data(d))
@@ -67,7 +73,10 @@ pub fn Filter::apply(
     RunLengthDecode => ok_or(run_length_decode(data))
     LzwDecode => ok_or(lzw_decode(data, params))
     FlateDecode => ok_or(flate_decode(data, params))
-    DctDecode | CcittFaxDecode | Jbig2Decode | JpxDecode => Err(ImageDecode)
+    DctDecode => image_ok_or(dct_decode(data, params, image_params))
+    CcittFaxDecode => image_ok_or(ccitt_decode(data, params, image_params))
+    Jbig2Decode => image_ok_or(jbig2_decode(data, params, image_params))
+    JpxDecode => image_ok_or(jpx_decode(data, image_params))
     _ => Err(StreamDecode)
   }
 }
