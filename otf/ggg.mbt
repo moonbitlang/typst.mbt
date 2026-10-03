@@ -25,17 +25,37 @@ pub fn LazyArray16::range(
   self : LazyArray16[RangeRecord],
   glyph : GlyphId,
 ) -> RangeRecord? {
-  self
-  .binary_search_by(record => {
-    if glyph < record.start {
-      1
-    } else if glyph <= record.end {
-      0
-    } else {
-      -1
-    }
-  })
-  .map(p => p.1)
+  // `binary_search_by` specialized to compare the raw big-endian fields
+  // instead of parsing a record for every probe (same probe sequence).
+  let data = self.data
+  let mut size = self.len().to_int()
+  if size == 0 {
+    return None
+  }
+  let g = glyph.0.to_int()
+  let mut base = 0
+  while size > 1 {
+    let half = size / 2
+    let mid = base + half
+    let at = mid * 6
+    let start = (data[at].to_int() << 8) | data[at + 1].to_int()
+    let end = (data[at + 2].to_int() << 8) | data[at + 3].to_int()
+    let cmp = if g < start { 1 } else if g <= end { 0 } else { -1 }
+    base = if cmp > 0 { base } else { mid }
+    size -= half
+  }
+  let at = base * 6
+  let start = (data[at].to_int() << 8) | data[at + 1].to_int()
+  let end = (data[at + 2].to_int() << 8) | data[at + 3].to_int()
+  if g >= start && g <= end {
+    Some({
+      start: GlyphId(start.to_uint16()),
+      end: GlyphId(end.to_uint16()),
+      value: ((data[at + 4].to_int() << 8) | data[at + 5].to_int()).to_uint16(),
+    })
+  } else {
+    None
+  }
 }
 
 ///|

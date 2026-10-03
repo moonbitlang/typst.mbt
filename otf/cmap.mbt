@@ -803,24 +803,38 @@ pub fn CmapSubtable12::glyph_index(
   self : CmapSubtable12,
   code_point : UInt,
 ) -> GlyphId? {
-  guard self.groups.binary_search_by(range => {
-      if range.start_char_code > code_point {
-        1
-      } else if range.end_char_code < code_point {
-        -1
-      } else {
-        0
-      }
-    })
-    is Some((_, group)) else {
+  // `binary_search_by` specialized to compare the raw big-endian fields
+  // instead of parsing a group for every probe (same probe sequence).
+  let data = self.groups.data
+  let mut size = self.groups.len()
+  if size == 0 {
     return None
   }
-  guard u32_checked_add(group.start_glyph_id, code_point) is Some(id) else {
+  let mut base : UInt = 0
+  while size > 1 {
+    let half = size / 2
+    let mid = base + half
+    let at = mid.reinterpret_as_int() * 12
+    let cmp = if be_u32(data, at) > code_point {
+      1
+    } else if be_u32(data, at + 4) < code_point {
+      -1
+    } else {
+      0
+    }
+    base = if cmp > 0 { base } else { mid }
+    size -= half
+  }
+  let at = base.reinterpret_as_int() * 12
+  let start_char_code = be_u32(data, at)
+  if start_char_code > code_point || be_u32(data, at + 4) < code_point {
     return None
   }
-  guard u32_checked_sub(id, group.start_char_code) is Some(id) else {
+  let start_glyph_id = be_u32(data, at + 8)
+  guard u32_checked_add(start_glyph_id, code_point) is Some(id) else {
     return None
   }
+  guard u32_checked_sub(id, start_char_code) is Some(id) else { return None }
   match u16_try_from_u32(id) {
     Some(g) => Some(GlyphId(g))
     None => None
