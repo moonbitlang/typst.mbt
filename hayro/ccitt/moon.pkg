@@ -2,4 +2,10 @@ import {
   "moonbitlang/core/cmp",
 }
 
+import {
+  "moonbitlang/x/fs",
+  "moonbitlang/core/buffer",
+  "moonbitlang/core/string",
+} for "test"
+
 warnings = "-deprecated"

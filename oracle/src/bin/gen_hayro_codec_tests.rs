@@ -16,9 +16,19 @@
 //!   decoding: `path<TAB>settings<TAB>result`. Checked by
 //!   `hayro/jpeg2000/oracle_test.mbt` (`testdata/oracle.tsv`).
 //!
+//! - `ccitt <cases.tsv>`: decodes the CCITT streams listed in `cases.tsv`
+//!   (written by `scripts/gen_ccitt_test_files.py`; files relative to its
+//!   `files/` directory) with `hayro_ccitt::decode` and the listed settings;
+//!   one line per case: `file<TAB>case index<TAB>result<TAB>pixels`, where the
+//!   result is `ok <bytes read>` or `E <error>` and `pixels` is
+//!   `<rows> <len>:<fnv1a64>` of the pushed pixels (`1` white, `0` black,
+//!   `\n` per completed row; chunks expanded). Checked by
+//!   `hayro/ccitt/oracle_test.mbt` (`testdata/oracle.tsv`).
+//!
 //! Usage (in `oracle/`):
 //! `cargo run --release --offline --bin gen_hayro_codec_tests -- streams ../hayro/syntax/testdata/codec_pdfs.txt > ../hayro/syntax/testdata/codec_streams.tsv`
 //! `cargo run --release --offline --bin gen_hayro_codec_tests -- jpx ../hayro/jpeg2000/testdata/files/* > ../hayro/jpeg2000/testdata/oracle.tsv`
+//! `cargo run --release --offline --bin gen_hayro_codec_tests -- ccitt ../hayro/ccitt/testdata/cases.tsv > ../hayro/ccitt/testdata/oracle.tsv`
 //! (paths are printed relative to the module root).
 
 use std::fmt::Write as _;
@@ -274,11 +284,77 @@ fn jpx(files: &[String]) {
     }
 }
 
+struct CcittRecorder {
+    out: Vec<u8>,
+    rows: u32,
+}
+
+impl hayro_ccitt::Decoder for CcittRecorder {
+    fn push_pixel(&mut self, white: bool) {
+        self.out.push(if white { b'1' } else { b'0' });
+    }
+
+    fn push_pixel_chunk(&mut self, white: bool, chunk_count: u32) {
+        let b = if white { b'1' } else { b'0' };
+        self.out.extend(std::iter::repeat_n(b, chunk_count as usize * 8));
+    }
+
+    fn next_line(&mut self) {
+        self.rows += 1;
+        self.out.push(b'\n');
+    }
+}
+
+fn ccitt(cases: &str) {
+    println!("# file\tcase\tresult\tpixels (gen_hayro_codec_tests ccitt)");
+    let dir = std::path::Path::new(cases).parent().unwrap().join("files");
+    let list = std::fs::read_to_string(cases).unwrap();
+    let mut index = 0;
+    for line in list.lines() {
+        if line.is_empty() || line.starts_with('#') {
+            continue;
+        }
+        let f: Vec<&str> = line.split('\t').collect();
+        let data = std::fs::read(dir.join(f[0])).unwrap();
+        let k: i32 = f[3].parse().unwrap();
+        let settings = hayro_ccitt::DecodeSettings {
+            columns: f[1].parse().unwrap(),
+            rows: f[2].parse().unwrap(),
+            end_of_line: f[4] == "1",
+            rows_are_byte_aligned: f[5] == "1",
+            end_of_block: f[6] == "1",
+            encoding: if k < 0 {
+                hayro_ccitt::EncodingMode::Group4
+            } else if k == 0 {
+                hayro_ccitt::EncodingMode::Group3_1D
+            } else {
+                hayro_ccitt::EncodingMode::Group3_2D { k: k as u32 }
+            },
+            invert_black: f[7] == "1",
+        };
+        let mut decoder = CcittRecorder { out: vec![], rows: 0 };
+        let mut ctx = hayro_ccitt::DecoderContext::new(settings);
+        let result = match hayro_ccitt::decode(&data, &mut decoder, &mut ctx) {
+            Ok(n) => format!("ok {n}"),
+            Err(e) => format!("E {e}"),
+        };
+        println!(
+            "{}\t{index}\t{result}\t{} {}:{:016x}",
+            f[0],
+            decoder.rows,
+            decoder.out.len(),
+            fnv(&decoder.out)
+        );
+        index += 1;
+    }
+}
+
 fn main() {
     let args: Vec<String> = std::env::args().collect();
     match args.get(1).map(String::as_str) {
         Some("streams") => streams(&args[2]),
         Some("jpx") => jpx(&args[2..]),
-        _ => panic!("usage: gen_hayro_codec_tests streams <list> | jpx <file>..."),
+        Some("ccitt") => ccitt(&args[2]),
+        _ => panic!("usage: gen_hayro_codec_tests streams <list> | jpx <file>... | ccitt <cases.tsv>"),
     }
 }

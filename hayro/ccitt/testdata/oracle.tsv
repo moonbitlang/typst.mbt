@@ -1,0 +1,571 @@
+# file	case	result	pixels (gen_hayro_codec_tests ccitt)
+c000_text_1x1_k-1.bin	0	ok 1	1 2:07f8bc07b4ba5002
+c000_text_1x1_k-1.bin	1	ok 1	1 3:456c3318181f9c07
+c001_text_1x1_k0.bin	2	ok 1	1 2:07fc1e07b4bd2c5f
+c002_text_1x1_k0.bin	3	ok 12	1 2:07f8bc07b4ba5002
+c002_text_1x1_k0.bin	4	E unexpected end of input	1 2:07f8bc07b4ba5002
+c002_text_1x1_k0.bin	5	ok 5	1 3:4568d118181cbfaa
+c003_text_1x1_k0.bin	6	ok 12	1 2:07f8bc07b4ba5002
+c003_text_1x1_k0_trunc.bin	7	ok 8	1 2:07f8bc07b4ba5002
+c004_text_1x1_k2.bin	8	E invalid CCITT code sequence	4 8:1427b6828121e5fd
+c004_text_1x1_k2_corrupt.bin	9	ok 4	1 2:07f8bc07b4ba5002
+c005_text_1x1_k2.bin	10	ok 1	1 2:07fc1e07b4bd2c5f
+c005_text_1x1_k2.bin	11	E unexpected end of input	1 2:07fc1e07b4bd2c5f
+c006_text_1x1_k3.bin	12	ok 5	1 2:07f8bc07b4ba5002
+c006_text_1x1_k3_trunc.bin	13	ok 5	1 2:07f8bc07b4ba5002
+c006_text_1x1_k3_corrupt.bin	14	ok 1	1 2:07f8bc07b4ba5002
+c007_noise_1x1_k-1.bin	15	ok 4	1 2:07f8bc07b4ba5002
+c008_noise_1x1_k-1.bin	16	ok 1	1 2:07f8bc07b4ba5002
+c008_noise_1x1_k-1.bin	17	E invalid CCITT code sequence	1 2:07f8bc07b4ba5002
+c009_noise_1x1_k-1.bin	18	ok 0	0 0:cbf29ce484222325
+c010_noise_1x1_k0.bin	19	ok 12	1 2:07f8bc07b4ba5002
+c011_noise_1x1_k0.bin	20	ok 1	1 2:07f8bc07b4ba5002
+c011_noise_1x1_k0.bin	21	ok 1	1 2:07f8bc07b4ba5002
+c012_noise_1x1_k2.bin	22	E invalid CCITT code sequence	4 8:1427b6828121e5fd
+c013_noise_1x1_k4.bin	23	E unexpected end of input	1 2:07f8bc07b4ba5002
+c013_noise_1x1_k4.bin	24	E unexpected end of input	1 2:07f8bc07b4ba5002
+c014_noise_1x1_k3.bin	25	ok 5	1 2:07f8bc07b4ba5002
+c015_stripes_1x1_k0.bin	26	ok 1	1 2:07f8bc07b4ba5002
+c015_stripes_1x1_k0.bin	27	E unexpected end of input	1 2:07f8bc07b4ba5002
+c015_stripes_1x1_k0.bin	28	E unexpected end of input	0 1:af63ac4c86019afc
+c016_stripes_1x1_k0.bin	29	ok 12	1 2:07f8bc07b4ba5002
+c016_stripes_1x1_k0_trunc.bin	30	ok 7	1 2:07f8bc07b4ba5002
+c016_stripes_1x1_k0_corrupt.bin	31	ok 1	1 2:07f8bc07b4ba5002
+c017_stripes_1x1_k0.bin	32	ok 12	1 2:07f8bc07b4ba5002
+c018_stripes_1x1_k0.bin	33	ok 1	1 2:07f8bc07b4ba5002
+c018_stripes_1x1_k0.bin	34	ok 1	1 2:07f8bc07b4ba5002
+c019_white_1x1_k-1.bin	35	ok 4	1 2:07f8bc07b4ba5002
+c020_white_1x1_k0.bin	36	ok 12	1 2:07f8bc07b4ba5002
+c020_white_1x1_k0_trunc.bin	37	ok 8	1 2:07f8bc07b4ba5002
+c021_white_1x1_k2.bin	38	ok 4	1 2:07f8bc07b4ba5002
+c022_white_1x1_k4.bin	39	ok 3	1 2:07fc1e07b4bd2c5f
+c023_white_1x1_k2.bin	40	ok 1	1 2:07f8bc07b4ba5002
+c024_white_1x1_k3.bin	41	ok 5	1 2:07f8bc07b4ba5002
+c024_white_1x1_k3_trunc.bin	42	ok 5	1 2:07f8bc07b4ba5002
+c025_black_1x1_k0.bin	43	ok 12	1 2:07fc1e07b4bd2c5f
+c025_black_1x1_k0_trunc.bin	44	ok 8	1 2:07fc1e07b4bd2c5f
+c025_black_1x1_k0_corrupt.bin	45	ok 1	1 2:07f8bc07b4ba5002
+c026_black_1x1_k0.bin	46	ok 12	1 2:07fc1e07b4bd2c5f
+c026_black_1x1_k0.bin	47	ok 12	1 2:07fc1e07b4bd2c5f
+c027_black_1x1_k0.bin	48	ok 2	1 2:07fc1e07b4bd2c5f
+c028_black_1x1_k2.bin	49	ok 5	1 2:07f8bc07b4ba5002
+c028_black_1x1_k2_corrupt.bin	50	ok 3	1 2:07fc1e07b4bd2c5f
+c029_black_1x1_k4.bin	51	ok 3	1 2:07fc1e07b4bd2c5f
+c030_black_1x1_k2.bin	52	ok 2	1 2:07fc1e07b4bd2c5f
+c030_black_1x1_k2.bin	53	E unexpected end of input	1 2:07fc1e07b4bd2c5f
+c031_text_7x3_k-1.bin	54	ok 9	3 24:052eb98167225dc3
+c031_text_7x3_k-1_corrupt.bin	55	ok 2	3 24:4d7d3a3e0e6bbb61
+c032_text_7x3_k0.bin	56	ok 6	3 24:052eb98167225dc3
+c032_text_7x3_k0_trunc.bin	57	E unexpected end of input	2 17:3569ebded04d9d58
+c033_text_7x3_k0.bin	58	ok 20	3 24:052eb98167225dc3
+c034_text_7x3_k4.bin	59	ok 11	3 24:9dfa4692cc4f4af4
+c035_noise_7x3_k-1.bin	60	ok 7	3 24:36703c8eef5c1cd5
+c035_noise_7x3_k-1.bin	61	E invalid CCITT code sequence	3 24:36703c8eef5c1cd5
+c036_noise_7x3_k-1.bin	62	ok 6	3 24:36703c8eef5c1cd5
+c036_noise_7x3_k-1.bin	63	ok 6	3 24:36703c8eef5c1cd5
+c036_noise_7x3_k-1_corrupt.bin	64	E invalid CCITT code sequence	2 19:94687239b830625f
+c037_noise_7x3_k0.bin	65	ok 4	3 24:36703c8eef5c1cd5
+c038_noise_7x3_k0.bin	66	ok 18	3 24:36703c8eef5c1cd5
+c038_noise_7x3_k0.bin	67	ok 18	3 24:36703c8eef5c1cd5
+c038_noise_7x3_k0_corrupt.bin	68	E invalid CCITT code sequence	2 19:a4206839c8f23896
+c039_noise_7x3_k2.bin	69	ok 10	3 24:36703c8eef5c1cd5
+c040_noise_7x3_k4.bin	70	ok 9	3 24:36703c8eef5c1cd5
+c040_noise_7x3_k4.bin	71	E unexpected end of input	3 24:36703c8eef5c1cd5
+c040_noise_7x3_k4_corrupt.bin	72	ok 6	3 24:4d79c03e0e68b63c
+c041_noise_7x3_k2.bin	73	E unexpected end of input	3 24:36703c8eef5c1cd5
+c042_noise_7x3_k3.bin	74	ok 12	3 24:00b326966fd064a6
+c042_noise_7x3_k3_trunc.bin	75	ok 12	3 24:00b326966fd064a6
+c043_stripes_7x3_k-1.bin	76	ok 5	3 24:a034f027aa1df5a2
+c043_stripes_7x3_k-1_trunc.bin	77	ok 2	3 24:a034f027aa1df5a2
+c043_stripes_7x3_k-1.bin	78	ok 5	3 27:9210befff4241387
+c044_stripes_7x3_k-1.bin	79	ok 0	0 0:cbf29ce484222325
+c045_stripes_7x3_k-1.bin	80	ok 3	3 24:a034f027aa1df5a2
+c046_stripes_7x3_k0.bin	81	E unexpected end of input	3 24:e324e7481bfe8419
+c046_stripes_7x3_k0.bin	82	E unexpected end of input	3 24:e324e7481bfe8419
+c046_stripes_7x3_k0.bin	83	E unexpected end of input	2 18:7558c274bf5682b6
+c047_stripes_7x3_k0.bin	84	ok 18	3 24:a034f027aa1df5a2
+c047_stripes_7x3_k0_corrupt.bin	85	ok 12	3 24:a034f027aa1df5a2
+c048_stripes_7x3_k2.bin	86	E invalid CCITT code sequence	3 24:a034f027aa1df5a2
+c049_stripes_7x3_k3.bin	87	ok 9	3 24:e324e7481bfe8419
+c050_white_7x3_k0.bin	88	ok 2	3 24:c0fb76494f58b2c7
+c051_white_7x3_k0.bin	89	ok 15	3 24:4d79c03e0e68b63c
+c052_white_7x3_k2.bin	90	ok 8	3 24:c0fb76494f58b2c7
+c052_white_7x3_k2.bin	91	ok 16	6 48:6d4c4b54c4ed3aa5
+c053_black_7x3_k-1.bin	92	ok 0	0 0:cbf29ce484222325
+c054_black_7x3_k0.bin	93	ok 6	3 24:4d79c03e0e68b63c
+c054_black_7x3_k0_corrupt.bin	94	ok 6	3 24:3838349c95608787
+c055_black_7x3_k4.bin	95	ok 7	3 24:c0fb76494f58b2c7
+c055_black_7x3_k4.bin	96	ok 7	3 24:c0fb76494f58b2c7
+c055_black_7x3_k4_corrupt.bin	97	E invalid CCITT code sequence	2 16:85df55b9d040fb95
+c056_black_7x3_k2.bin	98	ok 4	3 24:c0fb76494f58b2c7
+c057_text_8x4_k-1.bin	99	ok 12	4 36:8a6085222e1d0863
+c058_text_8x4_k-1.bin	100	ok 9	4 36:8a6085222e1d0863
+c058_text_8x4_k-1.bin	101	E unexpected end of input	4 36:8a6085222e1d0863
+c058_text_8x4_k-1_corrupt.bin	102	ok 4	4 36:192d582f63551756
+c059_text_8x4_k-1.bin	103	ok 11	4 36:8a6085222e1d0863
+c059_text_8x4_k-1.bin	104	ok 11	4 36:8a6085222e1d0863
+c059_text_8x4_k-1_corrupt.bin	105	ok 11	4 36:e137774e7eeb8fcc
+c060_text_8x4_k0.bin	106	E unexpected end of input	4 36:8a6085222e1d0863
+c060_text_8x4_k0_corrupt.bin	107	ok 6	4 36:f3ff9ab6cf882e55
+c061_text_8x4_k0.bin	108	ok 24	4 36:ce257f313c049083
+c062_text_8x4_k0.bin	109	ok 25	4 36:8a6085222e1d0863
+c062_text_8x4_k0_trunc.bin	110	ok 16	4 36:8a6085222e1d0863
+c063_text_8x4_k2.bin	111	ok 16	4 36:ce257f313c049083
+c063_text_8x4_k2_corrupt.bin	112	E invalid CCITT code sequence	0 0:cbf29ce484222325
+c064_text_8x4_k4.bin	113	ok 16	4 36:8a6085222e1d0863
+c064_text_8x4_k4_trunc.bin	114	E unexpected end of input	2 23:bc62438283eb3168
+c065_text_8x4_k3.bin	115	ok 19	4 36:8a6085222e1d0863
+c066_noise_8x4_k-1.bin	116	ok 8	4 36:18d2e468dc20653d
+c066_noise_8x4_k-1.bin	117	E invalid CCITT code sequence	4 36:18d2e468dc20653d
+c066_noise_8x4_k-1.bin	118	E invalid CCITT code sequence	3 30:352cf5e55a0045d1
+c067_noise_8x4_k-1.bin	119	ok 5	4 36:18d2e468dc20653d
+c067_noise_8x4_k-1_corrupt.bin	120	E unexpected end of input	3 28:a46d8ff038d820b1
+c068_noise_8x4_k0.bin	121	ok 22	4 36:18d2e468dc20653d
+c068_noise_8x4_k0_trunc.bin	122	ok 13	4 36:18d2e468dc20653d
+c069_noise_8x4_k0.bin	123	ok 9	4 36:18d2e468dc20653d
+c069_noise_8x4_k0_corrupt.bin	124	ok 7	4 36:95ee7add066ff82e
+c070_noise_8x4_k2.bin	125	ok 13	4 36:18d2e468dc20653d
+c070_noise_8x4_k2_trunc.bin	126	ok 13	4 36:18d2e468dc20653d
+c071_stripes_8x4_k-1.bin	127	ok 0	0 0:cbf29ce484222325
+c072_stripes_8x4_k0.bin	128	ok 19	4 36:ff775aad97b6434e
+c072_stripes_8x4_k0_trunc.bin	129	ok 11	4 36:ff775aad97b6434e
+c073_stripes_8x4_k0.bin	130	ok 21	4 36:e079d171e86952d6
+c073_stripes_8x4_k0.bin	131	ok 21	4 36:e079d171e86952d6
+c074_stripes_8x4_k0.bin	132	ok 4	4 36:ff775aad97b6434e
+c074_stripes_8x4_k0.bin	133	ok 4	4 36:ff775aad97b6434e
+c074_stripes_8x4_k0.bin	134	ok 4	2 20:73c26f4cd59f8329
+c075_stripes_8x4_k2.bin	135	E unexpected end of input	4 36:ff775aad97b6434e
+c075_stripes_8x4_k2.bin	136	E unexpected end of input	4 36:ff775aad97b6434e
+c076_stripes_8x4_k3.bin	137	ok 12	4 36:e079d171e86952d6
+c076_stripes_8x4_k3_trunc.bin	138	ok 12	4 36:e079d171e86952d6
+c076_stripes_8x4_k3_corrupt.bin	139	ok 12	4 36:e98ca271edaaccac
+c077_white_8x4_k-1.bin	140	ok 1	4 36:95dc087285b57725
+c078_white_8x4_k-1.bin	141	ok 4	4 36:95dc087285b57725
+c078_white_8x4_k-1.bin	142	ok 4	4 36:95dc087285b57725
+c079_white_8x4_k0.bin	143	ok 21	4 36:95dc087285b57725
+c079_white_8x4_k0_corrupt.bin	144	E invalid CCITT code sequence	2 25:5e2f6412dd4c6643
+c080_white_8x4_k0.bin	145	ok 4	4 36:06e0b1e160f07105
+c081_white_8x4_k2.bin	146	ok 10	4 36:95dc087285b57725
+c081_white_8x4_k2_corrupt.bin	147	E invalid CCITT code sequence	2 18:716bcb9b8cbd6525
+c082_white_8x4_k4.bin	148	ok 8	4 36:95dc087285b57725
+c083_black_8x4_k-1.bin	149	ok 0	0 0:cbf29ce484222325
+c083_black_8x4_k-1.bin	150	E invalid CCITT code sequence	4 36:06e0b1e160f07105
+c083_black_8x4_k-1_trunc.bin	151	ok 3	4 36:06e0b1e160f07105
+c083_black_8x4_k-1.bin	152	E invalid CCITT code sequence	2 28:471f4546ba7c98b9
+c084_black_8x4_k-1.bin	153	ok 3	4 36:06e0b1e160f07105
+c085_black_8x4_k0.bin	154	ok 7	4 36:06e0b1e160f07105
+c085_black_8x4_k0.bin	155	ok 7	4 36:06e0b1e160f07105
+c086_black_8x4_k0.bin	156	ok 22	4 36:95dc087285b57725
+c086_black_8x4_k0.bin	157	ok 22	4 36:95dc087285b57725
+c086_black_8x4_k0_trunc.bin	158	ok 13	4 36:95dc087285b57725
+c087_black_8x4_k0.bin	159	ok 8	4 36:06e0b1e160f07105
+c088_black_8x4_k4.bin	160	ok 9	4 36:06e0b1e160f07105
+c089_black_8x4_k2.bin	161	ok 5	4 36:06e0b1e160f07105
+c090_black_8x4_k3.bin	162	E invalid CCITT code sequence	6 54:285b2f26b1d1d526
+c090_black_8x4_k3.bin	163	E invalid CCITT code sequence	6 54:285b2f26b1d1d526
+c090_black_8x4_k3_trunc.bin	164	ok 14	4 36:06e0b1e160f07105
+c091_text_9x5_k0.bin	165	ok 13	5 50:fdc8a8d28831b570
+c091_text_9x5_k0_trunc.bin	166	E unexpected end of input	3 33:7e06034dd4793986
+c092_text_9x5_k4.bin	167	ok 19	5 50:fdc8a8d28831b570
+c093_text_9x5_k2.bin	168	ok 12	5 50:fdc8a8d28831b570
+c094_noise_9x5_k-1.bin	169	ok 13	5 50:9a2c595164bec8b2
+c094_noise_9x5_k-1_trunc.bin	170	ok 8	3 30:1b3079d393fefb0f
+c094_noise_9x5_k-1_corrupt.bin	171	E invalid CCITT code sequence	1 16:ac6c7c717d0d750a
+c095_noise_9x5_k0.bin	172	ok 12	5 50:9a2c595164bec8b2
+c095_noise_9x5_k0.bin	173	E unexpected end of input	5 50:9a2c595164bec8b2
+c096_noise_9x5_k0.bin	174	ok 28	5 50:9a2c595164bec8b2
+c097_noise_9x5_k0.bin	175	ok 13	5 50:9a2c595164bec8b2
+c097_noise_9x5_k0_corrupt.bin	176	ok 10	5 50:0ba6ee38bd73c142
+c098_noise_9x5_k2.bin	177	ok 12	5 50:9a2c595164bec8b2
+c098_noise_9x5_k2.bin	178	ok 12	5 50:9a2c595164bec8b2
+c098_noise_9x5_k2_trunc.bin	179	E unexpected end of input	3 32:d4460b1bc31a521e
+c099_stripes_9x5_k-1.bin	180	ok 3	5 50:b549fdd9979a1c3f
+c100_stripes_9x5_k-1.bin	181	ok 6	5 50:ecb3ec8693164bc2
+c100_stripes_9x5_k-1.bin	182	ok 6	5 50:ecb3ec8693164bc2
+c100_stripes_9x5_k-1_trunc.bin	183	ok 4	3 30:0264d9c587be221a
+c101_stripes_9x5_k0.bin	184	ok 22	5 50:b549fdd9979a1c3f
+c102_stripes_9x5_k4.bin	185	ok 11	5 50:ecb3ec8693164bc2
+c103_stripes_9x5_k2.bin	186	E invalid CCITT code sequence	5 50:b549fdd9979a1c3f
+c104_stripes_9x5_k3.bin	187	ok 14	5 50:ecb3ec8693164bc2
+c104_stripes_9x5_k3_trunc.bin	188	ok 14	5 50:ecb3ec8693164bc2
+c104_stripes_9x5_k3_corrupt.bin	189	E invalid CCITT code sequence	1 15:841381848e7ac5d9
+c105_white_9x5_k-1.bin	190	ok 4	5 50:2d4cf8d908f56082
+c105_white_9x5_k-1.bin	191	ok 4	5 55:597c525b04ce4597
+c106_white_9x5_k-1.bin	192	ok 1	5 50:2d4cf8d908f56082
+c106_white_9x5_k-1.bin	193	ok 1	5 55:597c525b04ce4597
+c107_white_9x5_k-1.bin	194	ok 5	5 50:2d4cf8d908f56082
+c107_white_9x5_k-1_trunc.bin	195	ok 3	3 30:d5043dc168c7cc1e
+c108_white_9x5_k0.bin	196	ok 4	5 50:2d4cf8d908f56082
+c109_white_9x5_k0.bin	197	ok 20	5 50:2d4cf8d908f56082
+c110_white_9x5_k0.bin	198	ok 24	5 50:2d4cf8d908f56082
+c110_white_9x5_k0_corrupt.bin	199	ok 18	5 50:2d4cf8d908f56082
+c111_white_9x5_k0.bin	200	ok 5	5 50:2d4cf8d908f56082
+c111_white_9x5_k0_trunc.bin	201	ok 3	3 30:d5043dc168c7cc1e
+c112_white_9x5_k2.bin	202	E invalid CCITT code sequence	6 60:24a71aa621adb8b7
+c113_white_9x5_k4.bin	203	ok 10	5 50:2d4cf8d908f56082
+c113_white_9x5_k4.bin	204	E invalid CCITT code sequence	1 11:cea27a6a93e9a592
+c114_black_9x5_k-1.bin	205	ok 7	5 50:0a38e4960430c65f
+c115_black_9x5_k0.bin	206	ok 10	5 50:0a38e4960430c65f
+c116_black_9x5_k4.bin	207	ok 13	5 50:2d4cf8d908f56082
+c116_black_9x5_k4_corrupt.bin	208	E invalid CCITT code sequence	1 10:be9b5571a0d97696
+c117_black_9x5_k2.bin	209	ok 7	5 50:0a38e4960430c65f
+c118_text_31x17_k-1.bin	210	ok 101	17 544:16f31591ea9a2ffb
+c119_text_31x17_k-1.bin	211	ok 0	0 0:cbf29ce484222325
+c120_text_31x17_k0.bin	212	ok 135	17 544:2814fd0b7dcbf404
+c120_text_31x17_k0.bin	213	E invalid CCITT code sequence	8 291:115ccb60c9b19f30
+c121_text_31x17_k0.bin	214	ok 99	17 544:2814fd0b7dcbf404
+c122_text_31x17_k4.bin	215	E unexpected end of input	17 544:16f31591ea9a2ffb
+c122_text_31x17_k4_trunc.bin	216	E invalid CCITT code sequence	10 320:15a68d17887fb8bb
+c122_text_31x17_k4_corrupt.bin	217	E invalid CCITT code sequence	12 384:e1c0d13eaa2c6d51
+c123_text_31x17_k2.bin	218	ok 94	17 544:2814fd0b7dcbf404
+c123_text_31x17_k2.bin	219	E unexpected end of input	17 544:2814fd0b7dcbf404
+c123_text_31x17_k2_trunc.bin	220	E unexpected end of input	9 311:55761f0241d08f63
+c124_text_31x17_k3.bin	221	ok 128	17 544:16f31591ea9a2ffb
+c124_text_31x17_k3_trunc.bin	222	E unexpected end of input	13 422:a121d280f49722a8
+c125_noise_31x17_k-1.bin	223	ok 140	17 544:57a3b9bc9473540e
+c125_noise_31x17_k-1.bin	224	E unexpected end of input	17 544:57a3b9bc9473540e
+c125_noise_31x17_k-1_corrupt.bin	225	E arithmetic overflow in position calculation	6 217:fbab097b6181ce60
+c126_noise_31x17_k-1.bin	226	ok 0	0 0:cbf29ce484222325
+c126_noise_31x17_k-1_trunc.bin	227	E unexpected end of input	10 337:30df922e16dc8aab
+c126_noise_31x17_k-1_corrupt.bin	228	E invalid CCITT code sequence	1 49:77301e1e0e11d85a
+c127_noise_31x17_k0.bin	229	ok 163	17 544:57a3b9bc9473540e
+c127_noise_31x17_k0.bin	230	E unexpected end of input	17 544:57a3b9bc9473540e
+c127_noise_31x17_k0_trunc.bin	231	E unexpected end of input	12 384:7c44249bc4c5f075
+c128_noise_31x17_k4.bin	232	ok 163	17 544:57a3b9bc9473540e
+c128_noise_31x17_k4.bin	233	E invalid CCITT code sequence	1 64:bd6e1bf347a5b95a
+c129_noise_31x17_k3.bin	234	ok 169	17 544:d1d338490f824311
+c130_stripes_31x17_k-1.bin	235	ok 0	0 0:cbf29ce484222325
+c130_stripes_31x17_k-1_trunc.bin	236	E unexpected end of input	12 400:cdb7bc974a354e15
+c131_stripes_31x17_k-1.bin	237	ok 27	17 544:24a08721613fcea7
+c131_stripes_31x17_k-1_trunc.bin	238	E unexpected end of input	11 369:56d917e2f6d4ccc8
+c132_stripes_31x17_k-1.bin	239	ok 31	17 544:24a08721613fcea7
+c132_stripes_31x17_k-1_trunc.bin	240	ok 20	10 320:a2d5b1390a214d39
+c133_stripes_31x17_k0.bin	241	ok 63	17 544:c3a81cb362475464
+c134_stripes_31x17_k0.bin	242	ok 70	17 544:24a08721613fcea7
+c135_stripes_31x17_k2.bin	243	ok 75	17 544:24a08721613fcea7
+c136_stripes_31x17_k4.bin	244	ok 64	17 544:24a08721613fcea7
+c136_stripes_31x17_k4.bin	245	E unexpected end of input	17 544:24a08721613fcea7
+c137_stripes_31x17_k2.bin	246	E unexpected end of input	17 544:24a08721613fcea7
+c137_stripes_31x17_k2_trunc.bin	247	E unexpected end of input	12 384:9d53d44d5efa9b21
+c137_stripes_31x17_k2.bin	248	ok 45	17 561:7e2b0e004ec7af45
+c138_stripes_31x17_k3.bin	249	E unexpected end of input	18 606:202e0c1cba950c60
+c138_stripes_31x17_k3.bin	250	E unexpected end of input	18 606:202e0c1cba950c60
+c139_white_31x17_k-1.bin	251	ok 0	0 0:cbf29ce484222325
+c140_white_31x17_k-1.bin	252	ok 3	17 544:24a1271657b8fdd4
+c140_white_31x17_k-1.bin	253	ok 3	17 561:10223017b004c17d
+c141_white_31x17_k-1.bin	254	ok 17	17 544:24a1271657b8fdd4
+c141_white_31x17_k-1_trunc.bin	255	ok 11	11 352:436e85e16822c6d4
+c141_white_31x17_k-1_corrupt.bin	256	ok 17	17 544:24a1271657b8fdd4
+c142_white_31x17_k0.bin	257	ok 17	17 544:24a1271657b8fdd4
+c142_white_31x17_k0_corrupt.bin	258	ok 17	17 544:24a1271657b8fdd4
+c143_white_31x17_k0.bin	259	ok 52	17 544:24a1271657b8fdd4
+c144_white_31x17_k0.bin	260	ok 60	17 544:24a1271657b8fdd4
+c145_white_31x17_k0.bin	261	ok 17	17 544:5728629537118167
+c146_white_31x17_k4.bin	262	ok 35	17 544:24a1271657b8fdd4
+c146_white_31x17_k4_trunc.bin	263	E invalid CCITT code sequence	11 352:436e85e16822c6d4
+c147_white_31x17_k3.bin	264	ok 42	17 544:24a1271657b8fdd4
+c147_white_31x17_k3.bin	265	E invalid CCITT code sequence	1 64:9fb40c4ac984fc49
+c148_black_31x17_k0.bin	266	ok 77	17 544:5728629537118167
+c148_black_31x17_k0_corrupt.bin	267	ok 65	17 544:479767df36a7af27
+c149_black_31x17_k0.bin	268	ok 51	17 544:5728629537118167
+c150_black_31x17_k2.bin	269	ok 54	17 544:5728629537118167
+c150_black_31x17_k2.bin	270	E invalid CCITT code sequence	18 576:a77fde73a5c62cf6
+c150_black_31x17_k2_trunc.bin	271	E invalid CCITT code sequence	13 416:3570c30c9d48c567
+c151_black_31x17_k2.bin	272	ok 27	17 544:24a1271657b8fdd4
+c152_black_31x17_k3.bin	273	E unexpected end of input	18 606:8cf748c7bb250120
+c152_black_31x17_k3.bin	274	E invalid CCITT code sequence	0 31:e80ed4bb5c2acf77
+c153_text_64x8_k-1.bin	275	ok 0	0 0:cbf29ce484222325
+c153_text_64x8_k-1.bin	276	E invalid CCITT code sequence	8 520:f96b7f88a9338b25
+c154_text_64x8_k-1.bin	277	ok 144	8 520:2f41a1c0ab7d6c8d
+c155_text_64x8_k-1.bin	278	ok 147	8 520:f96b7f88a9338b25
+c156_text_64x8_k0.bin	279	ok 119	8 520:f96b7f88a9338b25
+c156_text_64x8_k0.bin	280	E unexpected end of input	8 520:f96b7f88a9338b25
+c156_text_64x8_k0_corrupt.bin	281	ok 76	8 520:cc75acb3bd8b632f
+c157_text_64x8_k0.bin	282	ok 140	8 520:2f41a1c0ab7d6c8d
+c157_text_64x8_k0_trunc.bin	283	E unexpected end of input	5 379:9fdfa22297863c0b
+c157_text_64x8_k0_corrupt.bin	284	ok 99	8 520:fb444830c8bdb22a
+c158_text_64x8_k2.bin	285	ok 144	8 520:f96b7f88a9338b25
+c159_text_64x8_k4.bin	286	ok 149	8 520:f96b7f88a9338b25
+c159_text_64x8_k4_trunc.bin	287	E unexpected end of input	5 355:7799e725c5da8328
+c159_text_64x8_k4_corrupt.bin	288	E arithmetic overflow in position calculation	3 249:2d0eca5d36fe43bb
+c160_text_64x8_k2.bin	289	ok 131	8 520:2f41a1c0ab7d6c8d
+c160_text_64x8_k2_trunc.bin	290	E unexpected end of input	5 360:a9b3536da18f6c8a
+c160_text_64x8_k2_corrupt.bin	291	E arithmetic overflow in position calculation	5 360:fb6e3a69f79a49e2
+c161_noise_64x8_k-1.bin	292	ok 132	8 520:be7811c7cb558240
+c161_noise_64x8_k-1.bin	293	E invalid CCITT code sequence	8 520:be7811c7cb558240
+c162_noise_64x8_k0.bin	294	ok 138	8 520:c3db1630e940b208
+c162_noise_64x8_k0.bin	295	E invalid CCITT code sequence	6 418:792bfcb465614354
+c163_noise_64x8_k2.bin	296	ok 119	8 520:be7811c7cb558240
+c163_noise_64x8_k2.bin	297	E arithmetic overflow in position calculation	1 75:dd5175a173c14235
+c164_stripes_64x8_k-1.bin	298	ok 30	8 520:d9a7964e29339a13
+c164_stripes_64x8_k-1.bin	299	ok 30	8 528:06ee6b8fb35100c9
+c165_stripes_64x8_k-1.bin	300	ok 27	8 520:e13fc8d0715913fb
+c165_stripes_64x8_k-1.bin	301	E invalid CCITT code sequence	8 520:e13fc8d0715913fb
+c165_stripes_64x8_k-1_corrupt.bin	302	E invalid CCITT code sequence	7 494:e7d4c8151a5fc44a
+c166_stripes_64x8_k-1.bin	303	ok 29	8 520:e13fc8d0715913fb
+c166_stripes_64x8_k-1_trunc.bin	304	E unexpected end of input	4 299:ae01bfb49a69c076
+c166_stripes_64x8_k-1_corrupt.bin	305	ok 29	6 390:5210ed27fa946572
+c167_stripes_64x8_k0.bin	306	E unexpected end of input	8 520:e13fc8d0715913fb
+c167_stripes_64x8_k0.bin	307	E unexpected end of input	8 520:e13fc8d0715913fb
+c167_stripes_64x8_k0_trunc.bin	308	E unexpected end of input	5 349:3755cc9ff508c3ed
+c168_stripes_64x8_k0.bin	309	ok 74	8 520:e13fc8d0715913fb
+c169_stripes_64x8_k0.bin	310	ok 56	8 520:d9a7964e29339a13
+c169_stripes_64x8_k0.bin	311	ok 56	8 520:d9a7964e29339a13
+c170_stripes_64x8_k4.bin	312	ok 43	8 520:e13fc8d0715913fb
+c170_stripes_64x8_k4.bin	313	E unexpected end of input	8 520:e13fc8d0715913fb
+c170_stripes_64x8_k4_trunc.bin	314	E unexpected end of input	4 314:51042daaa8a7f7ba
+c170_stripes_64x8_k4.bin	315	E invalid CCITT code sequence	3 210:3e8783096fbc2d41
+c171_stripes_64x8_k2.bin	316	ok 37	8 520:e13fc8d0715913fb
+c171_stripes_64x8_k2.bin	317	ok 37	8 520:e13fc8d0715913fb
+c171_stripes_64x8_k2_corrupt.bin	318	ok 28	8 520:164b6c625171554c
+c172_stripes_64x8_k3.bin	319	ok 49	8 520:e13fc8d0715913fb
+c173_white_64x8_k-1.bin	320	ok 4	8 520:4fbc298d2ddc64e5
+c173_white_64x8_k-1.bin	321	ok 4	8 528:742d1531e90c7d15
+c174_white_64x8_k0.bin	322	ok 13	8 520:4fbc298d2ddc64e5
+c174_white_64x8_k0.bin	323	ok 13	8 520:4fbc298d2ddc64e5
+c175_white_64x8_k0.bin	324	ok 41	8 520:4fbc298d2ddc64e5
+c175_white_64x8_k0_corrupt.bin	325	E invalid CCITT code sequence	5 353:cf7181b149181e02
+c176_white_64x8_k2.bin	326	E unexpected end of input	8 573:5f1a42e6b7a9698e
+c176_white_64x8_k2_trunc.bin	327	ok 20	8 520:4fbc298d2ddc64e5
+c176_white_64x8_k2_corrupt.bin	328	E invalid CCITT code sequence	1 65:0f5187e6e0c07261
+c177_white_64x8_k4.bin	329	ok 17	8 520:4fbc298d2ddc64e5
+c178_white_64x8_k3.bin	330	ok 24	8 520:4fbc298d2ddc64e5
+c178_white_64x8_k3.bin	331	E unexpected end of input	8 573:5f1a42e6b7a9698e
+c179_black_64x8_k-1.bin	332	ok 9	8 520:9b2e58eb7af678e5
+c179_black_64x8_k-1.bin	333	E invalid CCITT code sequence	8 520:9b2e58eb7af678e5
+c179_black_64x8_k-1_corrupt.bin	334	ok 6	8 520:9b2e58eb7af678e5
+c180_black_64x8_k-1.bin	335	ok 6	8 520:9b2e58eb7af678e5
+c180_black_64x8_k-1.bin	336	E unexpected end of input	8 520:9b2e58eb7af678e5
+c181_black_64x8_k0.bin	337	ok 28	8 520:4fbc298d2ddc64e5
+c181_black_64x8_k0_corrupt.bin	338	E unexpected end of input	6 402:7081bbc563b103fd
+c182_black_64x8_k0.bin	339	ok 49	8 520:9b2e58eb7af678e5
+c182_black_64x8_k0_trunc.bin	340	E unexpected end of input	6 390:55ed7283a3d04835
+c183_black_64x8_k0.bin	341	ok 49	8 520:9b2e58eb7af678e5
+c183_black_64x8_k0.bin	342	ok 49	8 520:9b2e58eb7af678e5
+c183_black_64x8_k0_trunc.bin	343	E unexpected end of input	6 390:55ed7283a3d04835
+c183_black_64x8_k0_corrupt.bin	344	ok 42	8 520:d0dce7a90e28b2b1
+c183_black_64x8_k0.bin	345	ok 44	8 528:2410d10c7d588b93
+c184_black_64x8_k0.bin	346	ok 32	8 520:9b2e58eb7af678e5
+c184_black_64x8_k0.bin	347	ok 32	6 396:dc21dcd31e0a403d
+c185_black_64x8_k2.bin	348	ok 30	8 520:9b2e58eb7af678e5
+c185_black_64x8_k2_trunc.bin	349	E unexpected end of input	6 390:55ed7283a3d04835
+c186_black_64x8_k4.bin	350	ok 22	8 520:9b2e58eb7af678e5
+c186_black_64x8_k4.bin	351	E unexpected end of input	8 520:9b2e58eb7af678e5
+c186_black_64x8_k4_corrupt.bin	352	E arithmetic overflow in position calculation	2 130:f70f6183bec0b955
+c186_black_64x8_k4.bin	353	E invalid CCITT code sequence	2 149:56c143f9c5ef6df0
+c187_text_100x30_k-1.bin	354	ok 577	30 3030:15b18f42b8c4aa7a
+c187_text_100x30_k-1.bin	355	E invalid CCITT code sequence	30 3030:15b18f42b8c4aa7a
+c188_text_100x30_k-1.bin	356	ok 0	0 0:cbf29ce484222325
+c188_text_100x30_k-1.bin	357	E unexpected end of input	30 3030:15b18f42b8c4aa7a
+c188_text_100x30_k-1_trunc.bin	358	E unexpected end of input	17 1748:5e3fb59a30f085a8
+c189_text_100x30_k-1.bin	359	ok 0	0 0:cbf29ce484222325
+c189_text_100x30_k-1.bin	360	ok 592	30 3030:15b18f42b8c4aa7a
+c189_text_100x30_k-1_trunc.bin	361	E unexpected end of input	17 1744:8af2d3249f26eaf3
+c189_text_100x30_k-1_corrupt.bin	362	E arithmetic overflow in position calculation	4 499:1e31a4e54a0e1a3e
+c190_text_100x30_k0.bin	363	E unexpected end of input	30 3030:15b18f42b8c4aa7a
+c191_text_100x30_k0.bin	364	ok 582	30 3030:15b18f42b8c4aa7a
+c192_text_100x30_k0.bin	365	ok 598	30 3030:15b18f42b8c4aa7a
+c192_text_100x30_k0_corrupt.bin	366	E invalid CCITT code sequence	4 436:e7a03acd753c852f
+c193_text_100x30_k0.bin	367	ok 543	30 3030:15b18f42b8c4aa7a
+c194_text_100x30_k2.bin	368	ok 568	30 3030:15b18f42b8c4aa7a
+c194_text_100x30_k2.bin	369	E unexpected end of input	30 3083:803a13e840905fef
+c195_text_100x30_k4.bin	370	ok 591	30 3030:15b18f42b8c4aa7a
+c196_text_100x30_k2.bin	371	ok 521	30 3030:15b18f42b8c4aa7a
+c196_text_100x30_k2.bin	372	E invalid CCITT code sequence	20 2140:e88776c93ea159c7
+c197_text_100x30_k3.bin	373	E unexpected end of input	30 3083:2a5153d3591f20e4
+c198_noise_100x30_k-1.bin	374	ok 743	30 3030:ad391ad5ada72f11
+c198_noise_100x30_k-1_corrupt.bin	375	E arithmetic overflow in position calculation	12 1311:3f931c1ab3d4e7f7
+c199_noise_100x30_k-1.bin	376	ok 753	30 3030:ad391ad5ada72f11
+c199_noise_100x30_k-1_trunc.bin	377	E unexpected end of input	20 2020:3d6bde226bf46cc6
+c200_noise_100x30_k0.bin	378	E unexpected end of input	30 3030:870ff881c9d3e9dd
+c200_noise_100x30_k0_corrupt.bin	379	ok 483	30 3030:09e4dd06e1d220bf
+c201_noise_100x30_k2.bin	380	ok 681	30 3030:870ff881c9d3e9dd
+c201_noise_100x30_k2.bin	381	E unexpected end of input	30 3030:870ff881c9d3e9dd
+c201_noise_100x30_k2_trunc.bin	382	E unexpected end of input	20 2020:1d06566163ef3d72
+c202_stripes_100x30_k-1.bin	383	ok 0	0 0:cbf29ce484222325
+c202_stripes_100x30_k-1_trunc.bin	384	E unexpected end of input	19 1919:0671de318c59dd55
+c203_stripes_100x30_k-1.bin	385	ok 0	0 0:cbf29ce484222325
+c203_stripes_100x30_k-1_corrupt.bin	386	E arithmetic overflow in position calculation	28 2828:c8f27bdc74737f75
+c204_stripes_100x30_k0.bin	387	ok 324	30 3030:f6c659604fbd2bb5
+c204_stripes_100x30_k0.bin	388	ok 324	30 3030:f6c659604fbd2bb5
+c204_stripes_100x30_k0_corrupt.bin	389	ok 293	30 3030:d78d0c2474ab612c
+c205_stripes_100x30_k0.bin	390	ok 378	30 3030:f6c659604fbd2bb5
+c206_stripes_100x30_k0.bin	391	ok 390	30 3030:e845cdc8b49a1a55
+c206_stripes_100x30_k0_trunc.bin	392	E unexpected end of input	20 2084:57bf9994be3fde51
+c207_stripes_100x30_k2.bin	393	ok 277	30 3030:f6c659604fbd2bb5
+c207_stripes_100x30_k2_trunc.bin	394	E unexpected end of input	20 2094:e96988d602247a30
+c207_stripes_100x30_k2_corrupt.bin	395	E invalid CCITT code sequence	13 1404:8b0b5968975763f4
+c208_stripes_100x30_k2.bin	396	ok 231	30 3030:f6c659604fbd2bb5
+c209_stripes_100x30_k3.bin	397	ok 231	30 3030:f6c659604fbd2bb5
+c209_stripes_100x30_k3_corrupt.bin	398	E invalid CCITT code sequence	20 2047:420363414ee0ba71
+c209_stripes_100x30_k3.bin	399	E invalid CCITT code sequence	1 127:256926352b22470d
+c210_long_100x30_k-1.bin	400	ok 0	0 0:cbf29ce484222325
+c211_long_100x30_k-1.bin	401	ok 0	0 0:cbf29ce484222325
+c211_long_100x30_k-1_trunc.bin	402	E unexpected end of input	18 1818:f37b4e4219f68f92
+c212_long_100x30_k-1.bin	403	ok 36	30 3030:ad5bfe8e51502d56
+c213_long_100x30_k0.bin	404	ok 82	30 3030:c84c28a100fee6fa
+c213_long_100x30_k0.bin	405	E unexpected end of input	30 3030:c84c28a100fee6fa
+c214_long_100x30_k0.bin	406	ok 146	30 3030:ad5bfe8e51502d56
+c214_long_100x30_k0_corrupt.bin	407	ok 146	28 2828:0e4aa14d3a20f387
+c215_long_100x30_k2.bin	408	ok 108	30 3030:c84c28a100fee6fa
+c216_long_100x30_k2.bin	409	ok 62	30 3030:c84c28a100fee6fa
+c216_long_100x30_k2_corrupt.bin	410	E invalid CCITT code sequence	11 1167:9508dfd0c609035b
+c216_long_100x30_k2.bin	411	E arithmetic overflow in position calculation	2 204:d297e0d228a20d29
+c217_white_100x30_k-1.bin	412	ok 7	30 3030:db3588535f1790b5
+c218_white_100x30_k-1.bin	413	ok 0	0 0:cbf29ce484222325
+c218_white_100x30_k-1.bin	414	E unexpected end of input	30 3030:db3588535f1790b5
+c219_white_100x30_k0.bin	415	ok 129	30 3030:983aa6139e81fab5
+c219_white_100x30_k0_trunc.bin	416	E unexpected end of input	21 2121:910400e1c3e02b2d
+c220_white_100x30_k2.bin	417	ok 77	30 3030:983aa6139e81fab5
+c220_white_100x30_k2_corrupt.bin	418	E invalid CCITT code sequence	11 1111:bfb839a52394e56b
+c220_white_100x30_k2.bin	419	E invalid CCITT code sequence	1 102:28e537fa51fbf4f2
+c221_white_100x30_k2.bin	420	ok 30	30 3030:db3588535f1790b5
+c221_white_100x30_k2_trunc.bin	421	ok 20	20 2020:8509b6f0b9c45105
+c221_white_100x30_k2.bin	422	E unexpected end of input	14 1428:36ffe23bc8a45750
+c222_white_100x30_k3.bin	423	ok 82	30 3030:983aa6139e81fab5
+c222_white_100x30_k3.bin	424	E unexpected end of input	30 3083:66a20090a4feeb2d
+c222_white_100x30_k3_trunc.bin	425	ok 60	22 2222:62e667574f0ee1f5
+c222_white_100x30_k3_corrupt.bin	426	E invalid CCITT code sequence	3 303:e8fc0e26c0ba485d
+c222_white_100x30_k3.bin	427	E invalid CCITT code sequence	0 100:a2103c010d71aeb5
+c223_black_100x30_k-1.bin	428	ok 15	30 3030:983aa6139e81fab5
+c223_black_100x30_k-1_trunc.bin	429	E unexpected end of input	24 2424:9ed7eb31629d3f65
+c224_black_100x30_k-1.bin	430	ok 12	30 3030:983aa6139e81fab5
+c224_black_100x30_k-1_corrupt.bin	431	E unexpected end of input	27 2727:91e8291204875e57
+c225_black_100x30_k0.bin	432	ok 113	30 3030:983aa6139e81fab5
+c226_black_100x30_k0.bin	433	ok 167	30 3030:983aa6139e81fab5
+c227_black_100x30_k0.bin	434	ok 120	30 3030:983aa6139e81fab5
+c227_black_100x30_k0.bin	435	ok 120	30 3030:983aa6139e81fab5
+c227_black_100x30_k0_trunc.bin	436	ok 80	20 2020:d5fabf19fa855185
+c227_black_100x30_k0.bin	437	ok 120	20 2040:6a581c37e32c7fe9
+c228_black_100x30_k2.bin	438	ok 111	30 3030:983aa6139e81fab5
+c228_black_100x30_k2.bin	439	E unexpected end of input	30 3083:7363ba06ea75041e
+c229_black_100x30_k2.bin	440	ok 64	30 3030:983aa6139e81fab5
+c230_text_1728x6_k-1.bin	441	ok 2958	6 10374:0d78e1ee39b7dc49
+c230_text_1728x6_k-1.bin	442	E invalid CCITT code sequence	6 10374:0d78e1ee39b7dc49
+c231_text_1728x6_k0.bin	443	ok 2439	6 10374:96233749626389b1
+c231_text_1728x6_k0_corrupt.bin	444	ok 1802	6 10374:b07da04fba4dbca5
+c232_text_1728x6_k0.bin	445	ok 2441	6 10374:96233749626389b1
+c233_text_1728x6_k2.bin	446	E unexpected end of input	6 10427:ce1874539bef44c9
+c233_text_1728x6_k2_corrupt.bin	447	E arithmetic overflow in position calculation	5 9937:b982eb2db985c94f
+c234_text_1728x6_k4.bin	448	ok 2756	6 10374:0d78e1ee39b7dc49
+c234_text_1728x6_k4_trunc.bin	449	E unexpected end of input	3 6661:2ec40ac4fa3c91b1
+c235_text_1728x6_k2.bin	450	ok 2651	6 10374:0d78e1ee39b7dc49
+c236_text_1728x6_k3.bin	451	ok 2713	6 10374:96233749626389b1
+c236_text_1728x6_k3_corrupt.bin	452	E invalid CCITT code sequence	1 3287:c45215c55eff5f38
+c237_noise_1728x6_k-1.bin	453	ok 2635	6 10374:fd5517004719474b
+c237_noise_1728x6_k-1_trunc.bin	454	E unexpected end of input	3 6817:05755bcbeb6fd464
+c238_noise_1728x6_k0.bin	455	ok 2030	6 10374:fd5517004719474b
+c239_noise_1728x6_k0.bin	456	ok 2033	6 10374:a8b7a625da96d91f
+c239_noise_1728x6_k0.bin	457	ok 2033	6 10374:a8b7a625da96d91f
+c240_noise_1728x6_k4.bin	458	ok 2403	6 10374:fd5517004719474b
+c240_noise_1728x6_k4_corrupt.bin	459	E arithmetic overflow in position calculation	1 3409:3c1aec42d10e4d50
+c241_noise_1728x6_k2.bin	460	ok 2300	6 10374:fd5517004719474b
+c242_stripes_1728x6_k-1.bin	461	ok 0	0 0:cbf29ce484222325
+c242_stripes_1728x6_k-1.bin	462	ok 540	6 10374:f014adca4da0674a
+c242_stripes_1728x6_k-1_trunc.bin	463	E unexpected end of input	3 5666:d4b1a301bd255a75
+c242_stripes_1728x6_k-1_corrupt.bin	464	ok 454	6 10374:6127696a1d7a5482
+c243_stripes_1728x6_k-1.bin	465	ok 544	6 10374:f014adca4da0674a
+c243_stripes_1728x6_k-1.bin	466	ok 544	6 10374:f014adca4da0674a
+c243_stripes_1728x6_k-1_corrupt.bin	467	E invalid CCITT code sequence	3 6275:49ede60634445450
+c244_stripes_1728x6_k2.bin	468	ok 746	6 10374:6cd9fa72817a8542
+c245_stripes_1728x6_k4.bin	469	ok 615	6 10374:f014adca4da0674a
+c245_stripes_1728x6_k4.bin	470	E unexpected end of input	6 10374:f014adca4da0674a
+c245_stripes_1728x6_k4_trunc.bin	471	E unexpected end of input	4 7045:572770d40435db96
+c246_stripes_1728x6_k2.bin	472	ok 736	6 10374:f014adca4da0674a
+c246_stripes_1728x6_k2.bin	473	E invalid CCITT code sequence	6 10374:f014adca4da0674a
+c246_stripes_1728x6_k2_trunc.bin	474	E unexpected end of input	3 6526:f3fa83f74cc5f1ed
+c246_stripes_1728x6_k2_corrupt.bin	475	E unexpected end of input	5 9158:90f8bc7eba727388
+c247_long_1728x6_k-1.bin	476	ok 0	0 0:cbf29ce484222325
+c247_long_1728x6_k-1_trunc.bin	477	E unexpected end of input	3 6450:b4158f3e600178c7
+c248_long_1728x6_k-1.bin	478	ok 33	6 10374:fcbb4f51ac392fa6
+c248_long_1728x6_k-1.bin	479	ok 33	6 10374:fcbb4f51ac392fa6
+c248_long_1728x6_k-1_corrupt.bin	480	E invalid CCITT code sequence	4 7182:c01ff9c5f1d42455
+c249_long_1728x6_k0.bin	481	ok 49	6 10374:3dc1fed718f1b802
+c249_long_1728x6_k0.bin	482	ok 49	6 10374:3dc1fed718f1b802
+c250_white_1728x6_k-1.bin	483	ok 1	6 10374:6788d7fe6b113f35
+c251_white_1728x6_k0.bin	484	ok 31	6 10374:6788d7fe6b113f35
+c251_white_1728x6_k0.bin	485	E unexpected end of input	6 10374:6788d7fe6b113f35
+c252_white_1728x6_k0.bin	486	ok 33	6 10374:6788d7fe6b113f35
+c253_white_1728x6_k2.bin	487	E unexpected end of input	6 10427:168340c632eb4bad
+c253_white_1728x6_k2.bin	488	E unexpected end of input	6 10427:168340c632eb4bad
+c253_white_1728x6_k2_corrupt.bin	489	ok 18	6 10374:138a990d8bc5a035
+c254_white_1728x6_k4.bin	490	ok 15	6 10374:6788d7fe6b113f35
+c255_white_1728x6_k2.bin	491	ok 8	6 10374:6788d7fe6b113f35
+c256_white_1728x6_k3.bin	492	E unexpected end of input	6 10427:76328832286ba19e
+c256_white_1728x6_k3.bin	493	E unexpected end of input	6 10427:76328832286ba19e
+c256_white_1728x6_k3_trunc.bin	494	ok 16	6 10374:6788d7fe6b113f35
+c257_black_1728x6_k-1.bin	495	ok 6	6 10374:6788d7fe6b113f35
+c258_black_1728x6_k0.bin	496	ok 42	6 10374:138a990d8bc5a035
+c258_black_1728x6_k0_trunc.bin	497	E unexpected end of input	5 8645:2c1186243960e37d
+c258_black_1728x6_k0_corrupt.bin	498	ok 32	6 10374:138a990d8bc5a035
+c259_text_3000x4_k-1.bin	499	ok 3144	4 12004:2542fe4d93be5913
+c260_text_3000x4_k-1.bin	500	ok 3145	4 12004:cd0afa35b03025bb
+c260_text_3000x4_k-1_trunc.bin	501	E unexpected end of input	2 8408:02d0075e40d3fc6d
+c261_text_3000x4_k0.bin	502	ok 2855	4 12004:cd0afa35b03025bb
+c261_text_3000x4_k0.bin	503	ok 2855	4 12004:cd0afa35b03025bb
+c262_text_3000x4_k0.bin	504	ok 2873	4 12004:cd0afa35b03025bb
+c263_text_3000x4_k0.bin	505	ok 2856	4 12004:2542fe4d93be5913
+c264_text_3000x4_k2.bin	506	ok 2898	4 12004:cd0afa35b03025bb
+c264_text_3000x4_k2.bin	507	E unexpected end of input	4 12057:68fe6723ee27b0b0
+c264_text_3000x4_k2_trunc.bin	508	E unexpected end of input	2 8784:3e75781d8550c766
+c265_text_3000x4_k2.bin	509	ok 2890	4 12004:cd0afa35b03025bb
+c265_text_3000x4_k2.bin	510	ok 2890	4 12004:cd0afa35b03025bb
+c266_noise_3000x4_k-1.bin	511	ok 0	0 0:cbf29ce484222325
+c267_noise_3000x4_k-1.bin	512	ok 3046	4 12004:d2accc76ab03f060
+c267_noise_3000x4_k-1_trunc.bin	513	E unexpected end of input	2 7951:ef56f30a01b98d2a
+c268_noise_3000x4_k-1.bin	514	ok 0	0 0:cbf29ce484222325
+c268_noise_3000x4_k-1_corrupt.bin	515	E arithmetic overflow in position calculation	2 6089:15079bce3a0a2f16
+c268_noise_3000x4_k-1.bin	516	ok 3047	4 12008:bd963a6ec5ac4495
+c269_noise_3000x4_k0.bin	517	ok 2394	4 12004:d2accc76ab03f060
+c269_noise_3000x4_k0.bin	518	E unexpected end of input	4 12004:d2accc76ab03f060
+c270_noise_3000x4_k0.bin	519	ok 2381	4 12004:d2accc76ab03f060
+c271_noise_3000x4_k2.bin	520	ok 2673	4 12004:d2accc76ab03f060
+c272_noise_3000x4_k2.bin	521	E invalid CCITT code sequence	4 12004:d2accc76ab03f060
+c273_stripes_3000x4_k-1.bin	522	ok 788	4 12004:1c4310334bd900a5
+c273_stripes_3000x4_k-1.bin	523	E unexpected end of input	4 12004:1c4310334bd900a5
+c273_stripes_3000x4_k-1.bin	524	E unexpected end of input	3 9006:d63ba1184e2af1d4
+c274_stripes_3000x4_k0.bin	525	ok 1201	4 12004:1c4310334bd900a5
+c274_stripes_3000x4_k0.bin	526	E unexpected end of input	4 12004:1c4310334bd900a5
+c274_stripes_3000x4_k0_trunc.bin	527	E unexpected end of input	2 8002:953978e1a919efb5
+c275_stripes_3000x4_k0.bin	528	ok 1216	4 12004:1c4310334bd900a5
+c275_stripes_3000x4_k0_trunc.bin	529	E unexpected end of input	2 8057:317c6959bc42729f
+c275_stripes_3000x4_k0_corrupt.bin	530	E unexpected end of input	3 10291:d1de4efdc5965e05
+c276_stripes_3000x4_k0.bin	531	ok 1201	4 12004:1c4310334bd900a5
+c276_stripes_3000x4_k0.bin	532	ok 1201	4 12004:1c4310334bd900a5
+c277_stripes_3000x4_k2.bin	533	ok 909	4 12004:d4cb4f5d59197d65
+c277_stripes_3000x4_k2_corrupt.bin	534	E invalid CCITT code sequence	1 3007:8318bdbdb90c02a0
+c278_stripes_3000x4_k4.bin	535	E unexpected end of input	4 12004:1c4310334bd900a5
+c279_long_3000x4_k-1.bin	536	ok 22	4 12004:75da9dfe55f5fd4d
+c279_long_3000x4_k-1_corrupt.bin	537	E invalid CCITT code sequence	2 6002:f2ffef39d4f06b70
+c280_long_3000x4_k0.bin	538	ok 20	4 12004:75da9dfe55f5fd4d
+c280_long_3000x4_k0_corrupt.bin	539	E unexpected end of input	2 8994:2a9d7ee0af273a29
+c281_long_3000x4_k0.bin	540	ok 35	4 12004:75da9dfe55f5fd4d
+c281_long_3000x4_k0.bin	541	ok 35	4 12004:75da9dfe55f5fd4d
+c282_long_3000x4_k0.bin	542	ok 22	4 12004:75da9dfe55f5fd4d
+c282_long_3000x4_k0_trunc.bin	543	E unexpected end of input	2 7996:d41007ad0f88d6ec
+c283_long_3000x4_k2.bin	544	ok 29	4 12004:75da9dfe55f5fd4d
+c284_long_3000x4_k2.bin	545	ok 22	4 12004:75da9dfe55f5fd4d
+c284_long_3000x4_k2_corrupt.bin	546	E unexpected end of input	1 5887:b6f79573ddb9f482
+c285_long_3000x4_k3.bin	547	ok 31	4 12004:75da9dfe55f5fd4d
+c285_long_3000x4_k3_corrupt.bin	548	ok 25	4 12004:62ab94a3b01f9915
+c286_white_3000x4_k-1.bin	549	ok 4	4 12004:d47631e1a46d91a5
+c287_white_3000x4_k-1.bin	550	ok 1	4 12004:d47631e1a46d91a5
+c287_white_3000x4_k-1.bin	551	E unexpected end of input	4 12004:d47631e1a46d91a5
+c288_white_3000x4_k-1.bin	552	ok 0	0 0:cbf29ce484222325
+c289_white_3000x4_k0.bin	553	ok 16	4 12004:d47631e1a46d91a5
+c289_white_3000x4_k0.bin	554	ok 16	4 12004:d47631e1a46d91a5
+c290_white_3000x4_k2.bin	555	ok 16	4 12004:d47631e1a46d91a5
+c290_white_3000x4_k2.bin	556	E unexpected end of input	4 12057:041cda53a2dde7ce
+c290_white_3000x4_k2_corrupt.bin	557	E unexpected end of input	0 2707:78518c3196c34968
+c291_white_3000x4_k4.bin	558	E unexpected end of input	4 12004:d47631e1a46d91a5
+c292_white_3000x4_k2.bin	559	ok 8	4 12004:d47631e1a46d91a5
+c293_black_3000x4_k-1.bin	560	ok 10	4 12004:96c2e0fc3bc72f05
+c293_black_3000x4_k-1_corrupt.bin	561	E arithmetic overflow in position calculation	2 6002:65253ab6682c1a04
+c294_black_3000x4_k0.bin	562	ok 22	4 12004:96c2e0fc3bc72f05
+c294_black_3000x4_k0_trunc.bin	563	E unexpected end of input	2 6002:92eb738ad751bb55
+c294_black_3000x4_k0.bin	564	ok 22	2 6004:175d7703c9f5db95
+c295_black_3000x4_k0.bin	565	ok 37	4 12004:96c2e0fc3bc72f05
+c295_black_3000x4_k0_trunc.bin	566	E unexpected end of input	3 9003:d4bbf6426d5eef8d
+c296_black_3000x4_k0.bin	567	ok 24	4 12004:d47631e1a46d91a5
+c297_black_3000x4_k2.bin	568	E unexpected end of input	4 12057:95c090f6f1c13b2e
+c298_black_3000x4_k3.bin	569	ok 22	4 12004:96c2e0fc3bc72f05
