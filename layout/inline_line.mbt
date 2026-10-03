@@ -144,7 +144,7 @@ fn line(
   }
 
   // Trim the line at the end, if necessary for this breakpoint.
-  let trim = breakpoint.trim(start, full.to_string())
+  let trim = breakpoint.trim_by(start, end, pred => full.trim_end_len(pred))
   let trimmed_start = start
   let trimmed_end = trim.layout
 
