@@ -197,3 +197,21 @@ pub fn BitWriter::write(self : BitWriter, val : UInt) -> Unit? {
   self.cur_pos += bit_size
   Some(())
 }
+
+///|
+/// Fill bytes with a repeated value when at a byte boundary.
+pub fn BitWriter::fill_bytes(
+  self : BitWriter,
+  byte : Byte,
+  count : Int,
+) -> Unit? {
+  // (upstream: `debug_assert_eq!(self.cur_pos % 8, 0)`)
+  let start = self.base + self.cur_pos / 8
+  let end = start + count
+  if count < 0 || end > self.data.length() {
+    return None
+  }
+  self.data.fill(byte, start~, end~)
+  self.cur_pos += count * 8
+  Some(())
+}

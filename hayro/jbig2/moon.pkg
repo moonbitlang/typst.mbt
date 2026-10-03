@@ -1,0 +1,5 @@
+import {
+  "moonbitlang/typst/hayro/ccitt",
+}
+
+warnings = "-deprecated"

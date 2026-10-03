@@ -1,0 +1,14 @@
+import {
+  "moonbitlang/x/fs",
+} for "test"
+
+// Upstream keeps some unread fields and enum variants for completeness.
+
+warnings = "-deprecated-unused_field-unused_constructor"
+
+options(
+  targets: {
+    "math_native.mbt": [ "native" ],
+    "math_other.mbt": [ "not", "native" ],
+  },
+)

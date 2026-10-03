@@ -1,0 +1,130 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/hayro/jpeg2000"
+
+import {
+  "moonbitlang/core/debug",
+}
+
+// Values
+
+// Errors
+pub(all) suberror DecodeError {
+  Format(FormatError)
+  Marker(MarkerError)
+  Tile(TileError)
+  Validation(ValidationError)
+  Decoding(DecodingError)
+  Color(ColorError)
+} derive(Eq, @debug.Debug)
+pub impl Show for DecodeError
+
+// Types and methods
+pub(all) enum ColorError {
+  Mct
+  PaletteResolutionFailed
+  SyccConversionFailed
+  LabConversionFailed
+} derive(Eq, @debug.Debug)
+pub impl Show for ColorError
+
+pub(all) enum ColorSpace {
+  Gray
+  RGB
+  CMYK
+  Unknown(num_channels~ : Int)
+  Icc(profile~ : Bytes, num_channels~ : Int)
+} derive(Eq, @debug.Debug)
+pub fn ColorSpace::num_channels(Self) -> Int
+
+pub struct ComponentData {
+  // private fields
+}
+pub fn ComponentData::bit_depth(Self) -> Int
+pub fn ComponentData::samples(Self) -> ArrayView[Float]
+
+pub(all) struct DecodeSettings {
+  resolve_palette_indices : Bool
+  strict : Bool
+  target_resolution : (UInt, UInt)?
+} derive(@debug.Debug)
+pub impl Default for DecodeSettings
+
+pub struct DecodedImage {
+  // private fields
+}
+pub fn DecodedImage::components(Self) -> ArrayView[ComponentData]
+pub fn DecodedImage::data_u8(Self) -> Bytes
+pub fn DecodedImage::store_u8_into(Self, FixedArray[Byte]) -> Unit
+
+pub struct DecoderContext {
+  // private fields
+}
+pub fn DecoderContext::new() -> Self
+pub impl Default for DecoderContext
+
+pub(all) enum DecodingError {
+  CodeBlockDecodeFailure
+  TooManyBitplanes
+  TooManyCodingPasses
+  InvalidBitplaneCount
+  InvalidPrecinct
+  InvalidProgressionIterator
+  UnexpectedEof
+} derive(Eq, @debug.Debug)
+pub impl Show for DecodingError
+
+pub(all) enum FormatError {
+  InvalidSignature
+  InvalidFileType
+  InvalidBox
+  MissingCodestream
+  Unsupported
+} derive(Eq, @debug.Debug)
+pub impl Show for FormatError
+
+pub struct Image {
+  // private fields
+}
+pub fn Image::color_space(Self) -> ColorSpace
+pub fn Image::decode(Self, DecoderContext) -> DecodedImage raise DecodeError
+pub fn Image::has_alpha(Self) -> Bool
+pub fn Image::height(Self) -> UInt
+pub fn Image::new(BytesView, DecodeSettings) -> Self raise DecodeError
+pub fn Image::original_bit_depth(Self) -> Int
+pub fn Image::width(Self) -> UInt
+
+pub(all) enum MarkerError {
+  Invalid
+  Unsupported
+  Expected(String)
+  Missing(String)
+  ParseFailure(String)
+} derive(Eq, @debug.Debug)
+pub impl Show for MarkerError
+
+pub(all) enum TileError {
+  Invalid
+  InvalidIndex
+  InvalidOffsets
+  PpmPptConflict
+} derive(Eq, @debug.Debug)
+pub impl Show for TileError
+
+pub(all) enum ValidationError {
+  InvalidDimensions
+  ImageTooLarge
+  TooManyChannels
+  InvalidComponentMetadata
+  InvalidProgressionOrder
+  InvalidTransformation
+  InvalidQuantizationStyle
+  MissingPrecinctExponents
+  InsufficientExponents
+  MissingStepSize
+  InvalidExponents
+} derive(Eq, @debug.Debug)
+pub impl Show for ValidationError
+
+// Type aliases
+
+// Traits

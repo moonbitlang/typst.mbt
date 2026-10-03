@@ -1,6 +1,8 @@
 import {
   "moonbitlang/typst/codecs",
   "moonbitlang/typst/hayro/ccitt",
+  "moonbitlang/typst/hayro/jbig2",
+  "moonbitlang/typst/hayro/jpeg2000",
   "moonbitlang/core/encoding/utf8",
   "moonbitlang/core/buffer",
   "moonbitlang/core/hashset",
