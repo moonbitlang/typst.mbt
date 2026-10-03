@@ -1,0 +1,7 @@
+import {
+  "moonbitlang/typst/wasmparser",
+  "moonbitlang/typst/wasmi/core" @wasmi_core,
+  "moonbitlang/typst/wasmi/ir",
+}
+
+warnings = "-unused_type_variable"

@@ -114,7 +114,7 @@ def parse(text):
             continue
         m = re.match(r"^#\[snake_name\((r#)?(\w+)\)\]$", line)
         if m:
-            snake = m.group(2)
+            snake = m.group(2) + ("_" if m.group(1) else "")
             i += 1
             name_line = lines[i].strip()
             mi = re.match(r"^(\w+)\s*\{\s*(.*?)\s*\}\s*,?$", name_line)
@@ -268,6 +268,45 @@ def main():
     w("  }")
     w("}")
     w("")
+    # Field accessors used where upstream mutates `&mut Op` fields in place.
+    accessors = [
+        # (is_result, field, rust type, getter name, setter name)
+        (True, "result", "Slot", "result_slot", "set_result"),
+        (False, "offset", "BranchOffset16", "branch_offset16", "set_branch_offset16"),
+        (False, "offset", "BranchOffset", "branch_offset", "set_branch_offset"),
+        (True, "results", "SlotSpan", "results_span", "set_results_span"),
+    ]
+    for want_result, fname, fty, getter, setter in accessors:
+        mty = TYPES[fty]
+        matching = []
+        for group, docs, snake, name, fields in ops:
+            for f in fields:
+                if f[0] == want_result and f[1] == fname and f[2] == fty:
+                    matching.append((name, fields))
+        w("///|")
+        w(f"/// Returns the `{fname}: {fty}` field of the instruction, if any.")
+        w(f"pub fn Op::{getter}(self : Op) -> {mty}? {{")
+        w("  match self {")
+        for name, fields in matching:
+            w(f"    {name}({fname}~, ..) => Some({fname})")
+        w("    _ => None")
+        w("  }")
+        w("}")
+        w("")
+        w("///|")
+        w(f"/// Returns the instruction with its `{fname}: {fty}` field replaced, if it has one.")
+        w(f"pub fn Op::{setter}(self : Op, new_value : {mty}) -> Op? {{")
+        w("  match self {")
+        for name, fields in matching:
+            others = [field_name(f[0], f[1]) for f in fields if f[1] != fname]
+            binds = ", ".join(f"{o}~" for o in others)
+            pat = f"{name}({binds})" if others else f"{name}(..)"
+            args = ", ".join([f"{fname}=new_value"] + [f"{o}~" for o in others])
+            w(f"    {pat} => Some({name}({args}))")
+        w("    _ => None")
+        w("  }")
+        w("}")
+        w("")
     path = os.path.join(ROOT, "wasmi", "ir", "op_gen.mbt")
     with open(path, "w") as f:
         f.write("\n".join(out))

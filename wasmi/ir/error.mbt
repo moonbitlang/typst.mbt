@@ -2,7 +2,7 @@
 
 ///|
 /// An error that may be occurred when operating with some Wasmi IR primitives.
-pub(all) suberror Error {
+pub(all) suberror IrError {
   /// Encountered when trying to create a [`Slot`] from an out of bounds integer.
   StackSlotOutOfBounds
   /// Encountered when trying to create a [`BranchOffset`] from an out of bounds integer.
@@ -14,7 +14,7 @@ pub(all) suberror Error {
 } derive(Eq)
 
 ///|
-pub impl Show for Error with output(self, logger) {
+pub impl Show for IrError with output(self, logger) {
   logger.write_string(
     match self {
       StackSlotOutOfBounds => "stack slot index out of bounds"

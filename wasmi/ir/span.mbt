@@ -70,10 +70,10 @@ pub fn FixedSlotSpan::to_array(self : FixedSlotSpan) -> (Slot, Slot) {
 /// # Errors
 ///
 /// If `span` cannot hold `n` slots (overflowing slot indices).
-pub fn FixedSlotSpan::new(span : SlotSpan, n : Int) -> FixedSlotSpan raise Error {
+pub fn FixedSlotSpan::new(span : SlotSpan, n : Int) -> FixedSlotSpan raise IrError {
   let head = span.head()
   if head.0 >= head.next_n(n).0 {
-    raise Error::StackSlotOutOfBounds
+    raise IrError::StackSlotOutOfBounds
   }
   FixedSlotSpan(span)
 }
@@ -239,8 +239,8 @@ pub fn SlotSpanIter::next(self : SlotSpanIter) -> Slot? {
     return None
   }
   let reg = self.next
-  self.next = Slot(self.next).next().0
-  Some(Slot(reg))
+  self.next = Slot::Slot(self.next).next().0
+  Some(Slot::Slot(reg))
 }
 
 ///|
@@ -249,8 +249,8 @@ pub fn SlotSpanIter::next_back(self : SlotSpanIter) -> Slot? {
   if self.next == self.last {
     return None
   }
-  self.last = Slot(self.last).prev().0
-  Some(Slot(self.last))
+  self.last = Slot::Slot(self.last).prev().0
+  Some(Slot::Slot(self.last))
 }
 
 ///|

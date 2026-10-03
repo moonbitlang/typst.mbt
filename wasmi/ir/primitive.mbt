@@ -64,10 +64,10 @@ pub fn BranchOffset16::from_i16(offset : Int) -> BranchOffset16 {
 
 ///|
 /// Upstream `TryFrom<BranchOffset> for BranchOffset16`.
-pub fn BranchOffset16::try_from(offset : BranchOffset) -> BranchOffset16 raise Error {
+pub fn BranchOffset16::try_from(offset : BranchOffset) -> BranchOffset16 raise IrError {
   let offset = offset.to_i32()
   if offset < -32768 || offset > 32767 {
-    raise Error::BranchOffsetOutOfBounds
+    raise IrError::BranchOffsetOutOfBounds
   }
   BranchOffset16(offset)
 }
@@ -99,7 +99,7 @@ pub fn BranchOffset16::is_init(self : BranchOffset16) -> Bool {
 pub fn BranchOffset16::init(
   self : BranchOffset16,
   valid_offset : BranchOffset,
-) -> BranchOffset16 raise Error {
+) -> BranchOffset16 raise IrError {
   guard valid_offset.is_init()
   guard !self.is_init()
   BranchOffset16::try_from(valid_offset)
@@ -139,12 +139,12 @@ pub fn BranchOffset::uninit() -> BranchOffset {
 pub fn BranchOffset::from_src_to_dst(
   src : UInt,
   dst : UInt,
-) -> BranchOffset raise Error {
+) -> BranchOffset raise IrError {
   let src = src.to_uint64().reinterpret_as_int64()
   let dst = dst.to_uint64().reinterpret_as_int64()
   let offset = dst - src
   if offset < -2147483648L || offset > 2147483647L {
-    raise Error::BranchOffsetOutOfBounds
+    raise IrError::BranchOffsetOutOfBounds
   }
   BranchOffset(offset.to_int())
 }
@@ -190,9 +190,9 @@ pub fn BlockFuel::from_u32(value : UInt) -> BlockFuel {
 
 ///|
 /// Upstream `TryFrom<u64> for BlockFuel`.
-pub fn BlockFuel::try_from_u64(index : UInt64) -> BlockFuel raise Error {
+pub fn BlockFuel::try_from_u64(index : UInt64) -> BlockFuel raise IrError {
   if index > 0xFFFF_FFFFUL {
-    raise Error::BlockFuelOutOfBounds
+    raise IrError::BlockFuelOutOfBounds
   }
   BlockFuel(index.to_uint())
 }
@@ -203,10 +203,10 @@ pub fn BlockFuel::try_from_u64(index : UInt64) -> BlockFuel raise Error {
 /// # Errors
 ///
 /// If the new fuel amount after this operation is out of bounds.
-pub fn BlockFuel::bump_by(self : BlockFuel, amount : UInt64) -> BlockFuel raise Error {
+pub fn BlockFuel::bump_by(self : BlockFuel, amount : UInt64) -> BlockFuel raise IrError {
   let new_amount = self.to_u64() + amount
   if new_amount < amount {
-    raise Error::BlockFuelOutOfBounds
+    raise IrError::BlockFuelOutOfBounds
   }
   BlockFuel::try_from_u64(new_amount)
 }
@@ -264,9 +264,9 @@ let comparators : FixedArray[Comparator] = [
 
 ///|
 /// Upstream `TryFrom<u32> for Comparator`.
-pub fn Comparator::try_from_u32(value : UInt) -> Comparator raise Error {
+pub fn Comparator::try_from_u32(value : UInt) -> Comparator raise IrError {
   if value >= comparators.length().reinterpret_as_uint() {
-    raise Error::ComparatorOutOfBounds
+    raise IrError::ComparatorOutOfBounds
   }
   comparators[value.reinterpret_as_int()]
 }

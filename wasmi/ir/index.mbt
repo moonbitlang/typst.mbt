@@ -47,9 +47,9 @@ pub fn Memory::is_default(self : Memory) -> Bool {
 
 ///|
 /// Upstream `TryFrom<u32> for Slot`.
-pub fn Slot::try_from_u32(local_index : UInt) -> Slot raise Error {
+pub fn Slot::try_from_u32(local_index : UInt) -> Slot raise IrError {
   if local_index > 0x7FFFU {
-    raise Error::StackSlotOutOfBounds
+    raise IrError::StackSlotOutOfBounds
   }
   Slot(local_index.reinterpret_as_int())
 }
