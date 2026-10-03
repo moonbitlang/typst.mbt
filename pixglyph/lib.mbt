@@ -233,12 +233,26 @@ fn Canvas::new(w : UInt, h : UInt) -> Canvas {
 ///|
 /// Return the accumulated coverage values.
 fn Canvas::accumulate(self : Canvas) -> Bytes {
+  // A plain loop with `min` and `to_int` spelled out (the closure call and
+  // the core float helpers are not inlined; performance). `acc.abs().min(1.0)`
+  // is in `[0, 1]` or NaN-free `1.0`, so the product is in `[0, 255]`.
+  let n = self.w * self.h
+  guard n >= 0 && n <= self.a.length() else { abort("canvas out of bounds") }
+  let out = FixedArray::make(n, b'\x00')
   let mut acc : Float = 0.0
-  Bytes::makei(self.w * self.h, i => {
-    acc = acc + self.a[i]
-    ((255.0 : Float) * acc.abs().min(1.0)).to_int().to_byte()
-  })
+  for i in 0..<n {
+    acc = acc + self.a.unsafe_get(i)
+    let v = acc.abs()
+    // `Float::min(v, 1.0)`: NaN yields the other operand.
+    let v : Float = if v < 1.0 { v } else { 1.0 }
+    out.unsafe_set(i, f32_to_i32_unchecked((255.0 : Float) * v).to_byte())
+  }
+  Bytes::from_fixedarray(out)
 }
+
+///|
+/// Truncating conversion of a float known to be in the `Int` range.
+fn f32_to_i32_unchecked(x : Float) -> Int = "%f32.to_i32"
 
 ///|
 /// Add to a value in the accumulation buffer.
