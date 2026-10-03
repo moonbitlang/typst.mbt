@@ -347,24 +347,27 @@ fn DeflateStream::level_flags(self : DeflateStream) -> Int {
 fn read_u32_le(window : FixedArray[Byte], i : Int) -> UInt {
   // One bounds check for all four bytes (performance).
   guard i >= 0 && i + 4 <= window.length() else { abort("index out of bounds") }
-  window.unsafe_get(i).to_uint() |
-  (window.unsafe_get(i + 1).to_uint() << 8) |
-  (window.unsafe_get(i + 2).to_uint() << 16) |
-  (window.unsafe_get(i + 3).to_uint() << 24)
+  // Intrinsic conversions only (core's `Byte::to_uint` is not inlined).
+  (window.unsafe_get(i).to_int() |
+  (window.unsafe_get(i + 1).to_int() << 8) |
+  (window.unsafe_get(i + 2).to_int() << 16) |
+  (window.unsafe_get(i + 3).to_int() << 24)).reinterpret_as_uint()
 }
 
 ///|
 fn read_u64_le(window : FixedArray[Byte], i : Int) -> UInt64 {
   // One bounds check for all eight bytes (performance).
   guard i >= 0 && i + 8 <= window.length() else { abort("index out of bounds") }
-  window.unsafe_get(i).to_uint64() |
-  (window.unsafe_get(i + 1).to_uint64() << 8) |
-  (window.unsafe_get(i + 2).to_uint64() << 16) |
-  (window.unsafe_get(i + 3).to_uint64() << 24) |
-  (window.unsafe_get(i + 4).to_uint64() << 32) |
-  (window.unsafe_get(i + 5).to_uint64() << 40) |
-  (window.unsafe_get(i + 6).to_uint64() << 48) |
-  (window.unsafe_get(i + 7).to_uint64() << 56)
+  let lo = window.unsafe_get(i).to_int() |
+    (window.unsafe_get(i + 1).to_int() << 8) |
+    (window.unsafe_get(i + 2).to_int() << 16) |
+    (window.unsafe_get(i + 3).to_int() << 24)
+  let hi = window.unsafe_get(i + 4).to_int() |
+    (window.unsafe_get(i + 5).to_int() << 8) |
+    (window.unsafe_get(i + 6).to_int() << 16) |
+    (window.unsafe_get(i + 7).to_int() << 24)
+  UInt64::extend_uint(lo.reinterpret_as_uint()) |
+  (UInt64::extend_uint(hi.reinterpret_as_uint()) << 32)
 }
 
 ///|

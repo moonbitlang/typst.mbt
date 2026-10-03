@@ -289,13 +289,19 @@ fn filter_row_cost(
     abort("index out of bounds")
   }
   let first = if bpp < len { bpp } else { len }
-  let mut sum = 0UL
+  // Sums of a row are below `2^63` (`255 * len`); the limit is clamped.
+  let limit = if limit > 0x7FFFFFFFFFFFFFFFUL {
+    0x7FFFFFFFFFFFFFFFL
+  } else {
+    limit.reinterpret_as_int64()
+  }
+  let mut sum = 0L
   match filter {
     1 => {
       for i in 0..<first {
         let v = current.unsafe_get(i).to_int()
         output.unsafe_set(i + 1, v.to_byte())
-        sum += filter_cost(v)
+        sum += (if v >= 128 { 256 - v } else { v }).to_int64()
       }
       for i in first..<len {
         let v = (
@@ -304,9 +310,9 @@ fn filter_row_cost(
           ) &
           0xFF
         output.unsafe_set(i + 1, v.to_byte())
-        sum += filter_cost(v)
+        sum += (if v >= 128 { 256 - v } else { v }).to_int64()
         if sum > limit {
-          return sum
+          return sum.reinterpret_as_uint64()
         }
       }
     }
@@ -317,9 +323,9 @@ fn filter_row_cost(
           ) &
           0xFF
         output.unsafe_set(i + 1, v.to_byte())
-        sum += filter_cost(v)
+        sum += (if v >= 128 { 256 - v } else { v }).to_int64()
         if sum > limit {
-          return sum
+          return sum.reinterpret_as_uint64()
         }
       }
     3 => {
@@ -329,16 +335,16 @@ fn filter_row_cost(
           ) &
           0xFF
         output.unsafe_set(i + 1, v.to_byte())
-        sum += filter_cost(v)
+        sum += (if v >= 128 { 256 - v } else { v }).to_int64()
       }
       for i in first..<len {
         let a = current.unsafe_get(i - bpp).to_int()
         let b = previous.unsafe_get(i).to_int()
         let v = (current.unsafe_get(i).to_int() - (a + b) / 2) & 0xFF
         output.unsafe_set(i + 1, v.to_byte())
-        sum += filter_cost(v)
+        sum += (if v >= 128 { 256 - v } else { v }).to_int64()
         if sum > limit {
-          return sum
+          return sum.reinterpret_as_uint64()
         }
       }
     }
@@ -350,7 +356,7 @@ fn filter_row_cost(
           ) &
           0xFF
         output.unsafe_set(i + 1, v.to_byte())
-        sum += filter_cost(v)
+        sum += (if v >= 128 { 256 - v } else { v }).to_int64()
       }
       for i in first..<len {
         let pred = filter_paeth(
@@ -360,9 +366,9 @@ fn filter_row_cost(
         )
         let v = (current.unsafe_get(i).to_int() - pred) & 0xFF
         output.unsafe_set(i + 1, v.to_byte())
-        sum += filter_cost(v)
+        sum += (if v >= 128 { 256 - v } else { v }).to_int64()
         if sum > limit {
-          return sum
+          return sum.reinterpret_as_uint64()
         }
       }
     }
@@ -370,17 +376,10 @@ fn filter_row_cost(
       for i in 0..<len {
         let v = current.unsafe_get(i).to_int()
         output.unsafe_set(i + 1, v.to_byte())
-        sum += filter_cost(v)
+        sum += (if v >= 128 { 256 - v } else { v }).to_int64()
       }
   }
-  sum
-}
-
-///|
-/// The cost of a filtered byte (its absolute value read as `i8`).
-#inline
-fn filter_cost(v : Int) -> UInt64 {
-  (if v >= 128 { 256 - v } else { v }).to_uint64()
+  sum.reinterpret_as_uint64()
 }
 
 ///|
