@@ -138,7 +138,7 @@ fn check_codec_streams(filter : @syntax.Filter) -> Unit raise {
   let mismatches = []
   let mut checked = 0
   let mut cur_path = ""
-  let mut cur_streams : Map[String, @syntax.Stream] = {}
+  let mut cur_streams : Map[String, @syntax.Stream] = Map([])
   for line in expected.split("\n") {
     let line = line.to_string()
     if line.is_empty() || line.has_prefix("#") {
@@ -148,7 +148,7 @@ fn check_codec_streams(filter : @syntax.Filter) -> Unit raise {
     let path = parts[0]
     if path != cur_path {
       cur_path = path
-      cur_streams = {}
+      cur_streams = Map([])
       let file = if path.has_prefix("/") { path } else { root + path }
       let data = @fs.read_file_to_bytes(file) catch {
         _ => {
