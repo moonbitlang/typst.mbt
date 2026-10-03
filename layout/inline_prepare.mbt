@@ -26,7 +26,7 @@ priv struct Preparation {
   /// The breakpoints of `text` (computed on first use). Not upstream:
   /// upstream recomputes them for each line breaking pass; they only depend
   /// on the preparation, so they are cached here (performance).
-  mut breakpoints : Array[(Int, @linebreak.Breakpoint)]?
+  mut breakpoints : (Array[Int], Array[@linebreak.Breakpoint])?
 }
 
 ///|

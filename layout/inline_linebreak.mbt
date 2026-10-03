@@ -610,10 +610,11 @@ fn breakpoints(
   p : Preparation,
   f : (Int, @linebreak.Breakpoint) -> Unit,
 ) -> Unit {
-  let all = match p.breakpoints {
+  let (ends, kinds) = match p.breakpoints {
     Some(all) => all
     None => {
-      let all = []
+      let ends = []
+      let kinds = []
       let hyphenate = p.config.hyphenate != Some(false)
       let cj = p.config.lang is Some(lang) && lang.as_str() is ("zh" | "ja")
       @linebreak.breakpoints(
@@ -622,14 +623,17 @@ fn breakpoints(
         hyphenate~,
         lang_at=offset => lang_at(p, offset),
         hyphenate_at=offset => hyphenate_at(p, offset),
-        (end, breakpoint) => all.push((end, breakpoint)),
+        (end, breakpoint) => {
+          ends.push(end)
+          kinds.push(breakpoint)
+        },
       )
-      p.breakpoints = Some(all)
-      all
+      p.breakpoints = Some((ends, kinds))
+      (ends, kinds)
     }
   }
-  for entry in all {
-    f(entry.0, entry.1)
+  for i in 0..<ends.length() {
+    f(ends[i], kinds[i])
   }
 }
 
