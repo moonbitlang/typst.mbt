@@ -124,12 +124,22 @@ pub fn SvgFormatter::to_string(self : SvgFormatter) -> String {
 ///|
 /// Write a string, escaping XML metacharacters.
 pub fn SvgFormatter::push_str(self : SvgFormatter, value : String) -> Unit {
-  for c in value {
-    match c {
-      '&' => self.buf.write_string("&amp;")
-      '<' => self.buf.write_string("&lt;")
-      _ => self.buf.write_char(c)
+  // Copy runs without metacharacters at once (performance).
+  let mut start = 0
+  for i in 0..<value.length() {
+    let c = value.unsafe_get(i)
+    if c == '&' || c == '<' {
+      if start < i {
+        self.buf.write_view(value.view(start_offset=start, end_offset=i))
+      }
+      self.buf.write_string(if c == '&' { "&amp;" } else { "&lt;" })
+      start = i + 1
     }
+  }
+  if start == 0 {
+    self.buf.write_string(value)
+  } else if start < value.length() {
+    self.buf.write_view(value.view(start_offset=start))
   }
 }
 

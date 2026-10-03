@@ -44,6 +44,9 @@ priv enum State {
 priv struct DepthData {
   /// The byte range of the element name in the buffer.
   range : (Int, Int)
+  /// The element name (the text of `range`; not upstream: copied out of the
+  /// buffer instead, which needed a copy of the whole buffer here).
+  name : String
   mut has_children : Bool
 }
 
@@ -110,7 +113,7 @@ pub fn XmlWriter::write_comment(self : XmlWriter, text : String) -> Unit {
   self.push_str(text) // TODO: check content
   self.push_str("-->")
   if self.state == Attributes {
-    self.depth_stack.push({ range: (0, 0), has_children: false, })
+    self.depth_stack.push({ range: (0, 0), name: "", has_children: false, })
   }
   self.state = Document
 }
@@ -134,6 +137,7 @@ pub fn XmlWriter::start_element(self : XmlWriter, name : String) -> Unit {
   self.push_str(name)
   self.depth_stack.push({
     range: (start, self.buf.length()),
+    name,
     has_children: false,
   })
   self.state = Attributes
@@ -238,7 +242,7 @@ pub fn XmlWriter::write_text(self : XmlWriter, text : String) -> Unit {
     }
   }
   if self.state == Attributes {
-    self.depth_stack.push({ range: (0, 0), has_children: false, })
+    self.depth_stack.push({ range: (0, 0), name: "", has_children: false, })
   }
   self.state = Document
 }
@@ -253,10 +257,7 @@ pub fn XmlWriter::end_element(self : XmlWriter) -> Unit {
         self.write_node_indent()
       }
       self.push_str("</")
-      let bytes = self.buf.to_bytes()
-      for i in depth.range.0..<depth.range.1 {
-        self.push_byte(bytes[i])
-      }
+      self.push_str(depth.name)
       self.push_byte(b'>')
     } else {
       self.push_str("/>")
