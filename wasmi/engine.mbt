@@ -509,6 +509,9 @@ priv struct UncompiledFuncEntity {
   bytes : BytesView
   /// The Wasm module of the Wasm function.
   module : ModuleHeader
+  /// Optional Wasm validation information, validated on first use
+  /// (upstream `validation`, taken when compiling).
+  mut validation : @wasmparser.FuncToValidate?
 }
 
 ///|
@@ -608,9 +611,15 @@ fn CodeMap::init_func_as_uncompiled(
   func_idx : FuncIdx,
   bytes : BytesView,
   module : ModuleHeader,
+  func_to_validate : @wasmparser.FuncToValidate?,
 ) -> Unit {
   guard self.funcs[func.0] is Uninit
-  self.funcs[func.0] = Uncompiled({ func_index: func_idx, bytes, module, })
+  self.funcs[func.0] = Uncompiled({
+    func_index: func_idx,
+    bytes,
+    module,
+    validation: func_to_validate,
+  })
 }
 
 ///|
@@ -649,12 +658,19 @@ fn CodeMap::get(
 fn UncompiledFuncEntity::compile(
   self : UncompiledFuncEntity,
 ) -> CompiledFuncEntity raise WasmiError {
+  let config = self.module.engine_upgrade().config()
+  // Note: upstream validates while translating (`ValidatingFuncTranslator`);
+  // validating first yields the same result for valid bodies and the
+  // validation error for invalid ones instead of translating them.
+  match self.validation {
+    Some(func_to_validate) => {
+      self.validation = None
+      validate_func_body(func_to_validate, 0, self.bytes, config)
+    }
+    None => ()
+  }
   let translator = FuncTranslator::new(self.func_index, self.module)
-  FuncTranslationDriver::new(
-    0,
-    self.bytes,
-    self.module.engine_upgrade().config(),
-  ).translate(translator)
+  FuncTranslationDriver::new(0, self.bytes, config).translate(translator)
 }
 
 // ---------------------------------------------------------------------------
@@ -773,12 +789,12 @@ pub fn Engine::translate_func(
     (LazyTranslation, Some(func_to_validate)) => {
       validate_func_body(func_to_validate, offset, bytes, self.config)
       self.code_map.init_func_as_uncompiled(
-        engine_func, func_index, bytes, module,
+        engine_func, func_index, bytes, module, None,
       )
     }
-    (_, _) =>
+    (_, func_to_validate) =>
       self.code_map.init_func_as_uncompiled(
-        engine_func, func_index, bytes, module,
+        engine_func, func_index, bytes, module, func_to_validate,
       )
   }
 }

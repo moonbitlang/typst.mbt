@@ -243,21 +243,24 @@ fn SpecCtx::instantiate(
 }
 
 ///|
-/// Replays one expected-outcome file, returning (passed, failed).
+/// Replays one expected-outcome file, returning (passed, failed, skipped).
+/// `skip` lines (text-format modules, which wasmi does not parse) are
+/// counted as skipped; unknown commands fail.
 fn run_wasm_spec_file(
   json_dir : String,
   tsv : String,
   verbose : Bool,
   label : String,
-) -> (Int, Int) {
+) -> (Int, Int, Int) {
   let ctx = SpecCtx::new() catch {
     e => {
       println("\{label}: failed to set up spectest: \{e}")
-      return (0, 1)
+      return (0, 1, 0)
     }
   }
   let mut passed = 0
   let mut failed = 0
+  let mut skipped = 0
   for line in tsv.split("\n") {
     let line = line.to_string()
     if line == "" {
@@ -343,7 +346,11 @@ fn run_wasm_spec_file(
         let outcome = ctx.get(parts[2], field)
         "get\t\{parts[1]}\t\{parts[2]}\t\{parts[3]}\t\{outcome}"
       }
-      _ => line
+      "skip" => {
+        skipped += 1
+        continue
+      }
+      _ => "unknown command"
     }
     if actual == line {
       passed += 1
@@ -356,7 +363,7 @@ fn run_wasm_spec_file(
       }
     }
   }
-  (passed, failed)
+  (passed, failed, skipped)
 }
 
 ///|
@@ -367,6 +374,7 @@ fn run_wasm_spec_stage(filter : String?, verbose : Bool) -> Unit {
   dirs.sort_by(spec_compare)
   let mut passed = 0
   let mut failed = 0
+  let mut skipped = 0
   let mut files_ok = 0
   let mut files = 0
   for dir in dirs {
@@ -380,7 +388,7 @@ fn run_wasm_spec_stage(filter : String?, verbose : Bool) -> Unit {
         continue
       }
       let text = read(expected + "/" + dir + "/" + tsv)
-      let (p, f) = run_wasm_spec_file(
+      let (p, f, s) = run_wasm_spec_file(
         corpus + "/" + dir + "/" + stem,
         text,
         verbose,
@@ -388,6 +396,7 @@ fn run_wasm_spec_stage(filter : String?, verbose : Bool) -> Unit {
       )
       passed += p
       failed += f
+      skipped += s
       files += 1
       if f == 0 {
         files_ok += 1
@@ -397,7 +406,7 @@ fn run_wasm_spec_stage(filter : String?, verbose : Bool) -> Unit {
     }
   }
   println(
-    "wasm-spec: \{passed} passed, \{failed} failed (files: \{files_ok}/\{files})",
+    "wasm-spec: \{passed} passed, \{failed} failed, \{skipped} skipped (text modules) (files: \{files_ok}/\{files})",
   )
 }
 

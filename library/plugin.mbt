@@ -482,7 +482,11 @@ fn PluginInstance::call(
 fn PluginInstance::snapshot(self : PluginInstance) -> Snapshot {
   let memory = self.memory()
   let mem_pages = memory.size(self.store)
-  let mem_data = memory.data(self.store).copy()
+  // Note: `data` is the memory's backing buffer, which may be longer than the
+  // memory itself (upstream's slice is exactly `data_size` bytes long).
+  let len = memory.data_size(self.store)
+  let mem_data = FixedArray::make(len, b'\x00')
+  memory.data(self.store).blit_to(mem_data, len~)
   { mem_pages, mem_data, }
 }
 

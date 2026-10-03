@@ -15,8 +15,8 @@ are in `AGENTS.md` — read it first.
 | paged / svg / pdf-semantic / render | 2299/2299 each |
 | pdftags / bundle | 133/133, 39/39 |
 | font / shape / shape-hb / break / resvg / usvg | 100% |
-| wasm-spec / wasm-validate | 65449/65449 (260 files), 14027/14027 |
-| unit tests (`moon test --target native -j16`) | 8094/8094 |
+| wasm-spec / wasm-validate | 64207/64207 (260 files; 1242 text modules skipped), 14027/14027 |
+| unit tests (`moon test --target native -j16`) | 8096/8096 |
 
 Run a stage: `moon run tests/runner --target native [--release] -- <stage>`
 (use `--release` for paged/svg/render/pdf-semantic sweeps). Regenerate

@@ -270,6 +270,11 @@ pub fn[T] Memory::grow(
 
 ///|
 /// Returns the underlying bytes of the linear memory.
+///
+/// # Note
+///
+/// Unlike upstream's slice, the returned buffer may be longer than the
+/// memory: only its first [`Memory::data_size`] bytes belong to it.
 pub fn[T] Memory::data(self : Memory, store : Store[T]) -> FixedArray[Byte] {
   store.inner.resolve_memory(self).data()
 }
