@@ -76,6 +76,30 @@
   original index (or use `stable_sort` on `Compare` types).
 - Measure with `moon run tests/runner --target native -- eval --dump`, then
   `python3 scripts/classify.py eval 60` for the biggest failure buckets.
+- Performance: `bench/run.sh` (hyperfine against the upstream binary, see
+  `bench/README.md`); profile with `moon run --profile --target native
+  --release cli -- query --ignore-system-fonts bench/longer.typ heading`.
+  comemo is replaced by `library/memo.mbt`: `layout_par_impl`,
+  `layout_fragment_impl` and the counter/state sequences are memoized for
+  one compilation (across introspection iterations). A memoized call's key
+  must fingerprint every argument except the engine (content, `StyleChain::
+  memo_hash`, regions, `Locator::memo_hash`, `Route::memo_hash`); introspector
+  reads are recorded and replayed for validation, sink effects are replayed,
+  frames are cloned. Keys go through `memo_fingerprint`, which refuses
+  values whose `Fingerprint` is lossy (`mark_fingerprint_lossy`: gradients,
+  tilings); a new `Fingerprint` that does not capture all data must mark
+  itself lossy. Results that can contain argument values also compare the
+  arguments with `Eq` (closures are equal only to themselves). Only memoize
+  pure functions of their arguments plus the tracked engine parts.
+- Performance: non-intrinsic core functions (`Byte::to_uint`,
+  `Byte::to_uint64`, `Int::to_uint64`, `Float::min`/`floor`/`to_int`,
+  `Double::floor`/`to_int`, ...) are compiled into the core bundle and are
+  never inlined into the generated C; in hot loops prefer intrinsics
+  (`Byte::to_int`, `reinterpret_as_*`, `UInt64::extend_uint`,
+  `FixedArray::unsafe_get` after one explicit bounds check) and avoid
+  per-element closures and iterators. Caches of pure functions (glyph
+  outlines, font selection, parsed numbering patterns) are fine; document
+  them as "not upstream" where they deviate structurally.
 - SVG export (`svg/`, port of typst-svg) is checked by two stages against
   the raw upstream SVGs (`scripts/goldens.sh svg`, pretty, merged pages, 1pt
   gap): `svg` compiles and exports each paged test; `svg-replay` exports
