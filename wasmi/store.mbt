@@ -74,13 +74,17 @@ pub struct Store[T] {
   /// All data that is not associated to `T`.
   inner : StoreInner
   /// The user provided host state.
-  mut data : T
+  ///
+  /// Note: boxed so that host function trampolines can share it without
+  /// referencing the store (which owns them): a reference cycle would keep
+  /// the store alive under reference counting.
+  priv data : Ref[T]
 }
 
 ///|
 /// Creates a new store.
 pub fn[T] Store::new(engine : Engine, data : T) -> Store[T] {
-  { inner: StoreInner::new(engine), data, }
+  { inner: StoreInner::new(engine), data: { val: data, }, }
 }
 
 ///|
@@ -92,13 +96,13 @@ pub fn[T] Store::engine(self : Store[T]) -> Engine {
 ///|
 /// Returns the host state of the store.
 pub fn[T] Store::data(self : Store[T]) -> T {
-  self.data
+  self.data.val
 }
 
 ///|
 /// Sets the host state of the store (upstream `data_mut`).
 pub fn[T] Store::set_data(self : Store[T], data : T) -> Unit {
-  self.data = data
+  self.data.val = data
 }
 
 // ---------------------------------------------------------------------------

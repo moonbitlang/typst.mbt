@@ -13,7 +13,7 @@ pub(all) struct FuncTranslator {
   /// Technically this is not needed since the information is redundant given via
   /// the `module` field. However, this acts like a faster access since `module`
   /// only holds a weak reference to the engine.
-  priv engine : Engine
+  priv engine : EngineWeak
   /// The immutable Wasm module resources.
   priv module : ModuleHeader
   /// This represents the reachability of the currently translated code.
@@ -228,7 +228,7 @@ fn FuncTranslator::push_results(
 
 ///|
 /// Returns the [`Engine`] for which the function is compiled.
-fn FuncTranslator::engine(self : FuncTranslator) -> Engine {
+fn FuncTranslator::engine(self : FuncTranslator) -> EngineWeak {
   self.engine
 }
 
@@ -695,7 +695,7 @@ fn FuncTranslator::frame_results(
 /// Returns the results [`SlotSpan`] of the `frame` if any.
 fn FuncTranslator::frame_results_impl(
   frame : FrameBase,
-  engine : Engine,
+  engine : EngineWeak,
   layout : StackLayout,
 ) -> @ir.SlotSpan? raise WasmiError {
   if frame.len_branch_params(engine) == 0 {

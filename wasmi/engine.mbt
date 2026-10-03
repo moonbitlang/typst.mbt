@@ -180,6 +180,26 @@ pub(all) struct Config {
 }
 
 ///|
+/// Returns a copy of the [`Config`] (upstream `Config: Clone`; [`Engine::new`]
+/// keeps its own copy).
+pub fn Config::clone(self : Config) -> Config {
+  {
+    stack: {
+      max_recursion_depth: self.stack.max_recursion_depth,
+      min_stack_height: self.stack.min_stack_height,
+      max_stack_height: self.stack.max_stack_height,
+      max_cached_stacks: self.stack.max_cached_stacks,
+    },
+    features: self.features,
+    consume_fuel: self.consume_fuel,
+    ignore_custom_sections: self.ignore_custom_sections,
+    fuel_costs: self.fuel_costs,
+    compilation_mode: self.compilation_mode,
+    limits: self.limits,
+  }
+}
+
+///|
 /// Returns the default [`WasmFeatures`].
 fn Config::default_features() -> @wasmparser.WasmFeatures {
   let features = @wasmparser.WasmFeatures::empty()
@@ -378,7 +398,7 @@ pub fn BlockType::func_type(func_type : DedupFuncType) -> BlockType {
 
 ///|
 /// Returns the number of parameters of the [`BlockType`].
-pub fn BlockType::len_params(self : BlockType, engine : Engine) -> Int {
+pub fn BlockType::len_params(self : BlockType, engine : EngineWeak) -> Int {
   match self {
     Empty | Returns(_) => 0
     FuncType(func_type) => engine.resolve_func_type(func_type).len_params()
@@ -387,7 +407,7 @@ pub fn BlockType::len_params(self : BlockType, engine : Engine) -> Int {
 
 ///|
 /// Returns the number of results of the [`BlockType`].
-pub fn BlockType::len_results(self : BlockType, engine : Engine) -> Int {
+pub fn BlockType::len_results(self : BlockType, engine : EngineWeak) -> Int {
   match self {
     Empty => 0
     Returns(_) => 1
@@ -399,7 +419,7 @@ pub fn BlockType::len_results(self : BlockType, engine : Engine) -> Int {
 /// Returns the function type of the [`BlockType`] (upstream `func_type_with`).
 pub fn BlockType::func_type_of(
   self : BlockType,
-  engine : Engine,
+  engine : EngineWeak,
 ) -> @wasmi_core.FuncType {
   match self {
     Empty =>
@@ -624,17 +644,28 @@ fn CodeMap::init_func_as_uncompiled(
 
 ///|
 /// Returns the [`CompiledFuncEntity`] of `func`, compiling it lazily if needed.
+///
+/// # Errors
+///
+/// - If translation or Wasm validation of `func` failed.
+/// - If `fuel` ran out in case fuel consumption is enabled.
 fn CodeMap::get(
   self : CodeMap,
+  fuel : @wasmi_core.Fuel?,
   func : EngineFunc,
 ) -> CompiledFuncEntity raise WasmiError {
   match self.funcs[func.0] {
     Compiled(entity) => entity
     Uncompiled(uncompiled) => {
       self.funcs[func.0] = Compiling
-      let compiled = uncompiled.compile() catch {
+      let compiled = uncompiled.compile(fuel) catch {
         error => {
-          self.funcs[func.0] = FailedToCompile
+          if error.as_trap_code() is Some(OutOfFuel) {
+            // The function stays uncompiled and can be compiled again.
+            self.funcs[func.0] = Uncompiled(uncompiled)
+          } else {
+            self.funcs[func.0] = FailedToCompile
+          }
           raise error
         }
       }
@@ -655,10 +686,33 @@ fn CodeMap::get(
 /// # Errors
 ///
 /// - If `func` fails to compile or validate.
+/// - If `fuel` ran out in case fuel consumption is enabled.
 fn UncompiledFuncEntity::compile(
   self : UncompiledFuncEntity,
+  fuel : @wasmi_core.Fuel?,
 ) -> CompiledFuncEntity raise WasmiError {
-  let config = self.module.engine_upgrade().config()
+  // The amount of fuel required to compile a function body per byte.
+  //
+  // This does _not_ include validation.
+  let compile_fuel_per_byte = 7UL
+  // The amount of fuel required to validate a function body per byte.
+  //
+  // This does _not_ include compilation.
+  let validate_fuel_per_byte = 2UL
+  if fuel is Some(fuel) {
+    let len_bytes = self.bytes.length().to_uint64()
+    let fuel_per_byte = if self.validation is Some(_) {
+      validate_fuel_per_byte + compile_fuel_per_byte
+    } else {
+      compile_fuel_per_byte
+    }
+    // Note: `len_bytes * 9` cannot overflow (`len_bytes` < 2^32).
+    (fuel.consume_fuel(_ => len_bytes * fuel_per_byte) |> ignore) catch {
+      OutOfFuel(required_fuel~) => raise ResumableOutOfFuel(required_fuel)
+      FuelMeteringDisabled => ()
+    }
+  }
+  let config = self.module.engine_upgrade().config
   // Note: upstream validates while translating (`ValidatingFuncTranslator`);
   // validating first yields the same result for valid bodies and the
   // validation error for invalid ones instead of translating them.
@@ -702,6 +756,7 @@ pub struct Engine {
 pub fn Engine::new(config : Config) -> Engine {
   let idx = engine_counter.val
   engine_counter.val += 1
+  let config = config.clone()
   {
     idx,
     config,
@@ -712,15 +767,49 @@ pub fn Engine::new(config : Config) -> Engine {
 }
 
 ///|
+/// A weak reference to an [`Engine`] (upstream `EngineWeak`): the parts that
+/// module headers and the translator need, without the code map. Module
+/// headers are referenced by the code map's uncompiled functions, so a
+/// strong reference would form a cycle that reference counting never frees.
+pub struct EngineWeak {
+  priv config : Config
+  priv func_types : FuncTypeRegistry
+}
+
+///|
+/// Creates a weak reference to the [`Engine`].
+pub fn Engine::weak(self : Engine) -> EngineWeak {
+  { config: self.config, func_types: self.func_types, }
+}
+
+///|
+/// Returns the [`Config`] of the referenced [`Engine`].
+pub fn EngineWeak::config(self : EngineWeak) -> Config {
+  self.config
+}
+
+///|
+/// Resolves a deduplicated function type into a [`FuncType`].
+pub fn EngineWeak::resolve_func_type(
+  self : EngineWeak,
+  func_type : DedupFuncType,
+) -> @wasmi_core.FuncType {
+  self.func_types.func_types[func_type.0]
+}
+
+///|
 /// Creates a new default [`Engine`].
 pub fn Engine::default() -> Engine {
   Engine::new(Config::default())
 }
 
 ///|
-/// Returns a shared reference to the [`Config`] of the [`Engine`].
+/// Returns the [`Config`] of the [`Engine`].
+///
+/// Note: upstream returns a shared reference; this returns a copy so that
+/// the engine's configuration cannot be changed after its creation.
 pub fn Engine::config(self : Engine) -> Config {
-  self.config
+  self.config.clone()
 }
 
 ///|
@@ -757,9 +846,10 @@ pub fn Engine::alloc_funcs(self : Engine, amount : Int) -> EngineFuncSpan {
 /// Returns the compiled function `func`, translating it lazily if needed.
 pub fn Engine::get_compiled(
   self : Engine,
+  fuel : @wasmi_core.Fuel?,
   func : EngineFunc,
 ) -> CompiledFuncEntity raise WasmiError {
-  self.code_map.get(func)
+  self.code_map.get(fuel, func)
 }
 
 ///|
@@ -789,7 +879,11 @@ pub fn Engine::translate_func(
     (LazyTranslation, Some(func_to_validate)) => {
       validate_func_body(func_to_validate, offset, bytes, self.config)
       self.code_map.init_func_as_uncompiled(
-        engine_func, func_index, bytes, module, None,
+        engine_func,
+        func_index,
+        bytes,
+        module,
+        None,
       )
     }
     (_, func_to_validate) =>

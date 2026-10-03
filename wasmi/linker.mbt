@@ -69,7 +69,7 @@ fn[T] Definition::as_func(self : Definition[T], store : Store[T]) -> Func? {
   match self {
     Extern(Func(func)) => Some(func)
     HostFunc(ty, func) => {
-      let trampoline = host_trampoline(store, ty, func)
+      let trampoline = host_trampoline(store.data, ty, func)
       let entity = HostFuncEntity::new(store.inner.engine, ty, trampoline)
       Some(store.inner.alloc_func(Host(entity)))
     }

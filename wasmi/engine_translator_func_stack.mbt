@@ -580,7 +580,10 @@ pub fn FrameBase::branch_to(self : FrameBase) -> Unit {
 
 ///|
 /// Returns the number of operands required for branching to the control frame.
-pub fn FrameBase::len_branch_params(self : FrameBase, engine : Engine) -> Int {
+pub fn FrameBase::len_branch_params(
+  self : FrameBase,
+  engine : EngineWeak,
+) -> Int {
   if self.is_loop {
     self.ty.len_params(engine)
   } else {
@@ -767,7 +770,7 @@ pub fn AcquiredTarget::control_frame(self : AcquiredTarget) -> FrameBase {
 /// The Wasm value stack during translation from Wasm to Wasmi bytecode.
 pub(all) struct TranslatorStack {
   /// The underlying [`Engine`].
-  priv engine : Engine
+  priv engine : EngineWeak
   /// The Wasm value stack.
   priv operands : OperandStack
   /// The Wasm control stack.
@@ -775,7 +778,7 @@ pub(all) struct TranslatorStack {
 }
 
 ///|
-pub fn TranslatorStack::new(engine : Engine) -> TranslatorStack {
+pub fn TranslatorStack::new(engine : EngineWeak) -> TranslatorStack {
   { engine, operands: OperandStack::new(), controls: ControlStack::new(), }
 }
 

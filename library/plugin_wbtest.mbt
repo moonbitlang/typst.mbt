@@ -33,7 +33,7 @@ fn plugin_test_unhex(hex : String) -> Bytes {
   let out = FixedArray::make(hex.length() / 2, b'\x00')
   for i in 0..<out.length() {
     out[i] = (digit(hex.code_unit_at(2 * i)) * 16 +
-      digit(hex.code_unit_at(2 * i + 1))).to_byte()
+    digit(hex.code_unit_at(2 * i + 1))).to_byte()
   }
   Bytes::from_fixedarray(out)
 }

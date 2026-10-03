@@ -40,8 +40,10 @@ pub fn Engine::execute_func(
   ) catch {
     // `error.into_resumable()`: resumable errors are turned back into
     // their non-resumable error (`ResumableError::into_error`).
-    Table(OutOfFuel(..)) | Memory(OutOfFuel(..)) | Fuel(OutOfFuel(..)) =>
-      raise WasmiError::TrapCode(OutOfFuel)
+    Table(OutOfFuel(..))
+    | Memory(OutOfFuel(..))
+    | Fuel(OutOfFuel(..))
+    | ResumableOutOfFuel(_) => raise WasmiError::TrapCode(OutOfFuel)
     error => raise error
   }
 }
@@ -88,7 +90,7 @@ fn EngineExecutor::execute_root_func(
       }
       let instance = wasm_func.instance
       let engine_func = wasm_func.body
-      let compiled_func = self.code_map.get(engine_func)
+      let compiled_func = self.code_map.get(Some(store.fuel), engine_func)
       let uninit_params = FrameParams::new()
       let frame = self.stack.values.alloc_call_frame(
         compiled_func, uninit_params,

@@ -25,7 +25,7 @@ pub(all) struct InstrEncoder {
 
 ///|
 /// Creates a new [`InstrEncoder`].
-pub fn InstrEncoder::new(engine : Engine) -> InstrEncoder {
+pub fn InstrEncoder::new(engine : EngineWeak) -> InstrEncoder {
   let config = engine.config()
   let fuel_costs = if config.get_consume_fuel() {
     Some(config.fuel_costs())

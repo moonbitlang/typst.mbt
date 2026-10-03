@@ -329,12 +329,20 @@ fn run_wasm_spec_file(
       "register" => {
         let as_name = parts[2]
         let name = parts[3]
-        if ctx.instance(name) is Some(instance) {
-          (ctx.linker.instance(ctx.store, as_name, instance) |> ignore) catch {
-            _ => ()
-          }
+        // Like the oracle, a missing instance (its module failed to
+        // instantiate, which the module line compares) registers nothing;
+        // a linker error fails the command (the oracle panics on one).
+        match ctx.instance(name) {
+          Some(instance) =>
+            try
+              ctx.linker.instance(ctx.store, as_name, instance) |> ignore
+            catch {
+              e => line + "\tregister failed: " + spec_escape(e.to_string())
+            } noraise {
+              _ => line
+            }
+          None => line
         }
-        line
       }
       "invoke" => {
         let field = spec_unhex_name(parts[3])
@@ -350,7 +358,11 @@ fn run_wasm_spec_file(
         skipped += 1
         continue
       }
-      _ => "unknown command"
+      _ => {
+        failed += 1
+        println("FAIL \{label}: unknown command: \{line}")
+        continue
+      }
     }
     if actual == line {
       passed += 1

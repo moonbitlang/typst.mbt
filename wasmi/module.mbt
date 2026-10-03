@@ -569,7 +569,7 @@ pub let default_memory_index : Int = 0
 ///|
 /// A parsed and validated WebAssembly module header.
 pub(all) struct ModuleHeader {
-  priv engine : Engine
+  priv engine : EngineWeak
   priv func_types : Array[DedupFuncType]
   priv imports : ModuleImports
   priv funcs : Array[DedupFuncType]
@@ -587,7 +587,7 @@ pub(all) struct ModuleHeader {
 
 ///|
 /// Returns the [`Engine`] of the [`ModuleHeader`] (upstream upgrades a weak reference).
-pub fn ModuleHeader::engine_upgrade(self : ModuleHeader) -> Engine {
+pub fn ModuleHeader::engine_upgrade(self : ModuleHeader) -> EngineWeak {
   self.engine
 }
 
@@ -736,7 +736,7 @@ fn ModuleHeaderBuilder::finish(self : ModuleHeaderBuilder) -> ModuleHeader {
     items.push(Global(name))
   }
   {
-    engine: self.engine,
+    engine: self.engine.weak(),
     func_types: self.func_types,
     imports: {
       items,

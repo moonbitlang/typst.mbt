@@ -38,6 +38,9 @@ pub(all) suberror WasmiError {
   Limits(EnforcedLimitsError)
   /// Encountered for Wasmi bytecode related errors.
   Ir(@ir.IrError)
+  /// A resumable out of fuel error (upstream `ResumableOutOfFuelError`),
+  /// carrying the minimum required amount of fuel to progress execution.
+  ResumableOutOfFuel(UInt64)
 }
 
 ///|
@@ -91,6 +94,7 @@ pub fn WasmiError::as_trap_code(self : WasmiError) -> @wasmi_core.TrapCode? {
     | Table(FillOutOfBounds)
     | Table(GrowOutOfBounds)
     | Table(InitOutOfBounds) => Some(TableOutOfBounds)
+    ResumableOutOfFuel(_) => Some(OutOfFuel)
     _ => None
   }
 }
@@ -125,6 +129,10 @@ pub impl Show for WasmiError with fn output(self, f) {
     Translation(error) => error.output(f)
     Limits(error) => error.output(f)
     Ir(error) => error.output(f)
+    ResumableOutOfFuel(required_fuel) =>
+      f.write_string(
+        "ran out of fuel while calling a resumable function: required_fuel=\{required_fuel}",
+      )
   }
 }
 

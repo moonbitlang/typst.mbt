@@ -21,7 +21,7 @@
 ///
 /// Returns the error of the host function if an error occurred.
 fn dispatch_host_func(
-  _store : StoreInner,
+  store : StoreInner,
   value_stack : ValueStack,
   host_func : HostFuncEntity,
   instance : Instance?,
@@ -43,7 +43,7 @@ fn dispatch_host_func(
   //       need to clean up the temporary buffer values here.
   //       This is required for resumable calls to work properly.
   errdefer value_stack.drop(max_inout)
-  (host_func.func)(instance, params_results)
+  (host_func.func)(store, instance, params_results)
   for i in 0..<len_results {
     value_stack.set(start + i, params_results.results[i])
   }
@@ -204,13 +204,13 @@ fn Executor::prepare_compiled_func_call(
   self : Executor,
   kind : CallKind,
   has_params : Bool,
-  _store : StoreInner,
+  store : StoreInner,
   results : @ir.SlotSpan,
   func : EngineFunc,
   instance : Instance?,
 ) -> Unit raise WasmiError {
   let mut instance = instance
-  let func = self.code_map.get(func)
+  let func = self.code_map.get(Some(store.fuel), func)
   let called = self.dispatch_compiled_func(has_params, results, func)
   match kind {
     Nested =>

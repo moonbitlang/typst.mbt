@@ -15,7 +15,7 @@ pub(all) struct FuncInOut {
 ///|
 /// A host function implementation: called with the caller instance (if any)
 /// and the parameters/results buffer.
-pub type Trampoline = (Instance?, FuncInOut) -> Unit raise WasmiError
+pub type Trampoline = (StoreInner, Instance?, FuncInOut) -> Unit raise WasmiError
 
 ///|
 /// A host function reference.
@@ -102,13 +102,13 @@ pub fn[T] Caller::get_export(self : Caller[T], name : String) -> Extern? {
 ///|
 /// Returns the host state of the store.
 pub fn[T] Caller::data(self : Caller[T]) -> T {
-  self.store.data
+  self.store.data.val
 }
 
 ///|
 /// Sets the host state of the store (upstream `data_mut`).
 pub fn[T] Caller::set_data(self : Caller[T], data : T) -> Unit {
-  self.store.data = data
+  self.store.data.val = data
 }
 
 ///|
@@ -127,7 +127,7 @@ pub fn[T] Func::new(
   ty : @wasmi_core.FuncType,
   func : (Caller[T], Array[Val], Array[Val]) -> Unit raise WasmiError,
 ) -> Func {
-  let trampoline = host_trampoline(store, ty, func)
+  let trampoline = host_trampoline(store.data, ty, func)
   let host_func = HostFuncEntity::new(store.inner.engine, ty, trampoline)
   store.inner.alloc_func(Host(host_func))
 }
@@ -135,12 +135,16 @@ pub fn[T] Func::new(
 ///|
 /// Wraps a dynamically typed host function into a [`Trampoline`] (upstream
 /// `HostFuncTrampolineEntity::new`).
-pub fn[T] host_trampoline(
-  store : Store[T],
+///
+/// The trampoline receives the calling store (as upstream) instead of
+/// capturing it, so that the store does not reference itself.
+fn[T] host_trampoline(
+  data : Ref[T],
   ty : @wasmi_core.FuncType,
   func : (Caller[T], Array[Val], Array[Val]) -> Unit raise WasmiError,
 ) -> Trampoline {
-  fn(instance, inout) raise WasmiError {
+  fn(inner, instance, inout) raise WasmiError {
+    let store : Store[T] = { inner, data, }
     let params = []
     for i, param_ty in ty.params() {
       params.push(store.inner.val_from_untyped(inout.params[i], param_ty))

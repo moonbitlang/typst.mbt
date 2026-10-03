@@ -23,8 +23,6 @@ pub let default_memory_index : Int
 
 pub fn fuel_base(@core.FuelCostsProvider) -> UInt64
 
-pub fn[T] host_trampoline(Store[T], @core.FuncType, (Caller[T], Array[Val], Array[Val]) -> Unit raise WasmiError) -> (Instance?, FuncInOut) -> Unit raise WasmiError
-
 pub let i32_store16_op : StoreWrapOperator
 
 pub let i32_store8_op : StoreWrapOperator
@@ -79,6 +77,7 @@ pub(all) suberror WasmiError {
   Translation(TranslationError)
   Limits(EnforcedLimitsError)
   Ir(@ir.IrError)
+  ResumableOutOfFuel(UInt64)
 }
 pub fn WasmiError::as_trap_code(Self) -> @core.TrapCode?
 pub fn WasmiError::from_ir(@ir.IrError) -> Self
@@ -121,9 +120,9 @@ pub(all) enum BlockType {
   FuncType(DedupFuncType)
 }
 pub fn BlockType::func_type(DedupFuncType) -> Self
-pub fn BlockType::func_type_of(Self, Engine) -> @core.FuncType
-pub fn BlockType::len_params(Self, Engine) -> Int
-pub fn BlockType::len_results(Self, Engine) -> Int
+pub fn BlockType::func_type_of(Self, EngineWeak) -> @core.FuncType
+pub fn BlockType::len_params(Self, EngineWeak) -> Int
+pub fn BlockType::len_results(Self, EngineWeak) -> Int
 pub fn BlockType::new(@wasmparser.BlockType, ModuleHeader) -> Self
 
 pub struct Caller[T] {
@@ -165,6 +164,7 @@ pub(all) struct Config {
   mut compilation_mode : CompilationMode
   mut limits : EnforcedLimits
 }
+pub fn Config::clone(Self) -> Self
 pub fn Config::compilation_mode(Self, CompilationMode) -> Self
 pub fn Config::default() -> Self
 pub fn Config::fuel_costs(Self) -> @core.FuelCostsProvider
@@ -270,11 +270,12 @@ pub fn Engine::alloc_funcs(Self, Int) -> EngineFuncSpan
 pub fn Engine::config(Self) -> Config
 pub fn Engine::default() -> Self
 pub fn Engine::execute_func(Self, StoreInner, Func, Array[Val], Array[Val]) -> Unit raise WasmiError
-pub fn Engine::get_compiled(Self, EngineFunc) -> CompiledFuncEntity raise WasmiError
+pub fn Engine::get_compiled(Self, @core.Fuel?, EngineFunc) -> CompiledFuncEntity raise WasmiError
 pub fn Engine::new(Config) -> Self
 pub fn Engine::resolve_func_type(Self, DedupFuncType) -> @core.FuncType
 pub fn Engine::same(Self, Self) -> Bool
 pub fn Engine::translate_func(Self, FuncIdx, EngineFunc, Int, BytesView, ModuleHeader, @wasmparser.FuncToValidate?) -> Unit raise WasmiError
+pub fn Engine::weak(Self) -> EngineWeak
 
 pub(all) struct EngineFunc(Int) derive(Compare, Eq, Hash, @debug.Debug)
 pub fn EngineFunc::from_internal(@ir.InternalFunc) -> Self
@@ -289,6 +290,12 @@ pub fn EngineFuncSpan::get(Self, Int) -> EngineFunc?
 pub fn EngineFuncSpan::get_or_panic(Self, Int) -> EngineFunc
 pub fn EngineFuncSpan::len(Self) -> Int
 pub fn EngineFuncSpan::position(Self, EngineFunc) -> Int?
+
+pub struct EngineWeak {
+  // private fields
+}
+pub fn EngineWeak::config(Self) -> Config
+pub fn EngineWeak::resolve_func_type(Self, DedupFuncType) -> @core.FuncType
 
 pub(all) struct EvalContext {
   get_global : (UInt) -> @core.UntypedVal?
@@ -347,7 +354,7 @@ pub fn FrameBase::consume_fuel_instr(Self) -> Instr?
 pub fn FrameBase::height(Self) -> Int
 pub fn FrameBase::is_branched_to(Self) -> Bool
 pub fn FrameBase::label(Self) -> LabelRef
-pub fn FrameBase::len_branch_params(Self, Engine) -> Int
+pub fn FrameBase::len_branch_params(Self, EngineWeak) -> Int
 pub fn FrameBase::ty(Self) -> BlockType
 
 pub(all) struct Func {
@@ -419,9 +426,9 @@ pub(all) struct HostFuncEntity {
   len_params : Int
   len_results : Int
   ty : DedupFuncType
-  func : (Instance?, FuncInOut) -> Unit raise WasmiError
+  func : (StoreInner, Instance?, FuncInOut) -> Unit raise WasmiError
 }
-pub fn HostFuncEntity::new(Engine, @core.FuncType, (Instance?, FuncInOut) -> Unit raise WasmiError) -> Self
+pub fn HostFuncEntity::new(Engine, @core.FuncType, (StoreInner, Instance?, FuncInOut) -> Unit raise WasmiError) -> Self
 
 pub(all) struct IfControlFrame {
   base : FrameBase
@@ -538,7 +545,7 @@ pub fn InstrEncoder::drain(Self) -> FixedArray[@ir.Op]
 pub fn InstrEncoder::encode_register_list(Self, ArrayView[Operand], StackLayout) -> Unit raise WasmiError
 pub fn InstrEncoder::get(Self, Instr) -> @ir.Op
 pub fn InstrEncoder::last_instr(Self) -> Instr?
-pub fn InstrEncoder::new(Engine) -> Self
+pub fn InstrEncoder::new(EngineWeak) -> Self
 pub fn InstrEncoder::next_instr(Self) -> Instr
 pub fn InstrEncoder::push_consume_fuel_instr(Self) -> Instr? raise WasmiError
 pub fn InstrEncoder::push_instr(Self, @ir.Op, Instr?, (@core.FuelCostsProvider) -> UInt64) -> Instr raise WasmiError
@@ -655,7 +662,7 @@ pub fn ModuleElementSegment::ty(Self) -> @core.ValType
 pub(all) struct ModuleHeader {
   // private fields
 }
-pub fn ModuleHeader::engine_upgrade(Self) -> Engine
+pub fn ModuleHeader::engine_upgrade(Self) -> EngineWeak
 pub fn ModuleHeader::get_engine_func(Self, FuncIdx) -> EngineFunc?
 pub fn ModuleHeader::get_func_index(Self, EngineFunc) -> FuncIdx?
 pub fn ModuleHeader::get_func_type(Self, FuncTypeIdx) -> DedupFuncType
@@ -741,7 +748,7 @@ pub(all) enum StackSpace {
 
 pub struct Store[T] {
   inner : StoreInner
-  mut data : T
+  // private fields
 }
 pub fn[T] Store::data(Self[T]) -> T
 pub fn[T] Store::engine(Self[T]) -> Engine
@@ -843,7 +850,7 @@ pub fn TranslatorStack::consume_fuel_instr(Self) -> Instr?
 pub fn TranslatorStack::height(Self) -> Int
 pub fn TranslatorStack::is_control_empty(Self) -> Bool
 pub fn TranslatorStack::max_height(Self) -> Int
-pub fn TranslatorStack::new(Engine) -> Self
+pub fn TranslatorStack::new(EngineWeak) -> Self
 pub fn TranslatorStack::operand_to_temp(Self, Int) -> Operand
 pub fn TranslatorStack::peek(Self, Int) -> Operand
 pub fn TranslatorStack::peek2(Self) -> (Operand, Operand)
@@ -903,7 +910,7 @@ pub type ConstEval2 = (@core.TypedVal, @core.TypedVal) -> @core.TypedVal raise @
 
 pub type FuelCostsFn = (@core.FuelCostsProvider) -> UInt64
 
-pub type Trampoline = (Instance?, FuncInOut) -> Unit raise WasmiError
+pub type Trampoline = (StoreInner, Instance?, FuncInOut) -> Unit raise WasmiError
 
 // Traits
 pub(open) trait AllocConst {
