@@ -680,7 +680,7 @@ pub(all) enum Operator {
   I64Sub128
   I64MulWideS
   I64MulWideU
-} derive(Show, Eq)
+} derive(Eq, Debug)
 
 ///|
 /// The proposal (`@<proposal>` group of `for_each_operator!`) that

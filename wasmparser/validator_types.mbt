@@ -11,7 +11,7 @@
 /// [`crate::Validator`].
 pub(all) struct CoreTypeId {
   index : UInt
-} derive(Eq, Hash, Compare, Show)
+} derive(Eq, Hash, Compare, Debug)
 
 ///|
 fn CoreTypeId::from_index(index : UInt) -> CoreTypeId {
@@ -29,7 +29,7 @@ pub fn CoreTypeId::index(self : CoreTypeId) -> Int {
 /// [`crate::Validator`].
 pub(all) struct RecGroupId {
   index : UInt
-} derive(Eq, Hash, Compare, Show)
+} derive(Eq, Hash, Compare, Debug)
 
 ///|
 fn RecGroupId::from_index(index : UInt) -> RecGroupId {
@@ -85,7 +85,9 @@ fn TypeInfo::core(size : UInt) -> TypeInfo {
 
 ///|
 fn TypeInfo::new_(size : UInt, contains_borrow : Bool) -> TypeInfo {
-  guard size < 1U << 24
+  if !(size < 1U << 24) {
+    abort("assertion failed: size < 1U << 24")
+  }
   TypeInfo(size | ((if contains_borrow { 1U } else { 0 }) << 31))
 }
 
@@ -122,7 +124,7 @@ pub(all) enum EntityType {
   Global(GlobalType)
   /// The entity is a tag.
   Tag(CoreTypeId)
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 fn EntityType::info(self : EntityType, types : TypeList) -> TypeInfo {

@@ -314,10 +314,10 @@ fn TypeCanonicalizer::canonicalize_type_index(
       // local type references will be direct self references. But any kind of
       // type recursion, including self references, is not allowed in the
       // typed function references proposal, only the GC proposal.
-      let local = index - self.rec_group_start
-      if local < self.rec_group_len {
+      let local_ = index - self.rec_group_start
+      if local_ < self.rec_group_len {
         if self.allow_gc() {
-          match PackedIndex::from_rec_group_index(local) {
+          match PackedIndex::from_rec_group_index(local_) {
             Some(id) => return id
             None =>
               bail(
@@ -340,7 +340,9 @@ fn TypeCanonicalizer::canonicalize_type_index(
         OnlyIds => {
           let (start, end) = self.within_rec_group.unwrap()
           let rec_group_len = end.index - start.index
-          guard local_index < rec_group_len
+          if !(local_index < rec_group_len) {
+            abort("assertion failed: local_index < rec_group_len")
+          }
           let id = CoreTypeId::from_index(start.index + local_index)
           PackedIndex::from_id(id).unwrap()
         }

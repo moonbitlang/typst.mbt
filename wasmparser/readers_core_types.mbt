@@ -30,7 +30,7 @@
 // * `01`: The `index` is an index into the containing type's recursion group.
 //
 // * `10`: The `index` is a `CoreTypeId`.
-pub(all) struct PackedIndex(UInt) derive(Eq, Hash, Compare)
+pub(all) struct PackedIndex(UInt) derive(Eq, Hash, Compare, Debug)
 
 ///|
 let packed_index_kind_mask : UInt = 0b11U << 20
@@ -179,7 +179,7 @@ pub(all) enum UnpackedIndex {
   RecGroup(UInt)
   /// A type identifier.
   Id(CoreTypeId)
-} derive(Eq, Hash)
+} derive(Eq, Hash, Debug)
 
 ///|
 /// Compress this index into its packed form.
@@ -242,13 +242,13 @@ pub impl Show for UnpackedIndex with fn output(self, logger) {
 /// Represents a recursive type group in a WebAssembly module.
 pub struct RecGroup {
   priv inner : RecGroupInner
-}
+} derive(Debug)
 
 ///|
 priv enum RecGroupInner {
   Implicit(Int, SubType)
   Explicit(Array[(Int, SubType)])
-}
+} derive(Debug)
 
 ///|
 fn RecGroup::explicit(types : Array[(Int, SubType)]) -> RecGroup {
@@ -289,7 +289,9 @@ pub fn RecGroup::len(self : RecGroup) -> Int {
 pub fn RecGroup::get(self : RecGroup, i : Int) -> SubType {
   match self.inner {
     Implicit(_, ty) => {
-      guard i == 0
+      if !(i == 0) {
+        abort("assertion failed: i == 0")
+      }
       ty
     }
     Explicit(types) => types[i].1
@@ -347,7 +349,7 @@ pub(all) struct SubType {
   mut supertype_idx : PackedIndex?
   /// The composite type of the subtype.
   composite_type : CompositeType
-} derive(Eq, Hash)
+} derive(Eq, Hash, Debug)
 
 ///|
 pub impl Show for SubType with fn output(self, logger) {
@@ -431,7 +433,7 @@ pub(all) struct CompositeType {
   /// Is the composite type shared? This is part of the
   /// shared-everything-threads proposal.
   shared : Bool
-} derive(Eq, Hash)
+} derive(Eq, Hash, Debug)
 
 ///|
 /// A [`CompositeType`] can contain one of these types.
@@ -444,7 +446,7 @@ pub(all) enum CompositeInnerType {
   Struct(StructType)
   /// The type is for a continuation.
   Cont(ContType)
-} derive(Eq, Hash)
+} derive(Eq, Hash, Debug)
 
 ///|
 pub impl Show for CompositeType with fn output(self, logger) {
@@ -505,15 +507,25 @@ pub struct FuncType {
   priv params_results : Array[ValType]
   /// The number of parameter types.
   priv len_params : Int
-} derive(Eq, Hash)
+} derive(Eq, Hash, Debug)
 
 ///|
 pub impl Show for FuncType with fn output(self, logger) {
-  logger.write_string("FuncType { params: ")
-  logger.write_string(self.params().to_string())
-  logger.write_string(", results: ")
-  logger.write_string(self.results().to_string())
-  logger.write_string(" }")
+  logger.write_string("FuncType { params: [")
+  for i, ty in self.params() {
+    if i > 0 {
+      logger.write_string(", ")
+    }
+    ty.output(logger)
+  }
+  logger.write_string("], results: [")
+  for i, ty in self.results() {
+    if i > 0 {
+      logger.write_string(", ")
+    }
+    ty.output(logger)
+  }
+  logger.write_string("] }")
 }
 
 ///|
@@ -533,7 +545,9 @@ fn FuncType::from_raw_parts(
   params_results : Array[ValType],
   len_params : Int,
 ) -> FuncType {
-  guard len_params <= params_results.length()
+  if !(len_params <= params_results.length()) {
+    abort("assertion failed: len_params <= params_results.length()")
+  }
   { params_results, len_params, }
 }
 
@@ -551,7 +565,7 @@ pub fn FuncType::results(self : FuncType) -> ArrayView[ValType] {
 
 ///|
 /// Represents a type of an array in a WebAssembly module.
-pub(all) struct ArrayType(FieldType) derive(Eq, Hash)
+pub(all) struct ArrayType(FieldType) derive(Eq, Hash, Debug)
 
 ///|
 /// Represents a field type of an array or a struct.
@@ -560,7 +574,7 @@ pub(all) struct FieldType {
   mut element_type : StorageType
   /// Are elements mutable.
   mutable : Bool
-} derive(Eq, Hash)
+} derive(Eq, Hash, Debug)
 
 ///|
 fn FieldType::remap_indices(
@@ -583,7 +597,7 @@ pub(all) enum StorageType {
   I16
   /// The storage type is a value type.
   Val(ValType)
-} derive(Eq, Hash)
+} derive(Eq, Hash, Debug)
 
 ///|
 pub impl Show for StorageType with fn output(self, logger) {
@@ -616,13 +630,13 @@ pub fn StorageType::unpack(self : StorageType) -> ValType {
 pub(all) struct StructType {
   /// Struct fields.
   fields : Array[FieldType]
-} derive(Eq, Hash)
+} derive(Eq, Hash, Debug)
 
 ///|
 /// Represents a type of a continuation in a WebAssembly module.
 pub(all) struct ContType {
   mut idx : PackedIndex
-} derive(Eq, Hash)
+} derive(Eq, Hash, Debug)
 
 ///|
 fn ContType::remap_indices(
@@ -647,7 +661,7 @@ pub(all) enum ValType {
   V128
   /// The value type is a reference.
   Ref(RefType)
-} derive(Eq, Hash)
+} derive(Eq, Hash, Debug)
 
 ///|
 pub impl Show for ValType with fn output(self, logger) {
@@ -781,7 +795,7 @@ fn ValType::remap_indices(
 //
 //   0000 = none
 //   ```
-pub(all) struct RefType(UInt) derive(Eq, Hash)
+pub(all) struct RefType(UInt) derive(Eq, Hash, Debug)
 
 ///|
 pub impl Show for RefType with fn output(self, logger) {
@@ -1262,16 +1276,7 @@ pub(all) enum HeapType {
   ///
   /// Introduced in the function-references proposal.
   Concrete(UnpackedIndex)
-} derive(Eq, Hash)
-
-///|
-pub impl Show for HeapType with fn output(self, logger) {
-  match self {
-    Abstract(shared~, ty~) =>
-      logger.write_string("Abstract { shared: \{shared}, ty: \{ty} }")
-    Concrete(i) => logger.write_string("Concrete(\{i})")
-  }
-}
+} derive(Eq, Hash, Debug)
 
 ///|
 /// Alias for an unshared `func` heap type.
@@ -1363,7 +1368,7 @@ pub(all) enum AbstractHeapType {
   ///
   /// Introduced in the stack-switching proposal.
   NoCont
-} derive(Eq, Hash, Show)
+} derive(Eq, Hash, Debug)
 
 ///|
 fn AbstractHeapType::as_str(self : AbstractHeapType, nullable : Bool) -> String {
@@ -1665,7 +1670,7 @@ pub(all) struct TableType {
   ///
   /// This is included the shared-everything-threads proposal.
   shared : Bool
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// Gets the index type for the table.
@@ -1711,7 +1716,7 @@ pub(all) struct MemoryType {
   ///
   /// [The custom-page-sizes proposal]: https://github.com/WebAssembly/custom-page-sizes
   page_size_log2 : UInt?
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// Gets the index type for the memory.
@@ -1732,14 +1737,14 @@ pub(all) struct GlobalType {
   mutable : Bool
   /// Whether or not the global is shared.
   shared : Bool
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// Represents a tag kind.
 pub(all) enum TagKind {
   /// The tag is an exception type.
   Exception
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// A tag's type.
@@ -1748,7 +1753,7 @@ pub(all) struct TagType {
   kind : TagKind
   /// The function type this tag uses.
   func_type_idx : UInt
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// A reader for the type section of a WebAssembly module.

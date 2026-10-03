@@ -12,7 +12,7 @@ pub(all) enum BlockType {
   ///
   /// The index is to a function type in the types section.
   FuncType(UInt)
-} derive(Eq, Hash, Show)
+} derive(Eq, Hash, Debug)
 
 ///|
 /// The kind of a control flow `Frame`.
@@ -49,7 +49,7 @@ pub(all) enum FrameKind {
   ///
   /// See: `WasmFeatures::legacy_exceptions` Note in `crates/wasmparser/src/features.rs`
   LegacyCatchAll
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// Represents a memory immediate in a WebAssembly memory instruction.
@@ -75,7 +75,7 @@ pub(all) struct MemArg {
   /// is always zero unless the multi-memory proposal of WebAssembly is
   /// enabled.
   memory : UInt
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// A br_table entries representation.
@@ -84,14 +84,14 @@ pub(all) struct MemArg {
 pub(all) struct BrTable {
   priv targets : Array[UInt]
   priv default : UInt
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// An IEEE binary32 immediate floating point value, represented as a u32
 /// containing the bit pattern.
 ///
 /// All bit patterns are allowed.
-pub(all) struct Ieee32(UInt) derive(Eq, Hash, Show)
+pub(all) struct Ieee32(UInt) derive(Eq, Hash, Debug)
 
 ///|
 /// Gets the underlying bits of the 32-bit float.
@@ -104,7 +104,7 @@ pub fn Ieee32::bits(self : Ieee32) -> UInt {
 /// containing the bit pattern.
 ///
 /// All bit patterns are allowed.
-pub(all) struct Ieee64(UInt64) derive(Eq, Hash, Show)
+pub(all) struct Ieee64(UInt64) derive(Eq, Hash, Debug)
 
 ///|
 /// Gets the underlying bits of the 64-bit float.
@@ -114,7 +114,7 @@ pub fn Ieee64::bits(self : Ieee64) -> UInt64 {
 
 ///|
 /// Represents a 128-bit vector value (16 bytes, little endian).
-pub(all) struct V128(Bytes) derive(Eq, Hash, Show)
+pub(all) struct V128(Bytes) derive(Eq, Hash, Debug)
 
 ///|
 /// Gets the bytes of the 128-bit vector value.
@@ -138,7 +138,7 @@ pub(all) enum Ordering {
   /// Like `AcqRel` but all threads see all sequentially consistent
   /// operations in the same order.
   SeqCst
-} derive(Eq, Hash, Show)
+} derive(Eq, Hash, Debug)
 
 ///|
 /// A reader for a core WebAssembly function's operators.
@@ -218,7 +218,7 @@ pub(all) struct TryTable {
   ty : BlockType
   /// Outer blocks which will receive exceptions.
   catches : Array[Catch]
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// Catch clauses that can be specified in [`TryTable`].
@@ -231,7 +231,7 @@ pub(all) enum Catch {
   All(label~ : UInt)
   /// Equivalent of `catch_all_ref`
   AllRef(label~ : UInt)
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 pub impl FromReader for TryTable with fn from_reader(reader) {
@@ -270,7 +270,7 @@ pub(all) struct ResumeTable {
   /// Either the outer blocks which will handle suspensions or
   /// "switch-to" handlers.
   handlers : Array[Handle]
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// Handle clauses that can be specified in [`ResumeTable`].
@@ -279,7 +279,7 @@ pub(all) enum Handle {
   OnLabel(tag~ : UInt, label~ : UInt)
   /// Equivalent of `(on $tag switch)`.
   OnSwitch(tag~ : UInt)
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// Returns the number of entries in the table.

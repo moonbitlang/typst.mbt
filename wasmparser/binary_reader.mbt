@@ -7,7 +7,7 @@ let wasm_magic_number : Bytes = b"\x00asm"
 pub(all) enum BinaryReaderErrorKind {
   Custom
   Invalid
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// A binary reader for WebAssembly modules.
@@ -118,7 +118,7 @@ fn[T] bail(offset : Int, message : String) -> T raise BinaryReaderError {
 pub(all) struct Range {
   start : Int
   end : Int
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// A binary reader of the WebAssembly structures and types.
@@ -878,7 +878,7 @@ pub fn BinaryReader::read_unlimited_string(
 /// `str::from_utf8`: `None` for any invalid sequence (overlong encodings,
 /// surrogates, code points above U+10FFFF, truncated sequences).
 fn decode_utf8(data : Bytes, start : Int, len : Int) -> String? {
-  let buf = StringBuilder::new(size_hint=len)
+  let buf = StringBuilder(size_hint=len)
   let end = start + len
   let mut i = start
   while i < end {
@@ -1244,31 +1244,12 @@ pub fn BinaryReader::read_operator(
       let tag_index = self.read_var_u32()
       Switch(cont_type_index~, tag_index~)
     }
-    0x11 => {
-      let index = self.read_var_u32()
-      let table = self.read_table_index_or_zero_if_not_reference_types()
-      CallIndirect(type_index=index, table_index=table)
-    }
     0x1c => {
       let results = self.read_var_u32()
       if results != 1 {
         raise BinaryReaderError::new("invalid result arity", self.position)
       }
       TypedSelect(ty=ValType::from_reader(self))
-    }
-    0x3f => {
-      let mem = self.read_memory_index_or_zero_if_not_multi_memory()
-      MemorySize(mem~)
-    }
-    0x40 => {
-      let mem = self.read_memory_index_or_zero_if_not_multi_memory()
-      MemoryGrow(mem~)
-    }
-    0xe4 => {
-      let cont_type_index = self.read_var_u32()
-      let tag_index = self.read_var_u32()
-      let resume_table = ResumeTable::from_reader(self)
-      ResumeThrow(cont_type_index~, tag_index~, resume_table~)
     }
     0xfb => self.read_0xfb_operator(pos)
     0xfc => self.read_0xfc_operator(pos)
@@ -1282,7 +1263,7 @@ pub fn BinaryReader::read_operator(
 ///|
 /// `cast_flags:08b`.
 fn binary8(x : Byte) -> String {
-  let buf = StringBuilder::new()
+  let buf = StringBuilder()
   for i = 7; i >= 0; i = i - 1 {
     buf.write_char(if ((x.to_int() >> i) & 1) != 0 { '1' } else { '0' })
   }
@@ -1844,7 +1825,7 @@ fn pretty_hex_bytes(bytes : BytesView) -> String {
   if bytes.length() == 0 {
     return "[]"
   }
-  let buf = StringBuilder::new()
+  let buf = StringBuilder()
   buf.write_string("[\n")
   for b in bytes {
     buf.write_string("    0x")

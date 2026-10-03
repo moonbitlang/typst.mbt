@@ -5,8 +5,9 @@
 //
 // The corpus is `tests/golden/wasm-spec/corpus` (the official WebAssembly
 // test suite, `scripts/wasm_spec_extract.sh`) plus the Typst test plugins of
-// `typst-dev-assets` and deterministic mutations of them (keyed
-// `plugins/<name>@cut:<len>` / `@set:<pos>:<byte>`).
+// `typst-dev-assets` (as `plugins/<name>`), and deterministic mutations of
+// the binaries that validate (keyed `<name>@cut:<len>` /
+// `<name>@set:<pos>:<byte>`).
 
 ///|
 let wasm_spec_corpus : String = "tests/golden/wasm-spec/corpus"
@@ -236,21 +237,29 @@ fn apply_wasm_mutation(bytes : Bytes, m : String) -> Bytes {
     "set" => {
       let pos = parse_decimal(parts[1])
       let byte = parse_decimal(parts[2])
-      Bytes::makei(bytes.length(), i => {
-        if i == pos {
-          byte.to_byte()
-        } else {
-          bytes[i]
-        }
-      })
+      let a = bytes.to_fixedarray()
+      a[pos] = byte.to_byte()
+      Bytes::from_fixedarray(a)
     }
     _ => abort("unknown mutation \{m}")
   }
 }
 
 ///|
+/// `--wasm-corpus=<dir>` and `--wasm-golden=<file>` replace the corpus and
+/// the golden (for ad-hoc corpora run through `gen_wasmparser_tests`).
 fn run_wasm_validate_stage(filter : String?, verbose : Bool) -> Unit {
-  let golden = read(golden_dir + "/wasm-spec/validate.tsv")
+  let mut corpus_dir = wasm_spec_corpus
+  let mut golden_path = golden_dir + "/wasm-spec/validate.tsv"
+  for a in @env.args() {
+    if a.has_prefix("--wasm-corpus=") {
+      corpus_dir = a.unsafe_substring(start=14, end=a.length())
+    }
+    if a.has_prefix("--wasm-golden=") {
+      golden_path = a.unsafe_substring(start=14, end=a.length())
+    }
+  }
+  let golden = read(golden_path)
   let expected : Map[String, String] = {}
   let order = []
   for line in golden.split("\n") {
@@ -267,49 +276,52 @@ fn run_wasm_validate_stage(filter : String?, verbose : Bool) -> Unit {
   }
   let files : Map[String, String] = {}
   let corpus = []
-  wasm_files(wasm_spec_corpus, "", corpus)
+  wasm_files(corpus_dir, "", corpus)
   for f in corpus {
     files.set(f.0, f.1)
   }
   let plugins = cargo_checkout_files("typst-dev-assets-") + "/plugins"
   let mut passed = 0
   let mut failed = 0
-  let plugin_cache : Map[String, Bytes] = {}
+  // The last file read (mutations follow their file).
+  let cache : Map[String, Bytes] = {}
   for name in order {
     if filter is Some(f) && !name.contains(f) {
       continue
     }
-    let bytes = if name.has_prefix("plugins/") {
-      let rest = name.unsafe_substring(start=8, end=name.length())
-      let (file, mutation) = match rest.find("@") {
-        Some(i) =>
-          (
-            rest.unsafe_substring(start=0, end=i),
-            Some(rest.unsafe_substring(start=i + 1, end=rest.length())),
-          )
-        None => (rest, None)
-      }
-      let data = match plugin_cache.get(file) {
-        Some(d) => d
-        None => {
-          let d = read_bytes(plugins + "/" + file)
-          plugin_cache.set(file, d)
-          d
-        }
-      }
-      match mutation {
-        Some(m) => apply_wasm_mutation(data, m)
-        None => data
-      }
+    let (file, mutation) = match name.find("@") {
+      Some(i) =>
+        (
+          name.unsafe_substring(start=0, end=i),
+          Some(name.unsafe_substring(start=i + 1, end=name.length())),
+        )
+      None => (name, None)
+    }
+    let path = if file.has_prefix("plugins/") {
+      Some(plugins + "/" + file.unsafe_substring(start=8, end=file.length()))
     } else {
-      match files.get(name) {
-        Some(path) => read_bytes(path)
-        None => {
-          failed += 1
-          println("FAIL \{name} (missing file)")
-          continue
+      files.get(file)
+    }
+    let data = match cache.get(file) {
+      Some(d) => d
+      None =>
+        match path {
+          Some(path) => {
+            let d = read_bytes(path)
+            cache.clear()
+            cache.set(file, d)
+            d
+          }
+          None => {
+            failed += 1
+            println("FAIL \{name} (missing file)")
+            continue
+          }
         }
-      }
+    }
+    let bytes = match mutation {
+      Some(m) => apply_wasm_mutation(data, m)
+      None => data
     }
     let actual = wasm_validate_line(name, bytes)
     let want = expected.get(name).unwrap()

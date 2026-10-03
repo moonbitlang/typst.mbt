@@ -311,7 +311,9 @@ pub impl FromReader for Element with fn from_reader(reader) {
   let items : ElementItems = if exprs {
     Expressions(ty.unwrap_or(reftype_funcref), SectionLimited::new(data))
   } else {
-    guard ty is None
+    if !(ty is None) {
+      abort("assertion failed: ty is None")
+    }
     Functions(SectionLimited::new(data))
   }
   let elem_end = reader.original_position()
@@ -336,7 +338,7 @@ pub(all) enum ExternalKind {
   Global
   /// The external kind is a tag.
   Tag
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// Represents an export in a WebAssembly module.
@@ -347,7 +349,7 @@ pub(all) struct Export {
   kind : ExternalKind
   /// The index of the exported item.
   index : UInt
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 pub impl FromReader for Export with fn from_reader(reader) {
@@ -420,7 +422,7 @@ pub(all) enum TypeRef {
   ///
   /// The value is an index in the types index space.
   Tag(TagType)
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// Represents an import in a WebAssembly module.
@@ -431,7 +433,7 @@ pub(all) struct Import {
   name : String
   /// The type of the imported item.
   ty : TypeRef
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 pub impl FromReader for Import with fn from_reader(reader) {
@@ -603,3 +605,45 @@ pub impl FromReader for TagType with fn from_reader(reader) {
   }
   { kind: Exception, func_type_idx: reader.read_var_u32(), }
 }
+
+// --- Section reader aliases (upstream `<Name>SectionReader<'a>`) ---
+
+///|
+/// A reader for the import section of a WebAssembly module.
+pub type ImportSectionReader = SectionLimited[Import]
+
+///|
+/// A reader for the function section of a WebAssembly module.
+pub type FunctionSectionReader = SectionLimited[UInt]
+
+///|
+/// A reader for the table section of a WebAssembly module.
+pub type TableSectionReader = SectionLimited[Table]
+
+///|
+/// A reader for the memory section of a WebAssembly module.
+pub type MemorySectionReader = SectionLimited[MemoryType]
+
+///|
+/// A reader for the tag section of a WebAssembly module.
+pub type TagSectionReader = SectionLimited[TagType]
+
+///|
+/// A reader for the global section of a WebAssembly module.
+pub type GlobalSectionReader = SectionLimited[Global]
+
+///|
+/// A reader for the export section of a WebAssembly module.
+pub type ExportSectionReader = SectionLimited[Export]
+
+///|
+/// A reader for the element section of a WebAssembly module.
+pub type ElementSectionReader = SectionLimited[Element]
+
+///|
+/// A reader for the code section of a WebAssembly module.
+pub type CodeSectionReader = SectionLimited[FunctionBody]
+
+///|
+/// A reader for the data section of a WebAssembly module.
+pub type DataSectionReader = SectionLimited[Data]

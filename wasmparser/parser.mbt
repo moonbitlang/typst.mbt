@@ -28,7 +28,7 @@ pub(all) enum Encoding {
   Module
   /// The encoding format is a WebAssembly component.
   Component
-} derive(Eq, Show)
+} derive(Eq, Debug)
 
 ///|
 /// An incremental parser of a binary WebAssembly module or component.
@@ -412,7 +412,7 @@ fn Parser::parse_reader(
         (Module, 9) => ElementSection(section(reader, len, SectionLimited::new))
         (Module, 10) => {
           let start = reader.original_position()
-          let len = Ref::new(len)
+          let len : Ref[UInt] = { val: len, }
           let count = delimited(reader, len, r => r.read_var_u32())
           let range = {
             start,
@@ -447,7 +447,9 @@ fn Parser::parse_reader(
     // ... otherwise trailing bytes with no remaining entries in these
     // sections indicates an error.
     FunctionBody(remaining=0, len~) => {
-      guard len > 0
+      if !(len > 0) {
+        abort("assertion failed: len > 0")
+      }
       let offset = reader.original_position()
       raise BinaryReaderError::new("trailing bytes at end of section", offset)
     }
@@ -466,7 +468,7 @@ fn Parser::parse_reader(
     // `delimited`. Actual parsing of the function body is delegated to
     // the caller to iterate over the `FunctionBody` structure.
     FunctionBody(remaining~, len~) => {
-      let len = Ref::new(len)
+      let len : Ref[UInt] = { val: len, }
       let body = delimited(reader, len, r => FunctionBody::new(r.read_reader()))
       self.state = FunctionBody(remaining=remaining - 1, len=len.val)
       CodeSectionEntry(body)

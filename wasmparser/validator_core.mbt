@@ -282,7 +282,9 @@ fn ModuleState::check_const_expr(
   validator.ops.finish(ops.original_position())
 
   // See comment in `RefFunc` below for why this is an assert.
-  guard !validator.uninserted_funcref
+  if !(!validator.uninserted_funcref) {
+    abort("assertion failed: !validator.uninserted_funcref")
+  }
   self.const_expr_allocs = validator.ops.into_allocations()
 }
 
@@ -410,7 +412,7 @@ fn VisitConstOperator::not_const(
 }
 
 ///|
-pub(all) struct Module {
+struct Module {
   // This is set once the code section starts.
   // `WasmModuleResources` implementations use the snapshot to
   // enable parallel validation of functions.
@@ -445,7 +447,7 @@ fn Module::default() -> Module {
     data_count: None,
     functions: [],
     tags: [],
-    function_references: @hashset.new(),
+    function_references: @hashset.HashSet([]),
     imports: {},
     exports: {},
     type_size: 1,
@@ -878,7 +880,7 @@ fn Module::max_memories(_self : Module, features : WasmFeatures) -> Int {
 ///|
 fn Module::export_to_entity_type(
   self : Module,
-  export : Export,
+  export_ : Export,
   offset : Int,
 ) -> EntityType raise BinaryReaderError {
   let check = (ty : String, index : UInt, total : Int) => {
@@ -886,27 +888,27 @@ fn Module::export_to_entity_type(
       bail(offset, "unknown \{ty} \{index}: exported \{ty} index out of bounds")
     }
   }
-  let index = export.index.reinterpret_as_int()
-  match export.kind {
+  let index = export_.index.reinterpret_as_int()
+  match export_.kind {
     Func => {
-      check("function", export.index, self.functions.length())
-      self.function_references.add(export.index)
+      check("function", export_.index, self.functions.length())
+      self.function_references.add(export_.index)
       Func(self.types[self.functions[index].reinterpret_as_int()])
     }
     Table => {
-      check("table", export.index, self.tables.length())
+      check("table", export_.index, self.tables.length())
       Table(self.tables[index])
     }
     Memory => {
-      check("memory", export.index, self.memories.length())
+      check("memory", export_.index, self.memories.length())
       Memory(self.memories[index])
     }
     Global => {
-      check("global", export.index, self.globals.length())
+      check("global", export_.index, self.globals.length())
       Global(self.globals[index])
     }
     Tag => {
-      check("tag", export.index, self.tags.length())
+      check("tag", export_.index, self.tags.length())
       Tag(self.tags[index])
     }
   }

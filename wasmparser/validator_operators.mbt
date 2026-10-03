@@ -16,7 +16,7 @@
 // `validator_operators_todo_gen.mbt`).
 
 ///|
-pub(all) struct OperatorValidator {
+struct OperatorValidator {
   locals : Locals
   priv local_inits : LocalInits
 
@@ -137,7 +137,7 @@ fn LocalInits::clear(self : LocalInits) -> Unit {
 let max_locals_to_track : Int = 50
 
 ///|
-pub(all) struct Locals {
+struct Locals {
   // Total number of locals in the function.
   priv mut num_locals : UInt
 
@@ -179,7 +179,7 @@ pub(all) struct Frame {
   mut unreachable : Bool
   /// The number of initializations in the stack at the time of its creation
   init_height : Int
-} derive(Show)
+} derive(Debug)
 
 ///|
 /// `OperatorValidatorTemp`: the operator validator together with the
@@ -1850,7 +1850,9 @@ fn OperatorValidatorTemp::visit_end(
   }
   if self.inner.control.length() == 0 &&
     self.inner.end_which_emptied_control is None {
-    guard self.offset != 0
+    if !(self.offset != 0) {
+      abort("assertion failed: self.offset != 0")
+    }
     self.inner.end_which_emptied_control = Some(self.offset)
   }
 }

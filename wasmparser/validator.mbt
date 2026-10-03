@@ -60,10 +60,10 @@ fn combine_type_sizes(
 /// you get identifiers out of (e.g. [`CoreTypeId`][crate::types::CoreTypeId])
 /// and then later assert that you are pairing those identifiers with the same
 /// `Validator` instance when accessing the identifier's associated data.
-pub(all) struct ValidatorId(Int) derive(Eq, Hash, Show)
+pub(all) struct ValidatorId(Int) derive(Eq, Hash, Debug)
 
 ///|
-let validator_id_counter : Ref[Int] = Ref::new(0)
+let validator_id_counter : Ref[Int] = { val: 0, }
 
 ///|
 fn ValidatorId::default() -> ValidatorId {
@@ -435,7 +435,9 @@ pub fn Validator::version(
   self.state = match encoding {
     Module =>
       if num == wasm_module_version {
-        guard self.module_ is None
+        if !(self.module_ is None) {
+          abort("assertion failed: self.module_ is None")
+        }
         self.module_ = Some(ModuleState::default())
         Module
       } else {

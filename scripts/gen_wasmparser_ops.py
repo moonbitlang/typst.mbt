@@ -140,7 +140,7 @@ def gen_operator(ops):
             out.append(f"  {name}({args})\n")
         else:
             out.append(f"  {name}\n")
-    out.append("} derive(Show, Eq)\n\n")
+    out.append("} derive(Eq, Debug)\n\n")
     # proposal / visit name accessors
     out.append("///|\n/// The proposal (`@<proposal>` group of `for_each_operator!`) that\n/// introduced this operator.\n")
     out.append("pub fn Operator::proposal(self : Operator) -> String {\n  match self {\n")

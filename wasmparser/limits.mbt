@@ -77,13 +77,21 @@ pub const DEFAULT_WASM_PAGE_SIZE : UInt64 = 65536
 
 ///|
 pub fn max_wasm_memory32_pages(page_size : UInt64) -> UInt64 {
-  guard page_size.popcnt() == 1 && page_size <= DEFAULT_WASM_PAGE_SIZE
+  if !(page_size.popcnt() == 1 && page_size <= DEFAULT_WASM_PAGE_SIZE) {
+    abort(
+      "assertion failed: page_size.popcnt() == 1 && page_size <= DEFAULT_WASM_PAGE_SIZE",
+    )
+  }
   (1UL << 32) / page_size
 }
 
 ///|
 pub fn max_wasm_memory64_pages(page_size : UInt64) -> UInt64 {
-  guard page_size.popcnt() == 1 && page_size <= DEFAULT_WASM_PAGE_SIZE
+  if !(page_size.popcnt() == 1 && page_size <= DEFAULT_WASM_PAGE_SIZE) {
+    abort(
+      "assertion failed: page_size.popcnt() == 1 && page_size <= DEFAULT_WASM_PAGE_SIZE",
+    )
+  }
   // `u64::try_from((1_u128 << 64) / u128::from(page_size)).unwrap_or(u64::MAX)`
   if page_size == 1 {
     0xFFFF_FFFF_FFFF_FFFFUL

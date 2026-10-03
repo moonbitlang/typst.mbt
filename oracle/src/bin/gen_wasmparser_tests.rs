@@ -15,10 +15,11 @@
 //! <relative path>\tpanic          (a payload wasmi panics on)
 //! ```
 //!
-//! For the plugins there are additionally lines for deterministic mutations
-//! (truncations and byte replacements), keyed `plugins/<name>@<mutation>`
-//! where `<mutation>` is `cut:<len>` (keep the first `len` bytes) or
-//! `set:<pos>:<byte>` (replace the byte at `pos`, both decimal). Messages
+//! For every binary that validates there are additionally lines for
+//! deterministic mutations (truncations and byte replacements; 3 per corpus
+//! file, 440 per plugin), keyed `<name>@<mutation>` where `<mutation>` is
+//! `cut:<len>` (keep the first `len` bytes) or `set:<pos>:<byte>` (replace
+//! the byte at `pos`, both decimal). Messages
 //! escape `\` as `\\`, newline as `\n` and tab as `\t`.
 //!
 //! The driver (`validate_like_wasmi`) mirrors `wasmi::ModuleParser`'s
@@ -256,11 +257,18 @@ fn collect(dir: &Path, out: &mut Vec<PathBuf>) {
     }
 }
 
-/// Deterministic mutations of a plugin: truncations and byte replacements.
-fn mutations(bytes: &[u8]) -> Vec<(String, Vec<u8>)> {
+/// Deterministic mutations of `bytes`: `cuts` truncations and `sets` byte
+/// replacements.
+fn mutations(bytes: &[u8], cuts: usize, sets: usize) -> Vec<(String, Vec<u8>)> {
     let mut out = Vec::new();
     let len = bytes.len();
+    if len == 0 {
+        return out;
+    }
     let mut state: u64 = 0x2545_f491_4f6c_dd1d ^ len as u64;
+    for b in bytes.iter().take(64) {
+        state = state.wrapping_mul(31).wrapping_add(*b as u64) | 1;
+    }
     let mut next = || {
         // xorshift64
         state ^= state << 13;
@@ -268,18 +276,36 @@ fn mutations(bytes: &[u8]) -> Vec<(String, Vec<u8>)> {
         state ^= state << 17;
         state
     };
-    for _ in 0..40 {
+    for _ in 0..cuts {
         let cut = (next() % len as u64) as usize;
         out.push((format!("cut:{cut}"), bytes[..cut].to_vec()));
     }
-    for _ in 0..200 {
-        let pos = (next() % len as u64) as usize;
+    for _ in 0..sets {
+        // Skip the header: mutations there all fail the same way.
+        let pos = if len > 8 {
+            8 + (next() % (len as u64 - 8)) as usize
+        } else {
+            (next() % len as u64) as usize
+        };
         let byte = (next() & 0xff) as u8;
         let mut m = bytes.to_vec();
         m[pos] = byte;
         out.push((format!("set:{pos}:{byte}"), m));
     }
     out
+}
+
+/// Prints the line of `name` and, if it validates, of `cuts`/`sets`
+/// mutations of it (keyed `<name>@<mutation>`).
+fn emit(name: &str, bytes: &[u8], cuts: usize, sets: usize) {
+    let base = line(name, bytes);
+    let ok = base.ends_with("\tok");
+    println!("{base}");
+    if ok {
+        for (m, mutated) in mutations(bytes, cuts, sets) {
+            println!("{}", line(&format!("{name}@{m}"), &mutated));
+        }
+    }
 }
 
 fn main() {
@@ -300,7 +326,7 @@ fn main() {
     entries.sort_by(|a, b| a.0.cmp(&b.0));
     for (rel, path) in entries {
         let bytes = std::fs::read(&path).unwrap();
-        println!("{}", line(&rel, &bytes));
+        emit(&rel, &bytes, 1, 2);
     }
     let mut plugin_files: Vec<PathBuf> = std::fs::read_dir(plugins)
         .unwrap()
@@ -311,9 +337,6 @@ fn main() {
     for path in plugin_files {
         let name = format!("plugins/{}", path.file_name().unwrap().to_str().unwrap());
         let bytes = std::fs::read(&path).unwrap();
-        println!("{}", line(&name, &bytes));
-        for (m, mutated) in mutations(&bytes) {
-            println!("{}", line(&format!("{name}@{m}"), &mutated));
-        }
+        emit(&name, &bytes, 40, 400);
     }
 }
