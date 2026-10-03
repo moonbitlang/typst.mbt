@@ -133,6 +133,44 @@ pub fn CmapSubtable::codepoints(
 }
 
 ///|
+/// Calls `f(start, end)` for each inclusive range of codepoints defined in
+/// this table, in the order of [CmapSubtable::codepoints] (not in ttf-parser:
+/// formats 4 and 12 report their segments and groups at once instead of
+/// every codepoint; the others report single codepoints).
+pub fn CmapSubtable::codepoint_ranges(
+  self : CmapSubtable,
+  f : (UInt, UInt) -> Unit,
+) -> Unit {
+  match self.format {
+    SegmentMappingToDeltaValues(subtable) => {
+      let n = if subtable.start_codes.len() < subtable.end_codes.len() {
+        subtable.start_codes.len()
+      } else {
+        subtable.end_codes.len()
+      }
+      for i in 0..<n.to_int() {
+        let start = subtable.start_codes.get(i.to_uint16()).unwrap()
+        let end = subtable.end_codes.get(i.to_uint16()).unwrap()
+        // OxFFFF value is special and indicates codes end.
+        if start == end && start == 0xFFFF {
+          break
+        }
+        if start <= end {
+          f(start.to_uint(), end.to_uint())
+        }
+      }
+    }
+    SegmentedCoverage(subtable) =>
+      for group in subtable.groups.iter() {
+        if group.start_char_code <= group.end_char_code {
+          f(group.start_char_code, group.end_char_code)
+        }
+      }
+    _ => self.codepoints(c => f(c, c))
+  }
+}
+
+///|
 priv struct EncodingRecord {
   platform_id : PlatformId
   encoding_id : UInt16
