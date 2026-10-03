@@ -649,7 +649,7 @@ pub struct Engine {
   priv code_map : CodeMap
   priv func_types : FuncTypeRegistry
   /// Reusable value stacks (upstream `EngineStacks`).
-  priv stacks : Array[Stack_]
+  priv stacks : Array[Stack]
 }
 
 ///|
