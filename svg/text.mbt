@@ -12,6 +12,40 @@ priv enum RenderedGlyph {
 }
 
 ///|
+/// The rendered outlines of glyphs, by the key of `render_glyph`.
+let glyph_paths : Map[@library.U128, RenderedGlyph?] = {}
+
+///|
+/// The bounding boxes of glyphs (by font and glyph).
+let glyph_bboxes : Map[@library.U128, @otf.Rect?] = {}
+
+///|
+/// `text.font.ttf().glyph_bounding_box(id)`, memoized (not upstream: it
+/// outlines CFF glyphs again for every use; performance).
+fn glyph_bounding_box(
+  font : @library.FontInstance,
+  glyph_id : UInt16,
+) -> @otf.Rect? {
+  let key = {
+    let h = @library.SipHasher128::new()
+    hash_font(h, font)
+    hash_u16(h, glyph_id.to_uint())
+    h.finish128()
+  }
+  match glyph_bboxes.get(key) {
+    Some(bbox) => bbox
+    None => {
+      let bbox = match font.ttf() {
+        Some(ttf) => ttf.glyph_bounding_box(@otf.GlyphId(glyph_id))
+        None => None
+      }
+      glyph_bboxes[key] = bbox
+      bbox
+    }
+  }
+}
+
+///|
 /// Render a text item. The text is rendered as a group of glyphs. We will try
 /// to render the text as SVG first, then bitmap, then outline. If none of
 /// them works, we will skip the text.
@@ -64,13 +98,23 @@ fn SVGRenderer::render_glyph(
       h.finish128()
     }
     let (id, path) = self.glyphs.insert_with_val(key, () => {
-      let builder = SvgPathBuilder::with_scale(scale)
-      guard text.font.ttf() is Some(ttf) else { return None }
-      guard ttf.outline_glyph(@otf.GlyphId(glyph_id), OutlineSink(builder))
-        is Some(_) else {
-        return None
+      // The outlines are shared by all pages (not upstream: each page's
+      // SVG outlines its glyphs again; performance).
+      match glyph_paths.get(key) {
+        Some(path) => return path
+        None => ()
       }
-      Some(RenderedGlyph::Path(builder.finsish()))
+      let path = {
+        let builder = SvgPathBuilder::with_scale(scale)
+        guard text.font.ttf() is Some(ttf) else { return None }
+        guard ttf.outline_glyph(@otf.GlyphId(glyph_id), OutlineSink(builder))
+          is Some(_) else {
+          return None
+        }
+        Some(RenderedGlyph::Path(builder.finsish()))
+      }
+      glyph_paths[key] = path
+      path
     })
     if path is Some(_) {
       self.render_path_glyph(svg, state, text, glyph_id, x_offset, y_offset, id)
@@ -136,10 +180,7 @@ fn SVGRenderer::render_path_glyph(
   let state = state.pre_concat(
     @library.Transform::translate(x_offset, y_offset),
   )
-  let glyph_size = match text.font.ttf() {
-    Some(ttf) => ttf.glyph_bounding_box(@otf.GlyphId(glyph_id))
-    None => None
-  }
+  let glyph_size = glyph_bounding_box(text.font, glyph_id)
   guard glyph_size is Some(glyph_size) else {
     // This shouldn't happen, because the glyph has been successfully
     // outlined to create the path.
