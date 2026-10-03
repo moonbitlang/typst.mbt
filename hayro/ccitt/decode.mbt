@@ -131,7 +131,7 @@ fn BitReader::read_eol_if_available(self : BitReader) -> Int {
     if fill_bits >= 11 && self.peak_bits(fill_bits + 1) == Some(1) {
       // Found EOL with fill bits, consume all of it.
       // (`read_bits(fill_bits + 1).unwrap()`: the peek above succeeded.)
-      self.bit_offset += fill_bits + 1
+      self.bit_offset += (fill_bits + 1).to_int64()
       count += 1
       continue
     }

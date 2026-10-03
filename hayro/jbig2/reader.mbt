@@ -8,13 +8,13 @@
 priv struct Reader {
   /// The underlying data.
   data : BytesView
-  /// The position in bits.
-  mut cur_pos : Int
+  /// The position in bits (upstream `usize`, 64 bits).
+  mut cur_pos : Int64
 }
 
 ///|
 fn Reader::new(data : BytesView) -> Reader {
-  { data, cur_pos: 0, }
+  { data, cur_pos: 0L, }
 }
 
 ///|
@@ -26,7 +26,7 @@ fn Reader::clone(self : Reader) -> Reader {
 fn Reader::align(self : Reader) -> Unit {
   let bit_pos = self.bit_pos()
   if bit_pos % 8 != 0 {
-    self.cur_pos += 8 - bit_pos
+    self.cur_pos += (8 - bit_pos).to_int64()
   }
 }
 
@@ -54,7 +54,7 @@ fn Reader::tail(self : Reader) -> BytesView? {
 /// don't fit into the data, e.g. negative `i32`s cast to `usize`.)
 fn Reader::read_bytes(self : Reader, len : Int64) -> BytesView? {
   guard self.peek_bytes(len) is Some(bytes) else { return None }
-  self.cur_pos += bytes.length() * 8
+  self.cur_pos += bytes.length().to_int64() * 8L
   Some(bytes)
 }
 
@@ -64,7 +64,7 @@ fn Reader::read_bytes(self : Reader, len : Int64) -> BytesView? {
 /// Assumes that the reader is currently byte-aligned.
 fn Reader::read_byte(self : Reader) -> Byte? {
   guard self.peek_byte() is Some(byte) else { return None }
-  self.cur_pos += 8
+  self.cur_pos += 8L
   Some(byte)
 }
 
@@ -147,7 +147,7 @@ fn Reader::read_i32(self : Reader) -> Int? {
 fn Reader::read_bit(self : Reader) -> Int? {
   guard self.cur_byte() is Some(byte) else { return None }
   let shift = 7 - self.bit_pos()
-  self.cur_pos += 1
+  self.cur_pos += 1L
   Some((byte.to_int() >> shift) & 1)
 }
 
@@ -166,7 +166,7 @@ fn Reader::read_bits(self : Reader, count : Int) -> UInt? {
     let bits = (byte >> shift) & mask
     // (`take` is at most 8; a shift by 32 can't happen.)
     value = (value << take) | bits
-    self.cur_pos += take
+    self.cur_pos += take.to_int64()
     remaining -= take
   }
   Some(value)
@@ -174,7 +174,7 @@ fn Reader::read_bits(self : Reader, count : Int) -> UInt? {
 
 ///|
 fn Reader::byte_pos(self : Reader) -> Int {
-  self.cur_pos >> 3
+  (self.cur_pos >> 3).to_int()
 }
 
 ///|
@@ -184,5 +184,5 @@ fn Reader::cur_byte(self : Reader) -> Byte? {
 
 ///|
 fn Reader::bit_pos(self : Reader) -> Int {
-  self.cur_pos & 7
+  (self.cur_pos & 7L).to_int()
 }

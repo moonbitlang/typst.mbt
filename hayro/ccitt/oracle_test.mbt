@@ -41,7 +41,11 @@ impl @ccitt.Decoder for Recorder with fn push_pixel(self, white) {
 }
 
 ///|
-impl @ccitt.Decoder for Recorder with fn push_pixel_chunk(self, white, chunk_count) {
+impl @ccitt.Decoder for Recorder with fn push_pixel_chunk(
+  self,
+  white,
+  chunk_count,
+) {
   let b = if white { b'1' } else { b'0' }
   for _ in 0..<(chunk_count.reinterpret_as_int() * 8) {
     self.out.write_byte(b)

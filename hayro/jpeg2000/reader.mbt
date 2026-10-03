@@ -4,12 +4,13 @@
 ///|
 priv struct BitReader {
   data : BytesView
-  mut cur_pos : Int
+  /// The position in bits (upstream `usize`, 64 bits).
+  mut cur_pos : Int64
 }
 
 ///|
 fn BitReader::new(data : BytesView) -> BitReader {
-  { data, cur_pos: 0, }
+  { data, cur_pos: 0L, }
 }
 
 ///|
@@ -21,7 +22,7 @@ fn BitReader::clone(self : BitReader) -> BitReader {
 fn BitReader::align(self : BitReader) -> Unit {
   let bit_pos = self.bit_pos()
   if bit_pos % 8 != 0 {
-    self.cur_pos += 8 - bit_pos
+    self.cur_pos += (8 - bit_pos).to_int64()
   }
 }
 
@@ -32,7 +33,7 @@ fn BitReader::at_end(self : BitReader) -> Bool {
 
 ///|
 fn BitReader::jump_to_end(self : BitReader) -> Unit {
-  self.cur_pos = self.data.length() * 8
+  self.cur_pos = self.data.length().to_int64() * 8L
 }
 
 ///|
@@ -53,14 +54,14 @@ fn BitReader::offset(self : BitReader) -> Int {
 ///|
 fn BitReader::read_bytes(self : BitReader, len : Int) -> BytesView? {
   guard self.peek_bytes(len) is Some(bytes) else { return None }
-  self.cur_pos += len * 8
+  self.cur_pos += len.to_int64() * 8L
   Some(bytes)
 }
 
 ///|
 fn BitReader::read_byte(self : BitReader) -> Int? {
   guard self.peek_byte() is Some(byte) else { return None }
-  self.cur_pos += 8
+  self.cur_pos += 8L
   Some(byte)
 }
 
@@ -125,18 +126,18 @@ fn BitReader::read_bit(self : BitReader) -> UInt? {
   }
   let byte = self.data[byte_pos].to_uint()
   let shift = 7 - self.bit_pos()
-  self.cur_pos += 1
+  self.cur_pos += 1L
   Some((byte >> shift) & 1)
 }
 
 ///|
 fn BitReader::byte_pos(self : BitReader) -> Int {
-  self.cur_pos / 8
+  (self.cur_pos / 8L).to_int()
 }
 
 ///|
 fn BitReader::bit_pos(self : BitReader) -> Int {
-  self.cur_pos % 8
+  (self.cur_pos % 8L).to_int()
 }
 
 ///|
