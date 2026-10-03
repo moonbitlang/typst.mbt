@@ -79,34 +79,40 @@ fn layout_fragment_impl(
       engine, content, locator, styles, regions, column,
     )
   }
-  let state = @library.SipHasher128::new()
-  state.write_str("layout_fragment")
-  state.write(content)
-  state.write_u128(styles.memo_hash())
-  state.write_f64(regions.size.x.to_raw())
-  state.write_f64(regions.size.y.to_raw())
-  state.write_bool(regions.expand.x)
-  state.write_bool(regions.expand.y)
-  state.write_f64(regions.full.to_raw())
-  state.write_usize(regions.backlog.length())
-  for height in regions.backlog {
-    state.write_f64(height.to_raw())
-  }
-  match regions.last {
-    Some(last) => {
-      state.write_discriminant(1)
-      state.write_f64(last.to_raw())
+  let key = @library.memo_fingerprint(state => {
+    state.write_str("layout_fragment")
+    state.write(content)
+    state.write_u128(styles.memo_hash())
+    state.write_f64(regions.size.x.to_raw())
+    state.write_f64(regions.size.y.to_raw())
+    state.write_bool(regions.expand.x)
+    state.write_bool(regions.expand.y)
+    state.write_f64(regions.full.to_raw())
+    state.write_usize(regions.backlog.length())
+    for height in regions.backlog {
+      state.write_f64(height.to_raw())
     }
-    None => state.write_discriminant(0)
+    match regions.last {
+      Some(last) => {
+        state.write_discriminant(1)
+        state.write_f64(last.to_raw())
+      }
+      None => state.write_discriminant(0)
+    }
+    state.write_usize(column.count)
+    state.write_bool(column.balanced)
+    state.write_f64(column.gutter.rel.get())
+    state.write_f64(column.gutter.abs.to_raw())
+    state.write(column.separator)
+    state.write_u128(locator.memo_hash())
+    state.write_u128(engine.route.memo_hash())
+  })
+  guard key is Some(key) else {
+    return layout_fragment_compute(
+      engine, content, locator, styles, regions, column,
+    )
   }
-  state.write_usize(column.count)
-  state.write_bool(column.balanced)
-  state.write_f64(column.gutter.rel.get())
-  state.write_f64(column.gutter.abs.to_raw())
-  state.write(column.separator)
-  state.write_u128(locator.memo_hash())
-  state.write_u128(engine.route.memo_hash())
-  @library.memoized_layout(engine, state.finish128(), engine => {
+  @library.memoized_layout(engine, key, engine => {
     layout_fragment_compute(engine, content, locator, styles, regions, column)
   })
 }

@@ -26,14 +26,19 @@
 // Caches only live for one compilation ([with_layout_memo]), across its
 // introspection iterations, as the world (files, fonts) is fixed during it.
 //
-// Keys rely on [Fingerprint]s, which are structural except for a few values
-// hashed through their repr (gradients, tilings, native functions by name).
-// Since the key also contains the resolved locator, two calls only share a
-// key if they lay out the same part of the document.
+// Keys rely on [Fingerprint]s. Calls whose arguments contain values with
+// lossy fingerprints (gradients and tilings, hashed through their repr) are
+// not memoized ([memo_fingerprint]). Values compare differently than they
+// fingerprint in one respect: closures are equal only to themselves, while
+// their fingerprints are structural. Where a result can contain argument
+// values (the state sequence holds the state's initial value), entries also
+// keep the arguments and are only reused for equal ones.
 
 ///|
 /// A memoized result.
-priv struct MemoEntry[T] {
+priv struct MemoEntry[T, I] {
+  /// The arguments that must be equal for reuse (beyond the key).
+  input : I
   /// The introspector the result was computed with.
   backend : &IntrospectorBackend
   /// The introspector reads of the call.
@@ -46,14 +51,14 @@ priv struct MemoEntry[T] {
 
 ///|
 /// The cached results of one memoized function.
-priv struct MemoStore[T] {
+priv struct MemoStore[T, I] {
   /// The compilation the entries belong to.
   mut generation : Int
-  entries : Map[U128, Array[MemoEntry[T]]]
+  entries : Map[U128, Array[MemoEntry[T, I]]]
 }
 
 ///|
-fn[T] MemoStore::new() -> MemoStore[T] {
+fn[T, I] MemoStore::new() -> MemoStore[T, I] {
   { generation: 0, entries: {}, }
 }
 
@@ -95,12 +100,14 @@ pub fn layout_memo_active() -> Bool {
 
 ///|
 /// Memoize `f`, keyed by `key` (which must fingerprint every argument of the
-/// call except the engine; see the module docs). `f` must use the engine it
-/// is given. `copy` produces an independent copy of a result.
-fn[T] memoize(
-  store : MemoStore[T],
+/// call except the engine; see the module docs) and `input` (compared for
+/// equality). `f` must use the engine it is given. `copy` produces an
+/// independent copy of a result.
+fn[T, I : Eq] memoize(
+  store : MemoStore[T, I],
   engine : Engine,
   key : U128,
+  input : I,
   copy : (T) -> T,
   f : (Engine) -> T raise SourceError,
 ) -> T raise SourceError {
@@ -116,8 +123,11 @@ fn[T] memoize(
   let backend = engine.introspector.backend
   if store.entries.get(key) is Some(entries) {
     for entry in entries {
-      if physical_equal(entry.backend, backend) ||
-        entry.reads.validate(engine.introspector) {
+      if entry.input == input &&
+        (
+          physical_equal(entry.backend, backend) ||
+          entry.reads.validate(engine.introspector)
+        ) {
         if parent is Some(parent) {
           entry.reads.merge_into(parent)
         }
@@ -146,7 +156,7 @@ fn[T] memoize(
     }
   }
   finish()
-  let entry = { backend, reads, sink, output: copy(output), }
+  let entry = { input, backend, reads, sink, output: copy(output), }
   match store.entries.get(key) {
     Some(entries) => {
       if entries.length() >= memo_max_entries {
@@ -160,7 +170,7 @@ fn[T] memoize(
 }
 
 ///|
-let layout_store : MemoStore[Array[Frame]] = MemoStore::new()
+let layout_store : MemoStore[Array[Frame], Unit] = MemoStore::new()
 
 ///|
 /// Memoize a layout function producing frames, keyed by `key` (which must
@@ -175,6 +185,7 @@ pub fn memoized_layout(
     layout_store,
     engine,
     key,
+    (),
     frames => frames.map(frame => frame.clone()),
     engine => f(engine).0,
   )

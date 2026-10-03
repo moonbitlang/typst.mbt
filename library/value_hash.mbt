@@ -97,6 +97,8 @@ pub impl Fingerprint for Value with fn fingerprint(self, state) {
     Gradient(v) => {
       state.write_discriminant(11)
       state.write_str(v.repr())
+      // The repr rounds numbers.
+      mark_fingerprint_lossy()
     }
     Tiling(v) => {
       state.write_discriminant(12)
@@ -104,6 +106,7 @@ pub impl Fingerprint for Value with fn fingerprint(self, state) {
       // only its size and item count are written.
       state.write_str(v.repr())
       state.write_usize(v.frame.items().length())
+      mark_fingerprint_lossy()
     }
     Symbol(v) => {
       state.write_discriminant(13)
@@ -297,15 +300,22 @@ pub impl Fingerprint for Content with fn fingerprint(self, state) {
   state.write(lifecycle)
   // Data (hashed once and cached, like upstream).
   let data = match self.data_hash.val {
-    Some(h) => h
+    Some((h, lossy)) => {
+      if lossy {
+        mark_fingerprint_lossy()
+      }
+      h
+    }
     None => {
       let inner = SipHasher128::new()
-      inner.write_usize(self.fields.length())
-      for field in self.fields {
-        inner.write(field)
-      }
+      let lossy = fingerprint_lossy_in(() => {
+        inner.write_usize(self.fields.length())
+        for field in self.fields {
+          inner.write(field)
+        }
+      })
       let h = inner.finish128()
-      self.data_hash.val = Some(h)
+      self.data_hash.val = Some((h, lossy))
       h
     }
   }

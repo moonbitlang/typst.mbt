@@ -359,8 +359,9 @@ pub struct StyleChain {
   head : Array[Style]
   /// The remaining links in the chain.
   tail : StyleChain?
-  /// The cached [StyleChain::memo_hash] (not upstream).
-  priv mut memo_hash : U128?
+  /// The cached fingerprint of [StyleChain::memo_hash] and whether it is
+  /// lossy (not upstream).
+  priv mut memo_hash : (U128, Bool)?
 }
 
 ///|
@@ -403,22 +404,29 @@ pub fn StyleChain::chain_one(self : StyleChain, style : Style) -> StyleChain {
 /// were chained.
 pub fn StyleChain::memo_hash(self : StyleChain) -> U128 {
   match self.memo_hash {
-    Some(hash) => hash
+    Some((hash, lossy)) => {
+      if lossy {
+        mark_fingerprint_lossy()
+      }
+      hash
+    }
     None => {
       let state = SipHasher128::new()
-      state.write_usize(self.head.length())
-      for style in self.head {
-        state.write(style)
-      }
-      match self.tail {
-        Some(tail) => {
-          state.write_discriminant(1)
-          state.write_u128(tail.memo_hash())
+      let lossy = fingerprint_lossy_in(() => {
+        state.write_usize(self.head.length())
+        for style in self.head {
+          state.write(style)
         }
-        None => state.write_discriminant(0)
-      }
+        match self.tail {
+          Some(tail) => {
+            state.write_discriminant(1)
+            state.write_u128(tail.memo_hash())
+          }
+          None => state.write_discriminant(0)
+        }
+      })
       let hash = state.finish128()
-      self.memo_hash = Some(hash)
+      self.memo_hash = Some((hash, lossy))
       hash
     }
   }
