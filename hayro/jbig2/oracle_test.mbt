@@ -1,7 +1,7 @@
-// Differential test against the real hayro-ccitt: decodes the streams of
-// `testdata/files` (written by `scripts/gen_ccitt_test_files.py`) with the
-// settings of `testdata/cases.tsv` and compares the result and the pushed
-// pixels with `testdata/oracle.tsv` (`gen_hayro_codec_tests ccitt`).
+// Differential test against the real hayro-jbig2: decodes the files of
+// `testdata/files` (written by `scripts/gen_jbig2_test_files.py`) as listed
+// in `testdata/cases.tsv` and compares the result and the pushed pixels with
+// `testdata/oracle.tsv` (`gen_hayro_codec_tests jbig2`).
 
 ///|
 fn module_root() -> String? {
@@ -29,35 +29,36 @@ fn hex16(v : UInt64) -> String {
 }
 
 ///|
-/// Records the pushed pixels like the generator's `CcittRecorder`.
+/// Records the pushed pixels like the generator's `Jbig2Recorder`.
 struct Recorder {
   out : @buffer.Buffer
   mut rows : Int
 }
 
 ///|
-impl @ccitt.Decoder for Recorder with fn push_pixel(self, white) {
-  self.out.write_byte(if white { b'1' } else { b'0' })
+impl @jbig2.Decoder for Recorder with fn push_pixel(self, black) {
+  self.out.write_byte(if black { b'1' } else { b'0' })
 }
 
 ///|
-impl @ccitt.Decoder for Recorder with fn push_pixel_chunk(self, white, chunk_count) {
-  let b = if white { b'1' } else { b'0' }
-  for _ in 0..<(chunk_count.reinterpret_as_int() * 8) {
-    self.out.write_byte(b)
-  }
+impl @jbig2.Decoder for Recorder with fn push_pixel_chunk(
+  self,
+  black,
+  chunk_count,
+) {
+  self.out.write_string_utf8("[\{if black { 1 } else { 0 }}\{chunk_count}]")
 }
 
 ///|
-impl @ccitt.Decoder for Recorder with fn next_line(self) {
+impl @jbig2.Decoder for Recorder with fn next_line(self) {
   self.rows += 1
   self.out.write_byte(b'\n')
 }
 
 ///|
-test "hayro-ccitt matches the oracle" {
+test "hayro-jbig2 matches the oracle" {
   guard module_root() is Some(root) else { return }
-  let dir = root + "hayro/ccitt/testdata/"
+  let dir = root + "hayro/jbig2/testdata/"
   let cases = @fs.read_file_to_string(dir + "cases.tsv")
   let expected = @fs.read_file_to_string(dir + "oracle.tsv")
     .split("\n")
@@ -72,28 +73,29 @@ test "hayro-ccitt matches the oracle" {
     }
     let f = line.split("\t").map(p => p.to_string()).to_array()
     let data = @fs.read_file_to_bytes(dir + "files/" + f[0])
-    let k = @string.parse_int(f[3])
-    let settings : @ccitt.DecodeSettings = {
-      columns: @string.parse_int(f[1]).reinterpret_as_uint(),
-      rows: @string.parse_int(f[2]).reinterpret_as_uint(),
-      end_of_line: f[4] == "1",
-      rows_are_byte_aligned: f[5] == "1",
-      end_of_block: f[6] == "1",
-      encoding: if k < 0 {
-        Group4
-      } else if k == 0 {
-        Group3_1D
-      } else {
-        Group3_2D(k=k.reinterpret_as_uint())
-      },
-      invert_black: f[7] == "1",
+    let globals = if f[1] == "-" {
+      None
+    } else {
+      Some(@fs.read_file_to_bytes(dir + "files/" + f[1]))
     }
     let recorder = { out: @buffer.new(), rows: 0, }
-    let ctx = @ccitt.DecoderContext::new(settings)
-    let result = try @ccitt.decode(data[:], recorder, ctx) catch {
+    let result = try {
+      if f[2] == "file" {
+        @jbig2.Image::new(data[:])
+      } else {
+        @jbig2.Image::new_embedded(data[:], globals.map(g => g[:]))
+      }
+    } catch {
       e => "E \{e}"
     } noraise {
-      n => "ok \{n}"
+      image => {
+        let size = "\{image.width()}x\{image.height()}"
+        try image.decode(recorder) catch {
+          e => "\{size} E \{e}"
+        } noraise {
+          _ => "\{size} ok"
+        }
+      }
     }
     let pixels = recorder.out.to_bytes()
     let actual = "\{f[0]}\t\{index}\t\{result}\t\{recorder.rows} \{pixels.length()}:\{hex16(fnv1a64(pixels))}"

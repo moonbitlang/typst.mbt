@@ -1,0 +1,190 @@
+# file	case	result	pixels (gen_hayro_codec_tests jbig2)
+j000_generic,t0.bin	0	8x5 ok	5 45:562ada192ded6898
+j001_generic,t0,customat.bin	1	8x5 ok	5 45:4faa79f92d999b7c
+j001_generic,t0,customat_trunc.bin	2	E unexpected end of input	0 0:cbf29ce484222325
+j001_generic,t0,customat_corrupt.bin	3	8x5 E overflow in bitmap dimension computation	0 0:cbf29ce484222325
+j002_generic,t0,tpgdon.bin	4	32x17 ok	17 413:307d44b649e4ea99
+j002_generic,t0,tpgdon_corrupt.bin	5	32x17 ok	17 413:307d44b649e4ea99
+j003_generic,t0,tpgdon,customat.bin	6	67x23 ok	23 1248:52814c63796d7dc8
+j003_generic,t0,tpgdon,customat_trunc.bin	7	E unexpected end of input	0 0:cbf29ce484222325
+j004_generic,t1.bin	8	32x17 ok	17 449:d646e3e9bf831afd
+j005_generic,t1,customat.bin	9	32x17 ok	17 393:404d9f7424b26c17
+j005_generic,t1,customat_trunc.bin	10	E unexpected end of input	0 0:cbf29ce484222325
+j006_generic,t1,tpgdon.bin	11	8x5 ok	5 45:d661a70af4c5457c
+j007_generic,t1,tpgdon,customat.bin	12	32x17 ok	17 417:dfccf4137629904c
+j007_generic,t1,tpgdon,customat_trunc.bin	13	E unexpected end of input	0 0:cbf29ce484222325
+j007_generic,t1,tpgdon,customat_corrupt.bin	14	32x17 ok	17 477:0061ec3fca4ee6e7
+j008_generic,t2.bin	15	67x23 ok	23 1184:e26932145ecd4c2b
+j009_generic,t2,customat.bin	16	300x12 ok	12 2428:76264d42ea75e66b
+j009_generic,t2,customat_trunc.bin	17	E unexpected end of input	0 0:cbf29ce484222325
+j010_generic,t2,tpgdon.bin	18	8x5 ok	5 45:056aa267847fbe5a
+j010_generic,t2,tpgdon_trunc.bin	19	E unexpected end of input	0 0:cbf29ce484222325
+j010_generic,t2,tpgdon_corrupt.bin	20	E unexpected end of input	0 0:cbf29ce484222325
+j011_generic,t2,tpgdon,customat.bin	21	101x31 ok	31 2374:f70d9efcde5e6cff
+j012_generic,t3.bin	22	67x23 ok	23 1172:1cae8290fba671f1
+j012_generic,t3_corrupt.bin	23	67x23 ok	23 1544:f9a50bb6ea711c80
+j013_generic,t3,customat.bin	24	67x23 ok	23 1164:64aabbf20c4c6782
+j013_generic,t3,customat_corrupt.bin	25	E unexpected end of input	0 0:cbf29ce484222325
+j014_generic,t3,tpgdon.bin	26	300x12 ok	12 2703:18896fb8ecc6d633
+j014_generic,t3,tpgdon_trunc.bin	27	E unexpected end of input	0 0:cbf29ce484222325
+j014_generic,t3,tpgdon_corrupt.bin	28	300x12 ok	12 3584:8656cfd1a9df695f
+j015_generic,t3,tpgdon,customat.bin	29	67x23 ok	23 1120:08063d591888c336
+j015_generic,t3,tpgdon,customat_trunc.bin	30	E unexpected end of input	0 0:cbf29ce484222325
+j015_generic,t3,tpgdon,customat_corrupt.bin	31	67x16407 ok	16407 132628:bf8fcb85e8e24e53
+j016_generic,offset,t0.bin	32	64x64 ok	64 2060:f8de024bba85f9d3
+j016_generic,offset,t0_trunc.bin	33	E unexpected end of input	0 0:cbf29ce484222325
+j017_generic,offset,t1.bin	34	200x50 ok	50 4176:764aa52777689b6e
+j017_generic,offset,t1_trunc.bin	35	E unexpected end of input	0 0:cbf29ce484222325
+j017_generic,offset,t1_corrupt.bin	36	200x50 ok	50 7057:30daf5597484f373
+j018_generic,offset,t2.bin	37	129x40 ok	40 2720:fb96bd32f71a5d92
+j018_generic,offset,t2_corrupt.bin	38	129x40 ok	40 3092:4d5d75c05b4a47db
+j019_generic,offset,t3.bin	39	64x64 ok	64 2004:4c92648284d5df9d
+j020_generic,mmr,eofb.bin	40	67x23 ok	23 1300:b013255b703f172d
+j021_generic,mmr.bin	41	1x1 ok	1 2:07fc1e07b4bd2c5f
+j021_generic,mmr_corrupt.bin	42	1x1 ok	1 2:07fc1e07b4bd2c5f
+j022_generic,mmr,eofb.bin	43	32x9 ok	9 201:decea38c89c19313
+j022_generic,mmr,eofb_trunc.bin	44	E unexpected end of input	0 0:cbf29ce484222325
+j023_generic,mmr.bin	45	250x40 ok	40 6283:acd5e72e91144c68
+j024_generic,mmr,eofb.bin	46	17x3 ok	3 54:71065860a74f5a38
+j024_generic,mmr,eofb_trunc.bin	47	E unexpected end of input	0 0:cbf29ce484222325
+j025_generic,unknownlength.jb2	48	60x20 ok	20 856:f4254d92d471b01e
+j025_generic,unknownlength_trunc.jb2	49	E missing end marker for unknown-length region	0 0:cbf29ce484222325
+j026_generic,unknownlength,rowcount.jb2	50	60x20 ok	20 544:d7fde0654319cff1
+j026_generic,unknownlength,rowcount_trunc.jb2	51	E missing end marker for unknown-length region	0 0:cbf29ce484222325
+j027_generic,unknownlength,mmr.jb2	52	60x20 ok	20 1048:a5b0fc675203bbdd
+j027_generic,unknownlength,mmr_corrupt.jb2	53	60x20 E invalid MMR-encoded data	0 0:cbf29ce484222325
+j028_generic,unknownlength,mmr,rowcount.jb2	54	60x20 ok	20 580:a80b135fcd1952b2
+j028_generic,unknownlength,mmr,rowcount_corrupt.jb2	55	60x20 ok	20 580:a80b135fcd1952b2
+j029_compose,or,default0.bin	56	80x30 ok	30 1086:868e3fbdeb42f628
+j029_compose,or,default0_corrupt.bin	57	80x30 E invalid MMR-encoded data	0 0:cbf29ce484222325
+j030_compose,and,default0.bin	58	80x30 ok	30 180:8d2eab74112c5f51
+j030_compose,and,default0_corrupt.bin	59	80x30 ok	30 180:8d2eab74112c5f51
+j031_compose,xor,default0.bin	60	80x30 ok	30 836:3258dafd5de3f635
+j031_compose,xor,default0_trunc.bin	61	E unexpected end of input	0 0:cbf29ce484222325
+j031_compose,xor,default0_corrupt.bin	62	80x30 E invalid MMR-encoded data	0 0:cbf29ce484222325
+j032_compose,xnor,default0.bin	63	80x30 ok	30 733:bd39be71e3ebe126
+j032_compose,xnor,default0_corrupt.bin	64	80x30 E invalid MMR-encoded data	0 0:cbf29ce484222325
+j033_compose,replace,default0.bin	65	80x30 ok	30 1001:c57ca208799103f9
+j034_compose,or,default1.bin	66	80x30 ok	30 180:03fe00c64c0f2181
+j035_compose,and,default1.bin	67	80x30 ok	30 741:162a06bc1387f389
+j036_compose,xor,default1.bin	68	80x30 ok	30 902:f37f7644b09c2bbb
+j037_compose,xnor,default1.bin	69	80x30 ok	30 639:ec90352cfc248b20
+j037_compose,xnor,default1_corrupt.bin	70	80x30 ok	30 336:2204e65159bcb39a
+j038_compose,replace,default1.bin	71	80x30 ok	30 857:f3f03c50f6e4a717
+j038_compose,replace,default1_trunc.bin	72	E unexpected end of input	0 0:cbf29ce484222325
+j039_compose,fullpage,or,default0.bin	73	40x12 ok	12 260:63bb9c4df1c95d27
+j039_compose,fullpage,or,default0_trunc.bin	74	E unexpected end of input	0 0:cbf29ce484222325
+j040_compose,fullpage,and,default0.bin	75	40x12 ok	12 60:82fad1ea4ba47a21
+j041_compose,fullpage,xor,default0.bin	76	40x12 ok	12 368:eba0df7d9bac7b0e
+j041_compose,fullpage,xor,default0_trunc.bin	77	E unexpected end of input	0 0:cbf29ce484222325
+j041_compose,fullpage,xor,default0_corrupt.bin	78	8x12 ok	12 104:c712c4c8bb7d1a64
+j042_compose,fullpage,xnor,default0.bin	79	40x12 ok	12 372:e55aca05d9f3b9f2
+j042_compose,fullpage,xnor,default0_trunc.bin	80	E unexpected end of input	0 0:cbf29ce484222325
+j043_compose,fullpage,replace,default0.bin	81	40x12 ok	12 336:7e1d835c105625f0
+j044_compose,fullpage,or,default1.bin	82	40x12 ok	12 60:7aabac65a1f78385
+j045_compose,fullpage,and,default1.bin	83	40x12 ok	12 376:c80264f3aa5a738f
+j045_compose,fullpage,and,default1_corrupt.bin	84	E missing page information segment	0 0:cbf29ce484222325
+j046_compose,fullpage,xor,default1.bin	85	40x12 ok	12 372:24114d81fad90212
+j046_compose,fullpage,xor,default1_trunc.bin	86	E unexpected end of input	0 0:cbf29ce484222325
+j047_compose,fullpage,xnor,default1.bin	87	40x12 ok	12 372:bd1a80fe21e3daac
+j047_compose,fullpage,xnor,default1_trunc.bin	88	E unexpected end of input	0 0:cbf29ce484222325
+j048_compose,fullpage,replace,default1.bin	89	40x12 ok	12 344:f13c4a96bdc2796e
+j048_compose,fullpage,replace,default1_corrupt.bin	90	40x12 ok	12 488:f3106d9177d00ec7
+j049_striped,unknownheight.jb2	91	50x31 ok	31 1273:f675439ecc62e362
+j049_striped,unknownheight_corrupt.jb2	92	50x31 ok	31 981:d2a9c3173cd4be70
+j050_striped.jb2	93	50x31 ok	31 1301:2883ebd6f5346e9e
+j051_striped,unknownheight,noeos.bin	94	E page height unknown with no stripe segments	0 0:cbf29ce484222325
+j052_refine,page,gr0.bin	95	70x25 ok	25 1499:6e51b0ec9687b927
+j052_refine,page,gr0_corrupt.bin	96	70x25 ok	25 1755:480f916a9b08ad4a
+j053_refine,intermediate,gr0.bin	97	70x25 ok	25 1511:bac48efb663f1529
+j053_refine,intermediate,gr0_trunc.bin	98	E unexpected end of input	0 0:cbf29ce484222325
+j054_refine,page,gr0,customat.bin	99	70x25 ok	25 1567:786214d4a8e5518a
+j054_refine,page,gr0,customat_trunc.bin	100	E unexpected end of input	0 0:cbf29ce484222325
+j055_refine,intermediate,gr0,customat.bin	101	70x25 ok	25 1555:f43e4b3f183181fe
+j056_refine,page,gr0,tpgron.bin	102	70x25 ok	25 1471:ea9693cc29f71bb6
+j057_refine,intermediate,gr0,tpgron.bin	103	70x25 ok	25 1435:a6f1ba715ae71a30
+j057_refine,intermediate,gr0,tpgron_trunc.bin	104	E unexpected end of input	0 0:cbf29ce484222325
+j058_refine,page,gr0,tpgron,customat.bin	105	70x25 ok	25 1399:f1f68ed472e4a6f5
+j059_refine,intermediate,gr0,tpgron,customat.bin	106	70x25 ok	25 1383:c872fe477c924eee
+j059_refine,intermediate,gr0,tpgron,customat_trunc.bin	107	E unexpected end of input	0 0:cbf29ce484222325
+j060_refine,page,gr1.bin	108	70x25 ok	25 1467:28bddb6a9a8ee471
+j060_refine,page,gr1_trunc.bin	109	E unexpected end of input	0 0:cbf29ce484222325
+j060_refine,page,gr1_corrupt.bin	110	70x25 ok	25 1747:ae8185c25f784ef7
+j061_refine,intermediate,gr1.bin	111	70x25 ok	25 1423:c5f0697b3af48c8d
+j062_refine,page,gr1,tpgron.bin	112	70x25 ok	25 1383:044a28daf846d4d1
+j062_refine,page,gr1,tpgron_trunc.bin	113	E unexpected end of input	0 0:cbf29ce484222325
+j063_refine,intermediate,gr1,tpgron.bin	114	70x25 ok	25 1355:764bab54a0217968
+j064_refine,page,default1,gr0.bin	115	45x14 ok	14 484:13d863d3c48bd3b4
+j064_refine,page,default1,gr0_corrupt.bin	116	E unexpected end of input	0 0:cbf29ce484222325
+j065_refine,page,default1,gr1.bin	117	45x14 ok	14 404:5fd856d558bb48ca
+j065_refine,page,default1,gr1_trunc.bin	118	E unexpected end of input	0 0:cbf29ce484222325
+j066_refine,chain,intermediate.bin	119	60x30 ok	30 1014:fe3eac1f33b3b4da
+j067_halftone,ht0,or,pd0.bin	120	98x44 ok	44 3812:e68743b8c10c6a9a
+j067_halftone,ht0,or,pd0_trunc.bin	121	E unexpected end of input	0 0:cbf29ce484222325
+j067_halftone,ht0,or,pd0_corrupt.bin	122	98x44 E missing required pattern dictionary	0 0:cbf29ce484222325
+j068_halftone,ht1,skip,or,pd0.bin	123	98x44 ok	44 3194:ae9733c6e301c743
+j069_halftone,ht2,xor,pd1,intermediate.bin	124	98x44 ok	44 3624:902f624b5d7b02b1
+j070_halftone,ht3,skip,and,pd2.bin	125	98x44 ok	44 3824:242c764268af5731
+j070_halftone,ht3,skip,and,pd2_corrupt.bin	126	98x44 E overflow in grid dimension computation	0 0:cbf29ce484222325
+j071_halftone,ht0,mmr,replace,pd0.bin	127	98x44 ok	44 3020:3469a1c5493f6dff
+j072_halftone,ht0,mmr,xnor,pd0,intermediate.bin	128	98x44 ok	44 738:32ad35b289044786
+j073_halftone,ht0,skip,or,pd1,rotated.bin	129	98x44 ok	44 922:68ce03c050415e87
+j073_halftone,ht0,skip,or,pd1,rotated_corrupt.bin	130	98x44 ok	44 950:b2bcdfd557863dca
+j074_halftone,ht1,or,pd2.bin	131	98x44 ok	44 2492:38dd0c09c40098f9
+j074_halftone,ht1,or,pd2_corrupt.bin	132	98x262188 E overflow in bitmap dimension computation	0 0:cbf29ce484222325
+j075_halftone,ht0,skip,replace,pd2,rotated,intermediate.bin	133	98x44 ok	44 2641:7c57c27ce5d623f9
+j075_halftone,ht0,skip,replace,pd2,rotated,intermediate_trunc.bin	134	E unexpected end of input	0 0:cbf29ce484222325
+j075_halftone,ht0,skip,replace,pd2,rotated,intermediate_corrupt.bin	135	98x44 ok	44 3968:898f0edf06e226c6
+j076_halftone,missingdict.bin	136	20x20 E missing required pattern dictionary	0 0:cbf29ce484222325
+j077_symbol,text,arith,sd0,tl,strips1,dsoff0,xor.bin	137	100x40 ok	40 949:636c9a924e59e7f8
+j077_symbol,text,arith,sd0,tl,strips1,dsoff0,xor_corrupt.bin	138	E unexpected end of input	0 0:cbf29ce484222325
+j078_symbol,text,arith,sd1,tl,transposed,strips2,dsoff3,xor.bin	139	100x40 ok	40 846:7d21a7ff839d1a2f
+j079_symbol,text,arith,sd2,tr,strips4,dsoff-2,or.bin	140	100x40 ok	40 875:ade09feec7d75756
+j079_symbol,text,arith,sd2,tr,strips4,dsoff-2,or_corrupt.bin	141	100x40 E symbol dictionary contains too many symbols	0 0:cbf29ce484222325
+j080_symbol,text,arith,sd3,tr,transposed,strips8,dsoff15,xor.bin	142	100x40 ok	40 1092:a0264f6459e67f45
+j080_symbol,text,arith,sd3,tr,transposed,strips8,dsoff15,xor_trunc.bin	143	E unexpected end of input	0 0:cbf29ce484222325
+j081_symbol,text,arith,sd0,bl,strips1,dsoff-16,or.bin	144	100x40 ok	40 857:fc7a37f2bfe36eef
+j081_symbol,text,arith,sd0,bl,strips1,dsoff-16,or_corrupt.bin	145	E unknown or reserved segment type	0 0:cbf29ce484222325
+j082_symbol,text,arith,sd1,bl,transposed,strips2,dsoff0,xor.bin	146	100x40 ok	40 877:0f5d29d9253ca4db
+j082_symbol,text,arith,sd1,bl,transposed,strips2,dsoff0,xor_trunc.bin	147	E unexpected end of input	0 0:cbf29ce484222325
+j082_symbol,text,arith,sd1,bl,transposed,strips2,dsoff0,xor_corrupt.bin	148	100x40 E overflow in bitmap dimension computation	0 0:cbf29ce484222325
+j083_symbol,text,arith,sd2,br,strips4,dsoff3,xor.bin	149	100x40 ok	40 906:fdddcbae904a3b01
+j083_symbol,text,arith,sd2,br,strips4,dsoff3,xor_corrupt.bin	150	100x40 ok	40 906:fdddcbae904a3b01
+j084_symbol,text,arith,sd3,br,transposed,strips8,dsoff-2,or.bin	151	100x40 ok	40 400:a986df2705366fa5
+j084_symbol,text,arith,sd3,br,transposed,strips8,dsoff-2,or_trunc.bin	152	E unexpected end of input	0 0:cbf29ce484222325
+j085_symbol,text,arith,globals,export,refine,gr0.bin	153	90x20 ok	20 692:0add9ace1d7d437d
+j085_symbol,text,arith,globals,export,refine,gr0_trunc.bin	154	E unexpected end of input	0 0:cbf29ce484222325
+j086_symbol,text,arith,globals,export,refine,gr1.bin	155	90x20 ok	20 636:27bd6e2f3122d98a
+j086_symbol,text,arith,globals,export,refine,gr1_corrupt.bin	156	90x20 E symbol dictionary contains too many symbols	0 0:cbf29ce484222325
+j087_symbol,refagg,arith,retained,gr0.bin	157	90x24 ok	24 772:86b6c6466b703f4d
+j087_symbol,refagg,arith,retained,gr0_corrupt.bin	158	90x24 E invalid symbol encountered	0 0:cbf29ce484222325
+j088_symbol,refagg,arith,retained,gr1.bin	159	90x24 ok	24 768:75e86e9ad2533c95
+j089_symbol,text,huffman,dh0,dw0,rawcoll,sel0.bin	160	100x45 ok	45 974:ca8528c4f98a41a1
+j090_symbol,text,huffman,dh1,dw0,mmrcoll,sel1,transposed.bin	161	100x45 ok	45 846:6715cac01856109e
+j090_symbol,text,huffman,dh1,dw0,mmrcoll,sel1,transposed_corrupt.bin	162	100x45 E too many symbol instances	0 0:cbf29ce484222325
+j091_symbol,text,huffman,dh0,dw1,rawcoll,sel2,refine.bin	163	100x45 ok	45 724:75bd591ae61ff0d0
+j091_symbol,text,huffman,dh0,dw1,rawcoll,sel2,refine_trunc.bin	164	E unexpected end of input	0 0:cbf29ce484222325
+j091_symbol,text,huffman,dh0,dw1,rawcoll,sel2,refine_corrupt.bin	165	100x45 E invalid symbol encountered	0 0:cbf29ce484222325
+j092_symbol,text,huffman,dh1,dw1,mmrcoll,sel3,refine.bin	166	100x45 ok	45 865:54a5becaa0449edf
+j093_symbol,text,huffman,customtables.bin	167	70x30 ok	30 634:006f8fff2dbad0d5
+j093_symbol,text,huffman,customtables_trunc.bin	168	E unexpected end of input	0 0:cbf29ce484222325
+j094_symbol,refagg,huffman.bin	169	60x20 ok	20 452:f509c94fa63331d4
+j095_file,sequential,eop,eof.jb2	170	60x25 ok	25 933:a070b555799a0fc7
+j095_file,sequential,eop,eof_trunc.jb2	171	E unexpected end of input	0 0:cbf29ce484222325
+j096_file,randomaccess,eop,eof.jb2	172	60x25 ok	25 933:a070b555799a0fc7
+j097_file,longreferred,segnum.jb2	173	40x12 ok	12 276:2fd03ea401f7d1f1
+j097_file,longreferred,segnum_corrupt.jb2	174	E unexpected end of input	0 0:cbf29ce484222325
+j098_text,intermediate,default1,refine.bin	175	48x16 ok	16 500:61c839967c72a449
+j099_ignoredsegments,exttemplate,eop.bin	176	30x9 ok	9 239:c12e184176ea5e82
+j099_ignoredsegments,exttemplate,eop_trunc.bin	177	E unexpected end of input	0 0:cbf29ce484222325
+j099_ignoredsegments,exttemplate,eop_corrupt.bin	178	30x9 ok	9 239:c12e184176ea5e82
+j100_error,badheader.jb2	179	E invalid JBIG2 file header	0 0:cbf29ce484222325
+j101_error,reservedbits.jb2	180	E reserved bits must be zero	0 0:cbf29ce484222325
+j102_error,nopageinfo.bin	181	E missing page information segment	0 0:cbf29ce484222325
+j103_error,emptypage.bin	182	E page has zero width or height	0 0:cbf29ce484222325
+j104_error,unknowntype.bin	183	E unknown or reserved segment type	0 0:cbf29ce484222325
+j105_error,forwardref.bin	184	E segment refers to larger segment number	0 0:cbf29ce484222325
+j106_error,toolarge.bin	185	70000x10 E overflow in bitmap dimension computation	0 0:cbf29ce484222325
+j107_error,empty.bin	186	E missing page information segment	0 0:cbf29ce484222325
+j108_generic,emptydata.bin	187	20x8 ok	8 152:ccaa543c3fb1f1ab
+j109_pageonly,default1.bin	188	13x3 ok	3 30:c6883aedfdcfc980

@@ -51,10 +51,12 @@ goldens with `scripts/goldens.sh <stage>` (needs Rust; builds `oracle/`).
   - [ ] Linux fontconfig: only `<dir>`/`<include>`/`<reset-dirs>` are
     interpreted; Windows support of `kit/platform` is untested and uses the
     narrow (ANSI code page) C file APIs, so non-ASCII paths need wide APIs.
-- [ ] **PDF image filters in `hayro/syntax`**: DCT (JPEG), JPX (JPEG 2000),
-  JBIG2 and CCITT streams inside embedded PDFs are not decoded (36 hayro
-  corpus files are `#skip`ped in `hayro/render/testdata/corpus.txt`; no
-  Typst suite test needs them).
+- [x] **PDF image filters in `hayro/syntax`**: DCT (zune-jpeg port in
+  `codecs/`), JPX (`hayro/jpeg2000`), JBIG2 (`hayro/jbig2`) and CCITT
+  (`hayro/ccitt`); the 36 previously skipped corpus files render and convert
+  bit-identically (render/svg oracles). hayro-jbig2's own conformance
+  suite (downloaded by its `sync.py`) has not been run; JBIG2 coverage
+  comes from the corpus, synthetic fixtures and local PDFs.
 - [ ] **skrifa**: no variable-font / CFF2 support (only used by hayro for
   PDF-embedded fonts).
 

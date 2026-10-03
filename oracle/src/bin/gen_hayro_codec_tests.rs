@@ -24,11 +24,22 @@
 //!   `<rows> <len>:<fnv1a64>` of the pushed pixels (`1` white, `0` black,
 //!   `\n` per completed row; chunks expanded). Checked by
 //!   `hayro/ccitt/oracle_test.mbt` (`testdata/oracle.tsv`).
+//! - `jbig2 <cases.tsv>`: decodes the JBIG2 files listed in `cases.tsv`
+//!   (written by `scripts/gen_jbig2_test_files.py`; files relative to its
+//!   `files/` directory) with `hayro_jbig2::Image::new` (kind `file`) or
+//!   `Image::new_embedded` (kind `embedded`, with the listed globals or
+//!   none); one line per case: `file<TAB>case index<TAB>result<TAB>pixels`,
+//!   where the result is `E <error>` if parsing fails, else `<w>x<h> ok` or
+//!   `<w>x<h> E <error>`, and `pixels` is `<rows> <len>:<fnv1a64>` of the
+//!   pushed pixels (`1` black, `0` white, `[<1|0><count>]` per pixel chunk,
+//!   `\n` per completed row). Checked by `hayro/jbig2/oracle_test.mbt`
+//!   (`testdata/oracle.tsv`).
 //!
 //! Usage (in `oracle/`):
 //! `cargo run --release --offline --bin gen_hayro_codec_tests -- streams ../hayro/syntax/testdata/codec_pdfs.txt > ../hayro/syntax/testdata/codec_streams.tsv`
 //! `cargo run --release --offline --bin gen_hayro_codec_tests -- jpx ../hayro/jpeg2000/testdata/files/* > ../hayro/jpeg2000/testdata/oracle.tsv`
 //! `cargo run --release --offline --bin gen_hayro_codec_tests -- ccitt ../hayro/ccitt/testdata/cases.tsv > ../hayro/ccitt/testdata/oracle.tsv`
+//! `cargo run --release --offline --bin gen_hayro_codec_tests -- jbig2 ../hayro/jbig2/testdata/cases.tsv > ../hayro/jbig2/testdata/oracle.tsv`
 //! (paths are printed relative to the module root).
 
 use std::fmt::Write as _;
@@ -349,12 +360,72 @@ fn ccitt(cases: &str) {
     }
 }
 
+struct Jbig2Recorder {
+    out: Vec<u8>,
+    rows: u32,
+}
+
+impl hayro_jbig2::Decoder for Jbig2Recorder {
+    fn push_pixel(&mut self, black: bool) {
+        self.out.push(if black { b'1' } else { b'0' });
+    }
+
+    fn push_pixel_chunk(&mut self, black: bool, chunk_count: u32) {
+        self.out
+            .extend_from_slice(format!("[{}{chunk_count}]", black as u8).as_bytes());
+    }
+
+    fn next_line(&mut self) {
+        self.rows += 1;
+        self.out.push(b'\n');
+    }
+}
+
+fn jbig2(cases: &str) {
+    println!("# file\tcase\tresult\tpixels (gen_hayro_codec_tests jbig2)");
+    let dir = std::path::Path::new(cases).parent().unwrap().join("files");
+    let list = std::fs::read_to_string(cases).unwrap();
+    let mut index = 0;
+    for line in list.lines() {
+        if line.is_empty() || line.starts_with('#') {
+            continue;
+        }
+        let f: Vec<&str> = line.split('\t').collect();
+        let data = std::fs::read(dir.join(f[0])).unwrap();
+        let globals = (f[1] != "-").then(|| std::fs::read(dir.join(f[1])).unwrap());
+        let mut rec = Jbig2Recorder { out: vec![], rows: 0 };
+        let image = if f[2] == "file" {
+            hayro_jbig2::Image::new(&data)
+        } else {
+            hayro_jbig2::Image::new_embedded(&data, globals.as_deref())
+        };
+        let result = match image {
+            Err(e) => format!("E {e}"),
+            Ok(image) => match image.decode(&mut rec) {
+                Ok(()) => format!("{}x{} ok", image.width(), image.height()),
+                Err(e) => format!("{}x{} E {e}", image.width(), image.height()),
+            },
+        };
+        println!(
+            "{}\t{index}\t{result}\t{} {}:{:016x}",
+            f[0],
+            rec.rows,
+            rec.out.len(),
+            fnv(&rec.out)
+        );
+        index += 1;
+    }
+}
+
 fn main() {
     let args: Vec<String> = std::env::args().collect();
     match args.get(1).map(String::as_str) {
         Some("streams") => streams(&args[2]),
         Some("jpx") => jpx(&args[2..]),
         Some("ccitt") => ccitt(&args[2]),
-        _ => panic!("usage: gen_hayro_codec_tests streams <list> | jpx <file>... | ccitt <cases.tsv>"),
+        Some("jbig2") => jbig2(&args[2]),
+        _ => panic!(
+            "usage: gen_hayro_codec_tests streams <list> | jpx <file>... | ccitt <cases.tsv> | jbig2 <cases.tsv>"
+        ),
     }
 }

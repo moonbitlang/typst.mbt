@@ -1,0 +1,190 @@
+# file	globals	kind	tags	intended (scripts/gen_jbig2_test_files.py)
+j000_generic,t0.bin	-	embedded	generic,t0	5 45:562ada192ded6898
+j001_generic,t0,customat.bin	-	embedded	generic,t0,customat	5 45:4faa79f92d999b7c
+j001_generic,t0,customat_trunc.bin	-	embedded	generic,t0,customat,truncated	-
+j001_generic,t0,customat_corrupt.bin	-	embedded	generic,t0,customat,corrupt	-
+j002_generic,t0,tpgdon.bin	-	embedded	generic,t0,tpgdon	17 413:307d44b649e4ea99
+j002_generic,t0,tpgdon_corrupt.bin	-	embedded	generic,t0,tpgdon,corrupt	-
+j003_generic,t0,tpgdon,customat.bin	-	embedded	generic,t0,tpgdon,customat	23 1248:52814c63796d7dc8
+j003_generic,t0,tpgdon,customat_trunc.bin	-	embedded	generic,t0,tpgdon,customat,truncated	-
+j004_generic,t1.bin	-	embedded	generic,t1	17 449:d646e3e9bf831afd
+j005_generic,t1,customat.bin	-	embedded	generic,t1,customat	17 393:404d9f7424b26c17
+j005_generic,t1,customat_trunc.bin	-	embedded	generic,t1,customat,truncated	-
+j006_generic,t1,tpgdon.bin	-	embedded	generic,t1,tpgdon	5 45:d661a70af4c5457c
+j007_generic,t1,tpgdon,customat.bin	-	embedded	generic,t1,tpgdon,customat	17 417:dfccf4137629904c
+j007_generic,t1,tpgdon,customat_trunc.bin	-	embedded	generic,t1,tpgdon,customat,truncated	-
+j007_generic,t1,tpgdon,customat_corrupt.bin	-	embedded	generic,t1,tpgdon,customat,corrupt	-
+j008_generic,t2.bin	-	embedded	generic,t2	23 1184:e26932145ecd4c2b
+j009_generic,t2,customat.bin	-	embedded	generic,t2,customat	12 2428:76264d42ea75e66b
+j009_generic,t2,customat_trunc.bin	-	embedded	generic,t2,customat,truncated	-
+j010_generic,t2,tpgdon.bin	-	embedded	generic,t2,tpgdon	5 45:056aa267847fbe5a
+j010_generic,t2,tpgdon_trunc.bin	-	embedded	generic,t2,tpgdon,truncated	-
+j010_generic,t2,tpgdon_corrupt.bin	-	embedded	generic,t2,tpgdon,corrupt	-
+j011_generic,t2,tpgdon,customat.bin	-	embedded	generic,t2,tpgdon,customat	31 2374:f70d9efcde5e6cff
+j012_generic,t3.bin	-	embedded	generic,t3	23 1172:1cae8290fba671f1
+j012_generic,t3_corrupt.bin	-	embedded	generic,t3,corrupt	-
+j013_generic,t3,customat.bin	-	embedded	generic,t3,customat	23 1164:64aabbf20c4c6782
+j013_generic,t3,customat_corrupt.bin	-	embedded	generic,t3,customat,corrupt	-
+j014_generic,t3,tpgdon.bin	-	embedded	generic,t3,tpgdon	12 2703:18896fb8ecc6d633
+j014_generic,t3,tpgdon_trunc.bin	-	embedded	generic,t3,tpgdon,truncated	-
+j014_generic,t3,tpgdon_corrupt.bin	-	embedded	generic,t3,tpgdon,corrupt	-
+j015_generic,t3,tpgdon,customat.bin	-	embedded	generic,t3,tpgdon,customat	23 1120:08063d591888c336
+j015_generic,t3,tpgdon,customat_trunc.bin	-	embedded	generic,t3,tpgdon,customat,truncated	-
+j015_generic,t3,tpgdon,customat_corrupt.bin	-	embedded	generic,t3,tpgdon,customat,corrupt	-
+j016_generic,offset,t0.bin	-	embedded	generic,offset,t0	64 2060:f8de024bba85f9d3
+j016_generic,offset,t0_trunc.bin	-	embedded	generic,offset,t0,truncated	-
+j017_generic,offset,t1.bin	-	embedded	generic,offset,t1	50 4176:764aa52777689b6e
+j017_generic,offset,t1_trunc.bin	-	embedded	generic,offset,t1,truncated	-
+j017_generic,offset,t1_corrupt.bin	-	embedded	generic,offset,t1,corrupt	-
+j018_generic,offset,t2.bin	-	embedded	generic,offset,t2	40 2720:fb96bd32f71a5d92
+j018_generic,offset,t2_corrupt.bin	-	embedded	generic,offset,t2,corrupt	-
+j019_generic,offset,t3.bin	-	embedded	generic,offset,t3	64 2004:4c92648284d5df9d
+j020_generic,mmr,eofb.bin	-	embedded	generic,mmr,eofb	23 1300:b013255b703f172d
+j021_generic,mmr.bin	-	embedded	generic,mmr	1 2:07fc1e07b4bd2c5f
+j021_generic,mmr_corrupt.bin	-	embedded	generic,mmr,corrupt	-
+j022_generic,mmr,eofb.bin	-	embedded	generic,mmr,eofb	9 201:decea38c89c19313
+j022_generic,mmr,eofb_trunc.bin	-	embedded	generic,mmr,eofb,truncated	-
+j023_generic,mmr.bin	-	embedded	generic,mmr	40 6283:acd5e72e91144c68
+j024_generic,mmr,eofb.bin	-	embedded	generic,mmr,eofb	3 54:71065860a74f5a38
+j024_generic,mmr,eofb_trunc.bin	-	embedded	generic,mmr,eofb,truncated	-
+j025_generic,unknownlength.jb2	-	file	generic,unknownlength	20 856:f4254d92d471b01e
+j025_generic,unknownlength_trunc.jb2	-	file	generic,unknownlength,truncated	-
+j026_generic,unknownlength,rowcount.jb2	-	file	generic,unknownlength,rowcount	20 544:d7fde0654319cff1
+j026_generic,unknownlength,rowcount_trunc.jb2	-	file	generic,unknownlength,rowcount,truncated	-
+j027_generic,unknownlength,mmr.jb2	-	file	generic,unknownlength,mmr	20 1048:a5b0fc675203bbdd
+j027_generic,unknownlength,mmr_corrupt.jb2	-	file	generic,unknownlength,mmr,corrupt	-
+j028_generic,unknownlength,mmr,rowcount.jb2	-	file	generic,unknownlength,mmr,rowcount	20 580:a80b135fcd1952b2
+j028_generic,unknownlength,mmr,rowcount_corrupt.jb2	-	file	generic,unknownlength,mmr,rowcount,corrupt	-
+j029_compose,or,default0.bin	-	embedded	compose,or,default0	30 1086:868e3fbdeb42f628
+j029_compose,or,default0_corrupt.bin	-	embedded	compose,or,default0,corrupt	-
+j030_compose,and,default0.bin	-	embedded	compose,and,default0	30 180:8d2eab74112c5f51
+j030_compose,and,default0_corrupt.bin	-	embedded	compose,and,default0,corrupt	-
+j031_compose,xor,default0.bin	-	embedded	compose,xor,default0	30 836:3258dafd5de3f635
+j031_compose,xor,default0_trunc.bin	-	embedded	compose,xor,default0,truncated	-
+j031_compose,xor,default0_corrupt.bin	-	embedded	compose,xor,default0,corrupt	-
+j032_compose,xnor,default0.bin	-	embedded	compose,xnor,default0	30 733:bd39be71e3ebe126
+j032_compose,xnor,default0_corrupt.bin	-	embedded	compose,xnor,default0,corrupt	-
+j033_compose,replace,default0.bin	-	embedded	compose,replace,default0	30 1001:c57ca208799103f9
+j034_compose,or,default1.bin	-	embedded	compose,or,default1	30 180:03fe00c64c0f2181
+j035_compose,and,default1.bin	-	embedded	compose,and,default1	30 741:162a06bc1387f389
+j036_compose,xor,default1.bin	-	embedded	compose,xor,default1	30 902:f37f7644b09c2bbb
+j037_compose,xnor,default1.bin	-	embedded	compose,xnor,default1	30 639:ec90352cfc248b20
+j037_compose,xnor,default1_corrupt.bin	-	embedded	compose,xnor,default1,corrupt	-
+j038_compose,replace,default1.bin	-	embedded	compose,replace,default1	30 857:f3f03c50f6e4a717
+j038_compose,replace,default1_trunc.bin	-	embedded	compose,replace,default1,truncated	-
+j039_compose,fullpage,or,default0.bin	-	embedded	compose,fullpage,or,default0	12 260:63bb9c4df1c95d27
+j039_compose,fullpage,or,default0_trunc.bin	-	embedded	compose,fullpage,or,default0,truncated	-
+j040_compose,fullpage,and,default0.bin	-	embedded	compose,fullpage,and,default0	12 60:82fad1ea4ba47a21
+j041_compose,fullpage,xor,default0.bin	-	embedded	compose,fullpage,xor,default0	12 368:eba0df7d9bac7b0e
+j041_compose,fullpage,xor,default0_trunc.bin	-	embedded	compose,fullpage,xor,default0,truncated	-
+j041_compose,fullpage,xor,default0_corrupt.bin	-	embedded	compose,fullpage,xor,default0,corrupt	-
+j042_compose,fullpage,xnor,default0.bin	-	embedded	compose,fullpage,xnor,default0	12 372:e55aca05d9f3b9f2
+j042_compose,fullpage,xnor,default0_trunc.bin	-	embedded	compose,fullpage,xnor,default0,truncated	-
+j043_compose,fullpage,replace,default0.bin	-	embedded	compose,fullpage,replace,default0	12 336:7e1d835c105625f0
+j044_compose,fullpage,or,default1.bin	-	embedded	compose,fullpage,or,default1	12 60:7aabac65a1f78385
+j045_compose,fullpage,and,default1.bin	-	embedded	compose,fullpage,and,default1	12 376:c80264f3aa5a738f
+j045_compose,fullpage,and,default1_corrupt.bin	-	embedded	compose,fullpage,and,default1,corrupt	-
+j046_compose,fullpage,xor,default1.bin	-	embedded	compose,fullpage,xor,default1	12 372:24114d81fad90212
+j046_compose,fullpage,xor,default1_trunc.bin	-	embedded	compose,fullpage,xor,default1,truncated	-
+j047_compose,fullpage,xnor,default1.bin	-	embedded	compose,fullpage,xnor,default1	12 372:bd1a80fe21e3daac
+j047_compose,fullpage,xnor,default1_trunc.bin	-	embedded	compose,fullpage,xnor,default1,truncated	-
+j048_compose,fullpage,replace,default1.bin	-	embedded	compose,fullpage,replace,default1	12 344:f13c4a96bdc2796e
+j048_compose,fullpage,replace,default1_corrupt.bin	-	embedded	compose,fullpage,replace,default1,corrupt	-
+j049_striped,unknownheight.jb2	-	file	striped,unknownheight	31 1273:f675439ecc62e362
+j049_striped,unknownheight_corrupt.jb2	-	file	striped,unknownheight,corrupt	-
+j050_striped.jb2	-	file	striped	31 1301:2883ebd6f5346e9e
+j051_striped,unknownheight,noeos.bin	-	embedded	striped,unknownheight,noeos	-
+j052_refine,page,gr0.bin	-	embedded	refine,page,gr0	25 1499:6e51b0ec9687b927
+j052_refine,page,gr0_corrupt.bin	-	embedded	refine,page,gr0,corrupt	-
+j053_refine,intermediate,gr0.bin	-	embedded	refine,intermediate,gr0	25 1511:bac48efb663f1529
+j053_refine,intermediate,gr0_trunc.bin	-	embedded	refine,intermediate,gr0,truncated	-
+j054_refine,page,gr0,customat.bin	-	embedded	refine,page,gr0,customat	25 1567:786214d4a8e5518a
+j054_refine,page,gr0,customat_trunc.bin	-	embedded	refine,page,gr0,customat,truncated	-
+j055_refine,intermediate,gr0,customat.bin	-	embedded	refine,intermediate,gr0,customat	25 1555:f43e4b3f183181fe
+j056_refine,page,gr0,tpgron.bin	-	embedded	refine,page,gr0,tpgron	25 1471:ea9693cc29f71bb6
+j057_refine,intermediate,gr0,tpgron.bin	-	embedded	refine,intermediate,gr0,tpgron	25 1435:a6f1ba715ae71a30
+j057_refine,intermediate,gr0,tpgron_trunc.bin	-	embedded	refine,intermediate,gr0,tpgron,truncated	-
+j058_refine,page,gr0,tpgron,customat.bin	-	embedded	refine,page,gr0,tpgron,customat	25 1399:f1f68ed472e4a6f5
+j059_refine,intermediate,gr0,tpgron,customat.bin	-	embedded	refine,intermediate,gr0,tpgron,customat	25 1383:c872fe477c924eee
+j059_refine,intermediate,gr0,tpgron,customat_trunc.bin	-	embedded	refine,intermediate,gr0,tpgron,customat,truncated	-
+j060_refine,page,gr1.bin	-	embedded	refine,page,gr1	25 1467:28bddb6a9a8ee471
+j060_refine,page,gr1_trunc.bin	-	embedded	refine,page,gr1,truncated	-
+j060_refine,page,gr1_corrupt.bin	-	embedded	refine,page,gr1,corrupt	-
+j061_refine,intermediate,gr1.bin	-	embedded	refine,intermediate,gr1	25 1423:c5f0697b3af48c8d
+j062_refine,page,gr1,tpgron.bin	-	embedded	refine,page,gr1,tpgron	25 1383:044a28daf846d4d1
+j062_refine,page,gr1,tpgron_trunc.bin	-	embedded	refine,page,gr1,tpgron,truncated	-
+j063_refine,intermediate,gr1,tpgron.bin	-	embedded	refine,intermediate,gr1,tpgron	25 1355:764bab54a0217968
+j064_refine,page,default1,gr0.bin	-	embedded	refine,page,default1,gr0	14 484:13d863d3c48bd3b4
+j064_refine,page,default1,gr0_corrupt.bin	-	embedded	refine,page,default1,gr0,corrupt	-
+j065_refine,page,default1,gr1.bin	-	embedded	refine,page,default1,gr1	14 404:5fd856d558bb48ca
+j065_refine,page,default1,gr1_trunc.bin	-	embedded	refine,page,default1,gr1,truncated	-
+j066_refine,chain,intermediate.bin	-	embedded	refine,chain,intermediate	30 1014:fe3eac1f33b3b4da
+j067_halftone,ht0,or,pd0.bin	-	embedded	halftone,ht0,or,pd0	44 3812:e68743b8c10c6a9a
+j067_halftone,ht0,or,pd0_trunc.bin	-	embedded	halftone,ht0,or,pd0,truncated	-
+j067_halftone,ht0,or,pd0_corrupt.bin	-	embedded	halftone,ht0,or,pd0,corrupt	-
+j068_halftone,ht1,skip,or,pd0.bin	-	embedded	halftone,ht1,skip,or,pd0	44 3194:ae9733c6e301c743
+j069_halftone,ht2,xor,pd1,intermediate.bin	-	embedded	halftone,ht2,xor,pd1,intermediate	44 3624:902f624b5d7b02b1
+j070_halftone,ht3,skip,and,pd2.bin	-	embedded	halftone,ht3,skip,and,pd2	44 3824:242c764268af5731
+j070_halftone,ht3,skip,and,pd2_corrupt.bin	-	embedded	halftone,ht3,skip,and,pd2,corrupt	-
+j071_halftone,ht0,mmr,replace,pd0.bin	-	embedded	halftone,ht0,mmr,replace,pd0	44 3020:3469a1c5493f6dff
+j072_halftone,ht0,mmr,xnor,pd0,intermediate.bin	-	embedded	halftone,ht0,mmr,xnor,pd0,intermediate	44 738:32ad35b289044786
+j073_halftone,ht0,skip,or,pd1,rotated.bin	-	embedded	halftone,ht0,skip,or,pd1,rotated	44 922:68ce03c050415e87
+j073_halftone,ht0,skip,or,pd1,rotated_corrupt.bin	-	embedded	halftone,ht0,skip,or,pd1,rotated,corrupt	-
+j074_halftone,ht1,or,pd2.bin	-	embedded	halftone,ht1,or,pd2	44 2492:38dd0c09c40098f9
+j074_halftone,ht1,or,pd2_corrupt.bin	-	embedded	halftone,ht1,or,pd2,corrupt	-
+j075_halftone,ht0,skip,replace,pd2,rotated,intermediate.bin	-	embedded	halftone,ht0,skip,replace,pd2,rotated,intermediate	44 2641:7c57c27ce5d623f9
+j075_halftone,ht0,skip,replace,pd2,rotated,intermediate_trunc.bin	-	embedded	halftone,ht0,skip,replace,pd2,rotated,intermediate,truncated	-
+j075_halftone,ht0,skip,replace,pd2,rotated,intermediate_corrupt.bin	-	embedded	halftone,ht0,skip,replace,pd2,rotated,intermediate,corrupt	-
+j076_halftone,missingdict.bin	-	embedded	halftone,missingdict	-
+j077_symbol,text,arith,sd0,tl,strips1,dsoff0,xor.bin	-	embedded	symbol,text,arith,sd0,tl,strips1,dsoff0,xor	40 949:636c9a924e59e7f8
+j077_symbol,text,arith,sd0,tl,strips1,dsoff0,xor_corrupt.bin	-	embedded	symbol,text,arith,sd0,tl,strips1,dsoff0,xor,corrupt	-
+j078_symbol,text,arith,sd1,tl,transposed,strips2,dsoff3,xor.bin	-	embedded	symbol,text,arith,sd1,tl,transposed,strips2,dsoff3,xor	40 846:7d21a7ff839d1a2f
+j079_symbol,text,arith,sd2,tr,strips4,dsoff-2,or.bin	-	embedded	symbol,text,arith,sd2,tr,strips4,dsoff-2,or	40 875:ade09feec7d75756
+j079_symbol,text,arith,sd2,tr,strips4,dsoff-2,or_corrupt.bin	-	embedded	symbol,text,arith,sd2,tr,strips4,dsoff-2,or,corrupt	-
+j080_symbol,text,arith,sd3,tr,transposed,strips8,dsoff15,xor.bin	-	embedded	symbol,text,arith,sd3,tr,transposed,strips8,dsoff15,xor	40 1092:a0264f6459e67f45
+j080_symbol,text,arith,sd3,tr,transposed,strips8,dsoff15,xor_trunc.bin	-	embedded	symbol,text,arith,sd3,tr,transposed,strips8,dsoff15,xor,truncated	-
+j081_symbol,text,arith,sd0,bl,strips1,dsoff-16,or.bin	-	embedded	symbol,text,arith,sd0,bl,strips1,dsoff-16,or	40 857:fc7a37f2bfe36eef
+j081_symbol,text,arith,sd0,bl,strips1,dsoff-16,or_corrupt.bin	-	embedded	symbol,text,arith,sd0,bl,strips1,dsoff-16,or,corrupt	-
+j082_symbol,text,arith,sd1,bl,transposed,strips2,dsoff0,xor.bin	-	embedded	symbol,text,arith,sd1,bl,transposed,strips2,dsoff0,xor	40 877:0f5d29d9253ca4db
+j082_symbol,text,arith,sd1,bl,transposed,strips2,dsoff0,xor_trunc.bin	-	embedded	symbol,text,arith,sd1,bl,transposed,strips2,dsoff0,xor,truncated	-
+j082_symbol,text,arith,sd1,bl,transposed,strips2,dsoff0,xor_corrupt.bin	-	embedded	symbol,text,arith,sd1,bl,transposed,strips2,dsoff0,xor,corrupt	-
+j083_symbol,text,arith,sd2,br,strips4,dsoff3,xor.bin	-	embedded	symbol,text,arith,sd2,br,strips4,dsoff3,xor	40 906:fdddcbae904a3b01
+j083_symbol,text,arith,sd2,br,strips4,dsoff3,xor_corrupt.bin	-	embedded	symbol,text,arith,sd2,br,strips4,dsoff3,xor,corrupt	-
+j084_symbol,text,arith,sd3,br,transposed,strips8,dsoff-2,or.bin	-	embedded	symbol,text,arith,sd3,br,transposed,strips8,dsoff-2,or	40 400:a986df2705366fa5
+j084_symbol,text,arith,sd3,br,transposed,strips8,dsoff-2,or_trunc.bin	-	embedded	symbol,text,arith,sd3,br,transposed,strips8,dsoff-2,or,truncated	-
+j085_symbol,text,arith,globals,export,refine,gr0.bin	j085_symbol,text,arith,globals,export,refine,gr0.glob	embedded	symbol,text,arith,globals,export,refine,gr0	20 692:0add9ace1d7d437d
+j085_symbol,text,arith,globals,export,refine,gr0_trunc.bin	j085_symbol,text,arith,globals,export,refine,gr0.glob	embedded	symbol,text,arith,globals,export,refine,gr0,truncated	-
+j086_symbol,text,arith,globals,export,refine,gr1.bin	j086_symbol,text,arith,globals,export,refine,gr1.glob	embedded	symbol,text,arith,globals,export,refine,gr1	20 636:27bd6e2f3122d98a
+j086_symbol,text,arith,globals,export,refine,gr1_corrupt.bin	j086_symbol,text,arith,globals,export,refine,gr1.glob	embedded	symbol,text,arith,globals,export,refine,gr1,corrupt	-
+j087_symbol,refagg,arith,retained,gr0.bin	-	embedded	symbol,refagg,arith,retained,gr0	24 772:86b6c6466b703f4d
+j087_symbol,refagg,arith,retained,gr0_corrupt.bin	-	embedded	symbol,refagg,arith,retained,gr0,corrupt	-
+j088_symbol,refagg,arith,retained,gr1.bin	-	embedded	symbol,refagg,arith,retained,gr1	24 768:75e86e9ad2533c95
+j089_symbol,text,huffman,dh0,dw0,rawcoll,sel0.bin	-	embedded	symbol,text,huffman,dh0,dw0,rawcoll,sel0	45 974:ca8528c4f98a41a1
+j090_symbol,text,huffman,dh1,dw0,mmrcoll,sel1,transposed.bin	-	embedded	symbol,text,huffman,dh1,dw0,mmrcoll,sel1,transposed	45 846:6715cac01856109e
+j090_symbol,text,huffman,dh1,dw0,mmrcoll,sel1,transposed_corrupt.bin	-	embedded	symbol,text,huffman,dh1,dw0,mmrcoll,sel1,transposed,corrupt	-
+j091_symbol,text,huffman,dh0,dw1,rawcoll,sel2,refine.bin	-	embedded	symbol,text,huffman,dh0,dw1,rawcoll,sel2,refine	45 724:75bd591ae61ff0d0
+j091_symbol,text,huffman,dh0,dw1,rawcoll,sel2,refine_trunc.bin	-	embedded	symbol,text,huffman,dh0,dw1,rawcoll,sel2,refine,truncated	-
+j091_symbol,text,huffman,dh0,dw1,rawcoll,sel2,refine_corrupt.bin	-	embedded	symbol,text,huffman,dh0,dw1,rawcoll,sel2,refine,corrupt	-
+j092_symbol,text,huffman,dh1,dw1,mmrcoll,sel3,refine.bin	-	embedded	symbol,text,huffman,dh1,dw1,mmrcoll,sel3,refine	45 865:54a5becaa0449edf
+j093_symbol,text,huffman,customtables.bin	-	embedded	symbol,text,huffman,customtables	30 634:006f8fff2dbad0d5
+j093_symbol,text,huffman,customtables_trunc.bin	-	embedded	symbol,text,huffman,customtables,truncated	-
+j094_symbol,refagg,huffman.bin	-	embedded	symbol,refagg,huffman	20 452:f509c94fa63331d4
+j095_file,sequential,eop,eof.jb2	-	file	file,sequential,eop,eof	25 933:a070b555799a0fc7
+j095_file,sequential,eop,eof_trunc.jb2	-	file	file,sequential,eop,eof,truncated	-
+j096_file,randomaccess,eop,eof.jb2	-	file	file,randomaccess,eop,eof	25 933:a070b555799a0fc7
+j097_file,longreferred,segnum.jb2	-	file	file,longreferred,segnum	12 276:2fd03ea401f7d1f1
+j097_file,longreferred,segnum_corrupt.jb2	-	file	file,longreferred,segnum,corrupt	-
+j098_text,intermediate,default1,refine.bin	-	embedded	text,intermediate,default1,refine	16 500:61c839967c72a449
+j099_ignoredsegments,exttemplate,eop.bin	-	embedded	ignoredsegments,exttemplate,eop	9 239:c12e184176ea5e82
+j099_ignoredsegments,exttemplate,eop_trunc.bin	-	embedded	ignoredsegments,exttemplate,eop,truncated	-
+j099_ignoredsegments,exttemplate,eop_corrupt.bin	-	embedded	ignoredsegments,exttemplate,eop,corrupt	-
+j100_error,badheader.jb2	-	file	error,badheader	-
+j101_error,reservedbits.jb2	-	file	error,reservedbits	-
+j102_error,nopageinfo.bin	-	embedded	error,nopageinfo	-
+j103_error,emptypage.bin	-	embedded	error,emptypage	-
+j104_error,unknowntype.bin	-	embedded	error,unknowntype	-
+j105_error,forwardref.bin	-	embedded	error,forwardref	-
+j106_error,toolarge.bin	-	embedded	error,toolarge	-
+j107_error,empty.bin	-	embedded	error,empty	-
+j108_generic,emptydata.bin	-	embedded	generic,emptydata	-
+j109_pageonly,default1.bin	-	embedded	pageonly,default1	3 30:c6883aedfdcfc980
