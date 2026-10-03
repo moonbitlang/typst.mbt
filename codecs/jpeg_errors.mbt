@@ -6,7 +6,7 @@
 ///|
 /// An I/O error of the byte reader (upstream `zune_core::bytestream::
 /// ZByteIoError`).
-priv enum ZByteIoError {
+pub(all) enum ZByteIoError {
   /// Not enough bytes to satisfy a read: (read, requested).
   NotEnoughBytes(Int, Int)
   /// A standard library error.
@@ -28,7 +28,7 @@ fn ZByteIoError::debug(self : ZByteIoError) -> String {
 
 ///|
 /// Common decode errors (upstream `zune_jpeg::errors::DecodeErrors`).
-priv suberror DecodeErrors {
+pub suberror DecodeErrors {
   /// Any other thing we do not know.
   Format(String)
   /// Any other thing we do not know but we don't need to allocate space on
@@ -58,7 +58,7 @@ priv suberror DecodeErrors {
 
 ///|
 /// Upstream `Display for DecodeErrors` (which forwards to `Debug`).
-fn DecodeErrors::display(self : DecodeErrors) -> String {
+pub fn DecodeErrors::display(self : DecodeErrors) -> String {
   match self {
     Format(a) => rust_debug_str(a)
     FormatStatic(a) => rust_debug_str(a)

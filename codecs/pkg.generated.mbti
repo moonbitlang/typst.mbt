@@ -55,6 +55,22 @@ pub fn zlib_compress(BytesView, level? : Int) -> Bytes
 pub fn zlib_decompress(BytesView, verify_checksum? : Bool) -> Bytes raise InflateError
 
 // Errors
+pub suberror DecodeErrors {
+  Format(String)
+  FormatStatic(String)
+  IllegalMagicBytes(Int)
+  HuffmanDecode(String)
+  ZeroError
+  DqtError(String)
+  SosError(String)
+  SofError(String)
+  ExhaustedData
+  TooSmallOutput(Int, Int)
+  IoErrors(ZByteIoError)
+  Panic(String)
+}
+pub fn DecodeErrors::display(Self) -> String
+
 pub(all) suberror ExifError {
   ExifError(String)
 } derive(@debug.Debug)
@@ -69,6 +85,15 @@ pub(all) suberror InflateError {
 
 // Types and methods
 type Adler32
+
+pub(all) enum ColorSpace {
+  RGB
+  YCbCr
+  Luma
+  YCCK
+  CMYK
+  MultiBand(Int)
+} derive(Eq, @debug.Debug)
 
 pub(all) enum ColorType {
   L8
@@ -88,6 +113,13 @@ pub struct Compressor {
 pub fn Compressor::finish(Self) -> Bytes
 pub fn Compressor::new() -> Self
 pub fn Compressor::write_data(Self, BytesView) -> Unit
+
+pub(all) struct DecoderOptions {
+  out_colorspace : ColorSpace
+  max_width : Int
+  max_height : Int
+}
+pub fn DecoderOptions::default() -> Self
 
 pub struct Exif {
   // private fields
@@ -135,6 +167,17 @@ pub(all) struct ImageInfo {
   icc : Bytes?
 } derive(@debug.Debug)
 
+pub struct JpegDecoder {
+  // private fields
+}
+pub fn JpegDecoder::decode(Self) -> Bytes raise DecodeErrors
+pub fn JpegDecoder::decode_headers(Self) -> Unit raise DecodeErrors
+pub fn JpegDecoder::dimensions(Self) -> (Int, Int)?
+pub fn JpegDecoder::info_components(Self) -> Int?
+pub fn JpegDecoder::input_colorspace(Self) -> ColorSpace?
+pub fn JpegDecoder::new_with_options(BytesView, DecoderOptions) -> Self
+pub fn JpegDecoder::set_options(Self, DecoderOptions) -> Unit
+
 pub(all) struct PixelDimensions {
   xppu : UInt
   yppu : UInt
@@ -177,6 +220,12 @@ pub(all) struct WebpImage {
   height : Int
   has_alpha : Bool
   data : Bytes
+}
+
+pub(all) enum ZByteIoError {
+  NotEnoughBytes(Int, Int)
+  StdIoError(String)
+  Generic(String)
 }
 
 pub struct ZlibEncoder {
