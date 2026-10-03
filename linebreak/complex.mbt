@@ -77,27 +77,20 @@ priv struct ComplexPayloads {
   mut km : LstmSegmenter?
   mut lo : LstmSegmenter?
   mut th : LstmSegmenter?
+  /// Whether the Southeast Asian LSTM models are enabled. They are decoded on
+  /// first use (not upstream, where they are baked data: decoding all of
+  /// them took a third of the CLI's startup time).
+  mut lstms : Bool
 }
 
 ///|
 fn ComplexPayloads::new() -> ComplexPayloads {
-  { my: None, km: None, lo: None, th: None, }
+  { my: None, km: None, lo: None, th: None, lstms: false, }
 }
 
 ///|
 fn ComplexPayloads::with_southeast_asian_lstms(self : ComplexPayloads) -> Unit {
-  if self.my is None {
-    self.my = Some(lstm_burmese.get())
-  }
-  if self.km is None {
-    self.km = Some(lstm_khmer.get())
-  }
-  if self.lo is None {
-    self.lo = Some(lstm_lao.get())
-  }
-  if self.th is None {
-    self.th = Some(lstm_thai.get())
-  }
+  self.lstms = true
 }
 
 ///|
@@ -106,10 +99,30 @@ fn ComplexPayloads::select(
   complex_script : ComplexScript,
 ) -> LstmSegmenter? {
   match complex_script {
-    Myanmar => self.my
-    Khmer => self.km
-    Lao => self.lo
-    Thai => self.th
+    Myanmar => {
+      if self.lstms && self.my is None {
+        self.my = Some(lstm_burmese.get())
+      }
+      self.my
+    }
+    Khmer => {
+      if self.lstms && self.km is None {
+        self.km = Some(lstm_khmer.get())
+      }
+      self.km
+    }
+    Lao => {
+      if self.lstms && self.lo is None {
+        self.lo = Some(lstm_lao.get())
+      }
+      self.lo
+    }
+    Thai => {
+      if self.lstms && self.th is None {
+        self.th = Some(lstm_thai.get())
+      }
+      self.th
+    }
     // No Chinese/Japanese dictionary is loaded by the line segmenter.
     ChineseOrJapanese => None
     None => None
