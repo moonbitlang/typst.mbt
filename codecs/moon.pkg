@@ -27,5 +27,7 @@ options(
     "imageops_libm_other.mbt": [ "not", "native" ],
     "zlib_v128.mbt": [ "native", "wasm" ],
     "zlib_scalar.mbt": [ "wasm-gc", "js" ],
+    "png_filter_v128.mbt": [ "native", "wasm" ],
+    "png_filter_scalar.mbt": [ "wasm-gc", "js" ],
   },
 )
