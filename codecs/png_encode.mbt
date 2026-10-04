@@ -169,12 +169,13 @@ fn encode_image_data_level(
   let in_len = width * bpp
   let mut prev = FixedArray::make(in_len, b'\x00')
   let current = FixedArray::make(in_len + 1, b'\x00')
+  let scratch = FixedArray::make(in_len + 1, b'\x00')
   let line = FixedArray::make(in_len, b'\x00')
   let zlib = ZlibEncoder::new(level)
   let mut line = line
   for y in 0..<height {
     line.blit_from_bytesview(0, data[y * in_len:(y + 1) * in_len])
-    let filter_type = adaptive_filter(bpp, prev, line, current)
+    let filter_type = adaptive_filter(bpp, prev, line, current, scratch)
     zlib.write_all(png_filter_type_bytes[filter_type][:])
     zlib.write_all_array(current, 1, in_len)
     // The current line becomes the previous one (instead of a copy).
@@ -199,10 +200,11 @@ fn encode_image_data(
   let mut prev = FixedArray::make(in_len, b'\x00')
   let compressor = Compressor::new()
   let current = FixedArray::make(in_len + 1, b'\x00')
+  let scratch = FixedArray::make(in_len + 1, b'\x00')
   let mut line = FixedArray::make(in_len, b'\x00')
   for y in 0..<height {
     line.blit_from_bytesview(0, data[y * in_len:(y + 1) * in_len])
-    let filter_type = adaptive_filter(bpp, prev, line, current)
+    let filter_type = adaptive_filter(bpp, prev, line, current, scratch)
     current[0] = filter_type.to_byte()
     compressor.write_data(Bytes::from_array(current[:])[:])
     // The current line becomes the previous one (instead of a copy).
@@ -248,20 +250,6 @@ fn filter_paeth(a : Int, b : Int, c : Int) -> Int {
 }
 
 ///|
-/// Applies a row filter, writing the filtered row into `output[1..]` (upstream
-/// `filter_internal`). Filter codes: 1 = Sub, 2 = Up, 3 = Avg, 4 = Paeth.
-fn filter_row(
-  filter : Int,
-  bpp : Int,
-  previous : FixedArray[Byte],
-  current : FixedArray[Byte],
-  output : FixedArray[Byte],
-) -> Unit {
-  filter_row_cost(filter, bpp, previous, current, output, 0xFFFFFFFFFFFFFFFFUL)
-  |> ignore
-}
-
-///|
 /// Sum of the absolute values of the filtered bytes read as `i8`
 /// (upstream `sum_buffer`).
 fn sum_buffer(buf : FixedArray[Byte]) -> UInt64 {
@@ -282,25 +270,35 @@ fn adaptive_filter(
   previous : FixedArray[Byte],
   current : FixedArray[Byte],
   output : FixedArray[Byte],
+  scratch : FixedArray[Byte],
 ) -> Int {
   let mut min_cost = 0xFFFFFFFFFFFFFFFFUL
   let mut filter_choice = 0
-  // Up, Sub, Avg, Paeth
-  for filter in [2, 1, 3, 4] {
+  // The best row so far and the buffer for the next filter: the candidates
+  // alternate between `output` and `scratch` so that the best one is kept
+  // instead of being recomputed like upstream does (same bytes).
+  let mut best = output
+  let mut out = output
+  for filter in adaptive_filter_order[:] {
     // A filter whose cost exceeds the minimum so far cannot be chosen, so
-    // its computation can stop early (its output is recomputed below if
-    // needed).
-    let cost = filter_row_cost(filter, bpp, previous, current, output, min_cost)
+    // its computation can stop early (with a partially filtered row).
+    let cost = filter_row_cost(filter, bpp, previous, current, out, min_cost)
     if cost <= min_cost {
       min_cost = cost
       filter_choice = filter
+      best = out
+      out = if physical_equal(out, output) { scratch } else { output }
       if cost == 0 {
-        return filter_choice
+        break
       }
     }
   }
-  if filter_choice != 4 {
-    filter_row(filter_choice, bpp, previous, current, output)
+  if !physical_equal(best, output) {
+    best.blit_to(output, len=current.length(), src_offset=1, dst_offset=1)
   }
   filter_choice
 }
+
+///|
+/// Up, Sub, Avg, Paeth (the order of upstream's adaptive filter).
+let adaptive_filter_order : ReadOnlyArray[Int] = [2, 1, 3, 4]

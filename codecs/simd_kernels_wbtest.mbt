@@ -562,10 +562,11 @@ test "bench adler32 64 KiB" (it : @bench.T) {
 test "bench adaptive_filter 64 rows of 4764 bytes" (it : @bench.T) {
   let rows = Array::makei(64, r => png_test_row(4764, r, r % 3))
   let out = FixedArray::make(4765, b'\x00')
+  let scratch = FixedArray::make(4765, b'\x00')
   it.bench(() => {
     let mut acc = 0
     for r in 1..<64 {
-      acc += adaptive_filter(4, rows[r - 1], rows[r], out)
+      acc += adaptive_filter(4, rows[r - 1], rows[r], out, scratch)
     }
     it.keep(acc)
   })

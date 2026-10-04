@@ -7,10 +7,12 @@
 // row sums only grow, so a filter gives up if and only if the scalar code
 // gives up; only the returned (over-limit) partial sum and the partially
 // written output differ, and neither is used for a filter that gave up (the
-// winner is recomputed, see [adaptive_filter]).
+// winner is kept, see [adaptive_filter]).
 
 ///|
-/// [filter_row] that also computes [sum_buffer] of the output, giving up
+/// Applies a row filter, writing the filtered row into `output[1..]`
+/// (upstream `filter_internal`; filter codes: 1 = Sub, 2 = Up, 3 = Avg, 4 =
+/// Paeth), and computes [sum_buffer] of the output, giving up
 /// (with a partially filtered row) once the cost exceeds `limit`.
 fn filter_row_cost(
   filter : Int,

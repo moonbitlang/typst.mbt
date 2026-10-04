@@ -2,7 +2,9 @@
 // (wasm-gc, js); `png_filter_v128.mbt` is the native/wasm counterpart.
 
 ///|
-/// [filter_row] that also computes [sum_buffer] of the output, giving up
+/// Applies a row filter, writing the filtered row into `output[1..]`
+/// (upstream `filter_internal`; filter codes: 1 = Sub, 2 = Up, 3 = Avg, 4 =
+/// Paeth), and computes [sum_buffer] of the output, giving up
 /// (with a partially filtered row) once the cost exceeds `limit`.
 /// Specialized loops without bounds checks (performance; same results).
 fn filter_row_cost(
