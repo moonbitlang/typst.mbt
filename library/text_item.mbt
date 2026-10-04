@@ -92,6 +92,7 @@ fn sum_em(glyphs : ArrayView[Glyph], f : (Glyph) -> Em) -> Em {
 
 ///|
 /// A glyph in a run of shaped text.
+#valtype
 pub(all) struct Glyph {
   /// The glyph's index in the font.
   id : UInt16

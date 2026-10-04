@@ -3,6 +3,7 @@
 
 ///|
 /// A size or distance, possibly expressed with contextual units.
+#valtype
 pub(all) struct Length {
   /// The absolute part.
   abs : Abs
