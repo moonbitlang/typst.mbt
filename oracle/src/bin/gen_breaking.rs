@@ -156,7 +156,7 @@ fn valued(f: impl Fn(u32) -> u32, skip: u32) -> Vec<(u32, u32, u32)> {
 }
 
 fn emit_valued(out: &mut String, name: &str, doc: &str, r: &[(u32, u32, u32)]) {
-    writeln!(out, "///|\n/// {doc}\nlet {name} : FixedArray[Int] = [").unwrap();
+    writeln!(out, "///|\n/// {doc}\nlet {name} : ReadOnlyArray[Int] = [").unwrap();
     for chunk in r.chunks(4) {
         out.push_str("  ");
         for (a, b, v) in chunk {
@@ -168,7 +168,7 @@ fn emit_valued(out: &mut String, name: &str, doc: &str, r: &[(u32, u32, u32)]) {
 }
 
 fn emit_ints(out: &mut String, name: &str, doc: &str, ty: &str, v: &[i64]) {
-    writeln!(out, "///|\n/// {doc}\nlet {name} : FixedArray[{ty}] = [").unwrap();
+    writeln!(out, "///|\n/// {doc}\nlet {name} : ReadOnlyArray[{ty}] = [").unwrap();
     for chunk in v.chunks(16) {
         out.push_str("  ");
         for x in chunk {
@@ -180,7 +180,7 @@ fn emit_ints(out: &mut String, name: &str, doc: &str, ty: &str, v: &[i64]) {
 }
 
 fn emit_names(out: &mut String, name: &str, names: &[String]) {
-    writeln!(out, "///|\nlet {name} : FixedArray[String] = [").unwrap();
+    writeln!(out, "///|\nlet {name} : ReadOnlyArray[String] = [").unwrap();
     for n in names {
         writeln!(out, "  {n:?},").unwrap();
     }
@@ -421,7 +421,7 @@ fn gen_linebreak(data_crate: &Path, dest: &Path, lstm_dest: &Path) {
         assert_eq!(keys.len(), values.len());
         writeln!(out, "///|\n/// `{name}` ({kind}).").unwrap();
         writeln!(out, "let {script}_model_type : String = {kind:?}\n").unwrap();
-        writeln!(out, "///|\nlet {script}_dic : FixedArray[(String, Int)] = [").unwrap();
+        writeln!(out, "///|\nlet {script}_dic : ReadOnlyArray[(String, Int)] = [").unwrap();
         for (k, v) in keys.iter().zip(&values) {
             writeln!(out, "  ({k:?}, {v}),").unwrap();
         }
@@ -433,7 +433,7 @@ fn gen_linebreak(data_crate: &Path, dest: &Path, lstm_dest: &Path) {
             assert_eq!(d.iter().product::<usize>() * 4, blobs[k + 2].len(), "{name} {mname}");
             writeln!(
                 out,
-                "///|\nlet {script}_{mname}_dims : FixedArray[Int] = {:?}\n",
+                "///|\nlet {script}_{mname}_dims : ReadOnlyArray[Int] = {:?}\n",
                 d
             )
             .unwrap();
@@ -719,7 +719,7 @@ fn gen_hypher(krate: &Path, dest: &Path) {
     }
     out.push_str("  }\n}\n\n");
 
-    out.push_str("///|\n/// The embedded tries (base64), indexed by `Lang::index`.\nlet tries : FixedArray[String] = [\n");
+    out.push_str("///|\n/// The embedded tries (base64), indexed by `Lang::index`.\nlet tries : ReadOnlyArray[String] = [\n");
     for v in &variants {
         let file = &files.iter().find(|(f, _)| f == v).unwrap().1;
         writeln!(out, "  trie_{file},").unwrap();

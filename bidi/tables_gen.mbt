@@ -6,7 +6,7 @@ pub let unicode_version : (Int, Int, Int) = (16, 0, 0)
 
 ///|
 /// `bidi_class_table` (unicode-bidi 0.3.18); values index `BidiClass` in declaration order. Missing = L.
-let bidi_class_table : FixedArray[Int] = [
+let bidi_class_table : ReadOnlyArray[Int] = [
   0x0, 0x8, 3, 0x9, 0x9, 21, 0xA, 0xA, 2, 0xB, 0xB, 21, 0xC, 0xC, 22, 0xD, 0xD, 2,
   0xE, 0x1B, 3, 0x1C, 0x1E, 2, 0x1F, 0x1F, 21, 0x20, 0x20, 22, 0x21, 0x22, 14, 0x23,
   0x25, 7, 0x26, 0x2A, 14, 0x2B, 0x2B, 6, 0x2C, 0x2C, 4, 0x2D, 0x2D, 6, 0x2E, 0x2F,
@@ -365,7 +365,7 @@ let bidi_class_table : FixedArray[Int] = [
 
 ///|
 /// `bidi_pairs_table` (unicode-bidi 0.3.18): `[open, close, normalized opening or -1]`.
-let bidi_pairs_table : FixedArray[Int] = [
+let bidi_pairs_table : ReadOnlyArray[Int] = [
   40, 41, -1, 91, 93, -1, 123, 125, -1, 3898, 3899, -1, 3900, 3901, -1, 5787, 5788,
   -1, 8261, 8262, -1, 8317, 8318, -1, 8333, 8334, -1, 8968, 8969, -1, 8970, 8971,
   -1, 9001, 9002, 12296, 10088, 10089, -1, 10090, 10091, -1, 10092, 10093, -1, 10094,

@@ -30,7 +30,7 @@ pub fn locales() -> Array[@citationberg.Locale] {
   match locales_cache.val {
     Some(l) => l
     None => {
-      let res = locales_xml.map(xml => {
+      let res = locales_xml[:].map(xml => {
         match @citationberg.LocaleFile::from_xml(xml) {
           Ok(f) => f.to_locale()
           Err(e) => abort("archived locale failed to parse: \{e}")

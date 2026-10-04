@@ -32,7 +32,7 @@ def char_lit(s):
     return ord(s)
 
 
-def emit_ints(name, doc, values, per_line=8, typ='FixedArray[Int]'):
+def emit_ints(name, doc, values, per_line=8, typ='ReadOnlyArray[Int]'):
     out = ['///|\n/// %s\nlet %s : %s = [\n' % (doc, name, typ)]
     for i in range(0, len(values), per_line):
         out.append('  ' + ' '.join('%s,' % v for v in values[i:i + per_line]) + '\n')
@@ -115,7 +115,7 @@ def gen_aat_layout():
             out += '///|\nconst %s : Int = %s\n\n' % (name, value)
     out += '///|\n/// Mapping from OpenType feature tags to AAT feature names and selectors.\n///\n'
     out += '/// Table data courtesy of Apple.\n/// Converted from mnemonics to integers when moving to this file.\n'
-    out += 'let feature_mappings : FixedArray[AatFeatureMapping] = [\n'
+    out += 'let feature_mappings : ReadOnlyArray[AatFeatureMapping] = [\n'
     for tag, a, b, c in rows:
         out += '  AatFeatureMapping::new("%s", %s, %s, %s),\n' % (tag, a, b, c)
     out += ']\n'
@@ -219,7 +219,7 @@ def gen_indic_table():
     offsets = re.findall(r'const (OFFSET_\w+): usize = (\d+);', src)
     out = HEADER % 'ot_shaper_indic_table.rs'
     out += '///|\n/// `(SyllabicCategory, MatraCategory)` per code point of the covered ranges.\n'
-    out += 'let indic_table : FixedArray[(Int, Int)] = [\n'
+    out += 'let indic_table : ReadOnlyArray[(Int, Int)] = [\n'
     out += ''.join(lines)
     out += ']\n\n'
     for name, val in offsets:
@@ -310,7 +310,7 @@ def gen_tag_table():
     assert n > 1400, n
     out += '///|\npriv struct LangTag {\n  language : String\n  tag : @otf.Tag\n}\n\n'
     out += '///|\n/// `OPEN_TYPE_LANGUAGES`, sorted by `language`.\n'
-    out += 'let open_type_languages : FixedArray[LangTag] = [\n'
+    out += 'let open_type_languages : ReadOnlyArray[LangTag] = [\n'
     out += '\n'.join(rows) + '\n]\n\n'
 
     # tags_from_complex_language: translate the generated Rust code line by line.

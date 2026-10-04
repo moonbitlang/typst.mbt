@@ -3,14 +3,14 @@
 
 ///|
 /// Ragel table `_use_syllable_machine_actions`.
-let use_syllable_machine_actions : FixedArray[Int] = [
+let use_syllable_machine_actions : ReadOnlyArray[Int] = [
   0, 1, 0, 1, 1, 1, 2, 1, 3, 1, 4, 1, 5, 1, 6, 1, 7, 1, 8, 1, 9, 1, 10, 1, 11, 1,
   12, 1, 13, 1, 14, 1, 15, 1, 16, 1, 17, 1, 18, 1, 19, 1, 20, 1, 21, 0, 0,
 ]
 
 ///|
 /// Ragel table `_use_syllable_machine_key_offsets`.
-let use_syllable_machine_key_offsets : FixedArray[Int] = [
+let use_syllable_machine_key_offsets : ReadOnlyArray[Int] = [
   0, 2, 39, 67, 93, 107, 119, 126, 132, 137, 140, 142, 143, 154, 164, 173, 175, 183,
   200, 216, 231, 245, 265, 278, 297, 315, 336, 361, 363, 376, 379, 381, 407, 421,
   433, 440, 446, 451, 454, 456, 457, 468, 478, 487, 489, 497, 514, 530, 545, 559,
@@ -24,7 +24,7 @@ let use_syllable_machine_key_offsets : FixedArray[Int] = [
 
 ///|
 /// Ragel table `_use_syllable_machine_trans_keys`.
-let use_syllable_machine_trans_keys : FixedArray[Int] = [
+let use_syllable_machine_trans_keys : ReadOnlyArray[Int] = [
   49, 51, 0, 1, 4, 5, 11, 12, 13, 14, 18, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
   32, 33, 34, 35, 37, 38, 39, 41, 42, 43, 45, 46, 47, 49, 51, 53, 44, 48, 11, 12,
   14, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 37, 38, 39, 41, 42,
@@ -101,7 +101,7 @@ let use_syllable_machine_trans_keys : FixedArray[Int] = [
 
 ///|
 /// Ragel table `_use_syllable_machine_single_lengths`.
-let use_syllable_machine_single_lengths : FixedArray[Int] = [
+let use_syllable_machine_single_lengths : ReadOnlyArray[Int] = [
   2, 35, 26, 24, 14, 12, 7, 6, 5, 3, 2, 1, 11, 10, 9, 2, 8, 17, 16, 15, 14, 20, 13,
   19, 18, 21, 23, 2, 13, 3, 2, 26, 14, 12, 7, 6, 5, 3, 2, 1, 11, 10, 9, 2, 8, 17,
   16, 15, 14, 20, 13, 19, 18, 21, 25, 2, 2, 13, 2, 2, 28, 26, 14, 12, 7, 6, 5, 3,
@@ -112,7 +112,7 @@ let use_syllable_machine_single_lengths : FixedArray[Int] = [
 
 ///|
 /// Ragel table `_use_syllable_machine_range_lengths`.
-let use_syllable_machine_range_lengths : FixedArray[Int] = [
+let use_syllable_machine_range_lengths : ReadOnlyArray[Int] = [
   0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -122,7 +122,7 @@ let use_syllable_machine_range_lengths : FixedArray[Int] = [
 
 ///|
 /// Ragel table `_use_syllable_machine_index_offsets`.
-let use_syllable_machine_index_offsets : FixedArray[Int] = [
+let use_syllable_machine_index_offsets : ReadOnlyArray[Int] = [
   0, 3, 40, 68, 94, 109, 122, 130, 137, 143, 147, 150, 152, 164, 175, 185, 188, 197,
   215, 232, 248, 263, 284, 298, 318, 337, 359, 384, 387, 401, 405, 408, 435, 450,
   463, 471, 478, 484, 488, 491, 493, 505, 516, 526, 529, 538, 556, 573, 589, 604,
@@ -136,7 +136,7 @@ let use_syllable_machine_index_offsets : FixedArray[Int] = [
 
 ///|
 /// Ragel table `_use_syllable_machine_cond_targs`.
-let use_syllable_machine_cond_targs : FixedArray[Int] = [
+let use_syllable_machine_cond_targs : ReadOnlyArray[Int] = [
   120, 0, 1, 2, 31, 58, 60, 88, 89, 114, 1, 116, 102, 90, 91, 92, 93, 106, 108, 109,
   110, 88, 111, 103, 104, 105, 97, 98, 99, 117, 118, 119, 94, 95, 96, 120, 124, 113,
   112, 1, 3, 4, 1, 17, 5, 6, 7, 8, 21, 23, 24, 25, 3, 26, 18, 19, 20, 12, 13, 14,
@@ -220,7 +220,7 @@ let use_syllable_machine_cond_targs : FixedArray[Int] = [
 
 ///|
 /// Ragel table `_use_syllable_machine_cond_actions`.
-let use_syllable_machine_cond_actions : FixedArray[Int] = [
+let use_syllable_machine_cond_actions : ReadOnlyArray[Int] = [
   0, 0, 43, 0, 0, 0, 0, 0, 0, 0, 21, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 23, 0, 0, 17, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 35, 0, 0, 17, 0, 0, 0, 0, 0, 0, 0,
@@ -293,7 +293,7 @@ let use_syllable_machine_cond_actions : FixedArray[Int] = [
 
 ///|
 /// Ragel table `_use_syllable_machine_to_state_actions`.
-let use_syllable_machine_to_state_actions : FixedArray[Int] = [
+let use_syllable_machine_to_state_actions : ReadOnlyArray[Int] = [
   0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -303,7 +303,7 @@ let use_syllable_machine_to_state_actions : FixedArray[Int] = [
 
 ///|
 /// Ragel table `_use_syllable_machine_from_state_actions`.
-let use_syllable_machine_from_state_actions : FixedArray[Int] = [
+let use_syllable_machine_from_state_actions : ReadOnlyArray[Int] = [
   0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -313,7 +313,7 @@ let use_syllable_machine_from_state_actions : FixedArray[Int] = [
 
 ///|
 /// Ragel table `_use_syllable_machine_eof_trans`.
-let use_syllable_machine_eof_trans : FixedArray[Int] = [
+let use_syllable_machine_eof_trans : ReadOnlyArray[Int] = [
   1549, 1550, 1551, 1552, 1553, 1554, 1555, 1556, 1557, 1558, 1559, 1560, 1561, 1562,
   1563, 1564, 1565, 1566, 1567, 1568, 1569, 1570, 1571, 1572, 1573, 1574, 1575, 1576,
   1577, 1578, 1579, 1580, 1581, 1582, 1583, 1584, 1585, 1586, 1587, 1588, 1589, 1590,

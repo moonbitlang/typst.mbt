@@ -23,7 +23,7 @@ pub fn is_cjk(Char) -> Bool
 
 pub fn locales() -> Array[@citationberg.Locale]
 
-pub fn rust_binary_search(Array[String], String) -> Bool
+pub fn rust_binary_search(ReadOnlyArray[String], String) -> Bool
 
 pub fn simplify_children(ElemChildren) -> ElemChildren
 
@@ -122,7 +122,7 @@ pub(all) enum ArchivedStyle {
   TurabianAuthorDate
   TurabianFullnote8
 } derive(Eq, Hash, @debug.Debug)
-pub fn ArchivedStyle::all() -> Array[Self]
+pub fn ArchivedStyle::all() -> ReadOnlyArray[Self]
 pub fn ArchivedStyle::by_id(String) -> Self?
 pub fn ArchivedStyle::by_name(String) -> Self?
 pub fn ArchivedStyle::csl_id(Self) -> String

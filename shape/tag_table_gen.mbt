@@ -9,7 +9,7 @@ priv struct LangTag {
 
 ///|
 /// `OPEN_TYPE_LANGUAGES`, sorted by `language`.
-let open_type_languages : FixedArray[LangTag] = [
+let open_type_languages : ReadOnlyArray[LangTag] = [
   { language: "aa", tag: @otf.Tag(0x41465220), }, // 'AFR ' Afar
   { language: "aae", tag: @otf.Tag(0x53514920), }, // 'SQI ' Arbëreshë Albanian -> Albanian
   { language: "aao", tag: @otf.Tag(0x41524120), }, // 'ARA ' Algerian Saharan Arabic -> Arabic

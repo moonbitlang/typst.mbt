@@ -3,7 +3,7 @@
 
 ///|
 /// `KEYFRAME_BPRED_MODE_PROBS` (900 entries).
-let keyframe_bpred_mode_probs : FixedArray[Int] = [
+let keyframe_bpred_mode_probs : ReadOnlyArray[Int] = [
   231, 120, 48, 89, 115, 113, 120, 152, 112, 152, 179, 64, 126, 170, 118, 46, 70,
   95, 175, 69, 143, 80, 85, 82, 72, 155, 103, 56, 58, 10, 171, 218, 189, 17, 13,
   152, 144, 71, 10, 38, 171, 213, 144, 34, 26, 114, 26, 17, 163, 44, 195, 21, 10,
@@ -57,7 +57,7 @@ let keyframe_bpred_mode_probs : FixedArray[Int] = [
 
 ///|
 /// `COEFF_UPDATE_PROBS` (1056 entries).
-let coeff_update_probs : FixedArray[Int] = [
+let coeff_update_probs : ReadOnlyArray[Int] = [
   255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
   255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
   255, 176, 246, 255, 255, 255, 255, 255, 255, 255, 255, 255, 223, 241, 252, 255,
@@ -128,7 +128,7 @@ let coeff_update_probs : FixedArray[Int] = [
 
 ///|
 /// `COEFF_PROBS` (1056 entries).
-let coeff_probs : FixedArray[Int] = [
+let coeff_probs : ReadOnlyArray[Int] = [
   128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128,
   128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128,
   128, 253, 136, 254, 255, 228, 219, 128, 128, 128, 128, 128, 189, 129, 242, 255,
@@ -197,7 +197,7 @@ let coeff_probs : FixedArray[Int] = [
 
 ///|
 /// `DC_QUANT` (128 entries).
-let dc_quant_table : FixedArray[Int] = [
+let dc_quant_table : ReadOnlyArray[Int] = [
   4, 5, 6, 7, 8, 9, 10, 10, 11, 12, 13, 14, 15, 16, 17, 17, 18, 19, 20, 20, 21, 21,
   22, 22, 23, 23, 24, 25, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 37,
   38, 39, 40, 41, 42, 43, 44, 45, 46, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56,
@@ -209,7 +209,7 @@ let dc_quant_table : FixedArray[Int] = [
 
 ///|
 /// `AC_QUANT` (128 entries).
-let ac_quant_table : FixedArray[Int] = [
+let ac_quant_table : ReadOnlyArray[Int] = [
   4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25,
   26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45,
   46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 60, 62, 64, 66, 68, 70, 72,
@@ -221,7 +221,7 @@ let ac_quant_table : FixedArray[Int] = [
 
 ///|
 /// `PROB_DCT_CAT` (72 entries).
-let prob_dct_cat : FixedArray[Int] = [
+let prob_dct_cat : ReadOnlyArray[Int] = [
   159, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 165, 145, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 173,
   148, 140, 0, 0, 0, 0, 0, 0, 0, 0, 0, 176, 155, 140, 135, 0, 0, 0, 0, 0, 0, 0, 0,
   180, 157, 141, 134, 130, 0, 0, 0, 0, 0, 0, 0, 254, 254, 243, 230, 196, 177, 153,

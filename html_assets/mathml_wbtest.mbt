@@ -3,7 +3,7 @@
 /// expectations (the first matching category, so `ForceDefault` reads as
 /// `Default`).
 fn info_letter(info : OperatorInfo) -> Char {
-  for i, candidate in category_infos {
+  for i, candidate in category_infos[:] {
     if candidate == info {
       return ('a'.to_int() + i).unsafe_to_char()
     }

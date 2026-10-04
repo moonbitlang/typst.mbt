@@ -58,7 +58,7 @@ def main():
             parts.append(f"///|\nlet {ident} : String =\n{literal(text)}\n")
             entries.append((command, kind, ident))
     parts.append("///|\n/// The help texts: (command, long?, text without the final newline).\n")
-    parts.append("let help_texts : Array[(String, Bool, String)] = [\n")
+    parts.append("let help_texts : ReadOnlyArray[(String, Bool, String)] = [\n")
     for command, kind, ident in entries:
         parts.append(f'  ("{command}", {"true" if kind == "long" else "false"}, {ident}),\n')
     parts.append("]\n")

@@ -244,7 +244,7 @@ fn Lang::index(self : Lang) -> Int {
 
 ///|
 /// The embedded tries (base64), indexed by `Lang::index`.
-let tries : FixedArray[String] = [
+let tries : ReadOnlyArray[String] = [
   trie_af, trie_sq, trie_as, trie_be, trie_bn, trie_bg, trie_ca, trie_hr, trie_cs,
   trie_da, trie_nl, trie_en, trie_et, trie_fi, trie_fr, trie_gl, trie_ka, trie_de,
   trie_el, trie_gu, trie_hi, trie_hu, trie_is, trie_it, trie_kn, trie_ku, trie_la,

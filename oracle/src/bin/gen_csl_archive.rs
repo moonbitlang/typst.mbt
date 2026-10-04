@@ -101,13 +101,13 @@ fn main() {
     out.push_str("    _ => None\n  }\n}\n\n");
 
     // all
-    out.push_str("///|\nlet archived_style_all : Array[ArchivedStyle] = [\n");
+    out.push_str("///|\nlet archived_style_all : ReadOnlyArray[ArchivedStyle] = [\n");
     for &s in all {
         writeln!(out, "  {},", variant(s)).unwrap();
     }
     out.push_str("]\n\n");
     out.push_str(
-        "///|\n/// Get all styles in the archive.\npub fn ArchivedStyle::all() -> Array[ArchivedStyle] {\n  archived_style_all\n}\n\n",
+        "///|\n/// Get all styles in the archive.\npub fn ArchivedStyle::all() -> ReadOnlyArray[ArchivedStyle] {\n  archived_style_all\n}\n\n",
     );
 
     // names
@@ -153,7 +153,7 @@ fn main() {
 
     // The locales.
     out.push_str(
-        "///|\n/// The XML of the archived CSL locales (serialized by citationberg).\nlet locales_xml : Array[String] = [\n",
+        "///|\n/// The XML of the archived CSL locales (serialized by citationberg).\nlet locales_xml : ReadOnlyArray[String] = [\n",
     );
     for l in locales() {
         let file = LocaleFile::try_from(l.clone()).unwrap();

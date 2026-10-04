@@ -112,15 +112,24 @@ def gen_tables(hayro):
     )
 
     def code_table(fn_prefix, entries, doc):
-        arr = ["None"] * 256
+        # A static `ReadOnlyArray[String]` (an array of `String?` would be
+        # built at startup); `""` marks codes without an entry.
+        arr = ['""'] * 256
         for k, v in entries:
-            arr[u8_key(k)] = "Some(%s)" % mbt_str(rust_str(v))
-        out.append("///|\n/// %s\nlet %s_table : FixedArray[String?] = [\n" % (doc, fn_prefix))
+            name = rust_str(v)
+            assert name, k
+            arr[u8_key(k)] = mbt_str(name)
+        out.append(
+            "///|\n/// %s (`\"\"` = no entry)\nlet %s_table : ReadOnlyArray[String] = [\n"
+            % (doc, fn_prefix)
+        )
         for i in range(0, 256, 4):
             out.append("  " + ", ".join(arr[i : i + 4]) + ",\n")
         out.append("]\n\n")
         out.append(
-            "///|\nfn %s_get(code : Byte) -> String? {\n  %s_table[code.to_int()]\n}\n\n"
+            "///|\nfn %s_get(code : Byte) -> String? {\n"
+            "  let name = %s_table[code.to_int()]\n"
+            "  if name == \"\" {\n    None\n  } else {\n    Some(name)\n  }\n}\n\n"
             % (fn_prefix, fn_prefix)
         )
 
