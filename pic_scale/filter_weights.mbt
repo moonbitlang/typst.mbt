@@ -20,6 +20,9 @@ priv struct FixedWeights {
   bounds_start : FixedArray[Int]
   bounds_size : FixedArray[Int]
   aligned_size : Int
+  /// Whether every weight is an `i16` value (the contract of the v128 rdm
+  /// kernels, checked once here: the weights are not modified afterwards).
+  weights_fit_i16 : Bool
 }
 
 ///|
@@ -131,10 +134,27 @@ fn FilterWeights::numerical_approximation_i16(
       output_kernel[k * align + i] = scratch[i]
     }
   }
-  {
+  let fixed : FixedWeights = {
     weights: output_kernel,
     bounds_start: self.bounds_start.copy(),
     bounds_size: self.bounds_size.copy(),
     aligned_size: align,
+    weights_fit_i16: weights_fit_i16(output_kernel, 0, output_kernel.length()),
   }
+  // `quantize_kernel` clamps to `lower_bound..=upper_bound`.
+  guard fixed.weights_fit_i16 else { abort("weights out of the i16 range") }
+  fixed
+}
+
+///|
+/// Whether `weights[off..off + n]` are `i16` values (`numerical_approximation_
+/// i16` clamps them; the v128 kernels hold them in `i16` lanes).
+fn weights_fit_i16(weights : FixedArray[Int], off : Int, n : Int) -> Bool {
+  for j in 0..<n {
+    let w = weights[off + j]
+    if w < -32768 || w > 32767 {
+      return false
+    }
+  }
+  true
 }
