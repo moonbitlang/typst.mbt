@@ -17,9 +17,10 @@ import {
   "moonbitlang/core/bench",
 } for "wbtest"
 
-// `@v128` is experimental (see AGENTS.md: v128 kernels).
+// `@v128` is experimental, and unused on wasm-gc/js, which select the
+// `*_scalar.mbt` files (see AGENTS.md: v128 kernels).
 
-warnings = "-alert_experimental"
+warnings = "-alert_experimental-unused_package"
 
 options(
   targets: {

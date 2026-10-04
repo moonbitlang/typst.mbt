@@ -5,9 +5,10 @@ import {
   "moonbitlang/core/v128",
 }
 
-// `@v128` is experimental (see AGENTS.md: v128 kernels).
+// `@v128` is experimental, and unused on wasm-gc/js, which select the
+// `*_scalar.mbt` files (see AGENTS.md: v128 kernels).
 
-warnings = "-deprecated-alert_experimental"
+warnings = "-deprecated-alert_experimental-unused_package"
 
 options(
   targets: {

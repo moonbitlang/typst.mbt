@@ -133,7 +133,7 @@ pub fn Pixmap::take_demultiplied(self : Pixmap) -> Bytes {
   let len = self.data.length()
   let out = FixedArray::make(len * 4, b'\x00')
   demultiply_into(self.data, out)
-  Bytes::from_fixedarray(out)
+  Bytes::from_array(out[:])
 }
 
 ///|

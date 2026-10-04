@@ -214,7 +214,7 @@ fn encode_image_data(
     line.blit_from_bytesview(0, data[y * in_len:(y + 1) * in_len])
     let filter_type = adaptive_filter(bpp, prev, line, current)
     current[0] = filter_type.to_byte()
-    compressor.write_data(Bytes::from_fixedarray(current)[:])
+    compressor.write_data(Bytes::from_array(current[:])[:])
     // The current line becomes the previous one (instead of a copy).
     let next = prev
     prev = line
