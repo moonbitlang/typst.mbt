@@ -149,10 +149,10 @@ priv struct DeflateStream {
   /// prev[N], where N is an offset in the current window, contains the offset
   /// in the window of the previous 4-byte sequence that hashes to the same
   /// value as the 4-byte sequence starting at N.
-  prev : FixedArray[UInt16]
+  prev : PosTable
   /// head[H] contains the offset of the last 4-character sequence seen so far
   /// in the current window that hashes to H.
-  head : FixedArray[UInt16]
+  head : PosTable
   /// Length of the best match at previous step.
   mut prev_length : Int
   /// To speed up deflation, hash chains are never searched beyond this length.
@@ -218,8 +218,8 @@ fn DeflateStream::new(level : Int) -> DeflateStream {
     window: FixedArray::make(2 * w_size, b'\x00'),
     w_size,
     lookahead: 0,
-    prev: FixedArray::make(w_size, 0),
-    head: FixedArray::make(HASH_SIZE, 0),
+    prev: PosTable::make(w_size),
+    head: PosTable::make(HASH_SIZE),
     prev_length: 0,
     max_chain_length: 0,
     max_lazy_match: 0,
@@ -273,7 +273,7 @@ fn DeflateStream::zng_tr_init(self : DeflateStream) -> Unit {
 ///|
 fn DeflateStream::lm_init(self : DeflateStream) -> Unit {
   self.window_size = 2 * self.w_size
-  self.head.fill(0)
+  self.head.fill_zero()
   // Set the default configuration parameters:
   self.lm_set_level(self.level)
   self.strstart = 0
@@ -378,10 +378,10 @@ fn DeflateStream::quick_insert_string(
 ) -> Int {
   let val = read_u32_le(self.window, string)
   let hm = hash_update(val)
-  let head = self.head.unsafe_get(hm).to_int()
+  let head = self.head.unsafe_get(hm)
   if head != (string & 0xffff) {
-    self.prev.unsafe_set(string & self.w_mask(), head.to_uint16())
-    self.head.unsafe_set(hm, string.to_uint16())
+    self.prev.unsafe_set(string & self.w_mask(), head)
+    self.head.unsafe_set(hm, string)
   }
   head
 }
@@ -410,9 +410,9 @@ fn DeflateStream::insert_string(
     let val = load_u32_le_unchecked(window, string + i)
     let hm = hash_update(val)
     let h = head.unsafe_get(hm)
-    if h.to_int() != idx {
+    if h != idx {
       prev.unsafe_set(idx & w_mask, h)
-      head.unsafe_set(hm, idx.to_uint16())
+      head.unsafe_set(hm, idx)
     }
   }
 }
@@ -421,18 +421,8 @@ fn DeflateStream::insert_string(
 
 ///|
 fn DeflateStream::slide_hash(self : DeflateStream) -> Unit {
-  let wsize = self.w_size.to_uint16()
-  slide_hash_chain(self.head, wsize)
-  slide_hash_chain(self.prev, wsize)
-}
-
-///|
-/// `m.saturating_sub(wsize)` for every entry.
-fn slide_hash_chain(table : FixedArray[UInt16], wsize : UInt16) -> Unit {
-  for i in 0..<table.length() {
-    let m = table.unsafe_get(i)
-    table.unsafe_set(i, if m >= wsize { m - wsize } else { 0 })
-  }
+  slide_hash_chain(self.head, self.w_size)
+  slide_hash_chain(self.prev, self.w_size)
 }
 
 ///|
@@ -666,7 +656,7 @@ fn DeflateStream::deflate(self : DeflateStream, flush : Int) -> Int {
             self.zng_tr_stored_block(0, 0, false)
           FLUSH_FULL => {
             self.zng_tr_stored_block(0, 0, false)
-            self.head.fill(0) // forget history
+            self.head.fill_zero() // forget history
             if self.lookahead == 0 {
               self.strstart = 0
               self.block_start = 0

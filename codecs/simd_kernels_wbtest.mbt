@@ -600,3 +600,48 @@ test "panic ycbcr_to_rgb_16 with an out-of-range offset" {
   let out = FixedArray::make(48, b'\x00')
   ycbcr_to_rgb_16(y, 0, y, 0, y, 0, out, 2147483647, 3)
 }
+
+///|
+test "slide_hash_chain saturates every entry" {
+  for n in [1, 7, 8, 9, 31, 32, 33, 1000] {
+    let t = PosTable::make(n)
+    let expected = []
+    for i in 0..<n {
+      let v = (i * 40503 + 12345) & 0xffff
+      t.unsafe_set(i, v)
+      expected.push(if v >= 32768 { v - 32768 } else { 0 })
+    }
+    slide_hash_chain(t, 32768)
+    for i in 0..<n {
+      assert_eq(t.unsafe_get(i), expected[i])
+    }
+    // Other window sizes saturate the same way.
+    for i in 0..<n {
+      t.unsafe_set(i, i * 977)
+    }
+    slide_hash_chain(t, 1024)
+    for i in 0..<n {
+      let v = (i * 977) & 0xffff
+      assert_eq(t.unsafe_get(i), if v >= 1024 { v - 1024 } else { 0 })
+    }
+  }
+}
+
+///|
+test "bench slide_hash_chain head and prev x10" (it : @bench.T) {
+  let head = PosTable::make(65536)
+  let prev = PosTable::make(32768)
+  for i in 0..<65536 {
+    head.unsafe_set(i, i * 40503)
+  }
+  for i in 0..<32768 {
+    prev.unsafe_set(i, i * 7919)
+  }
+  it.bench(() => {
+    for _ in 0..<10 {
+      slide_hash_chain(head, 32768)
+      slide_hash_chain(prev, 32768)
+    }
+    it.keep(head)
+  })
+}
