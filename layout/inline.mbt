@@ -35,12 +35,7 @@ pub fn layout_par(
     state.write_u128(locator.memo_hash())
     state.write_u128(engine.route.memo_hash())
   })
-  guard key is Some(key) else {
-    return layout_par_impl(
-      elem, engine, locator, styles, region, expand, situation,
-    )
-  }
-  @library.memoized_layout(engine, key, engine => {
+  @library.memoized_layout(engine, key, elem.0, styles, None, engine => {
     layout_par_impl(elem, engine, locator, styles, region, expand, situation)
   })
 }

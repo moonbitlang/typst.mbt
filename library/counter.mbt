@@ -317,9 +317,6 @@ fn counter_sequence(
     state.write(selector)
     state.write_u128(engine.route.memo_hash())
   })
-  guard key is Some(key) else {
-    return counter_sequence_impl(counter, selector, engine, introspector)
-  }
   memoize(
     counter_sequence_store,
     { ..engine, introspector, },

@@ -259,8 +259,9 @@ pub fn[T : Fingerprint] SipHasher128::write(
 ///|
 /// Set while fingerprinting a value whose [Fingerprint] does not capture all
 /// of its data (e.g. gradients and tilings are hashed through their repr).
-/// Such fingerprints are fine for identities (locations), but not as
-/// memoization keys (see [memo_fingerprint] and `memo.mbt`).
+/// Such fingerprints are fine for identities (locations), but equal
+/// fingerprints of introspection results do not prove equal results (see
+/// `memo.mbt`).
 let fingerprint_lossy : Ref[Bool] = { val: false, }
 
 ///|
@@ -280,18 +281,6 @@ pub fn fingerprint_lossy_in(f : () -> Unit) -> Bool {
   let lossy = fingerprint_lossy.val
   fingerprint_lossy.val = outer || lossy
   lossy
-}
-
-///|
-/// A memoization key: the fingerprint written by `f`, or `None` if it
-/// contains a value whose fingerprint does not capture all of its data.
-pub fn memo_fingerprint(f : (SipHasher128) -> Unit) -> U128? {
-  let state = SipHasher128::new()
-  if fingerprint_lossy_in(() => f(state)) {
-    None
-  } else {
-    Some(state.finish128())
-  }
 }
 
 ///|

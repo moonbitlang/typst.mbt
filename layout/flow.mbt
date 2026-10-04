@@ -107,12 +107,7 @@ fn layout_fragment_impl(
     state.write_u128(locator.memo_hash())
     state.write_u128(engine.route.memo_hash())
   })
-  guard key is Some(key) else {
-    return layout_fragment_compute(
-      engine, content, locator, styles, regions, column,
-    )
-  }
-  @library.memoized_layout(engine, key, engine => {
+  @library.memoized_layout(engine, key, content, styles, column.separator, engine => {
     layout_fragment_compute(engine, content, locator, styles, regions, column)
   })
 }

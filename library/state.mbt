@@ -130,21 +130,18 @@ fn state_sequence(
     hasher.write(state)
     hasher.write_u128(engine.route.memo_hash())
   })
-  guard key is Some(key) else {
-    return state_sequence_impl(state, engine, introspector)
-  }
   memoize(
     state_sequence_store,
     { ..engine, introspector, },
     key,
-    state,
+    StateInput(state),
     sequence => sequence,
     engine => state_sequence_impl(state, engine, engine.introspector),
   )
 }
 
 ///|
-let state_sequence_store : MemoStore[Array[Value], State] = MemoStore::new()
+let state_sequence_store : MemoStore[Array[Value], StateInput] = MemoStore::new()
 
 ///|
 /// The uncached [state_sequence].

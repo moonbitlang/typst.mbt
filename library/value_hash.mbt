@@ -550,6 +550,11 @@ pub impl Fingerprint for DynValue with fn fingerprint(self, state) {
     Regex(v) => state.write_str(v.as_str())
     Alignment(v) => state.write_leaf(v.repr(), v)
     Dir(v) => state.write_leaf(v.repr(), v)
-    other => state.write_str(other.repr())
+    other => {
+      state.write_str(other.repr())
+      // The repr may round numbers or abbreviate (e.g. strokes with
+      // tilings).
+      mark_fingerprint_lossy()
+    }
   }
 }
