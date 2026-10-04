@@ -353,6 +353,55 @@ test "bench upsample_vertical 1024 samples x16" (it : @bench.T) {
 }
 
 ///|
+fn kernel_test_floats(n : Int, seed : Int, scale : Float) -> FixedArray[Float] {
+  let ints = kernel_test_ints(n, seed, -100000, 100000)
+  FixedArray::makei(n, i => Float::from_int(ints[i]) / 100000.0 * scale)
+}
+
+///|
+test "vertical_sample_row matches the scalar sums" {
+  for row_len in [1, 3, 4, 5, 8, 12, 13, 16, 17, 31, 36, 50] {
+    for n in [1, 2, 3, 6, 7] {
+      let image = kernel_test_floats((n + 3) * row_len, row_len + n, 255.0)
+      let ws = Array::from_fixed_array(kernel_test_floats(n, n, 1.5))
+      for left in 0..<3 {
+        let out = FixedArray::make(row_len + 2, (-1.0 : Float))
+        vertical_sample_row(image, out, row_len, 1, left, ws)
+        for j in 0..<row_len {
+          let mut t : Float = 0.0
+          for i in 0..<n {
+            t = t + image[(left + i) * row_len + j] * ws[i]
+          }
+          assert_eq(out[1 + j].reinterpret_as_uint(), t.reinterpret_as_uint())
+        }
+        assert_eq(out[0], -1.0)
+        assert_eq(out[row_len + 1], -1.0)
+      }
+    }
+  }
+}
+
+///|
+test "bench vertical_sample 1200x800 rgba -> 600 rows" (it : @bench.T) {
+  let w = 1200
+  let h = 800
+  let image = kernel_test_floats(w * h * 4, 1, 255.0)
+  let filt : Filter = { kernel: catmullrom_kernel, support: 2.0, }
+  it.bench(() => {
+    it.keep(
+      vertical_sample(
+        image,
+        w.reinterpret_as_uint(),
+        h.reinterpret_as_uint(),
+        4,
+        600,
+        filt,
+      ),
+    )
+  })
+}
+
+///|
 test "bench ycbcr_to_rgb_16 x1000" (it : @bench.T) {
   let y = kernel_test_ints(16016, 1, 0, 255)
   let cb = kernel_test_ints(16016, 2, 0, 255)

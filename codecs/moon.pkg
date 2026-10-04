@@ -31,5 +31,7 @@ options(
     "png_filter_scalar.mbt": [ "wasm-gc", "js" ],
     "jpeg_v128.mbt": [ "native", "wasm" ],
     "jpeg_scalar.mbt": [ "wasm-gc", "js" ],
+    "imageops_v128.mbt": [ "native", "wasm" ],
+    "imageops_scalar.mbt": [ "wasm-gc", "js" ],
   },
 )
