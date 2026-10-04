@@ -320,3 +320,171 @@ fn upsample_vertical_core(
     i += 1
   }
 }
+
+///|
+/// One 1-D pass of `idct_int` on eight `i32x4` rows `m[base..base + 8]` (in
+/// place; each lane is an independent column): the same wrapping sums as
+/// the scalar passes, with the given rounding `bias` and final shift.
+fn idct_pass(
+  m : FixedArray[V128],
+  base : Int,
+  bias : V128,
+  shift : Int,
+) -> Unit {
+  let p2 = m[base + 2]
+  let p3 = m[base + 6]
+  let p1 = @v128.i32x4_mul(@v128.i32x4_add(p2, p3), ks(2217))
+  let t2 = @v128.i32x4_add(p1, @v128.i32x4_mul(p3, ks(-7567)))
+  let t3 = @v128.i32x4_add(p1, @v128.i32x4_mul(p2, ks(3135)))
+  let p2 = m[base]
+  let p3 = m[base + 4]
+  let t0 = @v128.i32x4_shl(@v128.i32x4_add(p2, p3), 12)
+  let t1 = @v128.i32x4_shl(@v128.i32x4_sub(p2, p3), 12)
+  let x0 = @v128.i32x4_add(@v128.i32x4_add(t0, t3), bias)
+  let x3 = @v128.i32x4_add(@v128.i32x4_sub(t0, t3), bias)
+  let x1 = @v128.i32x4_add(@v128.i32x4_add(t1, t2), bias)
+  let x2 = @v128.i32x4_add(@v128.i32x4_sub(t1, t2), bias)
+  let t0 = m[base + 7]
+  let t1 = m[base + 5]
+  let t2 = m[base + 3]
+  let t3 = m[base + 1]
+  let p3 = @v128.i32x4_add(t0, t2)
+  let p4 = @v128.i32x4_add(t1, t3)
+  let p1 = @v128.i32x4_add(t0, t3)
+  let p2 = @v128.i32x4_add(t1, t2)
+  let p5 = @v128.i32x4_mul(@v128.i32x4_add(p3, p4), ks(4816))
+  let t0 = @v128.i32x4_mul(t0, ks(1223))
+  let t1 = @v128.i32x4_mul(t1, ks(8410))
+  let t2 = @v128.i32x4_mul(t2, ks(12586))
+  let t3 = @v128.i32x4_mul(t3, ks(6149))
+  let p1 = @v128.i32x4_add(p5, @v128.i32x4_mul(p1, ks(-3685)))
+  let p2 = @v128.i32x4_add(p5, @v128.i32x4_mul(p2, ks(-10497)))
+  let p3 = @v128.i32x4_mul(p3, ks(-8034))
+  let p4 = @v128.i32x4_mul(p4, ks(-1597))
+  let t3 = @v128.i32x4_add(t3, @v128.i32x4_add(p1, p4))
+  let t2 = @v128.i32x4_add(t2, @v128.i32x4_add(p2, p3))
+  let t1 = @v128.i32x4_add(t1, @v128.i32x4_add(p2, p4))
+  let t0 = @v128.i32x4_add(t0, @v128.i32x4_add(p1, p3))
+  m[base] = @v128.i32x4_shr_s(@v128.i32x4_add(x0, t3), shift)
+  m[base + 1] = @v128.i32x4_shr_s(@v128.i32x4_add(x1, t2), shift)
+  m[base + 2] = @v128.i32x4_shr_s(@v128.i32x4_add(x2, t1), shift)
+  m[base + 3] = @v128.i32x4_shr_s(@v128.i32x4_add(x3, t0), shift)
+  m[base + 4] = @v128.i32x4_shr_s(@v128.i32x4_sub(x3, t0), shift)
+  m[base + 5] = @v128.i32x4_shr_s(@v128.i32x4_sub(x2, t1), shift)
+  m[base + 6] = @v128.i32x4_shr_s(@v128.i32x4_sub(x1, t2), shift)
+  m[base + 7] = @v128.i32x4_shr_s(@v128.i32x4_sub(x0, t3), shift)
+}
+
+///|
+/// Transposes the 4x4 `i32` matrix `m[i..i + 4]` (rows) in place.
+fn transpose4(m : FixedArray[V128], i : Int) -> Unit {
+  let a = m[i]
+  let b = m[i + 1]
+  let c = m[i + 2]
+  let d = m[i + 3]
+  // a0 b0 a1 b1 / a2 b2 a3 b3 / c0 d0 c1 d1 / c2 d2 c3 d3
+  let ab_lo = @v128.i8x16_shuffle(
+    a, b, 0, 1, 2, 3, 16, 17, 18, 19, 4, 5, 6, 7, 20, 21, 22, 23,
+  )
+  let ab_hi = @v128.i8x16_shuffle(
+    a, b, 8, 9, 10, 11, 24, 25, 26, 27, 12, 13, 14, 15, 28, 29, 30, 31,
+  )
+  let cd_lo = @v128.i8x16_shuffle(
+    c, d, 0, 1, 2, 3, 16, 17, 18, 19, 4, 5, 6, 7, 20, 21, 22, 23,
+  )
+  let cd_hi = @v128.i8x16_shuffle(
+    c, d, 8, 9, 10, 11, 24, 25, 26, 27, 12, 13, 14, 15, 28, 29, 30, 31,
+  )
+  m[i] = @v128.i8x16_shuffle(
+    ab_lo, cd_lo, 0, 1, 2, 3, 4, 5, 6, 7, 16, 17, 18, 19, 20, 21, 22, 23,
+  )
+  m[i + 1] = @v128.i8x16_shuffle(
+    ab_lo, cd_lo, 8, 9, 10, 11, 12, 13, 14, 15, 24, 25, 26, 27, 28, 29, 30, 31,
+  )
+  m[i + 2] = @v128.i8x16_shuffle(
+    ab_hi, cd_hi, 0, 1, 2, 3, 4, 5, 6, 7, 16, 17, 18, 19, 20, 21, 22, 23,
+  )
+  m[i + 3] = @v128.i8x16_shuffle(
+    ab_hi, cd_hi, 8, 9, 10, 11, 12, 13, 14, 15, 24, 25, 26, 27, 28, 29, 30, 31,
+  )
+}
+
+///|
+/// The integer IDCT (upstream `idct_neon` on aarch64): both passes on four
+/// columns (then four rows) at a time, with 4x4 transposes in between.
+fn idct_int(
+  in_vector : FixedArray[Int],
+  out_vector : FixedArray[Int],
+  out_pos : Int,
+  stride : Int,
+) -> Unit {
+  guard in_vector.length() >= 64 else {
+    idct_int_scalar(in_vector, out_vector, out_pos, stride)
+  }
+  let mut all_zero = true
+  for i in 1..<64 {
+    if in_vector.unsafe_get(i) != 0 {
+      all_zero = false
+      break
+    }
+  }
+  if all_zero {
+    idct_int_scalar(in_vector, out_vector, out_pos, stride)
+    return
+  }
+  // m[0..8]: rows 0..7 of columns 0..3; m[8..16]: of columns 4..7.
+  let zero = @v128.i32x4_splat(0)
+  let m = FixedArray::make(16, zero)
+  for r in 0..<8 {
+    m[r] = gather_i32x4(in_vector, 8 * r)
+    m[8 + r] = gather_i32x4(in_vector, 8 * r + 4)
+  }
+  // vertical pass
+  let b512 = @v128.i32x4_splat(512)
+  idct_pass(m, 0, b512, 10)
+  idct_pass(m, 8, b512, 10)
+  // Transpose: m[0..8] becomes columns 0..7 of rows 0..3, m[8..16] those
+  // of rows 4..7.
+  transpose4(m, 0)
+  transpose4(m, 4)
+  transpose4(m, 8)
+  transpose4(m, 12)
+  for j in 0..<4 {
+    let t = m[4 + j]
+    m[4 + j] = m[8 + j]
+    m[8 + j] = t
+  }
+  // horizontal pass
+  let bias = @v128.i32x4_splat(SCALE_BITS.reinterpret_as_uint())
+  idct_pass(m, 0, bias, 17)
+  idct_pass(m, 8, bias, 17)
+  // Back to rows: m[g * 8 + j] / m[g * 8 + 4 + j] are columns 0..3 / 4..7
+  // of row 4 * g + j.
+  let lo = zero
+  let hi = @v128.i32x4_splat(255)
+  for i in 0..<16 {
+    m[i] = @v128.i32x4_min_s(@v128.i32x4_max_s(m[i], lo), hi)
+  }
+  transpose4(m, 0)
+  transpose4(m, 4)
+  transpose4(m, 8)
+  transpose4(m, 12)
+  let mut pos = out_pos
+  for row in 0..<8 {
+    let g = row / 4 * 8
+    let j = row % 4
+    // `store8`: rows that do not fit are skipped.
+    if pos >= 0 && pos + 8 <= out_vector.length() {
+      scatter_i32x4(out_vector, pos, m[g + j])
+      scatter_i32x4(out_vector, pos + 4, m[g + 4 + j])
+    }
+    pos += stride
+  }
+}
+
+///|
+/// `i32x4.splat(c)`.
+#inline
+fn ks(c : Int) -> V128 {
+  @v128.i32x4_splat(c.reinterpret_as_uint())
+}

@@ -451,6 +451,55 @@ test "bench vertical_sample 1200x800 rgba -> 600 rows" (it : @bench.T) {
 }
 
 ///|
+test "idct_int matches the scalar IDCT" {
+  for seed in 0..<200 {
+    let (lo, hi) = match seed % 4 {
+      0 => (-64, 64)
+      1 => (-1024, 1024)
+      2 => (-40000, 40000)
+      _ => (-2147483647, 2147483647)
+    }
+    let coeffs = kernel_test_ints(64, seed, lo, hi)
+    if seed % 5 == 0 {
+      // DC only / sparse blocks
+      for i in 1..<64 {
+        if i % (seed % 7 + 2) != 0 {
+          coeffs[i] = 0
+        }
+      }
+    }
+    if seed % 11 == 0 {
+      coeffs.fill(0)
+      coeffs[0] = seed * 37 - 4000
+    }
+    for stride in [8, 13] {
+      // Some rows out of range (skipped by `store8`).
+      for len in [7 * stride + 8, 5 * stride + 3] {
+        let out1 = FixedArray::make(len, -7)
+        let out2 = FixedArray::make(len, -7)
+        idct_int(coeffs, out1, 0, stride)
+        idct_int_scalar(coeffs, out2, 0, stride)
+        for i in 0..<len {
+          assert_eq(out1[i], out2[i])
+        }
+      }
+    }
+  }
+}
+
+///|
+test "bench idct_int x1000" (it : @bench.T) {
+  let blocks = Array::makei(16, b => kernel_test_ints(64, b, -300, 300))
+  let out = FixedArray::make(64, 0)
+  it.bench(() => {
+    for i in 0..<1000 {
+      idct_int(blocks[i % 16], out, 0, 8)
+    }
+    it.keep(out)
+  })
+}
+
+///|
 test "bench ycbcr_to_rgb_16 x1000" (it : @bench.T) {
   let y = kernel_test_ints(16016, 1, 0, 255)
   let cb = kernel_test_ints(16016, 2, 0, 255)

@@ -45,3 +45,14 @@ fn upsample_vertical_core(
     output.set(start + i, (3 * input.at(i) + 2 + near.at(i)) >> 2)
   }
 }
+
+///|
+/// The integer IDCT.
+fn idct_int(
+  in_vector : FixedArray[Int],
+  out_vector : FixedArray[Int],
+  out_pos : Int,
+  stride : Int,
+) -> Unit {
+  idct_int_scalar(in_vector, out_vector, out_pos, stride)
+}
