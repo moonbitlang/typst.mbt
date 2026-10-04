@@ -114,7 +114,7 @@ pub fn utf8_to_utf16(text : String, offset : Int) -> Int {
   let mut bytes = 0
   let mut i = 0
   while i < text.length() && bytes < offset {
-    let (c, next) = @unicode.decode_at(text, i)
+    let { cp: c, idx: next, } = @unicode.decode_at(text, i)
     bytes += if c < 0x80 {
       1
     } else if c < 0x800 {

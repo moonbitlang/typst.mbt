@@ -476,7 +476,7 @@ fn CaseFolder::find_word(self : CaseFolder) -> String? {
   let end = if data.end > n { n } else { data.end }
   let mut alphabetic_end = start
   while alphabetic_end < end {
-    let (c, next) = @unicode.decode_at(self.buf, alphabetic_end)
+    let { cp: c, idx: next, } = @unicode.decode_at(self.buf, alphabetic_end)
     if !@unscanny.is_alphanumeric(Int::unsafe_to_char(c)) {
       break
     }
@@ -545,7 +545,7 @@ fn CaseFolder::process_word(self : CaseFolder) -> Unit {
     Capitalize => self.buf = capitalize_char(self.buf, data.start)
     Lowercase =>
       if data.start < self.buf.length() {
-        let (ci, next) = @unicode.decode_at(self.buf, data.start)
+        let { cp: ci, idx: next, } = @unicode.decode_at(self.buf, data.start)
         let c = Int::unsafe_to_char(ci)
         if @unscanny.is_uppercase(c) {
           self.buf = map_chars(self.buf, data.start, next, c => {
@@ -581,7 +581,7 @@ fn CaseFolder::may_trim_end(self : CaseFolder) -> Unit {
           let mut idx = None
           let mut i = self.buf.length()
           while i > 0 {
-            let (c, prev) = @unicode.decode_before(self.buf, i)
+            let { cp: c, idx: prev, } = @unicode.decode_before(self.buf, i)
             if @unscanny.is_whitespace(Int::unsafe_to_char(c)) {
               idx = Some(i)
               break
@@ -696,7 +696,7 @@ fn map_chars(
   out.write_string(buf[:start].to_owned())
   let mut i = start
   while i < buf.length() && i < end {
-    let (ci, next) = @unicode.decode_at(buf, i)
+    let { cp: ci, idx: next, } = @unicode.decode_at(buf, i)
     let c = Int::unsafe_to_char(ci)
     match f(c) {
       Some(rep) => out.write_string(rep)
@@ -713,7 +713,7 @@ fn capitalize_char(buf : String, start : Int) -> String {
   if start >= buf.length() {
     return buf
   }
-  let (ci, next) = @unicode.decode_at(buf, start)
+  let { cp: ci, idx: next, } = @unicode.decode_at(buf, start)
   let c = Int::unsafe_to_char(ci)
   if @unscanny.is_lowercase(c) {
     map_chars(buf, start, next, c => Some(@unscanny.char_to_uppercase(c)))

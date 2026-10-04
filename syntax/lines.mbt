@@ -76,7 +76,7 @@ fn Lines::advance_bytes(self : Lines, line : Line, byte_idx : Int) -> Int? {
   let mut b = line.byte_idx
   let mut u = line.utf16_idx
   while b < byte_idx && u < text.length() {
-    let (c, next) = @unicode.decode_at(text, u)
+    let { cp: c, idx: next, } = @unicode.decode_at(text, u)
     b += utf8_char_len(c)
     u = next
   }
@@ -115,7 +115,7 @@ fn Lines::column_in(self : Lines, line_idx : Int, byte_idx : Int) -> Int? {
   let mut count = 0
   let mut u = line.utf16_idx
   while u < end {
-    let (_, next) = @unicode.decode_at(self.text, u)
+    let { idx: next, .. } = @unicode.decode_at(self.text, u)
     count += 1
     u = next
   }
@@ -148,7 +148,7 @@ pub fn Lines::utf16_to_byte(self : Lines, utf16_idx : Int) -> Int? {
     if k >= utf16_idx {
       return Some(b)
     }
-    let (c, next) = @unicode.decode_at(text, u)
+    let { cp: c, idx: next, } = @unicode.decode_at(text, u)
     k += next - u
     b += utf8_char_len(c)
     u = next
@@ -194,7 +194,7 @@ pub fn Lines::line_column_to_byte(
   let mut u = line.utf16_idx
   for _ in 0..<column_idx {
     guard b < end else { return None }
-    let (c, next) = @unicode.decode_at(text, u)
+    let { cp: c, idx: next, } = @unicode.decode_at(text, u)
     b += utf8_char_len(c)
     u = next
   }
@@ -316,7 +316,7 @@ fn lines_from(
   let mut b = byte_offset
   let mut u = utf16_offset
   while u < text.length() {
-    let (c, next) = @unicode.decode_at(text, u)
+    let { cp: c, idx: next, } = @unicode.decode_at(text, u)
     b += utf8_char_len(c)
     u = next
     if is_newline(Int::unsafe_to_char(c)) {

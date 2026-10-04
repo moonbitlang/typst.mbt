@@ -31,14 +31,14 @@ pub struct Utf8Text {
 pub fn Utf8Text::new(text : String) -> Utf8Text {
   let mut len = 0
   for i = 0; i < text.length(); {
-    let (c, next) = @unicode.decode_at(text, i)
+    let { cp: c, idx: next, } = @unicode.decode_at(text, i)
     len += utf8_char_len(c)
     continue next
   }
   let cps = FixedArray::make(len, -1)
   let mut pos = 0
   for i = 0; i < text.length(); {
-    let (c, next) = @unicode.decode_at(text, i)
+    let { cp: c, idx: next, } = @unicode.decode_at(text, i)
     cps[pos] = c
     pos += utf8_char_len(c)
     continue next

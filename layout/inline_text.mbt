@@ -35,7 +35,7 @@ fn utf8_char_len(c : Int) -> Int {
 fn utf8_str_len(s : StringView) -> Int {
   let mut n = 0
   for i = 0; i < s.length(); {
-    let (c, next) = @unicode.decode_at(s, i)
+    let { cp: c, idx: next, } = @unicode.decode_at(s, i)
     n += utf8_char_len(c)
     continue next
   }
@@ -49,7 +49,7 @@ fn Utf8Str::new(s : String) -> Utf8Str {
   let cps = FixedArray::make(len, -1)
   let mut pos = 0
   for i = 0; i < s.length(); {
-    let (c, next) = @unicode.decode_at(s, i)
+    let { cp: c, idx: next, } = @unicode.decode_at(s, i)
     u16[pos] = i
     cps[pos] = c
     pos += utf8_char_len(c)

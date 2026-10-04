@@ -148,7 +148,7 @@ pub fn Breakpoint::is_hyphen(self : Breakpoint) -> Bool {
 fn trim_end_len(s : String, pred : (Int) -> Bool) -> Int {
   let mut end = s.length()
   while end > 0 {
-    let (c, start) = @unicode.decode_before(s, end)
+    let { cp: c, idx: start, } = @unicode.decode_before(s, end)
     if !pred(c) {
       break
     }
@@ -161,7 +161,7 @@ fn trim_end_len(s : String, pred : (Int) -> Bool) -> Int {
 fn utf8_str_len(s : StringView) -> Int {
   let mut n = 0
   for i = 0; i < s.length(); {
-    let (c, next) = @unicode.decode_at(s, i)
+    let { cp: c, idx: next, } = @unicode.decode_at(s, i)
     n += utf8_len(c)
     continue next
   }
@@ -186,7 +186,7 @@ fn Utf8Str::new(text : String) -> Utf8Str {
   let cps = FixedArray::make(len, -1)
   let mut pos = 0
   for i = 0; i < text.length(); {
-    let (c, next) = @unicode.decode_at(text, i)
+    let { cp: c, idx: next, } = @unicode.decode_at(text, i)
     to_utf16[pos] = i
     cps[pos] = c
     pos += utf8_len(c)
@@ -215,7 +215,7 @@ fn Utf8Str::char_before(self : Utf8Str, i : Int) -> Int? {
   if i <= 0 {
     return None
   }
-  let (c, _) = @unicode.decode_before(self.text, self.to_utf16[i])
+  let { cp: c, .. } = @unicode.decode_before(self.text, self.to_utf16[i])
   Some(c)
 }
 
@@ -332,7 +332,7 @@ pub fn breakpoints(
 ///|
 fn all_alphabetic(s : StringView) -> Bool {
   for i = 0; i < s.length(); {
-    let (c, next) = @unicode.decode_at(s, i)
+    let { cp: c, idx: next, } = @unicode.decode_at(s, i)
     if !@unicode.is_alphabetic(Int::unsafe_to_char(c)) {
       return false
     }
@@ -406,7 +406,7 @@ fn hyphenations(
 
     // Filter out forbidden hyphenation opportunities.
     if !syllable.is_empty() {
-      let (last, _) = @unicode.decode_before(syllable, syllable.length())
+      let { cp: last, .. } = @unicode.decode_before(syllable, syllable.length())
       if line_break(last) is (Glue | WordJoiner | ZWJ) {
         continue
       }
@@ -425,7 +425,7 @@ fn hyphenations(
 fn char_count(s : String) -> Int {
   let mut n = 0
   for i = 0; i < s.length(); {
-    let (_, next) = @unicode.decode_at(s, i)
+    let { idx: next, .. } = @unicode.decode_at(s, i)
     n += 1
     continue next
   }

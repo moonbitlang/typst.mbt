@@ -21,7 +21,7 @@ fn str_byte_to_utf16(s : String, byte : Int) -> Int? {
     if i >= s.length() {
       return None
     }
-    let (c, next) = @unicode.decode_at(s, i)
+    let { cp: c, idx: next, } = @unicode.decode_at(s, i)
     bytes += if c < 0x80 {
       1
     } else if c < 0x800 {
@@ -323,7 +323,7 @@ fn impl_str_ends_with(
         if u >= self_.length() {
           break
         }
-        let (c, _) = @unicode.decode_at(self_, u)
+        let { cp: c, .. } = @unicode.decode_at(self_, u)
         start_byte = mat.start + utf8_char_len(c)
       }
       false
@@ -386,7 +386,7 @@ fn str_match_indices(s : String, pat : String) -> Array[(Int, Int, Int)] {
       if i >= s.length() {
         break
       }
-      let (c, next) = @unicode.decode_at(s, i)
+      let { cp: c, idx: next, } = @unicode.decode_at(s, i)
       b += utf8_char_len(c)
       i = next
     }
@@ -629,7 +629,7 @@ fn rust_split_whitespace(s : String) -> Array[String] {
   let mut start = -1
   let mut i = 0
   while i < s.length() {
-    let (c, next) = @unicode.decode_at(s, i)
+    let { cp: c, idx: next, } = @unicode.decode_at(s, i)
     if @unicode.is_whitespace(c.unsafe_to_char()) {
       if start >= 0 {
         out.push(s.unsafe_substring(start~, end=i))

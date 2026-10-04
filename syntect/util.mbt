@@ -10,7 +10,7 @@ fn is_ws(c : Int) -> Bool {
 pub fn rust_trim(s : StringView) -> StringView {
   let mut start = 0
   while start < s.length() {
-    let (c, next) = @unicode.decode_at(s, start)
+    let { cp: c, idx: next, } = @unicode.decode_at(s, start)
     if !is_ws(c) {
       break
     }
@@ -18,7 +18,7 @@ pub fn rust_trim(s : StringView) -> StringView {
   }
   let mut end = s.length()
   while end > start {
-    let (c, prev) = @unicode.decode_before(s, end)
+    let { cp: c, idx: prev, } = @unicode.decode_before(s, end)
     if !is_ws(c) {
       break
     }
@@ -33,7 +33,7 @@ pub fn utf8_len(s : StringView) -> Int {
   let mut n = 0
   let mut i = 0
   while i < s.length() {
-    let (c, next) = @unicode.decode_at(s, i)
+    let { cp: c, idx: next, } = @unicode.decode_at(s, i)
     n += utf8_char_len(c)
     i = next
   }
@@ -68,7 +68,7 @@ pub fn ByteIndex::new(text : String) -> ByteIndex {
   let mut i = 0
   while i < text.length() {
     map[b] = i
-    let (c, next) = @unicode.decode_at(text, i)
+    let { cp: c, idx: next, } = @unicode.decode_at(text, i)
     b += utf8_char_len(c)
     i = next
   }

@@ -585,8 +585,8 @@ pub fn compare_str(a : StringView, b : StringView) -> Int {
   let mut i = 0
   let mut j = 0
   while i < a.length() && j < b.length() {
-    let (ca, ni) = @unicode.decode_at(a, i)
-    let (cb, nj) = @unicode.decode_at(b, j)
+    let { cp: ca, idx: ni, } = @unicode.decode_at(a, i)
+    let { cp: cb, idx: nj, } = @unicode.decode_at(b, j)
     if ca != cb {
       return ca.compare(cb)
     }

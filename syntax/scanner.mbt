@@ -39,7 +39,7 @@ fn Scanner::peek(self : Scanner) -> Char? {
   if self.done() {
     None
   } else {
-    let (c, _) = @unicode.decode_at(self.text, self.cursor)
+    let { cp: c, .. } = @unicode.decode_at(self.text, self.cursor)
     Some(Int::unsafe_to_char(c))
   }
 }
@@ -54,13 +54,13 @@ fn Scanner::scout(self : Scanner, n : Int) -> Char? {
       if i >= self.text.length() {
         return None
       }
-      let (_, next) = @unicode.decode_at(self.text, i)
+      let { idx: next, .. } = @unicode.decode_at(self.text, i)
       i = next
     }
     if i >= self.text.length() {
       None
     } else {
-      let (c, _) = @unicode.decode_at(self.text, i)
+      let { cp: c, .. } = @unicode.decode_at(self.text, i)
       Some(Int::unsafe_to_char(c))
     }
   } else {
@@ -69,13 +69,13 @@ fn Scanner::scout(self : Scanner, n : Int) -> Char? {
       if i <= 0 {
         return None
       }
-      let (_, prev) = @unicode.decode_before(self.text, i)
+      let { idx: prev, .. } = @unicode.decode_before(self.text, i)
       i = prev
     }
     if i <= 0 {
       None
     } else {
-      let (c, _) = @unicode.decode_before(self.text, i)
+      let { cp: c, .. } = @unicode.decode_before(self.text, i)
       Some(Int::unsafe_to_char(c))
     }
   }
@@ -87,7 +87,7 @@ fn Scanner::eat(self : Scanner) -> Char? {
   if self.done() {
     None
   } else {
-    let (c, next) = @unicode.decode_at(self.text, self.cursor)
+    let { cp: c, idx: next, } = @unicode.decode_at(self.text, self.cursor)
     self.cursor = next
     Some(Int::unsafe_to_char(c))
   }
@@ -97,7 +97,7 @@ fn Scanner::eat(self : Scanner) -> Char? {
 /// Un-consume the char before the cursor.
 fn Scanner::uneat(self : Scanner) -> Unit {
   if self.cursor > 0 {
-    let (_, prev) = @unicode.decode_before(self.text, self.cursor)
+    let { idx: prev, .. } = @unicode.decode_before(self.text, self.cursor)
     self.cursor = prev
   }
 }

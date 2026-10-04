@@ -165,7 +165,7 @@ impl SharedShapingContext for MathShapingContext with fn variations(self) {
 
 ///|
 /// `0..text.len().saturating_as()` as a `u16` range end.
-fn math_range_end(text : String) -> UInt16 {
+fn math_range_end(text : StringView) -> UInt16 {
   let len = @syntax.utf8_len(text)
   (if len > 65535 { 65535 } else { len }).to_uint16()
 }

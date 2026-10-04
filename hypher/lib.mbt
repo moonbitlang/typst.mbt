@@ -116,7 +116,7 @@ fn lowercase_and_dot(word : String, len : Int) -> FixedArray[Int] {
   // Add the lowercased chars.
   let mut offset = 1
   for i = 0; i < word.length(); {
-    let (cp, next) = @unicode.decode_at(word, i)
+    let { cp, idx: next, } = @unicode.decode_at(word, i)
     let mut c = cp
     if cp < 0x80 {
       // ASCII lowercases to a single ASCII char (fast path).
@@ -125,7 +125,7 @@ fn lowercase_and_dot(word : String, len : Int) -> FixedArray[Int] {
       }
     } else {
       let lower = @unicode.char_to_lowercase(Int::unsafe_to_char(cp))
-      let (l, lnext) = @unicode.decode_at(lower, 0)
+      let { cp: l, idx: lnext, } = @unicode.decode_at(lower, 0)
       if lnext == lower.length() && utf8_len(l) == utf8_len(c) {
         c = l
       }
@@ -151,7 +151,7 @@ fn char_to_byte_bounds(
   // Convert from chars to byte indices in the dotted word.
   let chars = []
   for i = 0; i < word.length(); {
-    let (c, next) = @unicode.decode_at(word, i)
+    let { cp: c, idx: next, } = @unicode.decode_at(word, i)
     chars.push(c)
     continue next
   }
@@ -365,14 +365,14 @@ fn encode_char(out : FixedArray[Int], offset : Int, c : Int) -> Int {
 fn utf8_encode(s : String) -> FixedArray[Int] {
   let mut len = 0
   for i = 0; i < s.length(); {
-    let (c, next) = @unicode.decode_at(s, i)
+    let { cp: c, idx: next, } = @unicode.decode_at(s, i)
     len += utf8_len(c)
     continue next
   }
   let out = FixedArray::make(len, 0)
   let mut offset = 0
   for i = 0; i < s.length(); {
-    let (c, next) = @unicode.decode_at(s, i)
+    let { cp: c, idx: next, } = @unicode.decode_at(s, i)
     offset = encode_char(out, offset, c)
     continue next
   }
