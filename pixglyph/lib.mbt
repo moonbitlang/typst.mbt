@@ -238,10 +238,10 @@ fn Canvas::accumulate(self : Canvas) -> Bytes {
   // A plain loop with `min` and `to_int` spelled out (the closure call and
   // the core float helpers are not inlined; performance). `acc.abs().min(1.0)`
   // is in `[0, 1]` or NaN-free `1.0`, so the product is in `[0, 255]`.
-  // `self.a[..self.w * self.h]` (no overflow: both are below 2^32).
-  let n = self.w * self.h
-  guard n <= self.a.length().to_int64() else { abort("canvas out of bounds") }
-  let n = n.to_int()
+  // `self.a[..self.w * self.h]` (upstream panics if that exceeds the
+  // buffer).
+  let n = self.coverage_len()
+  guard n >= 0 else { abort("canvas out of bounds") }
   let out = FixedArray::make(n, b'\x00')
   let mut acc : Float = 0.0
   for i in 0..<n {
@@ -252,6 +252,18 @@ fn Canvas::accumulate(self : Canvas) -> Bytes {
     out.unsafe_set(i, f32_to_i32_unchecked((255.0 : Float) * v).to_byte())
   }
   Bytes::from_fixedarray(out)
+}
+
+///|
+/// `w * h` if the buffer holds that many entries, else -1. The product of
+/// the two `u32` dimensions is computed in `u64` (it can exceed `Int64`).
+fn Canvas::coverage_len(self : Canvas) -> Int {
+  let n = self.w.reinterpret_as_uint64() * self.h.reinterpret_as_uint64()
+  if n <= self.a.length().to_int64().reinterpret_as_uint64() {
+    n.to_int()
+  } else {
+    -1
+  }
 }
 
 ///|

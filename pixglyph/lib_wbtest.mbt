@@ -294,3 +294,19 @@ test "float helpers match the core functions on special values" {
     }
   }
 }
+
+///|
+test "canvas coverage length of overflowing dimensions" {
+  // `w * h` beyond the (wrapping `u32`) allocation, also beyond `Int64`:
+  // `accumulate` aborts like upstream's slice.
+  assert_eq(Canvas::new(0xC0000000U, 0xC0000000U).coverage_len(), -1)
+  assert_eq(Canvas::new(65538U, 65536U).coverage_len(), -1)
+  assert_eq(Canvas::new(0xFFFFFFFFU, 1U).coverage_len(), -1)
+  assert_eq(Canvas::new(7U, 9U).coverage_len(), 63)
+  assert_eq(Canvas::new(0U, 9U).coverage_len(), 0)
+}
+
+///|
+test "panic accumulate with overflowing dimensions" {
+  ignore(Canvas::new(0xC0000000U, 0xC0000000U).accumulate())
+}
