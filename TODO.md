@@ -95,8 +95,8 @@ goldens with `scripts/goldens.sh <stage>` (needs Rust; builds `oracle/`).
   "deflate" (2026-10-04, hyperfine side by side with "v128" = main at
   fd575dd, in parentheses on wasm, and Rust): the zlib-rs port's hash
   tables as `u16` like upstream (half the cache footprint; on wasm a byte
-  array with a v128 `slide_hash`), no per-match or per-row allocations and
-  copies, the braided CRC-32 of zlib-rs, `compress_block` with the bit
+  array with a v128 `slide_hash`), no tuple allocations per match and no
+  `Bytes` copies per row, the braided CRC-32 of zlib-rs, `compress_block` with the bit
   buffer in locals, `fizzle_matches` bounded up front, the adaptive filter
   keeping its best row, and pixglyph's float helpers inlined.
   `encode_png_balanced` of three `long.typ` pages: 85 -> 60 ms (png 0.18.1

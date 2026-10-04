@@ -179,18 +179,26 @@
   a common file, which the `*_scalar.mbt` files call), and the kernel tests
   compare the target-selected kernel with it directly
   (`codecs/simd_boundary_wbtest.mbt`, `pic_scale/kernels_wbtest.mbt`,
-  `vello_cpu/fine_kernels_wbtest.mbt`, `*/simd_kernels_wbtest.mbt`): every
-  length 0..64, offsets, exact allocation ends, sentinels around outputs,
-  aliasing, edge parameters, and undersized buffers as `panic` tests. The
+  `vello_cpu/fine_kernels_wbtest.mbt`, `*/simd_kernels_wbtest.mbt`; on
+  wasm-gc/js both sides are the scalar code): small lengths (0..64 where the
+  kernel takes one), offsets, exact allocation ends, sentinels around
+  outputs, aliasing, edge parameters, and undersized buffers as `panic`
+  tests. The native test driver skips `panic` tests, so the v128 range
+  predicates are also tested directly on native/wasm
+  (`codecs/simd_guards_wbtest.mbt`, `pic_scale/kernels_v128_wbtest.mbt`,
+  `vello_cpu/fine_v128_wbtest.mbt`, `skia/simd_guards_wbtest.mbt`). The
   oracles (`pic_scale/oracle_wbtest.mbt`, `hayro/render/oracle_test.mbt`,
   which needs the `target/hayro` and `target/devassets` symlinks to the
   hayro and typst-dev-assets checkouts, else it is silently skipped) must
   pass on native, wasm and wasm-gc. (5) Aliasing: an output that may alias
   an input (`physical_equal` on the arrays) runs the scalar twin, since the
-  blocks read ahead of their writes; contracts the lanes rely on (e.g.
-  pic_scale's `i16` weights) are checked at the kernel boundary with a
-  scalar fallback, and every unchecked access has its bounds proof in a
-  comment next to it.
+  blocks read ahead of their writes (also overlapping output rows, and a
+  scratch accumulator aliasing an input); contracts the lanes rely on are
+  checked with a scalar fallback (pic_scale's `i16` weights: per call for
+  the vertical taps, via `FixedWeights.weights_fit_i16`, computed once
+  when the weights are made, for the horizontal rows); range checks compare
+  `len <= total - off` (no `Int64` overflow); and every unchecked access
+  has its bounds proof in a comment next to it.
 - SVG export (`svg/`, port of typst-svg) is checked by two stages against
   the raw upstream SVGs (`scripts/goldens.sh svg`, pretty, merged pages, 1pt
   gap): `svg` compiles and exports each paged test; `svg-replay` exports
