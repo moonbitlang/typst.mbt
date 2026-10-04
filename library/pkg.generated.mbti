@@ -5914,7 +5914,7 @@ pub fn FontBook::len(Self) -> Int
 pub fn FontBook::new() -> Self
 pub fn FontBook::push(Self, FontInfo) -> Unit
 pub fn FontBook::select(Self, String, FontVariant) -> Int?
-pub fn FontBook::select_fallback(Self, FontInfo?, FontVariant, String) -> Int?
+pub fn FontBook::select_fallback(Self, FontInfo?, FontVariant, StringView) -> Int?
 pub fn FontBook::select_family(Self, String) -> Array[Int]
 pub impl Default for FontBook
 
@@ -5958,10 +5958,11 @@ pub impl Show for FontInfo
 pub struct FontInstance {
   // private fields
 }
-pub fn FontInstance::edges(Self, TopEdge, BottomEdge, Abs, TextEdgeBounds) -> (Abs, Abs)
+pub fn FontInstance::edges(Self, TopEdge, BottomEdge, Abs, TextEdgeBounds) -> TextEdges
 pub fn FontInstance::face(Self) -> &FontInstanceFace
 pub fn FontInstance::font(Self) -> Font
 pub fn FontInstance::glyph_bounding_box(Self, UInt16) -> GlyphRect?
+pub fn FontInstance::glyph_edges(Self, TopEdge, BottomEdge, Abs, UInt16) -> TextEdges
 pub fn FontInstance::math(Self) -> MathConstants
 pub fn FontInstance::metrics(Self) -> FontMetrics
 pub fn FontInstance::to_em(Self, Double) -> Em
@@ -11033,6 +11034,11 @@ pub(all) enum TextEdgeBounds {
   Zero
   Glyph(UInt16)
   Frame(Frame)
+}
+
+pub struct TextEdges {
+  top : Abs
+  bottom : Abs
 }
 
 pub struct TextElem(Content)

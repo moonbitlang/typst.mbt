@@ -179,7 +179,7 @@ fn math_shape_text(
 ) -> Unit {
   let shape_tofus = (
     ctx : MathShapingContext,
-    text : String,
+    text : StringView,
     font : @library.FontInstance,
   ) => {
     for _ in text {

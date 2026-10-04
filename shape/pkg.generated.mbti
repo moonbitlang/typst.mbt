@@ -559,7 +559,7 @@ pub fn UnicodeBuffer::is_empty(Self) -> Bool
 pub fn UnicodeBuffer::language(Self) -> Language?
 pub fn UnicodeBuffer::len(Self) -> Int
 pub fn UnicodeBuffer::new() -> Self
-pub fn UnicodeBuffer::push_str(Self, String) -> Unit
+pub fn UnicodeBuffer::push_str(Self, StringView) -> Unit
 pub fn UnicodeBuffer::reset_clusters(Self) -> Unit
 pub fn UnicodeBuffer::script(Self) -> Script
 pub fn UnicodeBuffer::set_cluster_level(Self, Int) -> Unit

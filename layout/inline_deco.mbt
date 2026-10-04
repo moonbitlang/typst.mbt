@@ -138,9 +138,9 @@ fn determine_edges(
   let mut top = @library.Abs::zero()
   let mut bottom = @library.Abs::zero()
   for g in text.glyphs {
-    let (t, b) = text.font.edges(top_edge, bottom_edge, text.size, Glyph(g.id))
-    top = top.max(t)
-    bottom = bottom.max(b)
+    let e = text.font.glyph_edges(top_edge, bottom_edge, text.size, g.id)
+    top = top.max(e.top)
+    bottom = bottom.max(e.bottom)
   }
   (top, bottom)
 }

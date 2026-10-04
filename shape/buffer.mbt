@@ -1501,7 +1501,7 @@ fn Buffer::is_empty(self : Buffer) -> Bool {
 }
 
 ///|
-fn Buffer::push_str(self : Buffer, text : String) -> Unit {
+fn Buffer::push_str(self : Buffer, text : StringView) -> Unit {
   let mut count = 0
   for _ in text {
     count += 1
@@ -1646,7 +1646,7 @@ pub fn UnicodeBuffer::is_empty(self : UnicodeBuffer) -> Bool {
 
 ///|
 /// Pushes a string to a buffer (clusters are UTF-8 byte offsets).
-pub fn UnicodeBuffer::push_str(self : UnicodeBuffer, str : String) -> Unit {
+pub fn UnicodeBuffer::push_str(self : UnicodeBuffer, str : StringView) -> Unit {
   self.0.push_str(str)
 }
 

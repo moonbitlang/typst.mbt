@@ -722,11 +722,8 @@ fn ShapedText::measure(
   let bottom_edge = @library.TextElem::bottom_edge_in(self.styles)
 
   // Expand top and bottom by reading the font's vertical metrics.
-  let expand = (font : @library.FontInstance, bounds : @library.TextEdgeBounds) => {
-    let (t, b) = font.edges(top_edge, bottom_edge, size, bounds)
-    top = top.max(t)
-    bottom = bottom.max(b)
-  }
+  // (Upstream uses an `expand` closure; it is inlined here because the
+  // closure and its captured mutable variables were allocated per call.)
   if self.glyphs.is_fully_empty() {
     // When there are no glyphs, we just use the vertical metrics of the
     // first available font.
@@ -735,13 +732,23 @@ fn ShapedText::measure(
     for family in @library.families(self.styles) {
       if world.book().select(family.as_str(), self.variant) is Some(id) &&
         world.font(id) is Some(font) {
-        expand(font.instantiate(self.variant, size, variations), Zero)
+        let font = font.instantiate(self.variant, size, variations)
+        let e = font.edges(top_edge, bottom_edge, size, Zero)
+        top = top.max(e.top)
+        bottom = bottom.max(e.bottom)
         break
       }
     }
   } else {
     for g in self.glyphs.kept() {
-      expand(g.font, Glyph(g.glyph_id.to_uint16()))
+      let e = g.font.glyph_edges(
+        top_edge,
+        bottom_edge,
+        size,
+        g.glyph_id.to_uint16(),
+      )
+      top = top.max(e.top)
+      bottom = bottom.max(e.bottom)
     }
   }
   (top, bottom)
@@ -1231,9 +1238,9 @@ impl SharedShapingContext for ShapingContext with fn variations(self) {
 /// `shape_tofus` if no font is found.
 pub fn[C : SharedShapingContext] get_font_and_covers(
   ctx : C,
-  text : String,
+  text : StringView,
   families : FamilyIter,
-  shape_tofus : (C, String, @library.FontInstance) -> Unit,
+  shape_tofus : (C, StringView, @library.FontInstance) -> Unit,
 ) -> (@library.FontInstance, @library.Regex?)? {
   // Find the next available family.
   let world = ctx.world()
@@ -1315,8 +1322,11 @@ fn shape_segment(
 ) -> Unit {
   // Don't try shaping newlines, tabs, or default ignorables.
   let mut all_ignorable = true
-  for pair in text.char_indices() {
-    let c = pair.1
+  for i in 0..<text.len() {
+    let c = text.char_at(i)
+    if c < 0 {
+      continue
+    }
     if !(c == '\n' || c == '\t' || @unicode.is_default_ignorable(char_of(c))) {
       all_ignorable = false
       break
@@ -1325,7 +1335,7 @@ fn shape_segment(
   if all_ignorable {
     return
   }
-  let text_str = text.to_string()
+  let text_str = text.view()
   guard get_font_and_covers(ctx, text_str, families, (ctx, _, font) => {
       shape_tofus(ctx, base, text, font)
     })
@@ -1571,8 +1581,12 @@ fn typographic_shift_supported(
     return false
   }
   let lookups = feature.lookup_indices
-  for pair in text.char_indices() {
-    let c = char_of(pair.1)
+  for i in 0..<text.len() {
+    let cp = text.char_at(i)
+    if cp < 0 {
+      continue
+    }
+    let c = char_of(cp)
     guard rusty(font).ttf().glyph_index(c) is Some(gid) else { return false }
     let mut any = false
     for li in 0..<lookups.len().to_int() {
@@ -1632,14 +1646,20 @@ fn shape_tofus(
       script,
     })
   }
-  let chars = text.char_indices()
+  // `text.char_indices()` (reversed for RTL) without collecting them.
   if ctx.dir.is_positive() {
-    for pair in chars {
-      add_glyph(pair.0, pair.1)
+    for i in 0..<text.len() {
+      let c = text.char_at(i)
+      if c >= 0 {
+        add_glyph(i, c)
+      }
     }
   } else {
-    for i = chars.length() - 1; i >= 0; i = i - 1 {
-      add_glyph(chars[i].0, chars[i].1)
+    for i = text.len() - 1; i >= 0; i = i - 1 {
+      let c = text.char_at(i)
+      if c >= 0 {
+        add_glyph(i, c)
+      }
     }
   }
 }

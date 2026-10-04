@@ -72,7 +72,8 @@ fn Utf8Str::full(self : Utf8Str) -> Utf8Slice {
 
 ///|
 /// A substring of a `Utf8Str` (upstream `&str`). All offsets of its methods
-/// are relative to its start.
+/// are relative to its start. A value type, so slicing does not allocate.
+#valtype
 priv struct Utf8Slice {
   src : Utf8Str
   start : Int
@@ -109,6 +110,15 @@ fn Utf8Slice::to_string(self : Utf8Slice) -> String {
   } else {
     self.src.s.unsafe_substring(start=a, end=b)
   }
+}
+
+///|
+/// The slice as a view of the underlying MoonBit string (no copy).
+fn Utf8Slice::view(self : Utf8Slice) -> StringView {
+  self.src.s.view(
+    start_offset=self.src.u16[self.start],
+    end_offset=self.src.u16[self.end],
+  )
 }
 
 ///|
@@ -161,19 +171,6 @@ fn Utf8Slice::last_char(self : Utf8Slice) -> Int? {
   } else {
     Some(self.src.cps[self.start + self.char_start_before(self.len())])
   }
-}
-
-///|
-/// The `(relative byte offset, code point)` pairs.
-fn Utf8Slice::char_indices(self : Utf8Slice) -> Array[(Int, Int)] {
-  let out = []
-  for i in self.start..<self.end {
-    let c = self.src.cps[i]
-    if c >= 0 {
-      out.push((i - self.start, c))
-    }
-  }
-  out
 }
 
 ///|
