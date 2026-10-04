@@ -452,7 +452,8 @@ fn resize_infos(
     }
   } else {
     if size > v.capacity() {
-      v.reserve_capacity(@cmp.maximum(size, 2 * v.capacity()))
+      let doubled = 2 * v.capacity()
+      v.reserve_capacity(if size > doubled { size } else { doubled })
     }
     while v.length() < size {
       match spare.pop() {
@@ -479,7 +480,8 @@ fn resize_positions(
     }
   } else {
     if size > v.capacity() {
-      v.reserve_capacity(@cmp.maximum(size, 2 * v.capacity()))
+      let doubled = 2 * v.capacity()
+      v.reserve_capacity(if size > doubled { size } else { doubled })
     }
     while v.length() < size {
       match spare.pop() {

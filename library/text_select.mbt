@@ -16,7 +16,8 @@ pub fn families(styles : StyleChain) -> Array[FontFamily] {
   let list = TextElem::font_in(styles).0
   if TextElem::fallback_in(styles) {
     // `[..list, ..fallback_families]` without the spread's iterators.
-    let out = Array::new(capacity=list.length() + fallback_families.length())
+    let out : Array[FontFamily] = []
+    out.reserve_capacity(list.length() + fallback_families.length())
     out.append(list)
     out.append(fallback_families)
     out
