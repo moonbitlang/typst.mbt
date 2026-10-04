@@ -327,18 +327,26 @@ fn ShapedGlyph::copy(self : ShapedGlyph) -> ShapedGlyph {
 }
 
 ///|
+/// Upstream stores the left/right pairs as `(Em, Em)` tuples; they are
+/// flattened into a value type here so that the per-glyph adjustability does
+/// not allocate (tuples are boxed). `.0`/`.1` become `_left`/`_right`.
+#valtype
 priv struct Adjustability {
   /// The left and right stretchability
-  stretchability : (@library.Em, @library.Em)
+  stretch_left : @library.Em
+  stretch_right : @library.Em
   /// The left and right shrinkability
-  shrinkability : (@library.Em, @library.Em)
-} derive(Eq)
+  shrink_left : @library.Em
+  shrink_right : @library.Em
+}
 
 ///|
 fn Adjustability::default() -> Adjustability {
   {
-    stretchability: (@library.Em::zero(), @library.Em::zero()),
-    shrinkability: (@library.Em::zero(), @library.Em::zero()),
+    stretch_left: @library.Em::zero(),
+    stretch_right: @library.Em::zero(),
+    shrink_left: @library.Em::zero(),
+    shrink_right: @library.Em::zero(),
   }
 }
 
@@ -378,7 +386,7 @@ fn ShapedGlyph::is_cjk_left_aligned_punctuation(
   is_cjk_left_aligned_punctuation(
     self.c,
     self.x_advance,
-    self.stretchability(),
+    self.adjustability.stretch_right,
     style,
   )
 }
@@ -389,7 +397,7 @@ fn ShapedGlyph::is_cjk_right_aligned_punctuation(self : ShapedGlyph) -> Bool {
   is_cjk_right_aligned_punctuation(
     self.c,
     self.x_advance,
-    self.stretchability(),
+    self.adjustability.stretch_left,
   )
 }
 
@@ -411,13 +419,49 @@ fn ShapedGlyph::is_letter_or_number(self : ShapedGlyph) -> Bool {
 }
 
 ///|
+/// The glyph-independent part of the justification limits of a shaping run,
+/// resolved once per run instead of once per glyph (performance; upstream
+/// resolves them in `base_adjustability`).
+priv struct ResolvedJustificationLimits {
+  /// `(spacing.max + tracking.max - 1)` in `Em`.
+  space_stretch : @library.Rel[@library.Em]
+  /// `(1 - spacing.min - tracking.min)` in `Em`.
+  space_shrink : @library.Rel[@library.Em]
+  /// `tracking.max` in `Em`.
+  track_stretch : @library.Em
+  /// `-tracking.min` in `Em`.
+  track_shrink : @library.Em
+}
+
+///|
+fn ResolvedJustificationLimits::new(
+  limits : @library.JustificationLimits,
+  font_size : @library.Abs,
+) -> ResolvedJustificationLimits {
+  // To a space, both the spacing and tracking limits apply, just like
+  // `text.tracking` and `text.spacing` both apply to spaces.
+  let spacing = limits.spacing_limits()
+  let tracking = limits.tracking_limits()
+  let max = spacing.max + @library.Rel::from_abs(tracking.max)
+  let min = spacing.min + @library.Rel::from_abs(tracking.min)
+  let to_em = (length : @library.Length) => {
+    @library.Em::from_length(length, font_size)
+  }
+  {
+    space_stretch: (max - @library.Rel::one()).map(to_em),
+    space_shrink: (@library.Rel::one() - min).map(to_em),
+    track_stretch: to_em(tracking.max),
+    track_shrink: to_em(-tracking.min),
+  }
+}
+
+///|
 /// The amount by which the glyph's advance width is allowed to be shrunk or
 /// stretched to improve justification.
 fn ShapedGlyph::base_adjustability(
   self : ShapedGlyph,
   style : CjkPunctStyle,
-  limits : @library.JustificationLimits,
-  font_size : @library.Abs,
+  limits : ResolvedJustificationLimits,
   stretchable : Bool,
 ) -> Adjustability {
   let width = self.x_advance
@@ -425,54 +469,33 @@ fn ShapedGlyph::base_adjustability(
   // Do not ever shrink away more than three quarters of the glyph. As the
   // width approaches zero, justification gets increasingly expensive and
   // if negative it may not terminate.
-  let limited = (v : @library.Em) => em_min(v, width.times(0.75))
   let zero = @library.Em::zero()
   if self.is_space() {
-    // To a space, both the spacing and tracking limits apply, just like
-    // `text.tracking` and `text.spacing` both apply to spaces.
-    let spacing = limits.spacing_limits()
-    let tracking = limits.tracking_limits()
-    let max = spacing.max + @library.Rel::from_abs(tracking.max)
-    let min = spacing.min + @library.Rel::from_abs(tracking.min)
     {
-      stretchability: (
-        zero,
-        em_max(
-          (max - @library.Rel::one())
-          .map(length => @library.Em::from_length(length, font_size))
-          .relative_to(width),
-          zero,
-        ),
-      ),
-      shrinkability: (
-        zero,
-        limited(
-          (@library.Rel::one() - min)
-          .map(length => @library.Em::from_length(length, font_size))
-          .relative_to(width),
-        ),
+      stretch_left: zero,
+      stretch_right: em_max(limits.space_stretch.relative_to(width), zero),
+      shrink_left: zero,
+      shrink_right: em_min(
+        limits.space_shrink.relative_to(width),
+        width.times(0.75),
       ),
     }
   } else if self.is_cjk_left_aligned_punctuation(style) {
-    { stretchability: (zero, zero), shrinkability: (zero, width.div_by(2.0)), }
+    { ..Adjustability::default(), shrink_right: width.div_by(2.0), }
   } else if self.is_cjk_right_aligned_punctuation() {
-    { stretchability: (zero, zero), shrinkability: (width.div_by(2.0), zero), }
+    { ..Adjustability::default(), shrink_left: width.div_by(2.0), }
   } else if self.is_cjk_center_aligned_punctuation(style) {
     {
-      stretchability: (zero, zero),
-      shrinkability: (width.div_by(4.0), width.div_by(4.0)),
+      ..Adjustability::default(),
+      shrink_left: width.div_by(4.0),
+      shrink_right: width.div_by(4.0),
     }
   } else if stretchable {
-    let tracking = limits.tracking_limits()
     {
-      stretchability: (
-        zero,
-        em_max(@library.Em::from_length(tracking.max, font_size), zero),
-      ),
-      shrinkability: (
-        zero,
-        limited(@library.Em::from_length(-tracking.min, font_size)),
-      ),
+      stretch_left: zero,
+      stretch_right: em_max(limits.track_stretch, zero),
+      shrink_left: zero,
+      shrink_right: em_min(limits.track_shrink, width.times(0.75)),
     }
   } else {
     Adjustability::default()
@@ -480,34 +503,24 @@ fn ShapedGlyph::base_adjustability(
 }
 
 ///|
-/// The stretchability of the character.
-fn ShapedGlyph::stretchability(
-  self : ShapedGlyph,
-) -> (@library.Em, @library.Em) {
-  self.adjustability.stretchability
-}
-
-///|
-/// The shrinkability of the character.
-fn ShapedGlyph::shrinkability(self : ShapedGlyph) -> (@library.Em, @library.Em) {
-  self.adjustability.shrinkability
-}
-
-///|
 /// Shrink the width of glyph on the left side.
 fn ShapedGlyph::shrink_left(self : ShapedGlyph, amount : @library.Em) -> Unit {
   self.x_offset = self.x_offset - amount
   self.x_advance = self.x_advance - amount
-  let (l, r) = self.adjustability.shrinkability
-  self.adjustability = { ..self.adjustability, shrinkability: (l - amount, r), }
+  self.adjustability = {
+    ..self.adjustability,
+    shrink_left: self.adjustability.shrink_left - amount,
+  }
 }
 
 ///|
 /// Shrink the width of glyph on the right side.
 fn ShapedGlyph::shrink_right(self : ShapedGlyph, amount : @library.Em) -> Unit {
   self.x_advance = self.x_advance - amount
-  let (l, r) = self.adjustability.shrinkability
-  self.adjustability = { ..self.adjustability, shrinkability: (l, r - amount), }
+  self.adjustability = {
+    ..self.adjustability,
+    shrink_right: self.adjustability.shrink_right - amount,
+  }
 }
 
 ///|
@@ -587,14 +600,14 @@ fn ShapedText::build(
       let kept = i >= self.glyphs.kept_start && i < self.glyphs.kept_end
       let (x_advance, x_offset) = if kept {
         let adjustability_left = if justification_ratio < 0.0 {
-          shaped.shrinkability().0
+          shaped.adjustability.shrink_left
         } else {
-          shaped.stretchability().0
+          shaped.adjustability.stretch_left
         }
         let adjustability_right = if justification_ratio < 0.0 {
-          shaped.shrinkability().1
+          shaped.adjustability.shrink_right
         } else {
-          shaped.stretchability().1
+          shaped.adjustability.stretch_right
         }
         let justification_left = adjustability_left.times(justification_ratio)
         let mut justification_right = adjustability_right.times(
@@ -763,8 +776,8 @@ fn ShapedText::cjk_justifiable_at_last(self : ShapedText) -> Bool {
 fn ShapedText::stretchability(self : ShapedText) -> @library.Abs {
   let mut sum = abs_sum_start()
   for g in self.glyphs.kept() {
-    let (l, r) = g.stretchability()
-    sum = sum + (l + r).at(g.size)
+    let a = g.adjustability
+    sum = sum + (a.stretch_left + a.stretch_right).at(g.size)
   }
   sum
 }
@@ -774,8 +787,8 @@ fn ShapedText::stretchability(self : ShapedText) -> @library.Abs {
 fn ShapedText::shrinkability(self : ShapedText) -> @library.Abs {
   let mut sum = abs_sum_start()
   for g in self.glyphs.kept() {
-    let (l, r) = g.shrinkability()
-    sum = sum + (l + r).at(g.size)
+    let a = g.adjustability
+    sum = sum + (a.shrink_left + a.shrink_right).at(g.size)
   }
   sum
 }
@@ -1442,7 +1455,8 @@ fn shape_segment(
           c,
           script,
           x_advance,
-          Adjustability::default().stretchability,
+          @library.Em::zero(),
+          @library.Em::zero(),
         ),
         script,
       })
@@ -1612,7 +1626,8 @@ fn shape_tofus(
         c,
         script,
         x_advance,
-        Adjustability::default().stretchability,
+        @library.Em::zero(),
+        @library.Em::zero(),
       ),
       script,
     })
@@ -1664,17 +1679,17 @@ fn calculate_adjustability(
   region : @library.Region?,
 ) -> Unit {
   let style = cjk_punct_style(lang, region)
-  let limits = @library.ParElem::justification_limits_in(ctx.styles)
-  let font_size = ctx.size
+  let limits = ResolvedJustificationLimits::new(
+    @library.ParElem::justification_limits_in(ctx.styles),
+    ctx.size,
+  )
   let glyphs = ctx.glyphs
   for i, glyph in glyphs {
     // Do not apply adjustability to a glyph if there is another one in the
     // same cluster.
     let stretchable = i + 1 >= glyphs.length() ||
       glyph.range_start != glyphs[i + 1].range_start
-    glyph.adjustability = glyph.base_adjustability(
-      style, limits, font_size, stretchable,
-    )
+    glyph.adjustability = glyph.base_adjustability(style, limits, stretchable)
   }
   for i, glyph in glyphs {
     // CNS style needs not further adjustment.
@@ -1691,8 +1706,8 @@ fn calculate_adjustability(
     let delta = width.div_by(2.0)
     if glyph.is_cjk_punctuation() &&
       next.is_cjk_punctuation() &&
-      glyph.shrinkability().1 + next.shrinkability().0 >= delta {
-      let left_delta = em_min(glyph.shrinkability().1, delta)
+      glyph.adjustability.shrink_right + next.adjustability.shrink_left >= delta {
+      let left_delta = em_min(glyph.adjustability.shrink_right, delta)
       glyph.shrink_right(left_delta)
       next.shrink_left(delta - left_delta)
     }
@@ -1770,15 +1785,18 @@ fn is_cj_script(c : Char, script : String) -> Bool {
 
 ///|
 /// See <https://www.w3.org/TR/clreq/#punctuation_width_adjustment>
+///
+/// `stretch_right` is `stretchability.1` (the pair is flattened to avoid
+/// allocating a tuple per glyph).
 fn is_cjk_left_aligned_punctuation(
   c : Char,
   x_advance : @library.Em,
-  stretchability : (@library.Em, @library.Em),
+  stretch_right : @library.Em,
   style : CjkPunctStyle,
 ) -> Bool {
   // CJK quotation marks shares codepoints with latin quotation marks.
   // But only the CJK ones have full width.
-  if c is ('”' | '’') && x_advance + stretchability.1 == @library.Em::one() {
+  if c is ('”' | '’') && x_advance + stretch_right == @library.Em::one() {
     return true
   }
   if style is (Gb | Jis) && c is ('，' | '。' | '．' | '、' | '：' | '；') {
@@ -1811,14 +1829,16 @@ fn is_cjk_left_aligned_punctuation(
 
 ///|
 /// See <https://www.w3.org/TR/clreq/#punctuation_width_adjustment>
+///
+/// `stretch_left` is `stretchability.0`.
 fn is_cjk_right_aligned_punctuation(
   c : Char,
   x_advance : @library.Em,
-  stretchability : (@library.Em, @library.Em),
+  stretch_left : @library.Em,
 ) -> Bool {
   // CJK quotation marks shares codepoints with latin quotation marks.
   // But only the CJK ones have full width.
-  if c is ('“' | '‘') && x_advance + stretchability.0 == @library.Em::one() {
+  if c is ('“' | '‘') && x_advance + stretch_left == @library.Em::one() {
     return true
   }
   // See CLReq appendix A.3 https://www.w3.org/TR/clreq/#table_of_bracket_indication_punctuation_marks
@@ -1859,17 +1879,20 @@ fn is_cjk_center_aligned_punctuation(c : Char, style : CjkPunctStyle) -> Bool {
 /// fullwidth. This heuristics can therefore fail for monospace latin fonts.
 /// However, since monospace fonts are usually not justified this edge case
 /// should be rare enough.
+///
+/// The `stretchability` pair is passed flattened.
 fn is_justifiable(
   c : Char,
   script : String,
   x_advance : @library.Em,
-  stretchability : (@library.Em, @library.Em),
+  stretch_left : @library.Em,
+  stretch_right : @library.Em,
 ) -> Bool {
   // punctuation style is not relevant here.
   let style = Gb
   is_space(c) ||
   is_cj_script(c, script) ||
-  is_cjk_left_aligned_punctuation(c, x_advance, stretchability, style) ||
-  is_cjk_right_aligned_punctuation(c, x_advance, stretchability) ||
+  is_cjk_left_aligned_punctuation(c, x_advance, stretch_right, style) ||
+  is_cjk_right_aligned_punctuation(c, x_advance, stretch_left) ||
   is_cjk_center_aligned_punctuation(c, style)
 }

@@ -397,7 +397,7 @@ fn adjust_cj_at_line_start(p : Preparation, items : Items) -> Unit {
   if glyph.is_cjk_right_aligned_punctuation() {
     // If the first glyph is a CJK punctuation, we want to shrink it.
     let glyph = shaped.glyphs.to_mut()[0]
-    let shrink = glyph.shrinkability().0
+    let shrink = glyph.adjustability.shrink_left
     glyph.shrink_left(shrink)
   } else if p.config.cjk_latin_spacing &&
     glyph.is_cj_script() &&
@@ -408,10 +408,9 @@ fn adjust_cj_at_line_start(p : Preparation, items : Items) -> Unit {
     let shrink = glyph.x_offset
     glyph.x_advance = glyph.x_advance - shrink
     glyph.x_offset = @library.Em::zero()
-    let (_, r) = glyph.adjustability.shrinkability
     glyph.adjustability = {
       ..glyph.adjustability,
-      shrinkability: (@library.Em::zero(), r),
+      shrink_left: @library.Em::zero(),
     }
   }
 }
@@ -426,7 +425,7 @@ fn adjust_cj_at_line_end(p : Preparation, items : Items) -> Unit {
   let style = cjk_punct_style(shaped.lang, shaped.region)
   if glyph.is_cjk_left_aligned_punctuation(style) {
     // If the last glyph is a CJK punctuation, we want to shrink it.
-    let shrink = glyph.shrinkability().1
+    let shrink = glyph.adjustability.shrink_right
     let punct = shaped.glyphs.to_mut().last().unwrap()
     punct.shrink_right(shrink)
   } else if p.config.cjk_latin_spacing &&
@@ -437,10 +436,9 @@ fn adjust_cj_at_line_end(p : Preparation, items : Items) -> Unit {
     let shrink = glyph.x_advance - glyph.x_offset - @library.Em::one()
     let glyph = shaped.glyphs.to_mut().last().unwrap()
     glyph.x_advance = glyph.x_advance - shrink
-    let (l, _) = glyph.adjustability.shrinkability
     glyph.adjustability = {
       ..glyph.adjustability,
-      shrinkability: (l, @library.Em::zero()),
+      shrink_right: @library.Em::zero(),
     }
   }
 }

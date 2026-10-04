@@ -147,10 +147,10 @@ fn add_cjk_latin_spacing(items : Array[(Int, Int, InlineItem)]) -> Unit {
         shift == next_shift {
         // The spacing defaults to 1/4 em, and can be shrunk to 1/8 em.
         glyph.x_advance = glyph.x_advance + @library.Em::new(0.25)
-        let (l, r) = glyph.adjustability.shrinkability
         glyph.adjustability = {
           ..glyph.adjustability,
-          shrinkability: (l, r + @library.Em::new(0.125)),
+          shrink_right: glyph.adjustability.shrink_right +
+          @library.Em::new(0.125),
         }
       }
 
@@ -161,10 +161,9 @@ fn add_cjk_latin_spacing(items : Array[(Int, Int, InlineItem)]) -> Unit {
         shift == prev_shift {
         glyph.x_advance = glyph.x_advance + @library.Em::new(0.25)
         glyph.x_offset = glyph.x_offset + @library.Em::new(0.25)
-        let (l, r) = glyph.adjustability.shrinkability
         glyph.adjustability = {
           ..glyph.adjustability,
-          shrinkability: (l + @library.Em::new(0.125), r),
+          shrink_left: glyph.adjustability.shrink_left + @library.Em::new(0.125),
         }
         prev_glyph.is_justifiable = true
       }
