@@ -220,8 +220,16 @@ fn rel_checked_max(v : Rel[Length]) -> Rel[Length] raise HintedError {
 }
 
 ///|
+let par_elem_justification_limits_default_value : Value = JustificationLimits::default()
+  .into_value()
+  .shared()
+
+///|
+/// The default is built once and shared (marked shared, so that mutating a
+/// copy of it copies first, see [Value::shared]): it was rebuilt on every
+/// style lookup of the field (performance).
 fn par_elem_justification_limits_default() -> Value {
-  JustificationLimits::default().into_value()
+  par_elem_justification_limits_default_value
 }
 
 ///|
@@ -362,8 +370,16 @@ pub impl FromValue for FirstLineIndent with fn from_value(v) {
 }
 
 ///|
+let par_elem_first_line_indent_default_value : Value = FirstLineIndent::default()
+  .into_value()
+  .shared()
+
+///|
+/// The default is built once and shared (marked shared, so that mutating a
+/// copy of it copies first, see [Value::shared]): it was rebuilt on every
+/// style lookup of the field (performance).
 fn par_elem_first_line_indent_default() -> Value {
-  FirstLineIndent::default().into_value()
+  par_elem_first_line_indent_default_value
 }
 
 ///|

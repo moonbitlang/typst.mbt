@@ -189,8 +189,18 @@ pub impl FromValue for FontList with fn from_value(v) {
 ///|
 /// The default font list (upstream
 /// `FontList(vec![FontFamily::new("Libertinus Serif")])`).
+let text_elem_font_default_value : Value = FontList([
+    FontFamily::new("Libertinus Serif"),
+  ])
+  .into_value()
+  .shared()
+
+///|
+/// The default is built once and shared (marked shared, so that mutating a
+/// copy of it copies first, see [Value::shared]): it was rebuilt on every
+/// style lookup of the field (performance).
 fn text_elem_font_default() -> Value {
-  FontList([FontFamily::new("Libertinus Serif")]).into_value()
+  text_elem_font_default_value
 }
 
 ///|
@@ -292,8 +302,18 @@ pub impl FromValue for TextSize with fn from_value(v) {
 }
 
 ///|
+let text_elem_size_default_value : Value = TextSize(
+    Length::from_abs(Abs::pt(11.0)),
+  )
+  .into_value()
+  .shared()
+
+///|
+/// The default is built once and shared (marked shared, so that mutating a
+/// copy of it copies first, see [Value::shared]): it was rebuilt on every
+/// style lookup of the field (performance).
 fn text_elem_size_default() -> Value {
-  TextSize(Length::from_abs(Abs::pt(11.0))).into_value()
+  text_elem_size_default_value
 }
 
 ///|
@@ -668,8 +688,16 @@ pub impl FromValue for StylisticSets with fn from_value(v) {
 }
 
 ///|
+let text_elem_stylistic_set_default_value : Value = StylisticSets::default()
+  .into_value()
+  .shared()
+
+///|
+/// The default is built once and shared (marked shared, so that mutating a
+/// copy of it copies first, see [Value::shared]): it was rebuilt on every
+/// style lookup of the field (performance).
 fn text_elem_stylistic_set_default() -> Value {
-  StylisticSets::default().into_value()
+  text_elem_stylistic_set_default_value
 }
 
 // NumberType, NumberWidth
@@ -850,8 +878,16 @@ pub impl Fold for FontFeatures with fn fold(self, outer) {
 }
 
 ///|
+let text_elem_features_default_value : Value = FontFeatures::default()
+  .into_value()
+  .shared()
+
+///|
+/// The default is built once and shared (marked shared, so that mutating a
+/// copy of it copies first, see [Value::shared]): it was rebuilt on every
+/// style lookup of the field (performance).
 fn text_elem_features_default() -> Value {
-  FontFeatures::default().into_value()
+  text_elem_features_default_value
 }
 
 ///|
@@ -860,8 +896,16 @@ fn text_elem_features_fold(inner : Value, outer : Value) -> Value {
 }
 
 ///|
+let text_elem_variations_default_value : Value = FontVariations::default()
+  .into_value()
+  .shared()
+
+///|
+/// The default is built once and shared (marked shared, so that mutating a
+/// copy of it copies first, see [Value::shared]): it was rebuilt on every
+/// style lookup of the field (performance).
 fn text_elem_variations_default() -> Value {
-  FontVariations::default().into_value()
+  text_elem_variations_default_value
 }
 
 ///|
@@ -1083,8 +1127,16 @@ fn text_elem_costs_output(v : Value) -> Value {
 }
 
 ///|
+let text_elem_costs_default_value : Value = Costs::default()
+  .into_value()
+  .shared()
+
+///|
+/// The default is built once and shared (marked shared, so that mutating a
+/// copy of it copies first, see [Value::shared]): it was rebuilt on every
+/// style lookup of the field (performance).
 fn text_elem_costs_default() -> Value {
-  Costs::default().into_value()
+  text_elem_costs_default_value
 }
 
 ///|
