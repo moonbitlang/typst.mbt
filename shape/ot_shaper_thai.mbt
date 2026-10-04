@@ -103,7 +103,7 @@ fn PuaMapping::new(u : UInt, win_pua : UInt, mac_pua : UInt) -> PuaMapping {
 }
 
 ///|
-let sd_mappings : FixedArray[PuaMapping] = [
+let sd_mappings : ReadOnlyArray[PuaMapping] = [
   PuaMapping::new(0x0E48, 0xF70A, 0xF88B), // MAI EK
   PuaMapping::new(0x0E49, 0xF70B, 0xF88E), // MAI THO
   PuaMapping::new(0x0E4A, 0xF70C, 0xF891), // MAI TRI
@@ -116,7 +116,7 @@ let sd_mappings : FixedArray[PuaMapping] = [
 ]
 
 ///|
-let sdl_mappings : FixedArray[PuaMapping] = [
+let sdl_mappings : ReadOnlyArray[PuaMapping] = [
   PuaMapping::new(0x0E48, 0xF705, 0xF88C), // MAI EK
   PuaMapping::new(0x0E49, 0xF706, 0xF88F), // MAI THO
   PuaMapping::new(0x0E4A, 0xF707, 0xF892), // MAI TRI
@@ -126,7 +126,7 @@ let sdl_mappings : FixedArray[PuaMapping] = [
 ]
 
 ///|
-let sl_mappings : FixedArray[PuaMapping] = [
+let sl_mappings : ReadOnlyArray[PuaMapping] = [
   PuaMapping::new(0x0E48, 0xF713, 0xF88A), // MAI EK
   PuaMapping::new(0x0E49, 0xF714, 0xF88D), // MAI THO
   PuaMapping::new(0x0E4A, 0xF715, 0xF890), // MAI TRI
@@ -143,7 +143,7 @@ let sl_mappings : FixedArray[PuaMapping] = [
 ]
 
 ///|
-let rd_mappings : FixedArray[PuaMapping] = [
+let rd_mappings : ReadOnlyArray[PuaMapping] = [
   PuaMapping::new(0x0E0D, 0xF70F, 0xF89A), // YO YING
   PuaMapping::new(0x0E10, 0xF700, 0xF89E), // THO THAN
   PuaMapping::new(0x0000, 0x0000, 0x0000),
@@ -192,7 +192,7 @@ fn AboveState::to_int(self : AboveState) -> Int {
 }
 
 ///|
-let above_start_state : FixedArray[AboveState] = [
+let above_start_state : ReadOnlyArray[AboveState] = [
   T0, // NC
   T1, // AC
   T0, // RC
@@ -215,7 +215,7 @@ fn AboveStateMachineEdge::new(
 }
 
 ///|
-let above_state_machine : FixedArray[FixedArray[AboveStateMachineEdge]] = [
+let above_state_machine : ReadOnlyArray[FixedArray[AboveStateMachineEdge]] = [
   //        AV                                      BV                                      T
   // T0
   [
@@ -263,7 +263,7 @@ fn BelowState::to_int(self : BelowState) -> Int {
 }
 
 ///|
-let below_start_state : FixedArray[BelowState] = [
+let below_start_state : ReadOnlyArray[BelowState] = [
   B0, // NC
   B0, // AC
   B1, // RC
@@ -286,7 +286,7 @@ fn BelowStateMachineEdge::new(
 }
 
 ///|
-let below_state_machine : FixedArray[FixedArray[BelowStateMachineEdge]] = [
+let below_state_machine : ReadOnlyArray[FixedArray[BelowStateMachineEdge]] = [
   //        AV                                      BV                                      T
   // B0
   [

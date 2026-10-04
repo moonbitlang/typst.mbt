@@ -208,7 +208,7 @@ const POS_SMVD : Int = 13
 const POS_END : Int = 14
 
 ///|
-let indic_features : FixedArray[(@otf.Tag, Int)] = [
+let indic_features : ReadOnlyArray[(@otf.Tag, Int)] = [
   // Basic features.
   // These features are applied in order, one at a time, after initial_reordering,
   // constrained to the syllable.
@@ -371,7 +371,7 @@ fn IndicConfig::new(
 }
 
 ///|
-let indic_configs : FixedArray[IndicConfig] = [
+let indic_configs : ReadOnlyArray[IndicConfig] = [
   IndicConfig::new(None, false, 0, BeforePost, Implicit, PreAndPost),
   IndicConfig::new(
     Some(script_devanagari),
@@ -536,7 +536,7 @@ fn IndicShapePlan::new(plan : ShapePlan) -> IndicShapePlan {
   // as we discover more cases of what Windows does.  DON'T TOUCH OTHERWISE.
   let zero_context = is_old_spec && script != Some(script_malayalam)
   let mask_array = FixedArray::make(indic_features.length(), 0U)
-  for i, feature in indic_features {
+  for i, feature in indic_features[:] {
     mask_array[i] = if (feature.1 & F_GLOBAL) != 0 {
       0
     } else {

@@ -50,7 +50,7 @@ pub(all) enum Language {
 
 ///|
 /// `(variant, display name, serializations)`.
-let languages : Array[(Language, String, Array[String])] = [
+let languages : ReadOnlyArray[(Language, String, Array[String])] = [
   (Basque, "Basque", ["basque"]),
   (Bulgarian, "Bulgarian", ["bulgarian"]),
   (Catalan, "Catalan", ["catalan"]),
@@ -98,7 +98,7 @@ let languages : Array[(Language, String, Array[String])] = [
 
 ///|
 pub impl Show for Language with fn output(self, logger) {
-  for l in languages {
+  for l in languages[:] {
     if l.0 == self {
       logger.write_string(l.1)
       return
@@ -109,7 +109,7 @@ pub impl Show for Language with fn output(self, logger) {
 ///|
 /// Strum's `FromStr` (the display name and all serializations).
 pub fn Language::from_str(s : String) -> Language? {
-  for l in languages {
+  for l in languages[:] {
     if l.1 == s || l.2.contains(s) {
       return Some(l.0)
     }

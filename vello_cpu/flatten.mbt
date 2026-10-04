@@ -669,7 +669,7 @@ fn estimate_num_quads(
 }
 
 ///|
-let estimate_lut : FixedArray[Double] = [
+let estimate_lut : ReadOnlyArray[Double] = [
   1.0, 64.0, 729.0, 4096.0, 15625.0, 46656.0, 117649.0, 262144.0, 531441.0, 1000000.0,
   1771561.0, 2985984.0, 4826809.0, 7529536.0, 11390625.0, 16777216.0,
 ]

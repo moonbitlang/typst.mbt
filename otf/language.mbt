@@ -216,7 +216,7 @@ pub(all) enum Language {
 } derive(Eq, Debug)
 
 ///|
-let language_table : Array[(UInt16, Language, String, String)] = [
+let language_table : ReadOnlyArray[(UInt16, Language, String, String)] = [
   (0x0000, Unknown, "Unknown", "Unknown"),
   (0x0436, Afrikaans_SouthAfrica, "Afrikaans", "South Africa"),
   (0x041C, Albanian_Albania, "Albanian", "Albania"),
@@ -472,7 +472,7 @@ let language_table : Array[(UInt16, Language, String, String)] = [
 
 ///|
 fn Language::windows_language(id : UInt16) -> Language {
-  for entry in language_table {
+  for entry in language_table[:] {
     if entry.0 == id {
       return entry.1
     }
@@ -482,7 +482,7 @@ fn Language::windows_language(id : UInt16) -> Language {
 
 ///|
 fn Language::entry(self : Language) -> (UInt16, Language, String, String) {
-  for entry in language_table {
+  for entry in language_table[:] {
     if entry.1 == self {
       return entry
     }

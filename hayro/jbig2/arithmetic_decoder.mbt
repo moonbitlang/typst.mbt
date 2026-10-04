@@ -243,7 +243,7 @@ let qe_packed : FixedArray[UInt] = FixedArray::makei(qe_table.length(), i => {
 
 ///|
 /// QE values and associated data from Table C.2.
-let qe_table : FixedArray[QeData] = [
+let qe_table : ReadOnlyArray[QeData] = [
   qe(0x5601, 1, 1, true),
   qe(0x3401, 2, 6, false),
   qe(0x1801, 3, 9, false),

@@ -220,13 +220,14 @@ fn tags_from_language(language : Language, tags : Array[@otf.Tag]) -> Unit {
       if languages[idx + i].language != languages[idx].language {
         break
       }
-      if languages[idx + i].tag.is_null() {
+      let tag = @otf.Tag(languages[idx + i].tag)
+      if tag.is_null() {
         break
       }
       if three_tags_is_full(tags) {
         break
       }
-      tags.push(languages[idx + i].tag)
+      tags.push(tag)
     }
     return
   }

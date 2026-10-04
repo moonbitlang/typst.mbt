@@ -80,7 +80,7 @@ fn single_char(value : String) -> Char? {
 
 ///|
 /// The delimiter pairings supported for use as callable symbols.
-let lr_delims : Array[(Char, Char)] = [
+let lr_delims : ReadOnlyArray[(Char, Char)] = [
   // The `ceil` and `floor` pairs are omitted here because they are handled
   // manually.
   ('(', ')'),
@@ -129,7 +129,7 @@ fn lr_funcs() -> Map[Char, NativeFuncData] {
     Some(m) => m
     None => {
       let m : Map[Char, NativeFuncData] = Map([])
-      for pair in lr_delims {
+      for pair in lr_delims[:] {
         let (l, r) = pair
         m[l] = create_lr_func_data(l, r)
       }

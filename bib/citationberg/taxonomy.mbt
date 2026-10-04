@@ -111,7 +111,7 @@ pub(all) enum StandardVariable {
 } derive(Eq, Hash, Debug)
 
 ///|
-let standard_variable_names : Array[(StandardVariable, String)] = [
+let standard_variable_names : ReadOnlyArray[(StandardVariable, String)] = [
   (Abstract, "abstract"),
   (Annote, "annote"),
   (Archive, "archive"),
@@ -164,7 +164,7 @@ let standard_variable_names : Array[(StandardVariable, String)] = [
 ///|
 /// Serde names (deserialization).
 pub fn StandardVariable::from_str(s : String) -> StandardVariable? {
-  for p in standard_variable_names {
+  for p in standard_variable_names[:] {
     if p.1 == s {
       return Some(p.0)
     }
@@ -178,7 +178,7 @@ pub impl Show for StandardVariable with fn output(self, logger) {
     ArchivePlace => "archive_place"
     _ => {
       let mut name = ""
-      for p in standard_variable_names {
+      for p in standard_variable_names[:] {
         if p.0 == self {
           name = p.1
         }
@@ -273,7 +273,7 @@ pub(all) enum NumberVariable {
 } derive(Eq, Hash, Debug)
 
 ///|
-let number_variable_names : Array[(NumberVariable, String)] = [
+let number_variable_names : ReadOnlyArray[(NumberVariable, String)] = [
   (ChapterNumber, "chapter-number"),
   (CitationNumber, "citation-number"),
   (CollectionNumber, "collection-number"),
@@ -298,7 +298,7 @@ pub fn NumberVariable::from_str(s : String) -> NumberVariable? {
   if s == "printing" {
     return Some(PrintingNumber)
   }
-  for p in number_variable_names {
+  for p in number_variable_names[:] {
     if p.1 == s {
       return Some(p.0)
     }
@@ -308,7 +308,7 @@ pub fn NumberVariable::from_str(s : String) -> NumberVariable? {
 
 ///|
 pub impl Show for NumberVariable with fn output(self, logger) {
-  for p in number_variable_names {
+  for p in number_variable_names[:] {
     if p.0 == self {
       logger.write_string(p.1)
       return
@@ -335,7 +335,7 @@ pub(all) enum DateVariable {
 } derive(Eq, Hash, Debug)
 
 ///|
-let date_variable_names : Array[(DateVariable, String)] = [
+let date_variable_names : ReadOnlyArray[(DateVariable, String)] = [
   (Accessed, "accessed"),
   (AvailableDate, "available-date"),
   (EventDate, "event-date"),
@@ -346,7 +346,7 @@ let date_variable_names : Array[(DateVariable, String)] = [
 
 ///|
 pub fn DateVariable::from_str(s : String) -> DateVariable? {
-  for p in date_variable_names {
+  for p in date_variable_names[:] {
     if p.1 == s {
       return Some(p.0)
     }
@@ -356,7 +356,7 @@ pub fn DateVariable::from_str(s : String) -> DateVariable? {
 
 ///|
 pub impl Show for DateVariable with fn output(self, logger) {
-  for p in date_variable_names {
+  for p in date_variable_names[:] {
     if p.0 == self {
       logger.write_string(p.1)
       return
@@ -397,7 +397,7 @@ pub(all) enum NameVariable {
 } derive(Eq, Hash, Debug)
 
 ///|
-let name_variable_names : Array[(NameVariable, String)] = [
+let name_variable_names : ReadOnlyArray[(NameVariable, String)] = [
   (Author, "author"),
   (Chair, "chair"),
   (CollectionEditor, "collection-editor"),
@@ -432,7 +432,7 @@ pub fn NameVariable::from_str(s : String) -> NameVariable? {
   if s == "editortranslator" {
     return Some(EditorTranslator)
   }
-  for p in name_variable_names {
+  for p in name_variable_names[:] {
     if p.1 == s {
       return Some(p.0)
     }
@@ -442,7 +442,7 @@ pub fn NameVariable::from_str(s : String) -> NameVariable? {
 
 ///|
 pub impl Show for NameVariable with fn output(self, logger) {
-  for p in name_variable_names {
+  for p in name_variable_names[:] {
     if p.0 == self {
       logger.write_string(p.1)
       return
@@ -613,7 +613,7 @@ pub(all) enum Kind {
 } derive(Eq, Hash, Debug)
 
 ///|
-let kind_names : Array[(Kind, String)] = [
+let kind_names : ReadOnlyArray[(Kind, String)] = [
   (Article, "article"),
   (ArticleJournal, "article-journal"),
   (ArticleMagazine, "article-magazine"),
@@ -663,7 +663,7 @@ let kind_names : Array[(Kind, String)] = [
 
 ///|
 pub fn Kind::from_str(s : String) -> Kind? {
-  for p in kind_names {
+  for p in kind_names[:] {
     if p.1 == s {
       return Some(p.0)
     }
@@ -673,7 +673,7 @@ pub fn Kind::from_str(s : String) -> Kind? {
 
 ///|
 pub impl Show for Kind with fn output(self, logger) {
-  for p in kind_names {
+  for p in kind_names[:] {
     if p.0 == self {
       logger.write_string(p.1)
       return

@@ -1,7 +1,7 @@
 // Port of `hayro-syntax/src/object/number.rs`: numbers.
 
 ///|
-let powers_of_10 : FixedArray[Double] = [
+let powers_of_10 : ReadOnlyArray[Double] = [
   1.0, 1.0e1, 1.0e2, 1.0e3, 1.0e4, 1.0e5, 1.0e6, 1.0e7, 1.0e8, 1.0e9, 1.0e10, 1.0e11,
   1.0e12, 1.0e13, 1.0e14, 1.0e15, 1.0e16, 1.0e17, 1.0e18, 1.0e19,
 ]

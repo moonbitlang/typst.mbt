@@ -278,13 +278,13 @@ fn HuffmanTree::peek_symbol(
 // lossless.rs
 
 ///|
-let code_length_code_order : Array[Int] = [
+let code_length_code_order : ReadOnlyArray[Int] = [
   17, 18, 0, 1, 2, 3, 4, 5, 16, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
 ]
 
 ///|
 /// `DISTANCE_MAP` as (xoffset, yoffset) pairs.
-let distance_map : Array[Int] = [
+let distance_map : ReadOnlyArray[Int] = [
   0, 1, 1, 0, 1, 1, -1, 1, 0, 2, 2, 0, 1, 2, -1, 2, 2, 1, -2, 1, 2, 2, -2, 2, 0,
   3, 3, 0, 1, 3, -1, 3, 3, 1, -3, 1, 2, 3, -2, 3, 3, 2, -3, 2, 0, 4, 4, 0, 1, 4,
   -1, 4, 4, 1, -4, 1, 3, 3, -3, 3, 2, 4, -2, 4, 4, 2, -4, 2, 0, 5, 3, 4, -3, 4, 4,
@@ -298,7 +298,7 @@ let distance_map : Array[Int] = [
 ]
 
 ///|
-let alphabet_size : Array[Int] = [256 + 24, 256, 256, 256, 40]
+let alphabet_size : ReadOnlyArray[Int] = [256 + 24, 256, 256, 256, 40]
 
 ///|
 fn subsample_size(size : Int, bits : Int) -> Int {

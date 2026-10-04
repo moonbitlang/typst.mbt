@@ -100,7 +100,7 @@ let quad_recursive_limit : Int = 3
 // quads with extreme widths (e.g. (0,1) (1,6) (0,3) width=5e7) recurse to point of failure
 // largest seen for normal cubics: 5, 26
 // largest seen for normal quads: 11
-let recursive_limits : Array[Int] = [5 * 3, 26 * 3, 11 * 3, 11 * 3] // 3x limits seen in practice
+let recursive_limits : ReadOnlyArray[Int] = [5 * 3, 26 * 3, 11 * 3, 11 * 3] // 3x limits seen in practice
 
 ///|
 priv enum ReductionType {

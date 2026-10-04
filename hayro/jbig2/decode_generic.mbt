@@ -201,7 +201,7 @@ impl @ccitt.Decoder for BitmapDecoder with fn push_pixel(self, white) {
 
 ///|
 /// `byte_masks[i] = 0xFF << ((WORD_BYTES - 1 - i) * 8)`.
-let byte_masks : FixedArray[UInt] = [
+let byte_masks : ReadOnlyArray[UInt] = [
   0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF,
 ]
 

@@ -721,7 +721,7 @@ fn font_overhang_table(font : @library.FontInstance) -> Array[(Int, Double)] {
     None => {
       let table = []
       if font.ttf() is Some(ttf) {
-        for entry in default_overhang_table {
+        for entry in default_overhang_table[:] {
           let (c, factor) = entry
           if ttf.glyph_index(c) is Some(id) {
             table.push((id.0.to_int(), factor))
@@ -741,7 +741,7 @@ fn font_overhang_table(font : @library.FontInstance) -> Array[(Int, Double)] {
 ///
 /// For more discussion, see:
 /// <https://recoveringphysicist.com/21/>
-let default_overhang_table : Array[(Char, Double)] = [
+let default_overhang_table : ReadOnlyArray[(Char, Double)] = [
   // Dashes.
   ('–', 0.2),
   ('—', 0.2),

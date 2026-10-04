@@ -54,7 +54,7 @@ pub(all) enum Tag {
 
 ///|
 /// The list of all tags, in the same order as they are defined.
-pub let tag_list : FixedArray[Tag] = [
+pub let tag_list : ReadOnlyArray[Tag] = [
   Comment,
   Punctuation,
   Escape,

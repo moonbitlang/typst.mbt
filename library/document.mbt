@@ -99,7 +99,7 @@ pub(all) enum PagedFormat {
 } derive(Eq, Hash, Debug)
 
 ///|
-let paged_format_names : Array[String] = ["pdf", "png", "svg"]
+let paged_format_names : ReadOnlyArray[String] = ["pdf", "png", "svg"]
 
 ///|
 pub impl Reflect for PagedFormat with fn input() {

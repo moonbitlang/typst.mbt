@@ -129,7 +129,7 @@ fn demultiply_alpha(data : FixedArray[UInt]) -> Unit {
 /// ```
 ///
 /// Thanks to librsvg for the idea.
-let srgb_to_linear_rgb_table : FixedArray[Int] = [
+let srgb_to_linear_rgb_table : ReadOnlyArray[Int] = [
   0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3,
   3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6, 7, 7, 7, 8, 8, 8, 8, 9, 9,
   9, 10, 10, 10, 11, 11, 12, 12, 12, 13, 13, 13, 14, 14, 15, 15, 16, 16, 17, 17,
@@ -160,7 +160,7 @@ let srgb_to_linear_rgb_table : FixedArray[Int] = [
 /// ```
 ///
 /// Thanks to librsvg for the idea.
-let linear_rgb_to_srgb_table : FixedArray[Int] = [
+let linear_rgb_to_srgb_table : ReadOnlyArray[Int] = [
   0, 13, 22, 28, 34, 38, 42, 46, 50, 53, 56, 59, 61, 64, 66, 69, 71, 73, 75, 77,
   79, 81, 83, 85, 86, 88, 90, 92, 93, 95, 96, 98, 99, 101, 102, 104, 105, 106, 108,
   109, 110, 112, 113, 114, 115, 117, 118, 119, 120, 121, 122, 124, 125, 126, 127,

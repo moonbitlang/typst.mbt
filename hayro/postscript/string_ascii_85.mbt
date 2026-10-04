@@ -2,7 +2,7 @@
 // Keep in sync with `hayro-syntax/src/filter/ascii_85.rs`.
 
 ///|
-let pow_85 : FixedArray[UInt64] = [52200625, 614125, 7225, 85, 1]
+let pow_85 : ReadOnlyArray[UInt64] = [52200625, 614125, 7225, 85, 1]
 
 ///|
 fn ascii_85_decode_into(data : BytesView, out : Array[Byte]) -> Unit? {

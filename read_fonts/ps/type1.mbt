@@ -634,7 +634,7 @@ fn find_eexec_data(data : BytesView) -> Int? {
 
 ///|
 /// Converts digits (as ASCII characters) into integer values.
-let digit_to_num : FixedArray[Int] = [
+let digit_to_num : ReadOnlyArray[Int] = [
   -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
   -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
   -1, -1, -1, -1, -1, -1, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1, -1, -1, -1, -1,

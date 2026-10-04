@@ -13,10 +13,10 @@ fn info_letter(info : OperatorInfo) -> Char {
 
 ///|
 test "OperatorInfo::of matches typst-assets" {
-  for entry in test_infos {
+  for entry in test_infos[:] {
     let (form, explicit, expected) = entry
     let actual = StringBuilder()
-    for content in test_contents {
+    for content in test_contents[:] {
       actual.write_char(info_letter(OperatorInfo::of(content, form, explicit)))
     }
     assert_eq(actual.to_string(), expected)
@@ -26,7 +26,7 @@ test "OperatorInfo::of matches typst-assets" {
 ///|
 fn flags(f : (String) -> Bool) -> String {
   let out = StringBuilder()
-  for content in test_contents {
+  for content in test_contents[:] {
     out.write_char(if f(content) { '1' } else { '0' })
   }
   out.to_string()

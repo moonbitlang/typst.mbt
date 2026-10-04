@@ -72,7 +72,7 @@ pub impl Default for RefForm with fn default() {
 }
 
 ///|
-let ref_form_names : Array[String] = ["normal", "page"]
+let ref_form_names : ReadOnlyArray[String] = ["normal", "page"]
 
 ///|
 pub impl Reflect for RefForm with fn input() {

@@ -120,7 +120,7 @@ fn unfilter_row(
 
 ///|
 /// The Adam7 passes: (x start, y start, x step, y step).
-let adam7_passes : FixedArray[(Int, Int, Int, Int)] = [
+let adam7_passes : ReadOnlyArray[(Int, Int, Int, Int)] = [
   (0, 0, 8, 8),
   (4, 0, 8, 8),
   (0, 4, 4, 8),

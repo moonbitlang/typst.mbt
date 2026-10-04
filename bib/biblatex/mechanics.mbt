@@ -44,7 +44,7 @@ pub(all) enum EntryType {
 
 ///|
 /// The strum `lowercase` serializations of the entry types.
-let entry_type_names : Array[(String, EntryType)] = [
+let entry_type_names : ReadOnlyArray[(String, EntryType)] = [
   ("article", Article),
   ("book", Book),
   ("booklet", Booklet),
@@ -84,7 +84,7 @@ let entry_type_names : Array[(String, EntryType)] = [
 ///|
 /// Strum's `Display` (lowercase variant name).
 pub impl Show for EntryType with fn output(self, logger) {
-  for pair in entry_type_names {
+  for pair in entry_type_names[:] {
     if pair.1 == self {
       logger.write_string(pair.0)
       return
@@ -147,7 +147,7 @@ priv struct Requirements {
 /// Parse an entry type from a string.
 pub fn EntryType::new(name : String) -> EntryType {
   let name = @unscanny.to_lowercase(name)
-  for pair in entry_type_names {
+  for pair in entry_type_names[:] {
     if pair.0 == name {
       return pair.1
     }

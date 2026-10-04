@@ -1,7 +1,7 @@
 // Opcode tables from read-fonts 0.39.2 `src/tables/glyf/bytecode/opcode.rs`.
 
 ///|
-let opcode_names : FixedArray[String] = [
+let opcode_names : ReadOnlyArray[String] = [
   "SVTCA[y]", "SVTCA[x]", "SPVTCA[y]", "SPVTCA[x]", "SFVTCA[y]", "SFVTCA[x]", "SPVTL[||]",
   "SPVTL[+]", "SFVTL[||]", "SFVTL[+]", "SPVFS", "SFVFS", "GPV", "GFV", "SFVTPV",
   "ISECT", "SRP0", "SRP1", "SRP2", "SZP0", "SZP1", "SZP2", "SZPS", "SLOOP", "RTG",
@@ -38,7 +38,7 @@ let opcode_names : FixedArray[String] = [
 ]
 
 ///|
-let opcode_lengths : FixedArray[Int] = [
+let opcode_lengths : ReadOnlyArray[Int] = [
   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, -1, -2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,

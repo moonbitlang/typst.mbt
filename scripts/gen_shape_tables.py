@@ -300,7 +300,7 @@ def gen_tag_table():
         assert m, line
         lead, lang, tag, comment = m.groups()
         val = '0x%08X' % int.from_bytes(tag.encode('latin1'), 'big') if tag else '0'
-        entry = '{ language: "%s", tag: @otf.Tag(%s) }, // %s %s' % (
+        entry = '{ language: "%s", tag: %s }, // %s %s' % (
             lang, val, ("'%s'" % tag) if tag else 'null', comment)
         if lead == '//  ':
             rows.append('  // ' + entry)
@@ -308,7 +308,9 @@ def gen_tag_table():
             rows.append('  ' + entry)
             n += 1
     assert n > 1400, n
-    out += '///|\npriv struct LangTag {\n  language : String\n  tag : @otf.Tag\n}\n\n'
+    # The tag is stored as a plain `UInt` (an `@otf.Tag` field would make the
+    # table be built at startup instead of being static data).
+    out += '///|\npriv struct LangTag {\n  language : String\n  tag : UInt\n}\n\n'
     out += '///|\n/// `OPEN_TYPE_LANGUAGES`, sorted by `language`.\n'
     out += 'let open_type_languages : ReadOnlyArray[LangTag] = [\n'
     out += '\n'.join(rows) + '\n]\n\n'

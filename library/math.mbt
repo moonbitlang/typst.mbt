@@ -94,7 +94,7 @@ fn math_class_name(class : @unicode.MathClass) -> String {
 
 ///|
 /// The castable math classes, in upstream's order.
-let math_class_casts : Array[(String, @unicode.MathClass, String)] = [
+let math_class_casts : ReadOnlyArray[(String, @unicode.MathClass, String)] = [
   ("normal", Normal, "The default class for non-special things."),
   ("punctuation", Punctuation, "Punctuation, e.g. a comma."),
   ("opening", Opening, "An opening delimiter, e.g. `(`."),
@@ -111,7 +111,7 @@ let math_class_casts : Array[(String, @unicode.MathClass, String)] = [
 ///|
 pub impl Reflect for @unicode.MathClass with fn input() {
   let mut info : CastInfo? = None
-  for entry in math_class_casts {
+  for entry in math_class_casts[:] {
     let next = CastInfo::Value(Str(entry.0), entry.2)
     info = Some(
       match info {
@@ -144,7 +144,7 @@ pub impl IntoValue for @unicode.MathClass with fn into_value(self) {
 ///|
 pub impl FromValue for @unicode.MathClass with fn from_value(v) {
   if v is Str(s) {
-    for entry in math_class_casts {
+    for entry in math_class_casts[:] {
       if entry.0 == s {
         return entry.1
       }

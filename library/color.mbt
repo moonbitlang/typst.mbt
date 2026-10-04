@@ -2277,7 +2277,7 @@ fn color_map() -> Module {
 
 ///|
 /// Defines a gradient preset as a series of colors expressed as u32s.
-fn color_preset(colors : FixedArray[UInt]) -> Arr {
+fn color_preset(colors : ReadOnlyArray[UInt]) -> Arr {
   Arr::from_array(
     Array::makei(colors.length(), i => Value::Color(Color::from_u32(colors[i]))),
   )

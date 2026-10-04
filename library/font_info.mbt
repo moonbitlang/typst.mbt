@@ -263,7 +263,7 @@ pub fn find_name(ttf : @otf.Face, name_id : UInt16) -> String? {
 }
 
 ///|
-let mac_roman_table : Array[Char] = [
+let mac_roman_table : ReadOnlyArray[Char] = [
   'Ä', 'Å', 'Ç', 'É', 'Ñ', 'Ö', 'Ü', 'á', 'à', 'â', 'ä', 'ã', 'å', 'ç',
   'é', 'è', 'ê', 'ë', 'í', 'ì', 'î', 'ï', 'ñ', 'ó', 'ò', 'ô', 'ö', 'õ',
   'ú', 'ù', 'û', 'ü', '†', '°', '¢', '£', '§', '•', '¶', 'ß', '®',

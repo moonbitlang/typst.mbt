@@ -185,7 +185,7 @@ pub fn PostTable::names(self : PostTable) -> PostNames {
 
 ///|
 /// A list of Macintosh glyph names.
-let macintosh_names : Array[String] = [
+let macintosh_names : ReadOnlyArray[String] = [
   ".notdef", ".null", "nonmarkingreturn", "space", "exclam", "quotedbl", "numbersign",
   "dollar", "percent", "ampersand", "quotesingle", "parenleft", "parenright", "asterisk",
   "plus", "comma", "hyphen", "period", "slash", "zero", "one", "two", "three", "four",

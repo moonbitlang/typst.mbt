@@ -79,7 +79,7 @@ pub(all) enum EntryType {
 } derive(Eq, Hash, Debug)
 
 ///|
-let entry_type_names : Array[(EntryType, String, String)] = [
+let entry_type_names : ReadOnlyArray[(EntryType, String, String)] = [
   (Article, "article", "Article"),
   (Chapter, "chapter", "Chapter"),
   (Entry, "entry", "Entry"),
@@ -121,7 +121,7 @@ fn entry_type_expected() -> String {
 ///|
 /// `impl FromStr for EntryType` (serde names and aliases).
 pub fn EntryType::from_str(s : String) -> Result[EntryType, String] {
-  for t in entry_type_names {
+  for t in entry_type_names[:] {
     if t.1 == s || t.2 == s {
       return Ok(t.0)
     }
@@ -131,7 +131,7 @@ pub fn EntryType::from_str(s : String) -> Result[EntryType, String] {
 
 ///|
 pub impl Show for EntryType with fn output(self, logger) {
-  for t in entry_type_names {
+  for t in entry_type_names[:] {
     if t.0 == self {
       logger.write_string(t.1)
       return

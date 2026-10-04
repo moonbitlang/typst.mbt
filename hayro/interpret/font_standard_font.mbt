@@ -51,22 +51,23 @@ fn StandardFont::get_width(self : StandardFont, name : String) -> Float? {
     return Some(250.0)
   }
   let name = normalized_glyph_name(name)
-  match self {
-    Helvetica => metrics_helvetica.get(name)
-    HelveticaBold => metrics_helvetica_bold.get(name)
-    HelveticaOblique => metrics_helvetica_oblique.get(name)
-    HelveticaBoldOblique => metrics_helvetica_bold_oblique.get(name)
-    Courier => metrics_courier.get(name)
-    CourierBold => metrics_courier_bold.get(name)
-    CourierOblique => metrics_courier_oblique.get(name)
-    CourierBoldOblique => metrics_courier_bold_oblique.get(name)
-    TimesRoman => metrics_times_roman.get(name)
-    TimesBold => metrics_times_bold.get(name)
-    TimesItalic => metrics_times_italic.get(name)
-    TimesBoldItalic => metrics_times_bold_italic.get(name)
-    ZapfDingBats => metrics_zapf_ding_bats.get(name)
-    Symbol => metrics_symbol.get(name)
+  let table = match self {
+    Helvetica => metrics_helvetica
+    HelveticaBold => metrics_helvetica_bold
+    HelveticaOblique => metrics_helvetica_oblique
+    HelveticaBoldOblique => metrics_helvetica_bold_oblique
+    Courier => metrics_courier
+    CourierBold => metrics_courier_bold
+    CourierOblique => metrics_courier_oblique
+    CourierBoldOblique => metrics_courier_bold_oblique
+    TimesRoman => metrics_times_roman
+    TimesBold => metrics_times_bold
+    TimesItalic => metrics_times_italic
+    TimesBoldItalic => metrics_times_bold_italic
+    ZapfDingBats => metrics_zapf_ding_bats
+    Symbol => metrics_symbol
   }
+  sorted_table_get(table, name)
 }
 
 ///|

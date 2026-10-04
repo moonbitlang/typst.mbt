@@ -719,7 +719,10 @@ fn gen_hypher(krate: &Path, dest: &Path) {
     }
     out.push_str("  }\n}\n\n");
 
-    out.push_str("///|\n/// The embedded tries (base64), indexed by `Lang::index`.\nlet tries : ReadOnlyArray[String] = [\n");
+    // A `FixedArray`: a `ReadOnlyArray` whose elements are other `String`
+    // globals crashes moonc's debug native backend ("static ref fixedarray
+    // elements only support heap-object globals").
+    out.push_str("///|\n/// The embedded tries (base64), indexed by `Lang::index`.\nlet tries : FixedArray[String] = [\n");
     for v in &variants {
         let file = &files.iter().find(|(f, _)| f == v).unwrap().1;
         writeln!(out, "  trie_{file},").unwrap();

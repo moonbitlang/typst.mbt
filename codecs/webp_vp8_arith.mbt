@@ -34,7 +34,7 @@ fn TreeNode::value_from_branch(t : Int) -> Int {
 ///|
 /// `tree_nodes_from`.
 fn tree_nodes_from(
-  tree : Array[Int],
+  tree : ReadOnlyArray[Int],
   probs : ArrayView[Int],
 ) -> FixedArray[TreeNode] {
   FixedArray::makei(probs.length(), i => {
