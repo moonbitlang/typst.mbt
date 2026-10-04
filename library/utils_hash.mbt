@@ -257,30 +257,52 @@ pub fn[T : Fingerprint] SipHasher128::write(
 }
 
 ///|
-/// Set while fingerprinting a value whose [Fingerprint] does not capture all
-/// of its data (e.g. gradients and tilings are hashed through their repr).
-/// Such fingerprints are fine for identities (locations), but equal
-/// fingerprints of introspection results do not prove equal results (see
-/// `memo.mbt`).
-let fingerprint_lossy : Ref[Bool] = { val: false, }
+/// Flags of the fingerprint being computed (not upstream; see `memo.mbt`):
+/// [fingerprint_lossy] if it contains a value whose [Fingerprint] does not
+/// capture all of its data (e.g. gradients and tilings are hashed through
+/// their repr), [fingerprint_identity] if it contains a value that compares
+/// by identity (closures; their fingerprint is structural). Such
+/// fingerprints are fine for identities (locations), but equal fingerprints
+/// do not prove interchangeable values.
+let fingerprint_flags : Ref[Int] = { val: 0, }
+
+///|
+/// See [fingerprint_flags].
+pub let fingerprint_lossy : Int = 1
+
+///|
+/// See [fingerprint_flags].
+pub let fingerprint_identity : Int = 2
 
 ///|
 /// Record that the value being fingerprinted is not fully captured by its
 /// fingerprint.
 pub fn mark_fingerprint_lossy() -> Unit {
-  fingerprint_lossy.val = true
+  fingerprint_flags.val = fingerprint_flags.val | fingerprint_lossy
 }
 
 ///|
-/// Runs `f` and returns whether it fingerprinted a lossy value (the flag of
-/// an enclosing fingerprint computation is kept).
-pub fn fingerprint_lossy_in(f : () -> Unit) -> Bool {
-  let outer = fingerprint_lossy.val
-  fingerprint_lossy.val = false
+/// Record flags for the value being fingerprinted (e.g. from a cache).
+pub fn mark_fingerprint_flags(flags : Int) -> Unit {
+  fingerprint_flags.val = fingerprint_flags.val | flags
+}
+
+///|
+/// Runs `f` and returns the flags of what it fingerprinted (the flags of an
+/// enclosing fingerprint computation are kept).
+pub fn fingerprint_flags_in(f : () -> Unit) -> Int {
+  let outer = fingerprint_flags.val
+  fingerprint_flags.val = 0
   f()
-  let lossy = fingerprint_lossy.val
-  fingerprint_lossy.val = outer || lossy
-  lossy
+  let flags = fingerprint_flags.val
+  fingerprint_flags.val = outer | flags
+  flags
+}
+
+///|
+/// Runs `f` and returns whether it fingerprinted a lossy value.
+pub fn fingerprint_lossy_in(f : () -> Unit) -> Bool {
+  (fingerprint_flags_in(f) & fingerprint_lossy) != 0
 }
 
 ///|

@@ -124,32 +124,6 @@ fn state_sequence(
   engine : Engine,
   introspector : Introspector,
 ) -> Array[Value] raise SourceError {
-  // Memoized like upstream (see `memo.mbt`). The sequence is not mutated by
-  // its users.
-  let key = memo_fingerprint(hasher => {
-    hasher.write(state)
-    hasher.write_u128(engine.route.memo_hash())
-  })
-  memoize(
-    state_sequence_store,
-    { ..engine, introspector, },
-    key,
-    StateInput(state),
-    sequence => sequence,
-    engine => state_sequence_impl(state, engine, engine.introspector),
-  )
-}
-
-///|
-let state_sequence_store : MemoStore[Array[Value], StateInput] = MemoStore::new()
-
-///|
-/// The uncached [state_sequence].
-fn state_sequence_impl(
-  state : State,
-  engine : Engine,
-  introspector : Introspector,
-) -> Array[Value] raise SourceError {
   let engine = {
     ..engine,
     introspector,

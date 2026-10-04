@@ -261,6 +261,8 @@ pub impl Fingerprint for Func with fn fingerprint(self, state) {
       state.write(elem)
     }
     Closure(closure) => {
+      // Closures compare by identity.
+      fingerprint_flags.val = fingerprint_flags.val | fingerprint_identity
       state.write_discriminant(2)
       let node = match closure.node {
         Closure(node) => {
@@ -300,22 +302,20 @@ pub impl Fingerprint for Content with fn fingerprint(self, state) {
   state.write(lifecycle)
   // Data (hashed once and cached, like upstream).
   let data = match self.data_hash.val {
-    Some((h, lossy)) => {
-      if lossy {
-        mark_fingerprint_lossy()
-      }
+    Some((h, flags)) => {
+      mark_fingerprint_flags(flags)
       h
     }
     None => {
       let inner = SipHasher128::new()
-      let lossy = fingerprint_lossy_in(() => {
+      let flags = fingerprint_flags_in(() => {
         inner.write_usize(self.fields.length())
         for field in self.fields {
           inner.write(field)
         }
       })
       let h = inner.finish128()
-      self.data_hash.val = Some((h, lossy))
+      self.data_hash.val = Some((h, flags))
       h
     }
   }

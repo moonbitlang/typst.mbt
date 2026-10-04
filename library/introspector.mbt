@@ -210,7 +210,7 @@ fn Introspector::record(
     let key = hash128((name, args()))
     if !recorder.calls.contains(key) {
       let mut expected = u128_zero
-      if fingerprint_lossy_in(() => expected = result()) {
+      if fingerprint_flags_in(() => expected = result()) != 0 {
         recorder.lossy = true
       }
       recorder.calls[key] = { name, expected, replay, }
@@ -472,9 +472,10 @@ priv struct RecordedRead {
 /// fingerprint of the result, including error results.
 pub struct IntrospectionRecorder {
   priv calls : Map[U128, RecordedRead]
-  /// Whether the fingerprint of a recorded result was lossy, so that
-  /// [IntrospectionRecorder::validate] cannot prove equal results (not
-  /// upstream; only used for memoization, see `memo.mbt`).
+  /// Whether the fingerprint of a recorded result was lossy or contained
+  /// values compared by identity, so that [IntrospectionRecorder::validate]
+  /// cannot prove interchangeable results (not upstream; only used for
+  /// memoization, see `memo.mbt`).
   priv mut lossy : Bool
 }
 

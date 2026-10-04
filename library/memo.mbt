@@ -15,12 +15,18 @@
 //   strokes), and closures compare by identity but fingerprint structurally.
 //   So an entry also keeps the arguments and is only reused if they are
 //   equal ([values_memo_equal]: `==`, but recursing into content, styles,
-//   arrays, dictionaries and functions, where Typst's equality is looser).
+//   arrays, dictionaries, functions and dynamic values, where Typst's
+//   equality is looser).
+// - Only computations whose results cannot contain values created during
+//   the computation are memoized (a reused closure would keep its identity
+//   where a recomputed one gets a new one): layout produces frames and the
+//   counter sequence numbers. (The state sequence is not memoized.)
 // - Introspector reads of the call are recorded into a fresh
 //   [IntrospectionRecorder]. A cached result is only reused with the
 //   introspector it was computed with, or if all of its recorded reads
 //   produce the same results on the current introspector and none of the
-//   recorded results had a lossy fingerprint. Its reads are then merged into
+//   recorded results had a lossy fingerprint or contained values compared by
+//   identity (closures). Its reads are then merged into
 //   the caller's recorder (as if the call had been executed), so convergence
 //   checking is unaffected.
 // - The call's sink side effects (warnings, delayed errors, introspections,
@@ -198,15 +204,6 @@ impl Eq for LayoutInput with fn equal(self, other) {
 }
 
 ///|
-/// The state argument of the memoized state sequence.
-priv struct StateInput(State)
-
-///|
-impl Eq for StateInput with fn equal(self, other) {
-  self.0.key == other.0.key && values_memo_equal(self.0.init, other.0.init)
-}
-
-///|
 /// Whether two values are interchangeable for a memoized computation: `==`,
 /// but recursing into content, styles, collections and functions, whose
 /// Typst equality ignores fields or compares loosely. (Metadata such as
@@ -236,9 +233,93 @@ fn values_memo_equal(a : Value, b : Value) -> Bool {
     (Styles(x), Styles(y)) => styles_memo_equal(x.items, y.items)
     (Func(x), Func(y)) => funcs_memo_equal(x, y)
     (Args(x), Args(y)) => args_memo_equal(x, y)
+    (Dyn(x), Dyn(y)) => dyns_memo_equal(x, y)
     // Typst's equality says false for these.
     (Gradient(x), Gradient(y)) => x == y
     (Tiling(x), Tiling(y)) => x == y
+    _ => a == b
+  }
+}
+
+///|
+/// [values_memo_equal] for dynamic values: recursing into the payloads that
+/// hold values, content or functions.
+fn dyns_memo_equal(a : DynValue, b : DynValue) -> Bool {
+  if physical_equal(a, b) {
+    return true
+  }
+  match (a, b) {
+    (State(x), State(y)) => x.key == y.key && values_memo_equal(x.init, y.init)
+    (StateUpdate(Set(x)), StateUpdate(Set(y))) => values_memo_equal(x, y)
+    (StateUpdate(Func(x)), StateUpdate(Func(y))) => funcs_memo_equal(x, y)
+    (CounterUpdate(Func(x)), CounterUpdate(Func(y))) => funcs_memo_equal(x, y)
+    (Counter(x), Counter(y)) => counters_memo_equal(x, y)
+    (Selector(x), Selector(y)) => selectors_memo_equal(x, y)
+    (Tag(Start(x, f1)), Tag(Start(y, f2))) =>
+      f1 == f2 && content_memo_equal(x, y)
+    (InlineCallback(x), InlineCallback(y)) =>
+      content_memo_equal(x.captured, y.captured)
+    (BlockSingleCallback(x), BlockSingleCallback(y)) =>
+      content_memo_equal(x.captured, y.captured)
+    (BlockMultiCallback(x), BlockMultiCallback(y)) =>
+      content_memo_equal(x.captured, y.captured)
+    // Holds content compared loosely by `==`.
+    (CellGrid(_), CellGrid(_)) => false
+    _ => a == b
+  }
+}
+
+///|
+fn counters_memo_equal(a : Counter, b : Counter) -> Bool {
+  match (a.0, b.0) {
+    (Selector(x), Selector(y)) => selectors_memo_equal(x, y)
+    _ => a == b
+  }
+}
+
+///|
+fn selectors_memo_equal(a : Selector, b : Selector) -> Bool {
+  match (a, b) {
+    (Elem(e1, f1), Elem(e2, f2)) =>
+      e1 == e2 &&
+      (match (f1, f2) {
+        (None, None) => true
+        (Some(x), Some(y)) => {
+          if x.length() != y.length() {
+            return false
+          }
+          for i in 0..<x.length() {
+            if x[i].0 != y[i].0 || !values_memo_equal(x[i].1, y[i].1) {
+              return false
+            }
+          }
+          true
+        }
+        _ => false
+      })
+    (Or(x), Or(y)) | (And(x), And(y)) => {
+      if x.length() != y.length() {
+        return false
+      }
+      for i in 0..<x.length() {
+        if !selectors_memo_equal(x[i], y[i]) {
+          return false
+        }
+      }
+      true
+    }
+    (
+      Before(selector=s1, end=e1, inclusive=i1),
+      Before(selector=s2, end=e2, inclusive=i2),
+    ) =>
+      i1 == i2 && selectors_memo_equal(s1, s2) && selectors_memo_equal(e1, e2)
+    (
+      After(selector=s1, start=e1, inclusive=i1),
+      After(selector=s2, start=e2, inclusive=i2),
+    ) =>
+      i1 == i2 && selectors_memo_equal(s1, s2) && selectors_memo_equal(e1, e2)
+    (Within(selector=s1, ancestor=a1), Within(selector=s2, ancestor=a2)) =>
+      selectors_memo_equal(s1, s2) && selectors_memo_equal(a1, a2)
     _ => a == b
   }
 }
@@ -319,7 +400,11 @@ fn style_memo_equal(a : Style, b : Style) -> Bool {
     (Recipe(x), Recipe(y)) =>
       physical_equal(x, y) ||
       (
-        x.selector == y.selector &&
+        (match (x.selector, y.selector) {
+          (None, None) => true
+          (Some(s1), Some(s2)) => selectors_memo_equal(s1, s2)
+          _ => false
+        }) &&
         x.span == y.span &&
         x.outside == y.outside &&
         (match (x.transform, y.transform) {
