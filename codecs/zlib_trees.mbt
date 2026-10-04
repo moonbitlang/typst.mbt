@@ -229,12 +229,21 @@ fn BitWriter::emit_end_block(
 }
 
 ///|
+/// Bits and their count (upstream returns `(u64, usize)` tuples, which would
+/// be allocated here).
+#valtype
+priv struct EncodedBits {
+  bits : UInt64
+  len : Int
+}
+
+///|
 /// Upstream `encode_len`: the length code and extra bits of a match length.
 fn encode_len(
   lcodes : FixedArray[Int],
   llens : FixedArray[Int],
   lc : Int,
-) -> (UInt64, Int) {
+) -> EncodedBits {
   let mut lc = lc
   // Send the length code, len is the match length - STD_MIN_MATCH
   let code = length_code[lc]
@@ -247,7 +256,7 @@ fn encode_len(
     match_bits = match_bits | (lc.to_uint64() << match_bits_len)
     match_bits_len += extra
   }
-  (match_bits, match_bits_len)
+  { bits: match_bits, len: match_bits_len, }
 }
 
 ///|
@@ -256,7 +265,7 @@ fn encode_dist(
   dcodes : FixedArray[Int],
   dlens : FixedArray[Int],
   dist : Int,
-) -> (UInt64, Int) {
+) -> EncodedBits {
   let mut dist = dist - 1 // dist is now the match distance - 1
   let code = d_code(dist)
   // Send the distance code
@@ -268,7 +277,7 @@ fn encode_dist(
     match_bits = match_bits | (dist.to_uint64() << match_bits_len)
     match_bits_len += extra
   }
-  (match_bits, match_bits_len)
+  { bits: match_bits, len: match_bits_len, }
 }
 
 ///|
@@ -295,34 +304,16 @@ fn BitWriter::emit_dist(
   lc : Int,
   dist : Int,
 ) -> Unit {
-  let (match_bits, match_bits_len) = encode_len(ltree.a, ltree.b, lc)
-  let (dist_match_bits, dist_match_bits_len) = encode_dist(
-    dtree.a,
-    dtree.b,
-    dist,
-  )
-  self.send_bits(
-    match_bits | (dist_match_bits << match_bits_len),
-    match_bits_len + dist_match_bits_len,
-  )
+  let m = encode_len(ltree.a, ltree.b, lc)
+  let d = encode_dist(dtree.a, dtree.b, dist)
+  self.send_bits(m.bits | (d.bits << m.len), m.len + d.len)
 }
 
 ///|
 fn BitWriter::emit_dist_static(self : BitWriter, lc : Int, dist : Int) -> Unit {
-  let (match_bits, match_bits_len) = encode_len(
-    static_ltree.0,
-    static_ltree.1,
-    lc,
-  )
-  let (dist_match_bits, dist_match_bits_len) = encode_dist(
-    static_dtree.0,
-    static_dtree.1,
-    dist,
-  )
-  self.send_bits(
-    match_bits | (dist_match_bits << match_bits_len),
-    match_bits_len + dist_match_bits_len,
-  )
+  let m = encode_len(static_ltree.0, static_ltree.1, lc)
+  let d = encode_dist(static_dtree.0, static_dtree.1, dist)
+  self.send_bits(m.bits | (d.bits << m.len), m.len + d.len)
 }
 
 ///|
@@ -507,19 +498,14 @@ const SMALLEST : Int = 1
 ///|
 fn Heap::pqdownheap(self : Heap, tree : TreeDesc, k : Int) -> Unit {
   let mut k = k
-  // Pack the node's frequency and depth into a single integer.
-  fn freq_and_depth(i : Int) -> Int {
-    (tree.a[i] << 8) | self.depth[i]
-  }
-
   let v = self.heap[k]
-  let v_val = freq_and_depth(v)
+  let v_val = freq_and_depth(tree, self.depth, v)
   let mut j = k << 1 // left son of k
   while j <= self.heap_len {
     // Set j to the smallest of the two sons:
-    let mut j_val = freq_and_depth(self.heap[j])
+    let mut j_val = freq_and_depth(tree, self.depth, self.heap[j])
     if j < self.heap_len {
-      let j1_val = freq_and_depth(self.heap[j + 1])
+      let j1_val = freq_and_depth(tree, self.depth, self.heap[j + 1])
       if j1_val <= j_val {
         j += 1
         j_val = j1_val
@@ -536,6 +522,14 @@ fn Heap::pqdownheap(self : Heap, tree : TreeDesc, k : Int) -> Unit {
     j = j << 1
   }
   self.heap[k] = v
+}
+
+///|
+/// Pack the node's frequency and depth into a single integer (a closure in
+/// upstream's `pqdownheap`).
+#inline
+fn freq_and_depth(tree : TreeDesc, depth : FixedArray[Int], i : Int) -> Int {
+  (tree.a[i] << 8) | depth[i]
 }
 
 ///|

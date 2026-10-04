@@ -114,10 +114,13 @@ let configuration_table : ReadOnlyArray[Config] = [
 /// `State`). Positions are `u16`s upstream (`Pos`).
 priv struct DeflateStream {
   // -- stream --
+  /// The input (`input_array[input_array_off..]` instead when that is set).
   mut input : BytesView
+  mut input_array : FixedArray[Byte]?
+  mut input_array_off : Int
   mut next_in : Int
   mut avail_in : Int
-  mut output : Buffer
+  mut output : OutBuf
   mut avail_out : Int
   mut total_out : Int64
   mut data_type : Int
@@ -194,9 +197,11 @@ fn DeflateStream::new(level : Int) -> DeflateStream {
   let w_size = 1 << window_bits
   let stream : DeflateStream = {
     input: b""[:],
+    input_array: None,
+    input_array_off: 0,
     next_in: 0,
     avail_in: 0,
-    output: Buffer(),
+    output: OutBuf::new(),
     avail_out: 0,
     total_out: 0,
     data_type: Z_UNKNOWN,
@@ -443,12 +448,24 @@ fn DeflateStream::read_buf_window(
     return 0
   }
   self.avail_in -= len
-  let src = self.input[self.next_in:self.next_in + len]
   guard offset >= 0 && offset <= self.window.length() - len else {
     abort("index out of bounds")
   }
   let window = self.window
-  window.blit_from_bytesview(offset, src)
+  match self.input_array {
+    Some(array) =>
+      array.blit_to(
+        window,
+        len~,
+        src_offset=self.input_array_off + self.next_in,
+        dst_offset=offset,
+      )
+    None =>
+      window.blit_from_bytesview(
+        offset,
+        self.input[self.next_in:self.next_in + len],
+      )
+  }
   if self.wrap == 1 {
     self.adler = adler32_fixed(self.adler, window, offset, len)
   }
@@ -526,9 +543,7 @@ fn DeflateStream::flush_pending(self : DeflateStream) -> Unit {
   if len == 0 {
     return
   }
-  for i in pending.out..<(pending.out + len) {
-    self.output.write_byte(pending.buf[i])
-  }
+  self.output.append(pending.buf, pending.out, len)
   self.total_out += len.to_int64()
   self.avail_out -= len
   pending.advance(len)
@@ -696,26 +711,86 @@ fn DeflateStream::deflate(self : DeflateStream, flush : Int) -> Int {
 }
 
 ///|
-/// Upstream `Deflate::compress` (stable API): compresses `input` into
-/// `output`, writing at most `avail_out` bytes. Returns the return code and
-/// the number of input bytes consumed.
+/// The result of [DeflateStream::compress] (a tuple would be allocated).
+#valtype
+priv struct CompressResult {
+  /// The return code.
+  ret : Int
+  /// The number of input bytes consumed.
+  consumed : Int
+}
+
+///|
+/// Upstream `Deflate::compress` (stable API): compresses the input
+/// (`array[off..off + len]`, or `view` if `array` is `None`) into `output`,
+/// writing at most `avail_out` bytes.
 fn DeflateStream::compress(
   self : DeflateStream,
-  input : BytesView,
-  output : Buffer,
+  view : BytesView,
+  array : FixedArray[Byte]?,
+  off : Int,
+  len : Int,
+  output : OutBuf,
   avail_out : Int,
   flush : Int,
-) -> (Int, Int) {
-  self.input = input
+) -> CompressResult {
+  if array is Some(array) {
+    guard off >= 0 && len >= 0 && off <= array.length() - len else {
+      abort("index out of bounds")
+    }
+  }
+  self.input = view
+  self.input_array = array
+  self.input_array_off = off
   self.next_in = 0
-  self.avail_in = input.length()
+  self.avail_in = len
   self.output = output
   self.avail_out = avail_out
   let ret = self.deflate(flush)
   let consumed = self.next_in
   self.input = b""[:]
+  self.input_array = None
+  self.input_array_off = 0
   self.next_in = 0
   self.avail_in = 0
   self.avail_out = 0
-  (ret, consumed)
+  { ret, consumed, }
+}
+
+///|
+/// A growable output byte buffer (upstream writes into a `Vec<u8>`).
+priv struct OutBuf {
+  mut buf : FixedArray[Byte]
+  mut len : Int
+}
+
+///|
+fn OutBuf::new() -> OutBuf {
+  { buf: FixedArray::make(0, b'\x00'), len: 0, }
+}
+
+///|
+/// Appends `src[off..off + n]`.
+fn OutBuf::append(
+  self : OutBuf,
+  src : FixedArray[Byte],
+  off : Int,
+  n : Int,
+) -> Unit {
+  if n > self.buf.length() - self.len {
+    let cap = @cmp.maximum(
+      @cmp.maximum(self.len + n, 2 * self.buf.length()),
+      256,
+    )
+    let buf = FixedArray::make(cap, b'\x00')
+    self.buf.blit_to(buf, len=self.len)
+    self.buf = buf
+  }
+  src.blit_to(self.buf, len=n, src_offset=off, dst_offset=self.len)
+  self.len += n
+}
+
+///|
+fn OutBuf::to_bytes(self : OutBuf) -> Bytes {
+  Bytes::from_array(self.buf[0:self.len])
 }

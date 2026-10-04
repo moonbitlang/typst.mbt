@@ -166,6 +166,12 @@ pub fn encode_png_balanced(
 }
 
 ///|
+/// The filter type bytes written before each row.
+let png_filter_type_bytes : FixedArray[Bytes] = [
+  b"\x00", b"\x01", b"\x02", b"\x03", b"\x04",
+]
+
+///|
 /// Filters and compresses the image data (upstream
 /// `Writer::write_image_data` with `DeflateCompression::Level(level)`).
 fn encode_image_data_level(
@@ -185,8 +191,8 @@ fn encode_image_data_level(
   for y in 0..<height {
     line.blit_from_bytesview(0, data[y * in_len:(y + 1) * in_len])
     let filter_type = adaptive_filter(bpp, prev, line, current)
-    zlib.write_all(Bytes::make(1, filter_type.to_byte())[:])
-    zlib.write_all(Bytes::from_array(current[1:])[:])
+    zlib.write_all(png_filter_type_bytes[filter_type][:])
+    zlib.write_all_array(current, 1, in_len)
     // The current line becomes the previous one (instead of a copy).
     let next = prev
     prev = line
