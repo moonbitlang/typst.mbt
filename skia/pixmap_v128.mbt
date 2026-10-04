@@ -8,6 +8,9 @@
 /// goes through [PremultipliedColorU8::demultiply].
 fn demultiply_into(data : FixedArray[UInt], out : FixedArray[Byte]) -> Unit {
   let len = data.length()
+  // Unchecked: `data[i..i + 4]` for `i <= len - 4` and the stores to
+  // `out[4 * i..4 * i + 16]` within the checked length. (`data` and `out`
+  // have different element types, so they cannot alias.)
   guard out.length().to_int64() >= len.to_int64() * 4 else {
     abort("index out of bounds")
   }
