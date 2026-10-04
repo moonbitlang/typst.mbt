@@ -452,6 +452,22 @@ pub fn StyleChain::entries(self : StyleChain) -> Iter[Style] {
 }
 
 ///|
+/// `self.recipes().count()` without allocating the iterators.
+pub fn StyleChain::recipe_count(self : StyleChain) -> Int {
+  let mut n = 0
+  let mut link : StyleChain? = Some(self)
+  while link is Some(l) {
+    for style in l.head {
+      if style is Recipe(_) {
+        n += 1
+      }
+    }
+    link = l.tail
+  }
+  n
+}
+
+///|
 /// Iterate over the recipes in the chain.
 pub fn StyleChain::recipes(self : StyleChain) -> Iter[Recipe] {
   self.entries().filter_map(s => s.recipe())

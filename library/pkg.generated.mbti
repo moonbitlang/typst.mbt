@@ -10514,6 +10514,7 @@ pub fn StyleChain::links(Self) -> Array[Array[Style]]
 pub fn StyleChain::memo_hash(Self) -> U128
 pub fn StyleChain::new(Styles) -> Self
 pub fn StyleChain::pop(Self) -> Self
+pub fn StyleChain::recipe_count(Self) -> Int
 pub fn StyleChain::recipes(Self) -> Iter[Recipe]
 pub fn StyleChain::suffix(Self, Int) -> Styles
 pub fn StyleChain::to_map(Self) -> Styles
