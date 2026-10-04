@@ -122,6 +122,8 @@ pub(all) enum FuncInner {
   Element(Element)
   /// A user-defined closure.
   Closure(Closure)
+  /// A plugin WebAssembly function.
+  Plugin(PluginFunc)
   /// A nested function with pre-applied arguments.
   With(Func, Args)
 }
@@ -159,12 +161,19 @@ pub fn Func::closure(closure : Closure) -> Func {
 }
 
 ///|
+/// A plugin function.
+pub fn Func::plugin(func : PluginFunc) -> Func {
+  Func::from_inner(Plugin(func))
+}
+
+///|
 /// The function's name (e.g. `min`).
 pub fn Func::name(self : Func) -> String? {
   match self.inner {
     Native(native) => Some(native.name)
     Element(elem) => Some(elem.name())
     Closure(closure) => closure.name()
+    Plugin(func) => Some(func.name())
     With(func, _) => func.name()
   }
 }
@@ -176,6 +185,7 @@ pub fn Func::title(self : Func) -> String? {
     Native(native) => Some(native.title)
     Element(elem) => Some(elem.title())
     Closure(_) => None
+    Plugin(_) => None
     With(func, _) => func.title()
   }
 }
@@ -196,6 +206,7 @@ pub fn Func::scope(self : Func) -> Scope? {
     Native(native) => Some(native.scope())
     Element(elem) => Some(elem.scope())
     Closure(_) => None
+    Plugin(_) => None
     With(func, _) => func.scope()
   }
 }
@@ -231,6 +242,15 @@ pub fn Func::to_element(self : Func) -> Element? {
 }
 
 ///|
+/// Extract the plugin function, if it is one.
+pub fn Func::to_plugin(self : Func) -> PluginFunc? {
+  match self.inner {
+    Plugin(func) => Some(func)
+    _ => None
+  }
+}
+
+///|
 /// Extract the native function data, if it is one.
 pub fn Func::to_native(self : Func) -> NativeFuncData? {
   match self.inner {
@@ -260,6 +280,12 @@ pub fn Func::call(
     }
     Closure(closure) =>
       (engine.routines().eval_closure)(self, closure, engine, context, args)
+    Plugin(func) => {
+      let inputs : Array[BytesValue] = args.all()
+      let output = at(args.span, () => func.call(inputs.map(b => b.0)))
+      args.finish()
+      Bytes(BytesValue(output))
+    }
     With(func, pre) => {
       let items = pre.items.map(a => {
         span: a.span,
@@ -317,6 +343,7 @@ pub fn Func::repr(self : Func) -> String {
     Native(native) => native.name
     Element(elem) => elem.name()
     Closure(closure) => closure.name().unwrap_or(default)
+    Plugin(func) => func.name()
     With(_, _) => default
   }
 }
@@ -328,6 +355,7 @@ pub impl Eq for Func with fn equal(self, other) {
     (Native(a), Native(b)) => physical_equal(a, b)
     (Element(a), Element(b)) => a == b
     (Closure(a), Closure(b)) => physical_equal(a, b)
+    (Plugin(a), Plugin(b)) => a == b
     (With(f1, a1), With(f2, a2)) => f1 == f2 && a1 == a2
     _ => false
   }

@@ -103,6 +103,12 @@ kurbo = "=0.13.1"
 # The character widths codespan-reporting 0.11.1 uses (gen_unicode_width).
 unicode-width = "=0.1.14"
 
+# The WebAssembly runtime typst-library uses for plugins, pinned to upstream's
+# lock (gen_wasmi_spec, gen_wasmparser_tests).
+wasmi = { version = "=1.0.9", default-features = false, features = ["simd"] }
+wasmparser = { version = "=0.228.0", default-features = false, features = ["validate", "features", "simd"] }
+wasmi_core = { version = "=1.0.9", default-features = false, features = ["simd"] }
+
 # Record every shaping call Typst makes (for the `shape` stage); see
 # rustybuzz-tap/Cargo.toml.
 [patch.crates-io]

@@ -6302,6 +6302,7 @@ pub fn Func::field(Self, String, BindingGuard) -> Value raise HintedError
 pub fn Func::from_inner(FuncInner) -> Self
 pub fn Func::name(Self) -> String?
 pub fn Func::native(NativeFuncData) -> Self
+pub fn Func::plugin(PluginFunc) -> Self
 pub fn Func::repr(Self) -> String
 pub fn Func::scope(Self) -> Scope?
 pub fn Func::span(Self) -> @moonbitlang/typst/syntax.Span
@@ -6309,6 +6310,7 @@ pub fn Func::spanned(Self, @moonbitlang/typst/syntax.Span) -> Self
 pub fn Func::title(Self) -> String?
 pub fn Func::to_element(Self) -> Element?
 pub fn Func::to_native(Self) -> NativeFuncData?
+pub fn Func::to_plugin(Self) -> PluginFunc?
 pub fn Func::with_args(Self, Args) -> Self
 pub impl Eq for Func
 pub impl Fingerprint for Func
@@ -6320,6 +6322,7 @@ pub(all) enum FuncInner {
   Native(NativeFuncData)
   Element(Element)
   Closure(Closure)
+  Plugin(PluginFunc)
   With(Func, Args)
 }
 
@@ -8927,6 +8930,15 @@ pub impl Default for PlacementScope
 pub impl FromValue for PlacementScope
 pub impl IntoValue for PlacementScope
 pub impl Reflect for PlacementScope
+
+pub struct PluginFunc {
+  // private fields
+}
+pub fn PluginFunc::call(Self, Array[Bytes]) -> Bytes raise HintedError
+pub fn PluginFunc::name(Self) -> String
+pub fn PluginFunc::transition(Self, Array[Bytes]) -> Module raise HintedError
+pub impl Eq for PluginFunc
+pub impl Fingerprint for PluginFunc
 
 pub struct PngFormat(Content)
 pub fn PngFormat::new() -> Self

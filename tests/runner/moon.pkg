@@ -1,4 +1,6 @@
 import {
+  "moonbitlang/typst/wasmi",
+  "moonbitlang/typst/wasmi/core" @wasmi_core,
   "moonbitlang/typst/syntax",
   "moonbitlang/typst/syntax/ast",
   "moonbitlang/typst/library",
@@ -38,6 +40,7 @@ import {
   "moonbitlang/x/sys",
   "moonbitlang/core/env",
   "moonbitlang/core/encoding/utf8",
+  "moonbitlang/typst/wasmparser",
 }
 
 supported_targets = "native"

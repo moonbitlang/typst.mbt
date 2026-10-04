@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Regenerate reference outputs from upstream Typst (needs Rust).
-# Usage: scripts/goldens.sh [syntax|ast|reparse|eval|html|bundle|realize|fonts|font|paged|svg|pdf-semantic|pdftags|shape|shape-hb|break|usvg|usvg-images|resvg|raster ...]
+# Usage: scripts/goldens.sh [syntax|ast|reparse|eval|html|bundle|realize|fonts|font|paged|svg|pdf-semantic|pdftags|shape|shape-hb|break|usvg|usvg-images|resvg|raster|wasm-validate|wasm-spec ...]
 #
 # `reparse` applies seeded pseudo-random edits to every test body through
 # `Source::edit`/`Source::replace` and dumps the reparsed ranges and trees
@@ -76,6 +76,26 @@ for stage in "${stages[@]}"; do
     (cd oracle && cargo run --release -q --bin gen_resvg_golden -- ../.repos/resvg/crates/resvg/tests ../tests/golden/resvg)
     mv tests/golden/resvg/oracle_test.mbt resvg/oracle_test.mbt
     moon fmt
+    continue
+  fi
+  if [ "$stage" = wasm-validate ]; then
+    # wasmparser validation like wasmi's module parser
+    # (oracle/src/bin/gen_wasmparser_tests.rs) of the WebAssembly spec corpus
+    # (scripts/wasm_spec_extract.sh) and the Typst test plugins.
+    assets=$(ls -d ~/.cargo/git/checkouts/typst-dev-assets-*/*/files | head -1)
+    (cd oracle && cargo run --release -q --bin gen_wasmparser_tests -- \
+      ../tests/golden/wasm-spec/corpus "$assets/plugins") \
+      > tests/golden/wasm-spec/validate.tsv
+    continue
+  fi
+  if [ "$stage" = wasm-spec ]; then
+    # The WebAssembly spec test suite (WASM_TESTSUITE, default
+    # .repos/wasm-testsuite) run with the real wasmi 1.0.9
+    # (oracle/src/bin/gen_wasmi_spec.rs).
+    scripts/wasm_spec_extract.sh
+    rm -rf tests/golden/wasm-spec/expected
+    (cd oracle && cargo run --release -q --bin gen_wasmi_spec -- \
+      ../tests/golden/wasm-spec/corpus ../tests/golden/wasm-spec/expected)
     continue
   fi
   if [ "$stage" = fonts ]; then

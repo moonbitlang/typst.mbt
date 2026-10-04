@@ -1,0 +1,8 @@
+import {
+  "moonbitlang/core/bigint",
+  "moonbitlang/core/math",
+}
+
+import {
+  "moonbitlang/x/fs",
+} for "wbtest"

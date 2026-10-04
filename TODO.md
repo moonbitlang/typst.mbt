@@ -1,8 +1,7 @@
 # TODO
 
 Status (2026-10-03): the port is complete for the upstream test suite. Every
-differential stage matches upstream Typst (pinned in `UPSTREAM_REV`) except
-the 10 WASM plugin tests. See `PLAN.md` for the phase table and
+differential stage matches upstream Typst (pinned in `UPSTREAM_REV`). See `PLAN.md` for the phase table and
 `docs/p2-architecture.md`, `docs/p3-plan.md`, `docs/p4-plan.md` for design
 and per-unit status. Conventions and pitfalls for contributors (and agents)
 are in `AGENTS.md` — read it first.
@@ -10,13 +9,14 @@ are in `AGENTS.md` — read it first.
 | Stage | Result |
 |---|---|
 | syntax / ast / reparse | 3792/3792 |
-| eval | 3782/3792 (10 × `foundations/plugin.typ`) |
-| realize | 3788/3792 (4 × `foundations/plugin.typ`) |
+| eval | 3792/3792 |
+| realize | 3792/3792 |
 | html | 508/508 |
 | paged / svg / pdf-semantic / render | 2299/2299 each |
 | pdftags / bundle | 133/133, 39/39 |
 | font / shape / shape-hb / break / resvg / usvg | 100% |
-| unit tests (`moon test --target native -j16`) | 7818/7818 |
+| wasm-spec / wasm-validate | 64207/64207 (260 files; 1242 text modules skipped), 14027/14027 |
+| unit tests (`moon test --target native -j16`) | 8096/8096 |
 
 Run a stage: `moon run tests/runner --target native [--release] -- <stage>`
 (use `--release` for paged/svg/render/pdf-semantic sweeps). Regenerate
@@ -25,9 +25,10 @@ goldens with `scripts/goldens.sh <stage>` (needs Rust; builds `oracle/`).
 ## Open work
 
 ### Features
-- [ ] **WASM plugins** (`foundations/plugin.typ`, 10 eval + 4 realize
-  cases): port a WebAssembly runtime equivalent to upstream's `wasmi` plus
-  `typst-library/src/foundations/plugin.rs`.
+- [x] **WASM plugins** (`library/plugin.mbt` on `wasmparser/`, `wasmi/`,
+  `wasmi/core/`, `wasmi/ir/`; see AGENTS.md). Remaining: the executor is
+  ~2.2-2.6x slower than upstream wasmi on plugin-heavy documents (boxed
+  `Op` enum; a packed instruction encoding would close most of the gap).
 - [x] **CLI and a real file-system `World`** (`cli/`, `kit/`; see README):
   `compile`/`eval`/`query`/`fonts`/`info`/`init` on native, wasm-gc and
   wasm, checked against the upstream CLI. Remaining:
