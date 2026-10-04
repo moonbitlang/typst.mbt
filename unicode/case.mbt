@@ -3,7 +3,7 @@
 
 ///|
 /// Binary search a `[c, mapped, ...]` table.
-fn lookup_single(table : FixedArray[Int], c : Int) -> Int? {
+fn lookup_single(table : ReadOnlyArray[Int], c : Int) -> Int? {
   let n = table.length() / 2
   for lo = 0, hi = n; lo < hi; {
     let mid = lo + (hi - lo) / 2
@@ -23,7 +23,7 @@ fn lookup_single(table : FixedArray[Int], c : Int) -> Int? {
 ///|
 /// Look up a `[c, len, chars..., ...]` table (linear; the tables are small).
 /// Returns the start and length of the mapping.
-fn lookup_multi(table : FixedArray[Int], c : Int) -> (Int, Int)? {
+fn lookup_multi(table : ReadOnlyArray[Int], c : Int) -> (Int, Int)? {
   let mut i = 0
   while i < table.length() {
     let len = table[i + 1]
@@ -39,8 +39,8 @@ fn lookup_multi(table : FixedArray[Int], c : Int) -> (Int, Int)? {
 fn write_mapped(
   buf : StringBuilder,
   c : Int,
-  single : FixedArray[Int],
-  multi : FixedArray[Int],
+  single : ReadOnlyArray[Int],
+  multi : ReadOnlyArray[Int],
 ) -> Unit {
   match lookup_single(single, c) {
     Some(m) => buf.write_char(m.unsafe_to_char())

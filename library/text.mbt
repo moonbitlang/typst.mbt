@@ -362,12 +362,12 @@ pub(all) enum TopEdgeMetric {
 } derive(Eq, Hash, Debug)
 
 ///|
-let top_edge_metric_names : Array[String] = [
+let top_edge_metric_names : ReadOnlyArray[String] = [
   "ascender", "cap-height", "x-height", "baseline", "bounds",
 ]
 
 ///|
-let top_edge_metric_values : Array[TopEdgeMetric] = [
+let top_edge_metric_values : ReadOnlyArray[TopEdgeMetric] = [
   Ascender,
   CapHeight,
   XHeight,
@@ -392,7 +392,7 @@ pub impl Reflect for TopEdgeMetric with fn castable(v) {
 
 ///|
 pub impl IntoValue for TopEdgeMetric with fn into_value(self) {
-  for i, m in top_edge_metric_values {
+  for i, m in top_edge_metric_values[:] {
     if m == self {
       return Str(top_edge_metric_names[i])
     }
@@ -468,12 +468,12 @@ pub(all) enum BottomEdgeMetric {
 } derive(Eq, Hash, Debug)
 
 ///|
-let bottom_edge_metric_names : Array[String] = [
+let bottom_edge_metric_names : ReadOnlyArray[String] = [
   "baseline", "descender", "bounds",
 ]
 
 ///|
-let bottom_edge_metric_values : Array[BottomEdgeMetric] = [
+let bottom_edge_metric_values : ReadOnlyArray[BottomEdgeMetric] = [
   Baseline,
   Descender,
   Bounds,
@@ -496,7 +496,7 @@ pub impl Reflect for BottomEdgeMetric with fn castable(v) {
 
 ///|
 pub impl IntoValue for BottomEdgeMetric with fn into_value(self) {
-  for i, m in bottom_edge_metric_values {
+  for i, m in bottom_edge_metric_values[:] {
     if m == self {
       return Str(bottom_edge_metric_names[i])
     }
@@ -686,7 +686,7 @@ pub(all) enum NumberType {
 } derive(Eq, Hash, Debug)
 
 ///|
-let number_type_names : Array[String] = ["lining", "old-style"]
+let number_type_names : ReadOnlyArray[String] = ["lining", "old-style"]
 
 ///|
 pub impl Reflect for NumberType with fn input() {
@@ -730,7 +730,7 @@ pub(all) enum NumberWidth {
 } derive(Eq, Hash, Debug)
 
 ///|
-let number_width_names : Array[String] = ["proportional", "tabular"]
+let number_width_names : ReadOnlyArray[String] = ["proportional", "tabular"]
 
 ///|
 pub impl Reflect for NumberWidth with fn input() {

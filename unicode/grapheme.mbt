@@ -20,7 +20,7 @@ priv enum GraphemeCat {
 } derive(Eq)
 
 ///|
-let grapheme_cats : FixedArray[GraphemeCat] = grapheme_cat_names.map(
+let grapheme_cats : ReadOnlyArray[GraphemeCat] = grapheme_cat_names.map(
   cat_of_name,
 )
 

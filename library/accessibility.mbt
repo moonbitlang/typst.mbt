@@ -39,13 +39,13 @@ pub impl Default for ArtifactKind with fn default() {
 }
 
 ///|
-let artifact_kind_names : Array[String] = [
+let artifact_kind_names : ReadOnlyArray[String] = [
   "header", "footer", "watermark", "page-number", "line-number", "redaction", "bates",
   "page", "pagination-other", "layout", "background", "other",
 ]
 
 ///|
-let artifact_kind_values : Array[ArtifactKind] = [
+let artifact_kind_values : ReadOnlyArray[ArtifactKind] = [
   Header,
   Footer,
   Watermark,
@@ -77,7 +77,7 @@ pub impl Reflect for ArtifactKind with fn castable(v) {
 
 ///|
 pub impl IntoValue for ArtifactKind with fn into_value(self) {
-  for i, kind in artifact_kind_values {
+  for i, kind in artifact_kind_values[:] {
     if kind == self {
       return Str(artifact_kind_names[i])
     }
@@ -124,7 +124,7 @@ pub(all) enum PdfMarkerTagKind {
 // name (with `numbered` for `Bibliography`: `("bibliography", numbered)`).
 
 ///|
-let pdf_marker_tag_kind_names : Array[(String, PdfMarkerTagKind)] = [
+let pdf_marker_tag_kind_names : ReadOnlyArray[(String, PdfMarkerTagKind)] = [
   ("outline-body", OutlineBody),
   ("bib-entry", BibEntry),
   ("list-item-label", ListItemLabel),
@@ -155,7 +155,7 @@ pub impl IntoValue for PdfMarkerTagKind with fn into_value(self) {
     Bibliography(numbered) =>
       Array(Arr::from_array([Str("bibliography"), Bool(numbered)]))
     kind => {
-      for entry in pdf_marker_tag_kind_names {
+      for entry in pdf_marker_tag_kind_names[:] {
         if entry.1 == kind {
           return Str(entry.0)
         }
@@ -169,7 +169,7 @@ pub impl IntoValue for PdfMarkerTagKind with fn into_value(self) {
 pub impl FromValue for PdfMarkerTagKind with fn from_value(v) {
   match v {
     Str(s) =>
-      for entry in pdf_marker_tag_kind_names {
+      for entry in pdf_marker_tag_kind_names[:] {
         if entry.0 == s {
           return entry.1
         }

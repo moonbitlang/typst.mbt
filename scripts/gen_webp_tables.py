@@ -62,7 +62,7 @@ def main():
         out.append("///|")
         out.append("/// `%s` (%d entries)." % (name, len(nums)))
         mbt_name = name.lower() + ("_table" if name.endswith("_QUANT") else "")
-        out.append("let %s : FixedArray[Int] = [" % mbt_name)
+        out.append("let %s : ReadOnlyArray[Int] = [" % mbt_name)
         out.extend(lines)
         out.append("]")
     root = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")

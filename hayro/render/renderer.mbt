@@ -223,8 +223,15 @@ fn resize_image_data(
 
 ///|
 /// `AlphaColor::from_rgba8(r, g, b, a).premultiply().to_rgba8()`, cached for
-/// every `(component, alpha)` pair.
-let premul_table : FixedArray[Byte] = {
+/// every `(component, alpha)` pair (built on first use: computing it at
+/// startup took more than half of the CLI's initialization).
+let premul_table_cell : Ref[FixedArray[Byte]?] = { val: None, }
+
+///|
+fn premul_table() -> FixedArray[Byte] {
+  if premul_table_cell.val is Some(table) {
+    return table
+  }
   let table = FixedArray::make(256 * 256, b'\x00')
   for a in 0..<256 {
     for v in 0..<256 {
@@ -233,17 +240,26 @@ let premul_table : FixedArray[Byte] = {
       table[a * 256 + v] = p[0].to_byte()
     }
   }
+  premul_table_cell.val = Some(table)
   table
 }
 
 ///|
-/// The alpha channel of `AlphaColor::from_rgba8(..).premultiply().to_rgba8()`.
-let premul_alpha_table : FixedArray[Byte] = {
+/// The alpha channel of `AlphaColor::from_rgba8(..).premultiply().to_rgba8()`
+/// (built on first use).
+let premul_alpha_table_cell : Ref[FixedArray[Byte]?] = { val: None, }
+
+///|
+fn premul_alpha_table() -> FixedArray[Byte] {
+  if premul_alpha_table_cell.val is Some(table) {
+    return table
+  }
   let table = FixedArray::make(256, b'\x00')
   for a in 0..<256 {
     let c = @vello_cpu.AlphaColor::from_rgba8(0, 0, 0, a)
     table[a] = @vello_cpu.components_to_rgba8(c.premultiply())[3].to_byte()
   }
+  premul_alpha_table_cell.val = Some(table)
   table
 }
 
@@ -491,6 +507,8 @@ fn Renderer::draw_image_impl(
   }
   if has_alpha {
     let n = rgba_data.length() / 4
+    let premul_table = premul_table()
+    let premul_alpha_table = premul_alpha_table()
     for i in 0..<n {
       let a = rgba_data[i * 4 + 3].to_int()
       let row = a * 256

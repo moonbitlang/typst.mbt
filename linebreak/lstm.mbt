@@ -7,11 +7,11 @@
 /// A matrix of f32 values (`MatrixZero` / `MatrixOwned`), row-major.
 priv struct Matrix {
   data : FixedArray[Float]
-  dims : FixedArray[Int]
+  dims : ReadOnlyArray[Int]
 }
 
 ///|
-fn Matrix::from_base64(b64 : String, dims : FixedArray[Int]) -> Matrix {
+fn Matrix::from_base64(b64 : String, dims : ReadOnlyArray[Int]) -> Matrix {
   let bytes = decode_base64(b64)
   let n = bytes.length() / 4
   let data = FixedArray::make(n, (0.0 : Float))
@@ -46,7 +46,7 @@ fn Matrix::submatrix(self : Matrix, index : Int) -> Matrix {
   }
   {
     data,
-    dims: FixedArray::makei(self.dims.length() - 1, k => self.dims[k + 1]),
+    dims: ReadOnlyArray::makei(self.dims.length() - 1, k => self.dims[k + 1]),
   }
 }
 
@@ -72,12 +72,12 @@ priv struct LstmSegmenter {
 ///|
 fn LstmSegmenter::new(
   model_type : String,
-  dic : FixedArray[(String, Int)],
-  matrices : FixedArray[(String, FixedArray[Int])],
+  dic : ReadOnlyArray[(String, Int)],
+  matrices : ReadOnlyArray[(String, ReadOnlyArray[Int])],
 ) -> LstmSegmenter {
   let m = matrices.map(p => Matrix::from_base64(p.0, p.1))
   let map : Map[String, Int] = Map([])
-  for entry in dic {
+  for entry in dic[:] {
     map[entry.0] = entry.1
   }
   let time_w = m[7]

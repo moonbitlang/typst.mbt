@@ -1727,13 +1727,13 @@ fn nbsp_delta(font : @library.FontInstance) -> @library.Em? {
 
 ///|
 /// The CJK punctuation that can appear at the beginning or end of a line.
-let begin_punct_pat : Array[Char] = [
+let begin_punct_pat : ReadOnlyArray[Char] = [
   '“', '‘', '《', '〈', '（', '『', '「', '【', '〖', '〔', '［', '｛',
   '｟', '〘', '〝',
 ]
 
 ///|
-let end_punct_pat : Array[Char] = [
+let end_punct_pat : ReadOnlyArray[Char] = [
   '”', '’', '，', '．', '。', '、', '：', '；', '》', '〉', '）', '』',
   '」', '】', '〗', '〕', '］', '｝', '｠', '〙', '〟', '？', '！',
 ]

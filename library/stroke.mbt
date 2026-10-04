@@ -389,7 +389,7 @@ fn dash_pt(pt : Double) -> DashLength {
 
 ///|
 /// The named dash patterns (same names as tikz).
-let dash_patterns : Array[(String, String, () -> DashPattern)] = [
+let dash_patterns : ReadOnlyArray[(String, String, () -> DashPattern)] = [
   ("solid", "", () => DashPattern::from_array([])),
   (
     "dotted",
@@ -461,7 +461,7 @@ let dash_patterns : Array[(String, String, () -> DashPattern)] = [
 
 ///|
 pub impl Reflect for DashPattern with fn input() {
-  let infos : Array[CastInfo] = dash_patterns.map(p => {
+  let infos : Array[CastInfo] = dash_patterns[:].map(p => {
     CastInfo::Value(Str(p.0), p.1)
   })
   infos.push(Type(Type::array()))
@@ -495,7 +495,7 @@ pub impl IntoValue for DashPattern with fn into_value(self) {
 pub impl FromValue for DashPattern with fn from_value(v) {
   match v {
     Str(s) =>
-      for p in dash_patterns {
+      for p in dash_patterns[:] {
         if p.0 == s {
           return (p.2)()
         }

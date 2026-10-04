@@ -1318,7 +1318,7 @@ pub fn[T : Reflect] input_of(Ty[T]) -> CastInfo
 
 pub fn[T : Numeric] is_zero(T) -> Bool
 
-pub let iter_names : Array[String]
+pub let iter_names : ReadOnlyArray[String]
 
 pub fn join(Value, Value) -> Value raise HintedError
 
@@ -8189,12 +8189,12 @@ pub impl IntoValue for NumberingPattern
 pub impl Reflect for NumberingPattern
 
 pub(all) enum NumeralSystem {
-  Positional(Array[String])
-  Bijective(Array[String])
-  Additive(Array[(String, UInt64)])
-  Symbolic(Array[String])
-  Fixed(Array[String])
-  ZerolessFixed(Array[String])
+  Positional(ReadOnlyArray[String])
+  Bijective(ReadOnlyArray[String])
+  Additive(ReadOnlyArray[(String, UInt64)])
+  Symbolic(ReadOnlyArray[String])
+  Fixed(ReadOnlyArray[String])
+  ZerolessFixed(ReadOnlyArray[String])
   Chinese(ChineseVariant, ChineseCase)
 }
 pub fn NumeralSystem::represent(Self, UInt64) -> Result[String, RepresentationError]

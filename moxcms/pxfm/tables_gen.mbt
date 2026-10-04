@@ -2,7 +2,7 @@
 
 ///|
 /// `POW_INVERSE: [u64; 182]` (pow_tables.rs), flattened.
-let pow_inverse : FixedArray[UInt64] = [
+let pow_inverse : ReadOnlyArray[UInt64] = [
   0x3ff6900000000000UL, 0x3ff6700000000000UL, 0x3ff6500000000000UL, 0x3ff6300000000000UL,
   0x3ff6100000000000UL, 0x3ff5f00000000000UL, 0x3ff5e00000000000UL, 0x3ff5c00000000000UL,
   0x3ff5a00000000000UL, 0x3ff5800000000000UL, 0x3ff5600000000000UL, 0x3ff5400000000000UL,
@@ -53,7 +53,7 @@ let pow_inverse : FixedArray[UInt64] = [
 
 ///|
 /// `POW_LOG_INV: [(u64, u64); 182]` (pow_tables.rs), flattened.
-let pow_log_inv : FixedArray[UInt64] = [
+let pow_log_inv : ReadOnlyArray[UInt64] = [
   0xbd2e9e439f105039UL, 0xbfd5ff3070a79000UL, 0x3cde63af2df7ba69UL, 0xbfd5a42ab0f4d000UL,
   0xbd23167e63081cf7UL, 0xbfd548a2c3add000UL, 0xbd234d7aaf04d104UL, 0xbfd4ec9732600000UL,
   0x3d38bccffe1a0f8cUL, 0xbfd4900680401000UL, 0x3d3fb129931715adUL, 0xbfd432ef2a04f000UL,
@@ -149,7 +149,7 @@ let pow_log_inv : FixedArray[UInt64] = [
 
 ///|
 /// `EXP2_MID1: [(u64, u64); 64]` (pow_tables.rs), flattened.
-let exp2_mid1 : FixedArray[UInt64] = [
+let exp2_mid1 : ReadOnlyArray[UInt64] = [
   0x0UL, 0x3ff0000000000000UL, 0xbc719083535b085dUL, 0x3ff02c9a3e778061UL, 0x3c8d73e2a475b465UL,
   0x3ff059b0d3158574UL, 0x3c6186be4bb284ffUL, 0x3ff0874518759bc8UL, 0x3c98a62e4adc610bUL,
   0x3ff0b5586cf9890fUL, 0x3c403a1727c57b53UL, 0x3ff0e3ec32d3d1a2UL, 0xbc96c51039449b3aUL,
@@ -186,7 +186,7 @@ let exp2_mid1 : FixedArray[UInt64] = [
 
 ///|
 /// `POWF_R2: [u64; 193]` (powf_tables.rs), flattened.
-let powf_r2 : FixedArray[UInt64] = [
+let powf_r2 : ReadOnlyArray[UInt64] = [
   0x3ff0101000000000UL, 0x3ff00fd000000000UL, 0x3ff00f9000000000UL, 0x3ff00f5000000000UL,
   0x3ff00f1000000000UL, 0x3ff00ed000000000UL, 0x3ff00e9000000000UL, 0x3ff00e5000000000UL,
   0x3ff00e1000000000UL, 0x3ff00dd000000000UL, 0x3ff00d9000000000UL, 0x3ff00d5000000000UL,
@@ -240,7 +240,7 @@ let powf_r2 : FixedArray[UInt64] = [
 
 ///|
 /// `LOG2_R_TD: [(u64, u64, u64); 128]` (powf_tables.rs), flattened.
-let log2_r_td : FixedArray[UInt64] = [
+let log2_r_td : ReadOnlyArray[UInt64] = [
   0x0UL, 0x0UL, 0x0UL, 0x3b084a2c615b70adUL, 0xbe6177c23362928cUL, 0x3f872c8000000000UL,
   0xbb3f27b820fd03eaUL, 0xbe9179e0caa9c9abUL, 0x3f97440000000000UL, 0xbb2f27ef487c8f34UL,
   0xbe8c6cea541f5b70UL, 0x3fa184c000000000UL, 0xbb3e3f80fbc71454UL, 0xbe966c4d4e554434UL,
@@ -341,7 +341,7 @@ let log2_r_td : FixedArray[UInt64] = [
 
 ///|
 /// `LOG2_R2_DD: [(u64, u64); 193]` (powf_tables.rs), flattened.
-let log2_r2_dd : FixedArray[UInt64] = [
+let log2_r2_dd : ReadOnlyArray[UInt64] = [
   0x3c1ff25180953e64UL, 0xbf7720c2ab2312a9UL, 0xbc115ffd79560d8fUL, 0xbf76c4c92b1478ffUL,
   0x3c1b8d6d6f2e3579UL, 0xbf7668ce3c873549UL, 0xbc15bfc3f0d5ef71UL, 0xbf760cd1df6fde91UL,
   0xbbfd1f7a8777984aUL, 0xbf75b0d413c30b5eUL, 0x3bd8e858515b8343UL, 0xbf7554d4d97551abUL,
@@ -443,7 +443,7 @@ let log2_r2_dd : FixedArray[UInt64] = [
 
 ///|
 /// `EXP_REDUCE_T0: [(u64, u64); 64]` (exponents/exp.rs), flattened.
-let exp_reduce_t0 : FixedArray[UInt64] = [
+let exp_reduce_t0 : ReadOnlyArray[UInt64] = [
   0x0UL, 0x3ff0000000000000UL, 0xbc719083535b085eUL, 0x3ff02c9a3e778061UL, 0x3c8d73e2a475b466UL,
   0x3ff059b0d3158574UL, 0x3c6186be4bb28500UL, 0x3ff0874518759bc8UL, 0x3c98a62e4adc610aUL,
   0x3ff0b5586cf9890fUL, 0x3c403a1727c57b52UL, 0x3ff0e3ec32d3d1a2UL, 0xbc96c51039449b3aUL,
@@ -480,7 +480,7 @@ let exp_reduce_t0 : FixedArray[UInt64] = [
 
 ///|
 /// `EXP_REDUCE_T1: [(u64, u64); 64]` (exponents/exp.rs), flattened.
-let exp_reduce_t1 : FixedArray[UInt64] = [
+let exp_reduce_t1 : ReadOnlyArray[UInt64] = [
   0x0UL, 0x3ff0000000000000UL, 0x3c9ae8e38c59c72aUL, 0x3ff000b175effdc7UL, 0xbc57b5d0d58ea8f4UL,
   0x3ff00162f3904052UL, 0x3c94115cb6b16a8eUL, 0x3ff0021478e11ce6UL, 0xbc8d7c96f201bb2eUL,
   0x3ff002c605e2e8cfUL, 0x3c984711d4c35ea0UL, 0x3ff003779a95f959UL, 0xbc80484245243778UL,
@@ -517,7 +517,7 @@ let exp_reduce_t1 : FixedArray[UInt64] = [
 
 ///|
 /// `LOG_REDUCTION_F32: [u32; 128]` (logs/logf.rs), flattened.
-let log_reduction_f32 : FixedArray[UInt] = [
+let log_reduction_f32 : ReadOnlyArray[UInt] = [
   0x3f800000U, 0x3f7e0000U, 0x3f7c0000U, 0x3f7a0000U, 0x3f780000U, 0x3f760000U, 0x3f740000U,
   0x3f720000U, 0x3f700000U, 0x3f6f0000U, 0x3f6d0000U, 0x3f6b0000U, 0x3f6a0000U, 0x3f680000U,
   0x3f660000U, 0x3f650000U, 0x3f630000U, 0x3f620000U, 0x3f600000U, 0x3f5f0000U, 0x3f5d0000U,
@@ -541,7 +541,7 @@ let log_reduction_f32 : FixedArray[UInt] = [
 
 ///|
 /// `LOG2_R: [u64; 128]` (logs/log2f.rs), flattened.
-let log2_r : FixedArray[UInt64] = [
+let log2_r : ReadOnlyArray[UInt64] = [
   0x0UL, 0x3f872c7ba20f7327UL, 0x3f9743ee861f3556UL, 0x3fa184b8e4c56af8UL, 0x3fa77394c9d958d5UL,
   0x3fad6ebd1f1febfeUL, 0x3fb1bb32a600549dUL, 0x3fb4c560fe68af88UL, 0x3fb7d60496cfbb4cUL,
   0x3fb960caf9abb7caUL, 0x3fbc7b528b70f1c5UL, 0x3fbf9c95dc1d1165UL, 0x3fc097e38ce60649UL,
@@ -578,7 +578,7 @@ let log2_r : FixedArray[UInt64] = [
 
 ///|
 /// `LOG_RANGE_REDUCTION: [u64; 128]` (logs/log2.rs), flattened.
-let log_range_reduction_table : FixedArray[UInt64] = [
+let log_range_reduction_table : ReadOnlyArray[UInt64] = [
   0x3ff0000000000000UL, 0x3fefc00000000000UL, 0x3fef800000000000UL, 0x3fef400000000000UL,
   0x3fef000000000000UL, 0x3feec00000000000UL, 0x3fee800000000000UL, 0x3fee400000000000UL,
   0x3fee000000000000UL, 0x3fede00000000000UL, 0x3feda00000000000UL, 0x3fed600000000000UL,
@@ -615,7 +615,7 @@ let log_range_reduction_table : FixedArray[UInt64] = [
 
 ///|
 /// `S2: [i32; 193]` (logs/log_range_reduction.rs).
-let log_s2 : FixedArray[Int] = [
+let log_s2 : ReadOnlyArray[Int] = [
   257, 253, 249, 245, 241, 237, 233, 229, 225, 221, 217, 213, 209, 205, 201, 197,
   193, 189, 185, 180, 176, 172, 168, 164, 160, 156, 152, 148, 144, 140, 136, 132,
   128, 124, 120, 116, 112, 108, 104, 100, 96, 92, 88, 84, 80, 76, 72, 68, 64, 60,
@@ -633,7 +633,7 @@ let log_s2 : FixedArray[Int] = [
 
 ///|
 /// `S3: [i32; 161]` (logs/log_range_reduction.rs).
-let log_s3 : FixedArray[Int] = [
+let log_s3 : ReadOnlyArray[Int] = [
   80, 79, 78, 77, 76, 75, 74, 73, 72, 71, 70, 69, 68, 67, 66, 65, 64, 63, 62, 61,
   60, 59, 58, 57, 56, 55, 54, 53, 52, 51, 50, 49, 48, 47, 46, 45, 44, 43, 42, 41,
   40, 39, 38, 37, 36, 35, 34, 33, 32, 31, 30, 29, 28, 27, 26, 25, 24, 23, 22, 21,
@@ -647,7 +647,7 @@ let log_s3 : FixedArray[Int] = [
 
 ///|
 /// `S4: [i32; 130]` (logs/log_range_reduction.rs).
-let log_s4 : FixedArray[Int] = [
+let log_s4 : ReadOnlyArray[Int] = [
   65, 64, 63, 62, 61, 60, 59, 58, 57, 56, 55, 54, 53, 52, 51, 50, 49, 48, 47, 46,
   45, 44, 43, 42, 41, 40, 39, 38, 37, 36, 35, 34, 33, 32, 31, 30, 29, 28, 27, 26,
   25, 24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5,
@@ -660,7 +660,7 @@ let log_s4 : FixedArray[Int] = [
 
 ///|
 /// `LOG_STEP_1: [DyadicFloat128; 128]` (logs/log_dyadic.rs).
-let log_step_1 : FixedArray[DyadicFloat128] = [
+let log_step_1 : ReadOnlyArray[DyadicFloat128] = [
   dyadic(false, 0, 0x0UL, 0x0UL),
   dyadic(false, -134, 0x8080abac46f38946UL, 0x662d417ced007a46UL),
   dyadic(false, -133, 0x8102b2c49ac23a4fUL, 0x91d082dce3ddcd38UL),
@@ -793,7 +793,7 @@ let log_step_1 : FixedArray[DyadicFloat128] = [
 
 ///|
 /// `LOG_STEP_2: [DyadicFloat128; 193]` (logs/log_dyadic.rs).
-let log_step_2 : FixedArray[DyadicFloat128] = [
+let log_step_2 : ReadOnlyArray[DyadicFloat128] = [
   dyadic(true, -135, 0x803faacac419abf2UL, 0xa1c6f3fc242ef8d0UL),
   dyadic(true, -136, 0xfc834da16f0d9f57UL, 0xa225ebc02e6d9dd4UL),
   dyadic(true, -136, 0xf88735ccc7433381UL, 0xc33f6ad340ae18a9UL),
@@ -991,7 +991,7 @@ let log_step_2 : FixedArray[DyadicFloat128] = [
 
 ///|
 /// `LOG_STEP_3: [DyadicFloat128; 161]` (logs/log_dyadic.rs).
-let log_step_3 : FixedArray[DyadicFloat128] = [
+let log_step_3 : ReadOnlyArray[DyadicFloat128] = [
   dyadic(true, -142, 0x9fff38014d52e45aUL, 0x374b294076d669c3UL),
   dyadic(true, -142, 0x9dff3cf940fad85aUL, 0x7f6f05dcdbeb776eUL),
   dyadic(true, -142, 0x9bff41e134f1cb36UL, 0x3d55e21d41bbadf9UL),
@@ -1157,7 +1157,7 @@ let log_step_3 : FixedArray[DyadicFloat128] = [
 
 ///|
 /// `LOG_STEP_4: [DyadicFloat128; 130]` (logs/log_dyadic.rs).
-let log_step_4 : FixedArray[DyadicFloat128] = [
+let log_step_4 : ReadOnlyArray[DyadicFloat128] = [
   dyadic(true, -149, 0x81fffef7f002cb2bUL, 0x4cd24d68ff2f11aeUL),
   dyadic(true, -150, 0xfffffe0000055555UL, 0x455555888887dddeUL),
   dyadic(true, -150, 0xfbfffe0fe0051653UL, 0xf0fa101f52b3971fUL),
@@ -1292,7 +1292,7 @@ let log_step_4 : FixedArray[DyadicFloat128] = [
 
 ///|
 /// `EXP_T1_2_DYADIC: [DyadicFloat128; 64]` (pow_tables.rs).
-let exp_t1_2_dyadic : FixedArray[DyadicFloat128] = [
+let exp_t1_2_dyadic : ReadOnlyArray[DyadicFloat128] = [
   dyadic(false, -127, 0x8000000000000000UL, 0x0UL),
   dyadic(false, -127, 0x8164d1f3bc030773UL, 0x7be56527bd14def5UL),
   dyadic(false, -127, 0x82cd8698ac2ba1d7UL, 0x3e2a475b46520bffUL),
@@ -1361,7 +1361,7 @@ let exp_t1_2_dyadic : FixedArray[DyadicFloat128] = [
 
 ///|
 /// `EXP_T2_2_DYADIC: [DyadicFloat128; 64]` (pow_tables.rs).
-let exp_t2_2_dyadic : FixedArray[DyadicFloat128] = [
+let exp_t2_2_dyadic : ReadOnlyArray[DyadicFloat128] = [
   dyadic(false, -127, 0x8000000000000000UL, 0x0UL),
   dyadic(false, -127, 0x80058baf7fee3b5dUL, 0x1c718b38e549cb93UL),
   dyadic(false, -127, 0x800b179c82028fd0UL, 0x945e54e2ae18f2f0UL),

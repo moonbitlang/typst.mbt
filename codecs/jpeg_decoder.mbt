@@ -324,7 +324,7 @@ pub fn JpegDecoder::decode_headers(
         self.headers_decoded = true
         // Check if image is RGB: the component ids are 'R', 'G' and 'B'.
         let mut is_rgb = self.components.length() == 3
-        let chars = [b'R', b'G', b'B']
+        let chars = b"RGB"
         for i, comp in self.components {
           if i < 3 {
             is_rgb = is_rgb && comp.id == chars[i].to_int()

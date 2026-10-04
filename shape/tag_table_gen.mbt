@@ -4,1660 +4,1660 @@
 ///|
 priv struct LangTag {
   language : String
-  tag : @otf.Tag
+  tag : UInt
 }
 
 ///|
 /// `OPEN_TYPE_LANGUAGES`, sorted by `language`.
-let open_type_languages : FixedArray[LangTag] = [
-  { language: "aa", tag: @otf.Tag(0x41465220), }, // 'AFR ' Afar
-  { language: "aae", tag: @otf.Tag(0x53514920), }, // 'SQI ' Arbëreshë Albanian -> Albanian
-  { language: "aao", tag: @otf.Tag(0x41524120), }, // 'ARA ' Algerian Saharan Arabic -> Arabic
-  // { language: "aaq", tag: @otf.Tag(0x41415120) }, // 'AAQ ' Eastern Abnaki -> Eastern Abenaki
-  { language: "aat", tag: @otf.Tag(0x53514920), }, // 'SQI ' Arvanitika Albanian -> Albanian
-  { language: "ab", tag: @otf.Tag(0x41424B20), }, // 'ABK ' Abkhazian
-  { language: "aba", tag: @otf.Tag(0), }, // null Abé != Abaza
-  { language: "abh", tag: @otf.Tag(0x41524120), }, // 'ARA ' Tajiki Arabic -> Arabic
-  { language: "abq", tag: @otf.Tag(0x41424120), }, // 'ABA ' Abaza
-  { language: "abs", tag: @otf.Tag(0x43505020), }, // 'CPP ' Ambonese Malay -> Creoles
-  { language: "abv", tag: @otf.Tag(0x41524120), }, // 'ARA ' Baharna Arabic -> Arabic
-  { language: "acf", tag: @otf.Tag(0x46414E20), }, // 'FAN ' Saint Lucian Creole French -> French Antillean
-  { language: "acf", tag: @otf.Tag(0x43505020), }, // 'CPP ' Saint Lucian Creole French -> Creoles
-  // { language: "ach", tag: @otf.Tag(0x41434820) }, // 'ACH ' Acoli -> Acholi
-  { language: "acm", tag: @otf.Tag(0x41524120), }, // 'ARA ' Mesopotamian Arabic -> Arabic
-  { language: "acq", tag: @otf.Tag(0x41524120), }, // 'ARA ' Ta'izzi-Adeni Arabic -> Arabic
-  { language: "acr", tag: @otf.Tag(0x41435220), }, // 'ACR ' Achi
-  { language: "acr", tag: @otf.Tag(0x4D594E20), }, // 'MYN ' Achi -> Mayan
-  { language: "acw", tag: @otf.Tag(0x41524120), }, // 'ARA ' Hijazi Arabic -> Arabic
-  { language: "acx", tag: @otf.Tag(0x41524120), }, // 'ARA ' Omani Arabic -> Arabic
-  { language: "acy", tag: @otf.Tag(0x41435920), }, // 'ACY ' Cypriot Arabic
-  { language: "acy", tag: @otf.Tag(0x41524120), }, // 'ARA ' Cypriot Arabic -> Arabic
-  { language: "ada", tag: @otf.Tag(0x444E4720), }, // 'DNG ' Adangme -> Dangme
-  { language: "adf", tag: @otf.Tag(0x41524120), }, // 'ARA ' Dhofari Arabic -> Arabic
-  { language: "adp", tag: @otf.Tag(0x445A4E20), }, // 'DZN ' Adap(retired code) -> Dzongkha
-  // { language: "ady", tag: @otf.Tag(0x41445920) }, // 'ADY ' Adyghe
-  { language: "aeb", tag: @otf.Tag(0x41524120), }, // 'ARA ' Tunisian Arabic -> Arabic
-  { language: "aec", tag: @otf.Tag(0x41524120), }, // 'ARA ' Saidi Arabic -> Arabic
-  { language: "af", tag: @otf.Tag(0x41464B20), }, // 'AFK ' Afrikaans
-  { language: "afb", tag: @otf.Tag(0x41524120), }, // 'ARA ' Gulf Arabic -> Arabic
-  { language: "afk", tag: @otf.Tag(0), }, // null Nanubae != Afrikaans
-  { language: "afs", tag: @otf.Tag(0x43505020), }, // 'CPP ' Afro-Seminole Creole -> Creoles
-  { language: "agu", tag: @otf.Tag(0x4D594E20), }, // 'MYN ' Aguacateco -> Mayan
-  { language: "agw", tag: @otf.Tag(0), }, // null Kahua != Agaw
-  { language: "ahg", tag: @otf.Tag(0x41475720), }, // 'AGW ' Qimant -> Agaw
-  { language: "aht", tag: @otf.Tag(0x41544820), }, // 'ATH ' Ahtena -> Athapaskan
-  { language: "aig", tag: @otf.Tag(0x43505020), }, // 'CPP ' Antigua and Barbuda Creole English -> Creoles
-  { language: "aii", tag: @otf.Tag(0x53574120), }, // 'SWA ' Assyrian Neo-Aramaic -> Swadaya Aramaic
-  { language: "aii", tag: @otf.Tag(0x53595220), }, // 'SYR ' Assyrian Neo-Aramaic -> Syriac
-  // { language: "aio", tag: @otf.Tag(0x41494F20) }, // 'AIO ' Aiton
-  { language: "aiw", tag: @otf.Tag(0x41524920), }, // 'ARI ' Aari
-  { language: "ajp", tag: @otf.Tag(0x41524120), }, // 'ARA ' South Levantine Arabic(retired code) -> Arabic
-  { language: "ajt", tag: @otf.Tag(0x41524120), }, // 'ARA ' Judeo-Tunisian Arabic(retired code) -> Arabic
-  { language: "ak", tag: @otf.Tag(0x414B4120), }, // 'AKA ' Akan [macrolanguage]
-  { language: "akb", tag: @otf.Tag(0x414B4220), }, // 'AKB ' Batak Angkola
-  { language: "akb", tag: @otf.Tag(0x42544B20), }, // 'BTK ' Batak Angkola -> Batak
-  { language: "aln", tag: @otf.Tag(0x53514920), }, // 'SQI ' Gheg Albanian -> Albanian
-  { language: "als", tag: @otf.Tag(0x53514920), }, // 'SQI ' Tosk Albanian -> Albanian
-  // { language: "alt", tag: @otf.Tag(0x414C5420) }, // 'ALT ' Southern Altai -> Altai
-  { language: "am", tag: @otf.Tag(0x414D4820), }, // 'AMH ' Amharic
-  { language: "amf", tag: @otf.Tag(0x48424E20), }, // 'HBN ' Hamer-Banna -> Hammer-Banna
-  { language: "amw", tag: @otf.Tag(0x53595220), }, // 'SYR ' Western Neo-Aramaic -> Syriac
-  { language: "an", tag: @otf.Tag(0x41524720), }, // 'ARG ' Aragonese
-  // { language: "ang", tag: @otf.Tag(0x414E4720) }, // 'ANG ' Old English (ca. 450-1100) -> Anglo-Saxon
-  { language: "aoa", tag: @otf.Tag(0x43505020), }, // 'CPP ' Angolar -> Creoles
-  { language: "apa", tag: @otf.Tag(0x41544820), }, // 'ATH ' Apache  [collection] -> Athapaskan
-  { language: "apc", tag: @otf.Tag(0x41524120), }, // 'ARA ' Levantine Arabic -> Arabic
-  { language: "apd", tag: @otf.Tag(0x41524120), }, // 'ARA ' Sudanese Arabic -> Arabic
-  { language: "apj", tag: @otf.Tag(0x41544820), }, // 'ATH ' Jicarilla Apache -> Athapaskan
-  { language: "apk", tag: @otf.Tag(0x41544820), }, // 'ATH ' Kiowa Apache -> Athapaskan
-  { language: "apl", tag: @otf.Tag(0x41544820), }, // 'ATH ' Lipan Apache -> Athapaskan
-  { language: "apm", tag: @otf.Tag(0x41544820), }, // 'ATH ' Mescalero-Chiricahua Apache -> Athapaskan
-  { language: "apw", tag: @otf.Tag(0x41544820), }, // 'ATH ' Western Apache -> Athapaskan
-  { language: "ar", tag: @otf.Tag(0x41524120), }, // 'ARA ' Arabic [macrolanguage]
-  { language: "arb", tag: @otf.Tag(0x41524120), }, // 'ARA ' Standard Arabic -> Arabic
-  { language: "ari", tag: @otf.Tag(0), }, // null Arikara != Aari
-  { language: "ark", tag: @otf.Tag(0), }, // null Arikapú != Rakhine
-  { language: "arn", tag: @otf.Tag(0x4D415020), }, // 'MAP ' Mapudungun
-  { language: "arq", tag: @otf.Tag(0x41524120), }, // 'ARA ' Algerian Arabic -> Arabic
-  { language: "ars", tag: @otf.Tag(0x41524120), }, // 'ARA ' Najdi Arabic -> Arabic
-  { language: "ary", tag: @otf.Tag(0x4D4F5220), }, // 'MOR ' Moroccan Arabic -> Moroccan
-  { language: "ary", tag: @otf.Tag(0x41524120), }, // 'ARA ' Moroccan Arabic -> Arabic
-  { language: "arz", tag: @otf.Tag(0x41524120), }, // 'ARA ' Egyptian Arabic -> Arabic
-  { language: "as", tag: @otf.Tag(0x41534D20), }, // 'ASM ' Assamese
-  // { language: "ast", tag: @otf.Tag(0x41535420) }, // 'AST ' Asturian
-  // { language: "ath", tag: @otf.Tag(0x41544820) }, // 'ATH ' Athapascan  [collection] -> Athapaskan
-  { language: "atj", tag: @otf.Tag(0x52435220), }, // 'RCR ' Atikamekw -> R-Cree
-  // { language: "ats", tag: @otf.Tag(0x41545320) }, // 'ATS ' Gros Ventre (Atsina)
-  { language: "atv", tag: @otf.Tag(0x414C5420), }, // 'ALT ' Northern Altai -> Altai
-  { language: "auj", tag: @otf.Tag(0x42425220), }, // 'BBR ' Awjilah -> Berber
-  { language: "auz", tag: @otf.Tag(0x41524120), }, // 'ARA ' Uzbeki Arabic -> Arabic
-  { language: "av", tag: @otf.Tag(0x41565220), }, // 'AVR ' Avaric -> Avar
-  { language: "avl", tag: @otf.Tag(0x41524120), }, // 'ARA ' Eastern Egyptian Bedawi Arabic -> Arabic
-  // { language: "avn", tag: @otf.Tag(0x41564E20) }, // 'AVN ' Avatime
-  // { language: "awa", tag: @otf.Tag(0x41574120) }, // 'AWA ' Awadhi
-  { language: "ay", tag: @otf.Tag(0x41594D20), }, // 'AYM ' Aymara [macrolanguage]
-  { language: "ayc", tag: @otf.Tag(0x41594D20), }, // 'AYM ' Southern Aymara -> Aymara
-  { language: "ayh", tag: @otf.Tag(0x41524120), }, // 'ARA ' Hadrami Arabic -> Arabic
-  { language: "ayl", tag: @otf.Tag(0x41524120), }, // 'ARA ' Libyan Arabic -> Arabic
-  { language: "ayn", tag: @otf.Tag(0x41524120), }, // 'ARA ' Sanaani Arabic -> Arabic
-  { language: "ayp", tag: @otf.Tag(0x41524120), }, // 'ARA ' North Mesopotamian Arabic -> Arabic
-  { language: "ayr", tag: @otf.Tag(0x41594D20), }, // 'AYM ' Central Aymara -> Aymara
-  { language: "az", tag: @otf.Tag(0x415A4520), }, // 'AZE ' Azerbaijani [macrolanguage]
-  { language: "azb", tag: @otf.Tag(0x415A4220), }, // 'AZB ' South Azerbaijani -> Torki
-  { language: "azb", tag: @otf.Tag(0x415A4520), }, // 'AZE ' South Azerbaijani -> Azerbaijani
-  { language: "azd", tag: @otf.Tag(0x4E414820), }, // 'NAH ' Eastern Durango Nahuatl -> Nahuatl
-  { language: "azj", tag: @otf.Tag(0x415A4520), }, // 'AZE ' North Azerbaijani -> Azerbaijani
-  { language: "azn", tag: @otf.Tag(0x4E414820), }, // 'NAH ' Western Durango Nahuatl -> Nahuatl
-  { language: "azz", tag: @otf.Tag(0x4E414820), }, // 'NAH ' Highland Puebla Nahuatl -> Nahuatl
-  { language: "ba", tag: @otf.Tag(0x42534820), }, // 'BSH ' Bashkir
-  { language: "bad", tag: @otf.Tag(0x42414430), }, // 'BAD0' Banda  [collection]
-  { language: "bag", tag: @otf.Tag(0), }, // null Tuki != Baghelkhandi
-  { language: "bah", tag: @otf.Tag(0x43505020), }, // 'CPP ' Bahamas Creole English -> Creoles
-  { language: "bai", tag: @otf.Tag(0x424D4C20), }, // 'BML ' Bamileke  [collection]
-  { language: "bal", tag: @otf.Tag(0x424C4920), }, // 'BLI ' Baluchi [macrolanguage]
-  // { language: "ban", tag: @otf.Tag(0x42414E20) }, // 'BAN ' Balinese
-  // { language: "bar", tag: @otf.Tag(0x42415220) }, // 'BAR ' Bavarian
-  { language: "bau", tag: @otf.Tag(0), }, // null Bada (Nigeria) != Baulé
-  { language: "bbc", tag: @otf.Tag(0x42424320), }, // 'BBC ' Batak Toba
-  { language: "bbc", tag: @otf.Tag(0x42544B20), }, // 'BTK ' Batak Toba -> Batak
-  { language: "bbj", tag: @otf.Tag(0x424D4C20), }, // 'BML ' Ghomálá' -> Bamileke
-  { language: "bbp", tag: @otf.Tag(0x42414430), }, // 'BAD0' West Central Banda -> Banda
-  { language: "bbr", tag: @otf.Tag(0), }, // null Girawa != Berber
-  { language: "bbz", tag: @otf.Tag(0x41524120), }, // 'ARA ' Babalia Creole Arabic(retired code) -> Arabic
-  { language: "bcc", tag: @otf.Tag(0x424C4920), }, // 'BLI ' Southern Balochi -> Baluchi
-  { language: "bch", tag: @otf.Tag(0), }, // null Bariai != Bench
-  { language: "bci", tag: @otf.Tag(0x42415520), }, // 'BAU ' Baoulé -> Baulé
-  { language: "bcl", tag: @otf.Tag(0x42494B20), }, // 'BIK ' Central Bikol -> Bikol
-  { language: "bcq", tag: @otf.Tag(0x42434820), }, // 'BCH ' Bench
-  { language: "bcr", tag: @otf.Tag(0x41544820), }, // 'ATH ' Babine -> Athapaskan
-  // { language: "bdc", tag: @otf.Tag(0x42444320) }, // 'BDC ' Emberá-Baudó
-  // { language: "bdy", tag: @otf.Tag(0x42445920) }, // 'BDY ' Bandjalang
-  { language: "be", tag: @otf.Tag(0x42454C20), }, // 'BEL ' Belarusian
-  { language: "bea", tag: @otf.Tag(0x41544820), }, // 'ATH ' Beaver -> Athapaskan
-  { language: "beb", tag: @otf.Tag(0x42544920), }, // 'BTI ' Bebele -> Beti
-  // { language: "bem", tag: @otf.Tag(0x42454D20) }, // 'BEM ' Bemba (Zambia)
-  { language: "ber", tag: @otf.Tag(0x42425220), }, // 'BBR ' Berber  [collection]
-  { language: "bew", tag: @otf.Tag(0x43505020), }, // 'CPP ' Betawi -> Creoles
-  { language: "bfl", tag: @otf.Tag(0x42414430), }, // 'BAD0' Banda-Ndélé -> Banda
-  { language: "bfq", tag: @otf.Tag(0x42414420), }, // 'BAD ' Badaga
-  { language: "bft", tag: @otf.Tag(0x424C5420), }, // 'BLT ' Balti
-  { language: "bfu", tag: @otf.Tag(0x4C414820), }, // 'LAH ' Gahri -> Lahuli
-  { language: "bfy", tag: @otf.Tag(0x42414720), }, // 'BAG ' Bagheli -> Baghelkhandi
-  { language: "bg", tag: @otf.Tag(0x42475220), }, // 'BGR ' Bulgarian
-  // { language: "bgc", tag: @otf.Tag(0x42474320) }, // 'BGC ' Haryanvi
-  { language: "bgn", tag: @otf.Tag(0x424C4920), }, // 'BLI ' Western Balochi -> Baluchi
-  { language: "bgp", tag: @otf.Tag(0x424C4920), }, // 'BLI ' Eastern Balochi -> Baluchi
-  { language: "bgq", tag: @otf.Tag(0x42475120), }, // 'BGQ ' Bagri
-  { language: "bgq", tag: @otf.Tag(0x52414A20), }, // 'RAJ ' Bagri -> Rajasthani
-  { language: "bgr", tag: @otf.Tag(0x51494E20), }, // 'QIN ' Bawm Chin -> Chin
-  { language: "bhb", tag: @otf.Tag(0x42484920), }, // 'BHI ' Bhili
-  // { language: "bhi", tag: @otf.Tag(0x42484920) }, // 'BHI ' Bhilali -> Bhili
-  { language: "bhk", tag: @otf.Tag(0x42494B20), }, // 'BIK ' Albay Bicolano(retired code) -> Bikol
-  // { language: "bho", tag: @otf.Tag(0x42484F20) }, // 'BHO ' Bhojpuri
-  { language: "bhr", tag: @otf.Tag(0x4D4C4720), }, // 'MLG ' Bara Malagasy -> Malagasy
-  { language: "bi", tag: @otf.Tag(0x42495320), }, // 'BIS ' Bislama
-  { language: "bi", tag: @otf.Tag(0x43505020), }, // 'CPP ' Bislama -> Creoles
-  // { language: "bik", tag: @otf.Tag(0x42494B20) }, // 'BIK ' Bikol [macrolanguage]
-  { language: "bil", tag: @otf.Tag(0), }, // null Bile != Bilen
-  { language: "bin", tag: @otf.Tag(0x45444F20), }, // 'EDO ' Edo
-  { language: "biu", tag: @otf.Tag(0x51494E20), }, // 'QIN ' Biete -> Chin
-  // { language: "bjj", tag: @otf.Tag(0x424A4A20) }, // 'BJJ ' Kanauji
-  { language: "bjn", tag: @otf.Tag(0x4D4C5920), }, // 'MLY ' Banjar -> Malay
-  { language: "bjo", tag: @otf.Tag(0x42414430), }, // 'BAD0' Mid-Southern Banda -> Banda
-  { language: "bjq", tag: @otf.Tag(0x4D4C4720), }, // 'MLG ' Southern Betsimisaraka Malagasy(retired code) -> Malagasy
-  { language: "bjs", tag: @otf.Tag(0x43505020), }, // 'CPP ' Bajan -> Creoles
-  { language: "bjt", tag: @otf.Tag(0x424C4E20), }, // 'BLN ' Balanta-Ganja -> Balante
-  { language: "bkf", tag: @otf.Tag(0), }, // null Beeke != Blackfoot
-  { language: "bko", tag: @otf.Tag(0x424D4C20), }, // 'BML ' Kwa' -> Bamileke
-  { language: "bla", tag: @otf.Tag(0x424B4620), }, // 'BKF ' Siksika -> Blackfoot
-  { language: "ble", tag: @otf.Tag(0x424C4E20), }, // 'BLN ' Balanta-Kentohe -> Balante
-  { language: "blg", tag: @otf.Tag(0x49424120), }, // 'IBA ' Balau(retired code) -> Iban
-  { language: "bli", tag: @otf.Tag(0), }, // null Bolia != Baluchi
-  { language: "blk", tag: @otf.Tag(0x424C4B20), }, // 'BLK ' Pa’o Karen
-  { language: "blk", tag: @otf.Tag(0x4B524E20), }, // 'KRN ' Pa'o Karen -> Karen
-  { language: "bln", tag: @otf.Tag(0x42494B20), }, // 'BIK ' Southern Catanduanes Bikol -> Bikol
-  { language: "blt", tag: @otf.Tag(0), }, // null Tai Dam != Balti
-  { language: "bm", tag: @otf.Tag(0x424D4220), }, // 'BMB ' Bambara (Bamanankan)
-  { language: "bmb", tag: @otf.Tag(0), }, // null Bembe != Bambara (Bamanankan)
-  { language: "bml", tag: @otf.Tag(0), }, // null Bomboli != Bamileke
-  { language: "bmm", tag: @otf.Tag(0x4D4C4720), }, // 'MLG ' Northern Betsimisaraka Malagasy -> Malagasy
-  { language: "bn", tag: @otf.Tag(0x42454E20), }, // 'BEN ' Bangla
-  { language: "bo", tag: @otf.Tag(0x54494220), }, // 'TIB ' Tibetan
-  { language: "bpd", tag: @otf.Tag(0x42414430), }, // 'BAD0' Banda-Banda -> Banda
-  { language: "bpl", tag: @otf.Tag(0x43505020), }, // 'CPP ' Broome Pearling Lugger Pidgin -> Creoles
-  { language: "bpq", tag: @otf.Tag(0x43505020), }, // 'CPP ' Banda Malay -> Creoles
-  // { language: "bpy", tag: @otf.Tag(0x42505920) }, // 'BPY ' Bishnupriya -> Bishnupriya Manipuri
-  { language: "bqi", tag: @otf.Tag(0x4C524320), }, // 'LRC ' Bakhtiari -> Luri
-  { language: "bqk", tag: @otf.Tag(0x42414430), }, // 'BAD0' Banda-Mbrès -> Banda
-  { language: "br", tag: @otf.Tag(0x42524520), }, // 'BRE ' Breton
-  { language: "bra", tag: @otf.Tag(0x42524920), }, // 'BRI ' Braj -> Braj Bhasha
-  { language: "brc", tag: @otf.Tag(0x43505020), }, // 'CPP ' Berbice Creole Dutch -> Creoles
-  // { language: "brh", tag: @otf.Tag(0x42524820) }, // 'BRH ' Brahui
-  { language: "bri", tag: @otf.Tag(0), }, // null Mokpwe != Braj Bhasha
-  { language: "brm", tag: @otf.Tag(0), }, // null Barambu != Burmese
-  // { language: "brx", tag: @otf.Tag(0x42525820) }, // 'BRX ' Bodo (India)
-  { language: "bs", tag: @otf.Tag(0x424F5320), }, // 'BOS ' Bosnian
-  { language: "bsh", tag: @otf.Tag(0), }, // null Kati != Bashkir
-  // { language: "bsk", tag: @otf.Tag(0x42534B20) }, // 'BSK ' Burushaski
-  { language: "btb", tag: @otf.Tag(0x42544920), }, // 'BTI ' Beti (Cameroon)(retired code)
-  { language: "btd", tag: @otf.Tag(0x42544420), }, // 'BTD ' Batak Dairi (Pakpak)
-  { language: "btd", tag: @otf.Tag(0x42544B20), }, // 'BTK ' Batak Dairi -> Batak
-  { language: "bti", tag: @otf.Tag(0), }, // null Burate != Beti
-  { language: "btj", tag: @otf.Tag(0x4D4C5920), }, // 'MLY ' Bacanese Malay -> Malay
-  // { language: "btk", tag: @otf.Tag(0x42544B20) }, // 'BTK ' Batak  [collection]
-  { language: "btm", tag: @otf.Tag(0x42544D20), }, // 'BTM ' Batak Mandailing
-  { language: "btm", tag: @otf.Tag(0x42544B20), }, // 'BTK ' Batak Mandailing -> Batak
-  { language: "bto", tag: @otf.Tag(0x42494B20), }, // 'BIK ' Rinconada Bikol -> Bikol
-  { language: "bts", tag: @otf.Tag(0x42545320), }, // 'BTS ' Batak Simalungun
-  { language: "bts", tag: @otf.Tag(0x42544B20), }, // 'BTK ' Batak Simalungun -> Batak
-  { language: "btx", tag: @otf.Tag(0x42545820), }, // 'BTX ' Batak Karo
-  { language: "btx", tag: @otf.Tag(0x42544B20), }, // 'BTK ' Batak Karo -> Batak
-  { language: "btz", tag: @otf.Tag(0x42545A20), }, // 'BTZ ' Batak Alas-Kluet
-  { language: "btz", tag: @otf.Tag(0x42544B20), }, // 'BTK ' Batak Alas-Kluet -> Batak
-  // { language: "bug", tag: @otf.Tag(0x42554720) }, // 'BUG ' Buginese -> Bugis
-  { language: "bum", tag: @otf.Tag(0x42544920), }, // 'BTI ' Bulu (Cameroon) -> Beti
-  { language: "bve", tag: @otf.Tag(0x4D4C5920), }, // 'MLY ' Berau Malay -> Malay
-  { language: "bvu", tag: @otf.Tag(0x4D4C5920), }, // 'MLY ' Bukit Malay -> Malay
-  { language: "bwe", tag: @otf.Tag(0x4B524E20), }, // 'KRN ' Bwe Karen -> Karen
-  { language: "bxk", tag: @otf.Tag(0x4C554820), }, // 'LUH ' Bukusu -> Luyia
-  { language: "bxo", tag: @otf.Tag(0x43505020), }, // 'CPP ' Barikanchi -> Creoles
-  { language: "bxp", tag: @otf.Tag(0x42544920), }, // 'BTI ' Bebil -> Beti
-  { language: "bxr", tag: @otf.Tag(0x52425520), }, // 'RBU ' Russia Buriat -> Russian Buriat
-  { language: "byn", tag: @otf.Tag(0x42494C20), }, // 'BIL ' Bilin -> Bilen
-  { language: "byv", tag: @otf.Tag(0x42595620), }, // 'BYV ' Medumba
-  { language: "byv", tag: @otf.Tag(0x424D4C20), }, // 'BML ' Medumba -> Bamileke
-  { language: "bzc", tag: @otf.Tag(0x4D4C4720), }, // 'MLG ' Southern Betsimisaraka Malagasy -> Malagasy
-  { language: "bzj", tag: @otf.Tag(0x43505020), }, // 'CPP ' Belize Kriol English -> Creoles
-  { language: "bzk", tag: @otf.Tag(0x43505020), }, // 'CPP ' Nicaragua Creole English -> Creoles
-  { language: "ca", tag: @otf.Tag(0x43415420), }, // 'CAT ' Catalan
-  { language: "caa", tag: @otf.Tag(0x4D594E20), }, // 'MYN ' Chortí -> Mayan
-  { language: "cac", tag: @otf.Tag(0x4D594E20), }, // 'MYN ' Chuj -> Mayan
-  { language: "caf", tag: @otf.Tag(0x43525220), }, // 'CRR ' Southern Carrier -> Carrier
-  { language: "caf", tag: @otf.Tag(0x41544820), }, // 'ATH ' Southern Carrier -> Athapaskan
-  { language: "cak", tag: @otf.Tag(0x43414B20), }, // 'CAK ' Kaqchikel
-  { language: "cak", tag: @otf.Tag(0x4D594E20), }, // 'MYN ' Kaqchikel -> Mayan
-  // { language: "cay", tag: @otf.Tag(0x43415920) }, // 'CAY ' Cayuga
-  // { language: "cbg", tag: @otf.Tag(0x43424720) }, // 'CBG ' Chimila
-  { language: "cbk", tag: @otf.Tag(0x43424B20), }, // 'CBK ' Chavacano -> Zamboanga Chavacano
-  { language: "cbk", tag: @otf.Tag(0x43505020), }, // 'CPP ' Chavacano -> Creoles
-  { language: "cbl", tag: @otf.Tag(0x51494E20), }, // 'QIN ' Bualkhaw Chin -> Chin
-  { language: "ccl", tag: @otf.Tag(0x43505020), }, // 'CPP ' Cutchi-Swahili -> Creoles
-  { language: "ccm", tag: @otf.Tag(0x43505020), }, // 'CPP ' Malaccan Creole Malay -> Creoles
-  { language: "cco", tag: @otf.Tag(0x4343484E), }, // 'CCHN' Comaltepec Chinantec -> Chinantec
-  { language: "ccq", tag: @otf.Tag(0x41524B20), }, // 'ARK ' Chaungtha(retired code) -> Rakhine
-  { language: "cdo", tag: @otf.Tag(0x5A485320), }, // 'ZHS ' Min Dong Chinese -> Chinese, Simplified
-  { language: "ce", tag: @otf.Tag(0x43484520), }, // 'CHE ' Chechen
-  // { language: "ceb", tag: @otf.Tag(0x43454220) }, // 'CEB ' Cebuano
-  { language: "cek", tag: @otf.Tag(0x51494E20), }, // 'QIN ' Eastern Khumi Chin -> Chin
-  { language: "cey", tag: @otf.Tag(0x51494E20), }, // 'QIN ' Ekai Chin -> Chin
-  { language: "cfm", tag: @otf.Tag(0x48414C20), }, // 'HAL ' Halam (Falam Chin)
-  { language: "cfm", tag: @otf.Tag(0x51494E20), }, // 'QIN ' Falam Chin -> Chin
-  // { language: "cgg", tag: @otf.Tag(0x43474720) }, // 'CGG ' Chiga
-  { language: "ch", tag: @otf.Tag(0x43484120), }, // 'CHA ' Chamorro
-  { language: "chf", tag: @otf.Tag(0x4D594E20), }, // 'MYN ' Tabasco Chontal -> Mayan
-  { language: "chg", tag: @otf.Tag(0), }, // null Chagatai != Chaha Gurage
-  { language: "chh", tag: @otf.Tag(0), }, // null Chinook != Chattisgarhi
-  { language: "chj", tag: @otf.Tag(0x4343484E), }, // 'CCHN' Ojitlán Chinantec -> Chinantec
-  { language: "chk", tag: @otf.Tag(0x43484B30), }, // 'CHK0' Chuukese
-  { language: "chm", tag: @otf.Tag(0x484D4120), }, // 'HMA ' Mari (Russia) [macrolanguage] -> High Mari
-  { language: "chm", tag: @otf.Tag(0x4C4D4120), }, // 'LMA ' Mari (Russia) [macrolanguage] -> Low Mari
-  { language: "chn", tag: @otf.Tag(0x43505020), }, // 'CPP ' Chinook jargon -> Creoles
-  // { language: "cho", tag: @otf.Tag(0x43484F20) }, // 'CHO ' Choctaw
-  { language: "chp", tag: @otf.Tag(0x43485020), }, // 'CHP ' Chipewyan
-  { language: "chp", tag: @otf.Tag(0x53415920), }, // 'SAY ' Chipewyan -> Sayisi
-  { language: "chp", tag: @otf.Tag(0x41544820), }, // 'ATH ' Chipewyan -> Athapaskan
-  { language: "chq", tag: @otf.Tag(0x4343484E), }, // 'CCHN' Quiotepec Chinantec -> Chinantec
-  // { language: "chr", tag: @otf.Tag(0x43485220) }, // 'CHR ' Cherokee
-  // { language: "chy", tag: @otf.Tag(0x43485920) }, // 'CHY ' Cheyenne
-  { language: "chz", tag: @otf.Tag(0x4343484E), }, // 'CCHN' Ozumacín Chinantec -> Chinantec
-  { language: "ciw", tag: @otf.Tag(0x4F4A4220), }, // 'OJB ' Chippewa -> Ojibway
-  // { language: "cja", tag: @otf.Tag(0x434A4120) }, // 'CJA ' Western Cham
-  // { language: "cjm", tag: @otf.Tag(0x434A4D20) }, // 'CJM ' Eastern Cham
-  { language: "cjy", tag: @otf.Tag(0x5A485320), }, // 'ZHS ' Jinyu Chinese -> Chinese, Simplified
-  { language: "cka", tag: @otf.Tag(0x51494E20), }, // 'QIN ' Khumi Awa Chin(retired code) -> Chin
-  { language: "ckb", tag: @otf.Tag(0x4B555220), }, // 'KUR ' Central Kurdish -> Kurdish
-  { language: "ckn", tag: @otf.Tag(0x51494E20), }, // 'QIN ' Kaang Chin -> Chin
-  { language: "cks", tag: @otf.Tag(0x43505020), }, // 'CPP ' Tayo -> Creoles
-  { language: "ckt", tag: @otf.Tag(0x43484B20), }, // 'CHK ' Chukot -> Chukchi
-  { language: "ckz", tag: @otf.Tag(0x4D594E20), }, // 'MYN ' Cakchiquel-Quiché Mixed Language -> Mayan
-  { language: "clc", tag: @otf.Tag(0x41544820), }, // 'ATH ' Chilcotin -> Athapaskan
-  { language: "cld", tag: @otf.Tag(0x53595220), }, // 'SYR ' Chaldean Neo-Aramaic -> Syriac
-  { language: "cle", tag: @otf.Tag(0x4343484E), }, // 'CCHN' Lealao Chinantec -> Chinantec
-  { language: "clj", tag: @otf.Tag(0x51494E20), }, // 'QIN ' Laitu Chin -> Chin
-  { language: "cls", tag: @otf.Tag(0x53414E20), }, // 'SAN ' Classical Sanskrit -> Sanskrit
-  { language: "clt", tag: @otf.Tag(0x51494E20), }, // 'QIN ' Lautu Chin -> Chin
-  // { language: "cmi", tag: @otf.Tag(0x434D4920) }, // 'CMI ' Emberá-Chamí
-  { language: "cmn", tag: @otf.Tag(0x5A485320), }, // 'ZHS ' Mandarin Chinese -> Chinese, Simplified
-  { language: "cmr", tag: @otf.Tag(0x51494E20), }, // 'QIN ' Mro-Khimi Chin -> Chin
-  { language: "cnb", tag: @otf.Tag(0x51494E20), }, // 'QIN ' Chinbon Chin -> Chin
-  { language: "cnh", tag: @otf.Tag(0x51494E20), }, // 'QIN ' Hakha Chin -> Chin
-  { language: "cnk", tag: @otf.Tag(0x51494E20), }, // 'QIN ' Khumi Chin -> Chin
-  { language: "cnl", tag: @otf.Tag(0x4343484E), }, // 'CCHN' Lalana Chinantec -> Chinantec
-  { language: "cnp", tag: @otf.Tag(0x5A485320), }, // 'ZHS ' Northern Ping Chinese -> Chinese, Simplified
-  { language: "cnr", tag: @otf.Tag(0x53524220), }, // 'SRB ' Montenegrin -> Serbian
-  { language: "cnt", tag: @otf.Tag(0x4343484E), }, // 'CCHN' Tepetotutla Chinantec -> Chinantec
-  { language: "cnu", tag: @otf.Tag(0x42425220), }, // 'BBR ' Chenoua -> Berber
-  { language: "cnw", tag: @otf.Tag(0x51494E20), }, // 'QIN ' Ngawn Chin -> Chin
-  { language: "co", tag: @otf.Tag(0x434F5320), }, // 'COS ' Corsican
-  { language: "coa", tag: @otf.Tag(0x4D4C5920), }, // 'MLY ' Cocos Islands Malay -> Malay
-  { language: "cob", tag: @otf.Tag(0x4D594E20), }, // 'MYN ' Chicomuceltec -> Mayan
-  // { language: "coo", tag: @otf.Tag(0x434F4F20) }, // 'COO ' Comox
-  // { language: "cop", tag: @otf.Tag(0x434F5020) }, // 'COP ' Coptic
-  { language: "coq", tag: @otf.Tag(0x41544820), }, // 'ATH ' Coquille -> Athapaskan
-  { language: "cpa", tag: @otf.Tag(0x4343484E), }, // 'CCHN' Palantla Chinantec -> Chinantec
-  { language: "cpe", tag: @otf.Tag(0x43505020), }, // 'CPP ' English-based creoles and pidgins [collection] -> Creoles
-  { language: "cpf", tag: @otf.Tag(0x43505020), }, // 'CPP ' French-based creoles and pidgins [collection] -> Creoles
-  { language: "cpi", tag: @otf.Tag(0x43505020), }, // 'CPP ' Chinese Pidgin English -> Creoles
-  // { language: "cpp", tag: @otf.Tag(0x43505020) }, // 'CPP ' Portuguese-based creoles and pidgins [collection] -> Creoles
-  { language: "cpx", tag: @otf.Tag(0x5A485320), }, // 'ZHS ' Pu-Xian Chinese -> Chinese, Simplified
-  { language: "cqd", tag: @otf.Tag(0x484D4E20), }, // 'HMN ' Chuanqiandian Cluster Miao -> Hmong
-  { language: "cqu", tag: @otf.Tag(0x51554820), }, // 'QUH ' Chilean Quechua(retired code) -> Quechua (Bolivia)
-  { language: "cqu", tag: @otf.Tag(0x51555A20), }, // 'QUZ ' Chilean Quechua(retired code) -> Quechua
-  { language: "cr", tag: @otf.Tag(0x43524520), }, // 'CRE ' Cree [macrolanguage]
-  { language: "crh", tag: @otf.Tag(0x43525420), }, // 'CRT ' Crimean Tatar
-  { language: "cri", tag: @otf.Tag(0x43505020), }, // 'CPP ' Sãotomense -> Creoles
-  { language: "crj", tag: @otf.Tag(0x45435220), }, // 'ECR ' Southern East Cree -> Eastern Cree
-  { language: "crj", tag: @otf.Tag(0x59435220), }, // 'YCR ' Southern East Cree -> Y-Cree
-  { language: "crj", tag: @otf.Tag(0x43524520), }, // 'CRE ' Southern East Cree -> Cree
-  { language: "crk", tag: @otf.Tag(0x57435220), }, // 'WCR ' Plains Cree -> West-Cree
-  { language: "crk", tag: @otf.Tag(0x59435220), }, // 'YCR ' Plains Cree -> Y-Cree
-  { language: "crk", tag: @otf.Tag(0x43524520), }, // 'CRE ' Plains Cree -> Cree
-  { language: "crl", tag: @otf.Tag(0x45435220), }, // 'ECR ' Northern East Cree -> Eastern Cree
-  { language: "crl", tag: @otf.Tag(0x59435220), }, // 'YCR ' Northern East Cree -> Y-Cree
-  { language: "crl", tag: @otf.Tag(0x43524520), }, // 'CRE ' Northern East Cree -> Cree
-  { language: "crm", tag: @otf.Tag(0x4D435220), }, // 'MCR ' Moose Cree
-  { language: "crm", tag: @otf.Tag(0x4C435220), }, // 'LCR ' Moose Cree -> L-Cree
-  { language: "crm", tag: @otf.Tag(0x43524520), }, // 'CRE ' Moose Cree -> Cree
-  { language: "crp", tag: @otf.Tag(0x43505020), }, // 'CPP ' Creoles and pidgins [collection] -> Creoles
-  { language: "crr", tag: @otf.Tag(0), }, // null Carolina Algonquian != Carrier
-  { language: "crs", tag: @otf.Tag(0x43505020), }, // 'CPP ' Seselwa Creole French -> Creoles
-  { language: "crt", tag: @otf.Tag(0), }, // null Iyojwa'ja Chorote != Crimean Tatar
-  { language: "crx", tag: @otf.Tag(0x43525220), }, // 'CRR ' Carrier
-  { language: "crx", tag: @otf.Tag(0x41544820), }, // 'ATH ' Carrier -> Athapaskan
-  { language: "cs", tag: @otf.Tag(0x43535920), }, // 'CSY ' Czech
-  { language: "csa", tag: @otf.Tag(0x4343484E), }, // 'CCHN' Chiltepec Chinantec -> Chinantec
-  // { language: "csb", tag: @otf.Tag(0x43534220) }, // 'CSB ' Kashubian
-  { language: "csh", tag: @otf.Tag(0x51494E20), }, // 'QIN ' Asho Chin -> Chin
-  { language: "csj", tag: @otf.Tag(0x51494E20), }, // 'QIN ' Songlai Chin -> Chin
-  { language: "csl", tag: @otf.Tag(0), }, // null Chinese Sign Language != Church Slavonic
-  { language: "cso", tag: @otf.Tag(0x4343484E), }, // 'CCHN' Sochiapam Chinantec -> Chinantec
-  { language: "csp", tag: @otf.Tag(0x5A485320), }, // 'ZHS ' Southern Ping Chinese -> Chinese, Simplified
-  { language: "csv", tag: @otf.Tag(0x51494E20), }, // 'QIN ' Sumtu Chin -> Chin
-  { language: "csw", tag: @otf.Tag(0x4E435220), }, // 'NCR ' Swampy Cree -> N-Cree
-  { language: "csw", tag: @otf.Tag(0x4E484320), }, // 'NHC ' Swampy Cree -> Norway House Cree
-  { language: "csw", tag: @otf.Tag(0x43524520), }, // 'CRE ' Swampy Cree -> Cree
-  { language: "csy", tag: @otf.Tag(0x51494E20), }, // 'QIN ' Siyin Chin -> Chin
-  { language: "ctc", tag: @otf.Tag(0x41544820), }, // 'ATH ' Chetco -> Athapaskan
-  { language: "ctd", tag: @otf.Tag(0x51494E20), }, // 'QIN ' Tedim Chin -> Chin
-  { language: "cte", tag: @otf.Tag(0x4343484E), }, // 'CCHN' Tepinapa Chinantec -> Chinantec
-  // { language: "ctg", tag: @otf.Tag(0x43544720) }, // 'CTG ' Chittagonian
-  { language: "cth", tag: @otf.Tag(0x51494E20), }, // 'QIN ' Thaiphum Chin -> Chin
-  { language: "ctl", tag: @otf.Tag(0x4343484E), }, // 'CCHN' Tlacoatzintepec Chinantec -> Chinantec
-  // { language: "cto", tag: @otf.Tag(0x43544F20) }, // 'CTO ' Emberá-Catío
-  { language: "cts", tag: @otf.Tag(0x42494B20), }, // 'BIK ' Northern Catanduanes Bikol -> Bikol
-  // { language: "ctt", tag: @otf.Tag(0x43545420) }, // 'CTT ' Wayanad Chetti
-  { language: "ctu", tag: @otf.Tag(0x4D594E20), }, // 'MYN ' Chol -> Mayan
-  { language: "cu", tag: @otf.Tag(0x43534C20), }, // 'CSL ' Church Slavonic
-  { language: "cuc", tag: @otf.Tag(0x4343484E), }, // 'CCHN' Usila Chinantec -> Chinantec
-  // { language: "cuk", tag: @otf.Tag(0x43554B20) }, // 'CUK ' San Blas Kuna
-  { language: "cv", tag: @otf.Tag(0x43485520), }, // 'CHU ' Chuvash
-  { language: "cvn", tag: @otf.Tag(0x4343484E), }, // 'CCHN' Valle Nacional Chinantec -> Chinantec
-  { language: "cwd", tag: @otf.Tag(0x44435220), }, // 'DCR ' Woods Cree
-  { language: "cwd", tag: @otf.Tag(0x54435220), }, // 'TCR ' Woods Cree -> TH-Cree
-  { language: "cwd", tag: @otf.Tag(0x43524520), }, // 'CRE ' Woods Cree -> Cree
-  { language: "cy", tag: @otf.Tag(0x57454C20), }, // 'WEL ' Welsh
-  { language: "czh", tag: @otf.Tag(0x5A485320), }, // 'ZHS ' Huizhou Chinese -> Chinese, Simplified
-  { language: "czo", tag: @otf.Tag(0x5A485320), }, // 'ZHS ' Min Zhong Chinese -> Chinese, Simplified
-  { language: "czt", tag: @otf.Tag(0x51494E20), }, // 'QIN ' Zotung Chin -> Chin
-  { language: "da", tag: @otf.Tag(0x44414E20), }, // 'DAN ' Danish
-  // { language: "dag", tag: @otf.Tag(0x44414720) }, // 'DAG ' Dagbani
-  { language: "dao", tag: @otf.Tag(0x51494E20), }, // 'QIN ' Daai Chin -> Chin
-  { language: "dap", tag: @otf.Tag(0x4E495320), }, // 'NIS ' Nisi (India)(retired code)
-  // { language: "dar", tag: @otf.Tag(0x44415220) }, // 'DAR ' Dargwa
-  // { language: "dax", tag: @otf.Tag(0x44415820) }, // 'DAX ' Dayi
-  { language: "dcr", tag: @otf.Tag(0x43505020), }, // 'CPP ' Negerhollands -> Creoles
-  { language: "de", tag: @otf.Tag(0x44455520), }, // 'DEU ' German
-  { language: "den", tag: @otf.Tag(0x534C4120), }, // 'SLA ' Slave (Athapascan) [macrolanguage] -> Slavey
-  { language: "den", tag: @otf.Tag(0x41544820), }, // 'ATH ' Slave (Athapascan) [macrolanguage] -> Athapaskan
-  { language: "dep", tag: @otf.Tag(0x43505020), }, // 'CPP ' Pidgin Delaware -> Creoles
-  { language: "dgo", tag: @otf.Tag(0x44474F20), }, // 'DGO ' Dogri (individual language)
-  { language: "dgo", tag: @otf.Tag(0x44475220), }, // 'DGR ' Dogri (macrolanguage)
-  { language: "dgr", tag: @otf.Tag(0x41544820), }, // 'ATH ' Tlicho -> Athapaskan
-  { language: "dhd", tag: @otf.Tag(0x4D415720), }, // 'MAW ' Dhundari -> Marwari
-  // { language: "dhg", tag: @otf.Tag(0x44484720) }, // 'DHG ' Dhangu
-  { language: "dhv", tag: @otf.Tag(0), }, // null Dehu != Divehi (Dhivehi, Maldivian)(deprecated)
-  { language: "dib", tag: @otf.Tag(0x444E4B20), }, // 'DNK ' South Central Dinka -> Dinka
-  { language: "dik", tag: @otf.Tag(0x444E4B20), }, // 'DNK ' Southwestern Dinka -> Dinka
-  { language: "din", tag: @otf.Tag(0x444E4B20), }, // 'DNK ' Dinka [macrolanguage]
-  { language: "dip", tag: @otf.Tag(0x444E4B20), }, // 'DNK ' Northeastern Dinka -> Dinka
-  { language: "diq", tag: @otf.Tag(0x44495120), }, // 'DIQ ' Dimli 
-  { language: "diq", tag: @otf.Tag(0x5A5A4120), }, // 'ZZA ' Dimli  -> Zazaki
-  { language: "diw", tag: @otf.Tag(0x444E4B20), }, // 'DNK ' Northwestern Dinka -> Dinka
-  { language: "dje", tag: @otf.Tag(0x444A5220), }, // 'DJR ' Zarma
-  { language: "djk", tag: @otf.Tag(0x43505020), }, // 'CPP ' Eastern Maroon Creole -> Creoles
-  { language: "djr", tag: @otf.Tag(0x444A5230), }, // 'DJR0' Djambarrpuyngu
-  { language: "dks", tag: @otf.Tag(0x444E4B20), }, // 'DNK ' Southeastern Dinka -> Dinka
-  { language: "dng", tag: @otf.Tag(0x44554E20), }, // 'DUN ' Dungan
-  // { language: "dnj", tag: @otf.Tag(0x444E4A20) }, // 'DNJ ' Dan
-  { language: "dnk", tag: @otf.Tag(0), }, // null Dengka != Dinka
-  { language: "doi", tag: @otf.Tag(0x44475220), }, // 'DGR ' Dogri (macrolanguage) [macrolanguage]
-  { language: "drh", tag: @otf.Tag(0x4D4E4720), }, // 'MNG ' Darkhat(retired code) -> Mongolian
-  { language: "dri", tag: @otf.Tag(0), }, // null C'Lela != Dari
-  { language: "drw", tag: @otf.Tag(0x44524920), }, // 'DRI ' Darwazi(retired code) -> Dari
-  { language: "drw", tag: @otf.Tag(0x46415220), }, // 'FAR ' Darwazi(retired code) -> Persian
-  { language: "dsb", tag: @otf.Tag(0x4C534220), }, // 'LSB ' Lower Sorbian
-  { language: "dty", tag: @otf.Tag(0x4E455020), }, // 'NEP ' Dotyali -> Nepali
-  // { language: "duj", tag: @otf.Tag(0x44554A20) }, // 'DUJ ' Dhuwal(retired code)
-  { language: "dun", tag: @otf.Tag(0), }, // null Dusun Deyah != Dungan
-  { language: "dup", tag: @otf.Tag(0x4D4C5920), }, // 'MLY ' Duano -> Malay
-  { language: "dv", tag: @otf.Tag(0x44495620), }, // 'DIV ' Divehi (Dhivehi, Maldivian)
-  { language: "dv", tag: @otf.Tag(0x44485620), }, // 'DHV ' Divehi (Dhivehi, Maldivian)(deprecated)
-  { language: "dwk", tag: @otf.Tag(0x4B554920), }, // 'KUI ' Dawik Kui -> Kui
-  { language: "dwu", tag: @otf.Tag(0x44554A20), }, // 'DUJ ' Dhuwal
-  { language: "dwy", tag: @otf.Tag(0x44554A20), }, // 'DUJ ' Dhuwaya -> Dhuwal
-  { language: "dyu", tag: @otf.Tag(0x4A554C20), }, // 'JUL ' Dyula -> Jula
-  { language: "dz", tag: @otf.Tag(0x445A4E20), }, // 'DZN ' Dzongkha
-  { language: "dzn", tag: @otf.Tag(0), }, // null Dzando != Dzongkha
-  { language: "ecr", tag: @otf.Tag(0), }, // null Eteocretan != Eastern Cree
-  { language: "ee", tag: @otf.Tag(0x45574520), }, // 'EWE ' Ewe
-  // { language: "efi", tag: @otf.Tag(0x45464920) }, // 'EFI ' Efik
-  { language: "ekk", tag: @otf.Tag(0x45544920), }, // 'ETI ' Standard Estonian -> Estonian
-  { language: "eky", tag: @otf.Tag(0x4B524E20), }, // 'KRN ' Eastern Kayah -> Karen
-  { language: "el", tag: @otf.Tag(0x454C4C20), }, // 'ELL ' Modern Greek (1453-) -> Greek
-  { language: "emk", tag: @otf.Tag(0x454D4B20), }, // 'EMK ' Eastern Maninkakan
-  { language: "emk", tag: @otf.Tag(0x4D4E4B20), }, // 'MNK ' Eastern Maninkakan -> Maninka
-  // { language: "emp", tag: @otf.Tag(0x454D5020) }, // 'EMP ' Northern Emberá
-  { language: "emy", tag: @otf.Tag(0x4D594E20), }, // 'MYN ' Epigraphic Mayan -> Mayan
-  { language: "en", tag: @otf.Tag(0x454E4720), }, // 'ENG ' English
-  { language: "enb", tag: @otf.Tag(0x4B414C20), }, // 'KAL ' Markweeta -> Kalenjin
-  { language: "enf", tag: @otf.Tag(0x464E4520), }, // 'FNE ' Forest Enets
-  { language: "enh", tag: @otf.Tag(0x544E4520), }, // 'TNE ' Tundra Enets
-  { language: "eo", tag: @otf.Tag(0x4E544F20), }, // 'NTO ' Esperanto
-  { language: "es", tag: @otf.Tag(0x45535020), }, // 'ESP ' Spanish
-  { language: "esg", tag: @otf.Tag(0x474F4E20), }, // 'GON ' Aheri Gondi -> Gondi
-  { language: "esi", tag: @otf.Tag(0x49504B20), }, // 'IPK ' North Alaskan Inupiatun -> Inupiat
-  { language: "esk", tag: @otf.Tag(0x49504B20), }, // 'IPK ' Northwest Alaska Inupiatun -> Inupiat
-  // { language: "esu", tag: @otf.Tag(0x45535520) }, // 'ESU ' Central Yupik
-  { language: "et", tag: @otf.Tag(0x45544920), }, // 'ETI ' Estonian [macrolanguage]
-  { language: "eto", tag: @otf.Tag(0x42544920), }, // 'BTI ' Eton (Cameroon) -> Beti
-  { language: "eu", tag: @otf.Tag(0x45555120), }, // 'EUQ ' Basque
-  { language: "euq", tag: @otf.Tag(0), }, // null Basque  [collection] != Basque
-  { language: "eve", tag: @otf.Tag(0x45564E20), }, // 'EVN ' Even
-  { language: "evn", tag: @otf.Tag(0x45564B20), }, // 'EVK ' Evenki
-  { language: "ewo", tag: @otf.Tag(0x42544920), }, // 'BTI ' Ewondo -> Beti
-  { language: "eyo", tag: @otf.Tag(0x4B414C20), }, // 'KAL ' Keiyo -> Kalenjin
-  { language: "fa", tag: @otf.Tag(0x46415220), }, // 'FAR ' Persian [macrolanguage]
-  { language: "fab", tag: @otf.Tag(0x43505020), }, // 'CPP ' Fa d'Ambu -> Creoles
-  { language: "fan", tag: @otf.Tag(0x46414E30), }, // 'FAN0' Fang (Equatorial Guinea)
-  { language: "fan", tag: @otf.Tag(0x42544920), }, // 'BTI ' Fang (Equatorial Guinea) -> Beti
-  { language: "far", tag: @otf.Tag(0), }, // null Fataleka != Persian
-  { language: "fat", tag: @otf.Tag(0x46415420), }, // 'FAT ' Fanti
-  { language: "fat", tag: @otf.Tag(0x414B4120), }, // 'AKA ' Fanti -> Akan
-  { language: "fbl", tag: @otf.Tag(0x42494B20), }, // 'BIK ' West Albay Bikol -> Bikol
-  { language: "ff", tag: @otf.Tag(0x46554C20), }, // 'FUL ' Fulah [macrolanguage]
-  { language: "ffm", tag: @otf.Tag(0x46554C20), }, // 'FUL ' Maasina Fulfulde -> Fulah
-  { language: "fi", tag: @otf.Tag(0x46494E20), }, // 'FIN ' Finnish
-  { language: "fil", tag: @otf.Tag(0x50494C20), }, // 'PIL ' Filipino
-  { language: "fj", tag: @otf.Tag(0x464A4920), }, // 'FJI ' Fijian
-  { language: "flm", tag: @otf.Tag(0x48414C20), }, // 'HAL ' Halam (Falam Chin)(retired code)
-  { language: "flm", tag: @otf.Tag(0x51494E20), }, // 'QIN ' Falam Chin(retired code) -> Chin
-  { language: "fmp", tag: @otf.Tag(0x464D5020), }, // 'FMP ' Fe’fe’
-  { language: "fmp", tag: @otf.Tag(0x424D4C20), }, // 'BML ' Fe'fe' -> Bamileke
-  { language: "fng", tag: @otf.Tag(0x43505020), }, // 'CPP ' Fanagalo -> Creoles
-  { language: "fo", tag: @otf.Tag(0x464F5320), }, // 'FOS ' Faroese
-  // { language: "fon", tag: @otf.Tag(0x464F4E20) }, // 'FON ' Fon
-  { language: "fos", tag: @otf.Tag(0), }, // null Siraya != Faroese
-  { language: "fpe", tag: @otf.Tag(0x43505020), }, // 'CPP ' Fernando Po Creole English -> Creoles
-  { language: "fr", tag: @otf.Tag(0x46524120), }, // 'FRA ' French
-  // { language: "frc", tag: @otf.Tag(0x46524320) }, // 'FRC ' Cajun French
-  // { language: "frp", tag: @otf.Tag(0x46525020) }, // 'FRP ' Arpitan
-  { language: "fub", tag: @otf.Tag(0x46554C20), }, // 'FUL ' Adamawa Fulfulde -> Fulah
-  { language: "fuc", tag: @otf.Tag(0x46554C20), }, // 'FUL ' Pulaar -> Fulah
-  { language: "fue", tag: @otf.Tag(0x46554C20), }, // 'FUL ' Borgu Fulfulde -> Fulah
-  { language: "fuf", tag: @otf.Tag(0x46544120), }, // 'FTA ' Pular -> Futa
-  { language: "fuf", tag: @otf.Tag(0x46554C20), }, // 'FUL ' Pular -> Fulah
-  { language: "fuh", tag: @otf.Tag(0x46554C20), }, // 'FUL ' Western Niger Fulfulde -> Fulah
-  { language: "fui", tag: @otf.Tag(0x46554C20), }, // 'FUL ' Bagirmi Fulfulde -> Fulah
-  { language: "fuq", tag: @otf.Tag(0x46554C20), }, // 'FUL ' Central-Eastern Niger Fulfulde -> Fulah
-  { language: "fur", tag: @otf.Tag(0x46524C20), }, // 'FRL ' Friulian
-  { language: "fuv", tag: @otf.Tag(0x46555620), }, // 'FUV ' Nigerian Fulfulde
-  { language: "fuv", tag: @otf.Tag(0x46554C20), }, // 'FUL ' Nigerian Fulfulde -> Fulah
-  { language: "fy", tag: @otf.Tag(0x46524920), }, // 'FRI ' Western Frisian -> Frisian
-  { language: "ga", tag: @otf.Tag(0x49524920), }, // 'IRI ' Irish
-  { language: "ga", tag: @otf.Tag(0x49525420), }, // 'IRT ' Irish -> Irish Traditional
-  { language: "gaa", tag: @otf.Tag(0x47414420), }, // 'GAD ' Ga
-  { language: "gac", tag: @otf.Tag(0x43505020), }, // 'CPP ' Mixed Great Andamanese -> Creoles
-  { language: "gad", tag: @otf.Tag(0), }, // null Gaddang != Ga
-  { language: "gae", tag: @otf.Tag(0), }, // null Guarequena != Scottish Gaelic
-  // { language: "gag", tag: @otf.Tag(0x47414720) }, // 'GAG ' Gagauz
-  { language: "gal", tag: @otf.Tag(0), }, // null Galolen != Galician
-  { language: "gan", tag: @otf.Tag(0x5A485320), }, // 'ZHS ' Gan Chinese -> Chinese, Simplified
-  { language: "gar", tag: @otf.Tag(0), }, // null Galeya != Garshuni
-  { language: "gaw", tag: @otf.Tag(0), }, // null Nobonob != Garhwali
-  { language: "gax", tag: @otf.Tag(0x4F524F20), }, // 'ORO ' Borana-Arsi-Guji Oromo -> Oromo
-  { language: "gaz", tag: @otf.Tag(0x4F524F20), }, // 'ORO ' West Central Oromo -> Oromo
-  { language: "gbm", tag: @otf.Tag(0x47415720), }, // 'GAW ' Garhwali
-  { language: "gce", tag: @otf.Tag(0x41544820), }, // 'ATH ' Galice -> Athapaskan
-  { language: "gcf", tag: @otf.Tag(0x43505020), }, // 'CPP ' Guadeloupean Creole French -> Creoles
-  { language: "gcl", tag: @otf.Tag(0x43505020), }, // 'CPP ' Grenadian Creole English -> Creoles
-  { language: "gcr", tag: @otf.Tag(0x43505020), }, // 'CPP ' Guianese Creole French -> Creoles
-  { language: "gd", tag: @otf.Tag(0x47414520), }, // 'GAE ' Scottish Gaelic
-  { language: "gda", tag: @otf.Tag(0x52414A20), }, // 'RAJ ' Gade Lohar -> Rajasthani
-  // { language: "gez", tag: @otf.Tag(0x47455A20) }, // 'GEZ ' Geez
-  { language: "ggo", tag: @otf.Tag(0x474F4E20), }, // 'GON ' Southern Gondi(retired code) -> Gondi
-  { language: "gha", tag: @otf.Tag(0x42425220), }, // 'BBR ' Ghadamès -> Berber
-  { language: "ghc", tag: @otf.Tag(0x49525420), }, // 'IRT ' Hiberno-Scottish Gaelic -> Irish Traditional
-  { language: "ghk", tag: @otf.Tag(0x4B524E20), }, // 'KRN ' Geko Karen -> Karen
-  { language: "gho", tag: @otf.Tag(0x42425220), }, // 'BBR ' Ghomara -> Berber
-  { language: "gib", tag: @otf.Tag(0x43505020), }, // 'CPP ' Gibanawa -> Creoles
-  // { language: "gih", tag: @otf.Tag(0x47494820) }, // 'GIH ' Githabul
-  { language: "gil", tag: @otf.Tag(0x47494C30), }, // 'GIL0' Kiribati (Gilbertese)
-  { language: "gju", tag: @otf.Tag(0x52414A20), }, // 'RAJ ' Gujari -> Rajasthani
-  { language: "gkp", tag: @otf.Tag(0x474B5020), }, // 'GKP ' Guinea Kpelle -> Kpelle (Guinea)
-  { language: "gkp", tag: @otf.Tag(0x4B504C20), }, // 'KPL ' Guinea Kpelle -> Kpelle
-  { language: "gl", tag: @otf.Tag(0x47414C20), }, // 'GAL ' Galician
-  { language: "gld", tag: @otf.Tag(0x4E414E20), }, // 'NAN ' Nanai
-  // { language: "glk", tag: @otf.Tag(0x474C4B20) }, // 'GLK ' Gilaki
-  { language: "gmz", tag: @otf.Tag(0), }, // null Mgbolizhia != Gumuz
-  { language: "gn", tag: @otf.Tag(0x47554120), }, // 'GUA ' Guarani [macrolanguage]
-  { language: "gnb", tag: @otf.Tag(0x51494E20), }, // 'QIN ' Gangte -> Chin
-  // { language: "gnn", tag: @otf.Tag(0x474E4E20) }, // 'GNN ' Gumatj
-  { language: "gno", tag: @otf.Tag(0x474F4E20), }, // 'GON ' Northern Gondi -> Gondi
-  { language: "gnw", tag: @otf.Tag(0x47554120), }, // 'GUA ' Western Bolivian Guaraní -> Guarani
-  // { language: "gog", tag: @otf.Tag(0x474F4720) }, // 'GOG ' Gogo
-  { language: "gom", tag: @otf.Tag(0x4B4F4B20), }, // 'KOK ' Goan Konkani -> Konkani
-  // { language: "gon", tag: @otf.Tag(0x474F4E20) }, // 'GON ' Gondi [macrolanguage]
-  { language: "goq", tag: @otf.Tag(0x43505020), }, // 'CPP ' Gorap -> Creoles
-  { language: "gox", tag: @otf.Tag(0x42414430), }, // 'BAD0' Gobu -> Banda
-  { language: "gpe", tag: @otf.Tag(0x43505020), }, // 'CPP ' Ghanaian Pidgin English -> Creoles
-  { language: "gro", tag: @otf.Tag(0), }, // null Groma != Garo
-  { language: "grr", tag: @otf.Tag(0x42425220), }, // 'BBR ' Taznatit -> Berber
-  { language: "grt", tag: @otf.Tag(0x47524F20), }, // 'GRO ' Garo
-  { language: "gru", tag: @otf.Tag(0x534F4720), }, // 'SOG ' Kistane -> Sodo Gurage
-  { language: "gsw", tag: @otf.Tag(0x414C5320), }, // 'ALS ' Alsatian
-  { language: "gu", tag: @otf.Tag(0x47554A20), }, // 'GUJ ' Gujarati
-  { language: "gua", tag: @otf.Tag(0), }, // null Shiki != Guarani
-  // { language: "guc", tag: @otf.Tag(0x47554320) }, // 'GUC ' Wayuu
-  // { language: "guf", tag: @otf.Tag(0x47554620) }, // 'GUF ' Gupapuyngu
-  { language: "gug", tag: @otf.Tag(0x47554120), }, // 'GUA ' Paraguayan Guaraní -> Guarani
-  { language: "gui", tag: @otf.Tag(0x47554120), }, // 'GUA ' Eastern Bolivian Guaraní -> Guarani
-  { language: "guk", tag: @otf.Tag(0x474D5A20), }, // 'GMZ ' Gumuz
-  { language: "gul", tag: @otf.Tag(0x43505020), }, // 'CPP ' Sea Island Creole English -> Creoles
-  { language: "gun", tag: @otf.Tag(0x47554120), }, // 'GUA ' Mbyá Guaraní -> Guarani
-  // { language: "guz", tag: @otf.Tag(0x47555A20) }, // 'GUZ ' Gusii
-  { language: "gv", tag: @otf.Tag(0x4D4E5820), }, // 'MNX ' Manx
-  { language: "gwi", tag: @otf.Tag(0x41544820), }, // 'ATH ' Gwichʼin -> Athapaskan
-  { language: "gyn", tag: @otf.Tag(0x43505020), }, // 'CPP ' Guyanese Creole English -> Creoles
-  { language: "ha", tag: @otf.Tag(0x48415520), }, // 'HAU ' Hausa
-  { language: "haa", tag: @otf.Tag(0x41544820), }, // 'ATH ' Han -> Athapaskan
-  { language: "hae", tag: @otf.Tag(0x4F524F20), }, // 'ORO ' Eastern Oromo -> Oromo
-  { language: "hai", tag: @otf.Tag(0x48414930), }, // 'HAI0' Haida [macrolanguage]
-  { language: "hak", tag: @otf.Tag(0x5A485320), }, // 'ZHS ' Hakka Chinese -> Chinese, Simplified
-  { language: "hal", tag: @otf.Tag(0), }, // null Halang != Halam (Falam Chin)
-  { language: "har", tag: @otf.Tag(0x48524920), }, // 'HRI ' Harari
-  // { language: "haw", tag: @otf.Tag(0x48415720) }, // 'HAW ' Hawaiian
-  { language: "hax", tag: @otf.Tag(0x48414930), }, // 'HAI0' Southern Haida -> Haida
-  // { language: "hay", tag: @otf.Tag(0x48415920) }, // 'HAY ' Haya
-  // { language: "haz", tag: @otf.Tag(0x48415A20) }, // 'HAZ ' Hazaragi
-  { language: "hbn", tag: @otf.Tag(0), }, // null Heiban != Hammer-Banna
-  { language: "hca", tag: @otf.Tag(0x43505020), }, // 'CPP ' Andaman Creole Hindi -> Creoles
-  { language: "hdn", tag: @otf.Tag(0x48414930), }, // 'HAI0' Northern Haida -> Haida
-  { language: "he", tag: @otf.Tag(0x49575220), }, // 'IWR ' Hebrew
-  { language: "hea", tag: @otf.Tag(0x484D4E20), }, // 'HMN ' Northern Qiandong Miao -> Hmong
-  // { language: "hei", tag: @otf.Tag(0x48454920) }, // 'HEI ' Heiltsuk
-  { language: "hi", tag: @otf.Tag(0x48494E20), }, // 'HIN ' Hindi
-  // { language: "hil", tag: @otf.Tag(0x48494C20) }, // 'HIL ' Hiligaynon
-  { language: "hji", tag: @otf.Tag(0x4D4C5920), }, // 'MLY ' Haji -> Malay
-  { language: "hlt", tag: @otf.Tag(0x51494E20), }, // 'QIN ' Matu Chin -> Chin
-  { language: "hma", tag: @otf.Tag(0x484D4E20), }, // 'HMN ' Southern Mashan Hmong -> Hmong
-  { language: "hmc", tag: @otf.Tag(0x484D4E20), }, // 'HMN ' Central Huishui Hmong -> Hmong
-  { language: "hmd", tag: @otf.Tag(0x484D4420), }, // 'HMD ' Large Flowery Miao -> A-Hmao
-  { language: "hmd", tag: @otf.Tag(0x484D4E20), }, // 'HMN ' Large Flowery Miao -> Hmong
-  { language: "hme", tag: @otf.Tag(0x484D4E20), }, // 'HMN ' Eastern Huishui Hmong -> Hmong
-  { language: "hmg", tag: @otf.Tag(0x484D4E20), }, // 'HMN ' Southwestern Guiyang Hmong -> Hmong
-  { language: "hmh", tag: @otf.Tag(0x484D4E20), }, // 'HMN ' Southwestern Huishui Hmong -> Hmong
-  { language: "hmi", tag: @otf.Tag(0x484D4E20), }, // 'HMN ' Northern Huishui Hmong -> Hmong
-  { language: "hmj", tag: @otf.Tag(0x484D4E20), }, // 'HMN ' Ge -> Hmong
-  { language: "hml", tag: @otf.Tag(0x484D4E20), }, // 'HMN ' Luopohe Hmong -> Hmong
-  { language: "hmm", tag: @otf.Tag(0x484D4E20), }, // 'HMN ' Central Mashan Hmong -> Hmong
-  // { language: "hmn", tag: @otf.Tag(0x484D4E20) }, // 'HMN ' Hmong [macrolanguage]
-  { language: "hmp", tag: @otf.Tag(0x484D4E20), }, // 'HMN ' Northern Mashan Hmong -> Hmong
-  { language: "hmq", tag: @otf.Tag(0x484D4E20), }, // 'HMN ' Eastern Qiandong Miao -> Hmong
-  { language: "hmr", tag: @otf.Tag(0x51494E20), }, // 'QIN ' Hmar -> Chin
-  { language: "hms", tag: @otf.Tag(0x484D4E20), }, // 'HMN ' Southern Qiandong Miao -> Hmong
-  { language: "hmw", tag: @otf.Tag(0x484D4E20), }, // 'HMN ' Western Mashan Hmong -> Hmong
-  { language: "hmy", tag: @otf.Tag(0x484D4E20), }, // 'HMN ' Southern Guiyang Hmong -> Hmong
-  { language: "hmz", tag: @otf.Tag(0x484D5A20), }, // 'HMZ ' Hmong Shua -> Hmong Shuat
-  { language: "hmz", tag: @otf.Tag(0x484D4E20), }, // 'HMN ' Hmong Shua -> Hmong
-  // { language: "hnd", tag: @otf.Tag(0x484E4420) }, // 'HND ' Southern Hindko -> Hindko
-  { language: "hne", tag: @otf.Tag(0x43484820), }, // 'CHH ' Chhattisgarhi -> Chattisgarhi
-  { language: "hnj", tag: @otf.Tag(0x484D4E20), }, // 'HMN ' Hmong Njua -> Hmong
-  { language: "hno", tag: @otf.Tag(0x484E4420), }, // 'HND ' Northern Hindko -> Hindko
-  { language: "ho", tag: @otf.Tag(0x484D4F20), }, // 'HMO ' Hiri Motu
-  { language: "ho", tag: @otf.Tag(0x43505020), }, // 'CPP ' Hiri Motu -> Creoles
-  { language: "hoc", tag: @otf.Tag(0x484F2020), }, // 'HO  ' Ho
-  { language: "hoi", tag: @otf.Tag(0x41544820), }, // 'ATH ' Holikachuk -> Athapaskan
-  { language: "hoj", tag: @otf.Tag(0x48415220), }, // 'HAR ' Hadothi -> Harauti
-  { language: "hoj", tag: @otf.Tag(0x52414A20), }, // 'RAJ ' Hadothi -> Rajasthani
-  { language: "hr", tag: @otf.Tag(0x48525620), }, // 'HRV ' Croatian
-  { language: "hra", tag: @otf.Tag(0x51494E20), }, // 'QIN ' Hrangkhol -> Chin
-  { language: "hrm", tag: @otf.Tag(0x484D4E20), }, // 'HMN ' Horned Miao -> Hmong
-  { language: "hsb", tag: @otf.Tag(0x55534220), }, // 'USB ' Upper Sorbian
-  { language: "hsn", tag: @otf.Tag(0x5A485320), }, // 'ZHS ' Xiang Chinese -> Chinese, Simplified
-  { language: "ht", tag: @otf.Tag(0x48414920), }, // 'HAI ' Haitian (Haitian Creole)
-  { language: "ht", tag: @otf.Tag(0x43505020), }, // 'CPP ' Haitian -> Creoles
-  { language: "hu", tag: @otf.Tag(0x48554E20), }, // 'HUN ' Hungarian
-  { language: "huj", tag: @otf.Tag(0x484D4E20), }, // 'HMN ' Northern Guiyang Hmong -> Hmong
-  { language: "hup", tag: @otf.Tag(0x41544820), }, // 'ATH ' Hupa -> Athapaskan
-  // { language: "hur", tag: @otf.Tag(0x48555220) }, // 'HUR ' Halkomelem
-  { language: "hus", tag: @otf.Tag(0x4D594E20), }, // 'MYN ' Huastec -> Mayan
-  { language: "hwc", tag: @otf.Tag(0x43505020), }, // 'CPP ' Hawai'i Creole English -> Creoles
-  { language: "hy", tag: @otf.Tag(0x48594530), }, // 'HYE0' Armenian -> Armenian East
-  { language: "hy", tag: @otf.Tag(0x48594520), }, // 'HYE ' Armenian
-  { language: "hyw", tag: @otf.Tag(0x48594520), }, // 'HYE ' Western Armenian -> Armenian
-  { language: "hz", tag: @otf.Tag(0x48455220), }, // 'HER ' Herero
-  { language: "ia", tag: @otf.Tag(0x494E4120), }, // 'INA ' Interlingua (International Auxiliary Language Association)
-  // { language: "iba", tag: @otf.Tag(0x49424120) }, // 'IBA ' Iban
-  // { language: "ibb", tag: @otf.Tag(0x49424220) }, // 'IBB ' Ibibio
-  { language: "iby", tag: @otf.Tag(0x494A4F20), }, // 'IJO ' Ibani -> Ijo
-  { language: "icr", tag: @otf.Tag(0x43505020), }, // 'CPP ' Islander Creole English -> Creoles
-  { language: "id", tag: @otf.Tag(0x494E4420), }, // 'IND ' Indonesian
-  { language: "id", tag: @otf.Tag(0x4D4C5920), }, // 'MLY ' Indonesian -> Malay
-  { language: "ida", tag: @otf.Tag(0x4C554820), }, // 'LUH ' Idakho-Isukha-Tiriki -> Luyia
-  { language: "idb", tag: @otf.Tag(0x43505020), }, // 'CPP ' Indo-Portuguese -> Creoles
-  { language: "ie", tag: @otf.Tag(0x494C4520), }, // 'ILE ' Interlingue
-  { language: "ig", tag: @otf.Tag(0x49424F20), }, // 'IBO ' Igbo
-  { language: "igb", tag: @otf.Tag(0x45424920), }, // 'EBI ' Ebira
-  { language: "ihb", tag: @otf.Tag(0x43505020), }, // 'CPP ' Iha Based Pidgin -> Creoles
-  { language: "ii", tag: @otf.Tag(0x59494D20), }, // 'YIM ' Sichuan Yi -> Yi Modern
-  { language: "ijc", tag: @otf.Tag(0x494A4F20), }, // 'IJO ' Izon -> Ijo
-  { language: "ije", tag: @otf.Tag(0x494A4F20), }, // 'IJO ' Biseni -> Ijo
-  { language: "ijn", tag: @otf.Tag(0x494A4F20), }, // 'IJO ' Kalabari -> Ijo
-  // { language: "ijo", tag: @otf.Tag(0x494A4F20) }, // 'IJO ' Ijo  [collection]
-  { language: "ijs", tag: @otf.Tag(0x494A4F20), }, // 'IJO ' Southeast Ijo -> Ijo
-  { language: "ik", tag: @otf.Tag(0x49504B20), }, // 'IPK ' Inupiaq [macrolanguage] -> Inupiat
-  { language: "ike", tag: @otf.Tag(0x494E5520), }, // 'INU ' Eastern Canadian Inuktitut -> Inuktitut
-  { language: "ike", tag: @otf.Tag(0x494E554B), }, // 'INUK' Eastern Canadian Inuktitut -> Nunavik Inuktitut
-  { language: "ikt", tag: @otf.Tag(0x494E5520), }, // 'INU ' Inuinnaqtun -> Inuktitut
-  // { language: "ilo", tag: @otf.Tag(0x494C4F20) }, // 'ILO ' Iloko -> Ilokano
-  { language: "in", tag: @otf.Tag(0x494E4420), }, // 'IND ' Indonesian(retired code)
-  { language: "in", tag: @otf.Tag(0x4D4C5920), }, // 'MLY ' Indonesian(retired code) -> Malay
-  { language: "ing", tag: @otf.Tag(0x41544820), }, // 'ATH ' Degexit'an -> Athapaskan
-  { language: "inh", tag: @otf.Tag(0x494E4720), }, // 'ING ' Ingush
-  { language: "io", tag: @otf.Tag(0x49444F20), }, // 'IDO ' Ido
-  { language: "iri", tag: @otf.Tag(0), }, // null Rigwe != Irish
-  // { language: "iru", tag: @otf.Tag(0x49525520) }, // 'IRU ' Irula
-  { language: "is", tag: @otf.Tag(0x49534C20), }, // 'ISL ' Icelandic
-  { language: "ism", tag: @otf.Tag(0), }, // null Masimasi != Inari Sami
-  { language: "it", tag: @otf.Tag(0x49544120), }, // 'ITA ' Italian
-  { language: "itz", tag: @otf.Tag(0x4D594E20), }, // 'MYN ' Itzá -> Mayan
-  { language: "iu", tag: @otf.Tag(0x494E5520), }, // 'INU ' Inuktitut [macrolanguage]
-  { language: "iu", tag: @otf.Tag(0x494E554B), }, // 'INUK' Inuktitut [macrolanguage] -> Nunavik Inuktitut
-  { language: "iw", tag: @otf.Tag(0x49575220), }, // 'IWR ' Hebrew(retired code)
-  { language: "ixl", tag: @otf.Tag(0x4D594E20), }, // 'MYN ' Ixil -> Mayan
-  { language: "ja", tag: @otf.Tag(0x4A414E20), }, // 'JAN ' Japanese
-  { language: "jac", tag: @otf.Tag(0x4D594E20), }, // 'MYN ' Popti' -> Mayan
-  { language: "jak", tag: @otf.Tag(0x4D4C5920), }, // 'MLY ' Jakun -> Malay
-  { language: "jam", tag: @otf.Tag(0x4A414D20), }, // 'JAM ' Jamaican Creole English -> Jamaican Creole
-  { language: "jam", tag: @otf.Tag(0x43505020), }, // 'CPP ' Jamaican Creole English -> Creoles
-  { language: "jan", tag: @otf.Tag(0), }, // null Jandai != Japanese
-  { language: "jax", tag: @otf.Tag(0x4D4C5920), }, // 'MLY ' Jambi Malay -> Malay
-  { language: "jbe", tag: @otf.Tag(0x42425220), }, // 'BBR ' Judeo-Berber -> Berber
-  { language: "jbn", tag: @otf.Tag(0x42425220), }, // 'BBR ' Nafusi -> Berber
-  // { language: "jbo", tag: @otf.Tag(0x4A424F20) }, // 'JBO ' Lojban
-  // { language: "jct", tag: @otf.Tag(0x4A435420) }, // 'JCT ' Krymchak
-  // { language: "jdt", tag: @otf.Tag(0x4A445420) }, // 'JDT ' Judeo-Tat
-  { language: "jgo", tag: @otf.Tag(0x424D4C20), }, // 'BML ' Ngomba -> Bamileke
-  { language: "ji", tag: @otf.Tag(0x4A494920), }, // 'JII ' Yiddish(retired code)
-  { language: "jii", tag: @otf.Tag(0), }, // null Jiiddu != Yiddish
-  { language: "jkm", tag: @otf.Tag(0x4B524E20), }, // 'KRN ' Mobwa Karen -> Karen
-  { language: "jkp", tag: @otf.Tag(0x4B524E20), }, // 'KRN ' Paku Karen -> Karen
-  { language: "jud", tag: @otf.Tag(0), }, // null Worodougou != Ladino
-  { language: "jul", tag: @otf.Tag(0), }, // null Jirel != Jula
-  { language: "jv", tag: @otf.Tag(0x4A415620), }, // 'JAV ' Javanese
-  { language: "jvd", tag: @otf.Tag(0x43505020), }, // 'CPP ' Javindo -> Creoles
-  { language: "jw", tag: @otf.Tag(0x4A415620), }, // 'JAV ' Javanese(retired code)
-  { language: "ka", tag: @otf.Tag(0x4B415420), }, // 'KAT ' Georgian
-  { language: "kaa", tag: @otf.Tag(0x4B524B20), }, // 'KRK ' Karakalpak
-  { language: "kab", tag: @otf.Tag(0x4B414230), }, // 'KAB0' Kabyle
-  { language: "kab", tag: @otf.Tag(0x42425220), }, // 'BBR ' Kabyle -> Berber
-  { language: "kac", tag: @otf.Tag(0), }, // null Kachin != Kachchi
-  { language: "kam", tag: @otf.Tag(0x4B4D4220), }, // 'KMB ' Kamba (Kenya)
-  { language: "kar", tag: @otf.Tag(0x4B524E20), }, // 'KRN ' Karen  [collection]
-  // { language: "kaw", tag: @otf.Tag(0x4B415720) }, // 'KAW ' Kawi (Old Javanese)
-  // { language: "kbc", tag: @otf.Tag(0x4B424320) }, // 'KBC ' Kadiwéu
-  { language: "kbd", tag: @otf.Tag(0x4B414220), }, // 'KAB ' Kabardian
-  { language: "kby", tag: @otf.Tag(0x4B4E5220), }, // 'KNR ' Manga Kanuri -> Kanuri
-  { language: "kca", tag: @otf.Tag(0x4B484B20), }, // 'KHK ' Khanty -> Khanty-Kazim
-  { language: "kca", tag: @otf.Tag(0x4B485320), }, // 'KHS ' Khanty -> Khanty-Shurishkar
-  { language: "kca", tag: @otf.Tag(0x4B485620), }, // 'KHV ' Khanty -> Khanty-Vakhi
-  { language: "kcn", tag: @otf.Tag(0x43505020), }, // 'CPP ' Nubi -> Creoles
-  // { language: "kde", tag: @otf.Tag(0x4B444520) }, // 'KDE ' Makonde
-  { language: "kdr", tag: @otf.Tag(0x4B524D20), }, // 'KRM ' Karaim
-  { language: "kdt", tag: @otf.Tag(0x4B555920), }, // 'KUY ' Kuy
-  { language: "kea", tag: @otf.Tag(0x4B454120), }, // 'KEA ' Kabuverdianu (Crioulo)
-  { language: "kea", tag: @otf.Tag(0x43505020), }, // 'CPP ' Kabuverdianu -> Creoles
-  { language: "keb", tag: @otf.Tag(0), }, // null Kélé != Kebena
-  { language: "kek", tag: @otf.Tag(0x4B454B20), }, // 'KEK ' Kekchi
-  { language: "kek", tag: @otf.Tag(0x4D594E20), }, // 'MYN ' Kekchí -> Mayan
-  { language: "kex", tag: @otf.Tag(0x4B4B4E20), }, // 'KKN ' Kukna -> Kokni
-  { language: "kfa", tag: @otf.Tag(0x4B4F4420), }, // 'KOD ' Kodava -> Kodagu
-  { language: "kfr", tag: @otf.Tag(0x4B414320), }, // 'KAC ' Kachhi -> Kachchi
-  { language: "kfx", tag: @otf.Tag(0x4B554C20), }, // 'KUL ' Kullu Pahari -> Kulvi
-  { language: "kfy", tag: @otf.Tag(0x4B4D4E20), }, // 'KMN ' Kumaoni
-  { language: "kg", tag: @otf.Tag(0x4B4F4E30), }, // 'KON0' Kongo [macrolanguage]
-  { language: "kge", tag: @otf.Tag(0), }, // null Komering != Khutsuri Georgian
-  { language: "kha", tag: @otf.Tag(0x4B534920), }, // 'KSI ' Khasi
-  { language: "khb", tag: @otf.Tag(0x58424420), }, // 'XBD ' Lü
-  { language: "khk", tag: @otf.Tag(0x4D4E4720), }, // 'MNG ' Halh Mongolian -> Mongolian
-  { language: "khn", tag: @otf.Tag(0), }, // null Khandesi != Khamti Shan(Microsoft fonts)
-  { language: "khs", tag: @otf.Tag(0), }, // null Kasua != Khanty-Shurishkar
-  { language: "kht", tag: @otf.Tag(0x4B485420), }, // 'KHT ' Khamti -> Khamti Shan
-  { language: "kht", tag: @otf.Tag(0x4B484E20), }, // 'KHN ' Khamti -> Khamti Shan(Microsoft fonts)
-  { language: "khv", tag: @otf.Tag(0), }, // null Khvarshi != Khanty-Vakhi
-  // { language: "khw", tag: @otf.Tag(0x4B485720) }, // 'KHW ' Khowar
-  { language: "ki", tag: @otf.Tag(0x4B494B20), }, // 'KIK ' Kikuyu (Gikuyu)
-  { language: "kis", tag: @otf.Tag(0), }, // null Kis != Kisii
-  { language: "kiu", tag: @otf.Tag(0x4B495520), }, // 'KIU ' Kirmanjki 
-  { language: "kiu", tag: @otf.Tag(0x5A5A4120), }, // 'ZZA ' Kirmanjki  -> Zazaki
-  { language: "kj", tag: @otf.Tag(0x4B554120), }, // 'KUA ' Kuanyama
-  { language: "kjb", tag: @otf.Tag(0x4D594E20), }, // 'MYN ' Q'anjob'al -> Mayan
-  // { language: "kjd", tag: @otf.Tag(0x4B4A4420) }, // 'KJD ' Southern Kiwai
-  { language: "kjh", tag: @otf.Tag(0x4B484120), }, // 'KHA ' Khakas -> Khakass
-  // { language: "kjj", tag: @otf.Tag(0x4B4A4A20) }, // 'KJJ ' Khinalugh -> Khinalug
-  { language: "kjp", tag: @otf.Tag(0x4B4A5020), }, // 'KJP ' Pwo Eastern Karen -> Eastern Pwo Karen
-  { language: "kjp", tag: @otf.Tag(0x4B524E20), }, // 'KRN ' Pwo Eastern Karen -> Karen
-  { language: "kjt", tag: @otf.Tag(0x4B524E20), }, // 'KRN ' Phrae Pwo Karen -> Karen
-  // { language: "kjz", tag: @otf.Tag(0x4B4A5A20) }, // 'KJZ ' Bumthangkha
-  { language: "kk", tag: @otf.Tag(0x4B415A20), }, // 'KAZ ' Kazakh
-  { language: "kkn", tag: @otf.Tag(0), }, // null Kon Keu != Kokni
-  { language: "kkz", tag: @otf.Tag(0x41544820), }, // 'ATH ' Kaska -> Athapaskan
-  { language: "kl", tag: @otf.Tag(0x47524E20), }, // 'GRN ' Greenlandic
-  { language: "klm", tag: @otf.Tag(0), }, // null Migum != Kalmyk
-  { language: "kln", tag: @otf.Tag(0x4B414C20), }, // 'KAL ' Kalenjin [macrolanguage]
-  { language: "km", tag: @otf.Tag(0x4B484D20), }, // 'KHM ' Khmer
-  { language: "kmb", tag: @otf.Tag(0x4D424E20), }, // 'MBN ' Kimbundu -> Mbundu
-  { language: "kmn", tag: @otf.Tag(0), }, // null Awtuw != Kumaoni
-  { language: "kmo", tag: @otf.Tag(0), }, // null Kwoma != Komo
-  { language: "kmr", tag: @otf.Tag(0x4B555220), }, // 'KUR ' Northern Kurdish -> Kurdish
-  { language: "kms", tag: @otf.Tag(0), }, // null Kamasau != Komso
-  { language: "kmv", tag: @otf.Tag(0x43505020), }, // 'CPP ' Karipúna Creole French -> Creoles
-  { language: "kmw", tag: @otf.Tag(0x4B4D4F20), }, // 'KMO ' Komo (Democratic Republic of Congo)
-  // { language: "kmz", tag: @otf.Tag(0x4B4D5A20) }, // 'KMZ ' Khorasani Turkish -> Khorasani Turkic
-  { language: "kn", tag: @otf.Tag(0x4B414E20), }, // 'KAN ' Kannada
-  { language: "knc", tag: @otf.Tag(0x4B4E5220), }, // 'KNR ' Central Kanuri -> Kanuri
-  { language: "kng", tag: @otf.Tag(0x4B4F4E30), }, // 'KON0' Koongo -> Kongo
-  { language: "knj", tag: @otf.Tag(0x4D594E20), }, // 'MYN ' Western Kanjobal -> Mayan
-  { language: "knn", tag: @otf.Tag(0x4B4F4B20), }, // 'KOK ' Konkani 
-  { language: "knr", tag: @otf.Tag(0), }, // null Kaningra != Kanuri
-  { language: "ko", tag: @otf.Tag(0x4B4F5220), }, // 'KOR ' Korean
-  { language: "ko", tag: @otf.Tag(0x4B4F4820), }, // 'KOH ' Korean -> Korean Old Hangul
-  { language: "kod", tag: @otf.Tag(0), }, // null Kodi != Kodagu
-  { language: "koh", tag: @otf.Tag(0), }, // null Koyo != Korean Old Hangul
-  { language: "koi", tag: @otf.Tag(0x4B4F5020), }, // 'KOP ' Komi-Permyak
-  { language: "koi", tag: @otf.Tag(0x4B4F4D20), }, // 'KOM ' Komi-Permyak -> Komi
-  // { language: "kok", tag: @otf.Tag(0x4B4F4B20) }, // 'KOK ' Konkani  [macrolanguage]
-  { language: "kop", tag: @otf.Tag(0), }, // null Waube != Komi-Permyak
-  // { language: "kos", tag: @otf.Tag(0x4B4F5320) }, // 'KOS ' Kosraean
-  { language: "koy", tag: @otf.Tag(0x41544820), }, // 'ATH ' Koyukon -> Athapaskan
-  { language: "koz", tag: @otf.Tag(0), }, // null Korak != Komi-Zyrian
-  { language: "kpe", tag: @otf.Tag(0x4B504C20), }, // 'KPL ' Kpelle [macrolanguage]
-  { language: "kpl", tag: @otf.Tag(0), }, // null Kpala != Kpelle
-  { language: "kpp", tag: @otf.Tag(0x4B524E20), }, // 'KRN ' Paku Karen(retired code) -> Karen
-  { language: "kpv", tag: @otf.Tag(0x4B4F5A20), }, // 'KOZ ' Komi-Zyrian
-  { language: "kpv", tag: @otf.Tag(0x4B4F4D20), }, // 'KOM ' Komi-Zyrian -> Komi
-  { language: "kpy", tag: @otf.Tag(0x4B594B20), }, // 'KYK ' Koryak
-  { language: "kqs", tag: @otf.Tag(0x4B495320), }, // 'KIS ' Northern Kissi -> Kisii
-  { language: "kqy", tag: @otf.Tag(0x4B525420), }, // 'KRT ' Koorete
-  { language: "kr", tag: @otf.Tag(0x4B4E5220), }, // 'KNR ' Kanuri [macrolanguage]
-  { language: "krc", tag: @otf.Tag(0x4B415220), }, // 'KAR ' Karachay-Balkar -> Karachay
-  { language: "krc", tag: @otf.Tag(0x42414C20), }, // 'BAL ' Karachay-Balkar -> Balkar
-  { language: "kri", tag: @otf.Tag(0x4B524920), }, // 'KRI ' Krio
-  { language: "kri", tag: @otf.Tag(0x43505020), }, // 'CPP ' Krio -> Creoles
-  { language: "krk", tag: @otf.Tag(0), }, // null Kerek != Karakalpak
-  // { language: "krl", tag: @otf.Tag(0x4B524C20) }, // 'KRL ' Karelian
-  { language: "krm", tag: @otf.Tag(0), }, // null Krim(retired code) != Karaim
-  { language: "krn", tag: @otf.Tag(0), }, // null Sapo != Karen
-  { language: "krt", tag: @otf.Tag(0x4B4E5220), }, // 'KNR ' Tumari Kanuri -> Kanuri
-  { language: "kru", tag: @otf.Tag(0x4B555520), }, // 'KUU ' Kurukh
-  { language: "ks", tag: @otf.Tag(0x4B534820), }, // 'KSH ' Kashmiri
-  { language: "ksh", tag: @otf.Tag(0x4B534830), }, // 'KSH0' Kölsch -> Ripuarian
-  { language: "ksi", tag: @otf.Tag(0), }, // null Krisa != Khasi
-  { language: "ksm", tag: @otf.Tag(0), }, // null Kumba != Kildin Sami
-  { language: "kss", tag: @otf.Tag(0x4B495320), }, // 'KIS ' Southern Kisi -> Kisii
-  { language: "ksw", tag: @otf.Tag(0x4B535720), }, // 'KSW ' S’gaw Karen
-  { language: "ksw", tag: @otf.Tag(0x4B524E20), }, // 'KRN ' S'gaw Karen -> Karen
-  { language: "ktb", tag: @otf.Tag(0x4B454220), }, // 'KEB ' Kambaata -> Kebena
-  { language: "ktu", tag: @otf.Tag(0x4B4F4E20), }, // 'KON ' Kituba (Democratic Republic of Congo) -> Kikongo
-  { language: "ktw", tag: @otf.Tag(0x41544820), }, // 'ATH ' Kato -> Athapaskan
-  { language: "ku", tag: @otf.Tag(0x4B555220), }, // 'KUR ' Kurdish [macrolanguage]
-  { language: "kui", tag: @otf.Tag(0), }, // null Kuikúro-Kalapálo != Kui
-  { language: "kul", tag: @otf.Tag(0), }, // null Kulere != Kulvi
-  // { language: "kum", tag: @otf.Tag(0x4B554D20) }, // 'KUM ' Kumyk
-  { language: "kuu", tag: @otf.Tag(0x41544820), }, // 'ATH ' Upper Kuskokwim -> Athapaskan
-  { language: "kuw", tag: @otf.Tag(0x42414430), }, // 'BAD0' Kpagua -> Banda
-  { language: "kuy", tag: @otf.Tag(0), }, // null Kuuku-Ya'u != Kuy
-  { language: "kv", tag: @otf.Tag(0x4B4F4D20), }, // 'KOM ' Komi [macrolanguage]
-  { language: "kvb", tag: @otf.Tag(0x4D4C5920), }, // 'MLY ' Kubu -> Malay
-  { language: "kvl", tag: @otf.Tag(0x4B524E20), }, // 'KRN ' Kayaw -> Karen
-  { language: "kvq", tag: @otf.Tag(0x4B524E20), }, // 'KRN ' Geba Karen -> Karen
-  { language: "kvr", tag: @otf.Tag(0x4D4C5920), }, // 'MLY ' Kerinci -> Malay
-  { language: "kvt", tag: @otf.Tag(0x4B524E20), }, // 'KRN ' Lahta Karen -> Karen
-  { language: "kvu", tag: @otf.Tag(0x4B524E20), }, // 'KRN ' Yinbaw Karen -> Karen
-  { language: "kvy", tag: @otf.Tag(0x4B524E20), }, // 'KRN ' Yintale Karen -> Karen
-  { language: "kw", tag: @otf.Tag(0x434F5220), }, // 'COR ' Cornish
-  // { language: "kwk", tag: @otf.Tag(0x4B574B20) }, // 'KWK ' Kwakiutl -> Kwakʼwala
-  { language: "kww", tag: @otf.Tag(0x43505020), }, // 'CPP ' Kwinti -> Creoles
-  { language: "kwy", tag: @otf.Tag(0x4B4F4E30), }, // 'KON0' San Salvador Kongo -> Kongo
-  { language: "kxc", tag: @otf.Tag(0x4B4D5320), }, // 'KMS ' Konso -> Komso
-  { language: "kxd", tag: @otf.Tag(0x4D4C5920), }, // 'MLY ' Brunei -> Malay
-  { language: "kxf", tag: @otf.Tag(0x4B524E20), }, // 'KRN ' Manumanaw Karen -> Karen
-  { language: "kxk", tag: @otf.Tag(0x4B524E20), }, // 'KRN ' Zayein Karen -> Karen
-  { language: "kxl", tag: @otf.Tag(0x4B555520), }, // 'KUU ' Nepali Kurux(retired code) -> Kurukh
-  { language: "kxu", tag: @otf.Tag(0x4B554920), }, // 'KUI ' Kui (India)(retired code)
-  { language: "ky", tag: @otf.Tag(0x4B495220), }, // 'KIR ' Kirghiz (Kyrgyz)
-  { language: "kyk", tag: @otf.Tag(0), }, // null Kamayo != Koryak
-  { language: "kyu", tag: @otf.Tag(0x4B595520), }, // 'KYU ' Western Kayah
-  { language: "kyu", tag: @otf.Tag(0x4B524E20), }, // 'KRN ' Western Kayah -> Karen
-  { language: "la", tag: @otf.Tag(0x4C415420), }, // 'LAT ' Latin
-  { language: "lac", tag: @otf.Tag(0x4D594E20), }, // 'MYN ' Lacandon -> Mayan
-  { language: "lad", tag: @otf.Tag(0x4A554420), }, // 'JUD ' Ladino
-  { language: "lah", tag: @otf.Tag(0), }, // null Lahnda [macrolanguage] != Lahuli
-  { language: "lak", tag: @otf.Tag(0), }, // null Laka (Nigeria)(retired code) != Lak
-  { language: "lam", tag: @otf.Tag(0), }, // null Lamba != Lambani
-  { language: "laz", tag: @otf.Tag(0), }, // null Aribwatsa != Laz
-  { language: "lb", tag: @otf.Tag(0x4C545A20), }, // 'LTZ ' Luxembourgish
-  { language: "lbe", tag: @otf.Tag(0x4C414B20), }, // 'LAK ' Lak
-  { language: "lbj", tag: @otf.Tag(0x4C444B20), }, // 'LDK ' Ladakhi
-  { language: "lbl", tag: @otf.Tag(0x42494B20), }, // 'BIK ' Libon Bikol -> Bikol
-  { language: "lce", tag: @otf.Tag(0x4D4C5920), }, // 'MLY ' Loncong -> Malay
-  { language: "lcf", tag: @otf.Tag(0x4D4C5920), }, // 'MLY ' Lubu -> Malay
-  { language: "ldi", tag: @otf.Tag(0x4B4F4E30), }, // 'KON0' Laari -> Kongo
-  { language: "ldk", tag: @otf.Tag(0), }, // null Leelau != Ladakhi
-  // { language: "lef", tag: @otf.Tag(0x4C454620) }, // 'LEF ' Lelemi
-  // { language: "lez", tag: @otf.Tag(0x4C455A20) }, // 'LEZ ' Lezghian -> Lezgi
-  { language: "lg", tag: @otf.Tag(0x4C554720), }, // 'LUG ' Ganda
-  { language: "li", tag: @otf.Tag(0x4C494D20), }, // 'LIM ' Limburgish
-  { language: "lif", tag: @otf.Tag(0x4C4D4220), }, // 'LMB ' Limbu
-  // { language: "lij", tag: @otf.Tag(0x4C494A20) }, // 'LIJ ' Ligurian
-  { language: "lir", tag: @otf.Tag(0x43505020), }, // 'CPP ' Liberian English -> Creoles
-  // { language: "lis", tag: @otf.Tag(0x4C495320) }, // 'LIS ' Lisu
-  // { language: "liv", tag: @otf.Tag(0x4C495620) }, // 'LIV ' Liv
-  { language: "liw", tag: @otf.Tag(0x4D4C5920), }, // 'MLY ' Col -> Malay
-  { language: "liy", tag: @otf.Tag(0x42414430), }, // 'BAD0' Banda-Bambari -> Banda
-  // { language: "ljp", tag: @otf.Tag(0x4C4A5020) }, // 'LJP ' Lampung Api -> Lampung
-  { language: "lkb", tag: @otf.Tag(0x4C554820), }, // 'LUH ' Kabras -> Luyia
-  // { language: "lki", tag: @otf.Tag(0x4C4B4920) }, // 'LKI ' Laki
-  { language: "lko", tag: @otf.Tag(0x4C554820), }, // 'LUH ' Khayo -> Luyia
-  { language: "lks", tag: @otf.Tag(0x4C554820), }, // 'LUH ' Kisa -> Luyia
-  { language: "lld", tag: @otf.Tag(0x4C414420), }, // 'LAD ' Ladin
-  { language: "lma", tag: @otf.Tag(0), }, // null East Limba != Low Mari
-  { language: "lmb", tag: @otf.Tag(0), }, // null Merei != Limbu
-  { language: "lmn", tag: @otf.Tag(0x4C414D20), }, // 'LAM ' Lambadi -> Lambani
-  // { language: "lmo", tag: @otf.Tag(0x4C4D4F20) }, // 'LMO ' Lombard
-  { language: "lmw", tag: @otf.Tag(0), }, // null Lake Miwok != Lomwe
-  { language: "ln", tag: @otf.Tag(0x4C494E20), }, // 'LIN ' Lingala
-  { language: "lna", tag: @otf.Tag(0x42414430), }, // 'BAD0' Langbashe -> Banda
-  { language: "lnl", tag: @otf.Tag(0x42414430), }, // 'BAD0' South Central Banda -> Banda
-  { language: "lo", tag: @otf.Tag(0x4C414F20), }, // 'LAO ' Lao
-  // { language: "lom", tag: @otf.Tag(0x4C4F4D20) }, // 'LOM ' Loma (Liberia)
-  { language: "lou", tag: @otf.Tag(0x43505020), }, // 'CPP ' Louisiana Creole -> Creoles
-  // { language: "lpo", tag: @otf.Tag(0x4C504F20) }, // 'LPO ' Lipo
-  // { language: "lrc", tag: @otf.Tag(0x4C524320) }, // 'LRC ' Northern Luri -> Luri
-  { language: "lri", tag: @otf.Tag(0x4C554820), }, // 'LUH ' Marachi -> Luyia
-  { language: "lrm", tag: @otf.Tag(0x4C554820), }, // 'LUH ' Marama -> Luyia
-  { language: "lrt", tag: @otf.Tag(0x43505020), }, // 'CPP ' Larantuka Malay -> Creoles
-  { language: "lsb", tag: @otf.Tag(0), }, // null Burundian Sign Language != Lower Sorbian
-  { language: "lsm", tag: @otf.Tag(0x4C554820), }, // 'LUH ' Saamia -> Luyia
-  { language: "lt", tag: @otf.Tag(0x4C544820), }, // 'LTH ' Lithuanian
-  { language: "ltg", tag: @otf.Tag(0x4C564920), }, // 'LVI ' Latgalian -> Latvian
-  { language: "lth", tag: @otf.Tag(0), }, // null Thur != Lithuanian
-  { language: "lto", tag: @otf.Tag(0x4C554820), }, // 'LUH ' Tsotso -> Luyia
-  { language: "lts", tag: @otf.Tag(0x4C554820), }, // 'LUH ' Tachoni -> Luyia
-  { language: "lu", tag: @otf.Tag(0x4C554220), }, // 'LUB ' Luba-Katanga
-  // { language: "lua", tag: @otf.Tag(0x4C554120) }, // 'LUA ' Luba-Lulua
-  // { language: "luo", tag: @otf.Tag(0x4C554F20) }, // 'LUO ' Luo (Kenya and Tanzania)
-  { language: "lus", tag: @otf.Tag(0x4D495A20), }, // 'MIZ ' Lushai -> Mizo
-  { language: "lus", tag: @otf.Tag(0x51494E20), }, // 'QIN ' Lushai -> Chin
-  { language: "luy", tag: @otf.Tag(0x4C554820), }, // 'LUH ' Luyia [macrolanguage]
-  { language: "luz", tag: @otf.Tag(0x4C524320), }, // 'LRC ' Southern Luri -> Luri
-  { language: "lv", tag: @otf.Tag(0x4C564920), }, // 'LVI ' Latvian [macrolanguage]
-  { language: "lvi", tag: @otf.Tag(0), }, // null Lavi != Latvian
-  { language: "lvs", tag: @otf.Tag(0x4C564920), }, // 'LVI ' Standard Latvian -> Latvian
-  { language: "lwg", tag: @otf.Tag(0x4C554820), }, // 'LUH ' Wanga -> Luyia
-  { language: "lzh", tag: @otf.Tag(0x5A485420), }, // 'ZHT ' Literary Chinese -> Chinese, Traditional
-  { language: "lzz", tag: @otf.Tag(0x4C415A20), }, // 'LAZ ' Laz
-  // { language: "mad", tag: @otf.Tag(0x4D414420) }, // 'MAD ' Madurese -> Madura
-  // { language: "mag", tag: @otf.Tag(0x4D414720) }, // 'MAG ' Magahi
-  { language: "mai", tag: @otf.Tag(0x4D544820), }, // 'MTH ' Maithili
-  { language: "maj", tag: @otf.Tag(0), }, // null Jalapa De Díaz Mazatec != Majang
-  { language: "mak", tag: @otf.Tag(0x4D4B5220), }, // 'MKR ' Makasar
-  { language: "mam", tag: @otf.Tag(0x4D414D20), }, // 'MAM ' Mam
-  { language: "mam", tag: @otf.Tag(0x4D594E20), }, // 'MYN ' Mam -> Mayan
-  { language: "man", tag: @otf.Tag(0x4D4E4B20), }, // 'MNK ' Mandingo [macrolanguage] -> Maninka
-  { language: "map", tag: @otf.Tag(0), }, // null Austronesian  [collection] != Mapudungun
-  { language: "maw", tag: @otf.Tag(0), }, // null Mampruli != Marwari
-  { language: "max", tag: @otf.Tag(0x4D4C5920), }, // 'MLY ' North Moluccan Malay -> Malay
-  { language: "max", tag: @otf.Tag(0x43505020), }, // 'CPP ' North Moluccan Malay -> Creoles
-  { language: "mbf", tag: @otf.Tag(0x43505020), }, // 'CPP ' Baba Malay -> Creoles
-  { language: "mbn", tag: @otf.Tag(0), }, // null Macaguán != Mbundu
-  // { language: "mbo", tag: @otf.Tag(0x4D424F20) }, // 'MBO ' Mbo (Cameroon)
-  { language: "mch", tag: @otf.Tag(0), }, // null Maquiritari != Manchu
-  { language: "mcm", tag: @otf.Tag(0x43505020), }, // 'CPP ' Malaccan Creole Portuguese -> Creoles
-  { language: "mcr", tag: @otf.Tag(0), }, // null Menya != Moose Cree
-  { language: "mct", tag: @otf.Tag(0x42544920), }, // 'BTI ' Mengisa -> Beti
-  { language: "mde", tag: @otf.Tag(0), }, // null Maba (Chad) != Mende
-  { language: "mdf", tag: @otf.Tag(0x4D4F4B20), }, // 'MOK ' Moksha
-  // { language: "mdr", tag: @otf.Tag(0x4D445220) }, // 'MDR ' Mandar
-  { language: "mdy", tag: @otf.Tag(0x4D4C4520), }, // 'MLE ' Male (Ethiopia)
-  { language: "men", tag: @otf.Tag(0x4D444520), }, // 'MDE ' Mende (Sierra Leone)
-  { language: "meo", tag: @otf.Tag(0x4D4C5920), }, // 'MLY ' Kedah Malay -> Malay
-  // { language: "mer", tag: @otf.Tag(0x4D455220) }, // 'MER ' Meru
-  // { language: "mev", tag: @otf.Tag(0x4D455620) }, // 'MEV ' Mano
-  { language: "mfa", tag: @otf.Tag(0x4D464120), }, // 'MFA ' Pattani Malay
-  { language: "mfa", tag: @otf.Tag(0x4D4C5920), }, // 'MLY ' Pattani Malay -> Malay
-  { language: "mfb", tag: @otf.Tag(0x4D4C5920), }, // 'MLY ' Bangka -> Malay
-  { language: "mfe", tag: @otf.Tag(0x4D464520), }, // 'MFE ' Morisyen
-  { language: "mfe", tag: @otf.Tag(0x43505020), }, // 'CPP ' Morisyen -> Creoles
-  { language: "mfp", tag: @otf.Tag(0x43505020), }, // 'CPP ' Makassar Malay -> Creoles
-  { language: "mg", tag: @otf.Tag(0x4D4C4720), }, // 'MLG ' Malagasy [macrolanguage]
-  { language: "mga", tag: @otf.Tag(0x53474120), }, // 'SGA ' Middle Irish (900-1200) -> Old Irish
-  { language: "mh", tag: @otf.Tag(0x4D414820), }, // 'MAH ' Marshallese
-  { language: "mhc", tag: @otf.Tag(0x4D594E20), }, // 'MYN ' Mocho -> Mayan
-  { language: "mhr", tag: @otf.Tag(0x4C4D4120), }, // 'LMA ' Eastern Mari -> Low Mari
-  { language: "mhv", tag: @otf.Tag(0x41524B20), }, // 'ARK ' Arakanese(retired code) -> Rakhine
-  { language: "mi", tag: @otf.Tag(0x4D524920), }, // 'MRI ' Maori
-  { language: "min", tag: @otf.Tag(0x4D494E20), }, // 'MIN ' Minangkabau
-  { language: "min", tag: @otf.Tag(0x4D4C5920), }, // 'MLY ' Minangkabau -> Malay
-  { language: "miz", tag: @otf.Tag(0), }, // null Coatzospan Mixtec != Mizo
-  { language: "mk", tag: @otf.Tag(0x4D4B4420), }, // 'MKD ' Macedonian
-  { language: "mkn", tag: @otf.Tag(0x43505020), }, // 'CPP ' Kupang Malay -> Creoles
-  { language: "mkr", tag: @otf.Tag(0), }, // null Malas != Makasar
-  { language: "mku", tag: @otf.Tag(0x4D4E4B20), }, // 'MNK ' Konyanka Maninka -> Maninka
-  // { language: "mkw", tag: @otf.Tag(0x4D4B5720) }, // 'MKW ' Kituba (Congo)
-  { language: "ml", tag: @otf.Tag(0x4D414C20), }, // 'MAL ' Malayalam -> Malayalam Traditional
-  { language: "ml", tag: @otf.Tag(0x4D4C5220), }, // 'MLR ' Malayalam -> Malayalam Reformed
-  { language: "mle", tag: @otf.Tag(0), }, // null Manambu != Male
-  { language: "mln", tag: @otf.Tag(0), }, // null Malango != Malinke
-  { language: "mlq", tag: @otf.Tag(0x4D4C4E20), }, // 'MLN ' Western Maninkakan -> Malinke
-  { language: "mlq", tag: @otf.Tag(0x4D4E4B20), }, // 'MNK ' Western Maninkakan -> Maninka
-  { language: "mlr", tag: @otf.Tag(0), }, // null Vame != Malayalam Reformed
-  { language: "mmr", tag: @otf.Tag(0x484D4E20), }, // 'HMN ' Western Xiangxi Miao -> Hmong
-  { language: "mn", tag: @otf.Tag(0x4D4E4720), }, // 'MNG ' Mongolian [macrolanguage]
-  { language: "mnc", tag: @otf.Tag(0x4D434820), }, // 'MCH ' Manchu
-  { language: "mnd", tag: @otf.Tag(0), }, // null Mondé != Mandinka
-  { language: "mng", tag: @otf.Tag(0), }, // null Eastern Mnong != Mongolian
-  { language: "mnh", tag: @otf.Tag(0x42414430), }, // 'BAD0' Mono (Democratic Republic of Congo) -> Banda
-  // { language: "mni", tag: @otf.Tag(0x4D4E4920) }, // 'MNI ' Manipuri
-  { language: "mnk", tag: @otf.Tag(0x4D4E4420), }, // 'MND ' Mandinka
-  { language: "mnk", tag: @otf.Tag(0x4D4E4B20), }, // 'MNK ' Mandinka -> Maninka
-  { language: "mnp", tag: @otf.Tag(0x5A485320), }, // 'ZHS ' Min Bei Chinese -> Chinese, Simplified
-  { language: "mns", tag: @otf.Tag(0x4D414E20), }, // 'MAN ' Mansi
-  { language: "mnw", tag: @otf.Tag(0x4D4F4E20), }, // 'MON ' Mon
-  { language: "mnw", tag: @otf.Tag(0x4D4F4E54), }, // 'MONT' Mon -> Thailand Mon
-  { language: "mnx", tag: @otf.Tag(0), }, // null Manikion != Manx
-  { language: "mo", tag: @otf.Tag(0x4D4F4C20), }, // 'MOL ' Moldavian(retired code)
-  { language: "mo", tag: @otf.Tag(0x524F4D20), }, // 'ROM ' Moldavian(retired code) -> Romanian
-  { language: "mod", tag: @otf.Tag(0x43505020), }, // 'CPP ' Mobilian -> Creoles
-  // { language: "moh", tag: @otf.Tag(0x4D4F4820) }, // 'MOH ' Mohawk
-  { language: "mok", tag: @otf.Tag(0), }, // null Morori != Moksha
-  { language: "mop", tag: @otf.Tag(0x4D594E20), }, // 'MYN ' Mopán Maya -> Mayan
-  { language: "mor", tag: @otf.Tag(0), }, // null Moro != Moroccan
-  // { language: "mos", tag: @otf.Tag(0x4D4F5320) }, // 'MOS ' Mossi
-  { language: "mpe", tag: @otf.Tag(0x4D414A20), }, // 'MAJ ' Majang
-  { language: "mqg", tag: @otf.Tag(0x4D4C5920), }, // 'MLY ' Kota Bangun Kutai Malay -> Malay
-  { language: "mr", tag: @otf.Tag(0x4D415220), }, // 'MAR ' Marathi
-  { language: "mrh", tag: @otf.Tag(0x51494E20), }, // 'QIN ' Mara Chin -> Chin
-  { language: "mrj", tag: @otf.Tag(0x484D4120), }, // 'HMA ' Western Mari -> High Mari
-  { language: "ms", tag: @otf.Tag(0x4D4C5920), }, // 'MLY ' Malay  [macrolanguage]
-  { language: "msc", tag: @otf.Tag(0x4D4E4B20), }, // 'MNK ' Sankaran Maninka -> Maninka
-  { language: "msh", tag: @otf.Tag(0x4D4C4720), }, // 'MLG ' Masikoro Malagasy -> Malagasy
-  { language: "msi", tag: @otf.Tag(0x4D4C5920), }, // 'MLY ' Sabah Malay -> Malay
-  { language: "msi", tag: @otf.Tag(0x43505020), }, // 'CPP ' Sabah Malay -> Creoles
-  { language: "mt", tag: @otf.Tag(0x4D545320), }, // 'MTS ' Maltese
-  { language: "mth", tag: @otf.Tag(0), }, // null Munggui != Maithili
-  { language: "mtr", tag: @otf.Tag(0x4D415720), }, // 'MAW ' Mewari -> Marwari
-  { language: "mts", tag: @otf.Tag(0), }, // null Yora != Maltese
-  { language: "mud", tag: @otf.Tag(0x43505020), }, // 'CPP ' Mednyj Aleut -> Creoles
-  { language: "mui", tag: @otf.Tag(0x4D4C5920), }, // 'MLY ' Musi -> Malay
-  { language: "mun", tag: @otf.Tag(0), }, // null Munda  [collection] != Mundari
-  { language: "mup", tag: @otf.Tag(0x52414A20), }, // 'RAJ ' Malvi -> Rajasthani
-  { language: "muq", tag: @otf.Tag(0x484D4E20), }, // 'HMN ' Eastern Xiangxi Miao -> Hmong
-  // { language: "mus", tag: @otf.Tag(0x4D555320) }, // 'MUS ' Creek -> Muscogee
-  { language: "mvb", tag: @otf.Tag(0x41544820), }, // 'ATH ' Mattole -> Athapaskan
-  { language: "mve", tag: @otf.Tag(0x4D415720), }, // 'MAW ' Marwari (Pakistan)
-  { language: "mvf", tag: @otf.Tag(0x4D4E4720), }, // 'MNG ' Peripheral Mongolian -> Mongolian
-  { language: "mwk", tag: @otf.Tag(0x4D4E4B20), }, // 'MNK ' Kita Maninkakan -> Maninka
-  // { language: "mwl", tag: @otf.Tag(0x4D574C20) }, // 'MWL ' Mirandese
-  { language: "mwq", tag: @otf.Tag(0x51494E20), }, // 'QIN ' Mün Chin -> Chin
-  { language: "mwr", tag: @otf.Tag(0x4D415720), }, // 'MAW ' Marwari [macrolanguage]
-  { language: "mww", tag: @otf.Tag(0x4D575720), }, // 'MWW ' Hmong Daw
-  { language: "mww", tag: @otf.Tag(0x484D4E20), }, // 'HMN ' Hmong Daw -> Hmong
-  { language: "my", tag: @otf.Tag(0x42524D20), }, // 'BRM ' Burmese
-  { language: "mym", tag: @otf.Tag(0x4D454E20), }, // 'MEN ' Me’en
-  // { language: "myn", tag: @otf.Tag(0x4D594E20) }, // 'MYN ' Mayan  [collection]
-  { language: "myq", tag: @otf.Tag(0x4D4E4B20), }, // 'MNK ' Forest Maninka(retired code) -> Maninka
-  { language: "myv", tag: @otf.Tag(0x45525A20), }, // 'ERZ ' Erzya
-  { language: "mzb", tag: @otf.Tag(0x42425220), }, // 'BBR ' Tumzabt -> Berber
-  // { language: "mzn", tag: @otf.Tag(0x4D5A4E20) }, // 'MZN ' Mazanderani
-  { language: "mzs", tag: @otf.Tag(0x43505020), }, // 'CPP ' Macanese -> Creoles
-  { language: "na", tag: @otf.Tag(0x4E415520), }, // 'NAU ' Nauru -> Nauruan
-  { language: "nag", tag: @otf.Tag(0x4E414720), }, // 'NAG ' Naga Pidgin -> Naga-Assamese
-  { language: "nag", tag: @otf.Tag(0x43505020), }, // 'CPP ' Naga Pidgin -> Creoles
-  // { language: "nah", tag: @otf.Tag(0x4E414820) }, // 'NAH ' Nahuatl  [collection]
-  { language: "nan", tag: @otf.Tag(0x5A485320), }, // 'ZHS ' Min Nan Chinese -> Chinese, Simplified
-  // { language: "nap", tag: @otf.Tag(0x4E415020) }, // 'NAP ' Neapolitan
-  { language: "nas", tag: @otf.Tag(0), }, // null Naasioi != Naskapi
-  { language: "naz", tag: @otf.Tag(0x4E414820), }, // 'NAH ' Coatepec Nahuatl -> Nahuatl
-  { language: "nb", tag: @otf.Tag(0x4E4F5220), }, // 'NOR ' Norwegian Bokmål -> Norwegian
-  { language: "nch", tag: @otf.Tag(0x4E414820), }, // 'NAH ' Central Huasteca Nahuatl -> Nahuatl
-  { language: "nci", tag: @otf.Tag(0x4E414820), }, // 'NAH ' Classical Nahuatl -> Nahuatl
-  { language: "ncj", tag: @otf.Tag(0x4E414820), }, // 'NAH ' Northern Puebla Nahuatl -> Nahuatl
-  { language: "ncl", tag: @otf.Tag(0x4E414820), }, // 'NAH ' Michoacán Nahuatl -> Nahuatl
-  { language: "ncr", tag: @otf.Tag(0), }, // null Ncane != N-Cree
-  { language: "ncx", tag: @otf.Tag(0x4E414820), }, // 'NAH ' Central Puebla Nahuatl -> Nahuatl
-  { language: "nd", tag: @otf.Tag(0x4E444220), }, // 'NDB ' North Ndebele -> Ndebele
-  { language: "ndb", tag: @otf.Tag(0), }, // null Kenswei Nsei != Ndebele
-  // { language: "ndc", tag: @otf.Tag(0x4E444320) }, // 'NDC ' Ndau
-  { language: "ndg", tag: @otf.Tag(0), }, // null Ndengereko != Ndonga
-  // { language: "nds", tag: @otf.Tag(0x4E445320) }, // 'NDS ' Low Saxon
-  { language: "ne", tag: @otf.Tag(0x4E455020), }, // 'NEP ' Nepali  [macrolanguage]
-  { language: "nef", tag: @otf.Tag(0x43505020), }, // 'CPP ' Nefamese -> Creoles
-  // { language: "new", tag: @otf.Tag(0x4E455720) }, // 'NEW ' Newari
-  { language: "ng", tag: @otf.Tag(0x4E444720), }, // 'NDG ' Ndonga
-  // { language: "nga", tag: @otf.Tag(0x4E474120) }, // 'NGA ' Ngbaka
-  { language: "ngl", tag: @otf.Tag(0x4C4D5720), }, // 'LMW ' Lomwe
-  { language: "ngm", tag: @otf.Tag(0x43505020), }, // 'CPP ' Ngatik Men's Creole -> Creoles
-  { language: "ngo", tag: @otf.Tag(0x53585420), }, // 'SXT ' Ngoni(retired code) -> Sutu
-  { language: "ngr", tag: @otf.Tag(0), }, // null Engdewu != Nagari
-  { language: "ngu", tag: @otf.Tag(0x4E414820), }, // 'NAH ' Guerrero Nahuatl -> Nahuatl
-  { language: "nhc", tag: @otf.Tag(0x4E414820), }, // 'NAH ' Tabasco Nahuatl -> Nahuatl
-  { language: "nhd", tag: @otf.Tag(0x47554120), }, // 'GUA ' Chiripá -> Guarani
-  { language: "nhe", tag: @otf.Tag(0x4E414820), }, // 'NAH ' Eastern Huasteca Nahuatl -> Nahuatl
-  { language: "nhg", tag: @otf.Tag(0x4E414820), }, // 'NAH ' Tetelcingo Nahuatl -> Nahuatl
-  { language: "nhi", tag: @otf.Tag(0x4E414820), }, // 'NAH ' Zacatlán-Ahuacatlán-Tepetzintla Nahuatl -> Nahuatl
-  { language: "nhk", tag: @otf.Tag(0x4E414820), }, // 'NAH ' Isthmus-Cosoleacaque Nahuatl -> Nahuatl
-  { language: "nhm", tag: @otf.Tag(0x4E414820), }, // 'NAH ' Morelos Nahuatl -> Nahuatl
-  { language: "nhn", tag: @otf.Tag(0x4E414820), }, // 'NAH ' Central Nahuatl -> Nahuatl
-  { language: "nhp", tag: @otf.Tag(0x4E414820), }, // 'NAH ' Isthmus-Pajapan Nahuatl -> Nahuatl
-  { language: "nhq", tag: @otf.Tag(0x4E414820), }, // 'NAH ' Huaxcaleca Nahuatl -> Nahuatl
-  { language: "nht", tag: @otf.Tag(0x4E414820), }, // 'NAH ' Ometepec Nahuatl -> Nahuatl
-  { language: "nhv", tag: @otf.Tag(0x4E414820), }, // 'NAH ' Temascaltepec Nahuatl -> Nahuatl
-  { language: "nhw", tag: @otf.Tag(0x4E414820), }, // 'NAH ' Western Huasteca Nahuatl -> Nahuatl
-  { language: "nhx", tag: @otf.Tag(0x4E414820), }, // 'NAH ' Isthmus-Mecayapan Nahuatl -> Nahuatl
-  { language: "nhy", tag: @otf.Tag(0x4E414820), }, // 'NAH ' Northern Oaxaca Nahuatl -> Nahuatl
-  { language: "nhz", tag: @otf.Tag(0x4E414820), }, // 'NAH ' Santa María La Alta Nahuatl -> Nahuatl
-  { language: "niq", tag: @otf.Tag(0x4B414C20), }, // 'KAL ' Nandi -> Kalenjin
-  { language: "nis", tag: @otf.Tag(0), }, // null Nimi != Nisi
-  // { language: "niu", tag: @otf.Tag(0x4E495520) }, // 'NIU ' Niuean
-  { language: "niv", tag: @otf.Tag(0x47494C20), }, // 'GIL ' Gilyak
-  { language: "njt", tag: @otf.Tag(0x43505020), }, // 'CPP ' Ndyuka-Trio Pidgin -> Creoles
-  { language: "njz", tag: @otf.Tag(0x4E495320), }, // 'NIS ' Nyishi -> Nisi
-  { language: "nko", tag: @otf.Tag(0), }, // null Nkonya != N’Ko
-  { language: "nkx", tag: @otf.Tag(0x494A4F20), }, // 'IJO ' Nkoroo -> Ijo
-  { language: "nl", tag: @otf.Tag(0x4E4C4420), }, // 'NLD ' Dutch
-  { language: "nla", tag: @otf.Tag(0x424D4C20), }, // 'BML ' Ngombale -> Bamileke
-  { language: "nle", tag: @otf.Tag(0x4C554820), }, // 'LUH ' East Nyala -> Luyia
-  { language: "nln", tag: @otf.Tag(0x4E414820), }, // 'NAH ' Durango Nahuatl(retired code) -> Nahuatl
-  { language: "nlv", tag: @otf.Tag(0x4E414820), }, // 'NAH ' Orizaba Nahuatl -> Nahuatl
-  { language: "nn", tag: @otf.Tag(0x4E594E20), }, // 'NYN ' Norwegian Nynorsk (Nynorsk, Norwegian)
-  { language: "nnh", tag: @otf.Tag(0x424D4C20), }, // 'BML ' Ngiemboon -> Bamileke
-  { language: "nnz", tag: @otf.Tag(0x424D4C20), }, // 'BML ' Nda'nda' -> Bamileke
-  { language: "no", tag: @otf.Tag(0x4E4F5220), }, // 'NOR ' Norwegian [macrolanguage]
-  { language: "nod", tag: @otf.Tag(0x4E544120), }, // 'NTA ' Northern Thai -> Northern Tai
-  // { language: "noe", tag: @otf.Tag(0x4E4F4520) }, // 'NOE ' Nimadi
-  // { language: "nog", tag: @otf.Tag(0x4E4F4720) }, // 'NOG ' Nogai
-  // { language: "nov", tag: @otf.Tag(0x4E4F5620) }, // 'NOV ' Novial
-  { language: "npi", tag: @otf.Tag(0x4E455020), }, // 'NEP ' Nepali 
-  { language: "npl", tag: @otf.Tag(0x4E414820), }, // 'NAH ' Southeastern Puebla Nahuatl -> Nahuatl
-  { language: "nqo", tag: @otf.Tag(0x4E4B4F20), }, // 'NKO ' N’Ko
-  { language: "nr", tag: @otf.Tag(0x4E444220), }, // 'NDB ' South Ndebele -> Ndebele
-  { language: "nsk", tag: @otf.Tag(0x4E415320), }, // 'NAS ' Naskapi
-  { language: "nsm", tag: @otf.Tag(0), }, // null Sumi Naga != Northern Sami
-  // { language: "nso", tag: @otf.Tag(0x4E534F20) }, // 'NSO ' Northern Sotho
-  { language: "nsu", tag: @otf.Tag(0x4E414820), }, // 'NAH ' Sierra Negra Nahuatl -> Nahuatl
-  { language: "nto", tag: @otf.Tag(0), }, // null Ntomba != Esperanto
-  { language: "nue", tag: @otf.Tag(0x42414430), }, // 'BAD0' Ngundu -> Banda
-  { language: "nuu", tag: @otf.Tag(0x42414430), }, // 'BAD0' Ngbundu -> Banda
-  { language: "nuz", tag: @otf.Tag(0x4E414820), }, // 'NAH ' Tlamacazapa Nahuatl -> Nahuatl
-  { language: "nv", tag: @otf.Tag(0x4E415620), }, // 'NAV ' Navajo
-  { language: "nv", tag: @otf.Tag(0x41544820), }, // 'ATH ' Navajo -> Athapaskan
-  { language: "nwe", tag: @otf.Tag(0x424D4C20), }, // 'BML ' Ngwe -> Bamileke
-  { language: "ny", tag: @otf.Tag(0x43484920), }, // 'CHI ' Chichewa (Chewa, Nyanja)
-  { language: "nyd", tag: @otf.Tag(0x4C554820), }, // 'LUH ' Nyore -> Luyia
-  // { language: "nym", tag: @otf.Tag(0x4E594D20) }, // 'NYM ' Nyamwezi
-  { language: "nyn", tag: @otf.Tag(0x4E4B4C20), }, // 'NKL ' Nyankole
-  // { language: "nza", tag: @otf.Tag(0x4E5A4120) }, // 'NZA ' Tigon Mbembe -> Mbembe Tigon
-  { language: "oc", tag: @otf.Tag(0x4F434920), }, // 'OCI ' Occitan (post 1500)
-  { language: "oj", tag: @otf.Tag(0x4F4A4220), }, // 'OJB ' Ojibwa [macrolanguage] -> Ojibway
-  // { language: "ojb", tag: @otf.Tag(0x4F4A4220) }, // 'OJB ' Northwestern Ojibwa -> Ojibway
-  { language: "ojc", tag: @otf.Tag(0x4F4A4220), }, // 'OJB ' Central Ojibwa -> Ojibway
-  { language: "ojg", tag: @otf.Tag(0x4F4A4220), }, // 'OJB ' Eastern Ojibwa -> Ojibway
-  { language: "ojs", tag: @otf.Tag(0x4F435220), }, // 'OCR ' Severn Ojibwa -> Oji-Cree
-  { language: "ojs", tag: @otf.Tag(0x4F4A4220), }, // 'OJB ' Severn Ojibwa -> Ojibway
-  { language: "ojw", tag: @otf.Tag(0x4F4A4220), }, // 'OJB ' Western Ojibwa -> Ojibway
-  { language: "okd", tag: @otf.Tag(0x494A4F20), }, // 'IJO ' Okodia -> Ijo
-  { language: "oki", tag: @otf.Tag(0x4B414C20), }, // 'KAL ' Okiek -> Kalenjin
-  { language: "okm", tag: @otf.Tag(0x4B4F4820), }, // 'KOH ' Middle Korean (10th-16th cent.) -> Korean Old Hangul
-  { language: "okr", tag: @otf.Tag(0x494A4F20), }, // 'IJO ' Kirike -> Ijo
-  { language: "om", tag: @otf.Tag(0x4F524F20), }, // 'ORO ' Oromo [macrolanguage]
-  // { language: "one", tag: @otf.Tag(0x4F4E4520) }, // 'ONE ' Oneida
-  // { language: "ono", tag: @otf.Tag(0x4F4E4F20) }, // 'ONO ' Onondaga
-  { language: "onx", tag: @otf.Tag(0x43505020), }, // 'CPP ' Onin Based Pidgin -> Creoles
-  { language: "oor", tag: @otf.Tag(0x43505020), }, // 'CPP ' Oorlams -> Creoles
-  { language: "or", tag: @otf.Tag(0x4F524920), }, // 'ORI ' Odia  [macrolanguage]
-  { language: "orc", tag: @otf.Tag(0x4F524F20), }, // 'ORO ' Orma -> Oromo
-  { language: "orn", tag: @otf.Tag(0x4D4C5920), }, // 'MLY ' Orang Kanaq -> Malay
-  { language: "oro", tag: @otf.Tag(0), }, // null Orokolo != Oromo
-  { language: "orr", tag: @otf.Tag(0x494A4F20), }, // 'IJO ' Oruma -> Ijo
-  { language: "ors", tag: @otf.Tag(0x4D4C5920), }, // 'MLY ' Orang Seletar -> Malay
-  { language: "ory", tag: @otf.Tag(0x4F524920), }, // 'ORI ' Odia 
-  { language: "os", tag: @otf.Tag(0x4F535320), }, // 'OSS ' Ossetian
-  { language: "otw", tag: @otf.Tag(0x4F4A4220), }, // 'OJB ' Ottawa -> Ojibway
-  { language: "oua", tag: @otf.Tag(0x42425220), }, // 'BBR ' Tagargrent -> Berber
-  { language: "pa", tag: @otf.Tag(0x50414E20), }, // 'PAN ' Punjabi
-  { language: "paa", tag: @otf.Tag(0), }, // null Papuan  [collection] != Palestinian Aramaic
-  // { language: "pag", tag: @otf.Tag(0x50414720) }, // 'PAG ' Pangasinan
-  { language: "pal", tag: @otf.Tag(0), }, // null Pahlavi != Pali
-  // { language: "pam", tag: @otf.Tag(0x50414D20) }, // 'PAM ' Pampanga -> Pampangan
-  { language: "pap", tag: @otf.Tag(0x50415030), }, // 'PAP0' Papiamento -> Papiamentu
-  { language: "pap", tag: @otf.Tag(0x43505020), }, // 'CPP ' Papiamento -> Creoles
-  { language: "pas", tag: @otf.Tag(0), }, // null Papasena != Pashto
-  // { language: "pau", tag: @otf.Tag(0x50415520) }, // 'PAU ' Palauan
-  { language: "pbt", tag: @otf.Tag(0x50415320), }, // 'PAS ' Southern Pashto -> Pashto
-  { language: "pbu", tag: @otf.Tag(0x50415320), }, // 'PAS ' Northern Pashto -> Pashto
-  // { language: "pcc", tag: @otf.Tag(0x50434320) }, // 'PCC ' Bouyei
-  // { language: "pcd", tag: @otf.Tag(0x50434420) }, // 'PCD ' Picard
-  { language: "pce", tag: @otf.Tag(0x504C4720), }, // 'PLG ' Ruching Palaung -> Palaung
-  { language: "pck", tag: @otf.Tag(0x51494E20), }, // 'QIN ' Paite Chin -> Chin
-  { language: "pcm", tag: @otf.Tag(0x43505020), }, // 'CPP ' Nigerian Pidgin -> Creoles
-  // { language: "pdc", tag: @otf.Tag(0x50444320) }, // 'PDC ' Pennsylvania German
-  { language: "pdu", tag: @otf.Tag(0x4B524E20), }, // 'KRN ' Kayan -> Karen
-  { language: "pea", tag: @otf.Tag(0x43505020), }, // 'CPP ' Peranakan Indonesian -> Creoles
-  { language: "pel", tag: @otf.Tag(0x4D4C5920), }, // 'MLY ' Pekal -> Malay
-  { language: "pes", tag: @otf.Tag(0x46415220), }, // 'FAR ' Iranian Persian -> Persian
-  { language: "pey", tag: @otf.Tag(0x43505020), }, // 'CPP ' Petjo -> Creoles
-  { language: "pga", tag: @otf.Tag(0x41524120), }, // 'ARA ' Sudanese Creole Arabic -> Arabic
-  { language: "pga", tag: @otf.Tag(0x43505020), }, // 'CPP ' Sudanese Creole Arabic -> Creoles
-  // { language: "phk", tag: @otf.Tag(0x50484B20) }, // 'PHK ' Phake
-  { language: "pi", tag: @otf.Tag(0x50414C20), }, // 'PAL ' Pali
-  { language: "pih", tag: @otf.Tag(0x50494820), }, // 'PIH ' Pitcairn-Norfolk -> Norfolk
-  { language: "pih", tag: @otf.Tag(0x43505020), }, // 'CPP ' Pitcairn-Norfolk -> Creoles
-  { language: "pil", tag: @otf.Tag(0), }, // null Yom != Filipino
-  { language: "pis", tag: @otf.Tag(0x43505020), }, // 'CPP ' Pijin -> Creoles
-  { language: "pkh", tag: @otf.Tag(0x51494E20), }, // 'QIN ' Pankhu -> Chin
-  { language: "pko", tag: @otf.Tag(0x4B414C20), }, // 'KAL ' Pökoot -> Kalenjin
-  { language: "pl", tag: @otf.Tag(0x504C4B20), }, // 'PLK ' Polish
-  { language: "plg", tag: @otf.Tag(0x504C4730), }, // 'PLG0' Pilagá
-  { language: "plk", tag: @otf.Tag(0), }, // null Kohistani Shina != Polish
-  { language: "pll", tag: @otf.Tag(0x504C4720), }, // 'PLG ' Shwe Palaung -> Palaung
-  { language: "pln", tag: @otf.Tag(0x43505020), }, // 'CPP ' Palenquero -> Creoles
-  { language: "plp", tag: @otf.Tag(0x50415020), }, // 'PAP ' Palpa(retired code)
-  { language: "plt", tag: @otf.Tag(0x4D4C4720), }, // 'MLG ' Plateau Malagasy -> Malagasy
-  { language: "pml", tag: @otf.Tag(0x43505020), }, // 'CPP ' Lingua Franca -> Creoles
-  // { language: "pms", tag: @otf.Tag(0x504D5320) }, // 'PMS ' Piemontese
-  { language: "pmy", tag: @otf.Tag(0x43505020), }, // 'CPP ' Papuan Malay -> Creoles
-  // { language: "pnb", tag: @otf.Tag(0x504E4220) }, // 'PNB ' Western Panjabi
-  { language: "poc", tag: @otf.Tag(0x4D594E20), }, // 'MYN ' Poqomam -> Mayan
-  { language: "poh", tag: @otf.Tag(0x504F4820), }, // 'POH ' Poqomchi' -> Pocomchi
-  { language: "poh", tag: @otf.Tag(0x4D594E20), }, // 'MYN ' Poqomchi' -> Mayan
-  // { language: "pon", tag: @otf.Tag(0x504F4E20) }, // 'PON ' Pohnpeian
-  { language: "pov", tag: @otf.Tag(0x43505020), }, // 'CPP ' Upper Guinea Crioulo -> Creoles
-  { language: "ppa", tag: @otf.Tag(0x42414720), }, // 'BAG ' Pao(retired code) -> Baghelkhandi
-  { language: "pre", tag: @otf.Tag(0x43505020), }, // 'CPP ' Principense -> Creoles
-  // { language: "pro", tag: @otf.Tag(0x50524F20) }, // 'PRO ' Old Provençal (to 1500) -> Provençal / Old Provençal
-  { language: "prp", tag: @otf.Tag(0x47554A20), }, // 'GUJ ' Parsi(retired code) -> Gujarati
-  { language: "prs", tag: @otf.Tag(0x44524920), }, // 'DRI ' Dari
-  { language: "prs", tag: @otf.Tag(0x46415220), }, // 'FAR ' Dari -> Persian
-  { language: "ps", tag: @otf.Tag(0x50415320), }, // 'PAS ' Pashto [macrolanguage]
-  { language: "pse", tag: @otf.Tag(0x4D4C5920), }, // 'MLY ' Central Malay -> Malay
-  { language: "pst", tag: @otf.Tag(0x50415320), }, // 'PAS ' Central Pashto -> Pashto
-  { language: "pt", tag: @otf.Tag(0x50544720), }, // 'PTG ' Portuguese
-  { language: "pub", tag: @otf.Tag(0x51494E20), }, // 'QIN ' Purum -> Chin
-  { language: "puz", tag: @otf.Tag(0x51494E20), }, // 'QIN ' Purum Naga(retired code) -> Chin
-  { language: "pwo", tag: @otf.Tag(0x50574F20), }, // 'PWO ' Pwo Western Karen -> Western Pwo Karen
-  { language: "pwo", tag: @otf.Tag(0x4B524E20), }, // 'KRN ' Pwo Western Karen -> Karen
-  { language: "pww", tag: @otf.Tag(0x4B524E20), }, // 'KRN ' Pwo Northern Karen -> Karen
-  { language: "qu", tag: @otf.Tag(0x51555A20), }, // 'QUZ ' Quechua [macrolanguage]
-  { language: "qub", tag: @otf.Tag(0x51574820), }, // 'QWH ' Huallaga Huánuco Quechua -> Quechua (Peru)
-  { language: "qub", tag: @otf.Tag(0x51555A20), }, // 'QUZ ' Huallaga Huánuco Quechua -> Quechua
-  { language: "quc", tag: @otf.Tag(0x51554320), }, // 'QUC ' K’iche’
-  { language: "quc", tag: @otf.Tag(0x4D594E20), }, // 'MYN ' K'iche' -> Mayan
-  { language: "qud", tag: @otf.Tag(0x51564920), }, // 'QVI ' Calderón Highland Quichua -> Quechua (Ecuador)
-  { language: "qud", tag: @otf.Tag(0x51555A20), }, // 'QUZ ' Calderón Highland Quichua -> Quechua
-  { language: "quf", tag: @otf.Tag(0x51555A20), }, // 'QUZ ' Lambayeque Quechua -> Quechua
-  { language: "qug", tag: @otf.Tag(0x51564920), }, // 'QVI ' Chimborazo Highland Quichua -> Quechua (Ecuador)
-  { language: "qug", tag: @otf.Tag(0x51555A20), }, // 'QUZ ' Chimborazo Highland Quichua -> Quechua
-  { language: "quh", tag: @otf.Tag(0x51554820), }, // 'QUH ' South Bolivian Quechua -> Quechua (Bolivia)
-  { language: "quh", tag: @otf.Tag(0x51555A20), }, // 'QUZ ' South Bolivian Quechua -> Quechua
-  { language: "quk", tag: @otf.Tag(0x51555A20), }, // 'QUZ ' Chachapoyas Quechua -> Quechua
-  { language: "qul", tag: @otf.Tag(0x51554820), }, // 'QUH ' North Bolivian Quechua -> Quechua (Bolivia)
-  { language: "qul", tag: @otf.Tag(0x51555A20), }, // 'QUZ ' North Bolivian Quechua -> Quechua
-  { language: "qum", tag: @otf.Tag(0x4D594E20), }, // 'MYN ' Sipacapense -> Mayan
-  { language: "qup", tag: @otf.Tag(0x51564920), }, // 'QVI ' Southern Pastaza Quechua -> Quechua (Ecuador)
-  { language: "qup", tag: @otf.Tag(0x51555A20), }, // 'QUZ ' Southern Pastaza Quechua -> Quechua
-  { language: "qur", tag: @otf.Tag(0x51574820), }, // 'QWH ' Yanahuanca Pasco Quechua -> Quechua (Peru)
-  { language: "qur", tag: @otf.Tag(0x51555A20), }, // 'QUZ ' Yanahuanca Pasco Quechua -> Quechua
-  { language: "qus", tag: @otf.Tag(0x51554820), }, // 'QUH ' Santiago del Estero Quichua -> Quechua (Bolivia)
-  { language: "qus", tag: @otf.Tag(0x51555A20), }, // 'QUZ ' Santiago del Estero Quichua -> Quechua
-  { language: "quv", tag: @otf.Tag(0x4D594E20), }, // 'MYN ' Sacapulteco -> Mayan
-  { language: "quw", tag: @otf.Tag(0x51564920), }, // 'QVI ' Tena Lowland Quichua -> Quechua (Ecuador)
-  { language: "quw", tag: @otf.Tag(0x51555A20), }, // 'QUZ ' Tena Lowland Quichua -> Quechua
-  { language: "qux", tag: @otf.Tag(0x51574820), }, // 'QWH ' Yauyos Quechua -> Quechua (Peru)
-  { language: "qux", tag: @otf.Tag(0x51555A20), }, // 'QUZ ' Yauyos Quechua -> Quechua
-  { language: "quy", tag: @otf.Tag(0x51555A20), }, // 'QUZ ' Ayacucho Quechua -> Quechua
-  // { language: "quz", tag: @otf.Tag(0x51555A20) }, // 'QUZ ' Cusco Quechua -> Quechua
-  { language: "qva", tag: @otf.Tag(0x51574820), }, // 'QWH ' Ambo-Pasco Quechua -> Quechua (Peru)
-  { language: "qva", tag: @otf.Tag(0x51555A20), }, // 'QUZ ' Ambo-Pasco Quechua -> Quechua
-  { language: "qvc", tag: @otf.Tag(0x51555A20), }, // 'QUZ ' Cajamarca Quechua -> Quechua
-  { language: "qve", tag: @otf.Tag(0x51555A20), }, // 'QUZ ' Eastern Apurímac Quechua -> Quechua
-  { language: "qvh", tag: @otf.Tag(0x51574820), }, // 'QWH ' Huamalíes-Dos de Mayo Huánuco Quechua -> Quechua (Peru)
-  { language: "qvh", tag: @otf.Tag(0x51555A20), }, // 'QUZ ' Huamalíes-Dos de Mayo Huánuco Quechua -> Quechua
-  { language: "qvi", tag: @otf.Tag(0x51564920), }, // 'QVI ' Imbabura Highland Quichua -> Quechua (Ecuador)
-  { language: "qvi", tag: @otf.Tag(0x51555A20), }, // 'QUZ ' Imbabura Highland Quichua -> Quechua
-  { language: "qvj", tag: @otf.Tag(0x51564920), }, // 'QVI ' Loja Highland Quichua -> Quechua (Ecuador)
-  { language: "qvj", tag: @otf.Tag(0x51555A20), }, // 'QUZ ' Loja Highland Quichua -> Quechua
-  { language: "qvl", tag: @otf.Tag(0x51574820), }, // 'QWH ' Cajatambo North Lima Quechua -> Quechua (Peru)
-  { language: "qvl", tag: @otf.Tag(0x51555A20), }, // 'QUZ ' Cajatambo North Lima Quechua -> Quechua
-  { language: "qvm", tag: @otf.Tag(0x51574820), }, // 'QWH ' Margos-Yarowilca-Lauricocha Quechua -> Quechua (Peru)
-  { language: "qvm", tag: @otf.Tag(0x51555A20), }, // 'QUZ ' Margos-Yarowilca-Lauricocha Quechua -> Quechua
-  { language: "qvn", tag: @otf.Tag(0x51574820), }, // 'QWH ' North Junín Quechua -> Quechua (Peru)
-  { language: "qvn", tag: @otf.Tag(0x51555A20), }, // 'QUZ ' North Junín Quechua -> Quechua
-  { language: "qvo", tag: @otf.Tag(0x51564920), }, // 'QVI ' Napo Lowland Quechua -> Quechua (Ecuador)
-  { language: "qvo", tag: @otf.Tag(0x51555A20), }, // 'QUZ ' Napo Lowland Quechua -> Quechua
-  { language: "qvp", tag: @otf.Tag(0x51574820), }, // 'QWH ' Pacaraos Quechua -> Quechua (Peru)
-  { language: "qvp", tag: @otf.Tag(0x51555A20), }, // 'QUZ ' Pacaraos Quechua -> Quechua
-  { language: "qvs", tag: @otf.Tag(0x51555A20), }, // 'QUZ ' San Martín Quechua -> Quechua
-  { language: "qvw", tag: @otf.Tag(0x51574820), }, // 'QWH ' Huaylla Wanca Quechua -> Quechua (Peru)
-  { language: "qvw", tag: @otf.Tag(0x51555A20), }, // 'QUZ ' Huaylla Wanca Quechua -> Quechua
-  { language: "qvz", tag: @otf.Tag(0x51564920), }, // 'QVI ' Northern Pastaza Quichua -> Quechua (Ecuador)
-  { language: "qvz", tag: @otf.Tag(0x51555A20), }, // 'QUZ ' Northern Pastaza Quichua -> Quechua
-  { language: "qwa", tag: @otf.Tag(0x51574820), }, // 'QWH ' Corongo Ancash Quechua -> Quechua (Peru)
-  { language: "qwa", tag: @otf.Tag(0x51555A20), }, // 'QUZ ' Corongo Ancash Quechua -> Quechua
-  { language: "qwc", tag: @otf.Tag(0x51555A20), }, // 'QUZ ' Classical Quechua -> Quechua
-  { language: "qwh", tag: @otf.Tag(0x51574820), }, // 'QWH ' Huaylas Ancash Quechua -> Quechua (Peru)
-  { language: "qwh", tag: @otf.Tag(0x51555A20), }, // 'QUZ ' Huaylas Ancash Quechua -> Quechua
-  { language: "qws", tag: @otf.Tag(0x51574820), }, // 'QWH ' Sihuas Ancash Quechua -> Quechua (Peru)
-  { language: "qws", tag: @otf.Tag(0x51555A20), }, // 'QUZ ' Sihuas Ancash Quechua -> Quechua
-  { language: "qwt", tag: @otf.Tag(0x41544820), }, // 'ATH ' Kwalhioqua-Tlatskanai -> Athapaskan
-  { language: "qxa", tag: @otf.Tag(0x51574820), }, // 'QWH ' Chiquián Ancash Quechua -> Quechua (Peru)
-  { language: "qxa", tag: @otf.Tag(0x51555A20), }, // 'QUZ ' Chiquián Ancash Quechua -> Quechua
-  { language: "qxc", tag: @otf.Tag(0x51574820), }, // 'QWH ' Chincha Quechua -> Quechua (Peru)
-  { language: "qxc", tag: @otf.Tag(0x51555A20), }, // 'QUZ ' Chincha Quechua -> Quechua
-  { language: "qxh", tag: @otf.Tag(0x51574820), }, // 'QWH ' Panao Huánuco Quechua -> Quechua (Peru)
-  { language: "qxh", tag: @otf.Tag(0x51555A20), }, // 'QUZ ' Panao Huánuco Quechua -> Quechua
-  { language: "qxl", tag: @otf.Tag(0x51564920), }, // 'QVI ' Salasaca Highland Quichua -> Quechua (Ecuador)
-  { language: "qxl", tag: @otf.Tag(0x51555A20), }, // 'QUZ ' Salasaca Highland Quichua -> Quechua
-  { language: "qxn", tag: @otf.Tag(0x51574820), }, // 'QWH ' Northern Conchucos Ancash Quechua -> Quechua (Peru)
-  { language: "qxn", tag: @otf.Tag(0x51555A20), }, // 'QUZ ' Northern Conchucos Ancash Quechua -> Quechua
-  { language: "qxo", tag: @otf.Tag(0x51574820), }, // 'QWH ' Southern Conchucos Ancash Quechua -> Quechua (Peru)
-  { language: "qxo", tag: @otf.Tag(0x51555A20), }, // 'QUZ ' Southern Conchucos Ancash Quechua -> Quechua
-  { language: "qxp", tag: @otf.Tag(0x51555A20), }, // 'QUZ ' Puno Quechua -> Quechua
-  { language: "qxr", tag: @otf.Tag(0x51564920), }, // 'QVI ' Cañar Highland Quichua -> Quechua (Ecuador)
-  { language: "qxr", tag: @otf.Tag(0x51555A20), }, // 'QUZ ' Cañar Highland Quichua -> Quechua
-  { language: "qxt", tag: @otf.Tag(0x51574820), }, // 'QWH ' Santa Ana de Tusi Pasco Quechua -> Quechua (Peru)
-  { language: "qxt", tag: @otf.Tag(0x51555A20), }, // 'QUZ ' Santa Ana de Tusi Pasco Quechua -> Quechua
-  { language: "qxu", tag: @otf.Tag(0x51555A20), }, // 'QUZ ' Arequipa-La Unión Quechua -> Quechua
-  { language: "qxw", tag: @otf.Tag(0x51574820), }, // 'QWH ' Jauja Wanca Quechua -> Quechua (Peru)
-  { language: "qxw", tag: @otf.Tag(0x51555A20), }, // 'QUZ ' Jauja Wanca Quechua -> Quechua
-  { language: "rag", tag: @otf.Tag(0x4C554820), }, // 'LUH ' Logooli -> Luyia
-  // { language: "raj", tag: @otf.Tag(0x52414A20) }, // 'RAJ ' Rajasthani [macrolanguage]
-  { language: "ral", tag: @otf.Tag(0x51494E20), }, // 'QIN ' Ralte -> Chin
-  // { language: "rar", tag: @otf.Tag(0x52415220) }, // 'RAR ' Rarotongan
-  { language: "rbb", tag: @otf.Tag(0x504C4720), }, // 'PLG ' Rumai Palaung -> Palaung
-  { language: "rbl", tag: @otf.Tag(0x42494B20), }, // 'BIK ' Miraya Bikol -> Bikol
-  { language: "rcf", tag: @otf.Tag(0x43505020), }, // 'CPP ' Réunion Creole French -> Creoles
-  // { language: "rej", tag: @otf.Tag(0x52454A20) }, // 'REJ ' Rejang
-  // { language: "rhg", tag: @otf.Tag(0x52484720) }, // 'RHG ' Rohingya
-  // { language: "ria", tag: @otf.Tag(0x52494120) }, // 'RIA ' Riang (India)
-  { language: "rif", tag: @otf.Tag(0x52494620), }, // 'RIF ' Tarifit
-  { language: "rif", tag: @otf.Tag(0x42425220), }, // 'BBR ' Tarifit -> Berber
-  // { language: "rit", tag: @otf.Tag(0x52495420) }, // 'RIT ' Ritharrngu -> Ritarungo
-  { language: "rki", tag: @otf.Tag(0x41524B20), }, // 'ARK ' Rakhine
-  // { language: "rkw", tag: @otf.Tag(0x524B5720) }, // 'RKW ' Arakwal
-  { language: "rm", tag: @otf.Tag(0x524D5320), }, // 'RMS ' Romansh
-  { language: "rmc", tag: @otf.Tag(0x524F5920), }, // 'ROY ' Carpathian Romani -> Romany
-  { language: "rmf", tag: @otf.Tag(0x524F5920), }, // 'ROY ' Kalo Finnish Romani -> Romany
-  { language: "rml", tag: @otf.Tag(0x524F5920), }, // 'ROY ' Baltic Romani -> Romany
-  { language: "rmn", tag: @otf.Tag(0x524F5920), }, // 'ROY ' Balkan Romani -> Romany
-  { language: "rmo", tag: @otf.Tag(0x524F5920), }, // 'ROY ' Sinte Romani -> Romany
-  { language: "rms", tag: @otf.Tag(0), }, // null Romanian Sign Language != Romansh
-  { language: "rmw", tag: @otf.Tag(0x524F5920), }, // 'ROY ' Welsh Romani -> Romany
-  { language: "rmy", tag: @otf.Tag(0x524D5920), }, // 'RMY ' Vlax Romani
-  { language: "rmy", tag: @otf.Tag(0x524F5920), }, // 'ROY ' Vlax Romani -> Romany
-  { language: "rmz", tag: @otf.Tag(0x41524B20), }, // 'ARK ' Marma -> Rakhine
-  { language: "rn", tag: @otf.Tag(0x52554E20), }, // 'RUN ' Rundi
-  { language: "ro", tag: @otf.Tag(0x524F4D20), }, // 'ROM ' Romanian
-  { language: "rom", tag: @otf.Tag(0x524F5920), }, // 'ROY ' Romany [macrolanguage]
-  { language: "rop", tag: @otf.Tag(0x43505020), }, // 'CPP ' Kriol -> Creoles
-  { language: "rtc", tag: @otf.Tag(0x51494E20), }, // 'QIN ' Rungtu Chin -> Chin
-  // { language: "rtm", tag: @otf.Tag(0x52544D20) }, // 'RTM ' Rotuman
-  { language: "ru", tag: @otf.Tag(0x52555320), }, // 'RUS ' Russian
-  { language: "rue", tag: @otf.Tag(0x52535920), }, // 'RSY ' Rusyn
-  // { language: "rup", tag: @otf.Tag(0x52555020) }, // 'RUP ' Aromanian
-  { language: "rw", tag: @otf.Tag(0x52554120), }, // 'RUA ' Kinyarwanda
-  { language: "rwr", tag: @otf.Tag(0x4D415720), }, // 'MAW ' Marwari (India)
-  { language: "sa", tag: @otf.Tag(0x53414E20), }, // 'SAN ' Sanskrit [macrolanguage]
-  { language: "sad", tag: @otf.Tag(0), }, // null Sandawe != Sadri
-  { language: "sah", tag: @otf.Tag(0x59414B20), }, // 'YAK ' Yakut -> Sakha
-  { language: "sam", tag: @otf.Tag(0x50414120), }, // 'PAA ' Samaritan Aramaic -> Palestinian Aramaic
-  // { language: "sas", tag: @otf.Tag(0x53415320) }, // 'SAS ' Sasak
-  // { language: "sat", tag: @otf.Tag(0x53415420) }, // 'SAT ' Santali
-  { language: "say", tag: @otf.Tag(0), }, // null Saya != Sayisi
-  { language: "sc", tag: @otf.Tag(0x53524420), }, // 'SRD ' Sardinian [macrolanguage]
-  { language: "scf", tag: @otf.Tag(0x43505020), }, // 'CPP ' San Miguel Creole French -> Creoles
-  { language: "sch", tag: @otf.Tag(0x51494E20), }, // 'QIN ' Sakachep -> Chin
-  { language: "sci", tag: @otf.Tag(0x43505020), }, // 'CPP ' Sri Lankan Creole Malay -> Creoles
-  { language: "sck", tag: @otf.Tag(0x53414420), }, // 'SAD ' Sadri
-  // { language: "scn", tag: @otf.Tag(0x53434E20) }, // 'SCN ' Sicilian
-  // { language: "sco", tag: @otf.Tag(0x53434F20) }, // 'SCO ' Scots
-  { language: "scs", tag: @otf.Tag(0x53435320), }, // 'SCS ' North Slavey
-  { language: "scs", tag: @otf.Tag(0x534C4120), }, // 'SLA ' North Slavey -> Slavey
-  { language: "scs", tag: @otf.Tag(0x41544820), }, // 'ATH ' North Slavey -> Athapaskan
-  { language: "sd", tag: @otf.Tag(0x534E4420), }, // 'SND ' Sindhi
-  { language: "sdc", tag: @otf.Tag(0x53524420), }, // 'SRD ' Sassarese Sardinian -> Sardinian
-  { language: "sdh", tag: @otf.Tag(0x4B555220), }, // 'KUR ' Southern Kurdish -> Kurdish
-  { language: "sdn", tag: @otf.Tag(0x53524420), }, // 'SRD ' Gallurese Sardinian -> Sardinian
-  { language: "sds", tag: @otf.Tag(0x42425220), }, // 'BBR ' Sened -> Berber
-  { language: "se", tag: @otf.Tag(0x4E534D20), }, // 'NSM ' Northern Sami
-  // { language: "see", tag: @otf.Tag(0x53454520) }, // 'SEE ' Seneca
-  { language: "seh", tag: @otf.Tag(0x534E4120), }, // 'SNA ' Sena
-  { language: "sek", tag: @otf.Tag(0x41544820), }, // 'ATH ' Sekani -> Athapaskan
-  // { language: "sel", tag: @otf.Tag(0x53454C20) }, // 'SEL ' Selkup
-  { language: "sez", tag: @otf.Tag(0x51494E20), }, // 'QIN ' Senthang Chin -> Chin
-  { language: "sfm", tag: @otf.Tag(0x53464D20), }, // 'SFM ' Small Flowery Miao
-  { language: "sfm", tag: @otf.Tag(0x484D4E20), }, // 'HMN ' Small Flowery Miao -> Hmong
-  { language: "sg", tag: @otf.Tag(0x53474F20), }, // 'SGO ' Sango
-  // { language: "sga", tag: @otf.Tag(0x53474120) }, // 'SGA ' Old Irish (to 900)
-  { language: "sgc", tag: @otf.Tag(0x4B414C20), }, // 'KAL ' Kipsigis -> Kalenjin
-  { language: "sgo", tag: @otf.Tag(0), }, // null Songa(retired code) != Sango
-  // { language: "sgs", tag: @otf.Tag(0x53475320) }, // 'SGS ' Samogitian
-  { language: "sgw", tag: @otf.Tag(0x43484720), }, // 'CHG ' Sebat Bet Gurage -> Chaha Gurage
-  { language: "sh", tag: @otf.Tag(0x424F5320), }, // 'BOS ' Serbo-Croatian [macrolanguage] -> Bosnian
-  { language: "sh", tag: @otf.Tag(0x48525620), }, // 'HRV ' Serbo-Croatian [macrolanguage] -> Croatian
-  { language: "sh", tag: @otf.Tag(0x53524220), }, // 'SRB ' Serbo-Croatian [macrolanguage] -> Serbian
-  { language: "shi", tag: @otf.Tag(0x53484920), }, // 'SHI ' Tachelhit
-  { language: "shi", tag: @otf.Tag(0x42425220), }, // 'BBR ' Tachelhit -> Berber
-  { language: "shl", tag: @otf.Tag(0x51494E20), }, // 'QIN ' Shendu -> Chin
-  // { language: "shn", tag: @otf.Tag(0x53484E20) }, // 'SHN ' Shan
-  { language: "shu", tag: @otf.Tag(0x41524120), }, // 'ARA ' Chadian Arabic -> Arabic
-  { language: "shy", tag: @otf.Tag(0x42425220), }, // 'BBR ' Tachawit -> Berber
-  { language: "si", tag: @otf.Tag(0x534E4820), }, // 'SNH ' Sinhala (Sinhalese)
-  { language: "sib", tag: @otf.Tag(0), }, // null Sebop != Sibe
-  // { language: "sid", tag: @otf.Tag(0x53494420) }, // 'SID ' Sidamo
-  { language: "sig", tag: @otf.Tag(0), }, // null Paasaal != Silte Gurage
-  { language: "siz", tag: @otf.Tag(0x42425220), }, // 'BBR ' Siwi -> Berber
-  // { language: "sja", tag: @otf.Tag(0x534A4120) }, // 'SJA ' Epena
-  { language: "sjd", tag: @otf.Tag(0x4B534D20), }, // 'KSM ' Kildin Sami
-  { language: "sjo", tag: @otf.Tag(0x53494220), }, // 'SIB ' Xibe -> Sibe
-  { language: "sjs", tag: @otf.Tag(0x42425220), }, // 'BBR ' Senhaja De Srair -> Berber
-  { language: "sk", tag: @otf.Tag(0x534B5920), }, // 'SKY ' Slovak
-  { language: "skg", tag: @otf.Tag(0x4D4C4720), }, // 'MLG ' Sakalava Malagasy -> Malagasy
-  { language: "skr", tag: @otf.Tag(0x53524B20), }, // 'SRK ' Saraiki
-  { language: "sks", tag: @otf.Tag(0), }, // null Maia != Skolt Sami
-  { language: "skw", tag: @otf.Tag(0x43505020), }, // 'CPP ' Skepi Creole Dutch -> Creoles
-  { language: "sky", tag: @otf.Tag(0), }, // null Sikaiana != Slovak
-  { language: "sl", tag: @otf.Tag(0x534C5620), }, // 'SLV ' Slovenian
-  { language: "sla", tag: @otf.Tag(0), }, // null Slavic  [collection] != Slavey
-  { language: "sm", tag: @otf.Tag(0x534D4F20), }, // 'SMO ' Samoan
-  { language: "sma", tag: @otf.Tag(0x53534D20), }, // 'SSM ' Southern Sami
-  { language: "smd", tag: @otf.Tag(0x4D424E20), }, // 'MBN ' Sama(retired code) -> Mbundu
-  { language: "smj", tag: @otf.Tag(0x4C534D20), }, // 'LSM ' Lule Sami
-  { language: "sml", tag: @otf.Tag(0), }, // null Central Sama != Somali
-  { language: "smn", tag: @otf.Tag(0x49534D20), }, // 'ISM ' Inari Sami
-  { language: "sms", tag: @otf.Tag(0x534B5320), }, // 'SKS ' Skolt Sami
-  { language: "smt", tag: @otf.Tag(0x51494E20), }, // 'QIN ' Simte -> Chin
-  { language: "sn", tag: @otf.Tag(0x534E4130), }, // 'SNA0' Shona
-  { language: "snb", tag: @otf.Tag(0x49424120), }, // 'IBA ' Sebuyau(retired code) -> Iban
-  { language: "snh", tag: @otf.Tag(0), }, // null Shinabo(retired code) != Sinhala (Sinhalese)
-  // { language: "snk", tag: @otf.Tag(0x534E4B20) }, // 'SNK ' Soninke
-  { language: "so", tag: @otf.Tag(0x534D4C20), }, // 'SML ' Somali
-  { language: "sog", tag: @otf.Tag(0), }, // null Sogdian != Sodo Gurage
-  // { language: "sop", tag: @otf.Tag(0x534F5020) }, // 'SOP ' Songe
-  { language: "spv", tag: @otf.Tag(0x4F524920), }, // 'ORI ' Sambalpuri -> Odia
-  { language: "spy", tag: @otf.Tag(0x4B414C20), }, // 'KAL ' Sabaot -> Kalenjin
-  { language: "sq", tag: @otf.Tag(0x53514920), }, // 'SQI ' Albanian [macrolanguage]
-  { language: "sr", tag: @otf.Tag(0x53524220), }, // 'SRB ' Serbian
-  { language: "srb", tag: @otf.Tag(0), }, // null Sora != Serbian
-  { language: "src", tag: @otf.Tag(0x53524420), }, // 'SRD ' Logudorese Sardinian -> Sardinian
-  { language: "srk", tag: @otf.Tag(0), }, // null Serudung Murut != Saraiki
-  { language: "srm", tag: @otf.Tag(0x43505020), }, // 'CPP ' Saramaccan -> Creoles
-  { language: "srn", tag: @otf.Tag(0x43505020), }, // 'CPP ' Sranan Tongo -> Creoles
-  { language: "sro", tag: @otf.Tag(0x53524420), }, // 'SRD ' Campidanese Sardinian -> Sardinian
-  // { language: "srr", tag: @otf.Tag(0x53525220) }, // 'SRR ' Serer
-  { language: "srs", tag: @otf.Tag(0x41544820), }, // 'ATH ' Sarsi -> Athapaskan
-  { language: "ss", tag: @otf.Tag(0x53575A20), }, // 'SWZ ' Swati
-  { language: "ssh", tag: @otf.Tag(0x41524120), }, // 'ARA ' Shihhi Arabic -> Arabic
-  { language: "ssl", tag: @otf.Tag(0), }, // null Western Sisaala != South Slavey
-  { language: "ssm", tag: @otf.Tag(0), }, // null Semnam != Southern Sami
-  { language: "st", tag: @otf.Tag(0x534F5420), }, // 'SOT ' Southern Sotho
-  { language: "sta", tag: @otf.Tag(0x43505020), }, // 'CPP ' Settla -> Creoles
-  // { language: "stq", tag: @otf.Tag(0x53545120) }, // 'STQ ' Saterfriesisch -> Saterland Frisian
-  // { language: "str", tag: @otf.Tag(0x53545220) }, // 'STR ' Straits Salish
-  { language: "stv", tag: @otf.Tag(0x53494720), }, // 'SIG ' Silt'e -> Silte Gurage
-  { language: "su", tag: @otf.Tag(0x53554E20), }, // 'SUN ' Sundanese
-  // { language: "suk", tag: @otf.Tag(0x53554B20) }, // 'SUK ' Sukuma
-  { language: "suq", tag: @otf.Tag(0x53555220), }, // 'SUR ' Suri
-  { language: "sur", tag: @otf.Tag(0), }, // null Mwaghavul != Suri
-  { language: "sv", tag: @otf.Tag(0x53564520), }, // 'SVE ' Swedish
-  // { language: "sva", tag: @otf.Tag(0x53564120) }, // 'SVA ' Svan
-  { language: "svc", tag: @otf.Tag(0x43505020), }, // 'CPP ' Vincentian Creole English -> Creoles
-  { language: "sve", tag: @otf.Tag(0), }, // null Serili != Swedish
-  { language: "sw", tag: @otf.Tag(0x53574B20), }, // 'SWK ' Swahili  [macrolanguage]
-  { language: "swb", tag: @otf.Tag(0x434D5220), }, // 'CMR ' Maore Comorian -> Comorian
-  { language: "swc", tag: @otf.Tag(0x53574B20), }, // 'SWK ' Congo Swahili -> Swahili
-  { language: "swh", tag: @otf.Tag(0x53574B20), }, // 'SWK ' Swahili 
-  { language: "swk", tag: @otf.Tag(0), }, // null Malawi Sena != Swahili
-  { language: "swn", tag: @otf.Tag(0x42425220), }, // 'BBR ' Sawknah -> Berber
-  { language: "swv", tag: @otf.Tag(0x4D415720), }, // 'MAW ' Shekhawati -> Marwari
-  // { language: "sxu", tag: @otf.Tag(0x53585520) }, // 'SXU ' Upper Saxon
-  { language: "syc", tag: @otf.Tag(0x53595220), }, // 'SYR ' Classical Syriac -> Syriac
-  // { language: "syl", tag: @otf.Tag(0x53594C20) }, // 'SYL ' Sylheti
-  // { language: "syr", tag: @otf.Tag(0x53595220) }, // 'SYR ' Syriac [macrolanguage]
-  // { language: "szl", tag: @otf.Tag(0x535A4C20) }, // 'SZL ' Silesian
-  { language: "ta", tag: @otf.Tag(0x54414D20), }, // 'TAM ' Tamil
-  { language: "taa", tag: @otf.Tag(0x41544820), }, // 'ATH ' Lower Tanana -> Athapaskan
-  // { language: "tab", tag: @otf.Tag(0x54414220) }, // 'TAB ' Tabassaran -> Tabasaran
-  { language: "taj", tag: @otf.Tag(0), }, // null Eastern Tamang != Tajiki
-  { language: "taq", tag: @otf.Tag(0x54415120), }, // 'TAQ ' Tamasheq
-  { language: "taq", tag: @otf.Tag(0x544D4820), }, // 'TMH ' Tamasheq -> Tamashek
-  { language: "taq", tag: @otf.Tag(0x42425220), }, // 'BBR ' Tamasheq -> Berber
-  { language: "tas", tag: @otf.Tag(0x43505020), }, // 'CPP ' Tay Boi -> Creoles
-  { language: "tau", tag: @otf.Tag(0x41544820), }, // 'ATH ' Upper Tanana -> Athapaskan
-  { language: "tcb", tag: @otf.Tag(0x41544820), }, // 'ATH ' Tanacross -> Athapaskan
-  { language: "tce", tag: @otf.Tag(0x41544820), }, // 'ATH ' Southern Tutchone -> Athapaskan
-  { language: "tch", tag: @otf.Tag(0x43505020), }, // 'CPP ' Turks And Caicos Creole English -> Creoles
-  { language: "tcp", tag: @otf.Tag(0x51494E20), }, // 'QIN ' Tawr Chin -> Chin
-  { language: "tcs", tag: @otf.Tag(0x43505020), }, // 'CPP ' Torres Strait Creole -> Creoles
-  { language: "tcy", tag: @otf.Tag(0x54554C20), }, // 'TUL ' Tulu
-  { language: "tcz", tag: @otf.Tag(0x51494E20), }, // 'QIN ' Thado Chin -> Chin
-  // { language: "tdc", tag: @otf.Tag(0x54444320) }, // 'TDC ' Emberá-Tadó
-  // { language: "tdd", tag: @otf.Tag(0x54444420) }, // 'TDD ' Tai Nüa -> Dehong Dai
-  { language: "tdx", tag: @otf.Tag(0x4D4C4720), }, // 'MLG ' Tandroy-Mahafaly Malagasy -> Malagasy
-  { language: "te", tag: @otf.Tag(0x54454C20), }, // 'TEL ' Telugu
-  { language: "tec", tag: @otf.Tag(0x4B414C20), }, // 'KAL ' Terik -> Kalenjin
-  { language: "tem", tag: @otf.Tag(0x544D4E20), }, // 'TMN ' Timne -> Temne
-  // { language: "tet", tag: @otf.Tag(0x54455420) }, // 'TET ' Tetum
-  { language: "tez", tag: @otf.Tag(0x42425220), }, // 'BBR ' Tetserret -> Berber
-  { language: "tfn", tag: @otf.Tag(0x41544820), }, // 'ATH ' Tanaina -> Athapaskan
-  { language: "tg", tag: @otf.Tag(0x54414A20), }, // 'TAJ ' Tajik -> Tajiki
-  { language: "tgh", tag: @otf.Tag(0x43505020), }, // 'CPP ' Tobagonian Creole English -> Creoles
-  { language: "tgj", tag: @otf.Tag(0x4E495320), }, // 'NIS ' Tagin -> Nisi
-  { language: "tgn", tag: @otf.Tag(0), }, // null Tandaganon != Tongan
-  { language: "tgr", tag: @otf.Tag(0), }, // null Tareng != Tigre
-  { language: "tgx", tag: @otf.Tag(0x41544820), }, // 'ATH ' Tagish -> Athapaskan
-  { language: "tgy", tag: @otf.Tag(0), }, // null Togoyo != Tigrinya
-  { language: "th", tag: @otf.Tag(0x54484120), }, // 'THA ' Thai
-  // { language: "thp", tag: @otf.Tag(0x54485020) }, // 'THP ' Thompson
-  { language: "tht", tag: @otf.Tag(0x41544820), }, // 'ATH ' Tahltan -> Athapaskan
-  { language: "thv", tag: @otf.Tag(0x54485620), }, // 'THV ' Tahaggart Tamahaq
-  { language: "thv", tag: @otf.Tag(0x544D4820), }, // 'TMH ' Tahaggart Tamahaq -> Tamashek
-  { language: "thv", tag: @otf.Tag(0x42425220), }, // 'BBR ' Tahaggart Tamahaq -> Berber
-  { language: "thz", tag: @otf.Tag(0x54485A20), }, // 'THZ ' Tayart Tamajeq
-  { language: "thz", tag: @otf.Tag(0x544D4820), }, // 'TMH ' Tayart Tamajeq -> Tamashek
-  { language: "thz", tag: @otf.Tag(0x42425220), }, // 'BBR ' Tayart Tamajeq -> Berber
-  { language: "ti", tag: @otf.Tag(0x54475920), }, // 'TGY ' Tigrinya
-  { language: "tia", tag: @otf.Tag(0x42425220), }, // 'BBR ' Tidikelt Tamazight -> Berber
-  { language: "tig", tag: @otf.Tag(0x54475220), }, // 'TGR ' Tigre
-  // { language: "tiv", tag: @otf.Tag(0x54495620) }, // 'TIV ' Tiv
-  // { language: "tjl", tag: @otf.Tag(0x544A4C20) }, // 'TJL ' Tai Laing
-  { language: "tjo", tag: @otf.Tag(0x42425220), }, // 'BBR ' Temacine Tamazight -> Berber
-  { language: "tk", tag: @otf.Tag(0x544B4D20), }, // 'TKM ' Turkmen
-  { language: "tkg", tag: @otf.Tag(0x4D4C4720), }, // 'MLG ' Tesaka Malagasy -> Malagasy
-  { language: "tkm", tag: @otf.Tag(0), }, // null Takelma != Turkmen
-  { language: "tl", tag: @otf.Tag(0x54474C20), }, // 'TGL ' Tagalog
-  // { language: "tli", tag: @otf.Tag(0x544C4920) }, // 'TLI ' Tlingit
-  // { language: "tly", tag: @otf.Tag(0x544C5920) }, // 'TLY ' Talysh
-  { language: "tmg", tag: @otf.Tag(0x43505020), }, // 'CPP ' Ternateño -> Creoles
-  { language: "tmh", tag: @otf.Tag(0x544D4820), }, // 'TMH ' Tamashek [macrolanguage]
-  { language: "tmh", tag: @otf.Tag(0x42425220), }, // 'BBR ' Tamashek [macrolanguage] -> Berber
-  { language: "tmn", tag: @otf.Tag(0), }, // null Taman (Indonesia) != Temne
-  { language: "tmw", tag: @otf.Tag(0x4D4C5920), }, // 'MLY ' Temuan -> Malay
-  { language: "tn", tag: @otf.Tag(0x544E4120), }, // 'TNA ' Tswana
-  { language: "tna", tag: @otf.Tag(0), }, // null Tacana != Tswana
-  { language: "tne", tag: @otf.Tag(0), }, // null Tinoc Kallahan(retired code) != Tundra Enets
-  { language: "tnf", tag: @otf.Tag(0x44524920), }, // 'DRI ' Tangshewi(retired code) -> Dari
-  { language: "tnf", tag: @otf.Tag(0x46415220), }, // 'FAR ' Tangshewi(retired code) -> Persian
-  { language: "tng", tag: @otf.Tag(0), }, // null Tobanga != Tonga
-  { language: "to", tag: @otf.Tag(0x54474E20), }, // 'TGN ' Tonga (Tonga Islands) -> Tongan
-  { language: "tod", tag: @otf.Tag(0x544F4430), }, // 'TOD0' Toma
-  { language: "toi", tag: @otf.Tag(0x544E4720), }, // 'TNG ' Tonga (Zambia)
-  { language: "toj", tag: @otf.Tag(0x4D594E20), }, // 'MYN ' Tojolabal -> Mayan
-  { language: "tol", tag: @otf.Tag(0x41544820), }, // 'ATH ' Tolowa -> Athapaskan
-  { language: "tor", tag: @otf.Tag(0x42414430), }, // 'BAD0' Togbo-Vara Banda -> Banda
-  { language: "tpi", tag: @otf.Tag(0x54504920), }, // 'TPI ' Tok Pisin
-  { language: "tpi", tag: @otf.Tag(0x43505020), }, // 'CPP ' Tok Pisin -> Creoles
-  { language: "tr", tag: @otf.Tag(0x54524B20), }, // 'TRK ' Turkish
-  { language: "trf", tag: @otf.Tag(0x43505020), }, // 'CPP ' Trinidadian Creole English -> Creoles
-  { language: "trk", tag: @otf.Tag(0), }, // null Turkic  [collection] != Turkish
-  { language: "tru", tag: @otf.Tag(0x54554120), }, // 'TUA ' Turoyo -> Turoyo Aramaic
-  { language: "tru", tag: @otf.Tag(0x53595220), }, // 'SYR ' Turoyo -> Syriac
-  { language: "ts", tag: @otf.Tag(0x54534720), }, // 'TSG ' Tsonga
-  { language: "tsg", tag: @otf.Tag(0), }, // null Tausug != Tsonga
-  // { language: "tsj", tag: @otf.Tag(0x54534A20) }, // 'TSJ ' Tshangla
-  { language: "tt", tag: @otf.Tag(0x54415420), }, // 'TAT ' Tatar
-  { language: "ttc", tag: @otf.Tag(0x4D594E20), }, // 'MYN ' Tektiteko -> Mayan
-  { language: "ttm", tag: @otf.Tag(0x41544820), }, // 'ATH ' Northern Tutchone -> Athapaskan
-  { language: "ttq", tag: @otf.Tag(0x54545120), }, // 'TTQ ' Tawallammat Tamajaq
-  { language: "ttq", tag: @otf.Tag(0x544D4820), }, // 'TMH ' Tawallammat Tamajaq -> Tamashek
-  { language: "ttq", tag: @otf.Tag(0x42425220), }, // 'BBR ' Tawallammat Tamajaq -> Berber
-  { language: "tua", tag: @otf.Tag(0), }, // null Wiarumus != Turoyo Aramaic
-  { language: "tul", tag: @otf.Tag(0), }, // null Tula != Tulu
-  // { language: "tum", tag: @otf.Tag(0x54554D20) }, // 'TUM ' Tumbuka
-  // { language: "tus", tag: @otf.Tag(0x54555320) }, // 'TUS ' Tuscarora
-  { language: "tuu", tag: @otf.Tag(0x41544820), }, // 'ATH ' Tututni -> Athapaskan
-  { language: "tuv", tag: @otf.Tag(0), }, // null Turkana != Tuvin
-  { language: "tuy", tag: @otf.Tag(0x4B414C20), }, // 'KAL ' Tugen -> Kalenjin
-  // { language: "tvl", tag: @otf.Tag(0x54564C20) }, // 'TVL ' Tuvalu
-  { language: "tvy", tag: @otf.Tag(0x43505020), }, // 'CPP ' Timor Pidgin -> Creoles
-  { language: "tw", tag: @otf.Tag(0x54574920), }, // 'TWI ' Twi
-  { language: "tw", tag: @otf.Tag(0x414B4120), }, // 'AKA ' Twi -> Akan
-  { language: "txc", tag: @otf.Tag(0x41544820), }, // 'ATH ' Tsetsaut -> Athapaskan
-  { language: "txy", tag: @otf.Tag(0x4D4C4720), }, // 'MLG ' Tanosy Malagasy -> Malagasy
-  { language: "ty", tag: @otf.Tag(0x54485420), }, // 'THT ' Tahitian
-  { language: "tyv", tag: @otf.Tag(0x54555620), }, // 'TUV ' Tuvinian -> Tuvin
-  // { language: "tyz", tag: @otf.Tag(0x54595A20) }, // 'TYZ ' Tày
-  { language: "tzh", tag: @otf.Tag(0x4D594E20), }, // 'MYN ' Tzeltal -> Mayan
-  { language: "tzj", tag: @otf.Tag(0x4D594E20), }, // 'MYN ' Tz'utujil -> Mayan
-  { language: "tzm", tag: @otf.Tag(0x545A4D20), }, // 'TZM ' Central Atlas Tamazight -> Tamazight
-  { language: "tzm", tag: @otf.Tag(0x42425220), }, // 'BBR ' Central Atlas Tamazight -> Berber
-  { language: "tzo", tag: @otf.Tag(0x545A4F20), }, // 'TZO ' Tzotzil
-  { language: "tzo", tag: @otf.Tag(0x4D594E20), }, // 'MYN ' Tzotzil -> Mayan
-  { language: "ubl", tag: @otf.Tag(0x42494B20), }, // 'BIK ' Buhi'non Bikol -> Bikol
-  // { language: "udi", tag: @otf.Tag(0x55444920) }, // 'UDI ' Udi
-  // { language: "udm", tag: @otf.Tag(0x55444D20) }, // 'UDM ' Udmurt
-  { language: "ug", tag: @otf.Tag(0x55594720), }, // 'UYG ' Uyghur
-  { language: "uk", tag: @otf.Tag(0x554B5220), }, // 'UKR ' Ukrainian
-  { language: "uki", tag: @otf.Tag(0x4B554920), }, // 'KUI ' Kui (India)
-  { language: "uln", tag: @otf.Tag(0x43505020), }, // 'CPP ' Unserdeutsch -> Creoles
-  // { language: "umb", tag: @otf.Tag(0x554D4220) }, // 'UMB ' Umbundu
-  { language: "unr", tag: @otf.Tag(0x4D554E20), }, // 'MUN ' Mundari
-  { language: "ur", tag: @otf.Tag(0x55524420), }, // 'URD ' Urdu
-  { language: "urk", tag: @otf.Tag(0x4D4C5920), }, // 'MLY ' Urak Lawoi' -> Malay
-  { language: "usp", tag: @otf.Tag(0x4D594E20), }, // 'MYN ' Uspanteco -> Mayan
-  { language: "uz", tag: @otf.Tag(0x555A4220), }, // 'UZB ' Uzbek [macrolanguage]
-  { language: "uzn", tag: @otf.Tag(0x555A4220), }, // 'UZB ' Northern Uzbek -> Uzbek
-  { language: "uzs", tag: @otf.Tag(0x555A4220), }, // 'UZB ' Southern Uzbek -> Uzbek
-  { language: "vap", tag: @otf.Tag(0x51494E20), }, // 'QIN ' Vaiphei -> Chin
-  { language: "ve", tag: @otf.Tag(0x56454E20), }, // 'VEN ' Venda
-  // { language: "vec", tag: @otf.Tag(0x56454320) }, // 'VEC ' Venetian
-  { language: "vi", tag: @otf.Tag(0x56495420), }, // 'VIT ' Vietnamese
-  { language: "vic", tag: @otf.Tag(0x43505020), }, // 'CPP ' Virgin Islands Creole English -> Creoles
-  { language: "vit", tag: @otf.Tag(0), }, // null Viti != Vietnamese
-  { language: "vkk", tag: @otf.Tag(0x4D4C5920), }, // 'MLY ' Kaur -> Malay
-  { language: "vkp", tag: @otf.Tag(0x43505020), }, // 'CPP ' Korlai Creole Portuguese -> Creoles
-  { language: "vkt", tag: @otf.Tag(0x4D4C5920), }, // 'MLY ' Tenggarong Kutai Malay -> Malay
-  { language: "vls", tag: @otf.Tag(0x464C4520), }, // 'FLE ' Vlaams -> Dutch (Flemish)
-  { language: "vmw", tag: @otf.Tag(0x4D414B20), }, // 'MAK ' Makhuwa
-  { language: "vo", tag: @otf.Tag(0x564F4C20), }, // 'VOL ' Volapük
-  { language: "vro", tag: @otf.Tag(0x56524F20), }, // 'VRO ' Võro
-  { language: "vro", tag: @otf.Tag(0x45544920), }, // 'ETI ' Võro -> Estonian
-  { language: "vsn", tag: @otf.Tag(0x53414E20), }, // 'SAN ' Vedic Sanskrit -> Sanskrit
-  { language: "wa", tag: @otf.Tag(0x574C4E20), }, // 'WLN ' Walloon
-  { language: "wag", tag: @otf.Tag(0), }, // null Wa'ema != Wagdi
-  // { language: "war", tag: @otf.Tag(0x57415220) }, // 'WAR ' Waray (Philippines) -> Waray-Waray
-  // { language: "wbl", tag: @otf.Tag(0x57424C20) }, // 'WBL ' Wakhi
-  { language: "wbm", tag: @otf.Tag(0x57412020), }, // 'WA  ' Wa
-  { language: "wbr", tag: @otf.Tag(0x57414720), }, // 'WAG ' Wagdi
-  { language: "wbr", tag: @otf.Tag(0x52414A20), }, // 'RAJ ' Wagdi -> Rajasthani
-  // { language: "wci", tag: @otf.Tag(0x57434920) }, // 'WCI ' Waci Gbe
-  // { language: "wdt", tag: @otf.Tag(0x57445420) }, // 'WDT ' Wendat
-  { language: "wea", tag: @otf.Tag(0x4B524E20), }, // 'KRN ' Wewaw -> Karen
-  { language: "wes", tag: @otf.Tag(0x43505020), }, // 'CPP ' Cameroon Pidgin -> Creoles
-  { language: "weu", tag: @otf.Tag(0x51494E20), }, // 'QIN ' Rawngtu Chin -> Chin
-  { language: "wlc", tag: @otf.Tag(0x434D5220), }, // 'CMR ' Mwali Comorian -> Comorian
-  { language: "wle", tag: @otf.Tag(0x53494720), }, // 'SIG ' Wolane -> Silte Gurage
-  { language: "wlk", tag: @otf.Tag(0x41544820), }, // 'ATH ' Wailaki -> Athapaskan
-  { language: "wni", tag: @otf.Tag(0x434D5220), }, // 'CMR ' Ndzwani Comorian -> Comorian
-  { language: "wo", tag: @otf.Tag(0x574C4620), }, // 'WLF ' Wolof
-  { language: "wry", tag: @otf.Tag(0x4D415720), }, // 'MAW ' Merwari -> Marwari
-  { language: "wsg", tag: @otf.Tag(0x474F4E20), }, // 'GON ' Adilabad Gondi -> Gondi
-  // { language: "wtm", tag: @otf.Tag(0x57544D20) }, // 'WTM ' Mewati
-  { language: "wuu", tag: @otf.Tag(0x5A485320), }, // 'ZHS ' Wu Chinese -> Chinese, Simplified
-  { language: "wya", tag: @otf.Tag(0x57445420), }, // 'WDT ' Wyandot(retired code) -> Wendat
-  { language: "wya", tag: @otf.Tag(0x57594E20), }, // 'WYN ' Wyandot(retired code)
-  // { language: "wyn", tag: @otf.Tag(0x57594E20) }, // 'WYN ' Wyandot
-  { language: "xal", tag: @otf.Tag(0x4B4C4D20), }, // 'KLM ' Kalmyk
-  { language: "xal", tag: @otf.Tag(0x544F4420), }, // 'TOD ' Kalmyk -> Todo
-  { language: "xan", tag: @otf.Tag(0x53454B20), }, // 'SEK ' Xamtanga -> Sekota
-  { language: "xbd", tag: @otf.Tag(0), }, // null Bindal != Lü
-  { language: "xh", tag: @otf.Tag(0x58485320), }, // 'XHS ' Xhosa
-  // { language: "xjb", tag: @otf.Tag(0x584A4220) }, // 'XJB ' Minjungbal -> Minjangbal
-  // { language: "xkf", tag: @otf.Tag(0x584B4620) }, // 'XKF ' Khengkha
-  { language: "xmg", tag: @otf.Tag(0x424D4C20), }, // 'BML ' Mengaka -> Bamileke
-  { language: "xmm", tag: @otf.Tag(0x4D4C5920), }, // 'MLY ' Manado Malay -> Malay
-  { language: "xmm", tag: @otf.Tag(0x43505020), }, // 'CPP ' Manado Malay -> Creoles
-  { language: "xmv", tag: @otf.Tag(0x4D4C4720), }, // 'MLG ' Antankarana Malagasy -> Malagasy
-  { language: "xmw", tag: @otf.Tag(0x4D4C4720), }, // 'MLG ' Tsimihety Malagasy -> Malagasy
-  { language: "xnj", tag: @otf.Tag(0x53585420), }, // 'SXT ' Ngoni (Tanzania) -> Sutu
-  { language: "xnq", tag: @otf.Tag(0x53585420), }, // 'SXT ' Ngoni (Mozambique) -> Sutu
-  { language: "xnr", tag: @otf.Tag(0x44475220), }, // 'DGR ' Kangri -> Dogri (macrolanguage)
-  // { language: "xog", tag: @otf.Tag(0x584F4720) }, // 'XOG ' Soga
-  { language: "xpe", tag: @otf.Tag(0x58504520), }, // 'XPE ' Liberia Kpelle -> Kpelle (Liberia)
-  { language: "xpe", tag: @otf.Tag(0x4B504C20), }, // 'KPL ' Liberia Kpelle -> Kpelle
-  { language: "xsl", tag: @otf.Tag(0x53534C20), }, // 'SSL ' South Slavey
-  { language: "xsl", tag: @otf.Tag(0x534C4120), }, // 'SLA ' South Slavey -> Slavey
-  { language: "xsl", tag: @otf.Tag(0x41544820), }, // 'ATH ' South Slavey -> Athapaskan
-  { language: "xst", tag: @otf.Tag(0x53494720), }, // 'SIG ' Silt'e(retired code) -> Silte Gurage
-  // { language: "xub", tag: @otf.Tag(0x58554220) }, // 'XUB ' Betta Kurumba -> Bette Kuruma
-  // { language: "xuj", tag: @otf.Tag(0x58554A20) }, // 'XUJ ' Jennu Kurumba -> Jennu Kuruma
-  { language: "xup", tag: @otf.Tag(0x41544820), }, // 'ATH ' Upper Umpqua -> Athapaskan
-  { language: "xwo", tag: @otf.Tag(0x544F4420), }, // 'TOD ' Written Oirat -> Todo
-  { language: "yaj", tag: @otf.Tag(0x42414430), }, // 'BAD0' Banda-Yangere -> Banda
-  { language: "yak", tag: @otf.Tag(0), }, // null Yakama != Sakha
-  // { language: "yao", tag: @otf.Tag(0x59414F20) }, // 'YAO ' Yao
-  // { language: "yap", tag: @otf.Tag(0x59415020) }, // 'YAP ' Yapese
-  { language: "yba", tag: @otf.Tag(0), }, // null Yala != Yoruba
-  { language: "ybb", tag: @otf.Tag(0x424D4C20), }, // 'BML ' Yemba -> Bamileke
-  { language: "ybd", tag: @otf.Tag(0x41524B20), }, // 'ARK ' Yangbye(retired code) -> Rakhine
-  { language: "ycr", tag: @otf.Tag(0), }, // null Yilan Creole != Y-Cree
-  { language: "ydd", tag: @otf.Tag(0x4A494920), }, // 'JII ' Eastern Yiddish -> Yiddish
-  // { language: "ygp", tag: @otf.Tag(0x59475020) }, // 'YGP ' Gepo
-  { language: "yi", tag: @otf.Tag(0x4A494920), }, // 'JII ' Yiddish [macrolanguage]
-  { language: "yih", tag: @otf.Tag(0x4A494920), }, // 'JII ' Western Yiddish -> Yiddish
-  { language: "yim", tag: @otf.Tag(0), }, // null Yimchungru Naga != Yi Modern
-  // { language: "yna", tag: @otf.Tag(0x594E4120) }, // 'YNA ' Aluo
-  { language: "yo", tag: @otf.Tag(0x59424120), }, // 'YBA ' Yoruba
-  { language: "yos", tag: @otf.Tag(0x51494E20), }, // 'QIN ' Yos(retired code) -> Chin
-  { language: "yua", tag: @otf.Tag(0x4D594E20), }, // 'MYN ' Yucateco -> Mayan
-  { language: "yue", tag: @otf.Tag(0x5A484820), }, // 'ZHH ' Yue Chinese -> Chinese, Traditional, Hong Kong SAR
-  // { language: "yuf", tag: @otf.Tag(0x59554620) }, // 'YUF ' Havasupai-Walapai-Yavapai
-  // { language: "ywq", tag: @otf.Tag(0x59575120) }, // 'YWQ ' Wuding-Luquan Yi
-  { language: "za", tag: @otf.Tag(0x5A484120), }, // 'ZHA ' Zhuang [macrolanguage]
-  { language: "zch", tag: @otf.Tag(0x5A484120), }, // 'ZHA ' Central Hongshuihe Zhuang -> Zhuang
-  { language: "zdj", tag: @otf.Tag(0x434D5220), }, // 'CMR ' Ngazidja Comorian -> Comorian
-  // { language: "zea", tag: @otf.Tag(0x5A454120) }, // 'ZEA ' Zeeuws -> Zealandic
-  { language: "zeh", tag: @otf.Tag(0x5A484120), }, // 'ZHA ' Eastern Hongshuihe Zhuang -> Zhuang
-  { language: "zen", tag: @otf.Tag(0x42425220), }, // 'BBR ' Zenaga -> Berber
-  { language: "zgb", tag: @otf.Tag(0x5A484120), }, // 'ZHA ' Guibei Zhuang -> Zhuang
-  { language: "zgh", tag: @otf.Tag(0x5A474820), }, // 'ZGH ' Standard Moroccan Tamazight
-  { language: "zgh", tag: @otf.Tag(0x42425220), }, // 'BBR ' Standard Moroccan Tamazight -> Berber
-  { language: "zgm", tag: @otf.Tag(0x5A484120), }, // 'ZHA ' Minz Zhuang -> Zhuang
-  { language: "zgn", tag: @otf.Tag(0x5A484120), }, // 'ZHA ' Guibian Zhuang -> Zhuang
-  { language: "zh", tag: @otf.Tag(0x5A485320), }, // 'ZHS ' Chinese, Simplified [macrolanguage]
-  { language: "zhd", tag: @otf.Tag(0x5A484120), }, // 'ZHA ' Dai Zhuang -> Zhuang
-  { language: "zhn", tag: @otf.Tag(0x5A484120), }, // 'ZHA ' Nong Zhuang -> Zhuang
-  { language: "zkb", tag: @otf.Tag(0x4B484120), }, // 'KHA ' Koibal(retired code) -> Khakass
-  { language: "zlj", tag: @otf.Tag(0x5A484120), }, // 'ZHA ' Liujiang Zhuang -> Zhuang
-  { language: "zlm", tag: @otf.Tag(0x4D4C5920), }, // 'MLY ' Malay 
-  { language: "zln", tag: @otf.Tag(0x5A484120), }, // 'ZHA ' Lianshan Zhuang -> Zhuang
-  { language: "zlq", tag: @otf.Tag(0x5A484120), }, // 'ZHA ' Liuqian Zhuang -> Zhuang
-  { language: "zmi", tag: @otf.Tag(0x4D4C5920), }, // 'MLY ' Negeri Sembilan Malay -> Malay
-  { language: "zmz", tag: @otf.Tag(0x42414430), }, // 'BAD0' Mbandja -> Banda
-  { language: "znd", tag: @otf.Tag(0), }, // null Zande  [collection] != Zande
-  { language: "zne", tag: @otf.Tag(0x5A4E4420), }, // 'ZND ' Zande 
-  { language: "zom", tag: @otf.Tag(0x51494E20), }, // 'QIN ' Zou -> Chin
-  { language: "zqe", tag: @otf.Tag(0x5A484120), }, // 'ZHA ' Qiubei Zhuang -> Zhuang
-  { language: "zsm", tag: @otf.Tag(0x4D4C5920), }, // 'MLY ' Standard Malay -> Malay
-  { language: "zu", tag: @otf.Tag(0x5A554C20), }, // 'ZUL ' Zulu
-  { language: "zum", tag: @otf.Tag(0x4C524320), }, // 'LRC ' Kumzari -> Luri
-  { language: "zyb", tag: @otf.Tag(0x5A484120), }, // 'ZHA ' Yongbei Zhuang -> Zhuang
-  { language: "zyg", tag: @otf.Tag(0x5A484120), }, // 'ZHA ' Yang Zhuang -> Zhuang
-  { language: "zyj", tag: @otf.Tag(0x5A484120), }, // 'ZHA ' Youjiang Zhuang -> Zhuang
-  { language: "zyn", tag: @otf.Tag(0x5A484120), }, // 'ZHA ' Yongnan Zhuang -> Zhuang
-  { language: "zyp", tag: @otf.Tag(0x51494E20), }, // 'QIN ' Zyphe Chin -> Chin
-  // { language: "zza", tag: @otf.Tag(0x5A5A4120) }, // 'ZZA ' Zazaki [macrolanguage]
-  { language: "zzj", tag: @otf.Tag(0x5A484120), }, // 'ZHA ' Zuojiang Zhuang -> Zhuang
+let open_type_languages : ReadOnlyArray[LangTag] = [
+  { language: "aa", tag: 0x41465220, }, // 'AFR ' Afar
+  { language: "aae", tag: 0x53514920, }, // 'SQI ' Arbëreshë Albanian -> Albanian
+  { language: "aao", tag: 0x41524120, }, // 'ARA ' Algerian Saharan Arabic -> Arabic
+  // { language: "aaq", tag: 0x41415120 }, // 'AAQ ' Eastern Abnaki -> Eastern Abenaki
+  { language: "aat", tag: 0x53514920, }, // 'SQI ' Arvanitika Albanian -> Albanian
+  { language: "ab", tag: 0x41424B20, }, // 'ABK ' Abkhazian
+  { language: "aba", tag: 0, }, // null Abé != Abaza
+  { language: "abh", tag: 0x41524120, }, // 'ARA ' Tajiki Arabic -> Arabic
+  { language: "abq", tag: 0x41424120, }, // 'ABA ' Abaza
+  { language: "abs", tag: 0x43505020, }, // 'CPP ' Ambonese Malay -> Creoles
+  { language: "abv", tag: 0x41524120, }, // 'ARA ' Baharna Arabic -> Arabic
+  { language: "acf", tag: 0x46414E20, }, // 'FAN ' Saint Lucian Creole French -> French Antillean
+  { language: "acf", tag: 0x43505020, }, // 'CPP ' Saint Lucian Creole French -> Creoles
+  // { language: "ach", tag: 0x41434820 }, // 'ACH ' Acoli -> Acholi
+  { language: "acm", tag: 0x41524120, }, // 'ARA ' Mesopotamian Arabic -> Arabic
+  { language: "acq", tag: 0x41524120, }, // 'ARA ' Ta'izzi-Adeni Arabic -> Arabic
+  { language: "acr", tag: 0x41435220, }, // 'ACR ' Achi
+  { language: "acr", tag: 0x4D594E20, }, // 'MYN ' Achi -> Mayan
+  { language: "acw", tag: 0x41524120, }, // 'ARA ' Hijazi Arabic -> Arabic
+  { language: "acx", tag: 0x41524120, }, // 'ARA ' Omani Arabic -> Arabic
+  { language: "acy", tag: 0x41435920, }, // 'ACY ' Cypriot Arabic
+  { language: "acy", tag: 0x41524120, }, // 'ARA ' Cypriot Arabic -> Arabic
+  { language: "ada", tag: 0x444E4720, }, // 'DNG ' Adangme -> Dangme
+  { language: "adf", tag: 0x41524120, }, // 'ARA ' Dhofari Arabic -> Arabic
+  { language: "adp", tag: 0x445A4E20, }, // 'DZN ' Adap(retired code) -> Dzongkha
+  // { language: "ady", tag: 0x41445920 }, // 'ADY ' Adyghe
+  { language: "aeb", tag: 0x41524120, }, // 'ARA ' Tunisian Arabic -> Arabic
+  { language: "aec", tag: 0x41524120, }, // 'ARA ' Saidi Arabic -> Arabic
+  { language: "af", tag: 0x41464B20, }, // 'AFK ' Afrikaans
+  { language: "afb", tag: 0x41524120, }, // 'ARA ' Gulf Arabic -> Arabic
+  { language: "afk", tag: 0, }, // null Nanubae != Afrikaans
+  { language: "afs", tag: 0x43505020, }, // 'CPP ' Afro-Seminole Creole -> Creoles
+  { language: "agu", tag: 0x4D594E20, }, // 'MYN ' Aguacateco -> Mayan
+  { language: "agw", tag: 0, }, // null Kahua != Agaw
+  { language: "ahg", tag: 0x41475720, }, // 'AGW ' Qimant -> Agaw
+  { language: "aht", tag: 0x41544820, }, // 'ATH ' Ahtena -> Athapaskan
+  { language: "aig", tag: 0x43505020, }, // 'CPP ' Antigua and Barbuda Creole English -> Creoles
+  { language: "aii", tag: 0x53574120, }, // 'SWA ' Assyrian Neo-Aramaic -> Swadaya Aramaic
+  { language: "aii", tag: 0x53595220, }, // 'SYR ' Assyrian Neo-Aramaic -> Syriac
+  // { language: "aio", tag: 0x41494F20 }, // 'AIO ' Aiton
+  { language: "aiw", tag: 0x41524920, }, // 'ARI ' Aari
+  { language: "ajp", tag: 0x41524120, }, // 'ARA ' South Levantine Arabic(retired code) -> Arabic
+  { language: "ajt", tag: 0x41524120, }, // 'ARA ' Judeo-Tunisian Arabic(retired code) -> Arabic
+  { language: "ak", tag: 0x414B4120, }, // 'AKA ' Akan [macrolanguage]
+  { language: "akb", tag: 0x414B4220, }, // 'AKB ' Batak Angkola
+  { language: "akb", tag: 0x42544B20, }, // 'BTK ' Batak Angkola -> Batak
+  { language: "aln", tag: 0x53514920, }, // 'SQI ' Gheg Albanian -> Albanian
+  { language: "als", tag: 0x53514920, }, // 'SQI ' Tosk Albanian -> Albanian
+  // { language: "alt", tag: 0x414C5420 }, // 'ALT ' Southern Altai -> Altai
+  { language: "am", tag: 0x414D4820, }, // 'AMH ' Amharic
+  { language: "amf", tag: 0x48424E20, }, // 'HBN ' Hamer-Banna -> Hammer-Banna
+  { language: "amw", tag: 0x53595220, }, // 'SYR ' Western Neo-Aramaic -> Syriac
+  { language: "an", tag: 0x41524720, }, // 'ARG ' Aragonese
+  // { language: "ang", tag: 0x414E4720 }, // 'ANG ' Old English (ca. 450-1100) -> Anglo-Saxon
+  { language: "aoa", tag: 0x43505020, }, // 'CPP ' Angolar -> Creoles
+  { language: "apa", tag: 0x41544820, }, // 'ATH ' Apache  [collection] -> Athapaskan
+  { language: "apc", tag: 0x41524120, }, // 'ARA ' Levantine Arabic -> Arabic
+  { language: "apd", tag: 0x41524120, }, // 'ARA ' Sudanese Arabic -> Arabic
+  { language: "apj", tag: 0x41544820, }, // 'ATH ' Jicarilla Apache -> Athapaskan
+  { language: "apk", tag: 0x41544820, }, // 'ATH ' Kiowa Apache -> Athapaskan
+  { language: "apl", tag: 0x41544820, }, // 'ATH ' Lipan Apache -> Athapaskan
+  { language: "apm", tag: 0x41544820, }, // 'ATH ' Mescalero-Chiricahua Apache -> Athapaskan
+  { language: "apw", tag: 0x41544820, }, // 'ATH ' Western Apache -> Athapaskan
+  { language: "ar", tag: 0x41524120, }, // 'ARA ' Arabic [macrolanguage]
+  { language: "arb", tag: 0x41524120, }, // 'ARA ' Standard Arabic -> Arabic
+  { language: "ari", tag: 0, }, // null Arikara != Aari
+  { language: "ark", tag: 0, }, // null Arikapú != Rakhine
+  { language: "arn", tag: 0x4D415020, }, // 'MAP ' Mapudungun
+  { language: "arq", tag: 0x41524120, }, // 'ARA ' Algerian Arabic -> Arabic
+  { language: "ars", tag: 0x41524120, }, // 'ARA ' Najdi Arabic -> Arabic
+  { language: "ary", tag: 0x4D4F5220, }, // 'MOR ' Moroccan Arabic -> Moroccan
+  { language: "ary", tag: 0x41524120, }, // 'ARA ' Moroccan Arabic -> Arabic
+  { language: "arz", tag: 0x41524120, }, // 'ARA ' Egyptian Arabic -> Arabic
+  { language: "as", tag: 0x41534D20, }, // 'ASM ' Assamese
+  // { language: "ast", tag: 0x41535420 }, // 'AST ' Asturian
+  // { language: "ath", tag: 0x41544820 }, // 'ATH ' Athapascan  [collection] -> Athapaskan
+  { language: "atj", tag: 0x52435220, }, // 'RCR ' Atikamekw -> R-Cree
+  // { language: "ats", tag: 0x41545320 }, // 'ATS ' Gros Ventre (Atsina)
+  { language: "atv", tag: 0x414C5420, }, // 'ALT ' Northern Altai -> Altai
+  { language: "auj", tag: 0x42425220, }, // 'BBR ' Awjilah -> Berber
+  { language: "auz", tag: 0x41524120, }, // 'ARA ' Uzbeki Arabic -> Arabic
+  { language: "av", tag: 0x41565220, }, // 'AVR ' Avaric -> Avar
+  { language: "avl", tag: 0x41524120, }, // 'ARA ' Eastern Egyptian Bedawi Arabic -> Arabic
+  // { language: "avn", tag: 0x41564E20 }, // 'AVN ' Avatime
+  // { language: "awa", tag: 0x41574120 }, // 'AWA ' Awadhi
+  { language: "ay", tag: 0x41594D20, }, // 'AYM ' Aymara [macrolanguage]
+  { language: "ayc", tag: 0x41594D20, }, // 'AYM ' Southern Aymara -> Aymara
+  { language: "ayh", tag: 0x41524120, }, // 'ARA ' Hadrami Arabic -> Arabic
+  { language: "ayl", tag: 0x41524120, }, // 'ARA ' Libyan Arabic -> Arabic
+  { language: "ayn", tag: 0x41524120, }, // 'ARA ' Sanaani Arabic -> Arabic
+  { language: "ayp", tag: 0x41524120, }, // 'ARA ' North Mesopotamian Arabic -> Arabic
+  { language: "ayr", tag: 0x41594D20, }, // 'AYM ' Central Aymara -> Aymara
+  { language: "az", tag: 0x415A4520, }, // 'AZE ' Azerbaijani [macrolanguage]
+  { language: "azb", tag: 0x415A4220, }, // 'AZB ' South Azerbaijani -> Torki
+  { language: "azb", tag: 0x415A4520, }, // 'AZE ' South Azerbaijani -> Azerbaijani
+  { language: "azd", tag: 0x4E414820, }, // 'NAH ' Eastern Durango Nahuatl -> Nahuatl
+  { language: "azj", tag: 0x415A4520, }, // 'AZE ' North Azerbaijani -> Azerbaijani
+  { language: "azn", tag: 0x4E414820, }, // 'NAH ' Western Durango Nahuatl -> Nahuatl
+  { language: "azz", tag: 0x4E414820, }, // 'NAH ' Highland Puebla Nahuatl -> Nahuatl
+  { language: "ba", tag: 0x42534820, }, // 'BSH ' Bashkir
+  { language: "bad", tag: 0x42414430, }, // 'BAD0' Banda  [collection]
+  { language: "bag", tag: 0, }, // null Tuki != Baghelkhandi
+  { language: "bah", tag: 0x43505020, }, // 'CPP ' Bahamas Creole English -> Creoles
+  { language: "bai", tag: 0x424D4C20, }, // 'BML ' Bamileke  [collection]
+  { language: "bal", tag: 0x424C4920, }, // 'BLI ' Baluchi [macrolanguage]
+  // { language: "ban", tag: 0x42414E20 }, // 'BAN ' Balinese
+  // { language: "bar", tag: 0x42415220 }, // 'BAR ' Bavarian
+  { language: "bau", tag: 0, }, // null Bada (Nigeria) != Baulé
+  { language: "bbc", tag: 0x42424320, }, // 'BBC ' Batak Toba
+  { language: "bbc", tag: 0x42544B20, }, // 'BTK ' Batak Toba -> Batak
+  { language: "bbj", tag: 0x424D4C20, }, // 'BML ' Ghomálá' -> Bamileke
+  { language: "bbp", tag: 0x42414430, }, // 'BAD0' West Central Banda -> Banda
+  { language: "bbr", tag: 0, }, // null Girawa != Berber
+  { language: "bbz", tag: 0x41524120, }, // 'ARA ' Babalia Creole Arabic(retired code) -> Arabic
+  { language: "bcc", tag: 0x424C4920, }, // 'BLI ' Southern Balochi -> Baluchi
+  { language: "bch", tag: 0, }, // null Bariai != Bench
+  { language: "bci", tag: 0x42415520, }, // 'BAU ' Baoulé -> Baulé
+  { language: "bcl", tag: 0x42494B20, }, // 'BIK ' Central Bikol -> Bikol
+  { language: "bcq", tag: 0x42434820, }, // 'BCH ' Bench
+  { language: "bcr", tag: 0x41544820, }, // 'ATH ' Babine -> Athapaskan
+  // { language: "bdc", tag: 0x42444320 }, // 'BDC ' Emberá-Baudó
+  // { language: "bdy", tag: 0x42445920 }, // 'BDY ' Bandjalang
+  { language: "be", tag: 0x42454C20, }, // 'BEL ' Belarusian
+  { language: "bea", tag: 0x41544820, }, // 'ATH ' Beaver -> Athapaskan
+  { language: "beb", tag: 0x42544920, }, // 'BTI ' Bebele -> Beti
+  // { language: "bem", tag: 0x42454D20 }, // 'BEM ' Bemba (Zambia)
+  { language: "ber", tag: 0x42425220, }, // 'BBR ' Berber  [collection]
+  { language: "bew", tag: 0x43505020, }, // 'CPP ' Betawi -> Creoles
+  { language: "bfl", tag: 0x42414430, }, // 'BAD0' Banda-Ndélé -> Banda
+  { language: "bfq", tag: 0x42414420, }, // 'BAD ' Badaga
+  { language: "bft", tag: 0x424C5420, }, // 'BLT ' Balti
+  { language: "bfu", tag: 0x4C414820, }, // 'LAH ' Gahri -> Lahuli
+  { language: "bfy", tag: 0x42414720, }, // 'BAG ' Bagheli -> Baghelkhandi
+  { language: "bg", tag: 0x42475220, }, // 'BGR ' Bulgarian
+  // { language: "bgc", tag: 0x42474320 }, // 'BGC ' Haryanvi
+  { language: "bgn", tag: 0x424C4920, }, // 'BLI ' Western Balochi -> Baluchi
+  { language: "bgp", tag: 0x424C4920, }, // 'BLI ' Eastern Balochi -> Baluchi
+  { language: "bgq", tag: 0x42475120, }, // 'BGQ ' Bagri
+  { language: "bgq", tag: 0x52414A20, }, // 'RAJ ' Bagri -> Rajasthani
+  { language: "bgr", tag: 0x51494E20, }, // 'QIN ' Bawm Chin -> Chin
+  { language: "bhb", tag: 0x42484920, }, // 'BHI ' Bhili
+  // { language: "bhi", tag: 0x42484920 }, // 'BHI ' Bhilali -> Bhili
+  { language: "bhk", tag: 0x42494B20, }, // 'BIK ' Albay Bicolano(retired code) -> Bikol
+  // { language: "bho", tag: 0x42484F20 }, // 'BHO ' Bhojpuri
+  { language: "bhr", tag: 0x4D4C4720, }, // 'MLG ' Bara Malagasy -> Malagasy
+  { language: "bi", tag: 0x42495320, }, // 'BIS ' Bislama
+  { language: "bi", tag: 0x43505020, }, // 'CPP ' Bislama -> Creoles
+  // { language: "bik", tag: 0x42494B20 }, // 'BIK ' Bikol [macrolanguage]
+  { language: "bil", tag: 0, }, // null Bile != Bilen
+  { language: "bin", tag: 0x45444F20, }, // 'EDO ' Edo
+  { language: "biu", tag: 0x51494E20, }, // 'QIN ' Biete -> Chin
+  // { language: "bjj", tag: 0x424A4A20 }, // 'BJJ ' Kanauji
+  { language: "bjn", tag: 0x4D4C5920, }, // 'MLY ' Banjar -> Malay
+  { language: "bjo", tag: 0x42414430, }, // 'BAD0' Mid-Southern Banda -> Banda
+  { language: "bjq", tag: 0x4D4C4720, }, // 'MLG ' Southern Betsimisaraka Malagasy(retired code) -> Malagasy
+  { language: "bjs", tag: 0x43505020, }, // 'CPP ' Bajan -> Creoles
+  { language: "bjt", tag: 0x424C4E20, }, // 'BLN ' Balanta-Ganja -> Balante
+  { language: "bkf", tag: 0, }, // null Beeke != Blackfoot
+  { language: "bko", tag: 0x424D4C20, }, // 'BML ' Kwa' -> Bamileke
+  { language: "bla", tag: 0x424B4620, }, // 'BKF ' Siksika -> Blackfoot
+  { language: "ble", tag: 0x424C4E20, }, // 'BLN ' Balanta-Kentohe -> Balante
+  { language: "blg", tag: 0x49424120, }, // 'IBA ' Balau(retired code) -> Iban
+  { language: "bli", tag: 0, }, // null Bolia != Baluchi
+  { language: "blk", tag: 0x424C4B20, }, // 'BLK ' Pa’o Karen
+  { language: "blk", tag: 0x4B524E20, }, // 'KRN ' Pa'o Karen -> Karen
+  { language: "bln", tag: 0x42494B20, }, // 'BIK ' Southern Catanduanes Bikol -> Bikol
+  { language: "blt", tag: 0, }, // null Tai Dam != Balti
+  { language: "bm", tag: 0x424D4220, }, // 'BMB ' Bambara (Bamanankan)
+  { language: "bmb", tag: 0, }, // null Bembe != Bambara (Bamanankan)
+  { language: "bml", tag: 0, }, // null Bomboli != Bamileke
+  { language: "bmm", tag: 0x4D4C4720, }, // 'MLG ' Northern Betsimisaraka Malagasy -> Malagasy
+  { language: "bn", tag: 0x42454E20, }, // 'BEN ' Bangla
+  { language: "bo", tag: 0x54494220, }, // 'TIB ' Tibetan
+  { language: "bpd", tag: 0x42414430, }, // 'BAD0' Banda-Banda -> Banda
+  { language: "bpl", tag: 0x43505020, }, // 'CPP ' Broome Pearling Lugger Pidgin -> Creoles
+  { language: "bpq", tag: 0x43505020, }, // 'CPP ' Banda Malay -> Creoles
+  // { language: "bpy", tag: 0x42505920 }, // 'BPY ' Bishnupriya -> Bishnupriya Manipuri
+  { language: "bqi", tag: 0x4C524320, }, // 'LRC ' Bakhtiari -> Luri
+  { language: "bqk", tag: 0x42414430, }, // 'BAD0' Banda-Mbrès -> Banda
+  { language: "br", tag: 0x42524520, }, // 'BRE ' Breton
+  { language: "bra", tag: 0x42524920, }, // 'BRI ' Braj -> Braj Bhasha
+  { language: "brc", tag: 0x43505020, }, // 'CPP ' Berbice Creole Dutch -> Creoles
+  // { language: "brh", tag: 0x42524820 }, // 'BRH ' Brahui
+  { language: "bri", tag: 0, }, // null Mokpwe != Braj Bhasha
+  { language: "brm", tag: 0, }, // null Barambu != Burmese
+  // { language: "brx", tag: 0x42525820 }, // 'BRX ' Bodo (India)
+  { language: "bs", tag: 0x424F5320, }, // 'BOS ' Bosnian
+  { language: "bsh", tag: 0, }, // null Kati != Bashkir
+  // { language: "bsk", tag: 0x42534B20 }, // 'BSK ' Burushaski
+  { language: "btb", tag: 0x42544920, }, // 'BTI ' Beti (Cameroon)(retired code)
+  { language: "btd", tag: 0x42544420, }, // 'BTD ' Batak Dairi (Pakpak)
+  { language: "btd", tag: 0x42544B20, }, // 'BTK ' Batak Dairi -> Batak
+  { language: "bti", tag: 0, }, // null Burate != Beti
+  { language: "btj", tag: 0x4D4C5920, }, // 'MLY ' Bacanese Malay -> Malay
+  // { language: "btk", tag: 0x42544B20 }, // 'BTK ' Batak  [collection]
+  { language: "btm", tag: 0x42544D20, }, // 'BTM ' Batak Mandailing
+  { language: "btm", tag: 0x42544B20, }, // 'BTK ' Batak Mandailing -> Batak
+  { language: "bto", tag: 0x42494B20, }, // 'BIK ' Rinconada Bikol -> Bikol
+  { language: "bts", tag: 0x42545320, }, // 'BTS ' Batak Simalungun
+  { language: "bts", tag: 0x42544B20, }, // 'BTK ' Batak Simalungun -> Batak
+  { language: "btx", tag: 0x42545820, }, // 'BTX ' Batak Karo
+  { language: "btx", tag: 0x42544B20, }, // 'BTK ' Batak Karo -> Batak
+  { language: "btz", tag: 0x42545A20, }, // 'BTZ ' Batak Alas-Kluet
+  { language: "btz", tag: 0x42544B20, }, // 'BTK ' Batak Alas-Kluet -> Batak
+  // { language: "bug", tag: 0x42554720 }, // 'BUG ' Buginese -> Bugis
+  { language: "bum", tag: 0x42544920, }, // 'BTI ' Bulu (Cameroon) -> Beti
+  { language: "bve", tag: 0x4D4C5920, }, // 'MLY ' Berau Malay -> Malay
+  { language: "bvu", tag: 0x4D4C5920, }, // 'MLY ' Bukit Malay -> Malay
+  { language: "bwe", tag: 0x4B524E20, }, // 'KRN ' Bwe Karen -> Karen
+  { language: "bxk", tag: 0x4C554820, }, // 'LUH ' Bukusu -> Luyia
+  { language: "bxo", tag: 0x43505020, }, // 'CPP ' Barikanchi -> Creoles
+  { language: "bxp", tag: 0x42544920, }, // 'BTI ' Bebil -> Beti
+  { language: "bxr", tag: 0x52425520, }, // 'RBU ' Russia Buriat -> Russian Buriat
+  { language: "byn", tag: 0x42494C20, }, // 'BIL ' Bilin -> Bilen
+  { language: "byv", tag: 0x42595620, }, // 'BYV ' Medumba
+  { language: "byv", tag: 0x424D4C20, }, // 'BML ' Medumba -> Bamileke
+  { language: "bzc", tag: 0x4D4C4720, }, // 'MLG ' Southern Betsimisaraka Malagasy -> Malagasy
+  { language: "bzj", tag: 0x43505020, }, // 'CPP ' Belize Kriol English -> Creoles
+  { language: "bzk", tag: 0x43505020, }, // 'CPP ' Nicaragua Creole English -> Creoles
+  { language: "ca", tag: 0x43415420, }, // 'CAT ' Catalan
+  { language: "caa", tag: 0x4D594E20, }, // 'MYN ' Chortí -> Mayan
+  { language: "cac", tag: 0x4D594E20, }, // 'MYN ' Chuj -> Mayan
+  { language: "caf", tag: 0x43525220, }, // 'CRR ' Southern Carrier -> Carrier
+  { language: "caf", tag: 0x41544820, }, // 'ATH ' Southern Carrier -> Athapaskan
+  { language: "cak", tag: 0x43414B20, }, // 'CAK ' Kaqchikel
+  { language: "cak", tag: 0x4D594E20, }, // 'MYN ' Kaqchikel -> Mayan
+  // { language: "cay", tag: 0x43415920 }, // 'CAY ' Cayuga
+  // { language: "cbg", tag: 0x43424720 }, // 'CBG ' Chimila
+  { language: "cbk", tag: 0x43424B20, }, // 'CBK ' Chavacano -> Zamboanga Chavacano
+  { language: "cbk", tag: 0x43505020, }, // 'CPP ' Chavacano -> Creoles
+  { language: "cbl", tag: 0x51494E20, }, // 'QIN ' Bualkhaw Chin -> Chin
+  { language: "ccl", tag: 0x43505020, }, // 'CPP ' Cutchi-Swahili -> Creoles
+  { language: "ccm", tag: 0x43505020, }, // 'CPP ' Malaccan Creole Malay -> Creoles
+  { language: "cco", tag: 0x4343484E, }, // 'CCHN' Comaltepec Chinantec -> Chinantec
+  { language: "ccq", tag: 0x41524B20, }, // 'ARK ' Chaungtha(retired code) -> Rakhine
+  { language: "cdo", tag: 0x5A485320, }, // 'ZHS ' Min Dong Chinese -> Chinese, Simplified
+  { language: "ce", tag: 0x43484520, }, // 'CHE ' Chechen
+  // { language: "ceb", tag: 0x43454220 }, // 'CEB ' Cebuano
+  { language: "cek", tag: 0x51494E20, }, // 'QIN ' Eastern Khumi Chin -> Chin
+  { language: "cey", tag: 0x51494E20, }, // 'QIN ' Ekai Chin -> Chin
+  { language: "cfm", tag: 0x48414C20, }, // 'HAL ' Halam (Falam Chin)
+  { language: "cfm", tag: 0x51494E20, }, // 'QIN ' Falam Chin -> Chin
+  // { language: "cgg", tag: 0x43474720 }, // 'CGG ' Chiga
+  { language: "ch", tag: 0x43484120, }, // 'CHA ' Chamorro
+  { language: "chf", tag: 0x4D594E20, }, // 'MYN ' Tabasco Chontal -> Mayan
+  { language: "chg", tag: 0, }, // null Chagatai != Chaha Gurage
+  { language: "chh", tag: 0, }, // null Chinook != Chattisgarhi
+  { language: "chj", tag: 0x4343484E, }, // 'CCHN' Ojitlán Chinantec -> Chinantec
+  { language: "chk", tag: 0x43484B30, }, // 'CHK0' Chuukese
+  { language: "chm", tag: 0x484D4120, }, // 'HMA ' Mari (Russia) [macrolanguage] -> High Mari
+  { language: "chm", tag: 0x4C4D4120, }, // 'LMA ' Mari (Russia) [macrolanguage] -> Low Mari
+  { language: "chn", tag: 0x43505020, }, // 'CPP ' Chinook jargon -> Creoles
+  // { language: "cho", tag: 0x43484F20 }, // 'CHO ' Choctaw
+  { language: "chp", tag: 0x43485020, }, // 'CHP ' Chipewyan
+  { language: "chp", tag: 0x53415920, }, // 'SAY ' Chipewyan -> Sayisi
+  { language: "chp", tag: 0x41544820, }, // 'ATH ' Chipewyan -> Athapaskan
+  { language: "chq", tag: 0x4343484E, }, // 'CCHN' Quiotepec Chinantec -> Chinantec
+  // { language: "chr", tag: 0x43485220 }, // 'CHR ' Cherokee
+  // { language: "chy", tag: 0x43485920 }, // 'CHY ' Cheyenne
+  { language: "chz", tag: 0x4343484E, }, // 'CCHN' Ozumacín Chinantec -> Chinantec
+  { language: "ciw", tag: 0x4F4A4220, }, // 'OJB ' Chippewa -> Ojibway
+  // { language: "cja", tag: 0x434A4120 }, // 'CJA ' Western Cham
+  // { language: "cjm", tag: 0x434A4D20 }, // 'CJM ' Eastern Cham
+  { language: "cjy", tag: 0x5A485320, }, // 'ZHS ' Jinyu Chinese -> Chinese, Simplified
+  { language: "cka", tag: 0x51494E20, }, // 'QIN ' Khumi Awa Chin(retired code) -> Chin
+  { language: "ckb", tag: 0x4B555220, }, // 'KUR ' Central Kurdish -> Kurdish
+  { language: "ckn", tag: 0x51494E20, }, // 'QIN ' Kaang Chin -> Chin
+  { language: "cks", tag: 0x43505020, }, // 'CPP ' Tayo -> Creoles
+  { language: "ckt", tag: 0x43484B20, }, // 'CHK ' Chukot -> Chukchi
+  { language: "ckz", tag: 0x4D594E20, }, // 'MYN ' Cakchiquel-Quiché Mixed Language -> Mayan
+  { language: "clc", tag: 0x41544820, }, // 'ATH ' Chilcotin -> Athapaskan
+  { language: "cld", tag: 0x53595220, }, // 'SYR ' Chaldean Neo-Aramaic -> Syriac
+  { language: "cle", tag: 0x4343484E, }, // 'CCHN' Lealao Chinantec -> Chinantec
+  { language: "clj", tag: 0x51494E20, }, // 'QIN ' Laitu Chin -> Chin
+  { language: "cls", tag: 0x53414E20, }, // 'SAN ' Classical Sanskrit -> Sanskrit
+  { language: "clt", tag: 0x51494E20, }, // 'QIN ' Lautu Chin -> Chin
+  // { language: "cmi", tag: 0x434D4920 }, // 'CMI ' Emberá-Chamí
+  { language: "cmn", tag: 0x5A485320, }, // 'ZHS ' Mandarin Chinese -> Chinese, Simplified
+  { language: "cmr", tag: 0x51494E20, }, // 'QIN ' Mro-Khimi Chin -> Chin
+  { language: "cnb", tag: 0x51494E20, }, // 'QIN ' Chinbon Chin -> Chin
+  { language: "cnh", tag: 0x51494E20, }, // 'QIN ' Hakha Chin -> Chin
+  { language: "cnk", tag: 0x51494E20, }, // 'QIN ' Khumi Chin -> Chin
+  { language: "cnl", tag: 0x4343484E, }, // 'CCHN' Lalana Chinantec -> Chinantec
+  { language: "cnp", tag: 0x5A485320, }, // 'ZHS ' Northern Ping Chinese -> Chinese, Simplified
+  { language: "cnr", tag: 0x53524220, }, // 'SRB ' Montenegrin -> Serbian
+  { language: "cnt", tag: 0x4343484E, }, // 'CCHN' Tepetotutla Chinantec -> Chinantec
+  { language: "cnu", tag: 0x42425220, }, // 'BBR ' Chenoua -> Berber
+  { language: "cnw", tag: 0x51494E20, }, // 'QIN ' Ngawn Chin -> Chin
+  { language: "co", tag: 0x434F5320, }, // 'COS ' Corsican
+  { language: "coa", tag: 0x4D4C5920, }, // 'MLY ' Cocos Islands Malay -> Malay
+  { language: "cob", tag: 0x4D594E20, }, // 'MYN ' Chicomuceltec -> Mayan
+  // { language: "coo", tag: 0x434F4F20 }, // 'COO ' Comox
+  // { language: "cop", tag: 0x434F5020 }, // 'COP ' Coptic
+  { language: "coq", tag: 0x41544820, }, // 'ATH ' Coquille -> Athapaskan
+  { language: "cpa", tag: 0x4343484E, }, // 'CCHN' Palantla Chinantec -> Chinantec
+  { language: "cpe", tag: 0x43505020, }, // 'CPP ' English-based creoles and pidgins [collection] -> Creoles
+  { language: "cpf", tag: 0x43505020, }, // 'CPP ' French-based creoles and pidgins [collection] -> Creoles
+  { language: "cpi", tag: 0x43505020, }, // 'CPP ' Chinese Pidgin English -> Creoles
+  // { language: "cpp", tag: 0x43505020 }, // 'CPP ' Portuguese-based creoles and pidgins [collection] -> Creoles
+  { language: "cpx", tag: 0x5A485320, }, // 'ZHS ' Pu-Xian Chinese -> Chinese, Simplified
+  { language: "cqd", tag: 0x484D4E20, }, // 'HMN ' Chuanqiandian Cluster Miao -> Hmong
+  { language: "cqu", tag: 0x51554820, }, // 'QUH ' Chilean Quechua(retired code) -> Quechua (Bolivia)
+  { language: "cqu", tag: 0x51555A20, }, // 'QUZ ' Chilean Quechua(retired code) -> Quechua
+  { language: "cr", tag: 0x43524520, }, // 'CRE ' Cree [macrolanguage]
+  { language: "crh", tag: 0x43525420, }, // 'CRT ' Crimean Tatar
+  { language: "cri", tag: 0x43505020, }, // 'CPP ' Sãotomense -> Creoles
+  { language: "crj", tag: 0x45435220, }, // 'ECR ' Southern East Cree -> Eastern Cree
+  { language: "crj", tag: 0x59435220, }, // 'YCR ' Southern East Cree -> Y-Cree
+  { language: "crj", tag: 0x43524520, }, // 'CRE ' Southern East Cree -> Cree
+  { language: "crk", tag: 0x57435220, }, // 'WCR ' Plains Cree -> West-Cree
+  { language: "crk", tag: 0x59435220, }, // 'YCR ' Plains Cree -> Y-Cree
+  { language: "crk", tag: 0x43524520, }, // 'CRE ' Plains Cree -> Cree
+  { language: "crl", tag: 0x45435220, }, // 'ECR ' Northern East Cree -> Eastern Cree
+  { language: "crl", tag: 0x59435220, }, // 'YCR ' Northern East Cree -> Y-Cree
+  { language: "crl", tag: 0x43524520, }, // 'CRE ' Northern East Cree -> Cree
+  { language: "crm", tag: 0x4D435220, }, // 'MCR ' Moose Cree
+  { language: "crm", tag: 0x4C435220, }, // 'LCR ' Moose Cree -> L-Cree
+  { language: "crm", tag: 0x43524520, }, // 'CRE ' Moose Cree -> Cree
+  { language: "crp", tag: 0x43505020, }, // 'CPP ' Creoles and pidgins [collection] -> Creoles
+  { language: "crr", tag: 0, }, // null Carolina Algonquian != Carrier
+  { language: "crs", tag: 0x43505020, }, // 'CPP ' Seselwa Creole French -> Creoles
+  { language: "crt", tag: 0, }, // null Iyojwa'ja Chorote != Crimean Tatar
+  { language: "crx", tag: 0x43525220, }, // 'CRR ' Carrier
+  { language: "crx", tag: 0x41544820, }, // 'ATH ' Carrier -> Athapaskan
+  { language: "cs", tag: 0x43535920, }, // 'CSY ' Czech
+  { language: "csa", tag: 0x4343484E, }, // 'CCHN' Chiltepec Chinantec -> Chinantec
+  // { language: "csb", tag: 0x43534220 }, // 'CSB ' Kashubian
+  { language: "csh", tag: 0x51494E20, }, // 'QIN ' Asho Chin -> Chin
+  { language: "csj", tag: 0x51494E20, }, // 'QIN ' Songlai Chin -> Chin
+  { language: "csl", tag: 0, }, // null Chinese Sign Language != Church Slavonic
+  { language: "cso", tag: 0x4343484E, }, // 'CCHN' Sochiapam Chinantec -> Chinantec
+  { language: "csp", tag: 0x5A485320, }, // 'ZHS ' Southern Ping Chinese -> Chinese, Simplified
+  { language: "csv", tag: 0x51494E20, }, // 'QIN ' Sumtu Chin -> Chin
+  { language: "csw", tag: 0x4E435220, }, // 'NCR ' Swampy Cree -> N-Cree
+  { language: "csw", tag: 0x4E484320, }, // 'NHC ' Swampy Cree -> Norway House Cree
+  { language: "csw", tag: 0x43524520, }, // 'CRE ' Swampy Cree -> Cree
+  { language: "csy", tag: 0x51494E20, }, // 'QIN ' Siyin Chin -> Chin
+  { language: "ctc", tag: 0x41544820, }, // 'ATH ' Chetco -> Athapaskan
+  { language: "ctd", tag: 0x51494E20, }, // 'QIN ' Tedim Chin -> Chin
+  { language: "cte", tag: 0x4343484E, }, // 'CCHN' Tepinapa Chinantec -> Chinantec
+  // { language: "ctg", tag: 0x43544720 }, // 'CTG ' Chittagonian
+  { language: "cth", tag: 0x51494E20, }, // 'QIN ' Thaiphum Chin -> Chin
+  { language: "ctl", tag: 0x4343484E, }, // 'CCHN' Tlacoatzintepec Chinantec -> Chinantec
+  // { language: "cto", tag: 0x43544F20 }, // 'CTO ' Emberá-Catío
+  { language: "cts", tag: 0x42494B20, }, // 'BIK ' Northern Catanduanes Bikol -> Bikol
+  // { language: "ctt", tag: 0x43545420 }, // 'CTT ' Wayanad Chetti
+  { language: "ctu", tag: 0x4D594E20, }, // 'MYN ' Chol -> Mayan
+  { language: "cu", tag: 0x43534C20, }, // 'CSL ' Church Slavonic
+  { language: "cuc", tag: 0x4343484E, }, // 'CCHN' Usila Chinantec -> Chinantec
+  // { language: "cuk", tag: 0x43554B20 }, // 'CUK ' San Blas Kuna
+  { language: "cv", tag: 0x43485520, }, // 'CHU ' Chuvash
+  { language: "cvn", tag: 0x4343484E, }, // 'CCHN' Valle Nacional Chinantec -> Chinantec
+  { language: "cwd", tag: 0x44435220, }, // 'DCR ' Woods Cree
+  { language: "cwd", tag: 0x54435220, }, // 'TCR ' Woods Cree -> TH-Cree
+  { language: "cwd", tag: 0x43524520, }, // 'CRE ' Woods Cree -> Cree
+  { language: "cy", tag: 0x57454C20, }, // 'WEL ' Welsh
+  { language: "czh", tag: 0x5A485320, }, // 'ZHS ' Huizhou Chinese -> Chinese, Simplified
+  { language: "czo", tag: 0x5A485320, }, // 'ZHS ' Min Zhong Chinese -> Chinese, Simplified
+  { language: "czt", tag: 0x51494E20, }, // 'QIN ' Zotung Chin -> Chin
+  { language: "da", tag: 0x44414E20, }, // 'DAN ' Danish
+  // { language: "dag", tag: 0x44414720 }, // 'DAG ' Dagbani
+  { language: "dao", tag: 0x51494E20, }, // 'QIN ' Daai Chin -> Chin
+  { language: "dap", tag: 0x4E495320, }, // 'NIS ' Nisi (India)(retired code)
+  // { language: "dar", tag: 0x44415220 }, // 'DAR ' Dargwa
+  // { language: "dax", tag: 0x44415820 }, // 'DAX ' Dayi
+  { language: "dcr", tag: 0x43505020, }, // 'CPP ' Negerhollands -> Creoles
+  { language: "de", tag: 0x44455520, }, // 'DEU ' German
+  { language: "den", tag: 0x534C4120, }, // 'SLA ' Slave (Athapascan) [macrolanguage] -> Slavey
+  { language: "den", tag: 0x41544820, }, // 'ATH ' Slave (Athapascan) [macrolanguage] -> Athapaskan
+  { language: "dep", tag: 0x43505020, }, // 'CPP ' Pidgin Delaware -> Creoles
+  { language: "dgo", tag: 0x44474F20, }, // 'DGO ' Dogri (individual language)
+  { language: "dgo", tag: 0x44475220, }, // 'DGR ' Dogri (macrolanguage)
+  { language: "dgr", tag: 0x41544820, }, // 'ATH ' Tlicho -> Athapaskan
+  { language: "dhd", tag: 0x4D415720, }, // 'MAW ' Dhundari -> Marwari
+  // { language: "dhg", tag: 0x44484720 }, // 'DHG ' Dhangu
+  { language: "dhv", tag: 0, }, // null Dehu != Divehi (Dhivehi, Maldivian)(deprecated)
+  { language: "dib", tag: 0x444E4B20, }, // 'DNK ' South Central Dinka -> Dinka
+  { language: "dik", tag: 0x444E4B20, }, // 'DNK ' Southwestern Dinka -> Dinka
+  { language: "din", tag: 0x444E4B20, }, // 'DNK ' Dinka [macrolanguage]
+  { language: "dip", tag: 0x444E4B20, }, // 'DNK ' Northeastern Dinka -> Dinka
+  { language: "diq", tag: 0x44495120, }, // 'DIQ ' Dimli 
+  { language: "diq", tag: 0x5A5A4120, }, // 'ZZA ' Dimli  -> Zazaki
+  { language: "diw", tag: 0x444E4B20, }, // 'DNK ' Northwestern Dinka -> Dinka
+  { language: "dje", tag: 0x444A5220, }, // 'DJR ' Zarma
+  { language: "djk", tag: 0x43505020, }, // 'CPP ' Eastern Maroon Creole -> Creoles
+  { language: "djr", tag: 0x444A5230, }, // 'DJR0' Djambarrpuyngu
+  { language: "dks", tag: 0x444E4B20, }, // 'DNK ' Southeastern Dinka -> Dinka
+  { language: "dng", tag: 0x44554E20, }, // 'DUN ' Dungan
+  // { language: "dnj", tag: 0x444E4A20 }, // 'DNJ ' Dan
+  { language: "dnk", tag: 0, }, // null Dengka != Dinka
+  { language: "doi", tag: 0x44475220, }, // 'DGR ' Dogri (macrolanguage) [macrolanguage]
+  { language: "drh", tag: 0x4D4E4720, }, // 'MNG ' Darkhat(retired code) -> Mongolian
+  { language: "dri", tag: 0, }, // null C'Lela != Dari
+  { language: "drw", tag: 0x44524920, }, // 'DRI ' Darwazi(retired code) -> Dari
+  { language: "drw", tag: 0x46415220, }, // 'FAR ' Darwazi(retired code) -> Persian
+  { language: "dsb", tag: 0x4C534220, }, // 'LSB ' Lower Sorbian
+  { language: "dty", tag: 0x4E455020, }, // 'NEP ' Dotyali -> Nepali
+  // { language: "duj", tag: 0x44554A20 }, // 'DUJ ' Dhuwal(retired code)
+  { language: "dun", tag: 0, }, // null Dusun Deyah != Dungan
+  { language: "dup", tag: 0x4D4C5920, }, // 'MLY ' Duano -> Malay
+  { language: "dv", tag: 0x44495620, }, // 'DIV ' Divehi (Dhivehi, Maldivian)
+  { language: "dv", tag: 0x44485620, }, // 'DHV ' Divehi (Dhivehi, Maldivian)(deprecated)
+  { language: "dwk", tag: 0x4B554920, }, // 'KUI ' Dawik Kui -> Kui
+  { language: "dwu", tag: 0x44554A20, }, // 'DUJ ' Dhuwal
+  { language: "dwy", tag: 0x44554A20, }, // 'DUJ ' Dhuwaya -> Dhuwal
+  { language: "dyu", tag: 0x4A554C20, }, // 'JUL ' Dyula -> Jula
+  { language: "dz", tag: 0x445A4E20, }, // 'DZN ' Dzongkha
+  { language: "dzn", tag: 0, }, // null Dzando != Dzongkha
+  { language: "ecr", tag: 0, }, // null Eteocretan != Eastern Cree
+  { language: "ee", tag: 0x45574520, }, // 'EWE ' Ewe
+  // { language: "efi", tag: 0x45464920 }, // 'EFI ' Efik
+  { language: "ekk", tag: 0x45544920, }, // 'ETI ' Standard Estonian -> Estonian
+  { language: "eky", tag: 0x4B524E20, }, // 'KRN ' Eastern Kayah -> Karen
+  { language: "el", tag: 0x454C4C20, }, // 'ELL ' Modern Greek (1453-) -> Greek
+  { language: "emk", tag: 0x454D4B20, }, // 'EMK ' Eastern Maninkakan
+  { language: "emk", tag: 0x4D4E4B20, }, // 'MNK ' Eastern Maninkakan -> Maninka
+  // { language: "emp", tag: 0x454D5020 }, // 'EMP ' Northern Emberá
+  { language: "emy", tag: 0x4D594E20, }, // 'MYN ' Epigraphic Mayan -> Mayan
+  { language: "en", tag: 0x454E4720, }, // 'ENG ' English
+  { language: "enb", tag: 0x4B414C20, }, // 'KAL ' Markweeta -> Kalenjin
+  { language: "enf", tag: 0x464E4520, }, // 'FNE ' Forest Enets
+  { language: "enh", tag: 0x544E4520, }, // 'TNE ' Tundra Enets
+  { language: "eo", tag: 0x4E544F20, }, // 'NTO ' Esperanto
+  { language: "es", tag: 0x45535020, }, // 'ESP ' Spanish
+  { language: "esg", tag: 0x474F4E20, }, // 'GON ' Aheri Gondi -> Gondi
+  { language: "esi", tag: 0x49504B20, }, // 'IPK ' North Alaskan Inupiatun -> Inupiat
+  { language: "esk", tag: 0x49504B20, }, // 'IPK ' Northwest Alaska Inupiatun -> Inupiat
+  // { language: "esu", tag: 0x45535520 }, // 'ESU ' Central Yupik
+  { language: "et", tag: 0x45544920, }, // 'ETI ' Estonian [macrolanguage]
+  { language: "eto", tag: 0x42544920, }, // 'BTI ' Eton (Cameroon) -> Beti
+  { language: "eu", tag: 0x45555120, }, // 'EUQ ' Basque
+  { language: "euq", tag: 0, }, // null Basque  [collection] != Basque
+  { language: "eve", tag: 0x45564E20, }, // 'EVN ' Even
+  { language: "evn", tag: 0x45564B20, }, // 'EVK ' Evenki
+  { language: "ewo", tag: 0x42544920, }, // 'BTI ' Ewondo -> Beti
+  { language: "eyo", tag: 0x4B414C20, }, // 'KAL ' Keiyo -> Kalenjin
+  { language: "fa", tag: 0x46415220, }, // 'FAR ' Persian [macrolanguage]
+  { language: "fab", tag: 0x43505020, }, // 'CPP ' Fa d'Ambu -> Creoles
+  { language: "fan", tag: 0x46414E30, }, // 'FAN0' Fang (Equatorial Guinea)
+  { language: "fan", tag: 0x42544920, }, // 'BTI ' Fang (Equatorial Guinea) -> Beti
+  { language: "far", tag: 0, }, // null Fataleka != Persian
+  { language: "fat", tag: 0x46415420, }, // 'FAT ' Fanti
+  { language: "fat", tag: 0x414B4120, }, // 'AKA ' Fanti -> Akan
+  { language: "fbl", tag: 0x42494B20, }, // 'BIK ' West Albay Bikol -> Bikol
+  { language: "ff", tag: 0x46554C20, }, // 'FUL ' Fulah [macrolanguage]
+  { language: "ffm", tag: 0x46554C20, }, // 'FUL ' Maasina Fulfulde -> Fulah
+  { language: "fi", tag: 0x46494E20, }, // 'FIN ' Finnish
+  { language: "fil", tag: 0x50494C20, }, // 'PIL ' Filipino
+  { language: "fj", tag: 0x464A4920, }, // 'FJI ' Fijian
+  { language: "flm", tag: 0x48414C20, }, // 'HAL ' Halam (Falam Chin)(retired code)
+  { language: "flm", tag: 0x51494E20, }, // 'QIN ' Falam Chin(retired code) -> Chin
+  { language: "fmp", tag: 0x464D5020, }, // 'FMP ' Fe’fe’
+  { language: "fmp", tag: 0x424D4C20, }, // 'BML ' Fe'fe' -> Bamileke
+  { language: "fng", tag: 0x43505020, }, // 'CPP ' Fanagalo -> Creoles
+  { language: "fo", tag: 0x464F5320, }, // 'FOS ' Faroese
+  // { language: "fon", tag: 0x464F4E20 }, // 'FON ' Fon
+  { language: "fos", tag: 0, }, // null Siraya != Faroese
+  { language: "fpe", tag: 0x43505020, }, // 'CPP ' Fernando Po Creole English -> Creoles
+  { language: "fr", tag: 0x46524120, }, // 'FRA ' French
+  // { language: "frc", tag: 0x46524320 }, // 'FRC ' Cajun French
+  // { language: "frp", tag: 0x46525020 }, // 'FRP ' Arpitan
+  { language: "fub", tag: 0x46554C20, }, // 'FUL ' Adamawa Fulfulde -> Fulah
+  { language: "fuc", tag: 0x46554C20, }, // 'FUL ' Pulaar -> Fulah
+  { language: "fue", tag: 0x46554C20, }, // 'FUL ' Borgu Fulfulde -> Fulah
+  { language: "fuf", tag: 0x46544120, }, // 'FTA ' Pular -> Futa
+  { language: "fuf", tag: 0x46554C20, }, // 'FUL ' Pular -> Fulah
+  { language: "fuh", tag: 0x46554C20, }, // 'FUL ' Western Niger Fulfulde -> Fulah
+  { language: "fui", tag: 0x46554C20, }, // 'FUL ' Bagirmi Fulfulde -> Fulah
+  { language: "fuq", tag: 0x46554C20, }, // 'FUL ' Central-Eastern Niger Fulfulde -> Fulah
+  { language: "fur", tag: 0x46524C20, }, // 'FRL ' Friulian
+  { language: "fuv", tag: 0x46555620, }, // 'FUV ' Nigerian Fulfulde
+  { language: "fuv", tag: 0x46554C20, }, // 'FUL ' Nigerian Fulfulde -> Fulah
+  { language: "fy", tag: 0x46524920, }, // 'FRI ' Western Frisian -> Frisian
+  { language: "ga", tag: 0x49524920, }, // 'IRI ' Irish
+  { language: "ga", tag: 0x49525420, }, // 'IRT ' Irish -> Irish Traditional
+  { language: "gaa", tag: 0x47414420, }, // 'GAD ' Ga
+  { language: "gac", tag: 0x43505020, }, // 'CPP ' Mixed Great Andamanese -> Creoles
+  { language: "gad", tag: 0, }, // null Gaddang != Ga
+  { language: "gae", tag: 0, }, // null Guarequena != Scottish Gaelic
+  // { language: "gag", tag: 0x47414720 }, // 'GAG ' Gagauz
+  { language: "gal", tag: 0, }, // null Galolen != Galician
+  { language: "gan", tag: 0x5A485320, }, // 'ZHS ' Gan Chinese -> Chinese, Simplified
+  { language: "gar", tag: 0, }, // null Galeya != Garshuni
+  { language: "gaw", tag: 0, }, // null Nobonob != Garhwali
+  { language: "gax", tag: 0x4F524F20, }, // 'ORO ' Borana-Arsi-Guji Oromo -> Oromo
+  { language: "gaz", tag: 0x4F524F20, }, // 'ORO ' West Central Oromo -> Oromo
+  { language: "gbm", tag: 0x47415720, }, // 'GAW ' Garhwali
+  { language: "gce", tag: 0x41544820, }, // 'ATH ' Galice -> Athapaskan
+  { language: "gcf", tag: 0x43505020, }, // 'CPP ' Guadeloupean Creole French -> Creoles
+  { language: "gcl", tag: 0x43505020, }, // 'CPP ' Grenadian Creole English -> Creoles
+  { language: "gcr", tag: 0x43505020, }, // 'CPP ' Guianese Creole French -> Creoles
+  { language: "gd", tag: 0x47414520, }, // 'GAE ' Scottish Gaelic
+  { language: "gda", tag: 0x52414A20, }, // 'RAJ ' Gade Lohar -> Rajasthani
+  // { language: "gez", tag: 0x47455A20 }, // 'GEZ ' Geez
+  { language: "ggo", tag: 0x474F4E20, }, // 'GON ' Southern Gondi(retired code) -> Gondi
+  { language: "gha", tag: 0x42425220, }, // 'BBR ' Ghadamès -> Berber
+  { language: "ghc", tag: 0x49525420, }, // 'IRT ' Hiberno-Scottish Gaelic -> Irish Traditional
+  { language: "ghk", tag: 0x4B524E20, }, // 'KRN ' Geko Karen -> Karen
+  { language: "gho", tag: 0x42425220, }, // 'BBR ' Ghomara -> Berber
+  { language: "gib", tag: 0x43505020, }, // 'CPP ' Gibanawa -> Creoles
+  // { language: "gih", tag: 0x47494820 }, // 'GIH ' Githabul
+  { language: "gil", tag: 0x47494C30, }, // 'GIL0' Kiribati (Gilbertese)
+  { language: "gju", tag: 0x52414A20, }, // 'RAJ ' Gujari -> Rajasthani
+  { language: "gkp", tag: 0x474B5020, }, // 'GKP ' Guinea Kpelle -> Kpelle (Guinea)
+  { language: "gkp", tag: 0x4B504C20, }, // 'KPL ' Guinea Kpelle -> Kpelle
+  { language: "gl", tag: 0x47414C20, }, // 'GAL ' Galician
+  { language: "gld", tag: 0x4E414E20, }, // 'NAN ' Nanai
+  // { language: "glk", tag: 0x474C4B20 }, // 'GLK ' Gilaki
+  { language: "gmz", tag: 0, }, // null Mgbolizhia != Gumuz
+  { language: "gn", tag: 0x47554120, }, // 'GUA ' Guarani [macrolanguage]
+  { language: "gnb", tag: 0x51494E20, }, // 'QIN ' Gangte -> Chin
+  // { language: "gnn", tag: 0x474E4E20 }, // 'GNN ' Gumatj
+  { language: "gno", tag: 0x474F4E20, }, // 'GON ' Northern Gondi -> Gondi
+  { language: "gnw", tag: 0x47554120, }, // 'GUA ' Western Bolivian Guaraní -> Guarani
+  // { language: "gog", tag: 0x474F4720 }, // 'GOG ' Gogo
+  { language: "gom", tag: 0x4B4F4B20, }, // 'KOK ' Goan Konkani -> Konkani
+  // { language: "gon", tag: 0x474F4E20 }, // 'GON ' Gondi [macrolanguage]
+  { language: "goq", tag: 0x43505020, }, // 'CPP ' Gorap -> Creoles
+  { language: "gox", tag: 0x42414430, }, // 'BAD0' Gobu -> Banda
+  { language: "gpe", tag: 0x43505020, }, // 'CPP ' Ghanaian Pidgin English -> Creoles
+  { language: "gro", tag: 0, }, // null Groma != Garo
+  { language: "grr", tag: 0x42425220, }, // 'BBR ' Taznatit -> Berber
+  { language: "grt", tag: 0x47524F20, }, // 'GRO ' Garo
+  { language: "gru", tag: 0x534F4720, }, // 'SOG ' Kistane -> Sodo Gurage
+  { language: "gsw", tag: 0x414C5320, }, // 'ALS ' Alsatian
+  { language: "gu", tag: 0x47554A20, }, // 'GUJ ' Gujarati
+  { language: "gua", tag: 0, }, // null Shiki != Guarani
+  // { language: "guc", tag: 0x47554320 }, // 'GUC ' Wayuu
+  // { language: "guf", tag: 0x47554620 }, // 'GUF ' Gupapuyngu
+  { language: "gug", tag: 0x47554120, }, // 'GUA ' Paraguayan Guaraní -> Guarani
+  { language: "gui", tag: 0x47554120, }, // 'GUA ' Eastern Bolivian Guaraní -> Guarani
+  { language: "guk", tag: 0x474D5A20, }, // 'GMZ ' Gumuz
+  { language: "gul", tag: 0x43505020, }, // 'CPP ' Sea Island Creole English -> Creoles
+  { language: "gun", tag: 0x47554120, }, // 'GUA ' Mbyá Guaraní -> Guarani
+  // { language: "guz", tag: 0x47555A20 }, // 'GUZ ' Gusii
+  { language: "gv", tag: 0x4D4E5820, }, // 'MNX ' Manx
+  { language: "gwi", tag: 0x41544820, }, // 'ATH ' Gwichʼin -> Athapaskan
+  { language: "gyn", tag: 0x43505020, }, // 'CPP ' Guyanese Creole English -> Creoles
+  { language: "ha", tag: 0x48415520, }, // 'HAU ' Hausa
+  { language: "haa", tag: 0x41544820, }, // 'ATH ' Han -> Athapaskan
+  { language: "hae", tag: 0x4F524F20, }, // 'ORO ' Eastern Oromo -> Oromo
+  { language: "hai", tag: 0x48414930, }, // 'HAI0' Haida [macrolanguage]
+  { language: "hak", tag: 0x5A485320, }, // 'ZHS ' Hakka Chinese -> Chinese, Simplified
+  { language: "hal", tag: 0, }, // null Halang != Halam (Falam Chin)
+  { language: "har", tag: 0x48524920, }, // 'HRI ' Harari
+  // { language: "haw", tag: 0x48415720 }, // 'HAW ' Hawaiian
+  { language: "hax", tag: 0x48414930, }, // 'HAI0' Southern Haida -> Haida
+  // { language: "hay", tag: 0x48415920 }, // 'HAY ' Haya
+  // { language: "haz", tag: 0x48415A20 }, // 'HAZ ' Hazaragi
+  { language: "hbn", tag: 0, }, // null Heiban != Hammer-Banna
+  { language: "hca", tag: 0x43505020, }, // 'CPP ' Andaman Creole Hindi -> Creoles
+  { language: "hdn", tag: 0x48414930, }, // 'HAI0' Northern Haida -> Haida
+  { language: "he", tag: 0x49575220, }, // 'IWR ' Hebrew
+  { language: "hea", tag: 0x484D4E20, }, // 'HMN ' Northern Qiandong Miao -> Hmong
+  // { language: "hei", tag: 0x48454920 }, // 'HEI ' Heiltsuk
+  { language: "hi", tag: 0x48494E20, }, // 'HIN ' Hindi
+  // { language: "hil", tag: 0x48494C20 }, // 'HIL ' Hiligaynon
+  { language: "hji", tag: 0x4D4C5920, }, // 'MLY ' Haji -> Malay
+  { language: "hlt", tag: 0x51494E20, }, // 'QIN ' Matu Chin -> Chin
+  { language: "hma", tag: 0x484D4E20, }, // 'HMN ' Southern Mashan Hmong -> Hmong
+  { language: "hmc", tag: 0x484D4E20, }, // 'HMN ' Central Huishui Hmong -> Hmong
+  { language: "hmd", tag: 0x484D4420, }, // 'HMD ' Large Flowery Miao -> A-Hmao
+  { language: "hmd", tag: 0x484D4E20, }, // 'HMN ' Large Flowery Miao -> Hmong
+  { language: "hme", tag: 0x484D4E20, }, // 'HMN ' Eastern Huishui Hmong -> Hmong
+  { language: "hmg", tag: 0x484D4E20, }, // 'HMN ' Southwestern Guiyang Hmong -> Hmong
+  { language: "hmh", tag: 0x484D4E20, }, // 'HMN ' Southwestern Huishui Hmong -> Hmong
+  { language: "hmi", tag: 0x484D4E20, }, // 'HMN ' Northern Huishui Hmong -> Hmong
+  { language: "hmj", tag: 0x484D4E20, }, // 'HMN ' Ge -> Hmong
+  { language: "hml", tag: 0x484D4E20, }, // 'HMN ' Luopohe Hmong -> Hmong
+  { language: "hmm", tag: 0x484D4E20, }, // 'HMN ' Central Mashan Hmong -> Hmong
+  // { language: "hmn", tag: 0x484D4E20 }, // 'HMN ' Hmong [macrolanguage]
+  { language: "hmp", tag: 0x484D4E20, }, // 'HMN ' Northern Mashan Hmong -> Hmong
+  { language: "hmq", tag: 0x484D4E20, }, // 'HMN ' Eastern Qiandong Miao -> Hmong
+  { language: "hmr", tag: 0x51494E20, }, // 'QIN ' Hmar -> Chin
+  { language: "hms", tag: 0x484D4E20, }, // 'HMN ' Southern Qiandong Miao -> Hmong
+  { language: "hmw", tag: 0x484D4E20, }, // 'HMN ' Western Mashan Hmong -> Hmong
+  { language: "hmy", tag: 0x484D4E20, }, // 'HMN ' Southern Guiyang Hmong -> Hmong
+  { language: "hmz", tag: 0x484D5A20, }, // 'HMZ ' Hmong Shua -> Hmong Shuat
+  { language: "hmz", tag: 0x484D4E20, }, // 'HMN ' Hmong Shua -> Hmong
+  // { language: "hnd", tag: 0x484E4420 }, // 'HND ' Southern Hindko -> Hindko
+  { language: "hne", tag: 0x43484820, }, // 'CHH ' Chhattisgarhi -> Chattisgarhi
+  { language: "hnj", tag: 0x484D4E20, }, // 'HMN ' Hmong Njua -> Hmong
+  { language: "hno", tag: 0x484E4420, }, // 'HND ' Northern Hindko -> Hindko
+  { language: "ho", tag: 0x484D4F20, }, // 'HMO ' Hiri Motu
+  { language: "ho", tag: 0x43505020, }, // 'CPP ' Hiri Motu -> Creoles
+  { language: "hoc", tag: 0x484F2020, }, // 'HO  ' Ho
+  { language: "hoi", tag: 0x41544820, }, // 'ATH ' Holikachuk -> Athapaskan
+  { language: "hoj", tag: 0x48415220, }, // 'HAR ' Hadothi -> Harauti
+  { language: "hoj", tag: 0x52414A20, }, // 'RAJ ' Hadothi -> Rajasthani
+  { language: "hr", tag: 0x48525620, }, // 'HRV ' Croatian
+  { language: "hra", tag: 0x51494E20, }, // 'QIN ' Hrangkhol -> Chin
+  { language: "hrm", tag: 0x484D4E20, }, // 'HMN ' Horned Miao -> Hmong
+  { language: "hsb", tag: 0x55534220, }, // 'USB ' Upper Sorbian
+  { language: "hsn", tag: 0x5A485320, }, // 'ZHS ' Xiang Chinese -> Chinese, Simplified
+  { language: "ht", tag: 0x48414920, }, // 'HAI ' Haitian (Haitian Creole)
+  { language: "ht", tag: 0x43505020, }, // 'CPP ' Haitian -> Creoles
+  { language: "hu", tag: 0x48554E20, }, // 'HUN ' Hungarian
+  { language: "huj", tag: 0x484D4E20, }, // 'HMN ' Northern Guiyang Hmong -> Hmong
+  { language: "hup", tag: 0x41544820, }, // 'ATH ' Hupa -> Athapaskan
+  // { language: "hur", tag: 0x48555220 }, // 'HUR ' Halkomelem
+  { language: "hus", tag: 0x4D594E20, }, // 'MYN ' Huastec -> Mayan
+  { language: "hwc", tag: 0x43505020, }, // 'CPP ' Hawai'i Creole English -> Creoles
+  { language: "hy", tag: 0x48594530, }, // 'HYE0' Armenian -> Armenian East
+  { language: "hy", tag: 0x48594520, }, // 'HYE ' Armenian
+  { language: "hyw", tag: 0x48594520, }, // 'HYE ' Western Armenian -> Armenian
+  { language: "hz", tag: 0x48455220, }, // 'HER ' Herero
+  { language: "ia", tag: 0x494E4120, }, // 'INA ' Interlingua (International Auxiliary Language Association)
+  // { language: "iba", tag: 0x49424120 }, // 'IBA ' Iban
+  // { language: "ibb", tag: 0x49424220 }, // 'IBB ' Ibibio
+  { language: "iby", tag: 0x494A4F20, }, // 'IJO ' Ibani -> Ijo
+  { language: "icr", tag: 0x43505020, }, // 'CPP ' Islander Creole English -> Creoles
+  { language: "id", tag: 0x494E4420, }, // 'IND ' Indonesian
+  { language: "id", tag: 0x4D4C5920, }, // 'MLY ' Indonesian -> Malay
+  { language: "ida", tag: 0x4C554820, }, // 'LUH ' Idakho-Isukha-Tiriki -> Luyia
+  { language: "idb", tag: 0x43505020, }, // 'CPP ' Indo-Portuguese -> Creoles
+  { language: "ie", tag: 0x494C4520, }, // 'ILE ' Interlingue
+  { language: "ig", tag: 0x49424F20, }, // 'IBO ' Igbo
+  { language: "igb", tag: 0x45424920, }, // 'EBI ' Ebira
+  { language: "ihb", tag: 0x43505020, }, // 'CPP ' Iha Based Pidgin -> Creoles
+  { language: "ii", tag: 0x59494D20, }, // 'YIM ' Sichuan Yi -> Yi Modern
+  { language: "ijc", tag: 0x494A4F20, }, // 'IJO ' Izon -> Ijo
+  { language: "ije", tag: 0x494A4F20, }, // 'IJO ' Biseni -> Ijo
+  { language: "ijn", tag: 0x494A4F20, }, // 'IJO ' Kalabari -> Ijo
+  // { language: "ijo", tag: 0x494A4F20 }, // 'IJO ' Ijo  [collection]
+  { language: "ijs", tag: 0x494A4F20, }, // 'IJO ' Southeast Ijo -> Ijo
+  { language: "ik", tag: 0x49504B20, }, // 'IPK ' Inupiaq [macrolanguage] -> Inupiat
+  { language: "ike", tag: 0x494E5520, }, // 'INU ' Eastern Canadian Inuktitut -> Inuktitut
+  { language: "ike", tag: 0x494E554B, }, // 'INUK' Eastern Canadian Inuktitut -> Nunavik Inuktitut
+  { language: "ikt", tag: 0x494E5520, }, // 'INU ' Inuinnaqtun -> Inuktitut
+  // { language: "ilo", tag: 0x494C4F20 }, // 'ILO ' Iloko -> Ilokano
+  { language: "in", tag: 0x494E4420, }, // 'IND ' Indonesian(retired code)
+  { language: "in", tag: 0x4D4C5920, }, // 'MLY ' Indonesian(retired code) -> Malay
+  { language: "ing", tag: 0x41544820, }, // 'ATH ' Degexit'an -> Athapaskan
+  { language: "inh", tag: 0x494E4720, }, // 'ING ' Ingush
+  { language: "io", tag: 0x49444F20, }, // 'IDO ' Ido
+  { language: "iri", tag: 0, }, // null Rigwe != Irish
+  // { language: "iru", tag: 0x49525520 }, // 'IRU ' Irula
+  { language: "is", tag: 0x49534C20, }, // 'ISL ' Icelandic
+  { language: "ism", tag: 0, }, // null Masimasi != Inari Sami
+  { language: "it", tag: 0x49544120, }, // 'ITA ' Italian
+  { language: "itz", tag: 0x4D594E20, }, // 'MYN ' Itzá -> Mayan
+  { language: "iu", tag: 0x494E5520, }, // 'INU ' Inuktitut [macrolanguage]
+  { language: "iu", tag: 0x494E554B, }, // 'INUK' Inuktitut [macrolanguage] -> Nunavik Inuktitut
+  { language: "iw", tag: 0x49575220, }, // 'IWR ' Hebrew(retired code)
+  { language: "ixl", tag: 0x4D594E20, }, // 'MYN ' Ixil -> Mayan
+  { language: "ja", tag: 0x4A414E20, }, // 'JAN ' Japanese
+  { language: "jac", tag: 0x4D594E20, }, // 'MYN ' Popti' -> Mayan
+  { language: "jak", tag: 0x4D4C5920, }, // 'MLY ' Jakun -> Malay
+  { language: "jam", tag: 0x4A414D20, }, // 'JAM ' Jamaican Creole English -> Jamaican Creole
+  { language: "jam", tag: 0x43505020, }, // 'CPP ' Jamaican Creole English -> Creoles
+  { language: "jan", tag: 0, }, // null Jandai != Japanese
+  { language: "jax", tag: 0x4D4C5920, }, // 'MLY ' Jambi Malay -> Malay
+  { language: "jbe", tag: 0x42425220, }, // 'BBR ' Judeo-Berber -> Berber
+  { language: "jbn", tag: 0x42425220, }, // 'BBR ' Nafusi -> Berber
+  // { language: "jbo", tag: 0x4A424F20 }, // 'JBO ' Lojban
+  // { language: "jct", tag: 0x4A435420 }, // 'JCT ' Krymchak
+  // { language: "jdt", tag: 0x4A445420 }, // 'JDT ' Judeo-Tat
+  { language: "jgo", tag: 0x424D4C20, }, // 'BML ' Ngomba -> Bamileke
+  { language: "ji", tag: 0x4A494920, }, // 'JII ' Yiddish(retired code)
+  { language: "jii", tag: 0, }, // null Jiiddu != Yiddish
+  { language: "jkm", tag: 0x4B524E20, }, // 'KRN ' Mobwa Karen -> Karen
+  { language: "jkp", tag: 0x4B524E20, }, // 'KRN ' Paku Karen -> Karen
+  { language: "jud", tag: 0, }, // null Worodougou != Ladino
+  { language: "jul", tag: 0, }, // null Jirel != Jula
+  { language: "jv", tag: 0x4A415620, }, // 'JAV ' Javanese
+  { language: "jvd", tag: 0x43505020, }, // 'CPP ' Javindo -> Creoles
+  { language: "jw", tag: 0x4A415620, }, // 'JAV ' Javanese(retired code)
+  { language: "ka", tag: 0x4B415420, }, // 'KAT ' Georgian
+  { language: "kaa", tag: 0x4B524B20, }, // 'KRK ' Karakalpak
+  { language: "kab", tag: 0x4B414230, }, // 'KAB0' Kabyle
+  { language: "kab", tag: 0x42425220, }, // 'BBR ' Kabyle -> Berber
+  { language: "kac", tag: 0, }, // null Kachin != Kachchi
+  { language: "kam", tag: 0x4B4D4220, }, // 'KMB ' Kamba (Kenya)
+  { language: "kar", tag: 0x4B524E20, }, // 'KRN ' Karen  [collection]
+  // { language: "kaw", tag: 0x4B415720 }, // 'KAW ' Kawi (Old Javanese)
+  // { language: "kbc", tag: 0x4B424320 }, // 'KBC ' Kadiwéu
+  { language: "kbd", tag: 0x4B414220, }, // 'KAB ' Kabardian
+  { language: "kby", tag: 0x4B4E5220, }, // 'KNR ' Manga Kanuri -> Kanuri
+  { language: "kca", tag: 0x4B484B20, }, // 'KHK ' Khanty -> Khanty-Kazim
+  { language: "kca", tag: 0x4B485320, }, // 'KHS ' Khanty -> Khanty-Shurishkar
+  { language: "kca", tag: 0x4B485620, }, // 'KHV ' Khanty -> Khanty-Vakhi
+  { language: "kcn", tag: 0x43505020, }, // 'CPP ' Nubi -> Creoles
+  // { language: "kde", tag: 0x4B444520 }, // 'KDE ' Makonde
+  { language: "kdr", tag: 0x4B524D20, }, // 'KRM ' Karaim
+  { language: "kdt", tag: 0x4B555920, }, // 'KUY ' Kuy
+  { language: "kea", tag: 0x4B454120, }, // 'KEA ' Kabuverdianu (Crioulo)
+  { language: "kea", tag: 0x43505020, }, // 'CPP ' Kabuverdianu -> Creoles
+  { language: "keb", tag: 0, }, // null Kélé != Kebena
+  { language: "kek", tag: 0x4B454B20, }, // 'KEK ' Kekchi
+  { language: "kek", tag: 0x4D594E20, }, // 'MYN ' Kekchí -> Mayan
+  { language: "kex", tag: 0x4B4B4E20, }, // 'KKN ' Kukna -> Kokni
+  { language: "kfa", tag: 0x4B4F4420, }, // 'KOD ' Kodava -> Kodagu
+  { language: "kfr", tag: 0x4B414320, }, // 'KAC ' Kachhi -> Kachchi
+  { language: "kfx", tag: 0x4B554C20, }, // 'KUL ' Kullu Pahari -> Kulvi
+  { language: "kfy", tag: 0x4B4D4E20, }, // 'KMN ' Kumaoni
+  { language: "kg", tag: 0x4B4F4E30, }, // 'KON0' Kongo [macrolanguage]
+  { language: "kge", tag: 0, }, // null Komering != Khutsuri Georgian
+  { language: "kha", tag: 0x4B534920, }, // 'KSI ' Khasi
+  { language: "khb", tag: 0x58424420, }, // 'XBD ' Lü
+  { language: "khk", tag: 0x4D4E4720, }, // 'MNG ' Halh Mongolian -> Mongolian
+  { language: "khn", tag: 0, }, // null Khandesi != Khamti Shan(Microsoft fonts)
+  { language: "khs", tag: 0, }, // null Kasua != Khanty-Shurishkar
+  { language: "kht", tag: 0x4B485420, }, // 'KHT ' Khamti -> Khamti Shan
+  { language: "kht", tag: 0x4B484E20, }, // 'KHN ' Khamti -> Khamti Shan(Microsoft fonts)
+  { language: "khv", tag: 0, }, // null Khvarshi != Khanty-Vakhi
+  // { language: "khw", tag: 0x4B485720 }, // 'KHW ' Khowar
+  { language: "ki", tag: 0x4B494B20, }, // 'KIK ' Kikuyu (Gikuyu)
+  { language: "kis", tag: 0, }, // null Kis != Kisii
+  { language: "kiu", tag: 0x4B495520, }, // 'KIU ' Kirmanjki 
+  { language: "kiu", tag: 0x5A5A4120, }, // 'ZZA ' Kirmanjki  -> Zazaki
+  { language: "kj", tag: 0x4B554120, }, // 'KUA ' Kuanyama
+  { language: "kjb", tag: 0x4D594E20, }, // 'MYN ' Q'anjob'al -> Mayan
+  // { language: "kjd", tag: 0x4B4A4420 }, // 'KJD ' Southern Kiwai
+  { language: "kjh", tag: 0x4B484120, }, // 'KHA ' Khakas -> Khakass
+  // { language: "kjj", tag: 0x4B4A4A20 }, // 'KJJ ' Khinalugh -> Khinalug
+  { language: "kjp", tag: 0x4B4A5020, }, // 'KJP ' Pwo Eastern Karen -> Eastern Pwo Karen
+  { language: "kjp", tag: 0x4B524E20, }, // 'KRN ' Pwo Eastern Karen -> Karen
+  { language: "kjt", tag: 0x4B524E20, }, // 'KRN ' Phrae Pwo Karen -> Karen
+  // { language: "kjz", tag: 0x4B4A5A20 }, // 'KJZ ' Bumthangkha
+  { language: "kk", tag: 0x4B415A20, }, // 'KAZ ' Kazakh
+  { language: "kkn", tag: 0, }, // null Kon Keu != Kokni
+  { language: "kkz", tag: 0x41544820, }, // 'ATH ' Kaska -> Athapaskan
+  { language: "kl", tag: 0x47524E20, }, // 'GRN ' Greenlandic
+  { language: "klm", tag: 0, }, // null Migum != Kalmyk
+  { language: "kln", tag: 0x4B414C20, }, // 'KAL ' Kalenjin [macrolanguage]
+  { language: "km", tag: 0x4B484D20, }, // 'KHM ' Khmer
+  { language: "kmb", tag: 0x4D424E20, }, // 'MBN ' Kimbundu -> Mbundu
+  { language: "kmn", tag: 0, }, // null Awtuw != Kumaoni
+  { language: "kmo", tag: 0, }, // null Kwoma != Komo
+  { language: "kmr", tag: 0x4B555220, }, // 'KUR ' Northern Kurdish -> Kurdish
+  { language: "kms", tag: 0, }, // null Kamasau != Komso
+  { language: "kmv", tag: 0x43505020, }, // 'CPP ' Karipúna Creole French -> Creoles
+  { language: "kmw", tag: 0x4B4D4F20, }, // 'KMO ' Komo (Democratic Republic of Congo)
+  // { language: "kmz", tag: 0x4B4D5A20 }, // 'KMZ ' Khorasani Turkish -> Khorasani Turkic
+  { language: "kn", tag: 0x4B414E20, }, // 'KAN ' Kannada
+  { language: "knc", tag: 0x4B4E5220, }, // 'KNR ' Central Kanuri -> Kanuri
+  { language: "kng", tag: 0x4B4F4E30, }, // 'KON0' Koongo -> Kongo
+  { language: "knj", tag: 0x4D594E20, }, // 'MYN ' Western Kanjobal -> Mayan
+  { language: "knn", tag: 0x4B4F4B20, }, // 'KOK ' Konkani 
+  { language: "knr", tag: 0, }, // null Kaningra != Kanuri
+  { language: "ko", tag: 0x4B4F5220, }, // 'KOR ' Korean
+  { language: "ko", tag: 0x4B4F4820, }, // 'KOH ' Korean -> Korean Old Hangul
+  { language: "kod", tag: 0, }, // null Kodi != Kodagu
+  { language: "koh", tag: 0, }, // null Koyo != Korean Old Hangul
+  { language: "koi", tag: 0x4B4F5020, }, // 'KOP ' Komi-Permyak
+  { language: "koi", tag: 0x4B4F4D20, }, // 'KOM ' Komi-Permyak -> Komi
+  // { language: "kok", tag: 0x4B4F4B20 }, // 'KOK ' Konkani  [macrolanguage]
+  { language: "kop", tag: 0, }, // null Waube != Komi-Permyak
+  // { language: "kos", tag: 0x4B4F5320 }, // 'KOS ' Kosraean
+  { language: "koy", tag: 0x41544820, }, // 'ATH ' Koyukon -> Athapaskan
+  { language: "koz", tag: 0, }, // null Korak != Komi-Zyrian
+  { language: "kpe", tag: 0x4B504C20, }, // 'KPL ' Kpelle [macrolanguage]
+  { language: "kpl", tag: 0, }, // null Kpala != Kpelle
+  { language: "kpp", tag: 0x4B524E20, }, // 'KRN ' Paku Karen(retired code) -> Karen
+  { language: "kpv", tag: 0x4B4F5A20, }, // 'KOZ ' Komi-Zyrian
+  { language: "kpv", tag: 0x4B4F4D20, }, // 'KOM ' Komi-Zyrian -> Komi
+  { language: "kpy", tag: 0x4B594B20, }, // 'KYK ' Koryak
+  { language: "kqs", tag: 0x4B495320, }, // 'KIS ' Northern Kissi -> Kisii
+  { language: "kqy", tag: 0x4B525420, }, // 'KRT ' Koorete
+  { language: "kr", tag: 0x4B4E5220, }, // 'KNR ' Kanuri [macrolanguage]
+  { language: "krc", tag: 0x4B415220, }, // 'KAR ' Karachay-Balkar -> Karachay
+  { language: "krc", tag: 0x42414C20, }, // 'BAL ' Karachay-Balkar -> Balkar
+  { language: "kri", tag: 0x4B524920, }, // 'KRI ' Krio
+  { language: "kri", tag: 0x43505020, }, // 'CPP ' Krio -> Creoles
+  { language: "krk", tag: 0, }, // null Kerek != Karakalpak
+  // { language: "krl", tag: 0x4B524C20 }, // 'KRL ' Karelian
+  { language: "krm", tag: 0, }, // null Krim(retired code) != Karaim
+  { language: "krn", tag: 0, }, // null Sapo != Karen
+  { language: "krt", tag: 0x4B4E5220, }, // 'KNR ' Tumari Kanuri -> Kanuri
+  { language: "kru", tag: 0x4B555520, }, // 'KUU ' Kurukh
+  { language: "ks", tag: 0x4B534820, }, // 'KSH ' Kashmiri
+  { language: "ksh", tag: 0x4B534830, }, // 'KSH0' Kölsch -> Ripuarian
+  { language: "ksi", tag: 0, }, // null Krisa != Khasi
+  { language: "ksm", tag: 0, }, // null Kumba != Kildin Sami
+  { language: "kss", tag: 0x4B495320, }, // 'KIS ' Southern Kisi -> Kisii
+  { language: "ksw", tag: 0x4B535720, }, // 'KSW ' S’gaw Karen
+  { language: "ksw", tag: 0x4B524E20, }, // 'KRN ' S'gaw Karen -> Karen
+  { language: "ktb", tag: 0x4B454220, }, // 'KEB ' Kambaata -> Kebena
+  { language: "ktu", tag: 0x4B4F4E20, }, // 'KON ' Kituba (Democratic Republic of Congo) -> Kikongo
+  { language: "ktw", tag: 0x41544820, }, // 'ATH ' Kato -> Athapaskan
+  { language: "ku", tag: 0x4B555220, }, // 'KUR ' Kurdish [macrolanguage]
+  { language: "kui", tag: 0, }, // null Kuikúro-Kalapálo != Kui
+  { language: "kul", tag: 0, }, // null Kulere != Kulvi
+  // { language: "kum", tag: 0x4B554D20 }, // 'KUM ' Kumyk
+  { language: "kuu", tag: 0x41544820, }, // 'ATH ' Upper Kuskokwim -> Athapaskan
+  { language: "kuw", tag: 0x42414430, }, // 'BAD0' Kpagua -> Banda
+  { language: "kuy", tag: 0, }, // null Kuuku-Ya'u != Kuy
+  { language: "kv", tag: 0x4B4F4D20, }, // 'KOM ' Komi [macrolanguage]
+  { language: "kvb", tag: 0x4D4C5920, }, // 'MLY ' Kubu -> Malay
+  { language: "kvl", tag: 0x4B524E20, }, // 'KRN ' Kayaw -> Karen
+  { language: "kvq", tag: 0x4B524E20, }, // 'KRN ' Geba Karen -> Karen
+  { language: "kvr", tag: 0x4D4C5920, }, // 'MLY ' Kerinci -> Malay
+  { language: "kvt", tag: 0x4B524E20, }, // 'KRN ' Lahta Karen -> Karen
+  { language: "kvu", tag: 0x4B524E20, }, // 'KRN ' Yinbaw Karen -> Karen
+  { language: "kvy", tag: 0x4B524E20, }, // 'KRN ' Yintale Karen -> Karen
+  { language: "kw", tag: 0x434F5220, }, // 'COR ' Cornish
+  // { language: "kwk", tag: 0x4B574B20 }, // 'KWK ' Kwakiutl -> Kwakʼwala
+  { language: "kww", tag: 0x43505020, }, // 'CPP ' Kwinti -> Creoles
+  { language: "kwy", tag: 0x4B4F4E30, }, // 'KON0' San Salvador Kongo -> Kongo
+  { language: "kxc", tag: 0x4B4D5320, }, // 'KMS ' Konso -> Komso
+  { language: "kxd", tag: 0x4D4C5920, }, // 'MLY ' Brunei -> Malay
+  { language: "kxf", tag: 0x4B524E20, }, // 'KRN ' Manumanaw Karen -> Karen
+  { language: "kxk", tag: 0x4B524E20, }, // 'KRN ' Zayein Karen -> Karen
+  { language: "kxl", tag: 0x4B555520, }, // 'KUU ' Nepali Kurux(retired code) -> Kurukh
+  { language: "kxu", tag: 0x4B554920, }, // 'KUI ' Kui (India)(retired code)
+  { language: "ky", tag: 0x4B495220, }, // 'KIR ' Kirghiz (Kyrgyz)
+  { language: "kyk", tag: 0, }, // null Kamayo != Koryak
+  { language: "kyu", tag: 0x4B595520, }, // 'KYU ' Western Kayah
+  { language: "kyu", tag: 0x4B524E20, }, // 'KRN ' Western Kayah -> Karen
+  { language: "la", tag: 0x4C415420, }, // 'LAT ' Latin
+  { language: "lac", tag: 0x4D594E20, }, // 'MYN ' Lacandon -> Mayan
+  { language: "lad", tag: 0x4A554420, }, // 'JUD ' Ladino
+  { language: "lah", tag: 0, }, // null Lahnda [macrolanguage] != Lahuli
+  { language: "lak", tag: 0, }, // null Laka (Nigeria)(retired code) != Lak
+  { language: "lam", tag: 0, }, // null Lamba != Lambani
+  { language: "laz", tag: 0, }, // null Aribwatsa != Laz
+  { language: "lb", tag: 0x4C545A20, }, // 'LTZ ' Luxembourgish
+  { language: "lbe", tag: 0x4C414B20, }, // 'LAK ' Lak
+  { language: "lbj", tag: 0x4C444B20, }, // 'LDK ' Ladakhi
+  { language: "lbl", tag: 0x42494B20, }, // 'BIK ' Libon Bikol -> Bikol
+  { language: "lce", tag: 0x4D4C5920, }, // 'MLY ' Loncong -> Malay
+  { language: "lcf", tag: 0x4D4C5920, }, // 'MLY ' Lubu -> Malay
+  { language: "ldi", tag: 0x4B4F4E30, }, // 'KON0' Laari -> Kongo
+  { language: "ldk", tag: 0, }, // null Leelau != Ladakhi
+  // { language: "lef", tag: 0x4C454620 }, // 'LEF ' Lelemi
+  // { language: "lez", tag: 0x4C455A20 }, // 'LEZ ' Lezghian -> Lezgi
+  { language: "lg", tag: 0x4C554720, }, // 'LUG ' Ganda
+  { language: "li", tag: 0x4C494D20, }, // 'LIM ' Limburgish
+  { language: "lif", tag: 0x4C4D4220, }, // 'LMB ' Limbu
+  // { language: "lij", tag: 0x4C494A20 }, // 'LIJ ' Ligurian
+  { language: "lir", tag: 0x43505020, }, // 'CPP ' Liberian English -> Creoles
+  // { language: "lis", tag: 0x4C495320 }, // 'LIS ' Lisu
+  // { language: "liv", tag: 0x4C495620 }, // 'LIV ' Liv
+  { language: "liw", tag: 0x4D4C5920, }, // 'MLY ' Col -> Malay
+  { language: "liy", tag: 0x42414430, }, // 'BAD0' Banda-Bambari -> Banda
+  // { language: "ljp", tag: 0x4C4A5020 }, // 'LJP ' Lampung Api -> Lampung
+  { language: "lkb", tag: 0x4C554820, }, // 'LUH ' Kabras -> Luyia
+  // { language: "lki", tag: 0x4C4B4920 }, // 'LKI ' Laki
+  { language: "lko", tag: 0x4C554820, }, // 'LUH ' Khayo -> Luyia
+  { language: "lks", tag: 0x4C554820, }, // 'LUH ' Kisa -> Luyia
+  { language: "lld", tag: 0x4C414420, }, // 'LAD ' Ladin
+  { language: "lma", tag: 0, }, // null East Limba != Low Mari
+  { language: "lmb", tag: 0, }, // null Merei != Limbu
+  { language: "lmn", tag: 0x4C414D20, }, // 'LAM ' Lambadi -> Lambani
+  // { language: "lmo", tag: 0x4C4D4F20 }, // 'LMO ' Lombard
+  { language: "lmw", tag: 0, }, // null Lake Miwok != Lomwe
+  { language: "ln", tag: 0x4C494E20, }, // 'LIN ' Lingala
+  { language: "lna", tag: 0x42414430, }, // 'BAD0' Langbashe -> Banda
+  { language: "lnl", tag: 0x42414430, }, // 'BAD0' South Central Banda -> Banda
+  { language: "lo", tag: 0x4C414F20, }, // 'LAO ' Lao
+  // { language: "lom", tag: 0x4C4F4D20 }, // 'LOM ' Loma (Liberia)
+  { language: "lou", tag: 0x43505020, }, // 'CPP ' Louisiana Creole -> Creoles
+  // { language: "lpo", tag: 0x4C504F20 }, // 'LPO ' Lipo
+  // { language: "lrc", tag: 0x4C524320 }, // 'LRC ' Northern Luri -> Luri
+  { language: "lri", tag: 0x4C554820, }, // 'LUH ' Marachi -> Luyia
+  { language: "lrm", tag: 0x4C554820, }, // 'LUH ' Marama -> Luyia
+  { language: "lrt", tag: 0x43505020, }, // 'CPP ' Larantuka Malay -> Creoles
+  { language: "lsb", tag: 0, }, // null Burundian Sign Language != Lower Sorbian
+  { language: "lsm", tag: 0x4C554820, }, // 'LUH ' Saamia -> Luyia
+  { language: "lt", tag: 0x4C544820, }, // 'LTH ' Lithuanian
+  { language: "ltg", tag: 0x4C564920, }, // 'LVI ' Latgalian -> Latvian
+  { language: "lth", tag: 0, }, // null Thur != Lithuanian
+  { language: "lto", tag: 0x4C554820, }, // 'LUH ' Tsotso -> Luyia
+  { language: "lts", tag: 0x4C554820, }, // 'LUH ' Tachoni -> Luyia
+  { language: "lu", tag: 0x4C554220, }, // 'LUB ' Luba-Katanga
+  // { language: "lua", tag: 0x4C554120 }, // 'LUA ' Luba-Lulua
+  // { language: "luo", tag: 0x4C554F20 }, // 'LUO ' Luo (Kenya and Tanzania)
+  { language: "lus", tag: 0x4D495A20, }, // 'MIZ ' Lushai -> Mizo
+  { language: "lus", tag: 0x51494E20, }, // 'QIN ' Lushai -> Chin
+  { language: "luy", tag: 0x4C554820, }, // 'LUH ' Luyia [macrolanguage]
+  { language: "luz", tag: 0x4C524320, }, // 'LRC ' Southern Luri -> Luri
+  { language: "lv", tag: 0x4C564920, }, // 'LVI ' Latvian [macrolanguage]
+  { language: "lvi", tag: 0, }, // null Lavi != Latvian
+  { language: "lvs", tag: 0x4C564920, }, // 'LVI ' Standard Latvian -> Latvian
+  { language: "lwg", tag: 0x4C554820, }, // 'LUH ' Wanga -> Luyia
+  { language: "lzh", tag: 0x5A485420, }, // 'ZHT ' Literary Chinese -> Chinese, Traditional
+  { language: "lzz", tag: 0x4C415A20, }, // 'LAZ ' Laz
+  // { language: "mad", tag: 0x4D414420 }, // 'MAD ' Madurese -> Madura
+  // { language: "mag", tag: 0x4D414720 }, // 'MAG ' Magahi
+  { language: "mai", tag: 0x4D544820, }, // 'MTH ' Maithili
+  { language: "maj", tag: 0, }, // null Jalapa De Díaz Mazatec != Majang
+  { language: "mak", tag: 0x4D4B5220, }, // 'MKR ' Makasar
+  { language: "mam", tag: 0x4D414D20, }, // 'MAM ' Mam
+  { language: "mam", tag: 0x4D594E20, }, // 'MYN ' Mam -> Mayan
+  { language: "man", tag: 0x4D4E4B20, }, // 'MNK ' Mandingo [macrolanguage] -> Maninka
+  { language: "map", tag: 0, }, // null Austronesian  [collection] != Mapudungun
+  { language: "maw", tag: 0, }, // null Mampruli != Marwari
+  { language: "max", tag: 0x4D4C5920, }, // 'MLY ' North Moluccan Malay -> Malay
+  { language: "max", tag: 0x43505020, }, // 'CPP ' North Moluccan Malay -> Creoles
+  { language: "mbf", tag: 0x43505020, }, // 'CPP ' Baba Malay -> Creoles
+  { language: "mbn", tag: 0, }, // null Macaguán != Mbundu
+  // { language: "mbo", tag: 0x4D424F20 }, // 'MBO ' Mbo (Cameroon)
+  { language: "mch", tag: 0, }, // null Maquiritari != Manchu
+  { language: "mcm", tag: 0x43505020, }, // 'CPP ' Malaccan Creole Portuguese -> Creoles
+  { language: "mcr", tag: 0, }, // null Menya != Moose Cree
+  { language: "mct", tag: 0x42544920, }, // 'BTI ' Mengisa -> Beti
+  { language: "mde", tag: 0, }, // null Maba (Chad) != Mende
+  { language: "mdf", tag: 0x4D4F4B20, }, // 'MOK ' Moksha
+  // { language: "mdr", tag: 0x4D445220 }, // 'MDR ' Mandar
+  { language: "mdy", tag: 0x4D4C4520, }, // 'MLE ' Male (Ethiopia)
+  { language: "men", tag: 0x4D444520, }, // 'MDE ' Mende (Sierra Leone)
+  { language: "meo", tag: 0x4D4C5920, }, // 'MLY ' Kedah Malay -> Malay
+  // { language: "mer", tag: 0x4D455220 }, // 'MER ' Meru
+  // { language: "mev", tag: 0x4D455620 }, // 'MEV ' Mano
+  { language: "mfa", tag: 0x4D464120, }, // 'MFA ' Pattani Malay
+  { language: "mfa", tag: 0x4D4C5920, }, // 'MLY ' Pattani Malay -> Malay
+  { language: "mfb", tag: 0x4D4C5920, }, // 'MLY ' Bangka -> Malay
+  { language: "mfe", tag: 0x4D464520, }, // 'MFE ' Morisyen
+  { language: "mfe", tag: 0x43505020, }, // 'CPP ' Morisyen -> Creoles
+  { language: "mfp", tag: 0x43505020, }, // 'CPP ' Makassar Malay -> Creoles
+  { language: "mg", tag: 0x4D4C4720, }, // 'MLG ' Malagasy [macrolanguage]
+  { language: "mga", tag: 0x53474120, }, // 'SGA ' Middle Irish (900-1200) -> Old Irish
+  { language: "mh", tag: 0x4D414820, }, // 'MAH ' Marshallese
+  { language: "mhc", tag: 0x4D594E20, }, // 'MYN ' Mocho -> Mayan
+  { language: "mhr", tag: 0x4C4D4120, }, // 'LMA ' Eastern Mari -> Low Mari
+  { language: "mhv", tag: 0x41524B20, }, // 'ARK ' Arakanese(retired code) -> Rakhine
+  { language: "mi", tag: 0x4D524920, }, // 'MRI ' Maori
+  { language: "min", tag: 0x4D494E20, }, // 'MIN ' Minangkabau
+  { language: "min", tag: 0x4D4C5920, }, // 'MLY ' Minangkabau -> Malay
+  { language: "miz", tag: 0, }, // null Coatzospan Mixtec != Mizo
+  { language: "mk", tag: 0x4D4B4420, }, // 'MKD ' Macedonian
+  { language: "mkn", tag: 0x43505020, }, // 'CPP ' Kupang Malay -> Creoles
+  { language: "mkr", tag: 0, }, // null Malas != Makasar
+  { language: "mku", tag: 0x4D4E4B20, }, // 'MNK ' Konyanka Maninka -> Maninka
+  // { language: "mkw", tag: 0x4D4B5720 }, // 'MKW ' Kituba (Congo)
+  { language: "ml", tag: 0x4D414C20, }, // 'MAL ' Malayalam -> Malayalam Traditional
+  { language: "ml", tag: 0x4D4C5220, }, // 'MLR ' Malayalam -> Malayalam Reformed
+  { language: "mle", tag: 0, }, // null Manambu != Male
+  { language: "mln", tag: 0, }, // null Malango != Malinke
+  { language: "mlq", tag: 0x4D4C4E20, }, // 'MLN ' Western Maninkakan -> Malinke
+  { language: "mlq", tag: 0x4D4E4B20, }, // 'MNK ' Western Maninkakan -> Maninka
+  { language: "mlr", tag: 0, }, // null Vame != Malayalam Reformed
+  { language: "mmr", tag: 0x484D4E20, }, // 'HMN ' Western Xiangxi Miao -> Hmong
+  { language: "mn", tag: 0x4D4E4720, }, // 'MNG ' Mongolian [macrolanguage]
+  { language: "mnc", tag: 0x4D434820, }, // 'MCH ' Manchu
+  { language: "mnd", tag: 0, }, // null Mondé != Mandinka
+  { language: "mng", tag: 0, }, // null Eastern Mnong != Mongolian
+  { language: "mnh", tag: 0x42414430, }, // 'BAD0' Mono (Democratic Republic of Congo) -> Banda
+  // { language: "mni", tag: 0x4D4E4920 }, // 'MNI ' Manipuri
+  { language: "mnk", tag: 0x4D4E4420, }, // 'MND ' Mandinka
+  { language: "mnk", tag: 0x4D4E4B20, }, // 'MNK ' Mandinka -> Maninka
+  { language: "mnp", tag: 0x5A485320, }, // 'ZHS ' Min Bei Chinese -> Chinese, Simplified
+  { language: "mns", tag: 0x4D414E20, }, // 'MAN ' Mansi
+  { language: "mnw", tag: 0x4D4F4E20, }, // 'MON ' Mon
+  { language: "mnw", tag: 0x4D4F4E54, }, // 'MONT' Mon -> Thailand Mon
+  { language: "mnx", tag: 0, }, // null Manikion != Manx
+  { language: "mo", tag: 0x4D4F4C20, }, // 'MOL ' Moldavian(retired code)
+  { language: "mo", tag: 0x524F4D20, }, // 'ROM ' Moldavian(retired code) -> Romanian
+  { language: "mod", tag: 0x43505020, }, // 'CPP ' Mobilian -> Creoles
+  // { language: "moh", tag: 0x4D4F4820 }, // 'MOH ' Mohawk
+  { language: "mok", tag: 0, }, // null Morori != Moksha
+  { language: "mop", tag: 0x4D594E20, }, // 'MYN ' Mopán Maya -> Mayan
+  { language: "mor", tag: 0, }, // null Moro != Moroccan
+  // { language: "mos", tag: 0x4D4F5320 }, // 'MOS ' Mossi
+  { language: "mpe", tag: 0x4D414A20, }, // 'MAJ ' Majang
+  { language: "mqg", tag: 0x4D4C5920, }, // 'MLY ' Kota Bangun Kutai Malay -> Malay
+  { language: "mr", tag: 0x4D415220, }, // 'MAR ' Marathi
+  { language: "mrh", tag: 0x51494E20, }, // 'QIN ' Mara Chin -> Chin
+  { language: "mrj", tag: 0x484D4120, }, // 'HMA ' Western Mari -> High Mari
+  { language: "ms", tag: 0x4D4C5920, }, // 'MLY ' Malay  [macrolanguage]
+  { language: "msc", tag: 0x4D4E4B20, }, // 'MNK ' Sankaran Maninka -> Maninka
+  { language: "msh", tag: 0x4D4C4720, }, // 'MLG ' Masikoro Malagasy -> Malagasy
+  { language: "msi", tag: 0x4D4C5920, }, // 'MLY ' Sabah Malay -> Malay
+  { language: "msi", tag: 0x43505020, }, // 'CPP ' Sabah Malay -> Creoles
+  { language: "mt", tag: 0x4D545320, }, // 'MTS ' Maltese
+  { language: "mth", tag: 0, }, // null Munggui != Maithili
+  { language: "mtr", tag: 0x4D415720, }, // 'MAW ' Mewari -> Marwari
+  { language: "mts", tag: 0, }, // null Yora != Maltese
+  { language: "mud", tag: 0x43505020, }, // 'CPP ' Mednyj Aleut -> Creoles
+  { language: "mui", tag: 0x4D4C5920, }, // 'MLY ' Musi -> Malay
+  { language: "mun", tag: 0, }, // null Munda  [collection] != Mundari
+  { language: "mup", tag: 0x52414A20, }, // 'RAJ ' Malvi -> Rajasthani
+  { language: "muq", tag: 0x484D4E20, }, // 'HMN ' Eastern Xiangxi Miao -> Hmong
+  // { language: "mus", tag: 0x4D555320 }, // 'MUS ' Creek -> Muscogee
+  { language: "mvb", tag: 0x41544820, }, // 'ATH ' Mattole -> Athapaskan
+  { language: "mve", tag: 0x4D415720, }, // 'MAW ' Marwari (Pakistan)
+  { language: "mvf", tag: 0x4D4E4720, }, // 'MNG ' Peripheral Mongolian -> Mongolian
+  { language: "mwk", tag: 0x4D4E4B20, }, // 'MNK ' Kita Maninkakan -> Maninka
+  // { language: "mwl", tag: 0x4D574C20 }, // 'MWL ' Mirandese
+  { language: "mwq", tag: 0x51494E20, }, // 'QIN ' Mün Chin -> Chin
+  { language: "mwr", tag: 0x4D415720, }, // 'MAW ' Marwari [macrolanguage]
+  { language: "mww", tag: 0x4D575720, }, // 'MWW ' Hmong Daw
+  { language: "mww", tag: 0x484D4E20, }, // 'HMN ' Hmong Daw -> Hmong
+  { language: "my", tag: 0x42524D20, }, // 'BRM ' Burmese
+  { language: "mym", tag: 0x4D454E20, }, // 'MEN ' Me’en
+  // { language: "myn", tag: 0x4D594E20 }, // 'MYN ' Mayan  [collection]
+  { language: "myq", tag: 0x4D4E4B20, }, // 'MNK ' Forest Maninka(retired code) -> Maninka
+  { language: "myv", tag: 0x45525A20, }, // 'ERZ ' Erzya
+  { language: "mzb", tag: 0x42425220, }, // 'BBR ' Tumzabt -> Berber
+  // { language: "mzn", tag: 0x4D5A4E20 }, // 'MZN ' Mazanderani
+  { language: "mzs", tag: 0x43505020, }, // 'CPP ' Macanese -> Creoles
+  { language: "na", tag: 0x4E415520, }, // 'NAU ' Nauru -> Nauruan
+  { language: "nag", tag: 0x4E414720, }, // 'NAG ' Naga Pidgin -> Naga-Assamese
+  { language: "nag", tag: 0x43505020, }, // 'CPP ' Naga Pidgin -> Creoles
+  // { language: "nah", tag: 0x4E414820 }, // 'NAH ' Nahuatl  [collection]
+  { language: "nan", tag: 0x5A485320, }, // 'ZHS ' Min Nan Chinese -> Chinese, Simplified
+  // { language: "nap", tag: 0x4E415020 }, // 'NAP ' Neapolitan
+  { language: "nas", tag: 0, }, // null Naasioi != Naskapi
+  { language: "naz", tag: 0x4E414820, }, // 'NAH ' Coatepec Nahuatl -> Nahuatl
+  { language: "nb", tag: 0x4E4F5220, }, // 'NOR ' Norwegian Bokmål -> Norwegian
+  { language: "nch", tag: 0x4E414820, }, // 'NAH ' Central Huasteca Nahuatl -> Nahuatl
+  { language: "nci", tag: 0x4E414820, }, // 'NAH ' Classical Nahuatl -> Nahuatl
+  { language: "ncj", tag: 0x4E414820, }, // 'NAH ' Northern Puebla Nahuatl -> Nahuatl
+  { language: "ncl", tag: 0x4E414820, }, // 'NAH ' Michoacán Nahuatl -> Nahuatl
+  { language: "ncr", tag: 0, }, // null Ncane != N-Cree
+  { language: "ncx", tag: 0x4E414820, }, // 'NAH ' Central Puebla Nahuatl -> Nahuatl
+  { language: "nd", tag: 0x4E444220, }, // 'NDB ' North Ndebele -> Ndebele
+  { language: "ndb", tag: 0, }, // null Kenswei Nsei != Ndebele
+  // { language: "ndc", tag: 0x4E444320 }, // 'NDC ' Ndau
+  { language: "ndg", tag: 0, }, // null Ndengereko != Ndonga
+  // { language: "nds", tag: 0x4E445320 }, // 'NDS ' Low Saxon
+  { language: "ne", tag: 0x4E455020, }, // 'NEP ' Nepali  [macrolanguage]
+  { language: "nef", tag: 0x43505020, }, // 'CPP ' Nefamese -> Creoles
+  // { language: "new", tag: 0x4E455720 }, // 'NEW ' Newari
+  { language: "ng", tag: 0x4E444720, }, // 'NDG ' Ndonga
+  // { language: "nga", tag: 0x4E474120 }, // 'NGA ' Ngbaka
+  { language: "ngl", tag: 0x4C4D5720, }, // 'LMW ' Lomwe
+  { language: "ngm", tag: 0x43505020, }, // 'CPP ' Ngatik Men's Creole -> Creoles
+  { language: "ngo", tag: 0x53585420, }, // 'SXT ' Ngoni(retired code) -> Sutu
+  { language: "ngr", tag: 0, }, // null Engdewu != Nagari
+  { language: "ngu", tag: 0x4E414820, }, // 'NAH ' Guerrero Nahuatl -> Nahuatl
+  { language: "nhc", tag: 0x4E414820, }, // 'NAH ' Tabasco Nahuatl -> Nahuatl
+  { language: "nhd", tag: 0x47554120, }, // 'GUA ' Chiripá -> Guarani
+  { language: "nhe", tag: 0x4E414820, }, // 'NAH ' Eastern Huasteca Nahuatl -> Nahuatl
+  { language: "nhg", tag: 0x4E414820, }, // 'NAH ' Tetelcingo Nahuatl -> Nahuatl
+  { language: "nhi", tag: 0x4E414820, }, // 'NAH ' Zacatlán-Ahuacatlán-Tepetzintla Nahuatl -> Nahuatl
+  { language: "nhk", tag: 0x4E414820, }, // 'NAH ' Isthmus-Cosoleacaque Nahuatl -> Nahuatl
+  { language: "nhm", tag: 0x4E414820, }, // 'NAH ' Morelos Nahuatl -> Nahuatl
+  { language: "nhn", tag: 0x4E414820, }, // 'NAH ' Central Nahuatl -> Nahuatl
+  { language: "nhp", tag: 0x4E414820, }, // 'NAH ' Isthmus-Pajapan Nahuatl -> Nahuatl
+  { language: "nhq", tag: 0x4E414820, }, // 'NAH ' Huaxcaleca Nahuatl -> Nahuatl
+  { language: "nht", tag: 0x4E414820, }, // 'NAH ' Ometepec Nahuatl -> Nahuatl
+  { language: "nhv", tag: 0x4E414820, }, // 'NAH ' Temascaltepec Nahuatl -> Nahuatl
+  { language: "nhw", tag: 0x4E414820, }, // 'NAH ' Western Huasteca Nahuatl -> Nahuatl
+  { language: "nhx", tag: 0x4E414820, }, // 'NAH ' Isthmus-Mecayapan Nahuatl -> Nahuatl
+  { language: "nhy", tag: 0x4E414820, }, // 'NAH ' Northern Oaxaca Nahuatl -> Nahuatl
+  { language: "nhz", tag: 0x4E414820, }, // 'NAH ' Santa María La Alta Nahuatl -> Nahuatl
+  { language: "niq", tag: 0x4B414C20, }, // 'KAL ' Nandi -> Kalenjin
+  { language: "nis", tag: 0, }, // null Nimi != Nisi
+  // { language: "niu", tag: 0x4E495520 }, // 'NIU ' Niuean
+  { language: "niv", tag: 0x47494C20, }, // 'GIL ' Gilyak
+  { language: "njt", tag: 0x43505020, }, // 'CPP ' Ndyuka-Trio Pidgin -> Creoles
+  { language: "njz", tag: 0x4E495320, }, // 'NIS ' Nyishi -> Nisi
+  { language: "nko", tag: 0, }, // null Nkonya != N’Ko
+  { language: "nkx", tag: 0x494A4F20, }, // 'IJO ' Nkoroo -> Ijo
+  { language: "nl", tag: 0x4E4C4420, }, // 'NLD ' Dutch
+  { language: "nla", tag: 0x424D4C20, }, // 'BML ' Ngombale -> Bamileke
+  { language: "nle", tag: 0x4C554820, }, // 'LUH ' East Nyala -> Luyia
+  { language: "nln", tag: 0x4E414820, }, // 'NAH ' Durango Nahuatl(retired code) -> Nahuatl
+  { language: "nlv", tag: 0x4E414820, }, // 'NAH ' Orizaba Nahuatl -> Nahuatl
+  { language: "nn", tag: 0x4E594E20, }, // 'NYN ' Norwegian Nynorsk (Nynorsk, Norwegian)
+  { language: "nnh", tag: 0x424D4C20, }, // 'BML ' Ngiemboon -> Bamileke
+  { language: "nnz", tag: 0x424D4C20, }, // 'BML ' Nda'nda' -> Bamileke
+  { language: "no", tag: 0x4E4F5220, }, // 'NOR ' Norwegian [macrolanguage]
+  { language: "nod", tag: 0x4E544120, }, // 'NTA ' Northern Thai -> Northern Tai
+  // { language: "noe", tag: 0x4E4F4520 }, // 'NOE ' Nimadi
+  // { language: "nog", tag: 0x4E4F4720 }, // 'NOG ' Nogai
+  // { language: "nov", tag: 0x4E4F5620 }, // 'NOV ' Novial
+  { language: "npi", tag: 0x4E455020, }, // 'NEP ' Nepali 
+  { language: "npl", tag: 0x4E414820, }, // 'NAH ' Southeastern Puebla Nahuatl -> Nahuatl
+  { language: "nqo", tag: 0x4E4B4F20, }, // 'NKO ' N’Ko
+  { language: "nr", tag: 0x4E444220, }, // 'NDB ' South Ndebele -> Ndebele
+  { language: "nsk", tag: 0x4E415320, }, // 'NAS ' Naskapi
+  { language: "nsm", tag: 0, }, // null Sumi Naga != Northern Sami
+  // { language: "nso", tag: 0x4E534F20 }, // 'NSO ' Northern Sotho
+  { language: "nsu", tag: 0x4E414820, }, // 'NAH ' Sierra Negra Nahuatl -> Nahuatl
+  { language: "nto", tag: 0, }, // null Ntomba != Esperanto
+  { language: "nue", tag: 0x42414430, }, // 'BAD0' Ngundu -> Banda
+  { language: "nuu", tag: 0x42414430, }, // 'BAD0' Ngbundu -> Banda
+  { language: "nuz", tag: 0x4E414820, }, // 'NAH ' Tlamacazapa Nahuatl -> Nahuatl
+  { language: "nv", tag: 0x4E415620, }, // 'NAV ' Navajo
+  { language: "nv", tag: 0x41544820, }, // 'ATH ' Navajo -> Athapaskan
+  { language: "nwe", tag: 0x424D4C20, }, // 'BML ' Ngwe -> Bamileke
+  { language: "ny", tag: 0x43484920, }, // 'CHI ' Chichewa (Chewa, Nyanja)
+  { language: "nyd", tag: 0x4C554820, }, // 'LUH ' Nyore -> Luyia
+  // { language: "nym", tag: 0x4E594D20 }, // 'NYM ' Nyamwezi
+  { language: "nyn", tag: 0x4E4B4C20, }, // 'NKL ' Nyankole
+  // { language: "nza", tag: 0x4E5A4120 }, // 'NZA ' Tigon Mbembe -> Mbembe Tigon
+  { language: "oc", tag: 0x4F434920, }, // 'OCI ' Occitan (post 1500)
+  { language: "oj", tag: 0x4F4A4220, }, // 'OJB ' Ojibwa [macrolanguage] -> Ojibway
+  // { language: "ojb", tag: 0x4F4A4220 }, // 'OJB ' Northwestern Ojibwa -> Ojibway
+  { language: "ojc", tag: 0x4F4A4220, }, // 'OJB ' Central Ojibwa -> Ojibway
+  { language: "ojg", tag: 0x4F4A4220, }, // 'OJB ' Eastern Ojibwa -> Ojibway
+  { language: "ojs", tag: 0x4F435220, }, // 'OCR ' Severn Ojibwa -> Oji-Cree
+  { language: "ojs", tag: 0x4F4A4220, }, // 'OJB ' Severn Ojibwa -> Ojibway
+  { language: "ojw", tag: 0x4F4A4220, }, // 'OJB ' Western Ojibwa -> Ojibway
+  { language: "okd", tag: 0x494A4F20, }, // 'IJO ' Okodia -> Ijo
+  { language: "oki", tag: 0x4B414C20, }, // 'KAL ' Okiek -> Kalenjin
+  { language: "okm", tag: 0x4B4F4820, }, // 'KOH ' Middle Korean (10th-16th cent.) -> Korean Old Hangul
+  { language: "okr", tag: 0x494A4F20, }, // 'IJO ' Kirike -> Ijo
+  { language: "om", tag: 0x4F524F20, }, // 'ORO ' Oromo [macrolanguage]
+  // { language: "one", tag: 0x4F4E4520 }, // 'ONE ' Oneida
+  // { language: "ono", tag: 0x4F4E4F20 }, // 'ONO ' Onondaga
+  { language: "onx", tag: 0x43505020, }, // 'CPP ' Onin Based Pidgin -> Creoles
+  { language: "oor", tag: 0x43505020, }, // 'CPP ' Oorlams -> Creoles
+  { language: "or", tag: 0x4F524920, }, // 'ORI ' Odia  [macrolanguage]
+  { language: "orc", tag: 0x4F524F20, }, // 'ORO ' Orma -> Oromo
+  { language: "orn", tag: 0x4D4C5920, }, // 'MLY ' Orang Kanaq -> Malay
+  { language: "oro", tag: 0, }, // null Orokolo != Oromo
+  { language: "orr", tag: 0x494A4F20, }, // 'IJO ' Oruma -> Ijo
+  { language: "ors", tag: 0x4D4C5920, }, // 'MLY ' Orang Seletar -> Malay
+  { language: "ory", tag: 0x4F524920, }, // 'ORI ' Odia 
+  { language: "os", tag: 0x4F535320, }, // 'OSS ' Ossetian
+  { language: "otw", tag: 0x4F4A4220, }, // 'OJB ' Ottawa -> Ojibway
+  { language: "oua", tag: 0x42425220, }, // 'BBR ' Tagargrent -> Berber
+  { language: "pa", tag: 0x50414E20, }, // 'PAN ' Punjabi
+  { language: "paa", tag: 0, }, // null Papuan  [collection] != Palestinian Aramaic
+  // { language: "pag", tag: 0x50414720 }, // 'PAG ' Pangasinan
+  { language: "pal", tag: 0, }, // null Pahlavi != Pali
+  // { language: "pam", tag: 0x50414D20 }, // 'PAM ' Pampanga -> Pampangan
+  { language: "pap", tag: 0x50415030, }, // 'PAP0' Papiamento -> Papiamentu
+  { language: "pap", tag: 0x43505020, }, // 'CPP ' Papiamento -> Creoles
+  { language: "pas", tag: 0, }, // null Papasena != Pashto
+  // { language: "pau", tag: 0x50415520 }, // 'PAU ' Palauan
+  { language: "pbt", tag: 0x50415320, }, // 'PAS ' Southern Pashto -> Pashto
+  { language: "pbu", tag: 0x50415320, }, // 'PAS ' Northern Pashto -> Pashto
+  // { language: "pcc", tag: 0x50434320 }, // 'PCC ' Bouyei
+  // { language: "pcd", tag: 0x50434420 }, // 'PCD ' Picard
+  { language: "pce", tag: 0x504C4720, }, // 'PLG ' Ruching Palaung -> Palaung
+  { language: "pck", tag: 0x51494E20, }, // 'QIN ' Paite Chin -> Chin
+  { language: "pcm", tag: 0x43505020, }, // 'CPP ' Nigerian Pidgin -> Creoles
+  // { language: "pdc", tag: 0x50444320 }, // 'PDC ' Pennsylvania German
+  { language: "pdu", tag: 0x4B524E20, }, // 'KRN ' Kayan -> Karen
+  { language: "pea", tag: 0x43505020, }, // 'CPP ' Peranakan Indonesian -> Creoles
+  { language: "pel", tag: 0x4D4C5920, }, // 'MLY ' Pekal -> Malay
+  { language: "pes", tag: 0x46415220, }, // 'FAR ' Iranian Persian -> Persian
+  { language: "pey", tag: 0x43505020, }, // 'CPP ' Petjo -> Creoles
+  { language: "pga", tag: 0x41524120, }, // 'ARA ' Sudanese Creole Arabic -> Arabic
+  { language: "pga", tag: 0x43505020, }, // 'CPP ' Sudanese Creole Arabic -> Creoles
+  // { language: "phk", tag: 0x50484B20 }, // 'PHK ' Phake
+  { language: "pi", tag: 0x50414C20, }, // 'PAL ' Pali
+  { language: "pih", tag: 0x50494820, }, // 'PIH ' Pitcairn-Norfolk -> Norfolk
+  { language: "pih", tag: 0x43505020, }, // 'CPP ' Pitcairn-Norfolk -> Creoles
+  { language: "pil", tag: 0, }, // null Yom != Filipino
+  { language: "pis", tag: 0x43505020, }, // 'CPP ' Pijin -> Creoles
+  { language: "pkh", tag: 0x51494E20, }, // 'QIN ' Pankhu -> Chin
+  { language: "pko", tag: 0x4B414C20, }, // 'KAL ' Pökoot -> Kalenjin
+  { language: "pl", tag: 0x504C4B20, }, // 'PLK ' Polish
+  { language: "plg", tag: 0x504C4730, }, // 'PLG0' Pilagá
+  { language: "plk", tag: 0, }, // null Kohistani Shina != Polish
+  { language: "pll", tag: 0x504C4720, }, // 'PLG ' Shwe Palaung -> Palaung
+  { language: "pln", tag: 0x43505020, }, // 'CPP ' Palenquero -> Creoles
+  { language: "plp", tag: 0x50415020, }, // 'PAP ' Palpa(retired code)
+  { language: "plt", tag: 0x4D4C4720, }, // 'MLG ' Plateau Malagasy -> Malagasy
+  { language: "pml", tag: 0x43505020, }, // 'CPP ' Lingua Franca -> Creoles
+  // { language: "pms", tag: 0x504D5320 }, // 'PMS ' Piemontese
+  { language: "pmy", tag: 0x43505020, }, // 'CPP ' Papuan Malay -> Creoles
+  // { language: "pnb", tag: 0x504E4220 }, // 'PNB ' Western Panjabi
+  { language: "poc", tag: 0x4D594E20, }, // 'MYN ' Poqomam -> Mayan
+  { language: "poh", tag: 0x504F4820, }, // 'POH ' Poqomchi' -> Pocomchi
+  { language: "poh", tag: 0x4D594E20, }, // 'MYN ' Poqomchi' -> Mayan
+  // { language: "pon", tag: 0x504F4E20 }, // 'PON ' Pohnpeian
+  { language: "pov", tag: 0x43505020, }, // 'CPP ' Upper Guinea Crioulo -> Creoles
+  { language: "ppa", tag: 0x42414720, }, // 'BAG ' Pao(retired code) -> Baghelkhandi
+  { language: "pre", tag: 0x43505020, }, // 'CPP ' Principense -> Creoles
+  // { language: "pro", tag: 0x50524F20 }, // 'PRO ' Old Provençal (to 1500) -> Provençal / Old Provençal
+  { language: "prp", tag: 0x47554A20, }, // 'GUJ ' Parsi(retired code) -> Gujarati
+  { language: "prs", tag: 0x44524920, }, // 'DRI ' Dari
+  { language: "prs", tag: 0x46415220, }, // 'FAR ' Dari -> Persian
+  { language: "ps", tag: 0x50415320, }, // 'PAS ' Pashto [macrolanguage]
+  { language: "pse", tag: 0x4D4C5920, }, // 'MLY ' Central Malay -> Malay
+  { language: "pst", tag: 0x50415320, }, // 'PAS ' Central Pashto -> Pashto
+  { language: "pt", tag: 0x50544720, }, // 'PTG ' Portuguese
+  { language: "pub", tag: 0x51494E20, }, // 'QIN ' Purum -> Chin
+  { language: "puz", tag: 0x51494E20, }, // 'QIN ' Purum Naga(retired code) -> Chin
+  { language: "pwo", tag: 0x50574F20, }, // 'PWO ' Pwo Western Karen -> Western Pwo Karen
+  { language: "pwo", tag: 0x4B524E20, }, // 'KRN ' Pwo Western Karen -> Karen
+  { language: "pww", tag: 0x4B524E20, }, // 'KRN ' Pwo Northern Karen -> Karen
+  { language: "qu", tag: 0x51555A20, }, // 'QUZ ' Quechua [macrolanguage]
+  { language: "qub", tag: 0x51574820, }, // 'QWH ' Huallaga Huánuco Quechua -> Quechua (Peru)
+  { language: "qub", tag: 0x51555A20, }, // 'QUZ ' Huallaga Huánuco Quechua -> Quechua
+  { language: "quc", tag: 0x51554320, }, // 'QUC ' K’iche’
+  { language: "quc", tag: 0x4D594E20, }, // 'MYN ' K'iche' -> Mayan
+  { language: "qud", tag: 0x51564920, }, // 'QVI ' Calderón Highland Quichua -> Quechua (Ecuador)
+  { language: "qud", tag: 0x51555A20, }, // 'QUZ ' Calderón Highland Quichua -> Quechua
+  { language: "quf", tag: 0x51555A20, }, // 'QUZ ' Lambayeque Quechua -> Quechua
+  { language: "qug", tag: 0x51564920, }, // 'QVI ' Chimborazo Highland Quichua -> Quechua (Ecuador)
+  { language: "qug", tag: 0x51555A20, }, // 'QUZ ' Chimborazo Highland Quichua -> Quechua
+  { language: "quh", tag: 0x51554820, }, // 'QUH ' South Bolivian Quechua -> Quechua (Bolivia)
+  { language: "quh", tag: 0x51555A20, }, // 'QUZ ' South Bolivian Quechua -> Quechua
+  { language: "quk", tag: 0x51555A20, }, // 'QUZ ' Chachapoyas Quechua -> Quechua
+  { language: "qul", tag: 0x51554820, }, // 'QUH ' North Bolivian Quechua -> Quechua (Bolivia)
+  { language: "qul", tag: 0x51555A20, }, // 'QUZ ' North Bolivian Quechua -> Quechua
+  { language: "qum", tag: 0x4D594E20, }, // 'MYN ' Sipacapense -> Mayan
+  { language: "qup", tag: 0x51564920, }, // 'QVI ' Southern Pastaza Quechua -> Quechua (Ecuador)
+  { language: "qup", tag: 0x51555A20, }, // 'QUZ ' Southern Pastaza Quechua -> Quechua
+  { language: "qur", tag: 0x51574820, }, // 'QWH ' Yanahuanca Pasco Quechua -> Quechua (Peru)
+  { language: "qur", tag: 0x51555A20, }, // 'QUZ ' Yanahuanca Pasco Quechua -> Quechua
+  { language: "qus", tag: 0x51554820, }, // 'QUH ' Santiago del Estero Quichua -> Quechua (Bolivia)
+  { language: "qus", tag: 0x51555A20, }, // 'QUZ ' Santiago del Estero Quichua -> Quechua
+  { language: "quv", tag: 0x4D594E20, }, // 'MYN ' Sacapulteco -> Mayan
+  { language: "quw", tag: 0x51564920, }, // 'QVI ' Tena Lowland Quichua -> Quechua (Ecuador)
+  { language: "quw", tag: 0x51555A20, }, // 'QUZ ' Tena Lowland Quichua -> Quechua
+  { language: "qux", tag: 0x51574820, }, // 'QWH ' Yauyos Quechua -> Quechua (Peru)
+  { language: "qux", tag: 0x51555A20, }, // 'QUZ ' Yauyos Quechua -> Quechua
+  { language: "quy", tag: 0x51555A20, }, // 'QUZ ' Ayacucho Quechua -> Quechua
+  // { language: "quz", tag: 0x51555A20 }, // 'QUZ ' Cusco Quechua -> Quechua
+  { language: "qva", tag: 0x51574820, }, // 'QWH ' Ambo-Pasco Quechua -> Quechua (Peru)
+  { language: "qva", tag: 0x51555A20, }, // 'QUZ ' Ambo-Pasco Quechua -> Quechua
+  { language: "qvc", tag: 0x51555A20, }, // 'QUZ ' Cajamarca Quechua -> Quechua
+  { language: "qve", tag: 0x51555A20, }, // 'QUZ ' Eastern Apurímac Quechua -> Quechua
+  { language: "qvh", tag: 0x51574820, }, // 'QWH ' Huamalíes-Dos de Mayo Huánuco Quechua -> Quechua (Peru)
+  { language: "qvh", tag: 0x51555A20, }, // 'QUZ ' Huamalíes-Dos de Mayo Huánuco Quechua -> Quechua
+  { language: "qvi", tag: 0x51564920, }, // 'QVI ' Imbabura Highland Quichua -> Quechua (Ecuador)
+  { language: "qvi", tag: 0x51555A20, }, // 'QUZ ' Imbabura Highland Quichua -> Quechua
+  { language: "qvj", tag: 0x51564920, }, // 'QVI ' Loja Highland Quichua -> Quechua (Ecuador)
+  { language: "qvj", tag: 0x51555A20, }, // 'QUZ ' Loja Highland Quichua -> Quechua
+  { language: "qvl", tag: 0x51574820, }, // 'QWH ' Cajatambo North Lima Quechua -> Quechua (Peru)
+  { language: "qvl", tag: 0x51555A20, }, // 'QUZ ' Cajatambo North Lima Quechua -> Quechua
+  { language: "qvm", tag: 0x51574820, }, // 'QWH ' Margos-Yarowilca-Lauricocha Quechua -> Quechua (Peru)
+  { language: "qvm", tag: 0x51555A20, }, // 'QUZ ' Margos-Yarowilca-Lauricocha Quechua -> Quechua
+  { language: "qvn", tag: 0x51574820, }, // 'QWH ' North Junín Quechua -> Quechua (Peru)
+  { language: "qvn", tag: 0x51555A20, }, // 'QUZ ' North Junín Quechua -> Quechua
+  { language: "qvo", tag: 0x51564920, }, // 'QVI ' Napo Lowland Quechua -> Quechua (Ecuador)
+  { language: "qvo", tag: 0x51555A20, }, // 'QUZ ' Napo Lowland Quechua -> Quechua
+  { language: "qvp", tag: 0x51574820, }, // 'QWH ' Pacaraos Quechua -> Quechua (Peru)
+  { language: "qvp", tag: 0x51555A20, }, // 'QUZ ' Pacaraos Quechua -> Quechua
+  { language: "qvs", tag: 0x51555A20, }, // 'QUZ ' San Martín Quechua -> Quechua
+  { language: "qvw", tag: 0x51574820, }, // 'QWH ' Huaylla Wanca Quechua -> Quechua (Peru)
+  { language: "qvw", tag: 0x51555A20, }, // 'QUZ ' Huaylla Wanca Quechua -> Quechua
+  { language: "qvz", tag: 0x51564920, }, // 'QVI ' Northern Pastaza Quichua -> Quechua (Ecuador)
+  { language: "qvz", tag: 0x51555A20, }, // 'QUZ ' Northern Pastaza Quichua -> Quechua
+  { language: "qwa", tag: 0x51574820, }, // 'QWH ' Corongo Ancash Quechua -> Quechua (Peru)
+  { language: "qwa", tag: 0x51555A20, }, // 'QUZ ' Corongo Ancash Quechua -> Quechua
+  { language: "qwc", tag: 0x51555A20, }, // 'QUZ ' Classical Quechua -> Quechua
+  { language: "qwh", tag: 0x51574820, }, // 'QWH ' Huaylas Ancash Quechua -> Quechua (Peru)
+  { language: "qwh", tag: 0x51555A20, }, // 'QUZ ' Huaylas Ancash Quechua -> Quechua
+  { language: "qws", tag: 0x51574820, }, // 'QWH ' Sihuas Ancash Quechua -> Quechua (Peru)
+  { language: "qws", tag: 0x51555A20, }, // 'QUZ ' Sihuas Ancash Quechua -> Quechua
+  { language: "qwt", tag: 0x41544820, }, // 'ATH ' Kwalhioqua-Tlatskanai -> Athapaskan
+  { language: "qxa", tag: 0x51574820, }, // 'QWH ' Chiquián Ancash Quechua -> Quechua (Peru)
+  { language: "qxa", tag: 0x51555A20, }, // 'QUZ ' Chiquián Ancash Quechua -> Quechua
+  { language: "qxc", tag: 0x51574820, }, // 'QWH ' Chincha Quechua -> Quechua (Peru)
+  { language: "qxc", tag: 0x51555A20, }, // 'QUZ ' Chincha Quechua -> Quechua
+  { language: "qxh", tag: 0x51574820, }, // 'QWH ' Panao Huánuco Quechua -> Quechua (Peru)
+  { language: "qxh", tag: 0x51555A20, }, // 'QUZ ' Panao Huánuco Quechua -> Quechua
+  { language: "qxl", tag: 0x51564920, }, // 'QVI ' Salasaca Highland Quichua -> Quechua (Ecuador)
+  { language: "qxl", tag: 0x51555A20, }, // 'QUZ ' Salasaca Highland Quichua -> Quechua
+  { language: "qxn", tag: 0x51574820, }, // 'QWH ' Northern Conchucos Ancash Quechua -> Quechua (Peru)
+  { language: "qxn", tag: 0x51555A20, }, // 'QUZ ' Northern Conchucos Ancash Quechua -> Quechua
+  { language: "qxo", tag: 0x51574820, }, // 'QWH ' Southern Conchucos Ancash Quechua -> Quechua (Peru)
+  { language: "qxo", tag: 0x51555A20, }, // 'QUZ ' Southern Conchucos Ancash Quechua -> Quechua
+  { language: "qxp", tag: 0x51555A20, }, // 'QUZ ' Puno Quechua -> Quechua
+  { language: "qxr", tag: 0x51564920, }, // 'QVI ' Cañar Highland Quichua -> Quechua (Ecuador)
+  { language: "qxr", tag: 0x51555A20, }, // 'QUZ ' Cañar Highland Quichua -> Quechua
+  { language: "qxt", tag: 0x51574820, }, // 'QWH ' Santa Ana de Tusi Pasco Quechua -> Quechua (Peru)
+  { language: "qxt", tag: 0x51555A20, }, // 'QUZ ' Santa Ana de Tusi Pasco Quechua -> Quechua
+  { language: "qxu", tag: 0x51555A20, }, // 'QUZ ' Arequipa-La Unión Quechua -> Quechua
+  { language: "qxw", tag: 0x51574820, }, // 'QWH ' Jauja Wanca Quechua -> Quechua (Peru)
+  { language: "qxw", tag: 0x51555A20, }, // 'QUZ ' Jauja Wanca Quechua -> Quechua
+  { language: "rag", tag: 0x4C554820, }, // 'LUH ' Logooli -> Luyia
+  // { language: "raj", tag: 0x52414A20 }, // 'RAJ ' Rajasthani [macrolanguage]
+  { language: "ral", tag: 0x51494E20, }, // 'QIN ' Ralte -> Chin
+  // { language: "rar", tag: 0x52415220 }, // 'RAR ' Rarotongan
+  { language: "rbb", tag: 0x504C4720, }, // 'PLG ' Rumai Palaung -> Palaung
+  { language: "rbl", tag: 0x42494B20, }, // 'BIK ' Miraya Bikol -> Bikol
+  { language: "rcf", tag: 0x43505020, }, // 'CPP ' Réunion Creole French -> Creoles
+  // { language: "rej", tag: 0x52454A20 }, // 'REJ ' Rejang
+  // { language: "rhg", tag: 0x52484720 }, // 'RHG ' Rohingya
+  // { language: "ria", tag: 0x52494120 }, // 'RIA ' Riang (India)
+  { language: "rif", tag: 0x52494620, }, // 'RIF ' Tarifit
+  { language: "rif", tag: 0x42425220, }, // 'BBR ' Tarifit -> Berber
+  // { language: "rit", tag: 0x52495420 }, // 'RIT ' Ritharrngu -> Ritarungo
+  { language: "rki", tag: 0x41524B20, }, // 'ARK ' Rakhine
+  // { language: "rkw", tag: 0x524B5720 }, // 'RKW ' Arakwal
+  { language: "rm", tag: 0x524D5320, }, // 'RMS ' Romansh
+  { language: "rmc", tag: 0x524F5920, }, // 'ROY ' Carpathian Romani -> Romany
+  { language: "rmf", tag: 0x524F5920, }, // 'ROY ' Kalo Finnish Romani -> Romany
+  { language: "rml", tag: 0x524F5920, }, // 'ROY ' Baltic Romani -> Romany
+  { language: "rmn", tag: 0x524F5920, }, // 'ROY ' Balkan Romani -> Romany
+  { language: "rmo", tag: 0x524F5920, }, // 'ROY ' Sinte Romani -> Romany
+  { language: "rms", tag: 0, }, // null Romanian Sign Language != Romansh
+  { language: "rmw", tag: 0x524F5920, }, // 'ROY ' Welsh Romani -> Romany
+  { language: "rmy", tag: 0x524D5920, }, // 'RMY ' Vlax Romani
+  { language: "rmy", tag: 0x524F5920, }, // 'ROY ' Vlax Romani -> Romany
+  { language: "rmz", tag: 0x41524B20, }, // 'ARK ' Marma -> Rakhine
+  { language: "rn", tag: 0x52554E20, }, // 'RUN ' Rundi
+  { language: "ro", tag: 0x524F4D20, }, // 'ROM ' Romanian
+  { language: "rom", tag: 0x524F5920, }, // 'ROY ' Romany [macrolanguage]
+  { language: "rop", tag: 0x43505020, }, // 'CPP ' Kriol -> Creoles
+  { language: "rtc", tag: 0x51494E20, }, // 'QIN ' Rungtu Chin -> Chin
+  // { language: "rtm", tag: 0x52544D20 }, // 'RTM ' Rotuman
+  { language: "ru", tag: 0x52555320, }, // 'RUS ' Russian
+  { language: "rue", tag: 0x52535920, }, // 'RSY ' Rusyn
+  // { language: "rup", tag: 0x52555020 }, // 'RUP ' Aromanian
+  { language: "rw", tag: 0x52554120, }, // 'RUA ' Kinyarwanda
+  { language: "rwr", tag: 0x4D415720, }, // 'MAW ' Marwari (India)
+  { language: "sa", tag: 0x53414E20, }, // 'SAN ' Sanskrit [macrolanguage]
+  { language: "sad", tag: 0, }, // null Sandawe != Sadri
+  { language: "sah", tag: 0x59414B20, }, // 'YAK ' Yakut -> Sakha
+  { language: "sam", tag: 0x50414120, }, // 'PAA ' Samaritan Aramaic -> Palestinian Aramaic
+  // { language: "sas", tag: 0x53415320 }, // 'SAS ' Sasak
+  // { language: "sat", tag: 0x53415420 }, // 'SAT ' Santali
+  { language: "say", tag: 0, }, // null Saya != Sayisi
+  { language: "sc", tag: 0x53524420, }, // 'SRD ' Sardinian [macrolanguage]
+  { language: "scf", tag: 0x43505020, }, // 'CPP ' San Miguel Creole French -> Creoles
+  { language: "sch", tag: 0x51494E20, }, // 'QIN ' Sakachep -> Chin
+  { language: "sci", tag: 0x43505020, }, // 'CPP ' Sri Lankan Creole Malay -> Creoles
+  { language: "sck", tag: 0x53414420, }, // 'SAD ' Sadri
+  // { language: "scn", tag: 0x53434E20 }, // 'SCN ' Sicilian
+  // { language: "sco", tag: 0x53434F20 }, // 'SCO ' Scots
+  { language: "scs", tag: 0x53435320, }, // 'SCS ' North Slavey
+  { language: "scs", tag: 0x534C4120, }, // 'SLA ' North Slavey -> Slavey
+  { language: "scs", tag: 0x41544820, }, // 'ATH ' North Slavey -> Athapaskan
+  { language: "sd", tag: 0x534E4420, }, // 'SND ' Sindhi
+  { language: "sdc", tag: 0x53524420, }, // 'SRD ' Sassarese Sardinian -> Sardinian
+  { language: "sdh", tag: 0x4B555220, }, // 'KUR ' Southern Kurdish -> Kurdish
+  { language: "sdn", tag: 0x53524420, }, // 'SRD ' Gallurese Sardinian -> Sardinian
+  { language: "sds", tag: 0x42425220, }, // 'BBR ' Sened -> Berber
+  { language: "se", tag: 0x4E534D20, }, // 'NSM ' Northern Sami
+  // { language: "see", tag: 0x53454520 }, // 'SEE ' Seneca
+  { language: "seh", tag: 0x534E4120, }, // 'SNA ' Sena
+  { language: "sek", tag: 0x41544820, }, // 'ATH ' Sekani -> Athapaskan
+  // { language: "sel", tag: 0x53454C20 }, // 'SEL ' Selkup
+  { language: "sez", tag: 0x51494E20, }, // 'QIN ' Senthang Chin -> Chin
+  { language: "sfm", tag: 0x53464D20, }, // 'SFM ' Small Flowery Miao
+  { language: "sfm", tag: 0x484D4E20, }, // 'HMN ' Small Flowery Miao -> Hmong
+  { language: "sg", tag: 0x53474F20, }, // 'SGO ' Sango
+  // { language: "sga", tag: 0x53474120 }, // 'SGA ' Old Irish (to 900)
+  { language: "sgc", tag: 0x4B414C20, }, // 'KAL ' Kipsigis -> Kalenjin
+  { language: "sgo", tag: 0, }, // null Songa(retired code) != Sango
+  // { language: "sgs", tag: 0x53475320 }, // 'SGS ' Samogitian
+  { language: "sgw", tag: 0x43484720, }, // 'CHG ' Sebat Bet Gurage -> Chaha Gurage
+  { language: "sh", tag: 0x424F5320, }, // 'BOS ' Serbo-Croatian [macrolanguage] -> Bosnian
+  { language: "sh", tag: 0x48525620, }, // 'HRV ' Serbo-Croatian [macrolanguage] -> Croatian
+  { language: "sh", tag: 0x53524220, }, // 'SRB ' Serbo-Croatian [macrolanguage] -> Serbian
+  { language: "shi", tag: 0x53484920, }, // 'SHI ' Tachelhit
+  { language: "shi", tag: 0x42425220, }, // 'BBR ' Tachelhit -> Berber
+  { language: "shl", tag: 0x51494E20, }, // 'QIN ' Shendu -> Chin
+  // { language: "shn", tag: 0x53484E20 }, // 'SHN ' Shan
+  { language: "shu", tag: 0x41524120, }, // 'ARA ' Chadian Arabic -> Arabic
+  { language: "shy", tag: 0x42425220, }, // 'BBR ' Tachawit -> Berber
+  { language: "si", tag: 0x534E4820, }, // 'SNH ' Sinhala (Sinhalese)
+  { language: "sib", tag: 0, }, // null Sebop != Sibe
+  // { language: "sid", tag: 0x53494420 }, // 'SID ' Sidamo
+  { language: "sig", tag: 0, }, // null Paasaal != Silte Gurage
+  { language: "siz", tag: 0x42425220, }, // 'BBR ' Siwi -> Berber
+  // { language: "sja", tag: 0x534A4120 }, // 'SJA ' Epena
+  { language: "sjd", tag: 0x4B534D20, }, // 'KSM ' Kildin Sami
+  { language: "sjo", tag: 0x53494220, }, // 'SIB ' Xibe -> Sibe
+  { language: "sjs", tag: 0x42425220, }, // 'BBR ' Senhaja De Srair -> Berber
+  { language: "sk", tag: 0x534B5920, }, // 'SKY ' Slovak
+  { language: "skg", tag: 0x4D4C4720, }, // 'MLG ' Sakalava Malagasy -> Malagasy
+  { language: "skr", tag: 0x53524B20, }, // 'SRK ' Saraiki
+  { language: "sks", tag: 0, }, // null Maia != Skolt Sami
+  { language: "skw", tag: 0x43505020, }, // 'CPP ' Skepi Creole Dutch -> Creoles
+  { language: "sky", tag: 0, }, // null Sikaiana != Slovak
+  { language: "sl", tag: 0x534C5620, }, // 'SLV ' Slovenian
+  { language: "sla", tag: 0, }, // null Slavic  [collection] != Slavey
+  { language: "sm", tag: 0x534D4F20, }, // 'SMO ' Samoan
+  { language: "sma", tag: 0x53534D20, }, // 'SSM ' Southern Sami
+  { language: "smd", tag: 0x4D424E20, }, // 'MBN ' Sama(retired code) -> Mbundu
+  { language: "smj", tag: 0x4C534D20, }, // 'LSM ' Lule Sami
+  { language: "sml", tag: 0, }, // null Central Sama != Somali
+  { language: "smn", tag: 0x49534D20, }, // 'ISM ' Inari Sami
+  { language: "sms", tag: 0x534B5320, }, // 'SKS ' Skolt Sami
+  { language: "smt", tag: 0x51494E20, }, // 'QIN ' Simte -> Chin
+  { language: "sn", tag: 0x534E4130, }, // 'SNA0' Shona
+  { language: "snb", tag: 0x49424120, }, // 'IBA ' Sebuyau(retired code) -> Iban
+  { language: "snh", tag: 0, }, // null Shinabo(retired code) != Sinhala (Sinhalese)
+  // { language: "snk", tag: 0x534E4B20 }, // 'SNK ' Soninke
+  { language: "so", tag: 0x534D4C20, }, // 'SML ' Somali
+  { language: "sog", tag: 0, }, // null Sogdian != Sodo Gurage
+  // { language: "sop", tag: 0x534F5020 }, // 'SOP ' Songe
+  { language: "spv", tag: 0x4F524920, }, // 'ORI ' Sambalpuri -> Odia
+  { language: "spy", tag: 0x4B414C20, }, // 'KAL ' Sabaot -> Kalenjin
+  { language: "sq", tag: 0x53514920, }, // 'SQI ' Albanian [macrolanguage]
+  { language: "sr", tag: 0x53524220, }, // 'SRB ' Serbian
+  { language: "srb", tag: 0, }, // null Sora != Serbian
+  { language: "src", tag: 0x53524420, }, // 'SRD ' Logudorese Sardinian -> Sardinian
+  { language: "srk", tag: 0, }, // null Serudung Murut != Saraiki
+  { language: "srm", tag: 0x43505020, }, // 'CPP ' Saramaccan -> Creoles
+  { language: "srn", tag: 0x43505020, }, // 'CPP ' Sranan Tongo -> Creoles
+  { language: "sro", tag: 0x53524420, }, // 'SRD ' Campidanese Sardinian -> Sardinian
+  // { language: "srr", tag: 0x53525220 }, // 'SRR ' Serer
+  { language: "srs", tag: 0x41544820, }, // 'ATH ' Sarsi -> Athapaskan
+  { language: "ss", tag: 0x53575A20, }, // 'SWZ ' Swati
+  { language: "ssh", tag: 0x41524120, }, // 'ARA ' Shihhi Arabic -> Arabic
+  { language: "ssl", tag: 0, }, // null Western Sisaala != South Slavey
+  { language: "ssm", tag: 0, }, // null Semnam != Southern Sami
+  { language: "st", tag: 0x534F5420, }, // 'SOT ' Southern Sotho
+  { language: "sta", tag: 0x43505020, }, // 'CPP ' Settla -> Creoles
+  // { language: "stq", tag: 0x53545120 }, // 'STQ ' Saterfriesisch -> Saterland Frisian
+  // { language: "str", tag: 0x53545220 }, // 'STR ' Straits Salish
+  { language: "stv", tag: 0x53494720, }, // 'SIG ' Silt'e -> Silte Gurage
+  { language: "su", tag: 0x53554E20, }, // 'SUN ' Sundanese
+  // { language: "suk", tag: 0x53554B20 }, // 'SUK ' Sukuma
+  { language: "suq", tag: 0x53555220, }, // 'SUR ' Suri
+  { language: "sur", tag: 0, }, // null Mwaghavul != Suri
+  { language: "sv", tag: 0x53564520, }, // 'SVE ' Swedish
+  // { language: "sva", tag: 0x53564120 }, // 'SVA ' Svan
+  { language: "svc", tag: 0x43505020, }, // 'CPP ' Vincentian Creole English -> Creoles
+  { language: "sve", tag: 0, }, // null Serili != Swedish
+  { language: "sw", tag: 0x53574B20, }, // 'SWK ' Swahili  [macrolanguage]
+  { language: "swb", tag: 0x434D5220, }, // 'CMR ' Maore Comorian -> Comorian
+  { language: "swc", tag: 0x53574B20, }, // 'SWK ' Congo Swahili -> Swahili
+  { language: "swh", tag: 0x53574B20, }, // 'SWK ' Swahili 
+  { language: "swk", tag: 0, }, // null Malawi Sena != Swahili
+  { language: "swn", tag: 0x42425220, }, // 'BBR ' Sawknah -> Berber
+  { language: "swv", tag: 0x4D415720, }, // 'MAW ' Shekhawati -> Marwari
+  // { language: "sxu", tag: 0x53585520 }, // 'SXU ' Upper Saxon
+  { language: "syc", tag: 0x53595220, }, // 'SYR ' Classical Syriac -> Syriac
+  // { language: "syl", tag: 0x53594C20 }, // 'SYL ' Sylheti
+  // { language: "syr", tag: 0x53595220 }, // 'SYR ' Syriac [macrolanguage]
+  // { language: "szl", tag: 0x535A4C20 }, // 'SZL ' Silesian
+  { language: "ta", tag: 0x54414D20, }, // 'TAM ' Tamil
+  { language: "taa", tag: 0x41544820, }, // 'ATH ' Lower Tanana -> Athapaskan
+  // { language: "tab", tag: 0x54414220 }, // 'TAB ' Tabassaran -> Tabasaran
+  { language: "taj", tag: 0, }, // null Eastern Tamang != Tajiki
+  { language: "taq", tag: 0x54415120, }, // 'TAQ ' Tamasheq
+  { language: "taq", tag: 0x544D4820, }, // 'TMH ' Tamasheq -> Tamashek
+  { language: "taq", tag: 0x42425220, }, // 'BBR ' Tamasheq -> Berber
+  { language: "tas", tag: 0x43505020, }, // 'CPP ' Tay Boi -> Creoles
+  { language: "tau", tag: 0x41544820, }, // 'ATH ' Upper Tanana -> Athapaskan
+  { language: "tcb", tag: 0x41544820, }, // 'ATH ' Tanacross -> Athapaskan
+  { language: "tce", tag: 0x41544820, }, // 'ATH ' Southern Tutchone -> Athapaskan
+  { language: "tch", tag: 0x43505020, }, // 'CPP ' Turks And Caicos Creole English -> Creoles
+  { language: "tcp", tag: 0x51494E20, }, // 'QIN ' Tawr Chin -> Chin
+  { language: "tcs", tag: 0x43505020, }, // 'CPP ' Torres Strait Creole -> Creoles
+  { language: "tcy", tag: 0x54554C20, }, // 'TUL ' Tulu
+  { language: "tcz", tag: 0x51494E20, }, // 'QIN ' Thado Chin -> Chin
+  // { language: "tdc", tag: 0x54444320 }, // 'TDC ' Emberá-Tadó
+  // { language: "tdd", tag: 0x54444420 }, // 'TDD ' Tai Nüa -> Dehong Dai
+  { language: "tdx", tag: 0x4D4C4720, }, // 'MLG ' Tandroy-Mahafaly Malagasy -> Malagasy
+  { language: "te", tag: 0x54454C20, }, // 'TEL ' Telugu
+  { language: "tec", tag: 0x4B414C20, }, // 'KAL ' Terik -> Kalenjin
+  { language: "tem", tag: 0x544D4E20, }, // 'TMN ' Timne -> Temne
+  // { language: "tet", tag: 0x54455420 }, // 'TET ' Tetum
+  { language: "tez", tag: 0x42425220, }, // 'BBR ' Tetserret -> Berber
+  { language: "tfn", tag: 0x41544820, }, // 'ATH ' Tanaina -> Athapaskan
+  { language: "tg", tag: 0x54414A20, }, // 'TAJ ' Tajik -> Tajiki
+  { language: "tgh", tag: 0x43505020, }, // 'CPP ' Tobagonian Creole English -> Creoles
+  { language: "tgj", tag: 0x4E495320, }, // 'NIS ' Tagin -> Nisi
+  { language: "tgn", tag: 0, }, // null Tandaganon != Tongan
+  { language: "tgr", tag: 0, }, // null Tareng != Tigre
+  { language: "tgx", tag: 0x41544820, }, // 'ATH ' Tagish -> Athapaskan
+  { language: "tgy", tag: 0, }, // null Togoyo != Tigrinya
+  { language: "th", tag: 0x54484120, }, // 'THA ' Thai
+  // { language: "thp", tag: 0x54485020 }, // 'THP ' Thompson
+  { language: "tht", tag: 0x41544820, }, // 'ATH ' Tahltan -> Athapaskan
+  { language: "thv", tag: 0x54485620, }, // 'THV ' Tahaggart Tamahaq
+  { language: "thv", tag: 0x544D4820, }, // 'TMH ' Tahaggart Tamahaq -> Tamashek
+  { language: "thv", tag: 0x42425220, }, // 'BBR ' Tahaggart Tamahaq -> Berber
+  { language: "thz", tag: 0x54485A20, }, // 'THZ ' Tayart Tamajeq
+  { language: "thz", tag: 0x544D4820, }, // 'TMH ' Tayart Tamajeq -> Tamashek
+  { language: "thz", tag: 0x42425220, }, // 'BBR ' Tayart Tamajeq -> Berber
+  { language: "ti", tag: 0x54475920, }, // 'TGY ' Tigrinya
+  { language: "tia", tag: 0x42425220, }, // 'BBR ' Tidikelt Tamazight -> Berber
+  { language: "tig", tag: 0x54475220, }, // 'TGR ' Tigre
+  // { language: "tiv", tag: 0x54495620 }, // 'TIV ' Tiv
+  // { language: "tjl", tag: 0x544A4C20 }, // 'TJL ' Tai Laing
+  { language: "tjo", tag: 0x42425220, }, // 'BBR ' Temacine Tamazight -> Berber
+  { language: "tk", tag: 0x544B4D20, }, // 'TKM ' Turkmen
+  { language: "tkg", tag: 0x4D4C4720, }, // 'MLG ' Tesaka Malagasy -> Malagasy
+  { language: "tkm", tag: 0, }, // null Takelma != Turkmen
+  { language: "tl", tag: 0x54474C20, }, // 'TGL ' Tagalog
+  // { language: "tli", tag: 0x544C4920 }, // 'TLI ' Tlingit
+  // { language: "tly", tag: 0x544C5920 }, // 'TLY ' Talysh
+  { language: "tmg", tag: 0x43505020, }, // 'CPP ' Ternateño -> Creoles
+  { language: "tmh", tag: 0x544D4820, }, // 'TMH ' Tamashek [macrolanguage]
+  { language: "tmh", tag: 0x42425220, }, // 'BBR ' Tamashek [macrolanguage] -> Berber
+  { language: "tmn", tag: 0, }, // null Taman (Indonesia) != Temne
+  { language: "tmw", tag: 0x4D4C5920, }, // 'MLY ' Temuan -> Malay
+  { language: "tn", tag: 0x544E4120, }, // 'TNA ' Tswana
+  { language: "tna", tag: 0, }, // null Tacana != Tswana
+  { language: "tne", tag: 0, }, // null Tinoc Kallahan(retired code) != Tundra Enets
+  { language: "tnf", tag: 0x44524920, }, // 'DRI ' Tangshewi(retired code) -> Dari
+  { language: "tnf", tag: 0x46415220, }, // 'FAR ' Tangshewi(retired code) -> Persian
+  { language: "tng", tag: 0, }, // null Tobanga != Tonga
+  { language: "to", tag: 0x54474E20, }, // 'TGN ' Tonga (Tonga Islands) -> Tongan
+  { language: "tod", tag: 0x544F4430, }, // 'TOD0' Toma
+  { language: "toi", tag: 0x544E4720, }, // 'TNG ' Tonga (Zambia)
+  { language: "toj", tag: 0x4D594E20, }, // 'MYN ' Tojolabal -> Mayan
+  { language: "tol", tag: 0x41544820, }, // 'ATH ' Tolowa -> Athapaskan
+  { language: "tor", tag: 0x42414430, }, // 'BAD0' Togbo-Vara Banda -> Banda
+  { language: "tpi", tag: 0x54504920, }, // 'TPI ' Tok Pisin
+  { language: "tpi", tag: 0x43505020, }, // 'CPP ' Tok Pisin -> Creoles
+  { language: "tr", tag: 0x54524B20, }, // 'TRK ' Turkish
+  { language: "trf", tag: 0x43505020, }, // 'CPP ' Trinidadian Creole English -> Creoles
+  { language: "trk", tag: 0, }, // null Turkic  [collection] != Turkish
+  { language: "tru", tag: 0x54554120, }, // 'TUA ' Turoyo -> Turoyo Aramaic
+  { language: "tru", tag: 0x53595220, }, // 'SYR ' Turoyo -> Syriac
+  { language: "ts", tag: 0x54534720, }, // 'TSG ' Tsonga
+  { language: "tsg", tag: 0, }, // null Tausug != Tsonga
+  // { language: "tsj", tag: 0x54534A20 }, // 'TSJ ' Tshangla
+  { language: "tt", tag: 0x54415420, }, // 'TAT ' Tatar
+  { language: "ttc", tag: 0x4D594E20, }, // 'MYN ' Tektiteko -> Mayan
+  { language: "ttm", tag: 0x41544820, }, // 'ATH ' Northern Tutchone -> Athapaskan
+  { language: "ttq", tag: 0x54545120, }, // 'TTQ ' Tawallammat Tamajaq
+  { language: "ttq", tag: 0x544D4820, }, // 'TMH ' Tawallammat Tamajaq -> Tamashek
+  { language: "ttq", tag: 0x42425220, }, // 'BBR ' Tawallammat Tamajaq -> Berber
+  { language: "tua", tag: 0, }, // null Wiarumus != Turoyo Aramaic
+  { language: "tul", tag: 0, }, // null Tula != Tulu
+  // { language: "tum", tag: 0x54554D20 }, // 'TUM ' Tumbuka
+  // { language: "tus", tag: 0x54555320 }, // 'TUS ' Tuscarora
+  { language: "tuu", tag: 0x41544820, }, // 'ATH ' Tututni -> Athapaskan
+  { language: "tuv", tag: 0, }, // null Turkana != Tuvin
+  { language: "tuy", tag: 0x4B414C20, }, // 'KAL ' Tugen -> Kalenjin
+  // { language: "tvl", tag: 0x54564C20 }, // 'TVL ' Tuvalu
+  { language: "tvy", tag: 0x43505020, }, // 'CPP ' Timor Pidgin -> Creoles
+  { language: "tw", tag: 0x54574920, }, // 'TWI ' Twi
+  { language: "tw", tag: 0x414B4120, }, // 'AKA ' Twi -> Akan
+  { language: "txc", tag: 0x41544820, }, // 'ATH ' Tsetsaut -> Athapaskan
+  { language: "txy", tag: 0x4D4C4720, }, // 'MLG ' Tanosy Malagasy -> Malagasy
+  { language: "ty", tag: 0x54485420, }, // 'THT ' Tahitian
+  { language: "tyv", tag: 0x54555620, }, // 'TUV ' Tuvinian -> Tuvin
+  // { language: "tyz", tag: 0x54595A20 }, // 'TYZ ' Tày
+  { language: "tzh", tag: 0x4D594E20, }, // 'MYN ' Tzeltal -> Mayan
+  { language: "tzj", tag: 0x4D594E20, }, // 'MYN ' Tz'utujil -> Mayan
+  { language: "tzm", tag: 0x545A4D20, }, // 'TZM ' Central Atlas Tamazight -> Tamazight
+  { language: "tzm", tag: 0x42425220, }, // 'BBR ' Central Atlas Tamazight -> Berber
+  { language: "tzo", tag: 0x545A4F20, }, // 'TZO ' Tzotzil
+  { language: "tzo", tag: 0x4D594E20, }, // 'MYN ' Tzotzil -> Mayan
+  { language: "ubl", tag: 0x42494B20, }, // 'BIK ' Buhi'non Bikol -> Bikol
+  // { language: "udi", tag: 0x55444920 }, // 'UDI ' Udi
+  // { language: "udm", tag: 0x55444D20 }, // 'UDM ' Udmurt
+  { language: "ug", tag: 0x55594720, }, // 'UYG ' Uyghur
+  { language: "uk", tag: 0x554B5220, }, // 'UKR ' Ukrainian
+  { language: "uki", tag: 0x4B554920, }, // 'KUI ' Kui (India)
+  { language: "uln", tag: 0x43505020, }, // 'CPP ' Unserdeutsch -> Creoles
+  // { language: "umb", tag: 0x554D4220 }, // 'UMB ' Umbundu
+  { language: "unr", tag: 0x4D554E20, }, // 'MUN ' Mundari
+  { language: "ur", tag: 0x55524420, }, // 'URD ' Urdu
+  { language: "urk", tag: 0x4D4C5920, }, // 'MLY ' Urak Lawoi' -> Malay
+  { language: "usp", tag: 0x4D594E20, }, // 'MYN ' Uspanteco -> Mayan
+  { language: "uz", tag: 0x555A4220, }, // 'UZB ' Uzbek [macrolanguage]
+  { language: "uzn", tag: 0x555A4220, }, // 'UZB ' Northern Uzbek -> Uzbek
+  { language: "uzs", tag: 0x555A4220, }, // 'UZB ' Southern Uzbek -> Uzbek
+  { language: "vap", tag: 0x51494E20, }, // 'QIN ' Vaiphei -> Chin
+  { language: "ve", tag: 0x56454E20, }, // 'VEN ' Venda
+  // { language: "vec", tag: 0x56454320 }, // 'VEC ' Venetian
+  { language: "vi", tag: 0x56495420, }, // 'VIT ' Vietnamese
+  { language: "vic", tag: 0x43505020, }, // 'CPP ' Virgin Islands Creole English -> Creoles
+  { language: "vit", tag: 0, }, // null Viti != Vietnamese
+  { language: "vkk", tag: 0x4D4C5920, }, // 'MLY ' Kaur -> Malay
+  { language: "vkp", tag: 0x43505020, }, // 'CPP ' Korlai Creole Portuguese -> Creoles
+  { language: "vkt", tag: 0x4D4C5920, }, // 'MLY ' Tenggarong Kutai Malay -> Malay
+  { language: "vls", tag: 0x464C4520, }, // 'FLE ' Vlaams -> Dutch (Flemish)
+  { language: "vmw", tag: 0x4D414B20, }, // 'MAK ' Makhuwa
+  { language: "vo", tag: 0x564F4C20, }, // 'VOL ' Volapük
+  { language: "vro", tag: 0x56524F20, }, // 'VRO ' Võro
+  { language: "vro", tag: 0x45544920, }, // 'ETI ' Võro -> Estonian
+  { language: "vsn", tag: 0x53414E20, }, // 'SAN ' Vedic Sanskrit -> Sanskrit
+  { language: "wa", tag: 0x574C4E20, }, // 'WLN ' Walloon
+  { language: "wag", tag: 0, }, // null Wa'ema != Wagdi
+  // { language: "war", tag: 0x57415220 }, // 'WAR ' Waray (Philippines) -> Waray-Waray
+  // { language: "wbl", tag: 0x57424C20 }, // 'WBL ' Wakhi
+  { language: "wbm", tag: 0x57412020, }, // 'WA  ' Wa
+  { language: "wbr", tag: 0x57414720, }, // 'WAG ' Wagdi
+  { language: "wbr", tag: 0x52414A20, }, // 'RAJ ' Wagdi -> Rajasthani
+  // { language: "wci", tag: 0x57434920 }, // 'WCI ' Waci Gbe
+  // { language: "wdt", tag: 0x57445420 }, // 'WDT ' Wendat
+  { language: "wea", tag: 0x4B524E20, }, // 'KRN ' Wewaw -> Karen
+  { language: "wes", tag: 0x43505020, }, // 'CPP ' Cameroon Pidgin -> Creoles
+  { language: "weu", tag: 0x51494E20, }, // 'QIN ' Rawngtu Chin -> Chin
+  { language: "wlc", tag: 0x434D5220, }, // 'CMR ' Mwali Comorian -> Comorian
+  { language: "wle", tag: 0x53494720, }, // 'SIG ' Wolane -> Silte Gurage
+  { language: "wlk", tag: 0x41544820, }, // 'ATH ' Wailaki -> Athapaskan
+  { language: "wni", tag: 0x434D5220, }, // 'CMR ' Ndzwani Comorian -> Comorian
+  { language: "wo", tag: 0x574C4620, }, // 'WLF ' Wolof
+  { language: "wry", tag: 0x4D415720, }, // 'MAW ' Merwari -> Marwari
+  { language: "wsg", tag: 0x474F4E20, }, // 'GON ' Adilabad Gondi -> Gondi
+  // { language: "wtm", tag: 0x57544D20 }, // 'WTM ' Mewati
+  { language: "wuu", tag: 0x5A485320, }, // 'ZHS ' Wu Chinese -> Chinese, Simplified
+  { language: "wya", tag: 0x57445420, }, // 'WDT ' Wyandot(retired code) -> Wendat
+  { language: "wya", tag: 0x57594E20, }, // 'WYN ' Wyandot(retired code)
+  // { language: "wyn", tag: 0x57594E20 }, // 'WYN ' Wyandot
+  { language: "xal", tag: 0x4B4C4D20, }, // 'KLM ' Kalmyk
+  { language: "xal", tag: 0x544F4420, }, // 'TOD ' Kalmyk -> Todo
+  { language: "xan", tag: 0x53454B20, }, // 'SEK ' Xamtanga -> Sekota
+  { language: "xbd", tag: 0, }, // null Bindal != Lü
+  { language: "xh", tag: 0x58485320, }, // 'XHS ' Xhosa
+  // { language: "xjb", tag: 0x584A4220 }, // 'XJB ' Minjungbal -> Minjangbal
+  // { language: "xkf", tag: 0x584B4620 }, // 'XKF ' Khengkha
+  { language: "xmg", tag: 0x424D4C20, }, // 'BML ' Mengaka -> Bamileke
+  { language: "xmm", tag: 0x4D4C5920, }, // 'MLY ' Manado Malay -> Malay
+  { language: "xmm", tag: 0x43505020, }, // 'CPP ' Manado Malay -> Creoles
+  { language: "xmv", tag: 0x4D4C4720, }, // 'MLG ' Antankarana Malagasy -> Malagasy
+  { language: "xmw", tag: 0x4D4C4720, }, // 'MLG ' Tsimihety Malagasy -> Malagasy
+  { language: "xnj", tag: 0x53585420, }, // 'SXT ' Ngoni (Tanzania) -> Sutu
+  { language: "xnq", tag: 0x53585420, }, // 'SXT ' Ngoni (Mozambique) -> Sutu
+  { language: "xnr", tag: 0x44475220, }, // 'DGR ' Kangri -> Dogri (macrolanguage)
+  // { language: "xog", tag: 0x584F4720 }, // 'XOG ' Soga
+  { language: "xpe", tag: 0x58504520, }, // 'XPE ' Liberia Kpelle -> Kpelle (Liberia)
+  { language: "xpe", tag: 0x4B504C20, }, // 'KPL ' Liberia Kpelle -> Kpelle
+  { language: "xsl", tag: 0x53534C20, }, // 'SSL ' South Slavey
+  { language: "xsl", tag: 0x534C4120, }, // 'SLA ' South Slavey -> Slavey
+  { language: "xsl", tag: 0x41544820, }, // 'ATH ' South Slavey -> Athapaskan
+  { language: "xst", tag: 0x53494720, }, // 'SIG ' Silt'e(retired code) -> Silte Gurage
+  // { language: "xub", tag: 0x58554220 }, // 'XUB ' Betta Kurumba -> Bette Kuruma
+  // { language: "xuj", tag: 0x58554A20 }, // 'XUJ ' Jennu Kurumba -> Jennu Kuruma
+  { language: "xup", tag: 0x41544820, }, // 'ATH ' Upper Umpqua -> Athapaskan
+  { language: "xwo", tag: 0x544F4420, }, // 'TOD ' Written Oirat -> Todo
+  { language: "yaj", tag: 0x42414430, }, // 'BAD0' Banda-Yangere -> Banda
+  { language: "yak", tag: 0, }, // null Yakama != Sakha
+  // { language: "yao", tag: 0x59414F20 }, // 'YAO ' Yao
+  // { language: "yap", tag: 0x59415020 }, // 'YAP ' Yapese
+  { language: "yba", tag: 0, }, // null Yala != Yoruba
+  { language: "ybb", tag: 0x424D4C20, }, // 'BML ' Yemba -> Bamileke
+  { language: "ybd", tag: 0x41524B20, }, // 'ARK ' Yangbye(retired code) -> Rakhine
+  { language: "ycr", tag: 0, }, // null Yilan Creole != Y-Cree
+  { language: "ydd", tag: 0x4A494920, }, // 'JII ' Eastern Yiddish -> Yiddish
+  // { language: "ygp", tag: 0x59475020 }, // 'YGP ' Gepo
+  { language: "yi", tag: 0x4A494920, }, // 'JII ' Yiddish [macrolanguage]
+  { language: "yih", tag: 0x4A494920, }, // 'JII ' Western Yiddish -> Yiddish
+  { language: "yim", tag: 0, }, // null Yimchungru Naga != Yi Modern
+  // { language: "yna", tag: 0x594E4120 }, // 'YNA ' Aluo
+  { language: "yo", tag: 0x59424120, }, // 'YBA ' Yoruba
+  { language: "yos", tag: 0x51494E20, }, // 'QIN ' Yos(retired code) -> Chin
+  { language: "yua", tag: 0x4D594E20, }, // 'MYN ' Yucateco -> Mayan
+  { language: "yue", tag: 0x5A484820, }, // 'ZHH ' Yue Chinese -> Chinese, Traditional, Hong Kong SAR
+  // { language: "yuf", tag: 0x59554620 }, // 'YUF ' Havasupai-Walapai-Yavapai
+  // { language: "ywq", tag: 0x59575120 }, // 'YWQ ' Wuding-Luquan Yi
+  { language: "za", tag: 0x5A484120, }, // 'ZHA ' Zhuang [macrolanguage]
+  { language: "zch", tag: 0x5A484120, }, // 'ZHA ' Central Hongshuihe Zhuang -> Zhuang
+  { language: "zdj", tag: 0x434D5220, }, // 'CMR ' Ngazidja Comorian -> Comorian
+  // { language: "zea", tag: 0x5A454120 }, // 'ZEA ' Zeeuws -> Zealandic
+  { language: "zeh", tag: 0x5A484120, }, // 'ZHA ' Eastern Hongshuihe Zhuang -> Zhuang
+  { language: "zen", tag: 0x42425220, }, // 'BBR ' Zenaga -> Berber
+  { language: "zgb", tag: 0x5A484120, }, // 'ZHA ' Guibei Zhuang -> Zhuang
+  { language: "zgh", tag: 0x5A474820, }, // 'ZGH ' Standard Moroccan Tamazight
+  { language: "zgh", tag: 0x42425220, }, // 'BBR ' Standard Moroccan Tamazight -> Berber
+  { language: "zgm", tag: 0x5A484120, }, // 'ZHA ' Minz Zhuang -> Zhuang
+  { language: "zgn", tag: 0x5A484120, }, // 'ZHA ' Guibian Zhuang -> Zhuang
+  { language: "zh", tag: 0x5A485320, }, // 'ZHS ' Chinese, Simplified [macrolanguage]
+  { language: "zhd", tag: 0x5A484120, }, // 'ZHA ' Dai Zhuang -> Zhuang
+  { language: "zhn", tag: 0x5A484120, }, // 'ZHA ' Nong Zhuang -> Zhuang
+  { language: "zkb", tag: 0x4B484120, }, // 'KHA ' Koibal(retired code) -> Khakass
+  { language: "zlj", tag: 0x5A484120, }, // 'ZHA ' Liujiang Zhuang -> Zhuang
+  { language: "zlm", tag: 0x4D4C5920, }, // 'MLY ' Malay 
+  { language: "zln", tag: 0x5A484120, }, // 'ZHA ' Lianshan Zhuang -> Zhuang
+  { language: "zlq", tag: 0x5A484120, }, // 'ZHA ' Liuqian Zhuang -> Zhuang
+  { language: "zmi", tag: 0x4D4C5920, }, // 'MLY ' Negeri Sembilan Malay -> Malay
+  { language: "zmz", tag: 0x42414430, }, // 'BAD0' Mbandja -> Banda
+  { language: "znd", tag: 0, }, // null Zande  [collection] != Zande
+  { language: "zne", tag: 0x5A4E4420, }, // 'ZND ' Zande 
+  { language: "zom", tag: 0x51494E20, }, // 'QIN ' Zou -> Chin
+  { language: "zqe", tag: 0x5A484120, }, // 'ZHA ' Qiubei Zhuang -> Zhuang
+  { language: "zsm", tag: 0x4D4C5920, }, // 'MLY ' Standard Malay -> Malay
+  { language: "zu", tag: 0x5A554C20, }, // 'ZUL ' Zulu
+  { language: "zum", tag: 0x4C524320, }, // 'LRC ' Kumzari -> Luri
+  { language: "zyb", tag: 0x5A484120, }, // 'ZHA ' Yongbei Zhuang -> Zhuang
+  { language: "zyg", tag: 0x5A484120, }, // 'ZHA ' Yang Zhuang -> Zhuang
+  { language: "zyj", tag: 0x5A484120, }, // 'ZHA ' Youjiang Zhuang -> Zhuang
+  { language: "zyn", tag: 0x5A484120, }, // 'ZHA ' Yongnan Zhuang -> Zhuang
+  { language: "zyp", tag: 0x51494E20, }, // 'QIN ' Zyphe Chin -> Chin
+  // { language: "zza", tag: 0x5A5A4120 }, // 'ZZA ' Zazaki [macrolanguage]
+  { language: "zzj", tag: 0x5A484120, }, // 'ZHA ' Zuojiang Zhuang -> Zhuang
 ]
 
 ///|

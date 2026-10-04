@@ -483,7 +483,7 @@ fn CslSource::derived_style(
 /// including aliases.
 fn archived_style_names() -> Array[(String, String)] {
   let out = []
-  for style in @hayagriva.ArchivedStyle::all() {
+  for style in @hayagriva.ArchivedStyle::all()[:] {
     let names = style.names()
     let main_name = names[0]
     out.push((main_name, style.display_name()))

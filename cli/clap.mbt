@@ -281,7 +281,7 @@ fn CommandSpec::required_usage(
 ///|
 /// The upstream help text of a command (see `help_gen.mbt`).
 fn help_text(key : String, long : Bool) -> String? {
-  for entry in help_texts {
+  for entry in help_texts[:] {
     if entry.0 == key && entry.1 == long {
       return Some(entry.2 + "\n")
     }

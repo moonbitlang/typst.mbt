@@ -40,7 +40,7 @@ let myanmar_zawgyi_shaper : OtShaper = {
 }
 
 ///|
-let myanmar_features : FixedArray[@otf.Tag] = [
+let myanmar_features : ReadOnlyArray[@otf.Tag] = [
   // Basic features.
   // These features are applied in order, one at a time, after reordering,
   // constrained to the syllable.

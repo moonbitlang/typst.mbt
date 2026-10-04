@@ -6,9 +6,9 @@
 /// segmenter.
 priv struct RuleBreakData {
   /// Property table: code point -> property value (ranges `[lo, hi, v]`).
-  property_table : FixedArray[Int]
+  property_table : ReadOnlyArray[Int]
   /// Break state table (ULE bytes).
-  break_state_table : FixedArray[Int]
+  break_state_table : ReadOnlyArray[Int]
   /// Number of properties; should be the square root of the length of `break_state_table`.
   property_count : Int
   /// The index of the last simple state for `break_state_table`. (A simple state has no
@@ -25,8 +25,8 @@ priv struct RuleBreakData {
 
 ///|
 fn RuleBreakData::new(
-  property_table : FixedArray[Int],
-  break_state_table : FixedArray[Int],
+  property_table : ReadOnlyArray[Int],
+  break_state_table : ReadOnlyArray[Int],
   params : (Int, Int, Int, Int, Int),
 ) -> RuleBreakData {
   let (

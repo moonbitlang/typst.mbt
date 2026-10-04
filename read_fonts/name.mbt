@@ -197,7 +197,7 @@ pub fn NameString::to_string(self : NameString) -> String {
 }
 
 ///|
-let mac_roman_decode : FixedArray[Int] = [
+let mac_roman_decode : ReadOnlyArray[Int] = [
   196, 197, 199, 201, 209, 214, 220, 225, 224, 226, 228, 227, 229, 231, 233, 232,
   234, 235, 237, 236, 238, 239, 241, 243, 242, 244, 246, 245, 250, 249, 251, 252,
   8224, 176, 162, 163, 167, 8226, 182, 223, 174, 169, 8482, 180, 168, 8800, 198,
@@ -329,7 +329,7 @@ pub const NAME_ID_FAMILY_NAME : Int = 1
 
 ///|
 /// Mapping from Mac/Windows language ids to BCP 47 tags (sorted by id).
-let language_id_to_bcp47_table : FixedArray[(Int, String)] = [
+let language_id_to_bcp47_table : ReadOnlyArray[(Int, String)] = [
   (0, "en"),
   (1, "fr"),
   (2, "de"),

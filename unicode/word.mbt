@@ -27,7 +27,7 @@ priv enum WordCat {
 } derive(Eq)
 
 ///|
-let word_cats : FixedArray[WordCat] = word_cat_names.map(fn(name) {
+let word_cats : ReadOnlyArray[WordCat] = word_cat_names.map(fn(name) {
   match name {
     "WC_ALetter" => ALetter
     "WC_CR" => CR

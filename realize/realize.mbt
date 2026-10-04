@@ -56,7 +56,7 @@ priv struct State {
   /// The output elements of well-known types.
   sink : Array[Pair]
   /// Grouping rules used for realization.
-  rules : Array[GroupingRule]
+  rules : ReadOnlyArray[GroupingRule]
   /// Currently active groupings.
   groupings : Array[Grouping]
   /// Whether we are currently not within any container or show rule output.
@@ -1029,19 +1029,23 @@ fn to_tag(pair : Pair) -> @library.Tag? {
 
 ///|
 /// Grouping rules used in bundle realization.
-let bundle_rules : Array[GroupingRule] = []
+let bundle_rules : ReadOnlyArray[GroupingRule] = []
 
 ///|
 /// Grouping rules used in normal realization.
-let flow_rules : Array[GroupingRule] = [textual, par, cites, list, enum_, terms]
+let flow_rules : ReadOnlyArray[GroupingRule] = [
+  textual, par, cites, list, enum_, terms,
+]
 
 ///|
 /// Grouping rules used in paragraph realization.
-let par_rules : Array[GroupingRule] = [textual, cites, list, enum_, terms]
+let par_rules : ReadOnlyArray[GroupingRule] = [
+  textual, cites, list, enum_, terms,
+]
 
 ///|
 /// Grouping rules used in math realization.
-let math_rules : Array[GroupingRule] = [cites, list, enum_, terms]
+let math_rules : ReadOnlyArray[GroupingRule] = [cites, list, enum_, terms]
 
 ///|
 /// Groups adjacent textual elements for text show rule application.

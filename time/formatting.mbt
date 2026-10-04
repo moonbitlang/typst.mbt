@@ -1,13 +1,13 @@
 // Port of `time/src/formatting/{mod,formattable,component_provider}.rs`.
 
 ///|
-let month_names : FixedArray[String] = [
+let month_names : ReadOnlyArray[String] = [
   "January", "February", "March", "April", "May", "June", "July", "August", "September",
   "October", "November", "December",
 ]
 
 ///|
-let weekday_names : FixedArray[String] = [
+let weekday_names : ReadOnlyArray[String] = [
   "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday",
 ]
 

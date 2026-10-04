@@ -198,7 +198,7 @@ fn matrix_row(x : Float, y : Float, z : Float, m : FixedArray[Float]) -> Float {
 /// The inverse of the sRGB profile's colorant matrix
 /// (`ColorProfile::new_srgb().rgb_to_xyz_matrix().inverse()` in `moxcms`,
 /// D50-adapted, computed in `f64`).
-let srgb_xyz_to_rgb_d50 : FixedArray[Double] = [
+let srgb_xyz_to_rgb_d50 : ReadOnlyArray[Double] = [
   3.135943378956364, -1.6186452789750814, -0.49088075237649664, -0.9786401066803629,
   1.916001955909481, 0.03346461697728635, 0.07198041691508127, -0.22910802546197936,
   1.4053805920915055,
@@ -256,7 +256,9 @@ fn cmyk_build_grid() -> FixedArray[Int] {
   })
   let v2_to_v4 = Float::from_int(65535) / 65280.0
   let pcs_scale = Float::from_int(65535) / 32768.0
-  let m : FixedArray[Float] = srgb_xyz_to_rgb_d50.map(Float::from_double)
+  let m : FixedArray[Float] = FixedArray::makei(srgb_xyz_to_rgb_d50.length(), i => {
+    Float::from_double(srgb_xyz_to_rgb_d50[i])
+  })
   let gamma = srgb_gamma_table()
   let lut_cap : Float = 4095.0
   let s = cmyk_grid_size
@@ -267,7 +269,7 @@ fn cmyk_build_grid() -> FixedArray[Int] {
     for c in 0..<s {
       for mm in 0..<s {
         for y in 0..<s {
-          let src = [
+          let src : ReadOnlyArray[_] = [
             Float::from_int(c) * recpeq,
             Float::from_int(mm) * recpeq,
             Float::from_int(y) * recpeq,
@@ -290,7 +292,7 @@ fn cmyk_build_grid() -> FixedArray[Int] {
           let x1 = matrix_row(x, yy, z, [pcs_scale, 0.0, 0.0])
           let y1 = matrix_row(x, yy, z, [0.0, pcs_scale, 0.0])
           let z1 = matrix_row(x, yy, z, [0.0, 0.0, pcs_scale])
-          let rgb = [
+          let rgb : ReadOnlyArray[_] = [
             matrix_row(x1, y1, z1, [m[0], m[1], m[2]]),
             matrix_row(x1, y1, z1, [m[3], m[4], m[5]]),
             matrix_row(x1, y1, z1, [m[6], m[7], m[8]]),

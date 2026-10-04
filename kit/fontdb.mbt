@@ -32,7 +32,7 @@ fn FontDb::new() -> FontDb {
 
 ///|
 /// The extensions `load_fonts_dir` considers.
-let font_extensions : Array[String] = [
+let font_extensions : ReadOnlyArray[String] = [
   "ttf", "ttc", "TTF", "TTC", "otf", "otc", "OTF", "OTC",
 ]
 
@@ -168,7 +168,7 @@ fn is_mac_roman(name : @otf.Name) -> Bool {
 ///|
 /// The tables that face admission and `FontInfo::from_ttf` read (the first
 /// three are required by `Face::parse`).
-let probe_tables : Array[String] = [
+let probe_tables : ReadOnlyArray[String] = [
   "head", "hhea", "maxp", "name", "OS/2", "post", "cmap", "fvar", "MATH",
 ]
 

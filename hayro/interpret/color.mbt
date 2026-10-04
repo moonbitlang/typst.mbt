@@ -581,27 +581,27 @@ fn CalRgb::new(dict : @hayro_syntax.Dict) -> CalRgb? {
 }
 
 ///|
-let bradford_scale_matrix : FixedArray[Float] = [
+let bradford_scale_matrix : ReadOnlyArray[Float] = [
   0.8951, 0.2664, -0.1614, -0.7502, 1.7135, 0.0367, 0.0389, -0.0685, 1.0296,
 ]
 
 ///|
-let bradford_scale_inverse_matrix : FixedArray[Float] = [
+let bradford_scale_inverse_matrix : ReadOnlyArray[Float] = [
   0.9869929, -0.1470543, 0.1599627, 0.4323053, 0.5183603, 0.0492912, -0.0085287,
   0.0400428, 0.9684867,
 ]
 
 ///|
-let srgb_d65_xyz_to_rgb_matrix : FixedArray[Float] = [
+let srgb_d65_xyz_to_rgb_matrix : ReadOnlyArray[Float] = [
   3.2404542, -1.5371385, -0.4985314, -0.969_266, 1.8760108, 0.0415560, 0.0556434,
   -0.2040259, 1.0572252,
 ]
 
 ///|
-let flat_whitepoint : FixedArray[Float] = [1.0, 1.0, 1.0]
+let flat_whitepoint : ReadOnlyArray[Float] = [1.0, 1.0, 1.0]
 
 ///|
-let d65_whitepoint : FixedArray[Float] = [0.95047, 1.0, 1.08883]
+let d65_whitepoint : ReadOnlyArray[Float] = [0.95047, 1.0, 1.08883]
 
 ///|
 fn cal_rgb_decode_l_constant() -> Float {
@@ -621,7 +621,7 @@ fn cal_rgb_srgb_transfer_function(color : Float) -> Float {
 
 ///|
 fn cal_rgb_matrix_product(
-  a : FixedArray[Float],
+  a : ReadOnlyArray[Float],
   b : FixedArray[Float],
 ) -> FixedArray[Float] {
   [
@@ -645,7 +645,7 @@ fn cal_rgb_to_flat(
 
 ///|
 fn cal_rgb_to_d65(
-  source_white_point : FixedArray[Float],
+  source_white_point : ReadOnlyArray[Float],
   lms : FixedArray[Float],
 ) -> FixedArray[Float] {
   [
@@ -703,7 +703,7 @@ fn CalRgb::normalize_white_point_to_flat(
 ///|
 fn CalRgb::normalize_white_point_to_d65(
   _self : CalRgb,
-  source_white_point : FixedArray[Float],
+  source_white_point : ReadOnlyArray[Float],
   xyz : FixedArray[Float],
 ) -> FixedArray[Float] {
   let lms = cal_rgb_matrix_product(bradford_scale_matrix, xyz)

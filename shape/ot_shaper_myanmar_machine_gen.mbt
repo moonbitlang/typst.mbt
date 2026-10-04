@@ -3,13 +3,13 @@
 
 ///|
 /// `_myanmar_syllable_machine_actions: [i8; 21]`
-let myanmar_syllable_machine_actions : FixedArray[Int] = [
+let myanmar_syllable_machine_actions : ReadOnlyArray[Int] = [
   0, 1, 0, 1, 1, 1, 2, 1, 3, 1, 4, 1, 5, 1, 6, 1, 7, 1, 8, 0, 0,
 ]
 
 ///|
 /// `_myanmar_syllable_machine_key_offsets: [i16; 57]`
-let myanmar_syllable_machine_key_offsets : FixedArray[Int] = [
+let myanmar_syllable_machine_key_offsets : ReadOnlyArray[Int] = [
   0, 24, 42, 48, 51, 62, 69, 76, 81, 85, 93, 102, 112, 117, 120, 129, 137, 148, 158,
   174, 186, 197, 210, 223, 238, 252, 269, 275, 278, 289, 296, 303, 308, 312, 320,
   329, 339, 344, 347, 365, 374, 382, 393, 403, 419, 431, 442, 455, 468, 483, 497,
@@ -18,7 +18,7 @@ let myanmar_syllable_machine_key_offsets : FixedArray[Int] = [
 
 ///|
 /// `_myanmar_syllable_machine_trans_keys: [u8; 579]`
-let myanmar_syllable_machine_trans_keys : FixedArray[Int] = [
+let myanmar_syllable_machine_trans_keys : ReadOnlyArray[Int] = [
   3, 4, 8, 9, 15, 18, 20, 21, 22, 23, 32, 35, 36, 37, 38, 39, 40, 41, 1, 2, 5, 6,
   10, 11, 3, 4, 8, 9, 20, 21, 22, 23, 32, 35, 36, 37, 38, 39, 40, 41, 5, 6, 8, 23,
   32, 39, 5, 6, 8, 5, 6, 3, 8, 9, 20, 23, 32, 35, 39, 41, 5, 6, 3, 8, 9, 23, 39,
@@ -49,7 +49,7 @@ let myanmar_syllable_machine_trans_keys : FixedArray[Int] = [
 
 ///|
 /// `_myanmar_syllable_machine_single_lengths: [i8; 57]`
-let myanmar_syllable_machine_single_lengths : FixedArray[Int] = [
+let myanmar_syllable_machine_single_lengths : ReadOnlyArray[Int] = [
   18, 16, 4, 1, 9, 5, 5, 3, 2, 6, 7, 8, 3, 1, 7, 6, 9, 8, 14, 10, 9, 11, 11, 13,
   12, 15, 4, 1, 9, 5, 5, 3, 2, 6, 7, 8, 3, 1, 16, 7, 6, 9, 8, 14, 10, 9, 11, 11,
   13, 12, 15, 16, 15, 17, 1, 0, 0,
@@ -57,7 +57,7 @@ let myanmar_syllable_machine_single_lengths : FixedArray[Int] = [
 
 ///|
 /// `_myanmar_syllable_machine_range_lengths: [i8; 57]`
-let myanmar_syllable_machine_range_lengths : FixedArray[Int] = [
+let myanmar_syllable_machine_range_lengths : ReadOnlyArray[Int] = [
   3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3,
   2, 0, 0,
@@ -65,7 +65,7 @@ let myanmar_syllable_machine_range_lengths : FixedArray[Int] = [
 
 ///|
 /// `_myanmar_syllable_machine_index_offsets: [i16; 57]`
-let myanmar_syllable_machine_index_offsets : FixedArray[Int] = [
+let myanmar_syllable_machine_index_offsets : ReadOnlyArray[Int] = [
   0, 22, 40, 46, 49, 60, 67, 74, 79, 83, 91, 100, 110, 115, 118, 127, 135, 146, 156,
   172, 184, 195, 208, 221, 236, 250, 267, 273, 276, 287, 294, 301, 306, 310, 318,
   327, 337, 342, 345, 363, 372, 380, 391, 401, 417, 429, 440, 453, 466, 481, 495,
@@ -74,7 +74,7 @@ let myanmar_syllable_machine_index_offsets : FixedArray[Int] = [
 
 ///|
 /// `_myanmar_syllable_machine_cond_targs: [i8; 629]`
-let myanmar_syllable_machine_cond_targs : FixedArray[Int] = [
+let myanmar_syllable_machine_cond_targs : ReadOnlyArray[Int] = [
   26, 37, 27, 29, 51, 54, 39, 40, 41, 28, 43, 44, 46, 47, 48, 30, 50, 45, 1, 0, 1,
   0, 2, 13, 3, 5, 14, 15, 16, 4, 18, 19, 21, 22, 23, 6, 25, 20, 0, 0, 3, 4, 12, 6,
   0, 0, 3, 0, 0, 2, 3, 5, 9, 4, 10, 11, 6, 10, 0, 0, 2, 3, 5, 4, 6, 0, 0, 7, 3, 6,
@@ -107,7 +107,7 @@ let myanmar_syllable_machine_cond_targs : FixedArray[Int] = [
 
 ///|
 /// `_myanmar_syllable_machine_cond_actions: [i8; 629]`
-let myanmar_syllable_machine_cond_actions : FixedArray[Int] = [
+let myanmar_syllable_machine_cond_actions : ReadOnlyArray[Int] = [
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 11, 0, 0, 0, 0,
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 13, 0, 0, 0, 0, 5, 13, 0, 5, 13, 0, 0, 0,
   0, 0, 0, 0, 0, 0, 5, 13, 0, 0, 0, 0, 0, 5, 13, 0, 0, 0, 0, 0, 5, 13, 0, 0, 0, 5,
@@ -137,7 +137,7 @@ let myanmar_syllable_machine_cond_actions : FixedArray[Int] = [
 
 ///|
 /// `_myanmar_syllable_machine_to_state_actions: [i8; 57]`
-let myanmar_syllable_machine_to_state_actions : FixedArray[Int] = [
+let myanmar_syllable_machine_to_state_actions : ReadOnlyArray[Int] = [
   1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   0, 0, 0,
@@ -145,7 +145,7 @@ let myanmar_syllable_machine_to_state_actions : FixedArray[Int] = [
 
 ///|
 /// `_myanmar_syllable_machine_from_state_actions: [i8; 57]`
-let myanmar_syllable_machine_from_state_actions : FixedArray[Int] = [
+let myanmar_syllable_machine_from_state_actions : ReadOnlyArray[Int] = [
   3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   0, 0, 0,
@@ -153,7 +153,7 @@ let myanmar_syllable_machine_from_state_actions : FixedArray[Int] = [
 
 ///|
 /// `_myanmar_syllable_machine_eof_trans: [i16; 57]`
-let myanmar_syllable_machine_eof_trans : FixedArray[Int] = [
+let myanmar_syllable_machine_eof_trans : ReadOnlyArray[Int] = [
   573, 574, 575, 576, 577, 578, 579, 580, 581, 582, 583, 584, 585, 586, 587, 588,
   589, 590, 591, 592, 593, 594, 595, 596, 597, 598, 599, 600, 601, 602, 603, 604,
   605, 606, 607, 608, 609, 610, 611, 612, 613, 614, 615, 616, 617, 618, 619, 620,

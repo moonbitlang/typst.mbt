@@ -125,17 +125,17 @@ fn musl_cosf(x : Float) -> Float {
 }
 
 ///|
-let atan_hi : FixedArray[Float] = [
+let atan_hi : ReadOnlyArray[Float] = [
   4.6364760399e-01, 7.8539812565e-01, 9.8279368877e-01, 1.5707962513e+00,
 ]
 
 ///|
-let atan_lo : FixedArray[Float] = [
+let atan_lo : ReadOnlyArray[Float] = [
   5.0121582440e-09, 3.7748947079e-08, 3.4473217170e-08, 7.5497894159e-08,
 ]
 
 ///|
-let a_t : FixedArray[Float] = [
+let a_t : ReadOnlyArray[Float] = [
   3.3333328366e-01, -1.9999158382e-01, 1.4253635705e-01, -1.0648017377e-01, 6.1687607318e-02,
 ]
 

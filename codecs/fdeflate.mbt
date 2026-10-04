@@ -7,14 +7,14 @@ let fdeflate_huffman_codes : FixedArray[Int] = compute_codes(
 )
 
 ///|
-let fdeflate_bitmasks : FixedArray[UInt] = [
+let fdeflate_bitmasks : ReadOnlyArray[UInt] = [
   0x0000, 0x0001, 0x0003, 0x0007, 0x000F, 0x001F, 0x003F, 0x007F, 0x00FF, 0x01FF,
   0x03FF, 0x07FF, 0x0FFF, 0x1FFF, 0x3FFF, 0x7FFF, 0xFFFF,
 ]
 
 ///|
 /// Computes canonical (bit-reversed) Huffman codes from code lengths.
-fn compute_codes(lengths : FixedArray[Int]) -> FixedArray[Int] {
+fn compute_codes(lengths : ReadOnlyArray[Int]) -> FixedArray[Int] {
   let codes = FixedArray::make(lengths.length(), 0)
   let mut code = 0U
   for len in 1..<=16 {
@@ -158,7 +158,7 @@ pub fn Compressor::new() -> Compressor {
 }
 
 ///|
-let fdeflate_header : FixedArray[Int] = [
+let fdeflate_header : ReadOnlyArray[Int] = [
   120, 1, 237, 192, 3, 160, 36, 89, 150, 198, 241, 255, 119, 238, 141, 200, 204,
   167, 114, 75, 99, 174, 109, 219, 182, 109, 219, 182, 109, 219, 182, 109, 105, 140,
   158, 150, 74, 175, 158, 50, 51, 34, 238, 249, 118, 183, 106, 122, 166, 135, 59,

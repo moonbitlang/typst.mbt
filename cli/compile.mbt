@@ -627,7 +627,7 @@ fn export_image_pages(
 }
 
 ///|
-let indexable_templates : Array[String] = ["{p}", "{0p}", "{n}"]
+let indexable_templates : ReadOnlyArray[String] = ["{p}", "{0p}", "{n}"]
 
 ///|
 fn has_indexable_template(output : String) -> Bool {

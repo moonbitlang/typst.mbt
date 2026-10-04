@@ -27,7 +27,7 @@ pub impl Default for CitationForm with fn default() {
 }
 
 ///|
-let citation_form_casts : Array[(String, CitationForm, String)] = [
+let citation_form_casts : ReadOnlyArray[(String, CitationForm, String)] = [
   ("normal", Normal, "Display in the standard way for the active style."),
   (
     "prose",
@@ -46,7 +46,7 @@ let citation_form_casts : Array[(String, CitationForm, String)] = [
 ///|
 pub impl Reflect for CitationForm with fn input() {
   Union(
-    citation_form_casts.map(entry => CastInfo::Value(Str(entry.0), entry.2)),
+    citation_form_casts[:].map(entry => CastInfo::Value(Str(entry.0), entry.2)),
   )
 }
 
@@ -65,7 +65,7 @@ pub impl Reflect for CitationForm with fn castable(v) {
 
 ///|
 pub impl IntoValue for CitationForm with fn into_value(self) {
-  for entry in citation_form_casts {
+  for entry in citation_form_casts[:] {
     if entry.1 == self {
       return Str(entry.0)
     }
@@ -76,7 +76,7 @@ pub impl IntoValue for CitationForm with fn into_value(self) {
 ///|
 pub impl FromValue for CitationForm with fn from_value(v) {
   if v is Str(s) {
-    for entry in citation_form_casts {
+    for entry in citation_form_casts[:] {
       if entry.0 == s {
         return entry.1
       }

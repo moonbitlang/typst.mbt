@@ -66,7 +66,7 @@ fn reorder_marks_hebrew(
 }
 
 ///|
-let s_dagesh_forms : FixedArray[Int] = [
+let s_dagesh_forms : ReadOnlyArray[Int] = [
   0xFB30, // ALEF
    0xFB31, // BET
    0xFB32, // GIMEL

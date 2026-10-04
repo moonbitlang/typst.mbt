@@ -254,7 +254,7 @@ fn OpenTypeFontBlob::glyph_names(
   guard (try? self.font_ref.post()) is Ok(post) else { return glyph_names }
   match post.version().to_major_minor() {
     (1, 0) =>
-      for gid, name in @read_fonts.default_glyph_names {
+      for gid, name in @read_fonts.default_glyph_names[:] {
         glyph_names[name] = GlyphId::new(gid.reinterpret_as_uint())
       }
     (2, 0) => {

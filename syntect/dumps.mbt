@@ -183,7 +183,7 @@ fn Decoder::context(self : Decoder, table : Array[Scope]) -> Context {
 /// table and syntax metadata) and the contexts of each syntax.
 pub fn SyntaxSet::from_compact(
   header : String,
-  contexts : FixedArray[String],
+  contexts : ReadOnlyArray[String],
 ) -> SyntaxSet {
   let d : Decoder = { s: header, pos: 0, }
   let nscopes = d.int()

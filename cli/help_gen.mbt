@@ -1134,7 +1134,7 @@ let help_info_long : String =
 
 ///|
 /// The help texts: (command, long?, text without the final newline).
-let help_texts : Array[(String, Bool, String)] = [
+let help_texts : ReadOnlyArray[(String, Bool, String)] = [
   ("", false, help_main_short),
   ("", true, help_main_long),
   ("compile", false, help_compile_short),

@@ -3,14 +3,14 @@
 
 ///|
 /// `_indic_syllable_machine_actions: [i8; 44]`
-let indic_syllable_machine_actions : FixedArray[Int] = [
+let indic_syllable_machine_actions : ReadOnlyArray[Int] = [
   0, 1, 0, 1, 1, 1, 2, 1, 6, 1, 7, 1, 8, 1, 9, 1, 10, 1, 11, 1, 12, 1, 13, 1, 14,
   1, 15, 1, 16, 1, 17, 1, 18, 2, 2, 3, 2, 2, 4, 2, 2, 5, 0, 0,
 ]
 
 ///|
 /// `_indic_syllable_machine_key_offsets: [i16; 140]`
-let indic_syllable_machine_key_offsets : FixedArray[Int] = [
+let indic_syllable_machine_key_offsets : ReadOnlyArray[Int] = [
   0, 1, 7, 12, 17, 18, 24, 31, 37, 38, 43, 48, 49, 55, 62, 69, 76, 77, 82, 87, 88,
   94, 100, 107, 108, 113, 118, 119, 125, 131, 136, 137, 155, 165, 174, 182, 188,
   192, 195, 196, 198, 205, 211, 217, 225, 232, 238, 242, 249, 253, 258, 262, 271,
@@ -24,7 +24,7 @@ let indic_syllable_machine_key_offsets : FixedArray[Int] = [
 
 ///|
 /// `_indic_syllable_machine_trans_keys: [u8; 802]`
-let indic_syllable_machine_trans_keys : FixedArray[Int] = [
+let indic_syllable_machine_trans_keys : ReadOnlyArray[Int] = [
   8, 4, 7, 8, 13, 5, 6, 7, 8, 13, 5, 6, 7, 8, 13, 5, 6, 13, 4, 7, 8, 13, 5, 6, 4,
   7, 8, 12, 13, 5, 6, 4, 7, 8, 13, 5, 6, 8, 7, 8, 13, 5, 6, 7, 8, 13, 5, 6, 13, 4,
   7, 8, 13, 5, 6, 4, 7, 8, 12, 13, 5, 6, 4, 7, 8, 12, 13, 5, 6, 4, 7, 8, 12, 13,
@@ -62,7 +62,7 @@ let indic_syllable_machine_trans_keys : FixedArray[Int] = [
 
 ///|
 /// `_indic_syllable_machine_single_lengths: [i8; 140]`
-let indic_syllable_machine_single_lengths : FixedArray[Int] = [
+let indic_syllable_machine_single_lengths : ReadOnlyArray[Int] = [
   1, 4, 3, 3, 1, 4, 5, 4, 1, 3, 3, 1, 4, 5, 5, 5, 1, 3, 3, 1, 4, 4, 5, 1, 3, 3, 1,
   4, 4, 3, 1, 16, 10, 7, 6, 6, 2, 3, 1, 2, 5, 4, 6, 6, 5, 4, 4, 5, 4, 3, 4, 7, 10,
   10, 9, 8, 6, 10, 7, 6, 6, 3, 1, 2, 5, 4, 6, 5, 4, 4, 5, 4, 2, 3, 4, 7, 10, 4, 9,
@@ -73,7 +73,7 @@ let indic_syllable_machine_single_lengths : FixedArray[Int] = [
 
 ///|
 /// `_indic_syllable_machine_range_lengths: [i8; 140]`
-let indic_syllable_machine_range_lengths : FixedArray[Int] = [
+let indic_syllable_machine_range_lengths : ReadOnlyArray[Int] = [
   0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0,
   1, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 0,
   0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1, 1,
@@ -84,7 +84,7 @@ let indic_syllable_machine_range_lengths : FixedArray[Int] = [
 
 ///|
 /// `_indic_syllable_machine_index_offsets: [i16; 140]`
-let indic_syllable_machine_index_offsets : FixedArray[Int] = [
+let indic_syllable_machine_index_offsets : ReadOnlyArray[Int] = [
   0, 2, 8, 13, 18, 20, 26, 33, 39, 41, 46, 51, 53, 59, 66, 73, 80, 82, 87, 92, 94,
   100, 106, 113, 115, 120, 125, 127, 133, 139, 144, 146, 164, 175, 184, 192, 199,
   203, 207, 209, 212, 219, 225, 232, 240, 247, 253, 258, 265, 270, 275, 280, 289,
@@ -98,7 +98,7 @@ let indic_syllable_machine_index_offsets : FixedArray[Int] = [
 
 ///|
 /// `_indic_syllable_machine_cond_targs: [i16; 1003]`
-let indic_syllable_machine_cond_targs : FixedArray[Int] = [
+let indic_syllable_machine_cond_targs : ReadOnlyArray[Int] = [
   37, 31, 42, 43, 46, 43, 2, 31, 43, 4, 43, 2, 31, 43, 46, 43, 2, 31, 43, 31, 50,
   43, 46, 43, 2, 31, 42, 43, 46, 51, 43, 2, 31, 60, 66, 69, 66, 9, 31, 61, 31, 66,
   11, 66, 9, 31, 66, 69, 66, 9, 31, 66, 31, 74, 66, 69, 66, 9, 31, 60, 66, 69, 75,
@@ -155,7 +155,7 @@ let indic_syllable_machine_cond_targs : FixedArray[Int] = [
 
 ///|
 /// `_indic_syllable_machine_cond_actions: [i8; 1003]`
-let indic_syllable_machine_cond_actions : FixedArray[Int] = [
+let indic_syllable_machine_cond_actions : ReadOnlyArray[Int] = [
   0, 21, 5, 5, 0, 5, 0, 21, 5, 0, 5, 0, 21, 5, 0, 5, 0, 21, 5, 21, 5, 5, 0, 5, 0,
   21, 5, 5, 0, 5, 5, 0, 21, 5, 5, 0, 5, 0, 23, 0, 23, 5, 0, 5, 0, 23, 5, 0, 5, 0,
   23, 5, 23, 5, 5, 0, 5, 0, 23, 5, 5, 0, 5, 5, 0, 23, 5, 5, 0, 5, 5, 0, 23, 5, 36,
@@ -202,7 +202,7 @@ let indic_syllable_machine_cond_actions : FixedArray[Int] = [
 
 ///|
 /// `_indic_syllable_machine_to_state_actions: [i8; 140]`
-let indic_syllable_machine_to_state_actions : FixedArray[Int] = [
+let indic_syllable_machine_to_state_actions : ReadOnlyArray[Int] = [
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -213,7 +213,7 @@ let indic_syllable_machine_to_state_actions : FixedArray[Int] = [
 
 ///|
 /// `_indic_syllable_machine_from_state_actions: [i8; 140]`
-let indic_syllable_machine_from_state_actions : FixedArray[Int] = [
+let indic_syllable_machine_from_state_actions : ReadOnlyArray[Int] = [
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -224,7 +224,7 @@ let indic_syllable_machine_from_state_actions : FixedArray[Int] = [
 
 ///|
 /// `_indic_syllable_machine_eof_trans: [i16; 140]`
-let indic_syllable_machine_eof_trans : FixedArray[Int] = [
+let indic_syllable_machine_eof_trans : ReadOnlyArray[Int] = [
   864, 865, 866, 867, 868, 869, 870, 871, 872, 873, 874, 875, 876, 877, 878, 879,
   880, 881, 882, 883, 884, 885, 886, 887, 888, 889, 890, 891, 892, 893, 894, 895,
   896, 897, 898, 899, 900, 901, 902, 903, 904, 905, 906, 907, 908, 909, 910, 911,

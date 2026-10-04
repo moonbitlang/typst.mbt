@@ -14,7 +14,7 @@ pub struct Version(Array[UInt]) derive(Hash)
 
 ///|
 /// The names of the first three components.
-let version_components : Array[String] = ["major", "minor", "patch"]
+let version_components : ReadOnlyArray[String] = ["major", "minor", "patch"]
 
 ///|
 /// Create a new (empty) version.

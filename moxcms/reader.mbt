@@ -678,7 +678,7 @@ fn read_trc_tag(
     if entry_count > 4 {
       raise MalformedTrcCurve("Parametric curve has unknown entries count")
     }
-    let count_to_length = [1, 3, 4, 5, 7] // PARAMETRIC_CURVE_TYPE
+    let count_to_length : ReadOnlyArray[_] = [1, 3, 4, 5, 7] // PARAMETRIC_CURVE_TYPE
     let n = count_to_length[entry_count]
     if tag.length() < 12 + n * 4 {
       raise MalformedTrcCurve(
