@@ -52,13 +52,22 @@ pub fn Lang::as_str(self : Lang) -> String {
 ///|
 /// The default direction for the language.
 pub fn Lang::dir(self : Lang) -> Dir {
-  if [
-      lang_arabic, lang_divehi, lang_persian, lang_hebrew, lang_kashmiri, lang_punjabi,
-      lang_pashto, lang_sindhi, lang_uyghur, lang_urdu, lang_yiddish,
-    ].contains(self) {
-    RTL
-  } else {
-    LTR
+  // The codes of `[ARABIC, DIVEHI, PERSIAN, HEBREW, KASHMIRI, PUNJABI,
+  // PASHTO, SINDHI, UYGHUR, URDU, YIDDISH].contains(self)`, matched without
+  // allocating the array on every call.
+  match self.0 {
+    "ar"
+    | "dv"
+    | "fa"
+    | "he"
+    | "ks"
+    | "pa"
+    | "ps"
+    | "sd"
+    | "ug"
+    | "ur"
+    | "yi" => RTL
+    _ => LTR
   }
 }
 
