@@ -2,8 +2,8 @@
 # Benchmarks the typst.mbt CLI against upstream Typst with hyperfine.
 #
 # Usage: bench/run.sh [--no-build] [--runs N] [workload...]
-#   workloads: startup compile pdf svg png showcase longer (default: all but
-#   longer)
+#   workloads: startup compile pdf svg png showcase showcase-png longer
+#   (default: all but longer)
 #
 # Environment:
 #   TYPST_MBT  the MoonBit CLI binary (default: the native release build)
@@ -43,7 +43,7 @@ while [ $# -gt 0 ]; do
   esac
   shift
 done
-[ ${#workloads[@]} -eq 0 ] && workloads=(startup compile pdf svg png showcase)
+[ ${#workloads[@]} -eq 0 ] && workloads=(startup compile pdf svg png showcase showcase-png)
 
 if [ "$build" = 1 ]; then
   (cd "$root" && moon build cli --target native --release)
@@ -77,6 +77,7 @@ for w in "${workloads[@]}"; do
     longer) run longer query "${common[*]}" "$bench/longer.typ" heading ;;
     # The showcase uses system fonts (Geeza Pro, PingFang SC on macOS).
     showcase) run showcase compile --root "$bench" "$bench/showcase.typ" "{out}/showcase.pdf" ;;
+    showcase-png) run showcase-png compile --root "$bench" "$bench/showcase.typ" "{out}/showcase-{p}.png" ;;
     *) echo "unknown workload: $w" >&2; exit 1 ;;
   esac
 done

@@ -65,16 +65,32 @@ goldens with `scripts/goldens.sh <stage>` (needs Rust; builds `oracle/`).
 - [ ] **Performance** (`bench/run.sh`, `bench/README.md`; M-series Mac,
   native release, embedded fonts only, upstream `--jobs 1`; 2026-10-04):
 
-  | workload | Rust | before | memoized | ReadOnlyArray | now vs Rust |
-  |---|---:|---:|---:|---:|---:|
-  | `--version` (process startup only) | 4.8 ms | | 6.7 ms | 3.5 ms | 0.7× |
-  | startup (`tiny.typ` → PDF) | 7.6 ms | 80 ms | 22.7 ms | 19.8 ms | 2.6× |
-  | `long.typ` compile (`query`) | 105 ms | 1.32 s | 315 ms | 311 ms | 3.0× |
-  | `long.typ` → PDF | 120 ms | 1.45 s | 451 ms | 446 ms | 3.7× |
-  | `long.typ` → SVG | 188 ms | 1.98 s | 479 ms | 472 ms | 2.5× |
-  | `long.typ` → PNG (24 pages) | 945 ms | 5.32 s | 2.68 s | 2.65 s | 2.8× |
-  | `showcase.typ` → PDF (system fonts) | 298 ms | 2.25 s | 1.35 s | 1.32 s | 4.4× |
-  | `longer.typ` compile | 478 ms | 6.58 s | 1.56 s | 1.56 s | 3.3× |
+  | workload | Rust | before | memoized | ReadOnlyArray | v128 | now vs Rust |
+  |---|---:|---:|---:|---:|---:|---:|
+  | `--version` (process startup only) | 4.8 ms | | 6.7 ms | 3.5 ms | | 0.7× |
+  | startup (`tiny.typ` → PDF) | 6.9 ms | 80 ms | 22.7 ms | 19.9 ms | 20.0 ms | 2.9× |
+  | `long.typ` compile (`query`) | 103 ms | 1.32 s | 315 ms | 299 ms | 299 ms | 2.9× |
+  | `long.typ` → PDF | 118 ms | 1.45 s | 451 ms | 418 ms | 428 ms | 3.6× |
+  | `long.typ` → SVG | 178 ms | 1.98 s | 479 ms | 445 ms | 444 ms | 2.5× |
+  | `long.typ` → PNG (24 pages) | 941 ms | 5.32 s | 2.68 s | 2.66 s | 1.37 s | 1.45× |
+  | `showcase.typ` → PDF (system fonts) | 277 ms | 2.25 s | 1.35 s | 1.31 s | 1.20 s | 4.3× |
+  | `showcase.typ` → PNG (system fonts) | 541 ms | | | 1.58 s | 1.06 s | 2.0× |
+  | `longer.typ` compile | 478 ms | 6.58 s | 1.56 s | 1.56 s | | 3.3× |
+
+  The "v128" column (2026-10-04, side by side with "ReadOnlyArray" = main
+  at d6cd58c, re-measured) adds the SIMD export kernels (AGENTS.md: v128
+  kernels): zlib loads/`compare256`/adler32, PNG filters, demultiply,
+  JPEG IDCT/YCbCr/up-sampling, image resampling, pic_scale, vello_cpu
+  compositing, plus pixglyph's `#valtype` `Point` and fewer deflate
+  allocations. PDF/SVG of `long.typ` do not reach them. The same documents
+  on the wasm targets (`moonrun`, `--ignore-system-fonts`):
+
+  | workload | wasm before | wasm v128 | wasm-gc before | wasm-gc now |
+  |---|---:|---:|---:|---:|
+  | `long.typ` → PNG | 7.91 s | 4.42 s | 4.76 s | 4.54 s |
+  | `showcase.typ` → PNG | 6.18 s | 2.75 s | 2.77 s | 2.10 s |
+
+  (wasm-gc and js keep the scalar kernels: `@v128` is emulated there.)
 
   ("memoized" and "ReadOnlyArray" re-measured side by side on 2026-10-04,
   hyperfine, runs interleaved.) Constant tables as static `ReadOnlyArray`
@@ -100,10 +116,12 @@ goldens with `scripts/goldens.sh <stage>` (needs Rust; builds `oracle/`).
   Remaining hot spots: allocation/RC (~35% of compile), line breaking and
   shaping (rustybuzz port), style-chain lookups (values are cast from
   `Value` on every read), grid layout; PDF: pdflite's flate (font streams);
-  PNG: zlib deflate and PNG filtering; showcase: system font discovery
-  (parses every installed face), JPEG decoding. Not done: lazy embedded
-  `FontInfo` (startup), memoizing the state sequence (closure identity, see
-  AGENTS.md), typed style caches.
+  PNG: zlib-rs' `deflate_medium` (hash chains, scalar; ~55% of `long.typ`
+  → PNG), pixglyph's line rasterization, crc32 (no PMULL in `@v128`);
+  showcase: system font discovery (parses every installed face) and
+  pdflite's flate (font and image streams, most of its PDF export). Not
+  done: lazy embedded `FontInfo` (startup), memoizing the state sequence
+  (closure identity, see AGENTS.md), typed style caches.
 - [ ] **Build times**: the `library` package dominates (serial compile,
   ~80–95 s release rebuild). Consider splitting it into several packages
   along upstream module lines so `-j` parallelizes builds.

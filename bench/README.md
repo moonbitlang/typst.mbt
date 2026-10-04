@@ -14,15 +14,17 @@ workload against the upstream binary (`.repos/typst/target/release/typst`,
 or `$TYPST_RS`; run single-threaded with `--jobs 1`):
 
 ```sh
-bench/run.sh                     # startup compile pdf svg png showcase
+bench/run.sh                     # all but longer
 bench/run.sh --no-build compile  # just `query long.typ heading`
 bench/run.sh --runs 20 pdf svg
 ```
 
 Workloads: `startup` (`tiny.typ` → PDF), `compile` (`query long.typ
 heading`: compile without export), `pdf`, `svg`, `png` (`long.typ` to one
-file per page), `showcase` (→ PDF, with system fonts), `longer`. All but
-`showcase` pass `--ignore-system-fonts`, so only the embedded fonts are used.
+file per page), `showcase` (→ PDF, with system fonts), `showcase-png`
+(→ PNG: JPEG decoding, image resampling, PDF and SVG images), `longer`.
+All but the showcase pass `--ignore-system-fonts`, so only the embedded
+fonts are used.
 
 To profile, run e.g. `moon run --profile --target native --release cli --
 query --ignore-system-fonts bench/longer.typ heading` (macOS: needs Xcode's
