@@ -855,31 +855,33 @@ fn ShapedText::hyphen(
 ) -> ShapedText? {
   let world = engine.world
   let book = world.book()
-  let chain : Array[Int] = []
-  for family in @library.families(base.styles) {
-    let covered = match family.covers() {
-      None => true
-      Some(c) => c.is_match("-")
-    }
-    if covered && book.select(family.as_str(), base.variant) is Some(id) {
-      chain.push(id)
-    }
-  }
-  // The fallback is only consulted lazily, like upstream (`chain` +
-  // `find_map`): selecting it is expensive.
+  // The `chain` of font ids is walked lazily like upstream's (`filter`,
+  // `map`, `chain`, `flatten` + `find_map`): families are only selected
+  // until one provides the hyphen, the fallback only after all of them.
+  let families = @library.families(base.styles)
+  let mut next_family = 0
   let mut fallback_tried = false
-  for i = 0; ; i = i + 1 {
-    if i == chain.length() {
-      if fallback &&
-        !fallback_tried &&
-        book.select_fallback(None, base.variant, "-") is Some(id) {
-        fallback_tried = true
-        chain.push(id)
-      } else {
+  while true {
+    let id = if next_family < families.length() {
+      let family = families[next_family]
+      next_family += 1
+      let covered = match family.covers() {
+        None => true
+        Some(c) => c.is_match("-")
+      }
+      guard covered && book.select(family.as_str(), base.variant) is Some(id) else {
+        continue
+      }
+      id
+    } else if fallback && !fallback_tried {
+      fallback_tried = true
+      guard book.select_fallback(None, base.variant, "-") is Some(id) else {
         break
       }
+      id
+    } else {
+      break
     }
-    let id = chain[i]
     let size = @library.TextElem::size_in(base.styles).resolve(base.styles)
     let variations = @library.TextElem::variations_in(base.styles)
     guard world.font(id) is Some(font) else { continue }
