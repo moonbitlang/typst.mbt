@@ -14,7 +14,16 @@ set -euo pipefail
 
 root="$(cd "$(dirname "$0")/.." && pwd)"
 bench="$root/bench"
-mbt="${TYPST_MBT:-$root/_build/native/release/build/moonbitlang/typst/cli/cli.exe}"
+# The build path depends on whether a `moon.work` is present; build first so
+# a stale binary from the other layout is never measured.
+if [ -z "${TYPST_MBT:-}" ]; then
+  (cd "$root" && moon build cli --target native --release >/dev/null)
+  mbt="$(ls -t "$root"/_build/native/release/build/cli/cli.exe \
+    "$root"/_build/native/release/build/moonbitlang/typst/cli/cli.exe \
+    2>/dev/null | head -n 1)"
+else
+  mbt="$TYPST_MBT"
+fi
 rs="${TYPST_RS:-$root/.repos/typst/target/release/typst}"
 if [ ! -x "$rs" ] && [ -z "${TYPST_RS:-}" ]; then
   # In a git worktree, `.repos` lives in the main checkout.
