@@ -39,7 +39,7 @@ fn vertical_rdm_kernel(
   let mut x = 0
   while x < width {
     // The last block may overlap the previous one (same results).
-    let x0 = if x + 16 <= width { x } else { width - 16 }
+    let x0 = if x <= width - 16 { x } else { width - 16 }
     let mut lo = rounding
     let mut hi = rounding
     for j in 0..<bounds_size {
@@ -103,7 +103,7 @@ fn vertical_i32_kernel(
   let rnd = @v128.i32x4_splat((1 << (PRECISION - 1)).reinterpret_as_uint())
   let mut x = 0
   while x < width {
-    let x0 = if x + 16 <= width { x } else { width - 16 }
+    let x0 = if x <= width - 16 { x } else { width - 16 }
     let mut a0 = rnd
     let mut a1 = rnd
     let mut a2 = rnd
@@ -160,15 +160,24 @@ fn vertical_ranges_ok(
   bounds_size >= 0 &&
   src_offset >= 0 &&
   src_stride >= 0 &&
-  weights_offset >= 0 &&
-  weights_offset + bounds_size <= weights.length() &&
-  dst_offset >= 0 &&
-  dst_offset + width <= dst.length() &&
+  in_range(weights_offset, bounds_size.to_int64(), weights.length()) &&
+  in_range(dst_offset, width.to_int64(), dst.length()) &&
   (
     bounds_size == 0 ||
-    src_offset.to_int64() +
-    src_stride.to_int64() * (bounds_start + bounds_size - 1).to_int64() +
-    width.to_int64() <=
-    src.length().to_int64()
+    in_range(
+      src_offset,
+      src_stride.to_int64() *
+      (bounds_start.to_int64() + bounds_size.to_int64() - 1L) +
+      width.to_int64(),
+      src.length(),
+    )
   )
+}
+
+///|
+/// Whether `[off, off + len)` lies within `[0, total)`, computed without
+/// `Int` overflow (the `@v128` loads and stores are not bounds checked).
+#inline
+fn in_range(off : Int, len : Int64, total : Int) -> Bool {
+  off >= 0 && len >= 0L && off.to_int64() + len <= total.to_int64()
 }

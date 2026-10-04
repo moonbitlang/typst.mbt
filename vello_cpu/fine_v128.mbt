@@ -114,11 +114,10 @@ fn alpha_composite_solid(
   // Whole chunks only, like the emulation (8 pixels with masks, 16 without).
   let chunk = if alphas is Some(_) { 32 } else { 64 }
   let n = len / chunk * chunk
-  guard start >= 0 &&
-    start + n <= dest.length() &&
+  guard in_range(start, n.to_int64(), dest.length()) &&
     src.length() >= 4 &&
     (match alphas {
-      Some(off) => off >= 0 && off + n / 4 <= alpha_buf.length()
+      Some(off) => in_range(off, (n / 4).to_int64(), alpha_buf.length())
       None => true
     }) else {
     alpha_composite_solid_scalar(dest, start, len, src, alpha_buf, alphas)
@@ -165,12 +164,10 @@ fn alpha_composite_buffer(
   alphas : Int?,
 ) -> Unit {
   let n = len / 32 * 32
-  guard start >= 0 &&
-    start + n <= dest.length() &&
-    src_start >= 0 &&
-    src_start + n <= src.length() &&
+  guard in_range(start, n.to_int64(), dest.length()) &&
+    in_range(src_start, n.to_int64(), src.length()) &&
     (match alphas {
-      Some(off) => off >= 0 && off + n / 4 <= alpha_buf.length()
+      Some(off) => in_range(off, (n / 4).to_int64(), alpha_buf.length())
       None => true
     }) else {
     alpha_composite_buffer_scalar(
@@ -213,10 +210,14 @@ fn pack_region(scratch : FixedArray[Byte], region : Region) -> Unit {
   let w = region.width
   guard region.height == TILE_HEIGHT &&
     w >= 0 &&
-    w * TILE_HEIGHT_COMPONENTS <= scratch.length() &&
-    region.offset >= 0 &&
+    w.to_int64() * TILE_HEIGHT_COMPONENTS.to_int64() <=
+    scratch.length().to_int64() &&
     region.stride >= 0 &&
-    region.offset + 3 * region.stride + w * 4 <= buf.length() else {
+    in_range(
+      region.offset,
+      3L * region.stride.to_int64() + 4L * w.to_int64(),
+      buf.length(),
+    ) else {
     pack_region_scalar(scratch, region)
   }
   let r0 = region.offset
@@ -230,4 +231,12 @@ fn pack_region(scratch : FixedArray[Byte], region : Region) -> Unit {
     @v128.v128_store32_lane(buf, r2 + x * 4, col, 2)
     @v128.v128_store32_lane(buf, r3 + x * 4, col, 3)
   }
+}
+
+///|
+/// Whether `[off, off + len)` lies within `[0, total)`, computed without
+/// `Int` overflow (the `@v128` loads and stores are not bounds checked).
+#inline
+fn in_range(off : Int, len : Int64, total : Int) -> Bool {
+  off >= 0 && len >= 0L && off.to_int64() + len <= total.to_int64()
 }

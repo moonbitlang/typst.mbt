@@ -48,14 +48,10 @@ fn ycbcr_to_rgb_16(
   num_components : Int,
 ) -> Unit {
   guard (num_components == 3 || num_components == 4) &&
-    yo >= 0 &&
-    yo + 16 <= y.length() &&
-    cbo >= 0 &&
-    cbo + 16 <= cb.length() &&
-    cro >= 0 &&
-    cro + 16 <= cr.length() &&
-    out_pos >= 0 &&
-    out_pos + 16 * num_components <= output.length() else {
+    in_range(yo, 16, y.length()) &&
+    in_range(cbo, 16, cb.length()) &&
+    in_range(cro, 16, cr.length()) &&
+    in_range(out_pos, (16 * num_components).to_int64(), output.length()) else {
     // (panics like the scalar code on out-of-bounds accesses)
     ycbcr_to_rgb_16_scalar(
       y, yo, cb, cbo, cr, cro, output, out_pos, num_components,
@@ -233,8 +229,11 @@ fn scatter_i32x4(a : FixedArray[Int], i : Int, v : V128) -> Unit {
 ///|
 /// Whether `s[start..start + len]` is within its array.
 #inline
-fn slice_range_ok(s : Slice, start : Int, len : Int) -> Bool {
-  start >= 0 && len >= 0 && s.off >= 0 && s.off + start + len <= s.arr.length()
+fn slice_range_ok(s : Slice, start : Int, len : Int64) -> Bool {
+  start >= 0 &&
+  len >= 0L &&
+  s.off >= 0 &&
+  s.off.to_int64() + start.to_int64() + len <= s.arr.length().to_int64()
 }
 
 ///|
@@ -243,12 +242,12 @@ fn slice_range_ok(s : Slice, start : Int, len : Int) -> Bool {
 fn upsample_horizontal_core(input : Slice, output : Slice, n : Int) -> Unit {
   let mut w = 0
   if n > 0 &&
-    slice_range_ok(input, 0, n + 2) &&
-    slice_range_ok(output, 2, 2 * n) {
+    slice_range_ok(input, 0, n.to_int64() + 2) &&
+    slice_range_ok(output, 2, 2L * n.to_int64()) {
     let two = @v128.i32x4_splat(2)
     let inp = input.arr
     let out = output.arr
-    while w + 4 <= n {
+    while w <= n - 4 {
       let i = input.off + w
       let a = gather_i32x4(inp, i)
       let b = gather_i32x4(inp, i + 1)
@@ -298,11 +297,11 @@ fn upsample_vertical_core(
 ) -> Unit {
   let mut i = 0
   if n > 0 &&
-    slice_range_ok(input, 0, n) &&
-    slice_range_ok(near, 0, n) &&
-    slice_range_ok(output, start, n) {
+    slice_range_ok(input, 0, n.to_int64()) &&
+    slice_range_ok(near, 0, n.to_int64()) &&
+    slice_range_ok(output, start, n.to_int64()) {
     let two = @v128.i32x4_splat(2)
-    while i + 4 <= n {
+    while i <= n - 4 {
       let x = gather_i32x4(input.arr, input.off + i)
       let y = gather_i32x4(near.arr, near.off + i)
       // (3 * x + 2 + y) >> 2
@@ -474,7 +473,7 @@ fn idct_int(
     let g = row / 4 * 8
     let j = row % 4
     // `store8`: rows that do not fit are skipped.
-    if pos >= 0 && pos + 8 <= out_vector.length() {
+    if in_range(pos, 8, out_vector.length()) {
       scatter_i32x4(out_vector, pos, m[g + j])
       scatter_i32x4(out_vector, pos + 4, m[g + 4 + j])
     }

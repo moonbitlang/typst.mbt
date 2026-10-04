@@ -40,12 +40,12 @@ fn vertical_sample_row(
   if n > 0 &&
     row_len > 0 &&
     left >= 0 &&
-    (left + n) * row_len <= image.length() &&
-    out_base >= 0 &&
-    out_base + row_len <= out.length() {
+    (left.to_int64() + n.to_int64()) * row_len.to_int64() <=
+    image.length().to_int64() &&
+    in_range(out_base, row_len.to_int64(), out.length()) {
     let zero = @v128.f32x4_splat(0.0)
     // 16 samples (four independent sums) per pass over the weights.
-    while j + 16 <= row_len {
+    while j <= row_len - 16 {
       let mut a0 = zero
       let mut a1 = zero
       let mut a2 = zero
@@ -73,7 +73,7 @@ fn vertical_sample_row(
       scatter_f32x4(out, out_base + j + 12, a3)
       j += 16
     }
-    while j + 4 <= row_len {
+    while j <= row_len - 4 {
       let mut acc = zero
       for i in 0..<n {
         let px = gather_f32x4(image, (left + i) * row_len + j)
@@ -110,9 +110,13 @@ fn horizontal_sample_sums(
 ) -> Unit {
   let n = ws.length()
   if (channels == 3 || channels == 4) &&
-    start >= 0 &&
+    n > 0 &&
     t.length() >= channels &&
-    start + (n - 1) * channels + 4 <= image.length() {
+    in_range(
+      start,
+      (n - 1).to_int64() * channels.to_int64() + 4,
+      image.length(),
+    ) {
     let mut acc = @v128.f32x4_splat(0.0)
     for i in 0..<n {
       acc = @v128.f32x4_add(

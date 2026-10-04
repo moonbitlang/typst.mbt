@@ -14,8 +14,8 @@ const EARLY_EXIT_TRIGGER_LEVEL : Int = 5
 fn compare256(window : FixedArray[Byte], a : Int, b : Int) -> Int {
   if a >= 0 &&
     b >= 0 &&
-    a + 256 <= window.length() &&
-    b + 256 <= window.length() {
+    a <= window.length() - 256 &&
+    b <= window.length() - 256 {
     return compare256_unchecked(window, a, b)
   }
   for i in 0..<256 {

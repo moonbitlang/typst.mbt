@@ -103,3 +103,11 @@ fn hsum_u32x4(v : V128) -> UInt {
   @v128.i32x4_extract_lane(v, 2) +
   @v128.i32x4_extract_lane(v, 3)
 }
+
+///|
+/// Whether `[off, off + len)` lies within `[0, total)`, computed without
+/// `Int` overflow (the `@v128` loads and stores are not bounds checked).
+#inline
+fn in_range(off : Int, len : Int64, total : Int) -> Bool {
+  off >= 0 && len >= 0L && off.to_int64() + len <= total.to_int64()
+}

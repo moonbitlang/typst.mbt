@@ -346,14 +346,14 @@ fn DeflateStream::level_flags(self : DeflateStream) -> Int {
 ///|
 fn read_u32_le(window : FixedArray[Byte], i : Int) -> UInt {
   // One bounds check for all four bytes (performance).
-  guard i >= 0 && i + 4 <= window.length() else { abort("index out of bounds") }
+  guard i >= 0 && i <= window.length() - 4 else { abort("index out of bounds") }
   load_u32_le_unchecked(window, i)
 }
 
 ///|
 fn read_u64_le(window : FixedArray[Byte], i : Int) -> UInt64 {
   // One bounds check for all eight bytes (performance).
-  guard i >= 0 && i + 8 <= window.length() else { abort("index out of bounds") }
+  guard i >= 0 && i <= window.length() - 8 else { abort("index out of bounds") }
   load_u64_le_unchecked(window, i)
 }
 
@@ -429,7 +429,7 @@ fn DeflateStream::read_buf_window(
   }
   self.avail_in -= len
   let src = self.input[self.next_in:self.next_in + len]
-  guard offset >= 0 && offset + len <= self.window.length() else {
+  guard offset >= 0 && offset <= self.window.length() - len else {
     abort("index out of bounds")
   }
   let window = self.window

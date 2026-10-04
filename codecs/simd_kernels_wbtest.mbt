@@ -239,11 +239,14 @@ test "paeth16 matches filter_paeth on all byte triples" {
 ///|
 fn kernel_test_ints(n : Int, seed : Int, lo : Int, hi : Int) -> FixedArray[Int] {
   let bytes = kernel_test_bytes(4 * n, seed)
+  // 32 random bits per value, reduced into `lo..=hi` in `Int64`.
+  let range = hi.to_int64() - lo.to_int64() + 1L
   FixedArray::makei(n, i => {
-    let r = bytes[4 * i].to_int() |
-      (bytes[4 * i + 1].to_int() << 8) |
-      (bytes[4 * i + 2].to_int() << 16)
-    lo + r % (hi - lo + 1)
+    let r = bytes[4 * i].to_int64() |
+      (bytes[4 * i + 1].to_int64() << 8) |
+      (bytes[4 * i + 2].to_int64() << 16) |
+      (bytes[4 * i + 3].to_int64() << 24)
+    (lo.to_int64() + r % range).to_int()
   })
 }
 
@@ -392,8 +395,9 @@ test "horizontal_sample_sums matches the scalar sums" {
       )
       let ws = Array::from_fixed_array(kernel_test_floats(n, n + 7, 1.5))
       for start in [0, 1, channels] {
-        // Ends exactly at the image end, too (scalar fallback for 3).
-        let len = start + n * channels
+        // Ending exactly at the image end (the scalar fallback for 3
+        // channels) and with spare samples.
+        let len = start + n * channels + start % 2
         let img = FixedArray::makei(len, i => image[i])
         let t = FixedArray::make(4, (-1.0 : Float))
         horizontal_sample_sums(img, start, channels, ws, t)
@@ -588,4 +592,11 @@ fn bench_page() -> Bytes {
 test "bench encode_png_balanced 1191x400 page" (it : @bench.T) {
   let page = bench_page()
   it.bench(() => it.keep(encode_png_balanced(page[:], 1191, 400, Rgba)))
+}
+
+///|
+test "panic ycbcr_to_rgb_16 with an out-of-range offset" {
+  let y = FixedArray::make(16, 0)
+  let out = FixedArray::make(48, b'\x00')
+  ycbcr_to_rgb_16(y, 0, y, 0, y, 0, out, 2147483647, 3)
 }

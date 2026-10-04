@@ -20,11 +20,10 @@ fn horizontal_ranges_ok(
 ) -> Bool {
   let n = fw.bounds_start.length()
   if src_offset < 0 ||
-    dst_offset < 0 ||
-    dst_offset + n * channels > dst.length() ||
+    !in_range(dst_offset, n.to_int64() * channels.to_int64(), dst.length()) ||
     fw.bounds_size.length() < n ||
     fw.aligned_size < 0 ||
-    n * fw.aligned_size > fw.weights.length() {
+    n.to_int64() * fw.aligned_size.to_int64() > fw.weights.length().to_int64() {
     return false
   }
   for x in 0..<n {
@@ -33,7 +32,11 @@ fn horizontal_ranges_ok(
     if start < 0 ||
       size < 0 ||
       size > fw.aligned_size ||
-      src_offset + (start + size) * channels > src.length() {
+      !in_range(
+        src_offset,
+        (start.to_int64() + size.to_int64()) * channels.to_int64(),
+        src.length(),
+      ) {
       return false
     }
   }
@@ -163,7 +166,7 @@ fn rgb_rdm_row(
     let mut acc = init
     let mut j = 0
     // Tap `j` goes to slot `j % 2`.
-    while j + 2 <= size {
+    while j <= size - 2 {
       let w = @v128.v128_and_(
         weights_2x4(
           weights.unsafe_get(w_off + j),
@@ -265,7 +268,7 @@ fn plane_rdm_row(
     // Tap `j < blocks_end` goes to lane `j % 8`: blocks of 8, then a block
     // of 4 (lanes 0..3).
     while j < blocks_end {
-      let count = if j + 8 <= blocks_end { 8 } else { 4 }
+      let count = if j <= blocks_end - 8 { 8 } else { 4 }
       let w = @v128.i16x8_narrow_i32x4_s(
         gather_weights4(weights, w_off + j),
         if count == 8 {
@@ -375,10 +378,20 @@ fn q15_row(
     let v = @v128.i16x8_narrow_i32x4_s(v, v)
     let out = @v128.i8x16_narrow_i16x8_u(v, v)
     let d = dst_offset + x * channels
-    for c in 0..<channels {
+    if channels == 4 {
+      @v128.v128_store32_lane(dst, d, out, 0)
+    } else {
       dst.unsafe_set(
-        d + c,
-        @v128.i8x16_extract_lane_u(out, c).reinterpret_as_int().to_byte(),
+        d,
+        @v128.i8x16_extract_lane_u(out, 0).reinterpret_as_int().to_byte(),
+      )
+      dst.unsafe_set(
+        d + 1,
+        @v128.i8x16_extract_lane_u(out, 1).reinterpret_as_int().to_byte(),
+      )
+      dst.unsafe_set(
+        d + 2,
+        @v128.i8x16_extract_lane_u(out, 2).reinterpret_as_int().to_byte(),
       )
     }
   }

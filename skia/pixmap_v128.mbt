@@ -8,10 +8,12 @@
 /// goes through [PremultipliedColorU8::demultiply].
 fn demultiply_into(data : FixedArray[UInt], out : FixedArray[Byte]) -> Unit {
   let len = data.length()
-  guard out.length() >= len * 4 else { abort("index out of bounds") }
+  guard out.length().to_int64() >= len.to_int64() * 4 else {
+    abort("index out of bounds")
+  }
   let alpha = @v128.i32x4_splat(0xFF000000U)
   let mut i = 0
-  while i + 4 <= len {
+  while i <= len - 4 {
     let v = @v128.i32x4_splat(data.unsafe_get(i))
     let v = @v128.i32x4_replace_lane(v, data.unsafe_get(i + 1), 1)
     let v = @v128.i32x4_replace_lane(v, data.unsafe_get(i + 2), 2)

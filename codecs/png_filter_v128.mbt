@@ -21,7 +21,7 @@ fn filter_row_cost(
   limit : UInt64,
 ) -> UInt64 {
   let len = current.length()
-  guard previous.length() >= len && output.length() >= len + 1 && bpp >= 0 else {
+  guard previous.length() >= len && output.length() > len && bpp >= 0 else {
     abort("index out of bounds")
   }
   let first = if bpp < len { bpp } else { len }
@@ -42,7 +42,7 @@ fn filter_row_cost(
   let zero = @v128.i32x4_splat(0)
   let mut acc = zero
   let mut blocks = 0
-  while i + 16 <= len {
+  while i <= len - 16 {
     let x = @v128.v128_load(current, i)
     let v = match filter {
       1 => @v128.i8x16_sub(x, @v128.v128_load(current, i - bpp))

@@ -34,3 +34,17 @@ test "bench resize_planar_u8 2400x1800 -> 200x150 (i32)" (it : @bench.T) {
   let src = bench_image(2400, 1800, 1)
   it.bench(() => it.keep(resize_planar_u8(src, 2400, 1800, 200, 150)))
 }
+
+///|
+test "bench resize_rgba_u8 2400x1800 -> 200x150 (i32)" (it : @bench.T) {
+  let src = bench_image(2400, 1800, 4)
+  it.bench(() => {
+    it.keep(resize_rgba_u8_premultiplied(src, 2400, 1800, 200, 150))
+  })
+}
+
+///|
+test "bench resize_rgb_u8 2400x1800 -> 200x150 (i32)" (it : @bench.T) {
+  let src = bench_image(2400, 1800, 3)
+  it.bench(() => it.keep(resize_rgb_u8(src, 2400, 1800, 200, 150)))
+}
