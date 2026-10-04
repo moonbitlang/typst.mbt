@@ -50,7 +50,7 @@ pub(all) enum Language {
 
 ///|
 /// `(variant, display name, serializations)`.
-let languages : ReadOnlyArray[(Language, String, Array[String])] = [
+let languages : ReadOnlyArray[(Language, String, ReadOnlyArray[String])] = [
   (Basque, "Basque", ["basque"]),
   (Bulgarian, "Bulgarian", ["bulgarian"]),
   (Catalan, "Catalan", ["catalan"]),

@@ -134,7 +134,7 @@ fn arabic_action_is_stch(n : Int) -> Bool {
 
 ///|
 /// `(prev_action, curr_action, next_state)` per state and joining type.
-let arabic_state_table : ReadOnlyArray[FixedArray[(Int, Int, Int)]] = [
+let arabic_state_table : ReadOnlyArray[ReadOnlyArray[(Int, Int, Int)]] = [
   // jt_U,          jt_L,          jt_R,
   // jt_D,          jg_ALAPH,      jg_DALATH_RISH
 

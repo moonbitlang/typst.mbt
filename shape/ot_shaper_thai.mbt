@@ -153,7 +153,7 @@ fn pua_shape(u : UInt, action : Action, face : Face) -> UInt {
     SDL => sdl_mappings
     RD => rd_mappings
   }
-  for m in mappings {
+  for m in mappings[:] {
     if m.u == u {
       if face.get_nominal_glyph(m.win_pua.reinterpret_as_int()) is Some(_) {
         return m.win_pua
@@ -210,7 +210,7 @@ fn AboveStateMachineEdge::new(
 }
 
 ///|
-let above_state_machine : ReadOnlyArray[FixedArray[AboveStateMachineEdge]] = [
+let above_state_machine : ReadOnlyArray[ReadOnlyArray[AboveStateMachineEdge]] = [
   //        AV                                      BV                                      T
   // T0
   [
@@ -281,7 +281,7 @@ fn BelowStateMachineEdge::new(
 }
 
 ///|
-let below_state_machine : ReadOnlyArray[FixedArray[BelowStateMachineEdge]] = [
+let below_state_machine : ReadOnlyArray[ReadOnlyArray[BelowStateMachineEdge]] = [
   //        AV                                      BV                                      T
   // B0
   [

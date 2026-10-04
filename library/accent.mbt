@@ -44,7 +44,7 @@ pub fn get_accent_func(value : String) -> Func? {
 
 ///|
 /// A list of accents, each with a list of alternative names.
-let accents : ReadOnlyArray[(Char, Array[String])] = [
+let accents : ReadOnlyArray[(Char, ReadOnlyArray[String])] = [
   // Note: Symbols that can have a text presentation must explicitly have that
   // alternative listed here.
   ('\u{0300}', ["`"]),
