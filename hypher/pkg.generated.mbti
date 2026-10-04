@@ -6,9 +6,9 @@ import {
 }
 
 // Values
-pub fn hyphenate(String, Lang) -> Array[String]
+pub fn hyphenate(StringView, Lang) -> Array[StringView]
 
-pub fn hyphenate_bounded(String, Lang, Int, Int) -> Array[String]
+pub fn hyphenate_bounded(StringView, Lang, Int, Int) -> Array[StringView]
 
 // Errors
 

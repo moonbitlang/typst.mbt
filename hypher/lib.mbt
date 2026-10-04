@@ -3,7 +3,7 @@
 // Hyphenation patterns are embedded as efficiently encoded finite automata
 // (the very same `tries/*.bin` files as the crate's, see `tries_gen.mbt`).
 // Offsets are UTF-8 byte based like the crate's; syllables are returned as
-// strings.
+// views into the word (upstream's `Syllables` iterator of `&str`).
 
 ///|
 /// Segment a word into syllables.
@@ -11,7 +11,7 @@
 /// Returns the syllables.
 ///
 /// This uses the default [bounds](Lang::bounds) for the language.
-pub fn hyphenate(word : String, lang : Lang) -> Array[String] {
+pub fn hyphenate(word : StringView, lang : Lang) -> Array[StringView] {
   let (left_min, right_min) = lang.bounds()
   hyphenate_bounded(word, lang, left_min, right_min)
 }
@@ -20,31 +20,26 @@ pub fn hyphenate(word : String, lang : Lang) -> Array[String] {
 /// Segment a word into syllables, but forbid breaking between the given number
 /// of chars to each side.
 pub fn hyphenate_bounded(
-  word : String,
+  word : StringView,
   lang : Lang,
   left_min : Int,
   right_min : Int,
-) -> Array[String] {
-  let bytes = utf8_encode(word)
+) -> Array[StringView] {
+  // The UTF-8 length of the word (`word.len()`).
+  let len = utf8_str_len(word)
 
   // Initialize the trie state for the language.
   let root = lang.root()
 
   // Lowercase and add dots before and after the word..
-  let dotted = lowercase_and_dot(word, bytes.length())
+  let dotted = lowercase_and_dot(word, len)
 
   // Convert char bounds to byte bounds in the dotted word.
-  let (min_idx, max_idx) = char_to_byte_bounds(word, left_min, right_min)
+  let min_idx = char_to_byte_min(word, left_min)
+  let max_idx = char_to_byte_max(word, right_min, len)
 
   // The levels between each two inner bytes of the word.
-  let levels = FixedArray::make(
-    if bytes.length() > 1 {
-      bytes.length() - 1
-    } else {
-      0
-    },
-    0,
-  )
+  let levels = FixedArray::make(if len > 1 { len - 1 } else { 0 }, 0)
 
   // Start pattern matching at each character boundary.
   // The trie is walked with plain addresses instead of `State` objects
@@ -90,18 +85,37 @@ pub fn hyphenate_bounded(
     }
   }
 
+  // Break into segments at odd levels (upstream `Syllables`): level `i`
+  // splits after byte `i + 1`. Upstream slices `&word[start..end]`, so the
+  // splits are char boundaries; they are found by walking the chars.
   let syllables = []
-  let mut cursor = 0
-  for i in 0..<levels.length() {
-    if levels[i] % 2 == 1 {
-      syllables.push(utf8_decode(bytes, cursor, i + 1))
-      cursor = i + 1
+  let mut start = 0
+  let mut byte = 0
+  for i = 0; i < word.length(); {
+    let { cp, idx, } = @unicode.decode_at(word, i)
+    byte += utf8_len(cp)
+    if byte < len && levels[byte - 1] % 2 == 1 {
+      syllables.push(word.view(start_offset=start, end_offset=idx))
+      start = idx
     }
+    continue idx
   }
-  if cursor < bytes.length() {
-    syllables.push(utf8_decode(bytes, cursor, bytes.length()))
+  if start < word.length() {
+    syllables.push(word.view(start_offset=start))
   }
   syllables
+}
+
+///|
+/// The UTF-8 length of a string.
+fn utf8_str_len(s : StringView) -> Int {
+  let mut n = 0
+  for i = 0; i < s.length(); {
+    let { cp, idx, } = @unicode.decode_at(s, i)
+    n += utf8_len(cp)
+    continue idx
+  }
+  n
 }
 
 ///|
@@ -109,7 +123,7 @@ pub fn hyphenate_bounded(
 ///
 /// The dots enable patterns that match based on whether they are at the edges
 /// of the word.
-fn lowercase_and_dot(word : String, len : Int) -> FixedArray[Int] {
+fn lowercase_and_dot(word : StringView, len : Int) -> FixedArray[Int] {
   let dotted = FixedArray::make(len + 2, 0)
   dotted[0] = '.'.to_int()
 
@@ -138,41 +152,39 @@ fn lowercase_and_dot(word : String, len : Int) -> FixedArray[Int] {
 }
 
 ///|
-/// Convert char bounds to byte bounds in the dotted word.
-fn char_to_byte_bounds(
-  word : String,
-  left_min : Int,
-  right_min : Int,
-) -> (Int, Int) {
+/// Convert char bounds to byte bounds in the dotted word (upstream
+/// `char_to_byte_bounds`, split in two to not collect the chars): the
+/// minimum split index.
+fn char_to_byte_min(word : StringView, left_min : Int) -> Int {
   // It makes no sense to split outside the word.
   let left_min = if left_min > 1 { left_min } else { 1 }
-  let right_min = if right_min > 1 { right_min } else { 1 }
 
   // Convert from chars to byte indices in the dotted word.
-  let chars = []
-  for i = 0; i < word.length(); {
-    let { cp: c, idx: next, } = @unicode.decode_at(word, i)
-    chars.push(c)
-    continue next
-  }
   let mut left = 0
-  for k in 0..<chars.length() {
-    if k >= left_min {
-      break
-    }
-    left += utf8_len(chars[k])
+  let mut taken = 0
+  for i = 0; i < word.length() && taken < left_min; {
+    let { cp, idx, } = @unicode.decode_at(word, i)
+    left += utf8_len(cp)
+    taken += 1
+    continue idx
   }
+  1 + left
+}
+
+///|
+/// The maximum split index (see [char_to_byte_min]); `len` is the UTF-8
+/// length of the word.
+fn char_to_byte_max(word : StringView, right_min : Int, len : Int) -> Int {
+  let right_min = if right_min > 1 { right_min } else { 1 }
   let mut right = 0
   let mut taken = 0
-  for k = chars.length() - 1; k >= 0 && taken < right_min; k = k - 1 {
-    right += utf8_len(chars[k])
+  for i = word.length(); i > 0 && taken < right_min; {
+    let { cp, idx, } = @unicode.decode_before(word, i)
+    right += utf8_len(cp)
     taken += 1
+    continue idx
   }
-  let mut total = 0
-  for c in chars {
-    total += utf8_len(c)
-  }
-  (1 + left, 1 + total - right)
+  1 + len - right
 }
 
 ///|
@@ -359,57 +371,6 @@ fn encode_char(out : FixedArray[Int], offset : Int, c : Int) -> Int {
     out[offset + 3] = 0x80 | (c & 0x3F)
     offset + 4
   }
-}
-
-///|
-fn utf8_encode(s : String) -> FixedArray[Int] {
-  let mut len = 0
-  for i = 0; i < s.length(); {
-    let { cp: c, idx: next, } = @unicode.decode_at(s, i)
-    len += utf8_len(c)
-    continue next
-  }
-  let out = FixedArray::make(len, 0)
-  let mut offset = 0
-  for i = 0; i < s.length(); {
-    let { cp: c, idx: next, } = @unicode.decode_at(s, i)
-    offset = encode_char(out, offset, c)
-    continue next
-  }
-  out
-}
-
-///|
-/// Decode `bytes[start:end]` (valid UTF-8 at char boundaries) to a string.
-fn utf8_decode(bytes : FixedArray[Int], start : Int, end : Int) -> String {
-  let buf = StringBuilder()
-  let mut i = start
-  while i < end {
-    let b = bytes[i]
-    let (c, n) = if b < 0x80 {
-      (b, 1)
-    } else if b < 0xE0 {
-      (((b & 0x1F) << 6) | (bytes[i + 1] & 0x3F), 2)
-    } else if b < 0xF0 {
-      (
-        ((b & 0x0F) << 12) |
-        ((bytes[i + 1] & 0x3F) << 6) |
-        (bytes[i + 2] & 0x3F),
-        3,
-      )
-    } else {
-      (
-        ((b & 0x07) << 18) |
-        ((bytes[i + 1] & 0x3F) << 12) |
-        ((bytes[i + 2] & 0x3F) << 6) |
-        (bytes[i + 3] & 0x3F),
-        4,
-      )
-    }
-    buf.write_char(Int::unsafe_to_char(c))
-    i += n
-  }
-  buf.to_string()
 }
 
 ///|

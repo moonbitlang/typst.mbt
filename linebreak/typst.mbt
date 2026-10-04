@@ -317,7 +317,7 @@ pub fn breakpoints(
     if hyphenate && last < point {
       for segment in @unicode.split_word_bounds(t.slice(last, point)) {
         if !segment.is_empty() && all_alphabetic(segment) {
-          hyphenations(lang_at, hyphenate_at, last, segment.to_owned(), f)
+          hyphenations(lang_at, hyphenate_at, last, segment, f)
         }
         last += utf8_str_len(segment)
       }
@@ -381,7 +381,7 @@ fn hyphenations(
   lang_at : (Int) -> @hypher.Lang?,
   hyphenate_at : (Int) -> Bool,
   offset : Int,
-  word : String,
+  word : StringView,
   f : (Int, Breakpoint) -> Unit,
 ) -> Unit {
   guard lang_at(offset) is Some(lang) else { return }
@@ -422,7 +422,7 @@ fn hyphenations(
 }
 
 ///|
-fn char_count(s : String) -> Int {
+fn char_count(s : StringView) -> Int {
   let mut n = 0
   for i = 0; i < s.length(); {
     let { idx: next, .. } = @unicode.decode_at(s, i)
