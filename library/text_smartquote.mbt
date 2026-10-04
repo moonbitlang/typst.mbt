@@ -334,7 +334,7 @@ pub impl FromValue for SmartQuoteDict with fn from_value(v) {
   match v {
     Dict(value) => {
       let value = value.copy()
-      let keys = ["double", "single"]
+      let keys : ReadOnlyArray[_] = ["double", "single"]
       let double : Smart[SmartQuoteSet] = dict_take_cast(value, "double").unwrap_or(
         Auto,
       )

@@ -283,7 +283,7 @@ fn gen_data(root: &PathBuf) {
     );
     writeln!(out, "///|\nlet syntax_header : String = {}\n", lit(&(table.out + &header.out)))
         .unwrap();
-    out.push_str("///|\nlet syntax_contexts : FixedArray[String] = [\n");
+    out.push_str("///|\nlet syntax_contexts : ReadOnlyArray[String] = [\n");
     for b in &blobs {
         writeln!(out, "  {},", lit(b)).unwrap();
     }

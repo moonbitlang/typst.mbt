@@ -219,7 +219,7 @@ const USE_HR : Int = 55
 ///|
 /// These features are applied all at once, before reordering,
 /// constrained to the syllable.
-let use_basic_features : Array[@otf.Tag] = [
+let use_basic_features : ReadOnlyArray[@otf.Tag] = [
   tag("rkrf"),
   tag("abvf"),
   tag("blwf"),
@@ -230,7 +230,7 @@ let use_basic_features : Array[@otf.Tag] = [
 ]
 
 ///|
-let use_topographical_features : Array[@otf.Tag] = [
+let use_topographical_features : ReadOnlyArray[@otf.Tag] = [
   tag("isol"),
   tag("init"),
   tag("medi"),
@@ -258,7 +258,7 @@ fn JoiningForm::to_int(self : JoiningForm) -> Int {
 
 ///|
 /// These features are applied all at once, after reordering and clearing syllables.
-let use_other_features : Array[@otf.Tag] = [
+let use_other_features : ReadOnlyArray[@otf.Tag] = [
   tag("abvs"),
   tag("blws"),
   tag("haln"),
@@ -325,20 +325,20 @@ fn collect_features_use(planner : ShapePlanner) -> Unit {
   planner.ot_map.add_gsub_pause(Some(record_pref_use))
 
   // Orthographic unit shaping group
-  for feature in use_basic_features {
+  for feature in use_basic_features[:] {
     planner.ot_map.enable_feature(feature, F_MANUAL_ZWJ | F_PER_SYLLABLE, 1)
   }
   planner.ot_map.add_gsub_pause(Some(reorder_use))
   planner.ot_map.add_gsub_pause(Some(syllabic_clear_var)) // Don't need syllables anymore.
 
   // Topographical features
-  for feature in use_topographical_features {
+  for feature in use_topographical_features[:] {
     planner.ot_map.add_feature(feature, F_NONE, 1)
   }
   planner.ot_map.add_gsub_pause(None)
 
   // Standard typographic presentation
-  for feature in use_other_features {
+  for feature in use_other_features[:] {
     planner.ot_map.enable_feature(feature, F_MANUAL_ZWJ, 1)
   }
 }

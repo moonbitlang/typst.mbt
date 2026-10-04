@@ -207,7 +207,7 @@ fn main() {
     writeln!(out, "// Collation data of the ICU root collator (icu_collator 2.3.1).").unwrap();
     writeln!(out).unwrap();
     writeln!(out, "///|").unwrap();
-    write!(out, "let collation_compressible_leads : Array[Int] = [").unwrap();
+    write!(out, "let collation_compressible_leads : ReadOnlyArray[Int] = [").unwrap();
     for (i, l) in compressible.iter().enumerate() {
         if i > 0 {
             out.push_str(", ");
@@ -218,7 +218,7 @@ fn main() {
     writeln!(out).unwrap();
     writeln!(out, "///|").unwrap();
     writeln!(out, "/// Ranges of code points covered by `collation_table_data`.").unwrap();
-    write!(out, "let collation_ranges : Array[(Int, Int)] = [").unwrap();
+    write!(out, "let collation_ranges : ReadOnlyArray[(Int, Int)] = [").unwrap();
     for (i, (a, b)) in RANGES.iter().enumerate() {
         if i > 0 {
             out.push_str(", ");

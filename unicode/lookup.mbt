@@ -1,6 +1,6 @@
 ///|
 /// Binary search a flat `[lo0, hi0, lo1, hi1, ...]` range table.
-fn in_ranges(table : FixedArray[Int], c : Int) -> Bool {
+fn in_ranges(table : ReadOnlyArray[Int], c : Int) -> Bool {
   let n = table.length() / 2
   for lo = 0, hi = n; lo < hi; {
     let mid = lo + (hi - lo) / 2
@@ -19,7 +19,7 @@ fn in_ranges(table : FixedArray[Int], c : Int) -> Bool {
 ///|
 /// Binary search a flat `[lo0, hi0, v0, lo1, hi1, v1, ...]` table, returning
 /// the value of the matching range or `default`.
-fn in_valued(table : FixedArray[Int], c : Int, default : Int) -> Int {
+fn in_valued(table : ReadOnlyArray[Int], c : Int, default : Int) -> Int {
   let n = table.length() / 3
   for lo = 0, hi = n; lo < hi; {
     let mid = lo + (hi - lo) / 2
@@ -161,7 +161,7 @@ pub(all) enum MathClass {
 } derive(Eq, Debug, Hash)
 
 ///|
-let math_classes : FixedArray[MathClass] = [
+let math_classes : ReadOnlyArray[MathClass] = [
   Normal,
   Alphabetic,
   Binary,

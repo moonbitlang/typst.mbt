@@ -98,7 +98,7 @@ def main():
         width = 3 if ty == "UInt64" else 6
         out.append("///|")
         out.append(f"/// `{name}: {shape}` ({file}), flattened.")
-        out.append(f"let {mbt} : FixedArray[{ty}] = [")
+        out.append(f"let {mbt} : ReadOnlyArray[{ty}] = [")
         for i in range(0, len(values), width):
             out.append(
                 "  " + ", ".join(f"0x{v:x}{suffix}" for v in values[i : i + width]) + ","
@@ -115,7 +115,7 @@ def main():
             sys.exit(f"{name}: expected {n} entries, got {len(values)}")
         out.append("///|")
         out.append(f"/// `{name}: [i32; {n}]` ({file}).")
-        out.append(f"let {mbt} : FixedArray[Int] = [")
+        out.append(f"let {mbt} : ReadOnlyArray[Int] = [")
         for i in range(0, len(values), 12):
             out.append("  " + ", ".join(str(v) for v in values[i : i + 12]) + ",")
         out.append("]")
@@ -127,7 +127,7 @@ def main():
             sys.exit(f"{name}: expected {n} entries, got {len(values)}")
         out.append("///|")
         out.append(f"/// `{name}: [DyadicFloat128; {n}]` ({file}).")
-        out.append(f"let {mbt} : FixedArray[DyadicFloat128] = [")
+        out.append(f"let {mbt} : ReadOnlyArray[DyadicFloat128] = [")
         for neg, exp, hi, lo in values:
             out.append(f"  dyadic({str(neg).lower()}, {exp}, 0x{hi:x}UL, 0x{lo:x}UL),")
         out.append("]")

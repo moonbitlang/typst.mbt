@@ -260,7 +260,7 @@ pub(all) enum Comparator {
 } derive(Eq, Hash, Debug)
 
 ///|
-let comparators : FixedArray[Comparator] = [
+let comparators : ReadOnlyArray[Comparator] = [
   I32Eq,
   I32Ne,
   I32LtS,

@@ -11,7 +11,7 @@ pub fn highlight(@syntax.LinkedNode) -> Tag?
 
 pub fn highlight_html(@syntax.SyntaxNode) -> String
 
-pub let tag_list : FixedArray[Tag]
+pub let tag_list : ReadOnlyArray[Tag]
 
 // Errors
 

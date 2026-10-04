@@ -302,7 +302,7 @@ fn srgb_from_linear(x : Float) -> Float {
 /// Multiply a 3x3 matrix (given as `f64`s, cast to `f32`) and a vector
 /// (palette `multiply_3x3_and_vec3`).
 fn mul3(
-  m : FixedArray[Double],
+  m : ReadOnlyArray[Double],
   v : (Float, Float, Float),
 ) -> (Float, Float, Float) {
   let (x, y, z) = v
@@ -319,39 +319,39 @@ fn mul3(
 }
 
 ///|
-let srgb_rgb_to_xyz : FixedArray[Double] = [
+let srgb_rgb_to_xyz : ReadOnlyArray[Double] = [
   0.4124564, 0.3575761, 0.1804375, 0.2126729, 0.7151522, 0.0721750, 0.0193339, 0.1191920,
   0.9503041,
 ]
 
 ///|
-let srgb_xyz_to_rgb : FixedArray[Double] = [
+let srgb_xyz_to_rgb : ReadOnlyArray[Double] = [
   3.2404542, -1.5371385, -0.4985314, -0.9692660, 1.8760108, 0.0415560, 0.0556434,
   -0.2040259, 1.0572252,
 ]
 
 ///|
-let oklab_m1 : FixedArray[Double] = [
+let oklab_m1 : ReadOnlyArray[Double] = [
   0.8190224432164319, 0.3619062562801221, -0.12887378261216414, 0.0329836671980271,
   0.9292868468965546, 0.03614466816999844, 0.048177199566046255, 0.26423952494422764,
   0.6335478258136937,
 ]
 
 ///|
-let oklab_m1_inv : FixedArray[Double] = [
+let oklab_m1_inv : ReadOnlyArray[Double] = [
   1.2268798733741557, -0.5578149965554813, 0.28139105017721583, -0.04057576262431372,
   1.1122868293970594, -0.07171106666151701, -0.07637294974672142, -0.4214933239627914,
   1.5869240244272418,
 ]
 
 ///|
-let oklab_m2 : FixedArray[Double] = [
+let oklab_m2 : ReadOnlyArray[Double] = [
   0.2104542553, 0.7936177850, -0.0040720468, 1.9779984951, -2.4285922050, 0.4505937099,
   0.0259040371, 0.7827717662, -0.8086757660,
 ]
 
 ///|
-let oklab_m2_inv : FixedArray[Double] = [
+let oklab_m2_inv : ReadOnlyArray[Double] = [
   0.99999999845051981432, 0.39633779217376785678, 0.21580375806075880339, 1.0000000088817607767,
   -0.1055613423236563494, -0.063854174771705903402, 1.0000000546724109177, -0.089484182094965759684,
   -1.2914855378640917399,

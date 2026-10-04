@@ -101,7 +101,7 @@ fn str_lit(s: &str) -> String {
 
 /// Emit an array-returning function with one entry per line.
 fn emit_array(out: &mut String, doc: &str, name: &str, ty: &str, items: &[String]) {
-    writeln!(out, "///|\n/// {doc}\nlet {name} : Array[{ty}] = [").unwrap();
+    writeln!(out, "///|\n/// {doc}\nlet {name} : ReadOnlyArray[{ty}] = [").unwrap();
     for item in items {
         writeln!(out, "  {item},").unwrap();
     }

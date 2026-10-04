@@ -37,7 +37,7 @@ pub fn canonical_combining_class(c : Int) -> Int {
 ///|
 /// Binary search a `[c, len, chars..., ...]` table sorted by `c`. The
 /// entries have variable length, so this first builds an index lazily.
-fn decomposition_index(table : FixedArray[Int]) -> Array[Int] {
+fn decomposition_index(table : ReadOnlyArray[Int]) -> Array[Int] {
   let index = []
   let mut i = 0
   while i < table.length() {
@@ -55,7 +55,7 @@ let compatible_index : Ref[Array[Int]?] = { val: None, }
 
 ///|
 fn find_decomposition(
-  table : FixedArray[Int],
+  table : ReadOnlyArray[Int],
   cache : Ref[Array[Int]?],
   c : Int,
 ) -> Int? {

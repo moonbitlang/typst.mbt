@@ -35,7 +35,7 @@ fn pretend_parse_data_url(input : Bytes) -> Bytes? {
   while start < n && is_ascii_ws_or_ctrl(input[start]) {
     start += 1
   }
-  let expected = [b'd', b'a', b't', b'a', b':']
+  let expected = b"data:"
   let mut i = start
   let mut k = 0
   while k < 5 {

@@ -473,7 +473,7 @@ pub(all) enum PdfStandard {
 } derive(Eq, Hash, Debug)
 
 ///|
-let pdf_standard_casts : Array[(String, PdfStandard, String)] = [
+let pdf_standard_casts : ReadOnlyArray[(String, PdfStandard, String)] = [
   ("1.4", V_1_4, "PDF 1.4."),
   ("1.5", V_1_5, "PDF 1.5."),
   ("1.6", V_1_6, "PDF 1.6."),
@@ -531,7 +531,7 @@ fn PdfStandard::from_validator(value : Validator) -> PdfStandard {
 ///|
 pub impl Reflect for PdfStandard with fn input() {
   let mut info : CastInfo? = None
-  for entry in pdf_standard_casts {
+  for entry in pdf_standard_casts[:] {
     let next = CastInfo::Value(Str(entry.0), entry.2)
     info = Some(
       match info {
@@ -558,7 +558,7 @@ pub impl Reflect for PdfStandard with fn castable(v) {
 
 ///|
 pub impl IntoValue for PdfStandard with fn into_value(self) {
-  for entry in pdf_standard_casts {
+  for entry in pdf_standard_casts[:] {
     if entry.1 == self {
       return Str(entry.0)
     }
@@ -569,7 +569,7 @@ pub impl IntoValue for PdfStandard with fn into_value(self) {
 ///|
 pub impl FromValue for PdfStandard with fn from_value(v) {
   if v is Str(s) {
-    for entry in pdf_standard_casts {
+    for entry in pdf_standard_casts[:] {
       if entry.0 == s {
         return entry.1
       }

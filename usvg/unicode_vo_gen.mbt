@@ -13,7 +13,7 @@ priv enum VerticalOrientation {
 
 ///|
 /// The ranges of `unicode_vo::char_orientation` (start, end, orientation).
-let vertical_orientation_ranges : Array[(Int, Int, VerticalOrientation)] = [
+let vertical_orientation_ranges : ReadOnlyArray[(Int, Int, VerticalOrientation)] = [
   (0x00A7, 0x00A7, Upright),
   (0x00A9, 0x00A9, Upright),
   (0x00AE, 0x00AE, Upright),
@@ -238,7 +238,7 @@ let vertical_orientation_ranges : Array[(Int, Int, VerticalOrientation)] = [
 /// Returns a vertical orientation of a character (`unicode_vo::char_orientation`).
 fn char_orientation(c : Char) -> VerticalOrientation {
   let cp = c.to_int()
-  for r in vertical_orientation_ranges {
+  for r in vertical_orientation_ranges[:] {
     if cp >= r.0 && cp <= r.1 {
       return r.2
     }

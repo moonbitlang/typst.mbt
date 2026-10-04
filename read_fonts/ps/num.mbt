@@ -34,7 +34,7 @@ const BCD_NUMBER_LIMIT : Int = 0xCCCCCCC
 const BCD_INTEGER_LIMIT : Int = 0x7FFF
 
 ///|
-let bcd_power_tens : FixedArray[Int] = [
+let bcd_power_tens : ReadOnlyArray[Int] = [
   1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000,
 ]
 

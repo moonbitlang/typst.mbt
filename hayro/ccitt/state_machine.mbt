@@ -86,10 +86,10 @@ fn insert_code(
 fn insert_codes(
   states : FixedArray[State],
   num_states : Int,
-  codes : FixedArray[(Int, Int, Int)],
+  codes : ReadOnlyArray[(Int, Int, Int)],
 ) -> Int {
   let mut num_states = num_states
-  for c in codes {
+  for c in codes[:] {
     let (run_length, code_length, code) = c
     num_states = insert_code(states, num_states, run_length, code_length, code)
   }
@@ -99,8 +99,8 @@ fn insert_codes(
 ///|
 fn build_run_states(
   n : Int,
-  terminating : FixedArray[(Int, Int, Int)],
-  makeup : FixedArray[(Int, Int, Int)],
+  terminating : ReadOnlyArray[(Int, Int, Int)],
+  makeup : ReadOnlyArray[(Int, Int, Int)],
 ) -> FixedArray[State] {
   let states = FixedArray::makei(n, _ => State::new())
   let mut num_states = 1
@@ -161,7 +161,7 @@ fn mode_states() -> FixedArray[State] {
 
 ///|
 /// White terminating codes (T.4 Table 2/T.4, T.6 Table 2/T.6).
-let white_terminating : FixedArray[(Int, Int, Int)] = [
+let white_terminating : ReadOnlyArray[(Int, Int, Int)] = [
   (0, 8, 0b00110101),
   (1, 6, 0b000111),
   (2, 4, 0b0111),
@@ -230,7 +230,7 @@ let white_terminating : FixedArray[(Int, Int, Int)] = [
 
 ///|
 /// White make-up codes (T.4 Table 3a/T.4, T.6 Table 3/T.6).
-let white_makeup : FixedArray[(Int, Int, Int)] = [
+let white_makeup : ReadOnlyArray[(Int, Int, Int)] = [
   (64, 5, 0b11011),
   (128, 5, 0b10010),
   (192, 6, 0b010111),
@@ -262,7 +262,7 @@ let white_makeup : FixedArray[(Int, Int, Int)] = [
 
 ///|
 /// Black terminating codes (T.4 Table 2/T.4, T.6 Table 2/T.6).
-let black_terminating : FixedArray[(Int, Int, Int)] = [
+let black_terminating : ReadOnlyArray[(Int, Int, Int)] = [
   (0, 10, 0b0000110111),
   (1, 3, 0b010),
   (2, 2, 0b11),
@@ -331,7 +331,7 @@ let black_terminating : FixedArray[(Int, Int, Int)] = [
 
 ///|
 /// Black make-up codes (T.4 Table 3a/T.4, T.6 Table 3/T.6).
-let black_makeup : FixedArray[(Int, Int, Int)] = [
+let black_makeup : ReadOnlyArray[(Int, Int, Int)] = [
   (64, 10, 0b0000001111),
   (128, 12, 0b000011001000),
   (192, 12, 0b000011001001),
@@ -363,7 +363,7 @@ let black_makeup : FixedArray[(Int, Int, Int)] = [
 
 ///|
 /// Extended make-up codes for run lengths > 1728 (T.4 Table 3b/T.4, T.6 Table 3/T.6).
-let common_makeup : FixedArray[(Int, Int, Int)] = [
+let common_makeup : ReadOnlyArray[(Int, Int, Int)] = [
   (1792, 11, 0b00000001000),
   (1856, 11, 0b00000001100),
   (1920, 11, 0b00000001101),
@@ -381,7 +381,7 @@ let common_makeup : FixedArray[(Int, Int, Int)] = [
 
 ///|
 /// Mode codes for 2D encoding (T.4 Table 4/T.4, T.6 Table 1/T.6).
-let mode_codes : FixedArray[(Int, Int, Int)] = [
+let mode_codes : ReadOnlyArray[(Int, Int, Int)] = [
   (0, 4, 0b0001),
   (1, 3, 0b001),
   (2, 1, 0b1),

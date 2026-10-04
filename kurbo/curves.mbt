@@ -434,13 +434,13 @@ pub fn CubicBez::deriv(self : CubicBez) -> QuadBez {
 
 ///|
 fn arclen_quadrature_core(
-  coeffs : FixedArray[(Double, Double)],
+  coeffs : ReadOnlyArray[(Double, Double)],
   dm : Vec2,
   dm1 : Vec2,
   dm2 : Vec2,
 ) -> Double {
   let mut sum = neg_zero
-  for c in coeffs {
+  for c in coeffs[:] {
     let (wi, xi) = c
     let d = dm + dm2.scale(xi * xi)
     let dpx = (d + dm1.scale(xi)).hypot()
@@ -467,7 +467,7 @@ fn arclen_rec(c : CubicBez, accuracy : Double, depth : Int) -> Double {
   let dm1 = (dd2 + dd1).scale(0.5) // second derivative at midpoint
   let dm2 = (dd2 - dd1).scale(0.25) // 0.5 * (third derivative at midpoint)
   let mut est = neg_zero
-  for co in gauss_legendre_coeffs_8 {
+  for co in gauss_legendre_coeffs_8[:] {
     let (wi, xi) = co
     let d_norm2 = (dm + dm1.scale(xi) + dm2.scale(xi * xi)).hypot2()
     let dd_norm2 = (dm1 + dm2.scale(2.0 * xi)).hypot2()

@@ -284,7 +284,7 @@ pub(all) enum SyntaxKind {
 } derive(Eq, Hash, Compare, Debug)
 
 ///|
-let all_kinds : FixedArray[SyntaxKind] = [
+let all_kinds : ReadOnlyArray[SyntaxKind] = [
   End,
   Error,
   Shebang,

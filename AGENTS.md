@@ -63,6 +63,17 @@
   fields and views cast to it.
 - Never edit `*_gen.mbt` by hand. After merging branches, resolve conflicts
   in generated files by rerunning the generators.
+- Constant tables are `ReadOnlyArray` literals, and generators emit them: on
+  native they are static data (no allocation or fill code at startup, which
+  `FixedArray`/`Array` literals need). Only literal scalars, strings, `Bytes`,
+  tuples/structs of those, fieldless enums, function references and nested
+  `ReadOnlyArray`s are static; `ReadOnlyArray[Byte]` (use a `Bytes` literal),
+  elements of type `String?`, enums with payloads, newtypes inside
+  tuples/structs (store the raw `UInt`), mutable structs and calls are still
+  built at startup. `for x in t` over a `ReadOnlyArray` goes through `Iter`;
+  loop over `t[:]` instead. Big lookup maps: a sorted `ReadOnlyArray` plus
+  binary search (a `Map` literal is built at startup); tables computed by
+  code: build them on first use.
 - Placeholders in `library/placeholders.mbt` are replaced wholesale by the
   real port in its own file (delete the placeholder section).
 - Error messages, hints and reprs must be byte-identical to upstream. Read

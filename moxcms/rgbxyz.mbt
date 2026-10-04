@@ -245,7 +245,11 @@ fn[T : Sample] make_rgb_xyz_rgb_transform(
   let r_lin = profile.r_linear
   let g_lin = profile.g_linear
   let b_lin = profile.b_linear
-  let gammas = [profile.r_gamma, profile.g_gamma, profile.b_gamma]
+  let gammas : ReadOnlyArray[_] = [
+    profile.r_gamma,
+    profile.g_gamma,
+    profile.b_gamma,
+  ]
   (src, dst) => {
     check_lanes(src.length(), src_channels, dst.length(), dst_channels)
     let max_colors : T = T::max_colors()

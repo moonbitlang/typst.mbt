@@ -84,7 +84,7 @@ fn feature_is_syriac(tag : @otf.Tag) -> Bool {
 }
 
 ///|
-let arabic_features : FixedArray[@otf.Tag] = [
+let arabic_features : ReadOnlyArray[@otf.Tag] = [
   tag("isol"),
   tag("fina"),
   tag("fin2"),
@@ -134,7 +134,7 @@ fn arabic_action_is_stch(n : Int) -> Bool {
 
 ///|
 /// `(prev_action, curr_action, next_state)` per state and joining type.
-let arabic_state_table : FixedArray[FixedArray[(Int, Int, Int)]] = [
+let arabic_state_table : ReadOnlyArray[ReadOnlyArray[(Int, Int, Int)]] = [
   // jt_U,          jt_L,          jt_R,
   // jt_D,          jg_ALAPH,      jg_DALATH_RISH
 
@@ -241,7 +241,7 @@ fn collect_features_arabic(planner : ShapePlanner) -> Unit {
   planner.ot_map.enable_feature(tag("ccmp"), F_MANUAL_ZWJ, 1)
   planner.ot_map.enable_feature(tag("locl"), F_MANUAL_ZWJ, 1)
   planner.ot_map.add_gsub_pause(None)
-  for feature in arabic_features {
+  for feature in arabic_features[:] {
     let has_fallback = planner.script == Some(script_arabic) &&
       !feature_is_syriac(feature)
     let flags = if has_fallback { F_HAS_FALLBACK } else { F_NONE }
@@ -609,7 +609,7 @@ fn postprocess_glyphs_arabic(
 
 ///|
 // http://www.unicode.org/reports/tr53/
-let modifier_combining_marks : FixedArray[UInt] = [
+let modifier_combining_marks : ReadOnlyArray[UInt] = [
   0x0654, // ARABIC HAMZA ABOVE
    0x0655, // ARABIC HAMZA BELOW
    0x0658, // ARABIC MARK NOON GHUNNA

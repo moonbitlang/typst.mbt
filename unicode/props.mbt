@@ -3,7 +3,7 @@
 
 ///|
 /// Convert a flat `[lo0, hi0, lo1, hi1, ...]` table into ranges.
-fn table_ranges(table : FixedArray[Int]) -> Array[(Int, Int)] {
+fn table_ranges(table : ReadOnlyArray[Int]) -> Array[(Int, Int)] {
   let out = []
   for i = 0; i + 1 < table.length(); i = i + 2 {
     out.push((table[i], table[i + 1]))
@@ -58,7 +58,7 @@ fn lex_compare(a : String, b : String) -> Int {
 
 ///|
 /// Binary search a sorted `[key, value, key, value, ...]` table.
-fn lookup_pairs(table : FixedArray[String], key : String) -> String? {
+fn lookup_pairs(table : ReadOnlyArray[String], key : String) -> String? {
   let n = table.length() / 2
   for lo = 0, hi = n; lo < hi; {
     let mid = lo + (hi - lo) / 2
@@ -114,7 +114,7 @@ fn merge_ranges(ranges : Array[(Int, Int)]) -> Array[(Int, Int)] {
 /// The ranges of a valued table whose value satisfies `pred`; chars missing
 /// from the table have value `default`.
 fn valued_ranges(
-  table : FixedArray[Int],
+  table : ReadOnlyArray[Int],
   default : Int,
   pred : (Int) -> Bool,
 ) -> Array[(Int, Int)] {
@@ -141,7 +141,7 @@ fn valued_ranges(
 /// special `Any`, `Assigned` and `ASCII`. `None` if there is no data for it.
 pub fn general_category_ranges(canonical : String) -> Array[(Int, Int)]? {
   let leaves : Array[Int] = []
-  for i, name in gc_names {
+  for i, name in gc_names[:] {
     if name == canonical {
       leaves.push(i)
     }
@@ -153,7 +153,7 @@ pub fn general_category_ranges(canonical : String) -> Array[(Int, Int)]? {
       i += 1
       while gc_groups[i] != "" {
         if group == canonical {
-          for j, name in gc_names {
+          for j, name in gc_names[:] {
             if name == gc_groups[i] {
               leaves.push(j)
             }
@@ -173,7 +173,7 @@ pub fn general_category_ranges(canonical : String) -> Array[(Int, Int)]? {
 ///|
 /// The ranges of a canonical script. `None` if there is no data for it.
 pub fn script_ranges(canonical : String) -> Array[(Int, Int)]? {
-  for i, name in regex_script_names {
+  for i, name in regex_script_names[:] {
     if name == canonical {
       return Some(valued_ranges(regex_script_table, -1, v => v == i))
     }
@@ -185,7 +185,7 @@ pub fn script_ranges(canonical : String) -> Array[(Int, Int)]? {
 /// The `Script_Extensions` ranges of a canonical script. `None` if there is
 /// no data for it.
 pub fn script_extension_ranges(canonical : String) -> Array[(Int, Int)]? {
-  for i, name in regex_script_names {
+  for i, name in regex_script_names[:] {
     if name == canonical {
       let out = []
       for j = script_extension_offsets[i]
@@ -203,7 +203,7 @@ pub fn script_extension_ranges(canonical : String) -> Array[(Int, Int)]? {
 /// The ranges of a canonical binary property. `None` if there is no data
 /// for it.
 pub fn bool_property_ranges(canonical : String) -> Array[(Int, Int)]? {
-  for i, name in bool_prop_names {
+  for i, name in bool_prop_names[:] {
     if name == canonical {
       let out = []
       for j = bool_prop_offsets[i]; j < bool_prop_offsets[i + 1]; j = j + 2 {

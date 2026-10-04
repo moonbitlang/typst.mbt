@@ -98,55 +98,50 @@ priv struct PuaMapping {
 }
 
 ///|
-fn PuaMapping::new(u : UInt, win_pua : UInt, mac_pua : UInt) -> PuaMapping {
-  { u, win_pua, mac_pua, }
-}
-
-///|
-let sd_mappings : FixedArray[PuaMapping] = [
-  PuaMapping::new(0x0E48, 0xF70A, 0xF88B), // MAI EK
-  PuaMapping::new(0x0E49, 0xF70B, 0xF88E), // MAI THO
-  PuaMapping::new(0x0E4A, 0xF70C, 0xF891), // MAI TRI
-  PuaMapping::new(0x0E4B, 0xF70D, 0xF894), // MAI CHATTAWA
-  PuaMapping::new(0x0E4C, 0xF70E, 0xF897), // THANTHAKHAT
-  PuaMapping::new(0x0E38, 0xF718, 0xF89B), // SARA U
-  PuaMapping::new(0x0E39, 0xF719, 0xF89C), // SARA UU
-  PuaMapping::new(0x0E3A, 0xF71A, 0xF89D), // PHINTHU
-  PuaMapping::new(0x0000, 0x0000, 0x0000),
+let sd_mappings : ReadOnlyArray[PuaMapping] = [
+  { u: 0x0E48, win_pua: 0xF70A, mac_pua: 0xF88B, }, // MAI EK
+  { u: 0x0E49, win_pua: 0xF70B, mac_pua: 0xF88E, }, // MAI THO
+  { u: 0x0E4A, win_pua: 0xF70C, mac_pua: 0xF891, }, // MAI TRI
+  { u: 0x0E4B, win_pua: 0xF70D, mac_pua: 0xF894, }, // MAI CHATTAWA
+  { u: 0x0E4C, win_pua: 0xF70E, mac_pua: 0xF897, }, // THANTHAKHAT
+  { u: 0x0E38, win_pua: 0xF718, mac_pua: 0xF89B, }, // SARA U
+  { u: 0x0E39, win_pua: 0xF719, mac_pua: 0xF89C, }, // SARA UU
+  { u: 0x0E3A, win_pua: 0xF71A, mac_pua: 0xF89D, }, // PHINTHU
+  { u: 0x0000, win_pua: 0x0000, mac_pua: 0x0000, },
 ]
 
 ///|
-let sdl_mappings : FixedArray[PuaMapping] = [
-  PuaMapping::new(0x0E48, 0xF705, 0xF88C), // MAI EK
-  PuaMapping::new(0x0E49, 0xF706, 0xF88F), // MAI THO
-  PuaMapping::new(0x0E4A, 0xF707, 0xF892), // MAI TRI
-  PuaMapping::new(0x0E4B, 0xF708, 0xF895), // MAI CHATTAWA
-  PuaMapping::new(0x0E4C, 0xF709, 0xF898), // THANTHAKHAT
-  PuaMapping::new(0x0000, 0x0000, 0x0000),
+let sdl_mappings : ReadOnlyArray[PuaMapping] = [
+  { u: 0x0E48, win_pua: 0xF705, mac_pua: 0xF88C, }, // MAI EK
+  { u: 0x0E49, win_pua: 0xF706, mac_pua: 0xF88F, }, // MAI THO
+  { u: 0x0E4A, win_pua: 0xF707, mac_pua: 0xF892, }, // MAI TRI
+  { u: 0x0E4B, win_pua: 0xF708, mac_pua: 0xF895, }, // MAI CHATTAWA
+  { u: 0x0E4C, win_pua: 0xF709, mac_pua: 0xF898, }, // THANTHAKHAT
+  { u: 0x0000, win_pua: 0x0000, mac_pua: 0x0000, },
 ]
 
 ///|
-let sl_mappings : FixedArray[PuaMapping] = [
-  PuaMapping::new(0x0E48, 0xF713, 0xF88A), // MAI EK
-  PuaMapping::new(0x0E49, 0xF714, 0xF88D), // MAI THO
-  PuaMapping::new(0x0E4A, 0xF715, 0xF890), // MAI TRI
-  PuaMapping::new(0x0E4B, 0xF716, 0xF893), // MAI CHATTAWA
-  PuaMapping::new(0x0E4C, 0xF717, 0xF896), // THANTHAKHAT
-  PuaMapping::new(0x0E31, 0xF710, 0xF884), // MAI HAN-AKAT
-  PuaMapping::new(0x0E34, 0xF701, 0xF885), // SARA I
-  PuaMapping::new(0x0E35, 0xF702, 0xF886), // SARA II
-  PuaMapping::new(0x0E36, 0xF703, 0xF887), // SARA UE
-  PuaMapping::new(0x0E37, 0xF704, 0xF888), // SARA UEE
-  PuaMapping::new(0x0E47, 0xF712, 0xF889), // MAITAIKHU
-  PuaMapping::new(0x0E4D, 0xF711, 0xF899), // NIKHAHIT
-  PuaMapping::new(0x0000, 0x0000, 0x0000),
+let sl_mappings : ReadOnlyArray[PuaMapping] = [
+  { u: 0x0E48, win_pua: 0xF713, mac_pua: 0xF88A, }, // MAI EK
+  { u: 0x0E49, win_pua: 0xF714, mac_pua: 0xF88D, }, // MAI THO
+  { u: 0x0E4A, win_pua: 0xF715, mac_pua: 0xF890, }, // MAI TRI
+  { u: 0x0E4B, win_pua: 0xF716, mac_pua: 0xF893, }, // MAI CHATTAWA
+  { u: 0x0E4C, win_pua: 0xF717, mac_pua: 0xF896, }, // THANTHAKHAT
+  { u: 0x0E31, win_pua: 0xF710, mac_pua: 0xF884, }, // MAI HAN-AKAT
+  { u: 0x0E34, win_pua: 0xF701, mac_pua: 0xF885, }, // SARA I
+  { u: 0x0E35, win_pua: 0xF702, mac_pua: 0xF886, }, // SARA II
+  { u: 0x0E36, win_pua: 0xF703, mac_pua: 0xF887, }, // SARA UE
+  { u: 0x0E37, win_pua: 0xF704, mac_pua: 0xF888, }, // SARA UEE
+  { u: 0x0E47, win_pua: 0xF712, mac_pua: 0xF889, }, // MAITAIKHU
+  { u: 0x0E4D, win_pua: 0xF711, mac_pua: 0xF899, }, // NIKHAHIT
+  { u: 0x0000, win_pua: 0x0000, mac_pua: 0x0000, },
 ]
 
 ///|
-let rd_mappings : FixedArray[PuaMapping] = [
-  PuaMapping::new(0x0E0D, 0xF70F, 0xF89A), // YO YING
-  PuaMapping::new(0x0E10, 0xF700, 0xF89E), // THO THAN
-  PuaMapping::new(0x0000, 0x0000, 0x0000),
+let rd_mappings : ReadOnlyArray[PuaMapping] = [
+  { u: 0x0E0D, win_pua: 0xF70F, mac_pua: 0xF89A, }, // YO YING
+  { u: 0x0E10, win_pua: 0xF700, mac_pua: 0xF89E, }, // THO THAN
+  { u: 0x0000, win_pua: 0x0000, mac_pua: 0x0000, },
 ]
 
 ///|
@@ -158,7 +153,7 @@ fn pua_shape(u : UInt, action : Action, face : Face) -> UInt {
     SDL => sdl_mappings
     RD => rd_mappings
   }
-  for m in mappings {
+  for m in mappings[:] {
     if m.u == u {
       if face.get_nominal_glyph(m.win_pua.reinterpret_as_int()) is Some(_) {
         return m.win_pua
@@ -192,7 +187,7 @@ fn AboveState::to_int(self : AboveState) -> Int {
 }
 
 ///|
-let above_start_state : FixedArray[AboveState] = [
+let above_start_state : ReadOnlyArray[AboveState] = [
   T0, // NC
   T1, // AC
   T0, // RC
@@ -215,7 +210,7 @@ fn AboveStateMachineEdge::new(
 }
 
 ///|
-let above_state_machine : FixedArray[FixedArray[AboveStateMachineEdge]] = [
+let above_state_machine : ReadOnlyArray[ReadOnlyArray[AboveStateMachineEdge]] = [
   //        AV                                      BV                                      T
   // T0
   [
@@ -263,7 +258,7 @@ fn BelowState::to_int(self : BelowState) -> Int {
 }
 
 ///|
-let below_start_state : FixedArray[BelowState] = [
+let below_start_state : ReadOnlyArray[BelowState] = [
   B0, // NC
   B0, // AC
   B1, // RC
@@ -286,7 +281,7 @@ fn BelowStateMachineEdge::new(
 }
 
 ///|
-let below_state_machine : FixedArray[FixedArray[BelowStateMachineEdge]] = [
+let below_state_machine : ReadOnlyArray[ReadOnlyArray[BelowStateMachineEdge]] = [
   //        AV                                      BV                                      T
   // B0
   [

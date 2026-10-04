@@ -1569,7 +1569,7 @@ let zero_ctx_hh_stripe_lookup : FixedArray[Int] = build_zero_context_lookup(
 )
 
 ///|
-fn build_zero_context_lookup(source : FixedArray[Int]) -> FixedArray[Int] {
+fn build_zero_context_lookup(source : ReadOnlyArray[Int]) -> FixedArray[Int] {
   let out = FixedArray::make(512, 0)
   for flags in 0..<512 {
     out[flags] = source[neighbor_byte(flags)]
@@ -1593,7 +1593,7 @@ fn neighbor_byte(flags : Int) -> Int {
 ///|
 /// `SIGN_CONTEXT_LOOKUP`: each `(label, xor_bit)` is packed as
 /// `label | xor_bit << 8`.
-let sign_context_lookup : FixedArray[Int] = [
+let sign_context_lookup : ReadOnlyArray[Int] = [
   9, 10, 266, 0, 12, 13, 11, 0, 268, 267, 269, 0, 0, 0, 0, 0, 12, 13, 11, 0, 12,
   13, 11, 0, 9, 10, 266, 0, 0, 0, 0, 0, 268, 267, 269, 0, 9, 10, 266, 0, 268, 267,
   269, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 10, 9,
@@ -1608,7 +1608,7 @@ let sign_context_lookup : FixedArray[Int] = [
 ]
 
 ///|
-let zero_ctx_ll_lh_lookup : FixedArray[Int] = [
+let zero_ctx_ll_lh_lookup : ReadOnlyArray[Int] = [
   0, 3, 1, 3, 5, 7, 6, 7, 1, 3, 2, 3, 6, 7, 6, 7, 5, 7, 6, 7, 8, 8, 8, 8, 6, 7, 6,
   7, 8, 8, 8, 8, 1, 3, 2, 3, 6, 7, 6, 7, 2, 3, 2, 3, 6, 7, 6, 7, 6, 7, 6, 7, 8, 8,
   8, 8, 6, 7, 6, 7, 8, 8, 8, 8, 3, 4, 3, 4, 7, 7, 7, 7, 3, 4, 3, 4, 7, 7, 7, 7, 7,
@@ -1622,7 +1622,7 @@ let zero_ctx_ll_lh_lookup : FixedArray[Int] = [
 ]
 
 ///|
-let zero_ctx_hl_lookup : FixedArray[Int] = [
+let zero_ctx_hl_lookup : ReadOnlyArray[Int] = [
   0, 5, 1, 6, 3, 7, 3, 7, 1, 6, 2, 6, 3, 7, 3, 7, 3, 7, 3, 7, 4, 7, 4, 7, 3, 7, 3,
   7, 4, 7, 4, 7, 1, 6, 2, 6, 3, 7, 3, 7, 2, 6, 2, 6, 3, 7, 3, 7, 3, 7, 3, 7, 4, 7,
   4, 7, 3, 7, 3, 7, 4, 7, 4, 7, 5, 8, 6, 8, 7, 8, 7, 8, 6, 8, 6, 8, 7, 8, 7, 8, 7,
@@ -1636,7 +1636,7 @@ let zero_ctx_hl_lookup : FixedArray[Int] = [
 ]
 
 ///|
-let zero_ctx_hh_lookup : FixedArray[Int] = [
+let zero_ctx_hh_lookup : ReadOnlyArray[Int] = [
   0, 1, 3, 4, 1, 2, 4, 5, 3, 4, 6, 7, 4, 5, 7, 7, 1, 2, 4, 5, 2, 2, 5, 5, 4, 5, 7,
   7, 5, 5, 7, 7, 3, 4, 6, 7, 4, 5, 7, 7, 6, 7, 8, 8, 7, 7, 8, 8, 4, 5, 7, 7, 5, 5,
   7, 7, 7, 7, 8, 8, 7, 7, 8, 8, 1, 2, 4, 5, 2, 2, 5, 5, 4, 5, 7, 7, 5, 5, 7, 7, 2,

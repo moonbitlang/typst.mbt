@@ -72,7 +72,7 @@ fn EdgeClipper::clip_quad(
   p1 : @path.Point,
   p2 : @path.Point,
 ) -> Array[PathEdge]? {
-  let pts = [p0, p1, p2]
+  let pts : ReadOnlyArray[_] = [p0, p1, p2]
   guard @path.Rect::from_points(pts[:]) is Some(bounds) else { return None }
   if !quick_reject(bounds, self.clip) {
     let mono_y = Array::make(5, @path.Point::zero())
@@ -190,7 +190,7 @@ fn EdgeClipper::clip_cubic(
   p2 : @path.Point,
   p3 : @path.Point,
 ) -> Array[PathEdge]? {
-  let pts = [p0, p1, p2, p3]
+  let pts : ReadOnlyArray[_] = [p0, p1, p2, p3]
   guard @path.Rect::from_points(pts[:]) is Some(bounds) else { return None }
 
   // check if we're clipped out vertically

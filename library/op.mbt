@@ -3,7 +3,7 @@
 
 ///|
 /// The predefined text operators: (name, text, limits) (upstream `ops!`).
-let math_ops : Array[(String, String, Bool)] = [
+let math_ops : ReadOnlyArray[(String, String, Bool)] = [
   ("arccos", "arccos", false),
   ("arcsin", "arcsin", false),
   ("arctan", "arctan", false),
@@ -51,7 +51,7 @@ let math_ops : Array[(String, String, Bool)] = [
 ///|
 /// Define the text operators in the math scope (upstream `op::define`).
 fn op_define(math : Scope) -> Unit {
-  for entry in math_ops {
+  for entry in math_ops[:] {
     let (name, operator, limits) = entry
     math.define(
       name,

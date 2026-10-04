@@ -16,7 +16,7 @@ pub impl Default for PlacementScope with fn default() {
 }
 
 ///|
-let placement_scope_names : Array[String] = ["column", "parent"]
+let placement_scope_names : ReadOnlyArray[String] = ["column", "parent"]
 
 ///|
 pub impl Reflect for PlacementScope with fn input() {

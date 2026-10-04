@@ -1292,7 +1292,7 @@ fn write_light_source(light : LightSource, xml : @xmlwriter.XmlWriter) -> Unit {
 }
 
 ///|
-let pow_vec : FixedArray[Float] = [
+let pow_vec : ReadOnlyArray[Float] = [
   1.0, 10.0, 100.0, 1_000.0, 10_000.0, 100_000.0, 1_000_000.0, 10_000_000.0, 100_000_000.0,
   1_000_000_000.0, 10_000_000_000.0, 100_000_000_000.0, 1_000_000_000_000.0,
 ]

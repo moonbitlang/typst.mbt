@@ -156,7 +156,7 @@ fn compute_quad_extremas(
   p2 : Point,
   extremas : Array[Point],
 ) -> Int {
-  let src = [p0, p1, p2]
+  let src : ReadOnlyArray[_] = [p0, p1, p2]
   let mut extrema_idx = 0
   if find_quad_extrema(p0.x, p1.x, p2.x) is Some(t) {
     extremas[extrema_idx] = eval_quad_at(src[:], t.to_normalized())
@@ -183,7 +183,7 @@ fn compute_cubic_extremas(
   let n0 = find_cubic_extrema(p0.x, p1.x, p2.x, p3.x, ts0)
   let n1 = find_cubic_extrema(p0.y, p1.y, p2.y, p3.y, ts1)
   let total_len = n0 + n1
-  let src = [p0, p1, p2, p3]
+  let src : ReadOnlyArray[_] = [p0, p1, p2, p3]
   let mut extrema_idx = 0
   for i in 0..<n0 {
     extremas[extrema_idx] = eval_cubic_pos_at(src[:], ts0[i].to_normalized())

@@ -22,7 +22,7 @@ pub fn Accent::normalize(s : String) -> Accent? {
 /// Tries to select a well-known combining accent that matches for the value.
 pub fn Accent::combining(value : String) -> Accent? {
   let c = single_char(value)
-  for entry in accents {
+  for entry in accents[:] {
     let (accent, names) = entry
     if Some(accent) == c || names.contains(value) {
       return Some(Accent(accent))
@@ -44,7 +44,7 @@ pub fn get_accent_func(value : String) -> Func? {
 
 ///|
 /// A list of accents, each with a list of alternative names.
-let accents : Array[(Char, Array[String])] = [
+let accents : ReadOnlyArray[(Char, ReadOnlyArray[String])] = [
   // Note: Symbols that can have a text presentation must explicitly have that
   // alternative listed here.
   ('\u{0300}', ["`"]),
@@ -78,7 +78,7 @@ fn accent_funcs() -> Map[Char, NativeFuncData] {
     Some(m) => m
     None => {
       let m : Map[Char, NativeFuncData] = Map([])
-      for entry in accents {
+      for entry in accents[:] {
         m[entry.0] = create_accent_func_data(entry.0)
       }
       accent_funcs_cell.val = Some(m)

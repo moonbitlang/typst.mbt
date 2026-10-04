@@ -9,7 +9,7 @@
 pub let max_iters : Int = 5
 
 ///|
-pub let iter_names : Array[String] = [
+pub let iter_names : ReadOnlyArray[String] = [
   "iter (1)", "iter (2)", "iter (3)", "iter (4)", "iter (5)",
 ]
 
