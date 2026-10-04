@@ -17,10 +17,11 @@
 //   equal ([values_memo_equal]: `==`, but recursing into content, styles,
 //   arrays, dictionaries, functions and dynamic values, where Typst's
 //   equality is looser).
-// - Only computations whose results cannot contain values created during
-//   the computation are memoized (a reused closure would keep its identity
-//   where a recomputed one gets a new one): layout produces frames and the
-//   counter sequence numbers. (The state sequence is not memoized.)
+// - Results that may contain values created during the computation are not
+//   reused (a reused closure would keep its identity where a recomputed one
+//   gets a new one): layout results whose tags hold closures are not cached
+//   ([frame_cacheable]), the counter sequence only holds numbers, and the
+//   state sequence is not memoized.
 // - Introspector reads of the call are recorded into a fresh
 //   [IntrospectionRecorder]. A cached result is only reused with the
 //   introspector it was computed with, or if all of its recorded reads
@@ -123,6 +124,7 @@ fn[T, I : Eq] memoize(
   input : I,
   copy : (T) -> T,
   f : (Engine) -> T raise SourceError,
+  cacheable? : (T) -> Bool = _ => true,
 ) -> T raise SourceError {
   let generation = memo_generation.val
   if generation == 0 {
@@ -169,6 +171,9 @@ fn[T, I : Eq] memoize(
     }
   }
   finish()
+  if !cacheable(output) {
+    return output
+  }
   let entry = { input, backend, reads, sink, output: copy(output), }
   match store.entries.get(key) {
     Some(entries) => {
@@ -482,6 +487,46 @@ pub fn memoized_layout(
     { content, styles, extra, },
     frames => frames.map(frame => frame.clone()),
     engine => f(engine).0,
+    cacheable=frames => frames.iter().all(frame_cacheable),
   )
   Fragment(frames)
+}
+
+///|
+/// Whether a laid-out frame can be reused: its tags must not hold closures
+/// (they may have been created during layout, and a recomputation would
+/// create new ones with a different identity). Tilings are not inspected,
+/// so frames with tiling paints are not reused either.
+fn frame_cacheable(frame : Frame) -> Bool {
+  for entry in frame.items() {
+    match entry.1 {
+      Group(group) => if !frame_cacheable(group.frame) { return false }
+      Tag(Start(content, _)) => {
+        let flags = fingerprint_flags_in(() => {
+          SipHasher128::new().write(content)
+        })
+        if (flags & fingerprint_identity) != 0 {
+          return false
+        }
+      }
+      Shape(shape, _) => {
+        if shape.fill is Some(Tiling(_)) {
+          return false
+        }
+        if shape.stroke is Some(stroke) && stroke.paint is Tiling(_) {
+          return false
+        }
+      }
+      Text(text) => {
+        if text.fill is Tiling(_) {
+          return false
+        }
+        if text.stroke is Some(stroke) && stroke.paint is Tiling(_) {
+          return false
+        }
+      }
+      _ => ()
+    }
+  }
+  true
 }
