@@ -127,9 +127,16 @@ const BIT_BUF_SIZE : Int = 64
 
 ///|
 fn BitWriter::push_le_bytes(self : BitWriter, v : UInt64, n : Int) -> Unit {
-  for i in 0..<n {
-    self.pending.push((v >> (8 * i)).to_byte())
+  let pending = self.pending
+  guard n >= 0 && n <= 8 && pending.remaining() >= n else {
+    abort("buf.len() must fit in remaining()")
   }
+  let buf = pending.buf
+  let at = pending.out + pending.pending
+  for i in 0..<n {
+    buf.unsafe_set(at + i, (v >> (8 * i)).to_byte())
+  }
+  pending.pending += n
 }
 
 ///|
@@ -238,7 +245,10 @@ priv struct EncodedBits {
 }
 
 ///|
-/// Upstream `encode_len`: the length code and extra bits of a match length.
+/// Upstream `encode_len`: the length code and extra bits of a match length
+/// (`lc` is a byte; the caller checks the table sizes, see
+/// [DeflateStream::compress_block_help]).
+#inline
 fn encode_len(
   lcodes : FixedArray[Int],
   llens : FixedArray[Int],
@@ -246,74 +256,59 @@ fn encode_len(
 ) -> EncodedBits {
   let mut lc = lc
   // Send the length code, len is the match length - STD_MIN_MATCH
-  let code = length_code[lc]
+  let code = length_code.unsafe_get(lc)
   let c = code + LITERALS + 1
-  let mut match_bits = lcodes[c].to_uint64()
-  let mut match_bits_len = llens[c]
-  let extra = extra_lbits[code]
+  let mut match_bits = u64_of_int(lcodes.unsafe_get(c))
+  let mut match_bits_len = llens.unsafe_get(c)
+  let extra = extra_lbits.unsafe_get(code)
   if extra != 0 {
-    lc -= base_length[code]
-    match_bits = match_bits | (lc.to_uint64() << match_bits_len)
+    lc -= base_length.unsafe_get(code)
+    match_bits = match_bits | (u64_of_int(lc) << match_bits_len)
     match_bits_len += extra
   }
   { bits: match_bits, len: match_bits_len, }
 }
 
 ///|
-/// Upstream `encode_dist`.
+/// Upstream `encode_dist` (`dist` is in `1..=32768`; the caller checks the
+/// table sizes, see [DeflateStream::compress_block_help]).
+#inline
 fn encode_dist(
   dcodes : FixedArray[Int],
   dlens : FixedArray[Int],
   dist : Int,
 ) -> EncodedBits {
   let mut dist = dist - 1 // dist is now the match distance - 1
-  let code = d_code(dist)
+  let code = dist_code.unsafe_get(
+    if dist < 256 {
+      dist
+    } else {
+      256 + (dist >> 7)
+    },
+  )
   // Send the distance code
-  let mut match_bits = dcodes[code].to_uint64()
-  let mut match_bits_len = dlens[code]
-  let extra = extra_dbits[code]
+  let mut match_bits = u64_of_int(dcodes.unsafe_get(code))
+  let mut match_bits_len = dlens.unsafe_get(code)
+  let extra = extra_dbits.unsafe_get(code)
   if extra != 0 {
-    dist -= base_dist[code]
-    match_bits = match_bits | (dist.to_uint64() << match_bits_len)
+    dist -= base_dist.unsafe_get(code)
+    match_bits = match_bits | (u64_of_int(dist) << match_bits_len)
     match_bits_len += extra
   }
   { bits: match_bits, len: match_bits_len, }
 }
 
 ///|
+/// `x as u64` for a non-negative `x` (intrinsic conversions only).
+#inline
+fn u64_of_int(x : Int) -> UInt64 {
+  UInt64::extend_uint(x.reinterpret_as_uint())
+}
+
+///|
 fn d_code(dist : Int) -> Int {
   let index = if dist < 256 { dist } else { 256 + (dist >> 7) }
   dist_code[index]
-}
-
-///|
-fn BitWriter::emit_lit(
-  self : BitWriter,
-  lcodes : FixedArray[Int],
-  llens : FixedArray[Int],
-  c : Int,
-) -> Unit {
-  self.send_code(c, lcodes, llens)
-}
-
-///|
-fn BitWriter::emit_dist(
-  self : BitWriter,
-  ltree : TreeDesc,
-  dtree : TreeDesc,
-  lc : Int,
-  dist : Int,
-) -> Unit {
-  let m = encode_len(ltree.a, ltree.b, lc)
-  let d = encode_dist(dtree.a, dtree.b, dist)
-  self.send_bits(m.bits | (d.bits << m.len), m.len + d.len)
-}
-
-///|
-fn BitWriter::emit_dist_static(self : BitWriter, lc : Int, dist : Int) -> Unit {
-  let m = encode_len(static_ltree.0, static_ltree.1, lc)
-  let d = encode_dist(static_dtree.0, static_dtree.1, dist)
-  self.send_bits(m.bits | (d.bits << m.len), m.len + d.len)
 }
 
 ///|
@@ -845,35 +840,95 @@ fn DeflateStream::build_bl_tree(self : DeflateStream) -> Int {
 
 ///|
 fn DeflateStream::compress_block_static_trees(self : DeflateStream) -> Unit {
-  let (lcodes, llens) = static_ltree
-  let sym = self.sym_buf.buf
-  let bw = self.bit_writer
-  for i = 0; i < self.sym_buf.filled; i = i + 3 {
-    let dist = sym[i].to_int() | (sym[i + 1].to_int() << 8)
-    let lc = sym[i + 2].to_int()
-    match dist {
-      0 => bw.emit_lit(lcodes, llens, lc)
-      _ => bw.emit_dist_static(lc, dist)
-    }
-  }
-  bw.emit_end_block(lcodes, llens)
+  // Upstream's `emit_dist_static` reads the length codes from
+  // `STATIC_LTREE_ENCODINGS`, which are `encode_len` on the static tree.
+  self.compress_block_help(
+    static_ltree.0,
+    static_ltree.1,
+    static_dtree.0,
+    static_dtree.1,
+  )
 }
 
 ///|
 fn DeflateStream::compress_block_dynamic_trees(self : DeflateStream) -> Unit {
-  let ltree = self.l_desc
-  let dtree = self.d_desc
+  self.compress_block_help(
+    self.l_desc.a,
+    self.l_desc.b,
+    self.d_desc.a,
+    self.d_desc.b,
+  )
+}
+
+///|
+/// Upstream `compress_block_help`, with `emit_lit`, `emit_dist`
+/// (`encode_len`, `encode_dist`) and `send_bits` inlined and the bit buffer
+/// kept in locals (performance).
+fn DeflateStream::compress_block_help(
+  self : DeflateStream,
+  lcodes : FixedArray[Int],
+  llens : FixedArray[Int],
+  dcodes : FixedArray[Int],
+  dlens : FixedArray[Int],
+) -> Unit {
   let sym = self.sym_buf.buf
+  let filled = self.sym_buf.filled
+  // One check for all lookups below: literals are bytes, `lc` (the match
+  // length - STD_MIN_MATCH) is a byte, the distance - 1 is below 32K.
+  guard filled >= 0 &&
+    filled <= sym.length() &&
+    lcodes.length() >= L_CODES &&
+    llens.length() >= L_CODES &&
+    dcodes.length() >= D_CODES &&
+    dlens.length() >= D_CODES &&
+    length_code.length() == 256 &&
+    base_length.length() == LENGTH_CODES &&
+    extra_lbits.length() == LENGTH_CODES &&
+    dist_code.length() == 512 &&
+    base_dist.length() == D_CODES &&
+    extra_dbits.length() == D_CODES else {
+    abort("index out of bounds")
+  }
   let bw = self.bit_writer
-  for i = 0; i < self.sym_buf.filled; i = i + 3 {
-    let dist = sym[i].to_int() | (sym[i + 1].to_int() << 8)
-    let lc = sym[i + 2].to_int()
-    match dist {
-      0 => bw.emit_lit(ltree.a, ltree.b, lc)
-      _ => bw.emit_dist(ltree, dtree, lc, dist)
+  let mut bit_buffer = bw.bit_buffer
+  let mut bits_valid = bw.bits_valid
+  for i = 0; i <= filled - 3; i = i + 3 {
+    let dist = sym.unsafe_get(i).to_int() |
+      (sym.unsafe_get(i + 1).to_int() << 8)
+    let lc = sym.unsafe_get(i + 2).to_int()
+    let mut val : UInt64 = 0
+    let mut len = 0
+    if dist == 0 {
+      // emit_lit
+      val = u64_of_int(lcodes.unsafe_get(lc))
+      len = llens.unsafe_get(lc)
+    } else {
+      // emit_dist
+      let m = encode_len(lcodes, llens, lc)
+      let d = encode_dist(dcodes, dlens, dist)
+      val = m.bits | (d.bits << m.len)
+      len = m.len + d.len
+    }
+    // send_bits
+    let total_bits = len + bits_valid
+    if total_bits < BIT_BUF_SIZE {
+      bit_buffer = bit_buffer | (val << bits_valid)
+      bits_valid = total_bits
+    } else if bits_valid == BIT_BUF_SIZE {
+      // send_bits_overflow
+      bw.push_le_bytes(bit_buffer, 8)
+      bit_buffer = val
+      bits_valid = total_bits - BIT_BUF_SIZE
+    } else {
+      bit_buffer = bit_buffer | (val << bits_valid)
+      bw.push_le_bytes(bit_buffer, 8)
+      bit_buffer = val >> (BIT_BUF_SIZE - bits_valid)
+      bits_valid = total_bits - BIT_BUF_SIZE
     }
   }
-  bw.emit_end_block(ltree.a, ltree.b)
+  bw.bit_buffer = bit_buffer
+  bw.bits_valid = bits_valid
+  bw.emit_end_block(lcodes, llens)
 }
 
 ///|
