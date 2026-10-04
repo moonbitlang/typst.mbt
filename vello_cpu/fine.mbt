@@ -90,7 +90,12 @@ priv struct FineResources {
 ///|
 /// Writes the current buffer contents to the output row.
 fn Fine::pack(self : Fine, region : Region) -> Unit {
-  let scratch = self.top()
+  pack_region(self.top(), region)
+}
+
+///|
+/// [Fine::pack] one pixel at a time.
+fn pack_region_scalar(scratch : FixedArray[Byte], region : Region) -> Unit {
   for y in 0..<region.height {
     let row_start = region.offset + y * region.stride
     for x in 0..<region.width {
@@ -460,8 +465,10 @@ fn fill_solid(
 }
 
 ///|
-/// Composites a solid color onto a buffer using alpha blending.
-fn alpha_composite_solid(
+/// Composites a solid color onto a buffer using alpha blending (the lane
+/// emulation; the target-selected `alpha_composite_solid` is in
+/// `fine_{v128,scalar}.mbt`).
+fn alpha_composite_solid_scalar(
   dest : FixedArray[Byte],
   start : Int,
   len : Int,
@@ -508,8 +515,9 @@ fn alpha_composite_solid(
 
 ///|
 /// Composites a source buffer onto a destination buffer using alpha
-/// blending.
-fn alpha_composite_buffer(
+/// blending (the lane emulation; the target-selected
+/// `alpha_composite_buffer` is in `fine_{v128,scalar}.mbt`).
+fn alpha_composite_buffer_scalar(
   dest : FixedArray[Byte],
   start : Int,
   len : Int,
