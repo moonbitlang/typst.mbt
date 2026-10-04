@@ -29,5 +29,7 @@ options(
     "zlib_scalar.mbt": [ "wasm-gc", "js" ],
     "png_filter_v128.mbt": [ "native", "wasm" ],
     "png_filter_scalar.mbt": [ "wasm-gc", "js" ],
+    "jpeg_v128.mbt": [ "native", "wasm" ],
+    "jpeg_scalar.mbt": [ "wasm-gc", "js" ],
   },
 )

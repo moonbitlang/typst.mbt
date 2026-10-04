@@ -237,6 +237,136 @@ test "paeth16 matches filter_paeth on all byte triples" {
 }
 
 ///|
+fn kernel_test_ints(n : Int, seed : Int, lo : Int, hi : Int) -> FixedArray[Int] {
+  let bytes = kernel_test_bytes(4 * n, seed)
+  FixedArray::makei(n, i => {
+    let r = bytes[4 * i].to_int() |
+      (bytes[4 * i + 1].to_int() << 8) |
+      (bytes[4 * i + 2].to_int() << 16)
+    lo + r % (hi - lo + 1)
+  })
+}
+
+///|
+test "ycbcr_to_rgb_16 matches the scalar conversion" {
+  // Samples in 0..=255 (decoder output) and beyond (wrapping `as i16`,
+  // saturation).
+  for range in [(0, 255), (-70000, 70000), (-200, 600)] {
+    let (lo, hi) = range
+    for seed in 0..<20 {
+      let y = kernel_test_ints(40, seed, lo, hi)
+      let cb = kernel_test_ints(40, seed + 100, lo, hi)
+      let cr = kernel_test_ints(40, seed + 200, lo, hi)
+      for nc in [3, 4] {
+        for off in [0, 3, 24] {
+          let out1 = FixedArray::make(16 * nc + 5, b'\x00')
+          let out2 = FixedArray::make(16 * nc + 5, b'\x00')
+          ycbcr_to_rgb_16(y, off, cb, off / 3, cr, off / 2, out1, 5, nc)
+          ycbcr_to_rgb_16_scalar(y, off, cb, off / 3, cr, off / 2, out2, 5, nc)
+          for i in 0..<out1.length() {
+            assert_eq(out1[i], out2[i])
+          }
+        }
+      }
+    }
+  }
+}
+
+///|
+test "upsamplers match the reference filters" {
+  for len in [3, 4, 5, 6, 7, 8, 9, 15, 16, 17, 33, 64, 100] {
+    for seed in 0..<4 {
+      let src = kernel_test_ints(len + 7, seed, 0, 255)
+      let near = kernel_test_ints(len + 7, seed + 9, 0, 255)
+      let far = kernel_test_ints(len + 7, seed + 19, 0, 255)
+      let off = seed % 3
+      let input : Slice = { arr: src, off, len, }
+      let in_near : Slice = { arr: near, off: off + 1, len, }
+      let in_far : Slice = { arr: far, off: 2, len, }
+      // horizontal
+      let out_arr = FixedArray::make(2 * len + 9, -1)
+      let output : Slice = { arr: out_arr, off: 3, len: 2 * len, }
+      upsample_horizontal(input, output)
+      let inp = (i : Int) => src[off + i]
+      assert_eq(out_arr[3], inp(0))
+      assert_eq(out_arr[4], (inp(0) * 3 + inp(1) + 2) >> 2)
+      for w in 0..<(len - 2) {
+        let sample = 3 * inp(w + 1) + 2
+        assert_eq(out_arr[3 + 2 + 2 * w], (sample + inp(w)) >> 2)
+        assert_eq(out_arr[3 + 3 + 2 * w], (sample + inp(w + 2)) >> 2)
+      }
+      assert_eq(out_arr[2], -1)
+      assert_eq(out_arr[3 + 2 * len], -1)
+      // vertical
+      let vout = FixedArray::make(2 * len + 4, -1)
+      upsample_vertical(input, in_near, in_far, {
+        arr: vout,
+        off: 1,
+        len: 2 * len,
+      })
+      for i in 0..<len {
+        assert_eq(vout[1 + i], (3 * inp(i) + 2 + near[off + 1 + i]) >> 2)
+        assert_eq(vout[1 + len + i], (3 * inp(i) + 2 + far[2 + i]) >> 2)
+      }
+      assert_eq(vout[0], -1)
+      assert_eq(vout[1 + 2 * len], -1)
+    }
+  }
+}
+
+///|
+test "bench upsample_horizontal 1024 samples x16" (it : @bench.T) {
+  let src = kernel_test_ints(1024, 1, 0, 255)
+  let out = FixedArray::make(2048, 0)
+  it.bench(() => {
+    for _ in 0..<16 {
+      upsample_horizontal({ arr: src, off: 0, len: 1024, }, {
+        arr: out,
+        off: 0,
+        len: 2048,
+      }) catch {
+        _ => ()
+      }
+    }
+    it.keep(out)
+  })
+}
+
+///|
+test "bench upsample_vertical 1024 samples x16" (it : @bench.T) {
+  let src = kernel_test_ints(1024, 1, 0, 255)
+  let near = kernel_test_ints(1024, 2, 0, 255)
+  let out = FixedArray::make(2048, 0)
+  it.bench(() => {
+    for _ in 0..<16 {
+      upsample_vertical(
+        { arr: src, off: 0, len: 1024, },
+        { arr: near, off: 0, len: 1024, },
+        { arr: near, off: 0, len: 1024, },
+        { arr: out, off: 0, len: 2048, },
+      ) catch {
+        _ => ()
+      }
+    }
+    it.keep(out)
+  })
+}
+
+///|
+test "bench ycbcr_to_rgb_16 x1000" (it : @bench.T) {
+  let y = kernel_test_ints(16016, 1, 0, 255)
+  let cb = kernel_test_ints(16016, 2, 0, 255)
+  let cr = kernel_test_ints(16016, 3, 0, 255)
+  let out = FixedArray::make(16016 * 3, b'\x00')
+  it.bench(() => {
+    for c in 0..<1000 {
+      ycbcr_to_rgb_16(y, c * 16, cb, c * 16, cr, c * 16, out, c * 48, 3)
+    }
+    it.keep(out)
+  })
+}
+
+///|
 fn bench_window() -> FixedArray[Byte] {
   // Mostly-equal data like a rendered page: long runs with sparse changes.
   let w = FixedArray::make(65536, b'\xff')
