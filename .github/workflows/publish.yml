@@ -1,0 +1,51 @@
+name: Publish to mooncakes
+
+# Publishes moonbitlang/typst with the organization's mooncakes token
+# (the module name must match the authenticated user, so it cannot be
+# published from a personal login). Run manually after bumping `version` in
+# moon.mod and verifying the differential stages locally.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mooncakes-publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install MoonBit
+        run: |
+          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
+          echo "$HOME/.moon/bin" >> $GITHUB_PATH
+      - name: moon version
+        run: |
+          moon version --all
+          moon update
+      - name: Check
+        run: |
+          moon check --target native
+          moon check --target wasm-gc
+      - name: Package
+        run: |
+          moon package
+          ls -la _build/publish/
+      - name: Publish
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$SECRET" || { echo "Missing Mooncakes token" >&2; exit 1; }
+          umask 077
+          mkdir -p "$HOME/.moon"
+          trap 'rm -f "$HOME/.moon/credentials.json"' EXIT
+          printf '%s\n' "$SECRET" > "$HOME/.moon/credentials.json"
+          moon publish
+        env:
+          SECRET: ${{ secrets.MOONCAKES_MOONBITLANG_TOKEN }}
