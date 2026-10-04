@@ -5139,6 +5139,7 @@ pub fn Dict::get(Self, String) -> Value raise HintedError
 pub fn Dict::insert(Self, String, Value) -> Unit
 pub fn Dict::is_empty(Self) -> Bool
 pub fn Dict::iter(Self) -> Iter2[String, Value]
+pub fn Dict::keys_within(Self, ArrayView[String]) -> Bool
 pub fn Dict::len(Self) -> Int
 pub fn Dict::make_mut(Self) -> Self
 pub fn Dict::merge(Self, Self) -> Self

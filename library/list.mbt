@@ -124,5 +124,5 @@ fn list_elem_depth_default() -> Value {
 
 ///|
 fn list_elem_depth_fold(inner : Value, outer : Value) -> Value {
-  fold_of((Ty::new() : Ty[Depth]))(inner, outer)
+  fold_with((Ty::new() : Ty[Depth]), inner, outer)
 }

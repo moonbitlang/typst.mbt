@@ -59,7 +59,7 @@ fn html_elem_attrs_default() -> Value {
 ///|
 /// `#[fold]` of `HtmlElem.attrs` (`Fold for HtmlAttrs`).
 fn html_elem_attrs_fold(inner : Value, outer : Value) -> Value {
-  fold_of((Ty::new() : Ty[HtmlAttrs]))(inner, outer)
+  fold_with((Ty::new() : Ty[HtmlAttrs]), inner, outer)
 }
 
 ///|

@@ -298,7 +298,7 @@ fn text_elem_size_default() -> Value {
 
 ///|
 fn text_elem_size_fold(inner : Value, outer : Value) -> Value {
-  fold_of((Ty::new() : Ty[TextSize]))(inner, outer)
+  fold_with((Ty::new() : Ty[TextSize]), inner, outer)
 }
 
 // TopEdge, BottomEdge
@@ -856,7 +856,7 @@ fn text_elem_features_default() -> Value {
 
 ///|
 fn text_elem_features_fold(inner : Value, outer : Value) -> Value {
-  fold_of((Ty::new() : Ty[FontFeatures]))(inner, outer)
+  fold_with((Ty::new() : Ty[FontFeatures]), inner, outer)
 }
 
 ///|
@@ -866,7 +866,7 @@ fn text_elem_variations_default() -> Value {
 
 ///|
 fn text_elem_variations_fold(inner : Value, outer : Value) -> Value {
-  fold_of((Ty::new() : Ty[FontVariations]))(inner, outer)
+  fold_with((Ty::new() : Ty[FontVariations]), inner, outer)
 }
 
 // ItalicToggle, WeightDelta
@@ -914,7 +914,7 @@ fn text_elem_emph_default() -> Value {
 
 ///|
 fn text_elem_emph_fold(inner : Value, outer : Value) -> Value {
-  fold_of((Ty::new() : Ty[ItalicToggle]))(inner, outer)
+  fold_with((Ty::new() : Ty[ItalicToggle]), inner, outer)
 }
 
 ///|
@@ -960,7 +960,7 @@ fn text_elem_delta_default() -> Value {
 
 ///|
 fn text_elem_delta_fold(inner : Value, outer : Value) -> Value {
-  fold_of((Ty::new() : Ty[WeightDelta]))(inner, outer)
+  fold_with((Ty::new() : Ty[WeightDelta]), inner, outer)
 }
 
 // Costs
@@ -1045,6 +1045,15 @@ pub impl IntoValue for Costs with fn into_value(self) {
 pub impl FromValue for Costs with fn from_value(v) {
   match v {
     Dict(v) => {
+      if v.keys_within(["hyphenation", "runt", "widow", "orphan"]) {
+        // Without copying the dictionary (performance).
+        return {
+          hyphenation: dict_get_cast(v, "hyphenation"),
+          runt: dict_get_cast(v, "runt"),
+          widow: dict_get_cast(v, "widow"),
+          orphan: dict_get_cast(v, "orphan"),
+        }
+      }
       let v = v.copy()
       let ret = {
         hyphenation: dict_take_cast(v, "hyphenation"),
@@ -1080,7 +1089,7 @@ fn text_elem_costs_default() -> Value {
 
 ///|
 fn text_elem_costs_fold(inner : Value, outer : Value) -> Value {
-  fold_of((Ty::new() : Ty[Costs]))(inner, outer)
+  fold_with((Ty::new() : Ty[Costs]), inner, outer)
 }
 
 // Never

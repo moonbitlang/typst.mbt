@@ -81,6 +81,21 @@ pub fn Dict::insert(self : Dict, key : String, value : Value) -> Unit {
 }
 
 ///|
+/// Whether all keys of the dictionary are among `expected`. Then the
+/// copy-take-finish casting pattern (`dict.copy()`, `take` each key,
+/// `finish(expected)`) cannot fail with unexpected keys, and casts may read
+/// the keys without copying the dictionary (performance).
+pub fn Dict::keys_within(self : Dict, expected : ArrayView[String]) -> Bool {
+  let mut n = 0
+  for key in expected {
+    if self.map.contains(key) {
+      n += 1
+    }
+  }
+  n == self.map.length()
+}
+
+///|
 /// Remove the value if the dictionary contains the given key.
 pub fn Dict::take(self : Dict, key : String) -> Value raise HintedError {
   match self.map.get(key) {

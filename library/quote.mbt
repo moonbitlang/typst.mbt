@@ -82,7 +82,7 @@ fn quote_elem_depth_default() -> Value {
 
 ///|
 fn quote_elem_depth_fold(inner : Value, outer : Value) -> Value {
-  fold_of((Ty::new() : Ty[Depth]))(inner, outer)
+  fold_with((Ty::new() : Ty[Depth]), inner, outer)
 }
 
 ///|

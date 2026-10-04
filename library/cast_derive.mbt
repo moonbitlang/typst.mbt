@@ -55,6 +55,35 @@ fn[T] with_err_hint(
 }
 
 ///|
+/// [dict_take_cast] without removing the key (see [Dict::keys_within]).
+fn[T : FromValue] dict_get_cast(
+  dict : Dict,
+  key : String,
+) -> T? raise HintedError {
+  match dict.map.get(key) {
+    Some(v) => Some(T::from_value(v))
+    None => None
+  }
+}
+
+///|
+/// [fold_of] applied directly, without allocating the closure.
+fn[T : FromValue + IntoValue + Fold] fold_with(
+  _ty : Ty[T],
+  inner : Value,
+  outer : Value,
+) -> Value {
+  let folded = try {
+    let i : T = T::from_value(inner)
+    let o : T = T::from_value(outer)
+    Some(IntoValue::into_value(Fold::fold(i, o)))
+  } catch {
+    _ => None
+  }
+  folded.unwrap_or(inner)
+}
+
+///|
 /// Take a key from a dictionary and cast it, if present (upstream
 /// `dict.take(key).ok().map(|v| v.cast()).transpose()`).
 fn[T : FromValue] dict_take_cast(
