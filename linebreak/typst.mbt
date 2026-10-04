@@ -106,6 +106,38 @@ pub fn Breakpoint::trim(self : Breakpoint, start : Int, line : String) -> Trim {
 }
 
 ///|
+/// [Breakpoint::trim] for a line `start..end` whose UTF-8 length after
+/// trimming the trailing chars for which [Breakpoint::trims] holds is given by
+/// `trimmed_len` (the same result without building the line's string).
+pub fn Breakpoint::trim_by(
+  self : Breakpoint,
+  start : Int,
+  end : Int,
+  trimmed_len : ((Int) -> Bool) -> Int,
+) -> Trim {
+  match self {
+    Normal => { layout: start + trimmed_len(c => self.trims(c)), shaping: end, }
+    Mandatory => Trim::uniform(start + trimmed_len(c => self.trims(c)))
+    Hyphen(_, _) => Trim::uniform(end)
+  }
+}
+
+///|
+/// Whether a trailing char is trimmed from lines ending at this breakpoint
+/// (see [Breakpoint::trim]).
+pub fn Breakpoint::trims(self : Breakpoint, c : Int) -> Bool {
+  match self {
+    Normal => {
+      let ch = Int::unsafe_to_char(c)
+      @unicode.is_whitespace(ch) || @unicode.is_default_ignorable(ch)
+    }
+    Mandatory =>
+      line_break(c) is (MandatoryBreak | CarriageReturn | LineFeed | NextLine)
+    Hyphen(_, _) => false
+  }
+}
+
+///|
 /// Whether this is a hyphen breakpoint.
 pub fn Breakpoint::is_hyphen(self : Breakpoint) -> Bool {
   self is Hyphen(_, _)

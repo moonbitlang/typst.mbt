@@ -19,8 +19,9 @@ pub struct Content {
   /// guarded against the n-th show rule recipe.
   lifecycle : Array[Int]
   /// The lazily computed hash of the field data (upstream: the `hash` in the
-  /// content header). Shared by all copies with the same `fields`.
-  priv data_hash : Ref[U128?]
+  /// content header) and its flags (see `fingerprint_flags`). Shared by all
+  /// copies with the same `fields`.
+  priv data_hash : Ref[(U128, Int)?]
 }
 
 ///|

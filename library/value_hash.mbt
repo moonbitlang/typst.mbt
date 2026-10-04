@@ -97,6 +97,8 @@ pub impl Fingerprint for Value with fn fingerprint(self, state) {
     Gradient(v) => {
       state.write_discriminant(11)
       state.write_str(v.repr())
+      // The repr rounds numbers.
+      mark_fingerprint_lossy()
     }
     Tiling(v) => {
       state.write_discriminant(12)
@@ -104,6 +106,7 @@ pub impl Fingerprint for Value with fn fingerprint(self, state) {
       // only its size and item count are written.
       state.write_str(v.repr())
       state.write_usize(v.frame.items().length())
+      mark_fingerprint_lossy()
     }
     Symbol(v) => {
       state.write_discriminant(13)
@@ -258,6 +261,8 @@ pub impl Fingerprint for Func with fn fingerprint(self, state) {
       state.write(elem)
     }
     Closure(closure) => {
+      // Closures compare by identity.
+      fingerprint_flags.val = fingerprint_flags.val | fingerprint_identity
       state.write_discriminant(2)
       let node = match closure.node {
         Closure(node) => {
@@ -301,15 +306,20 @@ pub impl Fingerprint for Content with fn fingerprint(self, state) {
   state.write(lifecycle)
   // Data (hashed once and cached, like upstream).
   let data = match self.data_hash.val {
-    Some(h) => h
+    Some((h, flags)) => {
+      mark_fingerprint_flags(flags)
+      h
+    }
     None => {
       let inner = SipHasher128::new()
-      inner.write_usize(self.fields.length())
-      for field in self.fields {
-        inner.write(field)
-      }
+      let flags = fingerprint_flags_in(() => {
+        inner.write_usize(self.fields.length())
+        for field in self.fields {
+          inner.write(field)
+        }
+      })
       let h = inner.finish128()
-      self.data_hash.val = Some(h)
+      self.data_hash.val = Some((h, flags))
       h
     }
   }
@@ -544,6 +554,11 @@ pub impl Fingerprint for DynValue with fn fingerprint(self, state) {
     Regex(v) => state.write_str(v.as_str())
     Alignment(v) => state.write_leaf(v.repr(), v)
     Dir(v) => state.write_leaf(v.repr(), v)
-    other => state.write_str(other.repr())
+    other => {
+      state.write_str(other.repr())
+      // The repr may round numbers or abbreviate (e.g. strokes with
+      // tilings).
+      mark_fingerprint_lossy()
+    }
   }
 }

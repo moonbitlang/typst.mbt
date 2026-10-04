@@ -6,6 +6,8 @@ options(
   "pre-build": [
     {
       "input": [
+        "gen-fonts",
+        "gen-fonts.ps1",
         "files/LibertinusSerif-Regular.otf",
         "files/LibertinusSerif-Bold.otf",
         "files/LibertinusSerif-Italic.otf",

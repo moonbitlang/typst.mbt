@@ -234,6 +234,30 @@ fn Utf8Slice::trim_end_len(self : Utf8Slice, pred : (Int) -> Bool) -> Int {
 }
 
 ///|
+/// `self.slice(start, end).trim_end_len(c => is_whitespace(c))` without
+/// allocating the slice and the closure (performance).
+fn Utf8Slice::trim_end_whitespace_len(
+  self : Utf8Slice,
+  start : Int,
+  end : Int,
+) -> Int {
+  let base = self.start + start
+  let mut len = end - start
+  while len > 0 {
+    // `char_start_before` on the sub-slice.
+    let mut j = len - 1
+    while j > 0 && self.src.cps[base + j] < 0 {
+      j -= 1
+    }
+    if !@unicode.is_whitespace(char_of(self.src.cps[base + j])) {
+      break
+    }
+    len = j
+  }
+  len
+}
+
+///|
 fn char_of(c : Int) -> Char {
   Int::unsafe_to_char(c)
 }

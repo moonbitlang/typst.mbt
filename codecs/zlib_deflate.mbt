@@ -345,16 +345,29 @@ fn DeflateStream::level_flags(self : DeflateStream) -> Int {
 
 ///|
 fn read_u32_le(window : FixedArray[Byte], i : Int) -> UInt {
-  window[i].to_uint() |
-  (window[i + 1].to_uint() << 8) |
-  (window[i + 2].to_uint() << 16) |
-  (window[i + 3].to_uint() << 24)
+  // One bounds check for all four bytes (performance).
+  guard i >= 0 && i + 4 <= window.length() else { abort("index out of bounds") }
+  // Intrinsic conversions only (core's `Byte::to_uint` is not inlined).
+  (window.unsafe_get(i).to_int() |
+  (window.unsafe_get(i + 1).to_int() << 8) |
+  (window.unsafe_get(i + 2).to_int() << 16) |
+  (window.unsafe_get(i + 3).to_int() << 24)).reinterpret_as_uint()
 }
 
 ///|
 fn read_u64_le(window : FixedArray[Byte], i : Int) -> UInt64 {
-  read_u32_le(window, i).to_uint64() |
-  (read_u32_le(window, i + 4).to_uint64() << 32)
+  // One bounds check for all eight bytes (performance).
+  guard i >= 0 && i + 8 <= window.length() else { abort("index out of bounds") }
+  let lo = window.unsafe_get(i).to_int() |
+    (window.unsafe_get(i + 1).to_int() << 8) |
+    (window.unsafe_get(i + 2).to_int() << 16) |
+    (window.unsafe_get(i + 3).to_int() << 24)
+  let hi = window.unsafe_get(i + 4).to_int() |
+    (window.unsafe_get(i + 5).to_int() << 8) |
+    (window.unsafe_get(i + 6).to_int() << 16) |
+    (window.unsafe_get(i + 7).to_int() << 24)
+  UInt64::extend_uint(lo.reinterpret_as_uint()) |
+  (UInt64::extend_uint(hi.reinterpret_as_uint()) << 32)
 }
 
 ///|
@@ -403,13 +416,15 @@ fn DeflateStream::insert_string(
 ///|
 fn DeflateStream::slide_hash(self : DeflateStream) -> Unit {
   let wsize = self.w_size
-  for i in 0..<self.head.length() {
-    let m = self.head[i]
-    self.head[i] = if m >= wsize { m - wsize } else { 0 }
+  let head = self.head
+  for i in 0..<head.length() {
+    let m = head.unsafe_get(i)
+    head.unsafe_set(i, if m >= wsize { m - wsize } else { 0 })
   }
-  for i in 0..<self.prev.length() {
-    let m = self.prev[i]
-    self.prev[i] = if m >= wsize { m - wsize } else { 0 }
+  let prev = self.prev
+  for i in 0..<prev.length() {
+    let m = prev.unsafe_get(i)
+    prev.unsafe_set(i, if m >= wsize { m - wsize } else { 0 })
   }
 }
 
@@ -427,8 +442,12 @@ fn DeflateStream::read_buf_window(
   }
   self.avail_in -= len
   let src = self.input[self.next_in:self.next_in + len]
+  guard offset >= 0 && offset + len <= self.window.length() else {
+    abort("index out of bounds")
+  }
+  let window = self.window
   for i in 0..<len {
-    self.window[offset + i] = src[i]
+    window.unsafe_set(offset + i, src[i])
   }
   if self.wrap == 1 {
     self.adler = adler32(self.adler, src)

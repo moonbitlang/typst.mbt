@@ -2,9 +2,9 @@
 // feature): Libertinus Serif, New Computer Modern (+ Math) and DejaVu Sans
 // Mono. The font files are in `files/` (from typst-assets at revision
 // 94dcb99, version 0.15.1, with its LICENSE and NOTICE); the pre-build step
-// `gen-fonts` turns them into `fonts_gen.c` (native, decoded by
-// `fonts_stub.c`) and `fonts_wasm_gen.mbt` (wasm, wasm-gc), which are not
-// committed.
+// `gen-fonts` turns them into `fonts_gen.c` (native: raw bytes, copied by
+// `fonts_stub.c`) and `fonts_wasm_gen.mbt` (wasm, wasm-gc: base64), which
+// are not committed.
 
 ///|
 let fonts_cell : Ref[Array[Bytes]?] = { val: None, }

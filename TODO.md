@@ -62,10 +62,26 @@ goldens with `scripts/goldens.sh <stage>` (needs Rust; builds `oracle/`).
   PDF-embedded fonts).
 
 ### Quality / performance
-- [ ] **Benchmark** against upstream (compile times per stage, memory); use
-  `moon run --profile --target native --release`. Known hot spots to watch:
-  shaping-face/plan caches (`layout/inline_shaping.mbt`), frame COW, content
-  hashing (`library/value_hash.mbt`).
+- [ ] **Performance** (`bench/run.sh`, `bench/README.md`; M-series Mac,
+  native release, embedded fonts only, upstream `--jobs 1`; 2026-10-04):
+
+  | workload | Rust | before | now | now vs Rust |
+  |---|---:|---:|---:|---:|
+  | startup (`tiny.typ` → PDF) | 6.9 ms | 80 ms | 21 ms | 3.1× |
+  | `long.typ` compile (`query`) | 102 ms | 1.32 s | 308 ms | 3.0× |
+  | `long.typ` → PDF | 121 ms | 1.45 s | 434 ms | 3.6× |
+  | `long.typ` → SVG | 185 ms | 1.98 s | 459 ms | 2.5× |
+  | `long.typ` → PNG (24 pages) | 907 ms | 5.32 s | 2.66 s | 2.9× |
+  | `showcase.typ` → PDF (system fonts) | 285 ms | 2.25 s | 1.34 s | 4.7× |
+  | `longer.typ` compile | 472 ms | 6.58 s | 1.49 s | 3.2× |
+
+  Remaining hot spots: allocation/RC (~35% of compile), line breaking and
+  shaping (rustybuzz port), style-chain lookups (values are cast from
+  `Value` on every read), grid layout; PDF: pdflite's flate (font streams);
+  PNG: zlib deflate and PNG filtering; showcase: system font discovery
+  (parses every installed face), JPEG decoding. Not done: lazy embedded
+  `FontInfo` (startup), memoizing the state sequence (closure identity, see
+  AGENTS.md), typed style caches.
 - [ ] **Build times**: the `library` package dominates (serial compile,
   ~80–95 s release rebuild). Consider splitting it into several packages
   along upstream module lines so `-j` parallelizes builds.

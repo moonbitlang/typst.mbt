@@ -41,6 +41,11 @@ struct Face {
   prefered_cmap_encoding_subtable : Int?
   gsub : SubstitutionTable?
   gpos : PositioningTable?
+  /// Not upstream: memoized `get_nominal_glyph` results (glyph id, or -1
+  /// for none) by code point, and `glyph_props` by glyph id (-1: not yet
+  /// computed). Both only depend on the font's tables (performance).
+  nominal_glyphs : Map[Int, Int]
+  mut glyph_props_cache : FixedArray[Int]
 }
 
 ///|
@@ -62,6 +67,8 @@ pub fn Face::from_face(face : @otf.Face) -> Face {
     prefered_cmap_encoding_subtable: find_best_cmap_subtable(face),
     gsub: face.tables().gsub.map(SubstitutionTable::new),
     gpos: face.tables().gpos.map(PositioningTable::new),
+    nominal_glyphs: {},
+    glyph_props_cache: [],
     ttfp_face: face,
   }
 }
@@ -125,6 +132,22 @@ fn Face::has_glyph(self : Face, c : Int) -> Bool {
 
 ///|
 fn Face::get_nominal_glyph(self : Face, c : Int) -> @otf.GlyphId? {
+  match self.nominal_glyphs.get(c) {
+    Some(-1) => None
+    Some(gid) => Some(@otf.GlyphId(gid.to_uint16()))
+    None => {
+      let res = self.get_nominal_glyph_uncached(c)
+      self.nominal_glyphs[c] = match res {
+        Some(gid) => gid.0.to_int()
+        None => -1
+      }
+      res
+    }
+  }
+}
+
+///|
+fn Face::get_nominal_glyph_uncached(self : Face, c : Int) -> @otf.GlyphId? {
   let mut c = c
   guard self.prefered_cmap_encoding_subtable is Some(subtable_idx) else {
     return None
@@ -394,6 +417,23 @@ fn Face::glyph_name(self : Face, glyph : @otf.GlyphId) -> String? {
 
 ///|
 fn Face::glyph_props(self : Face, glyph : @otf.GlyphId) -> Int {
+  let g = glyph.0.to_int()
+  if g < self.glyph_props_cache.length() {
+    let cached = self.glyph_props_cache[g]
+    if cached >= 0 {
+      return cached
+    }
+  } else {
+    // Glyph ids are 16-bit.
+    self.glyph_props_cache = FixedArray::make(65536, -1)
+  }
+  let props = self.glyph_props_uncached(glyph)
+  self.glyph_props_cache[g] = props
+  props
+}
+
+///|
+fn Face::glyph_props_uncached(self : Face, glyph : @otf.GlyphId) -> Int {
   guard self.tables().gdef is Some(table) else { return 0 }
   match table.glyph_class(glyph) {
     Some(Base) => GLYPH_PROPS_BASE_GLYPH

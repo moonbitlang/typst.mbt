@@ -7,12 +7,17 @@ pub struct FontBook {
   priv families : Map[String, Array[Int]]
   /// Metadata about each font in the collection.
   priv infos : Array[FontInfo]
+  /// Memoized [FontBook::select] results (not upstream; cleared by `push`).
+  priv selected : Map[(String, FontVariant), Int?]
+  /// Memoized indices of the fonts covering a char (not upstream; cleared by
+  /// `push`).
+  priv covering : Map[Int, Array[Int]]
 }
 
 ///|
 /// Create a new, empty font book.
 pub fn FontBook::new() -> FontBook {
-  { families: {}, infos: [], }
+  { families: {}, infos: [], selected: {}, covering: {}, }
 }
 
 ///|
@@ -39,6 +44,8 @@ pub fn FontBook::from_fonts(fonts : Array[Font]) -> FontBook {
 ///|
 /// Insert metadata into the font book.
 pub fn FontBook::push(self : FontBook, info : FontInfo) -> Unit {
+  self.selected.clear()
+  self.covering.clear()
   let index = self.infos.length()
   let family = @unicode.to_lowercase(info.family)
   match self.families.get(family) {
@@ -91,8 +98,16 @@ pub fn FontBook::select(
   family : String,
   variant : FontVariant,
 ) -> Int? {
-  guard self.families.get(family) is Some(ids) else { return None }
-  self.find_best_variant(None, variant, ids)
+  let key = (family, variant)
+  if self.selected.get(key) is Some(selected) {
+    return selected
+  }
+  let selected = match self.families.get(family) {
+    Some(ids) => self.find_best_variant(None, variant, ids)
+    None => None
+  }
+  self.selected[key] = selected
+  selected
 }
 
 ///|
@@ -122,10 +137,17 @@ pub fn FontBook::select_fallback(
     }
   }
   guard c is Some(c) else { return None }
-  let ids = []
-  for index, info in self.infos {
-    if info.coverage.contains(c.to_int().reinterpret_as_uint()) {
-      ids.push(index)
+  let ids = match self.covering.get(c.to_int()) {
+    Some(ids) => ids
+    None => {
+      let ids = []
+      for index, info in self.infos {
+        if info.coverage.contains(c.to_int().reinterpret_as_uint()) {
+          ids.push(index)
+        }
+      }
+      self.covering[c.to_int()] = ids
+      ids
     }
   }
   // ... and find the best variant among them.

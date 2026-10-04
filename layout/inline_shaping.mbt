@@ -845,12 +845,21 @@ fn ShapedText::hyphen(
       chain.push(id)
     }
   }
-  // The fallback is only consulted lazily upstream (`chain` + `find_map`),
-  // but selecting is pure, so collecting it eagerly is equivalent.
-  if fallback && book.select_fallback(None, base.variant, "-") is Some(id) {
-    chain.push(id)
-  }
-  for id in chain {
+  // The fallback is only consulted lazily, like upstream (`chain` +
+  // `find_map`): selecting it is expensive.
+  let mut fallback_tried = false
+  for i = 0; ; i = i + 1 {
+    if i == chain.length() {
+      if fallback &&
+        !fallback_tried &&
+        book.select_fallback(None, base.variant, "-") is Some(id) {
+        fallback_tried = true
+        chain.push(id)
+      } else {
+        break
+      }
+    }
+    let id = chain[i]
     let size = @library.TextElem::size_in(base.styles).resolve(base.styles)
     let variations = @library.TextElem::variations_in(base.styles)
     guard world.font(id) is Some(font) else { continue }

@@ -310,6 +310,39 @@ fn counter_sequence(
   engine : Engine,
   introspector : Introspector,
 ) -> Array[(CounterState, Int64)] raise SourceError {
+  // Memoized like upstream (see `memo.mbt`). The sequence is not mutated by
+  // its users (they copy the states they modify).
+  let key = memo_fingerprint(state => {
+    state.write(counter)
+    state.write(selector)
+    state.write_u128(engine.route.memo_hash())
+  })
+  memoize(
+    counter_sequence_store,
+    { ..engine, introspector, },
+    key,
+    (counter, selector),
+    sequence => sequence,
+    engine => {
+      counter_sequence_impl(counter, selector, engine, engine.introspector)
+    },
+  )
+}
+
+///|
+let counter_sequence_store : MemoStore[
+  Array[(CounterState, Int64)],
+  (Counter, Selector),
+] = MemoStore::new()
+
+///|
+/// The uncached [counter_sequence].
+fn counter_sequence_impl(
+  counter : Counter,
+  selector : Selector,
+  engine : Engine,
+  introspector : Introspector,
+) -> Array[(CounterState, Int64)] raise SourceError {
   let engine = {
     ..engine,
     introspector,

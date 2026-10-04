@@ -180,9 +180,15 @@ pub fn FontInfo::from_ttf(ttf : @otf.Face) -> FontInfo? {
         let subtable_coverage = CoverageBuilder::with_capacity(
           coverage.0.length(),
         )
-        subtable.codepoints(
+        // Ranges instead of single codepoints (performance; the same
+        // coverage).
+        subtable.codepoint_ranges(
           // We expect codepoints in CMAP subtables to be already sorted
-          c => subtable_coverage.add_codepoint(c),
+          (start, end) => {
+            subtable_coverage.add_codepoint_range(
+              (start, if end == 0xFFFFFFFFU { end } else { end + 1 }),
+            )
+          },
         )
         coverage = coverage.union(subtable_coverage.build())
       }

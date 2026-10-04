@@ -23,6 +23,10 @@ priv struct Preparation {
   indices : Array[Int]
   /// The span mapper.
   spans : SpanMapper
+  /// The breakpoints of `text` (computed on first use). Not upstream:
+  /// upstream recomputes them for each line breaking pass; they only depend
+  /// on the preparation, so they are cached here (performance).
+  mut breakpoints : (Array[Int], Array[@linebreak.Breakpoint])?
 }
 
 ///|
@@ -33,25 +37,18 @@ fn Preparation::get(self : Preparation, offset : Int) -> (Int, Int, InlineItem) 
 }
 
 ///|
-/// The items that intersect the given `sliced` range alongside their
-/// indices in `self.items` (upstream `Preparation::slice`).
-fn Preparation::slice(self : Preparation, start : Int, end : Int) -> Array[Int] {
+/// The index of the first item that intersects a line starting at `start`
+/// (upstream `Preparation::slice`, which collects the intersecting items;
+/// callers iterate from here while `item.start < end || item.end <= end`
+/// instead).
+fn Preparation::slice_start(self : Preparation, start : Int) -> Int {
   // Usually, we don't want empty-range items at the start of the line
   // (because they will be part of the previous line), but for the first
   // line, we need to keep them.
-  let first = match start {
+  match start {
     0 => 0
     n => self.indices.get(n).unwrap_or(0)
   }
-  let out = []
-  for i in first..<self.items.length() {
-    let (s, e, _) = self.items[i]
-    if !(s < end || e <= end) {
-      break
-    }
-    out.push(i)
-  }
-  out
 }
 
 ///|
@@ -110,6 +107,7 @@ fn prepare(
     items,
     indices,
     spans,
+    breakpoints: None,
   }
 }
 

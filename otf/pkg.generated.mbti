@@ -294,6 +294,7 @@ pub(all) struct CmapSubtable {
   encoding_id : UInt16
   format : CmapFormat
 }
+pub fn CmapSubtable::codepoint_ranges(Self, (UInt, UInt) -> Unit) -> Unit
 pub fn CmapSubtable::codepoints(Self, (UInt) -> Unit) -> Unit
 pub fn CmapSubtable::glyph_index(Self, UInt) -> GlyphId?
 pub fn CmapSubtable::glyph_variation_index(Self, UInt, UInt) -> GlyphVariationResult?

@@ -144,7 +144,7 @@ fn line(
   }
 
   // Trim the line at the end, if necessary for this breakpoint.
-  let trim = breakpoint.trim(start, full.to_string())
+  let trim = breakpoint.trim_by(start, end, pred => full.trim_end_len(pred))
   let trimmed_start = start
   let trimmed_end = trim.layout
 
@@ -287,8 +287,13 @@ fn collect_range(
   items : Items,
   fallback : Ref[(Int, ItemEntry)?],
 ) -> Unit {
-  for i in p.slice(start, end) {
+  // `p.slice(start, end)` without collecting the indices (performance).
+  let first = p.slice_start(start)
+  for i in first..<p.items.length() {
     let (sub_start, sub_end, item) = p.items[i]
+    if !(sub_start < end || sub_end <= end) {
+      break
+    }
     let idx = logical_index_from_item_index(i)
 
     // All non-text items are just kept, they can't be split.

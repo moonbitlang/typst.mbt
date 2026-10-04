@@ -209,7 +209,11 @@ fn Introspector::record(
   if self.recorder is Some(recorder) {
     let key = hash128((name, args()))
     if !recorder.calls.contains(key) {
-      recorder.calls[key] = { name, expected: result(), replay, }
+      let mut expected = u128_zero
+      if fingerprint_flags_in(() => expected = result()) != 0 {
+        recorder.lossy = true
+      }
+      recorder.calls[key] = { name, expected, replay, }
     }
   }
 }
@@ -468,12 +472,17 @@ priv struct RecordedRead {
 /// fingerprint of the result, including error results.
 pub struct IntrospectionRecorder {
   priv calls : Map[U128, RecordedRead]
+  /// Whether the fingerprint of a recorded result was lossy or contained
+  /// values compared by identity, so that [IntrospectionRecorder::validate]
+  /// cannot prove interchangeable results (not upstream; only used for
+  /// memoization, see `memo.mbt`).
+  priv mut lossy : Bool
 }
 
 ///|
 /// Create an empty recorder.
 pub fn IntrospectionRecorder::new() -> IntrospectionRecorder {
-  { calls: {}, }
+  { calls: {}, lossy: false, }
 }
 
 ///|
@@ -505,6 +514,26 @@ pub fn IntrospectionRecorder::validate(
     }
   }
   true
+}
+
+///|
+/// Add the reads of this recorder to `other` (reads already recorded there
+/// are kept), as if they had been performed on `other`'s introspector.
+pub fn IntrospectionRecorder::merge_into(
+  self : IntrospectionRecorder,
+  other : IntrospectionRecorder,
+) -> Unit {
+  if physical_equal(self, other) {
+    return
+  }
+  if self.lossy {
+    other.lossy = true
+  }
+  for key, read in self.calls {
+    if !other.calls.contains(key) {
+      other.calls[key] = read
+    }
+  }
 }
 
 // The target-agnostic element introspector.

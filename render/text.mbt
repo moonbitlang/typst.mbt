@@ -75,6 +75,28 @@ impl @otf.OutlineBuilder for WrappedPathBuilder with fn close(self) {
 }
 
 ///|
+/// The loaded `pixglyph` glyphs (see [load_pixglyph]).
+let pixglyphs : Map[(@library.FontInstance, UInt16), @pixglyph.Glyph?] = {}
+
+///|
+/// `@pixglyph.Glyph::load(text.font.ttf(), id)`, memoized (not upstream:
+/// loading outlines the glyph; loaded glyphs are immutable; performance).
+fn load_pixglyph(font : @library.FontInstance, id : UInt16) -> @pixglyph.Glyph? {
+  let key = (font, id)
+  match pixglyphs.get(key) {
+    Some(glyph) => glyph
+    None => {
+      let glyph = match font.ttf() {
+        Some(ttf) => @pixglyph.Glyph::load(ttf, @otf.GlyphId(id))
+        None => None
+      }
+      pixglyphs[key] = glyph
+      glyph
+    }
+  }
+}
+
+///|
 /// Render an outline glyph into the canvas. This is the "normal" case.
 fn render_outline_glyph(
   canvas : @skia.Pixmap,
@@ -125,10 +147,7 @@ fn render_outline_glyph(
   }
 
   // Rasterize the glyph with `pixglyph`.
-  guard text.font.ttf() is Some(ttf) else { return }
-  guard @pixglyph.Glyph::load(ttf, @otf.GlyphId(id)) is Some(glyph) else {
-    return
-  }
+  guard load_pixglyph(text.font, id) is Some(glyph) else { return }
   let bitmap = glyph.rasterize(ts.tx, ts.ty, ppem)
   match text.fill {
     Gradient(gradient) => {

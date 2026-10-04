@@ -308,10 +308,22 @@ pub impl IntoValue for NumberingPattern with fn into_value(self) {
 ///|
 pub impl FromValue for NumberingPattern with fn from_value(v) {
   if castable_of((Ty::new() : Ty[String]), v) {
-    return NumberingPattern::from_str((v.cast() : String))
+    // Patterns are stored as strings in styles, so the same pattern is cast
+    // over and over; parsed patterns are immutable and cached (performance).
+    let pattern : String = v.cast()
+    if numbering_pattern_cache.get(pattern) is Some(parsed) {
+      return parsed
+    }
+    let parsed = NumberingPattern::from_str(pattern)
+    numbering_pattern_cache[pattern] = parsed
+    return parsed
   }
   raise HintedError(NumberingPattern::input().error(v))
 }
+
+///|
+/// Successfully parsed numbering patterns by pattern string.
+let numbering_pattern_cache : Map[String, NumberingPattern] = {}
 
 // Numbering defaults of element fields.
 

@@ -25,7 +25,7 @@ fn adler32(start_checksum : UInt, data : BytesView) -> UInt {
   while i < len {
     let n = @cmp.minimum(ADLER_NMAX, len - i)
     for j in i..<(i + n) {
-      adler += data[j].to_uint()
+      adler += data[j].to_int().reinterpret_as_uint()
       sum2 += adler
     }
     adler %= ADLER_BASE

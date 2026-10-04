@@ -1008,6 +1008,14 @@ pub let figure_elem_supplement : Int
 
 pub fn find_name(@otf.Face, UInt16) -> String?
 
+pub fn fingerprint_flags_in(() -> Unit) -> Int
+
+pub let fingerprint_identity : Int
+
+pub let fingerprint_lossy : Int
+
+pub fn fingerprint_lossy_in(() -> Unit) -> Bool
+
 pub fn flush_elem() -> Element
 
 pub fn[T : FromValue + IntoValue + Fold] fold_of(Ty[T]) -> (Value, Value) -> Value
@@ -1342,6 +1350,8 @@ pub fn layout_elem() -> Element
 
 pub let layout_elem_func : Int
 
+pub fn layout_memo_active() -> Bool
+
 pub fn leq(Value, Value) -> Value raise HintedError
 
 pub fn libm_erf(Double) -> Double
@@ -1418,6 +1428,10 @@ pub let lr_elem_size : Int
 
 pub fn lt(Value, Value) -> Value raise HintedError
 
+pub fn mark_fingerprint_flags(Int) -> Unit
+
+pub fn mark_fingerprint_lossy() -> Unit
+
 pub fn mat_elem() -> Element
 
 pub let mat_elem_align : Int
@@ -1469,6 +1483,10 @@ pub let max_iters : Int
 pub let max_layout_depth : Int
 
 pub let max_show_rule_depth : Int
+
+pub fn memo_fingerprint((SipHasher128) -> Unit) -> U128
+
+pub fn memoized_layout(Engine, U128, Content, StyleChain, Content?, (Engine) -> Fragment raise SourceError) -> Fragment raise SourceError
 
 pub fn metadata_elem() -> Element
 
@@ -3275,6 +3293,8 @@ pub let vec_elem_children : Int
 pub let vec_elem_delim : Int
 
 pub let vec_elem_gap : Int
+
+pub fn[T] with_layout_memo(() -> T raise SourceError) -> T raise SourceError
 
 pub fn[T] within(Loaded, () -> T raise LoadErr) -> T raise SourceError
 
@@ -7099,6 +7119,7 @@ pub struct IntrospectionRecorder {
   // private fields
 }
 pub fn IntrospectionRecorder::len(Self) -> Int
+pub fn IntrospectionRecorder::merge_into(Self, Self) -> Unit
 pub fn IntrospectionRecorder::methods(Self) -> Array[String]
 pub fn IntrospectionRecorder::new() -> Self
 pub fn IntrospectionRecorder::validate(Self, Introspector) -> Bool
@@ -7549,6 +7570,7 @@ pub struct Locator {
   // private fields
 }
 pub fn Locator::link(LocatorLink) -> Self
+pub fn Locator::memo_hash(Self) -> U128
 pub fn Locator::relayout(Self) -> Self
 pub fn Locator::root() -> Self
 pub fn Locator::split(Self) -> SplitLocator
@@ -9676,6 +9698,7 @@ pub fn Route::contains(Self, @moonbitlang/typst/syntax.FileId) -> Bool
 pub fn Route::decrease(Self) -> Unit
 pub fn Route::extend(Self) -> Self
 pub fn Route::increase(Self) -> Unit
+pub fn Route::memo_hash(Self) -> U128
 pub fn Route::root() -> Self
 pub fn Route::unnested(Self) -> Self
 pub fn Route::with_id(Self, @moonbitlang/typst/syntax.FileId) -> Self
@@ -10472,6 +10495,7 @@ pub impl Fingerprint for Style
 pub struct StyleChain {
   head : Array[Style]
   tail : StyleChain?
+  // private fields
 }
 pub fn StyleChain::chain(Self, Styles) -> Self
 pub fn StyleChain::chain_one(Self, Style) -> Self
@@ -10484,6 +10508,7 @@ pub fn StyleChain::get_value_with_local(Self, Element, FieldInfo, Value?) -> Val
 pub fn StyleChain::has(Self, Element, Int) -> Bool
 pub fn StyleChain::head_len(Self) -> Int
 pub fn StyleChain::links(Self) -> Array[Array[Style]]
+pub fn StyleChain::memo_hash(Self) -> U128
 pub fn StyleChain::new(Styles) -> Self
 pub fn StyleChain::pop(Self) -> Self
 pub fn StyleChain::recipes(Self) -> Iter[Recipe]

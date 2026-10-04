@@ -424,6 +424,30 @@ pub fn Route::decrease(self : Route) -> Unit {
 }
 
 ///|
+/// A fingerprint of the whole route: the length and file id of every segment
+/// (not upstream: part of the memoization key of layout functions; see
+/// `memo.mbt`).
+pub fn Route::memo_hash(self : Route) -> U128 {
+  let state = SipHasher128::new()
+  let mut route = self
+  while true {
+    state.write_usize(route.len)
+    match route.id {
+      Some(id) => {
+        state.write_discriminant(1)
+        state.write_u32(id.into_raw().to_uint())
+      }
+      None => state.write_discriminant(0)
+    }
+    match route.outer {
+      Some(outer) => route = outer
+      None => break
+    }
+  }
+  state.finish128()
+}
+
+///|
 /// Whether the given id is part of the route.
 pub fn Route::contains(self : Route, id : @syntax.FileId) -> Bool {
   self.id == Some(id) ||
