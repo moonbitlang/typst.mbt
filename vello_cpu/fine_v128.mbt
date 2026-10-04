@@ -5,6 +5,11 @@
 // wrapping `u16` arithmetic: `div_255(v) = (v + 255) >> 8`, `norm_mul(a, b)
 // = div_255(a * b)`. The results of `div_255` are at most 255, so the
 // saturating narrowing to `u8` is the plain truncation of the emulation.
+//
+// Every unchecked load/store is within the ranges checked by the guards
+// (otherwise the emulation runs and panics like upstream). Buffers that
+// alias (`src`/`scratch` being the destination) also run the emulation: the
+// 16-byte blocks would not see bytes the emulation has already written.
 
 ///|
 /// `div_255` on `u16` lanes.
@@ -164,7 +169,8 @@ fn alpha_composite_buffer(
   alphas : Int?,
 ) -> Unit {
   let n = len / 32 * 32
-  guard in_range(start, n.to_int64(), dest.length()) &&
+  guard !physical_equal(dest, src) &&
+    in_range(start, n.to_int64(), dest.length()) &&
     in_range(src_start, n.to_int64(), src.length()) &&
     (match alphas {
       Some(off) => in_range(off, (n / 4).to_int64(), alpha_buf.length())
@@ -208,7 +214,8 @@ fn alpha_composite_buffer(
 fn pack_region(scratch : FixedArray[Byte], region : Region) -> Unit {
   let buf = region.buf
   let w = region.width
-  guard region.height == TILE_HEIGHT &&
+  guard !physical_equal(scratch, buf) &&
+    region.height == TILE_HEIGHT &&
     w >= 0 &&
     w.to_int64() * TILE_HEIGHT_COMPONENTS.to_int64() <=
     scratch.length().to_int64() &&
