@@ -479,6 +479,7 @@ fn i16f(v : Int16) -> Float {
 
 ///|
 /// A point in 2D.
+#valtype
 priv struct Point {
   x : Float
   y : Float
