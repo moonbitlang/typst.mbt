@@ -223,15 +223,9 @@ fn DeflateStream::deflate_medium(
     strstart: 0,
     orgstart: 0,
   }
-  // Scratch copies (upstream passes the `Copy` matches by value; reusing
-  // these avoids an allocation per match).
+  // A scratch copy (upstream passes the `Copy` match by value; reusing it
+  // avoids an allocation per match).
   let scratch : Match = {
-    match_start: 0,
-    match_length: 0,
-    strstart: 0,
-    orgstart: 0,
-  }
-  let scratch2 : Match = {
     match_start: 0,
     match_length: 0,
     strstart: 0,
@@ -323,8 +317,6 @@ fn DeflateStream::deflate_medium(
             self.max_dist(),
             current_match,
             next_match,
-            scratch,
-            scratch2,
           )
         }
       } else {
@@ -440,8 +432,6 @@ fn fizzle_matches(
   max_dist : Int,
   current : Match,
   next : Match,
-  c : Match,
-  n : Match,
 ) -> Unit {
   // step zero: sanity checks
   if current.match_length <= 1 {
@@ -463,53 +453,34 @@ fn fizzle_matches(
 
   // step one: try to move the "next" match to the left as much as possible
   let limit = @cmp.maximum(next.strstart - (max_dist & 0xffff), 0)
-  // `c` and `n` are scratch copies of `current` and `next`.
-  c.assign(current)
-  n.assign(next)
-  // reverse iterators over window[..n.match_start] and window[..n.strstart]
-  let mut mi = n.match_start
-  let mut oi = n.strstart
+  // Upstream walks `window[..n.match_start]` and `window[..n.strstart]`
+  // backwards on copies `c`/`n` of the matches, moving `n` left by one per
+  // equal byte pair until `c.match_length < 1`, `n.strstart <= limit`,
+  // `n.match_length >= 256` or `n.match_start <= 1`. Those stop conditions
+  // only depend on the number of steps taken, so they bound it up front; the
+  // pairs read before that bound are in the window (never the exhausted
+  // iterators' `None`).
+  let steps = @cmp.minimum(
+    @cmp.minimum(current.match_length, next.strstart - limit),
+    @cmp.minimum(256 - next.match_length, next.match_start - 1),
+  )
+  guard next.match_start <= window.length() && next.strstart <= window.length() else {
+    abort("index out of bounds")
+  }
   let mut changed = 0
-  while true {
-    let mv = if mi > 0 {
-      mi -= 1
-      window[mi].to_int()
-    } else {
-      -1
-    }
-    let ov = if oi > 0 {
-      oi -= 1
-      window[oi].to_int()
-    } else {
-      -1
-    }
-    if mv != ov {
-      break
-    }
-    if c.match_length < 1 {
-      break
-    }
-    if n.strstart <= limit {
-      break
-    }
-    if n.match_length >= 256 {
-      break
-    }
-    if n.match_start <= 1 {
-      break
-    }
-    n.strstart -= 1
-    n.match_start -= 1
-    n.match_length += 1
-    c.match_length -= 1
+  while changed < steps &&
+        window.unsafe_get(next.match_start - 1 - changed) ==
+        window.unsafe_get(next.strstart - 1 - changed) {
     changed += 1
   }
   if changed == 0 {
     return
   }
-  if c.match_length <= 1 && n.match_length != 2 {
-    n.orgstart = (n.orgstart + 1) & 0xffff
-    current.assign(c)
-    next.assign(n)
+  if current.match_length - changed <= 1 && next.match_length + changed != 2 {
+    next.orgstart = (next.orgstart + 1) & 0xffff
+    next.strstart -= changed
+    next.match_start -= changed
+    next.match_length += changed
+    current.match_length -= changed
   }
 }
