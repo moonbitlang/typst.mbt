@@ -240,7 +240,16 @@ fn slice_range_ok(s : Slice, start : Int, len : Int64) -> Bool {
 /// The main loop of [upsample_horizontal]: `output[2..2 + 2 * n]` from
 /// `input[0..n + 2]`, four input samples at a time.
 fn upsample_horizontal_core(input : Slice, output : Slice, n : Int) -> Unit {
+  // Output aliasing the input: the scalar code (the blocks read ahead of
+  // their writes).
+  if physical_equal(input.arr, output.arr) {
+    upsample_horizontal_core_scalar(input, output, n)
+    return
+  }
   let mut w = 0
+  // Unchecked: the gathers read `input[off + w..off + w + 6]` for `w <= n -
+  // 4` and the scatters write `output[off + 2 + 2 * w..+ 8]`, within the
+  // checked slice ranges.
   if n > 0 &&
     slice_range_ok(input, 0, n.to_int64() + 2) &&
     slice_range_ok(output, 2, 2L * n.to_int64()) {
@@ -295,7 +304,17 @@ fn upsample_vertical_core(
   start : Int,
   n : Int,
 ) -> Unit {
+  // Output aliasing an input: the scalar code (the blocks read ahead of
+  // their writes).
+  if physical_equal(output.arr, input.arr) ||
+    physical_equal(output.arr, near.arr) {
+    upsample_vertical_core_scalar(input, near, output, start, n)
+    return
+  }
   let mut i = 0
+  // Unchecked: `input[off + i..+ 4]`, `near[off + i..+ 4]` and
+  // `output[off + start + i..+ 4]` for `i <= n - 4`, within the checked
+  // slice ranges.
   if n > 0 &&
     slice_range_ok(input, 0, n.to_int64()) &&
     slice_range_ok(near, 0, n.to_int64()) &&

@@ -36,7 +36,16 @@ fn vertical_sample_row(
   ws : Array[Float],
 ) -> Unit {
   let n = ws.length()
+  // An `out` aliasing `image` runs the scalar code (the blocks would read
+  // samples already overwritten).
+  if physical_equal(image, out) {
+    vertical_sample_row_scalar(image, out, row_len, out_base, left, ws)
+    return
+  }
   let mut j = 0
+  // Unchecked: `image[(left + i) * row_len + j + k]` for `i < n` and `j + k <
+  // row_len` is below `(left + n) * row_len <= image.length()`, `out[out_base
+  // + j + k]` within `in_range(out_base, row_len, ..)`, `ws[i]` for `i < n`.
   if n > 0 &&
     row_len > 0 &&
     left >= 0 &&
@@ -109,7 +118,11 @@ fn horizontal_sample_sums(
   t : FixedArray[Float],
 ) -> Unit {
   let n = ws.length()
-  if (channels == 3 || channels == 4) &&
+  // Unchecked: the gathers read `image[start + i * channels + k]` for `i <
+  // n`, `k < 4`, within the `in_range` below. A `t` aliasing `image` runs the
+  // scalar code (which clears `t` before reading `image`).
+  if !physical_equal(image, t) &&
+    (channels == 3 || channels == 4) &&
     n > 0 &&
     t.length() >= channels &&
     in_range(
@@ -133,13 +146,11 @@ fn horizontal_sample_sums(
     if channels == 4 {
       t[3] = @v128.f32x4_extract_lane(acc, 3)
     }
+    // The scalar code clears all of `t`.
+    for c in channels..<t.length() {
+      t[c] = 0.0
+    }
     return
   }
-  t.fill(0.0)
-  for i, wt in ws {
-    let base = start + i * channels
-    for c in 0..<channels {
-      t[c] = t[c] + image[base + c] * wt
-    }
-  }
+  horizontal_sample_sums_scalar(image, start, channels, ws, t)
 }

@@ -21,19 +21,13 @@ fn ycbcr_to_rgb_16(
 }
 
 ///|
-/// The main loop of [upsample_horizontal]: `output[2..2 + 2 * n]` from
-/// `input[0..n + 2]`.
+/// [upsample_horizontal_core_scalar].
 fn upsample_horizontal_core(input : Slice, output : Slice, n : Int) -> Unit {
-  for w in 0..<n {
-    let sample = 3 * input.at(w + 1) + 2
-    output.set(2 + 2 * w, (sample + input.at(w)) >> 2)
-    output.set(3 + 2 * w, (sample + input.at(w + 2)) >> 2)
-  }
+  upsample_horizontal_core_scalar(input, output, n)
 }
 
 ///|
-/// A row of [upsample_vertical]: `output[start..start + n]` from
-/// `input[0..n]` and the closest row `near[0..n]`.
+/// [upsample_vertical_core_scalar].
 fn upsample_vertical_core(
   input : Slice,
   near : Slice,
@@ -41,9 +35,7 @@ fn upsample_vertical_core(
   start : Int,
   n : Int,
 ) -> Unit {
-  for i in 0..<n {
-    output.set(start + i, (3 * input.at(i) + 2 + near.at(i)) >> 2)
-  }
+  upsample_vertical_core_scalar(input, near, output, start, n)
 }
 
 ///|

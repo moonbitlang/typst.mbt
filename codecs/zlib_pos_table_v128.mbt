@@ -9,6 +9,10 @@
 /// A `head`/`prev` table of `u16` positions (upstream `Pos`), stored
 /// little-endian in a byte array so that [slide_hash_chain] runs on v128 lanes
 /// (`FixedArray[UInt16]` cannot be loaded as v128).
+///
+/// The unchecked accesses take indices below `length`: the callers index
+/// `head` (`HASH_SIZE` entries) with a hash masked to `HASH_SIZE - 1` and
+/// `prev` (`w_size` entries) with a position masked to `w_size - 1`.
 #valtype
 priv struct PosTable {
   bytes : FixedArray[Byte]

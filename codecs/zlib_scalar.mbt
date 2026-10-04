@@ -29,7 +29,7 @@ fn load_u32_le_unchecked(window : FixedArray[Byte], i : Int) -> UInt {
 }
 
 ///|
-/// [compare256] for in-bounds ranges.
+/// [compare256] for in-bounds ranges (checked by [compare256]).
 fn compare256_unchecked(window : FixedArray[Byte], a : Int, b : Int) -> Int {
   // Compare eight bytes at a time (like zlib-rs' `compare256_rust_u64`);
   // the result is the same as comparing byte by byte.
@@ -51,6 +51,9 @@ fn adler32_fixed(
   off : Int,
   len : Int,
 ) -> UInt {
+  guard in_range(off, len.to_int64(), data.length()) else {
+    abort("index out of bounds")
+  }
   let mut sum2 = (start_checksum >> 16) & 0xffff
   let mut adler = start_checksum & 0xffff
   let mut i = off

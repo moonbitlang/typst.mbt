@@ -21,7 +21,9 @@ fn load_u32_le_unchecked(window : FixedArray[Byte], i : Int) -> UInt {
 }
 
 ///|
-/// [compare256] for in-bounds ranges: compares 16 bytes at a time.
+/// [compare256] for in-bounds ranges: compares 16 bytes at a time. Only
+/// called by [compare256] after checking `0 <= a, b <= window.length() -
+/// 256`, so every load (`a + i`, `b + i` with `i <= 240`) is in bounds.
 fn compare256_unchecked(window : FixedArray[Byte], a : Int, b : Int) -> Int {
   for i = 0; i < 256; i = i + 16 {
     let x = @v128.v128_load(window, a + i)
@@ -51,6 +53,10 @@ fn adler32_fixed(
   off : Int,
   len : Int,
 ) -> UInt {
+  // All loads below are within `data[off..off + len]`.
+  guard in_range(off, len.to_int64(), data.length()) else {
+    abort("index out of bounds")
+  }
   let mut sum2 = (start_checksum >> 16) & 0xffff
   let mut adler = start_checksum & 0xffff
   let weights_hi = @v128.i16x8_const(16, 15, 14, 13, 12, 11, 10, 9)
@@ -102,12 +108,4 @@ fn hsum_u32x4(v : V128) -> UInt {
   @v128.i32x4_extract_lane(v, 1) +
   @v128.i32x4_extract_lane(v, 2) +
   @v128.i32x4_extract_lane(v, 3)
-}
-
-///|
-/// Whether `[off, off + len)` lies within `[0, total)`, computed without
-/// `Int` overflow (the `@v128` loads and stores are not bounds checked).
-#inline
-fn in_range(off : Int, len : Int64, total : Int) -> Bool {
-  off >= 0 && len >= 0L && off.to_int64() + len <= total.to_int64()
 }

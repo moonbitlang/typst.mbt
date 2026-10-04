@@ -3,11 +3,15 @@
 // wrapping `u8` lanes, exactly like the scalar code; the bytes before `bpp`
 // and the tail of a row are filtered one at a time.
 //
-// The early exit is checked every 64 bytes instead of after every byte. The
-// row sums only grow, so a filter gives up if and only if the scalar code
-// gives up; only the returned (over-limit) partial sum and the partially
-// written output differ, and neither is used for a filter that gave up (the
-// winner is kept, see [adaptive_filter]).
+// The early exit is checked every 64 bytes instead of after every byte
+// (an intentional difference from `filter_row_cost_scalar`). The row sums
+// only grow, so a filter gives up if and only if the scalar code gives up,
+// and below the limit the sum and the output are exact; only the returned
+// (over-limit) partial sum and the partially written output differ, and
+// neither is used for a filter that gave up (the winner is kept, see
+// [adaptive_filter]; tested against a reference adaptive filter in
+// `simd_kernels_wbtest.mbt`). An output aliasing an input runs the scalar
+// code (the blocks would read bytes already overwritten).
 
 ///|
 /// Applies a row filter, writing the filtered row into `output[1..]`
@@ -22,6 +26,9 @@ fn filter_row_cost(
   output : FixedArray[Byte],
   limit : UInt64,
 ) -> UInt64 {
+  if physical_equal(output, current) || physical_equal(output, previous) {
+    return filter_row_cost_scalar(filter, bpp, previous, current, output, limit)
+  }
   let len = current.length()
   guard previous.length() >= len && output.length() > len && bpp >= 0 else {
     abort("index out of bounds")

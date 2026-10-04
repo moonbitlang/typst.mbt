@@ -37,6 +37,38 @@ fn Slice::sub(self : Slice, start : Int, end : Int) -> Slice {
 }
 
 ///|
+/// The main loop of [upsample_horizontal]: `output[2..2 + 2 * n]` from
+/// `input[0..n + 2]` (the scalar code of all targets: `jpeg_scalar.mbt`
+/// uses it, `jpeg_v128.mbt` for its tail and for aliased slices).
+fn upsample_horizontal_core_scalar(
+  input : Slice,
+  output : Slice,
+  n : Int,
+) -> Unit {
+  for w in 0..<n {
+    let sample = 3 * input.at(w + 1) + 2
+    output.set(2 + 2 * w, (sample + input.at(w)) >> 2)
+    output.set(3 + 2 * w, (sample + input.at(w + 2)) >> 2)
+  }
+}
+
+///|
+/// A row of [upsample_vertical]: `output[start..start + n]` from
+/// `input[0..n]` and the closest row `near[0..n]` (the scalar code of all
+/// targets, see [upsample_horizontal_core_scalar]).
+fn upsample_vertical_core_scalar(
+  input : Slice,
+  near : Slice,
+  output : Slice,
+  start : Int,
+  n : Int,
+) -> Unit {
+  for i in 0..<n {
+    output.set(start + i, (3 * input.at(i) + 2 + near.at(i)) >> 2)
+  }
+}
+
+///|
 /// Call the up-sampler of a component.
 fn run_upsampler(
   kind : UpSampler,
