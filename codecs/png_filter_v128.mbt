@@ -30,7 +30,7 @@ fn filter_row_cost(
     return filter_row_cost_scalar(filter, bpp, previous, current, output, limit)
   }
   let len = current.length()
-  guard previous.length() >= len && output.length() > len && bpp >= 0 else {
+  guard filter_ranges_ok(bpp, previous, current, output) else {
     abort("index out of bounds")
   }
   let first = if bpp < len { bpp } else { len }
@@ -97,6 +97,20 @@ fn filter_row_cost(
     i += 1
   }
   sum.reinterpret_as_uint64()
+}
+
+///|
+/// Whether the row accesses of [filter_row_cost] are in bounds:
+/// `previous[0..len]`, `output[1..len + 1]` for `len = current.length()`,
+/// and `i - bpp >= 0` from `first` on.
+fn filter_ranges_ok(
+  bpp : Int,
+  previous : FixedArray[Byte],
+  current : FixedArray[Byte],
+  output : FixedArray[Byte],
+) -> Bool {
+  let len = current.length()
+  previous.length() >= len && output.length() > len && bpp >= 0
 }
 
 ///|

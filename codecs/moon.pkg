@@ -29,6 +29,7 @@ options(
     "zlib_v128.mbt": [ "native", "wasm" ],
     "zlib_scalar.mbt": [ "wasm-gc", "js" ],
     "zlib_v128_wbtest.mbt": [ "native", "wasm" ],
+    "simd_guards_wbtest.mbt": [ "native", "wasm" ],
     "zlib_pos_table_v128.mbt": [ "wasm" ],
     "zlib_pos_table_scalar.mbt": [ "native", "wasm-gc", "js" ],
     "png_filter_v128.mbt": [ "native", "wasm" ],

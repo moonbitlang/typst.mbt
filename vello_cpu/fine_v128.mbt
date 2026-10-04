@@ -121,10 +121,7 @@ fn alpha_composite_solid(
   let n = len / chunk * chunk
   guard in_range(start, n.to_int64(), dest.length()) &&
     src.length() >= 4 &&
-    (match alphas {
-      Some(off) => in_range(off, (n / 4).to_int64(), alpha_buf.length())
-      None => true
-    }) else {
+    masks_ok(alpha_buf, alphas, n) else {
     alpha_composite_solid_scalar(dest, start, len, src, alpha_buf, alphas)
   }
   let color = @v128.i32x4_splat(
@@ -172,10 +169,7 @@ fn alpha_composite_buffer(
   guard !physical_equal(dest, src) &&
     in_range(start, n.to_int64(), dest.length()) &&
     in_range(src_start, n.to_int64(), src.length()) &&
-    (match alphas {
-      Some(off) => in_range(off, (n / 4).to_int64(), alpha_buf.length())
-      None => true
-    }) else {
+    masks_ok(alpha_buf, alphas, n) else {
     alpha_composite_buffer_scalar(
       dest, start, len, src, src_start, alpha_buf, alphas,
     )
@@ -214,17 +208,9 @@ fn alpha_composite_buffer(
 fn pack_region(scratch : FixedArray[Byte], region : Region) -> Unit {
   let buf = region.buf
   let w = region.width
-  guard !physical_equal(scratch, buf) &&
-    region.height == TILE_HEIGHT &&
-    w >= 0 &&
-    w.to_int64() * TILE_HEIGHT_COMPONENTS.to_int64() <=
-    scratch.length().to_int64() &&
-    region.stride >= 0 &&
-    in_range(
-      region.offset,
-      3L * region.stride.to_int64() + 4L * w.to_int64(),
-      buf.length(),
-    ) else {
+  // Rows that overlap (`stride < 4 * width`) or a scratch aliasing the buffer
+  // run the emulation: these stores go column by column, its row by row.
+  guard pack_ranges_ok(scratch, region) else {
     pack_region_scalar(scratch, region)
   }
   let r0 = region.offset
@@ -241,9 +227,38 @@ fn pack_region(scratch : FixedArray[Byte], region : Region) -> Unit {
 }
 
 ///|
+/// Whether the masks of `n` bytes of pixels (`alpha_buf[off..off + n / 4]`,
+/// if any) are in bounds.
+fn masks_ok(alpha_buf : Array[Byte], alphas : Int?, n : Int) -> Bool {
+  match alphas {
+    Some(off) => in_range(off, (n / 4).to_int64(), alpha_buf.length())
+    None => true
+  }
+}
+
+///|
+/// Whether [pack_region] can store column by column: the scratch holds the
+/// region's columns, the four rows are within the buffer and do not overlap
+/// (`stride >= 4 * width`), and the scratch is not the buffer.
+fn pack_ranges_ok(scratch : FixedArray[Byte], region : Region) -> Bool {
+  let w = region.width
+  !physical_equal(scratch, region.buf) &&
+  region.height == TILE_HEIGHT &&
+  w >= 0 &&
+  region.stride.to_int64() >= 4L * w.to_int64() &&
+  w.to_int64() * TILE_HEIGHT_COMPONENTS.to_int64() <=
+  scratch.length().to_int64() &&
+  in_range(
+    region.offset,
+    3L * region.stride.to_int64() + 4L * w.to_int64(),
+    region.buf.length(),
+  )
+}
+
+///|
 /// Whether `[off, off + len)` lies within `[0, total)`, computed without
 /// `Int` overflow (the `@v128` loads and stores are not bounds checked).
 #inline
 fn in_range(off : Int, len : Int64, total : Int) -> Bool {
-  off >= 0 && len >= 0L && off.to_int64() + len <= total.to_int64()
+  off >= 0 && len >= 0L && len <= total.to_int64() - off.to_int64()
 }

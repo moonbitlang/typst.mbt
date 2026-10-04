@@ -379,3 +379,19 @@ test "panic vertical_i32_kernel with an overflowing stride" {
     FixedArray::make(16, 0),
   )
 }
+
+///|
+test "vertical kernels with the accumulator aliasing the weights" {
+  // The emulation initializes `acc` before reading the weights.
+  for k in vertical_kernels() {
+    let (kernel, emulation, name) = k
+    let src = FixedArray::make(16, b'\xff')
+    let w1 = FixedArray::make(16, 32767)
+    let w2 = FixedArray::make(16, 32767)
+    let d1 = FixedArray::make(16, b'\x00')
+    let d2 = FixedArray::make(16, b'\x00')
+    kernel(16, 0, 1, src, 0, 16, d1, 0, w1, 0, w1)
+    emulation(16, 0, 1, src, 0, 16, d2, 0, w2, 0, w2)
+    assert_same_bytes(d1, d2, name)
+  }
+}

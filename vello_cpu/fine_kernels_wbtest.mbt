@@ -231,3 +231,21 @@ test "panic pack_region with a negative offset" {
   let buf = FixedArray::make(4 * 16 + 4, b'\x00')
   pack_region(scratch, region_of(buf, 4, 16, -4))
 }
+
+///|
+test "pack_region with overlapping rows" {
+  // stride < 4 * width: the rows overlap and the write order matters.
+  for width in [2, 3, 5] {
+    for stride in [0, 4, 4 * width - 4] {
+      let scratch = FixedArray::makei(width * TILE_HEIGHT_COMPONENTS, i => {
+        i.to_byte()
+      })
+      let len = 3 * stride + 4 * width
+      let b1 = FixedArray::make(len, b'\x5a')
+      let b2 = FixedArray::make(len, b'\x5a')
+      pack_region(scratch, region_of(b1, width, stride, 0))
+      pack_region_scalar(scratch, region_of(b2, width, stride, 0))
+      vassert_eq(b1, b2, "overlapping rows")
+    }
+  }
+}

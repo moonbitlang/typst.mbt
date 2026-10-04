@@ -15,6 +15,7 @@ options(
     "libm_native.mbt": [ "native" ],
     "libm_other.mbt": [ "not", "native" ],
     "fine_v128.mbt": [ "native", "wasm" ],
+    "fine_v128_wbtest.mbt": [ "native", "wasm" ],
     "fine_scalar.mbt": [ "wasm-gc", "js" ],
   },
 )

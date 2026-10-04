@@ -2,22 +2,12 @@
 // native/wasm, the scalar files on wasm-gc/js) against their scalar twins
 // (compiled on every target): every small length, offsets, exact
 // allocation ends, sentinels around the outputs, aliased buffers, and
-// undersized buffers (which must panic, not touch memory).
+// undersized buffers (which must panic, not touch memory; the native test
+// driver skips `panic` tests, so `simd_guards_wbtest.mbt` checks that the
+// v128 range predicates reject those parameters).
 
 ///|
 const SENTINEL : Int = 0x5A
-
-///|
-/// `n` bytes with `pad` sentinel bytes on both sides of `data`.
-fn padded_bytes(data : FixedArray[Byte], pad : Int) -> FixedArray[Byte] {
-  FixedArray::makei(data.length() + 2 * pad, i => {
-    if i < pad || i >= pad + data.length() {
-      SENTINEL.to_byte()
-    } else {
-      data[i - pad]
-    }
-  })
-}
 
 ///|
 fn assert_bytes_eq(a : FixedArray[Byte], b : FixedArray[Byte]) -> Unit raise {

@@ -47,11 +47,9 @@ fn ycbcr_to_rgb_16(
   out_pos : Int,
   num_components : Int,
 ) -> Unit {
-  guard (num_components == 3 || num_components == 4) &&
-    in_range(yo, 16, y.length()) &&
-    in_range(cbo, 16, cb.length()) &&
-    in_range(cro, 16, cr.length()) &&
-    in_range(out_pos, (16 * num_components).to_int64(), output.length()) else {
+  guard ycbcr_ranges_ok(
+    y, yo, cb, cbo, cr, cro, output, out_pos, num_components,
+  ) else {
     // (panics like the scalar code on out-of-bounds accesses)
     ycbcr_to_rgb_16_scalar(
       y, yo, cb, cbo, cr, cro, output, out_pos, num_components,
@@ -162,6 +160,27 @@ fn ycbcr_to_rgb_16(
 }
 
 ///|
+/// Whether the 16 samples of each component and the `16 * num_components`
+/// output bytes of [ycbcr_to_rgb_16] are in bounds.
+fn ycbcr_ranges_ok(
+  y : FixedArray[Int],
+  yo : Int,
+  cb : FixedArray[Int],
+  cbo : Int,
+  cr : FixedArray[Int],
+  cro : Int,
+  output : FixedArray[Byte],
+  out_pos : Int,
+  num_components : Int,
+) -> Bool {
+  (num_components == 3 || num_components == 4) &&
+  in_range(yo, 16, y.length()) &&
+  in_range(cbo, 16, cb.length()) &&
+  in_range(cro, 16, cr.length()) &&
+  in_range(out_pos, (16 * num_components).to_int64(), output.length())
+}
+
+///|
 /// `y * Y_CF + YUV_RND`.
 #inline
 fn ycc_y0(y : V128) -> V128 {
@@ -233,7 +252,7 @@ fn slice_range_ok(s : Slice, start : Int, len : Int64) -> Bool {
   start >= 0 &&
   len >= 0L &&
   s.off >= 0 &&
-  s.off.to_int64() + start.to_int64() + len <= s.arr.length().to_int64()
+  len <= s.arr.length().to_int64() - s.off.to_int64() - start.to_int64()
 }
 
 ///|

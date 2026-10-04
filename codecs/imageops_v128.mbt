@@ -46,12 +46,7 @@ fn vertical_sample_row(
   // Unchecked: `image[(left + i) * row_len + j + k]` for `i < n` and `j + k <
   // row_len` is below `(left + n) * row_len <= image.length()`, `out[out_base
   // + j + k]` within `in_range(out_base, row_len, ..)`, `ws[i]` for `i < n`.
-  if n > 0 &&
-    row_len > 0 &&
-    left >= 0 &&
-    (left.to_int64() + n.to_int64()) * row_len.to_int64() <=
-    image.length().to_int64() &&
-    in_range(out_base, row_len.to_int64(), out.length()) {
+  if vertical_sample_ranges_ok(image, out, row_len, out_base, left, n) {
     let zero = @v128.f32x4_splat(0.0)
     // 16 samples (four independent sums) per pass over the weights.
     while j <= row_len - 16 {
@@ -122,14 +117,7 @@ fn horizontal_sample_sums(
   // n`, `k < 4`, within the `in_range` below. A `t` aliasing `image` runs the
   // scalar code (which clears `t` before reading `image`).
   if !physical_equal(image, t) &&
-    (channels == 3 || channels == 4) &&
-    n > 0 &&
-    t.length() >= channels &&
-    in_range(
-      start,
-      (n - 1).to_int64() * channels.to_int64() + 4,
-      image.length(),
-    ) {
+    horizontal_sums_ranges_ok(image, start, channels, n, t) {
     let mut acc = @v128.f32x4_splat(0.0)
     for i in 0..<n {
       acc = @v128.f32x4_add(
@@ -153,4 +141,41 @@ fn horizontal_sample_sums(
     return
   }
   horizontal_sample_sums_scalar(image, start, channels, ws, t)
+}
+
+///|
+/// Whether the blocks of [vertical_sample_row] are in bounds: `image[(left +
+/// i) * row_len + j]` for `i < n`, `j < row_len` and `out[out_base +
+/// j]`.
+fn vertical_sample_ranges_ok(
+  image : FixedArray[Float],
+  out : FixedArray[Float],
+  row_len : Int,
+  out_base : Int,
+  left : Int,
+  n : Int,
+) -> Bool {
+  n > 0 &&
+  row_len > 0 &&
+  left >= 0 &&
+  (left.to_int64() + n.to_int64()) * row_len.to_int64() <=
+  image.length().to_int64() &&
+  in_range(out_base, row_len.to_int64(), out.length())
+}
+
+///|
+/// Whether the four-lane gathers of [horizontal_sample_sums] are in bounds
+/// (`image[start + i * channels..+ 4]` for `i < n`) and `t` holds the
+/// channels.
+fn horizontal_sums_ranges_ok(
+  image : FixedArray[Float],
+  start : Int,
+  channels : Int,
+  n : Int,
+  t : FixedArray[Float],
+) -> Bool {
+  (channels == 3 || channels == 4) &&
+  n > 0 &&
+  t.length() >= channels &&
+  in_range(start, (n - 1).to_int64() * channels.to_int64() + 4, image.length())
 }

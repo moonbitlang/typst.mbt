@@ -14,9 +14,10 @@
 // every access in bounds (the loads and stores are unchecked), the weights
 // of the taps in `i16` range (the lanes hold `i16` weights, the emulation
 // full `Int`s; `numerical_approximation_i16` clamps them), `acc` as long as
-// the emulation needs, and `dst` not aliasing `src` (the 16-column blocks,
-// incl. the overlapping last one, would read pixels already written; the
-// emulation reads every row before writing).
+// the emulation needs and not aliasing `weights` (the emulation initializes
+// `acc` before reading the weights), and `dst` not aliasing `src` (the
+// 16-column blocks, incl. the overlapping last one, would read pixels
+// already written; the emulation reads every row before writing).
 
 ///|
 /// [convolve_vertical_neon_i16_precision] (the `rdm` kernel).
@@ -165,6 +166,7 @@ fn vertical_ranges_ok(
   acc : FixedArray[Int],
 ) -> Bool {
   !physical_equal(src, dst) &&
+  !physical_equal(acc, weights) &&
   width >= 0 &&
   bounds_start >= 0 &&
   bounds_size >= 0 &&
@@ -191,5 +193,5 @@ fn vertical_ranges_ok(
 /// `Int` overflow (the `@v128` loads and stores are not bounds checked).
 #inline
 fn in_range(off : Int, len : Int64, total : Int) -> Bool {
-  off >= 0 && len >= 0L && off.to_int64() + len <= total.to_int64()
+  off >= 0 && len >= 0L && len <= total.to_int64() - off.to_int64()
 }
