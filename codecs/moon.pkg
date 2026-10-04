@@ -4,6 +4,7 @@ import {
   "moonbit-community/flate/gzip",
   "moonbitlang/core/cmp",
   "moonbitlang/core/math",
+  "moonbitlang/core/v128",
 }
 
 import {
@@ -12,9 +13,19 @@ import {
   "moonbitlang/typst/codecs",
 } for "test"
 
+import {
+  "moonbitlang/core/bench",
+} for "wbtest"
+
+// `@v128` is experimental (see AGENTS.md: v128 kernels).
+
+warnings = "-alert_experimental"
+
 options(
   targets: {
     "imageops_libm_native.mbt": [ "native" ],
     "imageops_libm_other.mbt": [ "not", "native" ],
+    "zlib_v128.mbt": [ "native", "wasm" ],
+    "zlib_scalar.mbt": [ "wasm-gc", "js" ],
   },
 )
