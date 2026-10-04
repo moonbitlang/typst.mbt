@@ -131,6 +131,46 @@
   allocations per MoonBit source line by compiling the generated
   `cli.c` with `moonbit_malloc`/`moonbit_make_*` wrapped by a counting macro
   (`#line` directives map call sites back to `.mbt` lines).
+- v128 kernels (`moonbitlang/core/v128`, experimental: `warnings =
+  "-alert_experimental"` in the package's `moon.pkg`): real SIMD on native
+  (NEON on aarch64, SSE2 on x86, via `moonbit_simd.h`) and wasm (SIMD128),
+  but emulated and slower than scalar code on wasm-gc (~1.3x) and js
+  (~40x). So each kernel exists twice with identical private entry points:
+  `<name>_v128.mbt` (`targets: ["native", "wasm"]`) and `<name>_scalar.mbt`
+  (`["wasm-gc", "js"]`, the previous scalar code or the lane emulation);
+  for an A/B comparison swap the two target lists and rerun `moon bench`.
+  Used in `codecs/` (`zlib_*`: unaligned loads, `compare256`, adler32;
+  `png_filter_*`; `jpeg_*`: IDCT, YCbCr conversion, up-sampling;
+  `imageops_*`: resize sums), `skia/pixmap_*` (PNG demultiply),
+  `pic_scale/{vertical,horizontal}_*` (the u8 kernels but the Q15 plane
+  row) and `vello_cpu/fine_*` (U8Kernel compositing, `pack`). Rules: (1) results
+  must be bit-identical to the scalar code: integer lanes wrap like the
+  emulation's masking (`i16x8_*` = `& 0xFFFF`), saturating narrowing is a
+  clamp only for values that fit `i16`/`i32` first; NEON `vqrdmlahq_s16` is
+  `i16x8_add_sat_s(acc, i16x8_q15mulr_sat_s(x, w))` when the Q15 product
+  cannot saturate. Float lanes only use separately rounded add/sub/mul/div
+  in upstream's order; never `relaxed_*` ops (fusion and NaN behavior are
+  implementation-defined: NEON fuses, SSE2 does not), so fused `mul_add`
+  (vello_cpu `madd`, hayro/jpeg2000, moxcms) stays scalar `fmaf`;
+  `f32x4_min`/`max` are wasm's NaN-propagating min/max (= NEON
+  `vmin`/`vmax`), not Rust's `f32::min` (`fminnm`). (2) `@v128` loads and
+  stores exist only for `FixedArray[Byte]` and are not bounds checked:
+  check the whole range once before the loop and otherwise run the scalar
+  code (which panics like upstream); guards must not overflow (`in_range(
+  off, len : Int64, total)` or `i <= len - 16`, never `i + 16 <= len`).
+  `FixedArray[Int]`/`[Float]`/`[UInt]` are gathered with `splat` +
+  `replace_lane` and scattered with `extract_lane` (clang merges
+  consecutive lanes into vector loads/stores); lane and shuffle indices
+  must be literals; avoid closures and tuples of `V128` (heap-allocated). (3) Measure each kernel on native and wasm
+  (`codecs/simd_kernels_wbtest.mbt`, `skia/simd_kernels_wbtest.mbt`,
+  `pic_scale/bench_wbtest.mbt`: `moon bench <file> --target native|wasm
+  --release`): clang already auto-vectorizes simple `unsafe_get` loops on
+  native (zlib's `slide_hash` was slower as v128), so keep v128 only where
+  it wins. (4) Test both paths: the `simd_kernels_wbtest.mbt` files compare
+  with reference loops, and the oracles (`pic_scale/oracle_wbtest.mbt`,
+  `hayro/render/oracle_test.mbt`, which needs the `target/hayro` and
+  `target/devassets` symlinks to the hayro and typst-dev-assets checkouts,
+  else it is silently skipped) must pass on native, wasm and wasm-gc.
 - SVG export (`svg/`, port of typst-svg) is checked by two stages against
   the raw upstream SVGs (`scripts/goldens.sh svg`, pretty, merged pages, 1pt
   gap): `svg` compiles and exports each paged test; `svg-replay` exports

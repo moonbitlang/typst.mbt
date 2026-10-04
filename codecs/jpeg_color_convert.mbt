@@ -32,8 +32,9 @@ const YUV_RND : Int = (1 << (YUV_PREC - 1)) - 1
 
 ///|
 /// Convert 16 YCbCr samples (`y[yo..yo + 16]` etc.) to RGB (`num_components
-/// == 3`) or RGBA (`4`) at `output[out_pos..]`.
-fn ycbcr_to_rgb_16(
+/// == 3`) or RGBA (`4`) at `output[out_pos..]` (the scalar code; the
+/// target-selected `ycbcr_to_rgb_16` is in `jpeg_{v128,scalar}.mbt`).
+fn ycbcr_to_rgb_16_scalar(
   y : FixedArray[Int],
   yo : Int,
   cb : FixedArray[Int],

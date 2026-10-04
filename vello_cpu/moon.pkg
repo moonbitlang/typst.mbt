@@ -2,13 +2,19 @@ import {
   "moonbitlang/typst/kurbo",
   "moonbitlang/core/double",
   "moonbitlang/core/float",
+  "moonbitlang/core/v128",
 }
 
-warnings = "-deprecated"
+// `@v128` is experimental, and unused on wasm-gc/js, which select the
+// `*_scalar.mbt` files (see AGENTS.md: v128 kernels).
+
+warnings = "-deprecated-alert_experimental-unused_package"
 
 options(
   targets: {
     "libm_native.mbt": [ "native" ],
     "libm_other.mbt": [ "not", "native" ],
+    "fine_v128.mbt": [ "native", "wasm" ],
+    "fine_scalar.mbt": [ "wasm-gc", "js" ],
   },
 )

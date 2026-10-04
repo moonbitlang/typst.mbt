@@ -76,7 +76,7 @@ fn store8(
 }
 
 ///|
-fn idct_int(
+fn idct_int_scalar(
   in_vector : FixedArray[Int],
   out_vector : FixedArray[Int],
   out_pos : Int,

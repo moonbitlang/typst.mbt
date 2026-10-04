@@ -346,28 +346,15 @@ fn DeflateStream::level_flags(self : DeflateStream) -> Int {
 ///|
 fn read_u32_le(window : FixedArray[Byte], i : Int) -> UInt {
   // One bounds check for all four bytes (performance).
-  guard i >= 0 && i + 4 <= window.length() else { abort("index out of bounds") }
-  // Intrinsic conversions only (core's `Byte::to_uint` is not inlined).
-  (window.unsafe_get(i).to_int() |
-  (window.unsafe_get(i + 1).to_int() << 8) |
-  (window.unsafe_get(i + 2).to_int() << 16) |
-  (window.unsafe_get(i + 3).to_int() << 24)).reinterpret_as_uint()
+  guard i >= 0 && i <= window.length() - 4 else { abort("index out of bounds") }
+  load_u32_le_unchecked(window, i)
 }
 
 ///|
 fn read_u64_le(window : FixedArray[Byte], i : Int) -> UInt64 {
   // One bounds check for all eight bytes (performance).
-  guard i >= 0 && i + 8 <= window.length() else { abort("index out of bounds") }
-  let lo = window.unsafe_get(i).to_int() |
-    (window.unsafe_get(i + 1).to_int() << 8) |
-    (window.unsafe_get(i + 2).to_int() << 16) |
-    (window.unsafe_get(i + 3).to_int() << 24)
-  let hi = window.unsafe_get(i + 4).to_int() |
-    (window.unsafe_get(i + 5).to_int() << 8) |
-    (window.unsafe_get(i + 6).to_int() << 16) |
-    (window.unsafe_get(i + 7).to_int() << 24)
-  UInt64::extend_uint(lo.reinterpret_as_uint()) |
-  (UInt64::extend_uint(hi.reinterpret_as_uint()) << 32)
+  guard i >= 0 && i <= window.length() - 8 else { abort("index out of bounds") }
+  load_u64_le_unchecked(window, i)
 }
 
 ///|
@@ -442,15 +429,13 @@ fn DeflateStream::read_buf_window(
   }
   self.avail_in -= len
   let src = self.input[self.next_in:self.next_in + len]
-  guard offset >= 0 && offset + len <= self.window.length() else {
+  guard offset >= 0 && offset <= self.window.length() - len else {
     abort("index out of bounds")
   }
   let window = self.window
-  for i in 0..<len {
-    window.unsafe_set(offset + i, src[i])
-  }
+  window.blit_from_bytesview(offset, src)
   if self.wrap == 1 {
-    self.adler = adler32(self.adler, src)
+    self.adler = adler32_fixed(self.adler, window, offset, len)
   }
   self.next_in += len
   len

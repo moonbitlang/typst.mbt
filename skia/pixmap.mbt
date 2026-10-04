@@ -132,14 +132,24 @@ pub fn Pixmap::take_demultiplied(self : Pixmap) -> Bytes {
   // results due to rounding. So we stick with this method for now.
   let len = self.data.length()
   let out = FixedArray::make(len * 4, b'\x00')
-  for i in 0..<len {
-    let c = PremultipliedColorU8(self.data[i]).demultiply()
-    out[i * 4] = c.red().to_byte()
-    out[i * 4 + 1] = c.green().to_byte()
-    out[i * 4 + 2] = c.blue().to_byte()
-    out[i * 4 + 3] = c.alpha().to_byte()
+  demultiply_into(self.data, out)
+  Bytes::from_array(out[:])
+}
+
+///|
+/// Writes the demultiplied bytes of the packed pixel `p` to `out[pos..pos +
+/// 4]` (the caller checks the bounds).
+#inline
+fn demultiply_pixel(p : UInt, out : FixedArray[Byte], pos : Int) -> Unit {
+  let c = if p >> 24 == 0xFF {
+    p
+  } else {
+    PremultipliedColorU8(p).demultiply().0
   }
-  Bytes::from_array(out)
+  out.unsafe_set(pos, (c & 0xFF).reinterpret_as_int().to_byte())
+  out.unsafe_set(pos + 1, ((c >> 8) & 0xFF).reinterpret_as_int().to_byte())
+  out.unsafe_set(pos + 2, ((c >> 16) & 0xFF).reinterpret_as_int().to_byte())
+  out.unsafe_set(pos + 3, (c >> 24).reinterpret_as_int().to_byte())
 }
 
 ///|

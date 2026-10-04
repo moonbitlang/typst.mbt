@@ -12,19 +12,11 @@ const EARLY_EXIT_TRIGGER_LEVEL : Int = 5
 /// The number of equal leading bytes of `window[a..a + 256]` and
 /// `window[b..b + 256]` (upstream `compare256`).
 fn compare256(window : FixedArray[Byte], a : Int, b : Int) -> Int {
-  // Compare eight bytes at a time (like zlib-rs' `compare256_rust_u64`);
-  // the result is the same as comparing byte by byte.
   if a >= 0 &&
     b >= 0 &&
-    a + 256 <= window.length() &&
-    b + 256 <= window.length() {
-    for i = 0; i < 256; i = i + 8 {
-      let diff = read_u64_le(window, a + i) ^ read_u64_le(window, b + i)
-      if diff != 0 {
-        return i + diff.ctz() / 8
-      }
-    }
-    return 256
+    a <= window.length() - 256 &&
+    b <= window.length() - 256 {
+    return compare256_unchecked(window, a, b)
   }
   for i in 0..<256 {
     if window[a + i] != window[b + i] {
@@ -36,11 +28,10 @@ fn compare256(window : FixedArray[Byte], a : Int, b : Int) -> Int {
 
 ///|
 /// Find the (length, offset) in the window of the longest match for the
-/// string at offset cur_match (upstream `longest_match`).
-fn DeflateStream::longest_match(
-  self : DeflateStream,
-  cur_match : Int,
-) -> (Int, Int) {
+/// string at offset cur_match (upstream `longest_match`). Returns the length
+/// and stores the offset in `self.match_start` (what both callers do with
+/// upstream's tuple; a MoonBit tuple would be allocated per call).
+fn DeflateStream::longest_match(self : DeflateStream, cur_match : Int) -> Int {
   let mut cur_match = cur_match
   let mut match_start = self.match_start
   let strstart = self.strstart
@@ -118,7 +109,7 @@ fn DeflateStream::longest_match(
             continue
           }
         }
-        return (best_len, match_start)
+        return self.set_match_start(best_len, match_start)
       }
     } else {
       while true {
@@ -135,7 +126,7 @@ fn DeflateStream::longest_match(
             continue
           }
         }
-        return (best_len, match_start)
+        return self.set_match_start(best_len, match_start)
       }
     }
 
@@ -150,11 +141,11 @@ fn DeflateStream::longest_match(
       // Do not look for better matches if the current match reaches or
       // exceeds the end of the input.
       if len >= lookahead {
-        return (lookahead, match_start)
+        return self.set_match_start(lookahead, match_start)
       }
       best_len = len
       if best_len >= nice_match {
-        return (best_len, match_start)
+        return self.set_match_start(best_len, match_start)
       }
       offset = best_len - 1
       if best_len >= 4 {
@@ -180,9 +171,20 @@ fn DeflateStream::longest_match(
         continue
       }
     }
-    return (best_len, match_start)
+    return self.set_match_start(best_len, match_start)
   }
-  (best_len, match_start)
+  self.set_match_start(best_len, match_start)
+}
+
+///|
+#inline
+fn DeflateStream::set_match_start(
+  self : DeflateStream,
+  len : Int,
+  match_start : Int,
+) -> Int {
+  self.match_start = match_start
+  len
 }
 
 ///|
@@ -191,16 +193,6 @@ priv struct Match {
   mut match_length : Int
   mut strstart : Int
   mut orgstart : Int
-}
-
-///|
-fn Match::copy(self : Match) -> Match {
-  {
-    match_start: self.match_start,
-    match_length: self.match_length,
-    strstart: self.strstart,
-    orgstart: self.orgstart,
-  }
 }
 
 ///|
@@ -226,6 +218,20 @@ fn DeflateStream::deflate_medium(
     orgstart: 0,
   }
   let next_match : Match = {
+    match_start: 0,
+    match_length: 0,
+    strstart: 0,
+    orgstart: 0,
+  }
+  // Scratch copies (upstream passes the `Copy` matches by value; reusing
+  // these avoids an allocation per match).
+  let scratch : Match = {
+    match_start: 0,
+    match_length: 0,
+    strstart: 0,
+    orgstart: 0,
+  }
+  let scratch2 : Match = {
     match_start: 0,
     match_length: 0,
     strstart: 0,
@@ -268,10 +274,9 @@ fn DeflateStream::deflate_medium(
         // To simplify the code, we prevent matches with the string of window
         // index 0 (in particular we have to avoid a match of the string with
         // itself at the start of the input file).
-        let (match_length, match_start) = self.longest_match(hash_head)
-        self.match_start = match_start
+        let match_length = self.longest_match(hash_head)
         current_match.match_length = match_length & 0xffff
-        current_match.match_start = match_start
+        current_match.match_start = self.match_start
         if current_match.match_length < WANT_MIN_MATCH {
           current_match.match_length = 1
         }
@@ -285,7 +290,8 @@ fn DeflateStream::deflate_medium(
         current_match.match_length = 1
       }
     }
-    self.insert_match(current_match.copy())
+    scratch.assign(current_match)
+    self.insert_match(scratch)
 
     // now, look ahead one
     if !early_exit &&
@@ -302,10 +308,9 @@ fn DeflateStream::deflate_medium(
       // point we have always match_length < WANT_MIN_MATCH
       let dist = self.strstart - hash_head
       if dist <= self.max_dist() && dist > 0 && hash_head != 0 {
-        let (match_length, match_start) = self.longest_match(hash_head)
-        self.match_start = match_start
+        let match_length = self.longest_match(hash_head)
         next_match.match_length = match_length & 0xffff
-        next_match.match_start = match_start
+        next_match.match_start = self.match_start
         if next_match.match_start >= next_match.strstart {
           // this can happen due to some restarts
           next_match.match_length = 1
@@ -318,6 +323,8 @@ fn DeflateStream::deflate_medium(
             self.max_dist(),
             current_match,
             next_match,
+            scratch,
+            scratch2,
           )
         }
       } else {
@@ -433,6 +440,8 @@ fn fizzle_matches(
   max_dist : Int,
   current : Match,
   next : Match,
+  c : Match,
+  n : Match,
 ) -> Unit {
   // step zero: sanity checks
   if current.match_length <= 1 {
@@ -454,8 +463,9 @@ fn fizzle_matches(
 
   // step one: try to move the "next" match to the left as much as possible
   let limit = @cmp.maximum(next.strstart - (max_dist & 0xffff), 0)
-  let c = current.copy()
-  let n = next.copy()
+  // `c` and `n` are scratch copies of `current` and `next`.
+  c.assign(current)
+  n.assign(next)
   // reverse iterators over window[..n.match_start] and window[..n.strstart]
   let mut mi = n.match_start
   let mut oi = n.strstart

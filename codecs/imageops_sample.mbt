@@ -273,7 +273,6 @@ fn vertical_sample(
   let ratio = Float::from_uint(height) / Float::from_uint(new_height)
   let sratio : Float = if ratio < 1.0 { 1.0 } else { ratio }
   let src_support = filter.support * sratio
-  let t = FixedArray::make(channels, (0.0 : Float))
   for outy in 0..<nh {
     // For an explanation of this algorithm, see the comments
     // in horizontal_sample.
@@ -286,19 +285,9 @@ fn vertical_sample(
       filter,
       ws,
     )
-    for x in 0..<w {
-      t.fill(0.0)
-      for i, wt in ws {
-        let base = ((left + i) * w + x) * channels
-        for c in 0..<channels {
-          t[c] = t[c] + image[base + c] * wt
-        }
-      }
-      let base = (outy * w + x) * channels
-      for c in 0..<channels {
-        out[base + c] = t[c]
-      }
-    }
+    // Every sample of the row is `sum(image[left + i][j] * ws[i])`, summed
+    // from 0.0 in the order of `i` (upstream's `t`, per pixel and channel).
+    vertical_sample_row(image, out, w * channels, outy * w * channels, left, ws)
   }
   out
 }
@@ -340,13 +329,9 @@ fn horizontal_sample(
       ws,
     )
     for y in 0..<h {
-      t.fill(0.0)
-      for i, wt in ws {
-        let base = (y * w + left + i) * channels
-        for c in 0..<channels {
-          t[c] = t[c] + image[base + c] * wt
-        }
-      }
+      // `t[c] = sum(image[y][left + i][c] * ws[i])`, from 0.0 in the order
+      // of `i`.
+      horizontal_sample_sums(image, (y * w + left) * channels, channels, ws, t)
       let base = (y * nw + outx) * channels
       for c in 0..<channels {
         // `NumCast::from(FloatNearest(clamp(t, min, max)))`

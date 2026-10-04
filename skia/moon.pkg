@@ -3,13 +3,23 @@ import {
   "moonbitlang/typst/codecs",
   "moonbitlang/core/math",
   "moonbitlang/core/buffer",
+  "moonbitlang/core/v128",
 }
 
-warnings = "-deprecated"
+import {
+  "moonbitlang/core/bench",
+} for "wbtest"
+
+// `@v128` is experimental, and unused on wasm-gc/js, which select the
+// `*_scalar.mbt` files (see AGENTS.md: v128 kernels).
+
+warnings = "-deprecated-alert_experimental-unused_package"
 
 options(
   targets: {
     "libm_native.mbt": [ "native" ],
     "libm_other.mbt": [ "not", "native" ],
+    "pixmap_v128.mbt": [ "native", "wasm" ],
+    "pixmap_scalar.mbt": [ "wasm-gc", "js" ],
   },
 )

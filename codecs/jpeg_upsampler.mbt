@@ -72,11 +72,7 @@ fn upsample_horizontal(
   //         out[i * 2 + 1] = (sample + input[i + 1]) >> 2;
   //     }
   let n = @cmp.minimum((output.len - 2) / 2, input.len - 2)
-  for w in 0..<n {
-    let sample = 3 * input.at(w + 1) + 2
-    output.set(2 + 2 * w, (sample + input.at(w)) >> 2)
-    output.set(3 + 2 * w, (sample + input.at(w + 2)) >> 2)
-  }
+  upsample_horizontal_core(input, output, n)
   // Get lengths
   let out_len = output.len - 2
   let input_len = input.len - 2
@@ -103,14 +99,10 @@ fn upsample_vertical(
   let middle = output.len / 2
   // for the first row, closest row is in_near
   let n = @cmp.minimum(input.len, @cmp.minimum(in_near.len, middle))
-  for i in 0..<n {
-    output.set(i, (3 * input.at(i) + 2 + in_near.at(i)) >> 2)
-  }
+  upsample_vertical_core(input, in_near, output, 0, n)
   // for the second row, the closest row to input is in_far
   let n = @cmp.minimum(input.len, @cmp.minimum(in_far.len, output.len - middle))
-  for i in 0..<n {
-    output.set(middle + i, (3 * input.at(i) + 2 + in_far.at(i)) >> 2)
-  }
+  upsample_vertical_core(input, in_far, output, middle, n)
 }
 
 ///|

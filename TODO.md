@@ -65,16 +65,32 @@ goldens with `scripts/goldens.sh <stage>` (needs Rust; builds `oracle/`).
 - [ ] **Performance** (`bench/run.sh`, `bench/README.md`; M-series Mac,
   native release, embedded fonts only, upstream `--jobs 1`; 2026-10-04):
 
-  | workload | Rust | before | memoized | ReadOnlyArray | allocations | now vs Rust |
-  |---|---:|---:|---:|---:|---:|---:|
-  | `--version` (process startup only) | 4.8 ms | | 6.7 ms | 3.5 ms | | 0.7× |
-  | startup (`tiny.typ` → PDF) | 7.7 ms | 80 ms | 22.7 ms | 19.5 ms | 18.0 ms | 2.3× |
-  | `long.typ` compile (`query`) | 102 ms | 1.32 s | 315 ms | 305 ms | 225 ms | 2.2× |
-  | `long.typ` → PDF | 119 ms | 1.45 s | 451 ms | 431 ms | 352 ms | 3.0× |
-  | `long.typ` → SVG | 183 ms | 1.98 s | 479 ms | 457 ms | 377 ms | 2.1× |
-  | `long.typ` → PNG (24 pages) | 913 ms | 5.32 s | 2.68 s | 2.65 s | 2.58 s | 2.8× |
-  | `showcase.typ` → PDF (system fonts) | 287 ms | 2.25 s | 1.35 s | 1.30 s | 1.30 s | 4.5× |
-  | `longer.typ` compile | 481 ms | 6.58 s | 1.56 s | 1.51 s | 1.12 s | 2.3× |
+  | workload | Rust | before | memoized | ReadOnlyArray | allocations | v128 | now vs Rust |
+  |---|---:|---:|---:|---:|---:|---:|---:|
+  | `--version` (process startup only) | 4.8 ms | | 6.7 ms | 3.5 ms | | | 0.7× |
+  | startup (`tiny.typ` → PDF) | 7.7 ms | 80 ms | 22.7 ms | 19.5 ms | 18.0 ms | 18.2 ms | 2.3× |
+  | `long.typ` compile (`query`) | 102 ms | 1.32 s | 315 ms | 305 ms | 225 ms | 227 ms | 2.2× |
+  | `long.typ` → PDF | 119 ms | 1.45 s | 451 ms | 431 ms | 352 ms | 356 ms | 3.0× |
+  | `long.typ` → SVG | 183 ms | 1.98 s | 479 ms | 457 ms | 377 ms | 381 ms | 2.1× |
+  | `long.typ` → PNG (24 pages) | 913 ms | 5.32 s | 2.68 s | 2.65 s | 2.58 s | 1.25 s | 1.37× |
+  | `showcase.typ` → PDF (system fonts) | 287 ms | 2.25 s | 1.35 s | 1.30 s | 1.30 s | 1.21 s | 4.2× |
+  | `showcase.typ` → PNG (system fonts) | 540 ms | | | | 1.60 s | 1.06 s | 2.0× |
+  | `longer.typ` compile | 481 ms | 6.58 s | 1.56 s | 1.51 s | 1.12 s | | 2.3× |
+
+  "v128" (2026-10-04, hyperfine side by side with "allocations" = main at
+  bfdf8ca and Rust): the SIMD export kernels (AGENTS.md: v128 kernels):
+  zlib loads/`compare256`/adler32, PNG filters, demultiply, JPEG
+  IDCT/YCbCr/up-sampling, image resampling, pic_scale, vello_cpu
+  compositing, plus pixglyph's `#valtype` `Point` (curve flattening
+  allocated a dozen points per step) and fewer deflate allocations. PDF/SVG of `long.typ` do not
+  reach them (unchanged within noise). The same documents on the wasm
+  targets (`moonrun`, `--ignore-system-fonts`; wasm-gc and js keep the
+  scalar kernels, `@v128` is emulated there):
+
+  | workload | wasm before | wasm v128 | wasm-gc before | wasm-gc now |
+  |---|---:|---:|---:|---:|
+  | `long.typ` → PNG | 7.57 s | 4.20 s | 4.80 s | 4.24 s |
+  | `showcase.typ` → PNG | 6.17 s | 2.81 s | 2.80 s | 2.08 s |
 
   ("memoized" and "ReadOnlyArray" re-measured side by side on 2026-10-04,
   hyperfine, runs interleaved.) Constant tables as static `ReadOnlyArray`
@@ -108,10 +124,12 @@ goldens with `scripts/goldens.sh <stage>` (needs Rust; builds `oracle/`).
   values, style casts, rustybuzz lookups), line breaking and
   shaping (rustybuzz port), style-chain lookups (values are cast from
   `Value` on every read), grid layout; PDF: pdflite's flate (font streams);
-  PNG: zlib deflate and PNG filtering; showcase: system font discovery
-  (parses every installed face), JPEG decoding. Not done: lazy embedded
-  `FontInfo` (startup), memoizing the state sequence (closure identity, see
-  AGENTS.md), typed style caches.
+  PNG: zlib-rs' `deflate_medium` (hash chains, scalar; ~55% of `long.typ`
+  → PNG), pixglyph's line rasterization, crc32 (no PMULL in `@v128`);
+  showcase: system font discovery (parses every installed face) and
+  pdflite's flate (font and image streams, most of its PDF export). Not
+  done: lazy embedded `FontInfo` (startup), memoizing the state sequence
+  (closure identity, see AGENTS.md), typed style caches.
 - [ ] **Build times**: the `library` package dominates (serial compile,
   ~80–95 s release rebuild). Consider splitting it into several packages
   along upstream module lines so `-j` parallelizes builds.
