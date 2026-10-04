@@ -155,8 +155,8 @@ goldens with `scripts/goldens.sh <stage>` (needs Rust; builds `oracle/`).
 
 ### office.mbt (pdflite, published on mooncakes)
 - [x] **Push/publish**: the export package and its follow-ups landed in
-  moonbitlang/office.mbt #591–#594 and ship in pdflite 0.3.4, which
-  typst.mbt now imports from mooncakes (no sibling checkout needed; an
+  moonbitlang/office.mbt #591–#594 and ship in pdflite 0.3.4; font subsetting (subsetter 0.2.6 port, #598)
+  ships in pdflite 0.3.5, which typst.mbt now imports from mooncakes (no sibling checkout needed; an
   untracked `moon.work` can still link a local office.mbt).
 - [ ] Bump `moonbit-community/flate` 0.8.1 → 0.8.4 in pdflite (faster);
   requires regenerating three byte-pinned fixtures (pdflite flate

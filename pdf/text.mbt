@@ -116,7 +116,18 @@ fn build_font(
   typst_font : @library.FontInstance,
 ) -> @export.Font raise @library.SourceError {
   let font = typst_font.font()
-  match @export.Font::new(font.data(), font.index().reinterpret_as_int()) {
+  let variations = []
+  for v in typst_font.variations().0 {
+    if @subsetter.Tag::from_str(v.0.0) is Some(tag) {
+      variations.push((tag, v.1.get()))
+    }
+  }
+  match
+    @export.Font::new_variable(
+      font.data(),
+      font.index().reinterpret_as_int(),
+      variations,
+    ) {
     Some(f) => {
       if color_glyph_hook(typst_font) is Some(hook) {
         f.set_color_glyphs(hook)
