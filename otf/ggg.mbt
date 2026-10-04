@@ -25,12 +25,29 @@ pub fn LazyArray16::range(
   self : LazyArray16[RangeRecord],
   glyph : GlyphId,
 ) -> RangeRecord? {
+  let at = range_record_at(self, glyph)
+  if at < 0 {
+    return None
+  }
+  let data = self.data
+  Some({
+    start: GlyphId(be_u16(data, at)),
+    end: GlyphId(be_u16(data, at + 2)),
+    value: be_u16(data, at + 4),
+  })
+}
+
+///|
+/// The byte offset of the [`RangeRecord`] containing `glyph` (see
+/// [LazyArray16::range]), or `-1`. (Lets hot callers read the record's
+/// fields without allocating it.)
+fn range_record_at(records : LazyArray16[RangeRecord], glyph : GlyphId) -> Int {
   // `binary_search_by` specialized to compare the raw big-endian fields
   // instead of parsing a record for every probe (same probe sequence).
-  let data = self.data
-  let mut size = self.len().to_int()
+  let data = records.data
+  let mut size = records.len().to_int()
   if size == 0 {
-    return None
+    return -1
   }
   let g = glyph.0.to_int()
   let mut base = 0
@@ -48,13 +65,9 @@ pub fn LazyArray16::range(
   let start = (data[at].to_int() << 8) | data[at + 1].to_int()
   let end = (data[at + 2].to_int() << 8) | data[at + 3].to_int()
   if g >= start && g <= end {
-    Some({
-      start: GlyphId(start.to_uint16()),
-      end: GlyphId(end.to_uint16()),
-      value: ((data[at + 4].to_int() << 8) | data[at + 5].to_int()).to_uint16(),
-    })
+    at
   } else {
-    None
+    -1
   }
 }
 
@@ -113,11 +126,34 @@ pub fn Coverage::contains(self : Coverage, glyph : GlyphId) -> Bool {
 /// Returns the coverage index of the glyph or `None` if it is not covered.
 pub fn Coverage::get(self : Coverage, glyph : GlyphId) -> UInt16? {
   match self {
-    Format1(glyphs~) => glyphs.binary_search(glyph).map(p => p.0)
+    Format1(glyphs~) => {
+      // `glyphs.binary_search(glyph).map(p => p.0)` specialized to compare
+      // the raw big-endian glyph ids (same probe sequence, without the
+      // closures and the result pair).
+      let data = glyphs.data
+      let mut size = glyphs.len().to_int()
+      if size == 0 {
+        return None
+      }
+      let g = glyph.0
+      let mut base = 0
+      while size > 1 {
+        let half = size / 2
+        let mid = base + half
+        base = if be_u16(data, mid * 2) > g { base } else { mid }
+        size -= half
+      }
+      if be_u16(data, base * 2) == g {
+        Some(base.to_uint16())
+      } else {
+        None
+      }
+    }
     Format2(records~) => {
-      guard records.range(glyph) is Some(record) else { return None }
-      let offset = glyph.0 - record.start.0
-      u16_checked_add(record.value, offset)
+      let at = range_record_at(records, glyph)
+      guard at >= 0 else { return None }
+      let offset = glyph.0 - be_u16(records.data, at)
+      u16_checked_add(be_u16(records.data, at + 4), offset)
     }
   }
 }
@@ -172,7 +208,16 @@ pub fn ClassDefinition::get(self : ClassDefinition, glyph : GlyphId) -> Class {
         Some(index) => classes.get(index)
         None => None
       }
-    Format2(records~) => records.range(glyph).map(record => record.value)
+    Format2(records~) => {
+      // `records.range(glyph).map(record => record.value)` without
+      // allocating the record.
+      let at = range_record_at(records, glyph)
+      if at >= 0 {
+        Some(be_u16(records.data, at + 4))
+      } else {
+        None
+      }
+    }
     Empty => Some(0)
   }
   r.unwrap_or(0)
