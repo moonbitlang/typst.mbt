@@ -104,7 +104,7 @@ fn DeflateStream::longest_match(self : DeflateStream, cur_match : Int) -> Int {
         // goto_next_in_chain
         chain_length -= 1
         if chain_length > 0 {
-          cur_match = prev[cur_match & wmask]
+          cur_match = prev.unsafe_get(cur_match & wmask).to_int()
           if cur_match > limit {
             continue
           }
@@ -121,7 +121,7 @@ fn DeflateStream::longest_match(self : DeflateStream, cur_match : Int) -> Int {
         // goto_next_in_chain
         chain_length -= 1
         if chain_length > 0 {
-          cur_match = prev[cur_match & wmask]
+          cur_match = prev.unsafe_get(cur_match & wmask).to_int()
           if cur_match > limit {
             continue
           }
@@ -166,7 +166,7 @@ fn DeflateStream::longest_match(self : DeflateStream, cur_match : Int) -> Int {
     // goto_next_in_chain
     chain_length -= 1
     if chain_length > 0 {
-      cur_match = prev[cur_match & wmask]
+      cur_match = prev.unsafe_get(cur_match & wmask).to_int()
       if cur_match > limit {
         continue
       }

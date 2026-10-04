@@ -146,10 +146,10 @@ priv struct DeflateStream {
   /// prev[N], where N is an offset in the current window, contains the offset
   /// in the window of the previous 4-byte sequence that hashes to the same
   /// value as the 4-byte sequence starting at N.
-  prev : FixedArray[Int]
+  prev : FixedArray[UInt16]
   /// head[H] contains the offset of the last 4-character sequence seen so far
   /// in the current window that hashes to H.
-  head : FixedArray[Int]
+  head : FixedArray[UInt16]
   /// Length of the best match at previous step.
   mut prev_length : Int
   /// To speed up deflation, hash chains are never searched beyond this length.
@@ -358,42 +358,56 @@ fn read_u64_le(window : FixedArray[Byte], i : Int) -> UInt64 {
 }
 
 ///|
+/// `update_hash(0, val)`: always in `0..HASH_SIZE`.
 fn hash_update(val : UInt) -> Int {
   ((val * 2654435761U) >> 16).reinterpret_as_int() & (HASH_SIZE - 1)
 }
 
 ///|
+/// Upstream `quick_insert_string`. `head` and `prev` hold `u16` positions
+/// (`Pos`); `head` has `HASH_SIZE` entries and `prev` `w_size`, so the hashed
+/// and masked indices are in bounds.
 fn DeflateStream::quick_insert_string(
   self : DeflateStream,
   string : Int,
 ) -> Int {
   let val = read_u32_le(self.window, string)
   let hm = hash_update(val)
-  let head = self.head[hm]
-  if head != string {
-    self.prev[string & self.w_mask()] = head
-    self.head[hm] = string
+  let head = self.head.unsafe_get(hm).to_int()
+  if head != (string & 0xffff) {
+    self.prev.unsafe_set(string & self.w_mask(), head.to_uint16())
+    self.head.unsafe_set(hm, string.to_uint16())
   }
   head
 }
 
 ///|
+/// Upstream `insert_string`: inserts the strings starting at
+/// `string..string + count`, as far as four bytes of each are in the window.
 fn DeflateStream::insert_string(
   self : DeflateStream,
   string : Int,
   count : Int,
 ) -> Unit {
+  let window = self.window
   // it can happen that insufficient bytes are initialized
-  let len = @cmp.minimum(self.window.length() - string, count + 3)
+  guard string >= 0 && string <= window.length() else {
+    abort("index out of bounds")
+  }
+  // `min(window.len() - string, count + 3) - 3` four-byte windows (without
+  // overflowing `count + 3`), all in bounds.
+  let n = @cmp.minimum(window.length() - string - 3, count)
   let w_mask = self.w_mask()
-  for i in 0..<(len - 3) {
+  let head = self.head
+  let prev = self.prev
+  for i in 0..<n {
     let idx = (string + i) & 0xffff
-    let val = read_u32_le(self.window, string + i)
+    let val = load_u32_le_unchecked(window, string + i)
     let hm = hash_update(val)
-    let head = self.head[hm]
-    if head != idx {
-      self.prev[idx & w_mask] = head
-      self.head[hm] = idx
+    let h = head.unsafe_get(hm)
+    if h.to_int() != idx {
+      prev.unsafe_set(idx & w_mask, h)
+      head.unsafe_set(hm, idx.to_uint16())
     }
   }
 }
@@ -402,16 +416,17 @@ fn DeflateStream::insert_string(
 
 ///|
 fn DeflateStream::slide_hash(self : DeflateStream) -> Unit {
-  let wsize = self.w_size
-  let head = self.head
-  for i in 0..<head.length() {
-    let m = head.unsafe_get(i)
-    head.unsafe_set(i, if m >= wsize { m - wsize } else { 0 })
-  }
-  let prev = self.prev
-  for i in 0..<prev.length() {
-    let m = prev.unsafe_get(i)
-    prev.unsafe_set(i, if m >= wsize { m - wsize } else { 0 })
+  let wsize = self.w_size.to_uint16()
+  slide_hash_chain(self.head, wsize)
+  slide_hash_chain(self.prev, wsize)
+}
+
+///|
+/// `m.saturating_sub(wsize)` for every entry.
+fn slide_hash_chain(table : FixedArray[UInt16], wsize : UInt16) -> Unit {
+  for i in 0..<table.length() {
+    let m = table.unsafe_get(i)
+    table.unsafe_set(i, if m >= wsize { m - wsize } else { 0 })
   }
 }
 
