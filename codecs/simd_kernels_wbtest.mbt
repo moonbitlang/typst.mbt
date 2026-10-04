@@ -645,3 +645,42 @@ test "bench slide_hash_chain head and prev x10" (it : @bench.T) {
     it.keep(head)
   })
 }
+
+///|
+/// The bitwise CRC-32 (reflected polynomial 0xEDB88320).
+fn ref_crc32(start : UInt, data : BytesView) -> UInt {
+  let mut c = start.lnot()
+  for b in data {
+    c = c ^ b.to_uint()
+    for _ in 0..<8 {
+      c = if (c & 1) != 0 { 0xEDB88320U ^ (c >> 1) } else { c >> 1 }
+    }
+  }
+  c.lnot()
+}
+
+///|
+test "crc32_braid matches the bitwise CRC-32" {
+  let data = Bytes::from_array(kernel_test_bytes(1000, 21)[:])
+  // Known answer: CRC-32 of "123456789".
+  assert_eq(crc32_braid(0, b"123456789"[:]), 0xCBF43926U)
+  for off in [0, 1, 3, 7, 8, 13] {
+    for len in [0, 1, 7, 8, 9, 39, 40, 41, 79, 80, 81, 119, 120, 121, 400, 987] {
+      let view = data[off:off + len]
+      assert_eq(crc32_braid(0, view), ref_crc32(0, view))
+      // Chained over a split, like the chunk type and data of a PNG chunk.
+      let third = len / 3
+      assert_eq(
+        crc32_braid(crc32_braid(0, view[:third]), view[third:]),
+        ref_crc32(0, view),
+      )
+      assert_eq(crc32_braid(0x12345678, view), ref_crc32(0x12345678, view))
+    }
+  }
+}
+
+///|
+test "bench crc32 64 KiB" (it : @bench.T) {
+  let data = Bytes::from_array(kernel_test_bytes(65536, 23)[:])
+  it.bench(() => it.keep(crc32_braid(0, data[:])))
+}

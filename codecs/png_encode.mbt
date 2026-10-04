@@ -52,29 +52,13 @@ pub fn PngColorType::samples(self : PngColorType) -> Int {
 }
 
 ///|
-let crc_table : FixedArray[UInt] = {
-  let table = FixedArray::make(256, 0U)
-  for n in 0..<256 {
-    let mut c = n.reinterpret_as_uint()
-    for _ in 0..<8 {
-      c = if (c & 1) != 0 { 0xEDB88320U ^ (c >> 1) } else { c >> 1 }
-    }
-    table[n] = c
-  }
-  table
-}
-
-///|
 /// The CRC-32 checksum of the given bytes (as used by PNG chunks).
 pub fn crc32(parts : Array[BytesView]) -> UInt {
-  let mut c = 0xFFFFFFFFU
+  let mut c = 0U
   for part in parts {
-    for byte in part {
-      c = crc_table[((c ^ byte.to_uint()) & 0xFF).reinterpret_as_int()] ^
-        (c >> 8)
-    }
+    c = crc32_braid(c, part)
   }
-  c ^ 0xFFFFFFFFU
+  c
 }
 
 ///|
