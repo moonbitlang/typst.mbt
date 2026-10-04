@@ -213,10 +213,12 @@ impl @otf.OutlineBuilder for Builder with fn close(self) {
 // limitations under the License.
 
 ///|
-/// The internal rendering buffer.
+/// The internal rendering buffer. The dimensions are upstream's `usize`s
+/// (from `u32`s), kept as `Int64` so that row offsets do not overflow; the
+/// buffer has upstream's (wrapping `u32`) `w * h + 4` entries.
 priv struct Canvas {
-  w : Int
-  h : Int
+  w : Int64
+  h : Int64
   a : FixedArray[Float]
 }
 
@@ -224,8 +226,8 @@ priv struct Canvas {
 /// Create a completely uncovered canvas.
 fn Canvas::new(w : UInt, h : UInt) -> Canvas {
   {
-    w: w.reinterpret_as_int(),
-    h: h.reinterpret_as_int(),
+    w: w.to_uint64().reinterpret_as_int64(),
+    h: h.to_uint64().reinterpret_as_int64(),
     a: FixedArray::make((w * h + 4).reinterpret_as_int(), 0.0),
   }
 }
@@ -236,8 +238,10 @@ fn Canvas::accumulate(self : Canvas) -> Bytes {
   // A plain loop with `min` and `to_int` spelled out (the closure call and
   // the core float helpers are not inlined; performance). `acc.abs().min(1.0)`
   // is in `[0, 1]` or NaN-free `1.0`, so the product is in `[0, 255]`.
+  // `self.a[..self.w * self.h]` (no overflow: both are below 2^32).
   let n = self.w * self.h
-  guard n >= 0 && n <= self.a.length() else { abort("canvas out of bounds") }
+  guard n <= self.a.length().to_int64() else { abort("canvas out of bounds") }
+  let n = n.to_int()
   let out = FixedArray::make(n, b'\x00')
   let mut acc : Float = 0.0
   for i in 0..<n {
@@ -257,14 +261,23 @@ fn f32_to_i32_unchecked(x : Float) -> Int = "%f32.to_i32"
 ///|
 /// Add to a value in the accumulation buffer.
 ///
-/// `linestart` is `y * w` for a row `y < h`, below the buffer length, so
-/// `x < len - linestart` cannot overflow (upstream adds `usize`s).
+/// `linestart` is `y * w` for a row `y >= 0` (upstream adds `usize`s): with
+/// `x >= 0` the index `linestart + x` is non-negative, and below the buffer
+/// length when the access happens.
 #inline
-fn Canvas::add(self : Canvas, linestart : Int, x : Int, delta : Float) -> Unit {
+fn Canvas::add(
+  self : Canvas,
+  linestart : Int64,
+  x : Int,
+  delta : Float,
+) -> Unit {
   let a = self.a
-  if x >= 0 && x < a.length() - linestart {
-    let i = linestart + x
-    a.unsafe_set(i, a.unsafe_get(i) + delta)
+  if x >= 0 {
+    let i = linestart + x.to_int64()
+    if i < a.length().to_int64() {
+      let i = i.to_int()
+      a.unsafe_set(i, a.unsafe_get(i) + delta)
+    }
   }
 }
 
@@ -285,9 +298,13 @@ fn Canvas::line(self : Canvas, p0 : Point, p1 : Point) -> Unit {
   if p0.y < 0.0 {
     x = x - p0.y * dxdy
   }
-  let y1 = min_int(self.h, f32_to_usize(f32_ceil(p1.y)))
+  let y1 = if self.h < f32_to_usize(f32_ceil(p1.y)).to_int64() {
+    self.h.to_int()
+  } else {
+    f32_to_usize(f32_ceil(p1.y))
+  }
   for y in y0..<y1 {
-    let linestart = y * self.w
+    let linestart = y.to_int64() * self.w
     let dy = f32_min(Float::from_int(y + 1), p1.y) -
       f32_max(Float::from_int(y), p0.y)
     let xnext = x + dxdy * dy
@@ -508,15 +525,6 @@ fn f32_max(a : Float, b : Float) -> Float {
   } else if b != b {
     a
   } else if a > b {
-    a
-  } else {
-    b
-  }
-}
-
-///|
-fn min_int(a : Int, b : Int) -> Int {
-  if a < b {
     a
   } else {
     b

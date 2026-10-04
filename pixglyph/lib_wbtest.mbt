@@ -224,3 +224,73 @@ test "rasterize source_serif4_var_S" {
   assert_eq(summary(b), "-2 -58 44 70")
   assert_eq(fnv1a(b.coverage), 0x31a701a64d8e240e)
 }
+
+///|
+test "canvas rows past a wrapped allocation are skipped" {
+  // 65538 x 65536: upstream's `u32` `w * h + 4` wraps to 131076 entries, and
+  // the `usize` row offsets put every row but the first two out of range
+  // (skipped like upstream's `get_mut`, never written).
+  let canvas = Canvas::new(65538U, 65536U)
+  assert_eq(canvas.a.length(), 131076)
+  canvas.line(point(1.5, 0.0), point(1.5, 65536.0))
+  let mut nonzero = 0
+  for i in 0..<canvas.a.length() {
+    if canvas.a[i] != 0.0 {
+      nonzero += 1
+      assert_true(i == 1 || i == 2 || i == 65539 || i == 65540)
+    }
+  }
+  assert_eq(nonzero, 4)
+}
+
+///|
+test "panic rasterize with a canvas past its wrapped allocation" {
+  // Upstream panics slicing `a[..w * h]` in `accumulate`.
+  let b = Builder::default()
+  @otf.OutlineBuilder::move_to(b, 0.0, 0.0)
+  @otf.OutlineBuilder::line_to(b, 0.0, 1.0)
+  @otf.OutlineBuilder::line_to(b, 1.0, 1.0)
+  @otf.OutlineBuilder::close(b)
+  let g : Glyph = {
+    units_per_em: 1000,
+    bbox: { x_min: 0, y_min: 0, x_max: 1, y_max: 1, },
+    segments: b.segments,
+  }
+  ignore(g.rasterize(0.0, 0.0, 65536000.0))
+}
+
+///|
+test "float helpers match the core functions on special values" {
+  let values : Array[Float] = [
+    0.0,
+    -0.0,
+    1.5,
+    -1.5,
+    0.5,
+    -0.5,
+    2147483520.0,
+    2147483648.0,
+    -2147483648.0,
+    -2147483904.0,
+    1.0e30,
+    -1.0e30,
+    Float::reinterpret_from_uint(0x7f800000), // inf
+    Float::reinterpret_from_uint(0xff800000), // -inf
+    Float::reinterpret_from_uint(0x7fc00000), // NaN
+    Float::reinterpret_from_uint(0x7f812345), // signaling NaN
+    Float::reinterpret_from_uint(0x00000001), // smallest subnormal
+    Float::reinterpret_from_uint(0x80000001),
+  ]
+  let same = (a : Float, b : Float) => {
+    (a != a && b != b) || a.reinterpret_as_uint() == b.reinterpret_as_uint()
+  }
+  for a in values {
+    assert_true(same(f32_floor(a), a.floor()))
+    assert_true(same(f32_ceil(a), a.ceil()))
+    assert_eq(f32_to_i32(a), a.to_int())
+    for b in values {
+      assert_true(same(f32_min(a, b), a.min(b)))
+      assert_true(same(f32_max(a, b), a.max(b)))
+    }
+  }
+}

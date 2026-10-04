@@ -6,7 +6,8 @@ extern "C" fn libm_powf(x : Float, y : Float) -> Float = "powf"
 
 ///|
 /// `f32::floor` (exact; clang compiles it to one instruction, while the core
-/// helper is a call).
+/// helper is a call). Unlike the core helper it quiets a signaling NaN,
+/// which no coverage value depends on (NaN coordinates give NaN either way).
 extern "C" fn f32_floor(x : Float) -> Float = "floorf"
 
 ///|
