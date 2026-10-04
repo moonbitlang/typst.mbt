@@ -81,7 +81,8 @@ goldens with `scripts/goldens.sh <stage>` (needs Rust; builds `oracle/`).
   bfdf8ca and Rust): the SIMD export kernels (AGENTS.md: v128 kernels):
   zlib loads/`compare256`/adler32, PNG filters, demultiply, JPEG
   IDCT/YCbCr/up-sampling, image resampling, pic_scale, vello_cpu
-  compositing, plus fewer deflate allocations. PDF/SVG of `long.typ` do not
+  compositing, plus pixglyph's `#valtype` `Point` (curve flattening
+  allocated a dozen points per step) and fewer deflate allocations. PDF/SVG of `long.typ` do not
   reach them (unchanged within noise). The same documents on the wasm
   targets (`moonrun`, `--ignore-system-fonts`; wasm-gc and js keep the
   scalar kernels, `@v128` is emulated there):

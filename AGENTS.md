@@ -142,8 +142,8 @@
   Used in `codecs/` (`zlib_*`: unaligned loads, `compare256`, adler32;
   `png_filter_*`; `jpeg_*`: IDCT, YCbCr conversion, up-sampling;
   `imageops_*`: resize sums), `skia/pixmap_*` (PNG demultiply),
-  `pic_scale/{vertical,horizontal}_*` (all u8 kernels) and
-  `vello_cpu/fine_*` (U8Kernel compositing, `pack`). Rules: (1) results
+  `pic_scale/{vertical,horizontal}_*` (the u8 kernels but the Q15 plane
+  row) and `vello_cpu/fine_*` (U8Kernel compositing, `pack`). Rules: (1) results
   must be bit-identical to the scalar code: integer lanes wrap like the
   emulation's masking (`i16x8_*` = `& 0xFFFF`), saturating narrowing is a
   clamp only for values that fit `i16`/`i32` first; NEON `vqrdmlahq_s16` is
