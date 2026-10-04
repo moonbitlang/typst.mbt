@@ -1,8 +1,23 @@
 import {
   "moonbitlang/core/cmp",
+  "moonbitlang/core/v128",
 }
 
 import {
   "moonbitlang/x/fs",
   "moonbitlang/core/string",
+  "moonbitlang/core/bench",
 } for "wbtest"
+
+// `@v128` is experimental (see AGENTS.md: v128 kernels).
+
+warnings = "-alert_experimental"
+
+options(
+  targets: {
+    "vertical_v128.mbt": [ "native", "wasm" ],
+    "vertical_scalar.mbt": [ "wasm-gc", "js" ],
+    "horizontal_v128.mbt": [ "native", "wasm" ],
+    "horizontal_scalar.mbt": [ "wasm-gc", "js" ],
+  },
+)

@@ -18,12 +18,12 @@ fn horizontal_plan(
     Float::from_int(dst_width)
   let rdm = scale_factor < Float::from_int(8)
   let filter_row : RowKernel = match (channels, rdm) {
-    (1, true) => convolve_horizontal_plane_neon_rdm_row
+    (1, true) => plane_rdm_row
     (1, false) => convolve_horizontal_plane_neon_row
-    (3, true) => convolve_horizontal_rgb_neon_rdm_row_one
-    (3, false) => convolve_horizontal_rgb_neon_row_one
-    (4, true) => convolve_horizontal_rgba_neon_row_i16
-    _ => convolve_horizontal_rgba_neon_row
+    (3, true) => rgb_rdm_row
+    (3, false) => rgb_q15_row
+    (4, true) => rgba_rdm_row
+    _ => rgba_q15_row
   }
   let i_weights = filter_weights.numerical_approximation_i16(PRECISION)
   { filter_row, filter_weights: i_weights, }
@@ -39,9 +39,9 @@ fn vertical_strategy_u8(
   let scale_factor : Float = Float::from_int(src_height) /
     Float::from_int(dst_height)
   let filter_row : ColumnKernel = if scale_factor < Float::from_int(8) {
-    convolve_vertical_neon_i16_precision
+    vertical_rdm_kernel
   } else {
-    convolve_vertical_neon_i32_precision
+    vertical_i32_kernel
   }
   let i_weights = filter_weights.numerical_approximation_i16(PRECISION)
   { filter_row, filter_weights: i_weights, }
