@@ -159,7 +159,7 @@ fn rgb_rdm_row(
     let start = src_offset + fw.bounds_start.unsafe_get(x) * 3
     let size = fw.bounds_size.unsafe_get(x)
     let w_off = x * fw.aligned_size
-    if start + size * 3 + 2 > src.length() {
+    if !in_range(start, size.to_int64() * 3 + 2, src.length()) {
       rgb_rdm_pixel(src, start, size, dst, dst_offset + x * 3, weights, w_off)
       continue
     }
@@ -349,7 +349,11 @@ fn q15_row(
     let start = src_offset + fw.bounds_start.unsafe_get(x) * channels
     let size = fw.bounds_size.unsafe_get(x)
     let w_off = x * fw.aligned_size
-    if start + size * channels + 4 - channels > src.length() {
+    if !in_range(
+        start,
+        size.to_int64() * channels.to_int64() + 4 - channels.to_int64(),
+        src.length(),
+      ) {
       // (RGB: lane 3 of the last tap would read past the end.)
       for c in 0..<channels {
         let mut v = 1 << (PRECISION - 1)

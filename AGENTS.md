@@ -141,7 +141,8 @@
   `vmin`/`vmax`), not Rust's `f32::min` (`fminnm`). (2) `@v128` loads and
   stores exist only for `FixedArray[Byte]` and are not bounds checked:
   check the whole range once before the loop and otherwise run the scalar
-  code (which panics like upstream). `FixedArray[Int]`/`[Float]`/`[UInt]`
+  code (which panics like upstream); guards must not overflow (`in_range(
+  off, len : Int64, total)` or `i <= len - 16`, never `i + 16 <= len`). `FixedArray[Int]`/`[Float]`/`[UInt]`
   are gathered with `splat` + `replace_lane` and scattered with
   `extract_lane` (clang merges consecutive lanes into vector loads/stores);
   lane and shuffle indices must be literals; avoid closures and tuples of
