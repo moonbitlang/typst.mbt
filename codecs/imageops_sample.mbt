@@ -329,13 +329,9 @@ fn horizontal_sample(
       ws,
     )
     for y in 0..<h {
-      t.fill(0.0)
-      for i, wt in ws {
-        let base = (y * w + left + i) * channels
-        for c in 0..<channels {
-          t[c] = t[c] + image[base + c] * wt
-        }
-      }
+      // `t[c] = sum(image[y][left + i][c] * ws[i])`, from 0.0 in the order
+      // of `i`.
+      horizontal_sample_sums(image, (y * w + left) * channels, channels, ws, t)
       let base = (y * nw + outx) * channels
       for c in 0..<channels {
         // `NumCast::from(FloatNearest(clamp(t, min, max)))`

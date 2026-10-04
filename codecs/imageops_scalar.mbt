@@ -21,3 +21,23 @@ fn vertical_sample_row(
     out[out_base + j] = t
   }
 }
+
+///|
+/// `t[c] = sum(image[start + i * channels + c] * ws[i])` for `c <
+/// channels`, summed from 0.0 in the order of `i` (a pixel of
+/// [horizontal_sample]).
+fn horizontal_sample_sums(
+  image : FixedArray[Float],
+  start : Int,
+  channels : Int,
+  ws : Array[Float],
+  t : FixedArray[Float],
+) -> Unit {
+  t.fill(0.0)
+  for i, wt in ws {
+    let base = start + i * channels
+    for c in 0..<channels {
+      t[c] = t[c] + image[base + c] * wt
+    }
+  }
+}

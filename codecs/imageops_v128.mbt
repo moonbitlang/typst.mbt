@@ -95,3 +95,47 @@ fn vertical_sample_row(
     j += 1
   }
 }
+
+///|
+/// `t[c] = sum(image[start + i * channels + c] * ws[i])` for `c <
+/// channels`, summed from 0.0 in the order of `i` (a pixel of
+/// [horizontal_sample]): one f32x4 lane per channel for 3 or 4 channels
+/// (with 3, lane 3 sums the next pixel's first sample and is ignored).
+fn horizontal_sample_sums(
+  image : FixedArray[Float],
+  start : Int,
+  channels : Int,
+  ws : Array[Float],
+  t : FixedArray[Float],
+) -> Unit {
+  let n = ws.length()
+  if (channels == 3 || channels == 4) &&
+    start >= 0 &&
+    t.length() >= channels &&
+    start + (n - 1) * channels + 4 <= image.length() {
+    let mut acc = @v128.f32x4_splat(0.0)
+    for i in 0..<n {
+      acc = @v128.f32x4_add(
+        acc,
+        @v128.f32x4_mul(
+          gather_f32x4(image, start + i * channels),
+          @v128.f32x4_splat(ws.unsafe_get(i)),
+        ),
+      )
+    }
+    t[0] = @v128.f32x4_extract_lane(acc, 0)
+    t[1] = @v128.f32x4_extract_lane(acc, 1)
+    t[2] = @v128.f32x4_extract_lane(acc, 2)
+    if channels == 4 {
+      t[3] = @v128.f32x4_extract_lane(acc, 3)
+    }
+    return
+  }
+  t.fill(0.0)
+  for i, wt in ws {
+    let base = start + i * channels
+    for c in 0..<channels {
+      t[c] = t[c] + image[base + c] * wt
+    }
+  }
+}

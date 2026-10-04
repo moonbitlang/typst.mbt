@@ -382,6 +382,55 @@ test "vertical_sample_row matches the scalar sums" {
 }
 
 ///|
+test "horizontal_sample_sums matches the scalar sums" {
+  for channels in 1..<=4 {
+    for n in [1, 2, 3, 5, 8] {
+      let image = kernel_test_floats(
+        (n + 3) * channels + 1,
+        n + channels,
+        255.0,
+      )
+      let ws = Array::from_fixed_array(kernel_test_floats(n, n + 7, 1.5))
+      for start in [0, 1, channels] {
+        // Ends exactly at the image end, too (scalar fallback for 3).
+        let len = start + n * channels
+        let img = FixedArray::makei(len, i => image[i])
+        let t = FixedArray::make(4, (-1.0 : Float))
+        horizontal_sample_sums(img, start, channels, ws, t)
+        for c in 0..<channels {
+          let mut e : Float = 0.0
+          for i in 0..<n {
+            e = e + img[start + i * channels + c] * ws[i]
+          }
+          assert_eq(t[c].reinterpret_as_uint(), e.reinterpret_as_uint())
+        }
+      }
+    }
+  }
+}
+
+///|
+test "bench horizontal_sample 1200x800 rgb -> 500 cols" (it : @bench.T) {
+  let w = 1200
+  let h = 800
+  let image = kernel_test_floats(w * h * 3, 1, 255.0)
+  let filt : Filter = { kernel: catmullrom_kernel, support: 2.0, }
+  it.bench(() => {
+    it.keep(
+      horizontal_sample(
+        image,
+        w.reinterpret_as_uint(),
+        h.reinterpret_as_uint(),
+        3,
+        500,
+        filt,
+        Rgb8,
+      ),
+    )
+  })
+}
+
+///|
 test "bench vertical_sample 1200x800 rgba -> 600 rows" (it : @bench.T) {
   let w = 1200
   let h = 800
