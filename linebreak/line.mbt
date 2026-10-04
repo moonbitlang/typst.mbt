@@ -142,7 +142,7 @@ pub fn LineSegmenter::segment_str(
   let chars = []
   let mut len = 0
   for i = 0; i < input.length(); {
-    let (c, next) = @unicode.decode_at(input, i)
+    let { cp: c, idx: next, } = @unicode.decode_at(input, i)
     chars.push((len, c))
     len += utf8_len(c)
     continue next

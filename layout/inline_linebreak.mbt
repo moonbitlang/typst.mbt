@@ -754,11 +754,16 @@ fn Estimates::compute(p : Preparation) -> Estimates {
     if item is Text(shaped) {
       for g in shaped.glyphs.kept() {
         let byte_len = g.range_end - g.range_start
-        let (sl, sr) = g.stretchability()
-        let (hl, hr) = g.shrinkability()
+        let a = g.adjustability
         widths.push(byte_len, g.x_advance.at(g.size))
-        stretchability.push(byte_len, (sl + sr).at(g.size))
-        shrinkability.push(byte_len, (hl + hr).at(g.size))
+        stretchability.push(
+          byte_len,
+          (a.stretch_left + a.stretch_right).at(g.size),
+        )
+        shrinkability.push(
+          byte_len,
+          (a.shrink_left + a.shrink_right).at(g.size),
+        )
         justifiables.push(byte_len, if g.is_justifiable() { 1 } else { 0 })
       }
     } else {

@@ -361,8 +361,8 @@ fn FrameEncoder::glyphs(
         f64_hex(g.y_offset.get()),
         g.range_start.to_string(),
         g.range_end.to_string(),
-        (self.span_enc)(g.span.0),
-        g.span.1.to_string(),
+        (self.span_enc)(g.span),
+        g.span_offset.to_string(),
       ])
     }),
   )

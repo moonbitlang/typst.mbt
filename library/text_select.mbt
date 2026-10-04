@@ -15,7 +15,12 @@ let fallback_families : Array[FontFamily] = [
 pub fn families(styles : StyleChain) -> Array[FontFamily] {
   let list = TextElem::font_in(styles).0
   if TextElem::fallback_in(styles) {
-    [..list, ..fallback_families]
+    // `[..list, ..fallback_families]` without the spread's iterators.
+    let out : Array[FontFamily] = []
+    out.reserve_capacity(list.length() + fallback_families.length())
+    out.append(list)
+    out.append(fallback_families)
+    out
   } else {
     list
   }
@@ -113,7 +118,11 @@ pub fn ScriptKind::feature(self : ScriptKind) -> String {
 pub fn JustificationLimits::spacing_limits(
   self : JustificationLimits,
 ) -> Limits[Rel[Length]] {
-  self.spacing.unwrap_or(limits_spacing_default())
+  // (A match: `unwrap_or` would build the default on every call.)
+  match self.spacing {
+    Some(spacing) => spacing
+    None => limits_spacing_default()
+  }
 }
 
 ///|
@@ -121,5 +130,8 @@ pub fn JustificationLimits::spacing_limits(
 pub fn JustificationLimits::tracking_limits(
   self : JustificationLimits,
 ) -> Limits[Length] {
-  self.tracking.unwrap_or(limits_tracking_default())
+  match self.tracking {
+    Some(tracking) => tracking
+    None => limits_tracking_default()
+  }
 }

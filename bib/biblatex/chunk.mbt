@@ -502,7 +502,7 @@ fn byte_to_utf16(s : String, byte : Int) -> Int {
   let mut b = 0
   let mut i = 0
   while i < s.length() && b < byte {
-    let (c, next) = @unicode.decode_at(s, i)
+    let { cp: c, idx: next, } = @unicode.decode_at(s, i)
     b += @unscanny.char_len_utf8(Int::unsafe_to_char(c))
     i = next
   }

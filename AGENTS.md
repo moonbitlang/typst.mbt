@@ -113,9 +113,24 @@
   `FixedArray::unsafe_get` after one explicit bounds check) and avoid
   per-element closures and iterators. Caches of pure functions (glyph
   outlines, font selection, parsed numbering patterns) are fine; document
-  them as "not upstream" where they deviate structurally. Small structs
-  created in hot loops can be `#valtype` (pixglyph's `Point`), and tuples
-  returned per call are heap-allocated (prefer storing into fields).
+  them as "not upstream" where they deviate structurally.
+- Allocation (native): structs, tuples, closures (and the mutable
+  variables they capture), `Some(..)` of a value type, enum payloads and
+  `[..]`/spread literals each allocate; a returned or stored tuple is always
+  boxed. In hot paths: pass `StringView`/`ArrayView` (upstream `&str`/`&[T]`)
+  instead of `to_string()`/`to_owned()`/`to_array()` copies; return small
+  immutable results as a `#valtype` struct (`@unicode.Decoded` from
+  `decode_at`, `TextEdges`, `SpanAt`) rather than a tuple; `#valtype` also
+  for small immutable non-generic data (`Point`, `Length`, `Glyph`,
+  `Utf8Slice`, `LazyArray16`; generic structs whose fields are type
+  parameters cannot be value types, and `physical_equal` on value types is
+  always false on native); flatten tuple fields of per-glyph structs; loop
+  instead of `iter().any/map/collect` and closure-based iterators (e.g. walk
+  `StyleChain` links directly); `match` instead of `unwrap_or(<allocating
+  default>)`; build constant style defaults once (`Value::shared`). Count
+  allocations per MoonBit source line by compiling the generated
+  `cli.c` with `moonbit_malloc`/`moonbit_make_*` wrapped by a counting macro
+  (`#line` directives map call sites back to `.mbt` lines).
 - v128 kernels (`moonbitlang/core/v128`, experimental: `warnings =
   "-alert_experimental"` in the package's `moon.pkg`): real SIMD on native
   (NEON on aarch64, SSE2 on x86, via `moonbit_simd.h`) and wasm (SIMD128),
@@ -125,7 +140,7 @@
   (`["wasm-gc", "js"]`, the previous scalar code or the lane emulation);
   for an A/B comparison swap the two target lists and rerun `moon bench`.
   Used in `codecs/` (`zlib_*`: unaligned loads, `compare256`, adler32;
-  `png_filter_*`; `jpeg_*`: YCbCr conversion and up-sampling;
+  `png_filter_*`; `jpeg_*`: IDCT, YCbCr conversion, up-sampling;
   `imageops_*`: resize sums), `skia/pixmap_*` (PNG demultiply),
   `pic_scale/{vertical,horizontal}_*` (all u8 kernels) and
   `vello_cpu/fine_*` (U8Kernel compositing, `pack`). Rules: (1) results
@@ -142,11 +157,11 @@
   stores exist only for `FixedArray[Byte]` and are not bounds checked:
   check the whole range once before the loop and otherwise run the scalar
   code (which panics like upstream); guards must not overflow (`in_range(
-  off, len : Int64, total)` or `i <= len - 16`, never `i + 16 <= len`). `FixedArray[Int]`/`[Float]`/`[UInt]`
-  are gathered with `splat` + `replace_lane` and scattered with
-  `extract_lane` (clang merges consecutive lanes into vector loads/stores);
-  lane and shuffle indices must be literals; avoid closures and tuples of
-  `V128` (heap-allocated). (3) Measure each kernel on native and wasm
+  off, len : Int64, total)` or `i <= len - 16`, never `i + 16 <= len`).
+  `FixedArray[Int]`/`[Float]`/`[UInt]` are gathered with `splat` +
+  `replace_lane` and scattered with `extract_lane` (clang merges
+  consecutive lanes into vector loads/stores); lane and shuffle indices
+  must be literals; avoid closures and tuples of `V128` (heap-allocated). (3) Measure each kernel on native and wasm
   (`codecs/simd_kernels_wbtest.mbt`, `skia/simd_kernels_wbtest.mbt`,
   `pic_scale/bench_wbtest.mbt`: `moon bench <file> --target native|wasm
   --release`): clang already auto-vectorizes simple `unsafe_get` loops on

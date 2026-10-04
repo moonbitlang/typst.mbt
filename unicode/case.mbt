@@ -90,7 +90,7 @@ pub fn to_lowercase(s : StringView) -> String {
   let chars : Array[Int] = []
   let mut i = 0
   while i < s.length() {
-    let (c, next) = decode_at(s, i)
+    let { cp: c, idx: next, } = decode_at(s, i)
     chars.push(c)
     i = next
   }
@@ -131,7 +131,7 @@ pub fn to_uppercase(s : StringView) -> String {
   let buf = StringBuilder()
   let mut i = 0
   while i < s.length() {
-    let (c, next) = decode_at(s, i)
+    let { cp: c, idx: next, } = decode_at(s, i)
     write_mapped(buf, c, to_uppercase_table, to_uppercase_multi_table)
     i = next
   }

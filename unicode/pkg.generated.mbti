@@ -24,9 +24,9 @@ pub fn char_width(Char) -> Int?
 
 pub fn chars_with_case_variants(Int, Int) -> Array[Int]
 
-pub fn decode_at(StringView, Int) -> (Int, Int)
+pub fn decode_at(StringView, Int) -> Decoded
 
-pub fn decode_before(StringView, Int) -> (Int, Int)
+pub fn decode_before(StringView, Int) -> Decoded
 
 pub fn default_math_class(Char) -> MathClass?
 
@@ -109,6 +109,11 @@ pub fn unicode_words(StringView) -> Array[StringView]
 // Errors
 
 // Types and methods
+pub struct Decoded {
+  cp : Int
+  idx : Int
+}
+
 pub(all) enum MathClass {
   Normal
   Alphabetic

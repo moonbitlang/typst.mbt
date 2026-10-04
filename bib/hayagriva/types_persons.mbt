@@ -378,7 +378,7 @@ pub fn Person::given_first(self : Person, initials : Bool) -> String {
 pub fn Person::name_particle(self : Person) -> String? {
   let mut i = self.name.length()
   while i > 0 {
-    let (c, prev) = @unicode.decode_before(self.name, i)
+    let { cp: c, idx: prev, } = @unicode.decode_before(self.name, i)
     i = prev
     if c != ' '.to_int() {
       continue

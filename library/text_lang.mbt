@@ -52,20 +52,47 @@ pub fn Lang::as_str(self : Lang) -> String {
 ///|
 /// The default direction for the language.
 pub fn Lang::dir(self : Lang) -> Dir {
-  if [
-      lang_arabic, lang_divehi, lang_persian, lang_hebrew, lang_kashmiri, lang_punjabi,
-      lang_pashto, lang_sindhi, lang_uyghur, lang_urdu, lang_yiddish,
-    ].contains(self) {
-    RTL
-  } else {
-    LTR
+  // The codes of `[ARABIC, DIVEHI, PERSIAN, HEBREW, KASHMIRI, PUNJABI,
+  // PASHTO, SINDHI, UYGHUR, URDU, YIDDISH].contains(self)`, matched without
+  // allocating the array on every call.
+  match self.0 {
+    "ar"
+    | "dv"
+    | "fa"
+    | "he"
+    | "ks"
+    | "pa"
+    | "ps"
+    | "sd"
+    | "ug"
+    | "ur"
+    | "yi" => RTL
+    _ => LTR
   }
 }
 
 ///|
 /// Whether all characters of the string are ASCII.
 fn is_ascii_str(s : String) -> Bool {
-  s.iter().all(c => c.to_int() < 0x80)
+  for i in 0..<s.length() {
+    if s.code_unit_at(i).to_int() >= 0x80 {
+      return false
+    }
+  }
+  true
+}
+
+///|
+/// `s.to_lower()`, returning `s` itself if it has no ASCII uppercase letters
+/// (performance: language codes are cast on every style lookup).
+fn ascii_to_lower(s : String) -> String {
+  for i in 0..<s.length() {
+    let c = s.code_unit_at(i).to_int()
+    if c >= 'A'.to_int() && c <= 'Z'.to_int() {
+      return s.to_lower()
+    }
+  }
+  s
 }
 
 ///|
@@ -73,7 +100,7 @@ fn is_ascii_str(s : String) -> Bool {
 pub fn Lang::from_str(iso : String) -> Lang raise HintedError {
   let len = @syntax.utf8_len(iso)
   if len >= 2 && len <= 3 && is_ascii_str(iso) {
-    Lang(iso.to_lower())
+    Lang(ascii_to_lower(iso))
   } else {
     bail("expected two or three letter language code (ISO 639-1/2/3)")
   }

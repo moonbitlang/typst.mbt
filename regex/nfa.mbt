@@ -313,7 +313,7 @@ pub fn Haystack::new(s : String) -> Haystack {
   let mut i = 0
   let mut b = 0
   while i < s.length() {
-    let (c, next) = @unicode.decode_at(s, i)
+    let { cp: c, idx: next, } = @unicode.decode_at(s, i)
     chars.push(c)
     b += if c < 0x80 {
       1

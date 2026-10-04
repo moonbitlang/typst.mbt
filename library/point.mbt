@@ -2,6 +2,7 @@
 
 ///|
 /// A point in 2D.
+#valtype
 pub(all) struct Point {
   /// The x coordinate.
   x : Abs

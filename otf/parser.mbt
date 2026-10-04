@@ -303,6 +303,7 @@ pub let empty_data : BytesView = b""[:]
 /// A slice-like container that converts internal binary data only on access.
 ///
 /// Array values are stored in a continuous data chunk.
+#valtype
 pub struct LazyArray16[T] {
   data : BytesView
 }
@@ -460,6 +461,7 @@ pub fn[T : FromData] LazyArray16::iter(self : LazyArray16[T]) -> Iter[T] {
 /// A slice-like container that converts internal binary data only on access.
 ///
 /// This is a low-level, internal structure that should not be used directly.
+#valtype
 pub struct LazyArray32[T] {
   data : BytesView
 }
@@ -568,6 +570,7 @@ pub fn[T : FromData] LazyArray32::iter(self : LazyArray32[T]) -> Iter[T] {
 /// Unlike [`LazyArray16`], internal storage is not continuous.
 ///
 /// Multiple offsets can point to the same data.
+#valtype
 pub struct LazyOffsetArray16[T] {
   data : BytesView
   // Zero offsets must be ignored, therefore we're using `Option<Offset16>`.

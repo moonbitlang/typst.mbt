@@ -65,32 +65,31 @@ goldens with `scripts/goldens.sh <stage>` (needs Rust; builds `oracle/`).
 - [ ] **Performance** (`bench/run.sh`, `bench/README.md`; M-series Mac,
   native release, embedded fonts only, upstream `--jobs 1`; 2026-10-04):
 
-  | workload | Rust | before | memoized | ReadOnlyArray | v128 | now vs Rust |
-  |---|---:|---:|---:|---:|---:|---:|
-  | `--version` (process startup only) | 4.8 ms | | 6.7 ms | 3.5 ms | | 0.7× |
-  | startup (`tiny.typ` → PDF) | 6.9 ms | 80 ms | 22.7 ms | 19.9 ms | 20.0 ms | 2.9× |
-  | `long.typ` compile (`query`) | 103 ms | 1.32 s | 315 ms | 299 ms | 299 ms | 2.9× |
-  | `long.typ` → PDF | 118 ms | 1.45 s | 451 ms | 418 ms | 428 ms | 3.6× |
-  | `long.typ` → SVG | 178 ms | 1.98 s | 479 ms | 445 ms | 444 ms | 2.5× |
-  | `long.typ` → PNG (24 pages) | 941 ms | 5.32 s | 2.68 s | 2.66 s | 1.37 s | 1.45× |
-  | `showcase.typ` → PDF (system fonts) | 277 ms | 2.25 s | 1.35 s | 1.31 s | 1.20 s | 4.3× |
-  | `showcase.typ` → PNG (system fonts) | 541 ms | | | 1.58 s | 1.06 s | 2.0× |
-  | `longer.typ` compile | 478 ms | 6.58 s | 1.56 s | 1.56 s | | 3.3× |
+  | workload | Rust | before | memoized | ReadOnlyArray | allocations | v128 | now vs Rust |
+  |---|---:|---:|---:|---:|---:|---:|---:|
+  | `--version` (process startup only) | 4.8 ms | | 6.7 ms | 3.5 ms | | | 0.7× |
+  | startup (`tiny.typ` → PDF) | 7.7 ms | 80 ms | 22.7 ms | 19.5 ms | 18.0 ms | 18.2 ms | 2.3× |
+  | `long.typ` compile (`query`) | 102 ms | 1.32 s | 315 ms | 305 ms | 225 ms | 227 ms | 2.2× |
+  | `long.typ` → PDF | 119 ms | 1.45 s | 451 ms | 431 ms | 352 ms | 356 ms | 3.0× |
+  | `long.typ` → SVG | 183 ms | 1.98 s | 479 ms | 457 ms | 377 ms | 381 ms | 2.1× |
+  | `long.typ` → PNG (24 pages) | 913 ms | 5.32 s | 2.68 s | 2.65 s | 2.58 s | 1.25 s | 1.37× |
+  | `showcase.typ` → PDF (system fonts) | 287 ms | 2.25 s | 1.35 s | 1.30 s | 1.30 s | 1.21 s | 4.2× |
+  | `showcase.typ` → PNG (system fonts) | 540 ms | | | | 1.60 s | 1.06 s | 2.0× |
+  | `longer.typ` compile | 481 ms | 6.58 s | 1.56 s | 1.51 s | 1.12 s | | 2.3× |
 
-  The "v128" column (2026-10-04, side by side with "ReadOnlyArray" = main
-  at d6cd58c, re-measured) adds the SIMD export kernels (AGENTS.md: v128
-  kernels): zlib loads/`compare256`/adler32, PNG filters, demultiply,
-  JPEG IDCT/YCbCr/up-sampling, image resampling, pic_scale, vello_cpu
-  compositing, plus pixglyph's `#valtype` `Point` and fewer deflate
-  allocations. PDF/SVG of `long.typ` do not reach them. The same documents
-  on the wasm targets (`moonrun`, `--ignore-system-fonts`):
+  "v128" (2026-10-04, hyperfine side by side with "allocations" = main at
+  bfdf8ca and Rust): the SIMD export kernels (AGENTS.md: v128 kernels):
+  zlib loads/`compare256`/adler32, PNG filters, demultiply, JPEG
+  IDCT/YCbCr/up-sampling, image resampling, pic_scale, vello_cpu
+  compositing, plus fewer deflate allocations. PDF/SVG of `long.typ` do not
+  reach them (unchanged within noise). The same documents on the wasm
+  targets (`moonrun`, `--ignore-system-fonts`; wasm-gc and js keep the
+  scalar kernels, `@v128` is emulated there):
 
   | workload | wasm before | wasm v128 | wasm-gc before | wasm-gc now |
   |---|---:|---:|---:|---:|
-  | `long.typ` → PNG | 7.91 s | 4.42 s | 4.76 s | 4.54 s |
-  | `showcase.typ` → PNG | 6.18 s | 2.75 s | 2.77 s | 2.10 s |
-
-  (wasm-gc and js keep the scalar kernels: `@v128` is emulated there.)
+  | `long.typ` → PNG | 7.57 s | 4.20 s | 4.80 s | 4.24 s |
+  | `showcase.typ` → PNG | 6.17 s | 2.81 s | 2.80 s | 2.08 s |
 
   ("memoized" and "ReadOnlyArray" re-measured side by side on 2026-10-04,
   hyperfine, runs interleaved.) Constant tables as static `ReadOnlyArray`
@@ -113,7 +112,15 @@ goldens with `scripts/goldens.sh <stage>` (needs Rust; builds `oracle/`).
   threshold 225) into all ~7.4k callers depending on unrelated changes
   elsewhere in the program, which moves `__text` by ±1.8 MB between builds.
 
-  Remaining hot spots: allocation/RC (~35% of compile), line breaking and
+  "allocations" (2026-10-04, hyperfine side by side with "ReadOnlyArray"
+  and Rust): fewer allocations and refcounting in the compile path (see
+  the allocation note in AGENTS.md): `query long.typ heading` allocates
+  7.7M objects instead of 15.9M, and memory management (malloc, drop,
+  cycle scan) fell from 36% of the samples (1120 of 3110 for 120
+  chapters of `longer.typ`) to 28% (648 of 2291).
+
+  Remaining hot spots: allocation/RC (~28% of compile: frames, content and
+  values, style casts, rustybuzz lookups), line breaking and
   shaping (rustybuzz port), style-chain lookups (values are cast from
   `Value` on every read), grid layout; PDF: pdflite's flate (font streams);
   PNG: zlib-rs' `deflate_medium` (hash chains, scalar; ~55% of `long.typ`

@@ -5139,6 +5139,7 @@ pub fn Dict::get(Self, String) -> Value raise HintedError
 pub fn Dict::insert(Self, String, Value) -> Unit
 pub fn Dict::is_empty(Self) -> Bool
 pub fn Dict::iter(Self) -> Iter2[String, Value]
+pub fn Dict::keys_within(Self, ArrayView[String]) -> Bool
 pub fn Dict::len(Self) -> Int
 pub fn Dict::make_mut(Self) -> Self
 pub fn Dict::merge(Self, Self) -> Self
@@ -5914,7 +5915,7 @@ pub fn FontBook::len(Self) -> Int
 pub fn FontBook::new() -> Self
 pub fn FontBook::push(Self, FontInfo) -> Unit
 pub fn FontBook::select(Self, String, FontVariant) -> Int?
-pub fn FontBook::select_fallback(Self, FontInfo?, FontVariant, String) -> Int?
+pub fn FontBook::select_fallback(Self, FontInfo?, FontVariant, StringView) -> Int?
 pub fn FontBook::select_family(Self, String) -> Array[Int]
 pub impl Default for FontBook
 
@@ -5958,10 +5959,11 @@ pub impl Show for FontInfo
 pub struct FontInstance {
   // private fields
 }
-pub fn FontInstance::edges(Self, TopEdge, BottomEdge, Abs, TextEdgeBounds) -> (Abs, Abs)
+pub fn FontInstance::edges(Self, TopEdge, BottomEdge, Abs, TextEdgeBounds) -> TextEdges
 pub fn FontInstance::face(Self) -> &FontInstanceFace
 pub fn FontInstance::font(Self) -> Font
 pub fn FontInstance::glyph_bounding_box(Self, UInt16) -> GlyphRect?
+pub fn FontInstance::glyph_edges(Self, TopEdge, BottomEdge, Abs, UInt16) -> TextEdges
 pub fn FontInstance::math(Self) -> MathConstants
 pub fn FontInstance::metrics(Self) -> FontMetrics
 pub fn FontInstance::to_em(Self, Double) -> Em
@@ -6363,7 +6365,8 @@ pub(all) struct Glyph {
   y_offset : Em
   range_start : UInt16
   range_end : UInt16
-  span : (@moonbitlang/typst/syntax.Span, UInt16)
+  span : @moonbitlang/typst/syntax.Span
+  span_offset : UInt16
 } derive(Eq, Hash)
 pub fn Glyph::range(Self) -> (Int, Int)
 
@@ -10511,6 +10514,7 @@ pub fn StyleChain::links(Self) -> Array[Array[Style]]
 pub fn StyleChain::memo_hash(Self) -> U128
 pub fn StyleChain::new(Styles) -> Self
 pub fn StyleChain::pop(Self) -> Self
+pub fn StyleChain::recipe_count(Self) -> Int
 pub fn StyleChain::recipes(Self) -> Iter[Recipe]
 pub fn StyleChain::suffix(Self, Int) -> Styles
 pub fn StyleChain::to_map(Self) -> Styles
@@ -11033,6 +11037,11 @@ pub(all) enum TextEdgeBounds {
   Zero
   Glyph(UInt16)
   Frame(Frame)
+}
+
+pub struct TextEdges {
+  top : Abs
+  bottom : Abs
 }
 
 pub struct TextElem(Content)

@@ -327,18 +327,26 @@ fn ShapedGlyph::copy(self : ShapedGlyph) -> ShapedGlyph {
 }
 
 ///|
+/// Upstream stores the left/right pairs as `(Em, Em)` tuples; they are
+/// flattened into a value type here so that the per-glyph adjustability does
+/// not allocate (tuples are boxed). `.0`/`.1` become `_left`/`_right`.
+#valtype
 priv struct Adjustability {
   /// The left and right stretchability
-  stretchability : (@library.Em, @library.Em)
+  stretch_left : @library.Em
+  stretch_right : @library.Em
   /// The left and right shrinkability
-  shrinkability : (@library.Em, @library.Em)
-} derive(Eq)
+  shrink_left : @library.Em
+  shrink_right : @library.Em
+}
 
 ///|
 fn Adjustability::default() -> Adjustability {
   {
-    stretchability: (@library.Em::zero(), @library.Em::zero()),
-    shrinkability: (@library.Em::zero(), @library.Em::zero()),
+    stretch_left: @library.Em::zero(),
+    stretch_right: @library.Em::zero(),
+    shrink_left: @library.Em::zero(),
+    shrink_right: @library.Em::zero(),
   }
 }
 
@@ -378,7 +386,7 @@ fn ShapedGlyph::is_cjk_left_aligned_punctuation(
   is_cjk_left_aligned_punctuation(
     self.c,
     self.x_advance,
-    self.stretchability(),
+    self.adjustability.stretch_right,
     style,
   )
 }
@@ -389,7 +397,7 @@ fn ShapedGlyph::is_cjk_right_aligned_punctuation(self : ShapedGlyph) -> Bool {
   is_cjk_right_aligned_punctuation(
     self.c,
     self.x_advance,
-    self.stretchability(),
+    self.adjustability.stretch_left,
   )
 }
 
@@ -411,13 +419,49 @@ fn ShapedGlyph::is_letter_or_number(self : ShapedGlyph) -> Bool {
 }
 
 ///|
+/// The glyph-independent part of the justification limits of a shaping run,
+/// resolved once per run instead of once per glyph (performance; upstream
+/// resolves them in `base_adjustability`).
+priv struct ResolvedJustificationLimits {
+  /// `(spacing.max + tracking.max - 1)` in `Em`.
+  space_stretch : @library.Rel[@library.Em]
+  /// `(1 - spacing.min - tracking.min)` in `Em`.
+  space_shrink : @library.Rel[@library.Em]
+  /// `tracking.max` in `Em`.
+  track_stretch : @library.Em
+  /// `-tracking.min` in `Em`.
+  track_shrink : @library.Em
+}
+
+///|
+fn ResolvedJustificationLimits::new(
+  limits : @library.JustificationLimits,
+  font_size : @library.Abs,
+) -> ResolvedJustificationLimits {
+  // To a space, both the spacing and tracking limits apply, just like
+  // `text.tracking` and `text.spacing` both apply to spaces.
+  let spacing = limits.spacing_limits()
+  let tracking = limits.tracking_limits()
+  let max = spacing.max + @library.Rel::from_abs(tracking.max)
+  let min = spacing.min + @library.Rel::from_abs(tracking.min)
+  let to_em = (length : @library.Length) => {
+    @library.Em::from_length(length, font_size)
+  }
+  {
+    space_stretch: (max - @library.Rel::one()).map(to_em),
+    space_shrink: (@library.Rel::one() - min).map(to_em),
+    track_stretch: to_em(tracking.max),
+    track_shrink: to_em(-tracking.min),
+  }
+}
+
+///|
 /// The amount by which the glyph's advance width is allowed to be shrunk or
 /// stretched to improve justification.
 fn ShapedGlyph::base_adjustability(
   self : ShapedGlyph,
   style : CjkPunctStyle,
-  limits : @library.JustificationLimits,
-  font_size : @library.Abs,
+  limits : ResolvedJustificationLimits,
   stretchable : Bool,
 ) -> Adjustability {
   let width = self.x_advance
@@ -425,54 +469,33 @@ fn ShapedGlyph::base_adjustability(
   // Do not ever shrink away more than three quarters of the glyph. As the
   // width approaches zero, justification gets increasingly expensive and
   // if negative it may not terminate.
-  let limited = (v : @library.Em) => em_min(v, width.times(0.75))
   let zero = @library.Em::zero()
   if self.is_space() {
-    // To a space, both the spacing and tracking limits apply, just like
-    // `text.tracking` and `text.spacing` both apply to spaces.
-    let spacing = limits.spacing_limits()
-    let tracking = limits.tracking_limits()
-    let max = spacing.max + @library.Rel::from_abs(tracking.max)
-    let min = spacing.min + @library.Rel::from_abs(tracking.min)
     {
-      stretchability: (
-        zero,
-        em_max(
-          (max - @library.Rel::one())
-          .map(length => @library.Em::from_length(length, font_size))
-          .relative_to(width),
-          zero,
-        ),
-      ),
-      shrinkability: (
-        zero,
-        limited(
-          (@library.Rel::one() - min)
-          .map(length => @library.Em::from_length(length, font_size))
-          .relative_to(width),
-        ),
+      stretch_left: zero,
+      stretch_right: em_max(limits.space_stretch.relative_to(width), zero),
+      shrink_left: zero,
+      shrink_right: em_min(
+        limits.space_shrink.relative_to(width),
+        width.times(0.75),
       ),
     }
   } else if self.is_cjk_left_aligned_punctuation(style) {
-    { stretchability: (zero, zero), shrinkability: (zero, width.div_by(2.0)), }
+    { ..Adjustability::default(), shrink_right: width.div_by(2.0), }
   } else if self.is_cjk_right_aligned_punctuation() {
-    { stretchability: (zero, zero), shrinkability: (width.div_by(2.0), zero), }
+    { ..Adjustability::default(), shrink_left: width.div_by(2.0), }
   } else if self.is_cjk_center_aligned_punctuation(style) {
     {
-      stretchability: (zero, zero),
-      shrinkability: (width.div_by(4.0), width.div_by(4.0)),
+      ..Adjustability::default(),
+      shrink_left: width.div_by(4.0),
+      shrink_right: width.div_by(4.0),
     }
   } else if stretchable {
-    let tracking = limits.tracking_limits()
     {
-      stretchability: (
-        zero,
-        em_max(@library.Em::from_length(tracking.max, font_size), zero),
-      ),
-      shrinkability: (
-        zero,
-        limited(@library.Em::from_length(-tracking.min, font_size)),
-      ),
+      stretch_left: zero,
+      stretch_right: em_max(limits.track_stretch, zero),
+      shrink_left: zero,
+      shrink_right: em_min(limits.track_shrink, width.times(0.75)),
     }
   } else {
     Adjustability::default()
@@ -480,34 +503,24 @@ fn ShapedGlyph::base_adjustability(
 }
 
 ///|
-/// The stretchability of the character.
-fn ShapedGlyph::stretchability(
-  self : ShapedGlyph,
-) -> (@library.Em, @library.Em) {
-  self.adjustability.stretchability
-}
-
-///|
-/// The shrinkability of the character.
-fn ShapedGlyph::shrinkability(self : ShapedGlyph) -> (@library.Em, @library.Em) {
-  self.adjustability.shrinkability
-}
-
-///|
 /// Shrink the width of glyph on the left side.
 fn ShapedGlyph::shrink_left(self : ShapedGlyph, amount : @library.Em) -> Unit {
   self.x_offset = self.x_offset - amount
   self.x_advance = self.x_advance - amount
-  let (l, r) = self.adjustability.shrinkability
-  self.adjustability = { ..self.adjustability, shrinkability: (l - amount, r), }
+  self.adjustability = {
+    ..self.adjustability,
+    shrink_left: self.adjustability.shrink_left - amount,
+  }
 }
 
 ///|
 /// Shrink the width of glyph on the right side.
 fn ShapedGlyph::shrink_right(self : ShapedGlyph, amount : @library.Em) -> Unit {
   self.x_advance = self.x_advance - amount
-  let (l, r) = self.adjustability.shrinkability
-  self.adjustability = { ..self.adjustability, shrinkability: (l, r - amount), }
+  self.adjustability = {
+    ..self.adjustability,
+    shrink_right: self.adjustability.shrink_right - amount,
+  }
 }
 
 ///|
@@ -580,21 +593,25 @@ fn ShapedText::build(
     }
     let pos = @library.Point::new(offset, top + shift - y_offset.at(size))
     let glyphs : Array[@library.Glyph] = []
+    let mut frame_width = frame.size().x
     for shaped in group {
       // Whether the glyph is _not_ trimmed end-of-line whitespace.
       // Trimmed whitespace has its advance width and offset zeroed out and
       // is not taken into account for justification.
       let kept = i >= self.glyphs.kept_start && i < self.glyphs.kept_end
-      let (x_advance, x_offset) = if kept {
+      // (Two variables instead of a boxed tuple.)
+      let mut x_advance = @library.Em::zero()
+      let mut x_offset = @library.Em::zero()
+      if kept {
         let adjustability_left = if justification_ratio < 0.0 {
-          shaped.shrinkability().0
+          shaped.adjustability.shrink_left
         } else {
-          shaped.stretchability().0
+          shaped.adjustability.stretch_left
         }
         let adjustability_right = if justification_ratio < 0.0 {
-          shaped.shrinkability().1
+          shaped.adjustability.shrink_right
         } else {
-          shaped.stretchability().1
+          shaped.adjustability.stretch_right
         }
         let justification_left = adjustability_left.times(justification_ratio)
         let mut justification_right = adjustability_right.times(
@@ -604,27 +621,22 @@ fn ShapedText::build(
           justification_right = justification_right +
             @library.Em::from_abs(extra_justification, glyph_size)
         }
-        let fsize = frame.size()
-        frame.set_size({
-          ..fsize,
-          x: fsize.x +
+        // `frame.size_mut().x += ..`, applied to the frame after the
+        // group's glyphs (no allocation per glyph; nothing reads the size in
+        // between).
+        frame_width = frame_width +
           (
             justification_left.at(glyph_size) +
             justification_right.at(glyph_size)
-          ),
-        })
-        (
-          shaped.x_advance + justification_left + justification_right,
-          shaped.x_offset + justification_left,
-        )
-      } else {
-        (@library.Em::zero(), @library.Em::zero())
+          )
+        x_advance = shaped.x_advance + justification_left + justification_right
+        x_offset = shaped.x_offset + justification_left
       }
       i += 1
 
       // We may not be able to reach the offset completely if it exceeds
       // u16, but better to have a roughly correct span offset than nothing.
-      let (span, sub) = spans.span_at(shaped.range_start)
+      let { span, offset: sub, } = spans.span_at(shaped.range_start)
       let sub = saturating_u16(
         sub.to_uint64() + span_offset.reinterpret_as_uint64(),
       )
@@ -638,9 +650,11 @@ fn ShapedText::build(
           (shaped.range_start - range_start).to_uint64(),
         ),
         range_end: saturating_u16((shaped.range_end - range_start).to_uint64()),
-        span: (span, sub),
+        span,
+        span_offset: sub,
       })
     }
+    frame.set_size({ ..frame.size(), x: frame_width, })
     let item : @library.TextItem = {
       font,
       size: glyph_size,
@@ -709,11 +723,8 @@ fn ShapedText::measure(
   let bottom_edge = @library.TextElem::bottom_edge_in(self.styles)
 
   // Expand top and bottom by reading the font's vertical metrics.
-  let expand = (font : @library.FontInstance, bounds : @library.TextEdgeBounds) => {
-    let (t, b) = font.edges(top_edge, bottom_edge, size, bounds)
-    top = top.max(t)
-    bottom = bottom.max(b)
-  }
+  // (Upstream uses an `expand` closure; it is inlined here because the
+  // closure and its captured mutable variables were allocated per call.)
   if self.glyphs.is_fully_empty() {
     // When there are no glyphs, we just use the vertical metrics of the
     // first available font.
@@ -722,13 +733,23 @@ fn ShapedText::measure(
     for family in @library.families(self.styles) {
       if world.book().select(family.as_str(), self.variant) is Some(id) &&
         world.font(id) is Some(font) {
-        expand(font.instantiate(self.variant, size, variations), Zero)
+        let font = font.instantiate(self.variant, size, variations)
+        let e = font.edges(top_edge, bottom_edge, size, Zero)
+        top = top.max(e.top)
+        bottom = bottom.max(e.bottom)
         break
       }
     }
   } else {
     for g in self.glyphs.kept() {
-      expand(g.font, Glyph(g.glyph_id.to_uint16()))
+      let e = g.font.glyph_edges(
+        top_edge,
+        bottom_edge,
+        size,
+        g.glyph_id.to_uint16(),
+      )
+      top = top.max(e.top)
+      bottom = bottom.max(e.bottom)
     }
   }
   (top, bottom)
@@ -763,8 +784,8 @@ fn ShapedText::cjk_justifiable_at_last(self : ShapedText) -> Bool {
 fn ShapedText::stretchability(self : ShapedText) -> @library.Abs {
   let mut sum = abs_sum_start()
   for g in self.glyphs.kept() {
-    let (l, r) = g.stretchability()
-    sum = sum + (l + r).at(g.size)
+    let a = g.adjustability
+    sum = sum + (a.stretch_left + a.stretch_right).at(g.size)
   }
   sum
 }
@@ -774,8 +795,8 @@ fn ShapedText::stretchability(self : ShapedText) -> @library.Abs {
 fn ShapedText::shrinkability(self : ShapedText) -> @library.Abs {
   let mut sum = abs_sum_start()
   for g in self.glyphs.kept() {
-    let (l, r) = g.shrinkability()
-    sum = sum + (l + r).at(g.size)
+    let a = g.adjustability
+    sum = sum + (a.shrink_left + a.shrink_right).at(g.size)
   }
   sum
 }
@@ -835,31 +856,33 @@ fn ShapedText::hyphen(
 ) -> ShapedText? {
   let world = engine.world
   let book = world.book()
-  let chain : Array[Int] = []
-  for family in @library.families(base.styles) {
-    let covered = match family.covers() {
-      None => true
-      Some(c) => c.is_match("-")
-    }
-    if covered && book.select(family.as_str(), base.variant) is Some(id) {
-      chain.push(id)
-    }
-  }
-  // The fallback is only consulted lazily, like upstream (`chain` +
-  // `find_map`): selecting it is expensive.
+  // The `chain` of font ids is walked lazily like upstream's (`filter`,
+  // `map`, `chain`, `flatten` + `find_map`): families are only selected
+  // until one provides the hyphen, the fallback only after all of them.
+  let families = @library.families(base.styles)
+  let mut next_family = 0
   let mut fallback_tried = false
-  for i = 0; ; i = i + 1 {
-    if i == chain.length() {
-      if fallback &&
-        !fallback_tried &&
-        book.select_fallback(None, base.variant, "-") is Some(id) {
-        fallback_tried = true
-        chain.push(id)
-      } else {
+  while true {
+    let id = if next_family < families.length() {
+      let family = families[next_family]
+      next_family += 1
+      let covered = match family.covers() {
+        None => true
+        Some(c) => c.is_match("-")
+      }
+      guard covered && book.select(family.as_str(), base.variant) is Some(id) else {
+        continue
+      }
+      id
+    } else if fallback && !fallback_tried {
+      fallback_tried = true
+      guard book.select_fallback(None, base.variant, "-") is Some(id) else {
         break
       }
+      id
+    } else {
+      break
     }
-    let id = chain[i]
     let size = @library.TextElem::size_in(base.styles).resolve(base.styles)
     let variations = @library.TextElem::variations_in(base.styles)
     guard world.font(id) is Some(font) else { continue }
@@ -1218,9 +1241,9 @@ impl SharedShapingContext for ShapingContext with fn variations(self) {
 /// `shape_tofus` if no font is found.
 pub fn[C : SharedShapingContext] get_font_and_covers(
   ctx : C,
-  text : String,
+  text : StringView,
   families : FamilyIter,
-  shape_tofus : (C, String, @library.FontInstance) -> Unit,
+  shape_tofus : (C, StringView, @library.FontInstance) -> Unit,
 ) -> (@library.FontInstance, @library.Regex?)? {
   // Find the next available family.
   let world = ctx.world()
@@ -1293,6 +1316,32 @@ pub fn[C : SharedShapingContext] get_font_and_covers(
 }
 
 ///|
+/// A shaping buffer kept for reuse (not upstream, which creates a buffer per
+/// shaped run: the buffer and its glyph slots were a large share of all
+/// allocations). It is taken while in use, so nested shaping (font
+/// fallback) creates its own.
+let spare_shaping_buffer : Ref[@shape.UnicodeBuffer?] = { val: None, }
+
+///|
+/// A fresh shaping buffer (`UnicodeBuffer::new()`), reusing the spare one.
+fn take_shaping_buffer() -> @shape.UnicodeBuffer {
+  match spare_shaping_buffer.val {
+    Some(buffer) => {
+      spare_shaping_buffer.val = None
+      buffer
+    }
+    None => @shape.UnicodeBuffer::new()
+  }
+}
+
+///|
+/// Keep a shaped buffer for reuse. Its glyph infos and positions must not be
+/// used anymore.
+fn recycle_shaping_buffer(buffer : @shape.GlyphBuffer) -> Unit {
+  spare_shaping_buffer.val = Some(buffer.recycle())
+}
+
+///|
 /// Shape text with font fallback using the `families` iterator.
 fn shape_segment(
   ctx : ShapingContext,
@@ -1302,8 +1351,11 @@ fn shape_segment(
 ) -> Unit {
   // Don't try shaping newlines, tabs, or default ignorables.
   let mut all_ignorable = true
-  for pair in text.char_indices() {
-    let c = pair.1
+  for i in 0..<text.len() {
+    let c = text.char_at(i)
+    if c < 0 {
+      continue
+    }
     if !(c == '\n' || c == '\t' || @unicode.is_default_ignorable(char_of(c))) {
       all_ignorable = false
       break
@@ -1312,7 +1364,7 @@ fn shape_segment(
   if all_ignorable {
     return
   }
-  let text_str = text.to_string()
+  let text_str = text.view()
   guard get_font_and_covers(ctx, text_str, families, (ctx, _, font) => {
       shape_tofus(ctx, base, text, font)
     })
@@ -1321,7 +1373,7 @@ fn shape_segment(
   }
 
   // Fill the buffer with our text.
-  let buffer = @shape.UnicodeBuffer::new()
+  let buffer = take_shaping_buffer()
   buffer.push_str(text_str)
   buffer.set_language(language(ctx.styles))
   if @library.TextElem::script_in(ctx.styles) is Custom(script) &&
@@ -1442,7 +1494,8 @@ fn shape_segment(
           c,
           script,
           x_advance,
-          Adjustability::default().stretchability,
+          @library.Em::zero(),
+          @library.Em::zero(),
         ),
         script,
       })
@@ -1498,6 +1551,7 @@ fn shape_segment(
     }
     i += 1
   }
+  recycle_shaping_buffer(buffer)
   ctx.used.pop() |> ignore
 }
 
@@ -1557,8 +1611,12 @@ fn typographic_shift_supported(
     return false
   }
   let lookups = feature.lookup_indices
-  for pair in text.char_indices() {
-    let c = char_of(pair.1)
+  for i in 0..<text.len() {
+    let cp = text.char_at(i)
+    if cp < 0 {
+      continue
+    }
+    let c = char_of(cp)
     guard rusty(font).ttf().glyph_index(c) is Some(gid) else { return false }
     let mut any = false
     for li in 0..<lookups.len().to_int() {
@@ -1612,19 +1670,26 @@ fn shape_tofus(
         c,
         script,
         x_advance,
-        Adjustability::default().stretchability,
+        @library.Em::zero(),
+        @library.Em::zero(),
       ),
       script,
     })
   }
-  let chars = text.char_indices()
+  // `text.char_indices()` (reversed for RTL) without collecting them.
   if ctx.dir.is_positive() {
-    for pair in chars {
-      add_glyph(pair.0, pair.1)
+    for i in 0..<text.len() {
+      let c = text.char_at(i)
+      if c >= 0 {
+        add_glyph(i, c)
+      }
     }
   } else {
-    for i = chars.length() - 1; i >= 0; i = i - 1 {
-      add_glyph(chars[i].0, chars[i].1)
+    for i = text.len() - 1; i >= 0; i = i - 1 {
+      let c = text.char_at(i)
+      if c >= 0 {
+        add_glyph(i, c)
+      }
     }
   }
 }
@@ -1664,17 +1729,17 @@ fn calculate_adjustability(
   region : @library.Region?,
 ) -> Unit {
   let style = cjk_punct_style(lang, region)
-  let limits = @library.ParElem::justification_limits_in(ctx.styles)
-  let font_size = ctx.size
+  let limits = ResolvedJustificationLimits::new(
+    @library.ParElem::justification_limits_in(ctx.styles),
+    ctx.size,
+  )
   let glyphs = ctx.glyphs
   for i, glyph in glyphs {
     // Do not apply adjustability to a glyph if there is another one in the
     // same cluster.
     let stretchable = i + 1 >= glyphs.length() ||
       glyph.range_start != glyphs[i + 1].range_start
-    glyph.adjustability = glyph.base_adjustability(
-      style, limits, font_size, stretchable,
-    )
+    glyph.adjustability = glyph.base_adjustability(style, limits, stretchable)
   }
   for i, glyph in glyphs {
     // CNS style needs not further adjustment.
@@ -1691,8 +1756,8 @@ fn calculate_adjustability(
     let delta = width.div_by(2.0)
     if glyph.is_cjk_punctuation() &&
       next.is_cjk_punctuation() &&
-      glyph.shrinkability().1 + next.shrinkability().0 >= delta {
-      let left_delta = em_min(glyph.shrinkability().1, delta)
+      glyph.adjustability.shrink_right + next.adjustability.shrink_left >= delta {
+      let left_delta = em_min(glyph.adjustability.shrink_right, delta)
       glyph.shrink_right(left_delta)
       next.shrink_left(delta - left_delta)
     }
@@ -1770,15 +1835,18 @@ fn is_cj_script(c : Char, script : String) -> Bool {
 
 ///|
 /// See <https://www.w3.org/TR/clreq/#punctuation_width_adjustment>
+///
+/// `stretch_right` is `stretchability.1` (the pair is flattened to avoid
+/// allocating a tuple per glyph).
 fn is_cjk_left_aligned_punctuation(
   c : Char,
   x_advance : @library.Em,
-  stretchability : (@library.Em, @library.Em),
+  stretch_right : @library.Em,
   style : CjkPunctStyle,
 ) -> Bool {
   // CJK quotation marks shares codepoints with latin quotation marks.
   // But only the CJK ones have full width.
-  if c is ('”' | '’') && x_advance + stretchability.1 == @library.Em::one() {
+  if c is ('”' | '’') && x_advance + stretch_right == @library.Em::one() {
     return true
   }
   if style is (Gb | Jis) && c is ('，' | '。' | '．' | '、' | '：' | '；') {
@@ -1811,14 +1879,16 @@ fn is_cjk_left_aligned_punctuation(
 
 ///|
 /// See <https://www.w3.org/TR/clreq/#punctuation_width_adjustment>
+///
+/// `stretch_left` is `stretchability.0`.
 fn is_cjk_right_aligned_punctuation(
   c : Char,
   x_advance : @library.Em,
-  stretchability : (@library.Em, @library.Em),
+  stretch_left : @library.Em,
 ) -> Bool {
   // CJK quotation marks shares codepoints with latin quotation marks.
   // But only the CJK ones have full width.
-  if c is ('“' | '‘') && x_advance + stretchability.0 == @library.Em::one() {
+  if c is ('“' | '‘') && x_advance + stretch_left == @library.Em::one() {
     return true
   }
   // See CLReq appendix A.3 https://www.w3.org/TR/clreq/#table_of_bracket_indication_punctuation_marks
@@ -1859,17 +1929,20 @@ fn is_cjk_center_aligned_punctuation(c : Char, style : CjkPunctStyle) -> Bool {
 /// fullwidth. This heuristics can therefore fail for monospace latin fonts.
 /// However, since monospace fonts are usually not justified this edge case
 /// should be rare enough.
+///
+/// The `stretchability` pair is passed flattened.
 fn is_justifiable(
   c : Char,
   script : String,
   x_advance : @library.Em,
-  stretchability : (@library.Em, @library.Em),
+  stretch_left : @library.Em,
+  stretch_right : @library.Em,
 ) -> Bool {
   // punctuation style is not relevant here.
   let style = Gb
   is_space(c) ||
   is_cj_script(c, script) ||
-  is_cjk_left_aligned_punctuation(c, x_advance, stretchability, style) ||
-  is_cjk_right_aligned_punctuation(c, x_advance, stretchability) ||
+  is_cjk_left_aligned_punctuation(c, x_advance, stretch_right, style) ||
+  is_cjk_right_aligned_punctuation(c, x_advance, stretch_left) ||
   is_cjk_center_aligned_punctuation(c, style)
 }

@@ -184,10 +184,20 @@ pub fn Frame::items(self : Frame) -> ArrayView[(Point, FrameItem)] {
 /// `Arc::make_mut`).
 fn Frame::make_mut(self : Frame) -> Array[(Point, FrameItem)] {
   if self.shared {
-    self.items = self.items.map(entry => (entry.0, entry.1.clone()))
+    self.items = self.items.map(clone_entry)
     self.shared = false
   }
   self.items
+}
+
+///|
+/// `(entry.0, entry.1.clone())`, sharing the (immutable) entry itself unless
+/// it holds a group, whose frame must not be aliased.
+fn clone_entry(entry : (Point, FrameItem)) -> (Point, FrameItem) {
+  match entry.1 {
+    Group(group) => (entry.0, Group(group.clone()))
+    _ => entry
+  }
 }
 
 // Insert items and subframes.
@@ -313,8 +323,22 @@ fn Frame::inline(self : Frame, layer : Int, pos : Point, frame : Frame) -> Unit 
   // zeros). Group items are cloned so that the moved frame's items are not
   // aliased.
   let sink = self.make_mut()
+  if layer == sink.length() && !physical_equal(sink, frame.items) {
+    // Inserting at the top layer (`push_frame`): append in place instead of
+    // rebuilding the whole item list (performance).
+    if pos.is_zero() {
+      for entry in frame.items {
+        sink.push(clone_entry(entry))
+      }
+    } else {
+      for entry in frame.items {
+        sink.push((entry.0 + pos, entry.1.clone()))
+      }
+    }
+    return
+  }
   let moved = if pos.is_zero() {
-    frame.items.map(entry => (entry.0, entry.1.clone()))
+    frame.items.map(clone_entry)
   } else {
     frame.items.map(entry => (entry.0 + pos, entry.1.clone()))
   }

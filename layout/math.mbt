@@ -37,7 +37,7 @@ pub fn layout_equation_inline(
   for item in items {
     guard item is Frame(frame) else { continue }
     let slack = @library.ParElem::leading_in(styles).resolve(styles).times(0.7)
-    let (t, b) = font.edges(
+    let { top: t, bottom: b, } = font.edges(
       @library.TextElem::top_edge_in(styles),
       @library.TextElem::bottom_edge_in(styles),
       @library.TextElem::size_in(styles).resolve(styles),

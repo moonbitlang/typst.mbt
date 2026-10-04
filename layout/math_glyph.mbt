@@ -192,7 +192,7 @@ fn GlyphFragment::with_span(
 ) -> GlyphFragment {
   self.item = {
     ..self.item,
-    glyphs: self.item.glyphs.map(glyph => { ..glyph, span: (span, 0), }),
+    glyphs: self.item.glyphs.map(glyph => { ..glyph, span, span_offset: 0, }),
   }
   self
 }
@@ -313,6 +313,7 @@ fn GlyphFragment::stretch(
           range_start: first.range_start,
           range_end: first.range_end,
           span: first.span,
+          span_offset: first.span_offset,
         },
       ],
     }
@@ -648,7 +649,7 @@ fn assemble(
           // font.
           engine.sink.warn(
             @library.SourceDiagnostic::warning_at(
-              base.item.glyphs[0].span.0,
+              base.item.glyphs[0].span,
               "glyph has assembly parts with overlap less than minConnectorOverlap",
             ).with_hints([
               "its rendering may appear broken - this is probably a font bug", "please file an issue at https://github.com/typst/typst/issues",
@@ -725,6 +726,7 @@ fn assemble(
       range_start: first.range_start,
       range_end: first.range_end,
       span: first.span,
+      span_offset: first.span_offset,
     })
   }
   match axis {

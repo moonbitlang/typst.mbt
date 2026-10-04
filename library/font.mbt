@@ -322,37 +322,77 @@ pub fn FontInstance::ttf(self : FontInstance) -> @otf.Face? {
 
 ///|
 /// Resolve the top and bottom edges of text.
+///
+/// Upstream returns `(Abs, Abs)`; [TextEdges] is a value type so that
+/// measuring text does not allocate per glyph.
 pub fn FontInstance::edges(
   self : FontInstance,
   top_edge : TopEdge,
   bottom_edge : BottomEdge,
   font_size : Abs,
   bounds : TextEdgeBounds,
-) -> (Abs, Abs) {
-  let cell : Ref[GlyphRect??] = Ref(None)
-  let bbox = (gid : UInt16, f : (GlyphRect) -> Int) => {
-    let rect = match cell.val {
-      Some(rect) => rect
-      None => {
-        let rect = self.glyph_bounding_box(gid)
-        cell.val = Some(rect)
-        rect
-      }
-    }
-    match rect {
-      Some(bbox) => self.to_em(f(bbox).to_double()).at(font_size)
-      None => Abs::zero()
-    }
+) -> TextEdges {
+  match bounds {
+    Zero => self.edges_impl(top_edge, bottom_edge, font_size, None, -1)
+    Frame(frame) =>
+      self.edges_impl(top_edge, bottom_edge, font_size, Some(frame), -1)
+    Glyph(gid) =>
+      self.edges_impl(top_edge, bottom_edge, font_size, None, gid.to_int())
   }
+}
+
+///|
+/// [FontInstance::edges] with `TextEdgeBounds::Glyph(gid)`, without
+/// allocating the bounds.
+pub fn FontInstance::glyph_edges(
+  self : FontInstance,
+  top_edge : TopEdge,
+  bottom_edge : BottomEdge,
+  font_size : Abs,
+  gid : UInt16,
+) -> TextEdges {
+  self.edges_impl(top_edge, bottom_edge, font_size, None, gid.to_int())
+}
+
+///|
+/// The top and bottom edges of text (see [FontInstance::edges]).
+#valtype
+pub struct TextEdges {
+  top : Abs
+  bottom : Abs
+}
+
+///|
+/// [FontInstance::edges] for the bounds `Glyph(gid)` if `gid >= 0`, else
+/// `Frame(frame)` if `frame` is set, else `Zero`. The glyph's bounding box is
+/// loaded at most once (upstream: a `OnceCell` read by a closure).
+fn FontInstance::edges_impl(
+  self : FontInstance,
+  top_edge : TopEdge,
+  bottom_edge : BottomEdge,
+  font_size : Abs,
+  frame : Frame?,
+  gid : Int,
+) -> TextEdges {
+  let mut rect : GlyphRect? = None
+  let mut loaded = false
   let top = match top_edge {
     Metric(metric) =>
       match metric.to_vertical() {
         Some(metric) => self.metrics().vertical(metric).at(font_size)
         None =>
-          match bounds {
-            Zero => Abs::zero()
-            Frame(frame) => frame.ascent()
-            Glyph(gid) => bbox(gid, b => b.y_max)
+          if gid >= 0 {
+            rect = self.glyph_bounding_box(gid.to_uint16())
+            loaded = true
+            match rect {
+              Some(bbox) => self.to_em(bbox.y_max.to_double()).at(font_size)
+              None => Abs::zero()
+            }
+          } else {
+            match frame {
+              Some(frame) => frame.ascent()
+              None => Abs::zero()
+            }
           }
       }
     Length(length) => length.at(font_size)
@@ -362,15 +402,24 @@ pub fn FontInstance::edges(
       match metric.to_vertical() {
         Some(metric) => -self.metrics().vertical(metric).at(font_size)
         None =>
-          match bounds {
-            Zero => Abs::zero()
-            Frame(frame) => frame.descent()
-            Glyph(gid) => -bbox(gid, b => b.y_min)
+          if gid >= 0 {
+            if !loaded {
+              rect = self.glyph_bounding_box(gid.to_uint16())
+            }
+            -(match rect {
+              Some(bbox) => self.to_em(bbox.y_min.to_double()).at(font_size)
+              None => Abs::zero()
+            })
+          } else {
+            match frame {
+              Some(frame) => frame.descent()
+              None => Abs::zero()
+            }
           }
       }
     Length(length) => -length.at(font_size)
   }
-  (top, bottom)
+  { top, bottom, }
 }
 
 ///|

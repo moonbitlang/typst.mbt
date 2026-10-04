@@ -759,7 +759,7 @@ pub fn get_base_direction_full(text : String) -> Direction {
 fn get_base_direction_impl(text : String, use_full_text : Bool) -> Direction {
   let mut isolate_level = 0
   for i = 0; i < text.length(); {
-    let (c, next) = @unicode.decode_at(text, i)
+    let { cp: c, idx: next, } = @unicode.decode_at(text, i)
     match bidi_class_of(c) {
       LRI | RLI | FSI => isolate_level += 1
       PDI if isolate_level > 0 => isolate_level -= 1

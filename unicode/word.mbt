@@ -121,9 +121,9 @@ fn next_word_bound(s : StringView, cached : WordCat?) -> (Int, WordCat?) {
 
   // The category of the char after the one at `idx`.
   fn get_next_cat(s : StringView, idx : Int) -> WordCat? {
-    let (_, nidx) = decode_at(s, idx)
+    let { idx: nidx, .. } = decode_at(s, idx)
     if nidx < s.length() {
-      let (nch, _) = decode_at(s, nidx)
+      let { cp: nch, .. } = decode_at(s, nidx)
       Some(word_category(nch))
     } else {
       None
@@ -134,7 +134,7 @@ fn next_word_bound(s : StringView, cached : WordCat?) -> (Int, WordCat?) {
   let mut skipped_format_extend = false
   let mut curr = 0
   while curr < len {
-    let (ch, next) = decode_at(s, curr)
+    let { cp: ch, idx: next, } = decode_at(s, curr)
     idx = curr
     curr = next
     // Whether or not the previous category was ZWJ
@@ -333,7 +333,7 @@ fn next_word_bound(s : StringView, cached : WordCat?) -> (Int, WordCat?) {
     }
   }
   let next_cat = if take_curr {
-    let (_, next) = decode_at(s, idx)
+    let { idx: next, .. } = decode_at(s, idx)
     idx = next
     None
   } else if take_cat {
@@ -368,7 +368,7 @@ pub fn split_word_bounds(s : StringView) -> Array[StringView] {
 pub fn unicode_words(s : StringView) -> Array[StringView] {
   split_word_bounds(s).filter(w => {
     for i = 0; i < w.length(); {
-      let (c, next) = decode_at(w, i)
+      let { cp: c, idx: next, } = decode_at(w, i)
       if seg_is_alphanumeric(c) {
         return true
       }
