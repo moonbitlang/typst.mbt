@@ -63,7 +63,27 @@ pub fn ModifierSet::iter(self : ModifierSet) -> Array[String] {
 ///|
 /// Whether the set contains the modifier `m`.
 pub fn ModifierSet::contains(self : ModifierSet, m : String) -> Bool {
-  self.iter().iter().any(lhs => lhs == m)
+  modifiers_contain(self.0, m)
+}
+
+///|
+/// Whether the dotted modifier list `set` contains `m`: `ModifierSet(set)
+/// .iter().iter().any(lhs => lhs == m)` without splitting the list into new
+/// strings (upstream iterates `&str` slices; symbols are resolved often).
+fn modifiers_contain(set : String, m : StringView) -> Bool {
+  if set.is_empty() {
+    return false
+  }
+  let mut start = 0
+  for i in 0..<=set.length() {
+    if i == set.length() || set.code_unit_at(i) == '.' {
+      if set.view(start_offset=start, end_offset=i) == m {
+        return true
+      }
+      start = i + 1
+    }
+  }
+  false
 }
 
 ///|
@@ -90,11 +110,22 @@ pub fn[T] ModifierSet::best_match_in(
     }
     let mut matching = 0
     let mut total = 0
-    for modifier in candidate.0.iter() {
-      if self.contains(modifier) {
-        matching += 1
+    // `for modifier in candidate.0.iter()`, over views of the dotted list.
+    let set = candidate.0.0
+    if !set.is_empty() {
+      let mut start = 0
+      for i in 0..<=set.length() {
+        if i == set.length() || set.code_unit_at(i) == '.' {
+          if modifiers_contain(
+              self.0,
+              set.view(start_offset=start, end_offset=i),
+            ) {
+            matching += 1
+          }
+          total += 1
+          start = i + 1
+        }
       }
-      total += 1
     }
     let score = (matching, total)
     let better = match best_score {
@@ -113,7 +144,21 @@ pub fn[T] ModifierSet::best_match_in(
 ///|
 /// Whether all modifiers in `self` are also present in `other`.
 pub fn ModifierSet::is_subset(self : ModifierSet, other : ModifierSet) -> Bool {
-  self.iter().iter().all(m => other.contains(m))
+  // `self.iter().iter().all(m => other.contains(m))` over views.
+  let set = self.0
+  if set.is_empty() {
+    return true
+  }
+  let mut start = 0
+  for i in 0..<=set.length() {
+    if i == set.length() || set.code_unit_at(i) == '.' {
+      if !modifiers_contain(other.0, set.view(start_offset=start, end_offset=i)) {
+        return false
+      }
+      start = i + 1
+    }
+  }
+  true
 }
 
 ///|
