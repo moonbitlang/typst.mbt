@@ -196,16 +196,6 @@ priv struct Match {
 }
 
 ///|
-fn Match::copy(self : Match) -> Match {
-  {
-    match_start: self.match_start,
-    match_length: self.match_length,
-    strstart: self.strstart,
-    orgstart: self.orgstart,
-  }
-}
-
-///|
 fn Match::assign(self : Match, other : Match) -> Unit {
   self.match_start = other.match_start
   self.match_length = other.match_length
@@ -228,6 +218,20 @@ fn DeflateStream::deflate_medium(
     orgstart: 0,
   }
   let next_match : Match = {
+    match_start: 0,
+    match_length: 0,
+    strstart: 0,
+    orgstart: 0,
+  }
+  // Scratch copies (upstream passes the `Copy` matches by value; reusing
+  // these avoids an allocation per match).
+  let scratch : Match = {
+    match_start: 0,
+    match_length: 0,
+    strstart: 0,
+    orgstart: 0,
+  }
+  let scratch2 : Match = {
     match_start: 0,
     match_length: 0,
     strstart: 0,
@@ -286,7 +290,8 @@ fn DeflateStream::deflate_medium(
         current_match.match_length = 1
       }
     }
-    self.insert_match(current_match.copy())
+    scratch.assign(current_match)
+    self.insert_match(scratch)
 
     // now, look ahead one
     if !early_exit &&
@@ -318,6 +323,8 @@ fn DeflateStream::deflate_medium(
             self.max_dist(),
             current_match,
             next_match,
+            scratch,
+            scratch2,
           )
         }
       } else {
@@ -433,6 +440,8 @@ fn fizzle_matches(
   max_dist : Int,
   current : Match,
   next : Match,
+  c : Match,
+  n : Match,
 ) -> Unit {
   // step zero: sanity checks
   if current.match_length <= 1 {
@@ -454,8 +463,9 @@ fn fizzle_matches(
 
   // step one: try to move the "next" match to the left as much as possible
   let limit = @cmp.maximum(next.strstart - (max_dist & 0xffff), 0)
-  let c = current.copy()
-  let n = next.copy()
+  // `c` and `n` are scratch copies of `current` and `next`.
+  c.assign(current)
+  n.assign(next)
   // reverse iterators over window[..n.match_start] and window[..n.strstart]
   let mut mi = n.match_start
   let mut oi = n.strstart

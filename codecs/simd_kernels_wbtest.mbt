@@ -468,3 +468,26 @@ test "bench adaptive_filter 64 rows of 4764 bytes" (it : @bench.T) {
     it.keep(acc)
   })
 }
+
+///|
+/// A 1191x400 RGBA page-like image: white with short text-like runs.
+fn bench_page() -> Bytes {
+  let w = 1191 * 4
+  let h = 400
+  let noise = kernel_test_bytes(w * h, 17)
+  Bytes::makei(w * h, i => {
+    let x = i % w
+    let y = i / w
+    if y % 24 < 14 && x % 700 < 500 && noise[i].to_int() < 90 {
+      noise[i / 4 * 4]
+    } else {
+      b'\xff'
+    }
+  })
+}
+
+///|
+test "bench encode_png_balanced 1191x400 page" (it : @bench.T) {
+  let page = bench_page()
+  it.bench(() => it.keep(encode_png_balanced(page[:], 1191, 400, Rgba)))
+}
