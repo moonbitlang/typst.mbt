@@ -5,7 +5,10 @@
 // `vertical_v128.mbt`). Rows with out-of-range taps run the emulation (which
 // panics like upstream); RGB pixels are loaded with up to 2 bytes of
 // over-read, so RGB pixels whose taps end within 2 bytes of the buffer's
-// end are computed one channel at a time.
+// end are computed one channel at a time. Rows whose weights are not `i16`
+// values (the rdm lanes hold `i16` weights, the emulation full `Int`s;
+// `numerical_approximation_i16` clamps them) or whose `dst` aliases `src`
+// also run the emulation.
 
 ///|
 /// Whether every pixel's taps of a row (`channels` bytes per pixel) are
@@ -19,7 +22,9 @@ fn horizontal_ranges_ok(
   channels : Int,
 ) -> Bool {
   let n = fw.bounds_start.length()
-  if src_offset < 0 ||
+  if physical_equal(src, dst) ||
+    !fw.weights_fit_i16 ||
+    src_offset < 0 ||
     !in_range(dst_offset, n.to_int64() * channels.to_int64(), dst.length()) ||
     fw.bounds_size.length() < n ||
     fw.aligned_size < 0 ||

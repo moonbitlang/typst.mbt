@@ -74,3 +74,44 @@ test "bench demultiply 1191x1684 page (per-pixel reference)" (it : @bench.T) {
     it.keep(out)
   })
 }
+
+///|
+/// The scalar `demultiply_into` (`pixmap_scalar.mbt`), as a reference on
+/// every target.
+fn ref_demultiply_into(data : FixedArray[UInt], out : FixedArray[Byte]) -> Unit {
+  for i in 0..<data.length() {
+    demultiply_pixel(data[i], out, i * 4)
+  }
+}
+
+///|
+test "demultiply_into matches the scalar code at every length" {
+  for n in 0..<=64 {
+    let data = kernel_test_pixels(n, n * 3 + 1)
+    // Exact allocation end and sentinels after it.
+    for extra in [0, 1, 4, 7] {
+      let o1 = FixedArray::make(4 * n + extra, b'\x5a')
+      let o2 = FixedArray::make(4 * n + extra, b'\x5a')
+      demultiply_into(data, o1)
+      ref_demultiply_into(data, o2)
+      for i in 0..<o1.length() {
+        assert_eq(o1[i], o2[i])
+      }
+      for i in (4 * n)..<o1.length() {
+        assert_eq(o1[i], b'\x5a')
+      }
+    }
+  }
+}
+
+///|
+test "panic demultiply_into with a short output" {
+  let data = kernel_test_pixels(16, 1)
+  demultiply_into(data, FixedArray::make(63, b'\x00'))
+}
+
+///|
+test "panic demultiply_into with a short output and a tail" {
+  let data = kernel_test_pixels(5, 1)
+  demultiply_into(data, FixedArray::make(19, b'\x00'))
+}

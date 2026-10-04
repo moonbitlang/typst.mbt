@@ -20,6 +20,7 @@ options(
     "libm_native.mbt": [ "native" ],
     "libm_other.mbt": [ "not", "native" ],
     "pixmap_v128.mbt": [ "native", "wasm" ],
+    "simd_guards_wbtest.mbt": [ "native", "wasm" ],
     "pixmap_scalar.mbt": [ "wasm-gc", "js" ],
   },
 )

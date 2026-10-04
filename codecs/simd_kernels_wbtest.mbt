@@ -562,10 +562,11 @@ test "bench adler32 64 KiB" (it : @bench.T) {
 test "bench adaptive_filter 64 rows of 4764 bytes" (it : @bench.T) {
   let rows = Array::makei(64, r => png_test_row(4764, r, r % 3))
   let out = FixedArray::make(4765, b'\x00')
+  let scratch = FixedArray::make(4765, b'\x00')
   it.bench(() => {
     let mut acc = 0
     for r in 1..<64 {
-      acc += adaptive_filter(4, rows[r - 1], rows[r], out)
+      acc += adaptive_filter(4, rows[r - 1], rows[r], out, scratch)
     }
     it.keep(acc)
   })
@@ -599,4 +600,88 @@ test "panic ycbcr_to_rgb_16 with an out-of-range offset" {
   let y = FixedArray::make(16, 0)
   let out = FixedArray::make(48, b'\x00')
   ycbcr_to_rgb_16(y, 0, y, 0, y, 0, out, 2147483647, 3)
+}
+
+///|
+test "slide_hash_chain saturates every entry" {
+  for n in [1, 7, 8, 9, 31, 32, 33, 1000] {
+    let t = PosTable::make(n)
+    let expected = []
+    for i in 0..<n {
+      let v = (i * 40503 + 12345) & 0xffff
+      t.unsafe_set(i, v)
+      expected.push(if v >= 32768 { v - 32768 } else { 0 })
+    }
+    slide_hash_chain(t, 32768)
+    for i in 0..<n {
+      assert_eq(t.unsafe_get(i), expected[i])
+    }
+    // Other window sizes saturate the same way.
+    for i in 0..<n {
+      t.unsafe_set(i, i * 977)
+    }
+    slide_hash_chain(t, 1024)
+    for i in 0..<n {
+      let v = (i * 977) & 0xffff
+      assert_eq(t.unsafe_get(i), if v >= 1024 { v - 1024 } else { 0 })
+    }
+  }
+}
+
+///|
+test "bench slide_hash_chain head and prev x10" (it : @bench.T) {
+  let head = PosTable::make(65536)
+  let prev = PosTable::make(32768)
+  for i in 0..<65536 {
+    head.unsafe_set(i, i * 40503)
+  }
+  for i in 0..<32768 {
+    prev.unsafe_set(i, i * 7919)
+  }
+  it.bench(() => {
+    for _ in 0..<10 {
+      slide_hash_chain(head, 32768)
+      slide_hash_chain(prev, 32768)
+    }
+    it.keep(head)
+  })
+}
+
+///|
+/// The bitwise CRC-32 (reflected polynomial 0xEDB88320).
+fn ref_crc32(start : UInt, data : BytesView) -> UInt {
+  let mut c = start.lnot()
+  for b in data {
+    c = c ^ b.to_uint()
+    for _ in 0..<8 {
+      c = if (c & 1) != 0 { 0xEDB88320U ^ (c >> 1) } else { c >> 1 }
+    }
+  }
+  c.lnot()
+}
+
+///|
+test "crc32_braid matches the bitwise CRC-32" {
+  let data = Bytes::from_array(kernel_test_bytes(1000, 21)[:])
+  // Known answer: CRC-32 of "123456789".
+  assert_eq(crc32_braid(0, b"123456789"[:]), 0xCBF43926U)
+  for off in [0, 1, 3, 7, 8, 13] {
+    for len in [0, 1, 7, 8, 9, 39, 40, 41, 79, 80, 81, 119, 120, 121, 400, 987] {
+      let view = data[off:off + len]
+      assert_eq(crc32_braid(0, view), ref_crc32(0, view))
+      // Chained over a split, like the chunk type and data of a PNG chunk.
+      let third = len / 3
+      assert_eq(
+        crc32_braid(crc32_braid(0, view[:third]), view[third:]),
+        ref_crc32(0, view),
+      )
+      assert_eq(crc32_braid(0x12345678, view), ref_crc32(0x12345678, view))
+    }
+  }
+}
+
+///|
+test "bench crc32 64 KiB" (it : @bench.T) {
+  let data = Bytes::from_array(kernel_test_bytes(65536, 23)[:])
+  it.bench(() => it.keep(crc32_braid(0, data[:])))
 }

@@ -213,10 +213,12 @@ impl @otf.OutlineBuilder for Builder with fn close(self) {
 // limitations under the License.
 
 ///|
-/// The internal rendering buffer.
+/// The internal rendering buffer. The dimensions are upstream's `usize`s
+/// (from `u32`s), kept as `Int64` so that row offsets do not overflow; the
+/// buffer has upstream's (wrapping `u32`) `w * h + 4` entries.
 priv struct Canvas {
-  w : Int
-  h : Int
+  w : Int64
+  h : Int64
   a : FixedArray[Float]
 }
 
@@ -224,8 +226,8 @@ priv struct Canvas {
 /// Create a completely uncovered canvas.
 fn Canvas::new(w : UInt, h : UInt) -> Canvas {
   {
-    w: w.reinterpret_as_int(),
-    h: h.reinterpret_as_int(),
+    w: w.to_uint64().reinterpret_as_int64(),
+    h: h.to_uint64().reinterpret_as_int64(),
     a: FixedArray::make((w * h + 4).reinterpret_as_int(), 0.0),
   }
 }
@@ -236,8 +238,10 @@ fn Canvas::accumulate(self : Canvas) -> Bytes {
   // A plain loop with `min` and `to_int` spelled out (the closure call and
   // the core float helpers are not inlined; performance). `acc.abs().min(1.0)`
   // is in `[0, 1]` or NaN-free `1.0`, so the product is in `[0, 255]`.
-  let n = self.w * self.h
-  guard n >= 0 && n <= self.a.length() else { abort("canvas out of bounds") }
+  // `self.a[..self.w * self.h]` (upstream panics if that exceeds the
+  // buffer).
+  let n = self.coverage_len()
+  guard n >= 0 else { abort("canvas out of bounds") }
   let out = FixedArray::make(n, b'\x00')
   let mut acc : Float = 0.0
   for i in 0..<n {
@@ -251,16 +255,40 @@ fn Canvas::accumulate(self : Canvas) -> Bytes {
 }
 
 ///|
+/// `w * h` if the buffer holds that many entries, else -1. The product of
+/// the two `u32` dimensions is computed in `u64` (it can exceed `Int64`).
+fn Canvas::coverage_len(self : Canvas) -> Int {
+  let n = self.w.reinterpret_as_uint64() * self.h.reinterpret_as_uint64()
+  if n <= self.a.length().to_int64().reinterpret_as_uint64() {
+    n.to_int()
+  } else {
+    -1
+  }
+}
+
+///|
 /// Truncating conversion of a float known to be in the `Int` range.
 fn f32_to_i32_unchecked(x : Float) -> Int = "%f32.to_i32"
 
 ///|
 /// Add to a value in the accumulation buffer.
-fn Canvas::add(self : Canvas, linestart : Int, x : Int, delta : Float) -> Unit {
+///
+/// `linestart` is `y * w` for a row `y >= 0` (upstream adds `usize`s): with
+/// `x >= 0` the index `linestart + x` is non-negative, and below the buffer
+/// length when the access happens.
+#inline
+fn Canvas::add(
+  self : Canvas,
+  linestart : Int64,
+  x : Int,
+  delta : Float,
+) -> Unit {
+  let a = self.a
   if x >= 0 {
-    let i = linestart + x
-    if i < self.a.length() {
-      self.a[i] = self.a[i] + delta
+    let i = linestart + x.to_int64()
+    if i < a.length().to_int64() {
+      let i = i.to_int()
+      a.unsafe_set(i, a.unsafe_get(i) + delta)
     }
   }
 }
@@ -282,17 +310,23 @@ fn Canvas::line(self : Canvas, p0 : Point, p1 : Point) -> Unit {
   if p0.y < 0.0 {
     x = x - p0.y * dxdy
   }
-  let y1 = min_int(self.h, f32_to_usize(p1.y.ceil()))
+  let y1 = if self.h < f32_to_usize(f32_ceil(p1.y)).to_int64() {
+    self.h.to_int()
+  } else {
+    f32_to_usize(f32_ceil(p1.y))
+  }
   for y in y0..<y1 {
-    let linestart = y * self.w
-    let dy = Float::from_int(y + 1).min(p1.y) - Float::from_int(y).max(p0.y)
+    let linestart = y.to_int64() * self.w
+    let dy = f32_min(Float::from_int(y + 1), p1.y) -
+      f32_max(Float::from_int(y), p0.y)
     let xnext = x + dxdy * dy
     let d = dy * dir
-    let (x0, x1) = if x < xnext { (x, xnext) } else { (xnext, x) }
-    let x0floor = x0.floor()
-    let x0i = x0floor.to_int()
-    let x1ceil = x1.ceil()
-    let x1i = x1ceil.to_int()
+    let x0 = if x < xnext { x } else { xnext }
+    let x1 = if x < xnext { xnext } else { x }
+    let x0floor = f32_floor(x0)
+    let x0i = f32_to_i32(x0floor)
+    let x1ceil = f32_ceil(x1)
+    let x1i = f32_to_i32(x1ceil)
     if x1i <= x0i + 1 {
       let xmf = (0.5 : Float) * (x + xnext) - x0floor
       self.add(linestart, x0i, d - d * xmf)
@@ -335,7 +369,7 @@ fn Canvas::quad(self : Canvas, p0 : Point, p1 : Point, p2 : Point) -> Unit {
 
   // Estimate the required number of subdivisions for flattening.
   let tol : Float = 3.0
-  let n = (1.0 : Float) + (tol * devsq).sqrt().sqrt().floor().min(30.0)
+  let n = (1.0 : Float) + f32_min(f32_floor((tol * devsq).sqrt().sqrt()), 30.0)
   let nu = f32_to_usize(n)
   let step = (1.0 : Float) / n
 
@@ -394,7 +428,7 @@ fn Canvas::cubic(
   // Estimate the required number of subdivisions for conversion.
   let tol : Float = 0.333
   let max = (432.0 : Float) * tol * tol
-  let n = clamp(libm_powf(err / max, (1.0 : Float) / 6.0).ceil(), 1.0, 20.0)
+  let n = clamp(f32_ceil(libm_powf(err / max, (1.0 : Float) / 6.0)), 1.0, 20.0)
   let nu = f32_to_usize(n)
   let step = (1.0 : Float) / n
   let step4 = step / 4.0
@@ -455,7 +489,7 @@ fn clamp(v : Float, min : Float, max : Float) -> Float {
 /// Rust's saturating `f32 as usize` cast (NaN and negatives give 0), capped
 /// at `Int::max_value`.
 fn f32_to_usize(v : Float) -> Int {
-  let i = v.to_int()
+  let i = f32_to_i32(v)
   if i < 0 {
     0
   } else {
@@ -464,8 +498,45 @@ fn f32_to_usize(v : Float) -> Int {
 }
 
 ///|
-fn min_int(a : Int, b : Int) -> Int {
-  if a < b {
+/// Rust's saturating `f32 as i32` (NaN gives 0), like `Float::to_int`
+/// (spelled out: the core helper is not inlined; performance).
+#inline
+fn f32_to_i32(v : Float) -> Int {
+  if v != v {
+    0
+  } else if v >= 2147483647.0 {
+    2147483647
+  } else if v <= -2147483648.0 {
+    -2147483648
+  } else {
+    f32_to_i32_unchecked(v)
+  }
+}
+
+///|
+/// `Float::min`: NaN yields the other operand (inlined; performance).
+#inline
+fn f32_min(a : Float, b : Float) -> Float {
+  if a != a {
+    b
+  } else if b != b {
+    a
+  } else if a < b {
+    a
+  } else {
+    b
+  }
+}
+
+///|
+/// `Float::max`: NaN yields the other operand (inlined; performance).
+#inline
+fn f32_max(a : Float, b : Float) -> Float {
+  if a != a {
+    b
+  } else if b != b {
+    a
+  } else if a > b {
     a
   } else {
     b

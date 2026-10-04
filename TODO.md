@@ -65,17 +65,17 @@ goldens with `scripts/goldens.sh <stage>` (needs Rust; builds `oracle/`).
 - [ ] **Performance** (`bench/run.sh`, `bench/README.md`; M-series Mac,
   native release, embedded fonts only, upstream `--jobs 1`; 2026-10-04):
 
-  | workload | Rust | before | memoized | ReadOnlyArray | allocations | v128 | now vs Rust |
-  |---|---:|---:|---:|---:|---:|---:|---:|
-  | `--version` (process startup only) | 4.8 ms | | 6.7 ms | 3.5 ms | | | 0.7× |
-  | startup (`tiny.typ` → PDF) | 7.7 ms | 80 ms | 22.7 ms | 19.5 ms | 18.0 ms | 18.2 ms | 2.3× |
-  | `long.typ` compile (`query`) | 102 ms | 1.32 s | 315 ms | 305 ms | 225 ms | 227 ms | 2.2× |
-  | `long.typ` → PDF | 119 ms | 1.45 s | 451 ms | 431 ms | 352 ms | 356 ms | 3.0× |
-  | `long.typ` → SVG | 183 ms | 1.98 s | 479 ms | 457 ms | 377 ms | 381 ms | 2.1× |
-  | `long.typ` → PNG (24 pages) | 913 ms | 5.32 s | 2.68 s | 2.65 s | 2.58 s | 1.25 s | 1.37× |
-  | `showcase.typ` → PDF (system fonts) | 287 ms | 2.25 s | 1.35 s | 1.30 s | 1.30 s | 1.21 s | 4.2× |
-  | `showcase.typ` → PNG (system fonts) | 540 ms | | | | 1.60 s | 1.06 s | 2.0× |
-  | `longer.typ` compile | 481 ms | 6.58 s | 1.56 s | 1.51 s | 1.12 s | | 2.3× |
+  | workload | Rust | before | memoized | ReadOnlyArray | allocations | v128 | deflate | now vs Rust |
+  |---|---:|---:|---:|---:|---:|---:|---:|---:|
+  | `--version` (process startup only) | 4.8 ms | | 6.7 ms | 3.5 ms | | | | 0.7× |
+  | startup (`tiny.typ` → PDF) | 7.7 ms | 80 ms | 22.7 ms | 19.5 ms | 18.0 ms | 18.2 ms | | 2.3× |
+  | `long.typ` compile (`query`) | 102 ms | 1.32 s | 315 ms | 305 ms | 225 ms | 227 ms | | 2.2× |
+  | `long.typ` → PDF | 119 ms | 1.45 s | 451 ms | 431 ms | 352 ms | 356 ms | | 3.0× |
+  | `long.typ` → SVG | 183 ms | 1.98 s | 479 ms | 457 ms | 377 ms | 381 ms | | 2.1× |
+  | `long.typ` → PNG (24 pages) | 913 ms | 5.32 s | 2.68 s | 2.65 s | 2.58 s | 1.25 s | 976 ms | 1.06× |
+  | `showcase.typ` → PDF (system fonts) | 287 ms | 2.25 s | 1.35 s | 1.30 s | 1.30 s | 1.21 s | | 4.2× |
+  | `showcase.typ` → PNG (system fonts) | 540 ms | | | | 1.60 s | 1.06 s | 1.02 s | 1.9× |
+  | `longer.typ` compile | 481 ms | 6.58 s | 1.56 s | 1.51 s | 1.12 s | | | 2.3× |
 
   "v128" (2026-10-04, hyperfine side by side with "allocations" = main at
   bfdf8ca and Rust): the SIMD export kernels (AGENTS.md: v128 kernels):
@@ -87,10 +87,26 @@ goldens with `scripts/goldens.sh <stage>` (needs Rust; builds `oracle/`).
   targets (`moonrun`, `--ignore-system-fonts`; wasm-gc and js keep the
   scalar kernels, `@v128` is emulated there):
 
-  | workload | wasm before | wasm v128 | wasm-gc before | wasm-gc now |
-  |---|---:|---:|---:|---:|
-  | `long.typ` → PNG | 7.57 s | 4.20 s | 4.80 s | 4.24 s |
-  | `showcase.typ` → PNG | 6.17 s | 2.81 s | 2.80 s | 2.08 s |
+  | workload | wasm before | wasm v128 | wasm deflate | wasm-gc before | wasm-gc v128 | wasm-gc deflate |
+  |---|---:|---:|---:|---:|---:|---:|
+  | `long.typ` → PNG | 7.57 s | 4.20 s (4.00 s) | 2.98 s | 4.80 s | 4.24 s (4.27 s) | 4.10 s |
+  | `showcase.typ` → PNG | 6.17 s | 2.81 s (2.69 s) | 2.61 s | 2.80 s | 2.08 s (2.04 s) | 2.05 s |
+
+  "deflate" (2026-10-04, hyperfine side by side with "v128" = main at
+  fd575dd, in parentheses on wasm, and Rust): the zlib-rs port's hash
+  tables as `u16` like upstream (half the cache footprint; on wasm a byte
+  array with a v128 `slide_hash`), no tuple allocations per match and no
+  `Bytes` copies per row, the braided CRC-32 of zlib-rs, `compress_block` with the bit
+  buffer in locals, `fizzle_matches` bounded up front, the adaptive filter
+  keeping its best row, and pixglyph's float helpers inlined.
+  `encode_png_balanced` of three `long.typ` pages: 85 -> 60 ms (png 0.18.1
+  + zlib-rs 0.6.8 in Rust: 54 ms); rasterizing 1405 glyphs: 10.7 -> 9.1 ms
+  (pixglyph: 7.2 ms). `long.typ` → PNG now spends less time exporting than
+  upstream; the remaining gap is the compilation. The upstream binary in
+  `.repos/typst` locks zlib-rs 0.5.1 (the oracle 0.6.8, which the port and
+  the goldens follow), so its PNGs differ from ours in the deflate stream
+  only. The showcase is dominated by system font scanning and JPEG
+  decoding, not the PNG path.
 
   ("memoized" and "ReadOnlyArray" re-measured side by side on 2026-10-04,
   hyperfine, runs interleaved.) Constant tables as static `ReadOnlyArray`

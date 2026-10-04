@@ -8,9 +8,10 @@
 /// goes through [PremultipliedColorU8::demultiply].
 fn demultiply_into(data : FixedArray[UInt], out : FixedArray[Byte]) -> Unit {
   let len = data.length()
-  guard out.length().to_int64() >= len.to_int64() * 4 else {
-    abort("index out of bounds")
-  }
+  // Unchecked: `data[i..i + 4]` for `i <= len - 4` and the stores to
+  // `out[4 * i..4 * i + 16]` within the checked length. (`data` and `out`
+  // have different element types, so they cannot alias.)
+  guard demultiply_ranges_ok(data, out) else { abort("index out of bounds") }
   let alpha = @v128.i32x4_splat(0xFF000000U)
   let mut i = 0
   while i <= len - 4 {
@@ -31,4 +32,13 @@ fn demultiply_into(data : FixedArray[UInt], out : FixedArray[Byte]) -> Unit {
     demultiply_pixel(data.unsafe_get(i), out, i * 4)
     i += 1
   }
+}
+
+///|
+/// Whether `out` holds the `4 * data.length()` bytes.
+fn demultiply_ranges_ok(
+  data : FixedArray[UInt],
+  out : FixedArray[Byte],
+) -> Bool {
+  out.length().to_int64() >= data.length().to_int64() * 4
 }

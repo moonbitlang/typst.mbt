@@ -114,10 +114,13 @@ let configuration_table : ReadOnlyArray[Config] = [
 /// `State`). Positions are `u16`s upstream (`Pos`).
 priv struct DeflateStream {
   // -- stream --
+  /// The input (`input_array[input_array_off..]` instead when that is set).
   mut input : BytesView
+  mut input_array : FixedArray[Byte]?
+  mut input_array_off : Int
   mut next_in : Int
   mut avail_in : Int
-  mut output : Buffer
+  mut output : OutBuf
   mut avail_out : Int
   mut total_out : Int64
   mut data_type : Int
@@ -146,10 +149,10 @@ priv struct DeflateStream {
   /// prev[N], where N is an offset in the current window, contains the offset
   /// in the window of the previous 4-byte sequence that hashes to the same
   /// value as the 4-byte sequence starting at N.
-  prev : FixedArray[Int]
+  prev : PosTable
   /// head[H] contains the offset of the last 4-character sequence seen so far
   /// in the current window that hashes to H.
-  head : FixedArray[Int]
+  head : PosTable
   /// Length of the best match at previous step.
   mut prev_length : Int
   /// To speed up deflation, hash chains are never searched beyond this length.
@@ -194,9 +197,11 @@ fn DeflateStream::new(level : Int) -> DeflateStream {
   let w_size = 1 << window_bits
   let stream : DeflateStream = {
     input: b""[:],
+    input_array: None,
+    input_array_off: 0,
     next_in: 0,
     avail_in: 0,
-    output: Buffer(),
+    output: OutBuf::new(),
     avail_out: 0,
     total_out: 0,
     data_type: Z_UNKNOWN,
@@ -213,8 +218,8 @@ fn DeflateStream::new(level : Int) -> DeflateStream {
     window: FixedArray::make(2 * w_size, b'\x00'),
     w_size,
     lookahead: 0,
-    prev: FixedArray::make(w_size, 0),
-    head: FixedArray::make(HASH_SIZE, 0),
+    prev: PosTable::make(w_size),
+    head: PosTable::make(HASH_SIZE),
     prev_length: 0,
     max_chain_length: 0,
     max_lazy_match: 0,
@@ -268,7 +273,7 @@ fn DeflateStream::zng_tr_init(self : DeflateStream) -> Unit {
 ///|
 fn DeflateStream::lm_init(self : DeflateStream) -> Unit {
   self.window_size = 2 * self.w_size
-  self.head.fill(0)
+  self.head.fill_zero()
   // Set the default configuration parameters:
   self.lm_set_level(self.level)
   self.strstart = 0
@@ -358,42 +363,59 @@ fn read_u64_le(window : FixedArray[Byte], i : Int) -> UInt64 {
 }
 
 ///|
+/// `update_hash(0, val)`: always in `0..HASH_SIZE`.
 fn hash_update(val : UInt) -> Int {
   ((val * 2654435761U) >> 16).reinterpret_as_int() & (HASH_SIZE - 1)
 }
 
 ///|
+/// Upstream `quick_insert_string`. `head` and `prev` hold `u16` positions
+/// (`Pos`); `head` has `HASH_SIZE` entries and `prev` `w_size`, so the hashed
+/// and masked indices are in bounds.
 fn DeflateStream::quick_insert_string(
   self : DeflateStream,
   string : Int,
 ) -> Int {
   let val = read_u32_le(self.window, string)
   let hm = hash_update(val)
-  let head = self.head[hm]
-  if head != string {
-    self.prev[string & self.w_mask()] = head
-    self.head[hm] = string
+  let head = self.head.unsafe_get(hm)
+  if head != (string & 0xffff) {
+    self.prev.unsafe_set(string & self.w_mask(), head)
+    self.head.unsafe_set(hm, string)
   }
   head
 }
 
 ///|
+/// Upstream `insert_string`: inserts the strings starting at
+/// `string..string + count`, as far as four bytes of each are in the window.
 fn DeflateStream::insert_string(
   self : DeflateStream,
   string : Int,
   count : Int,
 ) -> Unit {
+  let window = self.window
   // it can happen that insufficient bytes are initialized
-  let len = @cmp.minimum(self.window.length() - string, count + 3)
+  guard string >= 0 && string <= window.length() else {
+    abort("index out of bounds")
+  }
+  // `min(window.len() - string, count + 3) - 3` four-byte windows (without
+  // overflowing `count + 3`): the loads read `window[string + i..string + i +
+  // 4]` with `i < n <= window.len() - string - 3`, in bounds. The tables
+  // are indexed by a hash below `HASH_SIZE` (their length) and a position
+  // masked to `w_size - 1` (`prev`'s length).
+  let n = @cmp.minimum(window.length() - string - 3, count)
   let w_mask = self.w_mask()
-  for i in 0..<(len - 3) {
+  let head = self.head
+  let prev = self.prev
+  for i in 0..<n {
     let idx = (string + i) & 0xffff
-    let val = read_u32_le(self.window, string + i)
+    let val = load_u32_le_unchecked(window, string + i)
     let hm = hash_update(val)
-    let head = self.head[hm]
-    if head != idx {
-      self.prev[idx & w_mask] = head
-      self.head[hm] = idx
+    let h = head.unsafe_get(hm)
+    if h != idx {
+      prev.unsafe_set(idx & w_mask, h)
+      head.unsafe_set(hm, idx)
     }
   }
 }
@@ -402,17 +424,8 @@ fn DeflateStream::insert_string(
 
 ///|
 fn DeflateStream::slide_hash(self : DeflateStream) -> Unit {
-  let wsize = self.w_size
-  let head = self.head
-  for i in 0..<head.length() {
-    let m = head.unsafe_get(i)
-    head.unsafe_set(i, if m >= wsize { m - wsize } else { 0 })
-  }
-  let prev = self.prev
-  for i in 0..<prev.length() {
-    let m = prev.unsafe_get(i)
-    prev.unsafe_set(i, if m >= wsize { m - wsize } else { 0 })
-  }
+  slide_hash_chain(self.head, self.w_size)
+  slide_hash_chain(self.prev, self.w_size)
 }
 
 ///|
@@ -428,12 +441,24 @@ fn DeflateStream::read_buf_window(
     return 0
   }
   self.avail_in -= len
-  let src = self.input[self.next_in:self.next_in + len]
   guard offset >= 0 && offset <= self.window.length() - len else {
     abort("index out of bounds")
   }
   let window = self.window
-  window.blit_from_bytesview(offset, src)
+  match self.input_array {
+    Some(array) =>
+      array.blit_to(
+        window,
+        len~,
+        src_offset=self.input_array_off + self.next_in,
+        dst_offset=offset,
+      )
+    None =>
+      window.blit_from_bytesview(
+        offset,
+        self.input[self.next_in:self.next_in + len],
+      )
+  }
   if self.wrap == 1 {
     self.adler = adler32_fixed(self.adler, window, offset, len)
   }
@@ -511,9 +536,7 @@ fn DeflateStream::flush_pending(self : DeflateStream) -> Unit {
   if len == 0 {
     return
   }
-  for i in pending.out..<(pending.out + len) {
-    self.output.write_byte(pending.buf[i])
-  }
+  self.output.append(pending.buf, pending.out, len)
   self.total_out += len.to_int64()
   self.avail_out -= len
   pending.advance(len)
@@ -636,7 +659,7 @@ fn DeflateStream::deflate(self : DeflateStream, flush : Int) -> Int {
             self.zng_tr_stored_block(0, 0, false)
           FLUSH_FULL => {
             self.zng_tr_stored_block(0, 0, false)
-            self.head.fill(0) // forget history
+            self.head.fill_zero() // forget history
             if self.lookahead == 0 {
               self.strstart = 0
               self.block_start = 0
@@ -681,26 +704,86 @@ fn DeflateStream::deflate(self : DeflateStream, flush : Int) -> Int {
 }
 
 ///|
-/// Upstream `Deflate::compress` (stable API): compresses `input` into
-/// `output`, writing at most `avail_out` bytes. Returns the return code and
-/// the number of input bytes consumed.
+/// The result of [DeflateStream::compress] (a tuple would be allocated).
+#valtype
+priv struct CompressResult {
+  /// The return code.
+  ret : Int
+  /// The number of input bytes consumed.
+  consumed : Int
+}
+
+///|
+/// Upstream `Deflate::compress` (stable API): compresses the input
+/// (`array[off..off + len]`, or `view` if `array` is `None`) into `output`,
+/// writing at most `avail_out` bytes.
 fn DeflateStream::compress(
   self : DeflateStream,
-  input : BytesView,
-  output : Buffer,
+  view : BytesView,
+  array : FixedArray[Byte]?,
+  off : Int,
+  len : Int,
+  output : OutBuf,
   avail_out : Int,
   flush : Int,
-) -> (Int, Int) {
-  self.input = input
+) -> CompressResult {
+  if array is Some(array) {
+    guard off >= 0 && len >= 0 && off <= array.length() - len else {
+      abort("index out of bounds")
+    }
+  }
+  self.input = view
+  self.input_array = array
+  self.input_array_off = off
   self.next_in = 0
-  self.avail_in = input.length()
+  self.avail_in = len
   self.output = output
   self.avail_out = avail_out
   let ret = self.deflate(flush)
   let consumed = self.next_in
   self.input = b""[:]
+  self.input_array = None
+  self.input_array_off = 0
   self.next_in = 0
   self.avail_in = 0
   self.avail_out = 0
-  (ret, consumed)
+  { ret, consumed, }
+}
+
+///|
+/// A growable output byte buffer (upstream writes into a `Vec<u8>`).
+priv struct OutBuf {
+  mut buf : FixedArray[Byte]
+  mut len : Int
+}
+
+///|
+fn OutBuf::new() -> OutBuf {
+  { buf: FixedArray::make(0, b'\x00'), len: 0, }
+}
+
+///|
+/// Appends `src[off..off + n]`.
+fn OutBuf::append(
+  self : OutBuf,
+  src : FixedArray[Byte],
+  off : Int,
+  n : Int,
+) -> Unit {
+  if n > self.buf.length() - self.len {
+    let cap = @cmp.maximum(
+      @cmp.maximum(self.len + n, 2 * self.buf.length()),
+      256,
+    )
+    let buf = FixedArray::make(cap, b'\x00')
+    self.buf.blit_to(buf, len=self.len)
+    self.buf = buf
+  }
+  src.blit_to(self.buf, len=n, src_offset=off, dst_offset=self.len)
+  self.len += n
+}
+
+///|
+fn OutBuf::to_bytes(self : OutBuf) -> Bytes {
+  Bytes::from_array(self.buf[0:self.len])
 }

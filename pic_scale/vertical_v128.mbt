@@ -9,6 +9,15 @@
 //   `x` (a 14-bit pixel) is never negative.
 // - `vmlal_s16` = `i32x4_extmul_*_i16x8_s` + `i32x4_add`.
 // - `vqshrun_n_*` + `vqmovn_u16` = arithmetic shift + saturating narrowing.
+//
+// Contract (checked by `vertical_ranges_ok`, otherwise the emulation runs):
+// every access in bounds (the loads and stores are unchecked), the weights
+// of the taps in `i16` range (the lanes hold `i16` weights, the emulation
+// full `Int`s; `numerical_approximation_i16` clamps them), `acc` as long as
+// the emulation needs and not aliasing `weights` (the emulation initializes
+// `acc` before reading the weights), and `dst` not aliasing `src` (the
+// 16-column blocks, incl. the overlapping last one, would read pixels
+// already written; the emulation reads every row before writing).
 
 ///|
 /// [convolve_vertical_neon_i16_precision] (the `rdm` kernel).
@@ -28,7 +37,7 @@ fn vertical_rdm_kernel(
   guard width >= 16 &&
     vertical_ranges_ok(
       width, bounds_start, bounds_size, src, src_offset, src_stride, dst, dst_offset,
-      weights, weights_offset,
+      weights, weights_offset, acc,
     ) else {
     convolve_vertical_neon_i16_precision(
       width, bounds_start, bounds_size, src, src_offset, src_stride, dst, dst_offset,
@@ -93,7 +102,7 @@ fn vertical_i32_kernel(
   guard width >= 16 &&
     vertical_ranges_ok(
       width, bounds_start, bounds_size, src, src_offset, src_stride, dst, dst_offset,
-      weights, weights_offset,
+      weights, weights_offset, acc,
     ) else {
     convolve_vertical_neon_i32_precision(
       width, bounds_start, bounds_size, src, src_offset, src_stride, dst, dst_offset,
@@ -154,13 +163,18 @@ fn vertical_ranges_ok(
   dst_offset : Int,
   weights : FixedArray[Int],
   weights_offset : Int,
+  acc : FixedArray[Int],
 ) -> Bool {
+  !physical_equal(src, dst) &&
+  !physical_equal(acc, weights) &&
   width >= 0 &&
   bounds_start >= 0 &&
   bounds_size >= 0 &&
   src_offset >= 0 &&
   src_stride >= 0 &&
+  acc.length() >= width &&
   in_range(weights_offset, bounds_size.to_int64(), weights.length()) &&
+  weights_fit_i16(weights, weights_offset, bounds_size) &&
   in_range(dst_offset, width.to_int64(), dst.length()) &&
   (
     bounds_size == 0 ||
@@ -179,5 +193,5 @@ fn vertical_ranges_ok(
 /// `Int` overflow (the `@v128` loads and stores are not bounds checked).
 #inline
 fn in_range(off : Int, len : Int64, total : Int) -> Bool {
-  off >= 0 && len >= 0L && off.to_int64() + len <= total.to_int64()
+  off >= 0 && len >= 0L && len <= total.to_int64() - off.to_int64()
 }

@@ -2,9 +2,7 @@
 // is emulated (wasm-gc, js).
 
 ///|
-/// `out[out_base + j] = sum(image[(left + i) * row_len + j] * ws[i])` for
-/// `j < row_len`, summed from 0.0 in the order of `i` (a row of
-/// [vertical_sample]).
+/// [vertical_sample_row_scalar].
 fn vertical_sample_row(
   image : FixedArray[Float],
   out : FixedArray[Float],
@@ -13,19 +11,11 @@ fn vertical_sample_row(
   left : Int,
   ws : Array[Float],
 ) -> Unit {
-  for j in 0..<row_len {
-    let mut t : Float = 0.0
-    for i, wt in ws {
-      t = t + image[(left + i) * row_len + j] * wt
-    }
-    out[out_base + j] = t
-  }
+  vertical_sample_row_scalar(image, out, row_len, out_base, left, ws)
 }
 
 ///|
-/// `t[c] = sum(image[start + i * channels + c] * ws[i])` for `c <
-/// channels`, summed from 0.0 in the order of `i` (a pixel of
-/// [horizontal_sample]).
+/// [horizontal_sample_sums_scalar].
 fn horizontal_sample_sums(
   image : FixedArray[Float],
   start : Int,
@@ -33,11 +23,5 @@ fn horizontal_sample_sums(
   ws : Array[Float],
   t : FixedArray[Float],
 ) -> Unit {
-  t.fill(0.0)
-  for i, wt in ws {
-    let base = start + i * channels
-    for c in 0..<channels {
-      t[c] = t[c] + image[base + c] * wt
-    }
-  }
+  horizontal_sample_sums_scalar(image, start, channels, ws, t)
 }

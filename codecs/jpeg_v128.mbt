@@ -47,11 +47,9 @@ fn ycbcr_to_rgb_16(
   out_pos : Int,
   num_components : Int,
 ) -> Unit {
-  guard (num_components == 3 || num_components == 4) &&
-    in_range(yo, 16, y.length()) &&
-    in_range(cbo, 16, cb.length()) &&
-    in_range(cro, 16, cr.length()) &&
-    in_range(out_pos, (16 * num_components).to_int64(), output.length()) else {
+  guard ycbcr_ranges_ok(
+    y, yo, cb, cbo, cr, cro, output, out_pos, num_components,
+  ) else {
     // (panics like the scalar code on out-of-bounds accesses)
     ycbcr_to_rgb_16_scalar(
       y, yo, cb, cbo, cr, cro, output, out_pos, num_components,
@@ -162,6 +160,27 @@ fn ycbcr_to_rgb_16(
 }
 
 ///|
+/// Whether the 16 samples of each component and the `16 * num_components`
+/// output bytes of [ycbcr_to_rgb_16] are in bounds.
+fn ycbcr_ranges_ok(
+  y : FixedArray[Int],
+  yo : Int,
+  cb : FixedArray[Int],
+  cbo : Int,
+  cr : FixedArray[Int],
+  cro : Int,
+  output : FixedArray[Byte],
+  out_pos : Int,
+  num_components : Int,
+) -> Bool {
+  (num_components == 3 || num_components == 4) &&
+  in_range(yo, 16, y.length()) &&
+  in_range(cbo, 16, cb.length()) &&
+  in_range(cro, 16, cr.length()) &&
+  in_range(out_pos, (16 * num_components).to_int64(), output.length())
+}
+
+///|
 /// `y * Y_CF + YUV_RND`.
 #inline
 fn ycc_y0(y : V128) -> V128 {
@@ -233,14 +252,23 @@ fn slice_range_ok(s : Slice, start : Int, len : Int64) -> Bool {
   start >= 0 &&
   len >= 0L &&
   s.off >= 0 &&
-  s.off.to_int64() + start.to_int64() + len <= s.arr.length().to_int64()
+  len <= s.arr.length().to_int64() - s.off.to_int64() - start.to_int64()
 }
 
 ///|
 /// The main loop of [upsample_horizontal]: `output[2..2 + 2 * n]` from
 /// `input[0..n + 2]`, four input samples at a time.
 fn upsample_horizontal_core(input : Slice, output : Slice, n : Int) -> Unit {
+  // Output aliasing the input: the scalar code (the blocks read ahead of
+  // their writes).
+  if physical_equal(input.arr, output.arr) {
+    upsample_horizontal_core_scalar(input, output, n)
+    return
+  }
   let mut w = 0
+  // Unchecked: the gathers read `input[off + w..off + w + 6]` for `w <= n -
+  // 4` and the scatters write `output[off + 2 + 2 * w..+ 8]`, within the
+  // checked slice ranges.
   if n > 0 &&
     slice_range_ok(input, 0, n.to_int64() + 2) &&
     slice_range_ok(output, 2, 2L * n.to_int64()) {
@@ -295,7 +323,17 @@ fn upsample_vertical_core(
   start : Int,
   n : Int,
 ) -> Unit {
+  // Output aliasing an input: the scalar code (the blocks read ahead of
+  // their writes).
+  if physical_equal(output.arr, input.arr) ||
+    physical_equal(output.arr, near.arr) {
+    upsample_vertical_core_scalar(input, near, output, start, n)
+    return
+  }
   let mut i = 0
+  // Unchecked: `input[off + i..+ 4]`, `near[off + i..+ 4]` and
+  // `output[off + start + i..+ 4]` for `i <= n - 4`, within the checked
+  // slice ranges.
   if n > 0 &&
     slice_range_ok(input, 0, n.to_int64()) &&
     slice_range_ok(near, 0, n.to_int64()) &&

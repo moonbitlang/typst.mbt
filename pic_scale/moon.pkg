@@ -17,6 +17,7 @@ warnings = "-alert_experimental-unused_package"
 options(
   targets: {
     "vertical_v128.mbt": [ "native", "wasm" ],
+    "kernels_v128_wbtest.mbt": [ "native", "wasm" ],
     "vertical_scalar.mbt": [ "wasm-gc", "js" ],
     "horizontal_v128.mbt": [ "native", "wasm" ],
     "horizontal_scalar.mbt": [ "wasm-gc", "js" ],

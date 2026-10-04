@@ -17,7 +17,7 @@ const ZIO_BUF_CAPACITY : Int = 32768
 /// `flate2::write::ZlibEncoder<Vec<u8>>`).
 pub struct ZlibEncoder {
   priv data : DeflateStream
-  priv obj : Buffer
+  priv obj : OutBuf
 }
 
 ///|
@@ -26,13 +26,20 @@ pub struct ZlibEncoder {
 ///
 /// Only the levels handled by zlib-rs's `deflate_medium` (3..=6) are ported.
 pub fn ZlibEncoder::new(level : Int) -> ZlibEncoder {
-  { data: DeflateStream::new(level), obj: Buffer(), }
+  { data: DeflateStream::new(level), obj: OutBuf::new(), }
 }
 
 ///|
-/// Upstream `Writer::write_with_status`: compresses as much of `buf` as
-/// possible and returns the number of bytes consumed.
-fn ZlibEncoder::write(self : ZlibEncoder, buf : BytesView) -> Int {
+/// Upstream `Writer::write_with_status`: compresses as much of the input
+/// (`array[off..off + len]`, or `view` if `array` is `None`) as possible and
+/// returns the number of bytes consumed.
+fn ZlibEncoder::write(
+  self : ZlibEncoder,
+  view : BytesView,
+  array : FixedArray[Byte]?,
+  off : Int,
+  len : Int,
+) -> Int {
   // miniz isn't guaranteed to actually write any of the buffer provided, it
   // may be in a flushing mode where it's just giving us data before we're
   // actually giving it any data. We don't want to spuriously return `Ok(0)`
@@ -40,19 +47,22 @@ fn ZlibEncoder::write(self : ZlibEncoder, buf : BytesView) -> Int {
   // we execute this in a loop to ensure that we try our darndest to write the
   // data.
   while true {
-    let (ret, written) = self.data.compress(
-      buf,
+    let r = self.data.compress(
+      view,
+      array,
+      off,
+      len,
       self.obj,
       ZIO_BUF_CAPACITY,
       FLUSH_NO,
     )
-    guard ret >= 0 || ret == Z_BUF_ERROR else {
+    guard r.ret >= 0 || r.ret == Z_BUF_ERROR else {
       abort("corrupt deflate stream")
     }
-    if buf.length() != 0 && written == 0 && ret != Z_STREAM_END {
+    if len != 0 && r.consumed == 0 && r.ret != Z_STREAM_END {
       continue
     }
-    return written
+    return r.consumed
   }
   0
 }
@@ -62,9 +72,28 @@ fn ZlibEncoder::write(self : ZlibEncoder, buf : BytesView) -> Int {
 pub fn ZlibEncoder::write_all(self : ZlibEncoder, buf : BytesView) -> Unit {
   let mut buf = buf
   while buf.length() > 0 {
-    let n = self.write(buf)
+    let n = self.write(buf, None, 0, buf.length())
     guard n > 0 else { abort("failed to write whole buffer") }
     buf = buf[n:]
+  }
+}
+
+///|
+/// [ZlibEncoder::write_all] of `array[off..off + len]` (without copying it
+/// into a `Bytes`).
+fn ZlibEncoder::write_all_array(
+  self : ZlibEncoder,
+  array : FixedArray[Byte],
+  off : Int,
+  len : Int,
+) -> Unit {
+  let mut off = off
+  let mut len = len
+  while len > 0 {
+    let n = self.write(b""[:], Some(array), off, len)
+    guard n > 0 else { abort("failed to write whole buffer") }
+    off += n
+    len -= n
   }
 }
 
@@ -74,13 +103,16 @@ pub fn ZlibEncoder::write_all(self : ZlibEncoder, buf : BytesView) -> Unit {
 pub fn ZlibEncoder::finish(self : ZlibEncoder) -> Bytes {
   while true {
     let before = self.data.total_out
-    let (ret, _) = self.data.compress(
+    let r = self.data.compress(
       b""[:],
+      None,
+      0,
+      0,
       self.obj,
       ZIO_BUF_CAPACITY,
       FLUSH_FINISH,
     )
-    guard ret >= 0 || ret == Z_BUF_ERROR else {
+    guard r.ret >= 0 || r.ret == Z_BUF_ERROR else {
       abort("corrupt deflate stream")
     }
     if before == self.data.total_out {

@@ -140,6 +140,10 @@
   (`["wasm-gc", "js"]`, the previous scalar code or the lane emulation);
   for an A/B comparison swap the two target lists and rerun `moon bench`.
   Used in `codecs/` (`zlib_*`: unaligned loads, `compare256`, adler32;
+  `zlib_pos_table_*`: the deflate `head`/`prev` tables, a byte array with a
+  v128 saturating `slide_hash` on wasm only (15x faster there), while native
+  keeps `FixedArray[UInt16]`: its slide loop is memory bound and the byte
+  layout costs an instruction in the `longest_match` chain walk;
   `png_filter_*`; `jpeg_*`: IDCT, YCbCr conversion, up-sampling;
   `imageops_*`: resize sums), `skia/pixmap_*` (PNG demultiply),
   `pic_scale/{vertical,horizontal}_*` (the u8 kernels but the Q15 plane
@@ -166,11 +170,35 @@
   `pic_scale/bench_wbtest.mbt`: `moon bench <file> --target native|wasm
   --release`): clang already auto-vectorizes simple `unsafe_get` loops on
   native (zlib's `slide_hash` was slower as v128), so keep v128 only where
-  it wins. (4) Test both paths: the `simd_kernels_wbtest.mbt` files compare
-  with reference loops, and the oracles (`pic_scale/oracle_wbtest.mbt`,
-  `hayro/render/oracle_test.mbt`, which needs the `target/hayro` and
-  `target/devassets` symlinks to the hayro and typst-dev-assets checkouts,
-  else it is silently skipped) must pass on native, wasm and wasm-gc.
+  it wins; a kernel may also be v128 on one target only (own `targets`
+  list). Profile with real data (e.g. pages decoded from the CLI's PNGs)
+  and compare with the Rust crates on the same input (a scratch cargo
+  project using the registry sources, `--offline`): `encode_png_balanced`
+  is within ~12% of png 0.18.1 + zlib-rs 0.6.8 on long.typ pages. (4) Test both paths: the scalar twin of each kernel is
+  compiled on every target (a `*_scalar` function or the lane emulation in
+  a common file, which the `*_scalar.mbt` files call), and the kernel tests
+  compare the target-selected kernel with it directly
+  (`codecs/simd_boundary_wbtest.mbt`, `pic_scale/kernels_wbtest.mbt`,
+  `vello_cpu/fine_kernels_wbtest.mbt`, `*/simd_kernels_wbtest.mbt`; on
+  wasm-gc/js both sides are the scalar code): small lengths (0..64 where the
+  kernel takes one), offsets, exact allocation ends, sentinels around
+  outputs, aliasing, edge parameters, and undersized buffers as `panic`
+  tests. The native test driver skips `panic` tests, so the v128 range
+  predicates are also tested directly on native/wasm
+  (`codecs/simd_guards_wbtest.mbt`, `pic_scale/kernels_v128_wbtest.mbt`,
+  `vello_cpu/fine_v128_wbtest.mbt`, `skia/simd_guards_wbtest.mbt`). The
+  oracles (`pic_scale/oracle_wbtest.mbt`, `hayro/render/oracle_test.mbt`,
+  which needs the `target/hayro` and `target/devassets` symlinks to the
+  hayro and typst-dev-assets checkouts, else it is silently skipped) must
+  pass on native, wasm and wasm-gc. (5) Aliasing: an output that may alias
+  an input (`physical_equal` on the arrays) runs the scalar twin, since the
+  blocks read ahead of their writes (also overlapping output rows, and a
+  scratch accumulator aliasing an input); contracts the lanes rely on are
+  checked with a scalar fallback (pic_scale's `i16` weights: per call for
+  the vertical taps, via `FixedWeights.weights_fit_i16`, computed once
+  when the weights are made, for the horizontal rows); range checks compare
+  `len <= total - off` (no `Int64` overflow); and every unchecked access
+  has its bounds proof in a comment next to it.
 - SVG export (`svg/`, port of typst-svg) is checked by two stages against
   the raw upstream SVGs (`scripts/goldens.sh svg`, pretty, merged pages, 1pt
   gap): `svg` compiles and exports each paged test; `svg-replay` exports

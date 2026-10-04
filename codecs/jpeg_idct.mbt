@@ -63,7 +63,7 @@ fn store8(
   v6 : Int,
   v7 : Int,
 ) -> Unit {
-  if pos >= 0 && pos + 8 <= out.length() {
+  if in_range(pos, 8, out.length()) {
     out[pos] = v0
     out[pos + 1] = v1
     out[pos + 2] = v2
