@@ -81,15 +81,19 @@ fn Line::shrinkability(self : Line) -> @library.Abs {
 ///|
 /// Whether the line has items with negative width.
 fn Line::has_negative_width_items(self : Line) -> Bool {
-  self.items.0
-  .iter()
-  .any(entry => {
-    match entry.1.item {
+  // (A loop instead of `iter().any(..)`, which allocates the iterator and
+  // the closure per call.)
+  for entry in self.items.0 {
+    let negative = match entry.1.item {
       Absolute(amount, _) => amount < @library.Abs::zero()
       Frame(frame) => frame.width() < @library.Abs::zero()
       _ => false
     }
-  })
+    if negative {
+      return true
+    }
+  }
+  false
 }
 
 ///|
@@ -209,19 +213,40 @@ fn collect_items(
   let fallback : Ref[(Int, ItemEntry)?] = Ref(None)
 
   // Collect the items for each consecutively ordered run.
-  reorder(p, start, end, (s, e, rtl) => {
+  if p.bidi is None || start == end {
+    // `reorder` calls `f` once for the whole range; done directly so that
+    // the closure is not allocated for every candidate line.
     let from = items.0.length()
-    collect_range(engine, p, s, e, trim, items, fallback)
-    if rtl {
+    collect_range(engine, p, start, end, trim, items, fallback)
+    if p.config.dir == RTL {
       items.reorder(from)
     }
-  })
+  } else {
+    reorder(p, start, end, (s, e, rtl) => {
+      let from = items.0.length()
+      collect_range(engine, p, s, e, trim, items, fallback)
+      if rtl {
+        items.reorder(from)
+      }
+    })
+  }
 
   // Add fallback text to expand the line height, if necessary.
-  if !items.0.iter().any(entry => entry.1.item is Text(_)) &&
-    fallback.val is Some((idx, fallback)) {
+  if !items_have_text(items) && fallback.val is Some((idx, fallback)) {
     items.push(fallback, idx)
   }
+}
+
+///|
+/// `items.0.iter().any(entry => entry.1.item is Text(_))` without allocating
+/// the iterator and the closure.
+fn items_have_text(items : Items) -> Bool {
+  for entry in items.0 {
+    if entry.1.item is Text(_) {
+      return true
+    }
+  }
+  false
 }
 
 ///|
