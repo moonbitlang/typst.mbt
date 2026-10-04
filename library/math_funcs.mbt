@@ -222,7 +222,7 @@ fn MathVariant::name(self : MathVariant) -> String {
 }
 
 ///|
-let math_variants : Array[MathVariant] = [
+let math_variants : ReadOnlyArray[MathVariant] = [
   Plain,
   Fraktur,
   SansSerif,
@@ -254,7 +254,7 @@ pub impl IntoValue for MathVariant with fn into_value(self) {
 
 ///|
 pub impl FromValue for MathVariant with fn from_value(v) {
-  for variant in math_variants {
+  for variant in math_variants[:] {
     if v is Str(s) && s == variant.name() {
       return variant
     }

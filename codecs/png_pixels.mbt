@@ -120,7 +120,7 @@ fn unfilter_row(
 
 ///|
 /// The Adam7 passes: (x start, y start, x step, y step).
-let adam7_passes : FixedArray[(Int, Int, Int, Int)] = [
+let adam7_passes : ReadOnlyArray[(Int, Int, Int, Int)] = [
   (0, 0, 8, 8),
   (4, 0, 8, 8),
   (0, 4, 4, 8),
@@ -155,7 +155,7 @@ pub fn decode_png(data : BytesView) -> (ImageInfo, Bytes) raise ImageError {
   let expand = PngExpander::new(info, chunks)
   let mut pos = 0
   let passes = if info.interlaced { adam7_passes } else { [(0, 0, 1, 1)] }
-  for pass in passes {
+  for pass in passes[:] {
     let (x0, y0, dx, dy) = pass
     let pass_width = if width > x0 { (width - x0 + dx - 1) / dx } else { 0 }
     let pass_height = if height > y0 { (height - y0 + dy - 1) / dy } else { 0 }

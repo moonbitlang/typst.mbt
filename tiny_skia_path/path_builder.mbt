@@ -339,13 +339,13 @@ pub fn PathBuilder::push_rect(self : PathBuilder, rect : Rect) -> Unit {
 pub fn PathBuilder::push_oval(self : PathBuilder, oval : Rect) -> Unit {
   let cx = half(oval.left()) + half(oval.right())
   let cy = half(oval.top()) + half(oval.bottom())
-  let oval_points = [
+  let oval_points : ReadOnlyArray[_] = [
     Point::from_xy(cx, oval.bottom()),
     Point::from_xy(oval.left(), cy),
     Point::from_xy(cx, oval.top()),
     Point::from_xy(oval.right(), cy),
   ]
-  let rect_points = [
+  let rect_points : ReadOnlyArray[_] = [
     Point::from_xy(oval.right(), oval.bottom()),
     Point::from_xy(oval.left(), oval.bottom()),
     Point::from_xy(oval.left(), oval.top()),

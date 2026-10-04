@@ -184,7 +184,7 @@ pub(all) struct StandardAxes {
 }
 
 ///|
-let standard_axes_list : Array[String] = [
+let standard_axes_list : ReadOnlyArray[String] = [
   "ital", "slnt", "wght", "wdth", "opsz",
 ]
 

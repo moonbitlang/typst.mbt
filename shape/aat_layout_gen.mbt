@@ -414,7 +414,7 @@ const HB_AAT_LAYOUT_FEATURE_SELECTOR_UPPER_CASE_PETITE_CAPS : Int = 2
 ///
 /// Table data courtesy of Apple.
 /// Converted from mnemonics to integers when moving to this file.
-let feature_mappings : FixedArray[AatFeatureMapping] = [
+let feature_mappings : ReadOnlyArray[AatFeatureMapping] = [
   AatFeatureMapping::new(
     "afrc",
     HB_AAT_LAYOUT_FEATURE_TYPE_FRACTIONS,

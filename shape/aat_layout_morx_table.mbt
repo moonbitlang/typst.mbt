@@ -424,7 +424,7 @@ const REARRANGEMENT_VERB : UInt16 = 0x000F
 /// and end-side. Values of 0,1,2 mean move that many
 /// to the other side. Value of 3 means move 2 and
 /// flip them.
-let rearrangement_map : FixedArray[Int] = [
+let rearrangement_map : ReadOnlyArray[Int] = [
   0x00, // 0  no change
    0x10, // 1  Ax => xA
    0x01, // 2  xD => Dx

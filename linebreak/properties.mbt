@@ -58,7 +58,7 @@ pub(all) enum LineBreak {
 } derive(Eq, Hash, Debug)
 
 ///|
-let line_break_values : FixedArray[LineBreak] = [
+let line_break_values : ReadOnlyArray[LineBreak] = [
   Unknown,
   Ambiguous,
   Alphabetic,
@@ -113,7 +113,7 @@ let line_break_values : FixedArray[LineBreak] = [
 ///|
 /// The short name of a `Line_Break` value (e.g. `BK`).
 pub fn LineBreak::short_name(self : LineBreak) -> String {
-  for i, v in line_break_values {
+  for i, v in line_break_values[:] {
     if v == self {
       return line_break_names[i]
     }

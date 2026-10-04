@@ -40,7 +40,7 @@ fn main() {
     writeln!(
         out,
         "///|\n/// `UnicodeWidthChar::width` as `(lo, hi, width + 1)` ranges (0 = `None`);\n\
-         /// characters not covered have width 1.\nlet char_width_table : FixedArray[Int] = ["
+         /// characters not covered have width 1.\nlet char_width_table : ReadOnlyArray[Int] = ["
     )
     .unwrap();
     for chunk in ranges.chunks(4) {

@@ -210,7 +210,7 @@ fn get_operator_category(content : String, form : Form) -> Int {
 ///|
 /// Maps an operator table encoding to its category.
 fn from_encoding(encoding : Int) -> Int {
-  for entry in category_encodings {
+  for entry in category_encodings[:] {
     if entry.0 == encoding {
       return entry.1
     }
@@ -293,7 +293,7 @@ pub fn will_auto_transform(content : String) -> Bool {
 
 ///|
 fn map_two_ascii_chars(content : String) -> Char? {
-  for idx, s in two_ascii_chars_table {
+  for idx, s in two_ascii_chars_table[:] {
     if s == content {
       return Some((0x0320 + idx).unsafe_to_char())
     }

@@ -32,9 +32,9 @@ fn parse_language_bundle(
     Some(r) => lang + "-" + r
     None => lang
   }
-  for entry in translations {
+  for entry in translations[:] {
     if entry.0 == name {
-      return Map::from_array(entry.1)
+      return Map::from_array(entry.1[:])
     }
   }
   {}

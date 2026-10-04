@@ -402,7 +402,7 @@ priv struct StaticTreeDesc {
   /// static tree (lengths) or None
   static_lens : FixedArray[Int]?
   /// extra bits for each code
-  extra_bits : FixedArray[Int]
+  extra_bits : ReadOnlyArray[Int]
   /// base index for extra_bits
   extra_base : Int
   /// max number of elements in the tree

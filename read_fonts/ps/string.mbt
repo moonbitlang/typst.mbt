@@ -33,7 +33,7 @@ pub fn Sid::resolve_standard(self : Sid) -> Result[String, Int] {
 
 ///|
 /// The PostScript standard string set.
-pub let standard_strings : FixedArray[String] = [
+pub let standard_strings : ReadOnlyArray[String] = [
   ".notdef", "space", "exclam", "quotedbl", "numbersign", "dollar", "percent", "ampersand",
   "quoteright", "parenleft", "parenright", "asterisk", "plus", "comma", "hyphen",
   "period", "slash", "zero", "one", "two", "three", "four", "five", "six", "seven",

@@ -35,7 +35,7 @@ pub(all) enum BidiClass {
 } derive(Eq, Hash, Debug)
 
 ///|
-let bidi_classes : FixedArray[BidiClass] = [
+let bidi_classes : ReadOnlyArray[BidiClass] = [
   AL,
   AN,
   B,

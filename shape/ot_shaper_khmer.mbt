@@ -19,7 +19,7 @@ let khmer_shaper : OtShaper = {
 }
 
 ///|
-let khmer_features : FixedArray[(@otf.Tag, Int)] = [
+let khmer_features : ReadOnlyArray[(@otf.Tag, Int)] = [
   // Basic features.
   // These features are applied all at once, before reordering, constrained
   // to the syllable.
@@ -68,7 +68,7 @@ priv struct KhmerShapePlan {
 ///|
 fn KhmerShapePlan::new(plan : ShapePlan) -> KhmerShapePlan {
   let mask_array = FixedArray::make(khmer_features.length(), 0U)
-  for i, feature in khmer_features {
+  for i, feature in khmer_features[:] {
     mask_array[i] = if (feature.1 & F_GLOBAL) != 0 {
       0
     } else {

@@ -5,7 +5,7 @@
 ///
 /// These values work well for PNGs with some form of filtering enabled, but
 /// will likely make most other inputs worse.
-let fdeflate_huffman_lengths : FixedArray[Int] = [
+let fdeflate_huffman_lengths : ReadOnlyArray[Int] = [
   2, 3, 4, 5, 5, 6, 6, 7, 7, 7, 8, 8, 8, 8, 8, 9, 9, 9, 9, 9, 9, 9, 10, 10, 10, 10,
   10, 10, 10, 10, 10, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 12, 12, 12,
   12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12,
@@ -24,7 +24,7 @@ let fdeflate_huffman_lengths : FixedArray[Int] = [
 
 ///|
 /// Length code for length values (derived from deflate spec).
-let fdeflate_length_to_symbol : FixedArray[Int] = [
+let fdeflate_length_to_symbol : ReadOnlyArray[Int] = [
   257, 258, 259, 260, 261, 262, 263, 264, 265, 265, 266, 266, 267, 267, 268, 268,
   269, 269, 269, 269, 270, 270, 270, 270, 271, 271, 271, 271, 272, 272, 272, 272,
   273, 273, 273, 273, 273, 273, 273, 273, 274, 274, 274, 274, 274, 274, 274, 274,
@@ -45,7 +45,7 @@ let fdeflate_length_to_symbol : FixedArray[Int] = [
 
 ///|
 /// Number of extra bits for length values (derived from deflate spec).
-let fdeflate_length_to_len_extra : FixedArray[Int] = [
+let fdeflate_length_to_len_extra : ReadOnlyArray[Int] = [
   0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
   2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
   3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,

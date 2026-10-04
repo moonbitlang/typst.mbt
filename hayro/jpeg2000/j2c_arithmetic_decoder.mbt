@@ -211,7 +211,7 @@ fn ArithmeticDecoder::next_byte(self : ArithmeticDecoder) -> Int {
 // QE values and associated data from Table C.2.
 
 ///|
-let qe_table_qe : FixedArray[UInt] = [
+let qe_table_qe : ReadOnlyArray[UInt] = [
   0x5601, 0x3401, 0x1801, 0x0AC1, 0x0521, 0x0221, 0x5601, 0x5401, 0x4801, 0x3801,
   0x3001, 0x2401, 0x1C01, 0x1601, 0x5601, 0x5401, 0x5101, 0x4801, 0x3801, 0x3401,
   0x3001, 0x2801, 0x2401, 0x2201, 0x1C01, 0x1801, 0x1601, 0x1401, 0x1201, 0x1101,
@@ -220,21 +220,21 @@ let qe_table_qe : FixedArray[UInt] = [
 ]
 
 ///|
-let qe_table_nmps : FixedArray[Int] = [
+let qe_table_nmps : ReadOnlyArray[Int] = [
   1, 2, 3, 4, 5, 38, 7, 8, 9, 10, 11, 12, 13, 29, 15, 16, 17, 18, 19, 20, 21, 22,
   23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42,
   43, 44, 45, 45, 46,
 ]
 
 ///|
-let qe_table_nlps : FixedArray[Int] = [
+let qe_table_nlps : ReadOnlyArray[Int] = [
   1, 6, 9, 12, 29, 33, 6, 14, 14, 14, 17, 18, 20, 21, 14, 14, 15, 16, 17, 18, 19,
   19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38,
   39, 40, 41, 42, 43, 46,
 ]
 
 ///|
-let qe_table_switch : FixedArray[Bool] = [
+let qe_table_switch : ReadOnlyArray[Bool] = [
   true, false, false, false, false, false, true, false, false, false, false, false,
   false, false, true, false, false, false, false, false, false, false, false, false,
   false, false, false, false, false, false, false, false, false, false, false, false,

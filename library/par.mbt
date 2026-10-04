@@ -209,7 +209,7 @@ pub(all) enum Linebreaks {
 } derive(Eq, Hash, Debug)
 
 ///|
-let linebreaks_names : Array[String] = ["simple", "optimized"]
+let linebreaks_names : ReadOnlyArray[String] = ["simple", "optimized"]
 
 ///|
 pub impl Reflect for Linebreaks with fn input() {
@@ -344,7 +344,7 @@ pub(all) enum LineNumberingScope {
 } derive(Eq, Hash, Debug)
 
 ///|
-let line_numbering_scope_names : Array[String] = ["document", "page"]
+let line_numbering_scope_names : ReadOnlyArray[String] = ["document", "page"]
 
 ///|
 pub impl Reflect for LineNumberingScope with fn input() {

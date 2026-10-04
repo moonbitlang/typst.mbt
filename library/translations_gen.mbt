@@ -4,7 +4,7 @@
 ///|
 /// The translation bundles (upstream `TRANSLATIONS`, parsed like
 /// `parse_language_bundle`).
-let translations : Array[(String, Array[(String, String)])] = [
+let translations : ReadOnlyArray[(String, ReadOnlyArray[(String, String)])] = [
   (
     "af",
     [

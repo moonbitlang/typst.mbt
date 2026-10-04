@@ -43,7 +43,7 @@ fn is_valid_utf8(b : Bytes) -> Bool {
 /// Is this name on the list of fonts that require hinting?
 fn matches_hint_reliant_name_list(name : BytesView) -> Bool {
   let name = skip_pdf_random_tag(name)
-  for tricky_name in hint_reliant_names {
+  for tricky_name in hint_reliant_names[:] {
     // FreeType uses strstr(name, tricky_name) so we use contains() to
     // match behavior.
     if bytes_contains(name, tricky_name) {
@@ -91,7 +91,7 @@ fn skip_pdf_random_tag(name : BytesView) -> BytesView {
 }
 
 ///|
-let hint_reliant_names : FixedArray[String] = [
+let hint_reliant_names : ReadOnlyArray[String] = [
   "cpop", "DFGirl-W6-WIN-BF", "DFGothic-EB", "DFGyoSho-Lt", "DFHei", "DFHSGothic-W5",
   "DFHSMincho-W3", "DFHSMincho-W7", "DFKaiSho-SB", "DFKaiShu", "DFKai-SB", "DFMing",
   "DLC", "HuaTianKaiTi?", "HuaTianSongTi?", "Ming(for ISO10646)", "MingLiU", "MingMedium",
@@ -137,7 +137,7 @@ fn FontId::from_font(font : FontRef) -> FontId {
 /// Checks for fonts that require hinting based on the length and checksum
 /// of the cvt, fpgm and prep tables.
 fn matches_hint_reliant_id_list(font_id : FontId) -> Bool {
-  for id in hint_reliant_ids {
+  for id in hint_reliant_ids[:] {
     let (a, b, c, d, e, f) = id
     if font_id ==
       {
@@ -153,7 +153,7 @@ fn matches_hint_reliant_id_list(font_id : FontId) -> Bool {
 
 ///|
 /// (cvt checksum, cvt len, fpgm checksum, fpgm len, prep checksum, prep len)
-let hint_reliant_ids : FixedArray[(UInt, UInt, UInt, UInt, UInt, UInt)] = [
+let hint_reliant_ids : ReadOnlyArray[(UInt, UInt, UInt, UInt, UInt, UInt)] = [
   (0x05BCF058U, 0x000002E4U, 0x28233BF1U, 0x000087C4U, 0xA344A1EAU, 0x000001E1U),
   (0x05BCF058U, 0x000002E4U, 0x28233BF1U, 0x000087C4U, 0xA344A1EBU, 0x000001E1U),
   (0x12C3EBB2U, 0x00000350U, 0xB680EE64U, 0x000087A7U, 0xCE939563U, 0x00000758U),

@@ -254,7 +254,7 @@ priv enum EvalSerializationFormat {
 } derive(Eq)
 
 ///|
-let pdf_standard_names : Array[(String, @library.PdfStandard)] = [
+let pdf_standard_names : ReadOnlyArray[(String, @library.PdfStandard)] = [
   ("1.4", V_1_4),
   ("1.5", V_1_5),
   ("1.6", V_1_6),
@@ -530,7 +530,7 @@ fn compile_spec(path : String, about : String, watch : Bool) -> CommandSpec {
       "pdf-standard",
       "PDF_STANDARD",
       delimiter=',',
-      possible=pdf_standard_names.map(p => p.0),
+      possible=pdf_standard_names[:].map(p => p.0),
       multiple=true,
       help="One (or multiple comma-separated) PDF standards that Typst will enforce conformance with",
     ),

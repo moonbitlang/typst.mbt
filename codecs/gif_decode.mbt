@@ -351,8 +351,8 @@ fn gif_interlaced_rows(len : Int) -> Array[Int] {
   if len == 0 {
     return rows
   }
-  let steps = [8, 8, 4, 2]
-  let starts = [4, 2, 1, 0]
+  let steps : ReadOnlyArray[_] = [8, 8, 4, 2]
+  let starts : ReadOnlyArray[_] = [4, 2, 1, 0]
   let mut cur = 0
   let mut pass = 0
   while pass < 4 {

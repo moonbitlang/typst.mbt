@@ -513,7 +513,7 @@ priv enum ModifierValue {
 /// `FromStr`.
 priv struct ModifierDef {
   key : String
-  variants : Array[String]
+  variants : ReadOnlyArray[String]
 }
 
 ///|
@@ -527,7 +527,7 @@ fn from_modifier_value(
     }
     return Number(n)
   }
-  for i, variant in def.variants {
+  for i, variant in def.variants[:] {
     if ident_eq(modifier.value, variant) {
       return Variant(i)
     }
@@ -630,7 +630,7 @@ let padding_def : ModifierDef = {
 }
 
 ///|
-let bool_variants : Array[String] = ["false", "true"]
+let bool_variants : ReadOnlyArray[String] = ["false", "true"]
 
 ///|
 let sign_def : ModifierDef = {

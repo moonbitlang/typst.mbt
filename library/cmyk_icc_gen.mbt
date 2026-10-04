@@ -11,7 +11,7 @@ let cmyk_icc_input_entries : Int = 48
 let cmyk_icc_output_entries : Int = 2
 
 ///|
-let cmyk_icc_input_tables : FixedArray[Int] = [
+let cmyk_icc_input_tables : ReadOnlyArray[Int] = [
   0, 2595, 4096, 5787, 7318, 8968, 10533, 12100, 13651, 15194, 16730, 18254, 19786,
   21296, 22809, 24309, 25788, 27269, 28715, 30145, 31567, 32955, 34327, 35691, 37030,
   38350, 39668, 40981, 42270, 43560, 44851, 46144, 47431, 48721, 50011, 51303, 52580,
@@ -31,7 +31,7 @@ let cmyk_icc_input_tables : FixedArray[Int] = [
 ]
 
 ///|
-let cmyk_icc_clut : FixedArray[Int] = [
+let cmyk_icc_clut : ReadOnlyArray[Int] = [
   65280, 32768, 32768, 54894, 32693, 32507, 44374, 32662, 32344, 33589, 32698, 32339,
   22094, 32818, 32448, 8036, 33278, 32796, 64376, 32171, 37480, 54263, 32155, 36513,
   43822, 32194, 35690, 33056, 32293, 35037, 21561, 32452, 34534, 7338, 32830, 34403,
@@ -357,4 +357,4 @@ let cmyk_icc_clut : FixedArray[Int] = [
 ]
 
 ///|
-let cmyk_icc_output_tables : FixedArray[Int] = [0, 65535, 0, 65535, 0, 65535]
+let cmyk_icc_output_tables : ReadOnlyArray[Int] = [0, 65535, 0, 65535, 0, 65535]

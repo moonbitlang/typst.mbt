@@ -5,7 +5,7 @@
 let burmese_model_type : String = "Codepoints"
 
 ///|
-let burmese_dic : FixedArray[(String, Int)] = [
+let burmese_dic : ReadOnlyArray[(String, Int)] = [
   ("က", 0),
   ("ခ", 1),
   ("ဂ", 2),
@@ -196,7 +196,7 @@ let burmese_dic : FixedArray[(String, Int)] = [
 ]
 
 ///|
-let burmese_embedding_dims : FixedArray[Int] = [188, 40]
+let burmese_embedding_dims : ReadOnlyArray[Int] = [188, 40]
 
 ///|
 /// `embedding` of `Burmese_codepoints_exclusive_model4_heavy`, little-endian f32 (30080 bytes, base64)
@@ -621,7 +621,7 @@ let burmese_embedding_data : String =
   #|wtqbP4brw7/it+++aikPv8vcyD6Fh86/+xKTv4iyLL6lJlw/eUxVPjn0TEBbI5m+T90RQIlhS70=
 
 ///|
-let burmese_fw_w_dims : FixedArray[Int] = [4, 27, 40]
+let burmese_fw_w_dims : ReadOnlyArray[Int] = [4, 27, 40]
 
 ///|
 /// `fw_w` of `Burmese_codepoints_exclusive_model4_heavy`, little-endian f32 (17280 bytes, base64)
@@ -868,7 +868,7 @@ let burmese_fw_w_data : String =
   #|TVvlQFkoYj81MNo+4wwXQBY7w0Aouwy9UP37uptP2b2Y7N0/9nD5Psiqrj/YWAY+zJj8v63SI7/7x9w+qb4iwHIwWj+y3uS9
 
 ///|
-let burmese_fw_u_dims : FixedArray[Int] = [4, 27, 27]
+let burmese_fw_u_dims : ReadOnlyArray[Int] = [4, 27, 27]
 
 ///|
 /// `fw_u` of `Burmese_codepoints_exclusive_model4_heavy`, little-endian f32 (11664 bytes, base64)
@@ -1037,7 +1037,7 @@ let burmese_fw_u_data : String =
   #|jHIdwE9+9j9zVTZAsKkYQCQvEr/YXBA/g+MWwLnO/z/qZMI/8cmYv7ZSKj9qkKg/b8DKwCeh2j9fKsS+HnHRv0WOyL9u8gE+
 
 ///|
-let burmese_fw_b_dims : FixedArray[Int] = [4, 27]
+let burmese_fw_b_dims : ReadOnlyArray[Int] = [4, 27]
 
 ///|
 /// `fw_b` of `Burmese_codepoints_exclusive_model4_heavy`, little-endian f32 (432 bytes, base64)
@@ -1050,7 +1050,7 @@ let burmese_fw_b_data : String =
   #|rmekviAaDj9qhO89heZVv29FG0A6TABAXmpNPzC6BcAfBYq9HXAXv1Yi3ryle2e+Cp/Cvw7+20AQTpm/72PAPvjkYr8kAJ6/
 
 ///|
-let burmese_bw_w_dims : FixedArray[Int] = [4, 27, 40]
+let burmese_bw_w_dims : ReadOnlyArray[Int] = [4, 27, 40]
 
 ///|
 /// `bw_w` of `Burmese_codepoints_exclusive_model4_heavy`, little-endian f32 (17280 bytes, base64)
@@ -1297,7 +1297,7 @@ let burmese_bw_w_data : String =
   #|We81vjDIl7yuk4k9otxQPcMkZL4bR5Y+VrlRPlwwJL2YbQC/7Nusv28sgD3Mr5m8+qzHvnRYtT1fTW2+VPbOvWyme766k/E+
 
 ///|
-let burmese_bw_u_dims : FixedArray[Int] = [4, 27, 27]
+let burmese_bw_u_dims : ReadOnlyArray[Int] = [4, 27, 27]
 
 ///|
 /// `bw_u` of `Burmese_codepoints_exclusive_model4_heavy`, little-endian f32 (11664 bytes, base64)
@@ -1466,7 +1466,7 @@ let burmese_bw_u_data : String =
   #|6Wanvyh0KEDsAkE8OHRXvxdfID8P5LS/djrXvonL9j+np5E/oR5BwH5LE0COVO2+pvJQQH5R5L96oyXAGO4AQNnuKj+JCHC9
 
 ///|
-let burmese_bw_b_dims : FixedArray[Int] = [4, 27]
+let burmese_bw_b_dims : ReadOnlyArray[Int] = [4, 27]
 
 ///|
 /// `bw_b` of `Burmese_codepoints_exclusive_model4_heavy`, little-endian f32 (432 bytes, base64)
@@ -1479,7 +1479,7 @@ let burmese_bw_b_data : String =
   #|SIxZwEvwJT/dJx3AKoGOP1Nrp79n8FfAqTkyv4AAUUBgcaq/T/YYv1n7FEAm8lXArVVJQDZXHUAwA148Y2jFwC/TFcCWN0y+
 
 ///|
-let burmese_time_w_dims : FixedArray[Int] = [2, 4, 27]
+let burmese_time_w_dims : ReadOnlyArray[Int] = [2, 4, 27]
 
 ///|
 /// `time_w` of `Burmese_codepoints_exclusive_model4_heavy`, little-endian f32 (864 bytes, base64)
@@ -1498,7 +1498,7 @@ let burmese_time_w_data : String =
   #|jDnRPlbcGb/18YS+PlQiPyZLB8C/VeG/JsfKPhS+8T6yyay/EI1dvltv6b4Onp0/0+3Mv8XhAMCRogY+rO1av/LZU78QVfk/
 
 ///|
-let burmese_time_b_dims : FixedArray[Int] = [4]
+let burmese_time_b_dims : ReadOnlyArray[Int] = [4]
 
 ///|
 /// `time_b` of `Burmese_codepoints_exclusive_model4_heavy`, little-endian f32 (16 bytes, base64)
@@ -1510,7 +1510,7 @@ let burmese_time_b_data : String =
 let khmer_model_type : String = "Codepoints"
 
 ///|
-let khmer_dic : FixedArray[(String, Int)] = [
+let khmer_dic : ReadOnlyArray[(String, Int)] = [
   ("ក", 0),
   ("ខ", 1),
   ("គ", 2),
@@ -1601,7 +1601,7 @@ let khmer_dic : FixedArray[(String, Int)] = [
 ]
 
 ///|
-let khmer_embedding_dims : FixedArray[Int] = [88, 40]
+let khmer_embedding_dims : ReadOnlyArray[Int] = [88, 40]
 
 ///|
 /// `embedding` of `Khmer_codepoints_exclusive_model4_heavy`, little-endian f32 (14080 bytes, base64)
@@ -1804,7 +1804,7 @@ let khmer_embedding_data : String =
   #|qJ98wGhaL8BFTay+TN+Pv3FMMD963IFAyFXev0EChcCesVe/YryAvw==
 
 ///|
-let khmer_fw_w_dims : FixedArray[Int] = [4, 27, 40]
+let khmer_fw_w_dims : ReadOnlyArray[Int] = [4, 27, 40]
 
 ///|
 /// `fw_w` of `Khmer_codepoints_exclusive_model4_heavy`, little-endian f32 (17280 bytes, base64)
@@ -2051,7 +2051,7 @@ let khmer_fw_w_data : String =
   #|CtaavpbKoz652Ys9KZMFPcgPWT6bw6S+sHxsPg8cXbxoxLo+V3BIvNWtaL4ETrY9gLzbPfnWwD6dI4++j78LwI49BT99+qE/
 
 ///|
-let khmer_fw_u_dims : FixedArray[Int] = [4, 27, 27]
+let khmer_fw_u_dims : ReadOnlyArray[Int] = [4, 27, 27]
 
 ///|
 /// `fw_u` of `Khmer_codepoints_exclusive_model4_heavy`, little-endian f32 (11664 bytes, base64)
@@ -2220,7 +2220,7 @@ let khmer_fw_u_data : String =
   #|PnbrPiRnOj9Fj5q+DytvP7eCtz9y05G/TYncPxl6lL+nAAVAeBJhQBitIL+mb0c/wtHXPdQCDT+OvMm+Zd9Sv+TZbr8z04BA
 
 ///|
-let khmer_fw_b_dims : FixedArray[Int] = [4, 27]
+let khmer_fw_b_dims : ReadOnlyArray[Int] = [4, 27]
 
 ///|
 /// `fw_b` of `Khmer_codepoints_exclusive_model4_heavy`, little-endian f32 (432 bytes, base64)
@@ -2233,7 +2233,7 @@ let khmer_fw_b_data : String =
   #|Qa9GwJhHLj9T544/j/I5wEmHKL99p8w/p60Zv42ozT+B/grAFQ3gvS/UJL6UMhjA7yb5vvSVnMB8vBjA+makPUrdxj8K+KY+
 
 ///|
-let khmer_bw_w_dims : FixedArray[Int] = [4, 27, 40]
+let khmer_bw_w_dims : ReadOnlyArray[Int] = [4, 27, 40]
 
 ///|
 /// `bw_w` of `Khmer_codepoints_exclusive_model4_heavy`, little-endian f32 (17280 bytes, base64)
@@ -2480,7 +2480,7 @@ let khmer_bw_w_data : String =
   #|oXinPU3saT8rdoBA3ok6vmw9Xz8sgkfAeoYHQR/FW78EeWc/6EZZv+JKoD2wcA0/VT+KwX90eD8oNgnBZxVsP2qNED8+mAW/
 
 ///|
-let khmer_bw_u_dims : FixedArray[Int] = [4, 27, 27]
+let khmer_bw_u_dims : ReadOnlyArray[Int] = [4, 27, 27]
 
 ///|
 /// `bw_u` of `Khmer_codepoints_exclusive_model4_heavy`, little-endian f32 (11664 bytes, base64)
@@ -2649,7 +2649,7 @@ let khmer_bw_u_data : String =
   #|xsKov4gtSj9xPNm/6pSCPYDMZ77wZ5a/GFtqQGM4sb2cLWI/Xi5Rv1+N+z/rqz2/58VWwIf2Fb5lJsa+PRU/vztbor/fzqi/
 
 ///|
-let khmer_bw_b_dims : FixedArray[Int] = [4, 27]
+let khmer_bw_b_dims : ReadOnlyArray[Int] = [4, 27]
 
 ///|
 /// `bw_b` of `Khmer_codepoints_exclusive_model4_heavy`, little-endian f32 (432 bytes, base64)
@@ -2662,7 +2662,7 @@ let khmer_bw_b_data : String =
   #|DkQqvuFDaj8/hinAggbOvy6MYMBW7KW/vrtJvmnodcAEFcW+PGLXvx48hsAKnYo/9dDQv785bj0Q9d++AGYpvtX0kr/DA0LA
 
 ///|
-let khmer_time_w_dims : FixedArray[Int] = [2, 4, 27]
+let khmer_time_w_dims : ReadOnlyArray[Int] = [2, 4, 27]
 
 ///|
 /// `time_w` of `Khmer_codepoints_exclusive_model4_heavy`, little-endian f32 (864 bytes, base64)
@@ -2681,7 +2681,7 @@ let khmer_time_w_data : String =
   #|nUGevynf/z5uUPi+CZHJP/Fvs79PY1g9zURYP7Sx4T0o/BfAxm1mQKTvPT+8fqM+CJFfQGdHsj8GmPg/WZmDP4wzmb9/wh3A
 
 ///|
-let khmer_time_b_dims : FixedArray[Int] = [4]
+let khmer_time_b_dims : ReadOnlyArray[Int] = [4]
 
 ///|
 /// `time_b` of `Khmer_codepoints_exclusive_model4_heavy`, little-endian f32 (16 bytes, base64)
@@ -2693,7 +2693,7 @@ let khmer_time_b_data : String =
 let lao_model_type : String = "Codepoints"
 
 ///|
-let lao_dic : FixedArray[(String, Int)] = [
+let lao_dic : ReadOnlyArray[(String, Int)] = [
   ("ກ", 0),
   ("ຂ", 1),
   ("ຄ", 2),
@@ -2769,7 +2769,7 @@ let lao_dic : FixedArray[(String, Int)] = [
 ]
 
 ///|
-let lao_embedding_dims : FixedArray[Int] = [73, 40]
+let lao_embedding_dims : ReadOnlyArray[Int] = [73, 40]
 
 ///|
 /// `embedding` of `Lao_codepoints_exclusive_model4_heavy`, little-endian f32 (11680 bytes, base64)
@@ -2939,7 +2939,7 @@ let lao_embedding_data : String =
   #|YIZSP7/A5L97oDtAWxWbPw==
 
 ///|
-let lao_fw_w_dims : FixedArray[Int] = [4, 27, 40]
+let lao_fw_w_dims : ReadOnlyArray[Int] = [4, 27, 40]
 
 ///|
 /// `fw_w` of `Lao_codepoints_exclusive_model4_heavy`, little-endian f32 (17280 bytes, base64)
@@ -3186,7 +3186,7 @@ let lao_fw_w_data : String =
   #|5PEgP51Kmj35HRw/1dpkvntnQL56xDrAI2F8vQqMUj6oagO/nLMuPV6YUT+zRuG9p4WTvsqE3rw2JRA+8ecOPiJVFb8I74o+
 
 ///|
-let lao_fw_u_dims : FixedArray[Int] = [4, 27, 27]
+let lao_fw_u_dims : ReadOnlyArray[Int] = [4, 27, 27]
 
 ///|
 /// `fw_u` of `Lao_codepoints_exclusive_model4_heavy`, little-endian f32 (11664 bytes, base64)
@@ -3355,7 +3355,7 @@ let lao_fw_u_data : String =
   #|IjkSv1BIYj8WGyBAuPrnPo/QKr/RC6A//lWwPmrHq78sTVC/B5Y4v/B/AsAiHYq/U1LJPyVxQ75vxKy/wxmuv7ag5D7blW2/
 
 ///|
-let lao_fw_b_dims : FixedArray[Int] = [4, 27]
+let lao_fw_b_dims : ReadOnlyArray[Int] = [4, 27]
 
 ///|
 /// `fw_b` of `Lao_codepoints_exclusive_model4_heavy`, little-endian f32 (432 bytes, base64)
@@ -3368,7 +3368,7 @@ let lao_fw_b_data : String =
   #|KCRVPg8gq79jjGM+LiVAP0n3acBScda/qns1QBxkSz/I7tW+wlDbPwGglb+oyUDAR1uMPSonxr1GFos/Zakqv/DAKz+giLu/
 
 ///|
-let lao_bw_w_dims : FixedArray[Int] = [4, 27, 40]
+let lao_bw_w_dims : ReadOnlyArray[Int] = [4, 27, 40]
 
 ///|
 /// `bw_w` of `Lao_codepoints_exclusive_model4_heavy`, little-endian f32 (17280 bytes, base64)
@@ -3615,7 +3615,7 @@ let lao_bw_w_data : String =
   #|W6BnP2V6Zb/bGnC/R246PhIIKT/Wn5Q/FSUUvO9+er0k8Da+7/0SPpxPGj4lbU6/PJqYPlo2F70JXZe9K1GOPosmoL1zbj+/
 
 ///|
-let lao_bw_u_dims : FixedArray[Int] = [4, 27, 27]
+let lao_bw_u_dims : ReadOnlyArray[Int] = [4, 27, 27]
 
 ///|
 /// `bw_u` of `Lao_codepoints_exclusive_model4_heavy`, little-endian f32 (11664 bytes, base64)
@@ -3784,7 +3784,7 @@ let lao_bw_u_data : String =
   #|uEgRwHUJrsDt3Nw/59arPBGKPsBarfM+gRHSQPfY578s4onAPb/vPoLqVD8uL3m/quWAQCx24z9UD8g/Pq2GQNekkL89EN+/
 
 ///|
-let lao_bw_b_dims : FixedArray[Int] = [4, 27]
+let lao_bw_b_dims : ReadOnlyArray[Int] = [4, 27]
 
 ///|
 /// `bw_b` of `Lao_codepoints_exclusive_model4_heavy`, little-endian f32 (432 bytes, base64)
@@ -3797,7 +3797,7 @@ let lao_bw_b_data : String =
   #|GXyUPlM+ZsDp1bo/iZ7hv2jAgD/uNy8+iGssv1hEer57bg3ALrWLv0hR0zxGjEY/zJwvv5HGXL91tti9mt9FwMBsSr+Dfqu/
 
 ///|
-let lao_time_w_dims : FixedArray[Int] = [2, 4, 27]
+let lao_time_w_dims : ReadOnlyArray[Int] = [2, 4, 27]
 
 ///|
 /// `time_w` of `Lao_codepoints_exclusive_model4_heavy`, little-endian f32 (864 bytes, base64)
@@ -3816,7 +3816,7 @@ let lao_time_w_data : String =
   #|LriHPX3V3D4VS7K9o7MQv9lsib7r71C+BZXDvitAgL9Zr13AAhQUQN7daT9VZ+M/tQDXPini6r4lyve/OjGSPptKq7/Ipsw/
 
 ///|
-let lao_time_b_dims : FixedArray[Int] = [4]
+let lao_time_b_dims : ReadOnlyArray[Int] = [4]
 
 ///|
 /// `time_b` of `Lao_codepoints_exclusive_model4_heavy`, little-endian f32 (16 bytes, base64)
@@ -3828,7 +3828,7 @@ let lao_time_b_data : String =
 let thai_model_type : String = "Codepoints"
 
 ///|
-let thai_dic : FixedArray[(String, Int)] = [
+let thai_dic : ReadOnlyArray[(String, Int)] = [
   ("ก", 0),
   ("ข", 1),
   ("ฃ", 2),
@@ -3905,7 +3905,7 @@ let thai_dic : FixedArray[(String, Int)] = [
 ]
 
 ///|
-let thai_embedding_dims : FixedArray[Int] = [74, 40]
+let thai_embedding_dims : ReadOnlyArray[Int] = [74, 40]
 
 ///|
 /// `embedding` of `Thai_codepoints_exclusive_model4_heavy`, little-endian f32 (11840 bytes, base64)
@@ -4077,7 +4077,7 @@ let thai_embedding_data : String =
   #|CbZ6wAH+iz9/vRTAQbkCwL/7XTwkC/pAM4Khvl4/Tz8=
 
 ///|
-let thai_fw_w_dims : FixedArray[Int] = [4, 27, 40]
+let thai_fw_w_dims : ReadOnlyArray[Int] = [4, 27, 40]
 
 ///|
 /// `fw_w` of `Thai_codepoints_exclusive_model4_heavy`, little-endian f32 (17280 bytes, base64)
@@ -4324,7 +4324,7 @@ let thai_fw_w_data : String =
   #|2KphP6rLg791oqe/NaSiv0QgGb1HuQe/9GmBPQrilUBQfro+PTOzPX6+tD87NvO/6+cQQFj6Hj+6ZZW9UYUjvhebKz+sOw6+
 
 ///|
-let thai_fw_u_dims : FixedArray[Int] = [4, 27, 27]
+let thai_fw_u_dims : ReadOnlyArray[Int] = [4, 27, 27]
 
 ///|
 /// `fw_u` of `Thai_codepoints_exclusive_model4_heavy`, little-endian f32 (11664 bytes, base64)
@@ -4493,7 +4493,7 @@ let thai_fw_u_data : String =
   #|7tm8QDZL2D/nZJM/ZbgnQIvhmD4QVLE/QSGnQGF0wr5EkT+/UDRiQITjI8AaRGQ+pCyQv97VrT+qeeY/C3gFwBxBDD/cLTzA
 
 ///|
-let thai_fw_b_dims : FixedArray[Int] = [4, 27]
+let thai_fw_b_dims : ReadOnlyArray[Int] = [4, 27]
 
 ///|
 /// `fw_b` of `Thai_codepoints_exclusive_model4_heavy`, little-endian f32 (432 bytes, base64)
@@ -4506,7 +4506,7 @@ let thai_fw_b_data : String =
   #|m5w7wH0evz+T3JA9bVvbPz+GrT/E1bi/qZkMwJPV2j7WSypAv/xVwIRB1MBCuIm/M7PgP91FIL/7nfo+MGoAv0lhMz94zew/
 
 ///|
-let thai_bw_w_dims : FixedArray[Int] = [4, 27, 40]
+let thai_bw_w_dims : ReadOnlyArray[Int] = [4, 27, 40]
 
 ///|
 /// `bw_w` of `Thai_codepoints_exclusive_model4_heavy`, little-endian f32 (17280 bytes, base64)
@@ -4753,7 +4753,7 @@ let thai_bw_w_data : String =
   #|yRgdvjIUIr+ZMUg+AlG0PrD9Nr6zGDS+ctFhvxiPcT7+SM28HMJiPnohpD2L3hm/0AtUPrj6zz6N3dU9/8fePiCwcz7W67u7
 
 ///|
-let thai_bw_u_dims : FixedArray[Int] = [4, 27, 27]
+let thai_bw_u_dims : ReadOnlyArray[Int] = [4, 27, 27]
 
 ///|
 /// `bw_u` of `Thai_codepoints_exclusive_model4_heavy`, little-endian f32 (11664 bytes, base64)
@@ -4922,7 +4922,7 @@ let thai_bw_u_data : String =
   #|VN2SQH0PMD9tbozAUOs4QGJbn8A6bSg8VUH4P646fkDDALu/UPCIvxd/uz3Z1IXAB3wXQAHwnLzno2jA0oqIv8eZT0A0aQpA
 
 ///|
-let thai_bw_b_dims : FixedArray[Int] = [4, 27]
+let thai_bw_b_dims : ReadOnlyArray[Int] = [4, 27]
 
 ///|
 /// `bw_b` of `Thai_codepoints_exclusive_model4_heavy`, little-endian f32 (432 bytes, base64)
@@ -4935,7 +4935,7 @@ let thai_bw_b_data : String =
   #|CWTVv5PxWsCr076/89OYwBM6Xb8gow7A/05swFMyVL+rjtq/bwhhwPVjCsDDDbG/6yHnv66saEDY7mLAKvsAwB8WT8DoanI/
 
 ///|
-let thai_time_w_dims : FixedArray[Int] = [2, 4, 27]
+let thai_time_w_dims : ReadOnlyArray[Int] = [2, 4, 27]
 
 ///|
 /// `time_w` of `Thai_codepoints_exclusive_model4_heavy`, little-endian f32 (864 bytes, base64)
@@ -4954,7 +4954,7 @@ let thai_time_w_data : String =
   #|9WTEv5UENb/7Tvk/cekBP18ZCj+tzrc/uWvfPoj6wb1Z1Q+/2+IJwGqHOz17+wI/iaRyPyxO8b4MSz1AhEKMP0qnRb4USRg/
 
 ///|
-let thai_time_b_dims : FixedArray[Int] = [4]
+let thai_time_b_dims : ReadOnlyArray[Int] = [4]
 
 ///|
 /// `time_b` of `Thai_codepoints_exclusive_model4_heavy`, little-endian f32 (16 bytes, base64)

@@ -3,11 +3,13 @@
 
 ///|
 /// `ARTICLES` (sorted: true).
-let articles : Array[String] = ["A", "AN", "An", "THE", "The", "a", "an", "the"]
+let articles : ReadOnlyArray[String] = [
+  "A", "AN", "An", "THE", "The", "a", "an", "the",
+]
 
 ///|
 /// `NEVER_CAPITALIZE` (sorted: true).
-let never_capitalize : Array[String] = [
+let never_capitalize : ReadOnlyArray[String] = [
   "A", "Above", "Across", "Against", "Among", "An", "And", "Around", "As", "At",
   "Behind", "Below", "Beneath", "Beside", "Between", "But", "By", "Down", "During",
   "For", "From", "Front", "In", "Inside", "Into", "M", "N", "Near", "Nor", "Of",
@@ -17,7 +19,7 @@ let never_capitalize : Array[String] = [
 
 ///|
 /// `ALWAYS_CAPITALIZE` (sorted: false).
-let always_capitalize : Array[String] = [
+let always_capitalize : ReadOnlyArray[String] = [
   "ababa", "abidjan", "addis", "afghanistan", "africa", "african", "ahmedabad", "aires",
   "albania", "alexandria", "algeria", "algiers", "america", "american", "amsterdam",
   "andorra", "angeles", "angola", "antigua", "april", "arab", "arabia", "argentina",
@@ -77,7 +79,7 @@ let always_capitalize : Array[String] = [
 
 ///|
 /// `NAME_PARTICLES` (sorted: true).
-let name_particles : Array[String] = [
+let name_particles : ReadOnlyArray[String] = [
   "'t", "a", "ab", "af", "al", "am", "and", "ap", "auf", "auf der", "bar", "ben",
   "bin", "d'", "da", "dai", "dal", "dall'", "dalla", "dalle", "de", "de", "de", "de la",
   "de las", "de los", "de'", "degli", "dei", "del", "dela", "dell'", "della", "delle",

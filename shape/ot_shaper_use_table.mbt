@@ -2,7 +2,7 @@
 // functions; the tables are generated into `ot_shaper_use_table_gen.mbt`).
 
 ///|
-fn use_b4(a : FixedArray[Int], i : Int) -> Int {
+fn use_b4(a : ReadOnlyArray[Int], i : Int) -> Int {
   (a[i >> 1] >> ((i & 1) << 2)) & 15
 }
 

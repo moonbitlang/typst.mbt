@@ -631,7 +631,7 @@ fn write_name(
     Some(p) => p.text_case
     None => None
   }
-  let first_affixes = [
+  let first_affixes : ReadOnlyArray[_] = [
     first_part.bind(p => p.affixes.prefix),
     first_part.bind(p => p.affixes.suffix),
   ]
@@ -643,7 +643,7 @@ fn write_name(
     Some(p) => p.text_case
     None => None
   }
-  let family_affixes = [
+  let family_affixes : ReadOnlyArray[_] = [
     family_part.bind(p => p.affixes.prefix),
     family_part.bind(p => p.affixes.suffix),
   ]

@@ -219,12 +219,12 @@ let shorthand_systems : Map[String, NamedNumeralSystem] = {
 }
 
 ///|
-let positional_arabic : Array[String] = [
+let positional_arabic : ReadOnlyArray[String] = [
   "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
 ]
 
 ///|
-let fixed_circled_arabic : Array[String] = [
+let fixed_circled_arabic : ReadOnlyArray[String] = [
   "⓪", "①", "②", "③", "④", "⑤", "⑥", "⑦", "⑧", "⑨", "⑩", "⑪",
   "⑫", "⑬", "⑭", "⑮", "⑯", "⑰", "⑱", "⑲", "⑳", "㉑", "㉒", "㉓",
   "㉔", "㉕", "㉖", "㉗", "㉘", "㉙", "㉚", "㉛", "㉜", "㉝", "㉞", "㉟",
@@ -233,24 +233,24 @@ let fixed_circled_arabic : Array[String] = [
 ]
 
 ///|
-let zeroless_double_circled_arabic : Array[String] = [
+let zeroless_double_circled_arabic : ReadOnlyArray[String] = [
   "⓵", "⓶", "⓷", "⓸", "⓹", "⓺", "⓻", "⓼", "⓽", "⓾",
 ]
 
 ///|
-let bijective_lower_latin : Array[String] = [
+let bijective_lower_latin : ReadOnlyArray[String] = [
   "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p",
   "q", "r", "s", "t", "u", "v", "w", "x", "y", "z",
 ]
 
 ///|
-let bijective_upper_latin : Array[String] = [
+let bijective_upper_latin : ReadOnlyArray[String] = [
   "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P",
   "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
 ]
 
 ///|
-let additive_lower_roman : Array[(String, UInt64)] = [
+let additive_lower_roman : ReadOnlyArray[(String, UInt64)] = [
   ("m̅", 1000000),
   ("d̅", 500000),
   ("c̅", 100000),
@@ -275,7 +275,7 @@ let additive_lower_roman : Array[(String, UInt64)] = [
 ]
 
 ///|
-let additive_upper_roman : Array[(String, UInt64)] = [
+let additive_upper_roman : ReadOnlyArray[(String, UInt64)] = [
   ("M̅", 1000000),
   ("D̅", 500000),
   ("C̅", 100000),
@@ -300,7 +300,7 @@ let additive_upper_roman : Array[(String, UInt64)] = [
 ]
 
 ///|
-let additive_lower_greek : Array[(String, UInt64)] = [
+let additive_lower_greek : ReadOnlyArray[(String, UInt64)] = [
   ("͵θ", 9000),
   ("͵η", 8000),
   ("͵ζ", 7000),
@@ -341,7 +341,7 @@ let additive_lower_greek : Array[(String, UInt64)] = [
 ]
 
 ///|
-let additive_upper_greek : Array[(String, UInt64)] = [
+let additive_upper_greek : ReadOnlyArray[(String, UInt64)] = [
   ("͵Θ", 9000),
   ("͵Η", 8000),
   ("͵Ζ", 7000),
@@ -382,7 +382,7 @@ let additive_upper_greek : Array[(String, UInt64)] = [
 ]
 
 ///|
-let additive_lower_armenian : Array[(String, UInt64)] = [
+let additive_lower_armenian : ReadOnlyArray[(String, UInt64)] = [
   ("ք", 9000),
   ("փ", 8000),
   ("ւ", 7000),
@@ -422,7 +422,7 @@ let additive_lower_armenian : Array[(String, UInt64)] = [
 ]
 
 ///|
-let additive_upper_armenian : Array[(String, UInt64)] = [
+let additive_upper_armenian : ReadOnlyArray[(String, UInt64)] = [
   ("Ք", 9000),
   ("Փ", 8000),
   ("Ւ", 7000),
@@ -462,7 +462,7 @@ let additive_upper_armenian : Array[(String, UInt64)] = [
 ]
 
 ///|
-let additive_hebrew : Array[(String, UInt64)] = [
+let additive_hebrew : ReadOnlyArray[(String, UInt64)] = [
   ("ת", 400),
   ("ש", 300),
   ("ר", 200),
@@ -493,7 +493,7 @@ let additive_hebrew : Array[(String, UInt64)] = [
 ]
 
 ///|
-let bijective_hiragana_aiueo : Array[String] = [
+let bijective_hiragana_aiueo : ReadOnlyArray[String] = [
   "あ", "い", "う", "え", "お", "か", "き", "く", "け", "こ", "さ", "し",
   "す", "せ", "そ", "た", "ち", "つ", "て", "と", "な", "に", "ぬ", "ね",
   "の", "は", "ひ", "ふ", "へ", "ほ", "ま", "み", "む", "め", "も", "や",
@@ -501,7 +501,7 @@ let bijective_hiragana_aiueo : Array[String] = [
 ]
 
 ///|
-let bijective_hiragana_iroha : Array[String] = [
+let bijective_hiragana_iroha : ReadOnlyArray[String] = [
   "い", "ろ", "は", "に", "ほ", "へ", "と", "ち", "り", "ぬ", "る", "を",
   "わ", "か", "よ", "た", "れ", "そ", "つ", "ね", "な", "ら", "む", "う",
   "ゐ", "の", "お", "く", "や", "ま", "け", "ふ", "こ", "え", "て", "あ",
@@ -509,7 +509,7 @@ let bijective_hiragana_iroha : Array[String] = [
 ]
 
 ///|
-let bijective_katakana_aiueo : Array[String] = [
+let bijective_katakana_aiueo : ReadOnlyArray[String] = [
   "ア", "イ", "ウ", "エ", "オ", "カ", "キ", "ク", "ケ", "コ", "サ", "シ",
   "ス", "セ", "ソ", "タ", "チ", "ツ", "テ", "ト", "ナ", "ニ", "ヌ", "ネ",
   "ノ", "ハ", "ヒ", "フ", "ヘ", "ホ", "マ", "ミ", "ム", "メ", "モ", "ヤ",
@@ -517,7 +517,7 @@ let bijective_katakana_aiueo : Array[String] = [
 ]
 
 ///|
-let bijective_katakana_iroha : Array[String] = [
+let bijective_katakana_iroha : ReadOnlyArray[String] = [
   "イ", "ロ", "ハ", "ニ", "ホ", "ヘ", "ト", "チ", "リ", "ヌ", "ル", "ヲ",
   "ワ", "カ", "ヨ", "タ", "レ", "ソ", "ツ", "ネ", "ナ", "ラ", "ム", "ウ",
   "ヰ", "ノ", "オ", "ク", "ヤ", "マ", "ケ", "フ", "コ", "エ", "テ", "ア",
@@ -525,58 +525,60 @@ let bijective_katakana_iroha : Array[String] = [
 ]
 
 ///|
-let bijective_korean_jamo : Array[String] = [
+let bijective_korean_jamo : ReadOnlyArray[String] = [
   "ㄱ", "ㄴ", "ㄷ", "ㄹ", "ㅁ", "ㅂ", "ㅅ", "ㅇ", "ㅈ", "ㅊ", "ㅋ", "ㅌ",
   "ㅍ", "ㅎ",
 ]
 
 ///|
-let bijective_korean_syllable : Array[String] = [
+let bijective_korean_syllable : ReadOnlyArray[String] = [
   "가", "나", "다", "라", "마", "바", "사", "아", "자", "차", "카", "타",
   "파", "하",
 ]
 
 ///|
-let positional_eastern_arabic : Array[String] = [
+let positional_eastern_arabic : ReadOnlyArray[String] = [
   "٠", "١", "٢", "٣", "٤", "٥", "٦", "٧", "٨", "٩",
 ]
 
 ///|
-let bijective_arabic_abjad : Array[String] = [
+let bijective_arabic_abjad : ReadOnlyArray[String] = [
   "أ", "ب", "ج", "د", "ه\u{200D}", "و", "ز", "ح", "ط", "ي", "ك", "ل",
   "م", "ن", "س", "ع", "ف", "ص", "ق", "ر", "ش", "ت", "ث", "خ", "ذ", "ض",
   "ظ", "غ",
 ]
 
 ///|
-let positional_persian : Array[String] = [
+let positional_persian : ReadOnlyArray[String] = [
   "۰", "۱", "۲", "۳", "۴", "۵", "۶", "۷", "۸", "۹",
 ]
 
 ///|
-let positional_devanagari : Array[String] = [
+let positional_devanagari : ReadOnlyArray[String] = [
   "०", "१", "२", "३", "४", "५", "६", "७", "८", "९",
 ]
 
 ///|
-let positional_tibetan : Array[String] = [
+let positional_tibetan : ReadOnlyArray[String] = [
   "༠", "༡", "༢", "༣", "༤", "༥", "༦", "༧", "༨", "༩",
 ]
 
 ///|
-let positional_bengali : Array[String] = [
+let positional_bengali : ReadOnlyArray[String] = [
   "০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯",
 ]
 
 ///|
-let bijective_bengali_letters : Array[String] = [
+let bijective_bengali_letters : ReadOnlyArray[String] = [
   "ক", "খ", "গ", "ঘ", "ঙ", "চ", "ছ", "জ", "ঝ", "ঞ", "ট", "ঠ",
   "ড", "ঢ", "ণ", "ত", "থ", "দ", "ধ", "ন", "প", "ফ", "ব", "ভ",
   "ম", "য", "র", "ল", "শ", "ষ", "স", "হ",
 ]
 
 ///|
-let symbolic_symbols : Array[String] = ["*", "†", "‡", "§", "¶", "‖"]
+let symbolic_symbols : ReadOnlyArray[String] = [
+  "*", "†", "‡", "§", "¶", "‖",
+]
 
 ///|
 /// Returns the underlying numeral system of a named numeral system.
@@ -634,19 +636,19 @@ pub(all) enum ChineseCase {
 /// A numeral system.
 pub(all) enum NumeralSystem {
   /// A positional numeral system with the given digits, from zero upwards.
-  Positional(Array[String])
+  Positional(ReadOnlyArray[String])
   /// A bijective numeral system with the given digits, from one upwards.
-  Bijective(Array[String])
+  Bijective(ReadOnlyArray[String])
   /// An additive numeral system with the given numerals and their weights,
   /// in decreasing order of weight.
-  Additive(Array[(String, UInt64)])
+  Additive(ReadOnlyArray[(String, UInt64)])
   /// A symbolic numeral system: symbols are repeated to count past their
   /// number.
-  Symbolic(Array[String])
+  Symbolic(ReadOnlyArray[String])
   /// A fixed set of symbols, from zero upwards.
-  Fixed(Array[String])
+  Fixed(ReadOnlyArray[String])
   /// A fixed set of symbols, from one upwards.
-  ZerolessFixed(Array[String])
+  ZerolessFixed(ReadOnlyArray[String])
   /// Chinese numerals.
   Chinese(ChineseVariant, ChineseCase)
 }
@@ -715,7 +717,7 @@ fn pow_u64(base : UInt64, exp : UInt) -> UInt64 {
 /// Writes the digits of `n` (of the given size) positionally.
 fn write_positional(
   f : StringBuilder,
-  digits : Array[String],
+  digits : ReadOnlyArray[String],
   n : UInt64,
   size : UInt,
 ) -> Unit {
@@ -765,7 +767,7 @@ fn represent_number(system : NumeralSystem, number : UInt64) -> String {
         }
       }
       // Greedily add any symbol that fits.
-      for pair in numerals {
+      for pair in numerals[:] {
         let (numeral, weight) = pair
         if weight == 0 || weight > n {
           continue

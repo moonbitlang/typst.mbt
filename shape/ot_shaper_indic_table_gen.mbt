@@ -3,7 +3,7 @@
 
 ///|
 /// `(SyllabicCategory, MatraCategory)` per code point of the covered ranges.
-let indic_table : FixedArray[(Int, Int)] = [
+let indic_table : ReadOnlyArray[(Int, Int)] = [
 
   // Basic Latin
 

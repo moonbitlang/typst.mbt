@@ -21,7 +21,7 @@ pub impl Default for FontStyle with fn default() {
 }
 
 ///|
-let font_style_names : Array[String] = ["normal", "italic", "oblique"]
+let font_style_names : ReadOnlyArray[String] = ["normal", "italic", "oblique"]
 
 ///|
 pub impl Reflect for FontStyle with fn input() {
@@ -115,7 +115,7 @@ pub let font_weight_extrabold : FontWeight = FontWeight(800)
 pub let font_weight_black : FontWeight = FontWeight(900)
 
 ///|
-let font_weight_names : Array[String] = [
+let font_weight_names : ReadOnlyArray[String] = [
   "thin", "extralight", "light", "regular", "medium", "semibold", "bold", "extrabold",
   "black",
 ]

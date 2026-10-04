@@ -90,6 +90,22 @@ def mbt_str(s):
     return "".join(out)
 
 
+SORTED_DOC = "\n/// Sorted by key in MoonBit `String` order (for binary search)."
+
+
+def sort_by_string_key(rows):
+    """Sorts `(key, value)` rows by key in MoonBit's `String::compare` order
+    (UTF-16 length first, then code units); keys must be unique."""
+
+    def key(r):
+        units = r[0].encode("utf-16-be")
+        return (len(units) // 2, units)
+
+    rows = sorted(rows, key=key)
+    assert len({k for k, _ in rows}) == len(rows)
+    return rows
+
+
 def u8_key(lit):
     m = re.match(r"^(\d+)_u8$", lit)
     assert m, lit
@@ -112,27 +128,39 @@ def gen_tables(hayro):
     )
 
     def code_table(fn_prefix, entries, doc):
-        arr = ["None"] * 256
+        # A static `ReadOnlyArray[String]` (an array of `String?` would be
+        # built at startup); `""` marks codes without an entry.
+        arr = ['""'] * 256
         for k, v in entries:
-            arr[u8_key(k)] = "Some(%s)" % mbt_str(rust_str(v))
-        out.append("///|\n/// %s\nlet %s_table : FixedArray[String?] = [\n" % (doc, fn_prefix))
+            name = rust_str(v)
+            assert name, k
+            arr[u8_key(k)] = mbt_str(name)
+        out.append(
+            "///|\n/// %s (`\"\"` = no entry)\nlet %s_table : ReadOnlyArray[String] = [\n"
+            % (doc, fn_prefix)
+        )
         for i in range(0, 256, 4):
             out.append("  " + ", ".join(arr[i : i + 4]) + ",\n")
         out.append("]\n\n")
         out.append(
-            "///|\nfn %s_get(code : Byte) -> String? {\n  %s_table[code.to_int()]\n}\n\n"
+            "///|\nfn %s_get(code : Byte) -> String? {\n"
+            "  let name = %s_table[code.to_int()]\n"
+            "  if name == \"\" {\n    None\n  } else {\n    Some(name)\n  }\n}\n\n"
             % (fn_prefix, fn_prefix)
         )
 
     def inverse_table(fn_prefix, entries, doc):
+        rows = [(rust_str(k), int(re.match(r"^(\d+)", v).group(1))) for k, v in entries]
         out.append(
-            "///|\n/// %s\nlet %s_inverse_table : Map[String, Byte] = {\n" % (doc, fn_prefix)
+            "///|\n/// %s\nlet %s_inverse_table : ReadOnlyArray[(String, Int)] = [\n"
+            % (doc + SORTED_DOC, fn_prefix)
         )
-        for k, v in entries:
-            out.append("  %s: %d,\n" % (mbt_str(rust_str(k)), int(re.match(r"^(\d+)", v).group(1))))
-        out.append("}\n\n")
+        for k, v in sort_by_string_key(rows):
+            out.append("  (%s, %d),\n" % (mbt_str(k), v))
+        out.append("]\n\n")
         out.append(
-            "///|\nfn %s_get_inverse(name : String) -> Byte? {\n  %s_inverse_table.get(name)\n}\n\n"
+            "///|\nfn %s_get_inverse(name : String) -> Byte? {\n"
+            "  sorted_table_get(%s_inverse_table, name).map(v => v.to_byte())\n}\n\n"
             % (fn_prefix, fn_prefix)
         )
 
@@ -152,31 +180,57 @@ def gen_tables(hayro):
             inverse_table(mod, maps[inv], "Inverse of the " + mod + " table.")
 
     maps = parse_maps(os.path.join(gen, "glyph_names.rs"))
-    out.append("///|\n/// The Adobe Glyph List.\nlet glyph_names_table : Map[String, String] = {\n")
-    for k, v in maps["GLYPH_NAMES"]:
-        out.append("  %s: %s,\n" % (mbt_str(rust_str(k)), mbt_str(rust_str(v))))
-    out.append("}\n\n")
+    rows = [(rust_str(k), rust_str(v)) for k, v in maps["GLYPH_NAMES"]]
     out.append(
-        "///|\nfn glyph_names_get(name : String) -> String? {\n  glyph_names_table.get(name)\n}\n\n"
+        "///|\n/// The Adobe Glyph List.%s\nlet glyph_names_table : ReadOnlyArray[(String, String)] = [\n"
+        % SORTED_DOC
     )
+    for k, v in sort_by_string_key(rows):
+        out.append("  (%s, %s),\n" % (mbt_str(k), mbt_str(v)))
+    out.append("]\n\n")
     out.append(
-        "///|\n/// The reverse Adobe Glyph List.\nlet reverse_glyph_names_table : Map[Char, String] = {\n"
+        "///|\nfn glyph_names_get(name : String) -> String? {\n"
+        "  sorted_table_get(glyph_names_table, name)\n}\n\n"
     )
-    for k, v in maps["REVERSE_GLYPH_NAMES"]:
-        out.append("  %s: %s,\n" % (mbt_char(rust_str(k)), mbt_str(rust_str(v))))
-    out.append("}\n\n")
+    rows = [(rust_str(k), rust_str(v)) for k, v in maps["REVERSE_GLYPH_NAMES"]]
+    assert all(len(k) == 1 for k, _ in rows)
+    rows.sort(key=lambda r: ord(r[0]))
+    assert len({k for k, _ in rows}) == len(rows)
+    out.append(
+        "///|\n/// The reverse Adobe Glyph List, sorted by character (for binary search).\n"
+        "let reverse_glyph_names_table : ReadOnlyArray[(Char, String)] = [\n"
+    )
+    for k, v in rows:
+        out.append("  (%s, %s),\n" % (mbt_char(k), mbt_str(v)))
+    out.append("]\n\n")
     out.append(
         "///|\nfn glyph_names_get_reverse(unicode : Char) -> String? {\n"
-        "  reverse_glyph_names_table.get(unicode)\n}\n\n"
+        "  let table = reverse_glyph_names_table\n"
+        "  match table.binary_search_by(e => e.0.compare(unicode)) {\n"
+        "    Ok(i) => Some(table[i].1)\n"
+        "    Err(_) => None\n"
+        "  }\n}\n\n"
     )
 
     maps = parse_maps(os.path.join(gen, "metrics.rs"))
     for static, entries in maps.items():
         name = "metrics_" + static.lower()
-        out.append("///|\nlet %s : Map[String, Float] = {\n" % name)
-        for k, v in entries:
-            out.append("  %s: %s,\n" % (mbt_str(rust_str(k)), f32_val(v)))
-        out.append("}\n\n")
+        rows = [(rust_str(k), f32_val(v)) for k, v in entries]
+        out.append("///|\n/// `%s`.%s\nlet %s : ReadOnlyArray[(String, Float)] = [\n" % (static, SORTED_DOC, name))
+        for k, v in sort_by_string_key(rows):
+            out.append("  (%s, %s),\n" % (mbt_str(k), v))
+        out.append("]\n\n")
+
+    out.append(
+        "///|\n/// Looks up `key` in a table sorted by key in `String` order (upstream's\n"
+        "/// `phf` maps: a sorted table is static data, a `Map` would be built at\n"
+        "/// startup).\n"
+        "fn[V] sorted_table_get(table : ReadOnlyArray[(String, V)], key : String) -> V? {\n"
+        "  match table.binary_search_by(e => e.0.compare(key)) {\n"
+        "    Ok(i) => Some(table[i].1)\n"
+        "    Err(_) => None\n"
+        "  }\n}\n\n"
+    )
 
     path = os.path.join(ROOT, "hayro/interpret/font_generated_gen.mbt")
     open(path, "w", encoding="utf-8").write("".join(out))

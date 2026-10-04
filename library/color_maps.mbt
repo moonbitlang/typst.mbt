@@ -2,7 +2,7 @@
 // `typst-library/src/visualize/color.rs`).
 
 ///|
-let color_map_turbo : FixedArray[UInt] = [
+let color_map_turbo : ReadOnlyArray[UInt] = [
   0x23171bffU, 0x271a28ffU, 0x2b1c33ffU, 0x2f1e3fffU, 0x32204affU, 0x362354ffU, 0x39255fffU,
   0x3b2768ffU, 0x3e2a72ffU, 0x402c7bffU, 0x422f83ffU, 0x44318bffU, 0x453493ffU, 0x46369bffU,
   0x4839a2ffU, 0x493ca8ffU, 0x493eafffU, 0x4a41b5ffU, 0x4a44bbffU, 0x4b46c0ffU, 0x4b49c5ffU,
@@ -43,7 +43,7 @@ let color_map_turbo : FixedArray[UInt] = [
 ]
 
 ///|
-let color_map_cividis : FixedArray[UInt] = [
+let color_map_cividis : ReadOnlyArray[UInt] = [
   0x002051ffU, 0x002153ffU, 0x002255ffU, 0x002356ffU, 0x002358ffU, 0x002459ffU, 0x00255affU,
   0x00255cffU, 0x00265dffU, 0x00275effU, 0x00275fffU, 0x002860ffU, 0x002961ffU, 0x002962ffU,
   0x002a63ffU, 0x002b64ffU, 0x012b65ffU, 0x022c65ffU, 0x032d66ffU, 0x042d67ffU, 0x052e67ffU,
@@ -84,7 +84,7 @@ let color_map_cividis : FixedArray[UInt] = [
 ]
 
 ///|
-let color_map_rainbow : FixedArray[UInt] = [
+let color_map_rainbow : ReadOnlyArray[UInt] = [
   0x7c4bbbffU, 0x7f4bbcffU, 0x824bbdffU, 0x854abeffU, 0x884abeffU, 0x8b4abfffU, 0x8e49bfffU,
   0x9149c0ffU, 0x9449c0ffU, 0x9748c0ffU, 0x9a48c1ffU, 0x9e48c1ffU, 0xa148c1ffU, 0xa447c1ffU,
   0xa747c1ffU, 0xaa47c0ffU, 0xad47c0ffU, 0xb046c0ffU, 0xb446bfffU, 0xb746bfffU, 0xba46beffU,
@@ -125,37 +125,37 @@ let color_map_rainbow : FixedArray[UInt] = [
 ]
 
 ///|
-let color_map_spectral : FixedArray[UInt] = [
+let color_map_spectral : ReadOnlyArray[UInt] = [
   0x9e0142ffU, 0xd53e4fffU, 0xf46d43ffU, 0xfdae61ffU, 0xfee08bffU, 0xffffbfffU, 0xe6f598ffU,
   0xabdda4ffU, 0x66c2a5ffU, 0x3288bdffU, 0x5e4fa2ffU,
 ]
 
 ///|
-let color_map_viridis : FixedArray[UInt] = [
+let color_map_viridis : ReadOnlyArray[UInt] = [
   0x440154ffU, 0x482777ffU, 0x3f4a8affU, 0x31678effU, 0x26838fffU, 0x1f9d8affU, 0x6cce5affU,
   0xb6de2bffU, 0xfee825ffU,
 ]
 
 ///|
-let color_map_inferno : FixedArray[UInt] = [
+let color_map_inferno : ReadOnlyArray[UInt] = [
   0x000004ffU, 0x170b3affU, 0x420a68ffU, 0x6b176effU, 0x932667ffU, 0xbb3654ffU, 0xdd513affU,
   0xf3771affU, 0xfca50affU, 0xf6d644ffU, 0xfcffa4ffU,
 ]
 
 ///|
-let color_map_magma : FixedArray[UInt] = [
+let color_map_magma : ReadOnlyArray[UInt] = [
   0x000004ffU, 0x140e37ffU, 0x3b0f70ffU, 0x641a80ffU, 0x8c2981ffU, 0xb63679ffU, 0xde4968ffU,
   0xf66f5cffU, 0xfe9f6dffU, 0xfece91ffU, 0xfcfdbfffU,
 ]
 
 ///|
-let color_map_plasma : FixedArray[UInt] = [
+let color_map_plasma : ReadOnlyArray[UInt] = [
   0x0d0887ffU, 0x42039dffU, 0x6a00a8ffU, 0x900da3ffU, 0xb12a90ffU, 0xcb4678ffU, 0xe16462ffU,
   0xf1834bffU, 0xfca636ffU, 0xfccd25ffU, 0xf0f921ffU,
 ]
 
 ///|
-let color_map_rocket : FixedArray[UInt] = [
+let color_map_rocket : ReadOnlyArray[UInt] = [
   0x3051affU, 0x4051affU, 0x5061bffU, 0x6071cffU, 0x7071dffU, 0x8081effU, 0xa091fffU,
   0xb0920ffU, 0xd0a21ffU, 0xe0b22ffU, 0x100b23ffU, 0x110c24ffU, 0x130d25ffU, 0x140e26ffU,
   0x160e27ffU, 0x170f28ffU, 0x180f29ffU, 0x1a102affU, 0x1b112bffU, 0x1d112cffU, 0x1e122dffU,
@@ -196,7 +196,7 @@ let color_map_rocket : FixedArray[UInt] = [
 ]
 
 ///|
-let color_map_mako : FixedArray[UInt] = [
+let color_map_mako : ReadOnlyArray[UInt] = [
   0xb0405ffU, 0xd0406ffU, 0xe0508ffU, 0xf0609ffU, 0x10060affU, 0x11070cffU, 0x12080dffU,
   0x13090fffU, 0x140910ffU, 0x150a12ffU, 0x160b13ffU, 0x170c15ffU, 0x180d16ffU, 0x190e18ffU,
   0x1a0e19ffU, 0x1b0f1affU, 0x1c101cffU, 0x1d111dffU, 0x1e111fffU, 0x1f1220ffU, 0x201322ffU,
@@ -237,7 +237,7 @@ let color_map_mako : FixedArray[UInt] = [
 ]
 
 ///|
-let color_map_coolwarm : FixedArray[UInt] = [
+let color_map_coolwarm : ReadOnlyArray[UInt] = [
   0x3b4cc0ffU, 0x3c4ec2ffU, 0x3d50c3ffU, 0x3e51c5ffU, 0x3f53c6ffU, 0x4055c8ffU, 0x4257c9ffU,
   0x4358cbffU, 0x445accffU, 0x455cceffU, 0x465ecfffU, 0x485fd1ffU, 0x4961d2ffU, 0x4a63d3ffU,
   0x4b64d5ffU, 0x4c66d6ffU, 0x4e68d8ffU, 0x4f69d9ffU, 0x506bdaffU, 0x516ddbffU, 0x536eddffU,
@@ -278,7 +278,7 @@ let color_map_coolwarm : FixedArray[UInt] = [
 ]
 
 ///|
-let color_map_vlag : FixedArray[UInt] = [
+let color_map_vlag : ReadOnlyArray[UInt] = [
   0x2369bdffU, 0x266abdffU, 0x296cbcffU, 0x2c6dbcffU, 0x2f6ebcffU, 0x316fbcffU, 0x3470bcffU,
   0x3671bcffU, 0x3972bcffU, 0x3b73bcffU, 0x3d74bcffU, 0x3f75bcffU, 0x4276bcffU, 0x4477bcffU,
   0x4678bcffU, 0x4879bcffU, 0x4a7bbcffU, 0x4c7cbcffU, 0x4e7dbcffU, 0x507ebcffU, 0x517fbcffU,
@@ -319,7 +319,7 @@ let color_map_vlag : FixedArray[UInt] = [
 ]
 
 ///|
-let color_map_icefire : FixedArray[UInt] = [
+let color_map_icefire : ReadOnlyArray[UInt] = [
   0xbde7dbffU, 0xbae5daffU, 0xb7e3d9ffU, 0xb4e1d9ffU, 0xb2dfd8ffU, 0xafddd7ffU, 0xacdbd7ffU,
   0xa9d9d6ffU, 0xa7d7d5ffU, 0xa4d5d5ffU, 0xa1d3d4ffU, 0x9ed1d3ffU, 0x9bcfd3ffU, 0x98cdd2ffU,
   0x95cbd2ffU, 0x93cad1ffU, 0x90c8d1ffU, 0x8dc6d0ffU, 0x8ac4d0ffU, 0x87c2cfffU, 0x84c1cfffU,
@@ -360,7 +360,7 @@ let color_map_icefire : FixedArray[UInt] = [
 ]
 
 ///|
-let color_map_flare : FixedArray[UInt] = [
+let color_map_flare : ReadOnlyArray[UInt] = [
   0xedb081ffU, 0xedaf80ffU, 0xedae7fffU, 0xedad7fffU, 0xedac7effU, 0xedab7effU, 0xecaa7dffU,
   0xeca97cffU, 0xeca87cffU, 0xeca77bffU, 0xeca67bffU, 0xeca57affU, 0xeca479ffU, 0xeca379ffU,
   0xeca278ffU, 0xeca178ffU, 0xeca077ffU, 0xec9f76ffU, 0xeb9e76ffU, 0xeb9d75ffU, 0xeb9c75ffU,
@@ -401,7 +401,7 @@ let color_map_flare : FixedArray[UInt] = [
 ]
 
 ///|
-let color_map_crest : FixedArray[UInt] = [
+let color_map_crest : ReadOnlyArray[UInt] = [
   0xa5cd90ffU, 0xa4cc90ffU, 0xa3cc91ffU, 0xa2cb91ffU, 0xa0cb91ffU, 0x9fca91ffU, 0x9eca91ffU,
   0x9dc991ffU, 0x9cc891ffU, 0x9bc891ffU, 0x9ac791ffU, 0x99c791ffU, 0x98c691ffU, 0x96c691ffU,
   0x95c591ffU, 0x94c591ffU, 0x93c491ffU, 0x92c491ffU, 0x91c391ffU, 0x90c391ffU, 0x8fc291ffU,

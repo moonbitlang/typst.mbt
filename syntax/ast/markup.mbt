@@ -132,7 +132,7 @@ fn lookup_shorthand(
   list : ReadOnlyArray[(String, Char)],
   text : String,
 ) -> Char {
-  for entry in list {
+  for entry in list[:] {
     if entry.0 == text {
       return entry.1
     }

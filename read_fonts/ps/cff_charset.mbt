@@ -342,7 +342,7 @@ fn range_iter(
 
 ///|
 /// See "Expert" charset at <https://adobe-type-tools.github.io/font-tech-notes/pdfs/5176.CFF.pdf#page=47>
-let expert_charset : FixedArray[Int] = [
+let expert_charset : ReadOnlyArray[Int] = [
   0, 1, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 13, 14, 15, 99, 239, 240,
   241, 242, 243, 244, 245, 246, 247, 248, 27, 28, 249, 250, 251, 252, 253, 254, 255,
   256, 257, 258, 259, 260, 261, 262, 263, 264, 265, 266, 109, 110, 267, 268, 269,
@@ -358,7 +358,7 @@ let expert_charset : FixedArray[Int] = [
 
 ///|
 /// See "Expert Subset" charset at <https://adobe-type-tools.github.io/font-tech-notes/pdfs/5176.CFF.pdf#page=49>
-let expert_subset_charset : FixedArray[Int] = [
+let expert_subset_charset : ReadOnlyArray[Int] = [
   0, 1, 231, 232, 235, 236, 237, 238, 13, 14, 15, 99, 239, 240, 241, 242, 243, 244,
   245, 246, 247, 248, 27, 28, 249, 250, 251, 253, 254, 255, 256, 257, 258, 259, 260,
   261, 262, 263, 264, 265, 266, 109, 110, 267, 268, 269, 270, 272, 300, 301, 302,

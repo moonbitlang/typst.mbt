@@ -398,7 +398,7 @@ pub fn SyntaxSet::find_syntax_by_name(Self, String) -> SyntaxReference?
 pub fn SyntaxSet::find_syntax_by_scope(Self, Scope) -> SyntaxReference?
 pub fn SyntaxSet::find_syntax_by_token(Self, String) -> SyntaxReference?
 pub fn SyntaxSet::find_syntax_plain_text(Self) -> SyntaxReference
-pub fn SyntaxSet::from_compact(String, FixedArray[String]) -> Self
+pub fn SyntaxSet::from_compact(String, ReadOnlyArray[String]) -> Self
 pub fn SyntaxSet::from_lazy_syntaxes(Array[SyntaxReference]) -> Self
 pub fn SyntaxSet::get_context(Self, ContextId) -> Context raise ParsingError
 pub fn SyntaxSet::new() -> Self

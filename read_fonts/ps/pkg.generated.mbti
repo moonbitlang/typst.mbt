@@ -22,7 +22,7 @@ pub fn evaluate(&CharstringContext, BytesView, &CommandSink) -> @font_types.Fixe
 
 pub fn ok_entries(BytesView) -> Array[Entry]
 
-pub let standard_strings : FixedArray[String]
+pub let standard_strings : ReadOnlyArray[String]
 
 // Errors
 pub(all) suberror PsError {

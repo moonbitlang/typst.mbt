@@ -100,7 +100,7 @@ let quad_recursive_limit : Int = 3
 // quads with extreme widths (e.g. (0,1) (1,6) (0,3) width=5e7) recurse to point of failure
 // largest seen for normal cubics: 5, 26
 // largest seen for normal quads: 11
-let recursive_limits : Array[Int] = [5 * 3, 26 * 3, 11 * 3, 11 * 3] // 3x limits seen in practice
+let recursive_limits : ReadOnlyArray[Int] = [5 * 3, 26 * 3, 11 * 3, 11 * 3] // 3x limits seen in practice
 
 ///|
 priv enum ReductionType {
@@ -404,7 +404,7 @@ fn PathStroker::line_to(
 
 ///|
 fn PathStroker::quad_to(self : PathStroker, p1 : Point, p2 : Point) -> Unit {
-  let quad = [self.prev_pt, p1, p2]
+  let quad : ReadOnlyArray[_] = [self.prev_pt, p1, p2]
   let (reduction, reduction_type) = check_quad_linear(quad[:])
   if reduction_type == Point {
     // If the stroke consists of a moveTo followed by a degenerate curve, treat it
@@ -465,7 +465,7 @@ fn PathStroker::cubic_to(
   pt2 : Point,
   pt3 : Point,
 ) -> Unit {
-  let cubic = [self.prev_pt, pt1, pt2, pt3]
+  let cubic : ReadOnlyArray[_] = [self.prev_pt, pt1, pt2, pt3]
   let reduction = Array::make(3, Point::zero())
   let (reduction_type, tangent_pt) = check_cubic_linear(cubic[:], reduction)
   if reduction_type == Point {

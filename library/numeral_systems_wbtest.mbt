@@ -64,7 +64,7 @@ test "fixed systems" {
   let symbols = ["a", "b", "c", "d", "e", "f", "g"]
   for n in 0..<symbols.length() {
     for i in 0..<n {
-      let sub = symbols[0:n].to_array()
+      let sub = ReadOnlyArray::from_array(symbols[0:n])
       assert_eq(
         NumeralSystem::Fixed(sub).represent(i.to_uint64()),
         Ok(symbols[i]),

@@ -2,7 +2,7 @@
 
 ///|
 // Full list can be found here: https://www.w3.org/TR/SVG11/feature.html
-let features : Array[String] = [
+let features : ReadOnlyArray[String] = [
   "http://www.w3.org/TR/SVG11/feature#SVGDOM-static", "http://www.w3.org/TR/SVG11/feature#SVG-static",
   "http://www.w3.org/TR/SVG11/feature#CoreAttribute", // no xml:base and xml:lang
    "http://www.w3.org/TR/SVG11/feature#Structure", "http://www.w3.org/TR/SVG11/feature#BasicStructure",

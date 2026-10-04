@@ -3,7 +3,7 @@
 
 ///|
 /// Joining types (`hb_arabic_joining_type_t` values) of the covered ranges.
-let joining_table : FixedArray[Int] = [
+let joining_table : ReadOnlyArray[Int] = [
   0, 0, 0, 0, 0, 0, 8, 8, 0, 8, 8, 0, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
   8, 8, 8, 8, 8, 3, 0, 2, 2, 2, 2, 3, 2, 3, 2, 3, 3, 3, 3, 3, 2, 2, 2, 2, 3, 3, 3,
   3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 3, 3, 8, 8, 8, 8, 8, 8,

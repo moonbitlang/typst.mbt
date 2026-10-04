@@ -38,7 +38,7 @@ fn valued(f: impl Fn(char) -> Option<u32>) -> Vec<(u32, u32, u32)> {
 }
 
 fn emit_set(out: &mut String, name: &str, doc: &str, r: &[(u32, u32)]) {
-    writeln!(out, "///|\n/// {doc}\nlet {name} : FixedArray[Int] = [").unwrap();
+    writeln!(out, "///|\n/// {doc}\nlet {name} : ReadOnlyArray[Int] = [").unwrap();
     for chunk in r.chunks(6) {
         out.push_str("  ");
         for (a, b) in chunk {
@@ -50,7 +50,7 @@ fn emit_set(out: &mut String, name: &str, doc: &str, r: &[(u32, u32)]) {
 }
 
 fn emit_valued(out: &mut String, name: &str, doc: &str, r: &[(u32, u32, u32)]) {
-    writeln!(out, "///|\n/// {doc}\nlet {name} : FixedArray[Int] = [").unwrap();
+    writeln!(out, "///|\n/// {doc}\nlet {name} : ReadOnlyArray[Int] = [").unwrap();
     for chunk in r.chunks(4) {
         out.push_str("  ");
         for (a, b, v) in chunk {
@@ -62,7 +62,7 @@ fn emit_valued(out: &mut String, name: &str, doc: &str, r: &[(u32, u32, u32)]) {
 }
 
 fn emit_names(out: &mut String, name: &str, names: &[String]) {
-    writeln!(out, "///|\nlet {name} : FixedArray[String] = [").unwrap();
+    writeln!(out, "///|\nlet {name} : ReadOnlyArray[String] = [").unwrap();
     for n in names {
         writeln!(out, "  {n:?},").unwrap();
     }

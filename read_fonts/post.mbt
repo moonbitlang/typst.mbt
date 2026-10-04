@@ -117,7 +117,7 @@ pub fn Post::string_data(self : Post) -> Array[Result[String, ReadError]]? {
 
 ///|
 /// The 258 standard Macintosh glyph names.
-pub let default_glyph_names : FixedArray[String] = [
+pub let default_glyph_names : ReadOnlyArray[String] = [
   ".notdef", ".null", "nonmarkingreturn", "space", "exclam", "quotedbl", "numbersign",
   "dollar", "percent", "ampersand", "quotesingle", "parenleft", "parenright", "asterisk",
   "plus", "comma", "hyphen", "period", "slash", "zero", "one", "two", "three", "four",

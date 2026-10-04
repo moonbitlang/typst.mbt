@@ -58,7 +58,7 @@ def main():
             is_sorted = all(enc[i] <= enc[i + 1] for i in range(len(enc) - 1))
             out.append("///|")
             out.append(f"/// `{name}` (sorted: {str(is_sorted).lower()}).")
-            out.append(f"let {name.lower()} : Array[String] = [")
+            out.append(f"let {name.lower()} : ReadOnlyArray[String] = [")
             for s in items:
                 out.append(f"  {mbt_lit(s)},")
             out.append("]")

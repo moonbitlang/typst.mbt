@@ -96,7 +96,7 @@ priv struct Config {
 }
 
 ///|
-let configuration_table : FixedArray[Config] = [
+let configuration_table : ReadOnlyArray[Config] = [
   { good_length: 0, max_lazy: 0, nice_length: 0, max_chain: 0, }, // 0 store only
   { good_length: 0, max_lazy: 0, nice_length: 0, max_chain: 0, }, // 1
   { good_length: 4, max_lazy: 4, nice_length: 8, max_chain: 4, }, // 2 max speed, no lazy matches

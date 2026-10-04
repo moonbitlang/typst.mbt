@@ -260,7 +260,7 @@ priv enum MaybeRef {
 }
 
 ///|
-let abstract_heap_types : FixedArray[AbstractHeapType] = [
+let abstract_heap_types : ReadOnlyArray[AbstractHeapType] = [
   Func,
   Extern,
   Any,

@@ -55,12 +55,12 @@ let b_hd_pred : Int = 8
 let b_hu_pred : Int = 9
 
 ///|
-let segment_id_tree : Array[Int] = [2, 4, -0, -1, -2, -3]
+let segment_id_tree : ReadOnlyArray[Int] = [2, 4, -0, -1, -2, -3]
 
 ///|
 /// Section 11.2: tree for determining the keyframe luma intra prediction
 /// modes.
-let keyframe_ymode_tree : Array[Int] = [
+let keyframe_ymode_tree : ReadOnlyArray[Int] = [
   -b_pred,
   2,
   4,
@@ -72,11 +72,11 @@ let keyframe_ymode_tree : Array[Int] = [
 ]
 
 ///|
-let keyframe_ymode_probs : Array[Int] = [145, 156, 163, 128]
+let keyframe_ymode_probs : ReadOnlyArray[Int] = [145, 156, 163, 128]
 
 ///|
 /// Tree for determining the keyframe B_PRED mode.
-let keyframe_bpred_mode_tree : Array[Int] = [
+let keyframe_bpred_mode_tree : ReadOnlyArray[Int] = [
   -b_dc_pred,
   2,
   -b_tm_pred,
@@ -99,7 +99,7 @@ let keyframe_bpred_mode_tree : Array[Int] = [
 
 ///|
 /// Section 11.4: tree for determining macroblock the chroma mode.
-let keyframe_uv_mode_tree : Array[Int] = [
+let keyframe_uv_mode_tree : ReadOnlyArray[Int] = [
   -dc_pred,
   2,
   -v_pred,
@@ -109,7 +109,7 @@ let keyframe_uv_mode_tree : Array[Int] = [
 ]
 
 ///|
-let keyframe_uv_mode_probs : Array[Int] = [142, 114, 183]
+let keyframe_uv_mode_probs : ReadOnlyArray[Int] = [142, 114, 183]
 
 // DCT tokens.
 
@@ -129,19 +129,23 @@ let dct_cat6 : Int = 10
 let dct_eob : Int = 11
 
 ///|
-let dct_token_tree : Array[Int] = [
+let dct_token_tree : ReadOnlyArray[Int] = [
   -11, 2, -0, 4, -1, 6, 8, 12, -2, 10, -3, -4, 14, 16, -5, -6, 18, 20, -7, -8, -9,
   -10,
 ]
 
 ///|
-let dct_cat_base : Array[Int] = [5, 7, 11, 19, 35, 67]
+let dct_cat_base : ReadOnlyArray[Int] = [5, 7, 11, 19, 35, 67]
 
 ///|
-let coeff_bands : Array[Int] = [0, 1, 2, 3, 6, 4, 5, 6, 6, 6, 6, 6, 6, 6, 6, 7]
+let coeff_bands : ReadOnlyArray[Int] = [
+  0, 1, 2, 3, 6, 4, 5, 6, 6, 6, 6, 6, 6, 6, 6, 7,
+]
 
 ///|
-let zigzag : Array[Int] = [0, 1, 4, 8, 5, 2, 3, 6, 9, 12, 13, 10, 7, 11, 14, 15]
+let zigzag : ReadOnlyArray[Int] = [
+  0, 1, 4, 8, 5, 2, 3, 6, 9, 12, 13, 10, 7, 11, 14, 15,
+]
 
 ///|
 let keyframe_ymode_nodes : FixedArray[TreeNode] = tree_nodes_from(
@@ -1618,7 +1622,7 @@ fn predict_bvepred(
 ) -> Unit {
   let p = topleft_pixel(a, x0, y0, stride)
   let t = top_pixels(a, x0, y0, stride)
-  let avg = [
+  let avg : ReadOnlyArray[_] = [
     avg3(p, t[0], t[1]),
     avg3(t[0], t[1], t[2]),
     avg3(t[1], t[2], t[3]),
@@ -1665,7 +1669,7 @@ fn predict_bldpred(
   stride : Int,
 ) -> Unit {
   let t = top_pixels(a, x0, y0, stride)
-  let avgs = [
+  let avgs : ReadOnlyArray[_] = [
     avg3(t[0], t[1], t[2]),
     avg3(t[1], t[2], t[3]),
     avg3(t[2], t[3], t[4]),
@@ -1691,7 +1695,7 @@ fn predict_brdpred(
   stride : Int,
 ) -> Unit {
   let e = edge_pixels(a, x0, y0, stride)
-  let avgs = [
+  let avgs : ReadOnlyArray[_] = [
     avg3(e[0], e[1], e[2]),
     avg3(e[1], e[2], e[3]),
     avg3(e[2], e[3], e[4]),

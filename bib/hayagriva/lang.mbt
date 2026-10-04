@@ -739,7 +739,7 @@ pub fn is_cjk(c : Char) -> Bool {
 ///|
 /// Rust's `<[&str]>::binary_search(&x).is_ok()`, replicating the exact probe
 /// sequence of the standard library (the word lists are not all sorted).
-pub fn rust_binary_search(list : Array[String], x : String) -> Bool {
+pub fn rust_binary_search(list : ReadOnlyArray[String], x : String) -> Bool {
   let mut size = list.length()
   if size == 0 {
     return false

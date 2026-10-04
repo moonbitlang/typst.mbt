@@ -438,7 +438,7 @@ pub(all) enum Parity {
 } derive(Eq, Hash, Debug)
 
 ///|
-let parity_names : Array[String] = ["even", "odd"]
+let parity_names : ReadOnlyArray[String] = ["even", "odd"]
 
 ///|
 pub impl Reflect for Parity with fn input() {
@@ -515,7 +515,7 @@ pub fn Paper::a4() -> Paper {
 ///|
 /// The paper with the given name (as matched by the cast).
 pub fn Paper::from_name(name : String) -> Paper? {
-  for p in papers {
+  for p in papers[:] {
     if p.0 == name {
       return Some({ name: p.0, width: p.1, height: p.2, })
     }
@@ -559,7 +559,7 @@ pub impl FromValue for Paper with fn from_value(v) {
 // - https://en.wikipedia.org/wiki/Paper_size
 // - https://www.theedkins.co.uk/jo/units/oldunits/print.htm
 // - https://vintagepaper.co/blogs/news/traditional-paper-sizes
-let papers : Array[(String, Double, Double)] = [
+let papers : ReadOnlyArray[(String, Double, Double)] = [
   // ISO 216 A Series
   ("a0", 841.0, 1189.0),
   ("a1", 594.0, 841.0),

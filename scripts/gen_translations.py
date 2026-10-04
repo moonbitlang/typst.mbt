@@ -42,7 +42,7 @@ def main():
         "// typst-library. Do not edit.\n\n",
         "///|\n/// The translation bundles (upstream `TRANSLATIONS`, parsed like\n"
         "/// `parse_language_bundle`).\n",
-        "let translations : Array[(String, Array[(String, String)])] = [\n",
+        "let translations : ReadOnlyArray[(String, ReadOnlyArray[(String, String)])] = [\n",
     ]
     for name in names:
         text = open(os.path.join(LIB, "translations", name + ".txt"), encoding="utf-8").read()

@@ -274,7 +274,7 @@ fn solve_itp_bracket(
 // <https://pomax.github.io/bezierinfo/legendre-gauss.html>
 
 ///|
-let gauss_legendre_coeffs_8 : FixedArray[(Double, Double)] = [
+let gauss_legendre_coeffs_8 : ReadOnlyArray[(Double, Double)] = [
   (0.3626837833783620, -0.1834346424956498),
   (0.3626837833783620, 0.1834346424956498),
   (0.3137066458778873, -0.5255324099163290),
@@ -286,7 +286,7 @@ let gauss_legendre_coeffs_8 : FixedArray[(Double, Double)] = [
 ]
 
 ///|
-let gauss_legendre_coeffs_8_half : FixedArray[(Double, Double)] = [
+let gauss_legendre_coeffs_8_half : ReadOnlyArray[(Double, Double)] = [
   (0.3626837833783620, 0.1834346424956498),
   (0.3137066458778873, 0.5255324099163290),
   (0.2223810344533745, 0.7966664774136267),
@@ -295,7 +295,7 @@ let gauss_legendre_coeffs_8_half : FixedArray[(Double, Double)] = [
 
 ///|
 // Just the positive x_i values.
-let gauss_legendre_coeffs_16_half : FixedArray[(Double, Double)] = [
+let gauss_legendre_coeffs_16_half : ReadOnlyArray[(Double, Double)] = [
   (0.1894506104550685, 0.0950125098376374),
   (0.1826034150449236, 0.2816035507792589),
   (0.1691565193950025, 0.4580167776572274),
@@ -307,7 +307,7 @@ let gauss_legendre_coeffs_16_half : FixedArray[(Double, Double)] = [
 ]
 
 ///|
-let gauss_legendre_coeffs_24_half : FixedArray[(Double, Double)] = [
+let gauss_legendre_coeffs_24_half : ReadOnlyArray[(Double, Double)] = [
   (0.1279381953467522, 0.0640568928626056),
   (0.1258374563468283, 0.1911188674736163),
   (0.1216704729278034, 0.3150426796961634),

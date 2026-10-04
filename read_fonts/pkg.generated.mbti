@@ -55,7 +55,7 @@ pub const WE_HAVE_INSTRUCTIONS : Int = 0x0100
 
 pub fn compute_checksum(BytesView) -> UInt
 
-pub let default_glyph_names : FixedArray[String]
+pub let default_glyph_names : ReadOnlyArray[String]
 
 pub fn english_or_first(Array[LocalizedString]) -> LocalizedString?
 

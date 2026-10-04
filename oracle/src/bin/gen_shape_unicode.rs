@@ -37,7 +37,7 @@ fn valued(mut f: impl FnMut(char) -> Option<u32>) -> Vec<(u32, u32, u32)> {
 }
 
 fn emit_valued(out: &mut String, name: &str, doc: &str, r: &[(u32, u32, u32)]) {
-    writeln!(out, "///|\n/// {doc}\nlet {name} : FixedArray[Int] = [").unwrap();
+    writeln!(out, "///|\n/// {doc}\nlet {name} : ReadOnlyArray[Int] = [").unwrap();
     for chunk in r.chunks(4) {
         out.push_str("  ");
         for (a, b, v) in chunk {
@@ -162,7 +162,7 @@ fn main() {
         "Script (unicode-script) as rustybuzz maps it; value indexes `rb_script_tags`. Missing = Zzzz.",
         &script_values,
     );
-    writeln!(out, "///|\nlet rb_script_tags : FixedArray[String] = [").unwrap();
+    writeln!(out, "///|\nlet rb_script_tags : ReadOnlyArray[String] = [").unwrap();
     for t in &tags {
         writeln!(out, "  {t:?},").unwrap();
     }
@@ -186,7 +186,7 @@ fn main() {
     }
     writeln!(
         out,
-        "///|\n/// Bidi_Mirroring_Glyph (unicode-bidi-mirroring) as sorted `[c, mirrored]` pairs.\nlet rb_mirroring_table : FixedArray[Int] = [\n{pairs}]"
+        "///|\n/// Bidi_Mirroring_Glyph (unicode-bidi-mirroring) as sorted `[c, mirrored]` pairs.\nlet rb_mirroring_table : ReadOnlyArray[Int] = [\n{pairs}]"
     )
     .unwrap();
 
