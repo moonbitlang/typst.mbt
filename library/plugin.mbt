@@ -73,17 +73,13 @@ pub fn PluginFunc::transition(
 
 ///|
 /// The results of memoized plugin function calls and transitions (upstream
-/// `#[comemo::memoize]`), keyed by the hash of the function and arguments.
-let plugin_call_cache : Map[
-  U128,
-  Array[(PluginFunc, Array[Bytes], Result[Bytes, HintedError])],
-] = {}
+/// `#[comemo::memoize]`), keyed by the 128-bit hash of the function and
+/// arguments. Like comemo, only the hash of the inputs is kept (not the
+/// arguments themselves).
+let plugin_call_cache : Map[U128, Result[Bytes, HintedError]] = {}
 
 ///|
-let plugin_transition_cache : Map[
-  U128,
-  Array[(PluginFunc, Array[Bytes], Result[Module, HintedError])],
-] = {}
+let plugin_transition_cache : Map[U128, Result[Module, HintedError]] = {}
 
 ///|
 /// The modules of memoized plugin loads (upstream `#[comemo::memoize]` on
@@ -93,7 +89,7 @@ let plugin_module_cache : Map[U128, Array[(Bytes, Result[Module, HintedError])]]
 ///|
 /// Memoizes `f` for the plugin function `func` and its arguments.
 fn[R] memoized(
-  cache : Map[U128, Array[(PluginFunc, Array[Bytes], Result[R, HintedError])]],
+  cache : Map[U128, Result[R, HintedError]],
   func : PluginFunc,
   args : Array[Bytes],
   f : () -> R raise HintedError,
@@ -106,28 +102,18 @@ fn[R] memoized(
     state.write_bytes(arg)
   }
   let key = state.finish128()
-  let entries = match cache.get(key) {
-    Some(entries) => entries
+  let result = match cache.get(key) {
+    Some(result) => result
     None => {
-      let entries = []
-      cache.set(key, entries)
-      entries
-    }
-  }
-  for entry in entries {
-    if entry.0 == func && entry.1 == args {
-      match entry.2 {
-        Ok(v) => return v
-        Err(e) => raise e
+      let result : Result[R, HintedError] = try f() catch {
+        e => Err(e)
+      } noraise {
+        v => Ok(v)
       }
+      cache.set(key, result)
+      result
     }
   }
-  let result : Result[R, HintedError] = try f() catch {
-    e => Err(e)
-  } noraise {
-    v => Ok(v)
-  }
-  entries.push((func, args, result))
   match result {
     Ok(v) => v
     Err(e) => raise e

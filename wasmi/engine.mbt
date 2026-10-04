@@ -784,7 +784,10 @@ pub fn Engine::weak(self : Engine) -> EngineWeak {
 
 ///|
 /// Returns the [`Config`] of the referenced [`Engine`].
-pub fn EngineWeak::config(self : EngineWeak) -> Config {
+///
+/// Note: package-private since the [`Config`] is shared with the [`Engine`]
+/// ([`Engine::config`] returns a copy).
+fn EngineWeak::config(self : EngineWeak) -> Config {
   self.config
 }
 

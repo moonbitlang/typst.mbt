@@ -294,7 +294,6 @@ pub fn EngineFuncSpan::position(Self, EngineFunc) -> Int?
 pub struct EngineWeak {
   // private fields
 }
-pub fn EngineWeak::config(Self) -> Config
 pub fn EngineWeak::resolve_func_type(Self, DedupFuncType) -> @core.FuncType
 
 pub(all) struct EvalContext {

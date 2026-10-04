@@ -191,12 +191,21 @@ pub fn[T] Linker::get(
 /// # Errors
 ///
 /// If there already is a definition for any of the exported items for this [`Linker`].
+///
+/// # Panics
+///
+/// If the [`Engine`] of this [`Linker`] and the [`Engine`] of `store` are not the same.
 pub fn[T] Linker::instance(
   self : Linker[T],
   store : Store[T],
   module_name : String,
   instance : Instance,
 ) -> Linker[T] raise WasmiError {
+  if !Engine::same(store.inner.engine, self.engine) {
+    abort(
+      "assertion failed: Engine::same(store.as_context().store.engine(), self.engine())",
+    )
+  }
   for export in instance.exports(store) {
     let (name, item) = export
     self.insert(module_name, name, Extern(item))
@@ -217,6 +226,11 @@ pub fn[T] Linker::instantiate_and_start(
   store : Store[T],
   module : Module,
 ) -> Instance raise WasmiError {
+  if !Engine::same(self.engine, store.inner.engine) {
+    abort(
+      "assertion failed: Engine::same(self.engine(), context.as_context().engine())",
+    )
+  }
   let externals = []
   for imp in module.imports() {
     externals.push(self.process_import(store, imp))
