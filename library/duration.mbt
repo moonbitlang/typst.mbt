@@ -109,7 +109,9 @@ fn impl_duration_weeks(self_ : Duration) -> Double raise HintedError {
 /// Upstream `Repr for Duration`.
 pub fn Duration::repr(self : Duration) -> String {
   let parts = self.decompose()
-  let names = ["weeks", "days", "hours", "minutes", "seconds"]
+  let names : ReadOnlyArray[_] = [
+    "weeks", "days", "hours", "minutes", "seconds",
+  ]
   let vec = []
   for i, v in parts {
     if v != 0L {

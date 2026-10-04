@@ -38,7 +38,7 @@ fn ascii_85_decode_into(data : BytesView, out : Array[Byte]) -> Unit? {
         return None
       }
     }
-    let bytes = [
+    let bytes : ReadOnlyArray[_] = [
       (value >> 24).to_byte(),
       (value >> 16).to_byte(),
       (value >> 8).to_byte(),

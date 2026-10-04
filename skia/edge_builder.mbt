@@ -115,7 +115,7 @@ fn BasicEdgeBuilder::build(
         match edge {
           LineTo(p0, p1) => self.push_line(p0, p1)
           QuadTo(p0, p1, p2) => {
-            let points = [p0, p1, p2]
+            let points : ReadOnlyArray[_] = [p0, p1, p2]
             let mono_x = Array::make(5, @path.Point::zero())
             let n = chop_quad_at_y_extrema(points[:], mono_x)
             for i in 0..<=n {
@@ -123,7 +123,7 @@ fn BasicEdgeBuilder::build(
             }
           }
           CubicTo(p0, p1, p2, p3) => {
-            let points = [p0, p1, p2, p3]
+            let points : ReadOnlyArray[_] = [p0, p1, p2, p3]
             let mono_y = Array::make(10, @path.Point::zero())
             let n = chop_cubic_at_y_extrema(points[:], mono_y)
             for i in 0..<=n {

@@ -1622,7 +1622,7 @@ fn predict_bvepred(
 ) -> Unit {
   let p = topleft_pixel(a, x0, y0, stride)
   let t = top_pixels(a, x0, y0, stride)
-  let avg = [
+  let avg : ReadOnlyArray[_] = [
     avg3(p, t[0], t[1]),
     avg3(t[0], t[1], t[2]),
     avg3(t[1], t[2], t[3]),
@@ -1669,7 +1669,7 @@ fn predict_bldpred(
   stride : Int,
 ) -> Unit {
   let t = top_pixels(a, x0, y0, stride)
-  let avgs = [
+  let avgs : ReadOnlyArray[_] = [
     avg3(t[0], t[1], t[2]),
     avg3(t[1], t[2], t[3]),
     avg3(t[2], t[3], t[4]),
@@ -1695,7 +1695,7 @@ fn predict_brdpred(
   stride : Int,
 ) -> Unit {
   let e = edge_pixels(a, x0, y0, stride)
-  let avgs = [
+  let avgs : ReadOnlyArray[_] = [
     avg3(e[0], e[1], e[2]),
     avg3(e[1], e[2], e[3]),
     avg3(e[2], e[3], e[4]),

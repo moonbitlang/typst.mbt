@@ -269,7 +269,7 @@ fn cmyk_build_grid() -> FixedArray[Int] {
     for c in 0..<s {
       for mm in 0..<s {
         for y in 0..<s {
-          let src = [
+          let src : ReadOnlyArray[_] = [
             Float::from_int(c) * recpeq,
             Float::from_int(mm) * recpeq,
             Float::from_int(y) * recpeq,
@@ -292,7 +292,7 @@ fn cmyk_build_grid() -> FixedArray[Int] {
           let x1 = matrix_row(x, yy, z, [pcs_scale, 0.0, 0.0])
           let y1 = matrix_row(x, yy, z, [0.0, pcs_scale, 0.0])
           let z1 = matrix_row(x, yy, z, [0.0, 0.0, pcs_scale])
-          let rgb = [
+          let rgb : ReadOnlyArray[_] = [
             matrix_row(x1, y1, z1, [m[0], m[1], m[2]]),
             matrix_row(x1, y1, z1, [m[3], m[4], m[5]]),
             matrix_row(x1, y1, z1, [m[6], m[7], m[8]]),
