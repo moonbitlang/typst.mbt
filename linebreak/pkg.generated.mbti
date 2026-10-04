@@ -25,6 +25,8 @@ pub(all) enum Breakpoint {
 } derive(Eq, Hash, @debug.Debug)
 pub fn Breakpoint::is_hyphen(Self) -> Bool
 pub fn Breakpoint::trim(Self, Int, String) -> Trim
+pub fn Breakpoint::trim_by(Self, Int, Int, ((Int) -> Bool) -> Int) -> Trim
+pub fn Breakpoint::trims(Self, Int) -> Bool
 
 pub(all) enum LineBreak {
   Unknown
