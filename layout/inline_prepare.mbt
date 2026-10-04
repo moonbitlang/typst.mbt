@@ -116,7 +116,10 @@ fn prepare(
 /// Requirements for Chinese Text Layout, Section 3.2.2 Mixed Text
 /// Composition in Horizontal Written Mode
 fn add_cjk_latin_spacing(items : Array[(Int, Int, InlineItem)]) -> Unit {
-  let flat : Array[(ShapedGlyph, @library.ScriptKind?)?] = []
+  // The flattened `Option<(glyph, shift)>` items as two parallel arrays (no
+  // boxed tuple per glyph): `None` glyphs are the non-text items.
+  let flat : Array[ShapedGlyph?] = []
+  let shifts : Array[@library.ScriptKind?] = []
   for entry in items {
     match entry.2 {
       Tag(_) => ()
@@ -124,51 +127,58 @@ fn add_cjk_latin_spacing(items : Array[(Int, Int, InlineItem)]) -> Unit {
         // Check whether the text is normal, sub- or superscript. At
         // boundaries between these three, we do not want to insert
         // CJK-Latin-Spacing.
-        let shift = @library.TextElem::shift_settings_in(text.styles).map(shift => {
-          shift.kind
-        })
+        let shift = match @library.TextElem::shift_settings_in(text.styles) {
+          Some(shift) => Some(shift.kind)
+          None => None
+        }
 
         // Since we only call this function in [`prepare`], we can assume
         // that the glyphs are owned.
         for g in text.glyphs.to_mut() {
-          flat.push(Some((g, shift)))
+          flat.push(Some(g))
+          shifts.push(shift)
         }
       }
-      _ => flat.push(None)
+      _ => {
+        flat.push(None)
+        shifts.push(None)
+      }
     }
   }
-  let mut prev : (ShapedGlyph, @library.ScriptKind?)? = None
+  let mut prev : ShapedGlyph? = None
+  let mut prev_shift : @library.ScriptKind? = None
   for i, item in flat {
-    if item is Some((glyph, shift)) {
+    let shift = shifts[i]
+    if item is Some(glyph) {
       // Case 1: CJ followed by a Latin character
       if glyph.is_cj_script() &&
-        flat.get(i + 1) is Some(Some((next_glyph, next_shift))) &&
+        flat.get(i + 1) is Some(Some(next_glyph)) &&
         next_glyph.is_letter_or_number() &&
-        shift == next_shift {
+        shift == shifts[i + 1] {
         // The spacing defaults to 1/4 em, and can be shrunk to 1/8 em.
         glyph.x_advance = glyph.x_advance + @library.Em::new(0.25)
-        let (l, r) = glyph.adjustability.shrinkability
         glyph.adjustability = {
           ..glyph.adjustability,
-          shrinkability: (l, r + @library.Em::new(0.125)),
+          shrink_right: glyph.adjustability.shrink_right +
+          @library.Em::new(0.125),
         }
       }
 
       // Case 2: Latin followed by a CJ character
       if glyph.is_cj_script() &&
-        prev is Some((prev_glyph, prev_shift)) &&
+        prev is Some(prev_glyph) &&
         prev_glyph.is_letter_or_number() &&
         shift == prev_shift {
         glyph.x_advance = glyph.x_advance + @library.Em::new(0.25)
         glyph.x_offset = glyph.x_offset + @library.Em::new(0.25)
-        let (l, r) = glyph.adjustability.shrinkability
         glyph.adjustability = {
           ..glyph.adjustability,
-          shrinkability: (l + @library.Em::new(0.125), r),
+          shrink_left: glyph.adjustability.shrink_left + @library.Em::new(0.125),
         }
         prev_glyph.is_justifiable = true
       }
     }
     prev = item
+    prev_shift = shift
   }
 }

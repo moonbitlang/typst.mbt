@@ -109,7 +109,7 @@ fn page_elem_height_parse(
 
 ///|
 fn page_elem_margin_fold(inner : Value, outer : Value) -> Value {
-  fold_of((Ty::new() : Ty[Smart[Margin[Smart[Rel[Length]]]]]))(inner, outer)
+  fold_with((Ty::new() : Ty[Smart[Margin[Smart[Rel[Length]]]]]), inner, outer)
 }
 
 ///|

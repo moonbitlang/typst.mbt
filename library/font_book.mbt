@@ -125,7 +125,7 @@ pub fn FontBook::select_fallback(
   self : FontBook,
   like : FontInfo?,
   variant : FontVariant,
-  text : String,
+  text : StringView,
 ) -> Int? {
   // Find the fonts that contain the text's first non-space and
   // non-ignorable char ...

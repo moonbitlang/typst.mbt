@@ -74,7 +74,7 @@ fn convert_glyphs(t : @library.TextItem) -> Array[@export.Glyph] {
       x_offset: g.x_offset.get(),
       y_advance: g.y_advance.get(),
       y_offset: g.y_offset.get(),
-      location: Some(g.span.0.0),
+      location: Some(g.span.0),
     }
   })
 }

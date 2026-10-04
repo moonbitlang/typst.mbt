@@ -356,18 +356,24 @@ fn SpanMapper::push(self : SpanMapper, len : Int, span : @syntax.Span) -> Unit {
 /// Determine the span at the given byte offset.
 ///
 /// May return a detached span.
-fn SpanMapper::span_at(
-  self : SpanMapper,
-  offset : Int,
-) -> (@syntax.Span, UInt16) {
+fn SpanMapper::span_at(self : SpanMapper, offset : Int) -> SpanAt {
   let mut cursor = 0
   for entry in self.entries {
     let (len, span) = entry
     if offset >= cursor && offset < cursor + len {
       let d = offset - cursor
-      return (span, if d > 65535 { 0 } else { d.to_uint16() })
+      return { span, offset: if d > 65535 { 0 } else { d.to_uint16() }, }
     }
     cursor += len
   }
-  (@syntax.Span::detached(), 0)
+  { span: @syntax.Span::detached(), offset: 0, }
+}
+
+///|
+/// The `(Span, u16)` result of [SpanMapper::span_at] (a value type, so that
+/// looking up the span of every glyph does not allocate).
+#valtype
+priv struct SpanAt {
+  span : @syntax.Span
+  offset : UInt16
 }

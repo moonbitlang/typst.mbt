@@ -180,8 +180,12 @@ pub impl FromData for HmtxMetrics with fn size() {
 
 ///|
 pub impl FromData for HmtxMetrics with fn parse(data) {
-  let s = Stream::new(data)
-  { advance: s.read_u16(), side_bearing: s.read_i16(), }
+  // (`Stream::new(data)` + `read_u16`/`read_i16`, without allocating the
+  // stream: `data` has `size()` bytes.)
+  {
+    advance: be_u16(data, 0),
+    side_bearing: Int16::reinterpret_from_uint16(be_u16(data, 2)),
+  }
 }
 
 ///|

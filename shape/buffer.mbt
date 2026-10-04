@@ -203,6 +203,16 @@ fn GlyphPosition::new() -> GlyphPosition {
 }
 
 ///|
+/// `self.assign(GlyphPosition::new())` without allocating the temporary.
+fn GlyphPosition::reset(self : GlyphPosition) -> Unit {
+  self.x_advance = 0
+  self.y_advance = 0
+  self.x_offset = 0
+  self.y_offset = 0
+  self.var_ = 0
+}
+
+///|
 fn GlyphPosition::copy(self : GlyphPosition) -> GlyphPosition {
   { ..self, }
 }
@@ -266,6 +276,16 @@ pub(all) struct GlyphInfo {
 ///|
 fn GlyphInfo::new() -> GlyphInfo {
   { glyph_id: 0, mask: 0, cluster: 0, var1: 0, var2: 0, }
+}
+
+///|
+/// `self.assign(GlyphInfo::new())` without allocating the temporary.
+fn GlyphInfo::reset(self : GlyphInfo) -> Unit {
+  self.glyph_id = 0
+  self.mask = 0
+  self.cluster = 0
+  self.var1 = 0
+  self.var2 = 0
 }
 
 ///|
@@ -416,24 +436,61 @@ fn GlyphInfo::set_glyph_index(self : GlyphInfo, n : UInt) -> Unit {
 }
 
 ///|
-/// Resize a vector like Rust's `Vec::resize` with fresh default objects.
-fn resize_infos(v : Array[GlyphInfo], size : Int) -> Unit {
+/// Resize a vector like Rust's `Vec::resize` with default objects.
+///
+/// Truncated objects are kept in `spare` and reset when the vector grows
+/// again (performance: `push_str` reserves all slots, then every `add`
+/// truncates to `len + 1` and grows by one, like upstream's `ensure`).
+fn resize_infos(
+  v : Array[GlyphInfo],
+  size : Int,
+  spare : Array[GlyphInfo],
+) -> Unit {
   if size < v.length() {
-    v.truncate(size)
+    while v.length() > size {
+      spare.push(v.unsafe_pop())
+    }
   } else {
+    if size > v.capacity() {
+      let doubled = 2 * v.capacity()
+      v.reserve_capacity(if size > doubled { size } else { doubled })
+    }
     while v.length() < size {
-      v.push(GlyphInfo::new())
+      match spare.pop() {
+        Some(info) => {
+          info.reset()
+          v.push(info)
+        }
+        None => v.push(GlyphInfo::new())
+      }
     }
   }
 }
 
 ///|
-fn resize_positions(v : Array[GlyphPosition], size : Int) -> Unit {
+/// [resize_infos] for positions.
+fn resize_positions(
+  v : Array[GlyphPosition],
+  size : Int,
+  spare : Array[GlyphPosition],
+) -> Unit {
   if size < v.length() {
-    v.truncate(size)
+    while v.length() > size {
+      spare.push(v.unsafe_pop())
+    }
   } else {
+    if size > v.capacity() {
+      let doubled = 2 * v.capacity()
+      v.reserve_capacity(if size > doubled { size } else { doubled })
+    }
     while v.length() < size {
-      v.push(GlyphPosition::new())
+      match spare.pop() {
+        Some(pos) => {
+          pos.reset()
+          v.push(pos)
+        }
+        None => v.push(GlyphPosition::new())
+      }
     }
   }
 }
@@ -467,6 +524,9 @@ struct Buffer {
   mut pos : Array[GlyphPosition]
   /// The separate output buffer (lives in `pos` in Rust).
   mut out_sep : Array[GlyphInfo]
+  /// Truncated slots for reuse (see [resize_infos]).
+  spare_infos : Array[GlyphInfo]
+  spare_positions : Array[GlyphPosition]
 
   // Text before / after the main buffer contents.
   // Always in Unicode, and ordered outward.
@@ -527,10 +587,52 @@ fn Buffer::new() -> Buffer {
     info: [],
     pos: [],
     out_sep: [],
+    spare_infos: [],
+    spare_positions: [],
     have_separate_output: false,
     serial: 0,
     context: [[0, 0, 0, 0, 0], [0, 0, 0, 0, 0]],
     context_len: [0, 0],
+  }
+}
+
+///|
+/// Reset to the state of [Buffer::new], keeping the glyph slots in the spare
+/// pools (see [GlyphBuffer::recycle]).
+fn Buffer::reset(self : Buffer) -> Unit {
+  self.flags = 0
+  self.cluster_level = HB_BUFFER_CLUSTER_LEVEL_DEFAULT
+  self.invisible = None
+  self.scratch_flags = HB_BUFFER_SCRATCH_FLAG_DEFAULT
+  self.not_found_variation_selector = None
+  self.max_len = MAX_LEN_DEFAULT
+  self.max_ops = MAX_OPS_DEFAULT
+  self.direction = Invalid
+  self.script = None
+  self.language = None
+  self.shaping_failed = false
+  self.successful = true
+  self.have_output = false
+  self.have_positions = false
+  self.idx = 0
+  self.len = 0
+  self.out_len = 0
+  while self.info.pop() is Some(info) {
+    self.spare_infos.push(info)
+  }
+  while self.out_sep.pop() is Some(info) {
+    self.spare_infos.push(info)
+  }
+  while self.pos.pop() is Some(pos) {
+    self.spare_positions.push(pos)
+  }
+  self.have_separate_output = false
+  self.serial = 0
+  for side in 0..<2 {
+    for i in 0..<CONTEXT_LENGTH {
+      self.context[side][i] = 0
+    }
+    self.context_len[side] = 0
   }
 }
 
@@ -631,13 +733,13 @@ fn Buffer::add(self : Buffer, codepoint : UInt, cluster : UInt) -> Unit {
     return
   }
   let i = self.len
-  self.info[i].assign({
-    glyph_id: codepoint,
-    mask: 0,
-    cluster,
-    var1: 0,
-    var2: 0,
-  })
+  // `assign` of a fresh `GlyphInfo`, without allocating it.
+  let info = self.info[i]
+  info.glyph_id = codepoint
+  info.mask = 0
+  info.cluster = cluster
+  info.var1 = 0
+  info.var2 = 0
   self.len += 1
 }
 
@@ -784,7 +886,7 @@ fn Buffer::clear_positions(self : Buffer) -> Unit {
   self.out_len = 0
   self.have_separate_output = false
   for pos in self.pos {
-    pos.assign(GlyphPosition::new())
+    pos.reset()
   }
 }
 
@@ -1305,9 +1407,9 @@ fn Buffer::ensure(self : Buffer, size : Int) -> Bool {
     self.successful = false
     return false
   }
-  resize_infos(self.info, size)
-  resize_positions(self.pos, size)
-  resize_infos(self.out_sep, size)
+  resize_infos(self.info, size, self.spare_infos)
+  resize_positions(self.pos, size, self.spare_positions)
+  resize_infos(self.out_sep, size, self.spare_infos)
   true
 }
 
@@ -1337,7 +1439,7 @@ fn Buffer::shift_forward(self : Buffer, count : Int) -> Unit {
   }
   if self.idx + count > self.len {
     for i in self.len..<(self.idx + count) {
-      self.info[i].assign(GlyphInfo::new())
+      self.info[i].reset()
     }
   }
   self.len += count
@@ -1501,7 +1603,7 @@ fn Buffer::is_empty(self : Buffer) -> Bool {
 }
 
 ///|
-fn Buffer::push_str(self : Buffer, text : String) -> Unit {
+fn Buffer::push_str(self : Buffer, text : StringView) -> Unit {
   let mut count = 0
   for _ in text {
     count += 1
@@ -1646,7 +1748,7 @@ pub fn UnicodeBuffer::is_empty(self : UnicodeBuffer) -> Bool {
 
 ///|
 /// Pushes a string to a buffer (clusters are UTF-8 byte offsets).
-pub fn UnicodeBuffer::push_str(self : UnicodeBuffer, str : String) -> Unit {
+pub fn UnicodeBuffer::push_str(self : UnicodeBuffer, str : StringView) -> Unit {
   self.0.push_str(str)
 }
 
@@ -1816,6 +1918,17 @@ pub fn GlyphBuffer::glyph_positions(
 /// `UnicodeBuffer` reusing the existing allocation.
 pub fn GlyphBuffer::clear(self : GlyphBuffer) -> UnicodeBuffer {
   self.0.clear()
+  UnicodeBuffer(self.0)
+}
+
+///|
+/// Turn the glyph buffer back into a buffer in the state of
+/// `UnicodeBuffer::new()` (not upstream: unlike [GlyphBuffer::clear], also
+/// resets the flags and limits). Its glyph slots are kept for reuse, so
+/// that shaping many runs with one recycled buffer does not allocate them
+/// again.
+pub fn GlyphBuffer::recycle(self : GlyphBuffer) -> UnicodeBuffer {
+  self.0.reset()
   UnicodeBuffer(self.0)
 }
 

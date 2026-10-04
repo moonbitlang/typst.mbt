@@ -18,7 +18,7 @@ pub fn features(@library.StyleChain) -> Array[@shape.Feature]
 
 pub fn fill_and_stroke(@library.Frame, @library.Paint?, @library.Sides[@library.FixedStroke?], @library.Sides[@library.Rel[@library.Abs]], @library.Corners[@library.Rel[@library.Abs]], @syntax.Span) -> Unit
 
-pub fn[C : SharedShapingContext] get_font_and_covers(C, String, FamilyIter, (C, String, @library.FontInstance) -> Unit) -> (@library.FontInstance, @library.Regex?)?
+pub fn[C : SharedShapingContext] get_font_and_covers(C, StringView, FamilyIter, (C, StringView, @library.FontInstance) -> Unit) -> (@library.FontInstance, @library.Regex?)?
 
 pub fn grow(@library.Frame, @library.Sides[@library.Rel[@library.Abs]]) -> Unit
 

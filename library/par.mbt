@@ -50,6 +50,25 @@ pub impl IntoValue for JustificationLimits with fn into_value(self) {
 pub impl FromValue for JustificationLimits with fn from_value(v) {
   match v {
     Dict(dict) => {
+      if dict.keys_within(["spacing", "tracking"]) {
+        // The same casts in the same order as below, without copying the
+        // dictionary (performance).
+        let spacing = match dict.map.get("spacing") {
+          Some(v) =>
+            Some(Limits::cast(v, "spacing", rel_checked_min, rel_checked_max))
+          None => None
+        }
+        let tracking = match dict.map.get("tracking") {
+          Some(v) =>
+            Some(
+              Limits::cast(
+                v, "tracking", length_checked_min, length_checked_max,
+              ),
+            )
+          None => None
+        }
+        return { spacing, tracking, }
+      }
       let dict = dict.copy()
       let spacing = if dict.contains("spacing") {
         Some(
@@ -137,19 +156,33 @@ fn[T : FromValue] Limits::cast(
   checked_max : (T) -> T raise HintedError,
 ) -> Limits[T] raise HintedError {
   let dict : Dict = FromValue::from_value(value)
-  let dict = dict.copy()
-  let take = (key : String, check : (T) -> T raise HintedError) => {
-    let value = dict.take(key)
-    let checked = check(T::from_value(value)) catch {
-      HintedError(err) =>
-        bail("`\{key}` value of `\{field}` is invalid (\{err.message})")
-    }
-    checked
+  // Without unexpected keys, the keys are read without copying the
+  // dictionary (performance); `get` fails like `take` for missing keys.
+  let fast = dict.keys_within(["min", "max"])
+  let dict = if fast { dict } else { dict.copy() }
+  let min = limits_take(dict, fast, "min", field, checked_min)
+  let max = limits_take(dict, fast, "max", field, checked_max)
+  if !fast {
+    dict.finish(["min", "max"])
   }
-  let min = take("min", checked_min)
-  let max = take("max", checked_max)
-  dict.finish(["min", "max"])
   { min, max, }
+}
+
+///|
+/// The `take` closure of [Limits::cast] (removing the key unless `fast`).
+fn[T : FromValue] limits_take(
+  dict : Dict,
+  fast : Bool,
+  key : String,
+  field : String,
+  check : (T) -> T raise HintedError,
+) -> T raise HintedError {
+  let value = if fast { dict.get(key) } else { dict.take(key) }
+  let checked = check(T::from_value(value)) catch {
+    HintedError(err) =>
+      bail("`\{key}` value of `\{field}` is invalid (\{err.message})")
+  }
+  checked
 }
 
 ///|
@@ -187,13 +220,21 @@ fn rel_checked_max(v : Rel[Length]) -> Rel[Length] raise HintedError {
 }
 
 ///|
+let par_elem_justification_limits_default_value : Value = JustificationLimits::default()
+  .into_value()
+  .shared()
+
+///|
+/// The default is built once and shared (marked shared, so that mutating a
+/// copy of it copies first, see [Value::shared]): it was rebuilt on every
+/// style lookup of the field (performance).
 fn par_elem_justification_limits_default() -> Value {
-  JustificationLimits::default().into_value()
+  par_elem_justification_limits_default_value
 }
 
 ///|
 fn par_elem_justification_limits_fold(inner : Value, outer : Value) -> Value {
-  fold_of((Ty::new() : Ty[JustificationLimits]))(inner, outer)
+  fold_with((Ty::new() : Ty[JustificationLimits]), inner, outer)
 }
 
 ///|
@@ -311,6 +352,13 @@ pub impl FromValue for FirstLineIndent with fn from_value(v) {
     Dict(dict) => {
       // Get a value by key, accepting either non-existence or something
       // convertible to type T.
+      if dict.keys_within(["amount", "all"]) {
+        // Without copying the dictionary (performance).
+        return {
+          amount: dict_get_cast(dict, "amount"),
+          all: dict_get_cast(dict, "all"),
+        }
+      }
       let dict = dict.copy()
       let amount = dict_take_cast(dict, "amount")
       let all = dict_take_cast(dict, "all")
@@ -322,13 +370,21 @@ pub impl FromValue for FirstLineIndent with fn from_value(v) {
 }
 
 ///|
+let par_elem_first_line_indent_default_value : Value = FirstLineIndent::default()
+  .into_value()
+  .shared()
+
+///|
+/// The default is built once and shared (marked shared, so that mutating a
+/// copy of it copies first, see [Value::shared]): it was rebuilt on every
+/// style lookup of the field (performance).
 fn par_elem_first_line_indent_default() -> Value {
-  FirstLineIndent::default().into_value()
+  par_elem_first_line_indent_default_value
 }
 
 ///|
 fn par_elem_first_line_indent_fold(inner : Value, outer : Value) -> Value {
-  fold_of((Ty::new() : Ty[FirstLineIndent]))(inner, outer)
+  fold_with((Ty::new() : Ty[FirstLineIndent]), inner, outer)
 }
 
 ///|

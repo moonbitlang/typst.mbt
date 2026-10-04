@@ -94,31 +94,42 @@ fn check_pair(before : GraphemeCat, after : GraphemeCat) -> PairResult {
 }
 
 ///|
+/// A decoded scalar value: the code point and a UTF-16 index (after it for
+/// [decode_at], its start for [decode_before]). A value type, so that
+/// decoding does not allocate (a returned tuple is boxed); destructure it
+/// with `let { cp, idx } = decode_at(s, i)`.
+#valtype
+pub struct Decoded {
+  cp : Int
+  idx : Int
+}
+
+///|
 /// Decode the scalar value starting at UTF-16 index `i`. Returns the code
 /// point and the index after it. Lone surrogates decode as themselves.
-pub fn decode_at(s : StringView, i : Int) -> (Int, Int) {
+pub fn decode_at(s : StringView, i : Int) -> Decoded {
   let c = s.code_unit_at(i).to_int()
   if c >= 0xD800 && c <= 0xDBFF && i + 1 < s.length() {
     let d = s.code_unit_at(i + 1).to_int()
     if d >= 0xDC00 && d <= 0xDFFF {
-      return ((c - 0xD800) * 0x400 + (d - 0xDC00) + 0x10000, i + 2)
+      return { cp: (c - 0xD800) * 0x400 + (d - 0xDC00) + 0x10000, idx: i + 2, }
     }
   }
-  (c, i + 1)
+  { cp: c, idx: i + 1, }
 }
 
 ///|
 /// Decode the scalar value ending right before UTF-16 index `i`. Returns the
 /// code point and the index where it starts.
-pub fn decode_before(s : StringView, i : Int) -> (Int, Int) {
+pub fn decode_before(s : StringView, i : Int) -> Decoded {
   let d = s.code_unit_at(i - 1).to_int()
   if d >= 0xDC00 && d <= 0xDFFF && i >= 2 {
     let c = s.code_unit_at(i - 2).to_int()
     if c >= 0xD800 && c <= 0xDBFF {
-      return ((c - 0xD800) * 0x400 + (d - 0xDC00) + 0x10000, i - 2)
+      return { cp: (c - 0xD800) * 0x400 + (d - 0xDC00) + 0x10000, idx: i - 2, }
     }
   }
-  (d, i - 1)
+  { cp: d, idx: i - 1, }
 }
 
 ///|
@@ -129,7 +140,7 @@ fn lookback(s : StringView, pos : Int, kind : PairResult) -> Bool {
       let mut linkers = 0
       let mut i = pos
       while i > 0 {
-        let (c, prev) = decode_before(s, i)
+        let { cp: c, idx: prev, } = decode_before(s, i)
         if is_incb_linker(c) {
           linkers += 1
         } else if !in_ranges(incb_extend_table, c) {
@@ -143,7 +154,7 @@ fn lookback(s : StringView, pos : Int, kind : PairResult) -> Bool {
       let mut count = 0
       let mut i = pos
       while i > 0 {
-        let (c, prev) = decode_before(s, i)
+        let { cp: c, idx: prev, } = decode_before(s, i)
         if grapheme_cat(c) != RegionalIndicator {
           break
         }
@@ -154,10 +165,10 @@ fn lookback(s : StringView, pos : Int, kind : PairResult) -> Bool {
     }
     Emoji => {
       // The character before `pos` is a ZWJ.
-      let (_, start) = decode_before(s, pos)
+      let { idx: start, .. } = decode_before(s, pos)
       let mut i = start
       while i > 0 {
-        let (c, prev) = decode_before(s, i)
+        let { cp: c, idx: prev, } = decode_before(s, i)
         match grapheme_cat(c) {
           Extend => ()
           ExtendedPictographic => return false
@@ -179,11 +190,11 @@ pub fn grapheme_end(s : StringView, start : Int) -> Int {
   if start >= len {
     return start
   }
-  let (c0, next) = decode_at(s, start)
+  let { cp: c0, idx: next, } = decode_at(s, start)
   let mut before = grapheme_cat(c0)
   let mut pos = next
   while pos < len {
-    let (c, after_pos) = decode_at(s, pos)
+    let { cp: c, idx: after_pos, } = decode_at(s, pos)
     let after = grapheme_cat(c)
     let is_break = match check_pair(before, after) {
       NotBreak => false

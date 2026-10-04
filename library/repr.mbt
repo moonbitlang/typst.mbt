@@ -195,7 +195,7 @@ pub fn rust_trim(s : String) -> String {
 pub fn rust_trim_start(s : String) -> String {
   let mut i = 0
   while i < s.length() {
-    let (c, next) = @unicode.decode_at(s, i)
+    let { cp: c, idx: next, } = @unicode.decode_at(s, i)
     if !@unicode.is_whitespace(Int::unsafe_to_char(c)) {
       break
     }
@@ -209,7 +209,7 @@ pub fn rust_trim_start(s : String) -> String {
 pub fn rust_trim_end(s : String) -> String {
   let mut end = s.length()
   while end > 0 {
-    let (c, prev) = @unicode.decode_before(s, end)
+    let { cp: c, idx: prev, } = @unicode.decode_before(s, end)
     if !@unicode.is_whitespace(Int::unsafe_to_char(c)) {
       break
     }

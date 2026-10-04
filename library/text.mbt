@@ -189,8 +189,18 @@ pub impl FromValue for FontList with fn from_value(v) {
 ///|
 /// The default font list (upstream
 /// `FontList(vec![FontFamily::new("Libertinus Serif")])`).
+let text_elem_font_default_value : Value = FontList([
+    FontFamily::new("Libertinus Serif"),
+  ])
+  .into_value()
+  .shared()
+
+///|
+/// The default is built once and shared (marked shared, so that mutating a
+/// copy of it copies first, see [Value::shared]): it was rebuilt on every
+/// style lookup of the field (performance).
 fn text_elem_font_default() -> Value {
-  FontList([FontFamily::new("Libertinus Serif")]).into_value()
+  text_elem_font_default_value
 }
 
 ///|
@@ -292,13 +302,23 @@ pub impl FromValue for TextSize with fn from_value(v) {
 }
 
 ///|
+let text_elem_size_default_value : Value = TextSize(
+    Length::from_abs(Abs::pt(11.0)),
+  )
+  .into_value()
+  .shared()
+
+///|
+/// The default is built once and shared (marked shared, so that mutating a
+/// copy of it copies first, see [Value::shared]): it was rebuilt on every
+/// style lookup of the field (performance).
 fn text_elem_size_default() -> Value {
-  TextSize(Length::from_abs(Abs::pt(11.0))).into_value()
+  text_elem_size_default_value
 }
 
 ///|
 fn text_elem_size_fold(inner : Value, outer : Value) -> Value {
-  fold_of((Ty::new() : Ty[TextSize]))(inner, outer)
+  fold_with((Ty::new() : Ty[TextSize]), inner, outer)
 }
 
 // TopEdge, BottomEdge
@@ -668,8 +688,16 @@ pub impl FromValue for StylisticSets with fn from_value(v) {
 }
 
 ///|
+let text_elem_stylistic_set_default_value : Value = StylisticSets::default()
+  .into_value()
+  .shared()
+
+///|
+/// The default is built once and shared (marked shared, so that mutating a
+/// copy of it copies first, see [Value::shared]): it was rebuilt on every
+/// style lookup of the field (performance).
 fn text_elem_stylistic_set_default() -> Value {
-  StylisticSets::default().into_value()
+  text_elem_stylistic_set_default_value
 }
 
 // NumberType, NumberWidth
@@ -850,23 +878,39 @@ pub impl Fold for FontFeatures with fn fold(self, outer) {
 }
 
 ///|
+let text_elem_features_default_value : Value = FontFeatures::default()
+  .into_value()
+  .shared()
+
+///|
+/// The default is built once and shared (marked shared, so that mutating a
+/// copy of it copies first, see [Value::shared]): it was rebuilt on every
+/// style lookup of the field (performance).
 fn text_elem_features_default() -> Value {
-  FontFeatures::default().into_value()
+  text_elem_features_default_value
 }
 
 ///|
 fn text_elem_features_fold(inner : Value, outer : Value) -> Value {
-  fold_of((Ty::new() : Ty[FontFeatures]))(inner, outer)
+  fold_with((Ty::new() : Ty[FontFeatures]), inner, outer)
 }
 
 ///|
+let text_elem_variations_default_value : Value = FontVariations::default()
+  .into_value()
+  .shared()
+
+///|
+/// The default is built once and shared (marked shared, so that mutating a
+/// copy of it copies first, see [Value::shared]): it was rebuilt on every
+/// style lookup of the field (performance).
 fn text_elem_variations_default() -> Value {
-  FontVariations::default().into_value()
+  text_elem_variations_default_value
 }
 
 ///|
 fn text_elem_variations_fold(inner : Value, outer : Value) -> Value {
-  fold_of((Ty::new() : Ty[FontVariations]))(inner, outer)
+  fold_with((Ty::new() : Ty[FontVariations]), inner, outer)
 }
 
 // ItalicToggle, WeightDelta
@@ -914,7 +958,7 @@ fn text_elem_emph_default() -> Value {
 
 ///|
 fn text_elem_emph_fold(inner : Value, outer : Value) -> Value {
-  fold_of((Ty::new() : Ty[ItalicToggle]))(inner, outer)
+  fold_with((Ty::new() : Ty[ItalicToggle]), inner, outer)
 }
 
 ///|
@@ -960,7 +1004,7 @@ fn text_elem_delta_default() -> Value {
 
 ///|
 fn text_elem_delta_fold(inner : Value, outer : Value) -> Value {
-  fold_of((Ty::new() : Ty[WeightDelta]))(inner, outer)
+  fold_with((Ty::new() : Ty[WeightDelta]), inner, outer)
 }
 
 // Costs
@@ -1045,6 +1089,15 @@ pub impl IntoValue for Costs with fn into_value(self) {
 pub impl FromValue for Costs with fn from_value(v) {
   match v {
     Dict(v) => {
+      if v.keys_within(["hyphenation", "runt", "widow", "orphan"]) {
+        // Without copying the dictionary (performance).
+        return {
+          hyphenation: dict_get_cast(v, "hyphenation"),
+          runt: dict_get_cast(v, "runt"),
+          widow: dict_get_cast(v, "widow"),
+          orphan: dict_get_cast(v, "orphan"),
+        }
+      }
       let v = v.copy()
       let ret = {
         hyphenation: dict_take_cast(v, "hyphenation"),
@@ -1074,13 +1127,21 @@ fn text_elem_costs_output(v : Value) -> Value {
 }
 
 ///|
+let text_elem_costs_default_value : Value = Costs::default()
+  .into_value()
+  .shared()
+
+///|
+/// The default is built once and shared (marked shared, so that mutating a
+/// copy of it copies first, see [Value::shared]): it was rebuilt on every
+/// style lookup of the field (performance).
 fn text_elem_costs_default() -> Value {
-  Costs::default().into_value()
+  text_elem_costs_default_value
 }
 
 ///|
 fn text_elem_costs_fold(inner : Value, outer : Value) -> Value {
-  fold_of((Ty::new() : Ty[Costs]))(inner, outer)
+  fold_with((Ty::new() : Ty[Costs]), inner, outer)
 }
 
 // Never

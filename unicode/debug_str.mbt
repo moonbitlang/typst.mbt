@@ -6,7 +6,7 @@ pub fn rust_debug_str(s : StringView) -> String {
   let mut i = 0
   let mut first = true
   while i < s.length() {
-    let (c, next) = decode_at(s, i)
+    let { cp: c, idx: next, } = decode_at(s, i)
     write_rust_escaped(buf, c, first)
     first = false
     i = next

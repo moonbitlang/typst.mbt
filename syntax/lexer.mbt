@@ -47,7 +47,7 @@ fn Lexer::column(self : Lexer, index : Int) -> Int {
   }
   let mut count = 0
   while i > 0 {
-    let (c, prev) = @unicode.decode_before(self.s.text, i)
+    let { cp: c, idx: prev, } = @unicode.decode_before(self.s.text, i)
     if is_newline(Int::unsafe_to_char(c)) {
       break
     }
@@ -342,7 +342,7 @@ fn blocky_raw(s : Scanner, nodes : Array[SyntaxNode]) -> Unit {
 fn trim_end_unicode(s : String) -> String {
   let mut end = s.length()
   while end > 0 {
-    let (c, prev) = @unicode.decode_before(s, end)
+    let { cp: c, idx: prev, } = @unicode.decode_before(s, end)
     if !@unicode.is_whitespace(Int::unsafe_to_char(c)) {
       break
     }

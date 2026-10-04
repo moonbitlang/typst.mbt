@@ -114,6 +114,23 @@
   per-element closures and iterators. Caches of pure functions (glyph
   outlines, font selection, parsed numbering patterns) are fine; document
   them as "not upstream" where they deviate structurally.
+- Allocation (native): structs, tuples, closures (and the mutable
+  variables they capture), `Some(..)` of a value type, enum payloads and
+  `[..]`/spread literals each allocate; a returned or stored tuple is always
+  boxed. In hot paths: pass `StringView`/`ArrayView` (upstream `&str`/`&[T]`)
+  instead of `to_string()`/`to_owned()`/`to_array()` copies; return small
+  immutable results as a `#valtype` struct (`@unicode.Decoded` from
+  `decode_at`, `TextEdges`, `SpanAt`) rather than a tuple; `#valtype` also
+  for small immutable non-generic data (`Point`, `Length`, `Glyph`,
+  `Utf8Slice`, `LazyArray16`; generic structs whose fields are type
+  parameters cannot be value types, and `physical_equal` on value types is
+  always false on native); flatten tuple fields of per-glyph structs; loop
+  instead of `iter().any/map/collect` and closure-based iterators (e.g. walk
+  `StyleChain` links directly); `match` instead of `unwrap_or(<allocating
+  default>)`; build constant style defaults once (`Value::shared`). Count
+  allocations per MoonBit source line by compiling the generated
+  `cli.c` with `moonbit_malloc`/`moonbit_make_*` wrapped by a counting macro
+  (`#line` directives map call sites back to `.mbt` lines).
 - SVG export (`svg/`, port of typst-svg) is checked by two stages against
   the raw upstream SVGs (`scripts/goldens.sh svg`, pretty, merged pages, 1pt
   gap): `svg` compiles and exports each paged test; `svg-replay` exports

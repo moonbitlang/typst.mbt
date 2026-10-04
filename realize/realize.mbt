@@ -433,51 +433,60 @@ fn verdict(engine : Engine, elem : Content, styles : StyleChain) -> Verdict? {
   // top of the chain as the chain might grow to the bottom.
   let mut depth : Int? = None
   let mut r = 0
-  for recipe in styles.recipes() {
-    let i = r
-    r += 1
+  // `for recipe in styles.recipes()`, walking the chain's links directly
+  // (innermost first) instead of allocating the closure-based iterators.
+  let mut link : StyleChain? = Some(styles)
+  let mut done = false
+  while !done && link is Some(l) {
+    link = l.tail
+    for k = l.head.length() - 1; k >= 0; k = k - 1 {
+      guard l.head[k] is Recipe(recipe) else { continue }
+      let i = r
+      r += 1
 
-    // We're not interested in recipes that don't match.
-    guard recipe.selector is Some(selector) &&
-      selector.matches(elem, Some(styles)) else {
-      continue
-    }
-
-    // Special handling for show-set rules.
-    if recipe.transform is Style(transform) {
-      if !prepared {
-        map.apply(transform.copy())
+      // We're not interested in recipes that don't match.
+      guard recipe.selector is Some(selector) &&
+        selector.matches(elem, Some(styles)) else {
+        continue
       }
-      continue
-    }
 
-    // If we already have a show step, don't look for one.
-    if step is Some(_) {
-      continue
-    }
-
-    // Check whether this show rule was already applied to the element.
-    let total = match depth {
-      Some(d) => d
-      None => {
-        let d = styles.recipes().count()
-        depth = Some(d)
-        d
+      // Special handling for show-set rules.
+      if recipe.transform is Style(transform) {
+        if !prepared {
+          map.apply(transform.copy())
+        }
+        continue
       }
-    }
-    let index = total - i
-    if elem.is_guarded(index) {
-      continue
-    }
 
-    // We'll apply this recipe.
-    step = Some(Recipe(recipe, index))
+      // If we already have a show step, don't look for one.
+      if step is Some(_) {
+        continue
+      }
 
-    // If we found a show rule and are already prepared, there is nothing
-    // else to do, so we can just break. If we are not yet prepared,
-    // continue searching for potential show-set styles.
-    if prepared {
-      break
+      // Check whether this show rule was already applied to the element.
+      let total = match depth {
+        Some(d) => d
+        None => {
+          let d = styles.recipe_count()
+          depth = Some(d)
+          d
+        }
+      }
+      let index = total - i
+      if elem.is_guarded(index) {
+        continue
+      }
+
+      // We'll apply this recipe.
+      step = Some(Recipe(recipe, index))
+
+      // If we found a show rule and are already prepared, there is nothing
+      // else to do, so we can just break. If we are not yet prepared,
+      // continue searching for potential show-set styles.
+      if prepared {
+        done = true
+        break
+      }
     }
   }
 
@@ -1450,46 +1459,53 @@ fn find_regex_match_in_str(text : String, styles : StyleChain) -> RegexMatch? {
   let revoked = @hashset.HashSet([])
   let mut leftmost : (@regex.Match, Int, Recipe)? = None
   let mut depth : Int? = None
-  for entry in styles.entries() {
-    let recipe = match entry {
-      Recipe(recipe) => recipe
-      Property(_) => continue
-      Revocation(index) => {
-        revoked.add(index)
+  // `for entry in styles.entries()` without allocating the closure-based
+  // iterator.
+  let mut link : StyleChain? = Some(styles)
+  while link is Some(l) {
+    link = l.tail
+    for k = l.head.length() - 1; k >= 0; k = k - 1 {
+      let entry = l.head[k]
+      let recipe = match entry {
+        Recipe(recipe) => recipe
+        Property(_) => continue
+        Revocation(index) => {
+          revoked.add(index)
+          continue
+        }
+      }
+      r += 1
+      guard recipe.selector is Some(Regex(regex)) else { continue }
+      guard regex.inner.find(text) is Some(m) else { continue }
+
+      // Make sure we don't get any empty matches.
+      if m.start == m.end {
         continue
       }
-    }
-    r += 1
-    guard recipe.selector is Some(Regex(regex)) else { continue }
-    guard regex.inner.find(text) is Some(m) else { continue }
 
-    // Make sure we don't get any empty matches.
-    if m.start == m.end {
-      continue
-    }
-
-    // If we already have a match that is equally or more to the left, we're
-    // not interested in this new match.
-    if leftmost is Some((p, _, _)) && p.start <= m.start {
-      continue
-    }
-
-    // Check whether the rule is already revoked. Do it only now to not
-    // compute the depth unnecessarily. We subtract 1 from r because we
-    // already incremented it.
-    let total = match depth {
-      Some(d) => d
-      None => {
-        let d = styles.recipes().count()
-        depth = Some(d)
-        d
+      // If we already have a match that is equally or more to the left, we're
+      // not interested in this new match.
+      if leftmost is Some((p, _, _)) && p.start <= m.start {
+        continue
       }
+
+      // Check whether the rule is already revoked. Do it only now to not
+      // compute the depth unnecessarily. We subtract 1 from r because we
+      // already incremented it.
+      let total = match depth {
+        Some(d) => d
+        None => {
+          let d = styles.recipe_count()
+          depth = Some(d)
+          d
+        }
+      }
+      let index = total - (r - 1)
+      if revoked.contains(index) {
+        continue
+      }
+      leftmost = Some((m, index, recipe))
     }
-    let index = total - (r - 1)
-    if revoked.contains(index) {
-      continue
-    }
-    leftmost = Some((m, index, recipe))
   }
   leftmost.map(found => {
     let (m, id, recipe) = found

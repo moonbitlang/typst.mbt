@@ -423,7 +423,7 @@ pub fn split_whitespace(s : StringView) -> Array[StringView] {
   let mut start = -1
   let mut i = 0
   while i < s.length() {
-    let (c, next) = @unicode.decode_at(s, i)
+    let { cp: c, idx: next, } = @unicode.decode_at(s, i)
     let ws = @unicode.is_whitespace(c.unsafe_to_char())
     if ws {
       if start >= 0 {

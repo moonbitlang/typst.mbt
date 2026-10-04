@@ -55,7 +55,7 @@ pub fn trim_start(s : StringView) -> String {
   let mut i = 0
   let n = s.length()
   while i < n {
-    let (c, next) = @unicode.decode_at(s, i)
+    let { cp: c, idx: next, } = @unicode.decode_at(s, i)
     if !is_whitespace(Int::unsafe_to_char(c)) {
       break
     }
@@ -69,7 +69,7 @@ pub fn trim_start(s : StringView) -> String {
 pub fn trim_end(s : StringView) -> String {
   let mut j = s.length()
   while j > 0 {
-    let (c, prev) = @unicode.decode_before(s, j)
+    let { cp: c, idx: prev, } = @unicode.decode_before(s, j)
     if !is_whitespace(Int::unsafe_to_char(c)) {
       break
     }
@@ -157,7 +157,7 @@ pub fn last_char(s : StringView) -> Char? {
   if s.length() == 0 {
     return None
   }
-  let (c, _) = @unicode.decode_before(s, s.length())
+  let { cp: c, .. } = @unicode.decode_before(s, s.length())
   Some(Int::unsafe_to_char(c))
 }
 

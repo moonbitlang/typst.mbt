@@ -63,6 +63,7 @@ fn scale_elem_y_default() -> Value {
 
 ///|
 /// A scale-skew-translate transformation.
+#valtype
 pub(all) struct Transform {
   sx : Ratio
   ky : Ratio

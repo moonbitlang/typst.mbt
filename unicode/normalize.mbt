@@ -126,7 +126,7 @@ fn decompose(s : StringView, compat : Bool) -> Array[Int] {
   let out = []
   let mut i = 0
   while i < s.length() {
-    let (c, next) = decode_at(s, i)
+    let { cp: c, idx: next, } = decode_at(s, i)
     decompose_char(c, compat, out)
     i = next
   }

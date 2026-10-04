@@ -165,7 +165,7 @@ impl SharedShapingContext for MathShapingContext with fn variations(self) {
 
 ///|
 /// `0..text.len().saturating_as()` as a `u16` range end.
-fn math_range_end(text : String) -> UInt16 {
+fn math_range_end(text : StringView) -> UInt16 {
   let len = @syntax.utf8_len(text)
   (if len > 65535 { 65535 } else { len }).to_uint16()
 }
@@ -179,7 +179,7 @@ fn math_shape_text(
 ) -> Unit {
   let shape_tofus = (
     ctx : MathShapingContext,
-    text : String,
+    text : StringView,
     font : @library.FontInstance,
   ) => {
     for _ in text {
@@ -191,7 +191,8 @@ fn math_shape_text(
         y_offset: @library.Em::zero(),
         range_start: 0,
         range_end: math_range_end(text),
-        span: (@syntax.Span::detached(), 0),
+        span: @syntax.Span::detached(),
+        span_offset: 0,
       })
     }
     ctx.font = Some(font)
@@ -200,7 +201,7 @@ fn math_shape_text(
     is Some((font, covers)) else {
     return
   }
-  let buffer = @shape.UnicodeBuffer::new()
+  let buffer = take_shaping_buffer()
   buffer.push_str(text)
   buffer.set_language(ctx.language)
   // TODO: Use `rustybuzz::script::MATH` once
@@ -243,11 +244,13 @@ fn math_shape_text(
         y_offset: font.to_em(pos.y_offset.to_double()),
         range_start: 0,
         range_end: math_range_end(text),
-        span: (@syntax.Span::detached(), 0),
+        span: @syntax.Span::detached(),
+        span_offset: 0,
       })
     }
     if !buffer.is_empty() {
       ctx.font = Some(font)
     }
   }
+  recycle_shaping_buffer(buffer)
 }
