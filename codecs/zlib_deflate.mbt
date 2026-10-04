@@ -400,7 +400,10 @@ fn DeflateStream::insert_string(
     abort("index out of bounds")
   }
   // `min(window.len() - string, count + 3) - 3` four-byte windows (without
-  // overflowing `count + 3`), all in bounds.
+  // overflowing `count + 3`): the loads read `window[string + i..string + i +
+  // 4]` with `i < n <= window.len() - string - 3`, in bounds. The tables
+  // are indexed by a hash below `HASH_SIZE` (their length) and a position
+  // masked to `w_size - 1` (`prev`'s length).
   let n = @cmp.minimum(window.length() - string - 3, count)
   let w_mask = self.w_mask()
   let head = self.head

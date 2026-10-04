@@ -37,6 +37,7 @@ fn DeflateStream::longest_match(self : DeflateStream, cur_match : Int) -> Int {
   let strstart = self.strstart
   let wmask = self.w_mask()
   let window = self.window
+  // Indexed unchecked by `cur_match & wmask`, below its length `w_size`.
   let prev = self.prev
   let lookahead = self.lookahead
   let match_offset = 0

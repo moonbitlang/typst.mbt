@@ -84,6 +84,10 @@ fn build_crc32_tables() -> FixedArray[UInt] {
 ///|
 /// Upstream `crc32_braid::<5>(start, data)`.
 fn crc32_braid(start : UInt, data : BytesView) -> UInt {
+  // Unchecked accesses: the table indices are `offset + byte` within the
+  // checked table length; the word reads `bytes[base + 8 * w..+ 8]` for `w <
+  // words` and the byte reads stay within the view (`base + len <=
+  // bytes.length()`).
   let t = crc32_tables()
   guard t.length() == CRC_BRAID_TABLE + CRC_WORD * 256 else {
     abort("bad CRC-32 tables")

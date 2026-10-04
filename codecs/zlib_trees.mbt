@@ -131,6 +131,8 @@ fn BitWriter::push_le_bytes(self : BitWriter, v : UInt64, n : Int) -> Unit {
   guard n >= 0 && n <= 8 && pending.remaining() >= n else {
     abort("buf.len() must fit in remaining()")
   }
+  // `remaining() >= n`: `buf[at..at + n]` is in bounds (`out` and `pending`
+  // are never negative).
   let buf = pending.buf
   let at = pending.out + pending.pending
   for i in 0..<n {
