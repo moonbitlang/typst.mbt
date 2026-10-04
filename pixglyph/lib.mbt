@@ -256,12 +256,15 @@ fn f32_to_i32_unchecked(x : Float) -> Int = "%f32.to_i32"
 
 ///|
 /// Add to a value in the accumulation buffer.
+///
+/// `linestart` is `y * w` for a row `y < h`, below the buffer length, so
+/// `x < len - linestart` cannot overflow (upstream adds `usize`s).
+#inline
 fn Canvas::add(self : Canvas, linestart : Int, x : Int, delta : Float) -> Unit {
-  if x >= 0 {
+  let a = self.a
+  if x >= 0 && x < a.length() - linestart {
     let i = linestart + x
-    if i < self.a.length() {
-      self.a[i] = self.a[i] + delta
-    }
+    a.unsafe_set(i, a.unsafe_get(i) + delta)
   }
 }
 
@@ -282,17 +285,19 @@ fn Canvas::line(self : Canvas, p0 : Point, p1 : Point) -> Unit {
   if p0.y < 0.0 {
     x = x - p0.y * dxdy
   }
-  let y1 = min_int(self.h, f32_to_usize(p1.y.ceil()))
+  let y1 = min_int(self.h, f32_to_usize(f32_ceil(p1.y)))
   for y in y0..<y1 {
     let linestart = y * self.w
-    let dy = Float::from_int(y + 1).min(p1.y) - Float::from_int(y).max(p0.y)
+    let dy = f32_min(Float::from_int(y + 1), p1.y) -
+      f32_max(Float::from_int(y), p0.y)
     let xnext = x + dxdy * dy
     let d = dy * dir
-    let (x0, x1) = if x < xnext { (x, xnext) } else { (xnext, x) }
-    let x0floor = x0.floor()
-    let x0i = x0floor.to_int()
-    let x1ceil = x1.ceil()
-    let x1i = x1ceil.to_int()
+    let x0 = if x < xnext { x } else { xnext }
+    let x1 = if x < xnext { xnext } else { x }
+    let x0floor = f32_floor(x0)
+    let x0i = f32_to_i32(x0floor)
+    let x1ceil = f32_ceil(x1)
+    let x1i = f32_to_i32(x1ceil)
     if x1i <= x0i + 1 {
       let xmf = (0.5 : Float) * (x + xnext) - x0floor
       self.add(linestart, x0i, d - d * xmf)
@@ -335,7 +340,7 @@ fn Canvas::quad(self : Canvas, p0 : Point, p1 : Point, p2 : Point) -> Unit {
 
   // Estimate the required number of subdivisions for flattening.
   let tol : Float = 3.0
-  let n = (1.0 : Float) + (tol * devsq).sqrt().sqrt().floor().min(30.0)
+  let n = (1.0 : Float) + f32_min(f32_floor((tol * devsq).sqrt().sqrt()), 30.0)
   let nu = f32_to_usize(n)
   let step = (1.0 : Float) / n
 
@@ -394,7 +399,7 @@ fn Canvas::cubic(
   // Estimate the required number of subdivisions for conversion.
   let tol : Float = 0.333
   let max = (432.0 : Float) * tol * tol
-  let n = clamp(libm_powf(err / max, (1.0 : Float) / 6.0).ceil(), 1.0, 20.0)
+  let n = clamp(f32_ceil(libm_powf(err / max, (1.0 : Float) / 6.0)), 1.0, 20.0)
   let nu = f32_to_usize(n)
   let step = (1.0 : Float) / n
   let step4 = step / 4.0
@@ -455,11 +460,57 @@ fn clamp(v : Float, min : Float, max : Float) -> Float {
 /// Rust's saturating `f32 as usize` cast (NaN and negatives give 0), capped
 /// at `Int::max_value`.
 fn f32_to_usize(v : Float) -> Int {
-  let i = v.to_int()
+  let i = f32_to_i32(v)
   if i < 0 {
     0
   } else {
     i
+  }
+}
+
+///|
+/// Rust's saturating `f32 as i32` (NaN gives 0), like `Float::to_int`
+/// (spelled out: the core helper is not inlined; performance).
+#inline
+fn f32_to_i32(v : Float) -> Int {
+  if v != v {
+    0
+  } else if v >= 2147483647.0 {
+    2147483647
+  } else if v <= -2147483648.0 {
+    -2147483648
+  } else {
+    f32_to_i32_unchecked(v)
+  }
+}
+
+///|
+/// `Float::min`: NaN yields the other operand (inlined; performance).
+#inline
+fn f32_min(a : Float, b : Float) -> Float {
+  if a != a {
+    b
+  } else if b != b {
+    a
+  } else if a < b {
+    a
+  } else {
+    b
+  }
+}
+
+///|
+/// `Float::max`: NaN yields the other operand (inlined; performance).
+#inline
+fn f32_max(a : Float, b : Float) -> Float {
+  if a != a {
+    b
+  } else if b != b {
+    a
+  } else if a > b {
+    a
+  } else {
+    b
   }
 }
 

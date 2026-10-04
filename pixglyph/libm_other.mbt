@@ -4,3 +4,13 @@
 fn libm_powf(x : Float, y : Float) -> Float {
   x.pow(y)
 }
+
+///|
+fn f32_floor(x : Float) -> Float {
+  x.floor()
+}
+
+///|
+fn f32_ceil(x : Float) -> Float {
+  x.ceil()
+}
