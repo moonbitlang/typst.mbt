@@ -201,7 +201,7 @@ fn math_shape_text(
     is Some((font, covers)) else {
     return
   }
-  let buffer = @shape.UnicodeBuffer::new()
+  let buffer = take_shaping_buffer()
   buffer.push_str(text)
   buffer.set_language(ctx.language)
   // TODO: Use `rustybuzz::script::MATH` once
@@ -252,4 +252,5 @@ fn math_shape_text(
       ctx.font = Some(font)
     }
   }
+  recycle_shaping_buffer(buffer)
 }

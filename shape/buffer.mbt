@@ -451,6 +451,9 @@ fn resize_infos(
       spare.push(v.unsafe_pop())
     }
   } else {
+    if size > v.capacity() {
+      v.reserve_capacity(@cmp.maximum(size, 2 * v.capacity()))
+    }
     while v.length() < size {
       match spare.pop() {
         Some(info) => {
@@ -475,6 +478,9 @@ fn resize_positions(
       spare.push(v.unsafe_pop())
     }
   } else {
+    if size > v.capacity() {
+      v.reserve_capacity(@cmp.maximum(size, 2 * v.capacity()))
+    }
     while v.length() < size {
       match spare.pop() {
         Some(pos) => {
@@ -585,6 +591,46 @@ fn Buffer::new() -> Buffer {
     serial: 0,
     context: [[0, 0, 0, 0, 0], [0, 0, 0, 0, 0]],
     context_len: [0, 0],
+  }
+}
+
+///|
+/// Reset to the state of [Buffer::new], keeping the glyph slots in the spare
+/// pools (see [GlyphBuffer::recycle]).
+fn Buffer::reset(self : Buffer) -> Unit {
+  self.flags = 0
+  self.cluster_level = HB_BUFFER_CLUSTER_LEVEL_DEFAULT
+  self.invisible = None
+  self.scratch_flags = HB_BUFFER_SCRATCH_FLAG_DEFAULT
+  self.not_found_variation_selector = None
+  self.max_len = MAX_LEN_DEFAULT
+  self.max_ops = MAX_OPS_DEFAULT
+  self.direction = Invalid
+  self.script = None
+  self.language = None
+  self.shaping_failed = false
+  self.successful = true
+  self.have_output = false
+  self.have_positions = false
+  self.idx = 0
+  self.len = 0
+  self.out_len = 0
+  while self.info.pop() is Some(info) {
+    self.spare_infos.push(info)
+  }
+  while self.out_sep.pop() is Some(info) {
+    self.spare_infos.push(info)
+  }
+  while self.pos.pop() is Some(pos) {
+    self.spare_positions.push(pos)
+  }
+  self.have_separate_output = false
+  self.serial = 0
+  for side in 0..<2 {
+    for i in 0..<CONTEXT_LENGTH {
+      self.context[side][i] = 0
+    }
+    self.context_len[side] = 0
   }
 }
 
@@ -1870,6 +1916,17 @@ pub fn GlyphBuffer::glyph_positions(
 /// `UnicodeBuffer` reusing the existing allocation.
 pub fn GlyphBuffer::clear(self : GlyphBuffer) -> UnicodeBuffer {
   self.0.clear()
+  UnicodeBuffer(self.0)
+}
+
+///|
+/// Turn the glyph buffer back into a buffer in the state of
+/// `UnicodeBuffer::new()` (not upstream: unlike [GlyphBuffer::clear], also
+/// resets the flags and limits). Its glyph slots are kept for reuse, so
+/// that shaping many runs with one recycled buffer does not allocate them
+/// again.
+pub fn GlyphBuffer::recycle(self : GlyphBuffer) -> UnicodeBuffer {
+  self.0.reset()
   UnicodeBuffer(self.0)
 }
 

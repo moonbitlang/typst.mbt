@@ -1316,6 +1316,32 @@ pub fn[C : SharedShapingContext] get_font_and_covers(
 }
 
 ///|
+/// A shaping buffer kept for reuse (not upstream, which creates a buffer per
+/// shaped run: the buffer and its glyph slots were a large share of all
+/// allocations). It is taken while in use, so nested shaping (font
+/// fallback) creates its own.
+let spare_shaping_buffer : Ref[@shape.UnicodeBuffer?] = { val: None, }
+
+///|
+/// A fresh shaping buffer (`UnicodeBuffer::new()`), reusing the spare one.
+fn take_shaping_buffer() -> @shape.UnicodeBuffer {
+  match spare_shaping_buffer.val {
+    Some(buffer) => {
+      spare_shaping_buffer.val = None
+      buffer
+    }
+    None => @shape.UnicodeBuffer::new()
+  }
+}
+
+///|
+/// Keep a shaped buffer for reuse. Its glyph infos and positions must not be
+/// used anymore.
+fn recycle_shaping_buffer(buffer : @shape.GlyphBuffer) -> Unit {
+  spare_shaping_buffer.val = Some(buffer.recycle())
+}
+
+///|
 /// Shape text with font fallback using the `families` iterator.
 fn shape_segment(
   ctx : ShapingContext,
@@ -1347,7 +1373,7 @@ fn shape_segment(
   }
 
   // Fill the buffer with our text.
-  let buffer = @shape.UnicodeBuffer::new()
+  let buffer = take_shaping_buffer()
   buffer.push_str(text_str)
   buffer.set_language(language(ctx.styles))
   if @library.TextElem::script_in(ctx.styles) is Custom(script) &&
@@ -1525,6 +1551,7 @@ fn shape_segment(
     }
     i += 1
   }
+  recycle_shaping_buffer(buffer)
   ctx.used.pop() |> ignore
 }
 
