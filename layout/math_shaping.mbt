@@ -191,7 +191,8 @@ fn math_shape_text(
         y_offset: @library.Em::zero(),
         range_start: 0,
         range_end: math_range_end(text),
-        span: (@syntax.Span::detached(), 0),
+        span: @syntax.Span::detached(),
+        span_offset: 0,
       })
     }
     ctx.font = Some(font)
@@ -243,7 +244,8 @@ fn math_shape_text(
         y_offset: font.to_em(pos.y_offset.to_double()),
         range_start: 0,
         range_end: math_range_end(text),
-        span: (@syntax.Span::detached(), 0),
+        span: @syntax.Span::detached(),
+        span_offset: 0,
       })
     }
     if !buffer.is_empty() {

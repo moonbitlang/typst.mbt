@@ -6365,7 +6365,8 @@ pub(all) struct Glyph {
   y_offset : Em
   range_start : UInt16
   range_end : UInt16
-  span : (@moonbitlang/typst/syntax.Span, UInt16)
+  span : @moonbitlang/typst/syntax.Span
+  span_offset : UInt16
 } derive(Eq, Hash)
 pub fn Glyph::range(Self) -> (Int, Int)
 

@@ -593,12 +593,16 @@ fn ShapedText::build(
     }
     let pos = @library.Point::new(offset, top + shift - y_offset.at(size))
     let glyphs : Array[@library.Glyph] = []
+    let mut frame_width = frame.size().x
     for shaped in group {
       // Whether the glyph is _not_ trimmed end-of-line whitespace.
       // Trimmed whitespace has its advance width and offset zeroed out and
       // is not taken into account for justification.
       let kept = i >= self.glyphs.kept_start && i < self.glyphs.kept_end
-      let (x_advance, x_offset) = if kept {
+      // (Two variables instead of a boxed tuple.)
+      let mut x_advance = @library.Em::zero()
+      let mut x_offset = @library.Em::zero()
+      if kept {
         let adjustability_left = if justification_ratio < 0.0 {
           shaped.adjustability.shrink_left
         } else {
@@ -617,27 +621,22 @@ fn ShapedText::build(
           justification_right = justification_right +
             @library.Em::from_abs(extra_justification, glyph_size)
         }
-        let fsize = frame.size()
-        frame.set_size({
-          ..fsize,
-          x: fsize.x +
+        // `frame.size_mut().x += ..`, applied to the frame after the
+        // group's glyphs (no allocation per glyph; nothing reads the size in
+        // between).
+        frame_width = frame_width +
           (
             justification_left.at(glyph_size) +
             justification_right.at(glyph_size)
-          ),
-        })
-        (
-          shaped.x_advance + justification_left + justification_right,
-          shaped.x_offset + justification_left,
-        )
-      } else {
-        (@library.Em::zero(), @library.Em::zero())
+          )
+        x_advance = shaped.x_advance + justification_left + justification_right
+        x_offset = shaped.x_offset + justification_left
       }
       i += 1
 
       // We may not be able to reach the offset completely if it exceeds
       // u16, but better to have a roughly correct span offset than nothing.
-      let (span, sub) = spans.span_at(shaped.range_start)
+      let { span, offset: sub, } = spans.span_at(shaped.range_start)
       let sub = saturating_u16(
         sub.to_uint64() + span_offset.reinterpret_as_uint64(),
       )
@@ -651,9 +650,11 @@ fn ShapedText::build(
           (shaped.range_start - range_start).to_uint64(),
         ),
         range_end: saturating_u16((shaped.range_end - range_start).to_uint64()),
-        span: (span, sub),
+        span,
+        span_offset: sub,
       })
     }
+    frame.set_size({ ..frame.size(), x: frame_width, })
     let item : @library.TextItem = {
       font,
       size: glyph_size,

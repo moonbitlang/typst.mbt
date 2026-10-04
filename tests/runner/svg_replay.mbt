@@ -222,7 +222,8 @@ fn FrameDecoder::item(
                 y_offset: @library.Em::new(dec_f64(g[4])),
                 range_start: dec_int(g[5]).to_uint16(),
                 range_end: dec_int(g[6]).to_uint16(),
-                span: (@syntax.Span::detached(), dec_int(g[8]).to_uint16()),
+                span: @syntax.Span::detached(),
+                span_offset: dec_int(g[8]).to_uint16(),
               } : @library.Glyph)
           })
         _ => raise Unsupported("glyphs")

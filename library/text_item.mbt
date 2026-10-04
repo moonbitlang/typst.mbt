@@ -110,8 +110,12 @@ pub(all) struct Glyph {
   range_start : UInt16
   /// The end of the range of the glyph in its item's text (UTF-8 bytes).
   range_end : UInt16
-  /// The source code location of the text.
-  span : (@syntax.Span, UInt16)
+  /// The source code location of the text (upstream `span: (Span, u16)`,
+  /// flattened into `span` and `span_offset` so that a glyph needs no
+  /// boxed tuple).
+  span : @syntax.Span
+  /// The offset within the span.
+  span_offset : UInt16
 } derive(Eq, Hash)
 
 ///|

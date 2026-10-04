@@ -123,7 +123,8 @@ test "frame records" {
     y_offset: @library.Em::new(0.25),
     range_start: start,
     range_end: end,
-    span: (@syntax.Span::detached(), 0),
+    span: @syntax.Span::detached(),
+    span_offset: 0,
   }
   let linear : @library.Paint = Gradient(
     Linear({
