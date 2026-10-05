@@ -10,7 +10,9 @@
 //   moon run doc/examples/review --target native --release -- feedback <name> <text> [comment] [--nth n] [--json]
 //
 // `name` is one of the documents of `@twins.originals()` (default:
-// `showcase`); `compile_document` takes any `() -> @doc.Document`.
+// `showcase`); `compile_document` takes any `() -> @doc.Document`. The
+// MoonBit sources are read from the working directory (the module root),
+// so run the commands there.
 
 ///|
 /// Compile a document function with the files below `root`.
@@ -56,7 +58,7 @@ fn run(args : Array[String]) -> Unit raise {
       for warning in report.warnings {
         println(warning.render())
       }
-      let html = report.review_html().unwrap()
+      let html = report.review_html(sources=@system.sources()).unwrap()
       @system.write_text(out, html)
       println(
         "wrote \{out}: \{report.unwrap().pages().length()} pages, \{@utf8.encode(html).length()} bytes",
@@ -93,7 +95,7 @@ fn run(args : Array[String]) -> Unit raise {
       guard rest.length() >= 2 else {
         fail("feedback <name> <text> [comment] [--nth n] [--json]")
       }
-      let text = compiled(rest[0]).review_text()
+      let text = compiled(rest[0]).review_text(sources=@system.sources())
       guard text.find(rest[1], nth~) is Some(selection) else {
         fail("`\{rest[1]}` (occurrence \{nth}) is not in the document")
       }
