@@ -58,6 +58,10 @@ pub struct FieldInfo {
   /// `IntoValue` (e.g. which `Costs` entries were set, so that folding
   /// works). Upstream stores typed values and converts on access.
   output : ((Value) -> Value)?
+  /// Equality of two stored values, for field types whose `PartialEq` is
+  /// not the equality of their stored form (upstream compares the typed
+  /// fields; `None`: the equality of values).
+  eq : ((Value, Value) -> Bool)?
 }
 
 ///|
@@ -506,6 +510,7 @@ pub fn[T : FromValue + IntoValue] field_of(
   fold? : (Value, Value) -> Value,
   parse? : (Engine, Args, ParseLocals) -> Value? raise SourceError,
   output? : (Value) -> Value,
+  eq? : (Value, Value) -> Bool,
 ) -> FieldInfo {
   {
     id,
@@ -523,6 +528,16 @@ pub fn[T : FromValue + IntoValue] field_of(
     fold,
     parse,
     output,
+    eq,
+  }
+}
+
+///|
+/// Whether two stored values of the field are equal (see [FieldInfo::eq]).
+pub fn FieldInfo::values_equal(self : FieldInfo, a : Value, b : Value) -> Bool {
+  match self.eq {
+    Some(f) => f(a, b)
+    None => a == b
   }
 }
 

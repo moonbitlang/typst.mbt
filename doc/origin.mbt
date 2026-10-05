@@ -590,7 +590,9 @@ fn Origins::origin_of(
     end_line,
     end_column,
     kind: e.kind,
-    keys: e.keys,
+    // Without the keys of the occurrences that lowering registers for
+    // pieces (`Lower::piece_span`): they are the same origin.
+    keys: e.keys.filter(key => !is_pieces_key(key)),
     param,
     text_range,
   }

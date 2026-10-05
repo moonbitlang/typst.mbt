@@ -90,13 +90,13 @@ the description that lowers to what `eval_expr` produces for it:
 
 | Markup | EDSL | Evaluator |
 |---|---|---|
-| text | `Lit("..")`: a description with a location of its own for every text expression (plain strings of one array share the array's location, so diagnostics at two texts, e.g. from a show rule on `text`, would be deduplicated into one) | `TextElem::packed` |
+| text | `Lit("..")`: a description with a location of its own for every text expression (the plain strings of one array all resolve to the array's location; they have distinct spans inside it, `docs/edsl-design.md` 12.2) | `TextElem::packed` |
 | space | `Space()`, `Space::newline()` from `had_newline()` | `space_content` |
 | `\` line break, blank line | `Linebreak()`, `Parbreak()` | the elements |
 | escape `\#`, shorthand `~` `--` | `Symbol("..")` (new, section 9) | a `Symbol` value, displayed as `SymbolElem` |
 | `"`, `'` | `Smartquote(double=true/false)` | `eval_smart_quote` sets `double` |
 | `*a*`, `_a_` | `Strong(..)`, `Emph(..)` | |
-| raw | `Raw(text, block=b, lang=..)` with `lines().join("\n")`, if the raw has at least one line: the evaluator's raw keeps its lines, and a raw without lines (` `` `) is not `raw("")`, which has one empty line; it is not typed | `eval_raw` |
+| raw | `Raw(text, block=b, lang=..)` with `lines().join("\n")`, if that text is not empty; a raw without lines or with one empty line is not typed (section 4.8) | `eval_raw` |
 | `https://..` | `Link(Url(".."))` | `LinkElem::from_url` |
 | `<label>` | `Call("label", positional=[Value::str("..")])` in the sequence (a label-valued inserted expression with a location of its own) | the evaluator's attachment rule, which the EDSL applies to label values in sequences |
 | `@key`, `@key[supp]` | `Ref("key", supplement=Supplement(..))` | `eval_ref` |
@@ -117,10 +117,11 @@ of the stream has a description, also those that display nothing: a typed
 `let` (section 5) leaves `Seq([])`, the empty content the evaluator pushes
 for it. Every inserted value of a stream that is a bare `Value` (a
 displayed variable, a global) is wrapped as `Keyed("<n>", value)` with a
-number unique in the document: a bare value in an array shares the
-array's location with its siblings, and the engine deduplicates
-diagnostics by location and message; the key gives each its own origin
-and does not change the content.
+number unique in the document: a bare value in an array is reported at
+the array's location like its siblings (their engine spans are distinct
+pieces of that location, `docs/edsl-design.md` 12.2, so the engine neither
+deduplicates their diagnostics nor takes equal content for one element);
+the key gives each an origin of its own and does not change the content.
 
 An equation is `Equation(source, block=..)` with the text of its math node
 if no identifier of the math is a user binding; with user bindings that
@@ -310,10 +311,56 @@ character, every other description an interpolation (bound to a variable
 first if its code is long).
 
 The structure is the same in both modes; what differs is the origin of the
-text runs, which share the location of the `Prose` text (so diagnostics
-that differ only in the text run they concern would be deduplicated). The
-sweep is run in both modes: the exact mode is the reference, the readable
-mode additionally tests `Prose` on real paragraphs.
+text runs, which all resolve to the location of the `Prose` text. Each
+run, quote and paragraph break still has a span of its own inside that
+location's span (`docs/edsl-design.md` 12.2), as each expression of the
+markup has. (The first sweep in this mode found why that is needed:
+`[row #colbreak() row]` became two paragraphs that were equal including
+their spans, so the engine gave their tags the same key, where the
+markup's have two; the exports were identical.) The sweep is run in both
+modes: the exact mode is the reference, the readable mode additionally
+tests `Prose` on real paragraphs.
+
+### 4.8 Raw text: lines and strings
+
+Upstream stores the text of a raw element as `RawContent`
+(`typst-library/src/text/raw.rs`): the evaluator builds
+`RawContent::Lines`, the `Text` nodes of the raw syntax each with its
+span (`impl Eval for ast::Raw`, `typst-eval/src/markup.rs`), and the
+`raw` function builds `RawContent::Text` from its string argument. The
+port stores the same (`library/text_raw.mbt`; until this sweep it stored
+the joined string and looked the lines up in the source by the element's
+span, which gave markup evaluated by `eval` the string form). What a
+document can observe of the difference:
+
+- **the lines**: highlighting uses the lines as they are, or splits the
+  string at newlines (`preprocess`). The two agree whenever there is at
+  least one line — the lines of raw syntax contain no newline, and
+  `lines.join("\n")` splits back into them — and differ for a raw
+  without lines: ` `` `, ```` ``` ``` ````, and a fence whose content is
+  one line break have **no line**, while `raw("")` has **one empty
+  line**. `it.lines.len()` in a show rule tells, and so does the layout
+  (no line box against an empty one).
+- **equality**: two raws from syntax compare line by line, so a raw
+  without lines is not equal to a raw with one empty line, although both
+  have the text `""`; against a raw from a string the texts are compared,
+  so both are equal to `raw("", block: ..)`.
+- the text itself (`it.text`, `repr`, selectors on `text`) is the string
+  in both forms, and the spans of the lines only matter as provenance and
+  in the hash of the element.
+
+The EDSL's `Raw(text, ..)` is the `raw` function, so it is the exact
+translation of a raw literal whose text is not empty: the lines are the
+same, and so is every comparison (the comparison's structural dump prints
+both forms as their lines, section 7). For a raw **without lines** there
+is **no functional form in Typst**: no argument of `raw` gives zero
+lines, and `lines` is a synthesized field. A raw with **one empty line**
+has the lines of `raw("")`, but not its equality: it differs from a raw
+without lines, to which `raw("")` is equal. Literals with an empty text
+therefore stay Typst source (a `Markup` fragment, reason `raw-empty`;
+of the first kind there are three cases in the suite: `raw-empty`,
+`raw-trimming`, `issue-3601-empty-raw`); evaluated there they are the
+evaluator's raws, with their lines.
 
 ## 5. Bindings
 
@@ -415,7 +462,10 @@ For every case, in the test world:
    deduplication: severity, message, hints, whether located) are equal;
    the lowered and the evaluated content have the same structural dump
    (`StructDumper`: element identity, every stored field, labels, styles
-   with `liftable`, recipes; spans omitted, functions by repr).
+   with `liftable`, recipes; spans omitted, functions by repr; the text
+   of a raw element as the lines that highlighting sees, so that the
+   lines of raw syntax and the string of the `raw` function with the same
+   lines are equal and a raw without lines differs from `raw("")`).
 2. **Layout**, for cases that upstream compiles to a paged document
    (`is_paged`): `Document::compile_paged` against `@typst.compile`, with
    memoization on and off. Same status and diagnostics; on success the

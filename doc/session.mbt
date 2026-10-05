@@ -124,7 +124,13 @@ fn Session::host(
         (session.registry.span(entry), session.registry.entries[entry].keys)
       _ => (span, keys)
     }
-    let lower : Lower = { session, engine, context, keys, }
+    let lower : Lower = {
+      session,
+      engine,
+      context,
+      keys,
+      pieces: Option::None,
+    }
     let cx : Ctx = { lower, alive: { val: true, }, span, }
     let result = try (callback.invoke)(cx, args) catch {
       @library.SourceError(errors) => {
@@ -143,7 +149,7 @@ fn Session::host(
       value => value
     }
     cx.alive.val = false
-    lower.value(result, span)
+    lower.at(span).value(result, span)
   })
   self.hosts[callback.serial] = host
   host

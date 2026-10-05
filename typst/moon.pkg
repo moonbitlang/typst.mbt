@@ -7,3 +7,7 @@ import {
   "moonbitlang/typst/layout",
   "moonbitlang/core/hashset",
 }
+
+import {
+  "moonbitlang/typst/syntax/ast",
+} for "wbtest"

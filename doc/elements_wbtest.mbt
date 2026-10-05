@@ -12,7 +12,13 @@ fn test_lower() -> Lower {
     sink: @library.Sink::new(),
     route: @library.Route::root(),
   }
-  { session, engine, context: @library.Context::none(), keys: [], }
+  {
+    session,
+    engine,
+    context: @library.Context::none(),
+    keys: [],
+    pieces: Option::None,
+  }
 }
 
 ///|

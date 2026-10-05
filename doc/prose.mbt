@@ -191,19 +191,17 @@ pub fn Prose::Prose(
       word.reset()
     }
   }
+  // The quotes and paragraph breaks are calls without a location of their
+  // own, like the text runs: each takes a span of its own inside the text
+  // argument's when the sequence is lowered (`Pieces` in `lower.mbt`).
+  let call = (elem : @library.Element, args : Array[ArgNode]) => {
+    Content::of(NValue(Value::of(VCall(FElem(elem), args))))
+  }
   // The gap before a piece that is no text: a paragraph break or a space.
   let separate = () => {
     if gap >= 0 && !children.is_empty() {
       if gap >= 2 {
-        children.push(
-          Content::of(
-            NCall({
-              func: FElem(@library.parbreak_elem()),
-              args: [],
-              origin: site,
-            }),
-          ),
-        )
+        children.push(call(@library.parbreak_elem(), []))
       } else {
         children.push(Content::of(NSpace(gap == 1)))
       }
@@ -280,15 +278,9 @@ pub fn Prose::Prose(
     } else if quotes && (c == '"' || c == '\'') {
       flush()
       children.push(
-        Content::of(
-          NCall({
-            func: FElem(@library.smart_quote_elem()),
-            args: [
-              { name: Some("double"), value: Value::bool(c == '"'), param: 0, },
-            ],
-            origin: site,
-          }),
-        ),
+        call(@library.smart_quote_elem(), [
+          { name: Some("double"), value: Value::bool(c == '"'), param: -1, },
+        ]),
       )
     } else {
       word.write_char(c)

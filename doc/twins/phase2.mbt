@@ -336,6 +336,41 @@ pub fn phase2() -> Array[Twin] {
         ])
       },
     ),
+    // Every piece of a sequence is an expression of its own, as in markup:
+    // the text runs, quotes and paragraph breaks of `Prose`, the plain
+    // strings of `Seq` and the quotes of `Quoted` have distinct spans. The
+    // engine hashes spans into the keys of located elements, so the
+    // paragraphs with equal words below are different elements, as in the
+    // twin (the keys of their tags are compared by the frame dump). Found
+    // by converting the upstream suite in the readable mode
+    // (`grid-subheaders-non-repeating-header-before-multi-page-row`,
+    // `[row #colbreak() row]`).
+    twin(
+      "repeated-pieces",
+      [
+        page_typ, "#[#\"row\"#parbreak()#\"row\"#parbreak()#smartquote(double: true)#parbreak()#smartquote(double: true)#parbreak()#\"row\"]",
+        "#parbreak()", "#[#\"same\"#parbreak()#\"same\"#parbreak()#3#parbreak()#3]",
+        "#parbreak()", "#[#smartquote()#parbreak()#smartquote()]",
+      ],
+      () => {
+        Document([
+          page(),
+          Prose("row\n\nrow\n\n\"\n\n\"\n\nrow"),
+          Parbreak(),
+          Seq([
+            "same",
+            Parbreak(),
+            "same",
+            Parbreak(),
+            Value::int(3),
+            Parbreak(),
+            Value::int(3),
+          ]),
+          Parbreak(),
+          Quoted(Parbreak()),
+        ])
+      },
+    ),
     // Typst's operators on values, evaluated when the value is lowered.
     twin(
       "value-operators",
