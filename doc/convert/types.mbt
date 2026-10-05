@@ -4,7 +4,7 @@
 // the same document with the EDSL of `doc`. It translates statically what
 // it can type (markup, element calls with literal arguments, set and show
 // rules, literal bindings) and keeps everything else as Typst source in
-// fallback fragments (`Markup(..)`, `eval`), which are reported.
+// fallback fragments (`Markup(..)`), which are reported.
 
 ///|
 /// How a document was expressed (docs/edsl-convert.md, section 6.5).
@@ -14,8 +14,8 @@ pub(all) enum Tier {
   /// Typed, plus the value-level hatches (`Value::..`, `Call`, `Set`,
   /// `ShowWith`, `extra=`).
   T2
-  /// Contains source evaluated by the front end: fragments (`Markup`,
-  /// `eval`) or math strings (`Equation`).
+  /// Contains source evaluated by the front end: fragments (`Markup`) or
+  /// math strings (`Equation`).
   T3
   /// Not convertible.
   T4
@@ -40,8 +40,7 @@ pub struct Fallback {
   /// `let`, `import`, ...).
   construct : String
   /// `"item"`: one embedded expression; `"stream"`: a whole content block
-  /// or document; `"value"`: an argument evaluated with `eval`;
-  /// `"callback"`: the body of a host callback.
+  /// or document; `"callback"`: the body of a host callback.
   kind : String
   /// The UTF-8 length of the source kept as Typst.
   bytes : Int
@@ -102,8 +101,7 @@ priv enum Ty {
 priv struct Env {
   vars : Map[String, (String, Ty)]
   /// Inside a host callback: callbacks cannot be created here (the
-  /// creation rule of the EDSL), and there is no `eval` value fallback
-  /// (it would lose the invocation's context).
+  /// creation rule of the EDSL).
   in_callback : Bool
 }
 

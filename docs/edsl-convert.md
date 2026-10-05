@@ -401,9 +401,10 @@ rules are:
    known ones). The tier says how the document was expressed, not whether
    it is equal.
 
-For each fragment the manifest records the construct that forced it and
-its byte range in the original; the fallback ratio of a document is the
-union of those ranges over its length.
+For each fragment the manifest records the construct that forced it, its
+kind (an expression item, a whole stream, the body of a callback) and the
+number of source bytes it keeps; fragments do not nest, so the fallback
+ratio of a document is the sum of those over its length.
 
 ## 7. Comparison
 
@@ -443,7 +444,8 @@ query results or convergence is a failure to classify.
   `manifest.tsv`) and `edsl-suite [filter]` (compares). Generated code
   goes to gitignored files `tests/edsl_gen/s<k>/gen_*.mbt` in committed
   **stub shard packages** (a `moon.pkg` and one file each), so the tree
-  builds without generated code; shards are filled by generated size.
+  builds without generated code; a case goes to the shard of its number
+  modulo the number of shards (16), which spreads the directories evenly.
   Generated files only register builders in `fn init` with the committed
   registry package `tests/edsl_gen/registry` (case id, tier, a function
   reference; nothing is built at initialization; the stage sorts by case
@@ -503,11 +505,17 @@ converted documents; what the missing world blocks is reported as blocked.
    (5), expression fragments (6).
 3. The documentation inventory (10).
 
-Per case the manifest has: id, attributes, tier (and T3m), typed and
-fragment counts, fragment constructs with byte ranges, fallback ratio,
-first-attempt compile status; the stage adds per phase: evaluation status,
-diagnostics, structure, frames (memo on, off, cross), SVG, PDF, PNG, and
-the first failing phase. The report aggregates per suite directory.
+Per case the manifest (`tests/edsl_gen/manifest.tsv`) has: number, shard,
+file, name, attributes, whether it is paged, tier and whether its only
+source evaluation is math strings, the number of typed expressions, source
+and fragment bytes, the fragments (construct, kind, bytes), its lines in
+the shard file and the first-attempt compile status. The stage writes
+`tests/edsl_gen/results.tsv`: per case the checks that failed
+(`eval-status`, `eval-diagnostics`, `structure`, `compile-status`,
+`compile-diagnostics`, `frames`, `svg`, `pdf`, `png`, each also with
+`-memo-off` where it applies, `edsl-memo`, `typst-memo`) and the first
+difference of the first one. `scripts/edsl_report.py` aggregates both per
+suite directory.
 
 ## 12. Resolution of review 1
 

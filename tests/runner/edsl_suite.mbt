@@ -109,6 +109,31 @@ fn tsv_line(fields : Array[String]) -> String {
 }
 
 ///|
+/// The inverse of the escaping of `tsv_line` for one field.
+fn tsv_field(field : String) -> String {
+  let out = StringBuilder()
+  let mut escaped = false
+  for c in field {
+    if escaped {
+      out.write_char(
+        match c {
+          't' => '\t'
+          'n' => '\n'
+          'r' => '\r'
+          other => other
+        },
+      )
+      escaped = false
+    } else if c == '\\' {
+      escaped = true
+    } else {
+      out.write_char(c)
+    }
+  }
+  out.to_string()
+}
+
+///|
 /// `--failed=<file>`: the cases whose generated code did not type-check
 /// (lines `number<TAB>message`), which are regenerated as whole-document
 /// fragments and recorded as compile errors.
@@ -464,7 +489,8 @@ fn run_edsl_suite(filter : String?, verbose : Bool) -> Unit {
       try @string.parse_int(fields[0]) catch {
         _ => ()
       } noraise {
-        number => manifest[number] = fields[2] + "\t" + fields[3]
+        number =>
+          manifest[number] = tsv_field(fields[2]) + "\t" + tsv_field(fields[3])
       }
     }
   }
