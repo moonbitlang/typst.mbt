@@ -1,9 +1,11 @@
-# A MoonBit EDSL for typst.mbt (design, revision 4)
+# A MoonBit EDSL for typst.mbt (design, revision 5)
 
-Status: revision 4. Revision 3 resolved the items of
-`docs/edsl-reviews/review-2.md`; this revision resolves the issues A–G of
-`docs/edsl-reviews/review-3.md`. Section 19 maps each finding to the section
-that resolves it. Packages: `moonbitlang/typst/doc` (imported as `@doc`),
+Status: revision 5. Revision 3 resolved the items of
+`docs/edsl-reviews/review-2.md`, revision 4 the issues A–G of
+`docs/edsl-reviews/review-3.md`; this revision resolves the four issues of
+`docs/edsl-reviews/review-4.md` (all in the convergence contract of section
+11.4 and the structural dump of section 16.2). Section 19 maps each finding
+to the section that resolves it. Packages: `moonbitlang/typst/doc` (imported as `@doc`),
 `doc/system`, `doc/examples`, `doc/twins`.
 
 The examples of this document are compiled code: `doc/examples/
@@ -771,6 +773,14 @@ priv struct RecordedRead {
   recomputes the result on another introspector and compares it with the
   recorded one. It is kept as `exact` only if the result's fingerprint flags
   are non-zero (lossy or identity).
+- **Flags are complete for this purpose.** A fingerprint that does not
+  capture all data of a value must set a flag, or `exact` would be dropped.
+  The one place where the existing fingerprint silently omitted data is
+  fixed (review-4, issue 1): `Module::fingerprint_with_depth` hashes a
+  module that is bound directly in a scope (of another module, or of a
+  closure's captures) only by name and file; it now marks such a truncated
+  module `lossy | identity`. So an outer module whose nested module differs
+  is flagged, and so is everything containing it.
 - `validate` requires `replay(i) == expected` **and**, if present,
   `exact(i)`.
 - The comparison is `values_validate_equal`: the recursion of
@@ -778,30 +788,48 @@ priv struct RecordedRead {
   styles, arguments, selectors, dynamic values) in a *validating* mode that
   differs from memo-input equality only where a value is legitimately
   created anew in every layout iteration. No part of it accepts a value on
-  the strength of a fingerprint that may be lossy (review-3, issue A):
+  the strength of a fingerprint that may be lossy:
   - **host functions**: the same `HostFunc` object;
   - **Typst closures**: *structurally*, not by fingerprint and not by
     identity (a closure created during layout has a new identity in every
     iteration and must still converge, as with upstream's hash-based
     validation): the same kind and function span, the same syntax node (the
     same node object, or equal span and text), the same number of positional
-    parameters, and — **recursively with `values_validate_equal`** — equal
-    default values and equal captured bindings (the same names in order,
-    bound to equal values). A gradient, a host function or another closure
-    among the captures is therefore compared by the rules of this list;
-  - **modules** (captured, or as values): the same module, or — for a module
-    evaluated anew — the same name, content and bindings, recursively;
+    parameters, and — recursively — equal default values and equal captured
+    bindings (the same names in order, bound to equal values). A gradient, a
+    host function or another closure among the captures is therefore
+    compared by the rules of this list;
+  - **modules**: a module *value* is equal to the same module, or — for a
+    module evaluated anew — to one with the same name, file, content and
+    bindings. A module **bound directly in a scope** (among a module's
+    bindings or a closure's captures), which is where the fingerprint stops,
+    is equal **only to the same module object**. (Imports are memoized per
+    compilation, `eval_source_memoized`, so an imported module is the same
+    object in every iteration.);
   - **gradients and tilings**: the types' own equality (their fingerprints
     go through a rounded repr);
   - **resolved grids** (`CellGrid`, the synthesized field of tables and
-    grids; never equal as memo input): equal fingerprints and, cell by
-    cell, recursively equal bodies, equal fills and equal strokes;
+    grids; never equal as memo input): equal fingerprints and, exactly,
+    everything the grid fingerprint hashes lossily — per cell the body
+    (recursively), the fill and the strokes, and the explicit horizontal
+    and vertical lines with their strokes (review-4, issue 2);
   - **other leaves**: equal fingerprints, and for leaves whose fingerprint
     is marked lossy (dynamic values hashed through their repr, such as
     strokes) also the engine's `==`.
-- The recursion terminates without cycle detection: values are immutable, a
-  closure captures a snapshot of values that existed before it, and module
-  imports are acyclic, so the compared structures are finite DAGs.
+- **Termination** (review-4, issue 3) does not rest on an assumption about
+  the values: the comparison descends only where the fingerprint
+  computation descends — into content fields, collections, styles,
+  arguments, a closure's defaults and captures, a module value's content
+  and bindings — and, like the fingerprint, it does **not** descend into a
+  module bound in a scope (identity instead). `validate` computes the
+  fingerprints of both results before it calls `exact`, so both traversals
+  have terminated, and the comparison visits a subset of what they visited.
+  In particular a module that contains itself (which a host can build
+  through `Module::new` and `Scope::define`, and which the fingerprint
+  handles by its depth limit) is compared without recursion; a cyclic graph
+  through arrays or dictionaries cannot reach validation, because the
+  engine's fingerprint of it does not terminate in the first place (that is
+  the engine's existing behaviour, independent of this design).
 - A **stable query containing host functions converges**: under the
   creation rule the content in both introspectors holds the same `HostFunc`
   objects. A stable query containing closures created during layout
@@ -811,11 +839,16 @@ priv struct RecordedRead {
   exact fingerprints are validated as before, at the same cost.
 
 Gate: validation changes only for flagged results, and all differential
-stages must stay unchanged (section 17). Unit tests cover: two closures
-with the same code capturing the two distinct gradients of
-`library/memo_wbtest.mbt` (equal fingerprints) do not validate; closures
-created anew with equal captures validate; host functions validate by
-identity only.
+stages must stay unchanged (section 17). Unit tests
+(`library/validate_wbtest.mbt`, `library/validate_recorder_wbtest.mbt`)
+cover, at the value level and through a recorder with a recorded query:
+closures with the same code capturing the two distinct gradients of
+`library/memo_wbtest.mbt` (equal fingerprints) do not validate, closures
+created anew with equal captures do; host functions validate by identity
+only, also with equal keys; outer modules whose nested modules differ have
+equal fingerprints, are flagged and do not validate; a module containing
+itself terminates; grids differing only in the stroke of an explicit line
+do not validate.
 
 ### 11.5 Purity contract and determinism check
 
@@ -1209,7 +1242,9 @@ main file at the project root:
    stage of its own (review-3, issue F; the canonical dump of the `realize`
    stage is not used because it goes through `Content::fields()`, which
    omits internal fields, and prints non-unique element names). It prints,
-   recursively:
+   recursively, for **every content node its label** (labels are stored
+   independently of the element kind, and `Labelled` may label a sequence
+   or a styled wrapper; review-4, issue 4) after the node's encoding:
    - a sequence as the list of its children; styled content as its styles
      in order followed by the child; a property as element, field and
      value with its `liftable` flag; a recipe as its selector (repr) and
@@ -1219,7 +1254,7 @@ main file at the project root:
      first occurrence, shared by both documents, so `grid.cell` and
      `table.cell` differ — followed by **every stored field** by field id
      with its name (the raw storage, including internal and synthesized
-     fields), and its label;
+     fields);
    - values: content and arrays recursively; functions by repr (a host
      function and the twin's closure both print `(..) => ..`); everything
      else by repr.
@@ -1319,7 +1354,16 @@ and off, invalid inputs with their diagnostics) are ordinary tests of the
 
 ## 19. Resolution index
 
-Review 3 (revision 4):
+Review 4 (revision 5):
+
+| Review-4 item | Resolution |
+|---|---|
+| 1 module validation bypassed (MAJOR) | 11.4: a truncated module fingerprint is flagged `lossy | identity`, so `exact` is kept; nested modules are compared by identity |
+| 2 grid line strokes (MAJOR) | 11.4: resolved grids also compare the explicit lines with their strokes exactly |
+| 3 termination (MAJOR) | 11.4: the comparison descends only where the fingerprint did (never into scope-bound modules), so it terminates whenever the fingerprints did; no acyclicity assumption |
+| 4 labels in the structural dump (MINOR) | 16.2: the label of every content node is printed, including sequences and styled wrappers; twins with a labelled sequence and a labelled styled wrapper |
+
+Review 3 (revision 4, kept):
 
 | Review-3 item | Resolution |
 |---|---|

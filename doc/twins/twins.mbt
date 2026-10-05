@@ -36,6 +36,7 @@ using @doc {
   type ShowSet,
   type Select,
   type Block,
+  type Text,
   type V,
   type H,
   type Line,
@@ -156,6 +157,7 @@ pub fn constructs() -> Array[Twin] {
         page_typ, "#set heading(numbering: \"1.\");", "#heading[#\"First\"]<first>",
         "#[#heading[#\"Second\"]<second>]", "#par[#\"See \"#ref(<first>)#\" and \"#ref(<second>, supplement: [#\"Part\"])#\".\"]",
         "#par[#\"Jump to \"#link(<first>)[#\"the start\"]#\" or \"#link(\"https://typst.app\")#\".\"]",
+        "#[#[#\"a\"#\"b\"]<sequence>]", "#[#text(fill: red)[#\"styled\"]<wrapper>]",
       ],
       () => {
         Document([
@@ -181,6 +183,9 @@ pub fn constructs() -> Array[Twin] {
               ".",
             ]),
           ),
+          // Labels on a sequence and on a styled wrapper.
+          Labelled(Seq(["a", "b"]), "sequence"),
+          Labelled(Text("styled", fill=Red), "wrapper"),
         ])
       },
     ),

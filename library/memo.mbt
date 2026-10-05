@@ -441,8 +441,8 @@ fn funcs_memo_equal(a : Func, b : Func) -> Bool {
 /// Closure equality for [validating]: the same code and, recursively, equal
 /// defaults and captured values. Unlike the structural fingerprint this is
 /// exact where a captured value's fingerprint is lossy, and it compares
-/// captured host closures by identity. (Values are immutable and a closure
-/// captures values that existed before it, so the recursion terminates.)
+/// captured host closures by identity. (The recursion visits what the
+/// closures' fingerprints visited; see [scopes_validate_equal].)
 fn closures_validate_equal(a : Closure, b : Closure) -> Bool {
   if physical_equal(a, b) {
     return true
@@ -462,7 +462,11 @@ fn closures_validate_equal(a : Closure, b : Closure) -> Bool {
 
 ///|
 /// Scope equality for [validating]: the same names bound to equal values,
-/// in order.
+/// in order. Like the fingerprint (`Scope::fingerprint_with_depth`), it does
+/// not descend into modules bound in the scope: such a nested module is
+/// only equal to the same module. The comparison thus visits what the
+/// fingerprints of both values visited, and terminates as they did, also
+/// for modules that contain themselves.
 fn scopes_validate_equal(a : Scope, b : Scope) -> Bool {
   if physical_equal(a, b) {
     return true
@@ -474,7 +478,14 @@ fn scopes_validate_equal(a : Scope, b : Scope) -> Bool {
   let mut i = 0
   for name, binding in a.map {
     let (name2, binding2) = ys[i]
-    if name != name2 || !values_memo_equal(binding.value, binding2.value) {
+    if name != name2 {
+      return false
+    }
+    let equal = match (binding.value, binding2.value) {
+      (Module(x), Module(y)) => x == y
+      (x, y) => values_memo_equal(x, y)
+    }
+    if !equal {
       return false
     }
     i += 1
@@ -484,9 +495,10 @@ fn scopes_validate_equal(a : Scope, b : Scope) -> Bool {
 
 ///|
 /// Resolved grid equality for [validating], in addition to equal
-/// fingerprints: the cells' bodies, fills and strokes are compared exactly
-/// (bodies recursively, so closures and host closures in them follow the
-/// rules above).
+/// fingerprints: what the fingerprint hashes lossily is compared exactly,
+/// i.e. the cells' bodies (recursively, so closures and host closures in
+/// them follow the rules above), fills and strokes, and the strokes of the
+/// explicit lines.
 fn cell_grids_validate_equal(a : CellGrid, b : CellGrid) -> Bool {
   if physical_equal(a, b) {
     return true
@@ -519,16 +531,20 @@ fn cell_grids_validate_equal(a : CellGrid, b : CellGrid) -> Bool {
       _ => return false
     }
   }
-  true
+  // The explicit lines with their strokes.
+  a.vlines == b.vlines && a.hlines == b.hlines
 }
 
 ///|
-/// Module equality for [validating]: the same module, or (for modules
-/// evaluated anew) the same name, content and bindings.
+/// Module equality for [validating]: the same module, or (for a module
+/// evaluated anew) the same name, file, content and bindings, where modules
+/// among the bindings must be the same modules (see
+/// [scopes_validate_equal]).
 fn modules_validate_equal(a : Module, b : Module) -> Bool {
   a == b ||
   (
     a.name() == b.name() &&
+    a.file_id() == b.file_id() &&
     content_memo_equal(a.content(), b.content()) &&
     scopes_validate_equal(a.scope(), b.scope())
   )

@@ -225,6 +225,12 @@ fn Module::fingerprint_with_depth(
   if depth == 0 {
     state.write(self.inner.content)
     self.inner.scope.fingerprint_with_depth(state, depth + 1)
+  } else {
+    // The content and bindings of a nested module are not part of the
+    // fingerprint: it does not capture all data, and nested modules are
+    // compared by identity where an exact comparison is needed (see
+    // `values_validate_equal`).
+    mark_fingerprint_flags(fingerprint_lossy | fingerprint_identity)
   }
 }
 
