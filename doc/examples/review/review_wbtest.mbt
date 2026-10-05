@@ -507,3 +507,58 @@ test "the showcase's feedback has source characters and excerpts" {
   )
   assert_true(html.contains("\"format\":\"typst.mbt review feedback 2\""))
 }
+
+///|
+test "positions on the showcase: source lines lead back to the pages" {
+  let report = compile_document(@twins.full_showcase)
+  let text = report.review_text(sources=@system.sources())
+  let source = @utf8.decode(@system.read(bench_file))
+  // The middle of a box, looked up in the other direction.
+  let origin_of = (region : @doc.Region) => {
+    report
+    .origin_at(
+      region.page,
+      region.x + region.width / 2.0,
+      region.y + region.height / 2.0,
+    )
+    .unwrap()
+  }
+  // A heading: its words, in the outline and in the text.
+  let at = position_of(source, "Heading(\"Tables and figures\")")
+  let heading = text.positions(bench_file, at.0)
+  assert_eq(heading.length(), 6)
+  assert_eq(
+    heading
+    .map(region => origin_of(region).kind)
+    .filter(k => k != "Heading")
+    .length(),
+    0,
+  )
+  // A line of a prose block: the words that the line spells, not the
+  // whole block.
+  let at = position_of(source, "$|Typst lays out text with a Knuth–Plass")
+  let line = text.positions(bench_file, at.0)
+  assert_true(line.length() >= 12 && line.length() <= 16)
+  let block = text.origin_positions(origin_of(line[0]))
+  assert_true(block.length() > 5 * line.length())
+  // A column in that line: one word.
+  let at = position_of(source, "Knuth–Plass style")
+  let word = text.positions(bench_file, at.0, column=at.1 + 3)
+  assert_eq(word.length(), 1)
+  assert_eq(origin_of(word[0]).kind, "Prose")
+  let feedback = text.feedback(text.find("Knuth–Plass").unwrap(), "")
+  assert_eq(feedback.origins[0].source_ranges[0].line, at.0)
+  // An argument that is a variable: everything of the argument.
+  let at = position_of(source, "stage_cells,")
+  let cells = text.positions(bench_file, at.0)
+  assert_true(cells.length() > 30)
+  for region in cells {
+    assert_eq(origin_of(region).kind, "Table")
+  }
+  // An image: its box.
+  let at = position_of(source, "Image(\"glacier.jpg\"")
+  let image = text.positions(bench_file, at.0)
+  assert_eq(image.length(), 1)
+  assert_eq(origin_of(image[0]).kind, "Image")
+  assert_true(image[0].width > 100.0 && image[0].height > 100.0)
+}

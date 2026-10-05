@@ -123,6 +123,9 @@
   source characters only if all of the origin's text on the page is that
   literal's text (tier 3; otherwise the argument or the call, with the
   reason); excerpts and tiers are embedded in the page when it is made.
+  Slice 4a: `ReviewText::positions(file, line, column?)` gives the boxes
+  on the pages of what a source line produced (`doc/review_positions.mbt`;
+  the page has a "Source line" field with the same rule in `Core`).
 - Typst-to-EDSL translator (`doc/convert`, design in `docs/edsl-convert.md`,
   Codex-approved; a stress test of the EDSL, not a compiler): typed where
   the design's narrow rules prove it exact, Typst source in `Markup`

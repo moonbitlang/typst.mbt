@@ -108,7 +108,21 @@ h1 { font-size: 16px; font-weight: 600; overflow-wrap: anywhere; flex: 1 1 auto;
   text-align: center;
   font-variant-numeric: tabular-nums;
 }
-.jump:focus-visible, button:focus-visible, textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.jump:focus-visible, button:focus-visible, textarea:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.find { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; flex: 1 1 100%; min-width: 0; font-size: 12.5px; }
+.find label { color: var(--muted); font-weight: 600; }
+.find input {
+  flex: 0 1 15em;
+  min-width: 0;
+  padding: 4px 8px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: var(--field);
+  color: var(--ink);
+  font: 12.5px/1.4 var(--mono);
+}
+.find button { padding: 3px 10px; }
+.find .status { min-height: 0; flex: 1 1 12em; }
 h2 { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
 .meta { color: var(--muted); font-size: 12.5px; }
 
@@ -153,6 +167,10 @@ h2 { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
 .hit rect[data-o] { pointer-events: fill; }
 .hit rect[data-o].on, .hit path[data-o].on[pointer-events="fill"], .hit path[data-o].on[pointer-events="all"] { fill: var(--mark); }
 .hit path[data-o].on[pointer-events="stroke"], .hit path[data-o].on[pointer-events="all"] { stroke: var(--mark-line); stroke-opacity: 0.6; }
+/* What a source line produced: outlined (the outline takes no pointer). */
+.hit rect[data-o].src { stroke: var(--mark-line); stroke-width: 0.9; }
+.hit path[data-o].src[pointer-events="fill"] { stroke: var(--mark-line); stroke-width: 0.9; }
+.hit path[data-o].src[pointer-events="stroke"], .hit path[data-o].src[pointer-events="all"] { stroke: var(--mark-line); stroke-opacity: 0.6; }
 
 .panel {
   position: sticky;
@@ -188,7 +206,7 @@ button[aria-pressed="true"] { background: var(--field); border-color: var(--acce
 code { font: 13px/1.4 var(--mono); overflow-wrap: anywhere; }
 .origin .meta { font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
 .rendered { overflow-wrap: anywhere; max-height: 4.4em; overflow: auto; }
-.tier { margin-left: 8px; padding: 1px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+.tier { padding: 1px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; white-space: nowrap; }
 .tier.t3 { background: var(--exact-bg); color: var(--exact); }
 .tier.t2 { background: var(--coarse-bg); color: var(--coarse); }
 .tier.t1 { background: var(--field); color: var(--muted); }
@@ -243,7 +261,7 @@ textarea.out { font: 12px/1.45 var(--mono); white-space: pre; overflow: auto; }
   border-radius: 6px;
 }
 .comment p { grid-column: 1; overflow-wrap: anywhere; }
-.comment button { grid-column: 2; grid-row: 1 / span 2; }
+.comment .tools { grid-column: 2; grid-row: 1 / span 2; }
 .said { font-weight: 600; }
 
 @media (max-width: 860px) {

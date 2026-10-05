@@ -4,6 +4,12 @@
     <h1 id="doc-title">{{TITLE}}</h1>
     <p id="doc-meta" class="meta"></p>
     <a class="jump" href="#comments">Comments <span id="count" class="count">0</span></a>
+    <form id="find" class="find">
+      <label for="line">Source line</label>
+      <input id="line" type="text" inputmode="numeric" autocomplete="off" spellcheck="false" placeholder="line or file:line">
+      <button type="submit">Find</button>
+      <span id="find-status" class="status" role="status"></span>
+    </form>
   </div>
 </header>
 <p id="selftest" class="selftest" hidden></p>

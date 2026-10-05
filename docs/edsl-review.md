@@ -14,7 +14,8 @@ not do yet.
 | 1 | Click to source: the preview page, the origin of every rendered piece, the click lookup | below |
 | 2 | Select text across runs, comment, copy the feedback as text and JSON | below |
 | 3 | Source excerpts and source characters where they can be verified | below |
-| 4 | `Keyed` data keys, callbacks, raw lines, limits, source line → page positions | later |
+| 4a | Source line → page positions; find by source line in the page; comments lead back to their selection | below |
+| 4b | `Keyed` data keys for loop-built content; what the loop reports for callbacks, raw lines, bibliographies | later |
 
 The appendix holds the design that the slices are cut from. It is **not
 under review**; its text moves into a slice's section, shortened, when
@@ -431,6 +432,105 @@ What that gives:
   have source characters), 36 are calls, 5 are variables or
   expressions, 1 is right-to-left text; `node
   scripts/review_page_check.mjs` and `#selftest` pass.
+
+## Slice 4a: from a source line to the page
+
+### What it does
+
+```moonbit
+let text = report.review_text(sources=@system.sources())
+// Where is what line 200 of the showcase's source produced?
+for region in text.positions("doc/twins/bench.mbt", 200) {
+  println("page \{region.page}: \{region.x} \{region.y} \{region.width} x \{region.height}")
+}
+```
+
+- `ReviewText::positions(file, line, column?) -> Array[Region]` is the
+  direction of upstream's `jump_from_cursor`: the boxes on the pages of
+  what a source line produced, in the order of the pages. A `Region` is
+  a page and a rectangle in points. `origin_positions(origin)` gives the
+  boxes of everything one origin produced.
+- In the page, a field "Source line" takes `line` or `file:line` (a line
+  alone is a line of the file that most origins are in). What the line
+  produced is outlined and brought into view, and a sentence says on
+  which pages it is, or that nothing comes from that line.
+- Every comment of the list has a "Show" button: it selects what the
+  comment is about again and scrolls to it.
+- `doc/examples/review`: `positions <name> <file>:<line>[:<column>]`.
+- Two small things in the page: `#selftest` also runs when the address
+  changes to it without a reload, and the tier label of a location is
+  separated from the text before it (it used to run into it for a
+  reader of the plain text).
+
+### What a line gives
+
+An origin is a **candidate** if its location — the argument, or the call
+— has the line (with a column: the position) and is in that file.
+
+- A candidate with source characters (tier 3, slice 3) gives **the words
+  that have source characters on that line** (at that column): a line of
+  a `Prose` block gives the words that the line spells, not the block.
+- Any other candidate gives **everything it produced**, unless a narrower
+  candidate lies inside its location: the line of an argument does not
+  light up the whole call around it.
+
+The boxes are those of the page's layer (slice 1): one per word, per gap
+between words, per shape and per image, as bounding boxes on the page
+after the transforms of the groups around them.
+
+### What it guarantees
+
+1. **Both directions agree.** A box that `positions` returns for a line
+   is the box of something whose origin's location has that line. (For
+   the boxes of the test documents and of the showcase's lines the tests
+   also look the middle of the box up with `origin_at`; that is a check
+   of those documents, not a promise: the middle of the box of an
+   outlined shape is empty, and something else can lie over it.)
+2. **The page gives the library's answer.** The page finds the words and
+   origins of a line with the same rule from the same data; the library's
+   answers for some lines are embedded and compared by `#selftest` and
+   `scripts/review_page_check.mjs`.
+3. **A comment's selection is only shown where it still is.** A comment
+   keeps the numbers of its words, or for a shape or an image its origin
+   and which of that origin's shapes on the page it is. If the page was
+   made anew and those words are not that text any more, or the origin
+   is not the same call, "Show" says so and selects nothing. A comment
+   that an earlier version of the page stored has no selection: it stays
+   in the list and can be copied.
+4. Nothing of the compilation or of the other exports changes; the
+   lookup reads the tables that slices 1 to 3 built.
+
+### Known limits of this slice
+
+- Without sources, or where an argument has no source characters (a
+  variable, an expression), a line gives the whole argument: every cell
+  of a table for the line of the variable that holds them.
+- The narrowest candidate wins. On a line that has a string of an array
+  and a call inside that array, without source characters only the call
+  is found.
+- A box is a bounding box: of rotated text it is larger than the text,
+  around a stroke it leaves room for caps and joins, and a clip around a
+  group does not cut it.
+- `positions` takes the file as origins name it (relative to the module
+  root); the page's field takes a line of the main file or `file:line`
+  with that same name, and no column.
+- The outline that marks a source line is not a selection: it does not
+  fill the panel.
+
+### Tests
+
+- `doc/review_test.mbt`: a shape's box; a shape in a scaled group; text
+  found by its location; the narrower candidate; a column; another file,
+  a line without a location; an origin of another document; both
+  directions for every box; the page's form and embedded answers.
+- `doc/examples/review/review_wbtest.mbt`, on the showcase with its
+  sources: a heading's line (its words in the outline and in the text),
+  a line of a prose block (only its words), a column (one word), the
+  line of a variable (all cells), an image's line; each box looked up in
+  the other direction.
+- On the showcase's page: `node scripts/review_page_check.mjs` (36
+  records, 16 source lines) and `#selftest`; by hand: find a line, add
+  a comment, scroll away, "Show".
 
 ## Appendix: later slices (not under review)
 

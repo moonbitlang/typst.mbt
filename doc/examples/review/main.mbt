@@ -1,13 +1,14 @@
-// The review loop of the EDSL (docs/edsl-review.md, slices 1 and 2):
-// write the preview page of a document, in which a selection shows the
-// MoonBit constructor calls that produced it and becomes feedback for the
-// author, and answer the same questions from the command line.
+// The review loop of the EDSL (docs/edsl-review.md): write the preview
+// page of a document, in which a selection shows the MoonBit constructor
+// calls that produced it and becomes feedback for the author, and answer
+// the same questions from the command line.
 //
 // Usage (from the repository root: `bench/` holds the documents' files):
 //
 //   moon run doc/examples/review --target native --release -- preview [name] [-o preview.html]
 //   moon run doc/examples/review --target native --release -- at <name> <page> <x> <y>
 //   moon run doc/examples/review --target native --release -- feedback <name> <text> [comment] [--nth n] [--json]
+//   moon run doc/examples/review --target native --release -- positions <name> <file>:<line>[:<column>]
 //
 // `name` is one of the documents of `@twins.originals()` (default:
 // `showcase`); `compile_document` takes any `() -> @doc.Document`. The
@@ -106,7 +107,35 @@ fn run(args : Array[String]) -> Unit raise {
         println(feedback.to_text())
       }
     }
-    command => fail("unknown command `\{command}` (preview, at, feedback)")
+    "positions" => {
+      // Where on the pages is what a source line produced.
+      guard args.length() == 4 else {
+        fail("positions <name> <file>:<line>[:<column>]")
+      }
+      let parts = args[3].split(":").map(part => part.to_owned()).collect()
+      guard parts.length() == 2 || parts.length() == 3 else {
+        fail("positions <name> <file>:<line>[:<column>]")
+      }
+      let column : Int? = if parts.length() == 3 {
+        Some(@string.parse_int(parts[2]))
+      } else {
+        None
+      }
+      let text = compiled(args[2]).review_text(sources=@system.sources())
+      let regions = text.positions(
+        parts[0],
+        @string.parse_int(parts[1]),
+        column?,
+      )
+      for region in regions {
+        println(
+          "page \{region.page}: x \{region.x} y \{region.y} width \{region.width} height \{region.height}",
+        )
+      }
+      println("\{regions.length()} boxes")
+    }
+    command =>
+      fail("unknown command `\{command}` (preview, at, feedback, positions)")
   }
 }
 
