@@ -254,59 +254,8 @@ fn values_memo_equal(a : Value, b : Value) -> Bool {
     // Typst's equality says false for these.
     (Gradient(x), Gradient(y)) => x == y
     (Tiling(x), Tiling(y)) => x == y
-    (Module(x), Module(y)) if validating.val => modules_validate_equal(x, y)
-    _ => if validating.val { leaves_validate_equal(a, b) } else { a == b }
+    _ => a == b
   }
-}
-
-// Exact comparison of recorded introspection results (see
-// `IntrospectionRecorder::validate`).
-
-///|
-/// Whether the comparison functions of this file compare the results of a
-/// recorded introspector read for convergence validation instead of the
-/// arguments of a memoized call. The two differ where a value is created
-/// anew in every layout iteration: closures (which by identity could never
-/// converge; upstream validates by hash) are compared by their code,
-/// defaults and captured values, modules evaluated anew by their contents,
-/// and the resolved grids
-/// of tables (never equal for memoization, as their content `==` is too
-/// loose) cell by cell. Host closures compare by identity in both modes.
-let validating : Ref[Bool] = { val: false, }
-
-///|
-/// Whether two results of an introspector read are interchangeable: like
-/// [values_memo_equal], but for convergence validation (see [validating]).
-/// The caller has already compared the fingerprints of the whole results;
-/// this adds what a fingerprint cannot prove: the identity of host closures
-/// and the equality of values whose fingerprint is lossy.
-pub fn values_validate_equal(a : Value, b : Value) -> Bool {
-  let outer = validating.val
-  validating.val = true
-  let equal = values_memo_equal(a, b)
-  validating.val = outer
-  equal
-}
-
-///|
-/// Leaf comparison of [values_validate_equal]: equal fingerprints, and for
-/// values whose fingerprint does not capture all of their data also `==`.
-fn leaves_validate_equal(a : Value, b : Value) -> Bool {
-  let mut ha = u128_zero
-  let flags = fingerprint_flags_in(() => ha = hash128(a))
-  let mut hb = u128_zero
-  fingerprint_flags_in(() => hb = hash128(b)) |> ignore
-  ha == hb && ((flags & fingerprint_lossy) == 0 || a == b)
-}
-
-///|
-/// Fingerprint equality of two values (for [validating]).
-fn[T : Fingerprint] fingerprints_equal(a : T, b : T) -> Bool {
-  let mut ha = u128_zero
-  fingerprint_flags_in(() => ha = hash128(a)) |> ignore
-  let mut hb = u128_zero
-  fingerprint_flags_in(() => hb = hash128(b)) |> ignore
-  ha == hb
 }
 
 ///|
@@ -332,10 +281,7 @@ fn dyns_memo_equal(a : DynValue, b : DynValue) -> Bool {
     (BlockMultiCallback(x), BlockMultiCallback(y)) =>
       content_memo_equal(x.captured, y.captured)
     // Holds content compared loosely by `==`.
-    (CellGrid(x), CellGrid(y)) =>
-      validating.val &&
-      fingerprints_equal(Value::Dyn(a), Value::Dyn(b)) &&
-      cell_grids_validate_equal(x, y)
+    (CellGrid(_), CellGrid(_)) => false
     _ => a == b
   }
 }
@@ -431,123 +377,8 @@ fn funcs_memo_equal(a : Func, b : Func) -> Bool {
   match (a.inner, b.inner) {
     (With(f1, a1), With(f2, a2)) =>
       funcs_memo_equal(f1, f2) && args_memo_equal(a1, a2)
-    (Closure(x), Closure(y)) if validating.val =>
-      a.span == b.span && closures_validate_equal(x, y)
     _ => a == b
   }
-}
-
-///|
-/// Closure equality for [validating]: the same code and, recursively, equal
-/// defaults and captured values. Unlike the structural fingerprint this is
-/// exact where a captured value's fingerprint is lossy, and it compares
-/// captured host closures by identity. (The recursion visits what the
-/// closures' fingerprints visited; see [scopes_validate_equal].)
-fn closures_validate_equal(a : Closure, b : Closure) -> Bool {
-  if physical_equal(a, b) {
-    return true
-  }
-  let (x, y) = match (a.node, b.node) {
-    (Closure(x), Closure(y)) | (Context(x), Context(y)) => (x, y)
-    _ => return false
-  }
-  (
-    physical_equal(x, y) ||
-    (x.span() == y.span() && x.full_text() == y.full_text())
-  ) &&
-  a.num_pos_params == b.num_pos_params &&
-  value_arrays_memo_equal(a.defaults, b.defaults) &&
-  scopes_validate_equal(a.captured, b.captured)
-}
-
-///|
-/// Scope equality for [validating]: the same names bound to equal values,
-/// in order. Like the fingerprint (`Scope::fingerprint_with_depth`), it does
-/// not descend into modules bound in the scope: such a nested module is
-/// only equal to the same module. The comparison thus visits what the
-/// fingerprints of both values visited, and terminates as they did, also
-/// for modules that contain themselves.
-fn scopes_validate_equal(a : Scope, b : Scope) -> Bool {
-  if physical_equal(a, b) {
-    return true
-  }
-  if a.map.length() != b.map.length() {
-    return false
-  }
-  let ys = b.map.iter().collect()
-  let mut i = 0
-  for name, binding in a.map {
-    let (name2, binding2) = ys[i]
-    if name != name2 {
-      return false
-    }
-    let equal = match (binding.value, binding2.value) {
-      (Module(x), Module(y)) => x == y
-      (x, y) => values_memo_equal(x, y)
-    }
-    if !equal {
-      return false
-    }
-    i += 1
-  }
-  true
-}
-
-///|
-/// Resolved grid equality for [validating], in addition to equal
-/// fingerprints: what the fingerprint hashes lossily is compared exactly,
-/// i.e. the cells' bodies (recursively, so closures and host closures in
-/// them follow the rules above), fills and strokes, and the strokes of the
-/// explicit lines.
-fn cell_grids_validate_equal(a : CellGrid, b : CellGrid) -> Bool {
-  if physical_equal(a, b) {
-    return true
-  }
-  if a.entries.length() != b.entries.length() {
-    return false
-  }
-  for i in 0..<a.entries.length() {
-    match (a.entries[i], b.entries[i]) {
-      (Cell(x), Cell(y)) => {
-        if !content_memo_equal(x.body, y.body) {
-          return false
-        }
-        match (x.fill, y.fill) {
-          (None, None) => ()
-          (Some(p), Some(q)) =>
-            if !values_memo_equal(
-                IntoValue::into_value(p),
-                IntoValue::into_value(q),
-              ) {
-              return false
-            }
-          _ => return false
-        }
-        if x.stroke != y.stroke {
-          return false
-        }
-      }
-      (Merged(x), Merged(y)) => if x != y { return false }
-      _ => return false
-    }
-  }
-  // The explicit lines with their strokes.
-  a.vlines == b.vlines && a.hlines == b.hlines
-}
-
-///|
-/// Module equality for [validating]: the same module, or (for a module
-/// evaluated anew) the same name, file, content and bindings, where modules
-/// among the bindings must be the same modules (see
-/// [scopes_validate_equal]).
-fn modules_validate_equal(a : Module, b : Module) -> Bool {
-  a == b ||
-  (
-    a.name() == b.name() &&
-    a.file_id() == b.file_id() &&
-    content_memo_equal(a.content(), b.content()) &&
-    scopes_validate_equal(a.scope(), b.scope())
-  )
 }
 
 ///|

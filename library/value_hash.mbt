@@ -226,12 +226,6 @@ fn Module::fingerprint_with_depth(
   if depth == 0 {
     state.write(self.inner.content)
     self.inner.scope.fingerprint_with_depth(state, depth + 1)
-  } else {
-    // The content and bindings of a nested module are not part of the
-    // fingerprint: it does not capture all data, and nested modules are
-    // compared by identity where an exact comparison is needed (see
-    // `values_validate_equal`).
-    mark_fingerprint_flags(fingerprint_lossy | fingerprint_identity)
   }
 }
 
@@ -297,8 +291,15 @@ pub impl Fingerprint for Func with fn fingerprint(self, state) {
       state.write(args)
     }
     Host(host) => {
-      // Host closures compare by identity; the key identifies them.
-      fingerprint_flags.val = fingerprint_flags.val | fingerprint_identity
+      // Host closures compare by identity; the key identifies them. A
+      // collector (see `fingerprint_hosts_in`) also receives the closure
+      // itself.
+      fingerprint_flags.val = fingerprint_flags.val |
+        fingerprint_identity |
+        fingerprint_host
+      if fingerprint_hosts.val is Some(hosts) {
+        hosts.push(host)
+      }
       state.write_discriminant(5)
       state.write(host.key)
     }
@@ -318,7 +319,13 @@ pub impl Fingerprint for Content with fn fingerprint(self, state) {
   lifecycle.sort()
   state.write(lifecycle)
   // Data (hashed once and cached, like upstream).
-  let data = match self.data_hash.val {
+  let cached = match self.data_hash.val {
+    // A collector of host closures must visit the fields that hold some.
+    Some((_, flags)) if fingerprint_hosts.val is Some(_) &&
+      (flags & fingerprint_host) != 0 => Option::None
+    cached => cached
+  }
+  let data = match cached {
     Some((h, flags)) => {
       mark_fingerprint_flags(flags)
       h

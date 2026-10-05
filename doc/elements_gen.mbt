@@ -2,6 +2,13 @@
 
 ///|
 /// `heading`: A section heading.
+///
+/// Explicit states besides a value:
+/// - `level`: `auto` as `extra` with `Value::auto()`
+/// - `numbering`: `none` as `Numbering::none()`
+/// - `supplement`: `auto` as `Supplement::auto()`, `none` as `Supplement::none()`
+/// - `bookmarked`: `auto` as `extra` with `Value::auto()`
+/// - `hanging_indent`: `auto` as `Auto`
 pub struct Heading {
   priv content : Content
 }
@@ -10,14 +17,15 @@ pub struct Heading {
 #callsite(autofill(loc, args_loc))
 pub fn Heading::Heading(
   body : &IntoContent,
-  level? : @library.Smart[Int64],
+  level? : Int64,
   depth? : Int64,
   offset? : Int64,
-  numbering? : Numbering?,
-  supplement? : @library.Smart[Supplement?],
+  numbering? : Numbering,
+  supplement? : Supplement,
   outlined? : Bool,
-  bookmarked? : @library.Smart[Bool],
-  hanging_indent? : @library.Smart[Length],
+  bookmarked? : Bool,
+  hanging_indent? : Length,
+  extra? : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -25,14 +33,7 @@ pub fn Heading::Heading(
   let args : Array[ArgNode] = []
   args.push({ name: None, value: Value::content(body), param: 0, })
   if level is Some(v) {
-    args.push({
-      name: Some("level"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => Value::int(x)
-      },
-      param: 1,
-    })
+    args.push({ name: Some("level"), value: Value::int(v), param: 1, })
   }
   if depth is Some(v) {
     args.push({ name: Some("depth"), value: Value::int(v), param: 2, })
@@ -43,24 +44,14 @@ pub fn Heading::Heading(
   if numbering is Some(v) {
     args.push({
       name: Some("numbering"),
-      value: match v {
-        None => Value::none()
-        Some(x) => ToValue::to_value(x)
-      },
+      value: ToValue::to_value(v),
       param: 4,
     })
   }
   if supplement is Some(v) {
     args.push({
       name: Some("supplement"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) =>
-          match x {
-            None => Value::none()
-            Some(x) => ToValue::to_value(x)
-          }
-      },
+      value: ToValue::to_value(v),
       param: 5,
     })
   }
@@ -68,25 +59,16 @@ pub fn Heading::Heading(
     args.push({ name: Some("outlined"), value: Value::bool(v), param: 6, })
   }
   if bookmarked is Some(v) {
-    args.push({
-      name: Some("bookmarked"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => Value::bool(x)
-      },
-      param: 7,
-    })
+    args.push({ name: Some("bookmarked"), value: Value::bool(v), param: 7, })
   }
   if hanging_indent is Some(v) {
     args.push({
       name: Some("hanging-indent"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
+      value: ToValue::to_value(v),
       param: 8,
     })
   }
+  push_extra(args, extra, 9)
   {
     content: labelled_call(
       {
@@ -95,7 +77,7 @@ pub fn Heading::Heading(
         origin: Site::new("Heading", loc, args_loc),
       },
       label,
-      9,
+      10,
     ),
   }
 }
@@ -107,6 +89,13 @@ pub impl IntoContent for Heading with fn into_content(self) {
 
 ///|
 /// `set heading(..)`.
+///
+/// Explicit states besides a value:
+/// - `level`: `auto` as `extra` with `Value::auto()`
+/// - `numbering`: `none` as `Numbering::none()`
+/// - `supplement`: `auto` as `Supplement::auto()`, `none` as `Supplement::none()`
+/// - `bookmarked`: `auto` as `extra` with `Value::auto()`
+/// - `hanging_indent`: `auto` as `Auto`
 pub struct SetHeading {
   priv node : SetNode
 }
@@ -114,27 +103,21 @@ pub struct SetHeading {
 ///|
 #callsite(autofill(loc, args_loc))
 pub fn SetHeading::SetHeading(
-  level? : @library.Smart[Int64],
+  level? : Int64,
   depth? : Int64,
   offset? : Int64,
-  numbering? : Numbering?,
-  supplement? : @library.Smart[Supplement?],
+  numbering? : Numbering,
+  supplement? : Supplement,
   outlined? : Bool,
-  bookmarked? : @library.Smart[Bool],
-  hanging_indent? : @library.Smart[Length],
+  bookmarked? : Bool,
+  hanging_indent? : Length,
+  extra? : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetHeading {
   let args : Array[ArgNode] = []
   if level is Some(v) {
-    args.push({
-      name: Some("level"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => Value::int(x)
-      },
-      param: 0,
-    })
+    args.push({ name: Some("level"), value: Value::int(v), param: 0, })
   }
   if depth is Some(v) {
     args.push({ name: Some("depth"), value: Value::int(v), param: 1, })
@@ -145,24 +128,14 @@ pub fn SetHeading::SetHeading(
   if numbering is Some(v) {
     args.push({
       name: Some("numbering"),
-      value: match v {
-        None => Value::none()
-        Some(x) => ToValue::to_value(x)
-      },
+      value: ToValue::to_value(v),
       param: 3,
     })
   }
   if supplement is Some(v) {
     args.push({
       name: Some("supplement"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) =>
-          match x {
-            None => Value::none()
-            Some(x) => ToValue::to_value(x)
-          }
-      },
+      value: ToValue::to_value(v),
       param: 4,
     })
   }
@@ -170,25 +143,16 @@ pub fn SetHeading::SetHeading(
     args.push({ name: Some("outlined"), value: Value::bool(v), param: 5, })
   }
   if bookmarked is Some(v) {
-    args.push({
-      name: Some("bookmarked"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => Value::bool(x)
-      },
-      param: 6,
-    })
+    args.push({ name: Some("bookmarked"), value: Value::bool(v), param: 6, })
   }
   if hanging_indent is Some(v) {
     args.push({
       name: Some("hanging-indent"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
+      value: ToValue::to_value(v),
       param: 7,
     })
   }
+  push_extra(args, extra, 8)
   {
     node: {
       func: FElem(@library.heading_elem()),
@@ -236,26 +200,18 @@ pub fn HeadingView::body(
 /// The `heading` elements; with arguments, those whose fields have the given
 /// values (`heading.where(..)`).
 pub fn Select::heading(
-  level? : @library.Smart[Int64],
+  level? : Int64,
   depth? : Int64,
   offset? : Int64,
-  numbering? : Numbering?,
-  supplement? : @library.Smart[Supplement?],
+  numbering? : Numbering,
+  supplement? : Supplement,
   outlined? : Bool,
-  bookmarked? : @library.Smart[Bool],
-  hanging_indent? : @library.Smart[Length],
+  bookmarked? : Bool,
+  hanging_indent? : Length,
 ) -> Selector[HeadingView] {
   let fields : Array[(String, Value)] = []
   if level is Some(v) {
-    fields.push(
-      (
-        "level",
-        match v {
-          Auto => Value::auto()
-          Custom(x) => Value::int(x)
-        },
-      ),
-    )
+    fields.push(("level", Value::int(v)))
   }
   if depth is Some(v) {
     fields.push(("depth", Value::int(v)))
@@ -264,55 +220,19 @@ pub fn Select::heading(
     fields.push(("offset", Value::int(v)))
   }
   if numbering is Some(v) {
-    fields.push(
-      (
-        "numbering",
-        match v {
-          None => Value::none()
-          Some(x) => ToValue::to_value(x)
-        },
-      ),
-    )
+    fields.push(("numbering", ToValue::to_value(v)))
   }
   if supplement is Some(v) {
-    fields.push(
-      (
-        "supplement",
-        match v {
-          Auto => Value::auto()
-          Custom(x) =>
-            match x {
-              None => Value::none()
-              Some(x) => ToValue::to_value(x)
-            }
-        },
-      ),
-    )
+    fields.push(("supplement", ToValue::to_value(v)))
   }
   if outlined is Some(v) {
     fields.push(("outlined", Value::bool(v)))
   }
   if bookmarked is Some(v) {
-    fields.push(
-      (
-        "bookmarked",
-        match v {
-          Auto => Value::auto()
-          Custom(x) => Value::bool(x)
-        },
-      ),
-    )
+    fields.push(("bookmarked", Value::bool(v)))
   }
   if hanging_indent is Some(v) {
-    fields.push(
-      (
-        "hanging-indent",
-        match v {
-          Auto => Value::auto()
-          Custom(x) => ToValue::to_value(x)
-        },
-      ),
-    )
+    fields.push(("hanging-indent", ToValue::to_value(v)))
   }
   elem_selector(@library.heading_elem(), fields, content => HeadingView::{
     content,
@@ -321,6 +241,9 @@ pub fn Select::heading(
 
 ///|
 /// `par`: A logical subdivison of textual content.
+///
+/// Explicit states besides a value:
+/// - `linebreaks`: `auto` as `extra` with `Value::auto()`
 pub struct Par {
   priv content : Content
 }
@@ -332,8 +255,9 @@ pub fn Par::Par(
   leading? : Length,
   spacing? : Length,
   justify? : Bool,
-  linebreaks? : @library.Smart[String],
+  linebreaks? : String,
   hanging_indent? : Length,
+  extra? : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -350,14 +274,7 @@ pub fn Par::Par(
     args.push({ name: Some("justify"), value: Value::bool(v), param: 3, })
   }
   if linebreaks is Some(v) {
-    args.push({
-      name: Some("linebreaks"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => Value::str(x)
-      },
-      param: 4,
-    })
+    args.push({ name: Some("linebreaks"), value: Value::str(v), param: 4, })
   }
   if hanging_indent is Some(v) {
     args.push({
@@ -366,6 +283,7 @@ pub fn Par::Par(
       param: 5,
     })
   }
+  push_extra(args, extra, 6)
   {
     content: labelled_call(
       {
@@ -374,7 +292,7 @@ pub fn Par::Par(
         origin: Site::new("Par", loc, args_loc),
       },
       label,
-      6,
+      7,
     ),
   }
 }
@@ -386,6 +304,9 @@ pub impl IntoContent for Par with fn into_content(self) {
 
 ///|
 /// `set par(..)`.
+///
+/// Explicit states besides a value:
+/// - `linebreaks`: `auto` as `extra` with `Value::auto()`
 pub struct SetPar {
   priv node : SetNode
 }
@@ -396,8 +317,9 @@ pub fn SetPar::SetPar(
   leading? : Length,
   spacing? : Length,
   justify? : Bool,
-  linebreaks? : @library.Smart[String],
+  linebreaks? : String,
   hanging_indent? : Length,
+  extra? : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetPar {
@@ -412,14 +334,7 @@ pub fn SetPar::SetPar(
     args.push({ name: Some("justify"), value: Value::bool(v), param: 2, })
   }
   if linebreaks is Some(v) {
-    args.push({
-      name: Some("linebreaks"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => Value::str(x)
-      },
-      param: 3,
-    })
+    args.push({ name: Some("linebreaks"), value: Value::str(v), param: 3, })
   }
   if hanging_indent is Some(v) {
     args.push({
@@ -428,6 +343,7 @@ pub fn SetPar::SetPar(
       param: 4,
     })
   }
+  push_extra(args, extra, 5)
   {
     node: {
       func: FElem(@library.par_elem()),
@@ -476,7 +392,7 @@ pub fn Select::par(
   leading? : Length,
   spacing? : Length,
   justify? : Bool,
-  linebreaks? : @library.Smart[String],
+  linebreaks? : String,
   hanging_indent? : Length,
 ) -> Selector[ParView] {
   let fields : Array[(String, Value)] = []
@@ -490,15 +406,7 @@ pub fn Select::par(
     fields.push(("justify", Value::bool(v)))
   }
   if linebreaks is Some(v) {
-    fields.push(
-      (
-        "linebreaks",
-        match v {
-          Auto => Value::auto()
-          Custom(x) => Value::str(x)
-        },
-      ),
-    )
+    fields.push(("linebreaks", Value::str(v)))
   }
   if hanging_indent is Some(v) {
     fields.push(("hanging-indent", ToValue::to_value(v)))
@@ -515,11 +423,13 @@ pub struct Parbreak {
 ///|
 #callsite(autofill(loc, args_loc))
 pub fn Parbreak::Parbreak(
+  extra? : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> Parbreak {
   let args : Array[ArgNode] = []
+  push_extra(args, extra, 0)
   {
     content: labelled_call(
       {
@@ -528,7 +438,7 @@ pub fn Parbreak::Parbreak(
         origin: Site::new("Parbreak", loc, args_loc),
       },
       label,
-      0,
+      1,
     ),
   }
 }
@@ -577,6 +487,7 @@ pub struct Strong {
 pub fn Strong::Strong(
   body : &IntoContent,
   delta? : Int64,
+  extra? : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -586,6 +497,7 @@ pub fn Strong::Strong(
   if delta is Some(v) {
     args.push({ name: Some("delta"), value: Value::int(v), param: 1, })
   }
+  push_extra(args, extra, 2)
   {
     content: labelled_call(
       {
@@ -594,7 +506,7 @@ pub fn Strong::Strong(
         origin: Site::new("Strong", loc, args_loc),
       },
       label,
-      2,
+      3,
     ),
   }
 }
@@ -614,6 +526,7 @@ pub struct SetStrong {
 #callsite(autofill(loc, args_loc))
 pub fn SetStrong::SetStrong(
   delta? : Int64,
+  extra? : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetStrong {
@@ -621,6 +534,7 @@ pub fn SetStrong::SetStrong(
   if delta is Some(v) {
     args.push({ name: Some("delta"), value: Value::int(v), param: 0, })
   }
+  push_extra(args, extra, 1)
   {
     node: {
       func: FElem(@library.strong_elem()),
@@ -687,12 +601,14 @@ pub struct Emph {
 #callsite(autofill(loc, args_loc))
 pub fn Emph::Emph(
   body : &IntoContent,
+  extra? : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> Emph {
   let args : Array[ArgNode] = []
   args.push({ name: None, value: Value::content(body), param: 0, })
+  push_extra(args, extra, 1)
   {
     content: labelled_call(
       {
@@ -701,7 +617,7 @@ pub fn Emph::Emph(
         origin: Site::new("Emph", loc, args_loc),
       },
       label,
-      1,
+      2,
     ),
   }
 }
@@ -760,6 +676,7 @@ pub struct Link {
 pub fn Link::Link(
   dest : LinkTarget,
   body? : &IntoContent,
+  extra? : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -769,6 +686,7 @@ pub fn Link::Link(
   if body is Some(v) {
     args.push({ name: None, value: Value::content(v), param: 1, })
   }
+  push_extra(args, extra, 2)
   {
     content: labelled_call(
       {
@@ -777,7 +695,7 @@ pub fn Link::Link(
         origin: Site::new("Link", loc, args_loc),
       },
       label,
-      2,
+      3,
     ),
   }
 }
@@ -815,6 +733,9 @@ pub fn Select::link() -> Selector[LinkView] {
 
 ///|
 /// `ref`: A reference to a label or bibliography.
+///
+/// Explicit states besides a value:
+/// - `supplement`: `auto` as `Supplement::auto()`, `none` as `Supplement::none()`
 pub struct Ref {
   priv content : Content
 }
@@ -823,8 +744,9 @@ pub struct Ref {
 #callsite(autofill(loc, args_loc))
 pub fn Ref::Ref(
   target : String,
-  supplement? : @library.Smart[Supplement?],
+  supplement? : Supplement,
   form? : String,
+  extra? : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -834,20 +756,14 @@ pub fn Ref::Ref(
   if supplement is Some(v) {
     args.push({
       name: Some("supplement"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) =>
-          match x {
-            None => Value::none()
-            Some(x) => ToValue::to_value(x)
-          }
-      },
+      value: ToValue::to_value(v),
       param: 1,
     })
   }
   if form is Some(v) {
     args.push({ name: Some("form"), value: Value::str(v), param: 2, })
   }
+  push_extra(args, extra, 3)
   {
     content: labelled_call(
       {
@@ -856,7 +772,7 @@ pub fn Ref::Ref(
         origin: Site::new("Ref", loc, args_loc),
       },
       label,
-      3,
+      4,
     ),
   }
 }
@@ -868,6 +784,9 @@ pub impl IntoContent for Ref with fn into_content(self) {
 
 ///|
 /// `set ref(..)`.
+///
+/// Explicit states besides a value:
+/// - `supplement`: `auto` as `Supplement::auto()`, `none` as `Supplement::none()`
 pub struct SetRef {
   priv node : SetNode
 }
@@ -875,8 +794,9 @@ pub struct SetRef {
 ///|
 #callsite(autofill(loc, args_loc))
 pub fn SetRef::SetRef(
-  supplement? : @library.Smart[Supplement?],
+  supplement? : Supplement,
   form? : String,
+  extra? : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetRef {
@@ -884,20 +804,14 @@ pub fn SetRef::SetRef(
   if supplement is Some(v) {
     args.push({
       name: Some("supplement"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) =>
-          match x {
-            None => Value::none()
-            Some(x) => ToValue::to_value(x)
-          }
-      },
+      value: ToValue::to_value(v),
       param: 0,
     })
   }
   if form is Some(v) {
     args.push({ name: Some("form"), value: Value::str(v), param: 1, })
   }
+  push_extra(args, extra, 2)
   {
     node: {
       func: FElem(@library.ref_elem()),
@@ -937,24 +851,12 @@ pub fn RefView::view(self : RefView) -> ContentView {
 /// The `ref` elements; with arguments, those whose fields have the given
 /// values (`ref.where(..)`).
 pub fn Select::ref_(
-  supplement? : @library.Smart[Supplement?],
+  supplement? : Supplement,
   form? : String,
 ) -> Selector[RefView] {
   let fields : Array[(String, Value)] = []
   if supplement is Some(v) {
-    fields.push(
-      (
-        "supplement",
-        match v {
-          Auto => Value::auto()
-          Custom(x) =>
-            match x {
-              None => Value::none()
-              Some(x) => ToValue::to_value(x)
-            }
-        },
-      ),
-    )
+    fields.push(("supplement", ToValue::to_value(v)))
   }
   if form is Some(v) {
     fields.push(("form", Value::str(v)))
@@ -973,6 +875,7 @@ pub struct Footnote {
 pub fn Footnote::Footnote(
   body : &IntoContent,
   numbering? : Numbering,
+  extra? : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -986,6 +889,7 @@ pub fn Footnote::Footnote(
       param: 1,
     })
   }
+  push_extra(args, extra, 2)
   {
     content: labelled_call(
       {
@@ -994,7 +898,7 @@ pub fn Footnote::Footnote(
         origin: Site::new("Footnote", loc, args_loc),
       },
       label,
-      2,
+      3,
     ),
   }
 }
@@ -1014,6 +918,7 @@ pub struct SetFootnote {
 #callsite(autofill(loc, args_loc))
 pub fn SetFootnote::SetFootnote(
   numbering? : Numbering,
+  extra? : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetFootnote {
@@ -1025,6 +930,7 @@ pub fn SetFootnote::SetFootnote(
       param: 0,
     })
   }
+  push_extra(args, extra, 1)
   {
     node: {
       func: FElem(@library.footnote_elem()),
@@ -1075,6 +981,10 @@ pub fn Select::footnote(numbering? : Numbering) -> Selector[FootnoteView] {
 
 ///|
 /// `quote`: Displays a quote alongside an optional attribution.
+///
+/// Explicit states besides a value:
+/// - `quotes`: `auto` as `extra` with `Value::auto()`
+/// - `attribution`: `none` as `NoneValue()`
 pub struct Quote {
   priv content : Content
 }
@@ -1084,8 +994,9 @@ pub struct Quote {
 pub fn Quote::Quote(
   body : &IntoContent,
   block? : Bool,
-  quotes? : @library.Smart[Bool],
-  attribution? : &IntoContent?,
+  quotes? : Bool,
+  attribution? : &IntoContent,
+  extra? : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -1096,25 +1007,12 @@ pub fn Quote::Quote(
     args.push({ name: Some("block"), value: Value::bool(v), param: 1, })
   }
   if quotes is Some(v) {
-    args.push({
-      name: Some("quotes"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => Value::bool(x)
-      },
-      param: 2,
-    })
+    args.push({ name: Some("quotes"), value: Value::bool(v), param: 2, })
   }
   if attribution is Some(v) {
-    args.push({
-      name: Some("attribution"),
-      value: match v {
-        None => Value::none()
-        Some(x) => Value::content(x)
-      },
-      param: 3,
-    })
+    args.push({ name: Some("attribution"), value: Value::content(v), param: 3, })
   }
+  push_extra(args, extra, 4)
   {
     content: labelled_call(
       {
@@ -1123,7 +1021,7 @@ pub fn Quote::Quote(
         origin: Site::new("Quote", loc, args_loc),
       },
       label,
-      4,
+      5,
     ),
   }
 }
@@ -1135,6 +1033,10 @@ pub impl IntoContent for Quote with fn into_content(self) {
 
 ///|
 /// `set quote(..)`.
+///
+/// Explicit states besides a value:
+/// - `quotes`: `auto` as `extra` with `Value::auto()`
+/// - `attribution`: `none` as `NoneValue()`
 pub struct SetQuote {
   priv node : SetNode
 }
@@ -1143,8 +1045,9 @@ pub struct SetQuote {
 #callsite(autofill(loc, args_loc))
 pub fn SetQuote::SetQuote(
   block? : Bool,
-  quotes? : @library.Smart[Bool],
-  attribution? : &IntoContent?,
+  quotes? : Bool,
+  attribution? : &IntoContent,
+  extra? : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetQuote {
@@ -1153,25 +1056,12 @@ pub fn SetQuote::SetQuote(
     args.push({ name: Some("block"), value: Value::bool(v), param: 0, })
   }
   if quotes is Some(v) {
-    args.push({
-      name: Some("quotes"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => Value::bool(x)
-      },
-      param: 1,
-    })
+    args.push({ name: Some("quotes"), value: Value::bool(v), param: 1, })
   }
   if attribution is Some(v) {
-    args.push({
-      name: Some("attribution"),
-      value: match v {
-        None => Value::none()
-        Some(x) => Value::content(x)
-      },
-      param: 2,
-    })
+    args.push({ name: Some("attribution"), value: Value::content(v), param: 2, })
   }
+  push_extra(args, extra, 3)
   {
     node: {
       func: FElem(@library.quote_elem()),
@@ -1218,24 +1108,13 @@ pub fn QuoteView::body(
 ///|
 /// The `quote` elements; with arguments, those whose fields have the given
 /// values (`quote.where(..)`).
-pub fn Select::quote(
-  block? : Bool,
-  quotes? : @library.Smart[Bool],
-) -> Selector[QuoteView] {
+pub fn Select::quote(block? : Bool, quotes? : Bool) -> Selector[QuoteView] {
   let fields : Array[(String, Value)] = []
   if block is Some(v) {
     fields.push(("block", Value::bool(v)))
   }
   if quotes is Some(v) {
-    fields.push(
-      (
-        "quotes",
-        match v {
-          Auto => Value::auto()
-          Custom(x) => Value::bool(x)
-        },
-      ),
-    )
+    fields.push(("quotes", Value::bool(v)))
   }
   elem_selector(@library.quote_elem(), fields, content => QuoteView::{
     content,
@@ -1244,6 +1123,9 @@ pub fn Select::quote(
 
 ///|
 /// `list`: A bullet list.
+///
+/// Explicit states besides a value:
+/// - `spacing`: `auto` as `Auto`
 pub struct List {
   priv content : Content
 }
@@ -1256,8 +1138,9 @@ pub fn List::List(
   marker? : &IntoContent,
   indent? : Length,
   body_indent? : Length,
-  spacing? : @library.Smart[Length],
+  spacing? : Length,
   marker_align? : Alignment,
+  extra? : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -1280,14 +1163,7 @@ pub fn List::List(
     })
   }
   if spacing is Some(v) {
-    args.push({
-      name: Some("spacing"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 5,
-    })
+    args.push({ name: Some("spacing"), value: ToValue::to_value(v), param: 5, })
   }
   if marker_align is Some(v) {
     args.push({
@@ -1299,6 +1175,7 @@ pub fn List::List(
   for child in children {
     args.push({ name: None, value: Value::content(child), param: 0, })
   }
+  push_extra(args, extra, 7)
   {
     content: labelled_call(
       {
@@ -1307,7 +1184,7 @@ pub fn List::List(
         origin: Site::new("List", loc, args_loc),
       },
       label,
-      7,
+      8,
     ),
   }
 }
@@ -1319,6 +1196,9 @@ pub impl IntoContent for List with fn into_content(self) {
 
 ///|
 /// `set list(..)`.
+///
+/// Explicit states besides a value:
+/// - `spacing`: `auto` as `Auto`
 pub struct SetList {
   priv node : SetNode
 }
@@ -1330,8 +1210,9 @@ pub fn SetList::SetList(
   marker? : &IntoContent,
   indent? : Length,
   body_indent? : Length,
-  spacing? : @library.Smart[Length],
+  spacing? : Length,
   marker_align? : Alignment,
+  extra? : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetList {
@@ -1353,14 +1234,7 @@ pub fn SetList::SetList(
     })
   }
   if spacing is Some(v) {
-    args.push({
-      name: Some("spacing"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 4,
-    })
+    args.push({ name: Some("spacing"), value: ToValue::to_value(v), param: 4, })
   }
   if marker_align is Some(v) {
     args.push({
@@ -1369,6 +1243,7 @@ pub fn SetList::SetList(
       param: 5,
     })
   }
+  push_extra(args, extra, 6)
   {
     node: {
       func: FElem(@library.list_elem()),
@@ -1411,7 +1286,7 @@ pub fn Select::list(
   tight? : Bool,
   indent? : Length,
   body_indent? : Length,
-  spacing? : @library.Smart[Length],
+  spacing? : Length,
   marker_align? : Alignment,
 ) -> Selector[ListView] {
   let fields : Array[(String, Value)] = []
@@ -1425,15 +1300,7 @@ pub fn Select::list(
     fields.push(("body-indent", ToValue::to_value(v)))
   }
   if spacing is Some(v) {
-    fields.push(
-      (
-        "spacing",
-        match v {
-          Auto => Value::auto()
-          Custom(x) => ToValue::to_value(x)
-        },
-      ),
-    )
+    fields.push(("spacing", ToValue::to_value(v)))
   }
   if marker_align is Some(v) {
     fields.push(("marker-align", ToValue::to_value(v)))
@@ -1451,12 +1318,14 @@ pub struct ListItem {
 #callsite(autofill(loc, args_loc))
 pub fn ListItem::ListItem(
   body : &IntoContent,
+  extra? : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> ListItem {
   let args : Array[ArgNode] = []
   args.push({ name: None, value: Value::content(body), param: 0, })
+  push_extra(args, extra, 1)
   {
     content: labelled_call(
       {
@@ -1465,7 +1334,7 @@ pub fn ListItem::ListItem(
         origin: Site::new("ListItem", loc, args_loc),
       },
       label,
-      1,
+      2,
     ),
   }
 }
@@ -1513,6 +1382,10 @@ pub fn Select::list_item() -> Selector[ListItemView] {
 
 ///|
 /// `enum`: A numbered list.
+///
+/// Explicit states besides a value:
+/// - `start`: `auto` as `extra` with `Value::auto()`
+/// - `spacing`: `auto` as `Auto`
 pub struct Enum {
   priv content : Content
 }
@@ -1523,13 +1396,14 @@ pub fn Enum::Enum(
   children : Array[&IntoContent],
   tight? : Bool,
   numbering? : Numbering,
-  start? : @library.Smart[Int64],
+  start? : Int64,
   full? : Bool,
   reversed? : Bool,
   indent? : Length,
   body_indent? : Length,
-  spacing? : @library.Smart[Length],
+  spacing? : Length,
   number_align? : Alignment,
+  extra? : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -1546,14 +1420,7 @@ pub fn Enum::Enum(
     })
   }
   if start is Some(v) {
-    args.push({
-      name: Some("start"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => Value::int(x)
-      },
-      param: 3,
-    })
+    args.push({ name: Some("start"), value: Value::int(v), param: 3, })
   }
   if full is Some(v) {
     args.push({ name: Some("full"), value: Value::bool(v), param: 4, })
@@ -1572,14 +1439,7 @@ pub fn Enum::Enum(
     })
   }
   if spacing is Some(v) {
-    args.push({
-      name: Some("spacing"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 8,
-    })
+    args.push({ name: Some("spacing"), value: ToValue::to_value(v), param: 8, })
   }
   if number_align is Some(v) {
     args.push({
@@ -1591,6 +1451,7 @@ pub fn Enum::Enum(
   for child in children {
     args.push({ name: None, value: Value::content(child), param: 0, })
   }
+  push_extra(args, extra, 10)
   {
     content: labelled_call(
       {
@@ -1599,7 +1460,7 @@ pub fn Enum::Enum(
         origin: Site::new("Enum", loc, args_loc),
       },
       label,
-      10,
+      11,
     ),
   }
 }
@@ -1611,6 +1472,10 @@ pub impl IntoContent for Enum with fn into_content(self) {
 
 ///|
 /// `set enum(..)`.
+///
+/// Explicit states besides a value:
+/// - `start`: `auto` as `extra` with `Value::auto()`
+/// - `spacing`: `auto` as `Auto`
 pub struct SetEnum {
   priv node : SetNode
 }
@@ -1620,13 +1485,14 @@ pub struct SetEnum {
 pub fn SetEnum::SetEnum(
   tight? : Bool,
   numbering? : Numbering,
-  start? : @library.Smart[Int64],
+  start? : Int64,
   full? : Bool,
   reversed? : Bool,
   indent? : Length,
   body_indent? : Length,
-  spacing? : @library.Smart[Length],
+  spacing? : Length,
   number_align? : Alignment,
+  extra? : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetEnum {
@@ -1642,14 +1508,7 @@ pub fn SetEnum::SetEnum(
     })
   }
   if start is Some(v) {
-    args.push({
-      name: Some("start"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => Value::int(x)
-      },
-      param: 2,
-    })
+    args.push({ name: Some("start"), value: Value::int(v), param: 2, })
   }
   if full is Some(v) {
     args.push({ name: Some("full"), value: Value::bool(v), param: 3, })
@@ -1668,14 +1527,7 @@ pub fn SetEnum::SetEnum(
     })
   }
   if spacing is Some(v) {
-    args.push({
-      name: Some("spacing"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 7,
-    })
+    args.push({ name: Some("spacing"), value: ToValue::to_value(v), param: 7, })
   }
   if number_align is Some(v) {
     args.push({
@@ -1684,6 +1536,7 @@ pub fn SetEnum::SetEnum(
       param: 8,
     })
   }
+  push_extra(args, extra, 9)
   {
     node: {
       func: FElem(@library.enum_elem()),
@@ -1725,12 +1578,12 @@ pub fn EnumView::view(self : EnumView) -> ContentView {
 pub fn Select::enum_(
   tight? : Bool,
   numbering? : Numbering,
-  start? : @library.Smart[Int64],
+  start? : Int64,
   full? : Bool,
   reversed? : Bool,
   indent? : Length,
   body_indent? : Length,
-  spacing? : @library.Smart[Length],
+  spacing? : Length,
   number_align? : Alignment,
 ) -> Selector[EnumView] {
   let fields : Array[(String, Value)] = []
@@ -1741,15 +1594,7 @@ pub fn Select::enum_(
     fields.push(("numbering", ToValue::to_value(v)))
   }
   if start is Some(v) {
-    fields.push(
-      (
-        "start",
-        match v {
-          Auto => Value::auto()
-          Custom(x) => Value::int(x)
-        },
-      ),
-    )
+    fields.push(("start", Value::int(v)))
   }
   if full is Some(v) {
     fields.push(("full", Value::bool(v)))
@@ -1764,15 +1609,7 @@ pub fn Select::enum_(
     fields.push(("body-indent", ToValue::to_value(v)))
   }
   if spacing is Some(v) {
-    fields.push(
-      (
-        "spacing",
-        match v {
-          Auto => Value::auto()
-          Custom(x) => ToValue::to_value(x)
-        },
-      ),
-    )
+    fields.push(("spacing", ToValue::to_value(v)))
   }
   if number_align is Some(v) {
     fields.push(("number-align", ToValue::to_value(v)))
@@ -1786,6 +1623,9 @@ pub fn Select::enum_(
 /// `EnumItem(body, number?)`: the optional positional `number` is a labelled
 /// parameter passed positionally before the body. Twin: `enum.item(body)` /
 /// `enum.item(number, body)`.
+///
+/// Explicit states besides a value:
+/// - `number`: `auto` as `extra` with `Value::auto()`
 pub struct EnumItem {
   priv content : Content
 }
@@ -1794,23 +1634,18 @@ pub struct EnumItem {
 #callsite(autofill(loc, args_loc))
 pub fn EnumItem::EnumItem(
   body : &IntoContent,
-  number? : @library.Smart[Int64],
+  number? : Int64,
+  extra? : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> EnumItem {
   let args : Array[ArgNode] = []
   if number is Some(v) {
-    args.push({
-      name: None,
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => Value::int(x)
-      },
-      param: 1,
-    })
+    args.push({ name: None, value: Value::int(v), param: 1, })
   }
   args.push({ name: None, value: Value::content(body), param: 0, })
+  push_extra(args, extra, 2)
   {
     content: labelled_call(
       {
@@ -1819,7 +1654,7 @@ pub fn EnumItem::EnumItem(
         origin: Site::new("EnumItem", loc, args_loc),
       },
       label,
-      2,
+      3,
     ),
   }
 }
@@ -1831,6 +1666,9 @@ pub impl IntoContent for EnumItem with fn into_content(self) {
 
 ///|
 /// `set enum.item(..)`.
+///
+/// Explicit states besides a value:
+/// - `number`: `auto` as `extra` with `Value::auto()`
 pub struct SetEnumItem {
   priv node : SetNode
 }
@@ -1838,21 +1676,16 @@ pub struct SetEnumItem {
 ///|
 #callsite(autofill(loc, args_loc))
 pub fn SetEnumItem::SetEnumItem(
-  number? : @library.Smart[Int64],
+  number? : Int64,
+  extra? : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetEnumItem {
   let args : Array[ArgNode] = []
   if number is Some(v) {
-    args.push({
-      name: None,
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => Value::int(x)
-      },
-      param: 0,
-    })
+    args.push({ name: None, value: Value::int(v), param: 0, })
   }
+  push_extra(args, extra, 1)
   {
     node: {
       func: FElem(@library.enum_item_elem()),
@@ -1908,6 +1741,9 @@ pub fn Select::enum_item() -> Selector[EnumItemView] {
 
 ///|
 /// `terms`: A list of terms and their descriptions.
+///
+/// Explicit states besides a value:
+/// - `spacing`: `auto` as `Auto`
 pub struct Terms {
   priv content : Content
 }
@@ -1920,7 +1756,8 @@ pub fn Terms::Terms(
   separator? : &IntoContent,
   indent? : Length,
   hanging_indent? : Length,
-  spacing? : @library.Smart[Length],
+  spacing? : Length,
+  extra? : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -1943,18 +1780,12 @@ pub fn Terms::Terms(
     })
   }
   if spacing is Some(v) {
-    args.push({
-      name: Some("spacing"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 5,
-    })
+    args.push({ name: Some("spacing"), value: ToValue::to_value(v), param: 5, })
   }
   for child in children {
     args.push({ name: None, value: Value::content(child), param: 0, })
   }
+  push_extra(args, extra, 6)
   {
     content: labelled_call(
       {
@@ -1963,7 +1794,7 @@ pub fn Terms::Terms(
         origin: Site::new("Terms", loc, args_loc),
       },
       label,
-      6,
+      7,
     ),
   }
 }
@@ -1975,6 +1806,9 @@ pub impl IntoContent for Terms with fn into_content(self) {
 
 ///|
 /// `set terms(..)`.
+///
+/// Explicit states besides a value:
+/// - `spacing`: `auto` as `Auto`
 pub struct SetTerms {
   priv node : SetNode
 }
@@ -1986,7 +1820,8 @@ pub fn SetTerms::SetTerms(
   separator? : &IntoContent,
   indent? : Length,
   hanging_indent? : Length,
-  spacing? : @library.Smart[Length],
+  spacing? : Length,
+  extra? : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetTerms {
@@ -2008,15 +1843,9 @@ pub fn SetTerms::SetTerms(
     })
   }
   if spacing is Some(v) {
-    args.push({
-      name: Some("spacing"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 4,
-    })
+    args.push({ name: Some("spacing"), value: ToValue::to_value(v), param: 4, })
   }
+  push_extra(args, extra, 5)
   {
     node: {
       func: FElem(@library.terms_elem()),
@@ -2059,7 +1888,7 @@ pub fn Select::terms(
   tight? : Bool,
   indent? : Length,
   hanging_indent? : Length,
-  spacing? : @library.Smart[Length],
+  spacing? : Length,
 ) -> Selector[TermsView] {
   let fields : Array[(String, Value)] = []
   if tight is Some(v) {
@@ -2072,15 +1901,7 @@ pub fn Select::terms(
     fields.push(("hanging-indent", ToValue::to_value(v)))
   }
   if spacing is Some(v) {
-    fields.push(
-      (
-        "spacing",
-        match v {
-          Auto => Value::auto()
-          Custom(x) => ToValue::to_value(x)
-        },
-      ),
-    )
+    fields.push(("spacing", ToValue::to_value(v)))
   }
   elem_selector(@library.terms_elem(), fields, content => TermsView::{
     content,
@@ -2098,6 +1919,7 @@ pub struct TermsItem {
 pub fn TermsItem::TermsItem(
   term : &IntoContent,
   description : &IntoContent,
+  extra? : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -2105,6 +1927,7 @@ pub fn TermsItem::TermsItem(
   let args : Array[ArgNode] = []
   args.push({ name: None, value: Value::content(term), param: 0, })
   args.push({ name: None, value: Value::content(description), param: 1, })
+  push_extra(args, extra, 2)
   {
     content: labelled_call(
       {
@@ -2113,7 +1936,7 @@ pub fn TermsItem::TermsItem(
         origin: Site::new("TermsItem", loc, args_loc),
       },
       label,
-      2,
+      3,
     ),
   }
 }
@@ -2169,6 +1992,13 @@ pub fn Select::terms_item() -> Selector[TermsItemView] {
 
 ///|
 /// `figure`: A figure with an optional caption.
+///
+/// Explicit states besides a value:
+/// - `alt`: `none` as `extra` with `Value::none()`
+/// - `placement`: `none` as `None`, `auto` as `Auto`
+/// - `caption`: `none` as `NoneValue()`
+/// - `supplement`: `auto` as `Supplement::auto()`, `none` as `Supplement::none()`
+/// - `numbering`: `none` as `Numbering::none()`
 pub struct Figure {
   priv content : Content
 }
@@ -2177,14 +2007,15 @@ pub struct Figure {
 #callsite(autofill(loc, args_loc))
 pub fn Figure::Figure(
   body : &IntoContent,
-  alt? : String?,
-  placement? : @library.Smart[Alignment]?,
+  alt? : String,
+  placement? : Alignment,
   scope? : String,
-  caption? : &IntoContent?,
-  supplement? : @library.Smart[Supplement?],
-  numbering? : Numbering?,
+  caption? : &IntoContent,
+  supplement? : Supplement,
+  numbering? : Numbering,
   gap? : Length,
   outlined? : Bool,
+  extra? : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -2192,26 +2023,12 @@ pub fn Figure::Figure(
   let args : Array[ArgNode] = []
   args.push({ name: None, value: Value::content(body), param: 0, })
   if alt is Some(v) {
-    args.push({
-      name: Some("alt"),
-      value: match v {
-        None => Value::none()
-        Some(x) => Value::str(x)
-      },
-      param: 1,
-    })
+    args.push({ name: Some("alt"), value: Value::str(v), param: 1, })
   }
   if placement is Some(v) {
     args.push({
       name: Some("placement"),
-      value: match v {
-        None => Value::none()
-        Some(x) =>
-          match x {
-            Auto => Value::auto()
-            Custom(x) => ToValue::to_value(x)
-          }
-      },
+      value: ToValue::to_value(v),
       param: 2,
     })
   }
@@ -2219,36 +2036,19 @@ pub fn Figure::Figure(
     args.push({ name: Some("scope"), value: Value::str(v), param: 3, })
   }
   if caption is Some(v) {
-    args.push({
-      name: Some("caption"),
-      value: match v {
-        None => Value::none()
-        Some(x) => Value::content(x)
-      },
-      param: 4,
-    })
+    args.push({ name: Some("caption"), value: Value::content(v), param: 4, })
   }
   if supplement is Some(v) {
     args.push({
       name: Some("supplement"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) =>
-          match x {
-            None => Value::none()
-            Some(x) => ToValue::to_value(x)
-          }
-      },
+      value: ToValue::to_value(v),
       param: 5,
     })
   }
   if numbering is Some(v) {
     args.push({
       name: Some("numbering"),
-      value: match v {
-        None => Value::none()
-        Some(x) => ToValue::to_value(x)
-      },
+      value: ToValue::to_value(v),
       param: 6,
     })
   }
@@ -2258,6 +2058,7 @@ pub fn Figure::Figure(
   if outlined is Some(v) {
     args.push({ name: Some("outlined"), value: Value::bool(v), param: 8, })
   }
+  push_extra(args, extra, 9)
   {
     content: labelled_call(
       {
@@ -2266,7 +2067,7 @@ pub fn Figure::Figure(
         origin: Site::new("Figure", loc, args_loc),
       },
       label,
-      9,
+      10,
     ),
   }
 }
@@ -2278,6 +2079,13 @@ pub impl IntoContent for Figure with fn into_content(self) {
 
 ///|
 /// `set figure(..)`.
+///
+/// Explicit states besides a value:
+/// - `alt`: `none` as `extra` with `Value::none()`
+/// - `placement`: `none` as `None`, `auto` as `Auto`
+/// - `caption`: `none` as `NoneValue()`
+/// - `supplement`: `auto` as `Supplement::auto()`, `none` as `Supplement::none()`
+/// - `numbering`: `none` as `Numbering::none()`
 pub struct SetFigure {
   priv node : SetNode
 }
@@ -2285,39 +2093,26 @@ pub struct SetFigure {
 ///|
 #callsite(autofill(loc, args_loc))
 pub fn SetFigure::SetFigure(
-  alt? : String?,
-  placement? : @library.Smart[Alignment]?,
+  alt? : String,
+  placement? : Alignment,
   scope? : String,
-  caption? : &IntoContent?,
-  supplement? : @library.Smart[Supplement?],
-  numbering? : Numbering?,
+  caption? : &IntoContent,
+  supplement? : Supplement,
+  numbering? : Numbering,
   gap? : Length,
   outlined? : Bool,
+  extra? : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetFigure {
   let args : Array[ArgNode] = []
   if alt is Some(v) {
-    args.push({
-      name: Some("alt"),
-      value: match v {
-        None => Value::none()
-        Some(x) => Value::str(x)
-      },
-      param: 0,
-    })
+    args.push({ name: Some("alt"), value: Value::str(v), param: 0, })
   }
   if placement is Some(v) {
     args.push({
       name: Some("placement"),
-      value: match v {
-        None => Value::none()
-        Some(x) =>
-          match x {
-            Auto => Value::auto()
-            Custom(x) => ToValue::to_value(x)
-          }
-      },
+      value: ToValue::to_value(v),
       param: 1,
     })
   }
@@ -2325,36 +2120,19 @@ pub fn SetFigure::SetFigure(
     args.push({ name: Some("scope"), value: Value::str(v), param: 2, })
   }
   if caption is Some(v) {
-    args.push({
-      name: Some("caption"),
-      value: match v {
-        None => Value::none()
-        Some(x) => Value::content(x)
-      },
-      param: 3,
-    })
+    args.push({ name: Some("caption"), value: Value::content(v), param: 3, })
   }
   if supplement is Some(v) {
     args.push({
       name: Some("supplement"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) =>
-          match x {
-            None => Value::none()
-            Some(x) => ToValue::to_value(x)
-          }
-      },
+      value: ToValue::to_value(v),
       param: 4,
     })
   }
   if numbering is Some(v) {
     args.push({
       name: Some("numbering"),
-      value: match v {
-        None => Value::none()
-        Some(x) => ToValue::to_value(x)
-      },
+      value: ToValue::to_value(v),
       param: 5,
     })
   }
@@ -2364,6 +2142,7 @@ pub fn SetFigure::SetFigure(
   if outlined is Some(v) {
     args.push({ name: Some("outlined"), value: Value::bool(v), param: 7, })
   }
+  push_extra(args, extra, 8)
   {
     node: {
       func: FElem(@library.figure_elem()),
@@ -2411,69 +2190,29 @@ pub fn FigureView::body(
 /// The `figure` elements; with arguments, those whose fields have the given
 /// values (`figure.where(..)`).
 pub fn Select::figure(
-  alt? : String?,
-  placement? : @library.Smart[Alignment]?,
+  alt? : String,
+  placement? : Alignment,
   scope? : String,
-  supplement? : @library.Smart[Supplement?],
-  numbering? : Numbering?,
+  supplement? : Supplement,
+  numbering? : Numbering,
   gap? : Length,
   outlined? : Bool,
 ) -> Selector[FigureView] {
   let fields : Array[(String, Value)] = []
   if alt is Some(v) {
-    fields.push(
-      (
-        "alt",
-        match v {
-          None => Value::none()
-          Some(x) => Value::str(x)
-        },
-      ),
-    )
+    fields.push(("alt", Value::str(v)))
   }
   if placement is Some(v) {
-    fields.push(
-      (
-        "placement",
-        match v {
-          None => Value::none()
-          Some(x) =>
-            match x {
-              Auto => Value::auto()
-              Custom(x) => ToValue::to_value(x)
-            }
-        },
-      ),
-    )
+    fields.push(("placement", ToValue::to_value(v)))
   }
   if scope is Some(v) {
     fields.push(("scope", Value::str(v)))
   }
   if supplement is Some(v) {
-    fields.push(
-      (
-        "supplement",
-        match v {
-          Auto => Value::auto()
-          Custom(x) =>
-            match x {
-              None => Value::none()
-              Some(x) => ToValue::to_value(x)
-            }
-        },
-      ),
-    )
+    fields.push(("supplement", ToValue::to_value(v)))
   }
   if numbering is Some(v) {
-    fields.push(
-      (
-        "numbering",
-        match v {
-          None => Value::none()
-          Some(x) => ToValue::to_value(x)
-        },
-      ),
-    )
+    fields.push(("numbering", ToValue::to_value(v)))
   }
   if gap is Some(v) {
     fields.push(("gap", ToValue::to_value(v)))
@@ -2506,9 +2245,10 @@ pub fn Table::Table(
   column_gutter? : Array[Sizing],
   row_gutter? : Array[Sizing],
   inset? : Cells[Sides[Length]],
-  align? : Cells[@library.Smart[Alignment]],
-  fill? : Cells[Paint?],
-  stroke? : Cells[Sides[Stroke?]],
+  align? : Cells[Alignment],
+  fill? : Cells[Paint],
+  stroke? : Cells[Sides[Stroke]],
+  extra? : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -2552,6 +2292,7 @@ pub fn Table::Table(
   for child in children {
     args.push({ name: None, value: Value::content(child), param: 0, })
   }
+  push_extra(args, extra, 10)
   {
     content: labelled_call(
       {
@@ -2560,7 +2301,7 @@ pub fn Table::Table(
         origin: Site::new("Table", loc, args_loc),
       },
       label,
-      10,
+      11,
     ),
   }
 }
@@ -2585,9 +2326,10 @@ pub fn SetTable::SetTable(
   column_gutter? : Array[Sizing],
   row_gutter? : Array[Sizing],
   inset? : Cells[Sides[Length]],
-  align? : Cells[@library.Smart[Alignment]],
-  fill? : Cells[Paint?],
-  stroke? : Cells[Sides[Stroke?]],
+  align? : Cells[Alignment],
+  fill? : Cells[Paint],
+  stroke? : Cells[Sides[Stroke]],
+  extra? : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetTable {
@@ -2627,6 +2369,7 @@ pub fn SetTable::SetTable(
   if stroke is Some(v) {
     args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 8, })
   }
+  push_extra(args, extra, 9)
   {
     node: {
       func: FElem(@library.table_elem()),
@@ -2698,6 +2441,14 @@ pub fn Select::table(
 /// to apply styling. To do the latter, you can either use the function to
 /// override the properties for a particular cell, or use it in show rules to
 /// apply certain styles to multiple cells at once.
+///
+/// Explicit states besides a value:
+/// - `x`: `auto` as `extra` with `Value::auto()`
+/// - `y`: `auto` as `extra` with `Value::auto()`
+/// - `inset`: `auto` as `Sides::auto()`
+/// - `align`: `auto` as `Auto`
+/// - `fill`: `auto` as `Auto`, `none` as `None`
+/// - `breakable`: `auto` as `extra` with `Value::auto()`
 pub struct TableCell {
   priv content : Content
 }
@@ -2706,15 +2457,16 @@ pub struct TableCell {
 #callsite(autofill(loc, args_loc))
 pub fn TableCell::TableCell(
   body : &IntoContent,
-  x? : @library.Smart[Int64],
-  y? : @library.Smart[Int64],
+  x? : Int64,
+  y? : Int64,
   colspan? : Int64,
   rowspan? : Int64,
-  inset? : @library.Smart[Sides[Length]],
-  align? : @library.Smart[Alignment],
-  fill? : @library.Smart[Paint?],
-  stroke? : Sides[Stroke?],
-  breakable? : @library.Smart[Bool],
+  inset? : Sides[Length],
+  align? : Alignment,
+  fill? : Paint,
+  stroke? : Sides[Stroke],
+  breakable? : Bool,
+  extra? : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -2722,24 +2474,10 @@ pub fn TableCell::TableCell(
   let args : Array[ArgNode] = []
   args.push({ name: None, value: Value::content(body), param: 0, })
   if x is Some(v) {
-    args.push({
-      name: Some("x"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => Value::int(x)
-      },
-      param: 1,
-    })
+    args.push({ name: Some("x"), value: Value::int(v), param: 1, })
   }
   if y is Some(v) {
-    args.push({
-      name: Some("y"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => Value::int(x)
-      },
-      param: 2,
-    })
+    args.push({ name: Some("y"), value: Value::int(v), param: 2, })
   }
   if colspan is Some(v) {
     args.push({ name: Some("colspan"), value: Value::int(v), param: 3, })
@@ -2748,52 +2486,21 @@ pub fn TableCell::TableCell(
     args.push({ name: Some("rowspan"), value: Value::int(v), param: 4, })
   }
   if inset is Some(v) {
-    args.push({
-      name: Some("inset"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 5,
-    })
+    args.push({ name: Some("inset"), value: ToValue::to_value(v), param: 5, })
   }
   if align is Some(v) {
-    args.push({
-      name: Some("align"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 6,
-    })
+    args.push({ name: Some("align"), value: ToValue::to_value(v), param: 6, })
   }
   if fill is Some(v) {
-    args.push({
-      name: Some("fill"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) =>
-          match x {
-            None => Value::none()
-            Some(x) => ToValue::to_value(x)
-          }
-      },
-      param: 7,
-    })
+    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 7, })
   }
   if stroke is Some(v) {
     args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 8, })
   }
   if breakable is Some(v) {
-    args.push({
-      name: Some("breakable"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => Value::bool(x)
-      },
-      param: 9,
-    })
+    args.push({ name: Some("breakable"), value: Value::bool(v), param: 9, })
   }
+  push_extra(args, extra, 10)
   {
     content: labelled_call(
       {
@@ -2802,7 +2509,7 @@ pub fn TableCell::TableCell(
         origin: Site::new("TableCell", loc, args_loc),
       },
       label,
-      10,
+      11,
     ),
   }
 }
@@ -2814,6 +2521,14 @@ pub impl IntoContent for TableCell with fn into_content(self) {
 
 ///|
 /// `set table.cell(..)`.
+///
+/// Explicit states besides a value:
+/// - `x`: `auto` as `extra` with `Value::auto()`
+/// - `y`: `auto` as `extra` with `Value::auto()`
+/// - `inset`: `auto` as `Sides::auto()`
+/// - `align`: `auto` as `Auto`
+/// - `fill`: `auto` as `Auto`, `none` as `None`
+/// - `breakable`: `auto` as `extra` with `Value::auto()`
 pub struct SetTableCell {
   priv node : SetNode
 }
@@ -2821,38 +2536,25 @@ pub struct SetTableCell {
 ///|
 #callsite(autofill(loc, args_loc))
 pub fn SetTableCell::SetTableCell(
-  x? : @library.Smart[Int64],
-  y? : @library.Smart[Int64],
+  x? : Int64,
+  y? : Int64,
   colspan? : Int64,
   rowspan? : Int64,
-  inset? : @library.Smart[Sides[Length]],
-  align? : @library.Smart[Alignment],
-  fill? : @library.Smart[Paint?],
-  stroke? : Sides[Stroke?],
-  breakable? : @library.Smart[Bool],
+  inset? : Sides[Length],
+  align? : Alignment,
+  fill? : Paint,
+  stroke? : Sides[Stroke],
+  breakable? : Bool,
+  extra? : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetTableCell {
   let args : Array[ArgNode] = []
   if x is Some(v) {
-    args.push({
-      name: Some("x"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => Value::int(x)
-      },
-      param: 0,
-    })
+    args.push({ name: Some("x"), value: Value::int(v), param: 0, })
   }
   if y is Some(v) {
-    args.push({
-      name: Some("y"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => Value::int(x)
-      },
-      param: 1,
-    })
+    args.push({ name: Some("y"), value: Value::int(v), param: 1, })
   }
   if colspan is Some(v) {
     args.push({ name: Some("colspan"), value: Value::int(v), param: 2, })
@@ -2861,52 +2563,21 @@ pub fn SetTableCell::SetTableCell(
     args.push({ name: Some("rowspan"), value: Value::int(v), param: 3, })
   }
   if inset is Some(v) {
-    args.push({
-      name: Some("inset"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 4,
-    })
+    args.push({ name: Some("inset"), value: ToValue::to_value(v), param: 4, })
   }
   if align is Some(v) {
-    args.push({
-      name: Some("align"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 5,
-    })
+    args.push({ name: Some("align"), value: ToValue::to_value(v), param: 5, })
   }
   if fill is Some(v) {
-    args.push({
-      name: Some("fill"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) =>
-          match x {
-            None => Value::none()
-            Some(x) => ToValue::to_value(x)
-          }
-      },
-      param: 6,
-    })
+    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 6, })
   }
   if stroke is Some(v) {
     args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 7, })
   }
   if breakable is Some(v) {
-    args.push({
-      name: Some("breakable"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => Value::bool(x)
-      },
-      param: 8,
-    })
+    args.push({ name: Some("breakable"), value: Value::bool(v), param: 8, })
   }
+  push_extra(args, extra, 9)
   {
     node: {
       func: FElem(@library.table_cell_elem()),
@@ -2954,38 +2625,22 @@ pub fn TableCellView::body(
 /// The `table.cell` elements; with arguments, those whose fields have the
 /// given values (`table.cell.where(..)`).
 pub fn Select::table_cell(
-  x? : @library.Smart[Int64],
-  y? : @library.Smart[Int64],
+  x? : Int64,
+  y? : Int64,
   colspan? : Int64,
   rowspan? : Int64,
-  inset? : @library.Smart[Sides[Length]],
-  align? : @library.Smart[Alignment],
-  fill? : @library.Smart[Paint?],
-  stroke? : Sides[Stroke?],
-  breakable? : @library.Smart[Bool],
+  inset? : Sides[Length],
+  align? : Alignment,
+  fill? : Paint,
+  stroke? : Sides[Stroke],
+  breakable? : Bool,
 ) -> Selector[TableCellView] {
   let fields : Array[(String, Value)] = []
   if x is Some(v) {
-    fields.push(
-      (
-        "x",
-        match v {
-          Auto => Value::auto()
-          Custom(x) => Value::int(x)
-        },
-      ),
-    )
+    fields.push(("x", Value::int(v)))
   }
   if y is Some(v) {
-    fields.push(
-      (
-        "y",
-        match v {
-          Auto => Value::auto()
-          Custom(x) => Value::int(x)
-        },
-      ),
-    )
+    fields.push(("y", Value::int(v)))
   }
   if colspan is Some(v) {
     fields.push(("colspan", Value::int(v)))
@@ -2994,55 +2649,19 @@ pub fn Select::table_cell(
     fields.push(("rowspan", Value::int(v)))
   }
   if inset is Some(v) {
-    fields.push(
-      (
-        "inset",
-        match v {
-          Auto => Value::auto()
-          Custom(x) => ToValue::to_value(x)
-        },
-      ),
-    )
+    fields.push(("inset", ToValue::to_value(v)))
   }
   if align is Some(v) {
-    fields.push(
-      (
-        "align",
-        match v {
-          Auto => Value::auto()
-          Custom(x) => ToValue::to_value(x)
-        },
-      ),
-    )
+    fields.push(("align", ToValue::to_value(v)))
   }
   if fill is Some(v) {
-    fields.push(
-      (
-        "fill",
-        match v {
-          Auto => Value::auto()
-          Custom(x) =>
-            match x {
-              None => Value::none()
-              Some(x) => ToValue::to_value(x)
-            }
-        },
-      ),
-    )
+    fields.push(("fill", ToValue::to_value(v)))
   }
   if stroke is Some(v) {
     fields.push(("stroke", ToValue::to_value(v)))
   }
   if breakable is Some(v) {
-    fields.push(
-      (
-        "breakable",
-        match v {
-          Auto => Value::auto()
-          Custom(x) => Value::bool(x)
-        },
-      ),
-    )
+    fields.push(("breakable", Value::bool(v)))
   }
   elem_selector(@library.table_cell_elem(), fields, content => TableCellView::{
     content,
@@ -3061,6 +2680,7 @@ pub fn TableHeader::TableHeader(
   children : Array[&IntoContent],
   repeat? : Bool,
   level? : Int64,
+  extra? : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -3075,6 +2695,7 @@ pub fn TableHeader::TableHeader(
   for child in children {
     args.push({ name: None, value: Value::content(child), param: 0, })
   }
+  push_extra(args, extra, 3)
   {
     content: labelled_call(
       {
@@ -3083,7 +2704,7 @@ pub fn TableHeader::TableHeader(
         origin: Site::new("TableHeader", loc, args_loc),
       },
       label,
-      3,
+      4,
     ),
   }
 }
@@ -3104,6 +2725,7 @@ pub struct SetTableHeader {
 pub fn SetTableHeader::SetTableHeader(
   repeat? : Bool,
   level? : Int64,
+  extra? : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetTableHeader {
@@ -3114,6 +2736,7 @@ pub fn SetTableHeader::SetTableHeader(
   if level is Some(v) {
     args.push({ name: Some("level"), value: Value::int(v), param: 1, })
   }
+  push_extra(args, extra, 2)
   {
     node: {
       func: FElem(@library.table_header_elem()),
@@ -3179,6 +2802,7 @@ pub struct TableFooter {
 pub fn TableFooter::TableFooter(
   children : Array[&IntoContent],
   repeat? : Bool,
+  extra? : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -3190,6 +2814,7 @@ pub fn TableFooter::TableFooter(
   for child in children {
     args.push({ name: None, value: Value::content(child), param: 0, })
   }
+  push_extra(args, extra, 2)
   {
     content: labelled_call(
       {
@@ -3198,7 +2823,7 @@ pub fn TableFooter::TableFooter(
         origin: Site::new("TableFooter", loc, args_loc),
       },
       label,
-      2,
+      3,
     ),
   }
 }
@@ -3218,6 +2843,7 @@ pub struct SetTableFooter {
 #callsite(autofill(loc, args_loc))
 pub fn SetTableFooter::SetTableFooter(
   repeat? : Bool,
+  extra? : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetTableFooter {
@@ -3225,6 +2851,7 @@ pub fn SetTableFooter::SetTableFooter(
   if repeat is Some(v) {
     args.push({ name: Some("repeat"), value: Value::bool(v), param: 0, })
   }
+  push_extra(args, extra, 1)
   {
     node: {
       func: FElem(@library.table_footer_elem()),
@@ -3275,6 +2902,11 @@ pub fn Select::table_footer(repeat? : Bool) -> Selector[TableFooterView] {
 
 ///|
 /// `table.hline`: A horizontal line in the table.
+///
+/// Explicit states besides a value:
+/// - `y`: `auto` as `extra` with `Value::auto()`
+/// - `end_`: `none` as `extra` with `Value::none()`
+/// - `stroke`: `none` as `Stroke::none()`
 pub struct TableHline {
   priv content : Content
 }
@@ -3282,52 +2914,33 @@ pub struct TableHline {
 ///|
 #callsite(autofill(loc, args_loc))
 pub fn TableHline::TableHline(
-  y? : @library.Smart[Int64],
+  y? : Int64,
   start? : Int64,
-  end_? : Int64?,
-  stroke? : Stroke?,
+  end_? : Int64,
+  stroke? : Stroke,
   position? : Alignment,
+  extra? : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> TableHline {
   let args : Array[ArgNode] = []
   if y is Some(v) {
-    args.push({
-      name: Some("y"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => Value::int(x)
-      },
-      param: 0,
-    })
+    args.push({ name: Some("y"), value: Value::int(v), param: 0, })
   }
   if start is Some(v) {
     args.push({ name: Some("start"), value: Value::int(v), param: 1, })
   }
   if end_ is Some(v) {
-    args.push({
-      name: Some("end"),
-      value: match v {
-        None => Value::none()
-        Some(x) => Value::int(x)
-      },
-      param: 2,
-    })
+    args.push({ name: Some("end"), value: Value::int(v), param: 2, })
   }
   if stroke is Some(v) {
-    args.push({
-      name: Some("stroke"),
-      value: match v {
-        None => Value::none()
-        Some(x) => ToValue::to_value(x)
-      },
-      param: 3,
-    })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 3, })
   }
   if position is Some(v) {
     args.push({ name: Some("position"), value: ToValue::to_value(v), param: 4, })
   }
+  push_extra(args, extra, 5)
   {
     content: labelled_call(
       {
@@ -3336,7 +2949,7 @@ pub fn TableHline::TableHline(
         origin: Site::new("TableHline", loc, args_loc),
       },
       label,
-      5,
+      6,
     ),
   }
 }
@@ -3348,6 +2961,11 @@ pub impl IntoContent for TableHline with fn into_content(self) {
 
 ///|
 /// `set table.hline(..)`.
+///
+/// Explicit states besides a value:
+/// - `y`: `auto` as `extra` with `Value::auto()`
+/// - `end_`: `none` as `extra` with `Value::none()`
+/// - `stroke`: `none` as `Stroke::none()`
 pub struct SetTableHline {
   priv node : SetNode
 }
@@ -3355,51 +2973,32 @@ pub struct SetTableHline {
 ///|
 #callsite(autofill(loc, args_loc))
 pub fn SetTableHline::SetTableHline(
-  y? : @library.Smart[Int64],
+  y? : Int64,
   start? : Int64,
-  end_? : Int64?,
-  stroke? : Stroke?,
+  end_? : Int64,
+  stroke? : Stroke,
   position? : Alignment,
+  extra? : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetTableHline {
   let args : Array[ArgNode] = []
   if y is Some(v) {
-    args.push({
-      name: Some("y"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => Value::int(x)
-      },
-      param: 0,
-    })
+    args.push({ name: Some("y"), value: Value::int(v), param: 0, })
   }
   if start is Some(v) {
     args.push({ name: Some("start"), value: Value::int(v), param: 1, })
   }
   if end_ is Some(v) {
-    args.push({
-      name: Some("end"),
-      value: match v {
-        None => Value::none()
-        Some(x) => Value::int(x)
-      },
-      param: 2,
-    })
+    args.push({ name: Some("end"), value: Value::int(v), param: 2, })
   }
   if stroke is Some(v) {
-    args.push({
-      name: Some("stroke"),
-      value: match v {
-        None => Value::none()
-        Some(x) => ToValue::to_value(x)
-      },
-      param: 3,
-    })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 3, })
   }
   if position is Some(v) {
     args.push({ name: Some("position"), value: ToValue::to_value(v), param: 4, })
   }
+  push_extra(args, extra, 5)
   {
     node: {
       func: FElem(@library.table_h_line_elem()),
@@ -3439,48 +3038,24 @@ pub fn TableHlineView::view(self : TableHlineView) -> ContentView {
 /// The `table.hline` elements; with arguments, those whose fields have the
 /// given values (`table.hline.where(..)`).
 pub fn Select::table_hline(
-  y? : @library.Smart[Int64],
+  y? : Int64,
   start? : Int64,
-  end_? : Int64?,
-  stroke? : Stroke?,
+  end_? : Int64,
+  stroke? : Stroke,
   position? : Alignment,
 ) -> Selector[TableHlineView] {
   let fields : Array[(String, Value)] = []
   if y is Some(v) {
-    fields.push(
-      (
-        "y",
-        match v {
-          Auto => Value::auto()
-          Custom(x) => Value::int(x)
-        },
-      ),
-    )
+    fields.push(("y", Value::int(v)))
   }
   if start is Some(v) {
     fields.push(("start", Value::int(v)))
   }
   if end_ is Some(v) {
-    fields.push(
-      (
-        "end",
-        match v {
-          None => Value::none()
-          Some(x) => Value::int(x)
-        },
-      ),
-    )
+    fields.push(("end", Value::int(v)))
   }
   if stroke is Some(v) {
-    fields.push(
-      (
-        "stroke",
-        match v {
-          None => Value::none()
-          Some(x) => ToValue::to_value(x)
-        },
-      ),
-    )
+    fields.push(("stroke", ToValue::to_value(v)))
   }
   if position is Some(v) {
     fields.push(("position", ToValue::to_value(v)))
@@ -3493,6 +3068,11 @@ pub fn Select::table_hline(
 ///|
 /// `table.vline`: A vertical line in the table. See the docs for @grid.vline
 /// for more information regarding how to use this element's fields.
+///
+/// Explicit states besides a value:
+/// - `x`: `auto` as `extra` with `Value::auto()`
+/// - `end_`: `none` as `extra` with `Value::none()`
+/// - `stroke`: `none` as `Stroke::none()`
 pub struct TableVline {
   priv content : Content
 }
@@ -3500,52 +3080,33 @@ pub struct TableVline {
 ///|
 #callsite(autofill(loc, args_loc))
 pub fn TableVline::TableVline(
-  x? : @library.Smart[Int64],
+  x? : Int64,
   start? : Int64,
-  end_? : Int64?,
-  stroke? : Stroke?,
+  end_? : Int64,
+  stroke? : Stroke,
   position? : Alignment,
+  extra? : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> TableVline {
   let args : Array[ArgNode] = []
   if x is Some(v) {
-    args.push({
-      name: Some("x"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => Value::int(x)
-      },
-      param: 0,
-    })
+    args.push({ name: Some("x"), value: Value::int(v), param: 0, })
   }
   if start is Some(v) {
     args.push({ name: Some("start"), value: Value::int(v), param: 1, })
   }
   if end_ is Some(v) {
-    args.push({
-      name: Some("end"),
-      value: match v {
-        None => Value::none()
-        Some(x) => Value::int(x)
-      },
-      param: 2,
-    })
+    args.push({ name: Some("end"), value: Value::int(v), param: 2, })
   }
   if stroke is Some(v) {
-    args.push({
-      name: Some("stroke"),
-      value: match v {
-        None => Value::none()
-        Some(x) => ToValue::to_value(x)
-      },
-      param: 3,
-    })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 3, })
   }
   if position is Some(v) {
     args.push({ name: Some("position"), value: ToValue::to_value(v), param: 4, })
   }
+  push_extra(args, extra, 5)
   {
     content: labelled_call(
       {
@@ -3554,7 +3115,7 @@ pub fn TableVline::TableVline(
         origin: Site::new("TableVline", loc, args_loc),
       },
       label,
-      5,
+      6,
     ),
   }
 }
@@ -3566,6 +3127,11 @@ pub impl IntoContent for TableVline with fn into_content(self) {
 
 ///|
 /// `set table.vline(..)`.
+///
+/// Explicit states besides a value:
+/// - `x`: `auto` as `extra` with `Value::auto()`
+/// - `end_`: `none` as `extra` with `Value::none()`
+/// - `stroke`: `none` as `Stroke::none()`
 pub struct SetTableVline {
   priv node : SetNode
 }
@@ -3573,51 +3139,32 @@ pub struct SetTableVline {
 ///|
 #callsite(autofill(loc, args_loc))
 pub fn SetTableVline::SetTableVline(
-  x? : @library.Smart[Int64],
+  x? : Int64,
   start? : Int64,
-  end_? : Int64?,
-  stroke? : Stroke?,
+  end_? : Int64,
+  stroke? : Stroke,
   position? : Alignment,
+  extra? : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetTableVline {
   let args : Array[ArgNode] = []
   if x is Some(v) {
-    args.push({
-      name: Some("x"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => Value::int(x)
-      },
-      param: 0,
-    })
+    args.push({ name: Some("x"), value: Value::int(v), param: 0, })
   }
   if start is Some(v) {
     args.push({ name: Some("start"), value: Value::int(v), param: 1, })
   }
   if end_ is Some(v) {
-    args.push({
-      name: Some("end"),
-      value: match v {
-        None => Value::none()
-        Some(x) => Value::int(x)
-      },
-      param: 2,
-    })
+    args.push({ name: Some("end"), value: Value::int(v), param: 2, })
   }
   if stroke is Some(v) {
-    args.push({
-      name: Some("stroke"),
-      value: match v {
-        None => Value::none()
-        Some(x) => ToValue::to_value(x)
-      },
-      param: 3,
-    })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 3, })
   }
   if position is Some(v) {
     args.push({ name: Some("position"), value: ToValue::to_value(v), param: 4, })
   }
+  push_extra(args, extra, 5)
   {
     node: {
       func: FElem(@library.table_v_line_elem()),
@@ -3657,48 +3204,24 @@ pub fn TableVlineView::view(self : TableVlineView) -> ContentView {
 /// The `table.vline` elements; with arguments, those whose fields have the
 /// given values (`table.vline.where(..)`).
 pub fn Select::table_vline(
-  x? : @library.Smart[Int64],
+  x? : Int64,
   start? : Int64,
-  end_? : Int64?,
-  stroke? : Stroke?,
+  end_? : Int64,
+  stroke? : Stroke,
   position? : Alignment,
 ) -> Selector[TableVlineView] {
   let fields : Array[(String, Value)] = []
   if x is Some(v) {
-    fields.push(
-      (
-        "x",
-        match v {
-          Auto => Value::auto()
-          Custom(x) => Value::int(x)
-        },
-      ),
-    )
+    fields.push(("x", Value::int(v)))
   }
   if start is Some(v) {
     fields.push(("start", Value::int(v)))
   }
   if end_ is Some(v) {
-    fields.push(
-      (
-        "end",
-        match v {
-          None => Value::none()
-          Some(x) => Value::int(x)
-        },
-      ),
-    )
+    fields.push(("end", Value::int(v)))
   }
   if stroke is Some(v) {
-    fields.push(
-      (
-        "stroke",
-        match v {
-          None => Value::none()
-          Some(x) => ToValue::to_value(x)
-        },
-      ),
-    )
+    fields.push(("stroke", ToValue::to_value(v)))
   }
   if position is Some(v) {
     fields.push(("position", ToValue::to_value(v)))
@@ -3710,6 +3233,10 @@ pub fn Select::table_vline(
 
 ///|
 /// `outline`: A table of contents, figures, or other elements.
+///
+/// Explicit states besides a value:
+/// - `title`: `auto` as `AutoValue()`, `none` as `NoneValue()`
+/// - `depth`: `none` as `extra` with `Value::none()`
 pub struct Outline {
   priv content : Content
 }
@@ -3717,37 +3244,21 @@ pub struct Outline {
 ///|
 #callsite(autofill(loc, args_loc))
 pub fn Outline::Outline(
-  title? : @library.Smart[&IntoContent?],
-  depth? : Int64?,
+  title? : &IntoContent,
+  depth? : Int64,
+  extra? : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> Outline {
   let args : Array[ArgNode] = []
   if title is Some(v) {
-    args.push({
-      name: Some("title"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) =>
-          match x {
-            None => Value::none()
-            Some(x) => Value::content(x)
-          }
-      },
-      param: 0,
-    })
+    args.push({ name: Some("title"), value: Value::content(v), param: 0, })
   }
   if depth is Some(v) {
-    args.push({
-      name: Some("depth"),
-      value: match v {
-        None => Value::none()
-        Some(x) => Value::int(x)
-      },
-      param: 1,
-    })
+    args.push({ name: Some("depth"), value: Value::int(v), param: 1, })
   }
+  push_extra(args, extra, 2)
   {
     content: labelled_call(
       {
@@ -3756,7 +3267,7 @@ pub fn Outline::Outline(
         origin: Site::new("Outline", loc, args_loc),
       },
       label,
-      2,
+      3,
     ),
   }
 }
@@ -3768,6 +3279,10 @@ pub impl IntoContent for Outline with fn into_content(self) {
 
 ///|
 /// `set outline(..)`.
+///
+/// Explicit states besides a value:
+/// - `title`: `auto` as `AutoValue()`, `none` as `NoneValue()`
+/// - `depth`: `none` as `extra` with `Value::none()`
 pub struct SetOutline {
   priv node : SetNode
 }
@@ -3775,36 +3290,20 @@ pub struct SetOutline {
 ///|
 #callsite(autofill(loc, args_loc))
 pub fn SetOutline::SetOutline(
-  title? : @library.Smart[&IntoContent?],
-  depth? : Int64?,
+  title? : &IntoContent,
+  depth? : Int64,
+  extra? : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetOutline {
   let args : Array[ArgNode] = []
   if title is Some(v) {
-    args.push({
-      name: Some("title"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) =>
-          match x {
-            None => Value::none()
-            Some(x) => Value::content(x)
-          }
-      },
-      param: 0,
-    })
+    args.push({ name: Some("title"), value: Value::content(v), param: 0, })
   }
   if depth is Some(v) {
-    args.push({
-      name: Some("depth"),
-      value: match v {
-        None => Value::none()
-        Some(x) => Value::int(x)
-      },
-      param: 1,
-    })
+    args.push({ name: Some("depth"), value: Value::int(v), param: 1, })
   }
+  push_extra(args, extra, 2)
   {
     node: {
       func: FElem(@library.outline_elem()),
@@ -3843,18 +3342,10 @@ pub fn OutlineView::view(self : OutlineView) -> ContentView {
 ///|
 /// The `outline` elements; with arguments, those whose fields have the given
 /// values (`outline.where(..)`).
-pub fn Select::outline(depth? : Int64?) -> Selector[OutlineView] {
+pub fn Select::outline(depth? : Int64) -> Selector[OutlineView] {
   let fields : Array[(String, Value)] = []
   if depth is Some(v) {
-    fields.push(
-      (
-        "depth",
-        match v {
-          None => Value::none()
-          Some(x) => Value::int(x)
-        },
-      ),
-    )
+    fields.push(("depth", Value::int(v)))
   }
   elem_selector(@library.outline_elem(), fields, content => OutlineView::{
     content,
@@ -3863,6 +3354,10 @@ pub fn Select::outline(depth? : Int64?) -> Selector[OutlineView] {
 
 ///|
 /// `set document(..)`.
+///
+/// Explicit states besides a value:
+/// - `title`: `none` as `NoneValue()`
+/// - `description`: `none` as `NoneValue()`
 pub struct SetDocument {
   priv node : SetNode
 }
@@ -3870,40 +3365,28 @@ pub struct SetDocument {
 ///|
 #callsite(autofill(loc, args_loc))
 pub fn SetDocument::SetDocument(
-  title? : &IntoContent?,
+  title? : &IntoContent,
   author? : Array[String],
-  description? : &IntoContent?,
+  description? : &IntoContent,
   keywords? : Array[String],
+  extra? : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetDocument {
   let args : Array[ArgNode] = []
   if title is Some(v) {
-    args.push({
-      name: Some("title"),
-      value: match v {
-        None => Value::none()
-        Some(x) => Value::content(x)
-      },
-      param: 0,
-    })
+    args.push({ name: Some("title"), value: Value::content(v), param: 0, })
   }
   if author is Some(v) {
     args.push({ name: Some("author"), value: ToValue::to_value(v), param: 1, })
   }
   if description is Some(v) {
-    args.push({
-      name: Some("description"),
-      value: match v {
-        None => Value::none()
-        Some(x) => Value::content(x)
-      },
-      param: 2,
-    })
+    args.push({ name: Some("description"), value: Value::content(v), param: 2, })
   }
   if keywords is Some(v) {
     args.push({ name: Some("keywords"), value: ToValue::to_value(v), param: 3, })
   }
+  push_extra(args, extra, 4)
   {
     node: {
       func: FElem(@library.document_elem()),
@@ -3926,6 +3409,9 @@ pub impl SetRule for SetDocument
 ///
 /// `Title(body?)`: the optional positional body is a labelled parameter
 /// passed positionally. Twin: `title()` / `title(body)`.
+///
+/// Explicit states besides a value:
+/// - `body`: `auto` as `AutoValue()`
 pub struct Title {
   priv content : Content
 }
@@ -3933,22 +3419,17 @@ pub struct Title {
 ///|
 #callsite(autofill(loc, args_loc))
 pub fn Title::Title(
-  body? : @library.Smart[&IntoContent],
+  body? : &IntoContent,
+  extra? : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> Title {
   let args : Array[ArgNode] = []
   if body is Some(v) {
-    args.push({
-      name: None,
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => Value::content(x)
-      },
-      param: 0,
-    })
+    args.push({ name: None, value: Value::content(v), param: 0, })
   }
+  push_extra(args, extra, 1)
   {
     content: labelled_call(
       {
@@ -3957,7 +3438,7 @@ pub fn Title::Title(
         origin: Site::new("Title", loc, args_loc),
       },
       label,
-      1,
+      2,
     ),
   }
 }
@@ -4002,6 +3483,13 @@ pub fn Select::title() -> Selector[TitleView] {
 /// fields; the stored `text` field is not a parameter. `font`, `size` and
 /// `fill` have parse hooks that also accept positional arguments; the EDSL
 /// passes them named. Twin: `text(size: .., fill: .., body)`.
+///
+/// Explicit states besides a value:
+/// - `stroke`: `none` as `Stroke::none()`
+/// - `region`: `none` as `extra` with `Value::none()`
+/// - `hyphenate`: `auto` as `extra` with `Value::auto()`
+/// - `number_type`: `auto` as `extra` with `Value::auto()`
+/// - `number_width`: `auto` as `extra` with `Value::auto()`
 pub struct Text {
   priv content : Content
 }
@@ -4016,23 +3504,24 @@ pub fn Text::Text(
   weight? : FontWeight,
   size? : Length,
   fill? : Paint,
-  stroke? : Stroke?,
+  stroke? : Stroke,
   tracking? : Length,
   spacing? : Length,
   baseline? : Length,
   overhang? : Bool,
   lang? : String,
-  region? : String?,
-  dir? : @library.Smart[Dir],
-  hyphenate? : @library.Smart[Bool],
+  region? : String,
+  dir? : Dir,
+  hyphenate? : Bool,
   kerning? : Bool,
   ligatures? : Bool,
   discretionary_ligatures? : Bool,
   historical_ligatures? : Bool,
-  number_type? : @library.Smart[String],
-  number_width? : @library.Smart[String],
+  number_type? : String,
+  number_width? : String,
   slashed_zero? : Bool,
   fractions? : Bool,
+  extra? : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -4058,14 +3547,7 @@ pub fn Text::Text(
     args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 6, })
   }
   if stroke is Some(v) {
-    args.push({
-      name: Some("stroke"),
-      value: match v {
-        None => Value::none()
-        Some(x) => ToValue::to_value(x)
-      },
-      param: 7,
-    })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 7, })
   }
   if tracking is Some(v) {
     args.push({ name: Some("tracking"), value: ToValue::to_value(v), param: 8, })
@@ -4087,27 +3569,13 @@ pub fn Text::Text(
     args.push({ name: Some("lang"), value: Value::str(v), param: 12, })
   }
   if region is Some(v) {
-    args.push({
-      name: Some("region"),
-      value: match v {
-        None => Value::none()
-        Some(x) => Value::str(x)
-      },
-      param: 13,
-    })
+    args.push({ name: Some("region"), value: Value::str(v), param: 13, })
   }
   if dir is Some(v) {
     args.push({ name: Some("dir"), value: ToValue::to_value(v), param: 14, })
   }
   if hyphenate is Some(v) {
-    args.push({
-      name: Some("hyphenate"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => Value::bool(x)
-      },
-      param: 15,
-    })
+    args.push({ name: Some("hyphenate"), value: Value::bool(v), param: 15, })
   }
   if kerning is Some(v) {
     args.push({ name: Some("kerning"), value: Value::bool(v), param: 16, })
@@ -4130,24 +3598,10 @@ pub fn Text::Text(
     })
   }
   if number_type is Some(v) {
-    args.push({
-      name: Some("number-type"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => Value::str(x)
-      },
-      param: 20,
-    })
+    args.push({ name: Some("number-type"), value: Value::str(v), param: 20, })
   }
   if number_width is Some(v) {
-    args.push({
-      name: Some("number-width"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => Value::str(x)
-      },
-      param: 21,
-    })
+    args.push({ name: Some("number-width"), value: Value::str(v), param: 21, })
   }
   if slashed_zero is Some(v) {
     args.push({ name: Some("slashed-zero"), value: Value::bool(v), param: 22, })
@@ -4155,6 +3609,7 @@ pub fn Text::Text(
   if fractions is Some(v) {
     args.push({ name: Some("fractions"), value: Value::bool(v), param: 23, })
   }
+  push_extra(args, extra, 24)
   {
     content: labelled_call(
       {
@@ -4163,7 +3618,7 @@ pub fn Text::Text(
         origin: Site::new("Text", loc, args_loc),
       },
       label,
-      24,
+      25,
     ),
   }
 }
@@ -4175,6 +3630,13 @@ pub impl IntoContent for Text with fn into_content(self) {
 
 ///|
 /// `set text(..)`.
+///
+/// Explicit states besides a value:
+/// - `stroke`: `none` as `Stroke::none()`
+/// - `region`: `none` as `extra` with `Value::none()`
+/// - `hyphenate`: `auto` as `extra` with `Value::auto()`
+/// - `number_type`: `auto` as `extra` with `Value::auto()`
+/// - `number_width`: `auto` as `extra` with `Value::auto()`
 pub struct SetText {
   priv node : SetNode
 }
@@ -4188,23 +3650,24 @@ pub fn SetText::SetText(
   weight? : FontWeight,
   size? : Length,
   fill? : Paint,
-  stroke? : Stroke?,
+  stroke? : Stroke,
   tracking? : Length,
   spacing? : Length,
   baseline? : Length,
   overhang? : Bool,
   lang? : String,
-  region? : String?,
-  dir? : @library.Smart[Dir],
-  hyphenate? : @library.Smart[Bool],
+  region? : String,
+  dir? : Dir,
+  hyphenate? : Bool,
   kerning? : Bool,
   ligatures? : Bool,
   discretionary_ligatures? : Bool,
   historical_ligatures? : Bool,
-  number_type? : @library.Smart[String],
-  number_width? : @library.Smart[String],
+  number_type? : String,
+  number_width? : String,
   slashed_zero? : Bool,
   fractions? : Bool,
+  extra? : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetText {
@@ -4228,14 +3691,7 @@ pub fn SetText::SetText(
     args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 5, })
   }
   if stroke is Some(v) {
-    args.push({
-      name: Some("stroke"),
-      value: match v {
-        None => Value::none()
-        Some(x) => ToValue::to_value(x)
-      },
-      param: 6,
-    })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 6, })
   }
   if tracking is Some(v) {
     args.push({ name: Some("tracking"), value: ToValue::to_value(v), param: 7, })
@@ -4253,27 +3709,13 @@ pub fn SetText::SetText(
     args.push({ name: Some("lang"), value: Value::str(v), param: 11, })
   }
   if region is Some(v) {
-    args.push({
-      name: Some("region"),
-      value: match v {
-        None => Value::none()
-        Some(x) => Value::str(x)
-      },
-      param: 12,
-    })
+    args.push({ name: Some("region"), value: Value::str(v), param: 12, })
   }
   if dir is Some(v) {
     args.push({ name: Some("dir"), value: ToValue::to_value(v), param: 13, })
   }
   if hyphenate is Some(v) {
-    args.push({
-      name: Some("hyphenate"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => Value::bool(x)
-      },
-      param: 14,
-    })
+    args.push({ name: Some("hyphenate"), value: Value::bool(v), param: 14, })
   }
   if kerning is Some(v) {
     args.push({ name: Some("kerning"), value: Value::bool(v), param: 15, })
@@ -4296,24 +3738,10 @@ pub fn SetText::SetText(
     })
   }
   if number_type is Some(v) {
-    args.push({
-      name: Some("number-type"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => Value::str(x)
-      },
-      param: 19,
-    })
+    args.push({ name: Some("number-type"), value: Value::str(v), param: 19, })
   }
   if number_width is Some(v) {
-    args.push({
-      name: Some("number-width"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => Value::str(x)
-      },
-      param: 20,
-    })
+    args.push({ name: Some("number-width"), value: Value::str(v), param: 20, })
   }
   if slashed_zero is Some(v) {
     args.push({ name: Some("slashed-zero"), value: Value::bool(v), param: 21, })
@@ -4321,6 +3749,7 @@ pub fn SetText::SetText(
   if fractions is Some(v) {
     args.push({ name: Some("fractions"), value: Value::bool(v), param: 22, })
   }
+  push_extra(args, extra, 23)
   {
     node: {
       func: FElem(@library.text_elem()),
@@ -4374,21 +3803,21 @@ pub fn Select::text(
   weight? : FontWeight,
   size? : Length,
   fill? : Paint,
-  stroke? : Stroke?,
+  stroke? : Stroke,
   tracking? : Length,
   spacing? : Length,
   baseline? : Length,
   overhang? : Bool,
   lang? : String,
-  region? : String?,
-  dir? : @library.Smart[Dir],
-  hyphenate? : @library.Smart[Bool],
+  region? : String,
+  dir? : Dir,
+  hyphenate? : Bool,
   kerning? : Bool,
   ligatures? : Bool,
   discretionary_ligatures? : Bool,
   historical_ligatures? : Bool,
-  number_type? : @library.Smart[String],
-  number_width? : @library.Smart[String],
+  number_type? : String,
+  number_width? : String,
   slashed_zero? : Bool,
   fractions? : Bool,
 ) -> Selector[TextView] {
@@ -4412,15 +3841,7 @@ pub fn Select::text(
     fields.push(("fill", ToValue::to_value(v)))
   }
   if stroke is Some(v) {
-    fields.push(
-      (
-        "stroke",
-        match v {
-          None => Value::none()
-          Some(x) => ToValue::to_value(x)
-        },
-      ),
-    )
+    fields.push(("stroke", ToValue::to_value(v)))
   }
   if tracking is Some(v) {
     fields.push(("tracking", ToValue::to_value(v)))
@@ -4438,29 +3859,13 @@ pub fn Select::text(
     fields.push(("lang", Value::str(v)))
   }
   if region is Some(v) {
-    fields.push(
-      (
-        "region",
-        match v {
-          None => Value::none()
-          Some(x) => Value::str(x)
-        },
-      ),
-    )
+    fields.push(("region", Value::str(v)))
   }
   if dir is Some(v) {
     fields.push(("dir", ToValue::to_value(v)))
   }
   if hyphenate is Some(v) {
-    fields.push(
-      (
-        "hyphenate",
-        match v {
-          Auto => Value::auto()
-          Custom(x) => Value::bool(x)
-        },
-      ),
-    )
+    fields.push(("hyphenate", Value::bool(v)))
   }
   if kerning is Some(v) {
     fields.push(("kerning", Value::bool(v)))
@@ -4475,26 +3880,10 @@ pub fn Select::text(
     fields.push(("historical-ligatures", Value::bool(v)))
   }
   if number_type is Some(v) {
-    fields.push(
-      (
-        "number-type",
-        match v {
-          Auto => Value::auto()
-          Custom(x) => Value::str(x)
-        },
-      ),
-    )
+    fields.push(("number-type", Value::str(v)))
   }
   if number_width is Some(v) {
-    fields.push(
-      (
-        "number-width",
-        match v {
-          Auto => Value::auto()
-          Custom(x) => Value::str(x)
-        },
-      ),
-    )
+    fields.push(("number-width", Value::str(v)))
   }
   if slashed_zero is Some(v) {
     fields.push(("slashed-zero", Value::bool(v)))
@@ -4511,6 +3900,9 @@ pub fn Select::text(
 /// `Raw(text, ..)`: `text` is a string. `syntaxes` and `theme` (parse hooks
 /// that load files) are not typed yet. Twin: `raw(text, block: .., lang:
 /// ..)`.
+///
+/// Explicit states besides a value:
+/// - `lang`: `none` as `extra` with `Value::none()`
 pub struct Raw {
   priv content : Content
 }
@@ -4520,9 +3912,10 @@ pub struct Raw {
 pub fn Raw::Raw(
   text : String,
   block? : Bool,
-  lang? : String?,
+  lang? : String,
   align? : Alignment,
   tab_size? : Int64,
+  extra? : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -4533,14 +3926,7 @@ pub fn Raw::Raw(
     args.push({ name: Some("block"), value: Value::bool(v), param: 1, })
   }
   if lang is Some(v) {
-    args.push({
-      name: Some("lang"),
-      value: match v {
-        None => Value::none()
-        Some(x) => Value::str(x)
-      },
-      param: 2,
-    })
+    args.push({ name: Some("lang"), value: Value::str(v), param: 2, })
   }
   if align is Some(v) {
     args.push({ name: Some("align"), value: ToValue::to_value(v), param: 3, })
@@ -4548,6 +3934,7 @@ pub fn Raw::Raw(
   if tab_size is Some(v) {
     args.push({ name: Some("tab-size"), value: Value::int(v), param: 4, })
   }
+  push_extra(args, extra, 5)
   {
     content: labelled_call(
       {
@@ -4556,7 +3943,7 @@ pub fn Raw::Raw(
         origin: Site::new("Raw", loc, args_loc),
       },
       label,
-      5,
+      6,
     ),
   }
 }
@@ -4568,6 +3955,9 @@ pub impl IntoContent for Raw with fn into_content(self) {
 
 ///|
 /// `set raw(..)`.
+///
+/// Explicit states besides a value:
+/// - `lang`: `none` as `extra` with `Value::none()`
 pub struct SetRaw {
   priv node : SetNode
 }
@@ -4576,9 +3966,10 @@ pub struct SetRaw {
 #callsite(autofill(loc, args_loc))
 pub fn SetRaw::SetRaw(
   block? : Bool,
-  lang? : String?,
+  lang? : String,
   align? : Alignment,
   tab_size? : Int64,
+  extra? : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetRaw {
@@ -4587,14 +3978,7 @@ pub fn SetRaw::SetRaw(
     args.push({ name: Some("block"), value: Value::bool(v), param: 0, })
   }
   if lang is Some(v) {
-    args.push({
-      name: Some("lang"),
-      value: match v {
-        None => Value::none()
-        Some(x) => Value::str(x)
-      },
-      param: 1,
-    })
+    args.push({ name: Some("lang"), value: Value::str(v), param: 1, })
   }
   if align is Some(v) {
     args.push({ name: Some("align"), value: ToValue::to_value(v), param: 2, })
@@ -4602,6 +3986,7 @@ pub fn SetRaw::SetRaw(
   if tab_size is Some(v) {
     args.push({ name: Some("tab-size"), value: Value::int(v), param: 3, })
   }
+  push_extra(args, extra, 4)
   {
     node: {
       func: FElem(@library.raw_elem()),
@@ -4642,7 +4027,7 @@ pub fn RawView::view(self : RawView) -> ContentView {
 /// values (`raw.where(..)`).
 pub fn Select::raw(
   block? : Bool,
-  lang? : String?,
+  lang? : String,
   align? : Alignment,
   tab_size? : Int64,
 ) -> Selector[RawView] {
@@ -4651,15 +4036,7 @@ pub fn Select::raw(
     fields.push(("block", Value::bool(v)))
   }
   if lang is Some(v) {
-    fields.push(
-      (
-        "lang",
-        match v {
-          None => Value::none()
-          Some(x) => Value::str(x)
-        },
-      ),
-    )
+    fields.push(("lang", Value::str(v)))
   }
   if align is Some(v) {
     fields.push(("align", ToValue::to_value(v)))
@@ -4680,6 +4057,7 @@ pub struct Linebreak {
 #callsite(autofill(loc, args_loc))
 pub fn Linebreak::Linebreak(
   justify? : Bool,
+  extra? : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -4688,6 +4066,7 @@ pub fn Linebreak::Linebreak(
   if justify is Some(v) {
     args.push({ name: Some("justify"), value: Value::bool(v), param: 0, })
   }
+  push_extra(args, extra, 1)
   {
     content: labelled_call(
       {
@@ -4696,7 +4075,7 @@ pub fn Linebreak::Linebreak(
         origin: Site::new("Linebreak", loc, args_loc),
       },
       label,
-      1,
+      2,
     ),
   }
 }
@@ -4716,6 +4095,7 @@ pub struct SetLinebreak {
 #callsite(autofill(loc, args_loc))
 pub fn SetLinebreak::SetLinebreak(
   justify? : Bool,
+  extra? : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetLinebreak {
@@ -4723,6 +4103,7 @@ pub fn SetLinebreak::SetLinebreak(
   if justify is Some(v) {
     args.push({ name: Some("justify"), value: Value::bool(v), param: 0, })
   }
+  push_extra(args, extra, 1)
   {
     node: {
       func: FElem(@library.linebreak_elem()),
@@ -4783,6 +4164,7 @@ pub fn Smartquote::Smartquote(
   double? : Bool,
   enabled? : Bool,
   alternative? : Bool,
+  extra? : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -4797,6 +4179,7 @@ pub fn Smartquote::Smartquote(
   if alternative is Some(v) {
     args.push({ name: Some("alternative"), value: Value::bool(v), param: 2, })
   }
+  push_extra(args, extra, 3)
   {
     content: labelled_call(
       {
@@ -4805,7 +4188,7 @@ pub fn Smartquote::Smartquote(
         origin: Site::new("Smartquote", loc, args_loc),
       },
       label,
-      3,
+      4,
     ),
   }
 }
@@ -4827,6 +4210,7 @@ pub fn SetSmartquote::SetSmartquote(
   double? : Bool,
   enabled? : Bool,
   alternative? : Bool,
+  extra? : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetSmartquote {
@@ -4840,6 +4224,7 @@ pub fn SetSmartquote::SetSmartquote(
   if alternative is Some(v) {
     args.push({ name: Some("alternative"), value: Value::bool(v), param: 2, })
   }
+  push_extra(args, extra, 3)
   {
     node: {
       func: FElem(@library.smart_quote_elem()),
@@ -4900,6 +4285,10 @@ pub fn Select::smartquote(
 
 ///|
 /// `underline`: Underlines text.
+///
+/// Explicit states besides a value:
+/// - `stroke`: `auto` as `Stroke::auto()`
+/// - `offset`: `auto` as `Auto`
 pub struct Underline {
   priv content : Content
 }
@@ -4908,11 +4297,12 @@ pub struct Underline {
 #callsite(autofill(loc, args_loc))
 pub fn Underline::Underline(
   body : &IntoContent,
-  stroke? : @library.Smart[Stroke],
-  offset? : @library.Smart[Length],
+  stroke? : Stroke,
+  offset? : Length,
   extent? : Length,
   evade? : Bool,
   background? : Bool,
+  extra? : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -4920,24 +4310,10 @@ pub fn Underline::Underline(
   let args : Array[ArgNode] = []
   args.push({ name: None, value: Value::content(body), param: 0, })
   if stroke is Some(v) {
-    args.push({
-      name: Some("stroke"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 1,
-    })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 1, })
   }
   if offset is Some(v) {
-    args.push({
-      name: Some("offset"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 2,
-    })
+    args.push({ name: Some("offset"), value: ToValue::to_value(v), param: 2, })
   }
   if extent is Some(v) {
     args.push({ name: Some("extent"), value: ToValue::to_value(v), param: 3, })
@@ -4948,6 +4324,7 @@ pub fn Underline::Underline(
   if background is Some(v) {
     args.push({ name: Some("background"), value: Value::bool(v), param: 5, })
   }
+  push_extra(args, extra, 6)
   {
     content: labelled_call(
       {
@@ -4956,7 +4333,7 @@ pub fn Underline::Underline(
         origin: Site::new("Underline", loc, args_loc),
       },
       label,
-      6,
+      7,
     ),
   }
 }
@@ -4968,6 +4345,10 @@ pub impl IntoContent for Underline with fn into_content(self) {
 
 ///|
 /// `set underline(..)`.
+///
+/// Explicit states besides a value:
+/// - `stroke`: `auto` as `Stroke::auto()`
+/// - `offset`: `auto` as `Auto`
 pub struct SetUnderline {
   priv node : SetNode
 }
@@ -4975,34 +4356,21 @@ pub struct SetUnderline {
 ///|
 #callsite(autofill(loc, args_loc))
 pub fn SetUnderline::SetUnderline(
-  stroke? : @library.Smart[Stroke],
-  offset? : @library.Smart[Length],
+  stroke? : Stroke,
+  offset? : Length,
   extent? : Length,
   evade? : Bool,
   background? : Bool,
+  extra? : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetUnderline {
   let args : Array[ArgNode] = []
   if stroke is Some(v) {
-    args.push({
-      name: Some("stroke"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 0,
-    })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 0, })
   }
   if offset is Some(v) {
-    args.push({
-      name: Some("offset"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 1,
-    })
+    args.push({ name: Some("offset"), value: ToValue::to_value(v), param: 1, })
   }
   if extent is Some(v) {
     args.push({ name: Some("extent"), value: ToValue::to_value(v), param: 2, })
@@ -5013,6 +4381,7 @@ pub fn SetUnderline::SetUnderline(
   if background is Some(v) {
     args.push({ name: Some("background"), value: Value::bool(v), param: 4, })
   }
+  push_extra(args, extra, 5)
   {
     node: {
       func: FElem(@library.underline_elem()),
@@ -5060,34 +4429,18 @@ pub fn UnderlineView::body(
 /// The `underline` elements; with arguments, those whose fields have the
 /// given values (`underline.where(..)`).
 pub fn Select::underline(
-  stroke? : @library.Smart[Stroke],
-  offset? : @library.Smart[Length],
+  stroke? : Stroke,
+  offset? : Length,
   extent? : Length,
   evade? : Bool,
   background? : Bool,
 ) -> Selector[UnderlineView] {
   let fields : Array[(String, Value)] = []
   if stroke is Some(v) {
-    fields.push(
-      (
-        "stroke",
-        match v {
-          Auto => Value::auto()
-          Custom(x) => ToValue::to_value(x)
-        },
-      ),
-    )
+    fields.push(("stroke", ToValue::to_value(v)))
   }
   if offset is Some(v) {
-    fields.push(
-      (
-        "offset",
-        match v {
-          Auto => Value::auto()
-          Custom(x) => ToValue::to_value(x)
-        },
-      ),
-    )
+    fields.push(("offset", ToValue::to_value(v)))
   }
   if extent is Some(v) {
     fields.push(("extent", ToValue::to_value(v)))
@@ -5105,6 +4458,10 @@ pub fn Select::underline(
 
 ///|
 /// `overline`: Adds a line over text.
+///
+/// Explicit states besides a value:
+/// - `stroke`: `auto` as `Stroke::auto()`
+/// - `offset`: `auto` as `Auto`
 pub struct Overline {
   priv content : Content
 }
@@ -5113,11 +4470,12 @@ pub struct Overline {
 #callsite(autofill(loc, args_loc))
 pub fn Overline::Overline(
   body : &IntoContent,
-  stroke? : @library.Smart[Stroke],
-  offset? : @library.Smart[Length],
+  stroke? : Stroke,
+  offset? : Length,
   extent? : Length,
   evade? : Bool,
   background? : Bool,
+  extra? : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -5125,24 +4483,10 @@ pub fn Overline::Overline(
   let args : Array[ArgNode] = []
   args.push({ name: None, value: Value::content(body), param: 0, })
   if stroke is Some(v) {
-    args.push({
-      name: Some("stroke"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 1,
-    })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 1, })
   }
   if offset is Some(v) {
-    args.push({
-      name: Some("offset"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 2,
-    })
+    args.push({ name: Some("offset"), value: ToValue::to_value(v), param: 2, })
   }
   if extent is Some(v) {
     args.push({ name: Some("extent"), value: ToValue::to_value(v), param: 3, })
@@ -5153,6 +4497,7 @@ pub fn Overline::Overline(
   if background is Some(v) {
     args.push({ name: Some("background"), value: Value::bool(v), param: 5, })
   }
+  push_extra(args, extra, 6)
   {
     content: labelled_call(
       {
@@ -5161,7 +4506,7 @@ pub fn Overline::Overline(
         origin: Site::new("Overline", loc, args_loc),
       },
       label,
-      6,
+      7,
     ),
   }
 }
@@ -5173,6 +4518,10 @@ pub impl IntoContent for Overline with fn into_content(self) {
 
 ///|
 /// `set overline(..)`.
+///
+/// Explicit states besides a value:
+/// - `stroke`: `auto` as `Stroke::auto()`
+/// - `offset`: `auto` as `Auto`
 pub struct SetOverline {
   priv node : SetNode
 }
@@ -5180,34 +4529,21 @@ pub struct SetOverline {
 ///|
 #callsite(autofill(loc, args_loc))
 pub fn SetOverline::SetOverline(
-  stroke? : @library.Smart[Stroke],
-  offset? : @library.Smart[Length],
+  stroke? : Stroke,
+  offset? : Length,
   extent? : Length,
   evade? : Bool,
   background? : Bool,
+  extra? : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetOverline {
   let args : Array[ArgNode] = []
   if stroke is Some(v) {
-    args.push({
-      name: Some("stroke"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 0,
-    })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 0, })
   }
   if offset is Some(v) {
-    args.push({
-      name: Some("offset"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 1,
-    })
+    args.push({ name: Some("offset"), value: ToValue::to_value(v), param: 1, })
   }
   if extent is Some(v) {
     args.push({ name: Some("extent"), value: ToValue::to_value(v), param: 2, })
@@ -5218,6 +4554,7 @@ pub fn SetOverline::SetOverline(
   if background is Some(v) {
     args.push({ name: Some("background"), value: Value::bool(v), param: 4, })
   }
+  push_extra(args, extra, 5)
   {
     node: {
       func: FElem(@library.overline_elem()),
@@ -5265,34 +4602,18 @@ pub fn OverlineView::body(
 /// The `overline` elements; with arguments, those whose fields have the given
 /// values (`overline.where(..)`).
 pub fn Select::overline(
-  stroke? : @library.Smart[Stroke],
-  offset? : @library.Smart[Length],
+  stroke? : Stroke,
+  offset? : Length,
   extent? : Length,
   evade? : Bool,
   background? : Bool,
 ) -> Selector[OverlineView] {
   let fields : Array[(String, Value)] = []
   if stroke is Some(v) {
-    fields.push(
-      (
-        "stroke",
-        match v {
-          Auto => Value::auto()
-          Custom(x) => ToValue::to_value(x)
-        },
-      ),
-    )
+    fields.push(("stroke", ToValue::to_value(v)))
   }
   if offset is Some(v) {
-    fields.push(
-      (
-        "offset",
-        match v {
-          Auto => Value::auto()
-          Custom(x) => ToValue::to_value(x)
-        },
-      ),
-    )
+    fields.push(("offset", ToValue::to_value(v)))
   }
   if extent is Some(v) {
     fields.push(("extent", ToValue::to_value(v)))
@@ -5310,6 +4631,10 @@ pub fn Select::overline(
 
 ///|
 /// `strike`: Strikes through text.
+///
+/// Explicit states besides a value:
+/// - `stroke`: `auto` as `Stroke::auto()`
+/// - `offset`: `auto` as `Auto`
 pub struct Strike {
   priv content : Content
 }
@@ -5318,10 +4643,11 @@ pub struct Strike {
 #callsite(autofill(loc, args_loc))
 pub fn Strike::Strike(
   body : &IntoContent,
-  stroke? : @library.Smart[Stroke],
-  offset? : @library.Smart[Length],
+  stroke? : Stroke,
+  offset? : Length,
   extent? : Length,
   background? : Bool,
+  extra? : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -5329,24 +4655,10 @@ pub fn Strike::Strike(
   let args : Array[ArgNode] = []
   args.push({ name: None, value: Value::content(body), param: 0, })
   if stroke is Some(v) {
-    args.push({
-      name: Some("stroke"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 1,
-    })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 1, })
   }
   if offset is Some(v) {
-    args.push({
-      name: Some("offset"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 2,
-    })
+    args.push({ name: Some("offset"), value: ToValue::to_value(v), param: 2, })
   }
   if extent is Some(v) {
     args.push({ name: Some("extent"), value: ToValue::to_value(v), param: 3, })
@@ -5354,6 +4666,7 @@ pub fn Strike::Strike(
   if background is Some(v) {
     args.push({ name: Some("background"), value: Value::bool(v), param: 4, })
   }
+  push_extra(args, extra, 5)
   {
     content: labelled_call(
       {
@@ -5362,7 +4675,7 @@ pub fn Strike::Strike(
         origin: Site::new("Strike", loc, args_loc),
       },
       label,
-      5,
+      6,
     ),
   }
 }
@@ -5374,6 +4687,10 @@ pub impl IntoContent for Strike with fn into_content(self) {
 
 ///|
 /// `set strike(..)`.
+///
+/// Explicit states besides a value:
+/// - `stroke`: `auto` as `Stroke::auto()`
+/// - `offset`: `auto` as `Auto`
 pub struct SetStrike {
   priv node : SetNode
 }
@@ -5381,33 +4698,20 @@ pub struct SetStrike {
 ///|
 #callsite(autofill(loc, args_loc))
 pub fn SetStrike::SetStrike(
-  stroke? : @library.Smart[Stroke],
-  offset? : @library.Smart[Length],
+  stroke? : Stroke,
+  offset? : Length,
   extent? : Length,
   background? : Bool,
+  extra? : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetStrike {
   let args : Array[ArgNode] = []
   if stroke is Some(v) {
-    args.push({
-      name: Some("stroke"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 0,
-    })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 0, })
   }
   if offset is Some(v) {
-    args.push({
-      name: Some("offset"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 1,
-    })
+    args.push({ name: Some("offset"), value: ToValue::to_value(v), param: 1, })
   }
   if extent is Some(v) {
     args.push({ name: Some("extent"), value: ToValue::to_value(v), param: 2, })
@@ -5415,6 +4719,7 @@ pub fn SetStrike::SetStrike(
   if background is Some(v) {
     args.push({ name: Some("background"), value: Value::bool(v), param: 3, })
   }
+  push_extra(args, extra, 4)
   {
     node: {
       func: FElem(@library.strike_elem()),
@@ -5462,33 +4767,17 @@ pub fn StrikeView::body(
 /// The `strike` elements; with arguments, those whose fields have the given
 /// values (`strike.where(..)`).
 pub fn Select::strike(
-  stroke? : @library.Smart[Stroke],
-  offset? : @library.Smart[Length],
+  stroke? : Stroke,
+  offset? : Length,
   extent? : Length,
   background? : Bool,
 ) -> Selector[StrikeView] {
   let fields : Array[(String, Value)] = []
   if stroke is Some(v) {
-    fields.push(
-      (
-        "stroke",
-        match v {
-          Auto => Value::auto()
-          Custom(x) => ToValue::to_value(x)
-        },
-      ),
-    )
+    fields.push(("stroke", ToValue::to_value(v)))
   }
   if offset is Some(v) {
-    fields.push(
-      (
-        "offset",
-        match v {
-          Auto => Value::auto()
-          Custom(x) => ToValue::to_value(x)
-        },
-      ),
-    )
+    fields.push(("offset", ToValue::to_value(v)))
   }
   if extent is Some(v) {
     fields.push(("extent", ToValue::to_value(v)))
@@ -5503,6 +4792,9 @@ pub fn Select::strike(
 
 ///|
 /// `highlight`: Highlights text with a background color.
+///
+/// Explicit states besides a value:
+/// - `fill`: `none` as `None`
 pub struct Highlight {
   priv content : Content
 }
@@ -5511,10 +4803,11 @@ pub struct Highlight {
 #callsite(autofill(loc, args_loc))
 pub fn Highlight::Highlight(
   body : &IntoContent,
-  fill? : Paint?,
-  stroke? : Sides[Stroke?],
+  fill? : Paint,
+  stroke? : Sides[Stroke],
   extent? : Length,
   radius? : Corners[Length],
+  extra? : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -5522,14 +4815,7 @@ pub fn Highlight::Highlight(
   let args : Array[ArgNode] = []
   args.push({ name: None, value: Value::content(body), param: 0, })
   if fill is Some(v) {
-    args.push({
-      name: Some("fill"),
-      value: match v {
-        None => Value::none()
-        Some(x) => ToValue::to_value(x)
-      },
-      param: 1,
-    })
+    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 1, })
   }
   if stroke is Some(v) {
     args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 2, })
@@ -5540,6 +4826,7 @@ pub fn Highlight::Highlight(
   if radius is Some(v) {
     args.push({ name: Some("radius"), value: ToValue::to_value(v), param: 4, })
   }
+  push_extra(args, extra, 5)
   {
     content: labelled_call(
       {
@@ -5548,7 +4835,7 @@ pub fn Highlight::Highlight(
         origin: Site::new("Highlight", loc, args_loc),
       },
       label,
-      5,
+      6,
     ),
   }
 }
@@ -5560,6 +4847,9 @@ pub impl IntoContent for Highlight with fn into_content(self) {
 
 ///|
 /// `set highlight(..)`.
+///
+/// Explicit states besides a value:
+/// - `fill`: `none` as `None`
 pub struct SetHighlight {
   priv node : SetNode
 }
@@ -5567,23 +4857,17 @@ pub struct SetHighlight {
 ///|
 #callsite(autofill(loc, args_loc))
 pub fn SetHighlight::SetHighlight(
-  fill? : Paint?,
-  stroke? : Sides[Stroke?],
+  fill? : Paint,
+  stroke? : Sides[Stroke],
   extent? : Length,
   radius? : Corners[Length],
+  extra? : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetHighlight {
   let args : Array[ArgNode] = []
   if fill is Some(v) {
-    args.push({
-      name: Some("fill"),
-      value: match v {
-        None => Value::none()
-        Some(x) => ToValue::to_value(x)
-      },
-      param: 0,
-    })
+    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 0, })
   }
   if stroke is Some(v) {
     args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 1, })
@@ -5594,6 +4878,7 @@ pub fn SetHighlight::SetHighlight(
   if radius is Some(v) {
     args.push({ name: Some("radius"), value: ToValue::to_value(v), param: 3, })
   }
+  push_extra(args, extra, 4)
   {
     node: {
       func: FElem(@library.highlight_elem()),
@@ -5641,22 +4926,14 @@ pub fn HighlightView::body(
 /// The `highlight` elements; with arguments, those whose fields have the
 /// given values (`highlight.where(..)`).
 pub fn Select::highlight(
-  fill? : Paint?,
-  stroke? : Sides[Stroke?],
+  fill? : Paint,
+  stroke? : Sides[Stroke],
   extent? : Length,
   radius? : Corners[Length],
 ) -> Selector[HighlightView] {
   let fields : Array[(String, Value)] = []
   if fill is Some(v) {
-    fields.push(
-      (
-        "fill",
-        match v {
-          None => Value::none()
-          Some(x) => ToValue::to_value(x)
-        },
-      ),
-    )
+    fields.push(("fill", ToValue::to_value(v)))
   }
   if stroke is Some(v) {
     fields.push(("stroke", ToValue::to_value(v)))
@@ -5674,6 +4951,10 @@ pub fn Select::highlight(
 
 ///|
 /// `sub`: Renders text in subscript.
+///
+/// Explicit states besides a value:
+/// - `baseline`: `auto` as `Auto`
+/// - `size`: `auto` as `Auto`
 pub struct Sub {
   priv content : Content
 }
@@ -5683,8 +4964,9 @@ pub struct Sub {
 pub fn Sub::Sub(
   body : &IntoContent,
   typographic? : Bool,
-  baseline? : @library.Smart[Length],
-  size? : @library.Smart[Length],
+  baseline? : Length,
+  size? : Length,
+  extra? : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -5695,25 +4977,12 @@ pub fn Sub::Sub(
     args.push({ name: Some("typographic"), value: Value::bool(v), param: 1, })
   }
   if baseline is Some(v) {
-    args.push({
-      name: Some("baseline"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 2,
-    })
+    args.push({ name: Some("baseline"), value: ToValue::to_value(v), param: 2, })
   }
   if size is Some(v) {
-    args.push({
-      name: Some("size"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 3,
-    })
+    args.push({ name: Some("size"), value: ToValue::to_value(v), param: 3, })
   }
+  push_extra(args, extra, 4)
   {
     content: labelled_call(
       {
@@ -5722,7 +4991,7 @@ pub fn Sub::Sub(
         origin: Site::new("Sub", loc, args_loc),
       },
       label,
-      4,
+      5,
     ),
   }
 }
@@ -5734,6 +5003,10 @@ pub impl IntoContent for Sub with fn into_content(self) {
 
 ///|
 /// `set sub(..)`.
+///
+/// Explicit states besides a value:
+/// - `baseline`: `auto` as `Auto`
+/// - `size`: `auto` as `Auto`
 pub struct SetSub {
   priv node : SetNode
 }
@@ -5742,8 +5015,9 @@ pub struct SetSub {
 #callsite(autofill(loc, args_loc))
 pub fn SetSub::SetSub(
   typographic? : Bool,
-  baseline? : @library.Smart[Length],
-  size? : @library.Smart[Length],
+  baseline? : Length,
+  size? : Length,
+  extra? : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetSub {
@@ -5752,25 +5026,12 @@ pub fn SetSub::SetSub(
     args.push({ name: Some("typographic"), value: Value::bool(v), param: 0, })
   }
   if baseline is Some(v) {
-    args.push({
-      name: Some("baseline"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 1,
-    })
+    args.push({ name: Some("baseline"), value: ToValue::to_value(v), param: 1, })
   }
   if size is Some(v) {
-    args.push({
-      name: Some("size"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 2,
-    })
+    args.push({ name: Some("size"), value: ToValue::to_value(v), param: 2, })
   }
+  push_extra(args, extra, 3)
   {
     node: {
       func: FElem(@library.sub_elem()),
@@ -5817,40 +5078,28 @@ pub fn SubView::body(self : SubView) -> ContentView raise @library.HintedError {
 /// values (`sub.where(..)`).
 pub fn Select::sub(
   typographic? : Bool,
-  baseline? : @library.Smart[Length],
-  size? : @library.Smart[Length],
+  baseline? : Length,
+  size? : Length,
 ) -> Selector[SubView] {
   let fields : Array[(String, Value)] = []
   if typographic is Some(v) {
     fields.push(("typographic", Value::bool(v)))
   }
   if baseline is Some(v) {
-    fields.push(
-      (
-        "baseline",
-        match v {
-          Auto => Value::auto()
-          Custom(x) => ToValue::to_value(x)
-        },
-      ),
-    )
+    fields.push(("baseline", ToValue::to_value(v)))
   }
   if size is Some(v) {
-    fields.push(
-      (
-        "size",
-        match v {
-          Auto => Value::auto()
-          Custom(x) => ToValue::to_value(x)
-        },
-      ),
-    )
+    fields.push(("size", ToValue::to_value(v)))
   }
   elem_selector(@library.sub_elem(), fields, content => SubView::{ content, })
 }
 
 ///|
 /// `super`: Renders text in superscript.
+///
+/// Explicit states besides a value:
+/// - `baseline`: `auto` as `Auto`
+/// - `size`: `auto` as `Auto`
 pub struct Super {
   priv content : Content
 }
@@ -5860,8 +5109,9 @@ pub struct Super {
 pub fn Super::Super(
   body : &IntoContent,
   typographic? : Bool,
-  baseline? : @library.Smart[Length],
-  size? : @library.Smart[Length],
+  baseline? : Length,
+  size? : Length,
+  extra? : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -5872,25 +5122,12 @@ pub fn Super::Super(
     args.push({ name: Some("typographic"), value: Value::bool(v), param: 1, })
   }
   if baseline is Some(v) {
-    args.push({
-      name: Some("baseline"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 2,
-    })
+    args.push({ name: Some("baseline"), value: ToValue::to_value(v), param: 2, })
   }
   if size is Some(v) {
-    args.push({
-      name: Some("size"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 3,
-    })
+    args.push({ name: Some("size"), value: ToValue::to_value(v), param: 3, })
   }
+  push_extra(args, extra, 4)
   {
     content: labelled_call(
       {
@@ -5899,7 +5136,7 @@ pub fn Super::Super(
         origin: Site::new("Super", loc, args_loc),
       },
       label,
-      4,
+      5,
     ),
   }
 }
@@ -5911,6 +5148,10 @@ pub impl IntoContent for Super with fn into_content(self) {
 
 ///|
 /// `set super(..)`.
+///
+/// Explicit states besides a value:
+/// - `baseline`: `auto` as `Auto`
+/// - `size`: `auto` as `Auto`
 pub struct SetSuper {
   priv node : SetNode
 }
@@ -5919,8 +5160,9 @@ pub struct SetSuper {
 #callsite(autofill(loc, args_loc))
 pub fn SetSuper::SetSuper(
   typographic? : Bool,
-  baseline? : @library.Smart[Length],
-  size? : @library.Smart[Length],
+  baseline? : Length,
+  size? : Length,
+  extra? : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetSuper {
@@ -5929,25 +5171,12 @@ pub fn SetSuper::SetSuper(
     args.push({ name: Some("typographic"), value: Value::bool(v), param: 0, })
   }
   if baseline is Some(v) {
-    args.push({
-      name: Some("baseline"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 1,
-    })
+    args.push({ name: Some("baseline"), value: ToValue::to_value(v), param: 1, })
   }
   if size is Some(v) {
-    args.push({
-      name: Some("size"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 2,
-    })
+    args.push({ name: Some("size"), value: ToValue::to_value(v), param: 2, })
   }
+  push_extra(args, extra, 3)
   {
     node: {
       func: FElem(@library.super_elem()),
@@ -5996,34 +5225,18 @@ pub fn SuperView::body(
 /// values (`super.where(..)`).
 pub fn Select::super_(
   typographic? : Bool,
-  baseline? : @library.Smart[Length],
-  size? : @library.Smart[Length],
+  baseline? : Length,
+  size? : Length,
 ) -> Selector[SuperView] {
   let fields : Array[(String, Value)] = []
   if typographic is Some(v) {
     fields.push(("typographic", Value::bool(v)))
   }
   if baseline is Some(v) {
-    fields.push(
-      (
-        "baseline",
-        match v {
-          Auto => Value::auto()
-          Custom(x) => ToValue::to_value(x)
-        },
-      ),
-    )
+    fields.push(("baseline", ToValue::to_value(v)))
   }
   if size is Some(v) {
-    fields.push(
-      (
-        "size",
-        match v {
-          Auto => Value::auto()
-          Custom(x) => ToValue::to_value(x)
-        },
-      ),
-    )
+    fields.push(("size", ToValue::to_value(v)))
   }
   elem_selector(@library.super_elem(), fields, content => SuperView::{
     content,
@@ -6041,6 +5254,7 @@ pub struct Smallcaps {
 pub fn Smallcaps::Smallcaps(
   body : &IntoContent,
   all? : Bool,
+  extra? : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -6050,6 +5264,7 @@ pub fn Smallcaps::Smallcaps(
   if all is Some(v) {
     args.push({ name: Some("all"), value: Value::bool(v), param: 1, })
   }
+  push_extra(args, extra, 2)
   {
     content: labelled_call(
       {
@@ -6058,7 +5273,7 @@ pub fn Smallcaps::Smallcaps(
         origin: Site::new("Smallcaps", loc, args_loc),
       },
       label,
-      2,
+      3,
     ),
   }
 }
@@ -6078,6 +5293,7 @@ pub struct SetSmallcaps {
 #callsite(autofill(loc, args_loc))
 pub fn SetSmallcaps::SetSmallcaps(
   all? : Bool,
+  extra? : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetSmallcaps {
@@ -6085,6 +5301,7 @@ pub fn SetSmallcaps::SetSmallcaps(
   if all is Some(v) {
     args.push({ name: Some("all"), value: Value::bool(v), param: 0, })
   }
+  push_extra(args, extra, 1)
   {
     node: {
       func: FElem(@library.smallcaps_elem()),
@@ -6147,6 +5364,18 @@ pub fn Select::smallcaps(all? : Bool) -> Selector[SmallcapsView] {
 /// `Page(body, ..)`: the custom constructor produces page breaks around the
 /// styled body. `paper` is external and read by the `width`/`height` parsers,
 /// which share locals; all are passed named. Twin: `page(paper: .., body)`.
+///
+/// Explicit states besides a value:
+/// - `width`: `auto` as `Auto`
+/// - `height`: `auto` as `Auto`
+/// - `margin`: `auto` as `Sides::auto()`
+/// - `fill`: `auto` as `Auto`, `none` as `None`
+/// - `numbering`: `none` as `Numbering::none()`
+/// - `supplement`: `auto` as `AutoValue()`, `none` as `NoneValue()`
+/// - `header`: `auto` as `AutoValue()`, `none` as `NoneValue()`
+/// - `footer`: `auto` as `AutoValue()`, `none` as `NoneValue()`
+/// - `background`: `none` as `NoneValue()`
+/// - `foreground`: `none` as `NoneValue()`
 pub struct Page {
   priv content : Content
 }
@@ -6156,22 +5385,23 @@ pub struct Page {
 pub fn Page::Page(
   body : &IntoContent,
   paper? : String,
-  width? : @library.Smart[Length],
-  height? : @library.Smart[Length],
+  width? : Length,
+  height? : Length,
   flipped? : Bool,
-  margin? : @library.Smart[Sides[@library.Smart[Length]]],
+  margin? : Sides[Length],
   bleed? : Sides[Length],
   columns? : Int64,
-  fill? : @library.Smart[Paint?],
-  numbering? : Numbering?,
-  supplement? : @library.Smart[&IntoContent?],
+  fill? : Paint,
+  numbering? : Numbering,
+  supplement? : &IntoContent,
   number_align? : Alignment,
-  header? : @library.Smart[&IntoContent?],
+  header? : &IntoContent,
   header_ascent? : Length,
-  footer? : @library.Smart[&IntoContent?],
+  footer? : &IntoContent,
   footer_descent? : Length,
-  background? : &IntoContent?,
-  foreground? : &IntoContent?,
+  background? : &IntoContent,
+  foreground? : &IntoContent,
+  extra? : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -6182,37 +5412,16 @@ pub fn Page::Page(
     args.push({ name: Some("paper"), value: Value::str(v), param: 1, })
   }
   if width is Some(v) {
-    args.push({
-      name: Some("width"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 2,
-    })
+    args.push({ name: Some("width"), value: ToValue::to_value(v), param: 2, })
   }
   if height is Some(v) {
-    args.push({
-      name: Some("height"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 3,
-    })
+    args.push({ name: Some("height"), value: ToValue::to_value(v), param: 3, })
   }
   if flipped is Some(v) {
     args.push({ name: Some("flipped"), value: Value::bool(v), param: 4, })
   }
   if margin is Some(v) {
-    args.push({
-      name: Some("margin"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 5,
-    })
+    args.push({ name: Some("margin"), value: ToValue::to_value(v), param: 5, })
   }
   if bleed is Some(v) {
     args.push({ name: Some("bleed"), value: ToValue::to_value(v), param: 6, })
@@ -6221,42 +5430,17 @@ pub fn Page::Page(
     args.push({ name: Some("columns"), value: Value::int(v), param: 7, })
   }
   if fill is Some(v) {
-    args.push({
-      name: Some("fill"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) =>
-          match x {
-            None => Value::none()
-            Some(x) => ToValue::to_value(x)
-          }
-      },
-      param: 8,
-    })
+    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 8, })
   }
   if numbering is Some(v) {
     args.push({
       name: Some("numbering"),
-      value: match v {
-        None => Value::none()
-        Some(x) => ToValue::to_value(x)
-      },
+      value: ToValue::to_value(v),
       param: 9,
     })
   }
   if supplement is Some(v) {
-    args.push({
-      name: Some("supplement"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) =>
-          match x {
-            None => Value::none()
-            Some(x) => Value::content(x)
-          }
-      },
-      param: 10,
-    })
+    args.push({ name: Some("supplement"), value: Value::content(v), param: 10, })
   }
   if number_align is Some(v) {
     args.push({
@@ -6266,18 +5450,7 @@ pub fn Page::Page(
     })
   }
   if header is Some(v) {
-    args.push({
-      name: Some("header"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) =>
-          match x {
-            None => Value::none()
-            Some(x) => Value::content(x)
-          }
-      },
-      param: 12,
-    })
+    args.push({ name: Some("header"), value: Value::content(v), param: 12, })
   }
   if header_ascent is Some(v) {
     args.push({
@@ -6287,18 +5460,7 @@ pub fn Page::Page(
     })
   }
   if footer is Some(v) {
-    args.push({
-      name: Some("footer"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) =>
-          match x {
-            None => Value::none()
-            Some(x) => Value::content(x)
-          }
-      },
-      param: 14,
-    })
+    args.push({ name: Some("footer"), value: Value::content(v), param: 14, })
   }
   if footer_descent is Some(v) {
     args.push({
@@ -6308,25 +5470,12 @@ pub fn Page::Page(
     })
   }
   if background is Some(v) {
-    args.push({
-      name: Some("background"),
-      value: match v {
-        None => Value::none()
-        Some(x) => Value::content(x)
-      },
-      param: 16,
-    })
+    args.push({ name: Some("background"), value: Value::content(v), param: 16, })
   }
   if foreground is Some(v) {
-    args.push({
-      name: Some("foreground"),
-      value: match v {
-        None => Value::none()
-        Some(x) => Value::content(x)
-      },
-      param: 17,
-    })
+    args.push({ name: Some("foreground"), value: Value::content(v), param: 17, })
   }
+  push_extra(args, extra, 18)
   {
     content: labelled_call(
       {
@@ -6335,7 +5484,7 @@ pub fn Page::Page(
         origin: Site::new("Page", loc, args_loc),
       },
       label,
-      18,
+      19,
     ),
   }
 }
@@ -6347,6 +5496,18 @@ pub impl IntoContent for Page with fn into_content(self) {
 
 ///|
 /// `set page(..)`.
+///
+/// Explicit states besides a value:
+/// - `width`: `auto` as `Auto`
+/// - `height`: `auto` as `Auto`
+/// - `margin`: `auto` as `Sides::auto()`
+/// - `fill`: `auto` as `Auto`, `none` as `None`
+/// - `numbering`: `none` as `Numbering::none()`
+/// - `supplement`: `auto` as `AutoValue()`, `none` as `NoneValue()`
+/// - `header`: `auto` as `AutoValue()`, `none` as `NoneValue()`
+/// - `footer`: `auto` as `AutoValue()`, `none` as `NoneValue()`
+/// - `background`: `none` as `NoneValue()`
+/// - `foreground`: `none` as `NoneValue()`
 pub struct SetPage {
   priv node : SetNode
 }
@@ -6355,22 +5516,23 @@ pub struct SetPage {
 #callsite(autofill(loc, args_loc))
 pub fn SetPage::SetPage(
   paper? : String,
-  width? : @library.Smart[Length],
-  height? : @library.Smart[Length],
+  width? : Length,
+  height? : Length,
   flipped? : Bool,
-  margin? : @library.Smart[Sides[@library.Smart[Length]]],
+  margin? : Sides[Length],
   bleed? : Sides[Length],
   columns? : Int64,
-  fill? : @library.Smart[Paint?],
-  numbering? : Numbering?,
-  supplement? : @library.Smart[&IntoContent?],
+  fill? : Paint,
+  numbering? : Numbering,
+  supplement? : &IntoContent,
   number_align? : Alignment,
-  header? : @library.Smart[&IntoContent?],
+  header? : &IntoContent,
   header_ascent? : Length,
-  footer? : @library.Smart[&IntoContent?],
+  footer? : &IntoContent,
   footer_descent? : Length,
-  background? : &IntoContent?,
-  foreground? : &IntoContent?,
+  background? : &IntoContent,
+  foreground? : &IntoContent,
+  extra? : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetPage {
@@ -6379,37 +5541,16 @@ pub fn SetPage::SetPage(
     args.push({ name: Some("paper"), value: Value::str(v), param: 0, })
   }
   if width is Some(v) {
-    args.push({
-      name: Some("width"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 1,
-    })
+    args.push({ name: Some("width"), value: ToValue::to_value(v), param: 1, })
   }
   if height is Some(v) {
-    args.push({
-      name: Some("height"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 2,
-    })
+    args.push({ name: Some("height"), value: ToValue::to_value(v), param: 2, })
   }
   if flipped is Some(v) {
     args.push({ name: Some("flipped"), value: Value::bool(v), param: 3, })
   }
   if margin is Some(v) {
-    args.push({
-      name: Some("margin"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 4,
-    })
+    args.push({ name: Some("margin"), value: ToValue::to_value(v), param: 4, })
   }
   if bleed is Some(v) {
     args.push({ name: Some("bleed"), value: ToValue::to_value(v), param: 5, })
@@ -6418,42 +5559,17 @@ pub fn SetPage::SetPage(
     args.push({ name: Some("columns"), value: Value::int(v), param: 6, })
   }
   if fill is Some(v) {
-    args.push({
-      name: Some("fill"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) =>
-          match x {
-            None => Value::none()
-            Some(x) => ToValue::to_value(x)
-          }
-      },
-      param: 7,
-    })
+    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 7, })
   }
   if numbering is Some(v) {
     args.push({
       name: Some("numbering"),
-      value: match v {
-        None => Value::none()
-        Some(x) => ToValue::to_value(x)
-      },
+      value: ToValue::to_value(v),
       param: 8,
     })
   }
   if supplement is Some(v) {
-    args.push({
-      name: Some("supplement"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) =>
-          match x {
-            None => Value::none()
-            Some(x) => Value::content(x)
-          }
-      },
-      param: 9,
-    })
+    args.push({ name: Some("supplement"), value: Value::content(v), param: 9, })
   }
   if number_align is Some(v) {
     args.push({
@@ -6463,18 +5579,7 @@ pub fn SetPage::SetPage(
     })
   }
   if header is Some(v) {
-    args.push({
-      name: Some("header"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) =>
-          match x {
-            None => Value::none()
-            Some(x) => Value::content(x)
-          }
-      },
-      param: 11,
-    })
+    args.push({ name: Some("header"), value: Value::content(v), param: 11, })
   }
   if header_ascent is Some(v) {
     args.push({
@@ -6484,18 +5589,7 @@ pub fn SetPage::SetPage(
     })
   }
   if footer is Some(v) {
-    args.push({
-      name: Some("footer"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) =>
-          match x {
-            None => Value::none()
-            Some(x) => Value::content(x)
-          }
-      },
-      param: 13,
-    })
+    args.push({ name: Some("footer"), value: Value::content(v), param: 13, })
   }
   if footer_descent is Some(v) {
     args.push({
@@ -6505,25 +5599,12 @@ pub fn SetPage::SetPage(
     })
   }
   if background is Some(v) {
-    args.push({
-      name: Some("background"),
-      value: match v {
-        None => Value::none()
-        Some(x) => Value::content(x)
-      },
-      param: 15,
-    })
+    args.push({ name: Some("background"), value: Value::content(v), param: 15, })
   }
   if foreground is Some(v) {
-    args.push({
-      name: Some("foreground"),
-      value: match v {
-        None => Value::none()
-        Some(x) => Value::content(x)
-      },
-      param: 16,
-    })
+    args.push({ name: Some("foreground"), value: Value::content(v), param: 16, })
   }
+  push_extra(args, extra, 17)
   {
     node: {
       func: FElem(@library.page_elem()),
@@ -6572,14 +5653,14 @@ pub fn PageView::body(
 /// values (`page.where(..)`).
 pub fn Select::page(
   paper? : String,
-  width? : @library.Smart[Length],
-  height? : @library.Smart[Length],
+  width? : Length,
+  height? : Length,
   flipped? : Bool,
-  margin? : @library.Smart[Sides[@library.Smart[Length]]],
+  margin? : Sides[Length],
   bleed? : Sides[Length],
   columns? : Int64,
-  fill? : @library.Smart[Paint?],
-  numbering? : Numbering?,
+  fill? : Paint,
+  numbering? : Numbering,
   number_align? : Alignment,
   header_ascent? : Length,
   footer_descent? : Length,
@@ -6589,40 +5670,16 @@ pub fn Select::page(
     fields.push(("paper", Value::str(v)))
   }
   if width is Some(v) {
-    fields.push(
-      (
-        "width",
-        match v {
-          Auto => Value::auto()
-          Custom(x) => ToValue::to_value(x)
-        },
-      ),
-    )
+    fields.push(("width", ToValue::to_value(v)))
   }
   if height is Some(v) {
-    fields.push(
-      (
-        "height",
-        match v {
-          Auto => Value::auto()
-          Custom(x) => ToValue::to_value(x)
-        },
-      ),
-    )
+    fields.push(("height", ToValue::to_value(v)))
   }
   if flipped is Some(v) {
     fields.push(("flipped", Value::bool(v)))
   }
   if margin is Some(v) {
-    fields.push(
-      (
-        "margin",
-        match v {
-          Auto => Value::auto()
-          Custom(x) => ToValue::to_value(x)
-        },
-      ),
-    )
+    fields.push(("margin", ToValue::to_value(v)))
   }
   if bleed is Some(v) {
     fields.push(("bleed", ToValue::to_value(v)))
@@ -6631,30 +5688,10 @@ pub fn Select::page(
     fields.push(("columns", Value::int(v)))
   }
   if fill is Some(v) {
-    fields.push(
-      (
-        "fill",
-        match v {
-          Auto => Value::auto()
-          Custom(x) =>
-            match x {
-              None => Value::none()
-              Some(x) => ToValue::to_value(x)
-            }
-        },
-      ),
-    )
+    fields.push(("fill", ToValue::to_value(v)))
   }
   if numbering is Some(v) {
-    fields.push(
-      (
-        "numbering",
-        match v {
-          None => Value::none()
-          Some(x) => ToValue::to_value(x)
-        },
-      ),
-    )
+    fields.push(("numbering", ToValue::to_value(v)))
   }
   if number_align is Some(v) {
     fields.push(("number-align", ToValue::to_value(v)))
@@ -6670,6 +5707,9 @@ pub fn Select::page(
 
 ///|
 /// `pagebreak`: A manual page break.
+///
+/// Explicit states besides a value:
+/// - `to`: `none` as `extra` with `Value::none()`
 pub struct Pagebreak {
   priv content : Content
 }
@@ -6678,7 +5718,8 @@ pub struct Pagebreak {
 #callsite(autofill(loc, args_loc))
 pub fn Pagebreak::Pagebreak(
   weak? : Bool,
-  to? : String?,
+  to? : String,
+  extra? : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -6688,15 +5729,9 @@ pub fn Pagebreak::Pagebreak(
     args.push({ name: Some("weak"), value: Value::bool(v), param: 0, })
   }
   if to is Some(v) {
-    args.push({
-      name: Some("to"),
-      value: match v {
-        None => Value::none()
-        Some(x) => Value::str(x)
-      },
-      param: 1,
-    })
+    args.push({ name: Some("to"), value: Value::str(v), param: 1, })
   }
+  push_extra(args, extra, 2)
   {
     content: labelled_call(
       {
@@ -6705,7 +5740,7 @@ pub fn Pagebreak::Pagebreak(
         origin: Site::new("Pagebreak", loc, args_loc),
       },
       label,
-      2,
+      3,
     ),
   }
 }
@@ -6717,6 +5752,9 @@ pub impl IntoContent for Pagebreak with fn into_content(self) {
 
 ///|
 /// `set pagebreak(..)`.
+///
+/// Explicit states besides a value:
+/// - `to`: `none` as `extra` with `Value::none()`
 pub struct SetPagebreak {
   priv node : SetNode
 }
@@ -6725,7 +5763,8 @@ pub struct SetPagebreak {
 #callsite(autofill(loc, args_loc))
 pub fn SetPagebreak::SetPagebreak(
   weak? : Bool,
-  to? : String?,
+  to? : String,
+  extra? : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetPagebreak {
@@ -6734,15 +5773,9 @@ pub fn SetPagebreak::SetPagebreak(
     args.push({ name: Some("weak"), value: Value::bool(v), param: 0, })
   }
   if to is Some(v) {
-    args.push({
-      name: Some("to"),
-      value: match v {
-        None => Value::none()
-        Some(x) => Value::str(x)
-      },
-      param: 1,
-    })
+    args.push({ name: Some("to"), value: Value::str(v), param: 1, })
   }
+  push_extra(args, extra, 2)
   {
     node: {
       func: FElem(@library.pagebreak_elem()),
@@ -6781,24 +5814,13 @@ pub fn PagebreakView::view(self : PagebreakView) -> ContentView {
 ///|
 /// The `pagebreak` elements; with arguments, those whose fields have the
 /// given values (`pagebreak.where(..)`).
-pub fn Select::pagebreak(
-  weak? : Bool,
-  to? : String?,
-) -> Selector[PagebreakView] {
+pub fn Select::pagebreak(weak? : Bool, to? : String) -> Selector[PagebreakView] {
   let fields : Array[(String, Value)] = []
   if weak is Some(v) {
     fields.push(("weak", Value::bool(v)))
   }
   if to is Some(v) {
-    fields.push(
-      (
-        "to",
-        match v {
-          None => Value::none()
-          Some(x) => Value::str(x)
-        },
-      ),
-    )
+    fields.push(("to", Value::str(v)))
   }
   elem_selector(@library.pagebreak_elem(), fields, content => PagebreakView::{
     content,
@@ -6820,6 +5842,7 @@ pub struct Align {
 pub fn Align::Align(
   alignment : Alignment,
   body : &IntoContent,
+  extra? : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -6827,6 +5850,7 @@ pub fn Align::Align(
   let args : Array[ArgNode] = []
   args.push({ name: None, value: ToValue::to_value(alignment), param: 0, })
   args.push({ name: None, value: Value::content(body), param: 1, })
+  push_extra(args, extra, 2)
   {
     content: labelled_call(
       {
@@ -6835,7 +5859,7 @@ pub fn Align::Align(
         origin: Site::new("Align", loc, args_loc),
       },
       label,
-      2,
+      3,
     ),
   }
 }
@@ -6855,6 +5879,7 @@ pub struct SetAlign {
 #callsite(autofill(loc, args_loc))
 pub fn SetAlign::SetAlign(
   alignment? : Alignment,
+  extra? : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetAlign {
@@ -6862,6 +5887,7 @@ pub fn SetAlign::SetAlign(
   if alignment is Some(v) {
     args.push({ name: None, value: ToValue::to_value(v), param: 0, })
   }
+  push_extra(args, extra, 1)
   {
     node: {
       func: FElem(@library.align_elem()),
@@ -6922,6 +5948,13 @@ pub fn Select::align() -> Selector[AlignView] {
 /// block is `Block(Seq([]))`, whose body is empty content rather than `none`;
 /// `Call("block")` gives the body-less form). `spacing` is the external
 /// shorthand read by the `above`/`below` parsers. Twin: `block(.., body)`.
+///
+/// Explicit states besides a value:
+/// - `width`: `auto` as `Auto`
+/// - `fill`: `none` as `None`
+/// - `spacing`: `auto` as `Auto`
+/// - `above`: `auto` as `Auto`
+/// - `below`: `auto` as `Auto`
 pub struct Block {
   priv content : Content
 }
@@ -6930,19 +5963,20 @@ pub struct Block {
 #callsite(autofill(loc, args_loc))
 pub fn Block::Block(
   body : &IntoContent,
-  width? : @library.Smart[Length],
+  width? : Length,
   height? : Sizing,
   breakable? : Bool,
-  fill? : Paint?,
-  stroke? : Sides[Stroke?],
+  fill? : Paint,
+  stroke? : Sides[Stroke],
   radius? : Corners[Length],
   inset? : Sides[Length],
   outset? : Sides[Length],
-  spacing? : @library.Smart[Spacing],
-  above? : @library.Smart[Spacing],
-  below? : @library.Smart[Spacing],
+  spacing? : Spacing,
+  above? : Spacing,
+  below? : Spacing,
   clip? : Bool,
   sticky? : Bool,
+  extra? : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -6950,14 +5984,7 @@ pub fn Block::Block(
   let args : Array[ArgNode] = []
   args.push({ name: None, value: Value::content(body), param: 0, })
   if width is Some(v) {
-    args.push({
-      name: Some("width"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 1,
-    })
+    args.push({ name: Some("width"), value: ToValue::to_value(v), param: 1, })
   }
   if height is Some(v) {
     args.push({ name: Some("height"), value: ToValue::to_value(v), param: 2, })
@@ -6966,14 +5993,7 @@ pub fn Block::Block(
     args.push({ name: Some("breakable"), value: Value::bool(v), param: 3, })
   }
   if fill is Some(v) {
-    args.push({
-      name: Some("fill"),
-      value: match v {
-        None => Value::none()
-        Some(x) => ToValue::to_value(x)
-      },
-      param: 4,
-    })
+    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 4, })
   }
   if stroke is Some(v) {
     args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 5, })
@@ -6988,34 +6008,13 @@ pub fn Block::Block(
     args.push({ name: Some("outset"), value: ToValue::to_value(v), param: 8, })
   }
   if spacing is Some(v) {
-    args.push({
-      name: Some("spacing"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 9,
-    })
+    args.push({ name: Some("spacing"), value: ToValue::to_value(v), param: 9, })
   }
   if above is Some(v) {
-    args.push({
-      name: Some("above"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 10,
-    })
+    args.push({ name: Some("above"), value: ToValue::to_value(v), param: 10, })
   }
   if below is Some(v) {
-    args.push({
-      name: Some("below"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 11,
-    })
+    args.push({ name: Some("below"), value: ToValue::to_value(v), param: 11, })
   }
   if clip is Some(v) {
     args.push({ name: Some("clip"), value: Value::bool(v), param: 12, })
@@ -7023,6 +6022,7 @@ pub fn Block::Block(
   if sticky is Some(v) {
     args.push({ name: Some("sticky"), value: Value::bool(v), param: 13, })
   }
+  push_extra(args, extra, 14)
   {
     content: labelled_call(
       {
@@ -7031,7 +6031,7 @@ pub fn Block::Block(
         origin: Site::new("Block", loc, args_loc),
       },
       label,
-      14,
+      15,
     ),
   }
 }
@@ -7043,6 +6043,13 @@ pub impl IntoContent for Block with fn into_content(self) {
 
 ///|
 /// `set block(..)`.
+///
+/// Explicit states besides a value:
+/// - `width`: `auto` as `Auto`
+/// - `fill`: `none` as `None`
+/// - `spacing`: `auto` as `Auto`
+/// - `above`: `auto` as `Auto`
+/// - `below`: `auto` as `Auto`
 pub struct SetBlock {
   priv node : SetNode
 }
@@ -7050,32 +6057,26 @@ pub struct SetBlock {
 ///|
 #callsite(autofill(loc, args_loc))
 pub fn SetBlock::SetBlock(
-  width? : @library.Smart[Length],
+  width? : Length,
   height? : Sizing,
   breakable? : Bool,
-  fill? : Paint?,
-  stroke? : Sides[Stroke?],
+  fill? : Paint,
+  stroke? : Sides[Stroke],
   radius? : Corners[Length],
   inset? : Sides[Length],
   outset? : Sides[Length],
-  spacing? : @library.Smart[Spacing],
-  above? : @library.Smart[Spacing],
-  below? : @library.Smart[Spacing],
+  spacing? : Spacing,
+  above? : Spacing,
+  below? : Spacing,
   clip? : Bool,
   sticky? : Bool,
+  extra? : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetBlock {
   let args : Array[ArgNode] = []
   if width is Some(v) {
-    args.push({
-      name: Some("width"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 0,
-    })
+    args.push({ name: Some("width"), value: ToValue::to_value(v), param: 0, })
   }
   if height is Some(v) {
     args.push({ name: Some("height"), value: ToValue::to_value(v), param: 1, })
@@ -7084,14 +6085,7 @@ pub fn SetBlock::SetBlock(
     args.push({ name: Some("breakable"), value: Value::bool(v), param: 2, })
   }
   if fill is Some(v) {
-    args.push({
-      name: Some("fill"),
-      value: match v {
-        None => Value::none()
-        Some(x) => ToValue::to_value(x)
-      },
-      param: 3,
-    })
+    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 3, })
   }
   if stroke is Some(v) {
     args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 4, })
@@ -7106,34 +6100,13 @@ pub fn SetBlock::SetBlock(
     args.push({ name: Some("outset"), value: ToValue::to_value(v), param: 7, })
   }
   if spacing is Some(v) {
-    args.push({
-      name: Some("spacing"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 8,
-    })
+    args.push({ name: Some("spacing"), value: ToValue::to_value(v), param: 8, })
   }
   if above is Some(v) {
-    args.push({
-      name: Some("above"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 9,
-    })
+    args.push({ name: Some("above"), value: ToValue::to_value(v), param: 9, })
   }
   if below is Some(v) {
-    args.push({
-      name: Some("below"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 10,
-    })
+    args.push({ name: Some("below"), value: ToValue::to_value(v), param: 10, })
   }
   if clip is Some(v) {
     args.push({ name: Some("clip"), value: Value::bool(v), param: 11, })
@@ -7141,6 +6114,7 @@ pub fn SetBlock::SetBlock(
   if sticky is Some(v) {
     args.push({ name: Some("sticky"), value: Value::bool(v), param: 12, })
   }
+  push_extra(args, extra, 13)
   {
     node: {
       func: FElem(@library.block_elem()),
@@ -7180,31 +6154,23 @@ pub fn BlockView::view(self : BlockView) -> ContentView {
 /// The `block` elements; with arguments, those whose fields have the given
 /// values (`block.where(..)`).
 pub fn Select::block(
-  width? : @library.Smart[Length],
+  width? : Length,
   height? : Sizing,
   breakable? : Bool,
-  fill? : Paint?,
-  stroke? : Sides[Stroke?],
+  fill? : Paint,
+  stroke? : Sides[Stroke],
   radius? : Corners[Length],
   inset? : Sides[Length],
   outset? : Sides[Length],
-  spacing? : @library.Smart[Spacing],
-  above? : @library.Smart[Spacing],
-  below? : @library.Smart[Spacing],
+  spacing? : Spacing,
+  above? : Spacing,
+  below? : Spacing,
   clip? : Bool,
   sticky? : Bool,
 ) -> Selector[BlockView] {
   let fields : Array[(String, Value)] = []
   if width is Some(v) {
-    fields.push(
-      (
-        "width",
-        match v {
-          Auto => Value::auto()
-          Custom(x) => ToValue::to_value(x)
-        },
-      ),
-    )
+    fields.push(("width", ToValue::to_value(v)))
   }
   if height is Some(v) {
     fields.push(("height", ToValue::to_value(v)))
@@ -7213,15 +6179,7 @@ pub fn Select::block(
     fields.push(("breakable", Value::bool(v)))
   }
   if fill is Some(v) {
-    fields.push(
-      (
-        "fill",
-        match v {
-          None => Value::none()
-          Some(x) => ToValue::to_value(x)
-        },
-      ),
-    )
+    fields.push(("fill", ToValue::to_value(v)))
   }
   if stroke is Some(v) {
     fields.push(("stroke", ToValue::to_value(v)))
@@ -7236,37 +6194,13 @@ pub fn Select::block(
     fields.push(("outset", ToValue::to_value(v)))
   }
   if spacing is Some(v) {
-    fields.push(
-      (
-        "spacing",
-        match v {
-          Auto => Value::auto()
-          Custom(x) => ToValue::to_value(x)
-        },
-      ),
-    )
+    fields.push(("spacing", ToValue::to_value(v)))
   }
   if above is Some(v) {
-    fields.push(
-      (
-        "above",
-        match v {
-          Auto => Value::auto()
-          Custom(x) => ToValue::to_value(x)
-        },
-      ),
-    )
+    fields.push(("above", ToValue::to_value(v)))
   }
   if below is Some(v) {
-    fields.push(
-      (
-        "below",
-        match v {
-          Auto => Value::auto()
-          Custom(x) => ToValue::to_value(x)
-        },
-      ),
-    )
+    fields.push(("below", ToValue::to_value(v)))
   }
   if clip is Some(v) {
     fields.push(("clip", Value::bool(v)))
@@ -7283,6 +6217,10 @@ pub fn Select::block(
 /// `box`: An inline-level container that sizes content.
 ///
 /// `Box(body, ..)`: as `Block`. Twin: `box(.., body)`.
+///
+/// Explicit states besides a value:
+/// - `height`: `auto` as `Auto`
+/// - `fill`: `none` as `None`
 pub struct Box {
   priv content : Content
 }
@@ -7292,13 +6230,14 @@ pub struct Box {
 pub fn Box::Box(
   body : &IntoContent,
   width? : Sizing,
-  height? : @library.Smart[Length],
-  fill? : Paint?,
-  stroke? : Sides[Stroke?],
+  height? : Length,
+  fill? : Paint,
+  stroke? : Sides[Stroke],
   radius? : Corners[Length],
   inset? : Sides[Length],
   outset? : Sides[Length],
   clip? : Bool,
+  extra? : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -7309,24 +6248,10 @@ pub fn Box::Box(
     args.push({ name: Some("width"), value: ToValue::to_value(v), param: 1, })
   }
   if height is Some(v) {
-    args.push({
-      name: Some("height"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 2,
-    })
+    args.push({ name: Some("height"), value: ToValue::to_value(v), param: 2, })
   }
   if fill is Some(v) {
-    args.push({
-      name: Some("fill"),
-      value: match v {
-        None => Value::none()
-        Some(x) => ToValue::to_value(x)
-      },
-      param: 3,
-    })
+    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 3, })
   }
   if stroke is Some(v) {
     args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 4, })
@@ -7343,6 +6268,7 @@ pub fn Box::Box(
   if clip is Some(v) {
     args.push({ name: Some("clip"), value: Value::bool(v), param: 8, })
   }
+  push_extra(args, extra, 9)
   {
     content: labelled_call(
       {
@@ -7351,7 +6277,7 @@ pub fn Box::Box(
         origin: Site::new("Box", loc, args_loc),
       },
       label,
-      9,
+      10,
     ),
   }
 }
@@ -7363,6 +6289,10 @@ pub impl IntoContent for Box with fn into_content(self) {
 
 ///|
 /// `set box(..)`.
+///
+/// Explicit states besides a value:
+/// - `height`: `auto` as `Auto`
+/// - `fill`: `none` as `None`
 pub struct SetBox {
   priv node : SetNode
 }
@@ -7371,13 +6301,14 @@ pub struct SetBox {
 #callsite(autofill(loc, args_loc))
 pub fn SetBox::SetBox(
   width? : Sizing,
-  height? : @library.Smart[Length],
-  fill? : Paint?,
-  stroke? : Sides[Stroke?],
+  height? : Length,
+  fill? : Paint,
+  stroke? : Sides[Stroke],
   radius? : Corners[Length],
   inset? : Sides[Length],
   outset? : Sides[Length],
   clip? : Bool,
+  extra? : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetBox {
@@ -7386,24 +6317,10 @@ pub fn SetBox::SetBox(
     args.push({ name: Some("width"), value: ToValue::to_value(v), param: 0, })
   }
   if height is Some(v) {
-    args.push({
-      name: Some("height"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 1,
-    })
+    args.push({ name: Some("height"), value: ToValue::to_value(v), param: 1, })
   }
   if fill is Some(v) {
-    args.push({
-      name: Some("fill"),
-      value: match v {
-        None => Value::none()
-        Some(x) => ToValue::to_value(x)
-      },
-      param: 2,
-    })
+    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 2, })
   }
   if stroke is Some(v) {
     args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 3, })
@@ -7420,6 +6337,7 @@ pub fn SetBox::SetBox(
   if clip is Some(v) {
     args.push({ name: Some("clip"), value: Value::bool(v), param: 7, })
   }
+  push_extra(args, extra, 8)
   {
     node: {
       func: FElem(@library.box_elem()),
@@ -7460,9 +6378,9 @@ pub fn BoxView::view(self : BoxView) -> ContentView {
 /// values (`box.where(..)`).
 pub fn Select::box(
   width? : Sizing,
-  height? : @library.Smart[Length],
-  fill? : Paint?,
-  stroke? : Sides[Stroke?],
+  height? : Length,
+  fill? : Paint,
+  stroke? : Sides[Stroke],
   radius? : Corners[Length],
   inset? : Sides[Length],
   outset? : Sides[Length],
@@ -7473,26 +6391,10 @@ pub fn Select::box(
     fields.push(("width", ToValue::to_value(v)))
   }
   if height is Some(v) {
-    fields.push(
-      (
-        "height",
-        match v {
-          Auto => Value::auto()
-          Custom(x) => ToValue::to_value(x)
-        },
-      ),
-    )
+    fields.push(("height", ToValue::to_value(v)))
   }
   if fill is Some(v) {
-    fields.push(
-      (
-        "fill",
-        match v {
-          None => Value::none()
-          Some(x) => ToValue::to_value(x)
-        },
-      ),
-    )
+    fields.push(("fill", ToValue::to_value(v)))
   }
   if stroke is Some(v) {
     fields.push(("stroke", ToValue::to_value(v)))
@@ -7532,6 +6434,7 @@ pub fn Pad::Pad(
   x? : Length,
   y? : Length,
   rest? : Length,
+  extra? : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -7559,6 +6462,7 @@ pub fn Pad::Pad(
   if rest is Some(v) {
     args.push({ name: Some("rest"), value: ToValue::to_value(v), param: 7, })
   }
+  push_extra(args, extra, 8)
   {
     content: labelled_call(
       {
@@ -7567,7 +6471,7 @@ pub fn Pad::Pad(
         origin: Site::new("Pad", loc, args_loc),
       },
       label,
-      8,
+      9,
     ),
   }
 }
@@ -7593,6 +6497,7 @@ pub fn SetPad::SetPad(
   x? : Length,
   y? : Length,
   rest? : Length,
+  extra? : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetPad {
@@ -7618,6 +6523,7 @@ pub fn SetPad::SetPad(
   if rest is Some(v) {
     args.push({ name: Some("rest"), value: ToValue::to_value(v), param: 6, })
   }
+  push_extra(args, extra, 7)
   {
     node: {
       func: FElem(@library.pad_elem()),
@@ -7701,6 +6607,9 @@ pub fn Select::pad(
 ///
 /// `Place(body, alignment?, ..)`: the optional positional `alignment` is a
 /// labelled parameter passed positionally. Twin: `place(alignment, body)`.
+///
+/// Explicit states besides a value:
+/// - `alignment`: `auto` as `Auto`
 pub struct Place {
   priv content : Content
 }
@@ -7709,26 +6618,20 @@ pub struct Place {
 #callsite(autofill(loc, args_loc))
 pub fn Place::Place(
   body : &IntoContent,
-  alignment? : @library.Smart[Alignment],
+  alignment? : Alignment,
   scope? : String,
   float? : Bool,
   clearance? : Length,
   dx? : Length,
   dy? : Length,
+  extra? : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> Place {
   let args : Array[ArgNode] = []
   if alignment is Some(v) {
-    args.push({
-      name: None,
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 1,
-    })
+    args.push({ name: None, value: ToValue::to_value(v), param: 1, })
   }
   args.push({ name: None, value: Value::content(body), param: 0, })
   if scope is Some(v) {
@@ -7750,6 +6653,7 @@ pub fn Place::Place(
   if dy is Some(v) {
     args.push({ name: Some("dy"), value: ToValue::to_value(v), param: 6, })
   }
+  push_extra(args, extra, 7)
   {
     content: labelled_call(
       {
@@ -7758,7 +6662,7 @@ pub fn Place::Place(
         origin: Site::new("Place", loc, args_loc),
       },
       label,
-      7,
+      8,
     ),
   }
 }
@@ -7770,6 +6674,9 @@ pub impl IntoContent for Place with fn into_content(self) {
 
 ///|
 /// `set place(..)`.
+///
+/// Explicit states besides a value:
+/// - `alignment`: `auto` as `Auto`
 pub struct SetPlace {
   priv node : SetNode
 }
@@ -7777,25 +6684,19 @@ pub struct SetPlace {
 ///|
 #callsite(autofill(loc, args_loc))
 pub fn SetPlace::SetPlace(
-  alignment? : @library.Smart[Alignment],
+  alignment? : Alignment,
   scope? : String,
   float? : Bool,
   clearance? : Length,
   dx? : Length,
   dy? : Length,
+  extra? : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetPlace {
   let args : Array[ArgNode] = []
   if alignment is Some(v) {
-    args.push({
-      name: None,
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 0,
-    })
+    args.push({ name: None, value: ToValue::to_value(v), param: 0, })
   }
   if scope is Some(v) {
     args.push({ name: Some("scope"), value: Value::str(v), param: 1, })
@@ -7816,6 +6717,7 @@ pub fn SetPlace::SetPlace(
   if dy is Some(v) {
     args.push({ name: Some("dy"), value: ToValue::to_value(v), param: 5, })
   }
+  push_extra(args, extra, 6)
   {
     node: {
       func: FElem(@library.place_elem()),
@@ -7892,6 +6794,9 @@ pub fn Select::place(
 
 ///|
 /// `stack`: Arranges content and spacing horizontally or vertically.
+///
+/// Explicit states besides a value:
+/// - `spacing`: `none` as `None`
 pub struct Stack {
   priv content : Content
 }
@@ -7901,7 +6806,8 @@ pub struct Stack {
 pub fn Stack::Stack(
   children : Array[&IntoContent],
   dir? : Dir,
-  spacing? : Spacing?,
+  spacing? : Spacing,
+  extra? : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -7911,18 +6817,12 @@ pub fn Stack::Stack(
     args.push({ name: Some("dir"), value: ToValue::to_value(v), param: 1, })
   }
   if spacing is Some(v) {
-    args.push({
-      name: Some("spacing"),
-      value: match v {
-        None => Value::none()
-        Some(x) => ToValue::to_value(x)
-      },
-      param: 2,
-    })
+    args.push({ name: Some("spacing"), value: ToValue::to_value(v), param: 2, })
   }
   for child in children {
     args.push({ name: None, value: Value::content(child), param: 0, })
   }
+  push_extra(args, extra, 3)
   {
     content: labelled_call(
       {
@@ -7931,7 +6831,7 @@ pub fn Stack::Stack(
         origin: Site::new("Stack", loc, args_loc),
       },
       label,
-      3,
+      4,
     ),
   }
 }
@@ -7943,6 +6843,9 @@ pub impl IntoContent for Stack with fn into_content(self) {
 
 ///|
 /// `set stack(..)`.
+///
+/// Explicit states besides a value:
+/// - `spacing`: `none` as `None`
 pub struct SetStack {
   priv node : SetNode
 }
@@ -7951,7 +6854,8 @@ pub struct SetStack {
 #callsite(autofill(loc, args_loc))
 pub fn SetStack::SetStack(
   dir? : Dir,
-  spacing? : Spacing?,
+  spacing? : Spacing,
+  extra? : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetStack {
@@ -7960,15 +6864,9 @@ pub fn SetStack::SetStack(
     args.push({ name: Some("dir"), value: ToValue::to_value(v), param: 0, })
   }
   if spacing is Some(v) {
-    args.push({
-      name: Some("spacing"),
-      value: match v {
-        None => Value::none()
-        Some(x) => ToValue::to_value(x)
-      },
-      param: 1,
-    })
+    args.push({ name: Some("spacing"), value: ToValue::to_value(v), param: 1, })
   }
+  push_extra(args, extra, 2)
   {
     node: {
       func: FElem(@library.stack_elem()),
@@ -8007,21 +6905,13 @@ pub fn StackView::view(self : StackView) -> ContentView {
 ///|
 /// The `stack` elements; with arguments, those whose fields have the given
 /// values (`stack.where(..)`).
-pub fn Select::stack(dir? : Dir, spacing? : Spacing?) -> Selector[StackView] {
+pub fn Select::stack(dir? : Dir, spacing? : Spacing) -> Selector[StackView] {
   let fields : Array[(String, Value)] = []
   if dir is Some(v) {
     fields.push(("dir", ToValue::to_value(v)))
   }
   if spacing is Some(v) {
-    fields.push(
-      (
-        "spacing",
-        match v {
-          None => Value::none()
-          Some(x) => ToValue::to_value(x)
-        },
-      ),
-    )
+    fields.push(("spacing", ToValue::to_value(v)))
   }
   elem_selector(@library.stack_elem(), fields, content => StackView::{
     content,
@@ -8046,9 +6936,10 @@ pub fn Grid::Grid(
   column_gutter? : Array[Sizing],
   row_gutter? : Array[Sizing],
   inset? : Cells[Sides[Length]],
-  align? : Cells[@library.Smart[Alignment]],
-  fill? : Cells[Paint?],
-  stroke? : Cells[Sides[Stroke?]],
+  align? : Cells[Alignment],
+  fill? : Cells[Paint],
+  stroke? : Cells[Sides[Stroke]],
+  extra? : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -8092,6 +6983,7 @@ pub fn Grid::Grid(
   for child in children {
     args.push({ name: None, value: Value::content(child), param: 0, })
   }
+  push_extra(args, extra, 10)
   {
     content: labelled_call(
       {
@@ -8100,7 +6992,7 @@ pub fn Grid::Grid(
         origin: Site::new("Grid", loc, args_loc),
       },
       label,
-      10,
+      11,
     ),
   }
 }
@@ -8125,9 +7017,10 @@ pub fn SetGrid::SetGrid(
   column_gutter? : Array[Sizing],
   row_gutter? : Array[Sizing],
   inset? : Cells[Sides[Length]],
-  align? : Cells[@library.Smart[Alignment]],
-  fill? : Cells[Paint?],
-  stroke? : Cells[Sides[Stroke?]],
+  align? : Cells[Alignment],
+  fill? : Cells[Paint],
+  stroke? : Cells[Sides[Stroke]],
+  extra? : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetGrid {
@@ -8167,6 +7060,7 @@ pub fn SetGrid::SetGrid(
   if stroke is Some(v) {
     args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 8, })
   }
+  push_extra(args, extra, 9)
   {
     node: {
       func: FElem(@library.grid_elem()),
@@ -8236,6 +7130,14 @@ pub fn Select::grid(
 /// list of a grid to override grid style properties for an individual cell or
 /// manually positioning it within the grid. You can also use this function in
 /// show rules to apply certain styles to multiple cells at once.
+///
+/// Explicit states besides a value:
+/// - `x`: `auto` as `extra` with `Value::auto()`
+/// - `y`: `auto` as `extra` with `Value::auto()`
+/// - `inset`: `auto` as `Sides::auto()`
+/// - `align`: `auto` as `Auto`
+/// - `fill`: `auto` as `Auto`, `none` as `None`
+/// - `breakable`: `auto` as `extra` with `Value::auto()`
 pub struct GridCell {
   priv content : Content
 }
@@ -8244,15 +7146,16 @@ pub struct GridCell {
 #callsite(autofill(loc, args_loc))
 pub fn GridCell::GridCell(
   body : &IntoContent,
-  x? : @library.Smart[Int64],
-  y? : @library.Smart[Int64],
+  x? : Int64,
+  y? : Int64,
   colspan? : Int64,
   rowspan? : Int64,
-  inset? : @library.Smart[Sides[Length]],
-  align? : @library.Smart[Alignment],
-  fill? : @library.Smart[Paint?],
-  stroke? : Sides[Stroke?],
-  breakable? : @library.Smart[Bool],
+  inset? : Sides[Length],
+  align? : Alignment,
+  fill? : Paint,
+  stroke? : Sides[Stroke],
+  breakable? : Bool,
+  extra? : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -8260,24 +7163,10 @@ pub fn GridCell::GridCell(
   let args : Array[ArgNode] = []
   args.push({ name: None, value: Value::content(body), param: 0, })
   if x is Some(v) {
-    args.push({
-      name: Some("x"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => Value::int(x)
-      },
-      param: 1,
-    })
+    args.push({ name: Some("x"), value: Value::int(v), param: 1, })
   }
   if y is Some(v) {
-    args.push({
-      name: Some("y"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => Value::int(x)
-      },
-      param: 2,
-    })
+    args.push({ name: Some("y"), value: Value::int(v), param: 2, })
   }
   if colspan is Some(v) {
     args.push({ name: Some("colspan"), value: Value::int(v), param: 3, })
@@ -8286,52 +7175,21 @@ pub fn GridCell::GridCell(
     args.push({ name: Some("rowspan"), value: Value::int(v), param: 4, })
   }
   if inset is Some(v) {
-    args.push({
-      name: Some("inset"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 5,
-    })
+    args.push({ name: Some("inset"), value: ToValue::to_value(v), param: 5, })
   }
   if align is Some(v) {
-    args.push({
-      name: Some("align"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 6,
-    })
+    args.push({ name: Some("align"), value: ToValue::to_value(v), param: 6, })
   }
   if fill is Some(v) {
-    args.push({
-      name: Some("fill"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) =>
-          match x {
-            None => Value::none()
-            Some(x) => ToValue::to_value(x)
-          }
-      },
-      param: 7,
-    })
+    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 7, })
   }
   if stroke is Some(v) {
     args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 8, })
   }
   if breakable is Some(v) {
-    args.push({
-      name: Some("breakable"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => Value::bool(x)
-      },
-      param: 9,
-    })
+    args.push({ name: Some("breakable"), value: Value::bool(v), param: 9, })
   }
+  push_extra(args, extra, 10)
   {
     content: labelled_call(
       {
@@ -8340,7 +7198,7 @@ pub fn GridCell::GridCell(
         origin: Site::new("GridCell", loc, args_loc),
       },
       label,
-      10,
+      11,
     ),
   }
 }
@@ -8352,6 +7210,14 @@ pub impl IntoContent for GridCell with fn into_content(self) {
 
 ///|
 /// `set grid.cell(..)`.
+///
+/// Explicit states besides a value:
+/// - `x`: `auto` as `extra` with `Value::auto()`
+/// - `y`: `auto` as `extra` with `Value::auto()`
+/// - `inset`: `auto` as `Sides::auto()`
+/// - `align`: `auto` as `Auto`
+/// - `fill`: `auto` as `Auto`, `none` as `None`
+/// - `breakable`: `auto` as `extra` with `Value::auto()`
 pub struct SetGridCell {
   priv node : SetNode
 }
@@ -8359,38 +7225,25 @@ pub struct SetGridCell {
 ///|
 #callsite(autofill(loc, args_loc))
 pub fn SetGridCell::SetGridCell(
-  x? : @library.Smart[Int64],
-  y? : @library.Smart[Int64],
+  x? : Int64,
+  y? : Int64,
   colspan? : Int64,
   rowspan? : Int64,
-  inset? : @library.Smart[Sides[Length]],
-  align? : @library.Smart[Alignment],
-  fill? : @library.Smart[Paint?],
-  stroke? : Sides[Stroke?],
-  breakable? : @library.Smart[Bool],
+  inset? : Sides[Length],
+  align? : Alignment,
+  fill? : Paint,
+  stroke? : Sides[Stroke],
+  breakable? : Bool,
+  extra? : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetGridCell {
   let args : Array[ArgNode] = []
   if x is Some(v) {
-    args.push({
-      name: Some("x"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => Value::int(x)
-      },
-      param: 0,
-    })
+    args.push({ name: Some("x"), value: Value::int(v), param: 0, })
   }
   if y is Some(v) {
-    args.push({
-      name: Some("y"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => Value::int(x)
-      },
-      param: 1,
-    })
+    args.push({ name: Some("y"), value: Value::int(v), param: 1, })
   }
   if colspan is Some(v) {
     args.push({ name: Some("colspan"), value: Value::int(v), param: 2, })
@@ -8399,52 +7252,21 @@ pub fn SetGridCell::SetGridCell(
     args.push({ name: Some("rowspan"), value: Value::int(v), param: 3, })
   }
   if inset is Some(v) {
-    args.push({
-      name: Some("inset"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 4,
-    })
+    args.push({ name: Some("inset"), value: ToValue::to_value(v), param: 4, })
   }
   if align is Some(v) {
-    args.push({
-      name: Some("align"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 5,
-    })
+    args.push({ name: Some("align"), value: ToValue::to_value(v), param: 5, })
   }
   if fill is Some(v) {
-    args.push({
-      name: Some("fill"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) =>
-          match x {
-            None => Value::none()
-            Some(x) => ToValue::to_value(x)
-          }
-      },
-      param: 6,
-    })
+    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 6, })
   }
   if stroke is Some(v) {
     args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 7, })
   }
   if breakable is Some(v) {
-    args.push({
-      name: Some("breakable"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => Value::bool(x)
-      },
-      param: 8,
-    })
+    args.push({ name: Some("breakable"), value: Value::bool(v), param: 8, })
   }
+  push_extra(args, extra, 9)
   {
     node: {
       func: FElem(@library.grid_cell_elem()),
@@ -8492,38 +7314,22 @@ pub fn GridCellView::body(
 /// The `grid.cell` elements; with arguments, those whose fields have the
 /// given values (`grid.cell.where(..)`).
 pub fn Select::grid_cell(
-  x? : @library.Smart[Int64],
-  y? : @library.Smart[Int64],
+  x? : Int64,
+  y? : Int64,
   colspan? : Int64,
   rowspan? : Int64,
-  inset? : @library.Smart[Sides[Length]],
-  align? : @library.Smart[Alignment],
-  fill? : @library.Smart[Paint?],
-  stroke? : Sides[Stroke?],
-  breakable? : @library.Smart[Bool],
+  inset? : Sides[Length],
+  align? : Alignment,
+  fill? : Paint,
+  stroke? : Sides[Stroke],
+  breakable? : Bool,
 ) -> Selector[GridCellView] {
   let fields : Array[(String, Value)] = []
   if x is Some(v) {
-    fields.push(
-      (
-        "x",
-        match v {
-          Auto => Value::auto()
-          Custom(x) => Value::int(x)
-        },
-      ),
-    )
+    fields.push(("x", Value::int(v)))
   }
   if y is Some(v) {
-    fields.push(
-      (
-        "y",
-        match v {
-          Auto => Value::auto()
-          Custom(x) => Value::int(x)
-        },
-      ),
-    )
+    fields.push(("y", Value::int(v)))
   }
   if colspan is Some(v) {
     fields.push(("colspan", Value::int(v)))
@@ -8532,55 +7338,19 @@ pub fn Select::grid_cell(
     fields.push(("rowspan", Value::int(v)))
   }
   if inset is Some(v) {
-    fields.push(
-      (
-        "inset",
-        match v {
-          Auto => Value::auto()
-          Custom(x) => ToValue::to_value(x)
-        },
-      ),
-    )
+    fields.push(("inset", ToValue::to_value(v)))
   }
   if align is Some(v) {
-    fields.push(
-      (
-        "align",
-        match v {
-          Auto => Value::auto()
-          Custom(x) => ToValue::to_value(x)
-        },
-      ),
-    )
+    fields.push(("align", ToValue::to_value(v)))
   }
   if fill is Some(v) {
-    fields.push(
-      (
-        "fill",
-        match v {
-          Auto => Value::auto()
-          Custom(x) =>
-            match x {
-              None => Value::none()
-              Some(x) => ToValue::to_value(x)
-            }
-        },
-      ),
-    )
+    fields.push(("fill", ToValue::to_value(v)))
   }
   if stroke is Some(v) {
     fields.push(("stroke", ToValue::to_value(v)))
   }
   if breakable is Some(v) {
-    fields.push(
-      (
-        "breakable",
-        match v {
-          Auto => Value::auto()
-          Custom(x) => Value::bool(x)
-        },
-      ),
-    )
+    fields.push(("breakable", Value::bool(v)))
   }
   elem_selector(@library.grid_cell_elem(), fields, content => GridCellView::{
     content,
@@ -8599,6 +7369,7 @@ pub fn GridHeader::GridHeader(
   children : Array[&IntoContent],
   repeat? : Bool,
   level? : Int64,
+  extra? : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -8613,6 +7384,7 @@ pub fn GridHeader::GridHeader(
   for child in children {
     args.push({ name: None, value: Value::content(child), param: 0, })
   }
+  push_extra(args, extra, 3)
   {
     content: labelled_call(
       {
@@ -8621,7 +7393,7 @@ pub fn GridHeader::GridHeader(
         origin: Site::new("GridHeader", loc, args_loc),
       },
       label,
-      3,
+      4,
     ),
   }
 }
@@ -8642,6 +7414,7 @@ pub struct SetGridHeader {
 pub fn SetGridHeader::SetGridHeader(
   repeat? : Bool,
   level? : Int64,
+  extra? : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetGridHeader {
@@ -8652,6 +7425,7 @@ pub fn SetGridHeader::SetGridHeader(
   if level is Some(v) {
     args.push({ name: Some("level"), value: Value::int(v), param: 1, })
   }
+  push_extra(args, extra, 2)
   {
     node: {
       func: FElem(@library.grid_header_elem()),
@@ -8717,6 +7491,7 @@ pub struct GridFooter {
 pub fn GridFooter::GridFooter(
   children : Array[&IntoContent],
   repeat? : Bool,
+  extra? : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -8728,6 +7503,7 @@ pub fn GridFooter::GridFooter(
   for child in children {
     args.push({ name: None, value: Value::content(child), param: 0, })
   }
+  push_extra(args, extra, 2)
   {
     content: labelled_call(
       {
@@ -8736,7 +7512,7 @@ pub fn GridFooter::GridFooter(
         origin: Site::new("GridFooter", loc, args_loc),
       },
       label,
-      2,
+      3,
     ),
   }
 }
@@ -8756,6 +7532,7 @@ pub struct SetGridFooter {
 #callsite(autofill(loc, args_loc))
 pub fn SetGridFooter::SetGridFooter(
   repeat? : Bool,
+  extra? : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetGridFooter {
@@ -8763,6 +7540,7 @@ pub fn SetGridFooter::SetGridFooter(
   if repeat is Some(v) {
     args.push({ name: Some("repeat"), value: Value::bool(v), param: 0, })
   }
+  push_extra(args, extra, 1)
   {
     node: {
       func: FElem(@library.grid_footer_elem()),
@@ -8813,6 +7591,11 @@ pub fn Select::grid_footer(repeat? : Bool) -> Selector[GridFooterView] {
 
 ///|
 /// `grid.hline`: A horizontal line in the grid.
+///
+/// Explicit states besides a value:
+/// - `y`: `auto` as `extra` with `Value::auto()`
+/// - `end_`: `none` as `extra` with `Value::none()`
+/// - `stroke`: `none` as `Stroke::none()`
 pub struct GridHline {
   priv content : Content
 }
@@ -8820,52 +7603,33 @@ pub struct GridHline {
 ///|
 #callsite(autofill(loc, args_loc))
 pub fn GridHline::GridHline(
-  y? : @library.Smart[Int64],
+  y? : Int64,
   start? : Int64,
-  end_? : Int64?,
-  stroke? : Stroke?,
+  end_? : Int64,
+  stroke? : Stroke,
   position? : Alignment,
+  extra? : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> GridHline {
   let args : Array[ArgNode] = []
   if y is Some(v) {
-    args.push({
-      name: Some("y"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => Value::int(x)
-      },
-      param: 0,
-    })
+    args.push({ name: Some("y"), value: Value::int(v), param: 0, })
   }
   if start is Some(v) {
     args.push({ name: Some("start"), value: Value::int(v), param: 1, })
   }
   if end_ is Some(v) {
-    args.push({
-      name: Some("end"),
-      value: match v {
-        None => Value::none()
-        Some(x) => Value::int(x)
-      },
-      param: 2,
-    })
+    args.push({ name: Some("end"), value: Value::int(v), param: 2, })
   }
   if stroke is Some(v) {
-    args.push({
-      name: Some("stroke"),
-      value: match v {
-        None => Value::none()
-        Some(x) => ToValue::to_value(x)
-      },
-      param: 3,
-    })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 3, })
   }
   if position is Some(v) {
     args.push({ name: Some("position"), value: ToValue::to_value(v), param: 4, })
   }
+  push_extra(args, extra, 5)
   {
     content: labelled_call(
       {
@@ -8874,7 +7638,7 @@ pub fn GridHline::GridHline(
         origin: Site::new("GridHline", loc, args_loc),
       },
       label,
-      5,
+      6,
     ),
   }
 }
@@ -8886,6 +7650,11 @@ pub impl IntoContent for GridHline with fn into_content(self) {
 
 ///|
 /// `set grid.hline(..)`.
+///
+/// Explicit states besides a value:
+/// - `y`: `auto` as `extra` with `Value::auto()`
+/// - `end_`: `none` as `extra` with `Value::none()`
+/// - `stroke`: `none` as `Stroke::none()`
 pub struct SetGridHline {
   priv node : SetNode
 }
@@ -8893,51 +7662,32 @@ pub struct SetGridHline {
 ///|
 #callsite(autofill(loc, args_loc))
 pub fn SetGridHline::SetGridHline(
-  y? : @library.Smart[Int64],
+  y? : Int64,
   start? : Int64,
-  end_? : Int64?,
-  stroke? : Stroke?,
+  end_? : Int64,
+  stroke? : Stroke,
   position? : Alignment,
+  extra? : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetGridHline {
   let args : Array[ArgNode] = []
   if y is Some(v) {
-    args.push({
-      name: Some("y"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => Value::int(x)
-      },
-      param: 0,
-    })
+    args.push({ name: Some("y"), value: Value::int(v), param: 0, })
   }
   if start is Some(v) {
     args.push({ name: Some("start"), value: Value::int(v), param: 1, })
   }
   if end_ is Some(v) {
-    args.push({
-      name: Some("end"),
-      value: match v {
-        None => Value::none()
-        Some(x) => Value::int(x)
-      },
-      param: 2,
-    })
+    args.push({ name: Some("end"), value: Value::int(v), param: 2, })
   }
   if stroke is Some(v) {
-    args.push({
-      name: Some("stroke"),
-      value: match v {
-        None => Value::none()
-        Some(x) => ToValue::to_value(x)
-      },
-      param: 3,
-    })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 3, })
   }
   if position is Some(v) {
     args.push({ name: Some("position"), value: ToValue::to_value(v), param: 4, })
   }
+  push_extra(args, extra, 5)
   {
     node: {
       func: FElem(@library.grid_h_line_elem()),
@@ -8977,48 +7727,24 @@ pub fn GridHlineView::view(self : GridHlineView) -> ContentView {
 /// The `grid.hline` elements; with arguments, those whose fields have the
 /// given values (`grid.hline.where(..)`).
 pub fn Select::grid_hline(
-  y? : @library.Smart[Int64],
+  y? : Int64,
   start? : Int64,
-  end_? : Int64?,
-  stroke? : Stroke?,
+  end_? : Int64,
+  stroke? : Stroke,
   position? : Alignment,
 ) -> Selector[GridHlineView] {
   let fields : Array[(String, Value)] = []
   if y is Some(v) {
-    fields.push(
-      (
-        "y",
-        match v {
-          Auto => Value::auto()
-          Custom(x) => Value::int(x)
-        },
-      ),
-    )
+    fields.push(("y", Value::int(v)))
   }
   if start is Some(v) {
     fields.push(("start", Value::int(v)))
   }
   if end_ is Some(v) {
-    fields.push(
-      (
-        "end",
-        match v {
-          None => Value::none()
-          Some(x) => Value::int(x)
-        },
-      ),
-    )
+    fields.push(("end", Value::int(v)))
   }
   if stroke is Some(v) {
-    fields.push(
-      (
-        "stroke",
-        match v {
-          None => Value::none()
-          Some(x) => ToValue::to_value(x)
-        },
-      ),
-    )
+    fields.push(("stroke", ToValue::to_value(v)))
   }
   if position is Some(v) {
     fields.push(("position", ToValue::to_value(v)))
@@ -9030,6 +7756,11 @@ pub fn Select::grid_hline(
 
 ///|
 /// `grid.vline`: A vertical line in the grid.
+///
+/// Explicit states besides a value:
+/// - `x`: `auto` as `extra` with `Value::auto()`
+/// - `end_`: `none` as `extra` with `Value::none()`
+/// - `stroke`: `none` as `Stroke::none()`
 pub struct GridVline {
   priv content : Content
 }
@@ -9037,52 +7768,33 @@ pub struct GridVline {
 ///|
 #callsite(autofill(loc, args_loc))
 pub fn GridVline::GridVline(
-  x? : @library.Smart[Int64],
+  x? : Int64,
   start? : Int64,
-  end_? : Int64?,
-  stroke? : Stroke?,
+  end_? : Int64,
+  stroke? : Stroke,
   position? : Alignment,
+  extra? : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> GridVline {
   let args : Array[ArgNode] = []
   if x is Some(v) {
-    args.push({
-      name: Some("x"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => Value::int(x)
-      },
-      param: 0,
-    })
+    args.push({ name: Some("x"), value: Value::int(v), param: 0, })
   }
   if start is Some(v) {
     args.push({ name: Some("start"), value: Value::int(v), param: 1, })
   }
   if end_ is Some(v) {
-    args.push({
-      name: Some("end"),
-      value: match v {
-        None => Value::none()
-        Some(x) => Value::int(x)
-      },
-      param: 2,
-    })
+    args.push({ name: Some("end"), value: Value::int(v), param: 2, })
   }
   if stroke is Some(v) {
-    args.push({
-      name: Some("stroke"),
-      value: match v {
-        None => Value::none()
-        Some(x) => ToValue::to_value(x)
-      },
-      param: 3,
-    })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 3, })
   }
   if position is Some(v) {
     args.push({ name: Some("position"), value: ToValue::to_value(v), param: 4, })
   }
+  push_extra(args, extra, 5)
   {
     content: labelled_call(
       {
@@ -9091,7 +7803,7 @@ pub fn GridVline::GridVline(
         origin: Site::new("GridVline", loc, args_loc),
       },
       label,
-      5,
+      6,
     ),
   }
 }
@@ -9103,6 +7815,11 @@ pub impl IntoContent for GridVline with fn into_content(self) {
 
 ///|
 /// `set grid.vline(..)`.
+///
+/// Explicit states besides a value:
+/// - `x`: `auto` as `extra` with `Value::auto()`
+/// - `end_`: `none` as `extra` with `Value::none()`
+/// - `stroke`: `none` as `Stroke::none()`
 pub struct SetGridVline {
   priv node : SetNode
 }
@@ -9110,51 +7827,32 @@ pub struct SetGridVline {
 ///|
 #callsite(autofill(loc, args_loc))
 pub fn SetGridVline::SetGridVline(
-  x? : @library.Smart[Int64],
+  x? : Int64,
   start? : Int64,
-  end_? : Int64?,
-  stroke? : Stroke?,
+  end_? : Int64,
+  stroke? : Stroke,
   position? : Alignment,
+  extra? : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetGridVline {
   let args : Array[ArgNode] = []
   if x is Some(v) {
-    args.push({
-      name: Some("x"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => Value::int(x)
-      },
-      param: 0,
-    })
+    args.push({ name: Some("x"), value: Value::int(v), param: 0, })
   }
   if start is Some(v) {
     args.push({ name: Some("start"), value: Value::int(v), param: 1, })
   }
   if end_ is Some(v) {
-    args.push({
-      name: Some("end"),
-      value: match v {
-        None => Value::none()
-        Some(x) => Value::int(x)
-      },
-      param: 2,
-    })
+    args.push({ name: Some("end"), value: Value::int(v), param: 2, })
   }
   if stroke is Some(v) {
-    args.push({
-      name: Some("stroke"),
-      value: match v {
-        None => Value::none()
-        Some(x) => ToValue::to_value(x)
-      },
-      param: 3,
-    })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 3, })
   }
   if position is Some(v) {
     args.push({ name: Some("position"), value: ToValue::to_value(v), param: 4, })
   }
+  push_extra(args, extra, 5)
   {
     node: {
       func: FElem(@library.grid_v_line_elem()),
@@ -9194,48 +7892,24 @@ pub fn GridVlineView::view(self : GridVlineView) -> ContentView {
 /// The `grid.vline` elements; with arguments, those whose fields have the
 /// given values (`grid.vline.where(..)`).
 pub fn Select::grid_vline(
-  x? : @library.Smart[Int64],
+  x? : Int64,
   start? : Int64,
-  end_? : Int64?,
-  stroke? : Stroke?,
+  end_? : Int64,
+  stroke? : Stroke,
   position? : Alignment,
 ) -> Selector[GridVlineView] {
   let fields : Array[(String, Value)] = []
   if x is Some(v) {
-    fields.push(
-      (
-        "x",
-        match v {
-          Auto => Value::auto()
-          Custom(x) => Value::int(x)
-        },
-      ),
-    )
+    fields.push(("x", Value::int(v)))
   }
   if start is Some(v) {
     fields.push(("start", Value::int(v)))
   }
   if end_ is Some(v) {
-    fields.push(
-      (
-        "end",
-        match v {
-          None => Value::none()
-          Some(x) => Value::int(x)
-        },
-      ),
-    )
+    fields.push(("end", Value::int(v)))
   }
   if stroke is Some(v) {
-    fields.push(
-      (
-        "stroke",
-        match v {
-          None => Value::none()
-          Some(x) => ToValue::to_value(x)
-        },
-      ),
-    )
+    fields.push(("stroke", ToValue::to_value(v)))
   }
   if position is Some(v) {
     fields.push(("position", ToValue::to_value(v)))
@@ -9250,6 +7924,9 @@ pub fn Select::grid_vline(
 ///
 /// `Columns(body, count?, ..)`: the optional positional `count` is a labelled
 /// parameter passed positionally. Twin: `columns(count, body)`.
+///
+/// Explicit states besides a value:
+/// - `separator`: `none` as `NoneValue()`
 pub struct Columns {
   priv content : Content
 }
@@ -9261,7 +7938,8 @@ pub fn Columns::Columns(
   count? : Int64,
   gutter? : Length,
   balanced? : Bool,
-  separator? : &IntoContent?,
+  separator? : &IntoContent,
+  extra? : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -9278,15 +7956,9 @@ pub fn Columns::Columns(
     args.push({ name: Some("balanced"), value: Value::bool(v), param: 3, })
   }
   if separator is Some(v) {
-    args.push({
-      name: Some("separator"),
-      value: match v {
-        None => Value::none()
-        Some(x) => Value::content(x)
-      },
-      param: 4,
-    })
+    args.push({ name: Some("separator"), value: Value::content(v), param: 4, })
   }
+  push_extra(args, extra, 5)
   {
     content: labelled_call(
       {
@@ -9295,7 +7967,7 @@ pub fn Columns::Columns(
         origin: Site::new("Columns", loc, args_loc),
       },
       label,
-      5,
+      6,
     ),
   }
 }
@@ -9307,6 +7979,9 @@ pub impl IntoContent for Columns with fn into_content(self) {
 
 ///|
 /// `set columns(..)`.
+///
+/// Explicit states besides a value:
+/// - `separator`: `none` as `NoneValue()`
 pub struct SetColumns {
   priv node : SetNode
 }
@@ -9317,7 +7992,8 @@ pub fn SetColumns::SetColumns(
   count? : Int64,
   gutter? : Length,
   balanced? : Bool,
-  separator? : &IntoContent?,
+  separator? : &IntoContent,
+  extra? : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetColumns {
@@ -9332,15 +8008,9 @@ pub fn SetColumns::SetColumns(
     args.push({ name: Some("balanced"), value: Value::bool(v), param: 2, })
   }
   if separator is Some(v) {
-    args.push({
-      name: Some("separator"),
-      value: match v {
-        None => Value::none()
-        Some(x) => Value::content(x)
-      },
-      param: 3,
-    })
+    args.push({ name: Some("separator"), value: Value::content(v), param: 3, })
   }
+  push_extra(args, extra, 4)
   {
     node: {
       func: FElem(@library.columns_elem()),
@@ -9413,6 +8083,7 @@ pub struct Colbreak {
 #callsite(autofill(loc, args_loc))
 pub fn Colbreak::Colbreak(
   weak? : Bool,
+  extra? : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -9421,6 +8092,7 @@ pub fn Colbreak::Colbreak(
   if weak is Some(v) {
     args.push({ name: Some("weak"), value: Value::bool(v), param: 0, })
   }
+  push_extra(args, extra, 1)
   {
     content: labelled_call(
       {
@@ -9429,7 +8101,7 @@ pub fn Colbreak::Colbreak(
         origin: Site::new("Colbreak", loc, args_loc),
       },
       label,
-      1,
+      2,
     ),
   }
 }
@@ -9449,6 +8121,7 @@ pub struct SetColbreak {
 #callsite(autofill(loc, args_loc))
 pub fn SetColbreak::SetColbreak(
   weak? : Bool,
+  extra? : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetColbreak {
@@ -9456,6 +8129,7 @@ pub fn SetColbreak::SetColbreak(
   if weak is Some(v) {
     args.push({ name: Some("weak"), value: Value::bool(v), param: 0, })
   }
+  push_extra(args, extra, 1)
   {
     node: {
       func: FElem(@library.colbreak_elem()),
@@ -9515,6 +8189,7 @@ pub struct H {
 pub fn H::H(
   amount : Spacing,
   weak? : Bool,
+  extra? : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -9524,6 +8199,7 @@ pub fn H::H(
   if weak is Some(v) {
     args.push({ name: Some("weak"), value: Value::bool(v), param: 1, })
   }
+  push_extra(args, extra, 2)
   {
     content: labelled_call(
       {
@@ -9532,7 +8208,7 @@ pub fn H::H(
         origin: Site::new("H", loc, args_loc),
       },
       label,
-      2,
+      3,
     ),
   }
 }
@@ -9550,11 +8226,17 @@ pub struct SetH {
 
 ///|
 #callsite(autofill(loc, args_loc))
-pub fn SetH::SetH(weak? : Bool, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> SetH {
+pub fn SetH::SetH(
+  weak? : Bool,
+  extra? : Array[(String, Value)] = [],
+  loc~ : SourceLoc,
+  args_loc~ : ArgsLoc,
+) -> SetH {
   let args : Array[ArgNode] = []
   if weak is Some(v) {
     args.push({ name: Some("weak"), value: Value::bool(v), param: 0, })
   }
+  push_extra(args, extra, 1)
   {
     node: {
       func: FElem(@library.h_elem()),
@@ -9615,6 +8297,7 @@ pub struct V {
 pub fn V::V(
   amount : Spacing,
   weak? : Bool,
+  extra? : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -9624,6 +8307,7 @@ pub fn V::V(
   if weak is Some(v) {
     args.push({ name: Some("weak"), value: Value::bool(v), param: 1, })
   }
+  push_extra(args, extra, 2)
   {
     content: labelled_call(
       {
@@ -9632,7 +8316,7 @@ pub fn V::V(
         origin: Site::new("V", loc, args_loc),
       },
       label,
-      2,
+      3,
     ),
   }
 }
@@ -9650,11 +8334,17 @@ pub struct SetV {
 
 ///|
 #callsite(autofill(loc, args_loc))
-pub fn SetV::SetV(weak? : Bool, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> SetV {
+pub fn SetV::SetV(
+  weak? : Bool,
+  extra? : Array[(String, Value)] = [],
+  loc~ : SourceLoc,
+  args_loc~ : ArgsLoc,
+) -> SetV {
   let args : Array[ArgNode] = []
   if weak is Some(v) {
     args.push({ name: Some("weak"), value: Value::bool(v), param: 0, })
   }
+  push_extra(args, extra, 1)
   {
     node: {
       func: FElem(@library.v_elem()),
@@ -9711,12 +8401,14 @@ pub struct Hide {
 #callsite(autofill(loc, args_loc))
 pub fn Hide::Hide(
   body : &IntoContent,
+  extra? : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> Hide {
   let args : Array[ArgNode] = []
   args.push({ name: None, value: Value::content(body), param: 0, })
+  push_extra(args, extra, 1)
   {
     content: labelled_call(
       {
@@ -9725,7 +8417,7 @@ pub fn Hide::Hide(
         origin: Site::new("Hide", loc, args_loc),
       },
       label,
-      1,
+      2,
     ),
   }
 }
@@ -9781,6 +8473,7 @@ pub fn Repeat::Repeat(
   body : &IntoContent,
   gap? : Length,
   justify? : Bool,
+  extra? : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -9793,6 +8486,7 @@ pub fn Repeat::Repeat(
   if justify is Some(v) {
     args.push({ name: Some("justify"), value: Value::bool(v), param: 2, })
   }
+  push_extra(args, extra, 3)
   {
     content: labelled_call(
       {
@@ -9801,7 +8495,7 @@ pub fn Repeat::Repeat(
         origin: Site::new("Repeat", loc, args_loc),
       },
       label,
-      3,
+      4,
     ),
   }
 }
@@ -9822,6 +8516,7 @@ pub struct SetRepeat {
 pub fn SetRepeat::SetRepeat(
   gap? : Length,
   justify? : Bool,
+  extra? : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetRepeat {
@@ -9832,6 +8527,7 @@ pub fn SetRepeat::SetRepeat(
   if justify is Some(v) {
     args.push({ name: Some("justify"), value: Value::bool(v), param: 1, })
   }
+  push_extra(args, extra, 2)
   {
     node: {
       func: FElem(@library.repeat_elem()),
@@ -9903,6 +8599,7 @@ pub fn Move::Move(
   body : &IntoContent,
   dx? : Length,
   dy? : Length,
+  extra? : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -9915,6 +8612,7 @@ pub fn Move::Move(
   if dy is Some(v) {
     args.push({ name: Some("dy"), value: ToValue::to_value(v), param: 2, })
   }
+  push_extra(args, extra, 3)
   {
     content: labelled_call(
       {
@@ -9923,7 +8621,7 @@ pub fn Move::Move(
         origin: Site::new("Move", loc, args_loc),
       },
       label,
-      3,
+      4,
     ),
   }
 }
@@ -9944,6 +8642,7 @@ pub struct SetMove {
 pub fn SetMove::SetMove(
   dx? : Length,
   dy? : Length,
+  extra? : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetMove {
@@ -9954,6 +8653,7 @@ pub fn SetMove::SetMove(
   if dy is Some(v) {
     args.push({ name: Some("dy"), value: ToValue::to_value(v), param: 1, })
   }
+  push_extra(args, extra, 2)
   {
     node: {
       func: FElem(@library.move_elem()),
@@ -10027,6 +8727,7 @@ pub fn Rotate::Rotate(
   angle? : Angle,
   origin? : Alignment,
   reflow? : Bool,
+  extra? : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -10042,6 +8743,7 @@ pub fn Rotate::Rotate(
   if reflow is Some(v) {
     args.push({ name: Some("reflow"), value: Value::bool(v), param: 3, })
   }
+  push_extra(args, extra, 4)
   {
     content: labelled_call(
       {
@@ -10050,7 +8752,7 @@ pub fn Rotate::Rotate(
         origin: Site::new("Rotate", loc, args_loc),
       },
       label,
-      4,
+      5,
     ),
   }
 }
@@ -10072,6 +8774,7 @@ pub fn SetRotate::SetRotate(
   angle? : Angle,
   origin? : Alignment,
   reflow? : Bool,
+  extra? : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetRotate {
@@ -10085,6 +8788,7 @@ pub fn SetRotate::SetRotate(
   if reflow is Some(v) {
     args.push({ name: Some("reflow"), value: Value::bool(v), param: 2, })
   }
+  push_extra(args, extra, 3)
   {
     node: {
       func: FElem(@library.rotate_elem()),
@@ -10153,6 +8857,12 @@ pub fn Select::rotate(
 /// `Image(source, ..)`: `source` (a parse hook that loads the data) takes a
 /// path string, resolved against the project root, or bytes. `icc` is not
 /// typed yet. Twin: `image(source, ..)`.
+///
+/// Explicit states besides a value:
+/// - `format`: `auto` as `extra` with `Value::auto()`
+/// - `width`: `auto` as `Auto`
+/// - `alt`: `none` as `extra` with `Value::none()`
+/// - `scaling`: `auto` as `extra` with `Value::auto()`
 pub struct Image {
   priv content : Content
 }
@@ -10161,13 +8871,14 @@ pub struct Image {
 #callsite(autofill(loc, args_loc))
 pub fn Image::Image(
   source : &IntoSource,
-  format? : @library.Smart[String],
-  width? : @library.Smart[Length],
+  format? : String,
+  width? : Length,
   height? : Sizing,
-  alt? : String?,
+  alt? : String,
   page? : Int64,
   fit? : String,
-  scaling? : @library.Smart[String],
+  scaling? : String,
+  extra? : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -10179,37 +8890,16 @@ pub fn Image::Image(
     param: 0,
   })
   if format is Some(v) {
-    args.push({
-      name: Some("format"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => Value::str(x)
-      },
-      param: 1,
-    })
+    args.push({ name: Some("format"), value: Value::str(v), param: 1, })
   }
   if width is Some(v) {
-    args.push({
-      name: Some("width"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 2,
-    })
+    args.push({ name: Some("width"), value: ToValue::to_value(v), param: 2, })
   }
   if height is Some(v) {
     args.push({ name: Some("height"), value: ToValue::to_value(v), param: 3, })
   }
   if alt is Some(v) {
-    args.push({
-      name: Some("alt"),
-      value: match v {
-        None => Value::none()
-        Some(x) => Value::str(x)
-      },
-      param: 4,
-    })
+    args.push({ name: Some("alt"), value: Value::str(v), param: 4, })
   }
   if page is Some(v) {
     args.push({ name: Some("page"), value: Value::int(v), param: 5, })
@@ -10218,15 +8908,9 @@ pub fn Image::Image(
     args.push({ name: Some("fit"), value: Value::str(v), param: 6, })
   }
   if scaling is Some(v) {
-    args.push({
-      name: Some("scaling"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => Value::str(x)
-      },
-      param: 7,
-    })
+    args.push({ name: Some("scaling"), value: Value::str(v), param: 7, })
   }
+  push_extra(args, extra, 8)
   {
     content: labelled_call(
       {
@@ -10235,7 +8919,7 @@ pub fn Image::Image(
         origin: Site::new("Image", loc, args_loc),
       },
       label,
-      8,
+      9,
     ),
   }
 }
@@ -10247,6 +8931,12 @@ pub impl IntoContent for Image with fn into_content(self) {
 
 ///|
 /// `set image(..)`.
+///
+/// Explicit states besides a value:
+/// - `format`: `auto` as `extra` with `Value::auto()`
+/// - `width`: `auto` as `Auto`
+/// - `alt`: `none` as `extra` with `Value::none()`
+/// - `scaling`: `auto` as `extra` with `Value::auto()`
 pub struct SetImage {
   priv node : SetNode
 }
@@ -10254,49 +8944,29 @@ pub struct SetImage {
 ///|
 #callsite(autofill(loc, args_loc))
 pub fn SetImage::SetImage(
-  format? : @library.Smart[String],
-  width? : @library.Smart[Length],
+  format? : String,
+  width? : Length,
   height? : Sizing,
-  alt? : String?,
+  alt? : String,
   page? : Int64,
   fit? : String,
-  scaling? : @library.Smart[String],
+  scaling? : String,
+  extra? : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetImage {
   let args : Array[ArgNode] = []
   if format is Some(v) {
-    args.push({
-      name: Some("format"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => Value::str(x)
-      },
-      param: 0,
-    })
+    args.push({ name: Some("format"), value: Value::str(v), param: 0, })
   }
   if width is Some(v) {
-    args.push({
-      name: Some("width"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 1,
-    })
+    args.push({ name: Some("width"), value: ToValue::to_value(v), param: 1, })
   }
   if height is Some(v) {
     args.push({ name: Some("height"), value: ToValue::to_value(v), param: 2, })
   }
   if alt is Some(v) {
-    args.push({
-      name: Some("alt"),
-      value: match v {
-        None => Value::none()
-        Some(x) => Value::str(x)
-      },
-      param: 3,
-    })
+    args.push({ name: Some("alt"), value: Value::str(v), param: 3, })
   }
   if page is Some(v) {
     args.push({ name: Some("page"), value: Value::int(v), param: 4, })
@@ -10305,15 +8975,9 @@ pub fn SetImage::SetImage(
     args.push({ name: Some("fit"), value: Value::str(v), param: 5, })
   }
   if scaling is Some(v) {
-    args.push({
-      name: Some("scaling"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => Value::str(x)
-      },
-      param: 6,
-    })
+    args.push({ name: Some("scaling"), value: Value::str(v), param: 6, })
   }
+  push_extra(args, extra, 7)
   {
     node: {
       func: FElem(@library.image_elem()),
@@ -10353,50 +9017,26 @@ pub fn ImageView::view(self : ImageView) -> ContentView {
 /// The `image` elements; with arguments, those whose fields have the given
 /// values (`image.where(..)`).
 pub fn Select::image(
-  format? : @library.Smart[String],
-  width? : @library.Smart[Length],
+  format? : String,
+  width? : Length,
   height? : Sizing,
-  alt? : String?,
+  alt? : String,
   page? : Int64,
   fit? : String,
-  scaling? : @library.Smart[String],
+  scaling? : String,
 ) -> Selector[ImageView] {
   let fields : Array[(String, Value)] = []
   if format is Some(v) {
-    fields.push(
-      (
-        "format",
-        match v {
-          Auto => Value::auto()
-          Custom(x) => Value::str(x)
-        },
-      ),
-    )
+    fields.push(("format", Value::str(v)))
   }
   if width is Some(v) {
-    fields.push(
-      (
-        "width",
-        match v {
-          Auto => Value::auto()
-          Custom(x) => ToValue::to_value(x)
-        },
-      ),
-    )
+    fields.push(("width", ToValue::to_value(v)))
   }
   if height is Some(v) {
     fields.push(("height", ToValue::to_value(v)))
   }
   if alt is Some(v) {
-    fields.push(
-      (
-        "alt",
-        match v {
-          None => Value::none()
-          Some(x) => Value::str(x)
-        },
-      ),
-    )
+    fields.push(("alt", Value::str(v)))
   }
   if page is Some(v) {
     fields.push(("page", Value::int(v)))
@@ -10405,15 +9045,7 @@ pub fn Select::image(
     fields.push(("fit", Value::str(v)))
   }
   if scaling is Some(v) {
-    fields.push(
-      (
-        "scaling",
-        match v {
-          Auto => Value::auto()
-          Custom(x) => Value::str(x)
-        },
-      ),
-    )
+    fields.push(("scaling", Value::str(v)))
   }
   elem_selector(@library.image_elem(), fields, content => ImageView::{
     content,
@@ -10422,6 +9054,9 @@ pub fn Select::image(
 
 ///|
 /// `line`: A line from one point to another.
+///
+/// Explicit states besides a value:
+/// - `end_`: `none` as `extra` with `Value::none()`
 pub struct Line {
   priv content : Content
 }
@@ -10430,10 +9065,11 @@ pub struct Line {
 #callsite(autofill(loc, args_loc))
 pub fn Line::Line(
   start? : (Length, Length),
-  end_? : (Length, Length)?,
+  end_? : (Length, Length),
   length? : Length,
   angle? : Angle,
   stroke? : Stroke,
+  extra? : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -10449,11 +9085,7 @@ pub fn Line::Line(
   if end_ is Some(v) {
     args.push({
       name: Some("end"),
-      value: match v {
-        None => Value::none()
-        Some(x) =>
-          Value::array([ToValue::to_value(x.0), ToValue::to_value(x.1)])
-      },
+      value: Value::array([ToValue::to_value(v.0), ToValue::to_value(v.1)]),
       param: 1,
     })
   }
@@ -10466,6 +9098,7 @@ pub fn Line::Line(
   if stroke is Some(v) {
     args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 4, })
   }
+  push_extra(args, extra, 5)
   {
     content: labelled_call(
       {
@@ -10474,7 +9107,7 @@ pub fn Line::Line(
         origin: Site::new("Line", loc, args_loc),
       },
       label,
-      5,
+      6,
     ),
   }
 }
@@ -10486,6 +9119,9 @@ pub impl IntoContent for Line with fn into_content(self) {
 
 ///|
 /// `set line(..)`.
+///
+/// Explicit states besides a value:
+/// - `end_`: `none` as `extra` with `Value::none()`
 pub struct SetLine {
   priv node : SetNode
 }
@@ -10494,10 +9130,11 @@ pub struct SetLine {
 #callsite(autofill(loc, args_loc))
 pub fn SetLine::SetLine(
   start? : (Length, Length),
-  end_? : (Length, Length)?,
+  end_? : (Length, Length),
   length? : Length,
   angle? : Angle,
   stroke? : Stroke,
+  extra? : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetLine {
@@ -10512,11 +9149,7 @@ pub fn SetLine::SetLine(
   if end_ is Some(v) {
     args.push({
       name: Some("end"),
-      value: match v {
-        None => Value::none()
-        Some(x) =>
-          Value::array([ToValue::to_value(x.0), ToValue::to_value(x.1)])
-      },
+      value: Value::array([ToValue::to_value(v.0), ToValue::to_value(v.1)]),
       param: 1,
     })
   }
@@ -10529,6 +9162,7 @@ pub fn SetLine::SetLine(
   if stroke is Some(v) {
     args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 4, })
   }
+  push_extra(args, extra, 5)
   {
     node: {
       func: FElem(@library.line_elem()),
@@ -10569,7 +9203,7 @@ pub fn LineView::view(self : LineView) -> ContentView {
 /// values (`line.where(..)`).
 pub fn Select::line(
   start? : (Length, Length),
-  end_? : (Length, Length)?,
+  end_? : (Length, Length),
   length? : Length,
   angle? : Angle,
   stroke? : Stroke,
@@ -10582,14 +9216,7 @@ pub fn Select::line(
   }
   if end_ is Some(v) {
     fields.push(
-      (
-        "end",
-        match v {
-          None => Value::none()
-          Some(x) =>
-            Value::array([ToValue::to_value(x.0), ToValue::to_value(x.1)])
-        },
-      ),
+      ("end", Value::array([ToValue::to_value(v.0), ToValue::to_value(v.1)])),
     )
   }
   if length is Some(v) {
@@ -10609,6 +9236,12 @@ pub fn Select::line(
 ///
 /// `Rect(body?, ..)`: the optional positional body is a labelled parameter
 /// passed positionally (shapes are usually empty). Twin: `rect(.., body)`.
+///
+/// Explicit states besides a value:
+/// - `width`: `auto` as `Auto`
+/// - `fill`: `none` as `None`
+/// - `stroke`: `auto` as `Sides::auto()`
+/// - `body`: `none` as `NoneValue()`
 pub struct Rect {
   priv content : Content
 }
@@ -10616,61 +9249,34 @@ pub struct Rect {
 ///|
 #callsite(autofill(loc, args_loc))
 pub fn Rect::Rect(
-  width? : @library.Smart[Length],
+  width? : Length,
   height? : Sizing,
-  fill? : Paint?,
-  stroke? : @library.Smart[Sides[Stroke?]],
+  fill? : Paint,
+  stroke? : Sides[Stroke],
   radius? : Corners[Length],
   inset? : Sides[Length],
   outset? : Sides[Length],
-  body? : &IntoContent?,
+  body? : &IntoContent,
+  extra? : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> Rect {
   let args : Array[ArgNode] = []
   if body is Some(v) {
-    args.push({
-      name: None,
-      value: match v {
-        None => Value::none()
-        Some(x) => Value::content(x)
-      },
-      param: 7,
-    })
+    args.push({ name: None, value: Value::content(v), param: 7, })
   }
   if width is Some(v) {
-    args.push({
-      name: Some("width"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 0,
-    })
+    args.push({ name: Some("width"), value: ToValue::to_value(v), param: 0, })
   }
   if height is Some(v) {
     args.push({ name: Some("height"), value: ToValue::to_value(v), param: 1, })
   }
   if fill is Some(v) {
-    args.push({
-      name: Some("fill"),
-      value: match v {
-        None => Value::none()
-        Some(x) => ToValue::to_value(x)
-      },
-      param: 2,
-    })
+    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 2, })
   }
   if stroke is Some(v) {
-    args.push({
-      name: Some("stroke"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 3,
-    })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 3, })
   }
   if radius is Some(v) {
     args.push({ name: Some("radius"), value: ToValue::to_value(v), param: 4, })
@@ -10681,6 +9287,7 @@ pub fn Rect::Rect(
   if outset is Some(v) {
     args.push({ name: Some("outset"), value: ToValue::to_value(v), param: 6, })
   }
+  push_extra(args, extra, 8)
   {
     content: labelled_call(
       {
@@ -10689,7 +9296,7 @@ pub fn Rect::Rect(
         origin: Site::new("Rect", loc, args_loc),
       },
       label,
-      8,
+      9,
     ),
   }
 }
@@ -10701,6 +9308,11 @@ pub impl IntoContent for Rect with fn into_content(self) {
 
 ///|
 /// `set rect(..)`.
+///
+/// Explicit states besides a value:
+/// - `width`: `auto` as `Auto`
+/// - `fill`: `none` as `None`
+/// - `stroke`: `auto` as `Sides::auto()`
 pub struct SetRect {
   priv node : SetNode
 }
@@ -10708,49 +9320,29 @@ pub struct SetRect {
 ///|
 #callsite(autofill(loc, args_loc))
 pub fn SetRect::SetRect(
-  width? : @library.Smart[Length],
+  width? : Length,
   height? : Sizing,
-  fill? : Paint?,
-  stroke? : @library.Smart[Sides[Stroke?]],
+  fill? : Paint,
+  stroke? : Sides[Stroke],
   radius? : Corners[Length],
   inset? : Sides[Length],
   outset? : Sides[Length],
+  extra? : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetRect {
   let args : Array[ArgNode] = []
   if width is Some(v) {
-    args.push({
-      name: Some("width"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 0,
-    })
+    args.push({ name: Some("width"), value: ToValue::to_value(v), param: 0, })
   }
   if height is Some(v) {
     args.push({ name: Some("height"), value: ToValue::to_value(v), param: 1, })
   }
   if fill is Some(v) {
-    args.push({
-      name: Some("fill"),
-      value: match v {
-        None => Value::none()
-        Some(x) => ToValue::to_value(x)
-      },
-      param: 2,
-    })
+    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 2, })
   }
   if stroke is Some(v) {
-    args.push({
-      name: Some("stroke"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 3,
-    })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 3, })
   }
   if radius is Some(v) {
     args.push({ name: Some("radius"), value: ToValue::to_value(v), param: 4, })
@@ -10761,6 +9353,7 @@ pub fn SetRect::SetRect(
   if outset is Some(v) {
     args.push({ name: Some("outset"), value: ToValue::to_value(v), param: 6, })
   }
+  push_extra(args, extra, 7)
   {
     node: {
       func: FElem(@library.rect_elem()),
@@ -10800,50 +9393,26 @@ pub fn RectView::view(self : RectView) -> ContentView {
 /// The `rect` elements; with arguments, those whose fields have the given
 /// values (`rect.where(..)`).
 pub fn Select::rect(
-  width? : @library.Smart[Length],
+  width? : Length,
   height? : Sizing,
-  fill? : Paint?,
-  stroke? : @library.Smart[Sides[Stroke?]],
+  fill? : Paint,
+  stroke? : Sides[Stroke],
   radius? : Corners[Length],
   inset? : Sides[Length],
   outset? : Sides[Length],
 ) -> Selector[RectView] {
   let fields : Array[(String, Value)] = []
   if width is Some(v) {
-    fields.push(
-      (
-        "width",
-        match v {
-          Auto => Value::auto()
-          Custom(x) => ToValue::to_value(x)
-        },
-      ),
-    )
+    fields.push(("width", ToValue::to_value(v)))
   }
   if height is Some(v) {
     fields.push(("height", ToValue::to_value(v)))
   }
   if fill is Some(v) {
-    fields.push(
-      (
-        "fill",
-        match v {
-          None => Value::none()
-          Some(x) => ToValue::to_value(x)
-        },
-      ),
-    )
+    fields.push(("fill", ToValue::to_value(v)))
   }
   if stroke is Some(v) {
-    fields.push(
-      (
-        "stroke",
-        match v {
-          Auto => Value::auto()
-          Custom(x) => ToValue::to_value(x)
-        },
-      ),
-    )
+    fields.push(("stroke", ToValue::to_value(v)))
   }
   if radius is Some(v) {
     fields.push(("radius", ToValue::to_value(v)))
@@ -10862,6 +9431,13 @@ pub fn Select::rect(
 ///
 /// As `Rect`; `size` is the external shorthand read by the `width`/`height`
 /// parsers.
+///
+/// Explicit states besides a value:
+/// - `size`: `auto` as `Auto`
+/// - `width`: `auto` as `Auto`
+/// - `fill`: `none` as `None`
+/// - `stroke`: `auto` as `Sides::auto()`
+/// - `body`: `none` as `NoneValue()`
 pub struct Square {
   priv content : Content
 }
@@ -10869,72 +9445,38 @@ pub struct Square {
 ///|
 #callsite(autofill(loc, args_loc))
 pub fn Square::Square(
-  size? : @library.Smart[Length],
-  width? : @library.Smart[Length],
+  size? : Length,
+  width? : Length,
   height? : Sizing,
-  fill? : Paint?,
-  stroke? : @library.Smart[Sides[Stroke?]],
+  fill? : Paint,
+  stroke? : Sides[Stroke],
   radius? : Corners[Length],
   inset? : Sides[Length],
   outset? : Sides[Length],
-  body? : &IntoContent?,
+  body? : &IntoContent,
+  extra? : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> Square {
   let args : Array[ArgNode] = []
   if body is Some(v) {
-    args.push({
-      name: None,
-      value: match v {
-        None => Value::none()
-        Some(x) => Value::content(x)
-      },
-      param: 8,
-    })
+    args.push({ name: None, value: Value::content(v), param: 8, })
   }
   if size is Some(v) {
-    args.push({
-      name: Some("size"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 0,
-    })
+    args.push({ name: Some("size"), value: ToValue::to_value(v), param: 0, })
   }
   if width is Some(v) {
-    args.push({
-      name: Some("width"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 1,
-    })
+    args.push({ name: Some("width"), value: ToValue::to_value(v), param: 1, })
   }
   if height is Some(v) {
     args.push({ name: Some("height"), value: ToValue::to_value(v), param: 2, })
   }
   if fill is Some(v) {
-    args.push({
-      name: Some("fill"),
-      value: match v {
-        None => Value::none()
-        Some(x) => ToValue::to_value(x)
-      },
-      param: 3,
-    })
+    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 3, })
   }
   if stroke is Some(v) {
-    args.push({
-      name: Some("stroke"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 4,
-    })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 4, })
   }
   if radius is Some(v) {
     args.push({ name: Some("radius"), value: ToValue::to_value(v), param: 5, })
@@ -10945,6 +9487,7 @@ pub fn Square::Square(
   if outset is Some(v) {
     args.push({ name: Some("outset"), value: ToValue::to_value(v), param: 7, })
   }
+  push_extra(args, extra, 9)
   {
     content: labelled_call(
       {
@@ -10953,7 +9496,7 @@ pub fn Square::Square(
         origin: Site::new("Square", loc, args_loc),
       },
       label,
-      9,
+      10,
     ),
   }
 }
@@ -10965,6 +9508,12 @@ pub impl IntoContent for Square with fn into_content(self) {
 
 ///|
 /// `set square(..)`.
+///
+/// Explicit states besides a value:
+/// - `size`: `auto` as `Auto`
+/// - `width`: `auto` as `Auto`
+/// - `fill`: `none` as `None`
+/// - `stroke`: `auto` as `Sides::auto()`
 pub struct SetSquare {
   priv node : SetNode
 }
@@ -10972,60 +9521,33 @@ pub struct SetSquare {
 ///|
 #callsite(autofill(loc, args_loc))
 pub fn SetSquare::SetSquare(
-  size? : @library.Smart[Length],
-  width? : @library.Smart[Length],
+  size? : Length,
+  width? : Length,
   height? : Sizing,
-  fill? : Paint?,
-  stroke? : @library.Smart[Sides[Stroke?]],
+  fill? : Paint,
+  stroke? : Sides[Stroke],
   radius? : Corners[Length],
   inset? : Sides[Length],
   outset? : Sides[Length],
+  extra? : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetSquare {
   let args : Array[ArgNode] = []
   if size is Some(v) {
-    args.push({
-      name: Some("size"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 0,
-    })
+    args.push({ name: Some("size"), value: ToValue::to_value(v), param: 0, })
   }
   if width is Some(v) {
-    args.push({
-      name: Some("width"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 1,
-    })
+    args.push({ name: Some("width"), value: ToValue::to_value(v), param: 1, })
   }
   if height is Some(v) {
     args.push({ name: Some("height"), value: ToValue::to_value(v), param: 2, })
   }
   if fill is Some(v) {
-    args.push({
-      name: Some("fill"),
-      value: match v {
-        None => Value::none()
-        Some(x) => ToValue::to_value(x)
-      },
-      param: 3,
-    })
+    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 3, })
   }
   if stroke is Some(v) {
-    args.push({
-      name: Some("stroke"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 4,
-    })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 4, })
   }
   if radius is Some(v) {
     args.push({ name: Some("radius"), value: ToValue::to_value(v), param: 5, })
@@ -11036,6 +9558,7 @@ pub fn SetSquare::SetSquare(
   if outset is Some(v) {
     args.push({ name: Some("outset"), value: ToValue::to_value(v), param: 7, })
   }
+  push_extra(args, extra, 8)
   {
     node: {
       func: FElem(@library.square_elem()),
@@ -11075,62 +9598,30 @@ pub fn SquareView::view(self : SquareView) -> ContentView {
 /// The `square` elements; with arguments, those whose fields have the given
 /// values (`square.where(..)`).
 pub fn Select::square(
-  size? : @library.Smart[Length],
-  width? : @library.Smart[Length],
+  size? : Length,
+  width? : Length,
   height? : Sizing,
-  fill? : Paint?,
-  stroke? : @library.Smart[Sides[Stroke?]],
+  fill? : Paint,
+  stroke? : Sides[Stroke],
   radius? : Corners[Length],
   inset? : Sides[Length],
   outset? : Sides[Length],
 ) -> Selector[SquareView] {
   let fields : Array[(String, Value)] = []
   if size is Some(v) {
-    fields.push(
-      (
-        "size",
-        match v {
-          Auto => Value::auto()
-          Custom(x) => ToValue::to_value(x)
-        },
-      ),
-    )
+    fields.push(("size", ToValue::to_value(v)))
   }
   if width is Some(v) {
-    fields.push(
-      (
-        "width",
-        match v {
-          Auto => Value::auto()
-          Custom(x) => ToValue::to_value(x)
-        },
-      ),
-    )
+    fields.push(("width", ToValue::to_value(v)))
   }
   if height is Some(v) {
     fields.push(("height", ToValue::to_value(v)))
   }
   if fill is Some(v) {
-    fields.push(
-      (
-        "fill",
-        match v {
-          None => Value::none()
-          Some(x) => ToValue::to_value(x)
-        },
-      ),
-    )
+    fields.push(("fill", ToValue::to_value(v)))
   }
   if stroke is Some(v) {
-    fields.push(
-      (
-        "stroke",
-        match v {
-          Auto => Value::auto()
-          Custom(x) => ToValue::to_value(x)
-        },
-      ),
-    )
+    fields.push(("stroke", ToValue::to_value(v)))
   }
   if radius is Some(v) {
     fields.push(("radius", ToValue::to_value(v)))
@@ -11150,6 +9641,12 @@ pub fn Select::square(
 /// `ellipse`: An ellipse with optional content.
 ///
 /// As `Rect`.
+///
+/// Explicit states besides a value:
+/// - `width`: `auto` as `Auto`
+/// - `fill`: `none` as `None`
+/// - `stroke`: `auto` as `Stroke::auto()`, `none` as `Stroke::none()`
+/// - `body`: `none` as `NoneValue()`
 pub struct Ellipse {
   priv content : Content
 }
@@ -11157,64 +9654,33 @@ pub struct Ellipse {
 ///|
 #callsite(autofill(loc, args_loc))
 pub fn Ellipse::Ellipse(
-  width? : @library.Smart[Length],
+  width? : Length,
   height? : Sizing,
-  fill? : Paint?,
-  stroke? : @library.Smart[Stroke?],
+  fill? : Paint,
+  stroke? : Stroke,
   inset? : Sides[Length],
   outset? : Sides[Length],
-  body? : &IntoContent?,
+  body? : &IntoContent,
+  extra? : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> Ellipse {
   let args : Array[ArgNode] = []
   if body is Some(v) {
-    args.push({
-      name: None,
-      value: match v {
-        None => Value::none()
-        Some(x) => Value::content(x)
-      },
-      param: 6,
-    })
+    args.push({ name: None, value: Value::content(v), param: 6, })
   }
   if width is Some(v) {
-    args.push({
-      name: Some("width"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 0,
-    })
+    args.push({ name: Some("width"), value: ToValue::to_value(v), param: 0, })
   }
   if height is Some(v) {
     args.push({ name: Some("height"), value: ToValue::to_value(v), param: 1, })
   }
   if fill is Some(v) {
-    args.push({
-      name: Some("fill"),
-      value: match v {
-        None => Value::none()
-        Some(x) => ToValue::to_value(x)
-      },
-      param: 2,
-    })
+    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 2, })
   }
   if stroke is Some(v) {
-    args.push({
-      name: Some("stroke"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) =>
-          match x {
-            None => Value::none()
-            Some(x) => ToValue::to_value(x)
-          }
-      },
-      param: 3,
-    })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 3, })
   }
   if inset is Some(v) {
     args.push({ name: Some("inset"), value: ToValue::to_value(v), param: 4, })
@@ -11222,6 +9688,7 @@ pub fn Ellipse::Ellipse(
   if outset is Some(v) {
     args.push({ name: Some("outset"), value: ToValue::to_value(v), param: 5, })
   }
+  push_extra(args, extra, 7)
   {
     content: labelled_call(
       {
@@ -11230,7 +9697,7 @@ pub fn Ellipse::Ellipse(
         origin: Site::new("Ellipse", loc, args_loc),
       },
       label,
-      7,
+      8,
     ),
   }
 }
@@ -11242,6 +9709,11 @@ pub impl IntoContent for Ellipse with fn into_content(self) {
 
 ///|
 /// `set ellipse(..)`.
+///
+/// Explicit states besides a value:
+/// - `width`: `auto` as `Auto`
+/// - `fill`: `none` as `None`
+/// - `stroke`: `auto` as `Stroke::auto()`, `none` as `Stroke::none()`
 pub struct SetEllipse {
   priv node : SetNode
 }
@@ -11249,52 +9721,28 @@ pub struct SetEllipse {
 ///|
 #callsite(autofill(loc, args_loc))
 pub fn SetEllipse::SetEllipse(
-  width? : @library.Smart[Length],
+  width? : Length,
   height? : Sizing,
-  fill? : Paint?,
-  stroke? : @library.Smart[Stroke?],
+  fill? : Paint,
+  stroke? : Stroke,
   inset? : Sides[Length],
   outset? : Sides[Length],
+  extra? : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetEllipse {
   let args : Array[ArgNode] = []
   if width is Some(v) {
-    args.push({
-      name: Some("width"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 0,
-    })
+    args.push({ name: Some("width"), value: ToValue::to_value(v), param: 0, })
   }
   if height is Some(v) {
     args.push({ name: Some("height"), value: ToValue::to_value(v), param: 1, })
   }
   if fill is Some(v) {
-    args.push({
-      name: Some("fill"),
-      value: match v {
-        None => Value::none()
-        Some(x) => ToValue::to_value(x)
-      },
-      param: 2,
-    })
+    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 2, })
   }
   if stroke is Some(v) {
-    args.push({
-      name: Some("stroke"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) =>
-          match x {
-            None => Value::none()
-            Some(x) => ToValue::to_value(x)
-          }
-      },
-      param: 3,
-    })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 3, })
   }
   if inset is Some(v) {
     args.push({ name: Some("inset"), value: ToValue::to_value(v), param: 4, })
@@ -11302,6 +9750,7 @@ pub fn SetEllipse::SetEllipse(
   if outset is Some(v) {
     args.push({ name: Some("outset"), value: ToValue::to_value(v), param: 5, })
   }
+  push_extra(args, extra, 6)
   {
     node: {
       func: FElem(@library.ellipse_elem()),
@@ -11341,53 +9790,25 @@ pub fn EllipseView::view(self : EllipseView) -> ContentView {
 /// The `ellipse` elements; with arguments, those whose fields have the given
 /// values (`ellipse.where(..)`).
 pub fn Select::ellipse(
-  width? : @library.Smart[Length],
+  width? : Length,
   height? : Sizing,
-  fill? : Paint?,
-  stroke? : @library.Smart[Stroke?],
+  fill? : Paint,
+  stroke? : Stroke,
   inset? : Sides[Length],
   outset? : Sides[Length],
 ) -> Selector[EllipseView] {
   let fields : Array[(String, Value)] = []
   if width is Some(v) {
-    fields.push(
-      (
-        "width",
-        match v {
-          Auto => Value::auto()
-          Custom(x) => ToValue::to_value(x)
-        },
-      ),
-    )
+    fields.push(("width", ToValue::to_value(v)))
   }
   if height is Some(v) {
     fields.push(("height", ToValue::to_value(v)))
   }
   if fill is Some(v) {
-    fields.push(
-      (
-        "fill",
-        match v {
-          None => Value::none()
-          Some(x) => ToValue::to_value(x)
-        },
-      ),
-    )
+    fields.push(("fill", ToValue::to_value(v)))
   }
   if stroke is Some(v) {
-    fields.push(
-      (
-        "stroke",
-        match v {
-          Auto => Value::auto()
-          Custom(x) =>
-            match x {
-              None => Value::none()
-              Some(x) => ToValue::to_value(x)
-            }
-        },
-      ),
-    )
+    fields.push(("stroke", ToValue::to_value(v)))
   }
   if inset is Some(v) {
     fields.push(("inset", ToValue::to_value(v)))
@@ -11405,6 +9826,12 @@ pub fn Select::ellipse(
 ///
 /// As `Rect`; `radius` is the external shorthand read by the `width`/`height`
 /// parsers.
+///
+/// Explicit states besides a value:
+/// - `width`: `auto` as `Auto`
+/// - `fill`: `none` as `None`
+/// - `stroke`: `auto` as `Stroke::auto()`, `none` as `Stroke::none()`
+/// - `body`: `none` as `NoneValue()`
 pub struct Circle {
   priv content : Content
 }
@@ -11413,67 +9840,36 @@ pub struct Circle {
 #callsite(autofill(loc, args_loc))
 pub fn Circle::Circle(
   radius? : Length,
-  width? : @library.Smart[Length],
+  width? : Length,
   height? : Sizing,
-  fill? : Paint?,
-  stroke? : @library.Smart[Stroke?],
+  fill? : Paint,
+  stroke? : Stroke,
   inset? : Sides[Length],
   outset? : Sides[Length],
-  body? : &IntoContent?,
+  body? : &IntoContent,
+  extra? : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> Circle {
   let args : Array[ArgNode] = []
   if body is Some(v) {
-    args.push({
-      name: None,
-      value: match v {
-        None => Value::none()
-        Some(x) => Value::content(x)
-      },
-      param: 7,
-    })
+    args.push({ name: None, value: Value::content(v), param: 7, })
   }
   if radius is Some(v) {
     args.push({ name: Some("radius"), value: ToValue::to_value(v), param: 0, })
   }
   if width is Some(v) {
-    args.push({
-      name: Some("width"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 1,
-    })
+    args.push({ name: Some("width"), value: ToValue::to_value(v), param: 1, })
   }
   if height is Some(v) {
     args.push({ name: Some("height"), value: ToValue::to_value(v), param: 2, })
   }
   if fill is Some(v) {
-    args.push({
-      name: Some("fill"),
-      value: match v {
-        None => Value::none()
-        Some(x) => ToValue::to_value(x)
-      },
-      param: 3,
-    })
+    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 3, })
   }
   if stroke is Some(v) {
-    args.push({
-      name: Some("stroke"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) =>
-          match x {
-            None => Value::none()
-            Some(x) => ToValue::to_value(x)
-          }
-      },
-      param: 4,
-    })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 4, })
   }
   if inset is Some(v) {
     args.push({ name: Some("inset"), value: ToValue::to_value(v), param: 5, })
@@ -11481,6 +9877,7 @@ pub fn Circle::Circle(
   if outset is Some(v) {
     args.push({ name: Some("outset"), value: ToValue::to_value(v), param: 6, })
   }
+  push_extra(args, extra, 8)
   {
     content: labelled_call(
       {
@@ -11489,7 +9886,7 @@ pub fn Circle::Circle(
         origin: Site::new("Circle", loc, args_loc),
       },
       label,
-      8,
+      9,
     ),
   }
 }
@@ -11501,6 +9898,11 @@ pub impl IntoContent for Circle with fn into_content(self) {
 
 ///|
 /// `set circle(..)`.
+///
+/// Explicit states besides a value:
+/// - `width`: `auto` as `Auto`
+/// - `fill`: `none` as `None`
+/// - `stroke`: `auto` as `Stroke::auto()`, `none` as `Stroke::none()`
 pub struct SetCircle {
   priv node : SetNode
 }
@@ -11509,12 +9911,13 @@ pub struct SetCircle {
 #callsite(autofill(loc, args_loc))
 pub fn SetCircle::SetCircle(
   radius? : Length,
-  width? : @library.Smart[Length],
+  width? : Length,
   height? : Sizing,
-  fill? : Paint?,
-  stroke? : @library.Smart[Stroke?],
+  fill? : Paint,
+  stroke? : Stroke,
   inset? : Sides[Length],
   outset? : Sides[Length],
+  extra? : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> SetCircle {
@@ -11523,41 +9926,16 @@ pub fn SetCircle::SetCircle(
     args.push({ name: Some("radius"), value: ToValue::to_value(v), param: 0, })
   }
   if width is Some(v) {
-    args.push({
-      name: Some("width"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) => ToValue::to_value(x)
-      },
-      param: 1,
-    })
+    args.push({ name: Some("width"), value: ToValue::to_value(v), param: 1, })
   }
   if height is Some(v) {
     args.push({ name: Some("height"), value: ToValue::to_value(v), param: 2, })
   }
   if fill is Some(v) {
-    args.push({
-      name: Some("fill"),
-      value: match v {
-        None => Value::none()
-        Some(x) => ToValue::to_value(x)
-      },
-      param: 3,
-    })
+    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 3, })
   }
   if stroke is Some(v) {
-    args.push({
-      name: Some("stroke"),
-      value: match v {
-        Auto => Value::auto()
-        Custom(x) =>
-          match x {
-            None => Value::none()
-            Some(x) => ToValue::to_value(x)
-          }
-      },
-      param: 4,
-    })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 4, })
   }
   if inset is Some(v) {
     args.push({ name: Some("inset"), value: ToValue::to_value(v), param: 5, })
@@ -11565,6 +9943,7 @@ pub fn SetCircle::SetCircle(
   if outset is Some(v) {
     args.push({ name: Some("outset"), value: ToValue::to_value(v), param: 6, })
   }
+  push_extra(args, extra, 7)
   {
     node: {
       func: FElem(@library.circle_elem()),
@@ -11605,10 +9984,10 @@ pub fn CircleView::view(self : CircleView) -> ContentView {
 /// values (`circle.where(..)`).
 pub fn Select::circle(
   radius? : Length,
-  width? : @library.Smart[Length],
+  width? : Length,
   height? : Sizing,
-  fill? : Paint?,
-  stroke? : @library.Smart[Stroke?],
+  fill? : Paint,
+  stroke? : Stroke,
   inset? : Sides[Length],
   outset? : Sides[Length],
 ) -> Selector[CircleView] {
@@ -11617,44 +9996,16 @@ pub fn Select::circle(
     fields.push(("radius", ToValue::to_value(v)))
   }
   if width is Some(v) {
-    fields.push(
-      (
-        "width",
-        match v {
-          Auto => Value::auto()
-          Custom(x) => ToValue::to_value(x)
-        },
-      ),
-    )
+    fields.push(("width", ToValue::to_value(v)))
   }
   if height is Some(v) {
     fields.push(("height", ToValue::to_value(v)))
   }
   if fill is Some(v) {
-    fields.push(
-      (
-        "fill",
-        match v {
-          None => Value::none()
-          Some(x) => ToValue::to_value(x)
-        },
-      ),
-    )
+    fields.push(("fill", ToValue::to_value(v)))
   }
   if stroke is Some(v) {
-    fields.push(
-      (
-        "stroke",
-        match v {
-          Auto => Value::auto()
-          Custom(x) =>
-            match x {
-              None => Value::none()
-              Some(x) => ToValue::to_value(x)
-            }
-        },
-      ),
-    )
+    fields.push(("stroke", ToValue::to_value(v)))
   }
   if inset is Some(v) {
     fields.push(("inset", ToValue::to_value(v)))
@@ -11678,12 +10029,14 @@ pub struct Metadata {
 #callsite(autofill(loc, args_loc))
 pub fn Metadata::Metadata(
   value : Value,
+  extra? : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> Metadata {
   let args : Array[ArgNode] = []
   args.push({ name: None, value, param: 0, })
+  push_extra(args, extra, 1)
   {
     content: labelled_call(
       {
@@ -11692,7 +10045,7 @@ pub fn Metadata::Metadata(
         origin: Site::new("Metadata", loc, args_loc),
       },
       label,
-      1,
+      2,
     ),
   }
 }
@@ -11731,8 +10084,9 @@ pub fn Select::metadata() -> Selector[MetadataView] {
 }
 
 ///|
-/// The qualified Typst path and the element of each generated type.
-fn generated_elements() -> Array[(String, String, @library.Element)] {
+/// The generated element types: the name of each type, the qualified
+/// path of its Typst function and the engine element it constructs.
+pub fn generated_elements() -> Array[(String, String, @library.Element)] {
   [
     ("Heading", "heading", @library.heading_elem()),
     ("Par", "par", @library.par_elem()),

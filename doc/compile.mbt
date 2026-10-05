@@ -39,7 +39,7 @@ pub struct FileLocation {
   /// The path within the project or package, without a leading slash.
   path : String
   /// The package (`@namespace/name:version`), for package files.
-  package : String?
+  package_spec : String?
   /// The byte range in the file, if it could be resolved.
   range : (Int, Int)?
   /// One-based line and column of the start (0 if unknown).
@@ -63,8 +63,8 @@ pub fn Location::describe(self : Location) -> String {
   match self {
     Edsl(origin) => origin.describe()
     File(file) => {
-      let name = match file.package {
-        Some(package) => "\{package}/\{file.path}"
+      let name = match file.package_spec {
+        Some(spec) => "\{spec}/\{file.path}"
         None => file.path
       }
       if file.line > 0 {
@@ -156,8 +156,8 @@ fn Resolver::locate(self : Resolver, span : @syntax.DiagSpan) -> Location? {
     return Some(Edsl(origin))
   }
   guard span.id() is Some(id) else { return None }
-  let package = match id.root() {
-    Project => None
+  let package_spec = match id.root() {
+    Project => Option::None
     Package(spec) => Some("@\{spec.namespace}/\{spec.name}:\{spec.version}")
   }
   let path = id.vpath().get_without_slash()
@@ -198,7 +198,7 @@ fn Resolver::locate(self : Resolver, span : @syntax.DiagSpan) -> Location? {
       }
     _ => (0, 0)
   }
-  Some(File({ path, package, range, line, column, }))
+  Some(File({ path, package_spec, range, line, column, }))
 }
 
 ///|

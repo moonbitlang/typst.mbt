@@ -29,8 +29,6 @@ test "fingerprints distinguish elements with the same name" {
     let fa = Value::Func(Func::element(a))
     let fb = Value::Func(Func::element(b))
     assert_false(hash128(fa) == hash128(fb))
-    assert_false(values_validate_equal(fa, fb))
-    assert_true(values_validate_equal(fa, Value::Func(Func::element(a))))
     // The fingerprint is exact: no flag is needed.
     assert_eq(fingerprint_flags_in(() => SipHasher128::new().write(fa)), 0)
   }

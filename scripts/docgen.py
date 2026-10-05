@@ -14,7 +14,15 @@ Author-facing parameters are derived from the fields: required ones are
 positional, variadic ones an array, settable ones optional labelled
 parameters. The engine type of each field is mapped by `map_type`; fields
 whose type is not mapped yet are left out and listed in the coverage report
-(`doc/elements_coverage.txt`); they stay reachable through `Call`/`Set`.
+(`doc/elements_coverage.txt`); they stay reachable through the `extra`
+parameter of every constructor and through `Call`/`Set`.
+
+Plain values first (docs/edsl-design.md, section 6.1): the engine's
+`Smart<T>` and `Option<T>` layers are erased from the parameter types. The
+explicit `auto` and `none` states are cases of the facade enums (`Auto`,
+`None`), static constructors of the facade structs (`Stroke::none()`),
+`AutoValue()`/`NoneValue()` for content, and `extra` for scalars. The
+documentation of each constructor lists the states its fields accept.
 
 Storage metadata is not the constructor signature: an element with a
 `construct` hook, a `parse` hook on a field, an external field or an
@@ -55,7 +63,7 @@ KEYWORDS = {
     "var", "finally", "noasync", "end", "extend",
 }
 
-RESERVED_PARAMS = {"label", "loc", "args_loc"}
+RESERVED_PARAMS = {"label", "extra", "loc", "args_loc"}
 
 
 # --------------------------------------------------------------------------
@@ -118,7 +126,7 @@ LEAVES = {
     "OneOrMultiple<EcoString>": ("Array[String]", to_value),
     "FontWeight": ("FontWeight", to_value),
     "Dir": ("Dir", to_value),
-    "TextDir": ("@library.Smart[Dir]", to_value),
+    "TextDir": ("Dir", to_value),
     "Value": ("Value", lambda e: e),
     # String enums, written as in Typst.
     "FontStyle": ("String", lambda e: f"Value::str({e})"),
@@ -154,6 +162,38 @@ def split_generic(ty):
     return m.group(1), m.group(2)
 
 
+def states_of(ty):
+    """The explicit states (`auto`, `none`) an engine type accepts."""
+    states = []
+    while True:
+        g = split_generic(ty)
+        if g is None or g[0] not in ("Option", "Smart", "Arc", "Packed"):
+            break
+        if g[0] == "Smart" and "auto" not in states:
+            states.append("auto")
+        if g[0] == "Option" and "none" not in states:
+            states.append("none")
+        ty = g[1]
+    return states
+
+
+SCALARS = {"Bool", "Int64", "Double", "String", "Array[String]", "Array[Sizing]"}
+
+
+def state_spelling(mty, state):
+    """How an author writes the explicit state for a parameter type."""
+    if mty == "&IntoContent":
+        return "`AutoValue()`" if state == "auto" else "`NoneValue()`"
+    if mty in SCALARS or mty.startswith("("):
+        return f"`extra` with `Value::{state}()`"
+    if mty in ("Length", "Spacing", "Sizing", "Paint", "Alignment", "Dir"):
+        return "`Auto`" if state == "auto" else "`None`"
+    if mty in ("Value",):
+        return f"`Value::{state}()`"
+    base = mty.split("[")[0]
+    return f"`{base}::{state}()`"
+
+
 def is_value_type(mty):
     """Whether the mapped type implements `ToValue` (no trait objects)."""
     return "&" not in mty
@@ -169,36 +209,11 @@ def map_type(ty):
     outer, inner = g
     if outer in ("Arc", "Packed"):
         return map_type(inner)
-    if outer == "Option":
-        m = map_type(inner)
-        if m is None:
-            return None
-        mty, conv = m
-        return (
-            f"{mty}?",
-            lambda e: (
-                "match " + e + " {\n      None => Value::none()\n      Some(x) => "
-                + conv("x") + "\n    }"
-            ),
-        )
-    if outer == "Smart":
-        m = map_type(inner)
-        if m is None:
-            return None
-        mty, conv = m
-        return (
-            f"@library.Smart[{mty}]",
-            lambda e: (
-                "match " + e + " {\n      Auto => Value::auto()\n      Custom(x) => "
-                + conv("x") + "\n    }"
-            ),
-        )
+    if outer in ("Option", "Smart"):
+        # Plain values first: the layer is erased; the value family spells
+        # the explicit `none`/`auto` state (see `states_of`).
+        return map_type(inner)
     if outer in ("Sides", "Margin", "Corners"):
-        # The sides are optional arguments of the facade, which strips one
-        # `Option` layer of the element type.
-        g2 = split_generic(inner)
-        if g2 is not None and g2[0] == "Option":
-            inner = g2[1]
         m = map_type(inner)
         if m is None or not is_value_type(m[0]):
             return None
@@ -406,12 +421,29 @@ def method_name(name):
 
 
 class Param:
-    def __init__(self, field, kind, mty, conv):
+    def __init__(self, field, kind, mty, conv, ty=""):
         self.field = field      # Typst field name
         self.name = param_name(field)
         self.kind = kind        # "pos", "variadic", "named", "pos_opt"
         self.mty = mty
         self.conv = conv
+        self.ty = ty            # engine type
+
+
+def states_doc(params):
+    """Documentation lines: the explicit states the parameters accept."""
+    lines = []
+    for p in params:
+        if p.kind == "variadic":
+            continue
+        states = states_of(p.ty)
+        if not states:
+            continue
+        how = ", ".join(
+            f"`{s}` as {state_spelling(p.mty, s)}" for s in states
+        )
+        lines.append(f"- `{p.name}`: {how}")
+    return lines
 
 
 def params_of(spec, elem, coverage):
@@ -455,13 +487,13 @@ def params_of(spec, elem, coverage):
             m = map_type(ty)
             if m is None:
                 raise SystemExit(f"{spec.name}: required field {name} has unmapped type {ty}")
-            params.append(Param(name, "pos", m[0], m[1]))
+            params.append(Param(name, "pos", m[0], m[1], ty))
             continue
         m = map_type(ty)
         if m is None:
             coverage.append(f"{spec.path}.{name}: unmapped type {ty}")
             continue
-        params.append(Param(name, "pos_opt" if positional else "named", m[0], m[1]))
+        params.append(Param(name, "pos_opt" if positional else "named", m[0], m[1], ty))
     if needs_review and spec.review is None:
         raise SystemExit(
             f"{spec.name}: the constructor signature needs a reviewed note "
@@ -550,6 +582,11 @@ def emit_element(spec, out, coverage):
         if spec.review:
             out.append("///")
             out.append(doc_comment(spec.review))
+        states = states_doc(params)
+        if states:
+            out.append("///")
+            out.append("/// Explicit states besides a value:")
+            out.extend("/// " + line for line in states)
         out.append(f"pub struct {spec.name} {{\n  priv content : Content\n}}\n")
         out.append("///|")
         out.append("#callsite(autofill(loc, args_loc))")
@@ -558,6 +595,7 @@ def emit_element(spec, out, coverage):
             out.append(f"  {p.name} : {p.mty},")
         for p in optional:
             out.append(f"  {p.name}? : {p.mty},")
+        out.append("  extra? : Array[(String, Value)] = [],")
         out.append("  label? : String,")
         out.append("  loc~ : SourceLoc,")
         out.append("  args_loc~ : ArgsLoc,")
@@ -565,13 +603,14 @@ def emit_element(spec, out, coverage):
         lines = ["  let args : Array[ArgNode] = []"]
         push_args(lines, params)
         out.extend(lines)
+        out.append(f"  push_extra(args, extra, {len(ordered)})")
         out.append("  {")
         out.append("    content: labelled_call(")
         out.append(
             f'      {{ func: FElem({handle}), args, origin: Site::new("{spec.name}", loc, args_loc) }},'
         )
         out.append("      label,")
-        out.append(f"      {len(ordered)},")
+        out.append(f"      {len(ordered) + 1},")
         out.append("    ),")
         out.append("  }")
         out.append("}\n")
@@ -591,12 +630,18 @@ def emit_element(spec, out, coverage):
         sindex = {p.name: i for i, p in enumerate(settable)}
         out.append("///|")
         out.append(doc_comment(f"`set {title}(..)`."))
+        states = states_doc(settable)
+        if states:
+            out.append("///")
+            out.append("/// Explicit states besides a value:")
+            out.extend("/// " + line for line in states)
         out.append(f"pub struct {sname} {{\n  priv node : SetNode\n}}\n")
         out.append("///|")
         out.append("#callsite(autofill(loc, args_loc))")
         out.append(f"pub fn {sname}::{sname}(")
         for p in settable:
             out.append(f"  {p.name}? : {p.mty},")
+        out.append("  extra? : Array[(String, Value)] = [],")
         out.append("  loc~ : SourceLoc,")
         out.append("  args_loc~ : ArgsLoc,")
         out.append(f") -> {sname} {{")
@@ -610,6 +655,7 @@ def emit_element(spec, out, coverage):
                 f"    args.push({{ name: {name}, value: {p.conv('v')}, param: {i} }})"
             )
             out.append("  }")
+        out.append(f"  push_extra(args, extra, {len(settable)})")
         out.append(
             f'  {{ node: {{ func: FElem({handle}), args, origin: Site::new("{sname}", loc, args_loc) }} }}'
         )
@@ -689,8 +735,9 @@ def main():
     # The element table: qualified path and handle of every constructor
     # (checked against the library's scope by a test).
     out.append("///|")
-    out.append("/// The qualified Typst path and the element of each generated type.")
-    out.append("fn generated_elements() -> Array[(String, String, @library.Element)] {")
+    out.append("/// The generated element types: the name of each type, the qualified")
+    out.append("/// path of its Typst function and the engine element it constructs.")
+    out.append("pub fn generated_elements() -> Array[(String, String, @library.Element)] {")
     out.append("  [")
     for spec in ELEMENTS:
         elem = find_elem(spec)

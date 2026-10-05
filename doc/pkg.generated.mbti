@@ -11,6 +11,8 @@ import {
 }
 
 // Values
+pub fn generated_elements() -> Array[(String, String, @library.Element)]
+
 pub fn standard_library() -> @library.Library
 
 pub fn typst_fonts() -> Array[@library.Font]
@@ -26,7 +28,7 @@ pub struct Align {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn Align::Align(Alignment, &IntoContent, label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn Align::Align(Alignment, &IntoContent, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for Align
 
 pub struct AlignView {
@@ -37,6 +39,8 @@ pub fn AlignView::view(Self) -> ContentView
 pub impl IntoContent for AlignView
 
 pub(all) enum Alignment {
+  Auto
+  None
   Start
   Left
   Center
@@ -56,11 +60,17 @@ pub(all) enum Angle {
 }
 pub impl ToValue for Angle
 
+pub struct AutoValue {
+  // private fields
+}
+pub fn AutoValue::AutoValue() -> Self
+pub impl IntoContent for AutoValue
+
 pub struct Block {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn Block::Block(&IntoContent, width? : @library.Smart[Length], height? : Sizing, breakable? : Bool, fill? : Paint?, stroke? : Sides[Stroke?], radius? : Corners[Length], inset? : Sides[Length], outset? : Sides[Length], spacing? : @library.Smart[Spacing], above? : @library.Smart[Spacing], below? : @library.Smart[Spacing], clip? : Bool, sticky? : Bool, label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn Block::Block(&IntoContent, width? : Length, height? : Sizing, breakable? : Bool, fill? : Paint, stroke? : Sides[Stroke], radius? : Corners[Length], inset? : Sides[Length], outset? : Sides[Length], spacing? : Spacing, above? : Spacing, below? : Spacing, clip? : Bool, sticky? : Bool, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for Block
 
 pub struct BlockView {
@@ -73,7 +83,7 @@ pub struct Box {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn Box::Box(&IntoContent, width? : Sizing, height? : @library.Smart[Length], fill? : Paint?, stroke? : Sides[Stroke?], radius? : Corners[Length], inset? : Sides[Length], outset? : Sides[Length], clip? : Bool, label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn Box::Box(&IntoContent, width? : Sizing, height? : Length, fill? : Paint, stroke? : Sides[Stroke], radius? : Corners[Length], inset? : Sides[Length], outset? : Sides[Length], clip? : Bool, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for Box
 
 pub struct BoxView {
@@ -102,7 +112,7 @@ pub struct Circle {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn Circle::Circle(radius? : Length, width? : @library.Smart[Length], height? : Sizing, fill? : Paint?, stroke? : @library.Smart[Stroke?], inset? : Sides[Length], outset? : Sides[Length], body? : &IntoContent?, label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn Circle::Circle(radius? : Length, width? : Length, height? : Sizing, fill? : Paint, stroke? : Stroke, inset? : Sides[Length], outset? : Sides[Length], body? : &IntoContent, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for Circle
 
 pub struct CircleView {
@@ -115,7 +125,7 @@ pub struct Colbreak {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn Colbreak::Colbreak(weak? : Bool, label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn Colbreak::Colbreak(weak? : Bool, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for Colbreak
 
 pub struct ColbreakView {
@@ -128,7 +138,7 @@ pub struct Columns {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn Columns::Columns(&IntoContent, count? : Int64, gutter? : Length, balanced? : Bool, separator? : &IntoContent?, label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn Columns::Columns(&IntoContent, count? : Int64, gutter? : Length, balanced? : Bool, separator? : &IntoContent, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for Columns
 
 pub struct ColumnsView {
@@ -240,6 +250,7 @@ pub struct Diagnostic {
 pub fn Diagnostic::render(Self) -> String
 
 pub(all) enum Dir {
+  Auto
   Ltr
   Rtl
   Ttb
@@ -251,7 +262,7 @@ pub struct DocWorld {
   // private fields
 }
 pub fn DocWorld::in_memory(files? : Map[String, Bytes], fonts? : Array[Bytes], embedded_fonts? : Bool, today? : (Int, Int, Int)) -> Self
-pub fn DocWorld::new(load~ : (@syntax.FileId) -> Bytes raise @library.FileError, book~ : @library.FontBook, font~ : (Int) -> @library.Font?, today? : (@library.Duration?) -> @library.Datetime?, library? : @library.Library) -> Self
+pub fn DocWorld::new(load~ : (@syntax.FileId) -> Bytes raise @library.FileError, book~ : @library.FontBook, font~ : (Int) -> @library.Font?, today? : (@library.Duration?) -> @library.Datetime?) -> Self
 pub impl @library.World for DocWorld
 
 pub struct Document {
@@ -268,7 +279,7 @@ pub struct Ellipse {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn Ellipse::Ellipse(width? : @library.Smart[Length], height? : Sizing, fill? : Paint?, stroke? : @library.Smart[Stroke?], inset? : Sides[Length], outset? : Sides[Length], body? : &IntoContent?, label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn Ellipse::Ellipse(width? : Length, height? : Sizing, fill? : Paint, stroke? : Stroke, inset? : Sides[Length], outset? : Sides[Length], body? : &IntoContent, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for Ellipse
 
 pub struct EllipseView {
@@ -281,7 +292,7 @@ pub struct Emph {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn Emph::Emph(&IntoContent, label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn Emph::Emph(&IntoContent, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for Emph
 
 pub struct EmphView {
@@ -295,14 +306,14 @@ pub struct Enum {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn Enum::Enum(Array[&IntoContent], tight? : Bool, numbering? : Numbering, start? : @library.Smart[Int64], full? : Bool, reversed? : Bool, indent? : Length, body_indent? : Length, spacing? : @library.Smart[Length], number_align? : Alignment, label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn Enum::Enum(Array[&IntoContent], tight? : Bool, numbering? : Numbering, start? : Int64, full? : Bool, reversed? : Bool, indent? : Length, body_indent? : Length, spacing? : Length, number_align? : Alignment, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for Enum
 
 pub struct EnumItem {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn EnumItem::EnumItem(&IntoContent, number? : @library.Smart[Int64], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn EnumItem::EnumItem(&IntoContent, number? : Int64, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for EnumItem
 
 pub struct EnumItemView {
@@ -322,7 +333,7 @@ pub struct Equation {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn Equation::Equation(String, block? : Bool, numbering? : Numbering?, number_align? : Alignment, supplement? : @library.Smart[Supplement?], alt? : String?, scope? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn Equation::Equation(String, block? : Bool, numbering? : Numbering, number_align? : Alignment, supplement? : Supplement, alt? : String, scope? : Array[(String, Value)], extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for Equation
 
 pub struct ExportReport[T] {
@@ -338,7 +349,7 @@ pub struct Figure {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn Figure::Figure(&IntoContent, alt? : String?, placement? : @library.Smart[Alignment]?, scope? : String, caption? : &IntoContent?, supplement? : @library.Smart[Supplement?], numbering? : Numbering?, gap? : Length, outlined? : Bool, label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn Figure::Figure(&IntoContent, alt? : String, placement? : Alignment, scope? : String, caption? : &IntoContent, supplement? : Supplement, numbering? : Numbering, gap? : Length, outlined? : Bool, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for Figure
 
 pub struct FigureView {
@@ -350,7 +361,7 @@ pub impl IntoContent for FigureView
 
 pub struct FileLocation {
   path : String
-  package : String?
+  package_spec : String?
   range : (Int, Int)?
   line : Int
   column : Int
@@ -374,7 +385,7 @@ pub struct Footnote {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn Footnote::Footnote(&IntoContent, numbering? : Numbering, label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn Footnote::Footnote(&IntoContent, numbering? : Numbering, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for Footnote
 
 pub struct FootnoteView {
@@ -387,14 +398,14 @@ pub struct Grid {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn Grid::Grid(Array[&IntoContent], columns? : Array[Sizing], rows? : Array[Sizing], gutter? : Array[Sizing], column_gutter? : Array[Sizing], row_gutter? : Array[Sizing], inset? : Cells[Sides[Length]], align? : Cells[@library.Smart[Alignment]], fill? : Cells[Paint?], stroke? : Cells[Sides[Stroke?]], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn Grid::Grid(Array[&IntoContent], columns? : Array[Sizing], rows? : Array[Sizing], gutter? : Array[Sizing], column_gutter? : Array[Sizing], row_gutter? : Array[Sizing], inset? : Cells[Sides[Length]], align? : Cells[Alignment], fill? : Cells[Paint], stroke? : Cells[Sides[Stroke]], extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for Grid
 
 pub struct GridCell {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn GridCell::GridCell(&IntoContent, x? : @library.Smart[Int64], y? : @library.Smart[Int64], colspan? : Int64, rowspan? : Int64, inset? : @library.Smart[Sides[Length]], align? : @library.Smart[Alignment], fill? : @library.Smart[Paint?], stroke? : Sides[Stroke?], breakable? : @library.Smart[Bool], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn GridCell::GridCell(&IntoContent, x? : Int64, y? : Int64, colspan? : Int64, rowspan? : Int64, inset? : Sides[Length], align? : Alignment, fill? : Paint, stroke? : Sides[Stroke], breakable? : Bool, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for GridCell
 
 pub struct GridCellView {
@@ -408,7 +419,7 @@ pub struct GridFooter {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn GridFooter::GridFooter(Array[&IntoContent], repeat? : Bool, label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn GridFooter::GridFooter(Array[&IntoContent], repeat? : Bool, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for GridFooter
 
 pub struct GridFooterView {
@@ -421,7 +432,7 @@ pub struct GridHeader {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn GridHeader::GridHeader(Array[&IntoContent], repeat? : Bool, level? : Int64, label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn GridHeader::GridHeader(Array[&IntoContent], repeat? : Bool, level? : Int64, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for GridHeader
 
 pub struct GridHeaderView {
@@ -434,7 +445,7 @@ pub struct GridHline {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn GridHline::GridHline(y? : @library.Smart[Int64], start? : Int64, end_? : Int64?, stroke? : Stroke?, position? : Alignment, label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn GridHline::GridHline(y? : Int64, start? : Int64, end_? : Int64, stroke? : Stroke, position? : Alignment, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for GridHline
 
 pub struct GridHlineView {
@@ -453,7 +464,7 @@ pub struct GridVline {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn GridVline::GridVline(x? : @library.Smart[Int64], start? : Int64, end_? : Int64?, stroke? : Stroke?, position? : Alignment, label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn GridVline::GridVline(x? : Int64, start? : Int64, end_? : Int64, stroke? : Stroke, position? : Alignment, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for GridVline
 
 pub struct GridVlineView {
@@ -466,7 +477,7 @@ pub struct H {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn H::H(Spacing, weak? : Bool, label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn H::H(Spacing, weak? : Bool, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for H
 
 pub struct HView {
@@ -479,7 +490,7 @@ pub struct Heading {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn Heading::Heading(&IntoContent, level? : @library.Smart[Int64], depth? : Int64, offset? : Int64, numbering? : Numbering?, supplement? : @library.Smart[Supplement?], outlined? : Bool, bookmarked? : @library.Smart[Bool], hanging_indent? : @library.Smart[Length], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn Heading::Heading(&IntoContent, level? : Int64, depth? : Int64, offset? : Int64, numbering? : Numbering, supplement? : Supplement, outlined? : Bool, bookmarked? : Bool, hanging_indent? : Length, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for Heading
 
 pub struct HeadingView {
@@ -493,7 +504,7 @@ pub struct Hide {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn Hide::Hide(&IntoContent, label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn Hide::Hide(&IntoContent, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for Hide
 
 pub struct HideView {
@@ -507,7 +518,7 @@ pub struct Highlight {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn Highlight::Highlight(&IntoContent, fill? : Paint?, stroke? : Sides[Stroke?], extent? : Length, radius? : Corners[Length], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn Highlight::Highlight(&IntoContent, fill? : Paint, stroke? : Sides[Stroke], extent? : Length, radius? : Corners[Length], extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for Highlight
 
 pub struct HighlightView {
@@ -526,7 +537,7 @@ pub struct Image {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn Image::Image(&IntoSource, format? : @library.Smart[String], width? : @library.Smart[Length], height? : Sizing, alt? : String?, page? : Int64, fit? : String, scaling? : @library.Smart[String], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn Image::Image(&IntoSource, format? : String, width? : Length, height? : Sizing, alt? : String, page? : Int64, fit? : String, scaling? : String, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for Image
 
 pub struct ImageView {
@@ -549,6 +560,8 @@ pub fn Labelled::Labelled(&IntoContent, String, loc~ : SourceLoc, args_loc~ : Ar
 pub impl IntoContent for Labelled
 
 pub(all) enum Length {
+  Auto
+  None
   Pt(Double)
   Mm(Double)
   Cm(Double)
@@ -570,7 +583,7 @@ pub struct Line {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn Line::Line(start? : (Length, Length), end_? : (Length, Length)?, length? : Length, angle? : Angle, stroke? : Stroke, label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn Line::Line(start? : (Length, Length), end_? : (Length, Length), length? : Length, angle? : Angle, stroke? : Stroke, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for Line
 
 pub struct LineView {
@@ -583,7 +596,7 @@ pub struct Linebreak {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn Linebreak::Linebreak(justify? : Bool, label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn Linebreak::Linebreak(justify? : Bool, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for Linebreak
 
 pub struct LinebreakView {
@@ -596,7 +609,7 @@ pub struct Link {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn Link::Link(LinkTarget, body? : &IntoContent, label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn Link::Link(LinkTarget, body? : &IntoContent, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for Link
 
 pub(all) enum LinkTarget {
@@ -616,14 +629,14 @@ pub struct List {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn List::List(Array[&IntoContent], tight? : Bool, marker? : &IntoContent, indent? : Length, body_indent? : Length, spacing? : @library.Smart[Length], marker_align? : Alignment, label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn List::List(Array[&IntoContent], tight? : Bool, marker? : &IntoContent, indent? : Length, body_indent? : Length, spacing? : Length, marker_align? : Alignment, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for List
 
 pub struct ListItem {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn ListItem::ListItem(&IntoContent, label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn ListItem::ListItem(&IntoContent, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for ListItem
 
 pub struct ListItemView {
@@ -663,7 +676,7 @@ pub struct Metadata {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn Metadata::Metadata(Value, label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn Metadata::Metadata(Value, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for Metadata
 
 pub struct MetadataView {
@@ -676,7 +689,7 @@ pub struct Move {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn Move::Move(&IntoContent, dx? : Length, dy? : Length, label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn Move::Move(&IntoContent, dx? : Length, dy? : Length, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for Move
 
 pub struct MoveView {
@@ -686,12 +699,19 @@ pub fn MoveView::body(Self) -> ContentView raise @library.HintedError
 pub fn MoveView::view(Self) -> ContentView
 pub impl IntoContent for MoveView
 
+pub struct NoneValue {
+  // private fields
+}
+pub fn NoneValue::NoneValue() -> Self
+pub impl IntoContent for NoneValue
+
 pub struct Numbering {
   // private fields
 }
 pub fn Numbering::Numbering(String) -> Self
 #callsite(autofill(args_loc, loc))
 pub fn Numbering::func(loc~ : SourceLoc, args_loc~ : ArgsLoc, (Array[Int64], Ctx) -> &IntoContent raise) -> Self
+pub fn Numbering::none() -> Self
 pub impl ToValue for Numbering
 
 pub struct Origin {
@@ -723,7 +743,7 @@ pub struct Outline {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn Outline::Outline(title? : @library.Smart[&IntoContent?], depth? : Int64?, label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn Outline::Outline(title? : &IntoContent, depth? : Int64, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for Outline
 
 pub struct OutlineView {
@@ -736,7 +756,7 @@ pub struct Overline {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn Overline::Overline(&IntoContent, stroke? : @library.Smart[Stroke], offset? : @library.Smart[Length], extent? : Length, evade? : Bool, background? : Bool, label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn Overline::Overline(&IntoContent, stroke? : Stroke, offset? : Length, extent? : Length, evade? : Bool, background? : Bool, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for Overline
 
 pub struct OverlineView {
@@ -750,7 +770,7 @@ pub struct Pad {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn Pad::Pad(&IntoContent, left? : Length, top? : Length, right? : Length, bottom? : Length, x? : Length, y? : Length, rest? : Length, label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn Pad::Pad(&IntoContent, left? : Length, top? : Length, right? : Length, bottom? : Length, x? : Length, y? : Length, rest? : Length, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for Pad
 
 pub struct PadView {
@@ -764,7 +784,7 @@ pub struct Page {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn Page::Page(&IntoContent, paper? : String, width? : @library.Smart[Length], height? : @library.Smart[Length], flipped? : Bool, margin? : @library.Smart[Sides[@library.Smart[Length]]], bleed? : Sides[Length], columns? : Int64, fill? : @library.Smart[Paint?], numbering? : Numbering?, supplement? : @library.Smart[&IntoContent?], number_align? : Alignment, header? : @library.Smart[&IntoContent?], header_ascent? : Length, footer? : @library.Smart[&IntoContent?], footer_descent? : Length, background? : &IntoContent?, foreground? : &IntoContent?, label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn Page::Page(&IntoContent, paper? : String, width? : Length, height? : Length, flipped? : Bool, margin? : Sides[Length], bleed? : Sides[Length], columns? : Int64, fill? : Paint, numbering? : Numbering, supplement? : &IntoContent, number_align? : Alignment, header? : &IntoContent, header_ascent? : Length, footer? : &IntoContent, footer_descent? : Length, background? : &IntoContent, foreground? : &IntoContent, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for Page
 
 pub struct PageView {
@@ -778,7 +798,7 @@ pub struct Pagebreak {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn Pagebreak::Pagebreak(weak? : Bool, to? : String?, label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn Pagebreak::Pagebreak(weak? : Bool, to? : String, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for Pagebreak
 
 pub struct PagebreakView {
@@ -788,6 +808,8 @@ pub fn PagebreakView::view(Self) -> ContentView
 pub impl IntoContent for PagebreakView
 
 pub(all) enum Paint {
+  Auto
+  None
   Rgb(String)
   Luma(Int)
   Black
@@ -810,13 +832,17 @@ pub(all) enum Paint {
   Lime
   Value(Value)
 }
+pub fn Paint::conic(Array[Self], angle? : Angle, center? : (Length, Length), relative? : String) -> Self
+pub fn Paint::linear(Array[Self], angle? : Angle, dir? : Dir, relative? : String) -> Self
+pub fn Paint::radial(Array[Self], center? : (Length, Length), radius? : Length, focal_center? : (Length, Length), focal_radius? : Length, relative? : String) -> Self
+pub fn Paint::stop(Self, Length) -> Self
 pub impl ToValue for Paint
 
 pub struct Par {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn Par::Par(&IntoContent, leading? : Length, spacing? : Length, justify? : Bool, linebreaks? : @library.Smart[String], hanging_indent? : Length, label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn Par::Par(&IntoContent, leading? : Length, spacing? : Length, justify? : Bool, linebreaks? : String, hanging_indent? : Length, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for Par
 
 pub struct ParView {
@@ -830,7 +856,7 @@ pub struct Parbreak {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn Parbreak::Parbreak(label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn Parbreak::Parbreak(extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for Parbreak
 
 pub struct ParbreakView {
@@ -843,7 +869,7 @@ pub struct Place {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn Place::Place(&IntoContent, alignment? : @library.Smart[Alignment], scope? : String, float? : Bool, clearance? : Length, dx? : Length, dy? : Length, label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn Place::Place(&IntoContent, alignment? : Alignment, scope? : String, float? : Bool, clearance? : Length, dx? : Length, dy? : Length, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for Place
 
 pub struct PlaceView {
@@ -857,7 +883,7 @@ pub struct Quote {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn Quote::Quote(&IntoContent, block? : Bool, quotes? : @library.Smart[Bool], attribution? : &IntoContent?, label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn Quote::Quote(&IntoContent, block? : Bool, quotes? : Bool, attribution? : &IntoContent, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for Quote
 
 pub struct QuoteView {
@@ -871,7 +897,7 @@ pub struct Raw {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn Raw::Raw(String, block? : Bool, lang? : String?, align? : Alignment, tab_size? : Int64, label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn Raw::Raw(String, block? : Bool, lang? : String, align? : Alignment, tab_size? : Int64, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for Raw
 
 pub struct RawView {
@@ -884,7 +910,7 @@ pub struct Rect {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn Rect::Rect(width? : @library.Smart[Length], height? : Sizing, fill? : Paint?, stroke? : @library.Smart[Sides[Stroke?]], radius? : Corners[Length], inset? : Sides[Length], outset? : Sides[Length], body? : &IntoContent?, label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn Rect::Rect(width? : Length, height? : Sizing, fill? : Paint, stroke? : Sides[Stroke], radius? : Corners[Length], inset? : Sides[Length], outset? : Sides[Length], body? : &IntoContent, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for Rect
 
 pub struct RectView {
@@ -897,7 +923,7 @@ pub struct Ref {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn Ref::Ref(String, supplement? : @library.Smart[Supplement?], form? : String, label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn Ref::Ref(String, supplement? : Supplement, form? : String, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for Ref
 
 pub struct RefView {
@@ -910,7 +936,7 @@ pub struct Repeat {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn Repeat::Repeat(&IntoContent, gap? : Length, justify? : Bool, label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn Repeat::Repeat(&IntoContent, gap? : Length, justify? : Bool, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for Repeat
 
 pub struct RepeatView {
@@ -924,7 +950,7 @@ pub struct Rotate {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn Rotate::Rotate(&IntoContent, angle? : Angle, origin? : Alignment, reflow? : Bool, label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn Rotate::Rotate(&IntoContent, angle? : Angle, origin? : Alignment, reflow? : Bool, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for Rotate
 
 pub struct RotateView {
@@ -937,72 +963,72 @@ pub impl IntoContent for RotateView
 pub struct Select {
 }
 pub fn Select::align() -> Selector[AlignView]
-pub fn Select::block(width? : @library.Smart[Length], height? : Sizing, breakable? : Bool, fill? : Paint?, stroke? : Sides[Stroke?], radius? : Corners[Length], inset? : Sides[Length], outset? : Sides[Length], spacing? : @library.Smart[Spacing], above? : @library.Smart[Spacing], below? : @library.Smart[Spacing], clip? : Bool, sticky? : Bool) -> Selector[BlockView]
-pub fn Select::box(width? : Sizing, height? : @library.Smart[Length], fill? : Paint?, stroke? : Sides[Stroke?], radius? : Corners[Length], inset? : Sides[Length], outset? : Sides[Length], clip? : Bool) -> Selector[BoxView]
-pub fn Select::circle(radius? : Length, width? : @library.Smart[Length], height? : Sizing, fill? : Paint?, stroke? : @library.Smart[Stroke?], inset? : Sides[Length], outset? : Sides[Length]) -> Selector[CircleView]
+pub fn Select::block(width? : Length, height? : Sizing, breakable? : Bool, fill? : Paint, stroke? : Sides[Stroke], radius? : Corners[Length], inset? : Sides[Length], outset? : Sides[Length], spacing? : Spacing, above? : Spacing, below? : Spacing, clip? : Bool, sticky? : Bool) -> Selector[BlockView]
+pub fn Select::box(width? : Sizing, height? : Length, fill? : Paint, stroke? : Sides[Stroke], radius? : Corners[Length], inset? : Sides[Length], outset? : Sides[Length], clip? : Bool) -> Selector[BoxView]
+pub fn Select::circle(radius? : Length, width? : Length, height? : Sizing, fill? : Paint, stroke? : Stroke, inset? : Sides[Length], outset? : Sides[Length]) -> Selector[CircleView]
 pub fn Select::colbreak(weak? : Bool) -> Selector[ColbreakView]
 pub fn Select::columns(gutter? : Length, balanced? : Bool) -> Selector[ColumnsView]
 pub fn Select::elem(String, where_? : Array[(String, Value)]) -> Selector[ContentView]
-pub fn Select::ellipse(width? : @library.Smart[Length], height? : Sizing, fill? : Paint?, stroke? : @library.Smart[Stroke?], inset? : Sides[Length], outset? : Sides[Length]) -> Selector[EllipseView]
+pub fn Select::ellipse(width? : Length, height? : Sizing, fill? : Paint, stroke? : Stroke, inset? : Sides[Length], outset? : Sides[Length]) -> Selector[EllipseView]
 pub fn Select::emph() -> Selector[EmphView]
-pub fn Select::enum_(tight? : Bool, numbering? : Numbering, start? : @library.Smart[Int64], full? : Bool, reversed? : Bool, indent? : Length, body_indent? : Length, spacing? : @library.Smart[Length], number_align? : Alignment) -> Selector[EnumView]
+pub fn Select::enum_(tight? : Bool, numbering? : Numbering, start? : Int64, full? : Bool, reversed? : Bool, indent? : Length, body_indent? : Length, spacing? : Length, number_align? : Alignment) -> Selector[EnumView]
 pub fn Select::enum_item() -> Selector[EnumItemView]
-pub fn Select::figure(alt? : String?, placement? : @library.Smart[Alignment]?, scope? : String, supplement? : @library.Smart[Supplement?], numbering? : Numbering?, gap? : Length, outlined? : Bool) -> Selector[FigureView]
+pub fn Select::figure(alt? : String, placement? : Alignment, scope? : String, supplement? : Supplement, numbering? : Numbering, gap? : Length, outlined? : Bool) -> Selector[FigureView]
 pub fn Select::footnote(numbering? : Numbering) -> Selector[FootnoteView]
 pub fn Select::grid(columns? : Array[Sizing], rows? : Array[Sizing], gutter? : Array[Sizing], column_gutter? : Array[Sizing], row_gutter? : Array[Sizing]) -> Selector[GridView]
-pub fn Select::grid_cell(x? : @library.Smart[Int64], y? : @library.Smart[Int64], colspan? : Int64, rowspan? : Int64, inset? : @library.Smart[Sides[Length]], align? : @library.Smart[Alignment], fill? : @library.Smart[Paint?], stroke? : Sides[Stroke?], breakable? : @library.Smart[Bool]) -> Selector[GridCellView]
+pub fn Select::grid_cell(x? : Int64, y? : Int64, colspan? : Int64, rowspan? : Int64, inset? : Sides[Length], align? : Alignment, fill? : Paint, stroke? : Sides[Stroke], breakable? : Bool) -> Selector[GridCellView]
 pub fn Select::grid_footer(repeat? : Bool) -> Selector[GridFooterView]
 pub fn Select::grid_header(repeat? : Bool, level? : Int64) -> Selector[GridHeaderView]
-pub fn Select::grid_hline(y? : @library.Smart[Int64], start? : Int64, end_? : Int64?, stroke? : Stroke?, position? : Alignment) -> Selector[GridHlineView]
-pub fn Select::grid_vline(x? : @library.Smart[Int64], start? : Int64, end_? : Int64?, stroke? : Stroke?, position? : Alignment) -> Selector[GridVlineView]
+pub fn Select::grid_hline(y? : Int64, start? : Int64, end_? : Int64, stroke? : Stroke, position? : Alignment) -> Selector[GridHlineView]
+pub fn Select::grid_vline(x? : Int64, start? : Int64, end_? : Int64, stroke? : Stroke, position? : Alignment) -> Selector[GridVlineView]
 pub fn Select::h(weak? : Bool) -> Selector[HView]
-pub fn Select::heading(level? : @library.Smart[Int64], depth? : Int64, offset? : Int64, numbering? : Numbering?, supplement? : @library.Smart[Supplement?], outlined? : Bool, bookmarked? : @library.Smart[Bool], hanging_indent? : @library.Smart[Length]) -> Selector[HeadingView]
+pub fn Select::heading(level? : Int64, depth? : Int64, offset? : Int64, numbering? : Numbering, supplement? : Supplement, outlined? : Bool, bookmarked? : Bool, hanging_indent? : Length) -> Selector[HeadingView]
 pub fn Select::hide() -> Selector[HideView]
-pub fn Select::highlight(fill? : Paint?, stroke? : Sides[Stroke?], extent? : Length, radius? : Corners[Length]) -> Selector[HighlightView]
-pub fn Select::image(format? : @library.Smart[String], width? : @library.Smart[Length], height? : Sizing, alt? : String?, page? : Int64, fit? : String, scaling? : @library.Smart[String]) -> Selector[ImageView]
+pub fn Select::highlight(fill? : Paint, stroke? : Sides[Stroke], extent? : Length, radius? : Corners[Length]) -> Selector[HighlightView]
+pub fn Select::image(format? : String, width? : Length, height? : Sizing, alt? : String, page? : Int64, fit? : String, scaling? : String) -> Selector[ImageView]
 pub fn Select::label(String) -> Selector[ContentView]
-pub fn Select::line(start? : (Length, Length), end_? : (Length, Length)?, length? : Length, angle? : Angle, stroke? : Stroke) -> Selector[LineView]
+pub fn Select::line(start? : (Length, Length), end_? : (Length, Length), length? : Length, angle? : Angle, stroke? : Stroke) -> Selector[LineView]
 pub fn Select::linebreak(justify? : Bool) -> Selector[LinebreakView]
 pub fn Select::link() -> Selector[LinkView]
-pub fn Select::list(tight? : Bool, indent? : Length, body_indent? : Length, spacing? : @library.Smart[Length], marker_align? : Alignment) -> Selector[ListView]
+pub fn Select::list(tight? : Bool, indent? : Length, body_indent? : Length, spacing? : Length, marker_align? : Alignment) -> Selector[ListView]
 pub fn Select::list_item() -> Selector[ListItemView]
 pub fn Select::literal(String) -> Selector[ContentView]
 pub fn Select::metadata() -> Selector[MetadataView]
 pub fn Select::move_(dx? : Length, dy? : Length) -> Selector[MoveView]
-pub fn Select::outline(depth? : Int64?) -> Selector[OutlineView]
-pub fn Select::overline(stroke? : @library.Smart[Stroke], offset? : @library.Smart[Length], extent? : Length, evade? : Bool, background? : Bool) -> Selector[OverlineView]
+pub fn Select::outline(depth? : Int64) -> Selector[OutlineView]
+pub fn Select::overline(stroke? : Stroke, offset? : Length, extent? : Length, evade? : Bool, background? : Bool) -> Selector[OverlineView]
 pub fn Select::pad(left? : Length, top? : Length, right? : Length, bottom? : Length, x? : Length, y? : Length, rest? : Length) -> Selector[PadView]
-pub fn Select::page(paper? : String, width? : @library.Smart[Length], height? : @library.Smart[Length], flipped? : Bool, margin? : @library.Smart[Sides[@library.Smart[Length]]], bleed? : Sides[Length], columns? : Int64, fill? : @library.Smart[Paint?], numbering? : Numbering?, number_align? : Alignment, header_ascent? : Length, footer_descent? : Length) -> Selector[PageView]
-pub fn Select::pagebreak(weak? : Bool, to? : String?) -> Selector[PagebreakView]
-pub fn Select::par(leading? : Length, spacing? : Length, justify? : Bool, linebreaks? : @library.Smart[String], hanging_indent? : Length) -> Selector[ParView]
+pub fn Select::page(paper? : String, width? : Length, height? : Length, flipped? : Bool, margin? : Sides[Length], bleed? : Sides[Length], columns? : Int64, fill? : Paint, numbering? : Numbering, number_align? : Alignment, header_ascent? : Length, footer_descent? : Length) -> Selector[PageView]
+pub fn Select::pagebreak(weak? : Bool, to? : String) -> Selector[PagebreakView]
+pub fn Select::par(leading? : Length, spacing? : Length, justify? : Bool, linebreaks? : String, hanging_indent? : Length) -> Selector[ParView]
 pub fn Select::parbreak() -> Selector[ParbreakView]
 pub fn Select::place(scope? : String, float? : Bool, clearance? : Length, dx? : Length, dy? : Length) -> Selector[PlaceView]
-pub fn Select::quote(block? : Bool, quotes? : @library.Smart[Bool]) -> Selector[QuoteView]
-pub fn Select::raw(block? : Bool, lang? : String?, align? : Alignment, tab_size? : Int64) -> Selector[RawView]
-pub fn Select::rect(width? : @library.Smart[Length], height? : Sizing, fill? : Paint?, stroke? : @library.Smart[Sides[Stroke?]], radius? : Corners[Length], inset? : Sides[Length], outset? : Sides[Length]) -> Selector[RectView]
-pub fn Select::ref_(supplement? : @library.Smart[Supplement?], form? : String) -> Selector[RefView]
+pub fn Select::quote(block? : Bool, quotes? : Bool) -> Selector[QuoteView]
+pub fn Select::raw(block? : Bool, lang? : String, align? : Alignment, tab_size? : Int64) -> Selector[RawView]
+pub fn Select::rect(width? : Length, height? : Sizing, fill? : Paint, stroke? : Sides[Stroke], radius? : Corners[Length], inset? : Sides[Length], outset? : Sides[Length]) -> Selector[RectView]
+pub fn Select::ref_(supplement? : Supplement, form? : String) -> Selector[RefView]
 pub fn Select::regex(String) -> Selector[ContentView]
 pub fn Select::repeat(gap? : Length, justify? : Bool) -> Selector[RepeatView]
 pub fn Select::rotate(origin? : Alignment, reflow? : Bool) -> Selector[RotateView]
 pub fn Select::smallcaps(all? : Bool) -> Selector[SmallcapsView]
 pub fn Select::smartquote(double? : Bool, enabled? : Bool, alternative? : Bool) -> Selector[SmartquoteView]
-pub fn Select::square(size? : @library.Smart[Length], width? : @library.Smart[Length], height? : Sizing, fill? : Paint?, stroke? : @library.Smart[Sides[Stroke?]], radius? : Corners[Length], inset? : Sides[Length], outset? : Sides[Length]) -> Selector[SquareView]
-pub fn Select::stack(dir? : Dir, spacing? : Spacing?) -> Selector[StackView]
-pub fn Select::strike(stroke? : @library.Smart[Stroke], offset? : @library.Smart[Length], extent? : Length, background? : Bool) -> Selector[StrikeView]
+pub fn Select::square(size? : Length, width? : Length, height? : Sizing, fill? : Paint, stroke? : Sides[Stroke], radius? : Corners[Length], inset? : Sides[Length], outset? : Sides[Length]) -> Selector[SquareView]
+pub fn Select::stack(dir? : Dir, spacing? : Spacing) -> Selector[StackView]
+pub fn Select::strike(stroke? : Stroke, offset? : Length, extent? : Length, background? : Bool) -> Selector[StrikeView]
 pub fn Select::strong(delta? : Int64) -> Selector[StrongView]
-pub fn Select::sub(typographic? : Bool, baseline? : @library.Smart[Length], size? : @library.Smart[Length]) -> Selector[SubView]
-pub fn Select::super_(typographic? : Bool, baseline? : @library.Smart[Length], size? : @library.Smart[Length]) -> Selector[SuperView]
+pub fn Select::sub(typographic? : Bool, baseline? : Length, size? : Length) -> Selector[SubView]
+pub fn Select::super_(typographic? : Bool, baseline? : Length, size? : Length) -> Selector[SuperView]
 pub fn Select::table(columns? : Array[Sizing], rows? : Array[Sizing], gutter? : Array[Sizing], column_gutter? : Array[Sizing], row_gutter? : Array[Sizing]) -> Selector[TableView]
-pub fn Select::table_cell(x? : @library.Smart[Int64], y? : @library.Smart[Int64], colspan? : Int64, rowspan? : Int64, inset? : @library.Smart[Sides[Length]], align? : @library.Smart[Alignment], fill? : @library.Smart[Paint?], stroke? : Sides[Stroke?], breakable? : @library.Smart[Bool]) -> Selector[TableCellView]
+pub fn Select::table_cell(x? : Int64, y? : Int64, colspan? : Int64, rowspan? : Int64, inset? : Sides[Length], align? : Alignment, fill? : Paint, stroke? : Sides[Stroke], breakable? : Bool) -> Selector[TableCellView]
 pub fn Select::table_footer(repeat? : Bool) -> Selector[TableFooterView]
 pub fn Select::table_header(repeat? : Bool, level? : Int64) -> Selector[TableHeaderView]
-pub fn Select::table_hline(y? : @library.Smart[Int64], start? : Int64, end_? : Int64?, stroke? : Stroke?, position? : Alignment) -> Selector[TableHlineView]
-pub fn Select::table_vline(x? : @library.Smart[Int64], start? : Int64, end_? : Int64?, stroke? : Stroke?, position? : Alignment) -> Selector[TableVlineView]
-pub fn Select::terms(tight? : Bool, indent? : Length, hanging_indent? : Length, spacing? : @library.Smart[Length]) -> Selector[TermsView]
+pub fn Select::table_hline(y? : Int64, start? : Int64, end_? : Int64, stroke? : Stroke, position? : Alignment) -> Selector[TableHlineView]
+pub fn Select::table_vline(x? : Int64, start? : Int64, end_? : Int64, stroke? : Stroke, position? : Alignment) -> Selector[TableVlineView]
+pub fn Select::terms(tight? : Bool, indent? : Length, hanging_indent? : Length, spacing? : Length) -> Selector[TermsView]
 pub fn Select::terms_item() -> Selector[TermsItemView]
-pub fn Select::text(font? : Array[String], fallback? : Bool, style? : String, weight? : FontWeight, size? : Length, fill? : Paint, stroke? : Stroke?, tracking? : Length, spacing? : Length, baseline? : Length, overhang? : Bool, lang? : String, region? : String?, dir? : @library.Smart[Dir], hyphenate? : @library.Smart[Bool], kerning? : Bool, ligatures? : Bool, discretionary_ligatures? : Bool, historical_ligatures? : Bool, number_type? : @library.Smart[String], number_width? : @library.Smart[String], slashed_zero? : Bool, fractions? : Bool) -> Selector[TextView]
+pub fn Select::text(font? : Array[String], fallback? : Bool, style? : String, weight? : FontWeight, size? : Length, fill? : Paint, stroke? : Stroke, tracking? : Length, spacing? : Length, baseline? : Length, overhang? : Bool, lang? : String, region? : String, dir? : Dir, hyphenate? : Bool, kerning? : Bool, ligatures? : Bool, discretionary_ligatures? : Bool, historical_ligatures? : Bool, number_type? : String, number_width? : String, slashed_zero? : Bool, fractions? : Bool) -> Selector[TextView]
 pub fn Select::title() -> Selector[TitleView]
-pub fn Select::underline(stroke? : @library.Smart[Stroke], offset? : @library.Smart[Length], extent? : Length, evade? : Bool, background? : Bool) -> Selector[UnderlineView]
+pub fn Select::underline(stroke? : Stroke, offset? : Length, extent? : Length, evade? : Bool, background? : Bool) -> Selector[UnderlineView]
 pub fn Select::v(weak? : Bool) -> Selector[VView]
 
 pub struct Selector[W] {
@@ -1033,7 +1059,7 @@ pub struct SetAlign {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetAlign::SetAlign(alignment? : Alignment, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetAlign::SetAlign(alignment? : Alignment, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetAlign
 pub impl SetRule for SetAlign
 
@@ -1041,7 +1067,7 @@ pub struct SetBlock {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetBlock::SetBlock(width? : @library.Smart[Length], height? : Sizing, breakable? : Bool, fill? : Paint?, stroke? : Sides[Stroke?], radius? : Corners[Length], inset? : Sides[Length], outset? : Sides[Length], spacing? : @library.Smart[Spacing], above? : @library.Smart[Spacing], below? : @library.Smart[Spacing], clip? : Bool, sticky? : Bool, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetBlock::SetBlock(width? : Length, height? : Sizing, breakable? : Bool, fill? : Paint, stroke? : Sides[Stroke], radius? : Corners[Length], inset? : Sides[Length], outset? : Sides[Length], spacing? : Spacing, above? : Spacing, below? : Spacing, clip? : Bool, sticky? : Bool, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetBlock
 pub impl SetRule for SetBlock
 
@@ -1049,7 +1075,7 @@ pub struct SetBox {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetBox::SetBox(width? : Sizing, height? : @library.Smart[Length], fill? : Paint?, stroke? : Sides[Stroke?], radius? : Corners[Length], inset? : Sides[Length], outset? : Sides[Length], clip? : Bool, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetBox::SetBox(width? : Sizing, height? : Length, fill? : Paint, stroke? : Sides[Stroke], radius? : Corners[Length], inset? : Sides[Length], outset? : Sides[Length], clip? : Bool, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetBox
 pub impl SetRule for SetBox
 
@@ -1057,7 +1083,7 @@ pub struct SetCircle {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetCircle::SetCircle(radius? : Length, width? : @library.Smart[Length], height? : Sizing, fill? : Paint?, stroke? : @library.Smart[Stroke?], inset? : Sides[Length], outset? : Sides[Length], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetCircle::SetCircle(radius? : Length, width? : Length, height? : Sizing, fill? : Paint, stroke? : Stroke, inset? : Sides[Length], outset? : Sides[Length], extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetCircle
 pub impl SetRule for SetCircle
 
@@ -1065,7 +1091,7 @@ pub struct SetColbreak {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetColbreak::SetColbreak(weak? : Bool, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetColbreak::SetColbreak(weak? : Bool, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetColbreak
 pub impl SetRule for SetColbreak
 
@@ -1073,7 +1099,7 @@ pub struct SetColumns {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetColumns::SetColumns(count? : Int64, gutter? : Length, balanced? : Bool, separator? : &IntoContent?, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetColumns::SetColumns(count? : Int64, gutter? : Length, balanced? : Bool, separator? : &IntoContent, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetColumns
 pub impl SetRule for SetColumns
 
@@ -1081,7 +1107,7 @@ pub struct SetDocument {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetDocument::SetDocument(title? : &IntoContent?, author? : Array[String], description? : &IntoContent?, keywords? : Array[String], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetDocument::SetDocument(title? : &IntoContent, author? : Array[String], description? : &IntoContent, keywords? : Array[String], extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetDocument
 pub impl SetRule for SetDocument
 
@@ -1089,7 +1115,7 @@ pub struct SetEllipse {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetEllipse::SetEllipse(width? : @library.Smart[Length], height? : Sizing, fill? : Paint?, stroke? : @library.Smart[Stroke?], inset? : Sides[Length], outset? : Sides[Length], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetEllipse::SetEllipse(width? : Length, height? : Sizing, fill? : Paint, stroke? : Stroke, inset? : Sides[Length], outset? : Sides[Length], extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetEllipse
 pub impl SetRule for SetEllipse
 
@@ -1097,7 +1123,7 @@ pub struct SetEnum {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetEnum::SetEnum(tight? : Bool, numbering? : Numbering, start? : @library.Smart[Int64], full? : Bool, reversed? : Bool, indent? : Length, body_indent? : Length, spacing? : @library.Smart[Length], number_align? : Alignment, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetEnum::SetEnum(tight? : Bool, numbering? : Numbering, start? : Int64, full? : Bool, reversed? : Bool, indent? : Length, body_indent? : Length, spacing? : Length, number_align? : Alignment, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetEnum
 pub impl SetRule for SetEnum
 
@@ -1105,7 +1131,7 @@ pub struct SetEnumItem {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetEnumItem::SetEnumItem(number? : @library.Smart[Int64], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetEnumItem::SetEnumItem(number? : Int64, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetEnumItem
 pub impl SetRule for SetEnumItem
 
@@ -1113,7 +1139,7 @@ pub struct SetFigure {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetFigure::SetFigure(alt? : String?, placement? : @library.Smart[Alignment]?, scope? : String, caption? : &IntoContent?, supplement? : @library.Smart[Supplement?], numbering? : Numbering?, gap? : Length, outlined? : Bool, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetFigure::SetFigure(alt? : String, placement? : Alignment, scope? : String, caption? : &IntoContent, supplement? : Supplement, numbering? : Numbering, gap? : Length, outlined? : Bool, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetFigure
 pub impl SetRule for SetFigure
 
@@ -1121,7 +1147,7 @@ pub struct SetFootnote {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetFootnote::SetFootnote(numbering? : Numbering, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetFootnote::SetFootnote(numbering? : Numbering, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetFootnote
 pub impl SetRule for SetFootnote
 
@@ -1129,7 +1155,7 @@ pub struct SetGrid {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetGrid::SetGrid(columns? : Array[Sizing], rows? : Array[Sizing], gutter? : Array[Sizing], column_gutter? : Array[Sizing], row_gutter? : Array[Sizing], inset? : Cells[Sides[Length]], align? : Cells[@library.Smart[Alignment]], fill? : Cells[Paint?], stroke? : Cells[Sides[Stroke?]], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetGrid::SetGrid(columns? : Array[Sizing], rows? : Array[Sizing], gutter? : Array[Sizing], column_gutter? : Array[Sizing], row_gutter? : Array[Sizing], inset? : Cells[Sides[Length]], align? : Cells[Alignment], fill? : Cells[Paint], stroke? : Cells[Sides[Stroke]], extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetGrid
 pub impl SetRule for SetGrid
 
@@ -1137,7 +1163,7 @@ pub struct SetGridCell {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetGridCell::SetGridCell(x? : @library.Smart[Int64], y? : @library.Smart[Int64], colspan? : Int64, rowspan? : Int64, inset? : @library.Smart[Sides[Length]], align? : @library.Smart[Alignment], fill? : @library.Smart[Paint?], stroke? : Sides[Stroke?], breakable? : @library.Smart[Bool], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetGridCell::SetGridCell(x? : Int64, y? : Int64, colspan? : Int64, rowspan? : Int64, inset? : Sides[Length], align? : Alignment, fill? : Paint, stroke? : Sides[Stroke], breakable? : Bool, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetGridCell
 pub impl SetRule for SetGridCell
 
@@ -1145,7 +1171,7 @@ pub struct SetGridFooter {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetGridFooter::SetGridFooter(repeat? : Bool, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetGridFooter::SetGridFooter(repeat? : Bool, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetGridFooter
 pub impl SetRule for SetGridFooter
 
@@ -1153,7 +1179,7 @@ pub struct SetGridHeader {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetGridHeader::SetGridHeader(repeat? : Bool, level? : Int64, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetGridHeader::SetGridHeader(repeat? : Bool, level? : Int64, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetGridHeader
 pub impl SetRule for SetGridHeader
 
@@ -1161,7 +1187,7 @@ pub struct SetGridHline {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetGridHline::SetGridHline(y? : @library.Smart[Int64], start? : Int64, end_? : Int64?, stroke? : Stroke?, position? : Alignment, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetGridHline::SetGridHline(y? : Int64, start? : Int64, end_? : Int64, stroke? : Stroke, position? : Alignment, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetGridHline
 pub impl SetRule for SetGridHline
 
@@ -1169,7 +1195,7 @@ pub struct SetGridVline {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetGridVline::SetGridVline(x? : @library.Smart[Int64], start? : Int64, end_? : Int64?, stroke? : Stroke?, position? : Alignment, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetGridVline::SetGridVline(x? : Int64, start? : Int64, end_? : Int64, stroke? : Stroke, position? : Alignment, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetGridVline
 pub impl SetRule for SetGridVline
 
@@ -1177,7 +1203,7 @@ pub struct SetH {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetH::SetH(weak? : Bool, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetH::SetH(weak? : Bool, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetH
 pub impl SetRule for SetH
 
@@ -1185,7 +1211,7 @@ pub struct SetHeading {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetHeading::SetHeading(level? : @library.Smart[Int64], depth? : Int64, offset? : Int64, numbering? : Numbering?, supplement? : @library.Smart[Supplement?], outlined? : Bool, bookmarked? : @library.Smart[Bool], hanging_indent? : @library.Smart[Length], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetHeading::SetHeading(level? : Int64, depth? : Int64, offset? : Int64, numbering? : Numbering, supplement? : Supplement, outlined? : Bool, bookmarked? : Bool, hanging_indent? : Length, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetHeading
 pub impl SetRule for SetHeading
 
@@ -1193,7 +1219,7 @@ pub struct SetHighlight {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetHighlight::SetHighlight(fill? : Paint?, stroke? : Sides[Stroke?], extent? : Length, radius? : Corners[Length], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetHighlight::SetHighlight(fill? : Paint, stroke? : Sides[Stroke], extent? : Length, radius? : Corners[Length], extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetHighlight
 pub impl SetRule for SetHighlight
 
@@ -1201,7 +1227,7 @@ pub struct SetImage {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetImage::SetImage(format? : @library.Smart[String], width? : @library.Smart[Length], height? : Sizing, alt? : String?, page? : Int64, fit? : String, scaling? : @library.Smart[String], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetImage::SetImage(format? : String, width? : Length, height? : Sizing, alt? : String, page? : Int64, fit? : String, scaling? : String, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetImage
 pub impl SetRule for SetImage
 
@@ -1209,7 +1235,7 @@ pub struct SetLine {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetLine::SetLine(start? : (Length, Length), end_? : (Length, Length)?, length? : Length, angle? : Angle, stroke? : Stroke, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetLine::SetLine(start? : (Length, Length), end_? : (Length, Length), length? : Length, angle? : Angle, stroke? : Stroke, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetLine
 pub impl SetRule for SetLine
 
@@ -1217,7 +1243,7 @@ pub struct SetLinebreak {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetLinebreak::SetLinebreak(justify? : Bool, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetLinebreak::SetLinebreak(justify? : Bool, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetLinebreak
 pub impl SetRule for SetLinebreak
 
@@ -1225,7 +1251,7 @@ pub struct SetList {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetList::SetList(tight? : Bool, marker? : &IntoContent, indent? : Length, body_indent? : Length, spacing? : @library.Smart[Length], marker_align? : Alignment, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetList::SetList(tight? : Bool, marker? : &IntoContent, indent? : Length, body_indent? : Length, spacing? : Length, marker_align? : Alignment, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetList
 pub impl SetRule for SetList
 
@@ -1233,7 +1259,7 @@ pub struct SetMove {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetMove::SetMove(dx? : Length, dy? : Length, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetMove::SetMove(dx? : Length, dy? : Length, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetMove
 pub impl SetRule for SetMove
 
@@ -1241,7 +1267,7 @@ pub struct SetOutline {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetOutline::SetOutline(title? : @library.Smart[&IntoContent?], depth? : Int64?, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetOutline::SetOutline(title? : &IntoContent, depth? : Int64, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetOutline
 pub impl SetRule for SetOutline
 
@@ -1249,7 +1275,7 @@ pub struct SetOverline {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetOverline::SetOverline(stroke? : @library.Smart[Stroke], offset? : @library.Smart[Length], extent? : Length, evade? : Bool, background? : Bool, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetOverline::SetOverline(stroke? : Stroke, offset? : Length, extent? : Length, evade? : Bool, background? : Bool, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetOverline
 pub impl SetRule for SetOverline
 
@@ -1257,7 +1283,7 @@ pub struct SetPad {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetPad::SetPad(left? : Length, top? : Length, right? : Length, bottom? : Length, x? : Length, y? : Length, rest? : Length, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetPad::SetPad(left? : Length, top? : Length, right? : Length, bottom? : Length, x? : Length, y? : Length, rest? : Length, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetPad
 pub impl SetRule for SetPad
 
@@ -1265,7 +1291,7 @@ pub struct SetPage {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetPage::SetPage(paper? : String, width? : @library.Smart[Length], height? : @library.Smart[Length], flipped? : Bool, margin? : @library.Smart[Sides[@library.Smart[Length]]], bleed? : Sides[Length], columns? : Int64, fill? : @library.Smart[Paint?], numbering? : Numbering?, supplement? : @library.Smart[&IntoContent?], number_align? : Alignment, header? : @library.Smart[&IntoContent?], header_ascent? : Length, footer? : @library.Smart[&IntoContent?], footer_descent? : Length, background? : &IntoContent?, foreground? : &IntoContent?, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetPage::SetPage(paper? : String, width? : Length, height? : Length, flipped? : Bool, margin? : Sides[Length], bleed? : Sides[Length], columns? : Int64, fill? : Paint, numbering? : Numbering, supplement? : &IntoContent, number_align? : Alignment, header? : &IntoContent, header_ascent? : Length, footer? : &IntoContent, footer_descent? : Length, background? : &IntoContent, foreground? : &IntoContent, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetPage
 pub impl SetRule for SetPage
 
@@ -1273,7 +1299,7 @@ pub struct SetPagebreak {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetPagebreak::SetPagebreak(weak? : Bool, to? : String?, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetPagebreak::SetPagebreak(weak? : Bool, to? : String, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetPagebreak
 pub impl SetRule for SetPagebreak
 
@@ -1281,7 +1307,7 @@ pub struct SetPar {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetPar::SetPar(leading? : Length, spacing? : Length, justify? : Bool, linebreaks? : @library.Smart[String], hanging_indent? : Length, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetPar::SetPar(leading? : Length, spacing? : Length, justify? : Bool, linebreaks? : String, hanging_indent? : Length, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetPar
 pub impl SetRule for SetPar
 
@@ -1289,7 +1315,7 @@ pub struct SetPlace {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetPlace::SetPlace(alignment? : @library.Smart[Alignment], scope? : String, float? : Bool, clearance? : Length, dx? : Length, dy? : Length, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetPlace::SetPlace(alignment? : Alignment, scope? : String, float? : Bool, clearance? : Length, dx? : Length, dy? : Length, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetPlace
 pub impl SetRule for SetPlace
 
@@ -1297,7 +1323,7 @@ pub struct SetQuote {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetQuote::SetQuote(block? : Bool, quotes? : @library.Smart[Bool], attribution? : &IntoContent?, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetQuote::SetQuote(block? : Bool, quotes? : Bool, attribution? : &IntoContent, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetQuote
 pub impl SetRule for SetQuote
 
@@ -1305,7 +1331,7 @@ pub struct SetRaw {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetRaw::SetRaw(block? : Bool, lang? : String?, align? : Alignment, tab_size? : Int64, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetRaw::SetRaw(block? : Bool, lang? : String, align? : Alignment, tab_size? : Int64, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetRaw
 pub impl SetRule for SetRaw
 
@@ -1313,7 +1339,7 @@ pub struct SetRect {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetRect::SetRect(width? : @library.Smart[Length], height? : Sizing, fill? : Paint?, stroke? : @library.Smart[Sides[Stroke?]], radius? : Corners[Length], inset? : Sides[Length], outset? : Sides[Length], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetRect::SetRect(width? : Length, height? : Sizing, fill? : Paint, stroke? : Sides[Stroke], radius? : Corners[Length], inset? : Sides[Length], outset? : Sides[Length], extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetRect
 pub impl SetRule for SetRect
 
@@ -1321,7 +1347,7 @@ pub struct SetRef {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetRef::SetRef(supplement? : @library.Smart[Supplement?], form? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetRef::SetRef(supplement? : Supplement, form? : String, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetRef
 pub impl SetRule for SetRef
 
@@ -1329,7 +1355,7 @@ pub struct SetRepeat {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetRepeat::SetRepeat(gap? : Length, justify? : Bool, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetRepeat::SetRepeat(gap? : Length, justify? : Bool, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetRepeat
 pub impl SetRule for SetRepeat
 
@@ -1337,7 +1363,7 @@ pub struct SetRotate {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetRotate::SetRotate(angle? : Angle, origin? : Alignment, reflow? : Bool, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetRotate::SetRotate(angle? : Angle, origin? : Alignment, reflow? : Bool, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetRotate
 pub impl SetRule for SetRotate
 
@@ -1345,7 +1371,7 @@ pub struct SetSmallcaps {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetSmallcaps::SetSmallcaps(all? : Bool, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetSmallcaps::SetSmallcaps(all? : Bool, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetSmallcaps
 pub impl SetRule for SetSmallcaps
 
@@ -1353,7 +1379,7 @@ pub struct SetSmartquote {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetSmartquote::SetSmartquote(double? : Bool, enabled? : Bool, alternative? : Bool, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetSmartquote::SetSmartquote(double? : Bool, enabled? : Bool, alternative? : Bool, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetSmartquote
 pub impl SetRule for SetSmartquote
 
@@ -1361,7 +1387,7 @@ pub struct SetSquare {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetSquare::SetSquare(size? : @library.Smart[Length], width? : @library.Smart[Length], height? : Sizing, fill? : Paint?, stroke? : @library.Smart[Sides[Stroke?]], radius? : Corners[Length], inset? : Sides[Length], outset? : Sides[Length], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetSquare::SetSquare(size? : Length, width? : Length, height? : Sizing, fill? : Paint, stroke? : Sides[Stroke], radius? : Corners[Length], inset? : Sides[Length], outset? : Sides[Length], extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetSquare
 pub impl SetRule for SetSquare
 
@@ -1369,7 +1395,7 @@ pub struct SetStack {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetStack::SetStack(dir? : Dir, spacing? : Spacing?, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetStack::SetStack(dir? : Dir, spacing? : Spacing, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetStack
 pub impl SetRule for SetStack
 
@@ -1377,7 +1403,7 @@ pub struct SetStrike {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetStrike::SetStrike(stroke? : @library.Smart[Stroke], offset? : @library.Smart[Length], extent? : Length, background? : Bool, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetStrike::SetStrike(stroke? : Stroke, offset? : Length, extent? : Length, background? : Bool, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetStrike
 pub impl SetRule for SetStrike
 
@@ -1385,7 +1411,7 @@ pub struct SetStrong {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetStrong::SetStrong(delta? : Int64, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetStrong::SetStrong(delta? : Int64, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetStrong
 pub impl SetRule for SetStrong
 
@@ -1393,7 +1419,7 @@ pub struct SetSub {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetSub::SetSub(typographic? : Bool, baseline? : @library.Smart[Length], size? : @library.Smart[Length], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetSub::SetSub(typographic? : Bool, baseline? : Length, size? : Length, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetSub
 pub impl SetRule for SetSub
 
@@ -1401,7 +1427,7 @@ pub struct SetSuper {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetSuper::SetSuper(typographic? : Bool, baseline? : @library.Smart[Length], size? : @library.Smart[Length], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetSuper::SetSuper(typographic? : Bool, baseline? : Length, size? : Length, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetSuper
 pub impl SetRule for SetSuper
 
@@ -1409,7 +1435,7 @@ pub struct SetTable {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetTable::SetTable(columns? : Array[Sizing], rows? : Array[Sizing], gutter? : Array[Sizing], column_gutter? : Array[Sizing], row_gutter? : Array[Sizing], inset? : Cells[Sides[Length]], align? : Cells[@library.Smart[Alignment]], fill? : Cells[Paint?], stroke? : Cells[Sides[Stroke?]], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetTable::SetTable(columns? : Array[Sizing], rows? : Array[Sizing], gutter? : Array[Sizing], column_gutter? : Array[Sizing], row_gutter? : Array[Sizing], inset? : Cells[Sides[Length]], align? : Cells[Alignment], fill? : Cells[Paint], stroke? : Cells[Sides[Stroke]], extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetTable
 pub impl SetRule for SetTable
 
@@ -1417,7 +1443,7 @@ pub struct SetTableCell {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetTableCell::SetTableCell(x? : @library.Smart[Int64], y? : @library.Smart[Int64], colspan? : Int64, rowspan? : Int64, inset? : @library.Smart[Sides[Length]], align? : @library.Smart[Alignment], fill? : @library.Smart[Paint?], stroke? : Sides[Stroke?], breakable? : @library.Smart[Bool], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetTableCell::SetTableCell(x? : Int64, y? : Int64, colspan? : Int64, rowspan? : Int64, inset? : Sides[Length], align? : Alignment, fill? : Paint, stroke? : Sides[Stroke], breakable? : Bool, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetTableCell
 pub impl SetRule for SetTableCell
 
@@ -1425,7 +1451,7 @@ pub struct SetTableFooter {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetTableFooter::SetTableFooter(repeat? : Bool, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetTableFooter::SetTableFooter(repeat? : Bool, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetTableFooter
 pub impl SetRule for SetTableFooter
 
@@ -1433,7 +1459,7 @@ pub struct SetTableHeader {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetTableHeader::SetTableHeader(repeat? : Bool, level? : Int64, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetTableHeader::SetTableHeader(repeat? : Bool, level? : Int64, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetTableHeader
 pub impl SetRule for SetTableHeader
 
@@ -1441,7 +1467,7 @@ pub struct SetTableHline {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetTableHline::SetTableHline(y? : @library.Smart[Int64], start? : Int64, end_? : Int64?, stroke? : Stroke?, position? : Alignment, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetTableHline::SetTableHline(y? : Int64, start? : Int64, end_? : Int64, stroke? : Stroke, position? : Alignment, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetTableHline
 pub impl SetRule for SetTableHline
 
@@ -1449,7 +1475,7 @@ pub struct SetTableVline {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetTableVline::SetTableVline(x? : @library.Smart[Int64], start? : Int64, end_? : Int64?, stroke? : Stroke?, position? : Alignment, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetTableVline::SetTableVline(x? : Int64, start? : Int64, end_? : Int64, stroke? : Stroke, position? : Alignment, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetTableVline
 pub impl SetRule for SetTableVline
 
@@ -1457,7 +1483,7 @@ pub struct SetTerms {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetTerms::SetTerms(tight? : Bool, separator? : &IntoContent, indent? : Length, hanging_indent? : Length, spacing? : @library.Smart[Length], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetTerms::SetTerms(tight? : Bool, separator? : &IntoContent, indent? : Length, hanging_indent? : Length, spacing? : Length, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetTerms
 pub impl SetRule for SetTerms
 
@@ -1465,7 +1491,7 @@ pub struct SetText {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetText::SetText(font? : Array[String], fallback? : Bool, style? : String, weight? : FontWeight, size? : Length, fill? : Paint, stroke? : Stroke?, tracking? : Length, spacing? : Length, baseline? : Length, overhang? : Bool, lang? : String, region? : String?, dir? : @library.Smart[Dir], hyphenate? : @library.Smart[Bool], kerning? : Bool, ligatures? : Bool, discretionary_ligatures? : Bool, historical_ligatures? : Bool, number_type? : @library.Smart[String], number_width? : @library.Smart[String], slashed_zero? : Bool, fractions? : Bool, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetText::SetText(font? : Array[String], fallback? : Bool, style? : String, weight? : FontWeight, size? : Length, fill? : Paint, stroke? : Stroke, tracking? : Length, spacing? : Length, baseline? : Length, overhang? : Bool, lang? : String, region? : String, dir? : Dir, hyphenate? : Bool, kerning? : Bool, ligatures? : Bool, discretionary_ligatures? : Bool, historical_ligatures? : Bool, number_type? : String, number_width? : String, slashed_zero? : Bool, fractions? : Bool, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetText
 pub impl SetRule for SetText
 
@@ -1473,7 +1499,7 @@ pub struct SetUnderline {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetUnderline::SetUnderline(stroke? : @library.Smart[Stroke], offset? : @library.Smart[Length], extent? : Length, evade? : Bool, background? : Bool, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetUnderline::SetUnderline(stroke? : Stroke, offset? : Length, extent? : Length, evade? : Bool, background? : Bool, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetUnderline
 pub impl SetRule for SetUnderline
 
@@ -1481,7 +1507,7 @@ pub struct SetV {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetV::SetV(weak? : Bool, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetV::SetV(weak? : Bool, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetV
 pub impl SetRule for SetV
 
@@ -1508,6 +1534,8 @@ pub struct Sides[T] {
   // private fields
 }
 pub fn[T] Sides::Sides(all? : T, x? : T, y? : T, left? : T, top? : T, right? : T, bottom? : T, rest? : T) -> Self[T]
+pub fn[T] Sides::auto() -> Self[T]
+pub fn[T] Sides::none() -> Self[T]
 pub impl[T : ToValue] ToValue for Sides[T]
 
 pub struct Size {
@@ -1517,6 +1545,7 @@ pub struct Size {
 
 pub(all) enum Sizing {
   Auto
+  None
   Fr(Double)
   Pt(Double)
   Mm(Double)
@@ -1532,7 +1561,7 @@ pub struct Smallcaps {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn Smallcaps::Smallcaps(&IntoContent, all? : Bool, label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn Smallcaps::Smallcaps(&IntoContent, all? : Bool, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for Smallcaps
 
 pub struct SmallcapsView {
@@ -1546,7 +1575,7 @@ pub struct Smartquote {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn Smartquote::Smartquote(double? : Bool, enabled? : Bool, alternative? : Bool, label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn Smartquote::Smartquote(double? : Bool, enabled? : Bool, alternative? : Bool, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for Smartquote
 
 pub struct SmartquoteView {
@@ -1569,6 +1598,8 @@ pub fn Space::Space() -> Self
 pub impl IntoContent for Space
 
 pub(all) enum Spacing {
+  Auto
+  None
   Fr(Double)
   Pt(Double)
   Mm(Double)
@@ -1584,7 +1615,7 @@ pub struct Square {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn Square::Square(size? : @library.Smart[Length], width? : @library.Smart[Length], height? : Sizing, fill? : Paint?, stroke? : @library.Smart[Sides[Stroke?]], radius? : Corners[Length], inset? : Sides[Length], outset? : Sides[Length], body? : &IntoContent?, label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn Square::Square(size? : Length, width? : Length, height? : Sizing, fill? : Paint, stroke? : Sides[Stroke], radius? : Corners[Length], inset? : Sides[Length], outset? : Sides[Length], body? : &IntoContent, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for Square
 
 pub struct SquareView {
@@ -1597,7 +1628,7 @@ pub struct Stack {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn Stack::Stack(Array[&IntoContent], dir? : Dir, spacing? : Spacing?, label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn Stack::Stack(Array[&IntoContent], dir? : Dir, spacing? : Spacing, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for Stack
 
 pub struct StackView {
@@ -1610,7 +1641,7 @@ pub struct Strike {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn Strike::Strike(&IntoContent, stroke? : @library.Smart[Stroke], offset? : @library.Smart[Length], extent? : Length, background? : Bool, label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn Strike::Strike(&IntoContent, stroke? : Stroke, offset? : Length, extent? : Length, background? : Bool, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for Strike
 
 pub struct StrikeView {
@@ -1624,13 +1655,15 @@ pub struct Stroke {
   // private fields
 }
 pub fn Stroke::Stroke(paint? : Paint, thickness? : Length, cap? : String, join? : String, dash? : Value, miter_limit? : Double) -> Self
+pub fn Stroke::auto() -> Self
+pub fn Stroke::none() -> Self
 pub impl ToValue for Stroke
 
 pub struct Strong {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn Strong::Strong(&IntoContent, delta? : Int64, label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn Strong::Strong(&IntoContent, delta? : Int64, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for Strong
 
 pub struct StrongView {
@@ -1644,7 +1677,7 @@ pub struct Sub {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn Sub::Sub(&IntoContent, typographic? : Bool, baseline? : @library.Smart[Length], size? : @library.Smart[Length], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn Sub::Sub(&IntoContent, typographic? : Bool, baseline? : Length, size? : Length, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for Sub
 
 pub struct SubView {
@@ -1658,7 +1691,7 @@ pub struct Super {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn Super::Super(&IntoContent, typographic? : Bool, baseline? : @library.Smart[Length], size? : @library.Smart[Length], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn Super::Super(&IntoContent, typographic? : Bool, baseline? : Length, size? : Length, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for Super
 
 pub struct SuperView {
@@ -1672,22 +1705,24 @@ pub struct Supplement {
   // private fields
 }
 pub fn Supplement::Supplement(&IntoContent) -> Self
+pub fn Supplement::auto() -> Self
 #callsite(autofill(args_loc, loc))
 pub fn Supplement::func(loc~ : SourceLoc, args_loc~ : ArgsLoc, (ContentView, Ctx) -> &IntoContent raise) -> Self
+pub fn Supplement::none() -> Self
 pub impl ToValue for Supplement
 
 pub struct Table {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn Table::Table(Array[&IntoContent], columns? : Array[Sizing], rows? : Array[Sizing], gutter? : Array[Sizing], column_gutter? : Array[Sizing], row_gutter? : Array[Sizing], inset? : Cells[Sides[Length]], align? : Cells[@library.Smart[Alignment]], fill? : Cells[Paint?], stroke? : Cells[Sides[Stroke?]], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn Table::Table(Array[&IntoContent], columns? : Array[Sizing], rows? : Array[Sizing], gutter? : Array[Sizing], column_gutter? : Array[Sizing], row_gutter? : Array[Sizing], inset? : Cells[Sides[Length]], align? : Cells[Alignment], fill? : Cells[Paint], stroke? : Cells[Sides[Stroke]], extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for Table
 
 pub struct TableCell {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn TableCell::TableCell(&IntoContent, x? : @library.Smart[Int64], y? : @library.Smart[Int64], colspan? : Int64, rowspan? : Int64, inset? : @library.Smart[Sides[Length]], align? : @library.Smart[Alignment], fill? : @library.Smart[Paint?], stroke? : Sides[Stroke?], breakable? : @library.Smart[Bool], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn TableCell::TableCell(&IntoContent, x? : Int64, y? : Int64, colspan? : Int64, rowspan? : Int64, inset? : Sides[Length], align? : Alignment, fill? : Paint, stroke? : Sides[Stroke], breakable? : Bool, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for TableCell
 
 pub struct TableCellView {
@@ -1701,7 +1736,7 @@ pub struct TableFooter {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn TableFooter::TableFooter(Array[&IntoContent], repeat? : Bool, label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn TableFooter::TableFooter(Array[&IntoContent], repeat? : Bool, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for TableFooter
 
 pub struct TableFooterView {
@@ -1714,7 +1749,7 @@ pub struct TableHeader {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn TableHeader::TableHeader(Array[&IntoContent], repeat? : Bool, level? : Int64, label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn TableHeader::TableHeader(Array[&IntoContent], repeat? : Bool, level? : Int64, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for TableHeader
 
 pub struct TableHeaderView {
@@ -1727,7 +1762,7 @@ pub struct TableHline {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn TableHline::TableHline(y? : @library.Smart[Int64], start? : Int64, end_? : Int64?, stroke? : Stroke?, position? : Alignment, label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn TableHline::TableHline(y? : Int64, start? : Int64, end_? : Int64, stroke? : Stroke, position? : Alignment, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for TableHline
 
 pub struct TableHlineView {
@@ -1746,7 +1781,7 @@ pub struct TableVline {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn TableVline::TableVline(x? : @library.Smart[Int64], start? : Int64, end_? : Int64?, stroke? : Stroke?, position? : Alignment, label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn TableVline::TableVline(x? : Int64, start? : Int64, end_? : Int64, stroke? : Stroke, position? : Alignment, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for TableVline
 
 pub struct TableVlineView {
@@ -1759,14 +1794,14 @@ pub struct Terms {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn Terms::Terms(Array[&IntoContent], tight? : Bool, separator? : &IntoContent, indent? : Length, hanging_indent? : Length, spacing? : @library.Smart[Length], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn Terms::Terms(Array[&IntoContent], tight? : Bool, separator? : &IntoContent, indent? : Length, hanging_indent? : Length, spacing? : Length, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for Terms
 
 pub struct TermsItem {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn TermsItem::TermsItem(&IntoContent, &IntoContent, label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn TermsItem::TermsItem(&IntoContent, &IntoContent, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for TermsItem
 
 pub struct TermsItemView {
@@ -1787,12 +1822,12 @@ pub struct Text {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn Text::Text(&IntoContent, font? : Array[String], fallback? : Bool, style? : String, weight? : FontWeight, size? : Length, fill? : Paint, stroke? : Stroke?, tracking? : Length, spacing? : Length, baseline? : Length, overhang? : Bool, lang? : String, region? : String?, dir? : @library.Smart[Dir], hyphenate? : @library.Smart[Bool], kerning? : Bool, ligatures? : Bool, discretionary_ligatures? : Bool, historical_ligatures? : Bool, number_type? : @library.Smart[String], number_width? : @library.Smart[String], slashed_zero? : Bool, fractions? : Bool, label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn Text::Text(&IntoContent, font? : Array[String], fallback? : Bool, style? : String, weight? : FontWeight, size? : Length, fill? : Paint, stroke? : Stroke, tracking? : Length, spacing? : Length, baseline? : Length, overhang? : Bool, lang? : String, region? : String, dir? : Dir, hyphenate? : Bool, kerning? : Bool, ligatures? : Bool, discretionary_ligatures? : Bool, historical_ligatures? : Bool, number_type? : String, number_width? : String, slashed_zero? : Bool, fractions? : Bool, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for Text
 
 pub struct TextOrigin {
   origin : Origin
-  offset : Int?
+  engine_offset : Int?
 }
 
 pub struct TextView {
@@ -1806,7 +1841,7 @@ pub struct Title {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn Title::Title(body? : @library.Smart[&IntoContent], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn Title::Title(body? : &IntoContent, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for Title
 
 pub struct TitleView {
@@ -1824,7 +1859,7 @@ pub struct Underline {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn Underline::Underline(&IntoContent, stroke? : @library.Smart[Stroke], offset? : @library.Smart[Length], extent? : Length, evade? : Bool, background? : Bool, label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn Underline::Underline(&IntoContent, stroke? : Stroke, offset? : Length, extent? : Length, evade? : Bool, background? : Bool, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for Underline
 
 pub struct UnderlineView {
@@ -1838,7 +1873,7 @@ pub struct V {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn V::V(Spacing, weak? : Bool, label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn V::V(Spacing, weak? : Bool, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for V
 
 pub struct VView {
@@ -1869,6 +1904,7 @@ pub fn Value::paint(Paint) -> Self
 pub fn Value::sizing(Sizing) -> Self
 pub fn Value::str(String) -> Self
 pub fn Value::stroke(Stroke) -> Self
+pub impl IntoContent for Value
 pub impl ToValue for Value
 
 // Type aliases
@@ -1896,6 +1932,4 @@ pub impl ToValue for Int
 pub impl ToValue for Int64
 pub impl ToValue for Double
 pub impl ToValue for String
-pub impl[T : ToValue] ToValue for T?
 pub impl[T : ToValue] ToValue for Array[T]
-pub impl[T : ToValue] ToValue for @library.Smart[T]

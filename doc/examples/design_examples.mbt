@@ -38,6 +38,10 @@ using @doc {
   type Call,
   type Set,
   type Value,
+  type NoneValue,
+  type Paint,
+  type Sides,
+  type Numbering,
   type Image,
   type Link,
   type Raw,
@@ -78,22 +82,58 @@ pub fn branches(flag : Bool, it : &IntoContent) -> Content {
 /// Section 6: field states and units.
 pub fn field_states() -> Seq {
   Seq([
-    Heading("Automatic level", level=Auto),
-    Heading("Level two", level=Custom(2), numbering=None),
-    Heading("Numbered", numbering=Some(Numbering("1.")), depth=2),
+    // Explicit states: a scalar through `extra`, a facade by its own
+    // constructor, an enum facade by its cases, content by `NoneValue()`.
+    Heading("Automatic level", extra=[("level", Value::auto())]),
+    Heading("Level two", level=2, numbering=Numbering::none()),
+    Block("No fill, automatic width", fill=None, width=Auto),
+    Figure("No caption", caption=NoneValue()),
+    Heading("Numbered", numbering=Numbering("1."), depth=2),
     Block(
       "A block",
-      width=Custom(Pct(100)),
+      width=Pct(100),
       inset=Sides(all=Pt(9)),
       radius=Corners(all=Pt(4)),
-      fill=Some(Luma(246)),
-      stroke=Sides(all=Some(Stroke(thickness=Pt(0.5), paint=Luma(220)))),
-      above=Custom(Rel(Pt(11) + Em(0.5))),
+      fill=Luma(246),
+      stroke=Sides(all=Stroke(thickness=Pt(0.5), paint=Luma(220))),
+      above=Rel(Pt(11) + Em(0.5)),
     ),
     H(Fr(1)),
     V(Em(0.6)),
     Line(length=Pct(50) - Pt(10)),
     Align(Center + Horizon, "centered"),
+  ])
+}
+
+///|
+/// Sections 6.1 and 6.5: plain values first, and the explicit states where
+/// a document needs them.
+pub fn plain_values() -> Seq {
+  let title_fill = Paint::linear(
+    [Rgb("#1f4e79"), Rgb("#2e86ab"), Rgb("#7fc8a9")],
+    angle=Deg(20),
+  )
+  Seq([
+    SetPage(
+      margin=Sides(x=Cm(2.2), top=Cm(2.6), bottom=Cm(2.4)),
+      header=Context() <| _ => { "header" },
+    ),
+    SetHeading(numbering=Numbering("1.1")),
+    Block(
+      Text("typst.mbt", size=Pt(26), weight=Bold, fill=White),
+      fill=title_fill,
+      inset=Sides(x=Pt(18), y=Pt(22)),
+      radius=Corners(all=Pt(8)),
+      width=Pct(100),
+      stroke=Sides(all=Stroke(thickness=Pt(0.5), paint=Luma(220))),
+    ),
+    Text("1234567890", number_type="old-style"),
+    Raw("fn main() {}", lang="rust", block=true),
+    // The explicit states.
+    Block("x", fill=None, width=Auto),
+    Seq([SetPage(header=NoneValue(), margin=Sides::auto()), "y"]),
+    Heading("x", numbering=Numbering::none()),
+    Heading("x", extra=[("level", Value::auto())]),
   ])
 }
 
@@ -110,16 +150,16 @@ pub fn stages_figure() -> Figure {
         TableCell("2 299", colspan=1),
       ],
       columns=[Auto, Fr(1)],
-      align=Cells::columns([Custom(Left), Custom(Right)]),
+      align=Cells::columns([Left, Right]),
       fill=Cells() <| ((_, y) => {
         if y > 0 && y % 2 == 1 {
-          Some(Luma(247))
+          Luma(247)
         } else {
           None
         }
       }),
     ),
-    caption=Some("Differential test stages."),
+    caption="Differential test stages.",
     label="stages",
   )
 }
@@ -128,14 +168,11 @@ pub fn stages_figure() -> Figure {
 /// Section 8: rules.
 pub fn rules() -> Document {
   Document([
-    SetPage(
-      paper="a4",
-      margin=Custom(Sides(x=Custom(Cm(2.2)), top=Custom(Cm(2.6)))),
-    ),
+    SetPage(paper="a4", margin=Sides(x=Cm(2.2), top=Cm(2.6))),
     SetText(font=["Libertinus Serif"], size=Pt(11), lang="en"),
     SetPar(justify=true, leading=Em(0.62)),
-    SetHeading(numbering=Some(Numbering("1.1"))),
-    Show(Select::heading(level=Custom(1))) <| ((it, _) => {
+    SetHeading(numbering=Numbering("1.1")),
+    Show(Select::heading(level=1)) <| ((it, _) => {
       Seq([V(Em(0.6)), Block(Text(it, fill=Rgb("#1f4e79"))), V(Em(0.2))])
     }),
     ShowSet(Select::figure(), SetText(size=Pt(9))),
@@ -154,21 +191,17 @@ pub fn underlined_headings() -> Show {
 /// Section 10: a contextual page header.
 pub fn page_header() -> SetPage {
   SetPage(
-    header=Custom(
-      Some(
-        Context() <| cx => {
-          let page = cx.counter(Counter::page())
-          if page.get()[0] > 1 {
-            return Seq([
-              Emph("typst.mbt"),
-              H(Fr(1)),
-              page.display(numbering=Numbering("1 / 1"), both=true),
-            ])
-          }
-          Seq([])
-        },
-      ),
-    ),
+    header=Context() <| cx => {
+      let page = cx.counter(Counter::page())
+      if page.get()[0] > 1 {
+        return Seq([
+          Emph("typst.mbt"),
+          H(Fr(1)),
+          page.display(numbering=Numbering("1 / 1"), both=true),
+        ])
+      }
+      Seq([])
+    },
   )
 }
 
@@ -196,7 +229,7 @@ pub fn escape_hatches() -> Seq {
     Equation(
       "sum_(k=0)^n k = (n (n + 1)) / 2",
       block=true,
-      numbering=Some(Numbering("(1)")),
+      numbering=Numbering("(1)"),
       label="gauss",
     ),
     Par(Seq(["Inline ", Equation("x^2"), " and a reference: ", Ref("gauss")])),
@@ -224,7 +257,7 @@ pub fn overrides() -> Seq {
   Seq([
     Link(Url("https://moonbitlang.com")),
     Link(Url("https://typst.app"), body="Typst"),
-    Raw("fn main() {}", lang=Some("rust"), block=true),
+    Raw("fn main() {}", lang="rust", block=true),
     Text("bold red", weight=Bold, fill=Red),
   ])
 }
@@ -233,13 +266,9 @@ pub fn overrides() -> Seq {
 /// Section 14: a complete document.
 pub fn report() -> Document {
   Document([
-    SetPage(
-      width=Custom(Pt(360)),
-      height=Custom(Pt(480)),
-      margin=Custom(Sides(all=Custom(Pt(24)))),
-    ),
+    SetPage(width=Pt(360), height=Pt(480), margin=Sides(all=Pt(24))),
     SetText(size=Pt(10)),
-    SetHeading(numbering=Some(Numbering("1."))),
+    SetHeading(numbering=Numbering("1.")),
     underlined_headings(),
     page_header(),
     Heading("Report"),
@@ -251,6 +280,7 @@ pub fn report() -> Document {
     counter_updates(),
     escape_hatches(),
     overrides(),
+    plain_values(),
   ])
 }
 
@@ -272,8 +302,5 @@ pub fn write_report(path : String) -> Unit raise {
 ///|
 /// Section 12.5: resources resolve against the project root.
 pub fn picture() -> Figure {
-  Figure(
-    Image("assets/chart.png", width=Custom(Pct(80))),
-    caption=Some("A chart."),
-  )
+  Figure(Image("assets/chart.png", width=Pct(80)), caption="A chart.")
 }

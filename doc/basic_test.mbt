@@ -20,13 +20,9 @@ using @doc {
 ///|
 test "a small document compiles to SVG" {
   let doc = Document([
-    SetPage(
-      width=Custom(Pt(200)),
-      height=Custom(Pt(120)),
-      margin=Custom(Sides(all=Custom(Pt(10)))),
-    ),
+    SetPage(width=Pt(200), height=Pt(120), margin=Sides(all=Pt(10))),
     SetText(size=Pt(10)),
-    SetHeading(numbering=Some(Numbering("1."))),
+    SetHeading(numbering=Numbering("1.")),
     Show(Select::heading()) <| ((it, _) => {
       Seq([V(Em(0.5)), Block(Text(it, fill=Rgb("#1f4e79")))])
     }),

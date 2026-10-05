@@ -32,9 +32,8 @@ pub fn DocWorld::new(
   book~ : @library.FontBook,
   font~ : (Int) -> @library.Font?,
   today? : (@library.Duration?) -> @library.Datetime? = _ => None,
-  library? : @library.Library = standard_library(),
 ) -> DocWorld {
-  { library, load, sources: {}, book, font, today, }
+  { library: standard_library(), load, sources: Map([]), book, font, today, }
 }
 
 ///|

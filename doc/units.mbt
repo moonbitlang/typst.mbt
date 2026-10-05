@@ -6,6 +6,10 @@
 /// which of them a value is follows from Typst's own arithmetic, and
 /// whether a field accepts it from the field's cast.
 pub(all) enum Length {
+  /// Explicit `auto`, where the field accepts it.
+  Auto
+  /// Explicit `none`, where the field accepts it.
+  None
   Pt(Double)
   Mm(Double)
   Cm(Double)
@@ -48,6 +52,8 @@ pub fn Length::scale(self : Length, factor : Double) -> Length {
 ///|
 pub impl ToValue for Length with fn to_value(self) {
   match self {
+    Auto => Value::auto()
+    None => Value::none()
     Pt(v) => Value::of(VNumeric(v, @library.NumericUnit::Pt))
     Mm(v) => Value::of(VNumeric(v, @library.NumericUnit::Mm))
     Cm(v) => Value::of(VNumeric(v, @library.NumericUnit::Cm))
@@ -65,6 +71,10 @@ pub impl ToValue for Length with fn to_value(self) {
 /// The engine's `Spacing`: a length/ratio or a fraction of the remaining
 /// space.
 pub(all) enum Spacing {
+  /// Explicit `auto`, where the field accepts it.
+  Auto
+  /// Explicit `none`, where the field accepts it.
+  None
   Fr(Double)
   Pt(Double)
   Mm(Double)
@@ -79,6 +89,8 @@ pub(all) enum Spacing {
 ///|
 pub impl ToValue for Spacing with fn to_value(self) {
   match self {
+    Auto => Value::auto()
+    None => Value::none()
     Fr(v) => Value::of(VNumeric(v, @library.NumericUnit::Fr))
     Pt(v) => Value::of(VNumeric(v, @library.NumericUnit::Pt))
     Mm(v) => Value::of(VNumeric(v, @library.NumericUnit::Mm))
@@ -95,6 +107,8 @@ pub impl ToValue for Spacing with fn to_value(self) {
 /// length/ratio or a fraction.
 pub(all) enum Sizing {
   Auto
+  /// Explicit `none`, where the field accepts it.
+  None
   Fr(Double)
   Pt(Double)
   Mm(Double)
@@ -110,6 +124,7 @@ pub(all) enum Sizing {
 pub impl ToValue for Sizing with fn to_value(self) {
   match self {
     Auto => Value::auto()
+    None => Value::none()
     Fr(v) => Value::of(VNumeric(v, @library.NumericUnit::Fr))
     Pt(v) => Value::of(VNumeric(v, @library.NumericUnit::Pt))
     Mm(v) => Value::of(VNumeric(v, @library.NumericUnit::Mm))

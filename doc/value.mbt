@@ -241,19 +241,44 @@ pub impl ToValue for String with fn to_value(self) {
 }
 
 ///|
-pub impl[T : ToValue] ToValue for T? with fn to_value(self) {
-  match self {
-    None => Value::none()
-    Some(value) => value.to_value()
-  }
+/// A value where content is expected: as an argument it is the value
+/// itself (`Value::none()` for a content field is Typst's `none`); in a
+/// sequence it is displayed like `#value` in markup.
+pub impl IntoContent for Value with fn into_content(self) {
+  Content::of(NValue(self))
 }
 
 ///|
-pub impl[T : ToValue] ToValue for @library.Smart[T] with fn to_value(self) {
-  match self {
-    Auto => Value::auto()
-    Custom(value) => value.to_value()
-  }
+/// Explicit `none` for a content parameter (`header=NoneValue()`); as
+/// content it is empty.
+pub struct NoneValue {
+  priv content : Content
+}
+
+///|
+pub fn NoneValue::NoneValue() -> NoneValue {
+  { content: Content::of(NValue(Value::none())), }
+}
+
+///|
+pub impl IntoContent for NoneValue with fn into_content(self) {
+  self.content
+}
+
+///|
+/// Explicit `auto` for a content parameter (`title=AutoValue()`).
+pub struct AutoValue {
+  priv content : Content
+}
+
+///|
+pub fn AutoValue::AutoValue() -> AutoValue {
+  { content: Content::of(NValue(Value::auto())), }
+}
+
+///|
+pub impl IntoContent for AutoValue with fn into_content(self) {
+  self.content
 }
 
 ///|

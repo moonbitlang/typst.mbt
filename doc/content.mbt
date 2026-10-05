@@ -45,6 +45,8 @@ priv enum Node {
   NSpace
   /// Engine content, re-emitted unchanged (show-rule views, engine values).
   NEngine(@library.Content)
+  /// A value: as an argument the value itself, in a sequence its display.
+  NValue(Value)
 }
 
 ///|
@@ -285,6 +287,20 @@ pub fn Space::Space() -> Space {
 ///|
 pub impl IntoContent for Space with fn into_content(self) {
   self.content
+}
+
+///|
+/// Append the `extra` named arguments of a generated constructor (at
+/// parameter index `param`): they follow the typed arguments, so that a
+/// later argument wins, as in Typst.
+fn push_extra(
+  args : Array[ArgNode],
+  extra : Array[(String, Value)],
+  param : Int,
+) -> Unit {
+  for pair in extra {
+    args.push({ name: Some(pair.0), value: pair.1, param, })
+  }
 }
 
 ///|

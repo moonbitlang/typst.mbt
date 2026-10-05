@@ -275,6 +275,31 @@ pub let fingerprint_lossy : Int = 1
 pub let fingerprint_identity : Int = 2
 
 ///|
+/// See [fingerprint_flags]: the fingerprint contains a host closure (a
+/// [HostFunc]; it also sets [fingerprint_identity]).
+pub let fingerprint_host : Int = 4
+
+///|
+/// The collector of the host closures visited by fingerprint computations
+/// (see [fingerprint_hosts_in]).
+let fingerprint_hosts : Ref[Array[HostFunc]?] = { val: None, }
+
+///|
+/// Runs `f` (a fingerprint computation) and returns the host closures it
+/// visited, in order. Host closures compare by identity, which a
+/// fingerprint cannot express: their fingerprint is a key that the host
+/// promises to be unique. Where identity matters (the validation of
+/// recorded introspector reads), the visited closures are compared too.
+pub fn fingerprint_hosts_in(f : () -> Unit) -> Array[HostFunc] {
+  let outer = fingerprint_hosts.val
+  let hosts = []
+  fingerprint_hosts.val = Some(hosts)
+  f()
+  fingerprint_hosts.val = outer
+  hosts
+}
+
+///|
 /// Record that the value being fingerprinted is not fully captured by its
 /// fingerprint.
 pub fn mark_fingerprint_lossy() -> Unit {

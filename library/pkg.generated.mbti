@@ -1010,6 +1010,10 @@ pub fn find_name(@otf.Face, UInt16) -> String?
 
 pub fn fingerprint_flags_in(() -> Unit) -> Int
 
+pub let fingerprint_host : Int
+
+pub fn fingerprint_hosts_in(() -> Unit) -> Array[HostFunc]
+
 pub let fingerprint_identity : Int
 
 pub let fingerprint_lossy : Int
@@ -3283,8 +3287,6 @@ pub let v_elem_attach : Int
 pub let v_elem_weak : Int
 
 pub fn validate_utf8(BytesView) -> Utf8Error?
-
-pub fn values_validate_equal(Value, Value) -> Bool
 
 pub fn variant(StyleChain) -> FontVariant
 

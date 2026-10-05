@@ -77,16 +77,9 @@ fn fibonacci(count : Int) -> Array[Int] {
 /// The reduced showcase, built with the EDSL.
 pub fn showcase() -> Document {
   let accent = "#1f4e79"
-  let title_fill : Paint = Value(
-    Value::call(
-      "gradient.linear",
-      positional=[
-        Value::paint(Rgb("#1f4e79")),
-        Value::paint(Rgb("#2e86ab")),
-        Value::paint(Rgb("#7fc8a9")),
-      ],
-      named=[("angle", Value::angle(Deg(20)))],
-    ),
+  let title_fill = Paint::linear(
+    [Rgb("#1f4e79"), Rgb("#2e86ab"), Rgb("#7fc8a9")],
+    angle=Deg(20),
   )
   let stage_cells : Array[&@doc.IntoContent] = [
     TableHeader([
@@ -108,46 +101,40 @@ pub fn showcase() -> Document {
   }
   Document([
     // Setup.
-    SetDocument(title=Some("typst.mbt Showcase"), author=["typst.mbt"], keywords=[
+    SetDocument(title="typst.mbt Showcase", author=["typst.mbt"], keywords=[
       "typst", "moonbit", "typesetting",
     ]),
     SetPage(
       paper="a4",
-      margin=Custom(
-        Sides(x=Custom(Cm(2.2)), top=Custom(Cm(2.6)), bottom=Custom(Cm(2.4))),
-      ),
-      header=Custom(
-        Some(
-          Context() <| cx => {
-            let page = cx.counter(Counter::page())
-            if page.get()[0] > 1 {
-              return Seq([
-                SetText(size=Pt(9), fill=Luma(110)),
-                Emph("typst.mbt — a MoonBit port of Typst"),
-                H(Fr(1)),
-                page.display(numbering=Numbering("1 / 1"), both=true),
-              ])
-            }
-            Seq([])
-          },
-        ),
-      ),
+      margin=Sides(x=Cm(2.2), top=Cm(2.6), bottom=Cm(2.4)),
+      header=Context() <| cx => {
+        let page = cx.counter(Counter::page())
+        if page.get()[0] > 1 {
+          return Seq([
+            SetText(size=Pt(9), fill=Luma(110)),
+            Emph("typst.mbt — a MoonBit port of Typst"),
+            H(Fr(1)),
+            page.display(numbering=Numbering("1 / 1"), both=true),
+          ])
+        }
+        Seq([])
+      },
     ),
     SetText(font=["Libertinus Serif"], size=Pt(11), lang="en"),
     SetPar(justify=true, leading=Em(0.62)),
-    SetHeading(numbering=Some(Numbering("1.1"))),
+    SetHeading(numbering=Numbering("1.1")),
     Set("math.equation", [("numbering", Value::str("(1)"))]),
-    Show(Select::heading(level=Custom(1))) <| ((it, _) => {
+    Show(Select::heading(level=1)) <| ((it, _) => {
       Seq([V(Em(0.6)), Block(Text(it, fill=Rgb(accent))), V(Em(0.2))])
     }),
     Show(Select::raw(block=true)) <| ((it, _) => {
       Block(
         it,
-        fill=Some(Luma(246)),
+        fill=Luma(246),
         inset=Sides(all=Pt(9)),
         radius=Corners(all=Pt(4)),
-        width=Custom(Pct(100)),
-        stroke=Sides(all=Some(Stroke(thickness=Pt(0.5), paint=Luma(220)))),
+        width=Pct(100),
+        stroke=Sides(all=Stroke(thickness=Pt(0.5), paint=Luma(220))),
       )
     }),
     Show(Select::link()) <| ((it, _) => Underline(it)),
@@ -161,19 +148,19 @@ pub fn showcase() -> Document {
         V(Pt(4)),
         Text(blurb, size=Pt(9.5)),
       ]),
-      width=Custom(Pct(100)),
+      width=Pct(100),
       inset=Sides(x=Pt(18), y=Pt(22)),
       radius=Corners(all=Pt(8)),
-      fill=Some(title_fill),
+      fill=title_fill,
     ),
     V(Pt(4)),
-    Call("outline", named=[("depth", Value::int(2)), ("indent", Value::auto())]),
+    Outline(depth=2, extra=[("indent", Value::auto())]),
     // Text and paragraphs.
     Heading("Text and paragraphs"),
     Par(
       Seq([
         intro_1,
-        Text("1234567890", number_type=Custom("old-style")),
+        Text("1234567890", number_type="old-style"),
         intro_2,
         Footnote(
           Seq([
@@ -213,7 +200,7 @@ pub fn showcase() -> Document {
           Strong("Quote"),
           Quote(
             "Beauty is our business.",
-            attribution=Some("Donald E. Knuth"),
+            attribution="Donald E. Knuth",
             block=true,
           ),
         ]),
@@ -241,47 +228,42 @@ pub fn showcase() -> Document {
       Table(
         stage_cells,
         columns=[Auto, Fr(1), Auto, Auto],
-        align=Cells::columns([
-          Custom(Left),
-          Custom(Left),
-          Custom(Right),
-          Custom(Right),
-        ]),
+        align=Cells::columns([Left, Left, Right, Right]),
         stroke=Cells() <| ((_, y) => {
           if y == 0 {
-            Sides(bottom=Some(Stroke(thickness=Pt(0.8))))
+            Sides(bottom=Stroke(thickness=Pt(0.8)))
           } else {
-            Sides(bottom=Some(Stroke(thickness=Pt(0.3), paint=Luma(200))))
+            Sides(bottom=Stroke(thickness=Pt(0.3), paint=Luma(200)))
           }
         }),
         fill=Cells() <| ((_, y) => {
           if y > 0 && y % 2 == 1 {
-            Some(Luma(247))
+            Luma(247)
           } else {
             None
           }
         }),
       ),
-      caption=Some("Differential test stages against upstream Typst."),
+      caption="Differential test stages against upstream Typst.",
       label="stages",
     ),
     Grid(
       [
         Figure(
-          Image("glacier.jpg", width=Custom(Pct(100))),
-          caption=Some("A JPEG photo, embedded as is."),
+          Image("glacier.jpg", width=Pct(100)),
+          caption="A JPEG photo, embedded as is.",
         ),
         Figure(
-          Image("diagram.svg", width=Custom(Pct(100))),
-          caption=Some("An SVG diagram, converted to vectors."),
+          Image("diagram.svg", width=Pct(100)),
+          caption="An SVG diagram, converted to vectors.",
         ),
       ],
       columns=[Fr(1.15), Fr(1)],
       gutter=[Pt(12)],
     ),
     Figure(
-      Image("matplotlib.pdf", width=Custom(Pct(62))),
-      caption=Some("A PDF figure (matplotlib), embedded as a vector form."),
+      Image("matplotlib.pdf", width=Pct(62)),
+      caption="A PDF figure (matplotlib), embedded as a vector form.",
     ),
     // Code.
     Heading("Code"),
@@ -294,15 +276,15 @@ pub fn showcase() -> Document {
         ":",
       ]),
     ),
-    Raw(rust_code, lang=Some("rust"), block=true),
-    Raw(python_code, lang=Some("python"), block=true),
+    Raw(rust_code, lang="rust", block=true),
+    Raw(python_code, lang="python", block=true),
     Par(
       "And MoonBit itself is the scripting language — this table is computed:",
     ),
     Table(
       fib_cells,
       columns=Array::make(12, @doc.Sizing::Auto),
-      align=Cells::all(Custom(Center)),
+      align=Cells::all(Center),
       inset=Cells::all(Sides(all=Pt(5))),
     ),
   ])

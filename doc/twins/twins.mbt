@@ -60,6 +60,10 @@ using @doc {
   type Smartquote,
   type Image,
   type Paint,
+  type NoneValue,
+  type Sides,
+  type Numbering,
+  type Supplement,
 }
 
 ///|
@@ -83,11 +87,7 @@ fn twin(name : String, parts : Array[String], build : () -> Document) -> Twin {
 ///|
 /// A small page, so that documents stay small.
 fn page() -> SetPage {
-  SetPage(
-    width=Custom(Pt(240)),
-    height=Custom(Pt(160)),
-    margin=Custom(Sides(all=Custom(Pt(12)))),
-  )
+  SetPage(width=Pt(240), height=Pt(160), margin=Sides(all=Pt(12)))
 }
 
 ///|
@@ -98,7 +98,7 @@ let page_typ : String = "#set page(width: 240pt, height: 160pt, margin: 12pt);"
 pub fn constructs() -> Array[Twin] {
   [
     twin("heading", [page_typ, "#heading(level: 2)[#\"Introduction\"]"], () => {
-      Document([page(), Heading("Introduction", level=Custom(2))])
+      Document([page(), Heading("Introduction", level=2)])
     }),
     twin(
       "text-and-sequences",
@@ -146,7 +146,7 @@ pub fn constructs() -> Array[Twin] {
         Document([
           page(),
           Show(Select::heading()) <| ((it, _) => {
-            Block(it, fill=Some(Luma(230)), inset=Sides(all=Pt(4)))
+            Block(it, fill=Luma(230), inset=Sides(all=Pt(4)))
           }),
           ShowSet(Select::emph(), SetText(fill=Red)),
           Show(Select::literal("MoonBit")) <| ((it, _) => Strong(it)),
@@ -166,7 +166,7 @@ pub fn constructs() -> Array[Twin] {
       () => {
         Document([
           page(),
-          SetHeading(numbering=Some(Numbering("1."))),
+          SetHeading(numbering=Numbering("1.")),
           Heading("First", label="first"),
           Labelled(Heading("Second"), "second"),
           Par(
@@ -174,7 +174,7 @@ pub fn constructs() -> Array[Twin] {
               "See ",
               Ref("first"),
               " and ",
-              Ref("second", supplement=Custom(Some(Supplement("Part")))),
+              Ref("second", supplement=Supplement("Part")),
               ".",
             ]),
           ),
@@ -204,7 +204,7 @@ pub fn constructs() -> Array[Twin] {
       () => {
         Document([
           page(),
-          SetHeading(numbering=Some(Numbering("1."))),
+          SetHeading(numbering=Numbering("1.")),
           Heading("One"),
           Heading("Two"),
           Context() <| cx => {
@@ -286,26 +286,26 @@ pub fn constructs() -> Array[Twin] {
                 "syntax",
                 "3 792",
                 "paged",
-                TableCell("2 299", fill=Custom(Some(Yellow))),
+                TableCell("2 299", fill=Yellow),
               ],
               columns=[Auto, Fr(1)],
-              align=Cells::columns([Custom(Left), Custom(Right)]),
+              align=Cells::columns([Left, Right]),
               fill=Cells() <| ((_, y) => {
                 if y > 0 && y % 2 == 1 {
-                  Some(Luma(240))
+                  Luma(240)
                 } else {
                   None
                 }
               }),
               stroke=Cells() <| ((_, y) => {
                 if y == 0 {
-                  Sides(bottom=Some(Stroke(thickness=Pt(0.8))))
+                  Sides(bottom=Stroke(thickness=Pt(0.8)))
                 } else {
-                  Sides(bottom=Some(Stroke(thickness=Pt(0.3), paint=Luma(200))))
+                  Sides(bottom=Stroke(thickness=Pt(0.3), paint=Luma(200)))
                 }
               }),
             ),
-            caption=Some("Stages."),
+            caption="Stages.",
             label="stages",
           ),
           Par(Ref("stages")),
@@ -327,11 +327,7 @@ pub fn constructs() -> Array[Twin] {
           page(),
           List(["one", "two"], tight=true),
           Enum(["first", "second"]),
-          Quote(
-            "Beauty is our business.",
-            block=true,
-            attribution=Some("Knuth"),
-          ),
+          Quote("Beauty is our business.", block=true, attribution="Knuth"),
           Par(
             Seq([
               "Text",
@@ -346,8 +342,8 @@ pub fn constructs() -> Array[Twin] {
             Center + Horizon,
             Block(
               "boxed",
-              width=Custom(Pct(50)),
-              stroke=Sides(all=Some(Stroke(thickness=Pt(0.5), paint=Luma(120)))),
+              width=Pct(50),
+              stroke=Sides(all=Stroke(thickness=Pt(0.5), paint=Luma(120))),
               radius=Corners(all=Pt(2)),
               inset=Sides(x=Pt(4), y=Pt(2)),
             ),
@@ -356,7 +352,7 @@ pub fn constructs() -> Array[Twin] {
           Line(length=Pct(50) - Pt(10)),
           H(Fr(1)),
           Grid(["left", "right"], columns=[Fr(1), Fr(1)], gutter=[Pt(6)]),
-          Raw("let x = 1;", lang=Some("rust"), block=true),
+          Raw("let x = 1;", lang="rust", block=true),
         ])
       },
     ),
@@ -387,7 +383,84 @@ pub fn constructs() -> Array[Twin] {
           ]),
           Parbreak(),
           Pagebreak(weak=true),
-          Outline(depth=Some(1)),
+          Outline(depth=1),
+        ])
+      },
+    ),
+    // The four field states of each value family: omitted, a plain value,
+    // and the explicit `auto` and `none`.
+    twin(
+      "field-states",
+      [
+        page_typ, "#set page(header: none, fill: auto, margin: auto);", "#set page(margin: (x: 12pt, top: auto));",
+        "#set text(dir: auto);", "#block(fill: none, width: auto, above: auto)[#\"enum facades\"]",
+        "#block(fill: luma(240), width: 50%, above: 4pt, stroke: none, inset: (x: 1pt))[#\"plain values\"]",
+        "#heading(numbering: none, supplement: auto, level: auto)[#\"struct facades and scalars\"]",
+        "#heading(numbering: \"1.\", supplement: none, level: 2)[#\"plain\"]", "#figure(caption: none, placement: none)[#\"content\"]",
+        "#figure(caption: [#\"a caption\"], placement: auto)[#\"content\"]", "#block(fill: gradient.linear((red, 0%), (blue, 30%), (green, 100%), angle: 45deg), width: 100%, height: 6pt)",
+        "#block(fill: gradient.radial(white, black, radius: 40%), width: 100%, height: 6pt)",
+        "#3#none#1.5#true#\"text\"",
+      ],
+      () => {
+        Document([
+          page(),
+          SetPage(header=NoneValue(), fill=Auto, margin=Sides::auto()),
+          SetPage(margin=Sides(x=Pt(12), top=Auto)),
+          SetText(dir=Auto),
+          Block("enum facades", fill=None, width=Auto, above=Auto),
+          Block(
+            "plain values",
+            fill=Luma(240),
+            width=Pct(50),
+            above=Pt(4),
+            stroke=Sides::none(),
+            inset=Sides(x=Pt(1)),
+          ),
+          Heading(
+            "struct facades and scalars",
+            numbering=Numbering::none(),
+            supplement=Supplement::auto(),
+            extra=[("level", Value::auto())],
+          ),
+          Heading(
+            "plain",
+            numbering=Numbering("1."),
+            supplement=Supplement::none(),
+            level=2,
+          ),
+          Figure("content", caption=NoneValue(), placement=None),
+          Figure("content", caption="a caption", placement=Auto),
+          Call("block", named=[
+            (
+              "fill",
+              Value::paint(
+                Paint::linear(
+                  [
+                    Paint::stop(Red, Pct(0)),
+                    Paint::stop(Blue, Pct(30)),
+                    Paint::stop(Green, Pct(100)),
+                  ],
+                  angle=Deg(45),
+                ),
+              ),
+            ),
+            ("width", Value::length(Pct(100))),
+            ("height", Value::length(Pt(6))),
+          ]),
+          Call("block", named=[
+            (
+              "fill",
+              Value::paint(Paint::radial([White, Black], radius=Pct(40))),
+            ),
+            ("width", Value::length(Pct(100))),
+            ("height", Value::length(Pt(6))),
+          ]),
+          // Values are content like `#value` in markup.
+          Value::int(3),
+          Value::none(),
+          Value::float(1.5),
+          Value::bool(true),
+          Value::str("text"),
         ])
       },
     ),

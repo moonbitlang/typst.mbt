@@ -1,11 +1,24 @@
-# A MoonBit EDSL for typst.mbt (design, revision 6)
+# A MoonBit EDSL for typst.mbt (design, revision 7)
 
-Status: revision 6. Revisions 3 to 5 resolved the items of
-`docs/edsl-reviews/review-2.md`, `review-3.md` and `review-4.md`; this
-revision resolves the two issues of `docs/edsl-reviews/review-5.md`, both in
-the convergence contract of section 11.4 (element fingerprints; which engine
-values the EDSL admits, section 13). Section 19 maps each finding to the
-section that resolves it. Packages: `moonbitlang/typst/doc` (imported as `@doc`),
+Status: revision 7. Revisions 3 to 6 resolved the items of
+`docs/edsl-reviews/review-2.md` to `review-5.md`. This revision makes two
+changes:
+
+1. **Section 6, plain values first** (new, at the request of the project
+   owner after reading the showcase): a plain value is written plainly
+   (`margin=Sides(x=Cm(2.2))`, `header=Context() <| ...`, `level=2`); the
+   explicit `auto`/`none` states are spelled by the value family instead
+   of wrapping every value in `Custom(..)`/`Some(..)`. Gradients get typed
+   constructors. Sections 6.1, 6.2, 6.4 and 6.5 are new; the examples and
+   the generated signatures throughout follow.
+2. **Section 11.4, convergence validation, is narrowed** in response to
+   `docs/edsl-reviews/review-6.md`: the recorder validates host functions
+   by identity, which is what this design needs, and no longer attempts to
+   make validation exact for values with lossy fingerprints. Reviews 3 to 6
+   showed that this cannot be done piecemeal inside validation; it belongs
+   in the fingerprints and is separate engine work.
+
+Section 19 maps each review finding to the section that resolves it. Packages: `moonbitlang/typst/doc` (imported as `@doc`),
 `doc/system`, `doc/examples`, `doc/twins`.
 
 The examples of this document are compiled code: `doc/examples/
@@ -96,9 +109,21 @@ and decide API questions below.
    `using @doc { type Heading, type Par, type Seq }`; anything can be
    qualified instead (`@doc.Heading(...)`). Like enum constructors, a true
    constructor needs neither when the expected type is its own type
-   (`numbering=Some(Numbering("1."))`).
+   (`numbering=Numbering("1.")`).
 10. `with` and `and` are keywords and cannot be method names; `moon fmt`
-    rewrites a trailing callback as `f(a) <| ((x, y) => { ... })`.
+    rewrites a trailing callback as `f(a) <| ((x, y) => { ... })`. A braced
+    body that is a single identifier (`(it, _) => { it }`) parses as a
+    record literal; `it` alone or `{ Content(it) }` is meant.
+11. An enum may have cases named `None` and `Auto` (the engine's own
+    `Value` has both). Where the expected type is that enum, `fill=None`
+    resolves to the enum's case; `Option`'s `None` is unaffected
+    everywhere else in consumer packages. Inside the package that defines
+    such enums a bare `None` can be ambiguous and is written
+    `Option::None`.
+12. A static method (`Sides::auto()`, `Paint::linear(..)`) needs its type
+    in scope (`using @doc { type Sides }`) or qualification; a method call
+    on a bare enum case (`Blue.at(..)`) does not resolve, so such helpers
+    are static functions with typed parameters (`Paint::stop(Blue, ..)`).
 
 ## 3. Packages
 
@@ -290,39 +315,100 @@ functions returning content, and are called as functions.
 
 ## 6. Values
 
-### 6.1 Field states
+### 6.1 Field states: plain values first
 
 Every settable field keeps the engine's full value domain and the difference
-between absent, `auto`, `none` and a value. The EDSL type nests exactly as
-the engine type does:
+between absent, `auto`, `none` and a value. The **common case — a plain
+value — is written plainly**; the explicit `auto` and `none` states are
+spelled by the value's family, not by wrappers around every value:
 
-| Engine type | Parameter | Author writes | Lowered |
+| State | The author writes |
+|---|---|
+| absent (inherit from the style chain) | nothing: the argument is omitted, no named argument is passed |
+| a value | the value: `level=2`, `width=Pct(80)`, `fill=Luma(246)`, `numbering=Numbering("1.")`, `margin=Sides(x=Cm(2.2), top=Cm(2.6))`, `header=Context() <| cx => { ... }`, `caption="A caption"` |
+| explicit `auto` | by family, see below |
+| explicit `none` | by family, see below |
+
+| Value family | Parameter type | `auto` | `none` |
 |---|---|---|---|
-| any | `x? : T` omitted | nothing | no named argument (inherit) |
-| `Smart<T>` | `x? : Smart[T]` | `level=Auto`, `level=Custom(2)` | `Value::Auto` / value |
-| `Option<T>` | `x? : T?` | `numbering=None`, `numbering=Some(Numbering("1."))` | `Value::None` / value |
-| `Smart<Option<T>>` | `x? : Smart[T?]` | `supplement=Custom(None)` | nested |
-| `T` | `x? : T` | `depth=2` | value |
+| enum facades (`Length`, `Spacing`, `Sizing`, `Paint`, `Alignment`, `Dir`) | the enum | its case `Auto`: `width=Auto` | its case `None`: `fill=None` |
+| struct facades (`Stroke`, `Numbering`, `Supplement`, `Sides[T]`, `Corners[T]`, `Cells[T]`) | the struct | `Sides::auto()`, `Supplement::auto()` | `Stroke::none()`, `Numbering::none()` |
+| content | `&IntoContent` | `AutoValue()` | `NoneValue()` |
+| scalars and lists (`Bool`, `Int64`, `Double`, `String`, `Array[String]`) | the scalar | `extra=[("level", Value::auto())]` | `extra=[("lang", Value::none())]` |
 
-`Smart` is the engine's `@library.Smart[T]` (`Auto | Custom(T)`); by fact 5
-authors write `Auto` and `Custom(v)` without importing it. Values are
-validated by the engine's casts during lowering, so `level=Custom(0)` fails
-with the engine's own message at the `level` argument.
+- The engine's `Smart<T>` and `Option<T>` layers are therefore **erased
+  from the parameter type**: `Smart<Rel<Length>>` is `Length`,
+  `Option<Paint>` and `Smart<Option<Paint>>` are `Paint`,
+  `Smart<Option<Content>>` is `&IntoContent`,
+  `Smart<Margin<Smart<Rel<Length>>>>` is `Sides[Length]`,
+  `Smart<NonZeroUsize>` is `Int64`. A generated signature reads like the
+  Typst documentation of the function.
+- By fact 5 the enum cases resolve without imports wherever the parameter
+  type is the enum, and `None` resolves to the enum's case there
+  (`fill=None` with `fill? : Paint`), while `Option`'s `None` is unaffected
+  elsewhere.
+- `extra? : Array[(String, Value)]` is a parameter of every generated
+  constructor and set rule: named arguments passed after the typed ones (a
+  later argument wins, as in Typst). It gives scalars their rare explicit
+  `auto`/`none`, and it reaches every field the typed parameters do not
+  cover yet (section 7.1) without leaving the typed constructor.
+- **Which states a field accepts is the engine's cast**, as for units
+  (6.3): `Text("x", size=Auto)` fails with Typst's `expected length, found
+  auto` at the `size` argument. The generated documentation of each
+  constructor lists, per parameter, the states the engine type accepts.
+- Integers are `Int64` wherever the engine stores `i64`, `usize` or
+  `NonZeroUsize` (literals need no suffix; range and non-zero checks are the
+  engine casts'). `Double` is used for `f64`.
 
-### 6.2 The `Smart` facade decision
+### 6.2 The decision, and what was tried
 
-`level=2` through an adapter (`level? : &SmartInt`, or a generic parameter)
-was rejected on evidence: by fact 5 a trait-object or generic parameter
-breaks unqualified unit and enum constructors (`width=Pct(80)` no longer
-resolves), which is a settled decision, and it hides the three states from
-the signature. `Custom(v)` keeps signatures honest (the type shows that
-`auto` is legal), is uniform (one rule: `Smart` is `Auto`/`Custom`, `Option`
-is `None`/`Some`), and a missing wrapper is a precise type error (`expected
-Smart[Length], has type Length`).
+Revisions 3 to 6 mirrored the engine's nesting in the parameter types
+(`level? : Smart[Int64]`, `fill? : Paint?`,
+`margin? : Smart[Sides[Smart[Length]]]`), which keeps the three explicit
+states in the signature but makes the common case noisy:
 
-Integers are `Int64` wherever the engine stores `i64`, `usize` or
-`NonZeroUsize` (literals need no suffix; range and non-zero checks are the
-engine casts'). `Double` is used for `f64` and `Ratio`-free scalars.
+```moonbit
+// revisions 3–6
+SetPage(margin=Custom(Sides(x=Custom(Cm(2.2)), top=Custom(Cm(2.6)))),
+        header=Custom(Some(Context() <| cx => { ... })))
+Block(it, fill=Some(Luma(246)), width=Custom(Pct(100)),
+      stroke=Sides(all=Some(Stroke(thickness=Pt(0.5), paint=Luma(220)))))
+// revision 7
+SetPage(margin=Sides(x=Cm(2.2), top=Cm(2.6)),
+        header=Context() <| cx => { ... })
+Block(it, fill=Luma(246), width=Pct(100),
+      stroke=Sides(all=Stroke(thickness=Pt(0.5), paint=Luma(220))))
+```
+
+For an API whose authors are AI agents and whose reviewers are humans, the
+second form is the goal. Three ways to get it were compiled
+(moon 0.1.20260920):
+
+1. **Adapter parameters** — `width? : &IntoSmartLength` with impls for
+   `Length` and an `Auto` marker, or a generic `fn[L : IntoSmartLength]`.
+   Rejected on evidence: with a trait-object or generic parameter the
+   unqualified unit constructors stop resolving (`The value identifier Pt
+   is unbound`, fact 5), which would trade `Custom(Pct(80))` for
+   `@doc.Pct(80)` or an import list of every case, and each family needs
+   one trait per state combination.
+2. **Constructor overloads** — MoonBit has none; a second constructor per
+   element for the explicit states doubles the generated API.
+3. **States inside the value families** (chosen): the facade enums gain the
+   cases `Auto` and `None`, the facade structs static constructors, content
+   two marker descriptions. It compiles as intended —
+   `width=Pct(80)`, `width=Auto`, `fill=None`,
+   `margin=Sides(x=Cm(2.2), top=Auto)`, `header=NoneValue()` — needs no
+   imports beyond the constructors used, and keeps the generated `.mbti`
+   readable (`width? : Length`, `margin? : Sides[Length]`,
+   `header? : &IntoContent`).
+
+What is given up is the type-level statement of which explicit states a
+field accepts. It is replaced by (a) the generated documentation, (b) the
+engine's cast error at the argument's location, with Typst's message, and
+(c) the fact that the mistake is the rare case: a wrongly placed `Auto` or
+`None`, not a missing wrapper on every value. The four states stay
+expressible for every field (6.1), which is what the twins and the escape
+hatch `extra` are tested for.
 
 ### 6.3 Units
 
@@ -330,6 +416,7 @@ engine casts'). `Double` is used for `f64` and `Ratio`-free scalars.
 /// Lengths and ratios: everything Typst writes as `11pt`, `2em`, `50%` and
 /// their sums. One type for the engine's `Length`, `Rel<Length>`, `Ratio`.
 pub(all) enum Length {
+  Auto; None                                        // explicit states (6.1)
   Pt(Double); Mm(Double); Cm(Double); In(Double)    // absolute
   Em(Double)                                        // font-relative
   Pct(Double)                                       // ratio: Pct(50) is 50%
@@ -342,13 +429,14 @@ pub fn Length::scale(self : Length, factor : Double) -> Length
 
 /// The engine's `Spacing`: a length/ratio or a fraction.
 pub(all) enum Spacing {
+  Auto; None                                        // explicit states (6.1)
   Fr(Double)
   Pt(Double); Mm(Double); Cm(Double); In(Double); Em(Double); Pct(Double)
   Rel(Length)                                       // any composed length
 }
 /// The engine's `Sizing` and track sizes: additionally `auto`.
 pub(all) enum Sizing {
-  Auto
+  Auto; None
   Fr(Double)
   Pt(Double); Mm(Double); Cm(Double); In(Double); Em(Double); Pct(Double)
   Rel(Length)
@@ -372,7 +460,9 @@ pub(all) enum Angle { Deg(Double); Rad(Double) }
   `11pt + 0.5em`.
 - **Legal conversions** are the field's engine cast: a `Pct` in a field of
   engine type `Length` fails with the engine's cast message at that
-  argument. The unit shorthands of `Spacing`/`Sizing` (`Pt(40)`) lower like
+  argument (`expected length, found ratio`), and so does a state the field
+  does not accept (`expected length, found auto`). Arithmetic on a state
+  is Typst's operator error (`cannot add auto and length`). The unit shorthands of `Spacing`/`Sizing` (`Pt(40)`) lower like
   `Rel(Pt(40))`; `Fr(x)` lowers to `Value::Fraction`.
 - Track lists (`TrackSizings`) are `Array[Sizing]`:
   `columns=[Auto, Fr(1), Pt(40)]`.
@@ -383,24 +473,109 @@ All are immutable and lowered through Typst's public functions or values.
 
 | Engine type | EDSL | Example |
 |---|---|---|
-| `Paint`, `Color` | `enum Paint { Rgb(String); Luma(Int); Black; White; Red; ...; Value(Value) }` (Typst's named colours, lowered to the global bindings `black`, `red`, ...) | `fill=Rgb("#1f4e79")` → `rgb("#1f4e79")` |
-| `Stroke` | `Stroke(paint?, thickness?, cap?, join?, dash?, miter_limit?)` → `stroke(...)` | `Stroke(thickness=Pt(0.5), paint=Luma(220))` |
-| `Sides<Option<T>>`, `Margin<T>` | `Sides[T]`: `Sides(all?, x?, y?, left?, top?, right?, bottom?, rest?)`. The optional arguments are the sides' "unset" state, so one `Option` of the element type is absorbed (`Sides<Option<Rel>>` is `Sides[Length]`, `Sides<Option<Option<Stroke>>>` is `Sides[Stroke?]`). `all` lowers to the bare value, the others to Typst's dictionary; combining `all` with a side is a lowering error | `inset=Sides(all=Pt(9))` |
-| `Corners<Option<T>>` | `Corners[T]`: `Corners(all?, top?, ..., top_left?, ...)`, same rule | `radius=Corners(all=Pt(4))` |
-| `Alignment` and its subsets | `enum Alignment { Start; Left; Center; Right; End; Top; Horizon; Bottom; Both(Alignment, Alignment) }` with `impl Add` | `Center + Horizon` |
-| `Numbering` | `Numbering(pattern)`; `Numbering::func() <| (numbers, cx) => { ... }` | `Some(Numbering("1.1"))` |
-| `Supplement` | `Supplement(content)`; `Supplement::func() <| (it, cx) => { ... }` | |
+| `Paint`, `Color` (with `Option`/`Smart`) | `enum Paint { Auto; None; Rgb(String); Luma(Int); Black; White; Red; ...; Value(Value) }` (Typst's named colours, lowered to the global bindings `black`, `red`, ...) and the typed gradient constructors `Paint::linear(stops, angle?, ..)`, `Paint::radial(stops, ..)`, `Paint::conic(stops, ..)`; `paint.at(Pct(30))` positions a stop | `fill=Rgb("#1f4e79")`, `fill=Paint::linear([Rgb("#1f4e79"), Rgb("#7fc8a9")], angle=Deg(20))` |
+| `Stroke` | `Stroke(paint?, thickness?, cap?, join?, dash?, miter_limit?)` → `stroke(...)`; `Stroke::none()`, `Stroke::auto()` | `Stroke(thickness=Pt(0.5), paint=Luma(220))` |
+| `Sides<T>`, `Margin<T>` | `Sides[T]`: `Sides(all?, x?, y?, left?, top?, right?, bottom?, rest?)`; `all` lowers to the bare value, the others to Typst's dictionary; combining `all` with a side is a lowering error; `Sides::auto()`, `Sides::none()` for the field as a whole | `inset=Sides(all=Pt(9))`, `margin=Sides(x=Cm(2.2), top=Auto)` |
+| `Corners<T>` | `Corners[T]`: `Corners(all?, top?, ..., top_left?, ...)`, same rule | `radius=Corners(all=Pt(4))` |
+| `Alignment` and its subsets | `enum Alignment { Auto; None; Start; Left; Center; Right; End; Top; Horizon; Bottom; Both(Alignment, Alignment) }` with `impl Add` | `Center + Horizon` |
+| `Numbering` | `Numbering(pattern)`; `Numbering::func() <| (numbers, cx) => { ... }`; `Numbering::none()` | `numbering=Numbering("1.1")` |
+| `Supplement` | `Supplement(content)`; `Supplement::func() <| (it, cx) => { ... }`; `Supplement::none()`, `Supplement::auto()` | |
 | `Celled<T>` | `Cells[T]`: `Cells::all(v)`, `Cells::columns([..])`, `Cells() <| (x, y) => { ... }` | section 7.3 |
 | `DataSource` | `&IntoSource`, implemented by `String` (a path), `Bytes` and `Source` | `Image("chart.png")` |
-| `FontWeight`, `Dir` | enums (`Bold`, `Weight(450)`; `Ltr`, `Rtl`) | `weight=Bold` |
+| `FontWeight`, `Dir` | enums (`Bold`, `Weight(450)`; `Ltr`, `Rtl`, `Auto`) | `weight=Bold` |
 | other string enums | `String`, as written in Typst, in phase 1 (`fit="cover"`); generated enums in phase 2 | |
 | `LinkTarget` | `enum LinkTarget { Url(String); ToLabel(String); Dest(Value) }` | `Link(Url("https://.."))` |
-| anything else | `Value` (section 13) | `Value::call("gradient.linear", ...)` |
+| anything else | `Value` (section 13), also through `extra` | `Value::call("tiling", ...)` |
 
 `pub trait ToValue { to_value(Self) -> Value }` (sealed) is implemented by
-all of these, by `Bool`, `Int`, `Int64`, `Double`, `String`, `Smart[T]`,
-`T?`, `Array[T]`, `Content` and `Value`; it is the bound of generic
-facades such as `Cells[T]` and `Sides[T]`.
+all of these, by `Bool`, `Int`, `Int64`, `Double`, `String`, `Array[T]`,
+`Content` and `Value`; it is the bound of generic facades such as
+`Cells[T]` and `Sides[T]`.
+
+**Typed value constructors** (gradients here; colour spaces, tilings,
+dash patterns, dates in phase 2) follow the rule of the elements: where
+the engine has a native function (`gradient.linear`), the facade is a
+constructor with that function's parameters — positional ones first,
+settable ones as optional labelled parameters with plain values — and it
+lowers by calling the function. Phase 1 writes the three gradient
+constructors by hand; phase 2 generates the function facades from the
+manifest's function metadata, as `docgen.py` does for elements.
+
+### 6.5 Before and after
+
+The reduced showcase (`doc/twins/showcase.mbt`), revision 6 and revision 7:
+
+```moonbit
+// revision 6
+SetPage(
+  paper="a4",
+  margin=Custom(Sides(x=Custom(Cm(2.2)), top=Custom(Cm(2.6)), bottom=Custom(Cm(2.4)))),
+  header=Custom(Some(Context() <| cx => { ... })),
+)
+SetHeading(numbering=Some(Numbering("1.1")))
+Show(Select::heading(level=Custom(1))) <| (it, _) => { ... }
+Block(
+  it,
+  fill=Some(Luma(246)),
+  inset=Sides(all=Pt(9)),
+  radius=Corners(all=Pt(4)),
+  width=Custom(Pct(100)),
+  stroke=Sides(all=Some(Stroke(thickness=Pt(0.5), paint=Luma(220)))),
+)
+let title_fill : Paint = Value(
+  Value::call(
+    "gradient.linear",
+    positional=[Value::paint(Rgb("#1f4e79")), Value::paint(Rgb("#2e86ab")), Value::paint(Rgb("#7fc8a9"))],
+    named=[("angle", Value::angle(Deg(20)))],
+  ),
+)
+Text("1234567890", number_type=Custom("old-style"))
+Figure(Image("glacier.jpg", width=Custom(Pct(100))), caption=Some("A JPEG photo, embedded as is."))
+Table(
+  cells,
+  align=Cells::columns([Custom(Left), Custom(Left), Custom(Right), Custom(Right)]),
+  fill=Cells() <| (_, y) => { if y > 0 && y % 2 == 1 { Some(Luma(247)) } else { None } },
+)
+Raw(rust_code, lang=Some("rust"), block=true)
+
+// revision 7
+SetPage(
+  paper="a4",
+  margin=Sides(x=Cm(2.2), top=Cm(2.6), bottom=Cm(2.4)),
+  header=Context() <| cx => { ... },
+)
+SetHeading(numbering=Numbering("1.1"))
+Show(Select::heading(level=1)) <| (it, _) => { ... }
+Block(
+  it,
+  fill=Luma(246),
+  inset=Sides(all=Pt(9)),
+  radius=Corners(all=Pt(4)),
+  width=Pct(100),
+  stroke=Sides(all=Stroke(thickness=Pt(0.5), paint=Luma(220))),
+)
+let title_fill = Paint::linear(
+  [Rgb("#1f4e79"), Rgb("#2e86ab"), Rgb("#7fc8a9")],
+  angle=Deg(20),
+)
+Text("1234567890", number_type="old-style")
+Figure(Image("glacier.jpg", width=Pct(100)), caption="A JPEG photo, embedded as is.")
+Table(
+  cells,
+  align=Cells::columns([Left, Left, Right, Right]),
+  fill=Cells() <| (_, y) => { if y > 0 && y % 2 == 1 { Luma(247) } else { None } },
+)
+Raw(rust_code, lang="rust", block=true)
+```
+
+The explicit states, where a document needs them:
+
+```moonbit
+Block("x", fill=None, width=Auto)                         // fill: none, width: auto
+SetPage(header=NoneValue(), margin=Sides::auto())         // header: none, margin: auto
+Heading("x", numbering=Numbering::none())                 // numbering: none
+Heading("x", extra=[("level", Value::auto())])            // level: auto (a scalar)
+```
 
 ## 7. Elements (generated)
 
@@ -408,16 +583,25 @@ facades such as `Cells[T]` and `Sides[T]`.
 
 ```moonbit
 #callsite(autofill(loc, args_loc))
+/// `heading`: A section heading.
+///
+/// Explicit states besides a value:
+/// - `level`: `auto` as `extra` with `Value::auto()`
+/// - `numbering`: `none` as `Numbering::none()`
+/// - `supplement`: `auto` as `Supplement::auto()`, `none` as `Supplement::none()`
+/// - `bookmarked`: `auto` as `extra` with `Value::auto()`
+/// - `hanging_indent`: `auto` as `Auto`
 pub fn Heading::Heading(
   body : &IntoContent,
-  level? : Smart[Int64],
+  level? : Int64,
   depth? : Int64,
   offset? : Int64,
-  numbering? : Numbering?,
-  supplement? : Smart[Supplement?],
+  numbering? : Numbering,
+  supplement? : Supplement,
   outlined? : Bool,
-  bookmarked? : Smart[Bool],
-  hanging_indent? : Smart[Length],
+  bookmarked? : Bool,
+  hanging_indent? : Length,
+  extra? : Array[(String, Value)],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -444,15 +628,19 @@ pub fn Heading::Heading(
   (N3).
 - Required parameters are positional in the engine's order; variadic ones
   are an array; settable ones are optional labelled parameters typed per
-  section 6; `label? : String` comes last before the autofilled locations;
-  a callback parameter, if any, is the last positional one.
+  section 6 (plain values: the engine's `Smart`/`Option` layers are
+  erased); then `extra? : Array[(String, Value)]` (section 6.1) and
+  `label? : String`, before the autofilled locations; a callback
+  parameter, if any, is the last positional one. The generated
+  documentation lists the explicit states each parameter accepts and how
+  they are written, as shown above.
 - Constructors are pure and do not raise: validation happens during
   lowering, where errors point to the call or the argument.
 - Field types the type table does not cover yet are **left out of the typed
-  constructor and listed in the generated coverage report**; they stay
-  reachable through `Call`/`Set` (section 13). Phase 2 ends when that list is
-  empty.
-- **Reserved parameter names**: `label`, `loc`, `args_loc`. The generator
+  parameters and listed in the generated coverage report**; they stay
+  reachable through `extra` on the same constructor, and through
+  `Call`/`Set` (section 13). Phase 2 ends when that list is empty.
+- **Reserved parameter names**: `extra`, `label`, `loc`, `args_loc`. The generator
   fails if an element has a constructor parameter with one of these names
   (none does today; `cite.key` is why the occurrence key is the wrapper
   `Keyed`, not a parameter).
@@ -480,7 +668,7 @@ positional/named arguments and its functional twin. Phase-1 entries:
 | `place`, `rotate`, `columns`, `enum.item` | `Place(body, alignment?, ...)` | an optional positional parameter is labelled and passed positionally before the body |
 | `image` | `Image(source : &IntoSource, ...)` | `String` (path) or `Bytes` |
 | `raw` | `Raw(text : String, block?, lang?, ...)` | text is a string, not content |
-| `figure` | `Figure(body, caption? : &IntoContent?, ...)` | caption content is wrapped by the engine's cast |
+| `figure` | `Figure(body, caption? : &IntoContent, ...)` | caption content is wrapped by the engine's cast |
 | `equation` | `Equation(source : String, block?, numbering?, ..., scope?)` | section 13 |
 | `table`, `grid` | `Table(children, columns?, ..., gutter?)` | external `gutter`, parse hooks |
 | `v`, `h` | `V(amount : Spacing, weak?)` | internal `attach` not exposed |
@@ -499,10 +687,10 @@ Figure(
       "paged", TableCell("2 299", colspan=1),
     ],
     columns=[Auto, Fr(1)],
-    align=Cells::columns([Custom(Left), Custom(Right)]),
-    fill=Cells() <| (_, y) => { if y > 0 && y % 2 == 1 { Some(Luma(247)) } else { None } },
+    align=Cells::columns([Left, Right]),
+    fill=Cells() <| (_, y) => { if y > 0 && y % 2 == 1 { Luma(247) } else { None } },
   ),
-  caption=Some("Differential test stages."),
+  caption="Differential test stages.",
   label="stages",
 )
 ```
@@ -511,11 +699,11 @@ Figure(
 
 ```moonbit
 Document([
-  SetPage(paper="a4", margin=Custom(Sides(x=Custom(Cm(2.2)), top=Custom(Cm(2.6))))),
+  SetPage(paper="a4", margin=Sides(x=Cm(2.2), top=Cm(2.6))),
   SetText(font=["Libertinus Serif"], size=Pt(11), lang="en"),
   SetPar(justify=true, leading=Em(0.62)),
-  SetHeading(numbering=Some(Numbering("1.1"))),
-  Show(Select::heading(level=Custom(1))) <| (it, _) => {
+  SetHeading(numbering=Numbering("1.1")),
+  Show(Select::heading(level=1)) <| (it, _) => {
     Seq([V(Em(0.6)), Block(Text(it, fill=Rgb("#1f4e79"))), V(Em(0.2))])
   },
   ShowSet(Select::figure(), SetText(size=Pt(9))),
@@ -572,7 +760,7 @@ Document([
 
 ```moonbit
 pub struct Selector[W]            // opaque; W is the view type of its matches
-pub fn Select::heading(level? : Smart[Int64], depth? : Int64, ...) -> Selector[HeadingView]
+pub fn Select::heading(level? : Int64, depth? : Int64, ...) -> Selector[HeadingView]
 pub fn Select::label(name : String) -> Selector[ContentView]
 pub fn Select::literal(text : String) -> Selector[ContentView]      // show "text": ..
 pub fn Select::regex(pattern : String) -> Selector[ContentView]
@@ -609,13 +797,13 @@ pub fn[A, B] Selector::and_(self : Selector[A], other : Selector[B]) -> Selector
 ## 10. Context and introspection
 
 ```moonbit
-SetPage(header=Custom(Some(Context() <| cx => {
+SetPage(header=Context() <| cx => {
   let page = cx.counter(Counter::page())
   if page.get()[0] > 1 {
     return Seq([Emph("typst.mbt"), H(Fr(1)), page.display(numbering=Numbering("1 / 1"), both=true)])
   }
   Seq([])
-})))
+})
 ```
 
 ### 10.1 `Ctx`
@@ -715,8 +903,10 @@ pub fn Func::host(f : HostFunc) -> Func
   repr of an anonymous Typst closure, so content and frame dumps do not
   distinguish host functions from closures.
 - **Equality** (`Func ==`, memo input equality): the same `HostFunc` object.
-- **Fingerprint**: a discriminant, the `key` and the function span, and it
-  sets `fingerprint_identity` like closures do.
+- **Fingerprint**: a discriminant, the `key` and the function span. It
+  sets `fingerprint_identity`, like closures do, and the new flag
+  `fingerprint_host`, which lets the recorder find results that hold host
+  functions (11.4).
 
 ### 11.2 Identity
 
@@ -755,130 +945,90 @@ lifted.
 
 ### 11.4 Convergence validation (engine change)
 
-Before this design `IntrospectionRecorder::validate` compared, for every
-recorded read, the fingerprint of the recorded result with the fingerprint
-of the result on the new introspector, whatever the flags of that
-fingerprint. The recorder now also validates flagged results exactly
-(`library/introspector.mbt`, `library/memo.mbt`):
+`IntrospectionRecorder::validate` compares, for every recorded read, the
+fingerprint of the recorded result with the fingerprint of the result on
+the new introspector. A fingerprint cannot express identity: for a host
+function it writes the `key`. The recorder therefore also validates host
+functions **by identity** (`library/introspector.mbt`,
+`library/utils_hash.mbt`, `library/value_hash.mbt`):
 
 ```moonbit
 priv struct RecordedRead {
   name : String
-  expected : U128                          // fingerprint of the result
+  expected : U128                 // fingerprint of the result
   replay : (Introspector) -> U128
-  exact : ((Introspector) -> Bool)?        // new
+  hosts : Array[HostFunc]?        // new: the host functions in the result
 }
 ```
 
-- `Introspector::record` takes, from the read methods whose results can hold
-  values (`query`, `query_first`, `query_unique`, `query_label`,
-  `query_labelled`, `page_numbering`, `page_supplement`), a closure that
-  recomputes the result on another introspector and compares it with the
-  recorded one. It is kept as `exact` only if the result's fingerprint flags
-  are non-zero (lossy or identity).
-- **Unflagged fingerprints must be exact.** A fingerprint that does not
-  capture all data of a value, or that stands for a value compared by
-  identity, must set a flag, or `exact` would be dropped. Two places where
-  the existing fingerprints silently omitted something are fixed:
-  - *Elements* (review-5, issue A). `Element::fingerprint` wrote the
-    element's name, which is not unique (`grid.cell` and `table.cell` are
-    both `cell`), so the two cell functions, and otherwise equal content of
-    the two elements, had equal unflagged fingerprints. Every element now
-    has a unique **key** (the name of its accessor, `grid_cell_elem`;
-    emitted by `elemgen.py`), and the key is its fingerprint. It stays
-    unflagged because it is exact: equal keys are the same element.
-  - *Nested modules* (review-4, issue 1). `Module::fingerprint_with_depth`
-    hashes a module that is bound directly in a scope (of another module,
-    or of a closure's captures) only by name and file; it now marks such a
-    truncated module `lossy | identity`, so an outer module whose nested
-    module differs is flagged, and so is everything containing it.
-  The other functions that compare by identity with a structural, unflagged
-  fingerprint are native functions (name, title, documentation). A test
-  walks the scopes of the standard library and checks that no two distinct
-  functions (elements, native functions, constructors, methods) share a
-  fingerprint.
-- `validate` requires `replay(i) == expected` **and**, if present,
-  `exact(i)`.
-- The comparison is `values_validate_equal`: the recursion of
-  `values_memo_equal` (content with all stored fields, arrays, dictionaries,
-  styles, arguments, selectors, dynamic values) in a *validating* mode that
-  differs from memo-input equality only where a value is legitimately
-  created anew in every layout iteration. No part of it accepts a value on
-  the strength of a fingerprint that may be lossy:
-  - **host functions**: the same `HostFunc` object;
-  - **Typst closures**: *structurally*, not by fingerprint and not by
-    identity (a closure created during layout has a new identity in every
-    iteration and must still converge, as with upstream's hash-based
-    validation): the same kind and function span, the same syntax node (the
-    same node object, or equal span and text), the same number of positional
-    parameters, and — recursively — equal default values and equal captured
-    bindings (the same names in order, bound to equal values). A gradient, a
-    host function or another closure among the captures is therefore
-    compared by the rules of this list;
-  - **modules**: a module *value* is equal to the same module, or — for a
-    module evaluated anew — to one with the same name, file, content and
-    bindings. A module **bound directly in a scope** (among a module's
-    bindings or a closure's captures), which is where the fingerprint stops,
-    is equal **only to the same module object**. (Imports are memoized per
-    compilation, `eval_source_memoized`, so an imported module is the same
-    object in every iteration.);
-  - **gradients and tilings**: the types' own equality (their fingerprints
-    go through a rounded repr);
-  - **resolved grids** (`CellGrid`, the synthesized field of tables and
-    grids; never equal as memo input): equal fingerprints and, exactly,
-    everything the grid fingerprint hashes lossily — per cell the body
-    (recursively), the fill and the strokes, and the explicit horizontal
-    and vertical lines with their strokes (review-4, issue 2);
-  - **other leaves**: equal fingerprints, and for leaves whose fingerprint
-    is marked lossy (dynamic values hashed through their repr, such as
-    strokes) also the engine's `==`.
-- **Termination** (review-4, issue 3; review-5, issue B). The comparison
-  has two kinds of steps:
-  - its own recursion, which descends where the fingerprint computation
-    descends — into content fields, collections, styles, arguments, a
-    closure's defaults and captures, a module value's content and bindings
-    — and, like the fingerprint, does **not** descend into a module bound
-    in a scope (identity instead). So the one cyclic structure the engine
-    has, the module graph (`std` contains itself), is never followed;
-  - the *delegated* equality of types whose fingerprint is lossy: gradients,
-    tilings, strokes and the lines of resolved grids. These `==` do traverse
-    data the fingerprint skips — a tiling's laid-out frame with its items,
-    tag contents and paints.
-  Both terminate on every value **the engine produces**: Typst values are
-  immutable and built bottom-up — arrays, dictionaries, content, styles,
-  frames and closures only contain values that existed before them — so
-  apart from modules they are finite trees and DAGs. (Upstream cannot even
-  express a cycle in them; the port's arrays and frames are mutable
-  objects, but the engine never ties a knot.) The remaining question is
-  whether a *host* can hand the engine a knotted value, e.g. an array
-  containing itself inside the metadata of a tiling's frame, built through
-  the port's mutable API. Through the EDSL it cannot (section 13): there
-  is **no public way to turn a raw engine value or raw engine content into
-  a description**. Every engine value of a compilation is produced by a
-  public Typst function called by lowering, by the front end evaluating a
-  `Markup`/`Equation` source, or is read from engine content through a
-  view and passed back opaquely. The world's library is the compiler's own
-  input contract, as for `@typst.compile`; `DocWorld` uses the standard
-  library.
+- A fingerprint computation can **collect the host functions it visits**:
+  `fingerprint_hosts_in(f)` runs `f` and returns them in visiting order
+  (the `Host` branch of `Fingerprint for Func` pushes the function into an
+  active collector). Content caches the fingerprint of its fields together
+  with the fingerprint flags; a new flag, `fingerprint_host`, marks cached
+  fingerprints that visited a host function, and a collector recomputes
+  exactly those instead of using the cache, so it sees every host function
+  without re-hashing anything else.
+- `Introspector::record` computes the result's fingerprint as before; if
+  its flags contain `fingerprint_host`, it stores the collected host
+  functions with the read. Nothing changes for the 16 read methods
+  themselves.
+- `validate`: for a read without host functions, `replay(i) == expected`,
+  as before. For a read with host functions, the replay runs in a
+  collector, and the read validates iff the fingerprints are equal **and**
+  the same number of host functions was visited **and** they are pairwise
+  the same `HostFunc` objects. The two computations fingerprint values
+  with equal fingerprints by the same traversal, so the lists correspond
+  position by position.
 - A **stable query containing host functions converges**: under the
-  creation rule the content in both introspectors holds the same `HostFunc`
-  objects. A stable query containing closures created during layout
-  converges as before, because equal code with equal captures compares
-  equal.
-- `recorder.lossy` and the memo's reuse rule are unchanged. Results with
-  exact fingerprints are validated as before, at the same cost.
+  creation rule (11.2) the content in both introspectors holds the same
+  `HostFunc` objects. Two different host functions never validate, also if
+  a host gave them the same key (a tested case). Typst closures created
+  during layout are validated by their structural fingerprint, as before
+  and as upstream's hash-based validation does.
+- **Termination and cost**: validation performs exactly the fingerprint
+  computations it performed before, on the same values; the collector adds
+  no traversal of its own. Reads without host functions are untouched.
+- **Agreement with the non-convergence analysis**
+  (`library/convergence.mbt`), which compares the fingerprints of
+  inquiry outputs: with distinct keys for distinct host functions — which
+  the EDSL guarantees by construction (11.2: one key per host function of a
+  session, from its rank) — equal fingerprints imply the same host
+  functions, so identity validation and the fingerprint-based history agree.
+  The identity check is the engine's enforcement of that contract of
+  `HostFunc::new`, not a second notion of convergence.
 
-Gate: validation changes only for flagged results, and all differential
-stages must stay unchanged (section 17). Unit tests
-(`library/validate_wbtest.mbt`, `library/validate_recorder_wbtest.mbt`)
-cover, at the value level and through a recorder with a recorded query:
-closures with the same code capturing the two distinct gradients of
-`library/memo_wbtest.mbt` (equal fingerprints) do not validate, closures
-created anew with equal captures do; host functions validate by identity
-only, also with equal keys; outer modules whose nested modules differ have
-equal fingerprints, are flagged and do not validate; a module containing
-itself terminates; grids differing only in the stroke of an explicit line
-do not validate.
+**Not changed, deliberately: lossy fingerprints.** Some engine values are
+fingerprinted through a rounded repr or partially (gradients, tilings,
+strokes, the contents of modules bound in a scope; `mark_fingerprint_lossy`).
+Two such values can have equal fingerprints, and a recorded result
+differing only there validates — in the convergence loop and in the
+non-convergence analysis alike. That is the port's existing behaviour for
+every Typst document and is independent of host functions. Revisions 3 to 6
+tried to tighten it inside validation (exact comparison of flagged results);
+reviews 3 to 6 showed that this cannot be done piecemeal: each comparison
+rule opened another path (closure captures, nested modules, resolved grids,
+tiling frames with their own closures, the separate fingerprint-based
+history). The sound fix is at the source — exact fingerprints for those
+value types, which then serve validation, the history analysis and
+memoization at once — and it is engine work of its own, outside this
+design. One fingerprint defect found on the way is fixed here because it
+is a plain bug with a local fix: `Element::fingerprint` wrote the element's
+name, which is not unique (`grid.cell` and `table.cell` are both `cell`);
+every element now has a unique key (its accessor name, emitted by
+`elemgen.py`), which is its fingerprint.
+
+Gate: all differential stages unchanged (section 17). Unit tests
+(`library/validate_hosts_wbtest.mbt`, `library/validate_elements_wbtest.mbt`,
+`typst/fingerprint_wbtest.mbt`): host functions compare by identity and
+fingerprint by key; the collector finds host functions in content, arrays
+and closure captures, in order, also through cached content fingerprints,
+and does not change fingerprints; a recorded query validates with the same
+host function and not with another one, also with an equal key, also when
+captured by closures created anew; closures created anew with equal
+captures validate; elements with the same name have different
+fingerprints, also as recorded query results; no two distinct functions of
+the standard library share a fingerprint.
 
 ### 11.5 Purity contract and determinism check
 
@@ -1042,9 +1192,10 @@ elsewhere; a per-document base directory is not part of this design.
 
 ```moonbit
 pub fn Markup::Markup(source : String, scope? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Markup
-pub fn Equation::Equation(source : String, block? : Bool, numbering? : Numbering?,
-  number_align? : Alignment, supplement? : Smart[Supplement?], alt? : String?,
-  scope? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Equation
+pub fn Equation::Equation(source : String, block? : Bool, numbering? : Numbering,
+  number_align? : Alignment, supplement? : Supplement, alt? : String,
+  scope? : Array[(String, Value)], extra? : Array[(String, Value)], label? : String,
+  loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Equation
 pub fn Call::Call(path : String, positional? : Array[Value], named? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Call
 pub fn Set::Set(path : String, named : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Set
 ```
@@ -1080,11 +1231,16 @@ pub fn Set::Set(path : String, named : Array[(String, Value)], loc~ : SourceLoc,
   (a binding of the global scope, e.g. `"red"`),
   `::call(path, positional?, named?)`, and the typed `::paint`, `::stroke`,
   `::alignment`, `::sizing`. A `Value` is also what a view's `field(name)`
-  returns. There is deliberately **no constructor from a raw
+  returns, and it is content (`impl IntoContent for Value`): as an
+  argument the value itself, in a sequence its display, like `#value` in
+  markup. There is deliberately **no constructor from a raw
   `@library.Value` or `@library.Content`** (review-5, issue B): the
   generic hatch is calling Typst functions, which covers everything Typst
   can express, while a host-built engine value could be malformed in ways
-  the engine cannot check (section 11.4).
+  the engine cannot check — the engine's own traversals (fingerprints,
+  reprs, equality) assume the finite, acyclic values that Typst evaluation
+  produces, and the port's arrays, dictionaries and frames are mutable
+  objects.
 - **`Call(path, ...)`** calls any public function by its qualified name and
   is content (its displayed result, as `#f(..)` in markup); `Value::call`
   is the same as a value. **`Set(path, named)`** is the generic set rule.
@@ -1157,7 +1313,7 @@ pub(all) enum Location {
 }
 pub struct FileLocation {
   path : String                       // within the project or package
-  package : String?                   // "@namespace/name:version"
+  package_spec : String?              // "@namespace/name:version"
   range : (Int, Int)?                 // bytes, if resolvable
   line : Int; column : Int            // one-based, 0 if unknown
 }
@@ -1208,8 +1364,8 @@ pub struct FileLocation {
 ### 14.3 Worlds
 
 `compile` takes any `&@library.World`. The EDSL provides `DocWorld`, a world
-built from callbacks (`DocWorld::new(load~, book~, font~, today?,
-library?)`), and two ready-made constructions of it:
+built from callbacks (`DocWorld::new(load~, book~, font~, today?)`, with
+the standard library), and two ready-made constructions of it:
 
 - `DocWorld::in_memory(files? : Map[String, Bytes], fonts? : Array[Bytes],
   embedded_fonts? : Bool = true, today? : (Int, Int, Int))` in `doc`:
@@ -1257,7 +1413,12 @@ main file at the project root:
 
 | EDSL | Typst twin |
 |---|---|
-| `Heading("Intro", level=Custom(2))` | `#heading(level: 2)[#"Intro"]` |
+| `Heading("Intro", level=2)` | `#heading(level: 2)[#"Intro"]` |
+| `Block("x", fill=None, width=Auto)` | `#block(fill: none, width: auto)[#"x"]` |
+| `Heading("x", extra=[("level", Value::auto())])` | `#heading(level: auto)[#"x"]` |
+| `Figure("x", caption=NoneValue())` | `#figure(caption: none)[#"x"]` |
+| `Paint::linear([Red, Blue], angle=Deg(45))` | `gradient.linear(red, blue, angle: 45deg)` |
+| `Value::int(3)` as content | `#3` |
 | `"some text"` | `#"some text"` in a content block |
 | `Seq([a, b, c])` | `[#a#b#c]` |
 | `Seq([SetText(size=Pt(9)), a])` | `[#set text(size: 9pt);#a]` |
@@ -1351,8 +1512,8 @@ and off, invalid inputs with their diagnostics) are ordinary tests of the
 5. **Callbacks and context**: one host function per description, memo on
    and off, creation rule, stale `Ctx` and derived handles, the capability
    tables of section 10.1 row by row, a query whose results contain host
-   functions converges in the same number of iterations as its closure
-   twin; in the engine: the validation tests of section 11.4.
+   functions converges without a warning; in the engine: the validation
+   tests of section 11.4.
 6. **Provenance**: a glyph resolves to its node's origin; keyed
    occurrences resolve to different origins of one site; callback-made
    nodes resolve; registry lines never move across iterations; long text
@@ -1369,9 +1530,10 @@ and off, invalid inputs with their diagnostics) are ordinary tests of the
 ## 18. Phases
 
 1. **Engine**: `compile_with`; `FuncInner::Host`/`HostFunc` with the
-   equality, fingerprint and memo rules of section 11; the recorder's exact
-   validation (`values_validate_equal`) with unique element keys and
-   flagged truncated module fingerprints; `@eval.check_recipe`;
+   equality, fingerprint and memo rules of section 11; the recorder's
+   identity validation of host functions (`fingerprint_hosts_in`,
+   `fingerprint_host`); unique element keys as fingerprints
+   (`elemgen.py`); `@eval.check_recipe`;
    `set_layout_memo_enabled`; the runner's frame normalizer, structural
    dump and `edsl` stage. **EDSL**: description values, lowering (initial
    and callback results), the audited exceptions, units and value facades,
@@ -1391,49 +1553,43 @@ and off, invalid inputs with their diagnostics) are ordinary tests of the
 
 ## 19. Resolution index
 
-Review 5 (revision 6):
+Review 6 (revision 7):
 
-| Review-5 item | Resolution |
+| Review-6 item | Resolution |
 |---|---|
-| A element fingerprints (MAJOR) | 11.4: every element has a unique key, which is its fingerprint (engine change, `elemgen.py`); a test checks that distinct library functions have distinct fingerprints; a recorded-query regression with `table.cell`/`grid.cell` |
-| B termination through delegated equality (MAJOR) | 11.4, 13: the EDSL admits no host-built engine values (`Value::engine`/`Content::engine` are not public), so validation only sees values the engine produced, which are acyclic apart from the module graph that is not followed |
+| 1 exact validation vs non-convergence analysis (MAJOR) | 11.4: validation no longer goes beyond fingerprints except for host-function identity, which agrees with the fingerprint-based history under the unique-key contract the EDSL guarantees; exactness for lossy fingerprints is withdrawn from this design (it belongs in the fingerprints) |
+| 2 tiling equality and closures (MAJOR) | 11.4: no delegated equality is used any more; closures created anew, also inside tiling frames, validate by their structural fingerprint as before |
+| 3 stale index entry (MINOR) | this index is rewritten for the narrowed 11.4 |
 
-Review 4 (revision 5, kept):
+Earlier reviews, as they stand in revision 7:
 
-| Review-4 item | Resolution |
+| Item | Resolution |
 |---|---|
-| 1 module validation bypassed (MAJOR) | 11.4: a truncated module fingerprint is flagged `lossy | identity`, so `exact` is kept; nested modules are compared by identity |
-| 2 grid line strokes (MAJOR) | 11.4: resolved grids also compare the explicit lines with their strokes exactly |
-| 3 termination (MAJOR) | 11.4: the comparison descends only where the fingerprint did (never into scope-bound modules), so it terminates whenever the fingerprints did; no acyclicity assumption |
-| 4 labels in the structural dump (MINOR) | 16.2: the label of every content node is printed, including sequences and styled wrappers; twins with a labelled sequence and a labelled styled wrapper |
+| review-5 A element fingerprints | 11.4: every element has a unique key, which is its fingerprint (kept: a plain fingerprint bug with a local fix); tests for same-named elements and for all library functions |
+| review-5 B termination | 11.4, 13: validation adds no traversal beyond the fingerprint computation; the EDSL still admits no host-built engine values (`Value::engine`/`Content::engine` are not public) |
+| review-4 1–3, review-3 A (exactness for lossy results: closure captures, nested modules, resolved grids, termination of the exact comparison) | withdrawn with the narrowing of 11.4: these were consequences of making validation exact for lossy fingerprints, which this design no longer does; 11.4 states the unchanged behaviour and why |
+| review-4 4, review-3 F structural dump | 16.2: a dumper of its own with element identities, raw stored fields, `liftable`, and the label of every content node |
+| review-3 B rules in variadic arrays | 4.2, 8: rules only as direct children of `Document`/`Seq`; a lowering error elsewhere |
+| review-3 C text offsets | 12.1, 12.4: the engine offset is a hint, never reported as exact |
+| review-3 D diagnostic locations | 14.2: `Location` = `Edsl(Origin)` or `File(FileLocation)`, resolved when the report is built, with located hints and trace points |
+| review-3 E context capabilities | 10.1: both tables |
+| review-3 G unit leaves | 6.3: `Value::numeric(x, unit)` |
 
-Review 3 (revision 4, kept):
-
-| Review-3 item | Resolution |
-|---|---|
-| A closure captures (MAJOR) | 11.4: closures are validated structurally with recursion into defaults and captured bindings; modules and resolved grids likewise; no lossy fingerprint is trusted |
-| B rules in variadic arrays (MAJOR) | 4.2, 8: rules only as direct children of `Document`/`Seq`; a lowering error elsewhere; one positional argument per variadic entry |
-| C text offsets (MAJOR) | 12.1, 12.4: the engine offset is a hint, never reported as exact; the preprocessing cases are listed; exact offsets need an engine-side map (not in this design) |
-| D diagnostic locations (MAJOR) | 14.2: `Location` = `Edsl(Origin)` or `File(FileLocation)`, resolved for spans, located hints and trace points when the report is built |
-| E context capabilities (MINOR) | 10.1: both tables corrected (`counter.final` needs a location; supplement callbacks get styles only) |
-| F structural dump (MINOR) | 16.2: a dumper of its own with element identities, raw stored fields, labels and `liftable` |
-| G unit leaves (MINOR) | 6.3: leaves are `Value::numeric(x, unit)`, the evaluator's literal conversion |
-
-Review 2 (revision 3, kept):
+Review 2 (revision 3):
 
 | Review-2 item | Resolution |
 |---|---|
 | 1 constructor signatures | 7.2: reviewed per-element signature notes, enforced by the generator |
 | 2 construction environment | 5.1 initial lowering with `Context::none()`; 5.2 callback-result lowering |
-| 3 host identity and convergence | 11.2–11.4: one host function per description, creation rule, recorder with exact validation |
+| 3 host identity and convergence | 11.1–11.4: one host function per description, creation rule, identity equality, key fingerprint, memo rules, identity validation in the recorder; stable queries with host functions converge |
 | 5 spans | 5.3 span attachment and tracing; 12.2 checked limits and file ids; 12.4 text offsets; 13 snippet slots |
 | 6 resources | 12.5: root-anchored synthetic files, strings passed unchanged |
-| 7 smart/none/ints | 6.1, 6.2: `Smart` is `Auto`/`Custom`, adapter rejected on fact 5, `Int64` |
+| 7 absent/auto/none/value and integers | 6.1, 6.2: the four states stay expressible for every field; since revision 7 a plain value is written plainly and the explicit states by the value family; `Int64` |
 | 8 set rules | 8: sequence-tail nesting only in `Document`/`Seq`; `Element::set(..).spanned(..).liftable()` |
 | 9 sequences and labels | 4.2: `Seq` preserves nesting (twin `[#a#b]`), `Labelled` on one expression result |
 | 10 show-set, recipe checks | 8: `Transformation::Style`, shared `check_recipe` |
 | 11 `Ctx` | 10: capability tables, fallible signatures, tokens on derived handles, counter and state types |
-| 12 API coherence | facts 3, 5–10; 4.2 `Seq`/`Seq::of`/`Content`; `label` in signatures; `Keyed`; `SetRule`; `doc/examples` compiles every example |
+| 12 API coherence | facts 3, 5–12; 4.2 `Seq`/`Seq::of`/`Content`; `label` and `extra` in signatures; `Keyed`; `SetRule`; `doc/examples` compiles every example |
 | 13 reports | 14.2: `CompileReport`/`ExportReport`, warning propagation, located diagnostics |
 | 14 markup and math | 13: mode and scope stored, `Equation` on the math body, snippet files |
 | 16 equivalence and phasing | 16.2 structural dump, frame normalizer, export; 17.2 reduced milestone; 12.3 IDE adaptation |
@@ -1449,6 +1605,12 @@ Review 2 (revision 3, kept):
 1. Whether typed views should resolve style-dependent fields eagerly from
    the callback's styles or take `cx` per accessor (the design takes `cx`).
 2. Whether `Sides`/`Corners` need shorthand constructors for the common
-   uniform case beyond `all=`.
+   uniform case beyond `all=`, and whether scalars deserve typed explicit
+   states instead of `extra` (they are rare; `extra` keeps the scalar
+   parameters plain).
+4. Exact fingerprints for gradients, tilings, strokes and scope-bound
+   modules (11.4): separate engine work, which would make convergence
+   validation and the non-convergence analysis exact for every Typst
+   document.
 3. Whether the conservative memo rule for host functions (11.3) should be
    relaxed while the creation rule holds.

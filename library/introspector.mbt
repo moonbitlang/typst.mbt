@@ -198,72 +198,33 @@ pub fn Introspector::backend(self : Introspector) -> &IntrospectorBackend {
 
 ///|
 /// Record a read. `key` identifies the method and its arguments; `replay`
-/// recomputes the result's fingerprint on another introspector. `exact`
-/// (for reads whose results can hold values) compares the recorded result
-/// with the result on another introspector by [values_validate_equal]; it
-/// is only kept if the result's fingerprint is lossy or contains values
-/// compared by identity, where equal fingerprints prove nothing.
+/// recomputes the result's fingerprint on another introspector.
+///
+/// If the result holds host closures, they are recorded too (not upstream):
+/// host closures compare by identity, so a replayed result is only the same
+/// if it holds the same closures, not just closures with the same key.
 fn Introspector::record(
   self : Introspector,
   name : String,
   args : () -> U128,
   result : () -> U128,
   replay : (Introspector) -> U128,
-  exact? : (Introspector) -> Bool,
 ) -> Unit {
   if self.recorder is Some(recorder) {
     let key = hash128((name, args()))
     if !recorder.calls.contains(key) {
       let mut expected = u128_zero
-      let exact = if fingerprint_flags_in(() => expected = result()) != 0 {
+      let flags = fingerprint_flags_in(() => expected = result())
+      if flags != 0 {
         recorder.lossy = true
-        exact
+      }
+      let hosts = if (flags & fingerprint_host) != 0 {
+        Some(fingerprint_hosts_in(() => result() |> ignore))
       } else {
         None
       }
-      recorder.calls[key] = { name, expected, replay, exact, }
+      recorder.calls[key] = { name, expected, replay, hosts, }
     }
-  }
-}
-
-///|
-/// [values_validate_equal] for optional content.
-fn contents_validate_equal(a : Content?, b : Content?) -> Bool {
-  match (a, b) {
-    (None, None) => true
-    (Some(a), Some(b)) => values_validate_equal(Content(a), Content(b))
-    _ => false
-  }
-}
-
-///|
-/// [values_validate_equal] for content arrays.
-fn content_arrays_validate_equal(
-  a : Array[Content],
-  b : Array[Content],
-) -> Bool {
-  if a.length() != b.length() {
-    return false
-  }
-  for i in 0..<a.length() {
-    if !values_validate_equal(Content(a[i]), Content(b[i])) {
-      return false
-    }
-  }
-  true
-}
-
-///|
-/// [values_validate_equal] for the results of fallible queries (error
-/// results are strings, which the fingerprint captures).
-fn content_results_validate_equal(
-  a : Result[Content, HintedString],
-  b : Result[Content, HintedString],
-) -> Bool {
-  match (a, b) {
-    (Ok(a), Ok(b)) => values_validate_equal(Content(a), Content(b))
-    (Err(_), Err(_)) => true
-    _ => false
   }
 }
 
@@ -274,13 +235,9 @@ pub fn Introspector::query(
   selector : Selector,
 ) -> Array[Content] {
   let output = self.backend.query(selector)
-  self.record(
-    "query",
-    () => hash128(selector),
-    () => hash128(output),
-    i => hash128(i.backend.query(selector)),
-    exact=i => content_arrays_validate_equal(output, i.backend.query(selector)),
-  )
+  self.record("query", () => hash128(selector), () => hash128(output), i => {
+    hash128(i.backend.query(selector))
+  })
   output
 }
 
@@ -291,13 +248,9 @@ pub fn Introspector::query_first(
   selector : Selector,
 ) -> Content? {
   let output = self.backend.query_first(selector)
-  self.record(
-    "query_first",
-    () => hash128(selector),
-    () => hash128(output),
-    i => hash128(i.backend.query_first(selector)),
-    exact=i => contents_validate_equal(output, i.backend.query_first(selector)),
-  )
+  self.record("query_first", () => hash128(selector), () => hash128(output), i => {
+    hash128(i.backend.query_first(selector))
+  })
   output
 }
 
@@ -319,18 +272,9 @@ pub fn Introspector::query_unique(
   selector : Selector,
 ) -> Content raise HintedError {
   let output = result_of(() => self.backend.query_unique(selector))
-  self.record(
-    "query_unique",
-    () => hash128(selector),
-    () => hash128(output),
-    i => hash128(result_of(() => i.backend.query_unique(selector))),
-    exact=i => {
-      content_results_validate_equal(
-        output,
-        result_of(() => i.backend.query_unique(selector)),
-      )
-    },
-  )
+  self.record("query_unique", () => hash128(selector), () => hash128(output), i => {
+    hash128(result_of(() => i.backend.query_unique(selector)))
+  })
   match output {
     Ok(c) => c
     Err(err) => raise HintedError(err)
@@ -344,18 +288,9 @@ pub fn Introspector::query_label(
   label : Label,
 ) -> Content raise HintedError {
   let output = result_of(() => self.backend.query_label(label))
-  self.record(
-    "query_label",
-    () => hash128(label),
-    () => hash128(output),
-    i => hash128(result_of(() => i.backend.query_label(label))),
-    exact=i => {
-      content_results_validate_equal(
-        output,
-        result_of(() => i.backend.query_label(label)),
-      )
-    },
-  )
+  self.record("query_label", () => hash128(label), () => hash128(output), i => {
+    hash128(result_of(() => i.backend.query_label(label)))
+  })
   match output {
     Ok(c) => c
     Err(err) => raise HintedError(err)
@@ -366,13 +301,9 @@ pub fn Introspector::query_label(
 /// Queries for all elements with a label.
 pub fn Introspector::query_labelled(self : Introspector) -> Array[Content] {
   let output = self.backend.query_labelled()
-  self.record(
-    "query_labelled",
-    () => u128_zero,
-    () => hash128(output),
-    i => hash128(i.backend.query_labelled()),
-    exact=i => content_arrays_validate_equal(output, i.backend.query_labelled()),
-  )
+  self.record("query_labelled", () => u128_zero, () => hash128(output), i => {
+    hash128(i.backend.query_labelled())
+  })
   output
 }
 
@@ -471,14 +402,6 @@ pub fn Introspector::page_numbering(
     () => hash128(location),
     () => hash128(output),
     i => hash128(i.backend.page_numbering(location)),
-    exact=i => {
-      match (output, i.backend.page_numbering(location)) {
-        (None, None) => true
-        (Some(a), Some(b)) =>
-          values_validate_equal(a.into_value(), b.into_value())
-        _ => false
-      }
-    },
   )
   output
 }
@@ -495,9 +418,6 @@ pub fn Introspector::page_supplement(
     () => hash128(location),
     () => hash128(output),
     i => hash128(i.backend.page_supplement(location)),
-    exact=i => {
-      contents_validate_equal(output, i.backend.page_supplement(location))
-    },
   )
   output
 }
@@ -554,10 +474,9 @@ priv struct RecordedRead {
   expected : U128
   /// Recomputes the result's fingerprint on another introspector.
   replay : (Introspector) -> U128
-  /// Compares the result with the result on another introspector exactly
-  /// (not upstream): only for results whose fingerprint is lossy or contains
-  /// values compared by identity (closures, host closures).
-  exact : ((Introspector) -> Bool)?
+  /// The host closures in the result, in the order the fingerprint visits
+  /// them (not upstream; `None` if there are none): validated by identity.
+  hosts : Array[HostFunc]?
 }
 
 ///|
@@ -603,11 +522,24 @@ pub fn IntrospectionRecorder::validate(
 ) -> Bool {
   let introspector = introspector.untracked()
   for _, read in self.calls {
-    if (read.replay)(introspector) != read.expected {
-      return false
-    }
-    if read.exact is Some(exact) && !exact(introspector) {
-      return false
+    match read.hosts {
+      None => if (read.replay)(introspector) != read.expected { return false }
+      Some(expected) => {
+        // Equal fingerprints and, in the same order, the same host
+        // closures.
+        let mut hash = u128_zero
+        let hosts = fingerprint_hosts_in(() => {
+          hash = (read.replay)(introspector)
+        })
+        if hash != read.expected || hosts.length() != expected.length() {
+          return false
+        }
+        for i in 0..<hosts.length() {
+          if !physical_equal(hosts[i], expected[i]) {
+            return false
+          }
+        }
+      }
     }
   }
   true

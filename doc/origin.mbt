@@ -525,7 +525,7 @@ pub fn Origins::resolve_range(
       if id == origins_file {
         guard self.entry_at(start) is Some(entry) else { return None }
         let e = self.entries[entry]
-        let mut param = None
+        let mut param : Int? = Option::None
         for i, arg in e.args {
           if arg is Some((_, s, t)) && s == start && t == end {
             param = Some(i)
@@ -566,11 +566,13 @@ pub fn Origins::resolve_range(
 ///|
 /// The provenance of a glyph (docs/edsl-design.md, section 12.1).
 pub struct TextOrigin {
+  /// The constructor call the glyph's text comes from (exact).
   origin : Origin
-  /// The byte offset of the glyph's cluster in the text that reached
-  /// layout, unless the origin's text was too long for exact offsets
-  /// (tier 1 only).
-  offset : Int?
+  /// The glyph's span offset as the engine recorded it: a hint for
+  /// narrowing within the node's text, never claimed exact (the engine may
+  /// have preprocessed the text). `None` where it is known to be
+  /// unreliable: the origin lowered a text of more than 65,535 bytes.
+  engine_offset : Int?
 }
 
 ///|
@@ -590,5 +592,5 @@ pub fn Origins::resolve_glyph(
       })
     _ => false
   }
-  Some({ origin, offset: if long_text { None } else { Some(offset) }, })
+  Some({ origin, engine_offset: if long_text { None } else { Some(offset) }, })
 }

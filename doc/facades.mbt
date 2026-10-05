@@ -3,9 +3,13 @@
 // functions and values.
 
 ///|
-/// A paint: a colour, or any paint value (gradients, tilings) through
-/// `Value`.
+/// A paint: a colour, a gradient ([Paint::linear], [Paint::radial],
+/// [Paint::conic]), or any paint value through `Value`.
 pub(all) enum Paint {
+  /// Explicit `auto`, where the field accepts it.
+  Auto
+  /// Explicit `none`, where the field accepts it.
+  None
   /// `rgb("#rrggbb")` (any string `rgb` accepts).
   Rgb(String)
   /// `luma(n)` with `n` in `0..=255`.
@@ -35,6 +39,8 @@ pub(all) enum Paint {
 ///|
 pub impl ToValue for Paint with fn to_value(self) {
   match self {
+    Auto => Value::auto()
+    None => Value::none()
     Rgb(hex) => Value::native(@library.native_color_rgb(), [Value::str(hex)])
     Luma(n) =>
       Value::native(@library.native_color_luma(), [Value::int(n.to_int64())])
@@ -98,8 +104,124 @@ pub fn Stroke::Stroke(
 }
 
 ///|
+/// Explicit `none`, where the field accepts it.
+pub fn Stroke::none() -> Stroke {
+  { value: Value::none(), }
+}
+
+///|
+/// Explicit `auto`, where the field accepts it.
+pub fn Stroke::auto() -> Stroke {
+  { value: Value::auto(), }
+}
+
+///|
 pub impl ToValue for Stroke with fn to_value(self) {
   self.value
+}
+
+// Gradients: typed constructors for Typst's `gradient.*` functions.
+
+///|
+/// The stops of a gradient: colours, or colours with offsets
+/// ([Paint::stop]).
+fn gradient_stops(stops : Array[Paint]) -> Array[Value] {
+  stops.map(stop => stop.to_value())
+}
+
+///|
+/// A colour stop of a gradient at an offset: `(color, 30%)`.
+pub fn Paint::stop(color : Paint, offset : Length) -> Paint {
+  Value(Value::array([color.to_value(), offset.to_value()]))
+}
+
+///|
+/// `gradient.linear(..stops, angle: .., relative: ..)`.
+pub fn Paint::linear(
+  stops : Array[Paint],
+  angle? : Angle,
+  dir? : Dir,
+  relative? : String,
+) -> Paint {
+  let named : Array[(String, Value)] = []
+  if angle is Some(v) {
+    named.push(("angle", v.to_value()))
+  }
+  if dir is Some(v) {
+    named.push(("dir", v.to_value()))
+  }
+  if relative is Some(v) {
+    named.push(("relative", Value::str(v)))
+  }
+  Value(
+    Value::native(
+      @library.native_gradient_linear(),
+      gradient_stops(stops),
+      named~,
+    ),
+  )
+}
+
+///|
+/// `gradient.radial(..stops, center: .., radius: .., relative: ..)`.
+pub fn Paint::radial(
+  stops : Array[Paint],
+  center? : (Length, Length),
+  radius? : Length,
+  focal_center? : (Length, Length),
+  focal_radius? : Length,
+  relative? : String,
+) -> Paint {
+  let named : Array[(String, Value)] = []
+  if center is Some((x, y)) {
+    named.push(("center", Value::array([x.to_value(), y.to_value()])))
+  }
+  if radius is Some(v) {
+    named.push(("radius", v.to_value()))
+  }
+  if focal_center is Some((x, y)) {
+    named.push(("focal-center", Value::array([x.to_value(), y.to_value()])))
+  }
+  if focal_radius is Some(v) {
+    named.push(("focal-radius", v.to_value()))
+  }
+  if relative is Some(v) {
+    named.push(("relative", Value::str(v)))
+  }
+  Value(
+    Value::native(
+      @library.native_gradient_radial(),
+      gradient_stops(stops),
+      named~,
+    ),
+  )
+}
+
+///|
+/// `gradient.conic(..stops, angle: .., center: .., relative: ..)`.
+pub fn Paint::conic(
+  stops : Array[Paint],
+  angle? : Angle,
+  center? : (Length, Length),
+  relative? : String,
+) -> Paint {
+  let named : Array[(String, Value)] = []
+  if angle is Some(v) {
+    named.push(("angle", v.to_value()))
+  }
+  if center is Some((x, y)) {
+    named.push(("center", Value::array([x.to_value(), y.to_value()])))
+  }
+  if relative is Some(v) {
+    named.push(("relative", Value::str(v)))
+  }
+  Value(
+    Value::native(
+      @library.native_gradient_conic(),
+      gradient_stops(stops),
+      named~,
+    ),
+  )
 }
 
 ///|
@@ -109,6 +231,8 @@ pub impl ToValue for Stroke with fn to_value(self) {
 pub struct Sides[T] {
   priv all : T?
   priv sides : Array[(String, T)]
+  /// Explicit `auto` or `none` for the field as a whole.
+  priv state : Value?
 }
 
 ///|
@@ -144,11 +268,26 @@ pub fn[T] Sides::Sides(
   if rest is Some(v) {
     sides.push(("rest", v))
   }
-  { all, sides, }
+  { all, sides, state: Option::None, }
+}
+
+///|
+/// Explicit `auto` for the field as a whole, where it accepts it.
+pub fn[T] Sides::auto() -> Sides[T] {
+  { all: Option::None, sides: [], state: Some(Value::auto()), }
+}
+
+///|
+/// Explicit `none` for the field as a whole, where it accepts it.
+pub fn[T] Sides::none() -> Sides[T] {
+  { all: Option::None, sides: [], state: Some(Value::none()), }
 }
 
 ///|
 pub impl[T : ToValue] ToValue for Sides[T] with fn to_value(self) {
+  if self.state is Some(state) {
+    return state
+  }
   let dict = Value::dict(self.sides.map(pair => (pair.0, pair.1.to_value())))
   match self.all {
     Some(all) =>
@@ -229,6 +368,10 @@ pub impl[T : ToValue] ToValue for Corners[T] with fn to_value(self) {
 ///|
 /// An alignment (`left`, `center + horizon`, ...).
 pub(all) enum Alignment {
+  /// Explicit `auto`, where the field accepts it.
+  Auto
+  /// Explicit `none`, where the field accepts it.
+  None
   Start
   Left
   Center
@@ -249,6 +392,8 @@ pub impl Add for Alignment with fn add(self, other) {
 ///|
 pub impl ToValue for Alignment with fn to_value(self) {
   match self {
+    Auto => Value::auto()
+    None => Value::none()
     Start => Value::global("start")
     Left => Value::global("left")
     Center => Value::global("center")
@@ -289,6 +434,12 @@ pub fn Numbering::func(
 }
 
 ///|
+/// Explicit `none`: no numbering.
+pub fn Numbering::none() -> Numbering {
+  { value: Value::none(), }
+}
+
+///|
 pub impl ToValue for Numbering with fn to_value(self) {
   self.value
 }
@@ -319,6 +470,18 @@ pub fn Supplement::func(
     Value::content(f(ContentView::new(content), cx))
   })
   { value: Value::of(VCallback(callback)), }
+}
+
+///|
+/// Explicit `none`: no supplement.
+pub fn Supplement::none() -> Supplement {
+  { value: Value::none(), }
+}
+
+///|
+/// Explicit `auto`: the element's default supplement.
+pub fn Supplement::auto() -> Supplement {
+  { value: Value::auto(), }
 }
 
 ///|
@@ -458,6 +621,8 @@ pub impl ToValue for FontWeight with fn to_value(self) {
 ///|
 /// A direction (`ltr`, `rtl`, `ttb`, `btt`).
 pub(all) enum Dir {
+  /// Explicit `auto` (the direction of the text's language).
+  Auto
   Ltr
   Rtl
   Ttb
@@ -467,6 +632,7 @@ pub(all) enum Dir {
 ///|
 pub impl ToValue for Dir with fn to_value(self) {
   match self {
+    Auto => Value::auto()
     Ltr => Value::global("ltr")
     Rtl => Value::global("rtl")
     Ttb => Value::global("ttb")

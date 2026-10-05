@@ -199,11 +199,12 @@ pub struct Equation {
 pub fn Equation::Equation(
   source : String,
   block? : Bool = false,
-  numbering? : Numbering?,
+  numbering? : Numbering,
   number_align? : Alignment,
-  supplement? : @library.Smart[Supplement?],
-  alt? : String?,
+  supplement? : Supplement,
+  alt? : String,
   scope? : Array[(String, Value)] = [],
+  extra? : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -232,6 +233,7 @@ pub fn Equation::Equation(
   if alt is Some(v) {
     args.push({ name: Some("alt"), value: ToValue::to_value(v), param: 5, })
   }
+  push_extra(args, extra, 7)
   let site = Site::new("Equation", loc, args_loc)
   let content = Content::of(
     NEval({
@@ -246,7 +248,7 @@ pub fn Equation::Equation(
   {
     content: match label {
       None => content
-      Some(label) => Content::of(NLabelled(content, label, site, 7))
+      Some(label) => Content::of(NLabelled(content, label, site, 8))
     },
   }
 }

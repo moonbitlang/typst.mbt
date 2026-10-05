@@ -99,6 +99,8 @@ fn Lower::content(
     NEval(node) => self.eval(node)
     NSpace => @library.SpaceElem::shared()
     NEngine(content) => content
+    // Like `#value` in markup.
+    NValue(value) => self.value(value, fallback).display().spanned(fallback)
   }
 }
 
@@ -323,6 +325,9 @@ fn Lower::value(
       }
       @library.Value::Dict(dict)
     }
+    // A value in a content position is passed as the value (so that
+    // `none` and `auto` reach a content field as such).
+    VContent({ node: NValue(inner), }) => self.value(inner, span)
     VContent(content) => @library.Value::Content(self.content(content, span))
     VLabel(name) =>
       self.call(
