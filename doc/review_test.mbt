@@ -179,10 +179,11 @@ test "click: shapes by fill and by stroke (upstream test_jump_from_click_shapes,
     ),
     content="Line",
   )
-  // An open filled path is not closed for the test (kurbo's winding):
-  // the point is inside the triangle that an implicit closing line would
-  // make, but the path has no such segment.
-  let open : () -> &@doc.IntoContent = () => {
+  // An open filled path: the point is inside the triangle that the fill
+  // paints. Upstream tests the path as it is (kurbo's winding does not
+  // close it), so its lookup finds nothing; the origin lookup tests what
+  // is painted, like the preview page.
+  let open = compile_on_page([
     @doc.Curve(
       [
         @doc.CurveMove((Pt(0), Pt(0))),
@@ -190,9 +191,14 @@ test "click: shapes by fill and by stroke (upstream test_jump_from_click_shapes,
         @doc.CurveLine((Pt(10), Pt(10))),
       ],
       fill=Black,
-    )
+    ),
+  ])
+  assert_true(open.jump_from_click(1, 18.0, 12.0) is None)
+  guard open.origin_at(1, 18.0, 12.0) is Some(origin) else {
+    fail("the painted triangle is not hit")
   }
-  inspect(hit([open()], 8, 2), content="-")
+  inspect(origin.kind, content="Curve")
+  assert_true(open.origin_at(1, 12.0, 18.0) is None)
 }
 
 ///|
@@ -238,6 +244,100 @@ test "click: text names its call and argument; a link wins only in the upstream 
 }
 
 ///|
+test "click: what the origin lookup decides differently from upstream, like the page's layer" {
+  let rect = () => @doc.Rect(width=Pt(20), height=Pt(20), fill=Black)
+  // A scale of zero draws nothing. Upstream's `invert` answers it with a
+  // translation, so its lookup still finds the rectangle.
+  let flat = compile_on_page([
+    @doc.Scale(rect(), x=Pct(0), y=Pct(100), origin=Both(Top, Left)),
+  ])
+  assert_true(flat.origin_at(1, 20.0, 20.0) is None)
+  assert_true(flat.jump_from_click(1, 20.0, 20.0) is Some(Source(_)))
+  assert_true(!flat.review_html().unwrap().contains("matrix(1 0 0 1"))
+  // Two scales whose product is one: the rectangle is where it was, and
+  // the layer keeps the small coefficient.
+  let nested = compile_on_page([
+    @doc.Scale(
+      @doc.Scale(rect(), x=Pct(0.001), y=Pct(0.001), origin=Both(Top, Left)),
+      x=Pct(10000000),
+      y=Pct(10000000),
+      origin=Both(Top, Left),
+    ),
+  ])
+  guard nested.origin_at(1, 20.0, 20.0) is Some(origin) else {
+    fail("the rectangle is not hit")
+  }
+  inspect(origin.kind, content="Rect")
+  assert_true(
+    nested.review_html().unwrap().contains("matrix(0.00001 0 0 0.00001"),
+  )
+  // A dashed line counts as a whole line, also in a gap (upstream tests
+  // the dashes), however small the dashes are.
+  let dashed = compile_on_page([
+    @doc.Line(
+      length=Pt(60),
+      stroke=@doc.Stroke(
+        thickness=Pt(4),
+        dash=@doc.Value::array([
+          @doc.Value::length(Pt(10)),
+          @doc.Value::length(Pt(10)),
+        ]),
+      ),
+    ),
+  ])
+  guard dashed.origin_at(1, 15.0, 10.0) is Some(dash) else { fail("no dash") }
+  inspect(dash.kind, content="Line")
+  assert_true(dashed.origin_at(1, 25.0, 10.0) is Some(_))
+  assert_true(dashed.jump_from_click(1, 15.0, 10.0) is Some(_))
+  assert_true(dashed.jump_from_click(1, 25.0, 10.0) is None)
+  let dense = compile_on_page([
+    @doc.Line(
+      length=Pt(60),
+      stroke=@doc.Stroke(
+        thickness=Pt(4),
+        dash=@doc.Value::array([
+          @doc.Value::length(Pt(0.000000001)),
+          @doc.Value::length(Pt(0.000000001)),
+        ]),
+      ),
+    ),
+  ])
+  assert_true(dense.review_html().output() is Some(_))
+  assert_true(dense.origin_at(1, 25.0, 10.0) is Some(_))
+}
+
+///|
+test "the layer has the boxes of the glyphs, also when the pen moves back" {
+  // Tracking that is wider than the letters: the advance of an `i` is
+  // negative, so it has no box and the `W` starts left of the text's
+  // position.
+  let report = compile_on_page([
+    @doc.Text(
+      "iiW",
+      size=Pt(10),
+      tracking=Pt(-4),
+      kerning=false,
+      ligatures=false,
+    ),
+  ])
+  let glyphs = []
+  for page in report.unwrap().pages() {
+    collect_glyphs(page.frame, glyphs)
+  }
+  assert_eq(glyphs.length(), 3)
+  let html = report.review_html().unwrap()
+  // One box, for the `W`, which starts before the margin of 10pt.
+  let boxes = html.split("<rect data-o=").collect()
+  assert_eq(boxes.length(), 2)
+  guard boxes[1].find(" x=\"") is Some(at) else { fail("no x") }
+  let x = boxes[1][at + 4:].to_owned()
+  assert_true(x.has_prefix("7.") || x.has_prefix("8.") || x.has_prefix("9."))
+  // The library finds the `W` there as well, and nothing further left.
+  assert_true(report.origin_at(1, 9.5, 12.0) is Some(_))
+  assert_true(report.origin_at(1, 5.0, 12.0) is None)
+}
+
+///|
 test "the preview page is self-contained and carries the origin of every piece" {
   let report = compile_on_page([
     @doc.Heading("A <heading> & more"),
@@ -257,8 +357,11 @@ test "the preview page is self-contained and carries the origin of every piece" 
   for svg in report.svg_pages().unwrap() {
     assert_true(html.contains(svg))
   }
-  // The layer: text boxes, the clipped rectangle and the stroked line.
-  assert_true(html.contains("<svg class=\"hit\" data-page=\"1\""))
+  // The exporter's SVG is inert in the page (its links cannot be
+  // followed), and the layer follows it: text boxes, the clipped
+  // rectangle and the stroked line.
+  assert_true(html.contains("<div class=\"art\" inert><svg"))
+  assert_true(html.contains("</svg></div>\n<svg class=\"hit\" data-page=\"1\""))
   assert_true(html.contains("<rect data-o=\"0\""))
   assert_true(html.contains("clip-path=\"url(#rv-clip-0)\""))
   assert_true(html.contains("pointer-events=\"fill\""))
@@ -308,6 +411,17 @@ test "the preview page is self-contained and carries the origin of every piece" 
     ])
     .svg_pages()
     .unwrap(),
+  )
+  // Text of the document cannot end the data: a key with markup in it.
+  let hostile = compile_on_page([
+    @doc.Par(@doc.Keyed("</script><script>alert(1)</script>\u{2028}", "keyed")),
+  ])
+  let html = hostile.review_html(title="</title><script>").unwrap()
+  assert_eq(html.split("</script>").collect().length(), 4)
+  assert_eq(html.split("<script").collect().length(), 4)
+  assert_true(html.contains("\\u003c/script>\\u003cscript>alert(1)"))
+  assert_true(
+    html.contains("<title>&lt;/title&gt;&lt;script&gt; review</title>"),
   )
   let failed = @doc.Document([@doc.Image("missing.png")]).compile_paged(
     @doc.DocWorld::in_memory(),

@@ -94,8 +94,11 @@ fn spot(
   guard report.origin_at(page, x, y) is Some(origin) else {
     fail("the click on `\{needle}` hits nothing with a source")
   }
-  if report.jump_from_click(page, x, y) is Some(Source(jump)) {
-    assert_eq(jump.describe(), origin.describe())
+  match report.jump_from_click(page, x, y) {
+    Some(Source(jump)) => assert_eq(jump.describe(), origin.describe())
+    // An outline entry is a link to its heading.
+    Some(Position(..)) | Some(Url(_)) => ()
+    None => fail("upstream's lookup finds nothing at `\{needle}`")
   }
   origin
 }

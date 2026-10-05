@@ -61,22 +61,29 @@
     const bar = document.querySelector('.bar'), panel = $('panel');
     bar.hidden = panel.hidden = true;
     const bad = [];
-    for (const [page, x, y, want] of probes) {
-      const layer = layers[page - 1];
-      const scale = () => layer.getBoundingClientRect().width / layer.viewBox.baseVal.width;
-      // Elements are only found inside the viewport.
-      window.scrollBy(0, layer.getBoundingClientRect().top + y * scale() - window.innerHeight / 2);
-      const box = layer.getBoundingClientRect();
-      const el = document.elementFromPoint(box.left + x * scale(), box.top + y * scale());
-      const hit = el && el.closest ? el.closest('[data-o]') : null;
-      const got = hit === null ? -1 : Number(hit.getAttribute('data-o'));
-      if (got !== want) bad.push(`page ${page} at (${x}, ${y}): the page finds ${got}, the library ${want}`);
+    const shapes = Array.from(document.querySelectorAll('svg.hit [data-o]'));
+    // Twice: the second time with every shape marked, which must not
+    // change what is hit.
+    for (const round of [0, 1]) {
+      if (round === 1) for (const el of shapes) el.classList.add('on', 'hit-here');
+      for (const [page, x, y, want] of probes) {
+        const layer = layers[page - 1];
+        const scale = () => layer.getBoundingClientRect().width / layer.viewBox.baseVal.width;
+        // Elements are only found inside the viewport.
+        window.scrollBy(0, layer.getBoundingClientRect().top + y * scale() - window.innerHeight / 2);
+        const box = layer.getBoundingClientRect();
+        const el = document.elementFromPoint(box.left + x * scale(), box.top + y * scale());
+        const hit = el && el.closest ? el.closest('[data-o]') : null;
+        const got = hit === null ? -1 : Number(hit.getAttribute('data-o'));
+        if (got !== want) bad.push(`page ${page} at (${x}, ${y})${round ? ', marked' : ''}: the page finds ${got}, the library ${want}`);
+      }
     }
+    for (const el of shapes) el.classList.remove('on', 'hit-here');
     bar.hidden = panel.hidden = false;
     window.scrollTo(0, 0);
     $('selftest').hidden = false;
     $('selftest').textContent = bad.length === 0
-      ? `Self-test passed: at ${probes.length} points the page finds the origin that the library finds.`
+      ? `Self-test passed: at ${probes.length} points the page finds the origin that the library finds, also with every shape marked.`
       : `Self-test: ${bad.length} of ${probes.length} points differ from the library.\n` + bad.slice(0, 20).join('\n');
   }
   if (window.location.hash === '#selftest') selftest();

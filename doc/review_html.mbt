@@ -115,7 +115,9 @@ fn OriginTable::number(self : OriginTable, origin : Origin) -> Int {
 /// The answers of `origin_at` for a grid of points on every page, as
 /// `[page, x, y, origin]` (`-1`: nothing): the page's self-test
 /// (`#selftest` in its address) asks the browser for the shape of the
-/// layer at each point and compares.
+/// layer at each point and compares. The grid has at most 24 by 32 points
+/// per page and about 4,000 points in all, so the work is bounded for a
+/// document of any length (each point is one search of its page).
 fn CompileReport::probes(
   self : CompileReport[@layout.PagedDocument],
   document : @layout.PagedDocument,
@@ -123,14 +125,27 @@ fn CompileReport::probes(
 ) -> Json {
   let probes : Array[Json] = []
   let number = (x : Double) => Json::number((x * 100.0).round() / 100.0)
-  for i, page in document.pages() {
+  let pages = document.pages()
+  // Three columns for four rows, like a page.
+  let mut columns = 24
+  while columns > 1 && columns * (columns * 4 / 3) * pages.length() > 4096 {
+    columns -= 1
+  }
+  let rows = if columns * 4 / 3 > 1 { columns * 4 / 3 } else { 1 }
+  for i, page in pages {
     let size = page.frame.size()
-    for row in 0..<32 {
-      for column in 0..<24 {
+    for row in 0..<rows {
+      for column in 0..<columns {
         // Off the round coordinates at which boxes tend to end.
-        let x = ((column.to_double() + 0.37) * size.x.to_pt() / 24.0 * 100.0).round() /
+        let x = ((column.to_double() + 0.37) *
+          size.x.to_pt() /
+          columns.to_double() *
+          100.0).round() /
           100.0
-        let y = ((row.to_double() + 0.61) * size.y.to_pt() / 32.0 * 100.0).round() /
+        let y = ((row.to_double() + 0.61) *
+          size.y.to_pt() /
+          rows.to_double() *
+          100.0).round() /
           100.0
         let id = match self.origin_at(i + 1, x, y) {
           Some(origin) => table.number(origin)
@@ -207,37 +222,42 @@ fn OriginTable::layer(
             " clip-path=\"url(#\{id})\"><clipPath id=\"\{id}\"><path d=\"\{path_data(clip, 0.0, 0.0)}\"/></clipPath",
           )
         }
+        // (The coefficients are not rounded: nested scales multiply.)
         let ts = group.transform
         out.write_string(
-          "><g transform=\"matrix(\{svg_num(ts.sx.get())} \{svg_num(ts.ky.get())} \{svg_num(ts.kx.get())} \{svg_num(ts.sy.get())} \{svg_num(ts.tx.to_pt())} \{svg_num(ts.ty.to_pt())})\">",
+          "><g transform=\"matrix(\{ts.sx.get()} \{ts.ky.get()} \{ts.kx.get()} \{ts.sy.get()} \{ts.tx.to_pt()} \{ts.ty.to_pt()})\">",
         )
         self.layer(group.frame, out)
         out.write_string("</g></g>")
       }
       Text(text) => {
-        // One box per run of glyphs with the same origin: the union of
-        // the glyphs' boxes.
+        // One box per run of glyphs with the same origin whose boxes
+        // follow each other: the union of the glyphs' boxes. A glyph with
+        // a negative advance has no box (the click search finds nothing
+        // in it) and moves the pen back, so the next box starts a new
+        // run, which can overlap an earlier one. The search takes the
+        // first glyph that contains the point: the boxes are written in
+        // reverse order, the first on top.
         let size = text.size.to_pt()
-        let rect = (id : Int?, from : Double, to : Double) => {
-          if id is Some(id) && to > from {
-            out.write_string(
-              "<rect data-o=\"\{id}\" x=\"\{svg_num(from)}\" y=\"\{svg_num(y - size)}\" width=\"\{svg_num(to - from)}\" height=\"\{svg_num(size)}\"/>",
-            )
-          }
-        }
-        let mut run : Int? = Option::None
-        let mut start = x
+        let boxes : Array[(Int, Double, Double)] = []
         let mut at = x
         for glyph in text.glyphs {
-          let id = self.id(glyph.span)
-          if id != run {
-            rect(run, start, at)
-            run = id
-            start = at
+          let width = glyph.x_advance.at(text.size).to_pt()
+          if width >= 0.0 && self.id(glyph.span) is Some(id) {
+            match boxes.last() {
+              Some((last, from, to)) if last == id && to == at =>
+                boxes[boxes.length() - 1] = (id, from, at + width)
+              _ => boxes.push((id, at, at + width))
+            }
           }
-          at = at + glyph.x_advance.at(text.size).to_pt()
+          at = at + width
         }
-        rect(run, start, at)
+        for k = boxes.length() - 1; k >= 0; k = k - 1 {
+          let (id, from, to) = boxes[k]
+          out.write_string(
+            "<rect data-o=\"\{id}\" x=\"\{svg_num(from)}\" y=\"\{svg_num(y - size)}\" width=\"\{svg_num(to - from)}\" height=\"\{svg_num(size)}\"/>",
+          )
+        }
       }
       Shape(shape, span) => {
         guard self.id(span) is Some(id) else { continue }
@@ -337,12 +357,14 @@ pub fn CompileReport::review_html(
     let size = page.frame.size()
     let width = svg_num(size.x.to_pt())
     let height = svg_num(size.y.to_pt())
+    // The exporter's SVG is inert: a link in it can be neither focused
+    // nor followed, so nothing leads out of the page.
     out.write_string(
-      "<section class=\"page\" style=\"aspect-ratio: \{width} / \{height}\" aria-label=\"Page \{i + 1}\">\n",
+      "<section class=\"page\" style=\"aspect-ratio: \{width} / \{height}\" aria-label=\"Page \{i + 1}\">\n<div class=\"art\" inert>",
     )
     out.write_string(@svg.svg(page, options))
     out.write_string(
-      "\n<svg class=\"hit\" data-page=\"\{i + 1}\" viewBox=\"0 0 \{width} \{height}\" xmlns=\"http://www.w3.org/2000/svg\">",
+      "</div>\n<svg class=\"hit\" data-page=\"\{i + 1}\" viewBox=\"0 0 \{width} \{height}\" xmlns=\"http://www.w3.org/2000/svg\">",
     )
     table.layer(page.frame, out)
     out.write_string("</svg>\n</section>\n")

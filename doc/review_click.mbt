@@ -37,14 +37,44 @@ fn has_segments(path : Array[@kurbo.PathEl]) -> Bool {
 }
 
 ///|
+/// The path with every subpath closed: what a fill paints (SVG and PDF
+/// close an open subpath for filling).
+fn closed_path(path : Array[@kurbo.PathEl]) -> Array[@kurbo.PathEl] {
+  let out : Array[@kurbo.PathEl] = []
+  // Whether the current subpath has a segment and is not closed.
+  let mut open = false
+  for el in path {
+    match el {
+      MoveTo(_) => {
+        if open {
+          out.push(ClosePath)
+        }
+        open = false
+      }
+      ClosePath => open = false
+      _ => open = true
+    }
+    out.push(el)
+  }
+  if open {
+    out.push(ClosePath)
+  }
+  out
+}
+
+///|
 /// Upstream `Curve::contains`: when this curve is interpreted as a clip
-/// mask, would it contain `needle`?
+/// mask, would it contain `needle`? With `painted`, the curve is tested
+/// as a fill paints it, with its open subpaths closed; upstream tests the
+/// path as it is, so the inside of an open path is not contained.
 fn curve_contains(
   curve : @library.Curve,
   fill_rule : @library.FillRule,
   needle : @library.Point,
+  painted : Bool,
 ) -> Bool {
   let path = curve_to_kurbo(curve)
+  let path = if painted { closed_path(path) } else { path }
   guard has_segments(path) else { return false }
   let windings = @kurbo.BezPath::from_vec(path).winding(
     @kurbo.Point::new(needle.x.to_raw(), needle.y.to_raw()),
@@ -58,11 +88,14 @@ fn curve_contains(
 ///|
 /// Upstream `Curve::stroke_contains`: when this curve is stroked with
 /// `stroke`, would the stroke contain `needle`? (`Curve::to_kurbo_stroke`
-/// with a tolerance of 0.01.)
+/// with a tolerance of 0.01.) Without `dashed` the dash pattern is left
+/// out: the whole line counts, also in its gaps, and the work does not
+/// grow with the number of dashes.
 fn curve_stroke_contains(
   curve : @library.Curve,
   stroke : @library.FixedStroke,
   needle : @library.Point,
+  dashed : Bool,
 ) -> Bool {
   let cap = match stroke.cap {
     Butt => @kurbo.Cap::Butt
@@ -78,7 +111,7 @@ fn curve_stroke_contains(
     .with_caps(cap)
     .with_join(join)
     .with_miter_limit(stroke.miter_limit.get())
-  if stroke.dash is Some(dash) {
+  if dashed && stroke.dash is Some(dash) {
     style = style.with_dashes(
       dash.phase.to_raw(),
       dash.array.map(length => length.to_raw()),
@@ -129,12 +162,20 @@ priv enum Hit {
 ///
 /// `strict` is upstream's behaviour: a link wins over what is under it,
 /// and a shape or an image without a source location ends the search.
-/// Without it links are ignored and such a shape or image is transparent:
-/// the question is where the content under the pointer comes from.
+/// Without it links are ignored, such a shape or image is transparent, a
+/// filled curve or a clip counts as it is painted (`curve_contains`), a
+/// dashed stroke counts as a whole line, and a group whose transform has
+/// no inverse is skipped (upstream's `invert` answers a scale of zero
+/// with a translation): the question is where the content under the
+/// pointer comes from, and the preview page's layer answers it with
+/// exactly these rules.
 ///
-/// One deviation in both modes: upstream does not advance past a glyph
-/// whose span has no file, which shifts the boxes of the glyphs after it
-/// to the left; the port keeps every glyph at its place.
+/// One deviation in both modes: a glyph whose span has no origin (no
+/// file, or none that the report knows) is passed over. Upstream does not
+/// advance past a glyph without a file, which shifts the boxes of the
+/// glyphs after it to the left, and gives up the whole search at a glyph
+/// whose file or syntax node cannot be found; the port keeps every glyph
+/// at its place and goes on.
 fn[T] CompileReport::click_in_frame(
   self : CompileReport[T],
   document : @layout.PagedDocument,
@@ -165,13 +206,20 @@ fn[T] CompileReport::click_in_frame(
     match item {
       Group(group) => {
         let pos = click - pos
-        if group.clip is Some(clip) && !curve_contains(clip, NonZero, pos) {
+        if group.clip is Some(clip) &&
+          !curve_contains(clip, NonZero, pos, !strict) {
           continue
         }
         // Realistic transforms should always be invertible.
         // An example of one that isn't is a scale of 0, which would
         // not be clickable anyway.
         guard group.transform.invert() is Some(inv_transform) else { continue }
+        let ts = group.transform
+        if !strict &&
+          (ts.sx.get() * ts.sy.get() - ts.kx.get() * ts.ky.get()).abs() <
+          1.0e-12 {
+          continue
+        }
         let pos = pos.transform_inf(inv_transform)
         if self.click_in_frame(document, group.frame, pos, strict) is Some(hit) {
           return Some(hit)
@@ -198,7 +246,8 @@ fn[T] CompileReport::click_in_frame(
           within = match shape.geometry {
             Line(_) => false
             Rect(size) => is_in_rect(pos, size, click)
-            Curve(curve) => curve_contains(curve, shape.fill_rule, click - pos)
+            Curve(curve) =>
+              curve_contains(curve, shape.fill_rule, click - pos, !strict)
           }
         }
         if !within && shape.stroke is Some(stroke) {
@@ -208,6 +257,7 @@ fn[T] CompileReport::click_in_frame(
               stroke_base_curve(shape.geometry),
               stroke,
               click - pos,
+              strict,
             )
         }
         if within {

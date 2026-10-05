@@ -95,11 +95,24 @@ the parsed source of its file (there is no Typst source), and a glyph
 whose span has no origin does not shift the boxes of the glyphs after it
 (upstream skips the advance for such a glyph).
 
-`origin_at` runs the same search with two rules changed, because the
+`origin_at` runs the same search with five rules changed, because the
 question is "where does this come from", not "where should the editor
-jump": a link does not hide the content under it (outline entries,
-citations and references are links), and a shape or image without a
-source location is transparent instead of ending the search.
+jump", and because the page's layer must answer it the same way:
+
+- a link does not hide the content under it (outline entries, citations
+  and references are links);
+- a shape or image without a source location is transparent instead of
+  ending the search;
+- a filled curve (or a clip) counts as it is painted, with open subpaths
+  closed, where upstream tests the open path and finds nothing inside
+  it;
+- a dashed stroke counts as a whole line, gaps included (upstream
+  expands the dashes; the work of that grows with their number);
+- a group whose transform has no inverse draws nothing and is skipped
+  (upstream's `invert` answers a scale of zero with a translation).
+
+In the page, the exporter's SVG is inert: the links of the document can
+be neither followed nor focused, so the page does not lead anywhere.
 
 `kurbo/winding.mbt` adds the port of kurbo 0.13.1's `PathSeg::winding`,
 `BezPath::winding` and `BezPath::contains`, which upstream's
@@ -116,9 +129,15 @@ source location is transparent instead of ending the search.
   same origin, the argument; the page does not tell them apart yet.
 - A parameter is shown by its position among the constructor's declared
   parameters, not by its name.
-- The stroke of a dashed line is hit in its gaps as well (the layer does
-  not repeat the dash pattern; `origin_at` does), and a curve that does
-  not start with a move is read from the origin by the layer.
+- The stroke of a dashed line is hit in its gaps as well, in the page
+  and in `origin_at`. `jump_from_click` expands the dashes like
+  upstream, so a line with an extreme number of dashes is as expensive
+  there as it is upstream.
+- A curve that does not start with a move is read from the origin by the
+  layer.
+- The layer rounds coordinates to four decimals of a point (transform
+  coefficients are not rounded), so the page and the library can differ
+  within that distance of an edge.
 - The page is for pointing: text cannot be selected yet, and there is no
   comment box (slice 2).
 - HTML and bundle targets are not covered: the page is built from paged
@@ -139,7 +158,7 @@ source location is transparent instead of ending the search.
   the source file, the points to click by searching the frames.
 - The self-test of the generated page in a browser: at 3,072 points of
   the showcase's four pages the page finds the origin that the library
-  finds.
+  finds, before and after every shape of the layer is marked.
 
 ## Appendix: later slices (not under review)
 

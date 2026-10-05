@@ -2,6 +2,11 @@
 // definition (kurbo counts a clockwise loop in a y-down system as +1).
 
 ///|
+/// The winding number inside a square that runs right, down, left, up
+/// (clockwise where y points down).
+const SQUARE_WINDING : Int = 1
+
+///|
 fn winding_of(path : Array[@kurbo.PathEl], x : Double, y : Double) -> Int {
   @kurbo.BezPath::from_vec(path).winding(@kurbo.Point::new(x, y))
 }
@@ -23,9 +28,8 @@ test "winding: a square, by its direction" {
     LineTo(p(10, 0)),
     ClosePath,
   ]
-  let inside = winding_of(square, 5, 5)
-  assert_true(inside == 1 || inside == -1)
-  assert_eq(winding_of(reversed, 5, 5), -inside)
+  assert_eq(winding_of(square, 5, 5), SQUARE_WINDING)
+  assert_eq(winding_of(reversed, 5, 5), -SQUARE_WINDING)
   assert_eq(winding_of(square, 15, 5), 0)
   assert_eq(winding_of(square, 5, -1), 0)
   assert_true(@kurbo.BezPath::from_vec(square).contains(p(1, 9)))
