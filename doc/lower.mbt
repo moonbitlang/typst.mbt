@@ -80,6 +80,7 @@ fn Lower::content(
       self.labelled(body, label, span, label_span)
     }
     NKeyed(key, body) => {
+      self.check_text(key, fallback)
       let keys = self.keys.copy()
       keys.push(key)
       let inner : Lower = { ..self, keys, }
@@ -252,6 +253,7 @@ fn Lower::inserted(
     }
     NValue(value) => (self.value(value, fallback), fallback)
     NKeyed(key, body) => {
+      self.check_text(key, fallback)
       let keys = self.keys.copy()
       keys.push(key)
       let inner : Lower = { ..self, keys, }
@@ -326,6 +328,7 @@ fn Lower::global(
   path : String,
   span : @syntax.Span,
 ) -> @library.Value raise @library.SourceError {
+  self.check_text(path, span)
   let scopes = @library.Scopes::new(Some(self.engine.library))
   let guard_ = self.engine.binding_guard(span)
   let mut value : @library.Value? = None
@@ -376,6 +379,9 @@ fn Lower::args(
       self.session.registry.arg_span(entry, arg.param)
     } else {
       span
+    }
+    if arg.name is Some(name) {
+      self.check_text(name, arg_span)
     }
     if arg.value.val is VSpread(inner) {
       // Like the evaluator's spread argument (`eval_args`).
@@ -483,6 +489,7 @@ fn Lower::value(
     VDict(pairs) => {
       let dict = @library.Dict::new()
       for pair in pairs {
+        self.check_text(pair.0, span)
         dict.insert(pair.0, self.value(pair.1, span))
       }
       @library.Value::Dict(dict)
@@ -602,6 +609,7 @@ fn Lower::eval(
   self.check_text(node.source, source_span)
   let scope = @library.Scope::new()
   for pair in node.scope {
+    self.check_text(pair.0, span)
     scope.define(pair.0, self.value(pair.1, span)) |> ignore
   }
   let id = self.session.registry.snippet(

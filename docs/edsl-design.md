@@ -305,9 +305,11 @@ in it are not literal text:
    collapsing `space` (so a line break of the string is a space, and
    next to Chinese or Japanese text it is no space, as in markup:
    the run lowers to `Space::newline()` if it contains a line break and to
-   `Space()` otherwise). A run with two or more line breaks (a blank line)
-   is a paragraph break, `parbreak()`. White space at the start and at the
-   end of the text is dropped.
+   `Space()` otherwise). A line break is a line feed, a carriage return,
+   or a carriage return followed by a line feed (one break), as in
+   markup. A run with two or more line breaks (a blank line) is a
+   paragraph break, `parbreak()`. White space at the start and at the end
+   of the text is dropped.
 2. **The quote characters** `"` and `'` are `smartquote(double: true)` and
    `smartquote(double: false)`: the engine resolves them by language and
    nesting, and an apostrophe is a single quote, as in markup. With
@@ -339,46 +341,81 @@ line and the interpolated expressions in place:
 | `Prose("a \"b\" \{Emph("c")}.")` | `[#"a" #smartquote(double: true)#"b"#smartquote(double: true) #emph[#"c"]#"."]` |
 | `Prose("one\ntwo\n\nthree")` | `[#"one"`⏎`#"two"#parbreak()#"three"]` |
 
-**Interpolation.** `\{x}` in a string calls `Show` for `x`. Every
-description type implements `@builtin.Show` (generated for the element and
-view types, handwritten for the others; the set and show rule types do
-not, so interpolating a rule does not compile) by writing a
-**placeholder**: the noncharacter U+FDD0, a decimal number, U+FDD1. The
-number names the description in a **process-wide table** (`prose_table`),
-like the serial of a callback. `Prose` splits its text at the
-placeholders, **takes** the descriptions out of the table and puts them
-into its sequence, so the description keeps its structure and its own
-origin (the constructor call inside `\{..}` has its own call site).
+**Interpolation: `Show` is the hook, `Debug` is for people.** `\{x}` in
+a string calls `Show` for `x`. The description types that are content of
+their own — the generated element, function-facade and view types,
+`Content`, `Seq`, `Lit`, `Labelled`, `Keyed`, `Space`, `Symbol`, `Quoted`,
+`Markup`, `Equation`, `Call`, `Context`, the counter updates,
+`ContentView` and `Prose` itself — implement `@builtin.Show` by writing a
+**placeholder**. (The rule types do not, so interpolating a rule does not
+compile; nor do `Value`, the state markers `NoneValue`/`AutoValue` and
+`Document`: `Content(x)` wraps anything that is content.) What a
+description is made of is shown by core's `Debug` trait, which every
+description type implements, rules, values and `Document` included, with a
+readable representation in constructor syntax:
+
+```moonbit
+debug(Heading("Title", level=2))             // Heading("Title", level=2)
+debug_inspect(Prose("a \{Emph("b")}"), content="Prose([\"a\", Space, Emph(\"b\")])")
+println("built \{Repr(heading)}")            // in a string: Repr, not the bare value
+```
+
+`debug(v)`, `debug_inspect(v, ..)` in tests and `\{Repr(v)}` in strings
+are the ways to print a description; plain `\{v}`, `v.to_string()` and
+`println(v)` give the placeholder and belong to `Prose` only.
+
+A placeholder is the noncharacter U+FDD0, a decimal number in canonical
+spelling (no leading zeros, at most 18 digits) and U+FDD1. The number
+names the description in a **process-wide table** (`prose_table`), like
+the serial of a callback; numbers are 64-bit and never reused. `Prose`
+splits its text at the placeholders, **takes** the descriptions out of the
+table and puts them into its sequence, so the description keeps its
+structure and its own origin (the constructor call inside `\{..}` has its
+own call site).
 
 - *Lifetime.* An entry lives from the interpolation to the `Prose` call
   that consumes it — normally the next call. Nothing of the table is part
   of a description, a session or an output; a compilation never reads it
   except to word an error (below). Entries of strings that never reach a
-  `Prose` stay; the table keeps the newest 4096 of them.
+  `Prose` (a description printed with `println` instead of `debug`) stay
+  pending. The table holds the 65,536 newest pending entries: beyond
+  that the oldest is dropped, and a `Prose` whose text still names it
+  fails with `an interpolated description of this text is no longer
+  available: more than 65536 descriptions were interpolated since`. A
+  program that builds more than that many strings before turning the
+  first into `Prose` must build and consume them in smaller batches.
 - *One use.* The text of a `Prose` can be used once: a second `Prose` of
   the same string value finds its descriptions taken and is an error at
   lowering (`an interpolated description of this text was already used by
   another Prose`). Building the string again (a loop, a function) creates
   new placeholders.
+- *Reserved characters.* In the text of `Prose` the two delimiter
+  characters are reserved: a delimiter that is not part of a placeholder
+  with a number that an interpolation was given is an error (`the text of
+  Prose contains a reserved character (U+FDD0)`). Text that reproduces a
+  pending placeholder exactly — the delimiters around the number of a
+  description that is interpolated but not yet consumed — cannot be told
+  from the interpolation; data that may contain these noncharacters must
+  be inserted with `\{Lit(data)}`, never interpolated as a bare string.
 - *Callbacks.* `Prose` and the interpolation are pure constructions that
   run when the author's code runs, also inside a layout-time callback
   (section 11.5): the callback builds its string and its `Prose` in one
-  go, the table is back to its previous state when the constructor
-  returns, and the numbers never reach the result, so repeated or skipped
-  invocations (memoization) cannot be observed. Views are interpolated
-  like descriptions (`Prose("§ \{it}")` in a show callback).
-- *`Show` and debugging.* `to_string()`/`println` of a description
-  therefore print a placeholder, not a rendering. Descriptions are opaque
-  (section 4.1); what they describe is inspected through
-  `Document::lower` and the reports. (A readable `Debug` for descriptions
-  is left to the tooling phase.)
+  go, what it interpolated is consumed when the constructor returns, and
+  the numbers never reach the result, so repeated or skipped invocations
+  (memoization) cannot be observed in any output. The table is shared
+  state only in the two limits above (the cap and the reserved
+  characters). Views are interpolated like descriptions
+  (`Prose("§ \{it}")` in a show callback).
 
 **Leaks are errors, never output.** A placeholder is only meaningful in
 the text of `Prose`. Lowering checks every string it turns into engine
-data for a complete placeholder (the two delimiters around a number; a
-delimiter character alone is ordinary, if unusual, text, which upstream's
-suite has) — literal text (`String`, `Lit`), string values (`Value::str`, the
-text of `Raw`, paths, the source of `Markup` and `Equation`) — and fails
+data or looks up by — literal text (`String`, `Lit`), string values
+(`Value::str`, the text of `Raw`, paths, labels, the source of `Markup`
+and `Equation`) and names (dictionary keys, argument names of `Call` and
+`extra`, the paths of `Call`, `Set` and `Value::global`, scope names, the
+keys of `Keyed`, the directory of a `Document`) — for a complete
+placeholder with a number that was given out (a delimiter character alone
+is ordinary, if unusual, text, which upstream's suite has), and fails
 with `` `Emph` was interpolated into a string that is not the text of
 `Prose` `` (naming the interpolated constructor from the table, if it is
 still there) at the string's origin, with the hint to use `Prose` or
@@ -388,14 +425,15 @@ reserved character (U+FDD0)`); a rule smuggled in through `Content(..)` is
 rejected (`` `SetText` is a rule and cannot be interpolated into prose ``).
 All are located errors at the `Prose` call or the offending string.
 
-**Origins.** The `Prose` call is one origin; its text runs, spaces and
-quotes take the span of its `text` argument, like plain strings in an
-array take the array's (tier 1; the engine offset of a glyph is relative
-to its text run, so tier 2 narrows within the run, not within the whole
-string). Interpolated descriptions keep their own origins. Diagnostics
-that differ only in which text run of one `Prose` they concern are
-therefore deduplicated by the engine; `Lit` gives a text a location of its
-own where that matters.
+**Origins.** The `Prose` call is one origin. Its text runs take the span
+of its `text` argument, like plain strings in an array take the array's
+(tier 1; the engine offset of a glyph is relative to its text run, so
+tier 2 narrows within the run, not within the whole string); its quotes
+and paragraph breaks are calls with the span of the `Prose` call; its
+spaces have no span, like `Space()`. Interpolated descriptions keep their
+own origins. Diagnostics that differ only in which text run of one `Prose`
+they concern are therefore deduplicated by the engine; `Lit` gives a text
+a location of its own where that matters.
 
 ## 5. Lowering
 

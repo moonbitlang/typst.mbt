@@ -831,6 +831,10 @@ def emit_element(spec, out, coverage):
         out.append(
             f"pub impl @builtin.Show for {spec.name} with fn output(self, logger) {{\n  prose_placeholder(self.content, logger)\n}}\n"
         )
+        out.append("///|")
+        out.append(
+            f"pub impl @debug.Debug for {spec.name} with fn to_repr(self) {{\n  self.content.to_repr()\n}}\n"
+        )
 
     # --- set rule
     # Settable: every field that the function does not require (an optional
@@ -891,6 +895,10 @@ def emit_element(spec, out, coverage):
         )
         out.append("///|")
         out.append(f"pub impl SetRule for {sname}\n")
+        out.append("///|")
+        out.append(
+            f"pub impl @debug.Debug for {sname} with fn to_repr(self) {{\n  Content::of(NSetRule(self.node)).to_repr()\n}}\n"
+        )
 
     # --- view and selector
     if spec.view:
@@ -911,6 +919,10 @@ def emit_element(spec, out, coverage):
         out.append("/// Interpolation into the text of `Prose`.")
         out.append(
             f"pub impl @builtin.Show for {vname} with fn output(self, logger) {{\n  prose_placeholder(Content::of(NEngine(self.content)), logger)\n}}\n"
+        )
+        out.append("///|")
+        out.append(
+            f"pub impl @debug.Debug for {vname} with fn to_repr(self) {{\n  Content::of(NEngine(self.content)).to_repr()\n}}\n"
         )
         out.append("///|")
         out.append("/// The element as a generic view.")
@@ -1070,6 +1082,10 @@ def emit_function(spec, out):
         out.append("/// Interpolation into the text of `Prose`.")
         out.append(
             f"pub impl @builtin.Show for {spec.name} with fn output(self, logger) {{\n  prose_placeholder(self.content, logger)\n}}\n"
+        )
+        out.append("///|")
+        out.append(
+            f"pub impl @debug.Debug for {spec.name} with fn to_repr(self) {{\n  self.content.to_repr()\n}}\n"
         )
     else:
         out.append(f") -> {spec.owner} {{")

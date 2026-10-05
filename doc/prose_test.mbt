@@ -119,3 +119,137 @@ test "prose: a delimiter character alone is text outside Prose" {
   let report = compile([@doc.Par("a \u{FDD0} b"), @doc.Symbol("\u{FDD0}")])
   assert_eq(error_messages(report), "")
 }
+
+///|
+test "prose: only canonical placeholders of issued numbers are interpolations" {
+  // A number that overflows, has leading zeros or was never given out is
+  // not a placeholder: in `Prose` the character is reserved.
+  for
+    text in [
+      "\u{FDD0}4294967296000000000000\u{FDD1}", "\u{FDD0}007\u{FDD1}", "\u{FDD0}999999999999\u{FDD1}",
+      "\u{FDD0}\u{FDD1}",
+    ] {
+    let report = compile([@doc.Prose(text)])
+    assert_eq(
+      error_messages(report),
+      "the text of `Prose` contains a reserved character (U+FDD0)",
+    )
+    // Elsewhere it is text.
+    let report = compile([@doc.Par(text)])
+    assert_eq(error_messages(report), "")
+  }
+}
+
+///|
+test "prose: placeholders are found in every string that is lowered" {
+  let leak = (build : (String) -> &@doc.IntoContent) => {
+    let report = compile([build("x\{@doc.Emph("e")}")])
+    error_messages(report)
+  }
+  let expected = "`Emph` was interpolated into a string that is not the text of `Prose`"
+  // Literal text and string values.
+  assert_eq(leak(s => @doc.Lit(s)), expected)
+  assert_eq(leak(s => @doc.Value::str(s)), expected)
+  assert_eq(leak(s => @doc.Markup(s)), expected)
+  assert_eq(leak(s => @doc.Equation(s)), expected)
+  // Names: dictionary keys, argument names, paths, scope names, keys,
+  // labels.
+  assert_eq(leak(s => @doc.Value::dict([(s, @doc.Value::int(0))])), expected)
+  assert_eq(
+    leak(s => @doc.Call("text", named=[(s, @doc.Value::int(0))])),
+    expected,
+  )
+  assert_eq(leak(s => @doc.Call(s)), expected)
+  assert_eq(leak(s => @doc.Value::global(s)), expected)
+  assert_eq(
+    leak(s => @doc.Markup("x", scope=[(s, @doc.Value::int(0))])),
+    expected,
+  )
+  assert_eq(leak(s => @doc.Keyed(s, "x")), expected)
+  assert_eq(leak(s => @doc.Labelled("x", s)), expected)
+  assert_eq(
+    leak(s => @doc.Heading("x", extra=[(s, @doc.Value::int(0))])),
+    expected,
+  )
+  // The directory of a document.
+  let report = @doc.Document(["x"], dir="d\{@doc.Emph("e")}").compile_paged(
+    @doc.DocWorld::in_memory(),
+  )
+  assert_eq(error_messages(report), expected)
+}
+
+///|
+test "prose: nested and repeated interpolation" {
+  let inner = @doc.Emph("inner")
+  let report = compile([
+    @doc.Prose(
+      "a \{@doc.Strong(@doc.Prose("b \{inner} c"))} d \{inner} e \{inner}",
+    ),
+  ])
+  assert_eq(error_messages(report), "")
+  let texts = run_texts(report)
+  // The description is interpolated three times: three occurrences.
+  assert_eq(texts.filter(t => t == "inner").length(), 1)
+  let glyphs = []
+  for page in report.unwrap().pages() {
+    collect_glyphs(page.frame, glyphs)
+  }
+  let mut inner_glyphs = 0
+  for glyph in glyphs {
+    if glyph.0 == "inner" {
+      inner_glyphs += 1
+    }
+  }
+  assert_eq(inner_glyphs, 15)
+}
+
+///|
+test "debug: a description prints as its constructor call, not as a placeholder" {
+  let heading = @doc.Heading("Title", level=2, label="t")
+  @debug.debug_inspect(
+    heading,
+    content=(
+      #|Labelled(Heading("Title", level=2), label="t")
+    ),
+  )
+  @debug.debug_inspect(
+    @doc.Seq([
+      @doc.SetText(size=Pt(9), fill=Red),
+      @doc.Prose("a \"b\" \{@doc.Emph("c")}"),
+      @doc.Raw("fn main() {}", lang="rust", block=true),
+      @doc.Show(@doc.Select::heading(level=1), (it, _) => it),
+      @doc.Value::dict([("k", @doc.Value::length(Pt(1) + Em(2)))]),
+    ]),
+    content=(
+      #|Seq(
+      #|  [
+      #|    SetText(size=9pt, fill=red),
+      #|    Prose(
+      #|      [
+      #|        "a",
+      #|        Space,
+      #|        smartquote(double=true),
+      #|        "b",
+      #|        smartquote(double=true),
+      #|        Space,
+      #|        Emph("c"),
+      #|      ],
+      #|    ),
+      #|    Raw("fn main() {}", block=true, lang="rust"),
+      #|    Show(where(heading, level=1), <callback>),
+      #|    { "k": add(1pt, 2em) },
+      #|  ],
+      #|)
+
+    ),
+  )
+  // In a string: `Repr` is readable, plain interpolation is the hook of
+  // `Prose`.
+  inspect(
+    "see \{@debug.Repr(@doc.Emph("x"))}",
+    content=(
+      #|see Emph("x")
+    ),
+  )
+  assert_true("\{@doc.Emph("x")}".contains("\u{FDD0}"))
+}

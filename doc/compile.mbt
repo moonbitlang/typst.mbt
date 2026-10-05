@@ -332,6 +332,7 @@ fn Document::lower_initial(
     context: @library.Context::none(),
     keys: [],
   }
+  lower.check_text(self.dir, @syntax.Span::detached())
   if virtual_file(self.dir, "<edsl-origins>") is Option::None {
     raise @library.SourceError([
       @library.SourceDiagnostic::error_at(

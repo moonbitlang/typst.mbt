@@ -94,6 +94,11 @@ pub impl @builtin.Show for Heading with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for Heading with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set heading(..)`.
 ///
 /// Explicit states besides a value:
@@ -177,6 +182,11 @@ pub impl IntoContent for SetHeading with fn into_content(self) {
 pub impl SetRule for SetHeading
 
 ///|
+pub impl @debug.Debug for SetHeading with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `heading` element handed to a callback. As content it re-emits the
 /// element unchanged.
 pub struct HeadingView {
@@ -192,6 +202,11 @@ pub impl IntoContent for HeadingView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for HeadingView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for HeadingView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -321,6 +336,11 @@ pub impl @builtin.Show for Par with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for Par with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set par(..)`.
 ///
 /// Explicit states besides a value:
@@ -380,6 +400,11 @@ pub impl IntoContent for SetPar with fn into_content(self) {
 pub impl SetRule for SetPar
 
 ///|
+pub impl @debug.Debug for SetPar with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `par` element handed to a callback. As content it re-emits the element
 /// unchanged.
 pub struct ParView {
@@ -395,6 +420,11 @@ pub impl IntoContent for ParView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for ParView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for ParView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -479,6 +509,11 @@ pub impl @builtin.Show for Parbreak with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for Parbreak with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// A `parbreak` element handed to a callback. As content it re-emits the
 /// element unchanged.
 pub struct ParbreakView {
@@ -494,6 +529,11 @@ pub impl IntoContent for ParbreakView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for ParbreakView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for ParbreakView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -559,6 +599,11 @@ pub impl @builtin.Show for Strong with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for Strong with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set strong(..)`.
 pub struct SetStrong {
   priv node : SetNode
@@ -595,6 +640,11 @@ pub impl IntoContent for SetStrong with fn into_content(self) {
 pub impl SetRule for SetStrong
 
 ///|
+pub impl @debug.Debug for SetStrong with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `strong` element handed to a callback. As content it re-emits the
 /// element unchanged.
 pub struct StrongView {
@@ -610,6 +660,11 @@ pub impl IntoContent for StrongView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for StrongView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for StrongView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -682,6 +737,11 @@ pub impl @builtin.Show for Emph with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for Emph with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// A `emph` element handed to a callback. As content it re-emits the element
 /// unchanged.
 pub struct EmphView {
@@ -697,6 +757,11 @@ pub impl IntoContent for EmphView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for EmphView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for EmphView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -774,6 +839,11 @@ pub impl @builtin.Show for Link with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for Link with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// A `link` element handed to a callback. As content it re-emits the element
 /// unchanged.
 pub struct LinkView {
@@ -789,6 +859,11 @@ pub impl IntoContent for LinkView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for LinkView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for LinkView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -863,6 +938,11 @@ pub impl @builtin.Show for Ref with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for Ref with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set ref(..)`.
 ///
 /// Explicit states besides a value:
@@ -910,6 +990,11 @@ pub impl IntoContent for SetRef with fn into_content(self) {
 pub impl SetRule for SetRef
 
 ///|
+pub impl @debug.Debug for SetRef with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `ref` element handed to a callback. As content it re-emits the element
 /// unchanged.
 pub struct RefView {
@@ -925,6 +1010,11 @@ pub impl IntoContent for RefView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for RefView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for RefView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -1001,6 +1091,11 @@ pub impl @builtin.Show for Footnote with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for Footnote with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set footnote(..)`.
 pub struct SetFootnote {
   priv node : SetNode
@@ -1041,6 +1136,11 @@ pub impl IntoContent for SetFootnote with fn into_content(self) {
 pub impl SetRule for SetFootnote
 
 ///|
+pub impl @debug.Debug for SetFootnote with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `footnote` element handed to a callback. As content it re-emits the
 /// element unchanged.
 pub struct FootnoteView {
@@ -1056,6 +1156,11 @@ pub impl IntoContent for FootnoteView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for FootnoteView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for FootnoteView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -1136,6 +1241,11 @@ pub impl @builtin.Show for Quote with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for Quote with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set quote(..)`.
 ///
 /// Explicit states besides a value:
@@ -1184,6 +1294,11 @@ pub impl IntoContent for SetQuote with fn into_content(self) {
 pub impl SetRule for SetQuote
 
 ///|
+pub impl @debug.Debug for SetQuote with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `quote` element handed to a callback. As content it re-emits the element
 /// unchanged.
 pub struct QuoteView {
@@ -1199,6 +1314,11 @@ pub impl IntoContent for QuoteView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for QuoteView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for QuoteView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -1311,6 +1431,11 @@ pub impl @builtin.Show for List with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for List with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set list(..)`.
 ///
 /// Explicit states besides a value:
@@ -1378,6 +1503,11 @@ pub impl IntoContent for SetList with fn into_content(self) {
 pub impl SetRule for SetList
 
 ///|
+pub impl @debug.Debug for SetList with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `list` element handed to a callback. As content it re-emits the element
 /// unchanged.
 pub struct ListView {
@@ -1393,6 +1523,11 @@ pub impl IntoContent for ListView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for ListView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for ListView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -1473,6 +1608,11 @@ pub impl @builtin.Show for ListItem with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for ListItem with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// A `list.item` element handed to a callback. As content it re-emits the
 /// element unchanged.
 pub struct ListItemView {
@@ -1488,6 +1628,11 @@ pub impl IntoContent for ListItemView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for ListItemView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for ListItemView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -1611,6 +1756,11 @@ pub impl @builtin.Show for Enum with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for Enum with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set enum(..)`.
 ///
 /// Explicit states besides a value:
@@ -1695,6 +1845,11 @@ pub impl IntoContent for SetEnum with fn into_content(self) {
 pub impl SetRule for SetEnum
 
 ///|
+pub impl @debug.Debug for SetEnum with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `enum` element handed to a callback. As content it re-emits the element
 /// unchanged.
 pub struct EnumView {
@@ -1710,6 +1865,11 @@ pub impl IntoContent for EnumView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for EnumView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for EnumView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -1819,6 +1979,11 @@ pub impl @builtin.Show for EnumItem with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for EnumItem with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set enum.item(..)`.
 ///
 /// Explicit states besides a value:
@@ -1860,6 +2025,11 @@ pub impl IntoContent for SetEnumItem with fn into_content(self) {
 pub impl SetRule for SetEnumItem
 
 ///|
+pub impl @debug.Debug for SetEnumItem with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `enum.item` element handed to a callback. As content it re-emits the
 /// element unchanged.
 pub struct EnumItemView {
@@ -1875,6 +2045,11 @@ pub impl IntoContent for EnumItemView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for EnumItemView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for EnumItemView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -1973,6 +2148,11 @@ pub impl @builtin.Show for Terms with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for Terms with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set terms(..)`.
 ///
 /// Explicit states besides a value:
@@ -2032,6 +2212,11 @@ pub impl IntoContent for SetTerms with fn into_content(self) {
 pub impl SetRule for SetTerms
 
 ///|
+pub impl @debug.Debug for SetTerms with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `terms` element handed to a callback. As content it re-emits the element
 /// unchanged.
 pub struct TermsView {
@@ -2047,6 +2232,11 @@ pub impl IntoContent for TermsView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for TermsView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for TermsView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -2127,6 +2317,11 @@ pub impl @builtin.Show for TermsItem with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for TermsItem with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// A `terms.item` element handed to a callback. As content it re-emits the
 /// element unchanged.
 pub struct TermsItemView {
@@ -2142,6 +2337,11 @@ pub impl IntoContent for TermsItemView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for TermsItemView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for TermsItemView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -2270,6 +2470,11 @@ pub impl @builtin.Show for Figure with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for Figure with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set figure(..)`.
 ///
 /// Explicit states besides a value:
@@ -2353,6 +2558,11 @@ pub impl IntoContent for SetFigure with fn into_content(self) {
 pub impl SetRule for SetFigure
 
 ///|
+pub impl @debug.Debug for SetFigure with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `figure` element handed to a callback. As content it re-emits the
 /// element unchanged.
 pub struct FigureView {
@@ -2368,6 +2578,11 @@ pub impl IntoContent for FigureView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for FigureView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for FigureView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -2516,6 +2731,11 @@ pub impl @builtin.Show for Table with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for Table with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set table(..)`.
 pub struct SetTable {
   priv node : SetNode
@@ -2592,6 +2812,11 @@ pub impl IntoContent for SetTable with fn into_content(self) {
 pub impl SetRule for SetTable
 
 ///|
+pub impl @debug.Debug for SetTable with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `table` element handed to a callback. As content it re-emits the element
 /// unchanged.
 pub struct TableView {
@@ -2607,6 +2832,11 @@ pub impl IntoContent for TableView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for TableView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for TableView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -2736,6 +2966,11 @@ pub impl @builtin.Show for TableCell with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for TableCell with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set table.cell(..)`.
 ///
 /// Explicit states besides a value:
@@ -2812,6 +3047,11 @@ pub impl IntoContent for SetTableCell with fn into_content(self) {
 pub impl SetRule for SetTableCell
 
 ///|
+pub impl @debug.Debug for SetTableCell with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `table.cell` element handed to a callback. As content it re-emits the
 /// element unchanged.
 pub struct TableCellView {
@@ -2827,6 +3067,11 @@ pub impl IntoContent for TableCellView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for TableCellView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for TableCellView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -2943,6 +3188,11 @@ pub impl @builtin.Show for TableHeader with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for TableHeader with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set table.header(..)`.
 pub struct SetTableHeader {
   priv node : SetNode
@@ -2983,6 +3233,11 @@ pub impl IntoContent for SetTableHeader with fn into_content(self) {
 pub impl SetRule for SetTableHeader
 
 ///|
+pub impl @debug.Debug for SetTableHeader with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `table.header` element handed to a callback. As content it re-emits the
 /// element unchanged.
 pub struct TableHeaderView {
@@ -2998,6 +3253,11 @@ pub impl IntoContent for TableHeaderView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for TableHeaderView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for TableHeaderView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -3074,6 +3334,11 @@ pub impl @builtin.Show for TableFooter with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for TableFooter with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set table.footer(..)`.
 pub struct SetTableFooter {
   priv node : SetNode
@@ -3110,6 +3375,11 @@ pub impl IntoContent for SetTableFooter with fn into_content(self) {
 pub impl SetRule for SetTableFooter
 
 ///|
+pub impl @debug.Debug for SetTableFooter with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `table.footer` element handed to a callback. As content it re-emits the
 /// element unchanged.
 pub struct TableFooterView {
@@ -3125,6 +3395,11 @@ pub impl IntoContent for TableFooterView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for TableFooterView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for TableFooterView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -3212,6 +3487,11 @@ pub impl @builtin.Show for TableHline with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for TableHline with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set table.hline(..)`.
 ///
 /// Explicit states besides a value:
@@ -3269,6 +3549,11 @@ pub impl IntoContent for SetTableHline with fn into_content(self) {
 pub impl SetRule for SetTableHline
 
 ///|
+pub impl @debug.Debug for SetTableHline with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `table.hline` element handed to a callback. As content it re-emits the
 /// element unchanged.
 pub struct TableHlineView {
@@ -3284,6 +3569,11 @@ pub impl IntoContent for TableHlineView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for TableHlineView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for TableHlineView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -3390,6 +3680,11 @@ pub impl @builtin.Show for TableVline with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for TableVline with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set table.vline(..)`.
 ///
 /// Explicit states besides a value:
@@ -3447,6 +3742,11 @@ pub impl IntoContent for SetTableVline with fn into_content(self) {
 pub impl SetRule for SetTableVline
 
 ///|
+pub impl @debug.Debug for SetTableVline with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `table.vline` element handed to a callback. As content it re-emits the
 /// element unchanged.
 pub struct TableVlineView {
@@ -3462,6 +3762,11 @@ pub impl IntoContent for TableVlineView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for TableVlineView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for TableVlineView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -3559,6 +3864,11 @@ pub impl @builtin.Show for Outline with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for Outline with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set outline(..)`.
 ///
 /// Explicit states besides a value:
@@ -3608,6 +3918,11 @@ pub impl IntoContent for SetOutline with fn into_content(self) {
 pub impl SetRule for SetOutline
 
 ///|
+pub impl @debug.Debug for SetOutline with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `outline` element handed to a callback. As content it re-emits the
 /// element unchanged.
 pub struct OutlineView {
@@ -3623,6 +3938,11 @@ pub impl IntoContent for OutlineView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for OutlineView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for OutlineView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -3703,6 +4023,11 @@ pub impl IntoContent for SetDocument with fn into_content(self) {
 pub impl SetRule for SetDocument
 
 ///|
+pub impl @debug.Debug for SetDocument with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// `title`: A document title.
 ///
 /// `Title(body?)`: the optional positional body is a labelled parameter
@@ -3755,6 +4080,11 @@ pub impl @builtin.Show for Title with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for Title with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set title(..)`.
 ///
 /// Explicit states besides a value:
@@ -3796,6 +4126,11 @@ pub impl IntoContent for SetTitle with fn into_content(self) {
 pub impl SetRule for SetTitle
 
 ///|
+pub impl @debug.Debug for SetTitle with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `title` element handed to a callback. As content it re-emits the element
 /// unchanged.
 pub struct TitleView {
@@ -3811,6 +4146,11 @@ pub impl IntoContent for TitleView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for TitleView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for TitleView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -3988,6 +4328,11 @@ pub impl @builtin.Show for Text with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for Text with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set text(..)`.
 ///
 /// Explicit states besides a value:
@@ -4127,6 +4472,11 @@ pub impl IntoContent for SetText with fn into_content(self) {
 pub impl SetRule for SetText
 
 ///|
+pub impl @debug.Debug for SetText with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `text` element handed to a callback. As content it re-emits the element
 /// unchanged.
 pub struct TextView {
@@ -4142,6 +4492,11 @@ pub impl IntoContent for TextView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for TextView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for TextView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -4325,6 +4680,11 @@ pub impl @builtin.Show for Raw with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for Raw with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set raw(..)`.
 ///
 /// Explicit states besides a value:
@@ -4376,6 +4736,11 @@ pub impl IntoContent for SetRaw with fn into_content(self) {
 pub impl SetRule for SetRaw
 
 ///|
+pub impl @debug.Debug for SetRaw with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `raw` element handed to a callback. As content it re-emits the element
 /// unchanged.
 pub struct RawView {
@@ -4391,6 +4756,11 @@ pub impl IntoContent for RawView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for RawView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for RawView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -4469,6 +4839,11 @@ pub impl @builtin.Show for Linebreak with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for Linebreak with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set linebreak(..)`.
 pub struct SetLinebreak {
   priv node : SetNode
@@ -4505,6 +4880,11 @@ pub impl IntoContent for SetLinebreak with fn into_content(self) {
 pub impl SetRule for SetLinebreak
 
 ///|
+pub impl @debug.Debug for SetLinebreak with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `linebreak` element handed to a callback. As content it re-emits the
 /// element unchanged.
 pub struct LinebreakView {
@@ -4520,6 +4900,11 @@ pub impl IntoContent for LinebreakView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for LinebreakView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for LinebreakView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -4594,6 +4979,11 @@ pub impl @builtin.Show for Smartquote with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for Smartquote with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set smartquote(..)`.
 pub struct SetSmartquote {
   priv node : SetNode
@@ -4638,6 +5028,11 @@ pub impl IntoContent for SetSmartquote with fn into_content(self) {
 pub impl SetRule for SetSmartquote
 
 ///|
+pub impl @debug.Debug for SetSmartquote with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `smartquote` element handed to a callback. As content it re-emits the
 /// element unchanged.
 pub struct SmartquoteView {
@@ -4653,6 +5048,11 @@ pub impl IntoContent for SmartquoteView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for SmartquoteView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for SmartquoteView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -4751,6 +5151,11 @@ pub impl @builtin.Show for Underline with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for Underline with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set underline(..)`.
 ///
 /// Explicit states besides a value:
@@ -4807,6 +5212,11 @@ pub impl IntoContent for SetUnderline with fn into_content(self) {
 pub impl SetRule for SetUnderline
 
 ///|
+pub impl @debug.Debug for SetUnderline with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `underline` element handed to a callback. As content it re-emits the
 /// element unchanged.
 pub struct UnderlineView {
@@ -4822,6 +5232,11 @@ pub impl IntoContent for UnderlineView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for UnderlineView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for UnderlineView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -4936,6 +5351,11 @@ pub impl @builtin.Show for Overline with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for Overline with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set overline(..)`.
 ///
 /// Explicit states besides a value:
@@ -4992,6 +5412,11 @@ pub impl IntoContent for SetOverline with fn into_content(self) {
 pub impl SetRule for SetOverline
 
 ///|
+pub impl @debug.Debug for SetOverline with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `overline` element handed to a callback. As content it re-emits the
 /// element unchanged.
 pub struct OverlineView {
@@ -5007,6 +5432,11 @@ pub impl IntoContent for OverlineView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for OverlineView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for OverlineView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -5117,6 +5547,11 @@ pub impl @builtin.Show for Strike with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for Strike with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set strike(..)`.
 ///
 /// Explicit states besides a value:
@@ -5169,6 +5604,11 @@ pub impl IntoContent for SetStrike with fn into_content(self) {
 pub impl SetRule for SetStrike
 
 ///|
+pub impl @debug.Debug for SetStrike with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `strike` element handed to a callback. As content it re-emits the
 /// element unchanged.
 pub struct StrikeView {
@@ -5184,6 +5624,11 @@ pub impl IntoContent for StrikeView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for StrikeView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for StrikeView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -5289,6 +5734,11 @@ pub impl @builtin.Show for Highlight with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for Highlight with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set highlight(..)`.
 ///
 /// Explicit states besides a value:
@@ -5340,6 +5790,11 @@ pub impl IntoContent for SetHighlight with fn into_content(self) {
 pub impl SetRule for SetHighlight
 
 ///|
+pub impl @debug.Debug for SetHighlight with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `highlight` element handed to a callback. As content it re-emits the
 /// element unchanged.
 pub struct HighlightView {
@@ -5355,6 +5810,11 @@ pub impl IntoContent for HighlightView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for HighlightView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for HighlightView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -5457,6 +5917,11 @@ pub impl @builtin.Show for Sub with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for Sub with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set sub(..)`.
 ///
 /// Explicit states besides a value:
@@ -5505,6 +5970,11 @@ pub impl IntoContent for SetSub with fn into_content(self) {
 pub impl SetRule for SetSub
 
 ///|
+pub impl @debug.Debug for SetSub with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `sub` element handed to a callback. As content it re-emits the element
 /// unchanged.
 pub struct SubView {
@@ -5520,6 +5990,11 @@ pub impl IntoContent for SubView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for SubView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for SubView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -5614,6 +6089,11 @@ pub impl @builtin.Show for Super with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for Super with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set super(..)`.
 ///
 /// Explicit states besides a value:
@@ -5662,6 +6142,11 @@ pub impl IntoContent for SetSuper with fn into_content(self) {
 pub impl SetRule for SetSuper
 
 ///|
+pub impl @debug.Debug for SetSuper with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `super` element handed to a callback. As content it re-emits the element
 /// unchanged.
 pub struct SuperView {
@@ -5677,6 +6162,11 @@ pub impl IntoContent for SuperView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for SuperView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for SuperView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -5763,6 +6253,11 @@ pub impl @builtin.Show for Smallcaps with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for Smallcaps with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set smallcaps(..)`.
 pub struct SetSmallcaps {
   priv node : SetNode
@@ -5799,6 +6294,11 @@ pub impl IntoContent for SetSmallcaps with fn into_content(self) {
 pub impl SetRule for SetSmallcaps
 
 ///|
+pub impl @debug.Debug for SetSmallcaps with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `smallcaps` element handed to a callback. As content it re-emits the
 /// element unchanged.
 pub struct SmallcapsView {
@@ -5814,6 +6314,11 @@ pub impl IntoContent for SmallcapsView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for SmallcapsView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for SmallcapsView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -5986,6 +6491,11 @@ pub impl @builtin.Show for Page with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for Page with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set page(..)`.
 ///
 /// Explicit states besides a value:
@@ -6114,6 +6624,11 @@ pub impl IntoContent for SetPage with fn into_content(self) {
 pub impl SetRule for SetPage
 
 ///|
+pub impl @debug.Debug for SetPage with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `page` element handed to a callback. As content it re-emits the element
 /// unchanged.
 pub struct PageView {
@@ -6129,6 +6644,11 @@ pub impl IntoContent for PageView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for PageView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for PageView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -6254,6 +6774,11 @@ pub impl @builtin.Show for Pagebreak with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for Pagebreak with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set pagebreak(..)`.
 ///
 /// Explicit states besides a value:
@@ -6297,6 +6822,11 @@ pub impl IntoContent for SetPagebreak with fn into_content(self) {
 pub impl SetRule for SetPagebreak
 
 ///|
+pub impl @debug.Debug for SetPagebreak with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `pagebreak` element handed to a callback. As content it re-emits the
 /// element unchanged.
 pub struct PagebreakView {
@@ -6312,6 +6842,11 @@ pub impl IntoContent for PagebreakView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for PagebreakView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for PagebreakView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -6389,6 +6924,11 @@ pub impl @builtin.Show for Align with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for Align with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set align(..)`.
 pub struct SetAlign {
   priv node : SetNode
@@ -6427,6 +6967,11 @@ pub impl IntoContent for SetAlign with fn into_content(self) {
 pub impl SetRule for SetAlign
 
 ///|
+pub impl @debug.Debug for SetAlign with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `align` element handed to a callback. As content it re-emits the element
 /// unchanged.
 pub struct AlignView {
@@ -6442,6 +6987,11 @@ pub impl IntoContent for AlignView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for AlignView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for AlignView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -6579,6 +7129,11 @@ pub impl @builtin.Show for Block with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for Block with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set block(..)`.
 ///
 /// Explicit states besides a value:
@@ -6676,6 +7231,11 @@ pub impl IntoContent for SetBlock with fn into_content(self) {
 pub impl SetRule for SetBlock
 
 ///|
+pub impl @debug.Debug for SetBlock with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `block` element handed to a callback. As content it re-emits the element
 /// unchanged.
 pub struct BlockView {
@@ -6691,6 +7251,11 @@ pub impl IntoContent for BlockView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for BlockView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for BlockView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -6847,6 +7412,11 @@ pub impl @builtin.Show for Box with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for Box with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set box(..)`.
 ///
 /// Explicit states besides a value:
@@ -6921,6 +7491,11 @@ pub impl IntoContent for SetBox with fn into_content(self) {
 pub impl SetRule for SetBox
 
 ///|
+pub impl @debug.Debug for SetBox with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `box` element handed to a callback. As content it re-emits the element
 /// unchanged.
 pub struct BoxView {
@@ -6936,6 +7511,11 @@ pub impl IntoContent for BoxView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for BoxView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for BoxView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -7059,6 +7639,11 @@ pub impl @builtin.Show for Pad with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for Pad with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set pad(..)`.
 pub struct SetPad {
   priv node : SetNode
@@ -7119,6 +7704,11 @@ pub impl IntoContent for SetPad with fn into_content(self) {
 pub impl SetRule for SetPad
 
 ///|
+pub impl @debug.Debug for SetPad with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `pad` element handed to a callback. As content it re-emits the element
 /// unchanged.
 pub struct PadView {
@@ -7134,6 +7724,11 @@ pub impl IntoContent for PadView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for PadView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for PadView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -7264,6 +7859,11 @@ pub impl @builtin.Show for Place with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for Place with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set place(..)`.
 ///
 /// Explicit states besides a value:
@@ -7329,6 +7929,11 @@ pub impl IntoContent for SetPlace with fn into_content(self) {
 pub impl SetRule for SetPlace
 
 ///|
+pub impl @debug.Debug for SetPlace with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `place` element handed to a callback. As content it re-emits the element
 /// unchanged.
 pub struct PlaceView {
@@ -7344,6 +7949,11 @@ pub impl IntoContent for PlaceView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for PlaceView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for PlaceView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -7447,6 +8057,11 @@ pub impl @builtin.Show for Stack with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for Stack with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set stack(..)`.
 ///
 /// Explicit states besides a value:
@@ -7490,6 +8105,11 @@ pub impl IntoContent for SetStack with fn into_content(self) {
 pub impl SetRule for SetStack
 
 ///|
+pub impl @debug.Debug for SetStack with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `stack` element handed to a callback. As content it re-emits the element
 /// unchanged.
 pub struct StackView {
@@ -7505,6 +8125,11 @@ pub impl IntoContent for StackView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for StackView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for StackView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -7620,6 +8245,11 @@ pub impl @builtin.Show for Grid with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for Grid with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set grid(..)`.
 pub struct SetGrid {
   priv node : SetNode
@@ -7696,6 +8326,11 @@ pub impl IntoContent for SetGrid with fn into_content(self) {
 pub impl SetRule for SetGrid
 
 ///|
+pub impl @debug.Debug for SetGrid with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `grid` element handed to a callback. As content it re-emits the element
 /// unchanged.
 pub struct GridView {
@@ -7711,6 +8346,11 @@ pub impl IntoContent for GridView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for GridView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for GridView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -7838,6 +8478,11 @@ pub impl @builtin.Show for GridCell with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for GridCell with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set grid.cell(..)`.
 ///
 /// Explicit states besides a value:
@@ -7914,6 +8559,11 @@ pub impl IntoContent for SetGridCell with fn into_content(self) {
 pub impl SetRule for SetGridCell
 
 ///|
+pub impl @debug.Debug for SetGridCell with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `grid.cell` element handed to a callback. As content it re-emits the
 /// element unchanged.
 pub struct GridCellView {
@@ -7929,6 +8579,11 @@ pub impl IntoContent for GridCellView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for GridCellView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for GridCellView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -8045,6 +8700,11 @@ pub impl @builtin.Show for GridHeader with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for GridHeader with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set grid.header(..)`.
 pub struct SetGridHeader {
   priv node : SetNode
@@ -8085,6 +8745,11 @@ pub impl IntoContent for SetGridHeader with fn into_content(self) {
 pub impl SetRule for SetGridHeader
 
 ///|
+pub impl @debug.Debug for SetGridHeader with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `grid.header` element handed to a callback. As content it re-emits the
 /// element unchanged.
 pub struct GridHeaderView {
@@ -8100,6 +8765,11 @@ pub impl IntoContent for GridHeaderView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for GridHeaderView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for GridHeaderView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -8176,6 +8846,11 @@ pub impl @builtin.Show for GridFooter with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for GridFooter with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set grid.footer(..)`.
 pub struct SetGridFooter {
   priv node : SetNode
@@ -8212,6 +8887,11 @@ pub impl IntoContent for SetGridFooter with fn into_content(self) {
 pub impl SetRule for SetGridFooter
 
 ///|
+pub impl @debug.Debug for SetGridFooter with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `grid.footer` element handed to a callback. As content it re-emits the
 /// element unchanged.
 pub struct GridFooterView {
@@ -8227,6 +8907,11 @@ pub impl IntoContent for GridFooterView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for GridFooterView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for GridFooterView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -8314,6 +8999,11 @@ pub impl @builtin.Show for GridHline with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for GridHline with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set grid.hline(..)`.
 ///
 /// Explicit states besides a value:
@@ -8371,6 +9061,11 @@ pub impl IntoContent for SetGridHline with fn into_content(self) {
 pub impl SetRule for SetGridHline
 
 ///|
+pub impl @debug.Debug for SetGridHline with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `grid.hline` element handed to a callback. As content it re-emits the
 /// element unchanged.
 pub struct GridHlineView {
@@ -8386,6 +9081,11 @@ pub impl IntoContent for GridHlineView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for GridHlineView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for GridHlineView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -8491,6 +9191,11 @@ pub impl @builtin.Show for GridVline with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for GridVline with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set grid.vline(..)`.
 ///
 /// Explicit states besides a value:
@@ -8548,6 +9253,11 @@ pub impl IntoContent for SetGridVline with fn into_content(self) {
 pub impl SetRule for SetGridVline
 
 ///|
+pub impl @debug.Debug for SetGridVline with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `grid.vline` element handed to a callback. As content it re-emits the
 /// element unchanged.
 pub struct GridVlineView {
@@ -8563,6 +9273,11 @@ pub impl IntoContent for GridVlineView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for GridVlineView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for GridVlineView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -8669,6 +9384,11 @@ pub impl @builtin.Show for Columns with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for Columns with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set columns(..)`.
 ///
 /// Explicit states besides a value:
@@ -8722,6 +9442,11 @@ pub impl IntoContent for SetColumns with fn into_content(self) {
 pub impl SetRule for SetColumns
 
 ///|
+pub impl @debug.Debug for SetColumns with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `columns` element handed to a callback. As content it re-emits the
 /// element unchanged.
 pub struct ColumnsView {
@@ -8737,6 +9462,11 @@ pub impl IntoContent for ColumnsView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for ColumnsView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for ColumnsView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -8817,6 +9547,11 @@ pub impl @builtin.Show for Colbreak with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for Colbreak with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set colbreak(..)`.
 pub struct SetColbreak {
   priv node : SetNode
@@ -8853,6 +9588,11 @@ pub impl IntoContent for SetColbreak with fn into_content(self) {
 pub impl SetRule for SetColbreak
 
 ///|
+pub impl @debug.Debug for SetColbreak with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `colbreak` element handed to a callback. As content it re-emits the
 /// element unchanged.
 pub struct ColbreakView {
@@ -8868,6 +9608,11 @@ pub impl IntoContent for ColbreakView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for ColbreakView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for ColbreakView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -8936,6 +9681,11 @@ pub impl @builtin.Show for H with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for H with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set h(..)`.
 pub struct SetH {
   priv node : SetNode
@@ -8972,6 +9722,11 @@ pub impl IntoContent for SetH with fn into_content(self) {
 pub impl SetRule for SetH
 
 ///|
+pub impl @debug.Debug for SetH with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `h` element handed to a callback. As content it re-emits the element
 /// unchanged.
 pub struct HView {
@@ -8987,6 +9742,11 @@ pub impl IntoContent for HView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for HView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for HView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -9056,6 +9816,11 @@ pub impl @builtin.Show for V with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for V with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set v(..)`.
 pub struct SetV {
   priv node : SetNode
@@ -9092,6 +9857,11 @@ pub impl IntoContent for SetV with fn into_content(self) {
 pub impl SetRule for SetV
 
 ///|
+pub impl @debug.Debug for SetV with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `v` element handed to a callback. As content it re-emits the element
 /// unchanged.
 pub struct VView {
@@ -9107,6 +9877,11 @@ pub impl IntoContent for VView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for VView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for VView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -9169,6 +9944,11 @@ pub impl @builtin.Show for Hide with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for Hide with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// A `hide` element handed to a callback. As content it re-emits the element
 /// unchanged.
 pub struct HideView {
@@ -9184,6 +9964,11 @@ pub impl IntoContent for HideView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for HideView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for HideView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -9259,6 +10044,11 @@ pub impl @builtin.Show for Repeat with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for Repeat with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set repeat(..)`.
 pub struct SetRepeat {
   priv node : SetNode
@@ -9299,6 +10089,11 @@ pub impl IntoContent for SetRepeat with fn into_content(self) {
 pub impl SetRule for SetRepeat
 
 ///|
+pub impl @debug.Debug for SetRepeat with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `repeat` element handed to a callback. As content it re-emits the
 /// element unchanged.
 pub struct RepeatView {
@@ -9314,6 +10109,11 @@ pub impl IntoContent for RepeatView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for RepeatView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for RepeatView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -9397,6 +10197,11 @@ pub impl @builtin.Show for Move with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for Move with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set move(..)`.
 pub struct SetMove {
   priv node : SetNode
@@ -9437,6 +10242,11 @@ pub impl IntoContent for SetMove with fn into_content(self) {
 pub impl SetRule for SetMove
 
 ///|
+pub impl @debug.Debug for SetMove with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `move` element handed to a callback. As content it re-emits the element
 /// unchanged.
 pub struct MoveView {
@@ -9452,6 +10262,11 @@ pub impl IntoContent for MoveView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for MoveView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for MoveView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -9542,6 +10357,11 @@ pub impl @builtin.Show for Rotate with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for Rotate with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set rotate(..)`.
 pub struct SetRotate {
   priv node : SetNode
@@ -9588,6 +10408,11 @@ pub impl IntoContent for SetRotate with fn into_content(self) {
 pub impl SetRule for SetRotate
 
 ///|
+pub impl @debug.Debug for SetRotate with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `rotate` element handed to a callback. As content it re-emits the
 /// element unchanged.
 pub struct RotateView {
@@ -9603,6 +10428,11 @@ pub impl IntoContent for RotateView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for RotateView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for RotateView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -9723,6 +10553,11 @@ pub impl @builtin.Show for Image with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for Image with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set image(..)`.
 ///
 /// Explicit states besides a value:
@@ -9789,6 +10624,11 @@ pub impl IntoContent for SetImage with fn into_content(self) {
 pub impl SetRule for SetImage
 
 ///|
+pub impl @debug.Debug for SetImage with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `image` element handed to a callback. As content it re-emits the element
 /// unchanged.
 pub struct ImageView {
@@ -9804,6 +10644,11 @@ pub impl IntoContent for ImageView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for ImageView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for ImageView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -9923,6 +10768,11 @@ pub impl @builtin.Show for Line with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for Line with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set line(..)`.
 ///
 /// Explicit states besides a value:
@@ -9986,6 +10836,11 @@ pub impl IntoContent for SetLine with fn into_content(self) {
 pub impl SetRule for SetLine
 
 ///|
+pub impl @debug.Debug for SetLine with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `line` element handed to a callback. As content it re-emits the element
 /// unchanged.
 pub struct LineView {
@@ -10001,6 +10856,11 @@ pub impl IntoContent for LineView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for LineView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for LineView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -10126,6 +10986,11 @@ pub impl @builtin.Show for Rect with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for Rect with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set rect(..)`.
 ///
 /// Explicit states besides a value:
@@ -10198,6 +11063,11 @@ pub impl IntoContent for SetRect with fn into_content(self) {
 pub impl SetRule for SetRect
 
 ///|
+pub impl @debug.Debug for SetRect with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `rect` element handed to a callback. As content it re-emits the element
 /// unchanged.
 pub struct RectView {
@@ -10213,6 +11083,11 @@ pub impl IntoContent for RectView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for RectView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for RectView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -10347,6 +11222,11 @@ pub impl @builtin.Show for Square with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for Square with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set square(..)`.
 ///
 /// Explicit states besides a value:
@@ -10424,6 +11304,11 @@ pub impl IntoContent for SetSquare with fn into_content(self) {
 pub impl SetRule for SetSquare
 
 ///|
+pub impl @debug.Debug for SetSquare with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `square` element handed to a callback. As content it re-emits the
 /// element unchanged.
 pub struct SquareView {
@@ -10439,6 +11324,11 @@ pub impl IntoContent for SquareView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for SquareView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for SquareView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -10569,6 +11459,11 @@ pub impl @builtin.Show for Ellipse with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for Ellipse with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set ellipse(..)`.
 ///
 /// Explicit states besides a value:
@@ -10637,6 +11532,11 @@ pub impl IntoContent for SetEllipse with fn into_content(self) {
 pub impl SetRule for SetEllipse
 
 ///|
+pub impl @debug.Debug for SetEllipse with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `ellipse` element handed to a callback. As content it re-emits the
 /// element unchanged.
 pub struct EllipseView {
@@ -10652,6 +11552,11 @@ pub impl IntoContent for EllipseView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for EllipseView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for EllipseView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -10779,6 +11684,11 @@ pub impl @builtin.Show for Circle with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for Circle with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set circle(..)`.
 ///
 /// Explicit states besides a value:
@@ -10851,6 +11761,11 @@ pub impl IntoContent for SetCircle with fn into_content(self) {
 pub impl SetRule for SetCircle
 
 ///|
+pub impl @debug.Debug for SetCircle with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `circle` element handed to a callback. As content it re-emits the
 /// element unchanged.
 pub struct CircleView {
@@ -10866,6 +11781,11 @@ pub impl IntoContent for CircleView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for CircleView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for CircleView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -10981,6 +11901,11 @@ pub impl @builtin.Show for Polygon with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for Polygon with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set polygon(..)`.
 ///
 /// Explicit states besides a value:
@@ -11029,6 +11954,11 @@ pub impl IntoContent for SetPolygon with fn into_content(self) {
 pub impl SetRule for SetPolygon
 
 ///|
+pub impl @debug.Debug for SetPolygon with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `polygon` element handed to a callback. As content it re-emits the
 /// element unchanged.
 pub struct PolygonView {
@@ -11044,6 +11974,11 @@ pub impl IntoContent for PolygonView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for PolygonView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for PolygonView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -11136,6 +12071,11 @@ pub impl @builtin.Show for Curve with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for Curve with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set curve(..)`.
 ///
 /// Explicit states besides a value:
@@ -11184,6 +12124,11 @@ pub impl IntoContent for SetCurve with fn into_content(self) {
 pub impl SetRule for SetCurve
 
 ///|
+pub impl @debug.Debug for SetCurve with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `curve` element handed to a callback. As content it re-emits the element
 /// unchanged.
 pub struct CurveView {
@@ -11199,6 +12144,11 @@ pub impl IntoContent for CurveView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for CurveView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for CurveView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -11281,6 +12231,11 @@ pub impl @builtin.Show for CurveMove with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for CurveMove with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set curve.move(..)`.
 pub struct SetCurveMove {
   priv node : SetNode
@@ -11317,6 +12272,11 @@ pub impl IntoContent for SetCurveMove with fn into_content(self) {
 pub impl SetRule for SetCurveMove
 
 ///|
+pub impl @debug.Debug for SetCurveMove with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `curve.move` element handed to a callback. As content it re-emits the
 /// element unchanged.
 pub struct CurveMoveView {
@@ -11332,6 +12292,11 @@ pub impl IntoContent for CurveMoveView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for CurveMoveView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for CurveMoveView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -11405,6 +12370,11 @@ pub impl @builtin.Show for CurveLine with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for CurveLine with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set curve.line(..)`.
 pub struct SetCurveLine {
   priv node : SetNode
@@ -11441,6 +12411,11 @@ pub impl IntoContent for SetCurveLine with fn into_content(self) {
 pub impl SetRule for SetCurveLine
 
 ///|
+pub impl @debug.Debug for SetCurveLine with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `curve.line` element handed to a callback. As content it re-emits the
 /// element unchanged.
 pub struct CurveLineView {
@@ -11456,6 +12431,11 @@ pub impl IntoContent for CurveLineView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for CurveLineView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for CurveLineView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -11541,6 +12521,11 @@ pub impl @builtin.Show for CurveQuad with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for CurveQuad with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set curve.quad(..)`.
 pub struct SetCurveQuad {
   priv node : SetNode
@@ -11577,6 +12562,11 @@ pub impl IntoContent for SetCurveQuad with fn into_content(self) {
 pub impl SetRule for SetCurveQuad
 
 ///|
+pub impl @debug.Debug for SetCurveQuad with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `curve.quad` element handed to a callback. As content it re-emits the
 /// element unchanged.
 pub struct CurveQuadView {
@@ -11592,6 +12582,11 @@ pub impl IntoContent for CurveQuadView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for CurveQuadView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for CurveQuadView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -11687,6 +12682,11 @@ pub impl @builtin.Show for CurveCubic with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for CurveCubic with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set curve.cubic(..)`.
 pub struct SetCurveCubic {
   priv node : SetNode
@@ -11723,6 +12723,11 @@ pub impl IntoContent for SetCurveCubic with fn into_content(self) {
 pub impl SetRule for SetCurveCubic
 
 ///|
+pub impl @debug.Debug for SetCurveCubic with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `curve.cubic` element handed to a callback. As content it re-emits the
 /// element unchanged.
 pub struct CurveCubicView {
@@ -11738,6 +12743,11 @@ pub impl IntoContent for CurveCubicView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for CurveCubicView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for CurveCubicView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -11805,6 +12815,11 @@ pub impl @builtin.Show for CurveClose with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for CurveClose with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set curve.close(..)`.
 pub struct SetCurveClose {
   priv node : SetNode
@@ -11841,6 +12856,11 @@ pub impl IntoContent for SetCurveClose with fn into_content(self) {
 pub impl SetRule for SetCurveClose
 
 ///|
+pub impl @debug.Debug for SetCurveClose with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `curve.close` element handed to a callback. As content it re-emits the
 /// element unchanged.
 pub struct CurveCloseView {
@@ -11856,6 +12876,11 @@ pub impl IntoContent for CurveCloseView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for CurveCloseView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for CurveCloseView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -11952,6 +12977,11 @@ pub impl @builtin.Show for Scale with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for Scale with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set scale(..)`.
 ///
 /// Explicit states besides a value:
@@ -12011,6 +13041,11 @@ pub impl IntoContent for SetScale with fn into_content(self) {
 pub impl SetRule for SetScale
 
 ///|
+pub impl @debug.Debug for SetScale with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `scale` element handed to a callback. As content it re-emits the element
 /// unchanged.
 pub struct ScaleView {
@@ -12026,6 +13061,11 @@ pub impl IntoContent for ScaleView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for ScaleView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for ScaleView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -12128,6 +13168,11 @@ pub impl @builtin.Show for Skew with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for Skew with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set skew(..)`.
 pub struct SetSkew {
   priv node : SetNode
@@ -12176,6 +13221,11 @@ pub impl IntoContent for SetSkew with fn into_content(self) {
 pub impl SetRule for SetSkew
 
 ///|
+pub impl @debug.Debug for SetSkew with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `skew` element handed to a callback. As content it re-emits the element
 /// unchanged.
 pub struct SkewView {
@@ -12191,6 +13241,11 @@ pub impl IntoContent for SkewView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for SkewView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for SkewView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -12302,6 +13357,11 @@ pub impl IntoContent for SetEquation with fn into_content(self) {
 pub impl SetRule for SetEquation
 
 ///|
+pub impl @debug.Debug for SetEquation with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `math.equation` element handed to a callback. As content it re-emits the
 /// element unchanged.
 pub struct EquationView {
@@ -12317,6 +13377,11 @@ pub impl IntoContent for EquationView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for EquationView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for EquationView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -12438,6 +13503,11 @@ pub impl @builtin.Show for Bibliography with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for Bibliography with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set bibliography(..)`.
 ///
 /// Explicit states besides a value:
@@ -12490,6 +13560,11 @@ pub impl IntoContent for SetBibliography with fn into_content(self) {
 pub impl SetRule for SetBibliography
 
 ///|
+pub impl @debug.Debug for SetBibliography with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `bibliography` element handed to a callback. As content it re-emits the
 /// element unchanged.
 pub struct BibliographyView {
@@ -12505,6 +13580,11 @@ pub impl IntoContent for BibliographyView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for BibliographyView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for BibliographyView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -12600,6 +13680,11 @@ pub impl @builtin.Show for Cite with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for Cite with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `set cite(..)`.
 ///
 /// Explicit states besides a value:
@@ -12649,6 +13734,11 @@ pub impl IntoContent for SetCite with fn into_content(self) {
 pub impl SetRule for SetCite
 
 ///|
+pub impl @debug.Debug for SetCite with fn to_repr(self) {
+  Content::of(NSetRule(self.node)).to_repr()
+}
+
+///|
 /// A `cite` element handed to a callback. As content it re-emits the element
 /// unchanged.
 pub struct CiteView {
@@ -12664,6 +13754,11 @@ pub impl IntoContent for CiteView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for CiteView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for CiteView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -12730,6 +13825,11 @@ pub impl @builtin.Show for Metadata with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for Metadata with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// A `metadata` element handed to a callback. As content it re-emits the
 /// element unchanged.
 pub struct MetadataView {
@@ -12745,6 +13845,11 @@ pub impl IntoContent for MetadataView with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for MetadataView with fn output(self, logger) {
   prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
+pub impl @debug.Debug for MetadataView with fn to_repr(self) {
+  Content::of(NEngine(self.content)).to_repr()
 }
 
 ///|
@@ -12806,6 +13911,11 @@ pub impl @builtin.Show for Lorem with fn output(self, logger) {
 }
 
 ///|
+pub impl @debug.Debug for Lorem with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
 /// `polygon.regular`: A regular polygon, defined by its size and number of
 /// vertices.
 ///
@@ -12864,6 +13974,11 @@ pub impl IntoContent for PolygonRegular with fn into_content(self) {
 /// Interpolation into the text of `Prose`.
 pub impl @builtin.Show for PolygonRegular with fn output(self, logger) {
   prose_placeholder(self.content, logger)
+}
+
+///|
+pub impl @debug.Debug for PolygonRegular with fn to_repr(self) {
+  self.content.to_repr()
 }
 
 ///|

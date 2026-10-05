@@ -8,7 +8,7 @@ import {
 // Values
 pub fn api_type_names() -> Array[String]
 
-pub fn translate(String, String, @library.Library, baseline? : Bool) -> Translation
+pub fn translate(String, String, @library.Library, baseline? : Bool, prose? : Bool) -> Translation
 
 // Errors
 

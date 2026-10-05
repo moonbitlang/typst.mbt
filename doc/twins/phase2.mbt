@@ -302,6 +302,10 @@ pub fn phase2() -> Array[Twin] {
         page_typ, "#[#\"Code\" #\"blocks\" #\"use\" #raw(\"syntect\")#\",\" #smartquote(double: true)#\"quoted\"#smartquote(double: true)\n#\"and\" #\"it\"#smartquote(double: false)#\"s\" #emph[#\"fine\"]#\".\"#parbreak()#\"Next\" #\"paragraph\" #\"with\" #\"3\" #\"words.\"]",
         "#parbreak()", "#[#\"汉字\"\n#\"汉字\" #\"a\"\n#\"b\"]", "#parbreak()",
         "#[#\"say\" #\"\\\"hi\\\"\"]", "#figure(caption: [#\"A\" #strong[#\"bold\"] #\"caption\"])[#\"x\"]",
+        // Carriage returns are line breaks (CR LF is one); white space at
+        // the edges is dropped; `Lit` is verbatim between quotes.
+         "#parbreak()", "#[#\"汉\"\r#\"字\" #\"a\"\r\n#\"b\"#parbreak()#\"c\"]",
+        "#parbreak()", "#[#\"x\"]", "#[#smartquote(double: true)#\"a  'b'\"#smartquote(double: true)]",
       ],
       () => {
         let count = 3
@@ -324,6 +328,11 @@ pub fn phase2() -> Array[Twin] {
           Parbreak(),
           Prose("say \"hi\"", quotes=false),
           Figure("x", caption=Prose("A \{Strong("bold")} caption")),
+          Parbreak(),
+          Prose("汉\r字 a\r\nb\r\rc"),
+          Parbreak(),
+          Prose(" \n x \t\n\n "),
+          Prose("\"\{Lit("a  'b'")}\""),
         ])
       },
     ),

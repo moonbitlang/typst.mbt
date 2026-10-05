@@ -22,28 +22,37 @@ const PROSE_CLOSE : Char = '\u{FDD1}'
 ///|
 /// The descriptions that were interpolated into a string and not yet taken
 /// by a `Prose`, by number. An entry lives from the interpolation to the
-/// `Prose` call that consumes it, which is normally the next call; entries
-/// of strings that never reach `Prose` stay (they name the description in
-/// the error if such a string is lowered), up to `prose_table_max` of them.
-let prose_table : Map[Int, Content] = Map([])
+/// `Prose` call that consumes it, which is normally the next call. Entries
+/// of strings that never reach a `Prose` (a description printed for
+/// debugging, say) stay, and name the description in the error if such a
+/// string is lowered; when more than `prose_table_max` are pending, the
+/// oldest is dropped.
+let prose_table : Map[Int64, Content] = Map([])
 
 ///|
-let prose_serial : @ref.Ref[Int] = { val: 0, }
+/// The number of the next interpolation. Numbers are never reused.
+let prose_serial : @ref.Ref[Int64] = { val: 0L, }
 
 ///|
-/// The number of unconsumed interpolations that are kept.
-let prose_table_max : Int = 4096
+/// Every pending interpolation with a number below this one that is not in
+/// the table may have been dropped (rather than consumed).
+let prose_dropped_below : @ref.Ref[Int64] = { val: 0L, }
+
+///|
+/// The number of pending interpolations that are kept.
+let prose_table_max : Int = 65536
 
 ///|
 /// Write the placeholder of a description: what `\{description}` in a
 /// string is. Every interpolation is an occurrence of its own.
 fn prose_placeholder(content : Content, logger : &Logger) -> Unit {
   let id = prose_serial.val
-  prose_serial.val = id + 1
+  prose_serial.val = id + 1L
   if prose_table.length() >= prose_table_max {
-    // Forget the oldest entry that was never consumed.
+    // Drop the oldest pending entry (the map keeps insertion order).
     for key, _ in prose_table {
       prose_table.remove(key)
+      prose_dropped_below.val = key + 1L
       break
     }
   }
@@ -51,6 +60,33 @@ fn prose_placeholder(content : Content, logger : &Logger) -> Unit {
   logger.write_char(PROSE_OPEN)
   logger.write_string(id.to_string())
   logger.write_char(PROSE_CLOSE)
+}
+
+///|
+/// The placeholder whose number starts at `chars[start]` (after the opening
+/// character): its number and the index after its closing character. Only
+/// the canonical spelling is a placeholder: a decimal number without
+/// leading zeros and of at most 18 digits (so it cannot overflow), then
+/// the closing character.
+fn prose_token(chars : Array[Char], start : Int) -> (Int64, Int)? {
+  let mut id = 0L
+  let mut j = start
+  while j < chars.length() && chars[j] >= '0' && chars[j] <= '9' {
+    if j - start >= 18 {
+      return Option::None
+    }
+    id = id * 10L + (chars[j].to_int() - '0'.to_int()).to_int64()
+    j += 1
+  }
+  let digits = j - start
+  if digits == 0 || (digits > 1 && chars[start] == '0') {
+    return Option::None
+  }
+  if j < chars.length() && chars[j] == PROSE_CLOSE {
+    Some((id, j + 1))
+  } else {
+    Option::None
+  }
 }
 
 ///|
@@ -81,24 +117,13 @@ fn prose_leak(text : String) -> String? {
   // Most strings have no placeholder.
   guard text.contains_char(PROSE_OPEN) else { return Option::None }
   let chars = text.to_array()
-  let mut i = 0
-  while i < chars.length() {
-    let c = chars[i]
-    i += 1
-    guard c == PROSE_OPEN else { continue }
-    // A placeholder: the number and the closing character. The opening
-    // character alone is text (an unusual one).
-    let mut id = 0
-    let mut digits = 0
-    let mut j = i
-    while j < chars.length() && chars[j] >= '0' && chars[j] <= '9' {
-      id = id * 10 + (chars[j].to_int() - '0'.to_int())
-      digits += 1
-      j += 1
-    }
-    guard digits > 0 && j < chars.length() && chars[j] == PROSE_CLOSE else {
+  for i, c in chars {
+    // The opening character alone is text (an unusual one).
+    guard c == PROSE_OPEN && prose_token(chars, i + 1) is Some((id, _)) else {
       continue
     }
+    // A number that was never given out is not an interpolation.
+    guard id < prose_serial.val else { continue }
     let what = match prose_table.get(id) {
       Some(content) => "`\{content.kind()}`"
       Option::None => "a description"
@@ -187,8 +212,15 @@ pub fn Prose::Prose(
       if gap < 0 {
         gap = 0
       }
+      // A line break is a line feed, a carriage return, or the two
+      // together, as in markup.
       if c == '\n' {
         gap += 1
+      } else if c == '\r' {
+        gap += 1
+        if i < chars.length() && chars[i] == '\n' {
+          i += 1
+        }
       }
       continue
     }
@@ -197,41 +229,44 @@ pub fn Prose::Prose(
     }
     if c == PROSE_OPEN {
       flush()
-      let mut id = 0
-      let mut digits = 0
-      while i < chars.length() && chars[i] >= '0' && chars[i] <= '9' {
-        id = id * 10 + (chars[i].to_int() - '0'.to_int())
-        digits += 1
-        i += 1
-      }
-      let closed = i < chars.length() && chars[i] == PROSE_CLOSE
-      if closed {
-        i += 1
-      }
-      match (digits > 0 && closed, prose_table.get(id)) {
-        (true, Some(content)) => {
-          prose_table.remove(id)
-          match content.node {
-            NSetRule(_) | NShowRule(_) =>
+      match prose_token(chars, i) {
+        Some((id, after)) => {
+          i = after
+          match prose_table.get(id) {
+            Some(content) => {
+              prose_table.remove(id)
+              match content.node {
+                NSetRule(_) | NShowRule(_) =>
+                  problem = Some(
+                    "`\{content.kind()}` is a rule and cannot be interpolated into prose",
+                  )
+                _ => children.push(content)
+              }
+            }
+            Option::None =>
               problem = Some(
-                "`\{content.kind()}` is a rule and cannot be interpolated into prose",
+                if id >= prose_serial.val {
+                  // Not a number that an interpolation was given.
+                  "the text of `Prose` contains a reserved character (U+FDD0)"
+                } else if id < prose_dropped_below.val {
+                  "an interpolated description of this text is no longer available: more than \{prose_table_max} descriptions were interpolated since"
+                } else {
+                  "an interpolated description of this text was already used by another `Prose`"
+                },
               )
-            _ => children.push(content)
           }
         }
-        (true, Option::None) =>
-          problem = Some(
-            "an interpolated description of this text was already used by another `Prose`",
-          )
-        _ =>
+        Option::None =>
           problem = Some(
             "the text of `Prose` contains a reserved character (U+FDD0)",
           )
       }
     } else if c == PROSE_CLOSE {
-      problem = Some(
-        "the text of `Prose` contains a reserved character (U+FDD1)",
-      )
+      if problem is Option::None {
+        problem = Some(
+          "the text of `Prose` contains a reserved character (U+FDD1)",
+        )
+      }
     } else if quotes && (c == '"' || c == '\'') {
       flush()
       children.push(
