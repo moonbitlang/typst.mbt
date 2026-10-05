@@ -654,11 +654,14 @@ def emit_element(spec, out, coverage):
         )
 
     # --- set rule
+    # Settable: every field that the function does not require (an optional
+    # positional body included: `set rect([x])`). Optional positionals that
+    # the constructor requires (`spec.pos`) are settable; required fields
+    # that the specification made optional are not.
     settable = [p for p in optional]
     if spec.pos:
-        # Optional positionals that the constructor requires are settable.
-        settable = [p for p in required if p.field in spec.pos and p.field != "body"] + settable
-    settable = [p for p in settable if p.field != "body" and p.field not in spec.optional]
+        settable = [p for p in required if p.field in spec.pos] + settable
+    settable = [p for p in settable if p.field not in spec.optional]
     if spec.set and settable:
         sname = f"Set{spec.name}"
         sindex = {p.name: i for i, p in enumerate(settable)}

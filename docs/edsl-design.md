@@ -1,6 +1,13 @@
 # A MoonBit EDSL for typst.mbt (design, revision 8)
 
-Status: revision 8. Revisions 3 to 6 resolved the items of
+Status: revision 8, approved (`docs/edsl-reviews/review-8.md`), with the
+clarifications of the implementation review
+(`docs/edsl-reviews/impl-review-1.md`) worked in: the occurrence of a
+callback invocation (11.2), the collector's scope in validation (11.4),
+label-valued expressions in sequences (13), keyed origins of plain strings
+and the structural deduplication key (12.2), long strings passed as values
+(12.4), settable optional bodies (8) and the pixel comparison of all twins
+(16.2). Revisions 3 to 6 resolved the items of
 `docs/edsl-reviews/review-2.md` to `review-5.md`. Revision 8 resolves
 `review-7.md`: `extra` entries that name an optional positional field are
 passed in the field's positional place (6.1), the gradient constructors are
@@ -228,8 +235,9 @@ Par(Seq(["Typeset with ", Emph("care"), "."]))
   the new label replaces the old one. Every generated element constructor
   also takes `label? : String`, which is exactly `Labelled(elem, label)`.
 - **`Keyed(key, body)`** attaches a runtime occurrence key to the origins of
-  everything lowered inside `body` (section 12.2). It does not change the
-  lowered content.
+  everything lowered inside `body` (section 12.2), including a plain string
+  body, whose origin is the enclosing argument under the key. It does not
+  change the lowered content.
 - **`Space()`** is markup's space element (`SpaceElem::shared()`), for
   authors who need Typst's collapsing space rather than a `" "` text.
 
@@ -752,8 +760,10 @@ Document([
   before the table in the enclosing sequence; styling one cell is a `Seq`
   inside that cell. (Typst has the same restriction: `set` and `show` are
   only allowed directly in code and content blocks.)
-- **`SetX(...)`** (one generated type per element with settable fields; all
-  parameters optional, no `label`) lowers to
+- **`SetX(...)`** (one generated type per element with settable fields —
+  every field the function does not require, an optional positional body
+  included: `SetRect(body="x")` is `set rect([x])`; all parameters
+  optional, no `label`) lowers to
   `elem.set(engine, args.spanned(span)).spanned(span).liftable()`. Custom
   set parsers, repeated properties and folding (relative sizes compose,
   strokes and insets fold) behave identically; realization still decides
@@ -940,6 +950,15 @@ closure value used in several places. Its `key` is
 of the session in order of first lowering: unique within the compilation and
 reproducible across runs (it does not depend on the serial).
 
+A description can still occur several times (the same `Context` value
+under two `Keyed` wrappers). Each occurrence wraps the one host function in
+a function value with the occurrence's own span, and the engine passes a
+function's span back as the span of the call's arguments
+(`Func::call_values`). An invocation therefore knows the occurrence it runs
+for: its span and key path are those of that occurrence, for the origins of
+the content it returns and for its diagnostics. A call from elsewhere (Typst
+code in a snippet) runs for the occurrence lowered first.
+
 **Creation rule (phase 1)**: callbacks must be constructed before
 `compile_*` is called. A callback description whose serial is not below the
 session's starting serial was constructed during the compilation (inside
@@ -999,8 +1018,12 @@ priv struct RecordedRead {
   functions with the read. Nothing changes for the 16 read methods
   themselves.
 - `validate`: for a read without host functions, `replay(i) == expected`,
-  as before. For a read with host functions, the replay runs in a
-  collector, and the read validates iff the fingerprints are equal **and**
+  as before. For a read with host functions, the fingerprint of the
+  replayed result is computed in a collector — of the result only, as when
+  the read was recorded: computing the result may fingerprint other values
+  (a query hashes its selector, which can hold host functions too), and
+  those are not collected (`hash128_output`) — and the read validates iff
+  the fingerprints are equal **and**
   the same number of host functions was visited **and** they are pairwise
   the same `HostFunc` objects. The two computations fingerprint values
   with equal fingerprints by the same traversal, so the lists correspond
@@ -1101,8 +1124,9 @@ Source-site identity and runtime occurrence identity are separate:
   wrappers (`["row-17"]`, usually empty).
 
 A session owns one registry: a map from origin (site location string, key
-path) to an entry, and the **origin listing**, a text with one line per
-entry:
+path; the map's key encodes the path structurally, each key with its
+length, so no choice of keys makes two paths collide) to an entry, and the
+**origin listing**, a text with one line per entry:
 
 ```
 report.mbt:42:5-42:31@acme/report Par a0=report.mbt:42:9-42:30@acme/report
@@ -1186,7 +1210,8 @@ characters; `"ŉaA"` upper-cased is `"ʼNAA"`, where the glyph of the source
   origin (exact) and `engine_offset : Int?`, documented as a hint for
   narrowing within the node's text;
 - the offset is `None` where it is known to be unreliable from lowering
-  alone: an origin that lowered a string longer than 65,535 UTF-8 bytes is
+  alone: an origin that lowered a string longer than 65,535 UTF-8 bytes —
+  as text or as a string value (`Value::str`, the text of `Raw`) — is
   marked (sticky), and its glyphs report no offset;
 - exact offsets would need the engine to carry an offset map through
   slicing, embedding and case mapping without changing the laid-out frames.
@@ -1269,7 +1294,12 @@ pub fn Set::Set(path : String, named : Array[(String, Value)], loc~ : SourceLoc,
   objects.
 - **`Call(path, ...)`** calls any public function by its qualified name and
   is content (its displayed result, as `#f(..)` in markup); `Value::call`
-  is the same as a value. **`Set(path, named)`** is the generic set rule.
+  is the same as a value. As in markup, an inserted expression in a
+  sequence (`Call`, or a `Value` used as content) whose value is a **label**
+  is not displayed but attached to the content before it, with the
+  evaluator's rule and warnings (`Seq([Heading("x"), Value::label("h")])` is
+  `[#heading[x]#label("h")]`). As an argument, a `Value` is the argument
+  itself (`caption=NoneValue()`). **`Set(path, named)`** is the generic set rule.
   `path` is resolved like an identifier with field accesses in the
   evaluator: the first segment in the library's global scope, the rest with
   `Value::field` (`table.cell`, `math.equation`, `gradient.linear`). An
@@ -1499,8 +1529,9 @@ main file at the project root:
    links, tags, page info — is compared bit for bit. The comparison is run
    with memoization on and off (`set_layout_memo_enabled`).
 3. **Export**: the SVG text of every page and the PDF bytes (exported with
-   the same options and no timestamp) of the two documents are equal; PNG
-   pixmaps are compared for the milestone document.
+   the same options and no timestamp) of the two documents are equal, and so
+   are the PNG pixmaps of every page (sizes and pixel buffers, rendered with
+   the same resolved options) and the report's PNG export, for every twin.
 
 Behavioural tests that have no single twin (callback identity, stale `Ctx`,
 creation rule, convergence with host functions in query results, memo on

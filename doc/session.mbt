@@ -82,11 +82,17 @@ fn error_at(span : @syntax.Span, message : String) -> @library.SourceError {
 
 ///|
 /// The host function of a callback description: created on first use and
-/// then the same object for the whole compilation.
+/// then the same object for the whole compilation. `span` and `keys` are
+/// those of the occurrence being lowered. A description can occur several
+/// times (under different `Keyed` wrappers): each occurrence wraps the same
+/// host function in a `Func` with its own span, which the engine passes
+/// back as the span of the call's arguments, so an invocation knows the
+/// occurrence it runs for.
 fn Session::host(
   self : Session,
   callback : Callback,
   span : @syntax.Span,
+  keys : Array[String],
 ) -> @library.HostFunc raise @library.SourceError {
   if self.hosts.get(callback.serial) is Some(host) {
     return host
@@ -108,8 +114,17 @@ fn Session::host(
   state.write_usize(self.hosts.length())
   let key = state.finish128()
   let session = self
+  let loc = callback.origin.loc.to_string()
   let host = @library.HostFunc::new(key, (engine, context, args) => {
-    let lower : Lower = { session, engine, context, keys: [], }
+    // The occurrence: the engine calls a function value with its own span
+    // (`Func::call`). A call from elsewhere (Typst code in a snippet) runs
+    // for the first occurrence.
+    let (span, keys) = match session.registry.locate(args.span) {
+      Some((entry, _)) if session.registry.entries[entry].loc == loc =>
+        (session.registry.span(entry), session.registry.entries[entry].keys)
+      _ => (span, keys)
+    }
+    let lower : Lower = { session, engine, context, keys, }
     let cx : Ctx = { lower, alive: { val: true, }, span, }
     let result = try (callback.invoke)(cx, args) catch {
       @library.SourceError(errors) => {

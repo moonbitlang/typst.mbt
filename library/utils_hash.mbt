@@ -300,6 +300,30 @@ pub fn fingerprint_hosts_in(f : () -> Unit) -> Array[HostFunc] {
 }
 
 ///|
+/// A collector armed for the next [hash128_output] (the validation of a
+/// recorded introspector read sets it around the replay).
+let fingerprint_output_hosts : Ref[Array[HostFunc]?] = { val: None, }
+
+///|
+/// [hash128] of the result of a replayed introspector read. If a collector
+/// is armed, it receives the host closures of this fingerprint and only of
+/// this one: fingerprints computed while the result was produced (the
+/// argument is evaluated before the call) are not collected.
+fn[T : Fingerprint] hash128_output(value : T) -> U128 {
+  match fingerprint_output_hosts.val {
+    None => hash128(value)
+    Some(hosts) => {
+      fingerprint_output_hosts.val = None
+      let outer = fingerprint_hosts.val
+      fingerprint_hosts.val = Some(hosts)
+      let hash = hash128(value)
+      fingerprint_hosts.val = outer
+      hash
+    }
+  }
+}
+
+///|
 /// Record that the value being fingerprinted is not fully captured by its
 /// fingerprint.
 pub fn mark_fingerprint_lossy() -> Unit {

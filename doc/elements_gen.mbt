@@ -3457,6 +3457,47 @@ pub impl IntoContent for Title with fn into_content(self) {
 }
 
 ///|
+/// `set title(..)`.
+///
+/// Explicit states besides a value:
+/// - `body`: `auto` as `AutoValue()`
+pub struct SetTitle {
+  priv node : SetNode
+}
+
+///|
+#callsite(autofill(loc, args_loc))
+pub fn SetTitle::SetTitle(
+  body? : &IntoContent,
+  extra? : Array[(String, Value)] = [],
+  loc~ : SourceLoc,
+  args_loc~ : ArgsLoc,
+) -> SetTitle {
+  let args : Array[ArgNode] = []
+  if extra_arg(extra, "body") is Some(v) {
+    args.push({ name: None, value: v, param: 1, })
+  } else if body is Some(v) {
+    args.push({ name: None, value: Value::content(v), param: 0, })
+  }
+  push_extra(args, extra, 1, positional=["body"])
+  {
+    node: {
+      func: FElem(@library.title_elem()),
+      args,
+      origin: Site::new("SetTitle", loc, args_loc),
+    },
+  }
+}
+
+///|
+pub impl IntoContent for SetTitle with fn into_content(self) {
+  Content::of(NSetRule(self.node))
+}
+
+///|
+pub impl SetRule for SetTitle
+
+///|
 /// A `title` element handed to a callback. As content it re-emits the element
 /// unchanged.
 pub struct TitleView {
@@ -6075,6 +6116,7 @@ pub struct SetBlock {
 ///|
 #callsite(autofill(loc, args_loc))
 pub fn SetBlock::SetBlock(
+  body? : &IntoContent,
   width? : Length,
   height? : Sizing,
   breakable? : Bool,
@@ -6093,46 +6135,51 @@ pub fn SetBlock::SetBlock(
   args_loc~ : ArgsLoc,
 ) -> SetBlock {
   let args : Array[ArgNode] = []
+  if extra_arg(extra, "body") is Some(v) {
+    args.push({ name: None, value: v, param: 14, })
+  } else if body is Some(v) {
+    args.push({ name: None, value: Value::content(v), param: 0, })
+  }
   if width is Some(v) {
-    args.push({ name: Some("width"), value: ToValue::to_value(v), param: 0, })
+    args.push({ name: Some("width"), value: ToValue::to_value(v), param: 1, })
   }
   if height is Some(v) {
-    args.push({ name: Some("height"), value: ToValue::to_value(v), param: 1, })
+    args.push({ name: Some("height"), value: ToValue::to_value(v), param: 2, })
   }
   if breakable is Some(v) {
-    args.push({ name: Some("breakable"), value: Value::bool(v), param: 2, })
+    args.push({ name: Some("breakable"), value: Value::bool(v), param: 3, })
   }
   if fill is Some(v) {
-    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 3, })
+    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 4, })
   }
   if stroke is Some(v) {
-    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 4, })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 5, })
   }
   if radius is Some(v) {
-    args.push({ name: Some("radius"), value: ToValue::to_value(v), param: 5, })
+    args.push({ name: Some("radius"), value: ToValue::to_value(v), param: 6, })
   }
   if inset is Some(v) {
-    args.push({ name: Some("inset"), value: ToValue::to_value(v), param: 6, })
+    args.push({ name: Some("inset"), value: ToValue::to_value(v), param: 7, })
   }
   if outset is Some(v) {
-    args.push({ name: Some("outset"), value: ToValue::to_value(v), param: 7, })
+    args.push({ name: Some("outset"), value: ToValue::to_value(v), param: 8, })
   }
   if spacing is Some(v) {
-    args.push({ name: Some("spacing"), value: ToValue::to_value(v), param: 8, })
+    args.push({ name: Some("spacing"), value: ToValue::to_value(v), param: 9, })
   }
   if above is Some(v) {
-    args.push({ name: Some("above"), value: ToValue::to_value(v), param: 9, })
+    args.push({ name: Some("above"), value: ToValue::to_value(v), param: 10, })
   }
   if below is Some(v) {
-    args.push({ name: Some("below"), value: ToValue::to_value(v), param: 10, })
+    args.push({ name: Some("below"), value: ToValue::to_value(v), param: 11, })
   }
   if clip is Some(v) {
-    args.push({ name: Some("clip"), value: Value::bool(v), param: 11, })
+    args.push({ name: Some("clip"), value: Value::bool(v), param: 12, })
   }
   if sticky is Some(v) {
-    args.push({ name: Some("sticky"), value: Value::bool(v), param: 12, })
+    args.push({ name: Some("sticky"), value: Value::bool(v), param: 13, })
   }
-  push_extra(args, extra, 13)
+  push_extra(args, extra, 14, positional=["body"])
   {
     node: {
       func: FElem(@library.block_elem()),
@@ -6322,6 +6369,7 @@ pub struct SetBox {
 ///|
 #callsite(autofill(loc, args_loc))
 pub fn SetBox::SetBox(
+  body? : &IntoContent,
   width? : Sizing,
   height? : Length,
   fill? : Paint,
@@ -6335,31 +6383,36 @@ pub fn SetBox::SetBox(
   args_loc~ : ArgsLoc,
 ) -> SetBox {
   let args : Array[ArgNode] = []
+  if extra_arg(extra, "body") is Some(v) {
+    args.push({ name: None, value: v, param: 9, })
+  } else if body is Some(v) {
+    args.push({ name: None, value: Value::content(v), param: 0, })
+  }
   if width is Some(v) {
-    args.push({ name: Some("width"), value: ToValue::to_value(v), param: 0, })
+    args.push({ name: Some("width"), value: ToValue::to_value(v), param: 1, })
   }
   if height is Some(v) {
-    args.push({ name: Some("height"), value: ToValue::to_value(v), param: 1, })
+    args.push({ name: Some("height"), value: ToValue::to_value(v), param: 2, })
   }
   if fill is Some(v) {
-    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 2, })
+    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 3, })
   }
   if stroke is Some(v) {
-    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 3, })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 4, })
   }
   if radius is Some(v) {
-    args.push({ name: Some("radius"), value: ToValue::to_value(v), param: 4, })
+    args.push({ name: Some("radius"), value: ToValue::to_value(v), param: 5, })
   }
   if inset is Some(v) {
-    args.push({ name: Some("inset"), value: ToValue::to_value(v), param: 5, })
+    args.push({ name: Some("inset"), value: ToValue::to_value(v), param: 6, })
   }
   if outset is Some(v) {
-    args.push({ name: Some("outset"), value: ToValue::to_value(v), param: 6, })
+    args.push({ name: Some("outset"), value: ToValue::to_value(v), param: 7, })
   }
   if clip is Some(v) {
-    args.push({ name: Some("clip"), value: Value::bool(v), param: 7, })
+    args.push({ name: Some("clip"), value: Value::bool(v), param: 8, })
   }
-  push_extra(args, extra, 8)
+  push_extra(args, extra, 9, positional=["body"])
   {
     node: {
       func: FElem(@library.box_elem()),
@@ -9349,6 +9402,7 @@ pub impl IntoContent for Rect with fn into_content(self) {
 /// - `width`: `auto` as `Auto`
 /// - `fill`: `none` as `None`
 /// - `stroke`: `auto` as `Sides::auto()`
+/// - `body`: `none` as `NoneValue()`
 pub struct SetRect {
   priv node : SetNode
 }
@@ -9363,6 +9417,7 @@ pub fn SetRect::SetRect(
   radius? : Corners[Length],
   inset? : Sides[Length],
   outset? : Sides[Length],
+  body? : &IntoContent,
   extra? : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -9389,7 +9444,12 @@ pub fn SetRect::SetRect(
   if outset is Some(v) {
     args.push({ name: Some("outset"), value: ToValue::to_value(v), param: 6, })
   }
-  push_extra(args, extra, 7)
+  if extra_arg(extra, "body") is Some(v) {
+    args.push({ name: None, value: v, param: 8, })
+  } else if body is Some(v) {
+    args.push({ name: None, value: Value::content(v), param: 7, })
+  }
+  push_extra(args, extra, 8, positional=["body"])
   {
     node: {
       func: FElem(@library.rect_elem()),
@@ -9552,6 +9612,7 @@ pub impl IntoContent for Square with fn into_content(self) {
 /// - `width`: `auto` as `Auto`
 /// - `fill`: `none` as `None`
 /// - `stroke`: `auto` as `Sides::auto()`
+/// - `body`: `none` as `NoneValue()`
 pub struct SetSquare {
   priv node : SetNode
 }
@@ -9567,6 +9628,7 @@ pub fn SetSquare::SetSquare(
   radius? : Corners[Length],
   inset? : Sides[Length],
   outset? : Sides[Length],
+  body? : &IntoContent,
   extra? : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -9596,7 +9658,12 @@ pub fn SetSquare::SetSquare(
   if outset is Some(v) {
     args.push({ name: Some("outset"), value: ToValue::to_value(v), param: 7, })
   }
-  push_extra(args, extra, 8)
+  if extra_arg(extra, "body") is Some(v) {
+    args.push({ name: None, value: v, param: 9, })
+  } else if body is Some(v) {
+    args.push({ name: None, value: Value::content(v), param: 8, })
+  }
+  push_extra(args, extra, 9, positional=["body"])
   {
     node: {
       func: FElem(@library.square_elem()),
@@ -9754,6 +9821,7 @@ pub impl IntoContent for Ellipse with fn into_content(self) {
 /// - `width`: `auto` as `Auto`
 /// - `fill`: `none` as `None`
 /// - `stroke`: `auto` as `Stroke::auto()`, `none` as `Stroke::none()`
+/// - `body`: `none` as `NoneValue()`
 pub struct SetEllipse {
   priv node : SetNode
 }
@@ -9767,6 +9835,7 @@ pub fn SetEllipse::SetEllipse(
   stroke? : Stroke,
   inset? : Sides[Length],
   outset? : Sides[Length],
+  body? : &IntoContent,
   extra? : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -9790,7 +9859,12 @@ pub fn SetEllipse::SetEllipse(
   if outset is Some(v) {
     args.push({ name: Some("outset"), value: ToValue::to_value(v), param: 5, })
   }
-  push_extra(args, extra, 6)
+  if extra_arg(extra, "body") is Some(v) {
+    args.push({ name: None, value: v, param: 7, })
+  } else if body is Some(v) {
+    args.push({ name: None, value: Value::content(v), param: 6, })
+  }
+  push_extra(args, extra, 7, positional=["body"])
   {
     node: {
       func: FElem(@library.ellipse_elem()),
@@ -9945,6 +10019,7 @@ pub impl IntoContent for Circle with fn into_content(self) {
 /// - `width`: `auto` as `Auto`
 /// - `fill`: `none` as `None`
 /// - `stroke`: `auto` as `Stroke::auto()`, `none` as `Stroke::none()`
+/// - `body`: `none` as `NoneValue()`
 pub struct SetCircle {
   priv node : SetNode
 }
@@ -9959,6 +10034,7 @@ pub fn SetCircle::SetCircle(
   stroke? : Stroke,
   inset? : Sides[Length],
   outset? : Sides[Length],
+  body? : &IntoContent,
   extra? : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -9985,7 +10061,12 @@ pub fn SetCircle::SetCircle(
   if outset is Some(v) {
     args.push({ name: Some("outset"), value: ToValue::to_value(v), param: 6, })
   }
-  push_extra(args, extra, 7)
+  if extra_arg(extra, "body") is Some(v) {
+    args.push({ name: None, value: v, param: 8, })
+  } else if body is Some(v) {
+    args.push({ name: None, value: Value::content(v), param: 7, })
+  }
+  push_extra(args, extra, 8, positional=["body"])
   {
     node: {
       func: FElem(@library.circle_elem()),

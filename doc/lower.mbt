@@ -57,11 +57,8 @@ fn Lower::content(
       // Typst's string-to-content conversion (`Value::display`).
       @library.Value::Str(text).display().spanned(span)
     }
-    NCall(call) => {
-      let entry = self.entry(call.origin)
-      let span = self.session.registry.span(entry)
-      self.call(call.func, call.args, entry, span).display().spanned(span)
-    }
+    // A lone inserted expression: a sequence of one.
+    NCall(_) | NValue(_) => self.sequence([content], fallback)
     NSeq(children, site) => {
       let entry = self.entry(site)
       // Plain strings among the children share the array argument's span.
@@ -82,14 +79,21 @@ fn Lower::content(
       let keys = self.keys.copy()
       keys.push(key)
       let inner : Lower = { ..self, keys, }
+      // Content without a location of its own gets the enclosing
+      // argument's origin under the keys.
+      let fallback = match body.node {
+        NText(_, None) | NValue(_) | NSpace =>
+          self.session.registry.keyed_span(fallback, keys)
+        _ => fallback
+      }
       inner.content(body, fallback)
     }
     NContext(callback, site) => {
       let entry = self.entry(site)
       let span = self.session.registry.span(entry)
-      let func = @library.Func::host(self.session.host(callback, span)).spanned(
-        span,
-      )
+      let func = @library.Func::host(
+        self.session.host(callback, span, self.keys),
+      ).spanned(span)
       // The evaluator's `eval_contextual`: the element function cannot be
       // called (`cannot be constructed manually`).
       @library.Content::new(@library.context_elem(), [
@@ -99,8 +103,6 @@ fn Lower::content(
     NEval(node) => self.eval(node)
     NSpace => @library.SpaceElem::shared()
     NEngine(content) => content
-    // Like `#value` in markup.
-    NValue(value) => self.value(value, fallback).display().spanned(fallback)
   }
 }
 
@@ -143,6 +145,53 @@ fn Lower::sequence(
         let tail = self.sequence(children[i:], fallback)
         i = children.length()
         seq.push(tail.styled(@library.Style::Recipe(recipe)))
+      }
+      // An inserted expression (`#f(..)`, `#value` in markup): its value
+      // is displayed, and a label is attached to the content before it,
+      // with the evaluator's rule and warnings (`eval_markup_exprs`).
+      NCall(_) | NValue(_) => {
+        let (value, span) = match child.node {
+          NCall(call) => {
+            let entry = self.entry(call.origin)
+            let span = self.session.registry.span(entry)
+            (self.call(call.func, call.args, entry, span), span)
+          }
+          NValue(value) => (self.value(value, fallback), fallback)
+          _ => panic()
+        }
+        match value {
+          Label(label) => {
+            let mut found = -1
+            for j = seq.length() - 1; j >= 0; j = j - 1 {
+              if !seq[j].can("Unlabellable") {
+                found = j
+                break
+              }
+            }
+            if found >= 0 {
+              let elem = seq[found]
+              if elem.label() is Some(_) {
+                self.engine.sink.warn(
+                  @library.SourceDiagnostic::warning_at(
+                    elem.span(),
+                    "content labelled multiple times",
+                  ).with_hint(
+                    "only the last label is used, the rest are ignored",
+                  ),
+                )
+              }
+              seq[found] = elem.labelled(label)
+            } else {
+              self.engine.sink.warn(
+                @library.SourceDiagnostic::warning_at(
+                  span,
+                  "label `\{label.repr()}` is not attached to anything",
+                ),
+              )
+            }
+          }
+          value => seq.push(value.display().spanned(span))
+        }
       }
       _ => seq.push(self.content(child, fallback))
     }
@@ -288,7 +337,14 @@ fn Lower::value(
     VBool(v) => @library.Value::Bool(v)
     VInt(v) => @library.Value::Int(v)
     VFloat(v) => @library.Value::Float(v)
-    VStr(v) => @library.Value::Str(v)
+    VStr(v) => {
+      // Also for strings that become text (`#value`, raw text): glyph
+      // offsets into a long string are not reliable.
+      if @syntax.utf8_len(v) > text_offset_max {
+        self.session.registry.mark_long_text(span)
+      }
+      @library.Value::Str(v)
+    }
     // A numeric literal (`11pt`, `50%`, `1fr`, `90deg`).
     VNumeric(v, unit) => @library.Value::numeric(v, unit)
     // Typst's operators, in source order.
@@ -341,7 +397,9 @@ fn Lower::value(
     VCallback(callback) => {
       let own = self.session.registry.span(self.entry(callback.origin))
       @library.Value::Func(
-        @library.Func::host(self.session.host(callback, own)).spanned(own),
+        @library.Func::host(self.session.host(callback, own, self.keys)).spanned(
+          own,
+        ),
       )
     }
     VEngine(value) => value
@@ -390,7 +448,9 @@ fn Lower::show_rule(
   let transform : @library.Transformation = match show.transform {
     TFunc(callback) =>
       @library.Transformation::Func(
-        @library.Func::host(self.session.host(callback, span)).spanned(span),
+        @library.Func::host(self.session.host(callback, span, self.keys)).spanned(
+          span,
+        ),
       )
     TStyle(set) => @library.Transformation::Style(self.set_rule(set))
   }

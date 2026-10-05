@@ -323,6 +323,41 @@ fn check_twin(twin : @twins.Twin, base : &@library.World) -> Array[String] {
               }
             _ => failures.push("pdf: export failed")
           }
+          // Pixels: both documents rendered with the same resolved
+          // options, and the EDSL report's PNG export.
+          let png_options : @render.RenderOptions = {
+            render_bleed: false,
+            format: { ppi: None, },
+          }
+          let png_options = png_options.resolve(
+            @render.PngFormatOptions::get(b.options()),
+          )
+          let exported = edsl.png_pages().output().unwrap_or([])
+          if a.pages().length() != b.pages().length() ||
+            exported.length() != b.pages().length() {
+            failures.push("png: the page counts differ")
+          } else {
+            for i, page in b.pages() {
+              let pixels = try {
+                let x = @render.render(a.pages()[i], png_options)
+                let y = @render.render(page, png_options)
+                if x.width() != y.width() || x.height() != y.height() {
+                  Some("the sizes differ")
+                } else if x.data() != y.data() {
+                  Some("the pixels differ")
+                } else if exported[i] != y.encode_png() {
+                  Some("the exported PNG differs")
+                } else {
+                  None
+                }
+              } catch {
+                @render.RenderPanic(message) => Some(message)
+              }
+              if pixels is Some(message) {
+                failures.push("png: page \{i + 1}: \{message}")
+              }
+            }
+          }
         }
       }
       (None, Ok(_)) =>

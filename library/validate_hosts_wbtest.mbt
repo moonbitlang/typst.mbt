@@ -6,8 +6,11 @@
 priv struct FixedBackend(Array[Content])
 
 ///|
-impl IntrospectorBackend for FixedBackend with fn query(_, _) {
-  []
+impl IntrospectorBackend for FixedBackend with fn query(self, selector) {
+  // Like `ElementIntrospector::query`, which caches by the selector's
+  // fingerprint.
+  hash128(selector) |> ignore
+  self.0
 }
 
 ///|
@@ -219,4 +222,33 @@ test "validation: recorded results are validated by fingerprint and host identit
       content(test_closure(node, Int(1))),
     ]),
   )
+}
+
+///|
+test "validation: host closures fingerprinted while a read is replayed are not collected" {
+  // A query for the elements whose field is a host closure: the selector
+  // holds the closure, and so does the result. Recording collects the
+  // closures of the result; the replay fingerprints the selector first.
+  let call : NativeFn = (_, _, _) => None
+  let host = HostFunc::new(hash128("h"), call)
+  let elem = TextElem::packed("x").elem()
+  let content = () => {
+    Content::from_fields(elem, [Some(Value::Func(Func::host(host)))])
+  }
+  let selector = Selector::Elem(elem, Some([(0, Func(Func::host(host)))]))
+  let validates = (before : Array[Content], after : Array[Content]) => {
+    let recorder = IntrospectionRecorder::new()
+    let tracked = Introspector::new(FixedBackend(before)).track_with(recorder)
+    tracked.query(selector) |> ignore
+    recorder.validate(Introspector::new(FixedBackend(after)))
+  }
+  assert_true(validates([content()], [content()]))
+  assert_true(validates([content(), content()], [content(), content()]))
+  // Another closure with the same key still does not validate.
+  let other = Content::from_fields(elem, [
+    Some(Value::Func(Func::host(HostFunc::new(hash128("h"), call)))),
+  ])
+  assert_false(validates([content()], [other]))
+  // An armed collector does not outlive the validation.
+  assert_true(fingerprint_output_hosts.val is None)
 }

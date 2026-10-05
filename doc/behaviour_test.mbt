@@ -307,6 +307,88 @@ test "a query whose results hold host functions converges" {
 }
 
 ///|
+test "host functions do not add layout iterations" {
+  // The absence of a convergence warning does not show convergence (equal
+  // histories are not reported): count the runs of a context callback
+  // instead. They are the same whether the queried headings are numbered
+  // by a pattern or by a host function, and also if the query's selector
+  // holds the host function.
+  let runs_of = (numbering : @doc.Numbering, by_numbering : Bool) => {
+    let runs = @ref.Ref::{ val: 0, }
+    let found = @ref.Ref::{ val: 0, }
+    let report = compile([
+      @doc.SetHeading(numbering~),
+      @doc.Heading("One"),
+      @doc.Heading("Two"),
+      @doc.Context() <| cx => {
+        runs.val += 1
+        let selector = if by_numbering {
+          @doc.Select::heading(numbering~)
+        } else {
+          @doc.Select::heading()
+        }
+        found.val = cx.query(selector).length()
+        "\{found.val} headings"
+      },
+    ])
+    assert_eq(error_messages(report), "")
+    assert_eq(report.warnings.length(), 0)
+    assert_eq(found.val, 2)
+    runs.val
+  }
+  let host = @doc.Numbering::func() <| ((numbers, _) => "§\{numbers[0]}")
+  let plain = runs_of(@doc.Numbering("1."), false)
+  assert_eq(runs_of(@doc.Numbering("1."), true), plain)
+  assert_eq(runs_of(host, false), plain)
+  assert_eq(runs_of(host, true), plain)
+}
+
+///|
+test "a callback description used twice runs for each occurrence" {
+  // One host function, but the content it returns belongs to the
+  // occurrence it was invoked for.
+  let plain = @doc.Context() <| _ => { "x" }
+  let report = compile([@doc.Keyed("a", plain), @doc.Keyed("b", plain)])
+  inspect(error_messages(report), content="")
+  inspect(
+    text_origins(report).join(" | "),
+    content="x: Context a | x: Context b",
+  )
+  let located = @doc.Context() <| _ => { @doc.Par("y") }
+  let report = compile([@doc.Keyed("a", located), @doc.Keyed("b", located)])
+  inspect(text_origins(report).join(" | "), content="y: Par a | y: Par b")
+  // Errors too.
+  let failing = @doc.Context() <| _ => { @doc.Text("z", size=Auto) }
+  let report = compile([@doc.Keyed("a", "ok"), @doc.Keyed("b", failing)])
+  inspect(error_messages(report), content="expected length, found auto")
+  inspect(origin_of(report.errors[0]).keys.join("/"), content="b")
+}
+
+///|
+test "plain strings in `Keyed` resolve to the enclosing argument under the key" {
+  let report = compile([
+    @doc.Keyed("a", "alpha"),
+    @doc.Par(" "),
+    @doc.Keyed("b", @doc.Keyed("c", "beta")),
+  ])
+  inspect(error_messages(report), content="")
+  inspect(
+    text_origins(report).join(" | "),
+    content="alpha: Document a |  : Par | beta: Document b/c",
+  )
+  // The argument's location is kept.
+  let glyphs = []
+  for page in report.unwrap().pages() {
+    collect_glyphs(page.frame, glyphs)
+  }
+  let (_, span, offset) = glyphs[0]
+  guard report.origins.resolve_glyph(span, offset) is Some(found) else {
+    fail("no origin")
+  }
+  assert_eq(found.origin.param, Some(0))
+}
+
+///|
 test "glyphs resolve to their constructor calls, keys and callbacks" {
   let rows = ["alpha", "beta"]
   let report = compile([
@@ -420,7 +502,13 @@ test "errors in files imported by markup are located in those files" {
 ///|
 test "text longer than the offset range reports no offset" {
   let long = "word ".repeat(14000)
-  let report = compile([@doc.Par(long), @doc.Par("short")])
+  // Also for strings that reach text as values and as raw text.
+  let report = compile([
+    @doc.Par(long),
+    @doc.Value::str(long),
+    @doc.Raw(long),
+    @doc.Par("short"),
+  ])
   inspect(error_messages(report), content="")
   let glyphs = []
   for page in report.unwrap().pages() {

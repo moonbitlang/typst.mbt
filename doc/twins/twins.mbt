@@ -25,6 +25,8 @@ using @doc {
   type Enum,
   type EnumItem,
   type SetEnumItem,
+  type Rect,
+  type SetRect,
   type Place,
   type Quote,
   type Footnote,
@@ -476,7 +478,7 @@ pub fn constructs() -> Array[Twin] {
       [
         page_typ, "#set enum.item(3);", "#enum(enum.item[#\"inherited\"], enum.item(auto)[#\"automatic\"], enum.item(7)[#\"seven\"])",
         "#[#set enum.item(auto);#enum(enum.item[#\"reset\"])]", "#place(auto, float: true)[#\"floating\"]",
-        "#place(top + right)[#\"corner\"]",
+        "#place(top + right)[#\"corner\"]", "#[#set rect(width: 40pt, [#\"inherited\"]);#rect()#rect(none)#rect[#\"own\"]#[#set rect(none);#rect()]]",
       ],
       () => {
         Document([
@@ -493,6 +495,40 @@ pub fn constructs() -> Array[Twin] {
           ]),
           Place("floating", alignment=Auto, float=true),
           Place("corner", extra=[("alignment", Value::alignment(Top + Right))]),
+          // An optional positional body is settable: inherited, reset by an
+          // explicit `none`, and overridden.
+          Seq([
+            SetRect(width=Pt(40), body="inherited"),
+            Rect(),
+            Rect(body=NoneValue()),
+            Rect(body="own"),
+            Seq([SetRect(extra=[("body", Value::none())]), Rect()]),
+          ]),
+        ])
+      },
+    ),
+    // Inserted expressions whose value is a label attach it to the content
+    // before them, like `#label("..")` in markup, with the same warnings.
+    twin(
+      "label-values",
+      [
+        page_typ, "#set heading(numbering: \"1.\");", "#heading[#\"First\"]#label(\"first\")",
+        "#heading[#\"Second\"]#label(\"second\")", "#par[#\"See \"#ref(<first>)#\" and \"#ref(<second>)#\".\"]",
+        "#[#label(\"stray\")]", "#emph[#\"twice\"]#label(\"a\")#label(\"b\")",
+      ],
+      () => {
+        Document([
+          page(),
+          SetHeading(numbering=Numbering("1.")),
+          Heading("First"),
+          Value::label("first"),
+          Heading("Second"),
+          Call("label", positional=[Value::str("second")]),
+          Par(Seq(["See ", Ref("first"), " and ", Ref("second"), "."])),
+          Seq([Value::label("stray")]),
+          Emph("twice"),
+          Value::label("a"),
+          Value::label("b"),
         ])
       },
     ),

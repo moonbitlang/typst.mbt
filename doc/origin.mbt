@@ -115,11 +115,48 @@ fn Registry::entry(
   site : Site,
   keys : Array[String],
 ) -> Int raise @library.SourceError {
-  let loc = site.loc.to_string()
+  let ArgsLoc(arg_locs) = site.args
+  self.entry_of(
+    site.loc.to_string(),
+    site.kind,
+    arg_locs.map(arg => arg.map(arg => arg.to_string())),
+    keys,
+  )
+}
+
+///|
+/// The entry of the same call as `entry` under other keys.
+fn Registry::rekeyed(
+  self : Registry,
+  entry : Int,
+  keys : Array[String],
+) -> Int raise @library.SourceError {
+  let e = self.entries[entry]
+  self.entry_of(e.loc, e.kind, e.args.map(arg => arg.map(arg => arg.0)), keys)
+}
+
+///|
+/// See [Registry::entry]: `arg_locs` are the locations of the call's
+/// arguments, per declared parameter.
+fn Registry::entry_of(
+  self : Registry,
+  loc : String,
+  kind : String,
+  arg_locs : Array[String?],
+  keys : Array[String],
+) -> Int raise @library.SourceError {
+  // The deduplication key is unambiguous for any keys: each is prefixed
+  // with its length.
   let dedup = if keys.is_empty() {
     loc
   } else {
-    loc + "\u{0}" + keys.join("\u{1}")
+    let dedup = StringBuilder()
+    dedup.write_string(loc)
+    for key in keys {
+      dedup.write_string("\u{0}\{key.length()}:")
+      dedup.write_string(key)
+    }
+    dedup.to_string()
   }
   if self.index.get(dedup) is Some(i) {
     return i
@@ -128,13 +165,12 @@ fn Registry::entry(
   let line = StringBuilder()
   line.write_string(loc)
   line.write_char(' ')
-  line.write_string(site.kind)
+  line.write_string(kind)
   for key in keys {
     line.write_string(" key=")
     line.write_string(@library.repr_str(key))
   }
   let start = self.len
-  let ArgsLoc(arg_locs) = site.args
   let args : Array[(String, Int, Int)?] = []
   for i, arg in arg_locs {
     match arg {
@@ -142,7 +178,6 @@ fn Registry::entry(
       Some(arg) => {
         line.write_char(' ')
         let token_start = start + @syntax.utf8_len(line.to_string())
-        let arg = arg.to_string()
         line.write_string("a\{i}=")
         line.write_string(arg)
         let token_end = start + @syntax.utf8_len(line.to_string())
@@ -164,7 +199,7 @@ fn Registry::entry(
   let i = self.entries.length()
   self.entries.push({
     loc,
-    kind: site.kind,
+    kind,
     keys: keys.copy(),
     start,
     end,
@@ -202,8 +237,17 @@ fn Registry::arg_span(
 /// Record that a text too long for exact glyph offsets was lowered with the
 /// origin of `span`.
 fn Registry::mark_long_text(self : Registry, span : @syntax.Span) -> Unit {
-  guard span.get() is Range(id~, start~, ..) && id == origins_file else {
-    return
+  if self.locate(span) is Some((entry, _)) {
+    self.entries[entry].long_text = true
+  }
+}
+
+///|
+/// The entry whose line contains a span of the origin listing, and the
+/// parameter whose token the span is (`-1` for the entry's own span).
+fn Registry::locate(self : Registry, span : @syntax.Span) -> (Int, Int)? {
+  guard span.get() is Range(id~, start~, end~) && id == origins_file else {
+    return None
   }
   // Entries are sorted by their start: find the last one at or before it.
   let mut lo = 0
@@ -216,8 +260,32 @@ fn Registry::mark_long_text(self : Registry, span : @syntax.Span) -> Unit {
       hi = mid
     }
   }
-  if lo > 0 {
-    self.entries[lo - 1].long_text = true
+  guard lo > 0 else { return None }
+  let e = self.entries[lo - 1]
+  guard start <= e.end else { return None }
+  for i, arg in e.args {
+    if arg is Some((_, s, t)) && s == start && t == end {
+      return Some((lo - 1, i))
+    }
+  }
+  Some((lo - 1, -1))
+}
+
+///|
+/// The span for locationless content (a plain string) inside `Keyed`
+/// wrappers: the argument or call of `span` under `keys`, so that the
+/// occurrences resolve to distinct origins with the same location.
+fn Registry::keyed_span(
+  self : Registry,
+  span : @syntax.Span,
+  keys : Array[String],
+) -> @syntax.Span raise @library.SourceError {
+  guard self.locate(span) is Some((entry, param)) else { return span }
+  let keyed = self.rekeyed(entry, keys)
+  if param >= 0 {
+    self.arg_span(keyed, param)
+  } else {
+    self.span(keyed)
   }
 }
 

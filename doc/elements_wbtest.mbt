@@ -78,4 +78,22 @@ test "the origin registry is append-only and deduplicates by call site and keys"
     fail("no origin")
   }
   inspect(origin.keys.join("/"), content="row-1")
+  // Key paths are distinguished structurally, whatever the keys contain.
+  let nested = registry.entry(a, ["x", "y"])
+  for joined in ["x\u{1}y", "x\u{0}1:y", "x/y", "xy"] {
+    let single = registry.entry(a, [joined])
+    assert_true(single != nested)
+    guard frozen_keys(registry, single) is [key] else { fail("one key") }
+    assert_eq(key, joined)
+  }
+  assert_eq(frozen_keys(registry, nested).length(), 2)
+}
+
+///|
+/// The keys of an entry as a report resolves them.
+fn frozen_keys(registry : Registry, entry : Int) -> Array[String] raise {
+  guard registry.freeze().resolve(registry.span(entry)) is Some(origin) else {
+    fail("no origin")
+  }
+  origin.keys
 }

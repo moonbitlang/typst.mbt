@@ -1067,7 +1067,7 @@ pub struct SetBlock {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetBlock::SetBlock(width? : Length, height? : Sizing, breakable? : Bool, fill? : Paint, stroke? : Sides[Stroke], radius? : Corners[Length], inset? : Sides[Length], outset? : Sides[Length], spacing? : Spacing, above? : Spacing, below? : Spacing, clip? : Bool, sticky? : Bool, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetBlock::SetBlock(body? : &IntoContent, width? : Length, height? : Sizing, breakable? : Bool, fill? : Paint, stroke? : Sides[Stroke], radius? : Corners[Length], inset? : Sides[Length], outset? : Sides[Length], spacing? : Spacing, above? : Spacing, below? : Spacing, clip? : Bool, sticky? : Bool, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetBlock
 pub impl SetRule for SetBlock
 
@@ -1075,7 +1075,7 @@ pub struct SetBox {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetBox::SetBox(width? : Sizing, height? : Length, fill? : Paint, stroke? : Sides[Stroke], radius? : Corners[Length], inset? : Sides[Length], outset? : Sides[Length], clip? : Bool, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetBox::SetBox(body? : &IntoContent, width? : Sizing, height? : Length, fill? : Paint, stroke? : Sides[Stroke], radius? : Corners[Length], inset? : Sides[Length], outset? : Sides[Length], clip? : Bool, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetBox
 pub impl SetRule for SetBox
 
@@ -1083,7 +1083,7 @@ pub struct SetCircle {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetCircle::SetCircle(radius? : Length, width? : Length, height? : Sizing, fill? : Paint, stroke? : Stroke, inset? : Sides[Length], outset? : Sides[Length], extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetCircle::SetCircle(radius? : Length, width? : Length, height? : Sizing, fill? : Paint, stroke? : Stroke, inset? : Sides[Length], outset? : Sides[Length], body? : &IntoContent, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetCircle
 pub impl SetRule for SetCircle
 
@@ -1115,7 +1115,7 @@ pub struct SetEllipse {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetEllipse::SetEllipse(width? : Length, height? : Sizing, fill? : Paint, stroke? : Stroke, inset? : Sides[Length], outset? : Sides[Length], extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetEllipse::SetEllipse(width? : Length, height? : Sizing, fill? : Paint, stroke? : Stroke, inset? : Sides[Length], outset? : Sides[Length], body? : &IntoContent, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetEllipse
 pub impl SetRule for SetEllipse
 
@@ -1339,7 +1339,7 @@ pub struct SetRect {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetRect::SetRect(width? : Length, height? : Sizing, fill? : Paint, stroke? : Sides[Stroke], radius? : Corners[Length], inset? : Sides[Length], outset? : Sides[Length], extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetRect::SetRect(width? : Length, height? : Sizing, fill? : Paint, stroke? : Sides[Stroke], radius? : Corners[Length], inset? : Sides[Length], outset? : Sides[Length], body? : &IntoContent, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetRect
 pub impl SetRule for SetRect
 
@@ -1387,7 +1387,7 @@ pub struct SetSquare {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetSquare::SetSquare(size? : Length, width? : Length, height? : Sizing, fill? : Paint, stroke? : Sides[Stroke], radius? : Corners[Length], inset? : Sides[Length], outset? : Sides[Length], extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetSquare::SetSquare(size? : Length, width? : Length, height? : Sizing, fill? : Paint, stroke? : Sides[Stroke], radius? : Corners[Length], inset? : Sides[Length], outset? : Sides[Length], body? : &IntoContent, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetSquare
 pub impl SetRule for SetSquare
 
@@ -1494,6 +1494,14 @@ pub struct SetText {
 pub fn SetText::SetText(font? : Array[String], fallback? : Bool, style? : String, weight? : FontWeight, size? : Length, fill? : Paint, stroke? : Stroke, tracking? : Length, spacing? : Length, baseline? : Length, overhang? : Bool, lang? : String, region? : String, dir? : Dir, hyphenate? : Bool, kerning? : Bool, ligatures? : Bool, discretionary_ligatures? : Bool, historical_ligatures? : Bool, number_type? : String, number_width? : String, slashed_zero? : Bool, fractions? : Bool, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetText
 pub impl SetRule for SetText
+
+pub struct SetTitle {
+  // private fields
+}
+#callsite(autofill(args_loc, loc))
+pub fn SetTitle::SetTitle(body? : &IntoContent, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl IntoContent for SetTitle
+pub impl SetRule for SetTitle
 
 pub struct SetUnderline {
   // private fields
