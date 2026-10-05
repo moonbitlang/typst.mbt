@@ -481,16 +481,22 @@ after the transforms of the groups around them.
 ### What it guarantees
 
 1. **Both directions agree.** A box that `positions` returns for a line
-   belongs to an origin whose location has that line: looking its middle
-   up with `origin_at` leads back (tested for every box of the test
-   documents and for the showcase's lines).
+   is the box of something whose origin's location has that line. (For
+   the boxes of the test documents and of the showcase's lines the tests
+   also look the middle of the box up with `origin_at`; that is a check
+   of those documents, not a promise: the middle of the box of an
+   outlined shape is empty, and something else can lie over it.)
 2. **The page gives the library's answer.** The page finds the words and
    origins of a line with the same rule from the same data; the library's
    answers for some lines are embedded and compared by `#selftest` and
    `scripts/review_page_check.mjs`.
 3. **A comment's selection is only shown where it still is.** A comment
-   keeps the numbers of its words. If the page was made anew and those
-   words are not that text any more, "Show" says so and selects nothing.
+   keeps the numbers of its words, or for a shape or an image its origin
+   and which of that origin's shapes on the page it is. If the page was
+   made anew and those words are not that text any more, or the origin
+   is not the same call, "Show" says so and selects nothing. A comment
+   that an earlier version of the page stored has no selection: it stays
+   in the list and can be copied.
 4. Nothing of the compilation or of the other exports changes; the
    lookup reads the tables that slices 1 to 3 built.
 
@@ -503,7 +509,8 @@ after the transforms of the groups around them.
   and a call inside that array, without source characters only the call
   is found.
 - A box is a bounding box: of rotated text it is larger than the text,
-  and a clip around a group does not cut it.
+  around a stroke it leaves room for caps and joins, and a clip around a
+  group does not cut it.
 - `positions` takes the file as origins name it (relative to the module
   root); the page's field takes a line of the main file or `file:line`
   with that same name, and no column.

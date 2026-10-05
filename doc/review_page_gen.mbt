@@ -487,10 +487,18 @@ let review_page_js : String =
   #|    D.origins.forEach((o, id) => {
   #|      if (o.file === file && o.range[0] <= line && line <= o.range[2]) candidates.push(id);
   #|    });
+  #|    // (Many origins can have one location: under `Keyed`, each key is an
+  #|    // origin. Each location is compared once.)
+  #|    const ranges = new Map();
+  #|    for (const id of candidates) ranges.set(D.origins[id].range.join(' '), D.origins[id].range);
+  #|    const narrowest = new Set();
+  #|    for (const [key, range] of ranges) {
+  #|      if (!Array.from(ranges.values()).some((other) => inside(other, range))) narrowest.add(key);
+  #|    }
   #|    const exact = new Set(), whole = [];
   #|    for (const id of candidates) {
   #|      if (D.origins[id].tier === 3) exact.add(id);
-  #|      else if (!candidates.some((other) => inside(D.origins[other].range, D.origins[id].range))) whole.push(id);
+  #|      else if (narrowest.has(D.origins[id].range.join(' '))) whole.push(id);
   #|    }
   #|    const words = [];
   #|    if (exact.size > 0) {
@@ -560,15 +568,19 @@ let review_page_js : String =
   #|  const state = { from: -1, to: -1, anchor: -1, object: null, extend: false, comments: [] };
   #|  const key = 'typst.mbt review: ' + data.title;
   #|  try { state.comments = JSON.parse(localStorage.getItem(key) || '[]'); } catch (e) { state.comments = []; }
-  #|  // A comment of the list is its record and its selection (`from`, `to`:
-  #|  // words; or `origin`, `page`: a shape or an image). What something else
-  #|  // stored there is not a list of comments: only what the list can show
-  #|  // and turn into text is kept.
+  #|  // A comment of the list is its record and its selection: `from`, `to`
+  #|  // (words), or `origin`, `page`, `nth` (a shape or an image: the `nth`
+  #|  // shape of that origin on the page). A record that an earlier version
+  #|  // of the page stored alone is kept without a selection. What something
+  #|  // else stored there is not a list of comments: only what the list can
+  #|  // show and turn into text is kept.
+  #|  const whole = (n) => Number.isInteger(n) && n >= 0;
   #|  const usable = (item) => {
   #|    try {
   #|      const f = item.record;
-  #|      const picked = (Number.isInteger(item.from) && Number.isInteger(item.to)) ||
-  #|        (Number.isInteger(item.origin) && Number.isInteger(item.page));
+  #|      const picked = (item.from === undefined && item.origin === undefined) ||
+  #|        (whole(item.from) && whole(item.to)) ||
+  #|        (whole(item.origin) && whole(item.page) && whole(item.nth) && f.origins.length === 1);
   #|      return picked && f.format === 'typst.mbt review feedback 2' && typeof f.comment === 'string' &&
   #|        typeof f.selected_text === 'string' && f.pages.every((page) => typeof page === 'number') &&
   #|        f.origins.every((o) => typeof o.file === 'string' && typeof o.constructor === 'string' &&
@@ -579,7 +591,9 @@ let review_page_js : String =
   #|      return false;
   #|    }
   #|  };
-  #|  state.comments = (Array.isArray(state.comments) ? state.comments : []).filter(usable);
+  #|  state.comments = (Array.isArray(state.comments) ? state.comments : [])
+  #|    .map((item) => (item && item.record === undefined && item.format !== undefined ? { record: item } : item))
+  #|    .filter(usable);
   #|  const persist = () => { try { localStorage.setItem(key, JSON.stringify(state.comments)); } catch (e) { /* kept in the page only */ } };
   #|
   #|  const current = () => {
@@ -779,31 +793,40 @@ let review_page_js : String =
   #|  const allText = () => state.comments.map((item, i) =>
   #|    `--- comment ${i + 1} of ${state.comments.length} ---\n${Core.toText(item.record)}`).join('\n');
   #|
+  #|  // The shapes and images of an origin on a page, in the layer's order.
+  #|  const objects = (page, origin) => (layers[page - 1]
+  #|    ? Array.from(layers[page - 1].querySelectorAll(`[data-o="${Number(origin)}"]:not([data-i]):not([data-g])`))
+  #|    : []);
+  #|
   #|  // Select what a comment of the list is about again, and bring it into
   #|  // view. A page that was made anew from a changed source may not have
-  #|  // it at the same place: then nothing is selected.
+  #|  // it at its place: then nothing is selected, and the page says so.
   #|  function show(item) {
   #|    const f = item.record;
-  #|    let found = false;
-  #|    if (Number.isInteger(item.from)) {
-  #|      found = item.from >= 0 && item.to < data.words.length && item.from <= item.to &&
+  #|    let shape = null, found = false;
+  #|    if (whole(item.from)) {
+  #|      found = item.to < data.words.length && item.from <= item.to &&
   #|        Core.textOf(item.from, item.to) === f.selected_text;
-  #|      if (found) {
-  #|        state.anchor = item.from;
-  #|        selectWords(item.from, item.to);
-  #|      }
-  #|    } else {
-  #|      const layer = layers[item.page - 1];
-  #|      const shape = layer ? layer.querySelector(`[data-o="${item.origin}"]:not([data-i]):not([data-g])`) : null;
-  #|      const o = data.origins[item.origin], want = f.origins[0];
-  #|      found = shape !== null && o !== undefined && o.file === want.file && o.range[0] === want.start[0] && o.range[1] === want.start[1];
-  #|      if (found) {
-  #|        clear(false);
-  #|        state.object = shape;
-  #|        render(false);
-  #|      }
+  #|    } else if (whole(item.origin)) {
+  #|      // The same origin, in all that the record says of it.
+  #|      const now = data.origins[item.origin] === undefined ? null : Core.objectFeedback(item.origin, item.page, '').origins[0];
+  #|      const same = (a, b) => ['file', 'module', 'constructor', 'parameter', 'keys', 'start', 'end']
+  #|        .every((part) => JSON.stringify(a[part]) === JSON.stringify(b[part]));
+  #|      shape = now !== null && same(now, f.origins[0]) ? objects(item.page, item.origin)[item.nth] || null : null;
+  #|      found = shape !== null;
   #|    }
-  #|    $('list-status').textContent = found ? '' : 'This page does not have the selection of that comment at its place any more.';
+  #|    clear(false);
+  #|    if (found && shape === null) {
+  #|      state.anchor = item.from;
+  #|      selectWords(item.from, item.to);
+  #|    } else if (found) {
+  #|      state.object = shape;
+  #|      render(false);
+  #|    }
+  #|    $('list-status').textContent = found ? ''
+  #|      : whole(item.from) || whole(item.origin)
+  #|        ? 'This page does not have the selection of that comment at its place any more: nothing is selected.'
+  #|        : 'That comment was stored without its selection: it can be copied, not shown.';
   #|    if (found && marked.length > 0) marked[0].scrollIntoView({ block: 'center' });
   #|  }
   #|
@@ -842,9 +865,12 @@ let review_page_js : String =
   #|      $('comment').focus();
   #|      return;
   #|    }
-  #|    state.comments.push(state.object
-  #|      ? { record: f, origin: Number(state.object.getAttribute('data-o')), page: f.pages[0] }
-  #|      : { record: f, from: state.from, to: state.to });
+  #|    if (state.object) {
+  #|      const origin = Number(state.object.getAttribute('data-o'));
+  #|      state.comments.push({ record: f, origin, page: f.pages[0], nth: objects(f.pages[0], origin).indexOf(state.object) });
+  #|    } else {
+  #|      state.comments.push({ record: f, from: state.from, to: state.to });
+  #|    }
   #|    persist();
   #|    $('comment').value = '';
   #|    $('status').textContent = 'Added to the list below.';
@@ -873,7 +899,8 @@ let review_page_js : String =
   #|    }
   #|    const hits = Core.findLine(file, line);
   #|    for (const i of hits.words) for (const shape of boxes.get(i) || []) found.push(shape);
-  #|    for (const shape of shapes) if (hits.whole.includes(Number(shape.getAttribute('data-o')))) found.push(shape);
+  #|    const wholes = new Set(hits.whole);
+  #|    for (const shape of shapes) if (wholes.has(Number(shape.getAttribute('data-o')))) found.push(shape);
   #|    for (const shape of found) shape.classList.add('src');
   #|    const pages = Array.from(new Set(found.map((shape) => shape.closest('svg.hit').getAttribute('data-page'))));
   #|    $('find-status').textContent = found.length === 0

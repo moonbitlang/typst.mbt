@@ -111,9 +111,11 @@ fn OriginTable::note_box(
 }
 
 ///|
-/// The bounding box of a shape at `(x, y)` in its frame: of its geometry
-/// (for a curve, of its points and control points), widened by half the
-/// stroke.
+/// A box around a shape at `(x, y)` in its frame: the bounding box of its
+/// geometry (for a curve, of its points and control points), widened by
+/// what a stroke can reach beyond it: half its thickness, times the
+/// square root of two for a square cap in any direction, or times the
+/// miter limit for a pointed join.
 fn shape_box(
   shape : @library.Shape,
   x : Double,
@@ -143,7 +145,14 @@ fn shape_box(
     }
   }
   let pad = match shape.stroke {
-    Some(stroke) => stroke.thickness.to_pt() / 2.0
+    Some(stroke) => {
+      let reach = if stroke.join is Miter && stroke.miter_limit.get() > 1.4143 {
+        stroke.miter_limit.get()
+      } else {
+        1.4143
+      }
+      stroke.thickness.to_pt() / 2.0 * reach
+    }
     None => 0.0
   }
   let (left, top, right, bottom) = bounds(points)
@@ -195,14 +204,27 @@ fn ReviewText::line_hits(
       candidates.push(id)
     }
   }
+  // (Many origins can have one location: under `Keyed`, each key is an
+  // origin. Each location is compared once.)
+  let range_of = (o : Origin) => {
+    "\{o.start_line} \{o.start_column} \{o.end_line} \{o.end_column}"
+  }
+  let ranges : Map[String, Origin] = Map([])
+  for id in candidates {
+    ranges[range_of(self.origins[id])] = self.origins[id]
+  }
+  let narrowest : Map[String, Unit] = Map([])
+  for key, origin in ranges {
+    if !ranges.values().any(other => inside(other, origin)) {
+      narrowest[key] = ()
+    }
+  }
   let exact : Map[Int, Unit] = Map([])
   let whole : Array[Int] = []
   for id in candidates {
     if self.infos[id].tier == 3 {
       exact[id] = ()
-    } else if !candidates
-      .iter()
-      .any(other => inside(self.origins[other], self.origins[id])) {
+    } else if narrowest.contains(range_of(self.origins[id])) {
       whole.push(id)
     }
   }
@@ -240,10 +262,14 @@ pub fn ReviewText::positions(
   column? : Int,
 ) -> Array[Region] {
   let (words, whole) = self.line_hits(file, line, column)
+  let wanted : Map[Int, Unit] = Map([])
+  for id in whole {
+    wanted[id] = ()
+  }
   let regions : Array[Region] = []
   for box in self.boxes {
     if (box.word >= 0 && words.binary_search(box.word) is Ok(_)) ||
-      whole.contains(box.origin) {
+      wanted.contains(box.origin) {
       regions.push(box.region)
     }
   }

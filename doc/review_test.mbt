@@ -925,6 +925,16 @@ test "positions: where on the pages is what a source line produced" {
   assert_eq(text.positions(file, seq, column=stressed.start_column).length(), 1)
   // A line of its own.
   assert_eq(text.positions(file, seq + 1).length(), 1)
+  // The end of a location is exclusive: the column behind the emphasis'
+  // argument is the array around it again.
+  assert_eq(
+    text.positions(file, seq, column=stressed.end_column - 1).length(),
+    1,
+  )
+  assert_eq(
+    text.positions(file, seq, column=stressed.end_column).length(),
+    text.origin_positions(plain).length(),
+  )
   // Nothing: another file, a line without a location, a column outside.
   assert_true(text.positions("other.mbt", rect).is_empty())
   assert_true(text.positions(file, 1).is_empty())
@@ -941,4 +951,42 @@ test "positions: where on the pages is what a source line produced" {
   assert_true(
     html.contains("\"finds\":[[\"doc/review_test.mbt\",\{rect},[],[0]]"),
   )
+}
+
+///|
+/// A square from one call site (`positions` test below).
+fn keyed_square(key : String) -> @doc.Keyed {
+  @doc.Keyed(key, @doc.Rect(width=Pt(6), height=Pt(6), fill=Black))
+}
+
+///|
+test "positions: one location under many keys, and the reach of a stroke" {
+  // Each key is an origin of its own with the same location: a line gives
+  // all of them, one box each.
+  let squares : Array[&@doc.IntoContent] = []
+  for i in 0..<40 {
+    squares.push(keyed_square("row \{i}"))
+  }
+  let report = compile_on_page(squares)
+  let text = report.review_text()
+  let origin = report.origin_at(1, 12.0, 12.0).unwrap()
+  assert_eq(origin.keys, ["row 0"])
+  let all = text.positions("doc/review_test.mbt", origin.start_line)
+  assert_eq(all.length(), 40)
+  assert_eq(text.origin_positions(origin).length(), 1)
+  // A line with square caps reaches beyond its end points by half its
+  // thickness in both directions: the box has room for that.
+  let line = compile_on_page([
+    @doc.Line(
+      end_=(Pt(20), Pt(20)),
+      stroke=@doc.Stroke(thickness=Pt(2), cap="square"),
+    ),
+  ])
+  let text = line.review_text()
+  let origin = line.origin_at(1, 20.0, 20.0).unwrap()
+  let box = text.origin_positions(origin)[0]
+  assert_true(box.x <= 10.0 - 1.4142 && box.y <= 10.0 - 1.4142)
+  assert_true(box.x + box.width >= 30.0 + 1.4142)
+  // (And for a pointed join up to the miter limit, here 4: not more.)
+  assert_true(box.width <= 28.01)
 }

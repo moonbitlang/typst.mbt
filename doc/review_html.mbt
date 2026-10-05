@@ -590,10 +590,15 @@ pub fn CompileReport::review_html(
   data["samples"] = samples
   data["objects"] = objects
   // What some source lines produced (`[file, line, words, origins]`): the
-  // first line of every fifth origin, at most forty.
+  // first line of every fifth origin, each line once, at most forty.
   let finds : Array[Json] = []
+  let asked : Map[String, Unit] = Map([])
   for id, origin in table.list {
-    guard id % 5 == 0 && finds.length() < 40 else { continue }
+    let key = "\{origin.file}\u{0}\{origin.start_line}"
+    guard id % 5 == 0 && finds.length() < 40 && !asked.contains(key) else {
+      continue
+    }
+    asked[key] = ()
     let (words, whole) = text.line_hits(origin.file, origin.start_line, None)
     finds.push(
       Json::array([
