@@ -89,6 +89,8 @@ priv struct OriginTable {
   /// Whether the last text item was the hyphen of a line break: the next
   /// word is the rest of the word before it.
   mut hyphen : Bool
+  /// The boxes of the layers on their pages (`review_positions.mbt`).
+  boxes : Array[PageBox]
 }
 
 ///|
@@ -226,12 +228,14 @@ fn OriginTable::json(self : OriginTable) -> Json {
 /// `start` is where the text before the frame ended, if text can go on
 /// from there (the end of the pen and the baseline of the text item
 /// before it, in the frame's coordinates); the result is the same for
-/// what follows the frame.
+/// what follows the frame. `mat` maps the frame's coordinates to the
+/// page's: the box of every shape of the layer is noted on its page.
 fn OriginTable::layer(
   self : OriginTable,
   frame : @library.Frame,
   out : StringBuilder,
   start : (Double, Double)?,
+  mat : Mat,
 ) -> (Double, Double)? {
   let mut before = start
   for entry in frame.items() {
@@ -270,17 +274,18 @@ fn OriginTable::layer(
         )
         // Text goes on through a group that only places its content (a
         // box in a line).
+        let inside = mat.group(x, y, ts)
         if ts.is_identity() {
           let inner = match previous {
             Some((px, py)) => Some((px - x, py - y))
             None => Option::None
           }
-          before = match self.layer(group.frame, out, inner) {
+          before = match self.layer(group.frame, out, inner, inside) {
             Some((px, py)) => Some((px + x, py + y))
             None => Option::None
           }
         } else {
-          self.layer(group.frame, out, Option::None) |> ignore
+          self.layer(group.frame, out, Option::None, inside) |> ignore
         }
         out.write_string("</g></g>")
       }
@@ -344,6 +349,10 @@ fn OriginTable::layer(
             " x=\"\{svg_num(from)}\" y=\"\{svg_num(y - size)}\" width=\"\{svg_num(to - from)}\" height=\"\{svg_num(size)}\"/>",
           )
         }
+        // (Noted in the order of the glyphs.)
+        for box in boxes {
+          self.note_box(mat, box.0, box.1, box.2, y - size, box.3, y)
+        }
         if chars.last() is Some(last) && !is_blank(last) {
           before = Some((at, y))
         }
@@ -391,9 +400,12 @@ fn OriginTable::layer(
           )
         }
         out.write_string("/>")
+        let (x0, y0, x1, y1) = shape_box(shape, x, y)
+        self.note_box(mat, id, -1, x0, y0, x1, y1)
       }
       Image(_, size, span) => {
         guard self.id(span) is Some(id) else { continue }
+        self.note_box(mat, id, -1, x, y, x + size.x.to_pt(), y + size.y.to_pt())
         out.write_string(
           "<rect data-o=\"\{id}\" x=\"\{svg_num(x)}\" y=\"\{svg_num(y)}\" width=\"\{svg_num(size.x.to_pt())}\" height=\"\{svg_num(size.y.to_pt())}\"/>",
         )
@@ -430,13 +442,14 @@ fn[T] CompileReport::review_layers(
     pieces: Map([]),
     page: 0,
     hyphen: false,
+    boxes: [],
   }
   let layers = document
     .pages()
     .mapi((i, page) => {
       let out = StringBuilder()
       table.page = i + 1
-      table.layer(page.frame, out, Option::None) |> ignore
+      table.layer(page.frame, out, Option::None, mat_identity) |> ignore
       out.to_string()
     })
   (table, layers)
@@ -576,6 +589,22 @@ pub fn CompileReport::review_html(
   let (samples, objects) = text.samples()
   data["samples"] = samples
   data["objects"] = objects
+  // What some source lines produced (`[file, line, words, origins]`): the
+  // first line of every fifth origin, at most forty.
+  let finds : Array[Json] = []
+  for id, origin in table.list {
+    guard id % 5 == 0 && finds.length() < 40 else { continue }
+    let (words, whole) = text.line_hits(origin.file, origin.start_line, None)
+    finds.push(
+      Json::array([
+        Json::string(origin.file),
+        int(origin.start_line),
+        Json::array(words.map(int)),
+        Json::array(whole.map(int)),
+      ]),
+    )
+  }
+  data["finds"] = Json::array(finds)
   // Per file, the lines of the locations of its origins.
   let lines : Array[Map[String, Json]] = text.lines.map(_ => Map([]))
   let origins = table.json()

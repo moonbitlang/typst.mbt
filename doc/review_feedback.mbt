@@ -167,19 +167,7 @@ pub fn ReviewText::origin_feedback(
   page : Int,
   comment : String,
 ) -> Feedback {
-  // The origin's entry in the table, by what the table tells apart.
-  let same = (o : Origin) => {
-    o.file == origin.file &&
-    o.module_name == origin.module_name &&
-    o.kind == origin.kind &&
-    o.start_line == origin.start_line &&
-    o.start_column == origin.start_column &&
-    o.end_line == origin.end_line &&
-    o.end_column == origin.end_column &&
-    o.param == origin.param &&
-    o.keys == origin.keys
-  }
-  let entry = match self.origins.search_by(same) {
+  let entry = match self.origin_number(origin) {
     Some(id) => self.origin_entry(id, [], "", [])
     // An origin that is not of this document's page layers.
     None =>
@@ -205,6 +193,23 @@ pub fn ReviewText::origin_feedback(
     pages: [page],
     origins: [entry],
   }
+}
+
+///|
+/// The number of an origin in the table, by what the table tells apart.
+/// `None` for an origin that is not of this document's page layers.
+fn ReviewText::origin_number(self : ReviewText, origin : Origin) -> Int? {
+  self.origins.search_by(o => {
+    o.file == origin.file &&
+    o.module_name == origin.module_name &&
+    o.kind == origin.kind &&
+    o.start_line == origin.start_line &&
+    o.start_column == origin.start_column &&
+    o.end_line == origin.end_line &&
+    o.end_column == origin.end_column &&
+    o.param == origin.param &&
+    o.keys == origin.keys
+  })
 }
 
 ///|

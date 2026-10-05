@@ -1357,6 +1357,14 @@ pub impl @builtin.Show for RefView
 pub impl @debug.Debug for RefView
 pub impl IntoContent for RefView
 
+pub struct Region {
+  page : Int
+  x : Double
+  y : Double
+  width : Double
+  height : Double
+}
+
 pub struct Repeat {
   // private fields
 }
@@ -1382,6 +1390,8 @@ pub fn ReviewText::feedback(Self, Selection, String) -> Feedback
 pub fn ReviewText::find(Self, String, nth? : Int) -> Selection?
 pub fn ReviewText::length(Self) -> Int
 pub fn ReviewText::origin_feedback(Self, Origin, Int, String) -> Feedback
+pub fn ReviewText::origin_positions(Self, Origin) -> Array[Region]
+pub fn ReviewText::positions(Self, String, Int, column? : Int) -> Array[Region]
 pub fn ReviewText::range(Self, Int, Int) -> Selection?
 pub fn ReviewText::selected_text(Self, Selection) -> String
 pub fn ReviewText::text(Self) -> String

@@ -1,5 +1,5 @@
 // The preview page of the review loop (docs/edsl-review.md, slices 1 to
-// 3). Every page has a layer of invisible shapes (`svg.hit`), one per
+// 4). Every page has a layer of invisible shapes (`svg.hit`), one per
 // word, shape and image with a source location: `data-o` is the number of
 // the origin, `data-i` the number of the word. The data (`#review-data`)
 // has the table of origins and the words in reading order, with the
@@ -180,10 +180,59 @@ const Core = (() => {
     return out;
   }
 
+  // What a line of a source file produced (`ReviewText::line_hits`): the
+  // words that are spelled on the line, and the origins whose content is
+  // found as a whole. An origin is a candidate if its location has the
+  // line. A candidate with source characters gives the words that have
+  // some on the line; another one gives everything it produced, unless a
+  // narrower candidate lies inside its location.
+  function findLine(file, line) {
+    const inside = (b, a) => {
+      const starts = b[0] > a[0] || (b[0] === a[0] && b[1] >= a[1]);
+      const ends = b[2] < a[2] || (b[2] === a[2] && b[3] <= a[3]);
+      return starts && ends && !(b[0] === a[0] && b[1] === a[1] && b[2] === a[2] && b[3] === a[3]);
+    };
+    const candidates = [];
+    D.origins.forEach((o, id) => {
+      if (o.file === file && o.range[0] <= line && line <= o.range[2]) candidates.push(id);
+    });
+    const exact = new Set(), whole = [];
+    for (const id of candidates) {
+      if (D.origins[id].tier === 3) exact.add(id);
+      else if (!candidates.some((other) => inside(D.origins[other].range, D.origins[id].range))) whole.push(id);
+    }
+    const words = [];
+    if (exact.size > 0) {
+      D.words.forEach((word, i) => {
+        if (exact.has(word[3]) && (word[5] || []).some((seg) => seg[0] === line)) words.push(i);
+      });
+    }
+    return { words, whole };
+  }
+
+  // The file that most origins are in: the one that a line without a file
+  // name is a line of.
+  function mainFile() {
+    const count = new Map();
+    let best = '';
+    for (const o of D.origins) {
+      count.set(o.file, (count.get(o.file) || 0) + 1);
+      if (best === '' || count.get(o.file) > count.get(best)) best = o.file;
+    }
+    return best;
+  }
+
   // The records that the library made for some selections must be the
-  // records made here. Returns the differences.
+  // records made here, and so must its answers for some source lines.
+  // Returns the differences.
   function check() {
     const bad = [];
+    for (const [file, line, words, whole] of D.finds) {
+      const found = findLine(file, line);
+      if (JSON.stringify([found.words, found.whole]) !== JSON.stringify([words, whole])) {
+        bad.push(`${file}:${line}: what the line produced differs from the library's answer`);
+      }
+    }
     const same = (what, f, json, text) => {
       if (JSON.stringify(f) !== JSON.stringify(json)) bad.push(`${what}: the record differs from the library's`);
       if (toText(f) !== text) bad.push(`${what}: the text differs from the library's`);
@@ -193,7 +242,7 @@ const Core = (() => {
     return bad;
   }
 
-  return { load, feedback, objectFeedback, toText, textOf, location, call, shared, marks, check };
+  return { load, feedback, objectFeedback, toText, textOf, location, call, shared, marks, findLine, mainFile, check };
 })();
 
 if (typeof module !== 'undefined' && module.exports) module.exports = Core;
@@ -220,11 +269,16 @@ if (typeof document !== 'undefined') (() => {
   const state = { from: -1, to: -1, anchor: -1, object: null, extend: false, comments: [] };
   const key = 'typst.mbt review: ' + data.title;
   try { state.comments = JSON.parse(localStorage.getItem(key) || '[]'); } catch (e) { state.comments = []; }
-  // (What something else stored there is not a list of records: only what
-  // the list can show and turn into text is kept.)
-  const usable = (f) => {
+  // A comment of the list is its record and its selection (`from`, `to`:
+  // words; or `origin`, `page`: a shape or an image). What something else
+  // stored there is not a list of comments: only what the list can show
+  // and turn into text is kept.
+  const usable = (item) => {
     try {
-      return f.format === 'typst.mbt review feedback 2' && typeof f.comment === 'string' &&
+      const f = item.record;
+      const picked = (Number.isInteger(item.from) && Number.isInteger(item.to)) ||
+        (Number.isInteger(item.origin) && Number.isInteger(item.page));
+      return picked && f.format === 'typst.mbt review feedback 2' && typeof f.comment === 'string' &&
         typeof f.selected_text === 'string' && f.pages.every((page) => typeof page === 'number') &&
         f.origins.every((o) => typeof o.file === 'string' && typeof o.constructor === 'string' &&
           o.start.length === 2 && o.end.length === 2 && typeof o.rendered_text === 'string' && Array.isArray(o.pieces) &&
@@ -285,6 +339,8 @@ if (typeof document !== 'undefined') (() => {
       facts.textContent += o.parameter === undefined ? ' (the call)' : ' (the argument)';
       if (o.keys) facts.textContent += ` · data key ${o.keys.join(' / ')}`;
       card.appendChild(facts);
+      // (A separator, so that the text reads right without the styling.)
+      facts.appendChild(document.createTextNode(' · '));
       facts.appendChild(el('span', 'tier t' + o.tier,
         o.tier === 3 ? 'source characters' : o.tier === 2 ? 'the argument' : 'the call'));
       if (o.rendered_text !== '') card.appendChild(el('p', 'rendered', '“' + o.rendered_text + '”'));
@@ -429,21 +485,57 @@ if (typeof document !== 'undefined') (() => {
   });
 
   // The list of comments.
-  const allText = () => state.comments.map((f, i) =>
-    `--- comment ${i + 1} of ${state.comments.length} ---\n${Core.toText(f)}`).join('\n');
+  const allText = () => state.comments.map((item, i) =>
+    `--- comment ${i + 1} of ${state.comments.length} ---\n${Core.toText(item.record)}`).join('\n');
+
+  // Select what a comment of the list is about again, and bring it into
+  // view. A page that was made anew from a changed source may not have
+  // it at the same place: then nothing is selected.
+  function show(item) {
+    const f = item.record;
+    let found = false;
+    if (Number.isInteger(item.from)) {
+      found = item.from >= 0 && item.to < data.words.length && item.from <= item.to &&
+        Core.textOf(item.from, item.to) === f.selected_text;
+      if (found) {
+        state.anchor = item.from;
+        selectWords(item.from, item.to);
+      }
+    } else {
+      const layer = layers[item.page - 1];
+      const shape = layer ? layer.querySelector(`[data-o="${item.origin}"]:not([data-i]):not([data-g])`) : null;
+      const o = data.origins[item.origin], want = f.origins[0];
+      found = shape !== null && o !== undefined && o.file === want.file && o.range[0] === want.start[0] && o.range[1] === want.start[1];
+      if (found) {
+        clear(false);
+        state.object = shape;
+        render(false);
+      }
+    }
+    $('list-status').textContent = found ? '' : 'This page does not have the selection of that comment at its place any more.';
+    if (found && marked.length > 0) marked[0].scrollIntoView({ block: 'center' });
+  }
+
   function renderList() {
     const list = $('list');
     list.textContent = '';
-    state.comments.forEach((f, i) => {
+    state.comments.forEach((comment, i) => {
+      const f = comment.record;
       const item = el('li', 'comment');
       item.appendChild(el('p', 'said', f.comment));
       const o = f.origins[0];
       item.appendChild(el('p', 'meta', (f.selected_text === '' ? 'A shape or an image' : '“' + f.selected_text + '”') +
         (o ? ` · ${o.file}:${o.start[0]}:${o.start[1]}` : '')));
+      const tools = el('div', 'tools');
+      const again = el('button', '', 'Show');
+      again.type = 'button';
+      again.addEventListener('click', () => show(comment));
       const remove = el('button', '', 'Remove');
       remove.type = 'button';
       remove.addEventListener('click', () => { state.comments.splice(i, 1); persist(); renderList(); });
-      item.appendChild(remove);
+      tools.appendChild(again);
+      tools.appendChild(remove);
+      item.appendChild(tools);
       list.appendChild(item);
     });
     $('count').textContent = String(state.comments.length);
@@ -459,15 +551,45 @@ if (typeof document !== 'undefined') (() => {
       $('comment').focus();
       return;
     }
-    state.comments.push(f);
+    state.comments.push(state.object
+      ? { record: f, origin: Number(state.object.getAttribute('data-o')), page: f.pages[0] }
+      : { record: f, from: state.from, to: state.to });
     persist();
     $('comment').value = '';
     $('status').textContent = 'Added to the list below.';
     renderList();
   });
   $('copy-all').addEventListener('click', () => copy(allText(), $('all'), $('list-status')));
-  $('copy-all-json').addEventListener('click', () => copy(JSON.stringify(state.comments, null, 2), $('all'), $('list-status')));
+  $('copy-all-json').addEventListener('click', () =>
+    copy(JSON.stringify(state.comments.map((item) => item.record), null, 2), $('all'), $('list-status')));
   renderList();
+
+  // Find by source line: `line` or `file:line`. What the line produced is
+  // outlined (the words that it spells, where its text is known to be the
+  // text on the page; otherwise everything of the call or argument on it).
+  let found = [];
+  $('find').addEventListener('submit', (event) => {
+    event.preventDefault();
+    for (const shape of found) shape.classList.remove('src');
+    found = [];
+    const typed = $('line').value.trim();
+    const at = typed.lastIndexOf(':');
+    const file = at < 0 ? Core.mainFile() : typed.slice(0, at).trim();
+    const line = Number(at < 0 ? typed : typed.slice(at + 1));
+    if (typed === '' || !Number.isInteger(line) || line < 1) {
+      $('find-status').textContent = 'Type a line number, or file:line.';
+      return;
+    }
+    const hits = Core.findLine(file, line);
+    for (const i of hits.words) for (const shape of boxes.get(i) || []) found.push(shape);
+    for (const shape of shapes) if (hits.whole.includes(Number(shape.getAttribute('data-o')))) found.push(shape);
+    for (const shape of found) shape.classList.add('src');
+    const pages = Array.from(new Set(found.map((shape) => shape.closest('svg.hit').getAttribute('data-page'))));
+    $('find-status').textContent = found.length === 0
+      ? `Nothing on the pages comes from line ${line} of ${file}.`
+      : `Line ${line} of ${file}: outlined on page ${pages.join(', ')}.`;
+    if (found.length > 0) found[0].scrollIntoView({ block: 'center' });
+  });
 
   // The self-test (`#selftest` in the address): the browser must find the
   // origin that the library found at each probe, also when every shape is
@@ -511,8 +633,9 @@ if (typeof document !== 'undefined') (() => {
     window.scrollTo(0, 0);
     $('selftest').hidden = false;
     $('selftest').textContent = bad.length === 0
-      ? `Self-test passed: at ${data.probes.length} points the page finds the origin that the library finds, also with every shape marked, ${data.samples.length + data.objects.length} feedback records equal the library's, and nothing covers a page.`
+      ? `Self-test passed: at ${data.probes.length} points the page finds the origin that the library finds, also with every shape marked, ${data.samples.length + data.objects.length} feedback records and ${data.finds.length} source lines give the library's answers, and nothing covers a page.`
       : `Self-test: ${bad.length} differences from the library.\n` + bad.slice(0, 20).join('\n');
   }
   if (window.location.hash === '#selftest') selftest();
+  window.addEventListener('hashchange', () => { if (window.location.hash === '#selftest') selftest(); });
 })();

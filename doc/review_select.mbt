@@ -174,6 +174,9 @@ pub struct ReviewText {
   priv infos : Array[SourceInfo]
   priv segs : Array[Array[Seg]]
   priv lines : Array[Array[Array[Char]]]
+  /// The boxes of the words, shapes and images on their pages
+  /// (`review_positions.mbt`).
+  priv boxes : Array[PageBox]
 }
 
 ///|
@@ -216,6 +219,7 @@ fn ReviewText::new(
     infos: [],
     segs: [],
     lines: [],
+    boxes: table.boxes,
   }
   text.locate(sources)
   text

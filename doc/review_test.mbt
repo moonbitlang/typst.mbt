@@ -843,3 +843,102 @@ test "source: a provider's text gives excerpts and, for a literal that is the te
     .contains("\n       | \t\{" ".repeat(origin.start_column - 1)}^^^^^\n"),
   )
 }
+
+///|
+/// A region as `page: x y width height`, rounded to tenths of a point.
+fn region_text(region : @doc.Region) -> String {
+  let tenth = (x : Double) => (x * 10.0).round() / 10.0
+  "\{region.page}: \{tenth(region.x)} \{tenth(region.y)} \{tenth(region.width)} \{tenth(region.height)}"
+}
+
+///|
+test "positions: where on the pages is what a source line produced" {
+  let report = compile_on_page([
+    @doc.Rect(width=Pt(20), height=Pt(10), fill=Black),
+    @doc.Scale(
+      @doc.Rect(width=Pt(10), height=Pt(10), fill=Black),
+      x=Pct(300),
+      y=Pct(200),
+      origin=Both(Top, Left),
+    ),
+    @doc.Par(@doc.Seq(["plain ", @doc.Emph("stressed")])),
+    @doc.Par("alone"),
+  ])
+  let text = report.review_text()
+  let file = "doc/review_test.mbt"
+  let line_of = (x : Double, y : Double) => {
+    report.origin_at(1, x, y).unwrap().start_line
+  }
+  // A shape: its box on the page. (The page has margins of 10pt.)
+  let rect = line_of(15.0, 15.0)
+  inspect(
+    text.positions(file, rect).map(region_text).join(" | "),
+    content="1: 10 10 20 10",
+  )
+  // A shape in a group with a transform: the box of what is drawn (10pt
+  // by 10pt, scaled by 3 and 2, below the first shape and the spacing).
+  let scaled = rect + 2
+  inspect(
+    text.positions(file, scaled).map(region_text).join(" | "),
+    content="1: 10 33.2 30 20",
+  )
+  // The other direction agrees: the middle of every box of a line is
+  // something whose location has that line.
+  for line in rect..<(rect + 12) {
+    for region in text.positions(file, line) {
+      let found = report
+        .origin_at(
+          region.page,
+          region.x + region.width / 2.0,
+          region.y + region.height / 2.0,
+        )
+        .unwrap()
+      assert_true(found.start_line <= line && line <= found.end_line)
+    }
+  }
+  // Text whose source was not read is found by its location. Where a
+  // call is inside an argument on the same line, the line gives the
+  // narrower of the two: the emphasis, not the strings around it.
+  let seq = rect + 7
+  assert_eq(text.positions(file, seq).length(), 1)
+  let emphasis = text.positions(file, seq)[0]
+  let stressed = report
+    .origin_at(1, emphasis.x + 2.0, emphasis.y + emphasis.height / 2.0)
+    .unwrap()
+  assert_eq(stressed.kind, "Emph")
+  inspect(
+    text.positions(file, seq).map(region_text) ==
+    text.origin_positions(stressed).map(region_text),
+    content="true",
+  )
+  // With a column: what is at that position. The string of the sequence
+  // is its array argument, around the emphasis.
+  let plain = report
+    .origin_at(1, 12.0, emphasis.y + emphasis.height / 2.0)
+    .unwrap()
+  assert_eq(plain.kind, "Seq")
+  assert_eq(
+    text.positions(file, seq, column=plain.start_column + 1).length(),
+    text.origin_positions(plain).length(),
+  )
+  assert_true(text.origin_positions(plain).length() >= 1)
+  assert_eq(text.positions(file, seq, column=stressed.start_column).length(), 1)
+  // A line of its own.
+  assert_eq(text.positions(file, seq + 1).length(), 1)
+  // Nothing: another file, a line without a location, a column outside.
+  assert_true(text.positions("other.mbt", rect).is_empty())
+  assert_true(text.positions(file, 1).is_empty())
+  assert_true(text.positions(file, rect, column=1).is_empty())
+  // An origin of another document has no positions here.
+  let other = compile_on_page([@doc.Par("elsewhere, later")])
+  assert_true(
+    text.origin_positions(other.origin_at(1, 14.0, 16.0).unwrap()).is_empty(),
+  )
+  // The page has the form to find a line, and the library's answers for
+  // its self-test.
+  let html = report.review_html().unwrap()
+  assert_true(html.contains("<form id=\"find\""))
+  assert_true(
+    html.contains("\"finds\":[[\"doc/review_test.mbt\",\{rect},[],[0]]"),
+  )
+}
