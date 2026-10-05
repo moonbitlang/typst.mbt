@@ -102,8 +102,12 @@ fn Tr::global(
     self.lookup(path) is Some(_) else {
     raise Bail(otherwise)
   }
-  // Reading a binding can warn (deprecations).
-  { code: "Value::global(\{mbt_str(path)})", total: false, }
+  // Reading a binding can warn (deprecations); a named colour constant
+  // does not.
+  {
+    code: "Value::global(\{mbt_str(path)})",
+    total: color_constant(path) is Some(_),
+  }
 }
 
 ///|

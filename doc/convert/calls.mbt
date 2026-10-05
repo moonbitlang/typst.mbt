@@ -181,20 +181,21 @@ fn Tr::call_path(
 
 ///|
 /// The typed constructor of a call (an element or a function facade that
-/// is content), if the path has one and the arguments fit it.
+/// is content), if the path has one and the arguments fit it; otherwise
+/// why not (`""`: the path has no typed constructor).
 fn Tr::typed_call(
   self : Tr,
   path : String,
   args : @ast.Args,
   env : Env,
-) -> Code? {
+) -> Result[Code, String] {
   match find_elem(path) {
     Some(elem) if elem.ctor => {
       // The constructor stores the element itself: the name must denote
       // it in this library.
       guard self.lookup(path) is Some(Func(func)) &&
         func.to_element() is Some(_) else {
-        return None
+        return Err("")
       }
       return self.try_sig(Sig::of_elem(elem), path, args, env)
     }
@@ -203,8 +204,28 @@ fn Tr::typed_call(
   match find_func(path) {
     Some(func) if func.owner == "" =>
       self.try_sig(Sig::of_func(func), path, args, env)
-    _ => None
+    _ => Err("")
   }
+}
+
+///|
+/// The generic form of a call whose typed constructor did not fit for
+/// `reason`. If the generic form fails too and the typed one failed for
+/// the order of its arguments, that is the construct to report.
+fn Tr::generic_call(
+  self : Tr,
+  head : String,
+  path : String,
+  args : @ast.Args,
+  env : Env,
+  reason : String,
+) -> Code raise Bail {
+  let args = self.generic_args(path, args, env, false) catch {
+    Bail(construct) =>
+      raise Bail(if reason == "argument-order" { reason } else { construct })
+  }
+  self.hatch = true
+  { code: "\{head}(\{mbt_str(path)}\{args})", total: false, }
 }
 
 ///|
@@ -213,12 +234,8 @@ fn Tr::typed_call(
 fn Tr::call(self : Tr, call : @ast.FuncCall, env : Env) -> Code raise Bail {
   let path = self.call_path(call, env)
   match self.typed_call(path, call.args(), env) {
-    Some(code) => code
-    None => {
-      let args = self.generic_args(path, call.args(), env, false)
-      self.hatch = true
-      { code: "Call(\{mbt_str(path)}\{args})", total: false, }
-    }
+    Ok(code) => code
+    Err(reason) => self.generic_call("Call", path, call.args(), env, reason)
   }
 }
 
@@ -229,8 +246,9 @@ fn Tr::call(self : Tr, call : @ast.FuncCall, env : Env) -> Code raise Bail {
 fn Tr::call_arg(self : Tr, call : @ast.FuncCall, env : Env) -> Code raise Bail {
   let path = self.call_path(call, env)
   match self.typed_call(path, call.args(), env) {
-    Some(code) => code
-    None => self.call_value(path, call.args(), env)
+    Ok(code) => code
+    Err(reason) =>
+      self.generic_call("Value::call", path, call.args(), env, reason)
   }
 }
 
@@ -242,9 +260,7 @@ fn Tr::call_value(
   args : @ast.Args,
   env : Env,
 ) -> Code raise Bail {
-  let args = self.generic_args(path, args, env, false)
-  self.hatch = true
-  { code: "Value::call(\{mbt_str(path)}\{args})", total: false, }
+  self.generic_call("Value::call", path, args, env, "")
 }
 
 ///|
@@ -323,7 +339,7 @@ fn Tr::generic_args(
 }
 
 ///|
-/// Try a typed signature; `None` (with the state restored) if the
+/// Try a typed signature; the reason (with the state restored) if the
 /// arguments do not fit it.
 fn Tr::try_sig(
   self : Tr,
@@ -331,15 +347,15 @@ fn Tr::try_sig(
   path : String,
   args : @ast.Args,
   env : Env,
-) -> Code? {
+) -> Result[Code, String] {
   let mark = self.mark()
   try self.sig_call(sig, path, args, env) catch {
-    Bail(_) => {
+    Bail(reason) => {
       self.rollback(mark)
-      None
+      Err(reason)
     }
   } noraise {
-    code => Some(code)
+    code => Ok(code)
   }
 }
 

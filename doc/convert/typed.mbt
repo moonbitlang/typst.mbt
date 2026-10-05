@@ -331,7 +331,7 @@ fn Tr::paint(
         find_func(path) is Some(func) &&
         func.owner == "Paint" &&
         self.lookup(path) is Some(Func(_)) &&
-        self.try_sig(Sig::of_func(func), path, call.args(), env) is Some(code) {
+        self.try_sig(Sig::of_func(func), path, call.args(), env) is Ok(code) {
         return code
       }
     _ => ()

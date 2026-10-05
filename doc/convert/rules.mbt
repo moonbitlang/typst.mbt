@@ -17,7 +17,7 @@ fn Tr::set_rule(self : Tr, rule : @ast.SetRule, env : Env) -> Code raise Bail {
   }
   if find_elem(path) is Some(elem) &&
     elem.set &&
-    self.try_sig(Sig::of_set(elem), path, rule.args(), env) is Some(code) {
+    self.try_sig(Sig::of_set(elem), path, rule.args(), env) is Ok(code) {
     return code
   }
   let args = self.generic_args(path, rule.args(), env, true)
@@ -228,7 +228,10 @@ fn Tr::show_closure(
       FuncCall(call) =>
         match self.global_path(call.callee(), inner) {
           Some(path) if path != "label" && path != "eval" =>
-            self.typed_call(path, call.args(), inner)
+            match self.typed_call(path, call.args(), inner) {
+              Ok(code) => Some(code)
+              Err(_) => None
+            }
           _ => None
         }
       _ => None
