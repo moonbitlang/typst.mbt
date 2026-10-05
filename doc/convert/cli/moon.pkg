@@ -1,0 +1,11 @@
+import {
+  "moonbitlang/typst/doc",
+  "moonbitlang/typst/doc/convert",
+  "moonbitlang/typst/doc/system",
+  "moonbitlang/typst/kit/platform",
+  "moonbitlang/core/encoding/utf8",
+}
+
+supported_targets = "native"
+
+pkgtype(kind: "executable")
