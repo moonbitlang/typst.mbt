@@ -3243,6 +3243,7 @@ pub fn Select::table_vline(
 /// Explicit states besides a value:
 /// - `title`: `auto` as `AutoValue()`, `none` as `NoneValue()`
 /// - `depth`: `none` as `extra` with `Value::none()`
+/// - `indent`: `auto` as `Auto`
 pub struct Outline {
   priv content : Content
 }
@@ -3252,6 +3253,7 @@ pub struct Outline {
 pub fn Outline::Outline(
   title? : &IntoContent,
   depth? : Int64,
+  indent? : Length,
   extra? : Array[(String, Value)] = [],
   label? : String,
   loc~ : SourceLoc,
@@ -3264,7 +3266,10 @@ pub fn Outline::Outline(
   if depth is Some(v) {
     args.push({ name: Some("depth"), value: Value::int(v), param: 1, })
   }
-  push_extra(args, extra, 2)
+  if indent is Some(v) {
+    args.push({ name: Some("indent"), value: ToValue::to_value(v), param: 2, })
+  }
+  push_extra(args, extra, 3)
   {
     content: labelled_call(
       {
@@ -3273,7 +3278,7 @@ pub fn Outline::Outline(
         origin: Site::new("Outline", loc, args_loc),
       },
       label,
-      3,
+      4,
     ),
   }
 }
@@ -3289,6 +3294,7 @@ pub impl IntoContent for Outline with fn into_content(self) {
 /// Explicit states besides a value:
 /// - `title`: `auto` as `AutoValue()`, `none` as `NoneValue()`
 /// - `depth`: `none` as `extra` with `Value::none()`
+/// - `indent`: `auto` as `Auto`
 pub struct SetOutline {
   priv node : SetNode
 }
@@ -3298,6 +3304,7 @@ pub struct SetOutline {
 pub fn SetOutline::SetOutline(
   title? : &IntoContent,
   depth? : Int64,
+  indent? : Length,
   extra? : Array[(String, Value)] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
@@ -3309,7 +3316,10 @@ pub fn SetOutline::SetOutline(
   if depth is Some(v) {
     args.push({ name: Some("depth"), value: Value::int(v), param: 1, })
   }
-  push_extra(args, extra, 2)
+  if indent is Some(v) {
+    args.push({ name: Some("indent"), value: ToValue::to_value(v), param: 2, })
+  }
+  push_extra(args, extra, 3)
   {
     node: {
       func: FElem(@library.outline_elem()),
@@ -3348,10 +3358,16 @@ pub fn OutlineView::view(self : OutlineView) -> ContentView {
 ///|
 /// The `outline` elements; with arguments, those whose fields have the given
 /// values (`outline.where(..)`).
-pub fn Select::outline(depth? : Int64) -> Selector[OutlineView] {
+pub fn Select::outline(
+  depth? : Int64,
+  indent? : Length,
+) -> Selector[OutlineView] {
   let fields : Array[(String, Value)] = []
   if depth is Some(v) {
     fields.push(("depth", Value::int(v)))
+  }
+  if indent is Some(v) {
+    fields.push(("indent", ToValue::to_value(v)))
   }
   elem_selector(@library.outline_elem(), fields, content => OutlineView::{
     content,
@@ -10142,6 +10158,1641 @@ pub fn Select::circle(
 }
 
 ///|
+/// `polygon`: A closed polygon.
+///
+/// Explicit states besides a value:
+/// - `fill`: `none` as `None`
+/// - `stroke`: `auto` as `Stroke::auto()`, `none` as `Stroke::none()`
+pub struct Polygon {
+  priv content : Content
+}
+
+///|
+#callsite(autofill(loc, args_loc))
+pub fn Polygon::Polygon(
+  vertices : Array[(Length, Length)],
+  fill? : Paint,
+  fill_rule? : String,
+  stroke? : Stroke,
+  extra? : Array[(String, Value)] = [],
+  label? : String,
+  loc~ : SourceLoc,
+  args_loc~ : ArgsLoc,
+) -> Polygon {
+  let args : Array[ArgNode] = []
+  if fill is Some(v) {
+    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 1, })
+  }
+  if fill_rule is Some(v) {
+    args.push({ name: Some("fill-rule"), value: Value::str(v), param: 2, })
+  }
+  if stroke is Some(v) {
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 3, })
+  }
+  for child in vertices {
+    args.push({
+      name: None,
+      value: Value::array([
+        ToValue::to_value(child.0),
+        ToValue::to_value(child.1),
+      ]),
+      param: 0,
+    })
+  }
+  push_extra(args, extra, 4)
+  {
+    content: labelled_call(
+      {
+        func: FElem(@library.polygon_elem()),
+        args,
+        origin: Site::new("Polygon", loc, args_loc),
+      },
+      label,
+      5,
+    ),
+  }
+}
+
+///|
+pub impl IntoContent for Polygon with fn into_content(self) {
+  self.content
+}
+
+///|
+/// `set polygon(..)`.
+///
+/// Explicit states besides a value:
+/// - `fill`: `none` as `None`
+/// - `stroke`: `auto` as `Stroke::auto()`, `none` as `Stroke::none()`
+pub struct SetPolygon {
+  priv node : SetNode
+}
+
+///|
+#callsite(autofill(loc, args_loc))
+pub fn SetPolygon::SetPolygon(
+  fill? : Paint,
+  fill_rule? : String,
+  stroke? : Stroke,
+  extra? : Array[(String, Value)] = [],
+  loc~ : SourceLoc,
+  args_loc~ : ArgsLoc,
+) -> SetPolygon {
+  let args : Array[ArgNode] = []
+  if fill is Some(v) {
+    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 0, })
+  }
+  if fill_rule is Some(v) {
+    args.push({ name: Some("fill-rule"), value: Value::str(v), param: 1, })
+  }
+  if stroke is Some(v) {
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 2, })
+  }
+  push_extra(args, extra, 3)
+  {
+    node: {
+      func: FElem(@library.polygon_elem()),
+      args,
+      origin: Site::new("SetPolygon", loc, args_loc),
+    },
+  }
+}
+
+///|
+pub impl IntoContent for SetPolygon with fn into_content(self) {
+  Content::of(NSetRule(self.node))
+}
+
+///|
+pub impl SetRule for SetPolygon
+
+///|
+/// A `polygon` element handed to a callback. As content it re-emits the
+/// element unchanged.
+pub struct PolygonView {
+  priv content : @library.Content
+}
+
+///|
+pub impl IntoContent for PolygonView with fn into_content(self) {
+  Content::of(NEngine(self.content))
+}
+
+///|
+/// The element as a generic view.
+pub fn PolygonView::view(self : PolygonView) -> ContentView {
+  ContentView::new(self.content)
+}
+
+///|
+/// The `polygon` elements; with arguments, those whose fields have the given
+/// values (`polygon.where(..)`).
+pub fn Select::polygon(
+  fill? : Paint,
+  fill_rule? : String,
+  stroke? : Stroke,
+) -> Selector[PolygonView] {
+  let fields : Array[(String, Value)] = []
+  if fill is Some(v) {
+    fields.push(("fill", ToValue::to_value(v)))
+  }
+  if fill_rule is Some(v) {
+    fields.push(("fill-rule", Value::str(v)))
+  }
+  if stroke is Some(v) {
+    fields.push(("stroke", ToValue::to_value(v)))
+  }
+  elem_selector(@library.polygon_elem(), fields, content => PolygonView::{
+    content,
+  })
+}
+
+///|
+/// `curve`: A curve consisting of movements, lines, and Bézier segments.
+///
+/// Explicit states besides a value:
+/// - `fill`: `none` as `None`
+/// - `stroke`: `auto` as `Stroke::auto()`, `none` as `Stroke::none()`
+pub struct Curve {
+  priv content : Content
+}
+
+///|
+#callsite(autofill(loc, args_loc))
+pub fn Curve::Curve(
+  components : Array[&IntoContent],
+  fill? : Paint,
+  fill_rule? : String,
+  stroke? : Stroke,
+  extra? : Array[(String, Value)] = [],
+  label? : String,
+  loc~ : SourceLoc,
+  args_loc~ : ArgsLoc,
+) -> Curve {
+  let args : Array[ArgNode] = []
+  if fill is Some(v) {
+    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 1, })
+  }
+  if fill_rule is Some(v) {
+    args.push({ name: Some("fill-rule"), value: Value::str(v), param: 2, })
+  }
+  if stroke is Some(v) {
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 3, })
+  }
+  for child in components {
+    args.push({ name: None, value: Value::content(child), param: 0, })
+  }
+  push_extra(args, extra, 4)
+  {
+    content: labelled_call(
+      {
+        func: FElem(@library.curve_elem()),
+        args,
+        origin: Site::new("Curve", loc, args_loc),
+      },
+      label,
+      5,
+    ),
+  }
+}
+
+///|
+pub impl IntoContent for Curve with fn into_content(self) {
+  self.content
+}
+
+///|
+/// `set curve(..)`.
+///
+/// Explicit states besides a value:
+/// - `fill`: `none` as `None`
+/// - `stroke`: `auto` as `Stroke::auto()`, `none` as `Stroke::none()`
+pub struct SetCurve {
+  priv node : SetNode
+}
+
+///|
+#callsite(autofill(loc, args_loc))
+pub fn SetCurve::SetCurve(
+  fill? : Paint,
+  fill_rule? : String,
+  stroke? : Stroke,
+  extra? : Array[(String, Value)] = [],
+  loc~ : SourceLoc,
+  args_loc~ : ArgsLoc,
+) -> SetCurve {
+  let args : Array[ArgNode] = []
+  if fill is Some(v) {
+    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 0, })
+  }
+  if fill_rule is Some(v) {
+    args.push({ name: Some("fill-rule"), value: Value::str(v), param: 1, })
+  }
+  if stroke is Some(v) {
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 2, })
+  }
+  push_extra(args, extra, 3)
+  {
+    node: {
+      func: FElem(@library.curve_elem()),
+      args,
+      origin: Site::new("SetCurve", loc, args_loc),
+    },
+  }
+}
+
+///|
+pub impl IntoContent for SetCurve with fn into_content(self) {
+  Content::of(NSetRule(self.node))
+}
+
+///|
+pub impl SetRule for SetCurve
+
+///|
+/// A `curve` element handed to a callback. As content it re-emits the element
+/// unchanged.
+pub struct CurveView {
+  priv content : @library.Content
+}
+
+///|
+pub impl IntoContent for CurveView with fn into_content(self) {
+  Content::of(NEngine(self.content))
+}
+
+///|
+/// The element as a generic view.
+pub fn CurveView::view(self : CurveView) -> ContentView {
+  ContentView::new(self.content)
+}
+
+///|
+/// The `curve` elements; with arguments, those whose fields have the given
+/// values (`curve.where(..)`).
+pub fn Select::curve(
+  fill? : Paint,
+  fill_rule? : String,
+  stroke? : Stroke,
+) -> Selector[CurveView] {
+  let fields : Array[(String, Value)] = []
+  if fill is Some(v) {
+    fields.push(("fill", ToValue::to_value(v)))
+  }
+  if fill_rule is Some(v) {
+    fields.push(("fill-rule", Value::str(v)))
+  }
+  if stroke is Some(v) {
+    fields.push(("stroke", ToValue::to_value(v)))
+  }
+  elem_selector(@library.curve_elem(), fields, content => CurveView::{
+    content,
+  })
+}
+
+///|
+/// `curve.move`: Starts a new curve component.
+pub struct CurveMove {
+  priv content : Content
+}
+
+///|
+#callsite(autofill(loc, args_loc))
+pub fn CurveMove::CurveMove(
+  start : (Length, Length),
+  relative? : Bool,
+  extra? : Array[(String, Value)] = [],
+  label? : String,
+  loc~ : SourceLoc,
+  args_loc~ : ArgsLoc,
+) -> CurveMove {
+  let args : Array[ArgNode] = []
+  args.push({
+    name: None,
+    value: Value::array([ToValue::to_value(start.0), ToValue::to_value(start.1)]),
+    param: 0,
+  })
+  if relative is Some(v) {
+    args.push({ name: Some("relative"), value: Value::bool(v), param: 1, })
+  }
+  push_extra(args, extra, 2)
+  {
+    content: labelled_call(
+      {
+        func: FElem(@library.curve_move_elem()),
+        args,
+        origin: Site::new("CurveMove", loc, args_loc),
+      },
+      label,
+      3,
+    ),
+  }
+}
+
+///|
+pub impl IntoContent for CurveMove with fn into_content(self) {
+  self.content
+}
+
+///|
+/// `set curve.move(..)`.
+pub struct SetCurveMove {
+  priv node : SetNode
+}
+
+///|
+#callsite(autofill(loc, args_loc))
+pub fn SetCurveMove::SetCurveMove(
+  relative? : Bool,
+  extra? : Array[(String, Value)] = [],
+  loc~ : SourceLoc,
+  args_loc~ : ArgsLoc,
+) -> SetCurveMove {
+  let args : Array[ArgNode] = []
+  if relative is Some(v) {
+    args.push({ name: Some("relative"), value: Value::bool(v), param: 0, })
+  }
+  push_extra(args, extra, 1)
+  {
+    node: {
+      func: FElem(@library.curve_move_elem()),
+      args,
+      origin: Site::new("SetCurveMove", loc, args_loc),
+    },
+  }
+}
+
+///|
+pub impl IntoContent for SetCurveMove with fn into_content(self) {
+  Content::of(NSetRule(self.node))
+}
+
+///|
+pub impl SetRule for SetCurveMove
+
+///|
+/// A `curve.move` element handed to a callback. As content it re-emits the
+/// element unchanged.
+pub struct CurveMoveView {
+  priv content : @library.Content
+}
+
+///|
+pub impl IntoContent for CurveMoveView with fn into_content(self) {
+  Content::of(NEngine(self.content))
+}
+
+///|
+/// The element as a generic view.
+pub fn CurveMoveView::view(self : CurveMoveView) -> ContentView {
+  ContentView::new(self.content)
+}
+
+///|
+/// The `curve.move` elements; with arguments, those whose fields have the
+/// given values (`curve.move.where(..)`).
+pub fn Select::curve_move(relative? : Bool) -> Selector[CurveMoveView] {
+  let fields : Array[(String, Value)] = []
+  if relative is Some(v) {
+    fields.push(("relative", Value::bool(v)))
+  }
+  elem_selector(@library.curve_move_elem(), fields, content => CurveMoveView::{
+    content,
+  })
+}
+
+///|
+/// `curve.line`: Adds a straight line from the current point to a following
+/// one.
+pub struct CurveLine {
+  priv content : Content
+}
+
+///|
+#callsite(autofill(loc, args_loc))
+pub fn CurveLine::CurveLine(
+  end_ : (Length, Length),
+  relative? : Bool,
+  extra? : Array[(String, Value)] = [],
+  label? : String,
+  loc~ : SourceLoc,
+  args_loc~ : ArgsLoc,
+) -> CurveLine {
+  let args : Array[ArgNode] = []
+  args.push({
+    name: None,
+    value: Value::array([ToValue::to_value(end_.0), ToValue::to_value(end_.1)]),
+    param: 0,
+  })
+  if relative is Some(v) {
+    args.push({ name: Some("relative"), value: Value::bool(v), param: 1, })
+  }
+  push_extra(args, extra, 2)
+  {
+    content: labelled_call(
+      {
+        func: FElem(@library.curve_line_elem()),
+        args,
+        origin: Site::new("CurveLine", loc, args_loc),
+      },
+      label,
+      3,
+    ),
+  }
+}
+
+///|
+pub impl IntoContent for CurveLine with fn into_content(self) {
+  self.content
+}
+
+///|
+/// `set curve.line(..)`.
+pub struct SetCurveLine {
+  priv node : SetNode
+}
+
+///|
+#callsite(autofill(loc, args_loc))
+pub fn SetCurveLine::SetCurveLine(
+  relative? : Bool,
+  extra? : Array[(String, Value)] = [],
+  loc~ : SourceLoc,
+  args_loc~ : ArgsLoc,
+) -> SetCurveLine {
+  let args : Array[ArgNode] = []
+  if relative is Some(v) {
+    args.push({ name: Some("relative"), value: Value::bool(v), param: 0, })
+  }
+  push_extra(args, extra, 1)
+  {
+    node: {
+      func: FElem(@library.curve_line_elem()),
+      args,
+      origin: Site::new("SetCurveLine", loc, args_loc),
+    },
+  }
+}
+
+///|
+pub impl IntoContent for SetCurveLine with fn into_content(self) {
+  Content::of(NSetRule(self.node))
+}
+
+///|
+pub impl SetRule for SetCurveLine
+
+///|
+/// A `curve.line` element handed to a callback. As content it re-emits the
+/// element unchanged.
+pub struct CurveLineView {
+  priv content : @library.Content
+}
+
+///|
+pub impl IntoContent for CurveLineView with fn into_content(self) {
+  Content::of(NEngine(self.content))
+}
+
+///|
+/// The element as a generic view.
+pub fn CurveLineView::view(self : CurveLineView) -> ContentView {
+  ContentView::new(self.content)
+}
+
+///|
+/// The `curve.line` elements; with arguments, those whose fields have the
+/// given values (`curve.line.where(..)`).
+pub fn Select::curve_line(relative? : Bool) -> Selector[CurveLineView] {
+  let fields : Array[(String, Value)] = []
+  if relative is Some(v) {
+    fields.push(("relative", Value::bool(v)))
+  }
+  elem_selector(@library.curve_line_elem(), fields, content => CurveLineView::{
+    content,
+  })
+}
+
+///|
+/// `curve.quad`: Adds a quadratic Bézier curve segment from the last point to
+/// `end`, using `control` as the control point.
+///
+/// Explicit states besides a value:
+/// - `control`: `auto` as `extra` with `Value::auto()`, `none` as `extra` with `Value::none()`
+pub struct CurveQuad {
+  priv content : Content
+}
+
+///|
+#callsite(autofill(loc, args_loc))
+pub fn CurveQuad::CurveQuad(
+  control : (Length, Length),
+  end_ : (Length, Length),
+  relative? : Bool,
+  extra? : Array[(String, Value)] = [],
+  label? : String,
+  loc~ : SourceLoc,
+  args_loc~ : ArgsLoc,
+) -> CurveQuad {
+  let args : Array[ArgNode] = []
+  args.push({
+    name: None,
+    value: Value::array([
+      ToValue::to_value(control.0),
+      ToValue::to_value(control.1),
+    ]),
+    param: 0,
+  })
+  args.push({
+    name: None,
+    value: Value::array([ToValue::to_value(end_.0), ToValue::to_value(end_.1)]),
+    param: 1,
+  })
+  if relative is Some(v) {
+    args.push({ name: Some("relative"), value: Value::bool(v), param: 2, })
+  }
+  push_extra(args, extra, 3)
+  {
+    content: labelled_call(
+      {
+        func: FElem(@library.curve_quad_elem()),
+        args,
+        origin: Site::new("CurveQuad", loc, args_loc),
+      },
+      label,
+      4,
+    ),
+  }
+}
+
+///|
+pub impl IntoContent for CurveQuad with fn into_content(self) {
+  self.content
+}
+
+///|
+/// `set curve.quad(..)`.
+pub struct SetCurveQuad {
+  priv node : SetNode
+}
+
+///|
+#callsite(autofill(loc, args_loc))
+pub fn SetCurveQuad::SetCurveQuad(
+  relative? : Bool,
+  extra? : Array[(String, Value)] = [],
+  loc~ : SourceLoc,
+  args_loc~ : ArgsLoc,
+) -> SetCurveQuad {
+  let args : Array[ArgNode] = []
+  if relative is Some(v) {
+    args.push({ name: Some("relative"), value: Value::bool(v), param: 0, })
+  }
+  push_extra(args, extra, 1)
+  {
+    node: {
+      func: FElem(@library.curve_quad_elem()),
+      args,
+      origin: Site::new("SetCurveQuad", loc, args_loc),
+    },
+  }
+}
+
+///|
+pub impl IntoContent for SetCurveQuad with fn into_content(self) {
+  Content::of(NSetRule(self.node))
+}
+
+///|
+pub impl SetRule for SetCurveQuad
+
+///|
+/// A `curve.quad` element handed to a callback. As content it re-emits the
+/// element unchanged.
+pub struct CurveQuadView {
+  priv content : @library.Content
+}
+
+///|
+pub impl IntoContent for CurveQuadView with fn into_content(self) {
+  Content::of(NEngine(self.content))
+}
+
+///|
+/// The element as a generic view.
+pub fn CurveQuadView::view(self : CurveQuadView) -> ContentView {
+  ContentView::new(self.content)
+}
+
+///|
+/// The `curve.quad` elements; with arguments, those whose fields have the
+/// given values (`curve.quad.where(..)`).
+pub fn Select::curve_quad(relative? : Bool) -> Selector[CurveQuadView] {
+  let fields : Array[(String, Value)] = []
+  if relative is Some(v) {
+    fields.push(("relative", Value::bool(v)))
+  }
+  elem_selector(@library.curve_quad_elem(), fields, content => CurveQuadView::{
+    content,
+  })
+}
+
+///|
+/// `curve.cubic`: Adds a cubic Bézier curve segment from the last point to
+/// `end`, using `control-start` and `control-end` as the control points.
+///
+/// Explicit states besides a value:
+/// - `control_start`: `none` as `extra` with `Value::none()`, `auto` as `extra` with `Value::auto()`
+/// - `control_end`: `none` as `extra` with `Value::none()`
+pub struct CurveCubic {
+  priv content : Content
+}
+
+///|
+#callsite(autofill(loc, args_loc))
+pub fn CurveCubic::CurveCubic(
+  control_start : (Length, Length),
+  control_end : (Length, Length),
+  end_ : (Length, Length),
+  relative? : Bool,
+  extra? : Array[(String, Value)] = [],
+  label? : String,
+  loc~ : SourceLoc,
+  args_loc~ : ArgsLoc,
+) -> CurveCubic {
+  let args : Array[ArgNode] = []
+  args.push({
+    name: None,
+    value: Value::array([
+      ToValue::to_value(control_start.0),
+      ToValue::to_value(control_start.1),
+    ]),
+    param: 0,
+  })
+  args.push({
+    name: None,
+    value: Value::array([
+      ToValue::to_value(control_end.0),
+      ToValue::to_value(control_end.1),
+    ]),
+    param: 1,
+  })
+  args.push({
+    name: None,
+    value: Value::array([ToValue::to_value(end_.0), ToValue::to_value(end_.1)]),
+    param: 2,
+  })
+  if relative is Some(v) {
+    args.push({ name: Some("relative"), value: Value::bool(v), param: 3, })
+  }
+  push_extra(args, extra, 4)
+  {
+    content: labelled_call(
+      {
+        func: FElem(@library.curve_cubic_elem()),
+        args,
+        origin: Site::new("CurveCubic", loc, args_loc),
+      },
+      label,
+      5,
+    ),
+  }
+}
+
+///|
+pub impl IntoContent for CurveCubic with fn into_content(self) {
+  self.content
+}
+
+///|
+/// `set curve.cubic(..)`.
+pub struct SetCurveCubic {
+  priv node : SetNode
+}
+
+///|
+#callsite(autofill(loc, args_loc))
+pub fn SetCurveCubic::SetCurveCubic(
+  relative? : Bool,
+  extra? : Array[(String, Value)] = [],
+  loc~ : SourceLoc,
+  args_loc~ : ArgsLoc,
+) -> SetCurveCubic {
+  let args : Array[ArgNode] = []
+  if relative is Some(v) {
+    args.push({ name: Some("relative"), value: Value::bool(v), param: 0, })
+  }
+  push_extra(args, extra, 1)
+  {
+    node: {
+      func: FElem(@library.curve_cubic_elem()),
+      args,
+      origin: Site::new("SetCurveCubic", loc, args_loc),
+    },
+  }
+}
+
+///|
+pub impl IntoContent for SetCurveCubic with fn into_content(self) {
+  Content::of(NSetRule(self.node))
+}
+
+///|
+pub impl SetRule for SetCurveCubic
+
+///|
+/// A `curve.cubic` element handed to a callback. As content it re-emits the
+/// element unchanged.
+pub struct CurveCubicView {
+  priv content : @library.Content
+}
+
+///|
+pub impl IntoContent for CurveCubicView with fn into_content(self) {
+  Content::of(NEngine(self.content))
+}
+
+///|
+/// The element as a generic view.
+pub fn CurveCubicView::view(self : CurveCubicView) -> ContentView {
+  ContentView::new(self.content)
+}
+
+///|
+/// The `curve.cubic` elements; with arguments, those whose fields have the
+/// given values (`curve.cubic.where(..)`).
+pub fn Select::curve_cubic(relative? : Bool) -> Selector[CurveCubicView] {
+  let fields : Array[(String, Value)] = []
+  if relative is Some(v) {
+    fields.push(("relative", Value::bool(v)))
+  }
+  elem_selector(@library.curve_cubic_elem(), fields, content => CurveCubicView::{
+    content,
+  })
+}
+
+///|
+/// `curve.close`: Closes the curve by adding a segment from the last point to
+/// the start of the curve (or the last preceding `curve.move` point).
+pub struct CurveClose {
+  priv content : Content
+}
+
+///|
+#callsite(autofill(loc, args_loc))
+pub fn CurveClose::CurveClose(
+  mode? : String,
+  extra? : Array[(String, Value)] = [],
+  label? : String,
+  loc~ : SourceLoc,
+  args_loc~ : ArgsLoc,
+) -> CurveClose {
+  let args : Array[ArgNode] = []
+  if mode is Some(v) {
+    args.push({ name: Some("mode"), value: Value::str(v), param: 0, })
+  }
+  push_extra(args, extra, 1)
+  {
+    content: labelled_call(
+      {
+        func: FElem(@library.curve_close_elem()),
+        args,
+        origin: Site::new("CurveClose", loc, args_loc),
+      },
+      label,
+      2,
+    ),
+  }
+}
+
+///|
+pub impl IntoContent for CurveClose with fn into_content(self) {
+  self.content
+}
+
+///|
+/// `set curve.close(..)`.
+pub struct SetCurveClose {
+  priv node : SetNode
+}
+
+///|
+#callsite(autofill(loc, args_loc))
+pub fn SetCurveClose::SetCurveClose(
+  mode? : String,
+  extra? : Array[(String, Value)] = [],
+  loc~ : SourceLoc,
+  args_loc~ : ArgsLoc,
+) -> SetCurveClose {
+  let args : Array[ArgNode] = []
+  if mode is Some(v) {
+    args.push({ name: Some("mode"), value: Value::str(v), param: 0, })
+  }
+  push_extra(args, extra, 1)
+  {
+    node: {
+      func: FElem(@library.curve_close_elem()),
+      args,
+      origin: Site::new("SetCurveClose", loc, args_loc),
+    },
+  }
+}
+
+///|
+pub impl IntoContent for SetCurveClose with fn into_content(self) {
+  Content::of(NSetRule(self.node))
+}
+
+///|
+pub impl SetRule for SetCurveClose
+
+///|
+/// A `curve.close` element handed to a callback. As content it re-emits the
+/// element unchanged.
+pub struct CurveCloseView {
+  priv content : @library.Content
+}
+
+///|
+pub impl IntoContent for CurveCloseView with fn into_content(self) {
+  Content::of(NEngine(self.content))
+}
+
+///|
+/// The element as a generic view.
+pub fn CurveCloseView::view(self : CurveCloseView) -> ContentView {
+  ContentView::new(self.content)
+}
+
+///|
+/// The `curve.close` elements; with arguments, those whose fields have the
+/// given values (`curve.close.where(..)`).
+pub fn Select::curve_close(mode? : String) -> Selector[CurveCloseView] {
+  let fields : Array[(String, Value)] = []
+  if mode is Some(v) {
+    fields.push(("mode", Value::str(v)))
+  }
+  elem_selector(@library.curve_close_elem(), fields, content => CurveCloseView::{
+    content,
+  })
+}
+
+///|
+/// `scale`: Scales content without affecting layout.
+///
+/// `Scale(body, factor?, x?, y?, ..)`: `factor` is the external positional
+/// shorthand read by the `x`/`y` parsers; it is a labelled parameter passed
+/// positionally before the body. Twin: `scale(factor, body)` / `scale(x: ..,
+/// y: .., body)`.
+///
+/// Explicit states besides a value:
+/// - `factor`: `auto` as `Auto`
+/// - `x`: `auto` as `Auto`
+/// - `y`: `auto` as `Auto`
+pub struct Scale {
+  priv content : Content
+}
+
+///|
+#callsite(autofill(loc, args_loc))
+pub fn Scale::Scale(
+  body : &IntoContent,
+  factor? : Length,
+  x? : Length,
+  y? : Length,
+  origin? : Alignment,
+  reflow? : Bool,
+  extra? : Array[(String, Value)] = [],
+  label? : String,
+  loc~ : SourceLoc,
+  args_loc~ : ArgsLoc,
+) -> Scale {
+  let args : Array[ArgNode] = []
+  if extra_arg(extra, "factor") is Some(v) {
+    args.push({ name: None, value: v, param: 6, })
+  } else if factor is Some(v) {
+    args.push({ name: None, value: ToValue::to_value(v), param: 1, })
+  }
+  args.push({ name: None, value: Value::content(body), param: 0, })
+  if x is Some(v) {
+    args.push({ name: Some("x"), value: ToValue::to_value(v), param: 2, })
+  }
+  if y is Some(v) {
+    args.push({ name: Some("y"), value: ToValue::to_value(v), param: 3, })
+  }
+  if origin is Some(v) {
+    args.push({ name: Some("origin"), value: ToValue::to_value(v), param: 4, })
+  }
+  if reflow is Some(v) {
+    args.push({ name: Some("reflow"), value: Value::bool(v), param: 5, })
+  }
+  push_extra(args, extra, 6, positional=["factor"])
+  {
+    content: labelled_call(
+      {
+        func: FElem(@library.scale_elem()),
+        args,
+        origin: Site::new("Scale", loc, args_loc),
+      },
+      label,
+      7,
+    ),
+  }
+}
+
+///|
+pub impl IntoContent for Scale with fn into_content(self) {
+  self.content
+}
+
+///|
+/// `set scale(..)`.
+///
+/// Explicit states besides a value:
+/// - `factor`: `auto` as `Auto`
+/// - `x`: `auto` as `Auto`
+/// - `y`: `auto` as `Auto`
+pub struct SetScale {
+  priv node : SetNode
+}
+
+///|
+#callsite(autofill(loc, args_loc))
+pub fn SetScale::SetScale(
+  factor? : Length,
+  x? : Length,
+  y? : Length,
+  origin? : Alignment,
+  reflow? : Bool,
+  extra? : Array[(String, Value)] = [],
+  loc~ : SourceLoc,
+  args_loc~ : ArgsLoc,
+) -> SetScale {
+  let args : Array[ArgNode] = []
+  if extra_arg(extra, "factor") is Some(v) {
+    args.push({ name: None, value: v, param: 5, })
+  } else if factor is Some(v) {
+    args.push({ name: None, value: ToValue::to_value(v), param: 0, })
+  }
+  if x is Some(v) {
+    args.push({ name: Some("x"), value: ToValue::to_value(v), param: 1, })
+  }
+  if y is Some(v) {
+    args.push({ name: Some("y"), value: ToValue::to_value(v), param: 2, })
+  }
+  if origin is Some(v) {
+    args.push({ name: Some("origin"), value: ToValue::to_value(v), param: 3, })
+  }
+  if reflow is Some(v) {
+    args.push({ name: Some("reflow"), value: Value::bool(v), param: 4, })
+  }
+  push_extra(args, extra, 5, positional=["factor"])
+  {
+    node: {
+      func: FElem(@library.scale_elem()),
+      args,
+      origin: Site::new("SetScale", loc, args_loc),
+    },
+  }
+}
+
+///|
+pub impl IntoContent for SetScale with fn into_content(self) {
+  Content::of(NSetRule(self.node))
+}
+
+///|
+pub impl SetRule for SetScale
+
+///|
+/// A `scale` element handed to a callback. As content it re-emits the element
+/// unchanged.
+pub struct ScaleView {
+  priv content : @library.Content
+}
+
+///|
+pub impl IntoContent for ScaleView with fn into_content(self) {
+  Content::of(NEngine(self.content))
+}
+
+///|
+/// The element as a generic view.
+pub fn ScaleView::view(self : ScaleView) -> ContentView {
+  ContentView::new(self.content)
+}
+
+///|
+/// The `body` of the element.
+pub fn ScaleView::body(
+  self : ScaleView,
+) -> ContentView raise @library.HintedError {
+  ContentView::new(self.content.field_by_name("body").cast())
+}
+
+///|
+/// The `scale` elements; with arguments, those whose fields have the given
+/// values (`scale.where(..)`).
+pub fn Select::scale(
+  x? : Length,
+  y? : Length,
+  origin? : Alignment,
+  reflow? : Bool,
+) -> Selector[ScaleView] {
+  let fields : Array[(String, Value)] = []
+  if x is Some(v) {
+    fields.push(("x", ToValue::to_value(v)))
+  }
+  if y is Some(v) {
+    fields.push(("y", ToValue::to_value(v)))
+  }
+  if origin is Some(v) {
+    fields.push(("origin", ToValue::to_value(v)))
+  }
+  if reflow is Some(v) {
+    fields.push(("reflow", Value::bool(v)))
+  }
+  elem_selector(@library.scale_elem(), fields, content => ScaleView::{
+    content,
+  })
+}
+
+///|
+/// `skew`: Skews content.
+pub struct Skew {
+  priv content : Content
+}
+
+///|
+#callsite(autofill(loc, args_loc))
+pub fn Skew::Skew(
+  body : &IntoContent,
+  ax? : Angle,
+  ay? : Angle,
+  origin? : Alignment,
+  reflow? : Bool,
+  extra? : Array[(String, Value)] = [],
+  label? : String,
+  loc~ : SourceLoc,
+  args_loc~ : ArgsLoc,
+) -> Skew {
+  let args : Array[ArgNode] = []
+  args.push({ name: None, value: Value::content(body), param: 0, })
+  if ax is Some(v) {
+    args.push({ name: Some("ax"), value: ToValue::to_value(v), param: 1, })
+  }
+  if ay is Some(v) {
+    args.push({ name: Some("ay"), value: ToValue::to_value(v), param: 2, })
+  }
+  if origin is Some(v) {
+    args.push({ name: Some("origin"), value: ToValue::to_value(v), param: 3, })
+  }
+  if reflow is Some(v) {
+    args.push({ name: Some("reflow"), value: Value::bool(v), param: 4, })
+  }
+  push_extra(args, extra, 5)
+  {
+    content: labelled_call(
+      {
+        func: FElem(@library.skew_elem()),
+        args,
+        origin: Site::new("Skew", loc, args_loc),
+      },
+      label,
+      6,
+    ),
+  }
+}
+
+///|
+pub impl IntoContent for Skew with fn into_content(self) {
+  self.content
+}
+
+///|
+/// `set skew(..)`.
+pub struct SetSkew {
+  priv node : SetNode
+}
+
+///|
+#callsite(autofill(loc, args_loc))
+pub fn SetSkew::SetSkew(
+  ax? : Angle,
+  ay? : Angle,
+  origin? : Alignment,
+  reflow? : Bool,
+  extra? : Array[(String, Value)] = [],
+  loc~ : SourceLoc,
+  args_loc~ : ArgsLoc,
+) -> SetSkew {
+  let args : Array[ArgNode] = []
+  if ax is Some(v) {
+    args.push({ name: Some("ax"), value: ToValue::to_value(v), param: 0, })
+  }
+  if ay is Some(v) {
+    args.push({ name: Some("ay"), value: ToValue::to_value(v), param: 1, })
+  }
+  if origin is Some(v) {
+    args.push({ name: Some("origin"), value: ToValue::to_value(v), param: 2, })
+  }
+  if reflow is Some(v) {
+    args.push({ name: Some("reflow"), value: Value::bool(v), param: 3, })
+  }
+  push_extra(args, extra, 4)
+  {
+    node: {
+      func: FElem(@library.skew_elem()),
+      args,
+      origin: Site::new("SetSkew", loc, args_loc),
+    },
+  }
+}
+
+///|
+pub impl IntoContent for SetSkew with fn into_content(self) {
+  Content::of(NSetRule(self.node))
+}
+
+///|
+pub impl SetRule for SetSkew
+
+///|
+/// A `skew` element handed to a callback. As content it re-emits the element
+/// unchanged.
+pub struct SkewView {
+  priv content : @library.Content
+}
+
+///|
+pub impl IntoContent for SkewView with fn into_content(self) {
+  Content::of(NEngine(self.content))
+}
+
+///|
+/// The element as a generic view.
+pub fn SkewView::view(self : SkewView) -> ContentView {
+  ContentView::new(self.content)
+}
+
+///|
+/// The `body` of the element.
+pub fn SkewView::body(
+  self : SkewView,
+) -> ContentView raise @library.HintedError {
+  ContentView::new(self.content.field_by_name("body").cast())
+}
+
+///|
+/// The `skew` elements; with arguments, those whose fields have the given
+/// values (`skew.where(..)`).
+pub fn Select::skew(
+  ax? : Angle,
+  ay? : Angle,
+  origin? : Alignment,
+  reflow? : Bool,
+) -> Selector[SkewView] {
+  let fields : Array[(String, Value)] = []
+  if ax is Some(v) {
+    fields.push(("ax", ToValue::to_value(v)))
+  }
+  if ay is Some(v) {
+    fields.push(("ay", ToValue::to_value(v)))
+  }
+  if origin is Some(v) {
+    fields.push(("origin", ToValue::to_value(v)))
+  }
+  if reflow is Some(v) {
+    fields.push(("reflow", Value::bool(v)))
+  }
+  elem_selector(@library.skew_elem(), fields, content => SkewView::{ content, })
+}
+
+///|
+/// `set math.equation(..)`.
+///
+/// Explicit states besides a value:
+/// - `numbering`: `none` as `Numbering::none()`
+/// - `supplement`: `auto` as `Supplement::auto()`, `none` as `Supplement::none()`
+/// - `alt`: `none` as `extra` with `Value::none()`
+pub struct SetEquation {
+  priv node : SetNode
+}
+
+///|
+#callsite(autofill(loc, args_loc))
+pub fn SetEquation::SetEquation(
+  block? : Bool,
+  numbering? : Numbering,
+  number_align? : Alignment,
+  supplement? : Supplement,
+  alt? : String,
+  extra? : Array[(String, Value)] = [],
+  loc~ : SourceLoc,
+  args_loc~ : ArgsLoc,
+) -> SetEquation {
+  let args : Array[ArgNode] = []
+  if block is Some(v) {
+    args.push({ name: Some("block"), value: Value::bool(v), param: 0, })
+  }
+  if numbering is Some(v) {
+    args.push({
+      name: Some("numbering"),
+      value: ToValue::to_value(v),
+      param: 1,
+    })
+  }
+  if number_align is Some(v) {
+    args.push({
+      name: Some("number-align"),
+      value: ToValue::to_value(v),
+      param: 2,
+    })
+  }
+  if supplement is Some(v) {
+    args.push({
+      name: Some("supplement"),
+      value: ToValue::to_value(v),
+      param: 3,
+    })
+  }
+  if alt is Some(v) {
+    args.push({ name: Some("alt"), value: Value::str(v), param: 4, })
+  }
+  push_extra(args, extra, 5)
+  {
+    node: {
+      func: FElem(@library.equation_elem()),
+      args,
+      origin: Site::new("SetEquation", loc, args_loc),
+    },
+  }
+}
+
+///|
+pub impl IntoContent for SetEquation with fn into_content(self) {
+  Content::of(NSetRule(self.node))
+}
+
+///|
+pub impl SetRule for SetEquation
+
+///|
+/// A `math.equation` element handed to a callback. As content it re-emits the
+/// element unchanged.
+pub struct EquationView {
+  priv content : @library.Content
+}
+
+///|
+pub impl IntoContent for EquationView with fn into_content(self) {
+  Content::of(NEngine(self.content))
+}
+
+///|
+/// The element as a generic view.
+pub fn EquationView::view(self : EquationView) -> ContentView {
+  ContentView::new(self.content)
+}
+
+///|
+/// The `body` of the element.
+pub fn EquationView::body(
+  self : EquationView,
+) -> ContentView raise @library.HintedError {
+  ContentView::new(self.content.field_by_name("body").cast())
+}
+
+///|
+/// The `math.equation` elements; with arguments, those whose fields have the
+/// given values (`math.equation.where(..)`).
+pub fn Select::equation(
+  block? : Bool,
+  numbering? : Numbering,
+  number_align? : Alignment,
+  supplement? : Supplement,
+  alt? : String,
+) -> Selector[EquationView] {
+  let fields : Array[(String, Value)] = []
+  if block is Some(v) {
+    fields.push(("block", Value::bool(v)))
+  }
+  if numbering is Some(v) {
+    fields.push(("numbering", ToValue::to_value(v)))
+  }
+  if number_align is Some(v) {
+    fields.push(("number-align", ToValue::to_value(v)))
+  }
+  if supplement is Some(v) {
+    fields.push(("supplement", ToValue::to_value(v)))
+  }
+  if alt is Some(v) {
+    fields.push(("alt", Value::str(v)))
+  }
+  elem_selector(@library.equation_elem(), fields, content => EquationView::{
+    content,
+  })
+}
+
+///|
+/// `bibliography`: A bibliography / reference listing.
+///
+/// `Bibliography(sources, ..)`: `sources` (a parse hook that loads and
+/// decodes the files) takes one path string, bytes, or several of them
+/// (`Array[String]`, `Source::Many`), resolved against the project root;
+/// `style` (a parse hook) is a built-in CSL style name or a path, as a
+/// string. `target` is not typed yet. Twin: `bibliography(sources, style:
+/// ..)`.
+///
+/// Explicit states besides a value:
+/// - `title`: `auto` as `AutoValue()`, `none` as `NoneValue()`
+/// - `group`: `none` as `extra` with `Value::none()`, `auto` as `extra` with `Value::auto()`
+pub struct Bibliography {
+  priv content : Content
+}
+
+///|
+#callsite(autofill(loc, args_loc))
+pub fn Bibliography::Bibliography(
+  sources : &IntoSource,
+  title? : &IntoContent,
+  full? : Bool,
+  style? : String,
+  group? : String,
+  extra? : Array[(String, Value)] = [],
+  label? : String,
+  loc~ : SourceLoc,
+  args_loc~ : ArgsLoc,
+) -> Bibliography {
+  let args : Array[ArgNode] = []
+  args.push({
+    name: None,
+    value: ToValue::to_value(sources.into_source()),
+    param: 0,
+  })
+  if title is Some(v) {
+    args.push({ name: Some("title"), value: Value::content(v), param: 1, })
+  }
+  if full is Some(v) {
+    args.push({ name: Some("full"), value: Value::bool(v), param: 2, })
+  }
+  if style is Some(v) {
+    args.push({ name: Some("style"), value: Value::str(v), param: 3, })
+  }
+  if group is Some(v) {
+    args.push({ name: Some("group"), value: Value::str(v), param: 4, })
+  }
+  push_extra(args, extra, 5)
+  {
+    content: labelled_call(
+      {
+        func: FElem(@library.bibliography_elem()),
+        args,
+        origin: Site::new("Bibliography", loc, args_loc),
+      },
+      label,
+      6,
+    ),
+  }
+}
+
+///|
+pub impl IntoContent for Bibliography with fn into_content(self) {
+  self.content
+}
+
+///|
+/// `set bibliography(..)`.
+///
+/// Explicit states besides a value:
+/// - `title`: `auto` as `AutoValue()`, `none` as `NoneValue()`
+/// - `group`: `none` as `extra` with `Value::none()`, `auto` as `extra` with `Value::auto()`
+pub struct SetBibliography {
+  priv node : SetNode
+}
+
+///|
+#callsite(autofill(loc, args_loc))
+pub fn SetBibliography::SetBibliography(
+  title? : &IntoContent,
+  full? : Bool,
+  style? : String,
+  group? : String,
+  extra? : Array[(String, Value)] = [],
+  loc~ : SourceLoc,
+  args_loc~ : ArgsLoc,
+) -> SetBibliography {
+  let args : Array[ArgNode] = []
+  if title is Some(v) {
+    args.push({ name: Some("title"), value: Value::content(v), param: 0, })
+  }
+  if full is Some(v) {
+    args.push({ name: Some("full"), value: Value::bool(v), param: 1, })
+  }
+  if style is Some(v) {
+    args.push({ name: Some("style"), value: Value::str(v), param: 2, })
+  }
+  if group is Some(v) {
+    args.push({ name: Some("group"), value: Value::str(v), param: 3, })
+  }
+  push_extra(args, extra, 4)
+  {
+    node: {
+      func: FElem(@library.bibliography_elem()),
+      args,
+      origin: Site::new("SetBibliography", loc, args_loc),
+    },
+  }
+}
+
+///|
+pub impl IntoContent for SetBibliography with fn into_content(self) {
+  Content::of(NSetRule(self.node))
+}
+
+///|
+pub impl SetRule for SetBibliography
+
+///|
+/// A `bibliography` element handed to a callback. As content it re-emits the
+/// element unchanged.
+pub struct BibliographyView {
+  priv content : @library.Content
+}
+
+///|
+pub impl IntoContent for BibliographyView with fn into_content(self) {
+  Content::of(NEngine(self.content))
+}
+
+///|
+/// The element as a generic view.
+pub fn BibliographyView::view(self : BibliographyView) -> ContentView {
+  ContentView::new(self.content)
+}
+
+///|
+/// The `bibliography` elements; with arguments, those whose fields have the
+/// given values (`bibliography.where(..)`).
+pub fn Select::bibliography(
+  full? : Bool,
+  style? : String,
+  group? : String,
+) -> Selector[BibliographyView] {
+  let fields : Array[(String, Value)] = []
+  if full is Some(v) {
+    fields.push(("full", Value::bool(v)))
+  }
+  if style is Some(v) {
+    fields.push(("style", Value::str(v)))
+  }
+  if group is Some(v) {
+    fields.push(("group", Value::str(v)))
+  }
+  elem_selector(@library.bibliography_elem(), fields, content => BibliographyView::{
+    content,
+  })
+}
+
+///|
+/// `cite`: Cite a work from the bibliography.
+///
+/// `Cite(key, ..)`: `key` is the label name; `style` (a parse hook) is a
+/// built-in CSL style name or a path. Twin: `cite(label(key), supplement: ..,
+/// form: ..)`.
+///
+/// Explicit states besides a value:
+/// - `supplement`: `none` as `NoneValue()`
+/// - `form`: `none` as `extra` with `Value::none()`
+/// - `style`: `auto` as `extra` with `Value::auto()`
+pub struct Cite {
+  priv content : Content
+}
+
+///|
+#callsite(autofill(loc, args_loc))
+pub fn Cite::Cite(
+  key : String,
+  supplement? : &IntoContent,
+  form? : String,
+  style? : String,
+  extra? : Array[(String, Value)] = [],
+  label? : String,
+  loc~ : SourceLoc,
+  args_loc~ : ArgsLoc,
+) -> Cite {
+  let args : Array[ArgNode] = []
+  args.push({ name: None, value: Value::label(key), param: 0, })
+  if supplement is Some(v) {
+    args.push({ name: Some("supplement"), value: Value::content(v), param: 1, })
+  }
+  if form is Some(v) {
+    args.push({ name: Some("form"), value: Value::str(v), param: 2, })
+  }
+  if style is Some(v) {
+    args.push({ name: Some("style"), value: Value::str(v), param: 3, })
+  }
+  push_extra(args, extra, 4)
+  {
+    content: labelled_call(
+      {
+        func: FElem(@library.cite_elem()),
+        args,
+        origin: Site::new("Cite", loc, args_loc),
+      },
+      label,
+      5,
+    ),
+  }
+}
+
+///|
+pub impl IntoContent for Cite with fn into_content(self) {
+  self.content
+}
+
+///|
+/// `set cite(..)`.
+///
+/// Explicit states besides a value:
+/// - `supplement`: `none` as `NoneValue()`
+/// - `form`: `none` as `extra` with `Value::none()`
+/// - `style`: `auto` as `extra` with `Value::auto()`
+pub struct SetCite {
+  priv node : SetNode
+}
+
+///|
+#callsite(autofill(loc, args_loc))
+pub fn SetCite::SetCite(
+  supplement? : &IntoContent,
+  form? : String,
+  style? : String,
+  extra? : Array[(String, Value)] = [],
+  loc~ : SourceLoc,
+  args_loc~ : ArgsLoc,
+) -> SetCite {
+  let args : Array[ArgNode] = []
+  if supplement is Some(v) {
+    args.push({ name: Some("supplement"), value: Value::content(v), param: 0, })
+  }
+  if form is Some(v) {
+    args.push({ name: Some("form"), value: Value::str(v), param: 1, })
+  }
+  if style is Some(v) {
+    args.push({ name: Some("style"), value: Value::str(v), param: 2, })
+  }
+  push_extra(args, extra, 3)
+  {
+    node: {
+      func: FElem(@library.cite_elem()),
+      args,
+      origin: Site::new("SetCite", loc, args_loc),
+    },
+  }
+}
+
+///|
+pub impl IntoContent for SetCite with fn into_content(self) {
+  Content::of(NSetRule(self.node))
+}
+
+///|
+pub impl SetRule for SetCite
+
+///|
+/// A `cite` element handed to a callback. As content it re-emits the element
+/// unchanged.
+pub struct CiteView {
+  priv content : @library.Content
+}
+
+///|
+pub impl IntoContent for CiteView with fn into_content(self) {
+  Content::of(NEngine(self.content))
+}
+
+///|
+/// The element as a generic view.
+pub fn CiteView::view(self : CiteView) -> ContentView {
+  ContentView::new(self.content)
+}
+
+///|
+/// The `cite` elements; with arguments, those whose fields have the given
+/// values (`cite.where(..)`).
+pub fn Select::cite(form? : String, style? : String) -> Selector[CiteView] {
+  let fields : Array[(String, Value)] = []
+  if form is Some(v) {
+    fields.push(("form", Value::str(v)))
+  }
+  if style is Some(v) {
+    fields.push(("style", Value::str(v)))
+  }
+  elem_selector(@library.cite_elem(), fields, content => CiteView::{ content, })
+}
+
+///|
 /// `metadata`: Exposes a value to the query system without producing visible
 /// content.
 pub struct Metadata {
@@ -10204,6 +11855,141 @@ pub fn Select::metadata() -> Selector[MetadataView] {
   elem_selector(@library.metadata_elem(), fields, content => MetadataView::{
     content,
   })
+}
+
+///|
+/// `lorem`: Creates blind text.
+pub struct Lorem {
+  priv content : Content
+}
+
+///|
+#callsite(autofill(loc, args_loc))
+pub fn Lorem::Lorem(
+  words : Int64,
+  extra? : Array[(String, Value)] = [],
+  label? : String,
+  loc~ : SourceLoc,
+  args_loc~ : ArgsLoc,
+) -> Lorem {
+  let args : Array[ArgNode] = []
+  args.push({ name: None, value: Value::int(words), param: 0, })
+  push_extra(args, extra, 1)
+  {
+    content: labelled_call(
+      {
+        func: FNative(@library.native_lorem()),
+        args,
+        origin: Site::new("Lorem", loc, args_loc),
+      },
+      label,
+      2,
+    ),
+  }
+}
+
+///|
+pub impl IntoContent for Lorem with fn into_content(self) {
+  self.content
+}
+
+///|
+/// `polygon.regular`: A regular polygon, defined by its size and number of
+/// vertices.
+///
+/// Explicit states besides a value:
+/// - `fill`: `none` as `None`
+/// - `stroke`: `none` as `Stroke::none()`, `auto` as `Stroke::auto()`
+pub struct PolygonRegular {
+  priv content : Content
+}
+
+///|
+#callsite(autofill(loc, args_loc))
+pub fn PolygonRegular::PolygonRegular(
+  fill? : Paint,
+  stroke? : Stroke,
+  size? : Length,
+  vertices? : Int64,
+  extra? : Array[(String, Value)] = [],
+  label? : String,
+  loc~ : SourceLoc,
+  args_loc~ : ArgsLoc,
+) -> PolygonRegular {
+  let args : Array[ArgNode] = []
+  if fill is Some(v) {
+    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 0, })
+  }
+  if stroke is Some(v) {
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 1, })
+  }
+  if size is Some(v) {
+    args.push({ name: Some("size"), value: ToValue::to_value(v), param: 2, })
+  }
+  if vertices is Some(v) {
+    args.push({ name: Some("vertices"), value: Value::int(v), param: 3, })
+  }
+  push_extra(args, extra, 4)
+  {
+    content: labelled_call(
+      {
+        func: FNative(@library.native_polygon_elem_regular()),
+        args,
+        origin: Site::new("PolygonRegular", loc, args_loc),
+      },
+      label,
+      5,
+    ),
+  }
+}
+
+///|
+pub impl IntoContent for PolygonRegular with fn into_content(self) {
+  self.content
+}
+
+///|
+/// `tiling`: Construct a new tiling.
+///
+/// Explicit states besides a value:
+/// - `size`: `auto` as `extra` with `Value::auto()`
+/// - `relative`: `auto` as `extra` with `Value::auto()`
+pub fn Paint::tiling(
+  body : &IntoContent,
+  size? : (Length, Length),
+  spacing? : (Length, Length),
+  offset? : (Length, Length),
+  angle? : Angle,
+  relative? : String,
+) -> Paint {
+  let positional : Array[Value] = []
+  let named : Array[(String, Value)] = []
+  positional.push(Value::content(body))
+  if size is Some(v) {
+    named.push(
+      ("size", Value::array([ToValue::to_value(v.0), ToValue::to_value(v.1)])),
+    )
+  }
+  if spacing is Some(v) {
+    named.push(
+      (
+        "spacing",
+        Value::array([ToValue::to_value(v.0), ToValue::to_value(v.1)]),
+      ),
+    )
+  }
+  if offset is Some(v) {
+    named.push(
+      ("offset", Value::array([ToValue::to_value(v.0), ToValue::to_value(v.1)])),
+    )
+  }
+  if angle is Some(v) {
+    named.push(("angle", ToValue::to_value(v)))
+  }
+  if relative is Some(v) {
+    named.push(("relative", Value::str(v)))
+  }
+  Value(Value::native(@library.native_tiling_construct(), positional, named~))
 }
 
 ///|
@@ -10275,6 +12061,18 @@ pub fn generated_elements() -> Array[(String, String, @library.Element)] {
     ("Square", "square", @library.square_elem()),
     ("Ellipse", "ellipse", @library.ellipse_elem()),
     ("Circle", "circle", @library.circle_elem()),
+    ("Polygon", "polygon", @library.polygon_elem()),
+    ("Curve", "curve", @library.curve_elem()),
+    ("CurveMove", "curve.move", @library.curve_move_elem()),
+    ("CurveLine", "curve.line", @library.curve_line_elem()),
+    ("CurveQuad", "curve.quad", @library.curve_quad_elem()),
+    ("CurveCubic", "curve.cubic", @library.curve_cubic_elem()),
+    ("CurveClose", "curve.close", @library.curve_close_elem()),
+    ("Scale", "scale", @library.scale_elem()),
+    ("Skew", "skew", @library.skew_elem()),
+    ("Equation", "math.equation", @library.equation_elem()),
+    ("Bibliography", "bibliography", @library.bibliography_elem()),
+    ("Cite", "cite", @library.cite_elem()),
     ("Metadata", "metadata", @library.metadata_elem()),
   ]
 }

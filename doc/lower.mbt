@@ -83,7 +83,7 @@ fn Lower::content(
       // Content without a location of its own gets the enclosing
       // argument's origin under the keys.
       let fallback = match body.node {
-        NText(_, None) | NValue(_) | NSpace =>
+        NText(_, None) | NValue(_) | NSpace(_) =>
           self.session.registry.keyed_span(fallback, keys)
         _ => fallback
       }
@@ -102,7 +102,8 @@ fn Lower::content(
       ]).spanned(span)
     }
     NEval(node) => self.eval(node)
-    NSpace => @library.SpaceElem::shared()
+    NSpace(false) => @library.SpaceElem::shared()
+    NSpace(true) => @library.SpaceElem::shared_with_newline()
     NEngine(content) => content
   }
 }
@@ -145,7 +146,13 @@ fn Lower::sequence(
         let recipe = self.show_rule(show)
         let tail = self.sequence(children[i:], fallback)
         i = children.length()
-        seq.push(tail.styled(@library.Style::Recipe(recipe)))
+        // The evaluator's `styled_with_recipe`: a rule without a selector
+        // transforms the tail at once.
+        if recipe.selector is Option::None {
+          seq.push(recipe.apply(self.engine, self.context, tail))
+        } else {
+          seq.push(tail.styled(@library.Style::Recipe(recipe)))
+        }
       }
       // An inserted expression (`#f(..)`, `#value` in markup), also
       // inside `Keyed` wrappers, which do not change the lowered content:
@@ -349,6 +356,31 @@ fn Lower::args(
     } else {
       span
     }
+    if arg.value.val is VSpread(inner) {
+      // Like the evaluator's spread argument (`eval_args`).
+      match self.value(inner, arg_span) {
+        None => ()
+        Array(array) =>
+          for value in array.items {
+            items.push({
+              span: arg_span,
+              name: Option::None,
+              value: { v: value.shared(), span: arg_span, },
+            })
+          }
+        Dict(dict) =>
+          for key, value in dict.map {
+            items.push({
+              span: arg_span,
+              name: Some(key),
+              value: { v: value.shared(), span: arg_span, },
+            })
+          }
+        Args(args) => items.append(args.items)
+        v => @library.bail_at(arg_span, "cannot spread \{v.ty()}")
+      }
+      continue
+    }
     let v = self.value(arg.value, arg_span)
     items.push({
       span: arg_span,
@@ -459,6 +491,8 @@ fn Lower::value(
       )
     }
     VEngine(value) => value
+    VSpread(_) =>
+      raise error_at(span, "a spread value is only allowed as an argument")
     VInvalid(message) => raise error_at(span, message)
   }
 }
@@ -496,12 +530,31 @@ fn Lower::show_rule(
 ) -> @library.Recipe raise @library.SourceError {
   let entry = self.entry(show.origin)
   let span = self.session.registry.span(entry)
-  let selector_span = self.session.registry.arg_span(entry, 0)
-  let selector = self.value(show.selector, selector_span)
-  let selector : @library.ShowableSelector = @library.at(selector_span, () => {
-    selector.cast()
-  })
+  let selector : @library.Selector? = match show.selector {
+    Some(selector) => {
+      let selector_span = self.session.registry.arg_span(entry, 0)
+      let selector = self.value(selector, selector_span)
+      let selector : @library.ShowableSelector = @library.at(selector_span, () => {
+        selector.cast()
+      })
+      Some(selector.0)
+    }
+    Option::None => Option::None
+  }
   let transform : @library.Transformation = match show.transform {
+    TValue(value) => {
+      // The transformation is the last declared parameter.
+      let transform_span = self.session.registry.arg_span(
+        entry,
+        if show.selector is Some(_) {
+          1
+        } else {
+          0
+        },
+      )
+      let value = self.value(value, transform_span)
+      @library.at(transform_span, () => value.cast())
+    }
     TFunc(callback) =>
       @library.Transformation::Func(
         @library.Func::host(self.session.host(callback, span, self.keys)).spanned(
@@ -510,7 +563,7 @@ fn Lower::show_rule(
       )
     TStyle(set) => @library.Transformation::Style(self.set_rule(set))
   }
-  let recipe = @library.Recipe::new(Some(selector.0), transform, span)
+  let recipe = @library.Recipe::new(selector, transform, span)
   @eval.check_recipe(self.engine, recipe)
   recipe
 }

@@ -27,14 +27,18 @@ let origins_file : @syntax.FileId = @syntax.RootedPath::new(
 ).intern()
 
 ///|
-/// The file of the markup snippet in slot `slot`.
-fn snippet_file(slot : Int) -> @syntax.FileId {
-  @syntax.RootedPath::new(
-    Project,
-    @syntax.VirtualPath::new("<edsl-markup-\{slot}>") catch {
-      _ => panic()
-    },
-  ).intern()
+/// The file `name` in the directory `dir` of the project (`""`: the root).
+/// `None` if `dir` is not a path inside the project.
+fn virtual_file(dir : String, name : String) -> @syntax.FileId? {
+  let path = if dir == "" { name } else { dir + "/" + name }
+  let vpath = @syntax.VirtualPath::new(path) catch { _ => return Option::None }
+  Some(@syntax.RootedPath::new(Project, vpath).intern())
+}
+
+///|
+/// The file of the origin listing of a document in the directory `dir`.
+fn origins_file_in(dir : String) -> @syntax.FileId {
+  virtual_file(dir, "<edsl-origins>").unwrap_or(origins_file)
 }
 
 ///|
@@ -82,11 +86,25 @@ priv struct Registry {
   snippet_index : Map[String, Int]
   /// The parsed listing (for `World::source`), invalidated by appends.
   mut source : @syntax.Source?
+  /// The directory of the document's virtual files, relative to the
+  /// project root (`""`: the root), and the file of the origin listing in
+  /// it.
+  dir : String
+  origins : @syntax.FileId
 }
 
 ///|
-fn Registry::new() -> Registry {
+fn Registry::new(dir? : String = "") -> Registry {
+  // A directory that is no project path is reported when the document is
+  // lowered (`Document::lower_initial`); the listing is a root file then.
+  let dir = if virtual_file(dir, "<edsl-origins>") is Some(_) {
+    dir
+  } else {
+    ""
+  }
   {
+    dir,
+    origins: origins_file_in(dir),
     entries: [],
     index: {},
     listing: StringBuilder(),
@@ -214,7 +232,7 @@ fn Registry::entry_of(
 /// The span of an entry: its line.
 fn Registry::span(self : Registry, entry : Int) -> @syntax.Span {
   let e = self.entries[entry]
-  @syntax.Span::from_range(origins_file, e.start, e.end)
+  @syntax.Span::from_range(self.origins, e.start, e.end)
 }
 
 ///|
@@ -227,9 +245,9 @@ fn Registry::arg_span(
 ) -> @syntax.Span {
   let e = self.entries[entry]
   if param >= 0 && param < e.args.length() && e.args[param] is Some((_, s, t)) {
-    @syntax.Span::from_range(origins_file, s, t)
+    @syntax.Span::from_range(self.origins, s, t)
   } else {
-    @syntax.Span::from_range(origins_file, e.start, e.end)
+    @syntax.Span::from_range(self.origins, e.start, e.end)
   }
 }
 
@@ -246,7 +264,7 @@ fn Registry::mark_long_text(self : Registry, span : @syntax.Span) -> Unit {
 /// The entry whose line contains a span of the origin listing, and the
 /// parameter whose token the span is (`-1` for the entry's own span).
 fn Registry::locate(self : Registry, span : @syntax.Span) -> (Int, Int)? {
-  guard span.get() is Range(id~, start~, end~) && id == origins_file else {
+  guard span.get() is Range(id~, start~, end~) && id == self.origins else {
     return None
   }
   // Entries are sorted by their start: find the last one at or before it.
@@ -324,7 +342,7 @@ fn Registry::snippet(
       ),
     ])
   }
-  let id = snippet_file(slot)
+  let id = virtual_file(self.dir, "<edsl-markup-\{slot}>").unwrap()
   self.snippets.push({ entry, mode, text, id, source: None, })
   self.snippet_index[dedup] = slot
   id
@@ -336,7 +354,7 @@ fn Registry::listing_source(self : Registry) -> @syntax.Source {
   match self.source {
     Some(source) => source
     None => {
-      let source = @syntax.Source::new(origins_file, self.listing.to_string())
+      let source = @syntax.Source::new(self.origins, self.listing.to_string())
       self.source = Some(source)
       source
     }
@@ -349,7 +367,7 @@ fn Registry::virtual_source(
   self : Registry,
   id : @syntax.FileId,
 ) -> @syntax.Source? {
-  if id == origins_file {
+  if id == self.origins {
     return Some(self.listing_source())
   }
   for snippet in self.snippets {
@@ -468,6 +486,8 @@ pub struct Origins {
   priv entries : Array[Entry]
   priv listing : String
   priv snippets : Array[Snippet]
+  /// The file of the origin listing.
+  priv file : @syntax.FileId
 }
 
 ///|
@@ -490,6 +510,7 @@ fn Registry::freeze(self : Registry) -> Origins {
       id: s.id,
       source: None,
     }),
+    file: self.origins,
   }
 }
 
@@ -509,7 +530,7 @@ pub fn Origins::listing(self : Origins) -> String {
 /// The source text of a virtual file of the session (the origin listing or
 /// a markup snippet).
 pub fn Origins::source_text(self : Origins, id : @syntax.FileId) -> String? {
-  if id == origins_file {
+  if id == self.file {
     return Some(self.listing)
   }
   for snippet in self.snippets {
@@ -590,7 +611,7 @@ pub fn Origins::resolve_range(
 ) -> Origin? {
   match span.get() {
     Range(id~, start~, end~) =>
-      if id == origins_file {
+      if id == self.file {
         guard self.entry_at(start) is Some(entry) else { return None }
         let e = self.entries[entry]
         let mut param : Int? = Option::None
@@ -653,7 +674,7 @@ pub fn Origins::resolve_glyph(
   guard self.resolve(span) is Some(origin) else { return None }
   let long_text = match @syntax.DiagSpan::from_span(span).get() {
     Range(id~, start~, ..) =>
-      id == origins_file &&
+      id == self.file &&
       (match self.entry_at(start) {
         Some(entry) => self.entries[entry].long_text
         None => false

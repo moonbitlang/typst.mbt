@@ -1186,7 +1186,7 @@ pub struct LinearGradient {
   y1 : Float
   x2 : Float
   y2 : Float
-  extend : GradientExtend
+  extend_ : GradientExtend
   variation_data : ColrVariationData
   color_line : ColorLine
 }
@@ -1636,7 +1636,7 @@ pub struct RadialGradient {
   r1 : Float
   x1 : Float
   y1 : Float
-  extend : GradientExtend
+  extend_ : GradientExtend
   variation_data : ColrVariationData
   color_line : ColorLine
 }
@@ -2028,7 +2028,7 @@ pub struct SweepGradient {
   center_y : Float
   start_angle : Float
   end_angle : Float
-  extend : GradientExtend
+  extend_ : GradientExtend
   variation_data : ColrVariationData
   color_line : ColorLine
 }

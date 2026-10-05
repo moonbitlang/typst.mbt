@@ -14,3 +14,9 @@ typst_assets/fonts/fonts_wasm_gen.mbt
 
 # Local workspace linking a sibling office.mbt checkout (see AGENTS.md).
 moon.work
+
+# Scratch files of the EDSL stress test; generated conversions.
+/_scratch_edsl/
+/target
+/tests/edsl_gen/*/gen_*.mbt
+/tests/edsl_gen/manifest.tsv

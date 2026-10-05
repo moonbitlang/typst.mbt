@@ -136,6 +136,14 @@ pub fn Paint::stop(color : Paint, offset : Length) -> Paint {
 }
 
 ///|
+/// The colours of one of Typst's colour maps (`color.map.rainbow`,
+/// `"viridis"`, ...) as gradient stops: `Paint::conic(Paint::map("rainbow"))`
+/// is `gradient.conic(..color.map.rainbow)`.
+pub fn Paint::map(name : String) -> Array[Paint] {
+  [Value(Value::spread(Value::global("color.map." + name)))]
+}
+
+///|
 /// `gradient.linear(..stops, angle: .., relative: ..)`.
 pub fn Paint::linear(
   stops : Array[Paint],
@@ -555,6 +563,9 @@ pub impl ToValue for LinkTarget with fn to_value(self) {
 pub(all) enum Source {
   Path(String)
   Bytes(Bytes)
+  /// Several sources, where the field takes more than one (the files of a
+  /// bibliography).
+  Many(Array[Source])
 }
 
 ///|
@@ -579,11 +590,18 @@ pub impl IntoSource for Bytes with fn into_source(self) {
 }
 
 ///|
+/// Several paths.
+pub impl IntoSource for Array[String] with fn into_source(self) {
+  Many(self.map(path => Source::Path(path)))
+}
+
+///|
 pub impl ToValue for Source with fn to_value(self) {
   match self {
     Path(path) => Value::str(path)
     Bytes(bytes) =>
       Value::engine(@library.Value::Bytes(@library.BytesValue::new(bytes)))
+    Many(sources) => Value::array(sources.map(source => source.to_value()))
   }
 }
 

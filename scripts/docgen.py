@@ -139,6 +139,29 @@ LEAVES = {
     "Parity": ("String", lambda e: f"Value::str({e})"),
     "RefForm": ("String", lambda e: f"Value::str({e})"),
     "Linebreaks": ("String", lambda e: f"Value::str({e})"),
+    "FillRule": ("String", lambda e: f"Value::str({e})"),
+    "CloseMode": ("String", lambda e: f"Value::str({e})"),
+    "CitationForm": ("String", lambda e: f"Value::str({e})"),
+    "RelativeTo": ("String", lambda e: f"Value::str({e})"),
+    # A CSL style: a built-in name or a path, as written in Typst.
+    "Derived<CslSource, CslStyle>": ("String", lambda e: f"Value::str({e})"),
+    # One source or several (`Source::Many`, `Array[String]`).
+    "Derived<OneOrMultiple<DataSource>, Bibliography>": (
+        "&IntoSource",
+        lambda e: f"ToValue::to_value({e}.into_source())",
+    ),
+    # A length or ratio; the function form goes through `extra`.
+    "OutlineIndent": ("Length", to_value),
+    "ScaleAmount": ("Length", to_value),
+}
+
+# Variadic parameters of values: engine type -> (MoonBit array type,
+# conversion of one item).
+VALUE_LISTS = {
+    "Vec<Axes<Rel<Length>>>": (
+        "Array[(Length, Length)]",
+        lambda e: f"Value::array([ToValue::to_value({e}.0), ToValue::to_value({e}.1)])",
+    ),
 }
 
 CONTENT_LISTS = {
@@ -151,6 +174,7 @@ CONTENT_LISTS = {
     "Vec<Packed<EnumItem>>",
     "Vec<Packed<TermItem>>",
     "Vec<StackChild>",
+    "Vec<CurveComponent>",
 }
 
 
@@ -167,7 +191,7 @@ def states_of(ty):
     states = []
     while True:
         g = split_generic(ty)
-        if g is None or g[0] not in ("Option", "Smart", "Arc", "Packed"):
+        if g is None or g[0] not in ("Option", "Smart", "Arc", "Packed", "Spanned"):
             break
         if g[0] == "Smart" and "auto" not in states:
             states.append("auto")
@@ -207,7 +231,7 @@ def map_type(ty):
     if g is None:
         return None
     outer, inner = g
-    if outer in ("Arc", "Packed"):
+    if outer in ("Arc", "Packed", "Spanned"):
         return map_type(inner)
     if outer in ("Option", "Smart"):
         # Plain values first: the layer is erased; the value family spells
@@ -238,12 +262,15 @@ def map_type(ty):
 class E:
     def __init__(self, name, ident, path, file="", ctor=True, set=True,
                  ext=(), skip=(), pos=(), optional=(), types=None, review=None,
-                 doc=None):
+                 doc=None, view=None):
         self.name = name          # EDSL type name
         self.ident = ident        # engine element struct
         self.path = path          # qualified Typst path
         self.file = file          # disambiguates idents (substring of file)
         self.ctor = ctor
+        # Whether the view and the selector are generated (default: with
+        # the constructor).
+        self.view = ctor if view is None else view
         self.set = set
         self.ext = set_(ext)      # external fields to include
         self.skip = set_(skip)    # fields to leave out
@@ -388,8 +415,61 @@ ELEMENTS = [
     E("Circle", "CircleElem", "circle", ext=["radius"],
       review="As `Rect`; `radius` is the external shorthand read by the "
              "`width`/`height` parsers."),
+    E("Polygon", "PolygonElem", "polygon"),
+    E("Curve", "CurveElem", "curve"),
+    E("CurveMove", "CurveMove", "curve.move"),
+    E("CurveLine", "CurveLine", "curve.line"),
+    E("CurveQuad", "CurveQuad", "curve.quad"),
+    E("CurveCubic", "CurveCubic", "curve.cubic"),
+    E("CurveClose", "CurveClose", "curve.close"),
+    E("Scale", "ScaleElem", "scale", ext=["factor"],
+      review="`Scale(body, factor?, x?, y?, ..)`: `factor` is the external "
+             "positional shorthand read by the `x`/`y` parsers; it is a "
+             "labelled parameter passed positionally before the body. Twin: "
+             "`scale(factor, body)` / `scale(x: .., y: .., body)`."),
+    E("Skew", "SkewElem", "skew"),
+    # Math.
+    E("Equation", "EquationElem", "math.equation", ctor=False, view=True,
+      review="Set rule, view and selector only (`SetEquation`, "
+             "`Select::equation`): the constructor is the handwritten "
+             "`Equation(source, ..)`, which takes a math string (section "
+             "13). Twin: `set math.equation(..)`."),
+    # Bibliography.
+    E("Bibliography", "BibliographyElem", "bibliography",
+      review="`Bibliography(sources, ..)`: `sources` (a parse hook that "
+             "loads and decodes the files) takes one path string, bytes, or "
+             "several of them (`Array[String]`, `Source::Many`), resolved "
+             "against the project root; `style` (a parse hook) is a built-in "
+             "CSL style name or a path, as a string. `target` is not typed "
+             "yet. Twin: `bibliography(sources, style: ..)`."),
+    E("Cite", "CiteElem", "cite",
+      review="`Cite(key, ..)`: `key` is the label name; `style` (a parse "
+             "hook) is a built-in CSL style name or a path. Twin: "
+             "`cite(label(key), supplement: .., form: ..)`."),
     # Introspection.
     E("Metadata", "MetadataElem", "metadata"),
+]
+
+
+class F:
+    """A facade of a native function (docs/edsl-design.md, section 6.4): a
+    constructor with the function's parameters that lowers by calling it."""
+
+    def __init__(self, name, path, ident, parent=None, owner=None, doc=None):
+        self.name = name      # EDSL type name, or the method name with `owner`
+        self.path = path      # qualified Typst path (documentation)
+        self.ident = ident    # the function's Rust identifier
+        self.parent = parent  # the Rust type whose scope holds the function
+        # For value functions: the facade type that gets a static method
+        # `owner::name(..)` instead of a content type of its own.
+        self.owner = owner
+        self.doc = doc
+
+
+FUNCS = [
+    F("Lorem", "lorem", "lorem"),
+    F("PolygonRegular", "polygon.regular", "regular", parent="PolygonElem"),
+    F("tiling", "tiling", "construct", parent="Tiling", owner="Paint"),
 ]
 
 
@@ -468,10 +548,17 @@ def params_of(spec, elem, coverage):
             needs_review = True
         ty = spec.types.get(name, f["ty"])
         if f["variadic"]:
+            if ty in VALUE_LISTS:
+                mty, conv = VALUE_LISTS[ty]
+                params.append(Param(name, "variadic", mty, conv))
+                continue
             if ty not in CONTENT_LISTS:
                 coverage.append(f"{spec.path}.{name}: unmapped variadic type {ty}")
                 continue
-            params.append(Param(name, "variadic", "Array[&IntoContent]", None))
+            params.append(Param(
+                name, "variadic", "Array[&IntoContent]",
+                lambda e: f"Value::content({e})",
+            ))
             continue
         required = f["required"] and name not in spec.optional
         positional = f["positional"]
@@ -540,6 +627,93 @@ def positional_names(spec, ps):
     return ", positional=[" + ", ".join(f'"{n}"' for n in names) + "]"
 
 
+# The rows of the translator's table.
+API_ELEMS = []
+API_FUNCS = []
+
+
+def lowering_order(spec, ps):
+    """The fields of a constructor in the order its generated code pushes
+    their arguments (the order `Lower::args` evaluates them in); the same
+    order as `push_args` of `emit_element`."""
+    order = (
+        [p for p in ps if p.kind == "pos_opt"]
+        + [p for p in ps if p.kind == "pos" and p.field in spec.pos]
+        + [p for p in ps if p.kind == "pos" and p.field not in spec.pos]
+        + [p for p in ps if p.kind == "named"]
+        + [p for p in ps if p.kind == "variadic"]
+    )
+    late = [p for p in order if p.field in spec.optional]
+    order = [p for p in order if p.field not in spec.optional]
+    pos_end = max(
+        [i for i, p in enumerate(order) if p.kind == "pos"], default=-1
+    )
+    order[pos_end + 1:pos_end + 1] = late
+    return [p.field for p in order]
+
+
+def api_kind(spec, p):
+    """The kind of a parameter in the translator's table."""
+    if p.kind == "variadic":
+        return "Variadic"
+    if p.kind == "named":
+        return "Named"
+    if p.kind == "pos_opt" or p.field in spec.optional:
+        # Labelled in the EDSL, positional in Typst.
+        return "PosOpt"
+    return "Pos"
+
+
+def mbt_string(s):
+    return json.dumps(s, ensure_ascii=False)
+
+
+def emit_api():
+    """`doc/convert/api_gen.mbt`: the signatures of the generated
+    constructors, for the Typst-to-EDSL translator."""
+    out = [
+        "// Generated by scripts/docgen.py from gen/manifest.json. DO NOT EDIT.",
+        "",
+        "///|",
+        "/// The generated element constructors, set rules and selectors.",
+        "let api_elems : ReadOnlyArray[ApiElem] = [",
+    ]
+
+    def params(rows):
+        return "[" + ", ".join(
+            f"({mbt_string(f)}, {mbt_string(n)}, {k}, {mbt_string(t)})"
+            for f, n, k, t in rows
+        ) + "]"
+
+    def strings(xs):
+        return "[" + ", ".join(mbt_string(x) for x in xs) + "]"
+
+    for e in API_ELEMS:
+        out.append(
+            f"  {{ path: {mbt_string(e['path'])}, name: {mbt_string(e['name'])}, "
+            f"ctor: {str(e['ctor']).lower()}, set: {str(e['set']).lower()}, "
+            f"select: {mbt_string(e['select'])}, params: {params(e['params'])}, "
+            f"positional: {strings(e['positional'])}, order: {strings(e['order'])}, "
+            f"settable: {strings(e['settable'])}, "
+            f"where_: {strings(e['where'])} }},"
+        )
+    out.append("]")
+    out.append("")
+    out.append("///|")
+    out.append("/// The generated function facades.")
+    out.append("let api_funcs : ReadOnlyArray[ApiFunc] = [")
+    for f in API_FUNCS:
+        out.append(
+            f"  {{ path: {mbt_string(f['path'])}, name: {mbt_string(f['name'])}, "
+            f"owner: {mbt_string(f['owner'])}, params: {params(f['params'])} }},"
+        )
+    out.append("]")
+    path = os.path.join(ROOT, "doc", "convert", "api_gen.mbt")
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "w") as f:
+        f.write("\n".join(out) + "\n")
+
+
 def emit_element(spec, out, coverage):
     elem = find_elem(spec)
     params = params_of(spec, elem, coverage)
@@ -599,7 +773,7 @@ def emit_element(spec, out, coverage):
             elif p.kind == "variadic":
                 lines.append(f"  for child in {p.name} {{")
                 lines.append(
-                    f"    {var}.push({{ name: None, value: Value::content(child), param: {i} }})"
+                    f"    {var}.push({{ name: None, value: {p.conv('child')}, param: {i} }})"
                 )
                 lines.append("  }")
             else:
@@ -714,7 +888,7 @@ def emit_element(spec, out, coverage):
         out.append(f"pub impl SetRule for {sname}\n")
 
     # --- view and selector
-    if spec.ctor:
+    if spec.view:
         vname = f"{spec.name}View"
         out.append("///|")
         out.append(
@@ -765,6 +939,137 @@ def emit_element(spec, out, coverage):
         out.append(f"  elem_selector({handle}, fields, content => {vname}::{{ content, }})")
         out.append("}\n")
 
+    # --- the translator's table (doc/convert/api_gen.mbt)
+    has_set = spec.set and bool(settable)
+    where_names = []
+    if spec.view:
+        where_names = [
+            p.field for p in optional
+            if p.kind == "named" and is_value_type(p.mty) and not p.mty.startswith("Cells[")
+        ]
+    # Positional parameters in the engine's field order (the order in which
+    # the function takes positional arguments).
+    by_field = {p.field: p for p in params}
+    positional = [
+        f["name"] for f in elem["fields"]
+        if f["name"] in by_field
+        and by_field[f["name"]].kind in ("pos", "pos_opt", "variadic")
+    ]
+    API_ELEMS.append({
+        "path": spec.path,
+        "name": spec.name,
+        "ctor": spec.ctor,
+        "set": has_set,
+        "select": method_name(spec.name) if spec.view else "",
+        "params": [
+            (p.field, p.name, api_kind(spec, p), p.mty) for p in ordered
+        ],
+        "positional": positional,
+        "order": lowering_order(spec, params),
+        "settable": [p.field for p in settable] if has_set else [],
+        "where": where_names,
+    })
+
+
+def find_func(spec):
+    found = [
+        f for f in MANIFEST["funcs"]
+        if f["ident"] == spec.ident and (f.get("parent") or None) == spec.parent
+    ]
+    if len(found) != 1:
+        raise SystemExit(f"{spec.name}: {len(found)} functions match {spec.ident}")
+    return found[0]
+
+
+def emit_function(spec, out):
+    """A facade of a native function: required parameters positional,
+    named ones optional labelled parameters with plain values."""
+    from funcgen import func_key
+    func = find_func(spec)
+    handle = f"@library.native_{func_key(func)}()"
+    doc = first_sentence(func.get("doc"))
+    required, optional = [], []
+    for prm in func["params"]:
+        if prm["variadic"]:
+            raise SystemExit(f"{spec.name}: variadic parameter {prm['name']}")
+        m = map_type(prm["ty"])
+        if m is None:
+            raise SystemExit(f"{spec.name}: parameter {prm['name']} has unmapped type {prm['ty']}")
+        kind = "named" if prm["named"] else "pos"
+        (optional if prm["named"] else required).append(
+            Param(prm["name"], kind, m[0], m[1], prm["ty"])
+        )
+    ordered = required + optional
+    API_FUNCS.append({
+        "path": spec.path,
+        "name": spec.name,
+        "owner": spec.owner or "",
+        "params": [
+            (prm.field, prm.name, "Pos" if prm.kind == "pos" else "Named", prm.mty)
+            for prm in ordered
+        ],
+    })
+    out.append("///|")
+    out.append(doc_comment(f"`{spec.path}`: {doc}"))
+    states = states_doc(ordered)
+    if states:
+        out.append("///")
+        out.append("/// Explicit states besides a value:")
+        out.extend("/// " + line for line in states)
+    if spec.owner is None:
+        out.append(f"pub struct {spec.name} {{\n  priv content : Content\n}}\n")
+        out.append("///|")
+        out.append("#callsite(autofill(loc, args_loc))")
+        out.append(f"pub fn {spec.name}::{spec.name}(")
+    else:
+        out.append(f"pub fn {spec.owner}::{spec.name}(")
+    for prm in required:
+        out.append(f"  {prm.name} : {prm.mty},")
+    for prm in optional:
+        out.append(f"  {prm.name}? : {prm.mty},")
+    if spec.owner is None:
+        out.append("  extra? : Array[(String, Value)] = [],")
+        out.append("  label? : String,")
+        out.append("  loc~ : SourceLoc,")
+        out.append("  args_loc~ : ArgsLoc,")
+        out.append(f") -> {spec.name} {{")
+        out.append("  let args : Array[ArgNode] = []")
+        for i, prm in enumerate(ordered):
+            if prm.kind == "pos":
+                out.append(f"  args.push({emit_arg(prm, i, prm.name)})")
+            else:
+                out.append(f"  if {prm.name} is Some(v) {{")
+                out.append(f"    args.push({emit_arg(prm, i, 'v')})")
+                out.append("  }")
+        out.append(f"  push_extra(args, extra, {len(ordered)})")
+        out.append("  {")
+        out.append("    content: labelled_call(")
+        out.append(
+            f'      {{ func: FNative({handle}), args, origin: Site::new("{spec.name}", loc, args_loc) }},'
+        )
+        out.append("      label,")
+        out.append(f"      {len(ordered) + 1},")
+        out.append("    ),")
+        out.append("  }")
+        out.append("}\n")
+        out.append("///|")
+        out.append(
+            f"pub impl IntoContent for {spec.name} with fn into_content(self) {{\n  self.content\n}}\n"
+        )
+    else:
+        out.append(f") -> {spec.owner} {{")
+        out.append("  let positional : Array[Value] = []")
+        out.append("  let named : Array[(String, Value)] = []")
+        for prm in ordered:
+            if prm.kind == "pos":
+                out.append(f"  positional.push({prm.conv(prm.name)})")
+            else:
+                out.append(f"  if {prm.name} is Some(v) {{")
+                out.append(f'    named.push(("{prm.field}", {prm.conv("v")}))')
+                out.append("  }")
+        out.append(f"  Value(Value::native({handle}, positional, named~))")
+        out.append("}\n")
+
 
 # The audited exceptions of docs/edsl-design.md, section 5.3: the only
 # places where the `doc` package builds element storage itself instead of
@@ -772,7 +1077,7 @@ def emit_element(spec, out, coverage):
 STORAGE_PATTERNS = {
     r"@library\.Content::new\(": {"lower.mbt": 1},        # `context`
     r"@library\.Content::from_fields\(": {},
-    r"@library\.SpaceElem::shared": {"lower.mbt": 1},     # markup's space
+    r"@library\.SpaceElem::shared": {"lower.mbt": 2},     # markup's spaces
     r"@library\.\w+Elem::(new|packed)\(": {},
     r"\.with_field\(": {},
     r"\.without_field\(": {},
@@ -815,6 +1120,12 @@ def main():
             raise SystemExit(f"duplicate name {spec.name}")
         names.add(spec.name)
         emit_element(spec, out, coverage)
+    for spec in FUNCS:
+        if spec.owner is None:
+            if spec.name in names:
+                raise SystemExit(f"duplicate name {spec.name}")
+            names.add(spec.name)
+        emit_function(spec, out)
     # The element table: qualified path and handle of every constructor
     # (checked against the library's scope by a test).
     out.append("///|")
@@ -832,6 +1143,7 @@ def main():
     path = os.path.join(ROOT, "doc", "elements_gen.mbt")
     with open(path, "w") as f:
         f.write("\n".join(out) + "\n")
+    emit_api()
 
     # Coverage report: what the typed constructors do not cover yet.
     listed = {(s.ident, s.file) for s in ELEMENTS}
@@ -848,7 +1160,8 @@ def main():
         f.write("\n## Elements without a generated constructor\n")
         for line in missing:
             f.write(line + "\n")
-    print(f"generated {len(ELEMENTS)} elements; {len(coverage)} fields and "
+    print(f"generated {len(ELEMENTS)} elements and {len(FUNCS)} function "
+          f"facades; {len(coverage)} fields and "
           f"{len(missing)} element structs not covered")
     audit()
     print("audit: element storage is only built in the audited exceptions")

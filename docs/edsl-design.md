@@ -121,7 +121,13 @@ and decide API questions below.
    constructor needs neither when the expected type is its own type
    (`numbering=Numbering("1.")`).
 10. `with` and `and` are keywords and cannot be method names; `moon fmt`
-    rewrites a trailing callback as `f(a) <| ((x, y) => { ... })`. A braced
+    rewrites a trailing callback with several parameters as
+    `f(a) <| ((x, y) => { ... })` (`f(a) <| (x, y) => { ... }` parses and
+    type-checks, but the formatter adds the parentheses; a one-parameter
+    callback stays `f() <| x => { ... }`). The callback is the last
+    positional parameter, so `f(a, (x, y) => { ... })` is the same call
+    without the extra parentheses and is stable under `moon fmt`: the
+    documents of `doc/twins` use this spelling. A braced
     body that is a single identifier (`(it, _) => { it }`) parses as a
     record literal; `it` alone or `{ Content(it) }` is meant.
 11. An enum may have cases named `None` and `Auto` (the engine's own
@@ -240,6 +246,30 @@ Par(Seq(["Typeset with ", Emph("care"), "."]))
   change the lowered content.
 - **`Space()`** is markup's space element (`SpaceElem::shared()`), for
   authors who need Typst's collapsing space rather than a `" "` text.
+  **`Space::newline()`** is the space markup produces for a line break in
+  the source (`SpaceElem::shared_with_newline()`): realization discards it
+  next to text of a writing system without spaces (Chinese, Japanese).
+  Converted markup needs it to keep the original's behaviour; authors write
+  the string without a space instead.
+
+### 4.3 What markup writes with punctuation
+
+A plain string is never parsed, so the constructs that Typst markup spells
+with punctuation have constructors, and the characters are written as such:
+
+| Markup | EDSL |
+|---|---|
+| `"quoted"`, `'quoted'` (smart quotes by language and nesting) | `Quoted("quoted")`, `Quoted("quoted", double=false)`: a `smartquote` element before and after the body; twin `[#smartquote()#body#smartquote()]` |
+| an apostrophe `'` inside a word | the character `’` in the string (what the smart quote resolves to in every language) |
+| `--`, `---`, `...`, `~`, `-?`, escapes (`\#`) | the characters `–`, `—`, `…`, U+00A0, U+00AD, `#` in the string. (Markup evaluates these to symbol values, displayed as `symbol` elements that realization turns into text; `Symbol("—")`, the twin of `#symbol("—")`, is that element for converted markup.) |
+| a line break or several spaces in the source | one `" "` in the string; `Space()`/`Space::newline()` only for the collapsing behaviour |
+| a blank line | a new `Par(..)`, or `Parbreak()` between pieces of inline content |
+| `= Heading`, `- item`, `+ item`, `/ term: text` | `Heading(..)`, `List([..])`/`ListItem(..)`, `Enum([..])`/`EnumItem(..)`, `Terms([..])`/`TermsItem(..)` |
+| `` `raw` ``, `$x$`, `@label`, `<label>` | `Raw(..)`, `Equation(..)`, `Ref(..)`, `label=` or `Labelled(..)` |
+
+Strings are deliberately not scanned for quotes: a document that needs a
+straight `"` or `'` as text can write it, and `Quoted` is explicit about
+what the language decides.
 
 ## 5. Lowering
 
@@ -509,7 +539,10 @@ All are immutable and lowered through Typst's public functions or values.
 | `Numbering` | `Numbering(pattern)`; `Numbering::func() <| (numbers, cx) => { ... }`; `Numbering::none()` | `numbering=Numbering("1.1")` |
 | `Supplement` | `Supplement(content)`; `Supplement::func() <| (it, cx) => { ... }`; `Supplement::none()`, `Supplement::auto()` | |
 | `Celled<T>` | `Cells[T]`: `Cells::all(v)`, `Cells::columns([..])`, `Cells() <| (x, y) => { ... }` | section 7.3 |
-| `DataSource` | `&IntoSource`, implemented by `String` (a path), `Bytes` and `Source` | `Image("chart.png")` |
+| `DataSource` | `&IntoSource`, implemented by `String` (a path), `Bytes`, `Array[String]` (several paths, where the field takes them) and `Source` (`Path`, `Bytes`, `Many`) | `Image("chart.png")`, `Bibliography(["a.bib", "b.yml"])` |
+| `TrackSizings` | `Array[Sizing]`; `Sizing::repeat(n, size?)` is Typst's count shorthand | `columns=[Auto, Fr(1)]`, `columns=Sizing::repeat(5)` for `columns: 5` |
+| colour maps | `Paint::map(name)`: the stops `..color.map.<name>` (a spread value, section 13) | `Paint::conic(Paint::map("rainbow"))` |
+| `Tiling` | `Paint::tiling(body, size?, spacing?, offset?, angle?, relative?)` (generated from the function's metadata) | `fill=Paint::tiling(Line(..), size=(Pt(8), Pt(8)))` |
 | `FontWeight`, `Dir` | enums (`Bold`, `Weight(450)`; `Ltr`, `Rtl`, `Auto`) | `weight=Bold` |
 | other string enums | `String`, as written in Typst, in phase 1 (`fit="cover"`); generated enums in phase 2 | |
 | `LinkTarget` | `enum LinkTarget { Url(String); ToLabel(String); Dest(Value) }` | `Link(Url("https://.."))` |
@@ -528,7 +561,13 @@ constructor with that function's parameters — positional ones first,
 settable ones as optional labelled parameters with plain values — and it
 lowers by calling the function. Phase 1 writes the three gradient
 constructors by hand; phase 2 generates the function facades from the
-manifest's function metadata, as `docgen.py` does for elements.
+manifest's function metadata, as `docgen.py` does for elements. The
+generator has the mechanism (`FUNCS` in `scripts/docgen.py`): a function
+that returns content becomes a content type (`Lorem(words)`,
+`PolygonRegular(vertices?, size?, fill?, stroke?)`), a function that
+returns a value a static method of its facade (`Paint::tiling(..)`). The
+list is the functions the full showcase needs; the other value functions
+(colour spaces, dash patterns, dates) remain `Value::call`.
 
 ### 6.5 Before and after
 
@@ -701,6 +740,11 @@ positional/named arguments and its functional twin. Phase-1 entries:
 | `equation` | `Equation(source : String, block?, numbering?, ..., scope?)` | section 13 |
 | `table`, `grid` | `Table(children, columns?, ..., gutter?)` | external `gutter`, parse hooks |
 | `v`, `h` | `V(amount : Spacing, weak?)` | internal `attach` not exposed |
+| `math.equation` | `SetEquation(..)`, `Select::equation(..)`, `EquationView` | generated without a constructor: the constructor is the handwritten `Equation(source, ..)` |
+| `bibliography` | `Bibliography(sources : &IntoSource, title?, full?, style? : String, ..)` | one path, bytes or several sources; `style` is a CSL name or path |
+| `cite` | `Cite(key : String, supplement?, form?, style?)` | `key` is the label name |
+| `scale` | `Scale(body, factor?, x?, y?, ..)` | the external positional `factor` is labelled and passed positionally |
+| `polygon`, `curve` | `Polygon(vertices : Array[(Length, Length)], ..)`, `Curve(components, ..)` with `CurveMove`/`CurveLine`/`CurveQuad`/`CurveCubic`/`CurveClose` | a variadic parameter of values is a typed array |
 
 Each generated type's documentation carries its review note with the
 functional twin (`scripts/docgen.py`, `review=`).
@@ -786,6 +830,16 @@ Document([
   `` `show page` is not supported and has no effect``.
 - A show rule without a selector (`show: f`) is plain function application
   in MoonBit (`template(Seq([...]))`) and needs no construct.
+- **`ShowWith(selector, transform : Value)`** is the show rule whose
+  transformation is a value — a Typst function (`show link: underline` is
+  `ShowWith(Select::link(), Value::global("underline"))`), content or a
+  string — cast to a transformation at the `transform` argument like the
+  evaluator casts the right-hand side of a show rule.
+  **`ShowWith::all(transform)`** is `show: transform`: like the evaluator's
+  `styled_with_recipe`, a rule without a selector is applied to the rest of
+  the sequence at once (`recipe.apply`) instead of styling it. These are the
+  value-level hatch for rules, as `Set` is for set rules; converted Typst
+  code needs them for transformations that are not MoonBit callbacks.
 
 ## 9. Selectors and views
 
@@ -1237,8 +1291,14 @@ string relative to the file of the argument's span (`PathOrStr::resolve`,
 - `import`/`include` and paths inside `Markup` resolve relative to the
   snippet file, i.e. the project root as well.
 
-A document needing another base uses root-relative paths or a world rooted
-elsewhere; a per-document base directory is not part of this design.
+A document that lives elsewhere names its directory:
+`Document(children, dir="chapters/intro")` puts the session's virtual files
+(the origin listing and the snippets) into that directory of the project,
+so relative paths in arguments and in `Markup` fragments resolve as they
+would in a Typst file there. Path strings are still passed unchanged. The
+directory must be a path inside the project (lowering fails otherwise);
+each distinct directory uses its own interned file ids (1 + the snippet
+slots in use).
 
 ## 13. Escape hatches
 
@@ -1282,7 +1342,11 @@ pub fn Set::Set(path : String, named : Array[(String, Value)], loc~ : SourceLoc,
   `::dict([(k, v)])`, `::content(c)`, `::label(name)`, `::global(path)`
   (a binding of the global scope, e.g. `"red"`),
   `::call(path, positional?, named?)`, and the typed `::paint`, `::stroke`,
-  `::alignment`, `::sizing`. A `Value` is also what a view's `field(name)`
+  `::alignment`, `::sizing`. `Value::spread(v)` among the positional
+  arguments of a call is Typst's `..v` (the evaluator's rule: an array
+  gives positional arguments, a dictionary named ones, `arguments` both,
+  `none` nothing, anything else `cannot spread <type>`); anywhere else it
+  is a lowering error. A `Value` is also what a view's `field(name)`
   returns, and it is content (`impl IntoContent for Value`): as an
   argument the value itself, in a sequence its display, like `#value` in
   markup. There is deliberately **no constructor from a raw
@@ -1301,7 +1365,7 @@ pub fn Set::Set(path : String, named : Array[(String, Value)], loc~ : SourceLoc,
   evaluator's rule and warnings (`Seq([Heading("x"), Value::label("h")])` is
   `[#heading[x]#label("h")]`), also when the expression is wrapped in
   `Keyed`, which never changes the lowered content. As an argument, a
-  `Value` is the argument itself (`caption=NoneValue()`). **`Set(path, named)`** is the generic set rule.
+  `Value` is the argument itself (`caption=NoneValue()`). **`Set(path, named, positional?)`** is the generic set rule (`set text(8pt, red)` is `Set("text", [], positional=[..])`).
   `path` is resolved like an identifier with field accesses in the
   evaluator: the first segment in the library's global scope, the rest with
   `Value::field` (`table.cell`, `math.equation`, `gradient.linear`). An
