@@ -20,3 +20,5 @@ moon.work
 /target
 /tests/edsl_gen/*/gen_*.mbt
 /tests/edsl_gen/manifest.tsv
+/tests/edsl_gen/results.tsv
+/tests/edsl_gen/failed.txt

@@ -215,6 +215,18 @@ fn main {
     // The twins of the EDSL (`doc/twins`) against their Typst sources (see
     // `edsl_stage.mbt`).
     "edsl" => run_edsl_stage(filter, verbose)
+    // The upstream suite converted to the EDSL (docs/edsl-convert.md):
+    // generate the conversions, and compare them with the Typst path.
+    "edsl-convert" => {
+      let mut failed : Map[Int, String] = Map([])
+      for a in args {
+        if a.has_prefix("--failed=") {
+          failed = read_failed(a.unsafe_substring(start=9, end=a.length()))
+        }
+      }
+      run_edsl_convert(filter, args.contains("--baseline"), failed)
+    }
+    "edsl-suite" => run_edsl_suite(filter, verbose)
     _ => {
       println("unknown stage: \{stage}")
       @sys.exit(2)

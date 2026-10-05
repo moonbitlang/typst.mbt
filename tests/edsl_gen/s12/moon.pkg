@@ -1,0 +1,8 @@
+import {
+  "moonbitlang/typst/doc",
+  "moonbitlang/typst/tests/edsl_gen/registry",
+}
+
+supported_targets = "native"
+
+warnings = "-unused_type_declaration-unused_value"

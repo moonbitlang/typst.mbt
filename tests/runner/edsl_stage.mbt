@@ -89,6 +89,25 @@ priv struct StructDumper {
   /// The distinct elements in order of first occurrence (shared by the two
   /// documents of a comparison).
   elems : Array[@library.Element]
+  /// For realized content (the elements of frame tags): the locations in
+  /// order of first occurrence, per document. `None` for evaluated
+  /// content, which has none.
+  locations : Map[@library.Location, Int]?
+}
+
+///|
+/// The number of a location: its position in the order of first
+/// occurrence.
+fn StructDumper::loc(self : StructDumper, loc : @library.Location) -> String {
+  guard self.locations is Some(locations) else { return "#?" }
+  match locations.get(loc) {
+    Some(n) => "#\{n}"
+    None => {
+      let n = locations.length()
+      locations[loc] = n
+      "#\{n}"
+    }
+  }
 }
 
 ///|
@@ -124,6 +143,15 @@ fn StructDumper::content(
     let child = self.content(@library.StyledElem::child(content))
     return "styled(\{styles}; \{child})" + label
   }
+  // Tags of realized content: their locations are hashes, compared by
+  // their order of first occurrence.
+  if @library.TagElem::of(content) is Some(tag) {
+    return match tag.tag() {
+      Start(elem, _) =>
+        "tag.start(\{self.loc(elem.location().unwrap())}, \{self.elem(elem.elem())})"
+      End(loc, _, _) => "tag.end(\{self.loc(loc)})"
+    }
+  }
   let elem = content.elem()
   let fields = []
   for info in elem.fields() {
@@ -131,7 +159,11 @@ fn StructDumper::content(
       fields.push("\{info.name}: \{self.value(value)}")
     }
   }
-  "\{self.elem(elem)}(\{fields.join(", ")})" + label
+  let location = match (self.locations, content.location()) {
+    (Some(_), Some(loc)) => " " + self.loc(loc)
+    _ => ""
+  }
+  "\{self.elem(elem)}(\{fields.join(", ")})" + location + label
 }
 
 ///|
@@ -293,7 +325,7 @@ fn check_pair(
 
   // Structure.
   if structural {
-    let dumper : StructDumper = { elems: [], }
+    let dumper : StructDumper = { elems: [], locations: None, }
     let lowered = document.lower(base)
     let sink = @library.Sink::new()
     let evaluated = try

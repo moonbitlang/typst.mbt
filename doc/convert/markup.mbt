@@ -9,25 +9,14 @@ fn Tr::typed_code(self : Tr, code : String, total : Bool) -> Array[Op] {
 }
 
 ///|
-/// Translate one expression of a markup stream. `labelled`: a label
-/// follows it. Raises if it cannot be typed.
-fn Tr::item(
-  self : Tr,
-  expr : @ast.Expr,
-  env : Env,
-  labelled : Bool,
-) -> Array[Op] raise Bail {
+/// Translate one expression of a markup stream. Raises if it cannot be
+/// typed.
+fn Tr::item(self : Tr, expr : @ast.Expr, env : Env) -> Array[Op] raise Bail {
   match expr {
-    Text(text) => {
-      let literal = mbt_str(text.get())
-      // A plain string shares the location of its array; a text that is
-      // labelled gets its own, so diagnostics at two of them stay apart.
-      if labelled {
-        self.typed_code("Lit(\{literal})", true)
-      } else {
-        [Push({ code: literal, total: true, })]
-      }
-    }
+    // A plain string would share the location of its array with its
+    // siblings; every text gets its own, so diagnostics at two texts stay
+    // apart (the engine deduplicates by location and message).
+    Text(text) => [Push({ code: "Lit(\{mbt_str(text.get())})", total: true, })]
     Linebreak(_) => self.typed_code("Linebreak()", true)
     Parbreak(_) => self.typed_code("Parbreak()", true)
     Escape(escape) =>
@@ -130,16 +119,46 @@ fn Tr::equation(
 }
 
 ///|
-/// The methods whose results are never labels (section 6.1).
-let non_label_methods : Array[String] = [
-  "display", "step", "update", "len", "join", "map", "filter", "rev", "sorted", "slice",
-  "split", "replace", "trim", "pos", "named", "keys", "values", "pairs", "contains",
-  "starts-with", "ends-with", "enumerate", "zip", "flatten", "dedup", "chunks", "windows",
-  "intersperse", "position", "any", "all", "to-dict", "codepoints", "clusters", "lighten",
-  "darken", "saturate", "desaturate", "negate", "rotate", "transparentize", "opacify",
-  "mix", "with", "where", "func", "fields", "has", "text", "repeat", "sharp", "linear",
-  "radial", "conic", "page", "position",
+/// The global functions that are audited never to return a label (section
+/// 6.1), besides the element functions.
+let non_label_functions : Array[String] = [
+  "lorem", "rgb", "luma", "counter", "state", "numbering", "repr", "str", "int",
+  "float", "range", "datetime", "stroke", "gradient.linear", "gradient.radial", "gradient.conic",
+  "tiling",
 ]
+
+///|
+/// Whether a call is audited never to return a label: by the function it
+/// resolves to, or by its method and the type of its receiver.
+fn Tr::call_not_label(self : Tr, call : @ast.FuncCall, env : Env) -> Bool {
+  match self.global_path(call.callee(), env) {
+    Some(path) =>
+      non_label_functions.contains(path) ||
+      (match self.lookup(path) {
+        Some(Func(func)) => func.to_element() is Some(_)
+        _ => false
+      })
+    None => {
+      guard call.callee() is FieldAccess(access) else { return false }
+      let method = access.field().get()
+      match access.target() {
+        // Every method of a string returns a string, a number, a boolean,
+        // an array or dictionary of those, or `none`.
+        Str(_) => true
+        FuncCall(receiver) =>
+          match self.global_path(receiver.callee(), env) {
+            Some("counter") =>
+              ["display", "step", "update", "get", "at", "final"].contains(
+                method,
+              )
+            Some("state") => ["update", "display"].contains(method)
+            _ => false
+          }
+        _ => false
+      }
+    }
+  }
+}
 
 ///|
 /// Whether an expression is proven, by its form, not to evaluate to a
@@ -169,13 +188,7 @@ fn Tr::not_label(self : Tr, expr : @ast.Expr, env : Env) -> Bool {
       // A translated variable is a literal; an unbound name is a global.
       env.vars.contains(ident.get()) || self.global_path(expr, env) is Some(_)
     FieldAccess(_) => self.global_path(expr, env) is Some(_)
-    FuncCall(call) =>
-      match self.global_path(call.callee(), env) {
-        Some(path) => path != "label" && path != "eval"
-        None =>
-          call.callee() is FieldAccess(access) &&
-          non_label_methods.contains(access.field().get())
-      }
+    FuncCall(call) => self.call_not_label(call, env)
     Conditional(cond) =>
       self.not_label(cond.if_body(), env) &&
       (match cond.else_body() {

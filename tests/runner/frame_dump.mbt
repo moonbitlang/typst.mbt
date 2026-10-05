@@ -17,6 +17,10 @@ priv struct FrameEncoder {
   tag_names_only : Bool
   /// The locations of the skipped tags (see `skips`).
   skipped : Array[@library.Location]
+  /// If set, the elements of tags are encoded with the structural dump of
+  /// the `edsl` stages (element identity, every stored field, labels)
+  /// instead of the realization dump.
+  struct_tags : StructDumper?
   /// Shared with canonical content (location numbering).
   dumper : Dumper
   fonts : Map[String, Int]
@@ -30,6 +34,7 @@ fn FrameEncoder::new(
   span_enc : (@syntax.Span) -> String,
   zero_span_offsets? : Bool = false,
   tag_names_only? : Bool = false,
+  struct_tags? : StructDumper,
 ) -> FrameEncoder {
   {
     out: StringBuilder(),
@@ -37,6 +42,7 @@ fn FrameEncoder::new(
     zero_span_offsets,
     tag_names_only,
     skipped: [],
+    struct_tags,
     dumper: Dumper::new(),
     fonts: {},
     images: {},
@@ -160,7 +166,10 @@ fn FrameEncoder::content(
   self : FrameEncoder,
   content : @library.Content,
 ) -> Int {
-  let encoded = self.dumper.content(content)
+  let encoded = match self.struct_tags {
+    Some(dumper) => dumper.content(content)
+    None => self.dumper.content(content)
+  }
   if self.contents.get(encoded) is Some(id) {
     return id
   }
