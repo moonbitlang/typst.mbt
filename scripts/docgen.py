@@ -527,6 +527,19 @@ def emit_arg(p, index, expr):
     return f"{{ name: {name}, value: {p.conv(expr)}, param: {index} }}"
 
 
+def positional_names(spec, ps):
+    """The `positional=` argument of `push_extra` for these parameters: the
+    function's optional positional fields, which `extra` entries supply in
+    their positional place."""
+    names = [
+        p.field for p in ps
+        if p.kind == "pos_opt" or (p.kind == "pos" and p.field in spec.pos)
+    ]
+    if not names:
+        return ""
+    return ", positional=[" + ", ".join(f'"{n}"' for n in names) + "]"
+
+
 def emit_element(spec, out, coverage):
     elem = find_elem(spec)
     params = params_of(spec, elem, coverage)
@@ -562,8 +575,27 @@ def emit_element(spec, out, coverage):
         order[pos_end + 1:pos_end + 1] = late
         for p in order:
             i = index[p.name]
-            if p.kind == "pos":
+            if p.kind == "pos" and p.field not in spec.pos:
+                # Required by the function: no states besides a value.
                 lines.append(f"  {var}.push({emit_arg(p, i, p.name)})")
+            elif p.kind == "pos":
+                # An `extra` entry naming an optional positional field
+                # replaces the typed argument in its positional place.
+                lines.append(f'  if extra_arg(extra, "{p.field}") is Some(v) {{')
+                lines.append(
+                    f"    {var}.push({{ name: None, value: v, param: {len(ordered)} }})"
+                )
+                lines.append("  } else {")
+                lines.append(f"    {var}.push({emit_arg(p, i, p.name)})")
+                lines.append("  }")
+            elif p.kind == "pos_opt":
+                lines.append(f'  if extra_arg(extra, "{p.field}") is Some(v) {{')
+                lines.append(
+                    f"    {var}.push({{ name: None, value: v, param: {len(ordered)} }})"
+                )
+                lines.append(f"  }} else if {p.name} is Some(v) {{")
+                lines.append(f"    {var}.push({emit_arg(p, i, 'v')})")
+                lines.append("  }")
             elif p.kind == "variadic":
                 lines.append(f"  for child in {p.name} {{")
                 lines.append(
@@ -603,7 +635,9 @@ def emit_element(spec, out, coverage):
         lines = ["  let args : Array[ArgNode] = []"]
         push_args(lines, params)
         out.extend(lines)
-        out.append(f"  push_extra(args, extra, {len(ordered)})")
+        out.append(
+            f"  push_extra(args, extra, {len(ordered)}{positional_names(spec, params)})"
+        )
         out.append("  {")
         out.append("    content: labelled_call(")
         out.append(
@@ -650,12 +684,21 @@ def emit_element(spec, out, coverage):
             i = sindex[p.name]
             positional = p.kind in ("pos", "pos_opt")
             name = "None" if positional else f'Some("{p.field}")'
-            out.append(f"  if {p.name} is Some(v) {{")
+            if positional:
+                out.append(f'  if extra_arg(extra, "{p.field}") is Some(v) {{')
+                out.append(
+                    f"    args.push({{ name: None, value: v, param: {len(settable)} }})"
+                )
+                out.append(f"  }} else if {p.name} is Some(v) {{")
+            else:
+                out.append(f"  if {p.name} is Some(v) {{")
             out.append(
                 f"    args.push({{ name: {name}, value: {p.conv('v')}, param: {i} }})"
             )
             out.append("  }")
-        out.append(f"  push_extra(args, extra, {len(settable)})")
+        out.append(
+            f"  push_extra(args, extra, {len(settable)}{positional_names(spec, settable)})"
+        )
         out.append(
             f'  {{ node: {{ func: FElem({handle}), args, origin: Site::new("{sname}", loc, args_loc) }} }}'
         )

@@ -34,6 +34,6 @@ test "a missing resource is an error at the argument" {
     fail("expected an EDSL location")
   }
   inspect(origin.kind, content="Image")
-  inspect(origin.param, content="Some(0)")
+  assert_eq(origin.param, Some(0))
   assert_true(origin.file.has_suffix("design_examples.mbt"))
 }

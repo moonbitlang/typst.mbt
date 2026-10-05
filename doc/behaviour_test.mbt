@@ -138,7 +138,7 @@ test "show rules: recipe checks and selector validation are Typst's" {
       #|this selector cannot be used with show
     ),
   )
-  inspect(origin_of(invalid.errors[0]).param, content="Some(0)")
+  assert_eq(origin_of(invalid.errors[0]).param, Some(0))
 }
 
 ///|
@@ -399,7 +399,7 @@ test "errors in files imported by markup are located in those files" {
     fail("expected a file location")
   }
   inspect(file.path, content="lib.typ")
-  inspect((file.line, file.column), content="(2, 3)")
+  assert_eq((file.line, file.column), (2, 3))
   // The trace leads back to the markup source and its constructor call.
   let trace = report.errors[0].trace
   assert_true(trace.length() >= 1)
@@ -414,7 +414,7 @@ test "errors in files imported by markup are located in those files" {
     fail("expected an EDSL location")
   }
   inspect(origin.kind, content="Markup")
-  inspect(origin.text_range, content="Some((3, 4))")
+  assert_eq(origin.text_range, Some((3, 4)))
 }
 
 ///|

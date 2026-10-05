@@ -61,7 +61,7 @@ test "distinct library functions have distinct fingerprints" {
   collect_funcs(lib.global.scope(), funcs, modules, 0)
   collect_funcs(lib.math.scope(), funcs, modules, 0)
   assert_true(funcs.length() > 400)
-  let seen : Map[@library.U128, @library.Func] = {}
+  let seen : Map[@library.U128, @library.Func] = Map([])
   let collisions : Array[String] = []
   for func in funcs {
     let hash = @library.hash128(func)
@@ -72,5 +72,5 @@ test "distinct library functions have distinct fingerprints" {
       None => seen[hash] = func
     }
   }
-  inspect(collisions, content="[]")
+  inspect(collisions.join("; "), content="")
 }

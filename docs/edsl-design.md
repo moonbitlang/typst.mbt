@@ -1,8 +1,11 @@
-# A MoonBit EDSL for typst.mbt (design, revision 7)
+# A MoonBit EDSL for typst.mbt (design, revision 8)
 
-Status: revision 7. Revisions 3 to 6 resolved the items of
-`docs/edsl-reviews/review-2.md` to `review-5.md`. This revision makes two
-changes:
+Status: revision 8. Revisions 3 to 6 resolved the items of
+`docs/edsl-reviews/review-2.md` to `review-5.md`. Revision 8 resolves
+`review-7.md`: `extra` entries that name an optional positional field are
+passed in the field's positional place (6.1), the gradient constructors are
+phase 1 throughout, and the wording of 11.4 is limited to what the
+fingerprint traversal visits. Revision 7 made two changes:
 
 1. **Section 6, plain values first** (new, at the request of the project
    owner after reading the showcase): a plain value is written plainly
@@ -348,10 +351,27 @@ spelled by the value's family, not by wrappers around every value:
   (`fill=None` with `fill? : Paint`), while `Option`'s `None` is unaffected
   elsewhere.
 - `extra? : Array[(String, Value)]` is a parameter of every generated
-  constructor and set rule: named arguments passed after the typed ones (a
-  later argument wins, as in Typst). It gives scalars their rare explicit
+  constructor and set rule: arguments by **field name**, each passed the way
+  the Typst function takes that field. It gives scalars their rare explicit
   `auto`/`none`, and it reaches every field the typed parameters do not
   cover yet (section 7.1) without leaving the typed constructor.
+  - An entry for a **named** field is a named argument after the typed ones
+    (a later argument wins, as in Typst).
+  - An entry for an **optional positional** field of the function (the
+    reviewed mappings of section 7.2: `enum.item.number`, `place.alignment`,
+    `columns.count`, `rotate.angle`, an optional body, ...) is passed
+    **positionally, in the field's place**, and replaces the typed argument
+    if both are given (the last such entry wins); Typst takes these fields
+    only positionally, so a named argument would be `unexpected argument`.
+    `EnumItem("x", extra=[("number", Value::auto())])` is
+    `enum.item(auto)[x]`, and `SetEnumItem(extra=[("number",
+    Value::auto())])` is `set enum.item(auto)`: an explicit `auto` resets
+    a number that a set rule would otherwise make the item inherit. The
+    generator derives the positional names from the element metadata, the
+    same data that makes the typed parameter positional.
+  - A **required** positional field (`par.body`) has no state besides its
+    value and is not an `extra` name: the entry stays a named argument and
+    fails with Typst's `unexpected argument: body`.
 - **Which states a field accepts is the engine's cast**, as for units
   (6.3): `Text("x", size=Auto)` fails with Typst's `expected length, found
   auto` at the `size` argument. The generated documentation of each
@@ -473,7 +493,7 @@ All are immutable and lowered through Typst's public functions or values.
 
 | Engine type | EDSL | Example |
 |---|---|---|
-| `Paint`, `Color` (with `Option`/`Smart`) | `enum Paint { Auto; None; Rgb(String); Luma(Int); Black; White; Red; ...; Value(Value) }` (Typst's named colours, lowered to the global bindings `black`, `red`, ...) and the typed gradient constructors `Paint::linear(stops, angle?, ..)`, `Paint::radial(stops, ..)`, `Paint::conic(stops, ..)`; `paint.at(Pct(30))` positions a stop | `fill=Rgb("#1f4e79")`, `fill=Paint::linear([Rgb("#1f4e79"), Rgb("#7fc8a9")], angle=Deg(20))` |
+| `Paint`, `Color` (with `Option`/`Smart`) | `enum Paint { Auto; None; Rgb(String); Luma(Int); Black; White; Red; ...; Value(Value) }` (Typst's named colours, lowered to the global bindings `black`, `red`, ...) and the typed gradient constructors `Paint::linear(stops, angle?, ..)`, `Paint::radial(stops, ..)`, `Paint::conic(stops, ..)`; `Paint::stop(color, Pct(30))` positions a stop (static, by fact 12) | `fill=Rgb("#1f4e79")`, `fill=Paint::linear([Rgb("#1f4e79"), Rgb("#7fc8a9")], angle=Deg(20))` |
 | `Stroke` | `Stroke(paint?, thickness?, cap?, join?, dash?, miter_limit?)` → `stroke(...)`; `Stroke::none()`, `Stroke::auto()` | `Stroke(thickness=Pt(0.5), paint=Luma(220))` |
 | `Sides<T>`, `Margin<T>` | `Sides[T]`: `Sides(all?, x?, y?, left?, top?, right?, bottom?, rest?)`; `all` lowers to the bare value, the others to Typst's dictionary; combining `all` with a side is a lowering error; `Sides::auto()`, `Sides::none()` for the field as a whole | `inset=Sides(all=Pt(9))`, `margin=Sides(x=Cm(2.2), top=Auto)` |
 | `Corners<T>` | `Corners[T]`: `Corners(all?, top?, ..., top_left?, ...)`, same rule | `radius=Corners(all=Pt(4))` |
@@ -492,8 +512,9 @@ all of these, by `Bool`, `Int`, `Int64`, `Double`, `String`, `Array[T]`,
 `Content` and `Value`; it is the bound of generic facades such as
 `Cells[T]` and `Sides[T]`.
 
-**Typed value constructors** (gradients here; colour spaces, tilings,
-dash patterns, dates in phase 2) follow the rule of the elements: where
+**Typed value constructors** (the three gradient constructors in phase 1;
+colour spaces, tilings, dash patterns, dates in phase 2) follow the rule of
+the elements: where
 the engine has a native function (`gradient.linear`), the facade is a
 constructor with that function's parameters — positional ones first,
 settable ones as optional labelled parameters with plain values — and it
@@ -968,7 +989,11 @@ priv struct RecordedRead {
   with the fingerprint flags; a new flag, `fingerprint_host`, marks cached
   fingerprints that visited a host function, and a collector recomputes
   exactly those instead of using the cache, so it sees every host function
-  without re-hashing anything else.
+  **that the fingerprint traversal visits** without re-hashing anything
+  else. The traversal is the fingerprint's own: where a fingerprint does
+  not descend (the frames of a tiling, the other lossy cases below), it
+  visits neither Typst closures nor host functions, and such a result keeps
+  its existing lossy validation.
 - `Introspector::record` computes the result's fingerprint as before; if
   its flags contain `fingerprint_host`, it stores the collected host
   functions with the read. Nothing changes for the 16 read methods
@@ -982,10 +1007,11 @@ priv struct RecordedRead {
   position by position.
 - A **stable query containing host functions converges**: under the
   creation rule (11.2) the content in both introspectors holds the same
-  `HostFunc` objects. Two different host functions never validate, also if
-  a host gave them the same key (a tested case). Typst closures created
-  during layout are validated by their structural fingerprint, as before
-  and as upstream's hash-based validation does.
+  `HostFunc` objects. Two different host functions visited by the
+  fingerprint never validate against each other, also if a host gave them
+  the same key (a tested case). Typst closures created during layout are
+  validated by their structural fingerprint where the traversal visits
+  them, as before and as upstream's hash-based validation does.
 - **Termination and cost**: validation performs exactly the fingerprint
   computations it performed before, on the same values; the collector adds
   no traversal of its own. Reads without host functions are untouched.
@@ -1399,7 +1425,8 @@ listing id.
 | All remaining elements and fields, typed views and selectors | 2 | generator coverage complete |
 | State, functional updates | 2 | section 10.2 |
 | Bibliography and citations | 2 | generated `Bibliography`, `Cite` |
-| Shapes, gradients, tilings, curves as typed values | 2 | phase 1 through `Call`/`Value::call` |
+| Linear, radial and conic gradients as typed values | 1 | `Paint::linear`/`radial`/`conic`, `Paint::stop` (6.4) |
+| Shapes, tilings, curves, colour spaces as typed values | 2 | phase 1 through `Call`/`Value::call` |
 | HTML and bundle targets | 3 | `compile_html`, target elements |
 | Preview provenance, review packaging | 3 | region → origins |
 | Callbacks created during layout | 3 | section 11.2 |
@@ -1416,6 +1443,8 @@ main file at the project root:
 | `Heading("Intro", level=2)` | `#heading(level: 2)[#"Intro"]` |
 | `Block("x", fill=None, width=Auto)` | `#block(fill: none, width: auto)[#"x"]` |
 | `Heading("x", extra=[("level", Value::auto())])` | `#heading(level: auto)[#"x"]` |
+| `EnumItem("x", extra=[("number", Value::auto())])` | `#enum.item(auto)[#"x"]` |
+| `SetEnumItem(extra=[("number", Value::auto())])` | `#set enum.item(auto)` |
 | `Figure("x", caption=NoneValue())` | `#figure(caption: none)[#"x"]` |
 | `Paint::linear([Red, Blue], angle=Deg(45))` | `gradient.linear(red, blue, angle: 45deg)` |
 | `Value::int(3)` as content | `#3` |
@@ -1495,8 +1524,9 @@ and off, invalid inputs with their diagnostics) are ordinary tests of the
    code with a show rule, a computed table) — written in the EDSL
    (`doc/twins/showcase.mbt`) is layout- and export-equivalent to its
    functional Typst twin, and its PDF is produced through `doc/examples`.
-   Every construct it uses is in phase 1 (section 15); where a value is not
-   typed yet (the title block's gradient) it goes through `Value::call`.
+   Every construct it uses is in phase 1 (section 15), including the title
+   block's gradient (`Paint::linear`); a value that is not typed yet would
+   go through `Value::call`.
    The **full** showcase, with typed graphics and the bibliography, is the
    phase-2 milestone.
 3. **Coverage**: phase 1 — every listed element path resolves to the
@@ -1553,15 +1583,23 @@ and off, invalid inputs with their diagnostics) are ordinary tests of the
 
 ## 19. Resolution index
 
+Review 7 (revision 8):
+
+| Review-7 item | Resolution |
+|---|---|
+| 1 explicit states of positional scalar fields (MAJOR; review-2 item 7) | 6.1: an `extra` entry naming an optional positional field is passed in the field's positional place and replaces the typed argument, in constructors and set rules; twin `positional-states` (inherited number against explicit `auto`, a set rule with `auto`, `place`), unit test in `doc/states_test.mbt` |
+| 2 gradient documentation (MINOR) | 6.4 `Paint::stop`; 6.4, 15 and 17.2 put the three gradient constructors in phase 1 |
+| 3 convergence wording (MINOR) | 11.4: identity is guaranteed for host functions visited by the fingerprint traversal; tilings keep their lossy validation; index entry below corrected |
+
 Review 6 (revision 7):
 
 | Review-6 item | Resolution |
 |---|---|
 | 1 exact validation vs non-convergence analysis (MAJOR) | 11.4: validation no longer goes beyond fingerprints except for host-function identity, which agrees with the fingerprint-based history under the unique-key contract the EDSL guarantees; exactness for lossy fingerprints is withdrawn from this design (it belongs in the fingerprints) |
-| 2 tiling equality and closures (MAJOR) | 11.4: no delegated equality is used any more; closures created anew, also inside tiling frames, validate by their structural fingerprint as before |
+| 2 tiling equality and closures (MAJOR) | 11.4: no delegated equality is used any more; tiling results keep their existing lossy validation (the fingerprint does not visit their frames), closures elsewhere validate by their structural fingerprint as before |
 | 3 stale index entry (MINOR) | this index is rewritten for the narrowed 11.4 |
 
-Earlier reviews, as they stand in revision 7:
+Earlier reviews, as they stand in revision 8:
 
 | Item | Resolution |
 |---|---|
@@ -1584,7 +1622,7 @@ Review 2 (revision 3):
 | 3 host identity and convergence | 11.1–11.4: one host function per description, creation rule, identity equality, key fingerprint, memo rules, identity validation in the recorder; stable queries with host functions converge |
 | 5 spans | 5.3 span attachment and tracing; 12.2 checked limits and file ids; 12.4 text offsets; 13 snippet slots |
 | 6 resources | 12.5: root-anchored synthetic files, strings passed unchanged |
-| 7 absent/auto/none/value and integers | 6.1, 6.2: the four states stay expressible for every field; since revision 7 a plain value is written plainly and the explicit states by the value family; `Int64` |
+| 7 absent/auto/none/value and integers | 6.1, 6.2: the four states stay expressible for every field, positional ones included (`extra` passes them positionally); since revision 7 a plain value is written plainly and the explicit states by the value family; `Int64` |
 | 8 set rules | 8: sequence-tail nesting only in `Document`/`Seq`; `Element::set(..).spanned(..).liftable()` |
 | 9 sequences and labels | 4.2: `Seq` preserves nesting (twin `[#a#b]`), `Labelled` on one expression result |
 | 10 show-set, recipe checks | 8: `Transformation::Style`, shared `check_recipe` |

@@ -77,10 +77,5 @@ test "the origin registry is append-only and deduplicates by call site and keys"
   guard frozen.resolve(registry.span(keyed)) is Some(origin) else {
     fail("no origin")
   }
-  inspect(
-    origin.keys,
-    content=(
-      #|[row-1]
-    ),
-  )
+  inspect(origin.keys.join("/"), content="row-1")
 }

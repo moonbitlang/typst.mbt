@@ -8,12 +8,7 @@ test "an explicit state the field does not accept is the engine's cast error" {
   inspect(error_messages(auto_size), content="expected length, found auto")
   let origin = origin_of(auto_size.errors[0])
   inspect(origin.kind, content="Text")
-  inspect(
-    origin.param,
-    content=(
-      #|Some(5)
-    ),
-  )
+  assert_eq(origin.param, Some(5))
   // `heading.numbering` accepts `none` but not `auto`.
   let none = compile([@doc.Heading("x", numbering=@doc.Numbering::none())])
   inspect(error_messages(none), content="")
@@ -57,4 +52,37 @@ test "`extra` passes named arguments after the typed ones" {
     .unwrap()
   let level : Int64 = overridden.field(@library.heading_elem_level).cast()
   assert_eq(level, 3)
+}
+
+///|
+test "`extra` supplies optional positional fields in their positional place" {
+  // `enum.item.number` is positional only: `enum.item(auto, body)`.
+  let reset = compile([
+    @doc.Enum([@doc.EnumItem("x", extra=[("number", @doc.Value::auto())])]),
+  ])
+  inspect(error_messages(reset), content="")
+  let set_rule = compile([
+    @doc.SetEnumItem(extra=[("number", @doc.Value::auto())]),
+    @doc.Enum([@doc.EnumItem("x")]),
+  ])
+  inspect(error_messages(set_rule), content="")
+  // The entry replaces the typed argument.
+  let replaced = @doc.Document([
+      @doc.EnumItem("x", number=2, extra=[("number", @doc.Value::int(5))]),
+    ])
+    .lower(@doc.DocWorld::in_memory())
+    .unwrap()
+  let number : Int64 = replaced.field(@library.enum_item_elem_number).cast()
+  assert_eq(number, 5)
+  // A value the field does not accept is Typst's error for a stray
+  // positional argument (`set enum.item("two")`), at the `extra` argument.
+  let invalid = compile([
+    @doc.SetEnumItem(extra=[("number", @doc.Value::str("two"))]),
+    "x",
+  ])
+  inspect(error_messages(invalid), content="unexpected argument")
+  assert_eq(origin_of(invalid.errors[0]).param, Some(1))
+  // A required positional field is not an `extra` name.
+  let body = compile([@doc.Par("x", extra=[("body", @doc.Value::str("y"))])])
+  inspect(error_messages(body), content="unexpected argument: body")
 }

@@ -14,6 +14,9 @@ using @doc {
   type Keyed,
   type Content,
   type Figure,
+  type Enum,
+  type EnumItem,
+  type SetEnumItem,
   type Table,
   type TableHeader,
   type TableCell,
@@ -88,6 +91,11 @@ pub fn field_states() -> Seq {
     Heading("Level two", level=2, numbering=Numbering::none()),
     Block("No fill, automatic width", fill=None, width=Auto),
     Figure("No caption", caption=NoneValue()),
+    // An optional positional field: `extra` passes it positionally.
+    Seq([
+      SetEnumItem(extra=[("number", Value::auto())]),
+      Enum([EnumItem("Automatic number", extra=[("number", Value::auto())])]),
+    ]),
     Heading("Numbered", numbering=Numbering("1."), depth=2),
     Block(
       "A block",

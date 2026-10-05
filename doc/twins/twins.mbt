@@ -23,6 +23,9 @@ using @doc {
   type Grid,
   type List,
   type Enum,
+  type EnumItem,
+  type SetEnumItem,
+  type Place,
   type Quote,
   type Footnote,
   type Link,
@@ -461,6 +464,35 @@ pub fn constructs() -> Array[Twin] {
           Value::float(1.5),
           Value::bool(true),
           Value::str("text"),
+        ])
+      },
+    ),
+    // Explicit states of optional positional fields: `extra` entries that
+    // name them are passed in the field's positional place, in constructors
+    // and in set rules. A set number is inherited by an item without one,
+    // an explicit `auto` resets it.
+    twin(
+      "positional-states",
+      [
+        page_typ, "#set enum.item(3);", "#enum(enum.item[#\"inherited\"], enum.item(auto)[#\"automatic\"], enum.item(7)[#\"seven\"])",
+        "#[#set enum.item(auto);#enum(enum.item[#\"reset\"])]", "#place(auto, float: true)[#\"floating\"]",
+        "#place(top + right)[#\"corner\"]",
+      ],
+      () => {
+        Document([
+          page(),
+          SetEnumItem(number=3),
+          Enum([
+            EnumItem("inherited"),
+            EnumItem("automatic", extra=[("number", Value::auto())]),
+            EnumItem("seven", number=7),
+          ]),
+          Seq([
+            SetEnumItem(extra=[("number", Value::auto())]),
+            Enum([EnumItem("reset")]),
+          ]),
+          Place("floating", alignment=Auto, float=true),
+          Place("corner", extra=[("alignment", Value::alignment(Top + Right))]),
         ])
       },
     ),

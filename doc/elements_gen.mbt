@@ -683,10 +683,12 @@ pub fn Link::Link(
 ) -> Link {
   let args : Array[ArgNode] = []
   args.push({ name: None, value: ToValue::to_value(dest), param: 0, })
-  if body is Some(v) {
+  if extra_arg(extra, "body") is Some(v) {
+    args.push({ name: None, value: v, param: 2, })
+  } else if body is Some(v) {
     args.push({ name: None, value: Value::content(v), param: 1, })
   }
-  push_extra(args, extra, 2)
+  push_extra(args, extra, 2, positional=["body"])
   {
     content: labelled_call(
       {
@@ -1641,11 +1643,13 @@ pub fn EnumItem::EnumItem(
   args_loc~ : ArgsLoc,
 ) -> EnumItem {
   let args : Array[ArgNode] = []
-  if number is Some(v) {
+  if extra_arg(extra, "number") is Some(v) {
+    args.push({ name: None, value: v, param: 2, })
+  } else if number is Some(v) {
     args.push({ name: None, value: Value::int(v), param: 1, })
   }
   args.push({ name: None, value: Value::content(body), param: 0, })
-  push_extra(args, extra, 2)
+  push_extra(args, extra, 2, positional=["number"])
   {
     content: labelled_call(
       {
@@ -1682,10 +1686,12 @@ pub fn SetEnumItem::SetEnumItem(
   args_loc~ : ArgsLoc,
 ) -> SetEnumItem {
   let args : Array[ArgNode] = []
-  if number is Some(v) {
+  if extra_arg(extra, "number") is Some(v) {
+    args.push({ name: None, value: v, param: 1, })
+  } else if number is Some(v) {
     args.push({ name: None, value: Value::int(v), param: 0, })
   }
-  push_extra(args, extra, 1)
+  push_extra(args, extra, 1, positional=["number"])
   {
     node: {
       func: FElem(@library.enum_item_elem()),
@@ -3426,10 +3432,12 @@ pub fn Title::Title(
   args_loc~ : ArgsLoc,
 ) -> Title {
   let args : Array[ArgNode] = []
-  if body is Some(v) {
+  if extra_arg(extra, "body") is Some(v) {
+    args.push({ name: None, value: v, param: 1, })
+  } else if body is Some(v) {
     args.push({ name: None, value: Value::content(v), param: 0, })
   }
-  push_extra(args, extra, 1)
+  push_extra(args, extra, 1, positional=["body"])
   {
     content: labelled_call(
       {
@@ -5848,9 +5856,13 @@ pub fn Align::Align(
   args_loc~ : ArgsLoc,
 ) -> Align {
   let args : Array[ArgNode] = []
-  args.push({ name: None, value: ToValue::to_value(alignment), param: 0, })
+  if extra_arg(extra, "alignment") is Some(v) {
+    args.push({ name: None, value: v, param: 2, })
+  } else {
+    args.push({ name: None, value: ToValue::to_value(alignment), param: 0, })
+  }
   args.push({ name: None, value: Value::content(body), param: 1, })
-  push_extra(args, extra, 2)
+  push_extra(args, extra, 2, positional=["alignment"])
   {
     content: labelled_call(
       {
@@ -5884,10 +5896,12 @@ pub fn SetAlign::SetAlign(
   args_loc~ : ArgsLoc,
 ) -> SetAlign {
   let args : Array[ArgNode] = []
-  if alignment is Some(v) {
+  if extra_arg(extra, "alignment") is Some(v) {
+    args.push({ name: None, value: v, param: 1, })
+  } else if alignment is Some(v) {
     args.push({ name: None, value: ToValue::to_value(v), param: 0, })
   }
-  push_extra(args, extra, 1)
+  push_extra(args, extra, 1, positional=["alignment"])
   {
     node: {
       func: FElem(@library.align_elem()),
@@ -5982,7 +5996,11 @@ pub fn Block::Block(
   args_loc~ : ArgsLoc,
 ) -> Block {
   let args : Array[ArgNode] = []
-  args.push({ name: None, value: Value::content(body), param: 0, })
+  if extra_arg(extra, "body") is Some(v) {
+    args.push({ name: None, value: v, param: 14, })
+  } else {
+    args.push({ name: None, value: Value::content(body), param: 0, })
+  }
   if width is Some(v) {
     args.push({ name: Some("width"), value: ToValue::to_value(v), param: 1, })
   }
@@ -6022,7 +6040,7 @@ pub fn Block::Block(
   if sticky is Some(v) {
     args.push({ name: Some("sticky"), value: Value::bool(v), param: 13, })
   }
-  push_extra(args, extra, 14)
+  push_extra(args, extra, 14, positional=["body"])
   {
     content: labelled_call(
       {
@@ -6243,7 +6261,11 @@ pub fn Box::Box(
   args_loc~ : ArgsLoc,
 ) -> Box {
   let args : Array[ArgNode] = []
-  args.push({ name: None, value: Value::content(body), param: 0, })
+  if extra_arg(extra, "body") is Some(v) {
+    args.push({ name: None, value: v, param: 9, })
+  } else {
+    args.push({ name: None, value: Value::content(body), param: 0, })
+  }
   if width is Some(v) {
     args.push({ name: Some("width"), value: ToValue::to_value(v), param: 1, })
   }
@@ -6268,7 +6290,7 @@ pub fn Box::Box(
   if clip is Some(v) {
     args.push({ name: Some("clip"), value: Value::bool(v), param: 8, })
   }
-  push_extra(args, extra, 9)
+  push_extra(args, extra, 9, positional=["body"])
   {
     content: labelled_call(
       {
@@ -6630,7 +6652,9 @@ pub fn Place::Place(
   args_loc~ : ArgsLoc,
 ) -> Place {
   let args : Array[ArgNode] = []
-  if alignment is Some(v) {
+  if extra_arg(extra, "alignment") is Some(v) {
+    args.push({ name: None, value: v, param: 7, })
+  } else if alignment is Some(v) {
     args.push({ name: None, value: ToValue::to_value(v), param: 1, })
   }
   args.push({ name: None, value: Value::content(body), param: 0, })
@@ -6653,7 +6677,7 @@ pub fn Place::Place(
   if dy is Some(v) {
     args.push({ name: Some("dy"), value: ToValue::to_value(v), param: 6, })
   }
-  push_extra(args, extra, 7)
+  push_extra(args, extra, 7, positional=["alignment"])
   {
     content: labelled_call(
       {
@@ -6695,7 +6719,9 @@ pub fn SetPlace::SetPlace(
   args_loc~ : ArgsLoc,
 ) -> SetPlace {
   let args : Array[ArgNode] = []
-  if alignment is Some(v) {
+  if extra_arg(extra, "alignment") is Some(v) {
+    args.push({ name: None, value: v, param: 6, })
+  } else if alignment is Some(v) {
     args.push({ name: None, value: ToValue::to_value(v), param: 0, })
   }
   if scope is Some(v) {
@@ -6717,7 +6743,7 @@ pub fn SetPlace::SetPlace(
   if dy is Some(v) {
     args.push({ name: Some("dy"), value: ToValue::to_value(v), param: 5, })
   }
-  push_extra(args, extra, 6)
+  push_extra(args, extra, 6, positional=["alignment"])
   {
     node: {
       func: FElem(@library.place_elem()),
@@ -7945,7 +7971,9 @@ pub fn Columns::Columns(
   args_loc~ : ArgsLoc,
 ) -> Columns {
   let args : Array[ArgNode] = []
-  if count is Some(v) {
+  if extra_arg(extra, "count") is Some(v) {
+    args.push({ name: None, value: v, param: 5, })
+  } else if count is Some(v) {
     args.push({ name: None, value: Value::int(v), param: 1, })
   }
   args.push({ name: None, value: Value::content(body), param: 0, })
@@ -7958,7 +7986,7 @@ pub fn Columns::Columns(
   if separator is Some(v) {
     args.push({ name: Some("separator"), value: Value::content(v), param: 4, })
   }
-  push_extra(args, extra, 5)
+  push_extra(args, extra, 5, positional=["count"])
   {
     content: labelled_call(
       {
@@ -7998,7 +8026,9 @@ pub fn SetColumns::SetColumns(
   args_loc~ : ArgsLoc,
 ) -> SetColumns {
   let args : Array[ArgNode] = []
-  if count is Some(v) {
+  if extra_arg(extra, "count") is Some(v) {
+    args.push({ name: None, value: v, param: 4, })
+  } else if count is Some(v) {
     args.push({ name: None, value: Value::int(v), param: 0, })
   }
   if gutter is Some(v) {
@@ -8010,7 +8040,7 @@ pub fn SetColumns::SetColumns(
   if separator is Some(v) {
     args.push({ name: Some("separator"), value: Value::content(v), param: 3, })
   }
-  push_extra(args, extra, 4)
+  push_extra(args, extra, 4, positional=["count"])
   {
     node: {
       func: FElem(@library.columns_elem()),
@@ -8733,7 +8763,9 @@ pub fn Rotate::Rotate(
   args_loc~ : ArgsLoc,
 ) -> Rotate {
   let args : Array[ArgNode] = []
-  if angle is Some(v) {
+  if extra_arg(extra, "angle") is Some(v) {
+    args.push({ name: None, value: v, param: 4, })
+  } else if angle is Some(v) {
     args.push({ name: None, value: ToValue::to_value(v), param: 1, })
   }
   args.push({ name: None, value: Value::content(body), param: 0, })
@@ -8743,7 +8775,7 @@ pub fn Rotate::Rotate(
   if reflow is Some(v) {
     args.push({ name: Some("reflow"), value: Value::bool(v), param: 3, })
   }
-  push_extra(args, extra, 4)
+  push_extra(args, extra, 4, positional=["angle"])
   {
     content: labelled_call(
       {
@@ -8779,7 +8811,9 @@ pub fn SetRotate::SetRotate(
   args_loc~ : ArgsLoc,
 ) -> SetRotate {
   let args : Array[ArgNode] = []
-  if angle is Some(v) {
+  if extra_arg(extra, "angle") is Some(v) {
+    args.push({ name: None, value: v, param: 3, })
+  } else if angle is Some(v) {
     args.push({ name: None, value: ToValue::to_value(v), param: 0, })
   }
   if origin is Some(v) {
@@ -8788,7 +8822,7 @@ pub fn SetRotate::SetRotate(
   if reflow is Some(v) {
     args.push({ name: Some("reflow"), value: Value::bool(v), param: 2, })
   }
-  push_extra(args, extra, 3)
+  push_extra(args, extra, 3, positional=["angle"])
   {
     node: {
       func: FElem(@library.rotate_elem()),
@@ -9263,7 +9297,9 @@ pub fn Rect::Rect(
   args_loc~ : ArgsLoc,
 ) -> Rect {
   let args : Array[ArgNode] = []
-  if body is Some(v) {
+  if extra_arg(extra, "body") is Some(v) {
+    args.push({ name: None, value: v, param: 8, })
+  } else if body is Some(v) {
     args.push({ name: None, value: Value::content(v), param: 7, })
   }
   if width is Some(v) {
@@ -9287,7 +9323,7 @@ pub fn Rect::Rect(
   if outset is Some(v) {
     args.push({ name: Some("outset"), value: ToValue::to_value(v), param: 6, })
   }
-  push_extra(args, extra, 8)
+  push_extra(args, extra, 8, positional=["body"])
   {
     content: labelled_call(
       {
@@ -9460,7 +9496,9 @@ pub fn Square::Square(
   args_loc~ : ArgsLoc,
 ) -> Square {
   let args : Array[ArgNode] = []
-  if body is Some(v) {
+  if extra_arg(extra, "body") is Some(v) {
+    args.push({ name: None, value: v, param: 9, })
+  } else if body is Some(v) {
     args.push({ name: None, value: Value::content(v), param: 8, })
   }
   if size is Some(v) {
@@ -9487,7 +9525,7 @@ pub fn Square::Square(
   if outset is Some(v) {
     args.push({ name: Some("outset"), value: ToValue::to_value(v), param: 7, })
   }
-  push_extra(args, extra, 9)
+  push_extra(args, extra, 9, positional=["body"])
   {
     content: labelled_call(
       {
@@ -9667,7 +9705,9 @@ pub fn Ellipse::Ellipse(
   args_loc~ : ArgsLoc,
 ) -> Ellipse {
   let args : Array[ArgNode] = []
-  if body is Some(v) {
+  if extra_arg(extra, "body") is Some(v) {
+    args.push({ name: None, value: v, param: 7, })
+  } else if body is Some(v) {
     args.push({ name: None, value: Value::content(v), param: 6, })
   }
   if width is Some(v) {
@@ -9688,7 +9728,7 @@ pub fn Ellipse::Ellipse(
   if outset is Some(v) {
     args.push({ name: Some("outset"), value: ToValue::to_value(v), param: 5, })
   }
-  push_extra(args, extra, 7)
+  push_extra(args, extra, 7, positional=["body"])
   {
     content: labelled_call(
       {
@@ -9853,7 +9893,9 @@ pub fn Circle::Circle(
   args_loc~ : ArgsLoc,
 ) -> Circle {
   let args : Array[ArgNode] = []
-  if body is Some(v) {
+  if extra_arg(extra, "body") is Some(v) {
+    args.push({ name: None, value: v, param: 8, })
+  } else if body is Some(v) {
     args.push({ name: None, value: Value::content(v), param: 7, })
   }
   if radius is Some(v) {
@@ -9877,7 +9919,7 @@ pub fn Circle::Circle(
   if outset is Some(v) {
     args.push({ name: Some("outset"), value: ToValue::to_value(v), param: 6, })
   }
-  push_extra(args, extra, 8)
+  push_extra(args, extra, 8, positional=["body"])
   {
     content: labelled_call(
       {

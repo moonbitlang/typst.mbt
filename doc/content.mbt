@@ -290,17 +290,36 @@ pub impl IntoContent for Space with fn into_content(self) {
 }
 
 ///|
-/// Append the `extra` named arguments of a generated constructor (at
-/// parameter index `param`): they follow the typed arguments, so that a
-/// later argument wins, as in Typst.
+/// Append the `extra` arguments of a generated constructor (at parameter
+/// index `param`) as named arguments: they follow the typed arguments, so
+/// that a later argument wins, as in Typst. Entries that name one of the
+/// `positional` fields are not appended: the constructor passes them in
+/// the field's positional place (`extra_arg`).
 fn push_extra(
   args : Array[ArgNode],
   extra : Array[(String, Value)],
   param : Int,
+  positional? : Array[String] = [],
 ) -> Unit {
   for pair in extra {
-    args.push({ name: Some(pair.0), value: pair.1, param, })
+    if !positional.contains(pair.0) {
+      args.push({ name: Some(pair.0), value: pair.1, param, })
+    }
   }
+}
+
+///|
+/// The `extra` entry for the positional field `field`, if any: the function
+/// takes that field positionally only, so the entry replaces the typed
+/// argument in its positional place. The last entry wins.
+fn extra_arg(extra : Array[(String, Value)], field : String) -> Value? {
+  let mut found : Value? = Option::None
+  for pair in extra {
+    if pair.0 == field {
+      found = Some(pair.1)
+    }
+  }
+  found
 }
 
 ///|
