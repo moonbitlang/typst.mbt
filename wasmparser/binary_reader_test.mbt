@@ -139,7 +139,7 @@ test "read_operator" {
   assert_eq(r.read_operator(), I32Const(value=-1))
   match r.read_operator() {
     BrTable(targets~) => {
-      assert_eq(targets.targets().to_array(), [1, 2])
+      assert_eq(targets.targets().to_owned(), [1, 2])
       assert_eq(targets.default(), 0)
     }
     _ => fail("expected br_table")

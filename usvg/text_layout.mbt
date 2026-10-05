@@ -724,7 +724,7 @@ fn resolve_clusters_positions_path(
       let shift_y = (dy - baseline_shift).to_double()
       cluster.transform = cluster.transform.pre_translate(
         0.0,
-        shift_y.to_float(),
+        Float::from_double(shift_y),
       )
     }
     if text.rotate.get(cp) is Some(angle) {
@@ -879,9 +879,9 @@ fn collect_normals(
         let angle = libm_atan2(d.y, d.x) * (180.0 / k_pi) - 90.0
         normals.push(
           Some({
-            x: pos.x.to_float(),
-            y: pos.y.to_float(),
-            angle: angle.to_float(),
+            x: Float::from_double(pos.x),
+            y: Float::from_double(pos.y),
+            angle: Float::from_double(angle),
           }),
         )
         if normals.length() == offsets.length() {
@@ -890,8 +890,8 @@ fn collect_normals(
       }
     }
     length += curve_len
-    prev_x = curve.p3.x.to_float()
-    prev_y = curve.p3.y.to_float()
+    prev_x = Float::from_double(curve.p3.x)
+    prev_y = Float::from_double(curve.p3.y)
   }
 
   // If path ended and we still have unresolved normals - set them to `None`.
@@ -946,7 +946,7 @@ fn process_chunk(
   // Glyph splitting assigns distinct glyphs to the same index in the original text, we need to
   // store previously used indices to make sure we do not re-use the same index while overwriting
   // span glyphs.
-  let positions : Set[Int] = Set::new()
+  let positions : Set[Int] = Set([])
   let mut glyphs : Array[Glyph] = []
   for span in chunk.spans {
     let font = match fonts_cache.get(span.font) {

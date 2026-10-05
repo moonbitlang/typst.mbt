@@ -61,7 +61,7 @@ fn pretend_parse_data_url(input : Bytes) -> Bytes? {
   while end > i && is_ascii_ws_or_ctrl(input[end - 1]) {
     end -= 1
   }
-  Some(input[i:end].to_bytes())
+  Some(input[i:end].to_owned())
 }
 
 ///|
@@ -69,7 +69,7 @@ fn find_comma_before_fragment(after_colon : Bytes) -> (Bytes, Bytes)? {
   for i in 0..<after_colon.length() {
     let byte = after_colon[i]
     if byte == b',' {
-      return Some((after_colon[0:i].to_bytes(), after_colon[i + 1:].to_bytes()))
+      return Some((after_colon[0:i].to_owned(), after_colon[i + 1:].to_owned()))
     }
     if byte == b'#' {
       break
@@ -91,11 +91,11 @@ fn parse_data_url_header(
   while e > s && from_colon_to_comma[e - 1] is (b' ' | b'\t' | b'\n' | b'\r') {
     e -= 1
   }
-  let trimmed = from_colon_to_comma[s:e].to_bytes()
+  let trimmed = from_colon_to_comma[s:e].to_owned()
   let without_base64_suffix = remove_base64_suffix(trimmed)
   let base64 = without_base64_suffix is Some(_)
   let mime_type = without_base64_suffix.unwrap_or(trimmed)
-  let string = StringBuilder::new()
+  let string = StringBuilder()
   if mime_type.length() > 0 && mime_type[0] == b';' {
     string.write_string("text/plain")
   }
@@ -159,7 +159,7 @@ fn remove_base64_suffix(s : Bytes) -> Bytes? {
   if b != Some(b';') {
     return None
   }
-  Some(s[0:i].to_bytes())
+  Some(s[0:i].to_owned())
 }
 
 ///|
@@ -239,7 +239,7 @@ fn parse_mime(s : String) -> (String, String)? {
 ///|
 /// `DataUrl::decode_to_vec`; `None` for invalid base64.
 fn DataUrl::decode_to_vec(self : DataUrl) -> Bytes? {
-  let body = @buffer.new()
+  let body = Buffer()
   if self.base64 {
     let decoder = ForgivingBase64Decoder::new(body)
     let mut ok = true

@@ -51,7 +51,7 @@ fn markup_exprs(p : Parser, at_start : Bool, stop_set : SyntaxSet) -> Unit {
     return
   }
   let mut at_start = at_start || p.had_newline()
-  let nesting = Ref::new(0)
+  let nesting = @ref.Ref(0)
   // Keep going if we're at a nested right-bracket regardless of the stop set.
   while !p.at_set(stop_set) || (nesting.val > 0 && p.at(RightBracket)) {
     markup_expr(p, at_start, nesting)
@@ -1155,7 +1155,7 @@ fn params(p : Parser) -> Unit {
   p.with_nl_mode(Continue, () => {
     p.assert_at(LeftParen)
     let seen = @hashset.HashSet([])
-    let sink = Ref::new(false)
+    let sink = @ref.Ref(false)
     while !p.current().is_terminator() {
       if !p.at_set(param_set) {
         p.unexpected()
@@ -1227,9 +1227,9 @@ fn destructuring_or_parenthesized(
   reassignment : Bool,
   seen : @hashset.HashSet[String],
 ) -> Unit {
-  let sink = Ref::new(false)
+  let sink = @ref.Ref(false)
   let mut count = 0
-  let maybe_just_parens = Ref::new(true)
+  let maybe_just_parens = @ref.Ref(true)
   let m = p.marker()
   p.with_nl_mode(Continue, () => {
     p.assert_at(LeftParen)
@@ -1594,8 +1594,8 @@ fn Parser::flush_trivia(self : Parser) -> Unit {
 fn Parser::wrap(self : Parser, from : Int, kind : SyntaxKind) -> Unit {
   let to = self.before_trivia()
   let from = if from < to { from } else { to }
-  let children = self.nodes[from:to].to_array()
-  let rest = self.nodes[to:].to_array()
+  let children = self.nodes[from:to].to_owned()
+  let rest = self.nodes[to:].to_owned()
   self.nodes.truncate(from)
   self.nodes.push(SyntaxNode::inner_owned(kind, children))
   self.nodes.append(rest)
@@ -1610,7 +1610,7 @@ fn Parser::wrap_error(self : Parser, from : Int, message : String) -> Unit {
   for i in from..<to {
     buf.write_string(self.nodes[i].full_text())
   }
-  let rest = self.nodes[to:].to_array()
+  let rest = self.nodes[to:].to_owned()
   self.nodes.truncate(from)
   self.nodes.push(SyntaxNode::error(message, buf.to_string()))
   self.nodes.append(rest)
@@ -1873,7 +1873,7 @@ fn Parser::trim_errors(self : Parser) -> Unit {
     start -= 1
   }
   if start < end {
-    let rest = self.nodes[end:].to_array()
+    let rest = self.nodes[end:].to_owned()
     self.nodes.truncate(start)
     self.nodes.append(rest)
   }

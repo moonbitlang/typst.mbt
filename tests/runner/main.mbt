@@ -12,7 +12,7 @@ let golden_dir = "tests/golden"
 ///|
 /// Whether to print each test's name before running it (to find tests that
 /// crash the runner).
-let trace_tests : Ref[Bool] = Ref::new(false)
+let trace_tests : Ref[Bool] = Ref(false)
 
 ///|
 fn main {
@@ -79,7 +79,7 @@ fn main {
           @skia.trace_hook.val = Some(line => println(line))
         }
         if a.has_prefix("--raw=") {
-          render_raw_dir.val = Some(a.to_string().substring(start=6))
+          render_raw_dir.val = Some(a.to_string()[6:].to_owned())
         }
       }
       run_stage(
@@ -186,7 +186,7 @@ fn main {
     "resvg" => {
       for a in args {
         if a.has_prefix("--raw=") {
-          resvg_raw_dir.val = Some(a.to_string().substring(start=6))
+          resvg_raw_dir.val = Some(a.to_string()[6:].to_owned())
         }
       }
       run_resvg_stage(filter, verbose)
@@ -387,9 +387,9 @@ fn split_golden(text : String) -> Map[String, String] {
         out[n] = buf.to_string()
       }
       buf.reset()
-      name = Some(line.to_string().unsafe_substring(start=4, end=line.length()))
+      name = Some(line.to_owned().unsafe_substring(start=4, end=line.length()))
     } else {
-      buf.write_string(line.to_string())
+      buf.write_string(line.to_owned())
       buf.write_char('\n')
     }
   }
@@ -403,8 +403,8 @@ fn split_golden(text : String) -> Map[String, String] {
 
 ///|
 fn first_diff(expected : String, actual : String) -> String {
-  let e = expected.split("\n").map(s => s.to_string()).collect()
-  let a = actual.split("\n").map(s => s.to_string()).collect()
+  let e = expected.split("\n").map(s => s.to_owned()).collect()
+  let a = actual.split("\n").map(s => s.to_owned()).collect()
   let n = if e.length() < a.length() { e.length() } else { a.length() }
   for i in 0..<n {
     if e[i] != a[i] {
@@ -432,7 +432,7 @@ fn read(path : String) -> String {
 fn typ_files(dir : String) -> Array[String] {
   let out = []
   fn walk(dir : String) {
-    let entries = (@fs.read_dir(dir) catch { _ => [][:] }).to_array()
+    let entries = (@fs.read_dir(dir) catch { _ => [][:] }).to_owned()
     entries.sort()
     for entry in entries {
       let path = dir + "/" + entry
@@ -451,11 +451,11 @@ fn typ_files(dir : String) -> Array[String] {
 }
 
 ///|
-let dump_actual : Ref[Bool] = Ref::new(false)
+let dump_actual : Ref[Bool] = Ref(false)
 
 ///|
 fn ensure_parent_dir(path : String) -> Unit {
-  let parts = path.split("/").map(p => p.to_string()).collect()
+  let parts = path.split("/").map(p => p.to_owned()).collect()
   let mut dir = ""
   for i in 0..<(parts.length() - 1) {
     dir = if dir.is_empty() { parts[i] } else { dir + "/" + parts[i] }

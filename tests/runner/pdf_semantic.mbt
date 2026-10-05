@@ -46,7 +46,7 @@ fn pdf_semantic_report(rel : String, tc : TestCase) -> String {
 
 ///|
 /// Where the oracle saved upstream's PDFs (`--upstream-pdfs=<dir>`).
-let upstream_pdf_dir : Ref[String?] = Ref::new(None)
+let upstream_pdf_dir : Ref[String?] = Ref(None)
 
 ///|
 /// Run the MoonBit extractor on upstream's PDF of a test case and keep the
@@ -67,7 +67,7 @@ fn pdf_extract_check_report(rel : String, tc : TestCase) -> String {
   let out = StringBuilder()
   for line in golden.split("\n") {
     if line.has_prefix("warning ") || line.has_prefix("  hint ") {
-      out.write_string(line.to_string())
+      out.write_string(line.to_owned())
       out.write_char('\n')
     }
   }
@@ -96,7 +96,7 @@ let pdf_golden_cache : Map[String, Map[String, String]] = {}
 
 ///|
 /// Where to save the exported PDFs (`--save-pdf=<dir>`).
-let pdf_save_dir : Ref[String?] = Ref::new(None)
+let pdf_save_dir : Ref[String?] = Ref(None)
 
 ///|
 /// Compile a test case to a paged document like the oracle (setting the
@@ -186,7 +186,7 @@ fn pdf_semantic_matches(expected : String, actual : String) -> Bool {
     return false
   }
   for i in 0..<e.length() {
-    if e[i] != a[i] && !line_matches(e[i].to_string(), a[i].to_string()) {
+    if e[i] != a[i] && !line_matches(e[i].to_owned(), a[i].to_owned()) {
       return false
     }
   }
@@ -609,7 +609,7 @@ fn xmp_value(xml : String, key : String) -> String? {
   if xml.find(attr) is Some(at) {
     let rest = xml.view(start_offset=at + attr.length())
     return match rest.find("\"") {
-      Some(end) => Some(xml_unescape(rest.view(end_offset=end).to_string()))
+      Some(end) => Some(xml_unescape(rest.view(end_offset=end).to_owned()))
       None => None
     }
   }
@@ -629,9 +629,9 @@ fn xmp_value(xml : String, key : String) -> String? {
     guard rest.find(">") is Some(gt) else { return None }
     let inner = rest.view(start_offset=gt + 1)
     guard inner.find("</rdf:li>") is Some(end) else { return None }
-    return Some(xml_unescape(inner.view(end_offset=end).to_string()))
+    return Some(xml_unescape(inner.view(end_offset=end).to_owned()))
   }
-  Some(xml_unescape(body.trim().to_string()))
+  Some(xml_unescape(body.trim().to_owned()))
 }
 
 ///|
@@ -657,7 +657,7 @@ fn pdf_extract_impl(bytes : Bytes) -> String raise {
   let doc = @pdflite.pdf_read_document_from_bytes(bytes)
   let out = StringBuilder()
   let version = if bytes.length() >= 8 {
-    latin1(bytes[5:8].to_bytes())
+    latin1(bytes[5:8].to_owned())
   } else {
     ""
   }
@@ -756,7 +756,7 @@ fn pdf_extract_impl(bytes : Bytes) -> String raise {
           PdfArray(items) => items
           c => [c]
         }
-        let data = @buffer.new()
+        let data = Buffer()
         for p in parts {
           if r.stream_data(p) is Some(d) {
             data.write_bytes(d)

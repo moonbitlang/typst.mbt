@@ -72,7 +72,7 @@ fn impl_stroke_construct(args : Args) -> Stroke raise SourceError {
 
 ///|
 pub fn Stroke::repr(self : Stroke) -> String {
-  let r = StringBuilder::new()
+  let r = StringBuilder()
   let { paint, thickness, cap, join, dash, miter_limit, } = self
   if cap.is_auto() && join.is_auto() && dash.is_auto() && miter_limit.is_auto() {
     match (paint, thickness) {
@@ -363,7 +363,7 @@ pub(all) struct DashPattern {
 
 ///|
 pub fn DashPattern::repr(self : DashPattern) -> String {
-  let r = StringBuilder::new()
+  let r = StringBuilder()
   r.write_string("(array: (")
   for i, elem in self.array {
     if i != 0 {

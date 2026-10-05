@@ -809,7 +809,7 @@ fn @xmlwriter.XmlWriter::write_color(
   c : Color,
 ) -> Unit {
   let chars = "0123456789abcdef"
-  let buf = StringBuilder::new()
+  let buf = StringBuilder()
   buf.write_char('#')
   for n in [c.red, c.green, c.blue] {
     buf.write_char(chars.unsafe_get(n >> 4).unsafe_to_char())
@@ -845,7 +845,7 @@ fn @xmlwriter.XmlWriter::write_transform(
   opt : WriteOptions,
 ) -> Unit {
   if ts != Transform::default() {
-    let buf = StringBuilder::new()
+    let buf = StringBuilder()
     buf.write_string("matrix(")
     write_num(ts.sx, buf, opt.transforms_precision)
     buf.write_char(' ')
@@ -1096,7 +1096,7 @@ fn write_path(
     xml.write_func_iri(AId::ClipPath, id, opt)
   }
   xml.write_transform(AId::Transform, path_transform, opt)
-  let buf = StringBuilder::new()
+  let buf = StringBuilder()
   let prec = opt.coordinates_precision
   let iter = path.data.segments()
   while iter.next() is Some(seg) {

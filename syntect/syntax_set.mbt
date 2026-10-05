@@ -303,7 +303,7 @@ pub fn SyntaxSetBuilder::build(self : SyntaxSetBuilder) -> SyntaxSet {
   }
   let mut found_more_backref_includes = true
   for syntax_index in 0..<syntaxes.length() {
-    let no_prototype : Set[ContextId] = Set::new()
+    let no_prototype : Set[ContextId] = Set([])
     let prototype = all_context_ids[syntax_index].get("prototype")
     if prototype is Some(prototype_id) {
       recursively_mark_no_prototype(

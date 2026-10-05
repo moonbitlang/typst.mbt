@@ -103,7 +103,7 @@ pub fn ParseState::parse_line_indexed(
   if self.stack.is_empty() {
     raise MissingMainContext
   }
-  let match_start = Ref::new(0)
+  let match_start = Ref(0)
   let res = []
   if self.first_line {
     let cur_level = self.stack[self.stack.length() - 1]
@@ -114,9 +114,9 @@ pub fn ParseState::parse_line_indexed(
     self.first_line = false
   }
   let regions = Region::new()
-  let search_cache : Map[Int, Region?] = Map::new(capacity=128)
+  let search_cache : Map[Int, Region?] = Map([], capacity=128)
   // Used for detecting loops with push/pop, see long comment above.
-  let non_consuming_push_at = Ref::new((0, 0))
+  let non_consuming_push_at = Ref((0, 0))
   let text = SearchText::new(line)
   while self.parse_next_token(
           text, syntax_set, match_start, search_cache, regions, non_consuming_push_at,
@@ -229,7 +229,7 @@ fn ParseState::find_best_match(
     context_chain.push((false, ctx, None))
   }
   context_chain.push((false, cur_level.context, cur_level.captures))
-  let mut min_start = @int.max_value
+  let mut min_start = @int.MAX_VALUE
   let mut best_match : RegexMatch? = None
   let mut pop_would_loop = false
   for entry in context_chain {
@@ -369,7 +369,7 @@ fn ParseState::exec_pattern(
           )
         }
         map.push(
-          ((cap_end, @int.min_value), ScopeStackOp::Pop(scopes.length())),
+          ((cap_end, @int.MIN_VALUE), ScopeStackOp::Pop(scopes.length())),
         )
       }
     }

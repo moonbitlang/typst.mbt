@@ -166,7 +166,7 @@ fn Composer::page_contents(
   let backlog = []
   let mut skip = true
   let heights = [column_height]
-  heights.append(regions.backlog.to_array())
+  heights.append(regions.backlog.to_owned())
   for h in heights {
     for _ in 0..<self.config.columns.count {
       if skip {
@@ -387,7 +387,7 @@ fn Composer::column_contents(
   for note in footnotes {
     self.footnote(
       note,
-      Ref::new(regions),
+      Ref(regions),
       @library.Abs::zero(),
       Migration::forbid_(),
     )
@@ -554,7 +554,7 @@ fn Composer::footnotes(
     return
   }
   let mut relayout = false
-  let regions = Ref::new(regions)
+  let regions = Ref(regions)
   let migration = { allowed: migration.allowed, }
 
   // The first footnote's origin frame should be migratable if the region may
@@ -654,7 +654,7 @@ fn Composer::footnote(
 
   // Extract the first frame.
   let first = frames[0]
-  let rest = frames[1:].to_array()
+  let rest = frames[1:].to_owned()
   let note_need = self.config.footnote.gap + first.height()
 
   // If the first frame is empty, then none of its content fit. If possible,
@@ -757,7 +757,7 @@ fn Composer::footnote_spill(
 
   // Save the spill.
   if frames.length() > 1 {
-    self.footnote_spill = Some(frames[1:].to_array())
+    self.footnote_spill = Some(frames[1:].to_owned())
   }
 }
 

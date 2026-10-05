@@ -334,7 +334,7 @@ fn breakable_pod(
   let (first, full, backlog, last) = match height {
     // If the block is automatically sized, we can just inherit the regions.
     Auto | Fr(_) =>
-      (regions.size.y, regions.full, regions.backlog.to_array(), regions.last)
+      (regions.size.y, regions.full, regions.backlog.to_owned(), regions.last)
     Rel(rel) => {
       // Resolve the sizing to a concrete size.
       let resolved = rel.resolve(styles).relative_to(base.y)
@@ -405,7 +405,7 @@ fn distribute_height(
   // No backlog is generated.
   if remaining.to_raw() <= 0.0 {
     buf.push(remaining)
-    return (buf[0], buf[1:].to_array())
+    return (buf[0], buf[1:].to_owned())
   }
   while true {
     // This clamp is safe (min <= max), as 'remaining' won't be negative due
@@ -432,5 +432,5 @@ fn distribute_height(
 
   // Distribute the heights to the first region and the backlog. There is no
   // last region, since the height is fixed.
-  (buf[0], buf[1:].to_array())
+  (buf[0], buf[1:].to_owned())
 }

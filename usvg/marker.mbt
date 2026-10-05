@@ -521,7 +521,7 @@ fn convert_orientation(node : SvgNode) -> MarkerOrientation {
     _ => {
       let angle : @svgtypes.Angle? = node.attribute(AId::Orient)
       match angle {
-        Some(angle) => Angle(angle.to_degrees().to_float())
+        Some(angle) => Angle(Float::from_double(angle.to_degrees()))
         None => Angle(0.0)
       }
     }

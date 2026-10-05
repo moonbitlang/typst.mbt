@@ -34,7 +34,7 @@ pub struct FormatOptions {
 /// The default options of a format element: the defaults of its settable
 /// fields (upstream `E::Options::default()`).
 pub fn FormatOptions::default_for(elem : Element) -> FormatOptions {
-  let fields : Map[Int, SpannedValue[Value]] = Map::new()
+  let fields : Map[Int, SpannedValue[Value]] = Map([])
   for field in elem.fields() {
     if field.kind is (Settable | Ghost) {
       fields[field.id] = SpannedValue::detached(

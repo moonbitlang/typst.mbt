@@ -146,7 +146,7 @@ fn eval_for_loop(
         .collect(),
       )
     (Normal(_) | Placeholder(_), Str(str)) =>
-      run(@unicode.graphemes(str).map(g => @library.Value::Str(g.to_string())))
+      run(@unicode.graphemes(str).map(g => @library.Value::Str(g.to_owned())))
     (Normal(_) | Placeholder(_), Bytes(bytes)) =>
       run(bytes.0.iter().map(b => @library.Value::Int(b.to_int64())).collect())
     (Destructuring(_), Str(_) | Bytes(_)) =>

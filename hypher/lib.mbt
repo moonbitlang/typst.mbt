@@ -409,5 +409,5 @@ fn decode_base64(s : String) -> Bytes {
       len += 1
     }
   }
-  Bytes::from_fixedarray(out, len~)
+  Bytes::from_array(out[:len])
 }

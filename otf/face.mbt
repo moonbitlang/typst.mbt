@@ -1332,7 +1332,7 @@ pub fn Face::set_normalized_coordinates(
 ) -> Unit {
   for i, c in coords {
     if i < self.coordinates.length() {
-      self.coordinates[i] = NormalizedCoordinate(c.to_int16())
+      self.coordinates[i] = NormalizedCoordinate(Int16::from_int(c))
     }
   }
 }

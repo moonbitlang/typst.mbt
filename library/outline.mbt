@@ -136,7 +136,7 @@ fn OutlineElem::realize_iter(
   )
   let depth = match self.depth(styles) {
     Some(depth) => depth
-    None => NonZeroUSize(@int64.max_value)
+    None => NonZeroUSize(@int64.MAX_VALUE)
   }
   let out = []
   for elem in elems {

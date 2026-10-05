@@ -251,7 +251,7 @@ fn Canvas::accumulate(self : Canvas) -> Bytes {
     let v : Float = if v < 1.0 { v } else { 1.0 }
     out.unsafe_set(i, f32_to_i32_unchecked((255.0 : Float) * v).to_byte())
   }
-  Bytes::from_fixedarray(out)
+  Bytes::from_array(out)
 }
 
 ///|

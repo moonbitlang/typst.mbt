@@ -577,7 +577,7 @@ fn ModuleParser::parse_buffered(
       End(_) => break
       CustomSection(reader) =>
         if !self.engine.config().get_ignore_custom_sections() {
-          custom_sections.push((reader.name(), reader.data().to_bytes()))
+          custom_sections.push((reader.name(), reader.data().to_owned()))
         }
       unexpected => self.process_invalid_payload(unexpected)
     }
@@ -620,7 +620,7 @@ fn ModuleParser::parse_buffered(
       }
       CustomSection(reader) =>
         if !self.engine.config().get_ignore_custom_sections() {
-          custom_sections.push((reader.name(), reader.data().to_bytes()))
+          custom_sections.push((reader.name(), reader.data().to_owned()))
         }
       invalid => self.process_invalid_payload(invalid)
     }

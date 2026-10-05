@@ -225,7 +225,7 @@ fn Highlighter::update_single_cache_for_push(
       continue
     }
     let single_score = scope.len().to_double() *
-      2.0.pow((atom_len_bits * (path.length() - 1)).to_double())
+      @math.pow(2.0, (atom_len_bits * (path.length() - 1)).to_double())
     new_style = new_style.apply(modif, MatchPower(single_score))
   }
   new_style

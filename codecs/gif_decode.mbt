@@ -275,7 +275,7 @@ pub fn decode_gif_image(
     color: Rgba8,
     icc: first.icc,
   }
-  (info, Bytes::from_fixedarray(buf))
+  (info, Bytes::from_array(buf))
 }
 
 ///|
@@ -341,7 +341,7 @@ fn gif_decode_pixels(
       }
     }
   }
-  Bytes::from_fixedarray(out)
+  Bytes::from_array(out)
 }
 
 ///|

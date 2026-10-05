@@ -134,7 +134,7 @@ fn impl_bytes_slice(
   let end = if end > start { end } else { start }
   // We could hold a view into the original bytes here instead of making a
   // copy, but it's unclear when that's worth it.
-  BytesValue(self_.0[start:end].to_bytes())
+  BytesValue(self_.0[start:end].to_owned())
 }
 
 ///|
@@ -156,7 +156,7 @@ pub fn BytesValue::concat(self : BytesValue, other : BytesValue) -> BytesValue {
   } else if self.is_empty() {
     other
   } else {
-    let buf = @buffer.new(size_hint=self.len() + other.len())
+    let buf = Buffer(size_hint=self.len() + other.len())
     buf.write_bytes(self.0)
     buf.write_bytes(other.0)
     BytesValue(buf.to_bytes())
@@ -190,7 +190,7 @@ pub impl FromValue for ToBytes with fn from_value(v) {
       ToBytes(BytesValue::from_string(s))
     }
     Array(array) => {
-      let buf = @buffer.new(size_hint=array.items.length())
+      let buf = Buffer(size_hint=array.items.length())
       for item in array.items {
         match item {
           Int(byte) if byte >= 0L && byte <= 255L =>

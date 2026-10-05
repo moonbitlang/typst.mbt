@@ -248,7 +248,7 @@ pub fn substitute_backrefs_in_regex(
 }
 
 ///|
-let match_pattern_counter : Ref[Int] = Ref::new(0)
+let match_pattern_counter : Ref[Int] = Ref(0)
 
 ///|
 pub fn MatchPattern::new(

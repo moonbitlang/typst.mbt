@@ -216,7 +216,7 @@ priv struct PagedIntrospectorBuilder {
 fn PagedIntrospectorBuilder::new() -> PagedIntrospectorBuilder {
   {
     elements: @library.ElementIntrospectorBuilder::new(),
-    frame_link_targets: @hashset.HashSet::new(),
+    frame_link_targets: @hashset.HashSet([]),
   }
 }
 

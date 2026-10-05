@@ -46,7 +46,7 @@ fn resolve_fill(
       context_element: None,
     })
   }
-  let sub_opacity = Ref::new(Opacity::one())
+  let sub_opacity = Ref(Opacity::one())
   let (paint, context_element) = if node
     .ancestors()
     .find_first(n => n.has_attribute(AId::Fill))
@@ -90,7 +90,7 @@ fn resolve_stroke(
     // A `clipPath` child cannot be stroked.
     return None
   }
-  let sub_opacity = Ref::new(Opacity::one())
+  let sub_opacity = Ref(Opacity::one())
   let (paint, context_element) = if node
     .ancestors()
     .find_first(n => n.has_attribute(AId::Stroke))

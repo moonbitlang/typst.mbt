@@ -210,7 +210,7 @@ fn Node::deep_clone(self : Node) -> Node {
 ///|
 /// Create a new leaf node.
 pub fn SyntaxNode::leaf(kind : SyntaxKind, text : StringView) -> SyntaxNode {
-  let text = text.to_string()
+  let text = text.to_owned()
   { data: Leaf(text, kind, utf8_len(text)), span: Span::detached(), }
 }
 
@@ -221,7 +221,7 @@ pub fn SyntaxNode::inner(
   kind : SyntaxKind,
   children : ArrayView[SyntaxNode],
 ) -> SyntaxNode {
-  SyntaxNode::inner_owned(kind, children.to_array())
+  SyntaxNode::inner_owned(kind, children.to_owned())
 }
 
 ///|
@@ -236,7 +236,7 @@ fn SyntaxNode::inner_owned(
 ///|
 /// Create a new error node with a message for the given text.
 pub fn SyntaxNode::error(message : String, text : StringView) -> SyntaxNode {
-  let text = text.to_string()
+  let text = text.to_owned()
   {
     data: Error({ text, len: utf8_len(text), message, hints: [], }),
     span: Span::detached(),
@@ -742,8 +742,8 @@ fn SyntaxNode::replace_children(
       ),
     )
   }
-  let repl = repl.to_array()
-  let tail = inner.children[end:].to_array()
+  let repl = repl.to_owned()
+  let tail = inner.children[end:].to_owned()
   inner.children.truncate(start)
   inner.children.append(repl)
   inner.children.append(tail)

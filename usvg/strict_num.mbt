@@ -261,5 +261,5 @@ fn to_radians_f32(x : Float) -> Float {
 /// Rust's `f32 % f32` (`fmodf`; exact, so computing it in `f64` is
 /// equivalent).
 fn rem_f32(a : Float, b : Float) -> Float {
-  (a.to_double() % b.to_double()).to_float()
+  Float::from_double(a.to_double() % b.to_double())
 }

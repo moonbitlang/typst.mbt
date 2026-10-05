@@ -75,7 +75,7 @@ fn pdf_replay_canonicalize(dump : String) -> String {
   let out = StringBuilder()
   let mut export_error = false
   for line in dump.split("\n") {
-    let line = line.to_string()
+    let line = line.to_owned()
     if line == "export-error" {
       export_error = true
     }

@@ -226,7 +226,7 @@ pub fn[T] bail_hinted(
   message : String,
   hints : ArrayView[String],
 ) -> T raise HintedError {
-  raise HintedError({ message, hints: hints.to_array(), })
+  raise HintedError({ message, hints: hints.to_owned(), })
 }
 
 ///|

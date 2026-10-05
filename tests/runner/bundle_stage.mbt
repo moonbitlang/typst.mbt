@@ -7,7 +7,7 @@
 /// With `--stub-binary`, PDF and PNG documents are "exported" to empty files
 /// and compared without their sizes and hashes, which checks everything but
 /// the PDF and PNG exporters themselves.
-let bundle_stub_binary : Ref[Bool] = Ref::new(false)
+let bundle_stub_binary : Ref[Bool] = Ref(false)
 
 ///|
 /// The export options of the upstream test runner.
@@ -141,10 +141,10 @@ fn canonicalize_bundle(report : String) -> String {
     let kind = kinds.search_by(k => line.find(" (\{k}, ") is Some(_))
     if line.has_prefix("--- ") && kind is Some(k) && line.has_suffix(")") {
       let at = line.find(" (\{kinds[k]}, ").unwrap()
-      out.write_string(line[:at].to_string())
+      out.write_string(line[:at].to_owned())
       out.write_string(" (\{kinds[k]})")
     } else {
-      out.write_string(line.to_string())
+      out.write_string(line.to_owned())
     }
     out.write_char('\n')
   }

@@ -260,7 +260,7 @@ fn parse_reference(
   with_escape : Bool,
 ) -> ContextReference raise ParseSyntaxError {
   if y.as_str() is Some(s) {
-    let parts = s.split("#").map(p => p.to_string()).collect()
+    let parts = s.split("#").map(p => p.to_owned()).collect()
     let sub_context = if parts.length() > 1 { Some(parts[1]) } else { None }
     if parts[0].has_prefix("scope:") {
       let scope = state.scope_repo.build(
@@ -290,7 +290,7 @@ fn file_stem(path : String) -> String? {
   let components = path
     .split("/")
     .filter(c => !c.is_empty() && c != ".")
-    .map(c => c.to_string())
+    .map(c => c.to_owned())
     .collect()
   guard components.last() is Some(name) else { return None }
   if name == ".." {

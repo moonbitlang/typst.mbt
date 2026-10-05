@@ -33,7 +33,7 @@ impl World for WbWorld with fn today(_, _) {
 }
 
 ///|
-let wb_library_cell : Ref[Library?] = Ref::new(None)
+let wb_library_cell : Ref[Library?] = Ref(None)
 
 ///|
 fn wb_library() -> Library {

@@ -1006,7 +1006,7 @@ pub fn ProcessColor::to_hex(self : ProcessColor) -> String {
 ///|
 fn hex2(x : Int) -> String {
   let digits = "0123456789abcdef"
-  let s = StringBuilder::new()
+  let s = StringBuilder()
   s.write_char(digits[x / 16].unsafe_to_char())
   s.write_char(digits[x % 16].unsafe_to_char())
   s.to_string()

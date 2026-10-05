@@ -542,7 +542,7 @@ fn gradient_repr_tail(
 
 ///|
 pub fn LinearGradient::repr(self : LinearGradient) -> String {
-  let r = StringBuilder::new()
+  let r = StringBuilder()
   r.write_string("gradient.linear(")
   let pi = @math.PI
   let angle = f64_rem_euclid(self.angle.to_rad(), 2.0 * pi)
@@ -566,7 +566,7 @@ pub fn LinearGradient::repr(self : LinearGradient) -> String {
 
 ///|
 pub fn RadialGradient::repr(self : RadialGradient) -> String {
-  let r = StringBuilder::new()
+  let r = StringBuilder()
   r.write_string("gradient.radial(")
   if self.center.x != Ratio::new(0.5) || self.center.y != Ratio::new(0.5) {
     r.write_string("center: (")
@@ -598,7 +598,7 @@ pub fn RadialGradient::repr(self : RadialGradient) -> String {
 
 ///|
 pub fn ConicGradient::repr(self : ConicGradient) -> String {
-  let r = StringBuilder::new()
+  let r = StringBuilder()
   r.write_string("gradient.conic(")
   let angle = f64_rem_euclid(self.angle.to_rad(), 2.0 * @math.PI)
   if angle.abs() > f64_epsilon {

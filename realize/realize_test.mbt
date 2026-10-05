@@ -55,7 +55,7 @@ fn test_engine() -> @library.Engine {
 /// number of style links).
 fn run(
   content : @library.Content,
-  kind? : @library.RealizationKind = Fragment(kind=Ref::new(Block)),
+  kind? : @library.RealizationKind = Fragment(kind=Ref(Block)),
 ) -> String raise @library.SourceError {
   let styles = @library.StyleChain::new(@library.Styles::new())
   let pairs = @realize.realize(
@@ -144,7 +144,7 @@ test "spaces collapse at the edges and between each other" {
 
 ///|
 test "fully inline fragment" {
-  let kind = Ref::new(@library.FragmentKind::Block)
+  let kind = Ref(@library.FragmentKind::Block)
   let content = seq([text("a"), space(), text("b")])
   inspect(
     run(content, kind=Fragment(kind~)),
@@ -244,7 +244,7 @@ test "show-set rule on an element" {
   let content = strong.styled(Recipe(recipe))
   let styles = @library.StyleChain::new(@library.Styles::new())
   let pairs = @realize.realize(
-    Fragment(kind=Ref::new(Block)),
+    Fragment(kind=Ref(Block)),
     test_engine(),
     @library.Locator::root().split(),
     content,

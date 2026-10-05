@@ -97,12 +97,12 @@ fn run_usvg_stage(filter : String?, verbose : Bool) -> Unit {
   let mut passed = 0
   let mut failed = 0
   let assets = dev_assets_root()
-  let actual_dump = StringBuilder::new()
+  let actual_dump = StringBuilder()
   for line in read(golden_dir + "/usvg/trees.jsonl").split("\n") {
     if line.is_empty() {
       continue
     }
-    let obj = match (try? @json.parse(line.to_string())) {
+    let obj = match (try? @json.parse(line.to_owned())) {
       Ok(Object(obj)) => obj
       _ => continue
     }
@@ -203,7 +203,7 @@ fn run_usvg_stage(filter : String?, verbose : Bool) -> Unit {
     if line.is_empty() {
       continue
     }
-    let obj = match (try? @json.parse(line.to_string())) {
+    let obj = match (try? @json.parse(line.to_owned())) {
       Ok(Object(obj)) => obj
       _ => continue
     }
@@ -300,7 +300,7 @@ fn run_usvg_stage(filter : String?, verbose : Bool) -> Unit {
     if line.is_empty() {
       continue
     }
-    let obj = match (try? @json.parse(line.to_string())) {
+    let obj = match (try? @json.parse(line.to_owned())) {
       Ok(Object(obj)) => obj
       _ => continue
     }
@@ -372,7 +372,7 @@ fn usvg_glyph(face : @otf.Face, gid : Int) -> (String, @tiny_skia_path.Rect)? {
   guard face.glyph_svg_image(@otf.GlyphId(gid.to_uint16())) is Some(doc) else {
     return None
   }
-  let mut data = doc.data.to_bytes()
+  let mut data = doc.data.to_owned()
   if data.length() >= 2 && data[0] == b'\x1f' && data[1] == b'\x8b' {
     data = @codecs.gzip_decompress(data[:]) catch { _ => return None }
   }

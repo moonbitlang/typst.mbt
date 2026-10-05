@@ -63,7 +63,7 @@ fn is_condition_passed(node : SvgNode, opt : Options) -> Bool {
   let required_features : String? = node.attribute(AId::RequiredFeatures)
   if required_features is Some(features_str) {
     for feature in features_str.split(" ") {
-      let feature = feature.to_string()
+      let feature = feature.to_owned()
       if !features.contains(feature) {
         return false
       }
@@ -87,7 +87,7 @@ fn is_valid_sys_lang(node : SvgNode, opt : Options) -> Bool {
   if langs is Some(langs) {
     let mut has_match = false
     for lang in langs.split(",") {
-      let lang = rust_trim(lang.to_string())
+      let lang = rust_trim(lang.to_owned())
 
       // 'Evaluates to `true` if one of the languages indicated by user preferences exactly
       // equals one of the languages given in the value of this parameter.'

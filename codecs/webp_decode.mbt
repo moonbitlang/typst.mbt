@@ -97,7 +97,7 @@ fn WebpParser::read_u32(self : WebpParser) -> UInt raise ImageError {
 fn WebpParser::read_chunk_header(
   self : WebpParser,
 ) -> (Bytes, Int64, Int64) raise ImageError {
-  let fourcc = self.read_bytes(4).to_bytes()
+  let fourcc = self.read_bytes(4).to_owned()
   let chunk_size = self.read_u32()
   let chunk_size_rounded = if chunk_size == 0xFFFFFFFFU {
     chunk_size
@@ -815,7 +815,7 @@ pub fn decode_webp(data : BytesView) -> WebpImage raise ImageError {
       width: parser.width,
       height: parser.height,
       has_alpha: parser.has_alpha,
-      data: Bytes::from_fixedarray(buf),
+      data: Bytes::from_array(buf),
     }
   } catch {
     ImageError(msg) => decoding_error("WebP", msg)
@@ -854,7 +854,7 @@ pub fn decode_webp_image(
       },
       icc,
     }
-    (info, Bytes::from_fixedarray(buf))
+    (info, Bytes::from_array(buf))
   } catch {
     ImageError(msg) =>
       if msg == webp_eof {
