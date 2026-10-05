@@ -65,7 +65,23 @@ fn Tr::code_item(
     LetBinding(binding) => self.let_binding(binding, env)
     SetRule(rule) => [Push(self.set_rule(rule, env))]
     ShowRule(rule) => [Push(self.show_rule(rule, env))]
-    _ => [Push(self.content(expr, env))]
+    _ => {
+      let code = self.content(expr, env)
+      // A bare value in the array of a sequence shares the array's
+      // location with its siblings; a key gives it an origin of its own
+      // (the engine deduplicates diagnostics by location and message).
+      if code.code.has_prefix("Value::") {
+        self.fresh += 1
+        [
+          Push({
+            code: "Keyed(\"\{self.fresh}\", \{code.code})",
+            total: code.total,
+          }),
+        ]
+      } else {
+        [Push(code)]
+      }
+    }
   }
 }
 
@@ -216,8 +232,13 @@ fn Tr::contextual(
   env : Env,
 ) -> Code raise Bail {
   let body = contextual.body()
+  // No write: the evaluator's contextual closure captures its outer
+  // bindings read-only (with its own message).
+  let written : Map[String, Unit] = Map([])
+  mutated_names(body.to_untyped(), written)
   if env.in_callback ||
     escapes(body.to_untyped(), false, false) ||
+    !written.is_empty() ||
     !self.not_label(body, env) {
     raise Bail("context")
   }

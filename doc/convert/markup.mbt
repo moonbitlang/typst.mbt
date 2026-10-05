@@ -35,6 +35,11 @@ fn Tr::item(self : Tr, expr : @ast.Expr, env : Env) -> Array[Op] raise Bail {
     }
     Raw(raw) => {
       let lines = raw.lines().map(line => line.get()).collect()
+      // The evaluator's raw keeps its lines: a raw without lines is not
+      // `raw("")`, which has one empty line.
+      if lines.is_empty() {
+        raise Bail("raw-empty")
+      }
       let lang = match raw.lang() {
         Some(lang) => ", lang=\{mbt_str(lang.get())}"
         None => ""
@@ -46,10 +51,15 @@ fn Tr::item(self : Tr, expr : @ast.Expr, env : Env) -> Array[Op] raise Bail {
     }
     Link(link) => self.typed_code("Link(Url(\{mbt_str(link.get())}))", false)
     Label(label) => {
-      // The EDSL attaches a label value in a sequence with the
-      // evaluator's rule and warnings.
+      // The EDSL attaches a label-valued inserted expression with the
+      // evaluator's rule and warnings; the call has a location of its own.
       self.hatch = true
-      [Push({ code: "Value::label(\{mbt_str(label.get())})", total: false, })]
+      [
+        Push({
+          code: "Call(\"label\", positional=[Value::str(\{mbt_str(label.get())})])",
+          total: false,
+        }),
+      ]
     }
     Ref(reference) => {
       let target = mbt_str(reference.target())
@@ -142,9 +152,10 @@ fn Tr::call_not_label(self : Tr, call : @ast.FuncCall, env : Env) -> Bool {
       guard call.callee() is FieldAccess(access) else { return false }
       let method = access.field().get()
       match access.target() {
-        // Every method of a string returns a string, a number, a boolean,
-        // an array or dictionary of those, or `none`.
-        Str(_) => true
+        // Every method of a string but `at` (which returns its default)
+        // returns a string, a number, a boolean, an array or dictionary
+        // of those, or `none`.
+        Str(_) => method != "at"
         FuncCall(receiver) =>
           match self.global_path(receiver.callee(), env) {
             Some("counter") =>
@@ -182,7 +193,13 @@ fn Tr::not_label(self : Tr, expr : @ast.Expr, env : Env) -> Bool {
     | Contextual(_)
     | ModuleInclude(_) => true
     Binary(binary) =>
-      !(binary.op() is (Assign | AddAssign | SubAssign | MulAssign | DivAssign))
+      match binary.op() {
+        Assign | AddAssign | SubAssign | MulAssign | DivAssign => false
+        // `none + <x>` is the label.
+        Add =>
+          self.not_label(binary.lhs(), env) && self.not_label(binary.rhs(), env)
+        _ => true
+      }
     Parenthesized(p) => self.not_label(p.expr(), env)
     Ident(ident) =>
       // A translated variable is a literal; an unbound name is a global.
