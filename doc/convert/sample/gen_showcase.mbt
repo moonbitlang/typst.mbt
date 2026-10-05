@@ -176,6 +176,7 @@ using @doc {
   type Numbering,
   type Supplement,
   type Prose,
+  type Content,
 }
 
 ///|
