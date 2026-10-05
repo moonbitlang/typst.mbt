@@ -352,7 +352,7 @@ def main():
             f"    Some(e) => e\n"
             f"    None => {{\n"
             f"      let e = Element::new(\n"
-            f"        name={mbt_str(e['name'])},\n        title={mbt_str(e['title'])},\n"
+            f"        name={mbt_str(e['name'])},\n        title={mbt_str(e['title'])},\n        key={mbt_str(var)},\n"
             f"        docs={mbt_str(e['doc'])},\n        keywords=[{kws}],\n        capabilities=[{caps}],\n"
             f"        fields=[\n" + "\n".join("    " + x for x in fields) + "\n        ],\n      )\n"
             f"      {var}_cell.val = Some(e)\n{init_call}      e\n    }}\n  }}\n}}\n"

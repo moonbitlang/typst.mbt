@@ -63,6 +63,21 @@
   fields and views cast to it.
 - Never edit `*_gen.mbt` by hand. After merging branches, resolve conflicts
   in generated files by rerunning the generators.
+- EDSL (`doc/`, design in `docs/edsl-design.md`): MoonBit builders
+  (`Heading(..)`, `SetText(..)`, `Show(..) <| ..`) that are lowered through
+  the evaluator's own paths (`Func::call`, `Element::set`, recipes); it is
+  not part of the port, and it only uses public engine APIs. Callbacks
+  enter the engine as `FuncInner::Host` (identity equality, key
+  fingerprint). `doc/elements_gen.mbt` and `doc/elements_coverage.txt` come
+  from `scripts/docgen.py` (element list, type table and reviewed signature
+  notes are in the script; it also audits that `doc` builds element storage
+  only in the exceptions of the design's section 5.3). `doc/system` holds
+  all OS access, `doc/examples` compiles every example of the design
+  document, `doc/twins` pairs EDSL documents with functional Typst sources:
+  `moon run tests/runner --target native -- edsl` checks that each pair is
+  equal in structure, layout (spans erased, memoization on and off), SVG
+  and PDF bytes. Inside `doc` the facade enums have cases `None`/`Auto`:
+  write `Option::None` where a bare `None` is ambiguous.
 - Constant tables are `ReadOnlyArray` literals, and generators emit them: on
   native they are static data (no allocation or fill code at startup, which
   `FixedArray`/`Array` literals need). Only literal scalars, strings, `Bytes`,

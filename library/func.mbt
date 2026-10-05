@@ -126,6 +126,32 @@ pub(all) enum FuncInner {
   Plugin(PluginFunc)
   /// A nested function with pre-applied arguments.
   With(Func, Args)
+  /// A closure of the host program (not upstream; see [HostFunc]).
+  Host(HostFunc)
+}
+
+///|
+/// A closure of the host (MoonBit) program that embeds the compiler, e.g. a
+/// show rule or `context` callback of the `doc` package (not upstream).
+///
+/// Unlike a [NativeFuncData] it has no name, documentation or scope and it
+/// may capture arbitrary host data, which the engine cannot inspect. It
+/// therefore behaves like an anonymous [Closure]: it compares by identity
+/// (the same `HostFunc` object) and its repr is `(..) => ..`. Its
+/// fingerprint is the `key`, which the host must make unique per function
+/// within a compilation, and it marks the fingerprint as identity-bearing
+/// (`fingerprint_identity`), so the memoization rules for closures apply
+/// (see `memo.mbt`).
+pub struct HostFunc {
+  /// The implementation of the function.
+  call : NativeFn
+  /// The identity key of the function.
+  key : U128
+}
+
+///|
+pub fn HostFunc::new(key : U128, call : NativeFn) -> HostFunc {
+  { call, key, }
 }
 
 ///|
@@ -167,6 +193,12 @@ pub fn Func::plugin(func : PluginFunc) -> Func {
 }
 
 ///|
+/// A host closure.
+pub fn Func::host(func : HostFunc) -> Func {
+  Func::from_inner(Host(func))
+}
+
+///|
 /// The function's name (e.g. `min`).
 pub fn Func::name(self : Func) -> String? {
   match self.inner {
@@ -175,6 +207,7 @@ pub fn Func::name(self : Func) -> String? {
     Closure(closure) => closure.name()
     Plugin(func) => Some(func.name())
     With(func, _) => func.name()
+    Host(_) => None
   }
 }
 
@@ -187,6 +220,7 @@ pub fn Func::title(self : Func) -> String? {
     Closure(_) => None
     Plugin(_) => None
     With(func, _) => func.title()
+    Host(_) => None
   }
 }
 
@@ -208,6 +242,7 @@ pub fn Func::scope(self : Func) -> Scope? {
     Closure(_) => None
     Plugin(_) => None
     With(func, _) => func.scope()
+    Host(_) => None
   }
 }
 
@@ -299,6 +334,11 @@ pub fn Func::call(
       args.items.append(items)
       func.call(engine, context, args)
     }
+    Host(host) => {
+      let value = (host.call)(engine, context, args)
+      args.finish()
+      value
+    }
   }
 }
 
@@ -345,6 +385,7 @@ pub fn Func::repr(self : Func) -> String {
     Closure(closure) => closure.name().unwrap_or(default)
     Plugin(func) => func.name()
     With(_, _) => default
+    Host(_) => default
   }
 }
 
@@ -357,6 +398,7 @@ pub impl Eq for Func with fn equal(self, other) {
     (Closure(a), Closure(b)) => physical_equal(a, b)
     (Plugin(a), Plugin(b)) => a == b
     (With(f1, a1), With(f2, a2)) => f1 == f2 && a1 == a2
+    (Host(a), Host(b)) => physical_equal(a, b)
     _ => false
   }
 }

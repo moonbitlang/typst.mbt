@@ -16,6 +16,7 @@ pub fn context_elem() -> Element {
       let e = Element::new(
         name="context",
         title="Context",
+        key="context_elem",
         docs="Executes a `context` block.",
         keywords=[],
         capabilities=["Construct", "Locatable"],
@@ -53,6 +54,7 @@ pub fn symbol_elem() -> Element {
       let e = Element::new(
         name="symbol",
         title="Symbol",
+        key="symbol_elem",
         docs="A single character.",
         keywords=[],
         capabilities=["Repr", "PlainText"],
@@ -89,6 +91,7 @@ pub fn target_elem() -> Element {
       let e = Element::new(
         name="target",
         title="Target",
+        key="target_elem",
         docs="This element exists solely to host the `target` style chain field. It is never constructed and not visible to users.",
         keywords=[],
         capabilities=[],
@@ -123,6 +126,7 @@ pub fn counter_update_elem() -> Element {
       let e = Element::new(
         name="counter-update",
         title="Counter Update",
+        key="counter_update_elem",
         docs="Executes an update of a counter.",
         keywords=[],
         capabilities=["Construct", "Locatable", "Count"],
@@ -171,6 +175,7 @@ pub fn counter_display_elem() -> Element {
       let e = Element::new(
         name="counter-display",
         title="Counter Display",
+        key="counter_display_elem",
         docs="Executes a display of a counter.",
         keywords=[],
         capabilities=["Construct", "Unqueriable", "Locatable"],
@@ -232,6 +237,7 @@ pub fn metadata_elem() -> Element {
       let e = Element::new(
         name="metadata",
         title="Metadata",
+        key="metadata_elem",
         docs="Exposes a value to the query system without producing visible content.",
         keywords=[],
         capabilities=["Locatable"],
@@ -267,6 +273,7 @@ pub fn state_update_elem() -> Element {
       let e = Element::new(
         name="state-update",
         title="State Update",
+        key="state_update_elem",
         docs="Executes an update of a state.",
         keywords=[],
         capabilities=["Construct", "Locatable"],
@@ -315,6 +322,7 @@ pub fn tag_elem() -> Element {
       let e = Element::new(
         name="tag",
         title="Tag",
+        key="tag_elem",
         docs="Holds a tag for a locatable element that was realized.",
         keywords=[],
         capabilities=["Construct", "Unlabellable"],
@@ -352,6 +360,7 @@ pub fn align_elem() -> Element {
       let e = Element::new(
         name="align",
         title="Align",
+        key="align_elem",
         docs="Aligns content horizontally and vertically.",
         keywords=[],
         capabilities=[],
@@ -399,6 +408,7 @@ pub fn columns_elem() -> Element {
       let e = Element::new(
         name="columns",
         title="Columns",
+        key="columns_elem",
         docs="Separates a region into multiple equally sized columns.",
         keywords=[],
         capabilities=[],
@@ -475,6 +485,7 @@ pub fn colbreak_elem() -> Element {
       let e = Element::new(
         name="colbreak",
         title="Column Break",
+        key="colbreak_elem",
         docs="Forces a column break.",
         keywords=[],
         capabilities=[],
@@ -505,6 +516,7 @@ pub fn box_elem() -> Element {
       let e = Element::new(
         name="box",
         title="Box",
+        key="box_elem",
         docs="An inline-level container that sizes content.",
         keywords=[],
         capabilities=[],
@@ -626,6 +638,7 @@ pub fn inline_elem() -> Element {
       let e = Element::new(
         name="inline",
         title="Inline",
+        key="inline_elem",
         docs="An inline-level container that can produce arbitrary items that can break across lines.",
         keywords=[],
         capabilities=["Construct"],
@@ -663,6 +676,7 @@ pub fn block_elem() -> Element {
       let e = Element::new(
         name="block",
         title="Block",
+        key="block_elem",
         docs="A block-level container.",
         keywords=[],
         capabilities=[],
@@ -826,6 +840,7 @@ pub fn grid_elem() -> Element {
       let e = Element::new(
         name="grid",
         title="Grid",
+        key="grid_elem",
         docs="Arranges content in a grid.",
         keywords=[],
         capabilities=["Synthesize", "Tagged"],
@@ -967,6 +982,7 @@ pub fn grid_header_elem() -> Element {
       let e = Element::new(
         name="header",
         title="Grid Header",
+        key="grid_header_elem",
         docs="A repeatable grid header.",
         keywords=[],
         capabilities=[],
@@ -1019,6 +1035,7 @@ pub fn grid_footer_elem() -> Element {
       let e = Element::new(
         name="footer",
         title="Grid Footer",
+        key="grid_footer_elem",
         docs="A repeatable grid footer.",
         keywords=[],
         capabilities=[],
@@ -1061,6 +1078,7 @@ pub fn grid_h_line_elem() -> Element {
       let e = Element::new(
         name="hline",
         title="Grid Horizontal Line",
+        key="grid_h_line_elem",
         docs="A horizontal line in the grid.",
         keywords=[],
         capabilities=[],
@@ -1132,6 +1150,7 @@ pub fn grid_v_line_elem() -> Element {
       let e = Element::new(
         name="vline",
         title="Grid Vertical Line",
+        key="grid_v_line_elem",
         docs="A vertical line in the grid.",
         keywords=[],
         capabilities=[],
@@ -1203,6 +1222,7 @@ pub fn grid_cell_elem() -> Element {
       let e = Element::new(
         name="cell",
         title="Grid Cell",
+        key="grid_cell_elem",
         docs="A cell in the grid. You can use this function in the argument list of a grid to override grid style properties for an individual cell or manually positioning it within the grid. You can also use this function in show rules to apply certain styles to multiple cells at once.",
         keywords=[],
         capabilities=[],
@@ -1341,6 +1361,7 @@ pub fn hide_elem() -> Element {
       let e = Element::new(
         name="hide",
         title="Hide",
+        key="hide_elem",
         docs="Hides content without affecting layout.",
         keywords=[],
         capabilities=["Tagged"],
@@ -1387,6 +1408,7 @@ pub fn layout_elem() -> Element {
       let e = Element::new(
         name="layout",
         title="Layout",
+        key="layout_elem",
         docs="Executes a `layout` call.",
         keywords=[],
         capabilities=["Locatable"],
@@ -1422,6 +1444,7 @@ pub fn pad_elem() -> Element {
       let e = Element::new(
         name="pad",
         title="Padding",
+        key="pad_elem",
         docs="Adds spacing around content.",
         keywords=[],
         capabilities=[],
@@ -1531,6 +1554,7 @@ pub fn page_elem() -> Element {
       let e = Element::new(
         name="page",
         title="Page",
+        key="page_elem",
         docs="Layouts its child onto one or multiple pages.",
         keywords=[],
         capabilities=["Construct"],
@@ -1755,6 +1779,7 @@ pub fn pagebreak_elem() -> Element {
       let e = Element::new(
         name="pagebreak",
         title="Page Break",
+        key="pagebreak_elem",
         docs="A manual page break.",
         keywords=[],
         capabilities=[],
@@ -1803,6 +1828,7 @@ pub fn place_elem() -> Element {
       let e = Element::new(
         name="place",
         title="Place",
+        key="place_elem",
         docs="Places content relatively to its parent container.",
         keywords=[],
         capabilities=["Unqueriable", "Locatable", "Tagged"],
@@ -1895,6 +1921,7 @@ pub fn flush_elem() -> Element {
       let e = Element::new(
         name="flush",
         title="Flush",
+        key="flush_elem",
         docs="Asks the layout algorithm to place pending floating elements before continuing with the content.",
         keywords=[],
         capabilities=[],
@@ -1918,6 +1945,7 @@ pub fn repeat_elem() -> Element {
       let e = Element::new(
         name="repeat",
         title="Repeat",
+        key="repeat_elem",
         docs="Repeats content to the available space.",
         keywords=[],
         capabilities=["Tagged"],
@@ -1969,6 +1997,7 @@ pub fn h_elem() -> Element {
       let e = Element::new(
         name="h",
         title="Spacing (H)",
+        key="h_elem",
         docs="Inserts horizontal spacing into a paragraph.",
         keywords=[],
         capabilities=[],
@@ -2010,6 +2039,7 @@ pub fn v_elem() -> Element {
       let e = Element::new(
         name="v",
         title="Spacing (V)",
+        key="v_elem",
         docs="Inserts vertical spacing into a flow of blocks.",
         keywords=[],
         capabilities=[],
@@ -2063,6 +2093,7 @@ pub fn stack_elem() -> Element {
       let e = Element::new(
         name="stack",
         title="Stack",
+        key="stack_elem",
         docs="Arranges content and spacing horizontally or vertically.",
         keywords=[],
         capabilities=[],
@@ -2115,6 +2146,7 @@ pub fn move_elem() -> Element {
       let e = Element::new(
         name="move",
         title="Move",
+        key="move_elem",
         docs="Moves content without affecting layout.",
         keywords=[],
         capabilities=[],
@@ -2170,6 +2202,7 @@ pub fn rotate_elem() -> Element {
       let e = Element::new(
         name="rotate",
         title="Rotate",
+        key="rotate_elem",
         docs="Rotates content without affecting layout.",
         keywords=[],
         capabilities=[],
@@ -2239,6 +2272,7 @@ pub fn scale_elem() -> Element {
       let e = Element::new(
         name="scale",
         title="Scale",
+        key="scale_elem",
         docs="Scales content without affecting layout.",
         keywords=[],
         capabilities=[],
@@ -2330,6 +2364,7 @@ pub fn skew_elem() -> Element {
       let e = Element::new(
         name="skew",
         title="Skew",
+        key="skew_elem",
         docs="Skews content.",
         keywords=[],
         capabilities=[],
@@ -2400,6 +2435,7 @@ pub fn accent_elem() -> Element {
       let e = Element::new(
         name="accent",
         title="Accent",
+        key="accent_elem",
         docs="Attaches an accent to a base.",
         keywords=[],
         capabilities=["Mathy"],
@@ -2466,6 +2502,7 @@ pub fn math_attach_elem() -> Element {
       let e = Element::new(
         name="attach",
         title="Attach",
+        key="math_attach_elem",
         docs="A base with optional attachments.",
         keywords=[],
         capabilities=["Mathy"],
@@ -2537,6 +2574,7 @@ pub fn primes_elem() -> Element {
       let e = Element::new(
         name="primes",
         title="Primes",
+        key="primes_elem",
         docs="Grouped primes.",
         keywords=[],
         capabilities=["Mathy"],
@@ -2572,6 +2610,7 @@ pub fn scripts_elem() -> Element {
       let e = Element::new(
         name="scripts",
         title="Scripts",
+        key="scripts_elem",
         docs="Forces a base to display attachments as scripts.",
         keywords=[],
         capabilities=["Mathy"],
@@ -2607,6 +2646,7 @@ pub fn limits_elem() -> Element {
       let e = Element::new(
         name="limits",
         title="Limits",
+        key="limits_elem",
         docs="Forces a base to display attachments as limits.",
         keywords=[],
         capabilities=["Mathy"],
@@ -2648,6 +2688,7 @@ pub fn stretch_elem() -> Element {
       let e = Element::new(
         name="stretch",
         title="Stretch",
+        key="stretch_elem",
         docs="Stretches a glyph.",
         keywords=[],
         capabilities=["Mathy"],
@@ -2693,6 +2734,7 @@ pub fn cancel_elem() -> Element {
       let e = Element::new(
         name="cancel",
         title="Cancel",
+        key="cancel_elem",
         docs="Displays a diagonal line over a part of an equation.",
         keywords=[],
         capabilities=["Mathy"],
@@ -2785,6 +2827,7 @@ pub fn equation_elem() -> Element {
       let e = Element::new(
         name="equation",
         title="Equation",
+        key="equation_elem",
         docs="A mathematical equation.",
         keywords=[],
         capabilities=[
@@ -2950,6 +2993,7 @@ pub fn frac_elem() -> Element {
       let e = Element::new(
         name="frac",
         title="Fraction",
+        key="frac_elem",
         docs="A mathematical fraction.",
         keywords=[],
         capabilities=["Mathy"],
@@ -3030,6 +3074,7 @@ pub fn binom_elem() -> Element {
       let e = Element::new(
         name="binom",
         title="Binomial",
+        key="binom_elem",
         docs="A binomial expression.",
         keywords=[],
         capabilities=["Mathy"],
@@ -3078,6 +3123,7 @@ pub fn lr_elem() -> Element {
       let e = Element::new(
         name="lr",
         title="Left/Right",
+        key="lr_elem",
         docs="Scales delimiters.",
         keywords=[],
         capabilities=["Mathy"],
@@ -3124,6 +3170,7 @@ pub fn mid_elem() -> Element {
       let e = Element::new(
         name="mid",
         title="Mid",
+        key="mid_elem",
         docs="Scales delimiters vertically to the nearest surrounding `{lr()}` group.",
         keywords=[],
         capabilities=["Mathy"],
@@ -3159,6 +3206,7 @@ pub fn vec_elem() -> Element {
       let e = Element::new(
         name="vec",
         title="Vector",
+        key="vec_elem",
         docs="A column vector.",
         keywords=[],
         capabilities=["Mathy"],
@@ -3225,6 +3273,7 @@ pub fn mat_elem() -> Element {
       let e = Element::new(
         name="mat",
         title="Matrix",
+        key="mat_elem",
         docs="A matrix.",
         keywords=[],
         capabilities=["Mathy"],
@@ -3326,6 +3375,7 @@ pub fn cases_elem() -> Element {
       let e = Element::new(
         name="cases",
         title="Cases",
+        key="cases_elem",
         docs="A case distinction.",
         keywords=[],
         capabilities=["Mathy"],
@@ -3392,6 +3442,7 @@ pub fn align_point_elem() -> Element {
       let e = Element::new(
         name="align-point",
         title="Alignment Point",
+        key="align_point_elem",
         docs="A math alignment point: `&`, `&&`.",
         keywords=[],
         capabilities=["Mathy"],
@@ -3415,6 +3466,7 @@ pub fn class_elem() -> Element {
       let e = Element::new(
         name="class",
         title="Class",
+        key="class_elem",
         docs="Forced use of a certain math class.",
         keywords=[],
         capabilities=["Mathy"],
@@ -3461,6 +3513,7 @@ pub fn op_elem() -> Element {
       let e = Element::new(
         name="op",
         title="Text Operator",
+        key="op_elem",
         docs="A text operator in an equation.",
         keywords=[],
         capabilities=["Mathy"],
@@ -3502,6 +3555,7 @@ pub fn root_elem() -> Element {
       let e = Element::new(
         name="root",
         title="Root",
+        key="root_elem",
         docs="A general root.",
         keywords=[],
         capabilities=["Mathy"],
@@ -3548,6 +3602,7 @@ pub fn math_underline_elem() -> Element {
       let e = Element::new(
         name="underline",
         title="Underline",
+        key="math_underline_elem",
         docs="A horizontal line under content.",
         keywords=[],
         capabilities=["Mathy"],
@@ -3583,6 +3638,7 @@ pub fn math_overline_elem() -> Element {
       let e = Element::new(
         name="overline",
         title="Overline",
+        key="math_overline_elem",
         docs="A horizontal line over content.",
         keywords=[],
         capabilities=["Mathy"],
@@ -3618,6 +3674,7 @@ pub fn underbrace_elem() -> Element {
       let e = Element::new(
         name="underbrace",
         title="Underbrace",
+        key="underbrace_elem",
         docs="A horizontal brace under content, with an optional annotation below.",
         keywords=[],
         capabilities=["Mathy"],
@@ -3664,6 +3721,7 @@ pub fn overbrace_elem() -> Element {
       let e = Element::new(
         name="overbrace",
         title="Overbrace",
+        key="overbrace_elem",
         docs="A horizontal brace over content, with an optional annotation above.",
         keywords=[],
         capabilities=["Mathy"],
@@ -3710,6 +3768,7 @@ pub fn underbracket_elem() -> Element {
       let e = Element::new(
         name="underbracket",
         title="Underbracket",
+        key="underbracket_elem",
         docs="A horizontal bracket under content, with an optional annotation below.",
         keywords=[],
         capabilities=["Mathy"],
@@ -3756,6 +3815,7 @@ pub fn overbracket_elem() -> Element {
       let e = Element::new(
         name="overbracket",
         title="Overbracket",
+        key="overbracket_elem",
         docs="A horizontal bracket over content, with an optional annotation above.",
         keywords=[],
         capabilities=["Mathy"],
@@ -3802,6 +3862,7 @@ pub fn underparen_elem() -> Element {
       let e = Element::new(
         name="underparen",
         title="Underparen",
+        key="underparen_elem",
         docs="A horizontal parenthesis under content, with an optional annotation below.",
         keywords=[],
         capabilities=["Mathy"],
@@ -3848,6 +3909,7 @@ pub fn overparen_elem() -> Element {
       let e = Element::new(
         name="overparen",
         title="Overparen",
+        key="overparen_elem",
         docs="A horizontal parenthesis over content, with an optional annotation above.",
         keywords=[],
         capabilities=["Mathy"],
@@ -3894,6 +3956,7 @@ pub fn undershell_elem() -> Element {
       let e = Element::new(
         name="undershell",
         title="Undershell",
+        key="undershell_elem",
         docs="A horizontal tortoise shell bracket under content, with an optional annotation below.",
         keywords=[],
         capabilities=["Mathy"],
@@ -3940,6 +4003,7 @@ pub fn overshell_elem() -> Element {
       let e = Element::new(
         name="overshell",
         title="Overshell",
+        key="overshell_elem",
         docs="A horizontal tortoise shell bracket over content, with an optional annotation above.",
         keywords=[],
         capabilities=["Mathy"],
@@ -3986,6 +4050,7 @@ pub fn artifact_elem() -> Element {
       let e = Element::new(
         name="artifact",
         title="Artifact",
+        key="artifact_elem",
         docs="Marks content as a PDF artifact.",
         keywords=[],
         capabilities=["Tagged"],
@@ -4031,6 +4096,7 @@ pub fn pdf_marker_tag_elem() -> Element {
       let e = Element::new(
         name="pdf-marker-tag",
         title="Pdf Marker Tag",
+        key="pdf_marker_tag_elem",
         docs="Used to delimit content for tagged PDF.",
         keywords=[],
         capabilities=["Construct", "Tagged"],
@@ -4078,6 +4144,7 @@ pub fn bibliography_elem() -> Element {
       let e = Element::new(
         name="bibliography",
         title="Bibliography",
+        key="bibliography_elem",
         docs="A bibliography / reference listing.",
         keywords=[],
         capabilities=["Locatable", "Synthesize", "ShowSet", "LocalName"],
@@ -4208,6 +4275,7 @@ pub fn csl_light_elem() -> Element {
       let e = Element::new(
         name="csl-light",
         title="Csl Light",
+        key="csl_light_elem",
         docs="Translation of `font-weight=\"light\"` in CSL.",
         keywords=[],
         capabilities=[],
@@ -4243,6 +4311,7 @@ pub fn csl_indent_elem() -> Element {
       let e = Element::new(
         name="csl-indent",
         title="Csl Indent",
+        key="csl_indent_elem",
         docs="Translation of `display=\"indent\"` in CSL.",
         keywords=[],
         capabilities=[],
@@ -4278,6 +4347,7 @@ pub fn cite_elem() -> Element {
       let e = Element::new(
         name="cite",
         title="Cite",
+        key="cite_elem",
         docs="Cite a work from the bibliography.",
         keywords=[],
         capabilities=["Locatable", "Synthesize"],
@@ -4376,6 +4446,7 @@ pub fn cite_group_elem() -> Element {
       let e = Element::new(
         name="cite-group",
         title="Cite Group",
+        key="cite_group_elem",
         docs="A group of consecutive citations.",
         keywords=[],
         capabilities=["Locatable"],
@@ -4411,6 +4482,7 @@ pub fn divider_elem() -> Element {
       let e = Element::new(
         name="divider",
         title="Divider",
+        key="divider_elem",
         docs="A thematic break that separates sections of content.",
         keywords=[],
         capabilities=["ShowSet"],
@@ -4435,6 +4507,7 @@ pub fn document_elem() -> Element {
       let e = Element::new(
         name="document",
         title="Document",
+        key="document_elem",
         docs="Manages metadata and is used to add a document file to a bundle.",
         keywords=[],
         capabilities=["Locatable", "ShowSet"],
@@ -4542,6 +4615,7 @@ pub fn emph_elem() -> Element {
       let e = Element::new(
         name="emph",
         title="Emphasis",
+        key="emph_elem",
         docs="Emphasizes content by toggling italics.",
         keywords=["italic"],
         capabilities=["Locatable", "Tagged"],
@@ -4577,6 +4651,7 @@ pub fn enum_elem() -> Element {
       let e = Element::new(
         name="enum",
         title="Numbered List",
+        key="enum_elem",
         docs="A numbered list.",
         keywords=[],
         capabilities=["Locatable", "Tagged"],
@@ -4707,6 +4782,7 @@ pub fn enum_item_elem() -> Element {
       let e = Element::new(
         name="item",
         title="Numbered List Item",
+        key="enum_item_elem",
         docs="An enumeration item.",
         keywords=[],
         capabilities=["Tagged"],
@@ -4753,6 +4829,7 @@ pub fn figure_elem() -> Element {
       let e = Element::new(
         name="figure",
         title="Figure",
+        key="figure_elem",
         docs="A figure with an optional caption.",
         keywords=[],
         capabilities=[
@@ -4893,6 +4970,7 @@ pub fn figure_caption_elem() -> Element {
       let e = Element::new(
         name="caption",
         title="Caption",
+        key="figure_caption_elem",
         docs="The caption of a figure. This element can be used in set and show rules to customize the appearance of captions for all figures or figures of a specific kind.",
         keywords=[],
         capabilities=["Locatable", "Tagged", "Synthesize"],
@@ -4995,6 +5073,7 @@ pub fn footnote_elem() -> Element {
       let e = Element::new(
         name="footnote",
         title="Footnote",
+        key="footnote_elem",
         docs="A footnote.",
         keywords=[],
         capabilities=["Locatable", "Tagged", "Count"],
@@ -5043,6 +5122,7 @@ pub fn footnote_entry_elem() -> Element {
       let e = Element::new(
         name="entry",
         title="Footnote Entry",
+        key="footnote_entry_elem",
         docs="An entry in a footnote list.",
         keywords=[],
         capabilities=["Locatable", "Tagged", "ShowSet"],
@@ -5115,6 +5195,7 @@ pub fn footnote_container_elem() -> Element {
       let e = Element::new(
         name="footnote-container",
         title="Footnote Container",
+        key="footnote_container_elem",
         docs="In HTML export, this is inserted at the end of the body to display footnotes. In the future, we can expose this to allow customizing where the footnotes appear. It could also be exposed for paged export.",
         keywords=[],
         capabilities=["Locatable"],
@@ -5138,6 +5219,7 @@ pub fn footnote_marker_elem() -> Element {
       let e = Element::new(
         name="footnote-marker",
         title="Footnote Marker",
+        key="footnote_marker_elem",
         docs="This is an empty element inserted by the HTML footnote rule to indicate the presence of the default footnote rule. It's only used by the error in `FootnoteContainer::unsupported_with_custom_dom` and could be removed if that's not needed anymore.",
         keywords=[],
         capabilities=["Locatable"],
@@ -5161,6 +5243,7 @@ pub fn heading_elem() -> Element {
       let e = Element::new(
         name="heading",
         title="Heading",
+        key="heading_elem",
         docs="A section heading.",
         keywords=[],
         capabilities=[
@@ -5294,6 +5377,7 @@ pub fn link_elem() -> Element {
       let e = Element::new(
         name="link",
         title="Link",
+        key="link_elem",
         docs="Links to a URL or a location in the document.",
         keywords=[],
         capabilities=["Locatable"],
@@ -5354,6 +5438,7 @@ pub fn direct_link_elem() -> Element {
       let e = Element::new(
         name="direct-link",
         title="Direct Link",
+        key="direct_link_elem",
         docs="This is a temporary hack to dispatch to - a raw link that does not go through `LinkElem` in paged - `LinkElem` in HTML (there is no equivalent to a direct link)",
         keywords=[],
         capabilities=["Construct"],
@@ -5414,6 +5499,7 @@ pub fn link_marker_elem() -> Element {
       let e = Element::new(
         name="link-marker",
         title="Link Marker",
+        key="link_marker_elem",
         docs="An element that wraps all content that is @Content::linked to a destination.",
         keywords=[],
         capabilities=["Tagged", "Construct"],
@@ -5462,6 +5548,7 @@ pub fn list_elem() -> Element {
       let e = Element::new(
         name="list",
         title="Bullet List",
+        key="list_elem",
         docs="A bullet list.",
         keywords=[],
         capabilities=["Locatable", "Tagged"],
@@ -5566,6 +5653,7 @@ pub fn list_item_elem() -> Element {
       let e = Element::new(
         name="item",
         title="Bullet List Item",
+        key="list_item_elem",
         docs="A bullet list item.",
         keywords=[],
         capabilities=["Tagged"],
@@ -5601,6 +5689,7 @@ pub fn outline_elem() -> Element {
       let e = Element::new(
         name="outline",
         title="Outline",
+        key="outline_elem",
         docs="A table of contents, figures, or other elements.",
         keywords=["Table of Contents", "toc"],
         capabilities=["ShowSet", "LocalName", "Locatable", "Tagged"],
@@ -5669,6 +5758,7 @@ pub fn outline_entry_elem() -> Element {
       let e = Element::new(
         name="entry",
         title="Outline Entry",
+        key="outline_entry_elem",
         docs="Represents an entry line in an outline.",
         keywords=[],
         capabilities=["Locatable", "Tagged"],
@@ -5736,6 +5826,7 @@ pub fn prefix_info_elem() -> Element {
       let e = Element::new(
         name="prefix-info",
         title="Prefix Info",
+        key="prefix_info_elem",
         docs="Helper type for introspection-based prefix alignment.",
         keywords=[],
         capabilities=["Construct", "Unqueriable", "Locatable"],
@@ -5795,6 +5886,7 @@ pub fn par_elem() -> Element {
       let e = Element::new(
         name="par",
         title="Paragraph",
+        key="par_elem",
         docs="A logical subdivison of textual content.",
         keywords=[],
         capabilities=["Locatable", "Tagged"],
@@ -5902,6 +5994,7 @@ pub fn parbreak_elem() -> Element {
       let e = Element::new(
         name="parbreak",
         title="Paragraph Break",
+        key="parbreak_elem",
         docs="A paragraph break.",
         keywords=[],
         capabilities=["Unlabellable"],
@@ -5925,6 +6018,7 @@ pub fn par_line_elem() -> Element {
       let e = Element::new(
         name="line",
         title="Paragraph Line",
+        key="par_line_elem",
         docs="A paragraph line.",
         keywords=["line numbering"],
         capabilities=["Construct", "Locatable"],
@@ -5999,6 +6093,7 @@ pub fn par_line_marker_elem() -> Element {
       let e = Element::new(
         name="par-line-marker",
         title="Par Line Marker",
+        key="par_line_marker_elem",
         docs="A marker used to indicate the presence of a line.",
         keywords=[],
         capabilities=["Construct", "Unqueriable", "Locatable", "Count"],
@@ -6071,6 +6166,7 @@ pub fn quote_elem() -> Element {
       let e = Element::new(
         name="quote",
         title="Quote",
+        key="quote_elem",
         docs="Displays a quote alongside an optional attribution.",
         keywords=[],
         capabilities=["Locatable", "Tagged", "ShowSet"],
@@ -6145,6 +6241,7 @@ pub fn ref_elem() -> Element {
       let e = Element::new(
         name="ref",
         title="Reference",
+        key="ref_elem",
         docs="A reference to a label or bibliography.",
         keywords=[],
         capabilities=["Locatable", "Tagged", "Synthesize"],
@@ -6219,6 +6316,7 @@ pub fn strong_elem() -> Element {
       let e = Element::new(
         name="strong",
         title="Strong Emphasis",
+        key="strong_elem",
         docs="Strongly emphasizes content by increasing the font weight.",
         keywords=["bold", "weight"],
         capabilities=["Locatable", "Tagged"],
@@ -6260,6 +6358,7 @@ pub fn table_elem() -> Element {
       let e = Element::new(
         name="table",
         title="Table",
+        key="table_elem",
         docs="A table of items.",
         keywords=[],
         capabilities=[
@@ -6418,6 +6517,7 @@ pub fn table_header_elem() -> Element {
       let e = Element::new(
         name="header",
         title="Table Header",
+        key="table_header_elem",
         docs="A repeatable table header.",
         keywords=[],
         capabilities=[],
@@ -6470,6 +6570,7 @@ pub fn table_footer_elem() -> Element {
       let e = Element::new(
         name="footer",
         title="Table Footer",
+        key="table_footer_elem",
         docs="A repeatable table footer.",
         keywords=[],
         capabilities=[],
@@ -6512,6 +6613,7 @@ pub fn table_h_line_elem() -> Element {
       let e = Element::new(
         name="hline",
         title="Table Horizontal Line",
+        key="table_h_line_elem",
         docs="A horizontal line in the table.",
         keywords=[],
         capabilities=[],
@@ -6583,6 +6685,7 @@ pub fn table_v_line_elem() -> Element {
       let e = Element::new(
         name="vline",
         title="Table Vertical Line",
+        key="table_v_line_elem",
         docs="A vertical line in the table. See the docs for @grid.vline for more information regarding how to use this element's fields.",
         keywords=[],
         capabilities=[],
@@ -6654,6 +6757,7 @@ pub fn table_cell_elem() -> Element {
       let e = Element::new(
         name="cell",
         title="Table Cell",
+        key="table_cell_elem",
         docs="A cell in the table. Use this to position a cell manually or to apply styling. To do the latter, you can either use the function to override the properties for a particular cell, or use it in show rules to apply certain styles to multiple cells at once.",
         keywords=[],
         capabilities=[],
@@ -6804,6 +6908,7 @@ pub fn terms_elem() -> Element {
       let e = Element::new(
         name="terms",
         title="Term List",
+        key="terms_elem",
         docs="A list of terms and their descriptions.",
         keywords=[],
         capabilities=["Locatable", "Tagged"],
@@ -6897,6 +7002,7 @@ pub fn term_item_elem() -> Element {
       let e = Element::new(
         name="item",
         title="Term List Item",
+        key="term_item_elem",
         docs="A term list item.",
         keywords=[],
         capabilities=["Tagged"],
@@ -6943,6 +7049,7 @@ pub fn title_elem() -> Element {
       let e = Element::new(
         name="title",
         title="Title",
+        key="title_elem",
         docs="A document title.",
         keywords=[],
         capabilities=["Locatable", "Tagged", "ShowSet"],
@@ -6979,6 +7086,7 @@ pub fn underline_elem() -> Element {
       let e = Element::new(
         name="underline",
         title="Underline",
+        key="underline_elem",
         docs="Underlines text.",
         keywords=[],
         capabilities=["Locatable", "Tagged"],
@@ -7061,6 +7169,7 @@ pub fn overline_elem() -> Element {
       let e = Element::new(
         name="overline",
         title="Overline",
+        key="overline_elem",
         docs="Adds a line over text.",
         keywords=[],
         capabilities=["Locatable", "Tagged"],
@@ -7143,6 +7252,7 @@ pub fn strike_elem() -> Element {
       let e = Element::new(
         name="strike",
         title="Strikethrough",
+        key="strike_elem",
         docs="Strikes through text.",
         keywords=[],
         capabilities=["Locatable", "Tagged"],
@@ -7219,6 +7329,7 @@ pub fn highlight_elem() -> Element {
       let e = Element::new(
         name="highlight",
         title="Highlight",
+        key="highlight_elem",
         docs="Highlights text with a background color.",
         keywords=[],
         capabilities=["Locatable", "Tagged"],
@@ -7316,6 +7427,7 @@ pub fn linebreak_elem() -> Element {
       let e = Element::new(
         name="linebreak",
         title="Line Break",
+        key="linebreak_elem",
         docs="Inserts a line break.",
         keywords=[],
         capabilities=[],
@@ -7350,6 +7462,7 @@ pub fn text_elem() -> Element {
       let e = Element::new(
         name="text",
         title="Text",
+        key="text_elem",
         docs="Customizes the look and layout of text in a variety of ways.",
         keywords=[],
         capabilities=["Debug", "Construct", "PlainText", "Repr"],
@@ -7799,6 +7912,7 @@ pub fn raw_elem() -> Element {
       let e = Element::new(
         name="raw",
         title="Raw Text / Code",
+        key="raw_elem",
         docs="Raw text with optional syntax highlighting.",
         keywords=[],
         capabilities=[
@@ -7932,6 +8046,7 @@ pub fn raw_line_elem() -> Element {
       let e = Element::new(
         name="line",
         title="Raw Text / Code Line",
+        key="raw_line_elem",
         docs="A highlighted line of raw text.",
         keywords=[],
         capabilities=["Tagged", "PlainText"],
@@ -8000,6 +8115,7 @@ pub fn sub_elem() -> Element {
       let e = Element::new(
         name="sub",
         title="Subscript",
+        key="sub_elem",
         docs="Renders text in subscript.",
         keywords=[],
         capabilities=["Tagged"],
@@ -8065,6 +8181,7 @@ pub fn super_elem() -> Element {
       let e = Element::new(
         name="super",
         title="Superscript",
+        key="super_elem",
         docs="Renders text in superscript.",
         keywords=[],
         capabilities=["Tagged"],
@@ -8130,6 +8247,7 @@ pub fn smallcaps_elem() -> Element {
       let e = Element::new(
         name="smallcaps",
         title="Small Capitals",
+        key="smallcaps_elem",
         docs="Displays text in small capitals.",
         keywords=[],
         capabilities=[],
@@ -8171,6 +8289,7 @@ pub fn smart_quote_elem() -> Element {
       let e = Element::new(
         name="smartquote",
         title="Smartquote",
+        key="smart_quote_elem",
         docs="A language-aware quote that reacts to its context.",
         keywords=[],
         capabilities=["PlainText"],
@@ -8232,6 +8351,7 @@ pub fn space_elem() -> Element {
       let e = Element::new(
         name="space",
         title="Space",
+        key="space_elem",
         docs="A text space.",
         keywords=[],
         capabilities=["Unlabellable", "PlainText", "Repr", "PartialEq"],
@@ -8270,6 +8390,7 @@ pub fn curve_elem() -> Element {
       let e = Element::new(
         name="curve",
         title="Curve",
+        key="curve_elem",
         docs="A curve consisting of movements, lines, and Bézier segments.",
         keywords=[],
         capabilities=[],
@@ -8333,6 +8454,7 @@ pub fn curve_move_elem() -> Element {
       let e = Element::new(
         name="move",
         title="Curve Move",
+        key="curve_move_elem",
         docs="Starts a new curve component.",
         keywords=[],
         capabilities=[],
@@ -8378,6 +8500,7 @@ pub fn curve_line_elem() -> Element {
       let e = Element::new(
         name="line",
         title="Curve Line",
+        key="curve_line_elem",
         docs="Adds a straight line from the current point to a following one.",
         keywords=[],
         capabilities=[],
@@ -8423,6 +8546,7 @@ pub fn curve_quad_elem() -> Element {
       let e = Element::new(
         name="quad",
         title="Curve Quadratic Segment",
+        key="curve_quad_elem",
         docs="Adds a quadratic Bézier curve segment from the last point to `end`, using `control` as the control point.",
         keywords=[],
         capabilities=[],
@@ -8479,6 +8603,7 @@ pub fn curve_cubic_elem() -> Element {
       let e = Element::new(
         name="cubic",
         title="Curve Cubic Segment",
+        key="curve_cubic_elem",
         docs="Adds a cubic Bézier curve segment from the last point to `end`, using `control-start` and `control-end` as the control points.",
         keywords=[],
         capabilities=[],
@@ -8546,6 +8671,7 @@ pub fn curve_close_elem() -> Element {
       let e = Element::new(
         name="close",
         title="Curve Close",
+        key="curve_close_elem",
         docs="Closes the curve by adding a segment from the last point to the start of the curve (or the last preceding `curve.move` point).",
         keywords=[],
         capabilities=[],
@@ -8580,6 +8706,7 @@ pub fn image_elem() -> Element {
       let e = Element::new(
         name="image",
         title="Image",
+        key="image_elem",
         docs="A raster or vector graphic.",
         keywords=[],
         capabilities=[
@@ -8731,6 +8858,7 @@ pub fn line_elem() -> Element {
       let e = Element::new(
         name="line",
         title="Line",
+        key="line_elem",
         docs="A line from one point to another.",
         keywords=[],
         capabilities=[],
@@ -8808,6 +8936,7 @@ pub fn polygon_elem() -> Element {
       let e = Element::new(
         name="polygon",
         title="Polygon",
+        key="polygon_elem",
         docs="A closed polygon.",
         keywords=[],
         capabilities=[],
@@ -8871,6 +9000,7 @@ pub fn rect_elem() -> Element {
       let e = Element::new(
         name="rect",
         title="Rectangle",
+        key="rect_elem",
         docs="A rectangle with optional content.",
         keywords=[],
         capabilities=[],
@@ -8976,6 +9106,7 @@ pub fn square_elem() -> Element {
       let e = Element::new(
         name="square",
         title="Square",
+        key="square_elem",
         docs="A square with optional content.",
         keywords=[],
         capabilities=[],
@@ -9093,6 +9224,7 @@ pub fn ellipse_elem() -> Element {
       let e = Element::new(
         name="ellipse",
         title="Ellipse",
+        key="ellipse_elem",
         docs="An ellipse with optional content.",
         keywords=[],
         capabilities=[],
@@ -9187,6 +9319,7 @@ pub fn circle_elem() -> Element {
       let e = Element::new(
         name="circle",
         title="Circle",
+        key="circle_elem",
         docs="A circle with optional content.",
         keywords=[],
         capabilities=[],
@@ -9293,6 +9426,7 @@ pub fn html_format_elem() -> Element {
       let e = Element::new(
         name="html",
         title="HTML",
+        key="html_format_elem",
         docs="Typst's HTML export format (experimental).",
         keywords=[],
         capabilities=["Construct"],
@@ -9324,6 +9458,7 @@ pub fn html_elem() -> Element {
       let e = Element::new(
         name="elem",
         title="Elem",
+        key="html_elem",
         docs="An HTML element that can contain Typst content.",
         keywords=[],
         capabilities=[],
@@ -9414,6 +9549,7 @@ pub fn frame_elem() -> Element {
       let e = Element::new(
         name="frame",
         title="Frame",
+        key="frame_elem",
         docs="An element that lays out its content as an inline SVG.",
         keywords=[],
         capabilities=[],
@@ -9449,6 +9585,7 @@ pub fn pdf_format_elem() -> Element {
       let e = Element::new(
         name="pdf",
         title="PDF",
+        key="pdf_format_elem",
         docs="Typst's PDF export format.",
         keywords=[],
         capabilities=["Construct"],
@@ -9509,6 +9646,7 @@ pub fn pdf_attach_elem() -> Element {
       let e = Element::new(
         name="attach",
         title="Attach",
+        key="pdf_attach_elem",
         docs="A file that will be attached to the output PDF.",
         keywords=["embed"],
         capabilities=["Locatable"],
@@ -9598,6 +9736,7 @@ pub fn svg_format_elem() -> Element {
       let e = Element::new(
         name="svg",
         title="SVG",
+        key="svg_format_elem",
         docs="Typst's SVG export format.",
         keywords=[],
         capabilities=["Construct"],
@@ -9628,6 +9767,7 @@ pub fn png_format_elem() -> Element {
       let e = Element::new(
         name="png",
         title="PNG",
+        key="png_format_elem",
         docs="Typst's PNG export format.",
         keywords=[],
         capabilities=["Construct"],
@@ -9662,6 +9802,7 @@ pub fn bundle_format_elem() -> Element {
       let e = Element::new(
         name="bundle",
         title="Bundle",
+        key="bundle_format_elem",
         docs="Typst's bundle export format (experimental).",
         keywords=[],
         capabilities=["Construct"],
@@ -9686,6 +9827,7 @@ pub fn asset_elem() -> Element {
       let e = Element::new(
         name="asset",
         title="Asset",
+        key="asset_elem",
         docs="Adds a custom file to a bundle.",
         keywords=[],
         capabilities=["Locatable"],

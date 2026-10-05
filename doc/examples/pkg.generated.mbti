@@ -1,0 +1,49 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/doc/examples"
+
+import {
+  "moonbitlang/typst/doc",
+}
+
+// Values
+pub fn branches(Bool, &@doc.IntoContent) -> @doc.Content
+
+pub fn contents_summary() -> @doc.Context
+
+pub fn counter_updates() -> @doc.Seq
+
+pub fn escape_hatches() -> @doc.Seq
+
+pub fn export_pdf(@doc.DocWorld) -> Bytes raise @doc.DocError
+
+pub fn field_states() -> @doc.Seq
+
+pub fn joined_content() -> @doc.Par
+
+pub fn overrides() -> @doc.Seq
+
+pub fn page_header() -> @doc.SetPage
+
+pub fn picture() -> @doc.Figure
+
+pub fn plain_values() -> @doc.Seq
+
+pub fn report() -> @doc.Document
+
+pub fn rules() -> @doc.Document
+
+pub fn stages_figure() -> @doc.Figure
+
+pub fn structural() -> @doc.Seq
+
+pub fn underlined_headings() -> @doc.Show
+
+pub fn write_report(String) -> Unit raise
+
+// Errors
+
+// Types and methods
+
+// Type aliases
+
+// Traits

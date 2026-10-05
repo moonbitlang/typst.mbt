@@ -81,13 +81,25 @@ let memo_generation : Ref[Int] = { val: 0, }
 let memo_counter : Ref[Int] = { val: 0, }
 
 ///|
+/// Whether compilations memoize (see [set_layout_memo_enabled]).
+let memo_enabled : Ref[Bool] = { val: true, }
+
+///|
+/// Turn memoization on (the default) or off for the following
+/// compilations. Memoization must not change results; tests compare
+/// compilations with and without it.
+pub fn set_layout_memo_enabled(enabled : Bool) -> Unit {
+  memo_enabled.val = enabled
+}
+
+///|
 /// Run `f` (a compilation) with fresh memoization caches.
 pub fn[T] with_layout_memo(
   f : () -> T raise SourceError,
 ) -> T raise SourceError {
   let outer = memo_generation.val
   memo_counter.val += 1
-  memo_generation.val = memo_counter.val
+  memo_generation.val = if memo_enabled.val { memo_counter.val } else { 0 }
   let result = f() catch {
     e => {
       memo_generation.val = outer
