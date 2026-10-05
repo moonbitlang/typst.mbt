@@ -395,7 +395,7 @@ pub fn Route::root() -> Route {
 
 ///|
 /// Extend the route with another segment with a default length of 1.
-pub fn Route::extend(outer : Route) -> Route {
+pub fn Route::extend_(outer : Route) -> Route {
   { outer: Some(outer), id: None, len: 1, }
 }
 

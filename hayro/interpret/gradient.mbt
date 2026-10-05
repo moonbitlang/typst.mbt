@@ -122,7 +122,7 @@ fn EncodedRadialAxialShading::axial_extend_covers_bbox(
   let path_bbox = pattern.base_transform.transform_rect_bbox(path_bbox)
   let min_x = path_bbox.min_x()
   let max_x = path_bbox.max_x()
-  (self.extend[0] || min_x >= 0.0) && (self.extend[1] || max_x <= 1.0)
+  (self.extend_[0] || min_x >= 0.0) && (self.extend_[1] || max_x <= 1.0)
 }
 
 ///|
@@ -136,8 +136,8 @@ fn EncodedRadialAxialShading::radial_extend_covers_bbox(
   if p1.x.abs() <= RADIAL_EPSILON && p1.y.abs() <= RADIAL_EPSILON {
     return self.same_center_radial_extend_covers_bbox(path_bbox, r.x, r.y)
   }
-  let start_extend_ok = self.extend[0] || r.x.abs() <= RADIAL_EPSILON
-  let end_extend_ok = self.extend[1] ||
+  let start_extend_ok = self.extend_[0] || r.x.abs() <= RADIAL_EPSILON
+  let end_extend_ok = self.extend_[1] ||
     circle_covers_bbox(@kurbo.Circle::new(p1, r.y), path_bbox)
   start_extend_ok && end_extend_ok
 }
@@ -151,8 +151,8 @@ fn EncodedRadialAxialShading::same_center_radial_extend_covers_bbox(
 ) -> Bool {
   let mut inner_circle = @kurbo.Circle::new(@kurbo.point_zero, r0)
   let mut outer_circle = @kurbo.Circle::new(@kurbo.point_zero, r1)
-  let mut inner_extend = self.extend[0]
-  let mut outer_extend = self.extend[1]
+  let mut inner_extend = self.extend_[0]
+  let mut outer_extend = self.extend_[1]
   if inner_circle.radius > outer_circle.radius {
     let c = inner_circle
     inner_circle = outer_circle

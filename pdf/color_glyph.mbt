@@ -159,8 +159,8 @@ fn ColrSurfacePainter::stops(
 }
 
 ///|
-fn spread(extend : @otf.GradientExtend) -> @export.SpreadMethod {
-  match extend {
+fn spread(extend_ : @otf.GradientExtend) -> @export.SpreadMethod {
+  match extend_ {
     Pad => Pad
     Repeat => Repeat
     Reflect => Reflect
@@ -208,7 +208,7 @@ impl @otf.ColrPainter for ColrSurfacePainter with fn paint(self, paint) {
           x2: lg.x1.to_double(),
           y2: lg.y1.to_double(),
           transform: ts,
-          spread_method: spread(lg.extend),
+          spread_method: spread(lg.extend_),
           stops: self.stops(lg.stops(palette, coords)),
           anti_alias: true,
         }),
@@ -224,7 +224,7 @@ impl @otf.ColrPainter for ColrSurfacePainter with fn paint(self, paint) {
           cy: rg.y1.to_double(),
           cr: rg.r1.to_double(),
           transform: ts,
-          spread_method: spread(rg.extend),
+          spread_method: spread(rg.extend_),
           stops: self.stops(rg.stops(palette, coords)),
           anti_alias: true,
         }),
@@ -238,7 +238,7 @@ impl @otf.ColrPainter for ColrSurfacePainter with fn paint(self, paint) {
           start_angle: sg.start_angle.to_double(),
           end_angle: sg.end_angle.to_double(),
           transform: ts,
-          spread_method: spread(sg.extend),
+          spread_method: spread(sg.extend_),
           stops: self.stops(sg.stops(palette, coords)),
           anti_alias: true,
         }),

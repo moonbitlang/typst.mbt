@@ -15,7 +15,7 @@ pub fn html_block_fragment(
 ) -> Array[HtmlNode] raise @library.SourceError {
   let link = @library.LocatorLink::new(locator)
   let locator = @library.Locator::link(link).split()
-  let engine = engine.with_route(@library.Route::extend(engine.route))
+  let engine = engine.with_route(@library.Route::extend_(engine.route))
   @library.at(content.span(), () => engine.route.check_html_depth())
   let children = realize_fragment(engine, locator, content, styles)
   convert_to_nodes(engine, locator, children, Block, whitespace)

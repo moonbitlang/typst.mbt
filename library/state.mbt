@@ -127,7 +127,7 @@ fn state_sequence(
   let engine = {
     ..engine,
     introspector,
-    route: Route::extend(engine.route).unnested(),
+    route: Route::extend_(engine.route).unnested(),
   }
   let mut current = state.init
   let stops = [current]

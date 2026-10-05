@@ -422,7 +422,7 @@ fn layout_single_impl(
 ) -> @library.Frame raise @library.SourceError {
   let link = @library.LocatorLink::new(locator)
   let locator = @library.Locator::link(link)
-  let engine = engine.with_route(@library.Route::extend(engine.route))
+  let engine = engine.with_route(@library.Route::extend_(engine.route))
   layout_and_modify(styles, styles => {
     layout_single_block(elem, engine, locator, styles, region)
   })
@@ -499,7 +499,7 @@ fn layout_multi_impl(
 ) -> @library.Fragment raise @library.SourceError {
   let link = @library.LocatorLink::new(locator)
   let locator = @library.Locator::link(link)
-  let engine = engine.with_route(@library.Route::extend(engine.route))
+  let engine = engine.with_route(@library.Route::extend_(engine.route))
   layout_and_modify(styles, styles => {
     layout_multi_block(elem, engine, locator, styles, regions)
   })
