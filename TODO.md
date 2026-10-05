@@ -166,7 +166,8 @@ goldens with `scripts/goldens.sh <stage>` (needs Rust; builds `oracle/`).
   anti-aliasing), tilings (the laid-out frame: groups, text items with
   glyphs and spans, shapes, images, links, tags; hashed once per tiling),
   strokes and the other dynamic values (spot colorants, paths, CSS), colours
-  (component bits), modules (whole scope, hashed once per module) and
+  (component bits), symbols (all variants, also those ruled out by the
+  applied modifiers), modules (whole scope, hashed once per module) and
   closures (the syntax tree, defaults, captured bindings with spans and
   kinds, hashed once per closure). No `Fingerprint` marks itself lossy
   anymore, so memoized results with such values in recorded reads are
@@ -181,9 +182,10 @@ goldens with `scripts/goldens.sh <stage>` (needs Rust; builds `oracle/`).
   (10pt three times before), and closures of one `eval` call with the same
   text but different trees. Remaining differences in kind, not in what is
   told apart: the hash values are not upstream's (payload encodings; only
-  the SVG exporter's inputs are byte-exact), symbols, datetimes, decimals,
-  durations, alignments and directions are written as their repr plus the
-  builtin 32-bit hash (`write_leaf`; the reprs show all data), native
+  the SVG exporter's inputs are byte-exact), datetimes, decimals,
+  alignments and directions are written as their repr plus the builtin
+  32-bit hash (`write_leaf`; these reprs show all data, unlike those of
+  symbols and durations, which are hashed structurally), native
   functions by name, title and docs (upstream: identity;
   `typst/fingerprint_wbtest.mbt` checks they are distinct), the
   documentation of a captured library binding lacks upstream's `since`,

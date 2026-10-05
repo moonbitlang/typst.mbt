@@ -417,7 +417,14 @@ y
         + r"""// Symbols (with their variants), decimals (with their scale), durations
 // and datetimes.
 #check((sym.arrow.r, symbol("→"), sym.arrow, sym.arrow.r, symbol("→", ("r", "→")), symbol("→")).map(s => [#box(metadata(s))<r>]))
+// Symbols with the same accessible variants (and repr) that differ in the
+// variants their modifiers have ruled out.
+#let kept(..variants) = symbol(..variants, ("keep", "K")).keep
+#check((kept(("a", "b\u{301}")), kept(("ab", "\u{301}")), kept(("a", "b\u{301}"))).map(s => [#box(metadata(s))<r>]))
+#check((sym.plus, symbol("+"), $+$.body, sym.plus).map(s => [#box(metadata(s))<r>]))
 #check((decimal("1.0"), decimal("1.00"), decimal("1.0")).map(s => [#box(metadata(s))<r>]))
+// Durations below one second (the repr shows whole seconds).
+#check((duration(seconds: 1) * 0.5, duration(seconds: 1) * 0.25, duration(seconds: 1) * 0.5, duration(seconds: 0)).map(s => [#box(metadata(s))<r>]))
 #check((duration(seconds: 1), duration(seconds: 2), duration(seconds: 1), duration(minutes: 1), duration(seconds: 60)).map(s => [#box(metadata(s))<r>]))
 #check((datetime(year: 2020, month: 1, day: 1), datetime(year: 2020, month: 1, day: 1, hour: 0, minute: 0, second: 0), datetime(year: 2020, month: 1, day: 1)).map(s => [#box(metadata(s))<r>]))
 // Alignments, directions, regular expressions, versions, bytes and labels.

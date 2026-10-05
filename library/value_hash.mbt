@@ -105,7 +105,7 @@ pub impl Fingerprint for Value with fn fingerprint(self, state) {
     }
     Symbol(v) => {
       state.write_discriminant(13)
-      state.write_leaf(v.repr(), v)
+      state.write(v)
     }
     Version(v) => {
       state.write_discriminant(14)
@@ -134,7 +134,10 @@ pub impl Fingerprint for Value with fn fingerprint(self, state) {
     }
     Duration(v) => {
       state.write_discriminant(20)
-      state.write_leaf(v.repr(), v)
+      // Upstream derives `Hash` over `time::Duration`: seconds and
+      // nanoseconds (the repr only shows whole seconds).
+      state.write_i64(v.0.whole_seconds())
+      state.write_usize(v.0.subsec_nanoseconds())
     }
     Content(v) => {
       state.write_discriminant(21)
@@ -172,6 +175,53 @@ pub impl Fingerprint for Value with fn fingerprint(self, state) {
       state.write_discriminant(29)
       state.write(v)
     }
+  }
+}
+
+///|
+/// Upstream derives `Hash` for `Symbol`: a single value, a list of variants
+/// or a list with applied modifiers, including the variants that the
+/// modifiers have ruled out (which the repr does not show).
+pub impl Fingerprint for Symbol with fn fingerprint(self, state) {
+  match self.inner {
+    Single(value) => {
+      state.write_discriminant(0)
+      state.write_str(value)
+    }
+    Complex(variants) => {
+      state.write_discriminant(1)
+      fingerprint_symbol_variants(state, variants)
+    }
+    Modified({ list, modifiers, deprecated, }) => {
+      state.write_discriminant(2)
+      match list {
+        Static(variants) => {
+          state.write_discriminant(0)
+          fingerprint_symbol_variants(state, variants)
+        }
+        Runtime(variants) => {
+          state.write_discriminant(1)
+          fingerprint_symbol_variants(state, variants)
+        }
+      }
+      state.write_str(modifiers.as_str())
+      state.write_bool(deprecated)
+    }
+  }
+}
+
+///|
+/// `[(ModifierSet<S>, S, Option<S>)]`: modifiers, value and deprecation
+/// message of each variant.
+fn fingerprint_symbol_variants(
+  state : SipHasher128,
+  variants : Array[SymbolVariantData],
+) -> Unit {
+  state.write_usize(variants.length())
+  for variant in variants {
+    state.write_str(variant.0.as_str())
+    state.write_str(variant.1)
+    state.write(variant.2)
   }
 }
 

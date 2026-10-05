@@ -346,6 +346,41 @@ test "fingerprints of modules and closures cover scopes and syntax trees" {
   cyclic.bind("self", Binding::new(Module(cycle), detached)) |> ignore
   distinct(Module(cycle))
   assert_eq(hash128(Value::Module(cycle)), hash128(Value::Module(cycle)))
+  // Two modules that hold each other, one of them with a host closure: the
+  // module where a cycle closes caches the flags of everything in it, the
+  // other one is cached when it is hashed itself, and collecting the host
+  // closures leaves both hashes as they are.
+  let call : NativeFn = (_, _, _) => None
+  let host = HostFunc::new(hash128("f"), call)
+  let first_scope = Scope::new()
+  let second_scope = Scope::new()
+  let first = Module::anonymous(first_scope)
+  let second = Module::anonymous(second_scope)
+  first_scope.bind("b", Binding::new(Module(second), detached)) |> ignore
+  second_scope.bind("a", Binding::new(Module(first), detached)) |> ignore
+  second_scope.bind("f", Binding::new(Func(Func::host(host)), detached))
+  |> ignore
+  let (first_hash, first_flags) = fingerprint_and_flags(Value::Module(first))
+  assert_true((first_flags & fingerprint_host) != 0)
+  let collect = (m : Module) => {
+    fingerprint_hosts_in(() => hash128(Value::Module(m)) |> ignore)
+  }
+  for _ in 0..<2 {
+    for m in [second, first] {
+      let hosts = collect(m)
+      assert_eq(hosts.length(), 1)
+      assert_true(physical_equal(hosts[0], host))
+    }
+  }
+  let (second_hash, second_flags) = fingerprint_and_flags(Value::Module(second))
+  assert_true((second_flags & fingerprint_host) != 0)
+  assert_eq(
+    fingerprint_and_flags(Value::Module(first)),
+    (first_hash, first_flags),
+  )
+  assert_eq(collect(first).length(), 1)
+  assert_eq(hash128(Value::Module(first)), first_hash)
+  assert_eq(hash128(Value::Module(second)), second_hash)
   let node = @syntax.parse_code("x")
   distinct(closure(node, scope(Module(a), detached)))
   distinct(closure(node, scope(Module(b), detached)))
@@ -373,4 +408,62 @@ test "fingerprints of modules and closures cover scopes and syntax trees" {
     hash128(closure(@syntax.parse_code("x"), scope(Int(1), detached))),
     hash128(closure(node, scope(Int(1), detached))),
   )
+}
+
+///|
+test "fingerprints of symbols cover the variants that the repr hides" {
+  let variant = (modifiers : String, value : String) => {
+    let data : SymbolVariantData = (
+      ModifierSet::from_raw_dotted(modifiers),
+      value,
+      None,
+    )
+    data
+  }
+  let kept = (hidden : SymbolVariantData) => {
+    Value::Symbol({
+      inner: Modified({
+        list: Runtime([hidden, variant("keep", "K")]),
+        modifiers: ModifierSet::from_raw_dotted("keep"),
+        deprecated: false,
+      }),
+    })
+  }
+  let a = kept(variant("", "ab\u{301}"))
+  let b = kept(variant("", "a"))
+  assert_eq(a.repr(), b.repr())
+  assert_false(a == b)
+  assert_distinct([
+    a,
+    b,
+    kept(variant("x", "a")),
+    Symbol({ inner: Single("K"), }),
+    Symbol({ inner: Complex([variant("", "K")]), }),
+    Symbol({
+      inner: Modified({
+        list: Static([variant("", "K")]),
+        modifiers: ModifierSet::default(),
+        deprecated: false,
+      }),
+    }),
+    Symbol({
+      inner: Modified({
+        list: Runtime([variant("", "K")]),
+        modifiers: ModifierSet::default(),
+        deprecated: false,
+      }),
+    }),
+    Symbol({
+      inner: Modified({
+        list: Runtime([variant("", "K")]),
+        modifiers: ModifierSet::default(),
+        deprecated: true,
+      }),
+    }),
+  ])
+  // Durations below one second have one repr.
+  let half = Value::Duration(Duration(@time.Duration::seconds_f64(0.5)))
+  let quarter = Value::Duration(Duration(@time.Duration::seconds_f64(0.25)))
+  assert_eq(half.repr(), quarter.repr())
+  assert_distinct([half, quarter])
 }

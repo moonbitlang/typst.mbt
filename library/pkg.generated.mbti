@@ -10704,6 +10704,7 @@ pub fn Symbol::runtime_char(Char) -> Self
 pub fn Symbol::single(String) -> Self
 pub fn Symbol::variants(Self) -> Array[(ModifierSet, String, String?)]
 pub impl Show for Symbol
+pub impl Fingerprint for Symbol
 pub impl FromValue for Symbol
 pub impl IntoValue for Symbol
 pub impl Reflect for Symbol
