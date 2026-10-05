@@ -51,6 +51,7 @@ fn Lower::content(
         Some(site) => self.session.registry.span(self.entry(site))
         None => fallback
       }
+      self.check_text(text, span)
       if @syntax.utf8_len(text) > text_offset_max {
         self.session.registry.mark_long_text(span)
       }
@@ -69,6 +70,8 @@ fn Lower::content(
     // `show` directly in code and content blocks).
     NSetRule(set) => raise self.misplaced_rule(set.origin)
     NShowRule(show) => raise self.misplaced_rule(show.origin)
+    NInvalid(message, site) =>
+      raise error_at(self.session.registry.span(self.entry(site)), message)
     NLabelled(body, label, site, label_param) => {
       let entry = self.entry(site)
       let span = self.session.registry.span(entry)
@@ -110,6 +113,24 @@ fn Lower::content(
 
 ///|
 /// The error for a rule that is not a direct child of a sequence.
+/// A string that reaches lowering must not contain the placeholder of an
+/// interpolated description: only `Prose` resolves those (`prose.mbt`).
+fn Lower::check_text(
+  self : Lower,
+  text : String,
+  span : @syntax.Span,
+) -> Unit raise @library.SourceError {
+  ignore(self)
+  if prose_leak(text) is Some(message) {
+    raise @library.SourceError([
+      @library.SourceDiagnostic::error_at(span, message).with_hint(
+        prose_leak_hint,
+      ),
+    ])
+  }
+}
+
+///|
 fn Lower::misplaced_rule(
   self : Lower,
   site : Site,
@@ -422,6 +443,7 @@ fn Lower::value(
     VInt(v) => @library.Value::Int(v)
     VFloat(v) => @library.Value::Float(v)
     VStr(v) => {
+      self.check_text(v, span)
       // Also for strings that become text (`#value`, raw text): glyph
       // offsets into a long string are not reliable.
       if @syntax.utf8_len(v) > text_offset_max {
@@ -577,6 +599,7 @@ fn Lower::eval(
   let entry = self.entry(node.origin)
   let span = self.session.registry.span(entry)
   let source_span = self.session.registry.arg_span(entry, node.source_param)
+  self.check_text(node.source, source_span)
   let scope = @library.Scope::new()
   for pair in node.scope {
     scope.define(pair.0, self.value(pair.1, span)) |> ignore

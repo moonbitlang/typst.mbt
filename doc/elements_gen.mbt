@@ -88,6 +88,12 @@ pub impl IntoContent for Heading with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for Heading with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set heading(..)`.
 ///
 /// Explicit states besides a value:
@@ -180,6 +186,12 @@ pub struct HeadingView {
 ///|
 pub impl IntoContent for HeadingView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for HeadingView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -303,6 +315,12 @@ pub impl IntoContent for Par with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for Par with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set par(..)`.
 ///
 /// Explicit states besides a value:
@@ -371,6 +389,12 @@ pub struct ParView {
 ///|
 pub impl IntoContent for ParView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for ParView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -449,6 +473,12 @@ pub impl IntoContent for Parbreak with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for Parbreak with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// A `parbreak` element handed to a callback. As content it re-emits the
 /// element unchanged.
 pub struct ParbreakView {
@@ -458,6 +488,12 @@ pub struct ParbreakView {
 ///|
 pub impl IntoContent for ParbreakView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for ParbreakView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -517,6 +553,12 @@ pub impl IntoContent for Strong with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for Strong with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set strong(..)`.
 pub struct SetStrong {
   priv node : SetNode
@@ -562,6 +604,12 @@ pub struct StrongView {
 ///|
 pub impl IntoContent for StrongView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for StrongView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -628,6 +676,12 @@ pub impl IntoContent for Emph with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for Emph with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// A `emph` element handed to a callback. As content it re-emits the element
 /// unchanged.
 pub struct EmphView {
@@ -637,6 +691,12 @@ pub struct EmphView {
 ///|
 pub impl IntoContent for EmphView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for EmphView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -708,6 +768,12 @@ pub impl IntoContent for Link with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for Link with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// A `link` element handed to a callback. As content it re-emits the element
 /// unchanged.
 pub struct LinkView {
@@ -717,6 +783,12 @@ pub struct LinkView {
 ///|
 pub impl IntoContent for LinkView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for LinkView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -785,6 +857,12 @@ pub impl IntoContent for Ref with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for Ref with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set ref(..)`.
 ///
 /// Explicit states besides a value:
@@ -841,6 +919,12 @@ pub struct RefView {
 ///|
 pub impl IntoContent for RefView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for RefView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -911,6 +995,12 @@ pub impl IntoContent for Footnote with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for Footnote with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set footnote(..)`.
 pub struct SetFootnote {
   priv node : SetNode
@@ -960,6 +1050,12 @@ pub struct FootnoteView {
 ///|
 pub impl IntoContent for FootnoteView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for FootnoteView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -1034,6 +1130,12 @@ pub impl IntoContent for Quote with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for Quote with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set quote(..)`.
 ///
 /// Explicit states besides a value:
@@ -1091,6 +1193,12 @@ pub struct QuoteView {
 ///|
 pub impl IntoContent for QuoteView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for QuoteView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -1197,6 +1305,12 @@ pub impl IntoContent for List with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for List with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set list(..)`.
 ///
 /// Explicit states besides a value:
@@ -1276,6 +1390,12 @@ pub impl IntoContent for ListView with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for ListView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
 /// The element as a generic view.
 pub fn ListView::view(self : ListView) -> ContentView {
   ContentView::new(self.content)
@@ -1347,6 +1467,12 @@ pub impl IntoContent for ListItem with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for ListItem with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// A `list.item` element handed to a callback. As content it re-emits the
 /// element unchanged.
 pub struct ListItemView {
@@ -1356,6 +1482,12 @@ pub struct ListItemView {
 ///|
 pub impl IntoContent for ListItemView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for ListItemView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -1473,6 +1605,12 @@ pub impl IntoContent for Enum with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for Enum with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set enum(..)`.
 ///
 /// Explicit states besides a value:
@@ -1566,6 +1704,12 @@ pub struct EnumView {
 ///|
 pub impl IntoContent for EnumView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for EnumView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -1669,6 +1813,12 @@ pub impl IntoContent for EnumItem with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for EnumItem with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set enum.item(..)`.
 ///
 /// Explicit states besides a value:
@@ -1719,6 +1869,12 @@ pub struct EnumItemView {
 ///|
 pub impl IntoContent for EnumItemView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for EnumItemView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -1811,6 +1967,12 @@ pub impl IntoContent for Terms with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for Terms with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set terms(..)`.
 ///
 /// Explicit states besides a value:
@@ -1879,6 +2041,12 @@ pub struct TermsView {
 ///|
 pub impl IntoContent for TermsView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for TermsView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -1953,6 +2121,12 @@ pub impl IntoContent for TermsItem with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for TermsItem with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// A `terms.item` element handed to a callback. As content it re-emits the
 /// element unchanged.
 pub struct TermsItemView {
@@ -1962,6 +2136,12 @@ pub struct TermsItemView {
 ///|
 pub impl IntoContent for TermsItemView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for TermsItemView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -2084,6 +2264,12 @@ pub impl IntoContent for Figure with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for Figure with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set figure(..)`.
 ///
 /// Explicit states besides a value:
@@ -2176,6 +2362,12 @@ pub struct FigureView {
 ///|
 pub impl IntoContent for FigureView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for FigureView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -2318,6 +2510,12 @@ pub impl IntoContent for Table with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for Table with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set table(..)`.
 pub struct SetTable {
   priv node : SetNode
@@ -2403,6 +2601,12 @@ pub struct TableView {
 ///|
 pub impl IntoContent for TableView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for TableView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -2526,6 +2730,12 @@ pub impl IntoContent for TableCell with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for TableCell with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set table.cell(..)`.
 ///
 /// Explicit states besides a value:
@@ -2611,6 +2821,12 @@ pub struct TableCellView {
 ///|
 pub impl IntoContent for TableCellView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for TableCellView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -2721,6 +2937,12 @@ pub impl IntoContent for TableHeader with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for TableHeader with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set table.header(..)`.
 pub struct SetTableHeader {
   priv node : SetNode
@@ -2770,6 +2992,12 @@ pub struct TableHeaderView {
 ///|
 pub impl IntoContent for TableHeaderView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for TableHeaderView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -2840,6 +3068,12 @@ pub impl IntoContent for TableFooter with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for TableFooter with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set table.footer(..)`.
 pub struct SetTableFooter {
   priv node : SetNode
@@ -2885,6 +3119,12 @@ pub struct TableFooterView {
 ///|
 pub impl IntoContent for TableFooterView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for TableFooterView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -2966,6 +3206,12 @@ pub impl IntoContent for TableHline with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for TableHline with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set table.hline(..)`.
 ///
 /// Explicit states besides a value:
@@ -3032,6 +3278,12 @@ pub struct TableHlineView {
 ///|
 pub impl IntoContent for TableHlineView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for TableHlineView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -3132,6 +3384,12 @@ pub impl IntoContent for TableVline with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for TableVline with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set table.vline(..)`.
 ///
 /// Explicit states besides a value:
@@ -3198,6 +3456,12 @@ pub struct TableVlineView {
 ///|
 pub impl IntoContent for TableVlineView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for TableVlineView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -3289,6 +3553,12 @@ pub impl IntoContent for Outline with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for Outline with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set outline(..)`.
 ///
 /// Explicit states besides a value:
@@ -3347,6 +3617,12 @@ pub struct OutlineView {
 ///|
 pub impl IntoContent for OutlineView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for OutlineView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -3473,6 +3749,12 @@ pub impl IntoContent for Title with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for Title with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set title(..)`.
 ///
 /// Explicit states besides a value:
@@ -3523,6 +3805,12 @@ pub struct TitleView {
 ///|
 pub impl IntoContent for TitleView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for TitleView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -3694,6 +3982,12 @@ pub impl IntoContent for Text with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for Text with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set text(..)`.
 ///
 /// Explicit states besides a value:
@@ -3842,6 +4136,12 @@ pub struct TextView {
 ///|
 pub impl IntoContent for TextView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for TextView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -4019,6 +4319,12 @@ pub impl IntoContent for Raw with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for Raw with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set raw(..)`.
 ///
 /// Explicit states besides a value:
@@ -4079,6 +4385,12 @@ pub struct RawView {
 ///|
 pub impl IntoContent for RawView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for RawView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -4151,6 +4463,12 @@ pub impl IntoContent for Linebreak with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for Linebreak with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set linebreak(..)`.
 pub struct SetLinebreak {
   priv node : SetNode
@@ -4196,6 +4514,12 @@ pub struct LinebreakView {
 ///|
 pub impl IntoContent for LinebreakView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for LinebreakView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -4264,6 +4588,12 @@ pub impl IntoContent for Smartquote with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for Smartquote with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set smartquote(..)`.
 pub struct SetSmartquote {
   priv node : SetNode
@@ -4317,6 +4647,12 @@ pub struct SmartquoteView {
 ///|
 pub impl IntoContent for SmartquoteView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for SmartquoteView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -4409,6 +4745,12 @@ pub impl IntoContent for Underline with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for Underline with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set underline(..)`.
 ///
 /// Explicit states besides a value:
@@ -4474,6 +4816,12 @@ pub struct UnderlineView {
 ///|
 pub impl IntoContent for UnderlineView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for UnderlineView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -4582,6 +4930,12 @@ pub impl IntoContent for Overline with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for Overline with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set overline(..)`.
 ///
 /// Explicit states besides a value:
@@ -4647,6 +5001,12 @@ pub struct OverlineView {
 ///|
 pub impl IntoContent for OverlineView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for OverlineView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -4751,6 +5111,12 @@ pub impl IntoContent for Strike with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for Strike with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set strike(..)`.
 ///
 /// Explicit states besides a value:
@@ -4812,6 +5178,12 @@ pub struct StrikeView {
 ///|
 pub impl IntoContent for StrikeView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for StrikeView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -4911,6 +5283,12 @@ pub impl IntoContent for Highlight with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for Highlight with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set highlight(..)`.
 ///
 /// Explicit states besides a value:
@@ -4971,6 +5349,12 @@ pub struct HighlightView {
 ///|
 pub impl IntoContent for HighlightView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for HighlightView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -5067,6 +5451,12 @@ pub impl IntoContent for Sub with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for Sub with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set sub(..)`.
 ///
 /// Explicit states besides a value:
@@ -5124,6 +5514,12 @@ pub struct SubView {
 ///|
 pub impl IntoContent for SubView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for SubView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -5212,6 +5608,12 @@ pub impl IntoContent for Super with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for Super with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set super(..)`.
 ///
 /// Explicit states besides a value:
@@ -5269,6 +5671,12 @@ pub struct SuperView {
 ///|
 pub impl IntoContent for SuperView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for SuperView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -5349,6 +5757,12 @@ pub impl IntoContent for Smallcaps with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for Smallcaps with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set smallcaps(..)`.
 pub struct SetSmallcaps {
   priv node : SetNode
@@ -5394,6 +5808,12 @@ pub struct SmallcapsView {
 ///|
 pub impl IntoContent for SmallcapsView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for SmallcapsView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -5560,6 +5980,12 @@ pub impl IntoContent for Page with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for Page with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set page(..)`.
 ///
 /// Explicit states besides a value:
@@ -5700,6 +6126,12 @@ pub impl IntoContent for PageView with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for PageView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
 /// The element as a generic view.
 pub fn PageView::view(self : PageView) -> ContentView {
   ContentView::new(self.content)
@@ -5816,6 +6248,12 @@ pub impl IntoContent for Pagebreak with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for Pagebreak with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set pagebreak(..)`.
 ///
 /// Explicit states besides a value:
@@ -5868,6 +6306,12 @@ pub struct PagebreakView {
 ///|
 pub impl IntoContent for PagebreakView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for PagebreakView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -5939,6 +6383,12 @@ pub impl IntoContent for Align with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for Align with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set align(..)`.
 pub struct SetAlign {
   priv node : SetNode
@@ -5986,6 +6436,12 @@ pub struct AlignView {
 ///|
 pub impl IntoContent for AlignView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for AlignView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -6117,6 +6573,12 @@ pub impl IntoContent for Block with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for Block with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set block(..)`.
 ///
 /// Explicit states besides a value:
@@ -6223,6 +6685,12 @@ pub struct BlockView {
 ///|
 pub impl IntoContent for BlockView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for BlockView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -6373,6 +6841,12 @@ pub impl IntoContent for Box with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for Box with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set box(..)`.
 ///
 /// Explicit states besides a value:
@@ -6456,6 +6930,12 @@ pub struct BoxView {
 ///|
 pub impl IntoContent for BoxView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for BoxView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -6573,6 +7053,12 @@ pub impl IntoContent for Pad with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for Pad with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set pad(..)`.
 pub struct SetPad {
   priv node : SetNode
@@ -6642,6 +7128,12 @@ pub struct PadView {
 ///|
 pub impl IntoContent for PadView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for PadView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -6766,6 +7258,12 @@ pub impl IntoContent for Place with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for Place with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set place(..)`.
 ///
 /// Explicit states besides a value:
@@ -6840,6 +7338,12 @@ pub struct PlaceView {
 ///|
 pub impl IntoContent for PlaceView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for PlaceView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -6937,6 +7441,12 @@ pub impl IntoContent for Stack with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for Stack with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set stack(..)`.
 ///
 /// Explicit states besides a value:
@@ -6989,6 +7499,12 @@ pub struct StackView {
 ///|
 pub impl IntoContent for StackView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for StackView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -7098,6 +7614,12 @@ pub impl IntoContent for Grid with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for Grid with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set grid(..)`.
 pub struct SetGrid {
   priv node : SetNode
@@ -7183,6 +7705,12 @@ pub struct GridView {
 ///|
 pub impl IntoContent for GridView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for GridView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -7304,6 +7832,12 @@ pub impl IntoContent for GridCell with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for GridCell with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set grid.cell(..)`.
 ///
 /// Explicit states besides a value:
@@ -7389,6 +7923,12 @@ pub struct GridCellView {
 ///|
 pub impl IntoContent for GridCellView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for GridCellView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -7499,6 +8039,12 @@ pub impl IntoContent for GridHeader with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for GridHeader with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set grid.header(..)`.
 pub struct SetGridHeader {
   priv node : SetNode
@@ -7548,6 +8094,12 @@ pub struct GridHeaderView {
 ///|
 pub impl IntoContent for GridHeaderView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for GridHeaderView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -7618,6 +8170,12 @@ pub impl IntoContent for GridFooter with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for GridFooter with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set grid.footer(..)`.
 pub struct SetGridFooter {
   priv node : SetNode
@@ -7663,6 +8221,12 @@ pub struct GridFooterView {
 ///|
 pub impl IntoContent for GridFooterView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for GridFooterView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -7744,6 +8308,12 @@ pub impl IntoContent for GridHline with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for GridHline with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set grid.hline(..)`.
 ///
 /// Explicit states besides a value:
@@ -7810,6 +8380,12 @@ pub struct GridHlineView {
 ///|
 pub impl IntoContent for GridHlineView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for GridHlineView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -7909,6 +8485,12 @@ pub impl IntoContent for GridVline with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for GridVline with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set grid.vline(..)`.
 ///
 /// Explicit states besides a value:
@@ -7975,6 +8557,12 @@ pub struct GridVlineView {
 ///|
 pub impl IntoContent for GridVlineView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for GridVlineView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -8075,6 +8663,12 @@ pub impl IntoContent for Columns with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for Columns with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set columns(..)`.
 ///
 /// Explicit states besides a value:
@@ -8137,6 +8731,12 @@ pub struct ColumnsView {
 ///|
 pub impl IntoContent for ColumnsView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for ColumnsView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -8211,6 +8811,12 @@ pub impl IntoContent for Colbreak with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for Colbreak with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set colbreak(..)`.
 pub struct SetColbreak {
   priv node : SetNode
@@ -8256,6 +8862,12 @@ pub struct ColbreakView {
 ///|
 pub impl IntoContent for ColbreakView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for ColbreakView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -8318,6 +8930,12 @@ pub impl IntoContent for H with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for H with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set h(..)`.
 pub struct SetH {
   priv node : SetNode
@@ -8363,6 +8981,12 @@ pub struct HView {
 ///|
 pub impl IntoContent for HView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for HView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -8426,6 +9050,12 @@ pub impl IntoContent for V with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for V with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set v(..)`.
 pub struct SetV {
   priv node : SetNode
@@ -8471,6 +9101,12 @@ pub struct VView {
 ///|
 pub impl IntoContent for VView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for VView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -8527,6 +9163,12 @@ pub impl IntoContent for Hide with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for Hide with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// A `hide` element handed to a callback. As content it re-emits the element
 /// unchanged.
 pub struct HideView {
@@ -8536,6 +9178,12 @@ pub struct HideView {
 ///|
 pub impl IntoContent for HideView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for HideView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -8605,6 +9253,12 @@ pub impl IntoContent for Repeat with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for Repeat with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set repeat(..)`.
 pub struct SetRepeat {
   priv node : SetNode
@@ -8654,6 +9308,12 @@ pub struct RepeatView {
 ///|
 pub impl IntoContent for RepeatView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for RepeatView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -8731,6 +9391,12 @@ pub impl IntoContent for Move with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for Move with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set move(..)`.
 pub struct SetMove {
   priv node : SetNode
@@ -8780,6 +9446,12 @@ pub struct MoveView {
 ///|
 pub impl IntoContent for MoveView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for MoveView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -8864,6 +9536,12 @@ pub impl IntoContent for Rotate with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for Rotate with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set rotate(..)`.
 pub struct SetRotate {
   priv node : SetNode
@@ -8919,6 +9597,12 @@ pub struct RotateView {
 ///|
 pub impl IntoContent for RotateView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for RotateView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -9033,6 +9717,12 @@ pub impl IntoContent for Image with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for Image with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set image(..)`.
 ///
 /// Explicit states besides a value:
@@ -9108,6 +9798,12 @@ pub struct ImageView {
 ///|
 pub impl IntoContent for ImageView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for ImageView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -9221,6 +9917,12 @@ pub impl IntoContent for Line with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for Line with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set line(..)`.
 ///
 /// Explicit states besides a value:
@@ -9293,6 +9995,12 @@ pub struct LineView {
 ///|
 pub impl IntoContent for LineView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for LineView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -9412,6 +10120,12 @@ pub impl IntoContent for Rect with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for Rect with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set rect(..)`.
 ///
 /// Explicit states besides a value:
@@ -9493,6 +10207,12 @@ pub struct RectView {
 ///|
 pub impl IntoContent for RectView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for RectView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -9621,6 +10341,12 @@ pub impl IntoContent for Square with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for Square with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set square(..)`.
 ///
 /// Explicit states besides a value:
@@ -9707,6 +10433,12 @@ pub struct SquareView {
 ///|
 pub impl IntoContent for SquareView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for SquareView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -9831,6 +10563,12 @@ pub impl IntoContent for Ellipse with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for Ellipse with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set ellipse(..)`.
 ///
 /// Explicit states besides a value:
@@ -9908,6 +10646,12 @@ pub struct EllipseView {
 ///|
 pub impl IntoContent for EllipseView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for EllipseView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -10029,6 +10773,12 @@ pub impl IntoContent for Circle with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for Circle with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set circle(..)`.
 ///
 /// Explicit states besides a value:
@@ -10110,6 +10860,12 @@ pub struct CircleView {
 ///|
 pub impl IntoContent for CircleView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for CircleView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -10219,6 +10975,12 @@ pub impl IntoContent for Polygon with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for Polygon with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set polygon(..)`.
 ///
 /// Explicit states besides a value:
@@ -10276,6 +11038,12 @@ pub struct PolygonView {
 ///|
 pub impl IntoContent for PolygonView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for PolygonView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -10362,6 +11130,12 @@ pub impl IntoContent for Curve with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for Curve with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set curve(..)`.
 ///
 /// Explicit states besides a value:
@@ -10419,6 +11193,12 @@ pub struct CurveView {
 ///|
 pub impl IntoContent for CurveView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for CurveView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -10495,6 +11275,12 @@ pub impl IntoContent for CurveMove with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for CurveMove with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set curve.move(..)`.
 pub struct SetCurveMove {
   priv node : SetNode
@@ -10540,6 +11326,12 @@ pub struct CurveMoveView {
 ///|
 pub impl IntoContent for CurveMoveView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for CurveMoveView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -10607,6 +11399,12 @@ pub impl IntoContent for CurveLine with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for CurveLine with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set curve.line(..)`.
 pub struct SetCurveLine {
   priv node : SetNode
@@ -10652,6 +11450,12 @@ pub struct CurveLineView {
 ///|
 pub impl IntoContent for CurveLineView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for CurveLineView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -10731,6 +11535,12 @@ pub impl IntoContent for CurveQuad with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for CurveQuad with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set curve.quad(..)`.
 pub struct SetCurveQuad {
   priv node : SetNode
@@ -10776,6 +11586,12 @@ pub struct CurveQuadView {
 ///|
 pub impl IntoContent for CurveQuadView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for CurveQuadView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -10865,6 +11681,12 @@ pub impl IntoContent for CurveCubic with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for CurveCubic with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set curve.cubic(..)`.
 pub struct SetCurveCubic {
   priv node : SetNode
@@ -10910,6 +11732,12 @@ pub struct CurveCubicView {
 ///|
 pub impl IntoContent for CurveCubicView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for CurveCubicView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -10971,6 +11799,12 @@ pub impl IntoContent for CurveClose with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for CurveClose with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set curve.close(..)`.
 pub struct SetCurveClose {
   priv node : SetNode
@@ -11016,6 +11850,12 @@ pub struct CurveCloseView {
 ///|
 pub impl IntoContent for CurveCloseView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for CurveCloseView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -11106,6 +11946,12 @@ pub impl IntoContent for Scale with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for Scale with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set scale(..)`.
 ///
 /// Explicit states besides a value:
@@ -11174,6 +12020,12 @@ pub struct ScaleView {
 ///|
 pub impl IntoContent for ScaleView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for ScaleView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -11270,6 +12122,12 @@ pub impl IntoContent for Skew with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for Skew with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set skew(..)`.
 pub struct SetSkew {
   priv node : SetNode
@@ -11327,6 +12185,12 @@ pub struct SkewView {
 ///|
 pub impl IntoContent for SkewView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for SkewView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -11450,6 +12314,12 @@ pub impl IntoContent for EquationView with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for EquationView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
 /// The element as a generic view.
 pub fn EquationView::view(self : EquationView) -> ContentView {
   ContentView::new(self.content)
@@ -11562,6 +12432,12 @@ pub impl IntoContent for Bibliography with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for Bibliography with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set bibliography(..)`.
 ///
 /// Explicit states besides a value:
@@ -11623,6 +12499,12 @@ pub struct BibliographyView {
 ///|
 pub impl IntoContent for BibliographyView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for BibliographyView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -11712,6 +12594,12 @@ pub impl IntoContent for Cite with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for Cite with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `set cite(..)`.
 ///
 /// Explicit states besides a value:
@@ -11773,6 +12661,12 @@ pub impl IntoContent for CiteView with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for CiteView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
+}
+
+///|
 /// The element as a generic view.
 pub fn CiteView::view(self : CiteView) -> ContentView {
   ContentView::new(self.content)
@@ -11830,6 +12724,12 @@ pub impl IntoContent for Metadata with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for Metadata with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// A `metadata` element handed to a callback. As content it re-emits the
 /// element unchanged.
 pub struct MetadataView {
@@ -11839,6 +12739,12 @@ pub struct MetadataView {
 ///|
 pub impl IntoContent for MetadataView with fn into_content(self) {
   Content::of(NEngine(self.content))
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for MetadataView with fn output(self, logger) {
+  prose_placeholder(Content::of(NEngine(self.content)), logger)
 }
 
 ///|
@@ -11894,6 +12800,12 @@ pub impl IntoContent for Lorem with fn into_content(self) {
 }
 
 ///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for Lorem with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
 /// `polygon.regular`: A regular polygon, defined by its size and number of
 /// vertices.
 ///
@@ -11946,6 +12858,12 @@ pub fn PolygonRegular::PolygonRegular(
 ///|
 pub impl IntoContent for PolygonRegular with fn into_content(self) {
   self.content
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for PolygonRegular with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
 }
 
 ///|

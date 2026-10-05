@@ -1,6 +1,9 @@
 # A Typst-to-EDSL translator (design, revision 5)
 
-Status: revision 5. Revision 1 (a draft with source preludes, rule
+Status: revision 5, approved by the Codex review
+`docs/edsl-reviews/convert-plan-5.md`, with its five minor narrowings worked
+in (the audited call list, spreads after named arguments, stroke
+shorthands, integer literals, the `Numbering` forms). Revision 1 (a draft with source preludes, rule
 continuations, merged text and a relaxed comparison) was rejected by the
 Codex review `docs/edsl-reviews/convert-plan-1.md`; revision 2 adopted its
 replacement design; revision 3 narrows the rules that review 2
@@ -151,7 +154,11 @@ value).
   passes named, or in the positional place for optional positional fields.
   A named argument for a field that Typst takes positionally only, a
   duplicate named argument or a spread argument make the call a generic
-  `Call(path, positional=.., named=..)` with `Value::spread` (T2).
+  `Call(path, positional=.., named=..)` with `Value::spread` (T2). A call
+  with a spread after a named argument is not typed at all (`Call` passes
+  its positional arguments, the spreads among them, before the named
+  ones, and a later argument of the same name wins); the same holds for
+  the generic set rule.
 - Any other path: `Call(path, ..)` in a content stream, `Value::call(path,
   ..)` as a value (T2).
 - Methods on values, calls of user functions, closures and everything
@@ -182,15 +189,16 @@ computes:
 | Type | Typst forms |
 |---|---|
 | `&IntoContent` | a content block; a string literal; `none`/`auto` as `NoneValue()`/`AutoValue()`; any expression with a `Value` form |
-| `Bool`, `Int64`, `Double`, `String` | the literal (with a sign); a translated variable of that type |
+| `Bool`, `Int64`, `Double`, `String` | the literal (with a sign); a translated variable of that type. An integer literal only if it parses before its sign is applied (`-9223372036854775808` is Typst's error `cannot write minimum integer manually`) and fits the parameter (`Luma(Int)`, `Weight(Int)`) |
 | `Length` | numeric literals with a length or ratio unit; sums, differences and negations of those (the facade lowers them with Typst's operators); `auto`/`none` |
 | `Spacing`, `Sizing` | one numeric literal (a fraction, a length or a ratio); a `Length` form as `Rel(..)`; `auto`/`none`. No arithmetic with fractions (the facades have none) |
 | `Angle` | one numeric literal with an angle unit (the facade has no operators and no states) |
 | `Paint` | a named colour constant; `rgb("#..")`; `luma(int)`; `none`/`auto`; any `Value` form as `Value(..)` (T2) |
-| `Stroke` | a length; a paint; `length + paint`; `none`/`auto`. (A dictionary literal stays a dictionary, through `extra`: Typst validates its fields when the element function casts it, the facade would validate them while the arguments are lowered.) |
+| `Stroke` | a numeric literal with a length unit; a named colour constant, `rgb("#..")` or `luma(int)`; the sum of the two; `none`/`auto`. Ratios, relative lengths and paints that are arbitrary `Value` forms are not typed shorthands (the facade's `stroke(..)` call would validate them while the arguments are lowered); they use `extra`. (A dictionary literal stays a dictionary, through `extra`: Typst validates its fields when the element function casts it, the facade would validate them while the arguments are lowered.) |
 | `Alignment` | the constants; `a + b` of two constants; `auto`/`none` |
 | `Dir`, `FontWeight` | the constants (a weight also as an integer literal) |
-| `Numbering`, `Supplement`, `LinkTarget` | a string; content; a label literal |
+| `Numbering` | a string literal; `none`. Content and functions stay `Value` forms through `extra` |
+| `Supplement`, `LinkTarget` | a string; content; a label literal |
 | `&IntoSource` | a string literal, unchanged (section 9: the document's directory resolves it) |
 | `Sides[T]`, `Corners[T]` | a dictionary literal with the side keys, only when every component is total (the facade lowers its fields in a fixed order, not in source order); otherwise one `T` as `all=`. A dictionary with a component that is not total stays a dictionary, through `Value::dict` and `extra` |
 | `Cells[T]` | one `T` (`Cells::all`); an array literal of `T` (`Cells::columns`) |
@@ -319,11 +327,13 @@ rules are:
    forms only with an audited guarantee for the resolved function and
    receiver: a global path that resolves to an element function (its
    result is content); a global path in the audited list (`lorem`, `rgb`,
-   `luma`, `counter`, `state`, `numbering`, `repr`, `str`, `int`, `float`,
-   `range`, `datetime`, `stroke`, the gradient constructors, `tiling`); a
-   method in the audited list of its receiver's type where the receiver is
-   a call of `counter` (`display`, `step`, `update`, `get`, `at`, `final`:
-   arrays and content), a call of `state` (`update`, `display`), or a
+   `luma`, `counter`, `state`, `repr`, `str`, `int`, `float`, `range`,
+   `datetime`, `stroke`, the gradient constructors, `tiling`; not
+   `numbering`, which returns what its function returns); a method in the
+   audited list of its receiver's type where the receiver is a call of
+   `counter` (`step`, `update`, `get`, `at`, `final`: arrays and content;
+   not `display`, which forwards a numbering function's result), a call
+   of `state` (`update`), or a
    string literal (every `str` method except `at`, which returns its
    `default`). No other call qualifies: `join`,
    `first`, `at`, `calc.min` and user functions can return a label.
