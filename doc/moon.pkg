@@ -7,6 +7,8 @@ import {
   "moonbitlang/typst/svg",
   "moonbitlang/typst/render",
   "moonbitlang/typst/pdf",
+  "moonbitlang/typst/kurbo",
+  "moonbitlang/typst/unicode",
   "moonbitlang/typst/typst_assets/fonts" @assets_fonts,
   "moonbitlang/core/builtin",
   "moonbitlang/core/ref",

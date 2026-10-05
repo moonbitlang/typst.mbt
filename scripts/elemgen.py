@@ -9,6 +9,10 @@ rules and field access glue. This script generates the equivalent data tables
   cannot be translated mechanically,
 * `<elem>_<field>_parse(Engine, Args, ParseLocals) -> Value? raise SourceError` for
   `#[parse(..)]` fields,
+* `<elem>_<field>_output(Value) -> Value` and `<elem>_<field>_eq(Value,
+  Value) -> Bool` for field types whose stored value is not what upstream's
+  `IntoValue` gives users, or whose `PartialEq` is not the equality of the
+  stored values (`FieldInfo.output`, `FieldInfo.eq`),
 * capability impls, wired into the element's hooks when defined:
   `<elem>_synthesize(Engine, Content, StyleChain) -> Content raise SourceError`
   (`Synthesize`), `<elem>_show_set(Content, StyleChain) -> Styles`
@@ -320,6 +324,9 @@ def main():
             fname = f"{var}_{snake(f['ident'])}_output"
             if fname in defined:
                 args.append(f"output={fname}")
+            fname = f"{var}_{snake(f['ident'])}_eq"
+            if fname in defined:
+                args.append(f"eq={fname}")
             fields.append(f"    field_of({', '.join(args)}),")
         # Companions of `Derived<S, D>` fields: upstream stores the derived
         # (loaded) data next to the source; we store the source in the field

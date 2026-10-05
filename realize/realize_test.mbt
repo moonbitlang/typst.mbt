@@ -58,7 +58,7 @@ fn run(
   kind? : @library.RealizationKind = Fragment(kind=Ref::new(Block)),
 ) -> String raise @library.SourceError {
   let styles = @library.StyleChain::new(@library.Styles::new())
-  let pairs = realize(
+  let pairs = @realize.realize(
     kind,
     test_engine(),
     @library.Locator::root().split(),
@@ -243,7 +243,7 @@ test "show-set rule on an element" {
   )
   let content = strong.styled(Recipe(recipe))
   let styles = @library.StyleChain::new(@library.Styles::new())
-  let pairs = realize(
+  let pairs = @realize.realize(
     Fragment(kind=Ref::new(Block)),
     test_engine(),
     @library.Locator::root().split(),

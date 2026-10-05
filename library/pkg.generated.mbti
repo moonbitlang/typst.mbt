@@ -956,7 +956,7 @@ pub fn exp10(Int) -> Double
 
 pub fn families(StyleChain) -> Array[FontFamily]
 
-pub fn[T : FromValue + IntoValue] field_of(Ty[T], id~ : Int, name~ : String, docs? : String, kind~ : FieldKind, positional? : Bool, required? : Bool, variadic? : Bool, internal? : Bool, default? : () -> Value, fold? : (Value, Value) -> Value, parse? : (Engine, Args, ParseLocals) -> Value? raise SourceError, output? : (Value) -> Value) -> FieldInfo
+pub fn[T : FromValue + IntoValue] field_of(Ty[T], id~ : Int, name~ : String, docs? : String, kind~ : FieldKind, positional? : Bool, required? : Bool, variadic? : Bool, internal? : Bool, default? : () -> Value, fold? : (Value, Value) -> Value, parse? : (Engine, Args, ParseLocals) -> Value? raise SourceError, output? : (Value) -> Value, eq? : (Value, Value) -> Bool) -> FieldInfo
 
 pub fn fields_field(Value, String) -> Value raise HintedError
 
@@ -5327,6 +5327,7 @@ pub(all) enum DynValue {
   BlockMultiCallback(BlockMultiCallback)
   Decoration(Decoration)
   Loaded(Loaded)
+  RawContent(RawContent)
 } derive(Eq)
 pub fn DynValue::add_dyn(Self, Self) -> Value? raise HintedError
 pub fn DynValue::field(Self, String) -> Value??
@@ -5729,8 +5730,10 @@ pub struct FieldInfo {
   fold : ((Value, Value) -> Value)?
   parse : ((Engine, Args, ParseLocals) -> Value? raise SourceError)?
   output : ((Value) -> Value)?
+  eq : ((Value, Value) -> Bool)?
 }
 pub fn FieldInfo::to_output(Self, Value) -> Value
+pub fn FieldInfo::values_equal(Self, Value, Value) -> Bool
 
 pub(all) enum FieldKind {
   Required

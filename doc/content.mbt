@@ -263,7 +263,8 @@ pub impl IntoContent for Labelled with fn into_content(self) {
 ///|
 /// Attaches a runtime occurrence key to the origins of everything inside
 /// `body` (data-driven content built at one call site). It does not change
-/// the content.
+/// the content. A key must not start with the noncharacter U+FDD2, which
+/// marks the occurrences that lowering registers itself.
 pub struct Keyed {
   priv content : Content
 }

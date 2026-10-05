@@ -34,9 +34,13 @@ fn Tr::item(self : Tr, expr : @ast.Expr, env : Env) -> Array[Op] raise Bail {
     }
     Raw(raw) => {
       let lines = raw.lines().map(line => line.get()).collect()
-      // The evaluator's raw keeps its lines: a raw without lines is not
-      // `raw("")`, which has one empty line.
-      if lines.is_empty() {
+      // The evaluator's raw keeps its lines, `raw(text)` has the lines of
+      // its string (docs/edsl-convert.md, section 4.8). They are the same
+      // lines unless the text is empty: a raw without lines is not
+      // `raw("")`, which has one empty line; and a raw with one empty line
+      // is not equal to a raw without lines, while `raw("")` is (it
+      // compares by text).
+      if lines.is_empty() || (lines.length() == 1 && lines[0] == "") {
         raise Bail("raw-empty")
       }
       let lang = match raw.lang() {

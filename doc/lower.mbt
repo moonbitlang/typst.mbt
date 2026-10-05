@@ -11,6 +11,142 @@ priv struct Lower {
   context : @library.Context
   /// The occurrence keys of the enclosing `Keyed` wrappers.
   keys : Array[String]
+  /// The spans for what has no location of its own inside the argument
+  /// that is being lowered (`None`: nothing was given out yet, see
+  /// `Lower::args`).
+  pieces : Pieces?
+}
+
+///|
+/// The spans of the descendants of one located argument (or of a call
+/// whose arguments have no locations) that have no location of their own:
+/// the plain strings and values of a sequence, the text runs, quotes and
+/// paragraph breaks of `Prose`, the arguments that share a location, the
+/// arguments of call values. Each takes the next span of the counter, so
+/// all of them are distinct, however they are nested: a string or a value
+/// has no identity, and each place where one is used is a piece. The
+/// counter starts anew whenever the node that has the argument is lowered
+/// (in another layout iteration, or for a description with a site that is
+/// used twice), which gives the same spans again. (docs/edsl-design.md,
+/// section 12.2, pieces and reuse.)
+priv struct Pieces {
+  /// The span of the argument (its token in the origin listing) or of the
+  /// call (its line).
+  base : @syntax.Span
+  /// The number of spans that were given out. The first is `base` itself.
+  next : @ref.Ref[Int]
+  /// The spans of what is inside the argument under `Keyed` wrappers: one
+  /// counter per path of keys (`Lower::keyed`). The table belongs to the
+  /// argument: the counters of its key paths share it, so that a path is
+  /// one counter however the wrappers that spell it are nested.
+  keyed : Map[String, Pieces]
+}
+
+///|
+/// The spans inside `base`, none given out.
+fn Pieces::new(base : @syntax.Span) -> Pieces {
+  { base, next: { val: 0, }, keyed: Map([]), }
+}
+
+///|
+/// The spans inside `base` after `base` itself, which the caller uses.
+fn Pieces::after(base : @syntax.Span) -> Pieces {
+  { base, next: { val: 1, }, keyed: Map([]), }
+}
+
+///|
+/// The spans inside `base` among the scopes of the node that is being
+/// lowered, registered on first use: one counter per base, also when
+/// several arguments of the node have the same span (arguments without a
+/// location have the span of the call).
+fn pieces_of(scopes : Array[Pieces], base : @syntax.Span) -> Pieces {
+  for pieces in scopes {
+    if pieces.base == base {
+      return pieces
+    }
+  }
+  let pieces = Pieces::new(base)
+  scopes.push(pieces)
+  pieces
+}
+
+///|
+/// The first character of the keys of the occurrences that `piece_span`
+/// registers: a Unicode noncharacter. The keys of `Keyed` must not start
+/// with it, so no key of a document names such an occurrence, and
+/// `Origins` does not report these keys.
+const PIECES_KEY : Char = '\u{FDD2}'
+
+///|
+/// Whether a key of an origin was made by `piece_span`.
+fn is_pieces_key(key : String) -> Bool {
+  key.length() > 0 && key.get_char(0) == Some(PIECES_KEY)
+}
+
+///|
+/// `self` for lowering what is passed in the argument with the span
+/// `anchor`, which the caller gives to the argument itself.
+fn Lower::at(self : Lower, anchor : @syntax.Span) -> Lower {
+  { ..self, pieces: Some(Pieces::after(anchor)), }
+}
+
+///|
+/// For lowering a body without a location of its own under the keys `keys`
+/// (the current ones and that of a `Keyed`): the lowering context and the
+/// span of the body. `fallback` is the span that the body would have
+/// without the key.
+///
+/// The body is a piece of the enclosing argument under the keys: of the
+/// argument's token (or line) in the origin's occurrence under the keys
+/// (`Registry::keyed_span`). The pieces of an argument under one path of
+/// keys have a counter of their own, so the first is that token itself,
+/// and a second body under the same keys — another cell of a row whose
+/// cells have the row's key — takes the next piece instead of the same
+/// span. What is inside a body takes further pieces from that counter.
+/// The counters of all paths are in the table of the argument, also the
+/// paths that are reached inside a keyed body (a call value with a
+/// `Keyed` argument): `["a", "b"]` is one counter, wherever it is spelled.
+fn Lower::keyed(
+  self : Lower,
+  keys : Array[String],
+  fallback : @syntax.Span,
+) -> (Lower, @syntax.Span) raise @library.SourceError {
+  match self.pieces {
+    Some(outer) => {
+      // (Unambiguous for any keys: each is prefixed with its length.)
+      let path = keys.map(key => "\{key.length()}:\{key}").join("")
+      let pieces = match outer.keyed.get(path) {
+        Some(pieces) => pieces
+        None => {
+          let pieces : Pieces = {
+            base: self.session.registry.keyed_span(outer.base, keys),
+            next: { val: 0, },
+            keyed: outer.keyed,
+          }
+          outer.keyed[path] = pieces
+          pieces
+        }
+      }
+      let inner : Lower = { ..self, keys, pieces: Some(pieces), }
+      (inner, inner.take(pieces))
+    }
+    // No argument is being lowered: the span itself under the keys.
+    Option::None => {
+      let span = self.session.registry.keyed_span(fallback, keys)
+      ({ ..self, keys, pieces: Some(Pieces::after(span)), }, span)
+    }
+  }
+}
+
+///|
+/// The next span of `pieces`.
+fn Lower::take(
+  self : Lower,
+  pieces : Pieces,
+) -> @syntax.Span raise @library.SourceError {
+  let k = pieces.next.val
+  pieces.next.val = k + 1
+  self.piece_span(pieces.base, k)
 }
 
 ///|
@@ -29,11 +165,67 @@ fn[T] Lower::trace_call(
   f : () -> T raise @library.SourceError,
 ) -> T raise @library.SourceError {
   @library.trace(
-    s => @library.world_range(self.engine.world, s),
+    s => self.trace_range(s),
     () => @library.Tracepoint::Call(name),
     span,
     f,
   )
+}
+
+///|
+/// The byte range of a span for the containment test of trace points
+/// (`@library.trace`: an error inside the span of a call gets no trace
+/// point for that call). It is the range of the span in its file, except
+/// for the spans that `piece_span` takes from further occurrences of an
+/// origin, which are bytes of another line than the call: such a span
+/// counts as the first byte of the argument (or line) of the origin itself
+/// that it is a piece of. The pieces of the first block are the ranges
+/// from that byte to `k` bytes before the argument's end, so a later piece
+/// is inside every earlier one and inside the call's line, in every block:
+/// an error at an argument is inside its call, and the arguments of a call
+/// value, which are taken after the call's own span, are inside that. The
+/// range is a real range of the origin's own line, so no span outside that
+/// line contains it.
+fn Lower::trace_range(self : Lower, span : @syntax.DiagSpan) -> (Int, Int)? {
+  let range = @library.world_range(self.engine.world, span)
+  let registry = self.session.registry
+  guard span.get() is Range(id~, start~, end~) && id == registry.origins else {
+    return range
+  }
+  // The entry of the line (entries are sorted by their start).
+  let entries = registry.entries
+  let mut lo = 0
+  let mut hi = entries.length()
+  while lo < hi {
+    let mid = (lo + hi) / 2
+    if entries[mid].start <= start {
+      lo = mid + 1
+    } else {
+      hi = mid
+    }
+  }
+  guard lo > 0 else { return range }
+  let occurrence = entries[lo - 1]
+  guard start <= occurrence.end &&
+    occurrence.keys.last() is Some(key) &&
+    is_pieces_key(key) else {
+    return range
+  }
+  // The origin: the entry without the key of the block.
+  let keys = occurrence.keys.copy()
+  keys.pop() |> ignore
+  let origin = registry.rekeyed(lo - 1, keys) catch { _ => return range }
+  let origin = entries[origin]
+  for i, arg in occurrence.args {
+    if arg is Some((_, s, t)) &&
+      s == start &&
+      end <= t &&
+      origin.args[i] is Some((_, os, _)) {
+      return Some((os, os + 1))
+    }
+  }
+  guard start == occurrence.start else { return range }
+  Some((origin.start, origin.start + 1))
 }
 
 ///|
@@ -59,12 +251,16 @@ fn Lower::content(
       @library.Value::Str(text).display().spanned(span)
     }
     // A lone inserted expression: a sequence of one.
-    NCall(_) | NValue(_) => self.sequence([content], fallback)
-    NKeyed(_, _) if is_inserted(content) => self.sequence([content], fallback)
+    NCall(_) | NValue(_) => self.sequence([content], fallback, own=false)
+    NKeyed(_, _) if is_inserted(content) =>
+      self.sequence([content], fallback, own=false)
     NSeq(children, site) => {
       let entry = self.entry(site)
-      // Plain strings among the children share the array argument's span.
-      self.sequence(children[:], self.session.registry.arg_span(entry, 0))
+      // Children without a location of their own (plain strings, values)
+      // get distinct spans inside the array argument's (`Pieces`).
+      let pieces = Pieces::new(self.session.registry.arg_span(entry, 0))
+      let inner : Lower = { ..self, pieces: Some(pieces), }
+      inner.sequence(children[:], pieces.base, own=true)
     }
     // A rule outside a sequence styles nothing (Typst only allows `set` and
     // `show` directly in code and content blocks).
@@ -76,22 +272,24 @@ fn Lower::content(
       let entry = self.entry(site)
       let span = self.session.registry.span(entry)
       let label_span = self.session.registry.arg_span(entry, label_param)
-      let body = self.content(body, self.session.registry.arg_span(entry, 0))
+      let body_span = self.session.registry.arg_span(entry, 0)
+      let body = self.at(body_span).content(body, body_span)
       self.labelled(body, label, span, label_span)
     }
     NKeyed(key, body) => {
-      self.check_text(key, fallback)
+      self.check_key(key, fallback)
       let keys = self.keys.copy()
       keys.push(key)
       let inner : Lower = { ..self, keys, }
       // Content without a location of its own gets the enclosing
       // argument's origin under the keys.
-      let fallback = match body.node {
-        NText(_, None) | NValue(_) | NSpace(_) =>
-          self.session.registry.keyed_span(fallback, keys)
-        _ => fallback
+      match body.node {
+        NText(_, None) | NValue(_) | NSpace(_) => {
+          let (inner, span) = self.keyed(keys, fallback)
+          inner.content(body, span)
+        }
+        _ => inner.content(body, fallback)
       }
-      inner.content(body, fallback)
     }
     NContext(callback, site) => {
       let entry = self.entry(site)
@@ -132,6 +330,24 @@ fn Lower::check_text(
 }
 
 ///|
+/// The key of a `Keyed`: a text like any other that is lowered, and no key
+/// of the occurrences that lowering registers itself (`PIECES_KEY`).
+fn Lower::check_key(
+  self : Lower,
+  key : String,
+  span : @syntax.Span,
+) -> Unit raise @library.SourceError {
+  self.check_text(key, span)
+  if is_pieces_key(key) {
+    raise @library.SourceError([
+      @library.SourceDiagnostic::error_at(
+        span, "the key of `Keyed` starts with a reserved character (U+FDD2)",
+      ),
+    ])
+  }
+}
+
+///|
 fn Lower::misplaced_rule(
   self : Lower,
   site : Site,
@@ -145,28 +361,87 @@ fn Lower::misplaced_rule(
 }
 
 ///|
+/// The `k`-th span inside `base`, the span of a located argument (its token
+/// in the origin listing) or of a call (its line): the spans that
+/// [Pieces] gives to what has no location of its own. Every markup
+/// expression has a span of its own, and so has every piece: the engine
+/// hashes spans into the keys of located elements (two paragraphs with the
+/// same words are different elements in Typst) and deduplicates
+/// diagnostics by span. The spans are sub-ranges of `base`, which resolve
+/// to the same origin and argument: the `k`-th ends `k` bytes before its
+/// end. When they run out, the next ones are the sub-ranges of the same
+/// argument in a further occurrence of the origin, registered under the
+/// keys of the origin plus a key of its own (`PIECES_KEY`, block number):
+/// one line of the origin listing per `len` pieces, where `len` is the
+/// length of `base`.
+fn Lower::piece_span(
+  self : Lower,
+  base : @syntax.Span,
+  k : Int,
+) -> @syntax.Span raise @library.SourceError {
+  guard k > 0 && base.get() is Range(start~, end~, ..) && end > start else {
+    return base
+  }
+  // The sub-ranges that end 0 to `len - 1` bytes before the end are
+  // non-empty and distinct.
+  let per_block = end - start
+  let block = k / per_block
+  let m = k % per_block
+  let base = if block == 0 {
+    base
+  } else {
+    // The same argument (or line) in the occurrence `block` of the origin
+    // of `base`, which is at least as long.
+    let registry = self.session.registry
+    guard registry.locate(base) is Some((entry, param)) else { return base }
+    let keys = registry.entries[entry].keys.copy()
+    keys.push("\{PIECES_KEY}pieces \{block}")
+    let occurrence = registry.rekeyed(entry, keys)
+    if param >= 0 {
+      registry.arg_span(occurrence, param)
+    } else {
+      registry.span(occurrence)
+    }
+  }
+  guard m > 0 && base.get() is Range(id~, start~, end~) && end - m > start else {
+    return base
+  }
+  @syntax.Span::from_range(id, start, end - m)
+}
+
+///|
 /// Lower the children of a sequence like the evaluator's
-/// `eval_markup_exprs`: a rule styles the children after it.
+/// `eval_markup_exprs`: a rule styles the children after it. `own`: the
+/// children are the pieces of the argument with the span `fallback`, and
+/// each child without a location of its own takes a span of `self.pieces`;
+/// otherwise there is one child, an inserted expression with that span.
 fn Lower::sequence(
   self : Lower,
   children : ArrayView[Content],
   fallback : @syntax.Span,
+  own~ : Bool,
 ) -> @library.Content raise @library.SourceError {
+  let base = fallback
   let seq : Array[@library.Content] = []
   let mut i = 0
   while i < children.length() {
     let child = children[i]
     i += 1
+    let fallback = match (child.node, self.pieces) {
+      (NText(_, Option::None) | NValue(_), Some(pieces)) if own =>
+        self.take(pieces)
+      _ => base
+    }
     match child.node {
       NSetRule(set) => {
         let styles = self.set_rule(set)
-        let tail = self.sequence(children[i:], fallback)
+        let tail = self.sequence(children[i:], base, own~)
         i = children.length()
         seq.push(tail.styled_with_map(styles))
       }
       NShowRule(show) => {
         let recipe = self.show_rule(show)
-        let tail = self.sequence(children[i:], fallback)
+        let tail = self.sequence(children[i:], base, own~)
         i = children.length()
         // The evaluator's `styled_with_recipe`: a rule without a selector
         // transforms the tail at once.
@@ -253,15 +528,17 @@ fn Lower::inserted(
     }
     NValue(value) => (self.value(value, fallback), fallback)
     NKeyed(key, body) => {
-      self.check_text(key, fallback)
+      self.check_key(key, fallback)
       let keys = self.keys.copy()
       keys.push(key)
       let inner : Lower = { ..self, keys, }
-      let fallback = match body.node {
-        NValue(_) => self.session.registry.keyed_span(fallback, keys)
-        _ => fallback
+      match body.node {
+        NValue(_) => {
+          let (inner, span) = self.keyed(keys, fallback)
+          inner.inserted(body, span)
+        }
+        _ => inner.inserted(body, fallback)
       }
-      inner.inserted(body, fallback)
     }
     _ => panic()
   }
@@ -372,47 +649,47 @@ fn Lower::args(
   args : Array[ArgNode],
   entry : Int,
   span : @syntax.Span,
+  scopes? : Array[Pieces] = [],
 ) -> @library.Args raise @library.SourceError {
   let items : Array[@library.Arg] = []
-  // How many arguments had each span so far.
-  let uses : Map[Int, Int] = Map([])
+  // Arguments that share a location (the arguments of a generic call, the
+  // entries of a variadic array or of `extra`) still get distinct spans:
+  // the spans of one `Pieces` per location, which resolve to the same
+  // origin. A function that reports an error per argument would otherwise
+  // have equal diagnostics deduplicated into one, and equal content in two
+  // arguments would be one element for the engine. (`scopes`: the spans
+  // that the caller already took for the node.)
+  // A call without a location of its own (a call value): `span` is a span
+  // of the argument that the call is in. Its first argument has the span
+  // of the call, the others take further spans of that argument.
+  let outer = match self.pieces {
+    Some(pieces) => pieces
+    Option::None => Pieces::after(span)
+  }
+  let mut first = true
   for arg in args {
-    let base = if entry >= 0 && arg.param >= 0 {
-      self.session.registry.arg_span(entry, arg.param)
+    let pieces = if entry < 0 {
+      outer
     } else {
-      span
+      // A located argument: its token; an argument without a location:
+      // the line of the call.
+      let base = if arg.param >= 0 {
+        self.session.registry.arg_span(entry, arg.param)
+      } else {
+        span
+      }
+      pieces_of(scopes, base)
     }
-    // Arguments that share a location (the arguments of a generic call,
-    // the entries of a variadic array or of `extra`) still get distinct
-    // spans: sub-ranges of the shared one, which resolve to the same
-    // origin. A function that reports an error per argument would
-    // otherwise have equal diagnostics deduplicated into one.
-    let key = if entry >= 0 && arg.param >= 0 { arg.param } else { -1 }
-    let used = uses.get(key).unwrap_or(0)
-    uses[key] = used + 1
-    // The k-th argument of a location gets the sub-range that starts
-    // `k % 16` bytes after its start and ends `k / 16` bytes before its
-    // end: distinct for every k while it stays inside the first 16 bytes
-    // (the text before the next token of the listing line) and non-empty.
-    let arg_span = match base.get() {
-      Range(id~, start~, end~) if used > 0 =>
-        if start + used % 16 < end - used / 16 {
-          @syntax.Span::from_range(id, start + used % 16, end - used / 16)
-        } else {
-          // No sub-range is left: an occurrence of its own in the
-          // registry, like a `Keyed` one.
-          let keys = self.keys.copy()
-          keys.push("argument \{used}")
-          self.session.registry.keyed_span(base, keys)
-        }
-      _ => base
-    }
+    let arg_span = if entry < 0 && first { span } else { self.take(pieces) }
+    first = false
     if arg.name is Some(name) {
       self.check_text(name, arg_span)
     }
-    if arg.value.val is VSpread(inner) {
+    // What has no location inside the argument takes further spans.
+    let inner : Lower = { ..self, pieces: Some(pieces), }
+    if arg.value.val is VSpread(spread) {
       // Like the evaluator's spread argument (`eval_args`).
-      match self.value(inner, arg_span) {
+      match inner.value(spread, arg_span) {
         None => ()
         Array(array) =>
           for value in array.items {
@@ -435,7 +712,7 @@ fn Lower::args(
       }
       continue
     }
-    let v = self.value(arg.value, arg_span)
+    let v = inner.value(arg.value, arg_span)
     items.push({
       span: arg_span,
       name: arg.name,
@@ -597,10 +874,13 @@ fn Lower::show_rule(
 ) -> @library.Recipe raise @library.SourceError {
   let entry = self.entry(show.origin)
   let span = self.session.registry.span(entry)
+  let scopes : Array[Pieces] = []
   let selector : @library.Selector? = match show.selector {
     Some(selector) => {
-      let selector_span = self.session.registry.arg_span(entry, 0)
-      let selector = self.value(selector, selector_span)
+      let pieces = pieces_of(scopes, self.session.registry.arg_span(entry, 0))
+      let selector_span = self.take(pieces)
+      let inner : Lower = { ..self, pieces: Some(pieces), }
+      let selector = inner.value(selector, selector_span)
       let selector : @library.ShowableSelector = @library.at(selector_span, () => {
         selector.cast()
       })
@@ -611,15 +891,20 @@ fn Lower::show_rule(
   let transform : @library.Transformation = match show.transform {
     TValue(value) => {
       // The transformation is the last declared parameter.
-      let transform_span = self.session.registry.arg_span(
-        entry,
-        if show.selector is Some(_) {
-          1
-        } else {
-          0
-        },
+      let pieces = pieces_of(
+        scopes,
+        self.session.registry.arg_span(
+          entry,
+          if show.selector is Some(_) {
+            1
+          } else {
+            0
+          },
+        ),
       )
-      let value = self.value(value, transform_span)
+      let transform_span = self.take(pieces)
+      let inner : Lower = { ..self, pieces: Some(pieces), }
+      let value = inner.value(value, transform_span)
       @library.at(transform_span, () => value.cast())
     }
     TFunc(callback) =>
@@ -646,9 +931,16 @@ fn Lower::eval(
   let source_span = self.session.registry.arg_span(entry, node.source_param)
   self.check_text(node.source, source_span)
   let scope = @library.Scope::new()
+  // The values of the scope have no locations: each takes a span inside
+  // the call's, from one counter with what is inside them and with the
+  // arguments without a location.
+  let scopes : Array[Pieces] = []
   for pair in node.scope {
     self.check_text(pair.0, span)
-    scope.define(pair.0, self.value(pair.1, span)) |> ignore
+    let pieces = pieces_of(scopes, span)
+    let value_span = self.take(pieces)
+    let inner : Lower = { ..self, pieces: Some(pieces), }
+    scope.define(pair.0, inner.value(pair.1, value_span)) |> ignore
   }
   let id = self.session.registry.snippet(
     entry,
@@ -674,7 +966,7 @@ fn Lower::eval(
         equation.field(@library.equation_elem_body)
       })
       let func = @library.Func::element(@library.equation_elem()).spanned(span)
-      let args = self.args(node.args, entry, span)
+      let args = self.args(node.args, entry, span, scopes~)
       args.items.insert(0, {
         span: source_span,
         name: None,

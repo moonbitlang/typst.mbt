@@ -2,8 +2,93 @@
 // (typst 0.15.1 (e58a63af)). DO NOT EDIT.
 //
 // What upstream reports for documents that are not in its test suite:
-// the keys of located elements in measurement. The helpers are in
-// `oracle_helpers_wbtest.mbt`.
+// raw text built by markup (lines), by the `raw` function (a string)
+// and by `eval`; the keys of located elements in measurement. The
+// helpers are in `oracle_helpers_wbtest.mbt`.
+
+///|
+test "oracle: raw: lines of markup, function and eval forms" {
+  let source = "#show raw: it => metadata(repr((it.text, it.block, it.lines.len(), it.lines.map(l => (l.number, l.count, l.text)))))\n// Markup: without lines, with one empty line, with text.\n``\n``` ```\n```\n```\n```\n\n```\n`a`\n```\na\nb\n```\n`a\tb`\n// The function: a string, split into lines.\n#raw(\"\")\n#raw(\"a\\nb\")\n#raw(\"\\n\")\n#raw(\"a\\tb\")\n#raw(\"a\\u{2028}b\\r\\nc\")\n// Markup in an evaluated string: lines, with the span of the string.\n#eval(\"``\", mode: \"markup\")\n#eval(\"``` ```\", mode: \"markup\")\n#eval(\"```\\n```\", mode: \"markup\")\n#eval(\"```\\n\\n```\", mode: \"markup\")\n#eval(\"```\\na\\nb\\n```\", mode: \"markup\")\n#eval(\"``\", mode: \"code\")\n#eval(\"`a\\tb`\", mode: \"markup\")\n#eval(\"[``]\")\n"
+  let expected = [
+    "(\"\", false, 0, ())", "(\"\", false, 0, ())", "(\"\", true, 0, ())", "(\"\", true, 1, ((1, 1, \"\"),))",
+    "(\"a\", false, 1, ((1, 1, \"a\"),))", "(\"a\\nb\", true, 2, ((1, 2, \"a\"), (2, 2, \"b\")))",
+    "(\"a\\tb\", false, 1, ((1, 1, \"a b\"),))", "(\"\", false, 1, ((1, 1, \"\"),))",
+    "(\"a\\nb\", false, 2, ((1, 2, \"a\"), (2, 2, \"b\")))", "(\"\\n\", false, 2, ((1, 2, \"\"), (2, 2, \"\")))",
+    "(\"a\\tb\", false, 1, ((1, 1, \"a b\"),))", "(\n  \"a\\u{2028}b\\r\\nc\",\n  false,\n  3,\n  ((1, 3, \"a\"), (2, 3, \"b\"), (3, 3, \"c\")),\n)",
+    "(\"\", false, 0, ())", "(\"\", false, 0, ())", "(\"\", true, 0, ())", "(\"\", true, 1, ((1, 1, \"\"),))",
+    "(\"a\\nb\", true, 2, ((1, 2, \"a\"), (2, 2, \"b\")))", "(\"\", false, 0, ())",
+    "(\"a\\tb\", false, 1, ((1, 1, \"a b\"),))", "(\"\", false, 0, ())",
+  ]
+  assert_eq(oracle_metadata(source), expected)
+}
+
+///|
+test "oracle: raw: equality is by lines, or by text against a string" {
+  let source = "#let e0 = ``\n#let e1 = ``` ```\n#let b0 = ```\n```\n#let b1 = ```\n\n```\n#let test(..args) = metadata(repr(args.pos()))\n// A raw without lines and a raw with one empty line have the same text.\n#test(b0.text, b1.text, b0.block, b1.block)\n#test(e0 == e1, b0 == b1, b1 == b1, b0 == b0)\n#test(e0 == raw(\"\", block: false), b0 == raw(\"\", block: true), b1 == raw(\"\", block: true))\n#test(raw(\"\", block: true) == b0, raw(\"\", block: true) == b1)\n#test(eval(\"``\") == e0, eval(\"```\\n```\") == b0, eval(\"```\\n```\") == b1)\n#test(eval(\"```\\n\\n```\") == b1, eval(\"```\\n\\n```\") == b0)\n#test(`a` == `a`, `a` == `b`, `a` == raw(\"a\", block: false), `a` == raw(\"a\"))\n#test((b0,).contains(b1), (b1,).contains(b1), (b0, b1).dedup().len())\n#test((b0, b1).position(x => x == b1), (a: b0) == (a: b1), (a: b0) == (a: b0))\n#test([#b0] == [#b1], [#b0 a] == [#b1 a], [#b1 a] == [#b1 a])\n"
+  let expected = [
+    "(\"\", \"\", true, true)", "(true, false, true, true)", "(true, true, true)",
+    "(true, true)", "(true, true, false)", "(true, false)", "(true, false, true, false)",
+    "(false, true, 2)", "(1, false, true)", "(false, false, true)",
+  ]
+  assert_eq(oracle_metadata(source), expected)
+}
+
+///|
+test "oracle: raw: the text field is a string" {
+  let source = "#let a = `abc`\n#let b = ```py\nx = 1\n\ty = 2\n```\n#let c = ```\n\n\n```\n#let d = ``\n#let info(it) = metadata(repr((\n  it.text,\n  it.text.len(),\n  it.text + \"!\",\n  type(it.text),\n  it.at(\"text\"),\n  it.fields(),\n  it,\n  it.has(\"text\"),\n  it == raw(it.text, block: it.block, ..if it.has(\"lang\") { (lang: it.lang) }),\n  it.text.split(\"\\n\"),\n  str(it.text),\n  json.encode(it.text),\n  \"x\" in it.text,\n)))\n#info(a)\n#info(b)\n#info(c)\n#info(d)\n\n// Selectors compare the text.\n#show raw.where(text: \"abc\"): it => metadata(repr((\"where abc\", it.lines.len())))\n#show raw.where(text: \"\"): it => metadata(repr((\"where empty\", it.lines.len())))\n#show raw.where(text: \"\\n\"): it => metadata(repr((\"where newline\", it.lines.len())))\n`abc` #raw(\"abc\") `` #raw(\"\") #c #eval(\"`abc`\", mode: \"markup\")\n\n// Values that hold raw content.\n#let s = state(\"s\", ``)\n#context metadata(repr((\"state\", s.get() == ``, s.get() == d, s.get().text, s.get())))\n#metadata(repr((\"array\", (a, b).contains(`abc`), (c,).contains(``), (a, d).map(x => x.text))))\n#metadata(repr((\"math\", $`x` + #a$.body.children)))\n#metadata(repr((\"join\", (a + d).children.map(x => x.text), [#a#d].children.len())))\n"
+  let expected = [
+    "(\n  \"abc\",\n  3,\n  \"abc!\",\n  str,\n  \"abc\",\n  (text: \"abc\", block: false),\n  raw(text: \"abc\", block: false),\n  true,\n  true,\n  (\"abc\",),\n  \"abc\",\n  \"\\\"abc\\\"\",\n  false,\n)",
+    "(\n  \"x = 1\\n\\ty = 2\",\n  12,\n  \"x = 1\\n\\ty = 2!\",\n  str,\n  \"x = 1\\n\\ty = 2\",\n  (text: \"x = 1\\n\\ty = 2\", block: true, lang: \"py\"),\n  raw(text: \"x = 1\\n\\ty = 2\", block: true, lang: \"py\"),\n  true,\n  true,\n  (\"x = 1\", \"\\ty = 2\"),\n  \"x = 1\\n\\ty = 2\",\n  \"\\\"x = 1\\\\n\\\\ty = 2\\\"\",\n  true,\n)",
+    "(\n  \"\\n\",\n  1,\n  \"\\n!\",\n  str,\n  \"\\n\",\n  (text: \"\\n\", block: true),\n  raw(text: \"\\n\", block: true),\n  true,\n  true,\n  (\"\", \"\"),\n  \"\\n\",\n  \"\\\"\\\\n\\\"\",\n  false,\n)",
+    "(\n  \"\",\n  0,\n  \"!\",\n  str,\n  \"\",\n  (text: \"\", block: false),\n  raw(text: \"\", block: false),\n  true,\n  true,\n  (\"\",),\n  \"\",\n  \"\\\"\\\"\",\n  false,\n)",
+    "(\"where abc\", 1)", "(\"where abc\", 1)", "(\"where empty\", 0)", "(\"where empty\", 1)",
+    "(\"where newline\", 2)", "(\"where abc\", 1)", "(\n  \"state\",\n  true,\n  true,\n  \"\",\n  raw(text: \"\", block: false),\n)",
+    "(\"array\", true, false, (\"abc\", \"\"))", "(\n  \"math\",\n  (\n    [`],\n    [x],\n    [`],\n    [ ],\n    [+],\n    [ ],\n    raw(text: \"abc\", block: false),\n  ),\n)",
+    "(\"join\", (\"abc\", \"\"), 2)",
+  ]
+  assert_eq(oracle_metadata(source), expected)
+}
+
+///|
+test "oracle: raw: lines of highlighted and tabbed raw" {
+  let source = "#show raw.line: it => metadata(repr((it.number, it.count, it.text, it.body)))\n```py\nx = 1\n\ty = 2\n```\n```typ\n= A\n*b*\n```\n#raw(\"= A\\n*b*\", lang: \"typ\")\n#eval(\"```typ\\n= A\\n*b*\\n```\", mode: \"markup\")\n"
+  let expected = [
+    "(\n  1,\n  2,\n  \"x = 1\",\n  sequence(\n    [x],\n    styled(child: [ ], ..),\n    styled(child: [=], ..),\n    styled(child: [ ], ..),\n    styled(child: [1], ..),\n  ),\n)",
+    "(\n  2,\n  2,\n  \"  y = 2\",\n  sequence(\n    [  ],\n    styled(child: [y], ..),\n    styled(child: [ ], ..),\n    styled(child: [=], ..),\n    styled(child: [ ], ..),\n    styled(child: [2], ..),\n  ),\n)",
+    "(\n  1,\n  2,\n  \"= A\",\n  sequence(\n    underline(body: strong(body: [=])),\n    underline(body: strong(body: [ ])),\n    underline(body: strong(body: [A])),\n    [],\n  ),\n)",
+    "(\n  2,\n  2,\n  \"*b*\",\n  sequence(\n    [],\n    strong(body: [*]),\n    strong(body: styled(child: [b], ..)),\n    strong(body: styled(child: [*], ..)),\n  ),\n)",
+    "(\n  1,\n  2,\n  \"= A\",\n  sequence(\n    underline(body: strong(body: [=])),\n    underline(body: strong(body: [ ])),\n    underline(body: strong(body: [A])),\n    [],\n  ),\n)",
+    "(\n  2,\n  2,\n  \"*b*\",\n  sequence(\n    [],\n    strong(body: [*]),\n    strong(body: styled(child: [b], ..)),\n    strong(body: styled(child: [*], ..)),\n  ),\n)",
+    "(\n  1,\n  2,\n  \"= A\",\n  sequence(\n    underline(body: strong(body: [=])),\n    underline(body: strong(body: [ ])),\n    underline(body: strong(body: [A])),\n    [],\n  ),\n)",
+    "(\n  2,\n  2,\n  \"*b*\",\n  sequence(\n    [],\n    strong(body: [*]),\n    strong(body: styled(child: [b], ..)),\n    strong(body: styled(child: [*], ..)),\n  ),\n)",
+  ]
+  assert_eq(oracle_metadata(source), expected)
+}
+
+///|
+test "oracle: raw: plain text of raw content" {
+  let source = "#set document(title: [a `b` c ```\nx\ny\n``` d #raw(\"e\\nf\") g `` h])\n"
+  assert_eq(oracle_title(source), Some("a b c x\ny d e\nf g  h"))
+}
+
+///|
+test "oracle: location keys: measurement finds an element by its key and order" {
+  let source = "#set page(width: 200pt, height: auto)\n#let c = counter(\"c\")\n#let width(body) = context metadata(repr(measure(body).width))\n// The width of a probe is the value of the counter where it is.\n#let probe = context box(width: c.get().first() * 10pt, height: 1pt)\n// One expression laid out twice: the two probes are equal including their\n// spans, so they share their key, and a measured probe is the closest one\n// after the measurement.\n#width(probe)\n#c.step()\n#probe\n#width(probe)\n#c.step()\n#probe\n#width(probe)\n// Two expressions: probes that differ in their spans only have keys of\n// their own, and a measured one is itself wherever it is measured.\n#let first = context box(width: c.get().first() * 10pt, height: 1pt)\n#let second = context box(width: c.get().first() * 10pt, height: 1pt)\n#width(first)\n#width(second)\n#c.step()\n#first\n#width(first)\n#width(second)\n#c.step()\n#second\n#width(first)\n#width(second)\n// A probe that is not in the document is measured where the measurement is.\n#c.step()\n#width(context box(width: c.get().first() * 10pt, height: 1pt))\n"
+  let expected = [
+    "10pt", "20pt", "10pt", "30pt", "40pt", "30pt", "40pt", "30pt", "40pt", "50pt",
+  ]
+  assert_eq(oracle_metadata(source), expected)
+}
+
+///|
+test "oracle: location keys: the element's own location in measurement" {
+  let source = "#set page(width: 200pt, height: auto)\n#let c = counter(\"c\")\n#let width(body) = context metadata(repr(measure(body).width))\n// The width of a probe is the value of the counter at the location of the\n// element that the show rule replaces.\n#let probe(it) = context box(width: c.at(it.location()).first() * 10pt, height: 1pt)\n// Raw text: two literals with the same text are two elements.\n#show raw: probe\n#let a = `x`\n#let b = `x`\n#width(a)\n#width(b)\n#c.step()\n#a\n#width(a)\n#width(b)\n#c.step()\n#b\n#width(a)\n#width(b)\n// One literal laid out twice is the closest one after the measurement.\n#c.step()\n#a\n#width(a)\n// Labelled text is located: two words that differ in their spans only,\n// and one word twice.\n#show <w>: probe\n#let u = [word<w>]\n#let v = [word<w>]\n#width(u)\n#width(v)\n#c.step()\n#u\n#width(u)\n#width(v)\n#c.step()\n#v\n#width(u)\n#width(v)\n#c.step()\n#u\n#width(u)\n#width(v)\n// Elements of one expression in a loop.\n#show emph: probe\n#let items = range(3).map(i => emph[item])\n#width(items.at(0))\n#for item in items {\n  c.step()\n  item\n  width(item)\n}\n"
+  let expected = [
+    "10pt", "20pt", "30pt", "20pt", "30pt", "20pt", "10pt", "40pt", "50pt", "60pt",
+    "50pt", "60pt", "50pt", "40pt", "50pt", "70pt", "80pt", "90pt", "70pt",
+  ]
+  assert_eq(oracle_metadata(source), expected)
+}
 
 ///|
 test "oracle: location keys: strokes" {
@@ -71,7 +156,7 @@ test "oracle: location keys: colours and other dynamic values" {
 
 ///|
 test "oracle: location keys: closures" {
-  let source = "#set page(width: 200pt, height: auto)\n#let c = counter(\"c\")\n#let width(body) = context metadata(repr(measure(body).width))\n#let probe(it) = context box(width: c.at(it.location()).first() * 10pt, height: 1pt)\n#show <r>: probe\n#let check(items) = {\n  c.update(0)\n  for item in items { width(item) }\n  for item in items { c.step(); item }\n  for item in items { width(item) }\n}\n// Captured values.\n#check((1.001pt, 1.002pt, 1.001pt).map(s => [#box(metadata(() => stroke(s)))<r>]))\n#check((10.001%, 10.002%, 10.001%).map(s => [#box(metadata(() => gradient.linear((red, 0%), (blue, s), (green, 100%))))<r>]))\n#check((1, 1.0, 1).map(s => [#box(metadata(() => s))<r>]))\n// Captured modules.\n#check((std, calc, sym, std).map(s => [#box(metadata(() => s))<r>]))\n#check((std, calc, sym, std).map(s => [#box(metadata(s))<r>]))\n// Default values of named parameters.\n#check((1.001pt, 1.002pt, 1.001pt).map(s => [#box(metadata((x: stroke(s)) => x))<r>]))\n// Context expressions.\n#check((1.001pt, 1.002pt, 1.001pt).map(s => [#box(context stroke(s))<r>]))\n// The syntax tree: the nodes of an evaluated string have the span of the\n// call, and a closure is hashed with its tree. The list in the content\n// block of the first closure is nested (its marker is to the left of the\n// second one); in the other two it is not, and they are the same tree at\n// different offsets of their strings.\n#let code(s) = eval(s, mode: \"code\")\n#check((\n  \"(x => [- a\n          - b])\",\n  \"     (x => [- a\n          - b])\",\n  \"         (x => [- a\n          - b])\",\n  \"(x => [- a\n          - b])\",\n).map(s => [#box(metadata(code(s)))<r>]))\n// Closures with the same text in different strings of one call.\n#check((\"(x => x, 1)\", \"(x => x, 2)\", \"(x => x, 1)\").map(s => [#box(metadata(code(s).first()))<r>]))\n#check((\"(x => x)\", \"(x => y)\", \"(x => x)\").map(s => [#box(metadata(code(s)))<r>]))\n"
+  let source = "#set page(width: 200pt, height: auto)\n#let c = counter(\"c\")\n#let width(body) = context metadata(repr(measure(body).width))\n#let probe(it) = context box(width: c.at(it.location()).first() * 10pt, height: 1pt)\n#show <r>: probe\n#let check(items) = {\n  c.update(0)\n  for item in items { width(item) }\n  for item in items { c.step(); item }\n  for item in items { width(item) }\n}\n// Captured values.\n#check((1.001pt, 1.002pt, 1.001pt).map(s => [#box(metadata(() => stroke(s)))<r>]))\n#check((10.001%, 10.002%, 10.001%).map(s => [#box(metadata(() => gradient.linear((red, 0%), (blue, s), (green, 100%))))<r>]))\n#check((1, 1.0, 1).map(s => [#box(metadata(() => s))<r>]))\n// Captured modules.\n#check((std, calc, sym, std).map(s => [#box(metadata(() => s))<r>]))\n#check((std, calc, sym, std).map(s => [#box(metadata(s))<r>]))\n// Default values of named parameters.\n#check((1.001pt, 1.002pt, 1.001pt).map(s => [#box(metadata((x: stroke(s)) => x))<r>]))\n// Context expressions.\n#check((1.001pt, 1.002pt, 1.001pt).map(s => [#box(context stroke(s))<r>]))\n// The syntax tree: the nodes of an evaluated string have the span of the\n// call, and a closure is hashed with its tree. The list in the content\n// block of the first closure is nested (its marker is to the left of the\n// second one); in the other two it is not, and they are the same tree at\n// different offsets of their strings.\n#let code(s) = eval(s, mode: \"code\")\n#check((\n  \"(x => [- a\\n          - b])\",\n  \"     (x => [- a\\n          - b])\",\n  \"         (x => [- a\\n          - b])\",\n  \"(x => [- a\\n          - b])\",\n).map(s => [#box(metadata(code(s)))<r>]))\n// Closures with the same text in different strings of one call.\n#check((\"(x => x, 1)\", \"(x => x, 2)\", \"(x => x, 1)\").map(s => [#box(metadata(code(s).first()))<r>]))\n#check((\"(x => x)\", \"(x => y)\", \"(x => x)\").map(s => [#box(metadata(code(s)))<r>]))\n"
   let expected = [
     "10pt", "20pt", "10pt", "10pt", "20pt", "10pt", "10pt", "20pt", "10pt", "10pt",
     "20pt", "10pt", "10pt", "20pt", "10pt", "10pt", "20pt", "10pt", "10pt", "20pt",

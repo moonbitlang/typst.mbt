@@ -1,0 +1,61 @@
+<header class="bar">
+  <div class="bar-in">
+    <span class="eyebrow">Review</span>
+    <h1 id="doc-title">{{TITLE}}</h1>
+    <p id="doc-meta" class="meta"></p>
+    <a class="jump" href="#comments">Comments <span id="count" class="count">0</span></a>
+    <form id="find" class="find">
+      <label for="line">Source line</label>
+      <input id="line" type="text" inputmode="numeric" autocomplete="off" spellcheck="false" placeholder="line or file:line">
+      <button type="submit">Find</button>
+      <span id="find-status" class="status" role="status"></span>
+    </form>
+  </div>
+</header>
+<p id="selftest" class="selftest" hidden></p>
+<div class="layout">
+<!--PAGES-->
+<aside id="panel" class="panel" aria-label="Selection and comment">
+  <div id="empty">
+    <h2>Select something</h2>
+    <p class="meta">Drag over text, or click a word, a shape or an image. This panel then shows the MoonBit constructor calls that produced the selection, and you can attach a comment for the author.</p>
+  </div>
+  <div id="none" hidden>
+    <h2>No source location</h2>
+    <p class="meta">Nothing with a source location is at this point: the page is empty there, or the engine generated what is drawn (a list marker, a number, a rule of a table).</p>
+  </div>
+  <div id="found" hidden>
+    <p id="selected" class="selected"></p>
+    <p id="where" class="meta"></p>
+    <div class="tools">
+      <button type="button" id="extend" aria-pressed="false">Extend</button>
+      <button type="button" id="clear">Clear</button>
+    </div>
+    <div id="mapping" class="mapping"></div>
+    <label class="field" for="comment">Comment for the author</label>
+    <textarea id="comment" rows="3" placeholder="What should change here?"></textarea>
+    <div class="tools">
+      <button type="button" id="copy" class="primary">Copy feedback</button>
+      <button type="button" id="add">Add to list</button>
+      <button type="button" id="copy-json">Copy JSON</button>
+    </div>
+    <p id="status" class="status" role="status"></p>
+    <label class="field" for="output">Feedback text</label>
+    <textarea id="output" class="out" rows="6" readonly spellcheck="false"></textarea>
+  </div>
+</aside>
+</div>
+<section id="comments" class="comments" aria-label="Comments so far">
+  <h2>Comments so far</h2>
+  <p id="list-empty" class="meta">None yet. “Add to list” collects several comments to copy together. The list is kept in this page (and in this browser, if it allows that).</p>
+  <ol id="list" class="list"></ol>
+  <div id="list-tools" hidden>
+    <div class="tools">
+      <button type="button" id="copy-all" class="primary">Copy all</button>
+      <button type="button" id="copy-all-json">Copy all as JSON</button>
+    </div>
+    <p id="list-status" class="status" role="status"></p>
+    <label class="field" for="all">All comments as text</label>
+    <textarea id="all" class="out" rows="8" readonly spellcheck="false"></textarea>
+  </div>
+</section>

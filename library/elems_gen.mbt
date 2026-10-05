@@ -7927,6 +7927,8 @@ pub fn raw_elem() -> Element {
             kind=Required,
             positional=true,
             required=true,
+            output=raw_elem_text_output,
+            eq=raw_elem_text_eq,
           ),
           field_of((Ty::new() : Ty[Bool]), id=1, name="block", kind=Settable, default=() => {
             Bool(false)
@@ -7994,6 +7996,7 @@ pub fn raw_elem() -> Element {
         ],
       )
       raw_elem_cell.val = Some(e)
+      raw_elem_init(e)
       e.hooks().synthesize = Some(raw_elem_synthesize)
       e.hooks().show_set = Some(raw_elem_show_set)
       e.hooks().local_name = Some((lang, region) => {
@@ -8086,6 +8089,7 @@ pub fn raw_line_elem() -> Element {
         ],
       )
       raw_line_elem_cell.val = Some(e)
+      raw_line_elem_init(e)
       e
     }
   }

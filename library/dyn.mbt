@@ -53,6 +53,10 @@ pub(all) enum DynValue {
   /// The loaded data of a `Derived` field (stored in its generated internal
   /// `<field>-derived` companion field; upstream `Derived::derived`).
   Loaded(Loaded)
+  /// `text/raw.rs` (internal: the `text` field of raw elements that the
+  /// evaluator created from the lines of raw syntax, upstream
+  /// `RawContent::Lines`; see `RawContent`)
+  RawContent(RawContent)
 } derive(Eq)
 
 ///|
@@ -86,6 +90,9 @@ pub fn DynValue::ty(self : DynValue) -> Type {
     // internal style property.
     Decoration(_) => Type::content()
     Loaded(_) => Type::bytes()
+    // Upstream casts `RawContent` to its string; it is only stored in the
+    // `text` field of raw elements.
+    RawContent(_) => Type::str()
   }
 }
 
@@ -111,6 +118,7 @@ pub fn DynValue::repr(self : DynValue) -> String {
     InlineCallback(_) | BlockSingleCallback(_) | BlockMultiCallback(_) => "auto"
     Decoration(_) => "decoration(..)"
     Loaded(_) => "loaded(..)"
+    RawContent(v) => repr_str(v.get())
   }
 }
 

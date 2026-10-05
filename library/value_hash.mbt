@@ -660,6 +660,25 @@ pub impl Fingerprint for DynValue with fn fingerprint(self, state) {
       state.write_discriminant(9)
       state.write(v)
     }
+    // Upstream `#[derive(Hash)]` of `RawContent`: the lines with their
+    // spans. (`Text` is stored as a string value.)
+    RawContent(v) => {
+      state.write_discriminant(10)
+      match v {
+        Text(text) => {
+          state.write_discriminant(0)
+          state.write_str(text)
+        }
+        Lines(lines) => {
+          state.write_discriminant(1)
+          state.write_usize(lines.length())
+          for line in lines {
+            state.write_str(line.0)
+            state.write(line.1)
+          }
+        }
+      }
+    }
     Regex(v) => state.write_str(v.as_str())
     Alignment(v) => state.write_leaf(v.repr(), v)
     Dir(v) => state.write_leaf(v.repr(), v)

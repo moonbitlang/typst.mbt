@@ -84,6 +84,7 @@ pub struct BezPath {
 pub fn BezPath::bounding_box(Self) -> Rect
 pub fn BezPath::clone(Self) -> Self
 pub fn BezPath::close_path(Self) -> Unit
+pub fn BezPath::contains(Self, Point) -> Bool
 pub fn BezPath::curve_to(Self, Point, Point, Point) -> Unit
 pub fn BezPath::elements(Self) -> Array[PathEl]
 pub fn BezPath::extend_path(Self, Self) -> Unit
@@ -98,6 +99,7 @@ pub fn BezPath::quad_to(Self, Point, Point) -> Unit
 pub fn BezPath::segments(Self) -> Array[PathSeg]
 pub fn BezPath::transform(Self, Affine) -> Self
 pub fn BezPath::truncate(Self, Int) -> Unit
+pub fn BezPath::winding(Self, Point) -> Int
 
 pub(all) enum Cap {
   Butt
@@ -184,6 +186,7 @@ pub fn PathSeg::extrema(Self) -> Array[Double]
 pub fn PathSeg::inv_arclen(Self, Double, Double) -> Double
 pub fn PathSeg::start(Self) -> Point
 pub fn PathSeg::subsegment(Self, Double, Double) -> Self
+pub fn PathSeg::winding(Self, Point) -> Int
 
 pub(all) struct Point {
   x : Double

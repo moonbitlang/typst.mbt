@@ -28,3 +28,9 @@ fn oracle_metadata(source : String) -> Array[String] raise {
   }
   out
 }
+
+///|
+/// The title of a document: the plain text of the title's content.
+fn oracle_title(source : String) -> String? raise {
+  oracle_compile(source).info().title
+}

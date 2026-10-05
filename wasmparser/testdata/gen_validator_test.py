@@ -197,21 +197,21 @@ res = ['''// Validation of hand-written modules. The expected outcomes are those
 // driver as the runner's `wasm-validate` stage.
 
 ///|
-fn wasmi_test_features() -> WasmFeatures {
-  WasmFeatures::empty()
-  .set(MUTABLE_GLOBAL, true)
-  .set(MULTI_VALUE, true)
-  .set(MULTI_MEMORY, true)
-  .set(SATURATING_FLOAT_TO_INT, true)
-  .set(SIGN_EXTENSION, true)
-  .set(BULK_MEMORY, true)
-  .set(REFERENCE_TYPES, true)
-  .set(GC_TYPES, true)
-  .set(TAIL_CALL, true)
-  .set(EXTENDED_CONST, true)
-  .set(FLOATS, true)
-  .set(MEMORY64, true)
-  .set(SIMD, true)
+fn wasmi_test_features() -> @wasmparser.WasmFeatures {
+  @wasmparser.WasmFeatures::empty()
+  .set(@wasmparser.MUTABLE_GLOBAL, true)
+  .set(@wasmparser.MULTI_VALUE, true)
+  .set(@wasmparser.MULTI_MEMORY, true)
+  .set(@wasmparser.SATURATING_FLOAT_TO_INT, true)
+  .set(@wasmparser.SIGN_EXTENSION, true)
+  .set(@wasmparser.BULK_MEMORY, true)
+  .set(@wasmparser.REFERENCE_TYPES, true)
+  .set(@wasmparser.GC_TYPES, true)
+  .set(@wasmparser.TAIL_CALL, true)
+  .set(@wasmparser.EXTENDED_CONST, true)
+  .set(@wasmparser.FLOATS, true)
+  .set(@wasmparser.MEMORY64, true)
+  .set(@wasmparser.SIMD, true)
 }
 
 ///|
@@ -219,13 +219,15 @@ fn wasmi_test_features() -> WasmFeatures {
 /// payload which ends a phase (a data section or the end in the header
 /// phase, anything but a code entry in the code phase) without consuming
 /// it, which shifts the offsets of everything after it.
-fn wasmi_run(bytes : Bytes) -> Unit raise BinaryReaderError {
+fn wasmi_run(bytes : Bytes) -> Unit raise @wasmparser.BinaryReaderError {
   let features = wasmi_test_features()
-  let parser = Parser::new(0)
+  let parser = @wasmparser.Parser::new(0)
   parser.set_features(features)
-  let v = Validator::new_with_features(features)
+  let v = @wasmparser.Validator::new_with_features(features)
   let mut buffer = bytes[:]
-  fn next(buffer : BytesView) -> (Int, Payload) raise BinaryReaderError {
+  fn next(
+    buffer : BytesView,
+  ) -> (Int, @wasmparser.Payload) raise @wasmparser.BinaryReaderError {
     match parser.parse(buffer, true) {
       Parsed(consumed~, payload~) => (consumed, payload)
       NeedMoreData(_) => abort("unreachable")
@@ -250,9 +252,11 @@ fn wasmi_run(bytes : Bytes) -> Unit raise BinaryReaderError {
     guard payload is CodeSectionEntry(body) else { break }
     buffer = buffer[consumed:]
     let func = v.code_section_entry(body)
-    let validator = func.into_validator(FuncValidatorAllocations::default())
-    let body = FunctionBody::new(
-      BinaryReader::new_features(
+    let validator = func.into_validator(
+      @wasmparser.FuncValidatorAllocations::default(),
+    )
+    let body = @wasmparser.FunctionBody::new(
+      @wasmparser.BinaryReader::new_features(
         body.as_bytes(),
         body.get_binary_reader().original_position(),
         features,

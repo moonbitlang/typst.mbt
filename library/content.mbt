@@ -257,11 +257,12 @@ pub fn Content::get_by_name(
       None => raise Unknown
     }
   }
-  guard self.elem.field_id(name) is Some(id) && self.elem.field(id) is Some(_) else {
+  guard self.elem.field_id(name) is Some(id) &&
+    self.elem.field(id) is Some(info) else {
     raise Unknown
   }
   match self.field_raw(id) {
-    Some(v) => v.shared()
+    Some(v) => info.to_output(v).shared()
     None => raise Unset
   }
 }
@@ -381,7 +382,7 @@ pub impl Eq for Content with fn equal(self, other) {
             let b = other.field_raw(info.id)
             match (a, b) {
               (None, None) => ()
-              (Some(x), Some(y)) => if x != y { return false }
+              (Some(x), Some(y)) => if !info.values_equal(x, y) { return false }
               _ => return false
             }
           }

@@ -98,7 +98,7 @@ test "hayro-svg matches the oracle" {
       warning_sink: _ => (),
       render_annotations: false,
     }
-    let svg = convert(p, RenderCache::new(), settings, {
+    let svg = @hayro_svg.convert(p, @hayro_svg.RenderCache::new(), settings, {
       bg_color: [0, 0, 0, 0],
     })
     let actual_len = @utf8.encode(svg).length()

@@ -10,10 +10,12 @@
 ///|
 /// The content of the raw text.
 ///
-/// The evaluator creates `Lines` for raw blocks upstream. Here, the element's
-/// field stores the joined text (a `Value`), and the lines with their spans
-/// are recovered from the raw syntax node the element was created from when
-/// highlighting (see `RawElem::content`).
+/// Stored in the element's `text` field like upstream: `Text` as the string
+/// value, `Lines` (which the evaluator creates from the lines of raw
+/// syntax, each with the span of its syntax node) as the internal
+/// `DynValue::RawContent`. Users see the string through the field's output
+/// conversion (`raw_elem_text_output`, upstream's `IntoValue`), so the
+/// lines never become a Typst value.
 pub(all) enum RawContent {
   /// From a string.
   Text(String)
@@ -55,29 +57,6 @@ pub impl Eq for RawContent with fn equal(self, other) {
 }
 
 ///|
-/// The raw content of the element: `Lines` with the spans of the raw
-/// syntax node's lines if the element was created from raw syntax (as by
-/// upstream's evaluator), otherwise the text.
-fn RawElem::content(self : RawElem, engine : Engine) -> RawContent {
-  let text = self.text()
-  let span = self.0.span()
-  guard span.id() is Some(id) else { return text }
-  let source = engine.world.source(id) catch { _ => return text }
-  guard @syntax.LinkedNode::new(source.root()).find(span) is Some(node) &&
-    node.kind() == Raw &&
-    (@ast.Raw::from_untyped(node.get()) : @ast.Raw?) is Some(raw) else {
-    return text
-  }
-  let lines = raw.lines().map(line => (line.get(), line.span())).collect()
-  let lines : RawContent = Lines(lines)
-  if lines == text {
-    lines
-  } else {
-    text
-  }
-}
-
-///|
 pub impl Reflect for RawContent with fn input() {
   Type(Type::str())
 }
@@ -89,17 +68,62 @@ pub impl Reflect for RawContent with fn output() {
 
 ///|
 pub impl Reflect for RawContent with fn castable(v) {
-  str_castable(v)
+  v is Dyn(RawContent(_)) || str_castable(v)
 }
 
 ///|
+/// The stored form of the raw content (see [RawContent]). Upstream's cast
+/// to a string value is the field's output conversion,
+/// `raw_elem_text_output`.
 pub impl IntoValue for RawContent with fn into_value(self) {
-  Str(self.get())
+  match self {
+    Text(text) => Str(text)
+    Lines(_) => Dyn(RawContent(self))
+  }
 }
 
 ///|
 pub impl FromValue for RawContent with fn from_value(v) {
-  Text(FromValue::from_value(v))
+  match v {
+    Dyn(RawContent(content)) => content
+    v => Text(FromValue::from_value(v))
+  }
+}
+
+///|
+/// The `text` field as users see it (upstream `RawContent`'s `IntoValue`:
+/// `self.get().into_value()`).
+fn raw_elem_text_output(v : Value) -> Value {
+  match v {
+    Dyn(RawContent(content)) => Str(content.get())
+    v => v
+  }
+}
+
+///|
+/// Equality of two stored `text` fields (upstream `PartialEq for
+/// RawContent`).
+fn raw_elem_text_eq(a : Value, b : Value) -> Bool {
+  match (a, b) {
+    (Dyn(RawContent(x)), Dyn(RawContent(y))) => x == y
+    (Dyn(RawContent(x)), Str(y)) => x == RawContent::Text(y)
+    (Str(x), Dyn(RawContent(y))) => RawContent::Text(x) == y
+    _ => a == b
+  }
+}
+
+///|
+/// Upstream `PlainText for Packed<RawElem>`.
+fn raw_elem_init(e : Element) -> Unit {
+  e.hooks().plain_text = Some((c, out) => {
+    out.write_string(RawElem(c).text().get())
+  })
+}
+
+///|
+/// Upstream `PlainText for Packed<RawLine>`.
+fn raw_line_elem_init(e : Element) -> Unit {
+  e.hooks().plain_text = Some((c, out) => out.write_string(RawLine(c).text()))
 }
 
 ///|
@@ -151,7 +175,7 @@ fn RawElem::highlight(
 ) -> Array[RawLine] {
   let elem = self
   let routines = engine.routines()
-  let lines = raw_preprocess(elem.content(engine), styles, elem.0.span())
+  let lines = raw_preprocess(elem.text(), styles, elem.0.span())
   let count = lines.length().to_int64()
   let lang = match elem.lang(styles) {
     Some(s) => Some(@unicode.to_lowercase(s))
