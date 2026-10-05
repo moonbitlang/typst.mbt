@@ -233,7 +233,7 @@ pub struct Diagnostic {
   severity : Severity
   message : String
   hints : Array[Hint]
-  origin : Origin?
+  location : Location?
   trace : Array[TracePoint]
   raw : @library.SourceDiagnostic
 }
@@ -261,6 +261,7 @@ pub struct Document {
 pub fn Document::Document(Array[&IntoContent], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub fn[T : @library.Output] Document::compile(Self, &@library.World) -> CompileReport[T]
 pub fn Document::compile_paged(Self, &@library.World) -> CompileReport[@layout.PagedDocument]
+pub fn Document::lower(Self, &@library.World) -> CompileReport[@library.Content]
 pub impl IntoContent for Document
 
 pub struct Ellipse {
@@ -346,6 +347,14 @@ pub struct FigureView {
 pub fn FigureView::body(Self) -> ContentView raise @library.HintedError
 pub fn FigureView::view(Self) -> ContentView
 pub impl IntoContent for FigureView
+
+pub struct FileLocation {
+  path : String
+  package : String?
+  range : (Int, Int)?
+  line : Int
+  column : Int
+}
 
 pub(all) enum FontWeight {
   Thin
@@ -510,7 +519,7 @@ pub impl IntoContent for HighlightView
 
 pub struct Hint {
   message : String
-  origin : Origin?
+  location : Location?
 }
 
 pub struct Image {
@@ -636,6 +645,12 @@ pub struct Lit {
 #callsite(autofill(loc))
 pub fn Lit::Lit(String, loc~ : SourceLoc) -> Self
 pub impl IntoContent for Lit
+
+pub(all) enum Location {
+  Edsl(Origin)
+  File(FileLocation)
+}
+pub fn Location::describe(Self) -> String
 
 pub struct Markup {
   // private fields
@@ -1802,7 +1817,7 @@ pub impl IntoContent for TitleView
 
 pub struct TracePoint {
   description : String
-  origin : Origin?
+  location : Location?
 }
 
 pub struct Underline {

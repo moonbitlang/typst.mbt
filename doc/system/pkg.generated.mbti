@@ -1,0 +1,27 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/doc/system"
+
+import {
+  "moonbitlang/typst/doc",
+}
+
+// Values
+pub fn read(String) -> Bytes raise SystemError
+
+pub fn world(root? : String, embedded_fonts? : Bool, system_fonts? : Bool, font_paths? : Array[String], today? : (Int, Int, Int)) -> @doc.DocWorld raise SystemError
+
+pub fn write(String, Bytes) -> Unit raise SystemError
+
+pub fn write_text(String, String) -> Unit raise SystemError
+
+// Errors
+pub suberror SystemError {
+  SystemError(String)
+}
+pub impl Show for SystemError
+
+// Types and methods
+
+// Type aliases
+
+// Traits

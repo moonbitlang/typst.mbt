@@ -67,7 +67,10 @@ fn Lower::content(
       // Plain strings among the children share the array argument's span.
       self.sequence(children[:], self.session.registry.arg_span(entry, 0))
     }
-    NSetRule(_) | NShowRule(_) => self.sequence([content], fallback)
+    // A rule outside a sequence styles nothing (Typst only allows `set` and
+    // `show` directly in code and content blocks).
+    NSetRule(set) => raise self.misplaced_rule(set.origin)
+    NShowRule(show) => raise self.misplaced_rule(show.origin)
     NLabelled(body, label, site, label_param) => {
       let entry = self.entry(site)
       let span = self.session.registry.span(entry)
@@ -97,6 +100,20 @@ fn Lower::content(
     NSpace => @library.SpaceElem::shared()
     NEngine(content) => content
   }
+}
+
+///|
+/// The error for a rule that is not a direct child of a sequence.
+fn Lower::misplaced_rule(
+  self : Lower,
+  site : Site,
+) -> @library.SourceError raise @library.SourceError {
+  let span = self.session.registry.span(self.entry(site))
+  @library.SourceError([
+    @library.SourceDiagnostic::error_at(
+      span, "rules are only allowed directly in `Document` and `Seq`",
+    ).with_hint("wrap the rule and the content it styles in `Seq([..])`"),
+  ])
 }
 
 ///|

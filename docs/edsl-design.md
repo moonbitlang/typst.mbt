@@ -1,9 +1,14 @@
-# A MoonBit EDSL for typst.mbt (design, revision 3)
+# A MoonBit EDSL for typst.mbt (design, revision 4)
 
-Status: revision 3. It resolves every PARTIAL item and the new issues N1–N5 of
-`docs/edsl-reviews/review-2.md`; section 19 maps each finding to the section
+Status: revision 4. Revision 3 resolved the items of
+`docs/edsl-reviews/review-2.md`; this revision resolves the issues A–G of
+`docs/edsl-reviews/review-3.md`. Section 19 maps each finding to the section
 that resolves it. Packages: `moonbitlang/typst/doc` (imported as `@doc`),
 `doc/system`, `doc/examples`, `doc/twins`.
+
+The examples of this document are compiled code: `doc/examples/
+design_examples.mbt` contains each of them, and its tests compile them to
+PDF, SVG and PNG with the in-memory world.
 
 ## 0. Summary of the design
 
@@ -87,7 +92,11 @@ and decide API questions below.
    `Ref` shadows the prelude type, reachable as `@ref.Ref`.
 9. Names come into scope with a `using` declaration, e.g.
    `using @doc { type Heading, type Par, type Seq }`; anything can be
-   qualified instead (`@doc.Heading(...)`).
+   qualified instead (`@doc.Heading(...)`). Like enum constructors, a true
+   constructor needs neither when the expected type is its own type
+   (`numbering=Some(Numbering("1."))`).
+10. `with` and `and` are keywords and cannot be method names; `moon fmt`
+    rewrites a trailing callback as `f(a) <| ((x, y) => { ... })`.
 
 ## 3. Packages
 
@@ -105,8 +114,9 @@ and decide API questions below.
   listed in section 18 (phase 1).
 - `doc/elements_gen.mbt` is produced by a **new generator**
   `scripts/docgen.py` (section 7). It reads `gen/manifest.json` (the source of
-  `elemgen.py`) and a reviewed specification file; it does not reuse
-  `viewgen.py`'s storage access.
+  `elemgen.py`) and the reviewed specification in the script (the element
+  list with qualified paths and review notes); it does not reuse
+  `viewgen.py`'s storage access. It also writes `doc/elements_coverage.txt`.
 
 ## 4. Description values
 
@@ -168,8 +178,8 @@ Par(Seq(["Typeset with ", Emph("care"), "."]))
   expression result per child, joined by `Content::sequence`. It is *not*
   `a + b + c` (`Content::add` concatenates sequences).
 - A **rule** (`SetText(...)`, `Show(...)`, `ShowSet(...)`) among the children
-  styles the children after it, exactly as a rule inside a Typst block
-  (section 8).
+  of a `Seq` or `Document` styles the children after it, exactly as a rule
+  inside a Typst block (section 8). Rules are allowed nowhere else.
 - A plain **`String`** is literal text, never parsed: it lowers to
   `Value::Str(s).display()` — the `TextElem` that Typst's string-to-content
   conversion creates — spanned with its origin. Twin: `#"s"` inside a content
@@ -348,9 +358,11 @@ pub(all) enum Angle { Deg(Double); Rad(Double) }
   `Spacing` and `Sizing`, so `Pt(1) + Fr(1)` does not type-check; MoonBit's
   `Add` is homogeneous, so mixed-unit sums exist only inside `Length`.
 - **Promotion** is Typst's own. A `Length` tree is lowered bottom-up with
-  the engine's value operators in source order: leaves are `Pt(x)` →
-  `Value::Length(Abs::pt(x))` (likewise `mm`, `cm`, `in`), `Em(x)` → an em
-  length, `Pct(x)` → `Value::Ratio(x / 100)`; `Sum(a, b)` is
+  the engine's value operators in source order. A leaf is the value of the
+  corresponding numeric literal, made by the evaluator's own conversion
+  `Value::numeric(x, unit)`: `Pt(x)` is `x pt` (a `Value::Length`; likewise
+  `mm`, `cm`, `in`, `em`), `Pct(x)` is `x%` (a `Value::Ratio` of `x / 100`),
+  `Fr(x)` is `x fr`, `Deg`/`Rad` are angles. `Sum(a, b)` is
   `@library.add(lower(a), lower(b))`, `Diff` is `sub`, `Neg` is `neg`,
   `Scaled(a, k)` is `mul(lower(a), Float(k))`. So `Pt(11) + Em(0.5)` is a
   length, `Pt(1) + Pct(50)` a relative length and `Pct(50)` a ratio, with
@@ -371,14 +383,16 @@ All are immutable and lowered through Typst's public functions or values.
 |---|---|---|
 | `Paint`, `Color` | `enum Paint { Rgb(String); Luma(Int); Black; White; Red; ...; Value(Value) }` (Typst's named colours, lowered to the global bindings `black`, `red`, ...) | `fill=Rgb("#1f4e79")` → `rgb("#1f4e79")` |
 | `Stroke` | `Stroke(paint?, thickness?, cap?, join?, dash?, miter_limit?)` → `stroke(...)` | `Stroke(thickness=Pt(0.5), paint=Luma(220))` |
-| `Sides<T>`, `Margin<T>` | `Sides(all?, x?, y?, left?, top?, right?, bottom?)`; `all` lowers to the bare value, the others to the dictionary; combining `all` with a side is a lowering error | `inset=Sides(all=Some(Pt(9)))` |
-| `Corners<T>` | `Corners(all?, top?, ..., top_left?, ...)`, same rule | |
-| `Alignment` | `enum Alignment { Left; Center; Right; Start; End; Top; Horizon; Bottom; Both(Alignment, Alignment) }` with `impl Add` | `Center + Horizon` |
-| `Numbering` | `Numbering(pattern)`; `Numbering::with() <| (numbers, cx) => { ... }` | `Some(Numbering("1.1"))` |
-| `Supplement` | `Supplement(content)`; `Supplement::with() <| (it, cx) => { ... }` | |
-| `Celled<T>` | `Cells::all(v)`, `Cells::columns([..])`, `Cells() <| (x, y) => { ... }` | section 7.3 |
-| `DataSource` | `Source::path(String)`, `Source::bytes(Bytes)`; path parameters also accept a plain `String` via the generated signature | `Image("chart.png")` |
-| string enums (`FontWeight`, `Dir`, ...) | generated enums from the cast table of the manifest | `weight=Bold` |
+| `Sides<Option<T>>`, `Margin<T>` | `Sides[T]`: `Sides(all?, x?, y?, left?, top?, right?, bottom?, rest?)`. The optional arguments are the sides' "unset" state, so one `Option` of the element type is absorbed (`Sides<Option<Rel>>` is `Sides[Length]`, `Sides<Option<Option<Stroke>>>` is `Sides[Stroke?]`). `all` lowers to the bare value, the others to Typst's dictionary; combining `all` with a side is a lowering error | `inset=Sides(all=Pt(9))` |
+| `Corners<Option<T>>` | `Corners[T]`: `Corners(all?, top?, ..., top_left?, ...)`, same rule | `radius=Corners(all=Pt(4))` |
+| `Alignment` and its subsets | `enum Alignment { Start; Left; Center; Right; End; Top; Horizon; Bottom; Both(Alignment, Alignment) }` with `impl Add` | `Center + Horizon` |
+| `Numbering` | `Numbering(pattern)`; `Numbering::func() <| (numbers, cx) => { ... }` | `Some(Numbering("1.1"))` |
+| `Supplement` | `Supplement(content)`; `Supplement::func() <| (it, cx) => { ... }` | |
+| `Celled<T>` | `Cells[T]`: `Cells::all(v)`, `Cells::columns([..])`, `Cells() <| (x, y) => { ... }` | section 7.3 |
+| `DataSource` | `&IntoSource`, implemented by `String` (a path), `Bytes` and `Source` | `Image("chart.png")` |
+| `FontWeight`, `Dir` | enums (`Bold`, `Weight(450)`; `Ltr`, `Rtl`) | `weight=Bold` |
+| other string enums | `String`, as written in Typst, in phase 1 (`fit="cover"`); generated enums in phase 2 | |
+| `LinkTarget` | `enum LinkTarget { Url(String); ToLabel(String); Dest(Value) }` | `Link(Url("https://.."))` |
 | anything else | `Value` (section 13) | `Value::call("gradient.linear", ...)` |
 
 `pub trait ToValue { to_value(Self) -> Value }` (sealed) is implemented by
@@ -408,13 +422,16 @@ pub fn Heading::Heading(
 ) -> Heading                          // a description; pure, never raises
 ```
 
-- One type and true constructor per **public element function**: the
-  generator walks the library's scope tree (the global scope, the scopes of
-  functions and types, and the `math`, `html`, `pdf` modules), not the list
-  of element structs. Elements without a public function (`context`,
-  `sequence`, `styled`, `space`, tags, counter/state update and display
-  elements, ...) get no constructor; they are the audited list of section
-  5.3 or products of public functions.
+- One type and true constructor per **public element function**. The
+  generator's specification lists them by qualified Typst path with the
+  element they denote; a test resolves every listed path in the library's
+  scope (as `Call` does) and checks that it is the element function whose
+  handle the constructor stores. Elements without a public function
+  (`context`, `sequence`, `styled`, `space`, tags, counter/state update and
+  display elements, ...) get no constructor; they are the audited list of
+  section 5.3 or products of public functions. The phase-2 coverage test
+  walks the library's scope tree (the global scope, the scopes of functions
+  and types, and the `math`, `html`, `pdf` modules) for completeness.
 - **Names** are the qualified Typst path in UpperCamelCase: `heading` →
   `Heading`, `table.cell` → `TableCell`, `grid.cell` → `GridCell`,
   `table.header` → `TableHeader`, `enum.item` → `EnumItem`, `math.frac` →
@@ -455,8 +472,10 @@ positional/named arguments and its functional twin. Phase-1 entries:
 | `text` | `Text(body, font?, size?, fill?, weight?, ...)` | settable fields only; no `text` parameter; `size`/`fill`/`font` are passed named |
 | `link` | `Link(dest : LinkTarget, body? : &IntoContent)` | `body` omitted → no second positional argument (the parser synthesizes it for URLs) |
 | `page` | `Page(body, paper?, width?, ...)` | `paper` is external and resolved by the parser |
-| `block`, `box`, `rect`, ... | `Block(body, ...)`; `Block::empty(...)` for no body | optional positional body |
-| `align`, `place`, `rotate`, `scale`, `move`, `pad` | `Align(alignment, body)` etc. | optional positional settable first, as in Typst |
+| `block`, `box` | `Block(body, ...)` | the optional positional body is required; the body-less form is `Call("block", ..)` |
+| `rect`, `square`, `circle`, `ellipse`, `title` | `Rect(body?, ...)` | the optional positional body is a labelled parameter passed positionally |
+| `align` | `Align(alignment, body)` | the optional positional `alignment` is required and first |
+| `place`, `rotate`, `columns`, `enum.item` | `Place(body, alignment?, ...)` | an optional positional parameter is labelled and passed positionally before the body |
 | `image` | `Image(source : &IntoSource, ...)` | `String` (path) or `Bytes` |
 | `raw` | `Raw(text : String, block?, lang?, ...)` | text is a string, not content |
 | `figure` | `Figure(body, caption? : &IntoContent?, ...)` | caption content is wrapped by the engine's cast |
@@ -464,8 +483,8 @@ positional/named arguments and its functional twin. Phase-1 entries:
 | `table`, `grid` | `Table(children, columns?, ..., gutter?)` | external `gutter`, parse hooks |
 | `v`, `h` | `V(amount : Spacing, weak?)` | internal `attach` not exposed |
 
-`LinkTarget` and `IntoSource` are small facades (`Url(String)`,
-`ToLabel(String)`, ...; `String` and `Bytes`).
+Each generated type's documentation carries its review note with the
+functional twin (`scripts/docgen.py`, `review=`).
 
 ### 7.3 Example
 
@@ -492,8 +511,9 @@ Figure(
 Document([
   SetPage(paper="a4", margin=Custom(Sides(x=Custom(Cm(2.2)), top=Custom(Cm(2.6))))),
   SetText(font=["Libertinus Serif"], size=Pt(11), lang="en"),
+  SetPar(justify=true, leading=Em(0.62)),
   SetHeading(numbering=Some(Numbering("1.1"))),
-  Show(Select::heading(level=1)) <| (it, _) => {
+  Show(Select::heading(level=Custom(1))) <| (it, _) => {
     Seq([V(Em(0.6)), Block(Text(it, fill=Rgb("#1f4e79"))), V(Em(0.2))])
   },
   ShowSet(Select::figure(), SetText(size=Pt(9))),
@@ -502,14 +522,25 @@ Document([
 ])
 ```
 
-- A rule is a description like any other and appears **in a sequence**
-  (`Document`, `Seq`, a variadic children array). It styles the children
-  after it in that sequence and nothing outside it, exactly as `#set`/`#show`
-  inside a Typst content block: lowering a sequence follows
-  `eval_markup_exprs` — on a set rule, the remaining children are lowered as
-  the tail and pushed as `tail.styled_with_map(styles)`; on a show rule, as
-  `tail.styled(Recipe(recipe))`. A rule in a single-content position
-  (`Par(SetText(...))`) is the sequence containing only that rule.
+- A rule is a description that is only valid as a **direct child of a
+  `Document` or a `Seq`**. It styles the children after it in that sequence
+  and nothing outside it, exactly as `#set`/`#show` inside a Typst content
+  block: lowering a sequence follows `eval_markup_exprs` — on a set rule,
+  the remaining children are lowered as the tail and pushed as
+  `tail.styled_with_map(styles)`; on a show rule, as
+  `tail.styled(Recipe(recipe))`.
+- **Anywhere else a rule is a lowering error** (review-3, issue B): as a
+  single content argument (`Par(SetText(..))`), inside `Keyed`/`Labelled`,
+  and in particular as an entry of a **variadic argument array**
+  (`Table([SetText(..), "a", "b"])`). The error is `rules are only allowed
+  directly in `Document` and `Seq``, at the rule, with the hint to wrap the
+  rule and the content it styles in `Seq([..])`. A variadic array is never
+  given sequence semantics: every entry is lowered on its own and passed as
+  exactly one positional argument, so cells, headers and footers reach the
+  element function as the author wrote them. Styling a whole table is a rule
+  before the table in the enclosing sequence; styling one cell is a `Seq`
+  inside that cell. (Typst has the same restriction: `set` and `show` are
+  only allowed directly in code and content blocks.)
 - **`SetX(...)`** (one generated type per element with settable fields; all
   parameters optional, no `label`) lowers to
   `elem.set(engine, args.spanned(span)).spanned(span).liftable()`. Custom
@@ -517,21 +548,20 @@ Document([
   strokes and insets fold) behave identically; realization still decides
   `outside`.
 - **`Show(selector) <| (it, cx) => { ... }`**: the selector description
-  (section 9) is lowered to a value and cast with
-  `ShowableSelector::from_value` under `at(selector_span, ..)`, so
-  location/before/after selectors and nested regex selectors are rejected
-  with Typst's messages. The recipe is
+  (section 9) is lowered to a value and cast to `ShowableSelector` under
+  `at(selector_span, ..)`, so location/before/after selectors and nested
+  regex selectors are rejected with Typst's messages. The recipe is
   `Recipe::new(Some(selector), Func(host), span)`.
-- **`ShowSet(selector, rule : &SetRule)`** (finding 10) takes exactly one
-  set rule, like `show sel: set f(..)`. It lowers the selector as above, the
-  rule as a set rule (`Styles`, spanned and liftable as above), and builds
+- **`ShowSet(selector, rule : &SetRule)`** takes exactly one set rule, like
+  `show sel: set f(..)`. It lowers the selector as above, the rule as a set
+  rule (`Styles`, spanned and liftable as above), and builds
   `Recipe::new(Some(selector), Style(styles), span)`. Several show-set rules
   are several `ShowSet` values, in order. `SetRule` is the sealed trait of
-  the `SetX` types.
+  the `SetX` types and of the generic `Set`.
 - **Recipe checks**: after building a recipe, lowering runs the evaluator's
-  `check_show_page_rule` and `check_show_par_set_block`, which become one
-  public function `@eval.check_recipe(engine, recipe)` (engine change; the
-  evaluator calls the same function). `Show(Select::page())` thus warns
+  `check_show_page_rule` and `check_show_par_set_block` through the public
+  `@eval.check_recipe(engine, recipe)` (engine change; the evaluator calls
+  the same function). `Show(Select::page())` thus warns
   `` `show page` is not supported and has no effect``.
 - A show rule without a selector (`show: f`) is plain function application
   in MoonBit (`template(Seq([...]))`) and needs no construct.
@@ -539,40 +569,45 @@ Document([
 ## 9. Selectors and views
 
 ```moonbit
-pub struct Selector[V]            // opaque; V is the view type of its matches
-pub fn Select::heading(level? : Int64, ...) -> Selector[HeadingView]
+pub struct Selector[W]            // opaque; W is the view type of its matches
+pub fn Select::heading(level? : Smart[Int64], depth? : Int64, ...) -> Selector[HeadingView]
 pub fn Select::label(name : String) -> Selector[ContentView]
-pub fn Select::text(text : String) -> Selector[ContentView]
+pub fn Select::literal(text : String) -> Selector[ContentView]      // show "text": ..
 pub fn Select::regex(pattern : String) -> Selector[ContentView]
 pub fn Select::elem(path : String, where_? : Array[(String, Value)]) -> Selector[ContentView]
 pub fn[A, B] Selector::or(self : Selector[A], other : Selector[B]) -> Selector[ContentView]
+pub fn[A, B] Selector::and_(self : Selector[A], other : Selector[B]) -> Selector[ContentView]
 ```
 
-- `Select::<elem>(field? ...)` is generated per element; with field
-  arguments it lowers to `elem.where(field: value)` (`native_func_where`),
-  otherwise to the element function. `label`, `regex`, `or`, `and`,
-  `before`, `after` lower through `label(..)`, `regex(..)` and the
-  `selector` methods. Legality is checked by the consumer's cast:
-  `ShowableSelector` for rules, `LocatableSelector` for queries, counters
-  and `at` arguments (section 10).
+- `Select::<elem>(field? ...)` is generated per element (`Select::heading`,
+  `Select::table_cell`, `Select::text` for the `text` element). Its optional
+  parameters are the element's named settable fields with their field
+  types; with arguments it lowers to `elem.where(field: value)`
+  (`native_func_where`), otherwise to the element function. `label`,
+  `regex`, `or`, `and_` lower through `label(..)`, `regex(..)` and the
+  `selector` methods (`before`/`after`/`within` follow in phase 2).
+  Legality is checked by the consumer's cast: `ShowableSelector` for rules,
+  `LocatableSelector` for queries, counters and `at` arguments (section 10).
 - A **view** wraps the exact engine content the engine passed to the
   callback (for show rules `elem.guarded(guard)` with its location and
   prepared state). `impl IntoContent for HeadingView` re-emits that content
   unchanged, so wrapping it does not restart the rule; constructing a fresh
   `Heading(...)` in the callback creates a new element that the rule may
   match again, exactly as in Typst.
-- Views read fields through the engine's field access: `it.body()`,
-  `it.level(cx)` (resolved with the callback's styles; raises without
-  styles). Phase 1 has `ContentView` (`func_name()`, `field(name)`,
-  `text()`, `label()`, `engine()`) and typed views for the phase-1
-  elements; phase 2 generates all.
+- Views read fields through the engine's field access. Phase 1 has
+  `ContentView` (`func_name()`, `field(name)`, `content_field(name)`,
+  `text()`, `label()`, `engine()`), and per element a typed view with
+  `view()` and an accessor for each required content field (`it.body()`);
+  phase 2 generates typed accessors for all fields (style-resolved ones
+  take `cx`).
 
 ## 10. Context and introspection
 
 ```moonbit
 SetPage(header=Custom(Some(Context() <| cx => {
-  if cx.counter(Counter::page()).get()[0] > 1 {
-    return Seq([Emph("typst.mbt"), H(Fr(1)), cx.counter(Counter::page()).display(Numbering("1 / 1"), both=true)])
+  let page = cx.counter(Counter::page())
+  if page.get()[0] > 1 {
+    return Seq([Emph("typst.mbt"), H(Fr(1)), page.display(numbering=Numbering("1 / 1"), both=true)])
   }
   Seq([])
 })))
@@ -588,30 +623,42 @@ it (`CounterHandle`, `StateHandle`) checks it first and raises
 
 All operations call Typst's public functions with the invocation's engine
 and context, so capability errors, casts and tracked introspection
-(`engine.introspect`, recorded reads) are Typst's:
+(`engine.introspect`, recorded reads) are Typst's. What each needs is what
+the function needs (review-3, issue E; `library/counter.mbt`,
+`library/state.mbt`, `library/query.mbt`, `library/measure.mbt`):
 
 | Operation | Function called | Needs |
 |---|---|---|
 | `cx.location() -> Location raise` | `here()` | location |
 | `cx.counter(c).get() -> Array[Int64] raise` | `counter.get` | location |
-| `cx.counter(c).at(sel)`, `.final()` | `counter.at`, `counter.final` | context, selector cast by `LocatableSelector` |
-| `cx.counter(c).display(numbering?, both?) -> Content raise` | `counter.display` | location (numbering from styles if omitted) |
-| `cx.state(s).get()`, `.at(sel)`, `.final() -> Value raise` | `state.get/at/final` | location / context |
-| `cx.query(sel : Selector[V]) -> Array[V] raise` | `query` | location or styles; selector cast by `LocatableSelector` |
+| `cx.counter(c).final_value() -> Array[Int64] raise` | `counter.final` | location |
+| `cx.counter(c).at(sel) -> Array[Int64] raise` | `counter.at` | location or styles; `sel` cast by `LocatableSelector` and resolved uniquely |
+| `cx.counter(c).display(numbering?, both?) -> Content raise` | `counter.display` | location; without `numbering`, styles for the counted element's numbering |
+| `cx.state(s).get() -> Value raise` | `state.get` | location |
+| `cx.state(s).at(sel)`, `.final_value()` | `state.at`, `state.final` | location or styles |
+| `cx.query(sel : Selector[W]) -> Array[W] raise` | `query` | location or styles; `sel` cast by `LocatableSelector` |
 | `cx.measure(body, width?, height?) -> Size raise` | `measure` | styles **and** location |
 | `cx.styles() -> @library.StyleChain raise` | — (`Context::get_styles`) | styles |
 
-What each callback kind receives is the engine's choice, documented and
-tested: `Context`: location and styles; `Show`: styles, and a location only
-if the matched element has one; numbering and supplement callbacks: the
-context of the display site; cell callbacks receive no `Ctx`. A missing
-capability raises Typst's `can only be used when context is known` at the
-operation's call site (the operations are `#callsite(autofill(loc))`
-methods, so the span is the `cx.query(...)` call).
+What each callback kind receives is the engine's choice:
+
+| Callback | Context passed by the engine | Source |
+|---|---|---|
+| `Context() <| cx => ..` | location and styles | `context_rule` |
+| `Show(sel) <| (it, cx) => ..` | styles; a location only if the matched element has one | `visit_show_rules` |
+| `Numbering::func() <| (numbers, cx) => ..` | the context of the caller that applies the numbering (`Numbering::apply`): for `counter.display` the calling context | `library/numbering.mbt` |
+| `Supplement::func() <| (it, cx) => ..` | **styles only** (`Context::new(styles~)`) | `Supplement::resolve` |
+| `Cells() <| (x, y) => ..` | styles only; the callback receives no `Ctx` | `library/grid.mbt` |
+
+A missing capability raises Typst's `can only be used when context is
+known` at the operation's call site (the operations are
+`#callsite(autofill(loc))` methods, so the span is the `cx.query(...)`
+call). Tests cover each row of both tables.
 
 Callback signatures are fallible and may raise any error:
-`(V, Ctx) -> &IntoContent raise` (show), `(Ctx) -> &IntoContent raise`
+`(W, Ctx) -> &IntoContent raise` (show), `(Ctx) -> &IntoContent raise`
 (context), `(Array[Int64], Ctx) -> &IntoContent raise` (numbering),
+`(ContentView, Ctx) -> &IntoContent raise` (supplement),
 `(Int, Int) -> T raise` (cells). `SourceError`s pass through; any other
 error becomes an error diagnostic at the callback's origin with the error's
 `to_string()` as message.
@@ -620,23 +667,24 @@ error becomes an error diagnostic at the callback's origin with the error's
 
 ```moonbit
 pub fn Counter::page() -> Counter
-pub fn[V] Counter::of(sel : Selector[V]) -> Counter        // counter(heading), counter(figure.where(..))
+pub fn[W] Counter::of(sel : Selector[W]) -> Counter        // counter(heading), counter(figure.where(..))
 pub fn Counter::named(key : String) -> Counter
 pub fn CounterStep::CounterStep(counter : Counter, level? : Int64, ...) -> CounterStep
 pub fn CounterUpdate::CounterUpdate(counter : Counter, values : Array[Int64], ...) -> CounterUpdate
-pub fn CounterUpdate::with(counter : Counter, f : (Array[Int64]) -> Array[Int64] raise) -> CounterUpdate
+// phase 2
+pub fn CounterUpdate::func(counter : Counter, ..., f : (Array[Int64]) -> Array[Int64] raise) -> CounterUpdate
 pub fn State::State(key : String, init : Value) -> State
 pub fn StateUpdate::StateUpdate(state : State, value : Value, ...) -> StateUpdate
-pub fn StateUpdate::with(state : State, f : (Value) -> Value raise) -> StateUpdate
+pub fn StateUpdate::func(state : State, ..., f : (Value) -> Value raise) -> StateUpdate
 ```
 
 Updates are content placed in the document, as in Typst; there is no
 captured mutation. They lower to `counter(key).step(level: n)`,
 `counter(key).update(values)` (one value or an array for multi-level
 counters), `counter(key).update(host)` and `state(key, init).update(..)`.
-A state always carries its initial value; reading it gives a `Value`
-(typed accessors `as_int()`, `as_str()`, ... raise on mismatch). Phase 1
-implements counters; state and functional updates are phase 2.
+A state always carries its initial value; reading it gives a `Value`.
+Phase 1 implements counters (`Counter`, `CounterStep`, `CounterUpdate`
+with values); state and functional updates are phase 2.
 
 ## 11. Host functions
 
@@ -702,10 +750,11 @@ lifted.
 
 ### 11.4 Convergence validation (engine change)
 
-Today `IntrospectionRecorder::validate` compares, for every recorded read,
-the fingerprint of the recorded result with the fingerprint of the result on
-the new introspector, whatever the flags of that fingerprint. Revision 3
-changes the recorder (`library/introspector.mbt`):
+Before this design `IntrospectionRecorder::validate` compared, for every
+recorded read, the fingerprint of the recorded result with the fingerprint
+of the result on the new introspector, whatever the flags of that
+fingerprint. The recorder now also validates flagged results exactly
+(`library/introspector.mbt`, `library/memo.mbt`):
 
 ```moonbit
 priv struct RecordedRead {
@@ -716,37 +765,57 @@ priv struct RecordedRead {
 }
 ```
 
-- `Introspector::record` gets the recorded result and, from the read
-  methods whose results can hold values (`query`, `query_first`,
-  `query_unique`, `query_label`, `query_labelled`, `page_numbering`,
-  `page_supplement`), a comparison closure. If the result's fingerprint
-  flags are non-zero (lossy or identity), the read keeps
-  `exact = i => validate_equal(result, recompute(i))`.
+- `Introspector::record` takes, from the read methods whose results can hold
+  values (`query`, `query_first`, `query_unique`, `query_label`,
+  `query_labelled`, `page_numbering`, `page_supplement`), a closure that
+  recomputes the result on another introspector and compares it with the
+  recorded one. It is kept as `exact` only if the result's fingerprint flags
+  are non-zero (lossy or identity).
 - `validate` requires `replay(i) == expected` **and**, if present,
   `exact(i)`.
-- `validate_equal` walks both results in parallel (content fields, arrays,
-  dictionaries, styles, arguments, dynamic values, like
-  `values_memo_equal`) and compares leaves as follows:
+- The comparison is `values_validate_equal`: the recursion of
+  `values_memo_equal` (content with all stored fields, arrays, dictionaries,
+  styles, arguments, selectors, dynamic values) in a *validating* mode that
+  differs from memo-input equality only where a value is legitimately
+  created anew in every layout iteration. No part of it accepts a value on
+  the strength of a fingerprint that may be lossy (review-3, issue A):
   - **host functions**: the same `HostFunc` object;
-  - **Typst closures**: equal structural fingerprints. This is the present
-    and upstream behaviour (comemo validates by hash; a closure created
-    during layout has a new identity in every iteration and must still
-    converge);
+  - **Typst closures**: *structurally*, not by fingerprint and not by
+    identity (a closure created during layout has a new identity in every
+    iteration and must still converge, as with upstream's hash-based
+    validation): the same kind and function span, the same syntax node (the
+    same node object, or equal span and text), the same number of positional
+    parameters, and — **recursively with `values_validate_equal`** — equal
+    default values and equal captured bindings (the same names in order,
+    bound to equal values). A gradient, a host function or another closure
+    among the captures is therefore compared by the rules of this list;
+  - **modules** (captured, or as values): the same module, or — for a module
+    evaluated anew — the same name, content and bindings, recursively;
   - **gradients and tilings**: the types' own equality (their fingerprints
     go through a rounded repr);
+  - **resolved grids** (`CellGrid`, the synthesized field of tables and
+    grids; never equal as memo input): equal fingerprints and, cell by
+    cell, recursively equal bodies, equal fills and equal strokes;
   - **other leaves**: equal fingerprints, and for leaves whose fingerprint
-    is marked lossy (dynamic values hashed through their repr) also the
-    engine's `==`.
+    is marked lossy (dynamic values hashed through their repr, such as
+    strokes) also the engine's `==`.
+- The recursion terminates without cycle detection: values are immutable, a
+  closure captures a snapshot of values that existed before it, and module
+  imports are acyclic, so the compared structures are finite DAGs.
 - A **stable query containing host functions converges**: under the
   creation rule the content in both introspectors holds the same `HostFunc`
-  objects, so identity comparison succeeds. The check no longer depends on
-  128-bit fingerprints being collision-free for identity-bearing or lossy
-  results; for results with exact fingerprints it is unchanged, and so is
-  its cost.
-- `recorder.lossy` and the memo's reuse rule are unchanged.
+  objects. A stable query containing closures created during layout
+  converges as before, because equal code with equal captures compares
+  equal.
+- `recorder.lossy` and the memo's reuse rule are unchanged. Results with
+  exact fingerprints are validated as before, at the same cost.
 
-Gate: this changes validation only for flagged results, and all
-differential stages must stay byte-identical (section 17).
+Gate: validation changes only for flagged results, and all differential
+stages must stay unchanged (section 17). Unit tests cover: two closures
+with the same code capturing the two distinct gradients of
+`library/memo_wbtest.mbt` (equal fingerprints) do not validate; closures
+created anew with equal captures validate; host functions validate by
+identity only.
 
 ### 11.5 Purity contract and determinism check
 
@@ -755,26 +824,33 @@ times, including zero (memo reuse); results must depend only on their
 arguments, the `Ctx` and captured immutable data. Mutating captured state or
 engine values and reading external resources are unsupported.
 
-`check_determinism` (debug heuristic): with a frozen world, compile twice
-with memoization off and compare normalized frames (section 16),
-diagnostics and recorded introspections; report the origins of callbacks
-invoked on differing paths as candidates. It cannot prove purity.
+Memoization must not change results, so tests compile with memoization on
+and off (`@library.set_layout_memo_enabled`, an engine switch added for
+this) and compare. A `check_determinism` helper (phase 2, a debug
+heuristic): with a frozen world, compile twice with memoization off and
+compare normalized frames (section 16), diagnostics and recorded
+introspections; report the origins of callbacks invoked on differing paths
+as candidates. It cannot prove purity.
 
 ## 12. Provenance
 
 ### 12.1 Tiers
 
 1. **Call provenance (always exact)**: every node knows its constructor
-   call's `SourceLoc` and argument ranges.
-2. **Runtime text provenance**: for glyphs of a text node, the byte range
-   within the string that reached layout (glyph span offset), and the
-   occurrence key (`Keyed`). Exact when the string reaches layout unchanged;
-   see 12.4 for the limits.
+   call's `SourceLoc` and argument ranges; every engine span of the session
+   resolves to exactly one origin (and, for argument spans, the argument).
+2. **Runtime text provenance (engine offset, not claimed exact)**: for a
+   glyph of a text node, the origin (exact, tier 1), the occurrence key
+   (`Keyed`) and the *engine offset*: the glyph's span offset as the engine
+   recorded it. It equals the byte offset in the node's string unless the
+   engine preprocessed the text; section 12.4 lists the cases and why no
+   exactness is claimed.
 3. **Source-character provenance (best effort, needs a source provider)**:
-   mapping a runtime offset to a character of the `.mbt` file. Only for a
-   single plain string literal argument and only when a source provider
-   supplies the file; escapes, interpolation, concatenation and variables
-   report tier 2 only; ligatures and clusters map to the cluster's range.
+   mapping an offset to a character of the `.mbt` file. Only for a single
+   plain string literal argument and only when a source provider supplies
+   the file; escapes, interpolation, concatenation and variables report
+   tiers 1 and 2 only; ligatures and clusters map to the cluster's range. It
+   inherits tier 2's caveat.
 
 ### 12.2 The origin registry
 
@@ -830,29 +906,53 @@ report.mbt:57:9-57:40@acme/report TableCell key="row-17" a0=report.mbt:57:19-57:
 `Origins::resolve(span) -> Origin?` maps a range span of the listing id to
 its entry (binary search over line starts) and, if the range is an argument
 token, the argument index. `Origin` has `file`, the line/column range, the
-constructor name, the key path and the argument index/range. Spans of
-snippet files resolve to the `Markup`/`Equation` origin plus the byte range
-inside the snippet. Detached spans (shapes the engine generates) have no
-origin; previews fall back to the nearest enclosing tagged element (phase 3).
+constructor name, the key path and the argument index. Spans of snippet
+files resolve to the `Markup`/`Equation` origin plus the byte range inside
+the snippet. Spans of other files (Typst sources imported by `Markup`, data
+files) are not origins; reports resolve them as file locations (section
+14.2). Detached spans (shapes the engine generates) have no origin;
+previews fall back to the nearest enclosing tagged element (phase 3).
 
 The IDE adaptation (finding 16): upstream `jump_from_click` looks the span
 up in a parsed Typst source (`source.find(span)`), which an origin listing
 cannot satisfy. The EDSL does not use that path: a click or region resolves
 glyph spans with `Origins::resolve`, which needs no syntax tree.
 
-### 12.4 Text offsets and long text
+### 12.4 Text offsets
 
-Glyph span offsets are 16-bit: paragraph collection replaces an offset above
-65,535 by zero and shaping saturates sums (`layout/inline_collect.mbt`,
-`layout/inline_shaping.mbt`), so overflow cannot be detected from a glyph.
-Lowering therefore records it up front: when a text node's string is longer
-than 65,535 UTF-8 bytes, its origin entry is marked `long-text` (sticky),
-and the resolver reports **tier 1 only** for every glyph of that origin.
-For other origins the offset is exact for text that reaches layout
-unchanged; text rewritten by the engine (case transforms, text show rules,
-smart quotes, hyphenation inserts) yields the offset in the rewritten text,
-which the resolver reports as tier 2 with `exact=false` when the node's
-string no longer contains the glyph's range.
+`Origins::resolve_glyph(span, span_offset) -> TextOrigin?` returns the
+glyph's origin and its **engine offset**. The offset is what the engine
+stores per glyph: the byte offset of the glyph's cluster within the text
+run that paragraph collection built for the glyph's text element. It is the
+offset in the node's string only if nothing changed the text on the way, and
+several things can (review-3, issue C):
+
+- paragraph collection prepends a directional embedding character when a
+  run's direction differs from the paragraph's and applies case mapping
+  (`collect_inline`, `layout/inline_collect.mbt`), shifting or remapping
+  offsets;
+- a text or regex show rule slices a text element; the slices keep the
+  span but their offsets restart (`slice_textual`, `realize/realize.mbt`);
+- raw text adds the `span-offset` style per highlighted piece, which
+  shaping adds before saturating at 65,535; collection replaces an offset
+  above 65,535 by zero (`layout/inline_shaping.mbt`).
+
+None of this is recorded in a glyph, and it cannot be recovered afterwards:
+comparing the node's string at the offset with the cluster's text proves
+nothing, because a shifted offset can land on equal text (repeated
+characters; `"ŉaA"` upper-cased is `"ʼNAA"`, where the glyph of the source
+`a` reports offset 3, at which the source has the unique `A`). Therefore:
+
+- **the EDSL never reports a text offset as exact.** `TextOrigin` has the
+  origin (exact) and `engine_offset : Int?`, documented as a hint for
+  narrowing within the node's text;
+- the offset is `None` where it is known to be unreliable from lowering
+  alone: an origin that lowered a string longer than 65,535 UTF-8 bytes is
+  marked (sticky), and its glyphs report no offset;
+- exact offsets would need the engine to carry an offset map through
+  slicing, embedding and case mapping without changing the laid-out frames.
+  That is outside this design; if phase 3 adds it, it is an engine change
+  with its own review, and until then tier 3 is a best-effort hint as well.
 
 ### 12.5 Resource paths
 
@@ -882,7 +982,7 @@ pub fn Markup::Markup(source : String, scope? : Array[(String, Value)], loc~ : S
 pub fn Equation::Equation(source : String, block? : Bool, numbering? : Numbering?,
   number_align? : Alignment, supplement? : Smart[Supplement?], alt? : String?,
   scope? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Equation
-pub fn Call::Call(path : String, positional? : Array[Value], named? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Call
+pub fn Call::Call(path : String, positional? : Array[Value], named? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Call
 pub fn Set::Set(path : String, named : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Set
 ```
 
@@ -913,7 +1013,8 @@ pub fn Set::Set(path : String, named : Array[(String, Value)], loc~ : SourceLoc,
 - **`Value`** is the opaque description of a non-content engine value:
   `Value::int(n)`, `::float(x)`, `::bool(b)`, `::str(s)`, `::none()`,
   `::auto()`, `::length(l)`, `::fr(x)`, `::angle(a)`, `::array([..])`,
-  `::dict([(k, v)])`, `::content(c)`, `::label(name)`,
+  `::dict([(k, v)])`, `::content(c)`, `::label(name)`, `::global(path)`
+  (a binding of the global scope, e.g. `"red"`),
   `::call(path, positional?, named?)` and `::engine(v : @library.Value)`.
 - **`Call(path, ...)`** calls any public function by its qualified name and
   is content (its displayed result, as `#f(..)` in markup); `Value::call`
@@ -951,10 +1052,12 @@ main source; eval_source(..).content() })`, so the Typst path is unchanged.
 
 ```moonbit
 pub fn Document::Document(children : Array[&IntoContent], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Document
+pub fn[T : @library.Output] Document::compile(self : Document, world : &@library.World) -> CompileReport[T]
 pub fn Document::compile_paged(self : Document, world : &@library.World) -> CompileReport[@layout.PagedDocument]
+pub fn Document::lower(self : Document, world : &@library.World) -> CompileReport[@library.Content]   // tests, tools
 
 pub struct CompileReport[T] {
-  // private: output : T?
+  // private: output : T?, and a resolver for the diagnostics of exports
   errors : Array[Diagnostic]          // empty iff there is an output
   warnings : Array[Diagnostic]
   origins : Origins                   // immutable snapshot
@@ -962,7 +1065,7 @@ pub struct CompileReport[T] {
 pub fn[T] CompileReport::output(self : CompileReport[T]) -> T?
 pub fn[T] CompileReport::unwrap(self : CompileReport[T]) -> T raise DocError
 pub fn CompileReport::pdf(self : CompileReport[@layout.PagedDocument], options? : @pdf.PdfOptions) -> ExportReport[Bytes]
-pub fn CompileReport::svg_pages(self : CompileReport[@layout.PagedDocument]) -> ExportReport[Array[String]]
+pub fn CompileReport::svg_pages(self : CompileReport[@layout.PagedDocument], options? : @svg.SvgOptions) -> ExportReport[Array[String]]
 pub fn CompileReport::png_pages(self : CompileReport[@layout.PagedDocument], ppi? : Double) -> ExportReport[Array[Bytes]]
 
 pub struct ExportReport[T] {          // same accessors as CompileReport
@@ -974,52 +1077,82 @@ pub struct ExportReport[T] {          // same accessors as CompileReport
 pub struct Diagnostic {
   severity : Severity
   message : String
-  hints : Array[String]
-  origin : Origin?                    // resolved when the report is built
-  trace : Array[TracePoint]           // (description, origin?)
+  hints : Array[Hint]                 // { message : String, location : Location? }
+  location : Location?
+  trace : Array[TracePoint]           // { description : String, location : Location? }
   raw : @library.SourceDiagnostic
+}
+pub(all) enum Location {
+  Edsl(Origin)                        // a constructor call / argument / range of a Markup source
+  File(FileLocation)                  // a range of a project or package file
+}
+pub struct FileLocation {
+  path : String                       // within the project or package
+  package : String?                   // "@namespace/name:version"
+  range : (Int, Int)?                 // bytes, if resolvable
+  line : Int; column : Int            // one-based, 0 if unknown
 }
 ```
 
-- `compile_paged` creates a session, wraps `world` (section 12.2), runs
+- `compile` creates a session, wraps `world` (section 12.2), runs
   `compile_with` with initial lowering as the evaluation step, deduplicates
-  diagnostics like `@typst.compile`, **freezes the registry** into an
-  `Origins` snapshot (listing text, entries, snippet texts) and resolves
-  every diagnostic's span, hints and trace points against that snapshot.
-  This happens on success **and** on failure (N5): a failed compilation
-  returns a report with errors, warnings and the origins they refer to.
-  `Origins` and `Diagnostic` never consult a world or the interner again,
-  so a later compilation reusing the file ids cannot change what an old
-  report shows.
+  diagnostics like `@typst.compile`, and **freezes the registry** into an
+  `Origins` snapshot (listing text, entries, snippet texts). This happens on
+  success **and** on failure (N5): a failed compilation returns a report
+  with errors, warnings and the origins they refer to.
+- **Every location of every diagnostic is resolved when the report is
+  built**, while the world is available (review-3, issue D): the
+  diagnostic's span, each hint's span (engine hints are located:
+  `DiagSpanned[String]`) and each trace point's span become a `Location`:
+  - a span of the session's virtual files → `Edsl(origin)` from the
+    snapshot;
+  - a numbered span of any other file — a Typst source that a `Markup`
+    imported or included, whose errors keep their own spans — →
+    `File(..)`: the world's parsed source gives the byte range
+    (`Source::range`) and its line table the line and column;
+  - a raw range span of another file (data files: JSON, YAML, CSV, ...) →
+    `File(..)` with that range, and line/column if the file is UTF-8;
+  - a detached span → no location.
+  A `Diagnostic` is plain data afterwards: it never consults a world, a
+  source or the file-id interner again, so a later compilation reusing the
+  virtual file ids, or a changed file, cannot change what an old report
+  shows. `raw` remains for tools that render with a world of their own.
 - An export on a failed compile report returns the same errors without
   exporting. Otherwise it runs the exporter (`@pdf.pdf`, `@svg.svg`,
-  `@render.render`), and returns its output or its errors, with
-  `warnings = compile warnings ++ export warnings` and the same `Origins`
-  (export diagnostics carry spans of the same registry). Reports compose:
+  `@render.render`) and returns its output or its errors, with
+  `warnings = compile warnings ++ export warnings` and the same `Origins`.
+  Export diagnostics are resolved in the same way at export time; for that
+  the compile report keeps the snapshot and the world it was compiled with
+  (private; this is the only use). Reports compose:
   `doc.compile_paged(world).pdf()`.
 - Document settings follow Typst's precedence: `SetDocument(...)` and
   format settings from set rules are in the compiled document; explicit
   export options override them (`PdfOptions::resolve`).
 - `Diagnostic::render()` gives `error: message` / `  at file:line:col
-  (Constructor, argument n)` / hints / trace; `raw` stays available for
-  tools that render with a world.
-- HTML (`compile_html`) and bundles compile through their own targets with
-  the same session logic (phase 3).
+  (Constructor, argument n)` / hints / trace.
+- `Document::lower` returns the lowered engine content (what the compiler
+  would lay out) in the same kind of report; the structural twin tests use
+  it.
+- HTML (`compile[HtmlDocument]`) and bundles compile through their own
+  targets with the same session logic (phase 3).
 
 ### 14.3 Worlds
 
-`compile_*` takes any `&@library.World`. The EDSL provides:
+`compile` takes any `&@library.World`. The EDSL provides `DocWorld`, a world
+built from callbacks (`DocWorld::new(load~, book~, font~, today?,
+library?)`), and two ready-made constructions of it:
 
 - `DocWorld::in_memory(files? : Map[String, Bytes], fonts? : Array[Bytes],
-  embedded_fonts? : Bool = true, today? : Date, features? : ...)`: project
-  files by root-relative path, fonts from bytes plus the embedded Typst
-  fonts, a fixed date (or none), a standard library with all formats. For
-  tests and browsers.
-- `@system.world(root? : String = ".", system_fonts? : Bool = true,
-  font_paths? : Array[String], today? : Date)` in `doc/system`: files under
-  `root` through `kit`'s `FsRoot`/`FileStore`, packages through
-  `SystemPackages`, fonts through `FontStore`, the system or a fixed date;
-  plus `@system.write(bytes, path)` helpers.
+  embedded_fonts? : Bool = true, today? : (Int, Int, Int))` in `doc`:
+  project files by root-relative path, fonts from bytes plus the embedded
+  Typst fonts, a fixed date (or none), the standard library with the PDF,
+  SVG and PNG formats. No OS access: for tests and browsers.
+- `@system.world(root? : String = ".", embedded_fonts? : Bool = true,
+  system_fonts? : Bool = true, font_paths? : Array[String],
+  today? : (Int, Int, Int))` in `doc/system`: files under `root` through
+  `kit`'s `FsRoot`, packages through `SystemPackages`, fonts through
+  `FontStore`, the system date or a fixed one; plus
+  `@system.write(path, bytes)`, `write_text` and `read`.
 
 A world's `main()` is never read by `compile_with`; `DocWorld` returns the
 listing id.
@@ -1071,14 +1204,29 @@ main file at the project root:
 ### 16.2 Three kinds of equivalence
 
 1. **Structural** (lowering): the lowered content of the EDSL document
-   equals the evaluated content of the twin under the **structural dump**:
-   the canonical content dump of the test runner (`Dumper::content` in
-   `tests/runner/realize_stage.mbt`: sequences, styled content with its
-   styles in order, elements with all fields by repr; it has no spans),
-   extended for this stage by an option that also prints each element's
-   label and each property's `liftable` flag. Functions compare by repr, so
-   a host function and the twin's closure both print `(..) => ..`. Diagnostics (errors, warnings, hints) must be equal after
-   their spans are reduced to "has a span / detached".
+   (`Document::lower`) equals the evaluated content of the twin
+   (`eval_source`) under the **structural dump**, a dumper of the `edsl`
+   stage of its own (review-3, issue F; the canonical dump of the `realize`
+   stage is not used because it goes through `Content::fields()`, which
+   omits internal fields, and prints non-unique element names). It prints,
+   recursively:
+   - a sequence as the list of its children; styled content as its styles
+     in order followed by the child; a property as element, field and
+     value with its `liftable` flag; a recipe as its selector (repr) and
+     transformation (content, function, or styles);
+   - any other element as its **identity** — its name plus an index that
+     numbers the distinct `Element` handles of the comparison in order of
+     first occurrence, shared by both documents, so `grid.cell` and
+     `table.cell` differ — followed by **every stored field** by field id
+     with its name (the raw storage, including internal and synthesized
+     fields), and its label;
+   - values: content and arrays recursively; functions by repr (a host
+     function and the twin's closure both print `(..) => ..`); everything
+     else by repr.
+   Provenance is normalized by omission: spans of content, styles, recipes
+   and functions are not printed. Diagnostics (errors and warnings with
+   their hints) must be equal as messages; whether each has a location is
+   compared, not the location.
 2. **Layout** (behaviour): the paged documents are equal under the
    **frame normalizer**: the `typst-frame-v1` dump of the paged stage with
    (a) every span field replaced by `null` (item spans, glyph spans, format
@@ -1088,10 +1236,10 @@ main file at the project root:
    through the canonical content dump (functions by repr). Everything else
    — sizes, positions, glyph ids and advances, fonts, paints, images,
    links, tags, page info — is compared bit for bit. The comparison is run
-   with memoization on and off.
-3. **Export**: SVG text and PDF semantic dumps of the two documents are
-   equal (both exporters ignore spans except for diagnostics), and PNG
-   pixmaps are byte-identical.
+   with memoization on and off (`set_layout_memo_enabled`).
+3. **Export**: the SVG text of every page and the PDF bytes (exported with
+   the same options and no timestamp) of the two documents are equal; PNG
+   pixmaps are compared for the milestone document.
 
 Behavioural tests that have no single twin (callback identity, stale `Ctx`,
 creation rule, convergence with host functions in query results, memo on
@@ -1103,8 +1251,9 @@ and off, invalid inputs with their diagnostics) are ordinary tests of the
 1. **Twin corpus** (`doc/twins`): pairs of an EDSL builder and a Typst
    source. A new stage of the differential runner, `edsl`
    (`moon run tests/runner --target native -- edsl`), compiles both in the
-   same world and checks structural, layout and SVG equivalence; the `doc`
-   package's own tests run a subset with the in-memory world.
+   same world (rooted at the corpus' assets, embedded fonts only) and
+   checks structural, layout and export equivalence; the `doc` package's
+   own tests compare a subset through SVG with the in-memory world.
 2. **Milestone (phase 1)**: the *reduced showcase* — `bench/showcase.typ`
    without its *Drawing* and *Citations* sections and without the
    system-font line (page setup with a contextual header and page counter,
@@ -1114,25 +1263,31 @@ and off, invalid inputs with their diagnostics) are ordinary tests of the
    code with a show rule, a computed table) — written in the EDSL
    (`doc/twins/showcase.mbt`) is layout- and export-equivalent to its
    functional Typst twin, and its PDF is produced through `doc/examples`.
-   Every construct it uses is in phase 1 (section 15). The **full**
-   showcase, with typed graphics and the bibliography, is the phase-2
-   milestone.
-3. **Coverage**: phase 1 — the generator's report lists the element
-   functions and fields not yet typed; phase 2 — a test walks the library's
-   scope tree and fails if a public element function or field has neither a
-   typed parameter nor an entry in the audited exception list.
+   Every construct it uses is in phase 1 (section 15); where a value is not
+   typed yet (the title block's gradient) it goes through `Value::call`.
+   The **full** showcase, with typed graphics and the bibliography, is the
+   phase-2 milestone.
+3. **Coverage**: phase 1 — every listed element path resolves to the
+   element of its constructor, and the generator's report
+   (`doc/elements_coverage.txt`) lists the element structs and fields not
+   yet typed; phase 2 — a test walks the library's scope tree and fails if
+   a public element function or field has neither a typed parameter nor an
+   entry in the audited exception list.
 4. **Rules**: set-rule folding and order, show identity/wrapping/
    fresh-element recursion, regex selectors, invalid selectors, show-set,
-   `show page` warning.
+   `show page` warning, misplaced rules (in a variadic array, as a single
+   argument).
 5. **Callbacks and context**: one host function per description, memo on
-   and off, creation rule, stale `Ctx` and derived handles, capability
-   errors per callback kind, a query whose results contain host functions
-   converges in the same number of iterations as its closure twin.
-6. **Provenance**: a glyph resolves to its node's origin and offset; keyed
-   occurrences resolve to different origins of one site; callback-made nodes
-   resolve; registry lines never move across iterations; long text
-   downgrades; origin and snippet limits; diagnostics of a failed
-   compilation resolve from the report alone after another compilation ran.
+   and off, creation rule, stale `Ctx` and derived handles, the capability
+   tables of section 10.1 row by row, a query whose results contain host
+   functions converges in the same number of iterations as its closure
+   twin; in the engine: the validation tests of section 11.4.
+6. **Provenance**: a glyph resolves to its node's origin; keyed
+   occurrences resolve to different origins of one site; callback-made
+   nodes resolve; registry lines never move across iterations; long text
+   reports no offset; origin and snippet limits; diagnostics of a failed
+   compilation — including one inside a file imported by `Markup`, and a
+   located hint — keep their locations after another compilation ran.
 7. **Examples**: `doc/examples` compiles every example of this document.
 8. **Engine gates** for every engine change: all differential stages
    unchanged (syntax/eval/realize 3792, html 508, paged/svg/pdf-semantic/
@@ -1144,45 +1299,62 @@ and off, invalid inputs with their diagnostics) are ordinary tests of the
 
 1. **Engine**: `compile_with`; `FuncInner::Host`/`HostFunc` with the
    equality, fingerprint and memo rules of section 11; the recorder's exact
-   validation; `@eval.check_recipe`; the runner's frame normalizer and
-   `edsl` stage. **EDSL**: description values, lowering (initial and
-   callback results), the audited exceptions, units and value facades,
-   `docgen.py` with the phase-1 element list and overrides, rules,
+   validation (`values_validate_equal`); `@eval.check_recipe`;
+   `set_layout_memo_enabled`; the runner's frame normalizer, structural
+   dump and `edsl` stage. **EDSL**: description values, lowering (initial
+   and callback results), the audited exceptions, units and value facades,
+   `docgen.py` with the phase-1 element list and review notes, rules,
    selectors and views for those elements, `Ctx` (location, counters,
-   query, measure), `Markup`/`Equation`/`Call`/`Set`/`Value`, the origin
-   registry with diagnostics and resolution, `DocWorld::in_memory`,
-   `doc/system`, PDF/SVG/PNG reports, `doc/examples`, the twin corpus and
-   the reduced-showcase milestone.
+   query, measure, styles), `Markup`/`Equation`/`Call`/`Set`/`Value`, the
+   origin registry with located diagnostics and resolution,
+   `DocWorld::in_memory`, `doc/system`, PDF/SVG/PNG reports,
+   `doc/examples`, the twin corpus and the reduced-showcase milestone.
 2. Generator coverage of all public element functions and fields with typed
-   views and selectors (coverage test green), state and functional updates,
-   bibliography, typed graphics values, the full showcase milestone,
-   tier-3 source mapping.
+   views, selectors and enums (coverage test green), state and functional
+   updates, bibliography, typed graphics values, the full showcase
+   milestone, tier-3 source mapping, `check_determinism`.
 3. Preview provenance (region queries, container fallback, review-comment
-   packaging), HTML and bundle targets, callbacks created during layout.
+   packaging), HTML and bundle targets, callbacks created during layout,
+   and — only with an engine-side offset map — exact text offsets.
 
 ## 19. Resolution index
 
+Review 3 (revision 4):
+
+| Review-3 item | Resolution |
+|---|---|
+| A closure captures (MAJOR) | 11.4: closures are validated structurally with recursion into defaults and captured bindings; modules and resolved grids likewise; no lossy fingerprint is trusted |
+| B rules in variadic arrays (MAJOR) | 4.2, 8: rules only as direct children of `Document`/`Seq`; a lowering error elsewhere; one positional argument per variadic entry |
+| C text offsets (MAJOR) | 12.1, 12.4: the engine offset is a hint, never reported as exact; the preprocessing cases are listed; exact offsets need an engine-side map (not in this design) |
+| D diagnostic locations (MAJOR) | 14.2: `Location` = `Edsl(Origin)` or `File(FileLocation)`, resolved for spans, located hints and trace points when the report is built |
+| E context capabilities (MINOR) | 10.1: both tables corrected (`counter.final` needs a location; supplement callbacks get styles only) |
+| F structural dump (MINOR) | 16.2: a dumper of its own with element identities, raw stored fields, labels and `liftable` |
+| G unit leaves (MINOR) | 6.3: leaves are `Value::numeric(x, unit)`, the evaluator's literal conversion |
+
+Review 2 (revision 3, kept):
+
 | Review-2 item | Resolution |
 |---|---|
-| 1 constructor signatures | 7.2: reviewed per-element signature overrides, enforced by the generator |
+| 1 constructor signatures | 7.2: reviewed per-element signature notes, enforced by the generator |
 | 2 construction environment | 5.1 initial lowering with `Context::none()`; 5.2 callback-result lowering |
 | 3 host identity and convergence | 11.2–11.4: one host function per description, creation rule, recorder with exact validation |
-| 5 spans | 5.3 span attachment and tracing; 12.2 checked limits and file ids; 12.4 long text; 13 snippet slots |
+| 5 spans | 5.3 span attachment and tracing; 12.2 checked limits and file ids; 12.4 text offsets; 13 snippet slots |
 | 6 resources | 12.5: root-anchored synthetic files, strings passed unchanged |
 | 7 smart/none/ints | 6.1, 6.2: `Smart` is `Auto`/`Custom`, adapter rejected on fact 5, `Int64` |
+| 8 set rules | 8: sequence-tail nesting only in `Document`/`Seq`; `Element::set(..).spanned(..).liftable()` |
 | 9 sequences and labels | 4.2: `Seq` preserves nesting (twin `[#a#b]`), `Labelled` on one expression result |
 | 10 show-set, recipe checks | 8: `Transformation::Style`, shared `check_recipe` |
-| 11 `Ctx` | 10: capabilities, fallible signatures, tokens on derived handles, counter/state types |
-| 12 API coherence | facts 3, 5–9; 4.2 `Seq`/`Seq::of`/`Content`; `label` in signatures; `Keyed`; `SetRule`; `doc/examples` |
-| 13 reports | 14.2: `CompileReport`/`ExportReport`, warning propagation |
+| 11 `Ctx` | 10: capability tables, fallible signatures, tokens on derived handles, counter and state types |
+| 12 API coherence | facts 3, 5–10; 4.2 `Seq`/`Seq::of`/`Content`; `label` in signatures; `Keyed`; `SetRule`; `doc/examples` compiles every example |
+| 13 reports | 14.2: `CompileReport`/`ExportReport`, warning propagation, located diagnostics |
 | 14 markup and math | 13: mode and scope stored, `Equation` on the math body, snippet files |
-| 16 equivalence and phasing | 16.2 normalizer and three equivalences; 17.2 reduced milestone; 12.3 IDE adaptation |
+| 16 equivalence and phasing | 16.2 structural dump, frame normalizer, export; 17.2 reduced milestone; 12.3 IDE adaptation |
 | 17 units | 6.3 |
 | N1 callback-made nodes | 5.2, 12.2: append-only, deduplicated, lazily extended registry |
-| N2 construction rule | 5.3 audited exceptions; 7.1 generator covers public functions |
+| N2 construction rule | 5.3 audited exceptions; 7.1 constructors for public functions only |
 | N3 element identity | 7.1 `Element` handles and qualified names; 13 path resolution |
 | N4 mutable nodes | 4.1 opaque values, snapshots, no cycles |
-| N5 provenance ownership | 14.2 reports own origins on success and failure |
+| N5 provenance ownership | 14.2 reports own origins and resolved locations on success and failure |
 
 ## 20. Open questions
 

@@ -33,31 +33,76 @@ pub(all) enum Severity {
 } derive(Eq)
 
 ///|
+/// A range of a project or package file: a Typst source imported by
+/// `Markup`, or a data file.
+pub struct FileLocation {
+  /// The path within the project or package, without a leading slash.
+  path : String
+  /// The package (`@namespace/name:version`), for package files.
+  package : String?
+  /// The byte range in the file, if it could be resolved.
+  range : (Int, Int)?
+  /// One-based line and column of the start (0 if unknown).
+  line : Int
+  column : Int
+}
+
+///|
+/// Where a diagnostic points.
+pub(all) enum Location {
+  /// A constructor call of the EDSL program (and possibly an argument or a
+  /// range of a `Markup`/`Equation` source string).
+  Edsl(Origin)
+  /// A range of a file of the world.
+  File(FileLocation)
+}
+
+///|
+/// The location as text.
+pub fn Location::describe(self : Location) -> String {
+  match self {
+    Edsl(origin) => origin.describe()
+    File(file) => {
+      let name = match file.package {
+        Some(package) => "\{package}/\{file.path}"
+        None => file.path
+      }
+      if file.line > 0 {
+        "\{name}:\{file.line}:\{file.column}"
+      } else {
+        name
+      }
+    }
+  }
+}
+
+///|
 /// A point of a diagnostic's trace: what was being done, and where.
 pub struct TracePoint {
   description : String
-  origin : Origin?
+  location : Location?
 }
 
 ///|
 /// A hint of a diagnostic.
 pub struct Hint {
   message : String
-  origin : Origin?
+  location : Location?
 }
 
 ///|
-/// An error or warning of a compilation or export, with its location in
-/// the EDSL program resolved.
+/// An error or warning of a compilation or export, with its locations
+/// resolved when the report was built (they do not depend on a world or on
+/// file ids afterwards).
 pub struct Diagnostic {
   severity : Severity
   message : String
   hints : Array[Hint]
-  /// Where the problem is: the constructor call (and argument).
-  origin : Origin?
+  /// Where the problem is.
+  location : Location?
   trace : Array[TracePoint]
-  /// The engine's diagnostic. Its spans refer to the virtual files of the
-  /// report's [Origins].
+  /// The engine's diagnostic. Its spans refer to files of the world and to
+  /// the virtual files of the report's [Origins].
   raw : @library.SourceDiagnostic
 }
 
@@ -72,33 +117,93 @@ pub fn Diagnostic::render(self : Diagnostic) -> String {
     },
   )
   out.write_string(self.message)
-  if self.origin is Some(origin) {
+  if self.location is Some(location) {
     out.write_string("\n  at ")
-    out.write_string(origin.describe())
+    out.write_string(location.describe())
   }
   for hint in self.hints {
     out.write_string("\n  hint: ")
     out.write_string(hint.message)
-    if hint.origin is Some(origin) {
+    if hint.location is Some(location) {
       out.write_string(" (")
-      out.write_string(origin.position())
+      out.write_string(location.describe())
       out.write_string(")")
     }
   }
   for point in self.trace {
     out.write_string("\n  ")
     out.write_string(point.description)
-    if point.origin is Some(origin) {
+    if point.location is Some(location) {
       out.write_string(" at ")
-      out.write_string(origin.describe())
+      out.write_string(location.describe())
     }
   }
   out.to_string()
 }
 
 ///|
-fn Origins::diagnostic(
-  self : Origins,
+/// Resolves diagnostic spans while the world is available.
+priv struct Resolver {
+  origins : Origins
+  world : &@library.World
+}
+
+///|
+/// The location of a span: an origin for spans of the session's virtual
+/// files, a file range for spans of the world's files.
+fn Resolver::locate(self : Resolver, span : @syntax.DiagSpan) -> Location? {
+  if self.origins.resolve_range(span) is Some(origin) {
+    return Some(Edsl(origin))
+  }
+  guard span.id() is Some(id) else { return None }
+  let package = match id.root() {
+    Project => None
+    Package(spec) => Some("@\{spec.namespace}/\{spec.name}:\{spec.version}")
+  }
+  let path = id.vpath().get_without_slash()
+  // The byte range: numbered spans through the parsed source, raw ranges
+  // (data files) directly.
+  let mut range : (Int, Int)? = None
+  let mut lines : @syntax.Lines? = None
+  match span.get() {
+    Number(num~, sub_range~, ..) =>
+      try self.world.source(id) catch {
+        _ => ()
+      } noraise {
+        source => {
+          range = source.range(num, sub_range)
+          lines = Some(source.lines())
+        }
+      }
+    Range(start~, end~, ..) => {
+      range = Some((start, end))
+      try self.world.file(id) catch {
+        _ => ()
+      } noraise {
+        bytes =>
+          try @utf8.decode(bytes) catch {
+            _ => ()
+          } noraise {
+            text => lines = Some(@syntax.Lines::new(text))
+          }
+      }
+    }
+    Detached => ()
+  }
+  let (line, column) = match (range, lines) {
+    (Some((start, _)), Some(lines)) =>
+      match lines.byte_to_line_column(start) {
+        Some((line, column)) => (line + 1, column + 1)
+        None => (0, 0)
+      }
+    _ => (0, 0)
+  }
+  Some(File({ path, package, range, line, column, }))
+}
+
+///|
+fn Resolver::diagnostic(
+  self : Resolver,
   raw : @library.SourceDiagnostic,
 ) -> Diagnostic {
   {
@@ -109,20 +214,20 @@ fn Origins::diagnostic(
     message: raw.message,
     hints: raw.hints.map(hint => {
       message: hint.v,
-      origin: self.resolve_range(hint.span),
+      location: self.locate(hint.span),
     }),
-    origin: self.resolve_range(raw.span),
+    location: self.locate(raw.span),
     trace: raw.trace.map(point => {
       description: point.v.to_string(),
-      origin: self.resolve(point.span),
+      location: self.locate(@syntax.DiagSpan::from_span(point.span)),
     }),
     raw,
   }
 }
 
 ///|
-fn Origins::diagnostics(
-  self : Origins,
+fn Resolver::diagnostics(
+  self : Resolver,
   raw : Array[@library.SourceDiagnostic],
 ) -> Array[Diagnostic] {
   raw.map(d => self.diagnostic(d))
@@ -150,6 +255,8 @@ pub struct CompileReport[T] {
   errors : Array[Diagnostic]
   warnings : Array[Diagnostic]
   origins : Origins
+  /// Resolves the diagnostics of exports started from this report.
+  priv resolver : Resolver
 }
 
 ///|
@@ -191,6 +298,58 @@ pub fn[T] ExportReport::unwrap(self : ExportReport[T]) -> T raise DocError {
 }
 
 ///|
+/// Initial lowering: runs in the evaluator's environment (`eval_source`),
+/// without an introspector and without context.
+fn Document::lower_initial(
+  self : Document,
+  session : Session,
+  world : SessionWorld,
+  library : @library.Library,
+  traced : @library.Traced,
+  sink : @library.Sink,
+) -> @library.Content raise @library.SourceError {
+  let engine : @library.Engine = {
+    world,
+    library,
+    introspector: @library.Introspector::empty(),
+    traced,
+    sink,
+    route: @library.Route::extend(@library.Route::root()).with_id(origins_file),
+  }
+  let lower : Lower = {
+    session,
+    engine,
+    context: @library.Context::none(),
+    keys: [],
+  }
+  lower.content(self.content, @syntax.Span::detached())
+}
+
+///|
+/// Build the report of a session.
+fn[T] Session::report(
+  self : Session,
+  result : Result[T, Array[@library.SourceDiagnostic]],
+  sink : @library.Sink,
+) -> CompileReport[T] {
+  let origins = self.registry.freeze()
+  let resolver : Resolver = { origins, world: self.base, }
+  let warnings = resolver.diagnostics(@typst.deduplicate(sink.warnings()))
+  match result {
+    Ok(output) =>
+      { output: Some(output), errors: [], warnings, origins, resolver, }
+    Err(errors) =>
+      {
+        output: None,
+        errors: resolver.diagnostics(errors),
+        warnings,
+        origins,
+        resolver,
+      }
+  }
+}
+
+///|
 /// Compile to any output of the engine.
 pub fn[T : @library.Output] Document::compile(
   self : Document,
@@ -200,40 +359,45 @@ pub fn[T : @library.Output] Document::compile(
   let session_world : SessionWorld = { session, }
   let sink = @library.Sink::new()
   let traced = @library.Traced::new()
+  let evaluate = library => {
+    self.lower_initial(session, session_world, library, traced, sink)
+  }
   let result : Result[T, Array[@library.SourceDiagnostic]] = try
-    @typst.compile_with(session_world, traced, sink, library => {
-      // Initial lowering runs in the evaluator's environment
-      // (`eval_source`): no introspector, no context.
-      let engine : @library.Engine = {
-        world: session_world,
-        library,
-        introspector: @library.Introspector::empty(),
-        traced,
-        sink,
-        route: @library.Route::extend(@library.Route::root()).with_id(
-          origins_file,
-        ),
-      }
-      let lower : Lower = {
-        session,
-        engine,
-        context: @library.Context::none(),
-        keys: [],
-      }
-      lower.content(self.content, @syntax.Span::detached())
-    })
+    @typst.compile_with(session_world, traced, sink, evaluate)
   catch {
     @library.SourceError(errors) => Err(@typst.deduplicate(errors))
   } noraise {
     output => Ok(output)
   }
-  let origins = session.registry.freeze()
-  let warnings = origins.diagnostics(@typst.deduplicate(sink.warnings()))
-  match result {
-    Ok(output) => { output: Some(output), errors: [], warnings, origins, }
-    Err(errors) =>
-      { output: None, errors: origins.diagnostics(errors), warnings, origins, }
+  session.report(result, sink)
+}
+
+///|
+/// Lower the document to engine content without laying it out: what the
+/// compiler would lay out. For tests and tools; callbacks in the content
+/// stay bound to this lowering's origins.
+pub fn Document::lower(
+  self : Document,
+  world : &@library.World,
+) -> CompileReport[@library.Content] {
+  let session = Session::new(world)
+  let session_world : SessionWorld = { session, }
+  let sink = @library.Sink::new()
+  let traced = @library.Traced::new()
+  let result : Result[@library.Content, Array[@library.SourceDiagnostic]] = try
+    self.lower_initial(
+      session,
+      session_world,
+      session_world.session.base.library(),
+      traced,
+      sink,
+    )
+  catch {
+    @library.SourceError(errors) => Err(@typst.deduplicate(errors))
+  } noraise {
+    output => Ok(output)
   }
+  session.report(result, sink)
 }
 
 ///|
@@ -265,14 +429,14 @@ pub fn CompileReport::pdf(
   guard self.output is Some(document) else { return self.failed() }
   let warned = @pdf.pdf(document, options)
   let warnings = self.warnings.copy()
-  warnings.append(self.origins.diagnostics(warned.warnings))
+  warnings.append(self.resolver.diagnostics(warned.warnings))
   match warned.output {
     Ok(bytes) =>
       { output: Some(bytes), errors: [], warnings, origins: self.origins, }
     Err(errors) =>
       {
         output: None,
-        errors: self.origins.diagnostics(errors),
+        errors: self.resolver.diagnostics(errors),
         warnings,
         origins: self.origins,
       }
@@ -320,7 +484,7 @@ pub fn CompileReport::png_pages(
         )
         return {
           output: None,
-          errors: [self.origins.diagnostic(error)],
+          errors: [self.resolver.diagnostic(error)],
           warnings: self.warnings,
           origins: self.origins,
         }

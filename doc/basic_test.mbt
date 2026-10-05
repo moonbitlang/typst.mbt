@@ -14,9 +14,7 @@ using @doc {
   type Block,
   type Text,
   type V,
-  type Numbering,
   type DocWorld,
-  type Sides,
 }
 
 ///|
