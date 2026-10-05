@@ -357,3 +357,12 @@
   texts and stack exhaustion; `WASM_TESTSUITE=<testsuite checkout>
   scripts/goldens.sh wasm-spec`). `wasmi/core/oracle_wbtest.mbt` checks
   wasmi_core against `gen_wasmi_core_tests`.
+- Publishing: `moonbitlang/typst` is used as a dependency (e.g. by mbtx
+  scripts importing `moonbitlang/typst@x.y.z/doc`), and moon does not run
+  `pre-build` steps of dependencies. The package therefore ships the
+  generated font data (`typst_assets/fonts/fonts_gen.c`,
+  `fonts_wasm_gen.mbt`: gitignored but deliberately not in `.moonignore`);
+  the publish workflow checks that they are in the zip. Verify a release as
+  a dependency (a scratch module with `"deps": {"moonbitlang/typst": ..}`,
+  native and wasm-gc), not only by building the unpacked package as the root
+  module: 0.1.0-0.1.2 were broken as dependencies for this reason.

@@ -37,6 +37,11 @@ jobs:
         run: |
           moon package
           ls -la _build/publish/
+          # Pre-build steps do not run for dependencies: the package must
+          # carry the generated font data (see .moonignore).
+          for f in typst_assets/fonts/fonts_gen.c typst_assets/fonts/fonts_wasm_gen.mbt; do
+            unzip -l _build/publish/*.zip | grep -q " $f\$" || { echo "missing $f in the package" >&2; exit 1; }
+          done
       - name: Publish
         shell: bash
         run: |
