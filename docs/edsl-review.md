@@ -382,7 +382,10 @@ What that gives:
    records embedded in the page are compared by
    `scripts/review_page_check.mjs` and `#selftest`.
 4. **Reading sources is opt-in and changes nothing else**: no provider,
-   no file access. `@system.sources` refuses names that leave its root.
+   no file access. `@system.sources` reads the files that the source
+   locations name, below its root; it takes only plain relative names
+   (no absolute path, drive, `..` or backslash) and follows links inside
+   the root like any other file.
 
 ### Known limits of this slice
 
@@ -404,6 +407,8 @@ What that gives:
   other than `\n \r \t \b \\ \" \' \u{..} \uXXXX`, are not read: tier 2
   ("an expression").
 - The excerpt shows at most six lines and does not shorten long lines.
+- The reader follows brackets 64 levels deep; an argument nested deeper
+  is "an expression".
 
 ### Tests
 

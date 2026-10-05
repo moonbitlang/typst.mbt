@@ -85,7 +85,14 @@ priv struct LitReader {
   chars : Array[LitChar]
   mut at : Int
   mut holes : Bool
+  /// How deep the group that is being skipped is nested.
+  mut depth : Int
 }
+
+///|
+/// The deepest nesting of brackets that the reader follows (an argument
+/// that is nested deeper is not read as a literal).
+const GROUP_DEPTH : Int = 64
 
 ///|
 /// The index behind the end of the line that `i` is in.
@@ -125,8 +132,17 @@ fn LitReader::multiline_at(self : LitReader, i : Int, end : Int) -> Bool {
 ///|
 /// The index behind the bracketed group that starts at `i`, with strings,
 /// character literals, comments and nested groups skipped. `None` if it
-/// does not end before `end`.
+/// does not end before `end`, or is nested too deep.
 fn LitReader::skip_group(self : LitReader, i : Int, end : Int) -> Int? {
+  guard self.depth < GROUP_DEPTH else { return Option::None }
+  self.depth += 1
+  let after = self.skip_group_at(i, end)
+  self.depth -= 1
+  after
+}
+
+///|
+fn LitReader::skip_group_at(self : LitReader, i : Int, end : Int) -> Int? {
   let cells = self.cells
   let close = match cells[i].c {
     '(' => ')'
@@ -336,8 +352,9 @@ fn LitReader::multiline(self : LitReader, i : Int, end : Int) -> Int? {
 }
 
 ///|
-/// Read one literal that fills `start..end` exactly: a string or a
-/// multi-line string. `false` if the range is something else.
+/// Read one literal that fills `start..end`, but for white space and
+/// comments behind it: a string or a multi-line string. `false` if the
+/// range is something else (a string with a method call, say).
 fn LitReader::literal(self : LitReader, start : Int, end : Int) -> Bool {
   let before = self.chars.length()
   let holes = self.holes
@@ -348,7 +365,7 @@ fn LitReader::literal(self : LitReader, start : Int, end : Int) -> Bool {
   } else {
     Option::None
   }
-  if read == Some(end) {
+  if read is Some(after) && self.skip_trivia(after, end) == end {
     true
   } else {
     // Nothing of a range that is no literal is kept.
@@ -367,7 +384,7 @@ fn LitReader::strip(self : LitReader, start : Int, end : Int) -> (Int, Int) {
   let cells = self.cells
   let mut start = self.skip_trivia(start, end)
   let mut end = end
-  while true {
+  for _ in 0..<GROUP_DEPTH {
     while end > start && is_blank(cells[end - 1].c) {
       end -= 1
     }
@@ -386,7 +403,7 @@ fn LitReader::strip(self : LitReader, start : Int, end : Int) -> (Int, Int) {
 /// What the source of an argument is: its literal characters if it is a
 /// string, a multi-line string or an array with such elements.
 fn arg_shape(cells : Array[Cell]) -> ArgShape {
-  let reader : LitReader = { cells, chars: [], at: 0, holes: false, }
+  let reader : LitReader = { cells, chars: [], at: 0, holes: false, depth: 0, }
   let (start, end) = reader.strip(0, cells.length())
   guard start < end else { return Expression }
   if reader.literal(start, end) {

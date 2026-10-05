@@ -346,6 +346,44 @@ test "source characters: literals, escapes, array elements, prose" {
   assert_eq(twice.map(o => o.tier), [3, 3])
   assert_eq(twice[0].source_ranges[0].text, "title")
   assert_eq(twice[0].source_ranges[0].start, twice[1].source_ranges[0].start)
+  // A selection from the end of the first copy to the end of the second:
+  // its runs overlap in the source, and all of it is marked once.
+  let text = @doc.Document([@doc.Outline(), @doc.Heading("Repeated title")])
+    .compile_paged(@doc.DocWorld::in_memory())
+    .review_text(sources=@system.sources())
+  let whole = text.feedback(text.find("Repeated title", nth=1).unwrap(), "").origins[0]
+  assert_eq(whole.source_ranges.map(r => r.text), ["Repeated title"])
+  let across = text.feedback(
+    text.find("title").unwrap().through(text.find("title", nth=1).unwrap()),
+    "",
+  )
+  let heading = across.origins.filter(o => o.origin.kind == "Heading")[0]
+  assert_eq(heading.source_ranges.map(r => r.text), ["title", "Repeated title"])
+  let block = across.to_text()
+  assert_true(block.contains(" ^^^^^^^^^^^^^^\n"))
+  assert_true(!block.contains("^^^^^^^^^^^^^^^"))
+  // More lines than an excerpt shows: six, and the number of the rest.
+  let long = feedback_in(
+      [
+        @doc.Prose(
+          (
+            #|one
+            #|two
+            #|three
+            #|four
+            #|five
+            #|six
+            #|seven
+            #|eight
+          ),
+        ),
+      ],
+      "one two three four five six seven eight",
+    ).origins[0]
+  assert_eq(long.tier, 3)
+  assert_eq(long.source_ranges.length(), 8)
+  assert_eq(long.excerpt.length(), 6)
+  assert_eq(long.more, 2)
 }
 
 ///|
@@ -397,7 +435,8 @@ test "source characters are not claimed where the literal is not the text" {
   assert_true(
     note(upper).1.contains("is not the text on the page as it is written"),
   )
-  // Text of which a part is not on the page.
+  // What is hidden or scaled away has origins of its own: the literal
+  // beside it is still all of its own text.
   let hidden = feedback_in(
     [
       @doc.Par(

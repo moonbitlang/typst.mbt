@@ -339,6 +339,24 @@ pub fn ReviewText::find(
 }
 
 ///|
+/// The selection from the start of the earlier of two selections to the
+/// end of the later one.
+pub fn Selection::through(self : Selection, other : Selection) -> Selection {
+  {
+    from: if self.from < other.from {
+      self.from
+    } else {
+      other.from
+    },
+    to: if self.to > other.to {
+      self.to
+    } else {
+      other.to
+    },
+  }
+}
+
+///|
 /// The text of a selection.
 pub fn ReviewText::selected_text(
   self : ReviewText,

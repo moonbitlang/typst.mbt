@@ -748,6 +748,14 @@ test "source: a provider's text gives excerpts and, for a literal that is the te
     }
   }
   let text = report.review_text(sources~)
+  // (Lines can end with a carriage return.)
+  let text_crlf = report.review_text(sources=(_, _) => {
+    Some(file.replace_all(old="\n", new="\r\n"))
+  })
+  assert_eq(
+    text_crlf.feedback(text_crlf.find("words").unwrap(), "").origins[0].excerpt,
+    [(origin.start_line, line)],
+  )
   // The file is asked for once.
   assert_eq(asked, ["doc/review_test.mbt moonbitlang/typst"])
   let feedback = text.feedback(text.find("words here").unwrap(), "")
@@ -799,9 +807,39 @@ test "source: a provider's text gives excerpts and, for a literal that is the te
   assert_true(entry.source_ranges.is_empty())
   assert_true(entry.why.contains("is not the text on the page"))
   assert_eq(entry.excerpt.length(), 1)
-  // A file that is too short for the location: no excerpt, no panic.
+  // A literal of which only a part is on the page.
+  let partly = report.review_text(sources=(_, _) => {
+    Some(
+      "\n".repeat(origin.start_line - 1) +
+      " ".repeat(origin.start_column - 1) +
+      "\"plain words here plain\"),",
+    )
+  })
+  assert_eq(
+    partly.feedback(partly.find("words").unwrap(), "").origins[0].tier,
+    2,
+  )
+  // A file that is too short for the location: no excerpt, no lines that
+  // would be left out, no panic.
   let short = report.review_text(sources=(_, _) => Some("one line"))
   let entry = short.feedback(short.find("words").unwrap(), "").origins[0]
   assert_eq(entry.tier, 2)
   assert_true(entry.excerpt.is_empty())
+  assert_eq(entry.more, 0)
+  assert_true(entry.why.contains("does not have this location"))
+  // A tab in the source line is a tab in the line of marks.
+  let tabbed = report.review_text(sources=(_, _) => {
+    Some(
+      "\n".repeat(origin.start_line - 1) +
+      "\t" +
+      " ".repeat(origin.start_column - 2) +
+      "\"plain words here\"),",
+    )
+  })
+  assert_true(
+    tabbed
+    .feedback(tabbed.find("plain").unwrap(), "")
+    .to_text()
+    .contains("\n       | \t\{" ".repeat(origin.start_column - 1)}^^^^^\n"),
+  )
 }

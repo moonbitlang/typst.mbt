@@ -1508,6 +1508,7 @@ pub fn Select::v(weak? : Bool) -> Selector[VView]
 pub struct Selection {
   // private fields
 }
+pub fn Selection::through(Self, Self) -> Self
 
 pub struct Selector[W] {
   // private fields

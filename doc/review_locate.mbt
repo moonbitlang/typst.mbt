@@ -279,24 +279,29 @@ fn ReviewText::excerpt(
 ) -> (Array[(Int, String)], Int) {
   let file = self.infos[origin].file
   guard file >= 0 else { return ([], 0) }
+  // The lines, each once, in the order of first use, as far as the file
+  // has them.
+  let count = self.lines[file].length()
   let lines : Array[Int] = []
   if spans.is_empty() {
     let o = self.origins[origin]
     for line in o.start_line..<(o.end_line + 1) {
-      lines.push(line)
+      if line >= 1 && line <= count {
+        lines.push(line)
+      }
     }
   } else {
+    let seen : Map[Int, Unit] = Map([])
     for span in spans {
-      if !lines.contains(span.line) {
+      if !seen.contains(span.line) {
+        seen[span.line] = ()
         lines.push(span.line)
       }
     }
   }
   let shown : Array[(Int, String)] = []
   for line in lines {
-    guard shown.length() < EXCERPT_LINES && line <= self.lines[file].length() else {
-      break
-    }
+    guard shown.length() < EXCERPT_LINES else { break }
     shown.push((line, String::from_array(self.lines[file][line - 1])))
   }
   (shown, lines.length() - shown.length())

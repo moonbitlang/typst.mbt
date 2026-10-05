@@ -371,8 +371,26 @@ pub fn Feedback::to_text(self : Feedback) -> String {
         "\{" ".repeat(if number.length() < 6 { 6 - number.length() } else { 0 })}\{number} | \{line.1}\n",
       )
       let marks = entry.marks(line.0)
-      if marks != "" {
-        out.write_string("       | \{marks}\n")
+      if !marks.is_empty() {
+        // Under each marked column a `^`; before it what keeps the columns
+        // aligned (a tab under a tab).
+        out.write_string("       | ")
+        let mut column = 1
+        for c in line.1 {
+          guard marks.last() is Some(last) && column < last.1 else { break }
+          let marked = marks.iter().any(m => m.0 <= column && column < m.1)
+          out.write_char(
+            if marked {
+              '^'
+            } else if c == '\t' {
+              '\t'
+            } else {
+              ' '
+            },
+          )
+          column += 1
+        }
+        out.write_char('\n')
       }
     }
     if entry.more > 0 {
@@ -386,29 +404,43 @@ pub fn Feedback::to_text(self : Feedback) -> String {
 }
 
 ///|
-/// The marks under a line of the excerpt: `^` under the source characters
-/// on the line or, without source characters, under a location that is on
-/// this one line. Empty if nothing is marked.
-fn FeedbackOrigin::marks(self : FeedbackOrigin, line : Int) -> String {
+/// What is marked on a line of the excerpt: the source characters on the
+/// line or, without source characters, a location that is on this one
+/// line. As column ranges (`end` exclusive) in ascending order that do
+/// not touch: a selection that goes over two copies of a text on the page
+/// has runs that overlap in the source.
+fn FeedbackOrigin::marks(
+  self : FeedbackOrigin,
+  line : Int,
+) -> Array[(Int, Int)] {
   let ranges : Array[(Int, Int)] = []
   for span in self.source_ranges {
-    if span.line == line {
+    if span.line == line && span.end > span.start {
       ranges.push((span.start, span.end))
     }
   }
   let origin = self.origin
   if self.source_ranges.is_empty() &&
     origin.start_line == line &&
-    origin.end_line == line {
+    origin.end_line == line &&
+    origin.end_column > origin.start_column {
     ranges.push((origin.start_column, origin.end_column))
   }
-  let out = StringBuilder()
-  let mut column = 1
+  ranges.sort_by((a, b) => a.0.compare(b.0))
+  let out : Array[(Int, Int)] = []
   for range in ranges {
-    guard range.1 > range.0 && range.0 >= column else { continue }
-    out.write_string(" ".repeat(range.0 - column))
-    out.write_string("^".repeat(range.1 - range.0))
-    column = range.1
+    match out.last() {
+      Some(last) if range.0 <= last.1 =>
+        out[out.length() - 1] = (
+          last.0,
+          if range.1 > last.1 {
+            range.1
+          } else {
+            last.1
+          },
+        )
+      _ => out.push(range)
+    }
   }
-  out.to_string()
+  out
 }

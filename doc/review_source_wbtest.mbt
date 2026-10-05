@@ -55,6 +55,25 @@ test "reader: a string literal, with escapes and interpolations" {
   inspect(shape_of("\"open"), content="expression")
   inspect(shape_of("\"a\" + \"b\""), content="expression")
   inspect(shape_of("\"\""), content="")
+  // Columns count code points: a character outside the basic plane is
+  // one column.
+  inspect(
+    shape_of("\"a\u{1F600}b\""),
+    content="a@1:2-3#0 😀@1:3-4#1 b@1:4-5#2",
+  )
+  // A comment behind the literal; a method call behind it is no literal.
+  inspect(shape_of("\"x\" // why\n"), content="x@1:2-3#0")
+  inspect(shape_of("\"x\" // why\n.f()"), content="expression")
+  // Brackets are followed to a depth; beyond it nothing is read.
+  inspect(
+    shape_of("(".repeat(40) + "\"x\"" + ")".repeat(40)),
+    content="x@1:42-43#0",
+  )
+  inspect(
+    shape_of("(".repeat(5000) + "\"x\"" + ")".repeat(5000)),
+    content="expression",
+  )
+  inspect(shape_of("[" + "(".repeat(5000) + "]"), content="expression")
 }
 
 ///|
@@ -98,6 +117,11 @@ test "reader: arrays, bindings and expressions" {
   inspect(
     shape_of("[\"a\", Emph(\"x, y\"), name, \"b\",]"),
     content="a@1:3-4#0 b@1:28-29#4 +holes",
+  )
+  // A comment behind the last element.
+  inspect(
+    shape_of("[\n\"a\", // one\n\"b\" // two\n]"),
+    content="a@2:2-3#0 b@3:2-3#2",
   )
   inspect(shape_of("[]"), content="")
   inspect(shape_of("[f(x), y]"), content=" +holes")

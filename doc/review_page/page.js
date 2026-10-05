@@ -52,18 +52,28 @@ const Core = (() => {
         }
       }
     }
+    // (A line is cut into its code points once.)
+    const cut = new Map();
+    const chars = (line) => {
+      if (!cut.has(line)) cut.set(line, Array.from(lines[line]));
+      return cut.get(line);
+    };
     out.source_ranges = runs.map((run) => ({
-      line: run[0], start: run[1], end: run[2], text: Array.from(lines[run[0]]).slice(run[1] - 1, run[2] - 1).join(''),
+      line: run[0], start: run[1], end: run[2], text: chars(run[0]).slice(run[1] - 1, run[2] - 1).join(''),
     }));
-    const wanted = [];
-    if (lines && runs.length === 0) for (let line = o.range[0]; line <= o.range[2]; line++) wanted.push(line);
-    for (const run of runs) if (!wanted.includes(run[0])) wanted.push(run[0]);
-    out.excerpt = [];
-    for (const line of wanted) {
-      if (out.excerpt.length === 6 || lines[line] === undefined) break;
-      out.excerpt.push({ line, text: lines[line] });
+    // The lines, each once, in the order of first use, as far as the file
+    // has them.
+    const wanted = [], seen = new Set();
+    if (lines && runs.length === 0) {
+      for (let line = o.range[0]; line <= o.range[2]; line++) if (lines[line] !== undefined) wanted.push(line);
     }
-    if (wanted.length > out.excerpt.length) out.excerpt_more = wanted.length - out.excerpt.length;
+    for (const run of runs) {
+      if (seen.has(run[0])) continue;
+      seen.add(run[0]);
+      wanted.push(run[0]);
+    }
+    out.excerpt = wanted.slice(0, 6).map((line) => ({ line, text: lines[line] }));
+    if (wanted.length > 6) out.excerpt_more = wanted.length - 6;
     return out;
   }
 
@@ -133,8 +143,18 @@ const Core = (() => {
       for (const line of o.excerpt) {
         const number = String(line.line);
         out += `${' '.repeat(Math.max(0, 6 - number.length))}${number} | ${line.text}\n`;
-        const under = marks(o, line.line).map(([gap, width]) => ' '.repeat(gap) + '^'.repeat(width)).join('');
-        if (under !== '') out += `       | ${under}\n`;
+        // Under each marked column a `^`; before it what keeps the columns
+        // aligned (a tab under a tab).
+        const marked = marks(o, line.line);
+        if (marked.length > 0) {
+          let under = '', column = 1;
+          for (const c of line.text) {
+            if (column >= marked[marked.length - 1][1]) break;
+            under += marked.some((m) => m[0] <= column && column < m[1]) ? '^' : c === '\t' ? '\t' : ' ';
+            column++;
+          }
+          out += `       | ${under}\n`;
+        }
       }
       if (o.excerpt_more) out += `       | … ${o.excerpt_more} more lines\n`;
     });
@@ -143,16 +163,19 @@ const Core = (() => {
 
   // What is marked on a line of an excerpt: the source characters on the
   // line or, without source characters, a location that is on this one
-  // line. As `[gap, width]`: columns to skip, then columns to mark.
+  // line. As column ranges `[start, end]` (`end` exclusive) in ascending
+  // order that do not touch: a selection that goes over two copies of a
+  // text on the page has runs that overlap in the source.
   function marks(o, line) {
-    const ranges = o.source_ranges.filter((r) => r.line === line).map((r) => [r.start, r.end]);
-    if (o.source_ranges.length === 0 && o.start[0] === line && o.end[0] === line) ranges.push([o.start[1], o.end[1]]);
+    const ranges = o.source_ranges.filter((r) => r.line === line && r.end > r.start).map((r) => [r.start, r.end]);
+    if (o.source_ranges.length === 0 && o.start[0] === line && o.end[0] === line && o.end[1] > o.start[1]) {
+      ranges.push([o.start[1], o.end[1]]);
+    }
+    ranges.sort((a, b) => a[0] - b[0]);
     const out = [];
-    let column = 1;
-    for (const [start, end] of ranges) {
-      if (!(end > start && start >= column)) continue;
-      out.push([start - column, end - start]);
-      column = end;
+    for (const range of ranges) {
+      const last = out[out.length - 1];
+      if (last && range[0] <= last[1]) last[1] = Math.max(last[1], range[1]); else out.push(range);
     }
     return out;
   }
@@ -291,10 +314,10 @@ if (typeof document !== 'undefined') (() => {
       const code = el('span', 'code');
       const chars = Array.from(line.text);
       let at = 0;
-      for (const [gap, width] of Core.marks(o, line.line)) {
-        code.appendChild(document.createTextNode(chars.slice(at, at + gap).join('')));
-        code.appendChild(el('mark', '', chars.slice(at + gap, at + gap + width).join('')));
-        at += gap + width;
+      for (const [start, end] of Core.marks(o, line.line)) {
+        code.appendChild(document.createTextNode(chars.slice(at, start - 1).join('')));
+        code.appendChild(el('mark', '', chars.slice(start - 1, end - 1).join('')));
+        at = end - 1;
       }
       code.appendChild(document.createTextNode(chars.slice(at).join('')));
       row.appendChild(code);
