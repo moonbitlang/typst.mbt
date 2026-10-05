@@ -15,6 +15,8 @@ pub(all) struct Tiling {
   angle : Angle
   /// The relative placement of the tiling.
   relative : Smart[RelativeTo]
+  /// The fingerprint of `frame` (upstream stores the frame in a `LazyHash`).
+  frame_hash : LazyFingerprint
 } derive(Eq)
 
 ///|
@@ -120,7 +122,15 @@ fn impl_tiling_construct(
     offset.x.resolve(styles).relative_to(size.x + spacing.x),
     offset.y.resolve(styles).relative_to(size.y + spacing.y),
   )
-  { frame, size, spacing, offset, angle: angle_.v, relative: relative_, }
+  {
+    frame,
+    size,
+    spacing,
+    offset,
+    angle: angle_.v,
+    relative: relative_,
+    frame_hash: LazyFingerprint::new(),
+  }
 }
 
 ///|

@@ -3882,6 +3882,7 @@ pub fn Binding::with_category(Self, Category) -> Self
 pub fn Binding::with_deprecation(Self, Deprecation) -> Self
 pub fn Binding::with_documentation(Self, BindingDocumentation) -> Self
 pub fn Binding::with_feature(Self, Feature) -> Self
+pub impl Fingerprint for Binding
 
 pub(all) struct BindingDocumentation {
   name : String
@@ -4249,6 +4250,7 @@ pub(all) enum Category {
   Png
   Bundle
 } derive(Eq, Hash, @debug.Debug)
+pub impl Fingerprint for Category
 
 pub(all) struct Cell {
   body : Content
@@ -4431,6 +4433,7 @@ pub(all) struct Closure {
   defaults : Array[Value]
   captured : Scope
   num_pos_params : Int
+  hash : LazyFingerprint
 }
 pub fn Closure::name(Self) -> String?
 
@@ -4484,6 +4487,7 @@ pub fn Color::to_vec4_u8(Self) -> FixedArray[Int]
 pub fn Color::with_alpha(Self, Float) -> Self
 pub impl Eq for Color
 pub impl Hash for Color
+pub impl Fingerprint for Color
 pub impl FromValue for Color
 pub impl IntoValue for Color
 pub impl Reflect for Color
@@ -4494,6 +4498,7 @@ pub(all) enum ColorSpace {
   Spot(SpotColorant)
 } derive(Eq)
 pub fn ColorSpace::hue_index(Self) -> Int?
+pub impl Fingerprint for ColorSpace
 pub impl FromValue for ColorSpace
 pub impl IntoValue for ColorSpace
 pub impl Reflect for ColorSpace
@@ -4869,6 +4874,7 @@ pub fn Curve::move_(Self, Point) -> Unit
 pub fn Curve::new() -> Self
 pub fn Curve::rect(Axes[Abs]) -> Self
 pub fn Curve::translate(Self, Point) -> Unit
+pub impl Fingerprint for Curve
 
 pub struct CurveClose(Content)
 pub fn CurveClose::mode(Self, StyleChain) -> CloseMode
@@ -5128,6 +5134,7 @@ pub(all) enum Destination {
 } derive(Eq)
 pub fn Destination::alt_text(Self, Engine, StyleChain, @moonbitlang/typst/syntax.Span) -> String raise SourceError
 pub fn Destination::of_value(Value) -> Self
+pub impl Fingerprint for Destination
 pub impl FromValue for Destination
 pub impl IntoValue for Destination
 pub impl Reflect for Destination
@@ -5877,6 +5884,7 @@ pub(all) struct FixedStroke {
 } derive(Eq)
 pub fn FixedStroke::from_pair(Paint, Abs) -> Self
 pub impl Default for FixedStroke
+pub impl Fingerprint for FixedStroke
 
 pub struct FlushElem(Content)
 pub fn FlushElem::new() -> Self
@@ -5902,6 +5910,7 @@ pub fn Font::ttf(Self) -> @otf.Face?
 pub impl Eq for Font
 pub impl Hash for Font
 pub impl Show for Font
+pub impl Fingerprint for Font
 
 pub(all) struct FontAxis {
   tag : OpenTypeTag
@@ -5982,6 +5991,7 @@ pub fn FontInstance::y_advance(Self, UInt16) -> Em?
 pub impl Eq for FontInstance
 pub impl Hash for FontInstance
 pub impl Show for FontInstance
+pub impl Fingerprint for FontInstance
 
 pub(all) struct FontList(Array[FontFamily]) derive(Eq, Hash)
 pub fn FontList::new(Array[FontFamily]) -> Self raise HintedError
@@ -6285,6 +6295,7 @@ pub fn Frame::width(Self) -> Abs
 pub fn Frame::with_kind(Self, FrameKind) -> Self
 pub impl Default for Frame
 pub impl Eq for Frame
+pub impl Fingerprint for Frame
 
 pub struct FrameElem(Content)
 pub fn FrameElem::body(Self) -> Content
@@ -6303,6 +6314,7 @@ pub(all) enum FrameItem {
   Tag(Tag)
 } derive(Eq)
 pub fn FrameItem::clone(Self) -> Self
+pub impl Fingerprint for FrameItem
 
 pub(all) enum FrameKind {
   Soft
@@ -6378,6 +6390,7 @@ pub(all) struct Glyph {
   span_offset : UInt16
 } derive(Eq, Hash)
 pub fn Glyph::range(Self) -> (Int, Int)
+pub impl Fingerprint for Glyph
 
 pub(all) struct GlyphFrame {
   upem : Abs
@@ -6421,6 +6434,7 @@ pub fn Gradient::space(Self) -> ColorSpace
 pub fn Gradient::stops_ref(Self) -> Array[(Color, Ratio)]
 pub fn Gradient::unwrap_relative(Self, Bool) -> RelativeTo
 pub fn Gradient::with_relative(Self, RelativeTo) -> Self
+pub impl Fingerprint for Gradient
 pub impl FromValue for Gradient
 pub impl IntoValue for Gradient
 pub impl Reflect for Gradient
@@ -6669,6 +6683,7 @@ pub(all) struct GroupItem {
 } derive(Eq)
 pub fn GroupItem::clone(Self) -> Self
 pub fn GroupItem::new(Frame) -> Self
+pub impl Fingerprint for GroupItem
 
 pub(all) enum HAlignment {
   Start
@@ -7001,6 +7016,7 @@ pub fn Image::new(ImageKind, String?, Smart[ImageScaling]) -> Self
 pub fn Image::plain(ImageKind) -> Self
 pub fn Image::scaling(Self) -> Smart[ImageScaling]
 pub fn Image::width(Self) -> Double
+pub impl Fingerprint for Image
 
 pub struct ImageElem(Content)
 pub fn ImageElem::alt(Self, StyleChain) -> String?
@@ -7221,6 +7237,17 @@ pub(all) struct LayoutRegion {
   expand : Axes[Bool]
 } derive(Eq, Hash)
 pub fn LayoutRegion::new(Axes[Abs], Axes[Bool]) -> Self
+
+pub struct LazyFingerprint {
+  // private fields
+}
+pub fn LazyFingerprint::flags(Self, (SipHasher128) -> Unit) -> Int
+pub fn LazyFingerprint::new() -> Self
+pub fn LazyFingerprint::reset(Self) -> Unit
+pub fn LazyFingerprint::write(Self, SipHasher128, (SipHasher128) -> Unit) -> Unit
+pub fn LazyFingerprint::write_cached(Self, SipHasher128) -> Bool
+pub impl Eq for LazyFingerprint
+pub impl Hash for LazyFingerprint
 
 pub(all) enum LeftRightAlternator {
   None_
@@ -8014,6 +8041,7 @@ pub fn Module::with_file_id(Self, @moonbitlang/typst/syntax.FileId) -> Self
 pub fn Module::with_name(Self, String) -> Self
 pub fn Module::with_scope(Self, Scope) -> Self
 pub impl Eq for Module
+pub impl Fingerprint for Module
 
 pub struct MoveElem(Content)
 pub fn MoveElem::body(Self) -> Content
@@ -8618,6 +8646,7 @@ pub fn Paint::as_decoration(Self) -> Self
 pub fn Paint::relative(Self) -> Smart[RelativeTo]
 pub fn Paint::repr(Self) -> String
 pub fn Paint::unwrap_solid(Self) -> Color
+pub impl Fingerprint for Paint
 pub impl FromValue for Paint
 pub impl IntoValue for Paint
 pub impl Reflect for Paint
@@ -9113,6 +9142,7 @@ pub fn ProcessColor::to_vec4_u8(Self) -> FixedArray[Int]
 pub fn ProcessColor::with_alpha(Self, Float) -> Self
 pub impl Eq for ProcessColor
 pub impl Hash for ProcessColor
+pub impl Fingerprint for ProcessColor
 pub impl FromValue for ProcessColor
 pub impl IntoValue for ProcessColor
 pub impl Reflect for ProcessColor
@@ -9818,6 +9848,7 @@ pub fn Scope::new() -> Self
 pub fn Scope::prelude_path(Self, Array[String]) -> Binding?
 pub fn Scope::reset_category(Self) -> Unit
 pub fn Scope::start_category(Self, Category) -> Unit
+pub impl Fingerprint for Scope
 
 pub(all) struct Scopes {
   mut top : Scope
@@ -9905,6 +9936,7 @@ pub(all) struct Shape {
   fill_rule : FillRule
   stroke : FixedStroke?
 } derive(Eq)
+pub impl Fingerprint for Shape
 
 pub struct SharedFenceSizing {
   // private fields
@@ -10004,6 +10036,7 @@ pub fn SipHasher128::write_u32(Self, UInt) -> Unit
 pub fn SipHasher128::write_u64(Self, UInt64) -> Unit
 pub fn SipHasher128::write_u8(Self, Byte) -> Unit
 pub fn SipHasher128::write_usize(Self, Int) -> Unit
+pub impl @moonbitlang/typst/syntax.NodeHasher for SipHasher128
 
 pub(all) enum Sizing {
   Auto
@@ -10253,6 +10286,7 @@ pub(all) struct SpotColorant {
 } derive(Eq)
 pub fn SpotColorant::repr(Self) -> String
 pub impl Hash for SpotColorant
+pub impl Fingerprint for SpotColorant
 pub impl FromValue for SpotColorant
 pub impl IntoValue for SpotColorant
 pub impl Reflect for SpotColorant
@@ -10479,6 +10513,7 @@ pub fn Stroke::from_pair(Paint, Length) -> Self
 pub fn Stroke::repr(Self) -> String
 pub fn Stroke::resolve(Self, StyleChain) -> ResolvedStroke
 pub impl Default for Stroke
+pub impl Fingerprint for Stroke
 pub impl Fold for Stroke
 pub impl FromValue for Stroke
 pub impl IntoValue for Stroke
@@ -11162,6 +11197,7 @@ pub fn TextItem::bbox(Self) -> Rect
 pub fn TextItem::height(Self) -> Abs
 pub fn TextItem::width(Self) -> Abs
 pub impl Show for TextItem
+pub impl Fingerprint for TextItem
 
 pub(all) struct TextItemView {
   item : TextItem
@@ -11189,11 +11225,14 @@ pub(all) struct Tiling {
   offset : Axes[Abs]
   angle : Angle
   relative : Smart[RelativeTo]
+  frame_hash : LazyFingerprint
 } derive(Eq)
+pub fn Tiling::frame_fingerprint_flags(Self) -> Int
 pub fn Tiling::relative(Self) -> Smart[RelativeTo]
 pub fn Tiling::repr(Self) -> String
 pub fn Tiling::unwrap_relative(Self, Bool) -> RelativeTo
 pub fn Tiling::with_relative(Self, RelativeTo) -> Self
+pub impl Fingerprint for Tiling
 pub impl FromValue for Tiling
 pub impl IntoValue for Tiling
 pub impl Reflect for Tiling
@@ -11318,6 +11357,7 @@ pub fn Transform::scale_at(Ratio, Ratio, Abs, Abs) -> Self
 pub fn Transform::skew(Angle, Angle) -> Self
 pub fn Transform::translate(Abs, Abs) -> Self
 pub impl Default for Transform
+pub impl Fingerprint for Transform
 
 pub(all) enum Transformation {
   Content(Content)

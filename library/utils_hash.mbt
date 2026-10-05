@@ -259,11 +259,12 @@ pub fn[T : Fingerprint] SipHasher128::write(
 ///|
 /// Flags of the fingerprint being computed (not upstream; see `memo.mbt`):
 /// [fingerprint_lossy] if it contains a value whose [Fingerprint] does not
-/// capture all of its data (e.g. gradients and tilings are hashed through
-/// their repr), [fingerprint_identity] if it contains a value that compares
-/// by identity (closures; their fingerprint is structural). Such
-/// fingerprints are fine for identities (locations), but equal fingerprints
-/// do not prove interchangeable values.
+/// capture all of the data that upstream's `Hash` covers (no impl does at
+/// the moment; such an impl must call [mark_fingerprint_lossy]),
+/// [fingerprint_identity] if it contains a value that compares by identity
+/// (closures; their fingerprint is structural). Equal fingerprints with
+/// flags do not prove interchangeable values, and a lossy fingerprint gives
+/// elements a location key that upstream would not give them.
 let fingerprint_flags : Ref[Int] = { val: 0, }
 
 ///|
@@ -490,4 +491,120 @@ pub fn[T : Hash] SipHasher128::write_leaf(
 ) -> Unit {
   self.write_str(repr)
   self.write_u32(value.hash().reinterpret_as_uint())
+}
+
+///|
+/// A lazily computed fingerprint of immutable data, cached with the object
+/// that owns the data (upstream `typst_utils::LazyHash`), together with the
+/// [fingerprint_flags] of the data.
+///
+/// The owner's data must not change once it was fingerprinted (upstream
+/// `LazyHash` only hands out its value mutably by resetting the hash):
+/// closures, modules and the frames of tilings are values that evaluation
+/// never modifies after they were built, although their fields are
+/// reachable through the public API. An owner that does modify its data
+/// calls [LazyFingerprint::reset].
+pub struct LazyFingerprint {
+  priv mut cached : Bool
+  /// Whether the fingerprint is being computed (see
+  /// [LazyFingerprint::write]).
+  priv mut busy : Bool
+  priv mut hash : U128
+  priv mut flags : Int
+}
+
+///|
+/// An empty cache.
+pub fn LazyFingerprint::new() -> LazyFingerprint {
+  { cached: false, busy: false, hash: u128_zero, flags: 0, }
+}
+
+///|
+/// The cache is not part of the value that owns it.
+pub impl Eq for LazyFingerprint with fn equal(_, _) {
+  true
+}
+
+///|
+pub impl Hash for LazyFingerprint with fn hash_combine(_, _) {
+  ()
+}
+
+///|
+/// Forget the cached fingerprint (the owner's data is about to change).
+pub fn LazyFingerprint::reset(self : LazyFingerprint) -> Unit {
+  self.cached = false
+}
+
+///|
+/// Feeds the cached hash into `state`, if there is one. Returns whether it
+/// did; otherwise the caller computes it with [LazyFingerprint::write].
+///
+/// While host closures are collected ([fingerprint_hosts_in]), a cached
+/// hash of data that holds some is not used: the collector must visit them.
+pub fn LazyFingerprint::write_cached(
+  self : LazyFingerprint,
+  state : SipHasher128,
+) -> Bool {
+  if self.cached &&
+    !(fingerprint_hosts.val is Some(_) && (self.flags & fingerprint_host) != 0) {
+    mark_fingerprint_flags(self.flags)
+    state.write_u128(self.hash)
+    true
+  } else {
+    false
+  }
+}
+
+///|
+/// Feeds the 128-bit hash of what `f` writes into `state` (like upstream's
+/// `Hash for LazyHash`, which writes the `u128`) and caches it with the
+/// flags of what `f` fingerprinted.
+pub fn LazyFingerprint::write(
+  self : LazyFingerprint,
+  state : SipHasher128,
+  f : (SipHasher128) -> Unit,
+) -> Unit {
+  if self.write_cached(state) {
+    return
+  }
+  // Data that (indirectly) holds itself cannot be built by evaluation, but
+  // through the API (a module in its own scope): the inner occurrence is
+  // written as a marker instead of descending forever.
+  if self.busy {
+    state.write_discriminant(-1)
+    return
+  }
+  self.busy = true
+  let inner = SipHasher128::new()
+  let flags = fingerprint_flags_in(() => f(inner))
+  self.busy = false
+  let hash = inner.finish128()
+  self.hash = hash
+  self.flags = flags
+  self.cached = true
+  state.write_u128(hash)
+}
+
+///|
+/// The flags of the fingerprint (computing it with `f` if needed).
+pub fn LazyFingerprint::flags(
+  self : LazyFingerprint,
+  f : (SipHasher128) -> Unit,
+) -> Int {
+  if !self.cached {
+    self.write(SipHasher128::new(), f)
+  }
+  self.flags
+}
+
+///|
+/// Syntax nodes are hashed through [@syntax.SyntaxNode::hash_into].
+pub impl @syntax.NodeHasher for SipHasher128 with fn write_u64(self, v) {
+  SipHasher128::write_u64(self, v)
+}
+
+///|
+pub impl @syntax.NodeHasher for SipHasher128 with fn write_str(self, s) {
+  SipHasher128::write_str(self, s)
 }

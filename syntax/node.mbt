@@ -882,3 +882,89 @@ fn SyntaxNode::synthesize_at(
     }
   }
 }
+
+///|
+/// The sink of [SyntaxNode::hash_into] (not upstream: this package cannot
+/// name the hasher of `typst_utils::hash128`, which lives in `library`).
+pub(open) trait NodeHasher {
+  fn write_u64(Self, UInt64) -> Unit
+  fn write_str(Self, StringView) -> Unit
+}
+
+///|
+/// Feeds what upstream's derived `Hash for SyntaxNode` covers into `state`:
+/// the node data (kind, text or children, lengths, diagnostics and
+/// numbering bounds, error and warning messages with their hints) and the
+/// span, recursively.
+pub fn[H : NodeHasher] SyntaxNode::hash_into(
+  self : SyntaxNode,
+  state : H,
+) -> Unit {
+  hash_node(self.data, state)
+  state.write_u64(self.span.0)
+}
+
+///|
+fn[H : NodeHasher] hash_node(data : Node, state : H) -> Unit {
+  match data {
+    // The length is derived from the text.
+    Leaf(text, kind, _) => {
+      state.write_u64(0)
+      state.write_str(text)
+      state.write_u64(kind.index().to_uint64())
+    }
+    Inner(inner, kind) => {
+      state.write_u64(1)
+      state.write_u64(inner.len.to_uint64())
+      state.write_u64(inner.descendants.to_uint64())
+      state.write_u64(
+        (if inner.diagnosis.errors { 1UL } else { 0UL }) |
+        (if inner.diagnosis.warnings { 2UL } else { 0UL }),
+      )
+      state.write_u64(inner.upper)
+      state.write_u64(inner.children.length().to_uint64())
+      for child in inner.children {
+        child.hash_into(state)
+      }
+      state.write_u64(kind.index().to_uint64())
+    }
+    Error(err) => {
+      state.write_u64(2)
+      state.write_str(err.text)
+      state.write_str(err.message)
+      hash_hints(err.hints, state)
+    }
+    Warning(warning, kind) => {
+      state.write_u64(3)
+      hash_node(warning.child, state)
+      hash_sub_range(warning.sub_range, state)
+      state.write_str(warning.message)
+      hash_hints(warning.hints, state)
+      state.write_u64(kind.index().to_uint64())
+    }
+  }
+}
+
+///|
+fn[H : NodeHasher] hash_hints(
+  hints : Array[(String, SubRange?)],
+  state : H,
+) -> Unit {
+  state.write_u64(hints.length().to_uint64())
+  for hint in hints {
+    state.write_str(hint.0)
+    hash_sub_range(hint.1, state)
+  }
+}
+
+///|
+fn[H : NodeHasher] hash_sub_range(range : SubRange?, state : H) -> Unit {
+  match range {
+    None => state.write_u64(0)
+    Some(range) => {
+      state.write_u64(1)
+      state.write_u64(range.start.to_uint64())
+      state.write_u64(range.end.to_uint64())
+    }
+  }
+}

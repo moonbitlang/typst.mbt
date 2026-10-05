@@ -159,6 +159,39 @@ goldens with `scripts/goldens.sh <stage>` (needs Rust; builds `oracle/`).
   only image `source`/`icc` use the companion so far — bibliography
   `sources`/`style`, cite `style`, raw `syntaxes`/`theme` and `pdf.attach`
   `path` still re-derive from the source (caches keyed by bytes).
+- [x] Location keys (`prepare` in `realize/`: `hash128(elem)`, as upstream)
+  use the port's fingerprints (`library/value_hash.mbt`,
+  `library/visualize_hash.mbt`), which now cover what upstream's `Hash`
+  covers for every value: gradients (stops, geometry, space, relative,
+  anti-aliasing), tilings (the laid-out frame: groups, text items with
+  glyphs and spans, shapes, images, links, tags; hashed once per tiling),
+  strokes and the other dynamic values (spot colorants, paths, CSS), colours
+  (component bits), modules (whole scope, hashed once per module) and
+  closures (the syntax tree, defaults, captured bindings with spans and
+  kinds, hashed once per closure). No `Fingerprint` marks itself lossy
+  anymore, so memoized results with such values in recorded reads are
+  replayed across introspectors, and laid-out frames with tiling paints are
+  reused. Two located elements that are equal including their spans and
+  differ only in such a value used to share a key where upstream's differ,
+  which measurement observes (`Introspector::locator`):
+  `typst/oracle_wbtest.mbt` (`scripts/gen_typst_oracle.py`, group "location
+  keys") records upstream's answers, e.g. 10pt, 20pt, 30pt for
+  `(1.001pt, 1.002pt, 1.003pt).map(s => [#rect(stroke: s)<r>])` under
+  `#show <r>: it => context box(width: c.at(it.location()).first() * 10pt)`
+  (10pt three times before), and closures of one `eval` call with the same
+  text but different trees. Remaining differences in kind, not in what is
+  told apart: the hash values are not upstream's (payload encodings; only
+  the SVG exporter's inputs are byte-exact), symbols, datetimes, decimals,
+  durations, alignments and directions are written as their repr plus the
+  builtin 32-bit hash (`write_leaf`; the reprs show all data), native
+  functions by name, title and docs (upstream: identity;
+  `typst/fingerprint_wbtest.mbt` checks they are distinct), the
+  documentation of a captured library binding lacks upstream's `since`,
+  `keywords` and `def_site` (not ported; name, title and docs are hashed),
+  and frames have no `LazyHash` (they are mutable; a frame is hashed per
+  call, owners cache). The caches (`LazyFingerprint`) rely on closures,
+  modules and tiling frames not being modified after they were built, which
+  holds for evaluation but is not enforced by the public API.
 - [ ] `Source` is edited in place (upstream: copy-on-write) — callers that
   need the old tree must `deep_clone`.
 - [ ] `sorted()` comparison order differs from upstream's glidesort, so the

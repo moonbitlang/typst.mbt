@@ -93,21 +93,15 @@ pub impl Fingerprint for Value with fn fingerprint(self, state) {
     }
     Color(v) => {
       state.write_discriminant(10)
-      state.write_leaf(v.repr(), v)
+      state.write(v)
     }
     Gradient(v) => {
       state.write_discriminant(11)
-      state.write_str(v.repr())
-      // The repr rounds numbers.
-      mark_fingerprint_lossy()
+      state.write(v)
     }
     Tiling(v) => {
       state.write_discriminant(12)
-      // Upstream hashes the laid out frame; frames have no fingerprint, so
-      // only its size and item count are written.
-      state.write_str(v.repr())
-      state.write_usize(v.frame.items().length())
-      mark_fingerprint_lossy()
+      state.write(v)
     }
     Symbol(v) => {
       state.write_discriminant(13)
@@ -172,7 +166,7 @@ pub impl Fingerprint for Value with fn fingerprint(self, state) {
     }
     Module(v) => {
       state.write_discriminant(28)
-      v.fingerprint_with_depth(state, 0)
+      state.write(v)
     }
     Dyn(v) => {
       state.write_discriminant(29)
@@ -208,44 +202,134 @@ pub impl Fingerprint for Type with fn fingerprint(self, state) {
 }
 
 ///|
-/// Modules can (indirectly) contain themselves (e.g. `std`), so nested
-/// modules are only hashed by name and file.
-fn Module::fingerprint_with_depth(
-  self : Module,
-  state : SipHasher128,
-  depth : Int,
-) -> Unit {
+/// Upstream derives `Hash` for `Module`: the name and the shared inner data
+/// (scope, content, file). The inner data is hashed once per module (not
+/// upstream; see [LazyFingerprint]).
+pub impl Fingerprint for Module with fn fingerprint(self, state) {
+  // Modules compare by the identity of their inner data.
+  fingerprint_flags.val = fingerprint_flags.val | fingerprint_identity
   state.write(self.name)
-  match self.inner.file_id {
-    Some(id) => {
-      state.write_discriminant(1)
-      state.write_u32(id.into_raw().to_uint())
-    }
-    None => state.write_discriminant(0)
+  let inner = self.inner
+  if inner.hash.write_cached(state) {
+    return
   }
-  if depth == 0 {
-    state.write(self.inner.content)
-    self.inner.scope.fingerprint_with_depth(state, depth + 1)
+  inner.hash.write(state, state => {
+    state.write(inner.scope)
+    state.write(inner.content)
+    match inner.file_id {
+      Some(id) => {
+        state.write_discriminant(1)
+        state.write_u32(id.into_raw().to_uint())
+      }
+      None => state.write_discriminant(0)
+    }
+  })
+}
+
+///|
+/// Upstream `Hash for Scope`: the bindings in order, then `deduplicate` and
+/// `category`.
+pub impl Fingerprint for Scope with fn fingerprint(self, state) {
+  state.write_usize(self.map.length())
+  for name, binding in self.map {
+    state.write_str(name)
+    state.write(binding)
+  }
+  state.write_bool(self.deduplicate)
+  state.write(self.category)
+}
+
+///|
+/// Upstream derives `Hash` for `Binding`: value, kind, span, `check_access`
+/// and the out-of-band info.
+pub impl Fingerprint for Binding with fn fingerprint(self, state) {
+  state.write(self.value)
+  match self.kind {
+    Normal => state.write_discriminant(0)
+    Captured(capturer) => {
+      state.write_discriminant(1)
+      state.write_discriminant(
+        match capturer {
+          Function => 0
+          Context => 1
+        },
+      )
+    }
+  }
+  state.write(self.span)
+  state.write_bool(self.check_access)
+  match self.info {
+    None => state.write_discriminant(0)
+    Some(info) => {
+      state.write_discriminant(1)
+      if !info.hash.write_cached(state) {
+        info.hash.write(state, state => info.fingerprint_fields(state))
+      }
+    }
   }
 }
 
 ///|
-fn Scope::fingerprint_with_depth(
-  self : Scope,
+/// Upstream derives `Hash` for `BindingInfo`: category, feature, deprecation
+/// and documentation.
+fn BindingInfo::fingerprint_fields(
+  self : BindingInfo,
   state : SipHasher128,
-  depth : Int,
 ) -> Unit {
-  state.write_usize(self.map.length())
-  for name, binding in self.map {
-    state.write_str(name)
-    match binding.value {
-      Module(m) => {
-        state.write_discriminant(28)
-        m.fingerprint_with_depth(state, depth)
-      }
-      value => state.write(value)
+  state.write(self.category)
+  match self.feature {
+    None => state.write_discriminant(0)
+    Some(feature) => {
+      state.write_discriminant(1)
+      state.write_discriminant(
+        match feature {
+          Html => 0
+          Bundle => 1
+          A11yExtras => 2
+        },
+      )
     }
   }
+  match self.deprecation {
+    None => state.write_discriminant(0)
+    Some(deprecation) => {
+      state.write_discriminant(1)
+      state.write_str(deprecation.message)
+      state.write(deprecation.until)
+    }
+  }
+  match self.documentation {
+    None => state.write_discriminant(0)
+    Some(documentation) => {
+      state.write_discriminant(1)
+      state.write_str(documentation.name)
+      state.write_str(documentation.title)
+      state.write_str(documentation.docs)
+    }
+  }
+}
+
+///|
+pub impl Fingerprint for Category with fn fingerprint(self, state) {
+  state.write_discriminant(
+    match self {
+      Foundations => 0
+      Introspection => 1
+      Layout => 2
+      DataLoading => 3
+      Math => 4
+      Model => 5
+      Symbols => 6
+      Text => 7
+      Visualize => 8
+      Format => 9
+      Pdf => 10
+      Html => 11
+      Svg => 12
+      Png => 13
+      Bundle => 14
+    },
+  )
 }
 
 ///|
@@ -265,21 +349,26 @@ pub impl Fingerprint for Func with fn fingerprint(self, state) {
       // Closures compare by identity.
       fingerprint_flags.val = fingerprint_flags.val | fingerprint_identity
       state.write_discriminant(2)
-      let node = match closure.node {
-        Closure(node) => {
-          state.write_discriminant(0)
-          node
-        }
-        Context(node) => {
-          state.write_discriminant(1)
-          node
-        }
+      // Upstream `Arc<LazyHash<Closure>>`: the derived `Hash for Closure`
+      // (syntax node, defaults, captured scope with its bindings, number
+      // of positional parameters), computed once per closure.
+      if !closure.hash.write_cached(state) {
+        closure.hash.write(state, state => {
+          match closure.node {
+            Closure(node) => {
+              state.write_discriminant(0)
+              node.hash_into(state)
+            }
+            Context(node) => {
+              state.write_discriminant(1)
+              node.hash_into(state)
+            }
+          }
+          state.write(closure.defaults)
+          state.write(closure.captured)
+          state.write_usize(closure.num_pos_params)
+        })
       }
-      state.write(node.span())
-      state.write_str(node.full_text())
-      state.write(closure.defaults)
-      closure.captured.fingerprint_with_depth(state, 1)
-      state.write_usize(closure.num_pos_params)
     }
     Plugin(func) => {
       state.write_discriminant(3)
@@ -574,11 +663,28 @@ pub impl Fingerprint for DynValue with fn fingerprint(self, state) {
     Regex(v) => state.write_str(v.as_str())
     Alignment(v) => state.write_leaf(v.repr(), v)
     Dir(v) => state.write_leaf(v.repr(), v)
-    other => {
-      state.write_str(other.repr())
-      // The repr may round numbers or abbreviate (e.g. strokes with
-      // tilings).
-      mark_fingerprint_lossy()
+    SpotColorant(v) => state.write(v)
+    Stroke(v) => state.write(v)
+    RootedPath(v) => {
+      match v.root() {
+        Project => state.write_discriminant(0)
+        Package(spec) => {
+          state.write_discriminant(1)
+          state.write_str(spec.namespace)
+          state.write_str(spec.name)
+          state.write_u32(spec.version.major)
+          state.write_u32(spec.version.minor)
+          state.write_u32(spec.version.patch)
+        }
+      }
+      state.write(v.vpath())
+    }
+    HtmlCss(v) => {
+      state.write_usize(v.length())
+      for property in v.iter() {
+        state.write_str(property.name)
+        state.write_str(property.value)
+      }
     }
   }
 }

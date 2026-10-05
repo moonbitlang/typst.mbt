@@ -163,6 +163,10 @@ priv struct BindingInfo {
   mut feature : Feature?
   mut deprecation : Deprecation?
   mut documentation : BindingDocumentation?
+  /// The fingerprint of the fields above (not upstream: the info of a
+  /// standard library binding is shared by all of its captured copies, and
+  /// its documentation is long).
+  hash : LazyFingerprint
 } derive(Eq, Hash)
 
 ///|
@@ -192,13 +196,18 @@ pub fn Binding::detached(value : Value) -> Binding {
 ///|
 fn Binding::init_info(self : Binding) -> BindingInfo {
   match self.info {
-    Some(info) => info
+    Some(info) => {
+      // The caller modifies the info.
+      info.hash.reset()
+      info
+    }
     None => {
       let info = {
         category: None,
         feature: None,
         deprecation: None,
         documentation: None,
+        hash: LazyFingerprint::new(),
       }
       self.info = Some(info)
       info

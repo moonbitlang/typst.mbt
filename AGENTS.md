@@ -137,8 +137,14 @@
   is loose; closures by identity). Introspector reads are recorded and
   replayed for validation (not across introspectors if a result's
   fingerprint was lossy or contained closures: `fingerprint_flags_in`), sink
-  effects are replayed, frames are cloned. A new `Fingerprint` that does
-  not capture all data must call `mark_fingerprint_lossy`. Only memoize
+  effects are replayed, frames are cloned. A `Fingerprint` must cover
+  exactly what upstream's `Hash` covers (location keys are `hash128(elem)`:
+  a coarser fingerprint gives two elements one key, which `measure`
+  observes; `typst/oracle_wbtest.mbt`, generated from the upstream binary by
+  `scripts/gen_typst_oracle.py`, pins this); one that cannot must call
+  `mark_fingerprint_lossy` (none does). Immutable data that upstream keeps
+  in a `LazyHash` (closures, tiling frames) or shares (modules, binding
+  info) caches its hash and flags in a `LazyFingerprint`. Only memoize
   pure functions of their arguments plus the tracked engine parts whose
   results cannot contain values created during the call (closure identity;
   hence the state sequence is not memoized).

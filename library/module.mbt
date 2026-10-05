@@ -5,6 +5,10 @@ priv struct ModuleInner {
   scope : Scope
   content : Content
   file_id : @syntax.FileId?
+  /// The fingerprint of the fields above (not upstream: modules are shared,
+  /// and their scope is not modified once they are built, so they are
+  /// hashed once; see `value_hash.mbt` and [LazyFingerprint]).
+  hash : LazyFingerprint
 }
 
 ///|
@@ -22,14 +26,27 @@ pub struct Module {
 pub fn Module::new(name : String, scope : Scope) -> Module {
   {
     name: Some(name),
-    inner: { scope, content: Content::empty(), file_id: None, },
+    inner: {
+      scope,
+      content: Content::empty(),
+      file_id: None,
+      hash: LazyFingerprint::new(),
+    },
   }
 }
 
 ///|
 /// Create a new anonymous module without a name.
 pub fn Module::anonymous(scope : Scope) -> Module {
-  { name: None, inner: { scope, content: Content::empty(), file_id: None, }, }
+  {
+    name: None,
+    inner: {
+      scope,
+      content: Content::empty(),
+      file_id: None,
+      hash: LazyFingerprint::new(),
+    },
+  }
 }
 
 ///|
@@ -41,19 +58,32 @@ pub fn Module::with_name(self : Module, name : String) -> Module {
 ///|
 /// Update the module's scope.
 pub fn Module::with_scope(self : Module, scope : Scope) -> Module {
-  { name: self.name, inner: { ..self.inner, scope, }, }
+  {
+    name: self.name,
+    inner: { ..self.inner, scope, hash: LazyFingerprint::new(), },
+  }
 }
 
 ///|
 /// Update the module's content.
 pub fn Module::with_content(self : Module, content : Content) -> Module {
-  { name: self.name, inner: { ..self.inner, content, }, }
+  {
+    name: self.name,
+    inner: { ..self.inner, content, hash: LazyFingerprint::new(), },
+  }
 }
 
 ///|
 /// Update the module's file id.
 pub fn Module::with_file_id(self : Module, file_id : @syntax.FileId) -> Module {
-  { name: self.name, inner: { ..self.inner, file_id: Some(file_id), }, }
+  {
+    name: self.name,
+    inner: {
+      ..self.inner,
+      file_id: Some(file_id),
+      hash: LazyFingerprint::new(),
+    },
+  }
 }
 
 ///|
