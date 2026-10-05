@@ -249,12 +249,14 @@ fn Tr::show_closure(
   }
   // The wrapper form: the Typst closure applied to the matched element in
   // a fragment, evaluated with the invocation's context. Its result must
-  // not be a label, and no `break`/`continue` may escape it.
+  // not be a label: the body is proven by form, and it has no `return`
+  // of its own (which would make the result something else than the
+  // body's value) and no escaping `break`/`continue`.
   let bound : Env = { vars: env.vars.copy(), in_callback: true, }
   bound.vars[name] = (variable, TView(typed_view))
   let node = closure.to_untyped()
   if !self.not_label(closure.body(), bound) ||
-    escapes(closure.body().to_untyped(), false, true) {
+    escapes(closure.body().to_untyped(), false, false) {
     raise Bail("show-closure")
   }
   // A name for the argument that does not occur in the closure.

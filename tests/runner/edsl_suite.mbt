@@ -473,6 +473,24 @@ fn run_edsl_suite(filter : String?, verbose : Bool) -> Unit {
   let mut passed = 0
   let mut failed = 0
   let mut missing = 0
+  // In the other direction: every selected row of the manifest must be an
+  // enumerated case (a corpus that disappeared since the conversion would
+  // otherwise shrink the run silently).
+  let enumerated : Map[Int, String] = Map([])
+  for case_ in suite_cases() {
+    enumerated[case_.number] = case_.rel + "\t" + case_.tc.name
+  }
+  for number, identity in manifest {
+    if filter is Some(f) && !identity.contains(f) {
+      continue
+    }
+    if enumerated.get(number) != Some(identity) {
+      missing += 1
+      println(
+        "MISSING \{identity.replace(old="\t", new=" :: ")} (in the manifest, not in the corpus)",
+      )
+    }
+  }
   for case_ in suite_cases() {
     if filter is Some(f) &&
       !(case_.tc.name.contains(f) || case_.rel.contains(f)) {

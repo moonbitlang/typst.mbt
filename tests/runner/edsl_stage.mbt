@@ -132,7 +132,9 @@ fn StructDumper::content(
   content : @library.Content,
 ) -> String {
   let label = match content.label() {
-    Some(label) => " <\{label.resolve()}>"
+    // The name as a string literal, so that no name can imitate the
+    // encoding of other content.
+    Some(label) => " <\{@library.repr_str(label.resolve())}>"
     None => ""
   }
   if content.to_sequence() is Some(children) {

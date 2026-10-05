@@ -958,3 +958,13 @@ test "final review: local bindings, variable names, strings in prose" {
     ),
   )
 }
+
+///|
+test "final review 3: a show closure with a return of its own is not wrapped" {
+  inspect(
+    tr("#show heading: it => [#return <x>];#heading[H]"),
+    content=(
+      #|T3: Markup("#show heading: it => [#return <x>];#heading[H]")
+    ),
+  )
+}
