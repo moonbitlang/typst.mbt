@@ -81,13 +81,25 @@ let memo_generation : Ref[Int] = { val: 0, }
 let memo_counter : Ref[Int] = { val: 0, }
 
 ///|
+/// Whether compilations memoize (see [set_layout_memo_enabled]).
+let memo_enabled : Ref[Bool] = { val: true, }
+
+///|
+/// Turn memoization on (the default) or off for the following
+/// compilations. Memoization must not change results; tests compare
+/// compilations with and without it.
+pub fn set_layout_memo_enabled(enabled : Bool) -> Unit {
+  memo_enabled.val = enabled
+}
+
+///|
 /// Run `f` (a compilation) with fresh memoization caches.
 pub fn[T] with_layout_memo(
   f : () -> T raise SourceError,
 ) -> T raise SourceError {
   let outer = memo_generation.val
   memo_counter.val += 1
-  memo_generation.val = memo_counter.val
+  memo_generation.val = if memo_enabled.val { memo_counter.val } else { 0 }
   let result = f() catch {
     e => {
       memo_generation.val = outer
@@ -242,6 +254,7 @@ fn values_memo_equal(a : Value, b : Value) -> Bool {
     // Typst's equality says false for these.
     (Gradient(x), Gradient(y)) => x == y
     (Tiling(x), Tiling(y)) => x == y
+    (Module(x), Module(y)) if validating.val => modules_validate_equal(x, y)
     _ => if validating.val { leaves_validate_equal(a, b) } else { a == b }
   }
 }
@@ -253,11 +266,12 @@ fn values_memo_equal(a : Value, b : Value) -> Bool {
 /// Whether the comparison functions of this file compare the results of a
 /// recorded introspector read for convergence validation instead of the
 /// arguments of a memoized call. The two differ where a value is created
-/// anew in every layout iteration: closures compare by their structural
-/// fingerprint (as upstream's hash-based validation does; by identity they
-/// could never converge), and so do the resolved grids of tables, whose
-/// content `==` is too loose for memoization. Host closures compare by
-/// identity in both modes.
+/// anew in every layout iteration: closures (which by identity could never
+/// converge; upstream validates by hash) are compared by their code,
+/// defaults and captured values, modules evaluated anew by their contents,
+/// and the resolved grids
+/// of tables (never equal for memoization, as their content `==` is too
+/// loose) cell by cell. Host closures compare by identity in both modes.
 let validating : Ref[Bool] = { val: false, }
 
 ///|
@@ -318,8 +332,10 @@ fn dyns_memo_equal(a : DynValue, b : DynValue) -> Bool {
     (BlockMultiCallback(x), BlockMultiCallback(y)) =>
       content_memo_equal(x.captured, y.captured)
     // Holds content compared loosely by `==`.
-    (CellGrid(_), CellGrid(_)) =>
-      validating.val && fingerprints_equal(Value::Dyn(a), Value::Dyn(b))
+    (CellGrid(x), CellGrid(y)) =>
+      validating.val &&
+      fingerprints_equal(Value::Dyn(a), Value::Dyn(b)) &&
+      cell_grids_validate_equal(x, y)
     _ => a == b
   }
 }
@@ -415,9 +431,107 @@ fn funcs_memo_equal(a : Func, b : Func) -> Bool {
   match (a.inner, b.inner) {
     (With(f1, a1), With(f2, a2)) =>
       funcs_memo_equal(f1, f2) && args_memo_equal(a1, a2)
-    (Closure(_), Closure(_)) if validating.val => fingerprints_equal(a, b)
+    (Closure(x), Closure(y)) if validating.val =>
+      a.span == b.span && closures_validate_equal(x, y)
     _ => a == b
   }
+}
+
+///|
+/// Closure equality for [validating]: the same code and, recursively, equal
+/// defaults and captured values. Unlike the structural fingerprint this is
+/// exact where a captured value's fingerprint is lossy, and it compares
+/// captured host closures by identity. (Values are immutable and a closure
+/// captures values that existed before it, so the recursion terminates.)
+fn closures_validate_equal(a : Closure, b : Closure) -> Bool {
+  if physical_equal(a, b) {
+    return true
+  }
+  let (x, y) = match (a.node, b.node) {
+    (Closure(x), Closure(y)) | (Context(x), Context(y)) => (x, y)
+    _ => return false
+  }
+  (
+    physical_equal(x, y) ||
+    (x.span() == y.span() && x.full_text() == y.full_text())
+  ) &&
+  a.num_pos_params == b.num_pos_params &&
+  value_arrays_memo_equal(a.defaults, b.defaults) &&
+  scopes_validate_equal(a.captured, b.captured)
+}
+
+///|
+/// Scope equality for [validating]: the same names bound to equal values,
+/// in order.
+fn scopes_validate_equal(a : Scope, b : Scope) -> Bool {
+  if physical_equal(a, b) {
+    return true
+  }
+  if a.map.length() != b.map.length() {
+    return false
+  }
+  let ys = b.map.iter().collect()
+  let mut i = 0
+  for name, binding in a.map {
+    let (name2, binding2) = ys[i]
+    if name != name2 || !values_memo_equal(binding.value, binding2.value) {
+      return false
+    }
+    i += 1
+  }
+  true
+}
+
+///|
+/// Resolved grid equality for [validating], in addition to equal
+/// fingerprints: the cells' bodies, fills and strokes are compared exactly
+/// (bodies recursively, so closures and host closures in them follow the
+/// rules above).
+fn cell_grids_validate_equal(a : CellGrid, b : CellGrid) -> Bool {
+  if physical_equal(a, b) {
+    return true
+  }
+  if a.entries.length() != b.entries.length() {
+    return false
+  }
+  for i in 0..<a.entries.length() {
+    match (a.entries[i], b.entries[i]) {
+      (Cell(x), Cell(y)) => {
+        if !content_memo_equal(x.body, y.body) {
+          return false
+        }
+        match (x.fill, y.fill) {
+          (None, None) => ()
+          (Some(p), Some(q)) =>
+            if !values_memo_equal(
+                IntoValue::into_value(p),
+                IntoValue::into_value(q),
+              ) {
+              return false
+            }
+          _ => return false
+        }
+        if x.stroke != y.stroke {
+          return false
+        }
+      }
+      (Merged(x), Merged(y)) => if x != y { return false }
+      _ => return false
+    }
+  }
+  true
+}
+
+///|
+/// Module equality for [validating]: the same module, or (for modules
+/// evaluated anew) the same name, content and bindings.
+fn modules_validate_equal(a : Module, b : Module) -> Bool {
+  a == b ||
+  (
+    a.name() == b.name() &&
+    content_memo_equal(a.content(), b.content()) &&
+    scopes_validate_equal(a.scope(), b.scope())
+  )
 }
 
 ///|

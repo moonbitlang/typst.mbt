@@ -2578,6 +2578,8 @@ pub fn separated_list(ArrayView[String], String) -> String
 
 pub fn sequence_elem() -> Element
 
+pub fn set_layout_memo_enabled(Bool) -> Unit
+
 pub fn should_outline(FontInstance, UInt16) -> Bool
 
 pub let sink_max_values : Int
