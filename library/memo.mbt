@@ -242,8 +242,57 @@ fn values_memo_equal(a : Value, b : Value) -> Bool {
     // Typst's equality says false for these.
     (Gradient(x), Gradient(y)) => x == y
     (Tiling(x), Tiling(y)) => x == y
-    _ => a == b
+    _ => if validating.val { leaves_validate_equal(a, b) } else { a == b }
   }
+}
+
+// Exact comparison of recorded introspection results (see
+// `IntrospectionRecorder::validate`).
+
+///|
+/// Whether the comparison functions of this file compare the results of a
+/// recorded introspector read for convergence validation instead of the
+/// arguments of a memoized call. The two differ where a value is created
+/// anew in every layout iteration: closures compare by their structural
+/// fingerprint (as upstream's hash-based validation does; by identity they
+/// could never converge), and so do the resolved grids of tables, whose
+/// content `==` is too loose for memoization. Host closures compare by
+/// identity in both modes.
+let validating : Ref[Bool] = { val: false, }
+
+///|
+/// Whether two results of an introspector read are interchangeable: like
+/// [values_memo_equal], but for convergence validation (see [validating]).
+/// The caller has already compared the fingerprints of the whole results;
+/// this adds what a fingerprint cannot prove: the identity of host closures
+/// and the equality of values whose fingerprint is lossy.
+pub fn values_validate_equal(a : Value, b : Value) -> Bool {
+  let outer = validating.val
+  validating.val = true
+  let equal = values_memo_equal(a, b)
+  validating.val = outer
+  equal
+}
+
+///|
+/// Leaf comparison of [values_validate_equal]: equal fingerprints, and for
+/// values whose fingerprint does not capture all of their data also `==`.
+fn leaves_validate_equal(a : Value, b : Value) -> Bool {
+  let mut ha = u128_zero
+  let flags = fingerprint_flags_in(() => ha = hash128(a))
+  let mut hb = u128_zero
+  fingerprint_flags_in(() => hb = hash128(b)) |> ignore
+  ha == hb && ((flags & fingerprint_lossy) == 0 || a == b)
+}
+
+///|
+/// Fingerprint equality of two values (for [validating]).
+fn[T : Fingerprint] fingerprints_equal(a : T, b : T) -> Bool {
+  let mut ha = u128_zero
+  fingerprint_flags_in(() => ha = hash128(a)) |> ignore
+  let mut hb = u128_zero
+  fingerprint_flags_in(() => hb = hash128(b)) |> ignore
+  ha == hb
 }
 
 ///|
@@ -269,7 +318,8 @@ fn dyns_memo_equal(a : DynValue, b : DynValue) -> Bool {
     (BlockMultiCallback(x), BlockMultiCallback(y)) =>
       content_memo_equal(x.captured, y.captured)
     // Holds content compared loosely by `==`.
-    (CellGrid(_), CellGrid(_)) => false
+    (CellGrid(_), CellGrid(_)) =>
+      validating.val && fingerprints_equal(Value::Dyn(a), Value::Dyn(b))
     _ => a == b
   }
 }
@@ -365,6 +415,7 @@ fn funcs_memo_equal(a : Func, b : Func) -> Bool {
   match (a.inner, b.inner) {
     (With(f1, a1), With(f2, a2)) =>
       funcs_memo_equal(f1, f2) && args_memo_equal(a1, a2)
+    (Closure(_), Closure(_)) if validating.val => fingerprints_equal(a, b)
     _ => a == b
   }
 }

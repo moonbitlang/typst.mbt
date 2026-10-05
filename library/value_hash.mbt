@@ -289,6 +289,12 @@ pub impl Fingerprint for Func with fn fingerprint(self, state) {
       state.write(func)
       state.write(args)
     }
+    Host(host) => {
+      // Host closures compare by identity; the key identifies them.
+      fingerprint_flags.val = fingerprint_flags.val | fingerprint_identity
+      state.write_discriminant(5)
+      state.write(host.key)
+    }
   }
   state.write(self.span)
 }

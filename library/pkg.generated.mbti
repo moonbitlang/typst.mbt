@@ -3282,6 +3282,8 @@ pub let v_elem_weak : Int
 
 pub fn validate_utf8(BytesView) -> Utf8Error?
 
+pub fn values_validate_equal(Value, Value) -> Bool
+
 pub fn variant(StyleChain) -> FontVariant
 
 pub fn vec_elem() -> Element
@@ -6322,6 +6324,7 @@ pub fn Func::contextual(Self) -> Bool?
 pub fn Func::element(Element) -> Self
 pub fn Func::field(Self, String, BindingGuard) -> Value raise HintedError
 pub fn Func::from_inner(FuncInner) -> Self
+pub fn Func::host(HostFunc) -> Self
 pub fn Func::name(Self) -> String?
 pub fn Func::native(NativeFuncData) -> Self
 pub fn Func::plugin(PluginFunc) -> Self
@@ -6346,6 +6349,7 @@ pub(all) enum FuncInner {
   Closure(Closure)
   Plugin(PluginFunc)
   With(Func, Args)
+  Host(HostFunc)
 }
 
 pub(all) enum Geometry {
@@ -6817,6 +6821,12 @@ pub fn[T] History::from_entries(Array[(Introspector, T)]) -> Self[T]
 pub fn[T] History::hint(Self[T], String, (T) -> String) -> String
 pub fn[T, U] History::map(Self[T], (T) -> U) -> Self[U]
 pub fn[T] History::values(Self[T]) -> Array[T]
+
+pub struct HostFunc {
+  call : (Engine, Context, Args) -> Value raise SourceError
+  key : U128
+}
+pub fn HostFunc::new(U128, (Engine, Context, Args) -> Value raise SourceError) -> Self
 
 pub(all) struct Hsl {
   hue : Float
