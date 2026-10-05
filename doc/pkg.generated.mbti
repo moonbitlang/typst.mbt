@@ -154,7 +154,6 @@ pub struct Content {
   // private fields
 }
 pub fn Content::Content(&IntoContent) -> Self
-pub fn Content::engine(@library.Content) -> Self
 pub impl IntoContent for Content
 pub impl ToValue for Content
 
@@ -163,7 +162,8 @@ pub struct ContentView {
 }
 pub fn ContentView::content_field(Self, String) -> Self raise @library.HintedError
 pub fn ContentView::engine(Self) -> @library.Content
-pub fn ContentView::field(Self, String) -> @library.Value raise @library.HintedError
+pub fn ContentView::engine_field(Self, String) -> @library.Value raise @library.HintedError
+pub fn ContentView::field(Self, String) -> Value raise @library.HintedError
 pub fn ContentView::func_name(Self) -> String
 pub fn ContentView::label(Self) -> String?
 pub fn ContentView::text(Self) -> String
@@ -1858,7 +1858,6 @@ pub fn Value::bool(Bool) -> Self
 pub fn Value::call(String, positional? : Array[Self], named? : Array[(String, Self)]) -> Self
 pub fn Value::content(&IntoContent) -> Self
 pub fn Value::dict(Array[(String, Self)]) -> Self
-pub fn Value::engine(@library.Value) -> Self
 pub fn Value::float(Double) -> Self
 pub fn Value::fr(Double) -> Self
 pub fn Value::global(String) -> Self

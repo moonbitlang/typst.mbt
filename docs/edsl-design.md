@@ -1,11 +1,11 @@
-# A MoonBit EDSL for typst.mbt (design, revision 5)
+# A MoonBit EDSL for typst.mbt (design, revision 6)
 
-Status: revision 5. Revision 3 resolved the items of
-`docs/edsl-reviews/review-2.md`, revision 4 the issues A–G of
-`docs/edsl-reviews/review-3.md`; this revision resolves the four issues of
-`docs/edsl-reviews/review-4.md` (all in the convergence contract of section
-11.4 and the structural dump of section 16.2). Section 19 maps each finding
-to the section that resolves it. Packages: `moonbitlang/typst/doc` (imported as `@doc`),
+Status: revision 6. Revisions 3 to 5 resolved the items of
+`docs/edsl-reviews/review-2.md`, `review-3.md` and `review-4.md`; this
+revision resolves the two issues of `docs/edsl-reviews/review-5.md`, both in
+the convergence contract of section 11.4 (element fingerprints; which engine
+values the EDSL admits, section 13). Section 19 maps each finding to the
+section that resolves it. Packages: `moonbitlang/typst/doc` (imported as `@doc`),
 `doc/system`, `doc/examples`, `doc/twins`.
 
 The examples of this document are compiled code: `doc/examples/
@@ -598,7 +598,10 @@ pub fn[A, B] Selector::and_(self : Selector[A], other : Selector[B]) -> Selector
   match again, exactly as in Typst.
 - Views read fields through the engine's field access. Phase 1 has
   `ContentView` (`func_name()`, `field(name)`, `content_field(name)`,
-  `text()`, `label()`, `engine()`), and per element a typed view with
+  `text()`, `label()`; `field` returns an opaque `Value` that can be
+  passed on; `engine()` and `engine_field(name)` give read-only access to
+  the engine content and values for inspection), and per element a typed
+  view with
   `view()` and an accessor for each required content field (`it.body()`);
   phase 2 generates typed accessors for all fields (style-resolved ones
   take `cx`).
@@ -773,14 +776,27 @@ priv struct RecordedRead {
   recomputes the result on another introspector and compares it with the
   recorded one. It is kept as `exact` only if the result's fingerprint flags
   are non-zero (lossy or identity).
-- **Flags are complete for this purpose.** A fingerprint that does not
-  capture all data of a value must set a flag, or `exact` would be dropped.
-  The one place where the existing fingerprint silently omitted data is
-  fixed (review-4, issue 1): `Module::fingerprint_with_depth` hashes a
-  module that is bound directly in a scope (of another module, or of a
-  closure's captures) only by name and file; it now marks such a truncated
-  module `lossy | identity`. So an outer module whose nested module differs
-  is flagged, and so is everything containing it.
+- **Unflagged fingerprints must be exact.** A fingerprint that does not
+  capture all data of a value, or that stands for a value compared by
+  identity, must set a flag, or `exact` would be dropped. Two places where
+  the existing fingerprints silently omitted something are fixed:
+  - *Elements* (review-5, issue A). `Element::fingerprint` wrote the
+    element's name, which is not unique (`grid.cell` and `table.cell` are
+    both `cell`), so the two cell functions, and otherwise equal content of
+    the two elements, had equal unflagged fingerprints. Every element now
+    has a unique **key** (the name of its accessor, `grid_cell_elem`;
+    emitted by `elemgen.py`), and the key is its fingerprint. It stays
+    unflagged because it is exact: equal keys are the same element.
+  - *Nested modules* (review-4, issue 1). `Module::fingerprint_with_depth`
+    hashes a module that is bound directly in a scope (of another module,
+    or of a closure's captures) only by name and file; it now marks such a
+    truncated module `lossy | identity`, so an outer module whose nested
+    module differs is flagged, and so is everything containing it.
+  The other functions that compare by identity with a structural, unflagged
+  fingerprint are native functions (name, title, documentation). A test
+  walks the scopes of the standard library and checks that no two distinct
+  functions (elements, native functions, constructors, methods) share a
+  fingerprint.
 - `validate` requires `replay(i) == expected` **and**, if present,
   `exact(i)`.
 - The comparison is `values_validate_equal`: the recursion of
@@ -816,20 +832,34 @@ priv struct RecordedRead {
   - **other leaves**: equal fingerprints, and for leaves whose fingerprint
     is marked lossy (dynamic values hashed through their repr, such as
     strokes) also the engine's `==`.
-- **Termination** (review-4, issue 3) does not rest on an assumption about
-  the values: the comparison descends only where the fingerprint
-  computation descends — into content fields, collections, styles,
-  arguments, a closure's defaults and captures, a module value's content
-  and bindings — and, like the fingerprint, it does **not** descend into a
-  module bound in a scope (identity instead). `validate` computes the
-  fingerprints of both results before it calls `exact`, so both traversals
-  have terminated, and the comparison visits a subset of what they visited.
-  In particular a module that contains itself (which a host can build
-  through `Module::new` and `Scope::define`, and which the fingerprint
-  handles by its depth limit) is compared without recursion; a cyclic graph
-  through arrays or dictionaries cannot reach validation, because the
-  engine's fingerprint of it does not terminate in the first place (that is
-  the engine's existing behaviour, independent of this design).
+- **Termination** (review-4, issue 3; review-5, issue B). The comparison
+  has two kinds of steps:
+  - its own recursion, which descends where the fingerprint computation
+    descends — into content fields, collections, styles, arguments, a
+    closure's defaults and captures, a module value's content and bindings
+    — and, like the fingerprint, does **not** descend into a module bound
+    in a scope (identity instead). So the one cyclic structure the engine
+    has, the module graph (`std` contains itself), is never followed;
+  - the *delegated* equality of types whose fingerprint is lossy: gradients,
+    tilings, strokes and the lines of resolved grids. These `==` do traverse
+    data the fingerprint skips — a tiling's laid-out frame with its items,
+    tag contents and paints.
+  Both terminate on every value **the engine produces**: Typst values are
+  immutable and built bottom-up — arrays, dictionaries, content, styles,
+  frames and closures only contain values that existed before them — so
+  apart from modules they are finite trees and DAGs. (Upstream cannot even
+  express a cycle in them; the port's arrays and frames are mutable
+  objects, but the engine never ties a knot.) The remaining question is
+  whether a *host* can hand the engine a knotted value, e.g. an array
+  containing itself inside the metadata of a tiling's frame, built through
+  the port's mutable API. Through the EDSL it cannot (section 13): there
+  is **no public way to turn a raw engine value or raw engine content into
+  a description**. Every engine value of a compilation is produced by a
+  public Typst function called by lowering, by the front end evaluating a
+  `Markup`/`Equation` source, or is read from engine content through a
+  view and passed back opaquely. The world's library is the compiler's own
+  input contract, as for `@typst.compile`; `DocWorld` uses the standard
+  library.
 - A **stable query containing host functions converges**: under the
   creation rule the content in both introspectors holds the same `HostFunc`
   objects. A stable query containing closures created during layout
@@ -1048,7 +1078,13 @@ pub fn Set::Set(path : String, named : Array[(String, Value)], loc~ : SourceLoc,
   `::auto()`, `::length(l)`, `::fr(x)`, `::angle(a)`, `::array([..])`,
   `::dict([(k, v)])`, `::content(c)`, `::label(name)`, `::global(path)`
   (a binding of the global scope, e.g. `"red"`),
-  `::call(path, positional?, named?)` and `::engine(v : @library.Value)`.
+  `::call(path, positional?, named?)`, and the typed `::paint`, `::stroke`,
+  `::alignment`, `::sizing`. A `Value` is also what a view's `field(name)`
+  returns. There is deliberately **no constructor from a raw
+  `@library.Value` or `@library.Content`** (review-5, issue B): the
+  generic hatch is calling Typst functions, which covers everything Typst
+  can express, while a host-built engine value could be malformed in ways
+  the engine cannot check (section 11.4).
 - **`Call(path, ...)`** calls any public function by its qualified name and
   is content (its displayed result, as `#f(..)` in markup); `Value::call`
   is the same as a value. **`Set(path, named)`** is the generic set rule.
@@ -1334,7 +1370,8 @@ and off, invalid inputs with their diagnostics) are ordinary tests of the
 
 1. **Engine**: `compile_with`; `FuncInner::Host`/`HostFunc` with the
    equality, fingerprint and memo rules of section 11; the recorder's exact
-   validation (`values_validate_equal`); `@eval.check_recipe`;
+   validation (`values_validate_equal`) with unique element keys and
+   flagged truncated module fingerprints; `@eval.check_recipe`;
    `set_layout_memo_enabled`; the runner's frame normalizer, structural
    dump and `edsl` stage. **EDSL**: description values, lowering (initial
    and callback results), the audited exceptions, units and value facades,
@@ -1354,7 +1391,14 @@ and off, invalid inputs with their diagnostics) are ordinary tests of the
 
 ## 19. Resolution index
 
-Review 4 (revision 5):
+Review 5 (revision 6):
+
+| Review-5 item | Resolution |
+|---|---|
+| A element fingerprints (MAJOR) | 11.4: every element has a unique key, which is its fingerprint (engine change, `elemgen.py`); a test checks that distinct library functions have distinct fingerprints; a recorded-query regression with `table.cell`/`grid.cell` |
+| B termination through delegated equality (MAJOR) | 11.4, 13: the EDSL admits no host-built engine values (`Value::engine`/`Content::engine` are not public), so validation only sees values the engine produced, which are acyclic apart from the module graph that is not followed |
+
+Review 4 (revision 5, kept):
 
 | Review-4 item | Resolution |
 |---|---|

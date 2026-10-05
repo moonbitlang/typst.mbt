@@ -37,7 +37,7 @@ priv enum Val {
   VGlobal(String)
   /// A host callback.
   VCallback(Callback)
-  /// An engine value, passed through.
+  /// An engine value produced by the engine, passed through.
   VEngine(@library.Value)
   /// A description that cannot be lowered (the message is reported at the
   /// argument).
@@ -162,8 +162,11 @@ pub fn Value::call(
 }
 
 ///|
-/// An engine value, passed through unchanged.
-pub fn Value::engine(value : @library.Value) -> Value {
+/// An engine value, passed through unchanged. Not public: every engine
+/// value of a compilation is produced by the engine's own functions (from
+/// descriptions, or read from engine content through views), never built
+/// by the host, so the EDSL cannot hand the engine a malformed value graph.
+fn Value::engine(value : @library.Value) -> Value {
   Value::of(VEngine(value))
 }
 

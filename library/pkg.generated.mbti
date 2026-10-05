@@ -5355,7 +5355,7 @@ pub fn Element::is_unqueriable(Self) -> Bool
 pub fn Element::local_name(Self, String, String?) -> String?
 pub fn Element::local_name_in(Self, StyleChain) -> String
 pub fn Element::name(Self) -> String
-pub fn Element::new(name~ : String, title~ : String, docs? : String, keywords? : Array[String], capabilities? : Array[String], fields~ : Array[FieldInfo]) -> Self
+pub fn Element::new(name~ : String, title~ : String, key? : String, docs? : String, keywords? : Array[String], capabilities? : Array[String], fields~ : Array[FieldInfo]) -> Self
 pub fn Element::params(Self) -> Array[ParamInfo]
 pub fn Element::repr(Self) -> String
 pub fn Element::scope(Self) -> Scope
@@ -5375,6 +5375,7 @@ pub impl Reflect for Element
 
 pub struct ElementData {
   name : String
+  key : String
   title : String
   docs : String
   keywords : Array[String]

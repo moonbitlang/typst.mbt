@@ -50,8 +50,19 @@ pub fn ContentView::func_name(self : ContentView) -> String {
 }
 
 ///|
-/// A field of the content as an engine value (as `it.field` in Typst).
+/// A field of the content (as `it.field` in Typst), as a value that can
+/// be passed on, e.g. as an argument of `Call`.
 pub fn ContentView::field(
+  self : ContentView,
+  name : String,
+) -> Value raise @library.HintedError {
+  Value::engine(self.content.field_by_name(name))
+}
+
+///|
+/// A field of the content as an engine value, for inspection with the
+/// engine's API.
+pub fn ContentView::engine_field(
   self : ContentView,
   name : String,
 ) -> @library.Value raise @library.HintedError {
@@ -81,15 +92,10 @@ pub fn ContentView::label(self : ContentView) -> String? {
 }
 
 ///|
-/// The engine content itself.
+/// The engine content itself, for inspection with the engine's API. It
+/// must not be modified; to emit it, use the view.
 pub fn ContentView::engine(self : ContentView) -> @library.Content {
   self.content
-}
-
-///|
-/// Engine content as a description (e.g. a function's content result).
-pub fn Content::engine(content : @library.Content) -> Content {
-  Content::of(NEngine(content))
 }
 
 ///|

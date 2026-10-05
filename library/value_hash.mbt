@@ -23,8 +23,9 @@ pub impl Fingerprint for Label with fn fingerprint(self, state) {
 
 ///|
 pub impl Fingerprint for Element with fn fingerprint(self, state) {
-  // Elements are compared by identity and their names are unique.
-  state.write_str(self.name())
+  // Elements are compared by identity; their keys are unique (their names
+  // are not: `grid.cell` and `table.cell` are both `cell`).
+  state.write_str(self.0.key)
 }
 
 ///|
