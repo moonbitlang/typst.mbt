@@ -83,7 +83,7 @@ fn Lower::content(
       // Content without a location of its own gets the enclosing
       // argument's origin under the keys.
       let fallback = match body.node {
-        NText(_, None) | NValue(_) | NSpace =>
+        NText(_, None) | NValue(_) | NSpace(_) =>
           self.session.registry.keyed_span(fallback, keys)
         _ => fallback
       }
@@ -102,7 +102,8 @@ fn Lower::content(
       ]).spanned(span)
     }
     NEval(node) => self.eval(node)
-    NSpace => @library.SpaceElem::shared()
+    NSpace(false) => @library.SpaceElem::shared()
+    NSpace(true) => @library.SpaceElem::shared_with_newline()
     NEngine(content) => content
   }
 }
@@ -349,6 +350,31 @@ fn Lower::args(
     } else {
       span
     }
+    if arg.value.val is VSpread(inner) {
+      // Like the evaluator's spread argument (`eval_args`).
+      match self.value(inner, arg_span) {
+        None => ()
+        Array(array) =>
+          for value in array.items {
+            items.push({
+              span: arg_span,
+              name: Option::None,
+              value: { v: value.shared(), span: arg_span, },
+            })
+          }
+        Dict(dict) =>
+          for key, value in dict.map {
+            items.push({
+              span: arg_span,
+              name: Some(key),
+              value: { v: value.shared(), span: arg_span, },
+            })
+          }
+        Args(args) => items.append(args.items)
+        v => @library.bail_at(arg_span, "cannot spread \{v.ty()}")
+      }
+      continue
+    }
     let v = self.value(arg.value, arg_span)
     items.push({
       span: arg_span,
@@ -459,6 +485,8 @@ fn Lower::value(
       )
     }
     VEngine(value) => value
+    VSpread(_) =>
+      raise error_at(span, "a spread value is only allowed as an argument")
     VInvalid(message) => raise error_at(span, message)
   }
 }

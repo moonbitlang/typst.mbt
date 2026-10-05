@@ -62,7 +62,6 @@ using @doc {
   type Parbreak,
   type Pagebreak,
   type SetDocument,
-  type Smartquote,
   type Image,
   type Paint,
   type NoneValue,
@@ -553,6 +552,7 @@ pub fn constructs() -> Array[Twin] {
 /// The whole corpus.
 pub fn all() -> Array[Twin] {
   let twins = constructs()
+  twins.append(phase2())
   twins.push({ name: "showcase", typst: showcase_typst(), build: showcase, })
   twins
 }

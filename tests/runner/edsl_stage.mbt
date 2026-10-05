@@ -15,6 +15,11 @@
 // embedded fonts only.
 
 ///|
+/// `--edsl-dump=<dir>`: where the two sides of a failed comparison are
+/// written (`<check>.edsl.txt`, `<check>.typst.txt`), for diffing.
+let edsl_dump_dir : Ref[String?] = { val: None, }
+
+///|
 /// The world of a Typst twin: the base world plus the main source.
 priv struct TwinWorld {
   base : &@library.World
@@ -201,8 +206,15 @@ fn diagnostic_lines(diags : Array[@library.SourceDiagnostic]) -> String {
 
 ///|
 /// The normalized frame dump of a document.
-fn normalized_frames(doc : @layout.PagedDocument) -> String {
-  let enc = FrameEncoder::new(_ => "null", zero_span_offsets=true)
+fn normalized_frames(
+  doc : @layout.PagedDocument,
+  tag_names_only? : Bool = false,
+) -> String {
+  let enc = FrameEncoder::new(
+    _ => "null",
+    zero_span_offsets=true,
+    tag_names_only~,
+  )
   enc.document(doc)
   enc.out.to_string()
 }
@@ -239,48 +251,75 @@ fn first_difference(a : String, b : String) -> String {
 ///|
 /// Compare one twin; returns the failed checks.
 fn check_twin(twin : @twins.Twin, base : &@library.World) -> Array[String] {
+  check_pair((twin.build)(), twin_main(twin.typst), base, structural=true)
+}
+
+///|
+/// Compare an EDSL document with a Typst main file; returns the failed
+/// checks. With `structural`, the Typst source is a functional twin: the
+/// lowered and the evaluated content must have the same structural dump,
+/// and the tags of the frames are compared with their elements. Otherwise
+/// the source is markup that the document was converted from: element
+/// bodies differ in how text is split, so the structure is not compared
+/// and tags are compared by element name and location.
+fn check_pair(
+  document : @doc.Document,
+  main : @syntax.Source,
+  base : &@library.World,
+  structural~ : Bool,
+) -> Array[String] {
   let failures : Array[String] = []
   let differ = (what : String, edsl : String, typst : String) => {
     if edsl != typst {
       failures.push("\{what}: \{first_difference(edsl, typst)}")
+      if edsl_dump_dir.val is Some(dir) {
+        let stem = "\{dir}/\{what.replace_all(old=" ", new="-")}"
+        @fs.write_string_to_file(stem + ".edsl.txt", edsl) catch {
+          _ => ()
+        }
+        @fs.write_string_to_file(stem + ".typst.txt", typst) catch {
+          _ => ()
+        }
+      }
     }
   }
-  let document = (twin.build)()
-  let main = twin_main(twin.typst)
   let world : TwinWorld = { base, main, }
 
   // Structure.
-  let dumper : StructDumper = { elems: [], }
-  let lowered = document.lower(base)
-  let sink = @library.Sink::new()
-  let evaluated = try
-    @eval.eval_source(
-      world,
-      base.library(),
-      @library.Traced::new(),
-      sink,
-      @library.Route::root(),
-      main,
-    )
-  catch {
-    @library.SourceError(errors) => Err(errors)
-  } noraise {
-    module_ => Ok(module_.content())
-  }
-  match (lowered.output(), evaluated) {
-    (Some(edsl), Ok(typst)) =>
-      differ("structure", dumper.content(edsl), dumper.content(typst))
-    (None, Ok(_)) =>
-      failures.push(
-        "structure: the EDSL document does not lower: " +
-        lowered.errors.map(e => e.render()).join("; "),
+  if structural {
+    let dumper : StructDumper = { elems: [], }
+    let lowered = document.lower(base)
+    let sink = @library.Sink::new()
+    let evaluated = try
+      @eval.eval_source(
+        world,
+        base.library(),
+        @library.Traced::new(),
+        sink,
+        @library.Route::root(),
+        main,
       )
-    (_, Err(errors)) =>
-      failures.push(
-        "structure: the Typst twin does not evaluate: " +
-        diagnostic_lines(errors),
-      )
+    catch {
+      @library.SourceError(errors) => Err(errors)
+    } noraise {
+      module_ => Ok(module_.content())
+    }
+    match (lowered.output(), evaluated) {
+      (Some(edsl), Ok(typst)) =>
+        differ("structure", dumper.content(edsl), dumper.content(typst))
+      (None, Ok(_)) =>
+        failures.push(
+          "structure: the EDSL document does not lower: " +
+          lowered.errors.map(e => e.render()).join("; "),
+        )
+      (_, Err(errors)) =>
+        failures.push(
+          "structure: the Typst twin does not evaluate: " +
+          diagnostic_lines(errors),
+        )
+    }
   }
+  let tag_names_only = !structural
 
   // Layout and export, with memoization on and off.
   for memo in [true, false] {
@@ -298,7 +337,11 @@ fn check_twin(twin : @twins.Twin, base : &@library.World) -> Array[String] {
     )
     match (edsl.output(), typst.output) {
       (Some(a), Ok(b)) => {
-        differ("layout" + mode, normalized_frames(a), normalized_frames(b))
+        differ(
+          "layout" + mode,
+          normalized_frames(a, tag_names_only~),
+          normalized_frames(b, tag_names_only~),
+        )
         if memo {
           let svg_options = @svg.SvgOptions::default().resolve(
             @svg.SvgFormatOptions::get(b.options()),
@@ -399,6 +442,56 @@ fn run_edsl_stage(filter : String?, verbose : Bool) -> Unit {
     } else {
       failed += 1
       println("FAIL \{twin.name}")
+      for failure in failures {
+        println("    \{failure}")
+      }
+    }
+  }
+  // The documents of `bench/` against the Typst files they were converted
+  // from.
+  let mut with_system_fonts : &@library.World? = None
+  for original in @twins.originals() {
+    let name = "original/" + original.name
+    if filter is Some(f) && !name.contains(f) {
+      continue
+    }
+    let world : &@library.World = if original.system_fonts {
+      match with_system_fonts {
+        Some(world) => world
+        None => {
+          let world = @system.world(root="bench", today=(2026, 1, 1)) catch {
+            err => {
+              println("edsl: cannot create the world: \{err}")
+              @sys.exit(1)
+              return
+            }
+          }
+          with_system_fonts = Some(world)
+          world
+        }
+      }
+    } else {
+      base
+    }
+    let id = @syntax.RootedPath::new(
+      Project,
+      @syntax.VirtualPath::new(original.path) catch {
+        _ => panic()
+      },
+    ).intern()
+    let failures = try world.source(id) catch {
+      _ => ["the original `bench/\{original.path}` cannot be read"]
+    } noraise {
+      main => check_pair((original.build)(), main, world, structural=false)
+    }
+    if failures.is_empty() {
+      passed += 1
+      if verbose {
+        println("ok   \{name}")
+      }
+    } else {
+      failed += 1
+      println("FAIL \{name}")
       for failure in failures {
         println("    \{failure}")
       }

@@ -10,13 +10,32 @@ pub fn all() -> Array[Twin]
 
 pub fn constructs() -> Array[Twin]
 
+pub fn full_showcase() -> @doc.Document
+
+pub fn long() -> @doc.Document
+
+pub fn longer() -> @doc.Document
+
+pub fn originals() -> Array[Original]
+
+pub fn phase2() -> Array[Twin]
+
 pub fn showcase() -> @doc.Document
 
 pub fn showcase_typst() -> String
 
+pub fn tiny() -> @doc.Document
+
 // Errors
 
 // Types and methods
+pub struct Original {
+  name : String
+  path : String
+  system_fonts : Bool
+  build : () -> @doc.Document
+}
+
 pub struct Twin {
   name : String
   typst : String

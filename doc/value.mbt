@@ -37,6 +37,8 @@ priv enum Val {
   VGlobal(String)
   /// A host callback.
   VCallback(Callback)
+  /// `..value` in an argument list.
+  VSpread(Value)
   /// An engine value produced by the engine, passed through.
   VEngine(@library.Value)
   /// A description that cannot be lowered (the message is reported at the
@@ -159,6 +161,15 @@ pub fn Value::call(
   named? : Array[(String, Value)] = [],
 ) -> Value {
   Value::of(VCall(FPath(path), generic_args(positional, named)))
+}
+
+///|
+/// `..value` among the positional arguments of a call ([Value::call],
+/// [Call], the stops of a gradient): an array is spread into positional
+/// arguments, a dictionary into named ones and `arguments` into both, as in
+/// Typst. Anywhere else it is a lowering error.
+pub fn Value::spread(value : Value) -> Value {
+  Value::of(VSpread(value))
 }
 
 ///|

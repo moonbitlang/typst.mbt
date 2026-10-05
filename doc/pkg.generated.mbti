@@ -66,6 +66,19 @@ pub struct AutoValue {
 pub fn AutoValue::AutoValue() -> Self
 pub impl IntoContent for AutoValue
 
+pub struct Bibliography {
+  // private fields
+}
+#callsite(autofill(args_loc, loc))
+pub fn Bibliography::Bibliography(&IntoSource, title? : &IntoContent, full? : Bool, style? : String, group? : String, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl IntoContent for Bibliography
+
+pub struct BibliographyView {
+  // private fields
+}
+pub fn BibliographyView::view(Self) -> ContentView
+pub impl IntoContent for BibliographyView
+
 pub struct Block {
   // private fields
 }
@@ -120,6 +133,19 @@ pub struct CircleView {
 }
 pub fn CircleView::view(Self) -> ContentView
 pub impl IntoContent for CircleView
+
+pub struct Cite {
+  // private fields
+}
+#callsite(autofill(args_loc, loc))
+pub fn Cite::Cite(String, supplement? : &IntoContent, form? : String, style? : String, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl IntoContent for Cite
+
+pub struct CiteView {
+  // private fields
+}
+pub fn CiteView::view(Self) -> ContentView
+pub impl IntoContent for CiteView
 
 pub struct Colbreak {
   // private fields
@@ -239,6 +265,84 @@ pub fn[W] Ctx::query(Self, Selector[W], loc~ : SourceLoc) -> Array[W] raise
 #callsite(autofill(loc))
 pub fn Ctx::styles(Self, loc~ : SourceLoc) -> @library.StyleChain raise
 
+pub struct Curve {
+  // private fields
+}
+#callsite(autofill(args_loc, loc))
+pub fn Curve::Curve(Array[&IntoContent], fill? : Paint, fill_rule? : String, stroke? : Stroke, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl IntoContent for Curve
+
+pub struct CurveClose {
+  // private fields
+}
+#callsite(autofill(args_loc, loc))
+pub fn CurveClose::CurveClose(mode? : String, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl IntoContent for CurveClose
+
+pub struct CurveCloseView {
+  // private fields
+}
+pub fn CurveCloseView::view(Self) -> ContentView
+pub impl IntoContent for CurveCloseView
+
+pub struct CurveCubic {
+  // private fields
+}
+#callsite(autofill(args_loc, loc))
+pub fn CurveCubic::CurveCubic((Length, Length), (Length, Length), (Length, Length), relative? : Bool, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl IntoContent for CurveCubic
+
+pub struct CurveCubicView {
+  // private fields
+}
+pub fn CurveCubicView::view(Self) -> ContentView
+pub impl IntoContent for CurveCubicView
+
+pub struct CurveLine {
+  // private fields
+}
+#callsite(autofill(args_loc, loc))
+pub fn CurveLine::CurveLine((Length, Length), relative? : Bool, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl IntoContent for CurveLine
+
+pub struct CurveLineView {
+  // private fields
+}
+pub fn CurveLineView::view(Self) -> ContentView
+pub impl IntoContent for CurveLineView
+
+pub struct CurveMove {
+  // private fields
+}
+#callsite(autofill(args_loc, loc))
+pub fn CurveMove::CurveMove((Length, Length), relative? : Bool, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl IntoContent for CurveMove
+
+pub struct CurveMoveView {
+  // private fields
+}
+pub fn CurveMoveView::view(Self) -> ContentView
+pub impl IntoContent for CurveMoveView
+
+pub struct CurveQuad {
+  // private fields
+}
+#callsite(autofill(args_loc, loc))
+pub fn CurveQuad::CurveQuad((Length, Length), (Length, Length), relative? : Bool, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl IntoContent for CurveQuad
+
+pub struct CurveQuadView {
+  // private fields
+}
+pub fn CurveQuadView::view(Self) -> ContentView
+pub impl IntoContent for CurveQuadView
+
+pub struct CurveView {
+  // private fields
+}
+pub fn CurveView::view(Self) -> ContentView
+pub impl IntoContent for CurveView
+
 pub struct Diagnostic {
   severity : Severity
   message : String
@@ -335,6 +439,13 @@ pub struct Equation {
 #callsite(autofill(args_loc, loc))
 pub fn Equation::Equation(String, block? : Bool, numbering? : Numbering, number_align? : Alignment, supplement? : Supplement, alt? : String, scope? : Array[(String, Value)], extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for Equation
+
+pub struct EquationView {
+  // private fields
+}
+pub fn EquationView::body(Self) -> ContentView raise @library.HintedError
+pub fn EquationView::view(Self) -> ContentView
+pub impl IntoContent for EquationView
 
 pub struct ExportReport[T] {
   errors : Array[Diagnostic]
@@ -665,6 +776,13 @@ pub(all) enum Location {
 }
 pub fn Location::describe(Self) -> String
 
+pub struct Lorem {
+  // private fields
+}
+#callsite(autofill(args_loc, loc))
+pub fn Lorem::Lorem(Int64, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl IntoContent for Lorem
+
 pub struct Markup {
   // private fields
 }
@@ -743,7 +861,7 @@ pub struct Outline {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn Outline::Outline(title? : &IntoContent, depth? : Int64, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn Outline::Outline(title? : &IntoContent, depth? : Int64, indent? : Length, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for Outline
 
 pub struct OutlineView {
@@ -834,8 +952,10 @@ pub(all) enum Paint {
 }
 pub fn Paint::conic(Array[Self], angle? : Angle, center? : (Length, Length), relative? : String) -> Self
 pub fn Paint::linear(Array[Self], angle? : Angle, dir? : Dir, relative? : String) -> Self
+pub fn Paint::map(String) -> Array[Self]
 pub fn Paint::radial(Array[Self], center? : (Length, Length), radius? : Length, focal_center? : (Length, Length), focal_radius? : Length, relative? : String) -> Self
 pub fn Paint::stop(Self, Length) -> Self
+pub fn Paint::tiling(&IntoContent, size? : (Length, Length), spacing? : (Length, Length), offset? : (Length, Length), angle? : Angle, relative? : String) -> Self
 pub impl ToValue for Paint
 
 pub struct Par {
@@ -879,6 +999,26 @@ pub fn PlaceView::body(Self) -> ContentView raise @library.HintedError
 pub fn PlaceView::view(Self) -> ContentView
 pub impl IntoContent for PlaceView
 
+pub struct Polygon {
+  // private fields
+}
+#callsite(autofill(args_loc, loc))
+pub fn Polygon::Polygon(Array[(Length, Length)], fill? : Paint, fill_rule? : String, stroke? : Stroke, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl IntoContent for Polygon
+
+pub struct PolygonRegular {
+  // private fields
+}
+#callsite(autofill(args_loc, loc))
+pub fn PolygonRegular::PolygonRegular(fill? : Paint, stroke? : Stroke, size? : Length, vertices? : Int64, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl IntoContent for PolygonRegular
+
+pub struct PolygonView {
+  // private fields
+}
+pub fn PolygonView::view(Self) -> ContentView
+pub impl IntoContent for PolygonView
+
 pub struct Quote {
   // private fields
 }
@@ -892,6 +1032,13 @@ pub struct QuoteView {
 pub fn QuoteView::body(Self) -> ContentView raise @library.HintedError
 pub fn QuoteView::view(Self) -> ContentView
 pub impl IntoContent for QuoteView
+
+pub struct Quoted {
+  // private fields
+}
+#callsite(autofill(args_loc, loc))
+pub fn Quoted::Quoted(&IntoContent, double? : Bool, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl IntoContent for Quoted
 
 pub struct Raw {
   // private fields
@@ -960,19 +1107,42 @@ pub fn RotateView::body(Self) -> ContentView raise @library.HintedError
 pub fn RotateView::view(Self) -> ContentView
 pub impl IntoContent for RotateView
 
+pub struct Scale {
+  // private fields
+}
+#callsite(autofill(args_loc, loc))
+pub fn Scale::Scale(&IntoContent, factor? : Length, x? : Length, y? : Length, origin? : Alignment, reflow? : Bool, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl IntoContent for Scale
+
+pub struct ScaleView {
+  // private fields
+}
+pub fn ScaleView::body(Self) -> ContentView raise @library.HintedError
+pub fn ScaleView::view(Self) -> ContentView
+pub impl IntoContent for ScaleView
+
 pub struct Select {
 }
 pub fn Select::align() -> Selector[AlignView]
+pub fn Select::bibliography(full? : Bool, style? : String, group? : String) -> Selector[BibliographyView]
 pub fn Select::block(width? : Length, height? : Sizing, breakable? : Bool, fill? : Paint, stroke? : Sides[Stroke], radius? : Corners[Length], inset? : Sides[Length], outset? : Sides[Length], spacing? : Spacing, above? : Spacing, below? : Spacing, clip? : Bool, sticky? : Bool) -> Selector[BlockView]
 pub fn Select::box(width? : Sizing, height? : Length, fill? : Paint, stroke? : Sides[Stroke], radius? : Corners[Length], inset? : Sides[Length], outset? : Sides[Length], clip? : Bool) -> Selector[BoxView]
 pub fn Select::circle(radius? : Length, width? : Length, height? : Sizing, fill? : Paint, stroke? : Stroke, inset? : Sides[Length], outset? : Sides[Length]) -> Selector[CircleView]
+pub fn Select::cite(form? : String, style? : String) -> Selector[CiteView]
 pub fn Select::colbreak(weak? : Bool) -> Selector[ColbreakView]
 pub fn Select::columns(gutter? : Length, balanced? : Bool) -> Selector[ColumnsView]
+pub fn Select::curve(fill? : Paint, fill_rule? : String, stroke? : Stroke) -> Selector[CurveView]
+pub fn Select::curve_close(mode? : String) -> Selector[CurveCloseView]
+pub fn Select::curve_cubic(relative? : Bool) -> Selector[CurveCubicView]
+pub fn Select::curve_line(relative? : Bool) -> Selector[CurveLineView]
+pub fn Select::curve_move(relative? : Bool) -> Selector[CurveMoveView]
+pub fn Select::curve_quad(relative? : Bool) -> Selector[CurveQuadView]
 pub fn Select::elem(String, where_? : Array[(String, Value)]) -> Selector[ContentView]
 pub fn Select::ellipse(width? : Length, height? : Sizing, fill? : Paint, stroke? : Stroke, inset? : Sides[Length], outset? : Sides[Length]) -> Selector[EllipseView]
 pub fn Select::emph() -> Selector[EmphView]
 pub fn Select::enum_(tight? : Bool, numbering? : Numbering, start? : Int64, full? : Bool, reversed? : Bool, indent? : Length, body_indent? : Length, spacing? : Length, number_align? : Alignment) -> Selector[EnumView]
 pub fn Select::enum_item() -> Selector[EnumItemView]
+pub fn Select::equation(block? : Bool, numbering? : Numbering, number_align? : Alignment, supplement? : Supplement, alt? : String) -> Selector[EquationView]
 pub fn Select::figure(alt? : String, placement? : Alignment, scope? : String, supplement? : Supplement, numbering? : Numbering, gap? : Length, outlined? : Bool) -> Selector[FigureView]
 pub fn Select::footnote(numbering? : Numbering) -> Selector[FootnoteView]
 pub fn Select::grid(columns? : Array[Sizing], rows? : Array[Sizing], gutter? : Array[Sizing], column_gutter? : Array[Sizing], row_gutter? : Array[Sizing]) -> Selector[GridView]
@@ -995,7 +1165,7 @@ pub fn Select::list_item() -> Selector[ListItemView]
 pub fn Select::literal(String) -> Selector[ContentView]
 pub fn Select::metadata() -> Selector[MetadataView]
 pub fn Select::move_(dx? : Length, dy? : Length) -> Selector[MoveView]
-pub fn Select::outline(depth? : Int64) -> Selector[OutlineView]
+pub fn Select::outline(depth? : Int64, indent? : Length) -> Selector[OutlineView]
 pub fn Select::overline(stroke? : Stroke, offset? : Length, extent? : Length, evade? : Bool, background? : Bool) -> Selector[OverlineView]
 pub fn Select::pad(left? : Length, top? : Length, right? : Length, bottom? : Length, x? : Length, y? : Length, rest? : Length) -> Selector[PadView]
 pub fn Select::page(paper? : String, width? : Length, height? : Length, flipped? : Bool, margin? : Sides[Length], bleed? : Sides[Length], columns? : Int64, fill? : Paint, numbering? : Numbering, number_align? : Alignment, header_ascent? : Length, footer_descent? : Length) -> Selector[PageView]
@@ -1003,6 +1173,7 @@ pub fn Select::pagebreak(weak? : Bool, to? : String) -> Selector[PagebreakView]
 pub fn Select::par(leading? : Length, spacing? : Length, justify? : Bool, linebreaks? : String, hanging_indent? : Length) -> Selector[ParView]
 pub fn Select::parbreak() -> Selector[ParbreakView]
 pub fn Select::place(scope? : String, float? : Bool, clearance? : Length, dx? : Length, dy? : Length) -> Selector[PlaceView]
+pub fn Select::polygon(fill? : Paint, fill_rule? : String, stroke? : Stroke) -> Selector[PolygonView]
 pub fn Select::quote(block? : Bool, quotes? : Bool) -> Selector[QuoteView]
 pub fn Select::raw(block? : Bool, lang? : String, align? : Alignment, tab_size? : Int64) -> Selector[RawView]
 pub fn Select::rect(width? : Length, height? : Sizing, fill? : Paint, stroke? : Sides[Stroke], radius? : Corners[Length], inset? : Sides[Length], outset? : Sides[Length]) -> Selector[RectView]
@@ -1010,6 +1181,8 @@ pub fn Select::ref_(supplement? : Supplement, form? : String) -> Selector[RefVie
 pub fn Select::regex(String) -> Selector[ContentView]
 pub fn Select::repeat(gap? : Length, justify? : Bool) -> Selector[RepeatView]
 pub fn Select::rotate(origin? : Alignment, reflow? : Bool) -> Selector[RotateView]
+pub fn Select::scale(x? : Length, y? : Length, origin? : Alignment, reflow? : Bool) -> Selector[ScaleView]
+pub fn Select::skew(ax? : Angle, ay? : Angle, origin? : Alignment, reflow? : Bool) -> Selector[SkewView]
 pub fn Select::smallcaps(all? : Bool) -> Selector[SmallcapsView]
 pub fn Select::smartquote(double? : Bool, enabled? : Bool, alternative? : Bool) -> Selector[SmartquoteView]
 pub fn Select::square(size? : Length, width? : Length, height? : Sizing, fill? : Paint, stroke? : Sides[Stroke], radius? : Corners[Length], inset? : Sides[Length], outset? : Sides[Length]) -> Selector[SquareView]
@@ -1063,6 +1236,14 @@ pub fn SetAlign::SetAlign(alignment? : Alignment, extra? : Array[(String, Value)
 pub impl IntoContent for SetAlign
 pub impl SetRule for SetAlign
 
+pub struct SetBibliography {
+  // private fields
+}
+#callsite(autofill(args_loc, loc))
+pub fn SetBibliography::SetBibliography(title? : &IntoContent, full? : Bool, style? : String, group? : String, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl IntoContent for SetBibliography
+pub impl SetRule for SetBibliography
+
 pub struct SetBlock {
   // private fields
 }
@@ -1087,6 +1268,14 @@ pub fn SetCircle::SetCircle(radius? : Length, width? : Length, height? : Sizing,
 pub impl IntoContent for SetCircle
 pub impl SetRule for SetCircle
 
+pub struct SetCite {
+  // private fields
+}
+#callsite(autofill(args_loc, loc))
+pub fn SetCite::SetCite(supplement? : &IntoContent, form? : String, style? : String, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl IntoContent for SetCite
+pub impl SetRule for SetCite
+
 pub struct SetColbreak {
   // private fields
 }
@@ -1102,6 +1291,54 @@ pub struct SetColumns {
 pub fn SetColumns::SetColumns(count? : Int64, gutter? : Length, balanced? : Bool, separator? : &IntoContent, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetColumns
 pub impl SetRule for SetColumns
+
+pub struct SetCurve {
+  // private fields
+}
+#callsite(autofill(args_loc, loc))
+pub fn SetCurve::SetCurve(fill? : Paint, fill_rule? : String, stroke? : Stroke, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl IntoContent for SetCurve
+pub impl SetRule for SetCurve
+
+pub struct SetCurveClose {
+  // private fields
+}
+#callsite(autofill(args_loc, loc))
+pub fn SetCurveClose::SetCurveClose(mode? : String, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl IntoContent for SetCurveClose
+pub impl SetRule for SetCurveClose
+
+pub struct SetCurveCubic {
+  // private fields
+}
+#callsite(autofill(args_loc, loc))
+pub fn SetCurveCubic::SetCurveCubic(relative? : Bool, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl IntoContent for SetCurveCubic
+pub impl SetRule for SetCurveCubic
+
+pub struct SetCurveLine {
+  // private fields
+}
+#callsite(autofill(args_loc, loc))
+pub fn SetCurveLine::SetCurveLine(relative? : Bool, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl IntoContent for SetCurveLine
+pub impl SetRule for SetCurveLine
+
+pub struct SetCurveMove {
+  // private fields
+}
+#callsite(autofill(args_loc, loc))
+pub fn SetCurveMove::SetCurveMove(relative? : Bool, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl IntoContent for SetCurveMove
+pub impl SetRule for SetCurveMove
+
+pub struct SetCurveQuad {
+  // private fields
+}
+#callsite(autofill(args_loc, loc))
+pub fn SetCurveQuad::SetCurveQuad(relative? : Bool, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl IntoContent for SetCurveQuad
+pub impl SetRule for SetCurveQuad
 
 pub struct SetDocument {
   // private fields
@@ -1134,6 +1371,14 @@ pub struct SetEnumItem {
 pub fn SetEnumItem::SetEnumItem(number? : Int64, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetEnumItem
 pub impl SetRule for SetEnumItem
+
+pub struct SetEquation {
+  // private fields
+}
+#callsite(autofill(args_loc, loc))
+pub fn SetEquation::SetEquation(block? : Bool, numbering? : Numbering, number_align? : Alignment, supplement? : Supplement, alt? : String, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl IntoContent for SetEquation
+pub impl SetRule for SetEquation
 
 pub struct SetFigure {
   // private fields
@@ -1267,7 +1512,7 @@ pub struct SetOutline {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetOutline::SetOutline(title? : &IntoContent, depth? : Int64, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetOutline::SetOutline(title? : &IntoContent, depth? : Int64, indent? : Length, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetOutline
 pub impl SetRule for SetOutline
 
@@ -1319,6 +1564,14 @@ pub fn SetPlace::SetPlace(alignment? : Alignment, scope? : String, float? : Bool
 pub impl IntoContent for SetPlace
 pub impl SetRule for SetPlace
 
+pub struct SetPolygon {
+  // private fields
+}
+#callsite(autofill(args_loc, loc))
+pub fn SetPolygon::SetPolygon(fill? : Paint, fill_rule? : String, stroke? : Stroke, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl IntoContent for SetPolygon
+pub impl SetRule for SetPolygon
+
 pub struct SetQuote {
   // private fields
 }
@@ -1366,6 +1619,22 @@ pub struct SetRotate {
 pub fn SetRotate::SetRotate(angle? : Angle, origin? : Alignment, reflow? : Bool, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for SetRotate
 pub impl SetRule for SetRotate
+
+pub struct SetScale {
+  // private fields
+}
+#callsite(autofill(args_loc, loc))
+pub fn SetScale::SetScale(factor? : Length, x? : Length, y? : Length, origin? : Alignment, reflow? : Bool, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl IntoContent for SetScale
+pub impl SetRule for SetScale
+
+pub struct SetSkew {
+  // private fields
+}
+#callsite(autofill(args_loc, loc))
+pub fn SetSkew::SetSkew(ax? : Angle, ay? : Angle, origin? : Alignment, reflow? : Bool, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl IntoContent for SetSkew
+pub impl SetRule for SetSkew
 
 pub struct SetSmallcaps {
   // private fields
@@ -1563,7 +1832,22 @@ pub(all) enum Sizing {
   Pct(Double)
   Rel(Length)
 }
+pub fn Sizing::repeat(Int, size? : Self) -> Array[Self]
 pub impl ToValue for Sizing
+
+pub struct Skew {
+  // private fields
+}
+#callsite(autofill(args_loc, loc))
+pub fn Skew::Skew(&IntoContent, ax? : Angle, ay? : Angle, origin? : Alignment, reflow? : Bool, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl IntoContent for Skew
+
+pub struct SkewView {
+  // private fields
+}
+pub fn SkewView::body(Self) -> ContentView raise @library.HintedError
+pub fn SkewView::view(Self) -> ContentView
+pub impl IntoContent for SkewView
 
 pub struct Smallcaps {
   // private fields
@@ -1595,6 +1879,7 @@ pub impl IntoContent for SmartquoteView
 pub(all) enum Source {
   Path(String)
   Bytes(Bytes)
+  Many(Array[Source])
 }
 pub impl IntoSource for Source
 pub impl ToValue for Source
@@ -1603,6 +1888,7 @@ pub struct Space {
   // private fields
 }
 pub fn Space::Space() -> Self
+pub fn Space::newline() -> Self
 pub impl IntoContent for Space
 
 pub(all) enum Spacing {
@@ -1910,6 +2196,7 @@ pub fn Value::length(Length) -> Self
 pub fn Value::none() -> Self
 pub fn Value::paint(Paint) -> Self
 pub fn Value::sizing(Sizing) -> Self
+pub fn Value::spread(Self) -> Self
 pub fn Value::str(String) -> Self
 pub fn Value::stroke(Stroke) -> Self
 pub impl IntoContent for Value
@@ -1928,6 +2215,7 @@ pub(open) trait IntoSource {
 }
 pub impl IntoSource for String
 pub impl IntoSource for Bytes
+pub impl IntoSource for Array[String]
 
 pub trait SetRule : IntoContent {
 }

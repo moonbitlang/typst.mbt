@@ -25,6 +25,9 @@ fn main {
     if a.has_prefix("--upstream-pdfs=") {
       upstream_pdf_dir.val = Some(a.unsafe_substring(start=16, end=a.length()))
     }
+    if a.has_prefix("--edsl-dump=") {
+      edsl_dump_dir.val = Some(a.unsafe_substring(start=12, end=a.length()))
+    }
     if a.has_prefix("--save-pdf=") {
       pdf_save_dir.val = Some(a.unsafe_substring(start=11, end=a.length()))
     }
