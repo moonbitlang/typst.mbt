@@ -1054,11 +1054,102 @@ test "keyed: bodies under one key in one argument are pieces of their own" {
     texts[glyph.1] = ()
   }
   assert_eq(texts.length(), 60)
-  // A key that is used once has the span that it always had: the token
-  // of the argument in the origin under the key.
+  // A path of keys is one counter however it is spelled: under a key, in
+  // a call value under that key, or as two wrappers. Sixty-one texts
+  // under `["a", "b"]`, more than the token has pieces, are distinct.
+  let nested : Array[&@doc.IntoContent] = [
+    @doc.Keyed(
+      "a",
+      @doc.Value::call("strong", positional=[
+        @doc.Value::content(@doc.Keyed("b", "same")),
+      ]),
+    ),
+  ]
+  for _ in 0..<30 {
+    nested.push(@doc.Keyed("a", @doc.Keyed("b", "same")))
+    nested.push(
+      @doc.Keyed(
+        "a",
+        @doc.Value::call("emph", positional=[
+          @doc.Value::content(@doc.Keyed("b", "same")),
+        ]),
+      ),
+    )
+  }
+  let report = compile_on_page([@doc.Par(@doc.Seq(nested))])
+  assert_true(report.errors.is_empty())
+  let glyphs = []
+  for page in report.unwrap().pages() {
+    collect_glyphs(page.frame, glyphs)
+  }
+  let same : Map[@syntax.Span, Unit] = Map([])
+  for glyph in glyphs {
+    guard report.origins.resolve(glyph.1) is Some(origin) else { continue }
+    assert_eq(origin.keys, ["a", "b"])
+    same[glyph.1] = ()
+  }
+  assert_eq(same.length(), 61)
+  // A key that is used once has the span that it always had: the whole
+  // token of the argument in the origin under the key — also after the
+  // pieces without a key have used up the argument's own token.
+  let token_of = (
+    report : @doc.CompileReport[@layout.PagedDocument],
+    key : String,
+  ) => {
+    // The range of the token `a0=..` in the listing line of the origin
+    // under the key.
+    let listing = report.origins.listing()
+    let mut offset = 0
+    let mut found = (-1, -1)
+    for line in listing.split("\n") {
+      let line = line.to_owned()
+      if line.contains(" key=\"\{key}\" ") && line.find(" a0=") is Some(at) {
+        let start = offset + @utf8.encode(line[:at + 1].to_owned()).length()
+        let rest = line[at + 1:].to_owned()
+        let token = match rest.find(" ") {
+          Some(end) => rest[:end].to_owned()
+          None => rest
+        }
+        found = (start, start + @utf8.encode(token).length())
+      }
+      offset += @utf8.encode(line).length() + 1
+    }
+    found
+  }
+  let range_of = (span : @syntax.Span) => {
+    match @syntax.DiagSpan::from_span(span).get() {
+      Range(start~, end~, ..) => (start, end)
+      _ => (-1, -1)
+    }
+  }
+  // The span of the glyphs whose origin is under the key.
+  let span_of = (
+    report : @doc.CompileReport[@layout.PagedDocument],
+    key : String,
+  ) => {
+    let glyphs = []
+    for page in report.unwrap().pages() {
+      collect_glyphs(page.frame, glyphs)
+    }
+    let mut found = (-1, -1)
+    for glyph in glyphs {
+      if report.origins.resolve(glyph.1) is Some(origin) && origin.keys == [key] {
+        found = range_of(glyph.1)
+      }
+    }
+    found
+  }
   let once = compile_on_page([@doc.Par(@doc.Keyed("k", "alone"))])
-  let origin = once.origin_at(1, 14.0, 16.0).unwrap()
-  assert_eq((origin.kind, origin.keys, origin.param), ("Par", ["k"], Some(0)))
+  assert_true(token_of(once, "k").0 >= 0)
+  assert_eq(span_of(once, "k"), token_of(once, "k"))
+  let many : Array[&@doc.IntoContent] = []
+  for i in 0..<200 {
+    many.push("w\{i} ")
+  }
+  many.push(@doc.Keyed("k", "tail"))
+  let late = compile_on_page([@doc.Par(@doc.Seq(many))])
+  assert_true(late.origins.listing().contains("pieces 1"))
+  assert_eq(span_of(late, "k"), token_of(late, "k"))
 }
 
 ///|
