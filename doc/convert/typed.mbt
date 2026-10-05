@@ -40,8 +40,7 @@ fn Tr::typed_form(
     "String" | "&IntoSource" => self.scalar(expr, TStr, env)
     "Length" => self.length(expr, env, true, false)
     "Spacing" | "Sizing" => self.sizing(expr, env, true)
-    "Angle" =>
-      { code: angle_literal(expr), total: unparen(expr) is Numeric(_), }
+    "Angle" => { code: angle_literal(expr), total: true, }
     "Paint" => self.paint(expr, env, true)
     "Stroke" => self.stroke(expr, env)
     "Alignment" => self.alignment(expr, env, true)
@@ -224,24 +223,9 @@ fn Tr::is_pure_length(self : Tr, expr : @ast.Expr, env : Env) -> Bool {
 }
 
 ///|
-/// A number with a sign folded into the literal (`-10deg`): exact, since
-/// a unit conversion is one multiplication, which commutes with negation.
-fn signed_numeric(expr : @ast.Expr) -> (Double, @ast.NumericUnit)? {
-  match unparen(expr) {
-    Numeric(numeric) => Some(numeric.get())
-    Unary(unary) =>
-      match (unary.op(), signed_numeric(unary.expr())) {
-        (Neg, Some((value, unit))) => Some((-value, unit))
-        (Pos, found) => found
-        _ => None
-      }
-    _ => None
-  }
-}
-
-///|
-/// A spacing or sizing: a fraction, a length (the unit shorthands, or
-/// `Rel(..)` of a composed one), `auto`/`none` at the `top`.
+/// A spacing or sizing: one numeric literal (a fraction, a length or a
+/// ratio), any other length form as `Rel(..)`, `auto`/`none` at the `top`.
+/// The facades have no arithmetic with fractions.
 fn Tr::sizing(
   self : Tr,
   expr : @ast.Expr,
@@ -251,9 +235,14 @@ fn Tr::sizing(
   match unparen(expr) {
     Auto(_) if top => { code: "Auto", total: true, }
     None(_) if top => { code: "None", total: true, }
-    Numeric(_) => self.unit_or_fraction(expr, env)
-    Unary(_) if signed_numeric(expr) is Some((_, Fr)) =>
-      self.unit_or_fraction(expr, env)
+    Numeric(numeric) => {
+      let (value, unit) = numeric.get()
+      match unit {
+        Fr => { code: "Fr(\{number(value)})", total: true, }
+        // The unit cases of `Spacing`/`Sizing` are those of `Length`.
+        _ => self.length(expr, env, false, false)
+      }
+    }
     _ => {
       let length = self.length(expr, env, false, false)
       { code: "Rel(\{length.code})", total: length.total, }
@@ -262,27 +251,12 @@ fn Tr::sizing(
 }
 
 ///|
-fn Tr::unit_or_fraction(
-  self : Tr,
-  expr : @ast.Expr,
-  env : Env,
-) -> Code raise Bail {
-  guard signed_numeric(expr) is Some((value, unit)) else {
-    raise Bail("untyped")
-  }
-  match unit {
-    Fr => { code: "Fr(\{number(value)})", total: unparen(expr) is Numeric(_), }
-    // The unit cases of `Spacing`/`Sizing` are those of `Length`.
-    _ => self.length(expr, env, false, false)
-  }
-}
-
-///|
-/// An angle literal, with its sign.
+/// One numeric literal with an angle unit (the facade has no operators).
 fn angle_literal(expr : @ast.Expr) -> String raise Bail {
-  match signed_numeric(expr) {
-    Some((value, Deg)) => "Deg(\{number(value)})"
-    Some((value, Rad)) => "Rad(\{number(value)})"
+  guard unparen(expr) is Numeric(numeric) else { raise Bail("untyped") }
+  match numeric.get() {
+    (value, Deg) => "Deg(\{number(value)})"
+    (value, Rad) => "Rad(\{number(value)})"
     _ => raise Bail("untyped")
   }
 }
@@ -440,10 +414,14 @@ fn Tr::alignment(
       }
       { code: case, total: false, }
     }
-    Binary(binary) if binary.op() is Add => {
+    Binary(binary) if top && binary.op() is Add => {
+      // Two constants; adding two alignments of one axis fails.
+      guard unparen(binary.lhs()) is Ident(_) &&
+        unparen(binary.rhs()) is Ident(_) else {
+        raise Bail("untyped")
+      }
       let lhs = self.alignment(binary.lhs(), env, false)
       let rhs = self.alignment(binary.rhs(), env, false)
-      // Adding two alignments of one axis fails.
       { code: "Both(\{lhs.code}, \{rhs.code})", total: false, }
     }
     _ => raise Bail("untyped")
@@ -527,7 +505,8 @@ let corner_keys : Array[(String, String)] = [
 ///|
 /// A dictionary literal whose keys are all among `keys` (and distinct,
 /// and at least one): the labelled arguments of `Sides(..)`/`Corners(..)`.
-/// `None`: the expression is no such dictionary.
+/// `None`: the expression is no such dictionary. Raises if a component is
+/// not total.
 fn Tr::keyed(
   self : Tr,
   expr : @ast.Expr,
@@ -557,15 +536,15 @@ fn Tr::keyed(
     found.push((at, keys[at].1, named.expr()))
   }
   let parts : Array[String] = []
-  let slots : Array[Slot] = []
   let mut total = true
   for entry in found {
     let code = self.typed_form(entry.2, item, env)
-    slots.push({ major: entry.0, minor: 0, total: code.total, })
     total = total && code.total
     parts.push("\{entry.1}=\{code.code}")
   }
-  check_order(slots)
+  // The facade lowers its fields in a fixed order, not in source order:
+  // a dictionary with a component that is not total stays a dictionary.
+  guard total else { raise Bail("untyped") }
   Some({ code: parts.join(", "), total, })
 }
 
@@ -664,14 +643,9 @@ fn Tr::tracks(self : Tr, expr : @ast.Expr, env : Env) -> Code raise Bail {
       }
       { code: "[\{parts.join(", ")}]", total, }
     }
-    Int(int) =>
-      // `columns: 3` is three `auto` tracks; a count of zero is an error
-      // of the cast.
-      match int.get() {
-        Ok(count) if count >= 1L && count <= 1000L =>
-          { code: "Sizing::repeat(\{count})", total: true, }
-        _ => raise Bail("untyped")
-      }
+    // An integer count stays an integer (through `extra`): Typst
+    // validates it.
+    Int(_) => raise Bail("untyped")
     // `none` is no track size: a value alone is cast differently from an
     // array of it only if it is no size.
     None(_) => raise Bail("untyped")

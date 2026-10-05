@@ -107,16 +107,16 @@ fn Tr::global(
 }
 
 ///|
-/// A numeric literal with a unit (and a sign) as a value: lengths and
-/// ratios with the facade's negation, fractions and angles with the sign
-/// in the literal.
+/// A numeric literal with a unit as a value. A sign is the facade's
+/// negation for lengths and ratios; fractions and angles have none.
 fn numeric_value(expr : @ast.Expr) -> String raise Bail {
-  guard signed_numeric(expr) is Some((value, unit)) else {
-    raise Bail("operator")
-  }
-  match unit {
-    Fr => "Value::fr(\{number(value)})"
-    Deg | Rad => "Value::angle(\{angle_literal(expr)})"
+  match unparen(expr) {
+    Numeric(numeric) =>
+      match numeric.get() {
+        (value, Fr) => "Value::fr(\{number(value)})"
+        (_, Deg) | (_, Rad) => "Value::angle(\{angle_literal(expr)})"
+        _ => "Value::length(\{signed_length(expr)})"
+      }
     _ => "Value::length(\{signed_length(expr)})"
   }
 }

@@ -130,6 +130,23 @@ fn Tr::element_path(self : Tr, expr : @ast.Expr, env : Env) -> String? {
 }
 
 ///|
+/// Whether the typed form of an expression against `ty` lowers to the raw
+/// value of the Typst expression: `where` keeps its arguments as they are
+/// and matching compares them with the stored fields, so a constructor
+/// shorthand (`stroke: 1pt` as `Stroke(thickness=..)`) would select other
+/// elements. These are boolean, integer and string literals, one numeric
+/// literal and a named constant.
+fn keeps_raw_value(expr : @ast.Expr, ty : String) -> Bool {
+  match (ty, unparen(expr)) {
+    ("Bool", Bool(_)) | ("Int64", Int(_)) | ("String", Str(_)) => true
+    ("Length" | "Spacing" | "Sizing" | "Angle", Numeric(_)) => true
+    ("Paint" | "Alignment" | "Dir", Ident(_)) => true
+    ("FontWeight", Str(_) | Int(_)) => true
+    _ => false
+  }
+}
+
+///|
 /// The typed selector `Select::<name>(field=value, ..)` of
 /// `path.where(..)`: every field must be a selector field with a typed
 /// form, and the arguments that are not total must keep their order (the
@@ -147,6 +164,7 @@ fn Tr::typed_where(
   for field in fields {
     guard order.search(field.0) is Some(at) &&
       elem.param(field.0) is Some((_, name, _, ty)) &&
+      keeps_raw_value(field.1, ty) &&
       self.typed(field.1, ty, env) is Some(code) else {
       self.rollback(mark)
       return None
