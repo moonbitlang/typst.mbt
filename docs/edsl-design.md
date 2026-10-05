@@ -429,7 +429,9 @@ still there) at the string's origin, with the hint to use `Prose` or
 without a valid placeholder is rejected (`the text of Prose contains a
 reserved character (U+FDD0)`); a rule smuggled in through `Content(..)` is
 rejected (`` `SetText` is a rule and cannot be interpolated into prose ``).
-All are located errors at the `Prose` call or the offending string.
+All are located errors at the `Prose` call or the offending string
+(the directory of a `Document`, which has no argument origin of its own
+at that point, is reported without a location).
 The check is on the strings the EDSL hands to the engine, not on what
 Typst code computes from them: a placeholder that reaches Typst code in an
 escaped spelling (the string re-encoded as a Typst string literal with

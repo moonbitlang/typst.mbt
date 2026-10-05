@@ -252,3 +252,71 @@ test "debug: a description prints as its constructor call, not as a placeholder"
   )
   assert_true("\{@doc.Emph("x")}".contains("\u{FDD0}"))
 }
+
+///|
+test "prose: a placeholder in a string that a function returns is a leak" {
+  // The text of a file, read by a call in a stream and by a call as a
+  // value.
+  let files : Map[String, Bytes] = {
+    "x.txt": @utf8.encode("see \{@doc.Emph("x")}"),
+  }
+  let expected = "`Emph` was interpolated into a string that is not the text of `Prose`"
+  let report = compile(
+    [@doc.Call("read", positional=[@doc.Value::str("x.txt")])],
+    files~,
+  )
+  assert_eq(error_messages(report), expected)
+  let report = compile(
+    [@doc.Par(@doc.Value::call("read", positional=[@doc.Value::str("x.txt")]))],
+    files~,
+  )
+  assert_eq(error_messages(report), expected)
+}
+
+///|
+test "prose: text runs resolve to the text argument of the Prose call" {
+  let report = compile([@doc.Prose("alpha \{@doc.Emph("beta")} gamma")])
+  let glyphs = []
+  for page in report.unwrap().pages() {
+    collect_glyphs(page.frame, glyphs)
+  }
+  let mut runs = 0
+  for glyph in glyphs {
+    // The spaces of the prose have no span, like `Space()`.
+    guard report.origins.resolve(glyph.1) is Some(origin) else { continue }
+    if glyph.0 == "beta" {
+      assert_eq(origin.kind, "Emph")
+    } else {
+      // The words of the prose: the `text` argument of the `Prose` call.
+      assert_eq(origin.kind, "Prose")
+      assert_eq(origin.param, Some(0))
+      runs += 1
+    }
+  }
+  assert_true(runs > 0)
+}
+
+///|
+test "debug: generic targets and views" {
+  @debug.debug_inspect(
+    @doc.ShowSet(@doc.Select::heading(), @doc.Set("text", [])),
+    content=(
+      #|ShowSet(heading, Set("text"))
+    ),
+  )
+  @debug.debug_inspect(
+    @doc.ShowSet(@doc.Select::heading(), @doc.Set("par", [])),
+    content=(
+      #|ShowSet(heading, Set("par"))
+    ),
+  )
+  @debug.debug_inspect(
+    @doc.Document(
+      [@doc.Call("emph", positional=[@doc.Value::content("x")])],
+      dir="a/b",
+    ),
+    content=(
+      #|Document([Call("emph", "x")], dir="a/b")
+    ),
+  )
+}

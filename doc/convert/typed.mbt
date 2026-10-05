@@ -123,6 +123,8 @@ fn Tr::content_arg(self : Tr, expr : @ast.Expr, env : Env) -> Code raise Bail {
         _ => self.value(expr, env)
       }
     FuncCall(call) => self.call_arg(call, env)
+    // `header: context { .. }`: the context element, as in a stream.
+    Contextual(contextual) => self.contextual(contextual, env)
     _ => self.value(expr, env)
   }
 }

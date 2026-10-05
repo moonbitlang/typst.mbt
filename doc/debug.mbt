@@ -66,6 +66,11 @@ pub impl @debug.Debug for Value with fn to_repr(self) {
         (Option::None, a.to_repr()),
         (Option::None, b.to_repr()),
       ])
+    VDiv(a, b) =>
+      @debug.Repr::ctor("div", [
+        (Option::None, a.to_repr()),
+        (Option::None, b.to_repr()),
+      ])
     VNeg(a) => @debug.Repr::ctor("neg", [(Option::None, a.to_repr())])
     VArray(items) => @debug.Repr::array(items.map(item => item.to_repr()))
     VDict(pairs) =>
@@ -135,8 +140,7 @@ pub impl @debug.Debug for Content with fn to_repr(self) {
           Option::None,
           match show.transform {
             TFunc(_) => @debug.Repr::literal("<callback>")
-            TStyle(set) =>
-              @debug.Repr::ctor(set.origin.kind, args_repr(set.args))
+            TStyle(set) => Content::of(NSetRule(set)).to_repr()
             TValue(value) => value.to_repr()
           },
         ),
@@ -184,9 +188,12 @@ pub impl @debug.Debug for Content with fn to_repr(self) {
     }
     NSpace(false) => @debug.Repr::ctor("Space", [])
     NSpace(true) => @debug.Repr::ctor("Space::newline", [])
+    // Engine content (a view): its element and its text, which tell
+    // views apart without printing engine state.
     NEngine(content) =>
       @debug.Repr::ctor("View", [
         (Option::None, @debug.Repr::literal(content.elem().name())),
+        (Option::None, @debug.Repr::string(content.plain_text())),
       ])
     NValue(value) => value.to_repr()
     NInvalid(message, site) =>

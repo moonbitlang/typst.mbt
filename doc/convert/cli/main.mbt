@@ -4,10 +4,12 @@
 // be read and type-checked on its own.
 //
 // Usage: moon run doc/convert/cli --target native -- <file.typ> [--baseline]
-//        [--name=<function>] [--no-using]
+//        [--prose] [--path=<root-relative path>] [--name=<function>]
+//        [--no-using]
 //
-// The file's path is taken as its root-relative path (the document gets
-// its directory). Global names are those of the standard library. The
+// The file's path, or `--path`, is taken as its root-relative path (the
+// document gets its directory). `--prose` is the readable mode
+// (docs/edsl-convert.md, section 4.7). Global names are those of the standard library. The
 // source goes to standard output; the tier, the number of typed
 // expressions and the fallback fragments go to standard error.
 //
@@ -25,7 +27,7 @@ let handwritten_types : Array[String] = [
   "Document", "Seq", "Lit", "Labelled", "Keyed", "Space", "Symbol", "Quoted", "Markup",
   "Equation", "Call", "Set", "Show", "ShowSet", "ShowWith", "Select", "Context",
   "Value", "NoneValue", "AutoValue", "Paint", "Stroke", "Sides", "Corners", "Cells",
-  "Sizing", "Numbering", "Supplement",
+  "Sizing", "Numbering", "Supplement", "Prose",
 ]
 
 ///|
@@ -57,11 +59,17 @@ fn main {
   let args = @platform.args()
   let mut path : String? = None
   let mut baseline = false
+  let mut prose = false
+  let mut virtual_path : String? = None
   let mut function = "build"
   let mut using_ = true
   for arg in args {
     if arg == "--baseline" {
       baseline = true
+    } else if arg == "--prose" {
+      prose = true
+    } else if arg.strip_prefix("--path=") is Some(value) {
+      virtual_path = Some(value.to_owned())
     } else if arg == "--no-using" {
       using_ = false
     } else if arg.strip_prefix("--name=") is Some(name) {
@@ -72,7 +80,7 @@ fn main {
   }
   guard path is Some(path) else {
     @platform.print_stderr(
-      "usage: convert-cli <file.typ> [--baseline] [--name=<function>] [--no-using]\n",
+      "usage: convert-cli <file.typ> [--baseline] [--prose] [--path=<root-relative path>] [--name=<function>] [--no-using]\n",
     )
     return
   }
@@ -86,9 +94,10 @@ fn main {
   }
   let translation = @convert.translate(
     text,
-    path,
+    virtual_path.unwrap_or(path),
     @doc.standard_library(),
     baseline~,
+    prose~,
   )
   println(render(translation, function, using_))
   let report = StringBuilder()

@@ -446,9 +446,15 @@ fn Lower::call(
 ) -> @library.Value raise @library.SourceError {
   let func = self.func(func, span).spanned(span)
   let args = self.args(args, entry, span)
-  self.trace_call(func.name(), span, () => {
+  let result = self.trace_call(func.name(), span, () => {
     func.call(self.engine, self.context, args)
   })
+  // A string that a function returns (the text of a file, say) is
+  // checked like a string that is written.
+  if result is Str(text) {
+    self.check_text(text, span)
+  }
+  result
 }
 
 ///|
@@ -492,6 +498,11 @@ fn Lower::value(
       let b = self.value(b, span)
       @library.at(span, () => @library.mul(a, b))
     }
+    VDiv(a, b) => {
+      let a = self.value(a, span)
+      let b = self.value(b, span)
+      @library.at(span, () => @library.div(a, b))
+    }
     VNeg(a) => {
       let a = self.value(a, span)
       @library.at(span, () => @library.neg(a))
@@ -524,9 +535,6 @@ fn Lower::value(
       )
     VCall(func, args) => {
       let result = self.call(func, args, -1, span)
-      if result is Str(text) {
-        self.check_text(text, span)
-      }
       self.mark_long(result, span)
       result.spanned(span)
     }
