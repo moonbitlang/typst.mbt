@@ -20,7 +20,6 @@ import {
   "moonbitlang/pdflite/content" @pdfcontent,
   "moonbitlang/pdflite/geometry" @pdfgeometry,
   "moonbitlang/pdflite/export" @pdfexport,
-  "moonbitlang/core/buffer",
   "moonbitlang/core/cmp",
   "moonbitlang/typst/otf",
   "moonbitlang/typst/shape",
