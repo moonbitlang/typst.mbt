@@ -204,7 +204,8 @@ test "calls that are not typed" {
   inspect(
     tr("#rect(width: 2 * 5pt)"),
     content=(
-      #|T3: Markup("#rect(width: 2 * 5pt)")
+      #|T2: Rect(extra=[("width", Value::mul(Value::int(2), Value::length(Pt(5.0))))])
+
     ),
   )
   inspect(
@@ -438,7 +439,8 @@ test "typed values: paints and strokes" {
   inspect(
     tr("#line(stroke: (1pt + 1em) + red)"),
     content=(
-      #|T3: Markup("#line(stroke: (1pt + 1em) + red)")
+      #|T2: Line(extra=[("stroke", Value::add(Value::add(Value::length(Pt(1.0)), Value::length(Em(1.0))), Value::global("red")))])
+
     ),
   )
 }
@@ -467,7 +469,8 @@ test "typed values: sides, corners and cells" {
   inspect(
     tr("#block(inset: (x: 1pt + 2pt))[a]"),
     content=(
-      #|T3: Markup("#block(inset: (x: 1pt + 2pt))[a]")
+      #|T2: Block(Seq([Lit("a")]), extra=[("inset", Value::dict([("x", Value::add(Value::length(Pt(1.0)), Value::length(Pt(2.0))))]))])
+
     ),
   )
   // A dictionary of stroke fields stays one.
@@ -498,7 +501,8 @@ test "typed values: constants, strings and supplements" {
   inspect(
     tr("#align(top + (center + bottom))[a]"),
     content=(
-      #|T3: Markup("#align(top + (center + bottom))[a]")
+      #|T2: Call("align", positional=[Value::add(Value::global("top"), Value::add(Value::global("center"), Value::global("bottom"))), Value::content(Seq([Lit("a")]))])
+
     ),
   )
   inspect(
@@ -607,7 +611,8 @@ test "value forms" {
   inspect(
     tr("#metadata(1 + 2)"),
     content=(
-      #|T3: Markup("#metadata(1 + 2)")
+      #|T2: Metadata(Value::add(Value::int(1), Value::int(2)))
+
     ),
   )
   inspect(
@@ -905,7 +910,8 @@ test "show rules: value transformations" {
   inspect(
     tr("#show: columns.with(2)"),
     content=(
-      #|T3: Markup("#show: columns.with(2)")
+      #|T2: ShowWith::all(Value::call("function.with", positional=[Value::global("columns"), Value::int(2)]))
+
     ),
   )
   inspect(
