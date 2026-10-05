@@ -632,6 +632,26 @@ API_ELEMS = []
 API_FUNCS = []
 
 
+def lowering_order(spec, ps):
+    """The fields of a constructor in the order its generated code pushes
+    their arguments (the order `Lower::args` evaluates them in); the same
+    order as `push_args` of `emit_element`."""
+    order = (
+        [p for p in ps if p.kind == "pos_opt"]
+        + [p for p in ps if p.kind == "pos" and p.field in spec.pos]
+        + [p for p in ps if p.kind == "pos" and p.field not in spec.pos]
+        + [p for p in ps if p.kind == "named"]
+        + [p for p in ps if p.kind == "variadic"]
+    )
+    late = [p for p in order if p.field in spec.optional]
+    order = [p for p in order if p.field not in spec.optional]
+    pos_end = max(
+        [i for i, p in enumerate(order) if p.kind == "pos"], default=-1
+    )
+    order[pos_end + 1:pos_end + 1] = late
+    return [p.field for p in order]
+
+
 def api_kind(spec, p):
     """The kind of a parameter in the translator's table."""
     if p.kind == "variadic":
@@ -673,7 +693,8 @@ def emit_api():
             f"  {{ path: {mbt_string(e['path'])}, name: {mbt_string(e['name'])}, "
             f"ctor: {str(e['ctor']).lower()}, set: {str(e['set']).lower()}, "
             f"select: {mbt_string(e['select'])}, params: {params(e['params'])}, "
-            f"positional: {strings(e['positional'])}, settable: {strings(e['settable'])}, "
+            f"positional: {strings(e['positional'])}, order: {strings(e['order'])}, "
+            f"settable: {strings(e['settable'])}, "
             f"where_: {strings(e['where'])} }},"
         )
     out.append("]")
@@ -944,6 +965,7 @@ def emit_element(spec, out, coverage):
             (p.field, p.name, api_kind(spec, p), p.mty) for p in ordered
         ],
         "positional": positional,
+        "order": lowering_order(spec, params),
         "settable": [p.field for p in settable] if has_set else [],
         "where": where_names,
     })

@@ -27,6 +27,10 @@ priv struct ApiElem {
   params : ReadOnlyArray[(String, String, ParamKind, String)]
   /// The fields that take positional arguments, in the function's order.
   positional : ReadOnlyArray[String]
+  /// The fields in the order the constructor lowers its arguments (`extra`
+  /// entries follow them).
+  order : ReadOnlyArray[String]
+  /// The settable fields, in the order the set rule lowers them.
   settable : ReadOnlyArray[String]
   where_ : ReadOnlyArray[String]
 }

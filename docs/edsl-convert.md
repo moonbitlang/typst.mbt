@@ -1,9 +1,13 @@
-# A Typst-to-EDSL translator (design, revision 2)
+# A Typst-to-EDSL translator (design, revision 3)
 
-Status: revision 2. Revision 1 (a draft with source preludes, rule
+Status: revision 3. Revision 1 (a draft with source preludes, rule
 continuations, merged text and a relaxed comparison) was rejected by the
-Codex review `docs/edsl-reviews/convert-plan-1.md`; this revision adopts its
-replacement design. Section 12 maps the review's items to sections.
+Codex review `docs/edsl-reviews/convert-plan-1.md`; revision 2 adopted its
+replacement design; revision 3 narrows the rules that review 2
+(`convert-plan-2.md`) showed unsound: label-valued expressions, callback
+wrappers, `eval` as a value fallback, eager view reads, collection spreads,
+content boundaries and the encoding of frame tags. Section 12 maps the
+reviews' items to sections.
 
 Purpose: stress-test the EDSL of `doc/` (`docs/edsl-design.md`) by
 converting existing Typst documents — upstream's test suite and
@@ -74,7 +78,7 @@ the description that lowers to what `eval_expr` produces for it:
 
 | Markup | EDSL | Evaluator |
 |---|---|---|
-| text | a string | `TextElem::packed` |
+| text | a string; `Lit("..")` (a description with a location of its own) when a label follows it, so that warnings at two labelled texts of one sequence stay distinct | `TextElem::packed` |
 | space | `Space()`, `Space::newline()` from `had_newline()` | `space_content` |
 | `\` line break, blank line | `Linebreak()`, `Parbreak()` | the elements |
 | escape `\#`, shorthand `~` `--` | `Symbol("..")` (new, section 9) | a `Symbol` value, displayed as `SymbolElem` |
@@ -93,9 +97,13 @@ Text is **not merged** and paragraphs and lists are **not inferred**: a
 show rule on `text` observes how text is split, and the discarding of
 newline spaces depends on the realized neighbours. (The handwritten
 documents of `doc/twins/bench.mbt` are an author's equivalents of
-particular documents, not a lowering rule.) A content block is `Seq([..])`
-of its stream; a stream with exactly one description that is not a rule is
-that description, as `Content::sequence` returns a single child.
+particular documents, not a lowering rule.) A content block is always
+`Seq([..])` of its stream, also with one description: `Seq` displays an
+inserted value like markup does (`[#1]` is content, `Seq([Value::int(1)])`),
+while the bare value as an argument would be the value. Every expression
+of the stream has a description, also those that display nothing: a typed
+`let` (section 5) leaves `Seq([])`, the empty content the evaluator pushes
+for it.
 
 An equation is `Equation(source, block=..)` with the text of its math node
 if no identifier of the math is a user binding; with user bindings that
@@ -114,6 +122,8 @@ each prefix is a module, a function or a type (so `table.cell`,
 `math.equation`, `calc.pow` are paths, `red.lighten` is a method call on a
 value).
 
+- The path `label`, and `eval`: not typed (their results can be labels,
+  section 6.1).
 - A path with a constructor in the table: the typed constructor. The
   call's positional arguments (trailing content blocks included) are
   matched to the function's positional fields: all to the variadic field if
@@ -168,10 +178,11 @@ Typst's.
 
 ### 4.4 `Value` forms (T2)
 
-Literals; array and dictionary literals of `Value` forms (with
-`Value::spread` for spreads); a content block; a global path as
-`Value::global(path)`; a call of a global path as `Value::call`; a
-translated variable. Nothing else has a `Value` form.
+Literals; array and dictionary literals of `Value` forms without spreads
+(`Value::spread` exists only among the arguments of a call); a content
+block; a global path as `Value::global(path)`; a call of a global path as
+`Value::call`; a translated variable. Nothing else has a `Value` form; in
+particular closures do not (section 6.3).
 
 ### 4.5 Rules
 
@@ -187,30 +198,44 @@ translated variable. Nothing else has a `Value` form.
   (`Select::literal`), `regex("..")` (`Select::regex`), a label
   (`Select::label`); another element path as `Select::elem(path, ..)`
   (T2). The transform:
-  - a closure literal with one positional parameter whose body is a
-    content block or an element constructor call that translates with the
-    parameter bound to the callback's view (`it` as content re-emits the
-    element; `it.field` is `view.field("field")`): the host callback
+  - a closure literal `x => body` or `(x) => body` (exactly one
+    positional parameter that is an identifier; no named parameters, whose
+    defaults Typst evaluates when the closure is created, and no sink)
+    whose body is a content block or an element constructor call that
+    translates with the parameter bound to the callback's view, used only
+    as content (which re-emits the matched element). Field reads of the
+    view are not translated: the MoonBit callback would perform them
+    while it builds its result, before anything of the result is lowered,
+    which is not Typst's order. The result is the host callback
     `Show(sel, (it, _) => ..)`;
-  - any other closure literal, outside a callback: the host callback
-    `Show(sel, (it, _) => Markup("#(<closure>)(it)", scope=[("it",
-    Value::content(it)), ..]))`, a fragment (T3) that applies the Typst
-    closure to the matched element with the invocation's context;
+  - any other closure literal of that parameter shape whose body is
+    proven not to be a label (section 6.1) and has no escaping `return`,
+    outside a callback: the host callback `Show(sel, (it, _) =>
+    Markup("#(<closure>)(<arg>)", scope=[("<arg>", Value::content(it)),
+    ..]))`, a fragment (T3) that applies the Typst closure to the matched
+    element with the invocation's context; `<arg>` is a name that does
+    not occur in the closure. Creating the closure cannot fail (no
+    defaults), so doing it per invocation is not observable;
   - any other expression with a `Value` form (a function path such as
     `underline`, content, a string): `ShowWith(sel, value)` (T2; new,
-    section 9), which builds the recipe from the value like the evaluator.
+    section 9), which builds the recipe from the value like the evaluator;
+  - anything else: the rule is a statement that is not typed.
 - `show: transform` (no selector) with a `Value` form of the transform:
-  `ShowWith(value)`, which applies the recipe to the rest of the sequence
-  immediately, like `styled_with_recipe`.
+  `ShowWith::all(value)`, which applies the recipe to the rest of the
+  sequence immediately, like `styled_with_recipe`.
 - A rule is a description in the stream, so it styles the descriptions
   after it in the same `Seq`/`Document`, as in Typst.
 
 ### 4.6 Context
 
-`context expr`, outside a callback: `Context(_ => Markup("#{<expr>}",
-scope=..))`, a host callback whose result is a fragment evaluated with the
-invocation's context (T3). Inside a callback it stays in the enclosing
-fragment (the EDSL's creation rule forbids creating callbacks there).
+`context expr`, outside a callback, where `expr` is proven not to be a
+label (section 6.1) and has no `return` outside a closure of its own (the
+evaluator's contextual closure would consume it, a fragment cannot):
+`Context(_ => Markup("#{<expr>}", scope=..))`, a host callback whose
+result is a fragment evaluated with the invocation's context (T3).
+Otherwise, and inside a callback (the EDSL's creation rule forbids
+creating callbacks there), the `context` expression is an expression item
+(section 6.1): it evaluates to content.
 
 ## 5. Bindings
 
@@ -222,6 +247,7 @@ in the document (`=`, `+=`, ..., destructuring assignment, `push`, `pop`,
 `insert`, `remove` on it). The variable has that static type; a use is the
 variable where its type is expected, its `Value` (`Value::int(v)`, ...) as
 a `Value` form, and that value in a content stream (displayed like `#v`).
+The `let` itself leaves `Seq([])` in its stream (4.1).
 Fragments that mention the name get the value in their `scope`. A
 translated name that is rebound in the same scope by a binding that is not
 translated ends the typed part of that stream (section 6).
@@ -237,16 +263,25 @@ rules are:
 
 1. **Expression items.** An embedded expression `#expr` of a markup stream
    that is not typed, is no statement (`let`, `set`, `show`, `import`,
-   `include`, assignment) and contains no `break`/`continue`/`return`
-   outside a loop or closure of its own, becomes `Markup("#<expr>",
-   scope=[..])`: one inserted expression result, exactly the child the
-   evaluator pushes (`eval_string` of one expression returns its display).
-   Its scope holds the translated variables it mentions. If it mentions a
-   name that is bound by a statement that was not typed, rule 2 applies
-   instead.
+   assignment), contains no `break`/`continue`/`return` outside a loop or
+   closure of its own, and is **proven not to evaluate to a label**,
+   becomes `Markup("#<expr>", scope=[..])`: one inserted expression
+   result, exactly the child the evaluator pushes (`eval_string` of one
+   expression returns its display). A label result would be attached to
+   the content before the expression by the evaluator, which a fragment
+   cannot do. The proof is by form: literals other than labels, content
+   blocks, closures, array and dictionary literals, unary and binary
+   operations, `context` and `include` expressions, global paths, calls of
+   global paths other than `label` and `eval`, calls of the methods of a
+   fixed list whose results are never labels (`display`, `step`, `update`,
+   `len`, `join`, `map`, ...; not `at`, `first`, `last`, `find`, `fold`,
+   `get`, `final`, ...), translated variables, and conditionals, loops and
+   code blocks whose branches, bodies and statements are of these forms.
+   Its scope holds the translated variables it mentions.
 2. **Whole streams.** If a markup stream contains a statement that is not
-   typed, an expression item that needs it, or an untypable label
-   attachment, the **whole stream** is one fragment: the body of its
+   typed, an expression item that is not typed and not proven to be no
+   label (or that has escaping control flow), or a markup expression that
+   is not typed, the **whole stream** is one fragment: the body of its
    content block as `Markup(<body source>, scope=..)`, or the whole
    document. The fragment contains every definition, rule and use of the
    stream in source order, so scoping, captures, mutation, rule tails,
@@ -256,22 +291,21 @@ rules are:
    document as one fragment has no outer names). A code block (`{ .. }`)
    is typed only as a whole expression by rule 1 (its joins are
    `library.join`, which `Seq` is not).
-3. **Values.** An argument expression without a typed or `Value` form
-   that is closed over translated variables — typically a closure literal
-   (`fill: (x, y) => ..`, a numbering function) — is
-   `Value::call("eval", [source], scope: ..)` during initial lowering
-   only: there `eval`'s `Context::none()` and empty introspector are also
-   the lowering's. Inside a callback there is no value fallback; the item
-   is a fragment by rule 1. Its evaluation order is checked like any
-   argument that is not total (4.2).
+3. **No value fragments.** An argument expression without a typed or
+   `Value` form (a closure such as `fill: (x, y) => ..`, a method call, an
+   operator) makes its call not typed; the call is then an expression item
+   or its stream a fragment. Typst's `eval` function is not used as a
+   value fallback: it evaluates with one synthesized span, so diagnostics
+   of the evaluated code that differ only in their location collapse, and
+   inside callbacks it would lose the context.
 4. **Structure is preserved.** A fragment by rule 1 is one child of the
    sequence; a fragment by rule 2 is the whole sequence. The lowered
    content of a converted document therefore has the same structural dump
    as the evaluated content of its original, also where it is fragments.
 5. **Tiers.** T1: typed constructors, rules, callbacks only. T2: at least
    one value-level hatch (`Value::..`, `Call`, `Set`, `ShowWith`,
-   `extra=`), no source evaluation. T3: at least one fragment (`Markup`,
-   `eval`) or math string (`Equation`); the table reports documents whose
+   `extra=`), no source evaluation. T3: at least one fragment (`Markup`)
+   or math string (`Equation`); the table reports documents whose
    only source evaluation is math strings separately (T3m). T4: no
    conversion under this contract, with the reason (section 9 lists the
    known ones). The tier says how the document was expressed, not whether
@@ -294,10 +328,14 @@ For every case, in the test world:
 2. **Layout**, for cases that upstream compiles to a paged document
    (`is_paged`): `Document::compile_paged` against `@typst.compile`, with
    memoization on and off. Same status and diagnostics; on success the
-   normalized frames are equal in each mode (the `edsl` stage's twin
-   normalizer: spans and glyph span offsets erased, locations numbered by
-   first occurrence, tags with their elements), and each side equals
-   itself across the two modes.
+   normalized frames are equal in each mode (spans and glyph span
+   offsets erased, locations numbered by first occurrence), and each side
+   equals itself across the two modes. The element of a start tag is
+   encoded with the structural dump of phase 1 (element identity, every
+   stored field, labels; locations in fields by their number), not with
+   the realization dump of the `paged` stage, which prints element names
+   and public fields only: content that callbacks produce during layout
+   is compared structurally here.
 3. **Export**, with memoization on: the SVG of every page, the PDF bytes
    and the PNG pixels are equal; export failures are compared as
    diagnostics.
@@ -396,3 +434,17 @@ the first failing phase. The report aggregates per suite directory.
 | 10 callbacks and tiers | 4.5, 4.6, 6.5 |
 | 11 build | section 8 |
 | 12 order and measurements | section 11 |
+
+Review 2 (revision 3):
+
+| Review-2 item | Resolution |
+|---|---|
+| expression fragments can return labels (6.1) | 6.1: only expressions proven by form not to be labels; otherwise the stream is the fragment (6.2) |
+| show wrapper: closure construction timing, label results (4.5) | 4.5: closures with exactly one positional identifier parameter (no defaults), body proven not a label, no escaping `return`; a fresh argument name |
+| `Context(_ => Markup(..))` and `return`, labels (4.6) | 4.6: excluded; such `context` expressions are expression items |
+| content/value boundary, empty statement results (4.1, 5) | 4.1: content blocks are always `Seq([..])`; a typed `let` leaves `Seq([])` |
+| `eval` is not diagnostic-equivalent; plain strings share an origin (6.3, 4.1) | 6.3: no value fragments at all; 4.1: `Lit` for labelled text |
+| eager view reads in callbacks (4.5) | 4.5: translated callbacks use the view only as content |
+| collection spreads (4.4) | 4.4: spread-free literals only |
+| frame tags use the realization dump (7) | 7.2: tags are encoded structurally |
+| wrapper argument hygiene; `ShowWith::all` | 4.5 |
