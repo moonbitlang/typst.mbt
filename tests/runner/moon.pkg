@@ -44,6 +44,7 @@ import {
   "moonbitlang/typst/doc",
   "moonbitlang/typst/doc/twins",
   "moonbitlang/typst/doc/convert",
+  "moonbitlang/typst/doc/convert/sample",
   "moonbitlang/typst/tests/edsl_gen/registry",
   "moonbitlang/typst/tests/edsl_gen/s00",
   "moonbitlang/typst/tests/edsl_gen/s01",

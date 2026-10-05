@@ -188,7 +188,7 @@ computes:
 
 | Type | Typst forms |
 |---|---|
-| `&IntoContent` | a content block; a string literal; `none`/`auto` as `NoneValue()`/`AutoValue()`; any expression with a `Value` form |
+| `&IntoContent` | a content block; a string literal; `none`/`auto` as `NoneValue()`/`AutoValue()`; a `context` expression as its callback (4.6); any expression with a `Value` form |
 | `Bool`, `Int64`, `Double`, `String` | the literal (with a sign); a translated variable of that type. An integer literal only if it parses before its sign is applied (`-9223372036854775808` is Typst's error `cannot write minimum integer manually`) and fits the parameter (`Luma(Int)`, `Weight(Int)`) |
 | `Length` | numeric literals with a length or ratio unit; sums, differences and negations of those (the facade lowers them with Typst's operators); `auto`/`none` |
 | `Spacing`, `Sizing` | one numeric literal (a fraction, a length or a ratio); a `Length` form as `Rel(..)`; `auto`/`none`. No arithmetic with fractions (the facades have none) |
@@ -216,8 +216,15 @@ string-literal keys, of `Value` forms and without spreads
 (`Value::spread` exists only among the arguments of a call; a computed
 key has no form); a content
 block; a global path as `Value::global(path)`; a call of a global path as
-`Value::call`; a translated variable. Nothing else has a `Value` form; in
-particular closures do not (section 6.3).
+`Value::call`; a translated variable; `a + b`, `a - b`, `a * b`, `a / b`
+and `-a` of `Value` forms as `a.add(b)` ... `a.neg()` (the EDSL applies
+Typst's operator when the value is lowered, left operand first; such a
+value is not total); `f.with(..)` and `f.where(..)` where `f` is a global
+path that is a function and the method is not a member of its scope, as
+`Value::call("function.with", positional=[Value::global(f), ..])` (how
+Typst calls the method: the receiver type is proven, the method audited).
+Nothing else has a `Value` form; in particular closures, comparisons,
+`and`/`or`/`in` and other methods do not (section 6.3).
 
 ### 4.5 Rules
 

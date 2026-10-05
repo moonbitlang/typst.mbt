@@ -2618,6 +2618,7 @@ pub impl IntoContent for VView
 pub struct Value {
   // private fields
 }
+pub fn Value::add(Self, Self) -> Self
 pub fn Value::alignment(Alignment) -> Self
 pub fn Value::angle(Angle) -> Self
 pub fn Value::array(Array[Self]) -> Self
@@ -2626,18 +2627,22 @@ pub fn Value::bool(Bool) -> Self
 pub fn Value::call(String, positional? : Array[Self], named? : Array[(String, Self)]) -> Self
 pub fn Value::content(&IntoContent) -> Self
 pub fn Value::dict(Array[(String, Self)]) -> Self
+pub fn Value::div(Self, Self) -> Self
 pub fn Value::float(Double) -> Self
 pub fn Value::fr(Double) -> Self
 pub fn Value::global(String) -> Self
 pub fn Value::int(Int64) -> Self
 pub fn Value::label(String) -> Self
 pub fn Value::length(Length) -> Self
+pub fn Value::mul(Self, Self) -> Self
+pub fn Value::neg(Self) -> Self
 pub fn Value::none() -> Self
 pub fn Value::paint(Paint) -> Self
 pub fn Value::sizing(Sizing) -> Self
 pub fn Value::spread(Self) -> Self
 pub fn Value::str(String) -> Self
 pub fn Value::stroke(Stroke) -> Self
+pub fn Value::sub(Self, Self) -> Self
 pub impl @debug.Debug for Value
 pub impl IntoContent for Value
 pub impl ToValue for Value

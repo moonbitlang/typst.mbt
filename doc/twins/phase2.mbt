@@ -336,6 +336,32 @@ pub fn phase2() -> Array[Twin] {
         ])
       },
     ),
+    // Typst's operators on values, evaluated when the value is lowered.
+    twin(
+      "value-operators",
+      [
+        page_typ, "#rect(stroke: 1pt + red, width: 10pt * 2, height: 30pt / 2 - 5pt)",
+        "#(-(2 + 3))", "#(\"a\" + \"b\")", "#((1, 2) + (3,))",
+      ],
+      () => {
+        Document([
+          page(),
+          Call("rect", named=[
+            ("stroke", Value::length(Pt(1)).add(Value::paint(Red))),
+            ("width", Value::length(Pt(10)).mul(Value::int(2))),
+            (
+              "height",
+              Value::length(Pt(30)).div(Value::int(2)).sub(Value::length(Pt(5))),
+            ),
+          ]),
+          Value::int(2).add(Value::int(3)).neg(),
+          Value::str("a").add(Value::str("b")),
+          Value::array([Value::int(1), Value::int(2)]).add(
+            Value::array([Value::int(3)]),
+          ),
+        ])
+      },
+    ),
     // The space of a source line break is discarded next to Chinese text;
     // an ordinary space is kept.
     twin(

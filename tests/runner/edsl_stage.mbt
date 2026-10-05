@@ -535,6 +535,47 @@ fn run_edsl_stage(filter : String?, verbose : Bool) -> Unit {
       }
     }
   }
+  // The curated sample of translator output against its sources, as
+  // functional twins.
+  for entry in @sample.all() {
+    let (sample_name, path, build) = entry
+    let name = "converted/" + sample_name
+    if filter is Some(f) && !name.contains(f) {
+      continue
+    }
+    let world : &@library.World = match with_system_fonts {
+      Some(world) => world
+      None => {
+        let world = @system.world(root="bench", today=(2026, 1, 1)) catch {
+          err => {
+            println("edsl: cannot create the world: \{err}")
+            @sys.exit(1)
+            return
+          }
+        }
+        with_system_fonts = Some(world)
+        world
+      }
+    }
+    let failures = check_pair(
+      build(),
+      twin_main(read(path)),
+      world,
+      structural=true,
+    )
+    if failures.is_empty() {
+      passed += 1
+      if verbose {
+        println("ok   \{name}")
+      }
+    } else {
+      failed += 1
+      println("FAIL \{name}")
+      for failure in failures {
+        println("    \{failure}")
+      }
+    }
+  }
   println("edsl: \{passed} passed, \{failed} failed")
   if failed > 0 {
     @sys.exit(1)

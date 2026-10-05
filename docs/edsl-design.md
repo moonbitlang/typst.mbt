@@ -1520,7 +1520,12 @@ pub fn Set::Set(path : String, named : Array[(String, Value)], loc~ : SourceLoc,
   `::dict([(k, v)])`, `::content(c)`, `::label(name)`, `::global(path)`
   (a binding of the global scope, e.g. `"red"`),
   `::call(path, positional?, named?)`, and the typed `::paint`, `::stroke`,
-  `::alignment`, `::sizing`. `Value::spread(v)` among the positional
+  `::alignment`, `::sizing`. `a.add(b)`, `a.sub(b)`, `a.mul(b)`,
+  `a.div(b)` and `a.neg()` are Typst's operators `+`, `-`, `*`, `/` and
+  unary `-` on values: they are applied when the value is lowered, the
+  left operand first, with Typst's results and error messages (`1pt +
+  red` is a stroke, `"a" + 1` fails with `cannot add string and
+  integer`). `Value::spread(v)` among the positional
   arguments of a call is Typst's `..v` (the evaluator's rule: an array
   gives positional arguments, a dictionary named ones, `arguments` both,
   `none` nothing, anything else `cannot spread <type>`); anywhere else it
