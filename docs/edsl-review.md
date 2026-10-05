@@ -248,8 +248,14 @@ Locations are constructor calls and their arguments in the MoonBit source (line:
   `origin_at`) but is nothing to select: a click on it changes nothing.
 - Text without a source location (list markers, numbers, supplements) is
   not selectable and is left out of the selected text.
-- A text item of more than 65,535 bytes is one word (its glyph ranges
-  are stored in 16 bits).
+- Beyond 65,535 bytes of one text item the text of a word is not known
+  (glyph ranges are stored in 16 bits): it is shown as `…`, with its
+  right origin.
+- Text that a clip hides completely is still among the words (a group
+  that draws nothing because of a scale of zero is not).
+- A cluster that the engine splits over two text items (a mark set in
+  another font or at another height) appears in both, so its characters
+  are twice in the selected text. The origins are right.
 - A selection is one range of words, or one shape or image. Dragging
   starts and ends on words; there is no rectangle selection.
 - `find` matches rendered text exactly (case, punctuation, the typeset
@@ -260,7 +266,9 @@ Locations are constructor calls and their arguments in the MoonBit source (line:
 
 - `doc/review_test.mbt`: words and their order; a written word of two
   origins; ranges and `find` (parts of words, occurrences, no match, an
-  empty document); the runs of a `Prose` and the strings of an array as
+  empty document, a long repetitive needle); Unicode white space; text
+  through a box in a line; text in a group scaled to zero; a text item
+  of 80,000 bytes from two strings; the runs of a `Prose` and the strings of an array as
   pieces of one origin, with a gap; a `Keyed` data key; a word
   hyphenated at a line break; the text block and the JSON of a record,
   exactly; a shape; a long selection; the page's data and controls.
@@ -270,8 +278,14 @@ Locations are constructor calls and their arguments in the MoonBit source (line:
   searching the file), cells of the table built in a loop.
 - `node scripts/review_page_check.mjs` on the showcase's page: 36
   records equal the library's. In a browser: `#selftest` (the same, plus
-  3,072 points of hit testing, twice), a drag over two lines, "Extend" at
-  phone width, both themes, the copy fallback, the list of comments.
+  3,072 points of hit testing, twice, and a check that nothing covers a
+  page and no effect is on a page, its artwork or its layer), a drag
+  over two lines, "Extend" at phone width, both themes, the copy
+  fallback, the list of comments.
+- By hand, at a small viewport: scroll to every page and see that it
+  paints. (Captures of a browser pane that is not shown are unreliable
+  after the first frame: a second capture of the same scroll position
+  can be blank although the page is fine. Judge by a visible pane.)
 
 ## Appendix: later slices (not under review)
 

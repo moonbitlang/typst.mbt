@@ -379,10 +379,20 @@ let review_page_js : String =
   #|  const state = { from: -1, to: -1, anchor: -1, object: null, extend: false, comments: [] };
   #|  const key = 'typst.mbt review: ' + data.title;
   #|  try { state.comments = JSON.parse(localStorage.getItem(key) || '[]'); } catch (e) { state.comments = []; }
-  #|  // (What another version of the page stored is not a list of records.)
-  #|  state.comments = (Array.isArray(state.comments) ? state.comments : []).filter((f) =>
-  #|    f && f.format === 'typst.mbt review feedback 1' && Array.isArray(f.origins) && Array.isArray(f.pages) &&
-  #|    typeof f.comment === 'string' && typeof f.selected_text === 'string');
+  #|  // (What something else stored there is not a list of records: only what
+  #|  // the list can show and turn into text is kept.)
+  #|  const usable = (f) => {
+  #|    try {
+  #|      return f.format === 'typst.mbt review feedback 1' && typeof f.comment === 'string' &&
+  #|        typeof f.selected_text === 'string' && f.pages.every((page) => typeof page === 'number') &&
+  #|        f.origins.every((o) => typeof o.file === 'string' && typeof o.constructor === 'string' &&
+  #|          o.start.length === 2 && o.end.length === 2 && typeof o.rendered_text === 'string' && Array.isArray(o.pieces)) &&
+  #|        typeof Core.toText(f) === 'string';
+  #|    } catch (e) {
+  #|      return false;
+  #|    }
+  #|  };
+  #|  state.comments = (Array.isArray(state.comments) ? state.comments : []).filter(usable);
   #|  const persist = () => { try { localStorage.setItem(key, JSON.stringify(state.comments)); } catch (e) { /* kept in the page only */ } };
   #|
   #|  const current = () => {
@@ -605,11 +615,27 @@ let review_page_js : String =
   #|      }
   #|    }
   #|    for (const shape of shapes) shape.classList.remove('on');
+  #|    // Nothing covers a page, and no effect is on a page, its artwork or
+  #|    // its layer (what would make a page paint as a blank sheet).
+  #|    layers.forEach((layer, i) => {
+  #|      const page = layer.closest('.page');
+  #|      for (const part of [page, page.querySelector('.art'), layer]) {
+  #|        const style = getComputedStyle(part);
+  #|        if (style.filter !== 'none' || style.mixBlendMode !== 'normal' || style.opacity !== '1' || style.willChange !== 'auto') {
+  #|          bad.push(`page ${i + 1}: an effect is on ${part.tagName.toLowerCase()}.${part.getAttribute('class')}`);
+  #|        }
+  #|      }
+  #|      if (getComputedStyle(layer).backgroundColor !== 'rgba(0, 0, 0, 0)') bad.push(`page ${i + 1}: the layer has a background`);
+  #|      page.scrollIntoView({ block: 'center' });
+  #|      const box = page.getBoundingClientRect();
+  #|      const top = document.elementFromPoint(box.left + box.width / 2, Math.max(box.top, 0) + Math.min(box.height, window.innerHeight) / 2);
+  #|      if (!top || top.closest('.page') !== page) bad.push(`page ${i + 1}: something covers the page`);
+  #|    });
   #|    bar.hidden = panel.hidden = false;
   #|    window.scrollTo(0, 0);
   #|    $('selftest').hidden = false;
   #|    $('selftest').textContent = bad.length === 0
-  #|      ? `Self-test passed: at ${data.probes.length} points the page finds the origin that the library finds, also with every shape marked, and ${data.samples.length + data.objects.length} feedback records equal the library's.`
+  #|      ? `Self-test passed: at ${data.probes.length} points the page finds the origin that the library finds, also with every shape marked, ${data.samples.length + data.objects.length} feedback records equal the library's, and nothing covers a page.`
   #|      : `Self-test: ${bad.length} differences from the library.\n` + bad.slice(0, 20).join('\n');
   #|  }
   #|  if (window.location.hash === '#selftest') selftest();

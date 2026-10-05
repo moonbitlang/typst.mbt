@@ -630,9 +630,72 @@ test "select: a word that is hyphenated at a line break is read as one" {
   inspect(text.text(), content=written)
   let word = text.find("incomprehensible").unwrap()
   inspect(text.selected_text(word), content="incomprehensible")
-  // The hyphen's box has an origin (a click finds it) and no word.
+  // The engine's hyphen is no word of the page's data either.
   let html = compile_on_page([@doc.SetText(hyphenate=true), @doc.Par(written)])
     .review_html()
     .unwrap()
-  assert_true(html.contains("\" data-g=\"\" x="))
+  assert_true(!html.contains("\u{ad}"))
+}
+
+///|
+test "select: what is one text on the page is one text in the words" {
+  // Any white space of Unicode separates words (a thin space, a no-break
+  // space), and stands for a space in the text.
+  let spaced = text_of([@doc.Par("alpha\u{2009}beta\u{a0}gamma")])
+  assert_eq(spaced.length(), 3)
+  inspect(spaced.text(), content="alpha beta gamma")
+  assert_true(spaced.find("alpha beta") is Some(_))
+  // A box in a line is a group of its own: the text goes on through it.
+  let boxed = text_of([@doc.Par(@doc.Seq(["a", @doc.Box("b"), "c d"]))])
+  inspect(boxed.text(), content="abc d")
+  inspect(
+    origins_of(boxed.feedback(boxed.find("abc").unwrap(), "")),
+    content="Seq: a … c [a/c] | Box: b [b]",
+  )
+  // Text in a group that draws nothing (a scale of zero) is no text of
+  // the page.
+  let scaled = text_of([
+    @doc.Par(
+      @doc.Seq(["before ", @doc.Scale("hidden", x=Pct(0), y=Pct(100)), " after"]),
+    ),
+  ])
+  inspect(scaled.text(), content="before after")
+  // Many occurrences of a long needle's start: the search is linear.
+  let repeated = text_of([@doc.Par("ab ".repeat(300) + "ac")])
+  let needle = "ab ".repeat(200) + "ac"
+  guard repeated.find(needle) is Some(found) else { fail("not found") }
+  inspect(repeated.selected_text(found).length(), content="602")
+  assert_true(repeated.find("ab ".repeat(301)) is None)
+}
+
+///|
+test "select: beyond 65,535 bytes of a text item the words keep their origins" {
+  // Two strings in one line: one text item of 80,000 bytes. Glyph ranges
+  // are stored in 16 bits, so the end of the second string has no known
+  // text; its glyphs still have their span.
+  let report = @doc.Document([
+    @doc.SetPage(width=Pt(50000), height=Pt(40), margin=@doc.Sides(all=Pt(5))),
+    @doc.SetText(size=Pt(1), hyphenate=false),
+    @doc.Par(
+      @doc.Seq([
+        @doc.Keyed("A", "a".repeat(40000)),
+        @doc.Keyed("B", "b".repeat(40000)),
+      ]),
+    ),
+  ]).compile_paged(@doc.DocWorld::in_memory())
+  let text = report.review_text()
+  assert_eq(text.length(), 3)
+  let all = text.feedback(text.range(0, 2).unwrap(), "")
+  assert_eq(all.origins.map(o => o.origin.keys), [["A"], ["B"]])
+  assert_eq(all.origins[0].rendered.length(), 40000)
+  // The known part of the second string touches the first; the rest is a
+  // word without a known text.
+  assert_eq(all.origins[1].pieces.length(), 1)
+  assert_true(all.origins[1].rendered.has_prefix("bbbb"))
+  assert_true(all.origins[1].rendered.has_suffix("b …"))
+  assert_eq(all.origins[1].rendered.length(), 65535 - 40000 + 2)
+  assert_eq(
+    text.feedback(text.range(2, 2).unwrap(), "").origins[0].origin.keys,
+    ["B"],
+  )
 }

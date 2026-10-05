@@ -24,9 +24,10 @@ priv struct Word {
 }
 
 ///|
-/// Whether a character is white space between words.
+/// Whether a character is white space between words (Unicode's
+/// `White_Space`: also a thin or a no-break space).
 fn is_blank(c : Char) -> Bool {
-  c == ' ' || c == '\t' || c == '\n' || c == '\r' || c == '\u{3000}'
+  @unicode.is_whitespace(c)
 }
 
 ///|
@@ -63,18 +64,34 @@ fn OriginTable::item_words(
       Err(_) => Option::None
     }
   }
-  // Parts of words: (first byte, end byte as character indices, origin,
-  // piece, glyphs).
+  // Parts of words: (first and end character, origin, piece, glyphs).
   let parts : Array[(Int, Int, Int, Int, Array[Int])] = []
   let mut open = false
-  let mut valid = true
   for g, glyph in glyphs {
     let (from, to) = glyph.range()
     guard char_at(from) is Some(a) && char_at(to) is Some(b) && a < b else {
-      // The ranges of a very long item are not reliable (they are stored
-      // in 16 bits): the item is one word.
-      valid = false
-      break
+      // The range says nothing: ranges are stored in 16 bits, so beyond
+      // 65,535 bytes of an item they all end there. The glyph still has
+      // its span: glyphs like this that follow each other and belong to
+      // one piece are a word whose text is not known (`…`), after the
+      // words of the item.
+      guard self.id(glyph.span) is Some(origin) else {
+        open = false
+        continue
+      }
+      let piece = self.piece(glyph.span)
+      if open &&
+        parts.last() is Some((first, _, last_origin, last_piece, list)) &&
+        first >= chars.length() &&
+        last_origin == origin &&
+        last_piece == piece {
+        list.push(g)
+      } else {
+        let at = chars.length() + parts.length()
+        parts.push((at, at, origin, piece, [g]))
+      }
+      open = true
+      continue
     }
     let mut blank = true
     for c in chars[a:b] {
@@ -87,6 +104,7 @@ fn OriginTable::item_words(
     let piece = self.piece(glyph.span)
     if open &&
       parts.last() is Some((first, end, last_origin, last_piece, list)) &&
+      first < chars.length() &&
       last_origin == origin &&
       last_piece == piece &&
       (a == end || b == first || (a >= first && b <= end)) {
@@ -113,29 +131,6 @@ fn OriginTable::item_words(
     }
     open = true
   }
-  if !valid {
-    // One word with the whole text, for the origin of the first glyph
-    // that has one.
-    let whole = text.text.trim().to_owned()
-    for glyph in glyphs {
-      guard whole != "" && self.id(glyph.span) is Some(origin) else { continue }
-      let number = self.words.length()
-      self.words.push({
-        page: self.page,
-        text: whole,
-        space: true,
-        origin,
-        piece: self.piece(glyph.span),
-      })
-      for g, glyph in glyphs {
-        if self.id(glyph.span) is Some(_) {
-          word_of[g] = number
-        }
-      }
-      break
-    }
-    return word_of
-  }
   // Reading order: by the place in the item's text.
   parts.sort_by((x, y) => x.0.compare(y.0))
   let mut before = -1
@@ -144,7 +139,11 @@ fn OriginTable::item_words(
     let number = self.words.length()
     self.words.push({
       page: self.page,
-      text: String::from_array(chars[first:end].to_owned()),
+      text: if first < chars.length() {
+        String::from_array(chars[first:end].to_owned())
+      } else {
+        "…"
+      },
       space: if before < 0 {
         apart
       } else {
@@ -266,24 +265,48 @@ pub fn ReviewText::find(
       word_at.push(i)
     }
   }
-  let mut seen = 0
-  for at in 0..<(stream.length() - wanted.length() + 1) {
-    guard stream[at:at + wanted.length()] == wanted[:] else { continue }
-    if seen == nth {
-      let mut from = -1
-      let mut to = -1
-      for k in at..<(at + wanted.length()) {
-        if word_at[k] >= 0 {
-          if from < 0 {
-            from = word_at[k]
-          }
-          to = word_at[k]
-        }
-      }
-      guard from >= 0 else { return None }
-      return Some({ from, to, })
+  // The occurrences, by Knuth, Morris and Pratt: `fail[k]` is the length
+  // of the longest proper prefix of the needle's first `k + 1` characters
+  // that is also their suffix. The work is linear in the text.
+  let fail = Array::make(wanted.length(), 0)
+  let mut k = 0
+  for i in 1..<wanted.length() {
+    while k > 0 && wanted[i] != wanted[k] {
+      k = fail[k - 1]
     }
-    seen += 1
+    if wanted[i] == wanted[k] {
+      k += 1
+    }
+    fail[i] = k
+  }
+  let mut seen = 0
+  k = 0
+  for i, c in stream {
+    while k > 0 && c != wanted[k] {
+      k = fail[k - 1]
+    }
+    if c == wanted[k] {
+      k += 1
+    }
+    guard k == wanted.length() else { continue }
+    k = fail[k - 1]
+    if seen < nth {
+      seen += 1
+      continue
+    }
+    // The words that the occurrence touches.
+    let mut from = -1
+    let mut to = -1
+    for j in (i + 1 - wanted.length())..<(i + 1) {
+      if word_at[j] >= 0 {
+        if from < 0 {
+          from = word_at[j]
+        }
+        to = word_at[j]
+      }
+    }
+    guard from >= 0 else { return None }
+    return Some({ from, to, })
   }
   None
 }

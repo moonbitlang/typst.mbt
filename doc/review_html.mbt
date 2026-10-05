@@ -221,15 +221,19 @@ fn OriginTable::json(self : OriginTable) -> Json {
 /// of its origin (`data-o`); the box of a word also has the number of the
 /// word (`data-i`). Text without an origin, and shapes and images without
 /// one, are left out, so that the pointer reaches what is under them, as
-/// in `origin_at`; so are links.
+/// in `origin_at`; so are links, and groups that draw nothing.
+///
+/// `start` is where the text before the frame ended, if text can go on
+/// from there (the end of the pen and the baseline of the text item
+/// before it, in the frame's coordinates); the result is the same for
+/// what follows the frame.
 fn OriginTable::layer(
   self : OriginTable,
   frame : @library.Frame,
   out : StringBuilder,
-) -> Unit {
-  // The text item before the current item, if the text can go on after
-  // it: where its pen ends, and its baseline.
-  let mut before : (Double, Double)? = Option::None
+  start : (Double, Double)?,
+) -> (Double, Double)? {
+  let mut before = start
   for entry in frame.items() {
     let (pos, item) = entry
     let x = pos.x.to_pt()
@@ -240,6 +244,14 @@ fn OriginTable::layer(
     }
     match item {
       Group(group) => {
+        // A group whose transform has no inverse draws nothing (a scale of
+        // zero): the click search skips it, and its text is no text of
+        // the page.
+        let ts = group.transform
+        guard (ts.sx.get() * ts.sy.get() - ts.kx.get() * ts.ky.get()).abs() >=
+          1.0e-12 else {
+          continue
+        }
         // The clip applies at the group's position, before its transform
         // (the click search tests it there).
         out.write_string(
@@ -253,11 +265,23 @@ fn OriginTable::layer(
           )
         }
         // (The coefficients are not rounded: nested scales multiply.)
-        let ts = group.transform
         out.write_string(
           "><g transform=\"matrix(\{ts.sx.get()} \{ts.ky.get()} \{ts.kx.get()} \{ts.sy.get()} \{ts.tx.to_pt()} \{ts.ty.to_pt()})\">",
         )
-        self.layer(group.frame, out)
+        // Text goes on through a group that only places its content (a
+        // box in a line).
+        if ts.is_identity() {
+          let inner = match previous {
+            Some((px, py)) => Some((px - x, py - y))
+            None => Option::None
+          }
+          before = match self.layer(group.frame, out, inner) {
+            Some((px, py)) => Some((px + x, py + y))
+            None => Option::None
+          }
+        } else {
+          self.layer(group.frame, out, Option::None) |> ignore
+        }
         out.write_string("</g></g>")
       }
       Text(text) => {
@@ -377,6 +401,7 @@ fn OriginTable::layer(
       _ => ()
     }
   }
+  before
 }
 
 ///|
@@ -411,7 +436,7 @@ fn[T] CompileReport::review_layers(
     .mapi((i, page) => {
       let out = StringBuilder()
       table.page = i + 1
-      table.layer(page.frame, out)
+      table.layer(page.frame, out, Option::None) |> ignore
       out.to_string()
     })
   (table, layers)
