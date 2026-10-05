@@ -4,3 +4,7 @@ import {
   "moonbitlang/typst/library",
   "moonbitlang/typst/unicode",
 }
+
+import {
+  "moonbitlang/typst/doc",
+} for "test"
