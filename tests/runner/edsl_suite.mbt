@@ -452,6 +452,7 @@ fn run_edsl_suite(filter : String?, verbose : Bool) -> Unit {
     println(
       "edsl-suite: no converted cases; run scripts/edsl_convert.sh first (docs/edsl-convert.md, section 8)",
     )
+    @sys.exit(1)
     return
   }
   let results = StringBuilder()
@@ -507,5 +508,9 @@ fn run_edsl_suite(filter : String?, verbose : Bool) -> Unit {
   println(
     "edsl-suite: \{passed} passed, \{failed} failed" +
     (if missing > 0 { ", \{missing} not converted" } else { "" }),
-  )
+  ) // A selected case without a builder is a failure of the conversion
+  // (the registry must cover the enumeration, section 8).
+  if failed > 0 || missing > 0 {
+    @sys.exit(1)
+  }
 }

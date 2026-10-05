@@ -390,11 +390,14 @@ fn Lower::args(
     let key = if entry >= 0 && arg.param >= 0 { arg.param } else { -1 }
     let used = uses.get(key).unwrap_or(0)
     uses[key] = used + 1
+    // The k-th argument of a location gets the sub-range that starts
+    // `k % 16` bytes after its start and ends `k / 16` bytes before its
+    // end: distinct for every k while it stays inside the first 16 bytes
+    // (the text before the next token of the listing line) and non-empty.
     let arg_span = match base.get() {
-      // (Only the first few: the sub-range must stay inside the text
-      // before the next token of the listing line.)
-      Range(id~, start~, end~) if used > 0 && used < 16 && start + used < end =>
-        @syntax.Span::from_range(id, start + used, end)
+      Range(id~, start~, end~) if used > 0 &&
+        start + used % 16 < end - used / 16 =>
+        @syntax.Span::from_range(id, start + used % 16, end - used / 16)
       _ => base
     }
     if arg.name is Some(name) {

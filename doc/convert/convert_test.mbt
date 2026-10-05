@@ -205,7 +205,6 @@ test "calls that are not typed" {
     tr("#rect(width: 2 * 5pt)"),
     content=(
       #|T2: Rect(extra=[("width", Value::mul(Value::int(2), Value::length(Pt(5.0))))])
-
     ),
   )
   inspect(
@@ -440,7 +439,6 @@ test "typed values: paints and strokes" {
     tr("#line(stroke: (1pt + 1em) + red)"),
     content=(
       #|T2: Line(extra=[("stroke", Value::add(Value::add(Value::length(Pt(1.0)), Value::length(Em(1.0))), Value::global("red")))])
-
     ),
   )
 }
@@ -470,7 +468,6 @@ test "typed values: sides, corners and cells" {
     tr("#block(inset: (x: 1pt + 2pt))[a]"),
     content=(
       #|T2: Block(Seq([Lit("a")]), extra=[("inset", Value::dict([("x", Value::add(Value::length(Pt(1.0)), Value::length(Pt(2.0))))]))])
-
     ),
   )
   // A dictionary of stroke fields stays one.
@@ -502,7 +499,6 @@ test "typed values: constants, strings and supplements" {
     tr("#align(top + (center + bottom))[a]"),
     content=(
       #|T2: Call("align", positional=[Value::add(Value::global("top"), Value::add(Value::global("center"), Value::global("bottom"))), Value::content(Seq([Lit("a")]))])
-
     ),
   )
   inspect(
@@ -612,7 +608,6 @@ test "value forms" {
     tr("#metadata(1 + 2)"),
     content=(
       #|T2: Metadata(Value::add(Value::int(1), Value::int(2)))
-
     ),
   )
   inspect(
@@ -911,7 +906,6 @@ test "show rules: value transformations" {
     tr("#show: columns.with(2)"),
     content=(
       #|T2: ShowWith::all(Value::call("function.with", positional=[Value::global("columns"), Value::int(2)]))
-
     ),
   )
   inspect(
@@ -924,6 +918,43 @@ test "show rules: value transformations" {
     tr("#show: it => [a #it]"),
     content=(
       #|T3: Markup("#show: it => [a #it]")
+    ),
+  )
+}
+
+///|
+test "final review: local bindings, variable names, strings in prose" {
+  // A name that the expression binds itself may hold a label: the stream
+  // is the fragment, not the expression.
+  inspect(
+    tr("#heading[H] #{ let x = <target>; x }"),
+    content=(
+      #|T3: Markup("#heading[H] #{ let x = <target>; x }")
+    ),
+  )
+  // An expression without bindings of its own stays an item.
+  inspect(
+    tr("#heading[H] #for i in range(2) [a]"),
+    content=(
+      #|T3: Heading(Seq([Lit("H")])), Space(), Markup("#for i in range(2) [a]")
+    ),
+  )
+  // Every emitted identifier is reserved.
+  inspect(
+    tr("#let a-b = 1;#let a_b = 2;#let a_b_2 = 3;#a_b"),
+    content=(
+      #|T2: let v_a_b : Int64 = 1
+      #|let v_a_b_2 : Int64 = 2
+      #|let v_a_b_2_2 : Int64 = 3
+      #|Document([Seq([]), Seq([]), Seq([]), Keyed("1", Value::int(v_a_b_2))])
+    ),
+  )
+  // The readable mode: a string is a text of its own.
+  let prose = @convert.translate("a#\"b\"c", "main.typ", library, prose=true)
+  inspect(
+    prose.body,
+    content=(
+      #|Document([Prose("a\{Content("b")}c")])
     ),
   )
 }

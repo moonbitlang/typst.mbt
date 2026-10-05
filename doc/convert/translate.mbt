@@ -254,16 +254,16 @@ fn is_statement(expr : @ast.Expr) -> Bool {
 /// A fresh MoonBit variable for the Typst name `name`.
 fn Tr::variable(self : Tr, name : String) -> String {
   let base = "v_" + name.replace_all(old="-", new="_")
-  match self.names.get(base) {
-    None => {
-      self.names[base] = 1
-      base
-    }
-    Some(count) => {
-      self.names[base] = count + 1
-      "\{base}_\{count + 1}"
-    }
+  // Every emitted identifier is reserved: `a-b`, `a_b` and `a_b_2` must
+  // not share one.
+  let mut candidate = base
+  let mut count = 1
+  while self.names.contains(candidate) {
+    count += 1
+    candidate = "\{base}_\{count}"
   }
+  self.names[candidate] = 1
+  candidate
 }
 
 ///|
@@ -375,6 +375,10 @@ fn Tr::prose_text(self : Tr, ops : Array[Op], lets : Array[String]) -> String? {
       Gap(newline) => text.write_string(if newline { "\\n" } else { " " })
       Break => text.write_string("\\n\\n")
       Quote(double) => text.write_string(if double { "\\\"" } else { "'" })
+      // A string (a literal or a translated variable) is a text of its own:
+      // interpolated bare it would join the words around it.
+      Push(code) if code.code.has_prefix("\"") || code.code.has_prefix("v_") =>
+        text.write_string("\\{Content(" + code.code + ")}")
       Push(code) =>
         if code.code.length() <= 48 &&
           !code.code.contains("\\") &&

@@ -169,6 +169,59 @@ fn Tr::call_not_label(self : Tr, call : @ast.FuncCall, env : Env) -> Bool {
 /// label (section 6.1): only then may it be a fragment of its own, since
 /// the evaluator attaches a label result to the content before it.
 fn Tr::not_label(self : Tr, expr : @ast.Expr, env : Env) -> Bool {
+  // The names the expression binds itself (`let`, loop and closure
+  // parameters, imports) may hold anything, a label included: they are
+  // neither globals nor translated variables.
+  let locals : Map[String, Unit] = Map([])
+  if !bound_names(expr.to_untyped(), locals) {
+    // A wildcard import: any name may be bound.
+    return false
+  }
+  self.not_label_in(expr, env, locals)
+}
+
+///|
+/// Collect the names that are bound below a node. `false`: a wildcard
+/// import binds names that are not known.
+fn bound_names(node : @syntax.SyntaxNode, out : Map[String, Unit]) -> Bool {
+  match @ast.Expr::from_untyped(node) {
+    Some(LetBinding(binding)) =>
+      for ident in binding.kind().bindings() {
+        out[ident.get()] = ()
+      }
+    Some(ForLoop(loop_)) =>
+      for ident in loop_.pattern().bindings() {
+        out[ident.get()] = ()
+      }
+    Some(Closure(closure)) =>
+      // Parameters: every identifier of the parameter list.
+      idents_of(closure.params().to_untyped(), out)
+    Some(DestructAssignment(assign)) =>
+      for ident in assign.pattern().bindings() {
+        out[ident.get()] = ()
+      }
+    Some(ModuleImport(import_)) =>
+      match import_.imports() {
+        Some(Wildcard) => return false
+        _ => idents_of(node, out)
+      }
+    _ => ()
+  }
+  for child in node.children() {
+    if !bound_names(child, out) {
+      return false
+    }
+  }
+  true
+}
+
+///|
+fn Tr::not_label_in(
+  self : Tr,
+  expr : @ast.Expr,
+  env : Env,
+  locals : Map[String, Unit],
+) -> Bool {
   match expr {
     Label(_) => false
     None(_)
@@ -190,32 +243,52 @@ fn Tr::not_label(self : Tr, expr : @ast.Expr, env : Env) -> Bool {
         Assign | AddAssign | SubAssign | MulAssign | DivAssign => false
         // `none + <x>` is the label.
         Add =>
-          self.not_label(binary.lhs(), env) && self.not_label(binary.rhs(), env)
+          self.not_label_in(binary.lhs(), env, locals) &&
+          self.not_label_in(binary.rhs(), env, locals)
         _ => true
       }
-    Parenthesized(p) => self.not_label(p.expr(), env)
+    Parenthesized(p) => self.not_label_in(p.expr(), env, locals)
+    // A translated variable is a literal; a global of the library is no
+    // label. A name that the expression binds itself, or that does not
+    // exist, is neither.
     Ident(ident) =>
-      // A translated variable is a literal; an unbound name is a global.
-      env.vars.contains(ident.get()) || self.global_path(expr, env) is Some(_)
-    FieldAccess(_) => self.global_path(expr, env) is Some(_)
-    FuncCall(call) => self.call_not_label(call, env)
+      !locals.contains(ident.get()) &&
+      (env.vars.contains(ident.get()) || self.lookup(ident.get()) is Some(_))
+    FieldAccess(_) =>
+      !rooted_in(expr, locals) &&
+      (match self.global_path(expr, env) {
+        Some(path) => self.lookup(path) is Some(_)
+        None => false
+      })
+    FuncCall(call) =>
+      !rooted_in(call.callee(), locals) && self.call_not_label(call, env)
     Conditional(cond) =>
-      self.not_label(cond.if_body(), env) &&
+      self.not_label_in(cond.if_body(), env, locals) &&
       (match cond.else_body() {
-        Some(body) => self.not_label(body, env)
+        Some(body) => self.not_label_in(body, env, locals)
         None => true
       })
-    ForLoop(loop_) => self.not_label(loop_.body(), env)
-    WhileLoop(loop_) => self.not_label(loop_.body(), env)
+    ForLoop(loop_) => self.not_label_in(loop_.body(), env, locals)
+    WhileLoop(loop_) => self.not_label_in(loop_.body(), env, locals)
     CodeBlock(block) => {
       for statement in block.body().exprs() {
-        if !(is_statement(statement) || self.not_label(statement, env)) {
+        if !(is_statement(statement) ||
+          self.not_label_in(statement, env, locals)) {
           return false
         }
       }
       true
     }
     _ => false
+  }
+}
+
+///|
+/// Whether the root identifier of an access path is one of `locals`.
+fn rooted_in(expr : @ast.Expr, locals : Map[String, Unit]) -> Bool {
+  match root_ident(expr) {
+    Some(name) => locals.contains(name)
+    None => false
   }
 }
 

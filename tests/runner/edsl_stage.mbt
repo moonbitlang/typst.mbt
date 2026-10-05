@@ -176,7 +176,12 @@ fn StructDumper::value(self : StructDumper, value : @library.Value) -> String {
       for key, v in d.map {
         pairs.push("\{key}: \{self.value(v)}")
       }
-      "(" + pairs.join(", ") + ")"
+      // `(:)` is not `()`, the empty array.
+      if pairs.is_empty() {
+        "(:)"
+      } else {
+        "(" + pairs.join(", ") + ")"
+      }
     }
     Styles(styles) => "styles(\{self.styles(styles)})"
     Func(f) => f.repr()

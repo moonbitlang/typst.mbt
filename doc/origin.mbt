@@ -283,8 +283,8 @@ fn Registry::locate(self : Registry, span : @syntax.Span) -> (Int, Int)? {
   guard start <= e.end else { return None }
   for i, arg in e.args {
     // The token, or a sub-range of it (arguments that share a token get
-    // sub-ranges that end with it, `Lower::args`).
-    if arg is Some((_, s, t)) && s <= start && start < t && t == end {
+    // sub-ranges of it, `Lower::args`).
+    if arg is Some((_, s, t)) && s <= start && start < end && end <= t {
       return Some((lo - 1, i))
     }
   }
@@ -618,7 +618,7 @@ pub fn Origins::resolve_range(
         let e = self.entries[entry]
         let mut param : Int? = Option::None
         for i, arg in e.args {
-          if arg is Some((_, s, t)) && s <= start && start < t && t == end {
+          if arg is Some((_, s, t)) && s <= start && start < end && end <= t {
             param = Some(i)
             break
           }
