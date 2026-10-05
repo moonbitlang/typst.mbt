@@ -158,6 +158,11 @@ fn StructDumper::content(
   let fields = []
   for info in elem.fields() {
     if content.field_raw(info.id) is Some(value) {
+      if @library.RawElem::of(content) is Some(raw) &&
+        info.id == @library.raw_elem_text {
+        fields.push("\{info.name}: \{raw_text_dump(raw)}")
+        continue
+      }
       fields.push("\{info.name}: \{self.value(value)}")
     }
   }
@@ -166,6 +171,21 @@ fn StructDumper::content(
     _ => ""
   }
   "\{self.elem(elem)}(\{fields.join(", ")})" + location + label
+}
+
+///|
+/// The text of a raw element: the lines of raw syntax (the evaluator's
+/// `RawContent::Lines`), or the string of the `raw` function
+/// (`RawContent::Text`), which highlighting splits at newlines. Both are
+/// encoded as the lines that highlighting sees: the two forms are equal
+/// when they have the same lines, and a raw without lines (` `` `) differs
+/// from `raw("")`, which has one empty line.
+fn raw_text_dump(raw : @library.RawElem) -> String {
+  let lines = match raw.text() {
+    Lines(lines) => lines.map(line => line.0)
+    Text(text) => @syntax.split_newlines(text)
+  }
+  "lines(" + lines.map(line => @library.repr_str(line)).join(", ") + ")"
 }
 
 ///|

@@ -968,3 +968,54 @@ test "final review 3: a show closure with a return of its own is not wrapped" {
     ),
   )
 }
+
+///|
+test "raw: a literal with an empty text is not typed" {
+  // Section 4.8: the evaluator's raw has the lines of the raw syntax,
+  // `Raw(text)` the lines of its string. A literal with text is exactly
+  // `Raw(text)`.
+  inspect(
+    tr("`a`"),
+    content=(
+      #|T1: Raw("a", block=false)
+    ),
+  )
+  inspect(
+    tr("```py\nx = 1\n  y\n```"),
+    content=(
+      #|T1: Raw("x = 1\n  y", block=true, lang="py")
+    ),
+  )
+  inspect(
+    tr("```\n\n\n```"),
+    content=(
+      #|T1: Raw("\n", block=true)
+    ),
+  )
+  // Without lines (`raw("")` has one), and with one empty line (unlike
+  // `raw("")`, it is not equal to a raw without lines).
+  inspect(
+    tr("``"),
+    content=(
+      #|T3: Markup("``")
+    ),
+  )
+  inspect(
+    tr("``` ```"),
+    content=(
+      #|T3: Markup("``` ```")
+    ),
+  )
+  inspect(
+    tr("```typ\n```"),
+    content=(
+      #|T3: Markup("```typ\n```")
+    ),
+  )
+  inspect(
+    tr("```\n\n```"),
+    content=(
+      #|T3: Markup("```\n\n```")
+    ),
+  )
+}

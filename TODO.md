@@ -159,6 +159,27 @@ goldens with `scripts/goldens.sh <stage>` (needs Rust; builds `oracle/`).
   only image `source`/`icc` use the companion so far — bibliography
   `sources`/`style`, cite `style`, raw `syntaxes`/`theme` and `pdf.attach`
   `path` still re-derive from the source (caches keyed by bytes).
+- [ ] Location keys (`prepare` in `realize/`: `hash128(elem)`, as upstream)
+  use the port's fingerprints (`library/value_hash.mbt`). They cover what
+  upstream's `Hash` covers for content, spans, styles and plain values
+  (`typst/oracle_wbtest.mbt` and the `K` numbering of the `paged` stage
+  check it), but are lossy for gradients (repr), tilings (repr and item
+  count; upstream hashes the frame), strokes and the other dynamic values
+  hashed by repr, and coarser for closures (the node's span and text and
+  the captured values, without the spans of the captured bindings). Two
+  located elements that are equal including their spans and differ only
+  in such a value share a key where upstream's differ, which measurement
+  observes (`Introspector::locator`): with
+  `#show <r>: it => context box(width: c.at(it.location()).first() * 10pt)`
+  and `(1.001pt, 1.002pt, 1.003pt).map(s => [#rect(stroke: s)<r>])` laid
+  out after one `c.step()` each, `measure` of the three items gives
+  10pt, 20pt, 30pt upstream and 10pt three times here; likewise for
+  gradients whose stops differ by 0.001% and for tilings of the same size
+  over squares of different colours (verified against the upstream
+  binary; closures with different captured values are distinct in both).
+  Memoization is protected by `mark_fingerprint_lossy`; keys are not. The
+  fix is exact fingerprints: `svg/hash.mbt` has upstream's byte streams
+  for colours and gradients; strokes and frames (for tilings) need them.
 - [ ] `Source` is edited in place (upstream: copy-on-write) — callers that
   need the old tree must `deep_clone`.
 - [ ] `sorted()` comparison order differs from upstream's glidesort, so the

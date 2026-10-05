@@ -128,15 +128,13 @@ fn eval_emph(
 
 ///|
 fn eval_raw(v : @ast.Raw) -> @library.Content {
-  let lines = v.lines().map(line => line.get()).collect()
-  let text = lines.join("\n")
-  let elem = @library.Content::new(@library.raw_elem(), [
-    (@library.raw_elem_text, Str(text)),
-  ]).with_field(@library.raw_elem_block, Bool(v.block()))
-  match v.lang() {
-    Some(lang) => elem.with_field(@library.raw_elem_lang, Str(lang.get()))
+  let lines = v.lines().map(line => (line.get(), line.span())).collect()
+  let elem = @library.RawElem::new(Lines(lines)).with_block(v.block())
+  let elem = match v.lang() {
+    Some(lang) => elem.with_lang(Some(lang.get()))
     None => elem
   }
+  elem.pack()
 }
 
 ///|

@@ -282,6 +282,19 @@ fn dyns_memo_equal(a : DynValue, b : DynValue) -> Bool {
       content_memo_equal(x.captured, y.captured)
     // Holds content compared loosely by `==`.
     (CellGrid(_), CellGrid(_)) => false
+    // `==` ignores the spans of the lines, which highlighting gives to the
+    // raw lines.
+    (RawContent(Lines(x)), RawContent(Lines(y))) => {
+      if x.length() != y.length() {
+        return false
+      }
+      for i in 0..<x.length() {
+        if x[i].0 != y[i].0 || x[i].1 != y[i].1 {
+          return false
+        }
+      }
+      true
+    }
     _ => a == b
   }
 }
