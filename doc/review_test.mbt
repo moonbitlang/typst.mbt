@@ -1,7 +1,7 @@
-// Tests of click to source (docs/edsl-review.md, slice 1): the click
-// search (the cases of upstream's `typst-ide/src/jump.rs` that need no
-// Typst source) and the preview page. The showcase is tested in
-// `doc/examples/review`.
+// Tests of the review loop (docs/edsl-review.md): the click search of
+// slice 1 (the cases of upstream's `typst-ide/src/jump.rs` that need no
+// Typst source), the words, selections and feedback records of slice 2,
+// and the preview page. The showcase is tested in `doc/examples/review`.
 
 ///|
 /// A page like upstream's test page: 120pt wide, 10pt margins.
@@ -362,18 +362,26 @@ test "the preview page is self-contained and carries the origin of every piece" 
   // rectangle and the stroked line.
   assert_true(html.contains("<div class=\"art\" inert><svg"))
   assert_true(html.contains("</svg></div>\n<svg class=\"hit\" data-page=\"1\""))
-  assert_true(html.contains("<rect data-o=\"0\""))
+  assert_true(html.contains("<rect data-o=\"0\" data-i=\"0\""))
   assert_true(html.contains("clip-path=\"url(#rv-clip-0)\""))
   assert_true(html.contains("pointer-events=\"fill\""))
   assert_true(html.contains("pointer-events=\"stroke\" stroke-width=\"2\""))
-  // The table of origins: one entry per call or argument, in the order of
-  // first use; text of the document does not end the data element.
+  // The data: the words in reading order, the library's answers for the
+  // self-test, and the table of origins (one entry per call or argument,
+  // in the order of first use). Text of the document does not end the
+  // data element.
   assert_true(
-    html.contains("<script type=\"application/json\" id=\"review-origins\">[{"),
+    html.contains(
+      "<script type=\"application/json\" id=\"review-data\">{\"title\":\"Test \\u003cpage>\",\"words\":[[1,\"A\",1,0,0],[1,\"\\u003cheading>\",1,0,0],",
+    ),
   )
-  assert_true(
-    html.contains("<script type=\"application/json\" id=\"review-probes\">[[1,"),
-  )
+  assert_true(html.contains("\"probes\":[[1,"))
+  assert_true(html.contains("\"samples\":[[0,0,{\"format\":"))
+  // The panel takes a comment and gives the record to copy.
+  for
+    id in ["comment", "copy", "copy-json", "add", "output", "list", "copy-all"] {
+    assert_true(html.contains(" id=\"\{id}\""))
+  }
   assert_true(html.contains("\"kind\":\"Heading\""))
   assert_true(html.contains("\"kind\":\"Emph\""))
   assert_true(html.contains("\"file\":\"doc/review_test.mbt\""))
@@ -417,8 +425,8 @@ test "the preview page is self-contained and carries the origin of every piece" 
     @doc.Par(@doc.Keyed("</script><script>alert(1)</script>\u{2028}", "keyed")),
   ])
   let html = hostile.review_html(title="</title><script>").unwrap()
-  assert_eq(html.split("</script>").collect().length(), 4)
-  assert_eq(html.split("<script").collect().length(), 4)
+  assert_eq(html.split("</script>").collect().length(), 3)
+  assert_eq(html.split("<script").collect().length(), 3)
   assert_true(html.contains("\\u003c/script>\\u003cscript>alert(1)"))
   assert_true(
     html.contains("<title>&lt;/title&gt;&lt;script&gt; review</title>"),
@@ -428,4 +436,203 @@ test "the preview page is self-contained and carries the origin of every piece" 
   )
   assert_true(failed.review_html().output() is None)
   assert_true(failed.origin_at(1, 10.0, 10.0) is None)
+}
+
+///|
+/// The text of a document compiled on the test page.
+fn text_of(children : Array[&@doc.IntoContent]) -> @doc.ReviewText raise {
+  compile_on_page(children).review_text(title="Test")
+}
+
+///|
+/// The origins of a feedback record as `Constructor: rendered [pieces]`.
+fn origins_of(feedback : @doc.Feedback) -> String {
+  feedback.origins
+  .map(o => "\{o.origin.kind}: \{o.rendered} [\{o.pieces.join("/")}]")
+  .join(" | ")
+}
+
+///|
+test "select: words in reading order, and a word of two origins" {
+  let text = text_of([
+    @doc.Par(@doc.Seq(["alpha beta ", @doc.Emph("gam"), "ma delta"])),
+    @doc.Par("second paragraph"),
+  ])
+  inspect(text.text(), content="alpha beta gamma delta second paragraph")
+  assert_eq(text.length(), 7)
+  // A written word whose style changes inside it is two words that
+  // touch: selected together they read as one, and each has its origin.
+  let gamma = text.find("gamma").unwrap()
+  inspect(text.selected_text(gamma), content="gamma")
+  inspect(
+    origins_of(text.feedback(gamma, "")),
+    content=(
+      #|Emph: gam [gam] | Seq: ma [ma]
+    ),
+  )
+  // The origins of a selection, each once, in reading order. The two
+  // strings of the array are two pieces of one argument; the text of
+  // another origin between them is a gap.
+  let more = text.find("beta gamma   delta").unwrap()
+  inspect(text.selected_text(more), content="beta gamma delta")
+  let feedback = text.feedback(more, "shorter")
+  inspect(
+    origins_of(feedback),
+    content=(
+      #|Seq: beta … ma delta [beta/ma delta] | Emph: gam [gam]
+    ),
+  )
+  assert_eq(feedback.origins[0].origin.param, Some(0))
+  assert_eq(feedback.pages, [1])
+  // A part of a word selects the word; the occurrences are counted.
+  inspect(text.selected_text(text.find("econ").unwrap()), content="second")
+  inspect(text.selected_text(text.find("a", nth=2).unwrap()), content="beta")
+  assert_true(text.find("delta alpha") is None)
+  assert_true(text.find("") is None)
+  assert_true(text.find("   ") is None)
+  assert_true(text.find("alpha", nth=1) is None)
+  // Ranges of words, in either order.
+  inspect(
+    text.selected_text(text.range(5, 1).unwrap()),
+    content="beta gamma delta second",
+  )
+  assert_true(text.range(0, 7) is None)
+  assert_true(text.range(-1, 2) is None)
+  // A document without text.
+  let empty = text_of([@doc.Rect(width=Pt(20), height=Pt(20), fill=Black)])
+  assert_eq(empty.length(), 0)
+  inspect(empty.text(), content="")
+  assert_true(empty.find("a") is None)
+}
+
+///|
+test "select: the runs of a prose and the strings of an array are pieces of one origin" {
+  let text = text_of([
+    @doc.Prose("One two \{@doc.Emph("three")} four, \"five\"."),
+    @doc.List(["first item", "second item"]),
+    @doc.Par(@doc.Keyed("row 7", "keyed words")),
+  ])
+  // The marker of the list has no source: it is no word.
+  inspect(
+    text.text(),
+    content="One two three four, “five”. first item second item keyed words",
+  )
+  let prose = text.feedback(text.find("One two three four").unwrap(), "")
+  inspect(
+    origins_of(prose),
+    content=(
+      #|Prose: One two … four, [One/two/four,] | Emph: three [three]
+    ),
+  )
+  // Each string of the array is one piece, whatever is selected of it.
+  let list = text.feedback(text.find("item second").unwrap(), "")
+  inspect(
+    origins_of(list),
+    content=(
+      #|List: item second [item/second]
+    ),
+  )
+  let whole = text.feedback(text.find("first item").unwrap(), "")
+  inspect(
+    origins_of(whole),
+    content=(
+      #|List: first item [first item]
+    ),
+  )
+  // The data key of a `Keyed` wrapper is part of the origin.
+  let keyed = text.feedback(text.find("keyed").unwrap(), "")
+  assert_eq(keyed.origins[0].origin.keys, ["row 7"])
+  assert_true(
+    keyed.to_text().contains(", Par(..), parameter 1, data key \"row 7\"\n"),
+  )
+}
+
+///|
+test "feedback: the text block and the JSON record" {
+  let report = compile_on_page([
+    @doc.Heading("The \"title\""),
+    @doc.Prose("Some words of prose."),
+    @doc.Rect(width=Pt(20), height=Pt(20), fill=Black),
+  ])
+  let text = report.review_text(title="Test")
+  let feedback = text.feedback(
+    text.find("title\" Some words").unwrap(),
+    "Too vague.",
+  )
+  let line = feedback.origins[0].origin.start_line
+  inspect(
+    feedback
+    .to_text()
+    .replace_all(old="\{line + 1}:", new="M:")
+    .replace_all(old="\{line}:", new="L:"),
+    content=(
+      #|Review comment on "Test" (a document rendered from MoonBit source by typst.mbt)
+      #|Comment: Too vague.
+      #|Selected text: "\"title\" Some words" (page 1)
+      #|Source 1 of 2: doc/review_test.mbt:L:18-L:33, Heading(..), parameter 1
+      #|  rendered: "\"title\""
+      #|Source 2 of 2: doc/review_test.mbt:M:16-M:38, Prose(..), parameter 1
+      #|  rendered: "Some words"
+      #|  2 pieces of this argument are selected; they share this location, which is the argument as a whole.
+      #|Locations are constructor calls and their arguments in the MoonBit source (line:column, columns in code points), not positions inside a string.
+      #|
+    ),
+  )
+  let json = feedback.to_json().stringify()
+  assert_true(
+    json.has_prefix(
+      "{\"format\":\"typst.mbt review feedback 1\",\"document\":\"Test\",\"comment\":\"Too vague.\",\"selected_text\":\"\\\"title\\\" Some words\",\"pages\":[1],\"origins\":[{\"file\":\"doc/review_test.mbt\",\"module\":\"moonbitlang/typst\",\"constructor\":\"Heading\",\"parameter\":1,\"start\":[\{line},18],\"end\":[\{line},33],\"rendered_text\":\"\\\"title\\\"\",\"pieces\":[\"\\\"title\\\"\"]},",
+    ),
+  )
+  assert_true(
+    json.has_suffix(
+      "\"rendered_text\":\"Some words\",\"pieces\":[\"Some\",\"words\"]}]}",
+    ),
+  )
+  // A shape: its origin from a click, without text.
+  guard report.origin_at(1, 20.0, 60.0) is Some(origin) else {
+    fail("the rectangle is not hit")
+  }
+  let shape = text.origin_feedback(origin, 1, "")
+  assert_eq(shape.selected_text, "")
+  let block = shape.to_text()
+  assert_true(
+    block.contains("Comment: (none)\nSelected: a shape or an image (page 1)\n"),
+  )
+  assert_true(block.contains(", Rect(..)\n"))
+  assert_true(!block.contains("rendered:"))
+  assert_true(
+    shape.to_json().stringify().contains("\"rendered_text\":\"\",\"pieces\":[]"),
+  )
+  // A long selection is shortened in the text, not in the record.
+  let long = text_of([@doc.Par("word ".repeat(100))])
+  let all = long.feedback(long.range(0, 99).unwrap(), "")
+  assert_eq(all.selected_text.length(), 499)
+  assert_true(all.to_text().contains("word word …\" (pages 1, 2"))
+  // A failed compilation has no text.
+  let failed = @doc.Document([@doc.Image("missing.png")]).compile_paged(
+    @doc.DocWorld::in_memory(),
+  )
+  try failed.review_text() catch {
+    _ => ()
+  } noraise {
+    _ => fail("a failed compilation has a text")
+  }
+}
+
+///|
+test "select: a word that is hyphenated at a line break is read as one" {
+  let written = "an extraordinarily incomprehensible internationalization"
+  let text = text_of([@doc.SetText(hyphenate=true), @doc.Par(written)])
+  // The word is in two text items with the engine's hyphen between them:
+  // two words that touch, and no hyphen in the text.
+  assert_true(text.length() > 4)
+  inspect(text.text(), content=written)
+  let word = text.find("incomprehensible").unwrap()
+  inspect(text.selected_text(word), content="incomprehensible")
+  // The hyphen's box has an origin (a click finds it) and no word.
+  let html = compile_on_page([@doc.SetText(hyphenate=true), @doc.Par(written)])
+    .review_html()
+    .unwrap()
+  assert_true(html.contains("\" data-g=\"\" x="))
 }

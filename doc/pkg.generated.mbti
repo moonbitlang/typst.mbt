@@ -222,6 +222,7 @@ pub fn[T] CompileReport::output(Self[T]) -> T?
 pub fn CompileReport::pdf(Self[@layout.PagedDocument], options? : @pdf.PdfOptions) -> ExportReport[Bytes]
 pub fn CompileReport::png_pages(Self[@layout.PagedDocument], ppi? : Double) -> ExportReport[Array[Bytes]]
 pub fn CompileReport::review_html(Self[@layout.PagedDocument], title? : String) -> ExportReport[String]
+pub fn CompileReport::review_text(Self[@layout.PagedDocument], title? : String) -> ReviewText raise DocError
 pub fn CompileReport::svg_pages(Self[@layout.PagedDocument], options? : @svg.SvgOptions) -> ExportReport[Array[String]]
 pub fn[T] CompileReport::unwrap(Self[T]) -> T raise DocError
 
@@ -549,6 +550,22 @@ pub struct ExportReport[T] {
 }
 pub fn[T] ExportReport::output(Self[T]) -> T?
 pub fn[T] ExportReport::unwrap(Self[T]) -> T raise DocError
+
+pub struct Feedback {
+  document : String
+  comment : String
+  selected_text : String
+  pages : Array[Int]
+  origins : Array[FeedbackOrigin]
+}
+pub fn Feedback::to_json(Self) -> Json
+pub fn Feedback::to_text(Self) -> String
+
+pub struct FeedbackOrigin {
+  origin : Origin
+  pieces : Array[String]
+  rendered : String
+}
 
 pub struct Figure {
   // private fields
@@ -1353,6 +1370,17 @@ pub impl @builtin.Show for RepeatView
 pub impl @debug.Debug for RepeatView
 pub impl IntoContent for RepeatView
 
+pub struct ReviewText {
+  // private fields
+}
+pub fn ReviewText::feedback(Self, Selection, String) -> Feedback
+pub fn ReviewText::find(Self, String, nth? : Int) -> Selection?
+pub fn ReviewText::length(Self) -> Int
+pub fn ReviewText::origin_feedback(Self, Origin, Int, String) -> Feedback
+pub fn ReviewText::range(Self, Int, Int) -> Selection?
+pub fn ReviewText::selected_text(Self, Selection) -> String
+pub fn ReviewText::text(Self) -> String
+
 pub struct Rotate {
   // private fields
 }
@@ -1471,6 +1499,10 @@ pub fn Select::text(font? : Array[String], fallback? : Bool, style? : String, we
 pub fn Select::title() -> Selector[TitleView]
 pub fn Select::underline(stroke? : Stroke, offset? : Length, extent? : Length, evade? : Bool, background? : Bool) -> Selector[UnderlineView]
 pub fn Select::v(weak? : Bool) -> Selector[VView]
+
+pub struct Selection {
+  // private fields
+}
 
 pub struct Selector[W] {
   // private fields

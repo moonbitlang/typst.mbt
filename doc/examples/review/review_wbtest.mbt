@@ -182,3 +182,60 @@ test "clicks on the showcase lead to the constructor calls of its source" {
     assert_true(html.contains(svg))
   }
 }
+
+///|
+test "selections on the showcase become feedback with the origins they cover" {
+  let report = compile_document(@twins.full_showcase)
+  let text = report.review_text()
+  let source = @utf8.decode(@system.read(bench_file))
+  // Words of one prose block: one origin, the text argument, and one
+  // piece per word.
+  let prose = text.feedback(
+    text.find("Knuth–Plass style optimizer,").unwrap(),
+    "",
+  )
+  assert_eq(prose.selected_text, "Knuth–Plass style optimizer,")
+  assert_eq(prose.origins.length(), 1)
+  assert_eq(prose.origins[0].origin.kind, "Prose")
+  assert_eq(prose.origins[0].pieces, ["Knuth–Plass", "style", "optimizer,"])
+  let call = position_of(source, "$|Typst lays out text with a Knuth–Plass")
+  assert_eq(prose.origins[0].origin.start_line, call.0)
+  // From a heading into the paragraph after it: two origins, in reading
+  // order.
+  let across = text.feedback(
+    text.find("Text and paragraphs Typst lays out").unwrap(),
+    "Tighten this.",
+  )
+  assert_eq(across.origins.map(o => o.origin.kind), ["Heading", "Prose"])
+  assert_eq(across.origins[0].pieces, ["Text and paragraphs"])
+  assert_eq(across.origins[1].rendered, "Typst lays out")
+  assert_eq(across.pages, [1])
+  let block = across.to_text()
+  assert_true(
+    block.has_prefix(
+      "Review comment on \"typst.mbt Showcase\" (a document rendered from MoonBit source by typst.mbt)\nComment: Tighten this.\n",
+    ),
+  )
+  let call = position_of(source, "Heading(\"Text and paragraphs\")")
+  assert_true(
+    block.contains(
+      "Source 1 of 2: \{bench_file}:\{call.0}:\{call.1 + 8}-\{call.0}:\{call.1 + 29}, Heading(..), parameter 1\n  rendered: \"Text and paragraphs\"\n",
+    ),
+  )
+  // Cells of the table that is built in a loop: pieces of the argument
+  // that holds the cells.
+  let cells = text.feedback(text.find("incremental reparse 3 792").unwrap(), "")
+  assert_eq(cells.origins.length(), 1)
+  assert_eq(cells.origins[0].origin.kind, "Table")
+  assert_eq(cells.origins[0].pieces, ["incremental reparse", "3 792"])
+  // The page carries the words and the library's records for its
+  // self-test.
+  let html = report.review_html().unwrap()
+  assert_true(html.contains("\"words\":[[1,\""))
+  assert_true(html.contains("[1,\"Knuth–Plass\",1,"))
+  assert_true(
+    html.contains(
+      "\"samples\":[[0,0,{\"format\":\"typst.mbt review feedback 1\"",
+    ),
+  )
+}

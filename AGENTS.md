@@ -110,7 +110,14 @@
   (`doc/review_page_gen.mbt`). `moon run doc/examples/review --target
   native --release -- preview showcase -o preview.html` writes the
   showcase's page; opening it with `#selftest` compares the browser's
-  hit testing with the library's answers embedded in the page.
+  hit testing with the library's answers embedded in the page. Slice 2:
+  `CompileReport::review_text` gives the words in reading order
+  (`doc/review_select.mbt`), `ReviewText::feedback` the record of a
+  selection and a comment (`doc/review_feedback.mbt`: `to_text`,
+  `to_json`). The page's script builds the same record
+  (`Core` in `page.js`); after changing either side run `node
+  scripts/review_page_check.mjs preview.html`, which compares them on
+  the records embedded in a generated page.
 - Typst-to-EDSL translator (`doc/convert`, design in `docs/edsl-convert.md`,
   Codex-approved; a stress test of the EDSL, not a compiler): typed where
   the design's narrow rules prove it exact, Typst source in `Markup`
