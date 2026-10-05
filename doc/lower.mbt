@@ -36,7 +36,9 @@ priv struct Pieces {
   /// The number of spans that were given out. The first is `base` itself.
   next : @ref.Ref[Int]
   /// The spans of what is inside the argument under `Keyed` wrappers: one
-  /// counter per path of keys (`Lower::keyed`).
+  /// counter per path of keys (`Lower::keyed`). The table belongs to the
+  /// argument: the counters of its key paths share it, so that a path is
+  /// one counter however the wrappers that spell it are nested.
   keyed : Map[String, Pieces]
 }
 
@@ -101,6 +103,9 @@ fn Lower::at(self : Lower, anchor : @syntax.Span) -> Lower {
 /// and a second body under the same keys — another cell of a row whose
 /// cells have the row's key — takes the next piece instead of the same
 /// span. What is inside a body takes further pieces from that counter.
+/// The counters of all paths are in the table of the argument, also the
+/// paths that are reached inside a keyed body (a call value with a
+/// `Keyed` argument): `["a", "b"]` is one counter, wherever it is spelled.
 fn Lower::keyed(
   self : Lower,
   keys : Array[String],
@@ -113,9 +118,11 @@ fn Lower::keyed(
       let pieces = match outer.keyed.get(path) {
         Some(pieces) => pieces
         None => {
-          let pieces = Pieces::new(
-            self.session.registry.keyed_span(outer.base, keys),
-          )
+          let pieces : Pieces = {
+            base: self.session.registry.keyed_span(outer.base, keys),
+            next: { val: 0, },
+            keyed: outer.keyed,
+          }
           outer.keyed[path] = pieces
           pieces
         }

@@ -574,8 +574,8 @@ the conversion sweep (`edsl-suite`, both modes) are unchanged.
 
 | Content | What a selection reports | Tier |
 |---|---|---|
-| made in a `Context` callback | the constructor calls inside the callback, like anywhere else; a literal there has source characters (the showcase's page header, on three pages from one literal) | 3 if literal, else 2 |
-| added by a show rule's callback | the constructor calls inside the callback; what the rule passes on keeps its own origin | as above |
+| made in a `Context` callback | the constructor calls inside the callback, by the usual rules: an argument that is a literal and is the text on the page has source characters (the showcase's page header, on three pages from one literal), another argument is the argument, and content whose location is a call (`Lit`, `Raw`) is the call | 3, 2 or 1 |
+| added by a show rule's callback | the constructor calls inside the callback, by the same rules; what the rule passes on keeps its own origin | 3, 2 or 1 |
 | raw text, `Raw(..)` | the `Raw` call | 1 |
 | raw text in `Markup` | the `Markup` call; each line is a piece of its own | 1 |
 | other text of `Markup` and `Equation` | the call | 1 |
@@ -586,9 +586,11 @@ the conversion sweep (`edsl-suite`, both modes) are unchanged.
 
 ### What it guarantees
 
-1. Pieces under `Keyed` are distinct: two bodies under one key in one
-   argument never have the same span, also when their text is equal and
-   when a body is a call value with arguments of its own.
+1. Pieces under `Keyed` are distinct: two bodies under one path of keys
+   in one argument never have the same span, also when their text is
+   equal, when a body is a call value with arguments of its own, and
+   however the wrappers that spell the path are nested (the counters of
+   an argument's key paths are in one table of that argument).
 2. A key that is used once in an argument has the span it had before.
 3. Normal output is unchanged: differential stages, the `edsl` stage,
    and the conversion sweep.
@@ -609,7 +611,10 @@ the conversion sweep (`edsl-suite`, both modes) are unchanged.
 
 - `doc/review_test.mbt`: four bodies under two keys in one array, two of
   them equal (distinct spans, one origin per key, a piece each); sixty
-  texts of call values and strings under one key; a key used once; a
+  texts of call values and strings under one key; sixty-one texts under
+  one path of two keys, spelled as nested wrappers and inside call
+  values; a key used once, whose span is the whole token of the argument
+  under the key, also after two hundred pieces without a key; a
   document with a context callback, a show rule callback, raw text, raw
   lines in markup, a citation, a bibliography from a data file and an
   included Typst file — the constructor and the tier of each, and that
