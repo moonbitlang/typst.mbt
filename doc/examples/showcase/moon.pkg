@@ -1,0 +1,8 @@
+import {
+  "moonbitlang/typst/doc",
+  "moonbitlang/typst/doc/system",
+  "moonbitlang/typst/doc/twins",
+  "moonbitlang/core/env",
+}
+
+pkgtype(kind: "executable")

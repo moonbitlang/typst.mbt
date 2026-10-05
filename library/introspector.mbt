@@ -199,6 +199,10 @@ pub fn Introspector::backend(self : Introspector) -> &IntrospectorBackend {
 ///|
 /// Record a read. `key` identifies the method and its arguments; `replay`
 /// recomputes the result's fingerprint on another introspector.
+///
+/// If the result holds host closures, they are recorded too (not upstream):
+/// host closures compare by identity, so a replayed result is only the same
+/// if it holds the same closures, not just closures with the same key.
 fn Introspector::record(
   self : Introspector,
   name : String,
@@ -210,10 +214,16 @@ fn Introspector::record(
     let key = hash128((name, args()))
     if !recorder.calls.contains(key) {
       let mut expected = u128_zero
-      if fingerprint_flags_in(() => expected = result()) != 0 {
+      let flags = fingerprint_flags_in(() => expected = result())
+      if flags != 0 {
         recorder.lossy = true
       }
-      recorder.calls[key] = { name, expected, replay, }
+      let hosts = if (flags & fingerprint_host) != 0 {
+        Some(fingerprint_hosts_in(() => result() |> ignore))
+      } else {
+        None
+      }
+      recorder.calls[key] = { name, expected, replay, hosts, }
     }
   }
 }
@@ -226,7 +236,7 @@ pub fn Introspector::query(
 ) -> Array[Content] {
   let output = self.backend.query(selector)
   self.record("query", () => hash128(selector), () => hash128(output), i => {
-    hash128(i.backend.query(selector))
+    hash128_output(i.backend.query(selector))
   })
   output
 }
@@ -239,7 +249,7 @@ pub fn Introspector::query_first(
 ) -> Content? {
   let output = self.backend.query_first(selector)
   self.record("query_first", () => hash128(selector), () => hash128(output), i => {
-    hash128(i.backend.query_first(selector))
+    hash128_output(i.backend.query_first(selector))
   })
   output
 }
@@ -263,7 +273,7 @@ pub fn Introspector::query_unique(
 ) -> Content raise HintedError {
   let output = result_of(() => self.backend.query_unique(selector))
   self.record("query_unique", () => hash128(selector), () => hash128(output), i => {
-    hash128(result_of(() => i.backend.query_unique(selector)))
+    hash128_output(result_of(() => i.backend.query_unique(selector)))
   })
   match output {
     Ok(c) => c
@@ -279,7 +289,7 @@ pub fn Introspector::query_label(
 ) -> Content raise HintedError {
   let output = result_of(() => self.backend.query_label(label))
   self.record("query_label", () => hash128(label), () => hash128(output), i => {
-    hash128(result_of(() => i.backend.query_label(label)))
+    hash128_output(result_of(() => i.backend.query_label(label)))
   })
   match output {
     Ok(c) => c
@@ -292,7 +302,7 @@ pub fn Introspector::query_label(
 pub fn Introspector::query_labelled(self : Introspector) -> Array[Content] {
   let output = self.backend.query_labelled()
   self.record("query_labelled", () => u128_zero, () => hash128(output), i => {
-    hash128(i.backend.query_labelled())
+    hash128_output(i.backend.query_labelled())
   })
   output
 }
@@ -310,7 +320,7 @@ pub fn Introspector::query_count_before(
     "query_count_before",
     () => hash128((selector, end)),
     () => hash128(output),
-    i => hash128(i.backend.query_count_before(selector, end)),
+    i => hash128_output(i.backend.query_count_before(selector, end)),
   )
   output
 }
@@ -320,7 +330,7 @@ pub fn Introspector::query_count_before(
 pub fn Introspector::label_count(self : Introspector, label : Label) -> Int {
   let output = self.backend.label_count(label)
   self.record("label_count", () => hash128(label), () => hash128(output), i => {
-    hash128(i.backend.label_count(label))
+    hash128_output(i.backend.label_count(label))
   })
   output
 }
@@ -335,7 +345,7 @@ pub fn Introspector::locator(
 ) -> Location? {
   let output = self.backend.locator(key, base)
   self.record("locator", () => hash128((key, base)), () => hash128(output), i => {
-    hash128(i.backend.locator(key, base))
+    hash128_output(i.backend.locator(key, base))
   })
   output
 }
@@ -349,7 +359,7 @@ pub fn Introspector::pages(
 ) -> NonZeroUSize? {
   let output = self.backend.pages(location)
   self.record("pages", () => hash128(location), () => hash128(output), i => {
-    hash128(i.backend.pages(location))
+    hash128_output(i.backend.pages(location))
   })
   output
 }
@@ -362,7 +372,7 @@ pub fn Introspector::page(
 ) -> NonZeroUSize? {
   let output = self.backend.page(location)
   self.record("page", () => hash128(location), () => hash128(output), i => {
-    hash128(i.backend.page(location))
+    hash128_output(i.backend.page(location))
   })
   output
 }
@@ -375,7 +385,7 @@ pub fn Introspector::position(
 ) -> DocumentPosition? {
   let output = self.backend.position(location)
   self.record("position", () => hash128(location), () => hash128(output), i => {
-    hash128(i.backend.position(location))
+    hash128_output(i.backend.position(location))
   })
   output
 }
@@ -391,7 +401,7 @@ pub fn Introspector::page_numbering(
     "page_numbering",
     () => hash128(location),
     () => hash128(output),
-    i => hash128(i.backend.page_numbering(location)),
+    i => hash128_output(i.backend.page_numbering(location)),
   )
   output
 }
@@ -407,7 +417,7 @@ pub fn Introspector::page_supplement(
     "page_supplement",
     () => hash128(location),
     () => hash128(output),
-    i => hash128(i.backend.page_supplement(location)),
+    i => hash128_output(i.backend.page_supplement(location)),
   )
   output
 }
@@ -420,7 +430,7 @@ pub fn Introspector::anchor(
 ) -> String? {
   let output = self.backend.anchor(location)
   self.record("anchor", () => hash128(location), () => hash128(output), i => {
-    hash128(i.backend.anchor(location))
+    hash128_output(i.backend.anchor(location))
   })
   output
 }
@@ -434,7 +444,7 @@ pub fn Introspector::document(
 ) -> Location? {
   let output = self.backend.document(location)
   self.record("document", () => hash128(location), () => hash128(output), i => {
-    hash128(i.backend.document(location))
+    hash128_output(i.backend.document(location))
   })
   output
 }
@@ -448,7 +458,7 @@ pub fn Introspector::path(
 ) -> @syntax.VirtualPath? {
   let output = self.backend.path(location)
   self.record("path", () => hash128(location), () => hash128(output), i => {
-    hash128(i.backend.path(location))
+    hash128_output(i.backend.path(location))
   })
   output
 }
@@ -462,8 +472,12 @@ priv struct RecordedRead {
   name : String
   /// The fingerprint of the result.
   expected : U128
-  /// Recomputes the result's fingerprint on another introspector.
+  /// Recomputes the result's fingerprint on another introspector, with
+  /// [hash128_output].
   replay : (Introspector) -> U128
+  /// The host closures in the result, in the order the fingerprint visits
+  /// them (not upstream; `None` if there are none): validated by identity.
+  hosts : Array[HostFunc]?
 }
 
 ///|
@@ -509,8 +523,27 @@ pub fn IntrospectionRecorder::validate(
 ) -> Bool {
   let introspector = introspector.untracked()
   for _, read in self.calls {
-    if (read.replay)(introspector) != read.expected {
-      return false
+    match read.hosts {
+      None => if (read.replay)(introspector) != read.expected { return false }
+      Some(expected) => {
+        // Equal fingerprints and, in the same order, the same host
+        // closures. Only the fingerprint of the replayed result is
+        // collected (`hash128_output`), like when the read was recorded:
+        // computing the result may fingerprint other values (a query
+        // hashes its selector, which can hold host closures too).
+        let hosts = []
+        fingerprint_output_hosts.val = Some(hosts)
+        let hash = (read.replay)(introspector)
+        fingerprint_output_hosts.val = None
+        if hash != read.expected || hosts.length() != expected.length() {
+          return false
+        }
+        for i in 0..<hosts.length() {
+          if !physical_equal(hosts[i], expected[i]) {
+            return false
+          }
+        }
+      }
     }
   }
   true

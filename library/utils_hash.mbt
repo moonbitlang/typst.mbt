@@ -275,6 +275,55 @@ pub let fingerprint_lossy : Int = 1
 pub let fingerprint_identity : Int = 2
 
 ///|
+/// See [fingerprint_flags]: the fingerprint contains a host closure (a
+/// [HostFunc]; it also sets [fingerprint_identity]).
+pub let fingerprint_host : Int = 4
+
+///|
+/// The collector of the host closures visited by fingerprint computations
+/// (see [fingerprint_hosts_in]).
+let fingerprint_hosts : Ref[Array[HostFunc]?] = { val: None, }
+
+///|
+/// Runs `f` (a fingerprint computation) and returns the host closures it
+/// visited, in order. Host closures compare by identity, which a
+/// fingerprint cannot express: their fingerprint is a key that the host
+/// promises to be unique. Where identity matters (the validation of
+/// recorded introspector reads), the visited closures are compared too.
+pub fn fingerprint_hosts_in(f : () -> Unit) -> Array[HostFunc] {
+  let outer = fingerprint_hosts.val
+  let hosts = []
+  fingerprint_hosts.val = Some(hosts)
+  f()
+  fingerprint_hosts.val = outer
+  hosts
+}
+
+///|
+/// A collector armed for the next [hash128_output] (the validation of a
+/// recorded introspector read sets it around the replay).
+let fingerprint_output_hosts : Ref[Array[HostFunc]?] = { val: None, }
+
+///|
+/// [hash128] of the result of a replayed introspector read. If a collector
+/// is armed, it receives the host closures of this fingerprint and only of
+/// this one: fingerprints computed while the result was produced (the
+/// argument is evaluated before the call) are not collected.
+fn[T : Fingerprint] hash128_output(value : T) -> U128 {
+  match fingerprint_output_hosts.val {
+    None => hash128(value)
+    Some(hosts) => {
+      fingerprint_output_hosts.val = None
+      let outer = fingerprint_hosts.val
+      fingerprint_hosts.val = Some(hosts)
+      let hash = hash128(value)
+      fingerprint_hosts.val = outer
+      hash
+    }
+  }
+}
+
+///|
 /// Record that the value being fingerprinted is not fully captured by its
 /// fingerprint.
 pub fn mark_fingerprint_lossy() -> Unit {

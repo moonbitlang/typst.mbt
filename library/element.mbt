@@ -88,6 +88,10 @@ pub struct ElementHooks {
 pub struct ElementData {
   /// The element's normal name (e.g. `heading`).
   name : String
+  /// A name that is unique among all elements (not upstream, where an
+  /// element is identified by its vtable): names are not, e.g. `cell` is
+  /// both `grid.cell` and `table.cell`. It is the element's fingerprint.
+  key : String
   /// The element's title case name (e.g. `Heading`).
   title : String
   /// Documentation.
@@ -131,6 +135,7 @@ pub impl Compare for Element with fn compare(self, other) {
 pub fn Element::new(
   name~ : String,
   title~ : String,
+  key? : String = name,
   docs? : String = "",
   keywords? : Array[String] = [],
   capabilities? : Array[String] = [],
@@ -138,6 +143,7 @@ pub fn Element::new(
 ) -> Element {
   Element({
     name,
+    key,
     title,
     docs,
     keywords,

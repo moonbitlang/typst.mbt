@@ -71,6 +71,40 @@ fn[T : @library.Output] compile_impl(
   traced : @library.Traced,
   sink : @library.Sink,
 ) -> T raise @library.SourceError {
+  compile_with(world, traced, sink, library => {
+    // Fetch the main source file once.
+    let main = world.main()
+    let main = world.source(main) catch {
+      err =>
+        raise @library.SourceError(hint_invalid_main_file(world, err, main))
+    }
+
+    // First evaluate the main source file into a module.
+    @eval.eval_source(
+      world,
+      library,
+      traced,
+      sink,
+      @library.Route::root(),
+      main,
+    ).content()
+  })
+}
+
+///|
+/// `compile_impl` with the evaluation step as a parameter (not upstream):
+/// `evaluate` receives the world's library and produces the content that is
+/// laid out. Everything else is the compiler's, in upstream's order: the
+/// target feature checks, the library and target styles, the evaluation,
+/// the memoization lifetime, the relayout loop with tracked introspection,
+/// the convergence warnings and the promotion of delayed errors. Used by
+/// hosts that build content without a Typst main file (the `doc` package).
+pub fn[T : @library.Output] compile_with(
+  world : &@library.World,
+  traced : @library.Traced,
+  sink : @library.Sink,
+  evaluate : (@library.Library) -> @library.Content raise @library.SourceError,
+) -> T raise @library.SourceError {
   let library = world.library()
   match T::target() {
     Paged => ()
@@ -84,21 +118,9 @@ fn[T : @library.Output] compile_impl(
   let styles = base.chain(target)
   let empty_introspector = @library.Introspector::empty()
 
-  // Fetch the main source file once.
-  let main = world.main()
-  let main = world.source(main) catch {
-    err => raise @library.SourceError(hint_invalid_main_file(world, err, main))
-  }
-
-  // First evaluate the main source file into a module.
-  let content = @eval.eval_source(
-    world,
-    library,
-    traced,
-    sink,
-    @library.Route::root(),
-    main,
-  ).content()
+  // First produce the content (the Typst path evaluates the main source
+  // file into a module).
+  let content = evaluate(library)
   // Layout results are memoized across the iterations (upstream: comemo;
   // see `library/memo.mbt`).
   let document = @library.with_layout_memo(() => {

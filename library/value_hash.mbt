@@ -23,8 +23,9 @@ pub impl Fingerprint for Label with fn fingerprint(self, state) {
 
 ///|
 pub impl Fingerprint for Element with fn fingerprint(self, state) {
-  // Elements are compared by identity and their names are unique.
-  state.write_str(self.name())
+  // Elements are compared by identity; their keys are unique (their names
+  // are not: `grid.cell` and `table.cell` are both `cell`).
+  state.write_str(self.0.key)
 }
 
 ///|
@@ -289,6 +290,19 @@ pub impl Fingerprint for Func with fn fingerprint(self, state) {
       state.write(func)
       state.write(args)
     }
+    Host(host) => {
+      // Host closures compare by identity; the key identifies them. A
+      // collector (see `fingerprint_hosts_in`) also receives the closure
+      // itself.
+      fingerprint_flags.val = fingerprint_flags.val |
+        fingerprint_identity |
+        fingerprint_host
+      if fingerprint_hosts.val is Some(hosts) {
+        hosts.push(host)
+      }
+      state.write_discriminant(5)
+      state.write(host.key)
+    }
   }
   state.write(self.span)
 }
@@ -305,7 +319,13 @@ pub impl Fingerprint for Content with fn fingerprint(self, state) {
   lifecycle.sort()
   state.write(lifecycle)
   // Data (hashed once and cached, like upstream).
-  let data = match self.data_hash.val {
+  let cached = match self.data_hash.val {
+    // A collector of host closures must visit the fields that hold some.
+    Some((_, flags)) if fingerprint_hosts.val is Some(_) &&
+      (flags & fingerprint_host) != 0 => Option::None
+    cached => cached
+  }
+  let data = match cached {
     Some((h, flags)) => {
       mark_fingerprint_flags(flags)
       h

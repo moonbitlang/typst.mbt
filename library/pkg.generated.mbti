@@ -1010,6 +1010,10 @@ pub fn find_name(@otf.Face, UInt16) -> String?
 
 pub fn fingerprint_flags_in(() -> Unit) -> Int
 
+pub let fingerprint_host : Int
+
+pub fn fingerprint_hosts_in(() -> Unit) -> Array[HostFunc]
+
 pub let fingerprint_identity : Int
 
 pub let fingerprint_lossy : Int
@@ -2577,6 +2581,8 @@ pub let scripts_elem_body : Int
 pub fn separated_list(ArrayView[String], String) -> String
 
 pub fn sequence_elem() -> Element
+
+pub fn set_layout_memo_enabled(Bool) -> Unit
 
 pub fn should_outline(FontInstance, UInt16) -> Bool
 
@@ -5351,7 +5357,7 @@ pub fn Element::is_unqueriable(Self) -> Bool
 pub fn Element::local_name(Self, String, String?) -> String?
 pub fn Element::local_name_in(Self, StyleChain) -> String
 pub fn Element::name(Self) -> String
-pub fn Element::new(name~ : String, title~ : String, docs? : String, keywords? : Array[String], capabilities? : Array[String], fields~ : Array[FieldInfo]) -> Self
+pub fn Element::new(name~ : String, title~ : String, key? : String, docs? : String, keywords? : Array[String], capabilities? : Array[String], fields~ : Array[FieldInfo]) -> Self
 pub fn Element::params(Self) -> Array[ParamInfo]
 pub fn Element::repr(Self) -> String
 pub fn Element::scope(Self) -> Scope
@@ -5371,6 +5377,7 @@ pub impl Reflect for Element
 
 pub struct ElementData {
   name : String
+  key : String
   title : String
   docs : String
   keywords : Array[String]
@@ -6322,6 +6329,7 @@ pub fn Func::contextual(Self) -> Bool?
 pub fn Func::element(Element) -> Self
 pub fn Func::field(Self, String, BindingGuard) -> Value raise HintedError
 pub fn Func::from_inner(FuncInner) -> Self
+pub fn Func::host(HostFunc) -> Self
 pub fn Func::name(Self) -> String?
 pub fn Func::native(NativeFuncData) -> Self
 pub fn Func::plugin(PluginFunc) -> Self
@@ -6346,6 +6354,7 @@ pub(all) enum FuncInner {
   Closure(Closure)
   Plugin(PluginFunc)
   With(Func, Args)
+  Host(HostFunc)
 }
 
 pub(all) enum Geometry {
@@ -6817,6 +6826,12 @@ pub fn[T] History::from_entries(Array[(Introspector, T)]) -> Self[T]
 pub fn[T] History::hint(Self[T], String, (T) -> String) -> String
 pub fn[T, U] History::map(Self[T], (T) -> U) -> Self[U]
 pub fn[T] History::values(Self[T]) -> Array[T]
+
+pub struct HostFunc {
+  call : (Engine, Context, Args) -> Value raise SourceError
+  key : U128
+}
+pub fn HostFunc::new(U128, (Engine, Context, Args) -> Value raise SourceError) -> Self
 
 pub(all) struct Hsl {
   hue : Float

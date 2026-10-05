@@ -55,16 +55,27 @@ fn eval_show_rule(
     }
   }
   let recipe = @library.Recipe::new(selector, transform, show.span())
-  check_show_page_rule(vm, recipe)
-  check_show_par_set_block(vm, recipe)
+  check_recipe(vm.engine, recipe)
   recipe
 }
 
 ///|
+/// The checks `eval_show_rule` performs on a new recipe (upstream: the two
+/// calls at the end of `ShowRule::eval`), for hosts that build recipes
+/// without evaluating a show rule (the `doc` package).
+pub fn check_recipe(engine : @library.Engine, recipe : @library.Recipe) -> Unit {
+  check_show_page_rule(engine, recipe)
+  check_show_par_set_block(engine, recipe)
+}
+
+///|
 /// Migration hint for `show page`.
-fn check_show_page_rule(vm : Vm, recipe : @library.Recipe) -> Unit {
+fn check_show_page_rule(
+  engine : @library.Engine,
+  recipe : @library.Recipe,
+) -> Unit {
   if recipe.selector is Some(Elem(elem, _)) && elem == @library.page_elem() {
-    vm.engine.sink.warn(
+    engine.sink.warn(
       @library.SourceDiagnostic::warning_at(
         recipe.span,
         "`show page` is not supported and has no effect",
@@ -75,14 +86,17 @@ fn check_show_page_rule(vm : Vm, recipe : @library.Recipe) -> Unit {
 
 ///|
 /// Migration hint for `show par: set block(spacing: ..)`.
-fn check_show_par_set_block(vm : Vm, recipe : @library.Recipe) -> Unit {
+fn check_show_par_set_block(
+  engine : @library.Engine,
+  recipe : @library.Recipe,
+) -> Unit {
   if recipe.selector is Some(Elem(elem, _)) &&
     elem == @library.par_elem() &&
     recipe.transform is Style(styles) {
     let chain = @library.StyleChain::new(styles)
     if chain.has(@library.block_elem(), @library.block_elem_above) ||
       chain.has(@library.block_elem(), @library.block_elem_below) {
-      vm.engine.sink.warn(
+      engine.sink.warn(
         @library.SourceDiagnostic::warning_at(
           recipe.span,
           "`show par: set block(spacing: ..)` has no effect anymore",
