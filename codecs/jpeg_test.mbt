@@ -14,7 +14,7 @@ fn fnv1a(data : Bytes) -> UInt64 {
 
 ///|
 fn jpeg_summary(data : Bytes) -> String {
-  let (info, pixels) = decode_jpeg(data[:]) catch {
+  let (info, pixels) = @codecs.decode_jpeg(data[:]) catch {
     ImageError(msg) => return "ERR \{msg}"
   }
   let color = match info.color {

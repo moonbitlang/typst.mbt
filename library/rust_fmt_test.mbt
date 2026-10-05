@@ -44,7 +44,7 @@ test "rust float formatting matches Rust std" {
   ]
   for case in cases {
     let (x, expected) = case
-    let actual = "\{rust_display_f64(x)}|\{rust_debug_f64(x)}|\{rust_fixed_f64(x, 2)}|\{rust_fixed_f64(x, 0)}|\{rust_fixed_f64(x, 3)}"
+    let actual = "\{@library.rust_display_f64(x)}|\{@library.rust_debug_f64(x)}|\{@library.rust_fixed_f64(x, 2)}|\{@library.rust_fixed_f64(x, 0)}|\{@library.rust_fixed_f64(x, 3)}"
     assert_eq(actual, expected)
   }
 }

@@ -3,12 +3,12 @@
 /// it back: `size <width bits> <height bits>` followed by the SVG, or
 /// `error <variant>`. Mirrors `tree_case` in `oracle/src/bin/gen_usvg_golden.rs`.
 fn corpus_case(input : String) -> String {
-  let opts : Options = {
-    ..Options::default(),
+  let opts : @usvg.Options = {
+    ..@usvg.Options::default(),
     font_family: "",
     resources_dir: None,
     image_href_resolver: {
-      resolve_data: ImageHrefResolver::default_data_resolver(),
+      resolve_data: @usvg.ImageHrefResolver::default_data_resolver(),
       resolve_string: (_, _) => None,
     },
   }
@@ -16,10 +16,10 @@ fn corpus_case(input : String) -> String {
     let h = x.reinterpret_as_uint().to_string(radix=16)
     String::make(8 - h.length(), '0') + h
   }
-  match (try? Tree::from_data(@utf8.encode(input), opts)) {
+  match (try? @usvg.Tree::from_data(@utf8.encode(input), opts)) {
     Ok(tree) =>
       "size \{bits(tree.size().width())} \{bits(tree.size().height())}\n" +
-      tree.to_string(WriteOptions::default())
+      tree.to_string(@usvg.WriteOptions::default())
     Err(e) =>
       "error " +
       (match e {
