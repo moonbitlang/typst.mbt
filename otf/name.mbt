@@ -191,7 +191,7 @@ pub fn Name::is_unicode(self : Name) -> Bool {
 ///|
 fn Name::name_from_utf16_be(self : Name) -> String? {
   let units : LazyArray16[UInt16] = LazyArray16::new(self.name)
-  let buf = StringBuilder::new()
+  let buf = StringBuilder()
   let n = units.len().to_int()
   let mut i = 0
   while i < n {

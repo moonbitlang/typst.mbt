@@ -139,7 +139,7 @@ pub fn ScopeRepository::build(
   let parts = s
     .trim_end(chars=".")
     .split(".")
-    .map(a => self.atom_to_index(a.to_string()))
+    .map(a => self.atom_to_index(a.to_owned()))
     .collect()
   if parts.length() > 8 {
     raise TooManyAtoms
@@ -322,7 +322,7 @@ pub fn ScopeStack::apply_with_hook(
           // don't try to clear more scopes than are on the stack
           let len = self.scopes.length()
           let to_leave = len - (if n < len { n } else { len })
-          let cleared = self.scopes[to_leave:].to_array()
+          let cleared = self.scopes[to_leave:].to_owned()
           self.scopes.truncate(to_leave)
           cleared
         }
@@ -388,7 +388,7 @@ pub fn ScopeStack::does_match(
     if sel_scope.is_prefix_of(scope) {
       let len = sel_scope.len()
       // equivalent to score |= len << (ATOM_LEN_BITS*i) on a large unsigned
-      score += len.to_double() * 2.0.pow((atom_len_bits * i).to_double())
+      score += len.to_double() * @math.pow(2.0, (atom_len_bits * i).to_double())
       sel_index += 1
       if sel_index >= self.scopes.length() {
         return Some(MatchPower(score))

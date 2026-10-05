@@ -33,7 +33,7 @@ pub impl Hash for PdfDocument with fn hash_combine(self, hasher) {
 
 ///|
 /// Cache of loaded documents (upstream memoizes `PdfDocument::new`).
-let pdf_document_cache : Map[Bytes, PdfDocument] = Map::new()
+let pdf_document_cache : Map[Bytes, PdfDocument] = Map([])
 
 ///|
 /// Loads a PDF document.

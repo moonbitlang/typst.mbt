@@ -27,7 +27,7 @@ pub fn Args::new(span : @syntax.Span, values : ArrayView[Value]) -> Args {
   {
     span,
     items: values
-    .to_array()
+    .to_owned()
     .map(v => ({ span, name: None, value: { v, span, }, } : Arg)),
   }
 }

@@ -62,7 +62,7 @@ fn test_font_files() -> Array[(String, Bytes)] {
 }
 
 ///|
-let test_font_files_cell : Ref[Array[(String, Bytes)]?] = Ref::new(None)
+let test_font_files_cell : Ref[Array[(String, Bytes)]?] = Ref(None)
 
 ///|
 /// The fonts of the test world, in book order (upstream
@@ -84,7 +84,7 @@ fn test_fonts() -> Array[@library.Font] {
 }
 
 ///|
-let test_fonts_cell : Ref[Array[@library.Font]?] = Ref::new(None)
+let test_fonts_cell : Ref[Array[@library.Font]?] = Ref(None)
 
 ///|
 /// The font book of the test world.
@@ -100,7 +100,7 @@ fn test_font_book() -> @library.FontBook {
 }
 
 ///|
-let test_font_book_cell : Ref[@library.FontBook?] = Ref::new(None)
+let test_font_book_cell : Ref[@library.FontBook?] = Ref(None)
 
 ///|
 fn read_bytes(path : String) -> Bytes {

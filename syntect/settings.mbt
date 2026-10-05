@@ -503,7 +503,7 @@ fn parse_rust_i64(s : String) -> Int64? {
   if digits.is_empty() || !digits.iter().all(c => c >= '0' && c <= '9') {
     return None
   }
-  let text = if neg { "-" + digits.to_string() } else { digits.to_string() }
+  let text = if neg { "-" + digits.to_owned() } else { digits.to_owned() }
   try @string.parse_int64(text) catch {
     _ => None
   } noraise {

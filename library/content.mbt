@@ -37,7 +37,7 @@ pub fn Content::from_fields(
     label: None,
     location: None,
     lifecycle: [],
-    data_hash: Ref::new(None),
+    data_hash: Ref(None),
   }
 }
 
@@ -57,7 +57,7 @@ pub fn Content::new(
 
 ///|
 fn Content::with_fields(self : Content, fields : FixedArray[Value?]) -> Content {
-  { ..self, fields, data_hash: Ref::new(None), }
+  { ..self, fields, data_hash: Ref(None), }
 }
 
 ///|
@@ -408,7 +408,7 @@ pub fn Content::sequence(children : ArrayView[Content]) -> Content {
   } else if children.length() == 1 {
     children[0]
   } else {
-    SequenceElem::new(children.to_array())
+    SequenceElem::new(children.to_owned())
   }
 }
 
@@ -569,7 +569,7 @@ pub fn Content::plain_text(self : Content) -> String {
 // Foundational elements: sequence and styled.
 
 ///|
-let sequence_elem_cell : Ref[Element?] = Ref::new(None)
+let sequence_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// A sequence of content.
@@ -627,7 +627,7 @@ pub fn SequenceElem::children(c : Content) -> Array[Content] {
 }
 
 ///|
-let styled_elem_cell : Ref[Element?] = Ref::new(None)
+let styled_elem_cell : Ref[Element?] = Ref(None)
 
 ///|
 /// Content alongside styles.

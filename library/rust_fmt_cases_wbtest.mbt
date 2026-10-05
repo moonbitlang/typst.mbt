@@ -7729,7 +7729,7 @@ test "f64 Display and Debug match Rust std on generated cases" {
   if !failures.is_empty() {
     fail(
       "\{failures.length()} mismatches, e.g. " +
-      failures[:5].to_array().join("; "),
+      failures[:5].to_owned().join("; "),
     )
   }
 }

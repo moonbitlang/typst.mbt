@@ -144,7 +144,7 @@ pub fn Tiling::unwrap_relative(self : Tiling, on_text : Bool) -> RelativeTo {
 
 ///|
 pub fn Tiling::repr(self : Tiling) -> String {
-  let out = StringBuilder::new()
+  let out = StringBuilder()
   out.write_string("tiling((\{self.size.x.repr()}, \{self.size.y.repr()})")
   if !(self.spacing.x.is_zero() && self.spacing.y.is_zero()) {
     out.write_string(", spacing: (")

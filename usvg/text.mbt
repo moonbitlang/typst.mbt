@@ -352,7 +352,7 @@ fn resolve_text_flow(node : SvgNode, state : State) -> TextFlow? {
     // 'If a percentage is given, then the `startOffset` represents
     // a percentage distance along the entire path.'
     let path_len = path_length(path)
-    (path_len * (start_offset.number / 100.0)).to_float()
+    Float::from_double(path_len * (start_offset.number / 100.0))
   } else {
     node.resolve_length(AId::StartOffset, state, 0.0)
   }
@@ -461,7 +461,7 @@ fn parse_font_variation_settings(node : SvgNode) -> Array[FontVariation] {
 
   // Parse comma-separated list of "tag" value pairs
   for part in value.split(",") {
-    let part = rust_trim(part.to_string())
+    let part = rust_trim(part.to_owned())
     if part.is_empty() {
       continue
     }
@@ -483,7 +483,7 @@ fn parse_font_variation_settings(node : SvgNode) -> Array[FontVariation] {
       _ => continue // Invalid format
     }
     i += 1
-    let tag_str = StringBuilder::new()
+    let tag_str = StringBuilder()
     while i < chars.length() {
       let c = chars[i]
       i += 1
@@ -593,7 +593,7 @@ fn rust_parse_f32(s : String) -> Float? {
 /// Converts a decimal string to `f32` exactly (avoiding double rounding via
 /// `f64` when the `f64` value lies exactly half-way between two `f32`s).
 fn decimal_to_f32(s : String, d : Double) -> Float {
-  let f = d.to_float()
+  let f = Float::from_double(d)
   // `d` is the correctly rounded f64; double rounding can only differ from a
   // direct conversion when `d` is exactly half-way between two `f32`s.
   let lo = f.to_double()
@@ -883,7 +883,8 @@ fn convert_baseline_shift(
     let len : @svgtypes.Length? = n.try_attribute(AId::BaselineShift)
     if len is Some(len) {
       if len.unit == @svgtypes.LengthUnit::Percent {
-        let n = resolve_font_size(n, state) * (len.number.to_float() / 100.0)
+        let n = resolve_font_size(n, state) *
+          (Float::from_double(len.number) / 100.0)
         shift.push(Number(n))
       } else {
         let n = convert_length(
@@ -970,8 +971,8 @@ fn path_length(path : TinyPath) -> Double {
     }
     let curve = segment_curve(seg, prev_x, prev_y, prev_mx, prev_my).unwrap()
     length += curve.arclen(0.5)
-    prev_x = curve.p3.x.to_float()
-    prev_y = curve.p3.y.to_float()
+    prev_x = Float::from_double(curve.p3.x)
+    prev_y = Float::from_double(curve.p3.y)
   }
   length
 }

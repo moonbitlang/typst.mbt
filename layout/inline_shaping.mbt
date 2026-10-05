@@ -61,7 +61,7 @@ pub fn create_shape_plan(
     direction,
     script,
     language,
-    features: features.to_array(),
+    features: features.to_owned(),
   }
   match shape_plans.get(key) {
     Some(plan) => plan

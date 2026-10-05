@@ -68,7 +68,7 @@ fn Fnv::write_u64(self : Fnv, v : UInt64) -> Unit {
 fn floor_boundary(text : Bytes, i : Int) -> Int {
   let mut i = i
   while (i < text.length() && (text[i].to_int() & 0xC0) == 0x80) ||
-        (i > 0 && i < text.length() && text[i - 1] == '\r' && text[i] == '\n') {
+        (i > 0 && i < text.length() && text[i - 1] == b'\r' && text[i] == b'\n') {
     i -= 1
   }
   i

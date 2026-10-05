@@ -533,7 +533,7 @@ fn name_to_unicode(name : @otf.Name) -> String? {
 ///|
 /// `String::from_utf16` (fails on unpaired surrogates).
 fn utf16_decode_strict(units : Array[Int]) -> String? {
-  let sb = StringBuilder::new()
+  let sb = StringBuilder()
   let mut i = 0
   while i < units.length() {
     let u = units[i]

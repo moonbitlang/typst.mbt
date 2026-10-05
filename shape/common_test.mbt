@@ -49,5 +49,5 @@ test "parse variations" {
   let v = @shape.Variation::from_str("wght=500").unwrap()
   assert_eq(v.tag, @otf.Tag::from_str("wght"))
   assert_eq(v.value, Float::from_int(500))
-  assert_eq(@shape.Variation::from_str("wght=").is_empty(), true)
+  assert_eq(@shape.Variation::from_str("wght=") is None, true)
 }

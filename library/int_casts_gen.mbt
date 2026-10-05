@@ -162,7 +162,7 @@ pub impl FromValue for U64 with fn from_value(value) {
     Int(v) => {
       if v < 0L {
         bail("number must be at least zero")
-      } else if v > @int64.max_value {
+      } else if v > @int64.MAX_VALUE {
         bail("number too large")
       }
       U64(v)
@@ -206,7 +206,7 @@ pub impl FromValue for USize with fn from_value(value) {
     Int(v) => {
       if v < 0L {
         bail("number must be at least zero")
-      } else if v > @int64.max_value {
+      } else if v > @int64.MAX_VALUE {
         bail("number too large")
       }
       USize(v)
@@ -420,7 +420,7 @@ pub impl FromValue for NonZeroU64 with fn from_value(value) {
     Int(v) => {
       if v <= 0L {
         bail("number must be positive")
-      } else if v > @int64.max_value {
+      } else if v > @int64.MAX_VALUE {
         bail("number too large")
       }
       NonZeroU64(v)
@@ -464,7 +464,7 @@ pub impl FromValue for NonZeroUSize with fn from_value(value) {
     Int(v) => {
       if v <= 0L {
         bail("number must be positive")
-      } else if v > @int64.max_value {
+      } else if v > @int64.MAX_VALUE {
         bail("number too large")
       }
       NonZeroUSize(v)

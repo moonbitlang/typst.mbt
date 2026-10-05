@@ -74,7 +74,7 @@ fn split_tests(text : String) -> Array[TestCase] {
     let header = text
       .unsafe_substring(start=after, end=header_end)
       .trim(chars=" \t")
-      .to_string()
+      .to_owned()
     let (name, attrs) = match header.find(" ") {
       Some(k) =>
         (

@@ -105,7 +105,7 @@ fn dump_instance(out : StringBuilder, inst : @library.FontInstance) -> Unit {
   out.write_string(
     "typst math \{c.script_percent_scale_down} \{c.script_script_percent_scale_down} \{@library.rust_display_f64(c.radical_degree_bottom_raise_percent)} \{values.map(em).join(" ")}\n",
   )
-  let adv = StringBuilder::new()
+  let adv = StringBuilder()
   let ttf = inst.ttf().unwrap()
   let count = ttf.number_of_glyphs().to_int()
   let count = if count < 512 { count } else { 512 }
@@ -161,13 +161,13 @@ fn font_dump_typst(
       "typst axis \{esc(axis.tag.0)} \{ff(axis.min.get())} \{ff(axis.max.get())} \{ff(axis.default.get())}\n",
     )
   }
-  let cov = StringBuilder::new()
+  let cov = StringBuilder()
   let mut n = 0
   for c in info.coverage.iter() {
     cov.write_string("\{c};")
     n += 1
   }
-  let probe = StringBuilder::new()
+  let probe = StringBuilder()
   let mut c : UInt = 0
   while c < 0x30000 {
     probe.write_char(if info.coverage.contains(c) { '1' } else { '0' })
@@ -234,7 +234,7 @@ fn font_dump_book() -> String {
     }
   }
   let book = @library.FontBook::from_fonts(fonts)
-  let text = StringBuilder::new()
+  let text = StringBuilder()
   for entry in book.families() {
     let (family, ids) = entry
     text.write_string(
@@ -311,7 +311,7 @@ fn abs_pt(v : @library.Abs) -> String {
 /// Dumps the color glyph frames (`text::color::glyph_frame`) of a face.
 fn dump_color_frames(out : StringBuilder, inst : @library.FontInstance) -> Unit {
   let count = inst.ttf().unwrap().number_of_glyphs().to_int()
-  let text = StringBuilder::new()
+  let text = StringBuilder()
   let mut n = 0
   for gid in 0..<count {
     let g = gid.to_uint16()

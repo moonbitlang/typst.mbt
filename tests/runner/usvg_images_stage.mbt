@@ -19,7 +19,7 @@ fn usvg_images_report(rel : String, tc : TestCase) -> String {
     Result[@layout.PagedDocument, Array[@library.SourceDiagnostic]],
   ] = @typst.compile(world)
   guard warned.output is Ok(doc) else { return "" }
-  let seen : Map[String, Unit] = Map::new()
+  let seen : Map[String, Unit] = Map([])
   let out = StringBuilder()
   fn walk(frame : @library.Frame) -> Unit {
     for entry in frame.items() {

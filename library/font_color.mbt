@@ -165,7 +165,7 @@ fn draw_raster_glyph(
   upem : Abs,
   raster_image : @otf.RasterGlyphImage,
 ) -> GlyphFrameItem? {
-  let data = raster_image.data.to_bytes()
+  let data = raster_image.data.to_owned()
   let raster = RasterImage::plain(data, Exchange(Png)) catch {
     _ => return None
   }
@@ -241,7 +241,7 @@ fn colr_glyph_to_svg(font : FontInstance, glyph_id : @otf.GlyphId) -> String? {
   let glyph_painter : GlyphPainter = {
     face: ttf,
     svg,
-    path_buf: StringBuilder::new(),
+    path_buf: StringBuilder(),
     gradient_index,
     clip_path_index,
     palette_index: 0,
@@ -272,7 +272,7 @@ fn draw_svg_glyph(
   // but might not work for others. See also: https://github.com/RazrFalcon/resvg/pull/776
   guard font.ttf() is Some(ttf) else { return None }
   guard ttf.glyph_svg_image(glyph_id) is Some(doc) else { return None }
-  let mut data = doc.data.to_bytes()
+  let mut data = doc.data.to_owned()
 
   // Decompress SVGZ.
   if data.length() >= 2 && data[0] == b'\x1f' && data[1] == b'\x8b' {
@@ -385,7 +385,7 @@ fn fixup_svg(svg : String, view_box : Rect) -> String {
       }
       cursor += 1
     }
-    match attr_name.to_string() {
+    match attr_name.to_owned() {
       "viewBox" => viewbox_range = Some((start, cursor))
       "width" => width_range = Some((start, cursor))
       "height" => height_range = Some((start, cursor))

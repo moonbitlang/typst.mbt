@@ -269,7 +269,7 @@ pub fn AnyConst32::try_from_i64(value : Int64) -> AnyConst32? {
 /// losslessly representable as `f32` (bit-wise roundtrip).
 pub fn AnyConst32::try_from_f64_bits(bits : UInt64) -> AnyConst32? {
   let value = bits.reinterpret_as_double()
-  let truncated = value.to_float()
+  let truncated = Float::from_double(value)
   if bits != truncated.to_double().reinterpret_as_uint64() {
     return None
   }
@@ -309,7 +309,7 @@ pub fn AnyConst32::to_f32_bits(self : AnyConst32) -> UInt {
 ///|
 /// Upstream `From<AnyConst32> for f64` (the `f32` widened; as bits).
 pub fn AnyConst32::to_f64_bits(self : AnyConst32) -> UInt64 {
-  self.0.reinterpret_as_float().to_double().reinterpret_as_uint64()
+  Float::reinterpret_from_int(self.0).to_double().reinterpret_as_uint64()
 }
 
 ///|
@@ -396,5 +396,5 @@ pub fn Const32::to_f32_bits(self : Const32) -> UInt {
 ///|
 /// Upstream `From<Const32<f64>> for f64` (as bits).
 pub fn Const32::to_f64_bits(self : Const32) -> UInt64 {
-  self.0.reinterpret_as_float().to_double().reinterpret_as_uint64()
+  Float::reinterpret_from_int(self.0).to_double().reinterpret_as_uint64()
 }

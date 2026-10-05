@@ -102,7 +102,7 @@ fn resolve_tref_text(xml : @xml.Document, href : String) -> String? {
   //
   // Note: we have to filter nodes by `is_text()` first since `text()` will look up
   // for text nodes in element children therefore we will get duplicates.
-  let text = StringBuilder::new()
+  let text = StringBuilder()
   for n in node.descendants() {
     if n.is_text() && n.text() is Some(t) {
       text.write_string(t)
@@ -337,7 +337,7 @@ fn collect_text_nodes(
 
 ///|
 fn trim_text(text : String, space : XmlSpace) -> String {
-  let s = StringBuilder::new()
+  let s = StringBuilder()
   let mut prev = '0'
   for c in text {
     // \r, \n and \t should be converted into spaces.

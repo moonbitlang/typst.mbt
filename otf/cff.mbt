@@ -323,6 +323,9 @@ impl Default for CffIndex with fn default() {
 }
 
 ///|
+extend CffIndex with Default::{default}
+
+///|
 fn CffIndex::len(self : CffIndex) -> UInt {
   // Last offset points to the byte after the `Object data`. We should skip it.
   let n = self.offsets.len()
@@ -607,7 +610,7 @@ fn parse_dict_number(b0 : Byte, s : Stream) -> Double raise Malformed {
 
 ///|
 fn parse_dict_float(s : Stream) -> Double raise Malformed {
-  let data = StringBuilder::new()
+  let data = StringBuilder()
   let mut idx = 0
   while true {
     let b1 = s.read_u8().to_int()

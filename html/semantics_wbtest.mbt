@@ -476,7 +476,7 @@ test "introspector: positions" {
   let pos = (c : @library.Content) => {
     introspector
     .html_position(c.location().unwrap())
-    .map(p => p.element().to_array())
+    .map(p => p.element().to_owned())
   }
   inspect(pos(m1), content="Some([1, 0])")
   inspect(pos(m2), content="Some([1, 1, 0])")
@@ -556,7 +556,7 @@ test "routines: html_mathml_body and html_span_filled" {
     .with_body(Some(text("x")))
     .pack()
   inspect(
-    html_mathml_body(math, @library.StyleChain::empty()).map(b => b.is_some()),
+    html_mathml_body(math, @library.StyleChain::empty()).map(b => b is Some(_)),
     content="Some(true)",
   )
   inspect(

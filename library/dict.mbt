@@ -205,7 +205,7 @@ pub fn Dict::unexpected_keys(
   let format_as_list = (arr : ArrayView[String]) => {
     separated_list(arr.map(s => "\"\{s}\""), "and")
   }
-  let msg = StringBuilder::new()
+  let msg = StringBuilder()
   msg.write_string(
     match unexpected.length() {
       1 => "unexpected key "

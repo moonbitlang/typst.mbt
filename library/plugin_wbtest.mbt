@@ -35,7 +35,7 @@ fn plugin_test_unhex(hex : String) -> Bytes {
     out[i] = (digit(hex.code_unit_at(2 * i)) * 16 +
     digit(hex.code_unit_at(2 * i + 1))).to_byte()
   }
-  Bytes::from_fixedarray(out)
+  Bytes::from_array(out)
 }
 
 ///|

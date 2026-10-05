@@ -54,7 +54,7 @@ fn flatten_text(text : Text, cache : Cache) -> (Group, NonZeroRect)? {
     // span to we push the actual outline paths into new_children. This way, we don't need
     // to create a new path for every glyph if we have many consecutive glyphs
     // with just outlines (which is the most common case).
-    let span_builder = Ref::new(@tiny_skia_path.PathBuilder::new())
+    let span_builder = Ref(@tiny_skia_path.PathBuilder::new())
 
     // For variable fonts, we need to extract the outline with variations applied.
     // We can't use the cache here since the outline depends on variation values.
@@ -334,7 +334,7 @@ fn FontDatabase::raster(
         visible: true,
         size,
         rendering_mode: OptimizeQuality,
-        kind: PNG(image.data.to_bytes()),
+        kind: PNG(image.data.to_owned()),
         abs_transform: Transform::default(),
         abs_bounding_box,
       },
@@ -362,7 +362,7 @@ fn FontDatabase::svg(self : FontDatabase, id : FontId, glyph_id : Int) -> Node? 
   guard font.glyph_svg_image(@otf.GlyphId(glyph_id.to_uint16())) is Some(image) else {
     return None
   }
-  guard (try? Tree::from_data(image.data.to_bytes(), Options::default()))
+  guard (try? Tree::from_data(image.data.to_owned(), Options::default()))
     is Ok(tree) else {
     return None
   }
@@ -389,7 +389,7 @@ fn FontDatabase::colr(
   svg.start_element("svg")
   svg.write_attribute("xmlns", "http://www.w3.org/2000/svg")
   svg.write_attribute("xmlns:xlink", "http://www.w3.org/1999/xlink")
-  let path_buf = StringBuilder::new()
+  let path_buf = StringBuilder()
   let gradient_index = 1
   let clip_path_index = 1
   svg.start_element("g")

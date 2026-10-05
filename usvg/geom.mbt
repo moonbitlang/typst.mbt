@@ -70,6 +70,9 @@ impl Default for BBox with fn default() {
 }
 
 ///|
+extend BBox with Default::{default}
+
+///|
 /// Checks if the bounding box is default, i.e. invalid.
 fn BBox::is_default(self : BBox) -> Bool {
   self.left == f32_max &&

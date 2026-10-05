@@ -95,12 +95,12 @@ fn resolve_clip_path_transform(node : SvgNode, state : State) -> Transform? {
       return None
   }
   let ts = Transform::from_row(
-    ts.a.to_float(),
-    ts.b.to_float(),
-    ts.c.to_float(),
-    ts.d.to_float(),
-    ts.e.to_float(),
-    ts.f.to_float(),
+    Float::from_double(ts.a),
+    Float::from_double(ts.b),
+    Float::from_double(ts.c),
+    Float::from_double(ts.d),
+    Float::from_double(ts.e),
+    Float::from_double(ts.f),
   )
   if ts.is_valid() {
     Some(node.resolve_transform(AId::Transform, state))

@@ -126,7 +126,7 @@ fn spec_unhex_name(s : String) -> String {
   for i in 0..<(s.length() / 2) {
     bytes[i] = spec_parse_hex(s.unsafe_substring(start=2 * i, end=2 * i + 2)).to_byte()
   }
-  @utf8.decode_lossy(Bytes::from_fixedarray(bytes))
+  @utf8.decode_lossy(Bytes::from_array(bytes))
 }
 
 ///|
@@ -192,7 +192,7 @@ fn SpecCtx::invoke(
   let vals = []
   if args != "" {
     for a in args.split(",") {
-      match self.arg(a.to_string()) {
+      match self.arg(a.to_owned()) {
         Some(v) => vals.push(v)
         None => return "unsupported"
       }
@@ -262,11 +262,11 @@ fn run_wasm_spec_file(
   let mut failed = 0
   let mut skipped = 0
   for line in tsv.split("\n") {
-    let line = line.to_string()
+    let line = line.to_owned()
     if line == "" {
       continue
     }
-    let parts = line.split("\t").map(p => p.to_string()).collect()
+    let parts = line.split("\t").map(p => p.to_owned()).collect()
     let kind = parts[0]
     let actual = match kind {
       "module" | "define" => {
@@ -382,7 +382,7 @@ fn run_wasm_spec_file(
 fn run_wasm_spec_stage(filter : String?, verbose : Bool) -> Unit {
   let corpus = golden_dir + "/wasm-spec/corpus"
   let expected = golden_dir + "/wasm-spec/expected"
-  let dirs = (@fs.read_dir(expected) catch { _ => [][:] }).to_array()
+  let dirs = (@fs.read_dir(expected) catch { _ => [][:] }).to_owned()
   dirs.sort_by(spec_compare)
   let mut passed = 0
   let mut failed = 0
@@ -390,7 +390,7 @@ fn run_wasm_spec_stage(filter : String?, verbose : Bool) -> Unit {
   let mut files_ok = 0
   let mut files = 0
   for dir in dirs {
-    let tsvs = (@fs.read_dir(expected + "/" + dir) catch { _ => [][:] }).to_array()
+    let tsvs = (@fs.read_dir(expected + "/" + dir) catch { _ => [][:] }).to_owned()
     tsvs.sort_by(spec_compare)
     for tsv in tsvs {
       guard tsv.has_suffix(".tsv") else { continue }

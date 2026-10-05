@@ -179,7 +179,7 @@ pub fn layout_enum(
       } else {
         0L
       }
-    } else if number == @int64.max_value {
+    } else if number == @int64.MAX_VALUE {
       number
     } else {
       number + 1L
@@ -420,7 +420,7 @@ fn layout_item(
     ),
     engine,
   )
-  let body = Ref::new(layouter.layout_body(layouter.body_regions, engine))
+  let body = Ref(layouter.layout_body(layouter.body_regions, engine))
   if layouter.list.baseline_align {
     layouter.baseline_align(marker, body, engine)
   } else {

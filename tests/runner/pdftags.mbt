@@ -50,7 +50,7 @@ fn pdftags_check_report(rel : String, tc : TestCase) -> String {
   let out = StringBuilder()
   for line in golden.split("\n") {
     if line.has_prefix("warning ") || line.has_prefix("  hint ") {
-      out.write_string(line.to_string())
+      out.write_string(line.to_owned())
       out.write_char('\n')
     }
   }
@@ -119,7 +119,7 @@ fn TagsFormatter::write(self : TagsFormatter, s : String) -> Unit {
     }
   }
   // Rust's `str::lines`.
-  let lines = s.split("\n").map(l => l.to_string()).collect()
+  let lines = s.split("\n").map(l => l.to_owned()).collect()
   if s.has_suffix("\n") {
     lines.pop() |> ignore
   }
@@ -191,7 +191,7 @@ fn pdftags_format(bytes : Bytes) -> String raise {
         PdfArray(items) => items
         c => [c]
       }
-      let data = @buffer.new()
+      let data = Buffer()
       for p in parts {
         if r.stream_data(p) is Some(d) {
           data.write_bytes(d)
@@ -698,15 +698,15 @@ fn canonicalize_internal_errors(dump : String) -> String {
         let rest = line.view(start_offset=at + marker.length())
         match rest.find(repo) {
           Some(r) => {
-            out.write_string(head.to_string())
+            out.write_string(head.to_owned())
             out.write_string(
-              rest.view(start_offset=r + repo.length()).to_string(),
+              rest.view(start_offset=r + repo.length()).to_owned(),
             )
           }
-          None => out.write_string(line.to_string())
+          None => out.write_string(line.to_owned())
         }
       }
-      None => out.write_string(line.to_string())
+      None => out.write_string(line.to_owned())
     }
   }
   out.to_string()

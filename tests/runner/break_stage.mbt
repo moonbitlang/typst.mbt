@@ -7,7 +7,7 @@ fn run_break_stage(filter : String?, verbose : Bool) -> Unit {
   let dir = golden_dir + "/break"
   let files = []
   fn walk(dir : String) {
-    let entries = (@fs.read_dir(dir) catch { _ => [][:] }).to_array()
+    let entries = (@fs.read_dir(dir) catch { _ => [][:] }).to_owned()
     for entry in entries {
       let path = dir + "/" + entry
       let is_dir = @fs.is_dir(path) catch { _ => false }

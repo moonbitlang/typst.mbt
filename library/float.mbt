@@ -70,7 +70,7 @@ fn impl_f64_from_bytes(
     if len == 8 {
       return bits.reinterpret_as_double()
     } else {
-      return bits.to_uint().reinterpret_as_float().to_double()
+      return Float::reinterpret_from_uint(bits.to_uint()).to_double()
     }
   }
   bail("bytes must have a length of 4 or 8")
@@ -91,7 +91,7 @@ fn impl_f64_to_bytes(
 ) -> BytesValue raise HintedError {
   let (bits, len) = match size_.get() {
     8L => (self_.reinterpret_as_uint64(), 8)
-    4L => (self_.to_float().reinterpret_as_uint().to_uint64(), 4)
+    4L => (Float::from_double(self_).reinterpret_as_uint().to_uint64(), 4)
     _ => bail("size must be either 4 or 8")
   }
   let buf = FixedArray::makei(len, i => {

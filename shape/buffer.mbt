@@ -2018,7 +2018,7 @@ pub fn GlyphBuffer::serialize(
   if out.is_empty() {
     out
   } else {
-    out[:out.length() - 1].to_string()
+    out[:out.length() - 1].to_owned()
   }
 }
 

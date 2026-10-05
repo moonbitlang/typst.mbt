@@ -425,12 +425,12 @@ fn ModuleDataSegment::from_wasmparser(
   segment : @wasmparser.Data,
 ) -> ModuleDataSegment {
   match segment.kind {
-    Passive => Passive(segment.data.to_bytes())
+    Passive => Passive(segment.data.to_owned())
     Active(memory_index~, offset_expr~) =>
       Active({
         memory_index: MemoryIdx(memory_index.reinterpret_as_int()),
         offset: ConstExpr::new(offset_expr),
-        bytes: segment.data.to_bytes(),
+        bytes: segment.data.to_owned(),
       })
   }
 }

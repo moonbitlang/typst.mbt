@@ -394,7 +394,7 @@ fn unicode_words(s : String) -> Array[String] {
         }
         break
       }
-      let word = String::from_array(chars[start:i].to_array())
+      let word = String::from_array(chars[start:i].to_owned())
       if word.iter().any(c => @unicode.is_alphanumeric(c)) {
         words.push(word)
       }

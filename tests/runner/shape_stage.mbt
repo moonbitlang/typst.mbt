@@ -143,7 +143,7 @@ fn run_shape_stage(filter : String?, verbose : Bool) -> Unit {
     let mut fp = 0
     let mut ff = 0
     for line in read(dir + "/" + file).split("\n") {
-      let line = line.to_string()
+      let line = line.to_owned()
       if line.is_empty() {
         continue
       }
@@ -226,7 +226,7 @@ fn parse_unicodes(s : String) -> Array[Int] {
   s
   .split(",")
   .map(p => {
-    let p = p.to_string()
+    let p = p.to_owned()
     let p = if p.has_prefix("U+") {
       p.unsafe_substring(start=2, end=p.length())
     } else {
@@ -268,7 +268,7 @@ fn parse_hb_args(options : String) -> HbArgs {
   let tokens = options
     .split(" ")
     .filter(s => !s.is_empty())
-    .map(s => s.to_string())
+    .map(s => s.to_owned())
     .to_array()
   let mut i = 0
   while i < tokens.length() {
@@ -316,7 +316,7 @@ fn parse_hb_args(options : String) -> HbArgs {
       "--variations" =>
         args.variations = take_value()
           .split(",")
-          .map(s => s.to_string())
+          .map(s => s.to_owned())
           .to_array()
       "--direction" => args.direction = @shape.Direction::from_str(take_value())
       "--language" => args.language = @shape.Language::from_str(take_value())
@@ -332,7 +332,7 @@ fn parse_hb_args(options : String) -> HbArgs {
       "--features" =>
         args.features = take_value()
           .split(",")
-          .map(s => s.to_string())
+          .map(s => s.to_owned())
           .to_array()
       "--unicodes-before" =>
         args.pre_context = Some(parse_unicodes(take_value()))
@@ -443,11 +443,11 @@ fn run_shape_hb_stage(filter : String?, verbose : Bool) -> Unit {
   let by_prefix : Map[String, (Int, Int)] = {}
   for file in files {
     for line in read(dir + "/" + file).split("\n") {
-      let line = line.to_string()
+      let line = line.to_owned()
       if line.is_empty() {
         continue
       }
-      let parts = line.split("\t").map(s => s.to_string()).to_array()
+      let parts = line.split("\t").map(s => s.to_owned()).to_array()
       let name = parts[0]
       if filter is Some(f) && !name.contains(f) {
         continue
