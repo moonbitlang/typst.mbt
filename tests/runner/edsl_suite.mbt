@@ -57,10 +57,10 @@ fn suite_cases() -> Array[SuiteCase] {
 fn edsl_using() -> String {
   let names = @convert.api_type_names()
   names.append([
-    "Document", "Seq", "Lit", "Labelled", "Keyed", "Space", "Symbol", "Quoted",
-    "Markup", "Equation", "Call", "Set", "Show", "ShowSet", "ShowWith", "Select",
-    "Context", "Value", "NoneValue", "AutoValue", "Paint", "Stroke", "Sides", "Corners",
-    "Cells", "Sizing", "Numbering", "Supplement", "Counter", "CounterStep", "CounterUpdate",
+    "Document", "Seq", "Lit", "Labelled", "Keyed", "Space", "Symbol", "Quoted", "Markup",
+    "Equation", "Call", "Set", "Show", "ShowSet", "ShowWith", "Select", "Context",
+    "Value", "NoneValue", "AutoValue", "Paint", "Stroke", "Sides", "Corners", "Cells",
+    "Sizing", "Numbering", "Supplement", "Counter", "CounterStep", "CounterUpdate",
   ])
   let out = StringBuilder()
   out.write_string("///|\nusing @doc {\n")
@@ -131,9 +131,8 @@ fn run_edsl_convert(
   let manifest = StringBuilder()
   manifest.write_string(
     tsv_line([
-      "number", "shard", "file", "name", "attrs", "paged", "tier", "math_only",
-      "typed", "source_bytes", "fallback_bytes", "fallbacks", "first_line", "last_line",
-      "compile",
+      "number", "shard", "file", "name", "attrs", "paged", "tier", "math_only", "typed",
+      "source_bytes", "fallback_bytes", "fallbacks", "first_line", "last_line", "compile",
     ]),
   )
   let mut converted = 0
@@ -207,10 +206,7 @@ fn run_edsl_convert(
       }
     }
   }
-  @fs.write_string_to_file(
-    "\{edsl_gen_dir}/manifest.tsv",
-    manifest.to_string(),
-  ) catch {
+  @fs.write_string_to_file("\{edsl_gen_dir}/manifest.tsv", manifest.to_string()) catch {
     _ => {
       println("edsl-convert: cannot write the manifest")
       @sys.exit(1)
@@ -288,18 +284,18 @@ fn suite_frames(doc : @layout.PagedDocument, dumper : StructDumper) -> String {
 /// Compare a converted case with its original (docs/edsl-convert.md,
 /// section 7).
 fn check_case(document : @doc.Document, case_ : SuiteCase) -> CaseChecks {
-  let checks : CaseChecks = { checks: [] }
+  let checks : CaseChecks = { checks: [], }
   let source = TestWorld::main_source("tests/suite/" + case_.rel, case_.tc.body)
   let library = test_library()
   let library = match parse_features(case_.tc.attrs) {
-    Some(f) => { ..library, features: f }
+    Some(f) => { ..library, features: f, }
     None => library
   }
-  let world : TestWorld = { main: source, library }
+  let world : TestWorld = { main: source, library, }
   let status = (ok : Bool) => if ok { "ok" } else { "error" }
 
   // 1. Evaluation.
-  let dumper : StructDumper = { elems: [] }
+  let dumper : StructDumper = { elems: [], locations: None, }
   let lowered = document.lower(world)
   let sink = @library.Sink::new()
   let evaluated = try
@@ -365,9 +361,11 @@ fn check_case(document : @doc.Document, case_ : SuiteCase) -> CaseChecks {
       frames_typst.push(None)
       continue
     }
-    let dumper : StructDumper = { elems: [] }
-    let frames_a = suite_frames(a, dumper)
-    let frames_b = suite_frames(b, dumper)
+    // The element numbering is shared by the two documents, the location
+    // numbering is each document's own.
+    let elems : Array[@library.Element] = []
+    let frames_a = suite_frames(a, { elems, locations: Some(Map([])), })
+    let frames_b = suite_frames(b, { elems, locations: Some(Map([])), })
     frames_edsl.push(Some(frames_a))
     frames_typst.push(Some(frames_b))
     checks.add("frames" + mode, frames_a, frames_b)
@@ -392,7 +390,7 @@ fn check_case(document : @doc.Document, case_ : SuiteCase) -> CaseChecks {
     checks.add("pdf", pdf(a), pdf(b))
     let png_options : @render.RenderOptions = {
       render_bleed: false,
-      format: { ppi: None },
+      format: { ppi: None, },
     }
     let png_options = png_options.resolve(
       @render.PngFormatOptions::get(b.options()),

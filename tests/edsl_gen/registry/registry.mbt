@@ -20,7 +20,7 @@ let cases : Array[Case] = []
 ///|
 /// Register the builder of case `number`.
 pub fn register(number : Int, build : () -> @doc.Document) -> Unit {
-  cases.push({ number, build })
+  cases.push({ number, build, })
 }
 
 ///|

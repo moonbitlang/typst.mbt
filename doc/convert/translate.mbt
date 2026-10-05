@@ -31,12 +31,16 @@ pub fn translate(
     names: Map([]),
   }
   let source_bytes = @syntax.utf8_len(text)
-  // A tree with errors is never translated: the accessors of the AST
-  // return placeholders for it, and its diagnostics are the front end's.
+  // A tree with errors or warnings is never translated: the accessors of
+  // the AST return placeholders for errors, and the diagnostics are the
+  // front end's.
+  let (errors, warnings) = root.errors_and_warnings()
   let forced = if baseline {
     Some("baseline")
-  } else if has_errors(root) {
+  } else if !errors.is_empty() || has_errors(root) {
     Some("syntax-error")
+  } else if !warnings.is_empty() {
+    Some("syntax-warning")
   } else {
     None
   }
@@ -193,7 +197,7 @@ fn Tr::items(
 ) -> Array[Op] raise Bail {
   let ops : Array[Op] = []
   let items = items_of(children)
-  for index, item in items {
+  for item in items {
     match item.kind {
       ITrivia => ()
       ISpace(newline) =>
@@ -209,10 +213,8 @@ fn Tr::items(
         )
       IExpr(expr, embedded) => {
         let mark = self.mark()
-        // Text that a label follows gets a location of its own.
-        let labelled = labelled_at(items, index)
         let result : Result[Array[Op], String] = try
-          self.item(expr, env, labelled)
+          self.item(expr, env)
         catch {
           Bail(construct) => Err(construct)
         } noraise {
@@ -246,21 +248,6 @@ fn Tr::items(
     }
   }
   ops
-}
-
-///|
-/// Whether the item at `index` is followed by a label (with only spaces
-/// between): the evaluator attaches the label to it.
-fn labelled_at(items : Array[Item], index : Int) -> Bool {
-  for j in (index + 1)..<items.length() {
-    match items[j].kind {
-      ISpace(_) | ITrivia => continue
-      IExpr(Label(_), _) => return true
-      IExpr(Parbreak(_), _) => continue
-      _ => return false
-    }
-  }
-  false
 }
 
 ///|

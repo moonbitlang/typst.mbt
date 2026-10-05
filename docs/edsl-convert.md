@@ -1,13 +1,17 @@
-# A Typst-to-EDSL translator (design, revision 3)
+# A Typst-to-EDSL translator (design, revision 4)
 
-Status: revision 3. Revision 1 (a draft with source preludes, rule
+Status: revision 4. Revision 1 (a draft with source preludes, rule
 continuations, merged text and a relaxed comparison) was rejected by the
 Codex review `docs/edsl-reviews/convert-plan-1.md`; revision 2 adopted its
 replacement design; revision 3 narrows the rules that review 2
 (`convert-plan-2.md`) showed unsound: label-valued expressions, callback
 wrappers, `eval` as a value fallback, eager view reads, collection spreads,
-content boundaries and the encoding of frame tags. Section 12 maps the
-reviews' items to sections.
+content boundaries and the encoding of frame tags; revision 4 narrows
+further after review 3 (`convert-plan-3.md`): audited non-label calls, a
+location for every text, no nested callbacks, a strict definition of total
+arguments, no typed stroke dictionaries, literal dictionary keys, and no
+translation of trees with syntax warnings. Section 12 maps the reviews'
+items to sections.
 
 Purpose: stress-test the EDSL of `doc/` (`docs/edsl-design.md`) by
 converting existing Typst documents — upstream's test suite and
@@ -78,7 +82,7 @@ the description that lowers to what `eval_expr` produces for it:
 
 | Markup | EDSL | Evaluator |
 |---|---|---|
-| text | a string; `Lit("..")` (a description with a location of its own) when a label follows it, so that warnings at two labelled texts of one sequence stay distinct | `TextElem::packed` |
+| text | `Lit("..")`: a description with a location of its own for every text expression (plain strings of one array share the array's location, so diagnostics at two texts, e.g. from a show rule on `text`, would be deduplicated into one) | `TextElem::packed` |
 | space | `Space()`, `Space::newline()` from `had_newline()` | `space_content` |
 | `\` line break, blank line | `Linebreak()`, `Parbreak()` | the elements |
 | escape `\#`, shorthand `~` `--` | `Symbol("..")` (new, section 9) | a `Symbol` value, displayed as `SymbolElem` |
@@ -110,8 +114,9 @@ if no identifier of the math is a user binding; with user bindings that
 are translated variables (section 5) it gets them as `scope=`; otherwise
 it is not typed (section 6).
 
-A syntax tree with errors is not translated at all: the document is one
-fragment (section 6), so its diagnostics are the front end's.
+A syntax tree with errors or warnings (`**` warns `no text within
+stars`) is not translated at all: the document is one fragment (section
+6), so its diagnostics are the front end's.
 
 ### 4.2 Calls
 
@@ -145,9 +150,16 @@ value).
 **Evaluation order.** Typst evaluates arguments in source order; the EDSL
 lowers them in the constructor's lowering order (section 3), `Call` its
 positional before its named ones. A translated argument is **total** if
-its lowering cannot fail or warn: literals, typed facade values built from
-literals, and content whose stream contains only text, spaces, symbols,
-smart quotes, breaks and `Strong`/`Emph`/`Heading`/item elements of such.
+its exact lowering is proven unable to fail or warn; literal operands
+alone do not establish that (`Luma(300)` calls `luma` and fails). The
+total forms are: boolean, integer, float and string literals; one numeric
+literal with a length, ratio, fraction or angle unit; a named colour
+constant; `none` and `auto`; `Sides`, `Corners`, `Cells` and arrays of
+total values (they lower to dictionaries and arrays without a call); a
+translated variable; and content whose stream contains only text, spaces,
+symbols, smart quotes, breaks and `Strong`/`Emph`/`Heading`/item elements
+of such. Everything else — sums, `rgb`, `luma`, strokes, alignments
+combined with `+`, calls, fragments — is not total.
 A call is typed only if its arguments that are not total keep their source
 order under the lowering order; otherwise it is not typed.
 
@@ -163,7 +175,7 @@ computes:
 | `Bool`, `Int64`, `Double`, `String` | the literal (with a sign); a translated variable of that type |
 | `Length`, `Spacing`, `Sizing`, `Angle` | numeric literals by unit; sums, differences and negations of those (the facade lowers them with Typst's operators); `auto`/`none` |
 | `Paint` | a named colour constant; `rgb("#..")`; `luma(int)`; `none`/`auto`; any `Value` form as `Value(..)` (T2) |
-| `Stroke` | a length; a paint; `length + paint`; a dictionary literal of stroke fields; `none`/`auto` |
+| `Stroke` | a length; a paint; `length + paint`; `none`/`auto`. (A dictionary literal stays a dictionary, through `extra`: Typst validates its fields when the element function casts it, the facade would validate them while the arguments are lowered.) |
 | `Alignment`, `Dir`, `FontWeight` | the constants; `a + b` |
 | `Numbering`, `Supplement`, `LinkTarget` | a string; content; a label literal |
 | `&IntoSource` | a string literal, unchanged (section 9: the document's directory resolves it) |
@@ -178,8 +190,10 @@ Typst's.
 
 ### 4.4 `Value` forms (T2)
 
-Literals; array and dictionary literals of `Value` forms without spreads
-(`Value::spread` exists only among the arguments of a call); a content
+Literals; array literals and dictionary literals with identifier or
+string-literal keys, of `Value` forms and without spreads
+(`Value::spread` exists only among the arguments of a call; a computed
+key has no form); a content
 block; a global path as `Value::global(path)`; a call of a global path as
 `Value::call`; a translated variable. Nothing else has a `Value` form; in
 particular closures do not (section 6.3).
@@ -203,7 +217,10 @@ particular closures do not (section 6.3).
     defaults Typst evaluates when the closure is created, and no sink)
     whose body is a content block or an element constructor call that
     translates with the parameter bound to the callback's view, used only
-    as content (which re-emits the matched element). Field reads of the
+    as content (which re-emits the matched element), outside a callback
+    (a rule or `context` inside the body would be a callback created
+    inside a callback, which the EDSL rejects; the body is translated
+    with that restriction, so such bodies take the next form). Field reads of the
     view are not translated: the MoonBit callback would perform them
     while it builds its result, before anything of the result is lowered,
     which is not Typst's order. The result is the host callback
@@ -271,12 +288,19 @@ rules are:
    the content before the expression by the evaluator, which a fragment
    cannot do. The proof is by form: literals other than labels, content
    blocks, closures, array and dictionary literals, unary and binary
-   operations, `context` and `include` expressions, global paths, calls of
-   global paths other than `label` and `eval`, calls of the methods of a
-   fixed list whose results are never labels (`display`, `step`, `update`,
-   `len`, `join`, `map`, ...; not `at`, `first`, `last`, `find`, `fold`,
-   `get`, `final`, ...), translated variables, and conditionals, loops and
-   code blocks whose branches, bodies and statements are of these forms.
+   operations, `context` and `include` expressions, global paths,
+   translated variables, and conditionals, loops and code blocks whose
+   branches, bodies and statements are of these forms. A call is of these
+   forms only with an audited guarantee for the resolved function and
+   receiver: a global path that resolves to an element function (its
+   result is content); a global path in the audited list (`lorem`, `rgb`,
+   `luma`, `counter`, `state`, `numbering`, `repr`, `str`, `int`, `float`,
+   `range`, `datetime`, `stroke`, the gradient constructors, `tiling`); a
+   method in the audited list of its receiver's type where the receiver is
+   a call of `counter` (`display`, `step`, `update`, `get`, `at`, `final`:
+   arrays and content), a call of `state` (`update`, `display`), or a
+   string literal (every `str` method). No other call qualifies: `join`,
+   `first`, `at`, `calc.min` and user functions can return a label.
    Its scope holds the translated variables it mentions.
 2. **Whole streams.** If a markup stream contains a statement that is not
    typed, an expression item that is not typed and not proven to be no
@@ -429,7 +453,7 @@ the first failing phase. The report aggregates per suite directory.
 | 4 mirror markup, no merging, symbols | 4.1; `Symbol` (9) |
 | 5 argument order, `extra`, bindings, joins, arithmetic | 4.2 (order check), 4.2 (`extra` only for named and optional positional fields), 5 (literals only), 6.2 (code blocks and loops are fragments), 4.3 (no MoonBit operators) |
 | 6 fallback regions | section 6: no preludes, no continuations, expression items or whole streams |
-| 7 value fallback, source context | 6.3 (`eval` only during initial lowering), 9 (`dir`) |
+| 7 value fallback, source context | 6.3 (no value fragments, no `eval` fallback), 9 (`dir`) |
 | 8, 9 comparison | section 7: the twin normalizer, structure, both memo modes and cross-mode, expected failures |
 | 10 callbacks and tiers | 4.5, 4.6, 6.5 |
 | 11 build | section 8 |
@@ -448,3 +472,15 @@ Review 2 (revision 3):
 | collection spreads (4.4) | 4.4: spread-free literals only |
 | frame tags use the realization dump (7) | 7.2: tags are encoded structurally |
 | wrapper argument hygiene; `ShowWith::all` | 4.5 |
+
+Review 3 (revision 4):
+
+| Review-3 item | Resolution |
+|---|---|
+| the non-label proof admits labels (`join`, `calc.min`) | 6.1: calls qualify only with an audited guarantee for the resolved function and receiver type |
+| `Lit` only before labels is insufficient | 4.1: `Lit` for every text expression |
+| nested host callbacks in the typed callback form | 4.5: outside a callback, body translated with that restriction |
+| literal-built facades are not total (`luma(300)`) | 4.2: the total forms are enumerated |
+| stroke dictionaries validate early | 4.3: no typed form; a dictionary through `extra` |
+| computed dictionary keys | 4.4: identifier or string-literal keys |
+| syntax warnings disappear | 4.1: trees with errors or warnings are not translated |
