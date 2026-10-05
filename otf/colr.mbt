@@ -258,7 +258,7 @@ impl FromData for VarColorStopRaw with fn parse(data) {
 
 ///|
 priv struct NonVarColorLine {
-  extend : GradientExtend
+  extend_ : GradientExtend
   colors : LazyArray16[ColorStopRaw]
   palettes : CpalTable
   foreground_color : RgbaColor
@@ -310,7 +310,7 @@ fn VarColorLine::get(
 
 ///|
 priv struct VarColorLine {
-  extend : GradientExtend
+  extend_ : GradientExtend
   colors : LazyArray16[VarColorStopRaw]
   palettes : CpalTable
   foreground_color : RgbaColor
@@ -348,7 +348,7 @@ pub struct LinearGradient {
   /// The `y2` value.
   y2 : Float
   /// The extend.
-  extend : GradientExtend
+  extend_ : GradientExtend
   variation_data : ColrVariationData
   color_line : ColorLine
 }
@@ -386,7 +386,7 @@ pub struct RadialGradient {
   /// The `y1` value.
   y1 : Float
   /// The extend.
-  extend : GradientExtend
+  extend_ : GradientExtend
   variation_data : ColrVariationData
   color_line : ColorLine
 }
@@ -420,7 +420,7 @@ pub struct SweepGradient {
   /// The end angle.
   end_angle : Float
   /// The extend.
-  extend : GradientExtend
+  extend_ : GradientExtend
   variation_data : ColrVariationData
   color_line : ColorLine
 }
@@ -995,7 +995,7 @@ fn ColrTable::parse_paint_impl(
             y1,
             x2,
             y2,
-            extend: color_line.extend,
+            extend_: color_line.extend_,
             variation_data: self.variation_data(),
             color_line: NonVarColorLine(color_line),
           }),
@@ -1030,7 +1030,7 @@ fn ColrTable::parse_paint_impl(
             y1,
             x2,
             y2,
-            extend: color_line.extend,
+            extend_: color_line.extend_,
             variation_data: self.variation_data(),
             color_line: VarColorLine(color_line),
           }),
@@ -1059,7 +1059,7 @@ fn ColrTable::parse_paint_impl(
             x1,
             y1,
             r1,
-            extend: color_line.extend,
+            extend_: color_line.extend_,
             variation_data: self.variation_data(),
             color_line: NonVarColorLine(color_line),
           }),
@@ -1094,7 +1094,7 @@ fn ColrTable::parse_paint_impl(
             x1,
             y1,
             r1,
-            extend: color_line.extend,
+            extend_: color_line.extend_,
             variation_data: self.variation_data(),
             color_line: VarColorLine(color_line),
           }),
@@ -1119,7 +1119,7 @@ fn ColrTable::parse_paint_impl(
             center_y,
             start_angle,
             end_angle,
-            extend: color_line.extend,
+            extend_: color_line.extend_,
             color_line: NonVarColorLine(color_line),
             variation_data: self.variation_data(),
           }),
@@ -1150,7 +1150,7 @@ fn ColrTable::parse_paint_impl(
             center_y,
             start_angle,
             end_angle,
-            extend: color_line.extend,
+            extend_: color_line.extend_,
             color_line: VarColorLine(color_line),
             variation_data: self.variation_data(),
           }),
@@ -1495,10 +1495,10 @@ fn ColrTable::parse_color_line(
 ) -> NonVarColorLine? {
   try {
     let s = Stream::new_at_r(self.data, offset)
-    let extend : GradientExtend = s.read()
+    let extend_ : GradientExtend = s.read()
     let count = s.read_u16()
     let colors = s.read_array16(count)
-    Some({ extend, colors, foreground_color, palettes: self.palettes, })
+    Some({ extend_, colors, foreground_color, palettes: self.palettes, })
   } catch {
     _ => None
   }
@@ -1512,10 +1512,10 @@ fn ColrTable::parse_var_color_line(
 ) -> VarColorLine? {
   try {
     let s = Stream::new_at_r(self.data, offset)
-    let extend : GradientExtend = s.read()
+    let extend_ : GradientExtend = s.read()
     let count = s.read_u16()
     let colors = s.read_array16(count)
-    Some({ extend, colors, foreground_color, palettes: self.palettes, })
+    Some({ extend_, colors, foreground_color, palettes: self.palettes, })
   } catch {
     _ => None
   }

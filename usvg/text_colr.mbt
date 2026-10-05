@@ -158,7 +158,7 @@ fn GlyphPainter::paint_linear_gradient(
   self.svg.write_attribute("x2", rust_display_f32(gradient.x1))
   self.svg.write_attribute("y2", rust_display_f32(gradient.y1))
   self.svg.write_attribute("gradientUnits", "userSpaceOnUse")
-  self.write_spread_method_attribute(gradient.extend)
+  self.write_spread_method_attribute(gradient.extend_)
   self.write_transform_attribute("gradientTransform", gradient_transform)
   self.write_gradient_stops(
     gradient.stops(self.palette_index, self.face.variation_coordinates()),
@@ -191,7 +191,7 @@ fn GlyphPainter::paint_radial_gradient(
   self.svg.write_attribute("fx", rust_display_f32(gradient.x0))
   self.svg.write_attribute("fy", rust_display_f32(gradient.y0))
   self.svg.write_attribute("gradientUnits", "userSpaceOnUse")
-  self.write_spread_method_attribute(gradient.extend)
+  self.write_spread_method_attribute(gradient.extend_)
   self.write_transform_attribute("gradientTransform", gradient_transform)
   self.write_gradient_stops(
     gradient.stops(self.palette_index, self.face.variation_coordinates()),

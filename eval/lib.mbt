@@ -23,7 +23,7 @@ pub fn eval_source(
     introspector: @library.Introspector::empty(),
     traced,
     sink,
-    route: @library.Route::extend(route).with_id(id),
+    route: @library.Route::extend_(route).with_id(id),
   }
 
   // Prepare VM.

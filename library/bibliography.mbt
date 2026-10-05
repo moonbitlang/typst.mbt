@@ -636,7 +636,7 @@ fn Works::generate_impl(
   engine : Engine,
   bibs_and_groups : Array[Content],
 ) -> Works {
-  let engine = { ..engine, route: Route::extend(engine.route), }
+  let engine = { ..engine, route: Route::extend_(engine.route), }
 
   // Prepare bibliographies and citation groups for rendering with
   // hayagriva.

@@ -91,7 +91,7 @@ pub(all) enum ShadingType {
     /// The function forming the basis of the shading.
     function~ : ShadingFunction,
     /// The extends in the left/right direction of the shading.
-    extend~ : FixedArray[Bool],
+    extend_~ : FixedArray[Bool],
     /// Whether the shading is axial or radial.
     axial~ : Bool
   )
@@ -177,7 +177,7 @@ fn Shading::new(
       guard read_function(dict, color_space) is Some(function) else {
         return None
       }
-      let extend = match (dict.get_fixed("Extend", 2) : Array[Bool]?) {
+      let extend_ = match (dict.get_fixed("Extend", 2) : Array[Bool]?) {
         Some(e) => FixedArray::from_array(e)
         None => [false, false]
       }
@@ -204,7 +204,7 @@ fn Shading::new(
       if invalid {
         ShadingType::Dummy
       } else {
-        ShadingType::RadialAxial(domain~, function~, extend~, coords~, axial~)
+        ShadingType::RadialAxial(domain~, function~, extend_~, coords~, axial~)
       }
     }
     4 => {

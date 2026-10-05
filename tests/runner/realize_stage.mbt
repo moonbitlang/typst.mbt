@@ -39,7 +39,7 @@ fn realize_report(rel : String, tc : TestCase) -> String {
       sink,
       // Like in `layout_document`/`html_document`, realization happens in a
       // nested route.
-      route: @library.Route::extend(@library.Route::root()).unnested(),
+      route: @library.Route::extend_(@library.Route::root()).unnested(),
     }
     let info = @library.DocumentInfo::new()
     let options = @library.DocumentFormatOptions::new(formats=library.formats)
