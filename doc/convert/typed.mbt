@@ -49,11 +49,10 @@ fn Tr::typed_form(
     "Numbering" =>
       match unparen(expr) {
         None(_) => { code: "Numbering::none()", total: true, }
-        _ => {
-          let pattern = self.scalar(expr, TStr, env)
-          // The pattern is parsed by the field's cast.
-          { code: "Numbering(\{pattern.code})", total: true, }
-        }
+        // A string literal; the pattern is parsed by the field's cast.
+        Str(pattern) =>
+          { code: "Numbering(\{mbt_str(pattern.get())})", total: true, }
+        _ => raise Bail("untyped")
       }
     "Supplement" =>
       match unparen(expr) {
@@ -330,7 +329,7 @@ fn Tr::paint(
       if self.global_path(call.callee(), env) is Some(path) &&
         find_func(path) is Some(func) &&
         func.owner == "Paint" &&
-        self.lookup(path) is Some(Func(_)) &&
+        self.lookup(path) is Some(Func(_) | Type(_)) &&
         self.try_sig(Sig::of_func(func), path, call.args(), env) is Ok(code) {
         return code
       }
@@ -354,39 +353,73 @@ fn Tr::typed_color(self : Tr, expr : @ast.Expr, env : Env) -> Code? {
 }
 
 ///|
-/// A stroke: a length, a colour, `length + colour`, `none`/`auto`. Each is
-/// the stroke the field's cast makes of the Typst value: `Stroke(..)`
-/// calls `stroke(..)` with the same parts, which cannot fail for a certain
-/// length and a colour. A dictionary literal has no typed form: Typst
-/// validates its fields when the element function casts it, the facade
-/// would validate them while the arguments are lowered.
+/// A stroke: one numeric literal with a length unit, a colour (a named
+/// constant, `rgb("..")`, `luma(n)`), the sum of the two, `none`/`auto`.
+/// Each is the stroke the field's cast makes of the Typst value:
+/// `Stroke(..)` calls `stroke(..)` with the same parts, which cannot fail
+/// for a length and a colour. Ratios, relative lengths and other paints
+/// have no typed form (the facade's call would validate them while the
+/// arguments are lowered), and neither has a dictionary literal (Typst
+/// validates its fields when the element function casts it).
 fn Tr::stroke(self : Tr, expr : @ast.Expr, env : Env) -> Code raise Bail {
   match unparen(expr) {
     None(_) => { code: "Stroke::none()", total: true, }
     Auto(_) => { code: "Stroke::auto()", total: true, }
     Binary(binary) if binary.op() is Add => {
       // `length + colour` (in either order) is a stroke.
-      let (length, color) = if self.is_pure_length(binary.lhs(), env) {
+      let (length, color) = if is_length_literal(binary.lhs()) {
         (binary.lhs(), binary.rhs())
       } else {
         (binary.rhs(), binary.lhs())
       }
-      let color = self.color(color, env)
-      let length = self.length(length, env, false, true)
+      let color = self.constant_color(color, env)
+      let length = self.length_literal(length, env)
       {
         code: "Stroke(paint=\{color.code}, thickness=\{length.code})",
         total: false,
       }
     }
     _ =>
-      if self.is_pure_length(expr, env) {
-        let length = self.length(expr, env, false, true)
+      if is_length_literal(expr) {
+        let length = self.length_literal(expr, env)
         { code: "Stroke(thickness=\{length.code})", total: false, }
       } else {
-        let color = self.color(expr, env)
+        let color = self.constant_color(expr, env)
         { code: "Stroke(paint=\{color.code})", total: false, }
       }
   }
+}
+
+///|
+/// Whether an expression is one numeric literal with a length unit (no
+/// ratio).
+fn is_length_literal(expr : @ast.Expr) -> Bool {
+  unparen(expr) is Numeric(numeric) &&
+  numeric.get().1 is (Pt | Mm | Cm | In | Em)
+}
+
+///|
+fn Tr::length_literal(
+  self : Tr,
+  expr : @ast.Expr,
+  env : Env,
+) -> Code raise Bail {
+  guard is_length_literal(expr) else { raise Bail("untyped") }
+  self.length(expr, env, false, true)
+}
+
+///|
+/// A colour that is statically one: a named constant (no variable),
+/// `rgb("..")`, `luma(n)`.
+fn Tr::constant_color(
+  self : Tr,
+  expr : @ast.Expr,
+  env : Env,
+) -> Code raise Bail {
+  if unparen(expr) is Ident(ident) && env.vars.contains(ident.get()) {
+    raise Bail("untyped")
+  }
+  self.color(expr, env)
 }
 
 ///|

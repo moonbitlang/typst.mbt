@@ -165,6 +165,7 @@ fn Tr::typed_where(
     guard order.search(field.0) is Some(at) &&
       elem.param(field.0) is Some((_, name, _, ty)) &&
       keeps_raw_value(field.1, ty) &&
+      !is_label_field(elem.path, field.0) &&
       self.typed(field.1, ty, env) is Some(code) else {
       self.rollback(mark)
       return None

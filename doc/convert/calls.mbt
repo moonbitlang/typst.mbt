@@ -319,9 +319,9 @@ fn Tr::generic_args(
     index += 1
   }
   // A spread dictionary gives named arguments, of which the last one of a
-  // name wins: the named arguments must all follow the spreads.
+  // name wins: a call with a spread after a named argument is not typed.
   if last_spread >= 0 && first_named >= 0 && first_named < last_spread {
-    raise Bail("argument-order")
+    raise Bail("spread-after-named")
   }
   check_order(slots)
   let positional = if positional.is_empty() {
@@ -357,6 +357,14 @@ fn Tr::try_sig(
   } noraise {
     code => Ok(code)
   }
+}
+
+///|
+/// The `String` parameters of the table that are the name of a label
+/// (`Ref("intro")` is `ref(<intro>)`, `Cite("key")` is `cite(<key>)`): the
+/// table does not tell them from string fields.
+fn is_label_field(path : String, field : String) -> Bool {
+  (path == "ref" && field == "target") || (path == "cite" && field == "key")
 }
 
 ///|
@@ -475,7 +483,15 @@ fn Tr::sig_call(
         continue
       }
       Some((_, _, Pos, ty)) if !sig.set => {
-        let code = self.typed_form(arg.expr, ty, env)
+        let code = if is_label_field(path, arg.field) {
+          // The parameter is the name of a label: only a label literal
+          // has this form (Typst rejects a string). The constructor
+          // calls `label`.
+          guard unparen(arg.expr) is Label(label) else { raise Bail("call") }
+          { code: mbt_str(label.get()), total: false, }
+        } else {
+          self.typed_form(arg.expr, ty, env)
+        }
         slots.push({
           major: sig.lowered_at(arg.field),
           minor: 0,
