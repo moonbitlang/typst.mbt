@@ -35,18 +35,21 @@ priv struct Pieces {
   base : @syntax.Span
   /// The number of spans that were given out. The first is `base` itself.
   next : @ref.Ref[Int]
+  /// The spans of what is inside the argument under `Keyed` wrappers: one
+  /// counter per path of keys (`Lower::keyed`).
+  keyed : Map[String, Pieces]
 }
 
 ///|
 /// The spans inside `base`, none given out.
 fn Pieces::new(base : @syntax.Span) -> Pieces {
-  { base, next: { val: 0, }, }
+  { base, next: { val: 0, }, keyed: Map([]), }
 }
 
 ///|
 /// The spans inside `base` after `base` itself, which the caller uses.
 fn Pieces::after(base : @syntax.Span) -> Pieces {
-  { base, next: { val: 1, }, }
+  { base, next: { val: 1, }, keyed: Map([]), }
 }
 
 ///|
@@ -83,6 +86,49 @@ fn is_pieces_key(key : String) -> Bool {
 /// `anchor`, which the caller gives to the argument itself.
 fn Lower::at(self : Lower, anchor : @syntax.Span) -> Lower {
   { ..self, pieces: Some(Pieces::after(anchor)), }
+}
+
+///|
+/// For lowering a body without a location of its own under the keys `keys`
+/// (the current ones and that of a `Keyed`): the lowering context and the
+/// span of the body. `fallback` is the span that the body would have
+/// without the key.
+///
+/// The body is a piece of the enclosing argument under the keys: of the
+/// argument's token (or line) in the origin's occurrence under the keys
+/// (`Registry::keyed_span`). The pieces of an argument under one path of
+/// keys have a counter of their own, so the first is that token itself,
+/// and a second body under the same keys — another cell of a row whose
+/// cells have the row's key — takes the next piece instead of the same
+/// span. What is inside a body takes further pieces from that counter.
+fn Lower::keyed(
+  self : Lower,
+  keys : Array[String],
+  fallback : @syntax.Span,
+) -> (Lower, @syntax.Span) raise @library.SourceError {
+  match self.pieces {
+    Some(outer) => {
+      // (Unambiguous for any keys: each is prefixed with its length.)
+      let path = keys.map(key => "\{key.length()}:\{key}").join("")
+      let pieces = match outer.keyed.get(path) {
+        Some(pieces) => pieces
+        None => {
+          let pieces = Pieces::new(
+            self.session.registry.keyed_span(outer.base, keys),
+          )
+          outer.keyed[path] = pieces
+          pieces
+        }
+      }
+      let inner : Lower = { ..self, keys, pieces: Some(pieces), }
+      (inner, inner.take(pieces))
+    }
+    // No argument is being lowered: the span itself under the keys.
+    Option::None => {
+      let span = self.session.registry.keyed_span(fallback, keys)
+      ({ ..self, keys, pieces: Some(Pieces::after(span)), }, span)
+    }
+  }
 }
 
 ///|
@@ -232,8 +278,8 @@ fn Lower::content(
       // argument's origin under the keys.
       match body.node {
         NText(_, None) | NValue(_) | NSpace(_) => {
-          let fallback = self.session.registry.keyed_span(fallback, keys)
-          inner.at(fallback).content(body, fallback)
+          let (inner, span) = self.keyed(keys, fallback)
+          inner.content(body, span)
         }
         _ => inner.content(body, fallback)
       }
@@ -481,8 +527,8 @@ fn Lower::inserted(
       let inner : Lower = { ..self, keys, }
       match body.node {
         NValue(_) => {
-          let fallback = self.session.registry.keyed_span(fallback, keys)
-          inner.at(fallback).inserted(body, fallback)
+          let (inner, span) = self.keyed(keys, fallback)
+          inner.inserted(body, span)
         }
         _ => inner.inserted(body, fallback)
       }

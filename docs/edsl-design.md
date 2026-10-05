@@ -1433,6 +1433,15 @@ report.mbt:57:9-57:40@acme/report TableCell key="row-17" a0=report.mbt:57:19-57:
   contains them. The values of a `Markup`/`Equation` scope and the
   selector and transformation values of a show rule are located arguments
   in this sense (the scope values share the call's line).
+  **Under `Keyed`.** A plain string or value inside `Keyed(key, ..)` is
+  a piece of the enclosing argument under the keys: of the argument's
+  token (or line) in the origin's occurrence under the keys. The pieces
+  of an argument under one path of keys have a counter of their own
+  (`Lower::keyed`): the first body is that token itself, a second body
+  under the same keys — another cell of a row whose cells have the row's
+  key — is the next piece, and what is inside a body takes further
+  pieces from that counter. So two bodies under one key are never equal
+  including their spans, like two strings without a key.
   **Reuse.** A description with a site of its own that is used twice
   (`let e = Emph("x")`, `Seq([e, e])`) has the spans of its site in both
   places, like the expression of a function that is called twice

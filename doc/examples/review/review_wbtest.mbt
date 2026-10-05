@@ -562,3 +562,62 @@ test "positions on the showcase: source lines lead back to the pages" {
   assert_eq(origin_of(image[0]).kind, "Image")
   assert_true(image[0].width > 100.0 && image[0].height > 100.0)
 }
+
+///|
+test "the showcase's loop-built rows name their data row" {
+  let report = compile_document(@twins.full_showcase)
+  let text = report.review_text(sources=@system.sources())
+  let source = @utf8.decode(@system.read(bench_file))
+  // A click on a cell of the stage table: the argument that holds the
+  // cells, under the key of the row.
+  let cell = spot(report, "parser, AST, incremental reparse")
+  assert_eq((cell.kind, cell.keys), ("Table", ["stage:syntax"]))
+  assert_eq(cell.start_line, position_of(source, "stage_cells,").0)
+  assert_eq(spot(report, "PNG rasterization").keys, ["stage:render"])
+  // The computed table: the cell with 13 is the eighth Fibonacci number.
+  assert_eq(spot(report, "13").keys, ["fib:7"])
+  // The four cells of a row are four pieces of that origin, and the
+  // feedback names the key.
+  let row = text.feedback(
+    text.find("syntax parser, AST, incremental reparse 3 792 100%").unwrap(),
+    "",
+  )
+  assert_eq(row.origins.length(), 1)
+  assert_eq(row.origins[0].pieces, [
+    "syntax", "parser, AST, incremental reparse", "3 792", "100%",
+  ])
+  assert_true(
+    row
+    .to_text()
+    .contains(", Table(..), parameter 1, data key \"stage:syntax\"\n"),
+  )
+  assert_true(
+    row.origins[0].why.has_prefix("the argument is the variable `stage_cells`"),
+  )
+  // A selection over two rows: two origins, one per key.
+  let rows = text.feedback(text.find("100% eval evaluation").unwrap(), "")
+  assert_eq(rows.origins.map(o => o.origin.keys), [
+    ["stage:syntax"],
+    ["stage:eval"],
+  ])
+  // The line of the argument still leads to all the cells.
+  let cells = text.positions(bench_file, cell.start_line)
+  assert_true(cells.length() > 30)
+  // Content made in a callback, with its source characters: the page
+  // header is on every page but the first, from one literal.
+  let header = text.feedback(text.find("a MoonBit port of Typst").unwrap(), "").origins[0]
+  assert_eq((header.origin.kind, header.tier), ("Emph", 3))
+  assert_eq(header.source_ranges.map(r => r.text), ["a MoonBit port of Typst"])
+  // Raw text interpolated into prose: its call.
+  let raw = text.feedback(text.find("syntect").unwrap(), "").origins[0]
+  assert_eq((raw.origin.kind, raw.tier), ("Raw", 1))
+  // The entries of the bibliography: its call. A citation: its call.
+  let entry = text.feedback(text.find("The Pirate Organization").unwrap(), "").origins[0]
+  assert_eq((entry.origin.kind, entry.tier), ("Bibliography", 1))
+  assert_eq(
+    entry.origin.start_line,
+    position_of(source, "Bibliography(\"works.bib\"").0,
+  )
+  let cited = text.feedback(text.find("[2]").unwrap(), "").origins[0]
+  assert_eq((cited.origin.kind, cited.tier), ("Ref", 1))
+}
