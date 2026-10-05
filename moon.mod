@@ -1,6 +1,6 @@
 name = "moonbitlang/typst"
 
-version = "0.1.0"
+version = "0.1.1"
 
 readme = "README.md"
 
@@ -18,6 +18,6 @@ warnings = "-implicit_impl_as_method"
 
 import {
   "moonbitlang/x@0.5.5",
-  "moonbitlang/pdflite@0.3.5",
-  "moonbit-community/flate@0.8.1",
+  "moonbitlang/pdflite@0.3.6",
+  "moonbit-community/flate@0.8.5",
 }
