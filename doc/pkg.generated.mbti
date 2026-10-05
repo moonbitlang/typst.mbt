@@ -216,9 +216,12 @@ pub struct CompileReport[T] {
   origins : Origins
   // private fields
 }
+pub fn CompileReport::jump_from_click(Self[@layout.PagedDocument], Int, Double, Double) -> Jump?
+pub fn CompileReport::origin_at(Self[@layout.PagedDocument], Int, Double, Double) -> Origin?
 pub fn[T] CompileReport::output(Self[T]) -> T?
 pub fn CompileReport::pdf(Self[@layout.PagedDocument], options? : @pdf.PdfOptions) -> ExportReport[Bytes]
 pub fn CompileReport::png_pages(Self[@layout.PagedDocument], ppi? : Double) -> ExportReport[Array[Bytes]]
+pub fn CompileReport::review_html(Self[@layout.PagedDocument], title? : String) -> ExportReport[String]
 pub fn CompileReport::svg_pages(Self[@layout.PagedDocument], options? : @svg.SvgOptions) -> ExportReport[Array[String]]
 pub fn[T] CompileReport::unwrap(Self[T]) -> T raise DocError
 
@@ -799,6 +802,12 @@ pub fn ImageView::view(Self) -> ContentView
 pub impl @builtin.Show for ImageView
 pub impl @debug.Debug for ImageView
 pub impl IntoContent for ImageView
+
+pub(all) enum Jump {
+  Source(Origin)
+  Url(String)
+  Position(page~ : Int, x~ : Double, y~ : Double)
+}
 
 pub struct Keyed {
   // private fields
