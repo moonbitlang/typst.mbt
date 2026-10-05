@@ -126,6 +126,9 @@
   Slice 4a: `ReviewText::positions(file, line, column?)` gives the boxes
   on the pages of what a source line produced (`doc/review_positions.mbt`;
   the page has a "Source line" field with the same rule in `Core`).
+  Slice 4b: bodies under one `Keyed` key in one argument are distinct
+  pieces (`Lower::keyed`, one counter per key path); the showcase keys
+  its data-driven rows.
 - Typst-to-EDSL translator (`doc/convert`, design in `docs/edsl-convert.md`,
   Codex-approved; a stress test of the EDSL, not a compiler): typed where
   the design's narrow rules prove it exact, Typst source in `Markup`

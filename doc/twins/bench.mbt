@@ -113,15 +113,19 @@ pub fn full_showcase() -> Document {
       Strong("Pass"),
     ]),
   ]
+  // The cells of the two tables come from data. Each row has a key, so
+  // that a review comment on a cell names the row it is from
+  // (docs/edsl-review.md, slice 4b); `Keyed` does not change the content.
   for row in stage_rows {
-    stage_cells.push(row.0)
-    stage_cells.push(row.1)
-    stage_cells.push(row.2)
-    stage_cells.push(row.3)
+    let key = "stage:\{row.0}"
+    stage_cells.push(Keyed(key, row.0))
+    stage_cells.push(Keyed(key, row.1))
+    stage_cells.push(Keyed(key, row.2))
+    stage_cells.push(Keyed(key, row.3))
   }
   let fib_cells : Array[&@doc.IntoContent] = []
-  for n in fibonacci(12) {
-    fib_cells.push(n.to_string())
+  for i, n in fibonacci(12) {
+    fib_cells.push(Keyed("fib:\{i}", n.to_string()))
   }
   let hyphenation_note = Footnote(
     (

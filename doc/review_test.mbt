@@ -990,3 +990,129 @@ test "positions: one location under many keys, and the reach of a stroke" {
   // (And for a pointed join up to the miter limit, here 4: not more.)
   assert_true(box.width <= 28.01)
 }
+
+///|
+test "keyed: bodies under one key in one argument are pieces of their own" {
+  // The cells of a row that have the row's key, two of them equal.
+  let report = compile_on_page([
+    @doc.List([
+      @doc.Keyed("row", "one"),
+      @doc.Keyed("row", "two"),
+      @doc.Keyed("row", "one"),
+      @doc.Keyed("other", "one"),
+    ]),
+  ])
+  let glyphs = []
+  for page in report.unwrap().pages() {
+    collect_glyphs(page.frame, glyphs)
+  }
+  let spans : Map[@syntax.Span, String] = Map([])
+  for glyph in glyphs {
+    guard report.origins.resolve(glyph.1) is Some(origin) else { continue }
+    assert_eq(origin.kind, "List")
+    spans[glyph.1] = "\{glyph.0} \{origin.keys}"
+  }
+  inspect(
+    spans.values().collect().join(" | "),
+    content=(
+      #|one [row] | two [row] | one [row] | one [other]
+    ),
+  )
+  // Each is a piece in the feedback: three of one origin, one of another.
+  let text = report.review_text()
+  let feedback = text.feedback(text.range(0, 3).unwrap(), "")
+  inspect(
+    feedback.origins
+    .map(o => "\{o.origin.keys}: \{o.pieces.join("/")}")
+    .join(" | "),
+    content=(
+      #|[row]: one/two/one | [other]: one
+    ),
+  )
+  // Call values under one key, with arguments of their own: every text
+  // has its span, in the one origin under the key.
+  let children : Array[&@doc.IntoContent] = []
+  for i in 0..<30 {
+    children.push(
+      @doc.Keyed(
+        "row",
+        @doc.Value::call("strong", positional=[@doc.Value::content("s\{i};")]),
+      ),
+    )
+    children.push(@doc.Keyed("row", "t\{i};"))
+  }
+  let report = compile_on_page([@doc.Par(@doc.Seq(children))])
+  assert_true(report.errors.is_empty())
+  let glyphs = []
+  for page in report.unwrap().pages() {
+    collect_glyphs(page.frame, glyphs)
+  }
+  let texts : Map[@syntax.Span, Unit] = Map([])
+  for glyph in glyphs {
+    guard report.origins.resolve(glyph.1) is Some(origin) else { continue }
+    assert_eq(origin.keys, ["row"])
+    texts[glyph.1] = ()
+  }
+  assert_eq(texts.length(), 60)
+  // A key that is used once has the span that it always had: the token
+  // of the argument in the origin under the key.
+  let once = compile_on_page([@doc.Par(@doc.Keyed("k", "alone"))])
+  let origin = once.origin_at(1, 14.0, 16.0).unwrap()
+  assert_eq((origin.kind, origin.keys, origin.param), ("Par", ["k"], Some(0)))
+}
+
+///|
+test "what the review reports for callbacks, raw text, bibliographies and included files" {
+  let files : Map[String, Bytes] = Map([])
+  files["refs.yaml"] = @utf8.encode(
+    "probe:\n  type: Book\n  title: A plain title\n  author: Doe, Jane\n  date: 2020\n",
+  )
+  files["part.typ"] = @utf8.encode("Included words.")
+  let report = @doc.Document([
+    test_page(),
+    // Content that a callback makes: the constructor calls inside it.
+    @doc.Context(_ => @doc.Par(@doc.Seq(["made ", @doc.Emph("inside")]))),
+    // A show rule with a callback: what it adds is the call inside it,
+    // what it passes on keeps its own origin.
+    @doc.Seq([
+      @doc.Show(@doc.Select::strong()) <| ((it, _) => {
+        @doc.Seq([@doc.Lit("added "), it])
+      }),
+      @doc.Par(@doc.Strong("kept")),
+    ]),
+    // Raw text: the call. Raw text in markup: the `Markup` call, one
+    // piece per line.
+    @doc.Raw("let x = 1"),
+    @doc.Markup("```\nfirst line\nsecond line\n```"),
+    // A bibliography and a citation: their calls.
+    @doc.Par(@doc.Cite("probe")),
+    @doc.Bibliography("refs.yaml"),
+    // Typst source in a file of its own has no MoonBit origin.
+    @doc.Markup("#include \"part.typ\""),
+  ]).compile_paged(@doc.DocWorld::in_memory(files~))
+  for error in report.errors {
+    println(error.render())
+  }
+  let text = report.review_text()
+  let origin = (needle : String) => {
+    let entry = text.feedback(text.find(needle).unwrap(), "").origins[0]
+    "\{entry.origin.kind} \{entry.origin.param} tier \{entry.tier}"
+  }
+  inspect(origin("made"), content="Seq Some(0) tier 2")
+  inspect(origin("inside"), content="Emph Some(0) tier 2")
+  inspect(origin("added"), content="Lit None tier 1")
+  inspect(origin("kept"), content="Strong Some(0) tier 2")
+  inspect(origin("let x"), content="Raw None tier 1")
+  inspect(origin("second line"), content="Markup None tier 1")
+  let lines = text.feedback(text.find("first line second line").unwrap(), "")
+  assert_eq(lines.origins.length(), 1)
+  assert_eq(lines.origins[0].pieces, ["first line", "second line"])
+  // The citation and the entry of the list.
+  inspect(origin("[1]"), content="Cite None tier 1")
+  inspect(origin("plain title"), content="Bibliography None tier 1")
+  // The included file's text is on the page, but not among the words:
+  // nothing of it can be selected, and a click on it finds no source.
+  assert_true(text.find("Included") is None)
+  assert_true(text.text().contains("A plain title"))
+  assert_true(!text.text().contains("Included"))
+}

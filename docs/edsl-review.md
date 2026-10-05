@@ -15,7 +15,7 @@ not do yet.
 | 2 | Select text across runs, comment, copy the feedback as text and JSON | below |
 | 3 | Source excerpts and source characters where they can be verified | below |
 | 4a | Source line → page positions; find by source line in the page; comments lead back to their selection | below |
-| 4b | `Keyed` data keys for loop-built content; what the loop reports for callbacks, raw lines, bibliographies | later |
+| 4b | `Keyed` data keys for loop-built content; what the loop reports for callbacks, raw lines, bibliographies | below |
 
 The appendix holds the design that the slices are cut from. It is **not
 under review**; its text moves into a slice's section, shortened, when
@@ -403,7 +403,7 @@ What that gives:
 - Text of `Markup` and `Equation` is the call (tier 1), not a position
   in the source string; raw text likewise. (A later slice.)
 - A parameter is still shown by its position; a `Keyed` data key is
-  shown, not used to find the row in the source.
+  shown, not used to find the row in the source (slice 4b).
 - `$|` lines with a backslash that starts no interpolation, and escapes
   other than `\n \r \t \b \\ \" \' \u{..} \uXXXX`, are not read: tier 2
   ("an expression").
@@ -531,6 +531,96 @@ after the transforms of the groups around them.
 - On the showcase's page: `node scripts/review_page_check.mjs` (36
   records, 16 source lines) and `#selftest`; by hand: find a line, add
   a comment, scroll away, "Show".
+
+## Slice 4b: data keys, and what is reported for the rest
+
+### `Keyed` rows
+
+Content that is built in a loop has one location for all its rows: the
+argument that holds the cells. `Keyed(key, body)` adds the key of the
+data row to the origin (D 4.2), and the loop already shows it: the panel
+has a "data key", the feedback text `data key "stage:syntax"`, the JSON
+`keys`. The showcase's two data-driven tables now key their rows
+(`stage:<name>`, `fib:<index>`), so a click on a cell names the row it
+is from:
+
+```
+Source 1 of 1: doc/twins/bench.mbt:263:9-263:20, Table(..), parameter 1, data key "stage:syntax"
+  rendered: "syntax parser, AST, incremental reparse 3 792 100%"
+  4 pieces of this argument are selected; they share this location, which is the argument as a whole.
+  note: the argument is the variable `stage_cells`: the text comes from a binding, not from a literal at this location
+```
+
+**One change to lowering comes with this** (`Lower::keyed`,
+`doc/lower.mbt`; D 12.2). A plain string or a value inside `Keyed` is a
+piece of the enclosing argument under the keys. Until now every such
+body under one key path had the same span, the argument's token in the
+origin under the keys: the four cells of a row were one piece for the
+review, and two equal cells were equal including their spans, which
+D 12.2 removes everywhere else. Now the pieces of an argument under one
+path of keys have a counter of their own: the first body has the span it
+always had, the next ones the further pieces of that token, and what is
+inside a body (the arguments of a call value) continues that counter.
+
+What that changes outside the review loop: nothing where a key path is
+used once per argument — the spans are the same — which is how the
+Typst-to-EDSL converter uses `Keyed` (a fresh key per value). Where a
+key repeats inside one argument, the later bodies get other spans (of
+the same origin). The differential stages, the `edsl` stage (the keyed
+showcase equals its Typst original in layout, SVG, PDF and pixels) and
+the conversion sweep (`edsl-suite`, both modes) are unchanged.
+
+### What the loop reports for the rest
+
+| Content | What a selection reports | Tier |
+|---|---|---|
+| made in a `Context` callback | the constructor calls inside the callback, like anywhere else; a literal there has source characters (the showcase's page header, on three pages from one literal) | 3 if literal, else 2 |
+| added by a show rule's callback | the constructor calls inside the callback; what the rule passes on keeps its own origin | as above |
+| raw text, `Raw(..)` | the `Raw` call | 1 |
+| raw text in `Markup` | the `Markup` call; each line is a piece of its own | 1 |
+| other text of `Markup` and `Equation` | the call | 1 |
+| a citation, a reference | the `Cite`/`Ref` call | 1 |
+| the entries of a bibliography | the `Bibliography` call (the entry's text is from the data file, which the loop does not read) | 1 |
+| text of a Typst file that markup includes or imports | nothing: its spans are of that file, not of the MoonBit source. It is on the page, but it is no word: it cannot be selected, and a click on it says that there is no source location | — |
+| what the engine generates (markers, numbers, supplements, the title of an outline or bibliography) | nothing, as in slice 1 | — |
+
+### What it guarantees
+
+1. Pieces under `Keyed` are distinct: two bodies under one key in one
+   argument never have the same span, also when their text is equal and
+   when a body is a call value with arguments of its own.
+2. A key that is used once in an argument has the span it had before.
+3. Normal output is unchanged: differential stages, the `edsl` stage,
+   and the conversion sweep.
+4. The table above is what the tests assert.
+
+### Known limits of this slice
+
+- The key is shown; it is not used to find the row in the source (the
+  data is a value, built somewhere else).
+- Rows without `Keyed` share the argument's origin and are told apart
+  only by their rendered text.
+- The location inside a `Markup` source (the line of a raw block) is
+  not mapped to source characters: the call is reported.
+- Included Typst files and bibliography data have no origin; mapping
+  them would need those files as sources.
+
+### Tests
+
+- `doc/review_test.mbt`: four bodies under two keys in one array, two of
+  them equal (distinct spans, one origin per key, a piece each); sixty
+  texts of call values and strings under one key; a key used once; a
+  document with a context callback, a show rule callback, raw text, raw
+  lines in markup, a citation, a bibliography from a data file and an
+  included Typst file — the constructor and the tier of each, and that
+  the included text is no word.
+- `doc/examples/review/review_wbtest.mbt`, on the showcase: cells name
+  their row (`stage:syntax`, `stage:render`, `fib:7`); the four cells of
+  a row are four pieces; a selection over two rows has two origins; the
+  page header from the callback has source characters; interpolated raw
+  text, a bibliography entry and a citation report their calls.
+- `edsl` stage: the keyed showcase equals `bench/showcase.typ`.
+  Conversion sweep: see the report of the slice.
 
 ## Appendix: later slices (not under review)
 
