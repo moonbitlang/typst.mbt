@@ -240,7 +240,6 @@ test "debug: a description prints as its constructor call, not as a placeholder"
       #|    { "k": add(1pt, 2em) },
       #|  ],
       #|)
-
     ),
   )
   // In a string: `Repr` is readable, plain interpolation is the hook of

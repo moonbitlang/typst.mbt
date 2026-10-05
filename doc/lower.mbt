@@ -374,11 +374,28 @@ fn Lower::args(
   span : @syntax.Span,
 ) -> @library.Args raise @library.SourceError {
   let items : Array[@library.Arg] = []
+  // How many arguments had each span so far.
+  let uses : Map[Int, Int] = Map([])
   for arg in args {
-    let arg_span = if entry >= 0 && arg.param >= 0 {
+    let base = if entry >= 0 && arg.param >= 0 {
       self.session.registry.arg_span(entry, arg.param)
     } else {
       span
+    }
+    // Arguments that share a location (the arguments of a generic call,
+    // the entries of a variadic array or of `extra`) still get distinct
+    // spans: sub-ranges of the shared one, which resolve to the same
+    // origin. A function that reports an error per argument would
+    // otherwise have equal diagnostics deduplicated into one.
+    let key = if entry >= 0 && arg.param >= 0 { arg.param } else { -1 }
+    let used = uses.get(key).unwrap_or(0)
+    uses[key] = used + 1
+    let arg_span = match base.get() {
+      // (Only the first few: the sub-range must stay inside the text
+      // before the next token of the listing line.)
+      Range(id~, start~, end~) if used > 0 && used < 16 && start + used < end =>
+        @syntax.Span::from_range(id, start + used, end)
+      _ => base
     }
     if arg.name is Some(name) {
       self.check_text(name, arg_span)
