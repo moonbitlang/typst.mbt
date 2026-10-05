@@ -48,6 +48,39 @@ reads every font file through moonrun's host API (slow; use
 `--ignore-system-fonts`), symlinks cannot be detected, the local time zone
 is UTC and only text can be written to stdout.
 
+## Documents as MoonBit code (experimental)
+
+The `doc` package builds documents with typed MoonBit constructors and
+compiles them with the same engine, without Typst markup. The API is
+experimental and may change between releases; the design is in
+`docs/edsl-design.md`.
+
+```moonbit
+fn report() -> @doc.Document {
+  @doc.Document([
+    @doc.SetPage(paper="a5", margin=@doc.Sides(all=@doc.Cm(1.8))),
+    @doc.SetHeading(numbering=@doc.Numbering("1.")),
+    @doc.Heading("Build times"),
+    (
+      $|Running text is a multiline string; inline elements such as
+      $|\{@doc.Emph("emphasis")} and \{@doc.Raw("code")} are interpolated.
+    )
+    |> @doc.Prose,
+    @doc.Equation("sum_(k=1)^n k = (n(n+1))/2", block=true),
+  ])
+}
+
+fn run() -> Unit raise {
+  let world = @system.world(root=".", system_fonts=false, today=(2026, 10, 5))
+  let compiled = report().compile_paged(world)
+  @system.write("report.pdf", compiled.pdf().unwrap())
+}
+```
+
+Import `moonbitlang/typst/doc` and `moonbitlang/typst/doc/system` (file
+and font access). Plain strings are literal text and are never parsed as
+markup; `Markup(..)` and `Equation(..)` are the explicit escape hatches.
+
 ## Testing
 
 ```sh
