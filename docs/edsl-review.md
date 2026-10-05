@@ -13,7 +13,7 @@ not do yet.
 |---|---|---|
 | 1 | Click to source: the preview page, the origin of every rendered piece, the click lookup | below |
 | 2 | Select text across runs, comment, copy the feedback as text and JSON | below |
-| 3 | Source excerpts and source characters where they can be verified | later |
+| 3 | Source excerpts and source characters where they can be verified | below |
 | 4 | `Keyed` data keys, callbacks, raw lines, limits, source line → page positions | later |
 
 The appendix holds the design that the slices are cut from. It is **not
@@ -228,7 +228,8 @@ Locations are constructor calls and their arguments in the MoonBit source (line:
 3. **Still call provenance only.** A record names constructor calls and
    arguments, and quotes rendered text. It does not say where in a
    string literal a piece is; the rendered text of the piece is what the
-   author searches for. The text block says so in its last line.
+   author searches for. (Slice 3 adds source characters where they can
+   be established.)
 4. **Nothing else changes.** The export still only reads the compiled
    document. Copying uses the clipboard when the page may; when it may
    not, the text is put into a text area and selected, and the page says
@@ -286,6 +287,145 @@ Locations are constructor calls and their arguments in the MoonBit source (line:
   paints. (Captures of a browser pane that is not shown are unreliable
   after the first frame: a second capture of the same scroll position
   can be blank although the page is fine. Judge by a visible pane.)
+
+## Slice 3: source excerpts and source characters
+
+### What it does
+
+```moonbit
+let text = report.review_text(sources=@system.sources())
+let feedback = text.feedback(text.find("Knuth–Plass style optimizer,").unwrap(), "Tighten.")
+```
+
+```
+Source 1 of 1: doc/twins/bench.mbt:202:7-215:18, Prose(..), parameter 1
+  rendered: "Knuth–Plass style optimizer,"
+  source characters: 202:36-202:64
+   202 |       $|Typst lays out text with a Knuth–Plass style optimizer, OpenType shaping and
+       |                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+```
+
+and, where the argument is a variable:
+
+```
+Source 1 of 1: doc/twins/bench.mbt:178:14-178:22, Text(..), parameter 1
+  rendered: "the Typst typesetting engine"
+  note: the argument is the variable `subtitle`: the text comes from a binding, not from a literal at this location
+   178 |         Text(subtitle, size=Pt(13)),
+       |              ^^^^^^^^
+```
+
+- **A source provider** is a function `(file, module) -> String?` that
+  gives the text of a MoonBit source file; `@system.sources(root?)`
+  reads the files below the module root. `review_text` and `review_html`
+  take it as `sources`. Without it nothing is read and everything stays
+  as in slice 2.
+- **Excerpts.** Every origin of a record has the lines of its source:
+  the lines of the source characters if it has them, the lines of the
+  location (argument or call) otherwise; at most six, with the number of
+  lines left out. The text block marks the characters (or a location
+  that is on one line) with `^`; the panel shows the same excerpt with
+  the same marks.
+- **Tiers.** Each origin has a tier, shown in the panel and in the
+  record: **3, source characters** — the runs of characters of the
+  source that spell the selected text; **2, the argument** as a whole;
+  **1, the call**. For tiers 1 and 2 a sentence says why it is not
+  narrower (`why`).
+- **What is embedded.** The page is made with the sources at hand:
+  the source characters of every word that has them, the tier and the
+  sentence of every origin, and the source lines of every location
+  are data of the page. The page reads no file and asks no server.
+
+### When source characters are given
+
+The argument at the origin's location is read from the source
+(`doc/review_source.mbt`): a string literal, a multi-line string
+(`#|`, `$|`), or an array whose elements are such literals. Its
+characters are taken with their line and column — escapes decoded,
+interpolations `\{..}` and elements that are no literal skipped.
+
+Then one comparison decides (`ReviewText::match_literal`): **all the text
+that the origin has on the page, in reading order, must be the literal's
+text, one or more times over, character by character.** White space is
+not compared (the page breaks lines, `Prose` reflows), nor are soft
+hyphens and directional formatting characters; a typographic quotation
+mark equals the plain one of the source. If the comparison holds, a
+character on the page is the character at the same position of the
+literal, and its line and column are known. If it does not hold, no
+source character is given for that origin: tier 2, with the reason.
+
+What that gives:
+
+| The argument | Result |
+|---|---|
+| a string literal, an array of them, a `Prose` block, shown as written (also twice: a heading and its outline entry; also hyphenated, with typeset quotes, across pages) | tier 3 |
+| a variable | tier 2: "the argument is the variable `name`: the text comes from a binding, not from a literal at this location". The binding is not followed |
+| a call, an operator, anything else | tier 2: "an expression, not a literal" |
+| a literal with an interpolation that adds text, or an array with a computed string | tier 2: the literal is not all of the text |
+| a literal whose text the engine changes (case, a show rule), draws in another order (right-to-left items of a line), or shows only in part (hidden, clipped away, scaled to zero) | tier 2: the literal is not the text on the page |
+| no argument: `Markup`, `Equation`, `Raw`, a shape, an image | tier 1: the call |
+| no provider, a file it does not have, a file without that location | tier 2 (or 1), no excerpt |
+
+### What it guarantees
+
+1. **A source character is only given after the comparison above.** The
+   record never points into a literal because an offset says so; it
+   points there because the whole text of the origin on the page is that
+   literal's text.
+2. **The excerpt is the source at the location**, read when the record
+   (or the page) is made. If the file changed since the document was
+   compiled, the comparison fails for the literals that changed and the
+   excerpt shows the new text at the old location; nothing checks that
+   the file is the one that was compiled.
+3. **The page and the library agree**, as in slice 2: the page's script
+   only joins runs of selected words and picks excerpt lines; the sample
+   records embedded in the page are compared by
+   `scripts/review_page_check.mjs` and `#selftest`.
+4. **Reading sources is opt-in and changes nothing else**: no provider,
+   no file access. `@system.sources` refuses names that leave its root.
+
+### Known limits of this slice
+
+- The comparison is about the origin's whole text. One changed word (a
+  show rule that replaces it), one hidden part, or one text item of a
+  line in another order takes the source characters away from the whole
+  argument, not only from the selection.
+- The comparison is by text, not by identity: if equal stretches of text
+  are drawn in exchanged places (a rule that reorders them), a selected
+  stretch is mapped to the source characters at its *position*, which
+  spell the same text.
+- A string that is used at two places of the source has two origins;
+  each is compared with its own text.
+- Text of `Markup` and `Equation` is the call (tier 1), not a position
+  in the source string; raw text likewise. (A later slice.)
+- A parameter is still shown by its position; a `Keyed` data key is
+  shown, not used to find the row in the source.
+- `$|` lines with a backslash that starts no interpolation, and escapes
+  other than `\n \r \t \b \\ \" \' \u{..} \uXXXX`, are not read: tier 2
+  ("an expression").
+- The excerpt shows at most six lines and does not shorten long lines.
+
+### Tests
+
+- `doc/review_source_wbtest.mbt`: the reader — strings, escapes,
+  interpolations, multi-line strings, arrays with other elements,
+  parentheses and comments, bindings, expressions, what it refuses.
+- `doc/review_test.mbt`: a provider in memory (asked once per file; the
+  runs, the excerpt, the marks, the page's data); a file with another
+  text at the location; a file that is too short; no provider.
+- `doc/examples/review/review_wbtest.mbt`, with the sources read from
+  disk: documents written in the test file itself (a literal, escapes,
+  an array with a call between its strings, a `Prose` block over two
+  lines with an interpolation and quotes, a heading with its outline
+  entry; a variable, an expression, an interpolated string, text in
+  upper case, hidden and scaled-away content, `Markup`); the expected
+  places are found by searching the file. On the showcase: words of a
+  prose block at the position found by searching `bench.mbt`, a
+  hyphenated word, the `subtitle` variable.
+- On the showcase's page: 36 of 78 origins are tier 3 (301 of 762 words
+  have source characters), 36 are calls, 5 are variables or
+  expressions, 1 is right-to-left text; `node
+  scripts/review_page_check.mjs` and `#selftest` pass.
 
 ## Appendix: later slices (not under review)
 

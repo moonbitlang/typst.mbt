@@ -1,7 +1,9 @@
 // Tests of the review loop (docs/edsl-review.md): the click search of
 // slice 1 (the cases of upstream's `typst-ide/src/jump.rs` that need no
 // Typst source), the words, selections and feedback records of slice 2,
-// and the preview page. The showcase is tested in `doc/examples/review`.
+// the tiers of slice 3 without a source file, and the preview page. What
+// needs source files (and the showcase) is tested in
+// `doc/examples/review`.
 
 ///|
 /// A page like upstream's test page: 120pt wide, 10pt margins.
@@ -372,10 +374,20 @@ test "the preview page is self-contained and carries the origin of every piece" 
   // data element.
   assert_true(
     html.contains(
-      "<script type=\"application/json\" id=\"review-data\">{\"title\":\"Test \\u003cpage>\",\"words\":[[1,\"A\",1,0,0],[1,\"\\u003cheading>\",1,0,0],",
+      "<script type=\"application/json\" id=\"review-data\">{\"title\":\"Test \\u003cpage>\",\"probes\":[[1,",
     ),
   )
-  assert_true(html.contains("\"probes\":[[1,"))
+  assert_true(
+    html.contains("\"words\":[[1,\"A\",1,0,0],[1,\"\\u003cheading>\",1,0,0],"),
+  )
+  // Without a source provider no line of a source file is in the page.
+  assert_true(html.contains("\"lines\":[]"))
+  assert_true(html.contains("\"kind\":\"Heading\",\"range\":["))
+  assert_true(
+    html.contains(
+      ",\"param\":0,\"tier\":2,\"why\":\"the location is the argument as a whole: its source file was not read",
+    ),
+  )
   assert_true(html.contains("\"samples\":[[0,0,{\"format\":"))
   // The panel takes a comment and gives the record to copy.
   for
@@ -571,22 +583,24 @@ test "feedback: the text block and the JSON record" {
       #|Selected text: "\"title\" Some words" (page 1)
       #|Source 1 of 2: doc/review_test.mbt:L:18-L:33, Heading(..), parameter 1
       #|  rendered: "\"title\""
+      #|  note: the location is the argument as a whole: its source file was not read when this was made
       #|Source 2 of 2: doc/review_test.mbt:M:16-M:38, Prose(..), parameter 1
       #|  rendered: "Some words"
       #|  2 pieces of this argument are selected; they share this location, which is the argument as a whole.
-      #|Locations are constructor calls and their arguments in the MoonBit source (line:column, columns in code points), not positions inside a string.
+      #|  note: the location is the argument as a whole: its source file was not read when this was made
+      #|Locations are constructor calls and their arguments in the MoonBit source (line:column, columns in code points). Source characters are given only where the literal at a location is the text on the page.
       #|
     ),
   )
   let json = feedback.to_json().stringify()
   assert_true(
     json.has_prefix(
-      "{\"format\":\"typst.mbt review feedback 1\",\"document\":\"Test\",\"comment\":\"Too vague.\",\"selected_text\":\"\\\"title\\\" Some words\",\"pages\":[1],\"origins\":[{\"file\":\"doc/review_test.mbt\",\"module\":\"moonbitlang/typst\",\"constructor\":\"Heading\",\"parameter\":1,\"start\":[\{line},18],\"end\":[\{line},33],\"rendered_text\":\"\\\"title\\\"\",\"pieces\":[\"\\\"title\\\"\"]},",
+      "{\"format\":\"typst.mbt review feedback 2\",\"document\":\"Test\",\"comment\":\"Too vague.\",\"selected_text\":\"\\\"title\\\" Some words\",\"pages\":[1],\"origins\":[{\"file\":\"doc/review_test.mbt\",\"module\":\"moonbitlang/typst\",\"constructor\":\"Heading\",\"parameter\":1,\"start\":[\{line},18],\"end\":[\{line},33],\"rendered_text\":\"\\\"title\\\"\",\"pieces\":[\"\\\"title\\\"\"],\"tier\":2,\"why\":\"the location is the argument as a whole: its source file was not read when this was made\",\"source_ranges\":[],\"excerpt\":[]},",
     ),
   )
   assert_true(
-    json.has_suffix(
-      "\"rendered_text\":\"Some words\",\"pieces\":[\"Some\",\"words\"]}]}",
+    json.contains(
+      "\"rendered_text\":\"Some words\",\"pieces\":[\"Some\",\"words\"],\"tier\":2,",
     ),
   )
   // A shape: its origin from a click, without text.
@@ -599,11 +613,27 @@ test "feedback: the text block and the JSON record" {
   assert_true(
     block.contains("Comment: (none)\nSelected: a shape or an image (page 1)\n"),
   )
-  assert_true(block.contains(", Rect(..)\n"))
+  assert_true(
+    block.contains(
+      ", Rect(..)\n  note: the location is the constructor call: what was selected is not the text of one of its arguments\n",
+    ),
+  )
   assert_true(!block.contains("rendered:"))
   assert_true(
-    shape.to_json().stringify().contains("\"rendered_text\":\"\",\"pieces\":[]"),
+    shape
+    .to_json()
+    .stringify()
+    .contains("\"rendered_text\":\"\",\"pieces\":[],\"tier\":1,"),
   )
+  // An origin of another document is not in this text's table.
+  let other = compile_on_page([@doc.Par("elsewhere")])
+  let foreign = text.origin_feedback(
+    other.origin_at(1, 14.0, 16.0).unwrap(),
+    1,
+    "",
+  )
+  assert_eq(foreign.origins[0].tier, 2)
+  assert_true(foreign.origins[0].excerpt.is_empty())
   // A long selection is shortened in the text, not in the record.
   let long = text_of([@doc.Par("word ".repeat(100))])
   let all = long.feedback(long.range(0, 99).unwrap(), "")
@@ -698,4 +728,80 @@ test "select: beyond 65,535 bytes of a text item the words keep their origins" {
     text.feedback(text.range(2, 2).unwrap(), "").origins[0].origin.keys,
     ["B"],
   )
+}
+
+///|
+test "source: a provider's text gives excerpts and, for a literal that is the text, source characters" {
+  let report = compile_on_page([@doc.Par("plain words here")])
+  // The source file as the provider gives it: empty but for the line of
+  // the argument, which has the literal where the origin says it is.
+  let origin = report.origin_at(1, 14.0, 16.0).unwrap()
+  let line = " ".repeat(origin.start_column - 1) + "\"plain words here\"),"
+  let file = "\n".repeat(origin.start_line - 1) + line + "\nafter\n"
+  let asked : Array[String] = []
+  let sources = (name : String, module_name : String) => {
+    asked.push("\{name} \{module_name}")
+    if name == "doc/review_test.mbt" {
+      Some(file)
+    } else {
+      None
+    }
+  }
+  let text = report.review_text(sources~)
+  // The file is asked for once.
+  assert_eq(asked, ["doc/review_test.mbt moonbitlang/typst"])
+  let feedback = text.feedback(text.find("words here").unwrap(), "")
+  let entry = feedback.origins[0]
+  assert_eq(entry.tier, 3)
+  assert_eq(entry.why, "")
+  assert_eq(entry.source_ranges.length(), 1)
+  assert_eq(entry.source_ranges[0].line, origin.start_line)
+  assert_eq(entry.source_ranges[0].start, origin.start_column + 7)
+  assert_eq(entry.source_ranges[0].end, origin.start_column + 17)
+  assert_eq(entry.source_ranges[0].text, "words here")
+  assert_eq(entry.excerpt, [(origin.start_line, line)])
+  assert_eq(entry.more, 0)
+  let block = feedback.to_text()
+  let l = origin.start_line
+  assert_true(
+    block.contains(
+      "  rendered: \"words here\"\n  source characters: \{l}:\{origin.start_column + 7}-\{l}:\{origin.start_column + 17}\n",
+    ),
+  )
+  assert_true(
+    block.contains(
+      " | \{line}\n       | \{" ".repeat(origin.start_column + 6)}^^^^^^^^^^\n",
+    ),
+  )
+  // The page has the line, the tier and the runs of the words.
+  let html = report.review_html(sources~).unwrap()
+  assert_true(html.contains("\"tier\":3,\"source\":0}"))
+  assert_true(
+    html.contains(
+      "\"lines\":[{\"\{l}\":\"\{" ".repeat(origin.start_column - 1)}\\\"plain words here\\\"),\"}]",
+    ),
+  )
+  assert_true(
+    html.contains(
+      "[1,\"plain\",1,0,0,[[\{l},\{origin.start_column + 1},\{origin.start_column + 6},0,5]]]",
+    ),
+  )
+  // A file whose text at the location is something else: the argument.
+  let wrong = report.review_text(sources=(_, _) => {
+    Some(
+      "\n".repeat(origin.start_line - 1) +
+      " ".repeat(origin.start_column - 1) +
+      "\"other words here\"),",
+    )
+  })
+  let entry = wrong.feedback(wrong.find("words").unwrap(), "").origins[0]
+  assert_eq(entry.tier, 2)
+  assert_true(entry.source_ranges.is_empty())
+  assert_true(entry.why.contains("is not the text on the page"))
+  assert_eq(entry.excerpt.length(), 1)
+  // A file that is too short for the location: no excerpt, no panic.
+  let short = report.review_text(sources=(_, _) => Some("one line"))
+  let entry = short.feedback(short.find("words").unwrap(), "").origins[0]
+  assert_eq(entry.tier, 2)
+  assert_true(entry.excerpt.is_empty())
 }

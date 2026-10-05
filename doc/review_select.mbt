@@ -168,6 +168,12 @@ pub struct ReviewText {
   priv title : String
   priv origins : Array[Origin]
   priv words : Array[Word]
+  /// What is known of the source of each origin, the source characters of
+  /// each word, and the lines of the source files that were read
+  /// (`review_locate.mbt`).
+  priv infos : Array[SourceInfo]
+  priv segs : Array[Array[Seg]]
+  priv lines : Array[Array[Array[Char]]]
 }
 
 ///|
@@ -181,17 +187,38 @@ pub struct Selection {
 ///|
 /// The text of a compiled document for selecting (`title`: as in
 /// `review_html`). Raises the errors of a failed compilation.
+///
+/// `sources` gives the text of a MoonBit source file by the file and the
+/// module of an origin (`@system.sources()` reads them from disk). With
+/// it, feedback has excerpts of the source, and source characters where
+/// an argument is a literal that is the text on the page.
 pub fn CompileReport::review_text(
   self : CompileReport[@layout.PagedDocument],
   title? : String,
+  sources? : (String, String) -> String?,
 ) -> ReviewText raise DocError {
   let document = self.unwrap()
   let (table, _) = self.review_layers(document)
-  {
-    title: review_title(document, title),
+  ReviewText::new(review_title(document, title), table, sources)
+}
+
+///|
+/// The text of the layers in `table`, with its sources read.
+fn ReviewText::new(
+  title : String,
+  table : OriginTable,
+  sources : ((String, String) -> String?)?,
+) -> ReviewText {
+  let text : ReviewText = {
+    title,
     origins: table.list,
     words: table.words,
+    infos: [],
+    segs: [],
+    lines: [],
   }
+  text.locate(sources)
+  text
 }
 
 ///|

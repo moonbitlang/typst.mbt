@@ -496,9 +496,13 @@ fn ReviewText::samples(self : ReviewText) -> (Json, Json) {
 ///
 /// The export reads the compiled document and changes nothing of it.
 /// `title` names the document in the page (default: the document's title).
+/// With `sources` (see `review_text`) the page has excerpts of the source
+/// and, where they are known, the source characters of a selection; what
+/// it needs of the source files is embedded when the page is made.
 pub fn CompileReport::review_html(
   self : CompileReport[@layout.PagedDocument],
   title? : String,
+  sources? : (String, String) -> String?,
 ) -> ExportReport[String] {
   guard self.output is Some(document) else { return self.failed() }
   let title = review_title(document, title)
@@ -535,28 +539,69 @@ pub fn CompileReport::review_html(
   }
   out.write_string("</main>\n")
   out.write_string(review_page_tail)
-  // The data: the words (`[page, text, apart, origin, piece]`), the
-  // library's answers for the self-test, and the table of origins (after
-  // the probes, which can add an origin that no box has).
-  let text : ReviewText = { title, origins: table.list, words: table.words, }
+  // The data: the words (`[page, text, apart, origin, piece]` and, for a
+  // word with source characters, its runs `[line, start, end, from,
+  // to]`), the library's answers for the self-test, the table of origins
+  // (read after the probes, which can add an origin that no box has)
+  // with what is known of their source, and the source lines that an
+  // excerpt can show.
+  let int = (n : Int) => Json::number(n.to_double())
   let data : Map[String, Json] = Map([])
   data["title"] = Json::string(title)
+  data["probes"] = self.probes(document, table)
+  let text = ReviewText::new(title, table, sources)
   data["words"] = Json::array(
-    table.words.map(word => {
-      Json::array([
-        Json::number(word.page.to_double()),
+    table.words.mapi((i, word) => {
+      let fields = [
+        int(word.page),
         Json::string(word.text),
-        Json::number(if word.space { 1.0 } else { 0.0 }),
-        Json::number(word.origin.to_double()),
-        Json::number(word.piece.to_double()),
-      ])
+        int(if word.space { 1 } else { 0 }),
+        int(word.origin),
+        int(word.piece),
+      ]
+      if !text.segs[i].is_empty() {
+        fields.push(
+          Json::array(
+            text.segs[i].map(seg => {
+              Json::array(
+                [seg.line, seg.start, seg.end, seg.from, seg.to].map(int),
+              )
+            }),
+          ),
+        )
+      }
+      Json::array(fields)
     }),
   )
-  data["probes"] = self.probes(document, table)
   let (samples, objects) = text.samples()
   data["samples"] = samples
   data["objects"] = objects
-  data["origins"] = table.json()
+  // Per file, the lines of the locations of its origins.
+  let lines : Array[Map[String, Json]] = text.lines.map(_ => Map([]))
+  let origins = table.json()
+  if origins is Array(entries) {
+    for id, entry in entries {
+      guard entry is Object(fields) else { continue }
+      let info = text.infos[id]
+      fields["tier"] = int(info.tier)
+      if info.why != "" {
+        fields["why"] = Json::string(info.why)
+      }
+      guard info.file >= 0 else { continue }
+      fields["source"] = int(info.file)
+      let origin = table.list[id]
+      for line in origin.start_line..<(origin.end_line + 1) {
+        guard line >= 1 && line <= text.lines[info.file].length() else {
+          continue
+        }
+        lines[info.file][line.to_string()] = Json::string(
+          String::from_array(text.lines[info.file][line - 1]),
+        )
+      }
+    }
+  }
+  data["origins"] = origins
+  data["lines"] = Json::array(lines.map(Json::object))
   // `<` cannot end the script element or start a comment.
   out.write_string("<script type=\"application/json\" id=\"review-data\">")
   out.write_string(

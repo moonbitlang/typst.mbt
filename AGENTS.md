@@ -117,7 +117,12 @@
   `to_json`). The page's script builds the same record
   (`Core` in `page.js`); after changing either side run `node
   scripts/review_page_check.mjs preview.html`, which compares them on
-  the records embedded in a generated page.
+  the records embedded in a generated page. Slice 3: with a source
+  provider (`sources=@system.sources()`), `doc/review_source.mbt` reads
+  the literal at an origin's location and `doc/review_locate.mbt` gives
+  source characters only if all of the origin's text on the page is that
+  literal's text (tier 3; otherwise the argument or the call, with the
+  reason); excerpts and tiers are embedded in the page when it is made.
 - Typst-to-EDSL translator (`doc/convert`, design in `docs/edsl-convert.md`,
   Codex-approved; a stress test of the EDSL, not a compiler): typed where
   the design's narrow rules prove it exact, Typst source in `Markup`

@@ -18,6 +18,10 @@ let review_page_css : String =
   #|  --field: #f3f5f7;
   #|  --mark: rgba(11, 92, 173, 0.22);
   #|  --mark-line: #b4540a;
+  #|  --exact: #17633a;
+  #|  --exact-bg: #dff3e6;
+  #|  --coarse: #7a4a00;
+  #|  --coarse-bg: #fbeacb;
   #|  --paper: #ffffff;
   #|  --shadow: 0 1px 2px rgba(20, 28, 38, 0.12), 0 8px 24px rgba(20, 28, 38, 0.08);
   #|  --ui: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -35,6 +39,10 @@ let review_page_css : String =
   #|    --field: #171b20;
   #|    --mark: rgba(63, 142, 224, 0.32);
   #|    --mark-line: #f29a4a;
+  #|    --exact: #8fdcae;
+  #|    --exact-bg: #173a27;
+  #|    --coarse: #f0c477;
+  #|    --coarse-bg: #3d2d0e;
   #|    --shadow: 0 1px 2px rgba(0, 0, 0, 0.5), 0 8px 24px rgba(0, 0, 0, 0.35);
   #|    color-scheme: dark;
   #|  }
@@ -50,6 +58,10 @@ let review_page_css : String =
   #|  --field: #171b20;
   #|  --mark: rgba(63, 142, 224, 0.32);
   #|  --mark-line: #f29a4a;
+  #|  --exact: #8fdcae;
+  #|  --exact-bg: #173a27;
+  #|  --coarse: #f0c477;
+  #|  --coarse-bg: #3d2d0e;
   #|  --shadow: 0 1px 2px rgba(0, 0, 0, 0.5), 0 8px 24px rgba(0, 0, 0, 0.35);
   #|  color-scheme: dark;
   #|}
@@ -181,6 +193,24 @@ let review_page_css : String =
   #|code { font: 13px/1.4 var(--mono); overflow-wrap: anywhere; }
   #|.origin .meta { font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
   #|.rendered { overflow-wrap: anywhere; max-height: 4.4em; overflow: auto; }
+  #|.tier { margin-left: 8px; padding: 1px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+  #|.tier.t3 { background: var(--exact-bg); color: var(--exact); }
+  #|.tier.t2 { background: var(--coarse-bg); color: var(--coarse); }
+  #|.tier.t1 { background: var(--field); color: var(--muted); }
+  #|.excerpt {
+  #|  margin: 2px 0;
+  #|  padding: 6px 0;
+  #|  background: var(--field);
+  #|  border: 1px solid var(--line);
+  #|  border-radius: 4px;
+  #|  font: 12px/1.5 var(--mono);
+  #|  overflow-x: auto;
+  #|}
+  #|.excerpt .row { display: flex; min-width: max-content; }
+  #|.excerpt .ln { flex: 0 0 3.6em; padding-right: 10px; text-align: right; color: var(--muted); user-select: none; font-variant-numeric: tabular-nums; }
+  #|.excerpt .code { white-space: pre; padding-right: 12px; }
+  #|.excerpt .more { padding-left: 3.6em; color: var(--muted); }
+  #|.excerpt mark { background: var(--mark); color: inherit; border-radius: 2px; outline: 1px solid var(--accent); }
   #|.note { color: var(--muted); font-size: 12.5px; }
   #|.field { display: block; font-size: 12px; font-weight: 600; color: var(--muted); letter-spacing: 0.02em; }
   #|textarea {
@@ -241,11 +271,13 @@ let review_page_css : String =
 ///|
 /// The script of the preview page.
 let review_page_js : String =
-  #|// The preview page of the review loop (docs/edsl-review.md, slices 1 and
-  #|// 2). Every page has a layer of invisible shapes (`svg.hit`), one per
+  #|// The preview page of the review loop (docs/edsl-review.md, slices 1 to
+  #|// 3). Every page has a layer of invisible shapes (`svg.hit`), one per
   #|// word, shape and image with a source location: `data-o` is the number of
   #|// the origin, `data-i` the number of the word. The data (`#review-data`)
-  #|// has the table of origins and the words in reading order.
+  #|// has the table of origins and the words in reading order, with the
+  #|// source characters of the words that have them and the source lines
+  #|// that an excerpt can show: all of it was read when the page was made.
   #|//
   #|// `Core` builds the feedback record of a selection. It applies the rules
   #|// of the library (`doc/review_feedback.mbt`) to the same data and needs no
@@ -266,7 +298,13 @@ let review_page_js : String =
   #|    return out;
   #|  }
   #|
-  #|  function originJson(id, rendered, pieces) {
+  #|  // The entry of the origin `id`: its selected text and, for its selected
+  #|  // words `words`, what its source says. The runs of source characters of
+  #|  // the words (`[line, start, end, from, to]`) are joined where one goes
+  #|  // on where the one before it ended. The excerpt has the lines of the
+  #|  // source characters, or without those the lines of the location, at
+  #|  // most six of them.
+  #|  function originJson(id, rendered, pieces, words) {
   #|    const o = D.origins[id];
   #|    const out = { file: o.file, module: o.module, constructor: o.kind };
   #|    if (o.param !== undefined) out.parameter = o.param + 1;
@@ -275,11 +313,35 @@ let review_page_js : String =
   #|    out.end = [o.range[2], o.range[3]];
   #|    out.rendered_text = rendered;
   #|    out.pieces = pieces;
+  #|    out.tier = o.tier;
+  #|    if (o.why) out.why = o.why;
+  #|    const lines = o.source === undefined ? null : D.lines[o.source];
+  #|    const runs = [];
+  #|    if (lines) {
+  #|      for (const i of words) {
+  #|        for (const seg of D.words[i][5] || []) {
+  #|          const last = runs[runs.length - 1];
+  #|          if (last && last[4] === seg[3]) { last[2] = seg[2]; last[4] = seg[4]; } else runs.push(seg.slice());
+  #|        }
+  #|      }
+  #|    }
+  #|    out.source_ranges = runs.map((run) => ({
+  #|      line: run[0], start: run[1], end: run[2], text: Array.from(lines[run[0]]).slice(run[1] - 1, run[2] - 1).join(''),
+  #|    }));
+  #|    const wanted = [];
+  #|    if (lines && runs.length === 0) for (let line = o.range[0]; line <= o.range[2]; line++) wanted.push(line);
+  #|    for (const run of runs) if (!wanted.includes(run[0])) wanted.push(run[0]);
+  #|    out.excerpt = [];
+  #|    for (const line of wanted) {
+  #|      if (out.excerpt.length === 6 || lines[line] === undefined) break;
+  #|      out.excerpt.push({ line, text: lines[line] });
+  #|    }
+  #|    if (wanted.length > out.excerpt.length) out.excerpt_more = wanted.length - out.excerpt.length;
   #|    return out;
   #|  }
   #|
   #|  const record = (comment, text, pages, origins) => ({
-  #|    format: 'typst.mbt review feedback 1', document: D.title, comment, selected_text: text, pages, origins,
+  #|    format: 'typst.mbt review feedback 2', document: D.title, comment, selected_text: text, pages, origins,
   #|  });
   #|
   #|  // The record for the words `from..=to`.
@@ -290,12 +352,13 @@ let review_page_js : String =
   #|      if (!pages.includes(page)) pages.push(page);
   #|      let entry = found.get(origin);
   #|      if (!entry) {
-  #|        entry = { pieces: [], rendered: '', last: -1 };
+  #|        entry = { pieces: [], rendered: '', last: -1, words: [] };
   #|        found.set(origin, entry);
   #|        order.push(origin);
   #|      }
   #|      entry.rendered += (entry.last >= 0 ? joint(entry.last, i, word) : '') + text;
   #|      entry.last = i;
+  #|      entry.words.push(i);
   #|      const place = places.get(piece);
   #|      if (place) {
   #|        entry.pieces[place.at] += joint(place.last, i, word) + text;
@@ -306,11 +369,11 @@ let review_page_js : String =
   #|      }
   #|    }
   #|    return record(comment, textOf(from, to), pages,
-  #|      order.map((id) => originJson(id, found.get(id).rendered, found.get(id).pieces)));
+  #|      order.map((id) => originJson(id, found.get(id).rendered, found.get(id).pieces, found.get(id).words)));
   #|  }
   #|
   #|  // The record for a shape or an image with the origin `id` on a page.
-  #|  const objectFeedback = (id, page, comment) => record(comment, '', [page], [originJson(id, '', [])]);
+  #|  const objectFeedback = (id, page, comment) => record(comment, '', [page], [originJson(id, '', [], [])]);
   #|
   #|  const quoted = (text) => {
   #|    const cs = Array.from(text);
@@ -334,9 +397,37 @@ let review_page_js : String =
   #|      if (o.keys) out += `, data key ${o.keys.map(quoted).join(' / ')}`;
   #|      out += '\n';
   #|      if (o.rendered_text !== '') out += `  rendered: ${quoted(o.rendered_text)}\n`;
-  #|      if (o.pieces.length > 1) out += `  ${shared(o)}\n`;
+  #|      if (o.tier === 3) {
+  #|        out += `  source characters: ${o.source_ranges.map((r) => `${r.line}:${r.start}-${r.line}:${r.end}`).join(', ')}\n`;
+  #|      } else {
+  #|        if (o.pieces.length > 1) out += `  ${shared(o)}\n`;
+  #|        out += `  note: ${o.why}\n`;
+  #|      }
+  #|      for (const line of o.excerpt) {
+  #|        const number = String(line.line);
+  #|        out += `${' '.repeat(Math.max(0, 6 - number.length))}${number} | ${line.text}\n`;
+  #|        const under = marks(o, line.line).map(([gap, width]) => ' '.repeat(gap) + '^'.repeat(width)).join('');
+  #|        if (under !== '') out += `       | ${under}\n`;
+  #|      }
+  #|      if (o.excerpt_more) out += `       | … ${o.excerpt_more} more lines\n`;
   #|    });
-  #|    return out + 'Locations are constructor calls and their arguments in the MoonBit source (line:column, columns in code points), not positions inside a string.\n';
+  #|    return out + 'Locations are constructor calls and their arguments in the MoonBit source (line:column, columns in code points). Source characters are given only where the literal at a location is the text on the page.\n';
+  #|  }
+  #|
+  #|  // What is marked on a line of an excerpt: the source characters on the
+  #|  // line or, without source characters, a location that is on this one
+  #|  // line. As `[gap, width]`: columns to skip, then columns to mark.
+  #|  function marks(o, line) {
+  #|    const ranges = o.source_ranges.filter((r) => r.line === line).map((r) => [r.start, r.end]);
+  #|    if (o.source_ranges.length === 0 && o.start[0] === line && o.end[0] === line) ranges.push([o.start[1], o.end[1]]);
+  #|    const out = [];
+  #|    let column = 1;
+  #|    for (const [start, end] of ranges) {
+  #|      if (!(end > start && start >= column)) continue;
+  #|      out.push([start - column, end - start]);
+  #|      column = end;
+  #|    }
+  #|    return out;
   #|  }
   #|
   #|  // The records that the library made for some selections must be the
@@ -352,7 +443,7 @@ let review_page_js : String =
   #|    return bad;
   #|  }
   #|
-  #|  return { load, feedback, objectFeedback, toText, textOf, location, call, shared, check };
+  #|  return { load, feedback, objectFeedback, toText, textOf, location, call, shared, marks, check };
   #|})();
   #|
   #|if (typeof module !== 'undefined' && module.exports) module.exports = Core;
@@ -383,10 +474,11 @@ let review_page_js : String =
   #|  // the list can show and turn into text is kept.)
   #|  const usable = (f) => {
   #|    try {
-  #|      return f.format === 'typst.mbt review feedback 1' && typeof f.comment === 'string' &&
+  #|      return f.format === 'typst.mbt review feedback 2' && typeof f.comment === 'string' &&
   #|        typeof f.selected_text === 'string' && f.pages.every((page) => typeof page === 'number') &&
   #|        f.origins.every((o) => typeof o.file === 'string' && typeof o.constructor === 'string' &&
-  #|          o.start.length === 2 && o.end.length === 2 && typeof o.rendered_text === 'string' && Array.isArray(o.pieces)) &&
+  #|          o.start.length === 2 && o.end.length === 2 && typeof o.rendered_text === 'string' && Array.isArray(o.pieces) &&
+  #|          o.source_ranges.every((r) => typeof r.line === 'number') && o.excerpt.every((l) => typeof l.text === 'string')) &&
   #|        typeof Core.toText(f) === 'string';
   #|    } catch (e) {
   #|      return false;
@@ -443,12 +535,46 @@ let review_page_js : String =
   #|      facts.textContent += o.parameter === undefined ? ' (the call)' : ' (the argument)';
   #|      if (o.keys) facts.textContent += ` · data key ${o.keys.join(' / ')}`;
   #|      card.appendChild(facts);
+  #|      facts.appendChild(el('span', 'tier t' + o.tier,
+  #|        o.tier === 3 ? 'source characters' : o.tier === 2 ? 'the argument' : 'the call'));
   #|      if (o.rendered_text !== '') card.appendChild(el('p', 'rendered', '“' + o.rendered_text + '”'));
-  #|      if (o.pieces.length > 1) card.appendChild(el('p', 'note', Core.shared(o)));
+  #|      if (o.excerpt.length > 0) card.appendChild(excerpt(o));
+  #|      if (o.tier < 3 && o.pieces.length > 1) card.appendChild(el('p', 'note', Core.shared(o)));
+  #|      if (o.tier < 3) card.appendChild(el('p', 'note', o.why.charAt(0).toUpperCase() + o.why.slice(1) + '.'));
   #|      list.appendChild(card);
+  #|    }
+  #|    // Bring what is marked into view in each excerpt.
+  #|    for (const pre of list.querySelectorAll('.excerpt')) {
+  #|      const mark = pre.querySelector('mark');
+  #|      if (!mark) continue;
+  #|      const box = pre.getBoundingClientRect(), at = mark.getBoundingClientRect();
+  #|      if (at.right > box.right - 8) pre.scrollLeft += at.left - box.left - Math.min(72, box.width / 4);
   #|    }
   #|    $('output').value = Core.toText(f);
   #|    $('status').textContent = state.extend ? 'Click the word where the selection should end.' : '';
+  #|  }
+  #|
+  #|  // The excerpt of an origin: its source lines with their numbers, and
+  #|  // what the feedback text marks with `^` marked.
+  #|  function excerpt(o) {
+  #|    const pre = el('pre', 'excerpt');
+  #|    for (const line of o.excerpt) {
+  #|      const row = el('div', 'row');
+  #|      row.appendChild(el('span', 'ln', String(line.line)));
+  #|      const code = el('span', 'code');
+  #|      const chars = Array.from(line.text);
+  #|      let at = 0;
+  #|      for (const [gap, width] of Core.marks(o, line.line)) {
+  #|        code.appendChild(document.createTextNode(chars.slice(at, at + gap).join('')));
+  #|        code.appendChild(el('mark', '', chars.slice(at + gap, at + gap + width).join('')));
+  #|        at += gap + width;
+  #|      }
+  #|      code.appendChild(document.createTextNode(chars.slice(at).join('')));
+  #|      row.appendChild(code);
+  #|      pre.appendChild(row);
+  #|    }
+  #|    if (o.excerpt_more) pre.appendChild(el('div', 'row more', `… ${o.excerpt_more} more lines`));
+  #|    return pre;
   #|  }
   #|
   #|  function selectWords(a, b) {

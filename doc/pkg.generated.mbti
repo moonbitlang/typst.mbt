@@ -221,8 +221,8 @@ pub fn CompileReport::origin_at(Self[@layout.PagedDocument], Int, Double, Double
 pub fn[T] CompileReport::output(Self[T]) -> T?
 pub fn CompileReport::pdf(Self[@layout.PagedDocument], options? : @pdf.PdfOptions) -> ExportReport[Bytes]
 pub fn CompileReport::png_pages(Self[@layout.PagedDocument], ppi? : Double) -> ExportReport[Array[Bytes]]
-pub fn CompileReport::review_html(Self[@layout.PagedDocument], title? : String) -> ExportReport[String]
-pub fn CompileReport::review_text(Self[@layout.PagedDocument], title? : String) -> ReviewText raise DocError
+pub fn CompileReport::review_html(Self[@layout.PagedDocument], title? : String, sources? : (String, String) -> String?) -> ExportReport[String]
+pub fn CompileReport::review_text(Self[@layout.PagedDocument], title? : String, sources? : (String, String) -> String?) -> ReviewText raise DocError
 pub fn CompileReport::svg_pages(Self[@layout.PagedDocument], options? : @svg.SvgOptions) -> ExportReport[Array[String]]
 pub fn[T] CompileReport::unwrap(Self[T]) -> T raise DocError
 
@@ -565,6 +565,11 @@ pub struct FeedbackOrigin {
   origin : Origin
   pieces : Array[String]
   rendered : String
+  tier : Int
+  why : String
+  source_ranges : Array[SourceSpan]
+  excerpt : Array[(Int, String)]
+  more : Int
 }
 
 pub struct Figure {
@@ -2280,6 +2285,13 @@ pub(all) enum Source {
 }
 pub impl IntoSource for Source
 pub impl ToValue for Source
+
+pub struct SourceSpan {
+  line : Int
+  start : Int
+  end : Int
+  text : String
+}
 
 pub struct Space {
   // private fields

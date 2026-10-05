@@ -91,3 +91,21 @@ pub fn read(path : String) -> Bytes raise SystemError {
     err => raise SystemError("failed to read \{path}: \{err}")
   }
 }
+
+///|
+/// A source provider for `CompileReport::review_text` and `review_html`:
+/// reads the MoonBit source files below `root`, the root of the module
+/// (source locations name files relative to it; default: the working
+/// directory). A file that cannot be read, is no UTF-8, or whose name
+/// leaves the root (an absolute path, a `..`) is not provided.
+pub fn sources(root? : String = ".") -> (String, String) -> String? {
+  (file, _) => {
+    guard !file.has_prefix("/") && !file.contains("..") && !file.contains("\\") else {
+      return None
+    }
+    let path = if root == "." || root == "" { file } else { "\{root}/\{file}" }
+    let bytes = @platform.read_file(path) catch { _ => return None }
+    let text = @utf8.decode(bytes) catch { _ => return None }
+    Some(text)
+  }
+}
