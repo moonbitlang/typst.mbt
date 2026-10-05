@@ -1850,6 +1850,7 @@ pub impl IntoContent for VView
 pub struct Value {
   // private fields
 }
+pub fn Value::alignment(Alignment) -> Self
 pub fn Value::angle(Angle) -> Self
 pub fn Value::array(Array[Self]) -> Self
 pub fn Value::auto() -> Self
@@ -1865,7 +1866,10 @@ pub fn Value::int(Int64) -> Self
 pub fn Value::label(String) -> Self
 pub fn Value::length(Length) -> Self
 pub fn Value::none() -> Self
+pub fn Value::paint(Paint) -> Self
+pub fn Value::sizing(Sizing) -> Self
 pub fn Value::str(String) -> Self
+pub fn Value::stroke(Stroke) -> Self
 pub impl ToValue for Value
 
 // Type aliases

@@ -100,6 +100,28 @@ pub fn Value::angle(value : Angle) -> Value {
 }
 
 ///|
+/// A paint (a colour).
+pub fn Value::paint(value : Paint) -> Value {
+  value.to_value()
+}
+
+///|
+pub fn Value::stroke(value : Stroke) -> Value {
+  value.to_value()
+}
+
+///|
+pub fn Value::alignment(value : Alignment) -> Value {
+  value.to_value()
+}
+
+///|
+/// A track or box size (`auto`, a length, a fraction).
+pub fn Value::sizing(value : Sizing) -> Value {
+  value.to_value()
+}
+
+///|
 pub fn Value::array(items : Array[Value]) -> Value {
   Value::of(VArray(items.copy()))
 }
