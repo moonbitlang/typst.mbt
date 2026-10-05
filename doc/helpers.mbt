@@ -22,13 +22,16 @@ pub fn Quoted::Quoted(
   args_loc~ : ArgsLoc,
 ) -> Quoted {
   let site = Site::new("Quoted", loc, args_loc)
+  // The two quotes are calls without a location of their own, like the
+  // quotes of `Prose`: each takes a span of its own inside the body
+  // argument's when the sequence is lowered (`Pieces` in `lower.mbt`).
   let quote = () => {
     let args : Array[ArgNode] = []
     if double is Some(v) {
-      args.push({ name: Some("double"), value: Value::bool(v), param: 1, })
+      args.push({ name: Some("double"), value: Value::bool(v), param: -1, })
     }
     Content::of(
-      NCall({ func: FElem(@library.smart_quote_elem()), args, origin: site, }),
+      NValue(Value::of(VCall(FElem(@library.smart_quote_elem()), args))),
     )
   }
   { content: Content::of(NSeq([quote(), body.into_content(), quote()], site)), }

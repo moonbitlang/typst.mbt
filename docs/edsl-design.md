@@ -227,7 +227,9 @@ Par(Seq(["Typeset with ", Emph("care"), "."]))
   `Value::Str(s).display()` — the `TextElem` that Typst's string-to-content
   conversion creates — spanned with its origin. Twin: `#"s"` inside a content
   block. `Lit(s)` is the same with a location of its own (a `String` inside
-  an array shares the array argument's location, fact 2).
+  an array has the array argument's location, fact 2; each such child of a
+  sequence still gets a span of its own inside that argument's span,
+  section 12.2, pieces).
 - **`Labelled(body, label)`** is the twin of `[#body<label>]`: `body` is
   lowered as **one inserted expression result** and the label is attached to
   that result as a whole, whether it is an element, a styled wrapper or a
@@ -243,7 +245,8 @@ Par(Seq(["Typeset with ", Emph("care"), "."]))
 - **`Keyed(key, body)`** attaches a runtime occurrence key to the origins of
   everything lowered inside `body` (section 12.2), including a plain string
   body, whose origin is the enclosing argument under the key. It does not
-  change the lowered content.
+  change the lowered content. A key that starts with the noncharacter
+  U+FDD2 is an error (lowering's own occurrences use it, section 12.2).
 - **`Space()`** is markup's space element (`SpaceElem::shared()`), for
   authors who need Typst's collapsing space rather than a `" "` text.
   **`Space::newline()`** is the space markup produces for a line break in
@@ -266,6 +269,11 @@ with punctuation have constructors, and the characters are written as such:
 | a blank line | a new `Par(..)`, or `Parbreak()` between pieces of inline content |
 | `= Heading`, `- item`, `+ item`, `/ term: text` | `Heading(..)`, `List([..])`/`ListItem(..)`, `Enum([..])`/`EnumItem(..)`, `Terms([..])`/`TermsItem(..)` |
 | `` `raw` ``, `$x$`, `@label`, `<label>` | `Raw(..)`, `Equation(..)`, `Ref(..)`, `label=` or `Labelled(..)` |
+
+`Raw(text)` is the `raw` function: its lines are the lines of the string,
+so `Raw("")` has one empty line. The raw without lines that markup's
+` `` ` writes has no function form in Typst and none in the EDSL
+(`Markup` evaluates it; `docs/edsl-convert.md`, section 4.8).
 
 Plain strings are deliberately not scanned for quotes: a document that
 needs a straight `"` or `'` as text can write it, and `Quoted` is explicit
@@ -442,15 +450,16 @@ are strings are checked); inside content or a collection that Typst code
 returns it is not, and engine values are not scanned. No description is
 lost or confused by that, and it does not happen by accident.
 
-**Origins.** The `Prose` call is one origin. Its text runs take the span
-of its `text` argument, like plain strings in an array take the array's
-(tier 1; the engine offset of a glyph is relative to its text run, so
-tier 2 narrows within the run, not within the whole string); its quotes
-and paragraph breaks are calls with the span of the `Prose` call; its
-spaces have no span, like `Space()`. Interpolated descriptions keep their
-own origins. Diagnostics that differ only in which text run of one `Prose`
-they concern are therefore deduplicated by the engine; `Lit` gives a text
-a location of its own where that matters.
+**Origins.** The `Prose` call is one origin. Its text runs, quotes and
+paragraph breaks all resolve to its `text` argument, like plain strings in
+an array resolve to the array's (tier 1; the engine offset of a glyph is
+relative to its text run, so tier 2 narrows within the run, not within the
+whole string), but **each has a span of its own** inside the argument's
+span (section 12.2, pieces), as each expression of the twin has: the engine hashes spans into the keys of located elements — two
+paragraphs of one `Prose` with the same words are different elements, as
+in markup — and deduplicates diagnostics by span. Its spaces have no span,
+like `Space()`. Interpolated descriptions keep their own origins. `Lit`
+gives a text a location of its own in the EDSL source where that matters.
 
 ## 5. Lowering
 
@@ -1382,6 +1391,60 @@ report.mbt:57:9-57:40@acme/report TableCell key="row-17" a0=report.mbt:57:19-57:
   in the node's span, like real source, which is what trace-point
   suppression (`library/diag.mbt`) assumes. A `String` child uses the span
   of the argument it was passed in.
+- **Pieces.** In markup every expression has a span of its own, and the
+  engine relies on it: the key of a located element is the hash of the
+  element **including the spans** of it and of its children (upstream
+  `Hash for RawContent`, `typst-realize`'s `prepare`), so two paragraphs
+  with the same words are different elements, while two elements that are
+  equal including their spans — one expression laid out twice — share
+  their key and are told apart by their order (`SplitLocator`; measurement
+  finds an element by its key, `Introspector::locator`). Diagnostics are
+  deduplicated by span and message. What has no location of its own inside
+  a located argument would all have the span of that argument: the plain
+  strings and values in the array of `Seq`/`Document`, the text runs,
+  quotes and paragraph breaks of `Prose`, the quotes of `Quoted`, the
+  arguments that share a location (the arguments of a generic call, the
+  entries of a variadic array or of `extra`), and the arguments of call
+  values (`Value::call(..)`), at any depth. Lowering gives each of these
+  **pieces** a span of its own from one counter per argument (`Pieces` in
+  `doc/lower.mbt`): the k-th is the **sub-range** that ends `k` bytes
+  before the end of the argument's token (or of the call's line, for
+  arguments without a location), which resolves to the same origin and
+  argument (`Origins::resolve` accepts any sub-range of a token). One
+  counter serves everything below the argument, so the spans are distinct
+  however the pieces are nested, and lowering the same description again
+  gives the same spans. The first argument of a call value has the span
+  of the call; the operands of an operator and the items of an array or
+  dictionary value have the span of the value. When the sub-ranges run out
+  (after as many pieces as the token has bytes, some 40 to 90), the next
+  ones are the sub-ranges of the same argument in a **further occurrence**
+  of the origin: an entry under the keys of the origin plus a key that
+  starts with the noncharacter U+FDD2, one more line of the listing per
+  block of pieces, however long the text. No `Keyed` key can name such an
+  occurrence (a key that starts with U+FDD2 is an error), and `Origins`
+  does not report these keys: the pieces of all blocks resolve to the one
+  origin. The spans of a further occurrence are bytes of another line
+  than the call, so for trace-point suppression they count as the first
+  byte of the argument (or line) of the origin itself
+  (`Lower::trace_range`): a later piece is inside every earlier one and
+  inside the call's line, in every block, so an error at any argument is
+  inside its call, the arguments of a call value, which are taken after
+  the call's own span, are inside that, and no span of another line
+  contains them. The values of a `Markup`/`Equation` scope and the
+  selector and transformation values of a show rule are located arguments
+  in this sense (the scope values share the call's line).
+  **Reuse.** A description with a site of its own that is used twice
+  (`let e = Emph("x")`, `Seq([e, e])`) has the spans of its site in both
+  places, like the expression of a function that is called twice
+  (`#let e() = emph[x]`, `#e()#e()`): equal elements with equal spans,
+  which share their key. What has no location of its own has no identity
+  either: a string or a value (`let v = Value::call("grid", ..)`) that is
+  used in two places — two children of a sequence, two scope bindings,
+  two arguments — is lowered in each place and is a piece in each place,
+  like the expression written twice (descriptions are deferred
+  computations, lowered where they are used). One scope binding that the
+  source uses twice (`Markup("#a #a", scope=[("a", v)])`) is one value
+  used twice by Typst.
 - The session wraps the caller's world: `source(id)` and `file(id)` of the
   listing's file id return the current listing (and those of snippet ids
   the snippet texts, section 13); everything else is delegated. Diagnostics,
@@ -1765,7 +1828,12 @@ main file at the project root:
      fields);
    - values: content and arrays recursively; functions by repr (a host
      function and the twin's closure both print `(..) => ..`); everything
-     else by repr.
+     else by repr. The text of a raw element is printed as the lines that
+     highlighting sees: the evaluator stores the lines of raw syntax, the
+     `raw` function a string that is split into lines, and the two are
+     the same raw text when the lines are the same (a raw without lines,
+     which only markup can write, differs from `raw("")`, which has one
+     empty line; `docs/edsl-convert.md`, section 4.8).
    Provenance is normalized by omission: spans of content, styles, recipes
    and functions are not printed. Diagnostics (errors and warnings with
    their hints) must be equal as messages; whether each has a location is

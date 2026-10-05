@@ -297,6 +297,379 @@ test "prose: text runs resolve to the text argument of the Prose call" {
 }
 
 ///|
+/// The pieces of lowered content that carry a span (text, smart quotes,
+/// paragraph breaks) with their spans as byte ranges of the origin listing.
+fn pieces(content : @library.Content) -> Array[(String, @syntax.Span)] {
+  let out = []
+  content.traverse(elem => {
+    let func = elem.elem()
+    if func == @library.text_elem() {
+      out.push(("text", elem.span()))
+    } else if func == @library.smart_quote_elem() {
+      out.push(("quote", elem.span()))
+    } else if func == @library.parbreak_elem() {
+      out.push(("break", elem.span()))
+    }
+    true
+  })
+  |> ignore
+  out
+}
+
+///|
+/// The number of distinct spans.
+fn distinct_spans(spans : Array[@syntax.Span]) -> Int {
+  let seen : Map[String, Unit] = Map([])
+  for span in spans {
+    let key = match span.get() {
+      Range(start~, end~, ..) => "\{start}-\{end}"
+      _ => "?"
+    }
+    seen[key] = ()
+  }
+  seen.length()
+}
+
+///|
+/// The key hashes of the end tags of a frame, in order.
+fn tag_keys(frame : @library.Frame, out : Array[@library.U128]) -> Unit {
+  for entry in frame.items() {
+    match entry.1 {
+      Group(group) => tag_keys(group.frame, out)
+      Tag(End(_, key, _)) => out.push(key)
+      _ => ()
+    }
+  }
+}
+
+///|
+/// The number of end tags of a compiled document and of distinct keys
+/// among them.
+fn count_keys(
+  report : @doc.CompileReport[@layout.PagedDocument],
+) -> (Int, Int) raise {
+  let keys = []
+  for page in report.unwrap().pages() {
+    tag_keys(page.frame, keys)
+  }
+  let seen : Map[@library.U128, Unit] = Map([])
+  for key in keys {
+    seen[key] = ()
+  }
+  (keys.length(), seen.length())
+}
+
+///|
+test "prose: every text run, quote and paragraph break has a span of its own" {
+  // Like the expressions of the twin (`[#"row" #smartquote()..]`): the
+  // engine hashes spans into the keys of located elements and
+  // deduplicates diagnostics by span.
+  let report = @doc.Document([@doc.Prose("row \"row\"\n\nrow \"row\"")]).lower(
+    @doc.DocWorld::in_memory(),
+  )
+  let found = pieces(report.unwrap())
+  inspect(
+    found.map(piece => piece.0).join(" "),
+    content="text quote text quote break text quote text quote",
+  )
+  assert_eq(distinct_spans(found.map(piece => piece.1)), found.length())
+  // All of them are the `text` argument of the `Prose` call, and no origin
+  // was registered for them.
+  for piece in found {
+    guard report.origins.resolve(piece.1) is Some(origin) else {
+      fail("no origin")
+    }
+    assert_eq(origin.kind, "Prose")
+    assert_eq(origin.param, Some(0))
+    assert_true(origin.keys.is_empty())
+  }
+  assert_eq(report.origins.length(), 2)
+}
+
+///|
+test "prose: paragraphs with equal words are different elements" {
+  // Found by converting the upstream suite in the readable mode
+  // (`[row #colbreak() row]`): with one span for all text runs the two
+  // paragraphs were equal including their spans, so their tags had the
+  // same key, unlike the markup's.
+  let prose = compile([@doc.Prose("row\n\nrow\n\n\"\n\n\"")])
+  let markup = compile([
+    @doc.Markup("row\n\nrow\n\n#smartquote()\n\n#smartquote()"),
+  ])
+  assert_eq(count_keys(prose), (4, 4))
+  assert_eq(count_keys(markup), (4, 4))
+  // Plain strings of a sequence and the quotes of `Quoted` likewise.
+  let seq = compile([@doc.Seq(["same", @doc.Parbreak(), "same"])])
+  assert_eq(count_keys(seq), (2, 2))
+  let quoted = compile([@doc.Quoted(@doc.Parbreak())])
+  assert_eq(count_keys(quoted), (2, 2))
+  // One description with a site used twice has the spans of its site in
+  // both places (`#let p = par[row]`, `#p#p`): equal elements with equal
+  // spans share their key, and the engine tells them apart by their order.
+  let par = @doc.Par("row")
+  let twice = compile([par, par])
+  assert_eq(count_keys(twice), (2, 1))
+  let twice = compile([@doc.Markup("#let p = par[row]\n#p#p")])
+  assert_eq(count_keys(twice), (2, 1))
+}
+
+///|
+test "prose: thousands of pieces keep distinct spans and add few origins" {
+  // The sub-ranges of the text argument's span run out after as many
+  // pieces as its token has bytes; further occurrences of the origin
+  // provide more, one line of the origin listing each. They are the same
+  // origin: their keys are not reported.
+  let words = StringBuilder()
+  for i in 0..<5000 {
+    words.write_string(if i % 7 == 0 { "\"w\" " } else { "w " })
+  }
+  let report = @doc.Document([@doc.Prose(words.to_string())]).lower(
+    @doc.DocWorld::in_memory(),
+  )
+  let found = pieces(report.unwrap())
+  assert_eq(found.length(), 5000 + 2 * 715)
+  assert_eq(distinct_spans(found.map(piece => piece.1)), found.length())
+  for piece in found {
+    guard report.origins.resolve(piece.1) is Some(origin) else {
+      fail("no origin")
+    }
+    assert_eq(origin.kind, "Prose")
+    assert_eq(origin.param, Some(0))
+    assert_true(origin.keys.is_empty())
+  }
+  assert_true(report.origins.length() > 2)
+  assert_true(report.origins.length() < found.length() / 20)
+}
+
+///|
+test "pieces: all spans inside one argument are distinct, however nested" {
+  // Found by review: the arguments of a call value among the pieces are
+  // spanned inside the same argument as the pieces. They take spans of the
+  // same counter, so the seventeenth argument, the arguments of nested
+  // call values and of calls near the end of a block of sub-ranges are
+  // all distinct from the pieces and from each other.
+  let cell = (text : String) => @doc.Value::content(text)
+  let children : Array[&@doc.IntoContent] = []
+  for _ in 0..<300 {
+    let args : Array[@doc.Value] = []
+    for _ in 0..<20 {
+      args.push(cell("x"))
+    }
+    args.push(
+      @doc.Value::call("grid", positional=[
+        cell("x"),
+        @doc.Value::call("grid", positional=[cell("x"), cell("x")]),
+        cell("x"),
+      ]),
+    )
+    args.push(cell("x"))
+    children.push(@doc.Value::call("grid", positional=args))
+    children.push("x")
+  }
+  let report = @doc.Document([@doc.Seq(children)]).lower(
+    @doc.DocWorld::in_memory(),
+  )
+  let found = pieces(report.unwrap())
+  assert_eq(found.length(), 300 * 26)
+  assert_eq(distinct_spans(found.map(piece => piece.1)), found.length())
+  for piece in found {
+    guard report.origins.resolve(piece.1) is Some(origin) else {
+      fail("no origin")
+    }
+    assert_eq(origin.kind, "Seq")
+    assert_eq(origin.param, Some(0))
+    assert_true(origin.keys.is_empty())
+  }
+  // The arguments of a located call that share a location, and the call
+  // values among them.
+  let args : Array[@doc.Value] = []
+  for _ in 0..<40 {
+    args.push(cell("x"))
+    args.push(@doc.Value::call("grid", positional=[cell("x"), cell("x")]))
+  }
+  let report = @doc.Document([@doc.Call("grid", positional=args)]).lower(
+    @doc.DocWorld::in_memory(),
+  )
+  let found = pieces(report.unwrap())
+  assert_eq(found.length(), 120)
+  assert_eq(distinct_spans(found.map(piece => piece.1)), 120)
+  for piece in found {
+    guard report.origins.resolve(piece.1) is Some(origin) else {
+      fail("no origin")
+    }
+    assert_eq(origin.kind, "Call")
+  }
+}
+
+///|
+test "pieces: no key of `Keyed` names an occurrence of the pieces" {
+  // Found by review: the occurrences that provide more spans are
+  // registered under a key of their own, which no `Keyed` can have.
+  let children : Array[&@doc.IntoContent] = []
+  for _ in 0..<400 {
+    children.push("same")
+  }
+  children.push(@doc.Keyed("pieces 1", "same"))
+  children.push(@doc.Keyed("pieces 1", @doc.Keyed("pieces 2", "same")))
+  children.push(@doc.Keyed("x\u{FDD2}", @doc.Emph("same")))
+  let report = @doc.Document([@doc.Seq(children)]).lower(
+    @doc.DocWorld::in_memory(),
+  )
+  let found = pieces(report.unwrap())
+  assert_eq(found.length(), 403)
+  assert_eq(distinct_spans(found.map(piece => piece.1)), 403)
+  let report = compile([@doc.Keyed("\u{FDD2}pieces 1", "same")])
+  inspect(
+    error_messages(report),
+    content="the key of `Keyed` starts with a reserved character (U+FDD2)",
+  )
+}
+
+///|
+test "pieces: the values of a `Markup` scope share one counter" {
+  // Found by review: every scope value restarted the counter of the call's
+  // span, so the second cells of the two grids had the same span and the
+  // grids were one element for the engine (the same key).
+  let grid = () => {
+    @doc.Value::call("grid", positional=[
+      @doc.Value::content("x"),
+      @doc.Value::content("x"),
+    ])
+  }
+  let document : Array[&@doc.IntoContent] = [
+    @doc.Markup("#a #b #c", scope=[("a", grid()), ("b", grid()), ("c", grid())]),
+  ]
+  let report = @doc.Document(document).lower(@doc.DocWorld::in_memory())
+  let found = pieces(report.unwrap())
+  assert_eq(found.length(), 6)
+  assert_eq(distinct_spans(found.map(piece => piece.1)), 6)
+  for piece in found {
+    guard report.origins.resolve(piece.1) is Some(origin) else {
+      fail("no origin")
+    }
+    assert_eq(origin.kind, "Markup")
+  }
+  let (tags, keys) = count_keys(compile(document))
+  assert_true(tags >= 3)
+  assert_eq(keys, tags)
+  // One binding that the source uses twice is one value used twice by
+  // Typst: equal elements with equal spans, which share their keys.
+  let same = grid()
+  let (tags, keys) = count_keys(
+    compile([@doc.Markup("#a #a", scope=[("a", same)])]),
+  )
+  assert_true(keys < tags)
+  // A value has no location and no identity: used in two bindings, it is
+  // lowered for each and is a piece in each, like the expression written
+  // twice (`scope: (a: grid(..), b: grid(..))`).
+  let (tags, keys) = count_keys(
+    compile([@doc.Markup("#a #b", scope=[("a", same), ("b", same)])]),
+  )
+  assert_eq(keys, tags)
+  // Likewise as two children of a sequence, unlike a description with a
+  // site of its own, which has the spans of its site in both places.
+  let (tags, keys) = count_keys(compile([@doc.Seq([same, same])]))
+  assert_eq(keys, tags)
+  let located = @doc.Call("grid", positional=[
+    @doc.Value::content("x"),
+    @doc.Value::content("x"),
+  ])
+  let (tags, keys) = count_keys(compile([@doc.Seq([located, located])]))
+  assert_true(keys < tags)
+}
+
+///|
+test "pieces: an error at an argument is inside the call in every block" {
+  // Found by review: the spans of further occurrences are other lines of
+  // the origin listing than the call. For trace points they count as the
+  // spans inside the call that they stand for, so an error at the last of
+  // many arguments has the same trace as an error at the second.
+  let failing = (cells : Int) => {
+    let args : Array[@doc.Value] = []
+    for _ in 0..<cells {
+      args.push(@doc.Value::content("x"))
+    }
+    compile([
+      @doc.Call("grid", positional=args, named=[("bogus", @doc.Value::int(1))]),
+    ])
+  }
+  let few = failing(2)
+  let many = failing(700)
+  inspect(error_messages(few), content="unexpected argument: bogus")
+  assert_eq(error_messages(many), error_messages(few))
+  assert_eq(origin_of(many.errors[0]).kind, "Call")
+  assert_eq(
+    many.errors[0].trace.map(point => point.description),
+    few.errors[0].trace.map(point => point.description),
+  )
+  // A call value among the pieces of a sequence, in a later block.
+  let failing = (before : Int, cells : Int) => {
+    let children : Array[&@doc.IntoContent] = []
+    for _ in 0..<before {
+      children.push("x")
+    }
+    let args : Array[@doc.Value] = []
+    for _ in 0..<cells {
+      args.push(@doc.Value::content("x"))
+    }
+    children.push(
+      @doc.Value::call("grid", positional=args, named=[
+        ("bogus", @doc.Value::int(1)),
+      ]),
+    )
+    compile([@doc.Seq(children)])
+  }
+  let few = failing(0, 2)
+  inspect(error_messages(few), content="unexpected argument: bogus")
+  for shape in [(0, 700), (700, 2), (130, 130), (45, 45), (0, 61), (60, 3)] {
+    let many = failing(shape.0, shape.1)
+    assert_eq(error_messages(many), error_messages(few))
+    assert_eq(origin_of(many.errors[0]).kind, "Seq")
+    assert_eq(
+      many.errors[0].trace.map(point => point.description),
+      few.errors[0].trace.map(point => point.description),
+    )
+  }
+}
+
+///|
+test "pieces: an error in a later block is outside unrelated calls" {
+  // Found by review: the range that a span of a further occurrence counts
+  // as must be a range of its own origin, or calls on other lines would
+  // seem to contain it and lose their trace points. A numbering callback
+  // returns a call that fails at its last argument: the trace of the
+  // surrounding `numbering` call stays, whatever the number of arguments.
+  let failing = (cells : Int) => {
+    let numbering = @doc.Numbering::func() <| ((_, _) => {
+      let args : Array[@doc.Value] = []
+      for _ in 0..<cells {
+        args.push(@doc.Value::content("x"))
+      }
+      @doc.Call("grid", positional=args, named=[("bogus", @doc.Value::int(1))])
+    })
+    compile([
+      @doc.Call("numbering", positional=[
+        @doc.ToValue::to_value(numbering),
+        @doc.Value::int(1),
+      ]),
+    ])
+  }
+  let few = failing(2)
+  inspect(error_messages(few), content="unexpected argument: bogus")
+  assert_eq(few.errors[0].trace.map(point => point.description), [
+    "while calling `numbering`",
+  ])
+  for cells in [61, 130, 700] {
+    let many = failing(cells)
+    assert_eq(error_messages(many), error_messages(few))
+    assert_eq(
+      many.errors[0].trace.map(point => point.description),
+      few.errors[0].trace.map(point => point.description),
+    )
+  }
+}
+
+///|
 test "debug: generic targets and views" {
   @debug.debug_inspect(
     @doc.ShowSet(@doc.Select::heading(), @doc.Set("text", [])),

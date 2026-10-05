@@ -102,13 +102,9 @@ pub impl @debug.Debug for Content with fn to_repr(self) {
     NText(text, Some(_)) =>
       @debug.Repr::ctor("Lit", [(Option::None, @debug.Repr::string(text))])
     NCall(call) => {
-      // The pieces that `Prose` and `Quoted` make (quotes, breaks) are
-      // calls with their site: name them by their function.
-      let name = if call.origin.kind == "Prose" || call.origin.kind == "Quoted" {
-        call.func.describe()
-      } else {
-        call.origin.kind
-      }
+      // (The pieces that `Prose` and `Quoted` make, quotes and breaks, are
+      // call values, which are named by their function.)
+      let name = call.origin.kind
       let args = args_repr(call.args)
       // A generic call names its function.
       if call.func is FPath(path) {
