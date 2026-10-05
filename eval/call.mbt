@@ -577,7 +577,7 @@ pub fn eval_closure(
   scopes.top = closure.captured.copy()
 
   // Prepare the engine.
-  let engine = engine.with_route(@library.Route::extend(engine.route))
+  let engine = engine.with_route(@library.Route::extend_(engine.route))
 
   // Prepare VM.
   let vm = Vm::new(engine, context, scopes, body.span())

@@ -346,7 +346,7 @@ fn counter_sequence_impl(
   let engine = {
     ..engine,
     introspector,
-    route: Route::extend(engine.route).unnested(),
+    route: Route::extend_(engine.route).unnested(),
   }
   let current = CounterState::init(counter.0 is Page)
   let mut page = 1L

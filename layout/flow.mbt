@@ -130,7 +130,7 @@ fn layout_fragment_compute(
   }
   let link = @library.LocatorLink::new(locator)
   let locator = @library.Locator::link(link).split()
-  let engine = engine.with_route(@library.Route::extend(engine.route))
+  let engine = engine.with_route(@library.Route::extend_(engine.route))
   @library.at(content.span(), () => engine.route.check_layout_depth())
   let kind = Ref::new(@library.FragmentKind::Block)
   let children = (engine.library.routines.realize)(

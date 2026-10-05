@@ -377,21 +377,21 @@ impl @otf.ColrPainter for ColrRecorder with fn paint(self, paint) {
       self.buf.write_string(
         "linear \{ff(g.x0)} \{ff(g.y0)} \{ff(g.x1)} \{ff(g.y1)} \{ff(g.x2)} \{ff(g.y2)} ",
       )
-      self.stops(g.stops(0, no_coords[:]), g.extend)
+      self.stops(g.stops(0, no_coords[:]), g.extend_)
       self.buf.write_char(';')
     }
     RadialGradient(g) => {
       self.buf.write_string(
         "radial \{ff(g.x0)} \{ff(g.y0)} \{ff(g.r0)} \{ff(g.r1)} \{ff(g.x1)} \{ff(g.y1)} ",
       )
-      self.stops(g.stops(0, no_coords[:]), g.extend)
+      self.stops(g.stops(0, no_coords[:]), g.extend_)
       self.buf.write_char(';')
     }
     SweepGradient(g) => {
       self.buf.write_string(
         "sweep \{ff(g.center_x)} \{ff(g.center_y)} \{ff(g.start_angle)} \{ff(g.end_angle)} ",
       )
-      self.stops(g.stops(0, no_coords[:]), g.extend)
+      self.stops(g.stops(0, no_coords[:]), g.extend_)
       self.buf.write_char(';')
     }
   }

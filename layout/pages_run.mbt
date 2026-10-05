@@ -41,7 +41,7 @@ fn layout_page_run(
 ) -> Array[LayoutedPage] raise @library.SourceError {
   let link = @library.LocatorLink::new(locator)
   let locator = @library.Locator::link(link).split()
-  let engine = engine.with_route(@library.Route::extend(engine.route))
+  let engine = engine.with_route(@library.Route::extend_(engine.route))
 
   // Determine the page-wide styles.
   let styles = @library.StyleChain::new(

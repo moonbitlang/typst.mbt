@@ -46,7 +46,7 @@ fn test_engine() -> @library.Engine {
     introspector: @library.Introspector::empty(),
     traced: @library.Traced::new(),
     sink: @library.Sink::new(),
-    route: @library.Route::extend(@library.Route::root()).unnested(),
+    route: @library.Route::extend_(@library.Route::root()).unnested(),
   }
 }
 

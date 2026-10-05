@@ -40,7 +40,7 @@ pub struct EncodedRadialAxialShading {
   priv function : ShadingFunction
   priv params : RadialAxialParams
   priv domain : FixedArray[Float]
-  priv extend : FixedArray[Bool]
+  priv extend_ : FixedArray[Bool]
 }
 
 ///|
@@ -84,9 +84,9 @@ pub fn ShadingPattern::encode(self : ShadingPattern) -> EncodedShadingPattern {
         encode_function_shading(domain, function),
         (self.matrix * matrix).inverse(),
       )
-    RadialAxial(coords~, domain~, function~, extend~, axial~) => {
+    RadialAxial(coords~, domain~, function~, extend_~, axial~) => {
       let (encoded, initial_transform) = encode_axial_shading(
-        coords, domain, function, extend, axial,
+        coords, domain, function, extend_, axial,
       )
       (encoded, initial_transform * self.matrix.inverse())
     }
@@ -148,7 +148,7 @@ fn encode_axial_shading(
   coords : FixedArray[Float],
   domain : FixedArray[Float],
   function : ShadingFunction,
-  extend : FixedArray[Bool],
+  extend_ : FixedArray[Bool],
   is_axial : Bool,
 ) -> (EncodedShadingType, @kurbo.Affine) {
   let (params, initial_transform) = if is_axial {
@@ -180,7 +180,7 @@ fn encode_axial_shading(
     (RadialAxialParams::Radial(p1~, r~), initial_transform)
   }
   (
-    EncodedShadingType::RadialAxial({ function, params, domain, extend, }),
+    EncodedShadingType::RadialAxial({ function, params, domain, extend_, }),
     initial_transform,
   )
 }
@@ -268,24 +268,24 @@ fn EncodedShadingType::eval(
         // TODO: Clamp out-of-range values.
         Some(color_space.to_rgba(out, 1.0, false))
       }
-    RadialAxial({ function, params, domain, extend, }) => {
+    RadialAxial({ function, params, domain, extend_, }) => {
       let (t0, t1) = (domain[0], domain[1])
       let mut t = match params {
         Axial => pos.x.to_float()
         Radial(p1~, r~) =>
-          radial_pos(pos, p1, r, extend[0], extend[1]).unwrap_or(F32_MIN)
+          radial_pos(pos, p1, r, extend_[0], extend_[1]).unwrap_or(F32_MIN)
       }
       if t == F32_MIN {
         return Some(bg_color)
       }
       if t < 0.0 {
-        if extend[0] {
+        if extend_[0] {
           t = 0.0
         } else {
           return Some(bg_color)
         }
       } else if t > 1.0 {
-        if extend[1] {
+        if extend_[1] {
           t = 1.0
         } else {
           return Some(bg_color)

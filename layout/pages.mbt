@@ -43,7 +43,7 @@ fn layout_document_common(
 ) -> PagedDocument raise @library.SourceError {
   let locator = locator.split()
   let engine = engine.with_route(
-    @library.Route::extend(engine.route).unnested(),
+    @library.Route::extend_(engine.route).unnested(),
   )
 
   // Mark the external styles as "outside" so that they are valid at the page

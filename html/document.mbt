@@ -52,7 +52,7 @@ fn html_document_common(
 ) -> HtmlDocument raise @library.SourceError {
   let locator = locator.split()
   let engine = engine.with_route(
-    @library.Route::extend(engine.route).unnested(),
+    @library.Route::extend_(engine.route).unnested(),
   )
 
   // Create this upfront to make it as stable as possible.

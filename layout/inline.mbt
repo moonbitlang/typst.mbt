@@ -53,7 +53,7 @@ fn layout_par_impl(
 ) -> @library.Fragment raise @library.SourceError {
   let link = @library.LocatorLink::new(locator)
   let locator = @library.Locator::link(link).split()
-  let engine = engine.with_route(@library.Route::extend(engine.route))
+  let engine = engine.with_route(@library.Route::extend_(engine.route))
   let children = (engine.library.routines.realize)(
     Par,
     engine,
