@@ -1,0 +1,23 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/tests/edsl_gen/registry"
+
+import {
+  "moonbitlang/typst/doc",
+}
+
+// Values
+pub fn all() -> Map[Int, Case]
+
+pub fn register(Int, () -> @doc.Document) -> Unit
+
+// Errors
+
+// Types and methods
+pub struct Case {
+  number : Int
+  build : () -> @doc.Document
+}
+
+// Type aliases
+
+// Traits

@@ -111,3 +111,11 @@ test "prose: in a show callback, the view is interpolated like a description" {
   assert_true(texts.contains("Title"))
   assert_true(texts.iter().any(t => t.contains("(heading)")))
 }
+
+///|
+test "prose: a delimiter character alone is text outside Prose" {
+  // Found by converting the upstream suite (html-non-char): only a
+  // complete placeholder is a leak.
+  let report = compile([@doc.Par("a \u{FDD0} b"), @doc.Symbol("\u{FDD0}")])
+  assert_eq(error_messages(report), "")
+}

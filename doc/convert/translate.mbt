@@ -12,6 +12,7 @@ pub fn translate(
   path : String,
   library : @library.Library,
   baseline? : Bool = false,
+  prose? : Bool = false,
 ) -> Translation {
   let root = @syntax.parse(text)
   let dir = match path.rev_find("/") {
@@ -29,6 +30,7 @@ pub fn translate(
     typed: 0,
     fresh: 0,
     names: Map([]),
+    prose,
   }
   let source_bytes = @syntax.utf8_len(text)
   // A tree with errors or warnings is never translated: the accessors of
@@ -181,7 +183,7 @@ fn Tr::stream(self : Tr, markup : @ast.Markup, env : Env) -> Code {
     .all(op => {
       match op {
         Push(code) => code.total
-        Stmt(_) => true
+        Stmt(_) | Word(_) | Gap(_) | Break | Quote(_) => true
       }
     })
   { code: self.emit(ops, "Seq", ""), total, }
@@ -200,17 +202,7 @@ fn Tr::items(
   for item in items {
     match item.kind {
       ITrivia => ()
-      ISpace(newline) =>
-        ops.push(
-          Push({
-            code: if newline {
-              "Space::newline()"
-            } else {
-              "Space()"
-            },
-            total: true,
-          }),
-        )
+      ISpace(newline) => ops.push(Gap(newline))
       IExpr(expr, embedded) => {
         let mark = self.mark()
         let result : Result[Array[Op], String] = try
@@ -292,23 +284,39 @@ fn is_rule(code : String) -> Bool {
 ///|
 /// Emit a stream as an expression: `ctor([..]suffix)`, in a block with
 /// the stream's `let`s before it if it has any. (The `let`s bind literals,
-/// each to a fresh variable, so they can stand first.)
+/// each to a fresh variable, so they can stand first.) In the readable
+/// mode a stream that `Prose` expresses exactly is `Prose(..)`.
 fn Tr::emit(
   self : Tr,
   ops : Array[Op],
   ctor : String,
   suffix : String,
 ) -> String {
-  ignore(self)
   let lets : Array[String] = []
   let pushes : Array[String] = []
-  for op in ops {
-    match op {
-      Push(code) => pushes.push(code.code)
-      Stmt(code) => lets.push(code)
-    }
+  match (if self.prose { self.prose_text(ops, lets) } else { None }) {
+    Some(prose) => pushes.push(prose)
+    None =>
+      for op in ops {
+        match op {
+          Push(code) => pushes.push(code.code)
+          Stmt(code) => lets.push(code)
+          Word(text) => pushes.push("Lit(\{mbt_str(text)})")
+          Gap(newline) =>
+            pushes.push(if newline { "Space::newline()" } else { "Space()" })
+          Break => pushes.push("Parbreak()")
+          Quote(double) => pushes.push("Smartquote(double=\{double})")
+        }
+      }
   }
-  let call = ctor + "([" + pushes.join(", ") + "]" + suffix + ")"
+  // `Prose` is the sequence of its pieces: it stands for `Seq([..])`.
+  let call = if ctor == "Seq" &&
+    pushes is [single] &&
+    single.has_prefix("Prose(") {
+    single
+  } else {
+    ctor + "([" + pushes.join(", ") + "]" + suffix + ")"
+  }
   if lets.is_empty() {
     call
   } else if ctor == "Document" {
@@ -316,4 +324,80 @@ fn Tr::emit(
   } else {
     "{\n" + lets.join("\n") + "\n" + call + "\n}"
   }
+}
+
+///|
+/// The stream as `Prose("..")`, if `Prose` splits that text into exactly
+/// these pieces (docs/edsl-design.md, section 4.4): words separated by
+/// white space, quotes, paragraph breaks and interpolated descriptions; no
+/// rule or statement, no white space at the edges (which `Prose` drops)
+/// and no two adjacent words (which `Prose` would join). Descriptions that
+/// are not short are bound to variables (pushed to `lets`) and
+/// interpolated by name.
+fn Tr::prose_text(self : Tr, ops : Array[Op], lets : Array[String]) -> String? {
+  guard !ops.is_empty() &&
+    !(ops[0] is (Gap(_) | Break)) &&
+    !(ops[ops.length() - 1] is (Gap(_) | Break)) else {
+    return None
+  }
+  let mut words = 0
+  for i, op in ops {
+    match op {
+      Stmt(_) => return None
+      Push(code) => if is_rule(code.code) { return None }
+      Word(text) => {
+        words += 1
+        if i > 0 && ops[i - 1] is Word(_) {
+          return None
+        }
+        for c in text {
+          if c == ' ' ||
+            c == '\t' ||
+            c == '\n' ||
+            c == '\r' ||
+            c == '"' ||
+            c == '\'' ||
+            c == '\u{FDD0}' ||
+            c == '\u{FDD1}' {
+            return None
+          }
+        }
+      }
+      Gap(_) => if i > 0 && ops[i - 1] is (Gap(_) | Break) { return None }
+      Break => if i > 0 && ops[i - 1] is (Gap(_) | Break) { return None }
+      Quote(_) => ()
+    }
+  }
+  // Plain sequences of descriptions gain nothing.
+  guard words > 0 else { return None }
+  let text = StringBuilder()
+  let bound : Array[String] = []
+  for op in ops {
+    match op {
+      Word(word) => {
+        let literal = mbt_str(word)
+        text.write_string(
+          literal.unsafe_substring(start=1, end=literal.length() - 1),
+        )
+      }
+      Gap(newline) => text.write_string(if newline { "\\n" } else { " " })
+      Break => text.write_string("\\n\\n")
+      Quote(double) => text.write_string(if double { "\\\"" } else { "'" })
+      Push(code) =>
+        if code.code.length() <= 48 &&
+          !code.code.contains("\\") &&
+          !code.code.contains("\n") &&
+          !code.code.contains("{") {
+          text.write_string("\\{" + code.code + "}")
+        } else {
+          self.fresh += 1
+          let name = "p\{self.fresh}"
+          bound.push("let \{name} = \{code.code}")
+          text.write_string("\\{" + name + "}")
+        }
+      Stmt(_) => ()
+    }
+  }
+  lets.append(bound)
+  Some("Prose(\"" + text.to_string() + "\")")
 }

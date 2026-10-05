@@ -78,30 +78,36 @@ fn Content::kind(self : Content) -> String {
 /// description that was interpolated. Strings other than the argument of
 /// `Prose` must not contain placeholders.
 fn prose_leak(text : String) -> String? {
-  let mut open = -1
-  for i, c in text {
-    if c == PROSE_OPEN {
-      open = i
-      break
-    }
-  }
-  guard open >= 0 else { return Option::None }
-  // The number after the opening character.
-  let mut id = 0
-  let mut digits = 0
-  for c in text.view(start_offset=open + 1) {
-    if c >= '0' && c <= '9' {
-      id = id * 10 + (c.to_int() - '0'.to_int())
+  // Most strings have no placeholder.
+  guard text.contains_char(PROSE_OPEN) else { return Option::None }
+  let chars = text.to_array()
+  let mut i = 0
+  while i < chars.length() {
+    let c = chars[i]
+    i += 1
+    guard c == PROSE_OPEN else { continue }
+    // A placeholder: the number and the closing character. The opening
+    // character alone is text (an unusual one).
+    let mut id = 0
+    let mut digits = 0
+    let mut j = i
+    while j < chars.length() && chars[j] >= '0' && chars[j] <= '9' {
+      id = id * 10 + (chars[j].to_int() - '0'.to_int())
       digits += 1
-    } else {
-      break
+      j += 1
     }
+    guard digits > 0 && j < chars.length() && chars[j] == PROSE_CLOSE else {
+      continue
+    }
+    let what = match prose_table.get(id) {
+      Some(content) => "`\{content.kind()}`"
+      Option::None => "a description"
+    }
+    return Some(
+      "\{what} was interpolated into a string that is not the text of `Prose`",
+    )
   }
-  let what = match (digits > 0, prose_table.get(id)) {
-    (true, Some(content)) => "`\{content.kind()}`"
-    _ => "a description"
-  }
-  Some("\{what} was interpolated into a string that is not the text of `Prose`")
+  Option::None
 }
 
 ///|

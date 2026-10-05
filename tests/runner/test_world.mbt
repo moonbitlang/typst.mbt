@@ -221,7 +221,7 @@ fn test_files_resolve(id : @syntax.FileId) -> String raise @library.FileError {
 }
 
 ///|
-let dev_assets_index : Ref[Map[String, String]?] = { val: None }
+let dev_assets_index : Ref[Map[String, String]?] = { val: None, }
 
 ///|
 /// The dev assets by file name (fonts excluded; the first in directory

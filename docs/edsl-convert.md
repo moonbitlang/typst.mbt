@@ -285,6 +285,29 @@ Otherwise, and inside a callback (the EDSL's creation rule forbids
 creating callbacks there), the `context` expression is an expression item
 (section 6.1): it evaluates to content.
 
+### 4.7 The readable mode: `Prose`
+
+`Lit` for every word is exact and unreadable. `Prose` (`docs/edsl-design.md`,
+section 4.4) writes running text as one string, and its lowering is a
+sequence of text runs, markup spaces, smart quotes and paragraph breaks —
+the evaluator's structure for plain markup. With `--prose` the translator
+emits a stream as `Prose("..")` instead of `Seq([..])` **exactly when
+`Prose` splits the emitted text into the stream's expressions**: the
+stream has no rule and no statement, no white space at its edges (which
+`Prose` drops; a content block `[ a ]` has spaces there), no two adjacent
+texts (markup's lexer also splits text at punctuation such as `-` and
+`.`; `Prose` would join them into one run), and no text with a quote or
+white space character. A space becomes a space or a line break (for a
+source newline), a paragraph break a blank line, a smart quote its
+character, every other description an interpolation (bound to a variable
+first if its code is long).
+
+The structure is the same in both modes; what differs is the origin of the
+text runs, which share the location of the `Prose` text (so diagnostics
+that differ only in the text run they concern would be deduplicated). The
+sweep is run in both modes: the exact mode is the reference, the readable
+mode additionally tests `Prose` on real paragraphs.
+
 ## 5. Bindings
 
 A `let name = init` becomes a MoonBit `let` only if `init` is a literal

@@ -16,15 +16,14 @@ fn Tr::item(self : Tr, expr : @ast.Expr, env : Env) -> Array[Op] raise Bail {
     // A plain string would share the location of its array with its
     // siblings; every text gets its own, so diagnostics at two texts stay
     // apart (the engine deduplicates by location and message).
-    Text(text) => [Push({ code: "Lit(\{mbt_str(text.get())})", total: true, })]
+    Text(text) => [Word(text.get())]
     Linebreak(_) => self.typed_code("Linebreak()", true)
-    Parbreak(_) => self.typed_code("Parbreak()", true)
+    Parbreak(_) => [Break]
     Escape(escape) =>
       self.typed_code("Symbol(\{mbt_str(escape.get().to_string())})", true)
     Shorthand(shorthand) =>
       self.typed_code("Symbol(\{mbt_str(shorthand.get().to_string())})", true)
-    SmartQuote(quote) =>
-      self.typed_code("Smartquote(double=\{quote.double()})", true)
+    SmartQuote(quote) => [Quote(quote.double())]
     Strong(strong) => {
       let body = self.stream(strong.body(), env)
       self.typed_code("Strong(\{body.code})", body.total)

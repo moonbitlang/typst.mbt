@@ -120,6 +120,14 @@ priv enum Op {
   Push(Code)
   /// A statement (a literal `let`).
   Stmt(String)
+  /// Markup text: `Lit(..)`.
+  Word(String)
+  /// Markup's space (`true`: with a newline): `Space()`.
+  Gap(Bool)
+  /// A paragraph break: `Parbreak()`.
+  Break
+  /// A smart quote (`true`: double): `Smartquote(double=..)`.
+  Quote(Bool)
 }
 
 ///|
@@ -139,6 +147,9 @@ priv struct Tr {
   mut fresh : Int
   /// The MoonBit variable names in use, with their number of uses.
   names : Map[String, Int]
+  /// Emit `Prose(..)` for the streams it can express exactly (the readable
+  /// mode, docs/edsl-convert.md, section 4.7).
+  prose : Bool
 }
 
 ///|

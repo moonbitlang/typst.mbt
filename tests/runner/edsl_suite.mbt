@@ -57,7 +57,7 @@ fn suite_cases() -> Array[SuiteCase] {
     let rel = "docs/" +
       file.unsafe_substring(start=docs_dir.length() + 1, end=file.length())
     for ordinal, tc in split_tests(read(file)) {
-      cases.push({ number: cases.length(), rel, ordinal, tc, paged: true })
+      cases.push({ number: cases.length(), rel, ordinal, tc, paged: true, })
     }
   }
   cases
@@ -84,6 +84,7 @@ fn edsl_using() -> String {
     "Equation", "Call", "Set", "Show", "ShowSet", "ShowWith", "Select", "Context",
     "Value", "NoneValue", "AutoValue", "Paint", "Stroke", "Sides", "Corners", "Cells",
     "Sizing", "Numbering", "Supplement", "Counter", "CounterStep", "CounterUpdate",
+    "Prose",
   ])
   let out = StringBuilder()
   out.write_string("///|\nusing @doc {\n")
@@ -134,6 +135,7 @@ fn read_failed(path : String) -> Map[Int, String] {
 fn run_edsl_convert(
   filter : String?,
   baseline : Bool,
+  prose : Bool,
   failed : Map[Int, String],
 ) -> Unit {
   let library = test_library()
@@ -171,6 +173,7 @@ fn run_edsl_convert(
       path,
       library,
       baseline=baseline || compile_error is Some(_),
+      prose~,
     )
     let shard = case_.number % edsl_shards
     let function = StringBuilder()

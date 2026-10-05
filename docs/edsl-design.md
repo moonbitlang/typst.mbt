@@ -375,7 +375,9 @@ origin (the constructor call inside `\{..}` has its own call site).
 
 **Leaks are errors, never output.** A placeholder is only meaningful in
 the text of `Prose`. Lowering checks every string it turns into engine
-data — literal text (`String`, `Lit`), string values (`Value::str`, the
+data for a complete placeholder (the two delimiters around a number; a
+delimiter character alone is ordinary, if unusual, text, which upstream's
+suite has) — literal text (`String`, `Lit`), string values (`Value::str`, the
 text of `Raw`, paths, the source of `Markup` and `Equation`) — and fails
 with `` `Emph` was interpolated into a string that is not the text of
 `Prose` `` (naming the interpolated constructor from the table, if it is

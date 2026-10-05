@@ -224,7 +224,12 @@ fn main {
           failed = read_failed(a.unsafe_substring(start=9, end=a.length()))
         }
       }
-      run_edsl_convert(filter, args.contains("--baseline"), failed)
+      run_edsl_convert(
+        filter,
+        args.contains("--baseline"),
+        args.contains("--prose"),
+        failed,
+      )
     }
     "edsl-suite" => run_edsl_suite(filter, verbose)
     _ => {
