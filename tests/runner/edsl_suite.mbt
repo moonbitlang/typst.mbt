@@ -9,7 +9,10 @@
 //   in the test world and writes `tests/edsl_gen/results.tsv`.
 //
 // A case is numbered by its position in the enumeration of the suite
-// (files in order, tests in order), the same in both commands.
+// (files in order, tests in order), the same in both commands. The
+// examples of upstream's documentation (`scripts/edsl_docs_examples.py`
+// extracts them to `tests/edsl_gen/docs`, in the suite's format) follow
+// the suite as the directories `docs/typ` and `docs/rs`.
 
 ///|
 let edsl_gen_dir = "tests/edsl_gen"
@@ -49,7 +52,27 @@ fn suite_cases() -> Array[SuiteCase] {
       })
     }
   }
+  let docs_dir = edsl_gen_dir + "/docs"
+  for file in typ_files(docs_dir) {
+    let rel = "docs/" +
+      file.unsafe_substring(start=docs_dir.length() + 1, end=file.length())
+    for ordinal, tc in split_tests(read(file)) {
+      cases.push({ number: cases.length(), rel, ordinal, tc, paged: true })
+    }
+  }
   cases
+}
+
+///|
+/// The path of the main file of a case: the suite file, or for an example
+/// of the documentation a file of the virtual directory `docs-examples`,
+/// whose other files are the dev assets by name (see `test_files_load`).
+fn case_path(rel : String) -> String {
+  if rel.has_prefix("docs/") {
+    "docs-examples/" + rel.unsafe_substring(start=5, end=rel.length())
+  } else {
+    "tests/suite/" + rel
+  }
 }
 
 ///|
@@ -141,7 +164,7 @@ fn run_edsl_convert(
       !(case_.tc.name.contains(f) || case_.rel.contains(f)) {
       continue
     }
-    let path = "tests/suite/" + case_.rel
+    let path = case_path(case_.rel)
     let compile_error = failed.get(case_.number)
     let translation = @convert.translate(
       case_.tc.body,
@@ -285,7 +308,7 @@ fn suite_frames(doc : @layout.PagedDocument, dumper : StructDumper) -> String {
 /// section 7).
 fn check_case(document : @doc.Document, case_ : SuiteCase) -> CaseChecks {
   let checks : CaseChecks = { checks: [], }
-  let source = TestWorld::main_source("tests/suite/" + case_.rel, case_.tc.body)
+  let source = TestWorld::main_source(case_path(case_.rel), case_.tc.body)
   let library = test_library()
   let library = match parse_features(case_.tc.attrs) {
     Some(f) => { ..library, features: f, }
