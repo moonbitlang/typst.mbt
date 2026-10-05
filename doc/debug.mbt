@@ -188,12 +188,11 @@ pub impl @debug.Debug for Content with fn to_repr(self) {
     }
     NSpace(false) => @debug.Repr::ctor("Space", [])
     NSpace(true) => @debug.Repr::ctor("Space::newline", [])
-    // Engine content (a view): its element and its text, which tell
-    // views apart without printing engine state.
+    // Engine content (a view): Typst's own representation of the
+    // element, which has its fields and no spans or locations.
     NEngine(content) =>
       @debug.Repr::ctor("View", [
-        (Option::None, @debug.Repr::literal(content.elem().name())),
-        (Option::None, @debug.Repr::string(content.plain_text())),
+        (Option::None, @debug.Repr::literal(content.repr())),
       ])
     NValue(value) => value.to_repr()
     NInvalid(message, site) =>

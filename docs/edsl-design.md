@@ -436,7 +436,10 @@ The check is on the strings the EDSL hands to the engine, not on what
 Typst code computes from them: a placeholder that reaches Typst code in an
 escaped spelling (the string re-encoded as a Typst string literal with
 `\u{fdd0}` escapes and evaluated by `eval` or `Markup`) is rebuilt by that
-code as ordinary text of noncharacters and a number. No description is
+code as ordinary text of noncharacters and a number. If the rebuilt
+string is itself the result of the call, it is still caught (results that
+are strings are checked); inside content or a collection that Typst code
+returns it is not, and engine values are not scanned. No description is
 lost or confused by that, and it does not happen by accident.
 
 **Origins.** The `Prose` call is one origin. Its text runs take the span
