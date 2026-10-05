@@ -38,3 +38,37 @@ pub fn Quoted::Quoted(
 pub impl IntoContent for Quoted with fn into_content(self) {
   self.content
 }
+
+///|
+/// The display of a symbol: what markup's escapes (`\\#`) and shorthands
+/// (`~`, `--`, `...`) evaluate to. It is laid out like the text, but it is
+/// a `symbol` element until realization, which converted markup keeps.
+/// Authors write the character in a string instead.
+///
+/// Twin: `#symbol("..")`.
+pub struct Symbol {
+  priv content : Content
+}
+
+///|
+#callsite(autofill(loc, args_loc))
+pub fn Symbol::Symbol(
+  text : String,
+  loc~ : SourceLoc,
+  args_loc~ : ArgsLoc,
+) -> Symbol {
+  {
+    content: Content::of(
+      NCall({
+        func: FNative(@library.native_symbol_construct()),
+        args: [{ name: Option::None, value: Value::str(text), param: 0, }],
+        origin: Site::new("Symbol", loc, args_loc),
+      }),
+    ),
+  }
+}
+
+///|
+pub impl IntoContent for Symbol with fn into_content(self) {
+  self.content
+}

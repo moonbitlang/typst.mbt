@@ -72,10 +72,11 @@ impl @library.World for TwinWorld with fn today(self, offset) {
 ///|
 /// The main file of a twin: a project-root file, like the EDSL's virtual
 /// files, so that paths resolve alike.
-fn twin_main(text : String) -> @syntax.Source {
+fn twin_main(text : String, dir? : String = "") -> @syntax.Source {
+  let path = if dir == "" { "twin.typ" } else { dir + "/twin.typ" }
   let id = @syntax.RootedPath::new(
     Project,
-    @syntax.VirtualPath::new("twin.typ") catch {
+    @syntax.VirtualPath::new(path) catch {
       _ => panic()
     },
   ).intern()
@@ -251,7 +252,12 @@ fn first_difference(a : String, b : String) -> String {
 ///|
 /// Compare one twin; returns the failed checks.
 fn check_twin(twin : @twins.Twin, base : &@library.World) -> Array[String] {
-  check_pair((twin.build)(), twin_main(twin.typst), base, structural=true)
+  check_pair(
+    (twin.build)(),
+    twin_main(twin.typst, dir=twin.dir),
+    base,
+    structural=true,
+  )
 }
 
 ///|

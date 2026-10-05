@@ -146,7 +146,13 @@ fn Lower::sequence(
         let recipe = self.show_rule(show)
         let tail = self.sequence(children[i:], fallback)
         i = children.length()
-        seq.push(tail.styled(@library.Style::Recipe(recipe)))
+        // The evaluator's `styled_with_recipe`: a rule without a selector
+        // transforms the tail at once.
+        if recipe.selector is Option::None {
+          seq.push(recipe.apply(self.engine, self.context, tail))
+        } else {
+          seq.push(tail.styled(@library.Style::Recipe(recipe)))
+        }
       }
       // An inserted expression (`#f(..)`, `#value` in markup), also
       // inside `Keyed` wrappers, which do not change the lowered content:
@@ -524,12 +530,31 @@ fn Lower::show_rule(
 ) -> @library.Recipe raise @library.SourceError {
   let entry = self.entry(show.origin)
   let span = self.session.registry.span(entry)
-  let selector_span = self.session.registry.arg_span(entry, 0)
-  let selector = self.value(show.selector, selector_span)
-  let selector : @library.ShowableSelector = @library.at(selector_span, () => {
-    selector.cast()
-  })
+  let selector : @library.Selector? = match show.selector {
+    Some(selector) => {
+      let selector_span = self.session.registry.arg_span(entry, 0)
+      let selector = self.value(selector, selector_span)
+      let selector : @library.ShowableSelector = @library.at(selector_span, () => {
+        selector.cast()
+      })
+      Some(selector.0)
+    }
+    Option::None => Option::None
+  }
   let transform : @library.Transformation = match show.transform {
+    TValue(value) => {
+      // The transformation is the last declared parameter.
+      let transform_span = self.session.registry.arg_span(
+        entry,
+        if show.selector is Some(_) {
+          1
+        } else {
+          0
+        },
+      )
+      let value = self.value(value, transform_span)
+      @library.at(transform_span, () => value.cast())
+    }
     TFunc(callback) =>
       @library.Transformation::Func(
         @library.Func::host(self.session.host(callback, span, self.keys)).spanned(
@@ -538,7 +563,7 @@ fn Lower::show_rule(
       )
     TStyle(set) => @library.Transformation::Style(self.set_rule(set))
   }
-  let recipe = @library.Recipe::new(Some(selector.0), transform, span)
+  let recipe = @library.Recipe::new(selector, transform, span)
   @eval.check_recipe(self.engine, recipe)
   recipe
 }

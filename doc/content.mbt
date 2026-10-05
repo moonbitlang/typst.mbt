@@ -112,12 +112,14 @@ priv struct SetNode {
 priv enum ShowTransform {
   TFunc(Callback)
   TStyle(SetNode)
+  /// A value that is cast to a transformation (a function, content).
+  TValue(Value)
 }
 
 ///|
 priv struct ShowNode {
-  /// The selector, as a value description.
-  selector : Value
+  /// The selector, as a value description (`None`: `show: transform`).
+  selector : Value?
   transform : ShowTransform
   origin : Site
 }

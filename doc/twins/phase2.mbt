@@ -14,6 +14,8 @@ using @doc {
   type CurveClose,
   type Scale,
   type Skew,
+  type ShowWith,
+  type Symbol,
 }
 
 ///|
@@ -234,6 +236,58 @@ pub fn phase2() -> Array[Twin] {
             Value::spread(Value::none()),
             Value::content("red"),
           ]),
+        ])
+      },
+    ),
+    // A document in a directory: relative paths in arguments and in
+    // fragments resolve against it.
+    twin(
+      "document-directory",
+      [
+        page_typ, "#image(\"../glacier.jpg\", width: 30pt)", "#eval(\"#image(\\\"../diagram.svg\\\", width: 30pt)\", mode: \"markup\")",
+        "#image(\"/glacier.jpg\", width: 20pt)",
+      ],
+      () => {
+        Document(
+          [
+            page(),
+            Image("../glacier.jpg", width=Pt(30)),
+            Markup("#image(\"../diagram.svg\", width: 30pt)"),
+            Image("/glacier.jpg", width=Pt(20)),
+          ],
+          dir="chapters",
+        )
+      },
+      dir="chapters",
+    ),
+    // Symbols (markup's escapes and shorthands) and show rules whose
+    // transformation is a value, with and without a selector; positional
+    // arguments of the generic set rule.
+    twin(
+      "symbols-and-value-rules",
+      [
+        page_typ, "#set text(8pt, red);", "#show link: underline;", "#show \"old\": [#\"new\"];",
+        "#show heading.where(level: 2): smallcaps;", "#show: box.with(stroke: 1pt);",
+        "#symbol(\"—\")#symbol(\"#\")#\" \"#link(\"https://typst.app\")#\" old \"#heading(level: 2)[#\"Sub\"]",
+      ],
+      () => {
+        Document([
+          page(),
+          Set("text", [], positional=[Value::length(Pt(8)), Value::paint(Red)]),
+          ShowWith(Select::link(), Value::global("underline")),
+          ShowWith(Select::literal("old"), Value::content("new")),
+          ShowWith(Select::heading(level=2), Value::global("smallcaps")),
+          ShowWith::all(
+            Value::call("function.with", positional=[Value::global("box")], named=[
+              ("stroke", Value::length(Pt(1))),
+            ]),
+          ),
+          Symbol("—"),
+          Symbol("#"),
+          " ",
+          Link(Url("https://typst.app")),
+          " old ",
+          Heading("Sub", level=2),
         ])
       },
     ),

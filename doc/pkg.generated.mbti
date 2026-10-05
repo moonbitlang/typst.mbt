@@ -373,7 +373,7 @@ pub struct Document {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn Document::Document(Array[&IntoContent], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn Document::Document(Array[&IntoContent], dir? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub fn[T : @library.Output] Document::compile(Self, &@library.World) -> CompileReport[T]
 pub fn Document::compile_paged(Self, &@library.World) -> CompileReport[@layout.PagedDocument]
 pub fn Document::lower(Self, &@library.World) -> CompileReport[@library.Content]
@@ -1224,7 +1224,7 @@ pub struct Set {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn Set::Set(String, Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn Set::Set(String, Array[(String, Value)], positional? : Array[Value], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for Set
 pub impl SetRule for Set
 
@@ -1807,6 +1807,15 @@ pub struct ShowSet {
 pub fn[W] ShowSet::ShowSet(Selector[W], &SetRule, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl IntoContent for ShowSet
 
+pub struct ShowWith {
+  // private fields
+}
+#callsite(autofill(args_loc, loc))
+pub fn[W] ShowWith::ShowWith(Selector[W], Value, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+#callsite(autofill(args_loc, loc))
+pub fn ShowWith::all(Value, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl IntoContent for ShowWith
+
 pub struct Sides[T] {
   // private fields
 }
@@ -2004,6 +2013,13 @@ pub fn Supplement::auto() -> Self
 pub fn Supplement::func(loc~ : SourceLoc, args_loc~ : ArgsLoc, (ContentView, Ctx) -> &IntoContent raise) -> Self
 pub fn Supplement::none() -> Self
 pub impl ToValue for Supplement
+
+pub struct Symbol {
+  // private fields
+}
+#callsite(autofill(args_loc, loc))
+pub fn Symbol::Symbol(String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl IntoContent for Symbol
 
 pub struct Table {
   // private fields

@@ -78,14 +78,22 @@ pub struct Twin {
   typst : String
   /// Builds the EDSL document.
   build : () -> Document
+  /// The directory of the Typst main file, relative to the project root
+  /// (`""`: the root). The EDSL document names the same directory.
+  dir : String
 }
 
 ///|
 /// The Typst source of a twin: the parts are joined without separators,
 /// so that no markup space separates the top-level expressions (the EDSL
 /// sequence has none either).
-fn twin(name : String, parts : Array[String], build : () -> Document) -> Twin {
-  { name, typst: parts.join(""), build, }
+fn twin(
+  name : String,
+  parts : Array[String],
+  build : () -> Document,
+  dir? : String = "",
+) -> Twin {
+  { name, typst: parts.join(""), build, dir, }
 }
 
 ///|
@@ -553,6 +561,11 @@ pub fn constructs() -> Array[Twin] {
 pub fn all() -> Array[Twin] {
   let twins = constructs()
   twins.append(phase2())
-  twins.push({ name: "showcase", typst: showcase_typst(), build: showcase, })
+  twins.push({
+    name: "showcase",
+    typst: showcase_typst(),
+    build: showcase,
+    dir: "",
+  })
   twins
 }

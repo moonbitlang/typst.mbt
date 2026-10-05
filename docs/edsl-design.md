@@ -261,7 +261,7 @@ with punctuation have constructors, and the characters are written as such:
 |---|---|
 | `"quoted"`, `'quoted'` (smart quotes by language and nesting) | `Quoted("quoted")`, `Quoted("quoted", double=false)`: a `smartquote` element before and after the body; twin `[#smartquote()#body#smartquote()]` |
 | an apostrophe `'` inside a word | the character `’` in the string (what the smart quote resolves to in every language) |
-| `--`, `---`, `...`, `~`, `-?` | the characters `–`, `—`, `…`, U+00A0, U+00AD in the string |
+| `--`, `---`, `...`, `~`, `-?`, escapes (`\#`) | the characters `–`, `—`, `…`, U+00A0, U+00AD, `#` in the string. (Markup evaluates these to symbol values, displayed as `symbol` elements that realization turns into text; `Symbol("—")`, the twin of `#symbol("—")`, is that element for converted markup.) |
 | a line break or several spaces in the source | one `" "` in the string; `Space()`/`Space::newline()` only for the collapsing behaviour |
 | a blank line | a new `Par(..)`, or `Parbreak()` between pieces of inline content |
 | `= Heading`, `- item`, `+ item`, `/ term: text` | `Heading(..)`, `List([..])`/`ListItem(..)`, `Enum([..])`/`EnumItem(..)`, `Terms([..])`/`TermsItem(..)` |
@@ -830,6 +830,16 @@ Document([
   `` `show page` is not supported and has no effect``.
 - A show rule without a selector (`show: f`) is plain function application
   in MoonBit (`template(Seq([...]))`) and needs no construct.
+- **`ShowWith(selector, transform : Value)`** is the show rule whose
+  transformation is a value — a Typst function (`show link: underline` is
+  `ShowWith(Select::link(), Value::global("underline"))`), content or a
+  string — cast to a transformation at the `transform` argument like the
+  evaluator casts the right-hand side of a show rule.
+  **`ShowWith::all(transform)`** is `show: transform`: like the evaluator's
+  `styled_with_recipe`, a rule without a selector is applied to the rest of
+  the sequence at once (`recipe.apply`) instead of styling it. These are the
+  value-level hatch for rules, as `Set` is for set rules; converted Typst
+  code needs them for transformations that are not MoonBit callbacks.
 
 ## 9. Selectors and views
 
@@ -1281,8 +1291,14 @@ string relative to the file of the argument's span (`PathOrStr::resolve`,
 - `import`/`include` and paths inside `Markup` resolve relative to the
   snippet file, i.e. the project root as well.
 
-A document needing another base uses root-relative paths or a world rooted
-elsewhere; a per-document base directory is not part of this design.
+A document that lives elsewhere names its directory:
+`Document(children, dir="chapters/intro")` puts the session's virtual files
+(the origin listing and the snippets) into that directory of the project,
+so relative paths in arguments and in `Markup` fragments resolve as they
+would in a Typst file there. Path strings are still passed unchanged. The
+directory must be a path inside the project (lowering fails otherwise);
+each distinct directory uses its own interned file ids (1 + the snippet
+slots in use).
 
 ## 13. Escape hatches
 
@@ -1349,7 +1365,7 @@ pub fn Set::Set(path : String, named : Array[(String, Value)], loc~ : SourceLoc,
   evaluator's rule and warnings (`Seq([Heading("x"), Value::label("h")])` is
   `[#heading[x]#label("h")]`), also when the expression is wrapped in
   `Keyed`, which never changes the lowered content. As an argument, a
-  `Value` is the argument itself (`caption=NoneValue()`). **`Set(path, named)`** is the generic set rule.
+  `Value` is the argument itself (`caption=NoneValue()`). **`Set(path, named, positional?)`** is the generic set rule (`set text(8pt, red)` is `Set("text", [], positional=[..])`).
   `path` is resolved like an identifier with field accesses in the
   evaluator: the first segment in the library's global scope, the rest with
   `Value::field` (`table.cell`, `math.equation`, `gradient.linear`). An

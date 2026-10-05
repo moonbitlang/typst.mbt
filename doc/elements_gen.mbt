@@ -31,51 +31,35 @@ pub fn Heading::Heading(
   args_loc~ : ArgsLoc,
 ) -> Heading {
   let args : Array[ArgNode] = []
-  args.push({ name: None, value: Value::content(body), param: 0, })
+  args.push({ name: None, value: Value::content(body), param: 0 })
   if level is Some(v) {
-    args.push({ name: Some("level"), value: Value::int(v), param: 1, })
+    args.push({ name: Some("level"), value: Value::int(v), param: 1 })
   }
   if depth is Some(v) {
-    args.push({ name: Some("depth"), value: Value::int(v), param: 2, })
+    args.push({ name: Some("depth"), value: Value::int(v), param: 2 })
   }
   if offset is Some(v) {
-    args.push({ name: Some("offset"), value: Value::int(v), param: 3, })
+    args.push({ name: Some("offset"), value: Value::int(v), param: 3 })
   }
   if numbering is Some(v) {
-    args.push({
-      name: Some("numbering"),
-      value: ToValue::to_value(v),
-      param: 4,
-    })
+    args.push({ name: Some("numbering"), value: ToValue::to_value(v), param: 4 })
   }
   if supplement is Some(v) {
-    args.push({
-      name: Some("supplement"),
-      value: ToValue::to_value(v),
-      param: 5,
-    })
+    args.push({ name: Some("supplement"), value: ToValue::to_value(v), param: 5 })
   }
   if outlined is Some(v) {
-    args.push({ name: Some("outlined"), value: Value::bool(v), param: 6, })
+    args.push({ name: Some("outlined"), value: Value::bool(v), param: 6 })
   }
   if bookmarked is Some(v) {
-    args.push({ name: Some("bookmarked"), value: Value::bool(v), param: 7, })
+    args.push({ name: Some("bookmarked"), value: Value::bool(v), param: 7 })
   }
   if hanging_indent is Some(v) {
-    args.push({
-      name: Some("hanging-indent"),
-      value: ToValue::to_value(v),
-      param: 8,
-    })
+    args.push({ name: Some("hanging-indent"), value: ToValue::to_value(v), param: 8 })
   }
   push_extra(args, extra, 9)
   {
     content: labelled_call(
-      {
-        func: FElem(@library.heading_elem()),
-        args,
-        origin: Site::new("Heading", loc, args_loc),
-      },
+      { func: FElem(@library.heading_elem()), args, origin: Site::new("Heading", loc, args_loc) },
       label,
       10,
     ),
@@ -117,49 +101,31 @@ pub fn SetHeading::SetHeading(
 ) -> SetHeading {
   let args : Array[ArgNode] = []
   if level is Some(v) {
-    args.push({ name: Some("level"), value: Value::int(v), param: 0, })
+    args.push({ name: Some("level"), value: Value::int(v), param: 0 })
   }
   if depth is Some(v) {
-    args.push({ name: Some("depth"), value: Value::int(v), param: 1, })
+    args.push({ name: Some("depth"), value: Value::int(v), param: 1 })
   }
   if offset is Some(v) {
-    args.push({ name: Some("offset"), value: Value::int(v), param: 2, })
+    args.push({ name: Some("offset"), value: Value::int(v), param: 2 })
   }
   if numbering is Some(v) {
-    args.push({
-      name: Some("numbering"),
-      value: ToValue::to_value(v),
-      param: 3,
-    })
+    args.push({ name: Some("numbering"), value: ToValue::to_value(v), param: 3 })
   }
   if supplement is Some(v) {
-    args.push({
-      name: Some("supplement"),
-      value: ToValue::to_value(v),
-      param: 4,
-    })
+    args.push({ name: Some("supplement"), value: ToValue::to_value(v), param: 4 })
   }
   if outlined is Some(v) {
-    args.push({ name: Some("outlined"), value: Value::bool(v), param: 5, })
+    args.push({ name: Some("outlined"), value: Value::bool(v), param: 5 })
   }
   if bookmarked is Some(v) {
-    args.push({ name: Some("bookmarked"), value: Value::bool(v), param: 6, })
+    args.push({ name: Some("bookmarked"), value: Value::bool(v), param: 6 })
   }
   if hanging_indent is Some(v) {
-    args.push({
-      name: Some("hanging-indent"),
-      value: ToValue::to_value(v),
-      param: 7,
-    })
+    args.push({ name: Some("hanging-indent"), value: ToValue::to_value(v), param: 7 })
   }
   push_extra(args, extra, 8)
-  {
-    node: {
-      func: FElem(@library.heading_elem()),
-      args,
-      origin: Site::new("SetHeading", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.heading_elem()), args, origin: Site::new("SetHeading", loc, args_loc) } }
 }
 
 ///|
@@ -190,9 +156,7 @@ pub fn HeadingView::view(self : HeadingView) -> ContentView {
 
 ///|
 /// The `body` of the element.
-pub fn HeadingView::body(
-  self : HeadingView,
-) -> ContentView raise @library.HintedError {
+pub fn HeadingView::body(self : HeadingView) -> ContentView raise @library.HintedError {
   ContentView::new(self.content.field_by_name("body").cast())
 }
 
@@ -234,9 +198,7 @@ pub fn Select::heading(
   if hanging_indent is Some(v) {
     fields.push(("hanging-indent", ToValue::to_value(v)))
   }
-  elem_selector(@library.heading_elem(), fields, content => HeadingView::{
-    content,
-  })
+  elem_selector(@library.heading_elem(), fields, content => HeadingView::{ content, })
 }
 
 ///|
@@ -263,34 +225,26 @@ pub fn Par::Par(
   args_loc~ : ArgsLoc,
 ) -> Par {
   let args : Array[ArgNode] = []
-  args.push({ name: None, value: Value::content(body), param: 0, })
+  args.push({ name: None, value: Value::content(body), param: 0 })
   if leading is Some(v) {
-    args.push({ name: Some("leading"), value: ToValue::to_value(v), param: 1, })
+    args.push({ name: Some("leading"), value: ToValue::to_value(v), param: 1 })
   }
   if spacing is Some(v) {
-    args.push({ name: Some("spacing"), value: ToValue::to_value(v), param: 2, })
+    args.push({ name: Some("spacing"), value: ToValue::to_value(v), param: 2 })
   }
   if justify is Some(v) {
-    args.push({ name: Some("justify"), value: Value::bool(v), param: 3, })
+    args.push({ name: Some("justify"), value: Value::bool(v), param: 3 })
   }
   if linebreaks is Some(v) {
-    args.push({ name: Some("linebreaks"), value: Value::str(v), param: 4, })
+    args.push({ name: Some("linebreaks"), value: Value::str(v), param: 4 })
   }
   if hanging_indent is Some(v) {
-    args.push({
-      name: Some("hanging-indent"),
-      value: ToValue::to_value(v),
-      param: 5,
-    })
+    args.push({ name: Some("hanging-indent"), value: ToValue::to_value(v), param: 5 })
   }
   push_extra(args, extra, 6)
   {
     content: labelled_call(
-      {
-        func: FElem(@library.par_elem()),
-        args,
-        origin: Site::new("Par", loc, args_loc),
-      },
+      { func: FElem(@library.par_elem()), args, origin: Site::new("Par", loc, args_loc) },
       label,
       7,
     ),
@@ -325,32 +279,22 @@ pub fn SetPar::SetPar(
 ) -> SetPar {
   let args : Array[ArgNode] = []
   if leading is Some(v) {
-    args.push({ name: Some("leading"), value: ToValue::to_value(v), param: 0, })
+    args.push({ name: Some("leading"), value: ToValue::to_value(v), param: 0 })
   }
   if spacing is Some(v) {
-    args.push({ name: Some("spacing"), value: ToValue::to_value(v), param: 1, })
+    args.push({ name: Some("spacing"), value: ToValue::to_value(v), param: 1 })
   }
   if justify is Some(v) {
-    args.push({ name: Some("justify"), value: Value::bool(v), param: 2, })
+    args.push({ name: Some("justify"), value: Value::bool(v), param: 2 })
   }
   if linebreaks is Some(v) {
-    args.push({ name: Some("linebreaks"), value: Value::str(v), param: 3, })
+    args.push({ name: Some("linebreaks"), value: Value::str(v), param: 3 })
   }
   if hanging_indent is Some(v) {
-    args.push({
-      name: Some("hanging-indent"),
-      value: ToValue::to_value(v),
-      param: 4,
-    })
+    args.push({ name: Some("hanging-indent"), value: ToValue::to_value(v), param: 4 })
   }
   push_extra(args, extra, 5)
-  {
-    node: {
-      func: FElem(@library.par_elem()),
-      args,
-      origin: Site::new("SetPar", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.par_elem()), args, origin: Site::new("SetPar", loc, args_loc) } }
 }
 
 ///|
@@ -432,11 +376,7 @@ pub fn Parbreak::Parbreak(
   push_extra(args, extra, 0)
   {
     content: labelled_call(
-      {
-        func: FElem(@library.parbreak_elem()),
-        args,
-        origin: Site::new("Parbreak", loc, args_loc),
-      },
+      { func: FElem(@library.parbreak_elem()), args, origin: Site::new("Parbreak", loc, args_loc) },
       label,
       1,
     ),
@@ -469,11 +409,10 @@ pub fn ParbreakView::view(self : ParbreakView) -> ContentView {
 ///|
 /// The `parbreak` elements; with arguments, those whose fields have the given
 /// values (`parbreak.where(..)`).
-pub fn Select::parbreak() -> Selector[ParbreakView] {
+pub fn Select::parbreak(
+) -> Selector[ParbreakView] {
   let fields : Array[(String, Value)] = []
-  elem_selector(@library.parbreak_elem(), fields, content => ParbreakView::{
-    content,
-  })
+  elem_selector(@library.parbreak_elem(), fields, content => ParbreakView::{ content, })
 }
 
 ///|
@@ -493,18 +432,14 @@ pub fn Strong::Strong(
   args_loc~ : ArgsLoc,
 ) -> Strong {
   let args : Array[ArgNode] = []
-  args.push({ name: None, value: Value::content(body), param: 0, })
+  args.push({ name: None, value: Value::content(body), param: 0 })
   if delta is Some(v) {
-    args.push({ name: Some("delta"), value: Value::int(v), param: 1, })
+    args.push({ name: Some("delta"), value: Value::int(v), param: 1 })
   }
   push_extra(args, extra, 2)
   {
     content: labelled_call(
-      {
-        func: FElem(@library.strong_elem()),
-        args,
-        origin: Site::new("Strong", loc, args_loc),
-      },
+      { func: FElem(@library.strong_elem()), args, origin: Site::new("Strong", loc, args_loc) },
       label,
       3,
     ),
@@ -532,16 +467,10 @@ pub fn SetStrong::SetStrong(
 ) -> SetStrong {
   let args : Array[ArgNode] = []
   if delta is Some(v) {
-    args.push({ name: Some("delta"), value: Value::int(v), param: 0, })
+    args.push({ name: Some("delta"), value: Value::int(v), param: 0 })
   }
   push_extra(args, extra, 1)
-  {
-    node: {
-      func: FElem(@library.strong_elem()),
-      args,
-      origin: Site::new("SetStrong", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.strong_elem()), args, origin: Site::new("SetStrong", loc, args_loc) } }
 }
 
 ///|
@@ -572,23 +501,21 @@ pub fn StrongView::view(self : StrongView) -> ContentView {
 
 ///|
 /// The `body` of the element.
-pub fn StrongView::body(
-  self : StrongView,
-) -> ContentView raise @library.HintedError {
+pub fn StrongView::body(self : StrongView) -> ContentView raise @library.HintedError {
   ContentView::new(self.content.field_by_name("body").cast())
 }
 
 ///|
 /// The `strong` elements; with arguments, those whose fields have the given
 /// values (`strong.where(..)`).
-pub fn Select::strong(delta? : Int64) -> Selector[StrongView] {
+pub fn Select::strong(
+  delta? : Int64,
+) -> Selector[StrongView] {
   let fields : Array[(String, Value)] = []
   if delta is Some(v) {
     fields.push(("delta", Value::int(v)))
   }
-  elem_selector(@library.strong_elem(), fields, content => StrongView::{
-    content,
-  })
+  elem_selector(@library.strong_elem(), fields, content => StrongView::{ content, })
 }
 
 ///|
@@ -607,15 +534,11 @@ pub fn Emph::Emph(
   args_loc~ : ArgsLoc,
 ) -> Emph {
   let args : Array[ArgNode] = []
-  args.push({ name: None, value: Value::content(body), param: 0, })
+  args.push({ name: None, value: Value::content(body), param: 0 })
   push_extra(args, extra, 1)
   {
     content: labelled_call(
-      {
-        func: FElem(@library.emph_elem()),
-        args,
-        origin: Site::new("Emph", loc, args_loc),
-      },
+      { func: FElem(@library.emph_elem()), args, origin: Site::new("Emph", loc, args_loc) },
       label,
       2,
     ),
@@ -647,16 +570,15 @@ pub fn EmphView::view(self : EmphView) -> ContentView {
 
 ///|
 /// The `body` of the element.
-pub fn EmphView::body(
-  self : EmphView,
-) -> ContentView raise @library.HintedError {
+pub fn EmphView::body(self : EmphView) -> ContentView raise @library.HintedError {
   ContentView::new(self.content.field_by_name("body").cast())
 }
 
 ///|
 /// The `emph` elements; with arguments, those whose fields have the given
 /// values (`emph.where(..)`).
-pub fn Select::emph() -> Selector[EmphView] {
+pub fn Select::emph(
+) -> Selector[EmphView] {
   let fields : Array[(String, Value)] = []
   elem_selector(@library.emph_elem(), fields, content => EmphView::{ content, })
 }
@@ -682,20 +604,16 @@ pub fn Link::Link(
   args_loc~ : ArgsLoc,
 ) -> Link {
   let args : Array[ArgNode] = []
-  args.push({ name: None, value: ToValue::to_value(dest), param: 0, })
+  args.push({ name: None, value: ToValue::to_value(dest), param: 0 })
   if extra_arg(extra, "body") is Some(v) {
-    args.push({ name: None, value: v, param: 2, })
+    args.push({ name: None, value: v, param: 2 })
   } else if body is Some(v) {
-    args.push({ name: None, value: Value::content(v), param: 1, })
+    args.push({ name: None, value: Value::content(v), param: 1 })
   }
   push_extra(args, extra, 2, positional=["body"])
   {
     content: labelled_call(
-      {
-        func: FElem(@library.link_elem()),
-        args,
-        origin: Site::new("Link", loc, args_loc),
-      },
+      { func: FElem(@library.link_elem()), args, origin: Site::new("Link", loc, args_loc) },
       label,
       3,
     ),
@@ -728,7 +646,8 @@ pub fn LinkView::view(self : LinkView) -> ContentView {
 ///|
 /// The `link` elements; with arguments, those whose fields have the given
 /// values (`link.where(..)`).
-pub fn Select::link() -> Selector[LinkView] {
+pub fn Select::link(
+) -> Selector[LinkView] {
   let fields : Array[(String, Value)] = []
   elem_selector(@library.link_elem(), fields, content => LinkView::{ content, })
 }
@@ -754,25 +673,17 @@ pub fn Ref::Ref(
   args_loc~ : ArgsLoc,
 ) -> Ref {
   let args : Array[ArgNode] = []
-  args.push({ name: None, value: Value::label(target), param: 0, })
+  args.push({ name: None, value: Value::label(target), param: 0 })
   if supplement is Some(v) {
-    args.push({
-      name: Some("supplement"),
-      value: ToValue::to_value(v),
-      param: 1,
-    })
+    args.push({ name: Some("supplement"), value: ToValue::to_value(v), param: 1 })
   }
   if form is Some(v) {
-    args.push({ name: Some("form"), value: Value::str(v), param: 2, })
+    args.push({ name: Some("form"), value: Value::str(v), param: 2 })
   }
   push_extra(args, extra, 3)
   {
     content: labelled_call(
-      {
-        func: FElem(@library.ref_elem()),
-        args,
-        origin: Site::new("Ref", loc, args_loc),
-      },
+      { func: FElem(@library.ref_elem()), args, origin: Site::new("Ref", loc, args_loc) },
       label,
       4,
     ),
@@ -804,23 +715,13 @@ pub fn SetRef::SetRef(
 ) -> SetRef {
   let args : Array[ArgNode] = []
   if supplement is Some(v) {
-    args.push({
-      name: Some("supplement"),
-      value: ToValue::to_value(v),
-      param: 0,
-    })
+    args.push({ name: Some("supplement"), value: ToValue::to_value(v), param: 0 })
   }
   if form is Some(v) {
-    args.push({ name: Some("form"), value: Value::str(v), param: 1, })
+    args.push({ name: Some("form"), value: Value::str(v), param: 1 })
   }
   push_extra(args, extra, 2)
-  {
-    node: {
-      func: FElem(@library.ref_elem()),
-      args,
-      origin: Site::new("SetRef", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.ref_elem()), args, origin: Site::new("SetRef", loc, args_loc) } }
 }
 
 ///|
@@ -883,22 +784,14 @@ pub fn Footnote::Footnote(
   args_loc~ : ArgsLoc,
 ) -> Footnote {
   let args : Array[ArgNode] = []
-  args.push({ name: None, value: Value::content(body), param: 0, })
+  args.push({ name: None, value: Value::content(body), param: 0 })
   if numbering is Some(v) {
-    args.push({
-      name: Some("numbering"),
-      value: ToValue::to_value(v),
-      param: 1,
-    })
+    args.push({ name: Some("numbering"), value: ToValue::to_value(v), param: 1 })
   }
   push_extra(args, extra, 2)
   {
     content: labelled_call(
-      {
-        func: FElem(@library.footnote_elem()),
-        args,
-        origin: Site::new("Footnote", loc, args_loc),
-      },
+      { func: FElem(@library.footnote_elem()), args, origin: Site::new("Footnote", loc, args_loc) },
       label,
       3,
     ),
@@ -926,20 +819,10 @@ pub fn SetFootnote::SetFootnote(
 ) -> SetFootnote {
   let args : Array[ArgNode] = []
   if numbering is Some(v) {
-    args.push({
-      name: Some("numbering"),
-      value: ToValue::to_value(v),
-      param: 0,
-    })
+    args.push({ name: Some("numbering"), value: ToValue::to_value(v), param: 0 })
   }
   push_extra(args, extra, 1)
-  {
-    node: {
-      func: FElem(@library.footnote_elem()),
-      args,
-      origin: Site::new("SetFootnote", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.footnote_elem()), args, origin: Site::new("SetFootnote", loc, args_loc) } }
 }
 
 ///|
@@ -971,14 +854,14 @@ pub fn FootnoteView::view(self : FootnoteView) -> ContentView {
 ///|
 /// The `footnote` elements; with arguments, those whose fields have the given
 /// values (`footnote.where(..)`).
-pub fn Select::footnote(numbering? : Numbering) -> Selector[FootnoteView] {
+pub fn Select::footnote(
+  numbering? : Numbering,
+) -> Selector[FootnoteView] {
   let fields : Array[(String, Value)] = []
   if numbering is Some(v) {
     fields.push(("numbering", ToValue::to_value(v)))
   }
-  elem_selector(@library.footnote_elem(), fields, content => FootnoteView::{
-    content,
-  })
+  elem_selector(@library.footnote_elem(), fields, content => FootnoteView::{ content, })
 }
 
 ///|
@@ -1004,24 +887,20 @@ pub fn Quote::Quote(
   args_loc~ : ArgsLoc,
 ) -> Quote {
   let args : Array[ArgNode] = []
-  args.push({ name: None, value: Value::content(body), param: 0, })
+  args.push({ name: None, value: Value::content(body), param: 0 })
   if block is Some(v) {
-    args.push({ name: Some("block"), value: Value::bool(v), param: 1, })
+    args.push({ name: Some("block"), value: Value::bool(v), param: 1 })
   }
   if quotes is Some(v) {
-    args.push({ name: Some("quotes"), value: Value::bool(v), param: 2, })
+    args.push({ name: Some("quotes"), value: Value::bool(v), param: 2 })
   }
   if attribution is Some(v) {
-    args.push({ name: Some("attribution"), value: Value::content(v), param: 3, })
+    args.push({ name: Some("attribution"), value: Value::content(v), param: 3 })
   }
   push_extra(args, extra, 4)
   {
     content: labelled_call(
-      {
-        func: FElem(@library.quote_elem()),
-        args,
-        origin: Site::new("Quote", loc, args_loc),
-      },
+      { func: FElem(@library.quote_elem()), args, origin: Site::new("Quote", loc, args_loc) },
       label,
       5,
     ),
@@ -1055,22 +934,16 @@ pub fn SetQuote::SetQuote(
 ) -> SetQuote {
   let args : Array[ArgNode] = []
   if block is Some(v) {
-    args.push({ name: Some("block"), value: Value::bool(v), param: 0, })
+    args.push({ name: Some("block"), value: Value::bool(v), param: 0 })
   }
   if quotes is Some(v) {
-    args.push({ name: Some("quotes"), value: Value::bool(v), param: 1, })
+    args.push({ name: Some("quotes"), value: Value::bool(v), param: 1 })
   }
   if attribution is Some(v) {
-    args.push({ name: Some("attribution"), value: Value::content(v), param: 2, })
+    args.push({ name: Some("attribution"), value: Value::content(v), param: 2 })
   }
   push_extra(args, extra, 3)
-  {
-    node: {
-      func: FElem(@library.quote_elem()),
-      args,
-      origin: Site::new("SetQuote", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.quote_elem()), args, origin: Site::new("SetQuote", loc, args_loc) } }
 }
 
 ///|
@@ -1101,16 +974,17 @@ pub fn QuoteView::view(self : QuoteView) -> ContentView {
 
 ///|
 /// The `body` of the element.
-pub fn QuoteView::body(
-  self : QuoteView,
-) -> ContentView raise @library.HintedError {
+pub fn QuoteView::body(self : QuoteView) -> ContentView raise @library.HintedError {
   ContentView::new(self.content.field_by_name("body").cast())
 }
 
 ///|
 /// The `quote` elements; with arguments, those whose fields have the given
 /// values (`quote.where(..)`).
-pub fn Select::quote(block? : Bool, quotes? : Bool) -> Selector[QuoteView] {
+pub fn Select::quote(
+  block? : Bool,
+  quotes? : Bool,
+) -> Selector[QuoteView] {
   let fields : Array[(String, Value)] = []
   if block is Some(v) {
     fields.push(("block", Value::bool(v)))
@@ -1118,9 +992,7 @@ pub fn Select::quote(block? : Bool, quotes? : Bool) -> Selector[QuoteView] {
   if quotes is Some(v) {
     fields.push(("quotes", Value::bool(v)))
   }
-  elem_selector(@library.quote_elem(), fields, content => QuoteView::{
-    content,
-  })
+  elem_selector(@library.quote_elem(), fields, content => QuoteView::{ content, })
 }
 
 ///|
@@ -1149,42 +1021,30 @@ pub fn List::List(
 ) -> List {
   let args : Array[ArgNode] = []
   if tight is Some(v) {
-    args.push({ name: Some("tight"), value: Value::bool(v), param: 1, })
+    args.push({ name: Some("tight"), value: Value::bool(v), param: 1 })
   }
   if marker is Some(v) {
-    args.push({ name: Some("marker"), value: Value::content(v), param: 2, })
+    args.push({ name: Some("marker"), value: Value::content(v), param: 2 })
   }
   if indent is Some(v) {
-    args.push({ name: Some("indent"), value: ToValue::to_value(v), param: 3, })
+    args.push({ name: Some("indent"), value: ToValue::to_value(v), param: 3 })
   }
   if body_indent is Some(v) {
-    args.push({
-      name: Some("body-indent"),
-      value: ToValue::to_value(v),
-      param: 4,
-    })
+    args.push({ name: Some("body-indent"), value: ToValue::to_value(v), param: 4 })
   }
   if spacing is Some(v) {
-    args.push({ name: Some("spacing"), value: ToValue::to_value(v), param: 5, })
+    args.push({ name: Some("spacing"), value: ToValue::to_value(v), param: 5 })
   }
   if marker_align is Some(v) {
-    args.push({
-      name: Some("marker-align"),
-      value: ToValue::to_value(v),
-      param: 6,
-    })
+    args.push({ name: Some("marker-align"), value: ToValue::to_value(v), param: 6 })
   }
   for child in children {
-    args.push({ name: None, value: Value::content(child), param: 0, })
+    args.push({ name: None, value: Value::content(child), param: 0 })
   }
   push_extra(args, extra, 7)
   {
     content: labelled_call(
-      {
-        func: FElem(@library.list_elem()),
-        args,
-        origin: Site::new("List", loc, args_loc),
-      },
+      { func: FElem(@library.list_elem()), args, origin: Site::new("List", loc, args_loc) },
       label,
       8,
     ),
@@ -1220,39 +1080,25 @@ pub fn SetList::SetList(
 ) -> SetList {
   let args : Array[ArgNode] = []
   if tight is Some(v) {
-    args.push({ name: Some("tight"), value: Value::bool(v), param: 0, })
+    args.push({ name: Some("tight"), value: Value::bool(v), param: 0 })
   }
   if marker is Some(v) {
-    args.push({ name: Some("marker"), value: Value::content(v), param: 1, })
+    args.push({ name: Some("marker"), value: Value::content(v), param: 1 })
   }
   if indent is Some(v) {
-    args.push({ name: Some("indent"), value: ToValue::to_value(v), param: 2, })
+    args.push({ name: Some("indent"), value: ToValue::to_value(v), param: 2 })
   }
   if body_indent is Some(v) {
-    args.push({
-      name: Some("body-indent"),
-      value: ToValue::to_value(v),
-      param: 3,
-    })
+    args.push({ name: Some("body-indent"), value: ToValue::to_value(v), param: 3 })
   }
   if spacing is Some(v) {
-    args.push({ name: Some("spacing"), value: ToValue::to_value(v), param: 4, })
+    args.push({ name: Some("spacing"), value: ToValue::to_value(v), param: 4 })
   }
   if marker_align is Some(v) {
-    args.push({
-      name: Some("marker-align"),
-      value: ToValue::to_value(v),
-      param: 5,
-    })
+    args.push({ name: Some("marker-align"), value: ToValue::to_value(v), param: 5 })
   }
   push_extra(args, extra, 6)
-  {
-    node: {
-      func: FElem(@library.list_elem()),
-      args,
-      origin: Site::new("SetList", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.list_elem()), args, origin: Site::new("SetList", loc, args_loc) } }
 }
 
 ///|
@@ -1326,15 +1172,11 @@ pub fn ListItem::ListItem(
   args_loc~ : ArgsLoc,
 ) -> ListItem {
   let args : Array[ArgNode] = []
-  args.push({ name: None, value: Value::content(body), param: 0, })
+  args.push({ name: None, value: Value::content(body), param: 0 })
   push_extra(args, extra, 1)
   {
     content: labelled_call(
-      {
-        func: FElem(@library.list_item_elem()),
-        args,
-        origin: Site::new("ListItem", loc, args_loc),
-      },
+      { func: FElem(@library.list_item_elem()), args, origin: Site::new("ListItem", loc, args_loc) },
       label,
       2,
     ),
@@ -1366,20 +1208,17 @@ pub fn ListItemView::view(self : ListItemView) -> ContentView {
 
 ///|
 /// The `body` of the element.
-pub fn ListItemView::body(
-  self : ListItemView,
-) -> ContentView raise @library.HintedError {
+pub fn ListItemView::body(self : ListItemView) -> ContentView raise @library.HintedError {
   ContentView::new(self.content.field_by_name("body").cast())
 }
 
 ///|
 /// The `list.item` elements; with arguments, those whose fields have the
 /// given values (`list.item.where(..)`).
-pub fn Select::list_item() -> Selector[ListItemView] {
+pub fn Select::list_item(
+) -> Selector[ListItemView] {
   let fields : Array[(String, Value)] = []
-  elem_selector(@library.list_item_elem(), fields, content => ListItemView::{
-    content,
-  })
+  elem_selector(@library.list_item_elem(), fields, content => ListItemView::{ content, })
 }
 
 ///|
@@ -1412,55 +1251,39 @@ pub fn Enum::Enum(
 ) -> Enum {
   let args : Array[ArgNode] = []
   if tight is Some(v) {
-    args.push({ name: Some("tight"), value: Value::bool(v), param: 1, })
+    args.push({ name: Some("tight"), value: Value::bool(v), param: 1 })
   }
   if numbering is Some(v) {
-    args.push({
-      name: Some("numbering"),
-      value: ToValue::to_value(v),
-      param: 2,
-    })
+    args.push({ name: Some("numbering"), value: ToValue::to_value(v), param: 2 })
   }
   if start is Some(v) {
-    args.push({ name: Some("start"), value: Value::int(v), param: 3, })
+    args.push({ name: Some("start"), value: Value::int(v), param: 3 })
   }
   if full is Some(v) {
-    args.push({ name: Some("full"), value: Value::bool(v), param: 4, })
+    args.push({ name: Some("full"), value: Value::bool(v), param: 4 })
   }
   if reversed is Some(v) {
-    args.push({ name: Some("reversed"), value: Value::bool(v), param: 5, })
+    args.push({ name: Some("reversed"), value: Value::bool(v), param: 5 })
   }
   if indent is Some(v) {
-    args.push({ name: Some("indent"), value: ToValue::to_value(v), param: 6, })
+    args.push({ name: Some("indent"), value: ToValue::to_value(v), param: 6 })
   }
   if body_indent is Some(v) {
-    args.push({
-      name: Some("body-indent"),
-      value: ToValue::to_value(v),
-      param: 7,
-    })
+    args.push({ name: Some("body-indent"), value: ToValue::to_value(v), param: 7 })
   }
   if spacing is Some(v) {
-    args.push({ name: Some("spacing"), value: ToValue::to_value(v), param: 8, })
+    args.push({ name: Some("spacing"), value: ToValue::to_value(v), param: 8 })
   }
   if number_align is Some(v) {
-    args.push({
-      name: Some("number-align"),
-      value: ToValue::to_value(v),
-      param: 9,
-    })
+    args.push({ name: Some("number-align"), value: ToValue::to_value(v), param: 9 })
   }
   for child in children {
-    args.push({ name: None, value: Value::content(child), param: 0, })
+    args.push({ name: None, value: Value::content(child), param: 0 })
   }
   push_extra(args, extra, 10)
   {
     content: labelled_call(
-      {
-        func: FElem(@library.enum_elem()),
-        args,
-        origin: Site::new("Enum", loc, args_loc),
-      },
+      { func: FElem(@library.enum_elem()), args, origin: Site::new("Enum", loc, args_loc) },
       label,
       11,
     ),
@@ -1500,52 +1323,34 @@ pub fn SetEnum::SetEnum(
 ) -> SetEnum {
   let args : Array[ArgNode] = []
   if tight is Some(v) {
-    args.push({ name: Some("tight"), value: Value::bool(v), param: 0, })
+    args.push({ name: Some("tight"), value: Value::bool(v), param: 0 })
   }
   if numbering is Some(v) {
-    args.push({
-      name: Some("numbering"),
-      value: ToValue::to_value(v),
-      param: 1,
-    })
+    args.push({ name: Some("numbering"), value: ToValue::to_value(v), param: 1 })
   }
   if start is Some(v) {
-    args.push({ name: Some("start"), value: Value::int(v), param: 2, })
+    args.push({ name: Some("start"), value: Value::int(v), param: 2 })
   }
   if full is Some(v) {
-    args.push({ name: Some("full"), value: Value::bool(v), param: 3, })
+    args.push({ name: Some("full"), value: Value::bool(v), param: 3 })
   }
   if reversed is Some(v) {
-    args.push({ name: Some("reversed"), value: Value::bool(v), param: 4, })
+    args.push({ name: Some("reversed"), value: Value::bool(v), param: 4 })
   }
   if indent is Some(v) {
-    args.push({ name: Some("indent"), value: ToValue::to_value(v), param: 5, })
+    args.push({ name: Some("indent"), value: ToValue::to_value(v), param: 5 })
   }
   if body_indent is Some(v) {
-    args.push({
-      name: Some("body-indent"),
-      value: ToValue::to_value(v),
-      param: 6,
-    })
+    args.push({ name: Some("body-indent"), value: ToValue::to_value(v), param: 6 })
   }
   if spacing is Some(v) {
-    args.push({ name: Some("spacing"), value: ToValue::to_value(v), param: 7, })
+    args.push({ name: Some("spacing"), value: ToValue::to_value(v), param: 7 })
   }
   if number_align is Some(v) {
-    args.push({
-      name: Some("number-align"),
-      value: ToValue::to_value(v),
-      param: 8,
-    })
+    args.push({ name: Some("number-align"), value: ToValue::to_value(v), param: 8 })
   }
   push_extra(args, extra, 9)
-  {
-    node: {
-      func: FElem(@library.enum_elem()),
-      args,
-      origin: Site::new("SetEnum", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.enum_elem()), args, origin: Site::new("SetEnum", loc, args_loc) } }
 }
 
 ///|
@@ -1644,19 +1449,15 @@ pub fn EnumItem::EnumItem(
 ) -> EnumItem {
   let args : Array[ArgNode] = []
   if extra_arg(extra, "number") is Some(v) {
-    args.push({ name: None, value: v, param: 2, })
+    args.push({ name: None, value: v, param: 2 })
   } else if number is Some(v) {
-    args.push({ name: None, value: Value::int(v), param: 1, })
+    args.push({ name: None, value: Value::int(v), param: 1 })
   }
-  args.push({ name: None, value: Value::content(body), param: 0, })
+  args.push({ name: None, value: Value::content(body), param: 0 })
   push_extra(args, extra, 2, positional=["number"])
   {
     content: labelled_call(
-      {
-        func: FElem(@library.enum_item_elem()),
-        args,
-        origin: Site::new("EnumItem", loc, args_loc),
-      },
+      { func: FElem(@library.enum_item_elem()), args, origin: Site::new("EnumItem", loc, args_loc) },
       label,
       3,
     ),
@@ -1687,18 +1488,12 @@ pub fn SetEnumItem::SetEnumItem(
 ) -> SetEnumItem {
   let args : Array[ArgNode] = []
   if extra_arg(extra, "number") is Some(v) {
-    args.push({ name: None, value: v, param: 1, })
+    args.push({ name: None, value: v, param: 1 })
   } else if number is Some(v) {
-    args.push({ name: None, value: Value::int(v), param: 0, })
+    args.push({ name: None, value: Value::int(v), param: 0 })
   }
   push_extra(args, extra, 1, positional=["number"])
-  {
-    node: {
-      func: FElem(@library.enum_item_elem()),
-      args,
-      origin: Site::new("SetEnumItem", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.enum_item_elem()), args, origin: Site::new("SetEnumItem", loc, args_loc) } }
 }
 
 ///|
@@ -1729,20 +1524,17 @@ pub fn EnumItemView::view(self : EnumItemView) -> ContentView {
 
 ///|
 /// The `body` of the element.
-pub fn EnumItemView::body(
-  self : EnumItemView,
-) -> ContentView raise @library.HintedError {
+pub fn EnumItemView::body(self : EnumItemView) -> ContentView raise @library.HintedError {
   ContentView::new(self.content.field_by_name("body").cast())
 }
 
 ///|
 /// The `enum.item` elements; with arguments, those whose fields have the
 /// given values (`enum.item.where(..)`).
-pub fn Select::enum_item() -> Selector[EnumItemView] {
+pub fn Select::enum_item(
+) -> Selector[EnumItemView] {
   let fields : Array[(String, Value)] = []
-  elem_selector(@library.enum_item_elem(), fields, content => EnumItemView::{
-    content,
-  })
+  elem_selector(@library.enum_item_elem(), fields, content => EnumItemView::{ content, })
 }
 
 ///|
@@ -1770,35 +1562,27 @@ pub fn Terms::Terms(
 ) -> Terms {
   let args : Array[ArgNode] = []
   if tight is Some(v) {
-    args.push({ name: Some("tight"), value: Value::bool(v), param: 1, })
+    args.push({ name: Some("tight"), value: Value::bool(v), param: 1 })
   }
   if separator is Some(v) {
-    args.push({ name: Some("separator"), value: Value::content(v), param: 2, })
+    args.push({ name: Some("separator"), value: Value::content(v), param: 2 })
   }
   if indent is Some(v) {
-    args.push({ name: Some("indent"), value: ToValue::to_value(v), param: 3, })
+    args.push({ name: Some("indent"), value: ToValue::to_value(v), param: 3 })
   }
   if hanging_indent is Some(v) {
-    args.push({
-      name: Some("hanging-indent"),
-      value: ToValue::to_value(v),
-      param: 4,
-    })
+    args.push({ name: Some("hanging-indent"), value: ToValue::to_value(v), param: 4 })
   }
   if spacing is Some(v) {
-    args.push({ name: Some("spacing"), value: ToValue::to_value(v), param: 5, })
+    args.push({ name: Some("spacing"), value: ToValue::to_value(v), param: 5 })
   }
   for child in children {
-    args.push({ name: None, value: Value::content(child), param: 0, })
+    args.push({ name: None, value: Value::content(child), param: 0 })
   }
   push_extra(args, extra, 6)
   {
     content: labelled_call(
-      {
-        func: FElem(@library.terms_elem()),
-        args,
-        origin: Site::new("Terms", loc, args_loc),
-      },
+      { func: FElem(@library.terms_elem()), args, origin: Site::new("Terms", loc, args_loc) },
       label,
       7,
     ),
@@ -1833,32 +1617,22 @@ pub fn SetTerms::SetTerms(
 ) -> SetTerms {
   let args : Array[ArgNode] = []
   if tight is Some(v) {
-    args.push({ name: Some("tight"), value: Value::bool(v), param: 0, })
+    args.push({ name: Some("tight"), value: Value::bool(v), param: 0 })
   }
   if separator is Some(v) {
-    args.push({ name: Some("separator"), value: Value::content(v), param: 1, })
+    args.push({ name: Some("separator"), value: Value::content(v), param: 1 })
   }
   if indent is Some(v) {
-    args.push({ name: Some("indent"), value: ToValue::to_value(v), param: 2, })
+    args.push({ name: Some("indent"), value: ToValue::to_value(v), param: 2 })
   }
   if hanging_indent is Some(v) {
-    args.push({
-      name: Some("hanging-indent"),
-      value: ToValue::to_value(v),
-      param: 3,
-    })
+    args.push({ name: Some("hanging-indent"), value: ToValue::to_value(v), param: 3 })
   }
   if spacing is Some(v) {
-    args.push({ name: Some("spacing"), value: ToValue::to_value(v), param: 4, })
+    args.push({ name: Some("spacing"), value: ToValue::to_value(v), param: 4 })
   }
   push_extra(args, extra, 5)
-  {
-    node: {
-      func: FElem(@library.terms_elem()),
-      args,
-      origin: Site::new("SetTerms", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.terms_elem()), args, origin: Site::new("SetTerms", loc, args_loc) } }
 }
 
 ///|
@@ -1909,9 +1683,7 @@ pub fn Select::terms(
   if spacing is Some(v) {
     fields.push(("spacing", ToValue::to_value(v)))
   }
-  elem_selector(@library.terms_elem(), fields, content => TermsView::{
-    content,
-  })
+  elem_selector(@library.terms_elem(), fields, content => TermsView::{ content, })
 }
 
 ///|
@@ -1931,16 +1703,12 @@ pub fn TermsItem::TermsItem(
   args_loc~ : ArgsLoc,
 ) -> TermsItem {
   let args : Array[ArgNode] = []
-  args.push({ name: None, value: Value::content(term), param: 0, })
-  args.push({ name: None, value: Value::content(description), param: 1, })
+  args.push({ name: None, value: Value::content(term), param: 0 })
+  args.push({ name: None, value: Value::content(description), param: 1 })
   push_extra(args, extra, 2)
   {
     content: labelled_call(
-      {
-        func: FElem(@library.term_item_elem()),
-        args,
-        origin: Site::new("TermsItem", loc, args_loc),
-      },
+      { func: FElem(@library.term_item_elem()), args, origin: Site::new("TermsItem", loc, args_loc) },
       label,
       3,
     ),
@@ -1972,28 +1740,23 @@ pub fn TermsItemView::view(self : TermsItemView) -> ContentView {
 
 ///|
 /// The `term` of the element.
-pub fn TermsItemView::term(
-  self : TermsItemView,
-) -> ContentView raise @library.HintedError {
+pub fn TermsItemView::term(self : TermsItemView) -> ContentView raise @library.HintedError {
   ContentView::new(self.content.field_by_name("term").cast())
 }
 
 ///|
 /// The `description` of the element.
-pub fn TermsItemView::description(
-  self : TermsItemView,
-) -> ContentView raise @library.HintedError {
+pub fn TermsItemView::description(self : TermsItemView) -> ContentView raise @library.HintedError {
   ContentView::new(self.content.field_by_name("description").cast())
 }
 
 ///|
 /// The `terms.item` elements; with arguments, those whose fields have the
 /// given values (`terms.item.where(..)`).
-pub fn Select::terms_item() -> Selector[TermsItemView] {
+pub fn Select::terms_item(
+) -> Selector[TermsItemView] {
   let fields : Array[(String, Value)] = []
-  elem_selector(@library.term_item_elem(), fields, content => TermsItemView::{
-    content,
-  })
+  elem_selector(@library.term_item_elem(), fields, content => TermsItemView::{ content, })
 }
 
 ///|
@@ -2027,51 +1790,35 @@ pub fn Figure::Figure(
   args_loc~ : ArgsLoc,
 ) -> Figure {
   let args : Array[ArgNode] = []
-  args.push({ name: None, value: Value::content(body), param: 0, })
+  args.push({ name: None, value: Value::content(body), param: 0 })
   if alt is Some(v) {
-    args.push({ name: Some("alt"), value: Value::str(v), param: 1, })
+    args.push({ name: Some("alt"), value: Value::str(v), param: 1 })
   }
   if placement is Some(v) {
-    args.push({
-      name: Some("placement"),
-      value: ToValue::to_value(v),
-      param: 2,
-    })
+    args.push({ name: Some("placement"), value: ToValue::to_value(v), param: 2 })
   }
   if scope is Some(v) {
-    args.push({ name: Some("scope"), value: Value::str(v), param: 3, })
+    args.push({ name: Some("scope"), value: Value::str(v), param: 3 })
   }
   if caption is Some(v) {
-    args.push({ name: Some("caption"), value: Value::content(v), param: 4, })
+    args.push({ name: Some("caption"), value: Value::content(v), param: 4 })
   }
   if supplement is Some(v) {
-    args.push({
-      name: Some("supplement"),
-      value: ToValue::to_value(v),
-      param: 5,
-    })
+    args.push({ name: Some("supplement"), value: ToValue::to_value(v), param: 5 })
   }
   if numbering is Some(v) {
-    args.push({
-      name: Some("numbering"),
-      value: ToValue::to_value(v),
-      param: 6,
-    })
+    args.push({ name: Some("numbering"), value: ToValue::to_value(v), param: 6 })
   }
   if gap is Some(v) {
-    args.push({ name: Some("gap"), value: ToValue::to_value(v), param: 7, })
+    args.push({ name: Some("gap"), value: ToValue::to_value(v), param: 7 })
   }
   if outlined is Some(v) {
-    args.push({ name: Some("outlined"), value: Value::bool(v), param: 8, })
+    args.push({ name: Some("outlined"), value: Value::bool(v), param: 8 })
   }
   push_extra(args, extra, 9)
   {
     content: labelled_call(
-      {
-        func: FElem(@library.figure_elem()),
-        args,
-        origin: Site::new("Figure", loc, args_loc),
-      },
+      { func: FElem(@library.figure_elem()), args, origin: Site::new("Figure", loc, args_loc) },
       label,
       10,
     ),
@@ -2113,49 +1860,31 @@ pub fn SetFigure::SetFigure(
 ) -> SetFigure {
   let args : Array[ArgNode] = []
   if alt is Some(v) {
-    args.push({ name: Some("alt"), value: Value::str(v), param: 0, })
+    args.push({ name: Some("alt"), value: Value::str(v), param: 0 })
   }
   if placement is Some(v) {
-    args.push({
-      name: Some("placement"),
-      value: ToValue::to_value(v),
-      param: 1,
-    })
+    args.push({ name: Some("placement"), value: ToValue::to_value(v), param: 1 })
   }
   if scope is Some(v) {
-    args.push({ name: Some("scope"), value: Value::str(v), param: 2, })
+    args.push({ name: Some("scope"), value: Value::str(v), param: 2 })
   }
   if caption is Some(v) {
-    args.push({ name: Some("caption"), value: Value::content(v), param: 3, })
+    args.push({ name: Some("caption"), value: Value::content(v), param: 3 })
   }
   if supplement is Some(v) {
-    args.push({
-      name: Some("supplement"),
-      value: ToValue::to_value(v),
-      param: 4,
-    })
+    args.push({ name: Some("supplement"), value: ToValue::to_value(v), param: 4 })
   }
   if numbering is Some(v) {
-    args.push({
-      name: Some("numbering"),
-      value: ToValue::to_value(v),
-      param: 5,
-    })
+    args.push({ name: Some("numbering"), value: ToValue::to_value(v), param: 5 })
   }
   if gap is Some(v) {
-    args.push({ name: Some("gap"), value: ToValue::to_value(v), param: 6, })
+    args.push({ name: Some("gap"), value: ToValue::to_value(v), param: 6 })
   }
   if outlined is Some(v) {
-    args.push({ name: Some("outlined"), value: Value::bool(v), param: 7, })
+    args.push({ name: Some("outlined"), value: Value::bool(v), param: 7 })
   }
   push_extra(args, extra, 8)
-  {
-    node: {
-      func: FElem(@library.figure_elem()),
-      args,
-      origin: Site::new("SetFigure", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.figure_elem()), args, origin: Site::new("SetFigure", loc, args_loc) } }
 }
 
 ///|
@@ -2186,9 +1915,7 @@ pub fn FigureView::view(self : FigureView) -> ContentView {
 
 ///|
 /// The `body` of the element.
-pub fn FigureView::body(
-  self : FigureView,
-) -> ContentView raise @library.HintedError {
+pub fn FigureView::body(self : FigureView) -> ContentView raise @library.HintedError {
   ContentView::new(self.content.field_by_name("body").cast())
 }
 
@@ -2226,9 +1953,7 @@ pub fn Select::figure(
   if outlined is Some(v) {
     fields.push(("outlined", Value::bool(v)))
   }
-  elem_selector(@library.figure_elem(), fields, content => FigureView::{
-    content,
-  })
+  elem_selector(@library.figure_elem(), fields, content => FigureView::{ content, })
 }
 
 ///|
@@ -2261,51 +1986,39 @@ pub fn Table::Table(
 ) -> Table {
   let args : Array[ArgNode] = []
   if columns is Some(v) {
-    args.push({ name: Some("columns"), value: ToValue::to_value(v), param: 1, })
+    args.push({ name: Some("columns"), value: ToValue::to_value(v), param: 1 })
   }
   if rows is Some(v) {
-    args.push({ name: Some("rows"), value: ToValue::to_value(v), param: 2, })
+    args.push({ name: Some("rows"), value: ToValue::to_value(v), param: 2 })
   }
   if gutter is Some(v) {
-    args.push({ name: Some("gutter"), value: ToValue::to_value(v), param: 3, })
+    args.push({ name: Some("gutter"), value: ToValue::to_value(v), param: 3 })
   }
   if column_gutter is Some(v) {
-    args.push({
-      name: Some("column-gutter"),
-      value: ToValue::to_value(v),
-      param: 4,
-    })
+    args.push({ name: Some("column-gutter"), value: ToValue::to_value(v), param: 4 })
   }
   if row_gutter is Some(v) {
-    args.push({
-      name: Some("row-gutter"),
-      value: ToValue::to_value(v),
-      param: 5,
-    })
+    args.push({ name: Some("row-gutter"), value: ToValue::to_value(v), param: 5 })
   }
   if inset is Some(v) {
-    args.push({ name: Some("inset"), value: ToValue::to_value(v), param: 6, })
+    args.push({ name: Some("inset"), value: ToValue::to_value(v), param: 6 })
   }
   if align is Some(v) {
-    args.push({ name: Some("align"), value: ToValue::to_value(v), param: 7, })
+    args.push({ name: Some("align"), value: ToValue::to_value(v), param: 7 })
   }
   if fill is Some(v) {
-    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 8, })
+    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 8 })
   }
   if stroke is Some(v) {
-    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 9, })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 9 })
   }
   for child in children {
-    args.push({ name: None, value: Value::content(child), param: 0, })
+    args.push({ name: None, value: Value::content(child), param: 0 })
   }
   push_extra(args, extra, 10)
   {
     content: labelled_call(
-      {
-        func: FElem(@library.table_elem()),
-        args,
-        origin: Site::new("Table", loc, args_loc),
-      },
+      { func: FElem(@library.table_elem()), args, origin: Site::new("Table", loc, args_loc) },
       label,
       11,
     ),
@@ -2341,48 +2054,34 @@ pub fn SetTable::SetTable(
 ) -> SetTable {
   let args : Array[ArgNode] = []
   if columns is Some(v) {
-    args.push({ name: Some("columns"), value: ToValue::to_value(v), param: 0, })
+    args.push({ name: Some("columns"), value: ToValue::to_value(v), param: 0 })
   }
   if rows is Some(v) {
-    args.push({ name: Some("rows"), value: ToValue::to_value(v), param: 1, })
+    args.push({ name: Some("rows"), value: ToValue::to_value(v), param: 1 })
   }
   if gutter is Some(v) {
-    args.push({ name: Some("gutter"), value: ToValue::to_value(v), param: 2, })
+    args.push({ name: Some("gutter"), value: ToValue::to_value(v), param: 2 })
   }
   if column_gutter is Some(v) {
-    args.push({
-      name: Some("column-gutter"),
-      value: ToValue::to_value(v),
-      param: 3,
-    })
+    args.push({ name: Some("column-gutter"), value: ToValue::to_value(v), param: 3 })
   }
   if row_gutter is Some(v) {
-    args.push({
-      name: Some("row-gutter"),
-      value: ToValue::to_value(v),
-      param: 4,
-    })
+    args.push({ name: Some("row-gutter"), value: ToValue::to_value(v), param: 4 })
   }
   if inset is Some(v) {
-    args.push({ name: Some("inset"), value: ToValue::to_value(v), param: 5, })
+    args.push({ name: Some("inset"), value: ToValue::to_value(v), param: 5 })
   }
   if align is Some(v) {
-    args.push({ name: Some("align"), value: ToValue::to_value(v), param: 6, })
+    args.push({ name: Some("align"), value: ToValue::to_value(v), param: 6 })
   }
   if fill is Some(v) {
-    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 7, })
+    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 7 })
   }
   if stroke is Some(v) {
-    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 8, })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 8 })
   }
   push_extra(args, extra, 9)
-  {
-    node: {
-      func: FElem(@library.table_elem()),
-      args,
-      origin: Site::new("SetTable", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.table_elem()), args, origin: Site::new("SetTable", loc, args_loc) } }
 }
 
 ///|
@@ -2437,9 +2136,7 @@ pub fn Select::table(
   if row_gutter is Some(v) {
     fields.push(("row-gutter", ToValue::to_value(v)))
   }
-  elem_selector(@library.table_elem(), fields, content => TableView::{
-    content,
-  })
+  elem_selector(@library.table_elem(), fields, content => TableView::{ content, })
 }
 
 ///|
@@ -2478,42 +2175,38 @@ pub fn TableCell::TableCell(
   args_loc~ : ArgsLoc,
 ) -> TableCell {
   let args : Array[ArgNode] = []
-  args.push({ name: None, value: Value::content(body), param: 0, })
+  args.push({ name: None, value: Value::content(body), param: 0 })
   if x is Some(v) {
-    args.push({ name: Some("x"), value: Value::int(v), param: 1, })
+    args.push({ name: Some("x"), value: Value::int(v), param: 1 })
   }
   if y is Some(v) {
-    args.push({ name: Some("y"), value: Value::int(v), param: 2, })
+    args.push({ name: Some("y"), value: Value::int(v), param: 2 })
   }
   if colspan is Some(v) {
-    args.push({ name: Some("colspan"), value: Value::int(v), param: 3, })
+    args.push({ name: Some("colspan"), value: Value::int(v), param: 3 })
   }
   if rowspan is Some(v) {
-    args.push({ name: Some("rowspan"), value: Value::int(v), param: 4, })
+    args.push({ name: Some("rowspan"), value: Value::int(v), param: 4 })
   }
   if inset is Some(v) {
-    args.push({ name: Some("inset"), value: ToValue::to_value(v), param: 5, })
+    args.push({ name: Some("inset"), value: ToValue::to_value(v), param: 5 })
   }
   if align is Some(v) {
-    args.push({ name: Some("align"), value: ToValue::to_value(v), param: 6, })
+    args.push({ name: Some("align"), value: ToValue::to_value(v), param: 6 })
   }
   if fill is Some(v) {
-    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 7, })
+    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 7 })
   }
   if stroke is Some(v) {
-    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 8, })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 8 })
   }
   if breakable is Some(v) {
-    args.push({ name: Some("breakable"), value: Value::bool(v), param: 9, })
+    args.push({ name: Some("breakable"), value: Value::bool(v), param: 9 })
   }
   push_extra(args, extra, 10)
   {
     content: labelled_call(
-      {
-        func: FElem(@library.table_cell_elem()),
-        args,
-        origin: Site::new("TableCell", loc, args_loc),
-      },
+      { func: FElem(@library.table_cell_elem()), args, origin: Site::new("TableCell", loc, args_loc) },
       label,
       11,
     ),
@@ -2557,40 +2250,34 @@ pub fn SetTableCell::SetTableCell(
 ) -> SetTableCell {
   let args : Array[ArgNode] = []
   if x is Some(v) {
-    args.push({ name: Some("x"), value: Value::int(v), param: 0, })
+    args.push({ name: Some("x"), value: Value::int(v), param: 0 })
   }
   if y is Some(v) {
-    args.push({ name: Some("y"), value: Value::int(v), param: 1, })
+    args.push({ name: Some("y"), value: Value::int(v), param: 1 })
   }
   if colspan is Some(v) {
-    args.push({ name: Some("colspan"), value: Value::int(v), param: 2, })
+    args.push({ name: Some("colspan"), value: Value::int(v), param: 2 })
   }
   if rowspan is Some(v) {
-    args.push({ name: Some("rowspan"), value: Value::int(v), param: 3, })
+    args.push({ name: Some("rowspan"), value: Value::int(v), param: 3 })
   }
   if inset is Some(v) {
-    args.push({ name: Some("inset"), value: ToValue::to_value(v), param: 4, })
+    args.push({ name: Some("inset"), value: ToValue::to_value(v), param: 4 })
   }
   if align is Some(v) {
-    args.push({ name: Some("align"), value: ToValue::to_value(v), param: 5, })
+    args.push({ name: Some("align"), value: ToValue::to_value(v), param: 5 })
   }
   if fill is Some(v) {
-    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 6, })
+    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 6 })
   }
   if stroke is Some(v) {
-    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 7, })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 7 })
   }
   if breakable is Some(v) {
-    args.push({ name: Some("breakable"), value: Value::bool(v), param: 8, })
+    args.push({ name: Some("breakable"), value: Value::bool(v), param: 8 })
   }
   push_extra(args, extra, 9)
-  {
-    node: {
-      func: FElem(@library.table_cell_elem()),
-      args,
-      origin: Site::new("SetTableCell", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.table_cell_elem()), args, origin: Site::new("SetTableCell", loc, args_loc) } }
 }
 
 ///|
@@ -2621,9 +2308,7 @@ pub fn TableCellView::view(self : TableCellView) -> ContentView {
 
 ///|
 /// The `body` of the element.
-pub fn TableCellView::body(
-  self : TableCellView,
-) -> ContentView raise @library.HintedError {
+pub fn TableCellView::body(self : TableCellView) -> ContentView raise @library.HintedError {
   ContentView::new(self.content.field_by_name("body").cast())
 }
 
@@ -2669,9 +2354,7 @@ pub fn Select::table_cell(
   if breakable is Some(v) {
     fields.push(("breakable", Value::bool(v)))
   }
-  elem_selector(@library.table_cell_elem(), fields, content => TableCellView::{
-    content,
-  })
+  elem_selector(@library.table_cell_elem(), fields, content => TableCellView::{ content, })
 }
 
 ///|
@@ -2693,22 +2376,18 @@ pub fn TableHeader::TableHeader(
 ) -> TableHeader {
   let args : Array[ArgNode] = []
   if repeat is Some(v) {
-    args.push({ name: Some("repeat"), value: Value::bool(v), param: 1, })
+    args.push({ name: Some("repeat"), value: Value::bool(v), param: 1 })
   }
   if level is Some(v) {
-    args.push({ name: Some("level"), value: Value::int(v), param: 2, })
+    args.push({ name: Some("level"), value: Value::int(v), param: 2 })
   }
   for child in children {
-    args.push({ name: None, value: Value::content(child), param: 0, })
+    args.push({ name: None, value: Value::content(child), param: 0 })
   }
   push_extra(args, extra, 3)
   {
     content: labelled_call(
-      {
-        func: FElem(@library.table_header_elem()),
-        args,
-        origin: Site::new("TableHeader", loc, args_loc),
-      },
+      { func: FElem(@library.table_header_elem()), args, origin: Site::new("TableHeader", loc, args_loc) },
       label,
       4,
     ),
@@ -2737,19 +2416,13 @@ pub fn SetTableHeader::SetTableHeader(
 ) -> SetTableHeader {
   let args : Array[ArgNode] = []
   if repeat is Some(v) {
-    args.push({ name: Some("repeat"), value: Value::bool(v), param: 0, })
+    args.push({ name: Some("repeat"), value: Value::bool(v), param: 0 })
   }
   if level is Some(v) {
-    args.push({ name: Some("level"), value: Value::int(v), param: 1, })
+    args.push({ name: Some("level"), value: Value::int(v), param: 1 })
   }
   push_extra(args, extra, 2)
-  {
-    node: {
-      func: FElem(@library.table_header_elem()),
-      args,
-      origin: Site::new("SetTableHeader", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.table_header_elem()), args, origin: Site::new("SetTableHeader", loc, args_loc) } }
 }
 
 ///|
@@ -2792,9 +2465,7 @@ pub fn Select::table_header(
   if level is Some(v) {
     fields.push(("level", Value::int(v)))
   }
-  elem_selector(@library.table_header_elem(), fields, content => TableHeaderView::{
-    content,
-  })
+  elem_selector(@library.table_header_elem(), fields, content => TableHeaderView::{ content, })
 }
 
 ///|
@@ -2815,19 +2486,15 @@ pub fn TableFooter::TableFooter(
 ) -> TableFooter {
   let args : Array[ArgNode] = []
   if repeat is Some(v) {
-    args.push({ name: Some("repeat"), value: Value::bool(v), param: 1, })
+    args.push({ name: Some("repeat"), value: Value::bool(v), param: 1 })
   }
   for child in children {
-    args.push({ name: None, value: Value::content(child), param: 0, })
+    args.push({ name: None, value: Value::content(child), param: 0 })
   }
   push_extra(args, extra, 2)
   {
     content: labelled_call(
-      {
-        func: FElem(@library.table_footer_elem()),
-        args,
-        origin: Site::new("TableFooter", loc, args_loc),
-      },
+      { func: FElem(@library.table_footer_elem()), args, origin: Site::new("TableFooter", loc, args_loc) },
       label,
       3,
     ),
@@ -2855,16 +2522,10 @@ pub fn SetTableFooter::SetTableFooter(
 ) -> SetTableFooter {
   let args : Array[ArgNode] = []
   if repeat is Some(v) {
-    args.push({ name: Some("repeat"), value: Value::bool(v), param: 0, })
+    args.push({ name: Some("repeat"), value: Value::bool(v), param: 0 })
   }
   push_extra(args, extra, 1)
-  {
-    node: {
-      func: FElem(@library.table_footer_elem()),
-      args,
-      origin: Site::new("SetTableFooter", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.table_footer_elem()), args, origin: Site::new("SetTableFooter", loc, args_loc) } }
 }
 
 ///|
@@ -2896,14 +2557,14 @@ pub fn TableFooterView::view(self : TableFooterView) -> ContentView {
 ///|
 /// The `table.footer` elements; with arguments, those whose fields have the
 /// given values (`table.footer.where(..)`).
-pub fn Select::table_footer(repeat? : Bool) -> Selector[TableFooterView] {
+pub fn Select::table_footer(
+  repeat? : Bool,
+) -> Selector[TableFooterView] {
   let fields : Array[(String, Value)] = []
   if repeat is Some(v) {
     fields.push(("repeat", Value::bool(v)))
   }
-  elem_selector(@library.table_footer_elem(), fields, content => TableFooterView::{
-    content,
-  })
+  elem_selector(@library.table_footer_elem(), fields, content => TableFooterView::{ content, })
 }
 
 ///|
@@ -2932,28 +2593,24 @@ pub fn TableHline::TableHline(
 ) -> TableHline {
   let args : Array[ArgNode] = []
   if y is Some(v) {
-    args.push({ name: Some("y"), value: Value::int(v), param: 0, })
+    args.push({ name: Some("y"), value: Value::int(v), param: 0 })
   }
   if start is Some(v) {
-    args.push({ name: Some("start"), value: Value::int(v), param: 1, })
+    args.push({ name: Some("start"), value: Value::int(v), param: 1 })
   }
   if end_ is Some(v) {
-    args.push({ name: Some("end"), value: Value::int(v), param: 2, })
+    args.push({ name: Some("end"), value: Value::int(v), param: 2 })
   }
   if stroke is Some(v) {
-    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 3, })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 3 })
   }
   if position is Some(v) {
-    args.push({ name: Some("position"), value: ToValue::to_value(v), param: 4, })
+    args.push({ name: Some("position"), value: ToValue::to_value(v), param: 4 })
   }
   push_extra(args, extra, 5)
   {
     content: labelled_call(
-      {
-        func: FElem(@library.table_h_line_elem()),
-        args,
-        origin: Site::new("TableHline", loc, args_loc),
-      },
+      { func: FElem(@library.table_h_line_elem()), args, origin: Site::new("TableHline", loc, args_loc) },
       label,
       6,
     ),
@@ -2990,28 +2647,22 @@ pub fn SetTableHline::SetTableHline(
 ) -> SetTableHline {
   let args : Array[ArgNode] = []
   if y is Some(v) {
-    args.push({ name: Some("y"), value: Value::int(v), param: 0, })
+    args.push({ name: Some("y"), value: Value::int(v), param: 0 })
   }
   if start is Some(v) {
-    args.push({ name: Some("start"), value: Value::int(v), param: 1, })
+    args.push({ name: Some("start"), value: Value::int(v), param: 1 })
   }
   if end_ is Some(v) {
-    args.push({ name: Some("end"), value: Value::int(v), param: 2, })
+    args.push({ name: Some("end"), value: Value::int(v), param: 2 })
   }
   if stroke is Some(v) {
-    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 3, })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 3 })
   }
   if position is Some(v) {
-    args.push({ name: Some("position"), value: ToValue::to_value(v), param: 4, })
+    args.push({ name: Some("position"), value: ToValue::to_value(v), param: 4 })
   }
   push_extra(args, extra, 5)
-  {
-    node: {
-      func: FElem(@library.table_h_line_elem()),
-      args,
-      origin: Site::new("SetTableHline", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.table_h_line_elem()), args, origin: Site::new("SetTableHline", loc, args_loc) } }
 }
 
 ///|
@@ -3066,9 +2717,7 @@ pub fn Select::table_hline(
   if position is Some(v) {
     fields.push(("position", ToValue::to_value(v)))
   }
-  elem_selector(@library.table_h_line_elem(), fields, content => TableHlineView::{
-    content,
-  })
+  elem_selector(@library.table_h_line_elem(), fields, content => TableHlineView::{ content, })
 }
 
 ///|
@@ -3098,28 +2747,24 @@ pub fn TableVline::TableVline(
 ) -> TableVline {
   let args : Array[ArgNode] = []
   if x is Some(v) {
-    args.push({ name: Some("x"), value: Value::int(v), param: 0, })
+    args.push({ name: Some("x"), value: Value::int(v), param: 0 })
   }
   if start is Some(v) {
-    args.push({ name: Some("start"), value: Value::int(v), param: 1, })
+    args.push({ name: Some("start"), value: Value::int(v), param: 1 })
   }
   if end_ is Some(v) {
-    args.push({ name: Some("end"), value: Value::int(v), param: 2, })
+    args.push({ name: Some("end"), value: Value::int(v), param: 2 })
   }
   if stroke is Some(v) {
-    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 3, })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 3 })
   }
   if position is Some(v) {
-    args.push({ name: Some("position"), value: ToValue::to_value(v), param: 4, })
+    args.push({ name: Some("position"), value: ToValue::to_value(v), param: 4 })
   }
   push_extra(args, extra, 5)
   {
     content: labelled_call(
-      {
-        func: FElem(@library.table_v_line_elem()),
-        args,
-        origin: Site::new("TableVline", loc, args_loc),
-      },
+      { func: FElem(@library.table_v_line_elem()), args, origin: Site::new("TableVline", loc, args_loc) },
       label,
       6,
     ),
@@ -3156,28 +2801,22 @@ pub fn SetTableVline::SetTableVline(
 ) -> SetTableVline {
   let args : Array[ArgNode] = []
   if x is Some(v) {
-    args.push({ name: Some("x"), value: Value::int(v), param: 0, })
+    args.push({ name: Some("x"), value: Value::int(v), param: 0 })
   }
   if start is Some(v) {
-    args.push({ name: Some("start"), value: Value::int(v), param: 1, })
+    args.push({ name: Some("start"), value: Value::int(v), param: 1 })
   }
   if end_ is Some(v) {
-    args.push({ name: Some("end"), value: Value::int(v), param: 2, })
+    args.push({ name: Some("end"), value: Value::int(v), param: 2 })
   }
   if stroke is Some(v) {
-    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 3, })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 3 })
   }
   if position is Some(v) {
-    args.push({ name: Some("position"), value: ToValue::to_value(v), param: 4, })
+    args.push({ name: Some("position"), value: ToValue::to_value(v), param: 4 })
   }
   push_extra(args, extra, 5)
-  {
-    node: {
-      func: FElem(@library.table_v_line_elem()),
-      args,
-      origin: Site::new("SetTableVline", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.table_v_line_elem()), args, origin: Site::new("SetTableVline", loc, args_loc) } }
 }
 
 ///|
@@ -3232,9 +2871,7 @@ pub fn Select::table_vline(
   if position is Some(v) {
     fields.push(("position", ToValue::to_value(v)))
   }
-  elem_selector(@library.table_v_line_elem(), fields, content => TableVlineView::{
-    content,
-  })
+  elem_selector(@library.table_v_line_elem(), fields, content => TableVlineView::{ content, })
 }
 
 ///|
@@ -3261,22 +2898,18 @@ pub fn Outline::Outline(
 ) -> Outline {
   let args : Array[ArgNode] = []
   if title is Some(v) {
-    args.push({ name: Some("title"), value: Value::content(v), param: 0, })
+    args.push({ name: Some("title"), value: Value::content(v), param: 0 })
   }
   if depth is Some(v) {
-    args.push({ name: Some("depth"), value: Value::int(v), param: 1, })
+    args.push({ name: Some("depth"), value: Value::int(v), param: 1 })
   }
   if indent is Some(v) {
-    args.push({ name: Some("indent"), value: ToValue::to_value(v), param: 2, })
+    args.push({ name: Some("indent"), value: ToValue::to_value(v), param: 2 })
   }
   push_extra(args, extra, 3)
   {
     content: labelled_call(
-      {
-        func: FElem(@library.outline_elem()),
-        args,
-        origin: Site::new("Outline", loc, args_loc),
-      },
+      { func: FElem(@library.outline_elem()), args, origin: Site::new("Outline", loc, args_loc) },
       label,
       4,
     ),
@@ -3311,22 +2944,16 @@ pub fn SetOutline::SetOutline(
 ) -> SetOutline {
   let args : Array[ArgNode] = []
   if title is Some(v) {
-    args.push({ name: Some("title"), value: Value::content(v), param: 0, })
+    args.push({ name: Some("title"), value: Value::content(v), param: 0 })
   }
   if depth is Some(v) {
-    args.push({ name: Some("depth"), value: Value::int(v), param: 1, })
+    args.push({ name: Some("depth"), value: Value::int(v), param: 1 })
   }
   if indent is Some(v) {
-    args.push({ name: Some("indent"), value: ToValue::to_value(v), param: 2, })
+    args.push({ name: Some("indent"), value: ToValue::to_value(v), param: 2 })
   }
   push_extra(args, extra, 3)
-  {
-    node: {
-      func: FElem(@library.outline_elem()),
-      args,
-      origin: Site::new("SetOutline", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.outline_elem()), args, origin: Site::new("SetOutline", loc, args_loc) } }
 }
 
 ///|
@@ -3369,9 +2996,7 @@ pub fn Select::outline(
   if indent is Some(v) {
     fields.push(("indent", ToValue::to_value(v)))
   }
-  elem_selector(@library.outline_elem(), fields, content => OutlineView::{
-    content,
-  })
+  elem_selector(@library.outline_elem(), fields, content => OutlineView::{ content, })
 }
 
 ///|
@@ -3397,25 +3022,19 @@ pub fn SetDocument::SetDocument(
 ) -> SetDocument {
   let args : Array[ArgNode] = []
   if title is Some(v) {
-    args.push({ name: Some("title"), value: Value::content(v), param: 0, })
+    args.push({ name: Some("title"), value: Value::content(v), param: 0 })
   }
   if author is Some(v) {
-    args.push({ name: Some("author"), value: ToValue::to_value(v), param: 1, })
+    args.push({ name: Some("author"), value: ToValue::to_value(v), param: 1 })
   }
   if description is Some(v) {
-    args.push({ name: Some("description"), value: Value::content(v), param: 2, })
+    args.push({ name: Some("description"), value: Value::content(v), param: 2 })
   }
   if keywords is Some(v) {
-    args.push({ name: Some("keywords"), value: ToValue::to_value(v), param: 3, })
+    args.push({ name: Some("keywords"), value: ToValue::to_value(v), param: 3 })
   }
   push_extra(args, extra, 4)
-  {
-    node: {
-      func: FElem(@library.document_elem()),
-      args,
-      origin: Site::new("SetDocument", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.document_elem()), args, origin: Site::new("SetDocument", loc, args_loc) } }
 }
 
 ///|
@@ -3449,18 +3068,14 @@ pub fn Title::Title(
 ) -> Title {
   let args : Array[ArgNode] = []
   if extra_arg(extra, "body") is Some(v) {
-    args.push({ name: None, value: v, param: 1, })
+    args.push({ name: None, value: v, param: 1 })
   } else if body is Some(v) {
-    args.push({ name: None, value: Value::content(v), param: 0, })
+    args.push({ name: None, value: Value::content(v), param: 0 })
   }
   push_extra(args, extra, 1, positional=["body"])
   {
     content: labelled_call(
-      {
-        func: FElem(@library.title_elem()),
-        args,
-        origin: Site::new("Title", loc, args_loc),
-      },
+      { func: FElem(@library.title_elem()), args, origin: Site::new("Title", loc, args_loc) },
       label,
       2,
     ),
@@ -3491,18 +3106,12 @@ pub fn SetTitle::SetTitle(
 ) -> SetTitle {
   let args : Array[ArgNode] = []
   if extra_arg(extra, "body") is Some(v) {
-    args.push({ name: None, value: v, param: 1, })
+    args.push({ name: None, value: v, param: 1 })
   } else if body is Some(v) {
-    args.push({ name: None, value: Value::content(v), param: 0, })
+    args.push({ name: None, value: Value::content(v), param: 0 })
   }
   push_extra(args, extra, 1, positional=["body"])
-  {
-    node: {
-      func: FElem(@library.title_elem()),
-      args,
-      origin: Site::new("SetTitle", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.title_elem()), args, origin: Site::new("SetTitle", loc, args_loc) } }
 }
 
 ///|
@@ -3534,11 +3143,10 @@ pub fn TitleView::view(self : TitleView) -> ContentView {
 ///|
 /// The `title` elements; with arguments, those whose fields have the given
 /// values (`title.where(..)`).
-pub fn Select::title() -> Selector[TitleView] {
+pub fn Select::title(
+) -> Selector[TitleView] {
   let fields : Array[(String, Value)] = []
-  elem_selector(@library.title_elem(), fields, content => TitleView::{
-    content,
-  })
+  elem_selector(@library.title_elem(), fields, content => TitleView::{ content, })
 }
 
 ///|
@@ -3592,96 +3200,80 @@ pub fn Text::Text(
   args_loc~ : ArgsLoc,
 ) -> Text {
   let args : Array[ArgNode] = []
-  args.push({ name: None, value: Value::content(body), param: 0, })
+  args.push({ name: None, value: Value::content(body), param: 0 })
   if font is Some(v) {
-    args.push({ name: Some("font"), value: ToValue::to_value(v), param: 1, })
+    args.push({ name: Some("font"), value: ToValue::to_value(v), param: 1 })
   }
   if fallback is Some(v) {
-    args.push({ name: Some("fallback"), value: Value::bool(v), param: 2, })
+    args.push({ name: Some("fallback"), value: Value::bool(v), param: 2 })
   }
   if style is Some(v) {
-    args.push({ name: Some("style"), value: Value::str(v), param: 3, })
+    args.push({ name: Some("style"), value: Value::str(v), param: 3 })
   }
   if weight is Some(v) {
-    args.push({ name: Some("weight"), value: ToValue::to_value(v), param: 4, })
+    args.push({ name: Some("weight"), value: ToValue::to_value(v), param: 4 })
   }
   if size is Some(v) {
-    args.push({ name: Some("size"), value: ToValue::to_value(v), param: 5, })
+    args.push({ name: Some("size"), value: ToValue::to_value(v), param: 5 })
   }
   if fill is Some(v) {
-    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 6, })
+    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 6 })
   }
   if stroke is Some(v) {
-    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 7, })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 7 })
   }
   if tracking is Some(v) {
-    args.push({ name: Some("tracking"), value: ToValue::to_value(v), param: 8, })
+    args.push({ name: Some("tracking"), value: ToValue::to_value(v), param: 8 })
   }
   if spacing is Some(v) {
-    args.push({ name: Some("spacing"), value: ToValue::to_value(v), param: 9, })
+    args.push({ name: Some("spacing"), value: ToValue::to_value(v), param: 9 })
   }
   if baseline is Some(v) {
-    args.push({
-      name: Some("baseline"),
-      value: ToValue::to_value(v),
-      param: 10,
-    })
+    args.push({ name: Some("baseline"), value: ToValue::to_value(v), param: 10 })
   }
   if overhang is Some(v) {
-    args.push({ name: Some("overhang"), value: Value::bool(v), param: 11, })
+    args.push({ name: Some("overhang"), value: Value::bool(v), param: 11 })
   }
   if lang is Some(v) {
-    args.push({ name: Some("lang"), value: Value::str(v), param: 12, })
+    args.push({ name: Some("lang"), value: Value::str(v), param: 12 })
   }
   if region is Some(v) {
-    args.push({ name: Some("region"), value: Value::str(v), param: 13, })
+    args.push({ name: Some("region"), value: Value::str(v), param: 13 })
   }
   if dir is Some(v) {
-    args.push({ name: Some("dir"), value: ToValue::to_value(v), param: 14, })
+    args.push({ name: Some("dir"), value: ToValue::to_value(v), param: 14 })
   }
   if hyphenate is Some(v) {
-    args.push({ name: Some("hyphenate"), value: Value::bool(v), param: 15, })
+    args.push({ name: Some("hyphenate"), value: Value::bool(v), param: 15 })
   }
   if kerning is Some(v) {
-    args.push({ name: Some("kerning"), value: Value::bool(v), param: 16, })
+    args.push({ name: Some("kerning"), value: Value::bool(v), param: 16 })
   }
   if ligatures is Some(v) {
-    args.push({ name: Some("ligatures"), value: Value::bool(v), param: 17, })
+    args.push({ name: Some("ligatures"), value: Value::bool(v), param: 17 })
   }
   if discretionary_ligatures is Some(v) {
-    args.push({
-      name: Some("discretionary-ligatures"),
-      value: Value::bool(v),
-      param: 18,
-    })
+    args.push({ name: Some("discretionary-ligatures"), value: Value::bool(v), param: 18 })
   }
   if historical_ligatures is Some(v) {
-    args.push({
-      name: Some("historical-ligatures"),
-      value: Value::bool(v),
-      param: 19,
-    })
+    args.push({ name: Some("historical-ligatures"), value: Value::bool(v), param: 19 })
   }
   if number_type is Some(v) {
-    args.push({ name: Some("number-type"), value: Value::str(v), param: 20, })
+    args.push({ name: Some("number-type"), value: Value::str(v), param: 20 })
   }
   if number_width is Some(v) {
-    args.push({ name: Some("number-width"), value: Value::str(v), param: 21, })
+    args.push({ name: Some("number-width"), value: Value::str(v), param: 21 })
   }
   if slashed_zero is Some(v) {
-    args.push({ name: Some("slashed-zero"), value: Value::bool(v), param: 22, })
+    args.push({ name: Some("slashed-zero"), value: Value::bool(v), param: 22 })
   }
   if fractions is Some(v) {
-    args.push({ name: Some("fractions"), value: Value::bool(v), param: 23, })
+    args.push({ name: Some("fractions"), value: Value::bool(v), param: 23 })
   }
   push_extra(args, extra, 24)
   {
     content: labelled_call(
-      {
-        func: FElem(@library.text_elem()),
-        args,
-        origin: Site::new("Text", loc, args_loc),
-      },
+      { func: FElem(@library.text_elem()), args, origin: Site::new("Text", loc, args_loc) },
       label,
       25,
     ),
@@ -3738,90 +3330,76 @@ pub fn SetText::SetText(
 ) -> SetText {
   let args : Array[ArgNode] = []
   if font is Some(v) {
-    args.push({ name: Some("font"), value: ToValue::to_value(v), param: 0, })
+    args.push({ name: Some("font"), value: ToValue::to_value(v), param: 0 })
   }
   if fallback is Some(v) {
-    args.push({ name: Some("fallback"), value: Value::bool(v), param: 1, })
+    args.push({ name: Some("fallback"), value: Value::bool(v), param: 1 })
   }
   if style is Some(v) {
-    args.push({ name: Some("style"), value: Value::str(v), param: 2, })
+    args.push({ name: Some("style"), value: Value::str(v), param: 2 })
   }
   if weight is Some(v) {
-    args.push({ name: Some("weight"), value: ToValue::to_value(v), param: 3, })
+    args.push({ name: Some("weight"), value: ToValue::to_value(v), param: 3 })
   }
   if size is Some(v) {
-    args.push({ name: Some("size"), value: ToValue::to_value(v), param: 4, })
+    args.push({ name: Some("size"), value: ToValue::to_value(v), param: 4 })
   }
   if fill is Some(v) {
-    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 5, })
+    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 5 })
   }
   if stroke is Some(v) {
-    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 6, })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 6 })
   }
   if tracking is Some(v) {
-    args.push({ name: Some("tracking"), value: ToValue::to_value(v), param: 7, })
+    args.push({ name: Some("tracking"), value: ToValue::to_value(v), param: 7 })
   }
   if spacing is Some(v) {
-    args.push({ name: Some("spacing"), value: ToValue::to_value(v), param: 8, })
+    args.push({ name: Some("spacing"), value: ToValue::to_value(v), param: 8 })
   }
   if baseline is Some(v) {
-    args.push({ name: Some("baseline"), value: ToValue::to_value(v), param: 9, })
+    args.push({ name: Some("baseline"), value: ToValue::to_value(v), param: 9 })
   }
   if overhang is Some(v) {
-    args.push({ name: Some("overhang"), value: Value::bool(v), param: 10, })
+    args.push({ name: Some("overhang"), value: Value::bool(v), param: 10 })
   }
   if lang is Some(v) {
-    args.push({ name: Some("lang"), value: Value::str(v), param: 11, })
+    args.push({ name: Some("lang"), value: Value::str(v), param: 11 })
   }
   if region is Some(v) {
-    args.push({ name: Some("region"), value: Value::str(v), param: 12, })
+    args.push({ name: Some("region"), value: Value::str(v), param: 12 })
   }
   if dir is Some(v) {
-    args.push({ name: Some("dir"), value: ToValue::to_value(v), param: 13, })
+    args.push({ name: Some("dir"), value: ToValue::to_value(v), param: 13 })
   }
   if hyphenate is Some(v) {
-    args.push({ name: Some("hyphenate"), value: Value::bool(v), param: 14, })
+    args.push({ name: Some("hyphenate"), value: Value::bool(v), param: 14 })
   }
   if kerning is Some(v) {
-    args.push({ name: Some("kerning"), value: Value::bool(v), param: 15, })
+    args.push({ name: Some("kerning"), value: Value::bool(v), param: 15 })
   }
   if ligatures is Some(v) {
-    args.push({ name: Some("ligatures"), value: Value::bool(v), param: 16, })
+    args.push({ name: Some("ligatures"), value: Value::bool(v), param: 16 })
   }
   if discretionary_ligatures is Some(v) {
-    args.push({
-      name: Some("discretionary-ligatures"),
-      value: Value::bool(v),
-      param: 17,
-    })
+    args.push({ name: Some("discretionary-ligatures"), value: Value::bool(v), param: 17 })
   }
   if historical_ligatures is Some(v) {
-    args.push({
-      name: Some("historical-ligatures"),
-      value: Value::bool(v),
-      param: 18,
-    })
+    args.push({ name: Some("historical-ligatures"), value: Value::bool(v), param: 18 })
   }
   if number_type is Some(v) {
-    args.push({ name: Some("number-type"), value: Value::str(v), param: 19, })
+    args.push({ name: Some("number-type"), value: Value::str(v), param: 19 })
   }
   if number_width is Some(v) {
-    args.push({ name: Some("number-width"), value: Value::str(v), param: 20, })
+    args.push({ name: Some("number-width"), value: Value::str(v), param: 20 })
   }
   if slashed_zero is Some(v) {
-    args.push({ name: Some("slashed-zero"), value: Value::bool(v), param: 21, })
+    args.push({ name: Some("slashed-zero"), value: Value::bool(v), param: 21 })
   }
   if fractions is Some(v) {
-    args.push({ name: Some("fractions"), value: Value::bool(v), param: 22, })
+    args.push({ name: Some("fractions"), value: Value::bool(v), param: 22 })
   }
   push_extra(args, extra, 23)
-  {
-    node: {
-      func: FElem(@library.text_elem()),
-      args,
-      origin: Site::new("SetText", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.text_elem()), args, origin: Site::new("SetText", loc, args_loc) } }
 }
 
 ///|
@@ -3852,9 +3430,7 @@ pub fn TextView::view(self : TextView) -> ContentView {
 
 ///|
 /// The `body` of the element.
-pub fn TextView::body(
-  self : TextView,
-) -> ContentView raise @library.HintedError {
+pub fn TextView::body(self : TextView) -> ContentView raise @library.HintedError {
   ContentView::new(self.content.field_by_name("body").cast())
 }
 
@@ -3986,27 +3562,23 @@ pub fn Raw::Raw(
   args_loc~ : ArgsLoc,
 ) -> Raw {
   let args : Array[ArgNode] = []
-  args.push({ name: None, value: Value::str(text), param: 0, })
+  args.push({ name: None, value: Value::str(text), param: 0 })
   if block is Some(v) {
-    args.push({ name: Some("block"), value: Value::bool(v), param: 1, })
+    args.push({ name: Some("block"), value: Value::bool(v), param: 1 })
   }
   if lang is Some(v) {
-    args.push({ name: Some("lang"), value: Value::str(v), param: 2, })
+    args.push({ name: Some("lang"), value: Value::str(v), param: 2 })
   }
   if align is Some(v) {
-    args.push({ name: Some("align"), value: ToValue::to_value(v), param: 3, })
+    args.push({ name: Some("align"), value: ToValue::to_value(v), param: 3 })
   }
   if tab_size is Some(v) {
-    args.push({ name: Some("tab-size"), value: Value::int(v), param: 4, })
+    args.push({ name: Some("tab-size"), value: Value::int(v), param: 4 })
   }
   push_extra(args, extra, 5)
   {
     content: labelled_call(
-      {
-        func: FElem(@library.raw_elem()),
-        args,
-        origin: Site::new("Raw", loc, args_loc),
-      },
+      { func: FElem(@library.raw_elem()), args, origin: Site::new("Raw", loc, args_loc) },
       label,
       6,
     ),
@@ -4040,25 +3612,19 @@ pub fn SetRaw::SetRaw(
 ) -> SetRaw {
   let args : Array[ArgNode] = []
   if block is Some(v) {
-    args.push({ name: Some("block"), value: Value::bool(v), param: 0, })
+    args.push({ name: Some("block"), value: Value::bool(v), param: 0 })
   }
   if lang is Some(v) {
-    args.push({ name: Some("lang"), value: Value::str(v), param: 1, })
+    args.push({ name: Some("lang"), value: Value::str(v), param: 1 })
   }
   if align is Some(v) {
-    args.push({ name: Some("align"), value: ToValue::to_value(v), param: 2, })
+    args.push({ name: Some("align"), value: ToValue::to_value(v), param: 2 })
   }
   if tab_size is Some(v) {
-    args.push({ name: Some("tab-size"), value: Value::int(v), param: 3, })
+    args.push({ name: Some("tab-size"), value: Value::int(v), param: 3 })
   }
   push_extra(args, extra, 4)
-  {
-    node: {
-      func: FElem(@library.raw_elem()),
-      args,
-      origin: Site::new("SetRaw", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.raw_elem()), args, origin: Site::new("SetRaw", loc, args_loc) } }
 }
 
 ///|
@@ -4129,16 +3695,12 @@ pub fn Linebreak::Linebreak(
 ) -> Linebreak {
   let args : Array[ArgNode] = []
   if justify is Some(v) {
-    args.push({ name: Some("justify"), value: Value::bool(v), param: 0, })
+    args.push({ name: Some("justify"), value: Value::bool(v), param: 0 })
   }
   push_extra(args, extra, 1)
   {
     content: labelled_call(
-      {
-        func: FElem(@library.linebreak_elem()),
-        args,
-        origin: Site::new("Linebreak", loc, args_loc),
-      },
+      { func: FElem(@library.linebreak_elem()), args, origin: Site::new("Linebreak", loc, args_loc) },
       label,
       2,
     ),
@@ -4166,16 +3728,10 @@ pub fn SetLinebreak::SetLinebreak(
 ) -> SetLinebreak {
   let args : Array[ArgNode] = []
   if justify is Some(v) {
-    args.push({ name: Some("justify"), value: Value::bool(v), param: 0, })
+    args.push({ name: Some("justify"), value: Value::bool(v), param: 0 })
   }
   push_extra(args, extra, 1)
-  {
-    node: {
-      func: FElem(@library.linebreak_elem()),
-      args,
-      origin: Site::new("SetLinebreak", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.linebreak_elem()), args, origin: Site::new("SetLinebreak", loc, args_loc) } }
 }
 
 ///|
@@ -4207,14 +3763,14 @@ pub fn LinebreakView::view(self : LinebreakView) -> ContentView {
 ///|
 /// The `linebreak` elements; with arguments, those whose fields have the
 /// given values (`linebreak.where(..)`).
-pub fn Select::linebreak(justify? : Bool) -> Selector[LinebreakView] {
+pub fn Select::linebreak(
+  justify? : Bool,
+) -> Selector[LinebreakView] {
   let fields : Array[(String, Value)] = []
   if justify is Some(v) {
     fields.push(("justify", Value::bool(v)))
   }
-  elem_selector(@library.linebreak_elem(), fields, content => LinebreakView::{
-    content,
-  })
+  elem_selector(@library.linebreak_elem(), fields, content => LinebreakView::{ content, })
 }
 
 ///|
@@ -4236,22 +3792,18 @@ pub fn Smartquote::Smartquote(
 ) -> Smartquote {
   let args : Array[ArgNode] = []
   if double is Some(v) {
-    args.push({ name: Some("double"), value: Value::bool(v), param: 0, })
+    args.push({ name: Some("double"), value: Value::bool(v), param: 0 })
   }
   if enabled is Some(v) {
-    args.push({ name: Some("enabled"), value: Value::bool(v), param: 1, })
+    args.push({ name: Some("enabled"), value: Value::bool(v), param: 1 })
   }
   if alternative is Some(v) {
-    args.push({ name: Some("alternative"), value: Value::bool(v), param: 2, })
+    args.push({ name: Some("alternative"), value: Value::bool(v), param: 2 })
   }
   push_extra(args, extra, 3)
   {
     content: labelled_call(
-      {
-        func: FElem(@library.smart_quote_elem()),
-        args,
-        origin: Site::new("Smartquote", loc, args_loc),
-      },
+      { func: FElem(@library.smart_quote_elem()), args, origin: Site::new("Smartquote", loc, args_loc) },
       label,
       4,
     ),
@@ -4281,22 +3833,16 @@ pub fn SetSmartquote::SetSmartquote(
 ) -> SetSmartquote {
   let args : Array[ArgNode] = []
   if double is Some(v) {
-    args.push({ name: Some("double"), value: Value::bool(v), param: 0, })
+    args.push({ name: Some("double"), value: Value::bool(v), param: 0 })
   }
   if enabled is Some(v) {
-    args.push({ name: Some("enabled"), value: Value::bool(v), param: 1, })
+    args.push({ name: Some("enabled"), value: Value::bool(v), param: 1 })
   }
   if alternative is Some(v) {
-    args.push({ name: Some("alternative"), value: Value::bool(v), param: 2, })
+    args.push({ name: Some("alternative"), value: Value::bool(v), param: 2 })
   }
   push_extra(args, extra, 3)
-  {
-    node: {
-      func: FElem(@library.smart_quote_elem()),
-      args,
-      origin: Site::new("SetSmartquote", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.smart_quote_elem()), args, origin: Site::new("SetSmartquote", loc, args_loc) } }
 }
 
 ///|
@@ -4343,9 +3889,7 @@ pub fn Select::smartquote(
   if alternative is Some(v) {
     fields.push(("alternative", Value::bool(v)))
   }
-  elem_selector(@library.smart_quote_elem(), fields, content => SmartquoteView::{
-    content,
-  })
+  elem_selector(@library.smart_quote_elem(), fields, content => SmartquoteView::{ content, })
 }
 
 ///|
@@ -4373,30 +3917,26 @@ pub fn Underline::Underline(
   args_loc~ : ArgsLoc,
 ) -> Underline {
   let args : Array[ArgNode] = []
-  args.push({ name: None, value: Value::content(body), param: 0, })
+  args.push({ name: None, value: Value::content(body), param: 0 })
   if stroke is Some(v) {
-    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 1, })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 1 })
   }
   if offset is Some(v) {
-    args.push({ name: Some("offset"), value: ToValue::to_value(v), param: 2, })
+    args.push({ name: Some("offset"), value: ToValue::to_value(v), param: 2 })
   }
   if extent is Some(v) {
-    args.push({ name: Some("extent"), value: ToValue::to_value(v), param: 3, })
+    args.push({ name: Some("extent"), value: ToValue::to_value(v), param: 3 })
   }
   if evade is Some(v) {
-    args.push({ name: Some("evade"), value: Value::bool(v), param: 4, })
+    args.push({ name: Some("evade"), value: Value::bool(v), param: 4 })
   }
   if background is Some(v) {
-    args.push({ name: Some("background"), value: Value::bool(v), param: 5, })
+    args.push({ name: Some("background"), value: Value::bool(v), param: 5 })
   }
   push_extra(args, extra, 6)
   {
     content: labelled_call(
-      {
-        func: FElem(@library.underline_elem()),
-        args,
-        origin: Site::new("Underline", loc, args_loc),
-      },
+      { func: FElem(@library.underline_elem()), args, origin: Site::new("Underline", loc, args_loc) },
       label,
       7,
     ),
@@ -4432,28 +3972,22 @@ pub fn SetUnderline::SetUnderline(
 ) -> SetUnderline {
   let args : Array[ArgNode] = []
   if stroke is Some(v) {
-    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 0, })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 0 })
   }
   if offset is Some(v) {
-    args.push({ name: Some("offset"), value: ToValue::to_value(v), param: 1, })
+    args.push({ name: Some("offset"), value: ToValue::to_value(v), param: 1 })
   }
   if extent is Some(v) {
-    args.push({ name: Some("extent"), value: ToValue::to_value(v), param: 2, })
+    args.push({ name: Some("extent"), value: ToValue::to_value(v), param: 2 })
   }
   if evade is Some(v) {
-    args.push({ name: Some("evade"), value: Value::bool(v), param: 3, })
+    args.push({ name: Some("evade"), value: Value::bool(v), param: 3 })
   }
   if background is Some(v) {
-    args.push({ name: Some("background"), value: Value::bool(v), param: 4, })
+    args.push({ name: Some("background"), value: Value::bool(v), param: 4 })
   }
   push_extra(args, extra, 5)
-  {
-    node: {
-      func: FElem(@library.underline_elem()),
-      args,
-      origin: Site::new("SetUnderline", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.underline_elem()), args, origin: Site::new("SetUnderline", loc, args_loc) } }
 }
 
 ///|
@@ -4484,9 +4018,7 @@ pub fn UnderlineView::view(self : UnderlineView) -> ContentView {
 
 ///|
 /// The `body` of the element.
-pub fn UnderlineView::body(
-  self : UnderlineView,
-) -> ContentView raise @library.HintedError {
+pub fn UnderlineView::body(self : UnderlineView) -> ContentView raise @library.HintedError {
   ContentView::new(self.content.field_by_name("body").cast())
 }
 
@@ -4516,9 +4048,7 @@ pub fn Select::underline(
   if background is Some(v) {
     fields.push(("background", Value::bool(v)))
   }
-  elem_selector(@library.underline_elem(), fields, content => UnderlineView::{
-    content,
-  })
+  elem_selector(@library.underline_elem(), fields, content => UnderlineView::{ content, })
 }
 
 ///|
@@ -4546,30 +4076,26 @@ pub fn Overline::Overline(
   args_loc~ : ArgsLoc,
 ) -> Overline {
   let args : Array[ArgNode] = []
-  args.push({ name: None, value: Value::content(body), param: 0, })
+  args.push({ name: None, value: Value::content(body), param: 0 })
   if stroke is Some(v) {
-    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 1, })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 1 })
   }
   if offset is Some(v) {
-    args.push({ name: Some("offset"), value: ToValue::to_value(v), param: 2, })
+    args.push({ name: Some("offset"), value: ToValue::to_value(v), param: 2 })
   }
   if extent is Some(v) {
-    args.push({ name: Some("extent"), value: ToValue::to_value(v), param: 3, })
+    args.push({ name: Some("extent"), value: ToValue::to_value(v), param: 3 })
   }
   if evade is Some(v) {
-    args.push({ name: Some("evade"), value: Value::bool(v), param: 4, })
+    args.push({ name: Some("evade"), value: Value::bool(v), param: 4 })
   }
   if background is Some(v) {
-    args.push({ name: Some("background"), value: Value::bool(v), param: 5, })
+    args.push({ name: Some("background"), value: Value::bool(v), param: 5 })
   }
   push_extra(args, extra, 6)
   {
     content: labelled_call(
-      {
-        func: FElem(@library.overline_elem()),
-        args,
-        origin: Site::new("Overline", loc, args_loc),
-      },
+      { func: FElem(@library.overline_elem()), args, origin: Site::new("Overline", loc, args_loc) },
       label,
       7,
     ),
@@ -4605,28 +4131,22 @@ pub fn SetOverline::SetOverline(
 ) -> SetOverline {
   let args : Array[ArgNode] = []
   if stroke is Some(v) {
-    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 0, })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 0 })
   }
   if offset is Some(v) {
-    args.push({ name: Some("offset"), value: ToValue::to_value(v), param: 1, })
+    args.push({ name: Some("offset"), value: ToValue::to_value(v), param: 1 })
   }
   if extent is Some(v) {
-    args.push({ name: Some("extent"), value: ToValue::to_value(v), param: 2, })
+    args.push({ name: Some("extent"), value: ToValue::to_value(v), param: 2 })
   }
   if evade is Some(v) {
-    args.push({ name: Some("evade"), value: Value::bool(v), param: 3, })
+    args.push({ name: Some("evade"), value: Value::bool(v), param: 3 })
   }
   if background is Some(v) {
-    args.push({ name: Some("background"), value: Value::bool(v), param: 4, })
+    args.push({ name: Some("background"), value: Value::bool(v), param: 4 })
   }
   push_extra(args, extra, 5)
-  {
-    node: {
-      func: FElem(@library.overline_elem()),
-      args,
-      origin: Site::new("SetOverline", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.overline_elem()), args, origin: Site::new("SetOverline", loc, args_loc) } }
 }
 
 ///|
@@ -4657,9 +4177,7 @@ pub fn OverlineView::view(self : OverlineView) -> ContentView {
 
 ///|
 /// The `body` of the element.
-pub fn OverlineView::body(
-  self : OverlineView,
-) -> ContentView raise @library.HintedError {
+pub fn OverlineView::body(self : OverlineView) -> ContentView raise @library.HintedError {
   ContentView::new(self.content.field_by_name("body").cast())
 }
 
@@ -4689,9 +4207,7 @@ pub fn Select::overline(
   if background is Some(v) {
     fields.push(("background", Value::bool(v)))
   }
-  elem_selector(@library.overline_elem(), fields, content => OverlineView::{
-    content,
-  })
+  elem_selector(@library.overline_elem(), fields, content => OverlineView::{ content, })
 }
 
 ///|
@@ -4718,27 +4234,23 @@ pub fn Strike::Strike(
   args_loc~ : ArgsLoc,
 ) -> Strike {
   let args : Array[ArgNode] = []
-  args.push({ name: None, value: Value::content(body), param: 0, })
+  args.push({ name: None, value: Value::content(body), param: 0 })
   if stroke is Some(v) {
-    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 1, })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 1 })
   }
   if offset is Some(v) {
-    args.push({ name: Some("offset"), value: ToValue::to_value(v), param: 2, })
+    args.push({ name: Some("offset"), value: ToValue::to_value(v), param: 2 })
   }
   if extent is Some(v) {
-    args.push({ name: Some("extent"), value: ToValue::to_value(v), param: 3, })
+    args.push({ name: Some("extent"), value: ToValue::to_value(v), param: 3 })
   }
   if background is Some(v) {
-    args.push({ name: Some("background"), value: Value::bool(v), param: 4, })
+    args.push({ name: Some("background"), value: Value::bool(v), param: 4 })
   }
   push_extra(args, extra, 5)
   {
     content: labelled_call(
-      {
-        func: FElem(@library.strike_elem()),
-        args,
-        origin: Site::new("Strike", loc, args_loc),
-      },
+      { func: FElem(@library.strike_elem()), args, origin: Site::new("Strike", loc, args_loc) },
       label,
       6,
     ),
@@ -4773,25 +4285,19 @@ pub fn SetStrike::SetStrike(
 ) -> SetStrike {
   let args : Array[ArgNode] = []
   if stroke is Some(v) {
-    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 0, })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 0 })
   }
   if offset is Some(v) {
-    args.push({ name: Some("offset"), value: ToValue::to_value(v), param: 1, })
+    args.push({ name: Some("offset"), value: ToValue::to_value(v), param: 1 })
   }
   if extent is Some(v) {
-    args.push({ name: Some("extent"), value: ToValue::to_value(v), param: 2, })
+    args.push({ name: Some("extent"), value: ToValue::to_value(v), param: 2 })
   }
   if background is Some(v) {
-    args.push({ name: Some("background"), value: Value::bool(v), param: 3, })
+    args.push({ name: Some("background"), value: Value::bool(v), param: 3 })
   }
   push_extra(args, extra, 4)
-  {
-    node: {
-      func: FElem(@library.strike_elem()),
-      args,
-      origin: Site::new("SetStrike", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.strike_elem()), args, origin: Site::new("SetStrike", loc, args_loc) } }
 }
 
 ///|
@@ -4822,9 +4328,7 @@ pub fn StrikeView::view(self : StrikeView) -> ContentView {
 
 ///|
 /// The `body` of the element.
-pub fn StrikeView::body(
-  self : StrikeView,
-) -> ContentView raise @library.HintedError {
+pub fn StrikeView::body(self : StrikeView) -> ContentView raise @library.HintedError {
   ContentView::new(self.content.field_by_name("body").cast())
 }
 
@@ -4850,9 +4354,7 @@ pub fn Select::strike(
   if background is Some(v) {
     fields.push(("background", Value::bool(v)))
   }
-  elem_selector(@library.strike_elem(), fields, content => StrikeView::{
-    content,
-  })
+  elem_selector(@library.strike_elem(), fields, content => StrikeView::{ content, })
 }
 
 ///|
@@ -4878,27 +4380,23 @@ pub fn Highlight::Highlight(
   args_loc~ : ArgsLoc,
 ) -> Highlight {
   let args : Array[ArgNode] = []
-  args.push({ name: None, value: Value::content(body), param: 0, })
+  args.push({ name: None, value: Value::content(body), param: 0 })
   if fill is Some(v) {
-    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 1, })
+    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 1 })
   }
   if stroke is Some(v) {
-    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 2, })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 2 })
   }
   if extent is Some(v) {
-    args.push({ name: Some("extent"), value: ToValue::to_value(v), param: 3, })
+    args.push({ name: Some("extent"), value: ToValue::to_value(v), param: 3 })
   }
   if radius is Some(v) {
-    args.push({ name: Some("radius"), value: ToValue::to_value(v), param: 4, })
+    args.push({ name: Some("radius"), value: ToValue::to_value(v), param: 4 })
   }
   push_extra(args, extra, 5)
   {
     content: labelled_call(
-      {
-        func: FElem(@library.highlight_elem()),
-        args,
-        origin: Site::new("Highlight", loc, args_loc),
-      },
+      { func: FElem(@library.highlight_elem()), args, origin: Site::new("Highlight", loc, args_loc) },
       label,
       6,
     ),
@@ -4932,25 +4430,19 @@ pub fn SetHighlight::SetHighlight(
 ) -> SetHighlight {
   let args : Array[ArgNode] = []
   if fill is Some(v) {
-    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 0, })
+    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 0 })
   }
   if stroke is Some(v) {
-    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 1, })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 1 })
   }
   if extent is Some(v) {
-    args.push({ name: Some("extent"), value: ToValue::to_value(v), param: 2, })
+    args.push({ name: Some("extent"), value: ToValue::to_value(v), param: 2 })
   }
   if radius is Some(v) {
-    args.push({ name: Some("radius"), value: ToValue::to_value(v), param: 3, })
+    args.push({ name: Some("radius"), value: ToValue::to_value(v), param: 3 })
   }
   push_extra(args, extra, 4)
-  {
-    node: {
-      func: FElem(@library.highlight_elem()),
-      args,
-      origin: Site::new("SetHighlight", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.highlight_elem()), args, origin: Site::new("SetHighlight", loc, args_loc) } }
 }
 
 ///|
@@ -4981,9 +4473,7 @@ pub fn HighlightView::view(self : HighlightView) -> ContentView {
 
 ///|
 /// The `body` of the element.
-pub fn HighlightView::body(
-  self : HighlightView,
-) -> ContentView raise @library.HintedError {
+pub fn HighlightView::body(self : HighlightView) -> ContentView raise @library.HintedError {
   ContentView::new(self.content.field_by_name("body").cast())
 }
 
@@ -5009,9 +4499,7 @@ pub fn Select::highlight(
   if radius is Some(v) {
     fields.push(("radius", ToValue::to_value(v)))
   }
-  elem_selector(@library.highlight_elem(), fields, content => HighlightView::{
-    content,
-  })
+  elem_selector(@library.highlight_elem(), fields, content => HighlightView::{ content, })
 }
 
 ///|
@@ -5037,24 +4525,20 @@ pub fn Sub::Sub(
   args_loc~ : ArgsLoc,
 ) -> Sub {
   let args : Array[ArgNode] = []
-  args.push({ name: None, value: Value::content(body), param: 0, })
+  args.push({ name: None, value: Value::content(body), param: 0 })
   if typographic is Some(v) {
-    args.push({ name: Some("typographic"), value: Value::bool(v), param: 1, })
+    args.push({ name: Some("typographic"), value: Value::bool(v), param: 1 })
   }
   if baseline is Some(v) {
-    args.push({ name: Some("baseline"), value: ToValue::to_value(v), param: 2, })
+    args.push({ name: Some("baseline"), value: ToValue::to_value(v), param: 2 })
   }
   if size is Some(v) {
-    args.push({ name: Some("size"), value: ToValue::to_value(v), param: 3, })
+    args.push({ name: Some("size"), value: ToValue::to_value(v), param: 3 })
   }
   push_extra(args, extra, 4)
   {
     content: labelled_call(
-      {
-        func: FElem(@library.sub_elem()),
-        args,
-        origin: Site::new("Sub", loc, args_loc),
-      },
+      { func: FElem(@library.sub_elem()), args, origin: Site::new("Sub", loc, args_loc) },
       label,
       5,
     ),
@@ -5088,22 +4572,16 @@ pub fn SetSub::SetSub(
 ) -> SetSub {
   let args : Array[ArgNode] = []
   if typographic is Some(v) {
-    args.push({ name: Some("typographic"), value: Value::bool(v), param: 0, })
+    args.push({ name: Some("typographic"), value: Value::bool(v), param: 0 })
   }
   if baseline is Some(v) {
-    args.push({ name: Some("baseline"), value: ToValue::to_value(v), param: 1, })
+    args.push({ name: Some("baseline"), value: ToValue::to_value(v), param: 1 })
   }
   if size is Some(v) {
-    args.push({ name: Some("size"), value: ToValue::to_value(v), param: 2, })
+    args.push({ name: Some("size"), value: ToValue::to_value(v), param: 2 })
   }
   push_extra(args, extra, 3)
-  {
-    node: {
-      func: FElem(@library.sub_elem()),
-      args,
-      origin: Site::new("SetSub", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.sub_elem()), args, origin: Site::new("SetSub", loc, args_loc) } }
 }
 
 ///|
@@ -5182,24 +4660,20 @@ pub fn Super::Super(
   args_loc~ : ArgsLoc,
 ) -> Super {
   let args : Array[ArgNode] = []
-  args.push({ name: None, value: Value::content(body), param: 0, })
+  args.push({ name: None, value: Value::content(body), param: 0 })
   if typographic is Some(v) {
-    args.push({ name: Some("typographic"), value: Value::bool(v), param: 1, })
+    args.push({ name: Some("typographic"), value: Value::bool(v), param: 1 })
   }
   if baseline is Some(v) {
-    args.push({ name: Some("baseline"), value: ToValue::to_value(v), param: 2, })
+    args.push({ name: Some("baseline"), value: ToValue::to_value(v), param: 2 })
   }
   if size is Some(v) {
-    args.push({ name: Some("size"), value: ToValue::to_value(v), param: 3, })
+    args.push({ name: Some("size"), value: ToValue::to_value(v), param: 3 })
   }
   push_extra(args, extra, 4)
   {
     content: labelled_call(
-      {
-        func: FElem(@library.super_elem()),
-        args,
-        origin: Site::new("Super", loc, args_loc),
-      },
+      { func: FElem(@library.super_elem()), args, origin: Site::new("Super", loc, args_loc) },
       label,
       5,
     ),
@@ -5233,22 +4707,16 @@ pub fn SetSuper::SetSuper(
 ) -> SetSuper {
   let args : Array[ArgNode] = []
   if typographic is Some(v) {
-    args.push({ name: Some("typographic"), value: Value::bool(v), param: 0, })
+    args.push({ name: Some("typographic"), value: Value::bool(v), param: 0 })
   }
   if baseline is Some(v) {
-    args.push({ name: Some("baseline"), value: ToValue::to_value(v), param: 1, })
+    args.push({ name: Some("baseline"), value: ToValue::to_value(v), param: 1 })
   }
   if size is Some(v) {
-    args.push({ name: Some("size"), value: ToValue::to_value(v), param: 2, })
+    args.push({ name: Some("size"), value: ToValue::to_value(v), param: 2 })
   }
   push_extra(args, extra, 3)
-  {
-    node: {
-      func: FElem(@library.super_elem()),
-      args,
-      origin: Site::new("SetSuper", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.super_elem()), args, origin: Site::new("SetSuper", loc, args_loc) } }
 }
 
 ///|
@@ -5279,9 +4747,7 @@ pub fn SuperView::view(self : SuperView) -> ContentView {
 
 ///|
 /// The `body` of the element.
-pub fn SuperView::body(
-  self : SuperView,
-) -> ContentView raise @library.HintedError {
+pub fn SuperView::body(self : SuperView) -> ContentView raise @library.HintedError {
   ContentView::new(self.content.field_by_name("body").cast())
 }
 
@@ -5303,9 +4769,7 @@ pub fn Select::super_(
   if size is Some(v) {
     fields.push(("size", ToValue::to_value(v)))
   }
-  elem_selector(@library.super_elem(), fields, content => SuperView::{
-    content,
-  })
+  elem_selector(@library.super_elem(), fields, content => SuperView::{ content, })
 }
 
 ///|
@@ -5325,18 +4789,14 @@ pub fn Smallcaps::Smallcaps(
   args_loc~ : ArgsLoc,
 ) -> Smallcaps {
   let args : Array[ArgNode] = []
-  args.push({ name: None, value: Value::content(body), param: 0, })
+  args.push({ name: None, value: Value::content(body), param: 0 })
   if all is Some(v) {
-    args.push({ name: Some("all"), value: Value::bool(v), param: 1, })
+    args.push({ name: Some("all"), value: Value::bool(v), param: 1 })
   }
   push_extra(args, extra, 2)
   {
     content: labelled_call(
-      {
-        func: FElem(@library.smallcaps_elem()),
-        args,
-        origin: Site::new("Smallcaps", loc, args_loc),
-      },
+      { func: FElem(@library.smallcaps_elem()), args, origin: Site::new("Smallcaps", loc, args_loc) },
       label,
       3,
     ),
@@ -5364,16 +4824,10 @@ pub fn SetSmallcaps::SetSmallcaps(
 ) -> SetSmallcaps {
   let args : Array[ArgNode] = []
   if all is Some(v) {
-    args.push({ name: Some("all"), value: Value::bool(v), param: 0, })
+    args.push({ name: Some("all"), value: Value::bool(v), param: 0 })
   }
   push_extra(args, extra, 1)
-  {
-    node: {
-      func: FElem(@library.smallcaps_elem()),
-      args,
-      origin: Site::new("SetSmallcaps", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.smallcaps_elem()), args, origin: Site::new("SetSmallcaps", loc, args_loc) } }
 }
 
 ///|
@@ -5404,23 +4858,21 @@ pub fn SmallcapsView::view(self : SmallcapsView) -> ContentView {
 
 ///|
 /// The `body` of the element.
-pub fn SmallcapsView::body(
-  self : SmallcapsView,
-) -> ContentView raise @library.HintedError {
+pub fn SmallcapsView::body(self : SmallcapsView) -> ContentView raise @library.HintedError {
   ContentView::new(self.content.field_by_name("body").cast())
 }
 
 ///|
 /// The `smallcaps` elements; with arguments, those whose fields have the
 /// given values (`smallcaps.where(..)`).
-pub fn Select::smallcaps(all? : Bool) -> Selector[SmallcapsView] {
+pub fn Select::smallcaps(
+  all? : Bool,
+) -> Selector[SmallcapsView] {
   let fields : Array[(String, Value)] = []
   if all is Some(v) {
     fields.push(("all", Value::bool(v)))
   }
-  elem_selector(@library.smallcaps_elem(), fields, content => SmallcapsView::{
-    content,
-  })
+  elem_selector(@library.smallcaps_elem(), fields, content => SmallcapsView::{ content, })
 }
 
 ///|
@@ -5472,82 +4924,62 @@ pub fn Page::Page(
   args_loc~ : ArgsLoc,
 ) -> Page {
   let args : Array[ArgNode] = []
-  args.push({ name: None, value: Value::content(body), param: 0, })
+  args.push({ name: None, value: Value::content(body), param: 0 })
   if paper is Some(v) {
-    args.push({ name: Some("paper"), value: Value::str(v), param: 1, })
+    args.push({ name: Some("paper"), value: Value::str(v), param: 1 })
   }
   if width is Some(v) {
-    args.push({ name: Some("width"), value: ToValue::to_value(v), param: 2, })
+    args.push({ name: Some("width"), value: ToValue::to_value(v), param: 2 })
   }
   if height is Some(v) {
-    args.push({ name: Some("height"), value: ToValue::to_value(v), param: 3, })
+    args.push({ name: Some("height"), value: ToValue::to_value(v), param: 3 })
   }
   if flipped is Some(v) {
-    args.push({ name: Some("flipped"), value: Value::bool(v), param: 4, })
+    args.push({ name: Some("flipped"), value: Value::bool(v), param: 4 })
   }
   if margin is Some(v) {
-    args.push({ name: Some("margin"), value: ToValue::to_value(v), param: 5, })
+    args.push({ name: Some("margin"), value: ToValue::to_value(v), param: 5 })
   }
   if bleed is Some(v) {
-    args.push({ name: Some("bleed"), value: ToValue::to_value(v), param: 6, })
+    args.push({ name: Some("bleed"), value: ToValue::to_value(v), param: 6 })
   }
   if columns is Some(v) {
-    args.push({ name: Some("columns"), value: Value::int(v), param: 7, })
+    args.push({ name: Some("columns"), value: Value::int(v), param: 7 })
   }
   if fill is Some(v) {
-    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 8, })
+    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 8 })
   }
   if numbering is Some(v) {
-    args.push({
-      name: Some("numbering"),
-      value: ToValue::to_value(v),
-      param: 9,
-    })
+    args.push({ name: Some("numbering"), value: ToValue::to_value(v), param: 9 })
   }
   if supplement is Some(v) {
-    args.push({ name: Some("supplement"), value: Value::content(v), param: 10, })
+    args.push({ name: Some("supplement"), value: Value::content(v), param: 10 })
   }
   if number_align is Some(v) {
-    args.push({
-      name: Some("number-align"),
-      value: ToValue::to_value(v),
-      param: 11,
-    })
+    args.push({ name: Some("number-align"), value: ToValue::to_value(v), param: 11 })
   }
   if header is Some(v) {
-    args.push({ name: Some("header"), value: Value::content(v), param: 12, })
+    args.push({ name: Some("header"), value: Value::content(v), param: 12 })
   }
   if header_ascent is Some(v) {
-    args.push({
-      name: Some("header-ascent"),
-      value: ToValue::to_value(v),
-      param: 13,
-    })
+    args.push({ name: Some("header-ascent"), value: ToValue::to_value(v), param: 13 })
   }
   if footer is Some(v) {
-    args.push({ name: Some("footer"), value: Value::content(v), param: 14, })
+    args.push({ name: Some("footer"), value: Value::content(v), param: 14 })
   }
   if footer_descent is Some(v) {
-    args.push({
-      name: Some("footer-descent"),
-      value: ToValue::to_value(v),
-      param: 15,
-    })
+    args.push({ name: Some("footer-descent"), value: ToValue::to_value(v), param: 15 })
   }
   if background is Some(v) {
-    args.push({ name: Some("background"), value: Value::content(v), param: 16, })
+    args.push({ name: Some("background"), value: Value::content(v), param: 16 })
   }
   if foreground is Some(v) {
-    args.push({ name: Some("foreground"), value: Value::content(v), param: 17, })
+    args.push({ name: Some("foreground"), value: Value::content(v), param: 17 })
   }
   push_extra(args, extra, 18)
   {
     content: labelled_call(
-      {
-        func: FElem(@library.page_elem()),
-        args,
-        origin: Site::new("Page", loc, args_loc),
-      },
+      { func: FElem(@library.page_elem()), args, origin: Site::new("Page", loc, args_loc) },
       label,
       19,
     ),
@@ -5603,80 +5035,58 @@ pub fn SetPage::SetPage(
 ) -> SetPage {
   let args : Array[ArgNode] = []
   if paper is Some(v) {
-    args.push({ name: Some("paper"), value: Value::str(v), param: 0, })
+    args.push({ name: Some("paper"), value: Value::str(v), param: 0 })
   }
   if width is Some(v) {
-    args.push({ name: Some("width"), value: ToValue::to_value(v), param: 1, })
+    args.push({ name: Some("width"), value: ToValue::to_value(v), param: 1 })
   }
   if height is Some(v) {
-    args.push({ name: Some("height"), value: ToValue::to_value(v), param: 2, })
+    args.push({ name: Some("height"), value: ToValue::to_value(v), param: 2 })
   }
   if flipped is Some(v) {
-    args.push({ name: Some("flipped"), value: Value::bool(v), param: 3, })
+    args.push({ name: Some("flipped"), value: Value::bool(v), param: 3 })
   }
   if margin is Some(v) {
-    args.push({ name: Some("margin"), value: ToValue::to_value(v), param: 4, })
+    args.push({ name: Some("margin"), value: ToValue::to_value(v), param: 4 })
   }
   if bleed is Some(v) {
-    args.push({ name: Some("bleed"), value: ToValue::to_value(v), param: 5, })
+    args.push({ name: Some("bleed"), value: ToValue::to_value(v), param: 5 })
   }
   if columns is Some(v) {
-    args.push({ name: Some("columns"), value: Value::int(v), param: 6, })
+    args.push({ name: Some("columns"), value: Value::int(v), param: 6 })
   }
   if fill is Some(v) {
-    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 7, })
+    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 7 })
   }
   if numbering is Some(v) {
-    args.push({
-      name: Some("numbering"),
-      value: ToValue::to_value(v),
-      param: 8,
-    })
+    args.push({ name: Some("numbering"), value: ToValue::to_value(v), param: 8 })
   }
   if supplement is Some(v) {
-    args.push({ name: Some("supplement"), value: Value::content(v), param: 9, })
+    args.push({ name: Some("supplement"), value: Value::content(v), param: 9 })
   }
   if number_align is Some(v) {
-    args.push({
-      name: Some("number-align"),
-      value: ToValue::to_value(v),
-      param: 10,
-    })
+    args.push({ name: Some("number-align"), value: ToValue::to_value(v), param: 10 })
   }
   if header is Some(v) {
-    args.push({ name: Some("header"), value: Value::content(v), param: 11, })
+    args.push({ name: Some("header"), value: Value::content(v), param: 11 })
   }
   if header_ascent is Some(v) {
-    args.push({
-      name: Some("header-ascent"),
-      value: ToValue::to_value(v),
-      param: 12,
-    })
+    args.push({ name: Some("header-ascent"), value: ToValue::to_value(v), param: 12 })
   }
   if footer is Some(v) {
-    args.push({ name: Some("footer"), value: Value::content(v), param: 13, })
+    args.push({ name: Some("footer"), value: Value::content(v), param: 13 })
   }
   if footer_descent is Some(v) {
-    args.push({
-      name: Some("footer-descent"),
-      value: ToValue::to_value(v),
-      param: 14,
-    })
+    args.push({ name: Some("footer-descent"), value: ToValue::to_value(v), param: 14 })
   }
   if background is Some(v) {
-    args.push({ name: Some("background"), value: Value::content(v), param: 15, })
+    args.push({ name: Some("background"), value: Value::content(v), param: 15 })
   }
   if foreground is Some(v) {
-    args.push({ name: Some("foreground"), value: Value::content(v), param: 16, })
+    args.push({ name: Some("foreground"), value: Value::content(v), param: 16 })
   }
   push_extra(args, extra, 17)
-  {
-    node: {
-      func: FElem(@library.page_elem()),
-      args,
-      origin: Site::new("SetPage", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.page_elem()), args, origin: Site::new("SetPage", loc, args_loc) } }
 }
 
 ///|
@@ -5707,9 +5117,7 @@ pub fn PageView::view(self : PageView) -> ContentView {
 
 ///|
 /// The `body` of the element.
-pub fn PageView::body(
-  self : PageView,
-) -> ContentView raise @library.HintedError {
+pub fn PageView::body(self : PageView) -> ContentView raise @library.HintedError {
   ContentView::new(self.content.field_by_name("body").cast())
 }
 
@@ -5791,19 +5199,15 @@ pub fn Pagebreak::Pagebreak(
 ) -> Pagebreak {
   let args : Array[ArgNode] = []
   if weak is Some(v) {
-    args.push({ name: Some("weak"), value: Value::bool(v), param: 0, })
+    args.push({ name: Some("weak"), value: Value::bool(v), param: 0 })
   }
   if to is Some(v) {
-    args.push({ name: Some("to"), value: Value::str(v), param: 1, })
+    args.push({ name: Some("to"), value: Value::str(v), param: 1 })
   }
   push_extra(args, extra, 2)
   {
     content: labelled_call(
-      {
-        func: FElem(@library.pagebreak_elem()),
-        args,
-        origin: Site::new("Pagebreak", loc, args_loc),
-      },
+      { func: FElem(@library.pagebreak_elem()), args, origin: Site::new("Pagebreak", loc, args_loc) },
       label,
       3,
     ),
@@ -5835,19 +5239,13 @@ pub fn SetPagebreak::SetPagebreak(
 ) -> SetPagebreak {
   let args : Array[ArgNode] = []
   if weak is Some(v) {
-    args.push({ name: Some("weak"), value: Value::bool(v), param: 0, })
+    args.push({ name: Some("weak"), value: Value::bool(v), param: 0 })
   }
   if to is Some(v) {
-    args.push({ name: Some("to"), value: Value::str(v), param: 1, })
+    args.push({ name: Some("to"), value: Value::str(v), param: 1 })
   }
   push_extra(args, extra, 2)
-  {
-    node: {
-      func: FElem(@library.pagebreak_elem()),
-      args,
-      origin: Site::new("SetPagebreak", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.pagebreak_elem()), args, origin: Site::new("SetPagebreak", loc, args_loc) } }
 }
 
 ///|
@@ -5879,7 +5277,10 @@ pub fn PagebreakView::view(self : PagebreakView) -> ContentView {
 ///|
 /// The `pagebreak` elements; with arguments, those whose fields have the
 /// given values (`pagebreak.where(..)`).
-pub fn Select::pagebreak(weak? : Bool, to? : String) -> Selector[PagebreakView] {
+pub fn Select::pagebreak(
+  weak? : Bool,
+  to? : String,
+) -> Selector[PagebreakView] {
   let fields : Array[(String, Value)] = []
   if weak is Some(v) {
     fields.push(("weak", Value::bool(v)))
@@ -5887,9 +5288,7 @@ pub fn Select::pagebreak(weak? : Bool, to? : String) -> Selector[PagebreakView] 
   if to is Some(v) {
     fields.push(("to", Value::str(v)))
   }
-  elem_selector(@library.pagebreak_elem(), fields, content => PagebreakView::{
-    content,
-  })
+  elem_selector(@library.pagebreak_elem(), fields, content => PagebreakView::{ content, })
 }
 
 ///|
@@ -5914,19 +5313,15 @@ pub fn Align::Align(
 ) -> Align {
   let args : Array[ArgNode] = []
   if extra_arg(extra, "alignment") is Some(v) {
-    args.push({ name: None, value: v, param: 2, })
+    args.push({ name: None, value: v, param: 2 })
   } else {
-    args.push({ name: None, value: ToValue::to_value(alignment), param: 0, })
+    args.push({ name: None, value: ToValue::to_value(alignment), param: 0 })
   }
-  args.push({ name: None, value: Value::content(body), param: 1, })
+  args.push({ name: None, value: Value::content(body), param: 1 })
   push_extra(args, extra, 2, positional=["alignment"])
   {
     content: labelled_call(
-      {
-        func: FElem(@library.align_elem()),
-        args,
-        origin: Site::new("Align", loc, args_loc),
-      },
+      { func: FElem(@library.align_elem()), args, origin: Site::new("Align", loc, args_loc) },
       label,
       3,
     ),
@@ -5954,18 +5349,12 @@ pub fn SetAlign::SetAlign(
 ) -> SetAlign {
   let args : Array[ArgNode] = []
   if extra_arg(extra, "alignment") is Some(v) {
-    args.push({ name: None, value: v, param: 1, })
+    args.push({ name: None, value: v, param: 1 })
   } else if alignment is Some(v) {
-    args.push({ name: None, value: ToValue::to_value(v), param: 0, })
+    args.push({ name: None, value: ToValue::to_value(v), param: 0 })
   }
   push_extra(args, extra, 1, positional=["alignment"])
-  {
-    node: {
-      func: FElem(@library.align_elem()),
-      args,
-      origin: Site::new("SetAlign", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.align_elem()), args, origin: Site::new("SetAlign", loc, args_loc) } }
 }
 
 ///|
@@ -5996,20 +5385,17 @@ pub fn AlignView::view(self : AlignView) -> ContentView {
 
 ///|
 /// The `body` of the element.
-pub fn AlignView::body(
-  self : AlignView,
-) -> ContentView raise @library.HintedError {
+pub fn AlignView::body(self : AlignView) -> ContentView raise @library.HintedError {
   ContentView::new(self.content.field_by_name("body").cast())
 }
 
 ///|
 /// The `align` elements; with arguments, those whose fields have the given
 /// values (`align.where(..)`).
-pub fn Select::align() -> Selector[AlignView] {
+pub fn Select::align(
+) -> Selector[AlignView] {
   let fields : Array[(String, Value)] = []
-  elem_selector(@library.align_elem(), fields, content => AlignView::{
-    content,
-  })
+  elem_selector(@library.align_elem(), fields, content => AlignView::{ content, })
 }
 
 ///|
@@ -6054,57 +5440,53 @@ pub fn Block::Block(
 ) -> Block {
   let args : Array[ArgNode] = []
   if extra_arg(extra, "body") is Some(v) {
-    args.push({ name: None, value: v, param: 14, })
+    args.push({ name: None, value: v, param: 14 })
   } else {
-    args.push({ name: None, value: Value::content(body), param: 0, })
+    args.push({ name: None, value: Value::content(body), param: 0 })
   }
   if width is Some(v) {
-    args.push({ name: Some("width"), value: ToValue::to_value(v), param: 1, })
+    args.push({ name: Some("width"), value: ToValue::to_value(v), param: 1 })
   }
   if height is Some(v) {
-    args.push({ name: Some("height"), value: ToValue::to_value(v), param: 2, })
+    args.push({ name: Some("height"), value: ToValue::to_value(v), param: 2 })
   }
   if breakable is Some(v) {
-    args.push({ name: Some("breakable"), value: Value::bool(v), param: 3, })
+    args.push({ name: Some("breakable"), value: Value::bool(v), param: 3 })
   }
   if fill is Some(v) {
-    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 4, })
+    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 4 })
   }
   if stroke is Some(v) {
-    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 5, })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 5 })
   }
   if radius is Some(v) {
-    args.push({ name: Some("radius"), value: ToValue::to_value(v), param: 6, })
+    args.push({ name: Some("radius"), value: ToValue::to_value(v), param: 6 })
   }
   if inset is Some(v) {
-    args.push({ name: Some("inset"), value: ToValue::to_value(v), param: 7, })
+    args.push({ name: Some("inset"), value: ToValue::to_value(v), param: 7 })
   }
   if outset is Some(v) {
-    args.push({ name: Some("outset"), value: ToValue::to_value(v), param: 8, })
+    args.push({ name: Some("outset"), value: ToValue::to_value(v), param: 8 })
   }
   if spacing is Some(v) {
-    args.push({ name: Some("spacing"), value: ToValue::to_value(v), param: 9, })
+    args.push({ name: Some("spacing"), value: ToValue::to_value(v), param: 9 })
   }
   if above is Some(v) {
-    args.push({ name: Some("above"), value: ToValue::to_value(v), param: 10, })
+    args.push({ name: Some("above"), value: ToValue::to_value(v), param: 10 })
   }
   if below is Some(v) {
-    args.push({ name: Some("below"), value: ToValue::to_value(v), param: 11, })
+    args.push({ name: Some("below"), value: ToValue::to_value(v), param: 11 })
   }
   if clip is Some(v) {
-    args.push({ name: Some("clip"), value: Value::bool(v), param: 12, })
+    args.push({ name: Some("clip"), value: Value::bool(v), param: 12 })
   }
   if sticky is Some(v) {
-    args.push({ name: Some("sticky"), value: Value::bool(v), param: 13, })
+    args.push({ name: Some("sticky"), value: Value::bool(v), param: 13 })
   }
   push_extra(args, extra, 14, positional=["body"])
   {
     content: labelled_call(
-      {
-        func: FElem(@library.block_elem()),
-        args,
-        origin: Site::new("Block", loc, args_loc),
-      },
+      { func: FElem(@library.block_elem()), args, origin: Site::new("Block", loc, args_loc) },
       label,
       15,
     ),
@@ -6152,57 +5534,51 @@ pub fn SetBlock::SetBlock(
 ) -> SetBlock {
   let args : Array[ArgNode] = []
   if extra_arg(extra, "body") is Some(v) {
-    args.push({ name: None, value: v, param: 14, })
+    args.push({ name: None, value: v, param: 14 })
   } else if body is Some(v) {
-    args.push({ name: None, value: Value::content(v), param: 0, })
+    args.push({ name: None, value: Value::content(v), param: 0 })
   }
   if width is Some(v) {
-    args.push({ name: Some("width"), value: ToValue::to_value(v), param: 1, })
+    args.push({ name: Some("width"), value: ToValue::to_value(v), param: 1 })
   }
   if height is Some(v) {
-    args.push({ name: Some("height"), value: ToValue::to_value(v), param: 2, })
+    args.push({ name: Some("height"), value: ToValue::to_value(v), param: 2 })
   }
   if breakable is Some(v) {
-    args.push({ name: Some("breakable"), value: Value::bool(v), param: 3, })
+    args.push({ name: Some("breakable"), value: Value::bool(v), param: 3 })
   }
   if fill is Some(v) {
-    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 4, })
+    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 4 })
   }
   if stroke is Some(v) {
-    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 5, })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 5 })
   }
   if radius is Some(v) {
-    args.push({ name: Some("radius"), value: ToValue::to_value(v), param: 6, })
+    args.push({ name: Some("radius"), value: ToValue::to_value(v), param: 6 })
   }
   if inset is Some(v) {
-    args.push({ name: Some("inset"), value: ToValue::to_value(v), param: 7, })
+    args.push({ name: Some("inset"), value: ToValue::to_value(v), param: 7 })
   }
   if outset is Some(v) {
-    args.push({ name: Some("outset"), value: ToValue::to_value(v), param: 8, })
+    args.push({ name: Some("outset"), value: ToValue::to_value(v), param: 8 })
   }
   if spacing is Some(v) {
-    args.push({ name: Some("spacing"), value: ToValue::to_value(v), param: 9, })
+    args.push({ name: Some("spacing"), value: ToValue::to_value(v), param: 9 })
   }
   if above is Some(v) {
-    args.push({ name: Some("above"), value: ToValue::to_value(v), param: 10, })
+    args.push({ name: Some("above"), value: ToValue::to_value(v), param: 10 })
   }
   if below is Some(v) {
-    args.push({ name: Some("below"), value: ToValue::to_value(v), param: 11, })
+    args.push({ name: Some("below"), value: ToValue::to_value(v), param: 11 })
   }
   if clip is Some(v) {
-    args.push({ name: Some("clip"), value: Value::bool(v), param: 12, })
+    args.push({ name: Some("clip"), value: Value::bool(v), param: 12 })
   }
   if sticky is Some(v) {
-    args.push({ name: Some("sticky"), value: Value::bool(v), param: 13, })
+    args.push({ name: Some("sticky"), value: Value::bool(v), param: 13 })
   }
   push_extra(args, extra, 14, positional=["body"])
-  {
-    node: {
-      func: FElem(@library.block_elem()),
-      args,
-      origin: Site::new("SetBlock", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.block_elem()), args, origin: Site::new("SetBlock", loc, args_loc) } }
 }
 
 ///|
@@ -6289,9 +5665,7 @@ pub fn Select::block(
   if sticky is Some(v) {
     fields.push(("sticky", Value::bool(v)))
   }
-  elem_selector(@library.block_elem(), fields, content => BlockView::{
-    content,
-  })
+  elem_selector(@library.block_elem(), fields, content => BlockView::{ content, })
 }
 
 ///|
@@ -6325,42 +5699,38 @@ pub fn Box::Box(
 ) -> Box {
   let args : Array[ArgNode] = []
   if extra_arg(extra, "body") is Some(v) {
-    args.push({ name: None, value: v, param: 9, })
+    args.push({ name: None, value: v, param: 9 })
   } else {
-    args.push({ name: None, value: Value::content(body), param: 0, })
+    args.push({ name: None, value: Value::content(body), param: 0 })
   }
   if width is Some(v) {
-    args.push({ name: Some("width"), value: ToValue::to_value(v), param: 1, })
+    args.push({ name: Some("width"), value: ToValue::to_value(v), param: 1 })
   }
   if height is Some(v) {
-    args.push({ name: Some("height"), value: ToValue::to_value(v), param: 2, })
+    args.push({ name: Some("height"), value: ToValue::to_value(v), param: 2 })
   }
   if fill is Some(v) {
-    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 3, })
+    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 3 })
   }
   if stroke is Some(v) {
-    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 4, })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 4 })
   }
   if radius is Some(v) {
-    args.push({ name: Some("radius"), value: ToValue::to_value(v), param: 5, })
+    args.push({ name: Some("radius"), value: ToValue::to_value(v), param: 5 })
   }
   if inset is Some(v) {
-    args.push({ name: Some("inset"), value: ToValue::to_value(v), param: 6, })
+    args.push({ name: Some("inset"), value: ToValue::to_value(v), param: 6 })
   }
   if outset is Some(v) {
-    args.push({ name: Some("outset"), value: ToValue::to_value(v), param: 7, })
+    args.push({ name: Some("outset"), value: ToValue::to_value(v), param: 7 })
   }
   if clip is Some(v) {
-    args.push({ name: Some("clip"), value: Value::bool(v), param: 8, })
+    args.push({ name: Some("clip"), value: Value::bool(v), param: 8 })
   }
   push_extra(args, extra, 9, positional=["body"])
   {
     content: labelled_call(
-      {
-        func: FElem(@library.box_elem()),
-        args,
-        origin: Site::new("Box", loc, args_loc),
-      },
+      { func: FElem(@library.box_elem()), args, origin: Site::new("Box", loc, args_loc) },
       label,
       10,
     ),
@@ -6400,42 +5770,36 @@ pub fn SetBox::SetBox(
 ) -> SetBox {
   let args : Array[ArgNode] = []
   if extra_arg(extra, "body") is Some(v) {
-    args.push({ name: None, value: v, param: 9, })
+    args.push({ name: None, value: v, param: 9 })
   } else if body is Some(v) {
-    args.push({ name: None, value: Value::content(v), param: 0, })
+    args.push({ name: None, value: Value::content(v), param: 0 })
   }
   if width is Some(v) {
-    args.push({ name: Some("width"), value: ToValue::to_value(v), param: 1, })
+    args.push({ name: Some("width"), value: ToValue::to_value(v), param: 1 })
   }
   if height is Some(v) {
-    args.push({ name: Some("height"), value: ToValue::to_value(v), param: 2, })
+    args.push({ name: Some("height"), value: ToValue::to_value(v), param: 2 })
   }
   if fill is Some(v) {
-    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 3, })
+    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 3 })
   }
   if stroke is Some(v) {
-    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 4, })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 4 })
   }
   if radius is Some(v) {
-    args.push({ name: Some("radius"), value: ToValue::to_value(v), param: 5, })
+    args.push({ name: Some("radius"), value: ToValue::to_value(v), param: 5 })
   }
   if inset is Some(v) {
-    args.push({ name: Some("inset"), value: ToValue::to_value(v), param: 6, })
+    args.push({ name: Some("inset"), value: ToValue::to_value(v), param: 6 })
   }
   if outset is Some(v) {
-    args.push({ name: Some("outset"), value: ToValue::to_value(v), param: 7, })
+    args.push({ name: Some("outset"), value: ToValue::to_value(v), param: 7 })
   }
   if clip is Some(v) {
-    args.push({ name: Some("clip"), value: Value::bool(v), param: 8, })
+    args.push({ name: Some("clip"), value: Value::bool(v), param: 8 })
   }
   push_extra(args, extra, 9, positional=["body"])
-  {
-    node: {
-      func: FElem(@library.box_elem()),
-      args,
-      origin: Site::new("SetBox", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.box_elem()), args, origin: Site::new("SetBox", loc, args_loc) } }
 }
 
 ///|
@@ -6531,36 +5895,32 @@ pub fn Pad::Pad(
   args_loc~ : ArgsLoc,
 ) -> Pad {
   let args : Array[ArgNode] = []
-  args.push({ name: None, value: Value::content(body), param: 0, })
+  args.push({ name: None, value: Value::content(body), param: 0 })
   if left is Some(v) {
-    args.push({ name: Some("left"), value: ToValue::to_value(v), param: 1, })
+    args.push({ name: Some("left"), value: ToValue::to_value(v), param: 1 })
   }
   if top is Some(v) {
-    args.push({ name: Some("top"), value: ToValue::to_value(v), param: 2, })
+    args.push({ name: Some("top"), value: ToValue::to_value(v), param: 2 })
   }
   if right is Some(v) {
-    args.push({ name: Some("right"), value: ToValue::to_value(v), param: 3, })
+    args.push({ name: Some("right"), value: ToValue::to_value(v), param: 3 })
   }
   if bottom is Some(v) {
-    args.push({ name: Some("bottom"), value: ToValue::to_value(v), param: 4, })
+    args.push({ name: Some("bottom"), value: ToValue::to_value(v), param: 4 })
   }
   if x is Some(v) {
-    args.push({ name: Some("x"), value: ToValue::to_value(v), param: 5, })
+    args.push({ name: Some("x"), value: ToValue::to_value(v), param: 5 })
   }
   if y is Some(v) {
-    args.push({ name: Some("y"), value: ToValue::to_value(v), param: 6, })
+    args.push({ name: Some("y"), value: ToValue::to_value(v), param: 6 })
   }
   if rest is Some(v) {
-    args.push({ name: Some("rest"), value: ToValue::to_value(v), param: 7, })
+    args.push({ name: Some("rest"), value: ToValue::to_value(v), param: 7 })
   }
   push_extra(args, extra, 8)
   {
     content: labelled_call(
-      {
-        func: FElem(@library.pad_elem()),
-        args,
-        origin: Site::new("Pad", loc, args_loc),
-      },
+      { func: FElem(@library.pad_elem()), args, origin: Site::new("Pad", loc, args_loc) },
       label,
       9,
     ),
@@ -6594,34 +5954,28 @@ pub fn SetPad::SetPad(
 ) -> SetPad {
   let args : Array[ArgNode] = []
   if left is Some(v) {
-    args.push({ name: Some("left"), value: ToValue::to_value(v), param: 0, })
+    args.push({ name: Some("left"), value: ToValue::to_value(v), param: 0 })
   }
   if top is Some(v) {
-    args.push({ name: Some("top"), value: ToValue::to_value(v), param: 1, })
+    args.push({ name: Some("top"), value: ToValue::to_value(v), param: 1 })
   }
   if right is Some(v) {
-    args.push({ name: Some("right"), value: ToValue::to_value(v), param: 2, })
+    args.push({ name: Some("right"), value: ToValue::to_value(v), param: 2 })
   }
   if bottom is Some(v) {
-    args.push({ name: Some("bottom"), value: ToValue::to_value(v), param: 3, })
+    args.push({ name: Some("bottom"), value: ToValue::to_value(v), param: 3 })
   }
   if x is Some(v) {
-    args.push({ name: Some("x"), value: ToValue::to_value(v), param: 4, })
+    args.push({ name: Some("x"), value: ToValue::to_value(v), param: 4 })
   }
   if y is Some(v) {
-    args.push({ name: Some("y"), value: ToValue::to_value(v), param: 5, })
+    args.push({ name: Some("y"), value: ToValue::to_value(v), param: 5 })
   }
   if rest is Some(v) {
-    args.push({ name: Some("rest"), value: ToValue::to_value(v), param: 6, })
+    args.push({ name: Some("rest"), value: ToValue::to_value(v), param: 6 })
   }
   push_extra(args, extra, 7)
-  {
-    node: {
-      func: FElem(@library.pad_elem()),
-      args,
-      origin: Site::new("SetPad", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.pad_elem()), args, origin: Site::new("SetPad", loc, args_loc) } }
 }
 
 ///|
@@ -6722,38 +6076,30 @@ pub fn Place::Place(
 ) -> Place {
   let args : Array[ArgNode] = []
   if extra_arg(extra, "alignment") is Some(v) {
-    args.push({ name: None, value: v, param: 7, })
+    args.push({ name: None, value: v, param: 7 })
   } else if alignment is Some(v) {
-    args.push({ name: None, value: ToValue::to_value(v), param: 1, })
+    args.push({ name: None, value: ToValue::to_value(v), param: 1 })
   }
-  args.push({ name: None, value: Value::content(body), param: 0, })
+  args.push({ name: None, value: Value::content(body), param: 0 })
   if scope is Some(v) {
-    args.push({ name: Some("scope"), value: Value::str(v), param: 2, })
+    args.push({ name: Some("scope"), value: Value::str(v), param: 2 })
   }
   if float is Some(v) {
-    args.push({ name: Some("float"), value: Value::bool(v), param: 3, })
+    args.push({ name: Some("float"), value: Value::bool(v), param: 3 })
   }
   if clearance is Some(v) {
-    args.push({
-      name: Some("clearance"),
-      value: ToValue::to_value(v),
-      param: 4,
-    })
+    args.push({ name: Some("clearance"), value: ToValue::to_value(v), param: 4 })
   }
   if dx is Some(v) {
-    args.push({ name: Some("dx"), value: ToValue::to_value(v), param: 5, })
+    args.push({ name: Some("dx"), value: ToValue::to_value(v), param: 5 })
   }
   if dy is Some(v) {
-    args.push({ name: Some("dy"), value: ToValue::to_value(v), param: 6, })
+    args.push({ name: Some("dy"), value: ToValue::to_value(v), param: 6 })
   }
   push_extra(args, extra, 7, positional=["alignment"])
   {
     content: labelled_call(
-      {
-        func: FElem(@library.place_elem()),
-        args,
-        origin: Site::new("Place", loc, args_loc),
-      },
+      { func: FElem(@library.place_elem()), args, origin: Site::new("Place", loc, args_loc) },
       label,
       8,
     ),
@@ -6789,37 +6135,27 @@ pub fn SetPlace::SetPlace(
 ) -> SetPlace {
   let args : Array[ArgNode] = []
   if extra_arg(extra, "alignment") is Some(v) {
-    args.push({ name: None, value: v, param: 6, })
+    args.push({ name: None, value: v, param: 6 })
   } else if alignment is Some(v) {
-    args.push({ name: None, value: ToValue::to_value(v), param: 0, })
+    args.push({ name: None, value: ToValue::to_value(v), param: 0 })
   }
   if scope is Some(v) {
-    args.push({ name: Some("scope"), value: Value::str(v), param: 1, })
+    args.push({ name: Some("scope"), value: Value::str(v), param: 1 })
   }
   if float is Some(v) {
-    args.push({ name: Some("float"), value: Value::bool(v), param: 2, })
+    args.push({ name: Some("float"), value: Value::bool(v), param: 2 })
   }
   if clearance is Some(v) {
-    args.push({
-      name: Some("clearance"),
-      value: ToValue::to_value(v),
-      param: 3,
-    })
+    args.push({ name: Some("clearance"), value: ToValue::to_value(v), param: 3 })
   }
   if dx is Some(v) {
-    args.push({ name: Some("dx"), value: ToValue::to_value(v), param: 4, })
+    args.push({ name: Some("dx"), value: ToValue::to_value(v), param: 4 })
   }
   if dy is Some(v) {
-    args.push({ name: Some("dy"), value: ToValue::to_value(v), param: 5, })
+    args.push({ name: Some("dy"), value: ToValue::to_value(v), param: 5 })
   }
   push_extra(args, extra, 6, positional=["alignment"])
-  {
-    node: {
-      func: FElem(@library.place_elem()),
-      args,
-      origin: Site::new("SetPlace", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.place_elem()), args, origin: Site::new("SetPlace", loc, args_loc) } }
 }
 
 ///|
@@ -6850,9 +6186,7 @@ pub fn PlaceView::view(self : PlaceView) -> ContentView {
 
 ///|
 /// The `body` of the element.
-pub fn PlaceView::body(
-  self : PlaceView,
-) -> ContentView raise @library.HintedError {
+pub fn PlaceView::body(self : PlaceView) -> ContentView raise @library.HintedError {
   ContentView::new(self.content.field_by_name("body").cast())
 }
 
@@ -6882,9 +6216,7 @@ pub fn Select::place(
   if dy is Some(v) {
     fields.push(("dy", ToValue::to_value(v)))
   }
-  elem_selector(@library.place_elem(), fields, content => PlaceView::{
-    content,
-  })
+  elem_selector(@library.place_elem(), fields, content => PlaceView::{ content, })
 }
 
 ///|
@@ -6909,22 +6241,18 @@ pub fn Stack::Stack(
 ) -> Stack {
   let args : Array[ArgNode] = []
   if dir is Some(v) {
-    args.push({ name: Some("dir"), value: ToValue::to_value(v), param: 1, })
+    args.push({ name: Some("dir"), value: ToValue::to_value(v), param: 1 })
   }
   if spacing is Some(v) {
-    args.push({ name: Some("spacing"), value: ToValue::to_value(v), param: 2, })
+    args.push({ name: Some("spacing"), value: ToValue::to_value(v), param: 2 })
   }
   for child in children {
-    args.push({ name: None, value: Value::content(child), param: 0, })
+    args.push({ name: None, value: Value::content(child), param: 0 })
   }
   push_extra(args, extra, 3)
   {
     content: labelled_call(
-      {
-        func: FElem(@library.stack_elem()),
-        args,
-        origin: Site::new("Stack", loc, args_loc),
-      },
+      { func: FElem(@library.stack_elem()), args, origin: Site::new("Stack", loc, args_loc) },
       label,
       4,
     ),
@@ -6956,19 +6284,13 @@ pub fn SetStack::SetStack(
 ) -> SetStack {
   let args : Array[ArgNode] = []
   if dir is Some(v) {
-    args.push({ name: Some("dir"), value: ToValue::to_value(v), param: 0, })
+    args.push({ name: Some("dir"), value: ToValue::to_value(v), param: 0 })
   }
   if spacing is Some(v) {
-    args.push({ name: Some("spacing"), value: ToValue::to_value(v), param: 1, })
+    args.push({ name: Some("spacing"), value: ToValue::to_value(v), param: 1 })
   }
   push_extra(args, extra, 2)
-  {
-    node: {
-      func: FElem(@library.stack_elem()),
-      args,
-      origin: Site::new("SetStack", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.stack_elem()), args, origin: Site::new("SetStack", loc, args_loc) } }
 }
 
 ///|
@@ -7000,7 +6322,10 @@ pub fn StackView::view(self : StackView) -> ContentView {
 ///|
 /// The `stack` elements; with arguments, those whose fields have the given
 /// values (`stack.where(..)`).
-pub fn Select::stack(dir? : Dir, spacing? : Spacing) -> Selector[StackView] {
+pub fn Select::stack(
+  dir? : Dir,
+  spacing? : Spacing,
+) -> Selector[StackView] {
   let fields : Array[(String, Value)] = []
   if dir is Some(v) {
     fields.push(("dir", ToValue::to_value(v)))
@@ -7008,9 +6333,7 @@ pub fn Select::stack(dir? : Dir, spacing? : Spacing) -> Selector[StackView] {
   if spacing is Some(v) {
     fields.push(("spacing", ToValue::to_value(v)))
   }
-  elem_selector(@library.stack_elem(), fields, content => StackView::{
-    content,
-  })
+  elem_selector(@library.stack_elem(), fields, content => StackView::{ content, })
 }
 
 ///|
@@ -7041,51 +6364,39 @@ pub fn Grid::Grid(
 ) -> Grid {
   let args : Array[ArgNode] = []
   if columns is Some(v) {
-    args.push({ name: Some("columns"), value: ToValue::to_value(v), param: 1, })
+    args.push({ name: Some("columns"), value: ToValue::to_value(v), param: 1 })
   }
   if rows is Some(v) {
-    args.push({ name: Some("rows"), value: ToValue::to_value(v), param: 2, })
+    args.push({ name: Some("rows"), value: ToValue::to_value(v), param: 2 })
   }
   if gutter is Some(v) {
-    args.push({ name: Some("gutter"), value: ToValue::to_value(v), param: 3, })
+    args.push({ name: Some("gutter"), value: ToValue::to_value(v), param: 3 })
   }
   if column_gutter is Some(v) {
-    args.push({
-      name: Some("column-gutter"),
-      value: ToValue::to_value(v),
-      param: 4,
-    })
+    args.push({ name: Some("column-gutter"), value: ToValue::to_value(v), param: 4 })
   }
   if row_gutter is Some(v) {
-    args.push({
-      name: Some("row-gutter"),
-      value: ToValue::to_value(v),
-      param: 5,
-    })
+    args.push({ name: Some("row-gutter"), value: ToValue::to_value(v), param: 5 })
   }
   if inset is Some(v) {
-    args.push({ name: Some("inset"), value: ToValue::to_value(v), param: 6, })
+    args.push({ name: Some("inset"), value: ToValue::to_value(v), param: 6 })
   }
   if align is Some(v) {
-    args.push({ name: Some("align"), value: ToValue::to_value(v), param: 7, })
+    args.push({ name: Some("align"), value: ToValue::to_value(v), param: 7 })
   }
   if fill is Some(v) {
-    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 8, })
+    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 8 })
   }
   if stroke is Some(v) {
-    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 9, })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 9 })
   }
   for child in children {
-    args.push({ name: None, value: Value::content(child), param: 0, })
+    args.push({ name: None, value: Value::content(child), param: 0 })
   }
   push_extra(args, extra, 10)
   {
     content: labelled_call(
-      {
-        func: FElem(@library.grid_elem()),
-        args,
-        origin: Site::new("Grid", loc, args_loc),
-      },
+      { func: FElem(@library.grid_elem()), args, origin: Site::new("Grid", loc, args_loc) },
       label,
       11,
     ),
@@ -7121,48 +6432,34 @@ pub fn SetGrid::SetGrid(
 ) -> SetGrid {
   let args : Array[ArgNode] = []
   if columns is Some(v) {
-    args.push({ name: Some("columns"), value: ToValue::to_value(v), param: 0, })
+    args.push({ name: Some("columns"), value: ToValue::to_value(v), param: 0 })
   }
   if rows is Some(v) {
-    args.push({ name: Some("rows"), value: ToValue::to_value(v), param: 1, })
+    args.push({ name: Some("rows"), value: ToValue::to_value(v), param: 1 })
   }
   if gutter is Some(v) {
-    args.push({ name: Some("gutter"), value: ToValue::to_value(v), param: 2, })
+    args.push({ name: Some("gutter"), value: ToValue::to_value(v), param: 2 })
   }
   if column_gutter is Some(v) {
-    args.push({
-      name: Some("column-gutter"),
-      value: ToValue::to_value(v),
-      param: 3,
-    })
+    args.push({ name: Some("column-gutter"), value: ToValue::to_value(v), param: 3 })
   }
   if row_gutter is Some(v) {
-    args.push({
-      name: Some("row-gutter"),
-      value: ToValue::to_value(v),
-      param: 4,
-    })
+    args.push({ name: Some("row-gutter"), value: ToValue::to_value(v), param: 4 })
   }
   if inset is Some(v) {
-    args.push({ name: Some("inset"), value: ToValue::to_value(v), param: 5, })
+    args.push({ name: Some("inset"), value: ToValue::to_value(v), param: 5 })
   }
   if align is Some(v) {
-    args.push({ name: Some("align"), value: ToValue::to_value(v), param: 6, })
+    args.push({ name: Some("align"), value: ToValue::to_value(v), param: 6 })
   }
   if fill is Some(v) {
-    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 7, })
+    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 7 })
   }
   if stroke is Some(v) {
-    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 8, })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 8 })
   }
   push_extra(args, extra, 9)
-  {
-    node: {
-      func: FElem(@library.grid_elem()),
-      args,
-      origin: Site::new("SetGrid", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.grid_elem()), args, origin: Site::new("SetGrid", loc, args_loc) } }
 }
 
 ///|
@@ -7256,42 +6553,38 @@ pub fn GridCell::GridCell(
   args_loc~ : ArgsLoc,
 ) -> GridCell {
   let args : Array[ArgNode] = []
-  args.push({ name: None, value: Value::content(body), param: 0, })
+  args.push({ name: None, value: Value::content(body), param: 0 })
   if x is Some(v) {
-    args.push({ name: Some("x"), value: Value::int(v), param: 1, })
+    args.push({ name: Some("x"), value: Value::int(v), param: 1 })
   }
   if y is Some(v) {
-    args.push({ name: Some("y"), value: Value::int(v), param: 2, })
+    args.push({ name: Some("y"), value: Value::int(v), param: 2 })
   }
   if colspan is Some(v) {
-    args.push({ name: Some("colspan"), value: Value::int(v), param: 3, })
+    args.push({ name: Some("colspan"), value: Value::int(v), param: 3 })
   }
   if rowspan is Some(v) {
-    args.push({ name: Some("rowspan"), value: Value::int(v), param: 4, })
+    args.push({ name: Some("rowspan"), value: Value::int(v), param: 4 })
   }
   if inset is Some(v) {
-    args.push({ name: Some("inset"), value: ToValue::to_value(v), param: 5, })
+    args.push({ name: Some("inset"), value: ToValue::to_value(v), param: 5 })
   }
   if align is Some(v) {
-    args.push({ name: Some("align"), value: ToValue::to_value(v), param: 6, })
+    args.push({ name: Some("align"), value: ToValue::to_value(v), param: 6 })
   }
   if fill is Some(v) {
-    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 7, })
+    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 7 })
   }
   if stroke is Some(v) {
-    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 8, })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 8 })
   }
   if breakable is Some(v) {
-    args.push({ name: Some("breakable"), value: Value::bool(v), param: 9, })
+    args.push({ name: Some("breakable"), value: Value::bool(v), param: 9 })
   }
   push_extra(args, extra, 10)
   {
     content: labelled_call(
-      {
-        func: FElem(@library.grid_cell_elem()),
-        args,
-        origin: Site::new("GridCell", loc, args_loc),
-      },
+      { func: FElem(@library.grid_cell_elem()), args, origin: Site::new("GridCell", loc, args_loc) },
       label,
       11,
     ),
@@ -7335,40 +6628,34 @@ pub fn SetGridCell::SetGridCell(
 ) -> SetGridCell {
   let args : Array[ArgNode] = []
   if x is Some(v) {
-    args.push({ name: Some("x"), value: Value::int(v), param: 0, })
+    args.push({ name: Some("x"), value: Value::int(v), param: 0 })
   }
   if y is Some(v) {
-    args.push({ name: Some("y"), value: Value::int(v), param: 1, })
+    args.push({ name: Some("y"), value: Value::int(v), param: 1 })
   }
   if colspan is Some(v) {
-    args.push({ name: Some("colspan"), value: Value::int(v), param: 2, })
+    args.push({ name: Some("colspan"), value: Value::int(v), param: 2 })
   }
   if rowspan is Some(v) {
-    args.push({ name: Some("rowspan"), value: Value::int(v), param: 3, })
+    args.push({ name: Some("rowspan"), value: Value::int(v), param: 3 })
   }
   if inset is Some(v) {
-    args.push({ name: Some("inset"), value: ToValue::to_value(v), param: 4, })
+    args.push({ name: Some("inset"), value: ToValue::to_value(v), param: 4 })
   }
   if align is Some(v) {
-    args.push({ name: Some("align"), value: ToValue::to_value(v), param: 5, })
+    args.push({ name: Some("align"), value: ToValue::to_value(v), param: 5 })
   }
   if fill is Some(v) {
-    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 6, })
+    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 6 })
   }
   if stroke is Some(v) {
-    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 7, })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 7 })
   }
   if breakable is Some(v) {
-    args.push({ name: Some("breakable"), value: Value::bool(v), param: 8, })
+    args.push({ name: Some("breakable"), value: Value::bool(v), param: 8 })
   }
   push_extra(args, extra, 9)
-  {
-    node: {
-      func: FElem(@library.grid_cell_elem()),
-      args,
-      origin: Site::new("SetGridCell", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.grid_cell_elem()), args, origin: Site::new("SetGridCell", loc, args_loc) } }
 }
 
 ///|
@@ -7399,9 +6686,7 @@ pub fn GridCellView::view(self : GridCellView) -> ContentView {
 
 ///|
 /// The `body` of the element.
-pub fn GridCellView::body(
-  self : GridCellView,
-) -> ContentView raise @library.HintedError {
+pub fn GridCellView::body(self : GridCellView) -> ContentView raise @library.HintedError {
   ContentView::new(self.content.field_by_name("body").cast())
 }
 
@@ -7447,9 +6732,7 @@ pub fn Select::grid_cell(
   if breakable is Some(v) {
     fields.push(("breakable", Value::bool(v)))
   }
-  elem_selector(@library.grid_cell_elem(), fields, content => GridCellView::{
-    content,
-  })
+  elem_selector(@library.grid_cell_elem(), fields, content => GridCellView::{ content, })
 }
 
 ///|
@@ -7471,22 +6754,18 @@ pub fn GridHeader::GridHeader(
 ) -> GridHeader {
   let args : Array[ArgNode] = []
   if repeat is Some(v) {
-    args.push({ name: Some("repeat"), value: Value::bool(v), param: 1, })
+    args.push({ name: Some("repeat"), value: Value::bool(v), param: 1 })
   }
   if level is Some(v) {
-    args.push({ name: Some("level"), value: Value::int(v), param: 2, })
+    args.push({ name: Some("level"), value: Value::int(v), param: 2 })
   }
   for child in children {
-    args.push({ name: None, value: Value::content(child), param: 0, })
+    args.push({ name: None, value: Value::content(child), param: 0 })
   }
   push_extra(args, extra, 3)
   {
     content: labelled_call(
-      {
-        func: FElem(@library.grid_header_elem()),
-        args,
-        origin: Site::new("GridHeader", loc, args_loc),
-      },
+      { func: FElem(@library.grid_header_elem()), args, origin: Site::new("GridHeader", loc, args_loc) },
       label,
       4,
     ),
@@ -7515,19 +6794,13 @@ pub fn SetGridHeader::SetGridHeader(
 ) -> SetGridHeader {
   let args : Array[ArgNode] = []
   if repeat is Some(v) {
-    args.push({ name: Some("repeat"), value: Value::bool(v), param: 0, })
+    args.push({ name: Some("repeat"), value: Value::bool(v), param: 0 })
   }
   if level is Some(v) {
-    args.push({ name: Some("level"), value: Value::int(v), param: 1, })
+    args.push({ name: Some("level"), value: Value::int(v), param: 1 })
   }
   push_extra(args, extra, 2)
-  {
-    node: {
-      func: FElem(@library.grid_header_elem()),
-      args,
-      origin: Site::new("SetGridHeader", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.grid_header_elem()), args, origin: Site::new("SetGridHeader", loc, args_loc) } }
 }
 
 ///|
@@ -7570,9 +6843,7 @@ pub fn Select::grid_header(
   if level is Some(v) {
     fields.push(("level", Value::int(v)))
   }
-  elem_selector(@library.grid_header_elem(), fields, content => GridHeaderView::{
-    content,
-  })
+  elem_selector(@library.grid_header_elem(), fields, content => GridHeaderView::{ content, })
 }
 
 ///|
@@ -7593,19 +6864,15 @@ pub fn GridFooter::GridFooter(
 ) -> GridFooter {
   let args : Array[ArgNode] = []
   if repeat is Some(v) {
-    args.push({ name: Some("repeat"), value: Value::bool(v), param: 1, })
+    args.push({ name: Some("repeat"), value: Value::bool(v), param: 1 })
   }
   for child in children {
-    args.push({ name: None, value: Value::content(child), param: 0, })
+    args.push({ name: None, value: Value::content(child), param: 0 })
   }
   push_extra(args, extra, 2)
   {
     content: labelled_call(
-      {
-        func: FElem(@library.grid_footer_elem()),
-        args,
-        origin: Site::new("GridFooter", loc, args_loc),
-      },
+      { func: FElem(@library.grid_footer_elem()), args, origin: Site::new("GridFooter", loc, args_loc) },
       label,
       3,
     ),
@@ -7633,16 +6900,10 @@ pub fn SetGridFooter::SetGridFooter(
 ) -> SetGridFooter {
   let args : Array[ArgNode] = []
   if repeat is Some(v) {
-    args.push({ name: Some("repeat"), value: Value::bool(v), param: 0, })
+    args.push({ name: Some("repeat"), value: Value::bool(v), param: 0 })
   }
   push_extra(args, extra, 1)
-  {
-    node: {
-      func: FElem(@library.grid_footer_elem()),
-      args,
-      origin: Site::new("SetGridFooter", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.grid_footer_elem()), args, origin: Site::new("SetGridFooter", loc, args_loc) } }
 }
 
 ///|
@@ -7674,14 +6935,14 @@ pub fn GridFooterView::view(self : GridFooterView) -> ContentView {
 ///|
 /// The `grid.footer` elements; with arguments, those whose fields have the
 /// given values (`grid.footer.where(..)`).
-pub fn Select::grid_footer(repeat? : Bool) -> Selector[GridFooterView] {
+pub fn Select::grid_footer(
+  repeat? : Bool,
+) -> Selector[GridFooterView] {
   let fields : Array[(String, Value)] = []
   if repeat is Some(v) {
     fields.push(("repeat", Value::bool(v)))
   }
-  elem_selector(@library.grid_footer_elem(), fields, content => GridFooterView::{
-    content,
-  })
+  elem_selector(@library.grid_footer_elem(), fields, content => GridFooterView::{ content, })
 }
 
 ///|
@@ -7710,28 +6971,24 @@ pub fn GridHline::GridHline(
 ) -> GridHline {
   let args : Array[ArgNode] = []
   if y is Some(v) {
-    args.push({ name: Some("y"), value: Value::int(v), param: 0, })
+    args.push({ name: Some("y"), value: Value::int(v), param: 0 })
   }
   if start is Some(v) {
-    args.push({ name: Some("start"), value: Value::int(v), param: 1, })
+    args.push({ name: Some("start"), value: Value::int(v), param: 1 })
   }
   if end_ is Some(v) {
-    args.push({ name: Some("end"), value: Value::int(v), param: 2, })
+    args.push({ name: Some("end"), value: Value::int(v), param: 2 })
   }
   if stroke is Some(v) {
-    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 3, })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 3 })
   }
   if position is Some(v) {
-    args.push({ name: Some("position"), value: ToValue::to_value(v), param: 4, })
+    args.push({ name: Some("position"), value: ToValue::to_value(v), param: 4 })
   }
   push_extra(args, extra, 5)
   {
     content: labelled_call(
-      {
-        func: FElem(@library.grid_h_line_elem()),
-        args,
-        origin: Site::new("GridHline", loc, args_loc),
-      },
+      { func: FElem(@library.grid_h_line_elem()), args, origin: Site::new("GridHline", loc, args_loc) },
       label,
       6,
     ),
@@ -7768,28 +7025,22 @@ pub fn SetGridHline::SetGridHline(
 ) -> SetGridHline {
   let args : Array[ArgNode] = []
   if y is Some(v) {
-    args.push({ name: Some("y"), value: Value::int(v), param: 0, })
+    args.push({ name: Some("y"), value: Value::int(v), param: 0 })
   }
   if start is Some(v) {
-    args.push({ name: Some("start"), value: Value::int(v), param: 1, })
+    args.push({ name: Some("start"), value: Value::int(v), param: 1 })
   }
   if end_ is Some(v) {
-    args.push({ name: Some("end"), value: Value::int(v), param: 2, })
+    args.push({ name: Some("end"), value: Value::int(v), param: 2 })
   }
   if stroke is Some(v) {
-    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 3, })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 3 })
   }
   if position is Some(v) {
-    args.push({ name: Some("position"), value: ToValue::to_value(v), param: 4, })
+    args.push({ name: Some("position"), value: ToValue::to_value(v), param: 4 })
   }
   push_extra(args, extra, 5)
-  {
-    node: {
-      func: FElem(@library.grid_h_line_elem()),
-      args,
-      origin: Site::new("SetGridHline", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.grid_h_line_elem()), args, origin: Site::new("SetGridHline", loc, args_loc) } }
 }
 
 ///|
@@ -7844,9 +7095,7 @@ pub fn Select::grid_hline(
   if position is Some(v) {
     fields.push(("position", ToValue::to_value(v)))
   }
-  elem_selector(@library.grid_h_line_elem(), fields, content => GridHlineView::{
-    content,
-  })
+  elem_selector(@library.grid_h_line_elem(), fields, content => GridHlineView::{ content, })
 }
 
 ///|
@@ -7875,28 +7124,24 @@ pub fn GridVline::GridVline(
 ) -> GridVline {
   let args : Array[ArgNode] = []
   if x is Some(v) {
-    args.push({ name: Some("x"), value: Value::int(v), param: 0, })
+    args.push({ name: Some("x"), value: Value::int(v), param: 0 })
   }
   if start is Some(v) {
-    args.push({ name: Some("start"), value: Value::int(v), param: 1, })
+    args.push({ name: Some("start"), value: Value::int(v), param: 1 })
   }
   if end_ is Some(v) {
-    args.push({ name: Some("end"), value: Value::int(v), param: 2, })
+    args.push({ name: Some("end"), value: Value::int(v), param: 2 })
   }
   if stroke is Some(v) {
-    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 3, })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 3 })
   }
   if position is Some(v) {
-    args.push({ name: Some("position"), value: ToValue::to_value(v), param: 4, })
+    args.push({ name: Some("position"), value: ToValue::to_value(v), param: 4 })
   }
   push_extra(args, extra, 5)
   {
     content: labelled_call(
-      {
-        func: FElem(@library.grid_v_line_elem()),
-        args,
-        origin: Site::new("GridVline", loc, args_loc),
-      },
+      { func: FElem(@library.grid_v_line_elem()), args, origin: Site::new("GridVline", loc, args_loc) },
       label,
       6,
     ),
@@ -7933,28 +7178,22 @@ pub fn SetGridVline::SetGridVline(
 ) -> SetGridVline {
   let args : Array[ArgNode] = []
   if x is Some(v) {
-    args.push({ name: Some("x"), value: Value::int(v), param: 0, })
+    args.push({ name: Some("x"), value: Value::int(v), param: 0 })
   }
   if start is Some(v) {
-    args.push({ name: Some("start"), value: Value::int(v), param: 1, })
+    args.push({ name: Some("start"), value: Value::int(v), param: 1 })
   }
   if end_ is Some(v) {
-    args.push({ name: Some("end"), value: Value::int(v), param: 2, })
+    args.push({ name: Some("end"), value: Value::int(v), param: 2 })
   }
   if stroke is Some(v) {
-    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 3, })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 3 })
   }
   if position is Some(v) {
-    args.push({ name: Some("position"), value: ToValue::to_value(v), param: 4, })
+    args.push({ name: Some("position"), value: ToValue::to_value(v), param: 4 })
   }
   push_extra(args, extra, 5)
-  {
-    node: {
-      func: FElem(@library.grid_v_line_elem()),
-      args,
-      origin: Site::new("SetGridVline", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.grid_v_line_elem()), args, origin: Site::new("SetGridVline", loc, args_loc) } }
 }
 
 ///|
@@ -8009,9 +7248,7 @@ pub fn Select::grid_vline(
   if position is Some(v) {
     fields.push(("position", ToValue::to_value(v)))
   }
-  elem_selector(@library.grid_v_line_elem(), fields, content => GridVlineView::{
-    content,
-  })
+  elem_selector(@library.grid_v_line_elem(), fields, content => GridVlineView::{ content, })
 }
 
 ///|
@@ -8041,28 +7278,24 @@ pub fn Columns::Columns(
 ) -> Columns {
   let args : Array[ArgNode] = []
   if extra_arg(extra, "count") is Some(v) {
-    args.push({ name: None, value: v, param: 5, })
+    args.push({ name: None, value: v, param: 5 })
   } else if count is Some(v) {
-    args.push({ name: None, value: Value::int(v), param: 1, })
+    args.push({ name: None, value: Value::int(v), param: 1 })
   }
-  args.push({ name: None, value: Value::content(body), param: 0, })
+  args.push({ name: None, value: Value::content(body), param: 0 })
   if gutter is Some(v) {
-    args.push({ name: Some("gutter"), value: ToValue::to_value(v), param: 2, })
+    args.push({ name: Some("gutter"), value: ToValue::to_value(v), param: 2 })
   }
   if balanced is Some(v) {
-    args.push({ name: Some("balanced"), value: Value::bool(v), param: 3, })
+    args.push({ name: Some("balanced"), value: Value::bool(v), param: 3 })
   }
   if separator is Some(v) {
-    args.push({ name: Some("separator"), value: Value::content(v), param: 4, })
+    args.push({ name: Some("separator"), value: Value::content(v), param: 4 })
   }
   push_extra(args, extra, 5, positional=["count"])
   {
     content: labelled_call(
-      {
-        func: FElem(@library.columns_elem()),
-        args,
-        origin: Site::new("Columns", loc, args_loc),
-      },
+      { func: FElem(@library.columns_elem()), args, origin: Site::new("Columns", loc, args_loc) },
       label,
       6,
     ),
@@ -8096,27 +7329,21 @@ pub fn SetColumns::SetColumns(
 ) -> SetColumns {
   let args : Array[ArgNode] = []
   if extra_arg(extra, "count") is Some(v) {
-    args.push({ name: None, value: v, param: 4, })
+    args.push({ name: None, value: v, param: 4 })
   } else if count is Some(v) {
-    args.push({ name: None, value: Value::int(v), param: 0, })
+    args.push({ name: None, value: Value::int(v), param: 0 })
   }
   if gutter is Some(v) {
-    args.push({ name: Some("gutter"), value: ToValue::to_value(v), param: 1, })
+    args.push({ name: Some("gutter"), value: ToValue::to_value(v), param: 1 })
   }
   if balanced is Some(v) {
-    args.push({ name: Some("balanced"), value: Value::bool(v), param: 2, })
+    args.push({ name: Some("balanced"), value: Value::bool(v), param: 2 })
   }
   if separator is Some(v) {
-    args.push({ name: Some("separator"), value: Value::content(v), param: 3, })
+    args.push({ name: Some("separator"), value: Value::content(v), param: 3 })
   }
   push_extra(args, extra, 4, positional=["count"])
-  {
-    node: {
-      func: FElem(@library.columns_elem()),
-      args,
-      origin: Site::new("SetColumns", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.columns_elem()), args, origin: Site::new("SetColumns", loc, args_loc) } }
 }
 
 ///|
@@ -8147,9 +7374,7 @@ pub fn ColumnsView::view(self : ColumnsView) -> ContentView {
 
 ///|
 /// The `body` of the element.
-pub fn ColumnsView::body(
-  self : ColumnsView,
-) -> ContentView raise @library.HintedError {
+pub fn ColumnsView::body(self : ColumnsView) -> ContentView raise @library.HintedError {
   ContentView::new(self.content.field_by_name("body").cast())
 }
 
@@ -8167,9 +7392,7 @@ pub fn Select::columns(
   if balanced is Some(v) {
     fields.push(("balanced", Value::bool(v)))
   }
-  elem_selector(@library.columns_elem(), fields, content => ColumnsView::{
-    content,
-  })
+  elem_selector(@library.columns_elem(), fields, content => ColumnsView::{ content, })
 }
 
 ///|
@@ -8189,16 +7412,12 @@ pub fn Colbreak::Colbreak(
 ) -> Colbreak {
   let args : Array[ArgNode] = []
   if weak is Some(v) {
-    args.push({ name: Some("weak"), value: Value::bool(v), param: 0, })
+    args.push({ name: Some("weak"), value: Value::bool(v), param: 0 })
   }
   push_extra(args, extra, 1)
   {
     content: labelled_call(
-      {
-        func: FElem(@library.colbreak_elem()),
-        args,
-        origin: Site::new("Colbreak", loc, args_loc),
-      },
+      { func: FElem(@library.colbreak_elem()), args, origin: Site::new("Colbreak", loc, args_loc) },
       label,
       2,
     ),
@@ -8226,16 +7445,10 @@ pub fn SetColbreak::SetColbreak(
 ) -> SetColbreak {
   let args : Array[ArgNode] = []
   if weak is Some(v) {
-    args.push({ name: Some("weak"), value: Value::bool(v), param: 0, })
+    args.push({ name: Some("weak"), value: Value::bool(v), param: 0 })
   }
   push_extra(args, extra, 1)
-  {
-    node: {
-      func: FElem(@library.colbreak_elem()),
-      args,
-      origin: Site::new("SetColbreak", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.colbreak_elem()), args, origin: Site::new("SetColbreak", loc, args_loc) } }
 }
 
 ///|
@@ -8267,14 +7480,14 @@ pub fn ColbreakView::view(self : ColbreakView) -> ContentView {
 ///|
 /// The `colbreak` elements; with arguments, those whose fields have the given
 /// values (`colbreak.where(..)`).
-pub fn Select::colbreak(weak? : Bool) -> Selector[ColbreakView] {
+pub fn Select::colbreak(
+  weak? : Bool,
+) -> Selector[ColbreakView] {
   let fields : Array[(String, Value)] = []
   if weak is Some(v) {
     fields.push(("weak", Value::bool(v)))
   }
-  elem_selector(@library.colbreak_elem(), fields, content => ColbreakView::{
-    content,
-  })
+  elem_selector(@library.colbreak_elem(), fields, content => ColbreakView::{ content, })
 }
 
 ///|
@@ -8294,18 +7507,14 @@ pub fn H::H(
   args_loc~ : ArgsLoc,
 ) -> H {
   let args : Array[ArgNode] = []
-  args.push({ name: None, value: ToValue::to_value(amount), param: 0, })
+  args.push({ name: None, value: ToValue::to_value(amount), param: 0 })
   if weak is Some(v) {
-    args.push({ name: Some("weak"), value: Value::bool(v), param: 1, })
+    args.push({ name: Some("weak"), value: Value::bool(v), param: 1 })
   }
   push_extra(args, extra, 2)
   {
     content: labelled_call(
-      {
-        func: FElem(@library.h_elem()),
-        args,
-        origin: Site::new("H", loc, args_loc),
-      },
+      { func: FElem(@library.h_elem()), args, origin: Site::new("H", loc, args_loc) },
       label,
       3,
     ),
@@ -8333,16 +7542,10 @@ pub fn SetH::SetH(
 ) -> SetH {
   let args : Array[ArgNode] = []
   if weak is Some(v) {
-    args.push({ name: Some("weak"), value: Value::bool(v), param: 0, })
+    args.push({ name: Some("weak"), value: Value::bool(v), param: 0 })
   }
   push_extra(args, extra, 1)
-  {
-    node: {
-      func: FElem(@library.h_elem()),
-      args,
-      origin: Site::new("SetH", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.h_elem()), args, origin: Site::new("SetH", loc, args_loc) } }
 }
 
 ///|
@@ -8374,7 +7577,9 @@ pub fn HView::view(self : HView) -> ContentView {
 ///|
 /// The `h` elements; with arguments, those whose fields have the given values
 /// (`h.where(..)`).
-pub fn Select::h(weak? : Bool) -> Selector[HView] {
+pub fn Select::h(
+  weak? : Bool,
+) -> Selector[HView] {
   let fields : Array[(String, Value)] = []
   if weak is Some(v) {
     fields.push(("weak", Value::bool(v)))
@@ -8402,18 +7607,14 @@ pub fn V::V(
   args_loc~ : ArgsLoc,
 ) -> V {
   let args : Array[ArgNode] = []
-  args.push({ name: None, value: ToValue::to_value(amount), param: 0, })
+  args.push({ name: None, value: ToValue::to_value(amount), param: 0 })
   if weak is Some(v) {
-    args.push({ name: Some("weak"), value: Value::bool(v), param: 1, })
+    args.push({ name: Some("weak"), value: Value::bool(v), param: 1 })
   }
   push_extra(args, extra, 2)
   {
     content: labelled_call(
-      {
-        func: FElem(@library.v_elem()),
-        args,
-        origin: Site::new("V", loc, args_loc),
-      },
+      { func: FElem(@library.v_elem()), args, origin: Site::new("V", loc, args_loc) },
       label,
       3,
     ),
@@ -8441,16 +7642,10 @@ pub fn SetV::SetV(
 ) -> SetV {
   let args : Array[ArgNode] = []
   if weak is Some(v) {
-    args.push({ name: Some("weak"), value: Value::bool(v), param: 0, })
+    args.push({ name: Some("weak"), value: Value::bool(v), param: 0 })
   }
   push_extra(args, extra, 1)
-  {
-    node: {
-      func: FElem(@library.v_elem()),
-      args,
-      origin: Site::new("SetV", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.v_elem()), args, origin: Site::new("SetV", loc, args_loc) } }
 }
 
 ///|
@@ -8482,7 +7677,9 @@ pub fn VView::view(self : VView) -> ContentView {
 ///|
 /// The `v` elements; with arguments, those whose fields have the given values
 /// (`v.where(..)`).
-pub fn Select::v(weak? : Bool) -> Selector[VView] {
+pub fn Select::v(
+  weak? : Bool,
+) -> Selector[VView] {
   let fields : Array[(String, Value)] = []
   if weak is Some(v) {
     fields.push(("weak", Value::bool(v)))
@@ -8506,15 +7703,11 @@ pub fn Hide::Hide(
   args_loc~ : ArgsLoc,
 ) -> Hide {
   let args : Array[ArgNode] = []
-  args.push({ name: None, value: Value::content(body), param: 0, })
+  args.push({ name: None, value: Value::content(body), param: 0 })
   push_extra(args, extra, 1)
   {
     content: labelled_call(
-      {
-        func: FElem(@library.hide_elem()),
-        args,
-        origin: Site::new("Hide", loc, args_loc),
-      },
+      { func: FElem(@library.hide_elem()), args, origin: Site::new("Hide", loc, args_loc) },
       label,
       2,
     ),
@@ -8546,16 +7739,15 @@ pub fn HideView::view(self : HideView) -> ContentView {
 
 ///|
 /// The `body` of the element.
-pub fn HideView::body(
-  self : HideView,
-) -> ContentView raise @library.HintedError {
+pub fn HideView::body(self : HideView) -> ContentView raise @library.HintedError {
   ContentView::new(self.content.field_by_name("body").cast())
 }
 
 ///|
 /// The `hide` elements; with arguments, those whose fields have the given
 /// values (`hide.where(..)`).
-pub fn Select::hide() -> Selector[HideView] {
+pub fn Select::hide(
+) -> Selector[HideView] {
   let fields : Array[(String, Value)] = []
   elem_selector(@library.hide_elem(), fields, content => HideView::{ content, })
 }
@@ -8578,21 +7770,17 @@ pub fn Repeat::Repeat(
   args_loc~ : ArgsLoc,
 ) -> Repeat {
   let args : Array[ArgNode] = []
-  args.push({ name: None, value: Value::content(body), param: 0, })
+  args.push({ name: None, value: Value::content(body), param: 0 })
   if gap is Some(v) {
-    args.push({ name: Some("gap"), value: ToValue::to_value(v), param: 1, })
+    args.push({ name: Some("gap"), value: ToValue::to_value(v), param: 1 })
   }
   if justify is Some(v) {
-    args.push({ name: Some("justify"), value: Value::bool(v), param: 2, })
+    args.push({ name: Some("justify"), value: Value::bool(v), param: 2 })
   }
   push_extra(args, extra, 3)
   {
     content: labelled_call(
-      {
-        func: FElem(@library.repeat_elem()),
-        args,
-        origin: Site::new("Repeat", loc, args_loc),
-      },
+      { func: FElem(@library.repeat_elem()), args, origin: Site::new("Repeat", loc, args_loc) },
       label,
       4,
     ),
@@ -8621,19 +7809,13 @@ pub fn SetRepeat::SetRepeat(
 ) -> SetRepeat {
   let args : Array[ArgNode] = []
   if gap is Some(v) {
-    args.push({ name: Some("gap"), value: ToValue::to_value(v), param: 0, })
+    args.push({ name: Some("gap"), value: ToValue::to_value(v), param: 0 })
   }
   if justify is Some(v) {
-    args.push({ name: Some("justify"), value: Value::bool(v), param: 1, })
+    args.push({ name: Some("justify"), value: Value::bool(v), param: 1 })
   }
   push_extra(args, extra, 2)
-  {
-    node: {
-      func: FElem(@library.repeat_elem()),
-      args,
-      origin: Site::new("SetRepeat", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.repeat_elem()), args, origin: Site::new("SetRepeat", loc, args_loc) } }
 }
 
 ///|
@@ -8664,16 +7846,17 @@ pub fn RepeatView::view(self : RepeatView) -> ContentView {
 
 ///|
 /// The `body` of the element.
-pub fn RepeatView::body(
-  self : RepeatView,
-) -> ContentView raise @library.HintedError {
+pub fn RepeatView::body(self : RepeatView) -> ContentView raise @library.HintedError {
   ContentView::new(self.content.field_by_name("body").cast())
 }
 
 ///|
 /// The `repeat` elements; with arguments, those whose fields have the given
 /// values (`repeat.where(..)`).
-pub fn Select::repeat(gap? : Length, justify? : Bool) -> Selector[RepeatView] {
+pub fn Select::repeat(
+  gap? : Length,
+  justify? : Bool,
+) -> Selector[RepeatView] {
   let fields : Array[(String, Value)] = []
   if gap is Some(v) {
     fields.push(("gap", ToValue::to_value(v)))
@@ -8681,9 +7864,7 @@ pub fn Select::repeat(gap? : Length, justify? : Bool) -> Selector[RepeatView] {
   if justify is Some(v) {
     fields.push(("justify", Value::bool(v)))
   }
-  elem_selector(@library.repeat_elem(), fields, content => RepeatView::{
-    content,
-  })
+  elem_selector(@library.repeat_elem(), fields, content => RepeatView::{ content, })
 }
 
 ///|
@@ -8704,21 +7885,17 @@ pub fn Move::Move(
   args_loc~ : ArgsLoc,
 ) -> Move {
   let args : Array[ArgNode] = []
-  args.push({ name: None, value: Value::content(body), param: 0, })
+  args.push({ name: None, value: Value::content(body), param: 0 })
   if dx is Some(v) {
-    args.push({ name: Some("dx"), value: ToValue::to_value(v), param: 1, })
+    args.push({ name: Some("dx"), value: ToValue::to_value(v), param: 1 })
   }
   if dy is Some(v) {
-    args.push({ name: Some("dy"), value: ToValue::to_value(v), param: 2, })
+    args.push({ name: Some("dy"), value: ToValue::to_value(v), param: 2 })
   }
   push_extra(args, extra, 3)
   {
     content: labelled_call(
-      {
-        func: FElem(@library.move_elem()),
-        args,
-        origin: Site::new("Move", loc, args_loc),
-      },
+      { func: FElem(@library.move_elem()), args, origin: Site::new("Move", loc, args_loc) },
       label,
       4,
     ),
@@ -8747,19 +7924,13 @@ pub fn SetMove::SetMove(
 ) -> SetMove {
   let args : Array[ArgNode] = []
   if dx is Some(v) {
-    args.push({ name: Some("dx"), value: ToValue::to_value(v), param: 0, })
+    args.push({ name: Some("dx"), value: ToValue::to_value(v), param: 0 })
   }
   if dy is Some(v) {
-    args.push({ name: Some("dy"), value: ToValue::to_value(v), param: 1, })
+    args.push({ name: Some("dy"), value: ToValue::to_value(v), param: 1 })
   }
   push_extra(args, extra, 2)
-  {
-    node: {
-      func: FElem(@library.move_elem()),
-      args,
-      origin: Site::new("SetMove", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.move_elem()), args, origin: Site::new("SetMove", loc, args_loc) } }
 }
 
 ///|
@@ -8790,16 +7961,17 @@ pub fn MoveView::view(self : MoveView) -> ContentView {
 
 ///|
 /// The `body` of the element.
-pub fn MoveView::body(
-  self : MoveView,
-) -> ContentView raise @library.HintedError {
+pub fn MoveView::body(self : MoveView) -> ContentView raise @library.HintedError {
   ContentView::new(self.content.field_by_name("body").cast())
 }
 
 ///|
 /// The `move` elements; with arguments, those whose fields have the given
 /// values (`move.where(..)`).
-pub fn Select::move_(dx? : Length, dy? : Length) -> Selector[MoveView] {
+pub fn Select::move_(
+  dx? : Length,
+  dy? : Length,
+) -> Selector[MoveView] {
   let fields : Array[(String, Value)] = []
   if dx is Some(v) {
     fields.push(("dx", ToValue::to_value(v)))
@@ -8833,25 +8005,21 @@ pub fn Rotate::Rotate(
 ) -> Rotate {
   let args : Array[ArgNode] = []
   if extra_arg(extra, "angle") is Some(v) {
-    args.push({ name: None, value: v, param: 4, })
+    args.push({ name: None, value: v, param: 4 })
   } else if angle is Some(v) {
-    args.push({ name: None, value: ToValue::to_value(v), param: 1, })
+    args.push({ name: None, value: ToValue::to_value(v), param: 1 })
   }
-  args.push({ name: None, value: Value::content(body), param: 0, })
+  args.push({ name: None, value: Value::content(body), param: 0 })
   if origin is Some(v) {
-    args.push({ name: Some("origin"), value: ToValue::to_value(v), param: 2, })
+    args.push({ name: Some("origin"), value: ToValue::to_value(v), param: 2 })
   }
   if reflow is Some(v) {
-    args.push({ name: Some("reflow"), value: Value::bool(v), param: 3, })
+    args.push({ name: Some("reflow"), value: Value::bool(v), param: 3 })
   }
   push_extra(args, extra, 4, positional=["angle"])
   {
     content: labelled_call(
-      {
-        func: FElem(@library.rotate_elem()),
-        args,
-        origin: Site::new("Rotate", loc, args_loc),
-      },
+      { func: FElem(@library.rotate_elem()), args, origin: Site::new("Rotate", loc, args_loc) },
       label,
       5,
     ),
@@ -8881,24 +8049,18 @@ pub fn SetRotate::SetRotate(
 ) -> SetRotate {
   let args : Array[ArgNode] = []
   if extra_arg(extra, "angle") is Some(v) {
-    args.push({ name: None, value: v, param: 3, })
+    args.push({ name: None, value: v, param: 3 })
   } else if angle is Some(v) {
-    args.push({ name: None, value: ToValue::to_value(v), param: 0, })
+    args.push({ name: None, value: ToValue::to_value(v), param: 0 })
   }
   if origin is Some(v) {
-    args.push({ name: Some("origin"), value: ToValue::to_value(v), param: 1, })
+    args.push({ name: Some("origin"), value: ToValue::to_value(v), param: 1 })
   }
   if reflow is Some(v) {
-    args.push({ name: Some("reflow"), value: Value::bool(v), param: 2, })
+    args.push({ name: Some("reflow"), value: Value::bool(v), param: 2 })
   }
   push_extra(args, extra, 3, positional=["angle"])
-  {
-    node: {
-      func: FElem(@library.rotate_elem()),
-      args,
-      origin: Site::new("SetRotate", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.rotate_elem()), args, origin: Site::new("SetRotate", loc, args_loc) } }
 }
 
 ///|
@@ -8929,9 +8091,7 @@ pub fn RotateView::view(self : RotateView) -> ContentView {
 
 ///|
 /// The `body` of the element.
-pub fn RotateView::body(
-  self : RotateView,
-) -> ContentView raise @library.HintedError {
+pub fn RotateView::body(self : RotateView) -> ContentView raise @library.HintedError {
   ContentView::new(self.content.field_by_name("body").cast())
 }
 
@@ -8949,9 +8109,7 @@ pub fn Select::rotate(
   if reflow is Some(v) {
     fields.push(("reflow", Value::bool(v)))
   }
-  elem_selector(@library.rotate_elem(), fields, content => RotateView::{
-    content,
-  })
+  elem_selector(@library.rotate_elem(), fields, content => RotateView::{ content, })
 }
 
 ///|
@@ -8987,40 +8145,32 @@ pub fn Image::Image(
   args_loc~ : ArgsLoc,
 ) -> Image {
   let args : Array[ArgNode] = []
-  args.push({
-    name: None,
-    value: ToValue::to_value(source.into_source()),
-    param: 0,
-  })
+  args.push({ name: None, value: ToValue::to_value(source.into_source()), param: 0 })
   if format is Some(v) {
-    args.push({ name: Some("format"), value: Value::str(v), param: 1, })
+    args.push({ name: Some("format"), value: Value::str(v), param: 1 })
   }
   if width is Some(v) {
-    args.push({ name: Some("width"), value: ToValue::to_value(v), param: 2, })
+    args.push({ name: Some("width"), value: ToValue::to_value(v), param: 2 })
   }
   if height is Some(v) {
-    args.push({ name: Some("height"), value: ToValue::to_value(v), param: 3, })
+    args.push({ name: Some("height"), value: ToValue::to_value(v), param: 3 })
   }
   if alt is Some(v) {
-    args.push({ name: Some("alt"), value: Value::str(v), param: 4, })
+    args.push({ name: Some("alt"), value: Value::str(v), param: 4 })
   }
   if page is Some(v) {
-    args.push({ name: Some("page"), value: Value::int(v), param: 5, })
+    args.push({ name: Some("page"), value: Value::int(v), param: 5 })
   }
   if fit is Some(v) {
-    args.push({ name: Some("fit"), value: Value::str(v), param: 6, })
+    args.push({ name: Some("fit"), value: Value::str(v), param: 6 })
   }
   if scaling is Some(v) {
-    args.push({ name: Some("scaling"), value: Value::str(v), param: 7, })
+    args.push({ name: Some("scaling"), value: Value::str(v), param: 7 })
   }
   push_extra(args, extra, 8)
   {
     content: labelled_call(
-      {
-        func: FElem(@library.image_elem()),
-        args,
-        origin: Site::new("Image", loc, args_loc),
-      },
+      { func: FElem(@library.image_elem()), args, origin: Site::new("Image", loc, args_loc) },
       label,
       9,
     ),
@@ -9060,34 +8210,28 @@ pub fn SetImage::SetImage(
 ) -> SetImage {
   let args : Array[ArgNode] = []
   if format is Some(v) {
-    args.push({ name: Some("format"), value: Value::str(v), param: 0, })
+    args.push({ name: Some("format"), value: Value::str(v), param: 0 })
   }
   if width is Some(v) {
-    args.push({ name: Some("width"), value: ToValue::to_value(v), param: 1, })
+    args.push({ name: Some("width"), value: ToValue::to_value(v), param: 1 })
   }
   if height is Some(v) {
-    args.push({ name: Some("height"), value: ToValue::to_value(v), param: 2, })
+    args.push({ name: Some("height"), value: ToValue::to_value(v), param: 2 })
   }
   if alt is Some(v) {
-    args.push({ name: Some("alt"), value: Value::str(v), param: 3, })
+    args.push({ name: Some("alt"), value: Value::str(v), param: 3 })
   }
   if page is Some(v) {
-    args.push({ name: Some("page"), value: Value::int(v), param: 4, })
+    args.push({ name: Some("page"), value: Value::int(v), param: 4 })
   }
   if fit is Some(v) {
-    args.push({ name: Some("fit"), value: Value::str(v), param: 5, })
+    args.push({ name: Some("fit"), value: Value::str(v), param: 5 })
   }
   if scaling is Some(v) {
-    args.push({ name: Some("scaling"), value: Value::str(v), param: 6, })
+    args.push({ name: Some("scaling"), value: Value::str(v), param: 6 })
   }
   push_extra(args, extra, 7)
-  {
-    node: {
-      func: FElem(@library.image_elem()),
-      args,
-      origin: Site::new("SetImage", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.image_elem()), args, origin: Site::new("SetImage", loc, args_loc) } }
 }
 
 ///|
@@ -9150,9 +8294,7 @@ pub fn Select::image(
   if scaling is Some(v) {
     fields.push(("scaling", Value::str(v)))
   }
-  elem_selector(@library.image_elem(), fields, content => ImageView::{
-    content,
-  })
+  elem_selector(@library.image_elem(), fields, content => ImageView::{ content, })
 }
 
 ///|
@@ -9179,36 +8321,24 @@ pub fn Line::Line(
 ) -> Line {
   let args : Array[ArgNode] = []
   if start is Some(v) {
-    args.push({
-      name: Some("start"),
-      value: Value::array([ToValue::to_value(v.0), ToValue::to_value(v.1)]),
-      param: 0,
-    })
+    args.push({ name: Some("start"), value: Value::array([ToValue::to_value(v.0), ToValue::to_value(v.1)]), param: 0 })
   }
   if end_ is Some(v) {
-    args.push({
-      name: Some("end"),
-      value: Value::array([ToValue::to_value(v.0), ToValue::to_value(v.1)]),
-      param: 1,
-    })
+    args.push({ name: Some("end"), value: Value::array([ToValue::to_value(v.0), ToValue::to_value(v.1)]), param: 1 })
   }
   if length is Some(v) {
-    args.push({ name: Some("length"), value: ToValue::to_value(v), param: 2, })
+    args.push({ name: Some("length"), value: ToValue::to_value(v), param: 2 })
   }
   if angle is Some(v) {
-    args.push({ name: Some("angle"), value: ToValue::to_value(v), param: 3, })
+    args.push({ name: Some("angle"), value: ToValue::to_value(v), param: 3 })
   }
   if stroke is Some(v) {
-    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 4, })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 4 })
   }
   push_extra(args, extra, 5)
   {
     content: labelled_call(
-      {
-        func: FElem(@library.line_elem()),
-        args,
-        origin: Site::new("Line", loc, args_loc),
-      },
+      { func: FElem(@library.line_elem()), args, origin: Site::new("Line", loc, args_loc) },
       label,
       6,
     ),
@@ -9243,36 +8373,22 @@ pub fn SetLine::SetLine(
 ) -> SetLine {
   let args : Array[ArgNode] = []
   if start is Some(v) {
-    args.push({
-      name: Some("start"),
-      value: Value::array([ToValue::to_value(v.0), ToValue::to_value(v.1)]),
-      param: 0,
-    })
+    args.push({ name: Some("start"), value: Value::array([ToValue::to_value(v.0), ToValue::to_value(v.1)]), param: 0 })
   }
   if end_ is Some(v) {
-    args.push({
-      name: Some("end"),
-      value: Value::array([ToValue::to_value(v.0), ToValue::to_value(v.1)]),
-      param: 1,
-    })
+    args.push({ name: Some("end"), value: Value::array([ToValue::to_value(v.0), ToValue::to_value(v.1)]), param: 1 })
   }
   if length is Some(v) {
-    args.push({ name: Some("length"), value: ToValue::to_value(v), param: 2, })
+    args.push({ name: Some("length"), value: ToValue::to_value(v), param: 2 })
   }
   if angle is Some(v) {
-    args.push({ name: Some("angle"), value: ToValue::to_value(v), param: 3, })
+    args.push({ name: Some("angle"), value: ToValue::to_value(v), param: 3 })
   }
   if stroke is Some(v) {
-    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 4, })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 4 })
   }
   push_extra(args, extra, 5)
-  {
-    node: {
-      func: FElem(@library.line_elem()),
-      args,
-      origin: Site::new("SetLine", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.line_elem()), args, origin: Site::new("SetLine", loc, args_loc) } }
 }
 
 ///|
@@ -9313,14 +8429,10 @@ pub fn Select::line(
 ) -> Selector[LineView] {
   let fields : Array[(String, Value)] = []
   if start is Some(v) {
-    fields.push(
-      ("start", Value::array([ToValue::to_value(v.0), ToValue::to_value(v.1)])),
-    )
+    fields.push(("start", Value::array([ToValue::to_value(v.0), ToValue::to_value(v.1)])))
   }
   if end_ is Some(v) {
-    fields.push(
-      ("end", Value::array([ToValue::to_value(v.0), ToValue::to_value(v.1)])),
-    )
+    fields.push(("end", Value::array([ToValue::to_value(v.0), ToValue::to_value(v.1)])))
   }
   if length is Some(v) {
     fields.push(("length", ToValue::to_value(v)))
@@ -9367,39 +8479,35 @@ pub fn Rect::Rect(
 ) -> Rect {
   let args : Array[ArgNode] = []
   if extra_arg(extra, "body") is Some(v) {
-    args.push({ name: None, value: v, param: 8, })
+    args.push({ name: None, value: v, param: 8 })
   } else if body is Some(v) {
-    args.push({ name: None, value: Value::content(v), param: 7, })
+    args.push({ name: None, value: Value::content(v), param: 7 })
   }
   if width is Some(v) {
-    args.push({ name: Some("width"), value: ToValue::to_value(v), param: 0, })
+    args.push({ name: Some("width"), value: ToValue::to_value(v), param: 0 })
   }
   if height is Some(v) {
-    args.push({ name: Some("height"), value: ToValue::to_value(v), param: 1, })
+    args.push({ name: Some("height"), value: ToValue::to_value(v), param: 1 })
   }
   if fill is Some(v) {
-    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 2, })
+    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 2 })
   }
   if stroke is Some(v) {
-    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 3, })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 3 })
   }
   if radius is Some(v) {
-    args.push({ name: Some("radius"), value: ToValue::to_value(v), param: 4, })
+    args.push({ name: Some("radius"), value: ToValue::to_value(v), param: 4 })
   }
   if inset is Some(v) {
-    args.push({ name: Some("inset"), value: ToValue::to_value(v), param: 5, })
+    args.push({ name: Some("inset"), value: ToValue::to_value(v), param: 5 })
   }
   if outset is Some(v) {
-    args.push({ name: Some("outset"), value: ToValue::to_value(v), param: 6, })
+    args.push({ name: Some("outset"), value: ToValue::to_value(v), param: 6 })
   }
   push_extra(args, extra, 8, positional=["body"])
   {
     content: labelled_call(
-      {
-        func: FElem(@library.rect_elem()),
-        args,
-        origin: Site::new("Rect", loc, args_loc),
-      },
+      { func: FElem(@library.rect_elem()), args, origin: Site::new("Rect", loc, args_loc) },
       label,
       9,
     ),
@@ -9440,39 +8548,33 @@ pub fn SetRect::SetRect(
 ) -> SetRect {
   let args : Array[ArgNode] = []
   if width is Some(v) {
-    args.push({ name: Some("width"), value: ToValue::to_value(v), param: 0, })
+    args.push({ name: Some("width"), value: ToValue::to_value(v), param: 0 })
   }
   if height is Some(v) {
-    args.push({ name: Some("height"), value: ToValue::to_value(v), param: 1, })
+    args.push({ name: Some("height"), value: ToValue::to_value(v), param: 1 })
   }
   if fill is Some(v) {
-    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 2, })
+    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 2 })
   }
   if stroke is Some(v) {
-    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 3, })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 3 })
   }
   if radius is Some(v) {
-    args.push({ name: Some("radius"), value: ToValue::to_value(v), param: 4, })
+    args.push({ name: Some("radius"), value: ToValue::to_value(v), param: 4 })
   }
   if inset is Some(v) {
-    args.push({ name: Some("inset"), value: ToValue::to_value(v), param: 5, })
+    args.push({ name: Some("inset"), value: ToValue::to_value(v), param: 5 })
   }
   if outset is Some(v) {
-    args.push({ name: Some("outset"), value: ToValue::to_value(v), param: 6, })
+    args.push({ name: Some("outset"), value: ToValue::to_value(v), param: 6 })
   }
   if extra_arg(extra, "body") is Some(v) {
-    args.push({ name: None, value: v, param: 8, })
+    args.push({ name: None, value: v, param: 8 })
   } else if body is Some(v) {
-    args.push({ name: None, value: Value::content(v), param: 7, })
+    args.push({ name: None, value: Value::content(v), param: 7 })
   }
   push_extra(args, extra, 8, positional=["body"])
-  {
-    node: {
-      func: FElem(@library.rect_elem()),
-      args,
-      origin: Site::new("SetRect", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.rect_elem()), args, origin: Site::new("SetRect", loc, args_loc) } }
 }
 
 ///|
@@ -9573,42 +8675,38 @@ pub fn Square::Square(
 ) -> Square {
   let args : Array[ArgNode] = []
   if extra_arg(extra, "body") is Some(v) {
-    args.push({ name: None, value: v, param: 9, })
+    args.push({ name: None, value: v, param: 9 })
   } else if body is Some(v) {
-    args.push({ name: None, value: Value::content(v), param: 8, })
+    args.push({ name: None, value: Value::content(v), param: 8 })
   }
   if size is Some(v) {
-    args.push({ name: Some("size"), value: ToValue::to_value(v), param: 0, })
+    args.push({ name: Some("size"), value: ToValue::to_value(v), param: 0 })
   }
   if width is Some(v) {
-    args.push({ name: Some("width"), value: ToValue::to_value(v), param: 1, })
+    args.push({ name: Some("width"), value: ToValue::to_value(v), param: 1 })
   }
   if height is Some(v) {
-    args.push({ name: Some("height"), value: ToValue::to_value(v), param: 2, })
+    args.push({ name: Some("height"), value: ToValue::to_value(v), param: 2 })
   }
   if fill is Some(v) {
-    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 3, })
+    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 3 })
   }
   if stroke is Some(v) {
-    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 4, })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 4 })
   }
   if radius is Some(v) {
-    args.push({ name: Some("radius"), value: ToValue::to_value(v), param: 5, })
+    args.push({ name: Some("radius"), value: ToValue::to_value(v), param: 5 })
   }
   if inset is Some(v) {
-    args.push({ name: Some("inset"), value: ToValue::to_value(v), param: 6, })
+    args.push({ name: Some("inset"), value: ToValue::to_value(v), param: 6 })
   }
   if outset is Some(v) {
-    args.push({ name: Some("outset"), value: ToValue::to_value(v), param: 7, })
+    args.push({ name: Some("outset"), value: ToValue::to_value(v), param: 7 })
   }
   push_extra(args, extra, 9, positional=["body"])
   {
     content: labelled_call(
-      {
-        func: FElem(@library.square_elem()),
-        args,
-        origin: Site::new("Square", loc, args_loc),
-      },
+      { func: FElem(@library.square_elem()), args, origin: Site::new("Square", loc, args_loc) },
       label,
       10,
     ),
@@ -9651,42 +8749,36 @@ pub fn SetSquare::SetSquare(
 ) -> SetSquare {
   let args : Array[ArgNode] = []
   if size is Some(v) {
-    args.push({ name: Some("size"), value: ToValue::to_value(v), param: 0, })
+    args.push({ name: Some("size"), value: ToValue::to_value(v), param: 0 })
   }
   if width is Some(v) {
-    args.push({ name: Some("width"), value: ToValue::to_value(v), param: 1, })
+    args.push({ name: Some("width"), value: ToValue::to_value(v), param: 1 })
   }
   if height is Some(v) {
-    args.push({ name: Some("height"), value: ToValue::to_value(v), param: 2, })
+    args.push({ name: Some("height"), value: ToValue::to_value(v), param: 2 })
   }
   if fill is Some(v) {
-    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 3, })
+    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 3 })
   }
   if stroke is Some(v) {
-    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 4, })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 4 })
   }
   if radius is Some(v) {
-    args.push({ name: Some("radius"), value: ToValue::to_value(v), param: 5, })
+    args.push({ name: Some("radius"), value: ToValue::to_value(v), param: 5 })
   }
   if inset is Some(v) {
-    args.push({ name: Some("inset"), value: ToValue::to_value(v), param: 6, })
+    args.push({ name: Some("inset"), value: ToValue::to_value(v), param: 6 })
   }
   if outset is Some(v) {
-    args.push({ name: Some("outset"), value: ToValue::to_value(v), param: 7, })
+    args.push({ name: Some("outset"), value: ToValue::to_value(v), param: 7 })
   }
   if extra_arg(extra, "body") is Some(v) {
-    args.push({ name: None, value: v, param: 9, })
+    args.push({ name: None, value: v, param: 9 })
   } else if body is Some(v) {
-    args.push({ name: None, value: Value::content(v), param: 8, })
+    args.push({ name: None, value: Value::content(v), param: 8 })
   }
   push_extra(args, extra, 9, positional=["body"])
-  {
-    node: {
-      func: FElem(@library.square_elem()),
-      args,
-      origin: Site::new("SetSquare", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.square_elem()), args, origin: Site::new("SetSquare", loc, args_loc) } }
 }
 
 ///|
@@ -9753,9 +8845,7 @@ pub fn Select::square(
   if outset is Some(v) {
     fields.push(("outset", ToValue::to_value(v)))
   }
-  elem_selector(@library.square_elem(), fields, content => SquareView::{
-    content,
-  })
+  elem_selector(@library.square_elem(), fields, content => SquareView::{ content, })
 }
 
 ///|
@@ -9789,36 +8879,32 @@ pub fn Ellipse::Ellipse(
 ) -> Ellipse {
   let args : Array[ArgNode] = []
   if extra_arg(extra, "body") is Some(v) {
-    args.push({ name: None, value: v, param: 7, })
+    args.push({ name: None, value: v, param: 7 })
   } else if body is Some(v) {
-    args.push({ name: None, value: Value::content(v), param: 6, })
+    args.push({ name: None, value: Value::content(v), param: 6 })
   }
   if width is Some(v) {
-    args.push({ name: Some("width"), value: ToValue::to_value(v), param: 0, })
+    args.push({ name: Some("width"), value: ToValue::to_value(v), param: 0 })
   }
   if height is Some(v) {
-    args.push({ name: Some("height"), value: ToValue::to_value(v), param: 1, })
+    args.push({ name: Some("height"), value: ToValue::to_value(v), param: 1 })
   }
   if fill is Some(v) {
-    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 2, })
+    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 2 })
   }
   if stroke is Some(v) {
-    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 3, })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 3 })
   }
   if inset is Some(v) {
-    args.push({ name: Some("inset"), value: ToValue::to_value(v), param: 4, })
+    args.push({ name: Some("inset"), value: ToValue::to_value(v), param: 4 })
   }
   if outset is Some(v) {
-    args.push({ name: Some("outset"), value: ToValue::to_value(v), param: 5, })
+    args.push({ name: Some("outset"), value: ToValue::to_value(v), param: 5 })
   }
   push_extra(args, extra, 7, positional=["body"])
   {
     content: labelled_call(
-      {
-        func: FElem(@library.ellipse_elem()),
-        args,
-        origin: Site::new("Ellipse", loc, args_loc),
-      },
+      { func: FElem(@library.ellipse_elem()), args, origin: Site::new("Ellipse", loc, args_loc) },
       label,
       8,
     ),
@@ -9858,36 +8944,30 @@ pub fn SetEllipse::SetEllipse(
 ) -> SetEllipse {
   let args : Array[ArgNode] = []
   if width is Some(v) {
-    args.push({ name: Some("width"), value: ToValue::to_value(v), param: 0, })
+    args.push({ name: Some("width"), value: ToValue::to_value(v), param: 0 })
   }
   if height is Some(v) {
-    args.push({ name: Some("height"), value: ToValue::to_value(v), param: 1, })
+    args.push({ name: Some("height"), value: ToValue::to_value(v), param: 1 })
   }
   if fill is Some(v) {
-    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 2, })
+    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 2 })
   }
   if stroke is Some(v) {
-    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 3, })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 3 })
   }
   if inset is Some(v) {
-    args.push({ name: Some("inset"), value: ToValue::to_value(v), param: 4, })
+    args.push({ name: Some("inset"), value: ToValue::to_value(v), param: 4 })
   }
   if outset is Some(v) {
-    args.push({ name: Some("outset"), value: ToValue::to_value(v), param: 5, })
+    args.push({ name: Some("outset"), value: ToValue::to_value(v), param: 5 })
   }
   if extra_arg(extra, "body") is Some(v) {
-    args.push({ name: None, value: v, param: 7, })
+    args.push({ name: None, value: v, param: 7 })
   } else if body is Some(v) {
-    args.push({ name: None, value: Value::content(v), param: 6, })
+    args.push({ name: None, value: Value::content(v), param: 6 })
   }
   push_extra(args, extra, 7, positional=["body"])
-  {
-    node: {
-      func: FElem(@library.ellipse_elem()),
-      args,
-      origin: Site::new("SetEllipse", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.ellipse_elem()), args, origin: Site::new("SetEllipse", loc, args_loc) } }
 }
 
 ///|
@@ -9946,9 +9026,7 @@ pub fn Select::ellipse(
   if outset is Some(v) {
     fields.push(("outset", ToValue::to_value(v)))
   }
-  elem_selector(@library.ellipse_elem(), fields, content => EllipseView::{
-    content,
-  })
+  elem_selector(@library.ellipse_elem(), fields, content => EllipseView::{ content, })
 }
 
 ///|
@@ -9984,39 +9062,35 @@ pub fn Circle::Circle(
 ) -> Circle {
   let args : Array[ArgNode] = []
   if extra_arg(extra, "body") is Some(v) {
-    args.push({ name: None, value: v, param: 8, })
+    args.push({ name: None, value: v, param: 8 })
   } else if body is Some(v) {
-    args.push({ name: None, value: Value::content(v), param: 7, })
+    args.push({ name: None, value: Value::content(v), param: 7 })
   }
   if radius is Some(v) {
-    args.push({ name: Some("radius"), value: ToValue::to_value(v), param: 0, })
+    args.push({ name: Some("radius"), value: ToValue::to_value(v), param: 0 })
   }
   if width is Some(v) {
-    args.push({ name: Some("width"), value: ToValue::to_value(v), param: 1, })
+    args.push({ name: Some("width"), value: ToValue::to_value(v), param: 1 })
   }
   if height is Some(v) {
-    args.push({ name: Some("height"), value: ToValue::to_value(v), param: 2, })
+    args.push({ name: Some("height"), value: ToValue::to_value(v), param: 2 })
   }
   if fill is Some(v) {
-    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 3, })
+    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 3 })
   }
   if stroke is Some(v) {
-    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 4, })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 4 })
   }
   if inset is Some(v) {
-    args.push({ name: Some("inset"), value: ToValue::to_value(v), param: 5, })
+    args.push({ name: Some("inset"), value: ToValue::to_value(v), param: 5 })
   }
   if outset is Some(v) {
-    args.push({ name: Some("outset"), value: ToValue::to_value(v), param: 6, })
+    args.push({ name: Some("outset"), value: ToValue::to_value(v), param: 6 })
   }
   push_extra(args, extra, 8, positional=["body"])
   {
     content: labelled_call(
-      {
-        func: FElem(@library.circle_elem()),
-        args,
-        origin: Site::new("Circle", loc, args_loc),
-      },
+      { func: FElem(@library.circle_elem()), args, origin: Site::new("Circle", loc, args_loc) },
       label,
       9,
     ),
@@ -10057,39 +9131,33 @@ pub fn SetCircle::SetCircle(
 ) -> SetCircle {
   let args : Array[ArgNode] = []
   if radius is Some(v) {
-    args.push({ name: Some("radius"), value: ToValue::to_value(v), param: 0, })
+    args.push({ name: Some("radius"), value: ToValue::to_value(v), param: 0 })
   }
   if width is Some(v) {
-    args.push({ name: Some("width"), value: ToValue::to_value(v), param: 1, })
+    args.push({ name: Some("width"), value: ToValue::to_value(v), param: 1 })
   }
   if height is Some(v) {
-    args.push({ name: Some("height"), value: ToValue::to_value(v), param: 2, })
+    args.push({ name: Some("height"), value: ToValue::to_value(v), param: 2 })
   }
   if fill is Some(v) {
-    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 3, })
+    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 3 })
   }
   if stroke is Some(v) {
-    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 4, })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 4 })
   }
   if inset is Some(v) {
-    args.push({ name: Some("inset"), value: ToValue::to_value(v), param: 5, })
+    args.push({ name: Some("inset"), value: ToValue::to_value(v), param: 5 })
   }
   if outset is Some(v) {
-    args.push({ name: Some("outset"), value: ToValue::to_value(v), param: 6, })
+    args.push({ name: Some("outset"), value: ToValue::to_value(v), param: 6 })
   }
   if extra_arg(extra, "body") is Some(v) {
-    args.push({ name: None, value: v, param: 8, })
+    args.push({ name: None, value: v, param: 8 })
   } else if body is Some(v) {
-    args.push({ name: None, value: Value::content(v), param: 7, })
+    args.push({ name: None, value: Value::content(v), param: 7 })
   }
   push_extra(args, extra, 8, positional=["body"])
-  {
-    node: {
-      func: FElem(@library.circle_elem()),
-      args,
-      origin: Site::new("SetCircle", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.circle_elem()), args, origin: Site::new("SetCircle", loc, args_loc) } }
 }
 
 ///|
@@ -10152,9 +9220,7 @@ pub fn Select::circle(
   if outset is Some(v) {
     fields.push(("outset", ToValue::to_value(v)))
   }
-  elem_selector(@library.circle_elem(), fields, content => CircleView::{
-    content,
-  })
+  elem_selector(@library.circle_elem(), fields, content => CircleView::{ content, })
 }
 
 ///|
@@ -10181,32 +9247,21 @@ pub fn Polygon::Polygon(
 ) -> Polygon {
   let args : Array[ArgNode] = []
   if fill is Some(v) {
-    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 1, })
+    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 1 })
   }
   if fill_rule is Some(v) {
-    args.push({ name: Some("fill-rule"), value: Value::str(v), param: 2, })
+    args.push({ name: Some("fill-rule"), value: Value::str(v), param: 2 })
   }
   if stroke is Some(v) {
-    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 3, })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 3 })
   }
   for child in vertices {
-    args.push({
-      name: None,
-      value: Value::array([
-        ToValue::to_value(child.0),
-        ToValue::to_value(child.1),
-      ]),
-      param: 0,
-    })
+    args.push({ name: None, value: Value::array([ToValue::to_value(child.0), ToValue::to_value(child.1)]), param: 0 })
   }
   push_extra(args, extra, 4)
   {
     content: labelled_call(
-      {
-        func: FElem(@library.polygon_elem()),
-        args,
-        origin: Site::new("Polygon", loc, args_loc),
-      },
+      { func: FElem(@library.polygon_elem()), args, origin: Site::new("Polygon", loc, args_loc) },
       label,
       5,
     ),
@@ -10240,22 +9295,16 @@ pub fn SetPolygon::SetPolygon(
 ) -> SetPolygon {
   let args : Array[ArgNode] = []
   if fill is Some(v) {
-    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 0, })
+    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 0 })
   }
   if fill_rule is Some(v) {
-    args.push({ name: Some("fill-rule"), value: Value::str(v), param: 1, })
+    args.push({ name: Some("fill-rule"), value: Value::str(v), param: 1 })
   }
   if stroke is Some(v) {
-    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 2, })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 2 })
   }
   push_extra(args, extra, 3)
-  {
-    node: {
-      func: FElem(@library.polygon_elem()),
-      args,
-      origin: Site::new("SetPolygon", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.polygon_elem()), args, origin: Site::new("SetPolygon", loc, args_loc) } }
 }
 
 ///|
@@ -10302,9 +9351,7 @@ pub fn Select::polygon(
   if stroke is Some(v) {
     fields.push(("stroke", ToValue::to_value(v)))
   }
-  elem_selector(@library.polygon_elem(), fields, content => PolygonView::{
-    content,
-  })
+  elem_selector(@library.polygon_elem(), fields, content => PolygonView::{ content, })
 }
 
 ///|
@@ -10331,25 +9378,21 @@ pub fn Curve::Curve(
 ) -> Curve {
   let args : Array[ArgNode] = []
   if fill is Some(v) {
-    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 1, })
+    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 1 })
   }
   if fill_rule is Some(v) {
-    args.push({ name: Some("fill-rule"), value: Value::str(v), param: 2, })
+    args.push({ name: Some("fill-rule"), value: Value::str(v), param: 2 })
   }
   if stroke is Some(v) {
-    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 3, })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 3 })
   }
   for child in components {
-    args.push({ name: None, value: Value::content(child), param: 0, })
+    args.push({ name: None, value: Value::content(child), param: 0 })
   }
   push_extra(args, extra, 4)
   {
     content: labelled_call(
-      {
-        func: FElem(@library.curve_elem()),
-        args,
-        origin: Site::new("Curve", loc, args_loc),
-      },
+      { func: FElem(@library.curve_elem()), args, origin: Site::new("Curve", loc, args_loc) },
       label,
       5,
     ),
@@ -10383,22 +9426,16 @@ pub fn SetCurve::SetCurve(
 ) -> SetCurve {
   let args : Array[ArgNode] = []
   if fill is Some(v) {
-    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 0, })
+    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 0 })
   }
   if fill_rule is Some(v) {
-    args.push({ name: Some("fill-rule"), value: Value::str(v), param: 1, })
+    args.push({ name: Some("fill-rule"), value: Value::str(v), param: 1 })
   }
   if stroke is Some(v) {
-    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 2, })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 2 })
   }
   push_extra(args, extra, 3)
-  {
-    node: {
-      func: FElem(@library.curve_elem()),
-      args,
-      origin: Site::new("SetCurve", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.curve_elem()), args, origin: Site::new("SetCurve", loc, args_loc) } }
 }
 
 ///|
@@ -10445,9 +9482,7 @@ pub fn Select::curve(
   if stroke is Some(v) {
     fields.push(("stroke", ToValue::to_value(v)))
   }
-  elem_selector(@library.curve_elem(), fields, content => CurveView::{
-    content,
-  })
+  elem_selector(@library.curve_elem(), fields, content => CurveView::{ content, })
 }
 
 ///|
@@ -10467,22 +9502,14 @@ pub fn CurveMove::CurveMove(
   args_loc~ : ArgsLoc,
 ) -> CurveMove {
   let args : Array[ArgNode] = []
-  args.push({
-    name: None,
-    value: Value::array([ToValue::to_value(start.0), ToValue::to_value(start.1)]),
-    param: 0,
-  })
+  args.push({ name: None, value: Value::array([ToValue::to_value(start.0), ToValue::to_value(start.1)]), param: 0 })
   if relative is Some(v) {
-    args.push({ name: Some("relative"), value: Value::bool(v), param: 1, })
+    args.push({ name: Some("relative"), value: Value::bool(v), param: 1 })
   }
   push_extra(args, extra, 2)
   {
     content: labelled_call(
-      {
-        func: FElem(@library.curve_move_elem()),
-        args,
-        origin: Site::new("CurveMove", loc, args_loc),
-      },
+      { func: FElem(@library.curve_move_elem()), args, origin: Site::new("CurveMove", loc, args_loc) },
       label,
       3,
     ),
@@ -10510,16 +9537,10 @@ pub fn SetCurveMove::SetCurveMove(
 ) -> SetCurveMove {
   let args : Array[ArgNode] = []
   if relative is Some(v) {
-    args.push({ name: Some("relative"), value: Value::bool(v), param: 0, })
+    args.push({ name: Some("relative"), value: Value::bool(v), param: 0 })
   }
   push_extra(args, extra, 1)
-  {
-    node: {
-      func: FElem(@library.curve_move_elem()),
-      args,
-      origin: Site::new("SetCurveMove", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.curve_move_elem()), args, origin: Site::new("SetCurveMove", loc, args_loc) } }
 }
 
 ///|
@@ -10551,14 +9572,14 @@ pub fn CurveMoveView::view(self : CurveMoveView) -> ContentView {
 ///|
 /// The `curve.move` elements; with arguments, those whose fields have the
 /// given values (`curve.move.where(..)`).
-pub fn Select::curve_move(relative? : Bool) -> Selector[CurveMoveView] {
+pub fn Select::curve_move(
+  relative? : Bool,
+) -> Selector[CurveMoveView] {
   let fields : Array[(String, Value)] = []
   if relative is Some(v) {
     fields.push(("relative", Value::bool(v)))
   }
-  elem_selector(@library.curve_move_elem(), fields, content => CurveMoveView::{
-    content,
-  })
+  elem_selector(@library.curve_move_elem(), fields, content => CurveMoveView::{ content, })
 }
 
 ///|
@@ -10579,22 +9600,14 @@ pub fn CurveLine::CurveLine(
   args_loc~ : ArgsLoc,
 ) -> CurveLine {
   let args : Array[ArgNode] = []
-  args.push({
-    name: None,
-    value: Value::array([ToValue::to_value(end_.0), ToValue::to_value(end_.1)]),
-    param: 0,
-  })
+  args.push({ name: None, value: Value::array([ToValue::to_value(end_.0), ToValue::to_value(end_.1)]), param: 0 })
   if relative is Some(v) {
-    args.push({ name: Some("relative"), value: Value::bool(v), param: 1, })
+    args.push({ name: Some("relative"), value: Value::bool(v), param: 1 })
   }
   push_extra(args, extra, 2)
   {
     content: labelled_call(
-      {
-        func: FElem(@library.curve_line_elem()),
-        args,
-        origin: Site::new("CurveLine", loc, args_loc),
-      },
+      { func: FElem(@library.curve_line_elem()), args, origin: Site::new("CurveLine", loc, args_loc) },
       label,
       3,
     ),
@@ -10622,16 +9635,10 @@ pub fn SetCurveLine::SetCurveLine(
 ) -> SetCurveLine {
   let args : Array[ArgNode] = []
   if relative is Some(v) {
-    args.push({ name: Some("relative"), value: Value::bool(v), param: 0, })
+    args.push({ name: Some("relative"), value: Value::bool(v), param: 0 })
   }
   push_extra(args, extra, 1)
-  {
-    node: {
-      func: FElem(@library.curve_line_elem()),
-      args,
-      origin: Site::new("SetCurveLine", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.curve_line_elem()), args, origin: Site::new("SetCurveLine", loc, args_loc) } }
 }
 
 ///|
@@ -10663,14 +9670,14 @@ pub fn CurveLineView::view(self : CurveLineView) -> ContentView {
 ///|
 /// The `curve.line` elements; with arguments, those whose fields have the
 /// given values (`curve.line.where(..)`).
-pub fn Select::curve_line(relative? : Bool) -> Selector[CurveLineView] {
+pub fn Select::curve_line(
+  relative? : Bool,
+) -> Selector[CurveLineView] {
   let fields : Array[(String, Value)] = []
   if relative is Some(v) {
     fields.push(("relative", Value::bool(v)))
   }
-  elem_selector(@library.curve_line_elem(), fields, content => CurveLineView::{
-    content,
-  })
+  elem_selector(@library.curve_line_elem(), fields, content => CurveLineView::{ content, })
 }
 
 ///|
@@ -10695,30 +9702,15 @@ pub fn CurveQuad::CurveQuad(
   args_loc~ : ArgsLoc,
 ) -> CurveQuad {
   let args : Array[ArgNode] = []
-  args.push({
-    name: None,
-    value: Value::array([
-      ToValue::to_value(control.0),
-      ToValue::to_value(control.1),
-    ]),
-    param: 0,
-  })
-  args.push({
-    name: None,
-    value: Value::array([ToValue::to_value(end_.0), ToValue::to_value(end_.1)]),
-    param: 1,
-  })
+  args.push({ name: None, value: Value::array([ToValue::to_value(control.0), ToValue::to_value(control.1)]), param: 0 })
+  args.push({ name: None, value: Value::array([ToValue::to_value(end_.0), ToValue::to_value(end_.1)]), param: 1 })
   if relative is Some(v) {
-    args.push({ name: Some("relative"), value: Value::bool(v), param: 2, })
+    args.push({ name: Some("relative"), value: Value::bool(v), param: 2 })
   }
   push_extra(args, extra, 3)
   {
     content: labelled_call(
-      {
-        func: FElem(@library.curve_quad_elem()),
-        args,
-        origin: Site::new("CurveQuad", loc, args_loc),
-      },
+      { func: FElem(@library.curve_quad_elem()), args, origin: Site::new("CurveQuad", loc, args_loc) },
       label,
       4,
     ),
@@ -10746,16 +9738,10 @@ pub fn SetCurveQuad::SetCurveQuad(
 ) -> SetCurveQuad {
   let args : Array[ArgNode] = []
   if relative is Some(v) {
-    args.push({ name: Some("relative"), value: Value::bool(v), param: 0, })
+    args.push({ name: Some("relative"), value: Value::bool(v), param: 0 })
   }
   push_extra(args, extra, 1)
-  {
-    node: {
-      func: FElem(@library.curve_quad_elem()),
-      args,
-      origin: Site::new("SetCurveQuad", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.curve_quad_elem()), args, origin: Site::new("SetCurveQuad", loc, args_loc) } }
 }
 
 ///|
@@ -10787,14 +9773,14 @@ pub fn CurveQuadView::view(self : CurveQuadView) -> ContentView {
 ///|
 /// The `curve.quad` elements; with arguments, those whose fields have the
 /// given values (`curve.quad.where(..)`).
-pub fn Select::curve_quad(relative? : Bool) -> Selector[CurveQuadView] {
+pub fn Select::curve_quad(
+  relative? : Bool,
+) -> Selector[CurveQuadView] {
   let fields : Array[(String, Value)] = []
   if relative is Some(v) {
     fields.push(("relative", Value::bool(v)))
   }
-  elem_selector(@library.curve_quad_elem(), fields, content => CurveQuadView::{
-    content,
-  })
+  elem_selector(@library.curve_quad_elem(), fields, content => CurveQuadView::{ content, })
 }
 
 ///|
@@ -10821,38 +9807,16 @@ pub fn CurveCubic::CurveCubic(
   args_loc~ : ArgsLoc,
 ) -> CurveCubic {
   let args : Array[ArgNode] = []
-  args.push({
-    name: None,
-    value: Value::array([
-      ToValue::to_value(control_start.0),
-      ToValue::to_value(control_start.1),
-    ]),
-    param: 0,
-  })
-  args.push({
-    name: None,
-    value: Value::array([
-      ToValue::to_value(control_end.0),
-      ToValue::to_value(control_end.1),
-    ]),
-    param: 1,
-  })
-  args.push({
-    name: None,
-    value: Value::array([ToValue::to_value(end_.0), ToValue::to_value(end_.1)]),
-    param: 2,
-  })
+  args.push({ name: None, value: Value::array([ToValue::to_value(control_start.0), ToValue::to_value(control_start.1)]), param: 0 })
+  args.push({ name: None, value: Value::array([ToValue::to_value(control_end.0), ToValue::to_value(control_end.1)]), param: 1 })
+  args.push({ name: None, value: Value::array([ToValue::to_value(end_.0), ToValue::to_value(end_.1)]), param: 2 })
   if relative is Some(v) {
-    args.push({ name: Some("relative"), value: Value::bool(v), param: 3, })
+    args.push({ name: Some("relative"), value: Value::bool(v), param: 3 })
   }
   push_extra(args, extra, 4)
   {
     content: labelled_call(
-      {
-        func: FElem(@library.curve_cubic_elem()),
-        args,
-        origin: Site::new("CurveCubic", loc, args_loc),
-      },
+      { func: FElem(@library.curve_cubic_elem()), args, origin: Site::new("CurveCubic", loc, args_loc) },
       label,
       5,
     ),
@@ -10880,16 +9844,10 @@ pub fn SetCurveCubic::SetCurveCubic(
 ) -> SetCurveCubic {
   let args : Array[ArgNode] = []
   if relative is Some(v) {
-    args.push({ name: Some("relative"), value: Value::bool(v), param: 0, })
+    args.push({ name: Some("relative"), value: Value::bool(v), param: 0 })
   }
   push_extra(args, extra, 1)
-  {
-    node: {
-      func: FElem(@library.curve_cubic_elem()),
-      args,
-      origin: Site::new("SetCurveCubic", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.curve_cubic_elem()), args, origin: Site::new("SetCurveCubic", loc, args_loc) } }
 }
 
 ///|
@@ -10921,14 +9879,14 @@ pub fn CurveCubicView::view(self : CurveCubicView) -> ContentView {
 ///|
 /// The `curve.cubic` elements; with arguments, those whose fields have the
 /// given values (`curve.cubic.where(..)`).
-pub fn Select::curve_cubic(relative? : Bool) -> Selector[CurveCubicView] {
+pub fn Select::curve_cubic(
+  relative? : Bool,
+) -> Selector[CurveCubicView] {
   let fields : Array[(String, Value)] = []
   if relative is Some(v) {
     fields.push(("relative", Value::bool(v)))
   }
-  elem_selector(@library.curve_cubic_elem(), fields, content => CurveCubicView::{
-    content,
-  })
+  elem_selector(@library.curve_cubic_elem(), fields, content => CurveCubicView::{ content, })
 }
 
 ///|
@@ -10949,16 +9907,12 @@ pub fn CurveClose::CurveClose(
 ) -> CurveClose {
   let args : Array[ArgNode] = []
   if mode is Some(v) {
-    args.push({ name: Some("mode"), value: Value::str(v), param: 0, })
+    args.push({ name: Some("mode"), value: Value::str(v), param: 0 })
   }
   push_extra(args, extra, 1)
   {
     content: labelled_call(
-      {
-        func: FElem(@library.curve_close_elem()),
-        args,
-        origin: Site::new("CurveClose", loc, args_loc),
-      },
+      { func: FElem(@library.curve_close_elem()), args, origin: Site::new("CurveClose", loc, args_loc) },
       label,
       2,
     ),
@@ -10986,16 +9940,10 @@ pub fn SetCurveClose::SetCurveClose(
 ) -> SetCurveClose {
   let args : Array[ArgNode] = []
   if mode is Some(v) {
-    args.push({ name: Some("mode"), value: Value::str(v), param: 0, })
+    args.push({ name: Some("mode"), value: Value::str(v), param: 0 })
   }
   push_extra(args, extra, 1)
-  {
-    node: {
-      func: FElem(@library.curve_close_elem()),
-      args,
-      origin: Site::new("SetCurveClose", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.curve_close_elem()), args, origin: Site::new("SetCurveClose", loc, args_loc) } }
 }
 
 ///|
@@ -11027,14 +9975,14 @@ pub fn CurveCloseView::view(self : CurveCloseView) -> ContentView {
 ///|
 /// The `curve.close` elements; with arguments, those whose fields have the
 /// given values (`curve.close.where(..)`).
-pub fn Select::curve_close(mode? : String) -> Selector[CurveCloseView] {
+pub fn Select::curve_close(
+  mode? : String,
+) -> Selector[CurveCloseView] {
   let fields : Array[(String, Value)] = []
   if mode is Some(v) {
     fields.push(("mode", Value::str(v)))
   }
-  elem_selector(@library.curve_close_elem(), fields, content => CurveCloseView::{
-    content,
-  })
+  elem_selector(@library.curve_close_elem(), fields, content => CurveCloseView::{ content, })
 }
 
 ///|
@@ -11069,31 +10017,27 @@ pub fn Scale::Scale(
 ) -> Scale {
   let args : Array[ArgNode] = []
   if extra_arg(extra, "factor") is Some(v) {
-    args.push({ name: None, value: v, param: 6, })
+    args.push({ name: None, value: v, param: 6 })
   } else if factor is Some(v) {
-    args.push({ name: None, value: ToValue::to_value(v), param: 1, })
+    args.push({ name: None, value: ToValue::to_value(v), param: 1 })
   }
-  args.push({ name: None, value: Value::content(body), param: 0, })
+  args.push({ name: None, value: Value::content(body), param: 0 })
   if x is Some(v) {
-    args.push({ name: Some("x"), value: ToValue::to_value(v), param: 2, })
+    args.push({ name: Some("x"), value: ToValue::to_value(v), param: 2 })
   }
   if y is Some(v) {
-    args.push({ name: Some("y"), value: ToValue::to_value(v), param: 3, })
+    args.push({ name: Some("y"), value: ToValue::to_value(v), param: 3 })
   }
   if origin is Some(v) {
-    args.push({ name: Some("origin"), value: ToValue::to_value(v), param: 4, })
+    args.push({ name: Some("origin"), value: ToValue::to_value(v), param: 4 })
   }
   if reflow is Some(v) {
-    args.push({ name: Some("reflow"), value: Value::bool(v), param: 5, })
+    args.push({ name: Some("reflow"), value: Value::bool(v), param: 5 })
   }
   push_extra(args, extra, 6, positional=["factor"])
   {
     content: labelled_call(
-      {
-        func: FElem(@library.scale_elem()),
-        args,
-        origin: Site::new("Scale", loc, args_loc),
-      },
+      { func: FElem(@library.scale_elem()), args, origin: Site::new("Scale", loc, args_loc) },
       label,
       7,
     ),
@@ -11130,30 +10074,24 @@ pub fn SetScale::SetScale(
 ) -> SetScale {
   let args : Array[ArgNode] = []
   if extra_arg(extra, "factor") is Some(v) {
-    args.push({ name: None, value: v, param: 5, })
+    args.push({ name: None, value: v, param: 5 })
   } else if factor is Some(v) {
-    args.push({ name: None, value: ToValue::to_value(v), param: 0, })
+    args.push({ name: None, value: ToValue::to_value(v), param: 0 })
   }
   if x is Some(v) {
-    args.push({ name: Some("x"), value: ToValue::to_value(v), param: 1, })
+    args.push({ name: Some("x"), value: ToValue::to_value(v), param: 1 })
   }
   if y is Some(v) {
-    args.push({ name: Some("y"), value: ToValue::to_value(v), param: 2, })
+    args.push({ name: Some("y"), value: ToValue::to_value(v), param: 2 })
   }
   if origin is Some(v) {
-    args.push({ name: Some("origin"), value: ToValue::to_value(v), param: 3, })
+    args.push({ name: Some("origin"), value: ToValue::to_value(v), param: 3 })
   }
   if reflow is Some(v) {
-    args.push({ name: Some("reflow"), value: Value::bool(v), param: 4, })
+    args.push({ name: Some("reflow"), value: Value::bool(v), param: 4 })
   }
   push_extra(args, extra, 5, positional=["factor"])
-  {
-    node: {
-      func: FElem(@library.scale_elem()),
-      args,
-      origin: Site::new("SetScale", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.scale_elem()), args, origin: Site::new("SetScale", loc, args_loc) } }
 }
 
 ///|
@@ -11184,9 +10122,7 @@ pub fn ScaleView::view(self : ScaleView) -> ContentView {
 
 ///|
 /// The `body` of the element.
-pub fn ScaleView::body(
-  self : ScaleView,
-) -> ContentView raise @library.HintedError {
+pub fn ScaleView::body(self : ScaleView) -> ContentView raise @library.HintedError {
   ContentView::new(self.content.field_by_name("body").cast())
 }
 
@@ -11212,9 +10148,7 @@ pub fn Select::scale(
   if reflow is Some(v) {
     fields.push(("reflow", Value::bool(v)))
   }
-  elem_selector(@library.scale_elem(), fields, content => ScaleView::{
-    content,
-  })
+  elem_selector(@library.scale_elem(), fields, content => ScaleView::{ content, })
 }
 
 ///|
@@ -11237,27 +10171,23 @@ pub fn Skew::Skew(
   args_loc~ : ArgsLoc,
 ) -> Skew {
   let args : Array[ArgNode] = []
-  args.push({ name: None, value: Value::content(body), param: 0, })
+  args.push({ name: None, value: Value::content(body), param: 0 })
   if ax is Some(v) {
-    args.push({ name: Some("ax"), value: ToValue::to_value(v), param: 1, })
+    args.push({ name: Some("ax"), value: ToValue::to_value(v), param: 1 })
   }
   if ay is Some(v) {
-    args.push({ name: Some("ay"), value: ToValue::to_value(v), param: 2, })
+    args.push({ name: Some("ay"), value: ToValue::to_value(v), param: 2 })
   }
   if origin is Some(v) {
-    args.push({ name: Some("origin"), value: ToValue::to_value(v), param: 3, })
+    args.push({ name: Some("origin"), value: ToValue::to_value(v), param: 3 })
   }
   if reflow is Some(v) {
-    args.push({ name: Some("reflow"), value: Value::bool(v), param: 4, })
+    args.push({ name: Some("reflow"), value: Value::bool(v), param: 4 })
   }
   push_extra(args, extra, 5)
   {
     content: labelled_call(
-      {
-        func: FElem(@library.skew_elem()),
-        args,
-        origin: Site::new("Skew", loc, args_loc),
-      },
+      { func: FElem(@library.skew_elem()), args, origin: Site::new("Skew", loc, args_loc) },
       label,
       6,
     ),
@@ -11288,25 +10218,19 @@ pub fn SetSkew::SetSkew(
 ) -> SetSkew {
   let args : Array[ArgNode] = []
   if ax is Some(v) {
-    args.push({ name: Some("ax"), value: ToValue::to_value(v), param: 0, })
+    args.push({ name: Some("ax"), value: ToValue::to_value(v), param: 0 })
   }
   if ay is Some(v) {
-    args.push({ name: Some("ay"), value: ToValue::to_value(v), param: 1, })
+    args.push({ name: Some("ay"), value: ToValue::to_value(v), param: 1 })
   }
   if origin is Some(v) {
-    args.push({ name: Some("origin"), value: ToValue::to_value(v), param: 2, })
+    args.push({ name: Some("origin"), value: ToValue::to_value(v), param: 2 })
   }
   if reflow is Some(v) {
-    args.push({ name: Some("reflow"), value: Value::bool(v), param: 3, })
+    args.push({ name: Some("reflow"), value: Value::bool(v), param: 3 })
   }
   push_extra(args, extra, 4)
-  {
-    node: {
-      func: FElem(@library.skew_elem()),
-      args,
-      origin: Site::new("SetSkew", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.skew_elem()), args, origin: Site::new("SetSkew", loc, args_loc) } }
 }
 
 ///|
@@ -11337,9 +10261,7 @@ pub fn SkewView::view(self : SkewView) -> ContentView {
 
 ///|
 /// The `body` of the element.
-pub fn SkewView::body(
-  self : SkewView,
-) -> ContentView raise @library.HintedError {
+pub fn SkewView::body(self : SkewView) -> ContentView raise @library.HintedError {
   ContentView::new(self.content.field_by_name("body").cast())
 }
 
@@ -11393,40 +10315,22 @@ pub fn SetEquation::SetEquation(
 ) -> SetEquation {
   let args : Array[ArgNode] = []
   if block is Some(v) {
-    args.push({ name: Some("block"), value: Value::bool(v), param: 0, })
+    args.push({ name: Some("block"), value: Value::bool(v), param: 0 })
   }
   if numbering is Some(v) {
-    args.push({
-      name: Some("numbering"),
-      value: ToValue::to_value(v),
-      param: 1,
-    })
+    args.push({ name: Some("numbering"), value: ToValue::to_value(v), param: 1 })
   }
   if number_align is Some(v) {
-    args.push({
-      name: Some("number-align"),
-      value: ToValue::to_value(v),
-      param: 2,
-    })
+    args.push({ name: Some("number-align"), value: ToValue::to_value(v), param: 2 })
   }
   if supplement is Some(v) {
-    args.push({
-      name: Some("supplement"),
-      value: ToValue::to_value(v),
-      param: 3,
-    })
+    args.push({ name: Some("supplement"), value: ToValue::to_value(v), param: 3 })
   }
   if alt is Some(v) {
-    args.push({ name: Some("alt"), value: Value::str(v), param: 4, })
+    args.push({ name: Some("alt"), value: Value::str(v), param: 4 })
   }
   push_extra(args, extra, 5)
-  {
-    node: {
-      func: FElem(@library.equation_elem()),
-      args,
-      origin: Site::new("SetEquation", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.equation_elem()), args, origin: Site::new("SetEquation", loc, args_loc) } }
 }
 
 ///|
@@ -11457,9 +10361,7 @@ pub fn EquationView::view(self : EquationView) -> ContentView {
 
 ///|
 /// The `body` of the element.
-pub fn EquationView::body(
-  self : EquationView,
-) -> ContentView raise @library.HintedError {
+pub fn EquationView::body(self : EquationView) -> ContentView raise @library.HintedError {
   ContentView::new(self.content.field_by_name("body").cast())
 }
 
@@ -11489,9 +10391,7 @@ pub fn Select::equation(
   if alt is Some(v) {
     fields.push(("alt", Value::str(v)))
   }
-  elem_selector(@library.equation_elem(), fields, content => EquationView::{
-    content,
-  })
+  elem_selector(@library.equation_elem(), fields, content => EquationView::{ content, })
 }
 
 ///|
@@ -11525,31 +10425,23 @@ pub fn Bibliography::Bibliography(
   args_loc~ : ArgsLoc,
 ) -> Bibliography {
   let args : Array[ArgNode] = []
-  args.push({
-    name: None,
-    value: ToValue::to_value(sources.into_source()),
-    param: 0,
-  })
+  args.push({ name: None, value: ToValue::to_value(sources.into_source()), param: 0 })
   if title is Some(v) {
-    args.push({ name: Some("title"), value: Value::content(v), param: 1, })
+    args.push({ name: Some("title"), value: Value::content(v), param: 1 })
   }
   if full is Some(v) {
-    args.push({ name: Some("full"), value: Value::bool(v), param: 2, })
+    args.push({ name: Some("full"), value: Value::bool(v), param: 2 })
   }
   if style is Some(v) {
-    args.push({ name: Some("style"), value: Value::str(v), param: 3, })
+    args.push({ name: Some("style"), value: Value::str(v), param: 3 })
   }
   if group is Some(v) {
-    args.push({ name: Some("group"), value: Value::str(v), param: 4, })
+    args.push({ name: Some("group"), value: Value::str(v), param: 4 })
   }
   push_extra(args, extra, 5)
   {
     content: labelled_call(
-      {
-        func: FElem(@library.bibliography_elem()),
-        args,
-        origin: Site::new("Bibliography", loc, args_loc),
-      },
+      { func: FElem(@library.bibliography_elem()), args, origin: Site::new("Bibliography", loc, args_loc) },
       label,
       6,
     ),
@@ -11584,25 +10476,19 @@ pub fn SetBibliography::SetBibliography(
 ) -> SetBibliography {
   let args : Array[ArgNode] = []
   if title is Some(v) {
-    args.push({ name: Some("title"), value: Value::content(v), param: 0, })
+    args.push({ name: Some("title"), value: Value::content(v), param: 0 })
   }
   if full is Some(v) {
-    args.push({ name: Some("full"), value: Value::bool(v), param: 1, })
+    args.push({ name: Some("full"), value: Value::bool(v), param: 1 })
   }
   if style is Some(v) {
-    args.push({ name: Some("style"), value: Value::str(v), param: 2, })
+    args.push({ name: Some("style"), value: Value::str(v), param: 2 })
   }
   if group is Some(v) {
-    args.push({ name: Some("group"), value: Value::str(v), param: 3, })
+    args.push({ name: Some("group"), value: Value::str(v), param: 3 })
   }
   push_extra(args, extra, 4)
-  {
-    node: {
-      func: FElem(@library.bibliography_elem()),
-      args,
-      origin: Site::new("SetBibliography", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.bibliography_elem()), args, origin: Site::new("SetBibliography", loc, args_loc) } }
 }
 
 ///|
@@ -11649,9 +10535,7 @@ pub fn Select::bibliography(
   if group is Some(v) {
     fields.push(("group", Value::str(v)))
   }
-  elem_selector(@library.bibliography_elem(), fields, content => BibliographyView::{
-    content,
-  })
+  elem_selector(@library.bibliography_elem(), fields, content => BibliographyView::{ content, })
 }
 
 ///|
@@ -11682,24 +10566,20 @@ pub fn Cite::Cite(
   args_loc~ : ArgsLoc,
 ) -> Cite {
   let args : Array[ArgNode] = []
-  args.push({ name: None, value: Value::label(key), param: 0, })
+  args.push({ name: None, value: Value::label(key), param: 0 })
   if supplement is Some(v) {
-    args.push({ name: Some("supplement"), value: Value::content(v), param: 1, })
+    args.push({ name: Some("supplement"), value: Value::content(v), param: 1 })
   }
   if form is Some(v) {
-    args.push({ name: Some("form"), value: Value::str(v), param: 2, })
+    args.push({ name: Some("form"), value: Value::str(v), param: 2 })
   }
   if style is Some(v) {
-    args.push({ name: Some("style"), value: Value::str(v), param: 3, })
+    args.push({ name: Some("style"), value: Value::str(v), param: 3 })
   }
   push_extra(args, extra, 4)
   {
     content: labelled_call(
-      {
-        func: FElem(@library.cite_elem()),
-        args,
-        origin: Site::new("Cite", loc, args_loc),
-      },
+      { func: FElem(@library.cite_elem()), args, origin: Site::new("Cite", loc, args_loc) },
       label,
       5,
     ),
@@ -11734,22 +10614,16 @@ pub fn SetCite::SetCite(
 ) -> SetCite {
   let args : Array[ArgNode] = []
   if supplement is Some(v) {
-    args.push({ name: Some("supplement"), value: Value::content(v), param: 0, })
+    args.push({ name: Some("supplement"), value: Value::content(v), param: 0 })
   }
   if form is Some(v) {
-    args.push({ name: Some("form"), value: Value::str(v), param: 1, })
+    args.push({ name: Some("form"), value: Value::str(v), param: 1 })
   }
   if style is Some(v) {
-    args.push({ name: Some("style"), value: Value::str(v), param: 2, })
+    args.push({ name: Some("style"), value: Value::str(v), param: 2 })
   }
   push_extra(args, extra, 3)
-  {
-    node: {
-      func: FElem(@library.cite_elem()),
-      args,
-      origin: Site::new("SetCite", loc, args_loc),
-    },
-  }
+  { node: { func: FElem(@library.cite_elem()), args, origin: Site::new("SetCite", loc, args_loc) } }
 }
 
 ///|
@@ -11781,7 +10655,10 @@ pub fn CiteView::view(self : CiteView) -> ContentView {
 ///|
 /// The `cite` elements; with arguments, those whose fields have the given
 /// values (`cite.where(..)`).
-pub fn Select::cite(form? : String, style? : String) -> Selector[CiteView] {
+pub fn Select::cite(
+  form? : String,
+  style? : String,
+) -> Selector[CiteView] {
   let fields : Array[(String, Value)] = []
   if form is Some(v) {
     fields.push(("form", Value::str(v)))
@@ -11809,15 +10686,11 @@ pub fn Metadata::Metadata(
   args_loc~ : ArgsLoc,
 ) -> Metadata {
   let args : Array[ArgNode] = []
-  args.push({ name: None, value, param: 0, })
+  args.push({ name: None, value: value, param: 0 })
   push_extra(args, extra, 1)
   {
     content: labelled_call(
-      {
-        func: FElem(@library.metadata_elem()),
-        args,
-        origin: Site::new("Metadata", loc, args_loc),
-      },
+      { func: FElem(@library.metadata_elem()), args, origin: Site::new("Metadata", loc, args_loc) },
       label,
       2,
     ),
@@ -11850,11 +10723,10 @@ pub fn MetadataView::view(self : MetadataView) -> ContentView {
 ///|
 /// The `metadata` elements; with arguments, those whose fields have the given
 /// values (`metadata.where(..)`).
-pub fn Select::metadata() -> Selector[MetadataView] {
+pub fn Select::metadata(
+) -> Selector[MetadataView] {
   let fields : Array[(String, Value)] = []
-  elem_selector(@library.metadata_elem(), fields, content => MetadataView::{
-    content,
-  })
+  elem_selector(@library.metadata_elem(), fields, content => MetadataView::{ content, })
 }
 
 ///|
@@ -11873,15 +10745,11 @@ pub fn Lorem::Lorem(
   args_loc~ : ArgsLoc,
 ) -> Lorem {
   let args : Array[ArgNode] = []
-  args.push({ name: None, value: Value::int(words), param: 0, })
+  args.push({ name: None, value: Value::int(words), param: 0 })
   push_extra(args, extra, 1)
   {
     content: labelled_call(
-      {
-        func: FNative(@library.native_lorem()),
-        args,
-        origin: Site::new("Lorem", loc, args_loc),
-      },
+      { func: FNative(@library.native_lorem()), args, origin: Site::new("Lorem", loc, args_loc) },
       label,
       2,
     ),
@@ -11918,25 +10786,21 @@ pub fn PolygonRegular::PolygonRegular(
 ) -> PolygonRegular {
   let args : Array[ArgNode] = []
   if fill is Some(v) {
-    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 0, })
+    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 0 })
   }
   if stroke is Some(v) {
-    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 1, })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 1 })
   }
   if size is Some(v) {
-    args.push({ name: Some("size"), value: ToValue::to_value(v), param: 2, })
+    args.push({ name: Some("size"), value: ToValue::to_value(v), param: 2 })
   }
   if vertices is Some(v) {
-    args.push({ name: Some("vertices"), value: Value::int(v), param: 3, })
+    args.push({ name: Some("vertices"), value: Value::int(v), param: 3 })
   }
   push_extra(args, extra, 4)
   {
     content: labelled_call(
-      {
-        func: FNative(@library.native_polygon_elem_regular()),
-        args,
-        origin: Site::new("PolygonRegular", loc, args_loc),
-      },
+      { func: FNative(@library.native_polygon_elem_regular()), args, origin: Site::new("PolygonRegular", loc, args_loc) },
       label,
       5,
     ),
@@ -11966,22 +10830,13 @@ pub fn Paint::tiling(
   let named : Array[(String, Value)] = []
   positional.push(Value::content(body))
   if size is Some(v) {
-    named.push(
-      ("size", Value::array([ToValue::to_value(v.0), ToValue::to_value(v.1)])),
-    )
+    named.push(("size", Value::array([ToValue::to_value(v.0), ToValue::to_value(v.1)])))
   }
   if spacing is Some(v) {
-    named.push(
-      (
-        "spacing",
-        Value::array([ToValue::to_value(v.0), ToValue::to_value(v.1)]),
-      ),
-    )
+    named.push(("spacing", Value::array([ToValue::to_value(v.0), ToValue::to_value(v.1)])))
   }
   if offset is Some(v) {
-    named.push(
-      ("offset", Value::array([ToValue::to_value(v.0), ToValue::to_value(v.1)])),
-    )
+    named.push(("offset", Value::array([ToValue::to_value(v.0), ToValue::to_value(v.1)])))
   }
   if angle is Some(v) {
     named.push(("angle", ToValue::to_value(v)))
