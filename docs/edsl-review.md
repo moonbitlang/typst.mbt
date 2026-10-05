@@ -11,8 +11,8 @@ not do yet.
 
 | Slice | What it adds | State |
 |---|---|---|
-| 1 | Click to source: the preview page, the origin of every rendered piece, the click lookup | this document, below |
-| 2 | Select text across runs, comment, copy the feedback as text and JSON | later |
+| 1 | Click to source: the preview page, the origin of every rendered piece, the click lookup | below |
+| 2 | Select text across runs, comment, copy the feedback as text and JSON | below |
 | 3 | Source excerpts and source characters where they can be verified | later |
 | 4 | `Keyed` data keys, callbacks, raw lines, limits, source line → page positions | later |
 
@@ -126,7 +126,7 @@ be neither followed nor focused, so the page does not lead anywhere.
   fills. A click on it says so. (Mapping it to the enclosing element is
   a later slice.)
 - All strings of one array argument and all runs of one `Prose` have the
-  same origin, the argument; the page does not tell them apart yet.
+  same origin, the argument. (Slice 2 tells them apart as pieces.)
 - A parameter is shown by its position among the constructor's declared
   parameters, not by its name.
 - The stroke of a dashed line is hit in its gaps as well, in the page
@@ -138,8 +138,8 @@ be neither followed nor focused, so the page does not lead anywhere.
 - The layer rounds coordinates to four decimals of a point (transform
   coefficients are not rounded), so the page and the library can differ
   within that distance of an edge.
-- The page is for pointing: text cannot be selected yet, and there is no
-  comment box (slice 2).
+- The page of slice 1 is for pointing: selecting text and commenting
+  come with slice 2.
 - HTML and bundle targets are not covered: the page is built from paged
   frames.
 
@@ -159,6 +159,133 @@ be neither followed nor focused, so the page does not lead anywhere.
 - The self-test of the generated page in a browser: at 3,072 points of
   the showcase's four pages the page finds the origin that the library
   finds, before and after every shape of the layer is marked.
+
+## Slice 2: select text and copy feedback
+
+### What it does
+
+```moonbit
+let report = document.compile_paged(world)
+let text = report.review_text()                // the words, in reading order
+let selection = text.find("Knuth–Plass style optimizer,").unwrap()
+let feedback = text.feedback(selection, "Tighten this sentence.")
+println(feedback.to_text())
+```
+
+```
+Review comment on "typst.mbt Showcase" (a document rendered from MoonBit source by typst.mbt)
+Comment: Tighten this sentence.
+Selected text: "Knuth–Plass style optimizer," (page 1)
+Source 1 of 1: doc/twins/bench.mbt:202:7-215:18, Prose(..), parameter 1
+  rendered: "Knuth–Plass style optimizer,"
+  3 pieces of this argument are selected; they share this location, which is the argument as a whole.
+Locations are constructor calls and their arguments in the MoonBit source (line:column, columns in code points), not positions inside a string.
+```
+
+- **Words.** The text of the document is cut into words: glyphs of one
+  text item that follow each other, belong to one piece, and have no
+  white space between them. A *piece* is text with one span: lowering
+  gives every run of a `Prose` and every string of an array a span of its
+  own (D 12.2), so pieces are told apart although they share an origin,
+  the argument. The layer of the preview page has one box per word, with
+  the number of the word.
+- **Selecting.** In the page, dragging with a mouse selects the words
+  from where the button went down to the pointer; a click selects one
+  word, a shape or an image; "Extend" (or shift) and a second click
+  select up to that word, which is how a range is selected on a touch
+  screen, where a finger scrolls. In the library, `ReviewText::find(text,
+  nth?)` selects the words that an occurrence of a text touches and
+  `ReviewText::range(from, to)` a range of word numbers.
+- **Feedback.** `ReviewText::feedback(selection, comment)` is the record:
+  the comment, the selected text as rendered, the pages, and the origins
+  of the selection, each once, in reading order. Per origin it has the
+  text that was rendered from it (`…` where words of another origin lie
+  between) and the selected text of each piece. `to_text()` is a block
+  that explains itself when pasted into a message; `to_json()` is the
+  same as data (the format is documented at `Feedback::to_json`).
+  `origin_feedback(origin, page, comment)` is the record for a shape or
+  an image.
+- **The panel** shows the selection, one card per origin (location,
+  constructor and parameter, range, data key, rendered text), a comment
+  box, "Copy feedback", "Copy JSON" and "Add to list"; under the pages is
+  the list of comments with "Copy all". When several pieces of one
+  argument are selected, the card says so in plain words: they share one
+  location, which is the argument as a whole.
+- `doc/examples/review`: `feedback <name> <text> [comment] [--nth n]
+  [--json]` prints the record for an occurrence of a text.
+
+### What it guarantees
+
+1. **One rule, applied twice, compared.** The page builds the record in
+   its script, the library in MoonBit, from the same words. The page
+   carries the library's records for a set of selections;
+   `node scripts/review_page_check.mjs preview.html` and the page's
+   `#selftest` check that the script builds the same records and texts.
+2. **Origins are complete and ordered.** Every word of the selection
+   contributes its origin; an origin appears once, at its first word.
+   Pieces are never merged across spans: two strings of an array are two
+   pieces even if they touch.
+3. **Still call provenance only.** A record names constructor calls and
+   arguments, and quotes rendered text. It does not say where in a
+   string literal a piece is; the rendered text of the piece is what the
+   author searches for. The text block says so in its last line.
+4. **Nothing else changes.** The export still only reads the compiled
+   document. Copying uses the clipboard when the page may; when it may
+   not, the text is put into a text area and selected, and the page says
+   so. The list of comments lives in the page; `localStorage` keeps it
+   across reloads where the browser allows it and is not relied on.
+
+### Known limits of this slice
+
+- Reading order is the order in which the engine placed the text items:
+  what a range covers across columns, floats, footnotes and table cells
+  follows that order, not the eye. Right-to-left text is in reading
+  order inside a text item; the items of a line are in visual order.
+- A word that the engine hyphenates at a line break is two words that
+  touch: selected together they read as the written word, without the
+  hyphen. A written hyphen at a line break stays, and a space follows it.
+- The gap between two words has an origin (a click on it is answered by
+  `origin_at`) but is nothing to select: a click on it changes nothing.
+- Text without a source location (list markers, numbers, supplements) is
+  not selectable and is left out of the selected text.
+- Beyond 65,535 bytes of one text item the text of a word is not known
+  (glyph ranges are stored in 16 bits): it is shown as `…`, with its
+  right origin.
+- Text that a clip hides completely is still among the words (a group
+  that draws nothing because of a scale of zero is not).
+- A cluster that the engine splits over two text items (a mark set in
+  another font or at another height) appears in both, so its characters
+  are twice in the selected text. The origins are right.
+- A selection is one range of words, or one shape or image. Dragging
+  starts and ends on words; there is no rectangle selection.
+- `find` matches rendered text exactly (case, punctuation, the typeset
+  quotes); white space stands for any gap between words.
+- The page shows a parameter by its position, as in slice 1.
+
+### Tests
+
+- `doc/review_test.mbt`: words and their order; a written word of two
+  origins; ranges and `find` (parts of words, occurrences, no match, an
+  empty document, a long repetitive needle); Unicode white space; text
+  through a box in a line; text in a group scaled to zero; a text item
+  of 80,000 bytes from two strings; the runs of a `Prose` and the strings of an array as
+  pieces of one origin, with a gap; a `Keyed` data key; a word
+  hyphenated at a line break; the text block and the JSON of a record,
+  exactly; a shape; a long selection; the page's data and controls.
+- `doc/examples/review/review_wbtest.mbt`, on the showcase: words of a
+  prose block (one origin, three pieces), a selection from a heading into
+  its paragraph (two origins in order, at the source positions found by
+  searching the file), cells of the table built in a loop.
+- `node scripts/review_page_check.mjs` on the showcase's page: 36
+  records equal the library's. In a browser: `#selftest` (the same, plus
+  3,072 points of hit testing, twice, and a check that nothing covers a
+  page and no effect is on a page, its artwork or its layer), a drag
+  over two lines, "Extend" at phone width, both themes, the copy
+  fallback, the list of comments.
+- By hand, at a small viewport: scroll to every page and see that it
+  paints. (Captures of a browser pane that is not shown are unreliable
+  after the first frame: a second capture of the same scroll position
+  can be blank although the page is fine. Judge by a visible pane.)
 
 ## Appendix: later slices (not under review)
 

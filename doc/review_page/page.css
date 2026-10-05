@@ -1,6 +1,7 @@
 /* Layout: the pages are a column of sheets on a desk; beside it (below it
    on a phone, as a sheet at the bottom edge) the panel that says where the
-   clicked content comes from. Colours are tokens; the paper stays white. */
+   selection comes from and takes the comment; under both, the list of
+   comments. Colours are tokens; the paper stays white. */
 :root {
   --desk: #e9ebee;
   --surface: #ffffff;
@@ -8,6 +9,8 @@
   --muted: #5b6470;
   --line: #cfd4db;
   --accent: #0b5cad;
+  --accent-ink: #ffffff;
+  --field: #f3f5f7;
   --mark: rgba(11, 92, 173, 0.22);
   --mark-line: #b4540a;
   --paper: #ffffff;
@@ -23,6 +26,8 @@
     --muted: #9aa5b2;
     --line: #353d47;
     --accent: #6fb1f5;
+    --accent-ink: #0b1826;
+    --field: #171b20;
     --mark: rgba(63, 142, 224, 0.32);
     --mark-line: #f29a4a;
     --shadow: 0 1px 2px rgba(0, 0, 0, 0.5), 0 8px 24px rgba(0, 0, 0, 0.35);
@@ -36,6 +41,8 @@
   --muted: #9aa5b2;
   --line: #353d47;
   --accent: #6fb1f5;
+  --accent-ink: #0b1826;
+  --field: #171b20;
   --mark: rgba(63, 142, 224, 0.32);
   --mark-line: #f29a4a;
   --shadow: 0 1px 2px rgba(0, 0, 0, 0.5), 0 8px 24px rgba(0, 0, 0, 0.35);
@@ -78,6 +85,18 @@ h1, h2 { text-wrap: balance; }
   font-weight: 600;
 }
 h1 { font-size: 16px; font-weight: 600; overflow-wrap: anywhere; flex: 1 1 auto; min-width: 0; }
+.jump { color: var(--accent); text-decoration: none; font-weight: 600; white-space: nowrap; }
+.count {
+  display: inline-block;
+  min-width: 1.6em;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--field);
+  color: var(--ink);
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.jump:focus-visible, button:focus-visible, textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 h2 { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
 .meta { color: var(--muted); font-size: 12.5px; }
 
@@ -109,6 +128,9 @@ h2 { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
   background: var(--paper);
   box-shadow: var(--shadow);
   overflow: hidden;
+  /* Words are selected by dragging over the layer, not as text. */
+  user-select: none;
+  -webkit-user-select: none;
 }
 .art { position: absolute; inset: 0; pointer-events: none; }
 .art > svg, .page > svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
@@ -119,7 +141,6 @@ h2 { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
 .hit rect[data-o] { pointer-events: fill; }
 .hit rect[data-o].on, .hit path[data-o].on[pointer-events="fill"], .hit path[data-o].on[pointer-events="all"] { fill: var(--mark); }
 .hit path[data-o].on[pointer-events="stroke"], .hit path[data-o].on[pointer-events="all"] { stroke: var(--mark-line); stroke-opacity: 0.6; }
-.hit rect[data-o].hit-here { stroke: var(--mark-line); stroke-width: 0.75; }
 
 .panel {
   position: sticky;
@@ -135,20 +156,75 @@ h2 { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
   gap: 8px;
 }
 #found { display: grid; gap: 8px; }
+.selected { font-size: 15px; font-weight: 600; overflow-wrap: anywhere; max-height: 5.8em; overflow: auto; }
+.tools { display: flex; flex-wrap: wrap; gap: 8px; }
+button {
+  font: inherit;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+button:hover { border-color: var(--accent); }
+button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 600; }
+button[aria-pressed="true"] { background: var(--field); border-color: var(--accent); }
+.mapping { display: grid; gap: 10px; }
+.origin { display: grid; gap: 3px; padding-top: 10px; border-top: 1px solid var(--line); min-width: 0; }
 .loc { color: var(--accent); font: 600 13.5px/1.35 var(--mono); overflow-wrap: anywhere; user-select: all; }
 code { font: 13px/1.4 var(--mono); overflow-wrap: anywhere; }
-.facts { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 4px 12px; font-size: 13px; }
-.facts dt { color: var(--muted); }
-.facts dd { overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+.origin .meta { font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.rendered { overflow-wrap: anywhere; max-height: 4.4em; overflow: auto; }
+.note { color: var(--muted); font-size: 12.5px; }
+.field { display: block; font-size: 12px; font-weight: 600; color: var(--muted); letter-spacing: 0.02em; }
+textarea {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: var(--field);
+  color: var(--ink);
+  font: 13px/1.45 var(--ui);
+  resize: vertical;
+}
+textarea.out { font: 12px/1.45 var(--mono); white-space: pre; overflow: auto; }
+.status { min-height: 1.4em; color: var(--muted); font-size: 12.5px; }
+
+.comments {
+  display: grid;
+  gap: 8px;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding-block: 4px 32px;
+  padding-inline: 16px;
+}
+.list { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.comment {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 2px 12px;
+  align-items: start;
+  padding: 10px 12px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}
+.comment p { grid-column: 1; overflow-wrap: anywhere; }
+.comment button { grid-column: 2; grid-row: 1 / span 2; }
+.said { font-weight: 600; }
 
 @media (max-width: 860px) {
-  .layout { grid-template-columns: minmax(0, 1fr); padding-bottom: 45vh; }
+  .layout { grid-template-columns: minmax(0, 1fr); }
+  .comments { padding-bottom: 48vh; }
   .panel {
     position: fixed;
     inset: auto 0 0 0;
     top: auto;
     z-index: 6;
-    max-height: 40vh;
+    max-height: 44vh;
     border-radius: 12px 12px 0 0;
     border-width: 1px 0 0;
     padding: 14px 16px calc(14px + env(safe-area-inset-bottom, 0px));

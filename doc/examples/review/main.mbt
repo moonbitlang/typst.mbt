@@ -1,12 +1,13 @@
-// The review loop of the EDSL (docs/edsl-review.md, slice 1): write the
-// preview page of a document, in which a click shows the MoonBit
-// constructor call that produced the clicked content, and answer the same
-// question for a point from the command line.
+// The review loop of the EDSL (docs/edsl-review.md, slices 1 and 2):
+// write the preview page of a document, in which a selection shows the
+// MoonBit constructor calls that produced it and becomes feedback for the
+// author, and answer the same questions from the command line.
 //
 // Usage (from the repository root: `bench/` holds the documents' files):
 //
 //   moon run doc/examples/review --target native --release -- preview [name] [-o preview.html]
 //   moon run doc/examples/review --target native --release -- at <name> <page> <x> <y>
+//   moon run doc/examples/review --target native --release -- feedback <name> <text> [comment] [--nth n] [--json]
 //
 // `name` is one of the documents of `@twins.originals()` (default:
 // `showcase`); `compile_document` takes any `() -> @doc.Document`.
@@ -72,7 +73,38 @@ fn run(args : Array[String]) -> Unit raise {
         None => println("nothing with a source location")
       }
     }
-    command => fail("unknown command `\{command}` (preview, at)")
+    "feedback" => {
+      // The words that the `nth` occurrence of a text touches.
+      let rest : Array[String] = []
+      let mut nth = 0
+      let mut json = false
+      let mut i = 2
+      while i < args.length() {
+        if args[i] == "--json" {
+          json = true
+        } else if args[i] == "--nth" && i + 1 < args.length() {
+          nth = @string.parse_int(args[i + 1])
+          i += 1
+        } else {
+          rest.push(args[i])
+        }
+        i += 1
+      }
+      guard rest.length() >= 2 else {
+        fail("feedback <name> <text> [comment] [--nth n] [--json]")
+      }
+      let text = compiled(rest[0]).review_text()
+      guard text.find(rest[1], nth~) is Some(selection) else {
+        fail("`\{rest[1]}` (occurrence \{nth}) is not in the document")
+      }
+      let feedback = text.feedback(selection, rest.get(2).unwrap_or(""))
+      if json {
+        println(feedback.to_json().stringify(indent=2))
+      } else {
+        println(feedback.to_text())
+      }
+    }
+    command => fail("unknown command `\{command}` (preview, at, feedback)")
   }
 }
 
