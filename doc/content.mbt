@@ -47,6 +47,9 @@ priv enum Node {
   NEngine(@library.Content)
   /// A value: as an argument the value itself, in a sequence its display.
   NValue(Value)
+  /// A description that cannot be lowered: the message is reported at the
+  /// origin (a constructor found the problem; constructors do not raise).
+  NInvalid(String, Site)
 }
 
 ///|

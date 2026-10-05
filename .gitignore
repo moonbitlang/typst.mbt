@@ -22,3 +22,4 @@ moon.work
 /tests/edsl_gen/manifest.tsv
 /tests/edsl_gen/results.tsv
 /tests/edsl_gen/failed.txt
+/tests/edsl_gen/docs/

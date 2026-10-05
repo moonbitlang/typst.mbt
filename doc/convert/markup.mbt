@@ -132,9 +132,8 @@ fn Tr::equation(
 /// The global functions that are audited never to return a label (section
 /// 6.1), besides the element functions.
 let non_label_functions : Array[String] = [
-  "lorem", "rgb", "luma", "counter", "state", "numbering", "repr", "str", "int",
-  "float", "range", "datetime", "stroke", "gradient.linear", "gradient.radial", "gradient.conic",
-  "tiling",
+  "lorem", "rgb", "luma", "counter", "state", "repr", "str", "int", "float", "range",
+  "datetime", "stroke", "gradient.linear", "gradient.radial", "gradient.conic", "tiling",
 ]
 
 ///|
@@ -158,11 +157,10 @@ fn Tr::call_not_label(self : Tr, call : @ast.FuncCall, env : Env) -> Bool {
         Str(_) => method != "at"
         FuncCall(receiver) =>
           match self.global_path(receiver.callee(), env) {
+            // Not `display`: it forwards a numbering function's result.
             Some("counter") =>
-              ["display", "step", "update", "get", "at", "final"].contains(
-                method,
-              )
-            Some("state") => ["update", "display"].contains(method)
+              ["step", "update", "get", "at", "final"].contains(method)
+            Some("state") => method == "update"
             _ => false
           }
         _ => false

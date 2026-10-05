@@ -16,6 +16,7 @@ using @doc {
   type Skew,
   type ShowWith,
   type Symbol,
+  type Prose,
 }
 
 ///|
@@ -288,6 +289,41 @@ pub fn phase2() -> Array[Twin] {
           Link(Url("https://typst.app")),
           " old ",
           Heading("Sub", level=2),
+        ])
+      },
+    ),
+    // Prose: words and markup's spaces, smart quotes, interpolated
+    // descriptions, a paragraph break at the blank line; a line break
+    // next to Chinese text is no space; `quotes=false` keeps the quote
+    // characters; an interpolated string is text like the rest.
+    twin(
+      "prose",
+      [
+        page_typ, "#[#\"Code\" #\"blocks\" #\"use\" #raw(\"syntect\")#\",\" #smartquote(double: true)#\"quoted\"#smartquote(double: true)\n#\"and\" #\"it\"#smartquote(double: false)#\"s\" #emph[#\"fine\"]#\".\"#parbreak()#\"Next\" #\"paragraph\" #\"with\" #\"3\" #\"words.\"]",
+        "#parbreak()", "#[#\"汉字\"\n#\"汉字\" #\"a\"\n#\"b\"]", "#parbreak()",
+        "#[#\"say\" #\"\\\"hi\\\"\"]", "#figure(caption: [#\"A\" #strong[#\"bold\"] #\"caption\"])[#\"x\"]",
+      ],
+      () => {
+        let count = 3
+        Document([
+          page(),
+          (
+            $|Code blocks use \{Raw("syntect")}, "quoted"
+            $|and it's \{Emph("fine")}.
+            $|
+            $|Next paragraph with \{count} words.
+          )
+          |> Prose,
+          Parbreak(),
+          (
+            $|汉字
+            $|汉字 a
+            $|b
+          )
+          |> Prose,
+          Parbreak(),
+          Prose("say \"hi\"", quotes=false),
+          Figure("x", caption=Prose("A \{Strong("bold")} caption")),
         ])
       },
     ),

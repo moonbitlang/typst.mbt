@@ -221,9 +221,55 @@ fn test_files_resolve(id : @syntax.FileId) -> String raise @library.FileError {
 }
 
 ///|
+let dev_assets_index : Ref[Map[String, String]?] = { val: None }
+
+///|
+/// The dev assets by file name (fonts excluded; the first in directory
+/// order wins).
+fn dev_assets_by_name() -> Map[String, String] {
+  if dev_assets_index.val is Some(index) {
+    return index
+  }
+  let index : Map[String, String] = Map([])
+  fn walk(dir : String) {
+    let entries = (@fs.read_dir(dir) catch { _ => [][:] }).to_owned()
+    entries.sort()
+    for entry in entries {
+      let path = dir + "/" + entry
+      let is_dir = @fs.is_dir(path) catch { _ => false }
+      if is_dir {
+        if entry != "fonts" {
+          walk(path)
+        }
+      } else if !index.contains(entry) {
+        index[entry] = path
+      }
+    }
+  }
+
+  walk(dev_assets_root())
+  dev_assets_index.val = Some(index)
+  index
+}
+
+///|
 /// Load a file (upstream `FileLoader for TestFiles`).
 fn test_files_load(id : @syntax.FileId) -> Bytes raise @library.FileError {
   let path = test_files_resolve(id)
+  // The examples of the documentation (the `edsl-suite` stage) name their
+  // files like upstream's example world: a dev asset by its file name.
+  if path.has_prefix("docs-examples/") {
+    let name = match path.rev_find("/") {
+      Some(i) => path.view(start_offset=i + 1).to_owned()
+      None => path
+    }
+    guard dev_assets_by_name().get(name) is Some(real) else {
+      raise @library.FileError::NotFound(path)
+    }
+    return @fs.read_file_to_bytes(real) catch {
+      _ => raise @library.FileError::NotFound(path)
+    }
+  }
   if path.has_prefix("assets/") {
     let real = dev_assets_root() +
       "/" +

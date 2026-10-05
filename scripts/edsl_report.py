@@ -40,6 +40,13 @@ def signature(detail):
     return re.sub(r"\d+", "N", text)
 
 
+def directory(path):
+    """The suite directory of a file; the documentation's examples are
+    `docs/typ` and `docs/rs`."""
+    parts = path.split("/")
+    return "/".join(parts[:2]) if parts[0] == "docs" else parts[0]
+
+
 def main():
     args = sys.argv[1:]
     top = 25
@@ -63,7 +70,7 @@ def main():
     constructs = collections.Counter()
     construct_bytes = collections.Counter()
     for row in manifest:
-        d = row["file"].split("/")[0]
+        d = directory(row["file"])
         if only_dir and d != only_dir:
             continue
         s = dirs.setdefault(d, collections.Counter())
@@ -110,7 +117,7 @@ def main():
 
     groups = collections.defaultdict(list)
     for row in manifest:
-        d = row["file"].split("/")[0]
+        d = directory(row["file"])
         if only_dir and d != only_dir:
             continue
         r = results.get(row["number"])
