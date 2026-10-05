@@ -17,14 +17,10 @@ pub fn rust_round(x : Double) -> Double {
 }
 
 ///|
-/// Exact `10^n` for the exponents `libm::exp10` is used with.
+/// `libm::exp10` of an integer (`round_with_precision`; exact for
+/// `|n| < 16`, `libm::pow(10.0, n)` beyond).
 pub fn exp10(n : Int) -> Double {
-  if n == 0 {
-    return 1.0
-  }
-  @string.parse_double("1e\{n}") catch {
-    _ => @math.pow(10.0, n.to_double())
-  }
+  libm_exp10(n.to_double())
 }
 
 ///|

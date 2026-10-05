@@ -118,27 +118,27 @@ pub fn Angle::cos(self : Angle) -> Double {
 
 ///|
 pub fn Angle::tan(self : Angle) -> Double {
-  @math.tan(self.to_rad())
+  libm_tan(self.to_rad())
 }
 
 ///|
 pub fn Angle::asin(x : Double) -> Angle {
-  Angle::rad(@math.asin(x))
+  Angle::rad(libm_asin(x))
 }
 
 ///|
 pub fn Angle::acos(x : Double) -> Angle {
-  Angle::rad(@math.acos(x))
+  Angle::rad(libm_acos(x))
 }
 
 ///|
 pub fn Angle::atan(x : Double) -> Angle {
-  Angle::rad(@math.atan(x))
+  Angle::rad(libm_atan(x))
 }
 
 ///|
 pub fn Angle::atan2(y : Double, x : Double) -> Angle {
-  Angle::rad(@math.atan2(y, x))
+  Angle::rad(libm_atan2(y, x))
 }
 
 ///|

@@ -1,5 +1,6 @@
-// Ports of `libm` functions that MoonBit's `@math` lacks, so results match
-// upstream bit for bit.
+// `erf` of the `libm` crate, which MoonBit's `@math` lacks (`calc.erf`), so
+// results match upstream bit for bit. See `libm_trig.mbt` for the other
+// `libm` ports.
 
 // origin: FreeBSD /usr/src/lib/msun/src/s_erf.c (via the `libm` crate)
 // ====================================================
@@ -235,7 +236,7 @@ fn erfc2(ix : UInt, x : Double) -> Double {
   }
   // `with_set_low_word(x, 0)`
   let z = (x.reinterpret_as_uint64() & 0xFFFF_FFFF_0000_0000UL).reinterpret_as_double()
-  @math.exp(-z * z - 0.5625) * @math.exp((z - x) * (z + x) + r / big_s) / x
+  libm_exp(-z * z - 0.5625) * libm_exp((z - x) * (z + x) + r / big_s) / x
 }
 
 ///|
