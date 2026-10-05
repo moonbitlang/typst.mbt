@@ -107,7 +107,7 @@ pub fn showcase() -> Document {
     SetPage(
       paper="a4",
       margin=Sides(x=Cm(2.2), top=Cm(2.6), bottom=Cm(2.4)),
-      header=Context() <| cx => {
+      header=Context(cx => {
         let page = cx.counter(Counter::page())
         if page.get()[0] > 1 {
           return Seq([
@@ -118,16 +118,16 @@ pub fn showcase() -> Document {
           ])
         }
         Seq([])
-      },
+      }),
     ),
     SetText(font=["Libertinus Serif"], size=Pt(11), lang="en"),
     SetPar(justify=true, leading=Em(0.62)),
     SetHeading(numbering=Numbering("1.1")),
-    Set("math.equation", [("numbering", Value::str("(1)"))]),
-    Show(Select::heading(level=1)) <| ((it, _) => {
+    SetEquation(numbering=Numbering("(1)")),
+    Show(Select::heading(level=1), (it, _) => {
       Seq([V(Em(0.6)), Block(Text(it, fill=Rgb(accent))), V(Em(0.2))])
     }),
-    Show(Select::raw(block=true)) <| ((it, _) => {
+    Show(Select::raw(block=true), (it, _) => {
       Block(
         it,
         fill=Luma(246),
@@ -137,7 +137,7 @@ pub fn showcase() -> Document {
         stroke=Sides(all=Stroke(thickness=Pt(0.5), paint=Luma(220))),
       )
     }),
-    Show(Select::link()) <| ((it, _) => Underline(it)),
+    Show(Select::link(), (it, _) => Underline(it)),
     // Title.
     Block(
       Seq([
@@ -154,7 +154,7 @@ pub fn showcase() -> Document {
       fill=title_fill,
     ),
     V(Pt(4)),
-    Outline(depth=2, extra=[("indent", Value::auto())]),
+    Outline(depth=2, indent=Auto),
     // Text and paragraphs.
     Heading("Text and paragraphs"),
     Par(
@@ -170,13 +170,11 @@ pub fn showcase() -> Document {
           ]),
         ),
         " Smart quotes adapt to the language: ",
-        Smartquote(),
-        "English",
-        Smartquote(),
+        Quoted("English"),
         ", ",
-        Text(Seq([Smartquote(), "Deutsch", Smartquote()]), lang="de"),
+        Text(Quoted("Deutsch"), lang="de"),
         ", ",
-        Text(Seq([Smartquote(), "Français", Smartquote()]), lang="fr"),
+        Text(Quoted("Français"), lang="fr"),
         ". See ",
         Link(Url("https://typst.app"), body="typst.app"),
         ".",
@@ -211,17 +209,17 @@ pub fn showcase() -> Document {
     // Mathematics.
     Heading("Mathematics"),
     Par(
-      Seq([
-        "The quadratic formula ",
-        Equation(quadratic),
-        " sits inline, while display math gets its own line:",
-      ]),
+      (
+        $|The quadratic formula \{Equation(quadratic)} sits
+        $|inline, while display math gets its own line:
+      )
+      |> Prose,
     ),
     Equation(display_math[0], block=true),
     Equation(display_math[1], block=true),
     Equation(display_math[2], block=true),
     Equation(maxwell, block=true, label="maxwell"),
-    Par(Seq(["Maxwell's law, ", Ref("maxwell"), ", is referenced by label."])),
+    Par(Prose("Maxwell's law, \{Ref("maxwell")}, is referenced by label.")),
     // Tables and figures.
     Heading("Tables and figures"),
     Figure(
@@ -229,20 +227,14 @@ pub fn showcase() -> Document {
         stage_cells,
         columns=[Auto, Fr(1), Auto, Auto],
         align=Cells::columns([Left, Left, Right, Right]),
-        stroke=Cells() <| ((_, y) => {
+        stroke=Cells((_, y) => {
           if y == 0 {
             Sides(bottom=Stroke(thickness=Pt(0.8)))
           } else {
             Sides(bottom=Stroke(thickness=Pt(0.3), paint=Luma(200)))
           }
         }),
-        fill=Cells() <| ((_, y) => {
-          if y > 0 && y % 2 == 1 {
-            Luma(247)
-          } else {
-            None
-          }
-        }),
+        fill=Cells((_, y) => if y > 0 && y % 2 == 1 { Luma(247) } else { None }),
       ),
       caption="Differential test stages against upstream Typst.",
       label="stages",
@@ -268,18 +260,18 @@ pub fn showcase() -> Document {
     // Code.
     Heading("Code"),
     Par(
-      Seq([
-        "Code blocks are highlighted with a port of ",
-        Raw("syntect"),
-        " and Typst's bundled syntaxes, see ",
-        Ref("stages"),
-        ":",
-      ]),
+      (
+        $|Code blocks are highlighted with a port of \{Raw("syntect")} and Typst's
+        $|bundled syntaxes, see \{Ref("stages")}:
+      )
+      |> Prose,
     ),
     Raw(rust_code, lang="rust", block=true),
     Raw(python_code, lang="python", block=true),
     Par(
-      "And MoonBit itself is the scripting language — this table is computed:",
+      Prose(
+        "And MoonBit itself is the scripting language — this table is computed:",
+      ),
     ),
     Table(
       fib_cells,
@@ -319,6 +311,66 @@ fn typ_text(text : String) -> String {
 /// A content block with literal text: `[#"text"]`.
 fn typ_block(text : String) -> String {
   "[" + typ_text(text) + "]"
+}
+
+///|
+/// The functional Typst twin of `Prose(text)` as the body of a content
+/// block: one `#"word"` per word, markup's white space between them (a
+/// line break where the text has one), `#smartquote(double: ..)` for the
+/// quotes and `#parbreak()` for a blank line. The character U+0001 stands
+/// for an interpolated description; `inserts` are their Typst expressions,
+/// in order.
+fn typ_prose(text : String, inserts : Array[String]) -> String {
+  let out = StringBuilder()
+  let word = StringBuilder()
+  let mut gap = -1
+  let mut any = false
+  let mut next = 0
+  let flush = () => {
+    if !word.is_empty() {
+      out.write_string(typ_text(word.to_string()))
+      word.reset()
+    }
+  }
+  for c in text {
+    if c == ' ' || c == '\n' {
+      flush()
+      if gap < 0 {
+        gap = 0
+      }
+      if c == '\n' {
+        gap += 1
+      }
+      continue
+    }
+    if word.is_empty() {
+      if gap >= 0 && any {
+        out.write_string(
+          if gap >= 2 {
+            "#parbreak()"
+          } else if gap == 1 {
+            "\n"
+          } else {
+            " "
+          },
+        )
+      }
+      gap = -1
+    }
+    any = true
+    if c == '\u{1}' {
+      flush()
+      out.write_string("#" + inserts[next])
+      next += 1
+    } else if c == '"' || c == '\'' {
+      flush()
+      out.write_string("#smartquote(double: \{c == '"'})")
+    } else {
+      word.write_char(c)
+    }
+  }
+  flush()
+  out.to_string()
 }
 
 ///|
@@ -364,7 +416,7 @@ pub fn showcase_typst() -> String {
   // Text and paragraphs.
   parts.push("#heading[#\"Text and paragraphs\"]")
   parts.push(
-    "#par[\{typ_text(intro_1)}#text(number-type: \"old-style\")[#\"1234567890\"]\{typ_text(intro_2)}#footnote[#\"Hyphenation patterns come from the \"#raw(\"hypher\")#\" crate, ported to MoonBit together with its tries.\"]#\" Smart quotes adapt to the language: \"#smartquote()#\"English\"#smartquote()#\", \"#text(lang: \"de\")[#smartquote()#\"Deutsch\"#smartquote()]#\", \"#text(lang: \"fr\")[#smartquote()#\"Français\"#smartquote()]#\". See \"#link(\"https://typst.app\")[#\"typst.app\"]#\".\"]",
+    "#par[\{typ_text(intro_1)}#text(number-type: \"old-style\")[#\"1234567890\"]\{typ_text(intro_2)}#footnote[#\"Hyphenation patterns come from the \"#raw(\"hypher\")#\" crate, ported to MoonBit together with its tries.\"]#\" Smart quotes adapt to the language: \"#[#smartquote()#\"English\"#smartquote()]#\", \"#text(lang: \"de\")[#smartquote()#\"Deutsch\"#smartquote()]#\", \"#text(lang: \"fr\")[#smartquote()#\"Français\"#smartquote()]#\". See \"#link(\"https://typst.app\")[#\"typst.app\"]#\".\"]",
   )
   parts.push("#par(text(lang: \"de\")\{typ_block(german)})")
   parts.push(
@@ -373,14 +425,23 @@ pub fn showcase_typst() -> String {
   // Mathematics.
   parts.push("#heading[#\"Mathematics\"]")
   parts.push(
-    "#par[#\"The quadratic formula \"#\{typ_equation(quadratic, false)}#\" sits inline, while display math gets its own line:\"]",
+    "#par[" +
+    typ_prose(
+      "The quadratic formula \u{1} sits\ninline, while display math gets its own line:",
+      [typ_equation(quadratic, false)],
+    ) +
+    "]",
   )
   for source in display_math {
     parts.push("#" + typ_equation(source, true))
   }
   parts.push("#" + typ_equation(maxwell, true) + "<maxwell>")
   parts.push(
-    "#par[#\"Maxwell's law, \"#ref(<maxwell>)#\", is referenced by label.\"]",
+    "#par[" +
+    typ_prose("Maxwell's law, \u{1}, is referenced by label.", [
+      "ref(<maxwell>)",
+    ]) +
+    "]",
   )
   // Tables and figures.
   parts.push("#heading[#\"Tables and figures\"]")
@@ -403,12 +464,22 @@ pub fn showcase_typst() -> String {
   // Code.
   parts.push("#heading[#\"Code\"]")
   parts.push(
-    "#par[#\"Code blocks are highlighted with a port of \"#raw(\"syntect\")#\" and Typst's bundled syntaxes, see \"#ref(<stages>)#\":\"]",
+    "#par[" +
+    typ_prose(
+      "Code blocks are highlighted with a port of \u{1} and Typst's\nbundled syntaxes, see \u{1}:",
+      ["raw(\"syntect\")", "ref(<stages>)"],
+    ) +
+    "]",
   )
   parts.push("#raw(\{typ_str(rust_code)}, lang: \"rust\", block: true)")
   parts.push("#raw(\{typ_str(python_code)}, lang: \"python\", block: true)")
   parts.push(
-    "#par[#\"And MoonBit itself is the scripting language — this table is computed:\"]",
+    "#par[" +
+    typ_prose(
+      "And MoonBit itself is the scripting language — this table is computed:",
+      [],
+    ) +
+    "]",
   )
   let fibs = StringBuilder()
   for n in fibonacci(12) {

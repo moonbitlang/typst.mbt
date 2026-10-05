@@ -4,12 +4,19 @@
 /// A document: a sequence of content and rules.
 pub struct Document {
   priv content : Content
+  /// The directory of the document, relative to the project root.
+  priv dir : String
 }
 
 ///|
 #callsite(autofill(loc, args_loc))
+/// `dir` is the directory of the document, relative to the project root
+/// (default: the root): relative paths in its arguments and in its
+/// `Markup` fragments resolve against it, as they would in a Typst file in
+/// that directory.
 pub fn Document::Document(
   children : Array[&IntoContent],
+  dir? : String = "",
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> Document {
@@ -17,6 +24,7 @@ pub fn Document::Document(
     content: Content::of(
       NSeq(snapshot(children), Site::new("Document", loc, args_loc)),
     ),
+    dir,
   }
 }
 
@@ -314,13 +322,24 @@ fn Document::lower_initial(
     introspector: @library.Introspector::empty(),
     traced,
     sink,
-    route: @library.Route::extend_(@library.Route::root()).with_id(origins_file),
+    route: @library.Route::extend_(@library.Route::root()).with_id(
+      session.registry.origins,
+    ),
   }
   let lower : Lower = {
     session,
     engine,
     context: @library.Context::none(),
     keys: [],
+  }
+  lower.check_text(self.dir, @syntax.Span::detached())
+  if virtual_file(self.dir, "<edsl-origins>") is Option::None {
+    raise @library.SourceError([
+      @library.SourceDiagnostic::error_at(
+        @syntax.Span::detached(),
+        "the document's directory is not a path inside the project: \{self.dir}",
+      ),
+    ])
   }
   lower.content(self.content, @syntax.Span::detached())
 }
@@ -355,7 +374,7 @@ pub fn[T : @library.Output] Document::compile(
   self : Document,
   world : &@library.World,
 ) -> CompileReport[T] {
-  let session = Session::new(world)
+  let session = Session::new(world, dir=self.dir)
   let session_world : SessionWorld = { session, }
   let sink = @library.Sink::new()
   let traced = @library.Traced::new()
@@ -380,7 +399,7 @@ pub fn Document::lower(
   self : Document,
   world : &@library.World,
 ) -> CompileReport[@library.Content] {
-  let session = Session::new(world)
+  let session = Session::new(world, dir=self.dir)
   let session_world : SessionWorld = { session, }
   let sink = @library.Sink::new()
   let traced = @library.Traced::new()

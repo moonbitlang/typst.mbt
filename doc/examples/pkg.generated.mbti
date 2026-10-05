@@ -28,6 +28,8 @@ pub fn picture() -> @doc.Figure
 
 pub fn plain_values() -> @doc.Seq
 
+pub fn prose() -> @doc.Seq
+
 pub fn report() -> @doc.Document
 
 pub fn rules() -> @doc.Document

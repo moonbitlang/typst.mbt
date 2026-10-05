@@ -121,7 +121,13 @@ and decide API questions below.
    constructor needs neither when the expected type is its own type
    (`numbering=Numbering("1.")`).
 10. `with` and `and` are keywords and cannot be method names; `moon fmt`
-    rewrites a trailing callback as `f(a) <| ((x, y) => { ... })`. A braced
+    rewrites a trailing callback with several parameters as
+    `f(a) <| ((x, y) => { ... })` (`f(a) <| (x, y) => { ... }` parses and
+    type-checks, but the formatter adds the parentheses; a one-parameter
+    callback stays `f() <| x => { ... }`). The callback is the last
+    positional parameter, so `f(a, (x, y) => { ... })` is the same call
+    without the extra parentheses and is stable under `moon fmt`: the
+    documents of `doc/twins` use this spelling. A braced
     body that is a single identifier (`(it, _) => { it }`) parses as a
     record literal; `it` alone or `{ Content(it) }` is meant.
 11. An enum may have cases named `None` and `Auto` (the engine's own
@@ -240,6 +246,211 @@ Par(Seq(["Typeset with ", Emph("care"), "."]))
   change the lowered content.
 - **`Space()`** is markup's space element (`SpaceElem::shared()`), for
   authors who need Typst's collapsing space rather than a `" "` text.
+  **`Space::newline()`** is the space markup produces for a line break in
+  the source (`SpaceElem::shared_with_newline()`): realization discards it
+  next to text of a writing system without spaces (Chinese, Japanese).
+  Converted markup needs it to keep the original's behaviour; authors write
+  the string without a space instead.
+
+### 4.3 What markup writes with punctuation
+
+A plain string is never parsed, so the constructs that Typst markup spells
+with punctuation have constructors, and the characters are written as such:
+
+| Markup | EDSL |
+|---|---|
+| `"quoted"`, `'quoted'` (smart quotes by language and nesting) | `Quoted("quoted")`, `Quoted("quoted", double=false)`: a `smartquote` element before and after the body; twin `[#smartquote()#body#smartquote()]` |
+| an apostrophe `'` inside a word | the character `’` in the string (what the smart quote resolves to in every language) |
+| `--`, `---`, `...`, `~`, `-?`, escapes (`\#`) | the characters `–`, `—`, `…`, U+00A0, U+00AD, `#` in the string. (Markup evaluates these to symbol values, displayed as `symbol` elements that realization turns into text; `Symbol("—")`, the twin of `#symbol("—")`, is that element for converted markup.) |
+| a line break or several spaces in the source | one `" "` in the string; `Space()`/`Space::newline()` only for the collapsing behaviour |
+| a blank line | a new `Par(..)`, or `Parbreak()` between pieces of inline content |
+| `= Heading`, `- item`, `+ item`, `/ term: text` | `Heading(..)`, `List([..])`/`ListItem(..)`, `Enum([..])`/`EnumItem(..)`, `Terms([..])`/`TermsItem(..)` |
+| `` `raw` ``, `$x$`, `@label`, `<label>` | `Raw(..)`, `Equation(..)`, `Ref(..)`, `label=` or `Labelled(..)` |
+
+Plain strings are deliberately not scanned for quotes: a document that
+needs a straight `"` or `'` as text can write it, and `Quoted` is explicit
+about what the language decides. Running text is written with `Prose`
+(4.4), where quotes are smart and white space is markup's.
+
+### 4.4 Prose
+
+Running text with inline elements is noisy as a sequence of fragments:
+
+```moonbit
+Par(Seq(["Code blocks are highlighted with a port of ", Raw("syntect"),
+         " and Typst’s bundled syntaxes:"]))
+```
+
+`Prose` takes the text as one string with the inline descriptions
+interpolated into it; with MoonBit's multiline strings (`$|` lines
+interpolate, `#|` lines do not) and the pipe operator:
+
+```moonbit
+(
+  $|Code blocks are highlighted with a port of \{Raw("syntect")}
+  $|and Typst's bundled syntaxes:
+) |> Prose
+```
+
+```moonbit
+pub fn Prose::Prose(text : String, quotes? : Bool = true,
+                    loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Prose
+```
+
+**What the text means.** The string is not markup. Exactly three things
+in it are not literal text:
+
+1. **White space** (space, tab, line feed, carriage return). A run of
+   white space between two pieces is one space element, markup's
+   collapsing `space` (so a line break of the string is a space, and
+   next to Chinese or Japanese text it is no space, as in markup:
+   the run lowers to `Space::newline()` if it contains a line break and to
+   `Space()` otherwise). A line break is a line feed, a carriage return,
+   or a carriage return followed by a line feed (one break), as in
+   markup. A run with two or more line breaks (a blank line) is a
+   paragraph break, `parbreak()`. White space at the start and at the end
+   of the text is dropped.
+2. **The quote characters** `"` and `'` are `smartquote(double: true)` and
+   `smartquote(double: false)`: the engine resolves them by language and
+   nesting, and an apostrophe is a single quote, as in markup. With
+   `quotes=false` they are literal text.
+3. **Placeholders** of interpolated descriptions (below).
+
+Everything else is literal text, one text element per run between those:
+`*`, `_`, `#`, `$`, `@`, `<`, `\\`, `~`, `--` from the author or from data
+are never interpreted. An interpolated string or number (`\{name}`,
+`\{count}`) is part of the text like what surrounds it (its white space
+and quotes are treated like the rest); `\{Lit(s)}` inserts a string
+verbatim.
+
+The result is inline content, a sequence. As an element's body it is that
+body (`Par(Prose(..))`, `caption=Prose(..)`, `Footnote(Prose(..))`, a
+table cell); directly in a `Document` or `Seq` it forms paragraphs the way
+markup does (realization collects the inline content between blocks, and a
+blank line of the prose separates two paragraphs). An interpolated block
+element (a `Heading`, a `Figure`) interrupts the paragraph, as in markup.
+A plain `String` keeps its meaning: literal text, the twin of `#"..."`.
+
+**Twin.** The content block with one `#"word"` per text run, markup's
+white space where the prose has white space (a line break where it has
+one), `#smartquote(double: ..)` for the quotes, `#parbreak()` for a blank
+line and the interpolated expressions in place:
+
+| EDSL | Typst twin |
+|---|---|
+| `Prose("a \"b\" \{Emph("c")}.")` | `[#"a" #smartquote(double: true)#"b"#smartquote(double: true) #emph[#"c"]#"."]` |
+| `Prose("one\ntwo\n\nthree")` | `[#"one"`⏎`#"two"#parbreak()#"three"]` |
+
+**Interpolation: `Show` is the hook, `Debug` is for people.** `\{x}` in
+a string calls `Show` for `x`. The description types that are content of
+their own — the generated element, function-facade and view types,
+`Content`, `Seq`, `Lit`, `Labelled`, `Keyed`, `Space`, `Symbol`, `Quoted`,
+`Markup`, `Equation`, `Call`, `Context`, the counter updates,
+`ContentView` and `Prose` itself — implement `@builtin.Show` by writing a
+**placeholder**. (The rule types do not, so interpolating a rule does not
+compile; nor do `Value`, the state markers `NoneValue`/`AutoValue` and
+`Document`: `Content(x)` wraps anything that is content.) What a
+description is made of is shown by core's `Debug` trait, which every
+description type implements, rules, values and `Document` included, with a
+readable representation in constructor syntax:
+
+```moonbit
+debug(Heading("Title", level=2))             // Heading("Title", level=2)
+debug_inspect(Prose("a \{Emph("b")}"), content="Prose([\"a\", Space, Emph(\"b\")])")
+println("built \{Repr(heading)}")            // in a string: Repr, not the bare value
+```
+
+`debug(v)`, `debug_inspect(v, ..)` in tests and `\{Repr(v)}` in strings
+are the ways to print a description; plain `\{v}`, `v.to_string()` and
+`println(v)` give the placeholder and belong to `Prose` only.
+
+A placeholder is the noncharacter U+FDD0, a decimal number in canonical
+spelling (no leading zeros, at most 18 digits) and U+FDD1. The number
+names the description in a **process-wide table** (`prose_table`), like
+the serial of a callback; numbers are 64-bit and never reused. `Prose`
+splits its text at the placeholders, **takes** the descriptions out of the
+table and puts them into its sequence, so the description keeps its
+structure and its own origin (the constructor call inside `\{..}` has its
+own call site).
+
+- *Lifetime.* An entry lives from the interpolation to the `Prose` call
+  that consumes it — normally the next call. Nothing of the table is part
+  of a description, a session or an output; a compilation never reads it
+  except to word an error (below). Entries of strings that never reach a
+  `Prose` (a description printed with `println` instead of `debug`) stay
+  pending. The table holds the 65,536 newest pending entries: beyond
+  that the oldest is dropped, and a `Prose` whose text still names it
+  fails with `an interpolated description of this text was already used
+  by another Prose, or dropped because more than 65536 descriptions were
+  interpolated since` (below the oldest pending number the table cannot
+  tell a consumed entry from a dropped one). A
+  program that builds more than that many strings before turning the
+  first into `Prose` must build and consume them in smaller batches.
+- *One use.* The text of a `Prose` can be used once: a second `Prose` of
+  the same string value finds its descriptions taken and is an error at
+  lowering (`an interpolated description of this text was already used by
+  another Prose`). Building the string again (a loop, a function) creates
+  new placeholders.
+- *Reserved characters.* In the text of `Prose` the two delimiter
+  characters are reserved: a delimiter that is not part of a placeholder
+  with a number that an interpolation was given is an error (`the text of
+  Prose contains a reserved character (U+FDD0)`). Text that reproduces a
+  pending placeholder exactly — the delimiters around the number of a
+  description that is interpolated but not yet consumed — cannot be told
+  from the interpolation; data that may contain these noncharacters must
+  be inserted with `\{Lit(data)}`, never interpolated as a bare string.
+  `Lit` protects the delimiter characters as such; a string that spells a
+  complete placeholder of a number that was given out is not
+  representable anywhere (lowering rejects it as a leak).
+- *Callbacks.* `Prose` and the interpolation are pure constructions that
+  run when the author's code runs, also inside a layout-time callback
+  (section 11.5): the callback builds its string and its `Prose` in one
+  go, what it interpolated is consumed when the constructor returns, and
+  the numbers never reach the result, so repeated or skipped invocations
+  (memoization) cannot be observed in any output. The table is shared
+  state only in the two limits above (the cap and the reserved
+  characters). Views are interpolated like descriptions
+  (`Prose("§ \{it}")` in a show callback).
+
+**Leaks are errors, never output.** A placeholder is only meaningful in
+the text of `Prose`. Lowering checks every string it turns into engine
+data or looks up by — literal text (`String`, `Lit`), string values
+(`Value::str`, the text of `Raw`, paths, labels, the source of `Markup`
+and `Equation`) and names (dictionary keys, argument names of `Call` and
+`extra`, the paths of `Call`, `Set` and `Value::global`, scope names, the
+keys of `Keyed`, the directory of a `Document`) — for a complete
+placeholder with a number that was given out (a delimiter character alone
+is ordinary, if unusual, text, which upstream's suite has), also the
+string that a called function returns, and fails
+with `` `Emph` was interpolated into a string that is not the text of
+`Prose` `` (naming the interpolated constructor from the table, if it is
+still there) at the string's origin, with the hint to use `Prose` or
+`Seq`. The text of a `Prose` that contains the delimiter characters
+without a valid placeholder is rejected (`the text of Prose contains a
+reserved character (U+FDD0)`); a rule smuggled in through `Content(..)` is
+rejected (`` `SetText` is a rule and cannot be interpolated into prose ``).
+All are located errors at the `Prose` call or the offending string
+(the directory of a `Document`, which has no argument origin of its own
+at that point, is reported without a location).
+The check is on the strings the EDSL hands to the engine, not on what
+Typst code computes from them: a placeholder that reaches Typst code in an
+escaped spelling (the string re-encoded as a Typst string literal with
+`\u{fdd0}` escapes and evaluated by `eval` or `Markup`) is rebuilt by that
+code as ordinary text of noncharacters and a number. If the rebuilt
+string is itself the result of the call, it is still caught (results that
+are strings are checked); inside content or a collection that Typst code
+returns it is not, and engine values are not scanned. No description is
+lost or confused by that, and it does not happen by accident.
+
+**Origins.** The `Prose` call is one origin. Its text runs take the span
+of its `text` argument, like plain strings in an array take the array's
+(tier 1; the engine offset of a glyph is relative to its text run, so
+tier 2 narrows within the run, not within the whole string); its quotes
+and paragraph breaks are calls with the span of the `Prose` call; its
+spaces have no span, like `Space()`. Interpolated descriptions keep their
+own origins. Diagnostics that differ only in which text run of one `Prose`
+they concern are therefore deduplicated by the engine; `Lit` gives a text
+a location of its own where that matters.
 
 ## 5. Lowering
 
@@ -509,7 +720,10 @@ All are immutable and lowered through Typst's public functions or values.
 | `Numbering` | `Numbering(pattern)`; `Numbering::func() <| (numbers, cx) => { ... }`; `Numbering::none()` | `numbering=Numbering("1.1")` |
 | `Supplement` | `Supplement(content)`; `Supplement::func() <| (it, cx) => { ... }`; `Supplement::none()`, `Supplement::auto()` | |
 | `Celled<T>` | `Cells[T]`: `Cells::all(v)`, `Cells::columns([..])`, `Cells() <| (x, y) => { ... }` | section 7.3 |
-| `DataSource` | `&IntoSource`, implemented by `String` (a path), `Bytes` and `Source` | `Image("chart.png")` |
+| `DataSource` | `&IntoSource`, implemented by `String` (a path), `Bytes`, `Array[String]` (several paths, where the field takes them) and `Source` (`Path`, `Bytes`, `Many`) | `Image("chart.png")`, `Bibliography(["a.bib", "b.yml"])` |
+| `TrackSizings` | `Array[Sizing]`; `Sizing::repeat(n, size?)` is Typst's count shorthand | `columns=[Auto, Fr(1)]`, `columns=Sizing::repeat(5)` for `columns: 5` |
+| colour maps | `Paint::map(name)`: the stops `..color.map.<name>` (a spread value, section 13) | `Paint::conic(Paint::map("rainbow"))` |
+| `Tiling` | `Paint::tiling(body, size?, spacing?, offset?, angle?, relative?)` (generated from the function's metadata) | `fill=Paint::tiling(Line(..), size=(Pt(8), Pt(8)))` |
 | `FontWeight`, `Dir` | enums (`Bold`, `Weight(450)`; `Ltr`, `Rtl`, `Auto`) | `weight=Bold` |
 | other string enums | `String`, as written in Typst, in phase 1 (`fit="cover"`); generated enums in phase 2 | |
 | `LinkTarget` | `enum LinkTarget { Url(String); ToLabel(String); Dest(Value) }` | `Link(Url("https://.."))` |
@@ -528,7 +742,13 @@ constructor with that function's parameters — positional ones first,
 settable ones as optional labelled parameters with plain values — and it
 lowers by calling the function. Phase 1 writes the three gradient
 constructors by hand; phase 2 generates the function facades from the
-manifest's function metadata, as `docgen.py` does for elements.
+manifest's function metadata, as `docgen.py` does for elements. The
+generator has the mechanism (`FUNCS` in `scripts/docgen.py`): a function
+that returns content becomes a content type (`Lorem(words)`,
+`PolygonRegular(vertices?, size?, fill?, stroke?)`), a function that
+returns a value a static method of its facade (`Paint::tiling(..)`). The
+list is the functions the full showcase needs; the other value functions
+(colour spaces, dash patterns, dates) remain `Value::call`.
 
 ### 6.5 Before and after
 
@@ -701,6 +921,11 @@ positional/named arguments and its functional twin. Phase-1 entries:
 | `equation` | `Equation(source : String, block?, numbering?, ..., scope?)` | section 13 |
 | `table`, `grid` | `Table(children, columns?, ..., gutter?)` | external `gutter`, parse hooks |
 | `v`, `h` | `V(amount : Spacing, weak?)` | internal `attach` not exposed |
+| `math.equation` | `SetEquation(..)`, `Select::equation(..)`, `EquationView` | generated without a constructor: the constructor is the handwritten `Equation(source, ..)` |
+| `bibliography` | `Bibliography(sources : &IntoSource, title?, full?, style? : String, ..)` | one path, bytes or several sources; `style` is a CSL name or path |
+| `cite` | `Cite(key : String, supplement?, form?, style?)` | `key` is the label name |
+| `scale` | `Scale(body, factor?, x?, y?, ..)` | the external positional `factor` is labelled and passed positionally |
+| `polygon`, `curve` | `Polygon(vertices : Array[(Length, Length)], ..)`, `Curve(components, ..)` with `CurveMove`/`CurveLine`/`CurveQuad`/`CurveCubic`/`CurveClose` | a variadic parameter of values is a typed array |
 
 Each generated type's documentation carries its review note with the
 functional twin (`scripts/docgen.py`, `review=`).
@@ -786,6 +1011,16 @@ Document([
   `` `show page` is not supported and has no effect``.
 - A show rule without a selector (`show: f`) is plain function application
   in MoonBit (`template(Seq([...]))`) and needs no construct.
+- **`ShowWith(selector, transform : Value)`** is the show rule whose
+  transformation is a value — a Typst function (`show link: underline` is
+  `ShowWith(Select::link(), Value::global("underline"))`), content or a
+  string — cast to a transformation at the `transform` argument like the
+  evaluator casts the right-hand side of a show rule.
+  **`ShowWith::all(transform)`** is `show: transform`: like the evaluator's
+  `styled_with_recipe`, a rule without a selector is applied to the rest of
+  the sequence at once (`recipe.apply`) instead of styling it. These are the
+  value-level hatch for rules, as `Set` is for set rules; converted Typst
+  code needs them for transformations that are not MoonBit callbacks.
 
 ## 9. Selectors and views
 
@@ -1237,8 +1472,14 @@ string relative to the file of the argument's span (`PathOrStr::resolve`,
 - `import`/`include` and paths inside `Markup` resolve relative to the
   snippet file, i.e. the project root as well.
 
-A document needing another base uses root-relative paths or a world rooted
-elsewhere; a per-document base directory is not part of this design.
+A document that lives elsewhere names its directory:
+`Document(children, dir="chapters/intro")` puts the session's virtual files
+(the origin listing and the snippets) into that directory of the project,
+so relative paths in arguments and in `Markup` fragments resolve as they
+would in a Typst file there. Path strings are still passed unchanged. The
+directory must be a path inside the project (lowering fails otherwise);
+each distinct directory uses its own interned file ids (1 + the snippet
+slots in use).
 
 ## 13. Escape hatches
 
@@ -1282,7 +1523,16 @@ pub fn Set::Set(path : String, named : Array[(String, Value)], loc~ : SourceLoc,
   `::dict([(k, v)])`, `::content(c)`, `::label(name)`, `::global(path)`
   (a binding of the global scope, e.g. `"red"`),
   `::call(path, positional?, named?)`, and the typed `::paint`, `::stroke`,
-  `::alignment`, `::sizing`. A `Value` is also what a view's `field(name)`
+  `::alignment`, `::sizing`. `a.add(b)`, `a.sub(b)`, `a.mul(b)`,
+  `a.div(b)` and `a.neg()` are Typst's operators `+`, `-`, `*`, `/` and
+  unary `-` on values: they are applied when the value is lowered, the
+  left operand first, with Typst's results and error messages (`1pt +
+  red` is a stroke, `"a" + 1` fails with `cannot add string and
+  integer`). `Value::spread(v)` among the positional
+  arguments of a call is Typst's `..v` (the evaluator's rule: an array
+  gives positional arguments, a dictionary named ones, `arguments` both,
+  `none` nothing, anything else `cannot spread <type>`); anywhere else it
+  is a lowering error. A `Value` is also what a view's `field(name)`
   returns, and it is content (`impl IntoContent for Value`): as an
   argument the value itself, in a sequence its display, like `#value` in
   markup. There is deliberately **no constructor from a raw
@@ -1301,7 +1551,7 @@ pub fn Set::Set(path : String, named : Array[(String, Value)], loc~ : SourceLoc,
   evaluator's rule and warnings (`Seq([Heading("x"), Value::label("h")])` is
   `[#heading[x]#label("h")]`), also when the expression is wrapped in
   `Keyed`, which never changes the lowered content. As an argument, a
-  `Value` is the argument itself (`caption=NoneValue()`). **`Set(path, named)`** is the generic set rule.
+  `Value` is the argument itself (`caption=NoneValue()`). **`Set(path, named, positional?)`** is the generic set rule (`set text(8pt, red)` is `Set("text", [], positional=[..])`).
   `path` is resolved like an identifier with field accesses in the
   evaluator: the first segment in the library's global scope, the rest with
   `Value::field` (`table.cell`, `math.equation`, `gradient.linear`). An

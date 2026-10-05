@@ -50,6 +50,9 @@ using @doc {
   type Raw,
   type Align,
   type Ref,
+  type Prose,
+  type Rect,
+  type Parbreak,
   trait IntoContent,
 }
 
@@ -271,6 +274,34 @@ pub fn overrides() -> Seq {
 }
 
 ///|
+/// Section 4.4: running text as one interpolated string.
+pub fn prose() -> Seq {
+  let name = "MoonBit"
+  Seq([
+    Par(
+      Seq([
+        "Code blocks are highlighted with a port of ",
+        Raw("syntect"),
+        " and Typst’s bundled syntaxes:",
+      ]),
+    ),
+    (
+      $|Code blocks are highlighted with a port of \{Raw("syntect")}
+      $|and Typst's bundled syntaxes:
+    )
+    |> Prose,
+    Parbreak(),
+    Par(Prose("a \"b\" \{Emph("c")}.")),
+    Prose("one\ntwo\n\nthree"),
+    Figure(
+      Rect(width=Pt(40), height=Pt(10)),
+      caption=Prose("Written in \{name}: \{Strong("typed")} prose."),
+    ),
+    Prose("5' 10\" verbatim: \{Lit("5' 10\"")}", quotes=false),
+  ])
+}
+
+///|
 /// Section 14: a complete document.
 pub fn report() -> Document {
   Document([
@@ -289,6 +320,7 @@ pub fn report() -> Document {
     escape_hatches(),
     overrides(),
     plain_values(),
+    prose(),
   ])
 }
 

@@ -1,0 +1,15 @@
+- **MAJOR — [doc/convert/markup.mbt:197](/Users/dii/git/typst.mbt/.claude/worktrees/agent-ab7f0b101467f17ea/doc/convert/markup.mbt:197): non-label proof ignores local bindings.** `#heading[H] #{ let x = <target>; x }` becomes a heading followed by an isolated `Markup` fragment. Typst attaches `<target>` to the heading; the fragment cannot. `not_label` incorrectly treats local `x` as a global. **Fix:** track bindings and shadowing inside blocks/loops, or conservatively fall back to the enclosing stream.
+
+- **MAJOR — [doc/convert/translate.mbt:255](/Users/dii/git/typst.mbt/.claude/worktrees/agent-ab7f0b101467f17ea/doc/convert/translate.mbt:255): generated variable names collide.** `#let a-b=1; #let a_b=2; #let a_b_2=3; #a_b` emits `v_a_b_2` twice and displays `3` instead of `2`. The allocator reserves base names but not generated suffixes. **Fix:** reserve every emitted identifier and retry until globally unused.
+
+- **MAJOR — [doc/convert/translate.mbt:378](/Users/dii/git/typst.mbt/.claude/worktrees/agent-ab7f0b101467f17ea/doc/convert/translate.mbt:378): readable mode interpolates strings as text, losing boundaries.** `a#"b"c` becomes `Prose("a\{"b"}c")`: one text node `"abc"` instead of three. Inserted whitespace and quotes can also be reinterpreted. This violates §4.7’s exact-segmentation condition. **Fix:** wrap string-valued insertions in `Lit`, including translated string variables, before interpolating them.
+
+- **MINOR — [doc/lower.mbt:396](/Users/dii/git/typst.mbt/.claude/worktrees/agent-ab7f0b101467f17ea/doc/lower.mbt:396): argument spans collide after 16 arguments.** A `color.mix` call with 17 explicit `(red, "bad")` arguments produces 17 upstream diagnostics; lowering assigns argument 17 the first argument’s span, collapsing their identical errors. **Fix:** allocate distinct registered ranges for every argument occurrence; do not silently reuse the base span.
+
+- **MAJOR — [tests/runner/edsl_suite.mbt:299](/Users/dii/git/typst.mbt/.claude/worktrees/agent-ab7f0b101467f17ea/tests/runner/edsl_suite.mbt:299): structural comparison inherits a type-erasing encoding.** `StructDumper::value` encodes both empty arrays and empty dictionaries as `()`. Consequently, `#metadata(())` versus `#metadata((:))` has indistinguishable structural/tag dumps despite different query results. Their SVG, PDF and PNG exports are also identical, verified with upstream. **Fix:** encode value types explicitly, particularly arrays versus dictionaries.
+
+- **MAJOR — [tests/runner/edsl_suite.mbt:507](/Users/dii/git/typst.mbt/.claude/worktrees/agent-ab7f0b101467f17ea/tests/runner/edsl_suite.mbt:507): the suite command succeeds despite failures or missing coverage.** Failed comparisons only increment a counter; missing builders are skipped, and an empty registry returns successfully. The manifest validation promised by §8 is absent. **Fix:** validate selected cases against the manifest/registry and exit nonzero for failures or missing cases.
+
+Validation used existing binaries; no fresh rebuild in the read-only workspace.
+
+VERDICT: REQUEST CHANGES

@@ -24,6 +24,7 @@ priv enum Val {
   VAdd(Value, Value)
   VSub(Value, Value)
   VMul(Value, Value)
+  VDiv(Value, Value)
   VNeg(Value)
   VArray(Array[Value])
   VDict(Array[(String, Value)])
@@ -37,6 +38,8 @@ priv enum Val {
   VGlobal(String)
   /// A host callback.
   VCallback(Callback)
+  /// `..value` in an argument list.
+  VSpread(Value)
   /// An engine value produced by the engine, passed through.
   VEngine(@library.Value)
   /// A description that cannot be lowered (the message is reported at the
@@ -159,6 +162,47 @@ pub fn Value::call(
   named? : Array[(String, Value)] = [],
 ) -> Value {
   Value::of(VCall(FPath(path), generic_args(positional, named)))
+}
+
+///|
+/// `self + other` with Typst's operator: evaluated when the value is
+/// lowered, left operand first, with Typst's result and errors (`1pt +
+/// red` is a stroke, `"a" + 1` is `cannot add string and integer`).
+pub fn Value::add(self : Value, other : Value) -> Value {
+  Value::of(VAdd(self, other))
+}
+
+///|
+/// `self - other` with Typst's operator.
+pub fn Value::sub(self : Value, other : Value) -> Value {
+  Value::of(VSub(self, other))
+}
+
+///|
+/// `self * other` with Typst's operator.
+pub fn Value::mul(self : Value, other : Value) -> Value {
+  Value::of(VMul(self, other))
+}
+
+///|
+/// `self / other` with Typst's operator.
+pub fn Value::div(self : Value, other : Value) -> Value {
+  Value::of(VDiv(self, other))
+}
+
+///|
+/// `-self` with Typst's operator.
+pub fn Value::neg(self : Value) -> Value {
+  Value::of(VNeg(self))
+}
+
+///|
+/// `..value` among the positional arguments of a call ([Value::call],
+/// [Call], the stops of a gradient): an array is spread into positional
+/// arguments, a dictionary into named ones and `arguments` into both, as in
+/// Typst. Anywhere else it is a lowering error.
+pub fn Value::spread(value : Value) -> Value {
+  Value::of(VSpread(value))
 }
 
 ///|

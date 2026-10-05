@@ -9714,7 +9714,7 @@ pub fn Route::check_layout_depth(Self) -> Unit raise HintedError
 pub fn Route::check_show_depth(Self) -> Unit raise HintedError
 pub fn Route::contains(Self, @moonbitlang/typst/syntax.FileId) -> Bool
 pub fn Route::decrease(Self) -> Unit
-pub fn Route::extend(Self) -> Self
+pub fn Route::extend_(Self) -> Self
 pub fn Route::increase(Self) -> Unit
 pub fn Route::memo_hash(Self) -> U128
 pub fn Route::root() -> Self

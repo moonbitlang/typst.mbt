@@ -17,10 +17,10 @@ priv struct Session {
 }
 
 ///|
-fn Session::new(base : &@library.World) -> Session {
+fn Session::new(base : &@library.World, dir? : String = "") -> Session {
   {
     base,
-    registry: Registry::new(),
+    registry: Registry::new(dir~),
     hosts: {},
     start_serial: callback_serial.val,
   }
@@ -39,8 +39,8 @@ impl @library.World for SessionWorld with fn library(self) {
 }
 
 ///|
-impl @library.World for SessionWorld with fn main(_) {
-  origins_file
+impl @library.World for SessionWorld with fn main(self) {
+  self.session.registry.origins
 }
 
 ///|
