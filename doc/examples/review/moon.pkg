@@ -2,11 +2,14 @@ import {
   "moonbitlang/typst/doc",
   "moonbitlang/typst/doc/system",
   "moonbitlang/typst/doc/twins",
-  "moonbitlang/typst/library",
   "moonbitlang/typst/layout",
   "moonbitlang/core/env",
   "moonbitlang/core/string",
   "moonbitlang/core/encoding/utf8",
 }
+
+import {
+  "moonbitlang/typst/library",
+} for "wbtest"
 
 pkgtype(kind: "executable")

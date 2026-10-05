@@ -205,7 +205,7 @@ test "click: text names its call and argument; a link wins only in the upstream 
   // The first line: the string of the sequence, then the emphasis.
   guard report.origin_at(1, 14.0, 16.0) is Some(plain) else { fail("no text") }
   inspect(plain.kind, content="Seq")
-  inspect(plain.param, content="Some(0)")
+  assert_eq(plain.param, Some(0))
   inspect(plain.file, content="doc/review_test.mbt")
   guard report.origin_at(1, 50.0, 16.0) is Some(stressed) else {
     fail("no emphasis")
