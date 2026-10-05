@@ -1211,8 +1211,9 @@ characters; `"ŉaA"` upper-cased is `"ʼNAA"`, where the glyph of the source
   narrowing within the node's text;
 - the offset is `None` where it is known to be unreliable from lowering
   alone: an origin that lowered a string longer than 65,535 UTF-8 bytes —
-  as text or as a string value (`Value::str`, the text of `Raw`) — is
-  marked (sticky), and its glyphs report no offset;
+  as text, as a string value (`Value::str`, the text of `Raw`) or as the
+  string result of a call (`Call("lorem", ..)`) — is marked (sticky), and
+  its glyphs report no offset;
 - exact offsets would need the engine to carry an offset map through
   slicing, embedding and case mapping without changing the laid-out frames.
   That is outside this design; if phase 3 adds it, it is an engine change
@@ -1298,8 +1299,9 @@ pub fn Set::Set(path : String, named : Array[(String, Value)], loc~ : SourceLoc,
   sequence (`Call`, or a `Value` used as content) whose value is a **label**
   is not displayed but attached to the content before it, with the
   evaluator's rule and warnings (`Seq([Heading("x"), Value::label("h")])` is
-  `[#heading[x]#label("h")]`). As an argument, a `Value` is the argument
-  itself (`caption=NoneValue()`). **`Set(path, named)`** is the generic set rule.
+  `[#heading[x]#label("h")]`), also when the expression is wrapped in
+  `Keyed`, which never changes the lowered content. As an argument, a
+  `Value` is the argument itself (`caption=NoneValue()`). **`Set(path, named)`** is the generic set rule.
   `path` is resolved like an identifier with field accesses in the
   evaluator: the first segment in the library's global scope, the rest with
   `Value::field` (`table.cell`, `math.equation`, `gradient.linear`). An

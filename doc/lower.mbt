@@ -59,6 +59,7 @@ fn Lower::content(
     }
     // A lone inserted expression: a sequence of one.
     NCall(_) | NValue(_) => self.sequence([content], fallback)
+    NKeyed(_, _) if is_inserted(content) => self.sequence([content], fallback)
     NSeq(children, site) => {
       let entry = self.entry(site)
       // Plain strings among the children share the array argument's span.
@@ -146,19 +147,13 @@ fn Lower::sequence(
         i = children.length()
         seq.push(tail.styled(@library.Style::Recipe(recipe)))
       }
-      // An inserted expression (`#f(..)`, `#value` in markup): its value
-      // is displayed, and a label is attached to the content before it,
-      // with the evaluator's rule and warnings (`eval_markup_exprs`).
-      NCall(_) | NValue(_) => {
-        let (value, span) = match child.node {
-          NCall(call) => {
-            let entry = self.entry(call.origin)
-            let span = self.session.registry.span(entry)
-            (self.call(call.func, call.args, entry, span), span)
-          }
-          NValue(value) => (self.value(value, fallback), fallback)
-          _ => panic()
-        }
+      // An inserted expression (`#f(..)`, `#value` in markup), also
+      // inside `Keyed` wrappers, which do not change the lowered content:
+      // its value is displayed, and a label is attached to the content
+      // before it, with the evaluator's rule and warnings
+      // (`eval_markup_exprs`).
+      _ if is_inserted(child) => {
+        let (value, span) = self.inserted(child, fallback)
         match value {
           Label(label) => {
             let mut found = -1
@@ -190,13 +185,70 @@ fn Lower::sequence(
               )
             }
           }
-          value => seq.push(value.display().spanned(span))
+          value => {
+            self.mark_long(value, span)
+            seq.push(value.display().spanned(span))
+          }
         }
       }
       _ => seq.push(self.content(child, fallback))
     }
   }
   @library.Content::sequence(seq)
+}
+
+///|
+/// Whether a description is an inserted expression: a call or a value,
+/// possibly inside `Keyed` wrappers.
+fn is_inserted(content : Content) -> Bool {
+  match content.node {
+    NCall(_) | NValue(_) => true
+    NKeyed(_, body) => is_inserted(body)
+    _ => false
+  }
+}
+
+///|
+/// The value and the span of an inserted expression (`is_inserted`),
+/// evaluated under the keys of its `Keyed` wrappers.
+fn Lower::inserted(
+  self : Lower,
+  content : Content,
+  fallback : @syntax.Span,
+) -> (@library.Value, @syntax.Span) raise @library.SourceError {
+  match content.node {
+    NCall(call) => {
+      let entry = self.entry(call.origin)
+      let span = self.session.registry.span(entry)
+      (self.call(call.func, call.args, entry, span), span)
+    }
+    NValue(value) => (self.value(value, fallback), fallback)
+    NKeyed(key, body) => {
+      let keys = self.keys.copy()
+      keys.push(key)
+      let inner : Lower = { ..self, keys, }
+      let fallback = match body.node {
+        NValue(_) => self.session.registry.keyed_span(fallback, keys)
+        _ => fallback
+      }
+      inner.inserted(body, fallback)
+    }
+    _ => panic()
+  }
+}
+
+///|
+/// Glyph offsets into a string of more than 65,535 bytes are not reliable:
+/// mark the origin of `span` if `value` is one (a string literal or the
+/// result of a call).
+fn Lower::mark_long(
+  self : Lower,
+  value : @library.Value,
+  span : @syntax.Span,
+) -> Unit {
+  if value is Str(text) && @syntax.utf8_len(text.to_string()) > text_offset_max {
+    self.session.registry.mark_long_text(span)
+  }
 }
 
 ///|
@@ -392,7 +444,11 @@ fn Lower::value(
         -1,
         span,
       )
-    VCall(func, args) => self.call(func, args, -1, span).spanned(span)
+    VCall(func, args) => {
+      let result = self.call(func, args, -1, span)
+      self.mark_long(result, span)
+      result.spanned(span)
+    }
     VGlobal(path) => self.global(path, span)
     VCallback(callback) => {
       let own = self.session.registry.span(self.entry(callback.origin))

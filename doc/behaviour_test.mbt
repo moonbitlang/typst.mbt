@@ -507,6 +507,9 @@ test "text longer than the offset range reports no offset" {
     @doc.Par(long),
     @doc.Value::str(long),
     @doc.Raw(long),
+    // ... and for strings that calls produce.
+    @doc.Call("lorem", positional=[@doc.Value::int(12000)]),
+    @doc.Par(@doc.Value::call("lorem", positional=[@doc.Value::int(12000)])),
     @doc.Par("short"),
   ])
   inspect(error_messages(report), content="")

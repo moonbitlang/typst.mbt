@@ -514,7 +514,9 @@ pub fn constructs() -> Array[Twin] {
       [
         page_typ, "#set heading(numbering: \"1.\");", "#heading[#\"First\"]#label(\"first\")",
         "#heading[#\"Second\"]#label(\"second\")", "#par[#\"See \"#ref(<first>)#\" and \"#ref(<second>)#\".\"]",
-        "#[#label(\"stray\")]", "#emph[#\"twice\"]#label(\"a\")#label(\"b\")",
+        "#[#label(\"stray\")]", "#emph[#\"twice\"]#label(\"a\")#label(\"b\")", "#heading[#\"Third\"]#label(\"third\")",
+        "#heading[#\"Fourth\"]#label(\"fourth\")", "#par[#\"And \"#ref(<third>)#\", \"#ref(<fourth>)#\".\"]",
+        "#[#label(\"unattached\")]#7",
       ],
       () => {
         Document([
@@ -529,6 +531,18 @@ pub fn constructs() -> Array[Twin] {
           Emph("twice"),
           Value::label("a"),
           Value::label("b"),
+          // `Keyed` does not change the lowered content: labels inside it
+          // attach to the content before the wrapper.
+          Heading("Third"),
+          Keyed("k", Value::label("third")),
+          Heading("Fourth"),
+          Keyed(
+            "outer",
+            Keyed("inner", Call("label", positional=[Value::str("fourth")])),
+          ),
+          Par(Seq(["And ", Ref("third"), ", ", Ref("fourth"), "."])),
+          Seq([Keyed("k", Value::label("unattached"))]),
+          Keyed("k", Value::int(7)),
         ])
       },
     ),
