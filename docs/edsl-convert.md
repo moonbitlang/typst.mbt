@@ -1,6 +1,6 @@
-# A Typst-to-EDSL translator (design, revision 4)
+# A Typst-to-EDSL translator (design, revision 5)
 
-Status: revision 4. Revision 1 (a draft with source preludes, rule
+Status: revision 5. Revision 1 (a draft with source preludes, rule
 continuations, merged text and a relaxed comparison) was rejected by the
 Codex review `docs/edsl-reviews/convert-plan-1.md`; revision 2 adopted its
 replacement design; revision 3 narrows the rules that review 2
@@ -10,8 +10,13 @@ content boundaries and the encoding of frame tags; revision 4 narrows
 further after review 3 (`convert-plan-3.md`): audited non-label calls, a
 location for every text, no nested callbacks, a strict definition of total
 arguments, no typed stroke dictionaries, literal dictionary keys, and no
-translation of trees with syntax warnings. Section 12 maps the reviews'
-items to sections.
+translation of trees with syntax warnings; revision 5 applies review 4
+(`convert-plan-4.md`): `+` and `str.at` in the non-label proof, total
+components for `Sides`/`Corners`, raw values in selectors, no writes in
+`context` wrappers, an origin for every inserted value, integer track
+counts, and only the operators the facades have; and the first finding of
+the sweep (the empty raw of markup). Section 12 maps the reviews' items
+to sections.
 
 Purpose: stress-test the EDSL of `doc/` (`docs/edsl-design.md`) by
 converting existing Typst documents — upstream's test suite and
@@ -88,9 +93,9 @@ the description that lowers to what `eval_expr` produces for it:
 | escape `\#`, shorthand `~` `--` | `Symbol("..")` (new, section 9) | a `Symbol` value, displayed as `SymbolElem` |
 | `"`, `'` | `Smartquote(double=true/false)` | `eval_smart_quote` sets `double` |
 | `*a*`, `_a_` | `Strong(..)`, `Emph(..)` | |
-| raw | `Raw(text, block=b, lang=..)` with `lines().join("\n")` | `eval_raw` |
+| raw | `Raw(text, block=b, lang=..)` with `lines().join("\n")`, if the raw has at least one line: the evaluator's raw keeps its lines, and a raw without lines (` `` `) is not `raw("")`, which has one empty line; it is not typed | `eval_raw` |
 | `https://..` | `Link(Url(".."))` | `LinkElem::from_url` |
-| `<label>` | `Value::label("..")` in the sequence | the evaluator's attachment rule, which the EDSL applies to label values in sequences |
+| `<label>` | `Call("label", positional=[Value::str("..")])` in the sequence (a label-valued inserted expression with a location of its own) | the evaluator's attachment rule, which the EDSL applies to label values in sequences |
 | `@key`, `@key[supp]` | `Ref("key", supplement=Supplement(..))` | `eval_ref` |
 | `= Heading` | `Heading(body, depth=n)` | `eval_heading` sets `depth` |
 | `- a`, `+ a`, `3. a`, `/ t: d` | `ListItem(..)`, `EnumItem(.., number=n)`, `TermsItem(..)` as siblings | the item elements; realization groups them |
@@ -107,7 +112,12 @@ inserted value like markup does (`[#1]` is content, `Seq([Value::int(1)])`),
 while the bare value as an argument would be the value. Every expression
 of the stream has a description, also those that display nothing: a typed
 `let` (section 5) leaves `Seq([])`, the empty content the evaluator pushes
-for it.
+for it. Every inserted value of a stream that is a bare `Value` (a
+displayed variable, a global) is wrapped as `Keyed("<n>", value)` with a
+number unique in the document: a bare value in an array shares the
+array's location with its siblings, and the engine deduplicates
+diagnostics by location and message; the key gives each its own origin
+and does not change the content.
 
 An equation is `Equation(source, block=..)` with the text of its math node
 if no identifier of the math is a user binding; with user bindings that
@@ -173,15 +183,18 @@ computes:
 |---|---|
 | `&IntoContent` | a content block; a string literal; `none`/`auto` as `NoneValue()`/`AutoValue()`; any expression with a `Value` form |
 | `Bool`, `Int64`, `Double`, `String` | the literal (with a sign); a translated variable of that type |
-| `Length`, `Spacing`, `Sizing`, `Angle` | numeric literals by unit; sums, differences and negations of those (the facade lowers them with Typst's operators); `auto`/`none` |
+| `Length` | numeric literals with a length or ratio unit; sums, differences and negations of those (the facade lowers them with Typst's operators); `auto`/`none` |
+| `Spacing`, `Sizing` | one numeric literal (a fraction, a length or a ratio); a `Length` form as `Rel(..)`; `auto`/`none`. No arithmetic with fractions (the facades have none) |
+| `Angle` | one numeric literal with an angle unit (the facade has no operators and no states) |
 | `Paint` | a named colour constant; `rgb("#..")`; `luma(int)`; `none`/`auto`; any `Value` form as `Value(..)` (T2) |
 | `Stroke` | a length; a paint; `length + paint`; `none`/`auto`. (A dictionary literal stays a dictionary, through `extra`: Typst validates its fields when the element function casts it, the facade would validate them while the arguments are lowered.) |
-| `Alignment`, `Dir`, `FontWeight` | the constants; `a + b` |
+| `Alignment` | the constants; `a + b` of two constants; `auto`/`none` |
+| `Dir`, `FontWeight` | the constants (a weight also as an integer literal) |
 | `Numbering`, `Supplement`, `LinkTarget` | a string; content; a label literal |
 | `&IntoSource` | a string literal, unchanged (section 9: the document's directory resolves it) |
-| `Sides[T]`, `Corners[T]` | a dictionary literal with the side keys; otherwise one `T` as `all=` |
+| `Sides[T]`, `Corners[T]` | a dictionary literal with the side keys, only when every component is total (the facade lowers its fields in a fixed order, not in source order); otherwise one `T` as `all=`. A dictionary with a component that is not total stays a dictionary, through `Value::dict` and `extra` |
 | `Cells[T]` | one `T` (`Cells::all`); an array literal of `T` (`Cells::columns`) |
-| `Array[Sizing]`, `Array[String]`, `(Length, Length)` | an array literal; the count shorthand as `Sizing::repeat(n)`; one value |
+| `Array[Sizing]`, `Array[String]`, `(Length, Length)` | an array literal; one value. An integer track count stays an integer, through `extra` (Typst validates it; `Sizing::repeat` would not) |
 | `Value` | section 4.4 |
 
 No MoonBit arithmetic, comparison or string operation is ever emitted for
@@ -208,7 +221,14 @@ particular closures do not (section 6.3).
   `set .. if ..` is not typed.
 - `show sel: set ..`: `ShowSet(selector, rule)`.
 - `show sel: transform` with a selector of the forms: an element path with
-  a selector in the table, its `.where(..)` with typed fields, a string
+  a selector in the table; its `.where(..)` as `Select::<elem>(field=..)`
+  only where the typed form of each field lowers to the raw value of the
+  Typst argument (boolean, integer and string literals, one numeric
+  literal, a named constant) — `where` keeps its arguments as they are and
+  matching compares them with the stored fields, so a constructor
+  shorthand (`stroke: 1pt` as `Stroke(thickness=..)`) would select other
+  elements; otherwise `Select::elem(path, where_=[..])` with `Value`
+  forms (T2); a string
   (`Select::literal`), `regex("..")` (`Select::regex`), a label
   (`Select::label`); another element path as `Select::elem(path, ..)`
   (T2). The transform:
@@ -246,8 +266,11 @@ particular closures do not (section 6.3).
 ### 4.6 Context
 
 `context expr`, outside a callback, where `expr` is proven not to be a
-label (section 6.1) and has no `return` outside a closure of its own (the
-evaluator's contextual closure would consume it, a fragment cannot):
+label (section 6.1), has no `return` outside a closure of its own (the
+evaluator's contextual closure would consume it, a fragment cannot) and
+contains no assignment or mutating method call (the contextual closure
+captures its outer bindings read-only, with its own error message; a
+fragment would reach them through its scope):
 `Context(_ => Markup("#{<expr>}", scope=..))`, a host callback whose
 result is a fragment evaluated with the invocation's context (T3).
 Otherwise, and inside a callback (the EDSL's creation rule forbids
@@ -287,8 +310,10 @@ rules are:
    expression returns its display). A label result would be attached to
    the content before the expression by the evaluator, which a fragment
    cannot do. The proof is by form: literals other than labels, content
-   blocks, closures, array and dictionary literals, unary and binary
-   operations, `context` and `include` expressions, global paths,
+   blocks, closures, array and dictionary literals, unary operations,
+   binary operations other than `+`, `a + b` where both operands are of
+   these forms (`none + <x>` is the label), `context` and `include`
+   expressions, global paths,
    translated variables, and conditionals, loops and code blocks whose
    branches, bodies and statements are of these forms. A call is of these
    forms only with an audited guarantee for the resolved function and
@@ -299,7 +324,8 @@ rules are:
    method in the audited list of its receiver's type where the receiver is
    a call of `counter` (`display`, `step`, `update`, `get`, `at`, `final`:
    arrays and content), a call of `state` (`update`, `display`), or a
-   string literal (every `str` method). No other call qualifies: `join`,
+   string literal (every `str` method except `at`, which returns its
+   `default`). No other call qualifies: `join`,
    `first`, `at`, `calc.min` and user functions can return a label.
    Its scope holds the translated variables it mentions.
 2. **Whole streams.** If a markup stream contains a statement that is not
@@ -484,3 +510,15 @@ Review 3 (revision 4):
 | stroke dictionaries validate early | 4.3: no typed form; a dictionary through `extra` |
 | computed dictionary keys | 4.4: identifier or string-literal keys |
 | syntax warnings disappear | 4.1: trees with errors or warnings are not translated |
+
+Review 4 (revision 5):
+
+| Review-4 item | Resolution |
+|---|---|
+| `none + <x>`, `"".at(0, default: <x>)` are labels | 6.1: `+` needs both operands proven; `str.at` is excluded |
+| reordering inside `Sides`/`Corners` | 4.3: typed only with total components |
+| constructor shorthands in selectors | 4.5: `Select::<elem>(..)` only for raw-value-preserving fields, else `Select::elem` with `Value` forms |
+| `context` wrapper and captured-binding writes | 4.6: no assignment or mutating call in the expression |
+| inserted values share an origin | 4.1: `Keyed` with a unique number; labels as `Call("label", ..)` |
+| count shorthand bypasses validation | 4.3: integer counts stay integers through `extra` |
+| typed forms without an API | 4.3: rows split by what the facades have |
