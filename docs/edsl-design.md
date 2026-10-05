@@ -267,9 +267,133 @@ with punctuation have constructors, and the characters are written as such:
 | `= Heading`, `- item`, `+ item`, `/ term: text` | `Heading(..)`, `List([..])`/`ListItem(..)`, `Enum([..])`/`EnumItem(..)`, `Terms([..])`/`TermsItem(..)` |
 | `` `raw` ``, `$x$`, `@label`, `<label>` | `Raw(..)`, `Equation(..)`, `Ref(..)`, `label=` or `Labelled(..)` |
 
-Strings are deliberately not scanned for quotes: a document that needs a
-straight `"` or `'` as text can write it, and `Quoted` is explicit about
-what the language decides.
+Plain strings are deliberately not scanned for quotes: a document that
+needs a straight `"` or `'` as text can write it, and `Quoted` is explicit
+about what the language decides. Running text is written with `Prose`
+(4.4), where quotes are smart and white space is markup's.
+
+### 4.4 Prose
+
+Running text with inline elements is noisy as a sequence of fragments:
+
+```moonbit
+Par(Seq(["Code blocks are highlighted with a port of ", Raw("syntect"),
+         " and Typst’s bundled syntaxes:"]))
+```
+
+`Prose` takes the text as one string with the inline descriptions
+interpolated into it; with MoonBit's multiline strings (`$|` lines
+interpolate, `#|` lines do not) and the pipe operator:
+
+```moonbit
+(
+  $|Code blocks are highlighted with a port of \{Raw("syntect")}
+  $|and Typst's bundled syntaxes:
+) |> Prose
+```
+
+```moonbit
+pub fn Prose::Prose(text : String, quotes? : Bool = true,
+                    loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Prose
+```
+
+**What the text means.** The string is not markup. Exactly three things
+in it are not literal text:
+
+1. **White space** (space, tab, line feed, carriage return). A run of
+   white space between two pieces is one space element, markup's
+   collapsing `space` (so a line break of the string is a space, and
+   next to Chinese or Japanese text it is no space, as in markup:
+   the run lowers to `Space::newline()` if it contains a line break and to
+   `Space()` otherwise). A run with two or more line breaks (a blank line)
+   is a paragraph break, `parbreak()`. White space at the start and at the
+   end of the text is dropped.
+2. **The quote characters** `"` and `'` are `smartquote(double: true)` and
+   `smartquote(double: false)`: the engine resolves them by language and
+   nesting, and an apostrophe is a single quote, as in markup. With
+   `quotes=false` they are literal text.
+3. **Placeholders** of interpolated descriptions (below).
+
+Everything else is literal text, one text element per run between those:
+`*`, `_`, `#`, `$`, `@`, `<`, `\\`, `~`, `--` from the author or from data
+are never interpreted. An interpolated string or number (`\{name}`,
+`\{count}`) is part of the text like what surrounds it (its white space
+and quotes are treated like the rest); `\{Lit(s)}` inserts a string
+verbatim.
+
+The result is inline content, a sequence. As an element's body it is that
+body (`Par(Prose(..))`, `caption=Prose(..)`, `Footnote(Prose(..))`, a
+table cell); directly in a `Document` or `Seq` it forms paragraphs the way
+markup does (realization collects the inline content between blocks, and a
+blank line of the prose separates two paragraphs). An interpolated block
+element (a `Heading`, a `Figure`) interrupts the paragraph, as in markup.
+A plain `String` keeps its meaning: literal text, the twin of `#"..."`.
+
+**Twin.** The content block with one `#"word"` per text run, markup's
+white space where the prose has white space (a line break where it has
+one), `#smartquote(double: ..)` for the quotes, `#parbreak()` for a blank
+line and the interpolated expressions in place:
+
+| EDSL | Typst twin |
+|---|---|
+| `Prose("a \"b\" \{Emph("c")}.")` | `[#"a" #smartquote(double: true)#"b"#smartquote(double: true) #emph[#"c"]#"."]` |
+| `Prose("one\ntwo\n\nthree")` | `[#"one"`⏎`#"two"#parbreak()#"three"]` |
+
+**Interpolation.** `\{x}` in a string calls `Show` for `x`. Every
+description type implements `@builtin.Show` (generated for the element and
+view types, handwritten for the others; the set and show rule types do
+not, so interpolating a rule does not compile) by writing a
+**placeholder**: the noncharacter U+FDD0, a decimal number, U+FDD1. The
+number names the description in a **process-wide table** (`prose_table`),
+like the serial of a callback. `Prose` splits its text at the
+placeholders, **takes** the descriptions out of the table and puts them
+into its sequence, so the description keeps its structure and its own
+origin (the constructor call inside `\{..}` has its own call site).
+
+- *Lifetime.* An entry lives from the interpolation to the `Prose` call
+  that consumes it — normally the next call. Nothing of the table is part
+  of a description, a session or an output; a compilation never reads it
+  except to word an error (below). Entries of strings that never reach a
+  `Prose` stay; the table keeps the newest 4096 of them.
+- *One use.* The text of a `Prose` can be used once: a second `Prose` of
+  the same string value finds its descriptions taken and is an error at
+  lowering (`an interpolated description of this text was already used by
+  another Prose`). Building the string again (a loop, a function) creates
+  new placeholders.
+- *Callbacks.* `Prose` and the interpolation are pure constructions that
+  run when the author's code runs, also inside a layout-time callback
+  (section 11.5): the callback builds its string and its `Prose` in one
+  go, the table is back to its previous state when the constructor
+  returns, and the numbers never reach the result, so repeated or skipped
+  invocations (memoization) cannot be observed. Views are interpolated
+  like descriptions (`Prose("§ \{it}")` in a show callback).
+- *`Show` and debugging.* `to_string()`/`println` of a description
+  therefore print a placeholder, not a rendering. Descriptions are opaque
+  (section 4.1); what they describe is inspected through
+  `Document::lower` and the reports. (A readable `Debug` for descriptions
+  is left to the tooling phase.)
+
+**Leaks are errors, never output.** A placeholder is only meaningful in
+the text of `Prose`. Lowering checks every string it turns into engine
+data — literal text (`String`, `Lit`), string values (`Value::str`, the
+text of `Raw`, paths, the source of `Markup` and `Equation`) — and fails
+with `` `Emph` was interpolated into a string that is not the text of
+`Prose` `` (naming the interpolated constructor from the table, if it is
+still there) at the string's origin, with the hint to use `Prose` or
+`Seq`. The text of a `Prose` that contains the delimiter characters
+without a valid placeholder is rejected (`the text of Prose contains a
+reserved character (U+FDD0)`); a rule smuggled in through `Content(..)` is
+rejected (`` `SetText` is a rule and cannot be interpolated into prose ``).
+All are located errors at the `Prose` call or the offending string.
+
+**Origins.** The `Prose` call is one origin; its text runs, spaces and
+quotes take the span of its `text` argument, like plain strings in an
+array take the array's (tier 1; the engine offset of a glyph is relative
+to its text run, so tier 2 narrows within the run, not within the whole
+string). Interpolated descriptions keep their own origins. Diagnostics
+that differ only in which text run of one `Prose` they concern are
+therefore deduplicated by the engine; `Lit` gives a text a location of its
+own where that matters.
 
 ## 5. Lowering
 

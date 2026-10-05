@@ -29,6 +29,7 @@ pub struct Align {
 }
 #callsite(autofill(args_loc, loc))
 pub fn Align::Align(Alignment, &IntoContent, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Align
 pub impl IntoContent for Align
 
 pub struct AlignView {
@@ -36,6 +37,7 @@ pub struct AlignView {
 }
 pub fn AlignView::body(Self) -> ContentView raise @library.HintedError
 pub fn AlignView::view(Self) -> ContentView
+pub impl @builtin.Show for AlignView
 pub impl IntoContent for AlignView
 
 pub(all) enum Alignment {
@@ -71,12 +73,14 @@ pub struct Bibliography {
 }
 #callsite(autofill(args_loc, loc))
 pub fn Bibliography::Bibliography(&IntoSource, title? : &IntoContent, full? : Bool, style? : String, group? : String, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Bibliography
 pub impl IntoContent for Bibliography
 
 pub struct BibliographyView {
   // private fields
 }
 pub fn BibliographyView::view(Self) -> ContentView
+pub impl @builtin.Show for BibliographyView
 pub impl IntoContent for BibliographyView
 
 pub struct Block {
@@ -84,12 +88,14 @@ pub struct Block {
 }
 #callsite(autofill(args_loc, loc))
 pub fn Block::Block(&IntoContent, width? : Length, height? : Sizing, breakable? : Bool, fill? : Paint, stroke? : Sides[Stroke], radius? : Corners[Length], inset? : Sides[Length], outset? : Sides[Length], spacing? : Spacing, above? : Spacing, below? : Spacing, clip? : Bool, sticky? : Bool, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Block
 pub impl IntoContent for Block
 
 pub struct BlockView {
   // private fields
 }
 pub fn BlockView::view(Self) -> ContentView
+pub impl @builtin.Show for BlockView
 pub impl IntoContent for BlockView
 
 pub struct Box {
@@ -97,12 +103,14 @@ pub struct Box {
 }
 #callsite(autofill(args_loc, loc))
 pub fn Box::Box(&IntoContent, width? : Sizing, height? : Length, fill? : Paint, stroke? : Sides[Stroke], radius? : Corners[Length], inset? : Sides[Length], outset? : Sides[Length], clip? : Bool, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Box
 pub impl IntoContent for Box
 
 pub struct BoxView {
   // private fields
 }
 pub fn BoxView::view(Self) -> ContentView
+pub impl @builtin.Show for BoxView
 pub impl IntoContent for BoxView
 
 pub struct Call {
@@ -110,6 +118,7 @@ pub struct Call {
 }
 #callsite(autofill(args_loc, loc))
 pub fn Call::Call(String, positional? : Array[Value], named? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Call
 pub impl IntoContent for Call
 
 pub struct Cells[T] {
@@ -126,12 +135,14 @@ pub struct Circle {
 }
 #callsite(autofill(args_loc, loc))
 pub fn Circle::Circle(radius? : Length, width? : Length, height? : Sizing, fill? : Paint, stroke? : Stroke, inset? : Sides[Length], outset? : Sides[Length], body? : &IntoContent, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Circle
 pub impl IntoContent for Circle
 
 pub struct CircleView {
   // private fields
 }
 pub fn CircleView::view(Self) -> ContentView
+pub impl @builtin.Show for CircleView
 pub impl IntoContent for CircleView
 
 pub struct Cite {
@@ -139,12 +150,14 @@ pub struct Cite {
 }
 #callsite(autofill(args_loc, loc))
 pub fn Cite::Cite(String, supplement? : &IntoContent, form? : String, style? : String, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Cite
 pub impl IntoContent for Cite
 
 pub struct CiteView {
   // private fields
 }
 pub fn CiteView::view(Self) -> ContentView
+pub impl @builtin.Show for CiteView
 pub impl IntoContent for CiteView
 
 pub struct Colbreak {
@@ -152,12 +165,14 @@ pub struct Colbreak {
 }
 #callsite(autofill(args_loc, loc))
 pub fn Colbreak::Colbreak(weak? : Bool, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Colbreak
 pub impl IntoContent for Colbreak
 
 pub struct ColbreakView {
   // private fields
 }
 pub fn ColbreakView::view(Self) -> ContentView
+pub impl @builtin.Show for ColbreakView
 pub impl IntoContent for ColbreakView
 
 pub struct Columns {
@@ -165,6 +180,7 @@ pub struct Columns {
 }
 #callsite(autofill(args_loc, loc))
 pub fn Columns::Columns(&IntoContent, count? : Int64, gutter? : Length, balanced? : Bool, separator? : &IntoContent, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Columns
 pub impl IntoContent for Columns
 
 pub struct ColumnsView {
@@ -172,6 +188,7 @@ pub struct ColumnsView {
 }
 pub fn ColumnsView::body(Self) -> ContentView raise @library.HintedError
 pub fn ColumnsView::view(Self) -> ContentView
+pub impl @builtin.Show for ColumnsView
 pub impl IntoContent for ColumnsView
 
 pub struct CompileReport[T] {
@@ -190,6 +207,7 @@ pub struct Content {
   // private fields
 }
 pub fn Content::Content(&IntoContent) -> Self
+pub impl @builtin.Show for Content
 pub impl IntoContent for Content
 pub impl ToValue for Content
 
@@ -203,6 +221,7 @@ pub fn ContentView::field(Self, String) -> Value raise @library.HintedError
 pub fn ContentView::func_name(Self) -> String
 pub fn ContentView::label(Self) -> String?
 pub fn ContentView::text(Self) -> String
+pub impl @builtin.Show for ContentView
 pub impl IntoContent for ContentView
 
 pub struct Context {
@@ -210,6 +229,7 @@ pub struct Context {
 }
 #callsite(autofill(args_loc, loc))
 pub fn Context::Context(loc~ : SourceLoc, args_loc~ : ArgsLoc, (Ctx) -> &IntoContent raise) -> Self
+pub impl @builtin.Show for Context
 pub impl IntoContent for Context
 
 pub struct Corners[T] {
@@ -243,6 +263,7 @@ pub struct CounterStep {
 }
 #callsite(autofill(args_loc, loc))
 pub fn CounterStep::CounterStep(Counter, level? : Int64, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for CounterStep
 pub impl IntoContent for CounterStep
 
 pub struct CounterUpdate {
@@ -250,6 +271,7 @@ pub struct CounterUpdate {
 }
 #callsite(autofill(args_loc, loc))
 pub fn CounterUpdate::CounterUpdate(Counter, Array[Int64], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for CounterUpdate
 pub impl IntoContent for CounterUpdate
 
 pub struct Ctx {
@@ -270,6 +292,7 @@ pub struct Curve {
 }
 #callsite(autofill(args_loc, loc))
 pub fn Curve::Curve(Array[&IntoContent], fill? : Paint, fill_rule? : String, stroke? : Stroke, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Curve
 pub impl IntoContent for Curve
 
 pub struct CurveClose {
@@ -277,12 +300,14 @@ pub struct CurveClose {
 }
 #callsite(autofill(args_loc, loc))
 pub fn CurveClose::CurveClose(mode? : String, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for CurveClose
 pub impl IntoContent for CurveClose
 
 pub struct CurveCloseView {
   // private fields
 }
 pub fn CurveCloseView::view(Self) -> ContentView
+pub impl @builtin.Show for CurveCloseView
 pub impl IntoContent for CurveCloseView
 
 pub struct CurveCubic {
@@ -290,12 +315,14 @@ pub struct CurveCubic {
 }
 #callsite(autofill(args_loc, loc))
 pub fn CurveCubic::CurveCubic((Length, Length), (Length, Length), (Length, Length), relative? : Bool, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for CurveCubic
 pub impl IntoContent for CurveCubic
 
 pub struct CurveCubicView {
   // private fields
 }
 pub fn CurveCubicView::view(Self) -> ContentView
+pub impl @builtin.Show for CurveCubicView
 pub impl IntoContent for CurveCubicView
 
 pub struct CurveLine {
@@ -303,12 +330,14 @@ pub struct CurveLine {
 }
 #callsite(autofill(args_loc, loc))
 pub fn CurveLine::CurveLine((Length, Length), relative? : Bool, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for CurveLine
 pub impl IntoContent for CurveLine
 
 pub struct CurveLineView {
   // private fields
 }
 pub fn CurveLineView::view(Self) -> ContentView
+pub impl @builtin.Show for CurveLineView
 pub impl IntoContent for CurveLineView
 
 pub struct CurveMove {
@@ -316,12 +345,14 @@ pub struct CurveMove {
 }
 #callsite(autofill(args_loc, loc))
 pub fn CurveMove::CurveMove((Length, Length), relative? : Bool, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for CurveMove
 pub impl IntoContent for CurveMove
 
 pub struct CurveMoveView {
   // private fields
 }
 pub fn CurveMoveView::view(Self) -> ContentView
+pub impl @builtin.Show for CurveMoveView
 pub impl IntoContent for CurveMoveView
 
 pub struct CurveQuad {
@@ -329,18 +360,21 @@ pub struct CurveQuad {
 }
 #callsite(autofill(args_loc, loc))
 pub fn CurveQuad::CurveQuad((Length, Length), (Length, Length), relative? : Bool, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for CurveQuad
 pub impl IntoContent for CurveQuad
 
 pub struct CurveQuadView {
   // private fields
 }
 pub fn CurveQuadView::view(Self) -> ContentView
+pub impl @builtin.Show for CurveQuadView
 pub impl IntoContent for CurveQuadView
 
 pub struct CurveView {
   // private fields
 }
 pub fn CurveView::view(Self) -> ContentView
+pub impl @builtin.Show for CurveView
 pub impl IntoContent for CurveView
 
 pub struct Diagnostic {
@@ -384,12 +418,14 @@ pub struct Ellipse {
 }
 #callsite(autofill(args_loc, loc))
 pub fn Ellipse::Ellipse(width? : Length, height? : Sizing, fill? : Paint, stroke? : Stroke, inset? : Sides[Length], outset? : Sides[Length], body? : &IntoContent, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Ellipse
 pub impl IntoContent for Ellipse
 
 pub struct EllipseView {
   // private fields
 }
 pub fn EllipseView::view(Self) -> ContentView
+pub impl @builtin.Show for EllipseView
 pub impl IntoContent for EllipseView
 
 pub struct Emph {
@@ -397,6 +433,7 @@ pub struct Emph {
 }
 #callsite(autofill(args_loc, loc))
 pub fn Emph::Emph(&IntoContent, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Emph
 pub impl IntoContent for Emph
 
 pub struct EmphView {
@@ -404,6 +441,7 @@ pub struct EmphView {
 }
 pub fn EmphView::body(Self) -> ContentView raise @library.HintedError
 pub fn EmphView::view(Self) -> ContentView
+pub impl @builtin.Show for EmphView
 pub impl IntoContent for EmphView
 
 pub struct Enum {
@@ -411,6 +449,7 @@ pub struct Enum {
 }
 #callsite(autofill(args_loc, loc))
 pub fn Enum::Enum(Array[&IntoContent], tight? : Bool, numbering? : Numbering, start? : Int64, full? : Bool, reversed? : Bool, indent? : Length, body_indent? : Length, spacing? : Length, number_align? : Alignment, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Enum
 pub impl IntoContent for Enum
 
 pub struct EnumItem {
@@ -418,6 +457,7 @@ pub struct EnumItem {
 }
 #callsite(autofill(args_loc, loc))
 pub fn EnumItem::EnumItem(&IntoContent, number? : Int64, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for EnumItem
 pub impl IntoContent for EnumItem
 
 pub struct EnumItemView {
@@ -425,12 +465,14 @@ pub struct EnumItemView {
 }
 pub fn EnumItemView::body(Self) -> ContentView raise @library.HintedError
 pub fn EnumItemView::view(Self) -> ContentView
+pub impl @builtin.Show for EnumItemView
 pub impl IntoContent for EnumItemView
 
 pub struct EnumView {
   // private fields
 }
 pub fn EnumView::view(Self) -> ContentView
+pub impl @builtin.Show for EnumView
 pub impl IntoContent for EnumView
 
 pub struct Equation {
@@ -438,6 +480,7 @@ pub struct Equation {
 }
 #callsite(autofill(args_loc, loc))
 pub fn Equation::Equation(String, block? : Bool, numbering? : Numbering, number_align? : Alignment, supplement? : Supplement, alt? : String, scope? : Array[(String, Value)], extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Equation
 pub impl IntoContent for Equation
 
 pub struct EquationView {
@@ -445,6 +488,7 @@ pub struct EquationView {
 }
 pub fn EquationView::body(Self) -> ContentView raise @library.HintedError
 pub fn EquationView::view(Self) -> ContentView
+pub impl @builtin.Show for EquationView
 pub impl IntoContent for EquationView
 
 pub struct ExportReport[T] {
@@ -461,6 +505,7 @@ pub struct Figure {
 }
 #callsite(autofill(args_loc, loc))
 pub fn Figure::Figure(&IntoContent, alt? : String, placement? : Alignment, scope? : String, caption? : &IntoContent, supplement? : Supplement, numbering? : Numbering, gap? : Length, outlined? : Bool, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Figure
 pub impl IntoContent for Figure
 
 pub struct FigureView {
@@ -468,6 +513,7 @@ pub struct FigureView {
 }
 pub fn FigureView::body(Self) -> ContentView raise @library.HintedError
 pub fn FigureView::view(Self) -> ContentView
+pub impl @builtin.Show for FigureView
 pub impl IntoContent for FigureView
 
 pub struct FileLocation {
@@ -497,12 +543,14 @@ pub struct Footnote {
 }
 #callsite(autofill(args_loc, loc))
 pub fn Footnote::Footnote(&IntoContent, numbering? : Numbering, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Footnote
 pub impl IntoContent for Footnote
 
 pub struct FootnoteView {
   // private fields
 }
 pub fn FootnoteView::view(Self) -> ContentView
+pub impl @builtin.Show for FootnoteView
 pub impl IntoContent for FootnoteView
 
 pub struct Grid {
@@ -510,6 +558,7 @@ pub struct Grid {
 }
 #callsite(autofill(args_loc, loc))
 pub fn Grid::Grid(Array[&IntoContent], columns? : Array[Sizing], rows? : Array[Sizing], gutter? : Array[Sizing], column_gutter? : Array[Sizing], row_gutter? : Array[Sizing], inset? : Cells[Sides[Length]], align? : Cells[Alignment], fill? : Cells[Paint], stroke? : Cells[Sides[Stroke]], extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Grid
 pub impl IntoContent for Grid
 
 pub struct GridCell {
@@ -517,6 +566,7 @@ pub struct GridCell {
 }
 #callsite(autofill(args_loc, loc))
 pub fn GridCell::GridCell(&IntoContent, x? : Int64, y? : Int64, colspan? : Int64, rowspan? : Int64, inset? : Sides[Length], align? : Alignment, fill? : Paint, stroke? : Sides[Stroke], breakable? : Bool, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for GridCell
 pub impl IntoContent for GridCell
 
 pub struct GridCellView {
@@ -524,6 +574,7 @@ pub struct GridCellView {
 }
 pub fn GridCellView::body(Self) -> ContentView raise @library.HintedError
 pub fn GridCellView::view(Self) -> ContentView
+pub impl @builtin.Show for GridCellView
 pub impl IntoContent for GridCellView
 
 pub struct GridFooter {
@@ -531,12 +582,14 @@ pub struct GridFooter {
 }
 #callsite(autofill(args_loc, loc))
 pub fn GridFooter::GridFooter(Array[&IntoContent], repeat? : Bool, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for GridFooter
 pub impl IntoContent for GridFooter
 
 pub struct GridFooterView {
   // private fields
 }
 pub fn GridFooterView::view(Self) -> ContentView
+pub impl @builtin.Show for GridFooterView
 pub impl IntoContent for GridFooterView
 
 pub struct GridHeader {
@@ -544,12 +597,14 @@ pub struct GridHeader {
 }
 #callsite(autofill(args_loc, loc))
 pub fn GridHeader::GridHeader(Array[&IntoContent], repeat? : Bool, level? : Int64, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for GridHeader
 pub impl IntoContent for GridHeader
 
 pub struct GridHeaderView {
   // private fields
 }
 pub fn GridHeaderView::view(Self) -> ContentView
+pub impl @builtin.Show for GridHeaderView
 pub impl IntoContent for GridHeaderView
 
 pub struct GridHline {
@@ -557,18 +612,21 @@ pub struct GridHline {
 }
 #callsite(autofill(args_loc, loc))
 pub fn GridHline::GridHline(y? : Int64, start? : Int64, end_? : Int64, stroke? : Stroke, position? : Alignment, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for GridHline
 pub impl IntoContent for GridHline
 
 pub struct GridHlineView {
   // private fields
 }
 pub fn GridHlineView::view(Self) -> ContentView
+pub impl @builtin.Show for GridHlineView
 pub impl IntoContent for GridHlineView
 
 pub struct GridView {
   // private fields
 }
 pub fn GridView::view(Self) -> ContentView
+pub impl @builtin.Show for GridView
 pub impl IntoContent for GridView
 
 pub struct GridVline {
@@ -576,12 +634,14 @@ pub struct GridVline {
 }
 #callsite(autofill(args_loc, loc))
 pub fn GridVline::GridVline(x? : Int64, start? : Int64, end_? : Int64, stroke? : Stroke, position? : Alignment, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for GridVline
 pub impl IntoContent for GridVline
 
 pub struct GridVlineView {
   // private fields
 }
 pub fn GridVlineView::view(Self) -> ContentView
+pub impl @builtin.Show for GridVlineView
 pub impl IntoContent for GridVlineView
 
 pub struct H {
@@ -589,12 +649,14 @@ pub struct H {
 }
 #callsite(autofill(args_loc, loc))
 pub fn H::H(Spacing, weak? : Bool, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for H
 pub impl IntoContent for H
 
 pub struct HView {
   // private fields
 }
 pub fn HView::view(Self) -> ContentView
+pub impl @builtin.Show for HView
 pub impl IntoContent for HView
 
 pub struct Heading {
@@ -602,6 +664,7 @@ pub struct Heading {
 }
 #callsite(autofill(args_loc, loc))
 pub fn Heading::Heading(&IntoContent, level? : Int64, depth? : Int64, offset? : Int64, numbering? : Numbering, supplement? : Supplement, outlined? : Bool, bookmarked? : Bool, hanging_indent? : Length, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Heading
 pub impl IntoContent for Heading
 
 pub struct HeadingView {
@@ -609,6 +672,7 @@ pub struct HeadingView {
 }
 pub fn HeadingView::body(Self) -> ContentView raise @library.HintedError
 pub fn HeadingView::view(Self) -> ContentView
+pub impl @builtin.Show for HeadingView
 pub impl IntoContent for HeadingView
 
 pub struct Hide {
@@ -616,6 +680,7 @@ pub struct Hide {
 }
 #callsite(autofill(args_loc, loc))
 pub fn Hide::Hide(&IntoContent, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Hide
 pub impl IntoContent for Hide
 
 pub struct HideView {
@@ -623,6 +688,7 @@ pub struct HideView {
 }
 pub fn HideView::body(Self) -> ContentView raise @library.HintedError
 pub fn HideView::view(Self) -> ContentView
+pub impl @builtin.Show for HideView
 pub impl IntoContent for HideView
 
 pub struct Highlight {
@@ -630,6 +696,7 @@ pub struct Highlight {
 }
 #callsite(autofill(args_loc, loc))
 pub fn Highlight::Highlight(&IntoContent, fill? : Paint, stroke? : Sides[Stroke], extent? : Length, radius? : Corners[Length], extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Highlight
 pub impl IntoContent for Highlight
 
 pub struct HighlightView {
@@ -637,6 +704,7 @@ pub struct HighlightView {
 }
 pub fn HighlightView::body(Self) -> ContentView raise @library.HintedError
 pub fn HighlightView::view(Self) -> ContentView
+pub impl @builtin.Show for HighlightView
 pub impl IntoContent for HighlightView
 
 pub struct Hint {
@@ -649,18 +717,21 @@ pub struct Image {
 }
 #callsite(autofill(args_loc, loc))
 pub fn Image::Image(&IntoSource, format? : String, width? : Length, height? : Sizing, alt? : String, page? : Int64, fit? : String, scaling? : String, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Image
 pub impl IntoContent for Image
 
 pub struct ImageView {
   // private fields
 }
 pub fn ImageView::view(Self) -> ContentView
+pub impl @builtin.Show for ImageView
 pub impl IntoContent for ImageView
 
 pub struct Keyed {
   // private fields
 }
 pub fn Keyed::Keyed(String, &IntoContent) -> Self
+pub impl @builtin.Show for Keyed
 pub impl IntoContent for Keyed
 
 pub struct Labelled {
@@ -668,6 +739,7 @@ pub struct Labelled {
 }
 #callsite(autofill(args_loc, loc))
 pub fn Labelled::Labelled(&IntoContent, String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Labelled
 pub impl IntoContent for Labelled
 
 pub(all) enum Length {
@@ -695,12 +767,14 @@ pub struct Line {
 }
 #callsite(autofill(args_loc, loc))
 pub fn Line::Line(start? : (Length, Length), end_? : (Length, Length), length? : Length, angle? : Angle, stroke? : Stroke, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Line
 pub impl IntoContent for Line
 
 pub struct LineView {
   // private fields
 }
 pub fn LineView::view(Self) -> ContentView
+pub impl @builtin.Show for LineView
 pub impl IntoContent for LineView
 
 pub struct Linebreak {
@@ -708,12 +782,14 @@ pub struct Linebreak {
 }
 #callsite(autofill(args_loc, loc))
 pub fn Linebreak::Linebreak(justify? : Bool, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Linebreak
 pub impl IntoContent for Linebreak
 
 pub struct LinebreakView {
   // private fields
 }
 pub fn LinebreakView::view(Self) -> ContentView
+pub impl @builtin.Show for LinebreakView
 pub impl IntoContent for LinebreakView
 
 pub struct Link {
@@ -721,6 +797,7 @@ pub struct Link {
 }
 #callsite(autofill(args_loc, loc))
 pub fn Link::Link(LinkTarget, body? : &IntoContent, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Link
 pub impl IntoContent for Link
 
 pub(all) enum LinkTarget {
@@ -734,6 +811,7 @@ pub struct LinkView {
   // private fields
 }
 pub fn LinkView::view(Self) -> ContentView
+pub impl @builtin.Show for LinkView
 pub impl IntoContent for LinkView
 
 pub struct List {
@@ -741,6 +819,7 @@ pub struct List {
 }
 #callsite(autofill(args_loc, loc))
 pub fn List::List(Array[&IntoContent], tight? : Bool, marker? : &IntoContent, indent? : Length, body_indent? : Length, spacing? : Length, marker_align? : Alignment, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for List
 pub impl IntoContent for List
 
 pub struct ListItem {
@@ -748,6 +827,7 @@ pub struct ListItem {
 }
 #callsite(autofill(args_loc, loc))
 pub fn ListItem::ListItem(&IntoContent, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for ListItem
 pub impl IntoContent for ListItem
 
 pub struct ListItemView {
@@ -755,12 +835,14 @@ pub struct ListItemView {
 }
 pub fn ListItemView::body(Self) -> ContentView raise @library.HintedError
 pub fn ListItemView::view(Self) -> ContentView
+pub impl @builtin.Show for ListItemView
 pub impl IntoContent for ListItemView
 
 pub struct ListView {
   // private fields
 }
 pub fn ListView::view(Self) -> ContentView
+pub impl @builtin.Show for ListView
 pub impl IntoContent for ListView
 
 pub struct Lit {
@@ -768,6 +850,7 @@ pub struct Lit {
 }
 #callsite(autofill(loc))
 pub fn Lit::Lit(String, loc~ : SourceLoc) -> Self
+pub impl @builtin.Show for Lit
 pub impl IntoContent for Lit
 
 pub(all) enum Location {
@@ -781,6 +864,7 @@ pub struct Lorem {
 }
 #callsite(autofill(args_loc, loc))
 pub fn Lorem::Lorem(Int64, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Lorem
 pub impl IntoContent for Lorem
 
 pub struct Markup {
@@ -788,6 +872,7 @@ pub struct Markup {
 }
 #callsite(autofill(args_loc, loc))
 pub fn Markup::Markup(String, scope? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Markup
 pub impl IntoContent for Markup
 
 pub struct Metadata {
@@ -795,12 +880,14 @@ pub struct Metadata {
 }
 #callsite(autofill(args_loc, loc))
 pub fn Metadata::Metadata(Value, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Metadata
 pub impl IntoContent for Metadata
 
 pub struct MetadataView {
   // private fields
 }
 pub fn MetadataView::view(Self) -> ContentView
+pub impl @builtin.Show for MetadataView
 pub impl IntoContent for MetadataView
 
 pub struct Move {
@@ -808,6 +895,7 @@ pub struct Move {
 }
 #callsite(autofill(args_loc, loc))
 pub fn Move::Move(&IntoContent, dx? : Length, dy? : Length, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Move
 pub impl IntoContent for Move
 
 pub struct MoveView {
@@ -815,6 +903,7 @@ pub struct MoveView {
 }
 pub fn MoveView::body(Self) -> ContentView raise @library.HintedError
 pub fn MoveView::view(Self) -> ContentView
+pub impl @builtin.Show for MoveView
 pub impl IntoContent for MoveView
 
 pub struct NoneValue {
@@ -862,12 +951,14 @@ pub struct Outline {
 }
 #callsite(autofill(args_loc, loc))
 pub fn Outline::Outline(title? : &IntoContent, depth? : Int64, indent? : Length, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Outline
 pub impl IntoContent for Outline
 
 pub struct OutlineView {
   // private fields
 }
 pub fn OutlineView::view(Self) -> ContentView
+pub impl @builtin.Show for OutlineView
 pub impl IntoContent for OutlineView
 
 pub struct Overline {
@@ -875,6 +966,7 @@ pub struct Overline {
 }
 #callsite(autofill(args_loc, loc))
 pub fn Overline::Overline(&IntoContent, stroke? : Stroke, offset? : Length, extent? : Length, evade? : Bool, background? : Bool, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Overline
 pub impl IntoContent for Overline
 
 pub struct OverlineView {
@@ -882,6 +974,7 @@ pub struct OverlineView {
 }
 pub fn OverlineView::body(Self) -> ContentView raise @library.HintedError
 pub fn OverlineView::view(Self) -> ContentView
+pub impl @builtin.Show for OverlineView
 pub impl IntoContent for OverlineView
 
 pub struct Pad {
@@ -889,6 +982,7 @@ pub struct Pad {
 }
 #callsite(autofill(args_loc, loc))
 pub fn Pad::Pad(&IntoContent, left? : Length, top? : Length, right? : Length, bottom? : Length, x? : Length, y? : Length, rest? : Length, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Pad
 pub impl IntoContent for Pad
 
 pub struct PadView {
@@ -896,6 +990,7 @@ pub struct PadView {
 }
 pub fn PadView::body(Self) -> ContentView raise @library.HintedError
 pub fn PadView::view(Self) -> ContentView
+pub impl @builtin.Show for PadView
 pub impl IntoContent for PadView
 
 pub struct Page {
@@ -903,6 +998,7 @@ pub struct Page {
 }
 #callsite(autofill(args_loc, loc))
 pub fn Page::Page(&IntoContent, paper? : String, width? : Length, height? : Length, flipped? : Bool, margin? : Sides[Length], bleed? : Sides[Length], columns? : Int64, fill? : Paint, numbering? : Numbering, supplement? : &IntoContent, number_align? : Alignment, header? : &IntoContent, header_ascent? : Length, footer? : &IntoContent, footer_descent? : Length, background? : &IntoContent, foreground? : &IntoContent, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Page
 pub impl IntoContent for Page
 
 pub struct PageView {
@@ -910,6 +1006,7 @@ pub struct PageView {
 }
 pub fn PageView::body(Self) -> ContentView raise @library.HintedError
 pub fn PageView::view(Self) -> ContentView
+pub impl @builtin.Show for PageView
 pub impl IntoContent for PageView
 
 pub struct Pagebreak {
@@ -917,12 +1014,14 @@ pub struct Pagebreak {
 }
 #callsite(autofill(args_loc, loc))
 pub fn Pagebreak::Pagebreak(weak? : Bool, to? : String, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Pagebreak
 pub impl IntoContent for Pagebreak
 
 pub struct PagebreakView {
   // private fields
 }
 pub fn PagebreakView::view(Self) -> ContentView
+pub impl @builtin.Show for PagebreakView
 pub impl IntoContent for PagebreakView
 
 pub(all) enum Paint {
@@ -963,6 +1062,7 @@ pub struct Par {
 }
 #callsite(autofill(args_loc, loc))
 pub fn Par::Par(&IntoContent, leading? : Length, spacing? : Length, justify? : Bool, linebreaks? : String, hanging_indent? : Length, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Par
 pub impl IntoContent for Par
 
 pub struct ParView {
@@ -970,6 +1070,7 @@ pub struct ParView {
 }
 pub fn ParView::body(Self) -> ContentView raise @library.HintedError
 pub fn ParView::view(Self) -> ContentView
+pub impl @builtin.Show for ParView
 pub impl IntoContent for ParView
 
 pub struct Parbreak {
@@ -977,12 +1078,14 @@ pub struct Parbreak {
 }
 #callsite(autofill(args_loc, loc))
 pub fn Parbreak::Parbreak(extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Parbreak
 pub impl IntoContent for Parbreak
 
 pub struct ParbreakView {
   // private fields
 }
 pub fn ParbreakView::view(Self) -> ContentView
+pub impl @builtin.Show for ParbreakView
 pub impl IntoContent for ParbreakView
 
 pub struct Place {
@@ -990,6 +1093,7 @@ pub struct Place {
 }
 #callsite(autofill(args_loc, loc))
 pub fn Place::Place(&IntoContent, alignment? : Alignment, scope? : String, float? : Bool, clearance? : Length, dx? : Length, dy? : Length, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Place
 pub impl IntoContent for Place
 
 pub struct PlaceView {
@@ -997,6 +1101,7 @@ pub struct PlaceView {
 }
 pub fn PlaceView::body(Self) -> ContentView raise @library.HintedError
 pub fn PlaceView::view(Self) -> ContentView
+pub impl @builtin.Show for PlaceView
 pub impl IntoContent for PlaceView
 
 pub struct Polygon {
@@ -1004,6 +1109,7 @@ pub struct Polygon {
 }
 #callsite(autofill(args_loc, loc))
 pub fn Polygon::Polygon(Array[(Length, Length)], fill? : Paint, fill_rule? : String, stroke? : Stroke, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Polygon
 pub impl IntoContent for Polygon
 
 pub struct PolygonRegular {
@@ -1011,19 +1117,30 @@ pub struct PolygonRegular {
 }
 #callsite(autofill(args_loc, loc))
 pub fn PolygonRegular::PolygonRegular(fill? : Paint, stroke? : Stroke, size? : Length, vertices? : Int64, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for PolygonRegular
 pub impl IntoContent for PolygonRegular
 
 pub struct PolygonView {
   // private fields
 }
 pub fn PolygonView::view(Self) -> ContentView
+pub impl @builtin.Show for PolygonView
 pub impl IntoContent for PolygonView
+
+pub struct Prose {
+  // private fields
+}
+#callsite(autofill(args_loc, loc))
+pub fn Prose::Prose(String, quotes? : Bool, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Prose
+pub impl IntoContent for Prose
 
 pub struct Quote {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
 pub fn Quote::Quote(&IntoContent, block? : Bool, quotes? : Bool, attribution? : &IntoContent, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Quote
 pub impl IntoContent for Quote
 
 pub struct QuoteView {
@@ -1031,6 +1148,7 @@ pub struct QuoteView {
 }
 pub fn QuoteView::body(Self) -> ContentView raise @library.HintedError
 pub fn QuoteView::view(Self) -> ContentView
+pub impl @builtin.Show for QuoteView
 pub impl IntoContent for QuoteView
 
 pub struct Quoted {
@@ -1038,6 +1156,7 @@ pub struct Quoted {
 }
 #callsite(autofill(args_loc, loc))
 pub fn Quoted::Quoted(&IntoContent, double? : Bool, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Quoted
 pub impl IntoContent for Quoted
 
 pub struct Raw {
@@ -1045,12 +1164,14 @@ pub struct Raw {
 }
 #callsite(autofill(args_loc, loc))
 pub fn Raw::Raw(String, block? : Bool, lang? : String, align? : Alignment, tab_size? : Int64, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Raw
 pub impl IntoContent for Raw
 
 pub struct RawView {
   // private fields
 }
 pub fn RawView::view(Self) -> ContentView
+pub impl @builtin.Show for RawView
 pub impl IntoContent for RawView
 
 pub struct Rect {
@@ -1058,12 +1179,14 @@ pub struct Rect {
 }
 #callsite(autofill(args_loc, loc))
 pub fn Rect::Rect(width? : Length, height? : Sizing, fill? : Paint, stroke? : Sides[Stroke], radius? : Corners[Length], inset? : Sides[Length], outset? : Sides[Length], body? : &IntoContent, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Rect
 pub impl IntoContent for Rect
 
 pub struct RectView {
   // private fields
 }
 pub fn RectView::view(Self) -> ContentView
+pub impl @builtin.Show for RectView
 pub impl IntoContent for RectView
 
 pub struct Ref {
@@ -1071,12 +1194,14 @@ pub struct Ref {
 }
 #callsite(autofill(args_loc, loc))
 pub fn Ref::Ref(String, supplement? : Supplement, form? : String, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Ref
 pub impl IntoContent for Ref
 
 pub struct RefView {
   // private fields
 }
 pub fn RefView::view(Self) -> ContentView
+pub impl @builtin.Show for RefView
 pub impl IntoContent for RefView
 
 pub struct Repeat {
@@ -1084,6 +1209,7 @@ pub struct Repeat {
 }
 #callsite(autofill(args_loc, loc))
 pub fn Repeat::Repeat(&IntoContent, gap? : Length, justify? : Bool, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Repeat
 pub impl IntoContent for Repeat
 
 pub struct RepeatView {
@@ -1091,6 +1217,7 @@ pub struct RepeatView {
 }
 pub fn RepeatView::body(Self) -> ContentView raise @library.HintedError
 pub fn RepeatView::view(Self) -> ContentView
+pub impl @builtin.Show for RepeatView
 pub impl IntoContent for RepeatView
 
 pub struct Rotate {
@@ -1098,6 +1225,7 @@ pub struct Rotate {
 }
 #callsite(autofill(args_loc, loc))
 pub fn Rotate::Rotate(&IntoContent, angle? : Angle, origin? : Alignment, reflow? : Bool, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Rotate
 pub impl IntoContent for Rotate
 
 pub struct RotateView {
@@ -1105,6 +1233,7 @@ pub struct RotateView {
 }
 pub fn RotateView::body(Self) -> ContentView raise @library.HintedError
 pub fn RotateView::view(Self) -> ContentView
+pub impl @builtin.Show for RotateView
 pub impl IntoContent for RotateView
 
 pub struct Scale {
@@ -1112,6 +1241,7 @@ pub struct Scale {
 }
 #callsite(autofill(args_loc, loc))
 pub fn Scale::Scale(&IntoContent, factor? : Length, x? : Length, y? : Length, origin? : Alignment, reflow? : Bool, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Scale
 pub impl IntoContent for Scale
 
 pub struct ScaleView {
@@ -1119,6 +1249,7 @@ pub struct ScaleView {
 }
 pub fn ScaleView::body(Self) -> ContentView raise @library.HintedError
 pub fn ScaleView::view(Self) -> ContentView
+pub impl @builtin.Show for ScaleView
 pub impl IntoContent for ScaleView
 
 pub struct Select {
@@ -1218,6 +1349,7 @@ pub struct Seq {
 pub fn Seq::Seq(Array[&IntoContent], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 #callsite(autofill(args_loc, loc))
 pub fn[T : IntoContent] Seq::of(Array[T], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Seq
 pub impl IntoContent for Seq
 
 pub struct Set {
@@ -1849,6 +1981,7 @@ pub struct Skew {
 }
 #callsite(autofill(args_loc, loc))
 pub fn Skew::Skew(&IntoContent, ax? : Angle, ay? : Angle, origin? : Alignment, reflow? : Bool, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Skew
 pub impl IntoContent for Skew
 
 pub struct SkewView {
@@ -1856,6 +1989,7 @@ pub struct SkewView {
 }
 pub fn SkewView::body(Self) -> ContentView raise @library.HintedError
 pub fn SkewView::view(Self) -> ContentView
+pub impl @builtin.Show for SkewView
 pub impl IntoContent for SkewView
 
 pub struct Smallcaps {
@@ -1863,6 +1997,7 @@ pub struct Smallcaps {
 }
 #callsite(autofill(args_loc, loc))
 pub fn Smallcaps::Smallcaps(&IntoContent, all? : Bool, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Smallcaps
 pub impl IntoContent for Smallcaps
 
 pub struct SmallcapsView {
@@ -1870,6 +2005,7 @@ pub struct SmallcapsView {
 }
 pub fn SmallcapsView::body(Self) -> ContentView raise @library.HintedError
 pub fn SmallcapsView::view(Self) -> ContentView
+pub impl @builtin.Show for SmallcapsView
 pub impl IntoContent for SmallcapsView
 
 pub struct Smartquote {
@@ -1877,12 +2013,14 @@ pub struct Smartquote {
 }
 #callsite(autofill(args_loc, loc))
 pub fn Smartquote::Smartquote(double? : Bool, enabled? : Bool, alternative? : Bool, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Smartquote
 pub impl IntoContent for Smartquote
 
 pub struct SmartquoteView {
   // private fields
 }
 pub fn SmartquoteView::view(Self) -> ContentView
+pub impl @builtin.Show for SmartquoteView
 pub impl IntoContent for SmartquoteView
 
 pub(all) enum Source {
@@ -1898,6 +2036,7 @@ pub struct Space {
 }
 pub fn Space::Space() -> Self
 pub fn Space::newline() -> Self
+pub impl @builtin.Show for Space
 pub impl IntoContent for Space
 
 pub(all) enum Spacing {
@@ -1919,12 +2058,14 @@ pub struct Square {
 }
 #callsite(autofill(args_loc, loc))
 pub fn Square::Square(size? : Length, width? : Length, height? : Sizing, fill? : Paint, stroke? : Sides[Stroke], radius? : Corners[Length], inset? : Sides[Length], outset? : Sides[Length], body? : &IntoContent, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Square
 pub impl IntoContent for Square
 
 pub struct SquareView {
   // private fields
 }
 pub fn SquareView::view(Self) -> ContentView
+pub impl @builtin.Show for SquareView
 pub impl IntoContent for SquareView
 
 pub struct Stack {
@@ -1932,12 +2073,14 @@ pub struct Stack {
 }
 #callsite(autofill(args_loc, loc))
 pub fn Stack::Stack(Array[&IntoContent], dir? : Dir, spacing? : Spacing, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Stack
 pub impl IntoContent for Stack
 
 pub struct StackView {
   // private fields
 }
 pub fn StackView::view(Self) -> ContentView
+pub impl @builtin.Show for StackView
 pub impl IntoContent for StackView
 
 pub struct Strike {
@@ -1945,6 +2088,7 @@ pub struct Strike {
 }
 #callsite(autofill(args_loc, loc))
 pub fn Strike::Strike(&IntoContent, stroke? : Stroke, offset? : Length, extent? : Length, background? : Bool, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Strike
 pub impl IntoContent for Strike
 
 pub struct StrikeView {
@@ -1952,6 +2096,7 @@ pub struct StrikeView {
 }
 pub fn StrikeView::body(Self) -> ContentView raise @library.HintedError
 pub fn StrikeView::view(Self) -> ContentView
+pub impl @builtin.Show for StrikeView
 pub impl IntoContent for StrikeView
 
 pub struct Stroke {
@@ -1967,6 +2112,7 @@ pub struct Strong {
 }
 #callsite(autofill(args_loc, loc))
 pub fn Strong::Strong(&IntoContent, delta? : Int64, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Strong
 pub impl IntoContent for Strong
 
 pub struct StrongView {
@@ -1974,6 +2120,7 @@ pub struct StrongView {
 }
 pub fn StrongView::body(Self) -> ContentView raise @library.HintedError
 pub fn StrongView::view(Self) -> ContentView
+pub impl @builtin.Show for StrongView
 pub impl IntoContent for StrongView
 
 pub struct Sub {
@@ -1981,6 +2128,7 @@ pub struct Sub {
 }
 #callsite(autofill(args_loc, loc))
 pub fn Sub::Sub(&IntoContent, typographic? : Bool, baseline? : Length, size? : Length, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Sub
 pub impl IntoContent for Sub
 
 pub struct SubView {
@@ -1988,6 +2136,7 @@ pub struct SubView {
 }
 pub fn SubView::body(Self) -> ContentView raise @library.HintedError
 pub fn SubView::view(Self) -> ContentView
+pub impl @builtin.Show for SubView
 pub impl IntoContent for SubView
 
 pub struct Super {
@@ -1995,6 +2144,7 @@ pub struct Super {
 }
 #callsite(autofill(args_loc, loc))
 pub fn Super::Super(&IntoContent, typographic? : Bool, baseline? : Length, size? : Length, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Super
 pub impl IntoContent for Super
 
 pub struct SuperView {
@@ -2002,6 +2152,7 @@ pub struct SuperView {
 }
 pub fn SuperView::body(Self) -> ContentView raise @library.HintedError
 pub fn SuperView::view(Self) -> ContentView
+pub impl @builtin.Show for SuperView
 pub impl IntoContent for SuperView
 
 pub struct Supplement {
@@ -2019,6 +2170,7 @@ pub struct Symbol {
 }
 #callsite(autofill(args_loc, loc))
 pub fn Symbol::Symbol(String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Symbol
 pub impl IntoContent for Symbol
 
 pub struct Table {
@@ -2026,6 +2178,7 @@ pub struct Table {
 }
 #callsite(autofill(args_loc, loc))
 pub fn Table::Table(Array[&IntoContent], columns? : Array[Sizing], rows? : Array[Sizing], gutter? : Array[Sizing], column_gutter? : Array[Sizing], row_gutter? : Array[Sizing], inset? : Cells[Sides[Length]], align? : Cells[Alignment], fill? : Cells[Paint], stroke? : Cells[Sides[Stroke]], extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Table
 pub impl IntoContent for Table
 
 pub struct TableCell {
@@ -2033,6 +2186,7 @@ pub struct TableCell {
 }
 #callsite(autofill(args_loc, loc))
 pub fn TableCell::TableCell(&IntoContent, x? : Int64, y? : Int64, colspan? : Int64, rowspan? : Int64, inset? : Sides[Length], align? : Alignment, fill? : Paint, stroke? : Sides[Stroke], breakable? : Bool, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for TableCell
 pub impl IntoContent for TableCell
 
 pub struct TableCellView {
@@ -2040,6 +2194,7 @@ pub struct TableCellView {
 }
 pub fn TableCellView::body(Self) -> ContentView raise @library.HintedError
 pub fn TableCellView::view(Self) -> ContentView
+pub impl @builtin.Show for TableCellView
 pub impl IntoContent for TableCellView
 
 pub struct TableFooter {
@@ -2047,12 +2202,14 @@ pub struct TableFooter {
 }
 #callsite(autofill(args_loc, loc))
 pub fn TableFooter::TableFooter(Array[&IntoContent], repeat? : Bool, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for TableFooter
 pub impl IntoContent for TableFooter
 
 pub struct TableFooterView {
   // private fields
 }
 pub fn TableFooterView::view(Self) -> ContentView
+pub impl @builtin.Show for TableFooterView
 pub impl IntoContent for TableFooterView
 
 pub struct TableHeader {
@@ -2060,12 +2217,14 @@ pub struct TableHeader {
 }
 #callsite(autofill(args_loc, loc))
 pub fn TableHeader::TableHeader(Array[&IntoContent], repeat? : Bool, level? : Int64, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for TableHeader
 pub impl IntoContent for TableHeader
 
 pub struct TableHeaderView {
   // private fields
 }
 pub fn TableHeaderView::view(Self) -> ContentView
+pub impl @builtin.Show for TableHeaderView
 pub impl IntoContent for TableHeaderView
 
 pub struct TableHline {
@@ -2073,18 +2232,21 @@ pub struct TableHline {
 }
 #callsite(autofill(args_loc, loc))
 pub fn TableHline::TableHline(y? : Int64, start? : Int64, end_? : Int64, stroke? : Stroke, position? : Alignment, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for TableHline
 pub impl IntoContent for TableHline
 
 pub struct TableHlineView {
   // private fields
 }
 pub fn TableHlineView::view(Self) -> ContentView
+pub impl @builtin.Show for TableHlineView
 pub impl IntoContent for TableHlineView
 
 pub struct TableView {
   // private fields
 }
 pub fn TableView::view(Self) -> ContentView
+pub impl @builtin.Show for TableView
 pub impl IntoContent for TableView
 
 pub struct TableVline {
@@ -2092,12 +2254,14 @@ pub struct TableVline {
 }
 #callsite(autofill(args_loc, loc))
 pub fn TableVline::TableVline(x? : Int64, start? : Int64, end_? : Int64, stroke? : Stroke, position? : Alignment, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for TableVline
 pub impl IntoContent for TableVline
 
 pub struct TableVlineView {
   // private fields
 }
 pub fn TableVlineView::view(Self) -> ContentView
+pub impl @builtin.Show for TableVlineView
 pub impl IntoContent for TableVlineView
 
 pub struct Terms {
@@ -2105,6 +2269,7 @@ pub struct Terms {
 }
 #callsite(autofill(args_loc, loc))
 pub fn Terms::Terms(Array[&IntoContent], tight? : Bool, separator? : &IntoContent, indent? : Length, hanging_indent? : Length, spacing? : Length, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Terms
 pub impl IntoContent for Terms
 
 pub struct TermsItem {
@@ -2112,6 +2277,7 @@ pub struct TermsItem {
 }
 #callsite(autofill(args_loc, loc))
 pub fn TermsItem::TermsItem(&IntoContent, &IntoContent, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for TermsItem
 pub impl IntoContent for TermsItem
 
 pub struct TermsItemView {
@@ -2120,12 +2286,14 @@ pub struct TermsItemView {
 pub fn TermsItemView::description(Self) -> ContentView raise @library.HintedError
 pub fn TermsItemView::term(Self) -> ContentView raise @library.HintedError
 pub fn TermsItemView::view(Self) -> ContentView
+pub impl @builtin.Show for TermsItemView
 pub impl IntoContent for TermsItemView
 
 pub struct TermsView {
   // private fields
 }
 pub fn TermsView::view(Self) -> ContentView
+pub impl @builtin.Show for TermsView
 pub impl IntoContent for TermsView
 
 pub struct Text {
@@ -2133,6 +2301,7 @@ pub struct Text {
 }
 #callsite(autofill(args_loc, loc))
 pub fn Text::Text(&IntoContent, font? : Array[String], fallback? : Bool, style? : String, weight? : FontWeight, size? : Length, fill? : Paint, stroke? : Stroke, tracking? : Length, spacing? : Length, baseline? : Length, overhang? : Bool, lang? : String, region? : String, dir? : Dir, hyphenate? : Bool, kerning? : Bool, ligatures? : Bool, discretionary_ligatures? : Bool, historical_ligatures? : Bool, number_type? : String, number_width? : String, slashed_zero? : Bool, fractions? : Bool, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Text
 pub impl IntoContent for Text
 
 pub struct TextOrigin {
@@ -2145,6 +2314,7 @@ pub struct TextView {
 }
 pub fn TextView::body(Self) -> ContentView raise @library.HintedError
 pub fn TextView::view(Self) -> ContentView
+pub impl @builtin.Show for TextView
 pub impl IntoContent for TextView
 
 pub struct Title {
@@ -2152,12 +2322,14 @@ pub struct Title {
 }
 #callsite(autofill(args_loc, loc))
 pub fn Title::Title(body? : &IntoContent, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Title
 pub impl IntoContent for Title
 
 pub struct TitleView {
   // private fields
 }
 pub fn TitleView::view(Self) -> ContentView
+pub impl @builtin.Show for TitleView
 pub impl IntoContent for TitleView
 
 pub struct TracePoint {
@@ -2170,6 +2342,7 @@ pub struct Underline {
 }
 #callsite(autofill(args_loc, loc))
 pub fn Underline::Underline(&IntoContent, stroke? : Stroke, offset? : Length, extent? : Length, evade? : Bool, background? : Bool, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Underline
 pub impl IntoContent for Underline
 
 pub struct UnderlineView {
@@ -2177,6 +2350,7 @@ pub struct UnderlineView {
 }
 pub fn UnderlineView::body(Self) -> ContentView raise @library.HintedError
 pub fn UnderlineView::view(Self) -> ContentView
+pub impl @builtin.Show for UnderlineView
 pub impl IntoContent for UnderlineView
 
 pub struct V {
@@ -2184,12 +2358,14 @@ pub struct V {
 }
 #callsite(autofill(args_loc, loc))
 pub fn V::V(Spacing, weak? : Bool, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for V
 pub impl IntoContent for V
 
 pub struct VView {
   // private fields
 }
 pub fn VView::view(Self) -> ContentView
+pub impl @builtin.Show for VView
 pub impl IntoContent for VView
 
 pub struct Value {

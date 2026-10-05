@@ -123,6 +123,13 @@ pub fn full_showcase() -> Document {
   for n in fibonacci(12) {
     fib_cells.push(n.to_string())
   }
+  let hyphenation_note = Footnote(
+    (
+      $|Hyphenation patterns come from the
+      $|\{Raw("hypher")} crate, ported to MoonBit together with its tries.
+    )
+    |> Prose,
+  )
   Document([
     // Setup.
     SetDocument(title="typst.mbt Showcase", author=["typst.mbt"], keywords=[
@@ -171,7 +178,11 @@ pub fn full_showcase() -> Document {
         Text(subtitle, size=Pt(13)),
         V(Pt(4)),
         Text(
-          "This document was compiled end to end by the MoonBit port: parsing, evaluation, layout, shaping, line breaking, hyphenation, math, bibliography and PDF export.",
+          (
+            $|This document was compiled end to end by the MoonBit port: parsing, evaluation,
+            $|layout, shaping, line breaking, hyphenation, math, bibliography and PDF export.
+          )
+          |> Prose,
           size=Pt(9.5),
         ),
       ]),
@@ -187,43 +198,23 @@ pub fn full_showcase() -> Document {
     Outline(depth=2, indent=Auto),
     // Text and paragraphs.
     Heading("Text and paragraphs"),
-    Par(
-      Seq([
-        "Typst lays out text with a Knuth–Plass style optimizer, OpenType shaping and Unicode line breaking. Ligatures (fi, fl, ffi), kerning and old-style figures (",
-        Text("1234567890", number_type="old-style"),
-        ") come from the fonts’ OpenType tables, and hyphenation follows the language: the paragraph you are reading is justified with hyphenation enabled.",
-        Footnote(
-          Seq([
-            "Hyphenation patterns come from the ",
-            Raw("hypher"),
-            " crate, ported to MoonBit together with its tries.",
-          ]),
-        ),
-        " Smart quotes adapt to the language: ",
-        Quoted("English"),
-        ", ",
-        Text(Quoted("Deutsch"), lang="de"),
-        ", ",
-        Text(Quoted("Français"), lang="fr"),
-        ".",
-      ]),
-    ),
-    Par(Text(german, lang="de")),
-    Par(
-      Seq([
-        "Mixed scripts are shaped and reordered with the Unicode bidirectional algorithm: English, ",
-        Text("مرحبا بالعالم", font=["Geeza Pro"], lang="ar"),
-        // The original breaks the source line here: Typst discards a newline
-        // space next to Chinese text, so there is no space in the string.
-        ", and",
-        Text(
-          "排版引擎的移植",
-          font=["PingFang SC", "Songti SC"],
-          lang="zh",
-        ),
-        ", all in one line.",
-      ]),
-    ),
+    (
+      $|Typst lays out text with a Knuth–Plass style optimizer, OpenType shaping and
+      $|Unicode line breaking. Ligatures (fi, fl, ffi), kerning and old-style figures
+      $|(\{Text("1234567890", number_type="old-style")}) come from the fonts' OpenType
+      $|tables, and hyphenation follows the language: the paragraph you are reading is
+      $|justified with hyphenation enabled.\{hyphenation_note} Smart quotes adapt
+      $|to the language: "English", \{Text(Prose("\"Deutsch\""), lang="de")},
+      $|\{Text(Prose("\"Français\""), lang="fr")}.
+      $|
+      $|\{Text(german, lang="de")}
+      $|
+      $|Mixed scripts are shaped and reordered with the Unicode bidirectional
+      $|algorithm: English, \{Text("مرحبا بالعالم", font=["Geeza Pro"], lang="ar")}, and
+      $|\{Text("排版引擎的移植", font=["PingFang SC", "Songti SC"], lang="zh")}, all in
+      $|one line.
+    )
+    |> Prose,
     Grid(
       [
         Seq([
@@ -251,18 +242,16 @@ pub fn full_showcase() -> Document {
     ),
     // Mathematics.
     Heading("Mathematics"),
-    Par(
-      Seq([
-        "The quadratic formula ",
-        Equation(quadratic),
-        " sits inline, while display math gets its own line:",
-      ]),
-    ),
+    (
+      $|The quadratic formula \{Equation(quadratic)} sits
+      $|inline, while display math gets its own line:
+    )
+    |> Prose,
     Equation(display_math[0], block=true),
     Equation(display_math[1], block=true),
     Equation(display_math[2], block=true),
     Equation(maxwell, block=true, label="maxwell"),
-    Par(Seq(["Maxwell’s law, ", Ref("maxwell"), ", is referenced by label."])),
+    Prose("Maxwell's law, \{Ref("maxwell")}, is referenced by label."),
     // Tables and figures.
     Heading("Tables and figures"),
     Figure(
@@ -302,16 +291,14 @@ pub fn full_showcase() -> Document {
     ),
     // Code.
     Heading("Code"),
-    Par(
-      Seq([
-        "Code blocks are highlighted with a port of ",
-        Raw("syntect"),
-        " and Typst’s bundled syntaxes:",
-      ]),
-    ),
+    (
+      $|Code blocks are highlighted with a port of \{Raw("syntect")} and Typst's bundled
+      $|syntaxes:
+    )
+    |> Prose,
     Raw(rust_code, lang="rust", block=true),
     Raw(python_code, lang="python", block=true),
-    Par("And Typst itself is scriptable — this table is computed:"),
+    Prose("And Typst itself is scriptable — this table is computed:"),
     Table(
       fib_cells,
       columns=Sizing::repeat(12),
@@ -370,23 +357,13 @@ pub fn full_showcase() -> Document {
     ),
     // Citations.
     Heading("Citations"),
-    Par(
-      Seq([
-        "Bibliographies are formatted with a port of ",
-        Raw("hayagriva"),
-        " and the Citation Style Language: the Net Wok study ",
-        Ref("netwok"),
-        ", distributed dumplings revisited ",
-        Ref("netwok", supplement=Supplement("p. 200")),
-        ", piracy ",
-        Ref("arrgh"),
-        " and glaciers ",
-        Ref("glacier-melt"),
-        ", as well as a classic ",
-        Ref("tolkien54"),
-        ".",
-      ]),
-    ),
+    (
+      $|Bibliographies are formatted with a port of \{Raw("hayagriva")} and the Citation Style
+      $|Language: the Net Wok study \{Ref("netwok")}, distributed dumplings revisited
+      $|\{Ref("netwok", supplement=Supplement("p. 200"))}, piracy \{Ref("arrgh")} and glaciers \{Ref("glacier-melt")}, as well as a classic
+      $|\{Ref("tolkien54")}.
+    )
+    |> Prose,
     Bibliography("works.bib", style="ieee"),
   ])
 }
