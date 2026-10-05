@@ -1,0 +1,24 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/doc/twins"
+
+import {
+  "moonbitlang/typst/doc",
+}
+
+// Values
+pub fn all() -> Array[Twin]
+
+pub fn constructs() -> Array[Twin]
+
+// Errors
+
+// Types and methods
+pub struct Twin {
+  name : String
+  typst : String
+  build : () -> @doc.Document
+}
+
+// Type aliases
+
+// Traits

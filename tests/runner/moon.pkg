@@ -41,6 +41,8 @@ import {
   "moonbitlang/core/env",
   "moonbitlang/core/encoding/utf8",
   "moonbitlang/typst/wasmparser",
+  "moonbitlang/typst/doc/twins",
+  "moonbitlang/typst/doc/system",
 }
 
 supported_targets = "native"

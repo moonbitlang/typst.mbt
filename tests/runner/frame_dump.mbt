@@ -8,6 +8,9 @@ priv struct FrameEncoder {
   out : StringBuilder
   /// Encodes spans (`null` or `[path,start,end]`).
   span_enc : (@syntax.Span) -> String
+  /// Whether glyph span offsets are written as 0 (the frame normalizer of
+  /// the `edsl` stage, together with a `span_enc` that erases spans).
+  zero_span_offsets : Bool
   /// Shared with canonical content (location numbering).
   dumper : Dumper
   fonts : Map[String, Int]
@@ -17,10 +20,14 @@ priv struct FrameEncoder {
 }
 
 ///|
-fn FrameEncoder::new(span_enc : (@syntax.Span) -> String) -> FrameEncoder {
+fn FrameEncoder::new(
+  span_enc : (@syntax.Span) -> String,
+  zero_span_offsets? : Bool = false,
+) -> FrameEncoder {
   {
     out: StringBuilder(),
     span_enc,
+    zero_span_offsets,
     dumper: Dumper::new(),
     fonts: {},
     images: {},
@@ -362,7 +369,11 @@ fn FrameEncoder::glyphs(
         g.range_start.to_string(),
         g.range_end.to_string(),
         (self.span_enc)(g.span),
-        g.span_offset.to_string(),
+        if self.zero_span_offsets {
+          "0"
+        } else {
+          g.span_offset.to_string()
+        },
       ])
     }),
   )
