@@ -1,0 +1,32 @@
+<header class="bar">
+  <div class="bar-in">
+    <span class="eyebrow">Review</span>
+    <h1 id="doc-title">{{TITLE}}</h1>
+    <p id="doc-meta" class="meta"></p>
+  </div>
+</header>
+<p id="selftest" class="selftest" hidden></p>
+<div class="layout">
+<!--PAGES-->
+<aside id="panel" class="panel" aria-label="Source of the clicked content" aria-live="polite">
+  <div id="empty">
+    <h2>Click something</h2>
+    <p class="meta">Click text, a shape or an image on a page. This panel then shows the MoonBit constructor call that produced it.</p>
+  </div>
+  <div id="none" hidden>
+    <h2>No source location</h2>
+    <p class="meta">Nothing with a source location is at this point: the page is empty there, or the engine generated what is drawn (a list marker, a number, a rule of a table).</p>
+  </div>
+  <div id="found" hidden>
+    <p id="where" class="loc"></p>
+    <p><code id="call"></code></p>
+    <dl class="facts">
+      <dt>File</dt><dd id="file"></dd>
+      <dt>Range</dt><dd id="range"></dd>
+      <dt id="key-label">Data key</dt><dd id="key"></dd>
+      <dt>Drawn</dt><dd id="drawn"></dd>
+    </dl>
+    <p class="meta" id="note"></p>
+  </div>
+</aside>
+</div>

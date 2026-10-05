@@ -99,6 +99,18 @@
   arguments that share a location, arguments of call values) gets a
   distinct sub-range of the argument's span from one counter (`Pieces` in
   `doc/lower.mbt`, section 12.2 of the design).
+- Review loop of the EDSL (`docs/edsl-review.md`, built in slices; slice
+  1 is click to source): `CompileReport::review_html` writes a
+  self-contained preview page (the exporter's SVG per page plus a layer
+  of invisible shapes that carry origin numbers), `origin_at` and
+  `jump_from_click` (port of typst-ide's) answer a click from code
+  (`doc/review_click.mbt`, `doc/review_html.mbt`). The page's sources are
+  `doc/review_page/page.{html,css,js}`: after editing them (and after
+  `moon fmt`) run `python3 scripts/gen_review_page.py`
+  (`doc/review_page_gen.mbt`). `moon run doc/examples/review --target
+  native --release -- preview showcase -o preview.html` writes the
+  showcase's page; opening it with `#selftest` compares the browser's
+  hit testing with the library's answers embedded in the page.
 - Typst-to-EDSL translator (`doc/convert`, design in `docs/edsl-convert.md`,
   Codex-approved; a stress test of the EDSL, not a compiler): typed where
   the design's narrow rules prove it exact, Typst source in `Markup`

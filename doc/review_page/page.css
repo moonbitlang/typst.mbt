@@ -1,0 +1,157 @@
+/* Layout: the pages are a column of sheets on a desk; beside it (below it
+   on a phone, as a sheet at the bottom edge) the panel that says where the
+   clicked content comes from. Colours are tokens; the paper stays white. */
+:root {
+  --desk: #e9ebee;
+  --surface: #ffffff;
+  --ink: #1b1f24;
+  --muted: #5b6470;
+  --line: #cfd4db;
+  --accent: #0b5cad;
+  --mark: rgba(11, 92, 173, 0.22);
+  --mark-line: #b4540a;
+  --paper: #ffffff;
+  --shadow: 0 1px 2px rgba(20, 28, 38, 0.12), 0 8px 24px rgba(20, 28, 38, 0.08);
+  --ui: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --desk: #14171b;
+    --surface: #1e2329;
+    --ink: #e7eaee;
+    --muted: #9aa5b2;
+    --line: #353d47;
+    --accent: #6fb1f5;
+    --mark: rgba(63, 142, 224, 0.32);
+    --mark-line: #f29a4a;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.5), 0 8px 24px rgba(0, 0, 0, 0.35);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --desk: #14171b;
+  --surface: #1e2329;
+  --ink: #e7eaee;
+  --muted: #9aa5b2;
+  --line: #353d47;
+  --accent: #6fb1f5;
+  --mark: rgba(63, 142, 224, 0.32);
+  --mark-line: #f29a4a;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.5), 0 8px 24px rgba(0, 0, 0, 0.35);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--desk);
+  color: var(--ink);
+  font: 14px/1.45 var(--ui);
+  -webkit-text-size-adjust: 100%;
+}
+h1, h2, p, dl, dd { margin: 0; }
+h1, h2 { text-wrap: balance; }
+[hidden] { display: none !important; }
+
+.bar {
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 5;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+}
+.bar-in {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 10px 16px;
+}
+.eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 600;
+}
+h1 { font-size: 16px; font-weight: 600; overflow-wrap: anywhere; flex: 1 1 auto; min-width: 0; }
+h2 { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+.meta { color: var(--muted); font-size: 12.5px; }
+
+.selftest {
+  max-width: 1280px;
+  margin: 12px auto 0;
+  padding: 10px 16px;
+  white-space: pre-wrap;
+  font: 12.5px/1.4 var(--mono);
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 24px;
+  align-items: start;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding-block: 20px;
+  padding-inline: 16px;
+}
+.pages { display: grid; gap: 20px; min-width: 0; justify-items: center; }
+.page {
+  position: relative;
+  width: 100%;
+  max-width: 860px;
+  background: var(--paper);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.art { position: absolute; inset: 0; pointer-events: none; }
+.art > svg, .page > svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+/* The layer of origins: invisible shapes that take the pointer. A box
+   takes it in its interior only, whatever outline marks it. */
+.hit { fill: transparent; stroke: none; }
+.hit [data-o] { cursor: pointer; }
+.hit rect[data-o] { pointer-events: fill; }
+.hit rect[data-o].on, .hit path[data-o].on[pointer-events="fill"], .hit path[data-o].on[pointer-events="all"] { fill: var(--mark); }
+.hit path[data-o].on[pointer-events="stroke"], .hit path[data-o].on[pointer-events="all"] { stroke: var(--mark-line); stroke-opacity: 0.6; }
+.hit rect[data-o].hit-here { stroke: var(--mark-line); stroke-width: 0.75; }
+
+.panel {
+  position: sticky;
+  top: calc(env(safe-area-inset-top, 0px) + 60px);
+  max-height: calc(100vh - 84px);
+  overflow: auto;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 16px;
+  min-width: 0;
+  display: grid;
+  gap: 8px;
+}
+#found { display: grid; gap: 8px; }
+.loc { color: var(--accent); font: 600 13.5px/1.35 var(--mono); overflow-wrap: anywhere; user-select: all; }
+code { font: 13px/1.4 var(--mono); overflow-wrap: anywhere; }
+.facts { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 4px 12px; font-size: 13px; }
+.facts dt { color: var(--muted); }
+.facts dd { overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+
+@media (max-width: 860px) {
+  .layout { grid-template-columns: minmax(0, 1fr); padding-bottom: 45vh; }
+  .panel {
+    position: fixed;
+    inset: auto 0 0 0;
+    top: auto;
+    z-index: 6;
+    max-height: 40vh;
+    border-radius: 12px 12px 0 0;
+    border-width: 1px 0 0;
+    padding: 14px 16px calc(14px + env(safe-area-inset-bottom, 0px));
+    box-shadow: 0 -6px 24px rgba(0, 0, 0, 0.18);
+  }
+}

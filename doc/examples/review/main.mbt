@@ -1,0 +1,88 @@
+// The review loop of the EDSL (docs/edsl-review.md, slice 1): write the
+// preview page of a document, in which a click shows the MoonBit
+// constructor call that produced the clicked content, and answer the same
+// question for a point from the command line.
+//
+// Usage (from the repository root: `bench/` holds the documents' files):
+//
+//   moon run doc/examples/review --target native --release -- preview [name] [-o preview.html]
+//   moon run doc/examples/review --target native --release -- at <name> <page> <x> <y>
+//
+// `name` is one of the documents of `@twins.originals()` (default:
+// `showcase`); `compile_document` takes any `() -> @doc.Document`.
+
+///|
+/// Compile a document function with the files below `root`.
+fn compile_document(
+  build : () -> @doc.Document,
+  root? : String = "bench",
+  system_fonts? : Bool = false,
+) -> @doc.CompileReport[@layout.PagedDocument] raise {
+  build().compile_paged(@system.world(root~, system_fonts~, today=(2026, 1, 1)))
+}
+
+///|
+/// The document with the given name, compiled.
+fn compiled(name : String) -> @doc.CompileReport[@layout.PagedDocument] raise {
+  for original in @twins.originals() {
+    if original.name == name {
+      return compile_document(
+        original.build,
+        system_fonts=original.system_fonts,
+      )
+    }
+  }
+  fail("unknown document `\{name}` (one of: tiny, long, longer, showcase)")
+}
+
+///|
+fn run(args : Array[String]) -> Unit raise {
+  match args.get(1).unwrap_or("preview") {
+    "preview" => {
+      let mut name = "showcase"
+      let mut out = "preview.html"
+      let mut i = 2
+      while i < args.length() {
+        if args[i] == "-o" && i + 1 < args.length() {
+          out = args[i + 1]
+          i += 1
+        } else {
+          name = args[i]
+        }
+        i += 1
+      }
+      let report = compiled(name)
+      for warning in report.warnings {
+        println(warning.render())
+      }
+      let html = report.review_html().unwrap()
+      @system.write_text(out, html)
+      println(
+        "wrote \{out}: \{report.unwrap().pages().length()} pages, \{@utf8.encode(html).length()} bytes",
+      )
+    }
+    "at" => {
+      guard args.length() == 6 else { fail("at <name> <page> <x> <y>") }
+      let report = compiled(args[2])
+      let page = @string.parse_int(args[3])
+      let x = @string.parse_double(args[4])
+      let y = @string.parse_double(args[5])
+      match report.origin_at(page, x, y) {
+        Some(origin) => println(origin.describe())
+        None => println("nothing with a source location")
+      }
+    }
+    command => fail("unknown command `\{command}` (preview, at)")
+  }
+}
+
+///|
+fn main {
+  run(@env.args()) catch {
+    @doc.DocError(errors) =>
+      for error in errors {
+        println(error.render())
+      }
+    err => println("error: \{err}")
+  }
+}
