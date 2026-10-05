@@ -314,7 +314,7 @@ fn Document::lower_initial(
     introspector: @library.Introspector::empty(),
     traced,
     sink,
-    route: @library.Route::extend(@library.Route::root()).with_id(origins_file),
+    route: @library.Route::extend_(@library.Route::root()).with_id(origins_file),
   }
   let lower : Lower = {
     session,
