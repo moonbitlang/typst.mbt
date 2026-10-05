@@ -19,7 +19,19 @@ pub(all) enum Tier {
   T3
   /// Not convertible.
   T4
-} derive(Eq, Show)
+} derive(Eq)
+
+///|
+pub impl Show for Tier with fn output(self, logger) {
+  logger.write_string(
+    match self {
+      T1 => "T1"
+      T2 => "T2"
+      T3 => "T3"
+      T4 => "T4"
+    },
+  )
+}
 
 ///|
 /// A fallback fragment: Typst source the translator could not type.

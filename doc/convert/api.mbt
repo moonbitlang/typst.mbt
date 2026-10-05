@@ -13,7 +13,7 @@ priv enum ParamKind {
   Named
   /// A variadic positional parameter: an array in the EDSL.
   Variadic
-} derive(Eq)
+}
 
 ///|
 /// An element function with its generated constructor, set rule and

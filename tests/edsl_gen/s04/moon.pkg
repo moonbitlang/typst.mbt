@@ -5,4 +5,4 @@ import {
 
 supported_targets = "native"
 
-warnings = "-unused_type_declaration-unused_value"
+warnings = "-unused_type_declaration-unused_value-unused_package"

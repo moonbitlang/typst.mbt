@@ -204,20 +204,3 @@ fn Tr::markup_fragment(
     "Markup(\{mbt_str(text)}, scope=[\{scope.join(", ")}])"
   }
 }
-
-///|
-/// A value fragment (section 6.3): `eval(source, scope: (..))` in code
-/// mode. Only during initial lowering.
-fn Tr::eval_fragment(
-  self : Tr,
-  construct : String,
-  text : String,
-  scope : Array[String],
-) -> String {
-  self.record(construct, "value", text)
-  if scope.is_empty() {
-    "Value::call(\"eval\", positional=[Value::str(\{mbt_str(text)})])"
-  } else {
-    "Value::call(\"eval\", positional=[Value::str(\{mbt_str(text)})], named=[(\"scope\", Value::dict([\{scope.join(", ")}]))])"
-  }
-}

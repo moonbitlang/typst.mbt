@@ -2,7 +2,6 @@ import {
   "moonbitlang/typst/syntax",
   "moonbitlang/typst/syntax/ast",
   "moonbitlang/typst/library",
-  "moonbitlang/typst/unicode",
 }
 
 import {

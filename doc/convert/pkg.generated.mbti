@@ -24,7 +24,8 @@ pub(all) enum Tier {
   T2
   T3
   T4
-} derive(Eq, Show)
+} derive(Eq)
+pub impl Show for Tier
 
 pub struct Translation {
   body : String

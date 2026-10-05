@@ -108,11 +108,7 @@ fn Tr::item(self : Tr, expr : @ast.Expr, env : Env) -> Array[Op] raise Bail {
 ///|
 /// An equation: the math string of its body, with the translated
 /// variables it mentions as its scope.
-fn Tr::equation(
-  self : Tr,
-  equation : @ast.Equation,
-  env : Env,
-) -> Array[Op] raise Bail {
+fn Tr::equation(self : Tr, equation : @ast.Equation, env : Env) -> Array[Op] {
   let body = equation.body().to_untyped()
   let source = body.full_text()
   let scope = self.scope([body], env)
@@ -137,7 +133,7 @@ let non_label_functions : Array[String] = [
 
 ///|
 /// Whether a call is audited never to return a label: by the function it
-/// resolves to, or by its method and the type of its receiver.
+/// resolves to, or by its method_name and the type of its receiver.
 fn Tr::call_not_label(self : Tr, call : @ast.FuncCall, env : Env) -> Bool {
   match self.global_path(call.callee(), env) {
     Some(path) =>
@@ -148,18 +144,18 @@ fn Tr::call_not_label(self : Tr, call : @ast.FuncCall, env : Env) -> Bool {
       })
     None => {
       guard call.callee() is FieldAccess(access) else { return false }
-      let method = access.field().get()
+      let method_name = access.field().get()
       match access.target() {
-        // Every method of a string but `at` (which returns its default)
+        // Every method_name of a string but `at` (which returns its default)
         // returns a string, a number, a boolean, an array or dictionary
         // of those, or `none`.
-        Str(_) => method != "at"
+        Str(_) => method_name != "at"
         FuncCall(receiver) =>
           match self.global_path(receiver.callee(), env) {
             // Not `display`: it forwards a numbering function's result.
             Some("counter") =>
-              ["step", "update", "get", "at", "final"].contains(method)
-            Some("state") => method == "update"
+              ["step", "update", "get", "at", "final"].contains(method_name)
+            Some("state") => method_name == "update"
             _ => false
           }
         _ => false
@@ -254,7 +250,7 @@ fn construct_of(expr : @ast.Expr) -> String {
     FieldAccess(_) => "field-access"
     FuncCall(call) =>
       match call.callee() {
-        FieldAccess(_) => "method-call"
+        FieldAccess(_) => "method_name-call"
         _ => "call"
       }
     Array(_) => "array"

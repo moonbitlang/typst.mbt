@@ -77,11 +77,8 @@ pub fn translate(
 }
 
 ///|
-/// A child of a markup stream: the syntax nodes `start..end` of the
-/// container and what they are.
+/// A child of a markup stream.
 priv struct Item {
-  start : Int
-  end : Int
   kind : ItemKind
 }
 
@@ -110,7 +107,7 @@ fn items_of(children : ArrayView[@syntax.SyntaxNode]) -> Array[Item] {
         Some(expr) => IExpr(expr, true)
         None => ITrivia
       }
-      items.push({ start: i, end: i + 2, kind: item_kind, })
+      items.push({ kind: item_kind, })
       was_stmt = children[i + 1].kind().is_stmt()
       i += 2
       continue
@@ -119,19 +116,14 @@ fn items_of(children : ArrayView[@syntax.SyntaxNode]) -> Array[Item] {
       // A newline directly after a statement without a semicolon is no
       // expression.
       if !was_stmt {
-        items.push({
-          start: i,
-          end: i + 1,
-          kind: ISpace(kind is SpaceWithNewline),
-        })
+        items.push({ kind: ISpace(kind is SpaceWithNewline), })
       } else {
-        items.push({ start: i, end: i + 1, kind: ITrivia, })
+        items.push({ kind: ITrivia, })
       }
     } else {
       match @ast.Expr::from_untyped(node) {
-        Some(expr) =>
-          items.push({ start: i, end: i + 1, kind: IExpr(expr, false), })
-        None => items.push({ start: i, end: i + 1, kind: ITrivia, })
+        Some(expr) => items.push({ kind: IExpr(expr, false), })
+        None => items.push({ kind: ITrivia, })
       }
     }
     was_stmt = kind.is_stmt()

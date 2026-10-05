@@ -22,12 +22,11 @@ let edsl_gen_dir = "tests/edsl_gen"
 let edsl_shards : Int = 16
 
 ///|
-/// The cases of the suite in order: number, suite file, ordinal in the
-/// file, test, and whether upstream compiles it to a paged document.
+/// The cases of the suite in order: number, suite file, test, and whether
+/// upstream compiles it to a paged document.
 priv struct SuiteCase {
   number : Int
   rel : String
-  ordinal : Int
   tc : TestCase
   paged : Bool
 }
@@ -42,11 +41,10 @@ fn suite_cases() -> Array[SuiteCase] {
     )
     let text = read(file)
     let skipped = text.has_prefix("// SKIP")
-    for ordinal, tc in split_tests(text) {
+    for tc in split_tests(text) {
       cases.push({
         number: cases.length(),
         rel,
-        ordinal,
         tc,
         paged: !skipped && is_paged(tc.attrs),
       })
@@ -56,8 +54,8 @@ fn suite_cases() -> Array[SuiteCase] {
   for file in typ_files(docs_dir) {
     let rel = "docs/" +
       file.unsafe_substring(start=docs_dir.length() + 1, end=file.length())
-    for ordinal, tc in split_tests(read(file)) {
-      cases.push({ number: cases.length(), rel, ordinal, tc, paged: true, })
+    for tc in split_tests(read(file)) {
+      cases.push({ number: cases.length(), rel, tc, paged: true, })
     }
   }
   cases

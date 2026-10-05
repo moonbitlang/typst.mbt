@@ -88,11 +88,11 @@ fn Tr::value(self : Tr, expr : @ast.Expr, env : Env) -> Code raise Bail {
     FieldAccess(_) => self.global(expr, env, "field-access")
     FuncCall(call) =>
       match self.function_method(call, env) {
-        Some((method, receiver)) => {
+        Some((method_name, receiver)) => {
           // `f.with(..)`, `f.where(..)` on a function of the library: the
-          // method of the type `function` with the function as its
+          // method_name of the type `function` with the function as its
           // first argument, which is how Typst calls it.
-          let path = "function." + method
+          let path = "function." + method_name
           let args = self.generic_args(path, call.args(), env, false)
           let receiver = "Value::global(\{mbt_str(receiver)})"
           let args = match args.strip_prefix(", positional=[") {
@@ -112,7 +112,7 @@ fn Tr::value(self : Tr, expr : @ast.Expr, env : Env) -> Code raise Bail {
     // (left operand first, as in Typst). Comparisons, `and`/`or` (which
     // do not evaluate both operands), `in` and assignments have no form.
     Binary(binary) => {
-      let method = match binary.op() {
+      let method_name = match binary.op() {
         Add => "add"
         Sub => "sub"
         Mul => "mul"
@@ -122,7 +122,7 @@ fn Tr::value(self : Tr, expr : @ast.Expr, env : Env) -> Code raise Bail {
       let lhs = self.value(binary.lhs(), env)
       let rhs = self.value(binary.rhs(), env)
       self.hatch = true
-      { code: "Value::\{method}(\{lhs.code}, \{rhs.code})", total: false, }
+      { code: "Value::\{method_name}(\{lhs.code}, \{rhs.code})", total: false, }
     }
     _ => raise Bail(construct_of(expr))
   }
@@ -184,21 +184,21 @@ fn signed_length(expr : @ast.Expr) -> String raise Bail {
 
 ///|
 /// `f.with(..)` or `f.where(..)` where `f` is a global path that is a
-/// function and the method is not a member of its scope: the method name
+/// function and the method_name is not a member of its scope: the method_name name
 /// and the path of the function. (A proven receiver type and an audited
-/// method, docs/edsl-convert.md, section 4.4.)
+/// method_name, docs/edsl-convert.md, section 4.4.)
 fn Tr::function_method(
   self : Tr,
   call : @ast.FuncCall,
   env : Env,
 ) -> (String, String)? {
   guard call.callee() is FieldAccess(access) else { return None }
-  let method = access.field().get()
-  guard method == "with" || method == "where" else { return None }
+  let method_name = access.field().get()
+  guard method_name == "with" || method_name == "where" else { return None }
   guard self.global_path(access.target(), env) is Some(receiver) &&
     self.lookup(receiver) is Some(Func(_)) &&
-    self.lookup(receiver + "." + method) is None else {
+    self.lookup(receiver + "." + method_name) is None else {
     return None
   }
-  Some((method, receiver))
+  Some((method_name, receiver))
 }
