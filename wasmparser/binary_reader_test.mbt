@@ -2,12 +2,12 @@
 // wasmparser 0.228.0's `binary_reader.rs`).
 
 ///|
-fn reader(bytes : Bytes) -> BinaryReader {
-  BinaryReader::new(bytes[:], 0)
+fn reader(bytes : Bytes) -> @wasmparser.BinaryReader {
+  @wasmparser.BinaryReader::new(bytes[:], 0)
 }
 
 ///|
-fn err_string(f : () -> Unit raise BinaryReaderError) -> String {
+fn err_string(f : () -> Unit raise @wasmparser.BinaryReaderError) -> String {
   match (try? f()) {
     Ok(_) => "ok"
     Err(e) => e.to_string()

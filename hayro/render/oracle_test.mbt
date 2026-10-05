@@ -74,13 +74,18 @@ test "hayro::render matches the oracle" {
       mismatches.push("\{parts[0]}: missing page \{page}")
       continue
     }
-    let pix = render(p, RenderCache::new(), typst_interpreter_settings(), {
-      x_scale: scale,
-      y_scale: scale,
-      width: None,
-      height: None,
-      bg_color: @vello_cpu.transparent,
-    })
+    let pix = @render.render(
+      p,
+      @render.RenderCache::new(),
+      typst_interpreter_settings(),
+      {
+        x_scale: scale,
+        y_scale: scale,
+        width: None,
+        height: None,
+        bg_color: @vello_cpu.transparent,
+      },
+    )
     let actual_hash = hex64(fnv1a64(pix.data()))
     if pix.width() != width || pix.height() != height || actual_hash != hash {
       mismatches.push(
