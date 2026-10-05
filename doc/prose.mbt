@@ -47,6 +47,14 @@ let prose_table_max : Int = 65536
 /// string is. Every interpolation is an occurrence of its own.
 fn prose_placeholder(content : Content, logger : &Logger) -> Unit {
   let id = prose_serial.val
+  // Numbers have at most 18 digits (`prose_token`) and are never reused:
+  // past that, nothing is registered and the written token is no
+  // placeholder (`Prose` rejects it as a reserved character).
+  if id >= 1000000000000000000L {
+    logger.write_char(PROSE_OPEN)
+    logger.write_char(PROSE_CLOSE)
+    return
+  }
   prose_serial.val = id + 1L
   if prose_table.length() >= prose_table_max {
     // Drop the oldest pending entry (the map keeps insertion order).
@@ -249,7 +257,9 @@ pub fn Prose::Prose(
                   // Not a number that an interpolation was given.
                   "the text of `Prose` contains a reserved character (U+FDD0)"
                 } else if id < prose_dropped_below.val {
-                  "an interpolated description of this text is no longer available: more than \{prose_table_max} descriptions were interpolated since"
+                  // Consumed, or dropped at the cap: the table cannot
+                  // tell which.
+                  "an interpolated description of this text was already used by another `Prose`, or dropped because more than \{prose_table_max} descriptions were interpolated since"
                 } else {
                   "an interpolated description of this text was already used by another `Prose`"
                 },

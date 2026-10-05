@@ -524,6 +524,9 @@ fn Lower::value(
       )
     VCall(func, args) => {
       let result = self.call(func, args, -1, span)
+      if result is Str(text) {
+        self.check_text(text, span)
+      }
       self.mark_long(result, span)
       result.spanned(span)
     }

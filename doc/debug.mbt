@@ -104,7 +104,12 @@ pub impl @debug.Debug for Content with fn to_repr(self) {
       } else {
         call.origin.kind
       }
-      @debug.Repr::ctor(name, args_repr(call.args))
+      let args = args_repr(call.args)
+      // A generic call names its function.
+      if call.func is FPath(path) {
+        args.insert(0, (Option::None, @debug.Repr::string(path)))
+      }
+      @debug.Repr::ctor(name, args)
     }
     NSeq(children, site) =>
       @debug.Repr::ctor(site.kind, [
@@ -113,7 +118,13 @@ pub impl @debug.Debug for Content with fn to_repr(self) {
           @debug.Repr::array(children.map(child => child.to_repr())),
         ),
       ])
-    NSetRule(set) => @debug.Repr::ctor(set.origin.kind, args_repr(set.args))
+    NSetRule(set) => {
+      let args = args_repr(set.args)
+      if set.func is FPath(path) {
+        args.insert(0, (Option::None, @debug.Repr::string(path)))
+      }
+      @debug.Repr::ctor(set.origin.kind, args)
+    }
     NShowRule(show) => {
       let args : Array[(String?, @debug.Repr)] = []
       if show.selector is Some(selector) {
@@ -157,6 +168,18 @@ pub impl @debug.Debug for Content with fn to_repr(self) {
     NEval(node) => {
       let args = [(Option::None, @debug.Repr::string(node.source))]
       args.append(args_repr(node.args))
+      if !node.scope.is_empty() {
+        args.push(
+          (
+            Some("scope"),
+            @debug.Repr::map(
+              node.scope.map(pair => {
+                (@debug.Repr::string(pair.0), pair.1.to_repr())
+              }),
+            ),
+          ),
+        )
+      }
       @debug.Repr::ctor(node.origin.kind, args)
     }
     NSpace(false) => @debug.Repr::ctor("Space", [])
@@ -252,7 +275,16 @@ pub impl @debug.Debug for ContentView with fn to_repr(self) {
 
 ///|
 pub impl @debug.Debug for Document with fn to_repr(self) {
-  self.into_content().to_repr()
+  guard self.content.node is NSeq(children, _) else {
+    return self.content.to_repr()
+  }
+  let args : Array[(String?, @debug.Repr)] = [
+    (Option::None, @debug.Repr::array(children.map(child => child.to_repr()))),
+  ]
+  if self.dir != "" {
+    args.push((Some("dir"), @debug.Repr::string(self.dir)))
+  }
+  @debug.Repr::ctor("Document", args)
 }
 
 ///|

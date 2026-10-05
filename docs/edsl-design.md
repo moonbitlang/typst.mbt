@@ -380,8 +380,10 @@ own call site).
   `Prose` (a description printed with `println` instead of `debug`) stay
   pending. The table holds the 65,536 newest pending entries: beyond
   that the oldest is dropped, and a `Prose` whose text still names it
-  fails with `an interpolated description of this text is no longer
-  available: more than 65536 descriptions were interpolated since`. A
+  fails with `an interpolated description of this text was already used
+  by another Prose, or dropped because more than 65536 descriptions were
+  interpolated since` (below the oldest pending number the table cannot
+  tell a consumed entry from a dropped one). A
   program that builds more than that many strings before turning the
   first into `Prose` must build and consume them in smaller batches.
 - *One use.* The text of a `Prose` can be used once: a second `Prose` of
@@ -397,6 +399,9 @@ own call site).
   description that is interpolated but not yet consumed — cannot be told
   from the interpolation; data that may contain these noncharacters must
   be inserted with `\{Lit(data)}`, never interpolated as a bare string.
+  `Lit` protects the delimiter characters as such; a string that spells a
+  complete placeholder of a number that was given out is not
+  representable anywhere (lowering rejects it as a leak).
 - *Callbacks.* `Prose` and the interpolation are pure constructions that
   run when the author's code runs, also inside a layout-time callback
   (section 11.5): the callback builds its string and its `Prose` in one
@@ -415,7 +420,8 @@ and `Equation`) and names (dictionary keys, argument names of `Call` and
 `extra`, the paths of `Call`, `Set` and `Value::global`, scope names, the
 keys of `Keyed`, the directory of a `Document`) — for a complete
 placeholder with a number that was given out (a delimiter character alone
-is ordinary, if unusual, text, which upstream's suite has), and fails
+is ordinary, if unusual, text, which upstream's suite has), also the
+string that a called function returns, and fails
 with `` `Emph` was interpolated into a string that is not the text of
 `Prose` `` (naming the interpolated constructor from the table, if it is
 still there) at the string's origin, with the hint to use `Prose` or
@@ -424,6 +430,12 @@ without a valid placeholder is rejected (`the text of Prose contains a
 reserved character (U+FDD0)`); a rule smuggled in through `Content(..)` is
 rejected (`` `SetText` is a rule and cannot be interpolated into prose ``).
 All are located errors at the `Prose` call or the offending string.
+The check is on the strings the EDSL hands to the engine, not on what
+Typst code computes from them: a placeholder that reaches Typst code in an
+escaped spelling (the string re-encoded as a Typst string literal with
+`\u{fdd0}` escapes and evaluated by `eval` or `Markup`) is rebuilt by that
+code as ordinary text of noncharacters and a number. No description is
+lost or confused by that, and it does not happen by accident.
 
 **Origins.** The `Prose` call is one origin. Its text runs take the span
 of its `text` argument, like plain strings in an array take the array's
