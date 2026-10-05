@@ -2624,6 +2624,7 @@ dependencies = [
  "image-webp",
  "indexmap",
  "kurbo",
+ "libm",
  "parking_lot",
  "pic-scale",
  "proc-macro2",

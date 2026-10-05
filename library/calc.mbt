@@ -98,14 +98,13 @@ fn impl_calc_pow(
           ])
       }
       let result = if a == f64_consts_e {
-        @math.exp(b.float())
+        libm_exp(b.float())
       } else if a == 2.0 {
-        // TODO: upstream uses `libm::exp2`.
-        @math.pow(2.0, b.float())
+        libm_exp2(b.float())
       } else if b is Int(b) {
         Scalar::new(a).powi(b.to_int()).get()
       } else {
-        @math.pow(a, b.float())
+        libm_pow(a, b.float())
       }
       if result.is_nan() {
         bail_at(span, "the result is not a real number")
@@ -128,7 +127,7 @@ fn impl_calc_exp(
       bail_at(exponent.span, "exponent may not be infinite, subnormal, or NaN")
     _ => ()
   }
-  let result = @math.exp(exponent.v.float())
+  let result = libm_exp(exponent.v.float())
   if result.is_nan() {
     bail_at(span, "the result is not a real number")
   }
@@ -161,10 +160,10 @@ fn impl_calc_root(
         "negative numbers do not have a real nth root when n is even",
       )
     } else {
-      -@math.pow(-radicand, 1.0 / index.v.to_double())
+      -libm_pow(-radicand, 1.0 / index.v.to_double())
     }
   } else {
-    @math.pow(radicand, 1.0 / index.v.to_double())
+    libm_pow(radicand, 1.0 / index.v.to_double())
   }
 }
 
@@ -173,8 +172,8 @@ fn impl_calc_root(
 fn impl_calc_sin(angle_ : AngleLike) -> Double raise HintedError {
   match angle_ {
     Angle(a) => a.sin()
-    Int(n) => @math.sin(n.to_double())
-    Float(n) => @math.sin(n)
+    Int(n) => libm_sin(n.to_double())
+    Float(n) => libm_sin(n)
   }
 }
 
@@ -183,8 +182,8 @@ fn impl_calc_sin(angle_ : AngleLike) -> Double raise HintedError {
 fn impl_calc_cos(angle_ : AngleLike) -> Double raise HintedError {
   match angle_ {
     Angle(a) => a.cos()
-    Int(n) => @math.cos(n.to_double())
-    Float(n) => @math.cos(n)
+    Int(n) => libm_cos(n.to_double())
+    Float(n) => libm_cos(n)
   }
 }
 
@@ -193,8 +192,8 @@ fn impl_calc_cos(angle_ : AngleLike) -> Double raise HintedError {
 fn impl_calc_tan(angle_ : AngleLike) -> Double raise HintedError {
   match angle_ {
     Angle(a) => a.tan()
-    Int(n) => @math.tan(n.to_double())
-    Float(n) => @math.tan(n)
+    Int(n) => libm_tan(n.to_double())
+    Float(n) => libm_tan(n)
   }
 }
 
@@ -233,25 +232,25 @@ fn impl_calc_atan2(x_ : Num, y_ : Num) -> Angle raise HintedError {
 ///|
 /// Calculates the hyperbolic sine of a hyperbolic angle.
 fn impl_calc_sinh(value_ : Double) -> Double raise HintedError {
-  @math.sinh(value_)
+  libm_sinh(value_)
 }
 
 ///|
 /// Calculates the hyperbolic cosine of a hyperbolic angle.
 fn impl_calc_cosh(value_ : Double) -> Double raise HintedError {
-  @math.cosh(value_)
+  libm_cosh(value_)
 }
 
 ///|
 /// Calculates the hyperbolic tangent of a hyperbolic angle.
 fn impl_calc_tanh(value_ : Double) -> Double raise HintedError {
-  @math.tanh(value_)
+  libm_tanh(value_)
 }
 
 ///|
 /// Calculates the inverse hyperbolic sine of a number.
 fn impl_calc_asinh(value_ : Double) -> Double raise HintedError {
-  @math.asinh(value_)
+  libm_asinh(value_)
 }
 
 ///|
@@ -263,7 +262,7 @@ fn impl_calc_acosh(
   if val < 1.0 {
     bail_at(value_.span, "value must be greater than or equal to 1")
   }
-  @math.acosh(val)
+  libm_acosh(val)
 }
 
 ///|
@@ -275,7 +274,7 @@ fn impl_calc_atanh(
   if val <= -1.0 || val >= 1.0 {
     bail_at(value_.span, "value must be between -1 and 1 (exclusive)")
   }
-  @math.atanh(val)
+  libm_atanh(val)
 }
 
 ///|
@@ -299,13 +298,13 @@ fn impl_calc_log(
     bail_at(base_.span, "base may not be zero, NaN, infinite, or subnormal")
   }
   let result = if base_.v == f64_consts_e {
-    @math.ln(number)
+    libm_log(number)
   } else if base_.v == 2.0 {
-    @math.log2(number)
+    libm_log2(number)
   } else if base_.v == 10.0 {
-    @math.log10(number)
+    libm_log10(number)
   } else {
-    @math.ln(number) / @math.ln(base_.v)
+    libm_log(number) / libm_log(base_.v)
   }
   if result.is_inf() || result.is_nan() {
     bail_at(span, "the result is not a real number")
@@ -323,7 +322,7 @@ fn impl_calc_ln(
   if number <= 0.0 {
     bail_at(value_.span, "value must be strictly positive")
   }
-  let result = @math.ln(number)
+  let result = libm_log(number)
   if result.is_inf() {
     bail_at(span, "result close to -inf")
   }
@@ -860,9 +859,9 @@ fn impl_calc_norm(
     // `x_i^p` directly, to avoid overflowing.
     let mut sum = -0.0
     for v in abs {
-      sum = sum + @math.pow(v / max, p.v)
+      sum = sum + libm_pow(v / max, p.v)
     }
-    max * @math.pow(sum, 1.0 / p.v)
+    max * libm_pow(sum, 1.0 / p.v)
   }
 }
 

@@ -380,7 +380,7 @@ pub impl CacheKey for ShadingPattern
 
 pub(all) enum ShadingType {
   FunctionBased(domain~ : FixedArray[Float], matrix~ : @kurbo.Affine, function~ : ShadingFunction)
-  RadialAxial(coords~ : FixedArray[Float], domain~ : FixedArray[Float], function~ : ShadingFunction, extend~ : FixedArray[Bool], axial~ : Bool)
+  RadialAxial(coords~ : FixedArray[Float], domain~ : FixedArray[Float], function~ : ShadingFunction, extend_~ : FixedArray[Bool], axial~ : Bool)
   TriangleMesh(triangles~ : Array[Triangle], function~ : ShadingFunction?)
   CoonsPatchMesh(patches~ : Array[CoonsPatch], function~ : ShadingFunction?)
   TensorProductPatchMesh(patches~ : Array[TensorProductPatch], function~ : ShadingFunction?)
