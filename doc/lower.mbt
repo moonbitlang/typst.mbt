@@ -395,9 +395,16 @@ fn Lower::args(
     // end: distinct for every k while it stays inside the first 16 bytes
     // (the text before the next token of the listing line) and non-empty.
     let arg_span = match base.get() {
-      Range(id~, start~, end~) if used > 0 &&
-        start + used % 16 < end - used / 16 =>
-        @syntax.Span::from_range(id, start + used % 16, end - used / 16)
+      Range(id~, start~, end~) if used > 0 =>
+        if start + used % 16 < end - used / 16 {
+          @syntax.Span::from_range(id, start + used % 16, end - used / 16)
+        } else {
+          // No sub-range is left: an occurrence of its own in the
+          // registry, like a `Keyed` one.
+          let keys = self.keys.copy()
+          keys.push("argument \{used}")
+          self.session.registry.keyed_span(base, keys)
+        }
       _ => base
     }
     if arg.name is Some(name) {

@@ -174,7 +174,9 @@ fn StructDumper::value(self : StructDumper, value : @library.Value) -> String {
     Dict(d) => {
       let pairs = []
       for key, v in d.map {
-        pairs.push("\{key}: \{self.value(v)}")
+        // The key as a string literal: `("a: 1, b": 2)` is not
+        // `(a: 1, b: 2)`.
+        pairs.push("\{@library.repr_str(key)}: \{self.value(v)}")
       }
       // `(:)` is not `()`, the empty array.
       if pairs.is_empty() {

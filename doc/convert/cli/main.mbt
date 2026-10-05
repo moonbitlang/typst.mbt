@@ -27,7 +27,7 @@ let handwritten_types : Array[String] = [
   "Document", "Seq", "Lit", "Labelled", "Keyed", "Space", "Symbol", "Quoted", "Markup",
   "Equation", "Call", "Set", "Show", "ShowSet", "ShowWith", "Select", "Context",
   "Value", "NoneValue", "AutoValue", "Paint", "Stroke", "Sides", "Corners", "Cells",
-  "Sizing", "Numbering", "Supplement", "Prose",
+  "Sizing", "Numbering", "Supplement", "Prose", "Content",
 ]
 
 ///|

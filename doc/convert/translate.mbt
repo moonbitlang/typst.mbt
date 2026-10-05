@@ -375,9 +375,8 @@ fn Tr::prose_text(self : Tr, ops : Array[Op], lets : Array[String]) -> String? {
       Gap(newline) => text.write_string(if newline { "\\n" } else { " " })
       Break => text.write_string("\\n\\n")
       Quote(double) => text.write_string(if double { "\\\"" } else { "'" })
-      // A string (a literal or a translated variable) is a text of its own:
-      // interpolated bare it would join the words around it.
-      Push(code) if code.code.has_prefix("\"") || code.code.has_prefix("v_") =>
+      // A view is interpolated as content (`Content(..)` erases its type).
+      Push(code) if code.code.has_prefix("v_") =>
         text.write_string("\\{Content(" + code.code + ")}")
       Push(code) =>
         if code.code.length() <= 48 &&

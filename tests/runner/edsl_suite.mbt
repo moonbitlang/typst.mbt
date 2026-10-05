@@ -82,7 +82,7 @@ fn edsl_using() -> String {
     "Equation", "Call", "Set", "Show", "ShowSet", "ShowWith", "Select", "Context",
     "Value", "NoneValue", "AutoValue", "Paint", "Stroke", "Sides", "Corners", "Cells",
     "Sizing", "Numbering", "Supplement", "Counter", "CounterStep", "CounterUpdate",
-    "Prose",
+    "Prose", "Content",
   ])
   let out = StringBuilder()
   out.write_string("///|\nusing @doc {\n")
@@ -455,6 +455,19 @@ fn run_edsl_suite(filter : String?, verbose : Bool) -> Unit {
     @sys.exit(1)
     return
   }
+  // The manifest of the conversion: the registered builders must be those
+  // of the enumerated cases (number, file and name).
+  let manifest : Map[Int, String] = Map([])
+  for line in read("\{edsl_gen_dir}/manifest.tsv").split("\n") {
+    let fields = line.split("\t").map(f => f.to_owned()).collect()
+    if fields.length() >= 4 {
+      try @string.parse_int(fields[0]) catch {
+        _ => ()
+      } noraise {
+        number => manifest[number] = fields[2] + "\t" + fields[3]
+      }
+    }
+  }
   let results = StringBuilder()
   results.write_string(tsv_line(["number", "file", "name", "failed", "detail"]))
   let mut passed = 0
@@ -465,8 +478,12 @@ fn run_edsl_suite(filter : String?, verbose : Bool) -> Unit {
       !(case_.tc.name.contains(f) || case_.rel.contains(f)) {
       continue
     }
-    guard registry.get(case_.number) is Some(entry) else {
+    guard registry.get(case_.number) is Some(entry) &&
+      manifest.get(case_.number) == Some(case_.rel + "\t" + case_.tc.name) else {
+      // No builder, or a builder that was generated for another case
+      // (the suite changed since the conversion).
       missing += 1
+      println("MISSING \{case_.rel} :: \{case_.tc.name}")
       continue
     }
     if trace_tests.val {
@@ -510,7 +527,10 @@ fn run_edsl_suite(filter : String?, verbose : Bool) -> Unit {
     (if missing > 0 { ", \{missing} not converted" } else { "" }),
   ) // A selected case without a builder is a failure of the conversion
   // (the registry must cover the enumeration, section 8).
-  if failed > 0 || missing > 0 {
+  if failed > 0 || missing > 0 || passed == 0 {
+    if passed + failed + missing == 0 {
+      println("edsl-suite: no case is selected")
+    }
     @sys.exit(1)
   }
 }

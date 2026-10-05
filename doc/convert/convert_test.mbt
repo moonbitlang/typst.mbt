@@ -642,7 +642,7 @@ test "translated variables" {
       #|let v_c : @doc.Paint = @doc.Paint::Red
       #|let v_n : Int64 = 2
       #|let v_s : String = "a"
-      #|Document([Seq([]), Seq([]), Seq([]), Seq([]), Rect(width=v_w, fill=v_c, body=Seq([v_s])), Lorem(v_n), Metadata(Value::array([Value::length(v_w), Value::paint(v_c), Value::int(v_n), Value::str(v_s)]))])
+      #|Document([Seq([]), Seq([]), Seq([]), Seq([]), Rect(width=v_w, fill=v_c, body=Seq([Lit(v_s)])), Lorem(v_n), Metadata(Value::array([Value::length(v_w), Value::paint(v_c), Value::int(v_n), Value::str(v_s)]))])
     ),
   )
   // A stroke is typed only from a literal length and a constant colour.
@@ -954,7 +954,7 @@ test "final review: local bindings, variable names, strings in prose" {
   inspect(
     prose.body,
     content=(
-      #|Document([Prose("a\{Content("b")}c")])
+      #|Document([Prose("a\{Lit("b")}c")])
     ),
   )
 }

@@ -559,3 +559,19 @@ test "arguments of a generic call have distinct spans" {
   assert_eq(origin_of(report.errors[0]).kind, "Call")
   assert_eq(origin_of(report.errors[1]).kind, "Call")
 }
+
+///|
+test "many arguments of one location keep distinct spans" {
+  // Beyond the sub-ranges of the shared location, occurrences get
+  // registry entries of their own (found by review): one diagnostic per
+  // argument survives the deduplication by span and message.
+  let args : Array[@doc.Value] = []
+  for _ in 0..<2000 {
+    args.push(
+      @doc.Value::array([@doc.Value::global("red"), @doc.Value::str("bad")]),
+    )
+  }
+  let report = compile([@doc.Call("color.mix", positional=args)])
+  assert_eq(report.errors.length(), 2000)
+  assert_eq(origin_of(report.errors[1999]).kind, "Call")
+}

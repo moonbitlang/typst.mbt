@@ -264,10 +264,12 @@ fn Tr::content(self : Tr, expr : @ast.Expr, env : Env) -> Code raise Bail {
     Parenthesized(p) => self.content(p.expr(), env)
     Contextual(contextual) => self.contextual(contextual, env)
     // A string is displayed as text, which a MoonBit string lowers to.
-    Str(string) => { code: mbt_str(string.get()), total: true, }
+    // A string in a stream is text with a location of its own, like the
+    // text of markup (a plain string would share its array's location).
+    Str(string) => { code: "Lit(\{mbt_str(string.get())})", total: true, }
     Ident(ident) =>
       match env.vars.get(ident.get()) {
-        Some((variable, TStr)) => { code: variable, total: true, }
+        Some((variable, TStr)) => { code: "Lit(\{variable})", total: true, }
         Some((variable, TView(_))) => { code: variable, total: true, }
         Some((variable, ty)) => {
           self.hatch = true
