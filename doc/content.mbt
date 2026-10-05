@@ -41,12 +41,15 @@ priv enum Node {
   NContext(Callback, Site)
   /// Typst source evaluated by the front end (markup or math).
   NEval(EvalNode)
-  /// Markup's space element.
-  NSpace
+  /// Markup's space element; whether the source space had a newline.
+  NSpace(Bool)
   /// Engine content, re-emitted unchanged (show-rule views, engine values).
   NEngine(@library.Content)
   /// A value: as an argument the value itself, in a sequence its display.
   NValue(Value)
+  /// A description that cannot be lowered: the message is reported at the
+  /// origin (a constructor found the problem; constructors do not raise).
+  NInvalid(String, Site)
 }
 
 ///|
@@ -112,12 +115,14 @@ priv struct SetNode {
 priv enum ShowTransform {
   TFunc(Callback)
   TStyle(SetNode)
+  /// A value that is cast to a transformation (a function, content).
+  TValue(Value)
 }
 
 ///|
 priv struct ShowNode {
-  /// The selector, as a value description.
-  selector : Value
+  /// The selector, as a value description (`None`: `show: transform`).
+  selector : Value?
   transform : ShowTransform
   origin : Site
 }
@@ -281,7 +286,16 @@ pub struct Space {
 
 ///|
 pub fn Space::Space() -> Space {
-  { content: Content::of(NSpace), }
+  { content: Content::of(NSpace(false)), }
+}
+
+///|
+/// The space that markup produces for a line break in the source. It is a
+/// space like `Space()`, but realization discards it next to text of a
+/// writing system without spaces (Chinese, Japanese): the twin of a
+/// newline between two pieces of markup.
+pub fn Space::newline() -> Space {
+  { content: Content::of(NSpace(true)), }
 }
 
 ///|

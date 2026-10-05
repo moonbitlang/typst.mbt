@@ -1,0 +1,5 @@
+import {
+  "moonbitlang/typst/doc",
+}
+
+supported_targets = "native"

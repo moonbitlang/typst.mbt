@@ -1,0 +1,43 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitlang/typst/doc/convert"
+
+import {
+  "moonbitlang/typst/library",
+}
+
+// Values
+pub fn api_type_names() -> Array[String]
+
+pub fn translate(String, String, @library.Library, baseline? : Bool, prose? : Bool) -> Translation
+
+// Errors
+
+// Types and methods
+pub struct Fallback {
+  construct : String
+  kind : String
+  bytes : Int
+}
+
+pub(all) enum Tier {
+  T1
+  T2
+  T3
+  T4
+} derive(Eq)
+pub impl Show for Tier
+
+pub struct Translation {
+  body : String
+  tier : Tier
+  math_only : Bool
+  fallbacks : Array[Fallback]
+  source_bytes : Int
+  fallback_bytes : Int
+  typed : Int
+  note : String
+}
+
+// Type aliases
+
+// Traits

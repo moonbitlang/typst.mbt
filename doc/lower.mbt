@@ -51,6 +51,7 @@ fn Lower::content(
         Some(site) => self.session.registry.span(self.entry(site))
         None => fallback
       }
+      self.check_text(text, span)
       if @syntax.utf8_len(text) > text_offset_max {
         self.session.registry.mark_long_text(span)
       }
@@ -69,6 +70,8 @@ fn Lower::content(
     // `show` directly in code and content blocks).
     NSetRule(set) => raise self.misplaced_rule(set.origin)
     NShowRule(show) => raise self.misplaced_rule(show.origin)
+    NInvalid(message, site) =>
+      raise error_at(self.session.registry.span(self.entry(site)), message)
     NLabelled(body, label, site, label_param) => {
       let entry = self.entry(site)
       let span = self.session.registry.span(entry)
@@ -77,13 +80,14 @@ fn Lower::content(
       self.labelled(body, label, span, label_span)
     }
     NKeyed(key, body) => {
+      self.check_text(key, fallback)
       let keys = self.keys.copy()
       keys.push(key)
       let inner : Lower = { ..self, keys, }
       // Content without a location of its own gets the enclosing
       // argument's origin under the keys.
       let fallback = match body.node {
-        NText(_, None) | NValue(_) | NSpace =>
+        NText(_, None) | NValue(_) | NSpace(_) =>
           self.session.registry.keyed_span(fallback, keys)
         _ => fallback
       }
@@ -102,13 +106,32 @@ fn Lower::content(
       ]).spanned(span)
     }
     NEval(node) => self.eval(node)
-    NSpace => @library.SpaceElem::shared()
+    NSpace(false) => @library.SpaceElem::shared()
+    NSpace(true) => @library.SpaceElem::shared_with_newline()
     NEngine(content) => content
   }
 }
 
 ///|
 /// The error for a rule that is not a direct child of a sequence.
+/// A string that reaches lowering must not contain the placeholder of an
+/// interpolated description: only `Prose` resolves those (`prose.mbt`).
+fn Lower::check_text(
+  self : Lower,
+  text : String,
+  span : @syntax.Span,
+) -> Unit raise @library.SourceError {
+  ignore(self)
+  if prose_leak(text) is Some(message) {
+    raise @library.SourceError([
+      @library.SourceDiagnostic::error_at(span, message).with_hint(
+        prose_leak_hint,
+      ),
+    ])
+  }
+}
+
+///|
 fn Lower::misplaced_rule(
   self : Lower,
   site : Site,
@@ -145,7 +168,13 @@ fn Lower::sequence(
         let recipe = self.show_rule(show)
         let tail = self.sequence(children[i:], fallback)
         i = children.length()
-        seq.push(tail.styled(@library.Style::Recipe(recipe)))
+        // The evaluator's `styled_with_recipe`: a rule without a selector
+        // transforms the tail at once.
+        if recipe.selector is Option::None {
+          seq.push(recipe.apply(self.engine, self.context, tail))
+        } else {
+          seq.push(tail.styled(@library.Style::Recipe(recipe)))
+        }
       }
       // An inserted expression (`#f(..)`, `#value` in markup), also
       // inside `Keyed` wrappers, which do not change the lowered content:
@@ -224,6 +253,7 @@ fn Lower::inserted(
     }
     NValue(value) => (self.value(value, fallback), fallback)
     NKeyed(key, body) => {
+      self.check_text(key, fallback)
       let keys = self.keys.copy()
       keys.push(key)
       let inner : Lower = { ..self, keys, }
@@ -298,6 +328,7 @@ fn Lower::global(
   path : String,
   span : @syntax.Span,
 ) -> @library.Value raise @library.SourceError {
+  self.check_text(path, span)
   let scopes = @library.Scopes::new(Some(self.engine.library))
   let guard_ = self.engine.binding_guard(span)
   let mut value : @library.Value? = None
@@ -343,11 +374,66 @@ fn Lower::args(
   span : @syntax.Span,
 ) -> @library.Args raise @library.SourceError {
   let items : Array[@library.Arg] = []
+  // How many arguments had each span so far.
+  let uses : Map[Int, Int] = Map([])
   for arg in args {
-    let arg_span = if entry >= 0 && arg.param >= 0 {
+    let base = if entry >= 0 && arg.param >= 0 {
       self.session.registry.arg_span(entry, arg.param)
     } else {
       span
+    }
+    // Arguments that share a location (the arguments of a generic call,
+    // the entries of a variadic array or of `extra`) still get distinct
+    // spans: sub-ranges of the shared one, which resolve to the same
+    // origin. A function that reports an error per argument would
+    // otherwise have equal diagnostics deduplicated into one.
+    let key = if entry >= 0 && arg.param >= 0 { arg.param } else { -1 }
+    let used = uses.get(key).unwrap_or(0)
+    uses[key] = used + 1
+    // The k-th argument of a location gets the sub-range that starts
+    // `k % 16` bytes after its start and ends `k / 16` bytes before its
+    // end: distinct for every k while it stays inside the first 16 bytes
+    // (the text before the next token of the listing line) and non-empty.
+    let arg_span = match base.get() {
+      Range(id~, start~, end~) if used > 0 =>
+        if start + used % 16 < end - used / 16 {
+          @syntax.Span::from_range(id, start + used % 16, end - used / 16)
+        } else {
+          // No sub-range is left: an occurrence of its own in the
+          // registry, like a `Keyed` one.
+          let keys = self.keys.copy()
+          keys.push("argument \{used}")
+          self.session.registry.keyed_span(base, keys)
+        }
+      _ => base
+    }
+    if arg.name is Some(name) {
+      self.check_text(name, arg_span)
+    }
+    if arg.value.val is VSpread(inner) {
+      // Like the evaluator's spread argument (`eval_args`).
+      match self.value(inner, arg_span) {
+        None => ()
+        Array(array) =>
+          for value in array.items {
+            items.push({
+              span: arg_span,
+              name: Option::None,
+              value: { v: value.shared(), span: arg_span, },
+            })
+          }
+        Dict(dict) =>
+          for key, value in dict.map {
+            items.push({
+              span: arg_span,
+              name: Some(key),
+              value: { v: value.shared(), span: arg_span, },
+            })
+          }
+        Args(args) => items.append(args.items)
+        v => @library.bail_at(arg_span, "cannot spread \{v.ty()}")
+      }
+      continue
     }
     let v = self.value(arg.value, arg_span)
     items.push({
@@ -370,9 +456,15 @@ fn Lower::call(
 ) -> @library.Value raise @library.SourceError {
   let func = self.func(func, span).spanned(span)
   let args = self.args(args, entry, span)
-  self.trace_call(func.name(), span, () => {
+  let result = self.trace_call(func.name(), span, () => {
     func.call(self.engine, self.context, args)
   })
+  // A string that a function returns (the text of a file, say) is
+  // checked like a string that is written.
+  if result is Str(text) {
+    self.check_text(text, span)
+  }
+  result
 }
 
 ///|
@@ -390,6 +482,7 @@ fn Lower::value(
     VInt(v) => @library.Value::Int(v)
     VFloat(v) => @library.Value::Float(v)
     VStr(v) => {
+      self.check_text(v, span)
       // Also for strings that become text (`#value`, raw text): glyph
       // offsets into a long string are not reliable.
       if @syntax.utf8_len(v) > text_offset_max {
@@ -415,6 +508,11 @@ fn Lower::value(
       let b = self.value(b, span)
       @library.at(span, () => @library.mul(a, b))
     }
+    VDiv(a, b) => {
+      let a = self.value(a, span)
+      let b = self.value(b, span)
+      @library.at(span, () => @library.div(a, b))
+    }
     VNeg(a) => {
       let a = self.value(a, span)
       @library.at(span, () => @library.neg(a))
@@ -429,6 +527,7 @@ fn Lower::value(
     VDict(pairs) => {
       let dict = @library.Dict::new()
       for pair in pairs {
+        self.check_text(pair.0, span)
         dict.insert(pair.0, self.value(pair.1, span))
       }
       @library.Value::Dict(dict)
@@ -459,6 +558,8 @@ fn Lower::value(
       )
     }
     VEngine(value) => value
+    VSpread(_) =>
+      raise error_at(span, "a spread value is only allowed as an argument")
     VInvalid(message) => raise error_at(span, message)
   }
 }
@@ -496,12 +597,31 @@ fn Lower::show_rule(
 ) -> @library.Recipe raise @library.SourceError {
   let entry = self.entry(show.origin)
   let span = self.session.registry.span(entry)
-  let selector_span = self.session.registry.arg_span(entry, 0)
-  let selector = self.value(show.selector, selector_span)
-  let selector : @library.ShowableSelector = @library.at(selector_span, () => {
-    selector.cast()
-  })
+  let selector : @library.Selector? = match show.selector {
+    Some(selector) => {
+      let selector_span = self.session.registry.arg_span(entry, 0)
+      let selector = self.value(selector, selector_span)
+      let selector : @library.ShowableSelector = @library.at(selector_span, () => {
+        selector.cast()
+      })
+      Some(selector.0)
+    }
+    Option::None => Option::None
+  }
   let transform : @library.Transformation = match show.transform {
+    TValue(value) => {
+      // The transformation is the last declared parameter.
+      let transform_span = self.session.registry.arg_span(
+        entry,
+        if show.selector is Some(_) {
+          1
+        } else {
+          0
+        },
+      )
+      let value = self.value(value, transform_span)
+      @library.at(transform_span, () => value.cast())
+    }
     TFunc(callback) =>
       @library.Transformation::Func(
         @library.Func::host(self.session.host(callback, span, self.keys)).spanned(
@@ -510,7 +630,7 @@ fn Lower::show_rule(
       )
     TStyle(set) => @library.Transformation::Style(self.set_rule(set))
   }
-  let recipe = @library.Recipe::new(Some(selector.0), transform, span)
+  let recipe = @library.Recipe::new(selector, transform, span)
   @eval.check_recipe(self.engine, recipe)
   recipe
 }
@@ -524,8 +644,10 @@ fn Lower::eval(
   let entry = self.entry(node.origin)
   let span = self.session.registry.span(entry)
   let source_span = self.session.registry.arg_span(entry, node.source_param)
+  self.check_text(node.source, source_span)
   let scope = @library.Scope::new()
   for pair in node.scope {
+    self.check_text(pair.0, span)
     scope.define(pair.0, self.value(pair.1, span)) |> ignore
   }
   let id = self.session.registry.snippet(

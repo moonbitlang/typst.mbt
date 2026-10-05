@@ -1,0 +1,9 @@
+import {
+  "moonbitlang/typst/syntax",
+  "moonbitlang/typst/syntax/ast",
+  "moonbitlang/typst/library",
+}
+
+import {
+  "moonbitlang/typst/doc",
+} for "test"

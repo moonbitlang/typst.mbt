@@ -76,8 +76,30 @@
   document, `doc/twins` pairs EDSL documents with functional Typst sources:
   `moon run tests/runner --target native -- edsl` checks that each pair is
   equal in structure, layout (spans erased, memoization on and off), SVG
-  and PDF bytes. Inside `doc` the facade enums have cases `None`/`Auto`:
-  write `Option::None` where a bare `None` is ambiguous.
+  and PDF bytes; it also compares the EDSL versions of `bench/*.typ`
+  (`doc/twins/bench.mbt`) with their originals, and a curated sample of
+  translator output (`doc/convert/sample`, `scripts/edsl_sample.sh`).
+  Inside `doc` the facade enums have cases `None`/`Auto`: write
+  `Option::None` where a bare `None` is ambiguous. `Show` of a description
+  is the interpolation hook of `Prose` (it writes a placeholder, section
+  4.4 of the design); print descriptions with core's `Debug` (`debug(v)`,
+  `debug_inspect(v)`, `\{Repr(v)}`).
+- Typst-to-EDSL translator (`doc/convert`, design in `docs/edsl-convert.md`,
+  Codex-approved; a stress test of the EDSL, not a compiler): typed where
+  the design's narrow rules prove it exact, Typst source in `Markup`
+  fragments otherwise. Its table of constructor signatures
+  (`doc/convert/api_gen.mbt`) is written by `scripts/docgen.py`.
+  `scripts/edsl_convert.sh [--prose] [--baseline] [filter]` converts
+  upstream's suite and the documentation's examples
+  (`scripts/edsl_docs_examples.py` extracts those) into the gitignored
+  shard packages `tests/edsl_gen/s*`, type-checks them and rebuilds the
+  runner; `moon run tests/runner --target native --release -- edsl-suite
+  [filter]` compares every case with the Typst path (diagnostics,
+  structure, frames with memoization on and off, SVG, PDF, PNG);
+  `python3 scripts/edsl_report.py` aggregates. Remove the generated files
+  (`rm tests/edsl_gen/s*/gen_cases.mbt`) before measuring warnings or
+  publishing. `moon run doc/convert/cli --target native -- file.typ
+  [--prose]` prints one translation.
 - Constant tables are `ReadOnlyArray` literals, and generators emit them: on
   native they are static data (no allocation or fill code at startup, which
   `FixedArray`/`Array` literals need). Only literal scalars, strings, `Bytes`,

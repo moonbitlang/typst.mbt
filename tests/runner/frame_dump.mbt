@@ -11,6 +11,16 @@ priv struct FrameEncoder {
   /// Whether glyph span offsets are written as 0 (the frame normalizer of
   /// the `edsl` stage, together with a `span_enc` that erases spans).
   zero_span_offsets : Bool
+  /// Whether the element of a start tag is written as its name only (the
+  /// `edsl` stage's comparison of a converted document with its markup
+  /// original, whose element bodies differ in how text is split).
+  tag_names_only : Bool
+  /// The locations of the skipped tags (see `skips`).
+  skipped : Array[@library.Location]
+  /// If set, the elements of tags are encoded with the structural dump of
+  /// the `edsl` stages (element identity, every stored field, labels)
+  /// instead of the realization dump.
+  struct_tags : StructDumper?
   /// Shared with canonical content (location numbering).
   dumper : Dumper
   fonts : Map[String, Int]
@@ -23,11 +33,16 @@ priv struct FrameEncoder {
 fn FrameEncoder::new(
   span_enc : (@syntax.Span) -> String,
   zero_span_offsets? : Bool = false,
+  tag_names_only? : Bool = false,
+  struct_tags? : StructDumper,
 ) -> FrameEncoder {
   {
     out: StringBuilder(),
     span_enc,
     zero_span_offsets,
+    tag_names_only,
+    skipped: [],
+    struct_tags,
     dumper: Dumper::new(),
     fonts: {},
     images: {},
@@ -151,7 +166,10 @@ fn FrameEncoder::content(
   self : FrameEncoder,
   content : @library.Content,
 ) -> Int {
-  let encoded = self.dumper.content(content)
+  let encoded = match self.struct_tags {
+    Some(dumper) => dumper.content(content)
+    None => self.dumper.content(content)
+  }
   if self.contents.get(encoded) is Some(id) {
     return id
   }
@@ -201,7 +219,12 @@ fn FrameEncoder::frame(
     "null"
   }
   let kind = if frame.kind().is_hard() { "hard" } else { "soft" }
-  let items = frame.items()
+  let items : Array[(@library.Point, @library.FrameItem)] = []
+  for entry in frame.items() {
+    if !(self.tag_names_only && self.skips(entry.1)) {
+      items.push(entry)
+    }
+  }
   self.record([
     json_str("frame"),
     json_str(r),
@@ -212,6 +235,28 @@ fn FrameEncoder::frame(
   ])
   for i, entry in items {
     self.item(r, i, entry.0, entry.1)
+  }
+}
+
+///|
+/// With `tag_names_only`: whether an item is the tag of a list, enum or term
+/// item in the flow. Markup creates such items (`- a`) and realization
+/// groups them into a list, so their tags precede the list's; the items
+/// passed to a `list(..)` call have none. (The tags are not introspectable
+/// and the exported PDF does not depend on them.)
+fn FrameEncoder::skips(self : FrameEncoder, item : @library.FrameItem) -> Bool {
+  match item {
+    Tag(Start(elem, _)) =>
+      if elem.is_(@library.list_item_elem()) ||
+        elem.is_(@library.enum_item_elem()) ||
+        elem.is_(@library.term_item_elem()) {
+        self.skipped.push(elem.location().unwrap())
+        true
+      } else {
+        false
+      }
+    Tag(End(loc, _, _)) => self.skipped.contains(loc)
+    _ => false
   }
 }
 
@@ -335,9 +380,13 @@ fn FrameEncoder::item(
     }
     Tag(Start(elem, flags)) => {
       let l = self.location(elem.location().unwrap())
-      let c = self.content(elem)
+      let c = if self.tag_names_only {
+        json_str(elem.elem().name())
+      } else {
+        self.content(elem).to_string()
+      }
       let rec = head("tag-start")
-      rec.append([l.to_string(), c.to_string()])
+      rec.append([l.to_string(), c])
       rec.append(tag_flags_enc(flags))
       self.record(rec)
     }

@@ -42,7 +42,7 @@ pub fn[W] Show::Show(
   {
     content: Content::of(
       NShowRule({
-        selector: selector.value,
+        selector: Some(selector.value),
         transform: TFunc(callback),
         origin: site,
       }),
@@ -52,6 +52,58 @@ pub fn[W] Show::Show(
 
 ///|
 pub impl IntoContent for Show with fn into_content(self) {
+  self.content
+}
+
+///|
+/// A show rule whose transformation is a value: a Typst function
+/// (`show link: underline`), content or a string (`show "a": [b]`); the
+/// value is cast like the transformation of a Typst show rule.
+/// `ShowWith::all(transform)` is the rule without a selector
+/// (`show: transform`), which transforms the rest of the sequence at once.
+pub struct ShowWith {
+  priv content : Content
+}
+
+///|
+#callsite(autofill(loc, args_loc))
+pub fn[W] ShowWith::ShowWith(
+  selector : Selector[W],
+  transform : Value,
+  loc~ : SourceLoc,
+  args_loc~ : ArgsLoc,
+) -> ShowWith {
+  {
+    content: Content::of(
+      NShowRule({
+        selector: Some(selector.value),
+        transform: TValue(transform),
+        origin: Site::new("ShowWith", loc, args_loc),
+      }),
+    ),
+  }
+}
+
+///|
+#callsite(autofill(loc, args_loc))
+pub fn ShowWith::all(
+  transform : Value,
+  loc~ : SourceLoc,
+  args_loc~ : ArgsLoc,
+) -> ShowWith {
+  {
+    content: Content::of(
+      NShowRule({
+        selector: Option::None,
+        transform: TValue(transform),
+        origin: Site::new("ShowWith", loc, args_loc),
+      }),
+    ),
+  }
+}
+
+///|
+pub impl IntoContent for ShowWith with fn into_content(self) {
   self.content
 }
 
@@ -72,7 +124,7 @@ pub fn[W] ShowSet::ShowSet(
   {
     content: Content::of(
       NShowRule({
-        selector: selector.value,
+        selector: Some(selector.value),
         transform: TStyle(set_node(rule)),
         origin: Site::new("ShowSet", loc, args_loc),
       }),
@@ -97,13 +149,14 @@ pub struct Set {
 pub fn Set::Set(
   path : String,
   named : Array[(String, Value)],
+  positional? : Array[Value] = [],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> Set {
   {
     node: {
       func: FPath(path),
-      args: generic_args([], named),
+      args: generic_args(positional, named),
       origin: Site::new("Set", loc, args_loc),
     },
   }

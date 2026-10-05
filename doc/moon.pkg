@@ -10,5 +10,6 @@ import {
   "moonbitlang/typst/typst_assets/fonts" @assets_fonts,
   "moonbitlang/core/builtin",
   "moonbitlang/core/ref",
+  "moonbitlang/core/debug",
   "moonbitlang/core/encoding/utf8",
 }

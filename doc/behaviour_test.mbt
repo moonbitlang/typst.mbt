@@ -534,3 +534,44 @@ test "text longer than the offset range reports no offset" {
   assert_true(short_offsets > 0)
   assert_eq(long_offsets, 0)
 }
+
+///|
+test "arguments of a generic call have distinct spans" {
+  // Found by converting the upstream suite (color-mix-bad-amount-type): a
+  // function that reports one error per argument, with the same message.
+  // The engine deduplicates diagnostics by span and message, so the
+  // arguments of `Call` must not share one span.
+  let pair = (color : String, amount : @doc.Value) => {
+    @doc.Value::array([@doc.Value::global(color), amount])
+  }
+  let report = compile([
+    @doc.Call("color.mix", positional=[
+      pair("red", @doc.Value::str("yes")),
+      pair("green", @doc.Value::str("no")),
+      pair("green", @doc.Value::length(Pct(10))),
+    ]),
+  ])
+  assert_eq(
+    error_messages(report),
+    "expected float or ratio, found string | expected float or ratio, found string",
+  )
+  // Both resolve to the call.
+  assert_eq(origin_of(report.errors[0]).kind, "Call")
+  assert_eq(origin_of(report.errors[1]).kind, "Call")
+}
+
+///|
+test "many arguments of one location keep distinct spans" {
+  // Beyond the sub-ranges of the shared location, occurrences get
+  // registry entries of their own (found by review): one diagnostic per
+  // argument survives the deduplication by span and message.
+  let args : Array[@doc.Value] = []
+  for _ in 0..<2000 {
+    args.push(
+      @doc.Value::array([@doc.Value::global("red"), @doc.Value::str("bad")]),
+    )
+  }
+  let report = compile([@doc.Call("color.mix", positional=args)])
+  assert_eq(report.errors.length(), 2000)
+  assert_eq(origin_of(report.errors[1999]).kind, "Call")
+}
