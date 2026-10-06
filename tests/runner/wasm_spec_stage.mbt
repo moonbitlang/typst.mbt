@@ -53,7 +53,7 @@ fn SpecCtx::new() -> SpecCtx raise @wasmi.WasmiError {
     let func = @wasmi.Func::new(store, spec_func_type(params, []), fn(_, _, _) {
       ()
     })
-    linker.define("spectest", name, Func(func)) |> ignore
+    linker.define_("spectest", name, Func(func)) |> ignore
   }
   let globals : Array[(String, @wasmi.Val)] = [
     ("global_i32", I32(666)),
@@ -64,14 +64,14 @@ fn SpecCtx::new() -> SpecCtx raise @wasmi.WasmiError {
   for entry in globals {
     let (name, val) = entry
     let global = @wasmi.Global::new(store, val, Const)
-    linker.define("spectest", name, Global(global)) |> ignore
+    linker.define_("spectest", name, Global(global)) |> ignore
   }
   let table = @wasmi.Table::new(
     store,
     @wasmi_core.TableType::new(FuncRef, 10, Some(20)),
     FuncRef(None),
   )
-  linker.define("spectest", "table", Table(table)) |> ignore
+  linker.define_("spectest", "table", Table(table)) |> ignore
   let memory_type = @wasmi_core.MemoryType::builder()
     .min(1)
     .max(Some(2))
@@ -79,16 +79,16 @@ fn SpecCtx::new() -> SpecCtx raise @wasmi.WasmiError {
       _ => abort("invalid memory type")
     }
   let memory = @wasmi.Memory::new(store, memory_type)
-  linker.define("spectest", "memory", Memory(memory)) |> ignore
+  linker.define_("spectest", "memory", Memory(memory)) |> ignore
   { engine, store, linker, named: {}, defs: {}, current: None, }
 }
 
 ///|
-fn SpecCtx::instance(self : SpecCtx, module : String) -> @wasmi.Instance? {
-  if module == "-" {
+fn SpecCtx::instance(self : SpecCtx, module_ : String) -> @wasmi.Instance? {
+  if module_ == "-" {
     self.current
   } else {
-    self.named.get(module)
+    self.named.get(module_)
   }
 }
 
@@ -179,11 +179,11 @@ fn SpecCtx::fmt_val(self : SpecCtx, v : @wasmi.Val) -> String {
 ///|
 fn SpecCtx::invoke(
   self : SpecCtx,
-  module : String,
+  module_ : String,
   field : String,
   args : String,
 ) -> String {
-  guard self.instance(module) is Some(instance) else {
+  guard self.instance(module_) is Some(instance) else {
     return "err:no instance"
   }
   guard instance.get_func(self.store, field) is Some(func) else {
@@ -207,8 +207,8 @@ fn SpecCtx::invoke(
 }
 
 ///|
-fn SpecCtx::get(self : SpecCtx, module : String, field : String) -> String {
-  guard self.instance(module) is Some(instance) else {
+fn SpecCtx::get(self : SpecCtx, module_ : String, field : String) -> String {
+  guard self.instance(module_) is Some(instance) else {
     return "err:no instance"
   }
   match instance.get_global(self.store, field) {
@@ -225,18 +225,18 @@ fn SpecCtx::load(
   let bytes = @fs.read_file_to_bytes(path) catch {
     _ => return Err("load-err:missing file")
   }
-  let module = @wasmi.Module::new(self.engine, bytes) catch {
+  let module_ = @wasmi.Module::new(self.engine, bytes) catch {
     e => return Err("load-err:" + spec_escape(e.to_string()))
   }
-  Ok(module)
+  Ok(module_)
 }
 
 ///|
 fn SpecCtx::instantiate(
   self : SpecCtx,
-  module : @wasmi.Module,
+  module_ : @wasmi.Module,
 ) -> Result[@wasmi.Instance, String] {
-  let instance = self.linker.instantiate_and_start(self.store, module) catch {
+  let instance = self.linker.instantiate_and_start(self.store, module_) catch {
     e => return Err("inst-err:" + spec_escape(e.to_string()))
   }
   Ok(instance)
@@ -274,14 +274,14 @@ fn run_wasm_spec_file(
         let file = parts[3]
         let outcome = match ctx.load(json_dir + "/" + file) {
           Err(e) => e
-          Ok(module) =>
+          Ok(module_) =>
             if kind == "define" {
               if name != "-" {
-                ctx.defs.set(name, module)
+                ctx.defs.set(name, module_)
               }
               "ok"
             } else {
-              match ctx.instantiate(module) {
+              match ctx.instantiate(module_) {
                 Err(e) => e
                 Ok(instance) => {
                   ctx.current = Some(instance)
@@ -300,8 +300,8 @@ fn run_wasm_spec_file(
         let module_name = parts[3]
         let outcome = match ctx.defs.get(module_name) {
           None => "inst-err:no definition"
-          Some(module) =>
-            match ctx.instantiate(module) {
+          Some(module_) =>
+            match ctx.instantiate(module_) {
               Err(e) => e
               Ok(instance) => {
                 ctx.current = Some(instance)
@@ -318,8 +318,8 @@ fn run_wasm_spec_file(
         let file = parts[3]
         let outcome = match ctx.load(json_dir + "/" + file) {
           Err(e) => e
-          Ok(module) =>
-            match ctx.instantiate(module) {
+          Ok(module_) =>
+            match ctx.instantiate(module_) {
               Err(e) => e
               Ok(_) => "ok"
             }

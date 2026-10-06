@@ -139,7 +139,7 @@ pub fn Value::ty(self : Value) -> Type {
     Func(_) => Type::func()
     Args(_) => Type::args()
     Type(_) => Type::type_()
-    Module(_) => Type::module()
+    Module(_) => Type::module_()
     Dyn(v) => v.ty()
   }
 }
@@ -239,7 +239,7 @@ pub fn Value::display(self : Value) -> Content {
     Version(v) => TextElem::packed(v.to_string())
     Symbol(v) => SymbolElem::packed(v.get())
     Content(v) => v
-    Module(module) => module.content()
+    Module(module_) => module_.content()
     _ => RawElem::packed_code(self.repr())
   }
 }
@@ -259,7 +259,7 @@ pub fn Value::field(
     Content(content) => content.field_by_name(field)
     Type(ty) => ty.field(field, guard_)
     Func(func) => func.field(field, guard_)
-    Module(module) => module.field(field, guard_)
+    Module(module_) => module_.field(field, guard_)
     _ => fields_field(self, field)
   }
 }
@@ -270,7 +270,7 @@ pub fn Value::scope(self : Value) -> Scope? {
   match self {
     Func(func) => func.scope()
     Type(ty) => Some(ty.scope())
-    Module(module) => Some(module.scope())
+    Module(module_) => Some(module_.scope())
     _ => None
   }
 }

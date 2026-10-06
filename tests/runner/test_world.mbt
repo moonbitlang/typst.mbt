@@ -371,15 +371,15 @@ fn define_test_colors(lib : @library.Library) -> Unit {
   }
   let global = lib.global.scope()
   if color("rgb(\"#9feb52\")") is Some(v) {
-    global.define("conifer", v) |> ignore
+    global.define_("conifer", v) |> ignore
   }
   if color("rgb(\"#43a127\")") is Some(v) {
-    global.define("forest", v) |> ignore
+    global.define_("forest", v) |> ignore
   }
   if color("red") is Some(v) &&
     global.get("check") is Some(binding) &&
     binding.value is Module(check) {
-    check.scope().define("red", v) |> ignore
+    check.scope().define_("red", v) |> ignore
   }
 }
 
@@ -387,13 +387,13 @@ fn define_test_colors(lib : @library.Library) -> Unit {
 fn define_test_globals(scope : @library.Scope) -> Unit {
   let check = @library.Scope::new()
   check
-  .define("deprecated", None)
+  .define_("deprecated", None)
   .with_deprecation(
     @library.Deprecation::new().with_message("this value is useless"),
   )
   |> ignore
-  check.define("gated", None).with_feature(Html) |> ignore
-  scope.define("check", Module(@library.Module::new("check", check))) |> ignore
+  check.define_("gated", None).with_feature(Html) |> ignore
+  scope.define_("check", Module(@library.Module::new("check", check))) |> ignore
   let test_scope = () => {
     let s = @library.Scope::new()
     s
@@ -538,7 +538,7 @@ fn eval_report(rel : String, tc : TestCase) -> String {
       }
     }
   } noraise {
-    module => out.write_string("ok \{module.content().repr()}\n")
+    module_ => out.write_string("ok \{module_.content().repr()}\n")
   }
   for diag in sink.warnings {
     write_source_diag(out, world, id, diag)

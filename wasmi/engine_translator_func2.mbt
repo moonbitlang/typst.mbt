@@ -826,7 +826,7 @@ fn FuncTranslator::call_indirect_params(
   index : Operand,
   table_index : UInt,
 ) -> @ir.Op raise WasmiError {
-  let table_type = self.module.get_type_of_table(
+  let table_type = self.module_.get_type_of_table(
     TableIdx(table_index.reinterpret_as_int()),
   )
   let index = self.make_index16(index, table_type.index_ty())
@@ -1286,7 +1286,7 @@ fn FuncTranslator::effective_address(
   ptr : @wasmi_core.TypedVal,
   offset : UInt64,
 ) -> @ir.Address? {
-  let memory_type = self.module.get_type_of_memory(MemoryIdx(mem.0))
+  let memory_type = self.module_.get_type_of_memory(MemoryIdx(mem.0))
   let ptr = if memory_type.is_64() {
     ptr.to_u64()
   } else {

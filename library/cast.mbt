@@ -512,7 +512,7 @@ pub impl IntoValue for Func with fn into_value(self) {
 pub impl FromValue for Func with fn from_value(v) {
   match v {
     Func(f) => f
-    Type(ty) => ty.constructor()
+    Type(ty) => ty.constructor_()
     Symbol(symbol) => symbol.func()
     v => cast_fail_with(Type(Type::func()), v)
   }

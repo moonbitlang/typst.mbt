@@ -53,7 +53,7 @@ let math_ops : ReadOnlyArray[(String, String, Bool)] = [
 fn op_define(math : Scope) -> Unit {
   for entry in math_ops[:] {
     let (name, operator, limits) = entry
-    math.define(
+    math.define_(
       name,
       // Latex also uses their equivalent of `TextElem` here.
       Content(
@@ -77,6 +77,6 @@ fn op_define(math : Scope) -> Unit {
       ]),
     )
   }
-  math.define("dif", Content(dif('d'))) |> ignore
-  math.define("Dif", Content(dif('D'))) |> ignore
+  math.define_("dif", Content(dif('d'))) |> ignore
+  math.define_("Dif", Content(dif('D'))) |> ignore
 }

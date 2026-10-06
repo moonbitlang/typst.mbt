@@ -413,9 +413,10 @@ pub(all) struct Frame {
   kind : FrameKind
   block_type : BlockType
   height : Int
-  mut unreachable : Bool
+  mut unreachable_ : Bool
   init_height : Int
-} derive(@debug.Debug)
+}
+pub impl @debug.Debug for Frame
 
 pub(all) enum FrameKind {
   Block

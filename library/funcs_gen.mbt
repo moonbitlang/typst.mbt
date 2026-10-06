@@ -18980,8 +18980,8 @@ fn register_scopes() -> Unit {
   })
   Type::float().0.register(data => {
     let s = Scope::deduplicating()
-    s.define("inf", impl_f64_const_inf()) |> ignore
-    s.define("nan", impl_f64_const_nan()) |> ignore
+    s.define_("inf", impl_f64_const_inf()) |> ignore
+    s.define_("nan", impl_f64_const_nan()) |> ignore
     s.define_func(native_f64_is_nan()) |> ignore
     s.define_func(native_f64_is_infinite()) |> ignore
     s.define_func(native_f64_signum()) |> ignore
@@ -18998,8 +18998,8 @@ fn register_scopes() -> Unit {
   })
   Type::int().0.register(data => {
     let s = Scope::deduplicating()
-    s.define("max", impl_i64_const_max()) |> ignore
-    s.define("min", impl_i64_const_min()) |> ignore
+    s.define_("max", impl_i64_const_max()) |> ignore
+    s.define_("min", impl_i64_const_min()) |> ignore
     s.define_func(native_i64_signum()) |> ignore
     s.define_func(native_i64_bit_not()) |> ignore
     s.define_func(native_i64_bit_and()) |> ignore
@@ -19113,14 +19113,14 @@ fn register_scopes() -> Unit {
   })
   Type::alignment().0.register(data => {
     let s = Scope::deduplicating()
-    s.define("start", impl_alignment_const_start()) |> ignore
-    s.define("end", impl_alignment_const_end()) |> ignore
-    s.define("left", impl_alignment_const_left()) |> ignore
-    s.define("center", impl_alignment_const_center()) |> ignore
-    s.define("right", impl_alignment_const_right()) |> ignore
-    s.define("top", impl_alignment_const_top()) |> ignore
-    s.define("horizon", impl_alignment_const_horizon()) |> ignore
-    s.define("bottom", impl_alignment_const_bottom()) |> ignore
+    s.define_("start", impl_alignment_const_start()) |> ignore
+    s.define_("end", impl_alignment_const_end()) |> ignore
+    s.define_("left", impl_alignment_const_left()) |> ignore
+    s.define_("center", impl_alignment_const_center()) |> ignore
+    s.define_("right", impl_alignment_const_right()) |> ignore
+    s.define_("top", impl_alignment_const_top()) |> ignore
+    s.define_("horizon", impl_alignment_const_horizon()) |> ignore
+    s.define_("bottom", impl_alignment_const_bottom()) |> ignore
     s.define_func(native_alignment_axis()) |> ignore
     s.define_func(native_alignment_inv()) |> ignore
     data.set_scope(s)
@@ -19133,10 +19133,10 @@ fn register_scopes() -> Unit {
   })
   Type::direction().0.register(data => {
     let s = Scope::deduplicating()
-    s.define("ltr", impl_dir_const_ltr()) |> ignore
-    s.define("rtl", impl_dir_const_rtl()) |> ignore
-    s.define("ttb", impl_dir_const_ttb()) |> ignore
-    s.define("btt", impl_dir_const_btt()) |> ignore
+    s.define_("ltr", impl_dir_const_ltr()) |> ignore
+    s.define_("rtl", impl_dir_const_rtl()) |> ignore
+    s.define_("ttb", impl_dir_const_ttb()) |> ignore
+    s.define_("btt", impl_dir_const_btt()) |> ignore
     s.define_func(native_dir_from()) |> ignore
     s.define_func(native_dir_to()) |> ignore
     s.define_func(native_dir_axis()) |> ignore
@@ -19229,25 +19229,25 @@ fn register_scopes() -> Unit {
   }
   Type::color().0.register(data => {
     let s = Scope::deduplicating()
-    s.define("black", impl_color_const_black()) |> ignore
-    s.define("gray", impl_color_const_gray()) |> ignore
-    s.define("white", impl_color_const_white()) |> ignore
-    s.define("silver", impl_color_const_silver()) |> ignore
-    s.define("navy", impl_color_const_navy()) |> ignore
-    s.define("blue", impl_color_const_blue()) |> ignore
-    s.define("aqua", impl_color_const_aqua()) |> ignore
-    s.define("teal", impl_color_const_teal()) |> ignore
-    s.define("eastern", impl_color_const_eastern()) |> ignore
-    s.define("purple", impl_color_const_purple()) |> ignore
-    s.define("fuchsia", impl_color_const_fuchsia()) |> ignore
-    s.define("maroon", impl_color_const_maroon()) |> ignore
-    s.define("red", impl_color_const_red()) |> ignore
-    s.define("orange", impl_color_const_orange()) |> ignore
-    s.define("yellow", impl_color_const_yellow()) |> ignore
-    s.define("olive", impl_color_const_olive()) |> ignore
-    s.define("green", impl_color_const_green()) |> ignore
-    s.define("lime", impl_color_const_lime()) |> ignore
-    s.define("map", impl_color_const_map()) |> ignore
+    s.define_("black", impl_color_const_black()) |> ignore
+    s.define_("gray", impl_color_const_gray()) |> ignore
+    s.define_("white", impl_color_const_white()) |> ignore
+    s.define_("silver", impl_color_const_silver()) |> ignore
+    s.define_("navy", impl_color_const_navy()) |> ignore
+    s.define_("blue", impl_color_const_blue()) |> ignore
+    s.define_("aqua", impl_color_const_aqua()) |> ignore
+    s.define_("teal", impl_color_const_teal()) |> ignore
+    s.define_("eastern", impl_color_const_eastern()) |> ignore
+    s.define_("purple", impl_color_const_purple()) |> ignore
+    s.define_("fuchsia", impl_color_const_fuchsia()) |> ignore
+    s.define_("maroon", impl_color_const_maroon()) |> ignore
+    s.define_("red", impl_color_const_red()) |> ignore
+    s.define_("orange", impl_color_const_orange()) |> ignore
+    s.define_("yellow", impl_color_const_yellow()) |> ignore
+    s.define_("olive", impl_color_const_olive()) |> ignore
+    s.define_("green", impl_color_const_green()) |> ignore
+    s.define_("lime", impl_color_const_lime()) |> ignore
+    s.define_("map", impl_color_const_map()) |> ignore
     s.define_func(native_color_luma()) |> ignore
     s.define_func(native_color_oklab()) |> ignore
     s.define_func(native_color_oklch()) |> ignore

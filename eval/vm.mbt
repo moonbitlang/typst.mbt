@@ -35,7 +35,7 @@ pub fn Vm::new(
 
 ///|
 /// Define a variable in the current scope.
-pub fn Vm::define(
+pub fn Vm::define_(
   self : Vm,
   ident : @ast.Ident,
   value : @library.Value,

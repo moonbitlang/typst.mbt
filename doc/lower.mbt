@@ -940,7 +940,7 @@ fn Lower::eval(
     let pieces = pieces_of(scopes, span)
     let value_span = self.take(pieces)
     let inner : Lower = { ..self, pieces: Some(pieces), }
-    scope.define(pair.0, inner.value(pair.1, value_span)) |> ignore
+    scope.define_(pair.0, inner.value(pair.1, value_span)) |> ignore
   }
   let id = self.session.registry.snippet(
     entry,

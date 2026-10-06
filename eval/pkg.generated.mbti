@@ -60,7 +60,7 @@ pub struct Vm {
   context : @library.Context
 }
 pub fn Vm::bind(Self, @ast.Ident, @library.Binding) -> Unit
-pub fn Vm::define(Self, @ast.Ident, @library.Value) -> Unit
+pub fn Vm::define_(Self, @ast.Ident, @library.Value) -> Unit
 pub fn Vm::new(@library.Engine, @library.Context, @library.Scopes, @syntax.Span) -> Self
 pub fn Vm::trace(Self, @library.Value) -> Unit
 pub fn Vm::trace_at(Self, @syntax.Span, @library.Value) -> Unit

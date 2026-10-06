@@ -736,18 +736,18 @@ pub fn FixedAlignment::from_side(side : Side) -> FixedAlignment {
 /// The directions and alignments of upstream `fn prelude` (`lib.rs`):
 /// scoped values that are globally available, too.
 fn prelude_layout(global : Scope) -> Unit {
-  global.define("ltr", Dyn(Dir(LTR))) |> ignore
-  global.define("rtl", Dyn(Dir(RTL))) |> ignore
-  global.define("ttb", Dyn(Dir(TTB))) |> ignore
-  global.define("btt", Dyn(Dir(BTT))) |> ignore
-  global.define("start", Dyn(Alignment(alignment_start))) |> ignore
-  global.define("left", Dyn(Alignment(alignment_left))) |> ignore
-  global.define("center", Dyn(Alignment(alignment_center))) |> ignore
-  global.define("right", Dyn(Alignment(alignment_right))) |> ignore
-  global.define("end", Dyn(Alignment(alignment_end))) |> ignore
-  global.define("top", Dyn(Alignment(alignment_top))) |> ignore
-  global.define("horizon", Dyn(Alignment(alignment_horizon))) |> ignore
-  global.define("bottom", Dyn(Alignment(alignment_bottom))) |> ignore
+  global.define_("ltr", Dyn(Dir(LTR))) |> ignore
+  global.define_("rtl", Dyn(Dir(RTL))) |> ignore
+  global.define_("ttb", Dyn(Dir(TTB))) |> ignore
+  global.define_("btt", Dyn(Dir(BTT))) |> ignore
+  global.define_("start", Dyn(Alignment(alignment_start))) |> ignore
+  global.define_("left", Dyn(Alignment(alignment_left))) |> ignore
+  global.define_("center", Dyn(Alignment(alignment_center))) |> ignore
+  global.define_("right", Dyn(Alignment(alignment_right))) |> ignore
+  global.define_("end", Dyn(Alignment(alignment_end))) |> ignore
+  global.define_("top", Dyn(Alignment(alignment_top))) |> ignore
+  global.define_("horizon", Dyn(Alignment(alignment_horizon))) |> ignore
+  global.define_("bottom", Dyn(Alignment(alignment_bottom))) |> ignore
 }
 
 ///|

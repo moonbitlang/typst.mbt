@@ -193,19 +193,19 @@ fn eval_field_callee(
   let guard_ = vm.guard_at(field_span)
   let mut is_method_call = false
   let callee_value = match target.ty().scope().get(field) {
-    Some(method) => {
+    Some(method_) => {
       is_method_call = true
       let ty = target.ty().short_name()
       @library.at(field_span, () => {
-        method.read(guard_, "call method `\{field}` on \{ty}")
+        method_.read(guard_, "call method `\{field}` on \{ty}")
       })
     }
     None =>
       match target {
-        Content(content) if content.elem().scope().get(field) is Some(method) => {
+        Content(content) if content.elem().scope().get(field) is Some(method_) => {
           is_method_call = true
           @library.at(field_span, () => {
-            method.read(guard_, "call method `\{field}` on content")
+            method_.read(guard_, "call method `\{field}` on content")
           })
         }
         Symbol(_) | Type(_) | Module(_) =>
@@ -585,7 +585,7 @@ pub fn eval_closure(
 
   // Provide the closure itself for recursive calls.
   if name is Some(name) {
-    vm.define(name, Func(func))
+    vm.define_(name, Func(func))
   }
   let num_pos_args = args.to_pos().len()
   let sink_size = num_pos_args - closure.num_pos_params
@@ -595,7 +595,7 @@ pub fn eval_closure(
   if params is Some(params) {
     for p in params.children() {
       match p {
-        Pos(Normal(Ident(ident))) => vm.define(ident, args.expect(ident.get()))
+        Pos(Normal(Ident(ident))) => vm.define_(ident, args.expect(ident.get()))
         Pos(pattern) =>
           destructure(vm, pattern, args.expect("pattern parameter"))
         Spread(spread) => {
@@ -612,7 +612,7 @@ pub fn eval_closure(
             Some(v) => v
             None => default.shared()
           }
-          vm.define(name, value)
+          vm.define_(name, value)
         }
       }
     }
@@ -624,7 +624,7 @@ pub fn eval_closure(
       if sink_pos_values is Some(values) {
         remaining_args.items.append(values)
       }
-      vm.define(sink_name, Args(remaining_args))
+      vm.define_(sink_name, Args(remaining_args))
     }
   }
 

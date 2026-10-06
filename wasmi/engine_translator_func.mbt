@@ -15,7 +15,7 @@ pub(all) struct FuncTranslator {
   /// only holds a weak reference to the engine.
   priv engine : EngineWeak
   /// The immutable Wasm module resources.
-  priv module : ModuleHeader
+  priv module_ : ModuleHeader
   /// This represents the reachability of the currently translated code.
   ///
   /// - `true`: The currently translated code is reachable.
@@ -46,13 +46,13 @@ pub(all) struct FuncTranslator {
 /// Creates a new [`FuncTranslator`].
 pub fn FuncTranslator::new(
   func : FuncIdx,
-  module : ModuleHeader,
+  module_ : ModuleHeader,
 ) -> FuncTranslator raise WasmiError {
-  let engine = module.engine_upgrade()
+  let engine = module_.engine_upgrade()
   let translator : FuncTranslator = {
     func,
     engine,
-    module,
+    module_,
     reachable: true,
     stack: TranslatorStack::new(engine),
     locals: LocalsRegistry::new(),
@@ -102,7 +102,7 @@ pub fn FuncTranslator::finish(
 fn FuncTranslator::init_func_body_block(
   self : FuncTranslator,
 ) -> Unit raise WasmiError {
-  let func_ty = self.module.get_type_of_func(self.func)
+  let func_ty = self.module_.get_type_of_func(self.func)
   let block_ty = BlockType::func_type(func_ty)
   let end_label = self.labels.new_label()
   let consume_fuel = self.instrs.push_consume_fuel_instr()
@@ -177,7 +177,7 @@ fn FuncTranslator::resolve_func_type(
   self : FuncTranslator,
   func_index : FuncIdx,
 ) -> @wasmi_core.FuncType {
-  let dedup_func_type = self.module.get_type_of_func(func_index)
+  let dedup_func_type = self.module_.get_type_of_func(func_index)
   self.engine.resolve_func_type(dedup_func_type)
 }
 
@@ -187,7 +187,7 @@ fn FuncTranslator::resolve_type(
   self : FuncTranslator,
   type_index : UInt,
 ) -> @wasmi_core.FuncType {
-  let dedup_func_type = self.module.get_func_type(
+  let dedup_func_type = self.module_.get_func_type(
     FuncTypeIdx(type_index.reinterpret_as_int()),
   )
   self.engine.resolve_func_type(dedup_func_type)
@@ -791,9 +791,9 @@ fn FuncTranslator::preserve_all_locals(
   self : FuncTranslator,
 ) -> Unit raise WasmiError {
   let consume_fuel_instr = self.stack.consume_fuel_instr()
-  for local in self.stack.preserve_all_locals() {
-    let result = self.layout.temp_to_reg(local.index())
-    guard FuncTranslator::make_copy_instr(result, local, self.layout)
+  for local_ in self.stack.preserve_all_locals() {
+    let result = self.layout.temp_to_reg(local_.index())
+    guard FuncTranslator::make_copy_instr(result, local_, self.layout)
       is Some(copy_instr) else {
       abort("`result` and `local` refer to different stack spaces")
     }
@@ -1344,7 +1344,7 @@ fn FuncTranslator::try_replace_result(
       return false
     Temp(operand) => self.layout.temp_to_reg(operand.operand_index())
   }
-  self.instrs.try_replace_result(result, old_result, self.layout, self.module)
+  self.instrs.try_replace_result(result, old_result, self.layout, self.module_)
 }
 
 ///|

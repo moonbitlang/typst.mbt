@@ -132,7 +132,7 @@ pub(all) struct ToDict(Module)
 
 ///|
 pub impl Reflect for ToDict with fn input() {
-  Type(Type::module())
+  Type(Type::module_())
 }
 
 ///|

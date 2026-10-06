@@ -2,27 +2,27 @@
 
 ///|
 /// Whether a specific method is mutating.
-fn is_mutating_method(method : String) -> Bool {
-  method is ("push" | "pop" | "insert" | "remove")
+fn is_mutating_method(method_ : String) -> Bool {
+  method_ is ("push" | "pop" | "insert" | "remove")
 }
 
 ///|
 /// Whether a specific method is mutating for dictionaries.
-fn is_dict_mutating_method(method : String) -> Bool {
-  method is ("insert" | "remove")
+fn is_dict_mutating_method(method_ : String) -> Bool {
+  method_ is ("insert" | "remove")
 }
 
 ///|
 /// Whether a specific method is an accessor.
-fn is_accessor_method(method : String) -> Bool {
-  method is ("first" | "last" | "at")
+fn is_accessor_method(method_ : String) -> Bool {
+  method_ is ("first" | "last" | "at")
 }
 
 ///|
 /// Call a mutating method on a value.
 fn call_method_mut(
   place : Place,
-  method : String,
+  method_ : String,
   args : @library.Args,
   span : @syntax.Span,
 ) -> @library.Value raise @library.SourceError {
@@ -30,13 +30,13 @@ fn call_method_mut(
   let ty = value.ty()
   let missing = () => {
     @library.SourceError([
-      @library.SourceDiagnostic::error_at(span, missing_method(ty, method)),
+      @library.SourceDiagnostic::error_at(span, missing_method(ty, method_)),
     ])
   }
   let mut output : @library.Value = None
   match value {
     Array(array) =>
-      match method {
+      match method_ {
         "push" => array.items.push(args.expect("value"))
         "pop" => output = @library.at(span, () => array.pop())
         "insert" => {
@@ -52,7 +52,7 @@ fn call_method_mut(
         _ => raise missing()
       }
     Dict(dict) =>
-      match method {
+      match method_ {
         "insert" => {
           let key : String = args.expect("key")
           let v : @library.Value = args.expect("value")
@@ -75,23 +75,23 @@ fn call_method_mut(
 /// Call an accessor method on a value.
 fn call_method_access(
   place : Place,
-  method : String,
+  method_ : String,
   args : @library.Args,
   span : @syntax.Span,
 ) -> Place raise @library.SourceError {
   let value = place.get_mut()
   let ty = value.ty()
   let temp_or_missing = () => {
-    let msg = if ty.scope().get(method) is Some(_) {
+    let msg = if ty.scope().get(method_) is Some(_) {
       "cannot mutate a temporary value"
     } else {
-      missing_method(ty, method)
+      missing_method(ty, method_)
     }
     @library.SourceError([@library.SourceDiagnostic::error_at(span, msg)])
   }
   let slot : Place = match value {
     Array(array) =>
-      match method {
+      match method_ {
         "first" => {
           if array.is_empty() {
             @library.bail_at(span, @library.array_is_empty())
@@ -113,7 +113,7 @@ fn call_method_access(
         _ => raise temp_or_missing()
       }
     Dict(dict) =>
-      match method {
+      match method_ {
         "at" => {
           let key : String = args.expect("key")
           if !dict.contains(key) {
@@ -135,6 +135,6 @@ fn call_method_access(
 
 ///|
 /// The missing method error message.
-fn missing_method(ty : @library.Type, method : String) -> String {
-  "type \{ty} has no method `\{method}`"
+fn missing_method(ty : @library.Type, method_ : String) -> String {
+  "type \{ty} has no method `\{method_}`"
 }

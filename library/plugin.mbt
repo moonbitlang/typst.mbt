@@ -11,7 +11,7 @@ fn impl_plugin(
   source_ : @syntax.Spanned[DataSource],
 ) -> Value raise SourceError {
   let loaded = source_.v.load(source_.span, engine.world)
-  Module(at(source_.span, () => Plugin::module(loaded.data)))
+  Module(at(source_.span, () => Plugin::module_(loaded.data)))
 }
 
 ///|
@@ -161,7 +161,7 @@ priv struct PluginBase {
   /// The hash of the bytes (upstream `Bytes` carries a `LazyHash`).
   bytes_hash : U128
   /// The compiled WebAssembly module.
-  module : @wasmi.Module
+  module_ : @wasmi.Module
   /// A linker used to create a `Store` for execution.
   linker : @wasmi.Linker[CallData]
 }
@@ -228,7 +228,7 @@ fn plugin_bytes_hash(bytes : Bytes) -> U128 {
 
 ///|
 /// Create a plugin and turn it into a module.
-fn Plugin::module(bytes : Bytes) -> Module raise HintedError {
+fn Plugin::module_(bytes : Bytes) -> Module raise HintedError {
   let key = plugin_bytes_hash(bytes)
   let entries = match plugin_module_cache.get(key) {
     Some(entries) => entries
@@ -280,11 +280,11 @@ fn Plugin::new(
   // Disable relaxed SIMD as it can introduce non-determinism.
   config.wasm_relaxed_simd(false) |> ignore
   let engine = @wasmi.Engine::new(config)
-  let module = @wasmi.Module::new(engine, bytes) catch {
+  let module_ = @wasmi.Module::new(engine, bytes) catch {
     err => bail("failed to load WebAssembly module (\{err})")
   }
   // Ensure that the plugin exports its memory.
-  if !(module.get_export("memory") is Some(Memory(_))) {
+  if !(module_.get_export("memory") is Some(Memory(_))) {
     bail("plugin does not export its memory")
   }
   let linker : @wasmi.Linker[CallData] = @wasmi.Linker::new(engine)
@@ -306,7 +306,7 @@ fn Plugin::new(
   } catch {
     _ => abort("unreachable")
   }
-  let base = { bytes, bytes_hash, module, linker, }
+  let base = { bytes, bytes_hash, module_, linker, }
   let instance = PluginInstance::new(base, None)
   { base, snapshot: None, fingerprint: U128::default(), pool: [instance], }
 }
@@ -375,8 +375,8 @@ fn Plugin::acquire(self : Plugin) -> PluginInstance raise HintedError {
 fn Plugin::into_module(self : Plugin) -> Module {
   // Build a scope from the collected functions.
   let scope = Scope::new()
-  for export in self.base.module.exports() {
-    let (name, ty) = export
+  for export_ in self.base.module_.exports() {
+    let (name, ty) = export_
     if ty is Func(_) {
       let func = { plugin: self, name, }
       scope.bind(name, Binding::detached(Func(Func::plugin(func)))) |> ignore
@@ -394,7 +394,7 @@ fn PluginInstance::new(
 ) -> PluginInstance raise HintedError {
   let data : CallData = { args: [], output: b"", memory_error: None, }
   let store = @wasmi.Store::new(base.linker.engine(), data)
-  let instance = base.linker.instantiate_and_start(store, base.module) catch {
+  let instance = base.linker.instantiate_and_start(store, base.module_) catch {
     e => bail("\{e}")
   }
   let instance = { instance, store, }
