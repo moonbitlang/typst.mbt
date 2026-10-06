@@ -1,11 +1,18 @@
 name: Test data
 description: >
   Fetch what the tests read besides the repository (scripts/ci/data.sh): the
-  upstream suite, the test suites of rustybuzz and resvg, the dev assets and
-  hayro's corpus.
+  upstream suite, the test suites of rustybuzz and resvg, the dev assets,
+  hayro's corpus and the pinned Typst packages of the `packages` stage.
 runs:
   using: composite
   steps:
+    # The package archives (scripts/packages.sh verifies and unpacks them),
+    # so that a run does not depend on the package registry being reachable.
+    - name: Cached packages
+      uses: actions/cache@v4
+      with:
+        path: .repos/typst-packages
+        key: typst-packages-v1-${{ runner.os }}-${{ hashFiles('tests/packages/manifest.tsv') }}
     - name: brotli
       shell: bash
       run: |

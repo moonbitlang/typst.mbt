@@ -6,6 +6,8 @@
 # - `.repos/` (scripts/upstream.sh with a shallow upstream checkout): the
 #   upstream suite, rustybuzz's and resvg's test suites, the WebAssembly
 #   spec tests.
+# - `.repos/typst-packages` (scripts/packages.sh): the Typst packages of the
+#   `packages` stage, pinned by tests/packages/manifest.tsv.
 # - The git dependencies of the oracle whose files the runner and the unit
 #   tests read, at the revisions of oracle/Cargo.lock: typst-dev-assets,
 #   typst-assets and hayro. A development machine has them as cargo
@@ -34,6 +36,7 @@ retry() {
 
 export UPSTREAM_SHALLOW=1
 retry scripts/upstream.sh
+retry scripts/packages.sh
 
 checkouts="$HOME/.cargo/git/checkouts"
 # The full revision of a git dependency in oracle/Cargo.lock.
@@ -83,6 +86,7 @@ for f in \
   .repos/rustybuzz/tests/fonts \
   .repos/resvg/crates/resvg/tests \
   .repos/wasm-testsuite/proposals/wide-arithmetic/wide-arithmetic.wast \
+  .repos/typst-packages/preview \
   target/devassets/images \
   target/devassets/fonts \
   target/devassets/plugins \

@@ -36,3 +36,5 @@ resvg	resvg	1723	0	-
 wasm-validate	wasm-validate	14042	0	-
 wasm-spec	wasm-spec	65449	1242	-
 edsl	edsl	42	0	-
+packages	packages frames	99	0	-
+packages	packages svg	99	0	99
