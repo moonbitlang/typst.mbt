@@ -105,3 +105,8 @@ pub(all) enum UnderlineOption {
   StippledUnderline
   SquigglyUnderline
 } derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend UnderlineOption with Eq::{not_equal, equal}

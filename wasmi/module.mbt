@@ -8,20 +8,70 @@
 pub(all) struct FuncIdx(Int) derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FuncIdx with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FuncIdx with @debug.Debug::{to_repr}
+
+///|
 /// An index to a table within a Wasm module.
 pub(all) struct TableIdx(Int) derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TableIdx with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TableIdx with @debug.Debug::{to_repr}
 
 ///|
 /// An index to a linear memory within a Wasm module.
 pub(all) struct MemoryIdx(Int) derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MemoryIdx with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MemoryIdx with @debug.Debug::{to_repr}
+
+///|
 /// An index to a global variable within a Wasm module.
 pub(all) struct GlobalIdx(Int) derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GlobalIdx with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GlobalIdx with @debug.Debug::{to_repr}
+
+///|
 /// A function type index into the Wasm module's type section.
 pub(all) struct FuncTypeIdx(Int) derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FuncTypeIdx with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FuncTypeIdx with @debug.Debug::{to_repr}
 
 ///|
 pub fn FuncIdx::into_u32(self : FuncIdx) -> UInt {
@@ -79,6 +129,11 @@ pub impl Show for ImportName with fn output(self, f) {
   f.write_string("::")
   f.write_string(self.field)
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ImportName with Show::{to_string, output}
 
 // ---------------------------------------------------------------------------
 // utils.rs

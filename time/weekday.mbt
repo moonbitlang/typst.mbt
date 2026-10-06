@@ -16,6 +16,21 @@ pub(all) enum Weekday {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Weekday with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Weekday with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Weekday with @debug.Debug::{to_repr}
+
+///|
 /// Get the previous weekday.
 pub fn Weekday::previous(self : Weekday) -> Weekday {
   match self {
@@ -93,3 +108,8 @@ pub fn Weekday::name(self : Weekday) -> String {
 pub impl Show for Weekday with fn output(self, logger) {
   logger.write_string(self.name())
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Weekday with Show::{to_string, output}

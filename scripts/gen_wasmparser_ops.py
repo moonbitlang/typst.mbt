@@ -28,6 +28,9 @@ import os
 import re
 import sys
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from promotions import deprecated_extend  # noqa: E402
+
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 OUT = os.path.join(ROOT, "wasmparser")
 
@@ -141,6 +144,9 @@ def gen_operator(ops):
         else:
             out.append(f"  {name}\n")
     out.append("} derive(Eq, Debug)\n\n")
+    # Neither derived trait is called through the type (scripts/promotions.py).
+    out.append(deprecated_extend("Operator", "Eq", ["not_equal", "equal"]) + "\n")
+    out.append(deprecated_extend("Operator", "@debug.Debug", ["to_repr"]) + "\n")
     # proposal / visit name accessors
     out.append("///|\n/// The proposal (`@<proposal>` group of `for_each_operator!`) that\n/// introduced this operator.\n")
     out.append("pub fn Operator::proposal(self : Operator) -> String {\n  match self {\n")

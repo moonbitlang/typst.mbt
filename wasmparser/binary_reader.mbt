@@ -14,6 +14,16 @@ pub(all) enum BinaryReaderErrorKind {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BinaryReaderErrorKind with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BinaryReaderErrorKind with @debug.Debug::{to_repr}
+
+///|
 /// A binary reader for WebAssembly modules.
 ///
 /// `Display` (`Show`/`to_string`) is `"{message} (at offset 0x{offset:x})"`.
@@ -126,6 +136,16 @@ pub(all) struct Range {
   start : Int
   end : Int
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Range with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Range with @debug.Debug::{to_repr}
 
 ///|
 /// A binary reader of the WebAssembly structures and types.

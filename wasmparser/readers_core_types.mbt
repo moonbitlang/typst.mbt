@@ -33,6 +33,26 @@
 pub(all) struct PackedIndex(UInt) derive(Eq, Hash, Compare, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PackedIndex with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PackedIndex with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PackedIndex with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PackedIndex with @debug.Debug::{to_repr}
+
+///|
 let packed_index_kind_mask : UInt = 0b11U << 20
 
 ///|
@@ -169,6 +189,11 @@ pub impl Show for PackedIndex with fn output(self, logger) {
 }
 
 ///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PackedIndex with Show::{to_string, output}
+
+///|
 /// The uncompressed form of a `PackedIndex`.
 ///
 /// Can be used for `match` statements.
@@ -180,6 +205,21 @@ pub(all) enum UnpackedIndex {
   /// A type identifier.
   Id(CoreTypeId)
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend UnpackedIndex with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend UnpackedIndex with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend UnpackedIndex with @debug.Debug::{to_repr}
 
 ///|
 /// Compress this index into its packed form.
@@ -246,6 +286,11 @@ pub extend UnpackedIndex with Show::{to_string, output}
 pub struct RecGroup {
   priv inner : RecGroupInner
 } derive(Debug)
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RecGroup with @debug.Debug::{to_repr}
 
 ///|
 priv enum RecGroupInner {
@@ -334,6 +379,11 @@ pub impl Eq for RecGroup with fn equal(self, other) {
 }
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RecGroup with Eq::{not_equal, equal}
+
+///|
 pub impl Hash for RecGroup with fn hash_combine(self, hasher) {
   let n = self.len()
   hasher.combine_int(n)
@@ -341,6 +391,11 @@ pub impl Hash for RecGroup with fn hash_combine(self, hasher) {
     hasher.combine(self.get(i))
   }
 }
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RecGroup with Hash::{hash, hash_combine}
 
 ///|
 /// Represents a subtype of possible other types in a WebAssembly module.
@@ -353,6 +408,21 @@ pub(all) struct SubType {
   /// The composite type of the subtype.
   composite_type : CompositeType
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SubType with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SubType with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SubType with @debug.Debug::{to_repr}
 
 ///|
 pub impl Show for SubType with fn output(self, logger) {
@@ -370,6 +440,11 @@ pub impl Show for SubType with fn output(self, logger) {
     logger.write_string(")")
   }
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SubType with Show::{to_string, output}
 
 ///|
 /// Unwrap an `ArrayType` or panic.
@@ -439,6 +514,21 @@ pub(all) struct CompositeType {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CompositeType with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CompositeType with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CompositeType with @debug.Debug::{to_repr}
+
+///|
 /// A [`CompositeType`] can contain one of these types.
 pub(all) enum CompositeInnerType {
   /// The type is for a function.
@@ -450,6 +540,21 @@ pub(all) enum CompositeInnerType {
   /// The type is for a continuation.
   Cont(ContType)
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CompositeInnerType with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CompositeInnerType with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CompositeInnerType with @debug.Debug::{to_repr}
 
 ///|
 pub impl Show for CompositeType with fn output(self, logger) {
@@ -516,6 +621,21 @@ pub struct FuncType {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FuncType with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FuncType with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FuncType with @debug.Debug::{to_repr}
+
+///|
 pub impl Show for FuncType with fn output(self, logger) {
   logger.write_string("FuncType { params: [")
   for i, ty in self.params() {
@@ -533,6 +653,11 @@ pub impl Show for FuncType with fn output(self, logger) {
   }
   logger.write_string("] }")
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FuncType with Show::{to_string, output}
 
 ///|
 /// Creates a new [`FuncType`] from the given `params` and `results`.
@@ -574,6 +699,21 @@ pub fn FuncType::results(self : FuncType) -> ArrayView[ValType] {
 pub(all) struct ArrayType(FieldType) derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ArrayType with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ArrayType with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ArrayType with @debug.Debug::{to_repr}
+
+///|
 /// Represents a field type of an array or a struct.
 pub(all) struct FieldType {
   /// Array element type.
@@ -581,6 +721,21 @@ pub(all) struct FieldType {
   /// Are elements mutable.
   mutable : Bool
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FieldType with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FieldType with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FieldType with @debug.Debug::{to_repr}
 
 ///|
 fn FieldType::remap_indices(
@@ -606,6 +761,21 @@ pub(all) enum StorageType {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StorageType with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StorageType with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StorageType with @debug.Debug::{to_repr}
+
+///|
 pub impl Show for StorageType with fn output(self, logger) {
   match self {
     I8 => logger.write_string("i8")
@@ -613,6 +783,11 @@ pub impl Show for StorageType with fn output(self, logger) {
     Val(v) => v.output(logger)
   }
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StorageType with Show::{to_string, output}
 
 ///|
 /// Is this a packed storage type, i.e. one that must be sign- or
@@ -639,10 +814,40 @@ pub(all) struct StructType {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StructType with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StructType with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StructType with @debug.Debug::{to_repr}
+
+///|
 /// Represents a type of a continuation in a WebAssembly module.
 pub(all) struct ContType {
   mut idx : PackedIndex
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ContType with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ContType with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ContType with @debug.Debug::{to_repr}
 
 ///|
 fn ContType::remap_indices(
@@ -668,6 +873,21 @@ pub(all) enum ValType {
   /// The value type is a reference.
   Ref(RefType)
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ValType with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ValType with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ValType with @debug.Debug::{to_repr}
 
 ///|
 pub impl Show for ValType with fn output(self, logger) {
@@ -805,6 +1025,21 @@ fn ValType::remap_indices(
 //   0000 = none
 //   ```
 pub(all) struct RefType(UInt) derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RefType with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RefType with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RefType with @debug.Debug::{to_repr}
 
 ///|
 pub impl Show for RefType with fn output(self, logger) {
@@ -1293,6 +1528,21 @@ pub(all) enum HeapType {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend HeapType with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend HeapType with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend HeapType with @debug.Debug::{to_repr}
+
+///|
 /// Alias for an unshared `func` heap type.
 pub let heaptype_func : HeapType = Abstract(shared=false, ty=Func)
 
@@ -1383,6 +1633,21 @@ pub(all) enum AbstractHeapType {
   /// Introduced in the stack-switching proposal.
   NoCont
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend AbstractHeapType with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend AbstractHeapType with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend AbstractHeapType with @debug.Debug::{to_repr}
 
 ///|
 fn AbstractHeapType::as_str(self : AbstractHeapType, nullable : Bool) -> String {
@@ -1702,6 +1967,16 @@ pub(all) struct TableType {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TableType with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TableType with @debug.Debug::{to_repr}
+
+///|
 /// Gets the index type for the table.
 pub fn TableType::index_type(self : TableType) -> ValType {
   if self.table64 {
@@ -1748,6 +2023,16 @@ pub(all) struct MemoryType {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MemoryType with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MemoryType with @debug.Debug::{to_repr}
+
+///|
 /// Gets the index type for the memory.
 pub fn MemoryType::index_type(self : MemoryType) -> ValType {
   if self.memory64 {
@@ -1769,11 +2054,31 @@ pub(all) struct GlobalType {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GlobalType with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GlobalType with @debug.Debug::{to_repr}
+
+///|
 /// Represents a tag kind.
 pub(all) enum TagKind {
   /// The tag is an exception type.
   Exception
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TagKind with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TagKind with @debug.Debug::{to_repr}
 
 ///|
 /// A tag's type.
@@ -1783,6 +2088,16 @@ pub(all) struct TagType {
   /// The function type this tag uses.
   func_type_idx : UInt
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TagType with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TagType with @debug.Debug::{to_repr}
 
 ///|
 /// A reader for the type section of a WebAssembly module.
@@ -1820,6 +2135,11 @@ pub fn TypeSectionReader::into_iter_err_on_gc_types(
 pub impl FromReader for CompositeType with fn from_reader(reader) {
   read_composite_type(reader.read_u8(), reader)
 }
+
+///|
+#deprecated("call as `FromReader::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CompositeType with FromReader::{from_reader}
 
 ///|
 fn read_composite_type(
@@ -1866,6 +2186,11 @@ pub impl FromReader for RecGroup with fn from_reader(reader) {
     }
   }
 }
+
+///|
+#deprecated("call as `FromReader::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RecGroup with FromReader::{from_reader}
 
 ///|
 pub impl FromReader for SubType with fn from_reader(reader) {

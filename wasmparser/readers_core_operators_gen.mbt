@@ -683,6 +683,16 @@ pub(all) enum Operator {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Operator with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Operator with @debug.Debug::{to_repr}
+
+///|
 /// The proposal (`@<proposal>` group of `for_each_operator!`) that
 /// introduced this operator.
 pub fn Operator::proposal(self : Operator) -> String {

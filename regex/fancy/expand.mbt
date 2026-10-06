@@ -11,6 +11,11 @@ pub struct Expander {
 } derive(Debug)
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Expander with @debug.Debug::{to_repr}
+
+///|
 /// Returns the default expander used by `Captures::expand`.
 ///
 /// To write a literal `$` use `$$`.

@@ -22,6 +22,16 @@ pub(all) enum TypeRef {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TypeRef with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TypeRef with @debug.Debug::{to_repr}
+
+///|
 /// Represents an import in a WebAssembly module.
 pub(all) struct Import {
   /// The module being imported from.
@@ -33,12 +43,27 @@ pub(all) struct Import {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Import with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Import with @debug.Debug::{to_repr}
+
+///|
 pub impl FromReader for Import with fn from_reader(reader) {
   let module_ = reader.read_string()
   let name = reader.read_string()
   let ty = TypeRef::from_reader(reader)
   { module_, name, ty, }
 }
+
+///|
+#deprecated("call as `FromReader::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Import with FromReader::{from_reader}
 
 ///|
 pub impl FromReader for TypeRef with fn from_reader(reader) {

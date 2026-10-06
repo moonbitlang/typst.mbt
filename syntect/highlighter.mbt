@@ -135,6 +135,11 @@ pub(all) struct ScoredStyle {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ScoredStyle with Eq::{not_equal, equal}
+
+///|
 fn ScoredStyle::apply(
   self : ScoredStyle,
   other : StyleModifier,

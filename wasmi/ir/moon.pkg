@@ -1,3 +1,4 @@
 import {
   "moonbitlang/typst/wasmi/core" @wasmi_core,
+  "moonbitlang/core/debug",
 }

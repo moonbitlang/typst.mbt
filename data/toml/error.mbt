@@ -10,6 +10,16 @@ pub(all) suberror TomlError {
 } derive(Debug, Eq)
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TomlError with @debug.Debug::{to_repr}
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TomlError with Eq::{not_equal, equal}
+
+///|
 /// `impl Display for StrContextValue` (winnow).
 fn StrContextValue::to_display(self : StrContextValue) -> String {
   match self {

@@ -13,7 +13,22 @@ pub struct Date {
 } derive(Eq, Compare, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Date with Eq::{not_equal, equal}
+
+///|
 pub extend Date with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Date with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Date with @debug.Debug::{to_repr}
 
 ///|
 let days_cumulative_common_leap : ReadOnlyArray[ReadOnlyArray[Int]] = [

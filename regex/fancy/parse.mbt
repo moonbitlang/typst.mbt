@@ -17,6 +17,16 @@ pub struct BitSet {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BitSet with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BitSet with @debug.Debug::{to_repr}
+
+///|
 pub fn BitSet::new() -> BitSet {
   { items: [], }
 }
@@ -61,6 +71,11 @@ pub struct ExprTree {
   contains_subroutines : Bool
   self_recursive : Bool
 } derive(Debug)
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ExprTree with @debug.Debug::{to_repr}
 
 ///|
 priv struct Parser {
@@ -1145,6 +1160,16 @@ pub struct ParsedId {
   relative : Int?
   skip : Int
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ParsedId with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ParsedId with @debug.Debug::{to_repr}
 
 ///|
 /// Attempts to parse an identifier, optionally followed by a relative number

@@ -21,6 +21,11 @@ pub impl Show for ScopeError with fn output(self, logger) {
 }
 
 ///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ScopeError with Show::{to_string, output}
+
+///|
 /// Multiplier on the power of 2 for MatchPower. This is only exposed for
 /// highlighting.
 pub let atom_len_bits : Int = 3
@@ -34,6 +39,26 @@ pub(all) struct Scope {
   a : UInt64
   b : UInt64
 } derive(Eq, Compare, Hash, Default)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Scope with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Scope with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Scope with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Scope with Default::{default}
 
 ///|
 /// Not all strings are valid scopes.
@@ -57,6 +82,11 @@ pub impl Show for ParseScopeError with fn output(self, logger) {
 }
 
 ///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ParseScopeError with Show::{to_string, output}
+
+///|
 /// The structure used to keep track of the mapping between scope atom
 /// numbers and their string names.
 pub struct ScopeRepository {
@@ -77,11 +107,26 @@ pub(all) struct ScopeStack {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ScopeStack with Eq::{not_equal, equal}
+
+///|
 /// How many scopes to clear.
 pub(all) enum ClearAmount {
   TopN(Int)
   All
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ClearAmount with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ClearAmount with @debug.Debug::{to_repr}
 
 ///|
 /// A change to a scope stack.
@@ -96,11 +141,21 @@ pub(all) enum ScopeStackOp {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ScopeStackOp with Eq::{not_equal, equal}
+
+///|
 /// Used for `ScopeStack::apply_with_hook`.
 pub(all) enum BasicScopeStackOp {
   Push(Scope)
   Pop
 } derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BasicScopeStackOp with Eq::{not_equal, equal}
 
 ///|
 fn pack_as_u16s(atoms : Array[Int]) -> Scope raise ParseScopeError {
@@ -257,6 +312,11 @@ pub impl Show for Scope with fn output(self, logger) {
 }
 
 ///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Scope with Show::{to_string, output}
+
+///|
 /// Upstream's `Debug` (`<source.php>`).
 pub fn Scope::debug(self : Scope) -> String {
   "<" + self.build_string() + ">"
@@ -268,7 +328,17 @@ pub fn Scope::debug(self : Scope) -> String {
 pub(all) struct MatchPower(Double) derive(Eq, Compare, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MatchPower with Eq::{not_equal, equal}
+
+///|
 pub extend MatchPower with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MatchPower with @debug.Debug::{to_repr}
 
 ///|
 pub fn ScopeStack::new() -> ScopeStack {
@@ -418,6 +488,11 @@ pub impl Show for ScopeStack with fn output(self, logger) {
     logger.write_char(' ')
   }
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ScopeStack with Show::{to_string, output}
 
 ///|
 /// Rust's `str::split_whitespace`.

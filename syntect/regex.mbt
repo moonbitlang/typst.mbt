@@ -22,6 +22,11 @@ pub struct Region {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Region with Eq::{not_equal, equal}
+
+///|
 /// A line prepared for searching: the text with its UTF-8 offsets and the
 /// regex engine's decoded form, shared by all searches on the line.
 pub struct SearchText {

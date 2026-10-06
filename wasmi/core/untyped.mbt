@@ -28,6 +28,26 @@ pub struct UntypedVal {
 } derive(Eq, Compare, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend UntypedVal with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend UntypedVal with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend UntypedVal with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend UntypedVal with @debug.Debug::{to_repr}
+
+///|
 pub impl Default for UntypedVal with fn default() {
   { lo64: 0, hi64: 0, }
 }
@@ -266,6 +286,11 @@ pub(all) suberror UntypedError {
 } derive(Debug)
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend UntypedError with @debug.Debug::{to_repr}
+
+///|
 /// Creates a new `InvalidLen` [`UntypedError`].
 pub fn UntypedError::invalid_len() -> UntypedError {
   InvalidLen
@@ -277,3 +302,6 @@ pub impl Show for UntypedError with fn output(self, logger) {
     InvalidLen => logger.write_string("mismatched length of the untyped slice")
   }
 }
+
+///|
+pub extend UntypedError with Show::{to_string, output}

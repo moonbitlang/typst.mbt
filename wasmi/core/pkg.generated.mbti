@@ -941,6 +941,7 @@ pub(all) suberror FuncTypeError {
   TooManyFunctionParams
   TooManyFunctionResults
 } derive(@debug.Debug)
+pub fn FuncTypeError::output(Self, &Logger) -> Unit
 pub fn FuncTypeError::to_string(Self) -> String
 pub impl Show for FuncTypeError
 
@@ -962,6 +963,7 @@ pub(all) suberror LimiterError {
 } derive(@debug.Debug)
 pub fn LimiterError::from_memory_error(MemoryError) -> Self
 pub fn LimiterError::from_table_error(TableError) -> Self
+pub fn LimiterError::output(Self, &Logger) -> Unit
 pub fn LimiterError::to_string(Self) -> String
 pub impl Show for LimiterError
 
@@ -1015,6 +1017,7 @@ pub(all) suberror TrapCode {
   OutOfFuel
   GrowthOperationLimited
 } derive(Eq, Hash, @debug.Debug)
+pub fn TrapCode::output(Self, &Logger) -> Unit
 pub fn TrapCode::to_string(Self) -> String
 pub fn TrapCode::to_u8(Self) -> Byte
 pub fn TrapCode::trap_message(Self) -> String
@@ -1025,6 +1028,7 @@ pub(all) suberror UntypedError {
   InvalidLen
 } derive(@debug.Debug)
 pub fn UntypedError::invalid_len() -> Self
+pub fn UntypedError::output(Self, &Logger) -> Unit
 pub fn UntypedError::to_string(Self) -> String
 pub impl Show for UntypedError
 
@@ -1049,6 +1053,7 @@ pub fn ElementSegmentRef::ty(Self) -> ValType
 pub struct F32(UInt)
 pub fn F32::from_bits(UInt) -> Self
 pub fn F32::from_float(Float) -> Self
+pub fn F32::output(Self, &Logger) -> Unit
 pub fn F32::partial_cmp(Self, Self) -> Int?
 pub fn F32::to_bits(Self) -> UInt
 pub fn F32::to_float(Self) -> Float
@@ -1060,6 +1065,7 @@ pub impl @debug.Debug for F32
 pub struct F64(UInt64)
 pub fn F64::from_bits(UInt64) -> Self
 pub fn F64::from_float(Double) -> Self
+pub fn F64::output(Self, &Logger) -> Unit
 pub fn F64::partial_cmp(Self, Self) -> Int?
 pub fn F64::to_bits(Self) -> UInt64
 pub fn F64::to_float(Self) -> Double
@@ -1103,6 +1109,7 @@ pub struct FuncType {
 pub fn FuncType::len_params(Self) -> Int
 pub fn FuncType::len_results(Self) -> Int
 pub fn FuncType::new(ArrayView[ValType], ArrayView[ValType]) -> Self raise FuncTypeError
+pub fn FuncType::output(Self, &Logger) -> Unit
 pub fn FuncType::params(Self) -> ArrayView[ValType]
 pub fn FuncType::params_results(Self) -> (ArrayView[ValType], ArrayView[ValType])
 pub fn FuncType::results(Self) -> ArrayView[ValType]
@@ -1249,6 +1256,7 @@ pub fn Trap::from_trap_code(TrapCode) -> Self
 pub fn Trap::i32_exit(Int) -> Self
 pub fn Trap::i32_exit_status(Self) -> Int?
 pub fn Trap::new(String) -> Self
+pub fn Trap::output(Self, &Logger) -> Unit
 pub fn Trap::to_string(Self) -> String
 pub fn Trap::trap_code(Self) -> TrapCode?
 pub impl Show for Trap
@@ -1347,6 +1355,7 @@ pub(all) enum ValType {
 } derive(Compare, Eq, Hash, @debug.Debug)
 pub fn ValType::is_num(Self) -> Bool
 pub fn ValType::is_ref(Self) -> Bool
+pub fn ValType::output(Self, &Logger) -> Unit
 pub fn ValType::to_string(Self) -> String
 pub impl Show for ValType
 

@@ -155,6 +155,16 @@ pub(all) enum Type {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Type with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Type with @debug.Debug::{to_repr}
+
+///|
 /// Lexicographic comparison of (ASCII) names, like Rust's `str` ordering
 /// (MoonBit's `String::compare` orders by length first).
 fn lex_compare(a : String, b : String) -> Int {

@@ -18,6 +18,21 @@ pub(all) enum Padding {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Padding with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Padding with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Padding with @debug.Debug::{to_repr}
+
+///|
 /// The number of digits present in a subsecond representation.
 pub(all) enum SubsecondDigits {
   /// Exactly one digit.
@@ -44,6 +59,21 @@ pub(all) enum SubsecondDigits {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SubsecondDigits with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SubsecondDigits with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SubsecondDigits with @debug.Debug::{to_repr}
+
+///|
 /// Indicate whether to permit trailing input when parsing.
 pub(all) enum TrailingInput {
   /// Trailing input is not permitted and will cause an error.
@@ -51,6 +81,21 @@ pub(all) enum TrailingInput {
   /// Trailing input is permitted but discarded.
   Discard
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TrailingInput with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TrailingInput with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TrailingInput with @debug.Debug::{to_repr}
 
 ///|
 /// A component of a larger format description.
@@ -143,6 +188,21 @@ pub(all) enum Component {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Component with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Component with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Component with @debug.Debug::{to_repr}
+
+///|
 /// A complete description of how to format and parse a type.
 ///
 /// This unifies `BorrowedFormatItem` and `OwnedFormatItem`.
@@ -162,3 +222,18 @@ pub(all) enum FormatItem {
   /// An empty slice is a no-op when formatting or parsing.
   First(Array[FormatItem])
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FormatItem with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FormatItem with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FormatItem with @debug.Debug::{to_repr}

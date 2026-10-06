@@ -2,6 +2,7 @@ import {
   "moonbitlang/typst/wasmparser",
   "moonbitlang/typst/wasmi/core" @wasmi_core,
   "moonbitlang/typst/wasmi/ir",
+  "moonbitlang/core/debug",
 }
 
 import {

@@ -24,6 +24,11 @@ pub(all) suberror MemoryError {
 } derive(Debug)
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MemoryError with @debug.Debug::{to_repr}
+
+///|
 /// Rust's `Display` of [MemoryError].
 pub impl Show for MemoryError with fn output(self, logger) {
   let message = match self {

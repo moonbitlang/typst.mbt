@@ -17,6 +17,16 @@ pub(all) struct OperatorInfo {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend OperatorInfo with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend OperatorInfo with @debug.Debug::{to_repr}
+
+///|
 /// The form an operator can have.
 pub(all) enum Form {
   Infix
@@ -25,8 +35,28 @@ pub(all) enum Form {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Form with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Form with @debug.Debug::{to_repr}
+
+///|
 /// Set of properties an operator can have.
 pub(all) struct Properties(Int) derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Properties with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Properties with @debug.Debug::{to_repr}
 
 ///|
 pub let properties_stretchy : Properties = Properties(1 << 0)

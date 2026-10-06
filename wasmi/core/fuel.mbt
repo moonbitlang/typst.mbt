@@ -97,6 +97,11 @@ pub impl Show for FuelCostsProvider with fn output(self, logger) {
 }
 
 ///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FuelCostsProvider with Show::{to_string, output}
+
+///|
 /// Applies `f` to either `self.custom` or [`DefaultFuelCosts`] if `self.custom` is `None`.
 fn FuelCostsProvider::apply(
   self : FuelCostsProvider,
@@ -207,6 +212,11 @@ pub(all) suberror FuelError {
   /// Raised when trying to consume more fuel than is available.
   OutOfFuel(required_fuel~ : UInt64)
 } derive(Debug)
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FuelError with @debug.Debug::{to_repr}
 
 ///|
 pub impl Show for FuelError with fn output(self, logger) {

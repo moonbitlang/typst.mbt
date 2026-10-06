@@ -21,7 +21,8 @@ names its methods (the compiler reports the ones that lack it as
 
 This script inserts the declarations that are missing. It works in a
 throwaway copy of the checkout to find them (the checkout is only changed by
-the insertion itself):
+the insertion itself, which also puts the declarations after a `derive(..)`
+in the order of its list):
 
     scripts/promotions.py [--only=pkg,pkg] [--dry] [--jobs N]
 
@@ -84,6 +85,82 @@ BUILTIN_TRAITS = {
 }
 
 
+# The methods of the core traits (the port's traits are read from the source).
+CORE_METHODS = {
+    "Eq": ["not_equal", "equal"],
+    "Hash": ["hash", "hash_combine"],
+    "Compare": ["op_lt", "op_le", "op_ge", "compare", "op_gt"],
+    "Show": ["to_string", "output"],
+    "Default": ["default"],
+    "Debug": ["to_repr"],
+    "Add": ["add"],
+    "Sub": ["sub"],
+    "Mul": ["mul"],
+    "Div": ["div"],
+    "Neg": ["neg"],
+    "BitOr": ["lor"],
+}
+
+_sources = {}
+
+
+def package_source(pkg):
+    """The text of the package's files, by file name."""
+    if pkg not in _sources:
+        out = {}
+        d = os.path.join(ROOT, pkg)
+        for f in sorted(os.listdir(d)) if os.path.isdir(d) else []:
+            if f.endswith(".mbt") and not f.startswith("zz_promotion_probe"):
+                out[f] = open(os.path.join(d, f), encoding="utf-8").read()
+        _sources[pkg] = out
+    return _sources[pkg]
+
+
+def trait_methods(it):
+    """All method names of the impl's trait, or None where they are unknown."""
+    full = it.get("full_trait", it["trait"])
+    name = full.split(".")[-1]
+    if is_core_trait(it):
+        return CORE_METHODS.get(name)
+    pkg = os.path.dirname(it["path"])
+    m = re.match(r"@([\w/]+)\.", full)
+    if m:
+        parts = m.group(1).split("/")
+        while parts and not os.path.isdir(os.path.join(ROOT, *parts)):
+            parts.pop(0)
+        pkg = "/".join(parts)
+    for text in package_source(pkg).values():
+        m = re.search(r"^(?:pub(?:\(\w+\))? |priv )?trait %s\b[^{]*\{\n(.*?)^\}" % re.escape(name), text, re.M | re.S)
+        if m:
+            return re.findall(r"^  (?:async )?(?:fn )?(\w+)(?:\[[^\]]*\])?\(", m.group(1), re.M)
+    return None
+
+
+def absent_names(it, suggested):
+    """The methods of the impl that the compiler does not ask for: something
+    else already makes the name a method of the type. Returns (`left_out`
+    entries for names that the `extend` of another trait has, names of regular
+    methods, names that an older `extend` of the same trait has)."""
+    left_out, regular, partial = [], [], []
+    pkg = os.path.dirname(it["path"])
+    short = it["trait"].split(".")[-1]
+    for m in trait_methods(it) or []:
+        if m in suggested:
+            continue
+        other = None
+        for text in package_source(pkg).values():
+            for x in re.finditer(r"^pub extend %s with ([@\w./]+)::\{([^}]*)\}" % re.escape(it["ty"]), text, re.M):
+                if m in [n.strip() for n in x.group(2).split(",")]:
+                    other = x.group(1).split(".")[-1]
+        if other == short:
+            partial.append(m)
+        elif other:
+            left_out.append((m, other))
+        else:
+            regular.append(m)
+    return left_out, regular, partial
+
+
 def is_core_trait(it):
     full = it.get("full_trait", it["trait"])
     return full.startswith(("@builtin.", "@moonbitlang/core/")) or full in BUILTIN_TRAITS
@@ -92,6 +169,14 @@ def is_core_trait(it):
 def message(trait):
     short = trait.split(".")[-1]
     return "call as `%s::m(x)`, or un-deprecate this `extend` to make it a method" % short
+
+
+def deprecated_extend(ty, trait, methods):
+    """The declaration, as a block of MoonBit source, of an impl whose methods
+    are not methods of the type (for generators that emit public impls or
+    derives; `trait` as the generated file names it, e.g. `@debug.Debug`)."""
+    return '///|\n#deprecated("%s")\n#doc(hidden)\npub extend %s with %s::{%s}\n' % (
+        message(trait), ty, trait, ", ".join(methods))
 
 
 def copy_checkout(dst):
@@ -207,7 +292,7 @@ def find_impls(copy, jobs):
         pkg = os.path.dirname(it["path"])
         for m in it["methods"]:
             sharers[(pkg, it["ty"], m)].append(it)
-        it["left_out"] = []
+        it["left_out"], it["clash"], it["partial"] = absent_names(it, it["methods"])
 
     def rank(it, m):
         pkg = os.path.dirname(it["path"])
@@ -323,6 +408,10 @@ def declaration(it):
             m, trait.split(".")[-1]))
     for m in it.get("clash", []):
         lines.append("// `%s` is not named here: the type already has a method of this name." % m)
+    if it.get("partial"):
+        # One declaration per trait: merge the two by hand.
+        print("NOTE %s:%d: an older `extend` of `%s` for `%s` names %s" % (
+            it["path"], it["line"], it["trait"], it["ty"], ", ".join(it["partial"])))
     if not it["calls"]:
         lines.append('#deprecated("%s")' % message(it["trait"]))
         lines.append("#doc(hidden)")
