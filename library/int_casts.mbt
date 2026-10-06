@@ -1,4 +1,6 @@
 // Integer newtypes with upstream's cast semantics (int.rs `cast!`s).
+// Handwritten: it was added as `int_casts_gen.mbt` in 1d0b96a, but no
+// generator for it has ever been in the repository.
 
 ///|
 /// Upstream `u8` (as a castable value).
