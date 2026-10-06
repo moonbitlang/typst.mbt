@@ -34,36 +34,44 @@ const LINT_TOLERANCE : Double = 1.0
 
 ///|
 /// The box of the outline of every glyph of a font that was asked for.
+/// (Arrays by glyph id, and no value per glyph: every glyph of a document
+/// is looked at.)
 priv struct FontInk {
   font : @library.FontInstance
-  /// Per glyph id the box of its outline in em, x to the right and y down
-  /// from the pen; `None` for a glyph without an outline (a space, and a
-  /// glyph that is a bitmap or an SVG document only).
-  boxes : Map[Int, @kurbo.Rect?]
+  /// Per glyph id: 0 if it was not asked for yet, 1 if it has no outline
+  /// (a space, and a glyph that is a bitmap or an SVG document only), 2
+  /// if its box is in `boxes`.
+  known : Array[Int]
+  /// Per glyph id four numbers: the left, top, right and bottom of the box
+  /// of its outline in em, x to the right and y down from the pen.
+  boxes : Array[Double]
 }
 
 ///|
-fn FontInk::glyph(self : FontInk, id : UInt16) -> @kurbo.Rect? {
-  let key = id.to_int()
-  match self.boxes.get(key) {
-    Some(box) => box
-    Option::None => {
-      let box = match self.font.glyph_bounding_box(id) {
-        Some(rect) if rect.x_min < rect.x_max && rect.y_min < rect.y_max => {
-          let upem = self.font.units_per_em()
-          Some(
-            @kurbo.Rect::new(
-              rect.x_min.to_double() / upem,
-              -rect.y_max.to_double() / upem,
-              rect.x_max.to_double() / upem,
-              -rect.y_min.to_double() / upem,
-            ),
-          )
-        }
-        _ => Option::None
-      }
-      self.boxes[key] = box
-      box
+/// Whether the glyph `id` has an outline: its box is then at `4 * id` of
+/// `boxes`.
+fn FontInk::has(self : FontInk, id : Int) -> Bool {
+  while self.known.length() <= id {
+    self.known.push(0)
+    for _ in 0..<4 {
+      self.boxes.push(0.0)
+    }
+  }
+  let known = self.known[id]
+  guard known == 0 else { return known == 2 }
+  match self.font.glyph_bounding_box(id.to_uint16()) {
+    Some(rect) if rect.x_min < rect.x_max && rect.y_min < rect.y_max => {
+      let upem = self.font.units_per_em()
+      self.boxes[4 * id] = rect.x_min.to_double() / upem
+      self.boxes[4 * id + 1] = -rect.y_max.to_double() / upem
+      self.boxes[4 * id + 2] = rect.x_max.to_double() / upem
+      self.boxes[4 * id + 3] = -rect.y_min.to_double() / upem
+      self.known[id] = 2
+      true
+    }
+    _ => {
+      self.known[id] = 1
+      false
     }
   }
 }
@@ -304,6 +312,9 @@ priv struct Leaving {
 priv struct Held {
   /// From the coordinates of the page to those of the frame.
   to_local : @kurbo.Affine
+  /// From the coordinates of the frame that is walked (`FrameLinter::
+  /// frame`) to those of this frame.
+  mut from_walked : @kurbo.Affine
   box : @kurbo.Rect
   /// The containers that had this size, and for each whether its width
   /// and its height were given, and whether the frame holds something
@@ -400,12 +411,14 @@ fn FrameLinter::ink(
   self : FrameLinter,
   font : @library.FontInstance,
 ) -> FontInk {
+  // (Every text item has a font instance of its own: the same font is an
+  // equal one.)
   for ink in self.fonts {
-    if physical_equal(ink.font, font) {
+    if physical_equal(ink.font, font) || ink.font == font {
       return ink
     }
   }
-  let ink : FontInk = { font, boxes: Map([]), }
+  let ink : FontInk = { font, known: [], boxes: [], }
   self.fonts.push(ink)
   ink
 }
@@ -532,30 +545,72 @@ fn FrameLinter::drawn(
 }
 
 ///|
-/// Whether a box of a frame with the transform `mat` is inside the page
-/// and inside every frame that may be a container: nothing in it can be
-/// found.
+/// Whether the box `x0..x1`, `y0..y1` is inside `box` after the transform
+/// `ts`, but for the tolerance. (Nothing is allocated: this is asked for
+/// every item of a document.)
+fn inside_after(
+  ts : @kurbo.Affine,
+  x0 : Double,
+  y0 : Double,
+  x1 : Double,
+  y1 : Double,
+  box : @kurbo.Rect,
+) -> Bool {
+  let c = ts.0
+  // The least and the greatest of the four corners, per axis.
+  let ax0 = c[0] * x0
+  let ax1 = c[0] * x1
+  let ay0 = c[2] * y0
+  let ay1 = c[2] * y1
+  let left = (if ax0 < ax1 { ax0 } else { ax1 }) +
+    (if ay0 < ay1 { ay0 } else { ay1 }) +
+    c[4]
+  let right = (if ax0 > ax1 { ax0 } else { ax1 }) +
+    (if ay0 > ay1 { ay0 } else { ay1 }) +
+    c[4]
+  let bx0 = c[1] * x0
+  let bx1 = c[1] * x1
+  let by0 = c[3] * y0
+  let by1 = c[3] * y1
+  let top = (if bx0 < bx1 { bx0 } else { bx1 }) +
+    (if by0 < by1 { by0 } else { by1 }) +
+    c[5]
+  let bottom = (if bx0 > bx1 { bx0 } else { bx1 }) +
+    (if by0 > by1 { by0 } else { by1 }) +
+    c[5]
+  box.x0 - left <= LINT_TOLERANCE &&
+  box.y0 - top <= LINT_TOLERANCE &&
+  right - box.x1 <= LINT_TOLERANCE &&
+  bottom - box.y1 <= LINT_TOLERANCE
+}
+
+///|
+/// Whether the box `x0..x1`, `y0..y1` of the frame that is walked, which
+/// has the transform `mat`, is inside the page and inside every frame
+/// that may be a container: nothing in it can be found.
 fn FrameLinter::within(
   self : FrameLinter,
   mat : @kurbo.Affine,
-  rect : @kurbo.Rect,
+  x0 : Double,
+  y0 : Double,
+  x1 : Double,
+  y1 : Double,
 ) -> Bool {
-  guard leaves(mat.transform_rect_bbox(rect), self.page_box, true, true).0 <=
-    LINT_TOLERANCE else {
-    return false
-  }
+  guard inside_after(mat, x0, y0, x1, y1, self.page_box) else { return false }
   for held in self.held {
-    guard leaves(
-        (held.to_local * mat).transform_rect_bbox(rect),
-        held.box,
-        true,
-        true,
-      ).0 <=
-      LINT_TOLERANCE else {
+    guard inside_after(held.from_walked, x0, y0, x1, y1, held.box) else {
       return false
     }
   }
   true
+}
+
+///|
+/// The frame with the transform `mat` is walked from here on.
+fn FrameLinter::walking(self : FrameLinter, mat : @kurbo.Affine) -> Unit {
+  for held in self.held {
+    held.from_walked = held.to_local * mat
+  }
 }
 
 ///|
@@ -825,7 +880,6 @@ fn FrameLinter::text(
   y : Double,
   mat : @kurbo.Affine,
 ) -> Unit {
-  self.missing(text)
   self.item += 1
   if self.unconfirmed > 0 {
     let mut last : @syntax.Span? = Option::None
@@ -843,68 +897,82 @@ fn FrameLinter::text(
     Some(stroke) => stroke.thickness.to_pt() / 2.0
     Option::None => 0.0
   }
-  let box_of = (glyph : @library.Glyph, pen : Double) => {
-    match ink.glyph(glyph.id) {
-      Some(box) => {
-        let gx = pen + glyph.x_offset.get() * size
-        let gy = y - glyph.y_offset.get() * size
-        Some(
-          @kurbo.Rect::new(
-            gx + box.x0 * size - pad,
-            gy + box.y0 * size - pad,
-            gx + box.x1 * size + pad,
-            gy + box.y1 * size + pad,
-          ),
-        )
-      }
-      Option::None => Option::None
-    }
-  }
   // All glyphs at once: nearly every item is inside.
   let mut pen = x
-  let mut all : @kurbo.Rect? = Option::None
+  let mut missing = false
+  let mut x0 = 1.0e300
+  let mut y0 = 1.0e300
+  let mut x1 = -1.0e300
+  let mut y1 = -1.0e300
   for glyph in text.glyphs {
-    if box_of(glyph, pen) is Some(box) {
-      all = match all {
-        Some(sum) => Some(sum.union(box))
-        Option::None => Some(box)
+    let id = glyph.id.to_int()
+    if id == 0 {
+      missing = true
+    }
+    if ink.has(id) {
+      let gx = pen + glyph.x_offset.get() * size
+      let gy = y - glyph.y_offset.get() * size
+      let left = gx + ink.boxes[4 * id] * size
+      let top = gy + ink.boxes[4 * id + 1] * size
+      let right = gx + ink.boxes[4 * id + 2] * size
+      let bottom = gy + ink.boxes[4 * id + 3] * size
+      if left < x0 {
+        x0 = left
+      }
+      if top < y0 {
+        y0 = top
+      }
+      if right > x1 {
+        x1 = right
+      }
+      if bottom > y1 {
+        y1 = bottom
       }
     }
     pen += glyph.x_advance.get() * size
   }
-  guard all is Some(all) && !self.within(mat, all) else { return }
+  if missing {
+    self.missing(text)
+  }
+  guard x0 <= x1 && !self.within(mat, x0 - pad, y0 - pad, x1 + pad, y1 + pad) else {
+    return
+  }
   // Glyph by glyph: each has its own span.
   let chars = ItemText::new(text.text)
   let cap = text.font.metrics().cap_height.get() * size
   pen = x
   for glyph in text.glyphs {
     let advance = glyph.x_advance.get() * size
-    if box_of(glyph, pen) is Some(box) && !self.within(mat, box) {
-      let (from, to) = glyph.range()
-      let hang = match chars.range(from, to) {
-        Some([c]) => hang_of(c) * advance.abs()
-        _ => 0.0
-      }
-      // Between the cap height and the baseline of the glyph.
-      let base = y - glyph.y_offset.get() * size
-      let between = (v : Double) => {
-        if v < base - cap {
-          base - cap
-        } else if v > base {
-          base
-        } else {
-          v
-        }
-      }
-      let set = @kurbo.Rect::new(
-        box.x0,
-        between(box.y0),
-        box.x1,
-        between(box.y1),
-      )
-      self.drawing("text", glyph.span, EGlyph(box, set, hang), mat, false)
-    }
+    let id = glyph.id.to_int()
+    let gx = pen + glyph.x_offset.get() * size
+    // The baseline of the glyph.
+    let base = y - glyph.y_offset.get() * size
     pen += advance
+    guard ink.has(id) else { continue }
+    let box = @kurbo.Rect::new(
+      gx + ink.boxes[4 * id] * size - pad,
+      base + ink.boxes[4 * id + 1] * size - pad,
+      gx + ink.boxes[4 * id + 2] * size + pad,
+      base + ink.boxes[4 * id + 3] * size + pad,
+    )
+    guard !self.within(mat, box.x0, box.y0, box.x1, box.y1) else { continue }
+    let (from, to) = glyph.range()
+    let hang = match chars.range(from, to) {
+      Some([c]) => hang_of(c) * advance.abs()
+      _ => 0.0
+    }
+    // Between the cap height and the baseline.
+    let between = (v : Double) => {
+      if v < base - cap {
+        base - cap
+      } else if v > base {
+        base
+      } else {
+        v
+      }
+    }
+    let set = @kurbo.Rect::new(box.x0, between(box.y0), box.x1, between(box.y1))
+    self.drawing("text", glyph.span, EGlyph(box, set, hang), mat, false)
   }
 }
 
@@ -930,7 +998,7 @@ fn FrameLinter::shape(
   self.evidence(span, true)
   // A box around it first: of its points and of what a stroke can reach.
   let (x0, y0, x1, y1) = shape_box(shape, x, y)
-  guard !self.within(mat, @kurbo.Rect::new(x0, y0, x1, y1)) else { return }
+  guard !self.within(mat, x0, y0, x1, y1) else { return }
   let path : Array[@kurbo.PathEl] = match shape.geometry {
     Line(to) =>
       [
@@ -1110,6 +1178,7 @@ fn FrameLinter::group(
     if !containers.is_empty() {
       let frame : Held = {
         to_local: inside.inverse(),
+        from_walked: @kurbo.Affine::identity(),
         box: @kurbo.Rect::new(0.0, 0.0, width, height),
         confirmed: containers.map(_ => false),
         containers,
@@ -1122,6 +1191,8 @@ fn FrameLinter::group(
     }
   }
   self.frame(frame, inside)
+  // (The frame around the group is walked again.)
+  self.walking(mat)
   if held is Some(held) {
     self.held.pop() |> ignore
     self.close(held)
@@ -1168,6 +1239,7 @@ fn FrameLinter::frame(
   frame : @library.Frame,
   mat : @kurbo.Affine,
 ) -> Unit {
+  self.walking(mat)
   for entry in frame.items() {
     let (pos, item) = entry
     let x = pos.x.to_pt()
@@ -1179,8 +1251,10 @@ fn FrameLinter::frame(
       Image(_, size, span) => {
         self.item += 1
         self.evidence(span, false)
-        let box = @kurbo.Rect::new(x, y, x + size.x.to_pt(), y + size.y.to_pt())
-        if !self.within(mat, box) {
+        let right = x + size.x.to_pt()
+        let bottom = y + size.y.to_pt()
+        if !self.within(mat, x, y, right, bottom) {
+          let box = @kurbo.Rect::new(x, y, right, bottom)
           self.drawing("an image", span, ERect(box), mat, false)
         }
       }
