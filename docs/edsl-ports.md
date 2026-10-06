@@ -282,7 +282,8 @@ Whether `Marked` moves into `doc` is decided after the rewritten ports
 
 Checks the EDSL can make that the engine does not, in `report.lints`
 (separate from `warnings`, which stay upstream's diagnostics), each with an
-origin. What each can and cannot promise:
+origin. They run by default; `lints=false` on `compile_*` turns them off.
+What each can and cannot promise:
 
 - L1, adjacent inline items (S1). On the description tree, at author level:
   in the item array of `Document`, `Seq` or a kit container, two neighbours
@@ -400,6 +401,8 @@ package; fonts by `font_paths` fixtures before any embedding decision.
 ## 12. Open questions for the owner
 
 1. Embed a sans-serif family for `doc`, or keep upstream's three families
-   and document `font_paths`?
-2. Lints on by default?
+   and document `font_paths`? (Until answered: `font_paths`, no embedding.)
+2. Lints on by default? Decided by the owner on 2026-10-06: yes
+   (`compile_*(.., lints=false)` turns them off).
 3. The engine side channel that fixed-container overflow (S2) needs: wanted?
+   (Until answered: not built.)
