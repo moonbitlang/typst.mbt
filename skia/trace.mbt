@@ -3,7 +3,7 @@
 
 ///|
 /// When set, every public drawing call on a `Pixmap` is reported.
-pub let trace_hook : Ref[((String) -> Unit)?] = Ref::new(None)
+pub let trace_hook : Ref[((String) -> Unit)?] = Ref(None)
 
 ///|
 fn trace_fnv(data : Bytes) -> UInt64 {
@@ -56,7 +56,7 @@ fn trace_path(p : @path.Path) -> String {
       },
     )
   }
-  let buf = @buffer.new()
+  let buf = Buffer()
   for pt in p.points() {
     buf.write_uint_le(pt.x.reinterpret_as_uint())
     buf.write_uint_le(pt.y.reinterpret_as_uint())

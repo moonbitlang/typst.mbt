@@ -67,7 +67,7 @@ fn render_shape(
         line_cap: to_sk_line_cap(stroke.cap),
         line_join: to_sk_line_join(stroke.join),
         dash,
-        miter_limit: stroke.miter_limit.get().to_float(),
+        miter_limit: Float::from_double(stroke.miter_limit.get()),
       }
       canvas.stroke_path(path, paint, sk_stroke, ts, state.mask)
     }

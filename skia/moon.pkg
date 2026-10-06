@@ -2,7 +2,6 @@ import {
   "moonbitlang/typst/tiny_skia_path" @path,
   "moonbitlang/typst/codecs",
   "moonbitlang/core/math",
-  "moonbitlang/core/buffer",
   "moonbitlang/core/v128",
 }
 
@@ -15,7 +14,7 @@ import {
 // only used by `libm_other.mbt` (the non-native targets; native calls the
 // C library). moon.pkg has no per-target imports.
 
-warnings = "-deprecated-alert_experimental-unused_package"
+warnings = "-alert_experimental-unused_package"
 
 options(
   targets: {

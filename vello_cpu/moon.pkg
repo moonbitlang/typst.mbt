@@ -8,7 +8,7 @@ import {
 // `@v128` is experimental, and unused on wasm-gc/js, which select the
 // `*_scalar.mbt` files (see AGENTS.md: v128 kernels).
 
-warnings = "-deprecated-alert_experimental-unused_package"
+warnings = "-alert_experimental-unused_package"
 
 options(
   targets: {

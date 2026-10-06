@@ -365,14 +365,14 @@ fn convert_gradient_stops(gradient : @library.Gradient) -> Array[@export.Stop] {
           0.05
         }
         let mut t_x = t0.get()
-        let dt = @math.minimum(t1.get() - t0.get(), max_dt)
+        let dt = @cmp.minimum(t1.get() - t0.get(), max_dt)
         // Special casing for sharp gradients.
         if t0 == t1 {
           add_single(c1, t1)
           continue
         }
         while t_x < t1.get() {
-          let t_next = @math.minimum(t_x + dt, t1.get())
+          let t_next = @cmp.minimum(t_x + dt, t1.get())
           // The current progress in the current window.
           let t = (t : Double) => (t - t0.get()) / (t1.get() - t0.get())
           let c_next = @library.Color::mix_iter(

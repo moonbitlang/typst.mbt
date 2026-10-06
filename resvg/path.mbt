@@ -171,7 +171,7 @@ fn convert_base_gradient(
     Reflect => Reflect
     Repeat => Repeat
   }
-  let points = Array::new(capacity=stops.length())
+  let points = Array(capacity=stops.length())
   for stop in stops {
     let alpha = stop.opacity() * opacity
     let color = @skia.Color::from_rgba8(

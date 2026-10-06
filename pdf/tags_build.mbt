@@ -251,7 +251,7 @@ fn push_logical_child(tree : TreeBuilder, parent : @library.FrameParent) -> Int 
       No => tree.current()
     },
     @syntax.Span::detached(),
-    LogicalChild(parent.inherit_, Ref::new(group_id_invalid)),
+    LogicalChild(parent.inherit_, Ref(group_id_invalid)),
   )
   match tree.logical_children.get(parent.location) {
     Some(children) => children.push(id)
@@ -339,7 +339,7 @@ fn progress_tree_start(tree : TreeBuilder, elem : @library.Content) -> Int {
       ListItemLabel => push_group(tree, elem, ListItemLabel)
       ListItemBody => push_group(tree, elem, ListItemBody)
       TermsItemLabel => push_group(tree, elem, TermsItemLabel)
-      TermsItemBody => push_group(tree, elem, TermsItemBody(Ref::new(None)))
+      TermsItemBody => push_group(tree, elem, TermsItemBody(Ref(None)))
       Label => push_tag(tree, elem, new_tag(Lbl))
     }
   } else if @library.LinkMarker::of(elem) is Some(link) {

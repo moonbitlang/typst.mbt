@@ -231,7 +231,7 @@ fn RasterPipelineBlitter::mask_ctx(self : RasterPipelineBlitter) -> MaskCtx {
 ///|
 impl Blitter for RasterPipelineBlitter with fn blit_h(self, x, y, width) {
   let r = ScreenIntRect::from_xywh_safe(x, y, width, 1)
-  self.blit_rect(r)
+  Blitter::blit_rect(self, r)
 }
 
 ///|
@@ -253,7 +253,7 @@ impl Blitter for RasterPipelineBlitter with fn blit_anti_h(
     let width = run
     match aa[aa_offset] {
       0 => () // ALPHA_U8_TRANSPARENT
-      255 => self.blit_h(x, y, width) // ALPHA_U8_OPAQUE
+      255 => Blitter::blit_h(self, x, y, width) // ALPHA_U8_OPAQUE
       alpha => {
         self.blit_anti_h_rp.ctx.current_coverage = Float::from_int(alpha) *
           ((1.0 : Float) / 255.0)
@@ -282,7 +282,7 @@ impl Blitter for RasterPipelineBlitter with fn blit_v(self, x, y, height, alpha)
     bounds,
     row_bytes: 0, // so we reuse the 1 "row" for all of height
   }
-  self.blit_mask(mask, bounds)
+  Blitter::blit_mask(self, mask, bounds)
 }
 
 ///|
@@ -300,7 +300,7 @@ impl Blitter for RasterPipelineBlitter with fn blit_anti_h2(
     1,
   ).unwrap()
   let mask : BlitMask = { image: [alpha0, alpha1], bounds, row_bytes: 2, }
-  self.blit_mask(mask, bounds)
+  Blitter::blit_mask(self, mask, bounds)
 }
 
 ///|
@@ -318,7 +318,7 @@ impl Blitter for RasterPipelineBlitter with fn blit_anti_v2(
     2,
   ).unwrap()
   let mask : BlitMask = { image: [alpha0, alpha1], bounds, row_bytes: 1, }
-  self.blit_mask(mask, bounds)
+  Blitter::blit_mask(self, mask, bounds)
 }
 
 ///|

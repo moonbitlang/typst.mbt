@@ -126,7 +126,10 @@ fn handle_link(
 fn resolve_cross_link(gc : GlobalContext, loc : @library.Location) -> String? {
   guard gc.link_resolver is Some(resolver) else { return None }
   match resolver.resolve(loc) {
-    Some(Cross(..) as kind) => (try? kind.into_relative_uri()).to_option()
+    Some(Cross(..) as kind) =>
+      Some(kind.into_relative_uri()) catch {
+        _ => None
+      }
     _ => None
   }
 }
@@ -151,10 +154,10 @@ fn bounding_box(
   let mut max_y = -inf
   for point in points {
     let p = to_export_point(point.transform(fc.state().transform))
-    min_x = @math.minimum(min_x, p.x)
-    min_y = @math.minimum(min_y, p.y)
-    max_x = @math.maximum(max_x, p.x)
-    max_y = @math.maximum(max_y, p.y)
+    min_x = @cmp.minimum(min_x, p.x)
+    min_y = @cmp.minimum(min_y, p.y)
+    max_x = @cmp.maximum(max_x, p.x)
+    max_y = @cmp.maximum(max_y, p.y)
   }
   { left: min_x, top: min_y, right: max_x, bottom: max_y, }
 }

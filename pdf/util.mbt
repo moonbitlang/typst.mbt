@@ -129,7 +129,9 @@ fn page_label_generate(
   // spec, we use the given prefix and an offset. Otherwise, everything goes
   // into prefix.
   let prefix = if style is None {
-    (try? pat.apply(None, [number.reinterpret_as_int64()])).to_option()
+    Some(pat.apply(None, [number.reinterpret_as_int64()])) catch {
+      _ => None
+    }
   } else if prefix.is_empty() {
     None
   } else {
