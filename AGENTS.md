@@ -330,10 +330,17 @@
   always false on native); flatten tuple fields of per-glyph structs; loop
   instead of `iter().any/map/collect` and closure-based iterators (e.g. walk
   `StyleChain` links directly); `match` instead of `unwrap_or(<allocating
-  default>)`; build constant style defaults once (`Value::shared`). Count
-  allocations per MoonBit source line by compiling the generated
-  `cli.c` with `moonbit_malloc`/`moonbit_make_*` wrapped by a counting macro
-  (`#line` directives map call sites back to `.mbt` lines).
+  default>)`; build constant style defaults once (`Value::shared`);
+  `opt == Some(x)` allocates the `Some` for a value type such as a span
+  (`match`, `Vm::inspects`); what upstream gets for free on the path that
+  succeeds is built where the error or the check happens: a message made
+  by interpolation (upstream: `format_args!`), a binding guard (a struct
+  and a closure here, a tuple upstream: ask `Binding::is_guarded` first, as
+  `eval_ident` does), the closure of `at`/`trace` (catch inline). Count
+  allocations per MoonBit source line with `scripts/alloc_sites.py`: it
+  rewrites the generated `cli.c` so that every call of `moonbit_malloc`/
+  `moonbit_make_*` (and of `to_owned`) counts itself (`#line` directives
+  map call sites back to `.mbt` lines) and reports or compares the counts.
 - v128 kernels (`moonbitlang/core/v128`, experimental: `warnings =
   "-alert_experimental"` in the package's `moon.pkg`): real SIMD on native
   (NEON on aarch64, SSE2 on x86, via `moonbit_simd.h`) and wasm (SIMD128),

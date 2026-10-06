@@ -51,7 +51,7 @@ fn access_ident(
 ) -> Place raise @library.SourceError {
   let span = ident.span()
   let name = ident.get()
-  if vm.inspected == Some(span) {
+  if vm.inspects(span) {
     let guard_ = @library.BindingGuard::silent(vm.engine.library.features)
     try vm.scopes.get(name, guard_) catch {
       _ => ()

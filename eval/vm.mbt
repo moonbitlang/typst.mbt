@@ -53,7 +53,7 @@ pub fn Vm::bind(
   // `if let Ok(value) = binding.read(silent guard) { self.trace_at(..) }`:
   // the silent read has no effect, so it is only made for the inspected
   // span (the guard is an allocation here).
-  if self.inspected == Some(ident.span()) {
+  if self.inspects(ident.span()) {
     let guard_ = @library.BindingGuard::silent(self.engine.library.features)
     try binding.read(guard_, "") catch {
       _ => ()
@@ -81,8 +81,18 @@ pub fn Vm::trace_at(
   span : @syntax.Span,
   value : @library.Value,
 ) -> Unit {
-  if self.inspected == Some(span) {
+  if self.inspects(span) {
     self.trace(value)
+  }
+}
+
+///|
+/// `self.inspected == Some(span)`, which every evaluated expression asks,
+/// without the `Some` (an allocation for a span here).
+fn Vm::inspects(self : Vm, span : @syntax.Span) -> Bool {
+  match self.inspected {
+    Some(inspected) => inspected == span
+    None => false
   }
 }
 
