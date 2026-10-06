@@ -20,10 +20,11 @@ fn pow10(e : Int) -> Double {
 }
 
 ///|
-/// `n × 10^e`. For an integer `n` below `2^53` and `|e| <= 22` this is one
-/// multiplication or one division of exact doubles, hence the double
-/// nearest to the decimal number: `scale10(3.0, -1)` is the double `0.3`,
-/// which `0.1 + 0.1 + 0.1` and `3.0 * 0.1` are not.
+/// `n × 10^e`. For an `n` that is exact (an integer, or a multiple of one
+/// half, below `2^52`) and `|e| <= 22` this is one multiplication or one
+/// division of exact doubles, hence the double nearest to the decimal
+/// number: `scale10(3.0, -1)` is the double `0.3`, which `0.1 + 0.1 + 0.1`
+/// and `3.0 * 0.1` are not.
 fn scale10(n : Double, e : Int) -> Double {
   if e >= 0 {
     n * pow10(e)
@@ -35,15 +36,16 @@ fn scale10(n : Double, e : Int) -> Double {
 }
 
 ///|
-/// The mantissas of the steps: 1, 2, 2.5 (as 25 with an exponent one
-/// lower) and 5, each with the difference of its exponent to that of 1.
-let step_mantissas : ReadOnlyArray[(Double, Int)] = [
-  (1.0, 0),
-  (2.0, 0),
-  (25.0, -1),
-  (5.0, 0),
-  (1.0, 1),
-]
+/// The mantissas of the steps, and 10 for the next power of ten. `k × 2.5`
+/// is exact for every integer `k` below `2^51`.
+let step_mantissas : ReadOnlyArray[Double] = [1.0, 2.0, 2.5, 5.0, 10.0]
+
+///|
+/// The next double above `x`, for `x != 0`.
+fn next_up(x : Double) -> Double {
+  let bits = x.reinterpret_as_uint64()
+  (if x > 0.0 { bits + 1UL } else { bits - 1UL }).reinterpret_as_double()
+}
 
 ///|
 /// `x`, but zero for negative zero (which `to_string` would print as "-0").
@@ -78,12 +80,16 @@ const MAX_TICK_COUNT : Int = 1000
 ///   negative zero.
 /// - Each tick is `k × step` computed from the integer `k`, not by adding
 ///   the step repeatedly. In the exact range, which is steps between
-///   `1e-22` and `1e22` and bounds less than about `1e15` steps from zero,
-///   it is the double nearest to the decimal number, so `fixed` and
-///   `to_string` print it without digits of rounding error (`0.3`, not
-///   `0.30000000000000004`). Outside of that range a tick is within a few
-///   units in the last place of its multiple, and a bound that is meant as
-///   a multiple can be missed.
+///   `1e-22` and `1e22` and bounds less than `1e15` steps from zero, it is
+///   the double nearest to the decimal number: the double `0.3`, which
+///   `to_string` prints as "0.3", and not the sum `0.30000000000000004`.
+///   (It is still a double: `fixed(0.3, 20)` shows the digits of its exact
+///   value.)
+/// - Outside of the exact range a tick is only within a few units in the
+///   last place of a multiple, so a bound that is meant as a multiple can
+///   be missed; and where the doubles are farther apart than the step (a
+///   range more than `9e15` steps from zero) only some of the multiples are
+///   ticks, at most one for each double.
 /// - "At least `(hi - lo) / count`" is taken with a relative tolerance of
 ///   `1e-9`, so that bounds such as 0.3 and 0.9, whose difference as
 ///   doubles is slightly more than 0.6, still get the step 0.2 for three
@@ -128,42 +134,42 @@ pub fn ticks(lo : Double, hi : Double, count : Int) -> Array[Double] {
     e -= 1
   }
   let mut mantissa = 1.0
-  let mut exponent = e
   for candidate in step_mantissas[:] {
-    mantissa = candidate.0
-    exponent = e + candidate.1
-    if scale10(mantissa, exponent) >= target {
+    mantissa = candidate
+    if scale10(mantissa, e) >= target {
       break
     }
   }
-  let step = scale10(mantissa, exponent)
+  let step = scale10(mantissa, e)
   if step.is_inf() || step.is_nan() || step <= 0.0 {
     return []
   }
   // The first multiple at or above `lo`. The quotient is rounded, so it can
   // be off by one in either direction.
   let mut k = (lo / step).ceil()
-  if scale10((k - 1.0) * mantissa, exponent) >= lo {
+  if scale10((k - 1.0) * mantissa, e) >= lo {
     k = k - 1.0
-  } else if scale10(k * mantissa, exponent) < lo {
+  } else if scale10(k * mantissa, e) < lo {
     k = k + 1.0
   }
   let out : Array[Double] = []
   let mut last = lo
   // One more round than there can be ticks; the loop ends earlier at `hi`.
   for _ in 0..<(count + 2) {
-    let tick = scale10(k * mantissa, exponent)
+    let tick = scale10(k * mantissa, e)
     // Also ends the loop if the tick is not a number.
     if !(tick <= hi) || out.length() > count {
       break
     }
-    // Where neighbouring doubles are farther apart than the step, multiples
-    // coincide: only ascending ones are ticks.
+    // Outside of the exact range multiples can coincide as doubles: only
+    // ascending ones are ticks.
     if tick >= lo && (out.length() == 0 || tick > last) {
       out.push(positive_zero(tick))
       last = tick
     }
-    k = k + 1.0
+    // From 2^53 on not every integer is a double: the next one that is.
+    let next = k + 1.0
+    k = if next > k { next } else { next_up(k) }
   }
   out
 }

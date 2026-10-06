@@ -44,6 +44,17 @@ test "ticks: the doubles nearest to the multiples" {
   assert_eq(@format.ticks(0.0, 0.075, 3), [0.0, 0.025, 0.05, 0.075])
   assert_eq(@format.ticks(1.0e-7, 4.0e-7, 3), [1.0e-7, 2.0e-7, 3.0e-7, 4.0e-7])
   assert_eq(@format.ticks(1.0e15, 4.0e15, 3), [1.0e15, 2.0e15, 3.0e15, 4.0e15])
+  // The ends of the exact range: a step of 0.25 at 4e14 steps from zero,
+  // and a step of 2.5e-22.
+  let far = @format.ticks(100000000000000.0, 100000000000001.0, 4)
+  assert_eq(far.length(), 5)
+  for i, t in far {
+    assert_eq(t - 100000000000000.0, 0.25 * i.to_double())
+  }
+  assert_eq(@format.ticks(0.0, 1.0e-21, 4), [
+    0.0, 2.5e-22, 5.0e-22, 7.5e-22, 1.0e-21,
+  ])
+  assert_eq(@format.ticks(0.0, 1.0e23, 4), [0.0, 2.5e22, 5.0e22, 7.5e22, 1.0e23])
   // The difference of the doubles 0.9 and 0.3 is above 0.6, and a third of
   // it above 0.2: the step is 0.2 all the same.
   assert_true((0.9 - 0.3) / 3.0 > 0.2)
@@ -112,11 +123,17 @@ test "ticks: degenerate arguments" {
   assert_eq(tiny[0], 0.0)
   assert_true((tiny[1] / 1.0e-300 - 1.0).abs() < 1.0e-12)
   assert_true((tiny[2] / 2.0e-300 - 1.0).abs() < 1.0e-12)
-  // Bounds whose doubles are farther apart than the step: no tick twice.
+  // Bounds whose doubles are farther apart than the step (2 here): the
+  // nine doubles of the range, each of them a multiple, and none twice.
   let wide = @format.ticks(1.0e18, 1.0e18 + 1024.0, 1000)
-  assert_true(wide.length() >= 1 && wide.length() <= 1001)
-  for i in 1..<wide.length() {
-    assert_true(wide[i] > wide[i - 1])
+  assert_eq(wide.length(), 9)
+  for i, t in wide {
+    assert_eq(t - 1.0e18, 128.0 * i.to_double())
+  }
+  let wide = @format.ticks(-1.0e18 - 1024.0, -1.0e18, 1000)
+  assert_eq(wide.length(), 9)
+  for i, t in wide {
+    assert_eq(t - (-1.0e18 - 1024.0), 128.0 * i.to_double())
   }
 }
 
