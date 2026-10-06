@@ -5,4 +5,9 @@ import {
 
 supported_targets = "native"
 
-warnings = "-unused_type_declaration-unused_value-unused_package"
+// The imports are for the generated `gen_cases.mbt` (scripts/edsl_convert.sh,
+// not committed); the committed package is only `shard.mbt`, which names
+// neither. With the whole suite converted (3792 cases) the shards check
+// without a warning, so nothing else is switched off here.
+
+warnings = "-unused_package"
