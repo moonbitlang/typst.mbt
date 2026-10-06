@@ -127,10 +127,13 @@
 //    of any size, in the engine's arithmetic, without a callback and
 //    without the size as an argument. A part that measures is a callback
 //    by itself and falls under the creation rule by itself (an item of a
-//    `Canvas` with the anchor `Baseline`); the element around it does
-//    not, and a form of an element that would only fetch a size for the
-//    caller (`width=Auto`) is not built: the caller builds the element in
-//    a `Layout`, which an element without a callback allows.
+//    `Canvas` with the anchor `Baseline`); what it measures has the style
+//    that the primitive which places it sets for its body (the alignment
+//    of a `Place`: an `Align` around what is measured). The element
+//    around it does not, and a form of an element that would only fetch a
+//    size for the caller (`width=Auto`) is not built: the caller builds
+//    the element in a `Layout`, which an element without a callback
+//    allows.
 //
 // 5. Invalid arguments. Constructors do not raise. An argument that the
 //    element cannot accept is `site.invalid(message, arg=i)`: an error at

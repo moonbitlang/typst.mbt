@@ -16,7 +16,8 @@
 /// The Typst functions of `@kit.Canvas` and of its items, in one binding,
 /// so that their definition is one expression of the markup.
 ///
-/// `canvas`: the width, the height, then the items; `clip` is named.
+/// `canvas`: the width, the height, then the items; `clip` is named (`key`
+/// is not content: the function has none).
 /// `canvas-place`, `canvas-line`, `canvas-rect`, `canvas-circle`,
 /// `canvas-curve` and `canvas-arrow` take the arguments of the items in
 /// their order, the optional ones by name. Each checks what the item
@@ -59,12 +60,15 @@ let canvas_typ : String =
   #|      message: "the `height` of a `Canvas` must be a finite number of points that is not negative",
   #|    )
   #|    let items = args.pos()
+  #|    let named = args.named()
+  #|    let clip = (:)
+  #|    if "clip" in named { clip.insert("clip", named.clip) }
   #|    block(
   #|      width: width * 1pt,
   #|      height: height * 1pt,
   #|      // One region: the items are placed once.
   #|      breakable: false,
-  #|      ..args.named(),
+  #|      ..clip,
   #|      if items.len() == 0 { [] } else { items.join() },
   #|    )
   #|  }
@@ -75,13 +79,14 @@ let canvas_typ : String =
   #|    let (h, v) = anchor
   #|    let dx = offset(x, (left: 0, center: 1, right: 2).at(repr(h)))
   #|    if v == "baseline" {
-  #|      // The body is measured in the size of the canvas, as a `place`
-  #|      // lays it out, and placed with its top that far above the point.
+  #|      // The body is measured in the size of the canvas and under the
+  #|      // alignment that it is placed with, as a `place` lays it out, and
+  #|      // placed with its top that far above the point.
   #|      return place(left + top, layout(size => {
   #|        let region = (:)
   #|        if size.width.pt() != float.inf { region.insert("width", size.width) }
   #|        if size.height.pt() != float.inf { region.insert("height", size.height) }
-  #|        let baseline = measure(body, ..region).baseline
+  #|        let baseline = measure(align(h + top, body), ..region).baseline
   #|        place(h + top, dx: dx, dy: y * 1pt - baseline, body)
   #|      }))
   #|    }
@@ -152,16 +157,22 @@ let canvas_typ : String =
   #|    if from == none and before != tip { from = before }
   #|    let dx = if from == none { 0 } else { tip.at(0) - from.at(0) }
   #|    let dy = if from == none { 0 } else { tip.at(1) - from.at(1) }
-  #|    let length = calc.sqrt(dx * dx + dy * dy)
+  #|    // The direction of the path at its end. The differences are divided
+  #|    // by the larger of them before they are squared.
+  #|    let scale = calc.max(calc.abs(dx), calc.abs(dy))
   #|    assert(
-  #|      length > 0,
-  #|      message: "the last segment of `Canvas::arrow` ends where it starts: the arrow has no direction",
+  #|      scale > 0 and finite(scale),
+  #|      message: "the last segment of `Canvas::arrow` gives the arrow no direction: it ends where it starts, or its ends are farther apart than a number can say",
   #|    )
-  #|    // The direction of the path at its end; the head is as long as
-  #|    // `head` along it and as wide across it, and the path ends half of
-  #|    // that before the tip (or half way from where it arrives from).
-  #|    let ux = dx / length
-  #|    let uy = dy / length
+  #|    let sx = dx / scale
+  #|    let sy = dy / scale
+  #|    let norm = calc.sqrt(sx * sx + sy * sy)
+  #|    let ux = sx / norm
+  #|    let uy = sy / norm
+  #|    let length = scale * norm
+  #|    // The head is as long as `head` along the direction and as wide
+  #|    // across it, and the path ends half of that before the tip (or half
+  #|    // way from where it arrives from).
   #|    let half = head / 2
   #|    let reach = length / 2
   #|    let cut = if half < reach { half } else { reach }
@@ -170,7 +181,15 @@ let canvas_typ : String =
   #|    let across-x = half * uy
   #|    let across-y = half * ux
   #|    let end = (tip.at(0) - cut * ux, tip.at(1) - cut * uy)
-  #|    let path = (..segments.slice(0, -1), (..last.slice(0, -1), end))
+  #|    // The end of the last segment moves back, and the control points
+  #|    // that are at it, from the last one backwards, move with it.
+  #|    let shortened = last.slice(0, -1)
+  #|    let k = shortened.len() - 1
+  #|    while k >= 1 and shortened.at(k) == tip {
+  #|      shortened.at(k) = end
+  #|      k -= 1
+  #|    }
+  #|    let path = (..segments.slice(0, -1), (..shortened, end))
   #|    // The paint of the stroke, or the paint of a stroke without one.
   #|    let pen = named.at("stroke", default: auto)
   #|    let paint = if pen == auto or pen == none {

@@ -110,6 +110,11 @@ test "canvas: the functions reject what the element and its items reject, in the
       ]),
     ),
     (
+      "an arrow between points that are too far apart",
+      "#canvas-arrow((-1e308, 0), ((\"line\", (1e308, 0)),))",
+      @kit.Canvas::arrow((-1.0e308, 0.0), [LineTo((1.0e308, 0.0))]),
+    ),
+    (
       "a negative head",
       "#canvas-arrow((0, 0), ((\"line\", (9, 9)),), head: -1)",
       @kit.Canvas::arrow((0.0, 0.0), to, head=-1.0),
@@ -149,8 +154,9 @@ test "canvas: the functions reject what the element and its items reject, in the
       #|the start of an arrow: the coordinates of `Canvas::arrow` must be finite numbers of points
       #|a point of an arrow: the coordinates of `Canvas::arrow` must be finite numbers of points
       #|an arrow without a segment: `Canvas::arrow` needs a segment: a path from `start` to where the arrow points
-      #|an arrow to where it starts: the last segment of `Canvas::arrow` ends where it starts: the arrow has no direction
-      #|an arrow whose last curve is a point: the last segment of `Canvas::arrow` ends where it starts: the arrow has no direction
+      #|an arrow to where it starts: the last segment of `Canvas::arrow` gives the arrow no direction: it ends where it starts, or its ends are farther apart than a number can say
+      #|an arrow whose last curve is a point: the last segment of `Canvas::arrow` gives the arrow no direction: it ends where it starts, or its ends are farther apart than a number can say
+      #|an arrow between points that are too far apart: the last segment of `Canvas::arrow` gives the arrow no direction: it ends where it starts, or its ends are farther apart than a number can say
       #|a negative head: the `head` of `Canvas::arrow` must be a finite number of points that is not negative
       #|a head that is not a number: the `head` of `Canvas::arrow` must be a finite number of points that is not negative
     ),

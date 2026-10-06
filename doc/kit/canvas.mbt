@@ -51,7 +51,8 @@
 /// (`Keyed(bed.name, item)`), several as one (`Seq([bar, label])`, what a
 /// function of the caller returns for one row of its data), and anything
 /// else, which is laid out in the block from its top left corner as in any
-/// block (an image under the drawing). A rule is not an item (a rule goes
+/// block, and drawn in its place among the items (an image as the first
+/// item is under the drawing). A rule is not an item (a rule goes
 /// into a `Seq`): text is styled by a `Text` around the canvas or around
 /// the body of an item, or by a rule in a `Seq` with the items it is for.
 ///
@@ -85,7 +86,7 @@
 /// under the key of the item. An item that is a plain string resolves to
 /// the `items` argument under its key.
 ///
-/// Twin: the function `canvas` of `doc/twins/kit.mbt`.
+/// Twin: the function `canvas` of `doc/twins/kit_canvas.mbt`.
 pub struct Canvas {
   priv composite : @doc.Composite
 }
@@ -168,13 +169,34 @@ fn Segment::end(self : Segment) -> (Double, Double) {
 }
 
 ///|
-/// The segment with another last point.
+/// The segment with its last point moved to `end`. The control points
+/// that are at the last point, from the last one backwards, move with it:
+/// they give the segment no direction there, and left behind they would
+/// turn the path back at its end.
 fn Segment::ending_at(self : Segment, end : (Double, Double)) -> Segment {
   match self {
     LineTo(_) => LineTo(end)
-    QuadTo(control, _) => QuadTo(control, end)
-    CubicTo(first, second, _) => CubicTo(first, second, end)
+    QuadTo(control, old) =>
+      if same_point(control, old) {
+        QuadTo(end, end)
+      } else {
+        QuadTo(control, end)
+      }
+    CubicTo(first, second, old) =>
+      if !same_point(second, old) {
+        CubicTo(first, second, end)
+      } else if same_point(first, old) {
+        CubicTo(end, end, end)
+      } else {
+        CubicTo(first, end, end)
+      }
   }
+}
+
+///|
+/// Whether two points are the same point.
+fn same_point(a : (Double, Double), b : (Double, Double)) -> Bool {
+  a.0 == b.0 && a.1 == b.1
 }
 
 ///|
@@ -352,14 +374,16 @@ fn offset(at : Double, side : Int) -> @doc.Length {
 ///
 /// **With `Baseline` it measures.** The first baseline of the body is not
 /// an alignment of the engine: the body is measured (`Size.baseline`) in
-/// the size of the canvas, and placed with its top that far above the
-/// point. The item is then `Place(Layout(..), alignment=Both(Left, Top))`
-/// around that `Place`, and it creates a callback: it cannot be built
-/// inside one (a show rule, a `Context`, a `Layout`, so also not for a
-/// canvas that is built in a `Layout` for its width). There, use `Bottom`
-/// for a line of text, which ends at its baseline, or measure with the
-/// callback's own context (`cx.measure(body).baseline`) and anchor at
-/// `Top`. Nothing else differs: the canvas is one region whatever its
+/// the size of the canvas and under the alignment that it is placed with,
+/// and placed with its top that far above the point. The item is then
+/// `Place(Layout(..), alignment=Both(Left, Top))` around that `Place`,
+/// and it creates a callback: it cannot be built inside one (a show rule,
+/// a `Context`, a `Layout`, so also not for a canvas that is built in a
+/// `Layout` for its width). There, use `Bottom` for a line of text, which
+/// ends at its baseline, or measure with the callback's own context
+/// (`cx.measure(body).baseline`, with the width of the canvas for a body
+/// that is broken into lines there) and anchor at `Top`. Nothing else
+/// differs: the canvas is one region whatever its
 /// items are, and in a box without a size the body is measured without
 /// one, as it is placed there.
 ///
@@ -370,7 +394,7 @@ fn offset(at : Double, side : Int) -> @doc.Length {
 /// `body` argument, and with the source at hand to the characters of its
 /// literal; a description of the caller keeps its own call.
 ///
-/// Twin: the function `canvas-place` of `doc/twins/kit.mbt`.
+/// Twin: the function `canvas-place` of `doc/twins/kit_canvas.mbt`.
 #callsite(autofill(loc, args_loc))
 pub fn Canvas::place(
   at : (Double, Double),
@@ -400,10 +424,14 @@ pub fn Canvas::place(
       Bottom => (Bottom, offset(y, 2))
       Baseline => {
         // What is measured and what is placed is the same description,
-        // in the same region: a `Place` lays its body out in the size of
-        // its container without stretching it, which is what `measure`
-        // does with a width and a height. (The alignment of the body's
-        // lines, which a `Place` sets, does not move the first baseline.)
+        // in the same region and under the same styles: a `Place` lays
+        // its body out in the size of its container without stretching
+        // it, which is what `measure` does with a width and a height, and
+        // it sets its alignment for its body, which an `Align` around
+        // what is measured does. (The alignment of the lines of a body
+        // does not move its first baseline, but a body can read it: a
+        // `Context` in the caller's content.)
+        let alignment : @doc.Alignment = Both(horizontal, Top)
         let measured = @doc.Layout((size, cx) => {
           let width : @doc.Length? = if size.width.is_inf() {
             None
@@ -415,10 +443,14 @@ pub fn Canvas::place(
           } else {
             Some(Pt(size.height))
           }
-          let baseline = cx.measure(body, width?, height?).baseline
+          let baseline = cx.measure(
+              @doc.Align(alignment, body),
+              width?,
+              height?,
+            ).baseline
           @doc.Place(
             site.arg(1, body),
-            alignment=Both(horizontal, Top),
+            alignment~,
             dx~,
             // (A difference of lengths, which the engine takes: it keeps
             // lengths in a unit of its own, so the difference of the
@@ -454,7 +486,7 @@ pub fn Canvas::place(
 /// A line through several points is a `Canvas::curve` of `LineTo`s, which
 /// joins them.
 ///
-/// Twin: the function `canvas-line` of `doc/twins/kit.mbt`.
+/// Twin: the function `canvas-line` of `doc/twins/kit_canvas.mbt`.
 #callsite(autofill(loc, args_loc))
 pub fn Canvas::line(
   start : (Double, Double),
@@ -497,7 +529,7 @@ pub fn Canvas::line(
 /// in the middle is a `Canvas::rect` and a `Canvas::place` at its centre
 /// with the anchor `(Center, Horizon)`.
 ///
-/// Twin: the function `canvas-rect` of `doc/twins/kit.mbt`.
+/// Twin: the function `canvas-rect` of `doc/twins/kit_canvas.mbt`.
 #callsite(autofill(loc, args_loc))
 pub fn Canvas::rect(
   at : (Double, Double),
@@ -546,7 +578,7 @@ pub fn Canvas::rect(
 /// - `fill`, `stroke`: `Circle`'s; by default the circle's (no fill, and
 ///   then a stroke of 1pt in black).
 ///
-/// Twin: the function `canvas-circle` of `doc/twins/kit.mbt`.
+/// Twin: the function `canvas-circle` of `doc/twins/kit_canvas.mbt`.
 #callsite(autofill(loc, args_loc))
 pub fn Canvas::circle(
   center : (Double, Double),
@@ -598,7 +630,7 @@ pub fn Canvas::circle(
 /// relative to each other is a `Curve` of `doc`'s own components, placed
 /// at the origin: `Canvas::place((0.0, 0.0), Curve([..]))`.
 ///
-/// Twin: the function `canvas-curve` of `doc/twins/kit.mbt`.
+/// Twin: the function `canvas-curve` of `doc/twins/kit_canvas.mbt`.
 #callsite(autofill(loc, args_loc))
 pub fn Canvas::curve(
   start : (Double, Double),
@@ -646,7 +678,8 @@ priv struct ArrowHead {
 /// `tip`. The path ends half of `size` before the tip (or, where `from` is
 /// nearer than `size`, half way from `from`), so that its stroke ends
 /// inside the head and the point of the triangle is the point of the
-/// arrow. `None` if `from` is `tip`: there is no direction.
+/// arrow. `None` if there is no direction: `from` is `tip`, or the two are
+/// farther apart than a number can say.
 fn arrow_head(
   from : (Double, Double),
   tip : (Double, Double),
@@ -654,12 +687,18 @@ fn arrow_head(
 ) -> ArrowHead? {
   let dx = tip.0 - from.0
   let dy = tip.1 - from.1
-  let squares = dx * dx + dy * dy
-  let length = squares.sqrt()
-  guard length > 0.0 else { return None }
-  // The direction of the path at its end.
-  let ux = dx / length
-  let uy = dy / length
+  // The direction of the path at its end. The differences are divided by
+  // the larger of them before they are squared, so that neither a very
+  // small nor a very large one leaves the range of numbers.
+  let scale = if dx.abs() > dy.abs() { dx.abs() } else { dy.abs() }
+  guard scale > 0.0 && finite(scale) else { return None }
+  let sx = dx / scale
+  let sy = dy / scale
+  let squares = sx * sx + sy * sy
+  let norm = squares.sqrt()
+  let ux = sx / norm
+  let uy = sy / norm
+  let length = scale * norm
   let half = size / 2.0
   let reach = length / 2.0
   let cut = if half < reach { half } else { reach }
@@ -692,14 +731,14 @@ fn arriving_from(
   let points = last.points()
   // (The last of `points` is the end itself.)
   for k = points.length() - 2; k >= 0; k = k - 1 {
-    if points[k].0 != end.0 || points[k].1 != end.1 {
+    if !same_point(points[k], end) {
       return Some(points[k])
     }
   }
-  if before.0 != end.0 || before.1 != end.1 {
-    Some(before)
-  } else {
+  if same_point(before, end) {
     None
+  } else {
+    Some(before)
   }
 }
 
@@ -726,13 +765,16 @@ fn arriving_from(
 /// - **The path ends inside the head**, half of `head` before the tip, so
 ///   that the end of its stroke does not show beside the tip. The last
 ///   point of the last segment is moved back along the direction of
-///   arrival, which keeps that direction. (Where the last line, or the
-///   last control point, is nearer to the tip than `head`: half way.)
-/// - **The paint of the head is the paint of the stroke**
-///   (`@doc.Stroke::paint`), or black for a stroke without a paint, which
-///   is what such a stroke is drawn in unless a rule of the document
-///   (`SetCurve(stroke=..)`) says otherwise: an arrow in a colour names it
-///   in its `stroke`.
+///   arrival, and a control point that is at that point with it, which
+///   keeps the direction. (Where the last line, or the last control
+///   point, is nearer to the tip than `head`: half way.)
+/// - **The paint of the head is the paint of the stroke**, as the stroke
+///   was written (`@doc.Stroke::paint`), or black for a stroke without a
+///   paint, which is what such a stroke is drawn in unless a rule of the
+///   document (`SetCurve(stroke=..)`) says otherwise: an arrow in a colour
+///   names it in its `stroke`. The polygon has that fill and no stroke of
+///   its own; like every part of an element it is under the rules of the
+///   document (`SetPolygon(stroke=..)` gives the heads an outline).
 ///
 /// Parameters:
 ///
@@ -740,19 +782,21 @@ fn arriving_from(
 ///   a bend is two `LineTo`s; one that curves back is a `CubicTo`.
 /// - `stroke`: `Curve`'s, for the path; by default the curve's (1pt,
 ///   black). Dashed and dotted arrows are `Stroke(dash=Dashed)` and
-///   `Stroke(dash=Dotted)`; the head is filled, not stroked.
+///   `Stroke(dash=Dotted)`: the stroke is the path's, the head is filled.
 /// - `head`: the length and the width of the head in points; 5.5 by
 ///   default (the element's own; for strokes of about 1pt). Not negative.
 ///
 /// Errors, when the document is compiled: no segments (at `segments`), and
 /// a path whose last segment ends where it starts, with its control points
-/// there too, which arrives from no direction (at `segments`).
+/// there too, which arrives from no direction (at `segments`; also where
+/// the two points are so far apart that their difference is not a
+/// number).
 ///
 /// What an arrow does not have: a head at its start, heads of other shapes
 /// (open, barbed, round), a width of the head that is not its length. Such
 /// an arrow is a `Canvas::curve` and a `Polygon` of the caller.
 ///
-/// Twin: the function `canvas-arrow` of `doc/twins/kit.mbt`.
+/// Twin: the function `canvas-arrow` of `doc/twins/kit_canvas.mbt`.
 #callsite(autofill(loc, args_loc))
 pub fn Canvas::arrow(
   start : (Double, Double),
@@ -792,7 +836,7 @@ pub fn Canvas::arrow(
     guard arriving_from(before, last) is Some(from) &&
       arrow_head(from, last.end(), head) is Some(shape) else {
       return site.invalid(
-        "the last segment of `Canvas::arrow` ends where it starts: the arrow has no direction",
+        "the last segment of `Canvas::arrow` gives the arrow no direction: it ends where it starts, or its ends are farther apart than a number can say",
         arg=1,
       )
     }
@@ -800,11 +844,7 @@ pub fn Canvas::arrow(
     path[path.length() - 1] = last.ending_at(shape.end)
     // The paint of the stroke, or the paint of a stroke without one.
     let paint : @doc.Paint = match stroke {
-      Some(stroke) =>
-        match stroke.paint() {
-          Some(Auto) | None => Black
-          Some(paint) => paint
-        }
+      Some(stroke) => stroke.paint().unwrap_or(Black)
       None => Black
     }
     // One `Place`, like every item: the path and the head are placed in

@@ -604,6 +604,24 @@ test "canvas: the anchor `Baseline` puts the first baseline at the point" {
       #|large: 30.00 30.00 43.16
     ),
   )
+  // A body can read the alignment that it is under (a `context` of the
+  // caller's): it is measured under the alignment that it is placed
+  // with. This one is 20pt under `center + top` and 10pt otherwise.
+  let contextual = compile([
+    @kit.Canvas(100.0, 60.0, [
+      @kit.Canvas::place(
+        (50.0, 30.0),
+        @doc.Markup(
+          "#context text(size: if align.alignment == center + top { 20pt } else { 10pt })[Tag]",
+        ),
+        anchor=(Center, Baseline),
+      ),
+    ]),
+  ])
+  assert_eq(errors(contextual) + warnings(contextual), "")
+  let aligned = of_kind(drawn(contextual), "text")[0]
+  assert_eq(pt(aligned.h), "20.0")
+  assert_true(close(aligned.y - 10.0, 30.0))
   // Labels of two sizes stand on one line.
   let report = compile([
     @kit.Canvas(100.0, 60.0, [
@@ -882,13 +900,75 @@ test "canvas: the head of an arrow on a curve, a bend and a short line" {
   )
   assert_eq(path.length(), 3)
   check_head(head, path[2], (60.0, 40.0), 1.0, 0.0, 6.0, 3.0)
-  // A control point on the end: the path arrives from the one before it.
+  // A control point on the end: the path arrives from the one before it,
+  // and the control point moves back with the end. (Left at the tip, it
+  // would turn the path back at its end: the last arm of the curve would
+  // point away from the head.)
   let (head, path) = geometry(
     (10.0, 30.0),
     [CubicTo((40.0, 30.0), (60.0, 30.0), (60.0, 30.0))],
     6.0,
   )
   check_head(head, path[3], (60.0, 30.0), 1.0, 0.0, 6.0, 3.0)
+  inspect(
+    points(path.map(p => (p.0 + 10.0, p.1 + 10.0))),
+    content=(
+      #|(10.00, 30.00) (40.00, 30.00) (57.00, 30.00) (57.00, 30.00)
+    ),
+  )
+  // The same with both control points on the end, after a line: the path
+  // arrives from where the curve starts.
+  let (head, path) = geometry(
+    (10.0, 10.0),
+    [LineTo((30.0, 10.0)), CubicTo((30.0, 50.0), (30.0, 50.0), (30.0, 50.0))],
+    6.0,
+  )
+  check_head(head, path[4], (30.0, 50.0), 0.0, 1.0, 6.0, 3.0)
+  inspect(
+    points(path.map(p => (p.0 + 10.0, p.1 + 10.0))),
+    content=(
+      #|(10.00, 10.00) (30.00, 10.00) (30.00, 47.00) (30.00, 47.00) (30.00, 47.00)
+    ),
+  )
+  // And of a quadratic curve.
+  let (head, path) = geometry(
+    (10.0, 30.0),
+    [QuadTo((60.0, 30.0), (60.0, 30.0))],
+    6.0,
+  )
+  check_head(head, path[3], (60.0, 30.0), 1.0, 0.0, 6.0, 3.0)
+  // The last arm of every one of these paths points at the tip: from the
+  // last point of the path that is not its end, to its end.
+  let arms : Array[((Double, Double), Array[@kit.Segment])] = [
+    ((10.0, 30.0), [CubicTo((40.0, 30.0), (60.0, 30.0), (60.0, 30.0))]),
+    ((10.0, 30.0), [QuadTo((60.0, 30.0), (60.0, 30.0))]),
+    ((80.0, 20.0), [CubicTo((80.0, 50.0), (30.0, 50.0), (30.0, 20.0))]),
+    ((10.0, 10.0), [CubicTo((10.0, 40.0), (30.0, 50.0), (60.0, 10.0))]),
+  ]
+  for arm in arms {
+    let (head, path) = geometry(arm.0, arm.1, 6.0)
+    let end = path[path.length() - 1]
+    let mut k = path.length() - 2
+    while close(path[k].0, end.0) && close(path[k].1, end.1) {
+      k -= 1
+    }
+    // (The direction of the head: from the middle of its base to its tip.)
+    let axis = (
+      head[0].0 - (head[1].0 + head[2].0) / 2.0,
+      head[0].1 - (head[1].1 + head[2].1) / 2.0,
+    )
+    let last = (end.0 - path[k].0, end.1 - path[k].1)
+    assert_true(close(last.0 * axis.1 - last.1 * axis.0, 0.0))
+    assert_true(last.0 * axis.0 + last.1 * axis.1 > 0.0)
+  }
+  // A last line that is shorter than any length that can be drawn still
+  // has its direction.
+  let (head, path) = geometry(
+    (10.0, 0.0),
+    [LineTo((60.0, 0.0)), LineTo((60.0, 1.0e-200))],
+    6.0,
+  )
+  check_head(head, path[2], (60.0, 0.0), 0.0, 1.0, 6.0, 0.0)
   // A last line of 4pt with a head of 6pt: the path ends half way along
   // the line, not behind its start.
   let (head, path) = geometry(
@@ -949,7 +1029,12 @@ test "canvas: the paint and the stroke of an arrow, and what is not one" {
       #|fill  stroke 1.0 rgb("#ff4136") dashed | fill rgb("#ff4136") stroke 
     ),
   )
-  // A stroke without a paint: black, as the stroke is drawn.
+  // A stroke without a paint, or with the paint `auto` however it is
+  // written: black, as the stroke is drawn.
+  assert_eq(
+    drawn_arrow(Some(Stroke(paint=Value(@doc.Value::auto())))),
+    drawn_arrow(Some(Stroke(paint=Auto))),
+  )
   inspect(
     drawn_arrow(Some(Stroke(thickness=Pt(2)))) +
     " || " +
@@ -974,6 +1059,23 @@ test "canvas: the paint and the stroke of an arrow, and what is not one" {
       #|fill  stroke 1.0 rgb("#ff4136") | fill luma(0%) stroke 
     ),
   )
+  // The head is a polygon with a fill and no stroke of its own: a rule of
+  // the document for polygons reaches it, as rules reach the parts of
+  // every element.
+  let outlined = compile([
+    @doc.SetPolygon(stroke=Stroke(paint=Blue, thickness=Pt(0.5))),
+    @kit.Canvas(100.0, 60.0, [
+      @kit.Canvas::arrow((10.0, 30.0), [LineTo((60.0, 30.0))]),
+    ]),
+  ])
+  inspect(
+    outlines(outlined)
+    .map(shape => "fill \{shape.fill} stroke \{shape.stroke}")
+    .join(" | "),
+    content=(
+      #|fill  stroke 1.0 luma(0%) | fill luma(0%) stroke 0.5 rgb("#0074d9")
+    ),
+  )
   // What is not an arrow, each an error at its argument.
   let nan = 0.0 / 0.0
   let failing : Array[(String, @kit.CanvasItem)] = [
@@ -993,6 +1095,10 @@ test "canvas: the paint and the stroke of an arrow, and what is not one" {
     ("head", @kit.Canvas::arrow((10.0, 30.0), [LineTo((60.0, 30.0))], head=nan)),
     ("start", @kit.Canvas::arrow((nan, 30.0), [LineTo((60.0, 30.0))])),
     ("segments", @kit.Canvas::arrow((10.0, 30.0), [LineTo((60.0, nan))])),
+    (
+      "too far apart",
+      @kit.Canvas::arrow((-1.0e308, 30.0), [LineTo((1.0e308, 30.0))]),
+    ),
   ]
   let lines : Array[String] = []
   for entry in failing {
@@ -1003,12 +1109,13 @@ test "canvas: the paint and the stroke of an arrow, and what is not one" {
     lines.join("\n"),
     content=(
       #|no segments: Canvas::arrow a1 0: `Canvas::arrow` needs a segment: a path from `start` to where the arrow points
-      #|no direction: Canvas::arrow a1 0: the last segment of `Canvas::arrow` ends where it starts: the arrow has no direction
-      #|no direction, curve: Canvas::arrow a1 0: the last segment of `Canvas::arrow` ends where it starts: the arrow has no direction
+      #|no direction: Canvas::arrow a1 0: the last segment of `Canvas::arrow` gives the arrow no direction: it ends where it starts, or its ends are farther apart than a number can say
+      #|no direction, curve: Canvas::arrow a1 0: the last segment of `Canvas::arrow` gives the arrow no direction: it ends where it starts, or its ends are farther apart than a number can say
       #|negative head: Canvas::arrow a3 0: the `head` of `Canvas::arrow` must be a finite number of points that is not negative
       #|head: Canvas::arrow a3 0: the `head` of `Canvas::arrow` must be a finite number of points that is not negative
       #|start: Canvas::arrow a0 0: the coordinates of `Canvas::arrow` must be finite numbers of points
       #|segments: Canvas::arrow a1 0: the coordinates of `Canvas::arrow` must be finite numbers of points
+      #|too far apart: Canvas::arrow a1 0: the last segment of `Canvas::arrow` gives the arrow no direction: it ends where it starts, or its ends are farther apart than a number can say
     ),
   )
 }
@@ -1202,22 +1309,24 @@ test "canvas: what is outside of it, and what is not an item" {
   assert_eq(listing(drawn(clipped)), listing(drawn(open)))
   assert_eq(outlines(clipped).map(shape => shape.clipped), [true, true])
   // Content that is not placed is laid out from the top left corner of
-  // the block, as in any block; placed items are over it, wherever they
-  // are in the array.
+  // the block, as in any block, and everything is drawn in the order of
+  // the array: the rectangle under the first word, the circle over it.
   let flow = compile([
     @kit.Canvas(100.0, 40.0, [
-      @kit.Canvas::rect((50.0, 0.0), 10.0, 10.0, fill=Red),
+      @kit.Canvas::rect((0.0, 0.0), 30.0, 10.0, fill=Red),
       "First.",
       Par("Second."),
+      @kit.Canvas::circle((5.0, 5.0), 3.0, fill=Blue),
     ]),
   ])
   inspect(errors(flow) + warnings(flow), content="")
   inspect(
     listing(drawn(flow)),
     content=(
-      #|p1 box 60.0,10.0 10.0x10.0 rgb("#ff4136")
+      #|p1 box 10.0,10.0 30.0x10.0 rgb("#ff4136")
       #|p1 text 10.0,16.6 10.0pt "First."
       #|p1 text 10.0,35.2 10.0pt "Second."
+      #|p1 box 12.0,12.0 6.0x6.0 rgb("#0074d9")
     ),
   )
   // A rule is not an item: an item is under a key.
@@ -1330,7 +1439,13 @@ test "canvas: a drawing in other units is scaled" {
   let report = compile([
     Scale(
       @kit.Canvas(200.0, 50.0, [
-        @kit.Canvas::rect((0.0, 0.0), 200.0, 50.0, fill=Luma(230)),
+        @kit.Canvas::rect(
+          (0.0, 0.0),
+          200.0,
+          50.0,
+          fill=Luma(230),
+          stroke=Sides(all=Stroke(thickness=Pt(5))),
+        ),
         @kit.Canvas::place((100.0, 25.0), "mid", anchor=(Center, Horizon)),
       ]),
       factor=Pct(40),
@@ -1358,7 +1473,8 @@ test "canvas: a drawing in other units is scaled" {
       #|78.6
     ),
   )
-  // The frame of the drawing, as it is drawn: 80pt by 20pt.
+  // What is drawn, in the scale of the group that it is in: the frame of
+  // 80pt by 20pt, its stroke of 2pt, and the label in 4pt.
   let scaled : Array[String] = []
   fn walk(frame : @library.Frame, sx : Double, sy : Double) -> Unit {
     for entry in frame.items() {
@@ -1369,8 +1485,18 @@ test "canvas: a drawing in other units is scaled" {
             sx * group.transform.sx.get(),
             sy * group.transform.sy.get(),
           )
-        Shape({ geometry: Rect(size), .. }, _) =>
-          scaled.push("\{pt(size.x.to_pt() * sx)}x\{pt(size.y.to_pt() * sy)}")
+        Shape({ geometry: Rect(size), stroke, .. }, _) => {
+          scaled.push(
+            "rect \{pt(size.x.to_pt() * sx)}x\{pt(size.y.to_pt() * sy)}",
+          )
+          if stroke is Some(stroke) {
+            scaled.push("stroke \{pt(stroke.thickness.to_pt() * sx)}")
+          }
+        }
+        Text(text) =>
+          if text.text == "mid" {
+            scaled.push("text \{pt(text.size.to_pt() * sx)}")
+          }
         _ => ()
       }
     }
@@ -1378,9 +1504,9 @@ test "canvas: a drawing in other units is scaled" {
 
   walk(report.unwrap().pages()[0].frame, 1.0, 1.0)
   inspect(
-    scaled.join(" "),
+    scaled.join(", "),
     content=(
-      #|80.0x20.0
+      #|rect 80.0x20.0, stroke 2.0, text 4.0
     ),
   )
 }
