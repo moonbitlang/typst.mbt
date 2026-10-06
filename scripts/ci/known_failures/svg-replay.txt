@@ -1,0 +1,20 @@
+# Cases of the `svg-replay` stage that failed when CI was set up (the replay
+# exports upstream's frames decoded from the `paged` goldens, which is not
+# at parity). One `FAIL` line of the runner per line: scripts/ci/stages.py
+# fails on any failure that is not listed, and names listed cases that pass.
+FAIL pdf/validation.typ :: pdf-validation-tofu-in-svg
+FAIL visualize/image.typ :: image-decode-svg
+FAIL visualize/image.typ :: image-exif-rotation
+FAIL visualize/image.typ :: image-pixmap-luma8
+FAIL visualize/image.typ :: image-pixmap-lumaa8
+FAIL visualize/image.typ :: image-pixmap-rgb8
+FAIL visualize/image.typ :: image-pixmap-rgba8
+FAIL visualize/image.typ :: image-scaling-methods
+FAIL visualize/image.typ :: image-svg-auto-detection
+FAIL visualize/image.typ :: image-svg-foreign-object-inside-switch-svg1-1
+FAIL visualize/image.typ :: image-svg-foreign-object-inside-switch-svg2-0
+FAIL visualize/image.typ :: image-svg-foreign-object-warning
+FAIL visualize/image.typ :: image-svg-linked-jpg1
+FAIL visualize/image.typ :: image-svg-linked-jpg2
+FAIL visualize/image.typ :: image-svg-variable-font
+FAIL visualize/image.typ :: issue-7178-svg-fallback-deadlock

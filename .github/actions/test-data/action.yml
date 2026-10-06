@@ -1,0 +1,22 @@
+name: Test data
+description: >
+  Fetch what the tests read besides the repository (scripts/ci/data.sh): the
+  upstream suite, the test suites of rustybuzz and resvg, the dev assets and
+  hayro's corpus.
+runs:
+  using: composite
+  steps:
+    - name: brotli
+      shell: bash
+      run: |
+        if ! command -v brotli > /dev/null; then
+          if [ "$RUNNER_OS" = macOS ]; then
+            brew install brotli
+          else
+            sudo apt-get update -q
+            sudo apt-get install -y -q brotli
+          fi
+        fi
+    - name: Fetch
+      shell: bash
+      run: scripts/ci/data.sh

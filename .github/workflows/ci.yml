@@ -1,16 +1,25 @@
 name: CI
 
+# What runs where, and why, is described in AGENTS.md ("CI").
+
 on:
   push:
     branches: [main]
   pull_request:
+  merge_group:
+  schedule:
+    # Nightly: the long EDSL sweep; also keeps the goldens cache alive and
+    # notices a new MoonBit toolchain (the latest one is installed) without
+    # a pull request.
+    - cron: "17 19 * * *"
+  workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
   group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   check:
@@ -19,7 +28,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        target: [native, wasm-gc]
+        target: [native, wasm-gc, wasm]
     steps:
       - uses: actions/checkout@v5
       - name: Install MoonBit
@@ -36,3 +45,193 @@ jobs:
         run: |
           moon fmt
           git diff --exit-code
+
+  # The goldens of the differential stages: regenerated with the Rust oracle
+  # from upstream Typst unless the ones for these inputs are cached
+  # (scripts/ci/goldens_key.sh), on the platform the ports are bit-exact on
+  # (aarch64 macOS). The other jobs get them as an artifact of this run.
+  goldens:
+    runs-on: macos-26
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v5
+      - name: Key
+        id: key
+        run: echo "key=goldens-v1-macos26-arm64-$(scripts/ci/goldens_key.sh)" >> "$GITHUB_OUTPUT"
+      - name: Cached goldens
+        id: cache
+        uses: actions/cache/restore@v4
+        with:
+          path: tests/golden
+          key: ${{ steps.key.outputs.key }}
+      - uses: ./.github/actions/setup-moon
+        if: steps.cache.outputs.cache-hit != 'true'
+      - name: Generate the goldens
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: scripts/ci/goldens.sh
+      - name: Verify the goldens
+        run: scripts/ci/goldens_verify.sh
+      - name: Save the goldens
+        if: steps.cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: tests/golden
+          key: ${{ steps.key.outputs.key }}
+      - name: Pack the goldens
+        run: |
+          cat tests/golden/.key
+          tar -czf goldens.tar.gz tests/golden
+          ls -l goldens.tar.gz
+      - uses: actions/upload-artifact@v4
+        with:
+          name: goldens
+          path: goldens.tar.gz
+          compression-level: 0
+          retention-days: 3
+
+  # Every test executable is a whole program: the packages are split into
+  # shards that build and run their tests in parallel jobs
+  # (scripts/ci/unit_tests.py).
+  unit:
+    name: unit tests (${{ matrix.os }}, ${{ matrix.shard }}/4)
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-26, ubuntu-latest]
+        shard: [1, 2, 3, 4]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/setup-moon
+      - uses: ./.github/actions/test-data
+      - name: Unit tests
+        # One build job at a time on macOS: a test executable of the upper
+        # packages needs more than 3 GB to build, the runner has 7 GB.
+        run: scripts/ci/unit_tests.py --shard ${{ matrix.shard }}/4 ${{ runner.os == 'macOS' && '--jobs 1' || '' }}
+      - name: Upload the totals
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-totals-${{ matrix.os }}-${{ matrix.shard }}
+          path: _build/ci/unit/totals.json
+          retention-days: 3
+      - name: Upload the log
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-tests-${{ matrix.os }}-${{ matrix.shard }}
+          path: _build/ci/unit
+          retention-days: 14
+
+  # All shards ran, and together they ran the whole suite.
+  unit-total:
+    name: unit tests
+    if: always()
+    needs: unit
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: unit-totals-*
+          path: totals
+      - name: Totals
+        run: scripts/ci/unit_tests.py --sum totals --shards 4
+
+  stages:
+    name: stages (${{ matrix.os }})
+    needs: goldens
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-26, ubuntu-latest]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/setup-moon
+      - uses: ./.github/actions/test-data
+      - uses: actions/download-artifact@v4
+        with:
+          name: goldens
+      - name: Unpack the goldens
+        run: tar -xzf goldens.tar.gz
+      - name: Build the runner
+        run: |
+          # Time and peak memory of the build go to the log (the release
+          # build is one C compiler run over the whole program).
+          if [ "$RUNNER_OS" = macOS ]; then timed="/usr/bin/time -l"; else timed="/usr/bin/time -v"; fi
+          $timed moon build --target native --release tests/runner > build-runner.log 2>&1 || { tail -100 build-runner.log; exit 1; }
+          grep -E "^ +[0-9.]+ real|maximum resident set size|Elapsed \(wall clock\)|Maximum resident set size" build-runner.log
+          df -h .
+      - name: Stages
+        run: scripts/ci/stages.py --check-key
+      - name: Upload the logs and diffs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stages-${{ matrix.os }}
+          path: _build/ci/stages
+          retention-days: 14
+
+  package:
+    name: package as a dependency
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/setup-moon
+      - name: Consumer smoke test
+        run: scripts/ci/package_smoke.sh native wasm-gc
+
+  # The upstream suite and the documentation's examples converted to the EDSL
+  # and compared with the Typst path (docs/edsl-convert.md): long, so not on
+  # pull requests.
+  edsl-sweep:
+    name: EDSL conversion sweep
+    if: github.event_name != 'pull_request' && github.event_name != 'merge_group'
+    needs: goldens
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/setup-moon
+      - uses: ./.github/actions/test-data
+      - uses: actions/download-artifact@v4
+        with:
+          name: goldens
+      - name: Unpack the goldens
+        run: tar -xzf goldens.tar.gz
+      - name: Convert
+        run: |
+          python3 scripts/edsl_docs_examples.py
+          JOBS=4 scripts/edsl_convert.sh
+      - name: Compare
+        run: scripts/ci/edsl_sweep.sh
+      - name: Upload the results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: edsl-sweep
+          path: |
+            tests/edsl_gen/manifest.tsv
+            tests/edsl_gen/results.tsv
+            tests/edsl_gen/failed.txt
+            _build/ci/edsl-suite.log
+            _build/edsl-convert-*.log
+          retention-days: 14
+
+  # The one check to require in the branch protection of `main`.
+  required:
+    if: always()
+    needs: [check, goldens, unit, unit-total, stages, package]
+    runs-on: ubuntu-latest
+    steps:
+      - name: All jobs succeeded
+        env:
+          RESULTS: ${{ toJSON(needs.*.result) }}
+        run: |
+          echo "$RESULTS"
+          [ "$(jq -r 'map(select(. != "success")) | length' <<< "$RESULTS")" = 0 ]

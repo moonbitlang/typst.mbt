@@ -1,0 +1,10 @@
+# x86_64 Linux: a difference of the port, not of upstream (the Rust oracle
+# gives the same golden on x86_64 Linux and aarch64 macOS). The underline
+# evades the glyphs with kurbo's `solve_cubic` (typst-layout `deco.rs`,
+# `intersect_line`), which calls `f64::cbrt`. On Linux Rust's std does not
+# take `cbrt` from the C library: the binary links the one of its own
+# compiler-builtins (`libm` crate), while `kurbo/libm_native.mbt` binds
+# `cbrt` to the C library, which is glibc's there (1 to 4 ulp apart: x
+# position and length of one underline segment, f64 40896031a40e1a57 /
+# 406e6b107a05074c instead of ...1a56 / ...0750). On macOS both are Apple's.
+FAIL model/link.typ :: link-show
