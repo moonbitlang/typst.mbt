@@ -5,7 +5,9 @@ let alignment_type_data : NativeTypeData = NativeTypeData::new(
   name="alignment",
   long_name="alignment",
   title="Alignment",
+  since=Forever,
   docs="Where to align something along an axis.",
+  keywords=[],
 )
 
 ///|
@@ -19,7 +21,9 @@ let angle_type_data : NativeTypeData = NativeTypeData::new(
   name="angle",
   long_name="angle",
   title="Angle",
+  since=Forever,
   docs="An angle describing a rotation.",
+  keywords=[],
 )
 
 ///|
@@ -33,7 +37,9 @@ let args_type_data : NativeTypeData = NativeTypeData::new(
   name="arguments",
   long_name="arguments",
   title="Arguments",
+  since=Forever,
   docs="Captured arguments to a function.",
+  keywords=[],
 )
 
 ///|
@@ -47,7 +53,9 @@ let array_type_data : NativeTypeData = NativeTypeData::new(
   name="array",
   long_name="array",
   title="Array",
+  since=Forever,
   docs="A sequence of values.",
+  keywords=[],
 )
 
 ///|
@@ -61,7 +69,9 @@ let auto_type_data : NativeTypeData = NativeTypeData::new(
   name="auto",
   long_name="auto",
   title="Auto",
+  since=Forever,
   docs="A value that indicates a smart default.",
+  keywords=[],
 )
 
 ///|
@@ -75,7 +85,9 @@ let bool_type_data : NativeTypeData = NativeTypeData::new(
   name="bool",
   long_name="boolean",
   title="Boolean",
+  since=Forever,
   docs="A type with two states.",
+  keywords=[],
 )
 
 ///|
@@ -89,7 +101,9 @@ let bytes_type_data : NativeTypeData = NativeTypeData::new(
   name="bytes",
   long_name="bytes",
   title="Bytes",
+  since=Version(0, 7, 0),
   docs="A sequence of bytes.",
+  keywords=[],
 )
 
 ///|
@@ -103,7 +117,9 @@ let color_type_data : NativeTypeData = NativeTypeData::new(
   name="color",
   long_name="color",
   title="Color",
+  since=Forever,
   docs="A color in a specific color space.",
+  keywords=[],
 )
 
 ///|
@@ -117,7 +133,9 @@ let content_type_data : NativeTypeData = NativeTypeData::new(
   name="content",
   long_name="content",
   title="Content",
+  since=Forever,
   docs="A piece of document content.",
+  keywords=[],
 )
 
 ///|
@@ -131,7 +149,9 @@ let counter_type_data : NativeTypeData = NativeTypeData::new(
   name="counter",
   long_name="counter",
   title="Counter",
+  since=Forever,
   docs="Counts through pages, elements, and more.",
+  keywords=[],
 )
 
 ///|
@@ -145,7 +165,9 @@ let datetime_type_data : NativeTypeData = NativeTypeData::new(
   name="datetime",
   long_name="datetime",
   title="Datetime",
+  since=Version(0, 5, 0),
   docs="Represents a date, a time, or a combination of both.",
+  keywords=[],
 )
 
 ///|
@@ -159,7 +181,9 @@ let decimal_type_data : NativeTypeData = NativeTypeData::new(
   name="decimal",
   long_name="decimal",
   title="Decimal",
+  since=Version(0, 12, 0),
   docs="A fixed-point decimal number type.",
+  keywords=[],
 )
 
 ///|
@@ -173,7 +197,9 @@ let dict_type_data : NativeTypeData = NativeTypeData::new(
   name="dictionary",
   long_name="dictionary",
   title="Dictionary",
+  since=Forever,
   docs="A map from string keys to values.",
+  keywords=[],
 )
 
 ///|
@@ -187,7 +213,9 @@ let direction_type_data : NativeTypeData = NativeTypeData::new(
   name="direction",
   long_name="direction",
   title="Direction",
+  since=Forever,
   docs="The four directions into which content can be laid out.",
+  keywords=[],
 )
 
 ///|
@@ -201,7 +229,9 @@ let duration_type_data : NativeTypeData = NativeTypeData::new(
   name="duration",
   long_name="duration",
   title="Duration",
+  since=Version(0, 8, 0),
   docs="Represents a positive or negative span of time.",
+  keywords=[],
 )
 
 ///|
@@ -215,7 +245,9 @@ let float_type_data : NativeTypeData = NativeTypeData::new(
   name="float",
   long_name="float",
   title="Float",
+  since=Forever,
   docs="A floating-point number.",
+  keywords=[],
 )
 
 ///|
@@ -229,7 +261,9 @@ let fraction_type_data : NativeTypeData = NativeTypeData::new(
   name="fraction",
   long_name="fraction",
   title="Fraction",
+  since=Forever,
   docs="Defines how the remaining space in a layout is distributed.",
+  keywords=[],
 )
 
 ///|
@@ -243,7 +277,9 @@ let func_type_data : NativeTypeData = NativeTypeData::new(
   name="function",
   long_name="function",
   title="Function",
+  since=Forever,
   docs="A mapping from argument values to a return value.",
+  keywords=[],
 )
 
 ///|
@@ -257,7 +293,9 @@ let gradient_type_data : NativeTypeData = NativeTypeData::new(
   name="gradient",
   long_name="gradient",
   title="Gradient",
+  since=Version(0, 9, 0),
   docs="A color gradient.",
+  keywords=[],
 )
 
 ///|
@@ -271,7 +309,9 @@ let int_type_data : NativeTypeData = NativeTypeData::new(
   name="int",
   long_name="integer",
   title="Integer",
+  since=Forever,
   docs="An integer: a positive whole number, a negative whole number, or zero.",
+  keywords=[],
 )
 
 ///|
@@ -285,7 +325,9 @@ let label_type_data : NativeTypeData = NativeTypeData::new(
   name="label",
   long_name="label",
   title="Label",
+  since=Forever,
   docs="A label for an element.",
+  keywords=[],
 )
 
 ///|
@@ -299,7 +341,9 @@ let length_type_data : NativeTypeData = NativeTypeData::new(
   name="length",
   long_name="length",
   title="Length",
+  since=Forever,
   docs="A size or distance, possibly expressed with contextual units.",
+  keywords=[],
 )
 
 ///|
@@ -313,7 +357,9 @@ let location_type_data : NativeTypeData = NativeTypeData::new(
   name="location",
   long_name="location",
   title="Location",
+  since=Forever,
   docs="Identifies an element in the document.",
+  keywords=[],
 )
 
 ///|
@@ -327,7 +373,9 @@ let module__type_data : NativeTypeData = NativeTypeData::new(
   name="module",
   long_name="module",
   title="Module",
+  since=Forever,
   docs="A collection of variables and functions that are commonly related to a single theme.",
+  keywords=[],
 )
 
 ///|
@@ -341,7 +389,9 @@ let none_type_data : NativeTypeData = NativeTypeData::new(
   name="none",
   long_name="none",
   title="None",
+  since=Forever,
   docs="A value that indicates the absence of any other value.",
+  keywords=[],
 )
 
 ///|
@@ -355,7 +405,9 @@ let path_type_data : NativeTypeData = NativeTypeData::new(
   name="path",
   long_name="path",
   title="Path",
+  since=Version(0, 15, 0),
   docs="A file system path.",
+  keywords=[],
 )
 
 ///|
@@ -369,7 +421,9 @@ let ratio_type_data : NativeTypeData = NativeTypeData::new(
   name="ratio",
   long_name="ratio",
   title="Ratio",
+  since=Forever,
   docs="A ratio of a whole.",
+  keywords=[],
 )
 
 ///|
@@ -383,7 +437,9 @@ let regex_type_data : NativeTypeData = NativeTypeData::new(
   name="regex",
   long_name="regex",
   title="Regex",
+  since=Forever,
   docs="A regular expression.",
+  keywords=[],
 )
 
 ///|
@@ -397,7 +453,9 @@ let relative_type_data : NativeTypeData = NativeTypeData::new(
   name="relative",
   long_name="relative length",
   title="Relative Length",
+  since=Forever,
   docs="A length in relation to some known length.",
+  keywords=[],
 )
 
 ///|
@@ -411,7 +469,9 @@ let selector_type_data : NativeTypeData = NativeTypeData::new(
   name="selector",
   long_name="selector",
   title="Selector",
+  since=Version(0, 3, 0),
   docs="A filter for selecting elements within the document.",
+  keywords=[],
 )
 
 ///|
@@ -425,7 +485,9 @@ let spot_type_data : NativeTypeData = NativeTypeData::new(
   name="spot",
   long_name="spot colorant",
   title="Spot Colorant",
+  since=Version(0, 15, 0),
   docs="A spot colorant from which spot colors can be created.",
+  keywords=[],
 )
 
 ///|
@@ -439,7 +501,9 @@ let state_type_data : NativeTypeData = NativeTypeData::new(
   name="state",
   long_name="state",
   title="State",
+  since=Forever,
   docs="Manages stateful parts of your document.",
+  keywords=[],
 )
 
 ///|
@@ -453,7 +517,9 @@ let str_type_data : NativeTypeData = NativeTypeData::new(
   name="str",
   long_name="string",
   title="String",
+  since=Forever,
   docs="A sequence of Unicode codepoints.",
+  keywords=[],
 )
 
 ///|
@@ -467,7 +533,9 @@ let stroke_type_data : NativeTypeData = NativeTypeData::new(
   name="stroke",
   long_name="stroke",
   title="Stroke",
+  since=Forever,
   docs="Defines how to draw a line.",
+  keywords=[],
 )
 
 ///|
@@ -482,6 +550,7 @@ let styles_type_data : NativeTypeData = NativeTypeData::new(
   long_name="styles",
   title="Styles",
   docs="A list of style properties.",
+  keywords=[],
 )
 
 ///|
@@ -495,7 +564,9 @@ let symbol_type_data : NativeTypeData = NativeTypeData::new(
   name="symbol",
   long_name="symbol",
   title="Symbol",
+  since=Forever,
   docs="A Unicode symbol.",
+  keywords=[],
 )
 
 ///|
@@ -509,7 +580,9 @@ let tiling_type_data : NativeTypeData = NativeTypeData::new(
   name="tiling",
   long_name="tiling",
   title="Tiling",
+  since=Version(0, 13, 0),
   docs="A repeating tiling fill.",
+  keywords=["pattern"],
 )
 
 ///|
@@ -523,7 +596,9 @@ let type__type_data : NativeTypeData = NativeTypeData::new(
   name="type",
   long_name="type",
   title="Type",
+  since=Version(0, 8, 0),
   docs="Describes a kind of value.",
+  keywords=[],
 )
 
 ///|
@@ -537,7 +612,9 @@ let version_type_data : NativeTypeData = NativeTypeData::new(
   name="version",
   long_name="version",
   title="Version",
+  since=Version(0, 9, 0),
   docs="A version with an arbitrary number of components.",
+  keywords=[],
 )
 
 ///|

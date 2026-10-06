@@ -23,19 +23,25 @@ pub fn native_func(
 ///|
 /// Define a native function in a scope.
 pub fn Scope::define_func(self : Scope, data : NativeFuncData) -> Binding {
-  self.define_(data.name, Func(Func::native(data)))
+  self
+  .define_(data.name, Func(Func::native(data)))
+  .with_documentation(BindingDocumentation::from_func(data))
 }
 
 ///|
 /// Define a native type in a scope.
 pub fn Scope::define_type(self : Scope, ty : Type) -> Binding {
-  self.define_(ty.short_name(), Type(ty))
+  self
+  .define_(ty.short_name(), Type(ty))
+  .with_documentation(BindingDocumentation::from_type(ty.0))
 }
 
 ///|
 /// Define an element in a scope.
 pub fn Scope::define_elem(self : Scope, elem : Element) -> Binding {
-  self.define_(elem.name(), Func(Func::element(elem)))
+  self
+  .define_(elem.name(), Func(Func::element(elem)))
+  .with_documentation(BindingDocumentation::from_elem(elem))
 }
 
 ///|
@@ -66,10 +72,46 @@ fn calc_module() -> Module {
   for f in generated_calc_funcs() {
     scope.define_func(f) |> ignore
   }
-  scope.define_("inf", Float(@double.infinity)) |> ignore
-  scope.define_("pi", Float(@math.PI)) |> ignore
-  scope.define_("tau", Float(2.0 * @math.PI)) |> ignore
-  scope.define_("e", Float(2.718281828459045)) |> ignore
+  scope
+  .define_("inf", Float(@double.infinity))
+  .with_documentation({
+    name: "inf",
+    title: "Infinity",
+    docs: "\n            Infinity ($+oo$) as a value.\n\n            This is the same value as @float.inf. See the corresponding\n            documentation for more details.\n            ",
+    since: Some(Forever),
+    keywords: [],
+  })
+  |> ignore
+  scope
+  .define_("pi", Float(@math.PI))
+  .with_documentation({
+    name: "pi",
+    title: "Pi",
+    docs: "\n            Archimedes' constant ($pi$).\n\n            This is the ratio of a circle's circumference to its diameter.\n\n            ```example\n            #calc.pi\n            ```\n            ",
+    since: Some(Forever),
+    keywords: ["Archimedes"],
+  })
+  |> ignore
+  scope
+  .define_("tau", Float(2.0 * @math.PI))
+  .with_documentation({
+    name: "tau",
+    title: "Tau",
+    docs: "\n            The circumference of a unit circle ($tau$).\n\n            The constant $tau$ is defined by the relation $tau = 2 pi$.\n\n            ```example\n            #calc.tau \\\n            #(2 * calc.pi)\n            ```\n            ",
+    since: Some(Version(0, 8, 0)),
+    keywords: [],
+  })
+  |> ignore
+  scope
+  .define_("e", Float(2.718281828459045))
+  .with_documentation({
+    name: "e",
+    title: "Euler's number",
+    docs: "\n            Euler's number ($e$).\n\n            This is the base of the natural logarithm and the exponential function.\n\n            ```example\n            #calc.e\n            ```\n            ",
+    since: Some(Forever),
+    keywords: [],
+  })
+  |> ignore
   Module::new("calc", scope)
 }
 
@@ -82,7 +124,8 @@ pub let typst_version : (Int, Int, Int) = @syntax.typst_version
 fn sys_module(inputs : Dict) -> Module {
   let scope = Scope::deduplicating()
   let (major, minor, patch) = typst_version
-  scope.define_(
+  scope
+  .define_(
     "version",
     Version(
       Version([
@@ -92,8 +135,24 @@ fn sys_module(inputs : Dict) -> Module {
       ]),
     ),
   )
+  .with_documentation({
+    name: "version",
+    title: "Compiler Version",
+    docs: "\n            The currently active Typst compiler version.\n\n            ```example\n            #sys.version\n            ```\n            ",
+    since: Some(Version(0, 9, 0)),
+    keywords: [],
+  })
   |> ignore
-  scope.define_("inputs", Dict(inputs)) |> ignore
+  scope
+  .define_("inputs", Dict(inputs))
+  .with_documentation({
+    name: "inputs",
+    title: "CLI inputs",
+    docs: "\n            Makes external inputs available to the project.\n\n            An input specified in the command line as `--input key=value` becomes\n            available under `{sys.inputs.key}` as `{\"value\"}`. To include spaces in\n            the value, it may be enclosed with single or double quotes.\n\n            The value is always of type @str[string]. More complex data may be\n            parsed manually using functions like @json.\n            ",
+    since: Some(Version(0, 11, 0)),
+    keywords: [],
+  })
+  |> ignore
   Module::new("sys", scope)
 }
 

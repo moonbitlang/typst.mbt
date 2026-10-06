@@ -9,8 +9,12 @@ pub struct NativeTypeData {
   long_name : String
   /// The function's title case name (e.g. `String`).
   title : String
+  /// The version of Typst this type was introduced in.
+  since : Since?
   /// The documentation for this type as a string.
   docs : String
+  /// A list of alternate search terms for this type.
+  keywords : Array[String]
   /// The constructor for this type, set when the scope is built.
   priv mut constructor_ : NativeFuncData?
   /// The associated scope, built lazily.
@@ -24,13 +28,17 @@ pub fn NativeTypeData::new(
   name~ : String,
   long_name~ : String,
   title~ : String,
+  since? : Since,
   docs~ : String,
+  keywords? : Array[String] = [],
 ) -> NativeTypeData {
   {
     name,
     long_name,
     title,
+    since,
     docs,
+    keywords,
     constructor_: None,
     scope: None,
     scope_init: _ => (),
@@ -108,9 +116,21 @@ pub fn Type::title(self : Type) -> String {
 }
 
 ///|
+/// The version of Typst this type was introduced in.
+pub fn Type::since(self : Type) -> Since? {
+  self.0.since
+}
+
+///|
 /// Documentation for the type (as Markdown).
 pub fn Type::docs(self : Type) -> String {
   self.0.docs
+}
+
+///|
+/// Search keywords for the type.
+pub fn Type::keywords(self : Type) -> ArrayView[String] {
+  self.0.keywords[:]
 }
 
 ///|
