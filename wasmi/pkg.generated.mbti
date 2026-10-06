@@ -212,7 +212,9 @@ pub(all) struct DataSegmentEntity {
 pub fn DataSegmentEntity::bytes(Self) -> Bytes
 pub fn DataSegmentEntity::drop_bytes(Self) -> Unit
 
-pub(all) struct DedupFuncType(Int) derive(Eq, Hash, @debug.Debug)
+pub struct DedupFuncType {
+  // private fields
+} derive(Eq, Hash, @debug.Debug)
 
 pub(all) struct ElementSegment {
   // private fields

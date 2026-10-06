@@ -300,17 +300,86 @@ pub fn Config::wasm_features(self : Config) -> @wasmparser.WasmFeatures {
 // func_types.rs
 
 ///|
-/// A deduplicated Wasm [`FuncType`] (its index in the [`Engine`]'s
-/// registry; equal function types share their index).
-pub(all) struct DedupFuncType(Int) derive(Eq, Hash, Debug)
+/// A deduplicated Wasm [`FuncType`]: its index in the registry of its
+/// [`Engine`] (equal function types share their index), guarded by the index
+/// of that engine (upstream `GuardedEntity<EngineIdx, DedupFuncTypeIdx>`).
+#valtype
+pub struct DedupFuncType {
+  priv guard_idx : Int
+  priv entity_idx : Int
+} derive(Eq, Hash, Debug)
+
+///|
+/// Returns the entity index if the guard index matches (upstream
+/// `GuardedEntity::entity_index`).
+fn DedupFuncType::entity_index(self : DedupFuncType, guard_index : Int) -> Int? {
+  if self.guard_idx != guard_index {
+    return None
+  }
+  Some(self.entity_idx)
+}
 
 ///|
 /// A registry for [`FuncType`] entities.
 priv struct FuncTypeRegistry {
+  /// A unique identifier for the associated engine.
+  ///
+  /// # Note
+  ///
+  /// This is used to guard against invalid entity indices.
+  engine_idx : Int
   /// Deduplicated function types, keyed by their structure.
   dedup : Map[String, Int]
   /// The registered function types.
   func_types : Array[@wasmi_core.FuncType]
+}
+
+///|
+/// Creates a new [`FuncTypeRegistry`] using the given engine index.
+fn FuncTypeRegistry::new(engine_idx : Int) -> FuncTypeRegistry {
+  { engine_idx, dedup: Map([]), func_types: [], }
+}
+
+///|
+/// The panic message for an entity that another engine allocated.
+fn foreign_func_type_message(engine_idx : Int) -> String {
+  "encountered foreign entity in func type registry: \{engine_idx}"
+}
+
+///|
+/// Unpacks the entity and checks if it is owned by the engine.
+///
+/// # Panics
+///
+/// If the guarded entity is not owned by the engine.
+fn FuncTypeRegistry::unwrap_index(
+  self : FuncTypeRegistry,
+  func_type : DedupFuncType,
+) -> Int {
+  match func_type.entity_index(self.engine_idx) {
+    Some(index) => index
+    None => abort(foreign_func_type_message(self.engine_idx))
+  }
+}
+
+///|
+/// Resolves a deduplicated function type into a [`FuncType`] entity.
+///
+/// # Panics
+///
+/// - If the deduplicated function type is not owned by the engine.
+/// - If the deduplicated function type cannot be resolved to its entity.
+fn FuncTypeRegistry::resolve_func_type(
+  self : FuncTypeRegistry,
+  func_type : DedupFuncType,
+) -> @wasmi_core.FuncType {
+  let entity_index = self.unwrap_index(func_type)
+  if entity_index < 0 || entity_index >= self.func_types.length() {
+    abort(
+      "failed to resolve stored function type: DedupFuncTypeIdx(\{entity_index})",
+    )
+  }
+  self.func_types[entity_index]
 }
 
 ///|
@@ -349,15 +418,16 @@ fn FuncTypeRegistry::alloc_func_type(
   func_type : @wasmi_core.FuncType,
 ) -> DedupFuncType {
   let key = func_type_key(func_type)
-  match self.dedup.get(key) {
-    Some(index) => DedupFuncType(index)
+  let entity_idx = match self.dedup.get(key) {
+    Some(index) => index
     None => {
       let index = self.func_types.length()
       self.func_types.push(func_type)
       self.dedup.set(key, index)
-      DedupFuncType(index)
+      index
     }
   }
+  { guard_idx: self.engine_idx, entity_idx, }
 }
 
 // ---------------------------------------------------------------------------
@@ -747,7 +817,6 @@ let engine_counter : Ref[Int] = { val: 0, }
 /// - This structure is intentionally cheap to copy.
 ///   Most of its API has a `&self` receiver, so can be shared easily.
 pub struct Engine {
-  priv idx : Int
   priv config : Config
   priv code_map : CodeMap
   priv func_types : FuncTypeRegistry
@@ -758,14 +827,13 @@ pub struct Engine {
 ///|
 /// Creates a new [`Engine`] with the given [`Config`].
 pub fn Engine::new(config : Config) -> Engine {
-  let idx = engine_counter.val
+  let engine_idx = engine_counter.val
   engine_counter.val += 1
   let config = config.clone()
   {
-    idx,
     config,
     code_map: CodeMap::new(config),
-    func_types: { dedup: {}, func_types: [], },
+    func_types: FuncTypeRegistry::new(engine_idx),
     stacks: [],
   }
 }
@@ -801,7 +869,7 @@ pub fn EngineWeak::resolve_func_type(
   self : EngineWeak,
   func_type : DedupFuncType,
 ) -> @wasmi_core.FuncType {
-  self.func_types.func_types[func_type.0]
+  self.func_types.resolve_func_type(func_type)
 }
 
 ///|
@@ -840,7 +908,7 @@ pub fn Engine::resolve_func_type(
   self : Engine,
   func_type : DedupFuncType,
 ) -> @wasmi_core.FuncType {
-  self.func_types.func_types[func_type.0]
+  self.func_types.resolve_func_type(func_type)
 }
 
 ///|
