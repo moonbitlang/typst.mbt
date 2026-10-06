@@ -168,3 +168,18 @@ test "package spec debug" {
   assert_eq(@debug.to_string(spec.versionless()), "@preview/foo")
   assert_eq(@debug.to_string(Some(spec)), "Some(@preview/foo:0.1.0)")
 }
+
+///|
+/// Upstream `{:?}` of a version and of a version bound is their `Display`
+/// form (package.rs:457, :520).
+test "package version debug" {
+  guard! @syntax.PackageVersion::from_str("0.12.3") is Ok(version)
+  assert_eq(@debug.to_string(version), "0.12.3")
+  assert_eq(@debug.to_string([version]), "[0.12.3]")
+  guard! @syntax.VersionBound::from_str("0.12") is Ok(bound)
+  assert_eq(@debug.to_string(bound), "0.12")
+  guard! @syntax.VersionBound::from_str("1") is Ok(major)
+  assert_eq(@debug.to_string(major), "1")
+  guard! @syntax.VersionBound::from_str("1.2.3") is Ok(full)
+  assert_eq(@debug.to_string(full), "1.2.3")
+}
