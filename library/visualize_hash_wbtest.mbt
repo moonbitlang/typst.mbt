@@ -327,20 +327,42 @@ test "fingerprints of modules and closures cover scopes and syntax trees" {
   }
   // Anonymous modules (plugins) are told apart by their scopes, also when
   // a closure captures them.
+  let node0 = @syntax.parse_code("x")
   let a = Module::anonymous(scope(Int(1), detached))
   let b = Module::anonymous(scope(Int(2), detached))
   distinct(Module(a))
   distinct(Module(b))
   distinct(Module(a.with_name("a")))
-  // Modules compare by identity, which is no flag of their fingerprint (a
-  // compilation has one module per file and plugin), also from the cache.
+  // Modules compare by identity. That is a flag of the fingerprint of the
+  // modules that it does not identify (anonymous ones), also from the
+  // cache, and of what holds them; not of named modules and of the
+  // modules of plugins with functions (one object each per compilation).
   let other = Module::anonymous(scope(Int(1), detached))
   assert_false(a == other)
   assert_eq(hash128(Value::Module(a)), hash128(Value::Module(other)))
   for _ in 0..<2 {
     let (_, flags) = fingerprint_and_flags(Value::Module(a))
-    assert_eq(flags, 0)
+    assert_eq(flags, fingerprint_identity)
+    let (_, flags) = fingerprint_and_flags(
+      closure(node0, scope(Module(a), detached)),
+    )
+    assert_eq(flags, fingerprint_identity)
   }
+  let named = Module::new("m", scope(Int(1), detached))
+  let identified = Module::anonymous(scope(Int(1), detached), identified=true)
+  for m in [named, named.with_name("n"), identified, identified.with_name("p")] {
+    for _ in 0..<2 {
+      let (_, flags) = fingerprint_and_flags(Value::Module(m))
+      assert_eq(flags, 0)
+      let (_, flags) = fingerprint_and_flags(
+        closure(node0, scope(Module(m), detached)),
+      )
+      assert_eq(flags, 0)
+    }
+  }
+  // The flag follows the inner data.
+  let (_, flags) = fingerprint_and_flags(Value::Module(a.with_name("q")))
+  assert_eq(flags, fingerprint_identity)
   // A module in its own scope (which evaluation cannot build) terminates.
   let cyclic = Scope::new()
   let cycle = Module::anonymous(cyclic)

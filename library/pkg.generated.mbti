@@ -3626,6 +3626,7 @@ pub(all) struct Arg {
   name : String?
   value : @moonbitlang/typst/syntax.Spanned[Value]
 }
+pub fn Arg::shared(Self) -> Self
 
 pub(all) struct Args {
   mut span : @moonbitlang/typst/syntax.Span
@@ -8444,7 +8445,7 @@ pub fn ModifierSet::iter(Self) -> Array[String]
 pub struct Module {
   // private fields
 }
-pub fn Module::anonymous(Scope) -> Self
+pub fn Module::anonymous(Scope, identified? : Bool) -> Self
 pub fn Module::content(Self) -> Content
 pub fn Module::field(Self, String, BindingGuard) -> Value raise HintedError
 pub fn Module::file_id(Self) -> @moonbitlang/typst/syntax.FileId?

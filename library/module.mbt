@@ -9,6 +9,20 @@ priv struct ModuleInner {
   /// and their scope is not modified once they are built, so they are
   /// hashed once; see `value_hash.mbt` and [LazyFingerprint]).
   hash : LazyFingerprint
+  /// Whether the fingerprint identifies the module in a compilation: two
+  /// modules with this fingerprint are the same object (not upstream, whose
+  /// memoization compares hashes only; see `memo.mbt`). Modules compare by
+  /// identity, and this holds for
+  /// - named modules: the library's, and those of evaluated source files
+  ///   (`eval_source_memoized` returns one object per file);
+  /// - the module of a plugin that exports functions: their fingerprints
+  ///   carry the plugin, and a plugin is loaded once per content
+  ///   (`plugin_module_cache`, `plugin_transition_cache`).
+  /// It does not hold for other anonymous modules: plugins that export no
+  /// function have the same fingerprint, and so has whatever an embedder
+  /// builds twice. A fingerprint that covers such a module is marked
+  /// `fingerprint_identity`.
+  identified : Bool
 }
 
 ///|
@@ -31,13 +45,15 @@ pub fn Module::new(name : String, scope : Scope) -> Module {
       content: Content::empty(),
       file_id: None,
       hash: LazyFingerprint::new(),
+      identified: true,
     },
   }
 }
 
 ///|
-/// Create a new anonymous module without a name.
-pub fn Module::anonymous(scope : Scope) -> Module {
+/// Create a new anonymous module without a name. `identified` says whether
+/// its fingerprint identifies it (see `ModuleInner`; not upstream).
+pub fn Module::anonymous(scope : Scope, identified? : Bool = false) -> Module {
   {
     name: None,
     inner: {
@@ -45,6 +61,7 @@ pub fn Module::anonymous(scope : Scope) -> Module {
       content: Content::empty(),
       file_id: None,
       hash: LazyFingerprint::new(),
+      identified,
     },
   }
 }

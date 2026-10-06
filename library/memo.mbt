@@ -20,16 +20,21 @@
 //   values, where Typst's equality is looser). Closures compare by their
 //   hash, like upstream's (`closures_equal`): equal fingerprints are equal
 //   closures. Modules compare by identity, and a compilation has one module
-//   object per evaluated file and per plugin: equal fingerprints are the
-//   same module.
-// - Layout results whose tags hold host closures are not cached
-//   ([frame_cacheable]), the counter sequence only holds numbers, and the
-//   state sequence is not memoized.
+//   object per evaluated file and per plugin with functions: equal
+//   fingerprints are the same module. (Upstream compares hashes only: two
+//   plugins without functions are the same argument for its memoized calls,
+//   `(a, b).map(m => m == a)` is `(true, true)` there. The port keeps them
+//   apart: their fingerprints are flagged like those of host closures.)
+// - Layout results whose tags hold host closures or modules that their
+//   fingerprint does not identify are not cached ([frame_cacheable]), the
+//   counter sequence only holds numbers, and the state sequence is not
+//   memoized.
 // - Introspector reads of the call are recorded into a fresh
 //   [IntrospectionRecorder]. A cached result is only reused with the
 //   introspector it was computed with, or if all of its recorded reads
 //   produce the same results on the current introspector and none of the
-//   recorded results had a lossy fingerprint or contained host closures.
+//   recorded results had a lossy fingerprint or contained host closures or
+//   modules that their fingerprint does not identify.
 //   Its reads are then merged into the caller's recorder (as if the call
 //   had been executed), so convergence checking is unaffected.
 // - The call's sink side effects (warnings, delayed errors, introspections,
@@ -530,9 +535,10 @@ pub fn memoized_layout(
 }
 
 ///|
-/// Whether a laid-out frame can be reused: its tags must not hold host
-/// closures (`fingerprint_identity`). The same holds for the frames of its
-/// tiling paints.
+/// Whether a laid-out frame can be reused: its tags must not hold values
+/// that compare by identity and that their fingerprint does not identify
+/// (`fingerprint_identity`: host closures, anonymous modules). The same
+/// holds for the frames of its tiling paints.
 fn frame_cacheable(frame : Frame) -> Bool {
   for entry in frame.items() {
     match entry.1 {
