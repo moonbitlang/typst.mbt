@@ -21,8 +21,14 @@
 /// interpolated descriptions (`\{Emph("x")}`) are the descriptions, and
 /// nothing else is parsed.
 ///
-/// - Two `Para`s are two paragraphs, wherever they are; a blank line in
-///   the text is a paragraph break, so the text is several paragraphs.
+/// - Two `Para`s are two paragraphs wherever a paragraph can be (in the
+///   flow, a cell, an item, a block; inside a `Par` or another paragraph
+///   the engine ignores the breaks with a warning). A blank line in the
+///   text is a paragraph break, so the text is several paragraphs; an
+///   empty text is nothing.
+/// - A tight list after a `Para` is set off from it like after a blank
+///   line in Typst source (the break ends what the list could attach to).
+///   A list that belongs to the paragraph is interpolated into its text.
 /// - A block may be interpolated: a displayed formula
 ///   (`\{Equation("..", block=true)}`), a list, a figure. The engine ends
 ///   the paragraph at a block and starts another one after it; `Para`
@@ -31,7 +37,8 @@
 ///   paragraph break), so that it reads as the continuation it is. This
 ///   holds for the blocks that the description shows (the constructors
 ///   that lint L1 takes for blocks), not for what a callback, a `Call` or
-///   a view produces.
+///   a view produces; and a `show par: set par(first-line-indent: ..)` of
+///   the document wins over it, as over the options.
 /// - The options are those of `par`, set for the paragraphs of this text
 ///   (`set par(..)`), `extra` for the ones without a parameter
 ///   (`first-line-indent`). As a set rule they also reach paragraphs
@@ -63,11 +70,16 @@ fn piece_call(elem : @library.Element) -> Content {
 }
 
 ///|
-/// Whether a piece of running text is a paragraph break (a blank line of
-/// the text, `prose_pieces`).
+/// Whether a piece of running text is a paragraph break: a blank line of
+/// the text (`prose_pieces`), or an interpolated `Parbreak()`, also with a
+/// key or a label.
 fn is_parbreak_piece(content : Content) -> Bool {
-  content.node is NValue({ val: VCall(FElem(elem), _), }) &&
-  elem == @library.parbreak_elem()
+  match content.node {
+    NKeyed(_, body) | NLabelled(body, _, _, _) => is_parbreak_piece(body)
+    NValue({ val: VCall(FElem(elem), _), }) => elem == @library.parbreak_elem()
+    NCall({ func: FElem(elem), .. }) => elem == @library.parbreak_elem()
+    _ => false
+  }
 }
 
 ///|
@@ -133,7 +145,11 @@ pub fn Para::Para(
     continuation = Option::None
   }
   for piece in pieces {
-    if is_block(piece) {
+    if is_parbreak_piece(piece) {
+      // (Asked first: a paragraph break is a block for the lint.)
+      close()
+      children.push(piece)
+    } else if is_block(piece) {
       close()
       children.push(piece)
       continuation = Some([
@@ -151,9 +167,6 @@ pub fn Para::Para(
           }),
         ),
       ])
-    } else if is_parbreak_piece(piece) {
-      close()
-      children.push(piece)
     } else if continuation is Some(run) {
       // (A space right after the block is nothing on the page. It stays
       // outside, so that a run of nothing but that space is not made.)

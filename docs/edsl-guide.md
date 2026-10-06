@@ -170,7 +170,8 @@ paragraph breaks. The text is the text of a `Prose` (white space is
 reflowed, `"` and `'` are smart quotes unless `quotes=false`, interpolated
 descriptions are the descriptions). A click on a word of it leads to the
 text argument of the `Para` call. Two `Para`s are two paragraphs wherever
-they are, and a blank line in the text of one is a paragraph break, too.
+a paragraph can be (not inside a `Par`), and a blank line in the text of
+one is a paragraph break, too.
 The options are those of `par` (`justify`, `leading`, `spacing`,
 `linebreaks`, `hanging_indent`, and `extra` for the others); they are set
 for the paragraphs of the text (`set par(..)`), so they also hold for a
@@ -205,13 +206,21 @@ figure; not for one that a callback or a `Call` makes), so with the indent
 above "which the next paragraph uses." starts at the margin and "A new
 paragraph." is indented. About first-line indents, which are the engine's:
 
-- with `all: true` every paragraph is indented, also the first one and the
-  one after a heading;
+- with `all: true` every paragraph that starts at the start edge is
+  indented, also the first one and the one after a heading (but not the
+  first one of a list item);
 - without it (`first-line-indent: 1.5em`) a paragraph is indented if it
   follows a paragraph. A `Para` after a `Para` that *ends* with a formula
   follows a block and is not indented; give it the indent by hand
-  (`extra=[("first-line-indent", indent)]` with `all: true`), or set `all`
-  for the document.
+  (`extra=[("first-line-indent", Value::dict([("all", Value::bool(true))]))]`
+  keeps the document's amount), or set `all` for the document;
+- a `show par: set par(first-line-indent: ..)` of the document wins over
+  both the options of a `Para` and what it does after a formula.
+
+A list written as the next item after a `Para` is set off from it like
+after a blank line in Typst source; a list that belongs to the paragraph is
+interpolated into its text like the formula, where it attaches to the line
+before it.
 
 `Par(body)` is the `par` element: one paragraph with its properties as
 arguments, for inline content (`Par(Seq(["A chip ", Box(..)]))`). It cannot

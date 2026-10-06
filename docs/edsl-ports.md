@@ -185,13 +185,26 @@ source:
   paragraph after a display; with `all` both are. Neither setting gives
   what a paper wants.
 - (c) For text without blocks, `par(options)[text]` and
-  `[#set par(options);#parbreak() text #parbreak()]` are typeset the same:
-  17 containers (the flow, list and enum items, table and grid cells,
-  blocks, a box, a figure, a footnote, columns, a stack, `align`, a quote,
-  `pad`, `place`) under 5 settings of indents and options, 85 comparisons.
-  The one difference: options that are *set* reach the paragraphs inside
-  the text (the entry of a footnote, a box with paragraphs); the arguments
-  of `par(..)` do not.
+  `[#set par(options);#parbreak() text #parbreak()]` are drawn the same
+  (text runs and shapes at the same positions, no diagnostics) in 17
+  containers (the flow, list and enum items, table and grid cells, blocks,
+  a box, a figure, a footnote, columns, a stack, `align`, a quote, `pad`,
+  `place`) under 5 settings of indents and options, 85 comparisons; both
+  are `par` elements for a query. They are not the same thing, and differ
+  in these places (each pinned):
+  1. options that are *set* reach the paragraphs inside the text (the entry
+     of a footnote, a box with paragraphs); the arguments of `par(..)` do
+     not;
+  2. a tight list attaches to a paragraph before it, but not across a
+     paragraph break: after the delimited text it is set off like after a
+     blank line in markup (5.5pt more at 10pt text); inside the delimited
+     text it attaches;
+  3. a `show par: set par(..)` of the document wins over a set rule around
+     the text and loses to an argument of `par(..)`;
+  4. without text there is no paragraph, where `par[]` is an empty one that
+     takes its spacing (and is one more result of `query(par)`);
+  5. inside a paragraph neither is one: the breaks are ignored with a
+     warning each and the text stays; a nested `par` is dropped.
 - (d) Paragraph breaks collapse, and one at the start or end of a container
   is nothing (it only makes the text there a paragraph).
 
@@ -204,7 +217,9 @@ with `set par(first-line-indent: 0pt)`: the continuation is not indented
 under either setting, and nothing else is touched. So:
 
 - a displayed formula in a `Para` is kept, without a warning and with its
-  own origin; the text before and after it reads as one paragraph;
+  own origin; the text before and after it reads as one paragraph (an
+  interpolated `Parbreak()` is a paragraph break like a blank line, not a
+  block with a continuation);
 - the next `Para` is a new paragraph, and it is indented if indents are on
   for all paragraphs (`all: true`), or if the `Para` before it ends with
   text;
@@ -221,16 +236,26 @@ What the engine does not give, and the author still does by hand:
   indented: it follows a block, like a paragraph after a figure or a list.
   The author sets `all: true` for the document (then the first paragraph
   and the one after a heading are indented, too), or gives that paragraph
-  its indent (`extra` with `first-line-indent: (amount: .., all: true)`).
-  `Para` cannot do it: the amount is the document's, known at layout, and
-  an empty paragraph in between (the trick Typst users have) adds space.
+  its indent: `extra=[("first-line-indent", Value::dict([("all",
+  Value::bool(true))]))]`, which keeps the document's amount (the engine
+  folds the dictionary). `Para` cannot do it by itself: a description does
+  not know what comes before it, `all` on every `Para` would indent the
+  first paragraph and the one after a heading as well, and an empty
+  paragraph in between (the trick Typst users have) adds space.
+- A list (or another block) written as an item after a `Para` is set off
+  from it like after a blank line (difference 2 above). What belongs to
+  the paragraph is interpolated into its text, where it attaches as in
+  Typst source.
+- A `show par: set par(first-line-indent: ..)` of the document wins over
+  the continuation rule and over the options of a `Para` (difference 3).
 - The continuation rule is for blocks that the description shows (the
   constructors lint L1 takes for blocks, `Equation(block=true)`); after a
   block that a callback, a `Call`, `Markup` or a view makes, the text is
   indented as the engine indents it.
 - The rule and the options are set rules, so they reach paragraphs nested
   in that text: a footnote in the text after a display has an entry without
-  first-line indent when `all` is on.
+  first-line indent when `all` is on (the rule sets the amount to `0pt`;
+  `all` is inherited).
 - `label` is gone: there is no `par` element to carry it. `extra` gives
   further arguments to the `set par`.
 - `Para` is handwritten: an option that `Par` gains in the generator

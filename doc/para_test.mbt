@@ -119,7 +119,9 @@ test "engine: paragraph breaks collapse, and one at the edge of a container is n
 }
 
 ///|
-test "engine: text between paragraph breaks is typeset like `par[..]`, in every container" {
+test "engine: text between paragraph breaks is drawn like `par[..]`, in every container" {
+  // (Compared: the text runs and shapes of the pages with their positions
+  // to a tenth of a point, and that there is no error or warning.)
   let long = "One two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen."
   // `P` stands for the paragraph.
   let contexts = [
@@ -157,13 +159,34 @@ test "engine: text between paragraph breaks is typeset like `par[..]`, in every 
       if a != b {
         fail("differs in `\{context}` with `\{preamble}` and `\{options}`")
       }
+      if a.contains("error: ") || a.contains("warning: ") {
+        fail("diagnostics in `\{context}`: \{a}")
+      }
       compared += 1
     }
   }
   assert_eq(compared, 85)
-  // The one difference: options that are set reach the paragraphs inside
-  // the text (the entry of a footnote, a box with paragraphs); the
-  // arguments of `par(..)` are for that paragraph only.
+  // Both are `par` elements for a query (three with the two around).
+  let count = (paragraph : String) => {
+    typeset("Before.\n\n\{paragraph}\n\nAfter. #context query(par).len()")
+  }
+  assert_eq(count("#par[\{long}]"), count("#[#parbreak()\{long}#parbreak()]"))
+  inspect(
+    count("#par[short]"),
+    content=(
+      #|p1 text 10.0,16.6 w28.7 "Before."
+      #|p1 text 10.0,35.2 w21.2 "short"
+      #|p1 text 10.0,53.7 w25.2 "After. "
+      #|p1 text 35.2,53.7 w4.7 "3"
+    ),
+  )
+}
+
+///|
+test "engine: where text between paragraph breaks is not `par[..]`" {
+  // 1. Options that are set reach the paragraphs inside the text (the
+  // entry of a footnote, a box with paragraphs); the arguments of
+  // `par(..)` are for that paragraph only.
   let options = "justify: true, first-line-indent: (amount: 1em, all: true), hanging-indent: 6pt"
   let inside = "Text #box(width: 90pt)[#parbreak()Inner paragraph that is long enough to wrap.#parbreak()] more."
   inspect(
@@ -184,6 +207,86 @@ test "engine: text between paragraph breaks is typeset like `par[..]`, in every 
       #|p1 text 46.3,29.7 w84.0 "that is long enough "
       #|p1 text 46.3,42.7 w33.8 "to wrap."
       #|p1 text 130.3,16.6 w25.7 " more."
+    ),
+  )
+  // 2. A tight list attaches to the paragraph before it (the spacing is
+  // the leading), not across a paragraph break: after the delimited text
+  // it is set off like after a blank line in markup. Inside the delimited
+  // text it attaches.
+  let attached = typeset("#par[Hello]#list([Item])")
+  inspect(
+    attached,
+    content=(
+      #|p1 text 10.0,16.6 w22.1 "Hello"
+      #|p1 text 10.0,29.7 w3.5 "•"
+      #|p1 text 18.5,29.7 w18.5 "Item"
+    ),
+  )
+  inspect(
+    typeset("#[#parbreak()Hello#parbreak()]#list([Item])"),
+    content=(
+      #|p1 text 10.0,16.6 w22.1 "Hello"
+      #|p1 text 10.0,35.2 w3.5 "•"
+      #|p1 text 18.5,35.2 w18.5 "Item"
+    ),
+  )
+  assert_eq(typeset("#[#parbreak()Hello#list([Item])#parbreak()]"), attached)
+  assert_eq(typeset("Hello\n- Item"), attached)
+  assert_eq(
+    typeset("Hello\n\n- Item"),
+    typeset("#[#parbreak()Hello#parbreak()]#list([Item])"),
+  )
+  // 3. A show-set rule on `par` wins over a set rule around the text, and
+  // loses to an argument of `par(..)`.
+  let rule = "#show par: set par(first-line-indent: (amount: 20pt, all: true))\n"
+  inspect(
+    typeset(rule + "#par(first-line-indent: (amount: 10pt, all: true))[Text]"),
+    content=(
+      #|p1 text 20.0,16.6 w17.8 "Text"
+    ),
+  )
+  inspect(
+    typeset(
+      rule +
+      "#[#set par(first-line-indent: (amount: 10pt, all: true));#parbreak()Text#parbreak()]",
+    ),
+    content=(
+      #|p1 text 30.0,16.6 w17.8 "Text"
+    ),
+  )
+  // 4. Without text there is no paragraph; `par[]` is an empty one, which
+  // takes its spacing.
+  inspect(
+    typeset("Before.#par[]After. #context query(par).len()"),
+    content=(
+      #|p1 text 10.0,16.6 w28.7 "Before."
+      #|p1 text 10.0,47.2 w25.2 "After. "
+      #|p1 text 35.2,47.2 w4.7 "3"
+    ),
+  )
+  inspect(
+    typeset("Before.#[#parbreak()#parbreak()]After. #context query(par).len()"),
+    content=(
+      #|p1 text 10.0,16.6 w28.7 "Before."
+      #|p1 text 10.0,35.2 w25.2 "After. "
+      #|p1 text 35.2,35.2 w4.7 "2"
+    ),
+  )
+  // 5. Inside a paragraph neither is one: the breaks are ignored with a
+  // warning and the text stays, a nested `par` is dropped.
+  inspect(
+    typeset("#par[Outer #[#parbreak()inner#parbreak()] text.]"),
+    content=(
+      #|warning: parbreak may not occur inside of a paragraph and was ignored | parbreak may not occur inside of a paragraph and was ignored
+      #|p1 text 10.0,16.6 w68.2 "Outer inner text."
+    ),
+  )
+  inspect(
+    typeset("#par[Outer #par[inner] text.]"),
+    content=(
+      #|warning: par may not occur inside of a paragraph and was ignored
+      #|p1 text 10.0,16.6 w26.2 "Outer "
+      #|p1 text 36.2,16.6 w20.3 " text."
     ),
   )
 }
@@ -329,6 +432,68 @@ test "para: two of them are two paragraphs" {
 }
 
 ///|
+test "para: a list after it, an empty one, one inside a paragraph" {
+  // A tight list after a `Para` is set off like after a blank line; one
+  // that belongs to the paragraph is interpolated, and attaches.
+  inspect(
+    marks_of([@doc.Para("Text:"), @doc.List(["a", "b"]), @doc.Para("After.")]),
+    content=(
+      #|p1 text 10.0,16.6 w20.2 "Text:"
+      #|p1 text 10.0,35.2 w3.5 "•"
+      #|p1 text 18.5,35.2 w4.6 "a"
+      #|p1 text 10.0,48.2 w3.5 "•"
+      #|p1 text 18.5,48.2 w4.9 "b"
+      #|p1 text 10.0,66.8 w22.7 "After."
+    ),
+  )
+  inspect(
+    marks_of([@doc.Para("Text: \{@doc.List(["a", "b"])}"), @doc.Para("After.")]),
+    content=(
+      #|p1 text 10.0,16.6 w20.2 "Text:"
+      #|p1 text 10.0,29.7 w3.5 "•"
+      #|p1 text 18.5,29.7 w4.6 "a"
+      #|p1 text 10.0,42.7 w3.5 "•"
+      #|p1 text 18.5,42.7 w4.9 "b"
+      #|p1 text 10.0,61.3 w22.7 "After."
+    ),
+  )
+  assert_eq(
+    marks_of([@doc.Para("Text: \{@doc.List(["a", "b"])}"), @doc.Para("After.")]),
+    marks_of([
+      @doc.Par(@doc.Prose("Text:")),
+      @doc.List(["a", "b"]),
+      @doc.Par(@doc.Prose("After.")),
+    ]),
+  )
+  // An empty text is nothing (`Par("")` is an empty paragraph, which
+  // takes its spacing).
+  assert_eq(
+    marks_of([@doc.Para("Before."), @doc.Para(""), @doc.Para("After.")]),
+    marks_of([@doc.Para("Before."), @doc.Para("After.")]),
+  )
+  // Inside a `Par` there is no paragraph to make: the engine ignores the
+  // breaks, with a warning each, and the text is part of that paragraph.
+  let inside = compile(
+    [
+      ..small_page(),
+      @doc.Par(@doc.Seq(["Outer ", @doc.Para("inner"), " text."])),
+    ],
+  )
+  inspect(
+    warning_messages(inside),
+    content=(
+      #|parbreak may not occur inside of a paragraph and was ignored | parbreak may not occur inside of a paragraph and was ignored
+    ),
+  )
+  inspect(
+    listing(marks(inside)),
+    content=(
+      #|p1 text 10.0,16.6 w68.2 "Outer inner text."
+    ),
+  )
+}
+
+///|
 test "para: a blank line in the text is a paragraph break" {
   // The text of a `Prose` has a paragraph break at a blank line. Between
   // the two breaks of a `Para` it is one more: two paragraphs, with the
@@ -425,6 +590,19 @@ test "para: a displayed formula inside is kept, and the text after it is not ind
     indents(false, paragraphs()),
     content="10.0 Zero. | 20.0 Before | 97.1 𝑥 | 10.0 after. | 20.0 Next. | 20.0 Ends | 97.4 𝑦 | 10.0 Afterwards.",
   )
+  // The indent by hand, for that paragraph: `all` in its own options
+  // (the amount is the document's).
+  let indented = @doc.Value::dict([("all", @doc.Value::bool(true))])
+  inspect(
+    indents(false, [
+      @doc.Para("Ends \{@doc.Equation("y", block=true)}"),
+      @doc.Para("Afterwards.", extra=[("first-line-indent", indented)]),
+      @doc.Para("Next."),
+    ]),
+    content=(
+      #|10.0 Ends | 97.4 𝑦 | 20.0 Afterwards. | 20.0 Next.
+    ),
+  )
   // A blank line after a display starts a paragraph that is indented
   // again; a second display has its own continuation; any block that the
   // description shows counts (a list).
@@ -440,6 +618,42 @@ test "para: a displayed formula inside is kept, and the text after it is not ind
     ]),
     content=(
       #|20.0 A | 97.1 𝑥 | 10.0 b | 97.4 𝑦 | 10.0 c | 20.0 D | 10.0 • | 18.5 item | 10.0 e.
+    ),
+  )
+  // An interpolated `Parbreak()` is a paragraph break like a blank line:
+  // what follows is a new paragraph, not a continuation.
+  assert_eq(
+    indents(true, [@doc.Para("A\{@doc.Parbreak()}B")]),
+    indents(true, [@doc.Para("A\n\nB")]),
+  )
+  inspect(
+    indents(true, [
+      @doc.Para("A \{@doc.Keyed("k", @doc.Parbreak())} B\{@doc.V(Pt(2))}c"),
+    ]),
+    content=(
+      #|20.0 A | 20.0 B | 10.0 c
+    ),
+  )
+  // A show-set rule on `par` wins over the rule for the continuation (and
+  // over the options of a `Para`), as it does in Typst source.
+  inspect(
+    indents(true, [
+      @doc.ShowSet(
+        @doc.Select::par(),
+        @doc.Set("par", [
+          (
+            "first-line-indent",
+            @doc.Value::dict([
+              ("amount", @doc.Value::length(Pt(10))),
+              ("all", @doc.Value::bool(true)),
+            ]),
+          ),
+        ]),
+      ),
+      @doc.Para("Before \{@doc.Equation("x", block=true)} after."),
+    ]),
+    content=(
+      #|20.0 Before | 97.1 𝑥 | 20.0 after.
     ),
   )
   // What the description does not show is a block only for the engine:
