@@ -31,7 +31,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from typemap import mbt_type  # noqa: E402
-from typegen import accessor_name  # noqa: E402
+from typegen import accessor_name, mbt_since  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LIB = os.path.join(ROOT, "library")
@@ -284,7 +284,8 @@ def main():
             f"  match native_{key}_cell.val {{\n    Some(d) => d\n    None => {{\n"
             f"      let d = NativeFuncData::new(\n"
             f"        name={mbt_str(fname)},\n        title={mbt_str(f['title'])},\n"
-            f"        docs={mbt_str(f['doc'])},\n        keywords=[{', '.join(mbt_str(k) for k in f['keywords'])}],\n"
+            + (f"        {mbt_since(f['since'])},\n" if f["since"] else "")
+            + f"        docs={mbt_str(f['doc'])},\n        keywords=[{', '.join(mbt_str(k) for k in f['keywords'])}],\n"
             f"        contextual={str(f['contextual']).lower()},\n"
             f"        params=[\n" + "\n".join("    " + i for i in infos) + "\n        ],\n"
             f"        returns=() => {returns}{scope_fn},\n"

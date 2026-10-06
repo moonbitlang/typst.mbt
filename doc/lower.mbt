@@ -5,7 +5,7 @@
 // and context).
 
 ///|
-priv struct Lower {
+priv struct Lowering {
   session : Session
   engine : @library.Engine
   context : @library.Context
@@ -13,7 +13,7 @@ priv struct Lower {
   keys : Array[String]
   /// The spans for what has no location of its own inside the argument
   /// that is being lowered (`None`: nothing was given out yet, see
-  /// `Lower::args`).
+  /// `Lowering::args`).
   pieces : Pieces?
 }
 
@@ -36,7 +36,7 @@ priv struct Pieces {
   /// The number of spans that were given out. The first is `base` itself.
   next : @ref.Ref[Int]
   /// The spans of what is inside the argument under `Keyed` wrappers: one
-  /// counter per path of keys (`Lower::keyed`). The table belongs to the
+  /// counter per path of keys (`Lowering::keyed`). The table belongs to the
   /// argument: the counters of its key paths share it, so that a path is
   /// one counter however the wrappers that spell it are nested.
   keyed : Map[String, Pieces]
@@ -86,7 +86,7 @@ fn is_pieces_key(key : String) -> Bool {
 ///|
 /// `self` for lowering what is passed in the argument with the span
 /// `anchor`, which the caller gives to the argument itself.
-fn Lower::at(self : Lower, anchor : @syntax.Span) -> Lower {
+fn Lowering::at(self : Lowering, anchor : @syntax.Span) -> Lowering {
   { ..self, pieces: Some(Pieces::after(anchor)), }
 }
 
@@ -106,11 +106,11 @@ fn Lower::at(self : Lower, anchor : @syntax.Span) -> Lower {
 /// The counters of all paths are in the table of the argument, also the
 /// paths that are reached inside a keyed body (a call value with a
 /// `Keyed` argument): `["a", "b"]` is one counter, wherever it is spelled.
-fn Lower::keyed(
-  self : Lower,
+fn Lowering::keyed(
+  self : Lowering,
   keys : Array[String],
   fallback : @syntax.Span,
-) -> (Lower, @syntax.Span) raise @library.SourceError {
+) -> (Lowering, @syntax.Span) raise @library.SourceError {
   match self.pieces {
     Some(outer) => {
       // (Unambiguous for any keys: each is prefixed with its length.)
@@ -127,7 +127,7 @@ fn Lower::keyed(
           pieces
         }
       }
-      let inner : Lower = { ..self, keys, pieces: Some(pieces), }
+      let inner : Lowering = { ..self, keys, pieces: Some(pieces), }
       (inner, inner.take(pieces))
     }
     // No argument is being lowered: the span itself under the keys.
@@ -140,8 +140,8 @@ fn Lower::keyed(
 
 ///|
 /// The next span of `pieces`.
-fn Lower::take(
-  self : Lower,
+fn Lowering::take(
+  self : Lowering,
   pieces : Pieces,
 ) -> @syntax.Span raise @library.SourceError {
   let k = pieces.next.val
@@ -151,15 +151,18 @@ fn Lower::take(
 
 ///|
 /// The entry of a call site under the current keys.
-fn Lower::entry(self : Lower, site : Site) -> Int raise @library.SourceError {
+fn Lowering::entry(
+  self : Lowering,
+  site : Site,
+) -> Int raise @library.SourceError {
   self.session.registry.entry(site, self.keys)
 }
 
 ///|
 /// Run `f`, adding a call trace point to its errors (the evaluator's
 /// `trace_call`).
-fn[T] Lower::trace_call(
-  self : Lower,
+fn[T] Lowering::trace_call(
+  self : Lowering,
   name : String?,
   span : @syntax.Span,
   f : () -> T raise @library.SourceError,
@@ -186,7 +189,10 @@ fn[T] Lower::trace_call(
 /// value, which are taken after the call's own span, are inside that. The
 /// range is a real range of the origin's own line, so no span outside that
 /// line contains it.
-fn Lower::trace_range(self : Lower, span : @syntax.DiagSpan) -> (Int, Int)? {
+fn Lowering::trace_range(
+  self : Lowering,
+  span : @syntax.DiagSpan,
+) -> (Int, Int)? {
   let range = @library.world_range(self.engine.world, span)
   let registry = self.session.registry
   guard span.get() is Range(id~, start~, end~) && id == registry.origins else {
@@ -232,8 +238,8 @@ fn Lower::trace_range(self : Lower, span : @syntax.DiagSpan) -> (Int, Int)? {
 /// Lower a description to engine content. `fallback` is the span for nodes
 /// without a location of their own (plain strings): the span of the
 /// argument they were passed in.
-fn Lower::content(
-  self : Lower,
+fn Lowering::content(
+  self : Lowering,
   content : Content,
   fallback : @syntax.Span,
 ) -> @library.Content raise @library.SourceError {
@@ -259,7 +265,7 @@ fn Lower::content(
       // Children without a location of their own (plain strings, values)
       // get distinct spans inside the array argument's (`Pieces`).
       let pieces = Pieces::new(self.session.registry.arg_span(entry, 0))
-      let inner : Lower = { ..self, pieces: Some(pieces), }
+      let inner : Lowering = { ..self, pieces: Some(pieces), }
       inner.sequence(children[:], pieces.base, own=true)
     }
     // A rule outside a sequence styles nothing (Typst only allows `set` and
@@ -280,7 +286,7 @@ fn Lower::content(
       self.check_key(key, fallback)
       let keys = self.keys.copy()
       keys.push(key)
-      let inner : Lower = { ..self, keys, }
+      let inner : Lowering = { ..self, keys, }
       // Content without a location of its own gets the enclosing
       // argument's origin under the keys.
       match body.node {
@@ -314,8 +320,8 @@ fn Lower::content(
 /// The error for a rule that is not a direct child of a sequence.
 /// A string that reaches lowering must not contain the placeholder of an
 /// interpolated description: only `Prose` resolves those (`prose.mbt`).
-fn Lower::check_text(
-  self : Lower,
+fn Lowering::check_text(
+  self : Lowering,
   text : String,
   span : @syntax.Span,
 ) -> Unit raise @library.SourceError {
@@ -332,8 +338,8 @@ fn Lower::check_text(
 ///|
 /// The key of a `Keyed`: a text like any other that is lowered, and no key
 /// of the occurrences that lowering registers itself (`PIECES_KEY`).
-fn Lower::check_key(
-  self : Lower,
+fn Lowering::check_key(
+  self : Lowering,
   key : String,
   span : @syntax.Span,
 ) -> Unit raise @library.SourceError {
@@ -348,8 +354,8 @@ fn Lower::check_key(
 }
 
 ///|
-fn Lower::misplaced_rule(
-  self : Lower,
+fn Lowering::misplaced_rule(
+  self : Lowering,
   site : Site,
 ) -> @library.SourceError raise @library.SourceError {
   let span = self.session.registry.span(self.entry(site))
@@ -374,8 +380,8 @@ fn Lower::misplaced_rule(
 /// keys of the origin plus a key of its own (`PIECES_KEY`, block number):
 /// one line of the origin listing per `len` pieces, where `len` is the
 /// length of `base`.
-fn Lower::piece_span(
-  self : Lower,
+fn Lowering::piece_span(
+  self : Lowering,
   base : @syntax.Span,
   k : Int,
 ) -> @syntax.Span raise @library.SourceError {
@@ -415,8 +421,8 @@ fn Lower::piece_span(
 /// children are the pieces of the argument with the span `fallback`, and
 /// each child without a location of its own takes a span of `self.pieces`;
 /// otherwise there is one child, an inserted expression with that span.
-fn Lower::sequence(
-  self : Lower,
+fn Lowering::sequence(
+  self : Lowering,
   children : ArrayView[Content],
   fallback : @syntax.Span,
   own~ : Bool,
@@ -515,8 +521,8 @@ fn is_inserted(content : Content) -> Bool {
 ///|
 /// The value and the span of an inserted expression (`is_inserted`),
 /// evaluated under the keys of its `Keyed` wrappers.
-fn Lower::inserted(
-  self : Lower,
+fn Lowering::inserted(
+  self : Lowering,
   content : Content,
   fallback : @syntax.Span,
 ) -> (@library.Value, @syntax.Span) raise @library.SourceError {
@@ -531,7 +537,7 @@ fn Lower::inserted(
       self.check_key(key, fallback)
       let keys = self.keys.copy()
       keys.push(key)
-      let inner : Lower = { ..self, keys, }
+      let inner : Lowering = { ..self, keys, }
       match body.node {
         NValue(_) => {
           let (inner, span) = self.keyed(keys, fallback)
@@ -548,8 +554,8 @@ fn Lower::inserted(
 /// Glyph offsets into a string of more than 65,535 bytes are not reliable:
 /// mark the origin of `span` if `value` is one (a string literal or the
 /// result of a call).
-fn Lower::mark_long(
-  self : Lower,
+fn Lowering::mark_long(
+  self : Lowering,
   value : @library.Value,
   span : @syntax.Span,
 ) -> Unit {
@@ -560,8 +566,8 @@ fn Lower::mark_long(
 
 ///|
 /// Attach a label like markup does to one inserted expression result.
-fn Lower::labelled(
-  self : Lower,
+fn Lowering::labelled(
+  self : Lowering,
   body : @library.Content,
   name : String,
   span : @syntax.Span,
@@ -600,8 +606,8 @@ fn Lower::labelled(
 ///|
 /// Resolve a qualified name like the evaluator resolves an identifier
 /// followed by field accesses.
-fn Lower::global(
-  self : Lower,
+fn Lowering::global(
+  self : Lowering,
   path : String,
   span : @syntax.Span,
 ) -> @library.Value raise @library.SourceError {
@@ -626,8 +632,8 @@ fn Lower::global(
 
 ///|
 /// The function a reference denotes.
-fn Lower::func(
-  self : Lower,
+fn Lowering::func(
+  self : Lowering,
   func : FuncRef,
   span : @syntax.Span,
 ) -> @library.Func raise @library.SourceError {
@@ -644,8 +650,8 @@ fn Lower::func(
 ///|
 /// Lower arguments. Each argument is spanned with its parameter's location
 /// (`entry < 0` or `param < 0`: the call's span).
-fn Lower::args(
-  self : Lower,
+fn Lowering::args(
+  self : Lowering,
   args : Array[ArgNode],
   entry : Int,
   span : @syntax.Span,
@@ -686,7 +692,7 @@ fn Lower::args(
       self.check_text(name, arg_span)
     }
     // What has no location inside the argument takes further spans.
-    let inner : Lower = { ..self, pieces: Some(pieces), }
+    let inner : Lowering = { ..self, pieces: Some(pieces), }
     if arg.value.val is VSpread(spread) {
       // Like the evaluator's spread argument (`eval_args`).
       match inner.value(spread, arg_span) {
@@ -724,8 +730,8 @@ fn Lower::args(
 
 ///|
 /// Call a function like the evaluator's `call_func`.
-fn Lower::call(
-  self : Lower,
+fn Lowering::call(
+  self : Lowering,
   func : FuncRef,
   args : Array[ArgNode],
   entry : Int,
@@ -747,8 +753,8 @@ fn Lower::call(
 ///|
 /// Lower a value description. `span` is the span of the argument it is
 /// passed in.
-fn Lower::value(
-  self : Lower,
+fn Lowering::value(
+  self : Lowering,
   value : Value,
   span : @syntax.Span,
 ) -> @library.Value raise @library.SourceError {
@@ -843,8 +849,8 @@ fn Lower::value(
 
 ///|
 /// Lower a set rule like the evaluator's `eval_set_rule`.
-fn Lower::set_rule(
-  self : Lower,
+fn Lowering::set_rule(
+  self : Lowering,
   set : SetNode,
 ) -> @library.Styles raise @library.SourceError {
   let entry = self.entry(set.origin)
@@ -868,8 +874,8 @@ fn Lower::set_rule(
 
 ///|
 /// Lower a show rule like the evaluator's `eval_show_rule`.
-fn Lower::show_rule(
-  self : Lower,
+fn Lowering::show_rule(
+  self : Lowering,
   show : ShowNode,
 ) -> @library.Recipe raise @library.SourceError {
   let entry = self.entry(show.origin)
@@ -879,7 +885,7 @@ fn Lower::show_rule(
     Some(selector) => {
       let pieces = pieces_of(scopes, self.session.registry.arg_span(entry, 0))
       let selector_span = self.take(pieces)
-      let inner : Lower = { ..self, pieces: Some(pieces), }
+      let inner : Lowering = { ..self, pieces: Some(pieces), }
       let selector = inner.value(selector, selector_span)
       let selector : @library.ShowableSelector = @library.at(selector_span, () => {
         selector.cast()
@@ -903,7 +909,7 @@ fn Lower::show_rule(
         ),
       )
       let transform_span = self.take(pieces)
-      let inner : Lower = { ..self, pieces: Some(pieces), }
+      let inner : Lowering = { ..self, pieces: Some(pieces), }
       let value = inner.value(value, transform_span)
       @library.at(transform_span, () => value.cast())
     }
@@ -922,8 +928,8 @@ fn Lower::show_rule(
 
 ///|
 /// Evaluate Typst source with the front end (`Markup`, `Equation`).
-fn Lower::eval(
-  self : Lower,
+fn Lowering::eval(
+  self : Lowering,
   node : EvalNode,
 ) -> @library.Content raise @library.SourceError {
   let entry = self.entry(node.origin)
@@ -939,7 +945,7 @@ fn Lower::eval(
     self.check_text(pair.0, span)
     let pieces = pieces_of(scopes, span)
     let value_span = self.take(pieces)
-    let inner : Lower = { ..self, pieces: Some(pieces), }
+    let inner : Lowering = { ..self, pieces: Some(pieces), }
     scope.define_(pair.0, inner.value(pair.1, value_span)) |> ignore
   }
   let id = self.session.registry.snippet(

@@ -42,6 +42,7 @@ fn html_typed_create_func_data(
   NativeFuncData::new(
     name~,
     title~,
+    since=Version(0, 14, 0),
     docs=element.docs,
     keywords=["typed-html"],
     contextual=false,

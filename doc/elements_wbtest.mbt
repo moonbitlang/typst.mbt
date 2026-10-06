@@ -1,6 +1,6 @@
 ///|
 /// A lowering context without layout, for tests.
-fn test_lower() -> Lower {
+fn test_lower() -> Lowering {
   let world = DocWorld::in_memory()
   let session = Session::new(world)
   let session_world : SessionWorld = { session, }

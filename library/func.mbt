@@ -36,6 +36,8 @@ pub struct NativeFuncData {
   name : String
   /// The function's title case name (e.g. `Align`).
   title : String
+  /// The version of Typst the function was introduced in.
+  since : Since?
   /// Documentation for this function.
   docs : String
   /// Search keywords.
@@ -55,6 +57,7 @@ pub struct NativeFuncData {
 pub fn NativeFuncData::new(
   name~ : String,
   title~ : String,
+  since? : Since,
   docs? : String = "",
   keywords? : Array[String] = [],
   contextual? : Bool = false,
@@ -67,6 +70,7 @@ pub fn NativeFuncData::new(
     function,
     name,
     title,
+    since,
     docs,
     keywords,
     contextual,

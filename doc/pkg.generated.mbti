@@ -106,11 +106,19 @@ pub impl @builtin.Show for BlockView
 pub impl @debug.Debug for BlockView
 pub impl IntoContent for BlockView
 
+pub(all) enum BottomEdge {
+  Baseline
+  Descender
+  Bounds
+  Len(Length)
+}
+pub impl ToValue for BottomEdge
+
 pub struct Box {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn Box::Box(&IntoContent, width? : Sizing, height? : Length, fill? : Paint, stroke? : Sides[Stroke], radius? : Corners[Length], inset? : Sides[Length], outset? : Sides[Length], clip? : Bool, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn Box::Box(&IntoContent, width? : Sizing, height? : Length, baseline? : Length, fill? : Paint, stroke? : Sides[Stroke], radius? : Corners[Length], inset? : Sides[Length], outset? : Sides[Length], clip? : Bool, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl @builtin.Show for Box
 pub impl @debug.Debug for Box
 pub impl IntoContent for Box
@@ -191,6 +199,19 @@ pub fn ColbreakView::view(Self) -> ContentView
 pub impl @builtin.Show for ColbreakView
 pub impl @debug.Debug for ColbreakView
 pub impl IntoContent for ColbreakView
+
+pub(all) enum ColorSpace {
+  Auto
+  Oklab
+  Oklch
+  Srgb
+  LinearRgb
+  Grayscale
+  Cmyk
+  Hsl
+  Hsv
+}
+pub impl ToValue for ColorSpace
 
 pub struct Columns {
   // private fields
@@ -416,6 +437,30 @@ pub fn CurveView::view(Self) -> ContentView
 pub impl @builtin.Show for CurveView
 pub impl @debug.Debug for CurveView
 pub impl IntoContent for CurveView
+
+pub(all) enum Dash {
+  Auto
+  None
+  Solid
+  Dotted
+  DenselyDotted
+  LooselyDotted
+  Dashed
+  DenselyDashed
+  LooselyDashed
+  DashDotted
+  DenselyDashDotted
+  LooselyDashDotted
+  Pattern(Array[DashLen], phase~ : Length)
+  RawValue(Value)
+}
+pub impl ToValue for Dash
+
+pub(all) enum DashLen {
+  Dot
+  Len(Length)
+}
+pub impl ToValue for DashLen
 
 pub struct Diagnostic {
   severity : Severity
@@ -789,7 +834,7 @@ pub struct Highlight {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn Highlight::Highlight(&IntoContent, fill? : Paint, stroke? : Sides[Stroke], extent? : Length, radius? : Corners[Length], extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn Highlight::Highlight(&IntoContent, fill? : Paint, stroke? : Sides[Stroke], top_edge? : TopEdge, bottom_edge? : BottomEdge, extent? : Length, radius? : Corners[Length], extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl @builtin.Show for Highlight
 pub impl @debug.Debug for Highlight
 pub impl IntoContent for Highlight
@@ -848,6 +893,20 @@ pub impl @builtin.Show for Labelled
 pub impl @debug.Debug for Labelled
 pub impl IntoContent for Labelled
 
+pub struct Layout {
+  // private fields
+}
+#callsite(autofill(args_loc, loc))
+pub fn Layout::Layout(loc~ : SourceLoc, args_loc~ : ArgsLoc, (LayoutSize, Ctx) -> &IntoContent raise) -> Self
+pub impl @builtin.Show for Layout
+pub impl @debug.Debug for Layout
+pub impl IntoContent for Layout
+
+pub struct LayoutSize {
+  width : Double
+  height : Double
+}
+
 pub(all) enum Length {
   Auto
   None
@@ -863,6 +922,8 @@ pub(all) enum Length {
   Scaled(Length, Double)
 }
 pub fn Length::scale(Self, Double) -> Self
+pub fn Length::sizing(Self) -> Sizing
+pub fn Length::spacing(Self) -> Spacing
 pub impl Add for Length
 pub impl Neg for Length
 pub impl @builtin.Sub for Length
@@ -984,6 +1045,15 @@ pub fn Lorem::Lorem(Int64, extra? : Array[(String, Value)], label? : String, loc
 pub impl @builtin.Show for Lorem
 pub impl @debug.Debug for Lorem
 pub impl IntoContent for Lorem
+
+pub struct Lower {
+  // private fields
+}
+#callsite(autofill(args_loc, loc))
+pub fn Lower::Lower(&IntoContent, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Lower
+pub impl @debug.Debug for Lower
+pub impl IntoContent for Lower
 
 pub struct Markup {
   // private fields
@@ -1184,11 +1254,15 @@ pub(all) enum Paint {
   Value(Value)
 }
 pub fn Paint::conic(Array[Self], angle? : Angle, center? : (Length, Length), relative? : String) -> Self
+pub fn Paint::darken(Self, Double) -> Self
+pub fn Paint::lighten(Self, Double) -> Self
 pub fn Paint::linear(Array[Self], angle? : Angle, dir? : Dir, relative? : String) -> Self
 pub fn Paint::map(String) -> Array[Self]
+pub fn Paint::mix(Self, Self, weight? : Double, space? : ColorSpace) -> Self
 pub fn Paint::radial(Array[Self], center? : (Length, Length), radius? : Length, focal_center? : (Length, Length), focal_radius? : Length, relative? : String) -> Self
 pub fn Paint::stop(Self, Length) -> Self
 pub fn Paint::tiling(&IntoContent, size? : (Length, Length), spacing? : (Length, Length), offset? : (Length, Length), angle? : Angle, relative? : String) -> Self
+pub fn Paint::transparentize(Self, Double) -> Self
 pub impl ToValue for Paint
 
 pub struct Par {
@@ -1437,7 +1511,7 @@ pub struct Select {
 pub fn Select::align() -> Selector[AlignView]
 pub fn Select::bibliography(full? : Bool, style? : String, group? : String) -> Selector[BibliographyView]
 pub fn Select::block(width? : Length, height? : Sizing, breakable? : Bool, fill? : Paint, stroke? : Sides[Stroke], radius? : Corners[Length], inset? : Sides[Length], outset? : Sides[Length], spacing? : Spacing, above? : Spacing, below? : Spacing, clip? : Bool, sticky? : Bool) -> Selector[BlockView]
-pub fn Select::box(width? : Sizing, height? : Length, fill? : Paint, stroke? : Sides[Stroke], radius? : Corners[Length], inset? : Sides[Length], outset? : Sides[Length], clip? : Bool) -> Selector[BoxView]
+pub fn Select::box(width? : Sizing, height? : Length, baseline? : Length, fill? : Paint, stroke? : Sides[Stroke], radius? : Corners[Length], inset? : Sides[Length], outset? : Sides[Length], clip? : Bool) -> Selector[BoxView]
 pub fn Select::circle(radius? : Length, width? : Length, height? : Sizing, fill? : Paint, stroke? : Stroke, inset? : Sides[Length], outset? : Sides[Length]) -> Selector[CircleView]
 pub fn Select::cite(form? : String, style? : String) -> Selector[CiteView]
 pub fn Select::colbreak(weak? : Bool) -> Selector[ColbreakView]
@@ -1465,7 +1539,7 @@ pub fn Select::grid_vline(x? : Int64, start? : Int64, end_? : Int64, stroke? : S
 pub fn Select::h(weak? : Bool) -> Selector[HView]
 pub fn Select::heading(level? : Int64, depth? : Int64, offset? : Int64, numbering? : Numbering, supplement? : Supplement, outlined? : Bool, bookmarked? : Bool, hanging_indent? : Length) -> Selector[HeadingView]
 pub fn Select::hide() -> Selector[HideView]
-pub fn Select::highlight(fill? : Paint, stroke? : Sides[Stroke], extent? : Length, radius? : Corners[Length]) -> Selector[HighlightView]
+pub fn Select::highlight(fill? : Paint, stroke? : Sides[Stroke], top_edge? : TopEdge, bottom_edge? : BottomEdge, extent? : Length, radius? : Corners[Length]) -> Selector[HighlightView]
 pub fn Select::image(format? : String, width? : Length, height? : Sizing, alt? : String, page? : Int64, fit? : String, scaling? : String) -> Selector[ImageView]
 pub fn Select::label(String) -> Selector[ContentView]
 pub fn Select::line(start? : (Length, Length), end_? : (Length, Length), length? : Length, angle? : Angle, stroke? : Stroke) -> Selector[LineView]
@@ -1510,7 +1584,7 @@ pub fn Select::table_hline(y? : Int64, start? : Int64, end_? : Int64, stroke? : 
 pub fn Select::table_vline(x? : Int64, start? : Int64, end_? : Int64, stroke? : Stroke, position? : Alignment) -> Selector[TableVlineView]
 pub fn Select::terms(tight? : Bool, indent? : Length, hanging_indent? : Length, spacing? : Length) -> Selector[TermsView]
 pub fn Select::terms_item() -> Selector[TermsItemView]
-pub fn Select::text(font? : Array[String], fallback? : Bool, style? : String, weight? : FontWeight, size? : Length, fill? : Paint, stroke? : Stroke, tracking? : Length, spacing? : Length, baseline? : Length, overhang? : Bool, lang? : String, region? : String, dir? : Dir, hyphenate? : Bool, kerning? : Bool, ligatures? : Bool, discretionary_ligatures? : Bool, historical_ligatures? : Bool, number_type? : String, number_width? : String, slashed_zero? : Bool, fractions? : Bool) -> Selector[TextView]
+pub fn Select::text(font? : Array[String], fallback? : Bool, style? : String, weight? : FontWeight, size? : Length, fill? : Paint, stroke? : Stroke, tracking? : Length, spacing? : Length, baseline? : Length, overhang? : Bool, top_edge? : TopEdge, bottom_edge? : BottomEdge, lang? : String, region? : String, dir? : Dir, hyphenate? : Bool, kerning? : Bool, ligatures? : Bool, discretionary_ligatures? : Bool, historical_ligatures? : Bool, number_type? : String, number_width? : String, slashed_zero? : Bool, fractions? : Bool) -> Selector[TextView]
 pub fn Select::title() -> Selector[TitleView]
 pub fn Select::underline(stroke? : Stroke, offset? : Length, extent? : Length, evade? : Bool, background? : Bool) -> Selector[UnderlineView]
 pub fn Select::v(weak? : Bool) -> Selector[VView]
@@ -1578,7 +1652,7 @@ pub struct SetBox {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetBox::SetBox(body? : &IntoContent, width? : Sizing, height? : Length, fill? : Paint, stroke? : Sides[Stroke], radius? : Corners[Length], inset? : Sides[Length], outset? : Sides[Length], clip? : Bool, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetBox::SetBox(body? : &IntoContent, width? : Sizing, height? : Length, baseline? : Length, fill? : Paint, stroke? : Sides[Stroke], radius? : Corners[Length], inset? : Sides[Length], outset? : Sides[Length], clip? : Bool, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl @debug.Debug for SetBox
 pub impl IntoContent for SetBox
 pub impl SetRule for SetBox
@@ -1812,7 +1886,7 @@ pub struct SetHighlight {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetHighlight::SetHighlight(fill? : Paint, stroke? : Sides[Stroke], extent? : Length, radius? : Corners[Length], extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetHighlight::SetHighlight(fill? : Paint, stroke? : Sides[Stroke], top_edge? : TopEdge, bottom_edge? : BottomEdge, extent? : Length, radius? : Corners[Length], extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl @debug.Debug for SetHighlight
 pub impl IntoContent for SetHighlight
 pub impl SetRule for SetHighlight
@@ -2145,7 +2219,7 @@ pub struct SetText {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn SetText::SetText(font? : Array[String], fallback? : Bool, style? : String, weight? : FontWeight, size? : Length, fill? : Paint, stroke? : Stroke, tracking? : Length, spacing? : Length, baseline? : Length, overhang? : Bool, lang? : String, region? : String, dir? : Dir, hyphenate? : Bool, kerning? : Bool, ligatures? : Bool, discretionary_ligatures? : Bool, historical_ligatures? : Bool, number_type? : String, number_width? : String, slashed_zero? : Bool, fractions? : Bool, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn SetText::SetText(font? : Array[String], fallback? : Bool, style? : String, weight? : FontWeight, size? : Length, fill? : Paint, stroke? : Stroke, tracking? : Length, spacing? : Length, baseline? : Length, overhang? : Bool, top_edge? : TopEdge, bottom_edge? : BottomEdge, lang? : String, region? : String, dir? : Dir, hyphenate? : Bool, kerning? : Bool, ligatures? : Bool, discretionary_ligatures? : Bool, historical_ligatures? : Bool, number_type? : String, number_width? : String, slashed_zero? : Bool, fractions? : Bool, extra? : Array[(String, Value)], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl @debug.Debug for SetText
 pub impl IntoContent for SetText
 pub impl SetRule for SetText
@@ -2214,11 +2288,13 @@ pub struct Sides[T] {
 pub fn[T] Sides::Sides(all? : T, x? : T, y? : T, left? : T, top? : T, right? : T, bottom? : T, rest? : T) -> Self[T]
 pub fn[T] Sides::auto() -> Self[T]
 pub fn[T] Sides::none() -> Self[T]
+pub fn Sides::zero() -> Self[Length]
 pub impl[T : ToValue] ToValue for Sides[T]
 
 pub struct Size {
   width : Double
   height : Double
+  baseline : Double
 }
 
 pub(all) enum Sizing {
@@ -2382,7 +2458,7 @@ pub impl IntoContent for StrikeView
 pub struct Stroke {
   // private fields
 }
-pub fn Stroke::Stroke(paint? : Paint, thickness? : Length, cap? : String, join? : String, dash? : Value, miter_limit? : Double) -> Self
+pub fn Stroke::Stroke(paint? : Paint, thickness? : Length, cap? : String, join? : String, dash? : Dash, miter_limit? : Double) -> Self
 pub fn Stroke::auto() -> Self
 pub fn Stroke::none() -> Self
 pub impl ToValue for Stroke
@@ -2603,7 +2679,7 @@ pub struct Text {
   // private fields
 }
 #callsite(autofill(args_loc, loc))
-pub fn Text::Text(&IntoContent, font? : Array[String], fallback? : Bool, style? : String, weight? : FontWeight, size? : Length, fill? : Paint, stroke? : Stroke, tracking? : Length, spacing? : Length, baseline? : Length, overhang? : Bool, lang? : String, region? : String, dir? : Dir, hyphenate? : Bool, kerning? : Bool, ligatures? : Bool, discretionary_ligatures? : Bool, historical_ligatures? : Bool, number_type? : String, number_width? : String, slashed_zero? : Bool, fractions? : Bool, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub fn Text::Text(&IntoContent, font? : Array[String], fallback? : Bool, style? : String, weight? : FontWeight, size? : Length, fill? : Paint, stroke? : Stroke, tracking? : Length, spacing? : Length, baseline? : Length, overhang? : Bool, top_edge? : TopEdge, bottom_edge? : BottomEdge, lang? : String, region? : String, dir? : Dir, hyphenate? : Bool, kerning? : Bool, ligatures? : Bool, discretionary_ligatures? : Bool, historical_ligatures? : Bool, number_type? : String, number_width? : String, slashed_zero? : Bool, fractions? : Bool, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
 pub impl @builtin.Show for Text
 pub impl @debug.Debug for Text
 pub impl IntoContent for Text
@@ -2639,6 +2715,16 @@ pub impl @builtin.Show for TitleView
 pub impl @debug.Debug for TitleView
 pub impl IntoContent for TitleView
 
+pub(all) enum TopEdge {
+  Ascender
+  CapHeight
+  XHeight
+  Baseline
+  Bounds
+  Len(Length)
+}
+pub impl ToValue for TopEdge
+
 pub struct TracePoint {
   description : String
   location : Location?
@@ -2661,6 +2747,15 @@ pub fn UnderlineView::view(Self) -> ContentView
 pub impl @builtin.Show for UnderlineView
 pub impl @debug.Debug for UnderlineView
 pub impl IntoContent for UnderlineView
+
+pub struct Upper {
+  // private fields
+}
+#callsite(autofill(args_loc, loc))
+pub fn Upper::Upper(&IntoContent, extra? : Array[(String, Value)], label? : String, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl @builtin.Show for Upper
+pub impl @debug.Debug for Upper
+pub impl IntoContent for Upper
 
 pub struct V {
   // private fields

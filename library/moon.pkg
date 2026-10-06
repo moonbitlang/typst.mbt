@@ -10,6 +10,7 @@ import {
   "moonbitlang/typst/syntax/ast",
   "moonbitlang/core/double",
   "moonbitlang/core/encoding/utf8",
+  "moonbitlang/core/debug",
   "moonbitlang/typst/data/serde",
   "moonbitlang/typst/data/json",
   "moonbitlang/typst/data/csv",

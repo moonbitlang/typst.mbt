@@ -4202,6 +4202,8 @@ pub fn Text::Text(
   spacing? : Length,
   baseline? : Length,
   overhang? : Bool,
+  top_edge? : TopEdge,
+  bottom_edge? : BottomEdge,
   lang? : String,
   region? : String,
   dir? : Dir,
@@ -4258,51 +4260,65 @@ pub fn Text::Text(
   if overhang is Some(v) {
     args.push({ name: Some("overhang"), value: Value::bool(v), param: 11, })
   }
+  if top_edge is Some(v) {
+    args.push({
+      name: Some("top-edge"),
+      value: ToValue::to_value(v),
+      param: 12,
+    })
+  }
+  if bottom_edge is Some(v) {
+    args.push({
+      name: Some("bottom-edge"),
+      value: ToValue::to_value(v),
+      param: 13,
+    })
+  }
   if lang is Some(v) {
-    args.push({ name: Some("lang"), value: Value::str(v), param: 12, })
+    args.push({ name: Some("lang"), value: Value::str(v), param: 14, })
   }
   if region is Some(v) {
-    args.push({ name: Some("region"), value: Value::str(v), param: 13, })
+    args.push({ name: Some("region"), value: Value::str(v), param: 15, })
   }
   if dir is Some(v) {
-    args.push({ name: Some("dir"), value: ToValue::to_value(v), param: 14, })
+    args.push({ name: Some("dir"), value: ToValue::to_value(v), param: 16, })
   }
   if hyphenate is Some(v) {
-    args.push({ name: Some("hyphenate"), value: Value::bool(v), param: 15, })
+    args.push({ name: Some("hyphenate"), value: Value::bool(v), param: 17, })
   }
   if kerning is Some(v) {
-    args.push({ name: Some("kerning"), value: Value::bool(v), param: 16, })
+    args.push({ name: Some("kerning"), value: Value::bool(v), param: 18, })
   }
   if ligatures is Some(v) {
-    args.push({ name: Some("ligatures"), value: Value::bool(v), param: 17, })
+    args.push({ name: Some("ligatures"), value: Value::bool(v), param: 19, })
   }
   if discretionary_ligatures is Some(v) {
     args.push({
       name: Some("discretionary-ligatures"),
       value: Value::bool(v),
-      param: 18,
+      param: 20,
     })
   }
   if historical_ligatures is Some(v) {
     args.push({
       name: Some("historical-ligatures"),
       value: Value::bool(v),
-      param: 19,
+      param: 21,
     })
   }
   if number_type is Some(v) {
-    args.push({ name: Some("number-type"), value: Value::str(v), param: 20, })
+    args.push({ name: Some("number-type"), value: Value::str(v), param: 22, })
   }
   if number_width is Some(v) {
-    args.push({ name: Some("number-width"), value: Value::str(v), param: 21, })
+    args.push({ name: Some("number-width"), value: Value::str(v), param: 23, })
   }
   if slashed_zero is Some(v) {
-    args.push({ name: Some("slashed-zero"), value: Value::bool(v), param: 22, })
+    args.push({ name: Some("slashed-zero"), value: Value::bool(v), param: 24, })
   }
   if fractions is Some(v) {
-    args.push({ name: Some("fractions"), value: Value::bool(v), param: 23, })
+    args.push({ name: Some("fractions"), value: Value::bool(v), param: 25, })
   }
-  push_extra(args, extra, 24)
+  push_extra(args, extra, 26)
   {
     content: labelled_call(
       {
@@ -4311,7 +4327,7 @@ pub fn Text::Text(
         origin: Site::new("Text", loc, args_loc),
       },
       label,
-      25,
+      27,
     ),
   }
 }
@@ -4359,6 +4375,8 @@ pub fn SetText::SetText(
   spacing? : Length,
   baseline? : Length,
   overhang? : Bool,
+  top_edge? : TopEdge,
+  bottom_edge? : BottomEdge,
   lang? : String,
   region? : String,
   dir? : Dir,
@@ -4409,51 +4427,65 @@ pub fn SetText::SetText(
   if overhang is Some(v) {
     args.push({ name: Some("overhang"), value: Value::bool(v), param: 10, })
   }
+  if top_edge is Some(v) {
+    args.push({
+      name: Some("top-edge"),
+      value: ToValue::to_value(v),
+      param: 11,
+    })
+  }
+  if bottom_edge is Some(v) {
+    args.push({
+      name: Some("bottom-edge"),
+      value: ToValue::to_value(v),
+      param: 12,
+    })
+  }
   if lang is Some(v) {
-    args.push({ name: Some("lang"), value: Value::str(v), param: 11, })
+    args.push({ name: Some("lang"), value: Value::str(v), param: 13, })
   }
   if region is Some(v) {
-    args.push({ name: Some("region"), value: Value::str(v), param: 12, })
+    args.push({ name: Some("region"), value: Value::str(v), param: 14, })
   }
   if dir is Some(v) {
-    args.push({ name: Some("dir"), value: ToValue::to_value(v), param: 13, })
+    args.push({ name: Some("dir"), value: ToValue::to_value(v), param: 15, })
   }
   if hyphenate is Some(v) {
-    args.push({ name: Some("hyphenate"), value: Value::bool(v), param: 14, })
+    args.push({ name: Some("hyphenate"), value: Value::bool(v), param: 16, })
   }
   if kerning is Some(v) {
-    args.push({ name: Some("kerning"), value: Value::bool(v), param: 15, })
+    args.push({ name: Some("kerning"), value: Value::bool(v), param: 17, })
   }
   if ligatures is Some(v) {
-    args.push({ name: Some("ligatures"), value: Value::bool(v), param: 16, })
+    args.push({ name: Some("ligatures"), value: Value::bool(v), param: 18, })
   }
   if discretionary_ligatures is Some(v) {
     args.push({
       name: Some("discretionary-ligatures"),
       value: Value::bool(v),
-      param: 17,
+      param: 19,
     })
   }
   if historical_ligatures is Some(v) {
     args.push({
       name: Some("historical-ligatures"),
       value: Value::bool(v),
-      param: 18,
+      param: 20,
     })
   }
   if number_type is Some(v) {
-    args.push({ name: Some("number-type"), value: Value::str(v), param: 19, })
+    args.push({ name: Some("number-type"), value: Value::str(v), param: 21, })
   }
   if number_width is Some(v) {
-    args.push({ name: Some("number-width"), value: Value::str(v), param: 20, })
+    args.push({ name: Some("number-width"), value: Value::str(v), param: 22, })
   }
   if slashed_zero is Some(v) {
-    args.push({ name: Some("slashed-zero"), value: Value::bool(v), param: 21, })
+    args.push({ name: Some("slashed-zero"), value: Value::bool(v), param: 23, })
   }
   if fractions is Some(v) {
-    args.push({ name: Some("fractions"), value: Value::bool(v), param: 22, })
+    args.push({ name: Some("fractions"), value: Value::bool(v), param: 24, })
   }
-  push_extra(args, extra, 23)
+  push_extra(args, extra, 25)
   {
     node: {
       func: FElem(@library.text_elem()),
@@ -4528,6 +4560,8 @@ pub fn Select::text(
   spacing? : Length,
   baseline? : Length,
   overhang? : Bool,
+  top_edge? : TopEdge,
+  bottom_edge? : BottomEdge,
   lang? : String,
   region? : String,
   dir? : Dir,
@@ -4574,6 +4608,12 @@ pub fn Select::text(
   }
   if overhang is Some(v) {
     fields.push(("overhang", Value::bool(v)))
+  }
+  if top_edge is Some(v) {
+    fields.push(("top-edge", ToValue::to_value(v)))
+  }
+  if bottom_edge is Some(v) {
+    fields.push(("bottom-edge", ToValue::to_value(v)))
   }
   if lang is Some(v) {
     fields.push(("lang", Value::str(v)))
@@ -5687,6 +5727,8 @@ pub fn Highlight::Highlight(
   body : &IntoContent,
   fill? : Paint,
   stroke? : Sides[Stroke],
+  top_edge? : TopEdge,
+  bottom_edge? : BottomEdge,
   extent? : Length,
   radius? : Corners[Length],
   extra? : Array[(String, Value)] = [],
@@ -5702,13 +5744,23 @@ pub fn Highlight::Highlight(
   if stroke is Some(v) {
     args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 2, })
   }
+  if top_edge is Some(v) {
+    args.push({ name: Some("top-edge"), value: ToValue::to_value(v), param: 3, })
+  }
+  if bottom_edge is Some(v) {
+    args.push({
+      name: Some("bottom-edge"),
+      value: ToValue::to_value(v),
+      param: 4,
+    })
+  }
   if extent is Some(v) {
-    args.push({ name: Some("extent"), value: ToValue::to_value(v), param: 3, })
+    args.push({ name: Some("extent"), value: ToValue::to_value(v), param: 5, })
   }
   if radius is Some(v) {
-    args.push({ name: Some("radius"), value: ToValue::to_value(v), param: 4, })
+    args.push({ name: Some("radius"), value: ToValue::to_value(v), param: 6, })
   }
-  push_extra(args, extra, 5)
+  push_extra(args, extra, 7)
   {
     content: labelled_call(
       {
@@ -5717,7 +5769,7 @@ pub fn Highlight::Highlight(
         origin: Site::new("Highlight", loc, args_loc),
       },
       label,
-      6,
+      8,
     ),
   }
 }
@@ -5752,6 +5804,8 @@ pub struct SetHighlight {
 pub fn SetHighlight::SetHighlight(
   fill? : Paint,
   stroke? : Sides[Stroke],
+  top_edge? : TopEdge,
+  bottom_edge? : BottomEdge,
   extent? : Length,
   radius? : Corners[Length],
   extra? : Array[(String, Value)] = [],
@@ -5765,13 +5819,23 @@ pub fn SetHighlight::SetHighlight(
   if stroke is Some(v) {
     args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 1, })
   }
+  if top_edge is Some(v) {
+    args.push({ name: Some("top-edge"), value: ToValue::to_value(v), param: 2, })
+  }
+  if bottom_edge is Some(v) {
+    args.push({
+      name: Some("bottom-edge"),
+      value: ToValue::to_value(v),
+      param: 3,
+    })
+  }
   if extent is Some(v) {
-    args.push({ name: Some("extent"), value: ToValue::to_value(v), param: 2, })
+    args.push({ name: Some("extent"), value: ToValue::to_value(v), param: 4, })
   }
   if radius is Some(v) {
-    args.push({ name: Some("radius"), value: ToValue::to_value(v), param: 3, })
+    args.push({ name: Some("radius"), value: ToValue::to_value(v), param: 5, })
   }
-  push_extra(args, extra, 4)
+  push_extra(args, extra, 6)
   {
     node: {
       func: FElem(@library.highlight_elem()),
@@ -5837,6 +5901,8 @@ pub fn HighlightView::body(
 pub fn Select::highlight(
   fill? : Paint,
   stroke? : Sides[Stroke],
+  top_edge? : TopEdge,
+  bottom_edge? : BottomEdge,
   extent? : Length,
   radius? : Corners[Length],
 ) -> Selector[HighlightView] {
@@ -5846,6 +5912,12 @@ pub fn Select::highlight(
   }
   if stroke is Some(v) {
     fields.push(("stroke", ToValue::to_value(v)))
+  }
+  if top_edge is Some(v) {
+    fields.push(("top-edge", ToValue::to_value(v)))
+  }
+  if bottom_edge is Some(v) {
+    fields.push(("bottom-edge", ToValue::to_value(v)))
   }
   if extent is Some(v) {
     fields.push(("extent", ToValue::to_value(v)))
@@ -7330,7 +7402,10 @@ pub fn Select::block(
 ///|
 /// `box`: An inline-level container that sizes content.
 ///
-/// `Box(body, ..)`: as `Block`. Twin: `box(.., body)`.
+/// `Box(body, ..)`: as `Block`. `baseline` is the shift form of the field
+/// (`box(baseline: 2pt)`: how far the box is moved down from the text
+/// baseline, a length or a ratio of the box's height); the alignment form and
+/// the `(at:, shift:)` form go through `extra`. Twin: `box(.., body)`.
 ///
 /// Explicit states besides a value:
 /// - `height`: `auto` as `Auto`
@@ -7345,6 +7420,7 @@ pub fn Box::Box(
   body : &IntoContent,
   width? : Sizing,
   height? : Length,
+  baseline? : Length,
   fill? : Paint,
   stroke? : Sides[Stroke],
   radius? : Corners[Length],
@@ -7358,7 +7434,7 @@ pub fn Box::Box(
 ) -> Box {
   let args : Array[ArgNode] = []
   if extra_arg(extra, "body") is Some(v) {
-    args.push({ name: None, value: v, param: 9, })
+    args.push({ name: None, value: v, param: 10, })
   } else {
     args.push({ name: None, value: Value::content(body), param: 0, })
   }
@@ -7368,25 +7444,28 @@ pub fn Box::Box(
   if height is Some(v) {
     args.push({ name: Some("height"), value: ToValue::to_value(v), param: 2, })
   }
+  if baseline is Some(v) {
+    args.push({ name: Some("baseline"), value: ToValue::to_value(v), param: 3, })
+  }
   if fill is Some(v) {
-    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 3, })
+    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 4, })
   }
   if stroke is Some(v) {
-    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 4, })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 5, })
   }
   if radius is Some(v) {
-    args.push({ name: Some("radius"), value: ToValue::to_value(v), param: 5, })
+    args.push({ name: Some("radius"), value: ToValue::to_value(v), param: 6, })
   }
   if inset is Some(v) {
-    args.push({ name: Some("inset"), value: ToValue::to_value(v), param: 6, })
+    args.push({ name: Some("inset"), value: ToValue::to_value(v), param: 7, })
   }
   if outset is Some(v) {
-    args.push({ name: Some("outset"), value: ToValue::to_value(v), param: 7, })
+    args.push({ name: Some("outset"), value: ToValue::to_value(v), param: 8, })
   }
   if clip is Some(v) {
-    args.push({ name: Some("clip"), value: Value::bool(v), param: 8, })
+    args.push({ name: Some("clip"), value: Value::bool(v), param: 9, })
   }
-  push_extra(args, extra, 9, positional=["body"])
+  push_extra(args, extra, 10, positional=["body"])
   {
     content: labelled_call(
       {
@@ -7395,7 +7474,7 @@ pub fn Box::Box(
         origin: Site::new("Box", loc, args_loc),
       },
       label,
-      10,
+      11,
     ),
   }
 }
@@ -7432,6 +7511,7 @@ pub fn SetBox::SetBox(
   body? : &IntoContent,
   width? : Sizing,
   height? : Length,
+  baseline? : Length,
   fill? : Paint,
   stroke? : Sides[Stroke],
   radius? : Corners[Length],
@@ -7444,7 +7524,7 @@ pub fn SetBox::SetBox(
 ) -> SetBox {
   let args : Array[ArgNode] = []
   if extra_arg(extra, "body") is Some(v) {
-    args.push({ name: None, value: v, param: 9, })
+    args.push({ name: None, value: v, param: 10, })
   } else if body is Some(v) {
     args.push({ name: None, value: Value::content(v), param: 0, })
   }
@@ -7454,25 +7534,28 @@ pub fn SetBox::SetBox(
   if height is Some(v) {
     args.push({ name: Some("height"), value: ToValue::to_value(v), param: 2, })
   }
+  if baseline is Some(v) {
+    args.push({ name: Some("baseline"), value: ToValue::to_value(v), param: 3, })
+  }
   if fill is Some(v) {
-    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 3, })
+    args.push({ name: Some("fill"), value: ToValue::to_value(v), param: 4, })
   }
   if stroke is Some(v) {
-    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 4, })
+    args.push({ name: Some("stroke"), value: ToValue::to_value(v), param: 5, })
   }
   if radius is Some(v) {
-    args.push({ name: Some("radius"), value: ToValue::to_value(v), param: 5, })
+    args.push({ name: Some("radius"), value: ToValue::to_value(v), param: 6, })
   }
   if inset is Some(v) {
-    args.push({ name: Some("inset"), value: ToValue::to_value(v), param: 6, })
+    args.push({ name: Some("inset"), value: ToValue::to_value(v), param: 7, })
   }
   if outset is Some(v) {
-    args.push({ name: Some("outset"), value: ToValue::to_value(v), param: 7, })
+    args.push({ name: Some("outset"), value: ToValue::to_value(v), param: 8, })
   }
   if clip is Some(v) {
-    args.push({ name: Some("clip"), value: Value::bool(v), param: 8, })
+    args.push({ name: Some("clip"), value: Value::bool(v), param: 9, })
   }
-  push_extra(args, extra, 9, positional=["body"])
+  push_extra(args, extra, 10, positional=["body"])
   {
     node: {
       func: FElem(@library.box_elem()),
@@ -7530,6 +7613,7 @@ pub fn BoxView::view(self : BoxView) -> ContentView {
 pub fn Select::box(
   width? : Sizing,
   height? : Length,
+  baseline? : Length,
   fill? : Paint,
   stroke? : Sides[Stroke],
   radius? : Corners[Length],
@@ -7543,6 +7627,9 @@ pub fn Select::box(
   }
   if height is Some(v) {
     fields.push(("height", ToValue::to_value(v)))
+  }
+  if baseline is Some(v) {
+    fields.push(("baseline", ToValue::to_value(v)))
   }
   if fill is Some(v) {
     fields.push(("fill", ToValue::to_value(v)))
@@ -14023,6 +14110,107 @@ pub fn Paint::tiling(
     named.push(("relative", Value::str(v)))
   }
   Value(Value::native(@library.native_tiling_construct(), positional, named~))
+}
+
+///|
+/// `upper`: Converts a string or content to uppercase.
+///
+/// `Upper(body)`: `body` is content, so the function sets a text case
+/// property on it (`upper` of a string value, which gives the converted
+/// string, is `Call("upper", ..)` or a `Value::str` body). Twin:
+/// `upper[#body]`.
+pub struct Upper {
+  priv content : Content
+}
+
+///|
+#callsite(autofill(loc, args_loc))
+pub fn Upper::Upper(
+  text : &IntoContent,
+  extra? : Array[(String, Value)] = [],
+  label? : String,
+  loc~ : SourceLoc,
+  args_loc~ : ArgsLoc,
+) -> Upper {
+  let args : Array[ArgNode] = []
+  args.push({ name: None, value: Value::content(text), param: 0, })
+  push_extra(args, extra, 1)
+  {
+    content: labelled_call(
+      {
+        func: FNative(@library.native_upper()),
+        args,
+        origin: Site::new("Upper", loc, args_loc),
+      },
+      label,
+      2,
+    ),
+  }
+}
+
+///|
+pub impl IntoContent for Upper with fn into_content(self) {
+  self.content
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for Upper with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
+pub impl @debug.Debug for Upper with fn to_repr(self) {
+  self.content.to_repr()
+}
+
+///|
+/// `lower`: Converts a string or content to lowercase.
+///
+/// `Lower(body)`: as `Upper`. Twin: `lower[#body]`.
+pub struct Lower {
+  priv content : Content
+}
+
+///|
+#callsite(autofill(loc, args_loc))
+pub fn Lower::Lower(
+  text : &IntoContent,
+  extra? : Array[(String, Value)] = [],
+  label? : String,
+  loc~ : SourceLoc,
+  args_loc~ : ArgsLoc,
+) -> Lower {
+  let args : Array[ArgNode] = []
+  args.push({ name: None, value: Value::content(text), param: 0, })
+  push_extra(args, extra, 1)
+  {
+    content: labelled_call(
+      {
+        func: FNative(@library.native_lower()),
+        args,
+        origin: Site::new("Lower", loc, args_loc),
+      },
+      label,
+      2,
+    ),
+  }
+}
+
+///|
+pub impl IntoContent for Lower with fn into_content(self) {
+  self.content
+}
+
+///|
+/// Interpolation into the text of `Prose`.
+pub impl @builtin.Show for Lower with fn output(self, logger) {
+  prose_placeholder(self.content, logger)
+}
+
+///|
+pub impl @debug.Debug for Lower with fn to_repr(self) {
+  self.content.to_repr()
 }
 
 ///|

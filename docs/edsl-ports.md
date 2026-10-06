@@ -175,10 +175,28 @@ that remains on the page, and a dimension can be infinite (an auto-sized
 container). Like every callback it falls under the creation rule
 (revision 8, section 11): it cannot be created inside another callback.
 
+As built (step 2): the type is `LayoutSize`, not `Region`. `doc` already
+has a public `Region` (the box on a page that `ReviewText::positions`
+returns, published in 0.1.4). Measured: the size is the block's own where it
+has one and the surrounding region's otherwise (a box or block without a
+width reports the width around it, not an infinite one); a dimension is
+infinite on a page with `height: auto` or `width: auto`, and both are while
+the content is measured without a size (`doc/ports_test.mbt`).
+
 ### 3.3 `Size` with a baseline
 
 `Ctx::measure` returns the engine's baseline as well (`Size.baseline`), so
 text can be anchored on its baseline without a font-size estimate (T11).
+
+As built (step 2), measured at 10pt in the embedded serif
+(`doc/ports_test.mbt`): the baseline is that of the first line, from the top
+of the measured frame. With Typst's default text edges (cap height to
+baseline) it equals the height of one line (6.58pt); with
+`bottom_edge=Descender` the height is 9.04pt and the baseline stays 6.58pt.
+A block or box reports the baseline of its first line including its inset
+(a box with a `baseline` of its own the one it was given: 4.58pt for
+`baseline=Pt(2)`), content without a baseline of its own (a shape) its
+height, empty content 0.
 
 ### 3.4 Typed parameters and values
 
@@ -217,6 +235,35 @@ engine's explicit states, and the untyped escape (`extra=`, `Value`) stays.
   as an inset stays a located lowering error (T8).
 - T10 is withdrawn (section 2.3); the guide explains where the location of
   a value's error points and how `#callsite` moves it to a helper's caller.
+
+As built (step 2), where the list above could not be taken literally:
+
+- The untyped case of `Dash` is `RawValue(Value)`, not `Raw(Value)`: with a
+  case `Raw`, `@doc.Raw("code")` (the raw element's constructor, written
+  with its package) is an ambiguous constructor (error 4124).
+  `Stroke(dash=..)` changes type, which breaks `dash=Value::..`: there is no
+  implicit path from `Value` (a trait-object parameter would stop the cases
+  from resolving, revision 8, fact 5); such a call becomes
+  `dash=RawValue(..)` or a typed case.
+- MoonBit has no optional fields in enum cases, so `Pattern(lengths,
+  phase=..)` always names its phase, and lowers to the dictionary form.
+- The cases of `ColorSpace` for `rgb` and `luma` are `Srgb` and
+  `Grayscale`, not `Rgb` and `Luma`: a second enum of the package with
+  those cases makes `@doc.Rgb("#..")` and `@doc.Luma(..)` ambiguous where
+  no type is expected (`let c = @doc.Rgb(..)`), and they must stay the
+  colours of `Paint` as in 0.1.4 (pinned by a test). `Gray` is a case of
+  `Paint` too. The lowered values are Typst's `rgb` and `luma`.
+- `Upper`/`Lower` are generated function facades whose argument is content;
+  they are left out of the translator's table (`api=False` in
+  `scripts/docgen.py`), since `upper("x")` of a string literal is a string,
+  not text with a case property.
+- New parameters stand where the engine's fields do, so the parameter
+  indices of origins (`Origin.param`, `ArgsLoc`) move for what follows them:
+  by two from `lang` on in `Text`/`SetText` and from `extent` on in
+  `Highlight`/`SetHighlight`, by one from `fill` on in `Box`/`SetBox`
+  (`extra` and `label` included).
+- `transparentize` with a negative percentage is Typst's `opacify`
+  (`a + (1 − a) × |p|/100`), not the formula above with a negative `p`.
 
 ## 4. A kit (new package `doc/kit`)
 

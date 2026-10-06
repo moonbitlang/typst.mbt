@@ -3940,10 +3940,16 @@ pub fn Binding::check_write(Self, BindingGuard, String) -> Unit raise HintedErro
 pub fn Binding::copy(Self) -> Self
 pub fn Binding::deprecation(Self) -> Deprecation?
 pub fn Binding::detached(Value) -> Self
+pub fn Binding::docs(Self) -> String?
 pub fn Binding::feature(Self) -> Feature?
+pub fn Binding::is_documented(Self) -> Bool
+pub fn Binding::keywords(Self) -> ArrayView[String]
+pub fn Binding::name(Self) -> String?
 pub fn Binding::new(Value, @moonbitlang/typst/syntax.Span) -> Self
 pub fn Binding::read(Self, BindingGuard, String) -> Value raise HintedError
 pub fn Binding::set_value(Self, Value) -> Unit
+pub fn Binding::since(Self) -> Since?
+pub fn Binding::title(Self) -> String?
 pub fn Binding::with_category(Self, Category) -> Self
 pub fn Binding::with_deprecation(Self, Deprecation) -> Self
 pub fn Binding::with_documentation(Self, BindingDocumentation) -> Self
@@ -3954,7 +3960,12 @@ pub(all) struct BindingDocumentation {
   name : String
   title : String
   docs : String
+  since : Since?
+  keywords : ArrayView[String]
 } derive(Eq, Hash)
+pub fn BindingDocumentation::from_elem(Element) -> Self
+pub fn BindingDocumentation::from_func(NativeFuncData) -> Self
+pub fn BindingDocumentation::from_type(NativeTypeData) -> Self
 
 pub(all) enum BindingError {
   Captured(Capturer)
@@ -5569,10 +5580,11 @@ pub fn Element::into_value(Self) -> Value
 pub fn Element::is_locatable(Self) -> Bool
 pub fn Element::is_tagged(Self) -> Bool
 pub fn Element::is_unqueriable(Self) -> Bool
+pub fn Element::keywords(Self) -> ArrayView[String]
 pub fn Element::local_name(Self, String, String?) -> String?
 pub fn Element::local_name_in(Self, StyleChain) -> String
 pub fn Element::name(Self) -> String
-pub fn Element::new(name~ : String, title~ : String, key? : String, docs? : String, keywords? : Array[String], capabilities? : Array[String], fields~ : Array[FieldInfo]) -> Self
+pub fn Element::new(name~ : String, title~ : String, key? : String, since? : Since, docs? : String, keywords? : Array[String], capabilities? : Array[String], fields~ : Array[FieldInfo]) -> Self
 pub fn Element::output() -> CastInfo
 pub fn Element::params(Self) -> Array[ParamInfo]
 pub fn Element::repr(Self) -> String
@@ -5581,6 +5593,7 @@ pub fn Element::select(Self) -> Selector
 pub fn Element::set(Self, Engine, Args) -> Styles raise SourceError
 pub fn Element::set_fields(Self, Engine, Args) -> Styles raise SourceError
 pub fn Element::settable_field_accessor(Self, String) -> ((StyleChain) -> Value)?
+pub fn Element::since(Self) -> Since?
 pub fn Element::title(Self) -> String
 pub fn Element::where_(Self, Array[(Int, Value)]) -> Selector
 pub impl Compare for Element
@@ -5595,6 +5608,7 @@ pub struct ElementData {
   name : String
   key : String
   title : String
+  since : Since?
   docs : String
   keywords : Array[String]
   capabilities : Array[String]
@@ -8491,6 +8505,7 @@ pub struct NativeFuncData {
   function : (Engine, Context, Args) -> Value raise SourceError
   name : String
   title : String
+  since : Since?
   docs : String
   keywords : Array[String]
   contextual : Bool
@@ -8498,7 +8513,7 @@ pub struct NativeFuncData {
   returns : () -> CastInfo
   // private fields
 }
-pub fn NativeFuncData::new(name~ : String, title~ : String, docs? : String, keywords? : Array[String], contextual? : Bool, scope? : () -> Scope, params? : Array[ParamInfo], returns? : () -> CastInfo, (Engine, Context, Args) -> Value raise SourceError) -> Self
+pub fn NativeFuncData::new(name~ : String, title~ : String, since? : Since, docs? : String, keywords? : Array[String], contextual? : Bool, scope? : () -> Scope, params? : Array[ParamInfo], returns? : () -> CastInfo, (Engine, Context, Args) -> Value raise SourceError) -> Self
 pub fn NativeFuncData::scope(Self) -> Scope
 
 pub struct NativeRuleMap {
@@ -8522,10 +8537,12 @@ pub struct NativeTypeData {
   name : String
   long_name : String
   title : String
+  since : Since?
   docs : String
+  keywords : Array[String]
   // private fields
 }
-pub fn NativeTypeData::new(name~ : String, long_name~ : String, title~ : String, docs~ : String) -> Self
+pub fn NativeTypeData::new(name~ : String, long_name~ : String, title~ : String, since? : Since, docs~ : String, keywords? : Array[String]) -> Self
 pub fn NativeTypeData::register(Self, (Self) -> Unit) -> Unit
 pub fn NativeTypeData::set_constructor(Self, NativeFuncData) -> Unit
 pub fn NativeTypeData::set_scope(Self, Scope) -> Unit
@@ -10541,6 +10558,20 @@ pub impl[T : FromValue] FromValue for Sides[T?]
 pub impl[T : IntoValue + Eq] IntoValue for Sides[T?]
 pub impl[T : Reflect] Reflect for Sides[T?]
 
+pub(all) enum Since {
+  Forever
+  Version(UInt, UInt, UInt)
+  Unreleased
+} derive(Eq, Hash)
+pub fn Since::castable(Value) -> Bool
+pub fn Since::input() -> CastInfo
+pub fn Since::into_value(Self) -> Value
+pub fn Since::output() -> CastInfo
+pub impl @debug.Debug for Since
+pub impl FromValue for Since
+pub impl IntoValue for Since
+pub impl Reflect for Since
+
 pub(all) struct Sink {
   introspections : Array[Introspection]
   delayed : Array[SourceDiagnostic]
@@ -12080,6 +12111,7 @@ pub fn Type::fraction() -> Self
 pub fn Type::func() -> Self
 pub fn Type::gradient() -> Self
 pub fn Type::int() -> Self
+pub fn Type::keywords(Self) -> ArrayView[String]
 pub fn Type::label() -> Self
 pub fn Type::length() -> Self
 pub fn Type::location() -> Self
@@ -12094,6 +12126,7 @@ pub fn Type::repr(Self) -> String
 pub fn Type::scope(Self) -> Scope
 pub fn Type::selector() -> Self
 pub fn Type::short_name(Self) -> String
+pub fn Type::since(Self) -> Since?
 pub fn Type::spot() -> Self
 pub fn Type::state() -> Self
 pub fn Type::str() -> Self

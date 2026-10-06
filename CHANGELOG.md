@@ -47,9 +47,24 @@ Typst source) are unchanged.
 - `library`: the `pub(all)` structs `Closure` and `Tiling` have a new field
   each (`hash`, `frame_hash`, both `LazyFingerprint`); code that builds them
   with a struct literal must supply it (`LazyFingerprint::new()`).
+- `library`: the `pub(all)` struct `BindingDocumentation` has two new
+  fields, `since : Since?` and `keywords : ArrayView[String]` (upstream's
+  `since` and `keywords`); code that builds one with a struct literal
+  must supply them. The bindings of the standard library now carry their
+  documentation (they had none), which changes their fingerprints.
 - `hayro/interpret`: `GraphicsState` and `TextState`, `hayro/svg`:
   `SvgRenderer`, `otf`: `CffIndex` are no longer exported. They were
   abstract types that no public function accepted or returned.
+- `doc`: `Stroke(dash=..)` takes a `Dash` (it was a `Value`): write a
+  preset (`Dotted`, `Dashed`, ..), `Pattern([..], phase=..)`, or
+  `RawValue(v)` for the value passed before.
+- `doc`: the argument indices of origins (`Origin.param`, the ranges of
+  `ArgsLoc`) shift where parameters were added: by two from `lang` on in
+  `Text`/`SetText` and from `extent` on in `Highlight`/`SetHighlight`
+  (`top_edge`, `bottom_edge`), by one from `fill` on in `Box`/`SetBox`
+  (`baseline`).
+- `doc`: `Size` (the result of `Ctx::measure`) has a third field,
+  `baseline`; a pattern that names only `width` and `height` needs `..`.
 
 ### Changed: `Debug` output
 
@@ -75,6 +90,12 @@ deriving it.
 
 ### Added
 
+- `doc/format`, a new package without dependencies (it does not import
+  `doc` or the engine): `fixed(x, digits, trim?)` (the exact value of the
+  double rounded half away from zero, JavaScript's `toFixed`), `grouped`
+  and `grouped_int` (thousands separators), `percent`, `compact` (k, M, B),
+  `soft_breaks` (zero-width spaces after `_ / . : -`, for long words in
+  narrow cells) and `ticks` (round axis values).
 - `syntax`: `Debug` for `RootedPath` and `VirtualPath` (the text their
   `Show` already had, upstream's `Debug`).
 - `syntax`: the trait `NodeHasher` (`write_u64`, `write_str`) and
@@ -86,11 +107,28 @@ deriving it.
   `Paint`, `ProcessColor`, `Scope`, `Shape`, `SpotColorant`, `Stroke`,
   `Symbol`, `TextItem`, `Tiling`, `Transform`; `NodeHasher` for
   `SipHasher128`; `Tiling::frame_fingerprint_flags`.
+- `library`: `Since` (when a feature was introduced: `Forever`,
+  `Version(major, minor, patch)`, `Unreleased`; castable like upstream);
+  the field `since` on `NativeFuncData`, `NativeTypeData` and
+  `ElementData`, `keywords` on `NativeTypeData`, and the optional
+  parameters `since` / `keywords` of `NativeFuncData::new`,
+  `NativeTypeData::new`, `Element::new`; `Type::since`, `Type::keywords`,
+  `Element::since`, `Element::keywords`; `Binding::is_documented`,
+  `name`, `title`, `docs`, `since`, `keywords`;
+  `BindingDocumentation::from_func`, `from_type`, `from_elem`.
 - `read_fonts`: the `hdmx` table: `FontRef::hdmx`; `Hdmx` (`read`,
   `version`, `num_records`, `size_device_record`, `record_for_size`);
   `DeviceRecord` (fields and accessors `pixel_size`, `max_width`,
   `widths`). `skrifa` uses it for the advance of hinted glyphs, like
   upstream.
+
+- `doc`: `Layout` (the size of the enclosing region, with `LayoutSize`);
+  `Size.baseline`; `Box(baseline=)`; `top_edge`/`bottom_edge` (`TopEdge`,
+  `BottomEdge`) on `Text`, `SetText`, `Highlight`, `SetHighlight`; `Dash`
+  and `DashLen`; colour operations on `Paint` (`transparentize`, `lighten`,
+  `darken`, `mix` with `ColorSpace`); `Length::sizing`, `Length::spacing`;
+  `Upper`, `Lower`; `Sides::zero`. See `docs/edsl-ports.md` and
+  `docs/edsl-guide.md`.
 
 ### Not a change for users
 

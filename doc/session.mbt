@@ -124,7 +124,7 @@ fn Session::host(
         (session.registry.span(entry), session.registry.entries[entry].keys)
       _ => (span, keys)
     }
-    let lower : Lower = {
+    let lower : Lowering = {
       session,
       engine,
       context,
