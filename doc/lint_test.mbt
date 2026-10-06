@@ -38,7 +38,7 @@ test "lint L1: neighbours that are text, in an array that holds a block" {
   // The block can be anywhere in the array, and of any kind on the list:
   // a table, a spacing, a paragraph, a display equation, raw text as a
   // block, an alignment (which ends the paragraph).
-  let pair : Array[&@doc.IntoContent] = [@doc.Prose("One."), @doc.Prose("Two.")]
+  let pair : Array[&@doc.IntoContent] = ["One.", @doc.Text("Two.")]
   let with_block = (block : &@doc.IntoContent) => {
     let items : Array[&@doc.IntoContent] = [..pair, block]
     @doc.Document(items).lower(@doc.DocWorld::in_memory()).lints.length()
@@ -69,10 +69,64 @@ test "lint L1: neighbours that are text, in an array that holds a block" {
 }
 
 ///|
+test "lint L1: two neighbouring `Prose`, in any array" {
+  // A `Prose` drops the white space at its edges: two in a row never
+  // have anything between them, with or without a block in the array.
+  inspect(
+    lints_of([@doc.Prose("One."), @doc.Prose(" Two. "), @doc.Prose("Three.")]),
+    content=(
+      #|adjacent-inline (Prose, argument 1) after (Prose, argument 1): "One.Two."
+      #|adjacent-inline (Prose, argument 1) after (Prose, argument 1): "Two.Three."
+    ),
+  )
+  // Also as the body of something, under a key and with a label.
+  inspect(
+    lints_of([
+      @doc.Block(
+        @doc.Seq([
+          @doc.Keyed("k", @doc.Prose("One.")),
+          @doc.Labelled(@doc.Prose("Two."), "l"),
+        ]),
+      ),
+    ]),
+    content=(
+      #|adjacent-inline (Prose, argument 1) after (Prose, argument 1, key "k"): "One.Two."
+    ),
+  )
+  // Without a block the other kinds of text are not reported, also next
+  // to a `Prose`: a string, a `Prose` inside `Text` or `Emph`.
+  inspect(
+    lints_of([
+      @doc.Prose("One."),
+      " two ",
+      @doc.Prose("three."),
+      @doc.Text(@doc.Prose("Four.")),
+      @doc.Emph(@doc.Prose("Five.")),
+    ]),
+    content="",
+  )
+  // With something between them two `Prose` are no neighbours, and a
+  // block that is interpolated at the seam separates them.
+  inspect(
+    lints_of([
+      @doc.Prose("One."),
+      @doc.Space(),
+      @doc.Prose("Two."),
+      @doc.SetText(size=Pt(9)),
+      @doc.Prose("Three. \{@doc.Block("between")}"),
+      @doc.Prose("Four."),
+    ]),
+    content="",
+  )
+  // The fix.
+  inspect(lints_of([@doc.Para("One."), @doc.Para("Two.")]), content="")
+}
+
+///|
 test "lint L1: what is not reported" {
   // An array without a block: it may be the body of one paragraph, which
-  // is written like this. (So a document of nothing but `Prose` items is
-  // not reported either: the lint's false negative.)
+  // is written like this. (So a document of nothing but strings and
+  // wrapped text is not reported either: the lint's false negative.)
   inspect(
     lints_of([
       @doc.Heading("Title"),
@@ -81,7 +135,10 @@ test "lint L1: what is not reported" {
     ]),
     content="",
   )
-  inspect(lints_of([@doc.Prose("One."), @doc.Prose("Two.")]), content="")
+  inspect(
+    lints_of(["One.", @doc.Text("Two."), @doc.Strong(@doc.Prose("Three."))]),
+    content="",
+  )
   // Neighbours are adjacent items: with anything between them, two text
   // items are not neighbours. A space, a break, a rule.
   inspect(

@@ -159,6 +159,27 @@ site and do not register sites of their own (the registry deduplicates by
 location and key path, so two differently shaped constructors must not share
 a location).
 
+As built (step 1): `Para(text, quotes~, <the options of Par>, extra~,
+label~)` in `doc/para.mbt`. `Prose`'s scanner makes the pieces without a
+site; `Para` passes them as the value of the body argument of its own `par`
+call (a private node, `NPieces`), where they take spans of the `Para` call's
+text argument from that argument's counter. The origin listing of a `Para`
+has one line where `Par(Prose(..))` has two; origins, review text, tiers,
+source characters and `positions` are compared with `Par(Prose(..))` in
+`doc/para_test.mbt` and `doc/examples/review`. Two things are not what the
+section suggests:
+
+- One `Para` is one paragraph. A blank line in its text (which the `$|`
+  form makes easy to write) is a paragraph break inside `par[..]`: the
+  engine ignores it with the warning `parbreak may not occur inside of a
+  paragraph and was ignored`, located at the text argument of the `Para`
+  call, and the text before and after it runs together. Decided: this
+  stays (it is what `Par(Prose(..))` does, and an error would have no
+  twin); the test pins the warning and its location, the guide says it.
+- `Para` is handwritten: an option that `Par` gains in the generator
+  (`scripts/docgen.py`) has to be added to it by hand; until then `extra`
+  reaches it.
+
 ### 3.2 `Layout`
 
 ```moonbit
@@ -380,11 +401,67 @@ What each can and cannot promise:
 
 - L1, adjacent inline items (S1). On the description tree, at author level:
   in the item array of `Document`, `Seq` or a kit container, two neighbours
-  that are each a string, a `Prose`, or a `Text`/`Strong`/`Emph`/`Link`
+  are reported
+  (a) if both are a bare `Prose` (the `Prose` itself, not one wrapped in
+  `Text`/`Strong`/`Emph`/`Link`), in any array, with or without a block in
+  it: a `Prose` drops the white space at its edges, so two in a row never
+  have anything between them;
+  (b) if each is a string, a `Prose`, or a `Text`/`Strong`/`Emph`/`Link`
   wrapping one, when the array also holds at least one block-level
-  constructor (so a purely inline sequence, as in a `Text` body, is not
-  reported). It is a heuristic: it does not see through callbacks, `Call`
-  or embedded content. `Para` is the fix it names.
+  constructor (so a purely inline sequence of strings and wrapped text, as
+  in a `Text` body, is not reported).
+  It is a heuristic: it does not see through callbacks, `Call` or embedded
+  content. `Para` is the fix it names.
+
+  As built (step 1, `doc/lint.mbt`; rule (a) was added after the first
+  implementation, which had only (b) and so missed the plainest form of S1,
+  `Document([Prose(..), Prose(..)])`):
+  - A lint is `Lint { kind : LintKind, message, hints : Array[Hint],
+    location : Location? }` with `render()`; `LintKind` has the one case
+    `AdjacentInline`. `Location` and `Hint` are those of diagnostics, so a
+    later lint can point into a file of the world or nowhere, and a hint
+    can carry a second place (for L1: the text before). A page number for
+    L2 and L3 is a field to add then. `lints` is on `CompileReport` (not on
+    `ExportReport`), also when the compilation failed; `lints?` is on
+    `compile`, `compile_paged` and `lower`.
+  - Block-level constructor: a call of an element that the engine keeps out
+    of a paragraph whatever its arguments are: what the show rules wrap in
+    a block unconditionally, the elements of the flow (`par`, `parbreak`,
+    `pagebreak`, `colbreak`, `v`, `place`, `block`), list items, and
+    `align`, whose style interrupts a paragraph; `raw`, `quote` and
+    `Equation` only with a literal `block=true`. `doc/lint_wbtest.mbt`
+    checks the list against the engine for all 77 constructors of the
+    generator's table, so a new element has to be classified.
+  - "A string" is a plain string. A `Lit` is not text for the lint: the
+    translator writes markup as a stream of `Lit`s and spaces between
+    `Parbreak`s, and counting it gave 11 reports on one correct document
+    (`doc/convert/sample/gen_showcase.mbt`). An empty string is not text.
+  - Neighbours are adjacent items of the array: a rule or anything else
+    between two texts hides the pair (a false negative; no document showed
+    a need to look through rules). `Keyed` and a label do not change what
+    an item is. A pair with a block interpolated at its seam (a `Prose`
+    that ends or starts with one) is not reported.
+  - The place of a lint is the argument that has the text, as the review
+    loop resolves that text on the page (`ReviewText::origin_positions`
+    finds its boxes); one source location is reported once, however often
+    its description is used or under how many keys.
+  - The walker looks into arguments of constructors and of set rules
+    (also the generic `Set`), into arrays, dictionaries and operands of
+    values, and into the texts of `Prose` and `Para`; not into `Call` and
+    call values, callbacks, `Markup`, `Equation` and views.
+  - Measured: no report on the documents of the tests of `doc` but those
+    written to show the defect, on the 42 documents of the `edsl` stage but
+    one (the twin `prose` puts two
+    `Prose` side by side on purpose; the stage does not look at lints), and
+    none on the fourteen ports as written. With their paragraph helpers
+    taken out, `typst-evaluation` and `session-migrations` report one pair
+    each, which is every adjacent pair they have (the first is the seam the
+    findings quote). Without the block condition of (b), about 30 places of
+    correct inline composition would be reported.
+  - Known false negatives: strings and wrapped text in an array without a
+    block; `Text(Seq([..]))`, which is what the mark parsers of two ports
+    produce; wrappers other than the four (`Highlight`, `Underline`); a
+    `Para` with a blank line (3.1), which is the engine's warning instead.
 - L2, missing glyphs (S4). From the frames: glyph id 0 in a text item, with
   the origin of that glyph's span (a text item can combine several origins)
   and the text of the cluster (a code-point sequence; for clusters beyond the

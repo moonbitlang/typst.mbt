@@ -233,8 +233,7 @@ test "section 2: inline items in a sequence are one paragraph, `Para` separates 
   inspect(
     joined.listing(),
     content=(
-      #|p1 text 10.0,19.0 w35.9 "Notes"
-      #|p1 text 10.0,33.1 w172.0 "The first ends here.The second starts here."
+      #|p1 text 10.0,16.6 w172.0 "The first ends here.The second starts here."
     ),
   )
   // The lint (line and column numbers as N).
@@ -254,15 +253,17 @@ test "section 2: inline items in a sequence are one paragraph, `Para` separates 
   let world = @doc.DocWorld::in_memory()
   assert_eq(document.compile_paged(world).lints.length(), 1)
   assert_eq(document.compile_paged(world, lints=false).lints.length(), 0)
-  // Without a block in the array nothing is reported.
+  // Other text than two `Prose` (a string, a `Text` around one) is
+  // reported next to text if the array also holds a block, here a
+  // heading; without one the array may be the body of one paragraph.
+  let strings : Array[&@doc.IntoContent] = [
+    "The first ends here.",
+    @doc.Text("The second starts here."),
+  ]
+  assert_eq(@guide.lints_of(@doc.Document(strings)), [])
   assert_eq(
-    @guide.lints_of(
-      @doc.Document([
-        @doc.Prose("The first ends here."),
-        @doc.Prose("The second starts here."),
-      ]),
-    ),
-    [],
+    @guide.lints_of(@doc.Document([@doc.Heading("Notes"), ..strings])).length(),
+    1,
   )
   // A paragraph each.
   let apart = pages([@guide.paragraphs()])

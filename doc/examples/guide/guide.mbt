@@ -63,11 +63,7 @@ pub fn first_document() -> Document {
 ///|
 /// Section 2: two inline items in a sequence are one paragraph.
 pub fn run_together() -> Seq {
-  Seq([
-    Heading("Notes"),
-    Prose("The first ends here."),
-    Prose("The second starts here."),
-  ])
+  Seq([Prose("The first ends here."), Prose("The second starts here.")])
 }
 
 ///|

@@ -172,8 +172,9 @@
   `CompileReport::lints`, on by default, `lints=false` on `compile*`
   turns them off; they are not the engine's `warnings`. L1 (adjacent
   inline items) reads the description tree: two neighbours in the array
-  of a `Document` or `Seq` that are a string, a `Prose`, or a
-  `Text`/`Strong`/`Emph`/`Link` around one, if the array holds a block
+  of a `Document` or `Seq` that are both a bare `Prose` (in any array),
+  or that are each a string, a `Prose`, or a
+  `Text`/`Strong`/`Emph`/`Link` around one if the array holds a block
   (`is_block_call`). `doc/lint_wbtest.mbt` checks that list against the
   engine for every constructor of `generated_elements()`: a new element
   of `scripts/docgen.py` needs a sample there (block, inline or part).

@@ -12,9 +12,9 @@
 /// What a lint checks. Later checks add cases: a `match` on the kind
 /// needs a wildcard case.
 pub(all) enum LintKind {
-  /// L1: two neighbours in the array of a `Document` or `Seq` are text,
-  /// and the array holds a block: the two are typeset as one paragraph
-  /// with nothing between them.
+  /// L1: two neighbours in the array of a `Document` or `Seq` are text
+  /// (two `Prose`, or any text where the array also holds a block): the
+  /// two are typeset as one paragraph with nothing between them.
   AdjacentInline
 } derive(Eq)
 
@@ -115,28 +115,36 @@ fn Site::origin(self : Site, keys : Array[String], param : Int?) -> Origin {
 // - An item is *text* if it is a string, a `Prose`, or a `Text`,
 //   `Strong`, `Emph` or `Link` whose body is text. `Keyed` and a label do
 //   not change what an item is. Nothing else is text: not an empty
-//   string, not a `Lit` (the
-//   translator of `doc/convert` writes markup as a stream of `Lit`s and
-//   spaces between `Parbreak`s, which is one paragraph by intent), not
-//   `Raw`, a `Box`, a `Symbol`, `Quoted` or a nested `Seq`.
+//   string, not a `Lit` (the translator of `doc/convert` writes markup as
+//   a stream of `Lit`s and spaces between `Parbreak`s, which is one
+//   paragraph by intent), not `Raw`, a `Box`, a `Symbol`, `Quoted` or a
+//   nested `Seq`.
 // - An item is a *block* if it is one of the constructors of
 //   `is_block_call` (below): what the engine lays out as a block of the
 //   flow or what ends a paragraph, whatever its arguments are.
-// - Two neighbours of an array that are both text are reported if the
-//   array also holds a block. Neighbours are adjacent items of the
-//   array: with a rule (or anything else) between them, two items are not
-//   neighbours. A pair is not reported if a block is interpolated at its
-//   seam (the first is a `Prose` that ends with one, or the second starts
-//   with one): that block separates the two.
+// - Two neighbours of an array that are both text are reported
+//   (a) if both are a `Prose` itself (not one inside `Text`, `Strong`,
+//       `Emph` or `Link`), in any array; or
+//   (b) if the array also holds a block.
+//   Neighbours are adjacent items of the array: with a rule (or anything
+//   else) between them, two items are not neighbours. A pair is not
+//   reported if a block is interpolated at its seam (the first is a
+//   `Prose` that ends with one, or the second starts with one): that
+//   block separates the two.
 //
-// The block is the evidence that the array is a flow of blocks, in which
-// a run of text is a paragraph of its own; an array without one may be
-// the body of a paragraph, where `["Typeset with ", Emph("care"), "."]`
-// is the way to write it. So the lint has false negatives by design (a
-// document of nothing but `Prose` items is not reported), and it reports
-// a correct document only where an author composes one paragraph from
-// several text items directly between blocks, which reads better as one
-// `Par(Seq([..]))`.
+// (a): a `Prose` drops the white space at its edges, so two in a row
+// never have anything between them, and nobody means "here.Two". No
+// document of the tests, the twins or the ports has such a pair but the
+// ones that show the defect.
+//
+// (b): for the other kinds the block is the evidence that the array is a
+// flow of blocks, in which a run of text is a paragraph of its own; an
+// array without one may be the body of a paragraph, where
+// `["Typeset with ", Emph("care"), "."]` is the way to write it. So the
+// lint has false negatives by design (strings and wrapped text in an
+// array without a block), and it reports a correct document only where an
+// author composes one paragraph from several text items directly between
+// blocks, which reads better as one `Par(Seq([..]))`.
 
 ///|
 /// Whether a call makes a block: an element that the engine lays out as a
@@ -415,8 +423,19 @@ fn place_key(origin : Origin) -> String {
 }
 
 ///|
-/// L1 for one array: every pair of neighbours that are text, if the array
-/// holds a block.
+/// Whether a description is a `Prose` itself, also with a label or a key.
+fn is_prose(content : Content) -> Bool {
+  match content.node {
+    NKeyed(_, body) | NLabelled(body, _, _, _) => is_prose(body)
+    NSeq(_, site) => site.kind == "Prose"
+    _ => false
+  }
+}
+
+///|
+/// L1 for one array: every pair of neighbours that are both a `Prose`,
+/// and, if the array holds a block, every pair of neighbours that are
+/// text.
 fn Linter::adjacent(
   self : Linter,
   children : Array[Content],
@@ -430,11 +449,11 @@ fn Linter::adjacent(
       break
     }
   }
-  guard flow else { return }
   for i in 1..<children.length() {
     let before = children[i - 1]
     let item = children[i]
     guard is_text_item(before) && is_text_item(item) else { continue }
+    guard flow || (is_prose(before) && is_prose(item)) else { continue }
     // A block that is interpolated at the seam separates the two.
     guard !block_at_edge(before, true) && !block_at_edge(item, false) else {
       continue

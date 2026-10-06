@@ -224,11 +224,17 @@ test "S1: adjacent inline items are one paragraph with nothing between them" {
       #|p1 text 10.0,16.6 w171.6 "One ends here.Two starts here.Three.Four."
     ),
   )
-  // Lint L1 (step 1 of the proposal) reports adjacent text items where
-  // the array also holds a block. This array holds none (the rules of
-  // `small_page` are no content), so by the lint's definition it could be
-  // the body of one paragraph, and nothing is reported.
-  inspect(lint_lines(report), content="")
+  // Lint L1 (step 1 of the proposal) reports two neighbouring `Prose` in
+  // any array: a `Prose` drops the white space at its edges. For the
+  // other kinds of text (the string, the `Text`) it wants a block in the
+  // array, which this one does not hold (the rules of `small_page` are no
+  // content): without one it could be the body of one paragraph.
+  inspect(
+    lint_lines(report),
+    content=(
+      #|adjacent-inline (Prose, argument 1) after (Prose, argument 1): "One ends here.Two starts here."
+    ),
+  )
   // Under a heading, which is how the ports met it, each pair is
   // reported: at the second item, with the first as a hint, and with
   // what the page reads at the seam.

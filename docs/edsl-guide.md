@@ -140,17 +140,13 @@ them (`run_together`):
 
 ```moonbit
 pub fn run_together() -> Seq {
-  Seq([
-    Heading("Notes"),
-    Prose("The first ends here."),
-    Prose("The second starts here."),
-  ])
+  Seq([Prose("The first ends here."), Prose("The second starts here.")])
 }
 ```
 
-is typeset, under its heading, as the one line "The first ends here.The
-second starts here.". It compiles without an error or a warning. A paragraph
-of text is a `Para` (`paragraphs`):
+is typeset as the one line "The first ends here.The second starts here.".
+It compiles without an error or a warning. A paragraph of text is a `Para`
+(`paragraphs`):
 
 ```moonbit
 pub fn paragraphs() -> Seq {
@@ -199,24 +195,24 @@ For `run_together` it gives:
 
 ```text
 lint[adjacent-inline]: this text and the text before it are typeset as one paragraph with nothing between them: "…first ends here.The second start…"
-  at doc/examples/guide/guide.mbt:66:11 (Prose, argument 1)
-  hint: the text before it (doc/examples/guide/guide.mbt:65:11 (Prose, argument 1))
+  at doc/examples/guide/guide.mbt:66:44 (Prose, argument 1)
+  hint: the text before it (doc/examples/guide/guide.mbt:66:14 (Prose, argument 1))
   hint: a paragraph of text is `Para(..)`; pieces of one paragraph go in one `Par(Seq([..]))`
 ```
 
-This lint (`AdjacentInline`) looks at the arrays of `Document` and `Seq`. It
-reports two neighbours that are each a string, a `Prose`, or a `Text`,
-`Strong`, `Emph` or `Link` around one, if the array also holds a block (a
+This lint (`AdjacentInline`) looks at the arrays of `Document` and `Seq`.
+Two `Prose` that follow each other are always reported: a `Prose` drops the
+white space at its edges, so there is never anything between them. Other
+text next to text (a string, or a `Text`, `Strong`, `Emph` or `Link` around
+a string or a `Prose`) is reported if the array also holds a block (a
 heading, a table, a `Para`, a `Block`, a spacing, ..): then the array is a
 flow of blocks, and the two are probably meant as two paragraphs (the lint
 is a heuristic: one paragraph that is composed of several text items
 directly between blocks is reported, too; write it as one `Par(Seq([..]))`).
-Without a block
-the array can be the body of one paragraph (`Par(Seq(["Typeset with ",
-Emph("care"), "."]))`), so nothing is reported: a document of nothing but
-`Prose` items is not reported either. The lint does not look into
-callbacks, `Call` or `Markup`. `compile_paged(world, lints=false)` turns the
-lints off.
+Without a block the array can be the body of one paragraph
+(`Par(Seq(["Typeset with ", Emph("care"), "."]))`), so nothing is reported.
+The lint does not look into callbacks, `Call` or `Markup`.
+`compile_paged(world, lints=false)` turns the lints off.
 
 ## 3. Helpers that keep the caller's location
 

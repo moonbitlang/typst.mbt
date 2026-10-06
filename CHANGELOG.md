@@ -129,6 +129,19 @@ deriving it.
   `darken`, `mix` with `ColorSpace`); `Length::sizing`, `Length::spacing`;
   `Upper`, `Lower`; `Sides::zero`. See `docs/edsl-ports.md` and
   `docs/edsl-guide.md`.
+- `doc`: `Para(text, quotes?, leading?, spacing?, justify?, linebreaks?,
+  hanging_indent?, extra?, label?)`, a paragraph of prose:
+  `Par(Prose(text), ..)` as one constructor with one origin.
+- `doc`: lints. `CompileReport` has a new field `lints : Array[Lint]`;
+  `Lint` (`kind : LintKind`, `message`, `hints : Array[Hint]`,
+  `location : Location?`; `Lint::render`); `LintKind` (one case,
+  `AdjacentInline`: two text items next to each other in a sequence are
+  typeset as one paragraph with nothing between them; `LintKind::name`).
+  `Document::compile`, `compile_paged` and `lower` take `lints? : Bool =
+  true`; `lints=false` turns the lints off. Nothing breaks: `CompileReport`
+  cannot be built outside `doc` (it has a private field), and the new
+  parameter is optional. `LintKind` will get more cases: match it with a
+  wildcard.
 
 ### Not a change for users
 
