@@ -896,6 +896,239 @@ earlier run of the same comparison gave 10.9 and 11.4 ms, 5.49 and
    and the engine's facts about what can leave the page or its place
    (convention 7).
 
+### As built (step 5): `Canvas`
+
+Of the three elements of step 5, this is `Canvas`; `Lines` and `Flow` are
+not built here. It follows the conventions of steps 3 and 4, and where
+the two rows of the table above (written before any element existed) do
+not fit them, they are amended here; the amendments to the conventions
+are at the end.
+
+**The evidence**, read again (the ports of section 1, by what they wrote):
+
+| Port | Helpers | Coordinates | What it drew |
+|---|---|---|---|
+| bench, minisql-field-report | `at`, `label` (three anchors, baseline by `0.72 × size`), `segment`, `bar`, `canvas` | points; a scale is a closure of one or two lines | strips of dots, stacked bars, ratio bars; ticks from a `nice_ticks` |
+| shell-vs-myshell | the same, `dot`, a `pen` with dashes | an SVG's units times a constant `S`, at every position, size, thickness and font size | a strip plot, a scatter plot with a y axis that grows upwards |
+| typst-evaluation | `at`, `Node`, `node`, `head`, `arrow` (dotted) | points | a pipeline of seven boxes, a cubic curve back with a head |
+| session-migrations | `at`, `dbox`, `dtext` (baseline by `0.72 × size`), `arrow` over a polyline | an SVG's units times `S` | two flow diagrams with bends, a legend |
+| record-visitors | none | none: bars are `Grid` columns in per cent, and a tick is a `Place` with `dx=Diff(Pct(..), Pt(30))` | bar charts |
+
+What they have in common is small: a box of a fixed size, content placed
+at a point by one of a few anchors, lines, rectangles, circles, and an
+arrow with a triangle at its end. What differs is the document's: the
+scale, the palette, the text styles, where a box is. The element is the
+first and has nothing of the second.
+
+**`Canvas`** (`doc/kit/canvas.mbt`, tests `doc/kit/canvas_test.mbt`):
+`Canvas(width, height, items, clip~, key~)`, which is `Block(Seq(items),
+width=Pt(width), height=Pt(height), breakable=false)` with every item in
+`Keyed`, and six functions that make items (`CanvasItem`):
+
+```
+Canvas::place(at, body, anchor~)                      Place(body, alignment=.., dx=.., dy=..)
+Canvas::line(start, end_, stroke~)                    Place(Line(start=.., end_=.., stroke~))
+Canvas::rect(at, width, height, fill~, stroke~, radius~)
+                                                      Place(Rect(width=.., height=.., ..), dx=.., dy=..)
+Canvas::circle(center, radius, fill~, stroke~)        Place(Circle(radius=.., ..), dx=.., dy=..)
+Canvas::curve(start, segments, fill~, stroke~)        Place(Curve([CurveMove(start), ..], ..))
+Canvas::arrow(start, segments, stroke~, head~)        Place(Seq([Place(Curve(..)), Place(Polygon(..))]))
+```
+
+Every item is one `Place` with the alignment `Both(Left, Top)` (`place`
+has the alignment of its anchor): it takes no room, and the items do not
+move each other. Against the table above (`Canvas(width, height, items,
+unit~)` with `text`, `line`, `rect`, `circle`, `curve`, `arrow(..,
+head~)`; `width=Auto`; `anchor=Baseline`):
+
+| There | As built | Why |
+|---|---|---|
+| a fixed size, one region | the same: `width` and `height` in points, the block unbreakable | S2a and M4. Pinned beside it: the same items in a breakable block of that size at the end of a page are drawn from the top of its first part, in their full height, over the footnote and out of the bottom margin; the canvas is on the next page, whole |
+| the origin, the axes | top left, x to the right, y down; no parameter | `Place`'s own, SVG's, and what all five ports with coordinates used. The one chart with a y axis that grows upwards wrote it as the range of its scale, where it belongs: a flag on the canvas would turn text and shapes that are placed by their top left corner upside down in meaning only |
+| `unit~` | not built: a coordinate is a `Double` in points | A factor on positions scales half of a drawing: the two ports with `S` multiplied every thickness, corner radius and font size by it too, which are values in the primitives' own types that the element passes on. What they did by hand is the engine's `Scale(canvas, factor=Pct(56.7), reflow=true)`, which scales all of it and takes the room of the scaled drawing (tested) |
+| `text(x, y, body, anchor~)` | `Canvas::place(at, body, anchor~)` | It takes any content (a `Text`, a `Chip`, an `Equation`, a `Rect` with a body), and it is a `Place`: the primitive's name. There is no item for text alone and no parameter for its style (convention 2) |
+| points as two numbers | a point is a tuple `(x, y)` | As the points of `Line`, `Polygon` and `Curve` in `doc`, and as two ports passed them (`arrow([(140, 62), (172, 62)], ..)`): what a function of the caller returns for the side of a box is one value |
+| horizontal anchors by `Center` with `dx = x − width/2` | `Center` with `dx = Pt(x) - 50%`, likewise `Right` with `- 100%`, and `Horizon` and `Bottom` for `y` | The engine resolves a ratio in `dx` against the container that it aligns in, so the two cancel whatever the size is: `side × (S − w) + x − side × S = x − side × w`. The item does not need the size of the canvas, which is what lets an item be a description of its own. (One port wrote `dx=Diff(Pct(..), Pt(30))` for its ticks.) From the frames: a body of 20pt by 10pt at (50, 30) is at `50 − 20 × side`, `30 − 10 × side` for the nine anchors, in canvases of three sizes |
+| `anchor` | `anchor : (AnchorX, AnchorY)`, by default `(Left, Top)` | Two enums of the kit with `Place`'s names (`Left`, `Center`, `Right`; `Top`, `Horizon`, `Bottom`, `Baseline`). Not `@doc.Alignment`: it has `Start` and `End`, which depend on the direction of the text that the element does not know when it writes the offset, `Auto` and `None`, and no baseline |
+| `anchor=Baseline` measures | `(.., Baseline)`: the item is `Place(Layout((size, cx) => Place(body, .., dy=Pt(y) - baseline)))` | The first baseline is not an alignment of the engine. The body is measured as a `Place` lays it out (in the size of the canvas, not stretched: `cx.measure(body, width=.., height=..)`), so a body that is broken at the width of the canvas is measured in its lines (tested: a small word and then a large one that moves to the second line). It is the item that creates the callback and falls under the creation rule; the canvas does not. A line of text with the default edges ends at its baseline, so `Bottom` is its baseline without measuring, and the documentation says so |
+| `width=Auto`, from `Layout` | not built | It would need the items as a function of the width, which is `Layout` itself. A canvas and its other items create no callback, so the author writes `Layout((size, _) => Canvas(size.width, 80.0, chart(size.width)))` (the guide's first sample, and both figures of the measurement). The ports typed the width of the page in |
+| `line`, `rect`, `circle`, `curve` | thin: positions and sizes are numbers, `stroke`, `fill` and `radius` are the primitive's, in its types, passed on only when given | "No restyling": an item has no default of its own but the head of an arrow. `Rect`'s `inset` and `body`, `Curve`'s `fill_rule`, an ellipse and a polygon are not items: `Canvas::place(at, Rect(.., body=..))` places any shape |
+| `curve` | `Canvas::curve(start, segments)` with `Segment`: `LineTo(end)`, `QuadTo(control, end)`, `CubicTo(first, second, end)` | The drawing components of `Curve` in the coordinates of the canvas, typed, since the element has to read the last one for the head of an arrow. No `Move` and no `Close`: a path of a canvas is one line from its start to its end (which is what gives an arrow its end); a path of several parts or a closed one is a `Curve` of `doc`'s own components, placed. `QuadTo` had no use in the ports; it is there because `Curve` has it and the tangent of every component has to be defined |
+| `arrow(from, to, .., head~)`, a curve through control points | `Canvas::arrow(start, segments, stroke~, head~)`: the path of `curve` with a head at its end | One path type for both. A straight arrow is `[LineTo(b)]`, a bend two `LineTo`s (three of the twelve arrows of one port), the curve back a `CubicTo` |
+| the head | a filled triangle as long as `head` along the path and as wide across it, 5.5pt by default; in the paint of the stroke | Both ports with arrows drew that: 5.5pt long and 5.2pt wide, and 5.6pt by 5.6pt. One number, since nothing varied but the size with the stroke. Not built, for want of a use: an open head, other shapes, a head at the start, a width of its own |
+| "arrowheads are polygons" | the same, computed in MoonBit | The direction is that of the last line, or from the last control point of the last curve that is not its end; the path ends half the head before the tip (its end moved back along that direction, which keeps the tangent), so that the stroke ends inside the head; where the last arm is shorter than the head, half way. Tested as numbers from the frames: the tip, the base across the direction and `head` wide and `head` behind the tip, the order of the corners and the end of the path, in the eight directions, on a cubic and a quadratic curve, on a bend, with a control point on the end and with a last line shorter than the head |
+| | `clip : Bool`, `Block`'s, not clipped by default | What is outside the canvas is drawn there (pinned). Clipping by default would cut what is outside by design: half of the stroke of a line on the edge, a label centred under the last tick. Lint L3 is not built |
+| | `key : (Int) -> String`, by default the index | Convention 3, as for `DataTable` |
+| | no `fill`, `stroke`, `inset` | The ports' panels were blocks around the drawing; a background is the first item |
+
+**Items are the caller's descriptions.** The first sketch had the canvas
+build what it draws. An item is instead a `Composite` of its own, made
+where the caller writes `Canvas::rect(..)`, and the canvas takes content:
+
+- A click on a bar leads to the line that drew it, under its key, and an
+  error in its `fill` is at that argument of that call (tested for every
+  argument that an item passes on). With the items built by the canvas,
+  every shape of a chart would be the one call of `Canvas`.
+- `Keyed`, `Seq`, `Labelled` and a function of the caller that returns
+  the three items of a row compose items, because they compose content;
+  the kit adds no group and no key of its own to the items.
+- What is not an item is what it is in a block: it is laid out from the
+  top left corner (an image under the drawing). A rule among the items is
+  the existing error of a rule under `Keyed`; it goes into a `Seq` with
+  the items that it is for (both pinned).
+- The canvas keys every item by its index (or `key`), so that items from
+  one line of a loop are distinct origins; a key of the caller's is
+  inside it (`Canvas::rect`, key "15", key "South").
+
+**One accessor in `doc`**, `Stroke::paint() -> Paint?`: the paint that a
+stroke was made with. The head of an arrow is filled in the paint of its
+line, and a `Stroke` is opaque outside `doc`; the Typst twin reads
+`stroke(..).paint`. The alternative, a `fill` beside the `stroke`, makes
+every coloured arrow name its colour twice and draws a black head when
+one is forgotten. A stroke without a paint gives a black head, which is
+what such a stroke is drawn in unless a rule of the document for curves
+says otherwise (pinned: there the head stays black, and the
+documentation says that an arrow in a colour names it).
+
+**Invalid arguments.** A coordinate or a size that is not finite, a
+negative size of the canvas, a negative `head`, an arrow without a
+segment and an arrow whose last segment has no length are errors at
+their arguments. The engine takes a NaN for a length and draws something
+somewhere, which is the kind of output the kit exists to prevent.
+
+**A linear scale** is not built. In every port and in the measurement it
+is one function of one line (`left + (v - lo) / (hi - lo) * (right -
+left)`), written where its bounds are chosen; a type for it would hold
+four numbers and save nothing. `@format.ticks` (step 4) gives the ticks.
+
+**Where the line is.** Not built, and not planned as parts of `Canvas`:
+nodes with names and anchors, edges that find their way between them,
+axes, legends, kinds of charts. In the ports these are the loops over
+the document's data; a layer for diagrams would be its own design with
+its own evidence (two ports).
+
+**Twins** (`doc/twins/kit_canvas.mbt`): the functions `canvas`,
+`canvas-place`, `canvas-line`, `canvas-rect`, `canvas-circle`,
+`canvas-curve` and `canvas-arrow`, and the pairs `kit-canvas`,
+`kit-canvas-arrows` and `kit-canvas-baseline` (the `edsl` stage has 50
+pairs). `doc/twins/kit_canvas_wbtest.mbt` gives the functions and the
+items the same 21 rejected inputs. What the pairs showed:
+
+- The corners of a head are compared bit for bit, so the function does
+  the element's operations in the element's order (directions that are
+  neither along an axis nor a diagonal are in the pair).
+- The engine keeps a length in a unit of its own (127 to a point), so a
+  number of points that is computed from a measured one is not always
+  the length that the engine computes: `Pt(y - baseline)` was one unit in
+  the last place off `y * 1pt - baseline`. The item writes the
+  difference of two lengths (`Diff(Pt(y), Pt(baseline))`), which the
+  engine takes. (A measured length that is a `Double` of points is still
+  converted once; where that is not exact, the pair would differ in the
+  last place. No case was found.)
+- A function joins its items, and a join makes one sequence of the items
+  of a sequence, where the element keeps a `Seq` among its items. So an
+  arrow is one `Place` around its two, like every item, and the pairs
+  have no item that is a sequence. This is the one difference from the
+  twin: the frames of a canvas with a `Seq` among its items are the
+  function's, its structure is not.
+- Typst has no value for the anchor `Baseline`: the function takes the
+  string `"baseline"`.
+
+**The measurement.** `doc/examples/report` got a third page with two
+figures from invented data: a chart of ten bars with their values, a
+grid and ticks, and a diagram of five boxes with arrows, one dashed, and
+a curve back. By hand first, as the ports wrote it (`before_drawing.mbt`:
+`at`, `label` with three anchors and the estimated baseline, `segment`,
+`bar`, `canvas`, `Node`, `node`, `head`, `arrow`, `arrow_back`; the width
+of the text typed in), then with `Canvas` in a `Layout`.
+
+The count of section 9 is now split in two, by the author's mark per
+top-level item (`// helper-lines: kit` or `own`): what the kit provides
+is what the author wrote because `doc` has no element for it and would
+write the same way in another document; the document's own is what it
+has with any library: colours, measures, scales, text styles, and the
+functions that make a figure of its data. An item that is both (a table
+helper with the report's insets in it) is counted as what it exists for.
+`python3 scripts/edsl_helper_lines.py`:
+
+| | helper lines | what the kit provides | the document's own |
+|---|---|---|---|
+| before | 447 | 266 | 181 |
+| after | 253 | 0 | 253 |
+| of them for the two figures, before | 270 | 144 | 126 |
+| for the two figures, after | 150 | 0 | 150 |
+
+The second column is what the kit takes away. The third grows, and that
+is the finding of the split: 72 lines in all, 24 of them in the figures.
+What the hand-written mechanisms had written into them (the look of a
+card, the insets of a table, the size and the paint of a label as the
+defaults of `label`) is written at the calls with the kit, and a call of
+an item is longer than a call of a helper that was made for this one
+document (a label is a `Text` in a `Canvas::place` with an anchor). The
+figures are 40 lines of measures, scales and styles that both versions
+share, and a function per figure that is 86 lines by hand and 110 with
+the kit.
+
+The pages: the first two are identical as before (the SVG of both and
+the PDF of the two versions with the same figures, byte for byte). The
+third is compared by what is drawn (`report_wbtest.mbt`): the 37 shapes
+are the same shapes at the same places in the same paint (a straight
+arrow is a `Line` by hand and a `Curve` of one line with the kit, so the
+SVG is not the same text), the 43 text runs are the same text in the
+same size and paint at the same x, and 27 of them, the labels of the
+chart, are lower with the kit:
+
+| Label | By hand | With the kit | The kit's is lower by |
+|---|---|---|---|
+| a tick (6.5pt) | baseline asked for at `y`, top put at `y − 0.72 × size` | `(Center, Bottom)` at `y` | 0.40pt |
+| the name of a bed (7.5pt) | baseline at the middle of the bar + 2.5pt, top by the estimate | `(Right, Horizon)` at the middle of the bar | 0.43pt |
+| the value of a bar (6.5pt) | the same | `(Left, Horizon)` | 0.04pt |
+
+The version with the kit is right in each: its ticks are on the baseline
+that was asked for and the middle of the capitals of its names and
+values is on the middle of their bars, to the hundredth of a point; the
+hand-written ones are too high by those amounts (0.72 of the size where
+the font has 0.658, and 2.5pt for half the capitals of two sizes). The
+hand-written arrows were given the kit's proportions (a head as wide as
+long, the line ending in its middle), so that the figures differ only
+where one version is right.
+
+Building and compiling one document (`report time 500`, embedded fonts,
+aarch64 macOS, means of 500 runs in three repetitions): 13.29, 13.30 and
+14.01 ms before; 13.92, 13.89 and 14.71 ms after, 0.6 ms or under 5%
+more, of which 0.5 ms are the cards and the table of steps 3 and 4. The
+two figures alone (`report time 500 figures`): 2.02, 2.03 and 2.02 ms
+before; 2.23, 2.22 and 2.22 ms after, 0.2 ms or 10% more, for 59 items
+that are each a composite and two `Layout` callbacks.
+
+**Conventions amended** (`doc/kit/kit.mbt`, each marked "step 5"):
+
+1. An element can have parts that the caller makes: values of one type,
+   made by functions in the element's namespace, content like the
+   element; the element takes content, so that what `doc` has for content
+   composes them (convention 2).
+2. Positions and sizes in a coordinate system of an element are numbers
+   in points; what draws stays the primitive's parameter; no parameter
+   for a unit or a direction. An enum of the element's stands in for a
+   type of the primitive that does not fit, with the primitive's names
+   (convention 2).
+3. A part that the caller makes is a `Composite` of its own, and the
+   element keys the parts (convention 3).
+4. Where the engine can compute with a size that host code does not know
+   (a ratio in an offset), it is asked to, instead of a callback or an
+   argument. A part that measures falls under the creation rule by
+   itself. A form that would only fetch a size for the caller is not
+   built: an element without a callback can be built in a `Layout`
+   (convention 4).
+5. A number that is not finite is an error at its argument (convention
+   5).
+6. The function computes what the element computes with the same
+   operations in the same order; a length that the engine gave is used
+   as a length; every part is one element, since a function joins its
+   parts (convention 6).
+7. What an element computes is tested as numbers from the frames, and
+   every part has the tests of an element (convention 7).
+
 ## 5. Marks (a trial, in the kit)
 
 Revision 8 decided that strings are never parsed, and guarantees that `_`,

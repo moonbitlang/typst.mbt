@@ -221,6 +221,23 @@ upstream) for `Decimal`, `HtmlAttr`, `HtmlTag`, `Location`, `PdfStandards`,
   a `Para`, a sequence of rules and then one block is that block (it was
   inline content, like every other sequence): an element that gives its
   block a rule of its own, like `DataTable`, is a block.
+- `doc/kit`: `Canvas(width, height, items, clip?, key?)`, a drawing
+  surface for charts and diagrams: an unbreakable block of a fixed size in
+  points whose items are placed by coordinates (origin at the top left, y
+  down). Its items are `CanvasItem`s, each a call site of its own:
+  `Canvas::place(at, body, anchor?)` (content with one of nine sides at a
+  point, by the engine's alignment; with the anchor `Baseline` on its
+  measured first baseline, which is a callback), `Canvas::line(start,
+  end_, stroke?)`, `Canvas::rect(at, width, height, fill?, stroke?,
+  radius?)`, `Canvas::circle(center, radius, fill?, stroke?)`,
+  `Canvas::curve(start, segments, fill?, stroke?)` and
+  `Canvas::arrow(start, segments, stroke?, head?)`, a path with a filled
+  triangle at its end that points along the path. With them the enums
+  `AnchorX` (`Left`, `Center`, `Right`), `AnchorY` (`Top`, `Horizon`,
+  `Bottom`, `Baseline`) and `Segment` (`LineTo`, `QuadTo`, `CubicTo`).
+- `doc`: `Stroke::paint()`, the paint that a stroke was made with (`None`
+  for one without): what `Canvas::arrow` fills its head with, since a
+  stroke is opaque outside `doc`.
 
 ### Not a change for users
 

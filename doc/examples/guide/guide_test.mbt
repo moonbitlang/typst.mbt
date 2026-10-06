@@ -1210,28 +1210,31 @@ test "section 7: a chart on a canvas is as wide as its container, its labels at 
   // 140pt, from 30pt to 170pt of the page.
   let chart = pages([@doc.Pad(@guide.harvest_chart(beds, 12.0), x=Pt(20))])
   inspect(chart.errors() + chart.warnings(), content="")
-  inspect(chart.listing(), content=(
-    #|p1 line 66.0,10.0 0.0x28.0
-    #|p1 text 64.4,45.6 w3.3 "0"
-    #|p1 line 79.3,10.0 0.0x28.0
-    #|p1 text 77.7,45.6 w3.3 "2"
-    #|p1 line 92.7,10.0 0.0x28.0
-    #|p1 text 91.0,45.6 w3.3 "4"
-    #|p1 line 106.0,10.0 0.0x28.0
-    #|p1 text 104.4,45.6 w3.3 "6"
-    #|p1 line 119.3,10.0 0.0x28.0
-    #|p1 text 117.7,45.6 w3.3 "8"
-    #|p1 line 132.7,10.0 0.0x28.0
-    #|p1 text 129.4,45.6 w6.5 "10"
-    #|p1 line 146.0,10.0 0.0x28.0
-    #|p1 text 142.7,45.6 w6.5 "12"
-    #|p1 text 45.0,19.3 w17.0 "North"
-    #|p1 rect 66.0,12.0 30.0x10.0 rgb("#2a78d6")
-    #|p1 text 99.0,19.3 w8.1 "4.5"
-    #|p1 text 45.4,33.3 w16.6 "South"
-    #|p1 rect 66.0,26.0 80.0x10.0 rgb("#2a78d6")
-    #|p1 text 149.0,33.3 w11.3 "12.0"
-  ))
+  inspect(
+    chart.listing(),
+    content=(
+      #|p1 line 66.0,10.0 0.0x28.0
+      #|p1 text 64.4,45.6 w3.3 "0"
+      #|p1 line 79.3,10.0 0.0x28.0
+      #|p1 text 77.7,45.6 w3.3 "2"
+      #|p1 line 92.7,10.0 0.0x28.0
+      #|p1 text 91.0,45.6 w3.3 "4"
+      #|p1 line 106.0,10.0 0.0x28.0
+      #|p1 text 104.4,45.6 w3.3 "6"
+      #|p1 line 119.3,10.0 0.0x28.0
+      #|p1 text 117.7,45.6 w3.3 "8"
+      #|p1 line 132.7,10.0 0.0x28.0
+      #|p1 text 129.4,45.6 w6.5 "10"
+      #|p1 line 146.0,10.0 0.0x28.0
+      #|p1 text 142.7,45.6 w6.5 "12"
+      #|p1 text 45.0,19.3 w17.0 "North"
+      #|p1 rect 66.0,12.0 30.0x10.0 rgb("#2a78d6")
+      #|p1 text 99.0,19.3 w8.1 "4.5"
+      #|p1 text 45.4,33.3 w16.6 "South"
+      #|p1 rect 66.0,26.0 80.0x10.0 rgb("#2a78d6")
+      #|p1 text 149.0,33.3 w11.3 "12.0"
+    ),
+  )
   let bars = chart.of_kind("rect")
   let lines = chart.of_kind("line")
   assert_eq(bars.length(), 2)
@@ -1277,17 +1280,23 @@ test "section 7: arrows on a canvas, and labels on one baseline" {
   guard year.report.origin_at(1, 10.0 + 63.0, 10.0 + 10.0) is Some(origin) else {
     fail("no origin at the head")
   }
-  inspect(place(origin), content=(
-    #|guide.mbt (Canvas::arrow, key "3")
-  ))
+  inspect(
+    place(origin),
+    content=(
+      #|guide.mbt (Canvas::arrow, key "3")
+    ),
+  )
   // The number and its unit: both baselines 20pt under the top of the
   // canvas, the number ending at 40pt and the unit starting at 42pt.
   let both = pages([@guide.number_and_unit()])
   inspect(both.errors() + both.warnings(), content="")
-  inspect(both.listing(), content=(
-    #|p1 text 31.4,30.0 w18.6 "38"
-    #|p1 text 52.0,30.0 w10.1 "kg"
-  ))
+  inspect(
+    both.listing(),
+    content=(
+      #|p1 text 31.4,30.0 w18.6 "38"
+      #|p1 text 52.0,30.0 w10.1 "kg"
+    ),
+  )
   let runs = both.of_kind("text")
   assert_eq(pt(runs[0].y), "30.0")
   assert_eq(pt(runs[1].y), "30.0")
@@ -1295,15 +1304,21 @@ test "section 7: arrows on a canvas, and labels on one baseline" {
   // The anchor `Baseline` measures: built inside a callback, it is the
   // error of section 8, at the item.
   let inside = pages([@doc.Layout((_, _) => @guide.number_and_unit())])
-  inspect(inside.errors(), content=(
-    #|callbacks cannot be created inside a callback
-  ))
+  inspect(
+    inside.errors(),
+    content=(
+      #|callbacks cannot be created inside a callback
+    ),
+  )
   guard inside.report.errors[0].location is Some(Edsl(late)) else {
     fail("expected an EDSL location")
   }
-  inspect(place(late), content=(
-    #|guide.mbt (Canvas::place, key "0")
-  ))
+  inspect(
+    place(late),
+    content=(
+      #|guide.mbt (Canvas::place, key "0")
+    ),
+  )
 }
 
 ///|
