@@ -255,7 +255,23 @@ pub fn Value::display(self : Value) -> Content {
 }
 
 ///|
-/// Attempt to access a field on the value.
+/// Whether [Value::field] reads a binding of this value, and so uses its
+/// guard: the fields of symbols, types, functions and modules. For the
+/// other values a caller can pass [unused_binding_guard] instead of making
+/// one (not upstream, where a guard is a tuple on the stack).
+pub fn Value::has_guarded_fields(self : Value) -> Bool {
+  self is (Symbol(_) | Type(_) | Func(_) | Module(_))
+}
+
+///|
+/// A guard for [Value::field] on a value without guarded fields.
+pub let unused_binding_guard : BindingGuard = BindingGuard::silent(
+  Features::none(),
+)
+
+///|
+/// Attempt to access a field on the value. The guard is used for the values
+/// of [Value::has_guarded_fields].
 pub fn Value::field(
   self : Value,
   field : String,

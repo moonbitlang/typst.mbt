@@ -393,7 +393,14 @@ fn Plugin::into_module(self : Plugin) -> Module {
       scope.bind(name, Binding::detached(Func(Func::plugin(func)))) |> ignore
     }
   }
-  Module::anonymous(scope)
+  // The functions' fingerprints carry the plugin; without functions two
+  // plugins give modules that only differ in their identity.
+  let module_ = Module::anonymous(scope)
+  if scope.length() > 0 {
+    module_.canonical()
+  } else {
+    module_
+  }
 }
 
 ///|

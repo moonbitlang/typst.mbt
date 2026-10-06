@@ -13,6 +13,14 @@ pub(all) struct Arg {
 }
 
 ///|
+/// The argument with its value marked shared (upstream: a clone of the
+/// argument): for an argument that is passed on while its `Args` keep it.
+pub fn Arg::shared(self : Arg) -> Arg {
+  self.value.v.shared() |> ignore
+  self
+}
+
+///|
 /// Captured arguments to a function.
 pub(all) struct Args {
   /// The callsite span for the function.
@@ -24,12 +32,11 @@ pub(all) struct Args {
 ///|
 /// Create positional arguments from a span and values.
 pub fn Args::new(span : @syntax.Span, values : ArrayView[Value]) -> Args {
-  {
-    span,
-    items: values
-    .to_owned()
-    .map(v => ({ span, name: None, value: { v, span, }, } : Arg)),
+  let items : Array[Arg] = Array(capacity=values.length())
+  for v in values {
+    items.push({ span, name: None, value: { v, span, }, })
   }
+  { span, items, }
 }
 
 ///|

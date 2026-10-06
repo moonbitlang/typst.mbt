@@ -113,6 +113,7 @@ fn test_closure(node : @syntax.SyntaxNode, value : Value) -> Value {
       captured,
       num_pos_params: 0,
       hash: LazyFingerprint::new(),
+      node_hash: LazyFingerprint::new(),
     }),
   )
 }
@@ -130,7 +131,8 @@ test "host closures compare by identity and fingerprint by key" {
   // The fingerprint is the key.
   assert_false(hash128(Func::host(f)) == hash128(Func::host(g)))
   assert_eq(hash128(Func::host(f)), hash128(Func::host(same_key)))
-  // It is identity-bearing, like a closure's, and marks host closures.
+  // It is identity-bearing and marks host closures; a closure's is neither
+  // (closures with equal hashes are equal).
   let flags = fingerprint_flags_in(() => {
     SipHasher128::new().write(Func::host(f))
   })
@@ -139,8 +141,15 @@ test "host closures compare by identity and fingerprint by key" {
   let closure_flags = fingerprint_flags_in(() => {
     SipHasher128::new().write(test_closure(@syntax.parse_code("x"), Int(1)))
   })
-  assert_true((closure_flags & fingerprint_identity) != 0)
-  assert_eq(closure_flags & fingerprint_host, 0)
+  assert_eq(closure_flags, 0)
+  assert_true(
+    test_closure(@syntax.parse_code("x"), Int(1)) ==
+    test_closure(@syntax.parse_code("x"), Int(1)),
+  )
+  assert_false(
+    test_closure(@syntax.parse_code("x"), Int(1)) ==
+    test_closure(@syntax.parse_code("x"), Int(2)),
+  )
   // Like an anonymous closure, it has no name and the same repr.
   assert_eq(Func::host(f).repr(), "(..) => ..")
   assert_true(Func::host(f).name() is None)

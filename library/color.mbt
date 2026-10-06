@@ -2457,7 +2457,7 @@ fn color_map() -> Module {
   scope.define_("icefire", Array(color_preset(color_map_icefire))) |> ignore
   scope.define_("flare", Array(color_preset(color_map_flare))) |> ignore
   scope.define_("crest", Array(color_preset(color_map_crest))) |> ignore
-  Module::new("map", scope)
+  Module::new("map", scope).canonical()
 }
 
 ///|

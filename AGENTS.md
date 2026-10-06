@@ -278,16 +278,75 @@
   `bench/README.md`); profile with `moon run --profile --target native
   --release cli -- query --ignore-system-fonts bench/longer.typ heading`.
   comemo is replaced by `library/memo.mbt`: `layout_par_impl`,
-  `layout_fragment_impl` and the counter sequence are memoized for one
-  compilation (across introspection iterations). A memoized call's key must
+  `layout_fragment_impl`, the counter sequence and closure calls
+  (`eval_closure`, see below) are memoized for one compilation (its
+  evaluation and its introspection iterations). A memoized call's key must
   fingerprint every argument except the engine (content, `StyleChain::
   memo_hash`, regions, `Locator::memo_hash`, `Route::memo_hash`), and the
   entry keeps the arguments, which must also be equal under
   `values_memo_equal` (exact where fingerprints are lossy or Typst's `==`
-  is loose; closures by identity). Introspector reads are recorded and
-  replayed for validation (not across introspectors if a result's
-  fingerprint was lossy or contained closures: `fingerprint_flags_in`), sink
-  effects are replayed, frames are cloned. A `Fingerprint` must cover
+  is loose; host closures and modules by identity). Closures compare by
+  their hash, like upstream's `Arc<LazyHash<Closure>>` (`closures_equal`:
+  one closure expression evaluated twice with the same captures gives equal
+  functions), so equal fingerprints are equal closures; modules are one
+  object per evaluated file and per plugin in a compilation. Only host
+  closures flag a fingerprint as identity-bearing. Introspector reads
+  are recorded and replayed for validation (not across introspectors if a
+  result's fingerprint was lossy or contained host closures:
+  `fingerprint_flags_in`), sink effects are replayed, frames are cloned
+  (not cached if their tags hold host closures). The same flag marks the
+  modules that their fingerprint does not identify: every module but those
+  whose maker calls `Module::canonical` (the library's, the module of an
+  evaluated file, of a plugin with functions; one object each per
+  compilation). Two plugins without functions give modules that differ in
+  nothing but their identity; upstream, which compares hashes only, takes
+  one for the other as the argument of a memoized call, the port does not.
+  The traced span (IDE tracing) is not one per compilation: an evaluated
+  string runs without one. The evaluation of a source file is reused if
+  the span gives the answers it got (`Traced::get` for the files whose
+  code ran in it: `note_traced_file` in `Vm::new`, like upstream's tracked
+  `Traced`); memoized closure calls and layouts have the span in their
+  keys.
+  Closure calls (`memoized_closure`, upstream's `#[comemo::memoize]` on
+  `eval_closure`; without it a touying deck with cetz calls two million
+  functions instead of 160 000) are keyed by the function and the arguments
+  and track the rest like comemo does: the context notes what was asked of
+  it (`Context` has private fields and `location()`/`get_styles()`/
+  `try_*()`/`introspect()`: never read them another way), depth checks
+  note how far the route may move (`Route::check_within`), imports note
+  the file ids they ask routes for (`note_route_query`); results are
+  values (containers are marked shared). In short: closure calls are
+  memoized for a compilation; the key is the function (the closure's hash
+  and its span), the arguments with their spans and the traced span; a
+  hit also needs equal arguments (`args_memo_equal`) and the same answers
+  for what the call asked of its context, of the route (depth checks,
+  `contains`) and of the introspector (recorded reads), and it replays the
+  call's sink effects and consumes the arguments.
+- Values are shared by reference with a flag where upstream clones:
+  arrays and dictionaries are mutable objects, `Value::shared` marks one
+  as having a second holder, and mutation copies a marked one
+  (`Arr::make_mut`, `Place::get_mut`). Whatever hands a value out of
+  storage that outlives the expression must mark it where upstream clones
+  it: a state's stops (`state.mbt`), a field of content or of the style
+  chain (`field_by_name`, `settable_field_accessor`), a binding (`Eval
+  for Ident`, captures, imports, module fields), the items of a container
+  (`at`, `first`, `values`, callbacks, the spread of `arguments`), the
+  scope of `eval`, a memoized result. A missing mark is silent until
+  somebody mutates: the test is the probe of `scripts/sharing_probes.py`,
+  `(array.pop)(E)` (a native mutator called on the temporary; also
+  `let x = (); x.push(E); x.at(0).push(0)`) followed by reading `E` again,
+  compared with upstream; add a source there for every new place that
+  stores values (`python3 scripts/sharing_probes.py <upstream> <port cli>`
+  prints a verdict per source; the oracle cases `sharing: ..` of
+  `typst/oracle_wbtest.mbt` run them with memoization on and off). The capture analysis of a closure
+  or context expression is kept per syntax node for the compilation
+  (`eval/captures.mbt`, not upstream: the identifiers that
+  `CapturesVisitor` looks up are a function of the syntax, and
+  `CaptureSite::captures` replays them against the scopes; a table by span
+  and node identity, since nodes are mutable and spans are not unique).
+  The visitor stays the reference: it runs outside of compilations, and
+  `eval/captures_wbtest.mbt` compares the two on upstream's suite and, if
+  they are in `_build/typst-packages`, on touying, cetz and fletcher. A `Fingerprint` must cover
   exactly what upstream's `Hash` covers (location keys are `hash128(elem)`:
   a coarser fingerprint gives two elements one key, which `measure`
   observes; `typst/oracle_wbtest.mbt`, generated from the upstream binary by
@@ -296,8 +355,8 @@
   in a `LazyHash` (closures, tiling frames) or shares (modules, binding
   info) caches its hash and flags in a `LazyFingerprint`. Only memoize
   pure functions of their arguments plus the tracked engine parts whose
-  results cannot contain values created during the call (closure identity;
-  hence the state sequence is not memoized).
+  results cannot contain values created during the call that compare by
+  identity (the state sequence is not memoized).
 - Performance: non-intrinsic core functions (`Byte::to_uint`,
   `Byte::to_uint64`, `Int::to_uint64`, `Float::min`/`floor`/`to_int`,
   `Double::floor`/`to_int`, ...) are compiled into the core bundle and are
@@ -320,10 +379,17 @@
   always false on native); flatten tuple fields of per-glyph structs; loop
   instead of `iter().any/map/collect` and closure-based iterators (e.g. walk
   `StyleChain` links directly); `match` instead of `unwrap_or(<allocating
-  default>)`; build constant style defaults once (`Value::shared`). Count
-  allocations per MoonBit source line by compiling the generated
-  `cli.c` with `moonbit_malloc`/`moonbit_make_*` wrapped by a counting macro
-  (`#line` directives map call sites back to `.mbt` lines).
+  default>)`; build constant style defaults once (`Value::shared`);
+  `opt == Some(x)` allocates the `Some` for a value type such as a span
+  (`match`, `Vm::inspects`); what upstream gets for free on the path that
+  succeeds is built where the error or the check happens: a message made
+  by interpolation (upstream: `format_args!`), a binding guard (a struct
+  and a closure here, a tuple upstream: ask `Binding::is_guarded` first, as
+  `eval_ident` does), the closure of `at`/`trace` (catch inline). Count
+  allocations per MoonBit source line with `scripts/alloc_sites.py`: it
+  rewrites the generated `cli.c` so that every call of `moonbit_malloc`/
+  `moonbit_make_*` (and of `to_owned`) counts itself (`#line` directives
+  map call sites back to `.mbt` lines) and reports or compares the counts.
 - v128 kernels (`moonbitlang/core/v128`, experimental: `warnings =
   "-alert_experimental"` in the package's `moon.pkg`): real SIMD on native
   (NEON on aarch64, SSE2 on x86, via `moonbit_simd.h`) and wasm (SIMD128),

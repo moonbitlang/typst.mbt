@@ -6,7 +6,11 @@
 ///|
 /// The raw elements of the evaluated content of a main source, in order.
 fn raw_elems(source : @syntax.Source) -> Array[@library.RawElem] raise {
-  let world = { main: source, library: library([]), }
+  let world : TestWorld = {
+    main: source,
+    library: library([]),
+    files: Map([]),
+  }
   let content = @eval.eval_source(
     world,
     world.library,

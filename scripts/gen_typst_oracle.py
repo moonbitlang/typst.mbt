@@ -30,6 +30,22 @@ document title of the HTML export (the plain text of the title's content).
   differ in their bits (negative zeros, NaNs) do not.
 - `floats`: NaN values have the bits of Rust's `f64::NAN`, negated where
   upstream negates (`float("-nan")`, TOML's `-nan`).
+- `closures`: functions compare by their inner representation, and a
+  closure is an `Arc<LazyHash<Closure>>`: two closures are equal if their
+  hashes are (syntax node, defaults, captured bindings), so one closure
+  expression evaluated twice in the same environment gives equal functions.
+  Upstream memoizes closure calls (`eval_closure`) on the hashes of the
+  function and of the arguments: the second group pins that a repeated call
+  is indistinguishable from an evaluation (results are values, arguments
+  hash by their bits and types, calls in context see their location).
+- `sharing`: the probes of `scripts/sharing_probes.py` (which see): a value
+  that is handed out of storage (a state, a style, a field, a captured
+  variable, a cached result, ...) is upstream's clone, so a mutation of it
+  shows nowhere else.
+- `memo`: documents where memoized closure calls are reused together with
+  what they did besides returning a value: delayed errors, warnings at the
+  spans of forwarded arguments, imports (the route queries of cached
+  modules); these record the diagnostics too (`report`).
 - `fields`: a field that upstream marks `#[external]` (the `body` of `text`
   and `page`, which is also `#[required]`) is documentation only: the
   element has no such field for `has`, `at` and field access.
@@ -47,6 +63,9 @@ import re
 import subprocess
 import sys
 import tempfile
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import sharing_probes  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, "typst", "oracle_wbtest.mbt")
@@ -70,8 +89,11 @@ KEYS = r"""#set page(width: 200pt, height: auto)
 }
 """
 
-# (group: name, kind, source). `metadata`: the values of the document's metadata
-# elements, in order (all strings). `title`: the document title.
+# (group: name, kind, source[, files]). `metadata`: the values of the
+# document's metadata elements that are strings, in order. `title`: the
+# document title. `report`: the diagnostics as the CLI prints them with
+# `--diagnostic-format short`, then `--` and the metadata values if the
+# document compiled. `files`: other files of the project.
 CASES = [
     (
         "raw: lines of markup, function and eval forms",
@@ -531,6 +553,91 @@ y
 """,
     ),
     (
+        "closures: functions are equal if their hashes are",
+        "metadata",
+        r"""#let row(..args) = metadata(repr(args.pos()))
+#let f() = (x => x)
+#let g(a) = (x => x + a)
+#let h = f()
+// One closure expression evaluated twice with the same captured values.
+#row(f() == f(), g(1) == g(1), g(1) == g(2), g(1) == g(1.0), h == h, h == f())
+// Two expressions with the same text are two syntax nodes.
+#row((x => x) == (x => x), f() == (x => x))
+#row(range(3).map(i => (x => x)).dedup().len(), range(3).map(i => (x => x + i)).dedup().len())
+#row(range(4).map(i => (x => x + calc.rem(i, 2))).dedup().len(), range(4).map(i => { let j = calc.rem(i, 2); x => x + j }).dedup().len())
+// Through values that hold functions.
+#row(f().with(1) == f().with(1), f().with(1) == f().with(2), (f(),) == (f(),), (a: f()) == (a: f()), f() in (f(),))
+#row((f(), g(1), f(), g(1), g(2)).dedup().len(), (f(), g(1)).position(x => x == g(1)))
+// Named closures, defaults and context expressions.
+#let k(a) = { let n(x, y: a) = x; n }
+#let c() = context 1
+#row(k(1) == k(1), k(1) == k(2), [#context 1] == [#context 1], c() == c())
+// Captured functions and modules.
+#let m(p) = (x => p(x))
+#row(m(f()) == m(f()), m(g(1)) == m(g(2)), m(calc.abs) == m(calc.abs), m(calc.abs) == m(calc.max))
+// Element and native functions compare as before.
+#row(text == text, text == strong, calc.abs == calc.abs, text.with(red) == text.with(red))
+// State and show rules see equal functions as equal values.
+#let s = state("s", f())
+#context row(s.get() == f(), s.final() == f())
+""",
+    ),
+    (
+        "closures: a repeated call gives an independent, equal result",
+        "metadata",
+        r"""#let row(..args) = metadata(repr(args.pos()))
+// Upstream memoizes closure calls: the second call returns the value of
+// the first. Values that are mutated afterwards are copies.
+#let mk() = (1, 2)
+#let a = mk()
+#a.push(3)
+#row(a, mk(), mk() == mk())
+#let d() = (a: (1,), b: (c: 2))
+#let x = d()
+#x.a.push(2)
+#x.b.c = 5
+#x.insert("e", 1)
+#row(x, d())
+#let nest() = ((1,), (2,))
+#let y = nest()
+#y.at(0).push(9)
+#row(y, nest())
+// Arguments that the callee changes.
+#let grow(v) = { v.push(0); v }
+#let base = (1,)
+#row(grow(base), grow(base), base)
+#let put(v) = { v.k = 1; v }
+#let dict = (j: 0)
+#row(put(dict), put(dict), dict)
+// The same call from one place, with equal and with different arguments.
+#let sq(v) = v * v
+#let rp(v) = repr(v)
+#row(range(4).map(i => sq(calc.rem(i, 2))), (1, 1.0, 1).map(sq), (0.0, -0.0, 0, 0.0).map(rp), (1, 1.0, 100%, 1).map(rp))
+// Calls that return functions and content.
+#let adder(n) = (v => v + n)
+#row((adder(1))(1), (adder(1))(2), adder(1) == adder(1), (adder(2))(1))
+#let wrap(body) = [*#body*]
+#row(wrap[a] == wrap[a], wrap[a] == wrap[b], wrap[a].body)
+// Recursion and sinks.
+#let fib(n) = if n < 2 { n } else { fib(n - 1) + fib(n - 2) }
+#row(fib(20), fib(20))
+#let all(..args) = args
+#row(all(1, a: 2), all(1, a: 2) == all(1, a: 2), all(1, a: 2).pos(), all(..(1, 2), ..(b: 3)).named())
+// Counters and state read in context: every call sees its own location.
+#let c = counter("c")
+#let show-c() = context row(c.get(), c.final())
+#show-c()
+#c.step()
+#show-c()
+#c.step()
+#show-c()
+#let st = state("st", 0)
+#let bump() = st.update(v => v + 1)
+#let read() = context row(st.get(), st.final())
+#read() #bump() #read() #bump() #read()
+""",
+    ),
+    (
         "packages: a float without an alignment keeps the vertical alignment of its content",
         "metadata",
         r"""// charged-ieee: a table in `figure(placement: auto)`. The body of a float
@@ -565,6 +672,106 @@ y
     ),
 ]
 
+MEMO_LIB = r"""#let load(p) = { import p as m; m.v }
+#let warnfont(font) = text(font: font)[x]
+#let width(b) = measure(b).width
+"""
+
+CASES += [
+    (
+        "memo: a reused call with a delayed error that goes away",
+        "report",
+        r"""// The first layout finds no target: the show rule fails inside the
+// measurement, which the closure call keeps as a delayed error. The second
+// layout must not reuse that call.
+#let probe(b) = measure(b).width
+#show strong: it => box(width: query(<target>).first().value.first(), height: 1pt)
+#context metadata(repr((probe([*x*]), probe([*x*]))))
+#context metadata(repr(range(3).map(i => probe([*x*]))))
+#metadata((10pt,)) <target>
+""",
+    ),
+    (
+        "memo: a reused call with a delayed error that stays",
+        "report",
+        r"""#let probe(b) = measure(b).width
+#show strong: it => panic("no")
+#context metadata(repr((probe([*x*]), probe([*x*]))))
+#context metadata(repr(range(3).map(i => probe([*x*]))))
+""",
+    ),
+    (
+        "memo: reused calls with warnings, forwarded arguments, imports and delayed errors",
+        "report",
+        r"""#import "lib.typ": load, warnfont, width
+#show strong: it => box(width: query(<target>).first().value.first(), height: 1pt)
+// The second call is reused; `c.typ` reuses it from another route.
+#let both = ("a.typ", "a.typ").map(load)
+#import "c.typ": again
+// Forwarded arguments: the warning is the callee's, once per message.
+#let fw(..args) = warnfont(..args)
+#fw("Nope") #fw("Nope")
+#(1, 2).map(i => fw("Nope2")).join()
+#(1, 2).map(i => fw(..("Nope3",))).join()
+#context metadata(repr((width([*x*]), width([*x*]), both, again)))
+// A deprecation warning at the access inside the function.
+#let deprecated(v) = { let x = sym.prec.curly.eq; v }
+#metadata(repr((1, 1, 2).map(deprecated)))
+#metadata((10pt,)) <target>
+""",
+        {
+            "lib.typ": MEMO_LIB,
+            "a.typ": '#import "b.typ": w\n#let v = (w, w)\n',
+            "b.typ": "#let w = (1, 2)\n",
+            "c.typ": '#import "lib.typ": load\n#let again = ("a.typ",).map(load)\n',
+        },
+    ),
+    (
+        "memo: a cyclic import through a reused function",
+        "report",
+        r"""#import "lib.typ": load
+#let once = ("a.typ", "a.typ").map(load)
+#metadata(repr(once))
+#import "d.typ": v
+""",
+        {
+            "lib.typ": MEMO_LIB,
+            "a.typ": '#import "b.typ": w\n#let v = (w, w)\n',
+            "b.typ": "#let w = (1, 2)\n",
+            "d.typ": '#import "lib.typ": load\n#let v = ("a.typ", "d.typ").map(load)\n',
+        },
+    ),
+    (
+        "memo: modules of plugins without functions",
+        "metadata",
+        r"""// Two plugins that export their memory and nothing else: their modules
+// are equal in everything but their identity. (Not recorded here: upstream
+// takes one for the other as the argument of a memoized call,
+// `(pa, pb).map(m => m == pa)` is `(true, true)` there and `(true, false)`
+// in the port.)
+#let wasm(pages) = bytes((0, 97, 115, 109, 1, 0, 0, 0, 5, 3, 1, 0, pages, 7, 10, 1, 6, 109, 101, 109, 111, 114, 121, 2, 0))
+#let pa = plugin(wasm(1))
+#let pb = plugin(wasm(2))
+#let row(..args) = metadata(repr(args.pos()))
+#row(pa == pb, pa == pa, pa == plugin(wasm(1)), pb == plugin(wasm(2)), pa, dictionary(pa))
+#row((pa, pb, pa).dedup().len(), (pa, pb).contains(pb), (pa,).contains(pb), (a: pa) == (a: pb))
+#let is-a(m) = m == pa
+#row(is-a(pa), is-a(pb))
+#let s = state("plugins", pa)
+#s.update(pb)
+#context row(s.get() == pb, s.get() == pa, s.final() == pb)
+#metadata((pa,)) <first>
+#metadata((pb,)) <second>
+#context row(query(<first>).first().value.first() == pa, query(<second>).first().value.first() == pa, query(<second>).first().value.first() == pb)
+#let captured() = pa
+#let other() = pb
+#row(captured() == pa, other() == pa, captured == other, captured == captured)
+#context row(measure(box(width: if query(<second>).first().value.first() == pb { 10pt } else { 20pt })).width)
+""",
+    ),
+]
+CASES += sharing_probes.cases()
+
 
 def run(binary, args):
     out = subprocess.run([binary, *args], capture_output=True, text=True, stdin=subprocess.DEVNULL)
@@ -572,15 +779,36 @@ def run(binary, args):
     return out.stdout
 
 
-def upstream(binary, kind, source):
+def upstream(binary, kind, source, files):
     with tempfile.TemporaryDirectory() as tmp:
         path = os.path.join(tmp, "main.typ")
-        with open(path, "w", encoding="utf-8", newline="") as f:
-            f.write(source)
+        for name, text in {**files, "main.typ": source}.items():
+            with open(os.path.join(tmp, name), "w", encoding="utf-8", newline="") as f:
+                f.write(text)
         if kind == "metadata":
             values = json.loads(run(binary, ["query", "--root", tmp, path, "metadata", "--field", "value"]))
-            assert all(isinstance(v, str) for v in values), values
-            return values
+            # The other metadata elements are the documents' own.
+            return [v for v in values if isinstance(v, str)]
+        if kind == "report":
+            # From the directory, so that the diagnostics name the files as
+            # the test world does.
+            out = subprocess.run(
+                [binary, "query", "--root", ".", "--diagnostic-format", "short", "main.typ", "metadata",
+                 "--field", "value"],
+                capture_output=True, text=True, stdin=subprocess.DEVNULL, cwd=tmp)
+            lines = out.stderr.split("\n")
+            while lines and lines[-1] == "":
+                lines.pop()
+            # The notice about `typst query` itself.
+            notice = [i for i, line in enumerate(lines) if "`typst query` subcommand is deprecated" in line]
+            assert len(notice) == 1, lines
+            del lines[notice[0]:notice[0] + 2]
+            # The short format prints no hints.
+            assert all(line and not line.startswith(" ") for line in lines), lines
+            if out.returncode == 0:
+                lines.append("--")
+                lines += [v for v in json.loads(out.stdout) if isinstance(v, str)]
+            return lines
         html = os.path.join(tmp, "main.html")
         run(binary, ["compile", "--root", tmp, "--features", "html", "--format", "html", path, html])
         with open(html, encoding="utf-8") as f:
@@ -612,6 +840,18 @@ def literal(text):
     return "".join(out)
 
 
+def source_literal(text):
+    """A source as a MoonBit string: a literal, or the lines of a multi-line
+    string if it is long (a literal has to fit a line)."""
+    plain = literal(text)
+    printable = all(ch == "\n" or 0x20 <= ord(ch) <= 0x7E for ch in text)
+    if len(plain) < 8000 or not printable or not text.endswith("\n"):
+        return plain
+    # The lines are joined by newlines: the last, empty one ends the text.
+    lines = text.split("\n")
+    return "\n" + "".join(f"    #|{line}\n" for line in lines).rstrip("\n")
+
+
 def main():
     if len(sys.argv) != 2:
         sys.exit(__doc__)
@@ -624,19 +864,30 @@ def main():
         "// What upstream reports for documents that are not in its test suite:\n"
         "// raw text built by markup (lines), by the `raw` function (a string)\n"
         "// and by `eval`; the keys of located elements in measurement; the\n"
-        "// reductions of what the `packages` stage found (tests/packages). The\n"
-        "// helpers are in `oracle_helpers_wbtest.mbt`.\n"
+        "// reductions of what the `packages` stage found (tests/packages);\n"
+        "// closure equality, memoized calls and the sharing of values\n"
+        "// (`scripts/sharing_probes.py`). The helpers are in\n"
+        "// `oracle_helpers_wbtest.mbt`.\n"
     ]
-    for name, kind, source in CASES:
-        expected = upstream(binary, kind, source)
+    for case in CASES:
+        name, kind, source = case[:3]
+        files = case[3] if len(case) > 3 else {}
+        expected = upstream(binary, kind, source, files)
         body = [f"///|\ntest {literal('oracle: ' + name)} {{\n"]
-        body.append(f"  let source = {literal(source)}\n")
-        if kind == "metadata":
+        body.append(f"  let source = {source_literal(source)}\n")
+        args = "source"
+        if files:
+            body.append("  let files = [\n")
+            for path, text in files.items():
+                body.append(f"    ({literal(path)}, {literal(text)}),\n")
+            body.append("  ]\n")
+            args = "source, files~"
+        if kind in ("metadata", "report"):
             body.append("  let expected = [\n")
             for value in expected:
                 body.append(f"    {literal(value)},\n")
             body.append("  ]\n")
-            body.append("  assert_eq(oracle_metadata(source), expected)\n")
+            body.append(f"  assert_eq(oracle_{kind}({args}), expected)\n")
         else:
             body.append(f"  assert_eq(oracle_title(source), Some({literal(expected[0])}))\n")
         body.append("}\n")

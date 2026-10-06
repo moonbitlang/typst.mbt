@@ -5,3 +5,7 @@ import {
   "moonbitlang/typst/unicode",
   "moonbitlang/core/encoding/utf8",
 }
+
+import {
+  "moonbitlang/x/fs",
+} for "wbtest"

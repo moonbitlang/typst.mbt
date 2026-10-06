@@ -537,7 +537,7 @@ fn impl_counter_display(
   let numbering = match numbering {
     Some(numbering) => numbering
     None => {
-      let found = match context.styles {
+      let found = match context.try_styles() {
         Some(styles) => self_.matching_numbering(engine, styles, location, span)
         None => None
       }
@@ -549,7 +549,7 @@ fn impl_counter_display(
     }
   }
   if at_ is Some(_) {
-    let context = match context.styles {
+    let context = match context.try_styles() {
       Some(styles) => Context::new(location~, styles~)
       None => Context::new(location~)
     }

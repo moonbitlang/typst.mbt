@@ -823,7 +823,7 @@ pub fn[P] ElementIntrospector::query(
         } else {
           visited
         }
-        out.append(list[start_in_list:end_in_list].to_owned())
+        out.append(list[start_in_list:end_in_list])
         visited = end_in_list
       }
       out

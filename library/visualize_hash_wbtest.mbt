@@ -315,6 +315,7 @@ test "fingerprints of modules and closures cover scopes and syntax trees" {
         captured,
         num_pos_params: 0,
         hash: LazyFingerprint::new(),
+        node_hash: LazyFingerprint::new(),
       }),
     )
   }
@@ -326,20 +327,59 @@ test "fingerprints of modules and closures cover scopes and syntax trees" {
   }
   // Anonymous modules (plugins) are told apart by their scopes, also when
   // a closure captures them.
+  let node0 = @syntax.parse_code("x")
   let a = Module::anonymous(scope(Int(1), detached))
   let b = Module::anonymous(scope(Int(2), detached))
   distinct(Module(a))
   distinct(Module(b))
   distinct(Module(a.with_name("a")))
-  // Modules compare by identity: their fingerprint is flagged like a
-  // closure's, also from the cache.
+  // Modules compare by identity. That is a flag of the fingerprint of the
+  // modules that it does not identify (anonymous ones), also from the
+  // cache, and of what holds them; not of named modules and of the
+  // modules of plugins with functions (one object each per compilation).
   let other = Module::anonymous(scope(Int(1), detached))
   assert_false(a == other)
   assert_eq(hash128(Value::Module(a)), hash128(Value::Module(other)))
   for _ in 0..<2 {
     let (_, flags) = fingerprint_and_flags(Value::Module(a))
     assert_eq(flags, fingerprint_identity)
+    let (_, flags) = fingerprint_and_flags(
+      closure(node0, scope(Module(a), detached)),
+    )
+    assert_eq(flags, fingerprint_identity)
   }
+  let named = Module::new("m", scope(Int(1), detached)).canonical()
+  let identified = Module::anonymous(scope(Int(1), detached)).canonical()
+  for m in [named, named.with_name("n"), identified, identified.with_name("p")] {
+    for _ in 0..<2 {
+      let (_, flags) = fingerprint_and_flags(Value::Module(m))
+      assert_eq(flags, 0)
+      let (_, flags) = fingerprint_and_flags(
+        closure(node0, scope(Module(m), detached)),
+      )
+      assert_eq(flags, 0)
+    }
+  }
+  // A module is canonical because its maker says so: what is made of one
+  // is not, nor is a module that is just made.
+  for
+    m in [
+      Module::new("m", scope(Int(1), detached)),
+      named.with_scope(scope(Int(1), detached)),
+      named.with_content(Content::empty()),
+      identified.with_content(Content::empty()),
+    ] {
+    let (_, flags) = fingerprint_and_flags(Value::Module(m))
+    assert_eq(flags, fingerprint_identity)
+  }
+  // Making a module canonical does not change its hash.
+  assert_eq(
+    hash128(Value::Module(Module::new("m", scope(Int(1), detached)))),
+    hash128(Value::Module(named)),
+  )
+  // The flag follows the inner data.
+  let (_, flags) = fingerprint_and_flags(Value::Module(a.with_name("q")))
+  assert_eq(flags, fingerprint_identity)
   // A module in its own scope (which evaluation cannot build) terminates.
   let cyclic = Scope::new()
   let cycle = Module::anonymous(cyclic)
@@ -429,12 +469,19 @@ test "fingerprints of modules and closures cover scopes and syntax trees" {
     hash128(closure(nested, Scope::new())) ==
     hash128(closure(flat, Scope::new())),
   )
-  // The same tree with the same captures is the same hash (closures still
-  // compare by identity).
-  assert_eq(
-    hash128(closure(@syntax.parse_code("x"), scope(Int(1), detached))),
-    hash128(closure(node, scope(Int(1), detached))),
-  )
+  // The same tree with the same captures is the same hash, and closures
+  // with the same hash are equal (upstream `Arc<LazyHash<Closure>>`).
+  let one = closure(@syntax.parse_code("x"), scope(Int(1), detached))
+  let other = closure(node, scope(Int(1), detached))
+  assert_eq(hash128(one), hash128(other))
+  assert_true(one == other)
+  assert_true(one == one)
+  assert_false(one == closure(node, scope(Int(2), detached)))
+  assert_false(one == closure(node, scope(Float(1.0), detached)))
+  assert_false(one == closure(nested, scope(Int(1), detached)))
+  // A closure's fingerprint carries no flags of its own, only those of what
+  // it captured.
+  assert_eq(fingerprint_and_flags(one).1, 0)
 }
 
 ///|

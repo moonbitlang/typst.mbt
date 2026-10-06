@@ -67,7 +67,11 @@ fn apply_binary(
     return lhs
   }
   let rhs = eval_expr(vm, binary.rhs())
-  @library.at(binary.span(), () => op(lhs, rhs))
+  // `.at(binary.span())`, without the closure of `@library.at`.
+  op(lhs, rhs) catch {
+    @library.HintedError(err) =>
+      raise @library.SourceError([err.into_error_at(binary.span())])
+  }
 }
 
 ///|

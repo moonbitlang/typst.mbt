@@ -1204,9 +1204,11 @@ pub fn Func::host(f : HostFunc) -> Func
   distinguish host functions from closures.
 - **Equality** (`Func ==`, memo input equality): the same `HostFunc` object.
 - **Fingerprint**: a discriminant, the `key` and the function span. It
-  sets `fingerprint_identity`, like closures do, and the new flag
-  `fingerprint_host`, which lets the recorder find results that hold host
-  functions (11.4).
+  sets `fingerprint_identity` (the flag of values that compare by identity
+  and that their fingerprint does not identify: host functions and
+  anonymous modules; Typst closures no longer set it, they compare by
+  their hash like upstream's) and the new flag `fingerprint_host`, which
+  lets the recorder find results that hold host functions (11.4).
 
 ### 11.2 Identity
 
@@ -1243,8 +1245,13 @@ own.
 
 ### 11.3 Memoization
 
-Host functions follow the closure rules of `library/memo.mbt` without new
-cases: a fingerprint containing one has `fingerprint_identity` set, so
+Host functions follow the rules of `library/memo.mbt` for values that
+compare by identity (when this was designed these were the rules of Typst
+closures, which have since become equal by hash like upstream's and are
+memoized like upstream's `eval_closure`; a call of a host function is not
+memoized, but a memoized closure call that contains one skips it when it is
+reused, which the purity contract of callbacks allows): a fingerprint
+containing one has `fingerprint_identity` set, so
 frames whose tags hold host functions are not cached (`frame_cacheable`),
 memo inputs compare them by identity (`funcs_memo_equal` falls back to
 `==`), and a memoized result whose recorded reads contain one is not reused

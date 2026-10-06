@@ -4,8 +4,10 @@
 // What upstream reports for documents that are not in its test suite:
 // raw text built by markup (lines), by the `raw` function (a string)
 // and by `eval`; the keys of located elements in measurement; the
-// reductions of what the `packages` stage found (tests/packages). The
-// helpers are in `oracle_helpers_wbtest.mbt`.
+// reductions of what the `packages` stage found (tests/packages);
+// closure equality, memoized calls and the sharing of values
+// (`scripts/sharing_probes.py`). The helpers are in
+// `oracle_helpers_wbtest.mbt`.
 
 ///|
 test "oracle: raw: lines of markup, function and eval forms" {
@@ -259,6 +261,30 @@ test "oracle: fields: an external field is not a field of the element" {
 }
 
 ///|
+test "oracle: closures: functions are equal if their hashes are" {
+  let source = "#let row(..args) = metadata(repr(args.pos()))\n#let f() = (x => x)\n#let g(a) = (x => x + a)\n#let h = f()\n// One closure expression evaluated twice with the same captured values.\n#row(f() == f(), g(1) == g(1), g(1) == g(2), g(1) == g(1.0), h == h, h == f())\n// Two expressions with the same text are two syntax nodes.\n#row((x => x) == (x => x), f() == (x => x))\n#row(range(3).map(i => (x => x)).dedup().len(), range(3).map(i => (x => x + i)).dedup().len())\n#row(range(4).map(i => (x => x + calc.rem(i, 2))).dedup().len(), range(4).map(i => { let j = calc.rem(i, 2); x => x + j }).dedup().len())\n// Through values that hold functions.\n#row(f().with(1) == f().with(1), f().with(1) == f().with(2), (f(),) == (f(),), (a: f()) == (a: f()), f() in (f(),))\n#row((f(), g(1), f(), g(1), g(2)).dedup().len(), (f(), g(1)).position(x => x == g(1)))\n// Named closures, defaults and context expressions.\n#let k(a) = { let n(x, y: a) = x; n }\n#let c() = context 1\n#row(k(1) == k(1), k(1) == k(2), [#context 1] == [#context 1], c() == c())\n// Captured functions and modules.\n#let m(p) = (x => p(x))\n#row(m(f()) == m(f()), m(g(1)) == m(g(2)), m(calc.abs) == m(calc.abs), m(calc.abs) == m(calc.max))\n// Element and native functions compare as before.\n#row(text == text, text == strong, calc.abs == calc.abs, text.with(red) == text.with(red))\n// State and show rules see equal functions as equal values.\n#let s = state(\"s\", f())\n#context row(s.get() == f(), s.final() == f())\n"
+  let expected = [
+    "(true, true, false, false, true, true)", "(false, false)", "(1, 3)", "(4, 2)",
+    "(true, false, true, true, true)", "(3, 1)", "(true, false, true, true)", "(true, false, false, false)",
+    "(true, false, true, true)", "(true, true)",
+  ]
+  assert_eq(oracle_metadata(source), expected)
+}
+
+///|
+test "oracle: closures: a repeated call gives an independent, equal result" {
+  let source = "#let row(..args) = metadata(repr(args.pos()))\n// Upstream memoizes closure calls: the second call returns the value of\n// the first. Values that are mutated afterwards are copies.\n#let mk() = (1, 2)\n#let a = mk()\n#a.push(3)\n#row(a, mk(), mk() == mk())\n#let d() = (a: (1,), b: (c: 2))\n#let x = d()\n#x.a.push(2)\n#x.b.c = 5\n#x.insert(\"e\", 1)\n#row(x, d())\n#let nest() = ((1,), (2,))\n#let y = nest()\n#y.at(0).push(9)\n#row(y, nest())\n// Arguments that the callee changes.\n#let grow(v) = { v.push(0); v }\n#let base = (1,)\n#row(grow(base), grow(base), base)\n#let put(v) = { v.k = 1; v }\n#let dict = (j: 0)\n#row(put(dict), put(dict), dict)\n// The same call from one place, with equal and with different arguments.\n#let sq(v) = v * v\n#let rp(v) = repr(v)\n#row(range(4).map(i => sq(calc.rem(i, 2))), (1, 1.0, 1).map(sq), (0.0, -0.0, 0, 0.0).map(rp), (1, 1.0, 100%, 1).map(rp))\n// Calls that return functions and content.\n#let adder(n) = (v => v + n)\n#row((adder(1))(1), (adder(1))(2), adder(1) == adder(1), (adder(2))(1))\n#let wrap(body) = [*#body*]\n#row(wrap[a] == wrap[a], wrap[a] == wrap[b], wrap[a].body)\n// Recursion and sinks.\n#let fib(n) = if n < 2 { n } else { fib(n - 1) + fib(n - 2) }\n#row(fib(20), fib(20))\n#let all(..args) = args\n#row(all(1, a: 2), all(1, a: 2) == all(1, a: 2), all(1, a: 2).pos(), all(..(1, 2), ..(b: 3)).named())\n// Counters and state read in context: every call sees its own location.\n#let c = counter(\"c\")\n#let show-c() = context row(c.get(), c.final())\n#show-c()\n#c.step()\n#show-c()\n#c.step()\n#show-c()\n#let st = state(\"st\", 0)\n#let bump() = st.update(v => v + 1)\n#let read() = context row(st.get(), st.final())\n#read() #bump() #read() #bump() #read()\n"
+  let expected = [
+    "((1, 2, 3), (1, 2), true)", "((a: (1, 2), b: (c: 2), e: 1), (a: (1,), b: (c: 2)))",
+    "(((1, 9), (2,)), ((1,), (2,)))", "((1, 0), (1, 0), (1,))", "((j: 0, k: 1), (j: 0, k: 1), (j: 0))",
+    "(\n  (0, 1, 0, 1),\n  (1, 1.0, 1),\n  (\"0.0\", \"-0.0\", \"0\", \"0.0\"),\n  (\"1\", \"1.0\", \"100%\", \"1\"),\n)",
+    "(2, 3, true, 3)", "(true, false, [a])", "(6765, 6765)", "(arguments(a: 2, 1), true, (1,), (b: 3))",
+    "((0,), (2,))", "((1,), (2,))", "((2,), (2,))", "(0, 2)", "(1, 2)", "(2, 2)",
+  ]
+  assert_eq(oracle_metadata(source), expected)
+}
+
+///|
 test "oracle: packages: a float without an alignment keeps the vertical alignment of its content" {
   let source = "// charged-ieee: a table in `figure(placement: auto)`. The body of a float\n// is laid out with `Alignment::CENTER` if its alignment is `auto`\n// (`PlacedChild::layout`), which is horizontal only: boxes and cells keep\n// the inherited vertical alignment.\n#set page(width: 200pt, height: 200pt, margin: 20pt)\n#let at(label) = context metadata(repr(locate(label).position()))\n#let mark(name) = box(width: 6pt, height: 6pt)[#metadata(name)#label(name)]\n#place(auto, float: true, box(width: 60pt, height: 40pt, mark(\"a\")))\n#place(top, float: true, box(width: 60pt, height: 40pt, mark(\"b\")))\n#place(auto, float: true, grid(columns: 2, mark(\"c\"), box(width: 6pt, height: 30pt)))\n#[\n  #set align(bottom)\n  #place(auto, float: true, box(width: 60pt, height: 40pt, mark(\"d\")))\n  #place(auto, float: true, table(columns: 2, mark(\"e\"), box(width: 6pt, height: 30pt)))\n]\n#at(<a>) #at(<b>) #at(<c>) #at(<d>) #at(<e>)\n"
   let expected = [
@@ -289,6 +315,8779 @@ test "oracle: packages: the text of the predefined math operators" {
     "(\"sinc\", (115, 105, 110, 99), false)", "(\"sinh\", (115, 105, 110, 104), false)",
     "(\"sup\", (115, 117, 112), true)", "(\"tan\", (116, 97, 110), false)", "(\"tanh\", (116, 97, 110, 104), false)",
     "(\"tg\", (116, 103), false)", "(\"tr\", (116, 114), false)",
+  ]
+  assert_eq(oracle_metadata(source), expected)
+}
+
+///|
+test "oracle: memo: a reused call with a delayed error that goes away" {
+  let source = "// The first layout finds no target: the show rule fails inside the\n// measurement, which the closure call keeps as a delayed error. The second\n// layout must not reuse that call.\n#let probe(b) = measure(b).width\n#show strong: it => box(width: query(<target>).first().value.first(), height: 1pt)\n#context metadata(repr((probe([*x*]), probe([*x*]))))\n#context metadata(repr(range(3).map(i => probe([*x*]))))\n#metadata((10pt,)) <target>\n"
+  let expected = ["--", "(10pt, 10pt)", "(10pt, 10pt, 10pt)"]
+  assert_eq(oracle_report(source), expected)
+}
+
+///|
+test "oracle: memo: a reused call with a delayed error that stays" {
+  let source = "#let probe(b) = measure(b).width\n#show strong: it => panic(\"no\")\n#context metadata(repr((probe([*x*]), probe([*x*]))))\n#context metadata(repr(range(3).map(i => probe([*x*]))))\n"
+  let expected = ["main.typ:2:20: error: panicked with: no"]
+  assert_eq(oracle_report(source), expected)
+}
+
+///|
+test "oracle: memo: reused calls with warnings, forwarded arguments, imports and delayed errors" {
+  let source = "#import \"lib.typ\": load, warnfont, width\n#show strong: it => box(width: query(<target>).first().value.first(), height: 1pt)\n// The second call is reused; `c.typ` reuses it from another route.\n#let both = (\"a.typ\", \"a.typ\").map(load)\n#import \"c.typ\": again\n// Forwarded arguments: the warning is the callee's, once per message.\n#let fw(..args) = warnfont(..args)\n#fw(\"Nope\") #fw(\"Nope\")\n#(1, 2).map(i => fw(\"Nope2\")).join()\n#(1, 2).map(i => fw(..(\"Nope3\",))).join()\n#context metadata(repr((width([*x*]), width([*x*]), both, again)))\n// A deprecation warning at the access inside the function.\n#let deprecated(v) = { let x = sym.prec.curly.eq; v }\n#metadata(repr((1, 1, 2).map(deprecated)))\n#metadata((10pt,)) <target>\n"
+  let files = [
+    (
+      "lib.typ", "#let load(p) = { import p as m; m.v }\n#let warnfont(font) = text(font: font)[x]\n#let width(b) = measure(b).width\n",
+    ),
+    ("a.typ", "#import \"b.typ\": w\n#let v = (w, w)\n"),
+    ("b.typ", "#let w = (1, 2)\n"),
+    (
+      "c.typ", "#import \"lib.typ\": load\n#let again = (\"a.typ\",).map(load)\n",
+    ),
+  ]
+  let expected = [
+    "lib.typ:2:33: warning: unknown font family: nope", "lib.typ:2:33: warning: unknown font family: nope2",
+    "lib.typ:2:33: warning: unknown font family: nope3", "main.typ:13:40: warning: `prec.curly.eq` is deprecated, use `prec.eq.slant` instead",
+    "--", "(\n  10pt,\n  10pt,\n  (((1, 2), (1, 2)), ((1, 2), (1, 2))),\n  (((1, 2), (1, 2)),),\n)",
+    "(1, 1, 2)",
+  ]
+  assert_eq(oracle_report(source, files~), expected)
+}
+
+///|
+test "oracle: memo: a cyclic import through a reused function" {
+  let source = "#import \"lib.typ\": load\n#let once = (\"a.typ\", \"a.typ\").map(load)\n#metadata(repr(once))\n#import \"d.typ\": v\n"
+  let files = [
+    (
+      "lib.typ", "#let load(p) = { import p as m; m.v }\n#let warnfont(font) = text(font: font)[x]\n#let width(b) = measure(b).width\n",
+    ),
+    ("a.typ", "#import \"b.typ\": w\n#let v = (w, w)\n"),
+    ("b.typ", "#let w = (1, 2)\n"),
+    (
+      "d.typ", "#import \"lib.typ\": load\n#let v = (\"a.typ\", \"d.typ\").map(load)\n",
+    ),
+  ]
+  let expected = ["lib.typ:1:24: error: cyclic import"]
+  assert_eq(oracle_report(source, files~), expected)
+}
+
+///|
+test "oracle: memo: modules of plugins without functions" {
+  let source = "// Two plugins that export their memory and nothing else: their modules\n// are equal in everything but their identity. (Not recorded here: upstream\n// takes one for the other as the argument of a memoized call,\n// `(pa, pb).map(m => m == pa)` is `(true, true)` there and `(true, false)`\n// in the port.)\n#let wasm(pages) = bytes((0, 97, 115, 109, 1, 0, 0, 0, 5, 3, 1, 0, pages, 7, 10, 1, 6, 109, 101, 109, 111, 114, 121, 2, 0))\n#let pa = plugin(wasm(1))\n#let pb = plugin(wasm(2))\n#let row(..args) = metadata(repr(args.pos()))\n#row(pa == pb, pa == pa, pa == plugin(wasm(1)), pb == plugin(wasm(2)), pa, dictionary(pa))\n#row((pa, pb, pa).dedup().len(), (pa, pb).contains(pb), (pa,).contains(pb), (a: pa) == (a: pb))\n#let is-a(m) = m == pa\n#row(is-a(pa), is-a(pb))\n#let s = state(\"plugins\", pa)\n#s.update(pb)\n#context row(s.get() == pb, s.get() == pa, s.final() == pb)\n#metadata((pa,)) <first>\n#metadata((pb,)) <second>\n#context row(query(<first>).first().value.first() == pa, query(<second>).first().value.first() == pa, query(<second>).first().value.first() == pb)\n#let captured() = pa\n#let other() = pb\n#row(captured() == pa, other() == pa, captured == other, captured == captured)\n#context row(measure(box(width: if query(<second>).first().value.first() == pb { 10pt } else { 20pt })).width)\n"
+  let expected = [
+    "(false, true, true, true, <module>, (:))", "(2, true, false, false)", "(true, false)",
+    "(true, false, true)", "(true, false, true)", "(true, false, false, true)", "(10pt,)",
+  ]
+  assert_eq(oracle_metadata(source), expected)
+}
+
+///|
+test "oracle: sharing: state" {
+  let source =
+    #|#metadata("== state: initial array through get")
+    #|#[
+    #|#let s = state("s-init-array-get", ((1, 2), (k: (3,))))
+    #|#context {
+    #|  let _ = (array.pop)(s.get())
+    #|  let _ = (array.push)(s.get(), 0)
+    #|  let _ = (array.pop)(s.get().at(0))
+    #|  let _ = (array.push)(s.get().at(0), 0)
+    #|  let _ = (array.pop)(s.get().first())
+    #|  let _ = (array.push)(s.get().first(), 0)
+    #|  let _ = (dictionary.insert)(s.get().at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(s.get().at(1), "k")
+    #|  let _ = (dictionary.insert)(s.get().last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(s.get().last(), "k")
+    #|  let _ = (array.pop)(s.get().at(1).k)
+    #|  let _ = (array.push)(s.get().at(1).k, 0)
+    #|  let _ = (array.pop)(s.get().last().at("k"))
+    #|  let _ = (array.push)(s.get().last().at("k"), 0)
+    #|  let _ = (array.pop)(s.get().at(1).values().first())
+    #|  let _ = (array.push)(s.get().at(1).values().first(), 0)
+    #|  let _ = (array.pop)(s.get().slice(0, 1).first())
+    #|  let _ = (array.push)(s.get().slice(0, 1).first(), 0)
+    #|  metadata(repr((s.get(),)))
+    #|}
+    #|#context {
+    #|  { let pv = (); pv.push(s.get()); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(s.get()); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(s.get()); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(s.get()); pv.at(0).at(0).push(0) }
+    #|  { let pv = (); pv.push(s.get()); let _ = pv.at(0).first().pop() }
+    #|  { let pv = (); pv.push(s.get()); pv.at(0).first().push(0) }
+    #|  { let pv = (); pv.push(s.get()); pv.at(0).at(1).insert("zz", 0) }
+    #|  { let pv = (); pv.push(s.get()); let _ = pv.at(0).at(1).remove("k") }
+    #|  { let pv = (); pv.push(s.get()); pv.at(0).last().insert("zz", 0) }
+    #|  { let pv = (); pv.push(s.get()); let _ = pv.at(0).last().remove("k") }
+    #|  { let pv = (); pv.push(s.get()); let _ = pv.at(0).at(1).k.pop() }
+    #|  { let pv = (); pv.push(s.get()); pv.at(0).at(1).k.push(0) }
+    #|  { let pv = (); pv.push(s.get()); let _ = pv.at(0).last().at("k").pop() }
+    #|  { let pv = (); pv.push(s.get()); pv.at(0).last().at("k").push(0) }
+    #|  metadata(repr((s.get(),)))
+    #|}
+    #|#let get() = s.get()
+    #|#context {
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  let _ = (array.pop)(get().first())
+    #|  let _ = (array.push)(get().first(), 0)
+    #|  let _ = (dictionary.insert)(get().at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().at(1), "k")
+    #|  let _ = (dictionary.insert)(get().last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().last(), "k")
+    #|  let _ = (array.pop)(get().at(1).k)
+    #|  let _ = (array.push)(get().at(1).k, 0)
+    #|  let _ = (array.pop)(get().last().at("k"))
+    #|  let _ = (array.push)(get().last().at("k"), 0)
+    #|  let _ = (array.pop)(get().at(1).values().first())
+    #|  let _ = (array.push)(get().at(1).values().first(), 0)
+    #|  let _ = (array.pop)(get().slice(0, 1).first())
+    #|  let _ = (array.push)(get().slice(0, 1).first(), 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#context metadata(repr((s.get(),)))
+    #|]
+    #|#metadata("== state: array set by an update through get")
+    #|#[
+    #|#let s = state("s-set-array-get", 0)
+    #|#s.update(((1, 2), (k: (3,))))
+    #|#context {
+    #|  let _ = (array.pop)(s.get())
+    #|  let _ = (array.push)(s.get(), 0)
+    #|  let _ = (array.pop)(s.get().at(0))
+    #|  let _ = (array.push)(s.get().at(0), 0)
+    #|  let _ = (array.pop)(s.get().first())
+    #|  let _ = (array.push)(s.get().first(), 0)
+    #|  let _ = (dictionary.insert)(s.get().at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(s.get().at(1), "k")
+    #|  let _ = (dictionary.insert)(s.get().last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(s.get().last(), "k")
+    #|  let _ = (array.pop)(s.get().at(1).k)
+    #|  let _ = (array.push)(s.get().at(1).k, 0)
+    #|  let _ = (array.pop)(s.get().last().at("k"))
+    #|  let _ = (array.push)(s.get().last().at("k"), 0)
+    #|  let _ = (array.pop)(s.get().at(1).values().first())
+    #|  let _ = (array.push)(s.get().at(1).values().first(), 0)
+    #|  let _ = (array.pop)(s.get().slice(0, 1).first())
+    #|  let _ = (array.push)(s.get().slice(0, 1).first(), 0)
+    #|  metadata(repr((s.get(),)))
+    #|}
+    #|#context {
+    #|  { let pv = (); pv.push(s.get()); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(s.get()); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(s.get()); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(s.get()); pv.at(0).at(0).push(0) }
+    #|  { let pv = (); pv.push(s.get()); let _ = pv.at(0).first().pop() }
+    #|  { let pv = (); pv.push(s.get()); pv.at(0).first().push(0) }
+    #|  { let pv = (); pv.push(s.get()); pv.at(0).at(1).insert("zz", 0) }
+    #|  { let pv = (); pv.push(s.get()); let _ = pv.at(0).at(1).remove("k") }
+    #|  { let pv = (); pv.push(s.get()); pv.at(0).last().insert("zz", 0) }
+    #|  { let pv = (); pv.push(s.get()); let _ = pv.at(0).last().remove("k") }
+    #|  { let pv = (); pv.push(s.get()); let _ = pv.at(0).at(1).k.pop() }
+    #|  { let pv = (); pv.push(s.get()); pv.at(0).at(1).k.push(0) }
+    #|  { let pv = (); pv.push(s.get()); let _ = pv.at(0).last().at("k").pop() }
+    #|  { let pv = (); pv.push(s.get()); pv.at(0).last().at("k").push(0) }
+    #|  metadata(repr((s.get(),)))
+    #|}
+    #|#let get() = s.get()
+    #|#context {
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  let _ = (array.pop)(get().first())
+    #|  let _ = (array.push)(get().first(), 0)
+    #|  let _ = (dictionary.insert)(get().at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().at(1), "k")
+    #|  let _ = (dictionary.insert)(get().last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().last(), "k")
+    #|  let _ = (array.pop)(get().at(1).k)
+    #|  let _ = (array.push)(get().at(1).k, 0)
+    #|  let _ = (array.pop)(get().last().at("k"))
+    #|  let _ = (array.push)(get().last().at("k"), 0)
+    #|  let _ = (array.pop)(get().at(1).values().first())
+    #|  let _ = (array.push)(get().at(1).values().first(), 0)
+    #|  let _ = (array.pop)(get().slice(0, 1).first())
+    #|  let _ = (array.push)(get().slice(0, 1).first(), 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#context metadata(repr((s.get(),)))
+    #|]
+    #|#metadata("== state: array returned by an update function through get")
+    #|#[
+    #|#let s = state("s-fn-array-get", 0)
+    #|#s.update(v => ((1, 2), (k: (3,))))
+    #|#context {
+    #|  let _ = (array.pop)(s.get())
+    #|  let _ = (array.push)(s.get(), 0)
+    #|  let _ = (array.pop)(s.get().at(0))
+    #|  let _ = (array.push)(s.get().at(0), 0)
+    #|  let _ = (array.pop)(s.get().first())
+    #|  let _ = (array.push)(s.get().first(), 0)
+    #|  let _ = (dictionary.insert)(s.get().at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(s.get().at(1), "k")
+    #|  let _ = (dictionary.insert)(s.get().last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(s.get().last(), "k")
+    #|  let _ = (array.pop)(s.get().at(1).k)
+    #|  let _ = (array.push)(s.get().at(1).k, 0)
+    #|  let _ = (array.pop)(s.get().last().at("k"))
+    #|  let _ = (array.push)(s.get().last().at("k"), 0)
+    #|  let _ = (array.pop)(s.get().at(1).values().first())
+    #|  let _ = (array.push)(s.get().at(1).values().first(), 0)
+    #|  let _ = (array.pop)(s.get().slice(0, 1).first())
+    #|  let _ = (array.push)(s.get().slice(0, 1).first(), 0)
+    #|  metadata(repr((s.get(),)))
+    #|}
+    #|#context {
+    #|  { let pv = (); pv.push(s.get()); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(s.get()); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(s.get()); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(s.get()); pv.at(0).at(0).push(0) }
+    #|  { let pv = (); pv.push(s.get()); let _ = pv.at(0).first().pop() }
+    #|  { let pv = (); pv.push(s.get()); pv.at(0).first().push(0) }
+    #|  { let pv = (); pv.push(s.get()); pv.at(0).at(1).insert("zz", 0) }
+    #|  { let pv = (); pv.push(s.get()); let _ = pv.at(0).at(1).remove("k") }
+    #|  { let pv = (); pv.push(s.get()); pv.at(0).last().insert("zz", 0) }
+    #|  { let pv = (); pv.push(s.get()); let _ = pv.at(0).last().remove("k") }
+    #|  { let pv = (); pv.push(s.get()); let _ = pv.at(0).at(1).k.pop() }
+    #|  { let pv = (); pv.push(s.get()); pv.at(0).at(1).k.push(0) }
+    #|  { let pv = (); pv.push(s.get()); let _ = pv.at(0).last().at("k").pop() }
+    #|  { let pv = (); pv.push(s.get()); pv.at(0).last().at("k").push(0) }
+    #|  metadata(repr((s.get(),)))
+    #|}
+    #|#let get() = s.get()
+    #|#context {
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  let _ = (array.pop)(get().first())
+    #|  let _ = (array.push)(get().first(), 0)
+    #|  let _ = (dictionary.insert)(get().at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().at(1), "k")
+    #|  let _ = (dictionary.insert)(get().last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().last(), "k")
+    #|  let _ = (array.pop)(get().at(1).k)
+    #|  let _ = (array.push)(get().at(1).k, 0)
+    #|  let _ = (array.pop)(get().last().at("k"))
+    #|  let _ = (array.push)(get().last().at("k"), 0)
+    #|  let _ = (array.pop)(get().at(1).values().first())
+    #|  let _ = (array.push)(get().at(1).values().first(), 0)
+    #|  let _ = (array.pop)(get().slice(0, 1).first())
+    #|  let _ = (array.push)(get().slice(0, 1).first(), 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#context metadata(repr((s.get(),)))
+    #|]
+    #|#metadata("== state: initial array through at")
+    #|#[
+    #|#let s = state("s-init-array-at", ((1, 2), (k: (3,))))
+    #|#context {
+    #|  let _ = (array.pop)(s.at(here()))
+    #|  let _ = (array.push)(s.at(here()), 0)
+    #|  let _ = (array.pop)(s.at(here()).at(0))
+    #|  let _ = (array.push)(s.at(here()).at(0), 0)
+    #|  let _ = (array.pop)(s.at(here()).first())
+    #|  let _ = (array.push)(s.at(here()).first(), 0)
+    #|  let _ = (dictionary.insert)(s.at(here()).at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(s.at(here()).at(1), "k")
+    #|  let _ = (dictionary.insert)(s.at(here()).last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(s.at(here()).last(), "k")
+    #|  let _ = (array.pop)(s.at(here()).at(1).k)
+    #|  let _ = (array.push)(s.at(here()).at(1).k, 0)
+    #|  let _ = (array.pop)(s.at(here()).last().at("k"))
+    #|  let _ = (array.push)(s.at(here()).last().at("k"), 0)
+    #|  let _ = (array.pop)(s.at(here()).at(1).values().first())
+    #|  let _ = (array.push)(s.at(here()).at(1).values().first(), 0)
+    #|  let _ = (array.pop)(s.at(here()).slice(0, 1).first())
+    #|  let _ = (array.push)(s.at(here()).slice(0, 1).first(), 0)
+    #|  metadata(repr((s.at(here()),)))
+    #|}
+    #|#context {
+    #|  { let pv = (); pv.push(s.at(here())); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(s.at(here())); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(s.at(here())); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(s.at(here())); pv.at(0).at(0).push(0) }
+    #|  { let pv = (); pv.push(s.at(here())); let _ = pv.at(0).first().pop() }
+    #|  { let pv = (); pv.push(s.at(here())); pv.at(0).first().push(0) }
+    #|  { let pv = (); pv.push(s.at(here())); pv.at(0).at(1).insert("zz", 0) }
+    #|  { let pv = (); pv.push(s.at(here())); let _ = pv.at(0).at(1).remove("k") }
+    #|  { let pv = (); pv.push(s.at(here())); pv.at(0).last().insert("zz", 0) }
+    #|  { let pv = (); pv.push(s.at(here())); let _ = pv.at(0).last().remove("k") }
+    #|  { let pv = (); pv.push(s.at(here())); let _ = pv.at(0).at(1).k.pop() }
+    #|  { let pv = (); pv.push(s.at(here())); pv.at(0).at(1).k.push(0) }
+    #|  { let pv = (); pv.push(s.at(here())); let _ = pv.at(0).last().at("k").pop() }
+    #|  { let pv = (); pv.push(s.at(here())); pv.at(0).last().at("k").push(0) }
+    #|  metadata(repr((s.at(here()),)))
+    #|}
+    #|#let get() = s.at(here())
+    #|#context {
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  let _ = (array.pop)(get().first())
+    #|  let _ = (array.push)(get().first(), 0)
+    #|  let _ = (dictionary.insert)(get().at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().at(1), "k")
+    #|  let _ = (dictionary.insert)(get().last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().last(), "k")
+    #|  let _ = (array.pop)(get().at(1).k)
+    #|  let _ = (array.push)(get().at(1).k, 0)
+    #|  let _ = (array.pop)(get().last().at("k"))
+    #|  let _ = (array.push)(get().last().at("k"), 0)
+    #|  let _ = (array.pop)(get().at(1).values().first())
+    #|  let _ = (array.push)(get().at(1).values().first(), 0)
+    #|  let _ = (array.pop)(get().slice(0, 1).first())
+    #|  let _ = (array.push)(get().slice(0, 1).first(), 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#context metadata(repr((s.at(here()),)))
+    #|]
+    #|#metadata("== state: array set by an update through at")
+    #|#[
+    #|#let s = state("s-set-array-at", 0)
+    #|#s.update(((1, 2), (k: (3,))))
+    #|#context {
+    #|  let _ = (array.pop)(s.at(here()))
+    #|  let _ = (array.push)(s.at(here()), 0)
+    #|  let _ = (array.pop)(s.at(here()).at(0))
+    #|  let _ = (array.push)(s.at(here()).at(0), 0)
+    #|  let _ = (array.pop)(s.at(here()).first())
+    #|  let _ = (array.push)(s.at(here()).first(), 0)
+    #|  let _ = (dictionary.insert)(s.at(here()).at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(s.at(here()).at(1), "k")
+    #|  let _ = (dictionary.insert)(s.at(here()).last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(s.at(here()).last(), "k")
+    #|  let _ = (array.pop)(s.at(here()).at(1).k)
+    #|  let _ = (array.push)(s.at(here()).at(1).k, 0)
+    #|  let _ = (array.pop)(s.at(here()).last().at("k"))
+    #|  let _ = (array.push)(s.at(here()).last().at("k"), 0)
+    #|  let _ = (array.pop)(s.at(here()).at(1).values().first())
+    #|  let _ = (array.push)(s.at(here()).at(1).values().first(), 0)
+    #|  let _ = (array.pop)(s.at(here()).slice(0, 1).first())
+    #|  let _ = (array.push)(s.at(here()).slice(0, 1).first(), 0)
+    #|  metadata(repr((s.at(here()),)))
+    #|}
+    #|#context {
+    #|  { let pv = (); pv.push(s.at(here())); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(s.at(here())); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(s.at(here())); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(s.at(here())); pv.at(0).at(0).push(0) }
+    #|  { let pv = (); pv.push(s.at(here())); let _ = pv.at(0).first().pop() }
+    #|  { let pv = (); pv.push(s.at(here())); pv.at(0).first().push(0) }
+    #|  { let pv = (); pv.push(s.at(here())); pv.at(0).at(1).insert("zz", 0) }
+    #|  { let pv = (); pv.push(s.at(here())); let _ = pv.at(0).at(1).remove("k") }
+    #|  { let pv = (); pv.push(s.at(here())); pv.at(0).last().insert("zz", 0) }
+    #|  { let pv = (); pv.push(s.at(here())); let _ = pv.at(0).last().remove("k") }
+    #|  { let pv = (); pv.push(s.at(here())); let _ = pv.at(0).at(1).k.pop() }
+    #|  { let pv = (); pv.push(s.at(here())); pv.at(0).at(1).k.push(0) }
+    #|  { let pv = (); pv.push(s.at(here())); let _ = pv.at(0).last().at("k").pop() }
+    #|  { let pv = (); pv.push(s.at(here())); pv.at(0).last().at("k").push(0) }
+    #|  metadata(repr((s.at(here()),)))
+    #|}
+    #|#let get() = s.at(here())
+    #|#context {
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  let _ = (array.pop)(get().first())
+    #|  let _ = (array.push)(get().first(), 0)
+    #|  let _ = (dictionary.insert)(get().at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().at(1), "k")
+    #|  let _ = (dictionary.insert)(get().last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().last(), "k")
+    #|  let _ = (array.pop)(get().at(1).k)
+    #|  let _ = (array.push)(get().at(1).k, 0)
+    #|  let _ = (array.pop)(get().last().at("k"))
+    #|  let _ = (array.push)(get().last().at("k"), 0)
+    #|  let _ = (array.pop)(get().at(1).values().first())
+    #|  let _ = (array.push)(get().at(1).values().first(), 0)
+    #|  let _ = (array.pop)(get().slice(0, 1).first())
+    #|  let _ = (array.push)(get().slice(0, 1).first(), 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#context metadata(repr((s.at(here()),)))
+    #|]
+    #|#metadata("== state: array returned by an update function through at")
+    #|#[
+    #|#let s = state("s-fn-array-at", 0)
+    #|#s.update(v => ((1, 2), (k: (3,))))
+    #|#context {
+    #|  let _ = (array.pop)(s.at(here()))
+    #|  let _ = (array.push)(s.at(here()), 0)
+    #|  let _ = (array.pop)(s.at(here()).at(0))
+    #|  let _ = (array.push)(s.at(here()).at(0), 0)
+    #|  let _ = (array.pop)(s.at(here()).first())
+    #|  let _ = (array.push)(s.at(here()).first(), 0)
+    #|  let _ = (dictionary.insert)(s.at(here()).at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(s.at(here()).at(1), "k")
+    #|  let _ = (dictionary.insert)(s.at(here()).last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(s.at(here()).last(), "k")
+    #|  let _ = (array.pop)(s.at(here()).at(1).k)
+    #|  let _ = (array.push)(s.at(here()).at(1).k, 0)
+    #|  let _ = (array.pop)(s.at(here()).last().at("k"))
+    #|  let _ = (array.push)(s.at(here()).last().at("k"), 0)
+    #|  let _ = (array.pop)(s.at(here()).at(1).values().first())
+    #|  let _ = (array.push)(s.at(here()).at(1).values().first(), 0)
+    #|  let _ = (array.pop)(s.at(here()).slice(0, 1).first())
+    #|  let _ = (array.push)(s.at(here()).slice(0, 1).first(), 0)
+    #|  metadata(repr((s.at(here()),)))
+    #|}
+    #|#context {
+    #|  { let pv = (); pv.push(s.at(here())); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(s.at(here())); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(s.at(here())); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(s.at(here())); pv.at(0).at(0).push(0) }
+    #|  { let pv = (); pv.push(s.at(here())); let _ = pv.at(0).first().pop() }
+    #|  { let pv = (); pv.push(s.at(here())); pv.at(0).first().push(0) }
+    #|  { let pv = (); pv.push(s.at(here())); pv.at(0).at(1).insert("zz", 0) }
+    #|  { let pv = (); pv.push(s.at(here())); let _ = pv.at(0).at(1).remove("k") }
+    #|  { let pv = (); pv.push(s.at(here())); pv.at(0).last().insert("zz", 0) }
+    #|  { let pv = (); pv.push(s.at(here())); let _ = pv.at(0).last().remove("k") }
+    #|  { let pv = (); pv.push(s.at(here())); let _ = pv.at(0).at(1).k.pop() }
+    #|  { let pv = (); pv.push(s.at(here())); pv.at(0).at(1).k.push(0) }
+    #|  { let pv = (); pv.push(s.at(here())); let _ = pv.at(0).last().at("k").pop() }
+    #|  { let pv = (); pv.push(s.at(here())); pv.at(0).last().at("k").push(0) }
+    #|  metadata(repr((s.at(here()),)))
+    #|}
+    #|#let get() = s.at(here())
+    #|#context {
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  let _ = (array.pop)(get().first())
+    #|  let _ = (array.push)(get().first(), 0)
+    #|  let _ = (dictionary.insert)(get().at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().at(1), "k")
+    #|  let _ = (dictionary.insert)(get().last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().last(), "k")
+    #|  let _ = (array.pop)(get().at(1).k)
+    #|  let _ = (array.push)(get().at(1).k, 0)
+    #|  let _ = (array.pop)(get().last().at("k"))
+    #|  let _ = (array.push)(get().last().at("k"), 0)
+    #|  let _ = (array.pop)(get().at(1).values().first())
+    #|  let _ = (array.push)(get().at(1).values().first(), 0)
+    #|  let _ = (array.pop)(get().slice(0, 1).first())
+    #|  let _ = (array.push)(get().slice(0, 1).first(), 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#context metadata(repr((s.at(here()),)))
+    #|]
+    #|#metadata("== state: initial array through final")
+    #|#[
+    #|#let s = state("s-init-array-final", ((1, 2), (k: (3,))))
+    #|#context {
+    #|  let _ = (array.pop)(s.final())
+    #|  let _ = (array.push)(s.final(), 0)
+    #|  let _ = (array.pop)(s.final().at(0))
+    #|  let _ = (array.push)(s.final().at(0), 0)
+    #|  let _ = (array.pop)(s.final().first())
+    #|  let _ = (array.push)(s.final().first(), 0)
+    #|  let _ = (dictionary.insert)(s.final().at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(s.final().at(1), "k")
+    #|  let _ = (dictionary.insert)(s.final().last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(s.final().last(), "k")
+    #|  let _ = (array.pop)(s.final().at(1).k)
+    #|  let _ = (array.push)(s.final().at(1).k, 0)
+    #|  let _ = (array.pop)(s.final().last().at("k"))
+    #|  let _ = (array.push)(s.final().last().at("k"), 0)
+    #|  let _ = (array.pop)(s.final().at(1).values().first())
+    #|  let _ = (array.push)(s.final().at(1).values().first(), 0)
+    #|  let _ = (array.pop)(s.final().slice(0, 1).first())
+    #|  let _ = (array.push)(s.final().slice(0, 1).first(), 0)
+    #|  metadata(repr((s.final(),)))
+    #|}
+    #|#context {
+    #|  { let pv = (); pv.push(s.final()); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(s.final()); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(s.final()); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(s.final()); pv.at(0).at(0).push(0) }
+    #|  { let pv = (); pv.push(s.final()); let _ = pv.at(0).first().pop() }
+    #|  { let pv = (); pv.push(s.final()); pv.at(0).first().push(0) }
+    #|  { let pv = (); pv.push(s.final()); pv.at(0).at(1).insert("zz", 0) }
+    #|  { let pv = (); pv.push(s.final()); let _ = pv.at(0).at(1).remove("k") }
+    #|  { let pv = (); pv.push(s.final()); pv.at(0).last().insert("zz", 0) }
+    #|  { let pv = (); pv.push(s.final()); let _ = pv.at(0).last().remove("k") }
+    #|  { let pv = (); pv.push(s.final()); let _ = pv.at(0).at(1).k.pop() }
+    #|  { let pv = (); pv.push(s.final()); pv.at(0).at(1).k.push(0) }
+    #|  { let pv = (); pv.push(s.final()); let _ = pv.at(0).last().at("k").pop() }
+    #|  { let pv = (); pv.push(s.final()); pv.at(0).last().at("k").push(0) }
+    #|  metadata(repr((s.final(),)))
+    #|}
+    #|#let get() = s.final()
+    #|#context {
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  let _ = (array.pop)(get().first())
+    #|  let _ = (array.push)(get().first(), 0)
+    #|  let _ = (dictionary.insert)(get().at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().at(1), "k")
+    #|  let _ = (dictionary.insert)(get().last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().last(), "k")
+    #|  let _ = (array.pop)(get().at(1).k)
+    #|  let _ = (array.push)(get().at(1).k, 0)
+    #|  let _ = (array.pop)(get().last().at("k"))
+    #|  let _ = (array.push)(get().last().at("k"), 0)
+    #|  let _ = (array.pop)(get().at(1).values().first())
+    #|  let _ = (array.push)(get().at(1).values().first(), 0)
+    #|  let _ = (array.pop)(get().slice(0, 1).first())
+    #|  let _ = (array.push)(get().slice(0, 1).first(), 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#context metadata(repr((s.final(),)))
+    #|]
+    #|#metadata("== state: array set by an update through final")
+    #|#[
+    #|#let s = state("s-set-array-final", 0)
+    #|#s.update(((1, 2), (k: (3,))))
+    #|#context {
+    #|  let _ = (array.pop)(s.final())
+    #|  let _ = (array.push)(s.final(), 0)
+    #|  let _ = (array.pop)(s.final().at(0))
+    #|  let _ = (array.push)(s.final().at(0), 0)
+    #|  let _ = (array.pop)(s.final().first())
+    #|  let _ = (array.push)(s.final().first(), 0)
+    #|  let _ = (dictionary.insert)(s.final().at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(s.final().at(1), "k")
+    #|  let _ = (dictionary.insert)(s.final().last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(s.final().last(), "k")
+    #|  let _ = (array.pop)(s.final().at(1).k)
+    #|  let _ = (array.push)(s.final().at(1).k, 0)
+    #|  let _ = (array.pop)(s.final().last().at("k"))
+    #|  let _ = (array.push)(s.final().last().at("k"), 0)
+    #|  let _ = (array.pop)(s.final().at(1).values().first())
+    #|  let _ = (array.push)(s.final().at(1).values().first(), 0)
+    #|  let _ = (array.pop)(s.final().slice(0, 1).first())
+    #|  let _ = (array.push)(s.final().slice(0, 1).first(), 0)
+    #|  metadata(repr((s.final(),)))
+    #|}
+    #|#context {
+    #|  { let pv = (); pv.push(s.final()); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(s.final()); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(s.final()); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(s.final()); pv.at(0).at(0).push(0) }
+    #|  { let pv = (); pv.push(s.final()); let _ = pv.at(0).first().pop() }
+    #|  { let pv = (); pv.push(s.final()); pv.at(0).first().push(0) }
+    #|  { let pv = (); pv.push(s.final()); pv.at(0).at(1).insert("zz", 0) }
+    #|  { let pv = (); pv.push(s.final()); let _ = pv.at(0).at(1).remove("k") }
+    #|  { let pv = (); pv.push(s.final()); pv.at(0).last().insert("zz", 0) }
+    #|  { let pv = (); pv.push(s.final()); let _ = pv.at(0).last().remove("k") }
+    #|  { let pv = (); pv.push(s.final()); let _ = pv.at(0).at(1).k.pop() }
+    #|  { let pv = (); pv.push(s.final()); pv.at(0).at(1).k.push(0) }
+    #|  { let pv = (); pv.push(s.final()); let _ = pv.at(0).last().at("k").pop() }
+    #|  { let pv = (); pv.push(s.final()); pv.at(0).last().at("k").push(0) }
+    #|  metadata(repr((s.final(),)))
+    #|}
+    #|#let get() = s.final()
+    #|#context {
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  let _ = (array.pop)(get().first())
+    #|  let _ = (array.push)(get().first(), 0)
+    #|  let _ = (dictionary.insert)(get().at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().at(1), "k")
+    #|  let _ = (dictionary.insert)(get().last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().last(), "k")
+    #|  let _ = (array.pop)(get().at(1).k)
+    #|  let _ = (array.push)(get().at(1).k, 0)
+    #|  let _ = (array.pop)(get().last().at("k"))
+    #|  let _ = (array.push)(get().last().at("k"), 0)
+    #|  let _ = (array.pop)(get().at(1).values().first())
+    #|  let _ = (array.push)(get().at(1).values().first(), 0)
+    #|  let _ = (array.pop)(get().slice(0, 1).first())
+    #|  let _ = (array.push)(get().slice(0, 1).first(), 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#context metadata(repr((s.final(),)))
+    #|]
+    #|#metadata("== state: array returned by an update function through final")
+    #|#[
+    #|#let s = state("s-fn-array-final", 0)
+    #|#s.update(v => ((1, 2), (k: (3,))))
+    #|#context {
+    #|  let _ = (array.pop)(s.final())
+    #|  let _ = (array.push)(s.final(), 0)
+    #|  let _ = (array.pop)(s.final().at(0))
+    #|  let _ = (array.push)(s.final().at(0), 0)
+    #|  let _ = (array.pop)(s.final().first())
+    #|  let _ = (array.push)(s.final().first(), 0)
+    #|  let _ = (dictionary.insert)(s.final().at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(s.final().at(1), "k")
+    #|  let _ = (dictionary.insert)(s.final().last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(s.final().last(), "k")
+    #|  let _ = (array.pop)(s.final().at(1).k)
+    #|  let _ = (array.push)(s.final().at(1).k, 0)
+    #|  let _ = (array.pop)(s.final().last().at("k"))
+    #|  let _ = (array.push)(s.final().last().at("k"), 0)
+    #|  let _ = (array.pop)(s.final().at(1).values().first())
+    #|  let _ = (array.push)(s.final().at(1).values().first(), 0)
+    #|  let _ = (array.pop)(s.final().slice(0, 1).first())
+    #|  let _ = (array.push)(s.final().slice(0, 1).first(), 0)
+    #|  metadata(repr((s.final(),)))
+    #|}
+    #|#context {
+    #|  { let pv = (); pv.push(s.final()); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(s.final()); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(s.final()); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(s.final()); pv.at(0).at(0).push(0) }
+    #|  { let pv = (); pv.push(s.final()); let _ = pv.at(0).first().pop() }
+    #|  { let pv = (); pv.push(s.final()); pv.at(0).first().push(0) }
+    #|  { let pv = (); pv.push(s.final()); pv.at(0).at(1).insert("zz", 0) }
+    #|  { let pv = (); pv.push(s.final()); let _ = pv.at(0).at(1).remove("k") }
+    #|  { let pv = (); pv.push(s.final()); pv.at(0).last().insert("zz", 0) }
+    #|  { let pv = (); pv.push(s.final()); let _ = pv.at(0).last().remove("k") }
+    #|  { let pv = (); pv.push(s.final()); let _ = pv.at(0).at(1).k.pop() }
+    #|  { let pv = (); pv.push(s.final()); pv.at(0).at(1).k.push(0) }
+    #|  { let pv = (); pv.push(s.final()); let _ = pv.at(0).last().at("k").pop() }
+    #|  { let pv = (); pv.push(s.final()); pv.at(0).last().at("k").push(0) }
+    #|  metadata(repr((s.final(),)))
+    #|}
+    #|#let get() = s.final()
+    #|#context {
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  let _ = (array.pop)(get().first())
+    #|  let _ = (array.push)(get().first(), 0)
+    #|  let _ = (dictionary.insert)(get().at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().at(1), "k")
+    #|  let _ = (dictionary.insert)(get().last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().last(), "k")
+    #|  let _ = (array.pop)(get().at(1).k)
+    #|  let _ = (array.push)(get().at(1).k, 0)
+    #|  let _ = (array.pop)(get().last().at("k"))
+    #|  let _ = (array.push)(get().last().at("k"), 0)
+    #|  let _ = (array.pop)(get().at(1).values().first())
+    #|  let _ = (array.push)(get().at(1).values().first(), 0)
+    #|  let _ = (array.pop)(get().slice(0, 1).first())
+    #|  let _ = (array.push)(get().slice(0, 1).first(), 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#context metadata(repr((s.final(),)))
+    #|]
+    #|#metadata("== state: initial dictionary through get")
+    #|#[
+    #|#let s = state("s-init-dictionary-get", (a: (1, 2), d: (k: (3,))))
+    #|#context {
+    #|  let _ = (dictionary.insert)(s.get(), "zz", 0)
+    #|  let _ = (dictionary.remove)(s.get(), "a")
+    #|  let _ = (array.pop)(s.get().a)
+    #|  let _ = (array.push)(s.get().a, 0)
+    #|  let _ = (array.pop)(s.get().at("a"))
+    #|  let _ = (array.push)(s.get().at("a"), 0)
+    #|  let _ = (dictionary.insert)(s.get().d, "zz", 0)
+    #|  let _ = (dictionary.remove)(s.get().d, "k")
+    #|  let _ = (array.pop)(s.get().d.k)
+    #|  let _ = (array.push)(s.get().d.k, 0)
+    #|  let _ = (array.pop)(s.get().values().first())
+    #|  let _ = (array.push)(s.get().values().first(), 0)
+    #|  let _ = (array.pop)(s.get().pairs().first().last())
+    #|  let _ = (array.push)(s.get().pairs().first().last(), 0)
+    #|  let _ = (array.pop)(s.get().values().last().k)
+    #|  let _ = (array.push)(s.get().values().last().k, 0)
+    #|  metadata(repr((s.get(),)))
+    #|}
+    #|#context {
+    #|  { let pv = (); pv.push(s.get()); pv.at(0).insert("zz", 0) }
+    #|  { let pv = (); pv.push(s.get()); let _ = pv.at(0).remove("a") }
+    #|  { let pv = (); pv.push(s.get()); let _ = pv.at(0).a.pop() }
+    #|  { let pv = (); pv.push(s.get()); pv.at(0).a.push(0) }
+    #|  { let pv = (); pv.push(s.get()); let _ = pv.at(0).at("a").pop() }
+    #|  { let pv = (); pv.push(s.get()); pv.at(0).at("a").push(0) }
+    #|  { let pv = (); pv.push(s.get()); pv.at(0).d.insert("zz", 0) }
+    #|  { let pv = (); pv.push(s.get()); let _ = pv.at(0).d.remove("k") }
+    #|  { let pv = (); pv.push(s.get()); let _ = pv.at(0).d.k.pop() }
+    #|  { let pv = (); pv.push(s.get()); pv.at(0).d.k.push(0) }
+    #|  metadata(repr((s.get(),)))
+    #|}
+    #|#let get() = s.get()
+    #|#context {
+    #|  let _ = (dictionary.insert)(get(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get(), "a")
+    #|  let _ = (array.pop)(get().a)
+    #|  let _ = (array.push)(get().a, 0)
+    #|  let _ = (array.pop)(get().at("a"))
+    #|  let _ = (array.push)(get().at("a"), 0)
+    #|  let _ = (dictionary.insert)(get().d, "zz", 0)
+    #|  let _ = (dictionary.remove)(get().d, "k")
+    #|  let _ = (array.pop)(get().d.k)
+    #|  let _ = (array.push)(get().d.k, 0)
+    #|  let _ = (array.pop)(get().values().first())
+    #|  let _ = (array.push)(get().values().first(), 0)
+    #|  let _ = (array.pop)(get().pairs().first().last())
+    #|  let _ = (array.push)(get().pairs().first().last(), 0)
+    #|  let _ = (array.pop)(get().values().last().k)
+    #|  let _ = (array.push)(get().values().last().k, 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#context metadata(repr((s.get(),)))
+    #|]
+    #|#metadata("== state: dictionary set by an update through get")
+    #|#[
+    #|#let s = state("s-set-dictionary-get", 0)
+    #|#s.update((a: (1, 2), d: (k: (3,))))
+    #|#context {
+    #|  let _ = (dictionary.insert)(s.get(), "zz", 0)
+    #|  let _ = (dictionary.remove)(s.get(), "a")
+    #|  let _ = (array.pop)(s.get().a)
+    #|  let _ = (array.push)(s.get().a, 0)
+    #|  let _ = (array.pop)(s.get().at("a"))
+    #|  let _ = (array.push)(s.get().at("a"), 0)
+    #|  let _ = (dictionary.insert)(s.get().d, "zz", 0)
+    #|  let _ = (dictionary.remove)(s.get().d, "k")
+    #|  let _ = (array.pop)(s.get().d.k)
+    #|  let _ = (array.push)(s.get().d.k, 0)
+    #|  let _ = (array.pop)(s.get().values().first())
+    #|  let _ = (array.push)(s.get().values().first(), 0)
+    #|  let _ = (array.pop)(s.get().pairs().first().last())
+    #|  let _ = (array.push)(s.get().pairs().first().last(), 0)
+    #|  let _ = (array.pop)(s.get().values().last().k)
+    #|  let _ = (array.push)(s.get().values().last().k, 0)
+    #|  metadata(repr((s.get(),)))
+    #|}
+    #|#context {
+    #|  { let pv = (); pv.push(s.get()); pv.at(0).insert("zz", 0) }
+    #|  { let pv = (); pv.push(s.get()); let _ = pv.at(0).remove("a") }
+    #|  { let pv = (); pv.push(s.get()); let _ = pv.at(0).a.pop() }
+    #|  { let pv = (); pv.push(s.get()); pv.at(0).a.push(0) }
+    #|  { let pv = (); pv.push(s.get()); let _ = pv.at(0).at("a").pop() }
+    #|  { let pv = (); pv.push(s.get()); pv.at(0).at("a").push(0) }
+    #|  { let pv = (); pv.push(s.get()); pv.at(0).d.insert("zz", 0) }
+    #|  { let pv = (); pv.push(s.get()); let _ = pv.at(0).d.remove("k") }
+    #|  { let pv = (); pv.push(s.get()); let _ = pv.at(0).d.k.pop() }
+    #|  { let pv = (); pv.push(s.get()); pv.at(0).d.k.push(0) }
+    #|  metadata(repr((s.get(),)))
+    #|}
+    #|#let get() = s.get()
+    #|#context {
+    #|  let _ = (dictionary.insert)(get(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get(), "a")
+    #|  let _ = (array.pop)(get().a)
+    #|  let _ = (array.push)(get().a, 0)
+    #|  let _ = (array.pop)(get().at("a"))
+    #|  let _ = (array.push)(get().at("a"), 0)
+    #|  let _ = (dictionary.insert)(get().d, "zz", 0)
+    #|  let _ = (dictionary.remove)(get().d, "k")
+    #|  let _ = (array.pop)(get().d.k)
+    #|  let _ = (array.push)(get().d.k, 0)
+    #|  let _ = (array.pop)(get().values().first())
+    #|  let _ = (array.push)(get().values().first(), 0)
+    #|  let _ = (array.pop)(get().pairs().first().last())
+    #|  let _ = (array.push)(get().pairs().first().last(), 0)
+    #|  let _ = (array.pop)(get().values().last().k)
+    #|  let _ = (array.push)(get().values().last().k, 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#context metadata(repr((s.get(),)))
+    #|]
+    #|#metadata("== state: dictionary returned by an update function through get")
+    #|#[
+    #|#let s = state("s-fn-dictionary-get", 0)
+    #|#s.update(v => (a: (1, 2), d: (k: (3,))))
+    #|#context {
+    #|  let _ = (dictionary.insert)(s.get(), "zz", 0)
+    #|  let _ = (dictionary.remove)(s.get(), "a")
+    #|  let _ = (array.pop)(s.get().a)
+    #|  let _ = (array.push)(s.get().a, 0)
+    #|  let _ = (array.pop)(s.get().at("a"))
+    #|  let _ = (array.push)(s.get().at("a"), 0)
+    #|  let _ = (dictionary.insert)(s.get().d, "zz", 0)
+    #|  let _ = (dictionary.remove)(s.get().d, "k")
+    #|  let _ = (array.pop)(s.get().d.k)
+    #|  let _ = (array.push)(s.get().d.k, 0)
+    #|  let _ = (array.pop)(s.get().values().first())
+    #|  let _ = (array.push)(s.get().values().first(), 0)
+    #|  let _ = (array.pop)(s.get().pairs().first().last())
+    #|  let _ = (array.push)(s.get().pairs().first().last(), 0)
+    #|  let _ = (array.pop)(s.get().values().last().k)
+    #|  let _ = (array.push)(s.get().values().last().k, 0)
+    #|  metadata(repr((s.get(),)))
+    #|}
+    #|#context {
+    #|  { let pv = (); pv.push(s.get()); pv.at(0).insert("zz", 0) }
+    #|  { let pv = (); pv.push(s.get()); let _ = pv.at(0).remove("a") }
+    #|  { let pv = (); pv.push(s.get()); let _ = pv.at(0).a.pop() }
+    #|  { let pv = (); pv.push(s.get()); pv.at(0).a.push(0) }
+    #|  { let pv = (); pv.push(s.get()); let _ = pv.at(0).at("a").pop() }
+    #|  { let pv = (); pv.push(s.get()); pv.at(0).at("a").push(0) }
+    #|  { let pv = (); pv.push(s.get()); pv.at(0).d.insert("zz", 0) }
+    #|  { let pv = (); pv.push(s.get()); let _ = pv.at(0).d.remove("k") }
+    #|  { let pv = (); pv.push(s.get()); let _ = pv.at(0).d.k.pop() }
+    #|  { let pv = (); pv.push(s.get()); pv.at(0).d.k.push(0) }
+    #|  metadata(repr((s.get(),)))
+    #|}
+    #|#let get() = s.get()
+    #|#context {
+    #|  let _ = (dictionary.insert)(get(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get(), "a")
+    #|  let _ = (array.pop)(get().a)
+    #|  let _ = (array.push)(get().a, 0)
+    #|  let _ = (array.pop)(get().at("a"))
+    #|  let _ = (array.push)(get().at("a"), 0)
+    #|  let _ = (dictionary.insert)(get().d, "zz", 0)
+    #|  let _ = (dictionary.remove)(get().d, "k")
+    #|  let _ = (array.pop)(get().d.k)
+    #|  let _ = (array.push)(get().d.k, 0)
+    #|  let _ = (array.pop)(get().values().first())
+    #|  let _ = (array.push)(get().values().first(), 0)
+    #|  let _ = (array.pop)(get().pairs().first().last())
+    #|  let _ = (array.push)(get().pairs().first().last(), 0)
+    #|  let _ = (array.pop)(get().values().last().k)
+    #|  let _ = (array.push)(get().values().last().k, 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#context metadata(repr((s.get(),)))
+    #|]
+    #|#metadata("== state: initial dictionary through at")
+    #|#[
+    #|#let s = state("s-init-dictionary-at", (a: (1, 2), d: (k: (3,))))
+    #|#context {
+    #|  let _ = (dictionary.insert)(s.at(here()), "zz", 0)
+    #|  let _ = (dictionary.remove)(s.at(here()), "a")
+    #|  let _ = (array.pop)(s.at(here()).a)
+    #|  let _ = (array.push)(s.at(here()).a, 0)
+    #|  let _ = (array.pop)(s.at(here()).at("a"))
+    #|  let _ = (array.push)(s.at(here()).at("a"), 0)
+    #|  let _ = (dictionary.insert)(s.at(here()).d, "zz", 0)
+    #|  let _ = (dictionary.remove)(s.at(here()).d, "k")
+    #|  let _ = (array.pop)(s.at(here()).d.k)
+    #|  let _ = (array.push)(s.at(here()).d.k, 0)
+    #|  let _ = (array.pop)(s.at(here()).values().first())
+    #|  let _ = (array.push)(s.at(here()).values().first(), 0)
+    #|  let _ = (array.pop)(s.at(here()).pairs().first().last())
+    #|  let _ = (array.push)(s.at(here()).pairs().first().last(), 0)
+    #|  let _ = (array.pop)(s.at(here()).values().last().k)
+    #|  let _ = (array.push)(s.at(here()).values().last().k, 0)
+    #|  metadata(repr((s.at(here()),)))
+    #|}
+    #|#context {
+    #|  { let pv = (); pv.push(s.at(here())); pv.at(0).insert("zz", 0) }
+    #|  { let pv = (); pv.push(s.at(here())); let _ = pv.at(0).remove("a") }
+    #|  { let pv = (); pv.push(s.at(here())); let _ = pv.at(0).a.pop() }
+    #|  { let pv = (); pv.push(s.at(here())); pv.at(0).a.push(0) }
+    #|  { let pv = (); pv.push(s.at(here())); let _ = pv.at(0).at("a").pop() }
+    #|  { let pv = (); pv.push(s.at(here())); pv.at(0).at("a").push(0) }
+    #|  { let pv = (); pv.push(s.at(here())); pv.at(0).d.insert("zz", 0) }
+    #|  { let pv = (); pv.push(s.at(here())); let _ = pv.at(0).d.remove("k") }
+    #|  { let pv = (); pv.push(s.at(here())); let _ = pv.at(0).d.k.pop() }
+    #|  { let pv = (); pv.push(s.at(here())); pv.at(0).d.k.push(0) }
+    #|  metadata(repr((s.at(here()),)))
+    #|}
+    #|#let get() = s.at(here())
+    #|#context {
+    #|  let _ = (dictionary.insert)(get(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get(), "a")
+    #|  let _ = (array.pop)(get().a)
+    #|  let _ = (array.push)(get().a, 0)
+    #|  let _ = (array.pop)(get().at("a"))
+    #|  let _ = (array.push)(get().at("a"), 0)
+    #|  let _ = (dictionary.insert)(get().d, "zz", 0)
+    #|  let _ = (dictionary.remove)(get().d, "k")
+    #|  let _ = (array.pop)(get().d.k)
+    #|  let _ = (array.push)(get().d.k, 0)
+    #|  let _ = (array.pop)(get().values().first())
+    #|  let _ = (array.push)(get().values().first(), 0)
+    #|  let _ = (array.pop)(get().pairs().first().last())
+    #|  let _ = (array.push)(get().pairs().first().last(), 0)
+    #|  let _ = (array.pop)(get().values().last().k)
+    #|  let _ = (array.push)(get().values().last().k, 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#context metadata(repr((s.at(here()),)))
+    #|]
+    #|#metadata("== state: dictionary set by an update through at")
+    #|#[
+    #|#let s = state("s-set-dictionary-at", 0)
+    #|#s.update((a: (1, 2), d: (k: (3,))))
+    #|#context {
+    #|  let _ = (dictionary.insert)(s.at(here()), "zz", 0)
+    #|  let _ = (dictionary.remove)(s.at(here()), "a")
+    #|  let _ = (array.pop)(s.at(here()).a)
+    #|  let _ = (array.push)(s.at(here()).a, 0)
+    #|  let _ = (array.pop)(s.at(here()).at("a"))
+    #|  let _ = (array.push)(s.at(here()).at("a"), 0)
+    #|  let _ = (dictionary.insert)(s.at(here()).d, "zz", 0)
+    #|  let _ = (dictionary.remove)(s.at(here()).d, "k")
+    #|  let _ = (array.pop)(s.at(here()).d.k)
+    #|  let _ = (array.push)(s.at(here()).d.k, 0)
+    #|  let _ = (array.pop)(s.at(here()).values().first())
+    #|  let _ = (array.push)(s.at(here()).values().first(), 0)
+    #|  let _ = (array.pop)(s.at(here()).pairs().first().last())
+    #|  let _ = (array.push)(s.at(here()).pairs().first().last(), 0)
+    #|  let _ = (array.pop)(s.at(here()).values().last().k)
+    #|  let _ = (array.push)(s.at(here()).values().last().k, 0)
+    #|  metadata(repr((s.at(here()),)))
+    #|}
+    #|#context {
+    #|  { let pv = (); pv.push(s.at(here())); pv.at(0).insert("zz", 0) }
+    #|  { let pv = (); pv.push(s.at(here())); let _ = pv.at(0).remove("a") }
+    #|  { let pv = (); pv.push(s.at(here())); let _ = pv.at(0).a.pop() }
+    #|  { let pv = (); pv.push(s.at(here())); pv.at(0).a.push(0) }
+    #|  { let pv = (); pv.push(s.at(here())); let _ = pv.at(0).at("a").pop() }
+    #|  { let pv = (); pv.push(s.at(here())); pv.at(0).at("a").push(0) }
+    #|  { let pv = (); pv.push(s.at(here())); pv.at(0).d.insert("zz", 0) }
+    #|  { let pv = (); pv.push(s.at(here())); let _ = pv.at(0).d.remove("k") }
+    #|  { let pv = (); pv.push(s.at(here())); let _ = pv.at(0).d.k.pop() }
+    #|  { let pv = (); pv.push(s.at(here())); pv.at(0).d.k.push(0) }
+    #|  metadata(repr((s.at(here()),)))
+    #|}
+    #|#let get() = s.at(here())
+    #|#context {
+    #|  let _ = (dictionary.insert)(get(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get(), "a")
+    #|  let _ = (array.pop)(get().a)
+    #|  let _ = (array.push)(get().a, 0)
+    #|  let _ = (array.pop)(get().at("a"))
+    #|  let _ = (array.push)(get().at("a"), 0)
+    #|  let _ = (dictionary.insert)(get().d, "zz", 0)
+    #|  let _ = (dictionary.remove)(get().d, "k")
+    #|  let _ = (array.pop)(get().d.k)
+    #|  let _ = (array.push)(get().d.k, 0)
+    #|  let _ = (array.pop)(get().values().first())
+    #|  let _ = (array.push)(get().values().first(), 0)
+    #|  let _ = (array.pop)(get().pairs().first().last())
+    #|  let _ = (array.push)(get().pairs().first().last(), 0)
+    #|  let _ = (array.pop)(get().values().last().k)
+    #|  let _ = (array.push)(get().values().last().k, 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#context metadata(repr((s.at(here()),)))
+    #|]
+    #|#metadata("== state: dictionary returned by an update function through at")
+    #|#[
+    #|#let s = state("s-fn-dictionary-at", 0)
+    #|#s.update(v => (a: (1, 2), d: (k: (3,))))
+    #|#context {
+    #|  let _ = (dictionary.insert)(s.at(here()), "zz", 0)
+    #|  let _ = (dictionary.remove)(s.at(here()), "a")
+    #|  let _ = (array.pop)(s.at(here()).a)
+    #|  let _ = (array.push)(s.at(here()).a, 0)
+    #|  let _ = (array.pop)(s.at(here()).at("a"))
+    #|  let _ = (array.push)(s.at(here()).at("a"), 0)
+    #|  let _ = (dictionary.insert)(s.at(here()).d, "zz", 0)
+    #|  let _ = (dictionary.remove)(s.at(here()).d, "k")
+    #|  let _ = (array.pop)(s.at(here()).d.k)
+    #|  let _ = (array.push)(s.at(here()).d.k, 0)
+    #|  let _ = (array.pop)(s.at(here()).values().first())
+    #|  let _ = (array.push)(s.at(here()).values().first(), 0)
+    #|  let _ = (array.pop)(s.at(here()).pairs().first().last())
+    #|  let _ = (array.push)(s.at(here()).pairs().first().last(), 0)
+    #|  let _ = (array.pop)(s.at(here()).values().last().k)
+    #|  let _ = (array.push)(s.at(here()).values().last().k, 0)
+    #|  metadata(repr((s.at(here()),)))
+    #|}
+    #|#context {
+    #|  { let pv = (); pv.push(s.at(here())); pv.at(0).insert("zz", 0) }
+    #|  { let pv = (); pv.push(s.at(here())); let _ = pv.at(0).remove("a") }
+    #|  { let pv = (); pv.push(s.at(here())); let _ = pv.at(0).a.pop() }
+    #|  { let pv = (); pv.push(s.at(here())); pv.at(0).a.push(0) }
+    #|  { let pv = (); pv.push(s.at(here())); let _ = pv.at(0).at("a").pop() }
+    #|  { let pv = (); pv.push(s.at(here())); pv.at(0).at("a").push(0) }
+    #|  { let pv = (); pv.push(s.at(here())); pv.at(0).d.insert("zz", 0) }
+    #|  { let pv = (); pv.push(s.at(here())); let _ = pv.at(0).d.remove("k") }
+    #|  { let pv = (); pv.push(s.at(here())); let _ = pv.at(0).d.k.pop() }
+    #|  { let pv = (); pv.push(s.at(here())); pv.at(0).d.k.push(0) }
+    #|  metadata(repr((s.at(here()),)))
+    #|}
+    #|#let get() = s.at(here())
+    #|#context {
+    #|  let _ = (dictionary.insert)(get(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get(), "a")
+    #|  let _ = (array.pop)(get().a)
+    #|  let _ = (array.push)(get().a, 0)
+    #|  let _ = (array.pop)(get().at("a"))
+    #|  let _ = (array.push)(get().at("a"), 0)
+    #|  let _ = (dictionary.insert)(get().d, "zz", 0)
+    #|  let _ = (dictionary.remove)(get().d, "k")
+    #|  let _ = (array.pop)(get().d.k)
+    #|  let _ = (array.push)(get().d.k, 0)
+    #|  let _ = (array.pop)(get().values().first())
+    #|  let _ = (array.push)(get().values().first(), 0)
+    #|  let _ = (array.pop)(get().pairs().first().last())
+    #|  let _ = (array.push)(get().pairs().first().last(), 0)
+    #|  let _ = (array.pop)(get().values().last().k)
+    #|  let _ = (array.push)(get().values().last().k, 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#context metadata(repr((s.at(here()),)))
+    #|]
+    #|#metadata("== state: initial dictionary through final")
+    #|#[
+    #|#let s = state("s-init-dictionary-final", (a: (1, 2), d: (k: (3,))))
+    #|#context {
+    #|  let _ = (dictionary.insert)(s.final(), "zz", 0)
+    #|  let _ = (dictionary.remove)(s.final(), "a")
+    #|  let _ = (array.pop)(s.final().a)
+    #|  let _ = (array.push)(s.final().a, 0)
+    #|  let _ = (array.pop)(s.final().at("a"))
+    #|  let _ = (array.push)(s.final().at("a"), 0)
+    #|  let _ = (dictionary.insert)(s.final().d, "zz", 0)
+    #|  let _ = (dictionary.remove)(s.final().d, "k")
+    #|  let _ = (array.pop)(s.final().d.k)
+    #|  let _ = (array.push)(s.final().d.k, 0)
+    #|  let _ = (array.pop)(s.final().values().first())
+    #|  let _ = (array.push)(s.final().values().first(), 0)
+    #|  let _ = (array.pop)(s.final().pairs().first().last())
+    #|  let _ = (array.push)(s.final().pairs().first().last(), 0)
+    #|  let _ = (array.pop)(s.final().values().last().k)
+    #|  let _ = (array.push)(s.final().values().last().k, 0)
+    #|  metadata(repr((s.final(),)))
+    #|}
+    #|#context {
+    #|  { let pv = (); pv.push(s.final()); pv.at(0).insert("zz", 0) }
+    #|  { let pv = (); pv.push(s.final()); let _ = pv.at(0).remove("a") }
+    #|  { let pv = (); pv.push(s.final()); let _ = pv.at(0).a.pop() }
+    #|  { let pv = (); pv.push(s.final()); pv.at(0).a.push(0) }
+    #|  { let pv = (); pv.push(s.final()); let _ = pv.at(0).at("a").pop() }
+    #|  { let pv = (); pv.push(s.final()); pv.at(0).at("a").push(0) }
+    #|  { let pv = (); pv.push(s.final()); pv.at(0).d.insert("zz", 0) }
+    #|  { let pv = (); pv.push(s.final()); let _ = pv.at(0).d.remove("k") }
+    #|  { let pv = (); pv.push(s.final()); let _ = pv.at(0).d.k.pop() }
+    #|  { let pv = (); pv.push(s.final()); pv.at(0).d.k.push(0) }
+    #|  metadata(repr((s.final(),)))
+    #|}
+    #|#let get() = s.final()
+    #|#context {
+    #|  let _ = (dictionary.insert)(get(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get(), "a")
+    #|  let _ = (array.pop)(get().a)
+    #|  let _ = (array.push)(get().a, 0)
+    #|  let _ = (array.pop)(get().at("a"))
+    #|  let _ = (array.push)(get().at("a"), 0)
+    #|  let _ = (dictionary.insert)(get().d, "zz", 0)
+    #|  let _ = (dictionary.remove)(get().d, "k")
+    #|  let _ = (array.pop)(get().d.k)
+    #|  let _ = (array.push)(get().d.k, 0)
+    #|  let _ = (array.pop)(get().values().first())
+    #|  let _ = (array.push)(get().values().first(), 0)
+    #|  let _ = (array.pop)(get().pairs().first().last())
+    #|  let _ = (array.push)(get().pairs().first().last(), 0)
+    #|  let _ = (array.pop)(get().values().last().k)
+    #|  let _ = (array.push)(get().values().last().k, 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#context metadata(repr((s.final(),)))
+    #|]
+    #|#metadata("== state: dictionary set by an update through final")
+    #|#[
+    #|#let s = state("s-set-dictionary-final", 0)
+    #|#s.update((a: (1, 2), d: (k: (3,))))
+    #|#context {
+    #|  let _ = (dictionary.insert)(s.final(), "zz", 0)
+    #|  let _ = (dictionary.remove)(s.final(), "a")
+    #|  let _ = (array.pop)(s.final().a)
+    #|  let _ = (array.push)(s.final().a, 0)
+    #|  let _ = (array.pop)(s.final().at("a"))
+    #|  let _ = (array.push)(s.final().at("a"), 0)
+    #|  let _ = (dictionary.insert)(s.final().d, "zz", 0)
+    #|  let _ = (dictionary.remove)(s.final().d, "k")
+    #|  let _ = (array.pop)(s.final().d.k)
+    #|  let _ = (array.push)(s.final().d.k, 0)
+    #|  let _ = (array.pop)(s.final().values().first())
+    #|  let _ = (array.push)(s.final().values().first(), 0)
+    #|  let _ = (array.pop)(s.final().pairs().first().last())
+    #|  let _ = (array.push)(s.final().pairs().first().last(), 0)
+    #|  let _ = (array.pop)(s.final().values().last().k)
+    #|  let _ = (array.push)(s.final().values().last().k, 0)
+    #|  metadata(repr((s.final(),)))
+    #|}
+    #|#context {
+    #|  { let pv = (); pv.push(s.final()); pv.at(0).insert("zz", 0) }
+    #|  { let pv = (); pv.push(s.final()); let _ = pv.at(0).remove("a") }
+    #|  { let pv = (); pv.push(s.final()); let _ = pv.at(0).a.pop() }
+    #|  { let pv = (); pv.push(s.final()); pv.at(0).a.push(0) }
+    #|  { let pv = (); pv.push(s.final()); let _ = pv.at(0).at("a").pop() }
+    #|  { let pv = (); pv.push(s.final()); pv.at(0).at("a").push(0) }
+    #|  { let pv = (); pv.push(s.final()); pv.at(0).d.insert("zz", 0) }
+    #|  { let pv = (); pv.push(s.final()); let _ = pv.at(0).d.remove("k") }
+    #|  { let pv = (); pv.push(s.final()); let _ = pv.at(0).d.k.pop() }
+    #|  { let pv = (); pv.push(s.final()); pv.at(0).d.k.push(0) }
+    #|  metadata(repr((s.final(),)))
+    #|}
+    #|#let get() = s.final()
+    #|#context {
+    #|  let _ = (dictionary.insert)(get(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get(), "a")
+    #|  let _ = (array.pop)(get().a)
+    #|  let _ = (array.push)(get().a, 0)
+    #|  let _ = (array.pop)(get().at("a"))
+    #|  let _ = (array.push)(get().at("a"), 0)
+    #|  let _ = (dictionary.insert)(get().d, "zz", 0)
+    #|  let _ = (dictionary.remove)(get().d, "k")
+    #|  let _ = (array.pop)(get().d.k)
+    #|  let _ = (array.push)(get().d.k, 0)
+    #|  let _ = (array.pop)(get().values().first())
+    #|  let _ = (array.push)(get().values().first(), 0)
+    #|  let _ = (array.pop)(get().pairs().first().last())
+    #|  let _ = (array.push)(get().pairs().first().last(), 0)
+    #|  let _ = (array.pop)(get().values().last().k)
+    #|  let _ = (array.push)(get().values().last().k, 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#context metadata(repr((s.final(),)))
+    #|]
+    #|#metadata("== state: dictionary returned by an update function through final")
+    #|#[
+    #|#let s = state("s-fn-dictionary-final", 0)
+    #|#s.update(v => (a: (1, 2), d: (k: (3,))))
+    #|#context {
+    #|  let _ = (dictionary.insert)(s.final(), "zz", 0)
+    #|  let _ = (dictionary.remove)(s.final(), "a")
+    #|  let _ = (array.pop)(s.final().a)
+    #|  let _ = (array.push)(s.final().a, 0)
+    #|  let _ = (array.pop)(s.final().at("a"))
+    #|  let _ = (array.push)(s.final().at("a"), 0)
+    #|  let _ = (dictionary.insert)(s.final().d, "zz", 0)
+    #|  let _ = (dictionary.remove)(s.final().d, "k")
+    #|  let _ = (array.pop)(s.final().d.k)
+    #|  let _ = (array.push)(s.final().d.k, 0)
+    #|  let _ = (array.pop)(s.final().values().first())
+    #|  let _ = (array.push)(s.final().values().first(), 0)
+    #|  let _ = (array.pop)(s.final().pairs().first().last())
+    #|  let _ = (array.push)(s.final().pairs().first().last(), 0)
+    #|  let _ = (array.pop)(s.final().values().last().k)
+    #|  let _ = (array.push)(s.final().values().last().k, 0)
+    #|  metadata(repr((s.final(),)))
+    #|}
+    #|#context {
+    #|  { let pv = (); pv.push(s.final()); pv.at(0).insert("zz", 0) }
+    #|  { let pv = (); pv.push(s.final()); let _ = pv.at(0).remove("a") }
+    #|  { let pv = (); pv.push(s.final()); let _ = pv.at(0).a.pop() }
+    #|  { let pv = (); pv.push(s.final()); pv.at(0).a.push(0) }
+    #|  { let pv = (); pv.push(s.final()); let _ = pv.at(0).at("a").pop() }
+    #|  { let pv = (); pv.push(s.final()); pv.at(0).at("a").push(0) }
+    #|  { let pv = (); pv.push(s.final()); pv.at(0).d.insert("zz", 0) }
+    #|  { let pv = (); pv.push(s.final()); let _ = pv.at(0).d.remove("k") }
+    #|  { let pv = (); pv.push(s.final()); let _ = pv.at(0).d.k.pop() }
+    #|  { let pv = (); pv.push(s.final()); pv.at(0).d.k.push(0) }
+    #|  metadata(repr((s.final(),)))
+    #|}
+    #|#let get() = s.final()
+    #|#context {
+    #|  let _ = (dictionary.insert)(get(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get(), "a")
+    #|  let _ = (array.pop)(get().a)
+    #|  let _ = (array.push)(get().a, 0)
+    #|  let _ = (array.pop)(get().at("a"))
+    #|  let _ = (array.push)(get().at("a"), 0)
+    #|  let _ = (dictionary.insert)(get().d, "zz", 0)
+    #|  let _ = (dictionary.remove)(get().d, "k")
+    #|  let _ = (array.pop)(get().d.k)
+    #|  let _ = (array.push)(get().d.k, 0)
+    #|  let _ = (array.pop)(get().values().first())
+    #|  let _ = (array.push)(get().values().first(), 0)
+    #|  let _ = (array.pop)(get().pairs().first().last())
+    #|  let _ = (array.push)(get().pairs().first().last(), 0)
+    #|  let _ = (array.pop)(get().values().last().k)
+    #|  let _ = (array.push)(get().values().last().k, 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#context metadata(repr((s.final(),)))
+    #|]
+    #|#metadata("== state: an update function that returns its argument")
+    #|#[
+    #|#let s = state("s-id", ((1, 2), (k: (3,))))
+    #|#s.update(v => v)
+    #|#s.update(v => { v.at(0).push(7); v })
+    #|#context {
+    #|  let _ = (array.pop)(s.final())
+    #|  let _ = (array.push)(s.final(), 0)
+    #|  let _ = (array.pop)(s.final().at(0))
+    #|  let _ = (array.push)(s.final().at(0), 0)
+    #|  let _ = (dictionary.insert)(s.final().at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(s.final().at(1), "k")
+    #|  metadata(repr((s.final(), s.get(),)))
+    #|}
+    #|#context {
+    #|  { let pv = (); pv.push(s.final()); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(s.final()); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(s.final()); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(s.final()); pv.at(0).at(0).push(0) }
+    #|  { let pv = (); pv.push(s.final()); pv.at(0).at(1).insert("zz", 0) }
+    #|  { let pv = (); pv.push(s.final()); let _ = pv.at(0).at(1).remove("k") }
+    #|  metadata(repr((s.final(), s.get(),)))
+    #|}
+    #|#let get() = s.final()
+    #|#context {
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  let _ = (dictionary.insert)(get().at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().at(1), "k")
+    #|  metadata(repr((get(), s.get(),)))
+    #|}
+    #|#context metadata(repr((s.final(), s.get(),)))
+    #|]
+    #|#metadata("== state: a native function as the update")
+    #|#[
+    #|#let s = state("s-native", (2, 1))
+    #|// A new array that only the sequence holds, then a native mutator as the
+    #|// update function.
+    #|#s.update(array.rev)
+    #|#metadata(none) <s-native-before>
+    #|#s.update(array.pop)
+    #|#s.update(v => (v, (3, 4)))
+    #|#metadata(none) <s-native-mid>
+    #|#s.update(array.last)
+    #|#s.update(array.pop)
+    #|#context metadata(repr((s.at(<s-native-before>), s.at(<s-native-mid>), s.final(), s.get())))
+    #|#context metadata(repr((s.at(<s-native-before>), s.at(<s-native-mid>), s.final())))
+    #|]
+    #|#metadata("== state: made by a closure that is called twice")
+    #|#[
+    #|#let make() = state("s-made", ((1, 2), (k: (3,))))
+    #|#context {
+    #|  let _ = (array.pop)(make().final())
+    #|  let _ = (array.push)(make().final(), 0)
+    #|  let _ = (array.pop)(make().final().at(0))
+    #|  let _ = (array.push)(make().final().at(0), 0)
+    #|  let _ = (array.pop)(make().final().first())
+    #|  let _ = (array.push)(make().final().first(), 0)
+    #|  let _ = (dictionary.insert)(make().final().at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(make().final().at(1), "k")
+    #|  let _ = (dictionary.insert)(make().final().last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(make().final().last(), "k")
+    #|  let _ = (array.pop)(make().final().at(1).k)
+    #|  let _ = (array.push)(make().final().at(1).k, 0)
+    #|  let _ = (array.pop)(make().final().last().at("k"))
+    #|  let _ = (array.push)(make().final().last().at("k"), 0)
+    #|  let _ = (array.pop)(make().final().at(1).values().first())
+    #|  let _ = (array.push)(make().final().at(1).values().first(), 0)
+    #|  let _ = (array.pop)(make().final().slice(0, 1).first())
+    #|  let _ = (array.push)(make().final().slice(0, 1).first(), 0)
+    #|  metadata(repr((make().final(), make().get(),)))
+    #|}
+    #|#context {
+    #|  { let pv = (); pv.push(make().final()); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(make().final()); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(make().final()); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(make().final()); pv.at(0).at(0).push(0) }
+    #|  { let pv = (); pv.push(make().final()); let _ = pv.at(0).first().pop() }
+    #|  { let pv = (); pv.push(make().final()); pv.at(0).first().push(0) }
+    #|  { let pv = (); pv.push(make().final()); pv.at(0).at(1).insert("zz", 0) }
+    #|  { let pv = (); pv.push(make().final()); let _ = pv.at(0).at(1).remove("k") }
+    #|  { let pv = (); pv.push(make().final()); pv.at(0).last().insert("zz", 0) }
+    #|  { let pv = (); pv.push(make().final()); let _ = pv.at(0).last().remove("k") }
+    #|  { let pv = (); pv.push(make().final()); let _ = pv.at(0).at(1).k.pop() }
+    #|  { let pv = (); pv.push(make().final()); pv.at(0).at(1).k.push(0) }
+    #|  { let pv = (); pv.push(make().final()); let _ = pv.at(0).last().at("k").pop() }
+    #|  { let pv = (); pv.push(make().final()); pv.at(0).last().at("k").push(0) }
+    #|  metadata(repr((make().final(), make().get(),)))
+    #|}
+    #|#let get() = make().final()
+    #|#context {
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  let _ = (array.pop)(get().first())
+    #|  let _ = (array.push)(get().first(), 0)
+    #|  let _ = (dictionary.insert)(get().at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().at(1), "k")
+    #|  let _ = (dictionary.insert)(get().last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().last(), "k")
+    #|  let _ = (array.pop)(get().at(1).k)
+    #|  let _ = (array.push)(get().at(1).k, 0)
+    #|  let _ = (array.pop)(get().last().at("k"))
+    #|  let _ = (array.push)(get().last().at("k"), 0)
+    #|  let _ = (array.pop)(get().at(1).values().first())
+    #|  let _ = (array.push)(get().at(1).values().first(), 0)
+    #|  let _ = (array.pop)(get().slice(0, 1).first())
+    #|  let _ = (array.push)(get().slice(0, 1).first(), 0)
+    #|  metadata(repr((get(), make().get(),)))
+    #|}
+    #|#context metadata(repr((make().final(), make().get(),)))
+    #|]
+    #|#metadata("== state: captured by a closure")
+    #|#[
+    #|#let s = state("s-captured", (a: (1, 2), d: (k: (3,))))
+    #|#let read() = s.final()
+    #|#context {
+    #|  let _ = (dictionary.insert)(read(), "zz", 0)
+    #|  let _ = (dictionary.remove)(read(), "a")
+    #|  let _ = (array.pop)(read().a)
+    #|  let _ = (array.push)(read().a, 0)
+    #|  let _ = (array.pop)(read().at("a"))
+    #|  let _ = (array.push)(read().at("a"), 0)
+    #|  let _ = (dictionary.insert)(read().d, "zz", 0)
+    #|  let _ = (dictionary.remove)(read().d, "k")
+    #|  let _ = (array.pop)(read().d.k)
+    #|  let _ = (array.push)(read().d.k, 0)
+    #|  let _ = (array.pop)(read().values().first())
+    #|  let _ = (array.push)(read().values().first(), 0)
+    #|  let _ = (array.pop)(read().pairs().first().last())
+    #|  let _ = (array.push)(read().pairs().first().last(), 0)
+    #|  let _ = (array.pop)(read().values().last().k)
+    #|  let _ = (array.push)(read().values().last().k, 0)
+    #|  metadata(repr((read(), s.get(),)))
+    #|}
+    #|#context {
+    #|  { let pv = (); pv.push(read()); pv.at(0).insert("zz", 0) }
+    #|  { let pv = (); pv.push(read()); let _ = pv.at(0).remove("a") }
+    #|  { let pv = (); pv.push(read()); let _ = pv.at(0).a.pop() }
+    #|  { let pv = (); pv.push(read()); pv.at(0).a.push(0) }
+    #|  { let pv = (); pv.push(read()); let _ = pv.at(0).at("a").pop() }
+    #|  { let pv = (); pv.push(read()); pv.at(0).at("a").push(0) }
+    #|  { let pv = (); pv.push(read()); pv.at(0).d.insert("zz", 0) }
+    #|  { let pv = (); pv.push(read()); let _ = pv.at(0).d.remove("k") }
+    #|  { let pv = (); pv.push(read()); let _ = pv.at(0).d.k.pop() }
+    #|  { let pv = (); pv.push(read()); pv.at(0).d.k.push(0) }
+    #|  metadata(repr((read(), s.get(),)))
+    #|}
+    #|#let get() = read()
+    #|#context {
+    #|  let _ = (dictionary.insert)(get(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get(), "a")
+    #|  let _ = (array.pop)(get().a)
+    #|  let _ = (array.push)(get().a, 0)
+    #|  let _ = (array.pop)(get().at("a"))
+    #|  let _ = (array.push)(get().at("a"), 0)
+    #|  let _ = (dictionary.insert)(get().d, "zz", 0)
+    #|  let _ = (dictionary.remove)(get().d, "k")
+    #|  let _ = (array.pop)(get().d.k)
+    #|  let _ = (array.push)(get().d.k, 0)
+    #|  let _ = (array.pop)(get().values().first())
+    #|  let _ = (array.push)(get().values().first(), 0)
+    #|  let _ = (array.pop)(get().pairs().first().last())
+    #|  let _ = (array.push)(get().pairs().first().last(), 0)
+    #|  let _ = (array.pop)(get().values().last().k)
+    #|  let _ = (array.push)(get().values().last().k, 0)
+    #|  metadata(repr((get(), s.get(),)))
+    #|}
+    #|#context metadata(repr((read(), s.get(),)))
+    #|]
+    #|#metadata("== state: the reviewer's case")
+    #|#[
+    #|#let make() = state("s-review", (1, 2))
+    #|#context metadata(repr(range(2).map(i => (array.pop)(make().final()))))
+    #|#context metadata(repr(make().final()))
+    #|]
+    #|
+  let expected = [
+    "== state: initial array through get", "(((1, 2), (k: (3,))),)", "(((1, 2), (k: (3,))),)",
+    "(((1, 2), (k: (3,))),)", "(((1, 2), (k: (3,))),)", "== state: array set by an update through get",
+    "(((1, 2), (k: (3,))),)", "(((1, 2), (k: (3,))),)", "(((1, 2), (k: (3,))),)",
+    "(((1, 2), (k: (3,))),)", "== state: array returned by an update function through get",
+    "(((1, 2), (k: (3,))),)", "(((1, 2), (k: (3,))),)", "(((1, 2), (k: (3,))),)",
+    "(((1, 2), (k: (3,))),)", "== state: initial array through at", "(((1, 2), (k: (3,))),)",
+    "(((1, 2), (k: (3,))),)", "(((1, 2), (k: (3,))),)", "(((1, 2), (k: (3,))),)",
+    "== state: array set by an update through at", "(((1, 2), (k: (3,))),)", "(((1, 2), (k: (3,))),)",
+    "(((1, 2), (k: (3,))),)", "(((1, 2), (k: (3,))),)", "== state: array returned by an update function through at",
+    "(((1, 2), (k: (3,))),)", "(((1, 2), (k: (3,))),)", "(((1, 2), (k: (3,))),)",
+    "(((1, 2), (k: (3,))),)", "== state: initial array through final", "(((1, 2), (k: (3,))),)",
+    "(((1, 2), (k: (3,))),)", "(((1, 2), (k: (3,))),)", "(((1, 2), (k: (3,))),)",
+    "== state: array set by an update through final", "(((1, 2), (k: (3,))),)", "(((1, 2), (k: (3,))),)",
+    "(((1, 2), (k: (3,))),)", "(((1, 2), (k: (3,))),)", "== state: array returned by an update function through final",
+    "(((1, 2), (k: (3,))),)", "(((1, 2), (k: (3,))),)", "(((1, 2), (k: (3,))),)",
+    "(((1, 2), (k: (3,))),)", "== state: initial dictionary through get", "((a: (1, 2), d: (k: (3,))),)",
+    "((a: (1, 2), d: (k: (3,))),)", "((a: (1, 2), d: (k: (3,))),)", "((a: (1, 2), d: (k: (3,))),)",
+    "== state: dictionary set by an update through get", "((a: (1, 2), d: (k: (3,))),)",
+    "((a: (1, 2), d: (k: (3,))),)", "((a: (1, 2), d: (k: (3,))),)", "((a: (1, 2), d: (k: (3,))),)",
+    "== state: dictionary returned by an update function through get", "((a: (1, 2), d: (k: (3,))),)",
+    "((a: (1, 2), d: (k: (3,))),)", "((a: (1, 2), d: (k: (3,))),)", "((a: (1, 2), d: (k: (3,))),)",
+    "== state: initial dictionary through at", "((a: (1, 2), d: (k: (3,))),)", "((a: (1, 2), d: (k: (3,))),)",
+    "((a: (1, 2), d: (k: (3,))),)", "((a: (1, 2), d: (k: (3,))),)", "== state: dictionary set by an update through at",
+    "((a: (1, 2), d: (k: (3,))),)", "((a: (1, 2), d: (k: (3,))),)", "((a: (1, 2), d: (k: (3,))),)",
+    "((a: (1, 2), d: (k: (3,))),)", "== state: dictionary returned by an update function through at",
+    "((a: (1, 2), d: (k: (3,))),)", "((a: (1, 2), d: (k: (3,))),)", "((a: (1, 2), d: (k: (3,))),)",
+    "((a: (1, 2), d: (k: (3,))),)", "== state: initial dictionary through final",
+    "((a: (1, 2), d: (k: (3,))),)", "((a: (1, 2), d: (k: (3,))),)", "((a: (1, 2), d: (k: (3,))),)",
+    "((a: (1, 2), d: (k: (3,))),)", "== state: dictionary set by an update through final",
+    "((a: (1, 2), d: (k: (3,))),)", "((a: (1, 2), d: (k: (3,))),)", "((a: (1, 2), d: (k: (3,))),)",
+    "((a: (1, 2), d: (k: (3,))),)", "== state: dictionary returned by an update function through final",
+    "((a: (1, 2), d: (k: (3,))),)", "((a: (1, 2), d: (k: (3,))),)", "((a: (1, 2), d: (k: (3,))),)",
+    "((a: (1, 2), d: (k: (3,))),)", "== state: an update function that returns its argument",
+    "(((1, 2, 7), (k: (3,))), ((1, 2, 7), (k: (3,))))", "(((1, 2, 7), (k: (3,))), ((1, 2, 7), (k: (3,))))",
+    "(((1, 2, 7), (k: (3,))), ((1, 2, 7), (k: (3,))))", "(((1, 2, 7), (k: (3,))), ((1, 2, 7), (k: (3,))))",
+    "== state: a native function as the update", "((1, 2), (2, (3, 4)), 4, 4)", "((1, 2), (2, (3, 4)), 4)",
+    "== state: made by a closure that is called twice", "(((1, 2), (k: (3,))), ((1, 2), (k: (3,))))",
+    "(((1, 2), (k: (3,))), ((1, 2), (k: (3,))))", "(((1, 2), (k: (3,))), ((1, 2), (k: (3,))))",
+    "(((1, 2), (k: (3,))), ((1, 2), (k: (3,))))", "== state: captured by a closure",
+    "(\n  (a: (1, 2), d: (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n)", "(\n  (a: (1, 2), d: (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n)",
+    "(\n  (a: (1, 2), d: (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n)", "(\n  (a: (1, 2), d: (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n)",
+    "== state: the reviewer's case", "(2, 2)", "(1, 2)",
+  ]
+  assert_eq(oracle_metadata(source), expected)
+}
+
+///|
+test "oracle: sharing: counters" {
+  let source = "#metadata(\"== counter: custom counter through get\")\n#[\n#let c = counter(\"c-get\")\n#c.update((1, 2))\n#context {\n  let _ = (array.pop)(c.get())\n  let _ = (array.push)(c.get(), 0)\n  metadata(repr((c.get(),)))\n}\n#context {\n  { let pv = (); pv.push(c.get()); let _ = pv.at(0).pop() }\n  { let pv = (); pv.push(c.get()); pv.at(0).push(0) }\n  metadata(repr((c.get(),)))\n}\n#let get() = c.get()\n#context {\n  let _ = (array.pop)(get())\n  let _ = (array.push)(get(), 0)\n  metadata(repr((get(),)))\n}\n#context metadata(repr((c.get(),)))\n]\n#metadata(\"== counter: custom counter through at\")\n#[\n#let c = counter(\"c-at\")\n#c.update((1, 2))\n#context {\n  let _ = (array.pop)(c.at(here()))\n  let _ = (array.push)(c.at(here()), 0)\n  metadata(repr((c.at(here()),)))\n}\n#context {\n  { let pv = (); pv.push(c.at(here())); let _ = pv.at(0).pop() }\n  { let pv = (); pv.push(c.at(here())); pv.at(0).push(0) }\n  metadata(repr((c.at(here()),)))\n}\n#let get() = c.at(here())\n#context {\n  let _ = (array.pop)(get())\n  let _ = (array.push)(get(), 0)\n  metadata(repr((get(),)))\n}\n#context metadata(repr((c.at(here()),)))\n]\n#metadata(\"== counter: custom counter through final\")\n#[\n#let c = counter(\"c-final\")\n#c.update((1, 2))\n#context {\n  let _ = (array.pop)(c.final())\n  let _ = (array.push)(c.final(), 0)\n  metadata(repr((c.final(),)))\n}\n#context {\n  { let pv = (); pv.push(c.final()); let _ = pv.at(0).pop() }\n  { let pv = (); pv.push(c.final()); pv.at(0).push(0) }\n  metadata(repr((c.final(),)))\n}\n#let get() = c.final()\n#context {\n  let _ = (array.pop)(get())\n  let _ = (array.push)(get(), 0)\n  metadata(repr((get(),)))\n}\n#context metadata(repr((c.final(),)))\n]\n#metadata(\"== counter: headings and pages\")\n#[\n#set heading(numbering: \"1.1\")\n= A\n== B\n#context {\n  let _ = (array.pop)(counter(heading).get())\n  let _ = (array.push)(counter(heading).get(), 0)\n  metadata(repr((counter(heading).get(), counter(heading).final(), counter(page).get(), counter(page).final(),)))\n}\n#context {\n  { let pv = (); pv.push(counter(heading).get()); let _ = pv.at(0).pop() }\n  { let pv = (); pv.push(counter(heading).get()); pv.at(0).push(0) }\n  metadata(repr((counter(heading).get(), counter(heading).final(), counter(page).get(), counter(page).final(),)))\n}\n#let get() = counter(heading).get()\n#context {\n  let _ = (array.pop)(get())\n  let _ = (array.push)(get(), 0)\n  metadata(repr((get(), counter(heading).final(), counter(page).get(), counter(page).final(),)))\n}\n#context metadata(repr((counter(heading).get(), counter(heading).final(), counter(page).get(), counter(page).final(),)))\n]\n#metadata(\"== counter: the page counter\")\n#[\n#context {\n  let _ = (array.pop)(counter(page).get())\n  let _ = (array.push)(counter(page).get(), 0)\n  metadata(repr((counter(page).get(),)))\n}\n#context {\n  { let pv = (); pv.push(counter(page).get()); let _ = pv.at(0).pop() }\n  { let pv = (); pv.push(counter(page).get()); pv.at(0).push(0) }\n  metadata(repr((counter(page).get(),)))\n}\n#let get() = counter(page).get()\n#context {\n  let _ = (array.pop)(get())\n  let _ = (array.push)(get(), 0)\n  metadata(repr((get(),)))\n}\n#context metadata(repr((counter(page).get(),)))\n]\n"
+  let expected = [
+    "== counter: custom counter through get", "((1, 2),)", "((1, 2),)", "((1, 2),)",
+    "((1, 2),)", "== counter: custom counter through at", "((1, 2),)", "((1, 2),)",
+    "((1, 2),)", "((1, 2),)", "== counter: custom counter through final", "((1, 2),)",
+    "((1, 2),)", "((1, 2),)", "((1, 2),)", "== counter: headings and pages", "((1, 1), (1, 1), (1,), (1,))",
+    "((1, 1), (1, 1), (1,), (1,))", "((1, 1), (1, 1), (1,), (1,))", "((1, 1), (1, 1), (1,), (1,))",
+    "== counter: the page counter", "((1,),)", "((1,),)", "((1,),)", "((1,),)",
+  ]
+  assert_eq(oracle_metadata(source), expected)
+}
+
+///|
+test "oracle: sharing: element fields" {
+  let source =
+    #|#metadata("== element: children of a sequence")
+    #|#[
+    #|#let it = [a *b* c]
+    #|#{
+    #|  let _ = (array.pop)(it.children)
+    #|  let _ = (array.push)(it.children, 0)
+    #|  metadata(repr((it.children,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(it.children); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(it.children); pv.at(0).push(0) }
+    #|  metadata(repr((it.children,)))
+    #|}
+    #|#let get() = it.children
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#metadata(repr((it.children,)))
+    #|]
+    #|#metadata("== element: `at` of a sequence")
+    #|#[
+    #|#let it = [a *b* c]
+    #|#{
+    #|  let _ = (array.pop)(it.at("children"))
+    #|  let _ = (array.push)(it.at("children"), 0)
+    #|  metadata(repr((it.at("children"),)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(it.at("children")); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(it.at("children")); pv.at(0).push(0) }
+    #|  metadata(repr((it.at("children"),)))
+    #|}
+    #|#let get() = it.at("children")
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#metadata(repr((it.at("children"),)))
+    #|]
+    #|#metadata("== element: `fields()` of a sequence")
+    #|#[
+    #|#let it = [a *b* c]
+    #|#{
+    #|  let _ = (dictionary.insert)(it.fields(), "zz", 0)
+    #|  let _ = (dictionary.remove)(it.fields(), "children")
+    #|  let _ = (array.pop)(it.fields().children)
+    #|  let _ = (array.push)(it.fields().children, 0)
+    #|  metadata(repr((it.fields(),)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(it.fields()); pv.at(0).insert("zz", 0) }
+    #|  { let pv = (); pv.push(it.fields()); let _ = pv.at(0).remove("children") }
+    #|  { let pv = (); pv.push(it.fields()); let _ = pv.at(0).children.pop() }
+    #|  { let pv = (); pv.push(it.fields()); pv.at(0).children.push(0) }
+    #|  metadata(repr((it.fields(),)))
+    #|}
+    #|#let get() = it.fields()
+    #|#{
+    #|  let _ = (dictionary.insert)(get(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get(), "children")
+    #|  let _ = (array.pop)(get().children)
+    #|  let _ = (array.push)(get().children, 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#metadata(repr((it.fields(),)))
+    #|]
+    #|#metadata("== element: the value of metadata")
+    #|#[
+    #|#let m = metadata(((1, 2), (k: (3,))))
+    #|#{
+    #|  let _ = (array.pop)(m.value)
+    #|  let _ = (array.push)(m.value, 0)
+    #|  let _ = (array.pop)(m.value.at(0))
+    #|  let _ = (array.push)(m.value.at(0), 0)
+    #|  let _ = (array.pop)(m.value.first())
+    #|  let _ = (array.push)(m.value.first(), 0)
+    #|  let _ = (dictionary.insert)(m.value.at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(m.value.at(1), "k")
+    #|  let _ = (dictionary.insert)(m.value.last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(m.value.last(), "k")
+    #|  let _ = (array.pop)(m.value.at(1).k)
+    #|  let _ = (array.push)(m.value.at(1).k, 0)
+    #|  let _ = (array.pop)(m.value.last().at("k"))
+    #|  let _ = (array.push)(m.value.last().at("k"), 0)
+    #|  let _ = (array.pop)(m.value.at(1).values().first())
+    #|  let _ = (array.push)(m.value.at(1).values().first(), 0)
+    #|  let _ = (array.pop)(m.value.slice(0, 1).first())
+    #|  let _ = (array.push)(m.value.slice(0, 1).first(), 0)
+    #|  metadata(repr((m.value,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(m.value); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(m.value); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(m.value); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(m.value); pv.at(0).at(0).push(0) }
+    #|  { let pv = (); pv.push(m.value); let _ = pv.at(0).first().pop() }
+    #|  { let pv = (); pv.push(m.value); pv.at(0).first().push(0) }
+    #|  { let pv = (); pv.push(m.value); pv.at(0).at(1).insert("zz", 0) }
+    #|  { let pv = (); pv.push(m.value); let _ = pv.at(0).at(1).remove("k") }
+    #|  { let pv = (); pv.push(m.value); pv.at(0).last().insert("zz", 0) }
+    #|  { let pv = (); pv.push(m.value); let _ = pv.at(0).last().remove("k") }
+    #|  { let pv = (); pv.push(m.value); let _ = pv.at(0).at(1).k.pop() }
+    #|  { let pv = (); pv.push(m.value); pv.at(0).at(1).k.push(0) }
+    #|  { let pv = (); pv.push(m.value); let _ = pv.at(0).last().at("k").pop() }
+    #|  { let pv = (); pv.push(m.value); pv.at(0).last().at("k").push(0) }
+    #|  metadata(repr((m.value,)))
+    #|}
+    #|#let get() = m.value
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  let _ = (array.pop)(get().first())
+    #|  let _ = (array.push)(get().first(), 0)
+    #|  let _ = (dictionary.insert)(get().at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().at(1), "k")
+    #|  let _ = (dictionary.insert)(get().last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().last(), "k")
+    #|  let _ = (array.pop)(get().at(1).k)
+    #|  let _ = (array.push)(get().at(1).k, 0)
+    #|  let _ = (array.pop)(get().last().at("k"))
+    #|  let _ = (array.push)(get().last().at("k"), 0)
+    #|  let _ = (array.pop)(get().at(1).values().first())
+    #|  let _ = (array.push)(get().at(1).values().first(), 0)
+    #|  let _ = (array.pop)(get().slice(0, 1).first())
+    #|  let _ = (array.push)(get().slice(0, 1).first(), 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#metadata(repr((m.value,)))
+    #|]
+    #|#metadata("== element: the value of metadata, dictionary")
+    #|#[
+    #|#let m = metadata((a: (1, 2), d: (k: (3,))))
+    #|#{
+    #|  let _ = (dictionary.insert)(m.value, "zz", 0)
+    #|  let _ = (dictionary.remove)(m.value, "a")
+    #|  let _ = (array.pop)(m.value.a)
+    #|  let _ = (array.push)(m.value.a, 0)
+    #|  let _ = (array.pop)(m.value.at("a"))
+    #|  let _ = (array.push)(m.value.at("a"), 0)
+    #|  let _ = (dictionary.insert)(m.value.d, "zz", 0)
+    #|  let _ = (dictionary.remove)(m.value.d, "k")
+    #|  let _ = (array.pop)(m.value.d.k)
+    #|  let _ = (array.push)(m.value.d.k, 0)
+    #|  let _ = (array.pop)(m.value.values().first())
+    #|  let _ = (array.push)(m.value.values().first(), 0)
+    #|  let _ = (array.pop)(m.value.pairs().first().last())
+    #|  let _ = (array.push)(m.value.pairs().first().last(), 0)
+    #|  let _ = (array.pop)(m.value.values().last().k)
+    #|  let _ = (array.push)(m.value.values().last().k, 0)
+    #|  metadata(repr((m.value,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(m.value); pv.at(0).insert("zz", 0) }
+    #|  { let pv = (); pv.push(m.value); let _ = pv.at(0).remove("a") }
+    #|  { let pv = (); pv.push(m.value); let _ = pv.at(0).a.pop() }
+    #|  { let pv = (); pv.push(m.value); pv.at(0).a.push(0) }
+    #|  { let pv = (); pv.push(m.value); let _ = pv.at(0).at("a").pop() }
+    #|  { let pv = (); pv.push(m.value); pv.at(0).at("a").push(0) }
+    #|  { let pv = (); pv.push(m.value); pv.at(0).d.insert("zz", 0) }
+    #|  { let pv = (); pv.push(m.value); let _ = pv.at(0).d.remove("k") }
+    #|  { let pv = (); pv.push(m.value); let _ = pv.at(0).d.k.pop() }
+    #|  { let pv = (); pv.push(m.value); pv.at(0).d.k.push(0) }
+    #|  metadata(repr((m.value,)))
+    #|}
+    #|#let get() = m.value
+    #|#{
+    #|  let _ = (dictionary.insert)(get(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get(), "a")
+    #|  let _ = (array.pop)(get().a)
+    #|  let _ = (array.push)(get().a, 0)
+    #|  let _ = (array.pop)(get().at("a"))
+    #|  let _ = (array.push)(get().at("a"), 0)
+    #|  let _ = (dictionary.insert)(get().d, "zz", 0)
+    #|  let _ = (dictionary.remove)(get().d, "k")
+    #|  let _ = (array.pop)(get().d.k)
+    #|  let _ = (array.push)(get().d.k, 0)
+    #|  let _ = (array.pop)(get().values().first())
+    #|  let _ = (array.push)(get().values().first(), 0)
+    #|  let _ = (array.pop)(get().pairs().first().last())
+    #|  let _ = (array.push)(get().pairs().first().last(), 0)
+    #|  let _ = (array.pop)(get().values().last().k)
+    #|  let _ = (array.push)(get().values().last().k, 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#metadata(repr((m.value,)))
+    #|]
+    #|#metadata("== element: `at` of metadata")
+    #|#[
+    #|#let m = metadata(((1, 2), (k: (3,))))
+    #|#{
+    #|  let _ = (array.pop)(m.at("value"))
+    #|  let _ = (array.push)(m.at("value"), 0)
+    #|  let _ = (array.pop)(m.at("value").at(0))
+    #|  let _ = (array.push)(m.at("value").at(0), 0)
+    #|  let _ = (array.pop)(m.at("value").first())
+    #|  let _ = (array.push)(m.at("value").first(), 0)
+    #|  let _ = (dictionary.insert)(m.at("value").at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(m.at("value").at(1), "k")
+    #|  let _ = (dictionary.insert)(m.at("value").last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(m.at("value").last(), "k")
+    #|  let _ = (array.pop)(m.at("value").at(1).k)
+    #|  let _ = (array.push)(m.at("value").at(1).k, 0)
+    #|  let _ = (array.pop)(m.at("value").last().at("k"))
+    #|  let _ = (array.push)(m.at("value").last().at("k"), 0)
+    #|  let _ = (array.pop)(m.at("value").at(1).values().first())
+    #|  let _ = (array.push)(m.at("value").at(1).values().first(), 0)
+    #|  let _ = (array.pop)(m.at("value").slice(0, 1).first())
+    #|  let _ = (array.push)(m.at("value").slice(0, 1).first(), 0)
+    #|  metadata(repr((m.at("value"),)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(m.at("value")); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(m.at("value")); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(m.at("value")); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(m.at("value")); pv.at(0).at(0).push(0) }
+    #|  { let pv = (); pv.push(m.at("value")); let _ = pv.at(0).first().pop() }
+    #|  { let pv = (); pv.push(m.at("value")); pv.at(0).first().push(0) }
+    #|  { let pv = (); pv.push(m.at("value")); pv.at(0).at(1).insert("zz", 0) }
+    #|  { let pv = (); pv.push(m.at("value")); let _ = pv.at(0).at(1).remove("k") }
+    #|  { let pv = (); pv.push(m.at("value")); pv.at(0).last().insert("zz", 0) }
+    #|  { let pv = (); pv.push(m.at("value")); let _ = pv.at(0).last().remove("k") }
+    #|  { let pv = (); pv.push(m.at("value")); let _ = pv.at(0).at(1).k.pop() }
+    #|  { let pv = (); pv.push(m.at("value")); pv.at(0).at(1).k.push(0) }
+    #|  { let pv = (); pv.push(m.at("value")); let _ = pv.at(0).last().at("k").pop() }
+    #|  { let pv = (); pv.push(m.at("value")); pv.at(0).last().at("k").push(0) }
+    #|  metadata(repr((m.at("value"),)))
+    #|}
+    #|#let get() = m.at("value")
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  let _ = (array.pop)(get().first())
+    #|  let _ = (array.push)(get().first(), 0)
+    #|  let _ = (dictionary.insert)(get().at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().at(1), "k")
+    #|  let _ = (dictionary.insert)(get().last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().last(), "k")
+    #|  let _ = (array.pop)(get().at(1).k)
+    #|  let _ = (array.push)(get().at(1).k, 0)
+    #|  let _ = (array.pop)(get().last().at("k"))
+    #|  let _ = (array.push)(get().last().at("k"), 0)
+    #|  let _ = (array.pop)(get().at(1).values().first())
+    #|  let _ = (array.push)(get().at(1).values().first(), 0)
+    #|  let _ = (array.pop)(get().slice(0, 1).first())
+    #|  let _ = (array.push)(get().slice(0, 1).first(), 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#metadata(repr((m.at("value"),)))
+    #|]
+    #|#metadata("== element: `at` of metadata with a default")
+    #|#[
+    #|#let m = metadata(((1, 2), (k: (3,))))
+    #|#let dflt = ((1, 2), (k: (3,)))
+    #|#{
+    #|  let _ = (array.pop)(m.at("nothing", default: dflt))
+    #|  let _ = (array.push)(m.at("nothing", default: dflt), 0)
+    #|  let _ = (array.pop)((m.at("nothing", default: dflt)).at(0))
+    #|  let _ = (array.push)((m.at("nothing", default: dflt)).at(0), 0)
+    #|  let _ = (array.pop)((m.at("nothing", default: dflt)).first())
+    #|  let _ = (array.push)((m.at("nothing", default: dflt)).first(), 0)
+    #|  let _ = (dictionary.insert)((m.at("nothing", default: dflt)).at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)((m.at("nothing", default: dflt)).at(1), "k")
+    #|  let _ = (dictionary.insert)((m.at("nothing", default: dflt)).last(), "zz", 0)
+    #|  let _ = (dictionary.remove)((m.at("nothing", default: dflt)).last(), "k")
+    #|  let _ = (array.pop)((m.at("nothing", default: dflt)).at(1).k)
+    #|  let _ = (array.push)((m.at("nothing", default: dflt)).at(1).k, 0)
+    #|  let _ = (array.pop)((m.at("nothing", default: dflt)).last().at("k"))
+    #|  let _ = (array.push)((m.at("nothing", default: dflt)).last().at("k"), 0)
+    #|  let _ = (array.pop)((m.at("nothing", default: dflt)).at(1).values().first())
+    #|  let _ = (array.push)((m.at("nothing", default: dflt)).at(1).values().first(), 0)
+    #|  let _ = (array.pop)((m.at("nothing", default: dflt)).slice(0, 1).first())
+    #|  let _ = (array.push)((m.at("nothing", default: dflt)).slice(0, 1).first(), 0)
+    #|  metadata(repr((m.at("nothing", default: dflt), dflt,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(m.at("nothing", default: dflt)); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(m.at("nothing", default: dflt)); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(m.at("nothing", default: dflt)); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(m.at("nothing", default: dflt)); pv.at(0).at(0).push(0) }
+    #|  { let pv = (); pv.push(m.at("nothing", default: dflt)); let _ = pv.at(0).first().pop() }
+    #|  { let pv = (); pv.push(m.at("nothing", default: dflt)); pv.at(0).first().push(0) }
+    #|  { let pv = (); pv.push(m.at("nothing", default: dflt)); pv.at(0).at(1).insert("zz", 0) }
+    #|  { let pv = (); pv.push(m.at("nothing", default: dflt)); let _ = pv.at(0).at(1).remove("k") }
+    #|  { let pv = (); pv.push(m.at("nothing", default: dflt)); pv.at(0).last().insert("zz", 0) }
+    #|  { let pv = (); pv.push(m.at("nothing", default: dflt)); let _ = pv.at(0).last().remove("k") }
+    #|  { let pv = (); pv.push(m.at("nothing", default: dflt)); let _ = pv.at(0).at(1).k.pop() }
+    #|  { let pv = (); pv.push(m.at("nothing", default: dflt)); pv.at(0).at(1).k.push(0) }
+    #|  { let pv = (); pv.push(m.at("nothing", default: dflt)); let _ = pv.at(0).last().at("k").pop() }
+    #|  { let pv = (); pv.push(m.at("nothing", default: dflt)); pv.at(0).last().at("k").push(0) }
+    #|  metadata(repr((m.at("nothing", default: dflt), dflt,)))
+    #|}
+    #|#let get() = m.at("nothing", default: dflt)
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  let _ = (array.pop)(get().first())
+    #|  let _ = (array.push)(get().first(), 0)
+    #|  let _ = (dictionary.insert)(get().at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().at(1), "k")
+    #|  let _ = (dictionary.insert)(get().last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().last(), "k")
+    #|  let _ = (array.pop)(get().at(1).k)
+    #|  let _ = (array.push)(get().at(1).k, 0)
+    #|  let _ = (array.pop)(get().last().at("k"))
+    #|  let _ = (array.push)(get().last().at("k"), 0)
+    #|  let _ = (array.pop)(get().at(1).values().first())
+    #|  let _ = (array.push)(get().at(1).values().first(), 0)
+    #|  let _ = (array.pop)(get().slice(0, 1).first())
+    #|  let _ = (array.push)(get().slice(0, 1).first(), 0)
+    #|  metadata(repr((get(), dflt,)))
+    #|}
+    #|#metadata(repr((m.at("nothing", default: dflt), dflt,)))
+    #|]
+    #|#metadata("== element: `fields()` of metadata")
+    #|#[
+    #|#let m = metadata(((1, 2), (k: (3,))))
+    #|#{
+    #|  let _ = (dictionary.insert)(m.fields(), "zz", 0)
+    #|  let _ = (dictionary.remove)(m.fields(), "value")
+    #|  let _ = (array.pop)(m.fields().value)
+    #|  let _ = (array.push)(m.fields().value, 0)
+    #|  let _ = (array.pop)(m.fields().value.at(0))
+    #|  let _ = (array.push)(m.fields().value.at(0), 0)
+    #|  let _ = (array.pop)(m.fields().value.first())
+    #|  let _ = (array.push)(m.fields().value.first(), 0)
+    #|  let _ = (dictionary.insert)(m.fields().value.at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(m.fields().value.at(1), "k")
+    #|  let _ = (dictionary.insert)(m.fields().value.last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(m.fields().value.last(), "k")
+    #|  let _ = (array.pop)(m.fields().value.at(1).k)
+    #|  let _ = (array.push)(m.fields().value.at(1).k, 0)
+    #|  let _ = (array.pop)(m.fields().value.last().at("k"))
+    #|  let _ = (array.push)(m.fields().value.last().at("k"), 0)
+    #|  let _ = (array.pop)(m.fields().value.at(1).values().first())
+    #|  let _ = (array.push)(m.fields().value.at(1).values().first(), 0)
+    #|  let _ = (array.pop)(m.fields().value.slice(0, 1).first())
+    #|  let _ = (array.push)(m.fields().value.slice(0, 1).first(), 0)
+    #|  metadata(repr((m.fields(), m.value,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(m.fields()); pv.at(0).insert("zz", 0) }
+    #|  { let pv = (); pv.push(m.fields()); let _ = pv.at(0).remove("value") }
+    #|  { let pv = (); pv.push(m.fields()); let _ = pv.at(0).value.pop() }
+    #|  { let pv = (); pv.push(m.fields()); pv.at(0).value.push(0) }
+    #|  { let pv = (); pv.push(m.fields()); let _ = pv.at(0).value.at(0).pop() }
+    #|  { let pv = (); pv.push(m.fields()); pv.at(0).value.at(0).push(0) }
+    #|  { let pv = (); pv.push(m.fields()); let _ = pv.at(0).value.first().pop() }
+    #|  { let pv = (); pv.push(m.fields()); pv.at(0).value.first().push(0) }
+    #|  { let pv = (); pv.push(m.fields()); pv.at(0).value.at(1).insert("zz", 0) }
+    #|  { let pv = (); pv.push(m.fields()); let _ = pv.at(0).value.at(1).remove("k") }
+    #|  { let pv = (); pv.push(m.fields()); pv.at(0).value.last().insert("zz", 0) }
+    #|  { let pv = (); pv.push(m.fields()); let _ = pv.at(0).value.last().remove("k") }
+    #|  { let pv = (); pv.push(m.fields()); let _ = pv.at(0).value.at(1).k.pop() }
+    #|  { let pv = (); pv.push(m.fields()); pv.at(0).value.at(1).k.push(0) }
+    #|  { let pv = (); pv.push(m.fields()); let _ = pv.at(0).value.last().at("k").pop() }
+    #|  { let pv = (); pv.push(m.fields()); pv.at(0).value.last().at("k").push(0) }
+    #|  metadata(repr((m.fields(), m.value,)))
+    #|}
+    #|#let get() = m.fields()
+    #|#{
+    #|  let _ = (dictionary.insert)(get(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get(), "value")
+    #|  let _ = (array.pop)(get().value)
+    #|  let _ = (array.push)(get().value, 0)
+    #|  let _ = (array.pop)(get().value.at(0))
+    #|  let _ = (array.push)(get().value.at(0), 0)
+    #|  let _ = (array.pop)(get().value.first())
+    #|  let _ = (array.push)(get().value.first(), 0)
+    #|  let _ = (dictionary.insert)(get().value.at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().value.at(1), "k")
+    #|  let _ = (dictionary.insert)(get().value.last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().value.last(), "k")
+    #|  let _ = (array.pop)(get().value.at(1).k)
+    #|  let _ = (array.push)(get().value.at(1).k, 0)
+    #|  let _ = (array.pop)(get().value.last().at("k"))
+    #|  let _ = (array.push)(get().value.last().at("k"), 0)
+    #|  let _ = (array.pop)(get().value.at(1).values().first())
+    #|  let _ = (array.push)(get().value.at(1).values().first(), 0)
+    #|  let _ = (array.pop)(get().value.slice(0, 1).first())
+    #|  let _ = (array.push)(get().value.slice(0, 1).first(), 0)
+    #|  metadata(repr((get(), m.value,)))
+    #|}
+    #|#metadata(repr((m.fields(), m.value,)))
+    #|]
+    #|#metadata("== element: metadata found by a query")
+    #|#[
+    #|#metadata(((1, 2), (k: (3,)))) <probe-m>
+    #|#context {
+    #|  let _ = (array.pop)(query(<probe-m>).first().value)
+    #|  let _ = (array.push)(query(<probe-m>).first().value, 0)
+    #|  let _ = (array.pop)(query(<probe-m>).first().value.at(0))
+    #|  let _ = (array.push)(query(<probe-m>).first().value.at(0), 0)
+    #|  let _ = (array.pop)(query(<probe-m>).first().value.first())
+    #|  let _ = (array.push)(query(<probe-m>).first().value.first(), 0)
+    #|  let _ = (dictionary.insert)(query(<probe-m>).first().value.at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(query(<probe-m>).first().value.at(1), "k")
+    #|  let _ = (dictionary.insert)(query(<probe-m>).first().value.last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(query(<probe-m>).first().value.last(), "k")
+    #|  let _ = (array.pop)(query(<probe-m>).first().value.at(1).k)
+    #|  let _ = (array.push)(query(<probe-m>).first().value.at(1).k, 0)
+    #|  let _ = (array.pop)(query(<probe-m>).first().value.last().at("k"))
+    #|  let _ = (array.push)(query(<probe-m>).first().value.last().at("k"), 0)
+    #|  let _ = (array.pop)(query(<probe-m>).first().value.at(1).values().first())
+    #|  let _ = (array.push)(query(<probe-m>).first().value.at(1).values().first(), 0)
+    #|  let _ = (array.pop)(query(<probe-m>).first().value.slice(0, 1).first())
+    #|  let _ = (array.push)(query(<probe-m>).first().value.slice(0, 1).first(), 0)
+    #|  metadata(repr((query(<probe-m>).first().value, query(<probe-m>).first().fields().value,)))
+    #|}
+    #|#context {
+    #|  { let pv = (); pv.push(query(<probe-m>).first().value); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(query(<probe-m>).first().value); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(query(<probe-m>).first().value); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(query(<probe-m>).first().value); pv.at(0).at(0).push(0) }
+    #|  { let pv = (); pv.push(query(<probe-m>).first().value); let _ = pv.at(0).first().pop() }
+    #|  { let pv = (); pv.push(query(<probe-m>).first().value); pv.at(0).first().push(0) }
+    #|  { let pv = (); pv.push(query(<probe-m>).first().value); pv.at(0).at(1).insert("zz", 0) }
+    #|  { let pv = (); pv.push(query(<probe-m>).first().value); let _ = pv.at(0).at(1).remove("k") }
+    #|  { let pv = (); pv.push(query(<probe-m>).first().value); pv.at(0).last().insert("zz", 0) }
+    #|  { let pv = (); pv.push(query(<probe-m>).first().value); let _ = pv.at(0).last().remove("k") }
+    #|  { let pv = (); pv.push(query(<probe-m>).first().value); let _ = pv.at(0).at(1).k.pop() }
+    #|  { let pv = (); pv.push(query(<probe-m>).first().value); pv.at(0).at(1).k.push(0) }
+    #|  { let pv = (); pv.push(query(<probe-m>).first().value); let _ = pv.at(0).last().at("k").pop() }
+    #|  { let pv = (); pv.push(query(<probe-m>).first().value); pv.at(0).last().at("k").push(0) }
+    #|  metadata(repr((query(<probe-m>).first().value, query(<probe-m>).first().fields().value,)))
+    #|}
+    #|#let get() = query(<probe-m>).first().value
+    #|#context {
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  let _ = (array.pop)(get().first())
+    #|  let _ = (array.push)(get().first(), 0)
+    #|  let _ = (dictionary.insert)(get().at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().at(1), "k")
+    #|  let _ = (dictionary.insert)(get().last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().last(), "k")
+    #|  let _ = (array.pop)(get().at(1).k)
+    #|  let _ = (array.push)(get().at(1).k, 0)
+    #|  let _ = (array.pop)(get().last().at("k"))
+    #|  let _ = (array.push)(get().last().at("k"), 0)
+    #|  let _ = (array.pop)(get().at(1).values().first())
+    #|  let _ = (array.push)(get().at(1).values().first(), 0)
+    #|  let _ = (array.pop)(get().slice(0, 1).first())
+    #|  let _ = (array.push)(get().slice(0, 1).first(), 0)
+    #|  metadata(repr((get(), query(<probe-m>).first().fields().value,)))
+    #|}
+    #|#context metadata(repr((query(<probe-m>).first().value, query(<probe-m>).first().fields().value,)))
+    #|]
+    #|#metadata("== element: the result of a query")
+    #|#[
+    #|#metadata(((1, 2), (k: (3,)))) <probe-q>
+    #|#context {
+    #|  let _ = (array.pop)(query(<probe-q>))
+    #|  let _ = (array.push)(query(<probe-q>), 0)
+    #|  metadata(repr((query(<probe-q>),)))
+    #|}
+    #|#context {
+    #|  { let pv = (); pv.push(query(<probe-q>)); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(query(<probe-q>)); pv.at(0).push(0) }
+    #|  metadata(repr((query(<probe-q>),)))
+    #|}
+    #|#let get() = query(<probe-q>)
+    #|#context {
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#context metadata(repr((query(<probe-q>),)))
+    #|]
+    #|#metadata("== element: table fields")
+    #|#[
+    #|#let t = table(columns: (1fr, 2fr), align: (left, right), [a], [b])
+    #|#{
+    #|  let _ = (array.pop)(t.columns)
+    #|  let _ = (array.push)(t.columns, 0)
+    #|  metadata(repr((t.columns, t.children.len(), t.align,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(t.columns); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(t.columns); pv.at(0).push(0) }
+    #|  metadata(repr((t.columns, t.children.len(), t.align,)))
+    #|}
+    #|#let get() = t.columns
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  metadata(repr((get(), t.children.len(), t.align,)))
+    #|}
+    #|#metadata(repr((t.columns, t.children.len(), t.align,)))
+    #|]
+    #|#metadata("== element: table children")
+    #|#[
+    #|#let t = table(columns: (1fr, 2fr), [a], [b])
+    #|#{
+    #|  let _ = (array.pop)(t.children)
+    #|  let _ = (array.push)(t.children, 0)
+    #|  metadata(repr((t.children, t.columns,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(t.children); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(t.children); pv.at(0).push(0) }
+    #|  metadata(repr((t.children, t.columns,)))
+    #|}
+    #|#let get() = t.children
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  metadata(repr((get(), t.columns,)))
+    #|}
+    #|#metadata(repr((t.children, t.columns,)))
+    #|]
+    #|#metadata("== element: table alignment and fill")
+    #|#[
+    #|#let t = table(columns: 2, align: (left, right), fill: (red, blue), [a], [b])
+    #|#{
+    #|  let _ = (array.pop)(t.align)
+    #|  let _ = (array.push)(t.align, 0)
+    #|  metadata(repr((t.align, t.fill,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(t.align); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(t.align); pv.at(0).push(0) }
+    #|  metadata(repr((t.align, t.fill,)))
+    #|}
+    #|#let get() = t.align
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  metadata(repr((get(), t.fill,)))
+    #|}
+    #|#metadata(repr((t.align, t.fill,)))
+    #|]
+    #|#metadata("== element: table fill")
+    #|#[
+    #|#let t = table(columns: 2, fill: (red, blue), [a], [b])
+    #|#{
+    #|  let _ = (array.pop)(t.fill)
+    #|  let _ = (array.push)(t.fill, 0)
+    #|  metadata(repr((t.fill,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(t.fill); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(t.fill); pv.at(0).push(0) }
+    #|  metadata(repr((t.fill,)))
+    #|}
+    #|#let get() = t.fill
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#metadata(repr((t.fill,)))
+    #|]
+    #|#metadata("== element: `fields()` of a table")
+    #|#[
+    #|#let t = table(columns: (1fr, 2fr), [a], [b])
+    #|#{
+    #|  let _ = (dictionary.insert)(t.fields(), "zz", 0)
+    #|  let _ = (dictionary.remove)(t.fields(), "columns")
+    #|  let _ = (array.pop)(t.fields().columns)
+    #|  let _ = (array.push)(t.fields().columns, 0)
+    #|  let _ = (array.pop)(t.fields().children)
+    #|  let _ = (array.push)(t.fields().children, 0)
+    #|  metadata(repr((t.fields(), t.columns, t.children.len(),)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(t.fields()); pv.at(0).insert("zz", 0) }
+    #|  { let pv = (); pv.push(t.fields()); let _ = pv.at(0).remove("columns") }
+    #|  { let pv = (); pv.push(t.fields()); let _ = pv.at(0).columns.pop() }
+    #|  { let pv = (); pv.push(t.fields()); pv.at(0).columns.push(0) }
+    #|  { let pv = (); pv.push(t.fields()); let _ = pv.at(0).children.pop() }
+    #|  { let pv = (); pv.push(t.fields()); pv.at(0).children.push(0) }
+    #|  metadata(repr((t.fields(), t.columns, t.children.len(),)))
+    #|}
+    #|#let get() = t.fields()
+    #|#{
+    #|  let _ = (dictionary.insert)(get(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get(), "columns")
+    #|  let _ = (array.pop)(get().columns)
+    #|  let _ = (array.push)(get().columns, 0)
+    #|  let _ = (array.pop)(get().children)
+    #|  let _ = (array.push)(get().children, 0)
+    #|  metadata(repr((get(), t.columns, t.children.len(),)))
+    #|}
+    #|#metadata(repr((t.fields(), t.columns, t.children.len(),)))
+    #|]
+    #|#metadata("== element: grid tracks")
+    #|#[
+    #|#let g = grid(columns: (1fr, 2fr), rows: (auto, 1em), column-gutter: (1pt, 2pt), [a], [b])
+    #|#{
+    #|  let _ = (array.pop)(g.columns)
+    #|  let _ = (array.push)(g.columns, 0)
+    #|  metadata(repr((g.columns, g.rows, g.column-gutter, g.children.len(),)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(g.columns); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(g.columns); pv.at(0).push(0) }
+    #|  metadata(repr((g.columns, g.rows, g.column-gutter, g.children.len(),)))
+    #|}
+    #|#let get() = g.columns
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  metadata(repr((get(), g.rows, g.column-gutter, g.children.len(),)))
+    #|}
+    #|#metadata(repr((g.columns, g.rows, g.column-gutter, g.children.len(),)))
+    #|]
+    #|#metadata("== element: grid rows")
+    #|#[
+    #|#let g = grid(columns: (1fr, 2fr), rows: (auto, 1em), column-gutter: (1pt, 2pt), [a], [b])
+    #|#{
+    #|  let _ = (array.pop)(g.rows)
+    #|  let _ = (array.push)(g.rows, 0)
+    #|  metadata(repr((g.rows, g.column-gutter,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(g.rows); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(g.rows); pv.at(0).push(0) }
+    #|  metadata(repr((g.rows, g.column-gutter,)))
+    #|}
+    #|#let get() = g.rows
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  metadata(repr((get(), g.column-gutter,)))
+    #|}
+    #|#metadata(repr((g.rows, g.column-gutter,)))
+    #|]
+    #|#metadata("== element: grid gutter")
+    #|#[
+    #|#let g = grid(columns: 2, column-gutter: (1pt, 2pt), row-gutter: (3pt,), [a], [b])
+    #|#{
+    #|  let _ = (array.pop)(g.column-gutter)
+    #|  let _ = (array.push)(g.column-gutter, 0)
+    #|  metadata(repr((g.column-gutter, g.row-gutter,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(g.column-gutter); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(g.column-gutter); pv.at(0).push(0) }
+    #|  metadata(repr((g.column-gutter, g.row-gutter,)))
+    #|}
+    #|#let get() = g.column-gutter
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  metadata(repr((get(), g.row-gutter,)))
+    #|}
+    #|#metadata(repr((g.column-gutter, g.row-gutter,)))
+    #|]
+    #|#metadata("== element: sides of a block")
+    #|#[
+    #|#let b = block(inset: (x: 1pt), outset: (top: 2pt), radius: (top-left: 3pt), stroke: (left: 1pt))[a]
+    #|#{
+    #|  let _ = (dictionary.insert)(b.inset, "zz", 0)
+    #|  metadata(repr((b.inset, b.outset, b.radius, b.stroke,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(b.inset); pv.at(0).insert("zz", 0) }
+    #|  metadata(repr((b.inset, b.outset, b.radius, b.stroke,)))
+    #|}
+    #|#let get() = b.inset
+    #|#{
+    #|  let _ = (dictionary.insert)(get(), "zz", 0)
+    #|  metadata(repr((get(), b.outset, b.radius, b.stroke,)))
+    #|}
+    #|#metadata(repr((b.inset, b.outset, b.radius, b.stroke,)))
+    #|]
+    #|#metadata("== element: outset of a block")
+    #|#[
+    #|#let b = block(inset: (x: 1pt), outset: (top: 2pt), radius: (top-left: 3pt))[a]
+    #|#{
+    #|  let _ = (dictionary.insert)(b.outset, "zz", 0)
+    #|  metadata(repr((b.outset, b.radius,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(b.outset); pv.at(0).insert("zz", 0) }
+    #|  metadata(repr((b.outset, b.radius,)))
+    #|}
+    #|#let get() = b.outset
+    #|#{
+    #|  let _ = (dictionary.insert)(get(), "zz", 0)
+    #|  metadata(repr((get(), b.radius,)))
+    #|}
+    #|#metadata(repr((b.outset, b.radius,)))
+    #|]
+    #|#metadata("== element: radius and stroke of a rect")
+    #|#[
+    #|#let r = rect(radius: (top-left: 3pt), stroke: (left: 1pt))
+    #|#{
+    #|  let _ = (dictionary.insert)(r.radius, "zz", 0)
+    #|  metadata(repr((r.radius, r.stroke,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(r.radius); pv.at(0).insert("zz", 0) }
+    #|  metadata(repr((r.radius, r.stroke,)))
+    #|}
+    #|#let get() = r.radius
+    #|#{
+    #|  let _ = (dictionary.insert)(get(), "zz", 0)
+    #|  metadata(repr((get(), r.stroke,)))
+    #|}
+    #|#metadata(repr((r.radius, r.stroke,)))
+    #|]
+    #|#metadata("== element: stroke of a rect")
+    #|#[
+    #|#let r = rect(stroke: (left: 1pt, rest: 2pt))
+    #|#{
+    #|  let _ = (dictionary.insert)(r.stroke, "zz", 0)
+    #|  metadata(repr((r.stroke,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(r.stroke); pv.at(0).insert("zz", 0) }
+    #|  metadata(repr((r.stroke,)))
+    #|}
+    #|#let get() = r.stroke
+    #|#{
+    #|  let _ = (dictionary.insert)(get(), "zz", 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#metadata(repr((r.stroke,)))
+    #|]
+    #|#metadata("== element: children of a stack and an enum")
+    #|#[
+    #|#let s = stack([a], [b])
+    #|#let e = enum([a], [b])
+    #|#{
+    #|  let _ = (array.pop)(s.children)
+    #|  let _ = (array.push)(s.children, 0)
+    #|  metadata(repr((s.children, e.children,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(s.children); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(s.children); pv.at(0).push(0) }
+    #|  metadata(repr((s.children, e.children,)))
+    #|}
+    #|#let get() = s.children
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  metadata(repr((get(), e.children,)))
+    #|}
+    #|#metadata(repr((s.children, e.children,)))
+    #|]
+    #|#metadata("== element: children of an enum")
+    #|#[
+    #|#let e = enum([a], [b])
+    #|#{
+    #|  let _ = (array.pop)(e.children)
+    #|  let _ = (array.push)(e.children, 0)
+    #|  metadata(repr((e.children,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(e.children); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(e.children); pv.at(0).push(0) }
+    #|  metadata(repr((e.children,)))
+    #|}
+    #|#let get() = e.children
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#metadata(repr((e.children,)))
+    #|]
+    #|#metadata("== element: children of a list")
+    #|#[
+    #|#let l = list([a], [b])
+    #|#{
+    #|  let _ = (array.pop)(l.children)
+    #|  let _ = (array.push)(l.children, 0)
+    #|  metadata(repr((l.children,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(l.children); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(l.children); pv.at(0).push(0) }
+    #|  metadata(repr((l.children,)))
+    #|}
+    #|#let get() = l.children
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#metadata(repr((l.children,)))
+    #|]
+    #|#metadata("== element: children of terms")
+    #|#[
+    #|#let t = terms(terms.item[a][b], terms.item[c][d])
+    #|#{
+    #|  let _ = (array.pop)(t.children)
+    #|  let _ = (array.push)(t.children, 0)
+    #|  metadata(repr((t.children,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(t.children); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(t.children); pv.at(0).push(0) }
+    #|  metadata(repr((t.children,)))
+    #|}
+    #|#let get() = t.children
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#metadata(repr((t.children,)))
+    #|]
+    #|#metadata("== element: rows of a matrix")
+    #|#[
+    #|#let m = math.mat((1, 2), (3, 4))
+    #|#{
+    #|  let _ = (array.pop)(m.rows)
+    #|  let _ = (array.push)(m.rows, 0)
+    #|  let _ = (array.pop)(m.rows.at(0))
+    #|  let _ = (array.push)(m.rows.at(0), 0)
+    #|  metadata(repr((m.rows,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(m.rows); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(m.rows); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(m.rows); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(m.rows); pv.at(0).at(0).push(0) }
+    #|  metadata(repr((m.rows,)))
+    #|}
+    #|#let get() = m.rows
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#metadata(repr((m.rows,)))
+    #|]
+    #|#metadata("== element: children of a vector")
+    #|#[
+    #|#let v = math.vec($1$, $2$)
+    #|#{
+    #|  let _ = (array.pop)(v.children)
+    #|  let _ = (array.push)(v.children, 0)
+    #|  metadata(repr((v.children,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(v.children); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(v.children); pv.at(0).push(0) }
+    #|  metadata(repr((v.children,)))
+    #|}
+    #|#let get() = v.children
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#metadata(repr((v.children,)))
+    #|]
+    #|#metadata("== element: vertices of a polygon")
+    #|#[
+    #|#let p = polygon((0pt, 0pt), (1pt, 2pt))
+    #|#{
+    #|  let _ = (array.pop)(p.vertices)
+    #|  let _ = (array.push)(p.vertices, 0)
+    #|  let _ = (array.pop)(p.vertices.at(0))
+    #|  let _ = (array.push)(p.vertices.at(0), 0)
+    #|  metadata(repr((p.vertices,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(p.vertices); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(p.vertices); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(p.vertices); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(p.vertices); pv.at(0).at(0).push(0) }
+    #|  metadata(repr((p.vertices,)))
+    #|}
+    #|#let get() = p.vertices
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#metadata(repr((p.vertices,)))
+    #|]
+    #|#metadata("== element: `fields()` of a heading and a figure")
+    #|#[
+    #|#let h = heading(level: 2)[T]
+    #|#let f = figure([x], caption: [c])
+    #|#{
+    #|  let _ = (dictionary.insert)(h.fields(), "zz", 0)
+    #|  let _ = (dictionary.remove)(h.fields(), "level")
+    #|  metadata(repr((h.fields(), f.fields().keys(),)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(h.fields()); pv.at(0).insert("zz", 0) }
+    #|  { let pv = (); pv.push(h.fields()); let _ = pv.at(0).remove("level") }
+    #|  metadata(repr((h.fields(), f.fields().keys(),)))
+    #|}
+    #|#let get() = h.fields()
+    #|#{
+    #|  let _ = (dictionary.insert)(get(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get(), "level")
+    #|  metadata(repr((get(), f.fields().keys(),)))
+    #|}
+    #|#metadata(repr((h.fields(), f.fields().keys(),)))
+    #|]
+    #|#metadata("== element: fields in a show rule, used twice")
+    #|#[
+    #|#show table: it => {
+    #|  let _ = (array.pop)(it.children)
+    #|  let _ = (array.pop)(it.columns)
+    #|  let _ = (array.push)(it.align, center)
+    #|  let _ = (dictionary.insert)(it.fields(), "zz", 0)
+    #|  let _ = (array.pop)(it.fields().children)
+    #|  let _ = (array.pop)(it.at("columns"))
+    #|  { let x = (); x.push(it.columns); let _ = x.at(0).pop() }
+    #|  metadata(repr((it.children.len(), it.columns, it.align, it.fields().keys().len())))
+    #|  it
+    #|}
+    #|#show metadata.where(label: <probe-show>): it => {
+    #|  let _ = (array.pop)(it.value)
+    #|  let _ = (array.pop)(it.value.at(0))
+    #|  let _ = (dictionary.insert)(it.value.at(1), "zz", 0)
+    #|  let _ = (array.pop)(it.fields().value)
+    #|  metadata(repr(it.value))
+    #|  it
+    #|}
+    #|#table(columns: (1fr, 2fr), align: (left, right), [a], [b])
+    #|#metadata(((1, 2), (k: (3,)))) <probe-show>
+    #|#context metadata(repr((query(table).first().children.len(), query(table).first().columns, query(table).first().align, query(<probe-show>).first().value)))
+    #|]
+    #|#metadata("== element: raw lines in a show rule")
+    #|#[
+    #|#show raw: it => {
+    #|  let _ = (array.pop)(it.lines)
+    #|  let _ = (array.push)(it.lines, 0)
+    #|  let _ = (dictionary.insert)(it.fields(), "zz", 0)
+    #|  let _ = (array.pop)(it.fields().lines)
+    #|  { let x = (); x.push(it.lines); let _ = x.at(0).pop() }
+    #|  metadata(repr((it.lines.len(), it.lines.map(l => l.text), it.fields().keys().len())))
+    #|  it
+    #|}
+    #|#show raw.line: it => {
+    #|  let _ = (dictionary.insert)(it.fields(), "zz", 0)
+    #|  metadata(repr((it.number, it.count, it.fields().keys().len())))
+    #|  it
+    #|}
+    #|```
+    #|a
+    #|b
+    #|```
+    #|]
+    #|
+  let expected = [
+    "== element: children of a sequence", "(([a], [ ], strong(body: [b]), [ ], [c]),)",
+    "(([a], [ ], strong(body: [b]), [ ], [c]),)", "(([a], [ ], strong(body: [b]), [ ], [c]),)",
+    "(([a], [ ], strong(body: [b]), [ ], [c]),)", "== element: `at` of a sequence",
+    "(([a], [ ], strong(body: [b]), [ ], [c]),)", "(([a], [ ], strong(body: [b]), [ ], [c]),)",
+    "(([a], [ ], strong(body: [b]), [ ], [c]),)", "(([a], [ ], strong(body: [b]), [ ], [c]),)",
+    "== element: `fields()` of a sequence", "(\n  (children: ([a], [ ], strong(body: [b]), [ ], [c])),\n)",
+    "(\n  (children: ([a], [ ], strong(body: [b]), [ ], [c])),\n)", "(\n  (children: ([a], [ ], strong(body: [b]), [ ], [c])),\n)",
+    "(\n  (children: ([a], [ ], strong(body: [b]), [ ], [c])),\n)", "== element: the value of metadata",
+    "(((1, 2), (k: (3,))),)", "(((1, 2), (k: (3,))),)", "(((1, 2), (k: (3,))),)",
+    "(((1, 2), (k: (3,))),)", "== element: the value of metadata, dictionary", "((a: (1, 2), d: (k: (3,))),)",
+    "((a: (1, 2), d: (k: (3,))),)", "((a: (1, 2), d: (k: (3,))),)", "((a: (1, 2), d: (k: (3,))),)",
+    "== element: `at` of metadata", "(((1, 2), (k: (3,))),)", "(((1, 2), (k: (3,))),)",
+    "(((1, 2), (k: (3,))),)", "(((1, 2), (k: (3,))),)", "== element: `at` of metadata with a default",
+    "(((1, 2), (k: (3,))), ((1, 2), (k: (3,))))", "(((1, 2), (k: (3,))), ((1, 2), (k: (3,))))",
+    "(((1, 2), (k: (3,))), ((1, 2), (k: (3,))))", "(((1, 2), (k: (3,))), ((1, 2), (k: (3,))))",
+    "== element: `fields()` of metadata", "((value: ((1, 2), (k: (3,)))), ((1, 2), (k: (3,))))",
+    "((value: ((1, 2), (k: (3,)))), ((1, 2), (k: (3,))))", "((value: ((1, 2), (k: (3,)))), ((1, 2), (k: (3,))))",
+    "((value: ((1, 2), (k: (3,)))), ((1, 2), (k: (3,))))", "== element: metadata found by a query",
+    "(((1, 2), (k: (3,))), ((1, 2), (k: (3,))))", "(((1, 2), (k: (3,))), ((1, 2), (k: (3,))))",
+    "(((1, 2), (k: (3,))), ((1, 2), (k: (3,))))", "(((1, 2), (k: (3,))), ((1, 2), (k: (3,))))",
+    "== element: the result of a query", "((metadata(value: ((1, 2), (k: (3,)))),),)",
+    "((metadata(value: ((1, 2), (k: (3,)))),),)", "((metadata(value: ((1, 2), (k: (3,)))),),)",
+    "((metadata(value: ((1, 2), (k: (3,)))),),)", "== element: table fields", "((1fr, 2fr), 2, (left, right))",
+    "((1fr, 2fr), 2, (left, right))", "((1fr, 2fr), 2, (left, right))", "((1fr, 2fr), 2, (left, right))",
+    "== element: table children", "((cell(body: [a]), cell(body: [b])), (1fr, 2fr))",
+    "((cell(body: [a]), cell(body: [b])), (1fr, 2fr))", "((cell(body: [a]), cell(body: [b])), (1fr, 2fr))",
+    "((cell(body: [a]), cell(body: [b])), (1fr, 2fr))", "== element: table alignment and fill",
+    "((left, right), (rgb(\"#ff4136\"), rgb(\"#0074d9\")))", "((left, right), (rgb(\"#ff4136\"), rgb(\"#0074d9\")))",
+    "((left, right), (rgb(\"#ff4136\"), rgb(\"#0074d9\")))", "((left, right), (rgb(\"#ff4136\"), rgb(\"#0074d9\")))",
+    "== element: table fill", "((rgb(\"#ff4136\"), rgb(\"#0074d9\")),)", "((rgb(\"#ff4136\"), rgb(\"#0074d9\")),)",
+    "((rgb(\"#ff4136\"), rgb(\"#0074d9\")),)", "((rgb(\"#ff4136\"), rgb(\"#0074d9\")),)",
+    "== element: `fields()` of a table", "(\n  (\n    columns: (1fr, 2fr),\n    children: (cell(body: [a]), cell(body: [b])),\n  ),\n  (1fr, 2fr),\n  2,\n)",
+    "(\n  (\n    columns: (1fr, 2fr),\n    children: (cell(body: [a]), cell(body: [b])),\n  ),\n  (1fr, 2fr),\n  2,\n)",
+    "(\n  (\n    columns: (1fr, 2fr),\n    children: (cell(body: [a]), cell(body: [b])),\n  ),\n  (1fr, 2fr),\n  2,\n)",
+    "(\n  (\n    columns: (1fr, 2fr),\n    children: (cell(body: [a]), cell(body: [b])),\n  ),\n  (1fr, 2fr),\n  2,\n)",
+    "== element: grid tracks", "(\n  (1fr, 2fr),\n  (auto, 0% + 1em),\n  (0% + 1pt, 0% + 2pt),\n  2,\n)",
+    "(\n  (1fr, 2fr),\n  (auto, 0% + 1em),\n  (0% + 1pt, 0% + 2pt),\n  2,\n)", "(\n  (1fr, 2fr),\n  (auto, 0% + 1em),\n  (0% + 1pt, 0% + 2pt),\n  2,\n)",
+    "(\n  (1fr, 2fr),\n  (auto, 0% + 1em),\n  (0% + 1pt, 0% + 2pt),\n  2,\n)", "== element: grid rows",
+    "((auto, 0% + 1em), (0% + 1pt, 0% + 2pt))", "((auto, 0% + 1em), (0% + 1pt, 0% + 2pt))",
+    "((auto, 0% + 1em), (0% + 1pt, 0% + 2pt))", "((auto, 0% + 1em), (0% + 1pt, 0% + 2pt))",
+    "== element: grid gutter", "((0% + 1pt, 0% + 2pt), (0% + 3pt,))", "((0% + 1pt, 0% + 2pt), (0% + 3pt,))",
+    "((0% + 1pt, 0% + 2pt), (0% + 3pt,))", "((0% + 1pt, 0% + 2pt), (0% + 3pt,))",
+    "== element: sides of a block", "(\n  (left: 0% + 1pt, right: 0% + 1pt),\n  (top: 0% + 2pt),\n  (top-left: 0% + 3pt),\n  (left: 1pt),\n)",
+    "(\n  (left: 0% + 1pt, right: 0% + 1pt),\n  (top: 0% + 2pt),\n  (top-left: 0% + 3pt),\n  (left: 1pt),\n)",
+    "(\n  (left: 0% + 1pt, right: 0% + 1pt),\n  (top: 0% + 2pt),\n  (top-left: 0% + 3pt),\n  (left: 1pt),\n)",
+    "(\n  (left: 0% + 1pt, right: 0% + 1pt),\n  (top: 0% + 2pt),\n  (top-left: 0% + 3pt),\n  (left: 1pt),\n)",
+    "== element: outset of a block", "((top: 0% + 2pt), (top-left: 0% + 3pt))", "((top: 0% + 2pt), (top-left: 0% + 3pt))",
+    "((top: 0% + 2pt), (top-left: 0% + 3pt))", "((top: 0% + 2pt), (top-left: 0% + 3pt))",
+    "== element: radius and stroke of a rect", "((top-left: 0% + 3pt), (left: 1pt))",
+    "((top-left: 0% + 3pt), (left: 1pt))", "((top-left: 0% + 3pt), (left: 1pt))",
+    "((top-left: 0% + 3pt), (left: 1pt))", "== element: stroke of a rect", "((left: 1pt, top: 2pt, right: 2pt, bottom: 2pt),)",
+    "((left: 1pt, top: 2pt, right: 2pt, bottom: 2pt),)", "((left: 1pt, top: 2pt, right: 2pt, bottom: 2pt),)",
+    "((left: 1pt, top: 2pt, right: 2pt, bottom: 2pt),)", "== element: children of a stack and an enum",
+    "(([a], [b]), (item(body: [a]), item(body: [b])))", "(([a], [b]), (item(body: [a]), item(body: [b])))",
+    "(([a], [b]), (item(body: [a]), item(body: [b])))", "(([a], [b]), (item(body: [a]), item(body: [b])))",
+    "== element: children of an enum", "((item(body: [a]), item(body: [b])),)", "((item(body: [a]), item(body: [b])),)",
+    "((item(body: [a]), item(body: [b])),)", "((item(body: [a]), item(body: [b])),)",
+    "== element: children of a list", "((item(body: [a]), item(body: [b])),)", "((item(body: [a]), item(body: [b])),)",
+    "((item(body: [a]), item(body: [b])),)", "((item(body: [a]), item(body: [b])),)",
+    "== element: children of terms", "(\n  (\n    item(term: [a], description: [b]),\n    item(term: [c], description: [d]),\n  ),\n)",
+    "(\n  (\n    item(term: [a], description: [b]),\n    item(term: [c], description: [d]),\n  ),\n)",
+    "(\n  (\n    item(term: [a], description: [b]),\n    item(term: [c], description: [d]),\n  ),\n)",
+    "(\n  (\n    item(term: [a], description: [b]),\n    item(term: [c], description: [d]),\n  ),\n)",
+    "== element: rows of a matrix", "((([1], [2]), ([3], [4])),)", "((([1], [2]), ([3], [4])),)",
+    "((([1], [2]), ([3], [4])),)", "((([1], [2]), ([3], [4])),)", "== element: children of a vector",
+    "(\n  (\n    equation(block: false, body: [1]),\n    equation(block: false, body: [2]),\n  ),\n)",
+    "(\n  (\n    equation(block: false, body: [1]),\n    equation(block: false, body: [2]),\n  ),\n)",
+    "(\n  (\n    equation(block: false, body: [1]),\n    equation(block: false, body: [2]),\n  ),\n)",
+    "(\n  (\n    equation(block: false, body: [1]),\n    equation(block: false, body: [2]),\n  ),\n)",
+    "== element: vertices of a polygon", "(((0% + 0pt, 0% + 0pt), (0% + 1pt, 0% + 2pt)),)",
+    "(((0% + 0pt, 0% + 0pt), (0% + 1pt, 0% + 2pt)),)", "(((0% + 0pt, 0% + 0pt), (0% + 1pt, 0% + 2pt)),)",
+    "(((0% + 0pt, 0% + 0pt), (0% + 1pt, 0% + 2pt)),)", "== element: `fields()` of a heading and a figure",
+    "((level: 2, body: [T]), (\"body\", \"caption\"))", "((level: 2, body: [T]), (\"body\", \"caption\"))",
+    "((level: 2, body: [T]), (\"body\", \"caption\"))", "((level: 2, body: [T]), (\"body\", \"caption\"))",
+    "== element: fields in a show rule, used twice", "(2, (1fr, 2fr), (left, right), 9)",
+    "((1, 2), (k: (3,)))", "(2, (1fr, 2fr), (left, right), ((1, 2), (k: (3,))))",
+    "== element: raw lines in a show rule", "(2, (\"a\", \"b\"), 8)", "(1, 2, 4)",
+    "(2, 2, 4)",
+  ]
+  assert_eq(oracle_metadata(source), expected)
+}
+
+///|
+test "oracle: sharing: styles through contextual field access" {
+  let source =
+    #|#metadata("== style: document.author and keywords")
+    #|#set document(author: ("a", "b"), keywords: ("k", "l"))
+    #|#context {
+    #|  let _ = (array.pop)(document.author)
+    #|  let _ = (array.push)(document.author, 0)
+    #|  metadata(repr((document.author, document.keywords,)))
+    #|}
+    #|#context {
+    #|  { let pv = (); pv.push(document.author); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(document.author); pv.at(0).push(0) }
+    #|  metadata(repr((document.author, document.keywords,)))
+    #|}
+    #|#let get() = document.author
+    #|#context {
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  metadata(repr((get(), document.keywords,)))
+    #|}
+    #|#context metadata(repr((document.author, document.keywords,)))
+    #|#metadata("== style: text.font")
+    #|#[
+    #|#set text(font: ("Libertinus Serif", "New Computer Modern"))
+    #|#context {
+    #|  let _ = (array.pop)(text.font)
+    #|  let _ = (array.push)(text.font, 0)
+    #|  metadata(repr((text.font,)))
+    #|}
+    #|#context {
+    #|  { let pv = (); pv.push(text.font); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(text.font); pv.at(0).push(0) }
+    #|  metadata(repr((text.font,)))
+    #|}
+    #|#let get() = text.font
+    #|#context {
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#context metadata(repr((text.font,)))
+    #|]
+    #|#metadata("== style: text.font with coverage")
+    #|#[
+    #|#set text(font: ((name: "Libertinus Serif", covers: "latin-in-cjk"), "New Computer Modern"))
+    #|#context {
+    #|  let _ = (array.pop)(text.font)
+    #|  let _ = (array.push)(text.font, 0)
+    #|  let _ = (dictionary.insert)(text.font.at(0), "zz", 0)
+    #|  let _ = (dictionary.remove)(text.font.at(0), "name")
+    #|  metadata(repr((text.font,)))
+    #|}
+    #|#context {
+    #|  { let pv = (); pv.push(text.font); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(text.font); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(text.font); pv.at(0).at(0).insert("zz", 0) }
+    #|  { let pv = (); pv.push(text.font); let _ = pv.at(0).at(0).remove("name") }
+    #|  metadata(repr((text.font,)))
+    #|}
+    #|#let get() = text.font
+    #|#context {
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (dictionary.insert)(get().at(0), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().at(0), "name")
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#context metadata(repr((text.font,)))
+    #|]
+    #|#metadata("== style: text.font, the default")
+    #|#[
+    #|#context {
+    #|  metadata(repr((text.font,)))
+    #|}
+    #|#context {
+    #|  metadata(repr((text.font,)))
+    #|}
+    #|#let get() = text.font
+    #|#context {
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#context metadata(repr((text.font,)))
+    #|]
+    #|#metadata("== style: text.features")
+    #|#[
+    #|#set text(features: ("smcp", "c2sc"))
+    #|#context {
+    #|  let _ = (dictionary.insert)(text.features, "zz", 0)
+    #|  metadata(repr((text.features,)))
+    #|}
+    #|#context {
+    #|  { let pv = (); pv.push(text.features); pv.at(0).insert("zz", 0) }
+    #|  metadata(repr((text.features,)))
+    #|}
+    #|#let get() = text.features
+    #|#context {
+    #|  let _ = (dictionary.insert)(get(), "zz", 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#context metadata(repr((text.features,)))
+    #|]
+    #|#metadata("== style: text.features as a dictionary")
+    #|#[
+    #|#set text(features: (smcp: 1, liga: 0))
+    #|#context {
+    #|  let _ = (dictionary.insert)(text.features, "zz", 0)
+    #|  metadata(repr((text.features,)))
+    #|}
+    #|#context {
+    #|  { let pv = (); pv.push(text.features); pv.at(0).insert("zz", 0) }
+    #|  metadata(repr((text.features,)))
+    #|}
+    #|#let get() = text.features
+    #|#context {
+    #|  let _ = (dictionary.insert)(get(), "zz", 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#context metadata(repr((text.features,)))
+    #|]
+    #|#metadata("== style: text.features, the default")
+    #|#[
+    #|#context {
+    #|  let _ = (dictionary.insert)(text.features, "zz", 0)
+    #|  metadata(repr((text.features,)))
+    #|}
+    #|#context {
+    #|  { let pv = (); pv.push(text.features); pv.at(0).insert("zz", 0) }
+    #|  metadata(repr((text.features,)))
+    #|}
+    #|#let get() = text.features
+    #|#context {
+    #|  let _ = (dictionary.insert)(get(), "zz", 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#context metadata(repr((text.features,)))
+    #|]
+    #|#metadata("== style: text.stylistic-set")
+    #|#[
+    #|#set text(stylistic-set: (1, 2))
+    #|#context {
+    #|  let _ = (array.pop)(text.stylistic-set)
+    #|  let _ = (array.push)(text.stylistic-set, 0)
+    #|  metadata(repr((text.stylistic-set,)))
+    #|}
+    #|#context {
+    #|  { let pv = (); pv.push(text.stylistic-set); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(text.stylistic-set); pv.at(0).push(0) }
+    #|  metadata(repr((text.stylistic-set,)))
+    #|}
+    #|#let get() = text.stylistic-set
+    #|#context {
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#context metadata(repr((text.stylistic-set,)))
+    #|]
+    #|#metadata("== style: text.stylistic-set, the default")
+    #|#[
+    #|#context {
+    #|  let _ = (array.push)(text.stylistic-set, 0)
+    #|  metadata(repr((text.stylistic-set,)))
+    #|}
+    #|#context {
+    #|  { let pv = (); pv.push(text.stylistic-set); pv.at(0).push(0) }
+    #|  metadata(repr((text.stylistic-set,)))
+    #|}
+    #|#let get() = text.stylistic-set
+    #|#context {
+    #|  let _ = (array.push)(get(), 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#context metadata(repr((text.stylistic-set,)))
+    #|]
+    #|#metadata("== style: text.costs")
+    #|#[
+    #|#set text(costs: (hyphenation: 50%))
+    #|#context {
+    #|  let _ = (dictionary.insert)(text.costs, "zz", 0)
+    #|  let _ = (dictionary.remove)(text.costs, "hyphenation")
+    #|  metadata(repr((text.costs,)))
+    #|}
+    #|#context {
+    #|  { let pv = (); pv.push(text.costs); pv.at(0).insert("zz", 0) }
+    #|  { let pv = (); pv.push(text.costs); let _ = pv.at(0).remove("hyphenation") }
+    #|  metadata(repr((text.costs,)))
+    #|}
+    #|#let get() = text.costs
+    #|#context {
+    #|  let _ = (dictionary.insert)(get(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get(), "hyphenation")
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#context metadata(repr((text.costs,)))
+    #|]
+    #|#metadata("== style: text.costs, the default")
+    #|#[
+    #|#context {
+    #|  let _ = (dictionary.insert)(text.costs, "zz", 0)
+    #|  let _ = (dictionary.remove)(text.costs, "hyphenation")
+    #|  metadata(repr((text.costs,)))
+    #|}
+    #|#context {
+    #|  { let pv = (); pv.push(text.costs); pv.at(0).insert("zz", 0) }
+    #|  { let pv = (); pv.push(text.costs); let _ = pv.at(0).remove("hyphenation") }
+    #|  metadata(repr((text.costs,)))
+    #|}
+    #|#let get() = text.costs
+    #|#context {
+    #|  let _ = (dictionary.insert)(get(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get(), "hyphenation")
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#context metadata(repr((text.costs,)))
+    #|]
+    #|#metadata("== style: par.first-line-indent")
+    #|#[
+    #|#set par(first-line-indent: (amount: 1em, all: true))
+    #|#context {
+    #|  let _ = (dictionary.insert)(par.first-line-indent, "zz", 0)
+    #|  let _ = (dictionary.remove)(par.first-line-indent, "amount")
+    #|  metadata(repr((par.first-line-indent,)))
+    #|}
+    #|#context {
+    #|  { let pv = (); pv.push(par.first-line-indent); pv.at(0).insert("zz", 0) }
+    #|  { let pv = (); pv.push(par.first-line-indent); let _ = pv.at(0).remove("amount") }
+    #|  metadata(repr((par.first-line-indent,)))
+    #|}
+    #|#let get() = par.first-line-indent
+    #|#context {
+    #|  let _ = (dictionary.insert)(get(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get(), "amount")
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#context metadata(repr((par.first-line-indent,)))
+    #|]
+    #|#metadata("== style: table.columns and its other tracks")
+    #|#[
+    #|#set table(columns: (1fr, 2fr), rows: (auto,), align: (left, right), fill: (red, blue), inset: (x: 1pt), stroke: (top: 1pt))
+    #|#context {
+    #|  let _ = (array.pop)(table.columns)
+    #|  let _ = (array.push)(table.columns, 0)
+    #|  metadata(repr((table.columns, table.rows, table.align, table.fill, table.inset, table.stroke,)))
+    #|}
+    #|#context {
+    #|  { let pv = (); pv.push(table.columns); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(table.columns); pv.at(0).push(0) }
+    #|  metadata(repr((table.columns, table.rows, table.align, table.fill, table.inset, table.stroke,)))
+    #|}
+    #|#let get() = table.columns
+    #|#context {
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  metadata(repr((get(), table.rows, table.align, table.fill, table.inset, table.stroke,)))
+    #|}
+    #|#context metadata(repr((table.columns, table.rows, table.align, table.fill, table.inset, table.stroke,)))
+    #|]
+    #|#metadata("== style: table.align")
+    #|#[
+    #|#set table(align: (left, right), fill: (red, blue))
+    #|#context {
+    #|  let _ = (array.pop)(table.align)
+    #|  let _ = (array.push)(table.align, 0)
+    #|  metadata(repr((table.align, table.fill,)))
+    #|}
+    #|#context {
+    #|  { let pv = (); pv.push(table.align); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(table.align); pv.at(0).push(0) }
+    #|  metadata(repr((table.align, table.fill,)))
+    #|}
+    #|#let get() = table.align
+    #|#context {
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  metadata(repr((get(), table.fill,)))
+    #|}
+    #|#context metadata(repr((table.align, table.fill,)))
+    #|]
+    #|#metadata("== style: table.fill")
+    #|#[
+    #|#set table(fill: (red, blue))
+    #|#context {
+    #|  let _ = (array.pop)(table.fill)
+    #|  let _ = (array.push)(table.fill, 0)
+    #|  metadata(repr((table.fill,)))
+    #|}
+    #|#context {
+    #|  { let pv = (); pv.push(table.fill); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(table.fill); pv.at(0).push(0) }
+    #|  metadata(repr((table.fill,)))
+    #|}
+    #|#let get() = table.fill
+    #|#context {
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#context metadata(repr((table.fill,)))
+    #|]
+    #|#metadata("== style: table.inset")
+    #|#[
+    #|#set table(inset: (x: 1pt))
+    #|#context {
+    #|  let _ = (dictionary.insert)(table.inset, "zz", 0)
+    #|  metadata(repr((table.inset,)))
+    #|}
+    #|#context {
+    #|  { let pv = (); pv.push(table.inset); pv.at(0).insert("zz", 0) }
+    #|  metadata(repr((table.inset,)))
+    #|}
+    #|#let get() = table.inset
+    #|#context {
+    #|  let _ = (dictionary.insert)(get(), "zz", 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#context metadata(repr((table.inset,)))
+    #|]
+    #|#metadata("== style: table.stroke")
+    #|#[
+    #|#set table(stroke: (top: 1pt))
+    #|#context {
+    #|  let _ = (dictionary.insert)(table.stroke, "zz", 0)
+    #|  metadata(repr((table.stroke,)))
+    #|}
+    #|#context {
+    #|  { let pv = (); pv.push(table.stroke); pv.at(0).insert("zz", 0) }
+    #|  metadata(repr((table.stroke,)))
+    #|}
+    #|#let get() = table.stroke
+    #|#context {
+    #|  let _ = (dictionary.insert)(get(), "zz", 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#context metadata(repr((table.stroke,)))
+    #|]
+    #|#metadata("== style: table.columns, the default")
+    #|#[
+    #|#context {
+    #|  let _ = (array.push)(table.columns, 0)
+    #|  metadata(repr((table.columns, table.rows, table.inset, table.column-gutter,)))
+    #|}
+    #|#context {
+    #|  { let pv = (); pv.push(table.columns); pv.at(0).push(0) }
+    #|  metadata(repr((table.columns, table.rows, table.inset, table.column-gutter,)))
+    #|}
+    #|#let get() = table.columns
+    #|#context {
+    #|  let _ = (array.push)(get(), 0)
+    #|  metadata(repr((get(), table.rows, table.inset, table.column-gutter,)))
+    #|}
+    #|#context metadata(repr((table.columns, table.rows, table.inset, table.column-gutter,)))
+    #|]
+    #|#metadata("== style: grid tracks")
+    #|#[
+    #|#set grid(columns: (1fr, 2fr), rows: (auto, 1em), column-gutter: (1pt, 2pt), row-gutter: (3pt,))
+    #|#context {
+    #|  let _ = (array.pop)(grid.columns)
+    #|  let _ = (array.push)(grid.columns, 0)
+    #|  metadata(repr((grid.columns, grid.rows, grid.column-gutter, grid.row-gutter,)))
+    #|}
+    #|#context {
+    #|  { let pv = (); pv.push(grid.columns); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(grid.columns); pv.at(0).push(0) }
+    #|  metadata(repr((grid.columns, grid.rows, grid.column-gutter, grid.row-gutter,)))
+    #|}
+    #|#let get() = grid.columns
+    #|#context {
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  metadata(repr((get(), grid.rows, grid.column-gutter, grid.row-gutter,)))
+    #|}
+    #|#context metadata(repr((grid.columns, grid.rows, grid.column-gutter, grid.row-gutter,)))
+    #|]
+    #|#metadata("== style: grid.rows")
+    #|#[
+    #|#set grid(rows: (auto, 1em), column-gutter: (1pt, 2pt))
+    #|#context {
+    #|  let _ = (array.pop)(grid.rows)
+    #|  let _ = (array.push)(grid.rows, 0)
+    #|  metadata(repr((grid.rows, grid.column-gutter,)))
+    #|}
+    #|#context {
+    #|  { let pv = (); pv.push(grid.rows); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(grid.rows); pv.at(0).push(0) }
+    #|  metadata(repr((grid.rows, grid.column-gutter,)))
+    #|}
+    #|#let get() = grid.rows
+    #|#context {
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  metadata(repr((get(), grid.column-gutter,)))
+    #|}
+    #|#context metadata(repr((grid.rows, grid.column-gutter,)))
+    #|]
+    #|#metadata("== style: grid.column-gutter")
+    #|#[
+    #|#set grid(column-gutter: (1pt, 2pt))
+    #|#context {
+    #|  let _ = (array.pop)(grid.column-gutter)
+    #|  let _ = (array.push)(grid.column-gutter, 0)
+    #|  metadata(repr((grid.column-gutter,)))
+    #|}
+    #|#context {
+    #|  { let pv = (); pv.push(grid.column-gutter); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(grid.column-gutter); pv.at(0).push(0) }
+    #|  metadata(repr((grid.column-gutter,)))
+    #|}
+    #|#let get() = grid.column-gutter
+    #|#context {
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#context metadata(repr((grid.column-gutter,)))
+    #|]
+    #|#metadata("== style: page.margin")
+    #|#[
+    #|#set page(margin: (x: 1cm, y: 2cm))
+    #|#context {
+    #|  let _ = (dictionary.insert)(page.margin, "zz", 0)
+    #|  metadata(repr((page.margin,)))
+    #|}
+    #|#context {
+    #|  { let pv = (); pv.push(page.margin); pv.at(0).insert("zz", 0) }
+    #|  metadata(repr((page.margin,)))
+    #|}
+    #|#let get() = page.margin
+    #|#context {
+    #|  let _ = (dictionary.insert)(get(), "zz", 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#context metadata(repr((page.margin,)))
+    #|]
+    #|#metadata("== style: page.margin, the default")
+    #|#[
+    #|#context {
+    #|  metadata(repr((page.margin, page.columns,)))
+    #|}
+    #|#context {
+    #|  metadata(repr((page.margin, page.columns,)))
+    #|}
+    #|#let get() = page.margin
+    #|#context {
+    #|  metadata(repr((get(), page.columns,)))
+    #|}
+    #|#context metadata(repr((page.margin, page.columns,)))
+    #|]
+    #|#metadata("== style: rect sides")
+    #|#[
+    #|#set rect(stroke: (top: 1pt), inset: (x: 1pt), radius: (top-left: 1pt), outset: (y: 2pt))
+    #|#context {
+    #|  let _ = (dictionary.insert)(rect.stroke, "zz", 0)
+    #|  metadata(repr((rect.stroke, rect.inset, rect.radius, rect.outset,)))
+    #|}
+    #|#context {
+    #|  { let pv = (); pv.push(rect.stroke); pv.at(0).insert("zz", 0) }
+    #|  metadata(repr((rect.stroke, rect.inset, rect.radius, rect.outset,)))
+    #|}
+    #|#let get() = rect.stroke
+    #|#context {
+    #|  let _ = (dictionary.insert)(get(), "zz", 0)
+    #|  metadata(repr((get(), rect.inset, rect.radius, rect.outset,)))
+    #|}
+    #|#context metadata(repr((rect.stroke, rect.inset, rect.radius, rect.outset,)))
+    #|]
+    #|#metadata("== style: rect.inset")
+    #|#[
+    #|#set rect(inset: (x: 1pt), radius: (top-left: 1pt), outset: (y: 2pt))
+    #|#context {
+    #|  let _ = (dictionary.insert)(rect.inset, "zz", 0)
+    #|  metadata(repr((rect.inset, rect.radius, rect.outset,)))
+    #|}
+    #|#context {
+    #|  { let pv = (); pv.push(rect.inset); pv.at(0).insert("zz", 0) }
+    #|  metadata(repr((rect.inset, rect.radius, rect.outset,)))
+    #|}
+    #|#let get() = rect.inset
+    #|#context {
+    #|  let _ = (dictionary.insert)(get(), "zz", 0)
+    #|  metadata(repr((get(), rect.radius, rect.outset,)))
+    #|}
+    #|#context metadata(repr((rect.inset, rect.radius, rect.outset,)))
+    #|]
+    #|#metadata("== style: rect.radius")
+    #|#[
+    #|#set rect(radius: (top-left: 1pt))
+    #|#context {
+    #|  let _ = (dictionary.insert)(rect.radius, "zz", 0)
+    #|  metadata(repr((rect.radius,)))
+    #|}
+    #|#context {
+    #|  { let pv = (); pv.push(rect.radius); pv.at(0).insert("zz", 0) }
+    #|  metadata(repr((rect.radius,)))
+    #|}
+    #|#let get() = rect.radius
+    #|#context {
+    #|  let _ = (dictionary.insert)(get(), "zz", 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#context metadata(repr((rect.radius,)))
+    #|]
+    #|#metadata("== style: rect.inset, the default")
+    #|#[
+    #|#context {
+    #|  metadata(repr((rect.inset, rect.outset, rect.radius,)))
+    #|}
+    #|#context {
+    #|  metadata(repr((rect.inset, rect.outset, rect.radius,)))
+    #|}
+    #|#let get() = rect.inset
+    #|#context {
+    #|  metadata(repr((get(), rect.outset, rect.radius,)))
+    #|}
+    #|#context metadata(repr((rect.inset, rect.outset, rect.radius,)))
+    #|]
+    #|#metadata("== style: block and box sides")
+    #|#[
+    #|#set block(inset: (x: 1pt))
+    #|#set box(inset: (y: 1pt))
+    #|#context {
+    #|  let _ = (dictionary.insert)(block.inset, "zz", 0)
+    #|  metadata(repr((block.inset, box.inset,)))
+    #|}
+    #|#context {
+    #|  { let pv = (); pv.push(block.inset); pv.at(0).insert("zz", 0) }
+    #|  metadata(repr((block.inset, box.inset,)))
+    #|}
+    #|#let get() = block.inset
+    #|#context {
+    #|  let _ = (dictionary.insert)(get(), "zz", 0)
+    #|  metadata(repr((get(), box.inset,)))
+    #|}
+    #|#context metadata(repr((block.inset, box.inset,)))
+    #|]
+    #|#metadata("== style: box.inset")
+    #|#[
+    #|#set box(inset: (y: 1pt))
+    #|#context {
+    #|  let _ = (dictionary.insert)(box.inset, "zz", 0)
+    #|  metadata(repr((box.inset,)))
+    #|}
+    #|#context {
+    #|  { let pv = (); pv.push(box.inset); pv.at(0).insert("zz", 0) }
+    #|  metadata(repr((box.inset,)))
+    #|}
+    #|#let get() = box.inset
+    #|#context {
+    #|  let _ = (dictionary.insert)(get(), "zz", 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#context metadata(repr((box.inset,)))
+    #|]
+    #|#metadata("== style: table.cell.inset")
+    #|#[
+    #|#set table.cell(inset: (x: 1pt))
+    #|#context {
+    #|  let _ = (dictionary.insert)(table.cell.inset, "zz", 0)
+    #|  metadata(repr((table.cell.inset,)))
+    #|}
+    #|#context {
+    #|  { let pv = (); pv.push(table.cell.inset); pv.at(0).insert("zz", 0) }
+    #|  metadata(repr((table.cell.inset,)))
+    #|}
+    #|#let get() = table.cell.inset
+    #|#context {
+    #|  let _ = (dictionary.insert)(get(), "zz", 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#context metadata(repr((table.cell.inset,)))
+    #|]
+    #|#metadata("== style: list.marker")
+    #|#[
+    #|#set list(marker: ([a], [b]))
+    #|#context {
+    #|  let _ = (array.pop)(list.marker)
+    #|  let _ = (array.push)(list.marker, 0)
+    #|  metadata(repr((list.marker,)))
+    #|}
+    #|#context {
+    #|  { let pv = (); pv.push(list.marker); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(list.marker); pv.at(0).push(0) }
+    #|  metadata(repr((list.marker,)))
+    #|}
+    #|#let get() = list.marker
+    #|#context {
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#context metadata(repr((list.marker,)))
+    #|]
+    #|#metadata("== style: list.marker, the default")
+    #|#[
+    #|#context {
+    #|  let _ = (array.pop)(list.marker)
+    #|  let _ = (array.push)(list.marker, 0)
+    #|  metadata(repr((list.marker,)))
+    #|}
+    #|#context {
+    #|  { let pv = (); pv.push(list.marker); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(list.marker); pv.at(0).push(0) }
+    #|  metadata(repr((list.marker,)))
+    #|}
+    #|#let get() = list.marker
+    #|#context {
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#context metadata(repr((list.marker,)))
+    #|]
+    #|#metadata("== style: smartquote.quotes")
+    #|#[
+    #|#set smartquote(quotes: (single: ("a", "b"), double: ("c", "d")))
+    #|#context {
+    #|  let _ = (dictionary.insert)(smartquote.quotes, "zz", 0)
+    #|  let _ = (dictionary.remove)(smartquote.quotes, "single")
+    #|  let _ = (array.pop)(smartquote.quotes.single)
+    #|  let _ = (array.push)(smartquote.quotes.single, 0)
+    #|  metadata(repr((smartquote.quotes,)))
+    #|}
+    #|#context {
+    #|  { let pv = (); pv.push(smartquote.quotes); pv.at(0).insert("zz", 0) }
+    #|  { let pv = (); pv.push(smartquote.quotes); let _ = pv.at(0).remove("single") }
+    #|  { let pv = (); pv.push(smartquote.quotes); let _ = pv.at(0).single.pop() }
+    #|  { let pv = (); pv.push(smartquote.quotes); pv.at(0).single.push(0) }
+    #|  metadata(repr((smartquote.quotes,)))
+    #|}
+    #|#let get() = smartquote.quotes
+    #|#context {
+    #|  let _ = (dictionary.insert)(get(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get(), "single")
+    #|  let _ = (array.pop)(get().single)
+    #|  let _ = (array.push)(get().single, 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#context metadata(repr((smartquote.quotes,)))
+    #|]
+    #|#metadata("== style: math.mat.delim")
+    #|#[
+    #|#set math.mat(delim: ("[", "]"))
+    #|#context {
+    #|  let _ = (array.pop)(math.mat.delim)
+    #|  let _ = (array.push)(math.mat.delim, 0)
+    #|  metadata(repr((math.mat.delim,)))
+    #|}
+    #|#context {
+    #|  { let pv = (); pv.push(math.mat.delim); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(math.mat.delim); pv.at(0).push(0) }
+    #|  metadata(repr((math.mat.delim,)))
+    #|}
+    #|#let get() = math.mat.delim
+    #|#context {
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#context metadata(repr((math.mat.delim,)))
+    #|]
+    #|#metadata("== style: math.mat.augment")
+    #|#[
+    #|#set math.mat(augment: (hline: (1, 2), vline: 1))
+    #|#context {
+    #|  let _ = (dictionary.insert)(math.mat.augment, "zz", 0)
+    #|  let _ = (dictionary.remove)(math.mat.augment, "hline")
+    #|  let _ = (array.pop)(math.mat.augment.hline)
+    #|  let _ = (array.push)(math.mat.augment.hline, 0)
+    #|  metadata(repr((math.mat.augment,)))
+    #|}
+    #|#context {
+    #|  { let pv = (); pv.push(math.mat.augment); pv.at(0).insert("zz", 0) }
+    #|  { let pv = (); pv.push(math.mat.augment); let _ = pv.at(0).remove("hline") }
+    #|  { let pv = (); pv.push(math.mat.augment); let _ = pv.at(0).hline.pop() }
+    #|  { let pv = (); pv.push(math.mat.augment); pv.at(0).hline.push(0) }
+    #|  metadata(repr((math.mat.augment,)))
+    #|}
+    #|#let get() = math.mat.augment
+    #|#context {
+    #|  let _ = (dictionary.insert)(get(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get(), "hline")
+    #|  let _ = (array.pop)(get().hline)
+    #|  let _ = (array.push)(get().hline, 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#context metadata(repr((math.mat.augment,)))
+    #|]
+    #|#metadata("== style: raw.syntaxes, the default")
+    #|#[
+    #|#context {
+    #|  let _ = (array.push)(raw.syntaxes, 0)
+    #|  metadata(repr((raw.syntaxes,)))
+    #|}
+    #|#context {
+    #|  { let pv = (); pv.push(raw.syntaxes); pv.at(0).push(0) }
+    #|  metadata(repr((raw.syntaxes,)))
+    #|}
+    #|#let get() = raw.syntaxes
+    #|#context {
+    #|  let _ = (array.push)(get(), 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#context metadata(repr((raw.syntaxes,)))
+    #|]
+    #|#metadata("== style: enum.numbering and start")
+    #|#[
+    #|#set enum(numbering: "(a)", start: 3)
+    #|#context {
+    #|  metadata(repr((enum.numbering, enum.start,)))
+    #|}
+    #|#context {
+    #|  metadata(repr((enum.numbering, enum.start,)))
+    #|}
+    #|#let get() = enum.numbering
+    #|#context {
+    #|  metadata(repr((get(), enum.start,)))
+    #|}
+    #|#context metadata(repr((enum.numbering, enum.start,)))
+    #|]
+    #|#metadata("== style: the reviewer's case")
+    #|#[
+    #|#set text(font: ("Libertinus Serif", "New Computer Modern"))
+    #|#let f() = (array.pop)(text.font)
+    #|#context {
+    #|  metadata(repr(((range(2).map(i => f()), text.font),)))
+    #|}
+    #|#context {
+    #|  metadata(repr(((range(2).map(i => f()), text.font),)))
+    #|}
+    #|#let get() = (range(2).map(i => f()), text.font)
+    #|#context {
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#context metadata(repr(((range(2).map(i => f()), text.font),)))
+    #|]
+    #|
+  let expected = [
+    "== style: document.author and keywords", "((\"a\", \"b\"), (\"k\", \"l\"))",
+    "((\"a\", \"b\"), (\"k\", \"l\"))", "((\"a\", \"b\"), (\"k\", \"l\"))", "((\"a\", \"b\"), (\"k\", \"l\"))",
+    "== style: text.font", "((\"libertinus serif\", \"new computer modern\"),)",
+    "((\"libertinus serif\", \"new computer modern\"),)", "((\"libertinus serif\", \"new computer modern\"),)",
+    "((\"libertinus serif\", \"new computer modern\"),)", "== style: text.font with coverage",
+    "(\n  (\n    (name: \"libertinus serif\", covers: \"latin-in-cjk\"),\n    \"new computer modern\",\n  ),\n)",
+    "(\n  (\n    (name: \"libertinus serif\", covers: \"latin-in-cjk\"),\n    \"new computer modern\",\n  ),\n)",
+    "(\n  (\n    (name: \"libertinus serif\", covers: \"latin-in-cjk\"),\n    \"new computer modern\",\n  ),\n)",
+    "(\n  (\n    (name: \"libertinus serif\", covers: \"latin-in-cjk\"),\n    \"new computer modern\",\n  ),\n)",
+    "== style: text.font, the default", "(\"libertinus serif\",)", "(\"libertinus serif\",)",
+    "(\"libertinus serif\",)", "(\"libertinus serif\",)", "== style: text.features",
+    "((smcp: 1, c2sc: 1),)", "((smcp: 1, c2sc: 1),)", "((smcp: 1, c2sc: 1),)", "((smcp: 1, c2sc: 1),)",
+    "== style: text.features as a dictionary", "((smcp: 1, liga: 0),)", "((smcp: 1, liga: 0),)",
+    "((smcp: 1, liga: 0),)", "((smcp: 1, liga: 0),)", "== style: text.features, the default",
+    "((:),)", "((:),)", "((:),)", "((:),)", "== style: text.stylistic-set", "((1, 2),)",
+    "((1, 2),)", "((1, 2),)", "((1, 2),)", "== style: text.stylistic-set, the default",
+    "((),)", "((),)", "((),)", "((),)", "== style: text.costs", "(\n  (\n    hyphenation: 50%,\n    runt: 100%,\n    widow: 100%,\n    orphan: 100%,\n  ),\n)",
+    "(\n  (\n    hyphenation: 50%,\n    runt: 100%,\n    widow: 100%,\n    orphan: 100%,\n  ),\n)",
+    "(\n  (\n    hyphenation: 50%,\n    runt: 100%,\n    widow: 100%,\n    orphan: 100%,\n  ),\n)",
+    "(\n  (\n    hyphenation: 50%,\n    runt: 100%,\n    widow: 100%,\n    orphan: 100%,\n  ),\n)",
+    "== style: text.costs, the default", "(\n  (\n    hyphenation: 100%,\n    runt: 100%,\n    widow: 100%,\n    orphan: 100%,\n  ),\n)",
+    "(\n  (\n    hyphenation: 100%,\n    runt: 100%,\n    widow: 100%,\n    orphan: 100%,\n  ),\n)",
+    "(\n  (\n    hyphenation: 100%,\n    runt: 100%,\n    widow: 100%,\n    orphan: 100%,\n  ),\n)",
+    "(\n  (\n    hyphenation: 100%,\n    runt: 100%,\n    widow: 100%,\n    orphan: 100%,\n  ),\n)",
+    "== style: par.first-line-indent", "((amount: 1em, all: true),)", "((amount: 1em, all: true),)",
+    "((amount: 1em, all: true),)", "((amount: 1em, all: true),)", "== style: table.columns and its other tracks",
+    "(\n  (1fr, 2fr),\n  (auto,),\n  (left, right),\n  (rgb(\"#ff4136\"), rgb(\"#0074d9\")),\n  (\n    left: 0% + 1pt,\n    top: 0% + 5pt,\n    right: 0% + 1pt,\n    bottom: 0% + 5pt,\n  ),\n  (\n    left: stroke(),\n    top: 1pt,\n    right: stroke(),\n    bottom: stroke(),\n  ),\n)",
+    "(\n  (1fr, 2fr),\n  (auto,),\n  (left, right),\n  (rgb(\"#ff4136\"), rgb(\"#0074d9\")),\n  (\n    left: 0% + 1pt,\n    top: 0% + 5pt,\n    right: 0% + 1pt,\n    bottom: 0% + 5pt,\n  ),\n  (\n    left: stroke(),\n    top: 1pt,\n    right: stroke(),\n    bottom: stroke(),\n  ),\n)",
+    "(\n  (1fr, 2fr),\n  (auto,),\n  (left, right),\n  (rgb(\"#ff4136\"), rgb(\"#0074d9\")),\n  (\n    left: 0% + 1pt,\n    top: 0% + 5pt,\n    right: 0% + 1pt,\n    bottom: 0% + 5pt,\n  ),\n  (\n    left: stroke(),\n    top: 1pt,\n    right: stroke(),\n    bottom: stroke(),\n  ),\n)",
+    "(\n  (1fr, 2fr),\n  (auto,),\n  (left, right),\n  (rgb(\"#ff4136\"), rgb(\"#0074d9\")),\n  (\n    left: 0% + 1pt,\n    top: 0% + 5pt,\n    right: 0% + 1pt,\n    bottom: 0% + 5pt,\n  ),\n  (\n    left: stroke(),\n    top: 1pt,\n    right: stroke(),\n    bottom: stroke(),\n  ),\n)",
+    "== style: table.align", "((left, right), (rgb(\"#ff4136\"), rgb(\"#0074d9\")))",
+    "((left, right), (rgb(\"#ff4136\"), rgb(\"#0074d9\")))", "((left, right), (rgb(\"#ff4136\"), rgb(\"#0074d9\")))",
+    "((left, right), (rgb(\"#ff4136\"), rgb(\"#0074d9\")))", "== style: table.fill",
+    "((rgb(\"#ff4136\"), rgb(\"#0074d9\")),)", "((rgb(\"#ff4136\"), rgb(\"#0074d9\")),)",
+    "((rgb(\"#ff4136\"), rgb(\"#0074d9\")),)", "((rgb(\"#ff4136\"), rgb(\"#0074d9\")),)",
+    "== style: table.inset", "(\n  (\n    left: 0% + 1pt,\n    top: 0% + 5pt,\n    right: 0% + 1pt,\n    bottom: 0% + 5pt,\n  ),\n)",
+    "(\n  (\n    left: 0% + 1pt,\n    top: 0% + 5pt,\n    right: 0% + 1pt,\n    bottom: 0% + 5pt,\n  ),\n)",
+    "(\n  (\n    left: 0% + 1pt,\n    top: 0% + 5pt,\n    right: 0% + 1pt,\n    bottom: 0% + 5pt,\n  ),\n)",
+    "(\n  (\n    left: 0% + 1pt,\n    top: 0% + 5pt,\n    right: 0% + 1pt,\n    bottom: 0% + 5pt,\n  ),\n)",
+    "== style: table.stroke", "(\n  (\n    left: stroke(),\n    top: 1pt,\n    right: stroke(),\n    bottom: stroke(),\n  ),\n)",
+    "(\n  (\n    left: stroke(),\n    top: 1pt,\n    right: stroke(),\n    bottom: stroke(),\n  ),\n)",
+    "(\n  (\n    left: stroke(),\n    top: 1pt,\n    right: stroke(),\n    bottom: stroke(),\n  ),\n)",
+    "(\n  (\n    left: stroke(),\n    top: 1pt,\n    right: stroke(),\n    bottom: stroke(),\n  ),\n)",
+    "== style: table.columns, the default", "((), (), 0% + 5pt, ())", "((), (), 0% + 5pt, ())",
+    "((), (), 0% + 5pt, ())", "((), (), 0% + 5pt, ())", "== style: grid tracks",
+    "(\n  (1fr, 2fr),\n  (auto, 0% + 1em),\n  (0% + 1pt, 0% + 2pt),\n  (0% + 3pt,),\n)",
+    "(\n  (1fr, 2fr),\n  (auto, 0% + 1em),\n  (0% + 1pt, 0% + 2pt),\n  (0% + 3pt,),\n)",
+    "(\n  (1fr, 2fr),\n  (auto, 0% + 1em),\n  (0% + 1pt, 0% + 2pt),\n  (0% + 3pt,),\n)",
+    "(\n  (1fr, 2fr),\n  (auto, 0% + 1em),\n  (0% + 1pt, 0% + 2pt),\n  (0% + 3pt,),\n)",
+    "== style: grid.rows", "((auto, 0% + 1em), (0% + 1pt, 0% + 2pt))", "((auto, 0% + 1em), (0% + 1pt, 0% + 2pt))",
+    "((auto, 0% + 1em), (0% + 1pt, 0% + 2pt))", "((auto, 0% + 1em), (0% + 1pt, 0% + 2pt))",
+    "== style: grid.column-gutter", "((0% + 1pt, 0% + 2pt),)", "((0% + 1pt, 0% + 2pt),)",
+    "((0% + 1pt, 0% + 2pt),)", "((0% + 1pt, 0% + 2pt),)", "== style: page.margin",
+    "(\n  (\n    top: 0% + 56.69pt,\n    bottom: 0% + 56.69pt,\n    left: 0% + 28.35pt,\n    right: 0% + 28.35pt,\n  ),\n)",
+    "(\n  (\n    top: 0% + 56.69pt,\n    bottom: 0% + 56.69pt,\n    left: 0% + 28.35pt,\n    right: 0% + 28.35pt,\n  ),\n)",
+    "(\n  (\n    top: 0% + 56.69pt,\n    bottom: 0% + 56.69pt,\n    left: 0% + 28.35pt,\n    right: 0% + 28.35pt,\n  ),\n)",
+    "(\n  (\n    top: 0% + 56.69pt,\n    bottom: 0% + 56.69pt,\n    left: 0% + 28.35pt,\n    right: 0% + 28.35pt,\n  ),\n)",
+    "== style: page.margin, the default", "(auto, 1)", "(auto, 1)", "(auto, 1)",
+    "(auto, 1)", "== style: rect sides", "(\n  (top: 1pt),\n  (\n    left: 0% + 1pt,\n    top: 0% + 5pt,\n    right: 0% + 1pt,\n    bottom: 0% + 5pt,\n  ),\n  (top-left: 0% + 1pt),\n  (top: 0% + 2pt, bottom: 0% + 2pt),\n)",
+    "(\n  (top: 1pt),\n  (\n    left: 0% + 1pt,\n    top: 0% + 5pt,\n    right: 0% + 1pt,\n    bottom: 0% + 5pt,\n  ),\n  (top-left: 0% + 1pt),\n  (top: 0% + 2pt, bottom: 0% + 2pt),\n)",
+    "(\n  (top: 1pt),\n  (\n    left: 0% + 1pt,\n    top: 0% + 5pt,\n    right: 0% + 1pt,\n    bottom: 0% + 5pt,\n  ),\n  (top-left: 0% + 1pt),\n  (top: 0% + 2pt, bottom: 0% + 2pt),\n)",
+    "(\n  (top: 1pt),\n  (\n    left: 0% + 1pt,\n    top: 0% + 5pt,\n    right: 0% + 1pt,\n    bottom: 0% + 5pt,\n  ),\n  (top-left: 0% + 1pt),\n  (top: 0% + 2pt, bottom: 0% + 2pt),\n)",
+    "== style: rect.inset", "(\n  (\n    left: 0% + 1pt,\n    top: 0% + 5pt,\n    right: 0% + 1pt,\n    bottom: 0% + 5pt,\n  ),\n  (top-left: 0% + 1pt),\n  (top: 0% + 2pt, bottom: 0% + 2pt),\n)",
+    "(\n  (\n    left: 0% + 1pt,\n    top: 0% + 5pt,\n    right: 0% + 1pt,\n    bottom: 0% + 5pt,\n  ),\n  (top-left: 0% + 1pt),\n  (top: 0% + 2pt, bottom: 0% + 2pt),\n)",
+    "(\n  (\n    left: 0% + 1pt,\n    top: 0% + 5pt,\n    right: 0% + 1pt,\n    bottom: 0% + 5pt,\n  ),\n  (top-left: 0% + 1pt),\n  (top: 0% + 2pt, bottom: 0% + 2pt),\n)",
+    "(\n  (\n    left: 0% + 1pt,\n    top: 0% + 5pt,\n    right: 0% + 1pt,\n    bottom: 0% + 5pt,\n  ),\n  (top-left: 0% + 1pt),\n  (top: 0% + 2pt, bottom: 0% + 2pt),\n)",
+    "== style: rect.radius", "((top-left: 0% + 1pt),)", "((top-left: 0% + 1pt),)",
+    "((top-left: 0% + 1pt),)", "((top-left: 0% + 1pt),)", "== style: rect.inset, the default",
+    "(0% + 5pt, (:), (:))", "(0% + 5pt, (:), (:))", "(0% + 5pt, (:), (:))", "(0% + 5pt, (:), (:))",
+    "== style: block and box sides", "(\n  (left: 0% + 1pt, right: 0% + 1pt),\n  (top: 0% + 1pt, bottom: 0% + 1pt),\n)",
+    "(\n  (left: 0% + 1pt, right: 0% + 1pt),\n  (top: 0% + 1pt, bottom: 0% + 1pt),\n)",
+    "(\n  (left: 0% + 1pt, right: 0% + 1pt),\n  (top: 0% + 1pt, bottom: 0% + 1pt),\n)",
+    "(\n  (left: 0% + 1pt, right: 0% + 1pt),\n  (top: 0% + 1pt, bottom: 0% + 1pt),\n)",
+    "== style: box.inset", "((top: 0% + 1pt, bottom: 0% + 1pt),)", "((top: 0% + 1pt, bottom: 0% + 1pt),)",
+    "((top: 0% + 1pt, bottom: 0% + 1pt),)", "((top: 0% + 1pt, bottom: 0% + 1pt),)",
+    "== style: table.cell.inset", "((left: 0% + 1pt, right: 0% + 1pt),)", "((left: 0% + 1pt, right: 0% + 1pt),)",
+    "((left: 0% + 1pt, right: 0% + 1pt),)", "((left: 0% + 1pt, right: 0% + 1pt),)",
+    "== style: list.marker", "(([a], [b]),)", "(([a], [b]),)", "(([a], [b]),)", "(([a], [b]),)",
+    "== style: list.marker, the default", "(([\u{2022}], [\u{2023}], [\u{2013}]),)",
+    "(([\u{2022}], [\u{2023}], [\u{2013}]),)", "(([\u{2022}], [\u{2023}], [\u{2013}]),)",
+    "(([\u{2022}], [\u{2023}], [\u{2013}]),)", "== style: smartquote.quotes", "((double: (\"c\", \"d\"), single: (\"a\", \"b\")),)",
+    "((double: (\"c\", \"d\"), single: (\"a\", \"b\")),)", "((double: (\"c\", \"d\"), single: (\"a\", \"b\")),)",
+    "((double: (\"c\", \"d\"), single: (\"a\", \"b\")),)", "== style: math.mat.delim",
+    "((\"[\", \"]\"),)", "((\"[\", \"]\"),)", "((\"[\", \"]\"),)", "((\"[\", \"]\"),)",
+    "== style: math.mat.augment", "((hline: (1, 2), vline: (1,), stroke: auto),)",
+    "((hline: (1, 2), vline: (1,), stroke: auto),)", "((hline: (1, 2), vline: (1,), stroke: auto),)",
+    "((hline: (1, 2), vline: (1,), stroke: auto),)", "== style: raw.syntaxes, the default",
+    "((),)", "((),)", "((),)", "((),)", "== style: enum.numbering and start", "(\"(a)\", 3)",
+    "(\"(a)\", 3)", "(\"(a)\", 3)", "(\"(a)\", 3)", "== style: the reviewer's case",
+    "(\n  (\n    (\"new computer modern\", \"new computer modern\"),\n    (\"libertinus serif\", \"new computer modern\"),\n  ),\n)",
+    "(\n  (\n    (\"new computer modern\", \"new computer modern\"),\n    (\"libertinus serif\", \"new computer modern\"),\n  ),\n)",
+    "(\n  (\n    (\"new computer modern\", \"new computer modern\"),\n    (\"libertinus serif\", \"new computer modern\"),\n  ),\n)",
+    "(\n  (\n    (\"new computer modern\", \"new computer modern\"),\n    (\"libertinus serif\", \"new computer modern\"),\n  ),\n)",
+  ]
+  assert_eq(oracle_metadata(source), expected)
+}
+
+///|
+test "oracle: sharing: functions" {
+  let source =
+    #|#metadata("== function: the default of a named parameter")
+    #|#[
+    #|#let f(x: ((1, 2), (k: (3,)))) = x
+    #|#{
+    #|  let _ = (array.pop)(f())
+    #|  let _ = (array.push)(f(), 0)
+    #|  let _ = (array.pop)(f().at(0))
+    #|  let _ = (array.push)(f().at(0), 0)
+    #|  let _ = (array.pop)(f().first())
+    #|  let _ = (array.push)(f().first(), 0)
+    #|  let _ = (dictionary.insert)(f().at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(f().at(1), "k")
+    #|  let _ = (dictionary.insert)(f().last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(f().last(), "k")
+    #|  let _ = (array.pop)(f().at(1).k)
+    #|  let _ = (array.push)(f().at(1).k, 0)
+    #|  let _ = (array.pop)(f().last().at("k"))
+    #|  let _ = (array.push)(f().last().at("k"), 0)
+    #|  let _ = (array.pop)(f().at(1).values().first())
+    #|  let _ = (array.push)(f().at(1).values().first(), 0)
+    #|  let _ = (array.pop)(f().slice(0, 1).first())
+    #|  let _ = (array.push)(f().slice(0, 1).first(), 0)
+    #|  metadata(repr((f(),)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(f()); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(f()); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(f()); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(f()); pv.at(0).at(0).push(0) }
+    #|  { let pv = (); pv.push(f()); let _ = pv.at(0).first().pop() }
+    #|  { let pv = (); pv.push(f()); pv.at(0).first().push(0) }
+    #|  { let pv = (); pv.push(f()); pv.at(0).at(1).insert("zz", 0) }
+    #|  { let pv = (); pv.push(f()); let _ = pv.at(0).at(1).remove("k") }
+    #|  { let pv = (); pv.push(f()); pv.at(0).last().insert("zz", 0) }
+    #|  { let pv = (); pv.push(f()); let _ = pv.at(0).last().remove("k") }
+    #|  { let pv = (); pv.push(f()); let _ = pv.at(0).at(1).k.pop() }
+    #|  { let pv = (); pv.push(f()); pv.at(0).at(1).k.push(0) }
+    #|  { let pv = (); pv.push(f()); let _ = pv.at(0).last().at("k").pop() }
+    #|  { let pv = (); pv.push(f()); pv.at(0).last().at("k").push(0) }
+    #|  metadata(repr((f(),)))
+    #|}
+    #|#let get() = f()
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  let _ = (array.pop)(get().first())
+    #|  let _ = (array.push)(get().first(), 0)
+    #|  let _ = (dictionary.insert)(get().at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().at(1), "k")
+    #|  let _ = (dictionary.insert)(get().last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().last(), "k")
+    #|  let _ = (array.pop)(get().at(1).k)
+    #|  let _ = (array.push)(get().at(1).k, 0)
+    #|  let _ = (array.pop)(get().last().at("k"))
+    #|  let _ = (array.push)(get().last().at("k"), 0)
+    #|  let _ = (array.pop)(get().at(1).values().first())
+    #|  let _ = (array.push)(get().at(1).values().first(), 0)
+    #|  let _ = (array.pop)(get().slice(0, 1).first())
+    #|  let _ = (array.push)(get().slice(0, 1).first(), 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#metadata(repr((f(),)))
+    #|]
+    #|#metadata("== function: the default of a named parameter, dictionary")
+    #|#[
+    #|#let f(x: (a: (1, 2), d: (k: (3,)))) = x
+    #|#{
+    #|  let _ = (dictionary.insert)(f(), "zz", 0)
+    #|  let _ = (dictionary.remove)(f(), "a")
+    #|  let _ = (array.pop)(f().a)
+    #|  let _ = (array.push)(f().a, 0)
+    #|  let _ = (array.pop)(f().at("a"))
+    #|  let _ = (array.push)(f().at("a"), 0)
+    #|  let _ = (dictionary.insert)(f().d, "zz", 0)
+    #|  let _ = (dictionary.remove)(f().d, "k")
+    #|  let _ = (array.pop)(f().d.k)
+    #|  let _ = (array.push)(f().d.k, 0)
+    #|  let _ = (array.pop)(f().values().first())
+    #|  let _ = (array.push)(f().values().first(), 0)
+    #|  let _ = (array.pop)(f().pairs().first().last())
+    #|  let _ = (array.push)(f().pairs().first().last(), 0)
+    #|  let _ = (array.pop)(f().values().last().k)
+    #|  let _ = (array.push)(f().values().last().k, 0)
+    #|  metadata(repr((f(),)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(f()); pv.at(0).insert("zz", 0) }
+    #|  { let pv = (); pv.push(f()); let _ = pv.at(0).remove("a") }
+    #|  { let pv = (); pv.push(f()); let _ = pv.at(0).a.pop() }
+    #|  { let pv = (); pv.push(f()); pv.at(0).a.push(0) }
+    #|  { let pv = (); pv.push(f()); let _ = pv.at(0).at("a").pop() }
+    #|  { let pv = (); pv.push(f()); pv.at(0).at("a").push(0) }
+    #|  { let pv = (); pv.push(f()); pv.at(0).d.insert("zz", 0) }
+    #|  { let pv = (); pv.push(f()); let _ = pv.at(0).d.remove("k") }
+    #|  { let pv = (); pv.push(f()); let _ = pv.at(0).d.k.pop() }
+    #|  { let pv = (); pv.push(f()); pv.at(0).d.k.push(0) }
+    #|  metadata(repr((f(),)))
+    #|}
+    #|#let get() = f()
+    #|#{
+    #|  let _ = (dictionary.insert)(get(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get(), "a")
+    #|  let _ = (array.pop)(get().a)
+    #|  let _ = (array.push)(get().a, 0)
+    #|  let _ = (array.pop)(get().at("a"))
+    #|  let _ = (array.push)(get().at("a"), 0)
+    #|  let _ = (dictionary.insert)(get().d, "zz", 0)
+    #|  let _ = (dictionary.remove)(get().d, "k")
+    #|  let _ = (array.pop)(get().d.k)
+    #|  let _ = (array.push)(get().d.k, 0)
+    #|  let _ = (array.pop)(get().values().first())
+    #|  let _ = (array.push)(get().values().first(), 0)
+    #|  let _ = (array.pop)(get().pairs().first().last())
+    #|  let _ = (array.push)(get().pairs().first().last(), 0)
+    #|  let _ = (array.pop)(get().values().last().k)
+    #|  let _ = (array.push)(get().values().last().k, 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#metadata(repr((f(),)))
+    #|]
+    #|#metadata("== function: a pre-applied positional argument")
+    #|#[
+    #|#let f(x) = x
+    #|#let g = f.with(((1, 2), (k: (3,))))
+    #|#{
+    #|  let _ = (array.pop)(g())
+    #|  let _ = (array.push)(g(), 0)
+    #|  let _ = (array.pop)(g().at(0))
+    #|  let _ = (array.push)(g().at(0), 0)
+    #|  let _ = (array.pop)(g().first())
+    #|  let _ = (array.push)(g().first(), 0)
+    #|  let _ = (dictionary.insert)(g().at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(g().at(1), "k")
+    #|  let _ = (dictionary.insert)(g().last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(g().last(), "k")
+    #|  let _ = (array.pop)(g().at(1).k)
+    #|  let _ = (array.push)(g().at(1).k, 0)
+    #|  let _ = (array.pop)(g().last().at("k"))
+    #|  let _ = (array.push)(g().last().at("k"), 0)
+    #|  let _ = (array.pop)(g().at(1).values().first())
+    #|  let _ = (array.push)(g().at(1).values().first(), 0)
+    #|  let _ = (array.pop)(g().slice(0, 1).first())
+    #|  let _ = (array.push)(g().slice(0, 1).first(), 0)
+    #|  metadata(repr((g(),)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(g()); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(g()); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(g()); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(g()); pv.at(0).at(0).push(0) }
+    #|  { let pv = (); pv.push(g()); let _ = pv.at(0).first().pop() }
+    #|  { let pv = (); pv.push(g()); pv.at(0).first().push(0) }
+    #|  { let pv = (); pv.push(g()); pv.at(0).at(1).insert("zz", 0) }
+    #|  { let pv = (); pv.push(g()); let _ = pv.at(0).at(1).remove("k") }
+    #|  { let pv = (); pv.push(g()); pv.at(0).last().insert("zz", 0) }
+    #|  { let pv = (); pv.push(g()); let _ = pv.at(0).last().remove("k") }
+    #|  { let pv = (); pv.push(g()); let _ = pv.at(0).at(1).k.pop() }
+    #|  { let pv = (); pv.push(g()); pv.at(0).at(1).k.push(0) }
+    #|  { let pv = (); pv.push(g()); let _ = pv.at(0).last().at("k").pop() }
+    #|  { let pv = (); pv.push(g()); pv.at(0).last().at("k").push(0) }
+    #|  metadata(repr((g(),)))
+    #|}
+    #|#let get() = g()
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  let _ = (array.pop)(get().first())
+    #|  let _ = (array.push)(get().first(), 0)
+    #|  let _ = (dictionary.insert)(get().at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().at(1), "k")
+    #|  let _ = (dictionary.insert)(get().last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().last(), "k")
+    #|  let _ = (array.pop)(get().at(1).k)
+    #|  let _ = (array.push)(get().at(1).k, 0)
+    #|  let _ = (array.pop)(get().last().at("k"))
+    #|  let _ = (array.push)(get().last().at("k"), 0)
+    #|  let _ = (array.pop)(get().at(1).values().first())
+    #|  let _ = (array.push)(get().at(1).values().first(), 0)
+    #|  let _ = (array.pop)(get().slice(0, 1).first())
+    #|  let _ = (array.push)(get().slice(0, 1).first(), 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#metadata(repr((g(),)))
+    #|]
+    #|#metadata("== function: a pre-applied named argument")
+    #|#[
+    #|#let f(x: none) = x
+    #|#let g = f.with(x: (a: (1, 2), d: (k: (3,))))
+    #|#{
+    #|  let _ = (dictionary.insert)(g(), "zz", 0)
+    #|  let _ = (dictionary.remove)(g(), "a")
+    #|  let _ = (array.pop)(g().a)
+    #|  let _ = (array.push)(g().a, 0)
+    #|  let _ = (array.pop)(g().at("a"))
+    #|  let _ = (array.push)(g().at("a"), 0)
+    #|  let _ = (dictionary.insert)(g().d, "zz", 0)
+    #|  let _ = (dictionary.remove)(g().d, "k")
+    #|  let _ = (array.pop)(g().d.k)
+    #|  let _ = (array.push)(g().d.k, 0)
+    #|  let _ = (array.pop)(g().values().first())
+    #|  let _ = (array.push)(g().values().first(), 0)
+    #|  let _ = (array.pop)(g().pairs().first().last())
+    #|  let _ = (array.push)(g().pairs().first().last(), 0)
+    #|  let _ = (array.pop)(g().values().last().k)
+    #|  let _ = (array.push)(g().values().last().k, 0)
+    #|  metadata(repr((g(),)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(g()); pv.at(0).insert("zz", 0) }
+    #|  { let pv = (); pv.push(g()); let _ = pv.at(0).remove("a") }
+    #|  { let pv = (); pv.push(g()); let _ = pv.at(0).a.pop() }
+    #|  { let pv = (); pv.push(g()); pv.at(0).a.push(0) }
+    #|  { let pv = (); pv.push(g()); let _ = pv.at(0).at("a").pop() }
+    #|  { let pv = (); pv.push(g()); pv.at(0).at("a").push(0) }
+    #|  { let pv = (); pv.push(g()); pv.at(0).d.insert("zz", 0) }
+    #|  { let pv = (); pv.push(g()); let _ = pv.at(0).d.remove("k") }
+    #|  { let pv = (); pv.push(g()); let _ = pv.at(0).d.k.pop() }
+    #|  { let pv = (); pv.push(g()); pv.at(0).d.k.push(0) }
+    #|  metadata(repr((g(),)))
+    #|}
+    #|#let get() = g()
+    #|#{
+    #|  let _ = (dictionary.insert)(get(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get(), "a")
+    #|  let _ = (array.pop)(get().a)
+    #|  let _ = (array.push)(get().a, 0)
+    #|  let _ = (array.pop)(get().at("a"))
+    #|  let _ = (array.push)(get().at("a"), 0)
+    #|  let _ = (dictionary.insert)(get().d, "zz", 0)
+    #|  let _ = (dictionary.remove)(get().d, "k")
+    #|  let _ = (array.pop)(get().d.k)
+    #|  let _ = (array.push)(get().d.k, 0)
+    #|  let _ = (array.pop)(get().values().first())
+    #|  let _ = (array.push)(get().values().first(), 0)
+    #|  let _ = (array.pop)(get().pairs().first().last())
+    #|  let _ = (array.push)(get().pairs().first().last(), 0)
+    #|  let _ = (array.pop)(get().values().last().k)
+    #|  let _ = (array.push)(get().values().last().k, 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#metadata(repr((g(),)))
+    #|]
+    #|#metadata("== function: a pre-applied argument of a native function")
+    #|#[
+    #|#let g = array.rev.with(((1, 2), (k: (3,))))
+    #|#let h = array.first.with(((1, 2), (k: (3,))))
+    #|#let k = dictionary.at.with((a: (1, 2), d: (k: (3,))))
+    #|#{
+    #|  let _ = (array.pop)(h())
+    #|  let _ = (array.push)(h(), 0)
+    #|  metadata(repr((h(), g(), k("a"),)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(h()); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(h()); pv.at(0).push(0) }
+    #|  metadata(repr((h(), g(), k("a"),)))
+    #|}
+    #|#let get() = h()
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  metadata(repr((get(), g(), k("a"),)))
+    #|}
+    #|#metadata(repr((h(), g(), k("a"),)))
+    #|]
+    #|#metadata("== function: a pre-applied argument through a sink")
+    #|#[
+    #|#let f(..a) = a.pos()
+    #|#let g = f.with(((1, 2), (k: (3,))))
+    #|#{
+    #|  let _ = (array.pop)(g())
+    #|  let _ = (array.push)(g(), 0)
+    #|  let _ = (array.pop)(g().at(0))
+    #|  let _ = (array.push)(g().at(0), 0)
+    #|  let _ = (array.pop)(g().at(0).at(0))
+    #|  let _ = (array.push)(g().at(0).at(0), 0)
+    #|  let _ = (array.pop)(g().at(0).first())
+    #|  let _ = (array.push)(g().at(0).first(), 0)
+    #|  let _ = (dictionary.insert)(g().at(0).at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(g().at(0).at(1), "k")
+    #|  let _ = (dictionary.insert)(g().at(0).last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(g().at(0).last(), "k")
+    #|  let _ = (array.pop)(g().at(0).at(1).k)
+    #|  let _ = (array.push)(g().at(0).at(1).k, 0)
+    #|  let _ = (array.pop)(g().at(0).last().at("k"))
+    #|  let _ = (array.push)(g().at(0).last().at("k"), 0)
+    #|  let _ = (array.pop)(g().at(0).at(1).values().first())
+    #|  let _ = (array.push)(g().at(0).at(1).values().first(), 0)
+    #|  let _ = (array.pop)(g().at(0).slice(0, 1).first())
+    #|  let _ = (array.push)(g().at(0).slice(0, 1).first(), 0)
+    #|  metadata(repr((g(),)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(g()); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(g()); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(g()); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(g()); pv.at(0).at(0).push(0) }
+    #|  { let pv = (); pv.push(g()); let _ = pv.at(0).at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(g()); pv.at(0).at(0).at(0).push(0) }
+    #|  { let pv = (); pv.push(g()); let _ = pv.at(0).at(0).first().pop() }
+    #|  { let pv = (); pv.push(g()); pv.at(0).at(0).first().push(0) }
+    #|  { let pv = (); pv.push(g()); pv.at(0).at(0).at(1).insert("zz", 0) }
+    #|  { let pv = (); pv.push(g()); let _ = pv.at(0).at(0).at(1).remove("k") }
+    #|  { let pv = (); pv.push(g()); pv.at(0).at(0).last().insert("zz", 0) }
+    #|  { let pv = (); pv.push(g()); let _ = pv.at(0).at(0).last().remove("k") }
+    #|  { let pv = (); pv.push(g()); let _ = pv.at(0).at(0).at(1).k.pop() }
+    #|  { let pv = (); pv.push(g()); pv.at(0).at(0).at(1).k.push(0) }
+    #|  { let pv = (); pv.push(g()); let _ = pv.at(0).at(0).last().at("k").pop() }
+    #|  { let pv = (); pv.push(g()); pv.at(0).at(0).last().at("k").push(0) }
+    #|  metadata(repr((g(),)))
+    #|}
+    #|#let get() = g()
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  let _ = (array.pop)(get().at(0).at(0))
+    #|  let _ = (array.push)(get().at(0).at(0), 0)
+    #|  let _ = (array.pop)(get().at(0).first())
+    #|  let _ = (array.push)(get().at(0).first(), 0)
+    #|  let _ = (dictionary.insert)(get().at(0).at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().at(0).at(1), "k")
+    #|  let _ = (dictionary.insert)(get().at(0).last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().at(0).last(), "k")
+    #|  let _ = (array.pop)(get().at(0).at(1).k)
+    #|  let _ = (array.push)(get().at(0).at(1).k, 0)
+    #|  let _ = (array.pop)(get().at(0).last().at("k"))
+    #|  let _ = (array.push)(get().at(0).last().at("k"), 0)
+    #|  let _ = (array.pop)(get().at(0).at(1).values().first())
+    #|  let _ = (array.push)(get().at(0).at(1).values().first(), 0)
+    #|  let _ = (array.pop)(get().at(0).slice(0, 1).first())
+    #|  let _ = (array.push)(get().at(0).slice(0, 1).first(), 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#metadata(repr((g(),)))
+    #|]
+    #|#metadata("== function: a captured variable")
+    #|#[
+    #|#let xs = ((1, 2), (k: (3,)))
+    #|#let f() = xs
+    #|#{
+    #|  let _ = (array.pop)(f())
+    #|  let _ = (array.push)(f(), 0)
+    #|  let _ = (array.pop)(f().at(0))
+    #|  let _ = (array.push)(f().at(0), 0)
+    #|  let _ = (array.pop)(f().first())
+    #|  let _ = (array.push)(f().first(), 0)
+    #|  let _ = (dictionary.insert)(f().at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(f().at(1), "k")
+    #|  let _ = (dictionary.insert)(f().last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(f().last(), "k")
+    #|  let _ = (array.pop)(f().at(1).k)
+    #|  let _ = (array.push)(f().at(1).k, 0)
+    #|  let _ = (array.pop)(f().last().at("k"))
+    #|  let _ = (array.push)(f().last().at("k"), 0)
+    #|  let _ = (array.pop)(f().at(1).values().first())
+    #|  let _ = (array.push)(f().at(1).values().first(), 0)
+    #|  let _ = (array.pop)(f().slice(0, 1).first())
+    #|  let _ = (array.push)(f().slice(0, 1).first(), 0)
+    #|  metadata(repr((f(), xs,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(f()); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(f()); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(f()); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(f()); pv.at(0).at(0).push(0) }
+    #|  { let pv = (); pv.push(f()); let _ = pv.at(0).first().pop() }
+    #|  { let pv = (); pv.push(f()); pv.at(0).first().push(0) }
+    #|  { let pv = (); pv.push(f()); pv.at(0).at(1).insert("zz", 0) }
+    #|  { let pv = (); pv.push(f()); let _ = pv.at(0).at(1).remove("k") }
+    #|  { let pv = (); pv.push(f()); pv.at(0).last().insert("zz", 0) }
+    #|  { let pv = (); pv.push(f()); let _ = pv.at(0).last().remove("k") }
+    #|  { let pv = (); pv.push(f()); let _ = pv.at(0).at(1).k.pop() }
+    #|  { let pv = (); pv.push(f()); pv.at(0).at(1).k.push(0) }
+    #|  { let pv = (); pv.push(f()); let _ = pv.at(0).last().at("k").pop() }
+    #|  { let pv = (); pv.push(f()); pv.at(0).last().at("k").push(0) }
+    #|  metadata(repr((f(), xs,)))
+    #|}
+    #|#let get() = f()
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  let _ = (array.pop)(get().first())
+    #|  let _ = (array.push)(get().first(), 0)
+    #|  let _ = (dictionary.insert)(get().at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().at(1), "k")
+    #|  let _ = (dictionary.insert)(get().last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().last(), "k")
+    #|  let _ = (array.pop)(get().at(1).k)
+    #|  let _ = (array.push)(get().at(1).k, 0)
+    #|  let _ = (array.pop)(get().last().at("k"))
+    #|  let _ = (array.push)(get().last().at("k"), 0)
+    #|  let _ = (array.pop)(get().at(1).values().first())
+    #|  let _ = (array.push)(get().at(1).values().first(), 0)
+    #|  let _ = (array.pop)(get().slice(0, 1).first())
+    #|  let _ = (array.push)(get().slice(0, 1).first(), 0)
+    #|  metadata(repr((get(), xs,)))
+    #|}
+    #|#metadata(repr((f(), xs,)))
+    #|]
+    #|#metadata("== function: a captured variable, dictionary")
+    #|#[
+    #|#let xs = (a: (1, 2), d: (k: (3,)))
+    #|#let f() = xs
+    #|#{
+    #|  let _ = (dictionary.insert)(f(), "zz", 0)
+    #|  let _ = (dictionary.remove)(f(), "a")
+    #|  let _ = (array.pop)(f().a)
+    #|  let _ = (array.push)(f().a, 0)
+    #|  let _ = (array.pop)(f().at("a"))
+    #|  let _ = (array.push)(f().at("a"), 0)
+    #|  let _ = (dictionary.insert)(f().d, "zz", 0)
+    #|  let _ = (dictionary.remove)(f().d, "k")
+    #|  let _ = (array.pop)(f().d.k)
+    #|  let _ = (array.push)(f().d.k, 0)
+    #|  let _ = (array.pop)(f().values().first())
+    #|  let _ = (array.push)(f().values().first(), 0)
+    #|  let _ = (array.pop)(f().pairs().first().last())
+    #|  let _ = (array.push)(f().pairs().first().last(), 0)
+    #|  let _ = (array.pop)(f().values().last().k)
+    #|  let _ = (array.push)(f().values().last().k, 0)
+    #|  metadata(repr((f(), xs,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(f()); pv.at(0).insert("zz", 0) }
+    #|  { let pv = (); pv.push(f()); let _ = pv.at(0).remove("a") }
+    #|  { let pv = (); pv.push(f()); let _ = pv.at(0).a.pop() }
+    #|  { let pv = (); pv.push(f()); pv.at(0).a.push(0) }
+    #|  { let pv = (); pv.push(f()); let _ = pv.at(0).at("a").pop() }
+    #|  { let pv = (); pv.push(f()); pv.at(0).at("a").push(0) }
+    #|  { let pv = (); pv.push(f()); pv.at(0).d.insert("zz", 0) }
+    #|  { let pv = (); pv.push(f()); let _ = pv.at(0).d.remove("k") }
+    #|  { let pv = (); pv.push(f()); let _ = pv.at(0).d.k.pop() }
+    #|  { let pv = (); pv.push(f()); pv.at(0).d.k.push(0) }
+    #|  metadata(repr((f(), xs,)))
+    #|}
+    #|#let get() = f()
+    #|#{
+    #|  let _ = (dictionary.insert)(get(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get(), "a")
+    #|  let _ = (array.pop)(get().a)
+    #|  let _ = (array.push)(get().a, 0)
+    #|  let _ = (array.pop)(get().at("a"))
+    #|  let _ = (array.push)(get().at("a"), 0)
+    #|  let _ = (dictionary.insert)(get().d, "zz", 0)
+    #|  let _ = (dictionary.remove)(get().d, "k")
+    #|  let _ = (array.pop)(get().d.k)
+    #|  let _ = (array.push)(get().d.k, 0)
+    #|  let _ = (array.pop)(get().values().first())
+    #|  let _ = (array.push)(get().values().first(), 0)
+    #|  let _ = (array.pop)(get().pairs().first().last())
+    #|  let _ = (array.push)(get().pairs().first().last(), 0)
+    #|  let _ = (array.pop)(get().values().last().k)
+    #|  let _ = (array.push)(get().values().last().k, 0)
+    #|  metadata(repr((get(), xs,)))
+    #|}
+    #|#metadata(repr((f(), xs,)))
+    #|]
+    #|#metadata("== function: a parameter captured by a returned closure")
+    #|#[
+    #|#let mk(v) = () => v
+    #|#let f = mk(((1, 2), (k: (3,))))
+    #|#{
+    #|  let _ = (array.pop)(f())
+    #|  let _ = (array.push)(f(), 0)
+    #|  let _ = (array.pop)(f().at(0))
+    #|  let _ = (array.push)(f().at(0), 0)
+    #|  let _ = (array.pop)(f().first())
+    #|  let _ = (array.push)(f().first(), 0)
+    #|  let _ = (dictionary.insert)(f().at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(f().at(1), "k")
+    #|  let _ = (dictionary.insert)(f().last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(f().last(), "k")
+    #|  let _ = (array.pop)(f().at(1).k)
+    #|  let _ = (array.push)(f().at(1).k, 0)
+    #|  let _ = (array.pop)(f().last().at("k"))
+    #|  let _ = (array.push)(f().last().at("k"), 0)
+    #|  let _ = (array.pop)(f().at(1).values().first())
+    #|  let _ = (array.push)(f().at(1).values().first(), 0)
+    #|  let _ = (array.pop)(f().slice(0, 1).first())
+    #|  let _ = (array.push)(f().slice(0, 1).first(), 0)
+    #|  metadata(repr((f(),)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(f()); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(f()); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(f()); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(f()); pv.at(0).at(0).push(0) }
+    #|  { let pv = (); pv.push(f()); let _ = pv.at(0).first().pop() }
+    #|  { let pv = (); pv.push(f()); pv.at(0).first().push(0) }
+    #|  { let pv = (); pv.push(f()); pv.at(0).at(1).insert("zz", 0) }
+    #|  { let pv = (); pv.push(f()); let _ = pv.at(0).at(1).remove("k") }
+    #|  { let pv = (); pv.push(f()); pv.at(0).last().insert("zz", 0) }
+    #|  { let pv = (); pv.push(f()); let _ = pv.at(0).last().remove("k") }
+    #|  { let pv = (); pv.push(f()); let _ = pv.at(0).at(1).k.pop() }
+    #|  { let pv = (); pv.push(f()); pv.at(0).at(1).k.push(0) }
+    #|  { let pv = (); pv.push(f()); let _ = pv.at(0).last().at("k").pop() }
+    #|  { let pv = (); pv.push(f()); pv.at(0).last().at("k").push(0) }
+    #|  metadata(repr((f(),)))
+    #|}
+    #|#let get() = f()
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  let _ = (array.pop)(get().first())
+    #|  let _ = (array.push)(get().first(), 0)
+    #|  let _ = (dictionary.insert)(get().at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().at(1), "k")
+    #|  let _ = (dictionary.insert)(get().last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().last(), "k")
+    #|  let _ = (array.pop)(get().at(1).k)
+    #|  let _ = (array.push)(get().at(1).k, 0)
+    #|  let _ = (array.pop)(get().last().at("k"))
+    #|  let _ = (array.push)(get().last().at("k"), 0)
+    #|  let _ = (array.pop)(get().at(1).values().first())
+    #|  let _ = (array.push)(get().at(1).values().first(), 0)
+    #|  let _ = (array.pop)(get().slice(0, 1).first())
+    #|  let _ = (array.push)(get().slice(0, 1).first(), 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#metadata(repr((f(),)))
+    #|]
+    #|#metadata("== function: a literal built by a closure called twice")
+    #|#[
+    #|#let load() = ((1, 2), (k: (3,)))
+    #|#{
+    #|  let _ = (array.pop)(load())
+    #|  let _ = (array.push)(load(), 0)
+    #|  let _ = (array.pop)(load().at(0))
+    #|  let _ = (array.push)(load().at(0), 0)
+    #|  let _ = (array.pop)(load().first())
+    #|  let _ = (array.push)(load().first(), 0)
+    #|  let _ = (dictionary.insert)(load().at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(load().at(1), "k")
+    #|  let _ = (dictionary.insert)(load().last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(load().last(), "k")
+    #|  let _ = (array.pop)(load().at(1).k)
+    #|  let _ = (array.push)(load().at(1).k, 0)
+    #|  let _ = (array.pop)(load().last().at("k"))
+    #|  let _ = (array.push)(load().last().at("k"), 0)
+    #|  let _ = (array.pop)(load().at(1).values().first())
+    #|  let _ = (array.push)(load().at(1).values().first(), 0)
+    #|  let _ = (array.pop)(load().slice(0, 1).first())
+    #|  let _ = (array.push)(load().slice(0, 1).first(), 0)
+    #|  metadata(repr((load(),)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(load()); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(load()); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(load()); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(load()); pv.at(0).at(0).push(0) }
+    #|  { let pv = (); pv.push(load()); let _ = pv.at(0).first().pop() }
+    #|  { let pv = (); pv.push(load()); pv.at(0).first().push(0) }
+    #|  { let pv = (); pv.push(load()); pv.at(0).at(1).insert("zz", 0) }
+    #|  { let pv = (); pv.push(load()); let _ = pv.at(0).at(1).remove("k") }
+    #|  { let pv = (); pv.push(load()); pv.at(0).last().insert("zz", 0) }
+    #|  { let pv = (); pv.push(load()); let _ = pv.at(0).last().remove("k") }
+    #|  { let pv = (); pv.push(load()); let _ = pv.at(0).at(1).k.pop() }
+    #|  { let pv = (); pv.push(load()); pv.at(0).at(1).k.push(0) }
+    #|  { let pv = (); pv.push(load()); let _ = pv.at(0).last().at("k").pop() }
+    #|  { let pv = (); pv.push(load()); pv.at(0).last().at("k").push(0) }
+    #|  metadata(repr((load(),)))
+    #|}
+    #|#let get() = load()
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  let _ = (array.pop)(get().first())
+    #|  let _ = (array.push)(get().first(), 0)
+    #|  let _ = (dictionary.insert)(get().at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().at(1), "k")
+    #|  let _ = (dictionary.insert)(get().last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().last(), "k")
+    #|  let _ = (array.pop)(get().at(1).k)
+    #|  let _ = (array.push)(get().at(1).k, 0)
+    #|  let _ = (array.pop)(get().last().at("k"))
+    #|  let _ = (array.push)(get().last().at("k"), 0)
+    #|  let _ = (array.pop)(get().at(1).values().first())
+    #|  let _ = (array.push)(get().at(1).values().first(), 0)
+    #|  let _ = (array.pop)(get().slice(0, 1).first())
+    #|  let _ = (array.push)(get().slice(0, 1).first(), 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#metadata(repr((load(),)))
+    #|]
+    #|#metadata("== function: a dictionary built by a closure called twice")
+    #|#[
+    #|#let load() = (a: (1, 2), d: (k: (3,)))
+    #|#{
+    #|  let _ = (dictionary.insert)(load(), "zz", 0)
+    #|  let _ = (dictionary.remove)(load(), "a")
+    #|  let _ = (array.pop)(load().a)
+    #|  let _ = (array.push)(load().a, 0)
+    #|  let _ = (array.pop)(load().at("a"))
+    #|  let _ = (array.push)(load().at("a"), 0)
+    #|  let _ = (dictionary.insert)(load().d, "zz", 0)
+    #|  let _ = (dictionary.remove)(load().d, "k")
+    #|  let _ = (array.pop)(load().d.k)
+    #|  let _ = (array.push)(load().d.k, 0)
+    #|  let _ = (array.pop)(load().values().first())
+    #|  let _ = (array.push)(load().values().first(), 0)
+    #|  let _ = (array.pop)(load().pairs().first().last())
+    #|  let _ = (array.push)(load().pairs().first().last(), 0)
+    #|  let _ = (array.pop)(load().values().last().k)
+    #|  let _ = (array.push)(load().values().last().k, 0)
+    #|  metadata(repr((load(),)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(load()); pv.at(0).insert("zz", 0) }
+    #|  { let pv = (); pv.push(load()); let _ = pv.at(0).remove("a") }
+    #|  { let pv = (); pv.push(load()); let _ = pv.at(0).a.pop() }
+    #|  { let pv = (); pv.push(load()); pv.at(0).a.push(0) }
+    #|  { let pv = (); pv.push(load()); let _ = pv.at(0).at("a").pop() }
+    #|  { let pv = (); pv.push(load()); pv.at(0).at("a").push(0) }
+    #|  { let pv = (); pv.push(load()); pv.at(0).d.insert("zz", 0) }
+    #|  { let pv = (); pv.push(load()); let _ = pv.at(0).d.remove("k") }
+    #|  { let pv = (); pv.push(load()); let _ = pv.at(0).d.k.pop() }
+    #|  { let pv = (); pv.push(load()); pv.at(0).d.k.push(0) }
+    #|  metadata(repr((load(),)))
+    #|}
+    #|#let get() = load()
+    #|#{
+    #|  let _ = (dictionary.insert)(get(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get(), "a")
+    #|  let _ = (array.pop)(get().a)
+    #|  let _ = (array.push)(get().a, 0)
+    #|  let _ = (array.pop)(get().at("a"))
+    #|  let _ = (array.push)(get().at("a"), 0)
+    #|  let _ = (dictionary.insert)(get().d, "zz", 0)
+    #|  let _ = (dictionary.remove)(get().d, "k")
+    #|  let _ = (array.pop)(get().d.k)
+    #|  let _ = (array.push)(get().d.k, 0)
+    #|  let _ = (array.pop)(get().values().first())
+    #|  let _ = (array.push)(get().values().first(), 0)
+    #|  let _ = (array.pop)(get().pairs().first().last())
+    #|  let _ = (array.push)(get().pairs().first().last(), 0)
+    #|  let _ = (array.pop)(get().values().last().k)
+    #|  let _ = (array.push)(get().values().last().k, 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#metadata(repr((load(),)))
+    #|]
+    #|#metadata("== function: a nested result of a closure called twice")
+    #|#[
+    #|#let load() = (v: ((1, 2), (k: (3,))), w: ((a: (1, 2), d: (k: (3,))),))
+    #|#{
+    #|  let _ = (dictionary.insert)(load(), "zz", 0)
+    #|  let _ = (dictionary.remove)(load(), "v")
+    #|  let _ = (array.pop)(load().v)
+    #|  let _ = (array.push)(load().v, 0)
+    #|  let _ = (array.pop)(load().v.at(0))
+    #|  let _ = (array.push)(load().v.at(0), 0)
+    #|  let _ = (array.pop)(load().v.first())
+    #|  let _ = (array.push)(load().v.first(), 0)
+    #|  let _ = (dictionary.insert)(load().v.at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(load().v.at(1), "k")
+    #|  let _ = (dictionary.insert)(load().v.last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(load().v.last(), "k")
+    #|  let _ = (array.pop)(load().v.at(1).k)
+    #|  let _ = (array.push)(load().v.at(1).k, 0)
+    #|  let _ = (array.pop)(load().v.last().at("k"))
+    #|  let _ = (array.push)(load().v.last().at("k"), 0)
+    #|  let _ = (array.pop)(load().v.at(1).values().first())
+    #|  let _ = (array.push)(load().v.at(1).values().first(), 0)
+    #|  let _ = (array.pop)(load().v.slice(0, 1).first())
+    #|  let _ = (array.push)(load().v.slice(0, 1).first(), 0)
+    #|  let _ = (dictionary.insert)(load().w.at(0), "zz", 0)
+    #|  let _ = (dictionary.remove)(load().w.at(0), "a")
+    #|  let _ = (array.pop)(load().w.at(0).a)
+    #|  let _ = (array.push)(load().w.at(0).a, 0)
+    #|  let _ = (array.pop)(load().w.at(0).at("a"))
+    #|  let _ = (array.push)(load().w.at(0).at("a"), 0)
+    #|  let _ = (dictionary.insert)(load().w.at(0).d, "zz", 0)
+    #|  let _ = (dictionary.remove)(load().w.at(0).d, "k")
+    #|  let _ = (array.pop)(load().w.at(0).d.k)
+    #|  let _ = (array.push)(load().w.at(0).d.k, 0)
+    #|  let _ = (array.pop)(load().w.at(0).values().first())
+    #|  let _ = (array.push)(load().w.at(0).values().first(), 0)
+    #|  let _ = (array.pop)(load().w.at(0).pairs().first().last())
+    #|  let _ = (array.push)(load().w.at(0).pairs().first().last(), 0)
+    #|  let _ = (array.pop)(load().w.at(0).values().last().k)
+    #|  let _ = (array.push)(load().w.at(0).values().last().k, 0)
+    #|  metadata(repr((load(),)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(load()); pv.at(0).insert("zz", 0) }
+    #|  { let pv = (); pv.push(load()); let _ = pv.at(0).remove("v") }
+    #|  { let pv = (); pv.push(load()); let _ = pv.at(0).v.pop() }
+    #|  { let pv = (); pv.push(load()); pv.at(0).v.push(0) }
+    #|  { let pv = (); pv.push(load()); let _ = pv.at(0).v.at(0).pop() }
+    #|  { let pv = (); pv.push(load()); pv.at(0).v.at(0).push(0) }
+    #|  { let pv = (); pv.push(load()); let _ = pv.at(0).v.first().pop() }
+    #|  { let pv = (); pv.push(load()); pv.at(0).v.first().push(0) }
+    #|  { let pv = (); pv.push(load()); pv.at(0).v.at(1).insert("zz", 0) }
+    #|  { let pv = (); pv.push(load()); let _ = pv.at(0).v.at(1).remove("k") }
+    #|  { let pv = (); pv.push(load()); pv.at(0).v.last().insert("zz", 0) }
+    #|  { let pv = (); pv.push(load()); let _ = pv.at(0).v.last().remove("k") }
+    #|  { let pv = (); pv.push(load()); let _ = pv.at(0).v.at(1).k.pop() }
+    #|  { let pv = (); pv.push(load()); pv.at(0).v.at(1).k.push(0) }
+    #|  { let pv = (); pv.push(load()); let _ = pv.at(0).v.last().at("k").pop() }
+    #|  { let pv = (); pv.push(load()); pv.at(0).v.last().at("k").push(0) }
+    #|  { let pv = (); pv.push(load()); pv.at(0).w.at(0).insert("zz", 0) }
+    #|  { let pv = (); pv.push(load()); let _ = pv.at(0).w.at(0).remove("a") }
+    #|  { let pv = (); pv.push(load()); let _ = pv.at(0).w.at(0).a.pop() }
+    #|  { let pv = (); pv.push(load()); pv.at(0).w.at(0).a.push(0) }
+    #|  { let pv = (); pv.push(load()); let _ = pv.at(0).w.at(0).at("a").pop() }
+    #|  { let pv = (); pv.push(load()); pv.at(0).w.at(0).at("a").push(0) }
+    #|  { let pv = (); pv.push(load()); pv.at(0).w.at(0).d.insert("zz", 0) }
+    #|  { let pv = (); pv.push(load()); let _ = pv.at(0).w.at(0).d.remove("k") }
+    #|  { let pv = (); pv.push(load()); let _ = pv.at(0).w.at(0).d.k.pop() }
+    #|  { let pv = (); pv.push(load()); pv.at(0).w.at(0).d.k.push(0) }
+    #|  metadata(repr((load(),)))
+    #|}
+    #|#let get() = load()
+    #|#{
+    #|  let _ = (dictionary.insert)(get(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get(), "v")
+    #|  let _ = (array.pop)(get().v)
+    #|  let _ = (array.push)(get().v, 0)
+    #|  let _ = (array.pop)(get().v.at(0))
+    #|  let _ = (array.push)(get().v.at(0), 0)
+    #|  let _ = (array.pop)(get().v.first())
+    #|  let _ = (array.push)(get().v.first(), 0)
+    #|  let _ = (dictionary.insert)(get().v.at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().v.at(1), "k")
+    #|  let _ = (dictionary.insert)(get().v.last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().v.last(), "k")
+    #|  let _ = (array.pop)(get().v.at(1).k)
+    #|  let _ = (array.push)(get().v.at(1).k, 0)
+    #|  let _ = (array.pop)(get().v.last().at("k"))
+    #|  let _ = (array.push)(get().v.last().at("k"), 0)
+    #|  let _ = (array.pop)(get().v.at(1).values().first())
+    #|  let _ = (array.push)(get().v.at(1).values().first(), 0)
+    #|  let _ = (array.pop)(get().v.slice(0, 1).first())
+    #|  let _ = (array.push)(get().v.slice(0, 1).first(), 0)
+    #|  let _ = (dictionary.insert)(get().w.at(0), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().w.at(0), "a")
+    #|  let _ = (array.pop)(get().w.at(0).a)
+    #|  let _ = (array.push)(get().w.at(0).a, 0)
+    #|  let _ = (array.pop)(get().w.at(0).at("a"))
+    #|  let _ = (array.push)(get().w.at(0).at("a"), 0)
+    #|  let _ = (dictionary.insert)(get().w.at(0).d, "zz", 0)
+    #|  let _ = (dictionary.remove)(get().w.at(0).d, "k")
+    #|  let _ = (array.pop)(get().w.at(0).d.k)
+    #|  let _ = (array.push)(get().w.at(0).d.k, 0)
+    #|  let _ = (array.pop)(get().w.at(0).values().first())
+    #|  let _ = (array.push)(get().w.at(0).values().first(), 0)
+    #|  let _ = (array.pop)(get().w.at(0).pairs().first().last())
+    #|  let _ = (array.push)(get().w.at(0).pairs().first().last(), 0)
+    #|  let _ = (array.pop)(get().w.at(0).values().last().k)
+    #|  let _ = (array.push)(get().w.at(0).values().last().k, 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#metadata(repr((load(),)))
+    #|]
+    #|#metadata("== function: a variable captured by a context expression")
+    #|#[
+    #|#let xs = ((1, 2), (k: (3,)))
+    #|#context {
+    #|  let _ = (array.pop)(xs)
+    #|  let _ = (array.push)(xs, 0)
+    #|  let _ = (array.pop)(xs.at(0))
+    #|  let _ = (array.push)(xs.at(0), 0)
+    #|  let _ = (array.pop)(xs.first())
+    #|  let _ = (array.push)(xs.first(), 0)
+    #|  let _ = (dictionary.insert)(xs.at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(xs.at(1), "k")
+    #|  let _ = (dictionary.insert)(xs.last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(xs.last(), "k")
+    #|  let _ = (array.pop)(xs.at(1).k)
+    #|  let _ = (array.push)(xs.at(1).k, 0)
+    #|  let _ = (array.pop)(xs.last().at("k"))
+    #|  let _ = (array.push)(xs.last().at("k"), 0)
+    #|  let _ = (array.pop)(xs.at(1).values().first())
+    #|  let _ = (array.push)(xs.at(1).values().first(), 0)
+    #|  let _ = (array.pop)(xs.slice(0, 1).first())
+    #|  let _ = (array.push)(xs.slice(0, 1).first(), 0)
+    #|  metadata(repr((xs,)))
+    #|}
+    #|#context {
+    #|  { let pv = (); pv.push(xs); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(xs); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(xs); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(xs); pv.at(0).at(0).push(0) }
+    #|  { let pv = (); pv.push(xs); let _ = pv.at(0).first().pop() }
+    #|  { let pv = (); pv.push(xs); pv.at(0).first().push(0) }
+    #|  { let pv = (); pv.push(xs); pv.at(0).at(1).insert("zz", 0) }
+    #|  { let pv = (); pv.push(xs); let _ = pv.at(0).at(1).remove("k") }
+    #|  { let pv = (); pv.push(xs); pv.at(0).last().insert("zz", 0) }
+    #|  { let pv = (); pv.push(xs); let _ = pv.at(0).last().remove("k") }
+    #|  { let pv = (); pv.push(xs); let _ = pv.at(0).at(1).k.pop() }
+    #|  { let pv = (); pv.push(xs); pv.at(0).at(1).k.push(0) }
+    #|  { let pv = (); pv.push(xs); let _ = pv.at(0).last().at("k").pop() }
+    #|  { let pv = (); pv.push(xs); pv.at(0).last().at("k").push(0) }
+    #|  metadata(repr((xs,)))
+    #|}
+    #|#let get() = xs
+    #|#context {
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  let _ = (array.pop)(get().first())
+    #|  let _ = (array.push)(get().first(), 0)
+    #|  let _ = (dictionary.insert)(get().at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().at(1), "k")
+    #|  let _ = (dictionary.insert)(get().last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().last(), "k")
+    #|  let _ = (array.pop)(get().at(1).k)
+    #|  let _ = (array.push)(get().at(1).k, 0)
+    #|  let _ = (array.pop)(get().last().at("k"))
+    #|  let _ = (array.push)(get().last().at("k"), 0)
+    #|  let _ = (array.pop)(get().at(1).values().first())
+    #|  let _ = (array.push)(get().at(1).values().first(), 0)
+    #|  let _ = (array.pop)(get().slice(0, 1).first())
+    #|  let _ = (array.push)(get().slice(0, 1).first(), 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#context metadata(repr((xs,)))
+    #|]
+    #|#metadata("== function: the scope of an evaluated string")
+    #|#[
+    #|#let d = (x: (1, 2), y: (k: (3,)))
+    #|#let r = eval("x.push(9); y.k.push(9); y.insert(\"zz\", 0); (x, y)", scope: d)
+    #|#metadata(repr((r, d)))
+    #|#let r = eval("x.at(0).push(9); x", scope: (x: d.values()))
+    #|#metadata(repr((r, d)))
+    #|#let r = eval("#x.push(9)#y.insert(\"zz\", 0)#metadata(repr((x, y)))", scope: d, mode: "markup")
+    #|#r
+    #|#metadata(repr(d))
+    #|#let st = state("f-eval", (v: (1, 2), w: ((1, 2), (k: (3,)))))
+    #|#context metadata(repr((eval("v.push(9); w.at(0).push(9); (v, w)", scope: st.get()), st.get(), st.final())))
+    #|#set text(costs: (hyphenation: 50%))
+    #|#context metadata(repr((eval("c.insert(\"zz\", 0); c", scope: (c: text.costs)), text.costs)))
+    #|#let m = metadata((v: ((1, 2), (k: (3,)))))
+    #|#metadata(repr((eval("v.at(0).push(9); v.at(1).k.push(9); v", scope: m.value), m.value)))
+    #|#let mk() = (v: ((1, 2), (k: (3,))))
+    #|#metadata(repr(range(2).map(i => eval("v.at(0).push(9); v.push(9); v", scope: mk()))))
+    #|#metadata(repr(mk()))
+    #|]
+    #|#metadata("== function: the value of an evaluated string")
+    #|#[
+    #|#let xs = ((1, 2), (k: (3,)))
+    #|#{
+    #|  let _ = (array.pop)(eval("x", scope: (x: xs)))
+    #|  let _ = (array.push)(eval("x", scope: (x: xs)), 0)
+    #|  let _ = (array.pop)((eval("x", scope: (x: xs))).at(0))
+    #|  let _ = (array.push)((eval("x", scope: (x: xs))).at(0), 0)
+    #|  let _ = (array.pop)((eval("x", scope: (x: xs))).first())
+    #|  let _ = (array.push)((eval("x", scope: (x: xs))).first(), 0)
+    #|  let _ = (dictionary.insert)((eval("x", scope: (x: xs))).at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)((eval("x", scope: (x: xs))).at(1), "k")
+    #|  let _ = (dictionary.insert)((eval("x", scope: (x: xs))).last(), "zz", 0)
+    #|  let _ = (dictionary.remove)((eval("x", scope: (x: xs))).last(), "k")
+    #|  let _ = (array.pop)((eval("x", scope: (x: xs))).at(1).k)
+    #|  let _ = (array.push)((eval("x", scope: (x: xs))).at(1).k, 0)
+    #|  let _ = (array.pop)((eval("x", scope: (x: xs))).last().at("k"))
+    #|  let _ = (array.push)((eval("x", scope: (x: xs))).last().at("k"), 0)
+    #|  let _ = (array.pop)((eval("x", scope: (x: xs))).at(1).values().first())
+    #|  let _ = (array.push)((eval("x", scope: (x: xs))).at(1).values().first(), 0)
+    #|  let _ = (array.pop)((eval("x", scope: (x: xs))).slice(0, 1).first())
+    #|  let _ = (array.push)((eval("x", scope: (x: xs))).slice(0, 1).first(), 0)
+    #|  metadata(repr((eval("x", scope: (x: xs)), xs, eval("(x, x)", scope: (x: xs)),)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(eval("x", scope: (x: xs))); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(eval("x", scope: (x: xs))); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(eval("x", scope: (x: xs))); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(eval("x", scope: (x: xs))); pv.at(0).at(0).push(0) }
+    #|  { let pv = (); pv.push(eval("x", scope: (x: xs))); let _ = pv.at(0).first().pop() }
+    #|  { let pv = (); pv.push(eval("x", scope: (x: xs))); pv.at(0).first().push(0) }
+    #|  { let pv = (); pv.push(eval("x", scope: (x: xs))); pv.at(0).at(1).insert("zz", 0) }
+    #|  { let pv = (); pv.push(eval("x", scope: (x: xs))); let _ = pv.at(0).at(1).remove("k") }
+    #|  { let pv = (); pv.push(eval("x", scope: (x: xs))); pv.at(0).last().insert("zz", 0) }
+    #|  { let pv = (); pv.push(eval("x", scope: (x: xs))); let _ = pv.at(0).last().remove("k") }
+    #|  { let pv = (); pv.push(eval("x", scope: (x: xs))); let _ = pv.at(0).at(1).k.pop() }
+    #|  { let pv = (); pv.push(eval("x", scope: (x: xs))); pv.at(0).at(1).k.push(0) }
+    #|  { let pv = (); pv.push(eval("x", scope: (x: xs))); let _ = pv.at(0).last().at("k").pop() }
+    #|  { let pv = (); pv.push(eval("x", scope: (x: xs))); pv.at(0).last().at("k").push(0) }
+    #|  metadata(repr((eval("x", scope: (x: xs)), xs, eval("(x, x)", scope: (x: xs)),)))
+    #|}
+    #|#let get() = eval("x", scope: (x: xs))
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  let _ = (array.pop)(get().first())
+    #|  let _ = (array.push)(get().first(), 0)
+    #|  let _ = (dictionary.insert)(get().at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().at(1), "k")
+    #|  let _ = (dictionary.insert)(get().last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().last(), "k")
+    #|  let _ = (array.pop)(get().at(1).k)
+    #|  let _ = (array.push)(get().at(1).k, 0)
+    #|  let _ = (array.pop)(get().last().at("k"))
+    #|  let _ = (array.push)(get().last().at("k"), 0)
+    #|  let _ = (array.pop)(get().at(1).values().first())
+    #|  let _ = (array.push)(get().at(1).values().first(), 0)
+    #|  let _ = (array.pop)(get().slice(0, 1).first())
+    #|  let _ = (array.push)(get().slice(0, 1).first(), 0)
+    #|  metadata(repr((get(), xs, eval("(x, x)", scope: (x: xs)),)))
+    #|}
+    #|#metadata(repr((eval("x", scope: (x: xs)), xs, eval("(x, x)", scope: (x: xs)),)))
+    #|]
+    #|
+  let expected = [
+    "== function: the default of a named parameter", "(((1, 2), (k: (3,))),)", "(((1, 2), (k: (3,))),)",
+    "(((1, 2), (k: (3,))),)", "(((1, 2), (k: (3,))),)", "== function: the default of a named parameter, dictionary",
+    "((a: (1, 2), d: (k: (3,))),)", "((a: (1, 2), d: (k: (3,))),)", "((a: (1, 2), d: (k: (3,))),)",
+    "((a: (1, 2), d: (k: (3,))),)", "== function: a pre-applied positional argument",
+    "(((1, 2), (k: (3,))),)", "(((1, 2), (k: (3,))),)", "(((1, 2), (k: (3,))),)",
+    "(((1, 2), (k: (3,))),)", "== function: a pre-applied named argument", "((a: (1, 2), d: (k: (3,))),)",
+    "((a: (1, 2), d: (k: (3,))),)", "((a: (1, 2), d: (k: (3,))),)", "((a: (1, 2), d: (k: (3,))),)",
+    "== function: a pre-applied argument of a native function", "((1, 2), ((k: (3,)), (1, 2)), (1, 2))",
+    "((1, 2), ((k: (3,)), (1, 2)), (1, 2))", "((1, 2), ((k: (3,)), (1, 2)), (1, 2))",
+    "((1, 2), ((k: (3,)), (1, 2)), (1, 2))", "== function: a pre-applied argument through a sink",
+    "((((1, 2), (k: (3,))),),)", "((((1, 2), (k: (3,))),),)", "((((1, 2), (k: (3,))),),)",
+    "((((1, 2), (k: (3,))),),)", "== function: a captured variable", "(((1, 2), (k: (3,))), ((1, 2), (k: (3,))))",
+    "(((1, 2), (k: (3,))), ((1, 2), (k: (3,))))", "(((1, 2), (k: (3,))), ((1, 2), (k: (3,))))",
+    "(((1, 2), (k: (3,))), ((1, 2), (k: (3,))))", "== function: a captured variable, dictionary",
+    "(\n  (a: (1, 2), d: (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n)", "(\n  (a: (1, 2), d: (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n)",
+    "(\n  (a: (1, 2), d: (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n)", "(\n  (a: (1, 2), d: (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n)",
+    "== function: a parameter captured by a returned closure", "(((1, 2), (k: (3,))),)",
+    "(((1, 2), (k: (3,))),)", "(((1, 2), (k: (3,))),)", "(((1, 2), (k: (3,))),)",
+    "== function: a literal built by a closure called twice", "(((1, 2), (k: (3,))),)",
+    "(((1, 2), (k: (3,))),)", "(((1, 2), (k: (3,))),)", "(((1, 2), (k: (3,))),)",
+    "== function: a dictionary built by a closure called twice", "((a: (1, 2), d: (k: (3,))),)",
+    "((a: (1, 2), d: (k: (3,))),)", "((a: (1, 2), d: (k: (3,))),)", "((a: (1, 2), d: (k: (3,))),)",
+    "== function: a nested result of a closure called twice", "(\n  (\n    v: ((1, 2), (k: (3,))),\n    w: ((a: (1, 2), d: (k: (3,))),),\n  ),\n)",
+    "(\n  (\n    v: ((1, 2), (k: (3,))),\n    w: ((a: (1, 2), d: (k: (3,))),),\n  ),\n)",
+    "(\n  (\n    v: ((1, 2), (k: (3,))),\n    w: ((a: (1, 2), d: (k: (3,))),),\n  ),\n)",
+    "(\n  (\n    v: ((1, 2), (k: (3,))),\n    w: ((a: (1, 2), d: (k: (3,))),),\n  ),\n)",
+    "== function: a variable captured by a context expression", "(((1, 2), (k: (3,))),)",
+    "(((1, 2), (k: (3,))),)", "(((1, 2), (k: (3,))),)", "(((1, 2), (k: (3,))),)",
+    "== function: the scope of an evaluated string", "(\n  ((1, 2, 9), (k: (3, 9), zz: 0)),\n  (x: (1, 2), y: (k: (3,))),\n)",
+    "(((1, 2, 9), (k: (3,))), (x: (1, 2), y: (k: (3,))))", "((1, 2, 9), (k: (3,), zz: 0))",
+    "(x: (1, 2), y: (k: (3,)))", "(\n  ((1, 2, 9), ((1, 2, 9), (k: (3,)))),\n  (v: (1, 2), w: ((1, 2), (k: (3,)))),\n  (v: (1, 2), w: ((1, 2), (k: (3,)))),\n)",
+    "(\n  (\n    hyphenation: 50%,\n    runt: 100%,\n    widow: 100%,\n    orphan: 100%,\n    zz: 0,\n  ),\n  (\n    hyphenation: 50%,\n    runt: 100%,\n    widow: 100%,\n    orphan: 100%,\n  ),\n)",
+    "(((1, 2, 9), (k: (3, 9))), (v: ((1, 2), (k: (3,)))))", "(\n  ((1, 2, 9), (k: (3,)), 9),\n  ((1, 2, 9), (k: (3,)), 9),\n)",
+    "(v: ((1, 2), (k: (3,))))", "== function: the value of an evaluated string",
+    "(\n  ((1, 2), (k: (3,))),\n  ((1, 2), (k: (3,))),\n  (((1, 2), (k: (3,))), ((1, 2), (k: (3,)))),\n)",
+    "(\n  ((1, 2), (k: (3,))),\n  ((1, 2), (k: (3,))),\n  (((1, 2), (k: (3,))), ((1, 2), (k: (3,)))),\n)",
+    "(\n  ((1, 2), (k: (3,))),\n  ((1, 2), (k: (3,))),\n  (((1, 2), (k: (3,))), ((1, 2), (k: (3,)))),\n)",
+    "(\n  ((1, 2), (k: (3,))),\n  ((1, 2), (k: (3,))),\n  (((1, 2), (k: (3,))), ((1, 2), (k: (3,)))),\n)",
+  ]
+  assert_eq(oracle_metadata(source), expected)
+}
+
+///|
+test "oracle: sharing: modules" {
+  let source =
+    #|#metadata("== module: a variable of an imported file")
+    #|#[
+    #|#import "a.typ" as m
+    #|#{
+    #|  let _ = (array.pop)(m.xs)
+    #|  let _ = (array.push)(m.xs, 0)
+    #|  let _ = (array.pop)(m.xs.at(0))
+    #|  let _ = (array.push)(m.xs.at(0), 0)
+    #|  let _ = (array.pop)(m.xs.first())
+    #|  let _ = (array.push)(m.xs.first(), 0)
+    #|  let _ = (dictionary.insert)(m.xs.at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(m.xs.at(1), "k")
+    #|  let _ = (dictionary.insert)(m.xs.last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(m.xs.last(), "k")
+    #|  let _ = (array.pop)(m.xs.at(1).k)
+    #|  let _ = (array.push)(m.xs.at(1).k, 0)
+    #|  let _ = (array.pop)(m.xs.last().at("k"))
+    #|  let _ = (array.push)(m.xs.last().at("k"), 0)
+    #|  let _ = (array.pop)(m.xs.at(1).values().first())
+    #|  let _ = (array.push)(m.xs.at(1).values().first(), 0)
+    #|  let _ = (array.pop)(m.xs.slice(0, 1).first())
+    #|  let _ = (array.push)(m.xs.slice(0, 1).first(), 0)
+    #|  metadata(repr((m.xs, m.d,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(m.xs); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(m.xs); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(m.xs); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(m.xs); pv.at(0).at(0).push(0) }
+    #|  { let pv = (); pv.push(m.xs); let _ = pv.at(0).first().pop() }
+    #|  { let pv = (); pv.push(m.xs); pv.at(0).first().push(0) }
+    #|  { let pv = (); pv.push(m.xs); pv.at(0).at(1).insert("zz", 0) }
+    #|  { let pv = (); pv.push(m.xs); let _ = pv.at(0).at(1).remove("k") }
+    #|  { let pv = (); pv.push(m.xs); pv.at(0).last().insert("zz", 0) }
+    #|  { let pv = (); pv.push(m.xs); let _ = pv.at(0).last().remove("k") }
+    #|  { let pv = (); pv.push(m.xs); let _ = pv.at(0).at(1).k.pop() }
+    #|  { let pv = (); pv.push(m.xs); pv.at(0).at(1).k.push(0) }
+    #|  { let pv = (); pv.push(m.xs); let _ = pv.at(0).last().at("k").pop() }
+    #|  { let pv = (); pv.push(m.xs); pv.at(0).last().at("k").push(0) }
+    #|  metadata(repr((m.xs, m.d,)))
+    #|}
+    #|#let get() = m.xs
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  let _ = (array.pop)(get().first())
+    #|  let _ = (array.push)(get().first(), 0)
+    #|  let _ = (dictionary.insert)(get().at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().at(1), "k")
+    #|  let _ = (dictionary.insert)(get().last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().last(), "k")
+    #|  let _ = (array.pop)(get().at(1).k)
+    #|  let _ = (array.push)(get().at(1).k, 0)
+    #|  let _ = (array.pop)(get().last().at("k"))
+    #|  let _ = (array.push)(get().last().at("k"), 0)
+    #|  let _ = (array.pop)(get().at(1).values().first())
+    #|  let _ = (array.push)(get().at(1).values().first(), 0)
+    #|  let _ = (array.pop)(get().slice(0, 1).first())
+    #|  let _ = (array.push)(get().slice(0, 1).first(), 0)
+    #|  metadata(repr((get(), m.d,)))
+    #|}
+    #|#metadata(repr((m.xs, m.d,)))
+    #|]
+    #|#metadata("== module: a dictionary of an imported file")
+    #|#[
+    #|#import "a.typ" as m
+    #|#{
+    #|  let _ = (dictionary.insert)(m.d, "zz", 0)
+    #|  let _ = (dictionary.remove)(m.d, "a")
+    #|  let _ = (array.pop)(m.d.a)
+    #|  let _ = (array.push)(m.d.a, 0)
+    #|  let _ = (array.pop)(m.d.at("a"))
+    #|  let _ = (array.push)(m.d.at("a"), 0)
+    #|  let _ = (dictionary.insert)(m.d.d, "zz", 0)
+    #|  let _ = (dictionary.remove)(m.d.d, "k")
+    #|  let _ = (array.pop)(m.d.d.k)
+    #|  let _ = (array.push)(m.d.d.k, 0)
+    #|  let _ = (array.pop)(m.d.values().first())
+    #|  let _ = (array.push)(m.d.values().first(), 0)
+    #|  let _ = (array.pop)(m.d.pairs().first().last())
+    #|  let _ = (array.push)(m.d.pairs().first().last(), 0)
+    #|  let _ = (array.pop)(m.d.values().last().k)
+    #|  let _ = (array.push)(m.d.values().last().k, 0)
+    #|  metadata(repr((m.d, m.xs,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(m.d); pv.at(0).insert("zz", 0) }
+    #|  { let pv = (); pv.push(m.d); let _ = pv.at(0).remove("a") }
+    #|  { let pv = (); pv.push(m.d); let _ = pv.at(0).a.pop() }
+    #|  { let pv = (); pv.push(m.d); pv.at(0).a.push(0) }
+    #|  { let pv = (); pv.push(m.d); let _ = pv.at(0).at("a").pop() }
+    #|  { let pv = (); pv.push(m.d); pv.at(0).at("a").push(0) }
+    #|  { let pv = (); pv.push(m.d); pv.at(0).d.insert("zz", 0) }
+    #|  { let pv = (); pv.push(m.d); let _ = pv.at(0).d.remove("k") }
+    #|  { let pv = (); pv.push(m.d); let _ = pv.at(0).d.k.pop() }
+    #|  { let pv = (); pv.push(m.d); pv.at(0).d.k.push(0) }
+    #|  metadata(repr((m.d, m.xs,)))
+    #|}
+    #|#let get() = m.d
+    #|#{
+    #|  let _ = (dictionary.insert)(get(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get(), "a")
+    #|  let _ = (array.pop)(get().a)
+    #|  let _ = (array.push)(get().a, 0)
+    #|  let _ = (array.pop)(get().at("a"))
+    #|  let _ = (array.push)(get().at("a"), 0)
+    #|  let _ = (dictionary.insert)(get().d, "zz", 0)
+    #|  let _ = (dictionary.remove)(get().d, "k")
+    #|  let _ = (array.pop)(get().d.k)
+    #|  let _ = (array.push)(get().d.k, 0)
+    #|  let _ = (array.pop)(get().values().first())
+    #|  let _ = (array.push)(get().values().first(), 0)
+    #|  let _ = (array.pop)(get().pairs().first().last())
+    #|  let _ = (array.push)(get().pairs().first().last(), 0)
+    #|  let _ = (array.pop)(get().values().last().k)
+    #|  let _ = (array.push)(get().values().last().k, 0)
+    #|  metadata(repr((get(), m.xs,)))
+    #|}
+    #|#metadata(repr((m.d, m.xs,)))
+    #|]
+    #|#metadata("== module: an imported item")
+    #|#[
+    #|#import "a.typ": xs, d, get
+    #|#{
+    #|  let _ = (array.pop)(xs)
+    #|  let _ = (array.push)(xs, 0)
+    #|  let _ = (array.pop)(xs.at(0))
+    #|  let _ = (array.push)(xs.at(0), 0)
+    #|  let _ = (array.pop)(xs.first())
+    #|  let _ = (array.push)(xs.first(), 0)
+    #|  let _ = (dictionary.insert)(xs.at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(xs.at(1), "k")
+    #|  let _ = (dictionary.insert)(xs.last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(xs.last(), "k")
+    #|  let _ = (array.pop)(xs.at(1).k)
+    #|  let _ = (array.push)(xs.at(1).k, 0)
+    #|  let _ = (array.pop)(xs.last().at("k"))
+    #|  let _ = (array.push)(xs.last().at("k"), 0)
+    #|  let _ = (array.pop)(xs.at(1).values().first())
+    #|  let _ = (array.push)(xs.at(1).values().first(), 0)
+    #|  let _ = (array.pop)(xs.slice(0, 1).first())
+    #|  let _ = (array.push)(xs.slice(0, 1).first(), 0)
+    #|  metadata(repr((xs, d, get(),)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(xs); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(xs); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(xs); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(xs); pv.at(0).at(0).push(0) }
+    #|  { let pv = (); pv.push(xs); let _ = pv.at(0).first().pop() }
+    #|  { let pv = (); pv.push(xs); pv.at(0).first().push(0) }
+    #|  { let pv = (); pv.push(xs); pv.at(0).at(1).insert("zz", 0) }
+    #|  { let pv = (); pv.push(xs); let _ = pv.at(0).at(1).remove("k") }
+    #|  { let pv = (); pv.push(xs); pv.at(0).last().insert("zz", 0) }
+    #|  { let pv = (); pv.push(xs); let _ = pv.at(0).last().remove("k") }
+    #|  { let pv = (); pv.push(xs); let _ = pv.at(0).at(1).k.pop() }
+    #|  { let pv = (); pv.push(xs); pv.at(0).at(1).k.push(0) }
+    #|  { let pv = (); pv.push(xs); let _ = pv.at(0).last().at("k").pop() }
+    #|  { let pv = (); pv.push(xs); pv.at(0).last().at("k").push(0) }
+    #|  metadata(repr((xs, d, get(),)))
+    #|}
+    #|#let get() = xs
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  let _ = (array.pop)(get().first())
+    #|  let _ = (array.push)(get().first(), 0)
+    #|  let _ = (dictionary.insert)(get().at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().at(1), "k")
+    #|  let _ = (dictionary.insert)(get().last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().last(), "k")
+    #|  let _ = (array.pop)(get().at(1).k)
+    #|  let _ = (array.push)(get().at(1).k, 0)
+    #|  let _ = (array.pop)(get().last().at("k"))
+    #|  let _ = (array.push)(get().last().at("k"), 0)
+    #|  let _ = (array.pop)(get().at(1).values().first())
+    #|  let _ = (array.push)(get().at(1).values().first(), 0)
+    #|  let _ = (array.pop)(get().slice(0, 1).first())
+    #|  let _ = (array.push)(get().slice(0, 1).first(), 0)
+    #|  metadata(repr((get(), d, get(),)))
+    #|}
+    #|#metadata(repr((xs, d, get(),)))
+    #|]
+    #|#metadata("== module: a function of an imported file")
+    #|#[
+    #|#import "a.typ" as m
+    #|#{
+    #|  let _ = (array.pop)(m.get())
+    #|  let _ = (array.push)(m.get(), 0)
+    #|  let _ = (array.pop)(m.get().at(0))
+    #|  let _ = (array.push)(m.get().at(0), 0)
+    #|  let _ = (array.pop)(m.get().first())
+    #|  let _ = (array.push)(m.get().first(), 0)
+    #|  let _ = (dictionary.insert)(m.get().at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(m.get().at(1), "k")
+    #|  let _ = (dictionary.insert)(m.get().last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(m.get().last(), "k")
+    #|  let _ = (array.pop)(m.get().at(1).k)
+    #|  let _ = (array.push)(m.get().at(1).k, 0)
+    #|  let _ = (array.pop)(m.get().last().at("k"))
+    #|  let _ = (array.push)(m.get().last().at("k"), 0)
+    #|  let _ = (array.pop)(m.get().at(1).values().first())
+    #|  let _ = (array.push)(m.get().at(1).values().first(), 0)
+    #|  let _ = (array.pop)(m.get().slice(0, 1).first())
+    #|  let _ = (array.push)(m.get().slice(0, 1).first(), 0)
+    #|  metadata(repr((m.get(), m.xs,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(m.get()); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(m.get()); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(m.get()); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(m.get()); pv.at(0).at(0).push(0) }
+    #|  { let pv = (); pv.push(m.get()); let _ = pv.at(0).first().pop() }
+    #|  { let pv = (); pv.push(m.get()); pv.at(0).first().push(0) }
+    #|  { let pv = (); pv.push(m.get()); pv.at(0).at(1).insert("zz", 0) }
+    #|  { let pv = (); pv.push(m.get()); let _ = pv.at(0).at(1).remove("k") }
+    #|  { let pv = (); pv.push(m.get()); pv.at(0).last().insert("zz", 0) }
+    #|  { let pv = (); pv.push(m.get()); let _ = pv.at(0).last().remove("k") }
+    #|  { let pv = (); pv.push(m.get()); let _ = pv.at(0).at(1).k.pop() }
+    #|  { let pv = (); pv.push(m.get()); pv.at(0).at(1).k.push(0) }
+    #|  { let pv = (); pv.push(m.get()); let _ = pv.at(0).last().at("k").pop() }
+    #|  { let pv = (); pv.push(m.get()); pv.at(0).last().at("k").push(0) }
+    #|  metadata(repr((m.get(), m.xs,)))
+    #|}
+    #|#let get() = m.get()
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  let _ = (array.pop)(get().first())
+    #|  let _ = (array.push)(get().first(), 0)
+    #|  let _ = (dictionary.insert)(get().at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().at(1), "k")
+    #|  let _ = (dictionary.insert)(get().last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().last(), "k")
+    #|  let _ = (array.pop)(get().at(1).k)
+    #|  let _ = (array.push)(get().at(1).k, 0)
+    #|  let _ = (array.pop)(get().last().at("k"))
+    #|  let _ = (array.push)(get().last().at("k"), 0)
+    #|  let _ = (array.pop)(get().at(1).values().first())
+    #|  let _ = (array.push)(get().at(1).values().first(), 0)
+    #|  let _ = (array.pop)(get().slice(0, 1).first())
+    #|  let _ = (array.push)(get().slice(0, 1).first(), 0)
+    #|  metadata(repr((get(), m.xs,)))
+    #|}
+    #|#metadata(repr((m.get(), m.xs,)))
+    #|]
+    #|#metadata("== module: the module as a dictionary")
+    #|#[
+    #|#import "a.typ" as m
+    #|#{
+    #|  let _ = (dictionary.insert)(dictionary(m), "zz", 0)
+    #|  let _ = (dictionary.remove)(dictionary(m), "xs")
+    #|  let _ = (array.pop)(dictionary(m).xs)
+    #|  let _ = (array.push)(dictionary(m).xs, 0)
+    #|  let _ = (array.pop)(dictionary(m).xs.at(0))
+    #|  let _ = (array.push)(dictionary(m).xs.at(0), 0)
+    #|  let _ = (array.pop)(dictionary(m).xs.first())
+    #|  let _ = (array.push)(dictionary(m).xs.first(), 0)
+    #|  let _ = (dictionary.insert)(dictionary(m).xs.at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(dictionary(m).xs.at(1), "k")
+    #|  let _ = (dictionary.insert)(dictionary(m).xs.last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(dictionary(m).xs.last(), "k")
+    #|  let _ = (array.pop)(dictionary(m).xs.at(1).k)
+    #|  let _ = (array.push)(dictionary(m).xs.at(1).k, 0)
+    #|  let _ = (array.pop)(dictionary(m).xs.last().at("k"))
+    #|  let _ = (array.push)(dictionary(m).xs.last().at("k"), 0)
+    #|  let _ = (array.pop)(dictionary(m).xs.at(1).values().first())
+    #|  let _ = (array.push)(dictionary(m).xs.at(1).values().first(), 0)
+    #|  let _ = (array.pop)(dictionary(m).xs.slice(0, 1).first())
+    #|  let _ = (array.push)(dictionary(m).xs.slice(0, 1).first(), 0)
+    #|  let _ = (dictionary.insert)(dictionary(m).d, "zz", 0)
+    #|  let _ = (dictionary.remove)(dictionary(m).d, "a")
+    #|  let _ = (array.pop)(dictionary(m).d.a)
+    #|  let _ = (array.push)(dictionary(m).d.a, 0)
+    #|  let _ = (array.pop)(dictionary(m).d.at("a"))
+    #|  let _ = (array.push)(dictionary(m).d.at("a"), 0)
+    #|  let _ = (dictionary.insert)(dictionary(m).d.d, "zz", 0)
+    #|  let _ = (dictionary.remove)(dictionary(m).d.d, "k")
+    #|  let _ = (array.pop)(dictionary(m).d.d.k)
+    #|  let _ = (array.push)(dictionary(m).d.d.k, 0)
+    #|  let _ = (array.pop)(dictionary(m).d.values().first())
+    #|  let _ = (array.push)(dictionary(m).d.values().first(), 0)
+    #|  let _ = (array.pop)(dictionary(m).d.pairs().first().last())
+    #|  let _ = (array.push)(dictionary(m).d.pairs().first().last(), 0)
+    #|  let _ = (array.pop)(dictionary(m).d.values().last().k)
+    #|  let _ = (array.push)(dictionary(m).d.values().last().k, 0)
+    #|  metadata(repr((dictionary(m), m.xs, m.d,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(dictionary(m)); pv.at(0).insert("zz", 0) }
+    #|  { let pv = (); pv.push(dictionary(m)); let _ = pv.at(0).remove("xs") }
+    #|  { let pv = (); pv.push(dictionary(m)); let _ = pv.at(0).xs.pop() }
+    #|  { let pv = (); pv.push(dictionary(m)); pv.at(0).xs.push(0) }
+    #|  { let pv = (); pv.push(dictionary(m)); let _ = pv.at(0).xs.at(0).pop() }
+    #|  { let pv = (); pv.push(dictionary(m)); pv.at(0).xs.at(0).push(0) }
+    #|  { let pv = (); pv.push(dictionary(m)); let _ = pv.at(0).xs.first().pop() }
+    #|  { let pv = (); pv.push(dictionary(m)); pv.at(0).xs.first().push(0) }
+    #|  { let pv = (); pv.push(dictionary(m)); pv.at(0).xs.at(1).insert("zz", 0) }
+    #|  { let pv = (); pv.push(dictionary(m)); let _ = pv.at(0).xs.at(1).remove("k") }
+    #|  { let pv = (); pv.push(dictionary(m)); pv.at(0).xs.last().insert("zz", 0) }
+    #|  { let pv = (); pv.push(dictionary(m)); let _ = pv.at(0).xs.last().remove("k") }
+    #|  { let pv = (); pv.push(dictionary(m)); let _ = pv.at(0).xs.at(1).k.pop() }
+    #|  { let pv = (); pv.push(dictionary(m)); pv.at(0).xs.at(1).k.push(0) }
+    #|  { let pv = (); pv.push(dictionary(m)); let _ = pv.at(0).xs.last().at("k").pop() }
+    #|  { let pv = (); pv.push(dictionary(m)); pv.at(0).xs.last().at("k").push(0) }
+    #|  { let pv = (); pv.push(dictionary(m)); pv.at(0).d.insert("zz", 0) }
+    #|  { let pv = (); pv.push(dictionary(m)); let _ = pv.at(0).d.remove("a") }
+    #|  { let pv = (); pv.push(dictionary(m)); let _ = pv.at(0).d.a.pop() }
+    #|  { let pv = (); pv.push(dictionary(m)); pv.at(0).d.a.push(0) }
+    #|  { let pv = (); pv.push(dictionary(m)); let _ = pv.at(0).d.at("a").pop() }
+    #|  { let pv = (); pv.push(dictionary(m)); pv.at(0).d.at("a").push(0) }
+    #|  { let pv = (); pv.push(dictionary(m)); pv.at(0).d.d.insert("zz", 0) }
+    #|  { let pv = (); pv.push(dictionary(m)); let _ = pv.at(0).d.d.remove("k") }
+    #|  { let pv = (); pv.push(dictionary(m)); let _ = pv.at(0).d.d.k.pop() }
+    #|  { let pv = (); pv.push(dictionary(m)); pv.at(0).d.d.k.push(0) }
+    #|  metadata(repr((dictionary(m), m.xs, m.d,)))
+    #|}
+    #|#let get() = dictionary(m)
+    #|#{
+    #|  let _ = (dictionary.insert)(get(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get(), "xs")
+    #|  let _ = (array.pop)(get().xs)
+    #|  let _ = (array.push)(get().xs, 0)
+    #|  let _ = (array.pop)(get().xs.at(0))
+    #|  let _ = (array.push)(get().xs.at(0), 0)
+    #|  let _ = (array.pop)(get().xs.first())
+    #|  let _ = (array.push)(get().xs.first(), 0)
+    #|  let _ = (dictionary.insert)(get().xs.at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().xs.at(1), "k")
+    #|  let _ = (dictionary.insert)(get().xs.last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().xs.last(), "k")
+    #|  let _ = (array.pop)(get().xs.at(1).k)
+    #|  let _ = (array.push)(get().xs.at(1).k, 0)
+    #|  let _ = (array.pop)(get().xs.last().at("k"))
+    #|  let _ = (array.push)(get().xs.last().at("k"), 0)
+    #|  let _ = (array.pop)(get().xs.at(1).values().first())
+    #|  let _ = (array.push)(get().xs.at(1).values().first(), 0)
+    #|  let _ = (array.pop)(get().xs.slice(0, 1).first())
+    #|  let _ = (array.push)(get().xs.slice(0, 1).first(), 0)
+    #|  let _ = (dictionary.insert)(get().d, "zz", 0)
+    #|  let _ = (dictionary.remove)(get().d, "a")
+    #|  let _ = (array.pop)(get().d.a)
+    #|  let _ = (array.push)(get().d.a, 0)
+    #|  let _ = (array.pop)(get().d.at("a"))
+    #|  let _ = (array.push)(get().d.at("a"), 0)
+    #|  let _ = (dictionary.insert)(get().d.d, "zz", 0)
+    #|  let _ = (dictionary.remove)(get().d.d, "k")
+    #|  let _ = (array.pop)(get().d.d.k)
+    #|  let _ = (array.push)(get().d.d.k, 0)
+    #|  let _ = (array.pop)(get().d.values().first())
+    #|  let _ = (array.push)(get().d.values().first(), 0)
+    #|  let _ = (array.pop)(get().d.pairs().first().last())
+    #|  let _ = (array.push)(get().d.pairs().first().last(), 0)
+    #|  let _ = (array.pop)(get().d.values().last().k)
+    #|  let _ = (array.push)(get().d.values().last().k, 0)
+    #|  metadata(repr((get(), m.xs, m.d,)))
+    #|}
+    #|#metadata(repr((dictionary(m), m.xs, m.d,)))
+    #|]
+    #|#metadata("== module: a wildcard import")
+    #|#[
+    #|#import "a.typ": *
+    #|#{
+    #|  let _ = (dictionary.insert)(d, "zz", 0)
+    #|  let _ = (dictionary.remove)(d, "a")
+    #|  let _ = (array.pop)(d.a)
+    #|  let _ = (array.push)(d.a, 0)
+    #|  let _ = (array.pop)(d.at("a"))
+    #|  let _ = (array.push)(d.at("a"), 0)
+    #|  let _ = (dictionary.insert)(d.d, "zz", 0)
+    #|  let _ = (dictionary.remove)(d.d, "k")
+    #|  let _ = (array.pop)(d.d.k)
+    #|  let _ = (array.push)(d.d.k, 0)
+    #|  let _ = (array.pop)(d.values().first())
+    #|  let _ = (array.push)(d.values().first(), 0)
+    #|  let _ = (array.pop)(d.pairs().first().last())
+    #|  let _ = (array.push)(d.pairs().first().last(), 0)
+    #|  let _ = (array.pop)(d.values().last().k)
+    #|  let _ = (array.push)(d.values().last().k, 0)
+    #|  metadata(repr((d, xs,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(d); pv.at(0).insert("zz", 0) }
+    #|  { let pv = (); pv.push(d); let _ = pv.at(0).remove("a") }
+    #|  { let pv = (); pv.push(d); let _ = pv.at(0).a.pop() }
+    #|  { let pv = (); pv.push(d); pv.at(0).a.push(0) }
+    #|  { let pv = (); pv.push(d); let _ = pv.at(0).at("a").pop() }
+    #|  { let pv = (); pv.push(d); pv.at(0).at("a").push(0) }
+    #|  { let pv = (); pv.push(d); pv.at(0).d.insert("zz", 0) }
+    #|  { let pv = (); pv.push(d); let _ = pv.at(0).d.remove("k") }
+    #|  { let pv = (); pv.push(d); let _ = pv.at(0).d.k.pop() }
+    #|  { let pv = (); pv.push(d); pv.at(0).d.k.push(0) }
+    #|  metadata(repr((d, xs,)))
+    #|}
+    #|#let get() = d
+    #|#{
+    #|  let _ = (dictionary.insert)(get(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get(), "a")
+    #|  let _ = (array.pop)(get().a)
+    #|  let _ = (array.push)(get().a, 0)
+    #|  let _ = (array.pop)(get().at("a"))
+    #|  let _ = (array.push)(get().at("a"), 0)
+    #|  let _ = (dictionary.insert)(get().d, "zz", 0)
+    #|  let _ = (dictionary.remove)(get().d, "k")
+    #|  let _ = (array.pop)(get().d.k)
+    #|  let _ = (array.push)(get().d.k, 0)
+    #|  let _ = (array.pop)(get().values().first())
+    #|  let _ = (array.push)(get().values().first(), 0)
+    #|  let _ = (array.pop)(get().pairs().first().last())
+    #|  let _ = (array.push)(get().pairs().first().last(), 0)
+    #|  let _ = (array.pop)(get().values().last().k)
+    #|  let _ = (array.push)(get().values().last().k, 0)
+    #|  metadata(repr((get(), xs,)))
+    #|}
+    #|#metadata(repr((d, xs,)))
+    #|]
+    #|#metadata("== module: sys.inputs")
+    #|#[
+    #|#{
+    #|  let _ = (dictionary.insert)(sys.inputs, "zz", 0)
+    #|  metadata(repr((sys.inputs, dictionary(sys).inputs, std.sys.inputs,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(sys.inputs); pv.at(0).insert("zz", 0) }
+    #|  metadata(repr((sys.inputs, dictionary(sys).inputs, std.sys.inputs,)))
+    #|}
+    #|#let get() = sys.inputs
+    #|#{
+    #|  let _ = (dictionary.insert)(get(), "zz", 0)
+    #|  metadata(repr((get(), dictionary(sys).inputs, std.sys.inputs,)))
+    #|}
+    #|#metadata(repr((sys.inputs, dictionary(sys).inputs, std.sys.inputs,)))
+    #|]
+    #|#metadata("== module: sys as a dictionary")
+    #|#[
+    #|#{
+    #|  let _ = (dictionary.insert)(dictionary(sys).inputs, "zz", 0)
+    #|  metadata(repr((dictionary(sys).inputs, sys.inputs,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(dictionary(sys).inputs); pv.at(0).insert("zz", 0) }
+    #|  metadata(repr((dictionary(sys).inputs, sys.inputs,)))
+    #|}
+    #|#let get() = dictionary(sys).inputs
+    #|#{
+    #|  let _ = (dictionary.insert)(get(), "zz", 0)
+    #|  metadata(repr((get(), sys.inputs,)))
+    #|}
+    #|#metadata(repr((dictionary(sys).inputs, sys.inputs,)))
+    #|]
+    #|
+  let files = [
+    (
+      "a.typ", "#let xs = ((1, 2), (k: (3,)))\n#let d = (a: (1, 2), d: (k: (3,)))\n#let get() = xs\n",
+    ),
+  ]
+  let expected = [
+    "== module: a variable of an imported file", "(((1, 2), (k: (3,))), (a: (1, 2), d: (k: (3,))))",
+    "(((1, 2), (k: (3,))), (a: (1, 2), d: (k: (3,))))", "(((1, 2), (k: (3,))), (a: (1, 2), d: (k: (3,))))",
+    "(((1, 2), (k: (3,))), (a: (1, 2), d: (k: (3,))))", "== module: a dictionary of an imported file",
+    "((a: (1, 2), d: (k: (3,))), ((1, 2), (k: (3,))))", "((a: (1, 2), d: (k: (3,))), ((1, 2), (k: (3,))))",
+    "((a: (1, 2), d: (k: (3,))), ((1, 2), (k: (3,))))", "((a: (1, 2), d: (k: (3,))), ((1, 2), (k: (3,))))",
+    "== module: an imported item", "(\n  ((1, 2), (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n  ((1, 2), (k: (3,))),\n)",
+    "(\n  ((1, 2), (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n  ((1, 2), (k: (3,))),\n)",
+    "(\n  ((1, 2), (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n  ((1, 2), (k: (3,))),\n)",
+    "(\n  ((1, 2), (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n  ((1, 2), (k: (3,))),\n)",
+    "== module: a function of an imported file", "(((1, 2), (k: (3,))), ((1, 2), (k: (3,))))",
+    "(((1, 2), (k: (3,))), ((1, 2), (k: (3,))))", "(((1, 2), (k: (3,))), ((1, 2), (k: (3,))))",
+    "(((1, 2), (k: (3,))), ((1, 2), (k: (3,))))", "== module: the module as a dictionary",
+    "(\n  (\n    xs: ((1, 2), (k: (3,))),\n    d: (a: (1, 2), d: (k: (3,))),\n    get: get,\n  ),\n  ((1, 2), (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n)",
+    "(\n  (\n    xs: ((1, 2), (k: (3,))),\n    d: (a: (1, 2), d: (k: (3,))),\n    get: get,\n  ),\n  ((1, 2), (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n)",
+    "(\n  (\n    xs: ((1, 2), (k: (3,))),\n    d: (a: (1, 2), d: (k: (3,))),\n    get: get,\n  ),\n  ((1, 2), (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n)",
+    "(\n  (\n    xs: ((1, 2), (k: (3,))),\n    d: (a: (1, 2), d: (k: (3,))),\n    get: get,\n  ),\n  ((1, 2), (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n)",
+    "== module: a wildcard import", "((a: (1, 2), d: (k: (3,))), ((1, 2), (k: (3,))))",
+    "((a: (1, 2), d: (k: (3,))), ((1, 2), (k: (3,))))", "((a: (1, 2), d: (k: (3,))), ((1, 2), (k: (3,))))",
+    "((a: (1, 2), d: (k: (3,))), ((1, 2), (k: (3,))))", "== module: sys.inputs",
+    "((:), (:), (:))", "((:), (:), (:))", "((:), (:), (:))", "((:), (:), (:))", "== module: sys as a dictionary",
+    "((:), (:))", "((:), (:))", "((:), (:))", "((:), (:))",
+  ]
+  assert_eq(oracle_metadata(source, files~), expected)
+}
+
+///|
+test "oracle: sharing: arguments" {
+  let source =
+    #|#metadata("== arguments: positional values")
+    #|#[
+    #|#let a = arguments(((1, 2), (k: (3,))), 5, k: (a: (1, 2), d: (k: (3,))))
+    #|#{
+    #|  let _ = (array.pop)(a.pos())
+    #|  let _ = (array.push)(a.pos(), 0)
+    #|  let _ = (array.pop)(a.pos().at(0))
+    #|  let _ = (array.push)(a.pos().at(0), 0)
+    #|  let _ = (array.pop)(a.pos().at(0).at(0))
+    #|  let _ = (array.push)(a.pos().at(0).at(0), 0)
+    #|  let _ = (array.pop)(a.pos().at(0).first())
+    #|  let _ = (array.push)(a.pos().at(0).first(), 0)
+    #|  let _ = (dictionary.insert)(a.pos().at(0).at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(a.pos().at(0).at(1), "k")
+    #|  let _ = (dictionary.insert)(a.pos().at(0).last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(a.pos().at(0).last(), "k")
+    #|  let _ = (array.pop)(a.pos().at(0).at(1).k)
+    #|  let _ = (array.push)(a.pos().at(0).at(1).k, 0)
+    #|  let _ = (array.pop)(a.pos().at(0).last().at("k"))
+    #|  let _ = (array.push)(a.pos().at(0).last().at("k"), 0)
+    #|  let _ = (array.pop)(a.pos().at(0).at(1).values().first())
+    #|  let _ = (array.push)(a.pos().at(0).at(1).values().first(), 0)
+    #|  let _ = (array.pop)(a.pos().at(0).slice(0, 1).first())
+    #|  let _ = (array.push)(a.pos().at(0).slice(0, 1).first(), 0)
+    #|  metadata(repr((a.pos(),)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(a.pos()); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(a.pos()); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(a.pos()); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(a.pos()); pv.at(0).at(0).push(0) }
+    #|  { let pv = (); pv.push(a.pos()); let _ = pv.at(0).at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(a.pos()); pv.at(0).at(0).at(0).push(0) }
+    #|  { let pv = (); pv.push(a.pos()); let _ = pv.at(0).at(0).first().pop() }
+    #|  { let pv = (); pv.push(a.pos()); pv.at(0).at(0).first().push(0) }
+    #|  { let pv = (); pv.push(a.pos()); pv.at(0).at(0).at(1).insert("zz", 0) }
+    #|  { let pv = (); pv.push(a.pos()); let _ = pv.at(0).at(0).at(1).remove("k") }
+    #|  { let pv = (); pv.push(a.pos()); pv.at(0).at(0).last().insert("zz", 0) }
+    #|  { let pv = (); pv.push(a.pos()); let _ = pv.at(0).at(0).last().remove("k") }
+    #|  { let pv = (); pv.push(a.pos()); let _ = pv.at(0).at(0).at(1).k.pop() }
+    #|  { let pv = (); pv.push(a.pos()); pv.at(0).at(0).at(1).k.push(0) }
+    #|  { let pv = (); pv.push(a.pos()); let _ = pv.at(0).at(0).last().at("k").pop() }
+    #|  { let pv = (); pv.push(a.pos()); pv.at(0).at(0).last().at("k").push(0) }
+    #|  metadata(repr((a.pos(),)))
+    #|}
+    #|#let get() = a.pos()
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  let _ = (array.pop)(get().at(0).at(0))
+    #|  let _ = (array.push)(get().at(0).at(0), 0)
+    #|  let _ = (array.pop)(get().at(0).first())
+    #|  let _ = (array.push)(get().at(0).first(), 0)
+    #|  let _ = (dictionary.insert)(get().at(0).at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().at(0).at(1), "k")
+    #|  let _ = (dictionary.insert)(get().at(0).last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().at(0).last(), "k")
+    #|  let _ = (array.pop)(get().at(0).at(1).k)
+    #|  let _ = (array.push)(get().at(0).at(1).k, 0)
+    #|  let _ = (array.pop)(get().at(0).last().at("k"))
+    #|  let _ = (array.push)(get().at(0).last().at("k"), 0)
+    #|  let _ = (array.pop)(get().at(0).at(1).values().first())
+    #|  let _ = (array.push)(get().at(0).at(1).values().first(), 0)
+    #|  let _ = (array.pop)(get().at(0).slice(0, 1).first())
+    #|  let _ = (array.push)(get().at(0).slice(0, 1).first(), 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#metadata(repr((a.pos(),)))
+    #|]
+    #|#metadata("== arguments: named values")
+    #|#[
+    #|#let a = arguments(((1, 2), (k: (3,))), 5, k: (a: (1, 2), d: (k: (3,))))
+    #|#{
+    #|  let _ = (dictionary.insert)(a.named(), "zz", 0)
+    #|  let _ = (dictionary.remove)(a.named(), "k")
+    #|  let _ = (dictionary.insert)(a.named().k, "zz", 0)
+    #|  let _ = (dictionary.remove)(a.named().k, "a")
+    #|  let _ = (array.pop)(a.named().k.a)
+    #|  let _ = (array.push)(a.named().k.a, 0)
+    #|  let _ = (array.pop)(a.named().k.at("a"))
+    #|  let _ = (array.push)(a.named().k.at("a"), 0)
+    #|  let _ = (dictionary.insert)(a.named().k.d, "zz", 0)
+    #|  let _ = (dictionary.remove)(a.named().k.d, "k")
+    #|  let _ = (array.pop)(a.named().k.d.k)
+    #|  let _ = (array.push)(a.named().k.d.k, 0)
+    #|  let _ = (array.pop)(a.named().k.values().first())
+    #|  let _ = (array.push)(a.named().k.values().first(), 0)
+    #|  let _ = (array.pop)(a.named().k.pairs().first().last())
+    #|  let _ = (array.push)(a.named().k.pairs().first().last(), 0)
+    #|  let _ = (array.pop)(a.named().k.values().last().k)
+    #|  let _ = (array.push)(a.named().k.values().last().k, 0)
+    #|  metadata(repr((a.named(),)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(a.named()); pv.at(0).insert("zz", 0) }
+    #|  { let pv = (); pv.push(a.named()); let _ = pv.at(0).remove("k") }
+    #|  { let pv = (); pv.push(a.named()); pv.at(0).k.insert("zz", 0) }
+    #|  { let pv = (); pv.push(a.named()); let _ = pv.at(0).k.remove("a") }
+    #|  { let pv = (); pv.push(a.named()); let _ = pv.at(0).k.a.pop() }
+    #|  { let pv = (); pv.push(a.named()); pv.at(0).k.a.push(0) }
+    #|  { let pv = (); pv.push(a.named()); let _ = pv.at(0).k.at("a").pop() }
+    #|  { let pv = (); pv.push(a.named()); pv.at(0).k.at("a").push(0) }
+    #|  { let pv = (); pv.push(a.named()); pv.at(0).k.d.insert("zz", 0) }
+    #|  { let pv = (); pv.push(a.named()); let _ = pv.at(0).k.d.remove("k") }
+    #|  { let pv = (); pv.push(a.named()); let _ = pv.at(0).k.d.k.pop() }
+    #|  { let pv = (); pv.push(a.named()); pv.at(0).k.d.k.push(0) }
+    #|  metadata(repr((a.named(),)))
+    #|}
+    #|#let get() = a.named()
+    #|#{
+    #|  let _ = (dictionary.insert)(get(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get(), "k")
+    #|  let _ = (dictionary.insert)(get().k, "zz", 0)
+    #|  let _ = (dictionary.remove)(get().k, "a")
+    #|  let _ = (array.pop)(get().k.a)
+    #|  let _ = (array.push)(get().k.a, 0)
+    #|  let _ = (array.pop)(get().k.at("a"))
+    #|  let _ = (array.push)(get().k.at("a"), 0)
+    #|  let _ = (dictionary.insert)(get().k.d, "zz", 0)
+    #|  let _ = (dictionary.remove)(get().k.d, "k")
+    #|  let _ = (array.pop)(get().k.d.k)
+    #|  let _ = (array.push)(get().k.d.k, 0)
+    #|  let _ = (array.pop)(get().k.values().first())
+    #|  let _ = (array.push)(get().k.values().first(), 0)
+    #|  let _ = (array.pop)(get().k.pairs().first().last())
+    #|  let _ = (array.push)(get().k.pairs().first().last(), 0)
+    #|  let _ = (array.pop)(get().k.values().last().k)
+    #|  let _ = (array.push)(get().k.values().last().k, 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#metadata(repr((a.named(),)))
+    #|]
+    #|#metadata("== arguments: `at` with an index")
+    #|#[
+    #|#let a = arguments(((1, 2), (k: (3,))), 5, k: (a: (1, 2), d: (k: (3,))))
+    #|#{
+    #|  let _ = (array.pop)(a.at(0))
+    #|  let _ = (array.push)(a.at(0), 0)
+    #|  let _ = (array.pop)(a.at(0).at(0))
+    #|  let _ = (array.push)(a.at(0).at(0), 0)
+    #|  let _ = (array.pop)(a.at(0).first())
+    #|  let _ = (array.push)(a.at(0).first(), 0)
+    #|  let _ = (dictionary.insert)(a.at(0).at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(a.at(0).at(1), "k")
+    #|  let _ = (dictionary.insert)(a.at(0).last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(a.at(0).last(), "k")
+    #|  let _ = (array.pop)(a.at(0).at(1).k)
+    #|  let _ = (array.push)(a.at(0).at(1).k, 0)
+    #|  let _ = (array.pop)(a.at(0).last().at("k"))
+    #|  let _ = (array.push)(a.at(0).last().at("k"), 0)
+    #|  let _ = (array.pop)(a.at(0).at(1).values().first())
+    #|  let _ = (array.push)(a.at(0).at(1).values().first(), 0)
+    #|  let _ = (array.pop)(a.at(0).slice(0, 1).first())
+    #|  let _ = (array.push)(a.at(0).slice(0, 1).first(), 0)
+    #|  metadata(repr((a.at(0),)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(a.at(0)); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(a.at(0)); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(a.at(0)); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(a.at(0)); pv.at(0).at(0).push(0) }
+    #|  { let pv = (); pv.push(a.at(0)); let _ = pv.at(0).first().pop() }
+    #|  { let pv = (); pv.push(a.at(0)); pv.at(0).first().push(0) }
+    #|  { let pv = (); pv.push(a.at(0)); pv.at(0).at(1).insert("zz", 0) }
+    #|  { let pv = (); pv.push(a.at(0)); let _ = pv.at(0).at(1).remove("k") }
+    #|  { let pv = (); pv.push(a.at(0)); pv.at(0).last().insert("zz", 0) }
+    #|  { let pv = (); pv.push(a.at(0)); let _ = pv.at(0).last().remove("k") }
+    #|  { let pv = (); pv.push(a.at(0)); let _ = pv.at(0).at(1).k.pop() }
+    #|  { let pv = (); pv.push(a.at(0)); pv.at(0).at(1).k.push(0) }
+    #|  { let pv = (); pv.push(a.at(0)); let _ = pv.at(0).last().at("k").pop() }
+    #|  { let pv = (); pv.push(a.at(0)); pv.at(0).last().at("k").push(0) }
+    #|  metadata(repr((a.at(0),)))
+    #|}
+    #|#let get() = a.at(0)
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  let _ = (array.pop)(get().first())
+    #|  let _ = (array.push)(get().first(), 0)
+    #|  let _ = (dictionary.insert)(get().at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().at(1), "k")
+    #|  let _ = (dictionary.insert)(get().last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().last(), "k")
+    #|  let _ = (array.pop)(get().at(1).k)
+    #|  let _ = (array.push)(get().at(1).k, 0)
+    #|  let _ = (array.pop)(get().last().at("k"))
+    #|  let _ = (array.push)(get().last().at("k"), 0)
+    #|  let _ = (array.pop)(get().at(1).values().first())
+    #|  let _ = (array.push)(get().at(1).values().first(), 0)
+    #|  let _ = (array.pop)(get().slice(0, 1).first())
+    #|  let _ = (array.push)(get().slice(0, 1).first(), 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#metadata(repr((a.at(0),)))
+    #|]
+    #|#metadata("== arguments: `at` with a name and field access")
+    #|#[
+    #|#let a = arguments(((1, 2), (k: (3,))), 5, k: (a: (1, 2), d: (k: (3,))))
+    #|#{
+    #|  let _ = (dictionary.insert)(a.at("k"), "zz", 0)
+    #|  let _ = (dictionary.remove)(a.at("k"), "a")
+    #|  let _ = (array.pop)(a.at("k").a)
+    #|  let _ = (array.push)(a.at("k").a, 0)
+    #|  let _ = (array.pop)(a.at("k").at("a"))
+    #|  let _ = (array.push)(a.at("k").at("a"), 0)
+    #|  let _ = (dictionary.insert)(a.at("k").d, "zz", 0)
+    #|  let _ = (dictionary.remove)(a.at("k").d, "k")
+    #|  let _ = (array.pop)(a.at("k").d.k)
+    #|  let _ = (array.push)(a.at("k").d.k, 0)
+    #|  let _ = (array.pop)(a.at("k").values().first())
+    #|  let _ = (array.push)(a.at("k").values().first(), 0)
+    #|  let _ = (array.pop)(a.at("k").pairs().first().last())
+    #|  let _ = (array.push)(a.at("k").pairs().first().last(), 0)
+    #|  let _ = (array.pop)(a.at("k").values().last().k)
+    #|  let _ = (array.push)(a.at("k").values().last().k, 0)
+    #|  metadata(repr((a.at("k"), a.k,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(a.at("k")); pv.at(0).insert("zz", 0) }
+    #|  { let pv = (); pv.push(a.at("k")); let _ = pv.at(0).remove("a") }
+    #|  { let pv = (); pv.push(a.at("k")); let _ = pv.at(0).a.pop() }
+    #|  { let pv = (); pv.push(a.at("k")); pv.at(0).a.push(0) }
+    #|  { let pv = (); pv.push(a.at("k")); let _ = pv.at(0).at("a").pop() }
+    #|  { let pv = (); pv.push(a.at("k")); pv.at(0).at("a").push(0) }
+    #|  { let pv = (); pv.push(a.at("k")); pv.at(0).d.insert("zz", 0) }
+    #|  { let pv = (); pv.push(a.at("k")); let _ = pv.at(0).d.remove("k") }
+    #|  { let pv = (); pv.push(a.at("k")); let _ = pv.at(0).d.k.pop() }
+    #|  { let pv = (); pv.push(a.at("k")); pv.at(0).d.k.push(0) }
+    #|  metadata(repr((a.at("k"), a.k,)))
+    #|}
+    #|#let get() = a.at("k")
+    #|#{
+    #|  let _ = (dictionary.insert)(get(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get(), "a")
+    #|  let _ = (array.pop)(get().a)
+    #|  let _ = (array.push)(get().a, 0)
+    #|  let _ = (array.pop)(get().at("a"))
+    #|  let _ = (array.push)(get().at("a"), 0)
+    #|  let _ = (dictionary.insert)(get().d, "zz", 0)
+    #|  let _ = (dictionary.remove)(get().d, "k")
+    #|  let _ = (array.pop)(get().d.k)
+    #|  let _ = (array.push)(get().d.k, 0)
+    #|  let _ = (array.pop)(get().values().first())
+    #|  let _ = (array.push)(get().values().first(), 0)
+    #|  let _ = (array.pop)(get().pairs().first().last())
+    #|  let _ = (array.push)(get().pairs().first().last(), 0)
+    #|  let _ = (array.pop)(get().values().last().k)
+    #|  let _ = (array.push)(get().values().last().k, 0)
+    #|  metadata(repr((get(), a.k,)))
+    #|}
+    #|#metadata(repr((a.at("k"), a.k,)))
+    #|]
+    #|#metadata("== arguments: a named field")
+    #|#[
+    #|#let a = arguments(((1, 2), (k: (3,))), 5, k: (a: (1, 2), d: (k: (3,))))
+    #|#{
+    #|  let _ = (dictionary.insert)(a.k, "zz", 0)
+    #|  let _ = (dictionary.remove)(a.k, "a")
+    #|  let _ = (array.pop)(a.k.a)
+    #|  let _ = (array.push)(a.k.a, 0)
+    #|  let _ = (array.pop)(a.k.at("a"))
+    #|  let _ = (array.push)(a.k.at("a"), 0)
+    #|  let _ = (dictionary.insert)(a.k.d, "zz", 0)
+    #|  let _ = (dictionary.remove)(a.k.d, "k")
+    #|  let _ = (array.pop)(a.k.d.k)
+    #|  let _ = (array.push)(a.k.d.k, 0)
+    #|  let _ = (array.pop)(a.k.values().first())
+    #|  let _ = (array.push)(a.k.values().first(), 0)
+    #|  let _ = (array.pop)(a.k.pairs().first().last())
+    #|  let _ = (array.push)(a.k.pairs().first().last(), 0)
+    #|  let _ = (array.pop)(a.k.values().last().k)
+    #|  let _ = (array.push)(a.k.values().last().k, 0)
+    #|  metadata(repr((a.k,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(a.k); pv.at(0).insert("zz", 0) }
+    #|  { let pv = (); pv.push(a.k); let _ = pv.at(0).remove("a") }
+    #|  { let pv = (); pv.push(a.k); let _ = pv.at(0).a.pop() }
+    #|  { let pv = (); pv.push(a.k); pv.at(0).a.push(0) }
+    #|  { let pv = (); pv.push(a.k); let _ = pv.at(0).at("a").pop() }
+    #|  { let pv = (); pv.push(a.k); pv.at(0).at("a").push(0) }
+    #|  { let pv = (); pv.push(a.k); pv.at(0).d.insert("zz", 0) }
+    #|  { let pv = (); pv.push(a.k); let _ = pv.at(0).d.remove("k") }
+    #|  { let pv = (); pv.push(a.k); let _ = pv.at(0).d.k.pop() }
+    #|  { let pv = (); pv.push(a.k); pv.at(0).d.k.push(0) }
+    #|  metadata(repr((a.k,)))
+    #|}
+    #|#let get() = a.k
+    #|#{
+    #|  let _ = (dictionary.insert)(get(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get(), "a")
+    #|  let _ = (array.pop)(get().a)
+    #|  let _ = (array.push)(get().a, 0)
+    #|  let _ = (array.pop)(get().at("a"))
+    #|  let _ = (array.push)(get().at("a"), 0)
+    #|  let _ = (dictionary.insert)(get().d, "zz", 0)
+    #|  let _ = (dictionary.remove)(get().d, "k")
+    #|  let _ = (array.pop)(get().d.k)
+    #|  let _ = (array.push)(get().d.k, 0)
+    #|  let _ = (array.pop)(get().values().first())
+    #|  let _ = (array.push)(get().values().first(), 0)
+    #|  let _ = (array.pop)(get().pairs().first().last())
+    #|  let _ = (array.push)(get().pairs().first().last(), 0)
+    #|  let _ = (array.pop)(get().values().last().k)
+    #|  let _ = (array.push)(get().values().last().k, 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#metadata(repr((a.k,)))
+    #|]
+    #|#metadata("== arguments: `at` with a default")
+    #|#[
+    #|#let a = arguments(1)
+    #|#let dflt = ((1, 2), (k: (3,)))
+    #|#{
+    #|  let _ = (array.pop)(a.at(5, default: dflt))
+    #|  let _ = (array.push)(a.at(5, default: dflt), 0)
+    #|  let _ = (array.pop)((a.at(5, default: dflt)).at(0))
+    #|  let _ = (array.push)((a.at(5, default: dflt)).at(0), 0)
+    #|  let _ = (array.pop)((a.at(5, default: dflt)).first())
+    #|  let _ = (array.push)((a.at(5, default: dflt)).first(), 0)
+    #|  let _ = (dictionary.insert)((a.at(5, default: dflt)).at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)((a.at(5, default: dflt)).at(1), "k")
+    #|  let _ = (dictionary.insert)((a.at(5, default: dflt)).last(), "zz", 0)
+    #|  let _ = (dictionary.remove)((a.at(5, default: dflt)).last(), "k")
+    #|  let _ = (array.pop)((a.at(5, default: dflt)).at(1).k)
+    #|  let _ = (array.push)((a.at(5, default: dflt)).at(1).k, 0)
+    #|  let _ = (array.pop)((a.at(5, default: dflt)).last().at("k"))
+    #|  let _ = (array.push)((a.at(5, default: dflt)).last().at("k"), 0)
+    #|  let _ = (array.pop)((a.at(5, default: dflt)).at(1).values().first())
+    #|  let _ = (array.push)((a.at(5, default: dflt)).at(1).values().first(), 0)
+    #|  let _ = (array.pop)((a.at(5, default: dflt)).slice(0, 1).first())
+    #|  let _ = (array.push)((a.at(5, default: dflt)).slice(0, 1).first(), 0)
+    #|  metadata(repr((a.at(5, default: dflt), dflt,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(a.at(5, default: dflt)); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(a.at(5, default: dflt)); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(a.at(5, default: dflt)); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(a.at(5, default: dflt)); pv.at(0).at(0).push(0) }
+    #|  { let pv = (); pv.push(a.at(5, default: dflt)); let _ = pv.at(0).first().pop() }
+    #|  { let pv = (); pv.push(a.at(5, default: dflt)); pv.at(0).first().push(0) }
+    #|  { let pv = (); pv.push(a.at(5, default: dflt)); pv.at(0).at(1).insert("zz", 0) }
+    #|  { let pv = (); pv.push(a.at(5, default: dflt)); let _ = pv.at(0).at(1).remove("k") }
+    #|  { let pv = (); pv.push(a.at(5, default: dflt)); pv.at(0).last().insert("zz", 0) }
+    #|  { let pv = (); pv.push(a.at(5, default: dflt)); let _ = pv.at(0).last().remove("k") }
+    #|  { let pv = (); pv.push(a.at(5, default: dflt)); let _ = pv.at(0).at(1).k.pop() }
+    #|  { let pv = (); pv.push(a.at(5, default: dflt)); pv.at(0).at(1).k.push(0) }
+    #|  { let pv = (); pv.push(a.at(5, default: dflt)); let _ = pv.at(0).last().at("k").pop() }
+    #|  { let pv = (); pv.push(a.at(5, default: dflt)); pv.at(0).last().at("k").push(0) }
+    #|  metadata(repr((a.at(5, default: dflt), dflt,)))
+    #|}
+    #|#let get() = a.at(5, default: dflt)
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  let _ = (array.pop)(get().first())
+    #|  let _ = (array.push)(get().first(), 0)
+    #|  let _ = (dictionary.insert)(get().at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().at(1), "k")
+    #|  let _ = (dictionary.insert)(get().last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().last(), "k")
+    #|  let _ = (array.pop)(get().at(1).k)
+    #|  let _ = (array.push)(get().at(1).k, 0)
+    #|  let _ = (array.pop)(get().last().at("k"))
+    #|  let _ = (array.push)(get().last().at("k"), 0)
+    #|  let _ = (array.pop)(get().at(1).values().first())
+    #|  let _ = (array.push)(get().at(1).values().first(), 0)
+    #|  let _ = (array.pop)(get().slice(0, 1).first())
+    #|  let _ = (array.push)(get().slice(0, 1).first(), 0)
+    #|  metadata(repr((get(), dflt,)))
+    #|}
+    #|#metadata(repr((a.at(5, default: dflt), dflt,)))
+    #|]
+    #|#metadata("== arguments: the sink of a function")
+    #|#[
+    #|#let f(..a) = {
+    #|  let _ = (array.push)(a.pos(), 0)
+    #|  let _ = (array.pop)(a.pos().at(0))
+    #|  let _ = (array.pop)(a.at(0))
+    #|  let _ = (array.pop)(a.at(0).at(0))
+    #|  let _ = (dictionary.insert)(a.named(), "zz", 0)
+    #|  let _ = (dictionary.insert)(a.named().k, "zz", 0)
+    #|  let _ = (array.pop)(a.at("k").a)
+    #|  let _ = (array.pop)(a.k.a)
+    #|  { let x = (); x.push(a.at(0)); let _ = x.at(0).at(0).pop() }
+    #|  { let x = (); x.push(a.pos()); let _ = x.at(0).at(0).pop() }
+    #|  { let x = (); x.push(a.named()); let _ = x.at(0).k.a.pop() }
+    #|  (a.pos(), a.named())
+    #|}
+    #|#let xs = ((1, 2), (k: (3,)))
+    #|#let d = (a: (1, 2), d: (k: (3,)))
+    #|#metadata(repr(f(((1, 2), (k: (3,))), k: (a: (1, 2), d: (k: (3,))))))
+    #|#metadata(repr(f(((1, 2), (k: (3,))), k: (a: (1, 2), d: (k: (3,))))))
+    #|#metadata(repr((f(xs, k: d), xs, d)))
+    #|#metadata(repr((f(..(xs,), ..(k: d)), xs, d)))
+    #|]
+    #|#metadata("== arguments: spread into a native function")
+    #|#[
+    #|#let a = arguments(((1, 2), (k: (3,))), 0, k: (a: (1, 2), d: (k: (3,))))
+    #|#let b = arguments((1, 2))
+    #|#let d = arguments((a: (1, 2), d: (k: (3,))), "zz", 0)
+    #|#let _ = (array.push)(..a.pos())
+    #|#let _ = (array.push)(..b, 0)
+    #|#let _ = (array.pop)(..b)
+    #|#let _ = (dictionary.insert)(..d)
+    #|#let _ = (array.pop)(..arguments(..b))
+    #|#metadata(repr((a, b, d)))
+    #|#let f(..a) = {
+    #|  let _ = (array.pop)(..a)
+    #|  let _ = (array.push)(..a, 0)
+    #|  let _ = (array.pop)(..arguments(..a))
+    #|  a.pos()
+    #|}
+    #|#let g(..a) = {
+    #|  let _ = (dictionary.insert)(..a, "zz", 0)
+    #|  let _ = (dictionary.remove)(..a, "a")
+    #|  a.pos()
+    #|}
+    #|#let h(..a) = (f(..a), a.pos())
+    #|#metadata(repr((f((1, 2)), f((1, 2)), g((a: (1, 2), d: (k: (3,)))), g((a: (1, 2), d: (k: (3,)))), h((1, 2)), h((1, 2)))))
+    #|#let xs = (1, 2)
+    #|#metadata(repr((f(xs), h(xs), xs)))
+    #|// In math (`eval_math_args`).
+    #|#let am = arguments((1, 2), (3, 4))
+    #|#let pop = array.pop
+    #|#let both(a, b) = (array.pop)(a) + (array.pop)(b)
+    #|// (Evaluated, not laid out: the oracle's test world has no fonts.)
+    #|#let one = arguments((1, 2))
+    #|#let eq = $ pop(..#one) + pop(..#am.filter(v => v.len() == 2).pos().slice(0, 1)) + both(..#am) $
+    #|#metadata(repr((one, am)))
+    #|#let mk() = arguments((1, 2), (k: (3,)))
+    #|#let _ = range(2).map(i => (array.pop)(..mk().filter(v => type(v) == array)))
+    #|#let _ = range(2).map(i => (dictionary.insert)(mk().at(1), "zz", 0))
+    #|#metadata(repr(range(2).map(i => mk())))
+    #|#metadata(repr((a.pos(), b.pos())))
+    #|]
+    #|#metadata("== arguments: `filter` and `map`")
+    #|#[
+    #|#let a = arguments(((1, 2), (k: (3,))), 5, k: (a: (1, 2), d: (k: (3,))))
+    #|#{
+    #|  let _ = (array.pop)(a.filter(v => true).pos())
+    #|  let _ = (array.push)(a.filter(v => true).pos(), 0)
+    #|  let _ = (array.pop)((a.filter(v => true).pos()).at(0))
+    #|  let _ = (array.push)((a.filter(v => true).pos()).at(0), 0)
+    #|  let _ = (array.pop)((a.filter(v => true).pos()).at(0).at(0))
+    #|  let _ = (array.push)((a.filter(v => true).pos()).at(0).at(0), 0)
+    #|  let _ = (array.pop)((a.filter(v => true).pos()).at(0).first())
+    #|  let _ = (array.push)((a.filter(v => true).pos()).at(0).first(), 0)
+    #|  let _ = (dictionary.insert)((a.filter(v => true).pos()).at(0).at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)((a.filter(v => true).pos()).at(0).at(1), "k")
+    #|  let _ = (dictionary.insert)((a.filter(v => true).pos()).at(0).last(), "zz", 0)
+    #|  let _ = (dictionary.remove)((a.filter(v => true).pos()).at(0).last(), "k")
+    #|  let _ = (array.pop)((a.filter(v => true).pos()).at(0).at(1).k)
+    #|  let _ = (array.push)((a.filter(v => true).pos()).at(0).at(1).k, 0)
+    #|  let _ = (array.pop)((a.filter(v => true).pos()).at(0).last().at("k"))
+    #|  let _ = (array.push)((a.filter(v => true).pos()).at(0).last().at("k"), 0)
+    #|  let _ = (array.pop)((a.filter(v => true).pos()).at(0).at(1).values().first())
+    #|  let _ = (array.push)((a.filter(v => true).pos()).at(0).at(1).values().first(), 0)
+    #|  let _ = (array.pop)((a.filter(v => true).pos()).at(0).slice(0, 1).first())
+    #|  let _ = (array.push)((a.filter(v => true).pos()).at(0).slice(0, 1).first(), 0)
+    #|  metadata(repr((a.filter(v => true).pos(), a, a.map(v => v).named(), a.map(v => v).at(0), a.filter(v => true).at("k"),)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(a.filter(v => true).pos()); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(a.filter(v => true).pos()); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(a.filter(v => true).pos()); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(a.filter(v => true).pos()); pv.at(0).at(0).push(0) }
+    #|  { let pv = (); pv.push(a.filter(v => true).pos()); let _ = pv.at(0).at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(a.filter(v => true).pos()); pv.at(0).at(0).at(0).push(0) }
+    #|  { let pv = (); pv.push(a.filter(v => true).pos()); let _ = pv.at(0).at(0).first().pop() }
+    #|  { let pv = (); pv.push(a.filter(v => true).pos()); pv.at(0).at(0).first().push(0) }
+    #|  { let pv = (); pv.push(a.filter(v => true).pos()); pv.at(0).at(0).at(1).insert("zz", 0) }
+    #|  { let pv = (); pv.push(a.filter(v => true).pos()); let _ = pv.at(0).at(0).at(1).remove("k") }
+    #|  { let pv = (); pv.push(a.filter(v => true).pos()); pv.at(0).at(0).last().insert("zz", 0) }
+    #|  { let pv = (); pv.push(a.filter(v => true).pos()); let _ = pv.at(0).at(0).last().remove("k") }
+    #|  { let pv = (); pv.push(a.filter(v => true).pos()); let _ = pv.at(0).at(0).at(1).k.pop() }
+    #|  { let pv = (); pv.push(a.filter(v => true).pos()); pv.at(0).at(0).at(1).k.push(0) }
+    #|  { let pv = (); pv.push(a.filter(v => true).pos()); let _ = pv.at(0).at(0).last().at("k").pop() }
+    #|  { let pv = (); pv.push(a.filter(v => true).pos()); pv.at(0).at(0).last().at("k").push(0) }
+    #|  metadata(repr((a.filter(v => true).pos(), a, a.map(v => v).named(), a.map(v => v).at(0), a.filter(v => true).at("k"),)))
+    #|}
+    #|#let get() = a.filter(v => true).pos()
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  let _ = (array.pop)(get().at(0).at(0))
+    #|  let _ = (array.push)(get().at(0).at(0), 0)
+    #|  let _ = (array.pop)(get().at(0).first())
+    #|  let _ = (array.push)(get().at(0).first(), 0)
+    #|  let _ = (dictionary.insert)(get().at(0).at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().at(0).at(1), "k")
+    #|  let _ = (dictionary.insert)(get().at(0).last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().at(0).last(), "k")
+    #|  let _ = (array.pop)(get().at(0).at(1).k)
+    #|  let _ = (array.push)(get().at(0).at(1).k, 0)
+    #|  let _ = (array.pop)(get().at(0).last().at("k"))
+    #|  let _ = (array.push)(get().at(0).last().at("k"), 0)
+    #|  let _ = (array.pop)(get().at(0).at(1).values().first())
+    #|  let _ = (array.push)(get().at(0).at(1).values().first(), 0)
+    #|  let _ = (array.pop)(get().at(0).slice(0, 1).first())
+    #|  let _ = (array.push)(get().at(0).slice(0, 1).first(), 0)
+    #|  metadata(repr((get(), a, a.map(v => v).named(), a.map(v => v).at(0), a.filter(v => true).at("k"),)))
+    #|}
+    #|#metadata(repr((a.filter(v => true).pos(), a, a.map(v => v).named(), a.map(v => v).at(0), a.filter(v => true).at("k"),)))
+    #|]
+    #|#metadata("== arguments: spread into a sink")
+    #|#[
+    #|#let xs = ((1, 2), (k: (3,)))
+    #|#let d = (a: (1, 2), d: (k: (3,)))
+    #|#let f(..a) = a.pos()
+    #|#let g(..a) = a.named()
+    #|#{
+    #|  let _ = (array.pop)(f(..xs))
+    #|  let _ = (array.push)(f(..xs), 0)
+    #|  let _ = (array.pop)(f(..xs).at(0))
+    #|  let _ = (array.push)(f(..xs).at(0), 0)
+    #|  let _ = (dictionary.insert)(f(..xs).at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(f(..xs).at(1), "k")
+    #|  metadata(repr((f(..xs), xs, g(..d), d,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(f(..xs)); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(f(..xs)); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(f(..xs)); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(f(..xs)); pv.at(0).at(0).push(0) }
+    #|  { let pv = (); pv.push(f(..xs)); pv.at(0).at(1).insert("zz", 0) }
+    #|  { let pv = (); pv.push(f(..xs)); let _ = pv.at(0).at(1).remove("k") }
+    #|  metadata(repr((f(..xs), xs, g(..d), d,)))
+    #|}
+    #|#let get() = f(..xs)
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  let _ = (dictionary.insert)(get().at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().at(1), "k")
+    #|  metadata(repr((get(), xs, g(..d), d,)))
+    #|}
+    #|#metadata(repr((f(..xs), xs, g(..d), d,)))
+    #|]
+    #|#metadata("== arguments: a dictionary spread into a sink")
+    #|#[
+    #|#let d = (a: (1, 2), d: (k: (3,)))
+    #|#let g(..a) = a.named()
+    #|#{
+    #|  let _ = (dictionary.insert)(g(..d), "zz", 0)
+    #|  let _ = (dictionary.remove)(g(..d), "a")
+    #|  let _ = (array.pop)(g(..d).a)
+    #|  let _ = (array.push)(g(..d).a, 0)
+    #|  let _ = (array.pop)(g(..d).at("a"))
+    #|  let _ = (array.push)(g(..d).at("a"), 0)
+    #|  let _ = (dictionary.insert)(g(..d).d, "zz", 0)
+    #|  let _ = (dictionary.remove)(g(..d).d, "k")
+    #|  let _ = (array.pop)(g(..d).d.k)
+    #|  let _ = (array.push)(g(..d).d.k, 0)
+    #|  let _ = (array.pop)(g(..d).values().first())
+    #|  let _ = (array.push)(g(..d).values().first(), 0)
+    #|  let _ = (array.pop)(g(..d).pairs().first().last())
+    #|  let _ = (array.push)(g(..d).pairs().first().last(), 0)
+    #|  let _ = (array.pop)(g(..d).values().last().k)
+    #|  let _ = (array.push)(g(..d).values().last().k, 0)
+    #|  metadata(repr((g(..d), d,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(g(..d)); pv.at(0).insert("zz", 0) }
+    #|  { let pv = (); pv.push(g(..d)); let _ = pv.at(0).remove("a") }
+    #|  { let pv = (); pv.push(g(..d)); let _ = pv.at(0).a.pop() }
+    #|  { let pv = (); pv.push(g(..d)); pv.at(0).a.push(0) }
+    #|  { let pv = (); pv.push(g(..d)); let _ = pv.at(0).at("a").pop() }
+    #|  { let pv = (); pv.push(g(..d)); pv.at(0).at("a").push(0) }
+    #|  { let pv = (); pv.push(g(..d)); pv.at(0).d.insert("zz", 0) }
+    #|  { let pv = (); pv.push(g(..d)); let _ = pv.at(0).d.remove("k") }
+    #|  { let pv = (); pv.push(g(..d)); let _ = pv.at(0).d.k.pop() }
+    #|  { let pv = (); pv.push(g(..d)); pv.at(0).d.k.push(0) }
+    #|  metadata(repr((g(..d), d,)))
+    #|}
+    #|#let get() = g(..d)
+    #|#{
+    #|  let _ = (dictionary.insert)(get(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get(), "a")
+    #|  let _ = (array.pop)(get().a)
+    #|  let _ = (array.push)(get().a, 0)
+    #|  let _ = (array.pop)(get().at("a"))
+    #|  let _ = (array.push)(get().at("a"), 0)
+    #|  let _ = (dictionary.insert)(get().d, "zz", 0)
+    #|  let _ = (dictionary.remove)(get().d, "k")
+    #|  let _ = (array.pop)(get().d.k)
+    #|  let _ = (array.push)(get().d.k, 0)
+    #|  let _ = (array.pop)(get().values().first())
+    #|  let _ = (array.push)(get().values().first(), 0)
+    #|  let _ = (array.pop)(get().pairs().first().last())
+    #|  let _ = (array.push)(get().pairs().first().last(), 0)
+    #|  let _ = (array.pop)(get().values().last().k)
+    #|  let _ = (array.push)(get().values().last().k, 0)
+    #|  metadata(repr((get(), d,)))
+    #|}
+    #|#metadata(repr((g(..d), d,)))
+    #|]
+    #|
+  let expected = [
+    "== arguments: positional values", "((((1, 2), (k: (3,))), 5),)", "((((1, 2), (k: (3,))), 5),)",
+    "((((1, 2), (k: (3,))), 5),)", "((((1, 2), (k: (3,))), 5),)", "== arguments: named values",
+    "((k: (a: (1, 2), d: (k: (3,)))),)", "((k: (a: (1, 2), d: (k: (3,)))),)", "((k: (a: (1, 2), d: (k: (3,)))),)",
+    "((k: (a: (1, 2), d: (k: (3,)))),)", "== arguments: `at` with an index", "(((1, 2), (k: (3,))),)",
+    "(((1, 2), (k: (3,))),)", "(((1, 2), (k: (3,))),)", "(((1, 2), (k: (3,))),)",
+    "== arguments: `at` with a name and field access", "(\n  (a: (1, 2), d: (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n)",
+    "(\n  (a: (1, 2), d: (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n)", "(\n  (a: (1, 2), d: (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n)",
+    "(\n  (a: (1, 2), d: (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n)", "== arguments: a named field",
+    "((a: (1, 2), d: (k: (3,))),)", "((a: (1, 2), d: (k: (3,))),)", "((a: (1, 2), d: (k: (3,))),)",
+    "((a: (1, 2), d: (k: (3,))),)", "== arguments: `at` with a default", "(((1, 2), (k: (3,))), ((1, 2), (k: (3,))))",
+    "(((1, 2), (k: (3,))), ((1, 2), (k: (3,))))", "(((1, 2), (k: (3,))), ((1, 2), (k: (3,))))",
+    "(((1, 2), (k: (3,))), ((1, 2), (k: (3,))))", "== arguments: the sink of a function",
+    "(\n  (((1, 2), (k: (3,))),),\n  (k: (a: (1, 2), d: (k: (3,)))),\n)", "(\n  (((1, 2), (k: (3,))),),\n  (k: (a: (1, 2), d: (k: (3,)))),\n)",
+    "(\n  (\n    (((1, 2), (k: (3,))),),\n    (k: (a: (1, 2), d: (k: (3,)))),\n  ),\n  ((1, 2), (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n)",
+    "(\n  (\n    (((1, 2), (k: (3,))),),\n    (k: (a: (1, 2), d: (k: (3,)))),\n  ),\n  ((1, 2), (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n)",
+    "== arguments: spread into a native function", "(\n  arguments(\n    ((1, 2), (k: (3,))),\n    0,\n    k: (a: (1, 2), d: (k: (3,))),\n  ),\n  arguments((1, 2)),\n  arguments((a: (1, 2), d: (k: (3,))), \"zz\", 0),\n)",
+    "(\n  ((1, 2),),\n  ((1, 2),),\n  ((a: (1, 2), d: (k: (3,))),),\n  ((a: (1, 2), d: (k: (3,))),),\n  (((1, 2),), ((1, 2),)),\n  (((1, 2),), ((1, 2),)),\n)",
+    "(((1, 2),), (((1, 2),), ((1, 2),)), (1, 2))", "(arguments((1, 2)), arguments((1, 2), (3, 4)))",
+    "(\n  arguments((1, 2), (k: (3,))),\n  arguments((1, 2), (k: (3,))),\n)", "((((1, 2), (k: (3,))), 0), ((1, 2),))",
+    "== arguments: `filter` and `map`", "(\n  (((1, 2), (k: (3,))), 5),\n  arguments(\n    ((1, 2), (k: (3,))),\n    5,\n    k: (a: (1, 2), d: (k: (3,))),\n  ),\n  (k: (a: (1, 2), d: (k: (3,)))),\n  ((1, 2), (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n)",
+    "(\n  (((1, 2), (k: (3,))), 5),\n  arguments(\n    ((1, 2), (k: (3,))),\n    5,\n    k: (a: (1, 2), d: (k: (3,))),\n  ),\n  (k: (a: (1, 2), d: (k: (3,)))),\n  ((1, 2), (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n)",
+    "(\n  (((1, 2), (k: (3,))), 5),\n  arguments(\n    ((1, 2), (k: (3,))),\n    5,\n    k: (a: (1, 2), d: (k: (3,))),\n  ),\n  (k: (a: (1, 2), d: (k: (3,)))),\n  ((1, 2), (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n)",
+    "(\n  (((1, 2), (k: (3,))), 5),\n  arguments(\n    ((1, 2), (k: (3,))),\n    5,\n    k: (a: (1, 2), d: (k: (3,))),\n  ),\n  (k: (a: (1, 2), d: (k: (3,)))),\n  ((1, 2), (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n)",
+    "== arguments: spread into a sink", "(\n  ((1, 2), (k: (3,))),\n  ((1, 2), (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n)",
+    "(\n  ((1, 2), (k: (3,))),\n  ((1, 2), (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n)",
+    "(\n  ((1, 2), (k: (3,))),\n  ((1, 2), (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n)",
+    "(\n  ((1, 2), (k: (3,))),\n  ((1, 2), (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n)",
+    "== arguments: a dictionary spread into a sink", "(\n  (a: (1, 2), d: (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n)",
+    "(\n  (a: (1, 2), d: (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n)", "(\n  (a: (1, 2), d: (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n)",
+    "(\n  (a: (1, 2), d: (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n)",
+  ]
+  assert_eq(oracle_metadata(source), expected)
+}
+
+///|
+test "oracle: sharing: loaded and computed data" {
+  let source =
+    #|#metadata("== data: json")
+    #|#[
+    #|#{
+    #|  let _ = (array.pop)(json(bytes("[[1, 2], {\"k\": [3]}]")))
+    #|  let _ = (array.push)(json(bytes("[[1, 2], {\"k\": [3]}]")), 0)
+    #|  let _ = (array.pop)((json(bytes("[[1, 2], {\"k\": [3]}]"))).at(0))
+    #|  let _ = (array.push)((json(bytes("[[1, 2], {\"k\": [3]}]"))).at(0), 0)
+    #|  let _ = (array.pop)((json(bytes("[[1, 2], {\"k\": [3]}]"))).first())
+    #|  let _ = (array.push)((json(bytes("[[1, 2], {\"k\": [3]}]"))).first(), 0)
+    #|  let _ = (dictionary.insert)((json(bytes("[[1, 2], {\"k\": [3]}]"))).at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)((json(bytes("[[1, 2], {\"k\": [3]}]"))).at(1), "k")
+    #|  let _ = (dictionary.insert)((json(bytes("[[1, 2], {\"k\": [3]}]"))).last(), "zz", 0)
+    #|  let _ = (dictionary.remove)((json(bytes("[[1, 2], {\"k\": [3]}]"))).last(), "k")
+    #|  let _ = (array.pop)((json(bytes("[[1, 2], {\"k\": [3]}]"))).at(1).k)
+    #|  let _ = (array.push)((json(bytes("[[1, 2], {\"k\": [3]}]"))).at(1).k, 0)
+    #|  let _ = (array.pop)((json(bytes("[[1, 2], {\"k\": [3]}]"))).last().at("k"))
+    #|  let _ = (array.push)((json(bytes("[[1, 2], {\"k\": [3]}]"))).last().at("k"), 0)
+    #|  let _ = (array.pop)((json(bytes("[[1, 2], {\"k\": [3]}]"))).at(1).values().first())
+    #|  let _ = (array.push)((json(bytes("[[1, 2], {\"k\": [3]}]"))).at(1).values().first(), 0)
+    #|  let _ = (array.pop)((json(bytes("[[1, 2], {\"k\": [3]}]"))).slice(0, 1).first())
+    #|  let _ = (array.push)((json(bytes("[[1, 2], {\"k\": [3]}]"))).slice(0, 1).first(), 0)
+    #|  metadata(repr((json(bytes("[[1, 2], {\"k\": [3]}]")),)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(json(bytes("[[1, 2], {\"k\": [3]}]"))); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(json(bytes("[[1, 2], {\"k\": [3]}]"))); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(json(bytes("[[1, 2], {\"k\": [3]}]"))); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(json(bytes("[[1, 2], {\"k\": [3]}]"))); pv.at(0).at(0).push(0) }
+    #|  { let pv = (); pv.push(json(bytes("[[1, 2], {\"k\": [3]}]"))); let _ = pv.at(0).first().pop() }
+    #|  { let pv = (); pv.push(json(bytes("[[1, 2], {\"k\": [3]}]"))); pv.at(0).first().push(0) }
+    #|  { let pv = (); pv.push(json(bytes("[[1, 2], {\"k\": [3]}]"))); pv.at(0).at(1).insert("zz", 0) }
+    #|  { let pv = (); pv.push(json(bytes("[[1, 2], {\"k\": [3]}]"))); let _ = pv.at(0).at(1).remove("k") }
+    #|  { let pv = (); pv.push(json(bytes("[[1, 2], {\"k\": [3]}]"))); pv.at(0).last().insert("zz", 0) }
+    #|  { let pv = (); pv.push(json(bytes("[[1, 2], {\"k\": [3]}]"))); let _ = pv.at(0).last().remove("k") }
+    #|  { let pv = (); pv.push(json(bytes("[[1, 2], {\"k\": [3]}]"))); let _ = pv.at(0).at(1).k.pop() }
+    #|  { let pv = (); pv.push(json(bytes("[[1, 2], {\"k\": [3]}]"))); pv.at(0).at(1).k.push(0) }
+    #|  { let pv = (); pv.push(json(bytes("[[1, 2], {\"k\": [3]}]"))); let _ = pv.at(0).last().at("k").pop() }
+    #|  { let pv = (); pv.push(json(bytes("[[1, 2], {\"k\": [3]}]"))); pv.at(0).last().at("k").push(0) }
+    #|  metadata(repr((json(bytes("[[1, 2], {\"k\": [3]}]")),)))
+    #|}
+    #|#let get() = json(bytes("[[1, 2], {\"k\": [3]}]"))
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  let _ = (array.pop)(get().first())
+    #|  let _ = (array.push)(get().first(), 0)
+    #|  let _ = (dictionary.insert)(get().at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().at(1), "k")
+    #|  let _ = (dictionary.insert)(get().last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().last(), "k")
+    #|  let _ = (array.pop)(get().at(1).k)
+    #|  let _ = (array.push)(get().at(1).k, 0)
+    #|  let _ = (array.pop)(get().last().at("k"))
+    #|  let _ = (array.push)(get().last().at("k"), 0)
+    #|  let _ = (array.pop)(get().at(1).values().first())
+    #|  let _ = (array.push)(get().at(1).values().first(), 0)
+    #|  let _ = (array.pop)(get().slice(0, 1).first())
+    #|  let _ = (array.push)(get().slice(0, 1).first(), 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#metadata(repr((json(bytes("[[1, 2], {\"k\": [3]}]")),)))
+    #|]
+    #|#metadata("== data: yaml")
+    #|#[
+    #|#{
+    #|  let _ = (array.pop)(yaml(bytes("- [1, 2]\n- {k: [3]}")))
+    #|  let _ = (array.push)(yaml(bytes("- [1, 2]\n- {k: [3]}")), 0)
+    #|  let _ = (array.pop)((yaml(bytes("- [1, 2]\n- {k: [3]}"))).at(0))
+    #|  let _ = (array.push)((yaml(bytes("- [1, 2]\n- {k: [3]}"))).at(0), 0)
+    #|  let _ = (array.pop)((yaml(bytes("- [1, 2]\n- {k: [3]}"))).first())
+    #|  let _ = (array.push)((yaml(bytes("- [1, 2]\n- {k: [3]}"))).first(), 0)
+    #|  let _ = (dictionary.insert)((yaml(bytes("- [1, 2]\n- {k: [3]}"))).at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)((yaml(bytes("- [1, 2]\n- {k: [3]}"))).at(1), "k")
+    #|  let _ = (dictionary.insert)((yaml(bytes("- [1, 2]\n- {k: [3]}"))).last(), "zz", 0)
+    #|  let _ = (dictionary.remove)((yaml(bytes("- [1, 2]\n- {k: [3]}"))).last(), "k")
+    #|  let _ = (array.pop)((yaml(bytes("- [1, 2]\n- {k: [3]}"))).at(1).k)
+    #|  let _ = (array.push)((yaml(bytes("- [1, 2]\n- {k: [3]}"))).at(1).k, 0)
+    #|  let _ = (array.pop)((yaml(bytes("- [1, 2]\n- {k: [3]}"))).last().at("k"))
+    #|  let _ = (array.push)((yaml(bytes("- [1, 2]\n- {k: [3]}"))).last().at("k"), 0)
+    #|  let _ = (array.pop)((yaml(bytes("- [1, 2]\n- {k: [3]}"))).at(1).values().first())
+    #|  let _ = (array.push)((yaml(bytes("- [1, 2]\n- {k: [3]}"))).at(1).values().first(), 0)
+    #|  let _ = (array.pop)((yaml(bytes("- [1, 2]\n- {k: [3]}"))).slice(0, 1).first())
+    #|  let _ = (array.push)((yaml(bytes("- [1, 2]\n- {k: [3]}"))).slice(0, 1).first(), 0)
+    #|  metadata(repr((yaml(bytes("- [1, 2]\n- {k: [3]}")),)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(yaml(bytes("- [1, 2]\n- {k: [3]}"))); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(yaml(bytes("- [1, 2]\n- {k: [3]}"))); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(yaml(bytes("- [1, 2]\n- {k: [3]}"))); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(yaml(bytes("- [1, 2]\n- {k: [3]}"))); pv.at(0).at(0).push(0) }
+    #|  { let pv = (); pv.push(yaml(bytes("- [1, 2]\n- {k: [3]}"))); let _ = pv.at(0).first().pop() }
+    #|  { let pv = (); pv.push(yaml(bytes("- [1, 2]\n- {k: [3]}"))); pv.at(0).first().push(0) }
+    #|  { let pv = (); pv.push(yaml(bytes("- [1, 2]\n- {k: [3]}"))); pv.at(0).at(1).insert("zz", 0) }
+    #|  { let pv = (); pv.push(yaml(bytes("- [1, 2]\n- {k: [3]}"))); let _ = pv.at(0).at(1).remove("k") }
+    #|  { let pv = (); pv.push(yaml(bytes("- [1, 2]\n- {k: [3]}"))); pv.at(0).last().insert("zz", 0) }
+    #|  { let pv = (); pv.push(yaml(bytes("- [1, 2]\n- {k: [3]}"))); let _ = pv.at(0).last().remove("k") }
+    #|  { let pv = (); pv.push(yaml(bytes("- [1, 2]\n- {k: [3]}"))); let _ = pv.at(0).at(1).k.pop() }
+    #|  { let pv = (); pv.push(yaml(bytes("- [1, 2]\n- {k: [3]}"))); pv.at(0).at(1).k.push(0) }
+    #|  { let pv = (); pv.push(yaml(bytes("- [1, 2]\n- {k: [3]}"))); let _ = pv.at(0).last().at("k").pop() }
+    #|  { let pv = (); pv.push(yaml(bytes("- [1, 2]\n- {k: [3]}"))); pv.at(0).last().at("k").push(0) }
+    #|  metadata(repr((yaml(bytes("- [1, 2]\n- {k: [3]}")),)))
+    #|}
+    #|#let get() = yaml(bytes("- [1, 2]\n- {k: [3]}"))
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  let _ = (array.pop)(get().first())
+    #|  let _ = (array.push)(get().first(), 0)
+    #|  let _ = (dictionary.insert)(get().at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().at(1), "k")
+    #|  let _ = (dictionary.insert)(get().last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().last(), "k")
+    #|  let _ = (array.pop)(get().at(1).k)
+    #|  let _ = (array.push)(get().at(1).k, 0)
+    #|  let _ = (array.pop)(get().last().at("k"))
+    #|  let _ = (array.push)(get().last().at("k"), 0)
+    #|  let _ = (array.pop)(get().at(1).values().first())
+    #|  let _ = (array.push)(get().at(1).values().first(), 0)
+    #|  let _ = (array.pop)(get().slice(0, 1).first())
+    #|  let _ = (array.push)(get().slice(0, 1).first(), 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#metadata(repr((yaml(bytes("- [1, 2]\n- {k: [3]}")),)))
+    #|]
+    #|#metadata("== data: toml")
+    #|#[
+    #|#{
+    #|  let _ = (dictionary.insert)(toml(bytes("a = [1, 2]\n[d]\nk = [3]")), "zz", 0)
+    #|  let _ = (dictionary.remove)(toml(bytes("a = [1, 2]\n[d]\nk = [3]")), "a")
+    #|  let _ = (array.pop)((toml(bytes("a = [1, 2]\n[d]\nk = [3]"))).a)
+    #|  let _ = (array.push)((toml(bytes("a = [1, 2]\n[d]\nk = [3]"))).a, 0)
+    #|  let _ = (array.pop)((toml(bytes("a = [1, 2]\n[d]\nk = [3]"))).at("a"))
+    #|  let _ = (array.push)((toml(bytes("a = [1, 2]\n[d]\nk = [3]"))).at("a"), 0)
+    #|  let _ = (dictionary.insert)((toml(bytes("a = [1, 2]\n[d]\nk = [3]"))).d, "zz", 0)
+    #|  let _ = (dictionary.remove)((toml(bytes("a = [1, 2]\n[d]\nk = [3]"))).d, "k")
+    #|  let _ = (array.pop)((toml(bytes("a = [1, 2]\n[d]\nk = [3]"))).d.k)
+    #|  let _ = (array.push)((toml(bytes("a = [1, 2]\n[d]\nk = [3]"))).d.k, 0)
+    #|  let _ = (array.pop)((toml(bytes("a = [1, 2]\n[d]\nk = [3]"))).values().first())
+    #|  let _ = (array.push)((toml(bytes("a = [1, 2]\n[d]\nk = [3]"))).values().first(), 0)
+    #|  let _ = (array.pop)((toml(bytes("a = [1, 2]\n[d]\nk = [3]"))).pairs().first().last())
+    #|  let _ = (array.push)((toml(bytes("a = [1, 2]\n[d]\nk = [3]"))).pairs().first().last(), 0)
+    #|  let _ = (array.pop)((toml(bytes("a = [1, 2]\n[d]\nk = [3]"))).values().last().k)
+    #|  let _ = (array.push)((toml(bytes("a = [1, 2]\n[d]\nk = [3]"))).values().last().k, 0)
+    #|  metadata(repr((toml(bytes("a = [1, 2]\n[d]\nk = [3]")),)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(toml(bytes("a = [1, 2]\n[d]\nk = [3]"))); pv.at(0).insert("zz", 0) }
+    #|  { let pv = (); pv.push(toml(bytes("a = [1, 2]\n[d]\nk = [3]"))); let _ = pv.at(0).remove("a") }
+    #|  { let pv = (); pv.push(toml(bytes("a = [1, 2]\n[d]\nk = [3]"))); let _ = pv.at(0).a.pop() }
+    #|  { let pv = (); pv.push(toml(bytes("a = [1, 2]\n[d]\nk = [3]"))); pv.at(0).a.push(0) }
+    #|  { let pv = (); pv.push(toml(bytes("a = [1, 2]\n[d]\nk = [3]"))); let _ = pv.at(0).at("a").pop() }
+    #|  { let pv = (); pv.push(toml(bytes("a = [1, 2]\n[d]\nk = [3]"))); pv.at(0).at("a").push(0) }
+    #|  { let pv = (); pv.push(toml(bytes("a = [1, 2]\n[d]\nk = [3]"))); pv.at(0).d.insert("zz", 0) }
+    #|  { let pv = (); pv.push(toml(bytes("a = [1, 2]\n[d]\nk = [3]"))); let _ = pv.at(0).d.remove("k") }
+    #|  { let pv = (); pv.push(toml(bytes("a = [1, 2]\n[d]\nk = [3]"))); let _ = pv.at(0).d.k.pop() }
+    #|  { let pv = (); pv.push(toml(bytes("a = [1, 2]\n[d]\nk = [3]"))); pv.at(0).d.k.push(0) }
+    #|  metadata(repr((toml(bytes("a = [1, 2]\n[d]\nk = [3]")),)))
+    #|}
+    #|#let get() = toml(bytes("a = [1, 2]\n[d]\nk = [3]"))
+    #|#{
+    #|  let _ = (dictionary.insert)(get(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get(), "a")
+    #|  let _ = (array.pop)(get().a)
+    #|  let _ = (array.push)(get().a, 0)
+    #|  let _ = (array.pop)(get().at("a"))
+    #|  let _ = (array.push)(get().at("a"), 0)
+    #|  let _ = (dictionary.insert)(get().d, "zz", 0)
+    #|  let _ = (dictionary.remove)(get().d, "k")
+    #|  let _ = (array.pop)(get().d.k)
+    #|  let _ = (array.push)(get().d.k, 0)
+    #|  let _ = (array.pop)(get().values().first())
+    #|  let _ = (array.push)(get().values().first(), 0)
+    #|  let _ = (array.pop)(get().pairs().first().last())
+    #|  let _ = (array.push)(get().pairs().first().last(), 0)
+    #|  let _ = (array.pop)(get().values().last().k)
+    #|  let _ = (array.push)(get().values().last().k, 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#metadata(repr((toml(bytes("a = [1, 2]\n[d]\nk = [3]")),)))
+    #|]
+    #|#metadata("== data: csv")
+    #|#[
+    #|#{
+    #|  let _ = (array.pop)(csv(bytes("1,2\n3,4")))
+    #|  let _ = (array.push)(csv(bytes("1,2\n3,4")), 0)
+    #|  let _ = (array.pop)((csv(bytes("1,2\n3,4"))).at(0))
+    #|  let _ = (array.push)((csv(bytes("1,2\n3,4"))).at(0), 0)
+    #|  metadata(repr((csv(bytes("1,2\n3,4")),)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(csv(bytes("1,2\n3,4"))); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(csv(bytes("1,2\n3,4"))); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(csv(bytes("1,2\n3,4"))); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(csv(bytes("1,2\n3,4"))); pv.at(0).at(0).push(0) }
+    #|  metadata(repr((csv(bytes("1,2\n3,4")),)))
+    #|}
+    #|#let get() = csv(bytes("1,2\n3,4"))
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#metadata(repr((csv(bytes("1,2\n3,4")),)))
+    #|]
+    #|#metadata("== data: csv rows as dictionaries")
+    #|#[
+    #|#{
+    #|  let _ = (array.pop)(csv(bytes("a,b\n3,4"), row-type: dictionary))
+    #|  let _ = (array.push)(csv(bytes("a,b\n3,4"), row-type: dictionary), 0)
+    #|  let _ = (dictionary.insert)((csv(bytes("a,b\n3,4"), row-type: dictionary)).at(0), "zz", 0)
+    #|  let _ = (dictionary.remove)((csv(bytes("a,b\n3,4"), row-type: dictionary)).at(0), "a")
+    #|  metadata(repr((csv(bytes("a,b\n3,4"), row-type: dictionary),)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(csv(bytes("a,b\n3,4"), row-type: dictionary)); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(csv(bytes("a,b\n3,4"), row-type: dictionary)); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(csv(bytes("a,b\n3,4"), row-type: dictionary)); pv.at(0).at(0).insert("zz", 0) }
+    #|  { let pv = (); pv.push(csv(bytes("a,b\n3,4"), row-type: dictionary)); let _ = pv.at(0).at(0).remove("a") }
+    #|  metadata(repr((csv(bytes("a,b\n3,4"), row-type: dictionary),)))
+    #|}
+    #|#let get() = csv(bytes("a,b\n3,4"), row-type: dictionary)
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (dictionary.insert)(get().at(0), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().at(0), "a")
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#metadata(repr((csv(bytes("a,b\n3,4"), row-type: dictionary),)))
+    #|]
+    #|#metadata("== data: cbor")
+    #|#[
+    #|#{
+    #|  let _ = (array.pop)(cbor(cbor.encode(((1, 2), (k: (3,))))))
+    #|  let _ = (array.push)(cbor(cbor.encode(((1, 2), (k: (3,))))), 0)
+    #|  let _ = (array.pop)((cbor(cbor.encode(((1, 2), (k: (3,)))))).at(0))
+    #|  let _ = (array.push)((cbor(cbor.encode(((1, 2), (k: (3,)))))).at(0), 0)
+    #|  let _ = (array.pop)((cbor(cbor.encode(((1, 2), (k: (3,)))))).first())
+    #|  let _ = (array.push)((cbor(cbor.encode(((1, 2), (k: (3,)))))).first(), 0)
+    #|  let _ = (dictionary.insert)((cbor(cbor.encode(((1, 2), (k: (3,)))))).at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)((cbor(cbor.encode(((1, 2), (k: (3,)))))).at(1), "k")
+    #|  let _ = (dictionary.insert)((cbor(cbor.encode(((1, 2), (k: (3,)))))).last(), "zz", 0)
+    #|  let _ = (dictionary.remove)((cbor(cbor.encode(((1, 2), (k: (3,)))))).last(), "k")
+    #|  let _ = (array.pop)((cbor(cbor.encode(((1, 2), (k: (3,)))))).at(1).k)
+    #|  let _ = (array.push)((cbor(cbor.encode(((1, 2), (k: (3,)))))).at(1).k, 0)
+    #|  let _ = (array.pop)((cbor(cbor.encode(((1, 2), (k: (3,)))))).last().at("k"))
+    #|  let _ = (array.push)((cbor(cbor.encode(((1, 2), (k: (3,)))))).last().at("k"), 0)
+    #|  let _ = (array.pop)((cbor(cbor.encode(((1, 2), (k: (3,)))))).at(1).values().first())
+    #|  let _ = (array.push)((cbor(cbor.encode(((1, 2), (k: (3,)))))).at(1).values().first(), 0)
+    #|  let _ = (array.pop)((cbor(cbor.encode(((1, 2), (k: (3,)))))).slice(0, 1).first())
+    #|  let _ = (array.push)((cbor(cbor.encode(((1, 2), (k: (3,)))))).slice(0, 1).first(), 0)
+    #|  metadata(repr((cbor(cbor.encode(((1, 2), (k: (3,))))),)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(cbor(cbor.encode(((1, 2), (k: (3,)))))); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(cbor(cbor.encode(((1, 2), (k: (3,)))))); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(cbor(cbor.encode(((1, 2), (k: (3,)))))); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(cbor(cbor.encode(((1, 2), (k: (3,)))))); pv.at(0).at(0).push(0) }
+    #|  { let pv = (); pv.push(cbor(cbor.encode(((1, 2), (k: (3,)))))); let _ = pv.at(0).first().pop() }
+    #|  { let pv = (); pv.push(cbor(cbor.encode(((1, 2), (k: (3,)))))); pv.at(0).first().push(0) }
+    #|  { let pv = (); pv.push(cbor(cbor.encode(((1, 2), (k: (3,)))))); pv.at(0).at(1).insert("zz", 0) }
+    #|  { let pv = (); pv.push(cbor(cbor.encode(((1, 2), (k: (3,)))))); let _ = pv.at(0).at(1).remove("k") }
+    #|  { let pv = (); pv.push(cbor(cbor.encode(((1, 2), (k: (3,)))))); pv.at(0).last().insert("zz", 0) }
+    #|  { let pv = (); pv.push(cbor(cbor.encode(((1, 2), (k: (3,)))))); let _ = pv.at(0).last().remove("k") }
+    #|  { let pv = (); pv.push(cbor(cbor.encode(((1, 2), (k: (3,)))))); let _ = pv.at(0).at(1).k.pop() }
+    #|  { let pv = (); pv.push(cbor(cbor.encode(((1, 2), (k: (3,)))))); pv.at(0).at(1).k.push(0) }
+    #|  { let pv = (); pv.push(cbor(cbor.encode(((1, 2), (k: (3,)))))); let _ = pv.at(0).last().at("k").pop() }
+    #|  { let pv = (); pv.push(cbor(cbor.encode(((1, 2), (k: (3,)))))); pv.at(0).last().at("k").push(0) }
+    #|  metadata(repr((cbor(cbor.encode(((1, 2), (k: (3,))))),)))
+    #|}
+    #|#let get() = cbor(cbor.encode(((1, 2), (k: (3,)))))
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  let _ = (array.pop)(get().first())
+    #|  let _ = (array.push)(get().first(), 0)
+    #|  let _ = (dictionary.insert)(get().at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().at(1), "k")
+    #|  let _ = (dictionary.insert)(get().last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().last(), "k")
+    #|  let _ = (array.pop)(get().at(1).k)
+    #|  let _ = (array.push)(get().at(1).k, 0)
+    #|  let _ = (array.pop)(get().last().at("k"))
+    #|  let _ = (array.push)(get().last().at("k"), 0)
+    #|  let _ = (array.pop)(get().at(1).values().first())
+    #|  let _ = (array.push)(get().at(1).values().first(), 0)
+    #|  let _ = (array.pop)(get().slice(0, 1).first())
+    #|  let _ = (array.push)(get().slice(0, 1).first(), 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#metadata(repr((cbor(cbor.encode(((1, 2), (k: (3,))))),)))
+    #|]
+    #|#metadata("== data: xml")
+    #|#[
+    #|#{
+    #|  let _ = (array.pop)(xml(bytes("<a><b/></a>")))
+    #|  let _ = (array.push)(xml(bytes("<a><b/></a>")), 0)
+    #|  let _ = (dictionary.insert)((xml(bytes("<a><b/></a>"))).at(0), "zz", 0)
+    #|  let _ = (dictionary.remove)((xml(bytes("<a><b/></a>"))).at(0), "tag")
+    #|  let _ = (array.pop)((xml(bytes("<a><b/></a>"))).at(0).children)
+    #|  let _ = (array.push)((xml(bytes("<a><b/></a>"))).at(0).children, 0)
+    #|  let _ = (dictionary.insert)((xml(bytes("<a><b/></a>"))).at(0).attrs, "zz", 0)
+    #|  metadata(repr((xml(bytes("<a><b/></a>")),)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(xml(bytes("<a><b/></a>"))); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(xml(bytes("<a><b/></a>"))); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(xml(bytes("<a><b/></a>"))); pv.at(0).at(0).insert("zz", 0) }
+    #|  { let pv = (); pv.push(xml(bytes("<a><b/></a>"))); let _ = pv.at(0).at(0).remove("tag") }
+    #|  { let pv = (); pv.push(xml(bytes("<a><b/></a>"))); let _ = pv.at(0).at(0).children.pop() }
+    #|  { let pv = (); pv.push(xml(bytes("<a><b/></a>"))); pv.at(0).at(0).children.push(0) }
+    #|  { let pv = (); pv.push(xml(bytes("<a><b/></a>"))); pv.at(0).at(0).attrs.insert("zz", 0) }
+    #|  metadata(repr((xml(bytes("<a><b/></a>")),)))
+    #|}
+    #|#let get() = xml(bytes("<a><b/></a>"))
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (dictionary.insert)(get().at(0), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().at(0), "tag")
+    #|  let _ = (array.pop)(get().at(0).children)
+    #|  let _ = (array.push)(get().at(0).children, 0)
+    #|  let _ = (dictionary.insert)(get().at(0).attrs, "zz", 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#metadata(repr((xml(bytes("<a><b/></a>")),)))
+    #|]
+    #|#metadata("== data: matches of a regex")
+    #|#[
+    #|#{
+    #|  let _ = (array.pop)("a1b2".matches(regex("[a-z](\\d)")))
+    #|  let _ = (array.push)("a1b2".matches(regex("[a-z](\\d)")), 0)
+    #|  let _ = (dictionary.insert)(("a1b2".matches(regex("[a-z](\\d)"))).at(0), "zz", 0)
+    #|  let _ = (dictionary.remove)(("a1b2".matches(regex("[a-z](\\d)"))).at(0), "text")
+    #|  let _ = (array.pop)(("a1b2".matches(regex("[a-z](\\d)"))).at(0).captures)
+    #|  let _ = (array.push)(("a1b2".matches(regex("[a-z](\\d)"))).at(0).captures, 0)
+    #|  metadata(repr(("a1b2".matches(regex("[a-z](\\d)")),)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push("a1b2".matches(regex("[a-z](\\d)"))); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push("a1b2".matches(regex("[a-z](\\d)"))); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push("a1b2".matches(regex("[a-z](\\d)"))); pv.at(0).at(0).insert("zz", 0) }
+    #|  { let pv = (); pv.push("a1b2".matches(regex("[a-z](\\d)"))); let _ = pv.at(0).at(0).remove("text") }
+    #|  { let pv = (); pv.push("a1b2".matches(regex("[a-z](\\d)"))); let _ = pv.at(0).at(0).captures.pop() }
+    #|  { let pv = (); pv.push("a1b2".matches(regex("[a-z](\\d)"))); pv.at(0).at(0).captures.push(0) }
+    #|  metadata(repr(("a1b2".matches(regex("[a-z](\\d)")),)))
+    #|}
+    #|#let get() = "a1b2".matches(regex("[a-z](\\d)"))
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (dictionary.insert)(get().at(0), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().at(0), "text")
+    #|  let _ = (array.pop)(get().at(0).captures)
+    #|  let _ = (array.push)(get().at(0).captures, 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#metadata(repr(("a1b2".matches(regex("[a-z](\\d)")),)))
+    #|]
+    #|#metadata("== data: measure, position and layout sizes")
+    #|#[
+    #|#context {
+    #|  let _ = (dictionary.insert)(measure(box(width: 10pt, height: 5pt)), "zz", 0)
+    #|  let _ = (dictionary.remove)(measure(box(width: 10pt, height: 5pt)), "width")
+    #|  metadata(repr((measure(box(width: 10pt, height: 5pt)), here().position().keys(),)))
+    #|}
+    #|#context {
+    #|  { let pv = (); pv.push(measure(box(width: 10pt, height: 5pt))); pv.at(0).insert("zz", 0) }
+    #|  { let pv = (); pv.push(measure(box(width: 10pt, height: 5pt))); let _ = pv.at(0).remove("width") }
+    #|  metadata(repr((measure(box(width: 10pt, height: 5pt)), here().position().keys(),)))
+    #|}
+    #|#context metadata(repr((measure(box(width: 10pt, height: 5pt)), here().position().keys(),)))
+    #|]
+    #|#metadata("== data: stops of a gradient and components of a color")
+    #|#[
+    #|#let g = gradient.linear(red, blue)
+    #|#let st = stroke(dash: (1pt, 2pt))
+    #|#{
+    #|  let _ = (array.pop)(g.stops())
+    #|  let _ = (array.push)(g.stops(), 0)
+    #|  let _ = (array.pop)(g.stops().at(0))
+    #|  let _ = (array.push)(g.stops().at(0), 0)
+    #|  metadata(repr((g.stops(), red.components(), st.dash,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(g.stops()); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(g.stops()); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(g.stops()); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(g.stops()); pv.at(0).at(0).push(0) }
+    #|  metadata(repr((g.stops(), red.components(), st.dash,)))
+    #|}
+    #|#let get() = g.stops()
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  metadata(repr((get(), red.components(), st.dash,)))
+    #|}
+    #|#metadata(repr((g.stops(), red.components(), st.dash,)))
+    #|]
+    #|#metadata("== data: the dash pattern of a stroke")
+    #|#[
+    #|#let st = stroke(dash: (1pt, 2pt))
+    #|#{
+    #|  let _ = (dictionary.insert)(st.dash, "zz", 0)
+    #|  let _ = (dictionary.remove)(st.dash, "array")
+    #|  let _ = (array.pop)(st.dash.array)
+    #|  let _ = (array.push)(st.dash.array, 0)
+    #|  metadata(repr((st.dash,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(st.dash); pv.at(0).insert("zz", 0) }
+    #|  { let pv = (); pv.push(st.dash); let _ = pv.at(0).remove("array") }
+    #|  { let pv = (); pv.push(st.dash); let _ = pv.at(0).array.pop() }
+    #|  { let pv = (); pv.push(st.dash); pv.at(0).array.push(0) }
+    #|  metadata(repr((st.dash,)))
+    #|}
+    #|#let get() = st.dash
+    #|#{
+    #|  let _ = (dictionary.insert)(get(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get(), "array")
+    #|  let _ = (array.pop)(get().array)
+    #|  let _ = (array.push)(get().array, 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#metadata(repr((st.dash,)))
+    #|]
+    #|
+  let expected = [
+    "== data: json", "(((1, 2), (k: (3,))),)", "(((1, 2), (k: (3,))),)", "(((1, 2), (k: (3,))),)",
+    "(((1, 2), (k: (3,))),)", "== data: yaml", "(((1, 2), (k: (3,))),)", "(((1, 2), (k: (3,))),)",
+    "(((1, 2), (k: (3,))),)", "(((1, 2), (k: (3,))),)", "== data: toml", "((a: (1, 2), d: (k: (3,))),)",
+    "((a: (1, 2), d: (k: (3,))),)", "((a: (1, 2), d: (k: (3,))),)", "((a: (1, 2), d: (k: (3,))),)",
+    "== data: csv", "(((\"1\", \"2\"), (\"3\", \"4\")),)", "(((\"1\", \"2\"), (\"3\", \"4\")),)",
+    "(((\"1\", \"2\"), (\"3\", \"4\")),)", "(((\"1\", \"2\"), (\"3\", \"4\")),)",
+    "== data: csv rows as dictionaries", "(((a: \"3\", b: \"4\"),),)", "(((a: \"3\", b: \"4\"),),)",
+    "(((a: \"3\", b: \"4\"),),)", "(((a: \"3\", b: \"4\"),),)", "== data: cbor",
+    "(((1, 2), (k: (3,))),)", "(((1, 2), (k: (3,))),)", "(((1, 2), (k: (3,))),)",
+    "(((1, 2), (k: (3,))),)", "== data: xml", "(\n  (\n    (\n      namespace: none,\n      tag: \"a\",\n      attrs: (:),\n      children: (\n        (\n          namespace: none,\n          tag: \"b\",\n          attrs: (:),\n          children: (),\n        ),\n      ),\n    ),\n  ),\n)",
+    "(\n  (\n    (\n      namespace: none,\n      tag: \"a\",\n      attrs: (:),\n      children: (\n        (\n          namespace: none,\n          tag: \"b\",\n          attrs: (:),\n          children: (),\n        ),\n      ),\n    ),\n  ),\n)",
+    "(\n  (\n    (\n      namespace: none,\n      tag: \"a\",\n      attrs: (:),\n      children: (\n        (\n          namespace: none,\n          tag: \"b\",\n          attrs: (:),\n          children: (),\n        ),\n      ),\n    ),\n  ),\n)",
+    "(\n  (\n    (\n      namespace: none,\n      tag: \"a\",\n      attrs: (:),\n      children: (\n        (\n          namespace: none,\n          tag: \"b\",\n          attrs: (:),\n          children: (),\n        ),\n      ),\n    ),\n  ),\n)",
+    "== data: matches of a regex", "(\n  (\n    (start: 0, end: 2, text: \"a1\", captures: (\"1\",)),\n    (start: 2, end: 4, text: \"b2\", captures: (\"2\",)),\n  ),\n)",
+    "(\n  (\n    (start: 0, end: 2, text: \"a1\", captures: (\"1\",)),\n    (start: 2, end: 4, text: \"b2\", captures: (\"2\",)),\n  ),\n)",
+    "(\n  (\n    (start: 0, end: 2, text: \"a1\", captures: (\"1\",)),\n    (start: 2, end: 4, text: \"b2\", captures: (\"2\",)),\n  ),\n)",
+    "(\n  (\n    (start: 0, end: 2, text: \"a1\", captures: (\"1\",)),\n    (start: 2, end: 4, text: \"b2\", captures: (\"2\",)),\n  ),\n)",
+    "== data: measure, position and layout sizes", "(\n  (width: 10pt, height: 5pt, baseline: 5pt),\n  (\"page\", \"x\", \"y\"),\n)",
+    "(\n  (width: 10pt, height: 5pt, baseline: 5pt),\n  (\"page\", \"x\", \"y\"),\n)",
+    "(\n  (width: 10pt, height: 5pt, baseline: 5pt),\n  (\"page\", \"x\", \"y\"),\n)",
+    "== data: stops of a gradient and components of a color", "(\n  (\n    (oklab(65.95%, 0.2, 0.108), 0%),\n    (oklab(56.22%, -0.05, -0.17), 100%),\n  ),\n  (100%, 25.49%, 21.18%, 100%),\n  (array: (1pt, 2pt), phase: 0pt),\n)",
+    "(\n  (\n    (oklab(65.95%, 0.2, 0.108), 0%),\n    (oklab(56.22%, -0.05, -0.17), 100%),\n  ),\n  (100%, 25.49%, 21.18%, 100%),\n  (array: (1pt, 2pt), phase: 0pt),\n)",
+    "(\n  (\n    (oklab(65.95%, 0.2, 0.108), 0%),\n    (oklab(56.22%, -0.05, -0.17), 100%),\n  ),\n  (100%, 25.49%, 21.18%, 100%),\n  (array: (1pt, 2pt), phase: 0pt),\n)",
+    "(\n  (\n    (oklab(65.95%, 0.2, 0.108), 0%),\n    (oklab(56.22%, -0.05, -0.17), 100%),\n  ),\n  (100%, 25.49%, 21.18%, 100%),\n  (array: (1pt, 2pt), phase: 0pt),\n)",
+    "== data: the dash pattern of a stroke", "((array: (1pt, 2pt), phase: 0pt),)",
+    "((array: (1pt, 2pt), phase: 0pt),)", "((array: (1pt, 2pt), phase: 0pt),)", "((array: (1pt, 2pt), phase: 0pt),)",
+  ]
+  assert_eq(oracle_metadata(source), expected)
+}
+
+///|
+test "oracle: sharing: methods that return parts of their receiver" {
+  let source =
+    #|#metadata("== accessor: array.first")
+    #|#[
+    #|#let x = ((1, 2), (3, 4), (5, 6))
+    #|#{
+    #|  let _ = (array.pop)(x.first())
+    #|  let _ = (array.push)(x.first(), 0)
+    #|  metadata(repr((x.first(), x,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(x.first()); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(x.first()); pv.at(0).push(0) }
+    #|  metadata(repr((x.first(), x,)))
+    #|}
+    #|#let get() = x.first()
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  metadata(repr((get(), x,)))
+    #|}
+    #|#metadata(repr((x.first(), x,)))
+    #|]
+    #|#metadata("== accessor: array.last")
+    #|#[
+    #|#let x = ((1, 2), (3, 4), (5, 6))
+    #|#{
+    #|  let _ = (array.pop)(x.last())
+    #|  let _ = (array.push)(x.last(), 0)
+    #|  metadata(repr((x.last(), x,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(x.last()); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(x.last()); pv.at(0).push(0) }
+    #|  metadata(repr((x.last(), x,)))
+    #|}
+    #|#let get() = x.last()
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  metadata(repr((get(), x,)))
+    #|}
+    #|#metadata(repr((x.last(), x,)))
+    #|]
+    #|#metadata("== accessor: array.at")
+    #|#[
+    #|#let x = ((1, 2), (3, 4), (5, 6))
+    #|#{
+    #|  let _ = (array.pop)(x.at(1))
+    #|  let _ = (array.push)(x.at(1), 0)
+    #|  metadata(repr((x.at(1), x,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(x.at(1)); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(x.at(1)); pv.at(0).push(0) }
+    #|  metadata(repr((x.at(1), x,)))
+    #|}
+    #|#let get() = x.at(1)
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  metadata(repr((get(), x,)))
+    #|}
+    #|#metadata(repr((x.at(1), x,)))
+    #|]
+    #|#metadata("== accessor: array.at with a negative index and a default")
+    #|#[
+    #|#let x = ((1, 2), (3, 4), (5, 6))
+    #|#{
+    #|  let _ = (array.pop)(x.at(-1, default: x.at(0)))
+    #|  let _ = (array.push)(x.at(-1, default: x.at(0)), 0)
+    #|  metadata(repr((x.at(-1, default: x.at(0)), x,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(x.at(-1, default: x.at(0))); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(x.at(-1, default: x.at(0))); pv.at(0).push(0) }
+    #|  metadata(repr((x.at(-1, default: x.at(0)), x,)))
+    #|}
+    #|#let get() = x.at(-1, default: x.at(0))
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  metadata(repr((get(), x,)))
+    #|}
+    #|#metadata(repr((x.at(-1, default: x.at(0)), x,)))
+    #|]
+    #|#metadata("== accessor: array.at, the default")
+    #|#[
+    #|#let x = ((1, 2), (3, 4), (5, 6))
+    #|#{
+    #|  let _ = (array.pop)(x.at(9, default: x.at(0)))
+    #|  let _ = (array.push)(x.at(9, default: x.at(0)), 0)
+    #|  metadata(repr((x.at(9, default: x.at(0)), x,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(x.at(9, default: x.at(0))); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(x.at(9, default: x.at(0))); pv.at(0).push(0) }
+    #|  metadata(repr((x.at(9, default: x.at(0)), x,)))
+    #|}
+    #|#let get() = x.at(9, default: x.at(0))
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  metadata(repr((get(), x,)))
+    #|}
+    #|#metadata(repr((x.at(9, default: x.at(0)), x,)))
+    #|]
+    #|#metadata("== accessor: array.first and last with a default")
+    #|#[
+    #|#let x = ((1, 2), (3, 4), (5, 6))
+    #|#{
+    #|  let _ = (array.pop)(x.first(default: x.at(1)))
+    #|  let _ = (array.push)(x.first(default: x.at(1)), 0)
+    #|  metadata(repr((x.first(default: x.at(1)), x, x.last(default: x.at(1)),)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(x.first(default: x.at(1))); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(x.first(default: x.at(1))); pv.at(0).push(0) }
+    #|  metadata(repr((x.first(default: x.at(1)), x, x.last(default: x.at(1)),)))
+    #|}
+    #|#let get() = x.first(default: x.at(1))
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  metadata(repr((get(), x, x.last(default: x.at(1)),)))
+    #|}
+    #|#metadata(repr((x.first(default: x.at(1)), x, x.last(default: x.at(1)),)))
+    #|]
+    #|#metadata("== accessor: array.slice")
+    #|#[
+    #|#let x = ((1, 2), (3, 4), (5, 6))
+    #|#{
+    #|  let _ = (array.pop)(x.slice(0, 2))
+    #|  let _ = (array.push)(x.slice(0, 2), 0)
+    #|  let _ = (array.pop)((x.slice(0, 2)).at(0))
+    #|  let _ = (array.push)((x.slice(0, 2)).at(0), 0)
+    #|  metadata(repr((x.slice(0, 2), x,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(x.slice(0, 2)); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(x.slice(0, 2)); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(x.slice(0, 2)); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(x.slice(0, 2)); pv.at(0).at(0).push(0) }
+    #|  metadata(repr((x.slice(0, 2), x,)))
+    #|}
+    #|#let get() = x.slice(0, 2)
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  metadata(repr((get(), x,)))
+    #|}
+    #|#metadata(repr((x.slice(0, 2), x,)))
+    #|]
+    #|#metadata("== accessor: array.rev")
+    #|#[
+    #|#let x = ((1, 2), (3, 4), (5, 6))
+    #|#{
+    #|  let _ = (array.pop)(x.rev())
+    #|  let _ = (array.push)(x.rev(), 0)
+    #|  let _ = (array.pop)(x.rev().at(0))
+    #|  let _ = (array.push)(x.rev().at(0), 0)
+    #|  metadata(repr((x.rev(), x,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(x.rev()); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(x.rev()); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(x.rev()); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(x.rev()); pv.at(0).at(0).push(0) }
+    #|  metadata(repr((x.rev(), x,)))
+    #|}
+    #|#let get() = x.rev()
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  metadata(repr((get(), x,)))
+    #|}
+    #|#metadata(repr((x.rev(), x,)))
+    #|]
+    #|#metadata("== accessor: array.zip")
+    #|#[
+    #|#let x = ((1, 2), (3, 4), (5, 6))
+    #|#{
+    #|  let _ = (array.pop)(x.zip(x))
+    #|  let _ = (array.push)(x.zip(x), 0)
+    #|  let _ = (array.pop)(x.zip(x).at(0))
+    #|  let _ = (array.push)(x.zip(x).at(0), 0)
+    #|  let _ = (array.pop)(x.zip(x).at(0).at(0))
+    #|  let _ = (array.push)(x.zip(x).at(0).at(0), 0)
+    #|  metadata(repr((x.zip(x), x,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(x.zip(x)); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(x.zip(x)); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(x.zip(x)); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(x.zip(x)); pv.at(0).at(0).push(0) }
+    #|  { let pv = (); pv.push(x.zip(x)); let _ = pv.at(0).at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(x.zip(x)); pv.at(0).at(0).at(0).push(0) }
+    #|  metadata(repr((x.zip(x), x,)))
+    #|}
+    #|#let get() = x.zip(x)
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  let _ = (array.pop)(get().at(0).at(0))
+    #|  let _ = (array.push)(get().at(0).at(0), 0)
+    #|  metadata(repr((get(), x,)))
+    #|}
+    #|#metadata(repr((x.zip(x), x,)))
+    #|]
+    #|#metadata("== accessor: array.zip with exact")
+    #|#[
+    #|#let x = ((1, 2), (3, 4), (5, 6))
+    #|#{
+    #|  let _ = (array.pop)(x.zip(x, exact: true))
+    #|  let _ = (array.push)(x.zip(x, exact: true), 0)
+    #|  let _ = (array.pop)((x.zip(x, exact: true)).at(0))
+    #|  let _ = (array.push)((x.zip(x, exact: true)).at(0), 0)
+    #|  let _ = (array.pop)((x.zip(x, exact: true)).at(0).at(0))
+    #|  let _ = (array.push)((x.zip(x, exact: true)).at(0).at(0), 0)
+    #|  metadata(repr((x.zip(x, exact: true), x,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(x.zip(x, exact: true)); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(x.zip(x, exact: true)); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(x.zip(x, exact: true)); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(x.zip(x, exact: true)); pv.at(0).at(0).push(0) }
+    #|  { let pv = (); pv.push(x.zip(x, exact: true)); let _ = pv.at(0).at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(x.zip(x, exact: true)); pv.at(0).at(0).at(0).push(0) }
+    #|  metadata(repr((x.zip(x, exact: true), x,)))
+    #|}
+    #|#let get() = x.zip(x, exact: true)
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  let _ = (array.pop)(get().at(0).at(0))
+    #|  let _ = (array.push)(get().at(0).at(0), 0)
+    #|  metadata(repr((get(), x,)))
+    #|}
+    #|#metadata(repr((x.zip(x, exact: true), x,)))
+    #|]
+    #|#metadata("== accessor: array.chunks")
+    #|#[
+    #|#let x = ((1, 2), (3, 4), (5, 6))
+    #|#{
+    #|  let _ = (array.pop)(x.chunks(2))
+    #|  let _ = (array.push)(x.chunks(2), 0)
+    #|  let _ = (array.pop)(x.chunks(2).at(0))
+    #|  let _ = (array.push)(x.chunks(2).at(0), 0)
+    #|  let _ = (array.pop)(x.chunks(2).at(0).at(0))
+    #|  let _ = (array.push)(x.chunks(2).at(0).at(0), 0)
+    #|  metadata(repr((x.chunks(2), x,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(x.chunks(2)); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(x.chunks(2)); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(x.chunks(2)); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(x.chunks(2)); pv.at(0).at(0).push(0) }
+    #|  { let pv = (); pv.push(x.chunks(2)); let _ = pv.at(0).at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(x.chunks(2)); pv.at(0).at(0).at(0).push(0) }
+    #|  metadata(repr((x.chunks(2), x,)))
+    #|}
+    #|#let get() = x.chunks(2)
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  let _ = (array.pop)(get().at(0).at(0))
+    #|  let _ = (array.push)(get().at(0).at(0), 0)
+    #|  metadata(repr((get(), x,)))
+    #|}
+    #|#metadata(repr((x.chunks(2), x,)))
+    #|]
+    #|#metadata("== accessor: array.windows")
+    #|#[
+    #|#let x = ((1, 2), (3, 4), (5, 6))
+    #|#{
+    #|  let _ = (array.pop)(x.windows(2))
+    #|  let _ = (array.push)(x.windows(2), 0)
+    #|  let _ = (array.pop)(x.windows(2).at(0))
+    #|  let _ = (array.push)(x.windows(2).at(0), 0)
+    #|  let _ = (array.pop)(x.windows(2).at(0).at(0))
+    #|  let _ = (array.push)(x.windows(2).at(0).at(0), 0)
+    #|  metadata(repr((x.windows(2), x,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(x.windows(2)); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(x.windows(2)); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(x.windows(2)); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(x.windows(2)); pv.at(0).at(0).push(0) }
+    #|  { let pv = (); pv.push(x.windows(2)); let _ = pv.at(0).at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(x.windows(2)); pv.at(0).at(0).at(0).push(0) }
+    #|  metadata(repr((x.windows(2), x,)))
+    #|}
+    #|#let get() = x.windows(2)
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  let _ = (array.pop)(get().at(0).at(0))
+    #|  let _ = (array.push)(get().at(0).at(0), 0)
+    #|  metadata(repr((get(), x,)))
+    #|}
+    #|#metadata(repr((x.windows(2), x,)))
+    #|]
+    #|#metadata("== accessor: array.enumerate")
+    #|#[
+    #|#let x = ((1, 2), (3, 4), (5, 6))
+    #|#{
+    #|  let _ = (array.pop)(x.enumerate())
+    #|  let _ = (array.push)(x.enumerate(), 0)
+    #|  let _ = (array.pop)(x.enumerate().at(0))
+    #|  let _ = (array.push)(x.enumerate().at(0), 0)
+    #|  let _ = (array.pop)(x.enumerate().at(0).at(1))
+    #|  let _ = (array.push)(x.enumerate().at(0).at(1), 0)
+    #|  metadata(repr((x.enumerate(), x,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(x.enumerate()); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(x.enumerate()); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(x.enumerate()); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(x.enumerate()); pv.at(0).at(0).push(0) }
+    #|  { let pv = (); pv.push(x.enumerate()); let _ = pv.at(0).at(0).at(1).pop() }
+    #|  { let pv = (); pv.push(x.enumerate()); pv.at(0).at(0).at(1).push(0) }
+    #|  metadata(repr((x.enumerate(), x,)))
+    #|}
+    #|#let get() = x.enumerate()
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  let _ = (array.pop)(get().at(0).at(1))
+    #|  let _ = (array.push)(get().at(0).at(1), 0)
+    #|  metadata(repr((get(), x,)))
+    #|}
+    #|#metadata(repr((x.enumerate(), x,)))
+    #|]
+    #|#metadata("== accessor: array.sorted")
+    #|#[
+    #|#let x = ((1, 2), (3, 4), (5, 6))
+    #|#{
+    #|  let _ = (array.pop)(x.sorted())
+    #|  let _ = (array.push)(x.sorted(), 0)
+    #|  let _ = (array.pop)(x.sorted().at(0))
+    #|  let _ = (array.push)(x.sorted().at(0), 0)
+    #|  metadata(repr((x.sorted(), x,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(x.sorted()); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(x.sorted()); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(x.sorted()); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(x.sorted()); pv.at(0).at(0).push(0) }
+    #|  metadata(repr((x.sorted(), x,)))
+    #|}
+    #|#let get() = x.sorted()
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  metadata(repr((get(), x,)))
+    #|}
+    #|#metadata(repr((x.sorted(), x,)))
+    #|]
+    #|#metadata("== accessor: array.sorted with a key")
+    #|#[
+    #|#let x = ((1, 2), (3, 4), (5, 6))
+    #|#{
+    #|  let _ = (array.pop)(x.sorted(key: v => v.at(0)))
+    #|  let _ = (array.push)(x.sorted(key: v => v.at(0)), 0)
+    #|  let _ = (array.pop)((x.sorted(key: v => v.at(0))).at(0))
+    #|  let _ = (array.push)((x.sorted(key: v => v.at(0))).at(0), 0)
+    #|  metadata(repr((x.sorted(key: v => v.at(0)), x,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(x.sorted(key: v => v.at(0))); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(x.sorted(key: v => v.at(0))); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(x.sorted(key: v => v.at(0))); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(x.sorted(key: v => v.at(0))); pv.at(0).at(0).push(0) }
+    #|  metadata(repr((x.sorted(key: v => v.at(0)), x,)))
+    #|}
+    #|#let get() = x.sorted(key: v => v.at(0))
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  metadata(repr((get(), x,)))
+    #|}
+    #|#metadata(repr((x.sorted(key: v => v.at(0)), x,)))
+    #|]
+    #|#metadata("== accessor: array.dedup")
+    #|#[
+    #|#let x = ((1, 2), (3, 4), (5, 6))
+    #|#{
+    #|  let _ = (array.pop)(x.dedup())
+    #|  let _ = (array.push)(x.dedup(), 0)
+    #|  let _ = (array.pop)(x.dedup().at(0))
+    #|  let _ = (array.push)(x.dedup().at(0), 0)
+    #|  metadata(repr((x.dedup(), x,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(x.dedup()); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(x.dedup()); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(x.dedup()); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(x.dedup()); pv.at(0).at(0).push(0) }
+    #|  metadata(repr((x.dedup(), x,)))
+    #|}
+    #|#let get() = x.dedup()
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  metadata(repr((get(), x,)))
+    #|}
+    #|#metadata(repr((x.dedup(), x,)))
+    #|]
+    #|#metadata("== accessor: array.dedup with a key")
+    #|#[
+    #|#let x = ((1, 2), (3, 4), (5, 6))
+    #|#{
+    #|  let _ = (array.pop)(x.dedup(key: v => v.at(0)))
+    #|  let _ = (array.push)(x.dedup(key: v => v.at(0)), 0)
+    #|  let _ = (array.pop)((x.dedup(key: v => v.at(0))).at(0))
+    #|  let _ = (array.push)((x.dedup(key: v => v.at(0))).at(0), 0)
+    #|  metadata(repr((x.dedup(key: v => v.at(0)), x,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(x.dedup(key: v => v.at(0))); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(x.dedup(key: v => v.at(0))); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(x.dedup(key: v => v.at(0))); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(x.dedup(key: v => v.at(0))); pv.at(0).at(0).push(0) }
+    #|  metadata(repr((x.dedup(key: v => v.at(0)), x,)))
+    #|}
+    #|#let get() = x.dedup(key: v => v.at(0))
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  metadata(repr((get(), x,)))
+    #|}
+    #|#metadata(repr((x.dedup(key: v => v.at(0)), x,)))
+    #|]
+    #|#metadata("== accessor: array.filter")
+    #|#[
+    #|#let x = ((1, 2), (3, 4), (5, 6))
+    #|#{
+    #|  let _ = (array.pop)(x.filter(v => true))
+    #|  let _ = (array.push)(x.filter(v => true), 0)
+    #|  let _ = (array.pop)((x.filter(v => true)).at(0))
+    #|  let _ = (array.push)((x.filter(v => true)).at(0), 0)
+    #|  metadata(repr((x.filter(v => true), x,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(x.filter(v => true)); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(x.filter(v => true)); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(x.filter(v => true)); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(x.filter(v => true)); pv.at(0).at(0).push(0) }
+    #|  metadata(repr((x.filter(v => true), x,)))
+    #|}
+    #|#let get() = x.filter(v => true)
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  metadata(repr((get(), x,)))
+    #|}
+    #|#metadata(repr((x.filter(v => true), x,)))
+    #|]
+    #|#metadata("== accessor: array.map with the identity")
+    #|#[
+    #|#let x = ((1, 2), (3, 4), (5, 6))
+    #|#{
+    #|  let _ = (array.pop)(x.map(v => v))
+    #|  let _ = (array.push)(x.map(v => v), 0)
+    #|  let _ = (array.pop)((x.map(v => v)).at(0))
+    #|  let _ = (array.push)((x.map(v => v)).at(0), 0)
+    #|  metadata(repr((x.map(v => v), x,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(x.map(v => v)); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(x.map(v => v)); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(x.map(v => v)); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(x.map(v => v)); pv.at(0).at(0).push(0) }
+    #|  metadata(repr((x.map(v => v), x,)))
+    #|}
+    #|#let get() = x.map(v => v)
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  metadata(repr((get(), x,)))
+    #|}
+    #|#metadata(repr((x.map(v => v), x,)))
+    #|]
+    #|#metadata("== accessor: array.find")
+    #|#[
+    #|#let x = ((1, 2), (3, 4), (5, 6))
+    #|#{
+    #|  let _ = (array.pop)(x.find(v => true))
+    #|  let _ = (array.push)(x.find(v => true), 0)
+    #|  metadata(repr((x.find(v => true), x,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(x.find(v => true)); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(x.find(v => true)); pv.at(0).push(0) }
+    #|  metadata(repr((x.find(v => true), x,)))
+    #|}
+    #|#let get() = x.find(v => true)
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  metadata(repr((get(), x,)))
+    #|}
+    #|#metadata(repr((x.find(v => true), x,)))
+    #|]
+    #|#metadata("== accessor: array.flatten")
+    #|#[
+    #|#let x = ((1, 2), (3, 4), (5, 6))
+    #|#{
+    #|  let _ = (array.pop)((x, x).flatten())
+    #|  let _ = (array.push)((x, x).flatten(), 0)
+    #|  metadata(repr(((x, x).flatten(), x,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push((x, x).flatten()); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push((x, x).flatten()); pv.at(0).push(0) }
+    #|  metadata(repr(((x, x).flatten(), x,)))
+    #|}
+    #|#let get() = (x, x).flatten()
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  metadata(repr((get(), x,)))
+    #|}
+    #|#metadata(repr(((x, x).flatten(), x,)))
+    #|]
+    #|#metadata("== accessor: array.flatten of deeper arrays")
+    #|#[
+    #|#let x = ((1, 2), (3, 4), (5, 6))
+    #|#{
+    #|  let _ = (array.pop)(((x,), (x,)).flatten())
+    #|  let _ = (array.push)(((x,), (x,)).flatten(), 0)
+    #|  metadata(repr((((x,), (x,)).flatten(), x,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(((x,), (x,)).flatten()); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(((x,), (x,)).flatten()); pv.at(0).push(0) }
+    #|  metadata(repr((((x,), (x,)).flatten(), x,)))
+    #|}
+    #|#let get() = ((x,), (x,)).flatten()
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  metadata(repr((get(), x,)))
+    #|}
+    #|#metadata(repr((((x,), (x,)).flatten(), x,)))
+    #|]
+    #|#metadata("== accessor: array.join of one item")
+    #|#[
+    #|#let x = ((1, 2), (3, 4), (5, 6))
+    #|#{
+    #|  let _ = (array.pop)((x.at(0),).join())
+    #|  let _ = (array.push)((x.at(0),).join(), 0)
+    #|  metadata(repr(((x.at(0),).join(), x,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push((x.at(0),).join()); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push((x.at(0),).join()); pv.at(0).push(0) }
+    #|  metadata(repr(((x.at(0),).join(), x,)))
+    #|}
+    #|#let get() = (x.at(0),).join()
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  metadata(repr((get(), x,)))
+    #|}
+    #|#metadata(repr(((x.at(0),).join(), x,)))
+    #|]
+    #|#metadata("== accessor: array.join")
+    #|#[
+    #|#let x = ((1, 2), (3, 4), (5, 6))
+    #|#{
+    #|  let _ = (array.pop)(x.join())
+    #|  let _ = (array.push)(x.join(), 0)
+    #|  metadata(repr((x.join(), x,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(x.join()); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(x.join()); pv.at(0).push(0) }
+    #|  metadata(repr((x.join(), x,)))
+    #|}
+    #|#let get() = x.join()
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  metadata(repr((get(), x,)))
+    #|}
+    #|#metadata(repr((x.join(), x,)))
+    #|]
+    #|#metadata("== accessor: array.join of nested arrays")
+    #|#[
+    #|#let x = ((1, 2), (3, 4), (5, 6))
+    #|#{
+    #|  let _ = (array.pop)((x, x).join())
+    #|  let _ = (array.push)((x, x).join(), 0)
+    #|  let _ = (array.pop)(((x, x).join()).at(0))
+    #|  let _ = (array.push)(((x, x).join()).at(0), 0)
+    #|  metadata(repr(((x, x).join(), x,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push((x, x).join()); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push((x, x).join()); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push((x, x).join()); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push((x, x).join()); pv.at(0).at(0).push(0) }
+    #|  metadata(repr(((x, x).join(), x,)))
+    #|}
+    #|#let get() = (x, x).join()
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  metadata(repr((get(), x,)))
+    #|}
+    #|#metadata(repr(((x, x).join(), x,)))
+    #|]
+    #|#metadata("== accessor: array.sum of one item")
+    #|#[
+    #|#let x = ((1, 2), (3, 4), (5, 6))
+    #|#{
+    #|  let _ = (array.pop)((x.at(0),).sum())
+    #|  let _ = (array.push)((x.at(0),).sum(), 0)
+    #|  metadata(repr(((x.at(0),).sum(), x,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push((x.at(0),).sum()); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push((x.at(0),).sum()); pv.at(0).push(0) }
+    #|  metadata(repr(((x.at(0),).sum(), x,)))
+    #|}
+    #|#let get() = (x.at(0),).sum()
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  metadata(repr((get(), x,)))
+    #|}
+    #|#metadata(repr(((x.at(0),).sum(), x,)))
+    #|]
+    #|#metadata("== accessor: array.sum with a default")
+    #|#[
+    #|#let x = ((1, 2), (3, 4), (5, 6))
+    #|#{
+    #|  let _ = (array.pop)(().sum(default: x.at(0)))
+    #|  let _ = (array.push)(().sum(default: x.at(0)), 0)
+    #|  metadata(repr((().sum(default: x.at(0)), x,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(().sum(default: x.at(0))); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(().sum(default: x.at(0))); pv.at(0).push(0) }
+    #|  metadata(repr((().sum(default: x.at(0)), x,)))
+    #|}
+    #|#let get() = ().sum(default: x.at(0))
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  metadata(repr((get(), x,)))
+    #|}
+    #|#metadata(repr((().sum(default: x.at(0)), x,)))
+    #|]
+    #|#metadata("== accessor: array.sum of nested arrays")
+    #|#[
+    #|#let x = ((1, 2), (3, 4), (5, 6))
+    #|#{
+    #|  let _ = (array.pop)((x, x).sum())
+    #|  let _ = (array.push)((x, x).sum(), 0)
+    #|  let _ = (array.pop)(((x, x).sum()).at(0))
+    #|  let _ = (array.push)(((x, x).sum()).at(0), 0)
+    #|  metadata(repr(((x, x).sum(), x,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push((x, x).sum()); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push((x, x).sum()); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push((x, x).sum()); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push((x, x).sum()); pv.at(0).at(0).push(0) }
+    #|  metadata(repr(((x, x).sum(), x,)))
+    #|}
+    #|#let get() = (x, x).sum()
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  metadata(repr((get(), x,)))
+    #|}
+    #|#metadata(repr(((x, x).sum(), x,)))
+    #|]
+    #|#metadata("== accessor: array.product of one item")
+    #|#[
+    #|#let x = ((1, 2), (3, 4), (5, 6))
+    #|#{
+    #|  let _ = (array.pop)((x.at(0),).product())
+    #|  let _ = (array.push)((x.at(0),).product(), 0)
+    #|  metadata(repr(((x.at(0),).product(), x,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push((x.at(0),).product()); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push((x.at(0),).product()); pv.at(0).push(0) }
+    #|  metadata(repr(((x.at(0),).product(), x,)))
+    #|}
+    #|#let get() = (x.at(0),).product()
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  metadata(repr((get(), x,)))
+    #|}
+    #|#metadata(repr(((x.at(0),).product(), x,)))
+    #|]
+    #|#metadata("== accessor: array.product with a default")
+    #|#[
+    #|#let x = ((1, 2), (3, 4), (5, 6))
+    #|#{
+    #|  let _ = (array.pop)(().product(default: x.at(0)))
+    #|  let _ = (array.push)(().product(default: x.at(0)), 0)
+    #|  metadata(repr((().product(default: x.at(0)), x,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(().product(default: x.at(0))); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(().product(default: x.at(0))); pv.at(0).push(0) }
+    #|  metadata(repr((().product(default: x.at(0)), x,)))
+    #|}
+    #|#let get() = ().product(default: x.at(0))
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  metadata(repr((get(), x,)))
+    #|}
+    #|#metadata(repr((().product(default: x.at(0)), x,)))
+    #|]
+    #|#metadata("== accessor: the result of a native pop and remove")
+    #|#[
+    #|#let x = ((1, 2), (3, 4), (5, 6))
+    #|#{
+    #|  let _ = (array.pop)((array.pop)(x))
+    #|  let _ = (array.push)((array.pop)(x), 0)
+    #|  metadata(repr(((array.pop)(x), x, (array.remove)(x, 0), (array.at)(x, 0), (array.first)(x),)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push((array.pop)(x)); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push((array.pop)(x)); pv.at(0).push(0) }
+    #|  metadata(repr(((array.pop)(x), x, (array.remove)(x, 0), (array.at)(x, 0), (array.first)(x),)))
+    #|}
+    #|#let get() = (array.pop)(x)
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  metadata(repr((get(), x, (array.remove)(x, 0), (array.at)(x, 0), (array.first)(x),)))
+    #|}
+    #|#metadata(repr(((array.pop)(x), x, (array.remove)(x, 0), (array.at)(x, 0), (array.first)(x),)))
+    #|]
+    #|#metadata("== accessor: the result of a native remove")
+    #|#[
+    #|#let x = ((1, 2), (3, 4), (5, 6))
+    #|#{
+    #|  let _ = (array.pop)((array.remove)(x, 1))
+    #|  let _ = (array.push)((array.remove)(x, 1), 0)
+    #|  metadata(repr(((array.remove)(x, 1), x,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push((array.remove)(x, 1)); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push((array.remove)(x, 1)); pv.at(0).push(0) }
+    #|  metadata(repr(((array.remove)(x, 1), x,)))
+    #|}
+    #|#let get() = (array.remove)(x, 1)
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  metadata(repr((get(), x,)))
+    #|}
+    #|#metadata(repr(((array.remove)(x, 1), x,)))
+    #|]
+    #|#metadata("== accessor: calc.abs and other natives that return an argument")
+    #|#[
+    #|#let x = ((1, 2), (3, 4), (5, 6))
+    #|#{
+    #|  let _ = (array.pop)(x.at(0, default: calc.abs(1)))
+    #|  let _ = (array.push)(x.at(0, default: calc.abs(1)), 0)
+    #|  metadata(repr((x.at(0, default: calc.abs(1)), x, calc.abs(-1), type(x),)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(x.at(0, default: calc.abs(1))); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(x.at(0, default: calc.abs(1))); pv.at(0).push(0) }
+    #|  metadata(repr((x.at(0, default: calc.abs(1)), x, calc.abs(-1), type(x),)))
+    #|}
+    #|#let get() = x.at(0, default: calc.abs(1))
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  metadata(repr((get(), x, calc.abs(-1), type(x),)))
+    #|}
+    #|#metadata(repr((x.at(0, default: calc.abs(1)), x, calc.abs(-1), type(x),)))
+    #|]
+    #|#metadata("== accessor: array.fold")
+    #|#[
+    #|#let x = ((1, 2), (3, 4), (5, 6))
+    #|#{
+    #|  let _ = (array.pop)(x.fold((), (acc, v) => v))
+    #|  let _ = (array.push)(x.fold((), (acc, v) => v), 0)
+    #|  metadata(repr((x.fold((), (acc, v) => v), x,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(x.fold((), (acc, v) => v)); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(x.fold((), (acc, v) => v)); pv.at(0).push(0) }
+    #|  metadata(repr((x.fold((), (acc, v) => v), x,)))
+    #|}
+    #|#let get() = x.fold((), (acc, v) => v)
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  metadata(repr((get(), x,)))
+    #|}
+    #|#metadata(repr((x.fold((), (acc, v) => v), x,)))
+    #|]
+    #|#metadata("== accessor: array.fold, the initial value")
+    #|#[
+    #|#let x = ((1, 2), (3, 4), (5, 6))
+    #|#{
+    #|  let _ = (array.pop)(().fold(x.at(0), (acc, v) => v))
+    #|  let _ = (array.push)(().fold(x.at(0), (acc, v) => v), 0)
+    #|  metadata(repr((().fold(x.at(0), (acc, v) => v), x,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(().fold(x.at(0), (acc, v) => v)); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(().fold(x.at(0), (acc, v) => v)); pv.at(0).push(0) }
+    #|  metadata(repr((().fold(x.at(0), (acc, v) => v), x,)))
+    #|}
+    #|#let get() = ().fold(x.at(0), (acc, v) => v)
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  metadata(repr((get(), x,)))
+    #|}
+    #|#metadata(repr((().fold(x.at(0), (acc, v) => v), x,)))
+    #|]
+    #|#metadata("== accessor: array.reduce")
+    #|#[
+    #|#let x = ((1, 2), (3, 4), (5, 6))
+    #|#{
+    #|  let _ = (array.pop)(x.reduce((acc, v) => v))
+    #|  let _ = (array.push)(x.reduce((acc, v) => v), 0)
+    #|  metadata(repr((x.reduce((acc, v) => v), x,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(x.reduce((acc, v) => v)); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(x.reduce((acc, v) => v)); pv.at(0).push(0) }
+    #|  metadata(repr((x.reduce((acc, v) => v), x,)))
+    #|}
+    #|#let get() = x.reduce((acc, v) => v)
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  metadata(repr((get(), x,)))
+    #|}
+    #|#metadata(repr((x.reduce((acc, v) => v), x,)))
+    #|]
+    #|#metadata("== accessor: array.reduce of one item")
+    #|#[
+    #|#let x = ((1, 2), (3, 4), (5, 6))
+    #|#{
+    #|  let _ = (array.pop)((x.at(0),).reduce((acc, v) => v))
+    #|  let _ = (array.push)((x.at(0),).reduce((acc, v) => v), 0)
+    #|  metadata(repr(((x.at(0),).reduce((acc, v) => v), x,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push((x.at(0),).reduce((acc, v) => v)); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push((x.at(0),).reduce((acc, v) => v)); pv.at(0).push(0) }
+    #|  metadata(repr(((x.at(0),).reduce((acc, v) => v), x,)))
+    #|}
+    #|#let get() = (x.at(0),).reduce((acc, v) => v)
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  metadata(repr((get(), x,)))
+    #|}
+    #|#metadata(repr(((x.at(0),).reduce((acc, v) => v), x,)))
+    #|]
+    #|#metadata("== accessor: array.intersperse")
+    #|#[
+    #|#let x = ((1, 2), (3, 4), (5, 6))
+    #|#{
+    #|  let _ = (array.pop)(x.intersperse(x.at(0)))
+    #|  let _ = (array.push)(x.intersperse(x.at(0)), 0)
+    #|  let _ = (array.pop)(x.intersperse(x.at(0)).at(0))
+    #|  let _ = (array.push)(x.intersperse(x.at(0)).at(0), 0)
+    #|  let _ = (array.pop)(x.intersperse(x.at(0)).at(1))
+    #|  let _ = (array.push)(x.intersperse(x.at(0)).at(1), 0)
+    #|  metadata(repr((x.intersperse(x.at(0)), x,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(x.intersperse(x.at(0))); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(x.intersperse(x.at(0))); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(x.intersperse(x.at(0))); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(x.intersperse(x.at(0))); pv.at(0).at(0).push(0) }
+    #|  { let pv = (); pv.push(x.intersperse(x.at(0))); let _ = pv.at(0).at(1).pop() }
+    #|  { let pv = (); pv.push(x.intersperse(x.at(0))); pv.at(0).at(1).push(0) }
+    #|  metadata(repr((x.intersperse(x.at(0)), x,)))
+    #|}
+    #|#let get() = x.intersperse(x.at(0))
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  let _ = (array.pop)(get().at(1))
+    #|  let _ = (array.push)(get().at(1), 0)
+    #|  metadata(repr((get(), x,)))
+    #|}
+    #|#metadata(repr((x.intersperse(x.at(0)), x,)))
+    #|]
+    #|#metadata("== accessor: array.split")
+    #|#[
+    #|#let x = ((1, 2), (3, 4), (5, 6))
+    #|#{
+    #|  let _ = (array.pop)(x.split((3, 4)))
+    #|  let _ = (array.push)(x.split((3, 4)), 0)
+    #|  let _ = (array.pop)((x.split((3, 4))).at(0))
+    #|  let _ = (array.push)((x.split((3, 4))).at(0), 0)
+    #|  let _ = (array.pop)((x.split((3, 4))).at(0).at(0))
+    #|  let _ = (array.push)((x.split((3, 4))).at(0).at(0), 0)
+    #|  metadata(repr((x.split((3, 4)), x,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(x.split((3, 4))); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(x.split((3, 4))); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(x.split((3, 4))); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(x.split((3, 4))); pv.at(0).at(0).push(0) }
+    #|  { let pv = (); pv.push(x.split((3, 4))); let _ = pv.at(0).at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(x.split((3, 4))); pv.at(0).at(0).at(0).push(0) }
+    #|  metadata(repr((x.split((3, 4)), x,)))
+    #|}
+    #|#let get() = x.split((3, 4))
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  let _ = (array.pop)(get().at(0).at(0))
+    #|  let _ = (array.push)(get().at(0).at(0), 0)
+    #|  metadata(repr((get(), x,)))
+    #|}
+    #|#metadata(repr((x.split((3, 4)), x,)))
+    #|]
+    #|#metadata("== accessor: array.to-dict")
+    #|#[
+    #|#let x = ((1, 2), (3, 4), (5, 6))
+    #|#{
+    #|  let _ = (dictionary.insert)((("a", x.at(0)), ("b", x)).to-dict(), "zz", 0)
+    #|  let _ = (dictionary.remove)((("a", x.at(0)), ("b", x)).to-dict(), "a")
+    #|  let _ = (array.pop)(((("a", x.at(0)), ("b", x)).to-dict()).a)
+    #|  let _ = (array.push)(((("a", x.at(0)), ("b", x)).to-dict()).a, 0)
+    #|  let _ = (array.pop)(((("a", x.at(0)), ("b", x)).to-dict()).b)
+    #|  let _ = (array.push)(((("a", x.at(0)), ("b", x)).to-dict()).b, 0)
+    #|  let _ = (array.pop)(((("a", x.at(0)), ("b", x)).to-dict()).b.at(0))
+    #|  let _ = (array.push)(((("a", x.at(0)), ("b", x)).to-dict()).b.at(0), 0)
+    #|  metadata(repr(((("a", x.at(0)), ("b", x)).to-dict(), x,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push((("a", x.at(0)), ("b", x)).to-dict()); pv.at(0).insert("zz", 0) }
+    #|  { let pv = (); pv.push((("a", x.at(0)), ("b", x)).to-dict()); let _ = pv.at(0).remove("a") }
+    #|  { let pv = (); pv.push((("a", x.at(0)), ("b", x)).to-dict()); let _ = pv.at(0).a.pop() }
+    #|  { let pv = (); pv.push((("a", x.at(0)), ("b", x)).to-dict()); pv.at(0).a.push(0) }
+    #|  { let pv = (); pv.push((("a", x.at(0)), ("b", x)).to-dict()); let _ = pv.at(0).b.pop() }
+    #|  { let pv = (); pv.push((("a", x.at(0)), ("b", x)).to-dict()); pv.at(0).b.push(0) }
+    #|  { let pv = (); pv.push((("a", x.at(0)), ("b", x)).to-dict()); let _ = pv.at(0).b.at(0).pop() }
+    #|  { let pv = (); pv.push((("a", x.at(0)), ("b", x)).to-dict()); pv.at(0).b.at(0).push(0) }
+    #|  metadata(repr(((("a", x.at(0)), ("b", x)).to-dict(), x,)))
+    #|}
+    #|#let get() = (("a", x.at(0)), ("b", x)).to-dict()
+    #|#{
+    #|  let _ = (dictionary.insert)(get(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get(), "a")
+    #|  let _ = (array.pop)(get().a)
+    #|  let _ = (array.push)(get().a, 0)
+    #|  let _ = (array.pop)(get().b)
+    #|  let _ = (array.push)(get().b, 0)
+    #|  let _ = (array.pop)(get().b.at(0))
+    #|  let _ = (array.push)(get().b.at(0), 0)
+    #|  metadata(repr((get(), x,)))
+    #|}
+    #|#metadata(repr(((("a", x.at(0)), ("b", x)).to-dict(), x,)))
+    #|]
+    #|#metadata("== accessor: array + array")
+    #|#[
+    #|#let x = ((1, 2), (3, 4), (5, 6))
+    #|#{
+    #|  let _ = (array.pop)(x + ())
+    #|  let _ = (array.push)(x + (), 0)
+    #|  let _ = (array.pop)((x + ()).at(0))
+    #|  let _ = (array.push)((x + ()).at(0), 0)
+    #|  metadata(repr((x + (), x,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(x + ()); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(x + ()); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(x + ()); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(x + ()); pv.at(0).at(0).push(0) }
+    #|  metadata(repr((x + (), x,)))
+    #|}
+    #|#let get() = x + ()
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  metadata(repr((get(), x,)))
+    #|}
+    #|#metadata(repr((x + (), x,)))
+    #|]
+    #|#metadata("== accessor: array + array, right")
+    #|#[
+    #|#let x = ((1, 2), (3, 4), (5, 6))
+    #|#{
+    #|  let _ = (array.pop)(() + x)
+    #|  let _ = (array.push)(() + x, 0)
+    #|  let _ = (array.pop)((() + x).at(0))
+    #|  let _ = (array.push)((() + x).at(0), 0)
+    #|  metadata(repr((() + x, x,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(() + x); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(() + x); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(() + x); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(() + x); pv.at(0).at(0).push(0) }
+    #|  metadata(repr((() + x, x,)))
+    #|}
+    #|#let get() = () + x
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  metadata(repr((get(), x,)))
+    #|}
+    #|#metadata(repr((() + x, x,)))
+    #|]
+    #|#metadata("== accessor: array + array, both")
+    #|#[
+    #|#let x = ((1, 2), (3, 4), (5, 6))
+    #|#{
+    #|  let _ = (array.pop)(x + x)
+    #|  let _ = (array.push)(x + x, 0)
+    #|  let _ = (array.pop)((x + x).at(0))
+    #|  let _ = (array.push)((x + x).at(0), 0)
+    #|  metadata(repr((x + x, x,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(x + x); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(x + x); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(x + x); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(x + x); pv.at(0).at(0).push(0) }
+    #|  metadata(repr((x + x, x,)))
+    #|}
+    #|#let get() = x + x
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  metadata(repr((get(), x,)))
+    #|}
+    #|#metadata(repr((x + x, x,)))
+    #|]
+    #|#metadata("== accessor: array * 1")
+    #|#[
+    #|#let x = ((1, 2), (3, 4), (5, 6))
+    #|#{
+    #|  let _ = (array.pop)(x * 1)
+    #|  let _ = (array.push)(x * 1, 0)
+    #|  let _ = (array.pop)((x * 1).at(0))
+    #|  let _ = (array.push)((x * 1).at(0), 0)
+    #|  metadata(repr((x * 1, x,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(x * 1); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(x * 1); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(x * 1); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(x * 1); pv.at(0).at(0).push(0) }
+    #|  metadata(repr((x * 1, x,)))
+    #|}
+    #|#let get() = x * 1
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  metadata(repr((get(), x,)))
+    #|}
+    #|#metadata(repr((x * 1, x,)))
+    #|]
+    #|#metadata("== accessor: array * 2")
+    #|#[
+    #|#let x = ((1, 2), (3, 4), (5, 6))
+    #|#{
+    #|  let _ = (array.pop)(2 * x)
+    #|  let _ = (array.push)(2 * x, 0)
+    #|  let _ = (array.pop)((2 * x).at(0))
+    #|  let _ = (array.push)((2 * x).at(0), 0)
+    #|  metadata(repr((2 * x, x,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(2 * x); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(2 * x); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(2 * x); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(2 * x); pv.at(0).at(0).push(0) }
+    #|  metadata(repr((2 * x, x,)))
+    #|}
+    #|#let get() = 2 * x
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  metadata(repr((get(), x,)))
+    #|}
+    #|#metadata(repr((2 * x, x,)))
+    #|]
+    #|#metadata("== accessor: a spread into an array")
+    #|#[
+    #|#let x = ((1, 2), (3, 4), (5, 6))
+    #|#{
+    #|  let _ = (array.pop)((..x,))
+    #|  let _ = (array.push)((..x,), 0)
+    #|  let _ = (array.pop)(((..x,)).at(0))
+    #|  let _ = (array.push)(((..x,)).at(0), 0)
+    #|  metadata(repr(((..x,), x,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push((..x,)); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push((..x,)); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push((..x,)); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push((..x,)); pv.at(0).at(0).push(0) }
+    #|  metadata(repr(((..x,), x,)))
+    #|}
+    #|#let get() = (..x,)
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  metadata(repr((get(), x,)))
+    #|}
+    #|#metadata(repr(((..x,), x,)))
+    #|]
+    #|#metadata("== accessor: an array literal")
+    #|#[
+    #|#let x = ((1, 2), (3, 4), (5, 6))
+    #|#{
+    #|  let _ = (array.pop)((x, x.at(0)))
+    #|  let _ = (array.push)((x, x.at(0)), 0)
+    #|  let _ = (array.pop)(((x, x.at(0))).at(0))
+    #|  let _ = (array.push)(((x, x.at(0))).at(0), 0)
+    #|  let _ = (array.pop)(((x, x.at(0))).at(1))
+    #|  let _ = (array.push)(((x, x.at(0))).at(1), 0)
+    #|  let _ = (array.pop)(((x, x.at(0))).at(0).at(0))
+    #|  let _ = (array.push)(((x, x.at(0))).at(0).at(0), 0)
+    #|  metadata(repr(((x, x.at(0)), x,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push((x, x.at(0))); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push((x, x.at(0))); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push((x, x.at(0))); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push((x, x.at(0))); pv.at(0).at(0).push(0) }
+    #|  { let pv = (); pv.push((x, x.at(0))); let _ = pv.at(0).at(1).pop() }
+    #|  { let pv = (); pv.push((x, x.at(0))); pv.at(0).at(1).push(0) }
+    #|  { let pv = (); pv.push((x, x.at(0))); let _ = pv.at(0).at(0).at(0).pop() }
+    #|  { let pv = (); pv.push((x, x.at(0))); pv.at(0).at(0).at(0).push(0) }
+    #|  metadata(repr(((x, x.at(0)), x,)))
+    #|}
+    #|#let get() = (x, x.at(0))
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  let _ = (array.pop)(get().at(1))
+    #|  let _ = (array.push)(get().at(1), 0)
+    #|  let _ = (array.pop)(get().at(0).at(0))
+    #|  let _ = (array.push)(get().at(0).at(0), 0)
+    #|  metadata(repr((get(), x,)))
+    #|}
+    #|#metadata(repr(((x, x.at(0)), x,)))
+    #|]
+    #|#metadata("== accessor: the array constructor")
+    #|#[
+    #|#let x = ((1, 2), (3, 4), (5, 6))
+    #|#{
+    #|  let _ = (array.pop)(array(x))
+    #|  let _ = (array.push)(array(x), 0)
+    #|  let _ = (array.pop)(array(x).at(0))
+    #|  let _ = (array.push)(array(x).at(0), 0)
+    #|  metadata(repr((array(x), x,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(array(x)); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(array(x)); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(array(x)); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(array(x)); pv.at(0).at(0).push(0) }
+    #|  metadata(repr((array(x), x,)))
+    #|}
+    #|#let get() = array(x)
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  metadata(repr((get(), x,)))
+    #|}
+    #|#metadata(repr((array(x), x,)))
+    #|]
+    #|#metadata("== accessor: calc.max and calc.min")
+    #|#[
+    #|#let x = ((1, 2), (3, 4), (5, 6))
+    #|#{
+    #|  let _ = (array.pop)(calc.max(..x))
+    #|  let _ = (array.push)(calc.max(..x), 0)
+    #|  metadata(repr((calc.max(..x), x, calc.min(..x),)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(calc.max(..x)); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(calc.max(..x)); pv.at(0).push(0) }
+    #|  metadata(repr((calc.max(..x), x, calc.min(..x),)))
+    #|}
+    #|#let get() = calc.max(..x)
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  metadata(repr((get(), x, calc.min(..x),)))
+    #|}
+    #|#metadata(repr((calc.max(..x), x, calc.min(..x),)))
+    #|]
+    #|#metadata("== accessor: calc.min")
+    #|#[
+    #|#let x = ((1, 2), (3, 4), (5, 6))
+    #|#{
+    #|  let _ = (array.pop)(calc.min(..x))
+    #|  let _ = (array.push)(calc.min(..x), 0)
+    #|  metadata(repr((calc.min(..x), x,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(calc.min(..x)); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(calc.min(..x)); pv.at(0).push(0) }
+    #|  metadata(repr((calc.min(..x), x,)))
+    #|}
+    #|#let get() = calc.min(..x)
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  metadata(repr((get(), x,)))
+    #|}
+    #|#metadata(repr((calc.min(..x), x,)))
+    #|]
+    #|#metadata("== accessor: a conditional and a block")
+    #|#[
+    #|#let x = ((1, 2), (3, 4), (5, 6))
+    #|#{
+    #|  let _ = (array.pop)(if true { x.at(0) } else { x.at(1) })
+    #|  let _ = (array.push)(if true { x.at(0) } else { x.at(1) }, 0)
+    #|  metadata(repr((if true { x.at(0) } else { x.at(1) }, x, { x.at(1) },)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(if true { x.at(0) } else { x.at(1) }); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(if true { x.at(0) } else { x.at(1) }); pv.at(0).push(0) }
+    #|  metadata(repr((if true { x.at(0) } else { x.at(1) }, x, { x.at(1) },)))
+    #|}
+    #|#let get() = if true { x.at(0) } else { x.at(1) }
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  metadata(repr((get(), x, { x.at(1) },)))
+    #|}
+    #|#metadata(repr((if true { x.at(0) } else { x.at(1) }, x, { x.at(1) },)))
+    #|]
+    #|#metadata("== accessor: a block")
+    #|#[
+    #|#let x = ((1, 2), (3, 4), (5, 6))
+    #|#{
+    #|  let _ = (array.pop)({ x.at(1) })
+    #|  let _ = (array.push)({ x.at(1) }, 0)
+    #|  metadata(repr(({ x.at(1) }, x,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push({ x.at(1) }); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push({ x.at(1) }); pv.at(0).push(0) }
+    #|  metadata(repr(({ x.at(1) }, x,)))
+    #|}
+    #|#let get() = { x.at(1) }
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  metadata(repr((get(), x,)))
+    #|}
+    #|#metadata(repr(({ x.at(1) }, x,)))
+    #|]
+    #|#metadata("== accessor: array.range and others without parts")
+    #|#[
+    #|#let x = ((1, 2), (3, 4), (5, 6))
+    #|#{
+    #|  let _ = (array.pop)(range(3))
+    #|  let _ = (array.push)(range(3), 0)
+    #|  metadata(repr((range(3), x, x.flatten(), x.len(),)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(range(3)); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(range(3)); pv.at(0).push(0) }
+    #|  metadata(repr((range(3), x, x.flatten(), x.len(),)))
+    #|}
+    #|#let get() = range(3)
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  metadata(repr((get(), x, x.flatten(), x.len(),)))
+    #|}
+    #|#metadata(repr((range(3), x, x.flatten(), x.len(),)))
+    #|]
+    #|#metadata("== accessor: array.at of a dictionary value")
+    #|#[
+    #|#let d = (a: (1, 2), d: (k: (3,)))
+    #|#{
+    #|  let _ = (array.pop)(d.a)
+    #|  let _ = (array.push)(d.a, 0)
+    #|  metadata(repr((d.a, d,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(d.a); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(d.a); pv.at(0).push(0) }
+    #|  metadata(repr((d.a, d,)))
+    #|}
+    #|#let get() = d.a
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  metadata(repr((get(), d,)))
+    #|}
+    #|#metadata(repr((d.a, d,)))
+    #|]
+    #|#metadata("== accessor: dictionary.at")
+    #|#[
+    #|#let d = (a: (1, 2), d: (k: (3,)))
+    #|#{
+    #|  let _ = (array.pop)(d.at("a"))
+    #|  let _ = (array.push)(d.at("a"), 0)
+    #|  metadata(repr((d.at("a"), d,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(d.at("a")); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(d.at("a")); pv.at(0).push(0) }
+    #|  metadata(repr((d.at("a"), d,)))
+    #|}
+    #|#let get() = d.at("a")
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  metadata(repr((get(), d,)))
+    #|}
+    #|#metadata(repr((d.at("a"), d,)))
+    #|]
+    #|#metadata("== accessor: dictionary.at, the default")
+    #|#[
+    #|#let d = (a: (1, 2), d: (k: (3,)))
+    #|#{
+    #|  let _ = (array.pop)(d.at("zz", default: d.a))
+    #|  let _ = (array.push)(d.at("zz", default: d.a), 0)
+    #|  metadata(repr((d.at("zz", default: d.a), d,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(d.at("zz", default: d.a)); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(d.at("zz", default: d.a)); pv.at(0).push(0) }
+    #|  metadata(repr((d.at("zz", default: d.a), d,)))
+    #|}
+    #|#let get() = d.at("zz", default: d.a)
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  metadata(repr((get(), d,)))
+    #|}
+    #|#metadata(repr((d.at("zz", default: d.a), d,)))
+    #|]
+    #|#metadata("== accessor: dictionary.values")
+    #|#[
+    #|#let d = (a: (1, 2), d: (k: (3,)))
+    #|#{
+    #|  let _ = (array.pop)(d.values())
+    #|  let _ = (array.push)(d.values(), 0)
+    #|  let _ = (array.pop)(d.values().at(0))
+    #|  let _ = (array.push)(d.values().at(0), 0)
+    #|  let _ = (dictionary.insert)(d.values().at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(d.values().at(1), "k")
+    #|  let _ = (array.pop)(d.values().at(1).k)
+    #|  let _ = (array.push)(d.values().at(1).k, 0)
+    #|  metadata(repr((d.values(), d,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(d.values()); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(d.values()); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(d.values()); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(d.values()); pv.at(0).at(0).push(0) }
+    #|  { let pv = (); pv.push(d.values()); pv.at(0).at(1).insert("zz", 0) }
+    #|  { let pv = (); pv.push(d.values()); let _ = pv.at(0).at(1).remove("k") }
+    #|  { let pv = (); pv.push(d.values()); let _ = pv.at(0).at(1).k.pop() }
+    #|  { let pv = (); pv.push(d.values()); pv.at(0).at(1).k.push(0) }
+    #|  metadata(repr((d.values(), d,)))
+    #|}
+    #|#let get() = d.values()
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  let _ = (dictionary.insert)(get().at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().at(1), "k")
+    #|  let _ = (array.pop)(get().at(1).k)
+    #|  let _ = (array.push)(get().at(1).k, 0)
+    #|  metadata(repr((get(), d,)))
+    #|}
+    #|#metadata(repr((d.values(), d,)))
+    #|]
+    #|#metadata("== accessor: dictionary.pairs")
+    #|#[
+    #|#let d = (a: (1, 2), d: (k: (3,)))
+    #|#{
+    #|  let _ = (array.pop)(d.pairs())
+    #|  let _ = (array.push)(d.pairs(), 0)
+    #|  let _ = (array.pop)(d.pairs().at(0))
+    #|  let _ = (array.push)(d.pairs().at(0), 0)
+    #|  let _ = (array.pop)(d.pairs().at(0).at(1))
+    #|  let _ = (array.push)(d.pairs().at(0).at(1), 0)
+    #|  let _ = (dictionary.insert)(d.pairs().at(1).at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(d.pairs().at(1).at(1), "k")
+    #|  metadata(repr((d.pairs(), d,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(d.pairs()); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(d.pairs()); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(d.pairs()); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(d.pairs()); pv.at(0).at(0).push(0) }
+    #|  { let pv = (); pv.push(d.pairs()); let _ = pv.at(0).at(0).at(1).pop() }
+    #|  { let pv = (); pv.push(d.pairs()); pv.at(0).at(0).at(1).push(0) }
+    #|  { let pv = (); pv.push(d.pairs()); pv.at(0).at(1).at(1).insert("zz", 0) }
+    #|  { let pv = (); pv.push(d.pairs()); let _ = pv.at(0).at(1).at(1).remove("k") }
+    #|  metadata(repr((d.pairs(), d,)))
+    #|}
+    #|#let get() = d.pairs()
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  let _ = (array.pop)(get().at(0).at(1))
+    #|  let _ = (array.push)(get().at(0).at(1), 0)
+    #|  let _ = (dictionary.insert)(get().at(1).at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().at(1).at(1), "k")
+    #|  metadata(repr((get(), d,)))
+    #|}
+    #|#metadata(repr((d.pairs(), d,)))
+    #|]
+    #|#metadata("== accessor: dictionary.keys")
+    #|#[
+    #|#let d = (a: (1, 2), d: (k: (3,)))
+    #|#{
+    #|  let _ = (array.pop)(d.keys())
+    #|  let _ = (array.push)(d.keys(), 0)
+    #|  metadata(repr((d.keys(), d,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(d.keys()); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(d.keys()); pv.at(0).push(0) }
+    #|  metadata(repr((d.keys(), d,)))
+    #|}
+    #|#let get() = d.keys()
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  metadata(repr((get(), d,)))
+    #|}
+    #|#metadata(repr((d.keys(), d,)))
+    #|]
+    #|#metadata("== accessor: dictionary + dictionary")
+    #|#[
+    #|#let d = (a: (1, 2), d: (k: (3,)))
+    #|#{
+    #|  let _ = (dictionary.insert)(d + (:), "zz", 0)
+    #|  let _ = (dictionary.remove)(d + (:), "a")
+    #|  let _ = (array.pop)((d + (:)).a)
+    #|  let _ = (array.push)((d + (:)).a, 0)
+    #|  let _ = (array.pop)((d + (:)).at("a"))
+    #|  let _ = (array.push)((d + (:)).at("a"), 0)
+    #|  let _ = (dictionary.insert)((d + (:)).d, "zz", 0)
+    #|  let _ = (dictionary.remove)((d + (:)).d, "k")
+    #|  let _ = (array.pop)((d + (:)).d.k)
+    #|  let _ = (array.push)((d + (:)).d.k, 0)
+    #|  let _ = (array.pop)((d + (:)).values().first())
+    #|  let _ = (array.push)((d + (:)).values().first(), 0)
+    #|  let _ = (array.pop)((d + (:)).pairs().first().last())
+    #|  let _ = (array.push)((d + (:)).pairs().first().last(), 0)
+    #|  let _ = (array.pop)((d + (:)).values().last().k)
+    #|  let _ = (array.push)((d + (:)).values().last().k, 0)
+    #|  metadata(repr((d + (:), d,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(d + (:)); pv.at(0).insert("zz", 0) }
+    #|  { let pv = (); pv.push(d + (:)); let _ = pv.at(0).remove("a") }
+    #|  { let pv = (); pv.push(d + (:)); let _ = pv.at(0).a.pop() }
+    #|  { let pv = (); pv.push(d + (:)); pv.at(0).a.push(0) }
+    #|  { let pv = (); pv.push(d + (:)); let _ = pv.at(0).at("a").pop() }
+    #|  { let pv = (); pv.push(d + (:)); pv.at(0).at("a").push(0) }
+    #|  { let pv = (); pv.push(d + (:)); pv.at(0).d.insert("zz", 0) }
+    #|  { let pv = (); pv.push(d + (:)); let _ = pv.at(0).d.remove("k") }
+    #|  { let pv = (); pv.push(d + (:)); let _ = pv.at(0).d.k.pop() }
+    #|  { let pv = (); pv.push(d + (:)); pv.at(0).d.k.push(0) }
+    #|  metadata(repr((d + (:), d,)))
+    #|}
+    #|#let get() = d + (:)
+    #|#{
+    #|  let _ = (dictionary.insert)(get(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get(), "a")
+    #|  let _ = (array.pop)(get().a)
+    #|  let _ = (array.push)(get().a, 0)
+    #|  let _ = (array.pop)(get().at("a"))
+    #|  let _ = (array.push)(get().at("a"), 0)
+    #|  let _ = (dictionary.insert)(get().d, "zz", 0)
+    #|  let _ = (dictionary.remove)(get().d, "k")
+    #|  let _ = (array.pop)(get().d.k)
+    #|  let _ = (array.push)(get().d.k, 0)
+    #|  let _ = (array.pop)(get().values().first())
+    #|  let _ = (array.push)(get().values().first(), 0)
+    #|  let _ = (array.pop)(get().pairs().first().last())
+    #|  let _ = (array.push)(get().pairs().first().last(), 0)
+    #|  let _ = (array.pop)(get().values().last().k)
+    #|  let _ = (array.push)(get().values().last().k, 0)
+    #|  metadata(repr((get(), d,)))
+    #|}
+    #|#metadata(repr((d + (:), d,)))
+    #|]
+    #|#metadata("== accessor: dictionary + dictionary, right")
+    #|#[
+    #|#let d = (a: (1, 2), d: (k: (3,)))
+    #|#{
+    #|  let _ = (dictionary.insert)((:) + d, "zz", 0)
+    #|  let _ = (dictionary.remove)((:) + d, "a")
+    #|  let _ = (array.pop)(((:) + d).a)
+    #|  let _ = (array.push)(((:) + d).a, 0)
+    #|  let _ = (array.pop)(((:) + d).at("a"))
+    #|  let _ = (array.push)(((:) + d).at("a"), 0)
+    #|  let _ = (dictionary.insert)(((:) + d).d, "zz", 0)
+    #|  let _ = (dictionary.remove)(((:) + d).d, "k")
+    #|  let _ = (array.pop)(((:) + d).d.k)
+    #|  let _ = (array.push)(((:) + d).d.k, 0)
+    #|  let _ = (array.pop)(((:) + d).values().first())
+    #|  let _ = (array.push)(((:) + d).values().first(), 0)
+    #|  let _ = (array.pop)(((:) + d).pairs().first().last())
+    #|  let _ = (array.push)(((:) + d).pairs().first().last(), 0)
+    #|  let _ = (array.pop)(((:) + d).values().last().k)
+    #|  let _ = (array.push)(((:) + d).values().last().k, 0)
+    #|  metadata(repr(((:) + d, d,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push((:) + d); pv.at(0).insert("zz", 0) }
+    #|  { let pv = (); pv.push((:) + d); let _ = pv.at(0).remove("a") }
+    #|  { let pv = (); pv.push((:) + d); let _ = pv.at(0).a.pop() }
+    #|  { let pv = (); pv.push((:) + d); pv.at(0).a.push(0) }
+    #|  { let pv = (); pv.push((:) + d); let _ = pv.at(0).at("a").pop() }
+    #|  { let pv = (); pv.push((:) + d); pv.at(0).at("a").push(0) }
+    #|  { let pv = (); pv.push((:) + d); pv.at(0).d.insert("zz", 0) }
+    #|  { let pv = (); pv.push((:) + d); let _ = pv.at(0).d.remove("k") }
+    #|  { let pv = (); pv.push((:) + d); let _ = pv.at(0).d.k.pop() }
+    #|  { let pv = (); pv.push((:) + d); pv.at(0).d.k.push(0) }
+    #|  metadata(repr(((:) + d, d,)))
+    #|}
+    #|#let get() = (:) + d
+    #|#{
+    #|  let _ = (dictionary.insert)(get(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get(), "a")
+    #|  let _ = (array.pop)(get().a)
+    #|  let _ = (array.push)(get().a, 0)
+    #|  let _ = (array.pop)(get().at("a"))
+    #|  let _ = (array.push)(get().at("a"), 0)
+    #|  let _ = (dictionary.insert)(get().d, "zz", 0)
+    #|  let _ = (dictionary.remove)(get().d, "k")
+    #|  let _ = (array.pop)(get().d.k)
+    #|  let _ = (array.push)(get().d.k, 0)
+    #|  let _ = (array.pop)(get().values().first())
+    #|  let _ = (array.push)(get().values().first(), 0)
+    #|  let _ = (array.pop)(get().pairs().first().last())
+    #|  let _ = (array.push)(get().pairs().first().last(), 0)
+    #|  let _ = (array.pop)(get().values().last().k)
+    #|  let _ = (array.push)(get().values().last().k, 0)
+    #|  metadata(repr((get(), d,)))
+    #|}
+    #|#metadata(repr(((:) + d, d,)))
+    #|]
+    #|#metadata("== accessor: a spread into a dictionary")
+    #|#[
+    #|#let d = (a: (1, 2), d: (k: (3,)))
+    #|#{
+    #|  let _ = (dictionary.insert)((w: 1, ..d), "zz", 0)
+    #|  let _ = (dictionary.remove)((w: 1, ..d), "a")
+    #|  let _ = (array.pop)(((w: 1, ..d)).a)
+    #|  let _ = (array.push)(((w: 1, ..d)).a, 0)
+    #|  let _ = (array.pop)(((w: 1, ..d)).at("a"))
+    #|  let _ = (array.push)(((w: 1, ..d)).at("a"), 0)
+    #|  let _ = (dictionary.insert)(((w: 1, ..d)).d, "zz", 0)
+    #|  let _ = (dictionary.remove)(((w: 1, ..d)).d, "k")
+    #|  let _ = (array.pop)(((w: 1, ..d)).d.k)
+    #|  let _ = (array.push)(((w: 1, ..d)).d.k, 0)
+    #|  metadata(repr(((w: 1, ..d), d,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push((w: 1, ..d)); pv.at(0).insert("zz", 0) }
+    #|  { let pv = (); pv.push((w: 1, ..d)); let _ = pv.at(0).remove("a") }
+    #|  { let pv = (); pv.push((w: 1, ..d)); let _ = pv.at(0).a.pop() }
+    #|  { let pv = (); pv.push((w: 1, ..d)); pv.at(0).a.push(0) }
+    #|  { let pv = (); pv.push((w: 1, ..d)); let _ = pv.at(0).at("a").pop() }
+    #|  { let pv = (); pv.push((w: 1, ..d)); pv.at(0).at("a").push(0) }
+    #|  { let pv = (); pv.push((w: 1, ..d)); pv.at(0).d.insert("zz", 0) }
+    #|  { let pv = (); pv.push((w: 1, ..d)); let _ = pv.at(0).d.remove("k") }
+    #|  { let pv = (); pv.push((w: 1, ..d)); let _ = pv.at(0).d.k.pop() }
+    #|  { let pv = (); pv.push((w: 1, ..d)); pv.at(0).d.k.push(0) }
+    #|  metadata(repr(((w: 1, ..d), d,)))
+    #|}
+    #|#let get() = (w: 1, ..d)
+    #|#{
+    #|  let _ = (dictionary.insert)(get(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get(), "a")
+    #|  let _ = (array.pop)(get().a)
+    #|  let _ = (array.push)(get().a, 0)
+    #|  let _ = (array.pop)(get().at("a"))
+    #|  let _ = (array.push)(get().at("a"), 0)
+    #|  let _ = (dictionary.insert)(get().d, "zz", 0)
+    #|  let _ = (dictionary.remove)(get().d, "k")
+    #|  let _ = (array.pop)(get().d.k)
+    #|  let _ = (array.push)(get().d.k, 0)
+    #|  metadata(repr((get(), d,)))
+    #|}
+    #|#metadata(repr(((w: 1, ..d), d,)))
+    #|]
+    #|#metadata("== accessor: a dictionary literal")
+    #|#[
+    #|#let d = (a: (1, 2), d: (k: (3,)))
+    #|#{
+    #|  let _ = (dictionary.insert)((v: d, w: d.a), "zz", 0)
+    #|  let _ = (dictionary.remove)((v: d, w: d.a), "v")
+    #|  let _ = (dictionary.insert)(((v: d, w: d.a)).v, "zz", 0)
+    #|  let _ = (dictionary.remove)(((v: d, w: d.a)).v, "a")
+    #|  let _ = (array.pop)(((v: d, w: d.a)).v.a)
+    #|  let _ = (array.push)(((v: d, w: d.a)).v.a, 0)
+    #|  let _ = (array.pop)(((v: d, w: d.a)).v.at("a"))
+    #|  let _ = (array.push)(((v: d, w: d.a)).v.at("a"), 0)
+    #|  let _ = (dictionary.insert)(((v: d, w: d.a)).v.d, "zz", 0)
+    #|  let _ = (dictionary.remove)(((v: d, w: d.a)).v.d, "k")
+    #|  let _ = (array.pop)(((v: d, w: d.a)).v.d.k)
+    #|  let _ = (array.push)(((v: d, w: d.a)).v.d.k, 0)
+    #|  let _ = (array.pop)(((v: d, w: d.a)).v.values().first())
+    #|  let _ = (array.push)(((v: d, w: d.a)).v.values().first(), 0)
+    #|  let _ = (array.pop)(((v: d, w: d.a)).v.pairs().first().last())
+    #|  let _ = (array.push)(((v: d, w: d.a)).v.pairs().first().last(), 0)
+    #|  let _ = (array.pop)(((v: d, w: d.a)).v.values().last().k)
+    #|  let _ = (array.push)(((v: d, w: d.a)).v.values().last().k, 0)
+    #|  let _ = (array.pop)(((v: d, w: d.a)).w)
+    #|  let _ = (array.push)(((v: d, w: d.a)).w, 0)
+    #|  metadata(repr(((v: d, w: d.a), d,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push((v: d, w: d.a)); pv.at(0).insert("zz", 0) }
+    #|  { let pv = (); pv.push((v: d, w: d.a)); let _ = pv.at(0).remove("v") }
+    #|  { let pv = (); pv.push((v: d, w: d.a)); pv.at(0).v.insert("zz", 0) }
+    #|  { let pv = (); pv.push((v: d, w: d.a)); let _ = pv.at(0).v.remove("a") }
+    #|  { let pv = (); pv.push((v: d, w: d.a)); let _ = pv.at(0).v.a.pop() }
+    #|  { let pv = (); pv.push((v: d, w: d.a)); pv.at(0).v.a.push(0) }
+    #|  { let pv = (); pv.push((v: d, w: d.a)); let _ = pv.at(0).v.at("a").pop() }
+    #|  { let pv = (); pv.push((v: d, w: d.a)); pv.at(0).v.at("a").push(0) }
+    #|  { let pv = (); pv.push((v: d, w: d.a)); pv.at(0).v.d.insert("zz", 0) }
+    #|  { let pv = (); pv.push((v: d, w: d.a)); let _ = pv.at(0).v.d.remove("k") }
+    #|  { let pv = (); pv.push((v: d, w: d.a)); let _ = pv.at(0).v.d.k.pop() }
+    #|  { let pv = (); pv.push((v: d, w: d.a)); pv.at(0).v.d.k.push(0) }
+    #|  { let pv = (); pv.push((v: d, w: d.a)); let _ = pv.at(0).w.pop() }
+    #|  { let pv = (); pv.push((v: d, w: d.a)); pv.at(0).w.push(0) }
+    #|  metadata(repr(((v: d, w: d.a), d,)))
+    #|}
+    #|#let get() = (v: d, w: d.a)
+    #|#{
+    #|  let _ = (dictionary.insert)(get(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get(), "v")
+    #|  let _ = (dictionary.insert)(get().v, "zz", 0)
+    #|  let _ = (dictionary.remove)(get().v, "a")
+    #|  let _ = (array.pop)(get().v.a)
+    #|  let _ = (array.push)(get().v.a, 0)
+    #|  let _ = (array.pop)(get().v.at("a"))
+    #|  let _ = (array.push)(get().v.at("a"), 0)
+    #|  let _ = (dictionary.insert)(get().v.d, "zz", 0)
+    #|  let _ = (dictionary.remove)(get().v.d, "k")
+    #|  let _ = (array.pop)(get().v.d.k)
+    #|  let _ = (array.push)(get().v.d.k, 0)
+    #|  let _ = (array.pop)(get().v.values().first())
+    #|  let _ = (array.push)(get().v.values().first(), 0)
+    #|  let _ = (array.pop)(get().v.pairs().first().last())
+    #|  let _ = (array.push)(get().v.pairs().first().last(), 0)
+    #|  let _ = (array.pop)(get().v.values().last().k)
+    #|  let _ = (array.push)(get().v.values().last().k, 0)
+    #|  let _ = (array.pop)(get().w)
+    #|  let _ = (array.push)(get().w, 0)
+    #|  metadata(repr((get(), d,)))
+    #|}
+    #|#metadata(repr(((v: d, w: d.a), d,)))
+    #|]
+    #|#metadata("== accessor: pairs back to a dictionary")
+    #|#[
+    #|#let d = (a: (1, 2), d: (k: (3,)))
+    #|#{
+    #|  let _ = (dictionary.insert)(d.pairs().to-dict(), "zz", 0)
+    #|  let _ = (dictionary.remove)(d.pairs().to-dict(), "a")
+    #|  let _ = (array.pop)(d.pairs().to-dict().a)
+    #|  let _ = (array.push)(d.pairs().to-dict().a, 0)
+    #|  let _ = (array.pop)(d.pairs().to-dict().at("a"))
+    #|  let _ = (array.push)(d.pairs().to-dict().at("a"), 0)
+    #|  let _ = (dictionary.insert)(d.pairs().to-dict().d, "zz", 0)
+    #|  let _ = (dictionary.remove)(d.pairs().to-dict().d, "k")
+    #|  let _ = (array.pop)(d.pairs().to-dict().d.k)
+    #|  let _ = (array.push)(d.pairs().to-dict().d.k, 0)
+    #|  let _ = (array.pop)(d.pairs().to-dict().values().first())
+    #|  let _ = (array.push)(d.pairs().to-dict().values().first(), 0)
+    #|  let _ = (array.pop)(d.pairs().to-dict().pairs().first().last())
+    #|  let _ = (array.push)(d.pairs().to-dict().pairs().first().last(), 0)
+    #|  let _ = (array.pop)(d.pairs().to-dict().values().last().k)
+    #|  let _ = (array.push)(d.pairs().to-dict().values().last().k, 0)
+    #|  metadata(repr((d.pairs().to-dict(), d,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(d.pairs().to-dict()); pv.at(0).insert("zz", 0) }
+    #|  { let pv = (); pv.push(d.pairs().to-dict()); let _ = pv.at(0).remove("a") }
+    #|  { let pv = (); pv.push(d.pairs().to-dict()); let _ = pv.at(0).a.pop() }
+    #|  { let pv = (); pv.push(d.pairs().to-dict()); pv.at(0).a.push(0) }
+    #|  { let pv = (); pv.push(d.pairs().to-dict()); let _ = pv.at(0).at("a").pop() }
+    #|  { let pv = (); pv.push(d.pairs().to-dict()); pv.at(0).at("a").push(0) }
+    #|  { let pv = (); pv.push(d.pairs().to-dict()); pv.at(0).d.insert("zz", 0) }
+    #|  { let pv = (); pv.push(d.pairs().to-dict()); let _ = pv.at(0).d.remove("k") }
+    #|  { let pv = (); pv.push(d.pairs().to-dict()); let _ = pv.at(0).d.k.pop() }
+    #|  { let pv = (); pv.push(d.pairs().to-dict()); pv.at(0).d.k.push(0) }
+    #|  metadata(repr((d.pairs().to-dict(), d,)))
+    #|}
+    #|#let get() = d.pairs().to-dict()
+    #|#{
+    #|  let _ = (dictionary.insert)(get(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get(), "a")
+    #|  let _ = (array.pop)(get().a)
+    #|  let _ = (array.push)(get().a, 0)
+    #|  let _ = (array.pop)(get().at("a"))
+    #|  let _ = (array.push)(get().at("a"), 0)
+    #|  let _ = (dictionary.insert)(get().d, "zz", 0)
+    #|  let _ = (dictionary.remove)(get().d, "k")
+    #|  let _ = (array.pop)(get().d.k)
+    #|  let _ = (array.push)(get().d.k, 0)
+    #|  let _ = (array.pop)(get().values().first())
+    #|  let _ = (array.push)(get().values().first(), 0)
+    #|  let _ = (array.pop)(get().pairs().first().last())
+    #|  let _ = (array.push)(get().pairs().first().last(), 0)
+    #|  let _ = (array.pop)(get().values().last().k)
+    #|  let _ = (array.push)(get().values().last().k, 0)
+    #|  metadata(repr((get(), d,)))
+    #|}
+    #|#metadata(repr((d.pairs().to-dict(), d,)))
+    #|]
+    #|#metadata("== accessor: dictionary.filter")
+    #|#[
+    #|#let d = (a: (1, 2), d: (k: (3,)))
+    #|#{
+    #|  let _ = (dictionary.insert)(d.filter(v => true), "zz", 0)
+    #|  let _ = (dictionary.remove)(d.filter(v => true), "a")
+    #|  let _ = (array.pop)((d.filter(v => true)).a)
+    #|  let _ = (array.push)((d.filter(v => true)).a, 0)
+    #|  let _ = (array.pop)((d.filter(v => true)).at("a"))
+    #|  let _ = (array.push)((d.filter(v => true)).at("a"), 0)
+    #|  let _ = (dictionary.insert)((d.filter(v => true)).d, "zz", 0)
+    #|  let _ = (dictionary.remove)((d.filter(v => true)).d, "k")
+    #|  let _ = (array.pop)((d.filter(v => true)).d.k)
+    #|  let _ = (array.push)((d.filter(v => true)).d.k, 0)
+    #|  let _ = (array.pop)((d.filter(v => true)).values().first())
+    #|  let _ = (array.push)((d.filter(v => true)).values().first(), 0)
+    #|  let _ = (array.pop)((d.filter(v => true)).pairs().first().last())
+    #|  let _ = (array.push)((d.filter(v => true)).pairs().first().last(), 0)
+    #|  let _ = (array.pop)((d.filter(v => true)).values().last().k)
+    #|  let _ = (array.push)((d.filter(v => true)).values().last().k, 0)
+    #|  metadata(repr((d.filter(v => true), d,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(d.filter(v => true)); pv.at(0).insert("zz", 0) }
+    #|  { let pv = (); pv.push(d.filter(v => true)); let _ = pv.at(0).remove("a") }
+    #|  { let pv = (); pv.push(d.filter(v => true)); let _ = pv.at(0).a.pop() }
+    #|  { let pv = (); pv.push(d.filter(v => true)); pv.at(0).a.push(0) }
+    #|  { let pv = (); pv.push(d.filter(v => true)); let _ = pv.at(0).at("a").pop() }
+    #|  { let pv = (); pv.push(d.filter(v => true)); pv.at(0).at("a").push(0) }
+    #|  { let pv = (); pv.push(d.filter(v => true)); pv.at(0).d.insert("zz", 0) }
+    #|  { let pv = (); pv.push(d.filter(v => true)); let _ = pv.at(0).d.remove("k") }
+    #|  { let pv = (); pv.push(d.filter(v => true)); let _ = pv.at(0).d.k.pop() }
+    #|  { let pv = (); pv.push(d.filter(v => true)); pv.at(0).d.k.push(0) }
+    #|  metadata(repr((d.filter(v => true), d,)))
+    #|}
+    #|#let get() = d.filter(v => true)
+    #|#{
+    #|  let _ = (dictionary.insert)(get(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get(), "a")
+    #|  let _ = (array.pop)(get().a)
+    #|  let _ = (array.push)(get().a, 0)
+    #|  let _ = (array.pop)(get().at("a"))
+    #|  let _ = (array.push)(get().at("a"), 0)
+    #|  let _ = (dictionary.insert)(get().d, "zz", 0)
+    #|  let _ = (dictionary.remove)(get().d, "k")
+    #|  let _ = (array.pop)(get().d.k)
+    #|  let _ = (array.push)(get().d.k, 0)
+    #|  let _ = (array.pop)(get().values().first())
+    #|  let _ = (array.push)(get().values().first(), 0)
+    #|  let _ = (array.pop)(get().pairs().first().last())
+    #|  let _ = (array.push)(get().pairs().first().last(), 0)
+    #|  let _ = (array.pop)(get().values().last().k)
+    #|  let _ = (array.push)(get().values().last().k, 0)
+    #|  metadata(repr((get(), d,)))
+    #|}
+    #|#metadata(repr((d.filter(v => true), d,)))
+    #|]
+    #|#metadata("== accessor: dictionary.map with the identity")
+    #|#[
+    #|#let d = (a: (1, 2), d: (k: (3,)))
+    #|#{
+    #|  let _ = (dictionary.insert)(d.map(v => v), "zz", 0)
+    #|  let _ = (dictionary.remove)(d.map(v => v), "a")
+    #|  let _ = (array.pop)((d.map(v => v)).a)
+    #|  let _ = (array.push)((d.map(v => v)).a, 0)
+    #|  let _ = (array.pop)((d.map(v => v)).at("a"))
+    #|  let _ = (array.push)((d.map(v => v)).at("a"), 0)
+    #|  let _ = (dictionary.insert)((d.map(v => v)).d, "zz", 0)
+    #|  let _ = (dictionary.remove)((d.map(v => v)).d, "k")
+    #|  let _ = (array.pop)((d.map(v => v)).d.k)
+    #|  let _ = (array.push)((d.map(v => v)).d.k, 0)
+    #|  let _ = (array.pop)((d.map(v => v)).values().first())
+    #|  let _ = (array.push)((d.map(v => v)).values().first(), 0)
+    #|  let _ = (array.pop)((d.map(v => v)).pairs().first().last())
+    #|  let _ = (array.push)((d.map(v => v)).pairs().first().last(), 0)
+    #|  let _ = (array.pop)((d.map(v => v)).values().last().k)
+    #|  let _ = (array.push)((d.map(v => v)).values().last().k, 0)
+    #|  metadata(repr((d.map(v => v), d,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(d.map(v => v)); pv.at(0).insert("zz", 0) }
+    #|  { let pv = (); pv.push(d.map(v => v)); let _ = pv.at(0).remove("a") }
+    #|  { let pv = (); pv.push(d.map(v => v)); let _ = pv.at(0).a.pop() }
+    #|  { let pv = (); pv.push(d.map(v => v)); pv.at(0).a.push(0) }
+    #|  { let pv = (); pv.push(d.map(v => v)); let _ = pv.at(0).at("a").pop() }
+    #|  { let pv = (); pv.push(d.map(v => v)); pv.at(0).at("a").push(0) }
+    #|  { let pv = (); pv.push(d.map(v => v)); pv.at(0).d.insert("zz", 0) }
+    #|  { let pv = (); pv.push(d.map(v => v)); let _ = pv.at(0).d.remove("k") }
+    #|  { let pv = (); pv.push(d.map(v => v)); let _ = pv.at(0).d.k.pop() }
+    #|  { let pv = (); pv.push(d.map(v => v)); pv.at(0).d.k.push(0) }
+    #|  metadata(repr((d.map(v => v), d,)))
+    #|}
+    #|#let get() = d.map(v => v)
+    #|#{
+    #|  let _ = (dictionary.insert)(get(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get(), "a")
+    #|  let _ = (array.pop)(get().a)
+    #|  let _ = (array.push)(get().a, 0)
+    #|  let _ = (array.pop)(get().at("a"))
+    #|  let _ = (array.push)(get().at("a"), 0)
+    #|  let _ = (dictionary.insert)(get().d, "zz", 0)
+    #|  let _ = (dictionary.remove)(get().d, "k")
+    #|  let _ = (array.pop)(get().d.k)
+    #|  let _ = (array.push)(get().d.k, 0)
+    #|  let _ = (array.pop)(get().values().first())
+    #|  let _ = (array.push)(get().values().first(), 0)
+    #|  let _ = (array.pop)(get().pairs().first().last())
+    #|  let _ = (array.push)(get().pairs().first().last(), 0)
+    #|  let _ = (array.pop)(get().values().last().k)
+    #|  let _ = (array.push)(get().values().last().k, 0)
+    #|  metadata(repr((get(), d,)))
+    #|}
+    #|#metadata(repr((d.map(v => v), d,)))
+    #|]
+    #|#metadata("== accessor: the result of a native dictionary remove")
+    #|#[
+    #|#let d = (a: (1, 2), d: (k: (3,)))
+    #|#{
+    #|  let _ = (array.pop)((dictionary.remove)(d, "a"))
+    #|  let _ = (array.push)((dictionary.remove)(d, "a"), 0)
+    #|  metadata(repr(((dictionary.remove)(d, "a"), d, (dictionary.remove)(d, "d"), (dictionary.at)(d, "a"),)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push((dictionary.remove)(d, "a")); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push((dictionary.remove)(d, "a")); pv.at(0).push(0) }
+    #|  metadata(repr(((dictionary.remove)(d, "a"), d, (dictionary.remove)(d, "d"), (dictionary.at)(d, "a"),)))
+    #|}
+    #|#let get() = (dictionary.remove)(d, "a")
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  metadata(repr((get(), d, (dictionary.remove)(d, "d"), (dictionary.at)(d, "a"),)))
+    #|}
+    #|#metadata(repr(((dictionary.remove)(d, "a"), d, (dictionary.remove)(d, "d"), (dictionary.at)(d, "a"),)))
+    #|]
+    #|#metadata("== accessor: a nested dictionary value")
+    #|#[
+    #|#let d = (a: (1, 2), d: (k: (3,)))
+    #|#{
+    #|  let _ = (dictionary.insert)(d.d, "zz", 0)
+    #|  let _ = (dictionary.remove)(d.d, "k")
+    #|  let _ = (array.pop)(d.d.k)
+    #|  let _ = (array.push)(d.d.k, 0)
+    #|  metadata(repr((d.d, d,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(d.d); pv.at(0).insert("zz", 0) }
+    #|  { let pv = (); pv.push(d.d); let _ = pv.at(0).remove("k") }
+    #|  { let pv = (); pv.push(d.d); let _ = pv.at(0).k.pop() }
+    #|  { let pv = (); pv.push(d.d); pv.at(0).k.push(0) }
+    #|  metadata(repr((d.d, d,)))
+    #|}
+    #|#let get() = d.d
+    #|#{
+    #|  let _ = (dictionary.insert)(get(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get(), "k")
+    #|  let _ = (array.pop)(get().k)
+    #|  let _ = (array.push)(get().k, 0)
+    #|  metadata(repr((get(), d,)))
+    #|}
+    #|#metadata(repr((d.d, d,)))
+    #|]
+    #|#metadata("== accessor: native functions as callbacks")
+    #|#[
+    #|#let x = ((1, 2), (3, 4), (5, 6))
+    #|#let b = ((true, true), (false, true), (true, false))
+    #|#let d = (a: (1, 2), b: (3, 4))
+    #|#let _ = x.map(array.pop)
+    #|#metadata(repr(x))
+    #|#let _ = x.sorted(key: array.pop)
+    #|#let _ = x.dedup(key: array.pop)
+    #|#metadata(repr(x))
+    #|#let _ = b.filter(array.pop)
+    #|#let _ = b.any(array.pop)
+    #|#let _ = b.all(array.pop)
+    #|#let _ = b.find(array.pop)
+    #|#let _ = b.position(array.pop)
+    #|#metadata(repr(b))
+    #|#let _ = d.values().map(array.pop)
+    #|#let _ = d.map(array.pop)
+    #|#let dt = (a: (true, true), b: (false, true))
+    #|#let _ = dt.filter(array.pop)
+    #|#metadata(repr(dt))
+    #|#let ar = arguments((true, true), (false, true), k: (true, false))
+    #|#let _ = ar.filter(array.pop)
+    #|#let _ = ar.map(array.pop)
+    #|#metadata(repr(ar))
+    #|#let _ = d.pairs().map(array.last).map(array.pop)
+    #|#metadata(repr(d))
+    #|#let _ = x.zip(x).map(array.first).map(array.pop)
+    #|#let _ = x.enumerate().map(array.last).map(array.pop)
+    #|#let _ = x.chunks(2).map(array.first).map(array.pop)
+    #|#let _ = x.windows(2).map(array.first).map(array.pop)
+    #|#let _ = x.rev().map(array.pop)
+    #|#let _ = x.slice(0).map(array.pop)
+    #|#let _ = (x + ()).map(array.pop)
+    #|#let _ = (x * 1).map(array.pop)
+    #|#let _ = (..x,).map(array.pop)
+    #|#let _ = x.sorted().map(array.pop)
+    #|#let _ = x.dedup().map(array.pop)
+    #|#let _ = x.filter(v => true).map(array.pop)
+    #|#let _ = x.intersperse(x.at(0)).map(array.pop)
+    #|#let _ = x.split((9,)).first().map(array.pop)
+    #|#let _ = (x, x).join().map(array.pop)
+    #|#let _ = (x, x).sum().map(array.pop)
+    #|#metadata(repr(x))
+    #|#let f() = x
+    #|#let _ = f().map(array.pop)
+    #|#let load() = ((1, 2), (3, 4))
+    #|#let _ = load().map(array.pop)
+    #|#metadata(repr((x, f(), load())))
+    #|]
+    #|#metadata("== accessor: destructuring and loops")
+    #|#[
+    #|#let x = ((1, 2), (3, 4), (5, 6))
+    #|#let d = (a: (1, 2), d: (k: (3,)))
+    #|#{
+    #|  let (a, ..rest) = x
+    #|  let _ = (array.pop)(a)
+    #|  let _ = (array.pop)(rest.at(0))
+    #|  let _ = (array.pop)(rest)
+    #|  let (a: p, ..others) = d
+    #|  let _ = (array.pop)(p)
+    #|  let _ = (dictionary.insert)(others.d, "zz", 0)
+    #|  for v in x { let _ = (array.pop)(v) }
+    #|  for (k, v) in d { if k == "a" { let _ = (array.pop)(v) } else { let _ = (dictionary.insert)(v, "zz", 0) } }
+    #|  for (i, v) in x.enumerate() { let _ = (array.pop)(v) }
+    #|  metadata(repr((x, d)))
+    #|}
+    #|#metadata(repr((x, d)))
+    #|]
+    #|
+  let expected = [
+    "== accessor: array.first", "((1, 2), ((1, 2), (3, 4), (5, 6)))", "((1, 2), ((1, 2), (3, 4), (5, 6)))",
+    "((1, 2), ((1, 2), (3, 4), (5, 6)))", "((1, 2), ((1, 2), (3, 4), (5, 6)))", "== accessor: array.last",
+    "((5, 6), ((1, 2), (3, 4), (5, 6)))", "((5, 6), ((1, 2), (3, 4), (5, 6)))", "((5, 6), ((1, 2), (3, 4), (5, 6)))",
+    "((5, 6), ((1, 2), (3, 4), (5, 6)))", "== accessor: array.at", "((3, 4), ((1, 2), (3, 4), (5, 6)))",
+    "((3, 4), ((1, 2), (3, 4), (5, 6)))", "((3, 4), ((1, 2), (3, 4), (5, 6)))", "((3, 4), ((1, 2), (3, 4), (5, 6)))",
+    "== accessor: array.at with a negative index and a default", "((5, 6), ((1, 2), (3, 4), (5, 6)))",
+    "((5, 6), ((1, 2), (3, 4), (5, 6)))", "((5, 6), ((1, 2), (3, 4), (5, 6)))", "((5, 6), ((1, 2), (3, 4), (5, 6)))",
+    "== accessor: array.at, the default", "((1, 2), ((1, 2), (3, 4), (5, 6)))", "((1, 2), ((1, 2), (3, 4), (5, 6)))",
+    "((1, 2), ((1, 2), (3, 4), (5, 6)))", "((1, 2), ((1, 2), (3, 4), (5, 6)))", "== accessor: array.first and last with a default",
+    "((1, 2), ((1, 2), (3, 4), (5, 6)), (5, 6))", "((1, 2), ((1, 2), (3, 4), (5, 6)), (5, 6))",
+    "((1, 2), ((1, 2), (3, 4), (5, 6)), (5, 6))", "((1, 2), ((1, 2), (3, 4), (5, 6)), (5, 6))",
+    "== accessor: array.slice", "(((1, 2), (3, 4)), ((1, 2), (3, 4), (5, 6)))", "(((1, 2), (3, 4)), ((1, 2), (3, 4), (5, 6)))",
+    "(((1, 2), (3, 4)), ((1, 2), (3, 4), (5, 6)))", "(((1, 2), (3, 4)), ((1, 2), (3, 4), (5, 6)))",
+    "== accessor: array.rev", "(((5, 6), (3, 4), (1, 2)), ((1, 2), (3, 4), (5, 6)))",
+    "(((5, 6), (3, 4), (1, 2)), ((1, 2), (3, 4), (5, 6)))", "(((5, 6), (3, 4), (1, 2)), ((1, 2), (3, 4), (5, 6)))",
+    "(((5, 6), (3, 4), (1, 2)), ((1, 2), (3, 4), (5, 6)))", "== accessor: array.zip",
+    "(\n  (\n    ((1, 2), (1, 2)),\n    ((3, 4), (3, 4)),\n    ((5, 6), (5, 6)),\n  ),\n  ((1, 2), (3, 4), (5, 6)),\n)",
+    "(\n  (\n    ((1, 2), (1, 2)),\n    ((3, 4), (3, 4)),\n    ((5, 6), (5, 6)),\n  ),\n  ((1, 2), (3, 4), (5, 6)),\n)",
+    "(\n  (\n    ((1, 2), (1, 2)),\n    ((3, 4), (3, 4)),\n    ((5, 6), (5, 6)),\n  ),\n  ((1, 2), (3, 4), (5, 6)),\n)",
+    "(\n  (\n    ((1, 2), (1, 2)),\n    ((3, 4), (3, 4)),\n    ((5, 6), (5, 6)),\n  ),\n  ((1, 2), (3, 4), (5, 6)),\n)",
+    "== accessor: array.zip with exact", "(\n  (\n    ((1, 2), (1, 2)),\n    ((3, 4), (3, 4)),\n    ((5, 6), (5, 6)),\n  ),\n  ((1, 2), (3, 4), (5, 6)),\n)",
+    "(\n  (\n    ((1, 2), (1, 2)),\n    ((3, 4), (3, 4)),\n    ((5, 6), (5, 6)),\n  ),\n  ((1, 2), (3, 4), (5, 6)),\n)",
+    "(\n  (\n    ((1, 2), (1, 2)),\n    ((3, 4), (3, 4)),\n    ((5, 6), (5, 6)),\n  ),\n  ((1, 2), (3, 4), (5, 6)),\n)",
+    "(\n  (\n    ((1, 2), (1, 2)),\n    ((3, 4), (3, 4)),\n    ((5, 6), (5, 6)),\n  ),\n  ((1, 2), (3, 4), (5, 6)),\n)",
+    "== accessor: array.chunks", "(\n  (((1, 2), (3, 4)), ((5, 6),)),\n  ((1, 2), (3, 4), (5, 6)),\n)",
+    "(\n  (((1, 2), (3, 4)), ((5, 6),)),\n  ((1, 2), (3, 4), (5, 6)),\n)", "(\n  (((1, 2), (3, 4)), ((5, 6),)),\n  ((1, 2), (3, 4), (5, 6)),\n)",
+    "(\n  (((1, 2), (3, 4)), ((5, 6),)),\n  ((1, 2), (3, 4), (5, 6)),\n)", "== accessor: array.windows",
+    "(\n  (((1, 2), (3, 4)), ((3, 4), (5, 6))),\n  ((1, 2), (3, 4), (5, 6)),\n)",
+    "(\n  (((1, 2), (3, 4)), ((3, 4), (5, 6))),\n  ((1, 2), (3, 4), (5, 6)),\n)",
+    "(\n  (((1, 2), (3, 4)), ((3, 4), (5, 6))),\n  ((1, 2), (3, 4), (5, 6)),\n)",
+    "(\n  (((1, 2), (3, 4)), ((3, 4), (5, 6))),\n  ((1, 2), (3, 4), (5, 6)),\n)",
+    "== accessor: array.enumerate", "(\n  ((0, (1, 2)), (1, (3, 4)), (2, (5, 6))),\n  ((1, 2), (3, 4), (5, 6)),\n)",
+    "(\n  ((0, (1, 2)), (1, (3, 4)), (2, (5, 6))),\n  ((1, 2), (3, 4), (5, 6)),\n)",
+    "(\n  ((0, (1, 2)), (1, (3, 4)), (2, (5, 6))),\n  ((1, 2), (3, 4), (5, 6)),\n)",
+    "(\n  ((0, (1, 2)), (1, (3, 4)), (2, (5, 6))),\n  ((1, 2), (3, 4), (5, 6)),\n)",
+    "== accessor: array.sorted", "(((1, 2), (3, 4), (5, 6)), ((1, 2), (3, 4), (5, 6)))",
+    "(((1, 2), (3, 4), (5, 6)), ((1, 2), (3, 4), (5, 6)))", "(((1, 2), (3, 4), (5, 6)), ((1, 2), (3, 4), (5, 6)))",
+    "(((1, 2), (3, 4), (5, 6)), ((1, 2), (3, 4), (5, 6)))", "== accessor: array.sorted with a key",
+    "(((1, 2), (3, 4), (5, 6)), ((1, 2), (3, 4), (5, 6)))", "(((1, 2), (3, 4), (5, 6)), ((1, 2), (3, 4), (5, 6)))",
+    "(((1, 2), (3, 4), (5, 6)), ((1, 2), (3, 4), (5, 6)))", "(((1, 2), (3, 4), (5, 6)), ((1, 2), (3, 4), (5, 6)))",
+    "== accessor: array.dedup", "(((1, 2), (3, 4), (5, 6)), ((1, 2), (3, 4), (5, 6)))",
+    "(((1, 2), (3, 4), (5, 6)), ((1, 2), (3, 4), (5, 6)))", "(((1, 2), (3, 4), (5, 6)), ((1, 2), (3, 4), (5, 6)))",
+    "(((1, 2), (3, 4), (5, 6)), ((1, 2), (3, 4), (5, 6)))", "== accessor: array.dedup with a key",
+    "(((1, 2), (3, 4), (5, 6)), ((1, 2), (3, 4), (5, 6)))", "(((1, 2), (3, 4), (5, 6)), ((1, 2), (3, 4), (5, 6)))",
+    "(((1, 2), (3, 4), (5, 6)), ((1, 2), (3, 4), (5, 6)))", "(((1, 2), (3, 4), (5, 6)), ((1, 2), (3, 4), (5, 6)))",
+    "== accessor: array.filter", "(((1, 2), (3, 4), (5, 6)), ((1, 2), (3, 4), (5, 6)))",
+    "(((1, 2), (3, 4), (5, 6)), ((1, 2), (3, 4), (5, 6)))", "(((1, 2), (3, 4), (5, 6)), ((1, 2), (3, 4), (5, 6)))",
+    "(((1, 2), (3, 4), (5, 6)), ((1, 2), (3, 4), (5, 6)))", "== accessor: array.map with the identity",
+    "(((1, 2), (3, 4), (5, 6)), ((1, 2), (3, 4), (5, 6)))", "(((1, 2), (3, 4), (5, 6)), ((1, 2), (3, 4), (5, 6)))",
+    "(((1, 2), (3, 4), (5, 6)), ((1, 2), (3, 4), (5, 6)))", "(((1, 2), (3, 4), (5, 6)), ((1, 2), (3, 4), (5, 6)))",
+    "== accessor: array.find", "((1, 2), ((1, 2), (3, 4), (5, 6)))", "((1, 2), ((1, 2), (3, 4), (5, 6)))",
+    "((1, 2), ((1, 2), (3, 4), (5, 6)))", "((1, 2), ((1, 2), (3, 4), (5, 6)))", "== accessor: array.flatten",
+    "(\n  (1, 2, 3, 4, 5, 6, 1, 2, 3, 4, 5, 6),\n  ((1, 2), (3, 4), (5, 6)),\n)",
+    "(\n  (1, 2, 3, 4, 5, 6, 1, 2, 3, 4, 5, 6),\n  ((1, 2), (3, 4), (5, 6)),\n)",
+    "(\n  (1, 2, 3, 4, 5, 6, 1, 2, 3, 4, 5, 6),\n  ((1, 2), (3, 4), (5, 6)),\n)",
+    "(\n  (1, 2, 3, 4, 5, 6, 1, 2, 3, 4, 5, 6),\n  ((1, 2), (3, 4), (5, 6)),\n)",
+    "== accessor: array.flatten of deeper arrays", "(\n  (1, 2, 3, 4, 5, 6, 1, 2, 3, 4, 5, 6),\n  ((1, 2), (3, 4), (5, 6)),\n)",
+    "(\n  (1, 2, 3, 4, 5, 6, 1, 2, 3, 4, 5, 6),\n  ((1, 2), (3, 4), (5, 6)),\n)",
+    "(\n  (1, 2, 3, 4, 5, 6, 1, 2, 3, 4, 5, 6),\n  ((1, 2), (3, 4), (5, 6)),\n)",
+    "(\n  (1, 2, 3, 4, 5, 6, 1, 2, 3, 4, 5, 6),\n  ((1, 2), (3, 4), (5, 6)),\n)",
+    "== accessor: array.join of one item", "((1, 2), ((1, 2), (3, 4), (5, 6)))",
+    "((1, 2), ((1, 2), (3, 4), (5, 6)))", "((1, 2), ((1, 2), (3, 4), (5, 6)))", "((1, 2), ((1, 2), (3, 4), (5, 6)))",
+    "== accessor: array.join", "((1, 2, 3, 4, 5, 6), ((1, 2), (3, 4), (5, 6)))",
+    "((1, 2, 3, 4, 5, 6), ((1, 2), (3, 4), (5, 6)))", "((1, 2, 3, 4, 5, 6), ((1, 2), (3, 4), (5, 6)))",
+    "((1, 2, 3, 4, 5, 6), ((1, 2), (3, 4), (5, 6)))", "== accessor: array.join of nested arrays",
+    "(\n  ((1, 2), (3, 4), (5, 6), (1, 2), (3, 4), (5, 6)),\n  ((1, 2), (3, 4), (5, 6)),\n)",
+    "(\n  ((1, 2), (3, 4), (5, 6), (1, 2), (3, 4), (5, 6)),\n  ((1, 2), (3, 4), (5, 6)),\n)",
+    "(\n  ((1, 2), (3, 4), (5, 6), (1, 2), (3, 4), (5, 6)),\n  ((1, 2), (3, 4), (5, 6)),\n)",
+    "(\n  ((1, 2), (3, 4), (5, 6), (1, 2), (3, 4), (5, 6)),\n  ((1, 2), (3, 4), (5, 6)),\n)",
+    "== accessor: array.sum of one item", "((1, 2), ((1, 2), (3, 4), (5, 6)))", "((1, 2), ((1, 2), (3, 4), (5, 6)))",
+    "((1, 2), ((1, 2), (3, 4), (5, 6)))", "((1, 2), ((1, 2), (3, 4), (5, 6)))", "== accessor: array.sum with a default",
+    "((1, 2), ((1, 2), (3, 4), (5, 6)))", "((1, 2), ((1, 2), (3, 4), (5, 6)))", "((1, 2), ((1, 2), (3, 4), (5, 6)))",
+    "((1, 2), ((1, 2), (3, 4), (5, 6)))", "== accessor: array.sum of nested arrays",
+    "(\n  ((1, 2), (3, 4), (5, 6), (1, 2), (3, 4), (5, 6)),\n  ((1, 2), (3, 4), (5, 6)),\n)",
+    "(\n  ((1, 2), (3, 4), (5, 6), (1, 2), (3, 4), (5, 6)),\n  ((1, 2), (3, 4), (5, 6)),\n)",
+    "(\n  ((1, 2), (3, 4), (5, 6), (1, 2), (3, 4), (5, 6)),\n  ((1, 2), (3, 4), (5, 6)),\n)",
+    "(\n  ((1, 2), (3, 4), (5, 6), (1, 2), (3, 4), (5, 6)),\n  ((1, 2), (3, 4), (5, 6)),\n)",
+    "== accessor: array.product of one item", "((1, 2), ((1, 2), (3, 4), (5, 6)))",
+    "((1, 2), ((1, 2), (3, 4), (5, 6)))", "((1, 2), ((1, 2), (3, 4), (5, 6)))", "((1, 2), ((1, 2), (3, 4), (5, 6)))",
+    "== accessor: array.product with a default", "((1, 2), ((1, 2), (3, 4), (5, 6)))",
+    "((1, 2), ((1, 2), (3, 4), (5, 6)))", "((1, 2), ((1, 2), (3, 4), (5, 6)))", "((1, 2), ((1, 2), (3, 4), (5, 6)))",
+    "== accessor: the result of a native pop and remove", "(\n  (5, 6),\n  ((1, 2), (3, 4), (5, 6)),\n  (1, 2),\n  (1, 2),\n  (1, 2),\n)",
+    "(\n  (5, 6),\n  ((1, 2), (3, 4), (5, 6)),\n  (1, 2),\n  (1, 2),\n  (1, 2),\n)",
+    "(\n  (5, 6),\n  ((1, 2), (3, 4), (5, 6)),\n  (1, 2),\n  (1, 2),\n  (1, 2),\n)",
+    "(\n  (5, 6),\n  ((1, 2), (3, 4), (5, 6)),\n  (1, 2),\n  (1, 2),\n  (1, 2),\n)",
+    "== accessor: the result of a native remove", "((3, 4), ((1, 2), (3, 4), (5, 6)))",
+    "((3, 4), ((1, 2), (3, 4), (5, 6)))", "((3, 4), ((1, 2), (3, 4), (5, 6)))", "((3, 4), ((1, 2), (3, 4), (5, 6)))",
+    "== accessor: calc.abs and other natives that return an argument", "((1, 2), ((1, 2), (3, 4), (5, 6)), 1, array)",
+    "((1, 2), ((1, 2), (3, 4), (5, 6)), 1, array)", "((1, 2), ((1, 2), (3, 4), (5, 6)), 1, array)",
+    "((1, 2), ((1, 2), (3, 4), (5, 6)), 1, array)", "== accessor: array.fold", "((5, 6), ((1, 2), (3, 4), (5, 6)))",
+    "((5, 6), ((1, 2), (3, 4), (5, 6)))", "((5, 6), ((1, 2), (3, 4), (5, 6)))", "((5, 6), ((1, 2), (3, 4), (5, 6)))",
+    "== accessor: array.fold, the initial value", "((1, 2), ((1, 2), (3, 4), (5, 6)))",
+    "((1, 2), ((1, 2), (3, 4), (5, 6)))", "((1, 2), ((1, 2), (3, 4), (5, 6)))", "((1, 2), ((1, 2), (3, 4), (5, 6)))",
+    "== accessor: array.reduce", "((5, 6), ((1, 2), (3, 4), (5, 6)))", "((5, 6), ((1, 2), (3, 4), (5, 6)))",
+    "((5, 6), ((1, 2), (3, 4), (5, 6)))", "((5, 6), ((1, 2), (3, 4), (5, 6)))", "== accessor: array.reduce of one item",
+    "((1, 2), ((1, 2), (3, 4), (5, 6)))", "((1, 2), ((1, 2), (3, 4), (5, 6)))", "((1, 2), ((1, 2), (3, 4), (5, 6)))",
+    "((1, 2), ((1, 2), (3, 4), (5, 6)))", "== accessor: array.intersperse", "(\n  ((1, 2), (1, 2), (3, 4), (1, 2), (5, 6)),\n  ((1, 2), (3, 4), (5, 6)),\n)",
+    "(\n  ((1, 2), (1, 2), (3, 4), (1, 2), (5, 6)),\n  ((1, 2), (3, 4), (5, 6)),\n)",
+    "(\n  ((1, 2), (1, 2), (3, 4), (1, 2), (5, 6)),\n  ((1, 2), (3, 4), (5, 6)),\n)",
+    "(\n  ((1, 2), (1, 2), (3, 4), (1, 2), (5, 6)),\n  ((1, 2), (3, 4), (5, 6)),\n)",
+    "== accessor: array.split", "((((1, 2),), ((5, 6),)), ((1, 2), (3, 4), (5, 6)))",
+    "((((1, 2),), ((5, 6),)), ((1, 2), (3, 4), (5, 6)))", "((((1, 2),), ((5, 6),)), ((1, 2), (3, 4), (5, 6)))",
+    "((((1, 2),), ((5, 6),)), ((1, 2), (3, 4), (5, 6)))", "== accessor: array.to-dict",
+    "(\n  (a: (1, 2), b: ((1, 2), (3, 4), (5, 6))),\n  ((1, 2), (3, 4), (5, 6)),\n)",
+    "(\n  (a: (1, 2), b: ((1, 2), (3, 4), (5, 6))),\n  ((1, 2), (3, 4), (5, 6)),\n)",
+    "(\n  (a: (1, 2), b: ((1, 2), (3, 4), (5, 6))),\n  ((1, 2), (3, 4), (5, 6)),\n)",
+    "(\n  (a: (1, 2), b: ((1, 2), (3, 4), (5, 6))),\n  ((1, 2), (3, 4), (5, 6)),\n)",
+    "== accessor: array + array", "(((1, 2), (3, 4), (5, 6)), ((1, 2), (3, 4), (5, 6)))",
+    "(((1, 2), (3, 4), (5, 6)), ((1, 2), (3, 4), (5, 6)))", "(((1, 2), (3, 4), (5, 6)), ((1, 2), (3, 4), (5, 6)))",
+    "(((1, 2), (3, 4), (5, 6)), ((1, 2), (3, 4), (5, 6)))", "== accessor: array + array, right",
+    "(((1, 2), (3, 4), (5, 6)), ((1, 2), (3, 4), (5, 6)))", "(((1, 2), (3, 4), (5, 6)), ((1, 2), (3, 4), (5, 6)))",
+    "(((1, 2), (3, 4), (5, 6)), ((1, 2), (3, 4), (5, 6)))", "(((1, 2), (3, 4), (5, 6)), ((1, 2), (3, 4), (5, 6)))",
+    "== accessor: array + array, both", "(\n  ((1, 2), (3, 4), (5, 6), (1, 2), (3, 4), (5, 6)),\n  ((1, 2), (3, 4), (5, 6)),\n)",
+    "(\n  ((1, 2), (3, 4), (5, 6), (1, 2), (3, 4), (5, 6)),\n  ((1, 2), (3, 4), (5, 6)),\n)",
+    "(\n  ((1, 2), (3, 4), (5, 6), (1, 2), (3, 4), (5, 6)),\n  ((1, 2), (3, 4), (5, 6)),\n)",
+    "(\n  ((1, 2), (3, 4), (5, 6), (1, 2), (3, 4), (5, 6)),\n  ((1, 2), (3, 4), (5, 6)),\n)",
+    "== accessor: array * 1", "(((1, 2), (3, 4), (5, 6)), ((1, 2), (3, 4), (5, 6)))",
+    "(((1, 2), (3, 4), (5, 6)), ((1, 2), (3, 4), (5, 6)))", "(((1, 2), (3, 4), (5, 6)), ((1, 2), (3, 4), (5, 6)))",
+    "(((1, 2), (3, 4), (5, 6)), ((1, 2), (3, 4), (5, 6)))", "== accessor: array * 2",
+    "(\n  ((1, 2), (3, 4), (5, 6), (1, 2), (3, 4), (5, 6)),\n  ((1, 2), (3, 4), (5, 6)),\n)",
+    "(\n  ((1, 2), (3, 4), (5, 6), (1, 2), (3, 4), (5, 6)),\n  ((1, 2), (3, 4), (5, 6)),\n)",
+    "(\n  ((1, 2), (3, 4), (5, 6), (1, 2), (3, 4), (5, 6)),\n  ((1, 2), (3, 4), (5, 6)),\n)",
+    "(\n  ((1, 2), (3, 4), (5, 6), (1, 2), (3, 4), (5, 6)),\n  ((1, 2), (3, 4), (5, 6)),\n)",
+    "== accessor: a spread into an array", "(((1, 2), (3, 4), (5, 6)), ((1, 2), (3, 4), (5, 6)))",
+    "(((1, 2), (3, 4), (5, 6)), ((1, 2), (3, 4), (5, 6)))", "(((1, 2), (3, 4), (5, 6)), ((1, 2), (3, 4), (5, 6)))",
+    "(((1, 2), (3, 4), (5, 6)), ((1, 2), (3, 4), (5, 6)))", "== accessor: an array literal",
+    "(\n  (((1, 2), (3, 4), (5, 6)), (1, 2)),\n  ((1, 2), (3, 4), (5, 6)),\n)", "(\n  (((1, 2), (3, 4), (5, 6)), (1, 2)),\n  ((1, 2), (3, 4), (5, 6)),\n)",
+    "(\n  (((1, 2), (3, 4), (5, 6)), (1, 2)),\n  ((1, 2), (3, 4), (5, 6)),\n)", "(\n  (((1, 2), (3, 4), (5, 6)), (1, 2)),\n  ((1, 2), (3, 4), (5, 6)),\n)",
+    "== accessor: the array constructor", "(((1, 2), (3, 4), (5, 6)), ((1, 2), (3, 4), (5, 6)))",
+    "(((1, 2), (3, 4), (5, 6)), ((1, 2), (3, 4), (5, 6)))", "(((1, 2), (3, 4), (5, 6)), ((1, 2), (3, 4), (5, 6)))",
+    "(((1, 2), (3, 4), (5, 6)), ((1, 2), (3, 4), (5, 6)))", "== accessor: calc.max and calc.min",
+    "((5, 6), ((1, 2), (3, 4), (5, 6)), (1, 2))", "((5, 6), ((1, 2), (3, 4), (5, 6)), (1, 2))",
+    "((5, 6), ((1, 2), (3, 4), (5, 6)), (1, 2))", "((5, 6), ((1, 2), (3, 4), (5, 6)), (1, 2))",
+    "== accessor: calc.min", "((1, 2), ((1, 2), (3, 4), (5, 6)))", "((1, 2), ((1, 2), (3, 4), (5, 6)))",
+    "((1, 2), ((1, 2), (3, 4), (5, 6)))", "((1, 2), ((1, 2), (3, 4), (5, 6)))", "== accessor: a conditional and a block",
+    "((1, 2), ((1, 2), (3, 4), (5, 6)), (3, 4))", "((1, 2), ((1, 2), (3, 4), (5, 6)), (3, 4))",
+    "((1, 2), ((1, 2), (3, 4), (5, 6)), (3, 4))", "((1, 2), ((1, 2), (3, 4), (5, 6)), (3, 4))",
+    "== accessor: a block", "((3, 4), ((1, 2), (3, 4), (5, 6)))", "((3, 4), ((1, 2), (3, 4), (5, 6)))",
+    "((3, 4), ((1, 2), (3, 4), (5, 6)))", "((3, 4), ((1, 2), (3, 4), (5, 6)))", "== accessor: array.range and others without parts",
+    "(\n  (0, 1, 2),\n  ((1, 2), (3, 4), (5, 6)),\n  (1, 2, 3, 4, 5, 6),\n  3,\n)",
+    "(\n  (0, 1, 2),\n  ((1, 2), (3, 4), (5, 6)),\n  (1, 2, 3, 4, 5, 6),\n  3,\n)",
+    "(\n  (0, 1, 2),\n  ((1, 2), (3, 4), (5, 6)),\n  (1, 2, 3, 4, 5, 6),\n  3,\n)",
+    "(\n  (0, 1, 2),\n  ((1, 2), (3, 4), (5, 6)),\n  (1, 2, 3, 4, 5, 6),\n  3,\n)",
+    "== accessor: array.at of a dictionary value", "((1, 2), (a: (1, 2), d: (k: (3,))))",
+    "((1, 2), (a: (1, 2), d: (k: (3,))))", "((1, 2), (a: (1, 2), d: (k: (3,))))",
+    "((1, 2), (a: (1, 2), d: (k: (3,))))", "== accessor: dictionary.at", "((1, 2), (a: (1, 2), d: (k: (3,))))",
+    "((1, 2), (a: (1, 2), d: (k: (3,))))", "((1, 2), (a: (1, 2), d: (k: (3,))))",
+    "((1, 2), (a: (1, 2), d: (k: (3,))))", "== accessor: dictionary.at, the default",
+    "((1, 2), (a: (1, 2), d: (k: (3,))))", "((1, 2), (a: (1, 2), d: (k: (3,))))",
+    "((1, 2), (a: (1, 2), d: (k: (3,))))", "((1, 2), (a: (1, 2), d: (k: (3,))))",
+    "== accessor: dictionary.values", "(((1, 2), (k: (3,))), (a: (1, 2), d: (k: (3,))))",
+    "(((1, 2), (k: (3,))), (a: (1, 2), d: (k: (3,))))", "(((1, 2), (k: (3,))), (a: (1, 2), d: (k: (3,))))",
+    "(((1, 2), (k: (3,))), (a: (1, 2), d: (k: (3,))))", "== accessor: dictionary.pairs",
+    "(\n  ((\"a\", (1, 2)), (\"d\", (k: (3,)))),\n  (a: (1, 2), d: (k: (3,))),\n)",
+    "(\n  ((\"a\", (1, 2)), (\"d\", (k: (3,)))),\n  (a: (1, 2), d: (k: (3,))),\n)",
+    "(\n  ((\"a\", (1, 2)), (\"d\", (k: (3,)))),\n  (a: (1, 2), d: (k: (3,))),\n)",
+    "(\n  ((\"a\", (1, 2)), (\"d\", (k: (3,)))),\n  (a: (1, 2), d: (k: (3,))),\n)",
+    "== accessor: dictionary.keys", "((\"a\", \"d\"), (a: (1, 2), d: (k: (3,))))",
+    "((\"a\", \"d\"), (a: (1, 2), d: (k: (3,))))", "((\"a\", \"d\"), (a: (1, 2), d: (k: (3,))))",
+    "((\"a\", \"d\"), (a: (1, 2), d: (k: (3,))))", "== accessor: dictionary + dictionary",
+    "(\n  (a: (1, 2), d: (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n)", "(\n  (a: (1, 2), d: (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n)",
+    "(\n  (a: (1, 2), d: (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n)", "(\n  (a: (1, 2), d: (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n)",
+    "== accessor: dictionary + dictionary, right", "(\n  (a: (1, 2), d: (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n)",
+    "(\n  (a: (1, 2), d: (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n)", "(\n  (a: (1, 2), d: (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n)",
+    "(\n  (a: (1, 2), d: (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n)", "== accessor: a spread into a dictionary",
+    "(\n  (w: 1, a: (1, 2), d: (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n)", "(\n  (w: 1, a: (1, 2), d: (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n)",
+    "(\n  (w: 1, a: (1, 2), d: (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n)", "(\n  (w: 1, a: (1, 2), d: (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n)",
+    "== accessor: a dictionary literal", "(\n  (v: (a: (1, 2), d: (k: (3,))), w: (1, 2)),\n  (a: (1, 2), d: (k: (3,))),\n)",
+    "(\n  (v: (a: (1, 2), d: (k: (3,))), w: (1, 2)),\n  (a: (1, 2), d: (k: (3,))),\n)",
+    "(\n  (v: (a: (1, 2), d: (k: (3,))), w: (1, 2)),\n  (a: (1, 2), d: (k: (3,))),\n)",
+    "(\n  (v: (a: (1, 2), d: (k: (3,))), w: (1, 2)),\n  (a: (1, 2), d: (k: (3,))),\n)",
+    "== accessor: pairs back to a dictionary", "(\n  (a: (1, 2), d: (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n)",
+    "(\n  (a: (1, 2), d: (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n)", "(\n  (a: (1, 2), d: (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n)",
+    "(\n  (a: (1, 2), d: (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n)", "== accessor: dictionary.filter",
+    "(\n  (a: (1, 2), d: (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n)", "(\n  (a: (1, 2), d: (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n)",
+    "(\n  (a: (1, 2), d: (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n)", "(\n  (a: (1, 2), d: (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n)",
+    "== accessor: dictionary.map with the identity", "(\n  (a: (1, 2), d: (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n)",
+    "(\n  (a: (1, 2), d: (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n)", "(\n  (a: (1, 2), d: (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n)",
+    "(\n  (a: (1, 2), d: (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n)", "== accessor: the result of a native dictionary remove",
+    "(\n  (1, 2),\n  (a: (1, 2), d: (k: (3,))),\n  (k: (3,)),\n  (1, 2),\n)", "(\n  (1, 2),\n  (a: (1, 2), d: (k: (3,))),\n  (k: (3,)),\n  (1, 2),\n)",
+    "(\n  (1, 2),\n  (a: (1, 2), d: (k: (3,))),\n  (k: (3,)),\n  (1, 2),\n)", "(\n  (1, 2),\n  (a: (1, 2), d: (k: (3,))),\n  (k: (3,)),\n  (1, 2),\n)",
+    "== accessor: a nested dictionary value", "((k: (3,)), (a: (1, 2), d: (k: (3,))))",
+    "((k: (3,)), (a: (1, 2), d: (k: (3,))))", "((k: (3,)), (a: (1, 2), d: (k: (3,))))",
+    "((k: (3,)), (a: (1, 2), d: (k: (3,))))", "== accessor: native functions as callbacks",
+    "((1, 2), (3, 4), (5, 6))", "((1, 2), (3, 4), (5, 6))", "((true, true), (false, true), (true, false))",
+    "(a: (true, true), b: (false, true))", "arguments((true, true), (false, true), k: (true, false))",
+    "(a: (1, 2), b: (3, 4))", "((1, 2), (3, 4), (5, 6))", "(\n  ((1, 2), (3, 4), (5, 6)),\n  ((1, 2), (3, 4), (5, 6)),\n  ((1, 2), (3, 4)),\n)",
+    "== accessor: destructuring and loops", "(\n  ((1, 2), (3, 4), (5, 6)),\n  (a: (1, 2), d: (k: (3,))),\n)",
+    "(\n  ((1, 2), (3, 4), (5, 6)),\n  (a: (1, 2), d: (k: (3,))),\n)",
+  ]
+  assert_eq(oracle_metadata(source), expected)
+}
+
+///|
+test "oracle: sharing: memoized calls and layouts" {
+  let source =
+    #|#metadata("== memo: the result of a closure that reads a state")
+    #|#[
+    #|#let s = state("m-state", ((1, 2), (k: (3,))))
+    #|#let read() = (s.get(), s.final())
+    #|#context {
+    #|  let _ = (array.pop)(read())
+    #|  let _ = (array.push)(read(), 0)
+    #|  let _ = (array.pop)(read().at(0))
+    #|  let _ = (array.push)(read().at(0), 0)
+    #|  let _ = (array.pop)(read().at(0).at(0))
+    #|  let _ = (array.push)(read().at(0).at(0), 0)
+    #|  let _ = (array.pop)(read().at(0).first())
+    #|  let _ = (array.push)(read().at(0).first(), 0)
+    #|  let _ = (dictionary.insert)(read().at(0).at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(read().at(0).at(1), "k")
+    #|  let _ = (dictionary.insert)(read().at(0).last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(read().at(0).last(), "k")
+    #|  let _ = (array.pop)(read().at(0).at(1).k)
+    #|  let _ = (array.push)(read().at(0).at(1).k, 0)
+    #|  let _ = (array.pop)(read().at(0).last().at("k"))
+    #|  let _ = (array.push)(read().at(0).last().at("k"), 0)
+    #|  let _ = (array.pop)(read().at(0).at(1).values().first())
+    #|  let _ = (array.push)(read().at(0).at(1).values().first(), 0)
+    #|  let _ = (array.pop)(read().at(0).slice(0, 1).first())
+    #|  let _ = (array.push)(read().at(0).slice(0, 1).first(), 0)
+    #|  let _ = (array.pop)(read().at(1))
+    #|  let _ = (array.push)(read().at(1), 0)
+    #|  let _ = (array.pop)(read().at(1).at(0))
+    #|  let _ = (array.push)(read().at(1).at(0), 0)
+    #|  let _ = (array.pop)(read().at(1).first())
+    #|  let _ = (array.push)(read().at(1).first(), 0)
+    #|  let _ = (dictionary.insert)(read().at(1).at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(read().at(1).at(1), "k")
+    #|  let _ = (dictionary.insert)(read().at(1).last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(read().at(1).last(), "k")
+    #|  let _ = (array.pop)(read().at(1).at(1).k)
+    #|  let _ = (array.push)(read().at(1).at(1).k, 0)
+    #|  let _ = (array.pop)(read().at(1).last().at("k"))
+    #|  let _ = (array.push)(read().at(1).last().at("k"), 0)
+    #|  let _ = (array.pop)(read().at(1).at(1).values().first())
+    #|  let _ = (array.push)(read().at(1).at(1).values().first(), 0)
+    #|  let _ = (array.pop)(read().at(1).slice(0, 1).first())
+    #|  let _ = (array.push)(read().at(1).slice(0, 1).first(), 0)
+    #|  metadata(repr((read(), s.get(),)))
+    #|}
+    #|#context {
+    #|  { let pv = (); pv.push(read()); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(read()); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(read()); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(read()); pv.at(0).at(0).push(0) }
+    #|  { let pv = (); pv.push(read()); let _ = pv.at(0).at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(read()); pv.at(0).at(0).at(0).push(0) }
+    #|  { let pv = (); pv.push(read()); let _ = pv.at(0).at(0).first().pop() }
+    #|  { let pv = (); pv.push(read()); pv.at(0).at(0).first().push(0) }
+    #|  { let pv = (); pv.push(read()); pv.at(0).at(0).at(1).insert("zz", 0) }
+    #|  { let pv = (); pv.push(read()); let _ = pv.at(0).at(0).at(1).remove("k") }
+    #|  { let pv = (); pv.push(read()); pv.at(0).at(0).last().insert("zz", 0) }
+    #|  { let pv = (); pv.push(read()); let _ = pv.at(0).at(0).last().remove("k") }
+    #|  { let pv = (); pv.push(read()); let _ = pv.at(0).at(0).at(1).k.pop() }
+    #|  { let pv = (); pv.push(read()); pv.at(0).at(0).at(1).k.push(0) }
+    #|  { let pv = (); pv.push(read()); let _ = pv.at(0).at(0).last().at("k").pop() }
+    #|  { let pv = (); pv.push(read()); pv.at(0).at(0).last().at("k").push(0) }
+    #|  { let pv = (); pv.push(read()); let _ = pv.at(0).at(1).pop() }
+    #|  { let pv = (); pv.push(read()); pv.at(0).at(1).push(0) }
+    #|  { let pv = (); pv.push(read()); let _ = pv.at(0).at(1).at(0).pop() }
+    #|  { let pv = (); pv.push(read()); pv.at(0).at(1).at(0).push(0) }
+    #|  { let pv = (); pv.push(read()); let _ = pv.at(0).at(1).first().pop() }
+    #|  { let pv = (); pv.push(read()); pv.at(0).at(1).first().push(0) }
+    #|  { let pv = (); pv.push(read()); pv.at(0).at(1).at(1).insert("zz", 0) }
+    #|  { let pv = (); pv.push(read()); let _ = pv.at(0).at(1).at(1).remove("k") }
+    #|  { let pv = (); pv.push(read()); pv.at(0).at(1).last().insert("zz", 0) }
+    #|  { let pv = (); pv.push(read()); let _ = pv.at(0).at(1).last().remove("k") }
+    #|  { let pv = (); pv.push(read()); let _ = pv.at(0).at(1).at(1).k.pop() }
+    #|  { let pv = (); pv.push(read()); pv.at(0).at(1).at(1).k.push(0) }
+    #|  { let pv = (); pv.push(read()); let _ = pv.at(0).at(1).last().at("k").pop() }
+    #|  { let pv = (); pv.push(read()); pv.at(0).at(1).last().at("k").push(0) }
+    #|  metadata(repr((read(), s.get(),)))
+    #|}
+    #|#let get() = read()
+    #|#context {
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  let _ = (array.pop)(get().at(0).at(0))
+    #|  let _ = (array.push)(get().at(0).at(0), 0)
+    #|  let _ = (array.pop)(get().at(0).first())
+    #|  let _ = (array.push)(get().at(0).first(), 0)
+    #|  let _ = (dictionary.insert)(get().at(0).at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().at(0).at(1), "k")
+    #|  let _ = (dictionary.insert)(get().at(0).last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().at(0).last(), "k")
+    #|  let _ = (array.pop)(get().at(0).at(1).k)
+    #|  let _ = (array.push)(get().at(0).at(1).k, 0)
+    #|  let _ = (array.pop)(get().at(0).last().at("k"))
+    #|  let _ = (array.push)(get().at(0).last().at("k"), 0)
+    #|  let _ = (array.pop)(get().at(0).at(1).values().first())
+    #|  let _ = (array.push)(get().at(0).at(1).values().first(), 0)
+    #|  let _ = (array.pop)(get().at(0).slice(0, 1).first())
+    #|  let _ = (array.push)(get().at(0).slice(0, 1).first(), 0)
+    #|  let _ = (array.pop)(get().at(1))
+    #|  let _ = (array.push)(get().at(1), 0)
+    #|  let _ = (array.pop)(get().at(1).at(0))
+    #|  let _ = (array.push)(get().at(1).at(0), 0)
+    #|  let _ = (array.pop)(get().at(1).first())
+    #|  let _ = (array.push)(get().at(1).first(), 0)
+    #|  let _ = (dictionary.insert)(get().at(1).at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().at(1).at(1), "k")
+    #|  let _ = (dictionary.insert)(get().at(1).last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().at(1).last(), "k")
+    #|  let _ = (array.pop)(get().at(1).at(1).k)
+    #|  let _ = (array.push)(get().at(1).at(1).k, 0)
+    #|  let _ = (array.pop)(get().at(1).last().at("k"))
+    #|  let _ = (array.push)(get().at(1).last().at("k"), 0)
+    #|  let _ = (array.pop)(get().at(1).at(1).values().first())
+    #|  let _ = (array.push)(get().at(1).at(1).values().first(), 0)
+    #|  let _ = (array.pop)(get().at(1).slice(0, 1).first())
+    #|  let _ = (array.push)(get().at(1).slice(0, 1).first(), 0)
+    #|  metadata(repr((get(), s.get(),)))
+    #|}
+    #|#context metadata(repr((read(), s.get(),)))
+    #|]
+    #|#metadata("== memo: a value handed through two closures")
+    #|#[
+    #|#let inner() = ((1, 2), (k: (3,)))
+    #|#let outer() = inner()
+    #|#{
+    #|  let _ = (array.pop)(outer())
+    #|  let _ = (array.push)(outer(), 0)
+    #|  let _ = (array.pop)(outer().at(0))
+    #|  let _ = (array.push)(outer().at(0), 0)
+    #|  let _ = (array.pop)(outer().first())
+    #|  let _ = (array.push)(outer().first(), 0)
+    #|  let _ = (dictionary.insert)(outer().at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(outer().at(1), "k")
+    #|  let _ = (dictionary.insert)(outer().last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(outer().last(), "k")
+    #|  let _ = (array.pop)(outer().at(1).k)
+    #|  let _ = (array.push)(outer().at(1).k, 0)
+    #|  let _ = (array.pop)(outer().last().at("k"))
+    #|  let _ = (array.push)(outer().last().at("k"), 0)
+    #|  let _ = (array.pop)(outer().at(1).values().first())
+    #|  let _ = (array.push)(outer().at(1).values().first(), 0)
+    #|  let _ = (array.pop)(outer().slice(0, 1).first())
+    #|  let _ = (array.push)(outer().slice(0, 1).first(), 0)
+    #|  metadata(repr((outer(), inner(),)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(outer()); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(outer()); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(outer()); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(outer()); pv.at(0).at(0).push(0) }
+    #|  { let pv = (); pv.push(outer()); let _ = pv.at(0).first().pop() }
+    #|  { let pv = (); pv.push(outer()); pv.at(0).first().push(0) }
+    #|  { let pv = (); pv.push(outer()); pv.at(0).at(1).insert("zz", 0) }
+    #|  { let pv = (); pv.push(outer()); let _ = pv.at(0).at(1).remove("k") }
+    #|  { let pv = (); pv.push(outer()); pv.at(0).last().insert("zz", 0) }
+    #|  { let pv = (); pv.push(outer()); let _ = pv.at(0).last().remove("k") }
+    #|  { let pv = (); pv.push(outer()); let _ = pv.at(0).at(1).k.pop() }
+    #|  { let pv = (); pv.push(outer()); pv.at(0).at(1).k.push(0) }
+    #|  { let pv = (); pv.push(outer()); let _ = pv.at(0).last().at("k").pop() }
+    #|  { let pv = (); pv.push(outer()); pv.at(0).last().at("k").push(0) }
+    #|  metadata(repr((outer(), inner(),)))
+    #|}
+    #|#let get() = outer()
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  let _ = (array.pop)(get().first())
+    #|  let _ = (array.push)(get().first(), 0)
+    #|  let _ = (dictionary.insert)(get().at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().at(1), "k")
+    #|  let _ = (dictionary.insert)(get().last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().last(), "k")
+    #|  let _ = (array.pop)(get().at(1).k)
+    #|  let _ = (array.push)(get().at(1).k, 0)
+    #|  let _ = (array.pop)(get().last().at("k"))
+    #|  let _ = (array.push)(get().last().at("k"), 0)
+    #|  let _ = (array.pop)(get().at(1).values().first())
+    #|  let _ = (array.push)(get().at(1).values().first(), 0)
+    #|  let _ = (array.pop)(get().slice(0, 1).first())
+    #|  let _ = (array.push)(get().slice(0, 1).first(), 0)
+    #|  metadata(repr((get(), inner(),)))
+    #|}
+    #|#metadata(repr((outer(), inner(),)))
+    #|]
+    #|#metadata("== memo: a closure result held by a second holder")
+    #|#[
+    #|#let load() = ((1, 2), (k: (3,)))
+    #|#let kept = load()
+    #|#{
+    #|  let _ = (array.pop)(load())
+    #|  let _ = (array.push)(load(), 0)
+    #|  let _ = (array.pop)(load().at(0))
+    #|  let _ = (array.push)(load().at(0), 0)
+    #|  let _ = (array.pop)(load().first())
+    #|  let _ = (array.push)(load().first(), 0)
+    #|  let _ = (dictionary.insert)(load().at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(load().at(1), "k")
+    #|  let _ = (dictionary.insert)(load().last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(load().last(), "k")
+    #|  let _ = (array.pop)(load().at(1).k)
+    #|  let _ = (array.push)(load().at(1).k, 0)
+    #|  let _ = (array.pop)(load().last().at("k"))
+    #|  let _ = (array.push)(load().last().at("k"), 0)
+    #|  let _ = (array.pop)(load().at(1).values().first())
+    #|  let _ = (array.push)(load().at(1).values().first(), 0)
+    #|  let _ = (array.pop)(load().slice(0, 1).first())
+    #|  let _ = (array.push)(load().slice(0, 1).first(), 0)
+    #|  metadata(repr((load(), kept,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(load()); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(load()); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(load()); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(load()); pv.at(0).at(0).push(0) }
+    #|  { let pv = (); pv.push(load()); let _ = pv.at(0).first().pop() }
+    #|  { let pv = (); pv.push(load()); pv.at(0).first().push(0) }
+    #|  { let pv = (); pv.push(load()); pv.at(0).at(1).insert("zz", 0) }
+    #|  { let pv = (); pv.push(load()); let _ = pv.at(0).at(1).remove("k") }
+    #|  { let pv = (); pv.push(load()); pv.at(0).last().insert("zz", 0) }
+    #|  { let pv = (); pv.push(load()); let _ = pv.at(0).last().remove("k") }
+    #|  { let pv = (); pv.push(load()); let _ = pv.at(0).at(1).k.pop() }
+    #|  { let pv = (); pv.push(load()); pv.at(0).at(1).k.push(0) }
+    #|  { let pv = (); pv.push(load()); let _ = pv.at(0).last().at("k").pop() }
+    #|  { let pv = (); pv.push(load()); pv.at(0).last().at("k").push(0) }
+    #|  metadata(repr((load(), kept,)))
+    #|}
+    #|#let get() = load()
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  let _ = (array.pop)(get().first())
+    #|  let _ = (array.push)(get().first(), 0)
+    #|  let _ = (dictionary.insert)(get().at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().at(1), "k")
+    #|  let _ = (dictionary.insert)(get().last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().last(), "k")
+    #|  let _ = (array.pop)(get().at(1).k)
+    #|  let _ = (array.push)(get().at(1).k, 0)
+    #|  let _ = (array.pop)(get().last().at("k"))
+    #|  let _ = (array.push)(get().last().at("k"), 0)
+    #|  let _ = (array.pop)(get().at(1).values().first())
+    #|  let _ = (array.push)(get().at(1).values().first(), 0)
+    #|  let _ = (array.pop)(get().slice(0, 1).first())
+    #|  let _ = (array.push)(get().slice(0, 1).first(), 0)
+    #|  metadata(repr((get(), kept,)))
+    #|}
+    #|#metadata(repr((load(), kept,)))
+    #|]
+    #|#metadata("== memo: an argument returned by the closure")
+    #|#[
+    #|#let id(v) = v
+    #|#let xs = ((1, 2), (k: (3,)))
+    #|#{
+    #|  let _ = (array.pop)(id(xs))
+    #|  let _ = (array.push)(id(xs), 0)
+    #|  let _ = (array.pop)(id(xs).at(0))
+    #|  let _ = (array.push)(id(xs).at(0), 0)
+    #|  let _ = (array.pop)(id(xs).first())
+    #|  let _ = (array.push)(id(xs).first(), 0)
+    #|  let _ = (dictionary.insert)(id(xs).at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(id(xs).at(1), "k")
+    #|  let _ = (dictionary.insert)(id(xs).last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(id(xs).last(), "k")
+    #|  let _ = (array.pop)(id(xs).at(1).k)
+    #|  let _ = (array.push)(id(xs).at(1).k, 0)
+    #|  let _ = (array.pop)(id(xs).last().at("k"))
+    #|  let _ = (array.push)(id(xs).last().at("k"), 0)
+    #|  let _ = (array.pop)(id(xs).at(1).values().first())
+    #|  let _ = (array.push)(id(xs).at(1).values().first(), 0)
+    #|  let _ = (array.pop)(id(xs).slice(0, 1).first())
+    #|  let _ = (array.push)(id(xs).slice(0, 1).first(), 0)
+    #|  metadata(repr((id(xs), xs, id(((1, 2), (k: (3,)))),)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(id(xs)); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(id(xs)); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(id(xs)); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(id(xs)); pv.at(0).at(0).push(0) }
+    #|  { let pv = (); pv.push(id(xs)); let _ = pv.at(0).first().pop() }
+    #|  { let pv = (); pv.push(id(xs)); pv.at(0).first().push(0) }
+    #|  { let pv = (); pv.push(id(xs)); pv.at(0).at(1).insert("zz", 0) }
+    #|  { let pv = (); pv.push(id(xs)); let _ = pv.at(0).at(1).remove("k") }
+    #|  { let pv = (); pv.push(id(xs)); pv.at(0).last().insert("zz", 0) }
+    #|  { let pv = (); pv.push(id(xs)); let _ = pv.at(0).last().remove("k") }
+    #|  { let pv = (); pv.push(id(xs)); let _ = pv.at(0).at(1).k.pop() }
+    #|  { let pv = (); pv.push(id(xs)); pv.at(0).at(1).k.push(0) }
+    #|  { let pv = (); pv.push(id(xs)); let _ = pv.at(0).last().at("k").pop() }
+    #|  { let pv = (); pv.push(id(xs)); pv.at(0).last().at("k").push(0) }
+    #|  metadata(repr((id(xs), xs, id(((1, 2), (k: (3,)))),)))
+    #|}
+    #|#let get() = id(xs)
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  let _ = (array.pop)(get().first())
+    #|  let _ = (array.push)(get().first(), 0)
+    #|  let _ = (dictionary.insert)(get().at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().at(1), "k")
+    #|  let _ = (dictionary.insert)(get().last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().last(), "k")
+    #|  let _ = (array.pop)(get().at(1).k)
+    #|  let _ = (array.push)(get().at(1).k, 0)
+    #|  let _ = (array.pop)(get().last().at("k"))
+    #|  let _ = (array.push)(get().last().at("k"), 0)
+    #|  let _ = (array.pop)(get().at(1).values().first())
+    #|  let _ = (array.push)(get().at(1).values().first(), 0)
+    #|  let _ = (array.pop)(get().slice(0, 1).first())
+    #|  let _ = (array.push)(get().slice(0, 1).first(), 0)
+    #|  metadata(repr((get(), xs, id(((1, 2), (k: (3,)))),)))
+    #|}
+    #|#metadata(repr((id(xs), xs, id(((1, 2), (k: (3,)))),)))
+    #|]
+    #|#metadata("== memo: an argument mutated by the closure")
+    #|#[
+    #|#let grow(v) = { v.at(0).push(9); v.at(1).k.push(9); v }
+    #|#let xs = ((1, 2), (k: (3,)))
+    #|#{
+    #|  let _ = (array.pop)(grow(xs))
+    #|  let _ = (array.push)(grow(xs), 0)
+    #|  let _ = (array.pop)(grow(xs).at(0))
+    #|  let _ = (array.push)(grow(xs).at(0), 0)
+    #|  let _ = (array.pop)(grow(xs).first())
+    #|  let _ = (array.push)(grow(xs).first(), 0)
+    #|  let _ = (dictionary.insert)(grow(xs).at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(grow(xs).at(1), "k")
+    #|  let _ = (dictionary.insert)(grow(xs).last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(grow(xs).last(), "k")
+    #|  let _ = (array.pop)(grow(xs).at(1).k)
+    #|  let _ = (array.push)(grow(xs).at(1).k, 0)
+    #|  let _ = (array.pop)(grow(xs).last().at("k"))
+    #|  let _ = (array.push)(grow(xs).last().at("k"), 0)
+    #|  let _ = (array.pop)(grow(xs).at(1).values().first())
+    #|  let _ = (array.push)(grow(xs).at(1).values().first(), 0)
+    #|  let _ = (array.pop)(grow(xs).slice(0, 1).first())
+    #|  let _ = (array.push)(grow(xs).slice(0, 1).first(), 0)
+    #|  metadata(repr((grow(xs), xs, grow(xs), grow(((1, 2), (k: (3,)))),)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(grow(xs)); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(grow(xs)); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(grow(xs)); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(grow(xs)); pv.at(0).at(0).push(0) }
+    #|  { let pv = (); pv.push(grow(xs)); let _ = pv.at(0).first().pop() }
+    #|  { let pv = (); pv.push(grow(xs)); pv.at(0).first().push(0) }
+    #|  { let pv = (); pv.push(grow(xs)); pv.at(0).at(1).insert("zz", 0) }
+    #|  { let pv = (); pv.push(grow(xs)); let _ = pv.at(0).at(1).remove("k") }
+    #|  { let pv = (); pv.push(grow(xs)); pv.at(0).last().insert("zz", 0) }
+    #|  { let pv = (); pv.push(grow(xs)); let _ = pv.at(0).last().remove("k") }
+    #|  { let pv = (); pv.push(grow(xs)); let _ = pv.at(0).at(1).k.pop() }
+    #|  { let pv = (); pv.push(grow(xs)); pv.at(0).at(1).k.push(0) }
+    #|  { let pv = (); pv.push(grow(xs)); let _ = pv.at(0).last().at("k").pop() }
+    #|  { let pv = (); pv.push(grow(xs)); pv.at(0).last().at("k").push(0) }
+    #|  metadata(repr((grow(xs), xs, grow(xs), grow(((1, 2), (k: (3,)))),)))
+    #|}
+    #|#let get() = grow(xs)
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  let _ = (array.pop)(get().first())
+    #|  let _ = (array.push)(get().first(), 0)
+    #|  let _ = (dictionary.insert)(get().at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().at(1), "k")
+    #|  let _ = (dictionary.insert)(get().last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().last(), "k")
+    #|  let _ = (array.pop)(get().at(1).k)
+    #|  let _ = (array.push)(get().at(1).k, 0)
+    #|  let _ = (array.pop)(get().last().at("k"))
+    #|  let _ = (array.push)(get().last().at("k"), 0)
+    #|  let _ = (array.pop)(get().at(1).values().first())
+    #|  let _ = (array.push)(get().at(1).values().first(), 0)
+    #|  let _ = (array.pop)(get().slice(0, 1).first())
+    #|  let _ = (array.push)(get().slice(0, 1).first(), 0)
+    #|  metadata(repr((get(), xs, grow(xs), grow(((1, 2), (k: (3,)))),)))
+    #|}
+    #|#metadata(repr((grow(xs), xs, grow(xs), grow(((1, 2), (k: (3,)))),)))
+    #|]
+    #|#metadata("== memo: a state object returned by a closure")
+    #|#[
+    #|#let make() = state("m-made", (a: (1, 2), d: (k: (3,))))
+    #|#make().update(v => v)
+    #|#context {
+    #|  let _ = (dictionary.insert)(make().get(), "zz", 0)
+    #|  let _ = (dictionary.remove)(make().get(), "a")
+    #|  let _ = (array.pop)(make().get().a)
+    #|  let _ = (array.push)(make().get().a, 0)
+    #|  let _ = (array.pop)(make().get().at("a"))
+    #|  let _ = (array.push)(make().get().at("a"), 0)
+    #|  let _ = (dictionary.insert)(make().get().d, "zz", 0)
+    #|  let _ = (dictionary.remove)(make().get().d, "k")
+    #|  let _ = (array.pop)(make().get().d.k)
+    #|  let _ = (array.push)(make().get().d.k, 0)
+    #|  let _ = (array.pop)(make().get().values().first())
+    #|  let _ = (array.push)(make().get().values().first(), 0)
+    #|  let _ = (array.pop)(make().get().pairs().first().last())
+    #|  let _ = (array.push)(make().get().pairs().first().last(), 0)
+    #|  let _ = (array.pop)(make().get().values().last().k)
+    #|  let _ = (array.push)(make().get().values().last().k, 0)
+    #|  metadata(repr((make().get(), make().final(),)))
+    #|}
+    #|#context {
+    #|  { let pv = (); pv.push(make().get()); pv.at(0).insert("zz", 0) }
+    #|  { let pv = (); pv.push(make().get()); let _ = pv.at(0).remove("a") }
+    #|  { let pv = (); pv.push(make().get()); let _ = pv.at(0).a.pop() }
+    #|  { let pv = (); pv.push(make().get()); pv.at(0).a.push(0) }
+    #|  { let pv = (); pv.push(make().get()); let _ = pv.at(0).at("a").pop() }
+    #|  { let pv = (); pv.push(make().get()); pv.at(0).at("a").push(0) }
+    #|  { let pv = (); pv.push(make().get()); pv.at(0).d.insert("zz", 0) }
+    #|  { let pv = (); pv.push(make().get()); let _ = pv.at(0).d.remove("k") }
+    #|  { let pv = (); pv.push(make().get()); let _ = pv.at(0).d.k.pop() }
+    #|  { let pv = (); pv.push(make().get()); pv.at(0).d.k.push(0) }
+    #|  metadata(repr((make().get(), make().final(),)))
+    #|}
+    #|#let get() = make().get()
+    #|#context {
+    #|  let _ = (dictionary.insert)(get(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get(), "a")
+    #|  let _ = (array.pop)(get().a)
+    #|  let _ = (array.push)(get().a, 0)
+    #|  let _ = (array.pop)(get().at("a"))
+    #|  let _ = (array.push)(get().at("a"), 0)
+    #|  let _ = (dictionary.insert)(get().d, "zz", 0)
+    #|  let _ = (dictionary.remove)(get().d, "k")
+    #|  let _ = (array.pop)(get().d.k)
+    #|  let _ = (array.push)(get().d.k, 0)
+    #|  let _ = (array.pop)(get().values().first())
+    #|  let _ = (array.push)(get().values().first(), 0)
+    #|  let _ = (array.pop)(get().pairs().first().last())
+    #|  let _ = (array.push)(get().pairs().first().last(), 0)
+    #|  let _ = (array.pop)(get().values().last().k)
+    #|  let _ = (array.push)(get().values().last().k, 0)
+    #|  metadata(repr((get(), make().final(),)))
+    #|}
+    #|#context metadata(repr((make().get(), make().final(),)))
+    #|]
+    #|#metadata("== memo: content with a container field returned by a closure")
+    #|#[
+    #|#let mk() = metadata(((1, 2), (k: (3,))))
+    #|#{
+    #|  let _ = (array.pop)(mk().value)
+    #|  let _ = (array.push)(mk().value, 0)
+    #|  let _ = (array.pop)(mk().value.at(0))
+    #|  let _ = (array.push)(mk().value.at(0), 0)
+    #|  let _ = (array.pop)(mk().value.first())
+    #|  let _ = (array.push)(mk().value.first(), 0)
+    #|  let _ = (dictionary.insert)(mk().value.at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(mk().value.at(1), "k")
+    #|  let _ = (dictionary.insert)(mk().value.last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(mk().value.last(), "k")
+    #|  let _ = (array.pop)(mk().value.at(1).k)
+    #|  let _ = (array.push)(mk().value.at(1).k, 0)
+    #|  let _ = (array.pop)(mk().value.last().at("k"))
+    #|  let _ = (array.push)(mk().value.last().at("k"), 0)
+    #|  let _ = (array.pop)(mk().value.at(1).values().first())
+    #|  let _ = (array.push)(mk().value.at(1).values().first(), 0)
+    #|  let _ = (array.pop)(mk().value.slice(0, 1).first())
+    #|  let _ = (array.push)(mk().value.slice(0, 1).first(), 0)
+    #|  metadata(repr((mk().value, mk().fields().value,)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(mk().value); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(mk().value); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(mk().value); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(mk().value); pv.at(0).at(0).push(0) }
+    #|  { let pv = (); pv.push(mk().value); let _ = pv.at(0).first().pop() }
+    #|  { let pv = (); pv.push(mk().value); pv.at(0).first().push(0) }
+    #|  { let pv = (); pv.push(mk().value); pv.at(0).at(1).insert("zz", 0) }
+    #|  { let pv = (); pv.push(mk().value); let _ = pv.at(0).at(1).remove("k") }
+    #|  { let pv = (); pv.push(mk().value); pv.at(0).last().insert("zz", 0) }
+    #|  { let pv = (); pv.push(mk().value); let _ = pv.at(0).last().remove("k") }
+    #|  { let pv = (); pv.push(mk().value); let _ = pv.at(0).at(1).k.pop() }
+    #|  { let pv = (); pv.push(mk().value); pv.at(0).at(1).k.push(0) }
+    #|  { let pv = (); pv.push(mk().value); let _ = pv.at(0).last().at("k").pop() }
+    #|  { let pv = (); pv.push(mk().value); pv.at(0).last().at("k").push(0) }
+    #|  metadata(repr((mk().value, mk().fields().value,)))
+    #|}
+    #|#let get() = mk().value
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  let _ = (array.pop)(get().first())
+    #|  let _ = (array.push)(get().first(), 0)
+    #|  let _ = (dictionary.insert)(get().at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().at(1), "k")
+    #|  let _ = (dictionary.insert)(get().last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().last(), "k")
+    #|  let _ = (array.pop)(get().at(1).k)
+    #|  let _ = (array.push)(get().at(1).k, 0)
+    #|  let _ = (array.pop)(get().last().at("k"))
+    #|  let _ = (array.push)(get().last().at("k"), 0)
+    #|  let _ = (array.pop)(get().at(1).values().first())
+    #|  let _ = (array.push)(get().at(1).values().first(), 0)
+    #|  let _ = (array.pop)(get().slice(0, 1).first())
+    #|  let _ = (array.push)(get().slice(0, 1).first(), 0)
+    #|  metadata(repr((get(), mk().fields().value,)))
+    #|}
+    #|#metadata(repr((mk().value, mk().fields().value,)))
+    #|]
+    #|#metadata("== memo: arguments returned by a closure")
+    #|#[
+    #|#let mk() = arguments(((1, 2), (k: (3,))), k: (a: (1, 2), d: (k: (3,))))
+    #|#{
+    #|  let _ = (array.pop)(mk().pos())
+    #|  let _ = (array.push)(mk().pos(), 0)
+    #|  let _ = (array.pop)(mk().pos().at(0))
+    #|  let _ = (array.push)(mk().pos().at(0), 0)
+    #|  let _ = (array.pop)(mk().pos().at(0).at(0))
+    #|  let _ = (array.push)(mk().pos().at(0).at(0), 0)
+    #|  let _ = (array.pop)(mk().pos().at(0).first())
+    #|  let _ = (array.push)(mk().pos().at(0).first(), 0)
+    #|  let _ = (dictionary.insert)(mk().pos().at(0).at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(mk().pos().at(0).at(1), "k")
+    #|  let _ = (dictionary.insert)(mk().pos().at(0).last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(mk().pos().at(0).last(), "k")
+    #|  let _ = (array.pop)(mk().pos().at(0).at(1).k)
+    #|  let _ = (array.push)(mk().pos().at(0).at(1).k, 0)
+    #|  let _ = (array.pop)(mk().pos().at(0).last().at("k"))
+    #|  let _ = (array.push)(mk().pos().at(0).last().at("k"), 0)
+    #|  let _ = (array.pop)(mk().pos().at(0).at(1).values().first())
+    #|  let _ = (array.push)(mk().pos().at(0).at(1).values().first(), 0)
+    #|  let _ = (array.pop)(mk().pos().at(0).slice(0, 1).first())
+    #|  let _ = (array.push)(mk().pos().at(0).slice(0, 1).first(), 0)
+    #|  metadata(repr((mk().pos(), mk().named(), mk().at(0),)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push(mk().pos()); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push(mk().pos()); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push(mk().pos()); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(mk().pos()); pv.at(0).at(0).push(0) }
+    #|  { let pv = (); pv.push(mk().pos()); let _ = pv.at(0).at(0).at(0).pop() }
+    #|  { let pv = (); pv.push(mk().pos()); pv.at(0).at(0).at(0).push(0) }
+    #|  { let pv = (); pv.push(mk().pos()); let _ = pv.at(0).at(0).first().pop() }
+    #|  { let pv = (); pv.push(mk().pos()); pv.at(0).at(0).first().push(0) }
+    #|  { let pv = (); pv.push(mk().pos()); pv.at(0).at(0).at(1).insert("zz", 0) }
+    #|  { let pv = (); pv.push(mk().pos()); let _ = pv.at(0).at(0).at(1).remove("k") }
+    #|  { let pv = (); pv.push(mk().pos()); pv.at(0).at(0).last().insert("zz", 0) }
+    #|  { let pv = (); pv.push(mk().pos()); let _ = pv.at(0).at(0).last().remove("k") }
+    #|  { let pv = (); pv.push(mk().pos()); let _ = pv.at(0).at(0).at(1).k.pop() }
+    #|  { let pv = (); pv.push(mk().pos()); pv.at(0).at(0).at(1).k.push(0) }
+    #|  { let pv = (); pv.push(mk().pos()); let _ = pv.at(0).at(0).last().at("k").pop() }
+    #|  { let pv = (); pv.push(mk().pos()); pv.at(0).at(0).last().at("k").push(0) }
+    #|  metadata(repr((mk().pos(), mk().named(), mk().at(0),)))
+    #|}
+    #|#let get() = mk().pos()
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  let _ = (array.pop)(get().at(0).at(0))
+    #|  let _ = (array.push)(get().at(0).at(0), 0)
+    #|  let _ = (array.pop)(get().at(0).first())
+    #|  let _ = (array.push)(get().at(0).first(), 0)
+    #|  let _ = (dictionary.insert)(get().at(0).at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().at(0).at(1), "k")
+    #|  let _ = (dictionary.insert)(get().at(0).last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().at(0).last(), "k")
+    #|  let _ = (array.pop)(get().at(0).at(1).k)
+    #|  let _ = (array.push)(get().at(0).at(1).k, 0)
+    #|  let _ = (array.pop)(get().at(0).last().at("k"))
+    #|  let _ = (array.push)(get().at(0).last().at("k"), 0)
+    #|  let _ = (array.pop)(get().at(0).at(1).values().first())
+    #|  let _ = (array.push)(get().at(0).at(1).values().first(), 0)
+    #|  let _ = (array.pop)(get().at(0).slice(0, 1).first())
+    #|  let _ = (array.push)(get().at(0).slice(0, 1).first(), 0)
+    #|  metadata(repr((get(), mk().named(), mk().at(0),)))
+    #|}
+    #|#metadata(repr((mk().pos(), mk().named(), mk().at(0),)))
+    #|]
+    #|#metadata("== memo: a function with a default returned by a closure")
+    #|#[
+    #|#let mk() = (x: ((1, 2), (k: (3,)))) => x
+    #|#{
+    #|  let _ = (array.pop)((mk())())
+    #|  let _ = (array.push)((mk())(), 0)
+    #|  let _ = (array.pop)((mk())().at(0))
+    #|  let _ = (array.push)((mk())().at(0), 0)
+    #|  let _ = (array.pop)((mk())().first())
+    #|  let _ = (array.push)((mk())().first(), 0)
+    #|  let _ = (dictionary.insert)((mk())().at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)((mk())().at(1), "k")
+    #|  let _ = (dictionary.insert)((mk())().last(), "zz", 0)
+    #|  let _ = (dictionary.remove)((mk())().last(), "k")
+    #|  let _ = (array.pop)((mk())().at(1).k)
+    #|  let _ = (array.push)((mk())().at(1).k, 0)
+    #|  let _ = (array.pop)((mk())().last().at("k"))
+    #|  let _ = (array.push)((mk())().last().at("k"), 0)
+    #|  let _ = (array.pop)((mk())().at(1).values().first())
+    #|  let _ = (array.push)((mk())().at(1).values().first(), 0)
+    #|  let _ = (array.pop)((mk())().slice(0, 1).first())
+    #|  let _ = (array.push)((mk())().slice(0, 1).first(), 0)
+    #|  metadata(repr(((mk())(),)))
+    #|}
+    #|#{
+    #|  { let pv = (); pv.push((mk())()); let _ = pv.at(0).pop() }
+    #|  { let pv = (); pv.push((mk())()); pv.at(0).push(0) }
+    #|  { let pv = (); pv.push((mk())()); let _ = pv.at(0).at(0).pop() }
+    #|  { let pv = (); pv.push((mk())()); pv.at(0).at(0).push(0) }
+    #|  { let pv = (); pv.push((mk())()); let _ = pv.at(0).first().pop() }
+    #|  { let pv = (); pv.push((mk())()); pv.at(0).first().push(0) }
+    #|  { let pv = (); pv.push((mk())()); pv.at(0).at(1).insert("zz", 0) }
+    #|  { let pv = (); pv.push((mk())()); let _ = pv.at(0).at(1).remove("k") }
+    #|  { let pv = (); pv.push((mk())()); pv.at(0).last().insert("zz", 0) }
+    #|  { let pv = (); pv.push((mk())()); let _ = pv.at(0).last().remove("k") }
+    #|  { let pv = (); pv.push((mk())()); let _ = pv.at(0).at(1).k.pop() }
+    #|  { let pv = (); pv.push((mk())()); pv.at(0).at(1).k.push(0) }
+    #|  { let pv = (); pv.push((mk())()); let _ = pv.at(0).last().at("k").pop() }
+    #|  { let pv = (); pv.push((mk())()); pv.at(0).last().at("k").push(0) }
+    #|  metadata(repr(((mk())(),)))
+    #|}
+    #|#let get() = (mk())()
+    #|#{
+    #|  let _ = (array.pop)(get())
+    #|  let _ = (array.push)(get(), 0)
+    #|  let _ = (array.pop)(get().at(0))
+    #|  let _ = (array.push)(get().at(0), 0)
+    #|  let _ = (array.pop)(get().first())
+    #|  let _ = (array.push)(get().first(), 0)
+    #|  let _ = (dictionary.insert)(get().at(1), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().at(1), "k")
+    #|  let _ = (dictionary.insert)(get().last(), "zz", 0)
+    #|  let _ = (dictionary.remove)(get().last(), "k")
+    #|  let _ = (array.pop)(get().at(1).k)
+    #|  let _ = (array.push)(get().at(1).k, 0)
+    #|  let _ = (array.pop)(get().last().at("k"))
+    #|  let _ = (array.push)(get().last().at("k"), 0)
+    #|  let _ = (array.pop)(get().at(1).values().first())
+    #|  let _ = (array.push)(get().at(1).values().first(), 0)
+    #|  let _ = (array.pop)(get().slice(0, 1).first())
+    #|  let _ = (array.push)(get().slice(0, 1).first(), 0)
+    #|  metadata(repr((get(),)))
+    #|}
+    #|#metadata(repr(((mk())(),)))
+    #|]
+    #|#metadata("== memo: the size given to a layout callback and a measurement")
+    #|#[
+    #|#layout(size => {
+    #|  let _ = (dictionary.insert)(size, "zz", 0)
+    #|  let m = measure([x])
+    #|  let _ = (dictionary.insert)(measure([x]), "zz", 0)
+    #|  metadata(repr((size.keys(), measure([x]).keys())))
+    #|})
+    #|#layout(size => metadata(repr(size.keys())))
+    #|]
+    #|
+  let expected = [
+    "== memo: the result of a closure that reads a state", "(\n  (((1, 2), (k: (3,))), ((1, 2), (k: (3,)))),\n  ((1, 2), (k: (3,))),\n)",
+    "(\n  (((1, 2), (k: (3,))), ((1, 2), (k: (3,)))),\n  ((1, 2), (k: (3,))),\n)",
+    "(\n  (((1, 2), (k: (3,))), ((1, 2), (k: (3,)))),\n  ((1, 2), (k: (3,))),\n)",
+    "(\n  (((1, 2), (k: (3,))), ((1, 2), (k: (3,)))),\n  ((1, 2), (k: (3,))),\n)",
+    "== memo: a value handed through two closures", "(((1, 2), (k: (3,))), ((1, 2), (k: (3,))))",
+    "(((1, 2), (k: (3,))), ((1, 2), (k: (3,))))", "(((1, 2), (k: (3,))), ((1, 2), (k: (3,))))",
+    "(((1, 2), (k: (3,))), ((1, 2), (k: (3,))))", "== memo: a closure result held by a second holder",
+    "(((1, 2), (k: (3,))), ((1, 2), (k: (3,))))", "(((1, 2), (k: (3,))), ((1, 2), (k: (3,))))",
+    "(((1, 2), (k: (3,))), ((1, 2), (k: (3,))))", "(((1, 2), (k: (3,))), ((1, 2), (k: (3,))))",
+    "== memo: an argument returned by the closure", "(\n  ((1, 2), (k: (3,))),\n  ((1, 2), (k: (3,))),\n  ((1, 2), (k: (3,))),\n)",
+    "(\n  ((1, 2), (k: (3,))),\n  ((1, 2), (k: (3,))),\n  ((1, 2), (k: (3,))),\n)",
+    "(\n  ((1, 2), (k: (3,))),\n  ((1, 2), (k: (3,))),\n  ((1, 2), (k: (3,))),\n)",
+    "(\n  ((1, 2), (k: (3,))),\n  ((1, 2), (k: (3,))),\n  ((1, 2), (k: (3,))),\n)",
+    "== memo: an argument mutated by the closure", "(\n  ((1, 2, 9), (k: (3, 9))),\n  ((1, 2), (k: (3,))),\n  ((1, 2, 9), (k: (3, 9))),\n  ((1, 2, 9), (k: (3, 9))),\n)",
+    "(\n  ((1, 2, 9), (k: (3, 9))),\n  ((1, 2), (k: (3,))),\n  ((1, 2, 9), (k: (3, 9))),\n  ((1, 2, 9), (k: (3, 9))),\n)",
+    "(\n  ((1, 2, 9), (k: (3, 9))),\n  ((1, 2), (k: (3,))),\n  ((1, 2, 9), (k: (3, 9))),\n  ((1, 2, 9), (k: (3, 9))),\n)",
+    "(\n  ((1, 2, 9), (k: (3, 9))),\n  ((1, 2), (k: (3,))),\n  ((1, 2, 9), (k: (3, 9))),\n  ((1, 2, 9), (k: (3, 9))),\n)",
+    "== memo: a state object returned by a closure", "(\n  (a: (1, 2), d: (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n)",
+    "(\n  (a: (1, 2), d: (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n)", "(\n  (a: (1, 2), d: (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n)",
+    "(\n  (a: (1, 2), d: (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n)", "== memo: content with a container field returned by a closure",
+    "(((1, 2), (k: (3,))), ((1, 2), (k: (3,))))", "(((1, 2), (k: (3,))), ((1, 2), (k: (3,))))",
+    "(((1, 2), (k: (3,))), ((1, 2), (k: (3,))))", "(((1, 2), (k: (3,))), ((1, 2), (k: (3,))))",
+    "== memo: arguments returned by a closure", "(\n  (((1, 2), (k: (3,))),),\n  (k: (a: (1, 2), d: (k: (3,)))),\n  ((1, 2), (k: (3,))),\n)",
+    "(\n  (((1, 2), (k: (3,))),),\n  (k: (a: (1, 2), d: (k: (3,)))),\n  ((1, 2), (k: (3,))),\n)",
+    "(\n  (((1, 2), (k: (3,))),),\n  (k: (a: (1, 2), d: (k: (3,)))),\n  ((1, 2), (k: (3,))),\n)",
+    "(\n  (((1, 2), (k: (3,))),),\n  (k: (a: (1, 2), d: (k: (3,)))),\n  ((1, 2), (k: (3,))),\n)",
+    "== memo: a function with a default returned by a closure", "(((1, 2), (k: (3,))),)",
+    "(((1, 2), (k: (3,))),)", "(((1, 2), (k: (3,))),)", "(((1, 2), (k: (3,))),)",
+    "== memo: the size given to a layout callback and a measurement", "(\n  (\"width\", \"height\"),\n  (\"width\", \"height\", \"baseline\"),\n)",
+    "(\"width\", \"height\")",
   ]
   assert_eq(oracle_metadata(source), expected)
 }

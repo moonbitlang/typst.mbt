@@ -118,12 +118,13 @@ pub fn[T : @library.Output] compile_with(
   let styles = base.chain(target)
   let empty_introspector = @library.Introspector::empty()
 
-  // First produce the content (the Typst path evaluates the main source
-  // file into a module).
-  let content = evaluate(library)
-  // Layout results are memoized across the iterations (upstream: comemo;
-  // see `library/memo.mbt`).
+  // Closure calls and layout results are memoized for the compilation:
+  // during the evaluation and across the relayout iterations (upstream:
+  // comemo; see `library/memo.mbt`).
   let document = @library.with_layout_memo(() => {
+    // First produce the content (the Typst path evaluates the main source
+    // file into a module).
+    let content = evaluate(library)
     let history : Array[T] = []
     let mut document : T? = None
 

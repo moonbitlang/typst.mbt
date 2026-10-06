@@ -138,13 +138,26 @@ fn SipHasher128::compress(self : SipHasher128, m : UInt64) -> Unit {
 ///|
 /// Write a single byte.
 pub fn SipHasher128::write_u8(self : SipHasher128, b : Byte) -> Unit {
-  self.tail = self.tail | (b.to_uint64() << (8 * self.ntail))
-  self.ntail += 1
-  self.length += 1
-  if self.ntail == 8 {
-    self.compress(self.tail)
-    self.tail = 0
-    self.ntail = 0
+  self.write_short(UInt64::extend_uint(b.to_int().reinterpret_as_uint()), 1)
+}
+
+///|
+/// Write the `n` low bytes of `v` (little endian; `1 <= n <= 7` and the
+/// other bytes of `v` are zero): what `n` calls of `write_u8` do.
+fn SipHasher128::write_short(self : SipHasher128, v : UInt64, n : Int) -> Unit {
+  let ntail = self.ntail
+  self.length += UInt64::extend_uint(n.reinterpret_as_uint())
+  let word = self.tail | (v << (8 * ntail))
+  let filled = ntail + n
+  if filled < 8 {
+    self.tail = word
+    self.ntail = filled
+  } else {
+    self.compress(word)
+    // The bytes of `v` that did not fit (`8 - ntail` did; `ntail >= 1`
+    // here, as `n <= 7`).
+    self.tail = v >> (8 * (8 - ntail))
+    self.ntail = filled - 8
   }
 }
 
@@ -178,9 +191,7 @@ pub fn SipHasher128::write_bytes(
 ///|
 /// Write a 32-bit integer.
 pub fn SipHasher128::write_u32(self : SipHasher128, v : UInt) -> Unit {
-  for i in 0..<4 {
-    self.write_u8((v >> (8 * i)).to_byte())
-  }
+  self.write_short(UInt64::extend_uint(v), 4)
 }
 
 ///|
@@ -225,6 +236,39 @@ pub fn SipHasher128::write_f64(self : SipHasher128, v : Double) -> Unit {
 /// Write a string: its UTF-8 bytes followed by `0xff` (like Rust's `str`
 /// hash).
 pub fn SipHasher128::write_str(self : SipHasher128, s : StringView) -> Unit {
+  // ASCII, which most hashed strings are (names, keys): the bytes are the
+  // code units, collected into words here. This is the loop below with
+  // `write_u8` written out; strings are a large part of what the
+  // memoization of closure calls hashes.
+  let len = s.length()
+  let mut tail = self.tail
+  let mut ntail = self.ntail
+  let mut i = 0
+  while i < len {
+    let unit = s.unsafe_get(i).to_int()
+    if unit >= 0x80 {
+      break
+    }
+    tail = tail |
+      (UInt64::extend_uint(unit.reinterpret_as_uint()) << (8 * ntail))
+    ntail += 1
+    if ntail == 8 {
+      self.compress(tail)
+      tail = 0
+      ntail = 0
+    }
+    i += 1
+  }
+  self.tail = tail
+  self.ntail = ntail
+  self.length += UInt64::extend_uint(i.reinterpret_as_uint())
+  if i == len {
+    self.write_u8(b'\xff')
+    return
+  }
+  // The rest, from the first character that is not ASCII (a character
+  // boundary: everything before it is one code unit per character).
+  let s = s.view(start_offset=i)
   for c in s {
     let code = c.to_int()
     if code < 0x80 {
@@ -290,9 +334,13 @@ pub fn[T : Fingerprint] SipHasher128::write(
 /// capture all of the data that upstream's `Hash` covers (no impl does at
 /// the moment; such an impl must call [mark_fingerprint_lossy]),
 /// [fingerprint_identity] if it contains a value that compares by identity
-/// (closures; their fingerprint is structural). Equal fingerprints with
-/// flags do not prove interchangeable values, and a lossy fingerprint gives
-/// elements a location key that upstream would not give them.
+/// and can be told apart from a value with the same fingerprint (host
+/// closures, whose fingerprint is a key of the host's, and the modules that
+/// their fingerprint does not identify, see `ModuleInner.identified`; not
+/// closures, which compare by their hash like upstream's). Equal
+/// fingerprints with flags do not prove
+/// interchangeable values, and a lossy fingerprint gives elements a
+/// location key that upstream would not give them.
 let fingerprint_flags : Ref[Int] = { val: 0, }
 
 ///|

@@ -7,7 +7,11 @@ fn eval_func_call(
 ) -> @library.Value raise @library.SourceError {
   let span = call.span()
   let callee = call.callee()
-  @library.at(span, () => vm.engine.route.check_call_depth())
+  // `.at(span)?`, here and below, without the closure of `@library.at`.
+  vm.engine.route.check_call_depth() catch {
+    @library.HintedError(err) =>
+      raise @library.SourceError([err.into_error_at(span)])
+  }
 
   // Try to evaluate as a call to an associated function or field.
   if callee is FieldAccess(access_expr) {
@@ -21,12 +25,6 @@ fn eval_func_call(
     } else {
       (eval_expr(vm, target_expr), None)
     }
-    let args = () => {
-      match maybe_args {
-        Some(args) => args
-        None => eval_args(vm, call.args()).spanned(span)
-      }
-    }
     match
       eval_field_callee(
         vm,
@@ -36,9 +34,19 @@ fn eval_func_call(
         target,
         false,
       ) {
-      Func(func) => call_func(vm, func, args(), span)
+      Func(func) => {
+        let args = match maybe_args {
+          Some(args) => args
+          None => eval_args(vm, call.args()).spanned(span)
+        }
+        call_func(vm, func, args, span)
+      }
       Method(func, target) => {
-        let args = args()
+        let args = match maybe_args {
+          Some(args) => args
+          None => eval_args(vm, call.args()).spanned(span)
+        }
+        // Method calls pass the target as the first argument.
         args.insert(0, target_expr.span(), target)
         call_func(vm, func, args, span)
       }
@@ -48,12 +56,12 @@ fn eval_func_call(
   } else {
     // Function call order: we evaluate the callee before the arguments.
     let callee_value = eval_expr(vm, callee)
-    let func : @library.Func = @library.at(callee.span(), () => {
-      callee_value.cast() catch {
-        @library.HintedError(err) =>
-          raise @library.HintedError(hint_if_shadowed_std(vm, callee, err))
-      }
-    })
+    let func : @library.Func = callee_value.cast() catch {
+      @library.HintedError(err) =>
+        raise @library.SourceError([
+          hint_if_shadowed_std(vm, callee, err).into_error_at(callee.span()),
+        ])
+    }
     let args = eval_args(vm, call.args()).spanned(span)
     call_func(vm, func, args, span)
   }
@@ -125,7 +133,11 @@ fn call_func(
   span : @syntax.Span,
 ) -> @library.Value raise @library.SourceError {
   let func = func.spanned(span)
-  trace_call(vm, func.name(), span, () => func.call(vm.engine, vm.context, args))
+  // `func.call(..).trace(vm.world(), point, span)`: the point (the name of
+  // the function) and the closures of the trace are only made for an error.
+  func.call(vm.engine, vm.context, args) catch {
+    err => trace_call(vm, func.name(), span, () => raise err)
+  }
 }
 
 ///|
@@ -190,28 +202,45 @@ fn eval_field_callee(
   target : @library.Value,
   in_math : Bool,
 ) -> FieldCallee raise @library.SourceError {
-  let guard_ = vm.guard_at(field_span)
+  // The guard (upstream: `vm.engine.binding_guard(field_span)`, a tuple)
+  // and the descriptions of the accesses are allocations here: they are
+  // made where a binding is checked on access.
   let mut is_method_call = false
   let callee_value = match target.ty().scope().get(field) {
     Some(method_) => {
       is_method_call = true
-      let ty = target.ty().short_name()
-      @library.at(field_span, () => {
-        method_.read(guard_, "call method `\{field}` on \{ty}")
-      })
+      if method_.is_guarded() {
+        let ty = target.ty().short_name()
+        let guard_ = vm.guard_at(field_span)
+        @library.at(field_span, () => {
+          method_.read(guard_, "call method `\{field}` on \{ty}")
+        })
+      } else {
+        method_.value
+      }
     }
     None =>
       match target {
         Content(content) if content.elem().scope().get(field) is Some(method_) => {
           is_method_call = true
-          @library.at(field_span, () => {
-            method_.read(guard_, "call method `\{field}` on content")
-          })
+          if method_.is_guarded() {
+            let guard_ = vm.guard_at(field_span)
+            @library.at(field_span, () => {
+              method_.read(guard_, "call method `\{field}` on content")
+            })
+          } else {
+            method_.value
+          }
         }
-        Symbol(_) | Type(_) | Module(_) =>
-          @library.at(field_span, () => target.field(field, guard_))
+        Symbol(_) | Type(_) | Module(_) => {
+          let guard_ = vm.guard_at(field_span)
+          target.field(field, guard_) catch {
+            @library.HintedError(err) =>
+              raise @library.SourceError([err.into_error_at(field_span)])
+          }
+        }
         Func(func) =>
-          try target.field(field, guard_) catch {
+          try target.field(field, vm.guard_at(field_span)) catch {
             @library.HintedError(err) =>
               if func.to_element() is Some(element) &&
                 element.settable_field_accessor(field) is Some(accessor) {
@@ -231,7 +260,7 @@ fn eval_field_callee(
             v => v
           }
         _ =>
-          try target.field(field, guard_) catch {
+          try target.field(field, vm.guard_at(field_span)) catch {
             _ => {
               let (kind, name) = element_or_type_with_name(target)
               @library.bail_at(
@@ -374,7 +403,13 @@ fn eval_args(
                 value: { v: value.shared(), span, },
               })
             }
-          Args(args) => items.append(args.items)
+          // Upstream extends with the items of its own clone of the
+          // arguments (`Eval for Ident` clones); here the arguments value
+          // still holds them, so they are passed on as shared.
+          Args(args) =>
+            for a in args.items {
+              items.push(a.shared())
+            }
           v => @library.bail_at(spread.span(), "cannot spread \{v.ty()}")
         }
     }
@@ -437,8 +472,10 @@ fn eval_math_args(
                 value: { v: value.shared(), span, },
               })
             }
+          // As in `eval_args`: the items stay in the spread value.
           Args(a) =>
             for a in a.items {
+              let a = a.shared()
               if a.name is None {
                 pos.push(a)
               } else {
@@ -534,9 +571,11 @@ fn eval_closure_expr(
   }
 
   // Collect captured variables.
-  let visitor = CapturesVisitor::new(Some(vm.scopes), Function)
-  visitor.visit(closure.to_untyped())
-  let captured = visitor.finish()
+  let { captured, node_hash, } = collect_captures(
+    vm.scopes,
+    closure.to_untyped(),
+    Function,
+  )
 
   // Define the closure.
   let num_pos_params = closure
@@ -550,13 +589,31 @@ fn eval_closure_expr(
     captured,
     num_pos_params,
     hash: @library.LazyFingerprint::new(),
+    node_hash,
   }
   Func(@library.Func::closure(closure_data).spanned(closure.params().span()))
 }
 
 ///|
 /// Call the function in the context with the arguments.
+///
+/// Upstream's `#[comemo::memoize]` on this function is
+/// `@library.memoized_closure` around [eval_closure_impl], which is the
+/// function's body.
 pub fn eval_closure(
+  func : @library.Func,
+  closure : @library.Closure,
+  engine : @library.Engine,
+  context : @library.Context,
+  args : @library.Args,
+) -> @library.Value raise @library.SourceError {
+  @library.memoized_closure(
+    func, closure, engine, context, args, eval_closure_impl,
+  )
+}
+
+///|
+fn eval_closure_impl(
   func : @library.Func,
   closure : @library.Closure,
   engine : @library.Engine,
@@ -649,6 +706,11 @@ pub struct CapturesVisitor {
   priv internal : @library.Scopes
   priv captures : @library.Scope
   priv capturer : @library.Capturer
+  /// Not upstream (see `captures.mbt`): if set, the visitor records the
+  /// identifiers that `capture` would look up instead of capturing them,
+  /// with the modes each name was recorded in (1: code, 2: math).
+  priv recording : Array[CaptureAttempt]?
+  priv recorded_modes : Map[String, Int]
 }
 
 ///|
@@ -662,6 +724,31 @@ pub fn CapturesVisitor::new(
     internal: @library.Scopes::new(None),
     captures: @library.Scope::new(),
     capturer,
+    recording: None,
+    recorded_modes: {},
+  }
+}
+
+///|
+/// A visitor that records what `capture` is asked for (not upstream; see
+/// `captures.mbt`).
+fn CapturesVisitor::recording() -> CapturesVisitor {
+  {
+    external: None,
+    internal: @library.Scopes::new(None),
+    captures: @library.Scope::new(),
+    capturer: Function,
+    recording: Some([]),
+    recorded_modes: {},
+  }
+}
+
+///|
+/// The identifiers a recording visitor was asked to capture, in order.
+fn CapturesVisitor::recorded(self : CapturesVisitor) -> Array[CaptureAttempt] {
+  match self.recording {
+    Some(attempts) => attempts
+    None => []
   }
 }
 
@@ -786,6 +873,20 @@ fn CapturesVisitor::capture(
     } noraise {
       _ => true
     }) {
+    return
+  }
+  // Not upstream: the recording for the cache of the compilation, once
+  // per name and mode.
+  if self.recording is Some(attempts) {
+    let mode = if in_math { 2 } else { 1 }
+    let modes = match self.recorded_modes.get(ident) {
+      Some(modes) => modes
+      None => 0
+    }
+    if (modes & mode) == 0 {
+      self.recorded_modes[ident] = modes | mode
+      attempts.push({ name: ident, in_math, repeated: modes != 0, })
+    }
     return
   }
   if self.captures.get(ident) is Some(_) {

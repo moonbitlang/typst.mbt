@@ -1,6 +1,6 @@
 // Memoization (not upstream: a replacement for comemo's `#[comemo::memoize]`
-// on `layout_par_impl`, `layout_fragment_impl` and the counter/state
-// sequences).
+// on `layout_par_impl`, `layout_fragment_impl`, the counter sequence and
+// `eval_closure`; the closure calls are at the end of this file).
 //
 // Upstream memoizes these functions on all their arguments, tracking which
 // parts of the tracked arguments (introspector, locator, route, sink) the call
@@ -8,37 +8,45 @@
 // measurements (e.g. of grid cells) cheap. Here:
 //
 // - Entries are found by a fingerprint of the untracked arguments (content,
-//   style chain, regions, ...) plus the fully resolved locator and the route
-//   (stricter than upstream, which only tracks what the call observes).
+//   style chain, regions, ...) plus, for the layout functions, the fully
+//   resolved locator and the route (stricter than upstream, which only
+//   tracks what the call observes).
 // - Fingerprints do not always distinguish what the computation can
-//   observe: closures compare by identity but fingerprint structurally (and
-//   a `Fingerprint` that does not capture all data marks itself lossy; none
-//   does at the moment). So an entry also keeps the arguments and is only
-//   reused if they are equal ([values_memo_equal]: `==`, but recursing into
-//   content, styles, arrays, dictionaries, functions and dynamic values,
-//   where Typst's equality is looser).
-// - Results that may contain values created during the computation are not
-//   reused (a reused closure would keep its identity where a recomputed one
-//   gets a new one): layout results whose tags hold closures are not cached
-//   ([frame_cacheable]), the counter sequence only holds numbers, and the
-//   state sequence is not memoized.
+//   observe: host closures compare by identity but fingerprint by their key
+//   (and a `Fingerprint` that does not capture all data marks itself lossy;
+//   none does at the moment). So an entry also keeps the arguments and is
+//   only reused if they are equal ([values_memo_equal]: `==`, but recursing
+//   into content, styles, arrays, dictionaries, functions and dynamic
+//   values, where Typst's equality is looser). Closures compare by their
+//   hash, like upstream's (`closures_equal`): equal fingerprints are equal
+//   closures. Modules compare by identity, and a compilation has one module
+//   object per evaluated file and per plugin with functions: equal
+//   fingerprints are the same module. (Upstream compares hashes only: two
+//   plugins without functions are the same argument for its memoized calls,
+//   `(a, b).map(m => m == a)` is `(true, true)` there. The port keeps them
+//   apart: their fingerprints are flagged like those of host closures.)
+// - Layout results whose tags hold host closures or modules that their
+//   fingerprint does not identify are not cached ([frame_cacheable]), the
+//   counter sequence only holds numbers, and the state sequence is not
+//   memoized.
 // - Introspector reads of the call are recorded into a fresh
 //   [IntrospectionRecorder]. A cached result is only reused with the
 //   introspector it was computed with, or if all of its recorded reads
 //   produce the same results on the current introspector and none of the
-//   recorded results had a lossy fingerprint or contained values compared by
-//   identity (closures). Its reads are then merged into
-//   the caller's recorder (as if the call had been executed), so convergence
-//   checking is unaffected.
+//   recorded results had a lossy fingerprint or contained host closures or
+//   modules that their fingerprint does not identify.
+//   Its reads are then merged into the caller's recorder (as if the call
+//   had been executed), so convergence checking is unaffected.
 // - The call's sink side effects (warnings, delayed errors, introspections,
 //   traced values) are recorded into a fresh [Sink] and replayed into the
 //   caller's sink, both after computing and on every reuse.
 // - Results are copied for every caller where they are mutable (frames are
-//   copy-on-write).
+//   copy-on-write; values mark their containers shared).
 // - Errors are not cached (the call is simply executed again).
 //
-// Caches only live for one compilation ([with_layout_memo]), across its
-// introspection iterations, as the world (files, fonts) is fixed during it.
+// Caches only live for one compilation ([with_layout_memo]: its evaluation
+// and its introspection iterations), as the world (files, fonts) is fixed
+// during it.
 
 ///|
 /// A memoized result.
@@ -117,6 +125,14 @@ pub fn layout_memo_active() -> Bool {
 }
 
 ///|
+/// The number of the current compilation, for caches that live as long as
+/// its memoized results do; zero outside of a compilation and when
+/// memoization is off.
+pub fn memo_compilation() -> Int {
+  memo_generation.val
+}
+
+///|
 /// The fingerprint written by `f` (a memoization key).
 pub fn memo_fingerprint(f : (SipHasher128) -> Unit) -> U128 {
   let state = SipHasher128::new()
@@ -146,6 +162,16 @@ fn[T, I : Eq] memoize(
     store.entries.clear()
     store.generation = generation
   }
+  // The traced span is not one per compilation (an evaluated string runs
+  // without): a result computed there replays no traced values.
+  let key = match engine.traced.0 {
+    None => key
+    Some(span) =>
+      memo_fingerprint(state => {
+        state.write_u128(key)
+        state.write(span)
+      })
+  }
   let parent = engine.introspector.recorder
   let backend = engine.introspector.backend
   if store.entries.get(key) is Some(entries) {
@@ -159,6 +185,9 @@ fn[T, I : Eq] memoize(
           entry.reads.merge_into(parent)
         }
         engine.sink.extend_from_sink(entry.sink)
+        // The key holds the whole route: for a closure call around this
+        // one, the result is that of this depth only.
+        note_route_shift(0, 0)
         return copy(entry.output)
       }
     }
@@ -516,10 +545,10 @@ pub fn memoized_layout(
 }
 
 ///|
-/// Whether a laid-out frame can be reused: its tags must not hold closures
-/// (they may have been created during layout, and a recomputation would
-/// create new ones with a different identity). The same holds for the
-/// frames of its tiling paints.
+/// Whether a laid-out frame can be reused: its tags must not hold values
+/// that compare by identity and that their fingerprint does not identify
+/// (`fingerprint_identity`: host closures, anonymous modules). The same
+/// holds for the frames of its tiling paints.
 fn frame_cacheable(frame : Frame) -> Bool {
   for entry in frame.items() {
     match entry.1 {
@@ -556,11 +585,553 @@ fn frame_cacheable(frame : Frame) -> Bool {
 
 ///|
 /// See [frame_cacheable]: the fingerprint of a tiling's frame (computed
-/// once per tiling) records whether it holds closures.
+/// once per tiling) records whether it holds such values.
 fn paint_cacheable(paint : Paint) -> Bool {
   match paint {
     Tiling(tiling) =>
       (tiling.frame_fingerprint_flags() & fingerprint_identity) == 0
     Solid(_) | Gradient(_) => true
   }
+}
+
+// Closure calls (upstream `#[comemo::memoize]` on `typst_eval::eval_closure`).
+//
+// Upstream memoizes every closure call on the function, the closure and the
+// arguments (all hashed, with their spans) and on what the call observes of
+// its tracked arguments: the world, the introspector, the traced span, the
+// route and the context; the mutations of the sink are replayed. Packages
+// that compute a lot (touying, cetz, fletcher) rely on it: a deck that calls
+// 160 000 functions with it calls two million without, as every relayout
+// and every measurement repeats them.
+//
+// Here, with the rules of the module docs:
+// - The function (the closure's hash and the span) and the arguments are
+//   fingerprinted, and the entry keeps them for the exact comparison.
+// - The context is tracked like upstream's `Tracked<Context>`: a [Context]
+//   notes what was asked of it, and a result only depends on the location
+//   and the styles if the call (with the calls inside it) asked for them.
+//   The entries of one function and arguments are found by a second
+//   fingerprint over what such calls have asked for so far
+//   (`ClosureStore.asked`), so that a function called at a thousand
+//   locations is not a list of a thousand entries.
+// - The route is tracked like upstream's `Tracked<Route>`: for the depth
+//   checks (`Route::within`) the entry keeps how much deeper or shallower
+//   the route may be without changing an answer (`route_shift_lo`, see
+//   `engine.mbt`), and for `Route::contains` the file ids that were asked
+//   for ([note_route_query]), whose answers must be the same on the route
+//   of a later call.
+// - The traced span is part of the fingerprint (an evaluated string runs
+//   without one). The world and the library are fixed for a compilation.
+// - Results are values: containers are marked shared, so that a mutation
+//   through one holder copies them. A result may hold closures that the
+//   call created: they are equal to the ones a repeated call would create
+//   (`closures_equal`), like upstream's.
+
+///|
+/// A memoized closure call.
+priv struct ClosureEntry {
+  /// The called function (the closure and the span).
+  func : Func
+  /// The arguments, as they were before the call consumed them.
+  args : Args
+  /// The context of the call and what the call asked of it (see [Context]).
+  context : Context
+  asked : Int
+  /// The depth of the route of the call, and the least and greatest change
+  /// of it that leaves the answers of all depth checks of the call as they
+  /// were.
+  depth : Int
+  shift_lo : Int
+  shift_hi : Int
+  /// The route of the call and the file ids it was asked for during the
+  /// call.
+  route : Route
+  queried : Array[@syntax.FileId]
+  /// The files whose code ran in the call (see `traced_file_log`), for the
+  /// evaluation of a source file that reuses the call; `None` if the call
+  /// was not computed inside one, which then cannot reuse it.
+  traced_files : Array[@syntax.FileId]?
+  /// The introspector the result was computed with.
+  backend : &IntrospectorBackend
+  /// The introspector reads of the call (`None`: none).
+  reads : IntrospectionRecorder?
+  /// The sink side effects of the call (`None`: none).
+  sink : Sink?
+  /// The result.
+  output : Value
+}
+
+///|
+/// The cached closure calls of the current compilation.
+priv struct ClosureStore {
+  mut generation : Int
+  /// By the fingerprint of the function and the arguments: what the calls
+  /// computed so far asked of their contexts.
+  asked : Map[U128, Int]
+  /// By that fingerprint and the parts of the context in `asked`.
+  entries : Map[U128, Array[ClosureEntry]]
+}
+
+///|
+let closure_store : ClosureStore = { generation: 0, asked: {}, entries: {}, }
+
+///|
+/// The numbers of closure calls that were reused and that were computed
+/// since the process started.
+let closure_memo_counts : FixedArray[Int] = [0, 0]
+
+///|
+/// How many closure calls memoization has reused and how many it has
+/// computed since the process started (for tests and measurements).
+pub fn closure_memo_stats() -> (Int, Int) {
+  (closure_memo_counts[0], closure_memo_counts[1])
+}
+
+///|
+/// The file ids that routes were asked for (`Route::contains`) while the
+/// memoized evaluations in progress ran (closure calls here, source files
+/// in `eval/import.mbt`), in order: an evaluation owns what was added since
+/// it started, which includes what the evaluations inside it added (comemo
+/// tracks `Route::contains`: a result is reused if the route of the later
+/// call gives the same answers).
+let route_query_log : Array[@syntax.FileId] = []
+
+///|
+/// The number of evaluations that are collecting route queries.
+let route_query_scopes : Ref[Int] = { val: 0, }
+
+///|
+/// Start collecting the route queries of an evaluation; returns the token
+/// for [route_queries_end].
+pub fn route_queries_begin() -> Int {
+  route_query_scopes.val += 1
+  route_query_log.length()
+}
+
+///|
+/// The file ids that routes were asked for since the matching
+/// [route_queries_begin] (without repetitions), which ends the collection
+/// for this evaluation. The evaluations around it keep them. The result
+/// must not be modified.
+pub fn route_queries_end(start : Int) -> Array[@syntax.FileId] {
+  let queried = if route_query_log.length() == start {
+    no_route_queries
+  } else {
+    let queried = []
+    for id in route_query_log[start:] {
+      if !queried.contains(id) {
+        queried.push(id)
+      }
+    }
+    queried
+  }
+  route_query_scopes.val -= 1
+  if route_query_scopes.val == 0 {
+    route_query_log.clear()
+  }
+  queried
+}
+
+///|
+/// The result of [route_queries_end] without queries.
+let no_route_queries : Array[@syntax.FileId] = []
+
+///|
+/// Record that a route was asked whether it contains `id`.
+pub fn note_route_query(id : @syntax.FileId) -> Unit {
+  if route_query_scopes.val > 0 {
+    route_query_log.push(id)
+  }
+}
+
+///|
+/// [note_route_query] for the queries of a reused evaluation.
+pub fn note_route_queries(ids : ArrayView[@syntax.FileId]) -> Unit {
+  if route_query_scopes.val > 0 {
+    for id in ids {
+      route_query_log.push(id)
+    }
+  }
+}
+
+///|
+/// The files whose code ran in the evaluations in progress that collect
+/// them, in order: an evaluation owns what was added since it started
+/// (not upstream: comemo tracks `Traced::get`, which every `Vm` asks for
+/// the file of its code, and reuses the evaluation of a source file if the
+/// traced span of the later evaluation gives the same answers, that is, if
+/// it lies in none of these files or is the same span). Only the
+/// evaluations of source files collect (`eval_source_memoized`), and the
+/// closure calls inside them, whose files are theirs; closure calls
+/// elsewhere do not, they have the traced span in their key.
+let traced_file_log : Ref[Array[@syntax.FileId]] = { val: [], }
+
+///|
+/// The number of evaluations that are collecting traced files.
+let traced_file_scopes : Ref[Int] = { val: 0, }
+
+///|
+/// Whether an evaluation is collecting traced files.
+pub fn traced_files_active() -> Bool {
+  traced_file_scopes.val > 0
+}
+
+///|
+/// Start collecting the traced files of an evaluation; returns the token
+/// for [traced_files_end].
+pub fn traced_files_begin() -> Int {
+  traced_file_scopes.val += 1
+  traced_file_log.val.length()
+}
+
+///|
+/// The files noted since the matching [traced_files_begin] (without
+/// repetitions), which ends the collection for this evaluation. The
+/// evaluations around it keep them (once each: the log does not grow with
+/// the number of calls). The result must not be modified.
+pub fn traced_files_end(start : Int) -> Array[@syntax.FileId] {
+  let log = traced_file_log.val
+  let files = if log.length() == start {
+    no_route_queries
+  } else {
+    let files = []
+    for id in log[start:] {
+      if !files.contains(id) {
+        files.push(id)
+      }
+    }
+    files
+  }
+  traced_file_scopes.val -= 1
+  if traced_file_scopes.val == 0 {
+    log.clear()
+  } else {
+    log.truncate(start)
+    log.append(files)
+  }
+  files
+}
+
+///|
+/// Record that code of the file `id` runs (a `Vm` asks `Traced::get(id)`).
+pub fn note_traced_file(id : @syntax.FileId) -> Unit {
+  if traced_file_scopes.val > 0 {
+    let log = traced_file_log.val
+    // Mostly the file of the call before.
+    if log.last() is Some(last) && last == id {
+      return
+    }
+    log.push(id)
+  }
+}
+
+///|
+/// [note_traced_file] for the files of a reused evaluation.
+pub fn note_traced_files(ids : ArrayView[@syntax.FileId]) -> Unit {
+  if traced_file_scopes.val > 0 {
+    for id in ids {
+      note_traced_file(id)
+    }
+  }
+}
+
+///|
+/// The collection of traced files that an evaluation with a traced span of
+/// its own set aside ([own_traced_begin]).
+pub struct OwnTraced {
+  priv log : Array[@syntax.FileId]
+  priv scopes : Int
+}
+
+///|
+/// Start an evaluation with a traced span of its own (an evaluated string
+/// runs without one, upstream `Traced::default().track()`): the files of
+/// its code are not those of the evaluations around it. Returns what
+/// [own_traced_end] restores.
+pub fn own_traced_begin() -> OwnTraced {
+  let saved = { log: traced_file_log.val, scopes: traced_file_scopes.val, }
+  traced_file_log.val = []
+  traced_file_scopes.val = 0
+  saved
+}
+
+///|
+/// End the evaluation that [own_traced_begin] started.
+pub fn own_traced_end(saved : OwnTraced) -> Unit {
+  traced_file_log.val = saved.log
+  traced_file_scopes.val = saved.scopes
+}
+
+///|
+/// Whether the traced spans `a` and `b` give the same answers for the files
+/// `asked` (`Traced::get`).
+pub fn traced_answers_equal(
+  a : Traced,
+  b : Traced,
+  asked : ArrayView[@syntax.FileId],
+) -> Bool {
+  if a.0 == b.0 {
+    return true
+  }
+  for id in asked {
+    if a.get(id) != b.get(id) {
+      return false
+    }
+  }
+  true
+}
+
+///|
+/// The fingerprint of the parts of a context that calls asked for.
+fn write_asked_context(
+  state : SipHasher128,
+  context : Context,
+  asked : Int,
+) -> Unit {
+  state.write_usize(asked)
+  if (asked & context_read_location) != 0 {
+    state.write(context.location)
+  }
+  if (asked & context_read_styles) != 0 {
+    match context.styles {
+      None => state.write_discriminant(0)
+      Some(styles) => {
+        state.write_discriminant(1)
+        state.write_u128(styles.memo_hash())
+      }
+    }
+  }
+  if (asked & context_read_introspect) != 0 {
+    state.write_bool(context.location is None && context.styles is None)
+  }
+}
+
+///|
+/// Whether the cached call may be reused for this one (the fingerprints of
+/// the function, the arguments and the asked parts of the context are
+/// equal). `shift` is how much deeper the route is now.
+fn ClosureEntry::matches(
+  self : ClosureEntry,
+  func : Func,
+  engine : Engine,
+  context : Context,
+  args : Args,
+  shift : Int,
+) -> Bool {
+  guard self.shift_lo <= shift &&
+    shift <= self.shift_hi &&
+    self.func.span == func.span else {
+    return false
+  }
+  guard funcs_memo_equal(self.func, func) else { return false }
+  if !physical_equal(self.context, context) {
+    let asked = self.asked
+    if (asked & context_read_location) != 0 {
+      guard self.context.location == context.location else { return false }
+    }
+    if (asked & context_read_styles) != 0 {
+      match (self.context.styles, context.styles) {
+        (None, None) => ()
+        (Some(a), Some(b)) => if !chain_memo_equal(a, b) { return false }
+        _ => return false
+      }
+    }
+    if (asked & context_read_introspect) != 0 {
+      guard (self.context.location is None && self.context.styles is None) ==
+        (context.location is None && context.styles is None) else {
+        return false
+      }
+    }
+  }
+  guard args_memo_equal(self.args, args) else { return false }
+  for id in self.queried {
+    guard self.route.contains(id) == engine.route.contains(id) else {
+      return false
+    }
+  }
+  physical_equal(self.backend, engine.introspector.backend) ||
+  (match self.reads {
+    None => true
+    Some(reads) => !reads.lossy && reads.validate(engine.introspector)
+  })
+}
+
+///|
+/// Memoize the closure call `f(func, closure, engine, context, args)` (see
+/// above). `f` must use the engine it is given.
+pub fn memoized_closure(
+  func : Func,
+  closure : Closure,
+  engine : Engine,
+  context : Context,
+  args : Args,
+  f : (Func, Closure, Engine, Context, Args) -> Value raise SourceError,
+) -> Value raise SourceError {
+  let generation = memo_generation.val
+  if generation == 0 {
+    return f(func, closure, engine, context, args)
+  }
+  let store = closure_store
+  if store.generation != generation {
+    store.asked.clear()
+    store.entries.clear()
+    store.generation = generation
+  }
+  // The fingerprints. Their flags are not those of a fingerprint that may
+  // be running around this call.
+  let outer_flags = fingerprint_flags.val
+  fingerprint_flags.val = 0
+  let state = SipHasher128::new()
+  state.write(func)
+  state.write(args)
+  // The traced span is not one per compilation: an evaluated string runs
+  // without (`eval_root`), and a call that ran there traced nothing.
+  // (Upstream tracks `Traced::get`; the whole span is stricter, and what
+  // the call returns does not depend on it.)
+  state.write(engine.traced.0)
+  let base = state.finish128()
+  let depth = engine.route.depth()
+  let parent = engine.introspector.recorder
+  let known = store.asked.get(base)
+  let collecting = traced_files_active()
+  if known is Some(asked) {
+    let state = SipHasher128::new()
+    state.write_u128(base)
+    write_asked_context(state, context, asked)
+    let key = state.finish128()
+    if (fingerprint_flags.val & fingerprint_lossy) == 0 &&
+      store.entries.get(key) is Some(entries) {
+      for entry in entries {
+        let shift = depth - entry.depth
+        if (!collecting || entry.traced_files is Some(_)) &&
+          entry.matches(func, engine, context, args, shift) {
+          fingerprint_flags.val = outer_flags
+          closure_memo_counts[0] += 1
+          // What the call did to its tracked arguments.
+          context.reads = context.reads | entry.asked
+          note_route_shift(entry.shift_lo - shift, entry.shift_hi - shift)
+          note_route_queries(entry.queried)
+          if entry.traced_files is Some(files) {
+            note_traced_files(files)
+          }
+          if entry.reads is Some(reads) && parent is Some(parent) {
+            reads.merge_into(parent)
+          }
+          if entry.sink is Some(sink) {
+            engine.sink.extend_from_sink(sink)
+          }
+          // The call consumed all of its arguments (`args.finish()`), which
+          // a caller that passed its own arguments on goes on to check.
+          args.items.clear()
+          return entry.output
+        }
+      }
+    }
+  }
+  let lossy = (fingerprint_flags.val & fingerprint_lossy) != 0
+  fingerprint_flags.val = outer_flags
+  if lossy {
+    return f(func, closure, engine, context, args)
+  }
+  closure_memo_counts[1] += 1
+  // The call consumes the arguments.
+  let snapshot = args.copy()
+  let reads = IntrospectionRecorder::new()
+  let sink = Sink::new()
+  let inner = {
+    ..engine,
+    introspector: engine.introspector.track_with(reads),
+    sink,
+  }
+  // Track the context and the route for this call alone.
+  let outer_asked = context.reads
+  context.reads = 0
+  let outer_lo = route_shift_lo.val
+  let outer_hi = route_shift_hi.val
+  route_shift_lo.val = route_shift_min
+  route_shift_hi.val = route_shift_max
+  route_shift_scopes.val += 1
+  let queries = route_queries_begin()
+  let traced_start = if collecting { traced_files_begin() } else { -1 }
+  let mut asked = 0
+  let mut shift_lo = 0
+  let mut shift_hi = 0
+  let mut queried = no_route_queries
+  let mut traced_files : Array[@syntax.FileId]? = None
+  // What the call did, it also did for the calls around it.
+  let finish = () => {
+    asked = context.reads
+    context.reads = outer_asked | asked
+    shift_lo = route_shift_lo.val
+    shift_hi = route_shift_hi.val
+    route_shift_lo.val = outer_lo
+    route_shift_hi.val = outer_hi
+    route_shift_scopes.val -= 1
+    note_route_shift(shift_lo, shift_hi)
+    queried = route_queries_end(queries)
+    if collecting {
+      traced_files = Some(traced_files_end(traced_start))
+    }
+    if parent is Some(parent) {
+      reads.merge_into(parent)
+    }
+    engine.sink.extend_from_sink(sink)
+  }
+  let output = {
+    errdefer finish()
+    f(func, closure, inner, context, args)
+  }
+  finish()
+  // The store may belong to another compilation by now (a nested one).
+  guard store.generation == generation else { return output }
+  let known = store.asked.get(base)
+  let all = match known {
+    Some(known) => known | asked
+    None => asked
+  }
+  if known != Some(all) {
+    // Entries under what was asked before are not found again; they are
+    // few (the set only grows, three times at most).
+    store.asked[base] = all
+  }
+  let outer_flags = fingerprint_flags.val
+  let state = SipHasher128::new()
+  state.write_u128(base)
+  write_asked_context(state, context, all)
+  let key = state.finish128()
+  fingerprint_flags.val = outer_flags
+  let entry : ClosureEntry = {
+    func,
+    args: snapshot,
+    context,
+    asked,
+    depth,
+    shift_lo,
+    shift_hi,
+    route: engine.route,
+    queried,
+    traced_files,
+    backend: engine.introspector.backend,
+    reads: if reads.calls.is_empty() && !reads.lossy {
+      None
+    } else {
+      Some(reads)
+    },
+    sink: if sink.is_empty() {
+      None
+    } else {
+      Some(sink)
+    },
+    output: output.shared(),
+  }
+  match store.entries.get(key) {
+    Some(entries) => {
+      if entries.length() >= memo_max_entries {
+        entries.remove(0) |> ignore
+      }
+      entries.push(entry)
+    }
+    None => store.entries[key] = [entry]
+  }
+  output
 }

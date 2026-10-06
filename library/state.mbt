@@ -72,7 +72,8 @@ fn state_at_introspection(
       source_result(() => {
         let sequence = state_sequence(state, engine, introspector)
         let offset = introspector.query_count_before(state.select(), loc)
-        sequence[offset]
+        // `sequence[offset].clone()`
+        sequence[offset].shared()
       })
     },
     history => format_state_convergence_warning(state, span, history),
@@ -90,7 +91,8 @@ fn state_final_introspection(
     (engine, introspector) => {
       source_result(() => {
         let sequence = state_sequence(state, engine, introspector)
-        sequence[sequence.length() - 1]
+        // `sequence.last().unwrap().clone()`
+        sequence[sequence.length() - 1].shared()
       })
     },
     history => format_state_convergence_warning(state, span, history),
@@ -134,7 +136,12 @@ fn state_sequence(
     introspector,
     route: Route::extend_(engine.route).unnested(),
   }
-  let mut current = state.init
+  // Upstream clones the initial value, the value of a `Set` update and every
+  // stop (`state.init.clone()`, `value.clone()`, `stops.push(current.clone())`):
+  // the state, the update element and the sequence each hold the value, so
+  // it is marked shared wherever it is taken out of one of them (an update
+  // function gets a value that the sequence holds too).
+  let mut current = state.init.shared()
   let stops = [current]
   for elem in introspector.query(state.select()) {
     let update = match elem.field_raw(state_update_elem_update) {
@@ -142,11 +149,11 @@ fn state_sequence(
       _ => abort("state update without update")
     }
     match update {
-      Set(value) => current = value
+      Set(value) => current = value.shared()
       Func(func) =>
         current = func.call_values(engine, Context::none(), [current])
     }
-    stops.push(current)
+    stops.push(current.shared())
   }
   stops
 }

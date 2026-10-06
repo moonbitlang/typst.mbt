@@ -1,10 +1,11 @@
 // Tests for the convergence loop of `compile` with synthetic outputs.
 
 ///|
-/// A world with a single main source.
+/// A world with a main source and, for some tests, other sources next to it.
 priv struct TestWorld {
   main : @syntax.Source
   library : @library.Library
+  files : Map[@syntax.FileId, @syntax.Source]
 }
 
 ///|
@@ -19,8 +20,13 @@ impl @library.World for TestWorld with fn main(self) {
 
 ///|
 impl @library.World for TestWorld with fn source(self, id) {
-  guard id == self.main.id() else { raise @library.FileError::NotFound("?") }
-  self.main
+  if id == self.main.id() {
+    return self.main
+  }
+  match self.files.get(id) {
+    Some(source) => source
+    None => raise @library.FileError::NotFound("?")
+  }
 }
 
 ///|
@@ -34,8 +40,23 @@ impl @library.World for TestWorld with fn today(_, _) {
 }
 
 ///|
-fn test_world(text : String) -> TestWorld {
-  { main: @syntax.Source::detached(text), library: library([]), }
+fn test_world(
+  text : String,
+  files? : Array[(String, String)] = [],
+) -> TestWorld {
+  let sources = Map([])
+  for file in files {
+    let vpath = @syntax.VirtualPath::new(file.0) catch {
+      _ => abort("invalid path")
+    }
+    let id = @syntax.RootedPath::new(Project, vpath).intern()
+    sources[id] = @syntax.Source::new(id, file.1)
+  }
+  {
+    main: @syntax.Source::detached(text),
+    library: library([]),
+    files: sources,
+  }
 }
 
 ///|

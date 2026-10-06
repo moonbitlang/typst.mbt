@@ -1596,10 +1596,23 @@ fn Parser::wrap(self : Parser, from : Int, kind : SyntaxKind) -> Unit {
   let to = self.before_trivia()
   let from = if from < to { from } else { to }
   let children = self.nodes[from:to].to_owned()
-  let rest = self.nodes[to:].to_owned()
-  self.nodes.truncate(from)
-  self.nodes.push(SyntaxNode::inner_owned(kind, children))
-  self.nodes.append(rest)
+  let node = SyntaxNode::inner_owned(kind, children)
+  // Upstream: `drain(from..to)` and `insert(from, node)`, done in place: the
+  // new node takes the first drained slot and the nodes after `to` (the
+  // trivia before the current token) move down.
+  if from == to {
+    self.nodes.insert(from, node)
+    return
+  }
+  self.nodes[from] = node
+  let shift = to - from - 1
+  if shift > 0 {
+    let len = self.nodes.length()
+    for i in to..<len {
+      self.nodes[i - shift] = self.nodes[i]
+    }
+    self.nodes.truncate(len - shift)
+  }
 }
 
 ///|

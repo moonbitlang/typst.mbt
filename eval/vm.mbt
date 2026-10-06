@@ -27,7 +27,11 @@ pub fn Vm::new(
   target : @syntax.Span,
 ) -> Vm {
   let inspected = match target.id() {
-    Some(id) => engine.traced.get(id)
+    Some(id) => {
+      // `Traced::get` is tracked (see `@library.note_traced_file`).
+      @library.note_traced_file(id)
+      engine.traced.get(id)
+    }
     None => None
   }
   { engine, context, flow: None, scopes, inspected, }
@@ -50,9 +54,17 @@ pub fn Vm::bind(
   ident : @ast.Ident,
   binding : @library.Binding,
 ) -> Unit {
-  let guard_ = @library.BindingGuard::silent(self.engine.library.features)
-  let value = binding.read(guard_, "") catch { _ => @library.Value::None }
-  self.trace_at(ident.span(), value)
+  // `if let Ok(value) = binding.read(silent guard) { self.trace_at(..) }`:
+  // the silent read has no effect, so it is only made for the inspected
+  // span (the guard is an allocation here).
+  if self.inspects(ident.span()) {
+    let guard_ = @library.BindingGuard::silent(self.engine.library.features)
+    try binding.read(guard_, "") catch {
+      _ => ()
+    } noraise {
+      value => self.trace(value)
+    }
+  }
   if ident.get() == "is" {
     self.engine.sink.warn(
       @library.SourceDiagnostic::warning_at(
@@ -73,15 +85,25 @@ pub fn Vm::trace_at(
   span : @syntax.Span,
   value : @library.Value,
 ) -> Unit {
-  if self.inspected == Some(span) {
+  if self.inspects(span) {
     self.trace(value)
+  }
+}
+
+///|
+/// `self.inspected == Some(span)`, which every evaluated expression asks,
+/// without the `Some` (an allocation for a span here).
+fn Vm::inspects(self : Vm, span : @syntax.Span) -> Bool {
+  match self.inspected {
+    Some(inspected) => inspected == span
+    None => false
   }
 }
 
 ///|
 /// Trace a value.
 pub fn Vm::trace(self : Vm, value : @library.Value) -> Unit {
-  let styles = self.context.styles.map(s => s.to_map())
+  let styles = self.context.try_styles().map(s => s.to_map())
   self.engine.sink.value(value.shared(), styles)
 }
 

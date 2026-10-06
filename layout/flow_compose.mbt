@@ -166,7 +166,7 @@ fn Composer::page_contents(
   let backlog = []
   let mut skip = true
   let heights = [column_height]
-  heights.append(regions.backlog.to_owned())
+  heights.append(regions.backlog)
   for h in heights {
     for _ in 0..<self.config.columns.count {
       if skip {
