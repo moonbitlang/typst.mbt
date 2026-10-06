@@ -256,3 +256,27 @@ test "oracle: fields: an external field is not a field of the element" {
   ]
   assert_eq(oracle_metadata(source), expected)
 }
+
+///|
+test "oracle: closures: functions are equal if their hashes are" {
+  let source = "#let row(..args) = metadata(repr(args.pos()))\n#let f() = (x => x)\n#let g(a) = (x => x + a)\n#let h = f()\n// One closure expression evaluated twice with the same captured values.\n#row(f() == f(), g(1) == g(1), g(1) == g(2), g(1) == g(1.0), h == h, h == f())\n// Two expressions with the same text are two syntax nodes.\n#row((x => x) == (x => x), f() == (x => x))\n#row(range(3).map(i => (x => x)).dedup().len(), range(3).map(i => (x => x + i)).dedup().len())\n#row(range(4).map(i => (x => x + calc.rem(i, 2))).dedup().len(), range(4).map(i => { let j = calc.rem(i, 2); x => x + j }).dedup().len())\n// Through values that hold functions.\n#row(f().with(1) == f().with(1), f().with(1) == f().with(2), (f(),) == (f(),), (a: f()) == (a: f()), f() in (f(),))\n#row((f(), g(1), f(), g(1), g(2)).dedup().len(), (f(), g(1)).position(x => x == g(1)))\n// Named closures, defaults and context expressions.\n#let k(a) = { let n(x, y: a) = x; n }\n#let c() = context 1\n#row(k(1) == k(1), k(1) == k(2), [#context 1] == [#context 1], c() == c())\n// Captured functions and modules.\n#let m(p) = (x => p(x))\n#row(m(f()) == m(f()), m(g(1)) == m(g(2)), m(calc.abs) == m(calc.abs), m(calc.abs) == m(calc.max))\n// Element and native functions compare as before.\n#row(text == text, text == strong, calc.abs == calc.abs, text.with(red) == text.with(red))\n// State and show rules see equal functions as equal values.\n#let s = state(\"s\", f())\n#context row(s.get() == f(), s.final() == f())\n"
+  let expected = [
+    "(true, true, false, false, true, true)", "(false, false)", "(1, 3)", "(4, 2)",
+    "(true, false, true, true, true)", "(3, 1)", "(true, false, true, true)", "(true, false, false, false)",
+    "(true, false, true, true)", "(true, true)",
+  ]
+  assert_eq(oracle_metadata(source), expected)
+}
+
+///|
+test "oracle: closures: a repeated call gives an independent, equal result" {
+  let source = "#let row(..args) = metadata(repr(args.pos()))\n// Upstream memoizes closure calls: the second call returns the value of\n// the first. Values that are mutated afterwards are copies.\n#let mk() = (1, 2)\n#let a = mk()\n#a.push(3)\n#row(a, mk(), mk() == mk())\n#let d() = (a: (1,), b: (c: 2))\n#let x = d()\n#x.a.push(2)\n#x.b.c = 5\n#x.insert(\"e\", 1)\n#row(x, d())\n#let nest() = ((1,), (2,))\n#let y = nest()\n#y.at(0).push(9)\n#row(y, nest())\n// Arguments that the callee changes.\n#let grow(v) = { v.push(0); v }\n#let base = (1,)\n#row(grow(base), grow(base), base)\n#let put(v) = { v.k = 1; v }\n#let dict = (j: 0)\n#row(put(dict), put(dict), dict)\n// The same call from one place, with equal and with different arguments.\n#let sq(v) = v * v\n#let rp(v) = repr(v)\n#row(range(4).map(i => sq(calc.rem(i, 2))), (1, 1.0, 1).map(sq), (0.0, -0.0, 0, 0.0).map(rp), (1, 1.0, 100%, 1).map(rp))\n// Calls that return functions and content.\n#let adder(n) = (v => v + n)\n#row((adder(1))(1), (adder(1))(2), adder(1) == adder(1), (adder(2))(1))\n#let wrap(body) = [*#body*]\n#row(wrap[a] == wrap[a], wrap[a] == wrap[b], wrap[a].body)\n// Recursion and sinks.\n#let fib(n) = if n < 2 { n } else { fib(n - 1) + fib(n - 2) }\n#row(fib(20), fib(20))\n#let all(..args) = args\n#row(all(1, a: 2), all(1, a: 2) == all(1, a: 2), all(1, a: 2).pos(), all(..(1, 2), ..(b: 3)).named())\n// Counters and state read in context: every call sees its own location.\n#let c = counter(\"c\")\n#let show-c() = context row(c.get(), c.final())\n#show-c()\n#c.step()\n#show-c()\n#c.step()\n#show-c()\n#let st = state(\"st\", 0)\n#let bump() = st.update(v => v + 1)\n#let read() = context row(st.get(), st.final())\n#read() #bump() #read() #bump() #read()\n"
+  let expected = [
+    "((1, 2, 3), (1, 2), true)", "((a: (1, 2), b: (c: 2), e: 1), (a: (1,), b: (c: 2)))",
+    "(((1, 9), (2,)), ((1,), (2,)))", "((1, 0), (1, 0), (1,))", "((j: 0, k: 1), (j: 0, k: 1), (j: 0))",
+    "(\n  (0, 1, 0, 1),\n  (1, 1.0, 1),\n  (\"0.0\", \"-0.0\", \"0\", \"0.0\"),\n  (\"1\", \"1.0\", \"100%\", \"1\"),\n)",
+    "(2, 3, true, 3)", "(true, false, [a])", "(6765, 6765)", "(arguments(a: 2, 1), true, (1,), (b: 3))",
+    "((0,), (2,))", "((1,), (2,))", "((2,), (2,))", "(0, 2)", "(1, 2)", "(2, 2)",
+  ]
+  assert_eq(oracle_metadata(source), expected)
+}

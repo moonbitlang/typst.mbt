@@ -142,13 +142,13 @@ pub(all) enum FuncInner {
 /// show rule or `context` callback of the `doc` package (not upstream).
 ///
 /// Unlike a [NativeFuncData] it has no name, documentation or scope and it
-/// may capture arbitrary host data, which the engine cannot inspect. It
-/// therefore behaves like an anonymous [Closure]: it compares by identity
-/// (the same `HostFunc` object) and its repr is `(..) => ..`. Its
-/// fingerprint is the `key`, which the host must make unique per function
-/// within a compilation, and it marks the fingerprint as identity-bearing
-/// (`fingerprint_identity`), so the memoization rules for closures apply
-/// (see `memo.mbt`).
+/// may capture arbitrary host data, which the engine cannot inspect. Its
+/// repr is that of an anonymous [Closure], `(..) => ..`, but it compares by
+/// identity (the same `HostFunc` object), where closures compare by their
+/// hash. Its fingerprint is the `key`, which the host must make unique per
+/// function within a compilation, and it marks the fingerprint as
+/// identity-bearing (`fingerprint_identity`), so the memoization rules for
+/// such values apply (see `memo.mbt`).
 pub struct HostFunc {
   /// The implementation of the function.
   call : NativeFn
@@ -397,12 +397,15 @@ pub fn Func::repr(self : Func) -> String {
 }
 
 ///|
-/// Upstream `PartialEq for Func` (identity of the inner representation).
+/// Upstream `PartialEq for Func`: the derived equality of the inner
+/// representation. Native functions and host closures are the same object;
+/// closures are equal if their hashes are (upstream `Arc<LazyHash<Closure>>`,
+/// see [closures_equal]).
 pub impl Eq for Func with fn equal(self, other) {
   match (self.inner, other.inner) {
     (Native(a), Native(b)) => physical_equal(a, b)
     (Element(a), Element(b)) => a == b
-    (Closure(a), Closure(b)) => physical_equal(a, b)
+    (Closure(a), Closure(b)) => closures_equal(a, b)
     (Plugin(a), Plugin(b)) => a == b
     (With(f1, a1), With(f2, a2)) => f1 == f2 && a1 == a2
     (Host(a), Host(b)) => physical_equal(a, b)

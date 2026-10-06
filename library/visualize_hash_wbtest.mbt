@@ -331,8 +331,8 @@ test "fingerprints of modules and closures cover scopes and syntax trees" {
   distinct(Module(a))
   distinct(Module(b))
   distinct(Module(a.with_name("a")))
-  // Modules compare by identity: their fingerprint is flagged like a
-  // closure's, also from the cache.
+  // Modules compare by identity: their fingerprint is flagged, also from
+  // the cache.
   let other = Module::anonymous(scope(Int(1), detached))
   assert_false(a == other)
   assert_eq(hash128(Value::Module(a)), hash128(Value::Module(other)))
@@ -429,12 +429,19 @@ test "fingerprints of modules and closures cover scopes and syntax trees" {
     hash128(closure(nested, Scope::new())) ==
     hash128(closure(flat, Scope::new())),
   )
-  // The same tree with the same captures is the same hash (closures still
-  // compare by identity).
-  assert_eq(
-    hash128(closure(@syntax.parse_code("x"), scope(Int(1), detached))),
-    hash128(closure(node, scope(Int(1), detached))),
-  )
+  // The same tree with the same captures is the same hash, and closures
+  // with the same hash are equal (upstream `Arc<LazyHash<Closure>>`).
+  let one = closure(@syntax.parse_code("x"), scope(Int(1), detached))
+  let other = closure(node, scope(Int(1), detached))
+  assert_eq(hash128(one), hash128(other))
+  assert_true(one == other)
+  assert_true(one == one)
+  assert_false(one == closure(node, scope(Int(2), detached)))
+  assert_false(one == closure(node, scope(Float(1.0), detached)))
+  assert_false(one == closure(nested, scope(Int(1), detached)))
+  // A closure's fingerprint carries no flags of its own, only those of what
+  // it captured.
+  assert_eq(fingerprint_and_flags(one).1, 0)
 }
 
 ///|

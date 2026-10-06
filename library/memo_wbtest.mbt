@@ -46,15 +46,24 @@ test "memo: fingerprint flags are detected and inputs compared exactly" {
   assert_true(
     fingerprint_lossy_in(() => SipHasher128::new().write([Some(LossyValue(1))])),
   )
-  // Flags are kept through cached data hashes and nesting (a closure
-  // compares by identity).
-  let closure = Content::from_fields(elem, [
-    Some(test_closure(@syntax.parse_code("x"), Int(1))),
-  ])
   let has_identity = (content : Content) => {
     let flags = fingerprint_flags_in(() => SipHasher128::new().write(content))
     (flags & fingerprint_identity) != 0
   }
+  // Flags are kept through cached data hashes and nesting (a host closure
+  // compares by identity), also when a closure captured the value.
+  let call : NativeFn = (_, _, _) => None
+  let host = Value::Func(Func::host(HostFunc::new(hash128("memo"), call)))
+  let closure = Content::from_fields(elem, [
+    Some(test_closure(@syntax.parse_code("x"), host)),
+  ])
+  assert_false(
+    has_identity(
+      Content::from_fields(elem, [
+        Some(test_closure(@syntax.parse_code("x"), Int(1))),
+      ]),
+    ),
+  )
   assert_false(has_identity(plain))
   for _ in 0..<2 {
     assert_true(has_identity(closure))

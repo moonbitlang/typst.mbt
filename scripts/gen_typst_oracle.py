@@ -30,6 +30,14 @@ document title of the HTML export (the plain text of the title's content).
   differ in their bits (negative zeros, NaNs) do not.
 - `floats`: NaN values have the bits of Rust's `f64::NAN`, negated where
   upstream negates (`float("-nan")`, TOML's `-nan`).
+- `closures`: functions compare by their inner representation, and a
+  closure is an `Arc<LazyHash<Closure>>`: two closures are equal if their
+  hashes are (syntax node, defaults, captured bindings), so one closure
+  expression evaluated twice in the same environment gives equal functions.
+  Upstream memoizes closure calls (`eval_closure`) on the hashes of the
+  function and of the arguments: the second group pins that a repeated call
+  is indistinguishable from an evaluation (results are values, arguments
+  hash by their bits and types, calls in context see their location).
 - `fields`: a field that upstream marks `#[external]` (the `body` of `text`
   and `page`, which is also `#[required]`) is documentation only: the
   element has no such field for `has`, `at` and field access.
@@ -525,6 +533,91 @@ y
 #metadata(repr((h.has("body"), h.has("level"), h.has("numbering"), h.fields().keys())))
 #metadata(repr((r.has("text"), r.has("lang"), r.has("lines"), r.fields().keys())))
 #metadata(repr((text(red)[a].func(), text(red)[a].has("body"), text(red)[a].has("child"))))
+""",
+    ),
+    (
+        "closures: functions are equal if their hashes are",
+        "metadata",
+        r"""#let row(..args) = metadata(repr(args.pos()))
+#let f() = (x => x)
+#let g(a) = (x => x + a)
+#let h = f()
+// One closure expression evaluated twice with the same captured values.
+#row(f() == f(), g(1) == g(1), g(1) == g(2), g(1) == g(1.0), h == h, h == f())
+// Two expressions with the same text are two syntax nodes.
+#row((x => x) == (x => x), f() == (x => x))
+#row(range(3).map(i => (x => x)).dedup().len(), range(3).map(i => (x => x + i)).dedup().len())
+#row(range(4).map(i => (x => x + calc.rem(i, 2))).dedup().len(), range(4).map(i => { let j = calc.rem(i, 2); x => x + j }).dedup().len())
+// Through values that hold functions.
+#row(f().with(1) == f().with(1), f().with(1) == f().with(2), (f(),) == (f(),), (a: f()) == (a: f()), f() in (f(),))
+#row((f(), g(1), f(), g(1), g(2)).dedup().len(), (f(), g(1)).position(x => x == g(1)))
+// Named closures, defaults and context expressions.
+#let k(a) = { let n(x, y: a) = x; n }
+#let c() = context 1
+#row(k(1) == k(1), k(1) == k(2), [#context 1] == [#context 1], c() == c())
+// Captured functions and modules.
+#let m(p) = (x => p(x))
+#row(m(f()) == m(f()), m(g(1)) == m(g(2)), m(calc.abs) == m(calc.abs), m(calc.abs) == m(calc.max))
+// Element and native functions compare as before.
+#row(text == text, text == strong, calc.abs == calc.abs, text.with(red) == text.with(red))
+// State and show rules see equal functions as equal values.
+#let s = state("s", f())
+#context row(s.get() == f(), s.final() == f())
+""",
+    ),
+    (
+        "closures: a repeated call gives an independent, equal result",
+        "metadata",
+        r"""#let row(..args) = metadata(repr(args.pos()))
+// Upstream memoizes closure calls: the second call returns the value of
+// the first. Values that are mutated afterwards are copies.
+#let mk() = (1, 2)
+#let a = mk()
+#a.push(3)
+#row(a, mk(), mk() == mk())
+#let d() = (a: (1,), b: (c: 2))
+#let x = d()
+#x.a.push(2)
+#x.b.c = 5
+#x.insert("e", 1)
+#row(x, d())
+#let nest() = ((1,), (2,))
+#let y = nest()
+#y.at(0).push(9)
+#row(y, nest())
+// Arguments that the callee changes.
+#let grow(v) = { v.push(0); v }
+#let base = (1,)
+#row(grow(base), grow(base), base)
+#let put(v) = { v.k = 1; v }
+#let dict = (j: 0)
+#row(put(dict), put(dict), dict)
+// The same call from one place, with equal and with different arguments.
+#let sq(v) = v * v
+#let rp(v) = repr(v)
+#row(range(4).map(i => sq(calc.rem(i, 2))), (1, 1.0, 1).map(sq), (0.0, -0.0, 0, 0.0).map(rp), (1, 1.0, 100%, 1).map(rp))
+// Calls that return functions and content.
+#let adder(n) = (v => v + n)
+#row((adder(1))(1), (adder(1))(2), adder(1) == adder(1), (adder(2))(1))
+#let wrap(body) = [*#body*]
+#row(wrap[a] == wrap[a], wrap[a] == wrap[b], wrap[a].body)
+// Recursion and sinks.
+#let fib(n) = if n < 2 { n } else { fib(n - 1) + fib(n - 2) }
+#row(fib(20), fib(20))
+#let all(..args) = args
+#row(all(1, a: 2), all(1, a: 2) == all(1, a: 2), all(1, a: 2).pos(), all(..(1, 2), ..(b: 3)).named())
+// Counters and state read in context: every call sees its own location.
+#let c = counter("c")
+#let show-c() = context row(c.get(), c.final())
+#show-c()
+#c.step()
+#show-c()
+#c.step()
+#show-c()
+#let st = state("st", 0)
+#let bump() = st.update(v => v + 1)
+#let read() = context row(st.get(), st.final())
+#read() #bump() #read() #bump() #read()
 """,
     ),
 ]

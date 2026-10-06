@@ -514,6 +514,51 @@ pub impl Fingerprint for Category with fn fingerprint(self, state) {
 pub extend Category with Fingerprint::{fingerprint}
 
 ///|
+/// Upstream `Arc<LazyHash<Closure>>`: the derived `Hash for Closure`
+/// (syntax node, defaults, captured scope with its bindings, number of
+/// positional parameters), computed once per closure and written as its
+/// 128-bit hash.
+fn Closure::fingerprint_lazy(self : Closure, state : SipHasher128) -> Unit {
+  if !self.hash.write_cached(state) {
+    self.hash.write(state, state => {
+      match self.node {
+        Closure(node) => {
+          state.write_discriminant(0)
+          node.hash_into(state)
+        }
+        Context(node) => {
+          state.write_discriminant(1)
+          node.hash_into(state)
+        }
+      }
+      state.write(self.defaults)
+      state.write(self.captured)
+      state.write_usize(self.num_pos_params)
+    })
+  }
+}
+
+///|
+/// Upstream `PartialEq for LazyHash<Closure>` behind an `Arc`: the same
+/// closure object, or closures with the same hash (the same syntax node,
+/// defaults and captured bindings: evaluating one closure expression twice
+/// in the same environment gives equal functions).
+fn closures_equal(a : Closure, b : Closure) -> Bool {
+  if physical_equal(a, b) {
+    return true
+  }
+  // The flags of the closures' data are not those of a fingerprint that may
+  // be running around this comparison.
+  let outer = fingerprint_flags.val
+  let x = SipHasher128::new()
+  a.fingerprint_lazy(x)
+  let y = SipHasher128::new()
+  b.fingerprint_lazy(y)
+  fingerprint_flags.val = outer
+  x.finish128() == y.finish128()
+}
+
+///|
 pub impl Fingerprint for Func with fn fingerprint(self, state) {
   match self.inner {
     Native(data) => {
@@ -527,29 +572,8 @@ pub impl Fingerprint for Func with fn fingerprint(self, state) {
       state.write(elem)
     }
     Closure(closure) => {
-      // Closures compare by identity.
-      fingerprint_flags.val = fingerprint_flags.val | fingerprint_identity
       state.write_discriminant(2)
-      // Upstream `Arc<LazyHash<Closure>>`: the derived `Hash for Closure`
-      // (syntax node, defaults, captured scope with its bindings, number
-      // of positional parameters), computed once per closure.
-      if !closure.hash.write_cached(state) {
-        closure.hash.write(state, state => {
-          match closure.node {
-            Closure(node) => {
-              state.write_discriminant(0)
-              node.hash_into(state)
-            }
-            Context(node) => {
-              state.write_discriminant(1)
-              node.hash_into(state)
-            }
-          }
-          state.write(closure.defaults)
-          state.write(closure.captured)
-          state.write_usize(closure.num_pos_params)
-        })
-      }
+      closure.fingerprint_lazy(state)
     }
     Plugin(func) => {
       state.write_discriminant(3)
