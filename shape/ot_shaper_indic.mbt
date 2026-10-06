@@ -5,7 +5,6 @@
 
 ///|
 let indic_shaper : OtShaper = {
-  name: "indic",
   collect_features: Some(collect_features_indic),
   override_features: Some(override_features_indic),
   create_data: Some(plan => Indic(IndicShapePlan::new(plan))),
@@ -58,6 +57,8 @@ const OT_SM : Int = 8
 const OT_A : Int = 9
 
 ///|
+// ot_shaper_indic.rs:53; unused upstream too.
+#warnings("-unused_value")
 const OT_VD : Int = OT_A
 
 ///|
@@ -193,6 +194,8 @@ const POS_BELOW_C : Int = 8
 const POS_AFTER_SUB : Int = 9
 
 ///|
+// ot_shaper_indic.rs:110; only the value of `RephPosition::BeforePost` upstream, :253.
+#warnings("-unused_value")
 const POS_BEFORE_POST : Int = 10
 
 ///|
@@ -239,15 +242,21 @@ let indic_features : ReadOnlyArray[(@otf.Tag, Int)] = [
 // `indic_feature`: must be in the same order as the INDIC_FEATURES array.
 
 ///|
+// ot_shaper_indic.rs:201; unused upstream too.
+#warnings("-unused_value")
 const INDIC_NUKT : Int = 0
 
 ///|
+// ot_shaper_indic.rs:202; unused upstream too.
+#warnings("-unused_value")
 const INDIC_AKHN : Int = 1
 
 ///|
 const INDIC_RPHF : Int = 2
 
 ///|
+// ot_shaper_indic.rs:204; unused upstream too.
+#warnings("-unused_value")
 const INDIC_RKRF : Int = 3
 
 ///|
@@ -266,27 +275,41 @@ const INDIC_HALF : Int = 7
 const INDIC_PSTF : Int = 8
 
 ///|
+// ot_shaper_indic.rs:210; unused upstream too.
+#warnings("-unused_value")
 const INDIC_VATU : Int = 9
 
 ///|
+// ot_shaper_indic.rs:211; unused upstream too.
+#warnings("-unused_value")
 const INDIC_CJCT : Int = 10
 
 ///|
 const INDIC_INIT : Int = 11
 
 ///|
+// ot_shaper_indic.rs:213; unused upstream too.
+#warnings("-unused_value")
 const INDIC_PRES : Int = 12
 
 ///|
+// ot_shaper_indic.rs:214; unused upstream too.
+#warnings("-unused_value")
 const INDIC_ABVS : Int = 13
 
 ///|
+// ot_shaper_indic.rs:215; unused upstream too.
+#warnings("-unused_value")
 const INDIC_BLWS : Int = 14
 
 ///|
+// ot_shaper_indic.rs:216; unused upstream too.
+#warnings("-unused_value")
 const INDIC_PSTS : Int = 15
 
 ///|
+// ot_shaper_indic.rs:217; unused upstream too.
+#warnings("-unused_value")
 const INDIC_HALN : Int = 16
 
 ///|

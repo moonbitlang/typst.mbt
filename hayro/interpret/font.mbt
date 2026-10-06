@@ -314,6 +314,9 @@ fn Font::is_horizontal(self : Font) -> Bool {
 }
 
 ///|
+// Upstream has this impl (hayro-interpret/src/font/mod.rs:400) and never
+// calls it either.
+#warnings("-unused_value")
 impl CacheKey for Font with fn cache_key(self) {
   self.cache_key
 }

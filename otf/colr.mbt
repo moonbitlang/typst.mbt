@@ -1534,6 +1534,8 @@ fn RecursionStack::new() -> RecursionStack {
 }
 
 ///|
+// Only used by a `debug_assert!` upstream (tables/colr.rs:1868).
+#warnings("-unused_value")
 fn RecursionStack::is_empty(self : RecursionStack) -> Bool {
   self.len == 0
 }
@@ -1571,11 +1573,6 @@ fn RecursionStack::pop(self : RecursionStack) -> Unit {
 struct ColrVariationData {
   variation_store : ItemVariationStore?
   delta_map : DeltaSetIndexMap?
-}
-
-///|
-impl Default for ColrVariationData with fn default() {
-  { variation_store: None, delta_map: None, }
 }
 
 ///|

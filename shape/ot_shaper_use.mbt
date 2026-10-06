@@ -2,7 +2,6 @@
 
 ///|
 let universal_shaper : OtShaper = {
-  name: "universal",
   collect_features: Some(collect_features_use),
   override_features: None,
   create_data: Some(plan => Use(UniversalShapePlan::new(plan))),
@@ -32,10 +31,14 @@ const USE_B : Int = 1
 
 ///|
 /// BASE_NUM
+// ot_shaper_use.rs:40; named only by the generated table upstream.
+#warnings("-unused_value")
 const USE_N : Int = 4
 
 ///|
 /// BASE_OTHER
+// ot_shaper_use.rs:41; named only by the generated table upstream.
+#warnings("-unused_value")
 const USE_GB : Int = 5
 
 ///|
@@ -49,6 +52,8 @@ const USE_CGJ : Int = 6
 
 ///|
 /// CONS_SUB
+// ot_shaper_use.rs:50; named only by the generated table upstream.
+#warnings("-unused_value")
 const USE_SUB : Int = 11
 
 ///|
@@ -57,6 +62,8 @@ const USE_H : Int = 12
 
 ///|
 /// HALANT_NUM
+// ot_shaper_use.rs:53; named only by the generated table upstream.
+#warnings("-unused_value")
 const USE_HN : Int = 13
 
 ///|
@@ -67,10 +74,14 @@ const USE_ZWNJ : Int = 14
 
 ///|
 /// Word joiner
+// ot_shaper_use.rs:57; named only by the generated table upstream.
+#warnings("-unused_value")
 const USE_WJ : Int = 16
 
 ///|
 /// Reserved characters
+// ot_shaper_use.rs:59; unused upstream too.
+#warnings("-unused_value")
 const USE_RSV : Int = 17
 
 ///|
@@ -79,6 +90,8 @@ const USE_R : Int = 18
 
 ///|
 /// SYM
+// ot_shaper_use.rs:61; unused upstream too.
+#warnings("-unused_value")
 const USE_S : Int = 19
 
 // pub const SM: u8      = 20;   // SYM_MOD
@@ -88,6 +101,8 @@ const USE_S : Int = 19
 
 ///|
 /// CONS_WITH_STACKER
+// ot_shaper_use.rs:68; named only by the generated table upstream.
+#warnings("-unused_value")
 const USE_CS : Int = 43
 
 ///|
@@ -98,6 +113,8 @@ const USE_IS : Int = 44
 
 ///|
 /// SAKOT
+// ot_shaper_use.rs:73; named only by the generated table upstream.
+#warnings("-unused_value")
 const USE_Sk : Int = 48
 
 ///|
@@ -130,10 +147,14 @@ const USE_MPre : Int = 30
 
 ///|
 /// CONS_MOD_ABOVE
+// ot_shaper_use.rs:82; named only by the generated table upstream.
+#warnings("-unused_value")
 const USE_CMAbv : Int = 31
 
 ///|
 /// CONS_MOD_BELOW
+// ot_shaper_use.rs:83; named only by the generated table upstream.
+#warnings("-unused_value")
 const USE_CMBlw : Int = 32
 
 ///|
@@ -170,10 +191,14 @@ const USE_VMPre : Int = 23
 
 ///|
 /// SYM_MOD_ABOVE
+// ot_shaper_use.rs:92; named only by the generated table upstream.
+#warnings("-unused_value")
 const USE_SMAbv : Int = 41
 
 ///|
 /// SYM_MOD_BELOW
+// ot_shaper_use.rs:93; named only by the Ragel grammar upstream.
+#warnings("-unused_value")
 const USE_SMBlw : Int = 42
 
 ///|
@@ -190,18 +215,26 @@ const USE_FMPst : Int = 47
 
 ///|
 /// HIEROGLYPH
+// ot_shaper_use.rs:97; named only by the generated table upstream.
+#warnings("-unused_value")
 const USE_G : Int = 49
 
 ///|
 /// HIEROGLYPH_JOINER
+// ot_shaper_use.rs:98; named only by the generated table upstream.
+#warnings("-unused_value")
 const USE_J : Int = 50
 
 ///|
 /// HIEROGLYPH_SEGMENT_BEGIN
+// ot_shaper_use.rs:99; named only by the generated table upstream.
+#warnings("-unused_value")
 const USE_SB : Int = 51
 
 ///|
 /// HIEROGLYPH_SEGMENT_END
+// ot_shaper_use.rs:100; named only by the generated table upstream.
+#warnings("-unused_value")
 const USE_SE : Int = 52
 
 ///|
@@ -210,10 +243,14 @@ const USE_HVM : Int = 53
 
 ///|
 /// HIEROGLYPH_MOD
+// ot_shaper_use.rs:102; named only by the generated table upstream.
+#warnings("-unused_value")
 const USE_HM : Int = 54
 
 ///|
 /// HIEROGLYPH_MIRROR
+// ot_shaper_use.rs:103; named only by the generated table upstream.
+#warnings("-unused_value")
 const USE_HR : Int = 55
 
 ///|

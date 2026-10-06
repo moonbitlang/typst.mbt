@@ -367,7 +367,6 @@ fn setup_masks_hangul(plan : ShapePlan, _face : Face, buffer : Buffer) -> Unit {
 
 ///|
 let hangul_shaper : OtShaper = {
-  name: "hangul",
   collect_features: Some(collect_features_hangul),
   override_features: Some(override_features_hangul),
   create_data: Some(plan => Hangul(data_create_hangul(plan.ot_map))),

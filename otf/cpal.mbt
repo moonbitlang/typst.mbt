@@ -67,7 +67,7 @@ priv struct BgraColor {
   green : Byte
   red : Byte
   alpha : Byte
-} derive(Eq, Debug)
+}
 
 ///|
 fn BgraColor::to_rgba(self : BgraColor) -> RgbaColor {

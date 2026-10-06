@@ -301,6 +301,9 @@ fn SubType::deep_copy(self : SubType) -> SubType {
 ///|
 /// Helper for interning a sub type as a rec group; see
 /// [`Self::intern_canonical_rec_group`].
+// Only called under the `component-model` feature upstream
+// (validator/types.rs:957, validator/component.rs).
+#warnings("-unused_value")
 fn TypeList::intern_sub_type(
   self : TypeList,
   sub_ty : SubType,

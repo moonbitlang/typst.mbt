@@ -227,12 +227,6 @@ fn FuncTranslator::push_results(
 }
 
 ///|
-/// Returns the [`Engine`] for which the function is compiled.
-fn FuncTranslator::engine(self : FuncTranslator) -> EngineWeak {
-  self.engine
-}
-
-///|
 /// Moves the top-most `len` operands to temporary stack slots.
 ///
 /// # Note

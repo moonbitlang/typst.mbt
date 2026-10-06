@@ -238,7 +238,7 @@ pub fn OperatorValidatorAllocations::default() -> OperatorValidatorAllocations {
 /// - `Bottom`: -1
 /// - `UnknownRef(None)`: -2, `UnknownRef(Some(t))`: -3 - index of `t`
 /// - `Known(ty)`: `ty` encoded by `encode_val_type` (non-negative)
-priv struct MaybeType(Int) derive(Eq)
+priv struct MaybeType(Int)
 
 ///|
 /// The unpacked form of a [`MaybeType`].
@@ -626,6 +626,10 @@ fn OperatorValidatorTemp::push_maybe_operand(
 }
 
 ///|
+// Only called by the GC/stack-switching operators (validator/operators.rs:619
+// has the definition), which are stubs in validator_operators_todo_gen.mbt:
+// wasmi never enables those proposals.
+#warnings("-unused_value")
 fn OperatorValidatorTemp::push_concrete_ref(
   self : OperatorValidatorTemp,
   nullable : Bool,
@@ -643,6 +647,10 @@ fn OperatorValidatorTemp::push_concrete_ref(
 }
 
 ///|
+// Only called by the GC/stack-switching operators (validator/operators.rs:633
+// has the definition), which are stubs in validator_operators_todo_gen.mbt:
+// wasmi never enables those proposals.
+#warnings("-unused_value")
 fn OperatorValidatorTemp::pop_concrete_ref(
   self : OperatorValidatorTemp,
   nullable : Bool,
@@ -1432,6 +1440,10 @@ fn OperatorValidatorTemp::struct_field_at(
 }
 
 ///|
+// Only called by the GC/stack-switching operators (validator/operators.rs:1441
+// has the definition), which are stubs in validator_operators_todo_gen.mbt:
+// wasmi never enables those proposals.
+#warnings("-unused_value")
 fn OperatorValidatorTemp::mutable_struct_field_at(
   self : OperatorValidatorTemp,
   struct_type_index : UInt,
@@ -1461,6 +1473,10 @@ fn OperatorValidatorTemp::array_type_at(
 }
 
 ///|
+// Only called by the GC/stack-switching operators (validator/operators.rs:1474
+// has the definition), which are stubs in validator_operators_todo_gen.mbt:
+// wasmi never enables those proposals.
+#warnings("-unused_value")
 fn OperatorValidatorTemp::mutable_array_type_at(
   self : OperatorValidatorTemp,
   at : UInt,

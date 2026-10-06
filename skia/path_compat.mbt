@@ -69,12 +69,6 @@ fn ts_find_cubic_max_curvature(
 }
 
 ///|
-/// `f32x2::splat` as a point.
-fn pt_splat(v : Float) -> @path.Point {
-  @path.Point::from_xy(v, v)
-}
-
-///|
 /// `Point::normalize` (the point becomes zero if it cannot be normalized).
 fn pt_normalize(p : @path.Point) -> @path.Point {
   p.normalize().0

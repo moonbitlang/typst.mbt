@@ -124,11 +124,6 @@ fn is_finite_f32(n : Float) -> Bool {
 }
 
 ///|
-fn is_finite_f64(n : Double) -> Bool {
-  !n.is_nan() && !n.is_inf()
-}
-
-///|
 /// `float_cmp::ApproxEqUlps` for `f32`.
 fn approx_eq_ulps(a : Float, b : Float, ulps : Int) -> Bool {
   // -0 and +0 are drastically far in ulps terms, so
@@ -148,19 +143,6 @@ fn approx_eq_ulps(a : Float, b : Float, ulps : Int) -> Bool {
 ///|
 fn approx_ne_ulps(a : Float, b : Float, ulps : Int) -> Bool {
   !approx_eq_ulps(a, b, ulps)
-}
-
-///|
-/// `float_cmp::ApproxEqUlps` for `f64`.
-fn approx_eq_ulps_f64(a : Double, b : Double, ulps : Int64) -> Bool {
-  if a == b {
-    return true
-  }
-  if is_sign_positive_f64(a) != is_sign_positive_f64(b) {
-    return false
-  }
-  let diff = a.reinterpret_as_int64() - b.reinterpret_as_int64()
-  diff >= -ulps && diff <= ulps
 }
 
 ///|
@@ -248,13 +230,6 @@ fn powi_f32(a : Float, b : Int) -> Float {
 /// Rust's `f32::to_degrees`.
 fn to_degrees_f32(x : Float) -> Float {
   x * Float::reinterpret_from_uint(0x42652EE1U)
-}
-
-///|
-/// Rust's `f32::to_radians`.
-fn to_radians_f32(x : Float) -> Float {
-  // `consts::PI / 180.0` in `f32`.
-  x * Float::reinterpret_from_uint(0x3C8EFA35U)
 }
 
 ///|

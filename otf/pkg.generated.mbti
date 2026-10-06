@@ -237,8 +237,6 @@ type Cff2Table
 pub fn Cff2Table::outline(Self, ArrayView[NormalizedCoordinate], GlyphId, &OutlineBuilder) -> Result[Rect, CFFError]
 pub fn Cff2Table::parse(BytesView) -> Self?
 
-type CffIndex
-
 type CffTable
 pub fn CffTable::glyph_cid(Self, GlyphId) -> UInt16?
 pub fn CffTable::glyph_index(Self, Byte) -> GlyphId?

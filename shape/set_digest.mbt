@@ -16,11 +16,6 @@ fn SetDigest::new() -> SetDigest {
 }
 
 ///|
-fn SetDigest::copy(self : SetDigest) -> SetDigest {
-  { m4: self.m4, m0: self.m0, m9: self.m9, }
-}
-
-///|
 fn digest_mask_for(g : Int, shift : Int) -> UInt64 {
   1UL << ((g.to_uint64() >> shift) & 63).to_int()
 }

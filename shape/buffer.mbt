@@ -130,6 +130,8 @@ const GLYPH_PROPS_LIGATURE : Int = 0x04
 const GLYPH_PROPS_MARK : Int = 0x08
 
 ///|
+// buffer.rs:1537; unused upstream too.
+#warnings("-unused_value")
 const GLYPH_PROPS_CLASS_MASK : Int = 0x0E
 
 ///|

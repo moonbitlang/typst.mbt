@@ -1336,7 +1336,7 @@ priv enum CollapseVerdict {
   First
   /// Only the year suffix should be printed.
   CollapseYearSuffix
-} derive(Eq)
+}
 
 ///|
 /// The result of [`BibliographyDriver::finish`].

@@ -115,6 +115,11 @@ fn AuthorMode::possible(self : AuthorMode) -> Array[String] {
 }
 
 ///|
+// Like upstream (mechanics.rs:179): `None` is only reached through
+// wildcards, `PagesRequired` is never built (`#[allow(dead_code)]`,
+// mechanics.rs:192) and `BothForbidden` is only read by the unported
+// `Entry::verify` (lib.rs:453).
+#warnings("-unused_constructor")
 priv enum PagesChapterMode {
   None_
   OneRequired

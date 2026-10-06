@@ -91,7 +91,7 @@ fn conservative_round_to_int(src : @path.Rect) -> @path.IntRect? {
 /// NOTE: cubics appear to be the main reason for needing this slop. If we
 /// could (perhaps) have a more accurate walker for cubics, we may be able to
 /// reduce this fudge factor.
-let conservative_round_bias : Double = 0.5 + 1.5 / 64.0
+let conservative_round_bias : Double = 0.5 + 1.5 / fdot6_one.to_double()
 
 ///|
 /// Round the value down. This is used to round the top and left of a

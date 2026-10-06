@@ -66,13 +66,17 @@ pub fn ImageHrefResolver::default_string_resolver() -> (String, Options) -> Imag
 }
 
 ///|
+// `SVG` is only built by `get_image_file_format` for the default string
+// resolver (usvg 0.47.0 parser/image.rs:306), which is a stub here: Typst
+// always sets its own resolver.
+#warnings("-unused_constructor")
 priv enum ImageFormat {
   ImgPNG
   ImgJPEG
   ImgGIF
   ImgWEBP
   ImgSVG
-} derive(Eq)
+}
 
 ///|
 fn image_convert(

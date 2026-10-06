@@ -13,6 +13,10 @@ let wasm_module_version : UInt = 0x1
 // * [2023-02-06] 0xc - `export` has an optional type ascribed to it
 // * [2023-05-10] 0xd - imports/exports drop URLs, new discriminator byte which
 //                      allows for `(import (interface "...") ...)` syntax.
+// `Parser::is_component` spells the header out (upstream builds it from
+// this constant, parser.rs:407); the validator's use needs the
+// `component-model` feature (validator.rs:684).
+#warnings("-unused_value")
 let wasm_component_version : UInt = 0xd
 
 ///|

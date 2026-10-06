@@ -80,15 +80,6 @@ pub impl Show for ImportName with fn output(self, f) {
   f.write_string(self.field)
 }
 
-///|
-/// An external item type index of an import.
-priv enum ExternTypeIdx {
-  Func(FuncTypeIdx)
-  Table(@wasmi_core.TableType)
-  Memory(@wasmi_core.MemoryType)
-  Global(@wasmi_core.GlobalType)
-}
-
 // ---------------------------------------------------------------------------
 // utils.rs
 
@@ -759,6 +750,10 @@ fn ModuleHeaderBuilder::finish(self : ModuleHeaderBuilder) -> ModuleHeader {
 
 ///|
 /// A parsed and validated WebAssembly module.
+// `custom_sections` is only read by upstream's `Module::custom_sections()`
+// accessor (wasmi 1.0.9 module/mod.rs:451), which is not ported: Typst's
+// plugins do not read custom sections.
+#warnings("-unused_field")
 pub struct Module {
   priv engine : Engine
   priv header : ModuleHeader

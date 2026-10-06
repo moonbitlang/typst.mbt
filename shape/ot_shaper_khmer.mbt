@@ -2,7 +2,6 @@
 
 ///|
 let khmer_shaper : OtShaper = {
-  name: "khmer",
   collect_features: Some(collect_features_khmer),
   override_features: Some(override_features_khmer),
   create_data: Some(plan => Khmer(KhmerShapePlan::new(plan))),

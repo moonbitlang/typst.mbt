@@ -19,6 +19,9 @@
 // here use the current tail length.
 
 ///|
+// `MoveSourceToDestination` is never pushed upstream either (tiny-skia
+// 0.12.0 src/pipeline/mod.rs:71); it has its entry in both stage tables.
+#warnings("-unused_constructor")
 enum Stage {
   MoveSourceToDestination
   MoveDestinationToSource

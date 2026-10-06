@@ -260,15 +260,6 @@ pub fn Entry::parents(self : Entry) -> Result[Array[String], TypeError] {
 }
 
 ///|
-/// Get an entry but return None for empty chunk slices.
-fn Entry::get_non_empty(self : Entry, key : String) -> Chunks? {
-  match self.get(key) {
-    Some(entry) if !entry.is_empty() => Some(entry)
-    _ => None
-  }
-}
-
-///|
 /// Resolves all data dependencies defined by `crossref` and `xdata` fields.
 fn Entry::resolve_crossrefs(
   self : Entry,

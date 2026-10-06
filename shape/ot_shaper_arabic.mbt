@@ -35,19 +35,27 @@ fn is_word_category(gc : Int) -> Bool {
 const JOINING_TYPE_U : Int = 0
 
 ///|
+// ot_shaper_arabic.rs:42; named only by the generated table upstream.
+#warnings("-unused_value")
 const JOINING_TYPE_L : Int = 1
 
 ///|
 const JOINING_TYPE_R : Int = 2
 
 ///|
+// ot_shaper_arabic.rs:44; named only by the generated table upstream.
+#warnings("-unused_value")
 const JOINING_TYPE_D : Int = 3
 
 ///|
 // We don't have C, like harfbuzz, because Rust doesn't allow duplicated enum variants.
+// ot_shaper_arabic.rs:46; named only by the generated table upstream.
+#warnings("-unused_value")
 const JOINING_TYPE_GROUP_ALAPH : Int = 4
 
 ///|
+// ot_shaper_arabic.rs:47; named only by the generated table upstream.
+#warnings("-unused_value")
 const JOINING_TYPE_GROUP_DALATH_RISH : Int = 5
 
 ///|
@@ -700,7 +708,6 @@ fn reorder_marks_arabic(
 
 ///|
 let arabic_shaper : OtShaper = {
-  name: "arabic",
   collect_features: Some(collect_features_arabic),
   override_features: None,
   create_data: Some(plan => Arabic(data_create_arabic(plan))),

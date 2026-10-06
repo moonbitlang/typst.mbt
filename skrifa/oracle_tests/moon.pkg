@@ -3,7 +3,6 @@ import {
   "moonbitlang/typst/read_fonts",
   "moonbitlang/typst/read_fonts/ps",
   "moonbitlang/typst/skrifa",
-  "moonbitlang/core/buffer",
 }
 
 import {

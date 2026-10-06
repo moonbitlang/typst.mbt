@@ -406,16 +406,6 @@ fn debug_platform(p : @read_fonts.PlatformId) -> String {
 }
 
 ///|
-/// Runs `f`, returning `None` on error (Rust `.ok()`).
-fn[T] ok(f : () -> T raise) -> T? {
-  try f() catch {
-    _ => None
-  } noraise {
-    v => Some(v)
-  }
-}
-
-///|
 /// Runs `f`, capturing the result.
 fn[T] res(
   f : () -> T raise @read_fonts.ReadError,

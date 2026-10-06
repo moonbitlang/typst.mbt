@@ -5,6 +5,10 @@
 ///
 /// Use a [`SyntaxSetBuilder`] to load syntax definitions and build a syntax
 /// set.
+// `path_syntaxes` is only read by `find_syntax_by_path`, `into_builder` and
+// `Clone` (syntect 5.3.0 parsing/syntax_set.rs:233, :313, :111), none of
+// which is ported; it is always empty here.
+#warnings("-unused_field")
 pub struct SyntaxSet {
   priv syntaxes : Array[SyntaxReference]
   /// Stores the syntax index for every path that was loaded

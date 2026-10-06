@@ -416,7 +416,7 @@ priv enum RoundMode {
   Off
   Super
   Super45
-} derive(Eq)
+}
 
 ///|
 /// Graphics state that controls rounding.
@@ -523,6 +523,9 @@ fn RoundState::round(self : RoundState, distance : Int) -> Int {
 
 ///|
 /// The persistent graphics state.
+// `scan_control` and `scan_type` are written by SCANCTRL/SCANTYPE and read
+// by nothing but tests upstream (skrifa 0.42.1 hint/graphics.rs:240, :242).
+#warnings("-unused_field")
 priv struct RetainedGraphicsState {
   mut auto_flip : Bool
   mut control_value_cutin : Int

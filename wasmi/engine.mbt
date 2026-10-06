@@ -592,6 +592,10 @@ pub fn CompiledFuncEntity::consts(
 
 ///|
 /// Datastructure to efficiently store information about compiled functions.
+// Upstream hands `features` to the lazy compilation (engine/code_map.rs:374);
+// the driver here reads the same value from the config
+// (engine_translator_driver.mbt, `validate_func_body`).
+#warnings("-unused_field")
 priv struct CodeMap {
   funcs : Array[CodeMapEntity]
   features : @wasmparser.WasmFeatures

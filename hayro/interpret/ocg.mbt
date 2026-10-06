@@ -148,7 +148,7 @@ priv enum OcmdPolicy {
   AnyOn
   AnyOff
   AllOff
-} derive(Eq)
+}
 
 ///|
 fn OcmdPolicy::from_name(name : String) -> OcmdPolicy? {

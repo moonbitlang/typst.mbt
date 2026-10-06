@@ -2,36 +2,6 @@
 // (`impl Display for f32/f64`), which usvg cannot import.
 
 ///|
-/// The shortest round-trip decimal digits and exponent of a finite, non-zero
-/// double: `x = 0.d1d2d3... * 10^exp` (digits without leading or trailing
-/// zeros).
-///
-/// This is Rust's `core::num::flt2dec::strategy::dragon::format_shortest`
-/// (which its Grisu fast path agrees with), including how it picks between
-/// two equally short candidates: when the remaining digits are exactly half
-/// way, it rounds up.
-fn shortest_digits(x : Double) -> (String, Int) {
-  // `flt2dec::decode`: the value is `mant * 2^exp`, its neighbors are
-  // `(mant - minus) * 2^exp` and `(mant + plus) * 2^exp` (half way to the
-  // adjacent floats), inclusive if the original mantissa is even.
-  let bits = x.abs().reinterpret_as_uint64()
-  let biased = ((bits >> 52) & 0x7FFUL).to_int()
-  let frac = bits & 0xFFFFFFFFFFFFFUL
-  let (raw_mant, raw_exp) = if biased == 0 {
-    (frac << 1, -1075)
-  } else {
-    (frac | 0x10000000000000UL, biased - 1075)
-  }
-  shortest_digits_decoded(
-    raw_mant,
-    raw_exp,
-    biased == 0,
-    raw_mant == 0x10000000000000UL,
-    x.abs(),
-  )
-}
-
-///|
 /// The shortest round-trip digits of an `f32` (see [shortest_digits]).
 fn shortest_digits_f32(x : Float) -> (String, Int) {
   // `flt2dec::decode` for `f32`.
@@ -180,25 +150,6 @@ fn shortest_digits_decoded(
     buf.write_char(Int::unsafe_to_char(48 + d))
   }
   (buf.to_string(), k)
-}
-
-///|
-/// Rust's `impl Display for f64` (`{}`): shortest round-trip digits, never
-/// using exponent notation.
-fn rust_display_f64(x : Double) -> String {
-  if x.is_nan() {
-    return "NaN"
-  }
-  let neg = x < 0.0 || (x == 0.0 && 1.0 / x < 0.0)
-  let sign = if neg { "-" } else { "" }
-  if x.is_inf() {
-    return sign + "inf"
-  }
-  if x == 0.0 {
-    return sign + "0"
-  }
-  let (digits, point) = shortest_digits(x)
-  sign + place_point(digits, point, 0)
 }
 
 ///|

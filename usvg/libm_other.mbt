@@ -1,16 +1,6 @@
 // Fallbacks for `libm_native.mbt` on non-native targets.
 
 ///|
-fn libm_sin(x : Double) -> Double {
-  @math.sin(x)
-}
-
-///|
-fn libm_cos(x : Double) -> Double {
-  @math.cos(x)
-}
-
-///|
 fn libm_tan(x : Double) -> Double {
   @math.tan(x)
 }
@@ -26,53 +16,13 @@ fn libm_pow(x : Double, y : Double) -> Double {
 }
 
 ///|
-fn libm_sqrt(x : Double) -> Double {
-  x.sqrt()
-}
-
-///|
-fn libm_acos(x : Double) -> Double {
-  @math.acos(x)
-}
-
-///|
 fn libm_log2(x : Double) -> Double {
   @math.log2(x)
 }
 
 ///|
-fn libm_asin(x : Double) -> Double {
-  @math.asin(x)
-}
-
-///|
-fn libm_sinf(x : Float) -> Float {
-  Float::from_double(@math.sin(x.to_double()))
-}
-
-///|
-fn libm_cosf(x : Float) -> Float {
-  Float::from_double(@math.cos(x.to_double()))
-}
-
-///|
-fn libm_tanf(x : Float) -> Float {
-  Float::from_double(@math.tan(x.to_double()))
-}
-
-///|
 fn libm_atan2f(y : Float, x : Float) -> Float {
   Float::from_double(@math.atan2(y.to_double(), x.to_double()))
-}
-
-///|
-fn libm_acosf(x : Float) -> Float {
-  Float::from_double(@math.acos(x.to_double()))
-}
-
-///|
-fn libm_powf(x : Float, y : Float) -> Float {
-  Float::from_double(@math.pow(x.to_double(), y.to_double()))
 }
 
 ///|
@@ -83,14 +33,4 @@ fn sincos_sin(x : Double) -> Double {
 ///|
 fn sincos_cos(x : Double) -> Double {
   @math.cos(x)
-}
-
-///|
-fn sincosf_sin(x : Float) -> Float {
-  Float::from_double(@math.sin(x.to_double()))
-}
-
-///|
-fn sincosf_cos(x : Float) -> Float {
-  Float::from_double(@math.cos(x.to_double()))
 }

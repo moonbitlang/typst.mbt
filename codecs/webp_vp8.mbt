@@ -201,6 +201,9 @@ fn MacroBlock::copy(self : MacroBlock) -> MacroBlock {
 ///|
 /// A decoded frame (`Frame`): the Y, U and V planes, padded to whole
 /// macroblocks.
+// `version`, `for_display` and `pixel_type` are only written, like
+// upstream (image-webp 0.2.4 src/vp8.rs:788-797, written :1174-1229).
+#warnings("-unused_field")
 priv struct Vp8Frame {
   mut width : Int
   mut height : Int

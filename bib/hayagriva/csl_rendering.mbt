@@ -924,7 +924,7 @@ priv enum BranchConditionPos {
   Position
   Type
   Variable
-} derive(Eq)
+}
 
 ///|
 fn BranchConditionPos::advance(self : BranchConditionPos) -> BranchConditionPos {
