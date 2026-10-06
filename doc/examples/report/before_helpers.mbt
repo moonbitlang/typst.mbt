@@ -1,3 +1,5 @@
+// helper-lines: kit
+//
 // The helpers an author wrote for equally high rounded cards before the
 // kit had `Cards` (finding H3 of docs/edsl-ports.md): the shape of the
 // measured cards of the ports. Each card is built twice, once to be
@@ -57,6 +59,10 @@ fn equal_rows(
   })
 }
 
+// helper-lines: own
+//
+// Which cards the report has, and how many to a row.
+
 ///|
 /// The row of tiles.
 fn tile_row(tiles : Array[Tile]) -> Context {
@@ -75,6 +81,8 @@ fn note_cards(notes : Array[Note], columns : Int) -> Context {
   )
 }
 
+// helper-lines: kit
+//
 // The helpers an author wrote for a status chip and for a framed table of
 // data before the kit had `Chip` and `DataTable` (findings H4 and H5): the
 // shape of the pills and of the table helpers of the ports.

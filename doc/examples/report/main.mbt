@@ -6,14 +6,25 @@
 //     compiles each version `runs` times (200) and prints the times
 //   moon run doc/examples/report --target native --release -- time [runs] table
 //     the same for the table of the beds alone, on a page of its own
+//   moon run doc/examples/report --target native --release -- time [runs] figures
+//     the same for the chart and the diagram alone
+//   moon run doc/examples/report --target native --release -- png <dir>
+//     writes the pages of both versions as <dir>/before-<n>.png and
+//     <dir>/after-<n>.png (144 ppi)
 //
 // What the measurement is (docs/edsl-ports.md, section 9):
 // - helper lines: the lines of code of the top-level functions and
 //   constants that have no text or data of the document. The files are
 //   split by that rule, so `python3 scripts/edsl_helper_lines.py` counts
-//   them: `shared.mbt`, `before_helpers.mbt` and `before.mbt` for the
-//   version before, `shared.mbt` and `after.mbt` for the version after
-//   (`content.mbt` is the document's text and data, this file the tool);
+//   them: `shared.mbt`, `before_helpers.mbt`, `before_drawing.mbt` and
+//   `before.mbt` for the version before, `shared.mbt` and `after.mbt` for
+//   the version after (`content.mbt` is the document's text and data, this
+//   file the tool). The script also splits each count in two: what the kit
+//   provides (the files and the items that are marked `// helper-lines:
+//   kit`: what an author wrote because `doc` has no element for it, and
+//   would write the same way in another document) and the document's own
+//   (its colours, measures and scales, the styles of its text, and the
+//   functions that make a figure of its data);
 // - pages: `report_wbtest.mbt` compares the SVG of the two versions;
 // - time: `time` below, building the description and compiling it.
 
@@ -37,6 +48,40 @@ fn tables() -> Array[(String, () -> Document)] {
     ("table before", () => alone(bed_table_before(bed_columns))),
     ("table after", () => alone(bed_table_after(bed_columns))),
   ]
+}
+
+///|
+/// The chart and the diagram alone, in the two versions.
+fn figures() -> Array[(String, () -> Document)] {
+  let alone = (chart : &IntoContent, diagram : &IntoContent) => {
+    Document([
+      SetPage(width=Pt(420), height=Pt(595), margin=Sides(all=Pt(36))),
+      SetText(size=Pt(10), fill=ink),
+      chart,
+      diagram,
+    ])
+  }
+  [
+    (
+      "figures before",
+      () => alone(harvest_chart_before(), year_diagram_before()),
+    ),
+    ("figures after", () => alone(harvest_chart_after(), year_diagram_after())),
+  ]
+}
+
+///|
+fn write_pngs(dir : String) -> Unit raise {
+  let world = @doc.DocWorld::in_memory()
+  for version in versions() {
+    let (name, build) = version
+    let pages = build().compile_paged(world).png_pages(ppi=144.0).unwrap()
+    for i, page in pages {
+      let path = "\{dir}/\{name}-\{i + 1}.png"
+      @system.write(path, page)
+      println("wrote \{path}")
+    }
+  }
 }
 
 ///|
@@ -95,6 +140,7 @@ fn main {
   let run = () => {
     match args.get(1) {
       Some("pdf") => write_pdfs(args.get(2).unwrap_or("."))
+      Some("png") => write_pngs(args.get(2).unwrap_or("."))
       Some("time") => {
         let mut runs = 0
         for c in args.get(2).unwrap_or("200") {
@@ -102,14 +148,17 @@ fn main {
         }
         time(
           runs,
-          if args.get(3) is Some("table") {
-            tables()
-          } else {
-            versions()
+          match args.get(3) {
+            Some("table") => tables()
+            Some("figures") => figures()
+            _ => versions()
           },
         )
       }
-      _ => println("usage: report pdf <dir> | report time [runs] [table]")
+      _ =>
+        println(
+          "usage: report pdf <dir> | report png <dir> | report time [runs] [table | figures]",
+        )
     }
   }
   run() catch {

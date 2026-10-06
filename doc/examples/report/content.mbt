@@ -199,13 +199,46 @@ fn best_bed() -> Int {
 }
 
 ///|
+/// A stage of a plant's year, for the diagram: its name and a note.
+priv struct Stage {
+  name : String
+  note : String
+}
+
+///|
+let stages : Array[Stage] = [
+  { name: "Sow", note: "indoors, in March", },
+  { name: "Prick out", note: "into pots", },
+  { name: "Harden off", note: "a week outside", },
+  { name: "Plant", note: "after the frosts", },
+  { name: "Harvest", note: "July to October", },
+]
+
+///|
+/// The stage that waits for the weather: the arrow into it is dashed.
+let waits : String = "Plant"
+
+///|
+/// What the arrow from the last stage back to the first says.
+let back_label : String = "seed kept for next year"
+
+///|
+/// What a bar of the chart says at its end.
+fn kilograms(bed : Bed) -> String {
+  @format.fixed(bed.kilograms, 1) + " kg"
+}
+
+///|
 /// The report around what the two versions build differently: the row of
-/// tiles, the two groups of notes, and the table of the beds.
+/// tiles, the two groups of notes, the table of the beds, the chart of the
+/// harvest and the diagram of the year.
 fn report(
   tile_row : &IntoContent,
   worked_cards : &IntoContent,
   change_cards : &IntoContent,
   bed_table : &IntoContent,
+  harvest_chart : &IntoContent,
+  year_diagram : &IntoContent,
 ) -> Document {
   Document([
     SetPage(width=Pt(420), height=Pt(595), margin=Sides(all=Pt(36))),
@@ -235,5 +268,14 @@ fn report(
     Para(
       "The beds are covered for the winter. The next meeting is on the first Saturday of March.",
     ),
+    Pagebreak(),
+    Heading("Kilograms by bed", level=2),
+    Para("The same ten beds by what they gave, in the colours of their state."),
+    harvest_chart,
+    Heading("A plant's year", level=2),
+    Para(
+      "What happens to a plant between March and October. Planting waits for the last frost, and the year closes on itself.",
+    ),
+    year_diagram,
   ])
 }
