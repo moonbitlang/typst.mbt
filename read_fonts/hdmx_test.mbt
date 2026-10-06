@@ -69,3 +69,21 @@ test "short hdmx data" {
   let hdmx = @read_fonts.Hdmx::read(@read_fonts.FontData::new(buf[0:24]), 3)
   assert_true(hdmx.record_for_size(8) is None)
 }
+
+///|
+test "hdmx edge cases" {
+  // A record size of zero gives no records (`ComputedArray::new` divides the
+  // data length by the item length, `checked_div`).
+  let zero = b"\x00\x00\x00\x03\x00\x00\x00\x00\x08\x0d\x0a\x0c\x0d\x00\x00\x00"
+  let hdmx = @read_fonts.Hdmx::read(@read_fonts.FontData::new(zero[:]), 3)
+  assert_true(hdmx.record_for_size(8) is None)
+  // More glyphs than the remaining data has widths for: the record cannot
+  // be read, which ends the search.
+  let buf = make_hdmx()
+  let hdmx = @read_fonts.Hdmx::read(@read_fonts.FontData::new(buf[:]), 100)
+  assert_true(hdmx.record_for_size(16) is None)
+  // Widths are read from the rest of the array, not from one record: with
+  // four glyphs the fourth width of the first record is its padding byte.
+  let hdmx = @read_fonts.Hdmx::read(@read_fonts.FontData::new(buf[:]), 4)
+  assert_eq(hdmx_record(hdmx, 8), Some((8, 13, [10, 12, 13, 0])))
+}
