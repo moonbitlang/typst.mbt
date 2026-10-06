@@ -208,6 +208,22 @@ def state_sources():
         shape=[("", "A", None, True), (".at(0)", "A", None, True), (".at(1)", "D", "k", True)],
         ctx=True, also=["s.get()"], clone=clone))
     out.append(Source(
+        "state: a native function as the update",
+        clone="state.rs `sequence_impl`: `stops.push(current.clone())`",
+        body="""#let s = state("s-native", (2, 1))
+// A new array that only the sequence holds, then a native mutator as the
+// update function.
+#s.update(array.rev)
+#metadata(none) <s-native-before>
+#s.update(array.pop)
+#s.update(v => (v, (3, 4)))
+#metadata(none) <s-native-mid>
+#s.update(array.last)
+#s.update(array.pop)
+#context metadata(repr((s.at(<s-native-before>), s.at(<s-native-mid>), s.final(), s.get())))
+#context metadata(repr((s.at(<s-native-before>), s.at(<s-native-mid>), s.final())))
+"""))
+    out.append(Source(
         "state: made by a closure that is called twice",
         pre=f'#let make() = state("s-made", {ARR})',
         expr="make().final()", shape=AA, ctx=True, also=["make().get()"], clone=clone))
@@ -586,6 +602,14 @@ def arguments_sources():
 #metadata(repr((f((1, 2)), f((1, 2)), g({DICT}), g({DICT}), h((1, 2)), h((1, 2)))))
 #let xs = (1, 2)
 #metadata(repr((f(xs), h(xs), xs)))
+// In math (`eval_math_args`).
+#let am = arguments((1, 2), (3, 4))
+#let pop = array.pop
+#let both(a, b) = (array.pop)(a) + (array.pop)(b)
+// (Evaluated, not laid out: the oracle's test world has no fonts.)
+#let one = arguments((1, 2))
+#let eq = $ pop(..#one) + pop(..#am.filter(v => v.len() == 2).pos().slice(0, 1)) + both(..#am) $
+#metadata(repr((one, am)))
 #let mk() = arguments((1, 2), (k: (3,)))
 #let _ = range(2).map(i => (array.pop)(..mk().filter(v => type(v) == array)))
 #let _ = range(2).map(i => (dictionary.insert)(mk().at(1), "zz", 0))

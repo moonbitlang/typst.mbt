@@ -68,8 +68,8 @@ fn oracle_strings(doc : @layout.PagedDocument) -> Array[String] {
 
 ///|
 /// The diagnostics of a document as the CLI prints them with
-/// `--diagnostic-format short` (`file:line:column: severity: message`, the
-/// errors first, hints without a span as ` = hint: ..` lines), then `--`
+/// `--diagnostic-format short` (`file:line:column: severity: message`
+/// without the hints, the errors first), then `--`
 /// and the metadata strings if it compiled; with memoization and without.
 fn oracle_report(
   source : String,
@@ -102,11 +102,6 @@ fn oracle_report(
         _ => ""
       }
       out.push("\{place}\{severity}: \{diagnostic.message}")
-      for hint in diagnostic.hints {
-        if hint.span.is_detached() {
-          out.push(" = hint: \{hint.v}")
-        }
-      }
     }
     if warned.output is Ok(doc) {
       out.push("--")

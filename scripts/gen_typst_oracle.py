@@ -803,6 +803,7 @@ def upstream(binary, kind, source, files):
             notice = [i for i, line in enumerate(lines) if "`typst query` subcommand is deprecated" in line]
             assert len(notice) == 1, lines
             del lines[notice[0]:notice[0] + 2]
+            # The short format prints no hints.
             assert all(line and not line.startswith(" ") for line in lines), lines
             if out.returncode == 0:
                 lines.append("--")

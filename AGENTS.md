@@ -294,11 +294,18 @@
   result's fingerprint was lossy or contained host closures:
   `fingerprint_flags_in`), sink effects are replayed, frames are cloned
   (not cached if their tags hold host closures). The same flag marks the
-  modules that their fingerprint does not identify (anonymous ones, but
-  those of plugins with functions: two plugins without functions give
-  modules that differ in nothing but their identity; upstream, which
-  compares hashes only, takes one for the other as the argument of a
-  memoized call, the port does not).
+  modules that their fingerprint does not identify: every module but those
+  whose maker calls `Module::canonical` (the library's, the module of an
+  evaluated file, of a plugin with functions; one object each per
+  compilation). Two plugins without functions give modules that differ in
+  nothing but their identity; upstream, which compares hashes only, takes
+  one for the other as the argument of a memoized call, the port does not.
+  The traced span (IDE tracing) is not one per compilation: an evaluated
+  string runs without one. The evaluation of a source file is reused if
+  the span gives the answers it got (`Traced::get` for the files whose
+  code ran in it: `note_traced_file` in `Vm::new`, like upstream's tracked
+  `Traced`); memoized closure calls and layouts have the span in their
+  keys.
   Closure calls (`memoized_closure`, upstream's `#[comemo::memoize]` on
   `eval_closure`; without it a touying deck with cetz calls two million
   functions instead of 160 000) are keyed by the function and the arguments

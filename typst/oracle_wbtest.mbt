@@ -1530,6 +1530,21 @@ test "oracle: sharing: state" {
     #|}
     #|#context metadata(repr((s.final(), s.get(),)))
     #|]
+    #|#metadata("== state: a native function as the update")
+    #|#[
+    #|#let s = state("s-native", (2, 1))
+    #|// A new array that only the sequence holds, then a native mutator as the
+    #|// update function.
+    #|#s.update(array.rev)
+    #|#metadata(none) <s-native-before>
+    #|#s.update(array.pop)
+    #|#s.update(v => (v, (3, 4)))
+    #|#metadata(none) <s-native-mid>
+    #|#s.update(array.last)
+    #|#s.update(array.pop)
+    #|#context metadata(repr((s.at(<s-native-before>), s.at(<s-native-mid>), s.final(), s.get())))
+    #|#context metadata(repr((s.at(<s-native-before>), s.at(<s-native-mid>), s.final())))
+    #|]
     #|#metadata("== state: made by a closure that is called twice")
     #|#[
     #|#let make() = state("s-made", ((1, 2), (k: (3,))))
@@ -1696,6 +1711,7 @@ test "oracle: sharing: state" {
     "((a: (1, 2), d: (k: (3,))),)", "== state: an update function that returns its argument",
     "(((1, 2, 7), (k: (3,))), ((1, 2, 7), (k: (3,))))", "(((1, 2, 7), (k: (3,))), ((1, 2, 7), (k: (3,))))",
     "(((1, 2, 7), (k: (3,))), ((1, 2, 7), (k: (3,))))", "(((1, 2, 7), (k: (3,))), ((1, 2, 7), (k: (3,))))",
+    "== state: a native function as the update", "((1, 2), (2, (3, 4)), 4, 4)", "((1, 2), (2, (3, 4)), 4)",
     "== state: made by a closure that is called twice", "(((1, 2), (k: (3,))), ((1, 2), (k: (3,))))",
     "(((1, 2), (k: (3,))), ((1, 2), (k: (3,))))", "(((1, 2), (k: (3,))), ((1, 2), (k: (3,))))",
     "(((1, 2), (k: (3,))), ((1, 2), (k: (3,))))", "== state: captured by a closure",
@@ -5485,6 +5501,14 @@ test "oracle: sharing: arguments" {
     #|#metadata(repr((f((1, 2)), f((1, 2)), g((a: (1, 2), d: (k: (3,)))), g((a: (1, 2), d: (k: (3,)))), h((1, 2)), h((1, 2)))))
     #|#let xs = (1, 2)
     #|#metadata(repr((f(xs), h(xs), xs)))
+    #|// In math (`eval_math_args`).
+    #|#let am = arguments((1, 2), (3, 4))
+    #|#let pop = array.pop
+    #|#let both(a, b) = (array.pop)(a) + (array.pop)(b)
+    #|// (Evaluated, not laid out: the oracle's test world has no fonts.)
+    #|#let one = arguments((1, 2))
+    #|#let eq = $ pop(..#one) + pop(..#am.filter(v => v.len() == 2).pos().slice(0, 1)) + both(..#am) $
+    #|#metadata(repr((one, am)))
     #|#let mk() = arguments((1, 2), (k: (3,)))
     #|#let _ = range(2).map(i => (array.pop)(..mk().filter(v => type(v) == array)))
     #|#let _ = range(2).map(i => (dictionary.insert)(mk().at(1), "zz", 0))
@@ -5675,9 +5699,9 @@ test "oracle: sharing: arguments" {
     "(\n  (\n    (((1, 2), (k: (3,))),),\n    (k: (a: (1, 2), d: (k: (3,)))),\n  ),\n  ((1, 2), (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n)",
     "== arguments: spread into a native function", "(\n  arguments(\n    ((1, 2), (k: (3,))),\n    0,\n    k: (a: (1, 2), d: (k: (3,))),\n  ),\n  arguments((1, 2)),\n  arguments((a: (1, 2), d: (k: (3,))), \"zz\", 0),\n)",
     "(\n  ((1, 2),),\n  ((1, 2),),\n  ((a: (1, 2), d: (k: (3,))),),\n  ((a: (1, 2), d: (k: (3,))),),\n  (((1, 2),), ((1, 2),)),\n  (((1, 2),), ((1, 2),)),\n)",
-    "(((1, 2),), (((1, 2),), ((1, 2),)), (1, 2))", "(\n  arguments((1, 2), (k: (3,))),\n  arguments((1, 2), (k: (3,))),\n)",
-    "((((1, 2), (k: (3,))), 0), ((1, 2),))", "== arguments: `filter` and `map`",
-    "(\n  (((1, 2), (k: (3,))), 5),\n  arguments(\n    ((1, 2), (k: (3,))),\n    5,\n    k: (a: (1, 2), d: (k: (3,))),\n  ),\n  (k: (a: (1, 2), d: (k: (3,)))),\n  ((1, 2), (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n)",
+    "(((1, 2),), (((1, 2),), ((1, 2),)), (1, 2))", "(arguments((1, 2)), arguments((1, 2), (3, 4)))",
+    "(\n  arguments((1, 2), (k: (3,))),\n  arguments((1, 2), (k: (3,))),\n)", "((((1, 2), (k: (3,))), 0), ((1, 2),))",
+    "== arguments: `filter` and `map`", "(\n  (((1, 2), (k: (3,))), 5),\n  arguments(\n    ((1, 2), (k: (3,))),\n    5,\n    k: (a: (1, 2), d: (k: (3,))),\n  ),\n  (k: (a: (1, 2), d: (k: (3,)))),\n  ((1, 2), (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n)",
     "(\n  (((1, 2), (k: (3,))), 5),\n  arguments(\n    ((1, 2), (k: (3,))),\n    5,\n    k: (a: (1, 2), d: (k: (3,))),\n  ),\n  (k: (a: (1, 2), d: (k: (3,)))),\n  ((1, 2), (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n)",
     "(\n  (((1, 2), (k: (3,))), 5),\n  arguments(\n    ((1, 2), (k: (3,))),\n    5,\n    k: (a: (1, 2), d: (k: (3,))),\n  ),\n  (k: (a: (1, 2), d: (k: (3,)))),\n  ((1, 2), (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n)",
     "(\n  (((1, 2), (k: (3,))), 5),\n  arguments(\n    ((1, 2), (k: (3,))),\n    5,\n    k: (a: (1, 2), d: (k: (3,))),\n  ),\n  (k: (a: (1, 2), d: (k: (3,)))),\n  ((1, 2), (k: (3,))),\n  (a: (1, 2), d: (k: (3,))),\n)",
