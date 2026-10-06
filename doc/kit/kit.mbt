@@ -12,11 +12,11 @@
 //    (`IntoContent`, interpolation into `Prose`, `Debug`). Its parameters
 //    have the names, the types and the defaults of the parameters of the
 //    primitives that they are passed to (`columns`, `gutter`, `fill`,
-//    `stroke`, `inset`), in the type of the primitive that draws them. A
-//    default differs from the primitive's only where the default is the
-//    reason the element exists, and the documentation says so. An element
-//    has no parameter for a fixed height, no `extra` and no `label`
-//    (`Labelled(element, ..)` labels what it expands to).
+//    `stroke`, `inset`, `radius`), in the type of the primitive that draws
+//    them. A default differs from the primitive's only where the default
+//    is the reason the element exists, and the documentation says so. An
+//    element has no parameter for a fixed height, no `extra` and no
+//    `label` (`Labelled(element, ..)` labels what it expands to).
 //
 // 3. Provenance: `@doc.Composite`. The constructor takes `loc~` and
 //    `args_loc~` (`#callsite(autofill(loc, args_loc))`) and builds
@@ -30,8 +30,19 @@
 //    item's index, so that the parts are distinct occurrences.
 //
 // 4. Measuring. An element measures only where the engine cannot do the
-//    work (`Cards` does not: the grid makes the cells of a row equally
-//    high).
+//    work (`Cards` without a radius does not: the grid makes the cells of
+//    a row equally high). One that does creates a callback (`Layout`) in
+//    `build`, so it cannot be constructed inside a callback (a show rule, a
+//    `Cells` function, a `Context` or `Layout`); it is built before and
+//    captured. Its documentation says "Measures", and says what happens in
+//    an unbounded region and at a page break. In the callback:
+//    - the caller's content was converted in `build` (`Content(item)`),
+//      once;
+//    - what is measured and what is placed are the same descriptions under
+//      the same keys, built by one function;
+//    - sizes are not computed by hand: a row is measured as a row of the
+//      grid that places it, at the width that `Layout` gives, so tracks
+//      and gutters are resolved by the engine in both.
 //
 // 5. Invalid arguments. Constructors do not raise. An argument that the
 //    element cannot accept is `site.invalid(message)`: an error at the
@@ -48,4 +59,6 @@
 //    that of the primitives written out); the property the element exists
 //    for, from the frames; provenance through the review loop (a string of
 //    the caller, a description of the caller, what the element generates,
-//    an error in every forwarded argument at that argument's index, keys).
+//    an error in every forwarded argument at that argument's index, keys);
+//    for a measuring element the creation rule, an unbounded region, a
+//    page break, and that nothing leaves the page.

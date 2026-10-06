@@ -15,27 +15,53 @@
 /// in a grid cell is the height of the region, not of the row
 /// (docs/edsl-guide.md, section 7).
 ///
-/// The cards are the cells of a `Grid`: the items in `GridCell(item,
-/// fill=.., stroke=.., inset=..)`, the tracks the grid's. The engine makes
-/// the cells of a row equally high. The corners are square: a cell has no
-/// radius. It does not measure, so it can be built anywhere, also inside a
-/// callback. A row that does not fit the rest of the page is broken as the
-/// grid breaks rows: what fits stays, and the rest of every card of the row
-/// continues on the next page.
+/// **Without `radius`** the cards are the cells of a `Grid`: the items in
+/// `GridCell(item, fill=.., stroke=.., inset=..)`, the tracks the
+/// grid's. The engine makes the cells of a row equally high. The corners
+/// are square: a cell has no radius. It does not measure, so it can be
+/// built anywhere, also inside a callback. A row that does not fit the
+/// rest of the page is broken as the grid breaks rows: what fits stays, and
+/// the rest of every card of the row continues on the next page.
 ///
-/// Parameters, with the names and types of `Grid` and of `GridCell`:
+/// **With `radius`** a cell cannot draw the card. **Measures**: the cards
+/// are `Block(item, width=Pct(100), fill=.., stroke=.., inset=..,
+/// radius=.., breakable=false)` in a `Grid` with the same tracks, and each
+/// row is measured first, as a grid of that one row at the width of the
+/// enclosing region (`Layout`), to give its cards the height of the row.
+/// The cards are the same boxes as without a radius. It creates a
+/// callback, so it cannot be built inside one (a show rule, a `Context`, a
+/// `Layout`): build it before and capture it.
+///
+/// - A card is not split: a row that does not fit the rest of the page
+///   moves to the next page as a whole, and pages break between rows.
+/// - A row that is higher than the enclosing region (the page between its
+///   margins) fits no page. Its cards are breakable blocks of their own
+///   height instead: nothing leaves the page, and the cards of that row
+///   are not equally high where they end.
+/// - In a region without a width (a page with `width: auto`, or while the
+///   cards are measured without one) the rows are measured without a
+///   width, as the grid is laid out there: fractional columns have no
+///   width in an unbounded region, with or without `radius`.
+/// - A column cannot be `Auto` (nor `columns` be empty, which is one `auto`
+///   column for the engine): an `auto` column is as wide as the widest card
+///   of all its rows, which a row that is measured alone does not know. It
+///   is an error at the call.
+///
+/// Parameters, with the names and types of `Grid` and of `GridCell` and
+/// `Block`:
 ///
 /// - `columns`: the tracks. The default is one `1fr` column per item: one
 ///   row of equally wide cards. (This default is the element's own: `Grid`
 ///   has one `auto` column, which puts the cards one under the other.)
 /// - `gutter`, `column_gutter`, `row_gutter`: the grid's; none by default.
-/// - `fill`, `stroke`, `inset`: of every card; by default the cell's (no
-///   fill, no stroke, no inset: set them).
+/// - `fill`, `stroke`, `inset`: of every card; by default the cell's or
+///   block's (no fill, no stroke, no inset: set them).
+/// - `radius`: of every card, and the choice of the second form.
 ///
-/// An item is the body of a card (a `GridCell` among the items is not a
-/// cell of the grid: for cells of your own, use `Grid`). A row with fewer
-/// items than columns is left open: there is no card where there is no
-/// item. No items: nothing.
+/// An item is the body of a card, in both forms (a `GridCell` among the
+/// items is not a cell of the grid: for cells of your own, use `Grid`). A
+/// row with fewer items than columns is left open: there is no card where
+/// there is no item. No items: nothing.
 ///
 /// Provenance: the call. An item that is a plain string resolves to the
 /// `items` argument under the key of its index (`"0"`, `"1"`, ..: every
@@ -43,19 +69,30 @@
 /// have that key too); an error in `fill` is at `fill`.
 ///
 /// Twin: the function `cards` of `doc/twins/kit.mbt`, a `grid` of
-/// `grid.cell`s.
+/// `grid.cell`s, or a `layout` that measures each row and returns a `grid`
+/// of `block`s.
 pub struct Cards {
   priv composite : @doc.Composite
+}
+
+///|
+/// Whether a track is `auto`.
+fn is_auto(track : @doc.Sizing) -> Bool {
+  match track {
+    Auto | Rel(Auto) => true
+    _ => false
+  }
 }
 
 ///|
 /// The call of a `Cards`: its site and its arguments. The parameters by
 /// their index in the declaration of `Cards::Cards`, for `site.arg`: items
 /// 0, columns 1, gutter 2, column_gutter 3, row_gutter 4, fill 5, stroke 6,
-/// inset 7.
+/// inset 7, radius 8.
 priv struct Call {
   site : @doc.CompositeSite
-  /// The caller's content, converted once.
+  /// The caller's content, converted once (the callback of the second
+  /// form runs whenever the cards are laid out).
   items : Array[@doc.Content]
   /// `columns`, or its default.
   tracks : Array[@doc.Sizing]
@@ -68,15 +105,20 @@ priv struct Call {
 }
 
 ///|
-/// The grid of the cards.
-fn Call::grid(self : Call, cells : Array[&@doc.IntoContent]) -> @doc.Grid {
+/// The grid of the cards, or of one row of them (`rows=false`: without the
+/// gutter between rows).
+fn Call::grid(
+  self : Call,
+  cells : Array[&@doc.IntoContent],
+  rows~ : Bool,
+) -> @doc.Grid {
   let site = self.site
   @doc.Grid(
     cells,
     columns=site.arg(1, self.tracks),
     gutter?=site.arg(2, self.gutter),
     column_gutter?=site.arg(3, self.column_gutter),
-    row_gutter?=site.arg(4, self.row_gutter),
+    row_gutter?=if rows { site.arg(4, self.row_gutter) } else { None },
   )
 }
 
@@ -96,6 +138,77 @@ fn Call::cell(self : Call, k : Int) -> @doc.Keyed {
 }
 
 ///|
+/// The card of item `k` as a block. What is measured (without a height)
+/// and what is placed (with the height of its row) is this block around
+/// the same item under the same key.
+fn Call::block(
+  self : Call,
+  k : Int,
+  radius : @doc.Corners[@doc.Length],
+  height? : @doc.Sizing,
+  breakable? : Bool,
+) -> @doc.Keyed {
+  let site = self.site
+  @doc.Keyed(
+    k.to_string(),
+    @doc.Block(
+      site.arg(0, self.items[k]),
+      // (A block is as wide as its content unless it is told: the card
+      // fills its column.)
+      width=Pct(100),
+      height?,
+      breakable?,
+      fill?=site.arg(5, self.fill),
+      stroke?=site.arg(6, self.stroke),
+      radius=site.arg(8, radius),
+      inset?=site.arg(7, self.inset),
+    ),
+  )
+}
+
+///|
+/// The second form: the rows measured, the cards blocks of the height of
+/// their row.
+fn Call::measured(
+  self : Call,
+  radius : @doc.Corners[@doc.Length],
+) -> @doc.Layout {
+  let count = self.items.length()
+  let per_row = self.tracks.length()
+  @doc.Layout((size, cx) => {
+    let cells : Array[&@doc.IntoContent] = []
+    let mut start = 0
+    while start < count {
+      let end = if start + per_row < count { start + per_row } else { count }
+      // The row, as the grid lays it out at the width of the region: its
+      // height is that of its highest card.
+      let row : Array[&@doc.IntoContent] = []
+      for k in start..<end {
+        row.push(self.block(k, radius, breakable=false))
+      }
+      let row = self.grid(row, rows=false)
+      let height = if size.width.is_inf() {
+        cx.measure(row).height
+      } else {
+        cx.measure(row, width=Pt(size.width)).height
+      }
+      for k in start..<end {
+        cells.push(
+          if height > size.height {
+            // No page holds this row: its cards may break.
+            self.block(k, radius)
+          } else {
+            self.block(k, radius, height=Pt(height), breakable=false)
+          },
+        )
+      }
+      start = end
+    }
+    self.grid(cells, rows=true)
+  })
+}
+
+///|
 #callsite(autofill(loc, args_loc))
 pub fn Cards::Cards(
   items : Array[&@doc.IntoContent],
@@ -106,6 +219,7 @@ pub fn Cards::Cards(
   fill? : @doc.Paint,
   stroke? : @doc.Sides[@doc.Stroke],
   inset? : @doc.Sides[@doc.Length],
+  radius? : @doc.Corners[@doc.Length],
   loc~ : SourceLoc,
   args_loc~ : ArgsLoc,
 ) -> Cards {
@@ -125,12 +239,20 @@ pub fn Cards::Cards(
       stroke,
       inset,
     }
-    // The cells draw the cards.
-    let cells : Array[&@doc.IntoContent] = []
-    for k in 0..<items.length() {
-      cells.push(call.cell(k))
+    guard radius is Some(radius) && !items.is_empty() else {
+      // The cells draw the cards.
+      let cells : Array[&@doc.IntoContent] = []
+      for k in 0..<items.length() {
+        cells.push(call.cell(k))
+      }
+      return @doc.Content(call.grid(cells, rows=true))
     }
-    call.grid(cells)
+    if call.tracks.is_empty() || call.tracks.iter().any(is_auto) {
+      return site.invalid(
+        "`Cards` with a `radius` cannot have an `Auto` column: its rows are measured one by one, and an `auto` column is as wide as the widest card of all rows",
+      )
+    }
+    @doc.Content(call.measured(radius))
   })
   { composite, }
 }
