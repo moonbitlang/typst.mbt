@@ -1,0 +1,18 @@
+# Only what the Notes themselves say about the works they name.
+edinburgh-1834:
+  type: article
+  date: 1834-07
+  parent:
+    type: periodical
+    title: Edinburgh Review
+clausen-406:
+  type: article
+  author: Clausen
+  parent:
+    type: periodical
+    title: Astronomische Nachrichten
+    issue: 406
+arbogast:
+  type: book
+  author: Arbogast
+  title: Calcul des Dérivations
