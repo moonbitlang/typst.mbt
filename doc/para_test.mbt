@@ -620,6 +620,19 @@ test "para: a displayed formula inside is kept, and the text after it is not ind
       #|20.0 A | 97.1 𝑥 | 10.0 b | 97.4 𝑦 | 10.0 c | 20.0 D | 10.0 • | 18.5 item | 10.0 e.
     ),
   )
+  // A block under rules of its own is that block: the text after it is
+  // the continuation, as after the block without the rules.
+  let ruled = @doc.Seq([@doc.SetText(fill=Blue), @doc.Equation("x", block=true)])
+  inspect(
+    indents(true, [@doc.Para("A \{ruled} b")]),
+    content=(
+      #|20.0 A | 97.1 𝑥 | 10.0 b
+    ),
+  )
+  assert_eq(
+    indents(true, [@doc.Para("A \{ruled} b")]),
+    indents(true, [@doc.Para("A \{@doc.Equation("x", block=true)} b")]),
+  )
   // An interpolated `Parbreak()` is a paragraph break like a blank line:
   // what follows is a new paragraph, not a continuation.
   assert_eq(

@@ -12,6 +12,8 @@ pub fn apostrophes() -> @doc.Seq
 
 pub fn cards(Array[&@doc.IntoContent]) -> @kit.Cards
 
+pub fn code_cell(String) -> @doc.Raw
+
 pub fn code_size() -> @doc.ShowSet
 
 pub fn composed_lengths() -> @doc.Seq
@@ -25,6 +27,8 @@ pub fn fonts_of(String) -> @doc.DocWorld raise @system.SystemError
 pub fn guide() -> @doc.Document
 
 pub fn half_width() -> @doc.Layout
+
+pub fn harvest_table(Array[Array[&@doc.IntoContent]]) -> @kit.DataTable
 
 pub fn kept_title(&@doc.IntoContent) -> @doc.Seq
 
@@ -51,9 +55,15 @@ pub fn ruled_table(Array[&@doc.IntoContent]) -> @doc.Table
 
 pub fn run_together() -> @doc.Seq
 
+pub fn short_row() -> @kit.DataTable
+
+pub fn status(String, done~ : Bool) -> @doc.Text
+
 pub fn stripes_captured() -> @doc.Seq
 
 pub fn stripes_in_show() -> @doc.Seq
+
+pub fn styled_table(Array[Array[&@doc.IntoContent]], Int) -> @doc.Seq
 
 pub fn typed_fields() -> @doc.Seq
 
