@@ -137,6 +137,9 @@ pub impl IntoValue for PagedPosition with fn into_value(self) {
 }
 
 ///|
+pub extend PagedPosition with IntoValue::{into_value}
+
+///|
 pub impl FromValue for PagedPosition with fn from_value(v) {
   match v {
     Dict(dict) => {
@@ -150,6 +153,9 @@ pub impl FromValue for PagedPosition with fn from_value(v) {
     v => raise HintedError(PagedPosition::input().error(v))
   }
 }
+
+///|
+pub extend PagedPosition with FromValue::{from_value}
 
 ///|
 /// A position in an HTML document.

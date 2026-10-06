@@ -349,6 +349,9 @@ pub impl FromValue for Length with fn from_value(v) {
 }
 
 ///|
+pub extend Length with FromValue::{from_value}
+
+///|
 pub impl Reflect for Angle with fn input() {
   Type(Type::angle())
 }
@@ -405,6 +408,9 @@ pub impl FromValue for Ratio with fn from_value(v) {
 }
 
 ///|
+pub extend Ratio with FromValue::{from_value}
+
+///|
 pub impl Reflect for Fr with fn input() {
   Type(Type::fraction())
 }
@@ -454,6 +460,9 @@ pub impl IntoValue for Rel[Length] with fn into_value(self) {
 }
 
 ///|
+pub extend Rel with IntoValue::{into_value}
+
+///|
 pub impl FromValue for Rel[Length] with fn from_value(v) {
   match v {
     Relative(r) => r
@@ -462,6 +471,9 @@ pub impl FromValue for Rel[Length] with fn from_value(v) {
     v => cast_fail_with(Type(Type::relative()), v)
   }
 }
+
+///|
+pub extend Rel with FromValue::{from_value}
 
 ///|
 pub impl Reflect for Content with fn input() {
@@ -487,6 +499,9 @@ pub impl IntoValue for Content with fn into_value(self) {
 }
 
 ///|
+pub extend Content with IntoValue::{into_value}
+
+///|
 pub impl FromValue for Content with fn from_value(v) {
   match v {
     Content(c) => c
@@ -496,6 +511,9 @@ pub impl FromValue for Content with fn from_value(v) {
     v => cast_fail_with(Type(Type::content()), v)
   }
 }
+
+///|
+pub extend Content with FromValue::{from_value}
 
 ///|
 pub impl Reflect for Func with fn input() {
@@ -529,6 +547,9 @@ pub impl FromValue for Func with fn from_value(v) {
     v => cast_fail_with(Type(Type::func()), v)
   }
 }
+
+///|
+pub extend Func with FromValue::{from_value}
 
 ///|
 pub impl Reflect for Type with fn input() {
@@ -588,6 +609,9 @@ pub impl FromValue for Arr with fn from_value(v) {
     v => cast_fail_with(Type(Type::array()), v)
   }
 }
+
+///|
+pub extend Arr with FromValue::{from_value}
 
 ///|
 pub impl Reflect for Dict with fn input() {

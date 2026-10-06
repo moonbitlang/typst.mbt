@@ -420,6 +420,9 @@ pub impl IntoValue for PdfStandards with fn into_value(self) {
 }
 
 ///|
+pub extend PdfStandards with IntoValue::{into_value}
+
+///|
 pub impl FromValue for PdfStandards with fn from_value(v) {
   match v {
     v if PdfStandard::castable(v) => PdfStandards::new([v.cast()])
@@ -571,6 +574,9 @@ pub impl IntoValue for PdfStandard with fn into_value(self) {
   }
   abort("unreachable")
 }
+
+///|
+pub extend PdfStandard with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for PdfStandard with fn from_value(v) {

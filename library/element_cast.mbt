@@ -32,6 +32,9 @@ pub impl IntoValue for Depth with fn into_value(self) {
 }
 
 ///|
+pub extend Depth with IntoValue::{into_value}
+
+///|
 pub impl FromValue for Depth with fn from_value(v) {
   Depth(FromValue::from_value(v))
 }

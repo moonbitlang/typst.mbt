@@ -92,6 +92,9 @@ pub impl IntoValue for Numbering with fn into_value(self) {
 }
 
 ///|
+pub extend Numbering with IntoValue::{into_value}
+
+///|
 pub impl FromValue for Numbering with fn from_value(v) {
   if NumberingPattern::castable(v) {
     return Pattern(NumberingPattern::from_value(v))
@@ -312,6 +315,9 @@ pub impl IntoValue for NumberingPattern with fn into_value(self) {
 }
 
 ///|
+pub extend NumberingPattern with IntoValue::{into_value}
+
+///|
 pub impl FromValue for NumberingPattern with fn from_value(v) {
   if castable_of((Ty::new() : Ty[String]), v) {
     // Patterns are stored as strings in styles, so the same pattern is cast
@@ -326,6 +332,9 @@ pub impl FromValue for NumberingPattern with fn from_value(v) {
   }
   raise HintedError(NumberingPattern::input().error(v))
 }
+
+///|
+pub extend NumberingPattern with FromValue::{from_value}
 
 ///|
 /// Successfully parsed numbering patterns by pattern string.

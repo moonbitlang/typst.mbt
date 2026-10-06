@@ -373,6 +373,9 @@ pub impl IntoValue for BaselinePos with fn into_value(self) {
 }
 
 ///|
+pub extend BaselinePos with IntoValue::{into_value}
+
+///|
 pub impl FromValue for BaselinePos with fn from_value(v) {
   if v is Auto || VAlignment::castable(v) {
     let at : Smart[VAlignment] = FromValue::from_value(v)

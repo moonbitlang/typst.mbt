@@ -275,6 +275,9 @@ pub impl FromValue for SmartQuoteSet with fn from_value(v) {
 }
 
 ///|
+pub extend SmartQuoteSet with FromValue::{from_value}
+
+///|
 fn str_to_set(value : String) -> (String, String) raise HintedError {
   let clusters = @unicode.graphemes(value)
   if clusters.length() == 2 {
@@ -336,6 +339,9 @@ pub impl IntoValue for SmartQuoteDict with fn into_value(self) {
 }
 
 ///|
+pub extend SmartQuoteDict with IntoValue::{into_value}
+
+///|
 pub impl FromValue for SmartQuoteDict with fn from_value(v) {
   match v {
     Dict(value) => {
@@ -355,6 +361,9 @@ pub impl FromValue for SmartQuoteDict with fn from_value(v) {
     v => raise HintedError(SmartQuoteDict::input().error(v))
   }
 }
+
+///|
+pub extend SmartQuoteDict with FromValue::{from_value}
 
 ///|
 /// Custom capabilities of `SmartQuoteElem` (upstream `impl PlainText for

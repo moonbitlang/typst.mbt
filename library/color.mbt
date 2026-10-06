@@ -1923,6 +1923,9 @@ pub impl FromValue for Color with fn from_value(v) {
 }
 
 ///|
+pub extend Color with FromValue::{from_value}
+
+///|
 pub impl Reflect for ProcessColor with fn input() {
   Color::input()
 }
@@ -1980,12 +1983,18 @@ pub impl IntoValue for SpotColorant with fn into_value(self) {
 }
 
 ///|
+pub extend SpotColorant with IntoValue::{into_value}
+
+///|
 pub impl FromValue for SpotColorant with fn from_value(v) {
   match v {
     Dyn(SpotColorant(c)) => c
     v => raise HintedError(SpotColorant::input().error(v))
   }
 }
+
+///|
+pub extend SpotColorant with FromValue::{from_value}
 
 ///|
 pub impl Reflect for SpotColorantName with fn input() {
@@ -2051,6 +2060,9 @@ pub impl IntoValue for ColorSpace with fn into_value(self) {
     Spot(s) => s.into_value()
   }
 }
+
+///|
+pub extend ColorSpace with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for ColorSpace with fn from_value(v) {

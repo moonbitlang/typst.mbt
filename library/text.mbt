@@ -67,6 +67,9 @@ pub impl IntoValue for FontFamily with fn into_value(self) {
 }
 
 ///|
+pub extend FontFamily with IntoValue::{into_value}
+
+///|
 pub impl FromValue for FontFamily with fn from_value(v) {
   if str_castable(v) {
     let string : String = (FromValue::from_value(v) : String)
@@ -84,6 +87,9 @@ pub impl FromValue for FontFamily with fn from_value(v) {
     v => raise HintedError(FontFamily::input().error(v))
   }
 }
+
+///|
+pub extend FontFamily with FromValue::{from_value}
 
 ///|
 /// Defines which codepoints a font family will be used for.
@@ -122,6 +128,9 @@ pub impl IntoValue for Covers with fn into_value(self) {
     Regex(regex) => Dyn(Regex(regex))
   }
 }
+
+///|
+pub extend Covers with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for Covers with fn from_value(v) {
@@ -182,6 +191,9 @@ pub impl IntoValue for FontList with fn into_value(self) {
     IntoValue::into_value(self.0)
   }
 }
+
+///|
+pub extend FontList with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for FontList with fn from_value(v) {
@@ -274,6 +286,9 @@ pub impl Fold for TextSize with fn fold(self, outer) {
 }
 
 ///|
+pub extend TextSize with Fold::{fold}
+
+///|
 /// Upstream `Resolve for TextSize`.
 pub fn TextSize::resolve(self : TextSize, styles : StyleChain) -> Abs {
   let factor = match EquationElem::size_in(styles) {
@@ -304,6 +319,9 @@ pub impl Reflect for TextSize with fn castable(v) {
 pub impl IntoValue for TextSize with fn into_value(self) {
   Length(self.0)
 }
+
+///|
+pub extend TextSize with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for TextSize with fn from_value(v) {
@@ -366,6 +384,9 @@ pub impl IntoValue for TopEdge with fn into_value(self) {
     Length(length) => Length(length)
   }
 }
+
+///|
+pub extend TopEdge with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for TopEdge with fn from_value(v) {
@@ -436,12 +457,18 @@ pub impl IntoValue for TopEdgeMetric with fn into_value(self) {
 }
 
 ///|
+pub extend TopEdgeMetric with IntoValue::{into_value}
+
+///|
 pub impl FromValue for TopEdgeMetric with fn from_value(v) {
   match str_names_find(top_edge_metric_names, v) {
     Some(i) => top_edge_metric_values[i]
     None => raise HintedError(TopEdgeMetric::input().error(v))
   }
 }
+
+///|
+pub extend TopEdgeMetric with FromValue::{from_value}
 
 ///|
 fn text_elem_top_edge_default() -> Value {
@@ -482,6 +509,9 @@ pub impl IntoValue for BottomEdge with fn into_value(self) {
     Length(length) => Length(length)
   }
 }
+
+///|
+pub extend BottomEdge with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for BottomEdge with fn from_value(v) {
@@ -546,12 +576,18 @@ pub impl IntoValue for BottomEdgeMetric with fn into_value(self) {
 }
 
 ///|
+pub extend BottomEdgeMetric with IntoValue::{into_value}
+
+///|
 pub impl FromValue for BottomEdgeMetric with fn from_value(v) {
   match str_names_find(bottom_edge_metric_names, v) {
     Some(i) => bottom_edge_metric_values[i]
     None => raise HintedError(BottomEdgeMetric::input().error(v))
   }
 }
+
+///|
+pub extend BottomEdgeMetric with FromValue::{from_value}
 
 ///|
 fn text_elem_bottom_edge_default() -> Value {
@@ -586,6 +622,9 @@ pub extend TextDir with Reflect::{output, input, castable}
 pub impl IntoValue for TextDir with fn into_value(self) {
   self.0.into_value()
 }
+
+///|
+pub extend TextDir with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for TextDir with fn from_value(v) {
@@ -629,6 +668,9 @@ pub extend Alternates with Reflect::{output, input, castable}
 pub impl IntoValue for Alternates with fn into_value(self) {
   Int(self.0)
 }
+
+///|
+pub extend Alternates with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for Alternates with fn from_value(v) {
@@ -690,6 +732,9 @@ pub extend StylisticSets with Reflect::{output, input, castable}
 pub impl IntoValue for StylisticSets with fn into_value(self) {
   Array(Arr::from_array(self.sets().map(i => Int(i.to_int64()))))
 }
+
+///|
+pub extend StylisticSets with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for StylisticSets with fn from_value(v) {
@@ -866,6 +911,9 @@ pub impl IntoValue for FontFeatures with fn into_value(self) {
 }
 
 ///|
+pub extend FontFeatures with IntoValue::{into_value}
+
+///|
 pub impl FromValue for FontFeatures with fn from_value(v) {
   match v {
     Array(values) => {
@@ -986,6 +1034,9 @@ pub impl IntoValue for ItalicToggle with fn into_value(self) {
 }
 
 ///|
+pub extend ItalicToggle with IntoValue::{into_value}
+
+///|
 pub impl FromValue for ItalicToggle with fn from_value(v) {
   ItalicToggle((FromValue::from_value(v) : Bool))
 }
@@ -1030,6 +1081,9 @@ pub impl Reflect for WeightDelta with fn castable(v) {
 pub impl IntoValue for WeightDelta with fn into_value(self) {
   Int(self.0)
 }
+
+///|
+pub extend WeightDelta with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for WeightDelta with fn from_value(v) {
@@ -1128,6 +1182,9 @@ pub impl IntoValue for Costs with fn into_value(self) {
 }
 
 ///|
+pub extend Costs with IntoValue::{into_value}
+
+///|
 pub impl FromValue for Costs with fn from_value(v) {
   match v {
     Dict(v) => {
@@ -1153,6 +1210,9 @@ pub impl FromValue for Costs with fn from_value(v) {
     v => raise HintedError(Costs::input().error(v))
   }
 }
+
+///|
+pub extend Costs with FromValue::{from_value}
 
 ///|
 /// Upstream's cast of `Costs` into a value: all four costs.

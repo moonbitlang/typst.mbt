@@ -366,6 +366,9 @@ pub impl IntoValue for ImageFit with fn into_value(self) {
 }
 
 ///|
+pub extend ImageFit with IntoValue::{into_value}
+
+///|
 pub impl FromValue for ImageFit with fn from_value(v) {
   match v {
     Str("cover") => Cover
@@ -541,6 +544,9 @@ pub impl IntoValue for VectorFormat with fn into_value(self) {
 }
 
 ///|
+pub extend VectorFormat with IntoValue::{into_value}
+
+///|
 pub impl FromValue for VectorFormat with fn from_value(v) {
   match v {
     Str("svg") => Svg
@@ -548,6 +554,9 @@ pub impl FromValue for VectorFormat with fn from_value(v) {
     v => raise HintedError(VectorFormat::input().error(v))
   }
 }
+
+///|
+pub extend VectorFormat with FromValue::{from_value}
 
 ///|
 /// The image scaling algorithm a viewer should use.
@@ -641,6 +650,9 @@ pub impl IntoValue for RasterFormat with fn into_value(self) {
 }
 
 ///|
+pub extend RasterFormat with IntoValue::{into_value}
+
+///|
 pub impl FromValue for RasterFormat with fn from_value(v) {
   if ExchangeFormat::castable(v) {
     Exchange(ExchangeFormat::from_value(v))
@@ -650,6 +662,9 @@ pub impl FromValue for RasterFormat with fn from_value(v) {
     raise HintedError(RasterFormat::input().error(v))
   }
 }
+
+///|
+pub extend RasterFormat with FromValue::{from_value}
 
 ///|
 /// A raster format typically used in image exchange, with efficient encoding.
@@ -741,6 +756,9 @@ pub impl IntoValue for ExchangeFormat with fn into_value(self) {
 }
 
 ///|
+pub extend ExchangeFormat with IntoValue::{into_value}
+
+///|
 pub impl FromValue for ExchangeFormat with fn from_value(v) {
   match v {
     Str("png") => Png
@@ -750,6 +768,9 @@ pub impl FromValue for ExchangeFormat with fn from_value(v) {
     v => raise HintedError(ExchangeFormat::input().error(v))
   }
 }
+
+///|
+pub extend ExchangeFormat with FromValue::{from_value}
 
 ///|
 /// Information that is needed to understand a pixmap buffer.
@@ -792,6 +813,9 @@ pub impl IntoValue for PixelFormat with fn into_value(self) {
 }
 
 ///|
+pub extend PixelFormat with IntoValue::{into_value}
+
+///|
 pub impl FromValue for PixelFormat with fn from_value(v) {
   match v {
     Dict(dict) => {
@@ -807,6 +831,9 @@ pub impl FromValue for PixelFormat with fn from_value(v) {
     v => raise HintedError(PixelFormat::input().error(v))
   }
 }
+
+///|
+pub extend PixelFormat with FromValue::{from_value}
 
 ///|
 /// Determines the channel encoding of raw pixel data.
@@ -853,6 +880,9 @@ pub impl IntoValue for PixelEncoding with fn into_value(self) {
     Lumaa8 => Str("lumaa8")
   }
 }
+
+///|
+pub extend PixelEncoding with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for PixelEncoding with fn from_value(v) {

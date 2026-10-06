@@ -37,6 +37,9 @@ pub impl IntoValue for FigureKind with fn into_value(self) {
 }
 
 ///|
+pub extend FigureKind with IntoValue::{into_value}
+
+///|
 pub impl FromValue for FigureKind with fn from_value(v) {
   if Element::castable(v) {
     return Elem(Element::from_value(v))

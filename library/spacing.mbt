@@ -76,6 +76,9 @@ pub impl IntoValue for Spacing with fn into_value(self) {
 }
 
 ///|
+pub extend Spacing with IntoValue::{into_value}
+
+///|
 pub impl FromValue for Spacing with fn from_value(value) {
   match value {
     Relative(_) | Length(_) | Ratio(_) => Rel(Rel::from_value(value))
@@ -83,6 +86,9 @@ pub impl FromValue for Spacing with fn from_value(value) {
     _ => raise HintedError(spacing_input().error(value))
   }
 }
+
+///|
+pub extend Spacing with FromValue::{from_value}
 
 ///|
 /// How to size something along an axis (upstream `Sizing`,
@@ -149,6 +155,9 @@ pub impl IntoValue for Sizing with fn into_value(self) {
 }
 
 ///|
+pub extend Sizing with IntoValue::{into_value}
+
+///|
 pub impl FromValue for Sizing with fn from_value(value) {
   match value {
     Value::Auto => Auto
@@ -157,3 +166,6 @@ pub impl FromValue for Sizing with fn from_value(value) {
     _ => raise HintedError(sizing_input().error(value))
   }
 }
+
+///|
+pub extend Sizing with FromValue::{from_value}

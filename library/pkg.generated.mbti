@@ -3491,7 +3491,9 @@ pub(all) enum Alignment {
 pub fn Alignment::add(Self, Self) -> Self raise HintedError
 pub fn Alignment::field(Self, String) -> Value?
 pub fn Alignment::fix(Self, Dir) -> Axes[FixedAlignment]
+pub fn Alignment::fold(Self, Self) -> Self
 pub fn Alignment::from_side(Side) -> Self
+pub fn Alignment::into_value(Self) -> Value
 pub fn Alignment::inv(Self) -> Self
 pub fn Alignment::repr(Self) -> String
 pub fn Alignment::resolve(Self, StyleChain) -> Axes[FixedAlignment]
@@ -3506,6 +3508,7 @@ pub impl Reflect for Alignment
 pub(all) struct Alternates(Int64) derive(Default, Eq, Hash)
 pub fn Alternates::castable(Value) -> Bool
 pub fn Alternates::input() -> CastInfo
+pub fn Alternates::into_value(Self) -> Value
 pub fn Alternates::output() -> CastInfo
 pub impl FromValue for Alternates
 pub impl IntoValue for Alternates
@@ -3651,6 +3654,7 @@ pub fn Arr::castable(Value) -> Bool
 pub fn Arr::concat(Self, Self) -> Self
 pub fn Arr::copy(Self) -> Self
 pub fn Arr::from_array(Array[Value]) -> Self
+pub fn Arr::from_value(Value) -> Self raise HintedError
 pub fn Arr::input() -> CastInfo
 pub fn Arr::insert(Self, Int64, Value) -> Unit raise HintedError
 pub fn Arr::is_empty(Self) -> Bool
@@ -3698,6 +3702,7 @@ pub(all) enum ArtifactKind {
 } derive(Eq, Hash, @debug.Debug)
 pub fn ArtifactKind::castable(Value) -> Bool
 pub fn ArtifactKind::input() -> CastInfo
+pub fn ArtifactKind::into_value(Self) -> Value
 pub fn ArtifactKind::output() -> CastInfo
 pub impl Default for ArtifactKind
 pub impl FromValue for ArtifactKind
@@ -3753,6 +3758,7 @@ pub(all) struct Augment {
   stroke : Smart[Stroke]
 } derive(Eq)
 pub fn Augment::castable(Value) -> Bool
+pub fn Augment::from_value(Value) -> Self raise HintedError
 pub fn Augment::input() -> CastInfo
 pub fn Augment::output() -> CastInfo
 pub fn Augment::resolve(Self, StyleChain) -> ResolvedAugment
@@ -3765,6 +3771,7 @@ pub impl Reflect for Augment
 pub(all) struct AugmentOffsets(Array[Int64]) derive(Eq, Hash, @debug.Debug)
 pub fn AugmentOffsets::castable(Value) -> Bool
 pub fn AugmentOffsets::input() -> CastInfo
+pub fn AugmentOffsets::into_value(Self) -> Value
 pub fn AugmentOffsets::output() -> CastInfo
 pub impl FromValue for AugmentOffsets
 pub impl IntoValue for AugmentOffsets
@@ -3783,6 +3790,7 @@ pub fn Axes::bitor(Self[Bool], Self[Bool]) -> Self[Bool]
 pub fn Axes::div_by(Self[Abs], Double) -> Self[Abs]
 pub fn Axes::fits(Self[Abs], Self[Abs]) -> Bool
 pub fn[T] Axes::get(Self[T], Axis) -> T
+pub fn[T : IntoValue] Axes::into_value(Self[T]) -> Value
 pub fn Axes::is_finite_size(Self[Abs]) -> Bool
 pub fn Axes::is_zero_size(Self[Abs]) -> Bool
 pub fn[T, U] Axes::map(Self[T], (T) -> U) -> Self[U]
@@ -3819,7 +3827,9 @@ pub impl Reflect for Axis
 
 pub(all) struct AxisValue(Double) derive(Eq, Hash, @debug.Debug)
 pub fn AxisValue::clamp(Self, FontAxis) -> Self
+pub fn AxisValue::from_value(Value) -> Self raise HintedError
 pub fn AxisValue::get(Self) -> Float
+pub fn AxisValue::into_value(Self) -> Value
 pub fn AxisValue::new(Float) -> Self
 pub impl FromValue for AxisValue
 pub impl IntoValue for AxisValue
@@ -3841,6 +3851,7 @@ pub(all) struct BaselinePos {
 pub fn BaselinePos::at(Self) -> Smart[VAlignment]
 pub fn BaselinePos::castable(Value) -> Bool
 pub fn BaselinePos::input() -> CastInfo
+pub fn BaselinePos::into_value(Self) -> Value
 pub fn BaselinePos::output() -> CastInfo
 pub fn BaselinePos::shift(Self) -> Rel[Length]
 pub impl Default for BaselinePos
@@ -4055,6 +4066,7 @@ pub(all) enum BottomEdge {
 } derive(Eq, Hash)
 pub fn BottomEdge::castable(Value) -> Bool
 pub fn BottomEdge::input() -> CastInfo
+pub fn BottomEdge::into_value(Self) -> Value
 pub fn BottomEdge::output() -> CastInfo
 pub impl FromValue for BottomEdge
 pub impl IntoValue for BottomEdge
@@ -4066,7 +4078,9 @@ pub(all) enum BottomEdgeMetric {
   Bounds
 } derive(Eq, Hash, @debug.Debug)
 pub fn BottomEdgeMetric::castable(Value) -> Bool
+pub fn BottomEdgeMetric::from_value(Value) -> Self raise HintedError
 pub fn BottomEdgeMetric::input() -> CastInfo
+pub fn BottomEdgeMetric::into_value(Self) -> Value
 pub fn BottomEdgeMetric::output() -> CastInfo
 pub fn BottomEdgeMetric::to_vertical(Self) -> VerticalFontMetric?
 pub impl FromValue for BottomEdgeMetric
@@ -4142,6 +4156,7 @@ pub fn BundleFormat::pack(Self) -> Content
 pub impl NativeElement for BundleFormat
 
 pub struct BundlePath(@moonbitlang/typst/syntax.VirtualPath) derive(Eq, Hash)
+pub fn BundlePath::from_value(Value) -> Self raise HintedError
 pub fn BundlePath::into_inner(Self) -> @moonbitlang/typst/syntax.VirtualPath
 pub fn BundlePath::new(@moonbitlang/typst/syntax.VirtualPath) -> Self raise HintedError
 pub impl FromValue for BundlePath
@@ -4352,6 +4367,7 @@ pub(all) enum Celled[T] {
   CelledFunc(Func)
   CelledArray(Array[T])
 } derive(Eq)
+pub fn[T : IntoValue] Celled::into_value(Self[T]) -> Value
 pub fn[T : FromValue] Celled::resolve(Self[T], Engine, StyleChain, Int, Int, T) -> T raise SourceError
 pub impl[T : Default] Default for Celled[T]
 pub impl[T : Fold] Fold for Celled[T]
@@ -4535,6 +4551,7 @@ pub fn Color::castable(Value) -> Bool
 pub fn Color::from_str(String) -> Result[Self, String]
 pub fn Color::from_u32(UInt) -> Self
 pub fn Color::from_u8(Int, Int, Int, Int) -> Self
+pub fn Color::from_value(Value) -> Self raise HintedError
 pub fn Color::input() -> CastInfo
 pub fn Color::mix_iter(Array[WeightedColor], Smart[ColorSpace]) -> Self raise HintedError
 pub fn Color::output() -> CastInfo
@@ -4569,6 +4586,7 @@ pub(all) enum ColorSpace {
 pub fn ColorSpace::castable(Value) -> Bool
 pub fn ColorSpace::hue_index(Self) -> Int?
 pub fn ColorSpace::input() -> CastInfo
+pub fn ColorSpace::into_value(Self) -> Value
 pub fn ColorSpace::output() -> CastInfo
 pub impl Fingerprint for ColorSpace
 pub impl FromValue for ColorSpace
@@ -4643,12 +4661,14 @@ pub fn Content::field_by_name(Self, String) -> Value raise HintedError
 pub fn Content::field_raw(Self, Int) -> Value?
 pub fn Content::fields(Self) -> Dict
 pub fn Content::from_fields(Element, FixedArray[Value?]) -> Self
+pub fn Content::from_value(Value) -> Self raise HintedError
 pub fn Content::func(Self) -> Element
 pub fn Content::get(Self, Int, styles? : StyleChain) -> Value raise FieldAccessError
 pub fn Content::get_by_name(Self, String) -> Value raise FieldAccessError
 pub fn Content::guarded(Self, Int) -> Self
 pub fn Content::has(Self, String) -> Bool
 pub fn Content::input() -> CastInfo
+pub fn Content::into_value(Self) -> Value
 pub fn Content::is_(Self, Element) -> Bool
 pub fn Content::is_empty(Self) -> Bool
 pub fn Content::is_guarded(Self, Int) -> Bool
@@ -4744,8 +4764,10 @@ pub(all) struct Costs {
   orphan : Ratio?
 } derive(Default, Eq, Hash)
 pub fn Costs::castable(Value) -> Bool
+pub fn Costs::from_value(Value) -> Self raise HintedError
 pub fn Costs::hyphenation(Self) -> Ratio
 pub fn Costs::input() -> CastInfo
+pub fn Costs::into_value(Self) -> Value
 pub fn Costs::orphan(Self) -> Ratio
 pub fn Costs::output() -> CastInfo
 pub fn Costs::runt(Self) -> Ratio
@@ -4791,6 +4813,7 @@ pub(all) enum CounterKey {
 } derive(Eq)
 pub fn CounterKey::castable(Value) -> Bool
 pub fn CounterKey::input() -> CastInfo
+pub fn CounterKey::into_value(Self) -> Value
 pub fn CounterKey::output() -> CastInfo
 pub fn CounterKey::repr(Self) -> String
 pub impl Fingerprint for CounterKey
@@ -4803,6 +4826,7 @@ pub fn CounterState::castable(Value) -> Bool
 pub fn CounterState::copy(Self) -> Self
 pub fn CounterState::display(Self, Engine, Context, @moonbitlang/typst/syntax.Span, Numbering) -> Value raise SourceError
 pub fn CounterState::first(Self) -> Int64
+pub fn CounterState::from_value(Value) -> Self raise HintedError
 pub fn CounterState::init(Bool) -> Self
 pub fn CounterState::input() -> CastInfo
 pub fn CounterState::output() -> CastInfo
@@ -4820,6 +4844,7 @@ pub(all) enum CounterUpdate {
 } derive(Eq)
 pub fn CounterUpdate::castable(Value) -> Bool
 pub fn CounterUpdate::input() -> CastInfo
+pub fn CounterUpdate::into_value(Self) -> Value
 pub fn CounterUpdate::output() -> CastInfo
 pub impl Fingerprint for CounterUpdate
 pub impl FromValue for CounterUpdate
@@ -4850,6 +4875,7 @@ pub(all) enum Covers {
 pub fn Covers::as_regex(Self) -> Regex
 pub fn Covers::castable(Value) -> Bool
 pub fn Covers::input() -> CastInfo
+pub fn Covers::into_value(Self) -> Value
 pub fn Covers::output() -> CastInfo
 pub impl FromValue for Covers
 pub impl IntoValue for Covers
@@ -4875,6 +4901,7 @@ pub(all) enum CslSource {
   Named(@hayagriva.ArchivedStyle, String?)
   Normal(DataSource)
 } derive(Eq, Hash)
+pub fn CslSource::into_value(Self) -> Value
 pub impl FromValue for CslSource
 pub impl IntoValue for CslSource
 pub impl Reflect for CslSource
@@ -4925,6 +4952,7 @@ pub impl ToCss for CssDisplay
 pub struct CssProperties(Array[CssProperty]) derive(Eq, Hash)
 pub fn CssProperties::build((HintedString) -> Unit) -> CssPropertiesBuilder
 pub fn CssProperties::copy(Self) -> Self
+pub fn CssProperties::into_value(Self) -> Value
 pub fn CssProperties::is_empty(Self) -> Bool
 pub fn CssProperties::iter(Self) -> Iter[CssProperty]
 pub fn CssProperties::length(Self) -> Int
@@ -5105,7 +5133,9 @@ pub(all) enum DataSource {
   Bytes(Bytes)
 } derive(Eq, Hash)
 pub fn DataSource::castable(Value) -> Bool
+pub fn DataSource::from_value(Value) -> Self raise HintedError
 pub fn DataSource::input() -> CastInfo
+pub fn DataSource::into_value(Self) -> Value
 pub fn DataSource::load(Self, @moonbitlang/typst/syntax.Span, &World) -> Loaded raise SourceError
 pub fn DataSource::output() -> CastInfo
 pub impl FromValue for DataSource
@@ -5225,6 +5255,7 @@ pub fn DelimiterPair::brace() -> Self
 pub fn DelimiterPair::castable(Value) -> Bool
 pub fn DelimiterPair::close(Self) -> Char?
 pub fn DelimiterPair::input() -> CastInfo
+pub fn DelimiterPair::into_value(Self) -> Value
 pub fn DelimiterPair::open(Self) -> Char?
 pub fn DelimiterPair::output() -> CastInfo
 pub fn DelimiterPair::paren() -> Self
@@ -5242,6 +5273,7 @@ pub fn Deprecation::with_message(Self, String) -> Self
 pub fn Deprecation::with_until(Self, String) -> Self
 
 pub(all) struct Depth(Int64) derive(Default, Eq, Hash)
+pub fn Depth::into_value(Self) -> Value
 pub impl Fold for Depth
 pub impl FromValue for Depth
 pub impl IntoValue for Depth
@@ -5254,7 +5286,9 @@ pub(all) enum Destination {
 } derive(Eq)
 pub fn Destination::alt_text(Self, Engine, StyleChain, @moonbitlang/typst/syntax.Span) -> String raise SourceError
 pub fn Destination::castable(Value) -> Bool
+pub fn Destination::from_value(Value) -> Self raise HintedError
 pub fn Destination::input() -> CastInfo
+pub fn Destination::into_value(Self) -> Value
 pub fn Destination::of_value(Value) -> Self
 pub fn Destination::output() -> CastInfo
 pub impl Fingerprint for Destination
@@ -5323,7 +5357,9 @@ pub impl NativeElement for DirectLinkElem
 
 pub struct DisplayPattern(String, @time.FormatItem)
 pub fn DisplayPattern::castable(Value) -> Bool
+pub fn DisplayPattern::from_value(Value) -> Self raise HintedError
 pub fn DisplayPattern::input() -> CastInfo
+pub fn DisplayPattern::into_value(Self) -> Value
 pub fn DisplayPattern::output() -> CastInfo
 pub impl FromValue for DisplayPattern
 pub impl IntoValue for DisplayPattern
@@ -5494,8 +5530,10 @@ pub fn Element::field(Self, Int) -> FieldInfo?
 pub fn Element::field_id(Self, String) -> Int?
 pub fn Element::field_name(Self, Int) -> String?
 pub fn Element::fields(Self) -> Array[FieldInfo]
+pub fn Element::from_value(Value) -> Self raise HintedError
 pub fn Element::hooks(Self) -> ElementHooks
 pub fn Element::input() -> CastInfo
+pub fn Element::into_value(Self) -> Value
 pub fn Element::is_locatable(Self) -> Bool
 pub fn Element::is_tagged(Self) -> Bool
 pub fn Element::is_unqueriable(Self) -> Bool
@@ -5816,7 +5854,9 @@ pub(all) enum ExchangeFormat {
 } derive(Eq, Hash, @debug.Debug)
 pub fn ExchangeFormat::castable(Value) -> Bool
 pub fn ExchangeFormat::detect(Bytes) -> Self?
+pub fn ExchangeFormat::from_value(Value) -> Self raise HintedError
 pub fn ExchangeFormat::input() -> CastInfo
+pub fn ExchangeFormat::into_value(Self) -> Value
 pub fn ExchangeFormat::output() -> CastInfo
 pub impl FromValue for ExchangeFormat
 pub impl IntoValue for ExchangeFormat
@@ -5984,6 +6024,7 @@ pub(all) enum FigureKind {
 } derive(Eq)
 pub fn FigureKind::castable(Value) -> Bool
 pub fn FigureKind::input() -> CastInfo
+pub fn FigureKind::into_value(Self) -> Value
 pub fn FigureKind::output() -> CastInfo
 pub impl FromValue for FigureKind
 pub impl IntoValue for FigureKind
@@ -6009,6 +6050,7 @@ pub fn FirstLineIndent::all(Self) -> Bool
 pub fn FirstLineIndent::amount(Self) -> Length
 pub fn FirstLineIndent::castable(Value) -> Bool
 pub fn FirstLineIndent::input() -> CastInfo
+pub fn FirstLineIndent::into_value(Self) -> Value
 pub fn FirstLineIndent::output() -> CastInfo
 pub impl Default for FirstLineIndent
 pub impl Fold for FirstLineIndent
@@ -6098,7 +6140,9 @@ pub(all) struct FontFamily {
 pub fn FontFamily::as_str(Self) -> String
 pub fn FontFamily::castable(Value) -> Bool
 pub fn FontFamily::covers(Self) -> Regex?
+pub fn FontFamily::from_value(Value) -> Self raise HintedError
 pub fn FontFamily::input() -> CastInfo
+pub fn FontFamily::into_value(Self) -> Value
 pub fn FontFamily::new(String) -> Self
 pub fn FontFamily::output() -> CastInfo
 pub fn FontFamily::with_coverage(String, Covers?) -> Self
@@ -6109,6 +6153,7 @@ pub impl Reflect for FontFamily
 pub(all) struct FontFeatures(Array[(OpenTypeTag, Int64)]) derive(Default, Eq, Hash)
 pub fn FontFeatures::castable(Value) -> Bool
 pub fn FontFeatures::input() -> CastInfo
+pub fn FontFeatures::into_value(Self) -> Value
 pub fn FontFeatures::output() -> CastInfo
 pub impl Fold for FontFeatures
 pub impl FromValue for FontFeatures
@@ -6158,6 +6203,7 @@ pub impl Fingerprint for FontInstance
 pub(all) struct FontList(Array[FontFamily]) derive(Eq, Hash)
 pub fn FontList::castable(Value) -> Bool
 pub fn FontList::input() -> CastInfo
+pub fn FontList::into_value(Self) -> Value
 pub fn FontList::new(Array[FontFamily]) -> Self raise HintedError
 pub fn FontList::output() -> CastInfo
 pub impl FromValue for FontList
@@ -6187,6 +6233,7 @@ pub fn FontStretch::from_number(Int) -> Self
 pub fn FontStretch::from_ratio(Ratio) -> Self
 pub fn FontStretch::from_wdth(AxisValue) -> Self
 pub fn FontStretch::input() -> CastInfo
+pub fn FontStretch::into_value(Self) -> Value
 pub fn FontStretch::output() -> CastInfo
 pub fn FontStretch::repr(Self) -> String
 pub fn FontStretch::round(Self) -> Self
@@ -6205,6 +6252,7 @@ pub(all) enum FontStyle {
 pub fn FontStyle::castable(Value) -> Bool
 pub fn FontStyle::distance(Self, Self) -> Int
 pub fn FontStyle::input() -> CastInfo
+pub fn FontStyle::into_value(Self) -> Value
 pub fn FontStyle::output() -> CastInfo
 pub impl Default for FontStyle
 pub impl FromValue for FontStyle
@@ -6224,6 +6272,7 @@ pub(all) struct FontVariations(Array[(OpenTypeTag, AxisValue)]) derive(Eq, Hash,
 pub fn FontVariations::castable(Value) -> Bool
 pub fn FontVariations::chain(Self, Self) -> Self
 pub fn FontVariations::input() -> CastInfo
+pub fn FontVariations::into_value(Self) -> Value
 pub fn FontVariations::normalized(Self) -> Self
 pub fn FontVariations::output() -> CastInfo
 pub fn FontVariations::resolve(Array[FontAxis], FontVariant, Abs) -> Self
@@ -6237,8 +6286,10 @@ pub(all) struct FontWeight(Int) derive(Compare, Eq, Hash, @debug.Debug)
 pub fn FontWeight::castable(Value) -> Bool
 pub fn FontWeight::distance(Self, Self) -> Int
 pub fn FontWeight::from_number(Int) -> Self
+pub fn FontWeight::from_value(Value) -> Self raise HintedError
 pub fn FontWeight::from_wght(AxisValue) -> Self
 pub fn FontWeight::input() -> CastInfo
+pub fn FontWeight::into_value(Self) -> Value
 pub fn FontWeight::output() -> CastInfo
 pub fn FontWeight::thicken(Self, Int) -> Self
 pub fn FontWeight::to_number(Self) -> Int
@@ -6261,6 +6312,7 @@ pub(all) enum FootnoteBody {
 } derive(Eq)
 pub fn FootnoteBody::castable(Value) -> Bool
 pub fn FootnoteBody::input() -> CastInfo
+pub fn FootnoteBody::into_value(Self) -> Value
 pub fn FootnoteBody::output() -> CastInfo
 pub impl FromValue for FootnoteBody
 pub impl IntoValue for FootnoteBody
@@ -6402,6 +6454,7 @@ pub(all) enum FracStyle {
 } derive(Eq, Hash, @debug.Debug)
 pub fn FracStyle::castable(Value) -> Bool
 pub fn FracStyle::input() -> CastInfo
+pub fn FracStyle::into_value(Self) -> Value
 pub fn FracStyle::output() -> CastInfo
 pub impl Default for FracStyle
 pub impl FromValue for FracStyle
@@ -6525,6 +6578,7 @@ pub fn Func::contextual(Self) -> Bool?
 pub fn Func::element(Element) -> Self
 pub fn Func::field(Self, String, BindingGuard) -> Value raise HintedError
 pub fn Func::from_inner(FuncInner) -> Self
+pub fn Func::from_value(Value) -> Self raise HintedError
 pub fn Func::host(HostFunc) -> Self
 pub fn Func::input() -> CastInfo
 pub fn Func::name(Self) -> String?
@@ -6885,6 +6939,7 @@ pub(all) enum HAlignment {
   End
 } derive(Eq, Hash, @debug.Debug)
 pub fn HAlignment::fix(Self, Dir) -> FixedAlignment
+pub fn HAlignment::into_value(Self) -> Value
 pub fn HAlignment::inv(Self) -> Self
 pub fn HAlignment::repr(Self) -> String
 pub fn HAlignment::resolve(Self, StyleChain) -> FixedAlignment
@@ -7085,6 +7140,7 @@ pub fn HtmlAttrs::castable(Value) -> Bool
 pub fn HtmlAttrs::copy(Self) -> Self
 pub fn HtmlAttrs::get(Self, HtmlAttr) -> String?
 pub fn HtmlAttrs::input() -> CastInfo
+pub fn HtmlAttrs::into_value(Self) -> Value
 pub fn HtmlAttrs::is_empty(Self) -> Bool
 pub fn HtmlAttrs::new() -> Self
 pub fn HtmlAttrs::output() -> CastInfo
@@ -7271,6 +7327,7 @@ pub(all) enum ImageFit {
 } derive(Eq, Hash, @debug.Debug)
 pub fn ImageFit::castable(Value) -> Bool
 pub fn ImageFit::input() -> CastInfo
+pub fn ImageFit::into_value(Self) -> Value
 pub fn ImageFit::output() -> CastInfo
 pub impl FromValue for ImageFit
 pub impl IntoValue for ImageFit
@@ -7391,6 +7448,7 @@ pub fn Introspector::track_with(Self, IntrospectionRecorder) -> Self
 pub fn Introspector::untracked(Self) -> Self
 
 pub(all) struct ItalicToggle(Bool) derive(Eq, Hash)
+pub fn ItalicToggle::into_value(Self) -> Value
 pub impl Fold for ItalicToggle
 pub impl FromValue for ItalicToggle
 pub impl IntoValue for ItalicToggle
@@ -7402,6 +7460,7 @@ pub(all) struct JustificationLimits {
 } derive(Eq, Hash)
 pub fn JustificationLimits::castable(Value) -> Bool
 pub fn JustificationLimits::input() -> CastInfo
+pub fn JustificationLimits::into_value(Self) -> Value
 pub fn JustificationLimits::output() -> CastInfo
 pub fn JustificationLimits::spacing_limits(Self) -> Limits[Rel[Length]]
 pub fn JustificationLimits::tracking_limits(Self) -> Limits[Length]
@@ -7427,6 +7486,8 @@ pub(all) struct Lang(String) derive(Compare, Eq, Hash, @debug.Debug)
 pub fn Lang::as_str(Self) -> String
 pub fn Lang::dir(Self) -> Dir
 pub fn Lang::from_str(String) -> Self raise HintedError
+pub fn Lang::from_value(Value) -> Self raise HintedError
+pub fn Lang::into_value(Self) -> Value
 pub impl FromValue for Lang
 pub impl IntoValue for Lang
 pub impl Reflect for Lang
@@ -7476,8 +7537,10 @@ pub(all) struct Length {
 pub fn Length::at(Self, Abs) -> Abs
 pub fn Length::castable(Value) -> Bool
 pub fn Length::div_by(Self, Double) -> Self
+pub fn Length::fold(Self, Self) -> Self
 pub fn Length::from_abs(Abs) -> Self
 pub fn Length::from_em(Em) -> Self
+pub fn Length::from_value(Value) -> Self raise HintedError
 pub fn Length::input() -> CastInfo
 pub fn Length::is_zero(Self) -> Bool
 pub fn Length::output() -> CastInfo
@@ -7527,6 +7590,7 @@ pub(all) struct Limits[T] {
   min : T
   max : T
 } derive(Eq, Hash)
+pub fn[T : IntoValue] Limits::into_value(Self[T]) -> Value
 pub impl[T] Fold for Limits[T]
 pub impl[T : IntoValue] IntoValue for Limits[T]
 
@@ -7635,6 +7699,7 @@ pub(all) enum LineNumberingScope {
 } derive(Eq, Hash, @debug.Debug)
 pub fn LineNumberingScope::castable(Value) -> Bool
 pub fn LineNumberingScope::input() -> CastInfo
+pub fn LineNumberingScope::into_value(Self) -> Value
 pub fn LineNumberingScope::output() -> CastInfo
 pub impl FromValue for LineNumberingScope
 pub impl IntoValue for LineNumberingScope
@@ -7720,7 +7785,9 @@ pub(all) enum LinkTarget {
   Label(Label)
 } derive(Eq)
 pub fn LinkTarget::castable(Value) -> Bool
+pub fn LinkTarget::from_value(Value) -> Self raise HintedError
 pub fn LinkTarget::input() -> CastInfo
+pub fn LinkTarget::into_value(Self) -> Value
 pub fn LinkTarget::of_value(Value) -> Self
 pub fn LinkTarget::output() -> CastInfo
 pub fn LinkTarget::resolve_early(Self, Engine, @moonbitlang/typst/syntax.Span) -> Destination raise SourceError
@@ -7786,6 +7853,7 @@ pub(all) enum ListMarker {
 } derive(Eq)
 pub fn ListMarker::castable(Value) -> Bool
 pub fn ListMarker::input() -> CastInfo
+pub fn ListMarker::into_value(Self) -> Value
 pub fn ListMarker::output() -> CastInfo
 pub impl FromValue for ListMarker
 pub impl IntoValue for ListMarker
@@ -7826,7 +7894,9 @@ pub impl Reflect for Locale
 
 pub(all) struct LocatableSelector(Selector) derive(Eq)
 pub fn LocatableSelector::castable(Value) -> Bool
+pub fn LocatableSelector::from_value(Value) -> Self raise HintedError
 pub fn LocatableSelector::input() -> CastInfo
+pub fn LocatableSelector::into_value(Self) -> Value
 pub fn LocatableSelector::output() -> CastInfo
 pub fn LocatableSelector::resolve_unique(Self, Engine, Context, @moonbitlang/typst/syntax.Span) -> Location raise SourceError
 pub impl FromValue for LocatableSelector
@@ -7906,6 +7976,8 @@ pub(all) struct Margin[T] {
   sides : Sides[T?]
   two_sided : Bool?
 } derive(Eq, Hash, @debug.Debug)
+pub fn[T : FromValue] Margin::from_value(Value) -> Self[T] raise HintedError
+pub fn[T : IntoValue + Eq] Margin::into_value(Self[T]) -> Value
 pub fn[T] Margin::splat(T?) -> Self[T]
 pub impl[T : Fold] Fold for Margin[T]
 pub impl[T : FromValue] FromValue for Margin[T]
@@ -8053,6 +8125,7 @@ pub fn MathDelimiter::char(Char) -> Self raise HintedError
 pub fn MathDelimiter::find_matching(Self) -> Self
 pub fn MathDelimiter::get(Self) -> Char?
 pub fn MathDelimiter::input() -> CastInfo
+pub fn MathDelimiter::into_value(Self) -> Value
 pub fn MathDelimiter::none() -> Self
 pub fn MathDelimiter::output() -> CastInfo
 pub impl Default for MathDelimiter
@@ -8167,6 +8240,7 @@ pub(all) enum MathSize {
 } derive(Compare, Eq, Hash, @debug.Debug)
 pub fn MathSize::castable(Value) -> Bool
 pub fn MathSize::input() -> CastInfo
+pub fn MathSize::into_value(Self) -> Value
 pub fn MathSize::output() -> CastInfo
 pub impl FromValue for MathSize
 pub impl IntoValue for MathSize
@@ -8476,6 +8550,7 @@ pub(all) enum Numbering {
 pub fn Numbering::apply(Self, Engine, Context, @moonbitlang/typst/syntax.Span, ArrayView[Int64]) -> Value raise SourceError
 pub fn Numbering::castable(Value) -> Bool
 pub fn Numbering::input() -> CastInfo
+pub fn Numbering::into_value(Self) -> Value
 pub fn Numbering::output() -> CastInfo
 pub fn Numbering::trimmed(Self) -> Self
 pub impl Fingerprint for Numbering
@@ -8492,7 +8567,9 @@ pub fn NumberingPattern::apply(Self, (Engine, @moonbitlang/typst/syntax.Span)?, 
 pub fn NumberingPattern::apply_kth(Self, Engine, @moonbitlang/typst/syntax.Span, Int, Int64) -> String
 pub fn NumberingPattern::castable(Value) -> Bool
 pub fn NumberingPattern::from_str(String) -> Self raise HintedError
+pub fn NumberingPattern::from_value(Value) -> Self raise HintedError
 pub fn NumberingPattern::input() -> CastInfo
+pub fn NumberingPattern::into_value(Self) -> Value
 pub fn NumberingPattern::num_pieces(Self) -> Int
 pub fn NumberingPattern::output() -> CastInfo
 pub fn NumberingPattern::to_string(Self) -> String
@@ -8556,6 +8633,7 @@ pub impl Eq for Oklch
 pub impl ToCss for Oklch
 
 pub(all) struct OneOrMultiple[T](Array[T]) derive(Eq, Hash)
+pub fn[T : IntoValue] OneOrMultiple::into_value(Self[T]) -> Value
 pub impl[T] Default for OneOrMultiple[T]
 pub impl[T] Fold for OneOrMultiple[T]
 pub impl[T : FromValue] FromValue for OneOrMultiple[T]
@@ -8578,6 +8656,7 @@ pub impl NativeElement for OpElem
 pub(all) struct OpenTypeTag(String) derive(Compare, Eq, Hash, @debug.Debug)
 pub fn OpenTypeTag::castable(Value) -> Bool
 pub fn OpenTypeTag::from_bytes_lossy(String) -> Self
+pub fn OpenTypeTag::from_value(Value) -> Self raise HintedError
 pub fn OpenTypeTag::input() -> CastInfo
 pub fn OpenTypeTag::output() -> CastInfo
 pub fn OpenTypeTag::to_str_lossy(Self) -> String
@@ -8863,7 +8942,9 @@ pub(all) struct PageRange {
   end : Int?
 } derive(Eq, Hash, @debug.Debug)
 pub fn PageRange::castable(Value) -> Bool
+pub fn PageRange::from_value(Value) -> Self raise HintedError
 pub fn PageRange::input() -> CastInfo
+pub fn PageRange::into_value(Self) -> Value
 pub fn PageRange::output() -> CastInfo
 pub impl FromValue for PageRange
 pub impl IntoValue for PageRange
@@ -8907,7 +8988,9 @@ pub(all) enum PagedFormat {
   Svg
 } derive(Eq, Hash, @debug.Debug)
 pub fn PagedFormat::castable(Value) -> Bool
+pub fn PagedFormat::from_value(Value) -> Self raise HintedError
 pub fn PagedFormat::input() -> CastInfo
+pub fn PagedFormat::into_value(Self) -> Value
 pub fn PagedFormat::output() -> CastInfo
 pub impl FromValue for PagedFormat
 pub impl IntoValue for PagedFormat
@@ -8918,7 +9001,9 @@ pub(all) struct PagedPosition {
   point : Point
 } derive(Eq)
 pub fn PagedPosition::castable(Value) -> Bool
+pub fn PagedPosition::from_value(Value) -> Self raise HintedError
 pub fn PagedPosition::input() -> CastInfo
+pub fn PagedPosition::into_value(Self) -> Value
 pub fn PagedPosition::origin() -> Self
 pub fn PagedPosition::output() -> CastInfo
 pub fn PagedPosition::to_dict(Self) -> Dict
@@ -8934,7 +9019,9 @@ pub(all) enum Paint {
 } derive(Eq)
 pub fn Paint::as_decoration(Self) -> Self
 pub fn Paint::castable(Value) -> Bool
+pub fn Paint::from_value(Value) -> Self raise HintedError
 pub fn Paint::input() -> CastInfo
+pub fn Paint::into_value(Self) -> Value
 pub fn Paint::output() -> CastInfo
 pub fn Paint::relative(Self) -> Smart[RelativeTo]
 pub fn Paint::repr(Self) -> String
@@ -8955,6 +9042,7 @@ pub fn Paper::castable(Value) -> Bool
 pub fn Paper::from_name(String) -> Self?
 pub fn Paper::height(Self) -> Abs
 pub fn Paper::input() -> CastInfo
+pub fn Paper::into_value(Self) -> Value
 pub fn Paper::output() -> CastInfo
 pub fn Paper::width(Self) -> Abs
 pub impl FromValue for Paper
@@ -9078,6 +9166,7 @@ pub(all) enum PathOrStr {
   Path(@moonbitlang/typst/syntax.RootedPath)
   Str(String)
 } derive(Eq, Hash)
+pub fn PathOrStr::into_value(Self) -> Value
 pub fn PathOrStr::resolve(Self, @moonbitlang/typst/syntax.FileId) -> @moonbitlang/typst/syntax.RootedPath raise HintedError
 pub fn PathOrStr::resolve_if_some(Self, @moonbitlang/typst/syntax.FileId?) -> @moonbitlang/typst/syntax.RootedPath raise HintedError
 pub impl FromValue for PathOrStr
@@ -9151,6 +9240,7 @@ pub(all) enum PdfMarkerTagKind {
 } derive(Eq, Hash, @debug.Debug)
 pub fn PdfMarkerTagKind::castable(Value) -> Bool
 pub fn PdfMarkerTagKind::input() -> CastInfo
+pub fn PdfMarkerTagKind::into_value(Self) -> Value
 pub fn PdfMarkerTagKind::output() -> CastInfo
 pub impl FromValue for PdfMarkerTagKind
 pub impl IntoValue for PdfMarkerTagKind
@@ -9213,6 +9303,7 @@ pub(all) enum PdfStandard {
 } derive(Eq, Hash, @debug.Debug)
 pub fn PdfStandard::castable(Value) -> Bool
 pub fn PdfStandard::input() -> CastInfo
+pub fn PdfStandard::into_value(Self) -> Value
 pub fn PdfStandard::output() -> CastInfo
 pub impl FromValue for PdfStandard
 pub impl IntoValue for PdfStandard
@@ -9223,6 +9314,7 @@ pub(all) struct PdfStandards {
 } derive(Eq, Hash)
 pub fn PdfStandards::castable(Value) -> Bool
 pub fn PdfStandards::input() -> CastInfo
+pub fn PdfStandards::into_value(Self) -> Value
 pub fn PdfStandards::new(ArrayView[PdfStandard]) -> Self raise HintedError
 pub fn PdfStandards::standards(Self) -> Array[PdfStandard]
 pub impl Default for PdfStandards
@@ -9249,6 +9341,7 @@ pub(all) enum PixelEncoding {
 } derive(Eq, Hash, @debug.Debug)
 pub fn PixelEncoding::castable(Value) -> Bool
 pub fn PixelEncoding::input() -> CastInfo
+pub fn PixelEncoding::into_value(Self) -> Value
 pub fn PixelEncoding::output() -> CastInfo
 pub impl FromValue for PixelEncoding
 pub impl IntoValue for PixelEncoding
@@ -9260,7 +9353,9 @@ pub(all) struct PixelFormat {
   height : U32
 } derive(Eq, Hash, @debug.Debug)
 pub fn PixelFormat::castable(Value) -> Bool
+pub fn PixelFormat::from_value(Value) -> Self raise HintedError
 pub fn PixelFormat::input() -> CastInfo
+pub fn PixelFormat::into_value(Self) -> Value
 pub fn PixelFormat::output() -> CastInfo
 pub impl FromValue for PixelFormat
 pub impl IntoValue for PixelFormat
@@ -9310,6 +9405,7 @@ pub(all) enum PlacementScope {
 } derive(Eq, Hash, @debug.Debug)
 pub fn PlacementScope::castable(Value) -> Bool
 pub fn PlacementScope::input() -> CastInfo
+pub fn PlacementScope::into_value(Self) -> Value
 pub fn PlacementScope::output() -> CastInfo
 pub impl Default for PlacementScope
 pub impl FromValue for PlacementScope
@@ -9551,7 +9647,9 @@ pub(all) enum RasterFormat {
   Pixel(PixelFormat)
 } derive(Eq, Hash, @debug.Debug)
 pub fn RasterFormat::castable(Value) -> Bool
+pub fn RasterFormat::from_value(Value) -> Self raise HintedError
 pub fn RasterFormat::input() -> CastInfo
+pub fn RasterFormat::into_value(Self) -> Value
 pub fn RasterFormat::output() -> CastInfo
 pub impl FromValue for RasterFormat
 pub impl IntoValue for RasterFormat
@@ -9578,6 +9676,7 @@ pub impl Hash for RasterImage
 pub(all) struct Ratio(Scalar) derive(Compare, Default, Eq, Hash)
 pub fn Ratio::abs(Self) -> Self
 pub fn Ratio::div_by(Self, Double) -> Self
+pub fn Ratio::from_value(Value) -> Self raise HintedError
 pub fn Ratio::get(Self) -> Double
 pub fn Ratio::is_one(Self) -> Bool
 pub fn Ratio::is_zero(Self) -> Bool
@@ -9815,6 +9914,7 @@ pub(all) enum RefForm {
 } derive(Eq, Hash, @debug.Debug)
 pub fn RefForm::castable(Value) -> Bool
 pub fn RefForm::input() -> CastInfo
+pub fn RefForm::into_value(Self) -> Value
 pub fn RefForm::output() -> CastInfo
 pub impl Default for RefForm
 pub impl FromValue for RefForm
@@ -9827,6 +9927,7 @@ pub struct Regex {
 pub fn Regex::as_str(Self) -> String
 pub fn Regex::castable(Value) -> Bool
 pub fn Regex::input() -> CastInfo
+pub fn Regex::into_value(Self) -> Value
 pub fn Regex::is_match(Self, String) -> Bool
 pub fn Regex::new(String) -> Self raise HintedError
 pub fn Regex::output() -> CastInfo
@@ -9838,6 +9939,7 @@ pub impl Reflect for Regex
 pub(all) struct Region(String) derive(Compare, Eq, Hash, @debug.Debug)
 pub fn Region::as_str(Self) -> String
 pub fn Region::from_str(String) -> Self raise HintedError
+pub fn Region::from_value(Value) -> Self raise HintedError
 pub impl FromValue for Region
 pub impl IntoValue for Region
 pub impl Reflect for Region
@@ -9867,6 +9969,8 @@ pub(all) struct Rel[T] {
 pub fn[T : Numeric] Rel::div_by(Self[T], Double) -> Self[T]
 pub fn[T : Numeric] Rel::from_abs(T) -> Self[T]
 pub fn[T : Numeric] Rel::from_ratio(Ratio) -> Self[T]
+pub fn Rel::from_value(Value) -> Self[Length] raise HintedError
+pub fn Rel::into_value(Self[Length]) -> Value
 pub fn[T : Numeric] Rel::is_one(Self[T]) -> Bool
 pub fn[T : Numeric] Rel::is_zero(Self[T]) -> Bool
 pub fn[T, U] Rel::map(Self[T], (T) -> U) -> Self[U]
@@ -10121,6 +10225,7 @@ type RustDecimal derive(Hash)
 
 pub(all) struct Scalar(Double) derive(Default)
 pub fn Scalar::get(Self) -> Double
+pub fn Scalar::into_value(Self) -> Value
 pub fn Scalar::new(Double) -> Self
 pub fn Scalar::powi(Self, Int) -> Self
 pub impl Add for Scalar
@@ -10256,7 +10361,9 @@ pub(all) enum Selector {
 } derive(Eq)
 pub fn Selector::can(String) -> Self
 pub fn Selector::castable(Value) -> Bool
+pub fn Selector::from_value(Value) -> Self raise HintedError
 pub fn Selector::input() -> CastInfo
+pub fn Selector::into_value(Self) -> Value
 pub fn Selector::matches(Self, Content, StyleChain?) -> Bool
 pub fn Selector::output() -> CastInfo
 pub fn Selector::regex(Regex) -> Self raise HintedError
@@ -10305,6 +10412,7 @@ pub impl Reflect for ShiftSettings
 
 pub(all) struct ShowableSelector(Selector) derive(Eq)
 pub fn ShowableSelector::castable(Value) -> Bool
+pub fn ShowableSelector::from_value(Value) -> Self raise HintedError
 pub fn ShowableSelector::input() -> CastInfo
 pub fn ShowableSelector::output() -> CastInfo
 pub impl FromValue for ShowableSelector
@@ -10333,7 +10441,9 @@ pub(all) struct Sides[T] {
   right : T
   bottom : T
 } derive(Default, Eq, Hash, @debug.Debug)
+pub fn[T : Fold] Sides::fold(Self[T?], Self[T?]) -> Self[T?]
 pub fn[T] Sides::get(Self[T], Side) -> T
+pub fn[T : IntoValue + Eq] Sides::into_value(Self[T?]) -> Value
 pub fn[T : Eq] Sides::is_uniform(Self[T]) -> Bool
 pub fn[T : Numeric] Sides::is_zero(Self[T]) -> Bool
 pub fn[T] Sides::iter(Self[T]) -> Iter[T]
@@ -10396,7 +10506,9 @@ pub(all) enum Sizing {
   Fr(Fr)
 } derive(Eq, Hash)
 pub fn Sizing::castable(Value) -> Bool
+pub fn Sizing::from_value(Value) -> Self raise HintedError
 pub fn Sizing::input() -> CastInfo
+pub fn Sizing::into_value(Self) -> Value
 pub fn Sizing::is_auto(Self) -> Bool
 pub fn Sizing::is_fractional(Self) -> Bool
 pub fn Sizing::output() -> CastInfo
@@ -10472,6 +10584,8 @@ pub fn[T, U] Smart::and_then(Self[T], (T) -> Self[U]) -> Self[U]
 pub fn[T] Smart::custom(Self[T]) -> T?
 pub fn[T] Smart::flatten(Self[Self[T]]) -> Self[T]
 pub fn[T] Smart::from_option(T?) -> Self[T]
+pub fn[T : FromValue] Smart::from_value(Value) -> Self[T] raise HintedError
+pub fn[T : IntoValue] Smart::into_value(Self[T]) -> Value
 pub fn[T] Smart::is_auto(Self[T]) -> Bool
 pub fn[T] Smart::is_custom(Self[T]) -> Bool
 pub fn[T] Smart::is_custom_and(Self[T], (T) -> Bool) -> Bool
@@ -10503,7 +10617,9 @@ pub(all) struct SmartQuoteDict {
   single : Smart[SmartQuoteSet]
 } derive(Eq, Hash, @debug.Debug)
 pub fn SmartQuoteDict::castable(Value) -> Bool
+pub fn SmartQuoteDict::from_value(Value) -> Self raise HintedError
 pub fn SmartQuoteDict::input() -> CastInfo
+pub fn SmartQuoteDict::into_value(Self) -> Value
 pub fn SmartQuoteDict::output() -> CastInfo
 pub impl FromValue for SmartQuoteDict
 pub impl IntoValue for SmartQuoteDict
@@ -10540,6 +10656,7 @@ pub(all) struct SmartQuoteSet {
   close : String
 } derive(Eq, Hash, @debug.Debug)
 pub fn SmartQuoteSet::castable(Value) -> Bool
+pub fn SmartQuoteSet::from_value(Value) -> Self raise HintedError
 pub fn SmartQuoteSet::input() -> CastInfo
 pub fn SmartQuoteSet::output() -> CastInfo
 pub impl FromValue for SmartQuoteSet
@@ -10612,7 +10729,9 @@ pub(all) enum Spacing {
 pub fn Spacing::castable(Value) -> Bool
 pub fn Spacing::from_em(Em) -> Self
 pub fn Spacing::from_length(Length) -> Self
+pub fn Spacing::from_value(Value) -> Self raise HintedError
 pub fn Spacing::input() -> CastInfo
+pub fn Spacing::into_value(Self) -> Value
 pub fn Spacing::is_fractional(Self) -> Bool
 pub fn Spacing::is_zero(Self) -> Bool
 pub fn Spacing::output() -> CastInfo
@@ -10658,7 +10777,9 @@ pub(all) struct SpotColorant {
   fallback : ProcessColor
 } derive(Eq)
 pub fn SpotColorant::castable(Value) -> Bool
+pub fn SpotColorant::from_value(Value) -> Self raise HintedError
 pub fn SpotColorant::input() -> CastInfo
+pub fn SpotColorant::into_value(Self) -> Value
 pub fn SpotColorant::output() -> CastInfo
 pub fn SpotColorant::repr(Self) -> String
 pub impl Hash for SpotColorant
@@ -10787,6 +10908,7 @@ pub(all) enum StateUpdate {
 } derive(Eq)
 pub fn StateUpdate::castable(Value) -> Bool
 pub fn StateUpdate::input() -> CastInfo
+pub fn StateUpdate::into_value(Self) -> Value
 pub fn StateUpdate::output() -> CastInfo
 pub impl Fingerprint for StateUpdate
 pub impl FromValue for StateUpdate
@@ -10904,8 +11026,10 @@ pub(all) struct Stroke {
 } derive(Eq)
 pub fn Stroke::castable(Value) -> Bool
 pub fn Stroke::field(Self, String) -> Value?
+pub fn Stroke::fold(Self, Self) -> Self
 pub fn Stroke::from_pair(Paint, Length) -> Self
 pub fn Stroke::input() -> CastInfo
+pub fn Stroke::into_value(Self) -> Value
 pub fn Stroke::output() -> CastInfo
 pub fn Stroke::repr(Self) -> String
 pub fn Stroke::resolve(Self, StyleChain) -> ResolvedStroke
@@ -11002,6 +11126,7 @@ pub(all) struct StylisticSets(Int) derive(Default, Eq, Hash)
 pub fn StylisticSets::castable(Value) -> Bool
 pub fn StylisticSets::has(Self, Int) -> Bool
 pub fn StylisticSets::input() -> CastInfo
+pub fn StylisticSets::into_value(Self) -> Value
 pub fn StylisticSets::output() -> CastInfo
 pub fn StylisticSets::sets(Self) -> Array[Int]
 pub impl FromValue for StylisticSets
@@ -11338,6 +11463,7 @@ pub(all) enum TableHeaderScope {
   Row
 } derive(Eq, Hash, @debug.Debug)
 pub fn TableHeaderScope::castable(Value) -> Bool
+pub fn TableHeaderScope::from_value(Value) -> Self raise HintedError
 pub fn TableHeaderScope::input() -> CastInfo
 pub fn TableHeaderScope::output() -> CastInfo
 pub fn TableHeaderScope::refers_to_column(Self) -> Bool
@@ -11425,6 +11551,7 @@ pub(all) enum Target {
 pub fn Target::castable(Value) -> Bool
 pub fn Target::default() -> Self
 pub fn Target::input() -> CastInfo
+pub fn Target::into_value(Self) -> Value
 pub fn Target::is_html(Self) -> Bool
 pub impl Show for Target
 pub impl Fingerprint for Target
@@ -11494,6 +11621,7 @@ pub impl NativeElement for TermsElem
 pub(all) struct TextDir(Smart[Dir]) derive(Eq, Hash)
 pub fn TextDir::castable(Value) -> Bool
 pub fn TextDir::input() -> CastInfo
+pub fn TextDir::into_value(Self) -> Value
 pub fn TextDir::output() -> CastInfo
 pub fn TextDir::resolve(Self, StyleChain) -> Dir
 pub impl FromValue for TextDir
@@ -11629,6 +11757,8 @@ pub fn TextItemView::height(Self) -> Abs
 pub fn TextItemView::width(Self) -> Abs
 
 pub(all) struct TextSize(Length) derive(Eq, Hash)
+pub fn TextSize::fold(Self, Self) -> Self
+pub fn TextSize::into_value(Self) -> Value
 pub fn TextSize::resolve(Self, StyleChain) -> Abs
 pub impl Fold for TextSize
 pub impl FromValue for TextSize
@@ -11738,7 +11868,9 @@ pub impl Reflect for ToStr
 
 pub struct TodayOffset(Duration)
 pub fn TodayOffset::castable(Value) -> Bool
+pub fn TodayOffset::from_value(Value) -> Self raise HintedError
 pub fn TodayOffset::input() -> CastInfo
+pub fn TodayOffset::into_value(Self) -> Value
 pub fn TodayOffset::output() -> CastInfo
 pub impl FromValue for TodayOffset
 pub impl IntoValue for TodayOffset
@@ -11750,6 +11882,7 @@ pub(all) enum TopEdge {
 } derive(Eq, Hash)
 pub fn TopEdge::castable(Value) -> Bool
 pub fn TopEdge::input() -> CastInfo
+pub fn TopEdge::into_value(Self) -> Value
 pub fn TopEdge::output() -> CastInfo
 pub impl FromValue for TopEdge
 pub impl IntoValue for TopEdge
@@ -11763,7 +11896,9 @@ pub(all) enum TopEdgeMetric {
   Bounds
 } derive(Eq, Hash, @debug.Debug)
 pub fn TopEdgeMetric::castable(Value) -> Bool
+pub fn TopEdgeMetric::from_value(Value) -> Self raise HintedError
 pub fn TopEdgeMetric::input() -> CastInfo
+pub fn TopEdgeMetric::into_value(Self) -> Value
 pub fn TopEdgeMetric::output() -> CastInfo
 pub fn TopEdgeMetric::to_vertical(Self) -> VerticalFontMetric?
 pub impl FromValue for TopEdgeMetric
@@ -12023,8 +12158,10 @@ pub impl Reflect for UnicodeNormalForm
 
 pub(all) struct Url(String) derive(Compare, Eq, Hash)
 pub fn Url::castable(Value) -> Bool
+pub fn Url::from_value(Value) -> Self raise HintedError
 pub fn Url::input() -> CastInfo
 pub fn Url::into_inner(Self) -> String
+pub fn Url::into_value(Self) -> Value
 pub fn Url::new(String) -> Self raise HintedError
 pub fn Url::output() -> CastInfo
 pub fn Url::strip_contact_scheme(Self) -> (UrlContactScheme, String)?
@@ -12051,6 +12188,7 @@ pub(all) enum VAlignment {
 pub fn VAlignment::castable(Value) -> Bool
 pub fn VAlignment::fix(Self, Dir) -> FixedAlignment
 pub fn VAlignment::input() -> CastInfo
+pub fn VAlignment::into_value(Self) -> Value
 pub fn VAlignment::inv(Self) -> Self
 pub fn VAlignment::output() -> CastInfo
 pub fn VAlignment::position(Self, Abs) -> Abs
@@ -12178,7 +12316,9 @@ pub(all) enum VectorFormat {
   Pdf
 } derive(Eq, Hash, @debug.Debug)
 pub fn VectorFormat::castable(Value) -> Bool
+pub fn VectorFormat::from_value(Value) -> Self raise HintedError
 pub fn VectorFormat::input() -> CastInfo
+pub fn VectorFormat::into_value(Self) -> Value
 pub fn VectorFormat::output() -> CastInfo
 pub impl FromValue for VectorFormat
 pub impl IntoValue for VectorFormat
@@ -12224,6 +12364,7 @@ pub(all) struct Warned[T] {
 }
 
 pub(all) struct WeightDelta(Int64) derive(Default, Eq, Hash)
+pub fn WeightDelta::into_value(Self) -> Value
 pub impl Fold for WeightDelta
 pub impl FromValue for WeightDelta
 pub impl IntoValue for WeightDelta

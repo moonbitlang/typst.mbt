@@ -50,6 +50,9 @@ pub impl IntoValue for JustificationLimits with fn into_value(self) {
 }
 
 ///|
+pub extend JustificationLimits with IntoValue::{into_value}
+
+///|
 pub impl FromValue for JustificationLimits with fn from_value(v) {
   match v {
     Dict(dict) => {
@@ -144,6 +147,9 @@ pub impl[T : IntoValue] IntoValue for Limits[T] with fn into_value(self) {
     ]),
   )
 }
+
+///|
+pub extend Limits with IntoValue::{into_value}
 
 ///|
 pub impl[T] Fold for Limits[T] with fn fold(self, _) {
@@ -355,6 +361,9 @@ pub impl IntoValue for FirstLineIndent with fn into_value(self) {
 }
 
 ///|
+pub extend FirstLineIndent with IntoValue::{into_value}
+
+///|
 pub impl FromValue for FirstLineIndent with fn from_value(v) {
   match v {
     Length(amount) => { amount: Some(amount), all: None, }
@@ -436,6 +445,9 @@ pub impl IntoValue for LineNumberingScope with fn into_value(self) {
     Page => Str("page")
   }
 }
+
+///|
+pub extend LineNumberingScope with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for LineNumberingScope with fn from_value(v) {

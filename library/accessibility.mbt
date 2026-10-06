@@ -89,6 +89,9 @@ pub impl IntoValue for ArtifactKind with fn into_value(self) {
 }
 
 ///|
+pub extend ArtifactKind with IntoValue::{into_value}
+
+///|
 pub impl FromValue for ArtifactKind with fn from_value(v) {
   match str_names_find(artifact_kind_names, v) {
     Some(i) => artifact_kind_values[i]
@@ -170,6 +173,9 @@ pub impl IntoValue for PdfMarkerTagKind with fn into_value(self) {
     }
   }
 }
+
+///|
+pub extend PdfMarkerTagKind with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for PdfMarkerTagKind with fn from_value(v) {

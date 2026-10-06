@@ -580,6 +580,9 @@ pub impl IntoValue for DisplayPattern with fn into_value(self) {
 }
 
 ///|
+pub extend DisplayPattern with IntoValue::{into_value}
+
+///|
 pub impl FromValue for DisplayPattern with fn from_value(v) {
   let v : String = v.cast()
   let item = @time.parse_owned_v2(v) catch {
@@ -587,6 +590,9 @@ pub impl FromValue for DisplayPattern with fn from_value(v) {
   }
   DisplayPattern(v, item)
 }
+
+///|
+pub extend DisplayPattern with FromValue::{from_value}
 
 ///|
 /// `Smart<DisplayPattern>`.
@@ -721,6 +727,9 @@ pub impl IntoValue for TodayOffset with fn into_value(self) {
 }
 
 ///|
+pub extend TodayOffset with IntoValue::{into_value}
+
+///|
 pub impl FromValue for TodayOffset with fn from_value(v) {
   match v {
     Duration(d) => TodayOffset(d)
@@ -728,6 +737,9 @@ pub impl FromValue for TodayOffset with fn from_value(v) {
     v => raise HintedError(TodayOffset::input().error(v))
   }
 }
+
+///|
+pub extend TodayOffset with FromValue::{from_value}
 
 ///|
 /// `Smart<TodayOffset>`.

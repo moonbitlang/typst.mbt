@@ -925,6 +925,9 @@ pub impl IntoValue for Regex with fn into_value(self) {
 }
 
 ///|
+pub extend Regex with IntoValue::{into_value}
+
+///|
 pub impl FromValue for Regex with fn from_value(v) {
   match v {
     Dyn(Regex(re)) => re

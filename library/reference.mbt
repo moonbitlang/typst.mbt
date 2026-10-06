@@ -104,6 +104,9 @@ pub impl IntoValue for RefForm with fn into_value(self) {
 }
 
 ///|
+pub extend RefForm with IntoValue::{into_value}
+
+///|
 pub impl FromValue for RefForm with fn from_value(v) {
   match str_names_find(ref_form_names, v) {
     Some(0) => Normal

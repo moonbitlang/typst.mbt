@@ -72,6 +72,9 @@ pub impl IntoValue for LinkTarget with fn into_value(self) {
 }
 
 ///|
+pub extend LinkTarget with IntoValue::{into_value}
+
+///|
 pub impl FromValue for LinkTarget with fn from_value(v) {
   if Destination::castable(v) {
     Dest(Destination::from_value(v))
@@ -81,6 +84,9 @@ pub impl FromValue for LinkTarget with fn from_value(v) {
     raise HintedError(LinkTarget::input().error(v))
   }
 }
+
+///|
+pub extend LinkTarget with FromValue::{from_value}
 
 ///|
 /// A link destination.
@@ -127,6 +133,9 @@ pub impl IntoValue for Destination with fn into_value(self) {
 }
 
 ///|
+pub extend Destination with IntoValue::{into_value}
+
+///|
 pub impl FromValue for Destination with fn from_value(v) {
   if Url::castable(v) {
     Url(Url::from_value(v))
@@ -138,6 +147,9 @@ pub impl FromValue for Destination with fn from_value(v) {
     raise HintedError(Destination::input().error(v))
   }
 }
+
+///|
+pub extend Destination with FromValue::{from_value}
 
 ///|
 /// A uniform resource locator with a maximum length.
@@ -201,9 +213,15 @@ pub impl IntoValue for Url with fn into_value(self) {
 }
 
 ///|
+pub extend Url with IntoValue::{into_value}
+
+///|
 pub impl FromValue for Url with fn from_value(v) {
   Url::new(FromValue::from_value(v))
 }
+
+///|
+pub extend Url with FromValue::{from_value}
 
 ///|
 /// A contact scheme of a URL.

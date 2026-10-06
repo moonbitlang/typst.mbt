@@ -90,6 +90,9 @@ pub impl IntoValue for ListMarker with fn into_value(self) {
 }
 
 ///|
+pub extend ListMarker with IntoValue::{into_value}
+
+///|
 pub impl FromValue for ListMarker with fn from_value(v) {
   if Content::castable(v) {
     return Content([Content::from_value(v)])

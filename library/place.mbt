@@ -45,6 +45,9 @@ pub impl IntoValue for PlacementScope with fn into_value(self) {
 }
 
 ///|
+pub extend PlacementScope with IntoValue::{into_value}
+
+///|
 pub impl FromValue for PlacementScope with fn from_value(v) {
   match str_names_find(placement_scope_names, v) {
     Some(0) => Column

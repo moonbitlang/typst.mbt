@@ -36,6 +36,9 @@ pub impl IntoValue for DataSource with fn into_value(self) {
 }
 
 ///|
+pub extend DataSource with IntoValue::{into_value}
+
+///|
 pub impl FromValue for DataSource with fn from_value(v) {
   if reflect_castable((Ty::new() : Ty[PathOrStr]), v) {
     Path(v.cast())
@@ -45,6 +48,9 @@ pub impl FromValue for DataSource with fn from_value(v) {
     raise HintedError(cast_error((Ty::new() : Ty[DataSource]), v))
   }
 }
+
+///|
+pub extend DataSource with FromValue::{from_value}
 
 ///|
 /// Loads data from a path or provided bytes (upstream `Load for

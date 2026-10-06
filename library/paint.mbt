@@ -82,6 +82,9 @@ pub impl IntoValue for Paint with fn into_value(self) {
 }
 
 ///|
+pub extend Paint with IntoValue::{into_value}
+
+///|
 pub impl FromValue for Paint with fn from_value(v) {
   match v {
     Color(color) => Solid(color)
@@ -90,3 +93,6 @@ pub impl FromValue for Paint with fn from_value(v) {
     v => raise HintedError(Paint::input().error(v))
   }
 }
+
+///|
+pub extend Paint with FromValue::{from_value}

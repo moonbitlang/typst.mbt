@@ -170,6 +170,9 @@ pub impl IntoValue for MathSize with fn into_value(self) {
 }
 
 ///|
+pub extend MathSize with IntoValue::{into_value}
+
+///|
 pub impl FromValue for MathSize with fn from_value(v) {
   match v {
     Str("script-script") => ScriptScript

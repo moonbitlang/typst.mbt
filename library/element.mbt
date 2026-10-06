@@ -625,12 +625,18 @@ pub impl IntoValue for Element with fn into_value(self) {
 }
 
 ///|
+pub extend Element with IntoValue::{into_value}
+
+///|
 pub impl FromValue for Element with fn from_value(v) {
   match Func::from_value(v).to_element() {
     Some(elem) => elem
     None => bail("expected element")
   }
 }
+
+///|
+pub extend Element with FromValue::{from_value}
 
 ///|
 /// A Typst element that is defined by a native type (upstream

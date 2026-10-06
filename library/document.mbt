@@ -132,6 +132,9 @@ pub impl IntoValue for PagedFormat with fn into_value(self) {
 }
 
 ///|
+pub extend PagedFormat with IntoValue::{into_value}
+
+///|
 pub impl FromValue for PagedFormat with fn from_value(v) {
   match str_names_find(paged_format_names, v) {
     Some(0) => Pdf
@@ -140,6 +143,9 @@ pub impl FromValue for PagedFormat with fn from_value(v) {
     None => raise HintedError(PagedFormat::input().error(v))
   }
 }
+
+///|
+pub extend PagedFormat with FromValue::{from_value}
 
 ///|
 /// One element, or multiple provided as an array.
@@ -174,6 +180,9 @@ pub impl[T : Reflect] Reflect for OneOrMultiple[T] with fn castable(value) {
 pub impl[T : IntoValue] IntoValue for OneOrMultiple[T] with fn into_value(self) {
   IntoValue::into_value(self.0)
 }
+
+///|
+pub extend OneOrMultiple with IntoValue::{into_value}
 
 ///|
 pub impl[T : FromValue] FromValue for OneOrMultiple[T] with fn from_value(value) {

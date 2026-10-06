@@ -285,6 +285,9 @@ pub impl IntoValue for StateUpdate with fn into_value(self) {
 }
 
 ///|
+pub extend StateUpdate with IntoValue::{into_value}
+
+///|
 pub impl FromValue for StateUpdate with fn from_value(v) {
   if v is Dyn(StateUpdate(update)) {
     return update

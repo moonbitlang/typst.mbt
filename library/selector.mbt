@@ -272,6 +272,9 @@ pub impl IntoValue for Selector with fn into_value(self) {
 }
 
 ///|
+pub extend Selector with IntoValue::{into_value}
+
+///|
 pub impl FromValue for Selector with fn from_value(v) {
   match v {
     Dyn(Selector(selector)) => selector
@@ -288,6 +291,9 @@ pub impl FromValue for Selector with fn from_value(v) {
     v => raise HintedError(Selector::input().error(v))
   }
 }
+
+///|
+pub extend Selector with FromValue::{from_value}
 
 ///|
 /// A selector that can be used with `query`.
@@ -348,6 +354,9 @@ pub impl IntoValue for LocatableSelector with fn into_value(self) {
 }
 
 ///|
+pub extend LocatableSelector with IntoValue::{into_value}
+
+///|
 pub impl FromValue for LocatableSelector with fn from_value(v) {
   fn validate(selector : Selector) -> Unit raise HintedError {
     match selector {
@@ -381,6 +390,9 @@ pub impl FromValue for LocatableSelector with fn from_value(v) {
   validate(selector)
   LocatableSelector(selector)
 }
+
+///|
+pub extend LocatableSelector with FromValue::{from_value}
 
 ///|
 /// A selector that can be used with show rules.
@@ -451,6 +463,9 @@ pub impl FromValue for ShowableSelector with fn from_value(v) {
   validate(selector, false)
   ShowableSelector(selector)
 }
+
+///|
+pub extend ShowableSelector with FromValue::{from_value}
 
 ///|
 /// `LocatableSelector(HeadingElem::ELEM.select())` (default of

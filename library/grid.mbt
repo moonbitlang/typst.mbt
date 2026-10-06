@@ -300,6 +300,9 @@ pub impl[T : IntoValue] IntoValue for Celled[T] with fn into_value(self) {
 }
 
 ///|
+pub extend Celled with IntoValue::{into_value}
+
+///|
 pub impl[T : FromValue] FromValue for Celled[T] with fn from_value(value) {
   match value {
     Func(v) => CelledFunc(v)

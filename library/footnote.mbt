@@ -36,6 +36,9 @@ pub impl IntoValue for FootnoteBody with fn into_value(self) {
 }
 
 ///|
+pub extend FootnoteBody with IntoValue::{into_value}
+
+///|
 pub impl FromValue for FootnoteBody with fn from_value(v) {
   if Content::castable(v) {
     return Content(Content::from_value(v))

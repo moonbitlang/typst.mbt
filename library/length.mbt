@@ -151,6 +151,9 @@ pub impl Fold for Length with fn fold(self, _) {
 }
 
 ///|
+pub extend Length with Fold::{fold}
+
+///|
 pub fn Length::repr(self : Length) -> String {
   match (self.abs.is_zero(), self.em.is_zero()) {
     (false, false) => "\{self.abs.repr()} + \{self.em.repr()}"

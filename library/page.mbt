@@ -183,6 +183,9 @@ pub impl[T : IntoValue + Eq] IntoValue for Margin[T] with fn into_value(self) {
 }
 
 ///|
+pub extend Margin with IntoValue::{into_value}
+
+///|
 pub impl[T : FromValue] FromValue for Margin[T] with fn from_value(value) {
   if castable_of((Ty::new() : Ty[T]), value) {
     let v = T::from_value(value)
@@ -238,6 +241,9 @@ pub impl[T : FromValue] FromValue for Margin[T] with fn from_value(value) {
     input_of((Ty::new() : Ty[T])).union_with(Type(Type::dict())).error(value),
   )
 }
+
+///|
+pub extend Margin with FromValue::{from_value}
 
 // Binding
 
@@ -395,6 +401,9 @@ pub impl IntoValue for PageRange with fn into_value(self) {
 }
 
 ///|
+pub extend PageRange with IntoValue::{into_value}
+
+///|
 pub impl FromValue for PageRange with fn from_value(v) {
   match v {
     Int(nr) => {
@@ -425,6 +434,9 @@ pub impl FromValue for PageRange with fn from_value(v) {
     v => raise HintedError(PageRange::input().error(v))
   }
 }
+
+///|
+pub extend PageRange with FromValue::{from_value}
 
 ///|
 fn parse_page_number(nr : Int64) -> Int raise HintedError {
@@ -559,6 +571,9 @@ pub extend Paper with Reflect::{output, input, castable}
 pub impl IntoValue for Paper with fn into_value(self) {
   Str(self.name)
 }
+
+///|
+pub extend Paper with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for Paper with fn from_value(v) {

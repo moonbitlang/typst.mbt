@@ -58,6 +58,9 @@ pub impl IntoValue for FracStyle with fn into_value(self) {
 }
 
 ///|
+pub extend FracStyle with IntoValue::{into_value}
+
+///|
 pub impl FromValue for FracStyle with fn from_value(v) {
   match v {
     Str("vertical") => Vertical

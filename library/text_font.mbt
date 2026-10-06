@@ -53,6 +53,9 @@ pub impl IntoValue for FontStyle with fn into_value(self) {
 }
 
 ///|
+pub extend FontStyle with IntoValue::{into_value}
+
+///|
 pub impl FromValue for FontStyle with fn from_value(v) {
   match str_names_find(font_style_names, v) {
     Some(0) => Normal
@@ -181,6 +184,9 @@ pub impl IntoValue for FontWeight with fn into_value(self) {
 }
 
 ///|
+pub extend FontWeight with IntoValue::{into_value}
+
+///|
 pub impl FromValue for FontWeight with fn from_value(v) {
   match str_names_find(font_weight_names, v) {
     Some(i) => return FontWeight((i + 1) * 100)
@@ -191,6 +197,9 @@ pub impl FromValue for FontWeight with fn from_value(v) {
     v => raise HintedError(FontWeight::input().error(v))
   }
 }
+
+///|
+pub extend FontWeight with FromValue::{from_value}
 
 ///|
 /// The width of a font (stored in thousandths, 500 - 2000).
@@ -251,6 +260,9 @@ pub extend FontStretch with Reflect::{output, input, castable}
 pub impl IntoValue for FontStretch with fn into_value(self) {
   Ratio(self.to_ratio())
 }
+
+///|
+pub extend FontStretch with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for FontStretch with fn from_value(v) {
@@ -347,6 +359,9 @@ pub impl FromValue for OpenTypeTag with fn from_value(v) {
   OpenTypeTag::from_bytes_lossy(v)
 }
 
+///|
+pub extend OpenTypeTag with FromValue::{from_value}
+
 // variations.rs
 
 ///|
@@ -374,11 +389,17 @@ pub impl IntoValue for AxisValue with fn into_value(self) {
 }
 
 ///|
+pub extend AxisValue with IntoValue::{into_value}
+
+///|
 pub impl FromValue for AxisValue with fn from_value(v) {
   let f : Double = (FromValue::from_value(v) : Double)
   // Round to `f32` precision like upstream's `v as f32`.
   AxisValue(Float::from_double(f).to_double())
 }
+
+///|
+pub extend AxisValue with FromValue::{from_value}
 
 ///|
 /// OpenType font variation settings.
@@ -424,6 +445,9 @@ pub impl IntoValue for FontVariations with fn into_value(self) {
   }
   Dict(dict)
 }
+
+///|
+pub extend FontVariations with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for FontVariations with fn from_value(v) {

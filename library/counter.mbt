@@ -711,6 +711,9 @@ pub impl IntoValue for CounterKey with fn into_value(self) {
 }
 
 ///|
+pub extend CounterKey with IntoValue::{into_value}
+
+///|
 pub impl FromValue for CounterKey with fn from_value(v) {
   if castable_of((Ty::new() : Ty[String]), v) {
     return Str((v.cast() : String))
@@ -793,6 +796,9 @@ pub extend CounterUpdate with Reflect::{output, input, castable}
 pub impl IntoValue for CounterUpdate with fn into_value(self) {
   Dyn(CounterUpdate(self))
 }
+
+///|
+pub extend CounterUpdate with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for CounterUpdate with fn from_value(v) {
@@ -931,6 +937,9 @@ pub impl FromValue for CounterState with fn from_value(v) {
   }
   raise HintedError(CounterState::input().error(v))
 }
+
+///|
+pub extend CounterState with FromValue::{from_value}
 
 ///|
 /// Custom behavior of `counter.update`, `counter.display` (internal) and

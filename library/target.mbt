@@ -98,6 +98,9 @@ pub impl IntoValue for Target with fn into_value(self) {
 }
 
 ///|
+pub extend Target with IntoValue::{into_value}
+
+///|
 pub impl FromValue for Target with fn from_value(v) {
   match v {
     Str("paged") => Paged

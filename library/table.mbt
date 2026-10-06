@@ -395,6 +395,9 @@ pub impl FromValue for TableHeaderScope with fn from_value(v) {
   }
 }
 
+///|
+pub extend TableHeaderScope with FromValue::{from_value}
+
 // Field defaults of the table elements.
 
 ///|

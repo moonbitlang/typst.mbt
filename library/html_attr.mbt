@@ -203,6 +203,9 @@ pub impl IntoValue for HtmlAttrs with fn into_value(self) {
 }
 
 ///|
+pub extend HtmlAttrs with IntoValue::{into_value}
+
+///|
 pub impl FromValue for HtmlAttrs with fn from_value(v) {
   match v {
     Dict(values) => {

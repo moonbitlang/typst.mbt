@@ -159,6 +159,9 @@ pub impl Fold for Stroke with fn fold(self, outer) {
 }
 
 ///|
+pub extend Stroke with Fold::{fold}
+
+///|
 pub impl Reflect for Stroke with fn input() {
   Length::input()
   .union_with(Color::input())
@@ -186,6 +189,9 @@ pub extend Stroke with Reflect::{output, input, castable}
 pub impl IntoValue for Stroke with fn into_value(self) {
   Dyn(Stroke(self))
 }
+
+///|
+pub extend Stroke with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for Stroke with fn from_value(v) {
