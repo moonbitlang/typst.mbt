@@ -174,7 +174,11 @@ pub fn Type::field(
 ) -> Value raise HintedError {
   match self.scope().get(field) {
     Some(binding) =>
-      binding.read(guard_, "access field `\{field}` on type \{self}").shared()
+      if binding.is_guarded() {
+        binding.read(guard_, "access field `\{field}` on type \{self}").shared()
+      } else {
+        binding.value.shared()
+      }
     None => bail("type \{self} does not contain field `\{field}`")
   }
 }

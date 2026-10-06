@@ -3292,6 +3292,8 @@ pub let undershell_elem_annotation : Int
 
 pub let undershell_elem_body : Int
 
+pub let unused_binding_guard : BindingGuard
+
 pub fn v_elem() -> Element
 
 pub let v_elem_amount : Int
@@ -3957,6 +3959,7 @@ pub fn Binding::detached(Value) -> Self
 pub fn Binding::docs(Self) -> String?
 pub fn Binding::feature(Self) -> Feature?
 pub fn Binding::is_documented(Self) -> Bool
+pub fn Binding::is_guarded(Self) -> Bool
 pub fn Binding::keywords(Self) -> ArrayView[String]
 pub fn Binding::name(Self) -> String?
 pub fn Binding::new(Value, @moonbitlang/typst/syntax.Span) -> Self
@@ -12433,6 +12436,7 @@ pub fn Value::castable(Self) -> Bool
 pub fn Value::display(Self) -> Content
 pub fn Value::field(Self, String, BindingGuard) -> Self raise HintedError
 pub fn Value::from_serde(@serde.Data) -> Self
+pub fn Value::has_guarded_fields(Self) -> Bool
 pub fn Value::input() -> CastInfo
 pub fn Value::numeric(Double, NumericUnit) -> Self
 pub fn Value::output() -> CastInfo

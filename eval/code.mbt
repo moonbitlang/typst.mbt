@@ -200,6 +200,16 @@ fn eval_ident(
   ident : @ast.Ident,
 ) -> @library.Value raise @library.SourceError {
   let span = ident.span()
+  // `vm.scopes.get(&self, vm.engine.binding_guard(span)).at(span).cloned()`.
+  // The guard and the closure of `at` are allocations here, so they are
+  // only made for a binding that is checked on access.
+  let binding = vm.scopes.get_binding(ident.get()) catch {
+    @library.HintedError(err) =>
+      raise @library.SourceError([err.into_error_at(span)])
+  }
+  if !binding.is_guarded() {
+    return binding.value.shared()
+  }
   @library.at(span, () => vm.scopes.get(ident.get(), vm.guard_at(span))).shared()
 }
 
@@ -353,7 +363,14 @@ fn access_field(
   field : String,
   field_span : @syntax.Span,
 ) -> @library.Value raise @library.SourceError {
-  let err = try target.field(field, vm.guard_at(field_span)) catch {
+  // `target.field(field, vm.engine.binding_guard(field_span))`; the guard is
+  // an allocation here and only made for the values that use it.
+  let guard_ = if target.has_guarded_fields() {
+    vm.guard_at(field_span)
+  } else {
+    @library.unused_binding_guard
+  }
+  let err = try target.field(field, guard_) catch {
     @library.HintedError(err) => err
   } noraise {
     value => return value

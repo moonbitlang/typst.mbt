@@ -269,7 +269,12 @@ pub fn Func::field(
     bail("cannot access fields on user-defined functions")
   }
   match scope.get(field) {
-    Some(binding) => binding.read(guard_, "access field `\{field}`").shared()
+    Some(binding) =>
+      if binding.is_guarded() {
+        binding.read(guard_, "access field `\{field}`").shared()
+      } else {
+        binding.value.shared()
+      }
     None =>
       match self.name() {
         Some(name) =>

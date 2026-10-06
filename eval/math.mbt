@@ -37,6 +37,14 @@ fn eval_math_ident(
   v : @ast.MathIdent,
 ) -> @library.Value raise @library.SourceError {
   let span = v.span()
+  // As in `eval_ident`: the guard is only made for a checked binding.
+  let binding = vm.scopes.get_binding_in_math(v.get()) catch {
+    @library.HintedError(err) =>
+      raise @library.SourceError([err.into_error_at(span)])
+  }
+  if !binding.is_guarded() {
+    return binding.value.shared()
+  }
   @library.at(span, () => vm.scopes.get_in_math(v.get(), vm.guard_at(span))).shared()
 }
 

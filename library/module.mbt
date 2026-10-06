@@ -112,7 +112,12 @@ pub fn Module::field(
   guard_ : BindingGuard,
 ) -> Value raise HintedError {
   match self.scope().get(field) {
-    Some(binding) => binding.read(guard_, "access field `\{field}`").shared()
+    Some(binding) =>
+      if binding.is_guarded() {
+        binding.read(guard_, "access field `\{field}`").shared()
+      } else {
+        binding.value.shared()
+      }
     None =>
       match self.name {
         Some(name) => bail("module `\{name}` does not contain `\{field}`")

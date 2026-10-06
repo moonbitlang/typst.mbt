@@ -50,9 +50,17 @@ pub fn Vm::bind(
   ident : @ast.Ident,
   binding : @library.Binding,
 ) -> Unit {
-  let guard_ = @library.BindingGuard::silent(self.engine.library.features)
-  let value = binding.read(guard_, "") catch { _ => @library.Value::None }
-  self.trace_at(ident.span(), value)
+  // `if let Ok(value) = binding.read(silent guard) { self.trace_at(..) }`:
+  // the silent read has no effect, so it is only made for the inspected
+  // span (the guard is an allocation here).
+  if self.inspected == Some(ident.span()) {
+    let guard_ = @library.BindingGuard::silent(self.engine.library.features)
+    try binding.read(guard_, "") catch {
+      _ => ()
+    } noraise {
+      value => self.trace(value)
+    }
+  }
   if ident.get() == "is" {
     self.engine.sink.warn(
       @library.SourceDiagnostic::warning_at(

@@ -458,6 +458,15 @@ pub fn Binding::read(
 }
 
 ///|
+/// Whether reading the binding checks a feature or warns about a
+/// deprecation (upstream's `check_access`). If it does not, `read` is the
+/// value: callers for which the guard or the description of the access are
+/// allocations (upstream's are a tuple and `format_args!`) ask first.
+pub fn Binding::is_guarded(self : Binding) -> Bool {
+  self.check_access
+}
+
+///|
 /// Check write access to the value.
 pub fn Binding::check_write(
   self : Binding,
@@ -726,7 +735,13 @@ pub fn Scopes::get(
   name : String,
   guard_ : BindingGuard,
 ) -> Value raise HintedError {
-  self.get_binding(name).read(guard_, "access variable `\{name}`")
+  let binding = self.get_binding(name)
+  // The message is only made for a checked binding (upstream:
+  // `or_cannot(format_args!(..))`).
+  if !binding.check_access {
+    return binding.value
+  }
+  binding.read(guard_, "access variable `\{name}`")
 }
 
 ///|
@@ -736,7 +751,11 @@ pub fn Scopes::get_in_math(
   name : String,
   guard_ : BindingGuard,
 ) -> Value raise HintedError {
-  self.get_binding_in_math(name).read(guard_, "access variable `\{name}`")
+  let binding = self.get_binding_in_math(name)
+  if !binding.check_access {
+    return binding.value
+  }
+  binding.read(guard_, "access variable `\{name}`")
 }
 
 ///|
