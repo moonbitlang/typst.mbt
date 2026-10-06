@@ -534,9 +534,7 @@ fn eval_closure_expr(
   }
 
   // Collect captured variables.
-  let visitor = CapturesVisitor::new(Some(vm.scopes), Function)
-  visitor.visit(closure.to_untyped())
-  let captured = visitor.finish()
+  let captured = collect_captures(vm.scopes, closure.to_untyped(), Function)
 
   // Define the closure.
   let num_pos_params = closure
@@ -666,6 +664,11 @@ pub struct CapturesVisitor {
   priv internal : @library.Scopes
   priv captures : @library.Scope
   priv capturer : @library.Capturer
+  /// Not upstream (see `captures.mbt`): if set, the visitor records the
+  /// identifiers that `capture` would look up instead of capturing them,
+  /// with the modes each name was recorded in (1: code, 2: math).
+  priv recording : Array[CaptureAttempt]?
+  priv recorded_modes : Map[String, Int]
 }
 
 ///|
@@ -679,6 +682,31 @@ pub fn CapturesVisitor::new(
     internal: @library.Scopes::new(None),
     captures: @library.Scope::new(),
     capturer,
+    recording: None,
+    recorded_modes: {},
+  }
+}
+
+///|
+/// A visitor that records what `capture` is asked for (not upstream; see
+/// `captures.mbt`).
+fn CapturesVisitor::recording() -> CapturesVisitor {
+  {
+    external: None,
+    internal: @library.Scopes::new(None),
+    captures: @library.Scope::new(),
+    capturer: Function,
+    recording: Some([]),
+    recorded_modes: {},
+  }
+}
+
+///|
+/// The identifiers a recording visitor was asked to capture, in order.
+fn CapturesVisitor::recorded(self : CapturesVisitor) -> Array[CaptureAttempt] {
+  match self.recording {
+    Some(attempts) => attempts
+    None => []
   }
 }
 
@@ -803,6 +831,20 @@ fn CapturesVisitor::capture(
     } noraise {
       _ => true
     }) {
+    return
+  }
+  // Not upstream: the recording for the cache of the compilation, once
+  // per name and mode.
+  if self.recording is Some(attempts) {
+    let mode = if in_math { 2 } else { 1 }
+    let modes = match self.recorded_modes.get(ident) {
+      Some(modes) => modes
+      None => 0
+    }
+    if (modes & mode) == 0 {
+      self.recorded_modes[ident] = modes | mode
+      attempts.push({ name: ident, in_math, repeated: modes != 0, })
+    }
     return
   }
   if self.captures.get(ident) is Some(_) {

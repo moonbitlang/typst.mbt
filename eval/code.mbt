@@ -376,9 +376,7 @@ fn eval_contextual(
   contextual : @ast.Contextual,
 ) -> @library.Content raise @library.SourceError {
   let body = contextual.body()
-  let visitor = CapturesVisitor::new(Some(vm.scopes), Context)
-  visitor.visit(body.to_untyped())
-  let captured = visitor.finish()
+  let captured = collect_captures(vm.scopes, body.to_untyped(), Context)
   let closure : @library.Closure = {
     node: Context(body.to_untyped()),
     defaults: [],

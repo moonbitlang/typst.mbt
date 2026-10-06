@@ -251,7 +251,15 @@
   `try_*()`/`introspect()`: never read them another way), depth checks
   note how far the route may move (`Route::check_within`), imports note
   the file ids they ask routes for (`note_route_query`); results are
-  values (containers are marked shared). A `Fingerprint` must cover
+  values (containers are marked shared). The capture analysis of a closure
+  or context expression is kept per syntax node for the compilation
+  (`eval/captures.mbt`, not upstream: the identifiers that
+  `CapturesVisitor` looks up are a function of the syntax, and
+  `CaptureSite::captures` replays them against the scopes; a table by span
+  and node identity, since nodes are mutable and spans are not unique).
+  The visitor stays the reference: it runs outside of compilations, and
+  `eval/captures_wbtest.mbt` compares the two on upstream's suite and, if
+  they are in `_build/typst-packages`, on touying, cetz and fletcher. A `Fingerprint` must cover
   exactly what upstream's `Hash` covers (location keys are `hash128(elem)`:
   a coarser fingerprint gives two elements one key, which `measure`
   observes; `typst/oracle_wbtest.mbt`, generated from the upstream binary by
