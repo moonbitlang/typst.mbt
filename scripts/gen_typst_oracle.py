@@ -30,6 +30,9 @@ document title of the HTML export (the plain text of the title's content).
   differ in their bits (negative zeros, NaNs) do not.
 - `floats`: NaN values have the bits of Rust's `f64::NAN`, negated where
   upstream negates (`float("-nan")`, TOML's `-nan`).
+- `fields`: a field that upstream marks `#[external]` (the `body` of `text`
+  and `page`, which is also `#[required]`) is documentation only: the
+  element has no such field for `has`, `at` and field access.
 
 Usage: python3 scripts/gen_typst_oracle.py <path to upstream typst binary>
        (then `moon fmt`)
@@ -505,6 +508,23 @@ y
 #row(float.nan * 1%, float.nan / 2, calc.ln(float.nan), calc.sin(float.nan), calc.rem(float.nan, 2))
 #row(..cbor(cbor.encode((float.nan, -float.nan))))
 #row(eval("float.nan"), eval("-float.nan"), eval("float.inf * 0", mode: "code"))
+""",
+    ),
+    (
+        "fields: an external field is not a field of the element",
+        "metadata",
+        r"""// `text` and `page` declare `#[external] #[required] body`: documentation
+// only. Packages that walk content (touying's `shape-of`) rely on
+// `has("body")` being false for a text element.
+#let t = [hello]
+#let s = [*x*]
+#let h = heading[T]
+#let r = raw("a")
+#metadata(repr((t.func(), t.has("body"), t.has("text"), t.fields().keys(), t.at("body", default: "none"))))
+#metadata(repr((s.has("body"), s.has("delta"), s.fields().keys())))
+#metadata(repr((h.has("body"), h.has("level"), h.has("numbering"), h.fields().keys())))
+#metadata(repr((r.has("text"), r.has("lang"), r.has("lines"), r.fields().keys())))
+#metadata(repr((text(red)[a].func(), text(red)[a].has("body"), text(red)[a].has("child"))))
 """,
     ),
 ]

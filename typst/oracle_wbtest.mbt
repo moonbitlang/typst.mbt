@@ -246,3 +246,13 @@ test "oracle: floats: the bits of NaN values" {
   ]
   assert_eq(oracle_metadata(source), expected)
 }
+
+///|
+test "oracle: fields: an external field is not a field of the element" {
+  let source = "// `text` and `page` declare `#[external] #[required] body`: documentation\n// only. Packages that walk content (touying's `shape-of`) rely on\n// `has(\"body\")` being false for a text element.\n#let t = [hello]\n#let s = [*x*]\n#let h = heading[T]\n#let r = raw(\"a\")\n#metadata(repr((t.func(), t.has(\"body\"), t.has(\"text\"), t.fields().keys(), t.at(\"body\", default: \"none\"))))\n#metadata(repr((s.has(\"body\"), s.has(\"delta\"), s.fields().keys())))\n#metadata(repr((h.has(\"body\"), h.has(\"level\"), h.has(\"numbering\"), h.fields().keys())))\n#metadata(repr((r.has(\"text\"), r.has(\"lang\"), r.has(\"lines\"), r.fields().keys())))\n#metadata(repr((text(red)[a].func(), text(red)[a].has(\"body\"), text(red)[a].has(\"child\"))))\n"
+  let expected = [
+    "(text, false, true, (\"text\",), \"none\")", "(true, false, (\"body\",))", "(true, false, false, (\"body\",))",
+    "(true, false, false, (\"text\",))", "(styled, false, true)",
+  ]
+  assert_eq(oracle_metadata(source), expected)
+}
