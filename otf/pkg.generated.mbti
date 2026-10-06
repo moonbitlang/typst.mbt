@@ -1095,8 +1095,10 @@ pub(all) enum Language {
   Yi_PRC
   Yoruba_Nigeria
 } derive(Eq, @debug.Debug)
+pub fn Language::output(Self, &Logger) -> Unit
 pub fn Language::primary_language(Self) -> String
 pub fn Language::region(Self) -> String
+pub fn Language::to_string(Self) -> String
 pub impl Show for Language
 
 pub(all) struct LanguageSystem {

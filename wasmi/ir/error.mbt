@@ -26,6 +26,9 @@ pub impl Show for IrError with fn output(self, logger) {
 }
 
 ///|
+pub extend IrError with Show::{to_string, output}
+
+///|
 /// Error when trying to convert a value into an immediate that cannot
 /// represent it (upstream `OutOfBoundsConst`).
 pub(all) suberror OutOfBoundsConst derive(Eq)

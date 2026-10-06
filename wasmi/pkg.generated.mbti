@@ -88,6 +88,8 @@ pub fn WasmiError::i32_exit(Int) -> Self
 pub fn WasmiError::i32_exit_status(Self) -> Int?
 pub fn WasmiError::message(Self) -> String
 pub fn WasmiError::new(String) -> Self
+pub fn WasmiError::output(Self, &Logger) -> Unit
+pub fn WasmiError::to_string(Self) -> String
 pub impl Show for WasmiError
 
 // Types and methods

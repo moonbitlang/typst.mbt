@@ -48,6 +48,9 @@ pub impl Show for MemoryError with fn output(self, logger) {
 }
 
 ///|
+pub extend MemoryError with Show::{to_string, output}
+
+///|
 /// `impl From<LimiterError> for MemoryError`
 pub fn MemoryError::from_limiter_error(error : LimiterError) -> MemoryError {
   match error {

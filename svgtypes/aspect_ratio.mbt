@@ -81,3 +81,6 @@ pub fn AspectRatio::from_str(text : String) -> AspectRatio raise SvgTypesError {
 pub impl Default for AspectRatio with fn default() {
   { defer_: false, align: Align::XMidYMid, slice: false, }
 }
+
+///|
+pub extend AspectRatio with Default::{default}

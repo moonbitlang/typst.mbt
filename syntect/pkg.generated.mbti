@@ -53,6 +53,8 @@ pub(all) suberror LoadingError {
   ParseTheme(ParseThemeError)
   ReadSettings(SettingsError)
 }
+pub fn LoadingError::output(Self, &Logger) -> Unit
+pub fn LoadingError::to_string(Self) -> String
 pub impl Show for LoadingError
 
 pub(all) suberror ParseScopeError {
@@ -71,6 +73,8 @@ pub(all) suberror ParseSyntaxError {
   MainMissing
   TypeMismatch
 }
+pub fn ParseSyntaxError::output(Self, &Logger) -> Unit
+pub fn ParseSyntaxError::to_string(Self) -> String
 pub impl Show for ParseSyntaxError
 
 pub(all) suberror ParseThemeError {

@@ -137,6 +137,9 @@ pub impl Show for WasmiError with fn output(self, f) {
 }
 
 ///|
+pub extend WasmiError with Show::{to_string, output}
+
+///|
 /// Upstream `WasmiError::to_string()` (the `Display` text).
 pub fn WasmiError::message(self : WasmiError) -> String {
   let buf = StringBuilder()

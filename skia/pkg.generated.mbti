@@ -344,6 +344,7 @@ pub(all) struct PixmapPaint {
   blend_mode : BlendMode
   quality : FilterQuality
 }
+pub fn PixmapPaint::default() -> Self
 pub impl Default for PixmapPaint
 
 type Point64 derive(Eq)

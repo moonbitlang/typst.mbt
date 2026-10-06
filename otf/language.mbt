@@ -506,3 +506,6 @@ pub fn Language::region(self : Language) -> String {
 pub impl Show for Language with fn output(self, logger) {
   logger.write_string("\{self.primary_language()} (\{self.region()})")
 }
+
+///|
+pub extend Language with Show::{to_string, output}

@@ -61,6 +61,7 @@ pub fn DecodedImage::store_u8_into(Self, FixedArray[Byte]) -> Unit
 pub struct DecoderContext {
   // private fields
 }
+pub fn DecoderContext::default() -> Self
 pub fn DecoderContext::new() -> Self
 pub impl Default for DecoderContext
 

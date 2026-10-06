@@ -7,6 +7,9 @@
 pub(all) struct F32x2(Float, Float) derive(Eq, Debug, Default)
 
 ///|
+pub extend F32x2 with Default::{default}
+
+///|
 /// Creates a new pair.
 pub fn F32x2::new(a : Float, b : Float) -> F32x2 {
   F32x2(a, b)

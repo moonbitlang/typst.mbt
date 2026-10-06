@@ -31,22 +31,10 @@ pub extend Trap with Show::{to_string}
 pub extend TrapCode with Show::{to_string}
 
 ///|
-pub extend MemoryError with Show::{to_string}
-
-///|
-pub extend TableError with Show::{to_string}
-
-///|
 pub extend LimiterError with Show::{to_string}
 
 ///|
-pub extend FuelError with Show::{to_string}
-
-///|
 pub extend FuncTypeError with Show::{to_string}
-
-///|
-pub extend GlobalError with Show::{to_string}
 
 ///|
 pub extend UntypedError with Show::{to_string}

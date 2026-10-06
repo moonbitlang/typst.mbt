@@ -206,6 +206,8 @@ pub fn BinaryReaderError::message(Self) -> String
 pub fn BinaryReaderError::needed_hint(Self) -> Int?
 pub fn BinaryReaderError::new(String, Int) -> Self
 pub fn BinaryReaderError::offset(Self) -> Int
+pub fn BinaryReaderError::output(Self, &Logger) -> Unit
+pub fn BinaryReaderError::to_string(Self) -> String
 pub impl Show for BinaryReaderError
 
 // Types and methods

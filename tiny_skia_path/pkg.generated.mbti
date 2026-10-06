@@ -52,6 +52,7 @@ pub fn CubicCoeff::from_points(ArrayView[Point]) -> Self
 
 pub(all) struct F32x2(Float, Float) derive(Default, Eq, @debug.Debug)
 pub fn F32x2::abs(Self) -> Self
+pub fn F32x2::default() -> Self
 pub fn F32x2::max(Self, Self) -> Self
 pub fn F32x2::max_component(Self) -> Float
 pub fn F32x2::min(Self, Self) -> Self
@@ -388,6 +389,7 @@ pub(all) struct Transform {
   tx : Float
   ty : Float
 } derive(Eq, @debug.Debug)
+pub fn Transform::default() -> Self
 pub fn Transform::from_bbox(NonZeroRect) -> Self
 pub fn Transform::from_rotate(Float) -> Self
 pub fn Transform::from_rotate_at(Float, Float, Float) -> Self
