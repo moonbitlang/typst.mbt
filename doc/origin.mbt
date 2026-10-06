@@ -283,7 +283,7 @@ fn Registry::locate(self : Registry, span : @syntax.Span) -> (Int, Int)? {
   guard start <= e.end else { return None }
   for i, arg in e.args {
     // The token, or a sub-range of it (arguments that share a token get
-    // sub-ranges of it, `Lower::args`).
+    // sub-ranges of it, `Lowering::args`).
     if arg is Some((_, s, t)) && s <= start && start < end && end <= t {
       return Some((lo - 1, i))
     }
@@ -591,7 +591,7 @@ fn Origins::origin_of(
     end_column,
     kind: e.kind,
     // Without the keys of the occurrences that lowering registers for
-    // pieces (`Lower::piece_span`): they are the same origin.
+    // pieces (`Lowering::piece_span`): they are the same origin.
     keys: e.keys.filter(key => !is_pieces_key(key)),
     param,
     text_range,

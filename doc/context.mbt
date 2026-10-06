@@ -8,7 +8,7 @@
 /// engine and context, so capability errors (`can only be used when context
 /// is known`), casts and tracked introspection are Typst's.
 pub struct Ctx {
-  priv lower : Lower
+  priv lower : Lowering
   /// The invocation token: cleared when the callback returns.
   priv alive : @ref.Ref[Bool]
   /// The span of the callback.

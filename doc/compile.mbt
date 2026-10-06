@@ -326,7 +326,7 @@ fn Document::lower_initial(
       session.registry.origins,
     ),
   }
-  let lower : Lower = {
+  let lower : Lowering = {
     session,
     engine,
     context: @library.Context::none(),

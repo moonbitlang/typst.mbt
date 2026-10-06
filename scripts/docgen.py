@@ -634,7 +634,7 @@ API_FUNCS = []
 
 def lowering_order(spec, ps):
     """The fields of a constructor in the order its generated code pushes
-    their arguments (the order `Lower::args` evaluates them in); the same
+    their arguments (the order `Lowering::args` evaluates them in); the same
     order as `push_args` of `emit_element`."""
     order = (
         [p for p in ps if p.kind == "pos_opt"]

@@ -66,7 +66,7 @@ positional in Typst but a labelled parameter in the EDSL; `Named`;
 `Variadic`); the fields that take positional arguments in the function's
 order; the settable fields; the selector's fields; and the **lowering
 order** of the constructor's and the set rule's arguments (the order in
-which the generated code pushes them, which is the order `Lower::args`
+which the generated code pushes them, which is the order `Lowering::args`
 evaluates them in). Function facades (`Lorem`, `PolygonRegular`,
 `Paint::tiling`) are listed likewise. The handwritten constructs the
 translator emits (`Equation`, `Quoted`, `Symbol`, selectors, units,

@@ -551,7 +551,7 @@ Source 1 of 1: doc/twins/bench.mbt:263:9-263:20, Table(..), parameter 1, data ke
   note: the argument is the variable `stage_cells`: the text comes from a binding, not from a literal at this location
 ```
 
-**One change to lowering comes with this** (`Lower::keyed`,
+**One change to lowering comes with this** (`Lowering::keyed`,
 `doc/lower.mbt`; D 12.2). A plain string or a value inside `Keyed` is a
 piece of the enclosing argument under the keys. Until now every such
 body under one key path had the same span, the argument's token in the
@@ -860,7 +860,7 @@ same text); only the source literal is not claimed.
 is a piece of the enclosing argument *under the key*: it takes the next
 number of the argument's counter, and so does everything inside it, and
 the number is turned into a span of the argument's token (or of the
-call's line) in the origin's occurrence under the key (`Lower::keyed`:
+call's line) in the origin's occurrence under the key (`Lowering::keyed`:
 the counter with `Registry::keyed_span` of its base as base). The
 invariant: **all pieces under one key path come from one counter and one
 base**, and `piece_span` is one-to-one for a base whatever its length
@@ -981,7 +981,7 @@ Source is evaluated at exactly these entries (an audit of the engine:
 the two calls of the `eval_string` routine in `library/`, and what the
 session calls itself):
 
-1. the session's snippets (`Lower::eval`);
+1. the session's snippets (`Lowering::eval`);
 2. the library function `eval` (`library/eval_funcs.mbt`);
 3. **math in bibliography data**: a field of a bibliography entry that
    contains `$..$` is evaluated in math mode when the bibliography is
