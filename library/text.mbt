@@ -50,6 +50,9 @@ pub impl Reflect for FontFamily with fn castable(v) {
 }
 
 ///|
+pub extend FontFamily with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for FontFamily with fn into_value(self) {
   match self.covers {
     Some(covers) =>
@@ -62,6 +65,9 @@ pub impl IntoValue for FontFamily with fn into_value(self) {
     None => Str(self.name)
   }
 }
+
+///|
+pub extend FontFamily with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for FontFamily with fn from_value(v) {
@@ -81,6 +87,9 @@ pub impl FromValue for FontFamily with fn from_value(v) {
     v => raise HintedError(FontFamily::input().error(v))
   }
 }
+
+///|
+pub extend FontFamily with FromValue::{from_value}
 
 ///|
 /// Defines which codepoints a font family will be used for.
@@ -110,12 +119,18 @@ pub impl Reflect for Covers with fn castable(v) {
 }
 
 ///|
+pub extend Covers with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for Covers with fn into_value(self) {
   match self {
     LatinInCjk => Str("latin-in-cjk")
     Regex(regex) => Dyn(Regex(regex))
   }
 }
+
+///|
+pub extend Covers with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for Covers with fn from_value(v) {
@@ -166,6 +181,9 @@ pub impl Reflect for FontList with fn castable(v) {
 }
 
 ///|
+pub extend FontList with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for FontList with fn into_value(self) {
   if self.0.length() == 1 {
     self.0[0].into_value()
@@ -173,6 +191,9 @@ pub impl IntoValue for FontList with fn into_value(self) {
     IntoValue::into_value(self.0)
   }
 }
+
+///|
+pub extend FontList with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for FontList with fn from_value(v) {
@@ -265,6 +286,9 @@ pub impl Fold for TextSize with fn fold(self, outer) {
 }
 
 ///|
+pub extend TextSize with Fold::{fold}
+
+///|
 /// Upstream `Resolve for TextSize`.
 pub fn TextSize::resolve(self : TextSize, styles : StyleChain) -> Abs {
   let factor = match EquationElem::size_in(styles) {
@@ -295,6 +319,9 @@ pub impl Reflect for TextSize with fn castable(v) {
 pub impl IntoValue for TextSize with fn into_value(self) {
   Length(self.0)
 }
+
+///|
+pub extend TextSize with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for TextSize with fn from_value(v) {
@@ -348,12 +375,18 @@ pub impl Reflect for TopEdge with fn castable(v) {
 }
 
 ///|
+pub extend TopEdge with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for TopEdge with fn into_value(self) {
   match self {
     Metric(metric) => metric.into_value()
     Length(length) => Length(length)
   }
 }
+
+///|
+pub extend TopEdge with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for TopEdge with fn from_value(v) {
@@ -411,6 +444,9 @@ pub impl Reflect for TopEdgeMetric with fn castable(v) {
 }
 
 ///|
+pub extend TopEdgeMetric with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for TopEdgeMetric with fn into_value(self) {
   for i, m in top_edge_metric_values[:] {
     if m == self {
@@ -421,12 +457,18 @@ pub impl IntoValue for TopEdgeMetric with fn into_value(self) {
 }
 
 ///|
+pub extend TopEdgeMetric with IntoValue::{into_value}
+
+///|
 pub impl FromValue for TopEdgeMetric with fn from_value(v) {
   match str_names_find(top_edge_metric_names, v) {
     Some(i) => top_edge_metric_values[i]
     None => raise HintedError(TopEdgeMetric::input().error(v))
   }
 }
+
+///|
+pub extend TopEdgeMetric with FromValue::{from_value}
 
 ///|
 fn text_elem_top_edge_default() -> Value {
@@ -458,12 +500,18 @@ pub impl Reflect for BottomEdge with fn castable(v) {
 }
 
 ///|
+pub extend BottomEdge with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for BottomEdge with fn into_value(self) {
   match self {
     Metric(metric) => metric.into_value()
     Length(length) => Length(length)
   }
 }
+
+///|
+pub extend BottomEdge with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for BottomEdge with fn from_value(v) {
@@ -515,6 +563,9 @@ pub impl Reflect for BottomEdgeMetric with fn castable(v) {
 }
 
 ///|
+pub extend BottomEdgeMetric with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for BottomEdgeMetric with fn into_value(self) {
   for i, m in bottom_edge_metric_values[:] {
     if m == self {
@@ -525,12 +576,18 @@ pub impl IntoValue for BottomEdgeMetric with fn into_value(self) {
 }
 
 ///|
+pub extend BottomEdgeMetric with IntoValue::{into_value}
+
+///|
 pub impl FromValue for BottomEdgeMetric with fn from_value(v) {
   match str_names_find(bottom_edge_metric_names, v) {
     Some(i) => bottom_edge_metric_values[i]
     None => raise HintedError(BottomEdgeMetric::input().error(v))
   }
 }
+
+///|
+pub extend BottomEdgeMetric with FromValue::{from_value}
 
 ///|
 fn text_elem_bottom_edge_default() -> Value {
@@ -559,9 +616,15 @@ pub impl Reflect for TextDir with fn castable(v) {
 }
 
 ///|
+pub extend TextDir with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for TextDir with fn into_value(self) {
   self.0.into_value()
 }
+
+///|
+pub extend TextDir with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for TextDir with fn from_value(v) {
@@ -584,6 +647,9 @@ fn text_elem_dir_default() -> Value {
 pub(all) struct Alternates(Int64) derive(Eq, Hash, Default)
 
 ///|
+pub extend Alternates with Default::{default}
+
+///|
 pub impl Reflect for Alternates with fn input() {
   CastInfo::Type(Type::bool()).union_with(Type(Type::int()))
 }
@@ -599,9 +665,15 @@ pub impl Reflect for Alternates with fn castable(v) {
 }
 
 ///|
+pub extend Alternates with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for Alternates with fn into_value(self) {
   Int(self.0)
 }
+
+///|
+pub extend Alternates with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for Alternates with fn from_value(v) {
@@ -620,6 +692,9 @@ fn text_elem_alternates_default() -> Value {
 ///|
 /// A set of stylistic sets to enable.
 pub(all) struct StylisticSets(Int) derive(Eq, Hash, Default)
+
+///|
+pub extend StylisticSets with Default::{default}
 
 ///|
 /// Returns whether this set contains a particular stylistic set.
@@ -657,9 +732,15 @@ pub impl Reflect for StylisticSets with fn castable(v) {
 }
 
 ///|
+pub extend StylisticSets with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for StylisticSets with fn into_value(self) {
   Array(Arr::from_array(self.sets().map(i => Int(i.to_int64()))))
 }
+
+///|
+pub extend StylisticSets with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for StylisticSets with fn from_value(v) {
@@ -732,6 +813,9 @@ pub impl Reflect for NumberType with fn castable(v) {
 }
 
 ///|
+pub extend NumberType with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for NumberType with fn into_value(self) {
   match self {
     Lining => Str("lining")
@@ -776,6 +860,9 @@ pub impl Reflect for NumberWidth with fn castable(v) {
 }
 
 ///|
+pub extend NumberWidth with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for NumberWidth with fn into_value(self) {
   match self {
     Proportional => Str("proportional")
@@ -803,6 +890,9 @@ pub(all) struct FontFeatures(Array[(OpenTypeTag, Int64)]) derive (
 )
 
 ///|
+pub extend FontFeatures with Default::{default}
+
+///|
 pub impl Reflect for FontFeatures with fn input() {
   CastInfo::Type(Type::array()).union_with(Type(Type::dict()))
 }
@@ -818,6 +908,9 @@ pub impl Reflect for FontFeatures with fn castable(v) {
 }
 
 ///|
+pub extend FontFeatures with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for FontFeatures with fn into_value(self) {
   let dict = Dict::new()
   for pair in self.0 {
@@ -825,6 +918,9 @@ pub impl IntoValue for FontFeatures with fn into_value(self) {
   }
   Dict(dict)
 }
+
+///|
+pub extend FontFeatures with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for FontFeatures with fn from_value(v) {
@@ -947,6 +1043,9 @@ pub impl IntoValue for ItalicToggle with fn into_value(self) {
 }
 
 ///|
+pub extend ItalicToggle with IntoValue::{into_value}
+
+///|
 pub impl FromValue for ItalicToggle with fn from_value(v) {
   ItalicToggle((FromValue::from_value(v) : Bool))
 }
@@ -966,6 +1065,9 @@ fn text_elem_emph_fold(inner : Value, outer : Value) -> Value {
 ///
 /// Internal field type without upstream casts; stored as an integer.
 pub(all) struct WeightDelta(Int64) derive(Eq, Hash, Default)
+
+///|
+pub extend WeightDelta with Default::{default}
 
 ///|
 pub impl Fold for WeightDelta with fn fold(self, outer) {
@@ -991,6 +1093,9 @@ pub impl Reflect for WeightDelta with fn castable(v) {
 pub impl IntoValue for WeightDelta with fn into_value(self) {
   Int(self.0)
 }
+
+///|
+pub extend WeightDelta with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for WeightDelta with fn from_value(v) {
@@ -1019,6 +1124,9 @@ pub(all) struct Costs {
   widow : Ratio?
   orphan : Ratio?
 } derive(Eq, Hash, Default)
+
+///|
+pub extend Costs with Default::{default}
 
 ///|
 pub fn Costs::hyphenation(self : Costs) -> Ratio {
@@ -1066,6 +1174,9 @@ pub impl Reflect for Costs with fn castable(v) {
 }
 
 ///|
+pub extend Costs with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for Costs with fn into_value(self) {
   // Only the entries that were set, so that the stored field value keeps
   // which costs were given (required for folding). Users see the full
@@ -1084,6 +1195,9 @@ pub impl IntoValue for Costs with fn into_value(self) {
   }
   Dict(Dict::from_pairs(pairs))
 }
+
+///|
+pub extend Costs with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for Costs with fn from_value(v) {
@@ -1111,6 +1225,9 @@ pub impl FromValue for Costs with fn from_value(v) {
     v => raise HintedError(Costs::input().error(v))
   }
 }
+
+///|
+pub extend Costs with FromValue::{from_value}
 
 ///|
 /// Upstream's cast of `Costs` into a value: all four costs.
@@ -1165,6 +1282,9 @@ pub impl Reflect for Never with fn output() {
 pub impl Reflect for Never with fn castable(_) {
   false
 }
+
+///|
+pub extend Never with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for Never with fn into_value(self) {

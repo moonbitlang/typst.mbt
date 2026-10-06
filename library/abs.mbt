@@ -5,6 +5,9 @@
 pub(all) struct Abs(Scalar) derive(Default, Eq, Compare, Hash)
 
 ///|
+pub extend Abs with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
 pub(all) enum AbsUnit {
   Pt
   Mm
@@ -185,6 +188,9 @@ pub impl Sub for Abs with fn sub(self, other) {
 pub impl Neg for Abs with fn neg(self) {
   Abs(-self.0)
 }
+
+///|
+pub extend Abs with Neg::{neg}
 
 ///|
 pub impl Mod for Abs with fn mod(self, other) {

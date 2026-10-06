@@ -370,6 +370,9 @@ pub impl Reflect for SymbolVariant with fn castable(v) {
 }
 
 ///|
+pub extend SymbolVariant with Reflect::{output, input, castable}
+
+///|
 /// Whether the value can be cast to `T` (upstream `T::castable`).
 fn[T : Reflect] reflect_castable(_ : Ty[T], v : Value) -> Bool {
   T::castable(v)

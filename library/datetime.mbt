@@ -572,9 +572,15 @@ pub impl Reflect for DisplayPattern with fn castable(v) {
 }
 
 ///|
+pub extend DisplayPattern with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for DisplayPattern with fn into_value(self) {
   Str(self.0)
 }
+
+///|
+pub extend DisplayPattern with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for DisplayPattern with fn from_value(v) {
@@ -584,6 +590,9 @@ pub impl FromValue for DisplayPattern with fn from_value(v) {
   }
   DisplayPattern(v, item)
 }
+
+///|
+pub extend DisplayPattern with FromValue::{from_value}
 
 ///|
 /// `Smart<DisplayPattern>`.
@@ -606,6 +615,9 @@ pub impl Reflect for SmartDisplayPattern with fn output() {
 pub impl Reflect for SmartDisplayPattern with fn castable(v) {
   v is Auto || DisplayPattern::castable(v)
 }
+
+///|
+pub extend SmartDisplayPattern with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for SmartDisplayPattern with fn into_value(self) {
@@ -707,9 +719,15 @@ pub impl Reflect for TodayOffset with fn castable(v) {
 }
 
 ///|
+pub extend TodayOffset with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for TodayOffset with fn into_value(self) {
   Duration(self.0)
 }
+
+///|
+pub extend TodayOffset with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for TodayOffset with fn from_value(v) {
@@ -719,6 +737,9 @@ pub impl FromValue for TodayOffset with fn from_value(v) {
     v => raise HintedError(TodayOffset::input().error(v))
   }
 }
+
+///|
+pub extend TodayOffset with FromValue::{from_value}
 
 ///|
 /// `Smart<TodayOffset>`.
@@ -741,6 +762,9 @@ pub impl Reflect for SmartTodayOffset with fn output() {
 pub impl Reflect for SmartTodayOffset with fn castable(v) {
   v is Auto || TodayOffset::castable(v)
 }
+
+///|
+pub extend SmartTodayOffset with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for SmartTodayOffset with fn into_value(self) {
@@ -773,6 +797,9 @@ pub impl Reflect for Datetime with fn output() {
 pub impl Reflect for Datetime with fn castable(v) {
   v is Datetime(_)
 }
+
+///|
+pub extend Datetime with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for Datetime with fn into_value(self) {

@@ -24,6 +24,9 @@ pub impl Reflect for ScaleAmount with fn castable(v) {
 }
 
 ///|
+pub extend ScaleAmount with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for ScaleAmount with fn into_value(self) {
   match self {
     Ratio(ratio) => Ratio(ratio)
@@ -90,6 +93,9 @@ pub fn Transform::identity() -> Transform {
 pub impl Default for Transform with fn default() {
   Transform::identity()
 }
+
+///|
+pub extend Transform with Default::{default}
 
 ///|
 /// A translate transform.

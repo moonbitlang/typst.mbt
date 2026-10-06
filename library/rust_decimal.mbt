@@ -20,6 +20,9 @@ struct RustDecimal {
 } derive(Hash)
 
 ///|
+pub extend RustDecimal with Hash::{hash, hash_combine}
+
+///|
 /// The maximum supported scale.
 let rd_max_scale : Int = 28
 

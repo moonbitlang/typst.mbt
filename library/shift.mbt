@@ -32,6 +32,9 @@ pub impl Reflect for Smallcaps with fn castable(v) {
 }
 
 ///|
+pub extend Smallcaps with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for Smallcaps with fn into_value(self) {
   match self {
     Minuscules => Str("minuscules")
@@ -109,6 +112,9 @@ pub impl Reflect for ShiftSettings with fn output() {
 pub impl Reflect for ShiftSettings with fn castable(v) {
   v is Dict(_)
 }
+
+///|
+pub extend ShiftSettings with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for ShiftSettings with fn into_value(self) {

@@ -37,6 +37,9 @@ pub impl Show for Tag with fn output(self, logger) {
 }
 
 ///|
+pub extend Tag with Show::{to_string}
+
+///|
 pub impl Fingerprint for Tag with fn fingerprint(self, state) {
   match self {
     Start(elem, flags) => {
@@ -93,6 +96,9 @@ pub impl Reflect for Tag with fn output() {
 pub impl Reflect for Tag with fn castable(v) {
   v is Dyn(Tag(_))
 }
+
+///|
+pub extend Tag with Reflect::{input, castable}
 
 ///|
 pub impl IntoValue for Tag with fn into_value(self) {

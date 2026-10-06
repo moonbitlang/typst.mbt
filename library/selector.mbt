@@ -264,9 +264,15 @@ pub impl Reflect for Selector with fn castable(v) {
 }
 
 ///|
+pub extend Selector with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for Selector with fn into_value(self) {
   Dyn(Selector(self))
 }
+
+///|
+pub extend Selector with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for Selector with fn from_value(v) {
@@ -285,6 +291,9 @@ pub impl FromValue for Selector with fn from_value(v) {
     v => raise HintedError(Selector::input().error(v))
   }
 }
+
+///|
+pub extend Selector with FromValue::{from_value}
 
 ///|
 /// A selector that can be used with `query`.
@@ -337,9 +346,15 @@ pub impl Reflect for LocatableSelector with fn castable(v) {
 }
 
 ///|
+pub extend LocatableSelector with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for LocatableSelector with fn into_value(self) {
   self.0.into_value()
 }
+
+///|
+pub extend LocatableSelector with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for LocatableSelector with fn from_value(v) {
@@ -377,6 +392,9 @@ pub impl FromValue for LocatableSelector with fn from_value(v) {
 }
 
 ///|
+pub extend LocatableSelector with FromValue::{from_value}
+
+///|
 /// A selector that can be used with show rules.
 ///
 /// Hopefully, this is made obsolete by a more powerful showing mechanism in
@@ -411,6 +429,9 @@ pub impl Reflect for ShowableSelector with fn castable(v) {
 }
 
 ///|
+pub extend ShowableSelector with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for ShowableSelector with fn into_value(self) {
   self.0.into_value()
 }
@@ -442,6 +463,9 @@ pub impl FromValue for ShowableSelector with fn from_value(v) {
   validate(selector, false)
   ShowableSelector(selector)
 }
+
+///|
+pub extend ShowableSelector with FromValue::{from_value}
 
 ///|
 /// `LocatableSelector(HeadingElem::ELEM.select())` (default of

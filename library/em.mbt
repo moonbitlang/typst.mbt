@@ -7,6 +7,9 @@
 pub(all) struct Em(Scalar) derive(Default, Eq, Compare, Hash)
 
 ///|
+pub extend Em with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
 pub fn Em::zero() -> Em {
   Em(Scalar(0.0))
 }

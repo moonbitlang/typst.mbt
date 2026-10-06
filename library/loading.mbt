@@ -25,12 +25,18 @@ pub impl Reflect for DataSource with fn castable(v) {
 }
 
 ///|
+pub extend DataSource with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for DataSource with fn into_value(self) {
   match self {
     Path(v) => IntoValue::into_value(v)
     Bytes(v) => Bytes(BytesValue(v))
   }
 }
+
+///|
+pub extend DataSource with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for DataSource with fn from_value(v) {
@@ -42,6 +48,9 @@ pub impl FromValue for DataSource with fn from_value(v) {
     raise HintedError(cast_error((Ty::new() : Ty[DataSource]), v))
   }
 }
+
+///|
+pub extend DataSource with FromValue::{from_value}
 
 ///|
 /// Loads data from a path or provided bytes (upstream `Load for

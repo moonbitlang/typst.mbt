@@ -23,6 +23,9 @@ pub impl Default for FontVariant with fn default() {
 }
 
 ///|
+pub extend FontVariant with Default::{default}
+
+///|
 /// Create a variant from its three components.
 pub fn FontVariant::new(
   style : FontStyle,

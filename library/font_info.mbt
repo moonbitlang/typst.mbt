@@ -409,6 +409,9 @@ pub impl Default for Coverage with fn default() {
 }
 
 ///|
+pub extend Coverage with Default::{default}
+
+///|
 /// Encode a vector of codepoints.
 pub fn Coverage::from_vec(codepoints : Array[UInt]) -> Coverage {
   let codepoints = codepoints.copy()

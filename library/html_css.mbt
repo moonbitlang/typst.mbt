@@ -130,6 +130,9 @@ pub impl IntoValue for CssProperties with fn into_value(self) {
 }
 
 ///|
+pub extend CssProperties with IntoValue::{into_value}
+
+///|
 pub impl FromValue for CssProperties with fn from_value(v) {
   match v {
     Dyn(HtmlCss(p)) => p

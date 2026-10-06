@@ -194,6 +194,9 @@ pub impl Reflect for Tiling with fn castable(v) {
 }
 
 ///|
+pub extend Tiling with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for Tiling with fn into_value(self) {
   Tiling(self)
 }

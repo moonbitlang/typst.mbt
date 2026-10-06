@@ -79,6 +79,9 @@ pub impl Reflect for Location with fn castable(v) {
 }
 
 ///|
+pub extend Location with Reflect::{input, castable}
+
+///|
 pub impl IntoValue for Location with fn into_value(self) {
   Dyn(Location(self))
 }

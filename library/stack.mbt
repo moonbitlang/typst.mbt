@@ -25,6 +25,9 @@ pub impl Reflect for StackChild with fn castable(v) {
 }
 
 ///|
+pub extend StackChild with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for StackChild with fn into_value(self) {
   match self {
     Spacing(spacing) => spacing.into_value()

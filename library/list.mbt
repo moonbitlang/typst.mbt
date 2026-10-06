@@ -74,6 +74,9 @@ pub impl Reflect for ListMarker with fn castable(v) {
 }
 
 ///|
+pub extend ListMarker with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for ListMarker with fn into_value(self) {
   match self {
     Content(vec) =>
@@ -85,6 +88,9 @@ pub impl IntoValue for ListMarker with fn into_value(self) {
     Func(func) => Func(func)
   }
 }
+
+///|
+pub extend ListMarker with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for ListMarker with fn from_value(v) {

@@ -87,6 +87,7 @@ pub(all) struct SvgOptions {
   render_bleed : Bool
   format : PartialSvgFormatOptions
 } derive(Default, Eq)
+pub fn SvgOptions::default() -> Self
 pub fn SvgOptions::resolve(Self, SvgFormatOptions) -> CompleteSvgOptions
 
 pub(all) struct SvgTransform(@library.Transform)

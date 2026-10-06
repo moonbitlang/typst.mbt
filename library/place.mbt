@@ -16,6 +16,9 @@ pub impl Default for PlacementScope with fn default() {
 }
 
 ///|
+pub extend PlacementScope with Default::{default}
+
+///|
 let placement_scope_names : ReadOnlyArray[String] = ["column", "parent"]
 
 ///|
@@ -34,12 +37,18 @@ pub impl Reflect for PlacementScope with fn castable(v) {
 }
 
 ///|
+pub extend PlacementScope with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for PlacementScope with fn into_value(self) {
   match self {
     Column => Str("column")
     Parent => Str("parent")
   }
 }
+
+///|
+pub extend PlacementScope with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for PlacementScope with fn from_value(v) {

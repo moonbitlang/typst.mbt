@@ -175,6 +175,9 @@ pub impl Reflect for Accent with fn castable(v) {
 }
 
 ///|
+pub extend Accent with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for Accent with fn into_value(self) {
   Str(self.0.to_string())
 }

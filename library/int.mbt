@@ -308,6 +308,9 @@ pub impl Reflect for Endianness with fn castable(v) {
 }
 
 ///|
+pub extend Endianness with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for Endianness with fn into_value(self) {
   match self {
     Big => Str("big")
@@ -349,6 +352,9 @@ pub impl Reflect for ToInt with fn output() {
 pub impl Reflect for ToInt with fn castable(v) {
   v is (Int(_) | Bool(_) | Float(_) | Decimal(_) | Str(_) | Symbol(_))
 }
+
+///|
+pub extend ToInt with Reflect::{output, input, castable}
 
 ///|
 pub impl FromValue for ToInt with fn from_value(v) {
