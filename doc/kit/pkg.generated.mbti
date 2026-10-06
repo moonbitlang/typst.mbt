@@ -20,6 +20,17 @@ pub impl Show for Cards
 pub impl @debug.Debug for Cards
 pub impl @doc.IntoContent for Cards
 
+pub struct Chip {
+  // private fields
+}
+#callsite(autofill(args_loc, loc))
+pub fn Chip::Chip(String, fill? : @doc.Paint, stroke? : @doc.Sides[@doc.Stroke], radius? : @doc.Corners[@doc.Length], inset? : @doc.Sides[@doc.Length], outset? : @doc.Sides[@doc.Length], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+#callsite(autofill(args_loc, loc))
+pub fn Chip::of(&@doc.IntoContent, fill? : @doc.Paint, stroke? : @doc.Sides[@doc.Stroke], radius? : @doc.Corners[@doc.Length], inset? : @doc.Sides[@doc.Length], outset? : @doc.Sides[@doc.Length], loc~ : SourceLoc, args_loc~ : ArgsLoc) -> Self
+pub impl Show for Chip
+pub impl @debug.Debug for Chip
+pub impl @doc.IntoContent for Chip
+
 // Type aliases
 
 // Traits
