@@ -1021,7 +1021,7 @@ its own evidence (two ports).
 `canvas-curve` and `canvas-arrow`, and the pairs `kit-canvas`,
 `kit-canvas-arrows` and `kit-canvas-baseline` (the `edsl` stage has 50
 pairs). `doc/twins/kit_canvas_wbtest.mbt` gives the functions and the
-items the same 21 rejected inputs. What the pairs showed:
+items the same 22 rejected inputs. What the pairs showed:
 
 - The corners of a head are compared bit for bit, so the function does
   the element's operations in the element's order (directions that are
