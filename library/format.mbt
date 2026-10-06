@@ -252,6 +252,24 @@ pub fn bundle_format() -> Format {
 }
 
 ///|
+/// The panic message of `Scope::prelude_path` for a path that crosses two
+/// feature gates. Upstream prints `{path:?}` after rebinding `path` to the
+/// segments between the first and the last one
+/// (`let [first, path @ .., last] = ..`, scope.rs:234 and :249).
+fn prelude_path_conflict(
+  path : Array[String],
+  prev : Feature,
+  new : Feature,
+) -> String {
+  let middle = path[1:path.length() - 1]
+    .iter()
+    .map(name => @unicode.rust_debug_str(name))
+    .collect()
+    .join(", ")
+  "cannot prelude from path [\{middle}] because it's gated by two different features: `\{prev}` and `\{new}`"
+}
+
+///|
 /// Define the binding at the end of `path` (looked up through the scopes of
 /// the values along it) in this scope, carrying over a feature gate on the
 /// path (upstream `Scope::prelude_path`).
@@ -268,9 +286,7 @@ pub fn Scope::prelude_path(self : Scope, path : Array[String]) -> Binding? {
     binding = next
     if binding.feature() is Some(new) {
       if path_feature is Some(prev) && prev != new {
-        abort(
-          "cannot prelude from path [\{path.join(", ")}] because it's gated by two different features: `\{prev}` and `\{new}`",
-        )
+        abort(prelude_path_conflict(path, prev, new))
       }
       path_feature = Some(new)
     }
