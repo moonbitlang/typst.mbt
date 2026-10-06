@@ -8,6 +8,7 @@
 ///|
 using @doc {
   type Block,
+  type Cells,
   type Columns,
   type Context,
   type Corners,
@@ -495,6 +496,16 @@ test "cards: several rows, a last row that is not full, and other tracks" {
       #|p1 71.3,58.7 57.3x27.7
     ),
   )
+  // (Why the look is on the cells and not on the grid: a grid fills the
+  // cells that it adds to complete a row, which would be an empty card.)
+  let filled = compile([
+    Grid(
+      items(["1", "2", "3"]),
+      columns=Sizing::repeat(2, size=Fr(1)),
+      fill=Cells::all(Luma(230)),
+    ),
+  ])
+  assert_eq(cards(filled).split("\n").count(), 4)
   // Tracks of fixed, relative and fractional widths, with a gutter of
   // their own.
   inspect(
