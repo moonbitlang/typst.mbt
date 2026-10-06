@@ -380,10 +380,5 @@ fn Callback::new(
 ) -> Callback {
   let serial = callback_serial.val
   callback_serial.val = serial + 1
-  // A callback that the `build` of a composite creates is a part of it.
-  let invoke = match composite_scope.val {
-    Some(scope) => composite_callback(scope.site, invoke)
-    Option::None => invoke
-  }
-  { serial, origin, invoke, }
+  { serial, origin, invoke: scoped_callback(invoke), }
 }

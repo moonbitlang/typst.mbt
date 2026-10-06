@@ -32,9 +32,9 @@
 // `site.arg(i, v)` has the location of its own call, a constructor has the
 // locations of its argument expressions, and an argument expression that
 // contains the call of `site.arg(i, v)` is the caller's argument `i`.
-// A callback that is created in a `build` runs as a part of it
-// (`composite_callback`), so the content that an element makes while the
-// document is laid out has the same provenance.
+// A callback runs where it was created (`scoped_callback`): one that a
+// `build` creates is a part of it, so the content that an element makes
+// while the document is laid out has the same provenance.
 
 ///|
 /// How the call of a constructor that ran inside the `build` of a composite
@@ -124,7 +124,8 @@ priv struct Scope {
   /// The composite's site.
   site : Site
   /// The marks that were made and not taken, without duplicates: a mark in
-  /// a loop is one mark.
+  /// a loop is one mark. (A mark that no constructor takes, of a value
+  /// that was bound to a name, is dropped with the scope.)
   mut marks : Array[Mark]
 }
 
@@ -262,53 +263,43 @@ pub fn[T] CompositeSite::arg(
 }
 
 ///|
-/// The function of a callback that is created inside the `build` of the
-/// composite with the site `site` (`Callback::new`): a callback is a part
-/// of the `build` that creates it, which runs later. While it runs, the
+/// The function of a callback that is created now (`Callback::new`): it
+/// runs where it was created. A callback that the `build` of a composite
+/// creates is a part of that `build`, which runs later: while it runs, the
 /// constructors that it calls are the composite's (also `cx.measure(..)`,
 /// which records where it is called), and `site.arg` marks their
-/// arguments; content that it returns is an argument like the result of
-/// `build`. The callback's own identity, occurrence and keys are those of
-/// every callback (docs/edsl-design.md, section 11.2): a callback
-/// description that is created while it runs is created inside a callback.
-fn composite_callback(
-  site : Site,
+/// arguments. A callback that was created outside of every `build` runs
+/// outside of every `build`, also when the engine calls it while a
+/// callback of a composite is running (the composite measures content of
+/// the caller that has a `Context` in it). The callback's own identity,
+/// occurrence and keys are those of every callback (docs/edsl-design.md,
+/// section 11.2): a callback description that is created while it runs is
+/// created inside a callback.
+fn scoped_callback(
   invoke : (Ctx, @library.Args) -> Value raise,
 ) -> (Ctx, @library.Args) -> Value raise {
+  let site = composite_scope.val.map(scope => scope.site)
   (cx, args) => {
-    let scope : Scope = { site, marks: [], }
     let outer = composite_scope.val
-    composite_scope.val = Some(scope)
+    composite_scope.val = site.map(site => { site, marks: [], })
     defer {
       composite_scope.val = outer
     }
-    let value = invoke(cx, args)
-    let param = scope.take_all()
-    match value.val {
-      VContent(body) if param >= 0 =>
-        Value::of(VContent(Content::of(NComposite(body, site.result(param)))))
-      _ => value
-    }
+    invoke(cx, args)
   }
 }
 
 ///|
-/// The site of the result of the `build` of the composite with the site
-/// `self` (`NComposite`): its one parameter, the body, is the parameter
-/// `param` of the call that origins report (`-1`: the call).
-fn Site::result(self : Site, param : Int) -> Site {
-  { ..self, owner: Some({ kind: self.origin_kind(), params: [param], }), }
-}
-
-///|
-/// Content that cannot be lowered: `message` is reported at the call of
-/// the composite when the document is compiled. For arguments that the
-/// element cannot accept (constructors do not raise).
+/// Content that cannot be lowered: `message` is reported when the document
+/// is compiled, at the argument `arg` of the composite's call (an index as
+/// for [CompositeSite::arg]) if the caller wrote it, else at the call. For
+/// arguments that the element cannot accept (constructors do not raise).
 pub fn CompositeSite::invalid(
   self : CompositeSite,
   message : String,
+  arg? : Int = -1,
 ) -> Content {
-  Content::of(NInvalid(message, self.site))
+  Content::of(NInvalid(message, self.site, self.site.param(arg)))
 }
 
 ///|
@@ -334,8 +325,9 @@ pub fn CompositeSite::invalid(
 ///   type of the caller builds. A function of the caller that `build`
 ///   calls runs inside it: an element that takes one calls it before the
 ///   hook.
-/// - **The result** of `build` is an argument in this sense too:
-///   `site => site.arg(0, body)` is `body` as the caller's first argument.
+/// - **The result** of `build` is not an argument of a constructor: a
+///   string of the caller that is the whole result is the call. Inside a
+///   constructor it is an argument: `site => Seq(site.arg(0, [body]))`.
 /// - **Nesting.** A composite that is built inside the `build` of another
 ///   one is a constructor like the others there: everything it produces
 ///   resolves to the call of the outermost composite, and its arguments to
@@ -346,9 +338,10 @@ pub fn CompositeSite::invalid(
 ///   constructed inside a callback; an element that creates one says so in
 ///   its documentation. A callback is a part of the `build` that created
 ///   it: when it runs, the constructors that it calls are the composite's
-///   too, `site.arg` marks their arguments, and what it returns is an
-///   argument like the result of `build`. The caller's content is
-///   converted in `build` (`Content(body)`), once, not in the callback.
+///   too, and `site.arg` marks their arguments. (A callback of the caller
+///   runs as the caller's, also when the engine calls it while the
+///   element measures.) The caller's content is converted in `build`
+///   (`Content(body)`), once, not in the callback.
 /// - **Keys.** The origins are those of the call under the keys of the
 ///   enclosing `Keyed` wrappers, as for any constructor; an element that
 ///   builds a part per item of its data wraps each in `Keyed`.
@@ -370,33 +363,11 @@ pub fn Composite::Composite(
 ) -> Composite {
   // (Inside the `build` of another composite this is a site of that one.)
   let site = Site::new(name, loc, args_loc)
-  let scope : Scope = { site, marks: [], }
   let outer = composite_scope.val
-  composite_scope.val = Some(scope)
+  composite_scope.val = Some({ site, marks: [], })
   let body = described(build({ site, }))
   composite_scope.val = outer
-  // The marks that no constructor took are those of the result.
-  let param = scope.take_all()
-  { content: Content::of(NComposite(body, site.result(param))), }
-}
-
-///|
-/// The parameter that all the remaining marks name, or `-1`.
-fn Scope::take_all(self : Scope) -> Int {
-  let mut found = UNMARKED
-  for mark in self.marks {
-    if found == UNMARKED {
-      found = mark.param
-    } else if found != mark.param {
-      found = AMBIGUOUS
-    }
-  }
-  self.marks = []
-  if found >= 0 {
-    found
-  } else {
-    -1
-  }
+  { content: Content::of(NComposite(body, site)), }
 }
 
 ///|

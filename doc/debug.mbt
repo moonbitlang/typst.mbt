@@ -209,7 +209,7 @@ pub impl @debug.Debug for Content with fn to_repr(self) {
         (Option::None, @debug.Repr::literal(content.repr())),
       ])
     NValue(value) => @debug.Debug::to_repr(value)
-    NInvalid(message, site) =>
+    NInvalid(message, site, _) =>
       @debug.Repr::ctor(site.kind, [
         (Some("invalid"), @debug.Repr::string(message)),
       ])

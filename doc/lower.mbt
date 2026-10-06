@@ -278,8 +278,11 @@ fn Lowering::content(
     // `show` directly in code and content blocks).
     NSetRule(set) => raise self.misplaced_rule(set.origin)
     NShowRule(show) => raise self.misplaced_rule(show.origin)
-    NInvalid(message, site) =>
-      raise error_at(self.session.registry.span(self.entry(site)), message)
+    NInvalid(message, site, param) =>
+      raise error_at(
+        self.session.registry.arg_span(self.entry(site), param),
+        message,
+      )
     NLabelled(body, label, site, label_param) => {
       let entry = self.entry(site)
       let span = self.session.registry.span(entry)
@@ -288,8 +291,7 @@ fn Lowering::content(
       let body = self.at(body_span).content(body, body_span)
       self.labelled(body, label, span, label_span)
     }
-    // What the `build` of a composite made, as the argument of the
-    // composite that it was marked as, if any.
+    // What the `build` of a composite made.
     NComposite(body, site) => {
       let (inner, span) = self.composite(site)
       inner.content(body, span)
@@ -450,7 +452,7 @@ fn Lowering::sequence(
         self.take(pieces)
       _ => base
     }
-    match child.node {
+    match rule_of(child).unwrap_or(child.node) {
       NSetRule(set) => {
         let styles = self.set_rule(set)
         let tail = self.sequence(children[i:], base, own~)
@@ -532,14 +534,38 @@ fn is_inserted(content : Content) -> Bool {
 
 ///|
 /// For lowering the body of a composite (`NComposite`): the lowering
-/// context and the span of the body, which is the argument of the
-/// composite's call that the result of `build` was marked as, or the call.
+/// context and the span of the body, which is the call (what has no
+/// location of its own in the result of `build` is not an argument of a
+/// constructor).
 fn Lowering::composite(
   self : Lowering,
   site : Site,
 ) -> (Lowering, @syntax.Span) raise @library.SourceError {
-  let span = self.param_span(site, self.entry(site), 0)
+  let span = self.session.registry.span(self.entry(site))
   (self.at(span), span)
+}
+
+///|
+/// The rule that a child of a sequence is, also as the result of a
+/// composite (which is what it is made of).
+fn rule_of(content : Content) -> Node? {
+  match content.node {
+    NSetRule(_) | NShowRule(_) => Some(content.node)
+    NComposite(body, _) => rule_of(body)
+    _ => Option::None
+  }
+}
+
+///|
+/// The value that a description is, also as the result of a composite:
+/// as an argument it is passed as the value (`none` reaches a content
+/// field as such).
+fn value_of(content : Content) -> Value? {
+  match content.node {
+    NValue(value) => Some(value)
+    NComposite(body, _) => value_of(body)
+    _ => Option::None
+  }
 }
 
 ///|
@@ -868,12 +894,15 @@ fn Lowering::value(
     // A value in a content position is passed as the value (so that
     // `none` and `auto` reach a content field as such).
     VContent({ node: NValue(inner), }) => self.value(inner, span)
-    // (Also where a composite made the value.)
-    VContent({ node: NComposite({ node: NValue(inner), }, site), }) => {
-      let (lowering, span) = self.composite(site)
-      lowering.value(inner, span)
-    }
-    VContent(content) => @library.Value::Content(self.content(content, span))
+    VContent(content) =>
+      match (content.node, value_of(content)) {
+        // (Also where a composite made the value.)
+        (NComposite(_, site), Some(inner)) => {
+          let (lowering, span) = self.composite(site)
+          lowering.value(inner, span)
+        }
+        _ => @library.Value::Content(self.content(content, span))
+      }
     VLabel(name) =>
       self.call(
         FNative(@library.native_label_construct()),

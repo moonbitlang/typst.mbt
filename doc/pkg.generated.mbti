@@ -261,7 +261,7 @@ pub struct CompositeSite {
 }
 #callsite(autofill(loc))
 pub fn[T] CompositeSite::arg(Self, Int, T, loc~ : SourceLoc) -> T
-pub fn CompositeSite::invalid(Self, String) -> Content
+pub fn CompositeSite::invalid(Self, String, arg? : Int) -> Content
 
 pub struct Content {
   // private fields

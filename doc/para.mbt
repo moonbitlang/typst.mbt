@@ -101,7 +101,8 @@ pub fn Para::Para(
   let site = Site::new("Para", loc, args_loc)
   let pieces = match prose_pieces(text, quotes, "Para") {
     Ok(pieces) => pieces
-    Err(message) => return { content: Content::of(NInvalid(message, site)), }
+    Err(message) =>
+      return { content: Content::of(NInvalid(message, site, -1)), }
   }
   // The options, as `set par(..)` for the sequence: the arguments of
   // `SetPar`, with the indices of this constructor's parameters.

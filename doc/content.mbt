@@ -42,9 +42,8 @@ priv enum Node {
   NLabelled(Content, String, Site, Int)
   /// Content whose origins carry a runtime occurrence key.
   NKeyed(String, Content)
-  /// A composite: what its `build` made (`composite.mbt`). It lowers to
-  /// that content. Parameter 0 of the site is the body: the caller's
-  /// argument that the result of `build` was marked as, or none.
+  /// A composite: what its `build` made (`composite.mbt`), and the site
+  /// of its call. It lowers to that content.
   NComposite(Content, Site)
   /// A `context` callback.
   NContext(Callback, Site)
@@ -58,7 +57,9 @@ priv enum Node {
   NValue(Value)
   /// A description that cannot be lowered: the message is reported at the
   /// origin (a constructor found the problem; constructors do not raise).
-  NInvalid(String, Site)
+  /// The integer is the parameter of the origin's entry that it is about
+  /// (`-1`: the call).
+  NInvalid(String, Site, Int)
 }
 
 ///|

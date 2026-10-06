@@ -308,8 +308,9 @@ fn text_origin(
     }
     // (A label of a constructor is on a call, which has its own origin;
     // the body of `Labelled(body, label)` is that call's first argument.)
-    NLabelled(body, _, own, _) | NComposite(body, own) =>
-      text_origin(body, own, 0, keys)
+    NLabelled(body, _, own, _) => text_origin(body, own, 0, keys)
+    // (The result of a composite is its call.)
+    NComposite(body, own) => text_origin(body, own, -1, keys)
     NSeq(_, own) => own.origin(keys, Some(0))
     NCall(call) =>
       match wrapper_body(call) {
@@ -543,7 +544,7 @@ fn Linter::content(
     | NEngine(_)
     | NText(_, _)
     | NSpace(_)
-    | NInvalid(_, _) => ()
+    | NInvalid(_, _, _) => ()
   }
 }
 

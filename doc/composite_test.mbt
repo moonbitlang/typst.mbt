@@ -143,9 +143,9 @@ fn responsive(
   @doc.Composite("Responsive", loc, args_loc, site => {
     @doc.Layout((size, _) => {
       if size.width < 100.0 {
-        site.arg(0, narrow)
+        @doc.Seq([site.arg(0, narrow)])
       } else {
-        site.arg(1, wide)
+        @doc.Seq([site.arg(1, wide)])
       }
     })
   })
@@ -179,8 +179,16 @@ fn marked(
         @doc.Content(
           @doc.Block(if a == "" { site.arg(2, b) } else { site.arg(1, a) }),
         )
-      // The result of `build` itself.
+      // The result of `build` itself is not an argument of a constructor;
       "result" => @doc.Content(site.arg(1, a))
+      // in a sequence it is one.
+      "sequence" => @doc.Content(@doc.Seq([site.arg(1, a)]))
+      // A mark that nothing takes says nothing about what is returned.
+      "stale" => {
+        let saved = site.arg(1, a)
+        ignore(saved)
+        @doc.Content(b)
+      }
       // No mark.
       _ => @doc.Content(@doc.Block(a))
     }
@@ -197,7 +205,10 @@ fn greeting(
 ) -> @doc.Composite {
   @doc.Composite("Greeting", loc, args_loc, site => {
     if name == "" {
-      return site.invalid("`Greeting` needs a name")
+      return site.invalid("`Greeting` needs a name", arg=0)
+    }
+    if name == "nobody" {
+      return site.invalid("`Greeting` greets somebody")
     }
     @doc.Content(@doc.Emph(site.arg(0, name)))
   })
@@ -581,7 +592,7 @@ test "composite: content that is made in a callback of the element" {
   }
   // (The page and the document are the other two.)
   assert_eq(report.origins.length(), 4)
-  // What the callback returns is an argument like the result of `build`.
+  // What the callback builds from an argument is that argument.
   inspect(
     text_args(
       compile_on_page([
@@ -591,6 +602,17 @@ test "composite: content that is made in a callback of the element" {
     ),
     content="wide: Responsive a1 | narrow: Responsive a0",
   )
+  // A callback of the caller that the engine calls while the element's
+  // callback is running (it measures the body) runs as the caller's: what
+  // it builds has its own call sites, and its errors are there.
+  inspect(
+    text_args(compile([fit(@doc.Context(_ => @doc.Emph("inner")))])),
+    content="inner: Emph a0",
+  )
+  let inner = compile([
+    fit(@doc.Context(_ => @doc.Block("x", inset=@doc.Sides::none()))),
+  ])
+  inspect(place(origin_of(inner.errors[0])), content="Block a7")
   // An error that the callback raises is at the call.
   let failing = compile([fit("x", fail_with="boom")])
   assert_true(failing.errors[0].message.contains("boom"))
@@ -641,9 +663,10 @@ test "composite: where a mark counts" {
   )
   inspect(args("branch", "a", "b"), content="a: Marked a1")
   inspect(args("branch", "", "b"), content="b: Marked a2")
-  // The result of `build` is an argument of the element.
-  inspect(args("result", "a", "b"), content="a: Marked a1")
+  inspect(args("sequence", "a", "b"), content="a: Marked a1")
   // Not marked there: the call, never another argument.
+  inspect(args("result", "a", "b"), content="a: Marked call")
+  inspect(args("stale", "a", "b"), content="b: Marked call")
   inspect(args("bound", "a", "b"), content="a: Marked call")
   inspect(
     args("mixed", "a", "b"),
@@ -658,12 +681,58 @@ test "composite: where a mark counts" {
     text_args(compile([greeting(name="you")])),
     content="you: Greeting a0",
   )
-  // An argument that the element cannot accept: an error at the call.
+  // An argument that the element cannot accept: an error at the argument,
+  // or at the call.
   let line = line_here() + 1
   let invalid = compile([greeting(name="")])
   inspect(error_messages(invalid), content="`Greeting` needs a name")
-  inspect(place(origin_of(invalid.errors[0])), content="Greeting call")
+  inspect(place(origin_of(invalid.errors[0])), content="Greeting a0")
   assert_eq(origin_of(invalid.errors[0]).start_line, line)
+  let nobody = compile([greeting(name="nobody")])
+  inspect(error_messages(nobody), content="`Greeting` greets somebody")
+  inspect(place(origin_of(nobody.errors[0])), content="Greeting call")
+}
+
+///|
+/// A composite that is a rule, one that is a value, and one that is made
+/// of the second.
+#callsite(autofill(loc, args_loc))
+fn small(loc~ : SourceLoc, args_loc~ : ArgsLoc) -> @doc.Composite {
+  @doc.Composite("Small", loc, args_loc, _ => @doc.SetText(size=Pt(6)))
+}
+
+///|
+#callsite(autofill(loc, args_loc))
+fn nothing(loc~ : SourceLoc, args_loc~ : ArgsLoc) -> @doc.Composite {
+  @doc.Composite("Nothing", loc, args_loc, _ => @doc.Value::none())
+}
+
+///|
+#callsite(autofill(loc, args_loc))
+fn nothing_at_all(loc~ : SourceLoc, args_loc~ : ArgsLoc) -> @doc.Composite {
+  @doc.Composite("NothingAtAll", loc, args_loc, _ => nothing())
+}
+
+///|
+test "composite: an element is what it is made of, also a rule or a value" {
+  // A rule styles what follows it in the sequence.
+  assert_eq(
+    lowered([small(), "text"]),
+    lowered([@doc.SetText(size=Pt(6)), "text"]),
+  )
+  // Elsewhere it is the error of a rule, at the call of the element.
+  let misplaced = compile([@doc.Par(small())])
+  inspect(
+    error_messages(misplaced),
+    content="rules are only allowed directly in `Document` and `Seq`",
+  )
+  inspect(place(origin_of(misplaced.errors[0])), content="Small call")
+  // A value is passed as the value where content is expected: `none` is
+  // no caption, not an empty one. Also through a second element.
+  let expected = lowered([@doc.Figure("x", caption=@doc.NoneValue())])
+  assert_true(expected != lowered([@doc.Figure("x", caption=@doc.Seq([]))]))
+  assert_eq(lowered([@doc.Figure("x", caption=nothing())]), expected)
+  assert_eq(lowered([@doc.Figure("x", caption=nothing_at_all())]), expected)
 }
 
 ///|
