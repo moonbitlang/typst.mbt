@@ -8,21 +8,21 @@
 priv struct CblcBitmapFormat {
   metrics : CblcMetricsFormat
   data : CblcBitmapDataFormat
-} derive(Eq, Debug)
+}
 
 ///|
 priv enum CblcMetricsFormat {
   Small
   Big
   Shared
-} derive(Eq, Debug)
+}
 
 ///|
 priv enum CblcBitmapDataFormat {
   ByteAligned(bit_depth~ : Byte)
   BitAligned(bit_depth~ : Byte)
   PNG
-} derive(Eq, Debug)
+}
 
 ///|
 priv struct CblcMetrics {
@@ -30,7 +30,7 @@ priv struct CblcMetrics {
   mut y : Int // i8
   mut width : Byte
   mut height : Byte
-} derive(Debug)
+}
 
 ///|
 fn CblcMetrics::default() -> CblcMetrics {
@@ -43,7 +43,7 @@ priv struct CblcLocation {
   offset : Int
   metrics : CblcMetrics
   ppem : UInt16
-} derive(Debug)
+}
 
 ///|
 priv struct BitmapSizeTable {

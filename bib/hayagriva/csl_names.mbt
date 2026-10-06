@@ -12,7 +12,7 @@ priv enum DisambiguatedNameForm {
   LongInitialized
   /// Print the full name.
   LongFull
-} derive(Eq, Compare, Hash, Debug)
+} derive(Eq, Compare)
 
 ///|
 fn DisambiguatedNameForm::from_options(
@@ -35,6 +35,9 @@ fn DisambiguatedNameForm::from_options(
 }
 
 ///|
+// Only called by upstream's `disambiguate_list` (names.rs:107), which is
+// `#[allow(dead_code)]` there (names.rs:97) and not ported.
+#warnings("-unused_value")
 fn DisambiguatedNameForm::disambiguate(
   self : DisambiguatedNameForm,
   allow_full_first_name : Bool,
@@ -63,7 +66,7 @@ priv struct NameDisambiguationProperties {
   name_forms : Array[Array[DisambiguatedNameForm?]]
   mut default_name_form : DisambiguatedNameForm
   variables : Array[@citationberg.NameVariable]
-} derive(Eq, Hash, Debug)
+} derive(Eq)
 
 ///|
 fn NameDisambiguationProperties::copy(

@@ -1302,7 +1302,7 @@ pub(all) struct ResumeTable {
 pub fn ResumeTable::len(Self) -> Int
 pub impl FromReader for ResumeTable
 
-pub struct SectionLimited[T] {
+pub struct SectionLimited[_] {
   // private fields
 }
 pub fn[T] SectionLimited::clone(Self[T]) -> Self[T]

@@ -3,6 +3,9 @@
 // `ot_shaper_use_machine_gen.mbt`; the driver below is ported by hand.
 
 ///|
+// `IndependentCluster` is never built upstream either
+// (rustybuzz 0.20.1 src/hb/ot_shaper_use_machine.rs:278); it keeps the numbering.
+#warnings("-unused_constructor")
 priv enum UseSyllableType {
   IndependentCluster
   ViramaTerminatedCluster

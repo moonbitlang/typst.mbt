@@ -192,6 +192,10 @@ fn OperandStack::new() -> OperandStack {
 }
 
 ///|
+// Upstream resets recycled allocations (`impl Reset`, stack/operands.rs:87,
+// stack/control.rs:92; `Stack::new`, stack/mod.rs:88); this port builds a
+// fresh stack per function and does not recycle.
+#warnings("-unused_value")
 fn OperandStack::reset(self : OperandStack) -> Unit {
   self.operands.clear()
   self.local_heads.clear()
@@ -641,6 +645,9 @@ priv struct ElseOperands {
 
 ///|
 /// The Wasm control stack.
+// `orphaned_else_operands` is only read by `debug_assert!`s upstream
+// (wasmi 1.0.9 translator/func/stack/control.rs:121-245).
+#warnings("-unused_field")
 priv struct ControlStack {
   /// The stack of control frames.
   frames : Array[ControlFrame]
@@ -663,6 +670,10 @@ fn ControlStack::new() -> ControlStack {
 }
 
 ///|
+// Upstream resets recycled allocations (`impl Reset`, stack/operands.rs:87,
+// stack/control.rs:92; `Stack::new`, stack/mod.rs:88); this port builds a
+// fresh stack per function and does not recycle.
+#warnings("-unused_value")
 fn ControlStack::reset(self : ControlStack) -> Unit {
   self.frames.clear()
   self.else_operands.ends.clear()

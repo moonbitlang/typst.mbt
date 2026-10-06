@@ -154,7 +154,6 @@ pub(all) struct DrawProps {
 }
 
 pub struct DummyDevice {
-  // private fields
 }
 pub fn DummyDevice::new() -> Self
 pub impl Device for DummyDevice
@@ -236,8 +235,6 @@ pub struct GlyphIdentifier {
   // private fields
 }
 pub impl CacheKey for GlyphIdentifier
-
-type GraphicsState
 
 pub struct Hasher128 {
   // private fields
@@ -458,8 +455,6 @@ pub struct TensorProductPatch {
 pub fn TensorProductPatch::interpolate(Self, @kurbo.Point) -> Array[Float]
 pub fn TensorProductPatch::map_coordinate(Self, @kurbo.Point) -> @kurbo.Point
 pub fn TensorProductPatch::to_triangles(Self, Array[Triangle]) -> Unit
-
-type TextState
 
 pub(all) struct TilingPattern {
   bbox : @kurbo.Rect

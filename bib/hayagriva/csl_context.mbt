@@ -5,7 +5,7 @@
 priv enum NumberVariableResult {
   Regular(MaybeTyped[Numeric])
   Transparent(Int)
-} derive(Eq)
+}
 
 ///|
 priv enum NumberOrPageVariableResult {
@@ -693,7 +693,7 @@ priv struct UsageInfo {
   has_non_empty_vars : Bool
   has_used_macros : Bool
   has_non_empty_group : Bool
-} derive(Eq, Debug)
+}
 
 ///|
 fn UsageInfo::default() -> UsageInfo {

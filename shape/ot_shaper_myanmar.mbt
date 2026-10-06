@@ -2,7 +2,6 @@
 
 ///|
 let myanmar_shaper : OtShaper = {
-  name: "myanmar",
   collect_features: Some(collect_features_myanmar),
   override_features: None,
   create_data: None,
@@ -23,7 +22,6 @@ let myanmar_shaper : OtShaper = {
 /// Disable all auto processing.
 /// https://github.com/harfbuzz/harfbuzz/issues/1162
 let myanmar_zawgyi_shaper : OtShaper = {
-  name: "myanmar_zawgyi",
   collect_features: None,
   override_features: None,
   create_data: None,

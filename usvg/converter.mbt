@@ -2,6 +2,9 @@
 // `Document` into a `Tree`.
 
 ///|
+// `fe_image_link` is only written, like upstream (usvg 0.47.0
+// parser/converter.rs:35; written :388, :494, filter.rs:833).
+#warnings("-unused_field")
 priv struct State {
   parent_clip_path : SvgNode?
   parent_markers : Array[SvgNode]

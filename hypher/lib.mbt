@@ -189,6 +189,10 @@ fn char_to_byte_max(word : StringView, right_min : Int, len : Int) -> Int {
 
 ///|
 /// A state in a trie traversal.
+// The decoded view of a node, like upstream's `State` (hypher 0.1.8
+// src/lib.rs:355). Only `data` and `addr` of the root are read: the
+// matching loop re-decodes the rest from the address (`transition_addr`).
+#warnings("-unused_field")
 priv struct State {
   data : Bytes
   addr : Int

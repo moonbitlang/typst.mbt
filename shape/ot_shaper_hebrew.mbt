@@ -2,7 +2,6 @@
 
 ///|
 let hebrew_shaper : OtShaper = {
-  name: "hebrew",
   collect_features: None,
   override_features: None,
   create_data: None,

@@ -250,18 +250,6 @@ fn filter_paeth(a : Int, b : Int, c : Int) -> Int {
 }
 
 ///|
-/// Sum of the absolute values of the filtered bytes read as `i8`
-/// (upstream `sum_buffer`).
-fn sum_buffer(buf : FixedArray[Byte]) -> UInt64 {
-  let mut sum = 0UL
-  for i in 1..<buf.length() {
-    let b = buf[i].to_int()
-    sum += (if b >= 128 { 256 - b } else { b }).to_uint64()
-  }
-  sum
-}
-
-///|
 /// Chooses the filter with the least `sum_buffer` cost (upstream
 /// `adaptive_filter`). Returns the filter code; `output[1..]` holds the
 /// filtered row.

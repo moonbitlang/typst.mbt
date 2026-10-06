@@ -29,6 +29,9 @@ fn between64(x : Double, a : Double, b : Double) -> Bool {
 }
 
 ///|
+// Only used by the `debug_assert!` of `between` upstream
+// (path64/mod.rs:51).
+#warnings("-unused_value")
 fn precisely_zero(x : Double) -> Bool {
   x.abs() < dbl_epsilon_err
 }
@@ -152,11 +155,6 @@ struct Point64 {
 ///|
 fn Point64::from_point(p : @path.Point) -> Point64 {
   { x: p.x.to_double(), y: p.y.to_double(), }
-}
-
-///|
-fn Point64::zero() -> Point64 {
-  { x: 0.0, y: 0.0, }
 }
 
 ///|

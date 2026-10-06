@@ -483,33 +483,14 @@ fn CowSlice::cvt_set(
   }
 }
 
-///|
-fn CowSlice::storage_get(
-  self : CowSlice,
-  index : Int,
-) -> Int raise HintErrorKind {
-  match self.get(index) {
-    Some(v) => v
-    None => raise InvalidStorageIndex(index)
-  }
-}
-
-///|
-fn CowSlice::storage_set(
-  self : CowSlice,
-  index : Int,
-  value : Int,
-) -> Unit raise HintErrorKind {
-  if !self.set(index, value) {
-    raise InvalidStorageIndex(index)
-  }
-}
-
 // ---------------------------------------------------------------------------
 // Definitions
 
 ///|
 /// Code range and properties for a function or instruction definition.
+// `end` is only read through `code_range()`, whose callers take `.start`
+// (skrifa 0.42.1 hint/program.rs:69, :92).
+#warnings("-unused_field")
 priv struct Definition {
   start : Int
   end : Int

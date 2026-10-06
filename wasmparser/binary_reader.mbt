@@ -1,4 +1,8 @@
 // Port of wasmparser 0.228.0 `src/binary_reader.rs`.
+//
+// Not ported: `read_u7` (binary_reader.rs:295), whose only callers are the
+// subsection readers of the name and linking custom sections
+// (readers.rs:294); wasmi does not read those sections.
 
 ///|
 let wasm_magic_number : Bytes = b"\x00asm"
@@ -276,15 +280,6 @@ fn BinaryReader::ensure_has_bytes(
     let hint = self.position + len - self.len
     raise BinaryReaderError::eof(self.original_position(), hint)
   }
-}
-
-///|
-fn BinaryReader::read_u7(self : BinaryReader) -> Byte raise BinaryReaderError {
-  let b = self.read_u8()
-  if (b & 0x80) != 0 {
-    raise BinaryReaderError::new("invalid u7", self.original_position() - 1)
-  }
-  b
 }
 
 ///|

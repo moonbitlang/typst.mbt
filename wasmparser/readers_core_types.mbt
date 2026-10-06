@@ -1037,6 +1037,8 @@ pub let reftype_cont : RefType = RefType(reftype_cont_abstype)
 pub let reftype_nocont : RefType = RefType(reftype_nocont_abstype)
 
 ///|
+// Only used by a `debug_assert!` upstream (readers/core/types.rs:1204).
+#warnings("-unused_value")
 fn RefType::can_represent_type_index(index : UInt) -> Bool {
   (index & reftype_index_mask) == index
 }

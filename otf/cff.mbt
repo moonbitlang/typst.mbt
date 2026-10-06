@@ -312,7 +312,7 @@ fn VarOffsets::is_empty(self : VarOffsets) -> Bool {
 }
 
 ///|
-struct CffIndex {
+priv struct CffIndex {
   data : BytesView
   offsets : VarOffsets
 }
@@ -364,7 +364,7 @@ priv enum OffsetSize {
   Size2
   Size3
   Size4
-} derive(Eq)
+}
 
 ///|
 fn OffsetSize::to_u32(self : OffsetSize) -> UInt {

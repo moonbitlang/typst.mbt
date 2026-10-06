@@ -6,6 +6,11 @@ import {
   "moonbitlang/x/fs",
 } for "test"
 
+// `x/fs` is only used by `stroke_oracle_test.mbt` (native only), and moon.pkg
+// has no per-target imports.
+
+warnings = "-unused_package"
+
 options(
   "native-stub": [ "sincos_stub.c" ],
   targets: {

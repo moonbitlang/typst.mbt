@@ -6,9 +6,13 @@
 const LOOKUP_FLAG_RIGHT_TO_LEFT : Int = 0x0001
 
 ///|
+// ot_layout_common.rs:10; unused upstream too.
+#warnings("-unused_value")
 const LOOKUP_FLAG_IGNORE_BASE_GLYPHS : Int = 0x0002
 
 ///|
+// ot_layout_common.rs:11; unused upstream too.
+#warnings("-unused_value")
 const LOOKUP_FLAG_IGNORE_LIGATURES : Int = 0x0004
 
 ///|

@@ -50,8 +50,6 @@ priv enum ShaperData {
 ///|
 /// A complex shaper (`hb_ot_shaper_t`).
 priv struct OtShaper {
-  /// Identifies the shaper (Rust compares shaper addresses).
-  name : String
   /// Called during `shape_plan()`.
   /// Shapers should use plan.map to add their features and callbacks.
   collect_features : ((ShapePlanner) -> Unit)?
@@ -92,7 +90,6 @@ priv struct OtShaper {
 
 ///|
 let default_shaper : OtShaper = {
-  name: "default",
   collect_features: None,
   override_features: None,
   create_data: None,
@@ -112,7 +109,6 @@ let default_shaper : OtShaper = {
 /// Same as default but no mark advance zeroing / fallback positioning.
 /// Dumbest shaper ever, basically.
 let dumber_shaper : OtShaper = {
-  name: "dumber",
   collect_features: None,
   override_features: None,
   create_data: None,

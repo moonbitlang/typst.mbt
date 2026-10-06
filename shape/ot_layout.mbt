@@ -57,7 +57,7 @@ fn hb_ot_layout_has_glyph_classes(face : Face) -> Bool {
 priv enum TableIndex {
   GSUB
   GPOS
-} derive(Eq, Debug)
+} derive(Eq)
 
 ///|
 fn TableIndex::to_int(self : TableIndex) -> Int {

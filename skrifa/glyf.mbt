@@ -429,6 +429,9 @@ fn FreeTypeScaler::hinted(
 
 ///|
 /// The result of scaling: points, flags and contours plus phantom points.
+// Only the x coordinates of the phantom points are read, like upstream
+// (skrifa 0.42.1 outline/glyf/outline.rs:142, :158, :168).
+#warnings("-unused_field")
 priv struct ScaledOutline {
   xs : ArrayView[Int]
   ys : ArrayView[Int]

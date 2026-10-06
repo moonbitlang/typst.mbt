@@ -57,14 +57,12 @@ impl Device with fn end_marked_content(_self) {
 
 ///|
 /// A device that discards all drawing operations.
-pub struct DummyDevice {
-  priv dummy : Unit
-}
+pub struct DummyDevice {}
 
 ///|
 /// Create a new dummy device.
 pub fn DummyDevice::new() -> DummyDevice {
-  { dummy: (), }
+  DummyDevice::{ }
 }
 
 ///|

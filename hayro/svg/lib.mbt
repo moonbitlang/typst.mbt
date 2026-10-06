@@ -55,7 +55,7 @@ pub impl Default for SvgRenderSettings with fn default() {
 }
 
 ///|
-struct SvgRenderer {
+priv struct SvgRenderer {
   render_settings : SvgRenderSettings
   mut xml : @xmlwriter.XmlWriter
   outline_glyphs : Deduplicator[CachedOutlineGlyph]
@@ -482,15 +482,10 @@ fn[T] Deduplicator::is_empty(self : Deduplicator[T]) -> Bool {
 }
 
 ///|
-fn[T] Deduplicator::clone(self : Deduplicator[T]) -> Deduplicator[T] {
-  { kind: self.kind, vec: self.vec.copy(), present: self.present.copy(), }
-}
-
-///|
 priv struct Id {
   kind : Char
   index : Int
-} derive(Eq, Hash)
+}
 
 ///|
 impl Show for Id with fn output(self, logger) {

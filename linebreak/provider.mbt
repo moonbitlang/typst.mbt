@@ -4,6 +4,10 @@
 ///|
 /// The struct that stores the break property data of a rule-based
 /// segmenter.
+// `sot_property` is only read by the `unstable` line segmenter and by the
+// other rule segmenters (icu_segmenter 2.3.0 line/v3.rs:303,
+// rule_segmenter_v1.rs:89), neither of which is ported.
+#warnings("-unused_field")
 priv struct RuleBreakData {
   /// Property table: code point -> property value (ranges `[lo, hi, v]`).
   property_table : ReadOnlyArray[Int]

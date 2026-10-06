@@ -22,8 +22,6 @@ pub(all) struct SvgRenderSettings {
 }
 pub impl Default for SvgRenderSettings
 
-type SvgRenderer
-
 // Type aliases
 
 // Traits

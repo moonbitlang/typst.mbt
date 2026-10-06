@@ -52,7 +52,7 @@ pub fn[T : FromReader] BinaryReader::read(
 ///
 /// Iterating does not consume the section: `into_iter` starts from a copy of
 /// the reader (upstream's `Clone`).
-pub struct SectionLimited[T] {
+pub struct SectionLimited[_] {
   priv reader : BinaryReader
   priv count : UInt
 }

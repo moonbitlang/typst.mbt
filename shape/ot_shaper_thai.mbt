@@ -2,7 +2,6 @@
 
 ///|
 let thai_shaper : OtShaper = {
-  name: "thai",
   collect_features: None,
   override_features: None,
   create_data: None,

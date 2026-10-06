@@ -105,11 +105,6 @@ fn Bounds::from_status(status : BoundsStatus) -> Bounds {
 }
 
 ///|
-fn Bounds::copy(self : Bounds) -> Bounds {
-  { status: self.status, extents: self.extents.copy(), }
-}
-
-///|
 fn Bounds::assign(self : Bounds, o : Bounds) -> Unit {
   self.status = o.status
   self.extents = o.extents.copy()

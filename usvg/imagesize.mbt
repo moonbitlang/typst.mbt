@@ -13,7 +13,7 @@ priv enum ImageSizeType {
   Gif
   Webp
   Other
-} derive(Eq)
+}
 
 ///|
 fn imagesize_image_type(data : Bytes) -> ImageSizeType? {

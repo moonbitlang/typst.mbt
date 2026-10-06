@@ -91,6 +91,9 @@ fn fdot6_div(a : Int, b : Int) -> Int {
 }
 
 ///|
+// Only used by `debug_assert!`s upstream (scan/hairline.rs:67,
+// scan/hairline_aa.rs:337).
+#warnings("-unused_value")
 fn fdot6_can_convert_to_fdot16(n : Int) -> Bool {
   let max_dot6 = 0x7FFFFFFF >> (16 - 6)
   n.abs() <= max_dot6

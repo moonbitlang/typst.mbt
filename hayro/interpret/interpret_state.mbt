@@ -118,7 +118,7 @@ fn TextStateFont::font(self : TextStateFont) -> Font {
 }
 
 ///|
-struct TextState {
+priv struct TextState {
   mut char_space : Float
   mut word_space : Float
   // Note that this stores 1/100 of the actual scaling.
@@ -243,7 +243,7 @@ fn TextState::default() -> TextState {
 }
 
 ///|
-struct GraphicsState {
+priv struct GraphicsState {
   // Stroke parameters.
   mut stroke_props : StrokeProps
   // Stroke paint parameters.
