@@ -563,6 +563,7 @@ pub fn all() -> Array[Twin] {
   twins.append(phase2())
   twins.append(ports())
   twins.append(kit())
+  twins.append(kit_canvas())
   twins.push({
     name: "showcase",
     typst: showcase_typst(),

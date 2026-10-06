@@ -298,6 +298,8 @@ pub extend Dash with ToValue::{to_value}
 /// A stroke (`stroke(paint: .., thickness: .., ..)`).
 pub struct Stroke {
   priv value : Value
+  /// The `paint` that it was made with: see [Stroke::paint].
+  priv paint : Paint?
 }
 
 ///|
@@ -328,19 +330,46 @@ pub fn Stroke::Stroke(
   if miter_limit is Some(v) {
     named.push(("miter-limit", Value::float(v)))
   }
-  { value: Value::native(@library.native_stroke_construct(), [], named~), }
+  // (`auto` is no paint, as `stroke(paint: auto).paint` is `auto`.)
+  let paint = match paint {
+    Some(Auto) | Some(Value({ val: VAuto, })) => Option::None
+    paint => paint
+  }
+  {
+    value: Value::native(@library.native_stroke_construct(), [], named~),
+    paint,
+  }
 }
 
 ///|
 /// Explicit `none`, where the field accepts it.
 pub fn Stroke::none() -> Stroke {
-  { value: Value::none(), }
+  { value: Value::none(), paint: Option::None, }
 }
 
 ///|
 /// Explicit `auto`, where the field accepts it.
 pub fn Stroke::auto() -> Stroke {
-  { value: Value::auto(), }
+  { value: Value::auto(), paint: Option::None, }
+}
+
+///|
+/// The `paint` that the stroke was made with (`stroke(..).paint`), as it
+/// was given; `None` for a stroke without one or with the paint `auto`
+/// (`Paint::Auto`, or the value `auto`), which is drawn in the paint of the
+/// stroke that it is folded with (a set rule of the document, or the
+/// default: black), and for `Stroke::none()` and `Stroke::auto()`.
+///
+/// It reads the description, not the document: it is the paint that was
+/// written, not what a rule of the document resolves a stroke to, and a
+/// paint that is computed when the document is compiled (a call value) is
+/// returned as that value, whatever it turns out to be.
+///
+/// For packages of elements (`doc/kit`), to which a stroke is opaque: an
+/// element that draws a line and fills a shape in the paint of that line
+/// (the head of an arrow) asks the stroke for it.
+pub fn Stroke::paint(self : Stroke) -> Paint? {
+  self.paint
 }
 
 ///|

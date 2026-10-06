@@ -1204,6 +1204,124 @@ test "section 7: a chip is on the baseline of its line and stays on one line" {
 }
 
 ///|
+test "section 7: a chart on a canvas is as wide as its container, its labels at their anchors" {
+  let beds = [("North", 4.5), ("South", 12.0)]
+  // In a pad of 20pt to each side of the region's 180pt: a canvas of
+  // 140pt, from 30pt to 170pt of the page.
+  let chart = pages([@doc.Pad(@guide.harvest_chart(beds, 12.0), x=Pt(20))])
+  inspect(chart.errors() + chart.warnings(), content="")
+  inspect(
+    chart.listing(),
+    content=(
+      #|p1 line 66.0,10.0 0.0x28.0
+      #|p1 text 64.4,45.6 w3.3 "0"
+      #|p1 line 79.3,10.0 0.0x28.0
+      #|p1 text 77.7,45.6 w3.3 "2"
+      #|p1 line 92.7,10.0 0.0x28.0
+      #|p1 text 91.0,45.6 w3.3 "4"
+      #|p1 line 106.0,10.0 0.0x28.0
+      #|p1 text 104.4,45.6 w3.3 "6"
+      #|p1 line 119.3,10.0 0.0x28.0
+      #|p1 text 117.7,45.6 w3.3 "8"
+      #|p1 line 132.7,10.0 0.0x28.0
+      #|p1 text 129.4,45.6 w6.5 "10"
+      #|p1 line 146.0,10.0 0.0x28.0
+      #|p1 text 142.7,45.6 w6.5 "12"
+      #|p1 text 45.0,19.3 w17.0 "North"
+      #|p1 rect 66.0,12.0 30.0x10.0 rgb("#2a78d6")
+      #|p1 text 99.0,19.3 w8.1 "4.5"
+      #|p1 text 45.4,33.3 w16.6 "South"
+      #|p1 rect 66.0,26.0 80.0x10.0 rgb("#2a78d6")
+      #|p1 text 149.0,33.3 w11.3 "12.0"
+    ),
+  )
+  let bars = chart.of_kind("rect")
+  let lines = chart.of_kind("line")
+  assert_eq(bars.length(), 2)
+  // The scale ends 24pt before the right edge of the canvas: there are
+  // the last line of the grid and the end of the bar of 12 kilograms.
+  assert_eq(pt(lines[lines.length() - 1].x), "146.0")
+  assert_eq(pt(bars[1].x + bars[1].w), "146.0")
+  // A name ends 4pt before its bar, and the value of a bar starts 3pt
+  // after it; both have the middle of their capitals on the middle of
+  // the bar (3.3pt of 7pt text are its capitals' half: 2.3pt).
+  let run = (text : String) => {
+    chart.of_kind("text").filter(run => run.text == text)[0]
+  }
+  let name = run("South")
+  assert_eq(pt(name.x + name.w), pt(bars[1].x - 4.0))
+  assert_eq(pt(run("4.5").x), pt(bars[0].x + bars[0].w + 3.0))
+  let middle = bars[1].y + bars[1].h / 2.0
+  assert_eq(pt(name.y - middle), "2.3")
+  assert_eq(pt(run("12.0").y - middle), "2.3")
+  // A tick is centred under its line, its top 3pt under the bars.
+  let tick = run("12")
+  assert_eq(pt(tick.x + tick.w / 2.0), "146.0")
+  // A click on a bar: the `Canvas::rect` that drew it, under the key of
+  // its bed (after the key that the canvas gives the item).
+  guard chart.report.origin_at(1, bars[1].x + 2.0, bars[1].y + 2.0)
+    is Some(origin) else {
+    fail("no origin at the bar")
+  }
+  inspect(
+    place(origin) + " " + origin.keys[origin.keys.length() - 1],
+    content=(
+      #|guide.mbt (Canvas::rect, key "15", key "South") South
+    ),
+  )
+}
+
+///|
+test "section 7: arrows on a canvas, and labels on one baseline" {
+  let year = pages([@guide.year()])
+  inspect(year.errors() + year.warnings(), content="")
+  // A click on the head of the first arrow, whose tip is at (65, 10) of
+  // the canvas: the `Canvas::arrow`.
+  guard year.report.origin_at(1, 10.0 + 63.0, 10.0 + 10.0) is Some(origin) else {
+    fail("no origin at the head")
+  }
+  inspect(
+    place(origin),
+    content=(
+      #|guide.mbt (Canvas::arrow, key "3")
+    ),
+  )
+  // The number and its unit: both baselines 20pt under the top of the
+  // canvas, the number ending at 40pt and the unit starting at 42pt.
+  let both = pages([@guide.number_and_unit()])
+  inspect(both.errors() + both.warnings(), content="")
+  inspect(
+    both.listing(),
+    content=(
+      #|p1 text 31.4,30.0 w18.6 "38"
+      #|p1 text 52.0,30.0 w10.1 "kg"
+    ),
+  )
+  let runs = both.of_kind("text")
+  assert_eq(pt(runs[0].y), "30.0")
+  assert_eq(pt(runs[1].y), "30.0")
+  assert_eq(pt(runs[0].x + runs[0].w), "50.0")
+  // The anchor `Baseline` measures: built inside a callback, it is the
+  // error of section 8, at the item.
+  let inside = pages([@doc.Layout((_, _) => @guide.number_and_unit())])
+  inspect(
+    inside.errors(),
+    content=(
+      #|callbacks cannot be created inside a callback
+    ),
+  )
+  guard inside.report.errors[0].location is Some(Edsl(late)) else {
+    fail("expected an EDSL location")
+  }
+  inspect(
+    place(late),
+    content=(
+      #|guide.mbt (Canvas::place, key "0")
+    ),
+  )
+}
+
+///|
 test "section 8: a callback cannot be created inside a callback" {
   let nested = pages([@guide.stripes_in_show()])
   inspect(
