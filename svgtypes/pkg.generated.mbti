@@ -218,6 +218,7 @@ pub(all) enum PaintFallback {
 pub(all) struct PaintOrder {
   order : FixedArray[PaintOrderKind]
 } derive(Eq, @debug.Debug)
+pub fn PaintOrder::default() -> Self
 pub fn PaintOrder::from_array(FixedArray[PaintOrderKind]) -> Self
 pub fn PaintOrder::from_str(String) -> Self
 pub impl Default for PaintOrder
@@ -320,6 +321,7 @@ pub(all) struct Transform {
   e : Double
   f : Double
 } derive(Eq, @debug.Debug)
+pub fn Transform::default() -> Self
 pub fn Transform::from_str(String) -> Self raise SvgTypesError
 pub fn Transform::new(Double, Double, Double, Double, Double, Double) -> Self
 pub impl Default for Transform

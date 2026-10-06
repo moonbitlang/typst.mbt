@@ -299,6 +299,7 @@ pub(all) struct Paint {
   mut force_hq_pipeline : Bool
 }
 pub fn Paint::clone(Self) -> Self
+pub fn Paint::default() -> Self
 pub fn Paint::is_solid_color(Self) -> Bool
 pub fn Paint::set_color(Self, Color) -> Unit
 pub fn Paint::set_color_rgba8(Self, Int, Int, Int, Int) -> Unit

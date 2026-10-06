@@ -246,6 +246,9 @@ pub impl Default for Names with fn default() {
 }
 
 ///|
+pub extend Names with Default::{default}
+
+///|
 /// Returns a name at index.
 pub fn Names::get(self : Names, index : UInt16) -> Name? {
   guard self.records.get(index) is Some(record) else { return None }
@@ -303,6 +306,9 @@ pub struct NameTable {
 pub impl Default for NameTable with fn default() {
   { names: Names::default(), }
 }
+
+///|
+pub extend NameTable with Default::{default}
 
 ///|
 /// Parses a table from raw data.

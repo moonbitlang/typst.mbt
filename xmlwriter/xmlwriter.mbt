@@ -34,6 +34,9 @@ pub impl Default for Options with fn default() {
 }
 
 ///|
+pub extend Options with Default::{default}
+
+///|
 priv enum State {
   Empty
   Document
