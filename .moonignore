@@ -42,6 +42,3 @@ AGENTS.md
 # (typst_assets/fonts/fonts_gen.c, fonts_wasm_gen.mbt). Pre-build steps do not
 # run for dependencies, so the published package must contain them; build once
 # (any target) before `moon package` so that they exist.
-
-# CI BREAK: drop the generated font data from the package.
-/typst_assets/fonts/fonts_gen.c
