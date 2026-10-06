@@ -24,6 +24,8 @@ using @doc {
   type Highlight,
   type Outline,
   type Call,
+  type Set,
+  type Equation,
   type Upper,
   type Layout,
   type Show,
@@ -78,6 +80,26 @@ pub fn paragraphs() -> Seq {
     )
     |> Para,
     Para("The third is justified.", justify=true),
+  ])
+}
+
+///|
+/// Section 2: a paragraph with a displayed formula in it. Every paragraph
+/// of the page is indented; the text after the formula is not.
+pub fn with_display() -> Seq {
+  let indent = Value::dict([
+    ("amount", Value::length(Em(1.5))),
+    ("all", Value::bool(true)),
+  ])
+  Seq([
+    Set("par", [("first-line-indent", indent)]),
+    (
+      $|The sum of the first numbers is
+      $|\{Equation("sum_(k=1)^n k = (n (n + 1)) / 2", block=true)}
+      $|which the next paragraph uses.
+    )
+    |> Para,
+    Para("A new paragraph."),
   ])
 }
 
@@ -309,6 +331,7 @@ pub fn guide() -> Document {
     code_size(),
     run_together(),
     paragraphs(),
+    with_display(),
     notes(),
     composed_lengths(),
     roman_numeral(),

@@ -70,6 +70,8 @@ fn block_samples() -> Array[(String, String, Content)] {
     // Model.
     ("Heading", "block", c(Heading("x"))),
     ("Par", "block", c(Par("x"))),
+    // (Handwritten: text between two paragraph breaks.)
+    ("Para", "block", c(Para("x"))),
     ("Parbreak", "block", c(Parbreak())),
     ("Strong", "inline", c(Strong("x"))),
     ("Emph", "inline", c(Emph("x"))),

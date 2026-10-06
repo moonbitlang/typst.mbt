@@ -155,8 +155,7 @@ fn Site::origin(self : Site, keys : Array[String], param : Int?) -> Origin {
 /// of the flow itself, the items that realization groups into a list,
 /// and `align`, whose style interrupts a paragraph (`realize.mbt`,
 /// `finish_interrupted`); `raw`, `quote` and equations only with a
-/// literal `block=true`. By element, so a constructor under another name
-/// (`Para`) is covered.
+/// literal `block=true`. (A `Para` is a block, too: `is_block`.)
 /// `doc/lint_wbtest.mbt` checks every entry, and that the other
 /// constructors of the generator's element table are not blocks, against
 /// what the engine does with them between two strings.
@@ -225,12 +224,14 @@ fn says_block(args : Array[ArgNode]) -> Bool {
 
 ///|
 /// Whether a description is a block (`is_block_call`), also with a label
-/// or a key, or a display equation.
+/// or a key, a display equation, or a `Para`.
 fn is_block(content : Content) -> Bool {
   match content.node {
     NKeyed(_, body) | NLabelled(body, _, _, _) => is_block(body)
     NCall(call) => is_block_call(call)
     NEval(node) => node.mode is Math && says_block(node.args)
+    // A `Para`: its text is between two paragraph breaks.
+    NSeq(_, site) => site.kind == "Para"
     _ => false
   }
 }

@@ -473,14 +473,18 @@ with nothing between them. A paragraph of running text is
 Para("One line.", justify=true)
 ```
 
-`Para(text, quotes~, ..)` is `Par(Prose(text, quotes~), ..)` with the
-options of `Par`, and everything above holds for its text (the messages
-name `Para`). Twin: `par(..)[..]` around the expansion of the prose. It is
-**one origin**: the call of `par` has the site of the `Para` call, and the
-text runs, quotes and breaks are pieces of that call's `text` argument,
-from the counter of that argument (section 12.2); neither a `Par` nor a
-`Prose` is registered. A paragraph break inside the text (a blank line) is
-what it is in `par[..]`: the engine's warning, and no second paragraph.
+`Para(text, quotes~, ..)` is the text of a `Prose` between two paragraph
+breaks, which is what a paragraph is in Typst source; everything above
+holds for its text (the messages name `Para`). It is not the `par` element,
+whose body cannot hold a block: a paragraph of a paper has displayed
+formulas in it. The options of `par` are a set rule in the sequence, the
+text after an interpolated block is a nested sequence with
+`first-line-indent: 0pt` (the engine starts a new paragraph after a block),
+and a blank line in the text is a paragraph break like the two around it.
+Twin: `[#set par(..);#parbreak() .. #parbreak()]`. It is **one origin**:
+the sequence and its rules have the site of the `Para` call, and the text
+runs, quotes and breaks are pieces of that call's `text` argument (section
+12.2). There is no element to label, so `Para` has no `label`.
 
 ## 5. Lowering
 

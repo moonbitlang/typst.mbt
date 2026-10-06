@@ -178,9 +178,13 @@
   (`is_block_call`). `doc/lint_wbtest.mbt` checks that list against the
   engine for every constructor of `generated_elements()`: a new element
   of `scripts/docgen.py` needs a sample there (block, inline or part).
-  `Para(text, ..)` (`doc/para.mbt`) is `Par(Prose(text), ..)` from one
-  call site: the pieces of the text are the value of the body argument
-  (`NPieces`) and take spans of the `Para` call's text argument.
+  `Para(text, ..)` (`doc/para.mbt`) is a paragraph of prose from one
+  call site: the pieces of a `Prose` between two `parbreak`s (not the
+  `par` element, which cannot hold a block such as a displayed formula),
+  `par`'s options as a set rule in that sequence, and the text after an
+  interpolated block (`is_block`) in a run of its own (`NPieces`) with
+  `first-line-indent: 0pt`. `doc/para_test.mbt` starts with the engine
+  facts this rests on (the "engine: .." tests).
 - Typst-to-EDSL translator (`doc/convert`, design in `docs/edsl-convert.md`,
   Codex-approved; a stress test of the EDSL, not a compiler): typed where
   the design's narrow rules prove it exact, Typst source in `Markup`

@@ -284,16 +284,57 @@ test "section 2: inline items in a sequence are one paragraph, `Para` separates 
   assert_eq(@guide.lints_of(@doc.Document([@guide.paragraphs()])), [])
   // The document of all samples has the one lint of `run_together`.
   assert_eq(@guide.lints_of(@guide.guide()).length(), 1)
-  // A blank line in the text of a `Para` is no second paragraph.
+  // A blank line in the text of a `Para` is a paragraph break.
   let blank = pages([@doc.Para("One ends here.\n\nTwo starts here.")])
-  inspect(
-    blank.warnings(),
-    content="parbreak may not occur inside of a paragraph and was ignored",
-  )
+  inspect(blank.warnings(), content="")
   inspect(
     blank.listing(),
     content=(
-      #|p1 text 10.0,16.6 w125.6 "One ends here.Two starts here."
+      #|p1 text 10.0,16.6 w60.8 "One ends here."
+      #|p1 text 10.0,35.2 w65.4 "Two starts here."
+    ),
+  )
+  // A displayed formula in a `Para` is kept; the text after it is not
+  // indented, the next `Para` is.
+  let display = pages([@guide.with_display()])
+  inspect(display.errors(), content="")
+  inspect(display.warnings(), content="")
+  inspect(
+    display.listing(),
+    content=(
+      #|p1 text 25.0,16.6 w127.8 "The sum of the first numbers is"
+      #|p1 text 63.1,43.2 w14.4 "∑"
+      #|p1 text 67.8,31.7 w4.9 "𝑛"
+      #|p1 text 63.5,54.3 w4.2 "𝑘"
+      #|p1 text 67.7,54.3 w5.4 "="
+      #|p1 text 73.2,54.3 w4.0 "1"
+      #|p1 text 79.2,43.2 w5.4 "𝑘"
+      #|p1 text 87.3,43.2 w7.8 "="
+      #|p1 text 98.9,36.5 w6.0 "𝑛"
+      #|p1 text 104.9,36.5 w3.9 "("
+      #|p1 text 108.8,36.5 w6.0 "𝑛"
+      #|p1 text 117.0,36.5 w7.8 "+"
+      #|p1 text 127.0,36.5 w5.0 "1"
+      #|p1 text 132.0,36.5 w3.9 ")"
+      #|p1 text 114.9,50.1 w5.0 "2"
+      #|p1 line 98.9,40.7 37.0x0.0
+      #|p1 text 10.0,72.9 w127.8 "which the next paragraph uses."
+      #|p1 text 25.0,91.5 w73.4 "A new paragraph."
+    ),
+  )
+  // The `par` element cannot hold it: `Par(..)` is for inline content.
+  let dropped = pages([
+    @doc.Par(@doc.Prose("Before \{@doc.Equation("x", block=true)} after.")),
+  ])
+  inspect(
+    dropped.warnings(),
+    content="block may not occur inside of a paragraph and was ignored",
+  )
+  inspect(
+    dropped.listing(),
+    content=(
+      #|p1 text 10.0,16.6 w29.1 "Before "
+      #|p1 text 39.1,16.6 w22.8 " after."
     ),
   )
   // A block between two inline items separates them.

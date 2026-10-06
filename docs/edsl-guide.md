@@ -51,6 +51,8 @@ using @doc {
   type Highlight,
   type Outline,
   type Call,
+  type Set,
+  type Equation,
   type Upper,
   type Layout,
   type Show,
@@ -163,16 +165,60 @@ pub fn paragraphs() -> Seq {
 }
 ```
 
-`Para(text, ..)` is `Par(Prose(text), ..)` as one call: the text is the text
-of a `Prose` (white space is reflowed, `"` and `'` are smart quotes unless
-`quotes=false`, interpolated descriptions are the descriptions), and the
-options are those of `Par`. A click on a word of it leads to the text
-argument of the `Para` call. One `Para` is one paragraph: a blank line in
-its text is not a second one (the engine ignores the break with the warning
-`parbreak may not occur inside of a paragraph and was ignored`, and the text
-runs together). `Par(body)` is still the paragraph of other content
-(`Par(Seq(["A chip ", Box(..)]))`), and `Prose` the text inside something
-else (a caption, a cell, the body of a `Text`).
+`Para(text, ..)` is a paragraph as it is in Typst source: text between two
+paragraph breaks. The text is the text of a `Prose` (white space is
+reflowed, `"` and `'` are smart quotes unless `quotes=false`, interpolated
+descriptions are the descriptions). A click on a word of it leads to the
+text argument of the `Para` call. Two `Para`s are two paragraphs wherever
+they are, and a blank line in the text of one is a paragraph break, too.
+The options are those of `par` (`justify`, `leading`, `spacing`,
+`linebreaks`, `hanging_indent`, and `extra` for the others); they are set
+for the paragraphs of the text (`set par(..)`), so they also hold for a
+paragraph inside it (a footnote, a box with paragraphs).
+
+A paragraph of a paper has displayed formulas in it. Interpolate them
+(`with_display`):
+
+```moonbit
+pub fn with_display() -> Seq {
+  let indent = Value::dict([
+    ("amount", Value::length(Em(1.5))),
+    ("all", Value::bool(true)),
+  ])
+  Seq([
+    Set("par", [("first-line-indent", indent)]),
+    (
+      $|The sum of the first numbers is
+      $|\{Equation("sum_(k=1)^n k = (n (n + 1)) / 2", block=true)}
+      $|which the next paragraph uses.
+    )
+    |> Para,
+    Para("A new paragraph."),
+  ])
+}
+```
+
+For the engine a block ends the paragraph, and the text after it is a
+paragraph of its own. `Para` keeps that text from being indented like a new
+paragraph (for a block that the description shows: a formula, a list, a
+figure; not for one that a callback or a `Call` makes), so with the indent
+above "which the next paragraph uses." starts at the margin and "A new
+paragraph." is indented. About first-line indents, which are the engine's:
+
+- with `all: true` every paragraph is indented, also the first one and the
+  one after a heading;
+- without it (`first-line-indent: 1.5em`) a paragraph is indented if it
+  follows a paragraph. A `Para` after a `Para` that *ends* with a formula
+  follows a block and is not indented; give it the indent by hand
+  (`extra=[("first-line-indent", indent)]` with `all: true`), or set `all`
+  for the document.
+
+`Par(body)` is the `par` element: one paragraph with its properties as
+arguments, for inline content (`Par(Seq(["A chip ", Box(..)]))`). It cannot
+hold a block: a displayed formula in `Par(Prose(..))` is dropped with the
+warning `block may not occur inside of a paragraph and was ignored`, and a
+blank line in that text with `parbreak may not occur ..`. `Prose` is the
+text inside something else (a caption, a cell, the body of a `Text`).
 
 Block-level elements between inline items (a heading, a block, a table, a
 list) separate them as well; only neighbours that are both inline run
@@ -715,8 +761,8 @@ of another callback; it is its creation that has to come first.
 | Statement | Test |
 |---|---|
 | The samples compile, and all but `stripes_in_show` without errors or warnings | G "the samples compile to PDF without warnings" |
-| 2: inline items run together, `Para` separates; the lint, where it reports and where not; a blank line in a `Para` | G "section 2: ..", F "S1: .." |
-| 2: `Para` is `Par(Prose(..))` from one call, and a click leads to its text argument | `doc/para_test.mbt`; with the source file, `doc/examples/review` "source characters: the text of a Para .." |
+| 2: inline items run together, `Para` separates; the lint, where it reports and where not; a blank line in a `Para`; a displayed formula in a `Para` and in a `Par` | G "section 2: ..", F "S1: .." |
+| 2: what the engine does with paragraphs, blocks and first-line indents; `Para` is typeset like `Par(Prose(..))` where there is no block; a click leads to its text argument | `doc/para_test.mbt` (the "engine: .." tests first); with the source file, `doc/examples/review` "source characters: the text of a Para .." |
 | 2: what the lint takes for text and for a block | `doc/lint_test.mbt`, `doc/lint_wbtest.mbt` |
 | 3: `note` at the call, `plain_note` in the helper | G "section 3: a helper with `#callsite` .." |
 | 3: the five rules about what the location covers | G "section 3: what the location of a helper covers" |

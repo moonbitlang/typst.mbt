@@ -130,8 +130,11 @@ deriving it.
   `Upper`, `Lower`; `Sides::zero`. See `docs/edsl-ports.md` and
   `docs/edsl-guide.md`.
 - `doc`: `Para(text, quotes?, leading?, spacing?, justify?, linebreaks?,
-  hanging_indent?, extra?, label?)`, a paragraph of prose:
-  `Par(Prose(text), ..)` as one constructor with one origin.
+  hanging_indent?, extra?)`, a paragraph of prose: the text of a `Prose`
+  between two paragraph breaks, with one origin. Unlike `Par(Prose(..))`
+  it can hold a block (a displayed formula is kept, and the text after it
+  is not indented as a new paragraph), and a blank line in its text is a
+  paragraph break. Its options are `par`'s, as a set rule for that text.
 - `doc`: lints. `CompileReport` has a new field `lints : Array[Lint]`;
   `Lint` (`kind : LintKind`, `message`, `hints : Array[Hint]`,
   `location : Location?`; `Lint::render`); `LintKind` (one case,

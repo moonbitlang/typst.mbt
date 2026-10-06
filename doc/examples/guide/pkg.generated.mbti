@@ -60,6 +60,8 @@ pub fn untyped_fields() -> @doc.Seq
 
 pub fn upper_case() -> @doc.Upper
 
+pub fn with_display() -> @doc.Seq
+
 // Errors
 
 // Types and methods

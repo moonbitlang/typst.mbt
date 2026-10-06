@@ -196,7 +196,7 @@ pub fn Prose::Prose(
 /// error if the text cannot be lowered. `kind` is the constructor's name,
 /// for messages. No piece made here has a site: the caller gives the
 /// sequence one (`Prose`) or makes them the pieces of an argument of its
-/// own call (`Para`).
+/// own sequence (`Para`).
 fn prose_pieces(
   text : String,
   quotes : Bool,

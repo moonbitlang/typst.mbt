@@ -268,11 +268,11 @@ fn Lowering::content(
       let inner : Lowering = { ..self, pieces: Some(pieces), }
       inner.sequence(children[:], pieces.base, own=true)
     }
-    // The value of an argument that is a sequence without a site (the
-    // text of `Para`): its children are pieces of that argument, whose
-    // span `fallback` is. They take the spans after it from the
-    // argument's counter (`Lowering::args`), so the words of the text resolve
-    // to the argument of the one call that has it.
+    // A sequence without a site inside one that has a site (the text
+    // after a block in a `Para`): its children are further pieces of the
+    // argument that is being lowered. They take the next spans of that
+    // argument's counter (`self.pieces`), so the words resolve to the text
+    // argument of the one call, like the words around them.
     NPieces(children) => self.sequence(children[:], fallback, own=true)
     // A rule outside a sequence styles nothing (Typst only allows `set` and
     // `show` directly in code and content blocks).
