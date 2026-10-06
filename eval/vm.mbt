@@ -81,7 +81,7 @@ pub fn Vm::trace_at(
 ///|
 /// Trace a value.
 pub fn Vm::trace(self : Vm, value : @library.Value) -> Unit {
-  let styles = self.context.styles.map(s => s.to_map())
+  let styles = self.context.try_styles().map(s => s.to_map())
   self.engine.sink.value(value.shared(), styles)
 }
 

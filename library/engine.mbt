@@ -332,6 +332,15 @@ pub fn Sink::values(self : Sink) -> Array[(Value, Styles?)] {
 }
 
 ///|
+/// Whether nothing was pushed into the sink (not upstream; see `memo.mbt`).
+pub fn Sink::is_empty(self : Sink) -> Bool {
+  self.introspections.is_empty() &&
+  self.delayed.is_empty() &&
+  self.warnings.is_empty() &&
+  self.values.is_empty()
+}
+
+///|
 /// Extend from another sink.
 pub fn Sink::extend_from_sink(self : Sink, other : Sink) -> Unit {
   self.extend_parts(
@@ -484,6 +493,23 @@ pub fn Route::memo_hash(self : Route) -> U128 {
 }
 
 ///|
+/// The depth of the route: the sum of the lengths of its segments (not
+/// upstream; see `route_shift_lo`). Lengths are not negative, so
+/// `self.within(depth)` is `self.depth() <= depth`.
+pub fn Route::depth(self : Route) -> Int {
+  let mut route = self
+  let mut depth = 0
+  while true {
+    depth += route.len
+    match route.outer {
+      Some(outer) => route = outer
+      None => break
+    }
+  }
+  depth
+}
+
+///|
 /// Whether the given id is part of the route.
 pub fn Route::contains(self : Route, id : @syntax.FileId) -> Bool {
   self.id == Some(id) ||
@@ -506,6 +532,60 @@ pub fn Route::within(self : Route, depth : Int) -> Bool {
 }
 
 ///|
+/// How much shallower (`route_shift_lo`, at most zero) and deeper
+/// (`route_shift_hi`, at least zero) the route of the memoized closure call
+/// in progress could be without changing the answer of a depth check made
+/// since that call started (not upstream; comemo tracks `Route::within` and
+/// reuses a result if the answers are the same; see `memoized_closure` in
+/// `memo.mbt`). The answer of `within(depth)` on a route of depth `d` is
+/// `d <= depth`: it stays true while the route is at most `depth - d`
+/// deeper, and false while it is more than that (a negative number) deeper.
+let route_shift_lo : Ref[Int] = { val: route_shift_min, }
+
+///|
+let route_shift_hi : Ref[Int] = { val: route_shift_max, }
+
+///|
+/// The number of memoized closure calls in progress.
+let route_shift_scopes : Ref[Int] = { val: 0, }
+
+///|
+/// No bound (far outside the depths that routes can have).
+let route_shift_min : Int = -1000000
+
+///|
+let route_shift_max : Int = 1000000
+
+///|
+/// Narrow the bounds of the call in progress: something in it is only what
+/// it was for a change of the depth in `lo..=hi`.
+fn note_route_shift(lo : Int, hi : Int) -> Unit {
+  if route_shift_scopes.val > 0 {
+    if lo > route_shift_lo.val {
+      route_shift_lo.val = lo
+    }
+    if hi < route_shift_hi.val {
+      route_shift_hi.val = hi
+    }
+  }
+}
+
+///|
+/// [Route::within] for the checks below, noted for memoization.
+fn Route::check_within(self : Route, depth : Int) -> Bool {
+  let within = self.within(depth)
+  if route_shift_scopes.val > 0 {
+    let slack = depth - self.depth()
+    if within {
+      note_route_shift(route_shift_min, slack)
+    } else {
+      note_route_shift(slack + 1, route_shift_max)
+    }
+  }
+  within
+}
+
+///|
 pub let max_show_rule_depth : Int = 64
 
 ///|
@@ -520,7 +600,7 @@ pub let max_call_depth : Int = 80
 ///|
 /// Ensures that we are within the maximum show rule depth.
 pub fn Route::check_show_depth(self : Route) -> Unit raise HintedError {
-  if !self.within(max_show_rule_depth) {
+  if !self.check_within(max_show_rule_depth) {
     bail_hinted("maximum show rule depth exceeded", [
       "maybe a show rule matches its own output", "maybe there are too deeply nested elements",
     ])
@@ -530,7 +610,7 @@ pub fn Route::check_show_depth(self : Route) -> Unit raise HintedError {
 ///|
 /// Ensures that we are within the maximum layout depth.
 pub fn Route::check_layout_depth(self : Route) -> Unit raise HintedError {
-  if !self.within(max_layout_depth) {
+  if !self.check_within(max_layout_depth) {
     bail_hinted("maximum layout depth exceeded", [
       "try to reduce the amount of nesting in your layout",
     ])
@@ -540,7 +620,7 @@ pub fn Route::check_layout_depth(self : Route) -> Unit raise HintedError {
 ///|
 /// Ensures that we are within the maximum HTML depth.
 pub fn Route::check_html_depth(self : Route) -> Unit raise HintedError {
-  if !self.within(max_html_depth) {
+  if !self.check_within(max_html_depth) {
     bail_hinted("maximum HTML depth exceeded", [
       "try to reduce the amount of nesting of your HTML",
     ])
@@ -550,34 +630,58 @@ pub fn Route::check_html_depth(self : Route) -> Unit raise HintedError {
 ///|
 /// Ensures that we are within the maximum function call depth.
 pub fn Route::check_call_depth(self : Route) -> Unit raise HintedError {
-  if !self.within(max_call_depth) {
+  if !self.check_within(max_call_depth) {
     bail("maximum function call depth exceeded")
   }
 }
 
 ///|
 /// Data that is contextually made available to code (upstream `Context`).
+///
+/// Upstream hands it to functions as a `Tracked<Context>`, which only has
+/// the three methods below, and memoized functions depend on what they
+/// asked of it. Here the context notes what was asked of it (`reads`, not
+/// upstream; see `memoized_closure` in `memo.mbt`), so the fields are only
+/// read through the methods.
 pub struct Context {
   /// The location in the document.
-  location : Location?
+  priv location : Location?
   /// The active styles.
-  styles : StyleChain?
+  priv styles : StyleChain?
+  /// What was asked of the context since a memoized closure call last
+  /// cleared it: [context_read_location], [context_read_styles],
+  /// [context_read_introspect].
+  priv mut reads : Int
 }
 
 ///|
+/// See [Context]: the location was read.
+let context_read_location : Int = 1
+
+///|
+/// See [Context]: the styles were read.
+let context_read_styles : Int = 2
+
+///|
+/// See [Context]: [Context::introspect] was called (which only depends on
+/// whether there is any context).
+let context_read_introspect : Int = 4
+
+///|
 pub fn Context::new(location? : Location, styles? : StyleChain) -> Context {
-  { location, styles, }
+  { location, styles, reads: 0, }
 }
 
 ///|
 /// An empty context.
 pub fn Context::none() -> Context {
-  { location: None, styles: None, }
+  { location: None, styles: None, reads: 0, }
 }
 
 ///|
 /// Try to extract the location.
 pub fn Context::location(self : Context) -> Location raise HintedError {
+  self.reads = self.reads | context_read_location
   match self.location {
     Some(l) => l
     None => raise HintedError(context_required())
@@ -587,6 +691,7 @@ pub fn Context::location(self : Context) -> Location raise HintedError {
 ///|
 /// Try to extract the styles.
 pub fn Context::get_styles(self : Context) -> StyleChain raise HintedError {
+  self.reads = self.reads | context_read_styles
   match self.styles {
     Some(s) => s
     None => raise HintedError(context_required())
@@ -594,9 +699,24 @@ pub fn Context::get_styles(self : Context) -> StyleChain raise HintedError {
 }
 
 ///|
+/// The location, if there is one (upstream `context.location().ok()`).
+pub fn Context::try_location(self : Context) -> Location? {
+  self.reads = self.reads | context_read_location
+  self.location
+}
+
+///|
+/// The styles, if there are any (upstream `context.styles().ok()`).
+pub fn Context::try_styles(self : Context) -> StyleChain? {
+  self.reads = self.reads | context_read_styles
+  self.styles
+}
+
+///|
 /// Guard access to the introspector by requiring at least some piece of
 /// context.
 pub fn Context::introspect(self : Context) -> Unit raise HintedError {
+  self.reads = self.reads | context_read_introspect
   if self.location is None && self.styles is None {
     raise HintedError(context_required())
   }

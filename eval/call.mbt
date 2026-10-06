@@ -556,7 +556,24 @@ fn eval_closure_expr(
 
 ///|
 /// Call the function in the context with the arguments.
+///
+/// Upstream's `#[comemo::memoize]` on this function is
+/// `@library.memoized_closure` around [eval_closure_impl], which is the
+/// function's body.
 pub fn eval_closure(
+  func : @library.Func,
+  closure : @library.Closure,
+  engine : @library.Engine,
+  context : @library.Context,
+  args : @library.Args,
+) -> @library.Value raise @library.SourceError {
+  @library.memoized_closure(
+    func, closure, engine, context, args, eval_closure_impl,
+  )
+}
+
+///|
+fn eval_closure_impl(
   func : @library.Func,
   closure : @library.Closure,
   engine : @library.Engine,

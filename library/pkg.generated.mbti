@@ -686,6 +686,8 @@ pub let class_elem_body : Int
 
 pub let class_elem_class : Int
 
+pub fn closure_memo_stats() -> (Int, Int)
+
 pub fn colbreak_elem() -> Element
 
 pub let colbreak_elem_weak : Int
@@ -1488,7 +1490,11 @@ pub let max_layout_depth : Int
 
 pub let max_show_rule_depth : Int
 
+pub fn memo_compilation() -> Int
+
 pub fn memo_fingerprint((SipHasher128) -> Unit) -> U128
+
+pub fn memoized_closure(Func, Closure, Engine, Context, Args, (Func, Closure, Engine, Context, Args) -> Value raise SourceError) -> Value raise SourceError
 
 pub fn memoized_layout(Engine, U128, Content, StyleChain, Content?, (Engine) -> Fragment raise SourceError) -> Fragment raise SourceError
 
@@ -2128,6 +2134,10 @@ pub fn not_(Value) -> Value raise HintedError
 
 pub fn not_in(BindingGuard, Value, Value) -> Value raise HintedError
 
+pub fn note_route_queries(ArrayView[@moonbitlang/typst/syntax.FileId]) -> Unit
+
+pub fn note_route_query(@moonbitlang/typst/syntax.FileId) -> Unit
+
 pub fn op_elem() -> Element
 
 pub let op_elem_limits : Int
@@ -2537,6 +2547,10 @@ pub let rotate_elem_reflow : Int
 pub fn round_int_with_precision(Int64, Int) -> Int64?
 
 pub fn round_with_precision(Double, Int) -> Double
+
+pub fn route_queries_begin() -> Int
+
+pub fn route_queries_end(Int) -> Array[@moonbitlang/typst/syntax.FileId]
 
 pub fn rust_debug_f64(Double) -> String
 
@@ -4739,14 +4753,15 @@ pub impl IntoValue for Content
 pub impl Reflect for Content
 
 pub struct Context {
-  location : Location?
-  styles : StyleChain?
+  // private fields
 }
 pub fn Context::get_styles(Self) -> StyleChain raise HintedError
 pub fn Context::introspect(Self) -> Unit raise HintedError
 pub fn Context::location(Self) -> Location raise HintedError
 pub fn Context::new(location? : Location, styles? : StyleChain) -> Self
 pub fn Context::none() -> Self
+pub fn Context::try_location(Self) -> Location?
+pub fn Context::try_styles(Self) -> StyleChain?
 
 pub struct ContextElem(Content)
 pub fn ContextElem::func(Self) -> Func
@@ -10286,6 +10301,7 @@ pub fn Route::check_layout_depth(Self) -> Unit raise HintedError
 pub fn Route::check_show_depth(Self) -> Unit raise HintedError
 pub fn Route::contains(Self, @moonbitlang/typst/syntax.FileId) -> Bool
 pub fn Route::decrease(Self) -> Unit
+pub fn Route::depth(Self) -> Int
 pub fn Route::extend_(Self) -> Self
 pub fn Route::increase(Self) -> Unit
 pub fn Route::memo_hash(Self) -> U128
@@ -10587,6 +10603,7 @@ pub fn Sink::delayed_errors(Self, Array[SourceDiagnostic]) -> Unit
 pub fn Sink::extend_from_sink(Self, Self) -> Unit
 pub fn Sink::introspection(Self, Introspection) -> Unit
 pub fn Sink::introspections(Self) -> ArrayView[Introspection]
+pub fn Sink::is_empty(Self) -> Bool
 pub fn Sink::new() -> Self
 pub fn Sink::take_delayed(Self) -> Array[SourceDiagnostic]
 pub fn Sink::value(Self, Value, Styles?) -> Unit

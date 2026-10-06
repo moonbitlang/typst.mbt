@@ -229,16 +229,29 @@
   `bench/README.md`); profile with `moon run --profile --target native
   --release cli -- query --ignore-system-fonts bench/longer.typ heading`.
   comemo is replaced by `library/memo.mbt`: `layout_par_impl`,
-  `layout_fragment_impl` and the counter sequence are memoized for one
-  compilation (across introspection iterations). A memoized call's key must
+  `layout_fragment_impl`, the counter sequence and closure calls
+  (`eval_closure`, see below) are memoized for one compilation (its
+  evaluation and its introspection iterations). A memoized call's key must
   fingerprint every argument except the engine (content, `StyleChain::
   memo_hash`, regions, `Locator::memo_hash`, `Route::memo_hash`), and the
   entry keeps the arguments, which must also be equal under
   `values_memo_equal` (exact where fingerprints are lossy or Typst's `==`
-  is loose; closures by identity). Introspector reads are recorded and
-  replayed for validation (not across introspectors if a result's
-  fingerprint was lossy or contained closures: `fingerprint_flags_in`), sink
-  effects are replayed, frames are cloned. A `Fingerprint` must cover
+  is loose; host closures and modules by identity). Closures compare by
+  their hash, like upstream's `Arc<LazyHash<Closure>>` (`closures_equal`:
+  one closure expression evaluated twice with the same captures gives equal
+  functions), so equal fingerprints are equal closures. Introspector reads
+  are recorded and replayed for validation (not across introspectors if a
+  result's fingerprint was lossy or contained host closures or modules:
+  `fingerprint_flags_in`), sink effects are replayed, frames are cloned.
+  Closure calls (`memoized_closure`, upstream's `#[comemo::memoize]` on
+  `eval_closure`; without it a touying deck with cetz calls two million
+  functions instead of 160 000) are keyed by the function and the arguments
+  and track the rest like comemo does: the context notes what was asked of
+  it (`Context` has private fields and `location()`/`get_styles()`/
+  `try_*()`/`introspect()`: never read them another way), depth checks
+  note how far the route may move (`Route::check_within`), imports note
+  the file ids they ask routes for (`note_route_query`); results are
+  values (containers are marked shared). A `Fingerprint` must cover
   exactly what upstream's `Hash` covers (location keys are `hash128(elem)`:
   a coarser fingerprint gives two elements one key, which `measure`
   observes; `typst/oracle_wbtest.mbt`, generated from the upstream binary by
@@ -247,8 +260,8 @@
   in a `LazyHash` (closures, tiling frames) or shares (modules, binding
   info) caches its hash and flags in a `LazyFingerprint`. Only memoize
   pure functions of their arguments plus the tracked engine parts whose
-  results cannot contain values created during the call (closure identity;
-  hence the state sequence is not memoized).
+  results cannot contain values created during the call that compare by
+  identity (the state sequence is not memoized).
 - Performance: non-intrinsic core functions (`Byte::to_uint`,
   `Byte::to_uint64`, `Int::to_uint64`, `Float::min`/`floor`/`to_int`,
   `Double::floor`/`to_int`, ...) are compiled into the core bundle and are

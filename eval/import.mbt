@@ -299,6 +299,8 @@ fn eval_source_memoized(
       .iter()
       .all(q => memo.route.contains(q) == engine.route.contains(q)) &&
       memo.traced.0 == engine.traced.0 {
+      // The evaluations around this one asked the same of their routes.
+      @library.note_route_queries(memo.queried)
       engine.sink.extend_from_sink(memo.sink)
       match memo.result {
         Ok(module_) => return module_
@@ -307,8 +309,8 @@ fn eval_source_memoized(
     }
   }
   let sink = @library.Sink::new()
-  let queried = [id]
-  route_queries.push(queried)
+  let queries = @library.route_queries_begin()
+  @library.note_route_query(id)
   let result : Result[@library.Module, Array[@library.SourceDiagnostic]] = try
     eval_source(
       engine.world,
@@ -323,11 +325,8 @@ fn eval_source_memoized(
   } noraise {
     module_ => Ok(module_)
   }
-  route_queries.pop() |> ignore
   // Queries made here are also made by the enclosing evaluations.
-  for outer in route_queries {
-    outer.append(queried)
-  }
+  let queried = @library.route_queries_end(queries)
   entries.push({
     world: engine.world,
     library: engine.library,
@@ -390,15 +389,9 @@ fn resolve_package(
 }
 
 ///|
-/// The file ids queried on the route by the evaluations in progress
-/// (innermost last).
-let route_queries : Array[Array[@syntax.FileId]] = []
-
-///|
-/// `Route::contains`, recording the query for memoization.
+/// `Route::contains`, recording the query for memoization (of the source
+/// files here and of closure calls in `library/memo.mbt`).
 fn route_contains(route : @library.Route, id : @syntax.FileId) -> Bool {
-  if route_queries.last() is Some(queried) {
-    queried.push(id)
-  }
+  @library.note_route_query(id)
   route.contains(id)
 }

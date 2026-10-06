@@ -16,7 +16,21 @@ fn oracle_compile(source : String) -> @layout.PagedDocument raise {
 
 ///|
 /// The values of the metadata elements of a document, which are strings.
+/// Memoization (`library/memo.mbt`) must not change them: the document is
+/// also compiled without it.
 fn oracle_metadata(source : String) -> Array[String] raise {
+  let memoized = oracle_metadata_once(source)
+  @library.set_layout_memo_enabled(false)
+  let plain = {
+    defer @library.set_layout_memo_enabled(true)
+    oracle_metadata_once(source)
+  }
+  assert_eq(plain, memoized)
+  memoized
+}
+
+///|
+fn oracle_metadata_once(source : String) -> Array[String] raise {
   let doc = oracle_compile(source)
   let out = []
   for elem in doc.introspector().query(Elem(@library.metadata_elem(), None)) {
