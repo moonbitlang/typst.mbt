@@ -349,7 +349,7 @@ fn Frame::inline(self : Frame, layer : Int, pos : Point, frame : Frame) -> Unit 
   }
   let items = sink[:layer].to_owned()
   items.append(moved)
-  items.append(sink[layer:].to_owned())
+  items.append(sink[layer:])
   self.items = items
 }
 

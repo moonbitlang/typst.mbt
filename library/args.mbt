@@ -24,12 +24,11 @@ pub(all) struct Args {
 ///|
 /// Create positional arguments from a span and values.
 pub fn Args::new(span : @syntax.Span, values : ArrayView[Value]) -> Args {
-  {
-    span,
-    items: values
-    .to_owned()
-    .map(v => ({ span, name: None, value: { v, span, }, } : Arg)),
+  let items : Array[Arg] = Array(capacity=values.length())
+  for v in values {
+    items.push({ span, name: None, value: { v, span, }, })
   }
+  { span, items, }
 }
 
 ///|
