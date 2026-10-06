@@ -14,6 +14,7 @@ MoonBit. See [PLAN.md](PLAN.md) for scope, architecture and status.
 | `svg/` | Port of `typst-svg` (so far: `WebImage` data URLs) |
 | `oracle/` | Rust crate dumping upstream reference outputs (goldens) |
 | `tests/runner/` | Differential runner comparing the port against the goldens |
+| `tests/packages/` | Documents that use real packages of the Typst package registry (pinned in `manifest.tsv`), for the `packages` stage |
 | `kit/`, `kit/platform/` | Port of `typst-kit` (files, packages, fonts, diagnostics) and OS access for native and wasm |
 | `cli/` | Port of `typst-cli`: the `typst` command line |
 | `typst_assets/fonts/` | The fonts embedded into the CLI (generated) |
@@ -97,4 +98,22 @@ scripts/upstream.sh            # checkout upstream at UPSTREAM_REV
 scripts/goldens.sh             # needs Rust; or `scripts/goldens.sh syntax ast`
 moon run tests/runner --target native -- syntax [filter] [-v]
 moon run tests/runner --target native -- ast [filter] [-v]
+```
+
+The stages (`scripts/ci/stages.tsv` lists them with their case counts, and
+`scripts/ci/stages.py` runs them all): `syntax`, `ast`, `reparse`, `eval`,
+`realize`, `html`, `bundle`, `paged` (laid-out frames), `svg`, `svg-replay`,
+`pdf-semantic`, `pdf-semantic-replay`, `pdftags`, `render`, `font`, `shape`,
+`shape-hb`, `break`, `usvg`, `usvg-images`, `resvg`, `wasm-validate`,
+`wasm-spec`, `edsl` and `packages`. Most of them run on upstream's own test
+suite (some on the suites of the crates upstream uses). `packages` compiles documents that use real packages of the
+Typst package registry (touying, cetz, fletcher, codly, glossarium, mitex,
+cmarker, templates, ...; see [tests/packages](tests/packages/README.md)) and
+compares frames, SVG and diagnostics with upstream:
+
+```sh
+scripts/packages.sh            # fetch the pinned packages into .repos/typst-packages
+scripts/goldens.sh packages    # needs Rust
+moon run tests/runner --target native --release -- packages [filter] [-v]
+scripts/packages_cli.py        # the same through the two CLIs: stderr, PNG pixels, times
 ```

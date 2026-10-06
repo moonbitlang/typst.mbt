@@ -1,11 +1,15 @@
 #!/usr/bin/env bash
 # CI: fetch what the tests read besides this repository, without Rust.
 #
-#   scripts/ci/data.sh
+#   scripts/ci/data.sh [--packages]
 #
 # - `.repos/` (scripts/upstream.sh with a shallow upstream checkout): the
 #   upstream suite, rustybuzz's and resvg's test suites, the WebAssembly
 #   spec tests.
+# - With `--packages` (the job that runs the stages; the other jobs do not
+#   depend on the package registry): `.repos/typst-packages`
+#   (scripts/packages.sh), the Typst packages of the `packages` stage,
+#   pinned by tests/packages/manifest.tsv.
 # - The git dependencies of the oracle whose files the runner and the unit
 #   tests read, at the revisions of oracle/Cargo.lock: typst-dev-assets,
 #   typst-assets and hayro. A development machine has them as cargo
@@ -34,6 +38,10 @@ retry() {
 
 export UPSTREAM_SHALLOW=1
 retry scripts/upstream.sh
+if [ "${1:-}" = --packages ]; then
+  retry scripts/packages.sh
+  [ -d .repos/typst-packages/preview ] || { echo "data.sh: missing .repos/typst-packages/preview" >&2; exit 1; }
+fi
 
 checkouts="$HOME/.cargo/git/checkouts"
 # The full revision of a git dependency in oracle/Cargo.lock.
