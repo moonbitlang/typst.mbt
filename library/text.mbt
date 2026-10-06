@@ -647,6 +647,9 @@ fn text_elem_dir_default() -> Value {
 pub(all) struct Alternates(Int64) derive(Eq, Hash, Default)
 
 ///|
+pub extend Alternates with Default::{default}
+
+///|
 pub impl Reflect for Alternates with fn input() {
   CastInfo::Type(Type::bool()).union_with(Type(Type::int()))
 }
@@ -689,6 +692,9 @@ fn text_elem_alternates_default() -> Value {
 ///|
 /// A set of stylistic sets to enable.
 pub(all) struct StylisticSets(Int) derive(Eq, Hash, Default)
+
+///|
+pub extend StylisticSets with Default::{default}
 
 ///|
 /// Returns whether this set contains a particular stylistic set.
@@ -884,6 +890,9 @@ pub(all) struct FontFeatures(Array[(OpenTypeTag, Int64)]) derive (
 )
 
 ///|
+pub extend FontFeatures with Default::{default}
+
+///|
 pub impl Reflect for FontFeatures with fn input() {
   CastInfo::Type(Type::array()).union_with(Type(Type::dict()))
 }
@@ -1058,6 +1067,9 @@ fn text_elem_emph_fold(inner : Value, outer : Value) -> Value {
 pub(all) struct WeightDelta(Int64) derive(Eq, Hash, Default)
 
 ///|
+pub extend WeightDelta with Default::{default}
+
+///|
 pub impl Fold for WeightDelta with fn fold(self, outer) {
   WeightDelta(outer.0 + self.0)
 }
@@ -1112,6 +1124,9 @@ pub(all) struct Costs {
   widow : Ratio?
   orphan : Ratio?
 } derive(Eq, Hash, Default)
+
+///|
+pub extend Costs with Default::{default}
 
 ///|
 pub fn Costs::hyphenation(self : Costs) -> Ratio {

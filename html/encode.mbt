@@ -8,6 +8,9 @@ pub(all) struct HtmlOptions {
 } derive(Eq, Default)
 
 ///|
+pub extend HtmlOptions with Default::{default}
+
+///|
 /// Resolved settings for HTML export (upstream `HtmlOptions<Complete>`).
 pub(all) struct CompleteHtmlOptions {
   /// The resolved format options.

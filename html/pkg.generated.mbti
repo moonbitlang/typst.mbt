@@ -114,6 +114,7 @@ pub fn HtmlNode::text(String, @syntax.Span) -> Self
 pub(all) struct HtmlOptions {
   format : @library.PartialHtmlFormatOptions
 } derive(Default, Eq)
+pub fn HtmlOptions::default() -> Self
 pub fn HtmlOptions::resolve(Self, @library.HtmlFormatOptions) -> CompleteHtmlOptions
 
 pub struct HtmlOutput {

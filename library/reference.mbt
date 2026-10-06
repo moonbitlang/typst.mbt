@@ -75,6 +75,9 @@ pub impl Default for RefForm with fn default() {
 }
 
 ///|
+pub extend RefForm with Default::{default}
+
+///|
 let ref_form_names : ReadOnlyArray[String] = ["normal", "page"]
 
 ///|

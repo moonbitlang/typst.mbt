@@ -163,6 +163,9 @@ pub impl Show for Type with fn output(self, logger) {
 }
 
 ///|
+pub extend Type with Show::{to_string}
+
+///|
 /// Determines a value's type (upstream `Type::construct`).
 fn impl_type_construct(value_ : Value) -> Type {
   value_.ty()

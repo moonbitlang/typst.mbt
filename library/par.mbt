@@ -20,6 +20,9 @@ pub impl Default for JustificationLimits with fn default() {
 }
 
 ///|
+pub extend JustificationLimits with Default::{default}
+
+///|
 pub impl Reflect for JustificationLimits with fn input() {
   Type(Type::dict())
 }
@@ -311,6 +314,9 @@ pub(all) struct FirstLineIndent {
 pub impl Default for FirstLineIndent with fn default() {
   { amount: Some(Length::zero()), all: Some(false), }
 }
+
+///|
+pub extend FirstLineIndent with Default::{default}
 
 ///|
 pub fn FirstLineIndent::amount(self : FirstLineIndent) -> Length {

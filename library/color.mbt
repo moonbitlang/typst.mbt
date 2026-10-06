@@ -1530,6 +1530,9 @@ pub impl Hash for ProcessColor with fn hash_combine(self, hasher) {
 }
 
 ///|
+pub extend ProcessColor with Hash::{hash, hash_combine}
+
+///|
 /// Constructs a new color from hex strings like the following:
 /// - `#aef` (shorthand, with leading hash),
 /// - `7a03c2` (without alpha),
@@ -1729,6 +1732,9 @@ pub impl Hash for SpotColorant with fn hash_combine(self, hasher) {
   }
   self.fallback.hash_combine(hasher)
 }
+
+///|
+pub extend SpotColorant with Hash::{hash, hash_combine}
 
 ///|
 fn repr_opt_spot_name(name : SpotColorantName?) -> String {

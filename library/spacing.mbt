@@ -109,6 +109,9 @@ pub impl Default for Sizing with fn default() {
 }
 
 ///|
+pub extend Sizing with Default::{default}
+
+///|
 /// Whether this is an automatic size.
 pub fn Sizing::is_auto(self : Sizing) -> Bool {
   self is Auto

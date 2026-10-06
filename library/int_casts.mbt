@@ -22,6 +22,9 @@ pub impl Reflect for U8 with fn castable(v) {
 }
 
 ///|
+pub extend U8 with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for U8 with fn into_value(self) {
   Int(self.0)
 }
@@ -115,6 +118,9 @@ pub impl IntoValue for U32 with fn into_value(self) {
 }
 
 ///|
+pub extend U32 with IntoValue::{into_value}
+
+///|
 pub impl FromValue for U32 with fn from_value(value) {
   match value {
     Int(v) => {
@@ -128,6 +134,9 @@ pub impl FromValue for U32 with fn from_value(value) {
     v => raise HintedError(CastInfo::Type(Type::int()).error(v))
   }
 }
+
+///|
+pub extend U32 with FromValue::{from_value}
 
 ///|
 pub fn U32::get(self : U32) -> Int64 {
@@ -154,6 +163,9 @@ pub impl Reflect for U64 with fn castable(v) {
 }
 
 ///|
+pub extend U64 with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for U64 with fn into_value(self) {
   Int(self.0)
 }
@@ -172,6 +184,9 @@ pub impl FromValue for U64 with fn from_value(value) {
     v => raise HintedError(CastInfo::Type(Type::int()).error(v))
   }
 }
+
+///|
+pub extend U64 with FromValue::{from_value}
 
 ///|
 pub fn U64::get(self : U64) -> Int64 {
@@ -456,9 +471,15 @@ pub impl Reflect for NonZeroUSize with fn castable(v) {
 }
 
 ///|
+pub extend NonZeroUSize with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for NonZeroUSize with fn into_value(self) {
   Int(self.0)
 }
+
+///|
+pub extend NonZeroUSize with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for NonZeroUSize with fn from_value(value) {
@@ -474,6 +495,9 @@ pub impl FromValue for NonZeroUSize with fn from_value(value) {
     v => raise HintedError(CastInfo::Type(Type::int()).error(v))
   }
 }
+
+///|
+pub extend NonZeroUSize with FromValue::{from_value}
 
 ///|
 pub fn NonZeroUSize::get(self : NonZeroUSize) -> Int64 {

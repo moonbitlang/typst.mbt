@@ -5,6 +5,9 @@
 pub(all) struct Ratio(Scalar) derive(Default, Eq, Compare, Hash)
 
 ///|
+pub extend Ratio with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
 pub fn Ratio::zero() -> Ratio {
   Ratio(Scalar(0.0))
 }

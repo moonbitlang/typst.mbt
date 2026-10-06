@@ -22,6 +22,9 @@ pub impl Default for PdfVersion with fn default() {
 }
 
 ///|
+pub extend PdfVersion with Default::{default}
+
+///|
 let pdf_version_min : PdfVersion = Pdf14
 
 ///|
@@ -290,6 +293,9 @@ pub impl Show for PdfStandards with fn output(_self, logger) {
 pub impl Default for PdfStandards with fn default() {
   { config: { validators: { a: None, ua: None, }, version: Pdf17, }, }
 }
+
+///|
+pub extend PdfStandards with Default::{default}
 
 ///|
 fn pdf_format_elem_standard_default() -> Value {

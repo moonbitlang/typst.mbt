@@ -145,6 +145,9 @@ pub impl Default for Alignment with fn default() {
 }
 
 ///|
+pub extend Alignment with Default::{default}
+
+///|
 /// Sum two alignments (upstream `Add for Alignment`).
 pub fn Alignment::add(
   self : Alignment,
@@ -717,6 +720,9 @@ pub(all) enum FixedAlignment {
   Center
   End
 } derive(Eq, Compare, Hash, Debug)
+
+///|
+pub extend FixedAlignment with Compare::{op_lt, op_le, op_ge, compare, op_gt}
 
 ///|
 /// Returns the position of this alignment in a container with the given

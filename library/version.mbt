@@ -115,6 +115,9 @@ pub impl Compare for Version with fn compare(self, other) {
 }
 
 ///|
+pub extend Version with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
 pub impl Eq for Version with fn equal(self, other) {
   self.compare(other) == 0
 }

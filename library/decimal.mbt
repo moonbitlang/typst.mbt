@@ -25,6 +25,9 @@ pub impl Compare for Decimal with fn compare(self, other) {
 }
 
 ///|
+pub extend Decimal with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
 pub let decimal_zero : Decimal = Decimal::Decimal(rd_zero)
 
 ///|

@@ -277,6 +277,9 @@ pub impl Default for Locale with fn default() {
 }
 
 ///|
+pub extend Locale with Default::{default}
+
+///|
 pub fn Locale::get_in(styles : StyleChain) -> Locale {
   Locale::new(TextElem::lang_in(styles), TextElem::region_in(styles))
 }

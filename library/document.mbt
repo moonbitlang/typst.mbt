@@ -157,6 +157,9 @@ pub impl[T] Default for OneOrMultiple[T] with fn default() {
 }
 
 ///|
+pub extend OneOrMultiple with Default::{default}
+
+///|
 pub impl[T] Fold for OneOrMultiple[T] with fn fold(self, outer) {
   OneOrMultiple(outer.0 + self.0)
 }

@@ -16,6 +16,9 @@ pub impl Default for PlacementScope with fn default() {
 }
 
 ///|
+pub extend PlacementScope with Default::{default}
+
+///|
 let placement_scope_names : ReadOnlyArray[String] = ["column", "parent"]
 
 ///|

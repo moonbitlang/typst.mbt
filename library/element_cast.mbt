@@ -7,6 +7,9 @@
 pub(all) struct Depth(Int64) derive(Eq, Hash, Default)
 
 ///|
+pub extend Depth with Default::{default}
+
+///|
 pub impl Fold for Depth with fn fold(self, outer) {
   Depth(outer.0 + self.0)
 }

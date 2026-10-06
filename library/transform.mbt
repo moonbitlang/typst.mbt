@@ -95,6 +95,9 @@ pub impl Default for Transform with fn default() {
 }
 
 ///|
+pub extend Transform with Default::{default}
+
+///|
 /// A translate transform.
 pub fn Transform::translate(tx : Abs, ty : Abs) -> Transform {
   { ..Transform::identity(), tx, ty, }

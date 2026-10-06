@@ -155,6 +155,9 @@ pub impl Add for Point with fn add(self, other) {
 }
 
 ///|
+pub extend Point with Add::{add}
+
+///|
 pub impl Sub for Point with fn sub(self, other) {
   { x: self.x - other.x, y: self.y - other.y, }
 }

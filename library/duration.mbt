@@ -5,6 +5,9 @@
 pub struct Duration(@time.Duration) derive(Eq, Hash, Compare)
 
 ///|
+pub extend Duration with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
 /// Whether the duration is empty / zero.
 pub fn Duration::is_zero(self : Duration) -> Bool {
   self.0.is_zero()

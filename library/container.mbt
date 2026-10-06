@@ -321,6 +321,9 @@ pub impl Default for BaselinePos with fn default() {
 }
 
 ///|
+pub extend BaselinePos with Default::{default}
+
+///|
 /// Baseline position relative to frame height, or `auto` to align with the
 /// inner baseline.
 pub fn BaselinePos::at(self : BaselinePos) -> Smart[VAlignment] {

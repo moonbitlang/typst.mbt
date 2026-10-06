@@ -337,6 +337,9 @@ pub impl Default for TableHeaderScope with fn default() {
 }
 
 ///|
+pub extend TableHeaderScope with Default::{default}
+
+///|
 pub fn TableHeaderScope::refers_to_column(self : TableHeaderScope) -> Bool {
   match self {
     Both => true
@@ -499,6 +502,9 @@ pub impl Default for TableCell with fn default() {
   .with_colspan(NonZeroUSize(1L))
   .with_rowspan(NonZeroUSize(1L))
 }
+
+///|
+pub extend TableCell with Default::{default}
 
 ///|
 /// The internal `kind` field of the cell, taking styles into account

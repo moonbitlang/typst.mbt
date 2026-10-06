@@ -79,6 +79,9 @@ pub impl Default for FillRule with fn default() {
 }
 
 ///|
+pub extend FillRule with Default::{default}
+
+///|
 pub impl Reflect for FillRule with fn input() {
   Union([
     Value(

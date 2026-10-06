@@ -21,6 +21,9 @@ pub impl Default for FontStyle with fn default() {
 }
 
 ///|
+pub extend FontStyle with Default::{default}
+
+///|
 let font_style_names : ReadOnlyArray[String] = ["normal", "italic", "oblique"]
 
 ///|
@@ -132,6 +135,9 @@ pub impl Default for FontWeight with fn default() {
 }
 
 ///|
+pub extend FontWeight with Default::{default}
+
+///|
 /// Create a font weight from a number between 100 and 900, clamping it if
 /// necessary.
 pub fn FontWeight::from_number(weight : Int) -> FontWeight {
@@ -213,6 +219,9 @@ pub let font_stretch_normal : FontStretch = FontStretch(1000)
 pub impl Default for FontStretch with fn default() {
   font_stretch_normal
 }
+
+///|
+pub extend FontStretch with Default::{default}
 
 ///|
 /// Create a font stretch from a ratio between 0.5 and 2.0, clamping it if
@@ -413,6 +422,9 @@ pub(all) struct FontVariations(Array[(OpenTypeTag, AxisValue)]) derive (
 pub impl Default for FontVariations with fn default() {
   FontVariations([])
 }
+
+///|
+pub extend FontVariations with Default::{default}
 
 ///|
 pub impl Fold for FontVariations with fn fold(self, outer) {

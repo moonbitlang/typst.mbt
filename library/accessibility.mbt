@@ -39,6 +39,9 @@ pub impl Default for ArtifactKind with fn default() {
 }
 
 ///|
+pub extend ArtifactKind with Default::{default}
+
+///|
 let artifact_kind_names : ReadOnlyArray[String] = [
   "header", "footer", "watermark", "page-number", "line-number", "redaction", "bates",
   "page", "pagination-other", "layout", "background", "other",

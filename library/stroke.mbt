@@ -31,6 +31,9 @@ pub impl Default for Stroke with fn default() {
 }
 
 ///|
+pub extend Stroke with Default::{default}
+
+///|
 /// Create a stroke from a paint and a thickness.
 pub fn Stroke::from_pair(paint : Paint, thickness : Length) -> Stroke {
   { ..Stroke::default(), paint: Custom(paint), thickness: Custom(thickness), }

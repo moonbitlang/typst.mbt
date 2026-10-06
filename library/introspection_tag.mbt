@@ -37,6 +37,9 @@ pub impl Show for Tag with fn output(self, logger) {
 }
 
 ///|
+pub extend Tag with Show::{to_string}
+
+///|
 pub impl Fingerprint for Tag with fn fingerprint(self, state) {
   match self {
     Start(elem, flags) => {

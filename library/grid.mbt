@@ -12,6 +12,9 @@ pub impl Default for TrackSizings with fn default() {
 }
 
 ///|
+pub extend TrackSizings with Default::{default}
+
+///|
 fn track_sizings_input() -> CastInfo {
   Sizing::input().union_with(NonZeroUSize::input()).union_with(Arr::input())
 }
@@ -503,3 +506,6 @@ pub impl Default for GridCell with fn default() {
   .with_colspan(NonZeroUSize(1L))
   .with_rowspan(NonZeroUSize(1L))
 }
+
+///|
+pub extend GridCell with Default::{default}
