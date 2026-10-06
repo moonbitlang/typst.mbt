@@ -20,10 +20,10 @@
 //! # World
 //!
 //! `TestWorld::packages`: what `typst compile --ignore-system-fonts
-//! --creation-timestamp 0` sees. The standard library without inputs and
-//! features (not the test library with its small pages), the fonts embedded
-//! in the CLI (`typst_assets::fonts()`), and the fixed date of the test
-//! world.
+//! --creation-timestamp 43200` sees. The standard library without inputs
+//! and features (not the test library with its small pages), the fonts
+//! embedded in the CLI (`typst_assets::fonts()`), and the fixed time of the
+//! test world (1970-01-01, 12:00 UTC).
 //!
 //! # Output
 //!

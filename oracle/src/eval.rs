@@ -12,7 +12,7 @@ use typst::World;
 use typst::diag::{SourceDiagnostic, SourceResult, Tracepoint, Warned};
 use typst::engine::{Route, Sink, Traced};
 use typst::foundations::{Content, Repr};
-use typst_syntax::{DiagSpan, DiagSpanKind, FileId};
+use typst_syntax::{DiagSpan, DiagSpanKind, FileId, VirtualRoot};
 
 use crate::collect;
 use crate::world::{TestWorld, parse_features};
@@ -154,6 +154,9 @@ pub fn canonical_internal_error(msg: &str) -> String {
 }
 
 /// Render a diagnostic span as `start..end` (main file) or `path:start..end`.
+/// The path of a file of a real package (the `packages` stage; the
+/// packages of upstream's suite have the namespace `test`) starts with
+/// `@namespace/name:version/`.
 fn locate(world: &TestWorld, main: FileId, kind: DiagSpanKind) -> String {
     let (id, range) = match kind {
         DiagSpanKind::Detached => return "-".into(),
@@ -169,6 +172,13 @@ fn locate(world: &TestWorld, main: FileId, kind: DiagSpanKind) -> String {
     if id == main {
         format!("{}..{}", range.start, range.end)
     } else {
-        format!("{:?}:{}..{}", id.vpath().get_without_slash(), range.start, range.end)
+        let path = id.vpath().get_without_slash();
+        let path = match id.root() {
+            VirtualRoot::Package(spec) if spec.namespace != "test" => {
+                format!("@{}/{}:{}/{path}", spec.namespace, spec.name, spec.version)
+            }
+            _ => path.to_string(),
+        };
+        format!("{:?}:{}..{}", path.as_str(), range.start, range.end)
     }
 }

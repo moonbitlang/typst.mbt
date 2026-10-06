@@ -628,7 +628,14 @@ fn locate(
   if id == main {
     "\{start}..\{end}"
   } else {
+    // A file of a real package (the `packages` stage; the packages of
+    // upstream's suite have the namespace `test`) is named with its package.
     let p = id.vpath().get_without_slash()
+    let p = match id.root() {
+      Package(spec) if spec.namespace_ != "test" =>
+        "@\{spec.namespace_}/\{spec.name}:\{spec.version}/\{p}"
+      _ => p
+    }
     "\{@unicode.rust_debug_str(p)}:\{start}..\{end}"
   }
 }
