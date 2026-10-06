@@ -398,11 +398,12 @@ argument list): what they produce is attributed to the composite's call as
 a whole. `site.arg(i, v)` ties a forwarded value or a body without a
 location of its own (a plain string) to the caller's argument `i`, so it
 resolves to that argument's range. Descriptions the caller passed in were
-constructed before `build` ran and A measuring element calls the hook again, with the same site, inside its
-callback, for the ordinary descriptions it rebuilds there; creating a new
-callback description there stays the existing error. So a selection inside a chip's text resolves
-to the caller's string or `Prose`, and a selection of the chip's box to the
-caller's `Chip(..)` call.
+constructed before `build` ran and keep their own origins. A measuring
+element calls the hook again, with the same site, inside its callback, for
+the ordinary descriptions it rebuilds there; creating a new callback
+description there stays the existing error. So a selection inside a chip's
+text resolves to the caller's string or `Prose`, and a selection of the
+chip's box to the caller's `Chip(..)` call.
 
 Rule for callbacks: a kit element that measures creates a `Layout` or
 `Context` callback, so under the creation rule it cannot be built inside a
@@ -431,6 +432,199 @@ given punctuation (S5; it changes the text that is copied from the PDF, which
 the documentation says). Dates and collation are not included: both need a
 locale and a time zone policy, and one port's 40-line `localeCompare` is
 not evidence enough for a design.
+
+### As built (step 3): `Composite`, the package, `Cards`
+
+**The hook** (`doc/composite.mbt`; tests `doc/composite_test.mbt`, whose
+elements are defined with the public API only, as a package outside `doc`
+defines them):
+
+```moonbit
+pub fn Composite::Composite(name : String, loc : SourceLoc, args_loc : ArgsLoc,
+  build : (CompositeSite) -> &IntoContent) -> Composite
+#callsite(autofill(loc))
+pub fn[T] CompositeSite::arg(self, param : Int, value : T, loc~ : SourceLoc) -> T
+pub fn CompositeSite::invalid(self, message : String) -> Content
+```
+
+What the section left open, and how it is decided:
+
+- `site.arg(i, v)` returns `v` itself, of its own type, so the sketch
+  type-checks as written (`fill=site.arg(1, fill)` for a `Paint`
+  parameter). A value cannot carry the mark: the facades are public enums
+  and structs without a place for a location, and a `Bool`, an `Int64` or a
+  `String` has none at all. The mark is tied to the constructor's argument
+  by what the compiler already records for provenance: `site.arg` has the
+  location of its own call (`#callsite(autofill(loc))`), every constructor
+  has the locations of its argument expressions (`args_loc`), and an
+  argument expression that contains the call of `site.arg(i, ..)` is the
+  caller's argument `i`. Constructors find their sites in one place
+  (`Site::new`); while a `build` runs it returns the composite's call with
+  a table from the constructor's parameters to the composite's, and
+  lowering reads every parameter index through that table (`Site::param`).
+  No constructor and no generator changed.
+- The rule is lexical: a mark belongs to the innermost constructor call
+  around it (arguments are evaluated before the constructor runs, so that
+  one takes it first). Where it does not hold, the argument is the call of
+  the composite as a whole, never another argument: a value bound to a name
+  before it is passed; an argument that contains marks of different
+  parameters (`Seq([site.arg(0, a), site.arg(1, b)])`: a `Seq` per
+  argument marks each). A wrong index is not detected: an element tests
+  every argument that it passes on (convention 7 below).
+- The result of `build` is an argument in the same sense
+  (`site => site.arg(0, body)`), and the composite is a node of the
+  description (`NComposite`) that lowers to its body and is transparent
+  for what reads descriptions (inserted expressions, the lint of adjacent
+  text, `Para`'s blocks); `Debug` prints its name around its expansion.
+- What origins report is the composite's name (`Origin.kind`), the call,
+  and the argument where one is marked; under the keys of the enclosing
+  `Keyed`, as for any constructor.
+- A composite built inside the `build` of another one is a constructor
+  like the others there: its site is the outer call, its parameters are the
+  outer parameters that its arguments were marked as, and what it generates
+  is the outer call. One rule, no case of its own.
+- Callbacks: the section had the element call the hook again inside its
+  callback. It is automatic instead: a callback that is created while a
+  `build` runs is a part of that `build` (`Callback::new` wraps it), so
+  when the engine calls it the constructors that it runs are the
+  composite's, `cx.measure(..)` included, and `site.arg` marks their
+  arguments. Revision 8 already gives an invocation its occurrence and
+  keys without the callback's author doing anything (section 11.2); the
+  site of a composite is one more thing of that kind, and an element
+  cannot forget it. A callback description that is created while a
+  callback runs is still the error of the creation rule, at the call of
+  the element; an element without a callback can be built anywhere.
+- The `into_content` of a type of the caller runs when the value is passed
+  to a constructor, which is inside `build`. It is the caller's code, so
+  `doc` converts content outside of the running `build` (`described`): what
+  it builds keeps its own call sites. A function of the caller that `build`
+  calls is not covered: an element that takes one calls it before the
+  hook.
+- An argument that an element cannot accept is `site.invalid(message)`, an
+  error at the call (constructors do not raise).
+
+Each rule has its test in `doc/composite_test.mbt`: the index mismatch of
+the third review (written first; on a hook that only substituted the
+composite's call it failed with the gutter's error at the fill, `Tiles a3`
+for `Tiles a2`), one site and the expansion, the caller's descriptions and
+custom types, a click, a selection with tiers 1 to 3 and `positions`, keys
+of the caller and of the element, one description used twice, a composite
+in a composite, callbacks (provenance of their content, a result that is
+an argument, an error, the creation rule), where a mark counts, the lint.
+
+**The package** `doc/kit` imports `doc` and core only; it is in the
+published package (`.moonignore` leaves it in). Its conventions are in
+`doc/kit/kit.mbt`:
+
+1. An element is an expansion into constructors of `doc`, and has no
+   behaviour of its own in the engine.
+2. It is a type with a constructor of its name, and content like the
+   elements of `doc`. Its parameters have the names, types and defaults of
+   the primitives that they are passed to, in the type of the primitive
+   that draws them; a default of its own only where that default is the
+   reason for the element, and said so. No fixed height, no `extra`, no
+   `label`.
+3. Provenance through `Composite`: everything is built inside `build`,
+   every forwarded argument is marked where it is passed, and a part per
+   item of the caller's data is `Keyed` with the item's index.
+4. It measures only where the engine cannot do the work, says "Measures"
+   in its documentation, and says what happens in an unbounded region and
+   at a page break. In the callback: the caller's content was converted in
+   `build`; what is measured and what is placed are the same descriptions
+   under the same keys, from one function; sizes are not computed by hand
+   (a row is measured as a row of the grid that places it).
+5. Invalid arguments are `site.invalid`; what the engine rejects is the
+   engine's error at the argument.
+6. Its twin is a Typst function with the same expansion, which passes on
+   only the arguments it was given; documents that use both are pairs of
+   the `edsl` stage.
+7. Its tests: the expansion, the property it exists for (from the frames),
+   provenance through the review loop including an error in every
+   forwarded argument at that argument's index, and for a measuring
+   element the creation rule, an unbounded region, a page break, and that
+   nothing leaves the page.
+
+**`Cards`** (`doc/kit/cards.mbt`, tests `doc/kit/cards_test.mbt`):
+`Cards(items, columns~, gutter~, column_gutter~, row_gutter~, fill~,
+stroke~, inset~, radius~)`. The tracks have `Grid`'s types, the look
+`GridCell`'s and `Block`'s (`Paint`, `Sides[Stroke]`, `Sides[Length]`,
+`Corners[Length]`): one look for all cards, not a `Cells` function, which
+a block cannot take. `columns` defaults to one `1fr` column per item (one
+row of equally wide cards; `Grid`'s default is one `auto` column, which
+stacks them): that default is the element's own. Every card is `Keyed`
+with its index.
+
+- Without `radius`: a `Grid` of `GridCell(item, fill, stroke, inset)`. The
+  look is on the cells, not on the grid: the grid fills and strokes the
+  cells that it adds to complete a row, which would draw empty cards. So
+  an item is the body of a card and a `GridCell` among the items is not a
+  cell of the grid (the guide's hand-written helper allowed that). No
+  callback.
+- With `radius`: a `Layout` whose `Grid` holds `Block(item,
+  width=Pct(100), height=<row>, breakable=false, fill, stroke, radius,
+  inset)`. What the section's row did not say:
+  - a block in a cell is as wide as its content, not as its cell: the card
+    needs `width=Pct(100)`;
+  - "the column width from `Layout`" cannot be computed in host code for
+    the tracks and gutters that `Grid` accepts (`Em`, `Pct`, `Fr`): the
+    row is measured as a grid of that one row, with the same tracks, at
+    the region's width, and the engine resolves them, in the measurement
+    and in the placement alike. The cards are the same boxes as without a
+    radius (tested on the page, in a block with an inset, a grid cell, a
+    pad and columns);
+  - an `Auto` column is an error at the call: it is as wide as the widest
+    card of all rows, which a row measured alone does not know, and a
+    card that is measured wider than it is placed would run out of its
+    height;
+  - an unbounded width: the rows are measured without a width, as the
+    grid is laid out there (fractional tracks have no width in an
+    unbounded region, with or without a radius);
+  - a row that is higher than the region: an unbreakable block that no
+    page holds leaves the page without a diagnostic (pinned as the
+    engine's fact), so the cards of such a row are breakable blocks of
+    their own height: nothing leaves the page, and that row is not
+    equalized;
+  - a page break between rows: a row that does not fit moves as a whole
+    (without a radius the grid breaks the row like any row).
+- S3 stays pinned as the engine's behaviour (`doc/ports_findings_test.mbt`),
+  and `Cards` is tested against it: equal heights for unequal content in
+  both forms, no added page, no split card.
+
+**Twins** (`doc/twins/kit.mbt`, the pairs `kit-cards` and
+`kit-cards-radius`; the `edsl` stage has 44 pairs): the Typst function is a
+string of that file, like every twin, not a `kit.typ`. A function differs
+from an element in two ways that the pairs are written around: its
+definition is an expression of the markup (the EDSL document starts with
+`Value::none()`), and an expression in its body has one span for all its
+calls, while each call of the element is a call site: two calls that make
+equal elements (two empty grids) are one element twice for Typst and two
+elements for the EDSL, which the frame dump shows in the numbering of
+their keys.
+
+**The measurement** (section 9, taken early): `doc/examples/report`, a
+one-page report with invented text (a row of four tiles and two groups of
+cards, the second in two rows), written twice: with the measured cards
+that the ports wrote by hand (`before_helpers.mbt`: the page's text width
+as a constant, each card built twice) and with `Cards` (`after.mbt`). The
+files are split by the rule of section 9, and
+`python3 scripts/edsl_helper_lines.py` counts their lines of code:
+
+| | helper lines | of them for the cards |
+|---|---|---|
+| before | 80 | 56 |
+| after | 42 | 18 |
+
+(24 lines are in both: colours, measures, and what is inside a tile and a
+card.) The pages are identical: the SVG of every page and the PDF bytes are
+equal (`report_wbtest.mbt`). Building and compiling one document
+(`moon run doc/examples/report --target native --release -- time 500`,
+the embedded fonts, aarch64 macOS) takes about 5.9 ms before and 6.2 ms
+after (the mean of 500 runs, in three repetitions; 5.4 ms and 5.7 ms in the
+fastest turn of ten runs). The version with the kit is about 5% slower.
+What differs in the work: it measures five rows as grids where the
+hand-written version measures thirteen blocks, and every constructor of
+the element finds its site through the hook; how the 0.3 ms divide
+between the two was not measured.
 
 ## 5. Marks (a trial, in the kit)
 
@@ -672,7 +866,7 @@ Its optional points: `Layout` passes a `Region`, not the `Size` of
 
 Third review (`ports-proposal-3.md`): `Composite` maps arguments explicitly
 (`site.arg(i, v)`); primitives inside `build` fall back to the composite's
-call instead of using their own parameter indices (4).
+call instead of using their own parameter indices (4; as built in step 3).
 
 Optional points of the first review taken: marks as a separately named constructor in the kit;
 cards by cell fill before measurement; format utilities in their own
