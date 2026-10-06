@@ -1,0 +1,15 @@
+name: Install MoonBit
+description: Install the MoonBit toolchain and update the registry index.
+runs:
+  using: composite
+  steps:
+    - name: Install MoonBit
+      shell: bash
+      run: |
+        curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
+        echo "$HOME/.moon/bin" >> "$GITHUB_PATH"
+    - name: moon version
+      shell: bash
+      run: |
+        moon version --all
+        moon update

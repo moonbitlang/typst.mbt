@@ -1,16 +1,23 @@
 name: CI
 
+# What runs where, and why, is described in AGENTS.md ("CI").
+
 on:
   push:
     branches: [main]
   pull_request:
+  schedule:
+    # Nightly: keeps the goldens cache alive and notices a new MoonBit
+    # toolchain (the latest one is installed) without a pull request.
+    - cron: "17 19 * * *"
+  workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
   group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   check:
@@ -19,20 +26,123 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        target: [native, wasm-gc]
+        target: [native, wasm-gc, wasm]
     steps:
       - uses: actions/checkout@v5
-      - name: Install MoonBit
-        run: |
-          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
-          echo "$HOME/.moon/bin" >> $GITHUB_PATH
-      - name: moon version
-        run: |
-          moon version --all
-          moon update
+      - uses: ./.github/actions/setup-moon
       - name: Check
         run: moon check --target ${{ matrix.target }}
       - name: Format
         run: |
           moon fmt
           git diff --exit-code
+
+  # The goldens of the differential stages: regenerated with the Rust oracle
+  # from upstream Typst when nothing that determines them is cached
+  # (scripts/ci/goldens_key.sh), on the platform the ports are bit-exact on.
+  goldens:
+    runs-on: macos-latest
+    timeout-minutes: 120
+    outputs:
+      key: ${{ steps.key.outputs.key }}
+    steps:
+      - uses: actions/checkout@v5
+      - name: Key
+        id: key
+        run: echo "key=goldens-v1-$(scripts/ci/goldens_key.sh)" >> "$GITHUB_OUTPUT"
+      - name: Look up the goldens
+        id: lookup
+        uses: actions/cache/restore@v4
+        with:
+          path: tests/golden
+          key: ${{ steps.key.outputs.key }}
+          lookup-only: true
+      - uses: ./.github/actions/setup-moon
+        if: steps.lookup.outputs.cache-hit != 'true'
+      - name: Generate the goldens
+        if: steps.lookup.outputs.cache-hit != 'true'
+        run: scripts/ci/goldens.sh
+      - name: Save the goldens
+        if: steps.lookup.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: tests/golden
+          key: ${{ steps.key.outputs.key }}
+
+  unit:
+    name: unit tests (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, ubuntu-latest]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/setup-moon
+      - name: Test data
+        run: scripts/ci/data.sh
+      - name: Unit tests
+        run: scripts/ci/unit_tests.sh --target native
+      - name: Upload the log
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-tests-${{ matrix.os }}
+          path: _build/ci/unit
+          retention-days: 14
+
+  stages:
+    name: stages (${{ matrix.os }})
+    needs: goldens
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, ubuntu-latest]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/setup-moon
+      - name: Test data
+        run: scripts/ci/data.sh
+      - name: Goldens
+        uses: actions/cache/restore@v4
+        with:
+          path: tests/golden
+          key: ${{ needs.goldens.outputs.key }}
+          fail-on-cache-miss: true
+      - name: Build the runner
+        run: moon build --target native --release tests/runner
+      - name: Stages
+        run: scripts/ci/stages.py --check-key
+      - name: Upload the logs and diffs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stages-${{ matrix.os }}
+          path: _build/ci/stages
+          retention-days: 14
+
+  package:
+    name: package as a dependency
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/setup-moon
+      - name: Consumer smoke test
+        run: scripts/ci/package_smoke.sh native wasm-gc
+
+  # The one check to require in the branch protection of `main`.
+  required:
+    if: always()
+    needs: [check, goldens, unit, stages, package]
+    runs-on: ubuntu-latest
+    steps:
+      - name: All jobs succeeded
+        env:
+          RESULTS: ${{ toJSON(needs.*.result) }}
+        run: |
+          echo "$RESULTS"
+          [ "$(jq -r 'map(select(. != "success")) | length' <<< "$RESULTS")" = 0 ]
