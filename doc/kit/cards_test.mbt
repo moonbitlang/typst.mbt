@@ -766,9 +766,22 @@ test "cards: with a radius a column cannot be auto" {
     errors(auto),
     content="`Cards` with a `radius` cannot have an `Auto` column: its rows are measured one by one, and an `auto` column is as wide as the widest card of all rows",
   )
-  inspect(error_place(auto), content="Cards call")
+  inspect(error_place(auto), content="Cards a1")
   assert_eq(error_origin(auto).start_line, line)
-  // (No tracks are one `auto` column for the engine.)
+  // (No tracks are one `auto` column for the engine; `auto + none` is
+  // `auto`.)
+  assert_eq(
+    errors(
+      compile([
+        @kit.Cards(
+          ["a"],
+          columns=[Rel(Sum(None, Sum(Auto, None)))],
+          radius=round,
+        ),
+      ]),
+    ),
+    errors(auto),
+  )
   assert_eq(
     errors(compile([@kit.Cards(["a"], columns=[], radius=round)])),
     errors(auto),
@@ -789,6 +802,64 @@ test "cards: with a radius a column cannot be auto" {
       #|p1 22.6,10.0 31.4x14.6
     ),
   )
+}
+
+///|
+test "cards: rules of the document for grids, and the caller's arrays" {
+  let two = ["One.", "Two has more words than fit one line of a card."]
+  let build = (radius : Corners[@doc.Length]?) => {
+    @kit.Cards(
+      [..items(two), ..items(two)],
+      columns=[Fr(1), Fr(1)],
+      fill=Luma(230),
+      radius?,
+    )
+  }
+  // An inset that the document sets for grids, here one that depends on
+  // the row: without a radius it is the inset of the cards (they are
+  // cells);
+  let by_row : Cells[Sides[@doc.Length]] = Cells((_, y) => {
+    if y == 0 {
+      Sides::zero()
+    } else {
+      Sides(all=Pt(20))
+    }
+  })
+  let setup = page(height=Pt(400))
+  let ruled = (radius : Corners[@doc.Length]?) => {
+    compile(setup~, [Seq([@doc.SetGrid(inset=by_row), build(radius)])])
+  }
+  let plain = (radius : Corners[@doc.Length]?) => {
+    compile(setup~, [build(radius)])
+  }
+  inspect(errors(ruled(None)) + errors(ruled(Some(round))), content="")
+  assert_true(cards(ruled(None)) != cards(plain(None)))
+  // with one the grid only places the blocks, and has no inset: the cards
+  // are what they are without the rule, and every row has the height that
+  // was measured for it.
+  assert_eq(cards(ruled(Some(round))), cards(plain(Some(round))))
+  // The description is what it was built from: the arrays of the caller
+  // can change afterwards.
+  let tracks : Array[Sizing] = [Fr(1), Fr(1)]
+  let gutter : Array[Sizing] = [Pt(4)]
+  for radius in [None, Some(round)] {
+    let before = compile([
+      @kit.Cards(items(two), columns=[Fr(1), Fr(1)], gutter=[Pt(4)], radius?),
+    ])
+    let built = @kit.Cards(items(two), columns=tracks, gutter~, radius?)
+    tracks[0] = None
+    tracks.push(Fr(1))
+    gutter[0] = Pt(40)
+    let after = compile([built])
+    tracks[0] = Fr(1)
+    tracks.pop() |> ignore
+    gutter[0] = Pt(4)
+    assert_eq(errors(after), "")
+    let texts = (report : @doc.CompileReport[@layout.PagedDocument]) => {
+      marks(report).map(m => "\{m.text} \{pt(m.x)},\{pt(m.y)}").join("\n")
+    }
+    assert_eq(texts(after), texts(before))
+  }
 }
 
 ///|

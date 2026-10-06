@@ -49,8 +49,13 @@ let kit_typ : String =
   #|      ..items.map(item => grid.cell(..look, item)),
   #|    )
   #|  }
+  #|  // The rows are measured one by one, which an `auto` column forbids.
+  #|  assert(
+  #|    columns.len() > 0 and auto not in columns,
+  #|    message: "`Cards` with a `radius` cannot have an `Auto` column: its rows are measured one by one, and an `auto` column is as wide as the widest card of all rows",
+  #|  )
   #|  // A card as a block: what is measured (without a height) and what is
-  #|  // placed (with the height of its row).
+  #|  // placed (with the height of its row). The grid only places them.
   #|  let card(item, ..size) = block(
   #|    width: 100%,
   #|    ..size,
@@ -66,6 +71,7 @@ let kit_typ : String =
   #|      // The row, as the grid lays it out at the width of the region.
   #|      let probe = grid(
   #|        columns: columns,
+  #|        inset: 0pt,
   #|        ..pick("gutter", "column-gutter"),
   #|        ..row.map(item => card(item, breakable: false)),
   #|      )
@@ -84,6 +90,7 @@ let kit_typ : String =
   #|    }
   #|    grid(
   #|      columns: columns,
+  #|      inset: 0pt,
   #|      ..pick("gutter", "column-gutter", "row-gutter"),
   #|      ..cells,
   #|    )
@@ -183,6 +190,8 @@ pub fn kit() -> Array[Twin] {
         // In a container, and the same cards used twice.
         "#pad(x: 20pt, cards(columns: (1fr, 1fr), gutter: (4pt,), stroke: 0.5pt + luma(120), radius: 4pt, [#\"padded\"], [#\"cards in a narrower region\"]))",
         "#let twice = cards(fill: luma(230), radius: 2pt, inset: 2pt, [#\"used\"], [#\"twice, in two places\"]);#twice#twice",
+        // An inset that the document sets for grids is not the cards'.
+        "#[#set grid(inset: 5pt);#cards(fill: luma(230), radius: 2pt, [#\"set\"], [#\"rule\"])]",
       ],
       () => {
         let twice = @kit.Cards(
@@ -240,6 +249,14 @@ pub fn kit() -> Array[Twin] {
           Value::none(),
           twice,
           twice,
+          Seq([
+            SetGrid(inset=Cells::all(Sides(all=Pt(5)))),
+            @kit.Cards(
+              ["set", "rule"],
+              fill=Luma(230),
+              radius=Corners(all=Pt(2)),
+            ),
+          ]),
         ])
       },
     ),

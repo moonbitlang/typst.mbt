@@ -45,7 +45,14 @@
 /// - A column cannot be `Auto` (nor `columns` be empty, which is one `auto`
 ///   column for the engine): an `auto` column is as wide as the widest card
 ///   of all its rows, which a row that is measured alone does not know. It
-///   is an error at the call.
+///   is an error at `columns`.
+/// - The grid only places the blocks: its cells have no inset, whatever
+///   the document sets for grids (`SetGrid(inset=..)` is the inset of the
+///   cards without a radius; with one, it is `SetBlock`'s or `inset`).
+/// - A row is measured as the first row of a grid. A rule of the document
+///   that depends on the row of a cell (`show grid.cell.where(y: 1): ..`)
+///   does not reach the measurement of the later rows, and can make a card
+///   higher than was measured.
 ///
 /// Parameters, with the names and types of `Grid` and of `GridCell` and
 /// `Block`:
@@ -76,10 +83,36 @@ pub struct Cards {
 }
 
 ///|
+/// What the engine makes of a length, as far as it matters for a track.
+priv enum Evaluated {
+  IsAuto
+  IsNone
+  Other
+}
+
+///|
+/// What a length evaluates to. Typst adds `none` as nothing, so
+/// `auto + none` is `auto`; every other operation on `auto` or `none` is an
+/// error or a length.
+fn evaluated(length : @doc.Length) -> Evaluated {
+  match length {
+    Auto => IsAuto
+    None => IsNone
+    Sum(a, b) =>
+      match (evaluated(a), evaluated(b)) {
+        (IsNone, other) | (other, IsNone) => other
+        _ => Other
+      }
+    _ => Other
+  }
+}
+
+///|
 /// Whether a track is `auto`.
 fn is_auto(track : @doc.Sizing) -> Bool {
   match track {
-    Auto | Rel(Auto) => true
+    Auto => true
+    Rel(length) => evaluated(length) is IsAuto
     _ => false
   }
 }
@@ -106,11 +139,16 @@ priv struct Call {
 
 ///|
 /// The grid of the cards, or of one row of them (`rows=false`: without the
-/// gutter between rows).
+/// gutter between rows). `blocks`: the cards are blocks in its cells, and
+/// the cells have no inset, whatever the document sets for grids: the
+/// look is the blocks', and an inset that depends on the row would not be
+/// the same where a row is measured, as the first row of a grid, and where
+/// it is placed.
 fn Call::grid(
   self : Call,
   cells : Array[&@doc.IntoContent],
   rows~ : Bool,
+  blocks~ : Bool,
 ) -> @doc.Grid {
   let site = self.site
   @doc.Grid(
@@ -119,6 +157,7 @@ fn Call::grid(
     gutter?=site.arg(2, self.gutter),
     column_gutter?=site.arg(3, self.column_gutter),
     row_gutter?=if rows { site.arg(4, self.row_gutter) } else { None },
+    inset?=if blocks { Some(@doc.Cells::all(@doc.Sides::zero())) } else { None },
   )
 }
 
@@ -186,7 +225,7 @@ fn Call::measured(
       for k in start..<end {
         row.push(self.block(k, radius, breakable=false))
       }
-      let row = self.grid(row, rows=false)
+      let row = self.grid(row, rows=false, blocks=true)
       let height = if size.width.is_inf() {
         cx.measure(row).height
       } else {
@@ -204,7 +243,7 @@ fn Call::measured(
       }
       start = end
     }
-    self.grid(cells, rows=true)
+    self.grid(cells, rows=true, blocks=true)
   })
 }
 
@@ -227,14 +266,16 @@ pub fn Cards::Cards(
     let call : Call = {
       site,
       items: items.map(item => @doc.Content(item)),
+      // (Copies: a description does not change when the caller's arrays
+      // do, and the callback of the second form reads them later.)
       tracks: match columns {
-        Some(columns) => columns
+        Some(columns) => columns.copy()
         // One row of equally wide cards.
         None => @doc.Sizing::repeat(items.length(), size=Fr(1))
       },
-      gutter,
-      column_gutter,
-      row_gutter,
+      gutter: gutter.map(tracks => tracks.copy()),
+      column_gutter: column_gutter.map(tracks => tracks.copy()),
+      row_gutter: row_gutter.map(tracks => tracks.copy()),
       fill,
       stroke,
       inset,
@@ -245,11 +286,12 @@ pub fn Cards::Cards(
       for k in 0..<items.length() {
         cells.push(call.cell(k))
       }
-      return @doc.Content(call.grid(cells, rows=true))
+      return @doc.Content(call.grid(cells, rows=true, blocks=false))
     }
     if call.tracks.is_empty() || call.tracks.iter().any(is_auto) {
       return site.invalid(
         "`Cards` with a `radius` cannot have an `Auto` column: its rows are measured one by one, and an `auto` column is as wide as the widest card of all rows",
+        arg=1,
       )
     }
     @doc.Content(call.measured(radius))

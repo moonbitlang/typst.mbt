@@ -42,12 +42,18 @@
 //      the same keys, built by one function;
 //    - sizes are not computed by hand: a row is measured as a row of the
 //      grid that places it, at the width that `Layout` gives, so tracks
-//      and gutters are resolved by the engine in both.
+//      and gutters are resolved by the engine in both;
+//    - what is measured must be laid out under the same styles and
+//      properties as what is placed: a property of a primitive that only
+//      places (the inset of the grid's cells) is given explicitly, so
+//      that a rule of the document cannot make the two differ.
 //
 // 5. Invalid arguments. Constructors do not raise. An argument that the
-//    element cannot accept is `site.invalid(message)`: an error at the
-//    call when the document is compiled. What the engine rejects (a value
-//    of the wrong kind) is the engine's error, at the argument.
+//    element cannot accept is `site.invalid(message, arg=i)`: an error at
+//    that argument when the document is compiled. What the engine rejects
+//    (a value of the wrong kind) is the engine's error, at the argument.
+//    The caller's arrays are copied: a description does not change with
+//    them.
 //
 // 6. Twin. An element has a functional Typst twin: a Typst function with
 //    the same expansion (`doc/twins/kit.mbt`), and documents that use both

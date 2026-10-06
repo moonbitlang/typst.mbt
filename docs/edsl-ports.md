@@ -444,7 +444,7 @@ pub fn Composite::Composite(name : String, loc : SourceLoc, args_loc : ArgsLoc,
   build : (CompositeSite) -> &IntoContent) -> Composite
 #callsite(autofill(loc))
 pub fn[T] CompositeSite::arg(self, param : Int, value : T, loc~ : SourceLoc) -> T
-pub fn CompositeSite::invalid(self, message : String) -> Content
+pub fn CompositeSite::invalid(self, message : String, arg? : Int) -> Content
 ```
 
 What the section left open, and how it is decided:
@@ -471,11 +471,16 @@ What the section left open, and how it is decided:
   parameters (`Seq([site.arg(0, a), site.arg(1, b)])`: a `Seq` per
   argument marks each). A wrong index is not detected: an element tests
   every argument that it passes on (convention 7 below).
-- The result of `build` is an argument in the same sense
-  (`site => site.arg(0, body)`), and the composite is a node of the
+- The result of `build` is not an argument of a constructor, so a string
+  of the caller that is the whole result is the call; in a constructor it
+  is an argument (`Seq([site.arg(0, body)])`). (A first version gave the
+  result the marks that no constructor had taken; a mark of a value that
+  was only bound to a name then attributed an unrelated result to that
+  argument, which the review found.) The composite is a node of the
   description (`NComposite`) that lowers to its body and is transparent
-  for what reads descriptions (inserted expressions, the lint of adjacent
-  text, `Para`'s blocks); `Debug` prints its name around its expansion.
+  for what reads descriptions (inserted expressions, a rule in a
+  sequence, a value in a content argument, the lint of adjacent text,
+  `Para`'s blocks); `Debug` prints its name around its expansion.
 - What origins report is the composite's name (`Origin.kind`), the call,
   and the argument where one is marked; under the keys of the enclosing
   `Keyed`, as for any constructor.
@@ -484,24 +489,29 @@ What the section left open, and how it is decided:
   outer parameters that its arguments were marked as, and what it generates
   is the outer call. One rule, no case of its own.
 - Callbacks: the section had the element call the hook again inside its
-  callback. It is automatic instead: a callback that is created while a
-  `build` runs is a part of that `build` (`Callback::new` wraps it), so
-  when the engine calls it the constructors that it runs are the
-  composite's, `cx.measure(..)` included, and `site.arg` marks their
-  arguments. Revision 8 already gives an invocation its occurrence and
-  keys without the callback's author doing anything (section 11.2); the
-  site of a composite is one more thing of that kind, and an element
-  cannot forget it. A callback description that is created while a
-  callback runs is still the error of the creation rule, at the call of
-  the element; an element without a callback can be built anywhere.
+  callback. It is automatic instead: a callback runs where it was created
+  (`Callback::new` captures the running `build`, or that there is none).
+  One that a `build` creates is a part of it, so when the engine calls it
+  the constructors that it runs are the composite's, `cx.measure(..)`
+  included, and `site.arg` marks their arguments. One of the caller runs
+  as the caller's, also when the engine calls it while a callback of an
+  element is running (the element measures content that has a `Context`
+  in it; the review found that it ran as the element's). Revision 8
+  already gives an invocation its occurrence and keys without the
+  callback's author doing anything (section 11.2); the site of a
+  composite is one more thing of that kind, and an element cannot forget
+  it. A callback description that is created while a callback runs is
+  still the error of the creation rule, at the call of the element; an
+  element without a callback can be built anywhere.
 - The `into_content` of a type of the caller runs when the value is passed
   to a constructor, which is inside `build`. It is the caller's code, so
   `doc` converts content outside of the running `build` (`described`): what
   it builds keeps its own call sites. A function of the caller that `build`
   calls is not covered: an element that takes one calls it before the
   hook.
-- An argument that an element cannot accept is `site.invalid(message)`, an
-  error at the call (constructors do not raise).
+- An argument that an element cannot accept is
+  `site.invalid(message, arg=i)`, an error at that argument, or at the
+  call without `arg` (constructors do not raise).
 
 Each rule has its test in `doc/composite_test.mbt`: the index mismatch of
 the third review (written first; on a hook that only substituted the
@@ -509,8 +519,9 @@ composite's call it failed with the gutter's error at the fill, `Tiles a3`
 for `Tiles a2`), one site and the expansion, the caller's descriptions and
 custom types, a click, a selection with tiers 1 to 3 and `positions`, keys
 of the caller and of the element, one description used twice, a composite
-in a composite, callbacks (provenance of their content, a result that is
-an argument, an error, the creation rule), where a mark counts, the lint.
+in a composite, callbacks (provenance of their content, a callback of the
+caller inside a measuring element, an error, the creation rule), where a
+mark counts, an element that is a rule or a value, the lint.
 
 **The package** `doc/kit` imports `doc` and core only; it is in the
 published package (`.moonignore` leaves it in). Its conventions are in
@@ -532,9 +543,11 @@ published package (`.moonignore` leaves it in). Its conventions are in
    at a page break. In the callback: the caller's content was converted in
    `build`; what is measured and what is placed are the same descriptions
    under the same keys, from one function; sizes are not computed by hand
-   (a row is measured as a row of the grid that places it).
+   (a row is measured as a row of the grid that places it); a property of
+   a primitive that only places is given explicitly, so that a rule of
+   the document cannot make what is measured differ from what is placed.
 5. Invalid arguments are `site.invalid`; what the engine rejects is the
-   engine's error at the argument.
+   engine's error at the argument. The caller's arrays are copied.
 6. Its twin is a Typst function with the same expansion, which passes on
    only the arguments it was given; documents that use both are pairs of
    the `edsl` stage.
@@ -572,10 +585,16 @@ with its index.
     and in the placement alike. The cards are the same boxes as without a
     radius (tested on the page, in a block with an inset, a grid cell, a
     pad and columns);
-  - an `Auto` column is an error at the call: it is as wide as the widest
-    card of all rows, which a row measured alone does not know, and a
-    card that is measured wider than it is placed would run out of its
-    height;
+  - an `Auto` column is an error at `columns`: it is as wide as the
+    widest card of all rows, which a row measured alone does not know,
+    and a card that is measured wider than it is placed would run out of
+    its height;
+  - the grid of the blocks has `inset=0pt` explicitly: the look is the
+    blocks', and a `set grid(inset: ..)` of the document, which may depend
+    on the row, would otherwise differ between the measured first row and
+    the placed one. A rule that depends on the row of a cell in another
+    way (`show grid.cell.where(y: 1): ..`) is not covered, and the
+    documentation says so;
   - an unbounded width: the rows are measured without a width, as the
     grid is laid out there (fractional tracks have no width in an
     unbounded region, with or without a radius);

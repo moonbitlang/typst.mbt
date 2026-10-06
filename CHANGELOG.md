@@ -194,7 +194,8 @@ upstream) for `Decimal`, `HtmlAttr`, `HtmlTag`, `Location`, `PdfStandards`,
   one constructor call. The constructors that run in `build` (and in the
   callbacks that it creates) are the call of the composite;
   `site.arg(i, v)` marks an argument of a constructor as the caller's
-  argument `i`; `site.invalid(message)` is an error at the call.
+  argument `i`; `site.invalid(message, arg?)` is an error at an argument or
+  at the call.
 - `doc/kit`, a new package on `doc` only: elements that are not one Typst
   element. Its first is `Cards(items, columns?, gutter?, column_gutter?,
   row_gutter?, fill?, stroke?, inset?, radius?)`: cards in rows, the cards
