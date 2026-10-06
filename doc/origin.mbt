@@ -91,6 +91,33 @@ priv struct Registry {
   /// it.
   dir : String
   origins : @syntax.FileId
+  /// The blocks and boxes that were lowered with a size of their own, by
+  /// the location of their call, and for the location of every call the
+  /// containers that it was lowered in (`Container`).
+  containers : Array[Container]
+  container_index : Map[String, Int]
+  inside : Map[String, Array[Int]]
+}
+
+///|
+/// A `block` or `box` that was called with a width or a height, for the
+/// lint of content outside a container of a fixed size (`lint_frames.mbt`).
+/// The frames do not say which frame is whose, or whether its size was
+/// given: lowering notes what the EDSL knows, which is the size that a
+/// call was made with and what was lowered inside its arguments.
+///
+/// A container is a location (a call site): a description that is lowered
+/// several times, in a callback or under several keys, is one container
+/// with every size that it had.
+priv struct Container {
+  /// The entry of the call that was lowered first.
+  entry : Int
+  /// The call's location (`Entry::loc`).
+  loc : String
+  /// The sizes that the call had: its width and its height where they are
+  /// absolute lengths (`None`: `auto`, or relative to something). Only
+  /// sizes with at least one of them.
+  sizes : Array[(@library.Abs?, @library.Abs?)]
 }
 
 ///|
@@ -112,6 +139,79 @@ fn Registry::new(dir? : String = "") -> Registry {
     snippets: [],
     snippet_index: {},
     source: None,
+    containers: [],
+    container_index: {},
+    inside: {},
+  }
+}
+
+///|
+/// The container of the call with the entry `entry`, registered on first
+/// use. What its own call draws is inside it, too (a plain string as its
+/// body has the origin of that argument).
+fn Registry::container(self : Registry, entry : Int) -> Int {
+  let loc = self.entries[entry].loc
+  match self.container_index.get(loc) {
+    Some(id) => id
+    None => {
+      let id = self.containers.length()
+      self.containers.push({ entry, loc, sizes: [], })
+      self.container_index[loc] = id
+      self.note_inside(entry, [id])
+      id
+    }
+  }
+}
+
+///|
+/// Note that the call with the entry `entry` was lowered inside the
+/// arguments of the containers `containers`.
+fn Registry::note_inside(
+  self : Registry,
+  entry : Int,
+  containers : Array[Int],
+) -> Unit {
+  let loc = self.entries[entry].loc
+  match self.inside.get(loc) {
+    Some(noted) =>
+      for id in containers {
+        if !noted.contains(id) {
+          noted.push(id)
+        }
+      }
+    None => self.inside[loc] = containers.copy()
+  }
+}
+
+///|
+/// The length of the field `name` of an element if it was given as an
+/// absolute length: not `auto`, a fraction, or a length with a part in em
+/// or in per cent.
+fn fixed_length(content : @library.Content, name : String) -> @library.Abs? {
+  let value = content.get_by_name(name) catch { _ => return None }
+  let length = match value {
+    Length(length) => length
+    Relative(rel) if rel.rel.is_zero() => rel.abs
+    _ => return None
+  }
+  guard length.em.is_zero() && length.abs.is_finite() else { return None }
+  Some(length.abs)
+}
+
+///|
+/// Note the size that the container `id` was called with: `value` is what
+/// its call returned.
+fn Registry::note_size(
+  self : Registry,
+  id : Int,
+  value : @library.Value,
+) -> Unit {
+  guard value is Content(content) else { return }
+  let size = (fixed_length(content, "width"), fixed_length(content, "height"))
+  guard size.0 is Some(_) || size.1 is Some(_) else { return }
+  let sizes = self.containers[id].sizes
+  if !sizes.contains(size) {
+    sizes.push(size)
   }
 }
 
@@ -490,6 +590,10 @@ pub struct Origins {
   priv snippets : Array[Snippet]
   /// The file of the origin listing.
   priv file : @syntax.FileId
+  /// The containers of a fixed size, and per entry those that its call
+  /// was lowered in (`Container`).
+  priv containers : Array[Container]
+  priv inside : Array[Array[Int]]
 }
 
 ///|
@@ -513,6 +617,17 @@ fn Registry::freeze(self : Registry) -> Origins {
       source: None,
     }),
     file: self.origins,
+    containers: self.containers.map(c => {
+      entry: c.entry,
+      loc: c.loc,
+      sizes: c.sizes.copy(),
+    }),
+    inside: self.entries.map(e => {
+      match self.inside.get(e.loc) {
+        Some(noted) => noted.copy()
+        None => []
+      }
+    }),
   }
 }
 
@@ -654,6 +769,41 @@ pub fn Origins::resolve_range(
     }
     Detached => None
   }
+}
+
+///|
+/// The entry that an engine span refers to and whether the span is one of
+/// its arguments, without building the origin: for the checks that look
+/// at every item of a document.
+fn Origins::entry_of(self : Origins, span : @syntax.Span) -> (Int, Bool)? {
+  match @syntax.DiagSpan::from_span(span).get() {
+    Range(id~, start~, end~) =>
+      if id == self.file {
+        guard self.entry_at(start) is Some(entry) else { return None }
+        for arg in self.entries[entry].args {
+          if arg is Some((_, s, t)) && s <= start && start < end && end <= t {
+            return Some((entry, true))
+          }
+        }
+        Some((entry, false))
+      } else {
+        self.snippet_entry(id)
+      }
+    Number(id~, ..) => self.snippet_entry(id)
+    Detached => None
+  }
+}
+
+///|
+/// The entry of the `Markup` or `Equation` call whose source is the file
+/// `id`: what is in the source is in its source argument.
+fn Origins::snippet_entry(self : Origins, id : @syntax.FileId) -> (Int, Bool)? {
+  for snippet in self.snippets {
+    if snippet.id == id {
+      return Some((snippet.entry, true))
+    }
+  }
+  None
 }
 
 ///|

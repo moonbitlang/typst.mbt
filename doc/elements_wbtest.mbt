@@ -18,6 +18,7 @@ fn test_lower() -> Lowering {
     context: @library.Context::none(),
     keys: [],
     pieces: Option::None,
+    containers: [],
   }
 }
 

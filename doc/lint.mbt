@@ -5,8 +5,8 @@
 // in `lints`; `lints=false` on `compile*` turns them off.
 //
 // Here: the shape of a lint, and L1, adjacent inline items, which reads
-// the description tree. The lints of section 6 that read the frames (L2,
-// L3) and L4 are later steps.
+// the description tree. The lints that read the laid-out pages (L2 and
+// L3) are in `lint_frames.mbt`; L4 is a later step.
 
 ///|
 /// What a lint checks. Later checks add cases: a `match` on the kind
@@ -16,6 +16,19 @@ pub(all) enum LintKind {
   /// (two `Prose`, or any text where the array also holds a block): the
   /// two are typeset as one paragraph with nothing between them.
   AdjacentInline
+  /// L2: a character that no font has a glyph for. It is drawn as the
+  /// glyph that the font has for a missing character (usually an empty
+  /// box). From the pages of a paged compilation.
+  MissingGlyph
+  /// L3: text, a shape or an image that leaves the page (with its bleed)
+  /// by more than a point. From the pages of a paged compilation.
+  OutsidePage
+  /// L3: text, a shape or an image that leaves the `Block` or `Box` that
+  /// it is in by more than a point, where that was built with a width or
+  /// a height in absolute units (also by an element that is built from
+  /// one, like the kit's `Canvas`). From the pages of a paged
+  /// compilation.
+  OutsideContainer
 } derive(Eq)
 
 ///|
@@ -28,6 +41,9 @@ pub extend LintKind with Eq::{not_equal, equal}
 pub fn LintKind::name(self : LintKind) -> String {
   match self {
     AdjacentInline => "adjacent-inline"
+    MissingGlyph => "missing-glyph"
+    OutsidePage => "outside-page"
+    OutsideContainer => "outside-container"
   }
 }
 
@@ -43,13 +59,21 @@ pub struct Lint {
   /// origin that the review loop gives for that text on the page, so
   /// `ReviewText::origin_positions` finds its boxes (there are none if
   /// all of a `Prose` is interpolated descriptions, which have origins of
-  /// their own). `None` if a lint cannot name a place.
+  /// their own). For the lints of the pages the call that made what was
+  /// found: the origin of the glyph, the shape or the image, or, for what
+  /// the engine made without a source location (the marker of a list
+  /// item, a decoration), of the element that it is part of. `None` if a
+  /// lint cannot name a place.
   location : Location?
+  /// For the lints of the pages: the page (from 1) of the finding, the
+  /// first if there are several. `None` for the lints of the description
+  /// tree.
+  page : Int?
 }
 
 ///|
-/// The lint as text: its kind and message, its location and its hints,
-/// in the form of `Diagnostic::render`.
+/// The lint as text: its kind and message, its location, its page and
+/// its hints, in the form of `Diagnostic::render`.
 pub fn Lint::render(self : Lint) -> String {
   let out = StringBuilder()
   out.write_string("lint[")
@@ -59,6 +83,9 @@ pub fn Lint::render(self : Lint) -> String {
   if self.location is Some(location) {
     out.write_string("\n  at ")
     out.write_string(location.describe())
+  }
+  if self.page is Some(page) {
+    out.write_string("\n  on page \{page}")
   }
   for hint in self.hints {
     out.write_string("\n  hint: ")
@@ -509,6 +536,7 @@ fn Linter::adjacent(
         },
       ],
       location: Some(Edsl(second)),
+      page: Option::None,
     })
   }
 }

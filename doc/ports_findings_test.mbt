@@ -360,10 +360,15 @@ test "S2a: a fixed-height block that is split at a page break does not hold its 
   let last = of_kind(all, "text")[4]
   assert_eq(last.page, part.page)
   assert_true(last.y > part.y + part.h)
+  // Not reported: neither part is a frame of the block's size, so the
+  // lint of containers (L3) does not know them as the block (and nothing
+  // is outside the page).
+  inspect(page_lints(whole), content="")
+  inspect(page_lints(split), content="")
 }
 
 ///|
-test "S2b: a block or a box with a fixed height does not grow" {
+test "S2b: a block or a box with a fixed height does not grow, which a lint reports" {
   let words = "one two three four five six seven eight nine ten eleven twelve"
   let block = compile(
     [
@@ -400,6 +405,24 @@ test "S2b: a block or a box with a fixed height does not grow" {
     let below = of_kind(all, "text").filter(line => line.y > frame.y + frame.h)
     assert_eq(below.length(), 2)
   }
+  // Reported (lint L3, `OutsideContainer`): the two lines, at the text,
+  // with the container in the first hint.
+  inspect(
+    page_lints(block),
+    content=(
+      #|outside-container (Block, argument 1) p1: text leaves its container (Block, 80pt by 20pt) at the bottom by 25.8pt (the farthest of 2)
+    ),
+  )
+  inspect(
+    page_lints(box),
+    content=(
+      #|outside-container (Box, argument 1) p1: text leaves its container (Box, 80pt by 20pt) at the bottom by 25.8pt (the farthest of 2)
+    ),
+  )
+  guard block.lints[0].hints[0].location is Some(Edsl(container)) else {
+    fail("no container")
+  }
+  inspect(what(container), content="(Block)")
 }
 
 ///|
@@ -438,7 +461,7 @@ test "S3: `Block(height=Pct(100))` in a grid cell takes the height of the region
 }
 
 ///|
-test "S4: a character no font covers is glyph 0, without a warning" {
+test "S4: a character no font covers is glyph 0, without a warning: a lint reports it" {
   // The embedded fonts have no CJK glyphs.
   let report = compile([..small_page(), "ab\u{4e2d}cd"])
   inspect(error_messages(report), content="")
@@ -452,8 +475,16 @@ test "S4: a character no font covers is glyph 0, without a warning" {
       #|"ab" 66,67 | "中" 0 | "cd" 68,69
     ),
   )
-  // A font family that does not exist is reported; a glyph that does not
-  // exist is not.
+  // Reported (lint L2, `MissingGlyph`), at the argument that has the
+  // character.
+  inspect(
+    page_lints(report),
+    content=(
+      #|missing-glyph (Document, argument 1) p1: no font has a glyph for "中" (U+4E2D): it is drawn as the missing glyph of Libertinus Serif
+    ),
+  )
+  // A font family that does not exist is the engine's warning; a glyph
+  // that does not exist is not.
   let family = compile(
     [..small_page(), @doc.Text("ab", font=["No Such Family"])],
   )
@@ -505,6 +536,9 @@ test "S5: a long word of inline raw text does not break and leaves its table cel
   let run = of_kind(all, "text")[0]
   assert_true(run.x + run.w > cells[0].x + cells[0].w)
   assert_true(run.x + run.w > cells[1].x + cells[1].w)
+  // Not reported: the word stays on the page, and a cell is no container
+  // that a lint knows (its frame is not told apart from the table's).
+  inspect(page_lints(report), content="")
   // Raw text is not hyphenated, but it breaks where text may break: at a
   // space, and so at a zero-width space (U+200B), which stays a character
   // of the run's text.

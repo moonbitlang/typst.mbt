@@ -1009,11 +1009,15 @@ pub struct Lint {
   message : String
   hints : Array[Hint]
   location : Location?
+  page : Int?
 }
 pub fn Lint::render(Self) -> String
 
 pub(all) enum LintKind {
   AdjacentInline
+  MissingGlyph
+  OutsidePage
+  OutsideContainer
 } derive(Eq)
 pub fn LintKind::name(Self) -> String
 

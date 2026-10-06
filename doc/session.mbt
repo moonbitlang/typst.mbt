@@ -130,6 +130,12 @@ fn Session::host(
       context,
       keys,
       pieces: Option::None,
+      // What a callback returns is inside the containers that the
+      // callback is in.
+      containers: match session.registry.inside.get(loc) {
+        Some(containers) => containers.copy()
+        None => []
+      },
     }
     let cx : Ctx = { lower, alive: { val: true, }, span, }
     let result = try (callback.invoke)(cx, args) catch {
