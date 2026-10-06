@@ -16,12 +16,32 @@ pub(all) enum Severity {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Severity with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Severity with @debug.Debug::{to_repr}
+
+///|
 /// The style of a label (`LabelStyle`). Ordered like upstream's derived
 /// `PartialOrd`: `Primary < Secondary`.
 pub(all) enum LabelStyle {
   Primary
   Secondary
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LabelStyle with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LabelStyle with @debug.Debug::{to_repr}
 
 ///|
 fn LabelStyle::ord(self : LabelStyle) -> Int {
@@ -85,6 +105,16 @@ pub(all) enum DisplayStyle {
   Rich
   Short
 } derive(Eq, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DisplayStyle with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DisplayStyle with @debug.Debug::{to_repr}
 
 ///|
 /// Configures how a diagnostic is rendered (`term::Config`).

@@ -57,6 +57,16 @@ pub(all) enum IntLiteralError {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend IntLiteralError with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend IntLiteralError with @debug.Debug::{to_repr}
+
+///|
 /// Try to strip a base prefix (`0x`, `0o`, `0b`) from the integer literal
 /// and return the base and the remaining digits.
 ///
@@ -134,6 +144,21 @@ pub(all) enum NumericUnit {
   /// Percentage: `%`.
   Percent
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NumericUnit with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NumericUnit with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NumericUnit with @debug.Debug::{to_repr}
 
 ///|
 /// Get the string value with resolved escape sequences.

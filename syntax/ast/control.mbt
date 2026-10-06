@@ -199,6 +199,21 @@ pub(all) enum BareImportError {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BareImportError with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BareImportError with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BareImportError with @debug.Debug::{to_repr}
+
+///|
 /// The items that ought to be imported from a file.
 pub(all) enum Imports {
   /// All items in the scope of the file should be imported.

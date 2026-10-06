@@ -4,4 +4,5 @@ import {
   "moonbitlang/core/string",
   "moonbitlang/core/int64",
   "moonbitlang/core/double",
+  "moonbitlang/core/debug",
 }

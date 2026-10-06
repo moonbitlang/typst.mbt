@@ -205,6 +205,16 @@ pub(all) enum Side {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Side with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Side with @debug.Debug::{to_repr}
+
+///|
 /// Get the rightmost non-trivia leaf before this node.
 pub fn LinkedNode::prev_leaf(self : LinkedNode) -> LinkedNode? {
   let mut node = self

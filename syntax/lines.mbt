@@ -297,6 +297,11 @@ pub impl Hash for Lines with fn hash_combine(self, hasher) {
 }
 
 ///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Lines with Hash::{hash, hash_combine}
+
+///|
 /// Create a line vector.
 fn compute_lines(text : String) -> Array[Line] {
   let lines = [{ byte_idx: 0, utf16_idx: 0, }]

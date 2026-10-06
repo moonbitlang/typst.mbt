@@ -14,6 +14,21 @@ pub(all) enum SyntaxMode {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SyntaxMode with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SyntaxMode with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SyntaxMode with @debug.Debug::{to_repr}
+
+///|
 /// A syntactical building block of a Typst file.
 ///
 /// Can be created by the lexer or by the parser.
@@ -295,6 +310,26 @@ pub(all) enum SyntaxKind {
   /// A destructuring assignment expression: `(x, y) = (1, 2)`.
   DestructAssignment
 } derive(Eq, Hash, Compare, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SyntaxKind with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SyntaxKind with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SyntaxKind with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SyntaxKind with @debug.Debug::{to_repr}
 
 ///|
 let all_kinds : ReadOnlyArray[SyntaxKind] = [
@@ -738,6 +773,11 @@ pub fn SyntaxKind::debug_name(self : SyntaxKind) -> String {
 pub impl Show for SyntaxKind with fn output(self, logger) {
   logger.write_string(self.debug_name())
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SyntaxKind with Show::{to_string, output}
 
 ///|
 /// Is this a bracket, brace, or parenthesis?

@@ -7,6 +7,11 @@ pub(all) struct SyntaxSet {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SyntaxSet with Eq::{not_equal, equal}
+
+///|
 pub fn SyntaxSet::new() -> SyntaxSet {
   { a: 0, b: 0, c: 0, }
 }
