@@ -57,7 +57,7 @@ fn convert_xml(buf : StringBuilder, node : @xml.Node) -> Unit {
     return
   }
   buf.write_string("{\"namespace\":")
-  match node.tag_name().namespace() {
+  match node.tag_name().namespace_() {
     Some(ns) => json_str(buf, ns)
     None => buf.write_string("null")
   }
@@ -160,7 +160,7 @@ test "typst suite: xml" {
   let data = children[0]
   assert_true(data.is_element())
   assert_eq(data.tag_name().name(), "data")
-  assert_eq(data.tag_name().namespace(), None)
+  assert_eq(data.tag_name().namespace_(), None)
   let kids = data.children()
   assert_eq(kids.length(), 5)
   assert_true(kids[0].is_text())
@@ -171,7 +171,7 @@ test "typst suite: xml" {
   assert_eq(attrs.length(), 1)
   assert_eq(attrs[0].name(), "name")
   assert_eq(attrs[0].value(), "hi")
-  assert_eq(attrs[0].namespace(), None)
+  assert_eq(attrs[0].namespace_(), None)
   assert_eq(hello.text(), Some("1"))
   assert_eq(hello.attribute("name"), Some("hi"))
   assert_eq(kids[4].text(), Some("\n"))
@@ -212,7 +212,7 @@ test "node kinds and text" {
   assert_true(top[0].is_comment())
   assert_eq(top[0].text(), Some("top"))
   assert_eq(top[0].tag_name().name(), "")
-  assert_eq(top[0].tag_name().namespace(), None)
+  assert_eq(top[0].tag_name().namespace_(), None)
   assert_true(top[1].is_pi())
   assert_eq(top[1].text(), None)
   assert_eq(top[1].pi(), Some({ target: "t", value: Some("v"), }))
@@ -363,12 +363,12 @@ test "namespaces api" {
     "<x:a xmlns:x='urn:x' xmlns='urn:d' x:p='1' q='2' xml:lang='en'><b xmlns:y='urn:y'/></x:a>",
   )
   let a = doc.root_element()
-  assert_eq(a.tag_name().namespace(), Some("urn:x"))
+  assert_eq(a.tag_name().namespace_(), Some("urn:x"))
   assert_eq(a.tag_name().name(), "a")
   assert_eq("\{a.tag_name()}", "{urn:x}a")
   let attrs = a.attributes()
   assert_eq(attrs.map(fn(at) { at.name() }), ["p", "q", "lang"])
-  assert_eq(attrs.map(fn(at) { at.namespace() }), [
+  assert_eq(attrs.map(fn(at) { at.namespace_() }), [
     Some("urn:x"),
     None,
     Some(@xml.NS_XML_URI),
@@ -390,7 +390,7 @@ test "namespaces api" {
   assert_true(a.has_tag_name("a", ns="urn:x"))
   assert_true(!a.has_tag_name("a", ns="urn:d"))
   let b = a.first_child().unwrap()
-  assert_eq(b.tag_name().namespace(), Some("urn:d"))
+  assert_eq(b.tag_name().namespace_(), Some("urn:d"))
   // Child namespaces: own declarations first, then inherited ones.
   assert_eq(b.namespaces().map(fn(ns) { (ns.name(), ns.uri()) }), [
     (Some("y"), "urn:y"),

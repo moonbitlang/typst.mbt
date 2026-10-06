@@ -53,7 +53,7 @@ pub struct Attribute {
   // private fields
 }
 pub fn Attribute::name(Self) -> String
-pub fn Attribute::namespace(Self) -> String?
+pub fn Attribute::namespace_(Self) -> String?
 pub fn Attribute::range(Self) -> (Int, Int)
 pub fn Attribute::range_qname(Self) -> (Int, Int)
 pub fn Attribute::range_value(Self) -> (Int, Int)
@@ -77,7 +77,7 @@ pub(all) struct ExpandedName {
   name : String
 } derive(Eq)
 pub fn ExpandedName::name(Self) -> String
-pub fn ExpandedName::namespace(Self) -> String?
+pub fn ExpandedName::namespace_(Self) -> String?
 pub impl Show for ExpandedName
 
 pub struct Namespace {

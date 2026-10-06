@@ -79,7 +79,7 @@ pub fn SystemPackages::latest_version(
   self : SystemPackages,
   spec : @syntax.VersionlessPackageSpec,
 ) -> @syntax.PackageVersion raise StrError {
-  if spec.namespace == universe_namespace {
+  if spec.namespace_ == universe_namespace {
     // Upstream downloads the package index of Typst Universe here.
     raise StrError(
       "failed to fetch package index (downloading packages is not supported by this build)",
@@ -148,7 +148,7 @@ pub fn FsPackages::obtain(
   self : FsPackages,
   spec : @syntax.PackageSpec,
 ) -> FsRoot? {
-  let subdir = "\{spec.namespace}/\{spec.name}/\{spec.version}"
+  let subdir = "\{spec.namespace_}/\{spec.name}/\{spec.version}"
   let dir = @platform.join(self.path(), subdir)
   if @platform.exists(dir) {
     Some(FsRoot::new(dir))
@@ -164,7 +164,7 @@ pub fn FsPackages::latest_version(
   self : FsPackages,
   spec : @syntax.VersionlessPackageSpec,
 ) -> @syntax.PackageVersion? {
-  let subdir = "\{spec.namespace}/\{spec.name}"
+  let subdir = "\{spec.namespace_}/\{spec.name}"
   let entries = @platform.read_dir(@platform.join(self.path(), subdir)) catch {
     _ => return None
   }

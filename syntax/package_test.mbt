@@ -143,9 +143,9 @@ test "package manifest" {
     Ok(m) => m
     Err(e) => fail(e)
   }
-  assert_eq(manifest.package.entrypoint, "lib.typ")
-  assert_eq(manifest.package.authors, ["A", "Bé"])
-  assert_eq(manifest.package.unknown_fields, ["extra"])
+  assert_eq(manifest.package_.entrypoint, "lib.typ")
+  assert_eq(manifest.package_.authors, ["A", "Bé"])
+  assert_eq(manifest.package_.unknown_fields, ["extra"])
   assert_eq(manifest.tool.sections, ["my-tool"])
   assert_eq(
     manifest.validate(spec),
@@ -157,4 +157,14 @@ test "package manifest" {
     "[package]\nname = 1\nversion = \"0.1.0\"\nentrypoint = \"a\"",
   )
   assert_true(wrong is Err("invalid type: integer `1`, expected a string"))
+}
+
+///|
+/// Upstream `{:?}` of a package spec is its `Display` form (package.rs:256,
+/// :302), also inside other values.
+test "package spec debug" {
+  guard! @syntax.PackageSpec::from_str("@preview/foo:0.1.0") is Ok(spec)
+  assert_eq(@debug.to_string(spec), "@preview/foo:0.1.0")
+  assert_eq(@debug.to_string(spec.versionless()), "@preview/foo")
+  assert_eq(@debug.to_string(Some(spec)), "Some(@preview/foo:0.1.0)")
 }

@@ -234,7 +234,7 @@ pub(all) struct PackageInfo {
 }
 
 pub(all) struct PackageManifest {
-  package : PackageInfo
+  package_ : PackageInfo
   template : TemplateInfo?
   tool : ToolInfo
   unknown_fields : Array[String]
@@ -243,13 +243,14 @@ pub fn PackageManifest::from_toml(String) -> Result[Self, String]
 pub fn PackageManifest::validate(Self, PackageSpec) -> Result[Unit, String]
 
 pub(all) struct PackageSpec {
-  namespace : String
+  namespace_ : String
   name : String
   version : PackageVersion
-} derive(Eq, Hash, @debug.Debug)
+} derive(Eq, Hash)
 pub fn PackageSpec::from_str(String) -> Result[Self, String]
 pub fn PackageSpec::versionless(Self) -> VersionlessPackageSpec
 pub impl Show for PackageSpec
+pub impl @debug.Debug for PackageSpec
 
 pub(all) struct PackageVersion {
   major : UInt
@@ -558,12 +559,13 @@ pub fn VersionBound::from_str(String) -> Result[Self, String]
 pub impl Show for VersionBound
 
 pub(all) struct VersionlessPackageSpec {
-  namespace : String
+  namespace_ : String
   name : String
-} derive(Eq, Hash, @debug.Debug)
+} derive(Eq, Hash)
 pub fn VersionlessPackageSpec::at(Self, PackageVersion) -> PackageSpec
 pub fn VersionlessPackageSpec::from_str(String) -> Result[Self, String]
 pub impl Show for VersionlessPackageSpec
+pub impl @debug.Debug for VersionlessPackageSpec
 
 pub struct VirtualPath {
   // private fields
