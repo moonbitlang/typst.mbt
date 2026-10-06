@@ -3,7 +3,8 @@
 //
 // What upstream reports for documents that are not in its test suite:
 // raw text built by markup (lines), by the `raw` function (a string)
-// and by `eval`; the keys of located elements in measurement. The
+// and by `eval`; the keys of located elements in measurement; the
+// reductions of what the `packages` stage found (tests/packages). The
 // helpers are in `oracle_helpers_wbtest.mbt`.
 
 ///|

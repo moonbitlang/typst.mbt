@@ -623,7 +623,8 @@ def main():
         "//\n"
         "// What upstream reports for documents that are not in its test suite:\n"
         "// raw text built by markup (lines), by the `raw` function (a string)\n"
-        "// and by `eval`; the keys of located elements in measurement. The\n"
+        "// and by `eval`; the keys of located elements in measurement; the\n"
+        "// reductions of what the `packages` stage found (tests/packages). The\n"
         "// helpers are in `oracle_helpers_wbtest.mbt`.\n"
     ]
     for name, kind, source in CASES:
