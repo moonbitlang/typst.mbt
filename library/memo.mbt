@@ -11,12 +11,12 @@
 //   style chain, regions, ...) plus the fully resolved locator and the route
 //   (stricter than upstream, which only tracks what the call observes).
 // - Fingerprints do not always distinguish what the computation can
-//   observe: some values are hashed through their repr (gradients, tilings,
-//   strokes), and closures compare by identity but fingerprint structurally.
-//   So an entry also keeps the arguments and is only reused if they are
-//   equal ([values_memo_equal]: `==`, but recursing into content, styles,
-//   arrays, dictionaries, functions and dynamic values, where Typst's
-//   equality is looser).
+//   observe: closures compare by identity but fingerprint structurally (and
+//   a `Fingerprint` that does not capture all data marks itself lossy; none
+//   does at the moment). So an entry also keeps the arguments and is only
+//   reused if they are equal ([values_memo_equal]: `==`, but recursing into
+//   content, styles, arrays, dictionaries, functions and dynamic values,
+//   where Typst's equality is looser).
 // - Results that may contain values created during the computation are not
 //   reused (a reused closure would keep its identity where a recomputed one
 //   gets a new one): layout results whose tags hold closures are not cached
@@ -520,8 +520,8 @@ pub fn memoized_layout(
 ///|
 /// Whether a laid-out frame can be reused: its tags must not hold closures
 /// (they may have been created during layout, and a recomputation would
-/// create new ones with a different identity). Tilings are not inspected,
-/// so frames with tiling paints are not reused either.
+/// create new ones with a different identity). The same holds for the
+/// frames of its tiling paints.
 fn frame_cacheable(frame : Frame) -> Bool {
   for entry in frame.items() {
     match entry.1 {
@@ -535,18 +535,18 @@ fn frame_cacheable(frame : Frame) -> Bool {
         }
       }
       Shape(shape, _) => {
-        if shape.fill is Some(Tiling(_)) {
+        if shape.fill is Some(fill) && !paint_cacheable(fill) {
           return false
         }
-        if shape.stroke is Some(stroke) && stroke.paint is Tiling(_) {
+        if shape.stroke is Some(stroke) && !paint_cacheable(stroke.paint) {
           return false
         }
       }
       Text(text) => {
-        if text.fill is Tiling(_) {
+        if !paint_cacheable(text.fill) {
           return false
         }
-        if text.stroke is Some(stroke) && stroke.paint is Tiling(_) {
+        if text.stroke is Some(stroke) && !paint_cacheable(stroke.paint) {
           return false
         }
       }
@@ -554,4 +554,15 @@ fn frame_cacheable(frame : Frame) -> Bool {
     }
   }
   true
+}
+
+///|
+/// See [frame_cacheable]: the fingerprint of a tiling's frame (computed
+/// once per tiling) records whether it holds closures.
+fn paint_cacheable(paint : Paint) -> Bool {
+  match paint {
+    Tiling(tiling) =>
+      (tiling.frame_fingerprint_flags() & fingerprint_identity) == 0
+    Solid(_) | Gradient(_) => true
+  }
 }

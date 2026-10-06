@@ -549,6 +549,7 @@ fn eval_closure_expr(
     defaults,
     captured,
     num_pos_params,
+    hash: @library.LazyFingerprint::new(),
   }
   Func(@library.Func::closure(closure_data).spanned(closure.params().span()))
 }

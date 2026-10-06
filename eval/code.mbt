@@ -381,6 +381,7 @@ fn eval_contextual(
     defaults: [],
     captured,
     num_pos_params: 0,
+    hash: @library.LazyFingerprint::new(),
   }
   let func = @library.Func::closure(closure).spanned(body.span())
   @library.Content::new(@library.context_elem(), [

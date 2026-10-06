@@ -174,6 +174,6 @@ pub impl Show for Point with fn output(self, logger) {
 
 ///|
 pub impl Fingerprint for Point with fn fingerprint(self, state) {
-  state.write_f64(self.x.to_pt())
-  state.write_f64(self.y.to_pt())
+  state.write_f64(self.x.to_raw())
+  state.write_f64(self.y.to_raw())
 }

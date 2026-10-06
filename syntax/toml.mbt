@@ -321,7 +321,9 @@ fn TomlParser::scalar(self : TomlParser) -> TomlValue raise TomlError {
   } else if digits == "-inf" {
     return TFloat(@double.neg_infinity)
   } else if digits is ("nan" | "+nan" | "-nan") {
-    return TFloat(@double.not_a_number)
+    // `f64::NAN`, negated after a `-`.
+    let nan = 0x7FF8000000000000L.reinterpret_as_double()
+    return TFloat(if digits == "-nan" { -nan } else { nan })
   }
   let is_int = digits
     .iter()

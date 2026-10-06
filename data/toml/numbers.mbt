@@ -279,5 +279,6 @@ fn inf(i : Input) -> Double raise ErrMode {
 /// `nan = %x6e.61.6e` (a positive NaN)
 fn nan(i : Input) -> Double raise ErrMode {
   literal(i, "nan")
-  @double.not_a_number.abs()
+  // `f64::NAN`.
+  0x7FF8000000000000L.reinterpret_as_double()
 }

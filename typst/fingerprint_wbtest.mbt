@@ -74,3 +74,74 @@ test "distinct library functions have distinct fingerprints" {
   }
   inspect(collisions.join("; "), content="")
 }
+
+///|
+/// Collect the types reachable from a scope (through the scopes of
+/// functions, types and modules).
+fn collect_types(
+  scope : @library.Scope,
+  types : Array[@library.Type],
+  modules : Array[@library.Module],
+  depth : Int,
+) -> Unit {
+  if depth > 6 {
+    return
+  }
+  for pair in scope.iter() {
+    let value = pair.1.read(
+      @library.BindingGuard::silent(@library.Features::all()),
+      "",
+    ) catch {
+      _ => continue
+    }
+    match value {
+      Func(func) =>
+        if func.scope() is Some(inner) {
+          collect_types(inner, types, modules, depth + 1)
+        }
+      Type(ty) => {
+        if types.contains(ty) {
+          continue
+        }
+        types.push(ty)
+        collect_types(ty.scope(), types, modules, depth + 1)
+      }
+      Module(m) => {
+        if modules.contains(m) {
+          continue
+        }
+        modules.push(m)
+        collect_types(m.scope(), types, modules, depth + 1)
+      }
+      _ => ()
+    }
+  }
+}
+
+///|
+/// Types compare by identity too, and are fingerprinted by their long name.
+test "distinct library types have distinct fingerprints" {
+  let lib = library([
+    @library.html_format(),
+    @library.pdf_format(),
+    @library.svg_format(),
+    @library.png_format(),
+    @library.bundle_format(),
+  ])
+  let types : Array[@library.Type] = []
+  let modules : Array[@library.Module] = []
+  collect_types(lib.global.scope(), types, modules, 0)
+  collect_types(lib.math.scope(), types, modules, 0)
+  assert_true(types.length() > 30)
+  let seen : Map[@library.U128, @library.Type] = Map([])
+  let collisions : Array[String] = []
+  for ty in types {
+    let hash = @library.hash128(ty)
+    match seen.get(hash) {
+      // `types` holds each type once (by identity).
+      Some(other) => collisions.push("\{ty.repr()} / \{other.repr()}")
+      None => seen[hash] = ty
+    }
+  }
+  inspect(collisions.join("; "), content="")
+}

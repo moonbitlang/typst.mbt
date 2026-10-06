@@ -111,6 +111,9 @@ pub(all) struct Closure {
   captured : Scope
   /// The number of positional parameters in the closure.
   num_pos_params : Int
+  /// The fingerprint of the fields above (upstream wraps the closure in a
+  /// `LazyHash`).
+  hash : LazyFingerprint
 }
 
 ///|

@@ -8,6 +8,10 @@ pub struct SvgImage {
   priv height : Double
   /// The fonts used by the SVG (upstream hashes them into `font_hash`).
   priv fonts : Array[Font]
+  /// Whether the SVG was decoded with a font resolver (upstream's
+  /// `font_hash` is zero without one and the hash of the used fonts, also
+  /// of none, with one).
+  priv resolved : Bool
   priv tree : @usvg.Tree
 }
 
@@ -16,12 +20,15 @@ pub struct SvgImage {
 /// can't hash a usvg tree directly, but the raw SVG data + a hash of all
 /// used fonts gives us something similar.").
 pub impl Eq for SvgImage with fn equal(self, other) {
-  self.data == other.data && self.fonts == other.fonts
+  self.data == other.data &&
+  self.resolved == other.resolved &&
+  self.fonts == other.fonts
 }
 
 ///|
 pub impl Hash for SvgImage with fn hash_combine(self, hasher) {
   hasher.combine(self.data)
+  hasher.combine(self.resolved)
   for font in self.fonts {
     hasher.combine(font)
   }
@@ -34,7 +41,7 @@ pub fn SvgImage::new(data : Bytes) -> SvgImage raise LoadErr {
     e => raise LoadErr(format_usvg_error(e))
   }
   let (width, height) = tree_size(tree)
-  { data, width, height, fonts: [], tree, }
+  { data, width, height, fonts: [], resolved: false, tree, }
 }
 
 ///|
@@ -91,7 +98,10 @@ pub fn SvgImage::with_fonts_images(
     None => []
   }
   let (width, height) = tree_size(tree)
-  ({ data, width, height, fonts: font_resolver.used, tree, }, warnings)
+  (
+    { data, width, height, fonts: font_resolver.used, resolved: true, tree, },
+    warnings,
+  )
 }
 
 ///|

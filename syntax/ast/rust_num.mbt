@@ -127,7 +127,10 @@ fn rust_parse_f64(s : String) -> Double? {
     return Some(if negative { @double.neg_infinity } else { @double.infinity })
   }
   if rest == "nan" {
-    return Some(@double.not_a_number)
+    // `f64::NAN` (MoonBit's `not_a_number` has another payload), negated
+    // after a `-` like upstream.
+    let nan = 0x7FF8000000000000L.reinterpret_as_double()
+    return Some(if negative { -nan } else { nan })
   }
   // Validate the grammar ourselves: MoonBit's parser also accepts `_`.
   let is_digit = (j : Int) => {

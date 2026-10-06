@@ -389,6 +389,7 @@ fn FrameDecoder::paint(
         offset: dec_size(p[4]),
         angle: @library.Angle::raw(dec_f64(p[5])),
         relative: dec_relative(p[6]),
+        frame_hash: @library.LazyFingerprint::new(),
       })
     }
     _ => raise Unsupported("paint \{kind}")

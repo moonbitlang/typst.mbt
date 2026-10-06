@@ -89,3 +89,160 @@ test "oracle: location keys: the element's own location in measurement" {
   ]
   assert_eq(oracle_metadata(source), expected)
 }
+
+///|
+test "oracle: location keys: strokes" {
+  let source = "#set page(width: 200pt, height: auto)\n#let c = counter(\"c\")\n#let width(body) = context metadata(repr(measure(body).width))\n#let probe(it) = context box(width: c.at(it.location()).first() * 10pt, height: 1pt)\n#show <r>: probe\n#let check(items) = {\n  c.update(0)\n  for item in items { width(item) }\n  for item in items { c.step(); item }\n  for item in items { width(item) }\n}\n// Thickness, dash array, dash phase and miter limit beyond the digits of\n// the repr.\n#check((1.001pt, 1.002pt, 1.001pt).map(s => [#rect(stroke: s)<r>]))\n#check((1.001pt, 1.002pt, 1.001pt).map(s => [#rect(stroke: (dash: (s, 2pt)))<r>]))\n#check((1.001pt, 1.002pt, 1.001pt).map(s => [#rect(stroke: (dash: (array: (1pt, 2pt), phase: s)))<r>]))\n#check((1.001, 1.002, 1.001).map(s => [#rect(stroke: (miter-limit: s))<r>]))\n#check((1.001em, 1.002em, 1.001em).map(s => [#rect(stroke: s + 1pt)<r>]))\n// The paint, the cap and the join.\n#check((red, blue, red).map(s => [#rect(stroke: s)<r>]))\n#check((\"butt\", \"round\", \"square\", \"butt\").map(s => [#rect(stroke: (cap: s))<r>]))\n#check((\"miter\", \"round\", \"bevel\", \"miter\").map(s => [#rect(stroke: (join: s))<r>]))\n#check((auto, none, \"dotted\", auto).map(s => [#rect(stroke: (dash: s))<r>]))\n// Strokes in other elements: lines, the resolved lines of a table, and a\n// stroke as a value.\n#check((1.001pt, 1.002pt, 1.001pt).map(s => [#line(stroke: s)<r>]))\n#check((1.001pt, 1.002pt, 1.001pt).map(s => [#table(stroke: s)[]<r>]))\n#check((1.001pt, 1.002pt, 1.001pt).map(s => [#box(metadata(stroke(s)))<r>]))\n"
+  let expected = [
+    "10pt", "20pt", "10pt", "10pt", "20pt", "10pt", "10pt", "20pt", "10pt", "10pt",
+    "20pt", "10pt", "10pt", "20pt", "10pt", "10pt", "20pt", "10pt", "10pt", "20pt",
+    "10pt", "10pt", "20pt", "10pt", "10pt", "20pt", "10pt", "10pt", "20pt", "10pt",
+    "10pt", "20pt", "10pt", "10pt", "20pt", "10pt", "10pt", "20pt", "30pt", "10pt",
+    "10pt", "20pt", "30pt", "10pt", "10pt", "20pt", "30pt", "10pt", "10pt", "20pt",
+    "30pt", "10pt", "10pt", "20pt", "30pt", "10pt", "10pt", "20pt", "30pt", "10pt",
+    "10pt", "20pt", "10pt", "10pt", "20pt", "10pt", "10pt", "20pt", "10pt", "10pt",
+    "20pt", "10pt", "10pt", "20pt", "10pt", "10pt", "20pt", "10pt",
+  ]
+  assert_eq(oracle_metadata(source), expected)
+}
+
+///|
+test "oracle: location keys: gradients" {
+  let source = "#set page(width: 200pt, height: auto)\n#let c = counter(\"c\")\n#let width(body) = context metadata(repr(measure(body).width))\n#let probe(it) = context box(width: c.at(it.location()).first() * 10pt, height: 1pt)\n#show <r>: probe\n#let check(items) = {\n  c.update(0)\n  for item in items { width(item) }\n  for item in items { c.step(); item }\n  for item in items { width(item) }\n}\n// Stops beyond the digits of the repr: offsets and colours.\n#check((10.001%, 10.002%, 10.001%).map(s => [#rect(fill: gradient.linear((red, 0%), (blue, s), (green, 100%)))<r>]))\n#check((10.0001%, 10.0002%, 10.0001%).map(s => [#rect(fill: gradient.linear(red, oklab(s, 0, 0)))<r>]))\n// Angles, centers and radii.\n#check((10.001deg, 10.002deg, 10.001deg).map(s => [#rect(fill: gradient.linear(red, blue, angle: s))<r>]))\n#check((10.001deg, 10.002deg, 10.001deg).map(s => [#rect(fill: gradient.conic(red, blue, angle: s))<r>]))\n#check((10.001%, 10.002%, 10.001%).map(s => [#rect(fill: gradient.conic(red, blue, center: (s, 50%)))<r>]))\n#check((10.001%, 10.002%, 10.001%).map(s => [#rect(fill: gradient.radial(red, blue, center: (50%, s)))<r>]))\n#check((10.001%, 10.002%, 10.001%).map(s => [#rect(fill: gradient.radial(red, blue, radius: s))<r>]))\n#check((10.001%, 10.002%, 10.001%).map(s => [#rect(fill: gradient.radial(red, blue, focal-center: (s, 50%)))<r>]))\n#check((10.001%, 10.002%, 10.001%).map(s => [#rect(fill: gradient.radial(red, blue, focal-radius: s))<r>]))\n// The kind, the colour space and the relative placement.\n#check((gradient.linear, gradient.radial, gradient.conic, gradient.linear).map(s => [#rect(fill: s(red, blue))<r>]))\n#check((oklab, rgb, color.hsl, oklab).map(s => [#rect(fill: gradient.linear(red, blue, space: s))<r>]))\n#check((auto, \"self\", \"parent\", auto).map(s => [#rect(fill: gradient.linear(red, blue, relative: s))<r>]))\n// Sharp gradients, and a gradient as the paint of a stroke.\n#check((2, 3, 2).map(s => [#rect(fill: gradient.linear(red, blue).sharp(s))<r>]))\n#check((10.001%, 10.002%, 10.001%).map(s => [#rect(stroke: gradient.linear((red, 0%), (blue, s), (green, 100%)))<r>]))\n"
+  let expected = [
+    "10pt", "20pt", "10pt", "10pt", "20pt", "10pt", "10pt", "20pt", "10pt", "10pt",
+    "20pt", "10pt", "10pt", "20pt", "10pt", "10pt", "20pt", "10pt", "10pt", "20pt",
+    "10pt", "10pt", "20pt", "10pt", "10pt", "20pt", "10pt", "10pt", "20pt", "10pt",
+    "10pt", "20pt", "10pt", "10pt", "20pt", "10pt", "10pt", "20pt", "10pt", "10pt",
+    "20pt", "10pt", "10pt", "20pt", "10pt", "10pt", "20pt", "10pt", "10pt", "20pt",
+    "10pt", "10pt", "20pt", "10pt", "10pt", "20pt", "30pt", "10pt", "10pt", "20pt",
+    "30pt", "10pt", "10pt", "20pt", "30pt", "10pt", "10pt", "20pt", "30pt", "10pt",
+    "10pt", "20pt", "30pt", "10pt", "10pt", "20pt", "30pt", "10pt", "10pt", "20pt",
+    "10pt", "10pt", "20pt", "10pt", "10pt", "20pt", "10pt", "10pt", "20pt", "10pt",
+  ]
+  assert_eq(oracle_metadata(source), expected)
+}
+
+///|
+test "oracle: location keys: tilings" {
+  let source = "#set page(width: 200pt, height: auto)\n#let c = counter(\"c\")\n#let width(body) = context metadata(repr(measure(body).width))\n#let probe(it) = context box(width: c.at(it.location()).first() * 10pt, height: 1pt)\n#show <r>: probe\n#let check(items) = {\n  c.update(0)\n  for item in items { width(item) }\n  for item in items { c.step(); item }\n  for item in items { width(item) }\n}\n// Tilings of the same size over different frames: fills, strokes and\n// geometry of the shapes, nested paints and groups.\n#check((red, blue, green, red).map(s => [#rect(fill: tiling(size: (10pt, 10pt), square(size: 5pt, fill: s)))<r>]))\n#check((1.001pt, 1.002pt, 1.001pt).map(s => [#rect(fill: tiling(size: (10pt, 10pt), line(length: 5pt, stroke: s)))<r>]))\n#check((4.001pt, 4.002pt, 4.001pt).map(s => [#rect(fill: tiling(size: (10pt, 10pt), square(size: s)))<r>]))\n#check((10.001%, 10.002%, 10.001%).map(s => [#rect(fill: tiling(size: (10pt, 10pt), square(size: 5pt, fill: gradient.radial((red, 0%), (blue, s), (green, 100%)))))<r>]))\n#check((red, blue, red).map(s => [#rect(fill: tiling(size: (10pt, 10pt), square(size: 5pt, fill: tiling(size: (2pt, 2pt), square(size: 1pt, fill: s)))))<r>]))\n#check((10.001deg, 10.002deg, 10.001deg).map(s => [#rect(fill: tiling(size: (10pt, 10pt), rotate(s, square(size: 5pt))))<r>]))\n#check((1.001pt, 1.002pt, 1.001pt).map(s => [#rect(fill: tiling(size: (10pt, 10pt), move(dx: s, square(size: 5pt))))<r>]))\n#check((true, false, true).map(s => [#rect(fill: tiling(size: (10pt, 10pt), box(width: 4pt, height: 4pt, clip: s, square(size: 5pt))))<r>]))\n// The spacing and the relative placement.\n#check((1.001pt, 1.002pt, 1.001pt).map(s => [#rect(fill: tiling(size: (10pt, 10pt), spacing: (s, 1pt), square(size: 5pt)))<r>]))\n#check((auto, \"self\", \"parent\", auto).map(s => [#rect(fill: tiling(size: (10pt, 10pt), relative: s, square(size: 5pt)))<r>]))\n// A tiling as the paint of a stroke, and as a value.\n#check((red, blue, red).map(s => [#rect(stroke: tiling(size: (10pt, 10pt), square(size: 5pt, fill: s)))<r>]))\n#check((red, blue, red).map(s => [#box(metadata(tiling(size: (10pt, 10pt), square(size: 5pt, fill: s))))<r>]))\n"
+  let expected = [
+    "10pt", "20pt", "30pt", "10pt", "10pt", "20pt", "30pt", "10pt", "10pt", "20pt",
+    "10pt", "10pt", "20pt", "10pt", "10pt", "20pt", "10pt", "10pt", "20pt", "10pt",
+    "10pt", "20pt", "10pt", "10pt", "20pt", "10pt", "10pt", "20pt", "10pt", "10pt",
+    "20pt", "10pt", "10pt", "20pt", "10pt", "10pt", "20pt", "10pt", "10pt", "20pt",
+    "10pt", "10pt", "20pt", "10pt", "10pt", "20pt", "10pt", "10pt", "20pt", "10pt",
+    "10pt", "20pt", "10pt", "10pt", "20pt", "10pt", "10pt", "20pt", "30pt", "10pt",
+    "10pt", "20pt", "30pt", "10pt", "10pt", "20pt", "10pt", "10pt", "20pt", "10pt",
+    "10pt", "20pt", "10pt", "10pt", "20pt", "10pt",
+  ]
+  assert_eq(oracle_metadata(source), expected)
+}
+
+///|
+test "oracle: location keys: colours and other dynamic values" {
+  let source = "#set page(width: 200pt, height: auto)\n#let c = counter(\"c\")\n#let width(body) = context metadata(repr(measure(body).width))\n#let probe(it) = context box(width: c.at(it.location()).first() * 10pt, height: 1pt)\n#show <r>: probe\n#let check(items) = {\n  c.update(0)\n  for item in items { width(item) }\n  for item in items { c.step(); item }\n  for item in items { width(item) }\n}\n// Colours hash their components: sRGB colours that are equal (they compare\n// with 8 bits per channel) have keys of their own.\n#check((10.001%, 10.002%, 10.001%).map(s => [#rect(fill: rgb(s, 0%, 0%))<r>]))\n#check((10.001%, 10.002%, 10.001%).map(s => [#rect(fill: luma(s))<r>]))\n#check((10.0001%, 10.0002%, 10.0001%).map(s => [#rect(fill: oklab(s, 0, 0))<r>]))\n#check((10.001%, 10.002%, 10.001%).map(s => [#rect(fill: cmyk(s, 0%, 0%, 0%))<r>]))\n#check((rgb, color.linear-rgb, rgb).map(s => [#rect(fill: s(10%, 20%, 30%))<r>]))\n#check((color.hsl, color.hsv, color.hsl).map(s => [#rect(fill: s(10deg, 20%, 30%))<r>]))\n// Spot colours and colorants.\n#check((10.001%, 10.002%, 10.001%).map(s => [#rect(fill: color.spot(\"A\", cmyk(s, 0%, 0%, 0%)).tint(50%))<r>]))\n#check((10.001%, 10.002%, 10.001%).map(s => [#rect(fill: color.spot(\"A\", cmyk(0%, 0%, 0%, 100%)).tint(s))<r>]))\n#check((\"A\", \"B\", \"A\").map(s => [#rect(fill: color.spot(s, cmyk(0%, 0%, 0%, 100%)).tint(50%))<r>]))\n#check((10.001%, 10.002%, 10.001%).map(s => [#box(metadata(color.spot(\"A\", cmyk(s, 0%, 0%, 0%))))<r>]))\n// Paths.\n#check((\"a.typ\", \"b.typ\", \"a.typ\").map(s => [#box(metadata(path(s)))<r>]))\n"
+  let expected = [
+    "10pt", "20pt", "10pt", "10pt", "20pt", "10pt", "10pt", "20pt", "10pt", "10pt",
+    "20pt", "10pt", "10pt", "20pt", "10pt", "10pt", "20pt", "10pt", "10pt", "20pt",
+    "10pt", "10pt", "20pt", "10pt", "10pt", "20pt", "10pt", "10pt", "20pt", "10pt",
+    "10pt", "20pt", "10pt", "10pt", "20pt", "10pt", "10pt", "20pt", "10pt", "10pt",
+    "20pt", "10pt", "10pt", "20pt", "10pt", "10pt", "20pt", "10pt", "10pt", "20pt",
+    "10pt", "10pt", "20pt", "10pt", "10pt", "20pt", "10pt", "10pt", "20pt", "10pt",
+    "10pt", "20pt", "10pt", "10pt", "20pt", "10pt",
+  ]
+  assert_eq(oracle_metadata(source), expected)
+}
+
+///|
+test "oracle: location keys: closures" {
+  let source = "#set page(width: 200pt, height: auto)\n#let c = counter(\"c\")\n#let width(body) = context metadata(repr(measure(body).width))\n#let probe(it) = context box(width: c.at(it.location()).first() * 10pt, height: 1pt)\n#show <r>: probe\n#let check(items) = {\n  c.update(0)\n  for item in items { width(item) }\n  for item in items { c.step(); item }\n  for item in items { width(item) }\n}\n// Captured values.\n#check((1.001pt, 1.002pt, 1.001pt).map(s => [#box(metadata(() => stroke(s)))<r>]))\n#check((10.001%, 10.002%, 10.001%).map(s => [#box(metadata(() => gradient.linear((red, 0%), (blue, s), (green, 100%))))<r>]))\n#check((1, 1.0, 1).map(s => [#box(metadata(() => s))<r>]))\n// Captured modules.\n#check((std, calc, sym, std).map(s => [#box(metadata(() => s))<r>]))\n#check((std, calc, sym, std).map(s => [#box(metadata(s))<r>]))\n// Default values of named parameters.\n#check((1.001pt, 1.002pt, 1.001pt).map(s => [#box(metadata((x: stroke(s)) => x))<r>]))\n// Context expressions.\n#check((1.001pt, 1.002pt, 1.001pt).map(s => [#box(context stroke(s))<r>]))\n// The syntax tree: the nodes of an evaluated string have the span of the\n// call, and a closure is hashed with its tree. The list in the content\n// block of the first closure is nested (its marker is to the left of the\n// second one); in the other two it is not, and they are the same tree at\n// different offsets of their strings.\n#let code(s) = eval(s, mode: \"code\")\n#check((\n  \"(x => [- a\\n          - b])\",\n  \"     (x => [- a\\n          - b])\",\n  \"         (x => [- a\\n          - b])\",\n  \"(x => [- a\\n          - b])\",\n).map(s => [#box(metadata(code(s)))<r>]))\n// Closures with the same text in different strings of one call.\n#check((\"(x => x, 1)\", \"(x => x, 2)\", \"(x => x, 1)\").map(s => [#box(metadata(code(s).first()))<r>]))\n#check((\"(x => x)\", \"(x => y)\", \"(x => x)\").map(s => [#box(metadata(code(s)))<r>]))\n"
+  let expected = [
+    "10pt", "20pt", "10pt", "10pt", "20pt", "10pt", "10pt", "20pt", "10pt", "10pt",
+    "20pt", "10pt", "10pt", "20pt", "10pt", "10pt", "20pt", "10pt", "10pt", "20pt",
+    "30pt", "10pt", "10pt", "20pt", "30pt", "10pt", "10pt", "20pt", "30pt", "10pt",
+    "10pt", "20pt", "30pt", "10pt", "10pt", "20pt", "10pt", "10pt", "20pt", "10pt",
+    "10pt", "20pt", "10pt", "10pt", "20pt", "10pt", "10pt", "20pt", "20pt", "10pt",
+    "10pt", "20pt", "20pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt",
+    "10pt", "20pt", "10pt", "10pt", "20pt", "10pt",
+  ]
+  assert_eq(oracle_metadata(source), expected)
+}
+
+///|
+test "oracle: location keys: other values" {
+  let source = "#set page(width: 200pt, height: auto)\n#let c = counter(\"c\")\n#let width(body) = context metadata(repr(measure(body).width))\n#let probe(it) = context box(width: c.at(it.location()).first() * 10pt, height: 1pt)\n#show <r>: probe\n#let check(items) = {\n  c.update(0)\n  for item in items { width(item) }\n  for item in items { c.step(); item }\n  for item in items { width(item) }\n}\n// Symbols (with their variants), decimals (with their scale), durations\n// and datetimes.\n#check((sym.arrow.r, symbol(\"\u{2192}\"), sym.arrow, sym.arrow.r, symbol(\"\u{2192}\", (\"r\", \"\u{2192}\")), symbol(\"\u{2192}\")).map(s => [#box(metadata(s))<r>]))\n// Symbols with the same accessible variants (and repr) that differ in the\n// variants their modifiers have ruled out.\n#let kept(..variants) = symbol(..variants, (\"keep\", \"K\")).keep\n#check((kept((\"a\", \"b\\u{301}\")), kept((\"ab\", \"\\u{301}\")), kept((\"a\", \"b\\u{301}\"))).map(s => [#box(metadata(s))<r>]))\n#check((sym.plus, symbol(\"+\"), $+$.body, sym.plus).map(s => [#box(metadata(s))<r>]))\n#check((decimal(\"1.0\"), decimal(\"1.00\"), decimal(\"1.0\")).map(s => [#box(metadata(s))<r>]))\n// Durations below one second (the repr shows whole seconds).\n#check((duration(seconds: 1) * 0.5, duration(seconds: 1) * 0.25, duration(seconds: 1) * 0.5, duration(seconds: 0)).map(s => [#box(metadata(s))<r>]))\n#check((duration(seconds: 1), duration(seconds: 2), duration(seconds: 1), duration(minutes: 1), duration(seconds: 60)).map(s => [#box(metadata(s))<r>]))\n#check((datetime(year: 2020, month: 1, day: 1), datetime(year: 2020, month: 1, day: 1, hour: 0, minute: 0, second: 0), datetime(year: 2020, month: 1, day: 1)).map(s => [#box(metadata(s))<r>]))\n// Alignments, directions, regular expressions, versions, bytes and labels.\n#check((left, start, left + top, left, ltr, rtl, ltr).map(s => [#box(metadata(s))<r>]))\n#check((regex(\"a\"), regex(\"b\"), regex(\"a\"), version(1, 0), version(1), version(1, 0)).map(s => [#box(metadata(s))<r>]))\n#check((bytes(\"a\"), bytes(\"b\"), bytes(\"a\"), \"a\", <a>, <b>, <a>).map(s => [#box(metadata(s))<r>]))\n// Lengths, relative lengths and fractions.\n#check((1em, 1.00001em, 1em, 1pt + 1em, 50% + 1pt, 50.00001% + 1pt, 50% + 1pt, 1fr, 1.00001fr, 1fr).map(s => [#box(metadata(s))<r>]))\n// Arguments, dictionaries, types, functions, selectors, counters, states.\n#check((arguments(1, a: 2), arguments(1, a: 3), arguments(1, a: 2), (a: 1), (a: 1, b: 2), (a: 1)).map(s => [#box(metadata(s))<r>]))\n#check((int, float, int, rect, circle, rect, calc.pow, calc.sin, calc.pow, rect.with(width: 1pt), rect.with(width: 2pt), rect.with(width: 1pt)).map(s => [#box(metadata(s))<r>]))\n#check((heading.where(level: 1), heading.where(level: 2), heading.where(level: 1), counter(\"a\"), counter(\"b\"), counter(\"a\"), state(\"a\", 1), state(\"a\", 2), state(\"a\", 1)).map(s => [#box(metadata(s))<r>]))\n"
+  let expected = [
+    "10pt", "20pt", "30pt", "10pt", "50pt", "20pt", "10pt", "20pt", "30pt", "10pt",
+    "50pt", "20pt", "10pt", "20pt", "10pt", "10pt", "20pt", "10pt", "10pt", "20pt",
+    "30pt", "10pt", "10pt", "20pt", "30pt", "10pt", "10pt", "20pt", "10pt", "10pt",
+    "20pt", "10pt", "10pt", "20pt", "10pt", "40pt", "10pt", "20pt", "10pt", "40pt",
+    "10pt", "20pt", "10pt", "40pt", "40pt", "10pt", "20pt", "10pt", "40pt", "40pt",
+    "10pt", "20pt", "10pt", "10pt", "20pt", "10pt", "10pt", "20pt", "30pt", "10pt",
+    "50pt", "60pt", "50pt", "10pt", "20pt", "30pt", "10pt", "50pt", "60pt", "50pt",
+    "10pt", "20pt", "10pt", "40pt", "50pt", "40pt", "10pt", "20pt", "10pt", "40pt",
+    "50pt", "40pt", "10pt", "20pt", "10pt", "40pt", "50pt", "60pt", "50pt", "10pt",
+    "20pt", "10pt", "40pt", "50pt", "60pt", "50pt", "10pt", "20pt", "10pt", "40pt",
+    "50pt", "60pt", "50pt", "80pt", "90pt", "80pt", "10pt", "20pt", "10pt", "40pt",
+    "50pt", "60pt", "50pt", "80pt", "90pt", "80pt", "10pt", "20pt", "30pt", "40pt",
+    "50pt", "40pt", "10pt", "20pt", "30pt", "40pt", "50pt", "40pt", "10pt", "20pt",
+    "10pt", "40pt", "50pt", "60pt", "70pt", "80pt", "90pt", "100pt", "110pt", "120pt",
+    "10pt", "20pt", "10pt", "40pt", "50pt", "60pt", "70pt", "80pt", "90pt", "100pt",
+    "110pt", "120pt", "10pt", "20pt", "10pt", "40pt", "50pt", "40pt", "70pt", "80pt",
+    "70pt", "10pt", "20pt", "10pt", "40pt", "50pt", "40pt", "70pt", "80pt", "70pt",
+  ]
+  assert_eq(oracle_metadata(source), expected)
+}
+
+///|
+test "oracle: location keys: field values are hashed as they are cast" {
+  let source = "#set page(width: 200pt, height: auto)\n#let c = counter(\"c\")\n#let width(body) = context metadata(repr(measure(body).width))\n#let probe(it) = context box(width: c.at(it.location()).first() * 10pt, height: 1pt)\n#show <r>: probe\n#let check(items) = {\n  c.update(0)\n  for item in items { width(item) }\n  for item in items { c.step(); item }\n  for item in items { width(item) }\n}\n// Field values that are spelled differently but cast to the same data.\n#check((10pt, 10pt + 0%, 10pt + 0em, 10pt).map(s => [#rect(width: s)<r>]))\n#check((1pt, stroke(1pt), (thickness: 1pt), 1pt + 0em, 1pt).map(s => [#rect(stroke: s)<r>]))\n#check((5pt, (rest: 5pt), (x: 5pt, y: 5pt), (left: 5pt, rest: 5pt), 5pt + 0%, 5pt).map(s => [#rect(inset: s)<r>]))\n#check((1pt, (rest: 1pt), (top: 1pt, bottom: 1pt), 1pt).map(s => [#rect(radius: s)<r>]))\n#check((red, rgb(\"#ff4136\"), rgb(255, 65, 54), red).map(s => [#rect(fill: s)<r>]))\n#check((2, (auto, auto), (auto,) * 2, 2).map(s => [#grid(columns: s)<r>]))\n#check((1pt, 1pt + 0%, 1pt).map(s => [#move(dx: s)[]<r>]))\n#check((1em, 1em + 0pt, 1em).map(s => [#h(s)<r>]))\n#check((100%, 100% + 0pt, 1fr, 100%).map(s => [#box(width: s)<r>]))\n#check((90deg, 1.5707963267948966rad, 90.0deg, 90deg).map(s => [#rotate(s)[]<r>]))\n#check((2, 2.0, 200%, 2).map(s => [#scale(x: s * 50%)[]<r>]))\n#check((\"1.\", numbering.with(\"1.\"), \"1.\").map(s => [#heading(numbering: s)[]<r>]))\n#check((3, 3.0).map(s => [#polygon.regular(vertices: 3, size: s * 1pt)<r>]))\n#check((\"https://a.b\", \"https://a.b\").map(s => [#link(s)[]<r>]))\n#check((1, 1.0, \"1\", 1).map(s => [#box(metadata(s))<r>]))\n#check((left, start, left).map(s => [#align(s)[]<r>]))\n#check(((x: 1pt), (left: 1pt, right: 1pt), (rest: 0pt, x: 1pt), (x: 1pt)).map(s => [#pad(..s)[]<r>]))\n#check(((1pt, 2pt), (1pt + 0%, 2pt), (1pt, 2pt)).map(s => [#line(end: (1pt, 2pt), start: s)<r>]))\n#check((0pt, 0pt + 0%, auto, 0pt).map(s => [#block(spacing: 1pt, above: s)[]<r>]))\n#check((1, 1.0, 1).map(s => [#box(v(s * 1pt, weak: true))<r>]))\n"
+  let expected = [
+    "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt",
+    "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt",
+    "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt",
+    "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "20pt",
+    "20pt", "10pt", "10pt", "20pt", "20pt", "10pt", "10pt", "10pt", "10pt", "10pt",
+    "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt",
+    "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "30pt", "10pt",
+    "10pt", "10pt", "30pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt",
+    "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt",
+    "10pt", "20pt", "10pt", "10pt", "20pt", "10pt", "10pt", "10pt", "10pt", "10pt",
+    "10pt", "10pt", "10pt", "10pt", "10pt", "20pt", "30pt", "10pt", "10pt", "20pt",
+    "30pt", "10pt", "10pt", "20pt", "10pt", "10pt", "20pt", "10pt", "10pt", "10pt",
+    "30pt", "10pt", "10pt", "10pt", "30pt", "10pt", "10pt", "10pt", "10pt", "10pt",
+    "10pt", "10pt", "10pt", "10pt", "30pt", "10pt", "10pt", "10pt", "30pt", "10pt",
+    "10pt", "10pt", "10pt", "10pt", "10pt", "10pt",
+  ]
+  assert_eq(oracle_metadata(source), expected)
+}
+
+///|
+test "oracle: location keys: negative zeros and NaNs" {
+  let source = "#set page(width: 200pt, height: auto)\n#let c = counter(\"c\")\n#let width(body) = context metadata(repr(measure(body).width))\n#let probe(it) = context box(width: c.at(it.location()).first() * 10pt, height: 1pt)\n#show <r>: probe\n#let check(items) = {\n  c.update(0)\n  for item in items { width(item) }\n  for item in items { c.step(); item }\n  for item in items { width(item) }\n}\n// Negative zeros: equal values with different bits.\n#check((10pt, 10pt + -0%, 10pt - 0%, 10pt).map(s => [#rect(width: s)<r>]))\n#check((0pt, -0pt, 0pt, 0em, -0em, 0pt).map(s => [#h(s)<r>]))\n#check((0%, -0%, 0%).map(s => [#rect(width: s)<r>]))\n#check((0deg, -0deg, 0deg).map(s => [#rotate(s)[]<r>]))\n#check((0.0, -0.0, 0.0).map(s => [#box(metadata(s))<r>]))\n#check((0fr, -0fr, 0fr).map(s => [#h(s)<r>]))\n#check((10pt, 10pt + -0%, 10pt).map(s => [#grid(columns: (s,))[]<r>]))\n#check((10pt, 10pt + -0%, 10pt).map(s => [#move(dx: s)[]<r>]))\n#check((1pt, 1pt + -0em, 1pt).map(s => [#rect(stroke: s)<r>]))\n#check((10pt, 10pt + -0%, 10pt).map(s => [#rect(inset: s)<r>]))\n#check((10pt, 10pt + -0%, 10pt).map(s => [#rect(radius: s)<r>]))\n#check((10pt, 10pt + -0%, 10pt).map(s => [#box(metadata(s))<r>]))\n#check((rgb(0, 0, 0), rgb(-0%, 0%, 0%), rgb(0, 0, 0)).map(s => [#rect(fill: s)<r>]))\n#check((float.nan, -float.nan, float.inf - float.inf, float.nan).map(s => [#box(metadata(s))<r>]))\n"
+  let expected = [
+    "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "20pt",
+    "10pt", "10pt", "20pt", "10pt", "10pt", "20pt", "10pt", "10pt", "20pt", "10pt",
+    "10pt", "20pt", "10pt", "10pt", "20pt", "10pt", "10pt", "20pt", "10pt", "10pt",
+    "20pt", "10pt", "10pt", "20pt", "10pt", "10pt", "20pt", "10pt", "10pt", "20pt",
+    "10pt", "10pt", "20pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt",
+    "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt",
+    "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt", "10pt",
+    "10pt", "10pt", "10pt", "10pt", "10pt", "20pt", "10pt", "10pt", "20pt", "10pt",
+    "10pt", "20pt", "10pt", "10pt", "20pt", "10pt", "10pt", "20pt", "10pt", "10pt",
+    "10pt", "20pt", "10pt", "10pt",
+  ]
+  assert_eq(oracle_metadata(source), expected)
+}
+
+///|
+test "oracle: floats: the bits of NaN values" {
+  let source = "#let b(x) = if type(x) == float { array(x.to-bytes(endian: \"big\")).map(v => str(v, base: 16)).join(\"\") } else { repr(x) }\n#let n = float.nan\n#let row(..xs) = metadata(xs.pos().map(b).join(\" \"))\n#row(float.nan, -float.nan, -n, float.inf - float.inf, 0.0 * float.inf, -(float.inf - float.inf))\n#row(float(\"nan\"), float(\"-nan\"), float(\"+nan\"), float(\"NaN\"), float(\"-NaN\"), float(\"NAN\"))\n#row(..yaml(bytes(\"[.nan, .NaN, .NAN, -.nan, +.nan, .inf, -.inf]\")))\n#row(..toml(bytes(\"a = [nan, -nan, +nan, inf, -inf]\")).a)\n#row(float.nan + 1, float.nan * -1, calc.abs(-float.nan), calc.pow(float.nan, 1), calc.abs(float.nan))\n#row(float.nan * 1%, float.nan / 2, calc.ln(float.nan), calc.sin(float.nan), calc.rem(float.nan, 2))\n#row(..cbor(cbor.encode((float.nan, -float.nan))))\n#row(eval(\"float.nan\"), eval(\"-float.nan\"), eval(\"float.inf * 0\", mode: \"code\"))\n"
+  let expected = [
+    "7ff8000000 fff8000000 fff8000000 7ff8000000 7ff8000000 fff8000000", "7ff8000000 fff8000000 7ff8000000 7ff8000000 fff8000000 7ff8000000",
+    "7ff8000000 7ff8000000 7ff8000000 \"-.nan\" \"+.nan\" 7ff0000000 fff0000000",
+    "7ff8000000 fff8000000 7ff8000000 7ff0000000 fff0000000", "7ff8000000 7ff8000000 7ff8000000 00000000 7ff8000000",
+    "0% 7ff8000000 7ff8000000 7ff8000000 7ff8000000", "7ff8000000 fff8000000", "7ff8000000 fff8000000 7ff8000000",
+  ]
+  assert_eq(oracle_metadata(source), expected)
+}
