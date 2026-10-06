@@ -5,7 +5,7 @@
 
 ///|
 /// Creates blind text.
-fn impl_lorem(words_ : USize) -> String raise HintedError {
+fn impl_lorem(words_ : USize) -> String {
   lorem_impl(words_.0)
 }
 

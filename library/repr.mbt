@@ -6,7 +6,7 @@ pub let minus_sign : String = "\u{2212}"
 
 ///|
 /// Returns the string representation of a value.
-fn impl_repr(value_ : Value) -> String raise HintedError {
+fn impl_repr(value_ : Value) -> String {
   value_.repr()
 }
 

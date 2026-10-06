@@ -102,13 +102,13 @@ fn impl_str_construct(
 
 ///|
 /// Default of `str(base:)`: `Spanned::detached(Base::Default)`.
-fn impl_str_construct__base_default() -> @syntax.Spanned[Base] raise SourceError {
+fn impl_str_construct__base_default() -> @syntax.Spanned[Base] {
   { v: Default, span: @syntax.Span::detached(), }
 }
 
 ///|
 /// The length of the string in UTF-8 encoded bytes.
-fn impl_str_len(self_ : String) -> USize raise HintedError {
+fn impl_str_len(self_ : String) -> USize {
   USize(str_len(self_).to_int64())
 }
 
@@ -173,7 +173,7 @@ fn impl_str_at(
 
 ///|
 /// Default of `slice(end:)`: none.
-fn impl_str_slice__end_default() -> Int64? raise SourceError {
+fn impl_str_slice__end_default() -> Int64? {
   None
 }
 
@@ -204,13 +204,13 @@ fn impl_str_slice(
 
 ///|
 /// Returns the grapheme clusters of the string as an array of substrings.
-fn impl_str_clusters(self_ : String) -> Arr raise HintedError {
+fn impl_str_clusters(self_ : String) -> Arr {
   Arr::from_array(@unicode.graphemes(self_).map(g => Value::Str(g.to_owned())))
 }
 
 ///|
 /// Returns the Unicode codepoints of the string as an array of substrings.
-fn impl_str_codepoints(self_ : String) -> Arr raise HintedError {
+fn impl_str_codepoints(self_ : String) -> Arr {
   let out = []
   for c in self_ {
     out.push(Value::Str(c.to_string()))
@@ -220,7 +220,7 @@ fn impl_str_codepoints(self_ : String) -> Arr raise HintedError {
 
 ///|
 /// Converts a character into its corresponding code point.
-fn impl_str_to_unicode(character_ : Char) -> U32 raise HintedError {
+fn impl_str_to_unicode(character_ : Char) -> U32 {
   U32(character_.to_int().to_int64())
 }
 
@@ -256,16 +256,13 @@ fn rust_hex(v : Int64) -> String {
 
 ///|
 /// Default of `normalize(form:)`: `UnicodeNormalForm::Nfc`.
-fn impl_str_normalize__form_default() -> UnicodeNormalForm raise SourceError {
+fn impl_str_normalize__form_default() -> UnicodeNormalForm {
   Nfc
 }
 
 ///|
 /// Normalizes the string to the given Unicode normal form.
-fn impl_str_normalize(
-  self_ : String,
-  form_ : UnicodeNormalForm,
-) -> String raise HintedError {
+fn impl_str_normalize(self_ : String, form_ : UnicodeNormalForm) -> String {
   match form_ {
     Nfc => @unicode.nfc(self_)
     Nfd => @unicode.nfd(self_)
@@ -276,10 +273,7 @@ fn impl_str_normalize(
 
 ///|
 /// Whether the string contains the specified pattern.
-fn impl_str_contains(
-  self_ : String,
-  pattern_ : StrPattern,
-) -> Bool raise HintedError {
+fn impl_str_contains(self_ : String, pattern_ : StrPattern) -> Bool {
   match pattern_ {
     Str(pat) => self_.contains(pat)
     Regex(re) => re.is_match(self_)
@@ -288,10 +282,7 @@ fn impl_str_contains(
 
 ///|
 /// Whether the string starts with the specified pattern.
-fn impl_str_starts_with(
-  self_ : String,
-  pattern_ : StrPattern,
-) -> Bool raise HintedError {
+fn impl_str_starts_with(self_ : String, pattern_ : StrPattern) -> Bool {
   match pattern_ {
     Str(pat) => self_.has_prefix(pat)
     Regex(re) =>
@@ -304,10 +295,7 @@ fn impl_str_starts_with(
 
 ///|
 /// Whether the string ends with the specified pattern.
-fn impl_str_ends_with(
-  self_ : String,
-  pattern_ : StrPattern,
-) -> Bool raise HintedError {
+fn impl_str_ends_with(self_ : String, pattern_ : StrPattern) -> Bool {
   match pattern_ {
     Str(pat) => self_.has_suffix(pat)
     Regex(re) => {
@@ -348,10 +336,7 @@ fn utf8_char_len(c : Int) -> Int {
 ///|
 /// Searches for the specified pattern in the string and returns the first
 /// match as a string or `none` if there is no match.
-fn impl_str_find(
-  self_ : String,
-  pattern_ : StrPattern,
-) -> String? raise HintedError {
+fn impl_str_find(self_ : String, pattern_ : StrPattern) -> String? {
   match pattern_ {
     Str(pat) => if self_.contains(pat) { Some(pat) } else { None }
     Regex(re) => re.inner.find(self_).map(m => m.text)
@@ -361,10 +346,7 @@ fn impl_str_find(
 ///|
 /// Searches for the specified pattern in the string and returns the index of
 /// the first match as an integer or `none` if there is no match.
-fn impl_str_position(
-  self_ : String,
-  pattern_ : StrPattern,
-) -> USize? raise HintedError {
+fn impl_str_position(self_ : String, pattern_ : StrPattern) -> USize? {
   match pattern_ {
     Str(pat) =>
       self_.find(pat).map(i => USize(str_utf16_to_byte(self_, i).to_int64()))
@@ -410,10 +392,7 @@ fn str_match_indices(s : String, pat : String) -> Array[(Int, Int, Int)] {
 /// Searches for the specified pattern in the string and returns a
 /// dictionary with details about the first match or `none` if there is no
 /// match.
-fn impl_str_match(
-  self_ : String,
-  pattern_ : StrPattern,
-) -> Dict? raise HintedError {
+fn impl_str_match(self_ : String, pattern_ : StrPattern) -> Dict? {
   match pattern_ {
     Str(pat) =>
       str_match_indices(self_, pat).get(0).map(m => match_to_dict(m.0, pat))
@@ -424,10 +403,7 @@ fn impl_str_match(
 ///|
 /// Searches for the specified pattern in the string and returns an array of
 /// dictionaries with details about all matches.
-fn impl_str_matches(
-  self_ : String,
-  pattern_ : StrPattern,
-) -> Arr raise HintedError {
+fn impl_str_matches(self_ : String, pattern_ : StrPattern) -> Arr {
   match pattern_ {
     Str(pat) =>
       Arr::from_array(
@@ -510,7 +486,7 @@ fn impl_str_replace(
 
 ///|
 /// Default of `trim(pattern)`: none.
-fn impl_str_trim__pattern_default() -> StrPattern? raise SourceError {
+fn impl_str_trim__pattern_default() -> StrPattern? {
   None
 }
 
@@ -522,7 +498,7 @@ fn impl_str_trim(
   pattern_ : StrPattern?,
   at_ : StrSide?,
   repeat_ : Bool,
-) -> String raise HintedError {
+) -> String {
   let mut start = at_ is (Some(Start) | None)
   let end = at_ is (Some(End) | None)
   match pattern_ {
@@ -593,17 +569,14 @@ fn impl_str_trim(
 
 ///|
 /// Default of `split(pattern)`: none.
-fn impl_str_split__pattern_default() -> StrPattern? raise SourceError {
+fn impl_str_split__pattern_default() -> StrPattern? {
   None
 }
 
 ///|
 /// Splits a string at matches of a specified pattern and returns an array of
 /// the resulting parts.
-fn impl_str_split(
-  self_ : String,
-  pattern_ : StrPattern?,
-) -> Arr raise HintedError {
+fn impl_str_split(self_ : String, pattern_ : StrPattern?) -> Arr {
   let s = self_
   match pattern_ {
     None => Arr::from_array(rust_split_whitespace(s).map(v => Value::Str(v)))
@@ -648,7 +621,7 @@ fn rust_split_whitespace(s : String) -> Array[String] {
 
 ///|
 /// Reverse the string.
-fn impl_str_rev(self_ : String) -> String raise HintedError {
+fn impl_str_rev(self_ : String) -> String {
   let s = StringBuilder()
   let graphemes = @unicode.graphemes(self_)
   for i = graphemes.length() - 1; i >= 0; i = i - 1 {

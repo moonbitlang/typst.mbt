@@ -615,6 +615,9 @@ fn ItemLayouter::vertical_align(
 ///|
 /// Finish list item layout by indenting the body's frames and add the marker
 /// to the first non-empty frame.
+// Cannot fail; keeps upstream's `SourceResult<Fragment>`
+// (typst-layout/src/lists.rs:585).
+#warnings("-unused_error_type")
 fn ItemLayouter::finish(
   self : ItemLayouter,
   marker : @library.Frame,

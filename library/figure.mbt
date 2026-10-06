@@ -267,6 +267,9 @@ fn figure_elem_show_set(_content : Content, _styles : StyleChain) -> Styles {
 
 ///|
 /// Upstream `Synthesize for Packed<FigureCaption>`.
+// Cannot fail; a `Synthesize::synthesize` hook, `Ok(())` upstream
+// (typst-library/src/model/figure.rs:652).
+#warnings("-unused_error_type")
 fn figure_caption_elem_synthesize(
   _engine : Engine,
   content : Content,

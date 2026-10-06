@@ -1013,9 +1013,7 @@ pub fn native_array_slice() -> NativeFuncData {
             docs: "The end index (exclusive). If omitted, the whole slice until the end of the array is extracted. If negative, indexes from the back.",
             input: () => input_of((Ty::new() : Ty[Int64?])),
             default: Some(() => {
-              IntoValue::into_value(impl_array_slice__end_default()) catch {
-                _ => None
-              }
+              IntoValue::into_value(impl_array_slice__end_default())
             }),
             positional: true,
             named: false,
@@ -1274,9 +1272,7 @@ pub fn native_array_range() -> NativeFuncData {
             docs: "The start of the range (inclusive).",
             input: () => input_of((Ty::new() : Ty[Int64])),
             default: Some(() => {
-              IntoValue::into_value(impl_array_range__start_default()) catch {
-                _ => None
-              }
+              IntoValue::into_value(impl_array_range__start_default())
             }),
             positional: true,
             named: false,
@@ -1311,9 +1307,7 @@ pub fn native_array_range() -> NativeFuncData {
             docs: "The distance between the generated numbers.",
             input: () => input_of((Ty::new() : Ty[NonZeroI64])),
             default: Some(() => {
-              IntoValue::into_value(impl_array_range__step_default()) catch {
-                _ => None
-              }
+              IntoValue::into_value(impl_array_range__step_default())
             }),
             positional: false,
             named: true,
@@ -2143,9 +2137,7 @@ pub fn native_array_join() -> NativeFuncData {
             docs: "A value to insert between each item of the array.",
             input: () => input_of((Ty::new() : Ty[Value?])),
             default: Some(() => {
-              IntoValue::into_value(impl_array_join__separator_default()) catch {
-                _ => None
-              }
+              IntoValue::into_value(impl_array_join__separator_default())
             }),
             positional: true,
             named: false,
@@ -2169,9 +2161,7 @@ pub fn native_array_join() -> NativeFuncData {
             docs: "What to return if the array is empty.",
             input: () => input_of((Ty::new() : Ty[Value?])),
             default: Some(() => {
-              IntoValue::into_value(impl_array_join__default_default()) catch {
-                _ => None
-              }
+              IntoValue::into_value(impl_array_join__default_default())
             }),
             positional: false,
             named: true,
@@ -2890,9 +2880,7 @@ pub fn native_bytes_slice() -> NativeFuncData {
             docs: "The end index (exclusive). If omitted, the whole slice until the end is extracted.",
             input: () => input_of((Ty::new() : Ty[Int64?])),
             default: Some(() => {
-              IntoValue::into_value(impl_bytes_slice__end_default()) catch {
-                _ => None
-              }
+              IntoValue::into_value(impl_bytes_slice__end_default())
             }),
             positional: true,
             named: false,
@@ -3927,9 +3915,7 @@ pub fn native_calc_log() -> NativeFuncData {
             docs: "The base of the logarithm. May not be zero.",
             input: () => input_of((Ty::new() : Ty[Double])),
             default: Some(() => {
-              IntoValue::into_value(impl_calc_log__base_default().v) catch {
-                _ => None
-              }
+              IntoValue::into_value(impl_calc_log__base_default().v)
             }),
             positional: false,
             named: true,
@@ -5192,9 +5178,7 @@ pub fn native_calc_norm() -> NativeFuncData {
             docs: "The value of $p$. Must be greater than zero.",
             input: () => input_of((Ty::new() : Ty[Double])),
             default: Some(() => {
-              IntoValue::into_value(impl_calc_norm__p_default().v) catch {
-                _ => None
-              }
+              IntoValue::into_value(impl_calc_norm__p_default().v)
             }),
             positional: false,
             named: true,
@@ -5666,9 +5650,7 @@ pub fn native_datetime_today() -> NativeFuncData {
             docs: "An offset to apply to the current UTC date. If set to `{auto}`, the offset will be the local offset.",
             input: () => input_of((Ty::new() : Ty[SmartTodayOffset])),
             default: Some(() => {
-              IntoValue::into_value(impl_datetime_today__offset_default()) catch {
-                _ => None
-              }
+              IntoValue::into_value(impl_datetime_today__offset_default())
             }),
             positional: false,
             named: true,
@@ -5735,9 +5717,7 @@ pub fn native_datetime_display() -> NativeFuncData {
             docs: "The format used to display the datetime.",
             input: () => input_of((Ty::new() : Ty[SmartDisplayPattern])),
             default: Some(() => {
-              IntoValue::into_value(impl_datetime_display__pattern_default()) catch {
-                _ => None
-              }
+              IntoValue::into_value(impl_datetime_display__pattern_default())
             }),
             positional: true,
             named: false,
@@ -7445,9 +7425,7 @@ pub fn native_f64_from_bytes() -> NativeFuncData {
             docs: "The endianness of the conversion.",
             input: () => input_of((Ty::new() : Ty[Endianness])),
             default: Some(() => {
-              IntoValue::into_value(impl_f64_from_bytes__endian_default()) catch {
-                _ => None
-              }
+              IntoValue::into_value(impl_f64_from_bytes__endian_default())
             }),
             positional: false,
             named: true,
@@ -7515,9 +7493,7 @@ pub fn native_f64_to_bytes() -> NativeFuncData {
             docs: "The endianness of the conversion.",
             input: () => input_of((Ty::new() : Ty[Endianness])),
             default: Some(() => {
-              IntoValue::into_value(impl_f64_to_bytes__endian_default()) catch {
-                _ => None
-              }
+              IntoValue::into_value(impl_f64_to_bytes__endian_default())
             }),
             positional: false,
             named: true,
@@ -7722,9 +7698,7 @@ pub fn native_i64_construct() -> NativeFuncData {
             docs: "The base (radix) for parsing strings, between 2 and 36.",
             input: () => input_of((Ty::new() : Ty[Base])),
             default: Some(() => {
-              IntoValue::into_value(impl_i64_construct__base_default().v) catch {
-                _ => None
-              }
+              IntoValue::into_value(impl_i64_construct__base_default().v)
             }),
             positional: false,
             named: true,
@@ -8224,9 +8198,7 @@ pub fn native_i64_from_bytes() -> NativeFuncData {
             docs: "The endianness of the conversion.",
             input: () => input_of((Ty::new() : Ty[Endianness])),
             default: Some(() => {
-              IntoValue::into_value(impl_i64_from_bytes__endian_default()) catch {
-                _ => None
-              }
+              IntoValue::into_value(impl_i64_from_bytes__endian_default())
             }),
             positional: false,
             named: true,
@@ -8309,9 +8281,7 @@ pub fn native_i64_to_bytes() -> NativeFuncData {
             docs: "The endianness of the conversion.",
             input: () => input_of((Ty::new() : Ty[Endianness])),
             default: Some(() => {
-              IntoValue::into_value(impl_i64_to_bytes__endian_default()) catch {
-                _ => None
-              }
+              IntoValue::into_value(impl_i64_to_bytes__endian_default())
             }),
             positional: false,
             named: true,
@@ -8709,11 +8679,7 @@ pub fn native_eval() -> NativeFuncData {
             name: "mode",
             docs: "The @reference:syntax:modes[syntactical mode] in which the string is parsed.",
             input: () => input_of((Ty::new() : Ty[@syntax.SyntaxMode])),
-            default: Some(() => {
-              IntoValue::into_value(impl_eval__mode_default()) catch {
-                _ => None
-              }
-            }),
+            default: Some(() => IntoValue::into_value(impl_eval__mode_default())),
             positional: false,
             named: true,
             variadic: false,
@@ -8725,9 +8691,7 @@ pub fn native_eval() -> NativeFuncData {
             docs: "A scope of definitions that are made available.",
             input: () => input_of((Ty::new() : Ty[Dict])),
             default: Some(() => {
-              IntoValue::into_value(impl_eval__scope_default()) catch {
-                _ => None
-              }
+              IntoValue::into_value(impl_eval__scope_default())
             }),
             positional: false,
             named: true,
@@ -9414,9 +9378,7 @@ pub fn native_str_construct() -> NativeFuncData {
             docs: "The base (radix) to display integers in, between 2 and 36.",
             input: () => input_of((Ty::new() : Ty[Base])),
             default: Some(() => {
-              IntoValue::into_value(impl_str_construct__base_default().v) catch {
-                _ => None
-              }
+              IntoValue::into_value(impl_str_construct__base_default().v)
             }),
             positional: false,
             named: true,
@@ -9747,9 +9709,7 @@ pub fn native_str_slice() -> NativeFuncData {
             docs: "The end byte index (exclusive). If omitted, the whole slice until the end of the string is extracted. If negative, indexes from the back.",
             input: () => input_of((Ty::new() : Ty[Int64?])),
             default: Some(() => {
-              IntoValue::into_value(impl_str_slice__end_default()) catch {
-                _ => None
-              }
+              IntoValue::into_value(impl_str_slice__end_default())
             }),
             positional: true,
             named: false,
@@ -10034,9 +9994,7 @@ pub fn native_str_normalize() -> NativeFuncData {
             docs: "",
             input: () => input_of((Ty::new() : Ty[UnicodeNormalForm])),
             default: Some(() => {
-              IntoValue::into_value(impl_str_normalize__form_default()) catch {
-                _ => None
-              }
+              IntoValue::into_value(impl_str_normalize__form_default())
             }),
             positional: false,
             named: true,
@@ -10634,9 +10592,7 @@ pub fn native_str_trim() -> NativeFuncData {
             docs: "The pattern to search for. If `{none}`, trims white spaces.",
             input: () => input_of((Ty::new() : Ty[StrPattern?])),
             default: Some(() => {
-              IntoValue::into_value(impl_str_trim__pattern_default()) catch {
-                _ => None
-              }
+              IntoValue::into_value(impl_str_trim__pattern_default())
             }),
             positional: true,
             named: false,
@@ -10731,9 +10687,7 @@ pub fn native_str_split() -> NativeFuncData {
             docs: "The pattern to split at. Defaults to whitespace.",
             input: () => input_of((Ty::new() : Ty[StrPattern?])),
             default: Some(() => {
-              IntoValue::into_value(impl_str_split__pattern_default()) catch {
-                _ => None
-              }
+              IntoValue::into_value(impl_str_split__pattern_default())
             }),
             positional: true,
             named: false,
@@ -11259,9 +11213,7 @@ pub fn native_counter_display() -> NativeFuncData {
             docs: "A @numbering[numbering pattern or a function], which specifies how to display the counter. If given a function, that function receives each number of the counter as a separate argument. If the amount of numbers varies, e.g. for the heading argument, you can use an @arguments[argument sink].",
             input: () => input_of((Ty::new() : Ty[Smart[Numbering]])),
             default: Some(() => {
-              IntoValue::into_value(impl_counter_display__numbering_default()) catch {
-                _ => None
-              }
+              IntoValue::into_value(impl_counter_display__numbering_default())
             }),
             positional: true,
             named: false,
@@ -11274,9 +11226,7 @@ pub fn native_counter_display() -> NativeFuncData {
             docs: "The place at which the counter should be displayed.",
             input: () => input_of((Ty::new() : Ty[Smart[LocatableSelector]])),
             default: Some(() => {
-              IntoValue::into_value(impl_counter_display__at_default()) catch {
-                _ => None
-              }
+              IntoValue::into_value(impl_counter_display__at_default())
             }),
             positional: false,
             named: true,
@@ -11485,9 +11435,7 @@ pub fn native_counter_step() -> NativeFuncData {
             docs: "The depth at which to step the counter. Defaults to `{1}`.",
             input: () => input_of((Ty::new() : Ty[NonZeroUSize])),
             default: Some(() => {
-              IntoValue::into_value(impl_counter_step__level_default()) catch {
-                _ => None
-              }
+              IntoValue::into_value(impl_counter_step__level_default())
             }),
             positional: false,
             named: true,
@@ -11919,9 +11867,7 @@ pub fn native_state_construct() -> NativeFuncData {
             docs: "The initial value of the state.",
             input: () => input_of((Ty::new() : Ty[Value])),
             default: Some(() => {
-              IntoValue::into_value(impl_state_construct__init_default()) catch {
-                _ => None
-              }
+              IntoValue::into_value(impl_state_construct__init_default())
             }),
             positional: true,
             named: false,
@@ -13279,9 +13225,7 @@ pub fn native_csv() -> NativeFuncData {
             docs: "The delimiter that separates columns in the CSV file. Must be a single ASCII character.",
             input: () => input_of((Ty::new() : Ty[Delimiter])),
             default: Some(() => {
-              IntoValue::into_value(impl_csv__delimiter_default()) catch {
-                _ => None
-              }
+              IntoValue::into_value(impl_csv__delimiter_default())
             }),
             positional: false,
             named: true,
@@ -13294,9 +13238,7 @@ pub fn native_csv() -> NativeFuncData {
             docs: "How to represent the file's rows.",
             input: () => input_of((Ty::new() : Ty[RowType])),
             default: Some(() => {
-              IntoValue::into_value(impl_csv__row_type_default()) catch {
-                _ => None
-              }
+              IntoValue::into_value(impl_csv__row_type_default())
             }),
             positional: false,
             named: true,
@@ -13486,9 +13428,7 @@ pub fn native_read() -> NativeFuncData {
             docs: "The encoding to read the file with.",
             input: () => input_of((Ty::new() : Ty[Encoding?])),
             default: Some(() => {
-              IntoValue::into_value(impl_read__encoding_default()) catch {
-                _ => None
-              }
+              IntoValue::into_value(impl_read__encoding_default())
             }),
             positional: false,
             named: true,
@@ -15053,9 +14993,7 @@ pub fn native_outline_entry_indented() -> NativeFuncData {
             docs: "The gap between the prefix and the inner content.",
             input: () => input_of((Ty::new() : Ty[Length])),
             default: Some(() => {
-              IntoValue::into_value(impl_outline_entry_indented__gap_default()) catch {
-                _ => None
-              }
+              IntoValue::into_value(impl_outline_entry_indented__gap_default())
             }),
             positional: false,
             named: true,
@@ -16643,9 +16581,7 @@ pub fn native_color_negate() -> NativeFuncData {
             docs: "The color space used for the transformation. By default, a perceptual color space is used.",
             input: () => input_of((Ty::new() : Ty[Smart[ColorSpace]])),
             default: Some(() => {
-              IntoValue::into_value(impl_color_negate__space_default()) catch {
-                _ => None
-              }
+              IntoValue::into_value(impl_color_negate__space_default())
             }),
             positional: false,
             named: true,
@@ -16724,9 +16660,7 @@ pub fn native_color_rotate() -> NativeFuncData {
             docs: "The color space used to rotate. By default, this happens in a perceptual color space (@color.oklch[`oklch`]).",
             input: () => input_of((Ty::new() : Ty[ProcessColorSpace])),
             default: Some(() => {
-              IntoValue::into_value(impl_color_rotate__space_default()) catch {
-                _ => None
-              }
+              IntoValue::into_value(impl_color_rotate__space_default())
             }),
             positional: false,
             named: true,
@@ -16795,9 +16729,7 @@ pub fn native_color_mix() -> NativeFuncData {
             docs: "The color space to mix in. By default, this happens in a perceptual color space (@color.oklab[`oklab`]) or, if all colors use the same spot colorant, using that colorant.",
             input: () => input_of((Ty::new() : Ty[Smart[ColorSpace]])),
             default: Some(() => {
-              IntoValue::into_value(impl_color_mix__space_default()) catch {
-                _ => None
-              }
+              IntoValue::into_value(impl_color_mix__space_default())
             }),
             positional: false,
             named: true,
@@ -17117,9 +17049,7 @@ pub fn native_gradient_linear() -> NativeFuncData {
             docs: "The color space in which to interpolate the gradient.",
             input: () => input_of((Ty::new() : Ty[Smart[ColorSpace]])),
             default: Some(() => {
-              IntoValue::into_value(impl_gradient_linear__space_default().v) catch {
-                _ => None
-              }
+              IntoValue::into_value(impl_gradient_linear__space_default().v)
             }),
             positional: false,
             named: true,
@@ -17145,9 +17075,7 @@ pub fn native_gradient_linear() -> NativeFuncData {
             docs: "The direction of the gradient.",
             input: () => input_of((Ty::new() : Ty[Dir])),
             default: Some(() => {
-              IntoValue::into_value(impl_gradient_linear__dir_default()) catch {
-                _ => None
-              }
+              IntoValue::into_value(impl_gradient_linear__dir_default())
             }),
             positional: true,
             named: false,
@@ -17230,9 +17158,7 @@ pub fn native_gradient_radial() -> NativeFuncData {
             docs: "The color space in which to interpolate the gradient.",
             input: () => input_of((Ty::new() : Ty[Smart[ColorSpace]])),
             default: Some(() => {
-              IntoValue::into_value(impl_gradient_radial__space_default().v) catch {
-                _ => None
-              }
+              IntoValue::into_value(impl_gradient_radial__space_default().v)
             }),
             positional: false,
             named: true,
@@ -17258,9 +17184,7 @@ pub fn native_gradient_radial() -> NativeFuncData {
             docs: "The center of the end circle of the gradient.",
             input: () => input_of((Ty::new() : Ty[Axes[Ratio]])),
             default: Some(() => {
-              IntoValue::into_value(impl_gradient_radial__center_default()) catch {
-                _ => None
-              }
+              IntoValue::into_value(impl_gradient_radial__center_default())
             }),
             positional: false,
             named: true,
@@ -17273,9 +17197,7 @@ pub fn native_gradient_radial() -> NativeFuncData {
             docs: "The radius of the end circle of the gradient.",
             input: () => input_of((Ty::new() : Ty[Ratio])),
             default: Some(() => {
-              IntoValue::into_value(impl_gradient_radial__radius_default().v) catch {
-                _ => None
-              }
+              IntoValue::into_value(impl_gradient_radial__radius_default().v)
             }),
             positional: false,
             named: true,
@@ -17303,9 +17225,7 @@ pub fn native_gradient_radial() -> NativeFuncData {
             default: Some(() => {
               IntoValue::into_value(
                 impl_gradient_radial__focal_radius_default().v,
-              ) catch {
-                _ => None
-              }
+              )
             }),
             positional: false,
             named: true,
@@ -17404,9 +17324,7 @@ pub fn native_gradient_conic() -> NativeFuncData {
             docs: "The angle of the gradient.",
             input: () => input_of((Ty::new() : Ty[Angle])),
             default: Some(() => {
-              IntoValue::into_value(impl_gradient_conic__angle_default()) catch {
-                _ => None
-              }
+              IntoValue::into_value(impl_gradient_conic__angle_default())
             }),
             positional: false,
             named: true,
@@ -17419,9 +17337,7 @@ pub fn native_gradient_conic() -> NativeFuncData {
             docs: "The color space in which to interpolate the gradient.",
             input: () => input_of((Ty::new() : Ty[Smart[ColorSpace]])),
             default: Some(() => {
-              IntoValue::into_value(impl_gradient_conic__space_default().v) catch {
-                _ => None
-              }
+              IntoValue::into_value(impl_gradient_conic__space_default().v)
             }),
             positional: false,
             named: true,
@@ -17447,9 +17363,7 @@ pub fn native_gradient_conic() -> NativeFuncData {
             docs: "The center of the circle of the gradient.",
             input: () => input_of((Ty::new() : Ty[Axes[Ratio]])),
             default: Some(() => {
-              IntoValue::into_value(impl_gradient_conic__center_default()) catch {
-                _ => None
-              }
+              IntoValue::into_value(impl_gradient_conic__center_default())
             }),
             positional: false,
             named: true,
@@ -17548,9 +17462,7 @@ pub fn native_gradient_sharp() -> NativeFuncData {
             docs: "How much to smooth the gradient.",
             input: () => input_of((Ty::new() : Ty[Ratio])),
             default: Some(() => {
-              IntoValue::into_value(impl_gradient_sharp__smoothness_default().v) catch {
-                _ => None
-              }
+              IntoValue::into_value(impl_gradient_sharp__smoothness_default().v)
             }),
             positional: false,
             named: true,
@@ -18294,9 +18206,7 @@ pub fn native_polygon_elem_regular() -> NativeFuncData {
             docs: "The diameter of the #link(\"https://en.wikipedia.org/wiki/Circumcircle\")[circumcircle] of the regular polygon.",
             input: () => input_of((Ty::new() : Ty[Length])),
             default: Some(() => {
-              IntoValue::into_value(impl_polygon_elem_regular__size_default()) catch {
-                _ => None
-              }
+              IntoValue::into_value(impl_polygon_elem_regular__size_default())
             }),
             positional: false,
             named: true,
@@ -18475,9 +18385,7 @@ pub fn native_tiling_construct() -> NativeFuncData {
             docs: "The bounding box of each cell of the tiling, specified as a `(x, y)` pair.",
             input: () => input_of((Ty::new() : Ty[Smart[Axes[Length]]])),
             default: Some(() => {
-              IntoValue::into_value(impl_tiling_construct__size_default().v) catch {
-                _ => None
-              }
+              IntoValue::into_value(impl_tiling_construct__size_default().v)
             }),
             positional: false,
             named: true,
@@ -18490,9 +18398,7 @@ pub fn native_tiling_construct() -> NativeFuncData {
             docs: "The spacing between cells of the tiling, specified as a `(x, y)` pair.",
             input: () => input_of((Ty::new() : Ty[Axes[Length]])),
             default: Some(() => {
-              IntoValue::into_value(impl_tiling_construct__spacing_default().v) catch {
-                _ => None
-              }
+              IntoValue::into_value(impl_tiling_construct__spacing_default().v)
             }),
             positional: false,
             named: true,
@@ -18505,9 +18411,7 @@ pub fn native_tiling_construct() -> NativeFuncData {
             docs: "Shifts the entire tile grid without affecting the tile size or spacing.",
             input: () => input_of((Ty::new() : Ty[Axes[Rel[Length]]])),
             default: Some(() => {
-              IntoValue::into_value(impl_tiling_construct__offset_default().v) catch {
-                _ => None
-              }
+              IntoValue::into_value(impl_tiling_construct__offset_default().v)
             }),
             positional: false,
             named: true,
@@ -18520,9 +18424,7 @@ pub fn native_tiling_construct() -> NativeFuncData {
             docs: "Rotates the tiles and the grid clockwise about the offset coordinates by the specified angle. The rotation is applied after the offset.",
             input: () => input_of((Ty::new() : Ty[Angle])),
             default: Some(() => {
-              IntoValue::into_value(impl_tiling_construct__angle_default().v) catch {
-                _ => None
-              }
+              IntoValue::into_value(impl_tiling_construct__angle_default().v)
             }),
             positional: false,
             named: true,
@@ -18698,9 +18600,7 @@ pub fn native_pdf_format_header_cell() -> NativeFuncData {
             default: Some(() => {
               IntoValue::into_value(
                 impl_pdf_format_header_cell__level_default(),
-              ) catch {
-                _ => None
-              }
+              )
             }),
             positional: false,
             named: true,
@@ -18715,9 +18615,7 @@ pub fn native_pdf_format_header_cell() -> NativeFuncData {
             default: Some(() => {
               IntoValue::into_value(
                 impl_pdf_format_header_cell__scope_default(),
-              ) catch {
-                _ => None
-              }
+              )
             }),
             positional: false,
             named: true,

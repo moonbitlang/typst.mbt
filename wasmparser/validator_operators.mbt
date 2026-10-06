@@ -1678,6 +1678,9 @@ pub fn WasmProposalValidator::set_offset(
 // --- `impl VisitOperator for OperatorValidatorTemp` ---
 
 ///|
+// Cannot fail; visitor methods share `Result<()>`
+// (wasmparser 0.228.0 src/validator/operators.rs:1819).
+#warnings("-unused_error_type")
 fn OperatorValidatorTemp::visit_nop(
   _self : OperatorValidatorTemp,
 ) -> Unit raise BinaryReaderError {
@@ -2332,6 +2335,9 @@ fn OperatorValidatorTemp::visit_memory_grow(
 }
 
 ///|
+// Cannot fail; visitor methods share `Result<()>`
+// (wasmparser 0.228.0 src/validator/operators.rs:2364).
+#warnings("-unused_error_type")
 fn OperatorValidatorTemp::visit_i32_const(
   self : OperatorValidatorTemp,
   _value : Int,
@@ -2340,6 +2346,9 @@ fn OperatorValidatorTemp::visit_i32_const(
 }
 
 ///|
+// Cannot fail; visitor methods share `Result<()>`
+// (wasmparser 0.228.0 src/validator/operators.rs:2368).
+#warnings("-unused_error_type")
 fn OperatorValidatorTemp::visit_i64_const(
   self : OperatorValidatorTemp,
   _value : Int64,
@@ -3856,6 +3865,9 @@ fn OperatorValidatorTemp::visit_memory_atomic_wait64(
 }
 
 ///|
+// Cannot fail; visitor methods share `Result<()>`
+// (wasmparser 0.228.0 src/validator/operators.rs:3002).
+#warnings("-unused_error_type")
 fn OperatorValidatorTemp::visit_atomic_fence(
   _self : OperatorValidatorTemp,
 ) -> Unit raise BinaryReaderError {

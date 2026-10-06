@@ -93,6 +93,9 @@ fn grid_elem_row_gutter_parse(
 }
 
 ///|
+// Cannot fail; a parse hook for `#[parse(Some(false))]`
+// (typst-library/src/layout/grid/mod.rs:855).
+#warnings("-unused_error_type")
 fn grid_cell_elem_is_repeated_parse(
   _engine : Engine,
   _args : Args,
@@ -130,6 +133,9 @@ fn table_elem_row_gutter_parse(
 }
 
 ///|
+// Cannot fail; a parse hook for `#[parse(None)]`
+// (typst-library/src/model/table.rs:276).
+#warnings("-unused_error_type")
 fn table_elem_summary_parse(
   _engine : Engine,
   _args : Args,
@@ -139,6 +145,9 @@ fn table_elem_summary_parse(
 }
 
 ///|
+// Cannot fail; a parse hook for `#[parse(Some(Smart::Auto))]`
+// (typst-library/src/model/table.rs:773).
+#warnings("-unused_error_type")
 fn table_cell_elem_kind_parse(
   _engine : Engine,
   _args : Args,
@@ -148,6 +157,9 @@ fn table_cell_elem_kind_parse(
 }
 
 ///|
+// Cannot fail; a parse hook for `#[parse(Some(false))]`
+// (typst-library/src/model/table.rs:777).
+#warnings("-unused_error_type")
 fn table_cell_elem_is_repeated_parse(
   _engine : Engine,
   _args : Args,
@@ -209,6 +221,9 @@ fn pad_elem_bottom_parse(
 // layout/page.rs: PagebreakElem
 
 ///|
+// Cannot fail; a parse hook for `#[parse(None)]`
+// (typst-library/src/layout/page.rs:576).
+#warnings("-unused_error_type")
 fn pagebreak_elem_boundary_parse(
   _engine : Engine,
   _args : Args,
@@ -220,6 +235,9 @@ fn pagebreak_elem_boundary_parse(
 // layout/spacing.rs: VElem
 
 ///|
+// Cannot fail; a parse hook for `#[parse(Some(false))]`
+// (typst-library/src/layout/spacing.rs:119).
+#warnings("-unused_error_type")
 fn v_elem_attach_parse(
   _engine : Engine,
   _args : Args,
@@ -259,6 +277,9 @@ fn scale_elem_y_parse(
 // text/space.rs: SpaceElem
 
 ///|
+// Cannot fail; a parse hook for `#[parse(false)]`
+// (typst-library/src/text/space.rs:13).
+#warnings("-unused_error_type")
 fn space_elem_had_newline_parse(
   _engine : Engine,
   _args : Args,
@@ -308,6 +329,9 @@ fn text_elem_fill_parse(
 // math/frac.rs: FracElem, BinomElem
 
 ///|
+// Cannot fail; a parse hook for `#[parse(None)]`
+// (typst-library/src/math/frac.rs:101).
+#warnings("-unused_error_type")
 fn frac_elem_num_deparenthesized_parse(
   _engine : Engine,
   _args : Args,
@@ -317,6 +341,9 @@ fn frac_elem_num_deparenthesized_parse(
 }
 
 ///|
+// Cannot fail; a parse hook for `#[parse(None)]`
+// (typst-library/src/math/frac.rs:108).
+#warnings("-unused_error_type")
 fn frac_elem_denom_deparenthesized_parse(
   _engine : Engine,
   _args : Args,

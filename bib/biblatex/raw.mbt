@@ -504,6 +504,9 @@ fn BiblatexParser::body(
 
 ///|
 /// Eat an inline comment.
+// Cannot fail; keeps upstream's `Result<(), ParseError>`
+// (biblatex 0.12.0 src/raw.rs:526).
+#warnings("-unused_error_type")
 fn BiblatexParser::comment(self : BiblatexParser) -> Unit raise PErr {
   if self.s.eat_if('%') {
     self.s.eat_until_char('\n') |> ignore

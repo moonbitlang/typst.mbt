@@ -400,12 +400,18 @@ pub fn or_(lhs : Value, rhs : Value) -> Value raise HintedError {
 
 ///|
 /// Compute whether two values are equal.
+// Cannot fail; binary operators share `HintedStrResult<Value>`
+// (typst-library/src/foundations/ops.rs:397).
+#warnings("-unused_error_type")
 pub fn eq_(lhs : Value, rhs : Value) -> Value raise HintedError {
   Bool(equal(lhs, rhs))
 }
 
 ///|
 /// Compute whether two values are unequal.
+// Cannot fail; binary operators share `HintedStrResult<Value>`
+// (typst-library/src/foundations/ops.rs:402).
+#warnings("-unused_error_type")
 pub fn neq(lhs : Value, rhs : Value) -> Value raise HintedError {
   Bool(!equal(lhs, rhs))
 }

@@ -4,7 +4,7 @@
 
 ///|
 /// Calculates the absolute value of a numeric value.
-fn impl_calc_abs(value_ : ToAbs) -> Value raise HintedError {
+fn impl_calc_abs(value_ : ToAbs) -> Value {
   value_.0
 }
 
@@ -169,7 +169,7 @@ fn impl_calc_root(
 
 ///|
 /// Calculates the sine of an angle.
-fn impl_calc_sin(angle_ : AngleLike) -> Double raise HintedError {
+fn impl_calc_sin(angle_ : AngleLike) -> Double {
   match angle_ {
     Angle(a) => a.sin()
     Int(n) => libm_sin(n.to_double())
@@ -179,7 +179,7 @@ fn impl_calc_sin(angle_ : AngleLike) -> Double raise HintedError {
 
 ///|
 /// Calculates the cosine of an angle.
-fn impl_calc_cos(angle_ : AngleLike) -> Double raise HintedError {
+fn impl_calc_cos(angle_ : AngleLike) -> Double {
   match angle_ {
     Angle(a) => a.cos()
     Int(n) => libm_cos(n.to_double())
@@ -189,7 +189,7 @@ fn impl_calc_cos(angle_ : AngleLike) -> Double raise HintedError {
 
 ///|
 /// Calculates the tangent of an angle.
-fn impl_calc_tan(angle_ : AngleLike) -> Double raise HintedError {
+fn impl_calc_tan(angle_ : AngleLike) -> Double {
   match angle_ {
     Angle(a) => a.tan()
     Int(n) => libm_tan(n.to_double())
@@ -219,37 +219,37 @@ fn impl_calc_acos(value_ : @syntax.Spanned[Num]) -> Angle raise SourceError {
 
 ///|
 /// Calculates the arctangent of a number.
-fn impl_calc_atan(value_ : Num) -> Angle raise HintedError {
+fn impl_calc_atan(value_ : Num) -> Angle {
   Angle::atan(value_.float())
 }
 
 ///|
 /// Calculates the four-quadrant arctangent of a coordinate.
-fn impl_calc_atan2(x_ : Num, y_ : Num) -> Angle raise HintedError {
+fn impl_calc_atan2(x_ : Num, y_ : Num) -> Angle {
   Angle::atan2(y_.float(), x_.float())
 }
 
 ///|
 /// Calculates the hyperbolic sine of a hyperbolic angle.
-fn impl_calc_sinh(value_ : Double) -> Double raise HintedError {
+fn impl_calc_sinh(value_ : Double) -> Double {
   libm_sinh(value_)
 }
 
 ///|
 /// Calculates the hyperbolic cosine of a hyperbolic angle.
-fn impl_calc_cosh(value_ : Double) -> Double raise HintedError {
+fn impl_calc_cosh(value_ : Double) -> Double {
   libm_cosh(value_)
 }
 
 ///|
 /// Calculates the hyperbolic tangent of a hyperbolic angle.
-fn impl_calc_tanh(value_ : Double) -> Double raise HintedError {
+fn impl_calc_tanh(value_ : Double) -> Double {
   libm_tanh(value_)
 }
 
 ///|
 /// Calculates the inverse hyperbolic sine of a number.
-fn impl_calc_asinh(value_ : Double) -> Double raise HintedError {
+fn impl_calc_asinh(value_ : Double) -> Double {
   libm_asinh(value_)
 }
 
@@ -279,7 +279,7 @@ fn impl_calc_atanh(
 
 ///|
 /// Default of `calc.log(base:)`: `Spanned::detached(10.0)`.
-fn impl_calc_log__base_default() -> @syntax.Spanned[Double] raise SourceError {
+fn impl_calc_log__base_default() -> @syntax.Spanned[Double] {
   { v: 10.0, span: @syntax.Span::detached(), }
 }
 
@@ -331,7 +331,7 @@ fn impl_calc_ln(
 
 ///|
 /// Calculates the error function of a number.
-fn impl_calc_erf(value_ : Double) -> Double raise HintedError {
+fn impl_calc_erf(value_ : Double) -> Double {
   libm_erf(value_)
 }
 
@@ -519,7 +519,7 @@ fn impl_calc_trunc(value_ : DecNum) -> Int64 raise HintedError {
 
 ///|
 /// Returns the fractional part of a number.
-fn impl_calc_fract(value_ : DecNum) -> DecNum raise HintedError {
+fn impl_calc_fract(value_ : DecNum) -> DecNum {
   match value_ {
     Int(_) => Int(0L)
     Float(n) => Float(n - n.trunc())
@@ -692,13 +692,13 @@ fn minmax(
 
 ///|
 /// Determines whether an integer is even.
-fn impl_calc_even(value_ : Int64) -> Bool raise HintedError {
+fn impl_calc_even(value_ : Int64) -> Bool {
   value_ % 2L == 0L
 }
 
 ///|
 /// Determines whether an integer is odd.
-fn impl_calc_odd(value_ : Int64) -> Bool raise HintedError {
+fn impl_calc_odd(value_ : Int64) -> Bool {
   value_ % 2L != 0L
 }
 
@@ -825,7 +825,7 @@ fn impl_calc_quo(
 
 ///|
 /// Default of `calc.norm(p:)`: `Spanned::detached(2.0)`.
-fn impl_calc_norm__p_default() -> @syntax.Spanned[Double] raise SourceError {
+fn impl_calc_norm__p_default() -> @syntax.Spanned[Double] {
   { v: 2.0, span: @syntax.Span::detached(), }
 }
 

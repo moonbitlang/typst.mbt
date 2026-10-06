@@ -118,16 +118,13 @@ pub fn[T : Reflect] castable_of(_ : Ty[T], v : Value) -> Bool {
 /// - A `{<label>}`.
 /// - A location.
 /// - A more complex selector like `{heading.where(level: 1)}`.
-fn impl_selector_construct(target_ : Selector) -> Selector raise HintedError {
+fn impl_selector_construct(target_ : Selector) -> Selector {
   target_
 }
 
 ///|
 /// Selects all elements that match this or any of the other selectors.
-fn impl_selector_or(
-  self_ : Selector,
-  others_ : Array[Selector],
-) -> Selector raise HintedError {
+fn impl_selector_or(self_ : Selector, others_ : Array[Selector]) -> Selector {
   let list = others_.copy()
   list.push(self_)
   Or(list)
@@ -135,10 +132,7 @@ fn impl_selector_or(
 
 ///|
 /// Selects all elements that match this and all of the other selectors.
-fn impl_selector_and(
-  self_ : Selector,
-  others_ : Array[Selector],
-) -> Selector raise HintedError {
+fn impl_selector_and(self_ : Selector, others_ : Array[Selector]) -> Selector {
   let list = others_.copy()
   list.push(self_)
   And(list)
@@ -151,7 +145,7 @@ fn impl_selector_before(
   self_ : Selector,
   end_ : LocatableSelector,
   inclusive_ : Bool,
-) -> Selector raise HintedError {
+) -> Selector {
   Before(selector=self_, end=end_.0, inclusive=inclusive_)
 }
 
@@ -162,7 +156,7 @@ fn impl_selector_after(
   self_ : Selector,
   start_ : LocatableSelector,
   inclusive_ : Bool,
-) -> Selector raise HintedError {
+) -> Selector {
   After(selector=self_, start=start_.0, inclusive=inclusive_)
 }
 
@@ -172,7 +166,7 @@ fn impl_selector_after(
 fn impl_selector_within(
   self_ : Selector,
   ancestor_ : LocatableSelector,
-) -> Selector raise HintedError {
+) -> Selector {
   Within(selector=self_, ancestor=ancestor_.0)
 }
 

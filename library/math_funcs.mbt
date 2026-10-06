@@ -14,10 +14,7 @@ pub fn Content::set(
 
 ///|
 /// A square root.
-fn impl_math_sqrt(
-  span : @syntax.Span,
-  radicand_ : Content,
-) -> Content raise HintedError {
+fn impl_math_sqrt(span : @syntax.Span, radicand_ : Content) -> Content {
   Content::new(root_elem(), [(root_elem_radicand, Content(radicand_))]).spanned(
     span,
   )
@@ -43,91 +40,79 @@ fn math_size(body : Content, size : MathSize, cramped : Bool) -> Content {
 
 ///|
 /// Bold font style in math.
-fn impl_math_bold(body_ : Content) -> Content raise HintedError {
+fn impl_math_bold(body_ : Content) -> Content {
   body_.set(equation_elem(), equation_elem_bold, Bool(true))
 }
 
 ///|
 /// Italic font style in math.
-fn impl_math_italic(body_ : Content) -> Content raise HintedError {
+fn impl_math_italic(body_ : Content) -> Content {
   body_.set(equation_elem(), equation_elem_italic, Bool(true))
 }
 
 ///|
 /// Serif (roman) font style in math.
-fn impl_math_serif(body_ : Content) -> Content raise HintedError {
+fn impl_math_serif(body_ : Content) -> Content {
   math_variant(body_, Plain)
 }
 
 ///|
 /// Sans-serif font style in math.
-fn impl_math_sans(body_ : Content) -> Content raise HintedError {
+fn impl_math_sans(body_ : Content) -> Content {
   math_variant(body_, SansSerif)
 }
 
 ///|
 /// Calligraphic (chancery) font style in math.
-fn impl_math_cal(body_ : Content) -> Content raise HintedError {
+fn impl_math_cal(body_ : Content) -> Content {
   math_variant(body_, Chancery)
 }
 
 ///|
 /// Script (roundhand) font style in math.
-fn impl_math_scr(body_ : Content) -> Content raise HintedError {
+fn impl_math_scr(body_ : Content) -> Content {
   math_variant(body_, Roundhand)
 }
 
 ///|
 /// Fraktur font style in math.
-fn impl_math_frak(body_ : Content) -> Content raise HintedError {
+fn impl_math_frak(body_ : Content) -> Content {
   math_variant(body_, Fraktur)
 }
 
 ///|
 /// Monospace font style in math.
-fn impl_math_mono(body_ : Content) -> Content raise HintedError {
+fn impl_math_mono(body_ : Content) -> Content {
   math_variant(body_, Monospace)
 }
 
 ///|
 /// Blackboard bold (double-struck) font style in math.
-fn impl_math_bb(body_ : Content) -> Content raise HintedError {
+fn impl_math_bb(body_ : Content) -> Content {
   math_variant(body_, DoubleStruck)
 }
 
 ///|
 /// Forced display style in math.
-fn impl_math_display(
-  body_ : Content,
-  cramped_ : Bool,
-) -> Content raise HintedError {
+fn impl_math_display(body_ : Content, cramped_ : Bool) -> Content {
   math_size(body_, Display, cramped_)
 }
 
 ///|
 /// Forced inline (text) style in math.
-fn impl_math_inline(
-  body_ : Content,
-  cramped_ : Bool,
-) -> Content raise HintedError {
+fn impl_math_inline(body_ : Content, cramped_ : Bool) -> Content {
   math_size(body_, Text, cramped_)
 }
 
 ///|
 /// Forced script style in math.
-fn impl_math_script(
-  body_ : Content,
-  cramped_ : Bool,
-) -> Content raise HintedError {
+fn impl_math_script(body_ : Content, cramped_ : Bool) -> Content {
   math_size(body_, Script, cramped_)
 }
 
 ///|
 /// Forced second script style in math.
-fn impl_math_sscript(
-  body_ : Content,
-  cramped_ : Bool,
-) -> Content raise HintedError {
+fn impl_math_sscript(body_ : Content, cramped_ : Bool) -> Content {
   math_size(body_, ScriptScript, cramped_)
 }
 

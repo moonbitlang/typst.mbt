@@ -303,7 +303,7 @@ fn impl_datetime_today(
 }
 
 ///|
-fn impl_datetime_today__offset_default() -> SmartTodayOffset raise SourceError {
+fn impl_datetime_today__offset_default() -> SmartTodayOffset {
   Auto
 }
 
@@ -343,7 +343,7 @@ fn impl_datetime_display(
 }
 
 ///|
-fn impl_datetime_display__pattern_default() -> SmartDisplayPattern raise SourceError {
+fn impl_datetime_display__pattern_default() -> SmartDisplayPattern {
   Auto
 }
 
@@ -428,42 +428,42 @@ pub fn Datetime::ordinal(self : Datetime) -> Int? {
 }
 
 ///|
-fn impl_datetime_year(self_ : Datetime) -> I32? raise HintedError {
+fn impl_datetime_year(self_ : Datetime) -> I32? {
   self_.year().map(v => I32(v.to_int64()))
 }
 
 ///|
-fn impl_datetime_month(self_ : Datetime) -> U8? raise HintedError {
+fn impl_datetime_month(self_ : Datetime) -> U8? {
   self_.month().map(v => U8(v.to_int64()))
 }
 
 ///|
-fn impl_datetime_weekday(self_ : Datetime) -> U8? raise HintedError {
+fn impl_datetime_weekday(self_ : Datetime) -> U8? {
   self_.weekday().map(v => U8(v.to_int64()))
 }
 
 ///|
-fn impl_datetime_day(self_ : Datetime) -> U8? raise HintedError {
+fn impl_datetime_day(self_ : Datetime) -> U8? {
   self_.day().map(v => U8(v.to_int64()))
 }
 
 ///|
-fn impl_datetime_hour(self_ : Datetime) -> U8? raise HintedError {
+fn impl_datetime_hour(self_ : Datetime) -> U8? {
   self_.hour().map(v => U8(v.to_int64()))
 }
 
 ///|
-fn impl_datetime_minute(self_ : Datetime) -> U8? raise HintedError {
+fn impl_datetime_minute(self_ : Datetime) -> U8? {
   self_.minute().map(v => U8(v.to_int64()))
 }
 
 ///|
-fn impl_datetime_second(self_ : Datetime) -> U8? raise HintedError {
+fn impl_datetime_second(self_ : Datetime) -> U8? {
   self_.second().map(v => U8(v.to_int64()))
 }
 
 ///|
-fn impl_datetime_ordinal(self_ : Datetime) -> U16? raise HintedError {
+fn impl_datetime_ordinal(self_ : Datetime) -> U16? {
   self_.ordinal().map(v => U16(v.to_int64()))
 }
 

@@ -156,6 +156,9 @@ fn raw_elem_syntaxes_default() -> Value {
 
 ///|
 /// Upstream `Synthesize for Packed<RawElem>`.
+// Cannot fail; a `Synthesize::synthesize` hook, `Ok(())` upstream
+// (typst-library/src/text/raw.rs:515).
+#warnings("-unused_error_type")
 fn raw_elem_synthesize(
   engine : Engine,
   content : Content,

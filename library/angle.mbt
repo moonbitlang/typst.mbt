@@ -83,13 +83,13 @@ pub fn Angle::to_deg(self : Angle) -> Double {
 
 ///|
 /// Converts this angle to radians (`angle.rad`).
-fn impl_angle_to_rad(self_ : Angle) -> Double raise HintedError {
+fn impl_angle_to_rad(self_ : Angle) -> Double {
   self_.to_rad()
 }
 
 ///|
 /// Converts this angle to degrees (`angle.deg`).
-fn impl_angle_to_deg(self_ : Angle) -> Double raise HintedError {
+fn impl_angle_to_deg(self_ : Angle) -> Double {
   self_.to_deg()
 }
 

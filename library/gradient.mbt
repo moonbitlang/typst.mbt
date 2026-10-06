@@ -71,12 +71,12 @@ fn gradient_too_few_stops(span : @syntax.Span) -> SourceDiagnostic {
 }
 
 ///|
-fn impl_gradient_linear__space_default() -> @syntax.Spanned[Smart[ColorSpace]] raise SourceError {
+fn impl_gradient_linear__space_default() -> @syntax.Spanned[Smart[ColorSpace]] {
   { v: Auto, span: @syntax.Span::detached(), }
 }
 
 ///|
-fn impl_gradient_linear__dir_default() -> Dir raise SourceError {
+fn impl_gradient_linear__dir_default() -> Dir {
   LTR
 }
 
@@ -112,22 +112,22 @@ fn impl_gradient_linear(
 }
 
 ///|
-fn impl_gradient_radial__space_default() -> @syntax.Spanned[Smart[ColorSpace]] raise SourceError {
+fn impl_gradient_radial__space_default() -> @syntax.Spanned[Smart[ColorSpace]] {
   { v: Auto, span: @syntax.Span::detached(), }
 }
 
 ///|
-fn impl_gradient_radial__center_default() -> Axes[Ratio] raise SourceError {
+fn impl_gradient_radial__center_default() -> Axes[Ratio] {
   Axes::new(Ratio::new(0.5), Ratio::new(0.5))
 }
 
 ///|
-fn impl_gradient_radial__radius_default() -> @syntax.Spanned[Ratio] raise SourceError {
+fn impl_gradient_radial__radius_default() -> @syntax.Spanned[Ratio] {
   { v: Ratio::new(0.5), span: @syntax.Span::detached(), }
 }
 
 ///|
-fn impl_gradient_radial__focal_radius_default() -> @syntax.Spanned[Ratio] raise SourceError {
+fn impl_gradient_radial__focal_radius_default() -> @syntax.Spanned[Ratio] {
   { v: Ratio::new(0.0), span: @syntax.Span::detached(), }
 }
 
@@ -176,17 +176,17 @@ fn impl_gradient_radial(
 }
 
 ///|
-fn impl_gradient_conic__angle_default() -> Angle raise SourceError {
+fn impl_gradient_conic__angle_default() -> Angle {
   Angle::zero()
 }
 
 ///|
-fn impl_gradient_conic__space_default() -> @syntax.Spanned[Smart[ColorSpace]] raise SourceError {
+fn impl_gradient_conic__space_default() -> @syntax.Spanned[Smart[ColorSpace]] {
   { v: Auto, span: @syntax.Span::detached(), }
 }
 
 ///|
-fn impl_gradient_conic__center_default() -> Axes[Ratio] raise SourceError {
+fn impl_gradient_conic__center_default() -> Axes[Ratio] {
   Axes::new(Ratio::new(0.5), Ratio::new(0.5))
 }
 
@@ -216,7 +216,7 @@ fn impl_gradient_conic(
 }
 
 ///|
-fn impl_gradient_sharp__smoothness_default() -> @syntax.Spanned[Ratio] raise SourceError {
+fn impl_gradient_sharp__smoothness_default() -> @syntax.Spanned[Ratio] {
   { v: Ratio::zero(), span: @syntax.Span::detached(), }
 }
 
@@ -317,7 +317,7 @@ fn impl_gradient_repeat(
 
 ///|
 /// Returns the kind of this gradient.
-fn impl_gradient_kind(self_ : Gradient) -> Func raise HintedError {
+fn impl_gradient_kind(self_ : Gradient) -> Func {
   Func::native(
     match self_ {
       Linear(_) => native_gradient_linear()
@@ -329,29 +329,25 @@ fn impl_gradient_kind(self_ : Gradient) -> Func raise HintedError {
 
 ///|
 /// Returns the stops of this gradient.
-fn impl_gradient_stops(
-  self_ : Gradient,
-) -> Array[GradientStop] raise HintedError {
+fn impl_gradient_stops(self_ : Gradient) -> Array[GradientStop] {
   self_.stops_ref().map(stop => { color: stop.0, offset: Some(stop.1), })
 }
 
 ///|
 /// Returns the mixing space of this gradient.
-fn impl_gradient_space(self_ : Gradient) -> ColorSpace raise HintedError {
+fn impl_gradient_space(self_ : Gradient) -> ColorSpace {
   self_.space()
 }
 
 ///|
 /// Returns the relative placement of this gradient.
-fn impl_gradient_relative(
-  self_ : Gradient,
-) -> Smart[RelativeTo] raise HintedError {
+fn impl_gradient_relative(self_ : Gradient) -> Smart[RelativeTo] {
   self_.relative()
 }
 
 ///|
 /// Returns the angle of this gradient.
-fn impl_gradient_angle(self_ : Gradient) -> Angle? raise HintedError {
+fn impl_gradient_angle(self_ : Gradient) -> Angle? {
   match self_ {
     Linear(linear) => Some(linear.angle)
     Radial(_) => None
@@ -361,7 +357,7 @@ fn impl_gradient_angle(self_ : Gradient) -> Angle? raise HintedError {
 
 ///|
 /// Returns the center of this gradient.
-fn impl_gradient_center(self_ : Gradient) -> Axes[Ratio]? raise HintedError {
+fn impl_gradient_center(self_ : Gradient) -> Axes[Ratio]? {
   match self_ {
     Linear(_) => None
     Radial(radial) => Some(radial.center)
@@ -371,7 +367,7 @@ fn impl_gradient_center(self_ : Gradient) -> Axes[Ratio]? raise HintedError {
 
 ///|
 /// Returns the radius of this gradient.
-fn impl_gradient_radius(self_ : Gradient) -> Ratio? raise HintedError {
+fn impl_gradient_radius(self_ : Gradient) -> Ratio? {
   match self_ {
     Radial(radial) => Some(radial.radius)
     _ => None
@@ -380,9 +376,7 @@ fn impl_gradient_radius(self_ : Gradient) -> Ratio? raise HintedError {
 
 ///|
 /// Returns the focal-center of this gradient.
-fn impl_gradient_focal_center(
-  self_ : Gradient,
-) -> Axes[Ratio]? raise HintedError {
+fn impl_gradient_focal_center(self_ : Gradient) -> Axes[Ratio]? {
   match self_ {
     Radial(radial) => Some(radial.focal_center)
     _ => None
@@ -391,7 +385,7 @@ fn impl_gradient_focal_center(
 
 ///|
 /// Returns the focal-radius of this gradient.
-fn impl_gradient_focal_radius(self_ : Gradient) -> Ratio? raise HintedError {
+fn impl_gradient_focal_radius(self_ : Gradient) -> Ratio? {
   match self_ {
     Radial(radial) => Some(radial.focal_radius)
     _ => None
@@ -400,20 +394,14 @@ fn impl_gradient_focal_radius(self_ : Gradient) -> Ratio? raise HintedError {
 
 ///|
 /// Sample the gradient at a given position.
-fn impl_gradient_sample(
-  self_ : Gradient,
-  t_ : RatioOrAngle,
-) -> Color raise HintedError {
+fn impl_gradient_sample(self_ : Gradient, t_ : RatioOrAngle) -> Color {
   self_.sample(t_)
 }
 
 ///|
 /// Samples the gradient at multiple positions at once and returns the
 /// results as an array.
-fn impl_gradient_samples(
-  self_ : Gradient,
-  ts_ : Array[RatioOrAngle],
-) -> Arr raise HintedError {
+fn impl_gradient_samples(self_ : Gradient, ts_ : Array[RatioOrAngle]) -> Arr {
   Arr::from_array(ts_.map(t => Value::Color(self_.sample(t))))
 }
 

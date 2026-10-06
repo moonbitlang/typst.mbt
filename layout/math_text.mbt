@@ -29,6 +29,9 @@ fn layout_math_text(
 
 ///|
 /// Lays out a [`NumberItem`].
+// Cannot fail; the item layouters share `SourceResult<()>`
+// (typst-layout/src/math/text.rs:46).
+#warnings("-unused_error_type")
 fn layout_math_number(
   item : @library.NumberItem,
   ctx : MathContext,
@@ -51,6 +54,9 @@ fn layout_math_number(
 
 ///|
 /// Layout a single character in the math font.
+// Cannot fail; the item layouters share `SourceResult<()>`
+// (typst-layout/src/math/text.rs:69).
+#warnings("-unused_error_type")
 fn layout_math_glyph(
   item : @library.GlyphItem,
   ctx : MathContext,

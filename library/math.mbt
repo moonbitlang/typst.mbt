@@ -57,7 +57,7 @@ fn math_define_spacings(math : Scope) -> Unit {
 
 ///|
 /// Upright (non-italic) font style in math (upstream `upright`).
-fn impl_math_upright(body : Content) -> Content raise HintedError {
+fn impl_math_upright(body : Content) -> Content {
   math_upright(body)
 }
 

@@ -9,6 +9,9 @@
 
 ///|
 /// Upstream `Synthesize for Packed<BibliographyElem>`.
+// Cannot fail; a `Synthesize::synthesize` hook, `Ok(())` upstream
+// (typst-library/src/model/bibliography.rs:328).
+#warnings("-unused_error_type")
 fn bibliography_elem_synthesize(
   _engine : Engine,
   content : Content,
@@ -615,6 +618,9 @@ let works_cache : Ref[(Introspector, Array[Content], Works)?] = { val: None, }
 
 ///|
 /// Generates and formats all bibliographies and citations.
+// Cannot fail; upstream's `.at(span)` wraps an always-`Ok` `generate_impl`
+// (typst-library/src/model/bibliography.rs:711).
+#warnings("-unused_error_type")
 pub fn Works::generate(
   engine : Engine,
   span : @syntax.Span,

@@ -120,6 +120,9 @@ fn OperatorValidatorTemp::visit_v128_store(
 }
 
 ///|
+// Cannot fail; visitor methods share `Result<()>`
+// (wasmparser 0.228.0 src/validator/operators/simd.rs:99).
+#warnings("-unused_error_type")
 fn OperatorValidatorTemp::visit_v128_const(
   self : OperatorValidatorTemp,
   _value : V128,

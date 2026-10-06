@@ -4,13 +4,13 @@
 
 ///|
 /// Construct spreadable arguments in place.
-fn impl_args_construct(args : Args) -> Args raise HintedError {
+fn impl_args_construct(args : Args) -> Args {
   args.take()
 }
 
 ///|
 /// Returns the number of arguments, both positional and named.
-fn impl_args_len(self_ : Args) -> USize raise HintedError {
+fn impl_args_len(self_ : Args) -> USize {
   USize(self_.items.length().to_int64())
 }
 
@@ -34,13 +34,13 @@ fn impl_args_at(
 
 ///|
 /// Returns the captured positional arguments as an array.
-fn impl_args_to_pos(self_ : Args) -> Arr raise HintedError {
+fn impl_args_to_pos(self_ : Args) -> Arr {
   self_.to_pos()
 }
 
 ///|
 /// Returns the captured named arguments as a dictionary.
-fn impl_args_to_named(self_ : Args) -> Dict raise HintedError {
+fn impl_args_to_named(self_ : Args) -> Dict {
   self_.to_named()
 }
 

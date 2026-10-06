@@ -77,6 +77,9 @@ pub fn InstrEncoder::push_instr(
 
 ///|
 /// Pushes a non-parameter [`Op`] to the [`InstrEncoder`].
+// Cannot fail; keeps upstream's `Result<Instr, Error>`
+// (wasmi 1.0.9 translator/func/instrs.rs:111).
+#warnings("-unused_error_type")
 fn InstrEncoder::push_instr_impl(
   self : InstrEncoder,
   instruction : @ir.Op,
@@ -92,6 +95,9 @@ fn InstrEncoder::push_instr_impl(
 ///
 /// - Returns `Ok(true)` if replacement was successful.
 /// - Returns `Ok(false)` if replacement was unsuccessful.
+// Cannot fail; keeps upstream's `Result<bool, Error>`
+// (wasmi 1.0.9 translator/func/instrs.rs:130).
+#warnings("-unused_error_type")
 pub fn InstrEncoder::try_replace_instr(
   self : InstrEncoder,
   instr : Instr,
@@ -115,6 +121,9 @@ pub fn InstrEncoder::try_replace_instr(
 ///   really is the source of the `local.set` or `local.tee`.
 /// - `new_result`:
 ///   the new result which shall replace the `old_result`.
+// Cannot fail; upstream's `relink_result` only returns `Ok`
+// (wasmi 1.0.9 translator/func/instrs.rs:156).
+#warnings("-unused_error_type")
 pub fn InstrEncoder::try_replace_result(
   self : InstrEncoder,
   new_result : @ir.Slot,

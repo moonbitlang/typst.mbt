@@ -2,13 +2,13 @@
 
 ///|
 /// Converts a string or content to lowercase.
-fn impl_lower(text_ : Caseable) -> Caseable raise HintedError {
+fn impl_lower(text_ : Caseable) -> Caseable {
   case_(text_, Lower)
 }
 
 ///|
 /// Converts a string or content to uppercase.
-fn impl_upper(text_ : Caseable) -> Caseable raise HintedError {
+fn impl_upper(text_ : Caseable) -> Caseable {
   case_(text_, Upper)
 }
 

@@ -43,6 +43,9 @@ fn impl_json(
 
 ///|
 /// Encodes structured data into a JSON string.
+// Cannot fail; upstream's error is serde_json's, unreachable for a `Value`
+// (typst-library/src/loading/json.rs:134).
+#warnings("-unused_error_type")
 fn impl_json_encode(
   value_ : @syntax.Spanned[Value],
   pretty_ : Bool,

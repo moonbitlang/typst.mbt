@@ -37,7 +37,7 @@ fn impl_duration_construct(
   hours_ : Int64,
   days_ : Int64,
   weeks_ : Int64,
-) -> Duration raise HintedError {
+) -> Duration {
   Duration(
     @time.Duration::seconds(seconds_) +
     @time.Duration::minutes(minutes_) +
@@ -81,27 +81,27 @@ pub fn Duration::weeks(self : Duration) -> Double {
 }
 
 ///|
-fn impl_duration_seconds(self_ : Duration) -> Double raise HintedError {
+fn impl_duration_seconds(self_ : Duration) -> Double {
   self_.seconds()
 }
 
 ///|
-fn impl_duration_minutes(self_ : Duration) -> Double raise HintedError {
+fn impl_duration_minutes(self_ : Duration) -> Double {
   self_.minutes()
 }
 
 ///|
-fn impl_duration_hours(self_ : Duration) -> Double raise HintedError {
+fn impl_duration_hours(self_ : Duration) -> Double {
   self_.hours()
 }
 
 ///|
-fn impl_duration_days(self_ : Duration) -> Double raise HintedError {
+fn impl_duration_days(self_ : Duration) -> Double {
   self_.days()
 }
 
 ///|
-fn impl_duration_weeks(self_ : Duration) -> Double raise HintedError {
+fn impl_duration_weeks(self_ : Duration) -> Double {
   self_.weeks()
 }
 

@@ -22,6 +22,9 @@ pub fn StackLayout::reset(self : StackLayout) -> Unit {
 
 ///|
 /// Register `amount` local variables.
+// Cannot fail; keeps upstream's `Result<(), Error>`
+// (wasmi 1.0.9 translator/func/layout/mod.rs:37).
+#warnings("-unused_error_type")
 pub fn StackLayout::register_locals(
   self : StackLayout,
   amount : Int,

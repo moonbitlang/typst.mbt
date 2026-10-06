@@ -164,6 +164,6 @@ pub impl Show for Type with fn output(self, logger) {
 
 ///|
 /// Determines a value's type (upstream `Type::construct`).
-fn impl_type_construct(value_ : Value) -> Type raise HintedError {
+fn impl_type_construct(value_ : Value) -> Type {
   value_.ty()
 }

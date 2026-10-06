@@ -100,7 +100,7 @@ fn impl_location_page(
   self_ : Location,
   engine : Engine,
   span : @syntax.Span,
-) -> NonZeroUSize? raise HintedError {
+) -> NonZeroUSize? {
   engine.introspect(page_introspection(self_, span))
 }
 
@@ -110,7 +110,7 @@ fn impl_location_page_numbering(
   self_ : Location,
   engine : Engine,
   span : @syntax.Span,
-) -> Numbering? raise HintedError {
+) -> Numbering? {
   Location::page_numbering(self_, engine, span)
 }
 
@@ -131,7 +131,7 @@ fn impl_location_position(
   self_ : Location,
   engine : Engine,
   span : @syntax.Span,
-) -> Dict? raise HintedError {
+) -> Dict? {
   engine
   .introspect(position_introspection(self_, span))
   .bind(DocumentPosition::into_dict)
@@ -141,7 +141,7 @@ fn impl_location_position(
 /// The location of the content. This is only available on content returned
 /// by @query or provided by a @reference:styling:show-rules[show rule], for
 /// other content it will be `{none}`.
-fn impl_content_location(self_ : Content) -> Location? raise HintedError {
+fn impl_content_location(self_ : Content) -> Location? {
   self_.location()
 }
 
