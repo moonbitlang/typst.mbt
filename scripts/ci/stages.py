@@ -7,11 +7,14 @@ The runner prints `<label>: N passed, M failed` and always exits with 0, and
 a stage whose inputs are missing reports `0 passed, 0 failed`. This script
 turns that into a verdict. A stage is good if
 
-- the runner exits with 0 and prints each summary line of the stage once,
-- passed + failed + skipped is the number of cases in `stages.tsv` (so a
-  suite that silently shrinks, or goldens that are missing, fail), and
-- no case fails, except those listed in `known_failures/<stage>.txt` (the
-  replay stages, which cannot reconstruct everything from the frames), and
+- the runner exits with 0 and prints the summary lines of the stage, each
+  once, and no other,
+- passed + failed + skipped is the number of cases in `stages.tsv` and
+  skipped is the number given there (so a suite that silently shrinks, and
+  goldens or inputs that are missing, fail),
+- exactly the cases listed in `known_failures/<stage>.txt` fail (the replay
+  stages are not at parity; a listed case that passes must be removed, so
+  that it cannot regress unnoticed later), and
 - at least as many outputs as `stages.tsv` says are byte-identical before
   canonicalization (raw hash parity), where the stage reports that.
 
@@ -23,7 +26,7 @@ into `<out>/diffs/`. A Markdown table is appended to `$GITHUB_STEP_SUMMARY`
 (or `--summary`).
 
 `--check-key` also requires the goldens to be the ones generated for this
-checkout (`tests/golden/.key`, see `scripts/ci/goldens.sh`).
+checkout (`scripts/ci/goldens_verify.sh`).
 """
 
 import argparse
@@ -52,17 +55,24 @@ MAX_DIFF_CASES = 200
 
 
 def read_table():
-    """stage -> [(label, total, least byte-identical or None)] in file order."""
+    """stage -> [(label, cases, skipped, least byte-identical or None)]."""
+    system = platform.system().lower()
     table = {}
     with open(os.path.join(HERE, "stages.tsv"), encoding="utf-8") as f:
         for line in f:
             line = line.rstrip("\n")
             if not line or line.startswith("#"):
                 continue
-            cols = line.split("\t")
-            stage, label, total = cols[:3]
-            identical = int(cols[3]) if len(cols) > 3 and cols[3] else None
-            table.setdefault(stage, []).append((label, int(total), identical))
+            stage, label, total, skips, identical = line.split("\t")
+            # `<number>` or `<number> <system>=<number> ...`.
+            skips = skips.split()
+            skipped = int(skips[0])
+            for alt in skips[1:]:
+                name, _, n = alt.partition("=")
+                if name == system:
+                    skipped = int(n)
+            identical = None if identical == "-" else int(identical)
+            table.setdefault(stage, []).append((label, int(total), skipped, identical))
     return table
 
 
@@ -126,7 +136,11 @@ def run_stage(runner, stage, expect, out_dir):
             m = IDENTICAL_RE.match(line)
             if m:
                 identical[m["label"]] = int(m["n"])
-    for label, total, least in expect:
+    labels = {label for label, _, _, _ in expect}
+    for label in seen:
+        if label not in labels:
+            res.problems.append(f"unexpected summary line `{label}: ...`")
+    for label, total, skips, least in expect:
         if least is not None and identical.get(label, -1) < least:
             res.problems.append(
                 f"{label}: {identical.get(label, 'no')} byte-identical before"
@@ -148,11 +162,24 @@ def run_stage(runner, stage, expect, out_dir):
                 " (missing inputs or goldens? if the suite changed, update"
                 " scripts/ci/stages.tsv)"
             )
+        if skipped != skips:
+            res.problems.append(
+                f"{label}: {skipped} cases skipped, expected {skips} (missing inputs?)"
+            )
     known = known_failures(stage)
     res.fails = [line for line in fail_lines if line not in known]
     res.known = len(fail_lines) - len(res.fails)
     res.fixed = sorted(known - set(fail_lines))
     failed_total = sum(row[2] for row in res.rows)
+    if res.fixed:
+        # Keep the allowance tight: a case that passes again must not be
+        # allowed to regress unnoticed later.
+        res.problems.append(
+            f"{len(res.fixed)} known failures pass now: remove them from"
+            f" scripts/ci/known_failures/ ({', '.join(x[5:] for x in res.fixed[:5])}"
+            + (", ..." if len(res.fixed) > 5 else "")
+            + ")"
+        )
     if res.fails:
         res.problems.append(f"{len(res.fails)} failing cases")
     elif failed_total != res.known:
@@ -242,20 +269,19 @@ def write_diffs(runner, res, out_dir):
     return written
 
 
-def check_key():
+def check_goldens():
     """The goldens must be the ones generated for this checkout."""
-    want = subprocess.check_output(
-        [os.path.join(HERE, "goldens_key.sh")], cwd=ROOT, text=True
-    ).strip()
-    path = os.path.join(ROOT, "tests/golden/.key")
-    try:
-        with open(path, encoding="utf-8") as f:
-            have = f.readline().strip()
-    except OSError:
-        return f"tests/golden/.key is missing (expected key {want})"
-    if have != want:
-        return f"stale goldens: their key is {have}, this checkout needs {want}"
-    return None
+    proc = subprocess.run(
+        [os.path.join(HERE, "goldens_verify.sh")],
+        cwd=ROOT,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+    )
+    if proc.returncode == 0:
+        return None
+    lines = proc.stdout.strip().split("\n")
+    return lines[-1] if lines else "goldens_verify.sh failed"
 
 
 def main():
@@ -283,7 +309,7 @@ def main():
     out_dir = os.path.join(ROOT, args.out)
     os.makedirs(out_dir, exist_ok=True)
 
-    key_problem = check_key() if args.check_key else None
+    key_problem = check_goldens() if args.check_key else None
     with concurrent.futures.ThreadPoolExecutor(max_workers=max(1, args.jobs)) as pool:
         futures = [
             pool.submit(run_stage, runner, stage, table[stage], out_dir)
@@ -319,12 +345,6 @@ def main():
         for note in res.notes:
             print(f"       {note}")
             notes.append(f"- `{res.stage}`: {note}")
-        if res.fixed:
-            details.append(
-                f"- `{res.stage}`: {len(res.fixed)} known failures pass now"
-                " (remove them from `scripts/ci/known_failures/`): "
-                + ", ".join(f"`{x[5:]}`" for x in res.fixed[:10])
-            )
         if res.ok:
             continue
         diffs = write_diffs(runner, res, out_dir) if res.fails else 0

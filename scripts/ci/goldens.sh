@@ -10,10 +10,12 @@
 # bidi conformance files of the `break` stage and the pinned wasm-tools of
 # the `wasm-spec` stage (into `.repos/`).
 #
-# Afterwards `tests/golden/.key` holds scripts/ci/goldens_key.sh's key, and
-# the oracle tests that the stages regenerate in the tree
-# (`usvg/oracle_test.mbt`, `resvg/oracle_test.mbt`) must be the committed
-# ones: the goldens are reproducible, or this script fails.
+# Afterwards `tests/golden/.key` holds scripts/ci/goldens_key.sh's key (and
+# what made the goldens), and the oracle tests that the stages regenerate in
+# the tree (`usvg/oracle_test.mbt`, `resvg/oracle_test.mbt`) must be the
+# committed ones (their checksums go to `tests/golden/.generated.sha256`
+# for scripts/ci/goldens_verify.sh): the goldens are reproducible, or this
+# script fails.
 set -euo pipefail
 cd "$(dirname "$0")/../.."
 
@@ -50,6 +52,7 @@ if [ "$(wasm-tools --version 2> /dev/null | awk '{print $2}')" != "$WASM_TOOLS_V
 fi
 echo "wasm-tools $(wasm-tools --version)"
 
+key=$(scripts/ci/goldens_key.sh)
 rm -rf tests/golden
 mkdir -p tests/golden
 # The default stages, then the WebAssembly ones (`wasm-validate` reads the
@@ -61,10 +64,22 @@ if ! git diff --exit-code --stat -- usvg/oracle_test.mbt resvg/oracle_test.mbt; 
   echo "goldens.sh: the regenerated oracle tests differ from the committed ones" >&2
   exit 1
 fi
+# Nothing that the key hashes may change while generating (cargo rewriting
+# oracle/Cargo.lock, for example): the goldens would be filed under a key
+# that does not describe them.
+if [ "$(scripts/ci/goldens_key.sh)" != "$key" ]; then
+  echo "goldens.sh: the inputs of the goldens changed while generating them:" >&2
+  git status --short >&2
+  exit 1
+fi
+shasum -a 256 usvg/oracle_test.mbt resvg/oracle_test.mbt > tests/golden/.generated.sha256
 {
-  scripts/ci/goldens_key.sh
+  echo "$key"
   echo "upstream $(cat UPSTREAM_REV)"
-  echo "host $(uname -sm)"
-  rustc --version
+  echo "host $(uname -srm)"
+  command -v sw_vers > /dev/null && echo "os $(sw_vers -productName) $(sw_vers -productVersion)"
+  (cd oracle && rustc --version)
+  wasm-tools --version
 } > tests/golden/.key
-echo "goldens: $(du -sh tests/golden | cut -f1), key $(head -1 tests/golden/.key)"
+cat tests/golden/.key
+echo "goldens: $(du -sh tests/golden | cut -f1)"

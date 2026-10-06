@@ -419,8 +419,10 @@
   error types are `WasmiError` and `@ir.IrError`. Stages: `wasm-validate`
   (wasmparser vs. the real crate) and `wasm-spec` (the WebAssembly spec
   suite plus `tests/wasm/*.wast` replayed against real wasmi, incl. error
-  texts and stack exhaustion; `WASM_TESTSUITE=<testsuite checkout>
-  scripts/goldens.sh wasm-spec`). `wasmi/core/oracle_wbtest.mbt` checks
+  texts and stack exhaustion; `scripts/goldens.sh wasm-spec wasm-validate`
+  on the pinned spec tests that `scripts/upstream.sh` fetches into
+  `.repos/wasm-testsuite`, extracted with the wasm-tools version named
+  there). `wasmi/core/oracle_wbtest.mbt` checks
   wasmi_core against `gen_wasmi_core_tests`.
 - Publishing: `moonbitlang/typst` is used as a dependency (e.g. by mbtx
   scripts importing `moonbitlang/typst@x.y.z/doc`), and moon does not run
@@ -431,3 +433,29 @@
   a dependency (a scratch module with `"deps": {"moonbitlang/typst": ..}`,
   native and wasm-gc), not only by building the unpacked package as the root
   module: 0.1.0-0.1.2 were broken as dependencies for this reason.
+- CI (`.github/workflows/ci.yml`, scripts in `scripts/ci/`; the check to
+  require for `main` is `required`): `check` (`moon check` on native,
+  wasm-gc, wasm; `moon fmt`), `unit tests` (`scripts/ci/unit_tests.sh`),
+  `stages` (every differential stage, `scripts/ci/stages.py`) and `package
+  as a dependency` (`scripts/ci/package_smoke.sh`: a consumer of
+  `moonbitlang/typst/doc` built against the unpacked `moon package` zip on
+  native and wasm-gc); nightly and on pushes to `main` also the EDSL
+  conversion sweep. The goldens are not stored anywhere: the `goldens` job
+  regenerates them on aarch64 macOS (`scripts/ci/goldens.sh`: upstream
+  checkout, oracle build, every `scripts/goldens.sh` stage plus `wasm-spec`
+  and `wasm-validate`) and caches them under `scripts/ci/goldens_key.sh`'s
+  hash of what determines them (`UPSTREAM_REV`, `oracle/**`, the golden
+  scripts, `tests/wasm`); a change of any of those regenerates them, and
+  the regenerated `usvg/oracle_test.mbt`/`resvg/oracle_test.mbt` must be the
+  committed ones. `scripts/ci/data.sh` fetches the other test inputs without
+  Rust (shallow upstream checkout, the oracle's locked revisions of
+  typst-dev-assets, typst-assets and hayro in cargo's checkout layout, the
+  `target/hayro`/`target/devassets` links, the CMap bundle). The runner
+  always exits with 0, so the verdict is `stages.py`'s: per stage the
+  number of cases and of skipped cases of `scripts/ci/stages.tsv` (update it
+  when the suite changes: `UPSTREAM_REV`, new twins, new wasm tests), no
+  failures besides `scripts/ci/known_failures/<stage>.txt` (the replay
+  stages; a listed case that passes must be removed), and the byte-identical
+  counts. Run it locally after a release build of the runner:
+  `scripts/ci/stages.py [stage ...]` (logs and per-case diffs of failures in
+  `_build/ci/stages`).

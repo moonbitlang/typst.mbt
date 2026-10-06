@@ -32,7 +32,7 @@ RB_VERSION=$(grep -A1 '^name = "rustybuzz"' oracle/Cargo.lock | sed -n 's/^versi
 if [ ! -f ".repos/rustybuzz/VERSION-$RB_VERSION" ]; then
   rm -rf .repos/rustybuzz
   mkdir -p .repos/rustybuzz
-  curl -fsSL "https://github.com/harfbuzz/rustybuzz/archive/refs/tags/v$RB_VERSION.tar.gz" \
+  curl -fsSL --retry 3 "https://github.com/harfbuzz/rustybuzz/archive/refs/tags/v$RB_VERSION.tar.gz" \
     | tar xz -C .repos/rustybuzz --strip-components=1
   touch ".repos/rustybuzz/VERSION-$RB_VERSION"
 fi
@@ -44,7 +44,7 @@ RESVG_VERSION=$(grep -A1 '^name = "resvg"' oracle/Cargo.lock | sed -n 's/^versio
 if [ ! -f ".repos/resvg/VERSION-$RESVG_VERSION" ]; then
   rm -rf .repos/resvg
   mkdir -p .repos/resvg
-  curl -fsSL "https://github.com/linebender/resvg/archive/refs/tags/v$RESVG_VERSION.tar.gz" \
+  curl -fsSL --retry 3 "https://github.com/linebender/resvg/archive/refs/tags/v$RESVG_VERSION.tar.gz" \
     | tar xz -C .repos/resvg --strip-components=1
   touch ".repos/resvg/VERSION-$RESVG_VERSION"
 fi
@@ -62,9 +62,9 @@ WASM_STAMP=".repos/wasm-testsuite/VERSION-$WASM_SPEC_REV-$WASM_TESTSUITE_REV"
 if [ ! -f "$WASM_STAMP" ]; then
   rm -rf .repos/wasm-testsuite
   mkdir -p .repos/wasm-testsuite/proposals/wide-arithmetic
-  curl -fsSL "https://github.com/WebAssembly/spec/archive/$WASM_SPEC_REV.tar.gz" \
+  curl -fsSL --retry 3 "https://github.com/WebAssembly/spec/archive/$WASM_SPEC_REV.tar.gz" \
     | tar xz -C .repos/wasm-testsuite --strip-components=3 "spec-$WASM_SPEC_REV/test/core"
-  curl -fsSL "https://raw.githubusercontent.com/WebAssembly/testsuite/$WASM_TESTSUITE_REV/proposals/wide-arithmetic/wide-arithmetic.wast" \
+  curl -fsSL --retry 3 "https://raw.githubusercontent.com/WebAssembly/testsuite/$WASM_TESTSUITE_REV/proposals/wide-arithmetic/wide-arithmetic.wast" \
     -o .repos/wasm-testsuite/proposals/wide-arithmetic/wide-arithmetic.wast
   touch "$WASM_STAMP"
 fi

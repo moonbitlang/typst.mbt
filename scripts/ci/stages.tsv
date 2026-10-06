@@ -1,34 +1,38 @@
 # The differential stages run by scripts/ci/stages.py, in this order.
 #
-# stage <TAB> summary label <TAB> cases [<TAB> byte-identical]
+# stage <TAB> summary label <TAB> cases <TAB> skipped <TAB> byte-identical
 #
 # `cases` is passed + failed + skipped of the stage's `<label>: N passed,
 # M failed` line: update it when the suite changes (UPSTREAM_REV, new twins,
-# ...). `byte-identical` is the least number the stage may report as
-# "byte-identical before canonicalization" (raw hash parity).
-# Cases that are allowed to fail are listed in known_failures/<stage>.txt.
-syntax	syntax	3792
-ast	ast	3792
-reparse	reparse	3792
-eval	eval	3792
-realize	realize	3792
-html	html	508
-bundle	bundle	39	24
-paged	paged	2299
-svg	svg	2299	2299
-svg-replay	svg-replay	2299	2283
-pdf-semantic	pdf-semantic	2299	2298
-pdf-semantic-replay	pdf-semantic-replay	2299
-pdftags	pdftags	133	133
-render	render	2299
-font	font	86
-shape	shape	4598
-shape-hb	shape-hb	2250
-break	break	12734
-usvg	usvg trees	93
-usvg	usvg glyphs	3360
-usvg-images	usvg-images	342
-resvg	resvg	1723
-wasm-validate	wasm-validate	14027
-wasm-spec	wasm-spec	65449
-edsl	edsl	34
+# ...). `skipped` is the exact number of cases the stage skips, optionally
+# followed by `<system>=<number>` for other platforms (`shape-hb` skips the
+# cases that use macOS system fonts where those are missing; `wasm-spec`
+# skips text modules). `byte-identical` is the least number the stage may
+# report as "byte-identical before canonicalization" (raw hash parity), or
+# `-`. Cases that are allowed to fail are listed in
+# known_failures/<stage>.txt.
+syntax	syntax	3792	0	-
+ast	ast	3792	0	-
+reparse	reparse	3792	0	-
+eval	eval	3792	0	-
+realize	realize	3792	0	-
+html	html	508	0	-
+bundle	bundle	39	0	24
+paged	paged	2299	0	-
+svg	svg	2299	0	2299
+svg-replay	svg-replay	2299	0	2283
+pdf-semantic	pdf-semantic	2299	0	2299
+pdf-semantic-replay	pdf-semantic-replay	2299	0	-
+pdftags	pdftags	133	0	133
+render	render	2299	0	-
+font	font	86	0	-
+shape	shape	4598	0	-
+shape-hb	shape-hb	2250	0 linux=121	-
+break	break	12734	0	-
+usvg	usvg trees	93	0	-
+usvg	usvg glyphs	3360	0	-
+usvg-images	usvg-images	342	0	-
+resvg	resvg	1723	0	-
+wasm-validate	wasm-validate	14042	0	-
+wasm-spec	wasm-spec	65449	1242	-
+edsl	edsl	34	0	-

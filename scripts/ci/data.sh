@@ -14,14 +14,26 @@
 #   layout (`<name>-ci/<short rev>`).
 # - The `target/hayro` and `target/devassets` links of the oracle tests,
 #   which are silently skipped without them (see AGENTS.md), and the
-#   decompressed CMap bundle of `hayro/cmap/bcmap_test.mbt` if `brotli` is
-#   installed.
+#   decompressed CMap bundle of `hayro/cmap/bcmap_test.mbt` (needs the
+#   `brotli` command).
 #
 # Fails if anything the tests would silently skip is missing afterwards.
 set -euo pipefail
 cd "$(dirname "$0")/../.."
 
-UPSTREAM_SHALLOW=1 scripts/upstream.sh
+# retry <command ...>: up to three attempts (network hiccups).
+retry() {
+  local n
+  for n in 1 2 3; do
+    "$@" && return 0
+    echo "data.sh: attempt $n failed: $*" >&2
+    sleep $((n * 5))
+  done
+  return 1
+}
+
+export UPSTREAM_SHALLOW=1
+retry scripts/upstream.sh
 
 checkouts="$HOME/.cargo/git/checkouts"
 # The full revision of a git dependency in oracle/Cargo.lock.
@@ -43,7 +55,7 @@ fetch_checkout() {
     mkdir -p "$dir"
     git -C "$dir" init -q
     git -C "$dir" remote add origin "https://github.com/$repo.git"
-    git -C "$dir" fetch -q --depth 1 origin "$rev"
+    retry git -C "$dir" fetch -q --depth 1 origin "$rev"
     git -C "$dir" checkout -q FETCH_HEAD
     touch "$dir/.ci-ok"
   fi
@@ -59,12 +71,11 @@ echo "hayro at $hayro"
 mkdir -p target
 ln -sfn "$hayro" target/hayro
 ln -sfn "$dev_assets/files" target/devassets
-if command -v brotli > /dev/null; then
-  brotli -d -c target/hayro/hayro-cmap/assets/cmaps.brotli > target/hayro-cmaps.bundle
-  echo "decompressed the CMap bundle"
-else
-  echo "no brotli: hayro/cmap/bcmap_test.mbt stays skipped"
-fi
+command -v brotli > /dev/null || {
+  echo "data.sh: brotli is not installed (hayro/cmap/bcmap_test.mbt would be skipped)" >&2
+  exit 1
+}
+brotli -d -c target/hayro/hayro-cmap/assets/cmaps.brotli > target/hayro-cmaps.bundle
 
 for f in \
   .repos/typst/tests/suite \
@@ -77,7 +88,7 @@ for f in \
   target/devassets/plugins \
   "$assets/files/fonts" \
   target/hayro/hayro-tests/pdfs \
-  target/hayro/hayro-cmap/assets/cmaps.brotli; do
-  [ -e "$f" ] || { echo "data.sh: missing $f" >&2; exit 1; }
+  target/hayro-cmaps.bundle; do
+  [ -s "$f" ] || { echo "data.sh: missing $f" >&2; exit 1; }
 done
 echo "test data ready"

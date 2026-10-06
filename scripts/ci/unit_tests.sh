@@ -5,11 +5,13 @@
 #
 # The full output (with the compiler's warnings) goes to
 # `_build/ci/unit/test.log`; the failures and the totals are printed and
-# appended to `$GITHUB_STEP_SUMMARY`. Fails if `moon test` fails, or if it
-# does not report its totals with `failed: 0`.
+# appended to `$GITHUB_STEP_SUMMARY`. Fails if `moon test` fails, if it does
+# not report its totals with `failed: 0`, or if it ran fewer than
+# $UNIT_TESTS_MIN tests (default 5600; the suite has 5631).
 set -uo pipefail
 cd "$(dirname "$0")/../.."
 [ $# -eq 0 ] && set -- --target native
+min_tests=${UNIT_TESTS_MIN:-5600}
 out=_build/ci/unit
 mkdir -p "$out"
 log="$out/test.log"
@@ -31,6 +33,13 @@ echo "moon test $*: exit $code after $seconds s"
 ok=1
 [ "$code" -eq 0 ] || ok=0
 grep -q 'failed: 0\.$' <<< "$totals" || ok=0
+# A floor on the number of tests: packages that are no longer built or run
+# must not pass silently. Raise it when it falls far behind.
+count=$(sed -n 's/^Total tests: \([0-9]*\),.*/\1/p' <<< "$totals")
+if [ "${count:-0}" -lt "$min_tests" ]; then
+  ok=0
+  totals="${totals:-no totals} (expected at least $min_tests tests)"
+fi
 if [ -n "${GITHUB_STEP_SUMMARY:-}" ]; then
   {
     echo "### Unit tests (\`moon test $*\`)"

@@ -4,8 +4,9 @@
 #
 # Usage: scripts/wasm_spec_extract.sh [TESTSUITE_DIR] [OUT_DIR]
 #
-# TESTSUITE_DIR defaults to $WASM_TESTSUITE or `.repos/wasm-testsuite` (a
-# checkout of https://github.com/WebAssembly/testsuite, see upstream.sh). The
+# TESTSUITE_DIR defaults to $WASM_TESTSUITE or `.repos/wasm-testsuite` (the
+# pinned `test/core` of https://github.com/WebAssembly/spec plus the
+# wide-arithmetic proposal, fetched by upstream.sh). The
 # top-level `*.wast` files and the proposal directories that wasmi's feature
 # set covers (or rejects) are extracted into OUT_DIR/<dir>/<name>.json plus
 # OUT_DIR/<dir>/<name>/*.wasm. Files that wasm-tools cannot parse are skipped

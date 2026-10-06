@@ -11,5 +11,6 @@ cd "$(dirname "$0")/../.."
   git ls-files -z -- oracle tests/wasm \
     scripts/goldens.sh scripts/upstream.sh scripts/wasm_spec_extract.sh \
     scripts/shape_hb_tests.py scripts/ci/goldens.sh scripts/ci/goldens_key.sh \
+    scripts/ci/goldens_verify.sh \
     | LC_ALL=C sort -z | xargs -0 shasum -a 256
 } | shasum -a 256 | cut -c1-20
