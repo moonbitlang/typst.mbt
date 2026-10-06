@@ -16,8 +16,10 @@ priv enum ArgKind {
   /// (`num_args = 0..=1, require_equals = true`); a bare occurrence takes
   /// `missing` as its value.
   OptionalValue(String)
-  /// An option whose value is optional but may also be the next argument
-  /// (`num_args = 0..=1` without `require_equals`, like `--color`).
+  /// An option declared with a `default_missing_value` but without
+  /// `num_args = 0..=1` (upstream's `--color`): clap checks the number of
+  /// values before it applies that default, so the value is required and
+  /// the option parses like `Value`.
   LooseValue
 }
 
