@@ -19,7 +19,9 @@ import {
 } for "wbtest"
 
 // `@v128` is experimental, and unused on wasm-gc/js, which select the
-// `*_scalar.mbt` files (see AGENTS.md: v128 kernels).
+// `*_scalar.mbt` files (see AGENTS.md: v128 kernels); `core/math` is
+// only used by `imageops_libm_other.mbt` (the non-native targets; native
+// calls the C library). moon.pkg has no per-target imports.
 
 warnings = "-alert_experimental-unused_package"
 

@@ -676,6 +676,9 @@ fn handle_radical(
 }
 
 ///|
+// Cannot fail; upstream returns `SourceResult` and only `Ok`
+// (typst-html/src/mathml.rs:737).
+#warnings("-unused_error_type")
 fn handle_glyph(
   item : @library.GlyphItem,
   ctx : MathContext,
@@ -912,6 +915,9 @@ fn handle_table(
 
 ///|
 /// Upstream `handle_text` (renamed; `convert.mbt` has its own).
+// Cannot fail; upstream returns `SourceResult` and only `Ok`
+// (typst-html/src/mathml.rs:971).
+#warnings("-unused_error_type")
 fn handle_math_text(
   item : @library.MathTextItem,
   ctx : MathContext,
@@ -942,6 +948,9 @@ fn handle_math_text(
 }
 
 ///|
+// Cannot fail; upstream returns `SourceResult` and only `Ok`
+// (typst-html/src/mathml.rs:999).
+#warnings("-unused_error_type")
 fn handle_number(
   item : @library.NumberItem,
   ctx : MathContext,
@@ -955,6 +964,9 @@ fn handle_number(
 }
 
 ///|
+// Cannot fail; upstream returns `SourceResult` and only `Ok`
+// (typst-html/src/mathml.rs:1010).
+#warnings("-unused_error_type")
 fn handle_primes(
   item : @library.PrimesItem,
   ctx : MathContext,

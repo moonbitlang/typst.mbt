@@ -16,8 +16,3 @@ import {
   "moonbitlang/typst/eval",
   "moonbitlang/core/debug",
 } for "wbtest"
-
-// Native show rules share the `ShowFn` signature, which may raise, even if
-// most of them don't.
-
-warnings = "-unused_error_type"

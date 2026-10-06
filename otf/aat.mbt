@@ -236,7 +236,7 @@ pub fn AatStateTable::new_state(self : AatStateTable, state : UInt16) -> UInt16 
 /// Also called `STXHeader`.
 ///
 /// Currently used by `kerx` and `morx` tables.
-struct ExtendedStateTable[T] {
+struct ExtendedStateTable[_] {
   number_of_classes : UInt
   lookup : AatLookup
   state_array : BytesView

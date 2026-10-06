@@ -98,7 +98,7 @@ pub fn[T : LookupSubtable] LookupSubtables::iter(
 
 ///|
 /// An iterator over lookup subtables.
-struct LookupSubtablesIter[T] {
+struct LookupSubtablesIter[_] {
   data : LookupSubtables
   mut index : UInt16
 }

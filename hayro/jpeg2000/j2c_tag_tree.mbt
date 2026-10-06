@@ -203,6 +203,10 @@ fn read_tag_node(
 }
 
 ///|
+// `width` and `height` are only read by upstream's `debug_assert!(x <
+// self.width && y < self.height)` (hayro-jpeg2000/src/j2c/tag_tree.rs:234),
+// which is not ported (release builds do not check it).
+#warnings("-unused_field")
 priv struct TagTree {
   root : Int
   width : UInt

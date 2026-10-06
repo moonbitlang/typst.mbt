@@ -304,7 +304,7 @@ pub let empty_data : BytesView = b""[:]
 ///
 /// Array values are stored in a continuous data chunk.
 #valtype
-pub struct LazyArray16[T] {
+pub struct LazyArray16[_] {
   data : BytesView
 }
 
@@ -462,7 +462,7 @@ pub fn[T : FromData] LazyArray16::iter(self : LazyArray16[T]) -> Iter[T] {
 ///
 /// This is a low-level, internal structure that should not be used directly.
 #valtype
-pub struct LazyArray32[T] {
+pub struct LazyArray32[_] {
   data : BytesView
 }
 
@@ -571,7 +571,7 @@ pub fn[T : FromData] LazyArray32::iter(self : LazyArray32[T]) -> Iter[T] {
 ///
 /// Multiple offsets can point to the same data.
 #valtype
-pub struct LazyOffsetArray16[T] {
+pub struct LazyOffsetArray16[_] {
   data : BytesView
   // Zero offsets must be ignored, therefore we're using `Option<Offset16>`.
   offsets : LazyArray16[Offset16?]

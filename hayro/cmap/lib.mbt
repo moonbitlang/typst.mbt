@@ -373,6 +373,9 @@ priv struct BfRange {
 
 ///|
 /// A codespace range defining valid character code byte sequences.
+// Parsed and stored, never read: upstream marks the struct
+// `#[allow(dead_code)]` (hayro-cmap/src/lib.rs:592).
+#warnings("-unused_field")
 priv struct CodespaceRange {
   number_bytes : Int
   low : UInt
