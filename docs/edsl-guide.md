@@ -206,7 +206,10 @@ This lint (`AdjacentInline`) looks at the arrays of `Document` and `Seq`. It
 reports two neighbours that are each a string, a `Prose`, or a `Text`,
 `Strong`, `Emph` or `Link` around one, if the array also holds a block (a
 heading, a table, a `Para`, a `Block`, a spacing, ..): then the array is a
-flow of blocks, and the two were meant as two paragraphs. Without a block
+flow of blocks, and the two are probably meant as two paragraphs (the lint
+is a heuristic: one paragraph that is composed of several text items
+directly between blocks is reported, too; write it as one `Par(Seq([..]))`).
+Without a block
 the array can be the body of one paragraph (`Par(Seq(["Typeset with ",
 Emph("care"), "."]))`), so nothing is reported: a document of nothing but
 `Prose` items is not reported either. The lint does not look into

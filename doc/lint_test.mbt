@@ -141,31 +141,47 @@ test "lint L1: what is not reported" {
 
 ///|
 test "lint L1: every array of `Document` and `Seq`, wherever it is" {
-  // The body of a block in a cell of a grid; the header of a page (an
-  // argument of a set rule); the replacement of a show rule; the body of
-  // a figure, with a key.
-  let section = (title : String) => {
-    @doc.Seq([@doc.Heading(title), @doc.Prose("First."), @doc.Prose("Second.")])
+  // An array with the defect; `count` is the number of lints of a
+  // document that has it in one place (each document is linted on its
+  // own, so a place that is not walked gives 0).
+  let section = () => {
+    @doc.Seq([@doc.Heading("H"), @doc.Prose("First."), @doc.Prose("Second.")])
   }
-  let report = compile([
-    @doc.SetPage(header=section("In a set rule")),
-    @doc.ShowWith(
-      @doc.Select::strong(),
-      @doc.Value::content(section("In a show rule")),
-    ),
-    @doc.Grid([@doc.Block(section("In a cell"))]),
-    @doc.Keyed("row 3", @doc.Figure(section("Under a key"))),
-    // Not inside the generic call.
-    @doc.Call("block", positional=[@doc.Value::content(section("Called"))]),
-  ])
-  // All four arrays are one call site (`section`): one place in the
-  // source, reported once.
-  inspect(
-    lint_lines(report),
-    content=(
-      #|adjacent-inline (Prose, argument 1) after (Prose, argument 1): "First.Second."
-    ),
+  let count = (item : &@doc.IntoContent) => {
+    @doc.Document([item]).lower(@doc.DocWorld::in_memory()).lints.length()
+  }
+  let content = (body : &@doc.IntoContent) => @doc.Value::content(body)
+  // An item, the body of a block in a cell of a grid, of a figure under
+  // a key, with a label.
+  assert_eq(count(section()), 1)
+  assert_eq(count(@doc.Grid([@doc.Block(section())])), 1)
+  assert_eq(count(@doc.Keyed("row 3", @doc.Figure(section()))), 1)
+  assert_eq(count(@doc.Labelled(section(), "l")), 1)
+  // An argument of a set rule, typed or generic; a show-set rule; the
+  // replacement of a show rule.
+  assert_eq(count(@doc.SetPage(header=section())), 1)
+  assert_eq(count(@doc.Set("page", [("header", content(section()))])), 1)
+  assert_eq(
+    count(@doc.ShowSet(@doc.Select::heading(), @doc.SetPage(header=section()))),
+    1,
   )
+  assert_eq(count(@doc.ShowWith(@doc.Select::strong(), content(section()))), 1)
+  // Inside values: an array, a dictionary, the operands of an operator.
+  let extra = (value : @doc.Value) => @doc.Block("x", extra=[("body", value)])
+  assert_eq(count(extra(@doc.Value::array([content(section())]))), 1)
+  assert_eq(count(extra(@doc.Value::dict([("k", content(section()))]))), 1)
+  assert_eq(count(extra(content(section()).add(content("more")))), 1)
+  assert_eq(count(extra(content(section()).mul(@doc.Value::int(2)))), 1)
+  // Not inside the generic call or a call value, a callback, `Markup`.
+  assert_eq(count(@doc.Call("block", positional=[content(section())])), 0)
+  assert_eq(
+    count(extra(@doc.Value::call("block", positional=[content(section())]))),
+    0,
+  )
+  assert_eq(count(@doc.Context(_ => section())), 0)
+  // One place in the source is reported once, however often it is used.
+  let twice = section()
+  assert_eq(count(@doc.Seq([twice, twice, @doc.Block(twice)])), 1)
   // Rows that a function builds for some data are one place, whatever
   // their keys are: the lint has the key of the first.
   let row = (key : String) => {
@@ -190,6 +206,34 @@ test "lint L1: every array of `Document` and `Seq`, wherever it is" {
     ]),
     content=(
       #|adjacent-inline (Text, argument 1) after (Seq, argument 1): "one.Two."
+    ),
+  )
+}
+
+///|
+test "lint L1: an empty string, and a block at the seam" {
+  // An empty string is nothing on the page: no text item.
+  inspect(lints_of([@doc.Heading("H"), "", "x"]), content="")
+  // A `Prose` that ends (or starts) with an interpolated block is
+  // separated from its neighbour by that block.
+  inspect(
+    lints_of([
+      @doc.Heading("H"),
+      @doc.Prose("One. \{@doc.Block("between")}"),
+      @doc.Prose("Two."),
+      @doc.Prose("\{@doc.V(Pt(2))} Three."),
+    ]),
+    content="",
+  )
+  // Inline content at the seam does not separate.
+  inspect(
+    lints_of([
+      @doc.Heading("H"),
+      @doc.Prose("One \{@doc.Emph("stressed")}"),
+      @doc.Prose("Two."),
+    ]),
+    content=(
+      #|adjacent-inline (Prose, argument 1) after (Prose, argument 1):
     ),
   )
 }
@@ -229,6 +273,33 @@ test "lint L1: the place of a lint is the origin that the review loop gives" {
   assert_eq(what(plain), "(Document, argument 1)")
   // The review text finds the place on the page.
   assert_true(text.origin_positions(prose).length() >= 1)
+  // A string in `Labelled` is that call's body, also for the lint.
+  let labelled = compile([
+    @doc.Heading("T"),
+    "plain.",
+    @doc.Labelled("marked.", "m"),
+  ])
+  guard labelled.lints.map(lint => lint.location) is [Some(Edsl(marked))] else {
+    fail("expected one lint with an origin")
+  }
+  assert_eq(what(marked), "(Labelled, argument 1)")
+  let text = labelled.review_text()
+  let record = text.feedback(text.find("plain.marked.").unwrap(), "")
+  assert_true(
+    record.origins.map(o => o.origin.describe()).contains(marked.describe()),
+  )
+  // A `Prose` that is all interpolated has no text of its own: the place
+  // is its text argument, and the page has nothing with that origin.
+  let hollow = compile([
+    @doc.Heading("T"),
+    "plain.",
+    @doc.Prose("\{@doc.Emph("stressed.")}"),
+  ])
+  guard hollow.lints.map(lint => lint.location) is [Some(Edsl(prose))] else {
+    fail("expected one lint with an origin")
+  }
+  assert_eq(what(prose), "(Prose, argument 1)")
+  assert_true(hollow.review_text().origin_positions(prose).is_empty())
 }
 
 ///|

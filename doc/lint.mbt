@@ -34,10 +34,11 @@ pub struct Lint {
   /// What to do about it, and further places it concerns (a hint with a
   /// location).
   hints : Array[Hint]
-  /// Where it is. For L1 the origin of the text, as the review loop gives
-  /// it for that text on the page (`ReviewText::origin_positions` finds
-  /// its boxes): the constructor call and argument that has the text.
-  /// `None` if a lint cannot name a place.
+  /// Where it is. For L1 the argument that has the text of the item: the
+  /// origin that the review loop gives for that text on the page, so
+  /// `ReviewText::origin_positions` finds its boxes (there are none if
+  /// all of a `Prose` is interpolated descriptions, which have origins of
+  /// their own). `None` if a lint cannot name a place.
   location : Location?
 }
 
@@ -113,7 +114,8 @@ fn Site::origin(self : Site, keys : Array[String], param : Int?) -> Origin {
 //   `Equation`, and engine content (views).
 // - An item is *text* if it is a string, a `Prose`, or a `Text`,
 //   `Strong`, `Emph` or `Link` whose body is text. `Keyed` and a label do
-//   not change what an item is. Nothing else is text: not a `Lit` (the
+//   not change what an item is. Nothing else is text: not an empty
+//   string, not a `Lit` (the
 //   translator of `doc/convert` writes markup as a stream of `Lit`s and
 //   spaces between `Parbreak`s, which is one paragraph by intent), not
 //   `Raw`, a `Box`, a `Symbol`, `Quoted` or a nested `Seq`.
@@ -123,7 +125,9 @@ fn Site::origin(self : Site, keys : Array[String], param : Int?) -> Origin {
 // - Two neighbours of an array that are both text are reported if the
 //   array also holds a block. Neighbours are adjacent items of the
 //   array: with a rule (or anything else) between them, two items are not
-//   neighbours.
+//   neighbours. A pair is not reported if a block is interpolated at its
+//   seam (the first is a `Prose` that ends with one, or the second starts
+//   with one): that block separates the two.
 //
 // The block is the evidence that the array is a flow of blocks, in which
 // a run of text is a paragraph of its own; an array without one may be
@@ -256,7 +260,8 @@ fn wrapper_body(call : CallNode) -> ArgNode? {
 fn is_text_item(content : Content) -> Bool {
   match content.node {
     NKeyed(_, body) | NLabelled(body, _, _, _) => is_text_item(body)
-    NText(_, Option::None) => true
+    // (An empty string is nothing on the page.)
+    NText(text, Option::None) => text != ""
     NSeq(_, site) => site.kind == "Prose"
     NCall(call) =>
       wrapper_body(call) is Some({ value: { val: VContent(body), }, .. }) &&
@@ -284,7 +289,9 @@ fn text_origin(
       keys.push(key)
       text_origin(body, site, param, keys)
     }
-    NLabelled(body, _, _, _) => text_origin(body, site, param, keys)
+    // (A label of a constructor is on a call, which has its own origin;
+    // the body of `Labelled(body, label)` is that call's first argument.)
+    NLabelled(body, _, own, _) => text_origin(body, own, 0, keys)
     NSeq(_, own) => own.origin(keys, Some(0))
     NCall(call) =>
       match wrapper_body(call) {
@@ -293,6 +300,26 @@ fn text_origin(
         _ => call.origin.origin(keys, Option::None)
       }
     _ => site.origin(keys, Some(param))
+  }
+}
+
+///|
+/// Whether the last (`last`) or first piece of a text item is a block: a
+/// `Prose` that ends or starts with an interpolated block (`is_block`),
+/// which ends the paragraph there.
+fn block_at_edge(content : Content, last : Bool) -> Bool {
+  match content.node {
+    NKeyed(_, body) | NLabelled(body, _, _, _) => block_at_edge(body, last)
+    NSeq(children, _) =>
+      children.length() > 0 &&
+      is_block(if last { children[children.length() - 1] } else { children[0] })
+    NCall(call) =>
+      match wrapper_body(call) {
+        Some({ value: { val: VContent(body), }, .. }) =>
+          block_at_edge(body, last)
+        _ => false
+      }
+    _ => false
   }
 }
 
@@ -346,6 +373,14 @@ fn edge_text(content : Content, last : Bool) -> String? {
 /// The last (`last`) or first `SEAM_CHARS` characters of a text, with an
 /// ellipsis where it is cut or where `more` says that the text goes on.
 fn clip_text(chars : Array[Char], last : Bool, more : Bool) -> String {
+  // (A message is one line: a line break of the text is shown as a space.)
+  let chars = chars.map(c => {
+    if c == '\n' || c == '\r' || c == '\t' {
+      ' '
+    } else {
+      c
+    }
+  })
   let count = SEAM_CHARS
   if chars.length() <= count {
     let text = String::from_array(chars)
@@ -400,6 +435,10 @@ fn Linter::adjacent(
     let before = children[i - 1]
     let item = children[i]
     guard is_text_item(before) && is_text_item(item) else { continue }
+    // A block that is interpolated at the seam separates the two.
+    guard !block_at_edge(before, true) && !block_at_edge(item, false) else {
+      continue
+    }
     let first = text_origin(before, array, 0, keys)
     let second = text_origin(item, array, 0, keys)
     let key = "\{place_key(first)}\u{1}\{place_key(second)}"
@@ -449,12 +488,14 @@ fn Linter::content(
     // The generic `Call` is not looked through: its arguments are values
     // of a function that the lint knows nothing about.
     NCall(call) => if !(call.func is FPath(_)) { self.args(call.args, keys) }
-    NSetRule(set) => if !(set.func is FPath(_)) { self.args(set.args, keys) }
+    // The arguments of a set rule, also of the generic `Set`: they are
+    // stored descriptions like those of `SetPage(header=..)`.
+    NSetRule(set) => self.args(set.args, keys)
     NShowRule(show) =>
       match show.transform {
         // A callback's result does not exist before layout.
         TFunc(_) => ()
-        TStyle(set) => if !(set.func is FPath(_)) { self.args(set.args, keys) }
+        TStyle(set) => self.args(set.args, keys)
         TValue(value) => self.value(value, keys)
       }
     NLabelled(body, _, _, _) => self.content(body, keys)
@@ -486,11 +527,17 @@ fn Linter::args(
 }
 
 ///|
-/// The descriptions inside a value: content, and the items of arrays and
-/// dictionaries. Call values are not looked through.
+/// The descriptions inside a value: content, the items of arrays and
+/// dictionaries and the operands of operators. Call values are not looked
+/// through.
 fn Linter::value(self : Linter, value : Value, keys : Array[String]) -> Unit {
   match value.val {
     VContent(content) => self.content(content, keys)
+    VAdd(a, b) | VSub(a, b) | VMul(a, b) | VDiv(a, b) => {
+      self.value(a, keys)
+      self.value(b, keys)
+    }
+    VNeg(a) => self.value(a, keys)
     VArray(items) =>
       for item in items {
         self.value(item, keys)

@@ -220,7 +220,7 @@ test "para: every piece of the text has a span of its own, like the pieces of a 
 }
 
 ///|
-test "para: under a key, and used twice" {
+test "para: under a key" {
   let row = (key : String) => @doc.Keyed(key, @doc.Para("keyed words"))
   let report = compile([row("a"), row("b")])
   // (The space between the words has no origin, as in a `Prose`.)
