@@ -1,62 +1,88 @@
-# What fourteen ports showed, and what the EDSL changes (proposal, revision 1)
+# What fourteen ports showed, and what the EDSL changes (proposal, revision 2)
 
-Status: proposal, not yet reviewed. It extends `docs/edsl-design.md`
-(revision 8); where the two disagree, that document holds until this one is
-accepted and folded into it.
+Status: proposal. Revision 1 was reviewed by Codex (xhigh):
+`docs/edsl-reviews/ports-proposal-1.md`, REQUEST CHANGES with eight required
+changes; section 11 says how each is resolved. This document extends
+`docs/edsl-design.md` (revision 8); where the two disagree, that document
+holds until this one is accepted and folded into it.
 
 ## 1. The experiment
 
 Fourteen HTML pages (reports, tutorials, dashboards, one in Chinese; 18 to
 85 KB each) were ported to PDF as single-file MoonBit scripts against the
-published package (`moonbitlang/typst@0.1.4/doc`), by five independent
-authors (the coordinator and four agents) who each reported every place where
-the EDSL lacked something, was verbose, surprised them, or reported an error
-badly. The scripts, PDFs and page images are in `_build/edsl-demo/ports/`
+published package (`moonbitlang/typst@0.1.4/doc`). The coordinator ported
+one (`bench`); four agents ported the other thirteen. The agents were given
+`bench.mbtx` as a reference, were told to copy its helpers, and were given
+the findings known at that point (the brief is `_build/edsl-demo/ports/
+BRIEF.md`). So the ports are not independent experiments: a finding counts
+as confirmed by an author only if that author hit it in their own documents
+after reading the brief; findings that were only in the brief are marked
+"brief". The scripts, PDFs and page images are in `_build/edsl-demo/ports/`
 (not committed: the pages are private).
-
-Result in numbers:
 
 | | |
 |---|---|
 | Ports that build and read as the same document | 14 of 14 |
 | Ports that needed embedded Typst source (`Markup`) | 0 |
-| Engine errors (`DocError`) across about 45 builds | 2, both located at run time only |
-| Lines of script | about 15,700 |
-| of which helper code a library could provide | about 5,600 (36%) |
-| Silent wrong output found only by looking at the page | 6 kinds (section 2.1) |
+| Engine errors (`DocError`) across about 45 builds | 2, both at run time |
 | Build and run per iteration | 15 to 18 s (12 s link, 5 s run) |
 
-So the engine is expressive enough; nothing was impossible. The cost is
-(a) output that is wrong without any diagnostic, and (b) a third of every
-script being the same helpers written again: cards, chips, tables, a canvas,
-number formats, inline markup.
+Per port, as each author counted (helper = code a library could have
+provided; generated data and the extracted text of the pages are content):
+
+| Port | Pages | Lines | Helper lines |
+|---|---|---|---|
+| bench | 3 | 910 | about 330 |
+| mooncakes-health | 18 | 1382 | 368 |
+| orgs-health (same code, other data) | 17 | 1353 | 368 |
+| typst-evaluation | 5 | 1047 | 342 |
+| record-visitors | 3 | 725 | 210 |
+| schemas-age-well | 8 | 1179 | 295 |
+| session-migrations | 9 | 1897 | 552 |
+| openseek-text-output | 4 | 1238 | 512 |
+| shell-prompt-ab | 4 | 848 | 330 |
+| shell-vs-myshell | 3 | 1030 | 477 |
+| minisql-field-report | 7 | 1508 | 574 |
+| moonc-startup | 1 | 563 | 234 |
+| mooncakes-consolidation | 4 | 888 | 371 |
+| tun-poc-zh | 4 | 1137 | 616 |
+| Total | 90 | 15,705 | about 5,580 (36% pooled; 27% to 54% per port) |
+
+The helper boundary was drawn by each author, not by one rule; section 9
+fixes a rule before anything is measured again.
+
+The engine is expressive enough: nothing was impossible. The cost is
+(a) output that is wrong without a diagnostic, and (b) the same helpers
+written again in each script.
 
 ## 2. Findings, by cause
 
-`n/5` is the number of authors who hit it independently.
+`n` is the number of authors (of five) who hit the finding in their own
+documents.
 
-### 2.1 Silent wrong output
+### 2.1 Wrong output without a diagnostic
 
-| # | What happens | n/5 |
+| # | What happens | n |
 |---|---|---|
-| S1 | Two adjacent inline items in a sequence (a `Prose`, a string, a `Text`) are typeset as one paragraph with no space between them: "…incremental.Two execution modes…" | 3 |
-| S2 | A `Block`/`Box` with a fixed height does not grow: text runs out below it, and across a page break the rest lands outside the box on the next page | 4 |
-| S3 | `Block(height=Pct(100))` in a grid cell takes the rest of the page (an extra page appears) | 2 |
+| S1 | Two adjacent inline items in a sequence (a `Prose`, a string, a `Text`) are typeset as one paragraph with nothing between them: "…incremental.Two execution modes…" | 3 |
+| S2a | A `Block` with a fixed height that meets a page break is split, and its content runs out below the fragment on the next page | 2 |
+| S2b | A `Block` or `Box` with a fixed height does not grow: content runs out below it (a `Box` is laid out in an unbreakable region, a `Block` may fragment) | 2 + brief |
+| S3 | `Block(height=Pct(100))` in a grid cell takes the height of the region: every card is as high as the page, and an extra page appears (nothing is out of bounds) | 2 |
 | S4 | A character no font covers is drawn as an empty box; `warnings` is empty | 1 |
 | S5 | Inline code in a table cell does not break and runs over the cell border | 2 |
 | S6 | `Prose` turns `'` after a digit into a prime ("#1770′s") | 1 |
 
-### 2.2 Things every script wrote again
+### 2.2 Things the scripts wrote again
 
-| # | Helper | n/5 | lines each time |
+| # | Helper | n | lines each time |
 |---|---|---|---|
 | H1 | Paragraph wrapper around `Prose` (because of S1) | 3 | 3 + one call per paragraph |
-| H2 | Inline markup: `c("x")` for code at 100 to 150 sites, or a parser for `` `code` ``, `**strong**`, links | 4 | 55 to 103 |
-| H3 | Equal-height cards in a row, with rounded corners (`Context` + `measure`, each card built twice, the row width typed in by hand) | 5 | 13 to 50 |
-| H4 | Chip/pill: inline box that does not wrap and sits on the text baseline | 4 | 10 to 20 |
-| H5 | Framed data table: header style, row rules, numeric columns, a marked row, rounded frame | 4 | 49 to 60 |
-| H6 | Canvas: absolute placement, text anchored at a point, arrowheads, a scale | 4 | 68 to 320 |
-| H7 | Number and date formats (`toFixed`, grouping, k/M, dates, `localeCompare`) | 4 | 30 to 147 |
+| H2 | Inline markup. Two different answers: a helper `c("x")` interpolated at 100 to 150 sites (2 authors), or a parser for marks in strings (2 authors; their grammars differ: `` `code` `` and `**strong**` in both, `__x__` is emphasis in one and dimmed text in the other, one adds `{{chip}}`) | 4 | 5, or 55 to 103 |
+| H3 | Equal-height cards in a row. Two answers: fill and stroke on the grid's cells (1 author; square corners, no measuring), or `Context` + `measure` with each card built twice and the row width typed in by hand (3 authors; rounded corners) | 4 | 10, or 13 to 50 |
+| H4 | Chip/pill: an inline box that does not wrap and sits on the text baseline | 4 | 10 to 20 |
+| H5 | Framed data table: column sizing, header style, row rules, numeric columns, a marked row, rounded frame | 4 | 49 to 60 |
+| H6 | Canvas: absolute placement, text anchored at a point (baseline estimated as `0.72 × size`), arrowheads, a scale; plus tick generation for charts | 4 | 68 to 320 |
+| H7 | Number and date formats (`toFixed`, grouping, k/M, a date stamp, `localeCompare`) | 4 | 30 to 147 |
 | H8 | Code block with coloured or dimmed spans (not a `raw`: `Raw` takes a string) | 3 | 30 to 55 |
 | H9 | A wrapping row of boxes with vertical centring (pipelines) | 1 | 40 |
 
@@ -67,192 +93,313 @@ number formats, inline markup.
 | T1 | `Box(baseline=)` (unmapped type) | `Grid(align=Horizon)`, `outset` |
 | T2 | `top_edge`/`bottom_edge` on text and highlight (unmapped) | `extra=[("top-edge", ..)]`, added gaps |
 | T3 | `Stroke(dash=)` is a `Value` | `Value::str("dotted")`, `Value::array(..)` |
-| T4 | No alpha, mix, lighten on `Paint` | 8-digit hex strings, a hand-written mixer |
-| T5 | No `Layout` (the available size) | page width typed in as a constant |
-| T6 | `Length`, `Sizing`, `Spacing` do not convert (`Rel(len)` exists and nobody found it) | helpers return `Double`, `Pt(px(14))` at 70 to 92 sites |
-| T7 | No `Upper`/`Lower` for content (`Call("upper", ..)` exists and nobody found it) | `s.to_upper()` on strings |
-| T8 | `Sides::none()` type-checks as an inset and fails at run time | `Sides(all=Pt(0))` |
-| T9 | `Outline(title=)` cannot be `none` | `Value::none()` |
-| T10 | `Stroke(paint=None)` fails with no source location | `Stroke::none()` |
+| T4 | No colour operations on `Paint` | 8-digit hex strings (an absolute alpha), a hand-written sRGB mixer |
+| T5 | No `Layout` (the size of the enclosing region) | page width typed in as a constant |
+| T6 | `Length`, `Sizing`, `Spacing` do not convert (`Rel(len)` exists; nobody found it) | helpers return `Double`, `Pt(px(14))` at 70 to 92 sites |
+| T7 | No `Upper`/`Lower` for content (`Call("upper", ..)` exists; nobody found it) | `s.to_upper()` on strings |
+| T8 | `Sides::none()` given as an inset fails at run time (located) | `Sides(all=Pt(0))` |
+| T9 | `Outline(title=NoneValue())` works; one author wrote `Value::none()` instead | documentation |
+| T10 | `Stroke(paint=None)` inside a table's `Cells` was reported without a source location (seen once, in the slide deck; the lowering path attaches the argument's span, so the cause is not known) | `Stroke::none()` |
+| T11 | `Ctx::measure` returns a size and drops the baseline the engine computes | `0.72 × size` |
 
 ### 2.4 Behaviour that is Typst's, and stays
 
-Auto columns distribute by Typst's algorithm, not HTML's; `sticky` binds one
-block; `raw` sets its size to 0.8em and em sizes compound; a stroke
-dictionary with one side leaves the others at the default; smart quotes
-follow Typst's rules (S6). The port is faithful to upstream, so the engine
-does not change. The EDSL answers with a kit element that picks the right
-settings (section 4), a lint (section 5) or documentation (section 7).
+- Auto columns take their measured content width, and what remains goes to
+  fractional columns or is taken from the auto columns; this is not HTML's
+  algorithm, and tables with several prose columns need weights.
+- `sticky` attaches a block to the block that follows it (consecutive sticky
+  blocks form a group); a heading, a paragraph of controls and a table do not
+  stay together unless the first two are one block.
+- `raw` sets its text size to 0.8em, and em sizes set on it compound.
+- A stroke dictionary that names one side leaves the others unspecified, and
+  they fold from the outer value: for a table that is its default stroke.
+- Smart quotes follow Typst's rules (S6).
+
+The port is faithful to upstream, so the engine does not change. The EDSL
+answers with a kit element that makes the right choice explicitly
+(section 4), a lint (section 5) or the guide (section 7).
 
 ### 2.5 Outside the EDSL
 
 - Fonts: no sans-serif face is embedded, which is the largest visual
   difference of every port; `system_fonts=true` raised one run from 5 s to
   39 s. Section 6.
-- MoonBit: findings for the language, listed in section 8.
+- MoonBit: findings for the language, section 8.
 
 ## 3. Changes to `doc` (the typed facade)
 
 `doc` stays what revision 8 defines: typed constructors lowered through the
-evaluator's own paths, each with a Typst twin. The changes below keep that.
+evaluator's own paths, invalid descriptions reported as located diagnostics
+when they are lowered (constructors do not raise), and a functional Typst
+twin for each constructor. Nothing below changes those rules.
 
-### 3.1 Paragraphs
+### 3.1 `Para`
 
-`Prose` stays inline (it is interpolated into other prose, and passed as a
-body). New:
+`Prose` stays inline (it is interpolated into prose and passed as a body).
 
 ```moonbit
 (
   $|Each dot is one complete trial of all nine milestones.
 )
-|> @doc.Para                        // = Par(Prose(text)), with par's options
+|> @doc.Para
 @doc.Para("One line.", justify=true)
 ```
 
-Twin: `#par[..]`. `Para` takes the options of `Par` and of `Prose`
-(`quotes`, and `marks` of 3.2). S1 itself is reported by lint L1.
+`Para(text, ..)` is `Par(Prose(text, quotes~), ..par's options)`. Twin:
+`par(..)[..]` around the functional expansion of the prose (section 4.4 of
+revision 8), not `#par[text]`. Provenance: one site, `Para`, whose first
+argument is the prose text; the inner `Par` and `Prose` are built with that
+site and do not register sites of their own (the registry deduplicates by
+location and key path, so two differently shaped constructors must not share
+a location).
 
-### 3.2 Marks in prose (opt-in)
-
-Revision 8 decided that strings are never parsed. Four of five authors then
-wrote the same parser. The proposal keeps the decision for plain strings and
-for `Prose` by default, and adds an opt-in:
-
-```moonbit
-@doc.Para("Run `moon check` after **every** edit, see [the guide](#setup).", marks=true)
-```
-
-Exactly four marks, nothing else is special: `` `code` `` (a `raw`),
-`**strong**`, `_emph_` at word boundaries, `[text](url)` or `[text](#label)`.
-A backslash escapes a mark character. Interpolation works as before. Each
-mark lowers to the same call the typed constructor makes (`Raw`, `Strong`,
-`Emph`, `Link`), so the twin is the Typst markup of the same shape, and the
-pieces take sub-ranges of the argument's span like interpolations do
-(`Pieces`); the text-offset rule of section 12.4 maps positions through the
-removed mark characters. Typst markup itself is not accepted here: `#`, `$`,
-`@`, `<`, `*` in data ("#1770", "$43.86", "@app") must stay literal.
-
-### 3.3 `Layout`
+### 3.2 `Layout`
 
 ```moonbit
-@doc.Layout() <| size => { .. size.width .. }   // pt, the region's size
+@doc.Layout() <| (size, cx) => { .. size.width .. cx.measure(..) .. }
 ```
 
-`layout(size => ..)` with a host callback, like `Context`. Removes the
-hand-typed page widths (T5) and is what the kit's `Cards`, `Flow` and
-`Canvas` are built on.
+`layout(size => ..)` with a host callback `(Size, Ctx) -> &IntoContent
+raise`, on the path `Context` uses; the engine already passes location and
+styles to it. `size` is the base size of the enclosing region
+(`regions.base()`): the width and height of the container, not the space
+that remains on the page, and a dimension can be infinite (an auto-sized
+container). Like every callback it falls under the creation rule
+(revision 8, section 11): it cannot be created inside another callback.
+
+### 3.3 `Size` with a baseline
+
+`Ctx::measure` returns the engine's baseline as well (`Size.baseline`), so
+text can be anchored on its baseline without a font-size estimate (T11).
 
 ### 3.4 Typed parameters and values
 
-Through `scripts/docgen.py` (type table and facades):
+Through `scripts/docgen.py` (type table) and the facades. Each keeps the
+engine's explicit states, and the untyped escape (`extra=`, `Value`) stays.
 
-- `Box(baseline=Length)` (T1).
-- `top_edge`/`bottom_edge : TextEdge` on `Text`, `SetText`, `Highlight`
-  (`Ascender`, `CapHeight`, `XHeight`, `Baseline`, `Bounds`, `Descender`,
-  `Len(Length)`) (T2).
-- `Stroke(dash=Dash)`: `Solid`, `Dotted`, `Dashed`, `DashDotted`, the
-  `Densely*`/`Loosely*` presets, `Pattern(Array[Length], phase~)` (T3).
-- `Paint::alpha(Double)`, `mix(Paint, Double)`, `lighten(Double)`,
-  `darken(Double)`, lowered to the engine's `transparentize`, `color.mix`,
-  `lighten`, `darken` (T4).
-- `Length::sizing()`, `Length::spacing()`; the guide shows `Rel` (T6).
-- `Upper(body)`, `Lower(body)` (the `upper`/`lower` functions) (T7).
-- `Sides::zero()`; `Sides::none()` given to a length-typed parameter is an
-  error raised at construction with the call's location (T8).
-- `Outline(title=)` accepts `NoneValue()` like other content options (T9).
-- Every value conversion error carries the location of the constructor that
-  holds the value (T10).
+- `Box(baseline=Length)`: the shift form only (`box(baseline: len)`, how far
+  the box is moved down from the text baseline). The `(at:, shift:)` and
+  alignment forms stay reachable through `extra` (T1).
+- `top_edge : TopEdge` (`Ascender`, `CapHeight`, `XHeight`, `Baseline`,
+  `Bounds`, `Len(Length)`) and `bottom_edge : BottomEdge` (`Baseline`,
+  `Descender`, `Bounds`, `Len(Length)`) on `Text`, `SetText`, `Highlight`:
+  two types, because the engine accepts different names for each (T2).
+- `Stroke(dash=Dash)`: `Auto`, `None`, the presets by upstream's names
+  (`Solid` lowers to `"solid"`, which is not `none`), `Pattern(Array[DashLen],
+  phase~)` with `DashLen` = `Dot` | `Len(Length)`, and `Raw(Value)` for what
+  a script passes today (T3).
+- Colour operations on `Paint`, lowered to the engine's native functions
+  with the receiver as first argument: `transparentize(Double)` (percent;
+  multiplies the alpha by `1 − t`, upstream's meaning, not "set the alpha"),
+  `lighten`, `darken`, `mix(other, weight~, space~)` (default space Oklab, as
+  upstream; `space="rgb"` gives what CSS `color-mix(in srgb, ..)` gives).
+  They are defined for colours; a gradient or tiling is the engine's located
+  cast error (T4).
+- `Length::sizing()`, `Length::spacing()` (= `Rel(self)`) (T6).
+- `Upper(body)`, `Lower(body)`. Twin: `upper[#body]`; on content this sets a
+  text case property, which is not the same structure as `upper("x")` on a
+  string (T7).
+- `Sides::zero()` (uniform `0pt`) for insets and margins. `Sides::none()`
+  as an inset stays a located lowering error (T8).
+- T10: first a reproducer (section 10, step 0); the fix follows from its
+  cause and must keep the more precise locations nested errors have today.
 
 ## 4. A kit (new package `doc/kit`)
 
-Composites that have no Typst element: they are built only from `doc`'s
-public API, so each has a definition in EDSL primitives rather than a Typst
-twin, and is tested against that definition (same frames). Nothing in `doc`
-depends on the kit.
+Composites that are not one Typst element. Each is defined by an expansion
+into `doc` primitives, and each has a functional Typst twin: a Typst
+function written with the same primitives (`doc/twins/kit.typ`), checked by
+the `edsl` stage like every other pair: structure, frames with memoization
+on and off, SVG and PDF bytes. Nothing in `doc` depends on the kit.
 
-| Element | Replaces | Built from |
-|---|---|---|
-| `Chip(body, fill~, text~, stroke~, radius~, inset~)` | H4 | `Box` with `baseline`, measured width so it does not wrap |
-| `Cards(items, columns~, gutter~, fill~, stroke~, radius~, inset~)` | H3, S3 | `Layout` + `measure`; rows of equal height; cards unbreakable |
-| `Flow(items, gap~, row_gap~, align~)` | H9 | `Layout` + `measure`, greedy rows |
-| `DataTable(head, rows, numeric~, mark~, frame~, header~, rule~, column_text~, key~)` | H5 | `Table` with the three `Cells` closures, `TableHeader`, a clipped rounded `Block`; rows keyed for provenance; `rest=Stroke::none()` set for the author |
-| `Canvas(width~, height, items, unit~)` with `text(x, y, body, anchor~)`, `line`, `rect`, `circle`, `curve`, `arrow(.., head~)` | H6 | `Block` + `Place`; anchored text by `measure`; `width=Auto` takes the region's width from `Layout`; arrowheads as polygons |
-| `Verbatim(text, lang~)` | H8 | monospaced text that keeps spaces and line breaks and takes interpolated styled spans (`\{kw("#let")}`); not a `raw` element, and says so |
-| `format`: `fixed`, `grouped`, `percent`, `compact` (k/M), `date`, `break_anywhere` | H7, S5 | plain MoonBit, no engine |
+Rule for callbacks: a kit element that measures creates a `Layout` or
+`Context` callback, so under the creation rule it cannot be built inside a
+callback (a show rule, a `Cells` function, another measuring element).
+The kit therefore avoids measuring wherever the engine can do the work, and
+says for each element whether it measures.
 
-The kit is where "what settings make this come out right" lives, so that
-section 2.4 does not have to be learned by each author.
+| Element | Replaces | Expansion | Measures |
+|---|---|---|---|
+| `Chip(body, fill~, text~, stroke~, radius~, inset~)` | H4 | `Box` with insets, an outset for the vertical padding and a `baseline` shift; a string body gets no-break spaces. A content body can wrap in a narrow column (documented) | no |
+| `Cards(items, columns~, gutter~, fill~, stroke~, inset~)` | H3, S3 | a `Grid` whose cells carry fill, stroke and inset: the engine makes the cells of a row equally high. Square corners | no |
+| `Cards(.., radius~)` | H3 | with a radius the cells cannot draw the card: rows are measured at the column width from `Layout`, each card is a rounded unbreakable `Block` of the row's height. Measured and final content are the same descriptions with the same keys | yes |
+| `Flow(items, gap~, row_gap~, align~)` | H9 | `Layout` + `measure`, greedy rows, each row a `Grid` aligned on the cross axis; an item wider than the region gets a row of its own; an infinite width gives one row | yes |
+| `DataTable(head, rows, columns~, numeric~, mark~, frame~, header~, rule~, column_text~, key~)` | H5 | `Table` with `TableHeader` (repeats on each page), cells unbreakable, the three `Cells` functions built once outside any callback, `rest=Stroke::none()` set explicitly, a clipped rounded `Block` as frame; `columns` is required (2.4); cells may be `TableCell` with spans; rows keyed by `key` or by index | no |
+| `Canvas(width, height, items, unit~)` with `text(x, y, body, anchor~)`, `line`, `rect`, `circle`, `curve`, `arrow(.., head~)` | H6 | a `Block` of that size with `Place`d items. Horizontal anchors use `Place`'s own alignment in the known width (`Center` with `dx = x − width/2`), vertical anchors `Top`, `Horizon`, `Bottom` likewise; arrowheads are polygons | no |
+| `Canvas(.., width=Auto)`, `anchor=Baseline` | H6 | the width from `Layout`; the baseline from `measure` (3.3) | yes |
+| `Lines(lines)` | H8 | monospaced lines: each line a sequence of strings and styled spans, joined by `Linebreak`, leading spaces kept as no-break spaces, tabs expanded by `tab_size`, no wrapping marks. It is not a `raw` element (no highlighting, `Select::raw` does not match) and its name says so | no |
 
-## 5. Lints
+Chart helpers (`ticks(lo, hi, n)`, a linear scale) come with `Canvas`.
 
-Checks the EDSL can make that the engine does not, reported as
-`report.lints` (separate from `warnings`, which stay identical to upstream's
-diagnostics), each with the origin of the offending call:
+Separate from layout, package `doc/format` (plain MoonBit, no engine):
+`fixed(x, digits)`, `grouped`, `percent`, `compact` (k/M) with stated
+contracts (negative values, half away from zero, NaN and infinities as
+`"NaN"`/`"∞"`), and `soft_breaks(s, after~)`, which inserts U+200B after the
+given punctuation (S5; it changes the text that is copied from the PDF, which
+the documentation says). Dates and collation are not included: both need a
+locale and a time zone policy, and one port's 40-line `localeCompare` is
+not evidence enough for a design.
 
-- L1 (S1): in a sequence at block level, two adjacent inline children.
-- L2 (S4): a glyph that resolved to `.notdef`, with the character.
-- L3 (S2, S3): content that extends beyond its fixed-size container or the
-  page by more than a tolerance, unless the container clips.
-- L4: many elements from one call site without `Keyed` (a helper without
-  `#callsite`, a loop): a note, since only the review loop is affected.
+## 5. Marks (a trial, in the kit)
 
-L1 and L4 read the description tree; L2 and L3 read the frames.
+Revision 8 decided that strings are never parsed, and guarantees that `_`,
+`*`, backslashes and other punctuation stay literal in `Prose`. Two authors
+wrote a parser for marks anyway, with different grammars; two used an
+interpolated helper. That is evidence that inline code is too heavy at 100+
+sites per document, not yet evidence for one grammar. So `Prose` does not
+change, and the kit gets a separately named constructor to try:
 
-## 6. Fonts
+```moonbit
+@kit.Marked("Run `moon check` after **every** edit, see [the guide](#setup).")
+```
 
-- A decision for the owner: embed one sans-serif family for `doc` (four
-  styles, about 1.2 MB, OFL) next to the three families upstream embeds, or
-  keep parity with upstream's set and document `font_paths`.
-- System font discovery costs 34 s in an mbtx run (debug wasm): to profile
-  separately; not part of this proposal.
+- Marks: `` `code` `` (no nesting, no marks inside, may not span lines),
+  `**strong**`, `_emph_` (opening `_` after start, white space or opening
+  punctuation, closing `_` before end, white space or punctuation; never
+  inside a word, and never between CJK characters without spaces, where
+  `Emph(..)` is written instead), `[text](target)` with `target` a URL or
+  `#label` (parentheses in a URL are percent-encoded by the author).
+  `**` and `_` nest in each other, not in themselves. An unmatched mark is
+  literal text. A backslash before a mark character makes it literal, and is
+  processed before marks.
+- Interpolated strings are text of the argument like any other, so marks in
+  `\{data}` are parsed; `\{@doc.Lit(data)}` keeps data literal. Interpolated
+  descriptions are placeholders as in `Prose` and are never parsed.
+- Lowering: each mark is the call its typed constructor makes. Twin:
+  `raw("..")`, `strong[..]`, `emph[..]`, `link(..)[..]` around literal text
+  with `Prose`'s white-space and quote expansion; not Typst markup of the
+  same shape.
+- Provenance: the pieces get distinct spans inside the argument's (`Pieces`),
+  so a selection resolves to the argument, as for any text whose rendered
+  characters are not the literal's (tier 2 of the review loop). No character
+  mapping through removed marks is claimed; that would be the engine work
+  section 12.4 of revision 8 reserves.
 
-## 7. Documentation
+Whether `Marked` moves into `doc` is decided after the rewritten ports
+(section 9) show whether authors choose it over `c("x")`.
 
-A guide, `docs/edsl-guide.md`, written from the ports: the `using @doc { .. }`
-prelude (which removes two thirds of the `@doc.` prefixes), helpers that keep
-the caller's location (`#callsite(autofill(loc, args_loc))`, found by
-experiment by one author), `Rel`, `Call`, the table of section 2.4, and one
-reference script per kind of document.
+## 6. Lints
+
+Checks the EDSL can make that the engine does not, in `report.lints`
+(separate from `warnings`, which stay upstream's diagnostics), each with an
+origin. What each can and cannot promise:
+
+- L1, adjacent inline items (S1). On the description tree, at author level:
+  in the item array of `Document`, `Seq` or a kit container, two neighbours
+  that are each a string, a `Prose`, or a `Text`/`Strong`/`Emph`/`Link`
+  wrapping one, when the array also holds at least one block-level
+  constructor (so a purely inline sequence, as in a `Text` body, is not
+  reported). It is a heuristic: it does not see through callbacks, `Call`
+  or embedded content. `Para` is the fix it names.
+- L2, missing glyphs (S4). From the frames: glyph id 0 in a text item, with
+  the item's origin and the text of the cluster (a code-point sequence; for
+  clusters beyond the 65,535 range limit, the item's text).
+- L3, content outside the page. From the frames: an item whose bounds leave
+  the page by more than 1pt.
+  Not covered: overflow of a fixed-size container (S2). Frames do not record
+  which container had a fixed size or where it was declared; that needs a
+  side channel from layout (container identity, bounds, origin, clipping,
+  fragments), which is an engine instrumentation decision outside this
+  proposal. Until then S2 is answered by the kit (its elements take no fixed
+  heights and are unbreakable where they measure) and the guide. S3 has no
+  out-of-bounds geometry at all and is answered by `Cards`.
+- L4, ambiguous origins. Counted during lowering: more than a threshold of
+  occurrences of one call site with one key path. Reported as a note that
+  the review loop cannot tell these apart (reuse of a description is valid),
+  with `Keyed` and `#callsite` as remedies.
+
+## 7. The guide
+
+`docs/edsl-guide.md`, written first (section 10, step 0), from the ports:
+the `using @doc { .. }` prelude (it removes two thirds of the `@doc.`
+prefixes; `trait IntoContent`, not `type`), helpers that keep the caller's
+location (`#callsite(autofill(loc, args_loc))`), `Rel`, `Call`,
+`NoneValue()`, `font_paths` for fonts that are not embedded, the table of
+section 2.4 with the remedy for each row, equal-height cards by cell fill,
+and when the creation rule bites.
 
 ## 8. For the language (not EDSL work)
 
 1. `if`/`match` branches of different concrete types do not unify to an
-   expected `&Trait` (`has type : Prose wanted : Box`); same in `map`
-   closures. Every script has `let x : &IntoContent = ..; x` dances.
+   expected `&Trait` (`has type : Prose wanted : Box`); the same in closures
+   passed to `map`.
 2. A `#|` string passed directly as an argument warns (`deprecated_syntax`),
-   so each needs parentheses on their own lines.
+   so each needs parentheses on lines of their own.
 3. `f(x) <| y => @pkg.g(..)` is a parse error; the body needs braces.
 4. `using @doc { type Sides }` reports the name unused when it is only used
    as a constructor.
 5. No number formatting in core (`toFixed`, grouping).
 6. Three enums with the same constructor names (`Pt`, `Em`, ..) cannot share
-   one helper's return type; an implicit conversion or a common trait would
-   remove about 160 call-site wrappers across two scripts.
+   one helper's return type.
 
-## 9. Order of work
+## 9. How success is measured
 
-Small pull requests, each with tests and its twin or definition check:
+Before anything is rewritten: five ports (bench, mooncakes-health,
+tun-poc-zh, session-migrations, typst-evaluation) are reduced to committed
+examples with synthetic data and fixed fonts, and their pages are stored as
+baselines. One rule decides what a helper line is: a top-level function or
+constant that does not contain text or data of the document. Then:
 
-1. `Para`, lint L1, located value errors, `Sides::zero` (the silent and the
-   unlocated first).
-2. Typed parameters and values of 3.4, `Layout`.
-3. Kit: `Chip`, `Cards`, `Flow`, `DataTable`.
-4. Kit: `Canvas`, `Verbatim`, `format`.
-5. Marks in prose.
-6. Lints L2 to L4.
-7. The guide; five ports rewritten against the kit (bench, mooncakes-health,
-   tun-poc-zh, session-migrations, typst-evaluation) as `doc/examples`
-   with synthetic data, and the measurement below.
+- Per finding, an acceptance test that states which of three outcomes holds:
+  prevented (the construct that failed is replaced by one that cannot),
+  reported (a lint or located error, with its test), or documented choice
+  (a guide entry; S6 and the auto-column behaviour are of this kind).
+- Per rewritten port: helper lines before and after by the rule above; pages
+  compared with the baseline, each difference classified as none, or as an
+  approved correction (a measured baseline replacing `0.72 × size`, a
+  corrected overflow); compile and layout time before and after.
+- The kit's pairs pass the `edsl` stage's full comparison.
 
-Success is measured on the rewritten ports: helper code under 10% of the
-script (from 36%), every silent failure of 2.1 either impossible or reported
-by a lint with a test, and the pages unchanged.
+A lower helper share alone is not success: it can be reached by moving
+complexity into the kit, which is why the time and page comparisons are part
+of the gate.
 
-## 10. Open questions
+## 10. Order of work
 
-1. Is `marks=true` worth a second inline syntax next to interpolation, or
-   should the guide teach `c("x")` and stop there?
-2. Should lints be on by default?
-3. Kit as a package of this module (`doc/kit`) or a separate module that can
-   move faster than the engine?
-4. The sans-serif family (section 6).
+Small pull requests, each with tests and its twin check.
+
+0. Fixtures and the guide: a failing or documenting test for every row of
+   2.1 and 2.3 (including a reproducer for T10), the five synthetic examples
+   with baselines, `docs/edsl-guide.md`.
+1. `Para`; lint L1.
+2. Typed parameters and values of 3.4; `Size.baseline`; `Layout`.
+3. One kit element end to end, with its twin and gates: `Cards` (both
+   forms). The package's shape is settled on it before the rest.
+4. `Chip`, `DataTable`, `doc/format`.
+5. `Canvas`, `Lines`, `Flow`.
+6. Lint L2 (a prototype comes with step 0's fixture), then L3 and L4.
+7. `Marked`.
+8. The five examples rewritten; the measurements of section 9.
+
+## 11. Resolution of the first review
+
+1. Text offsets through marks: the claim is removed; marks have a grammar,
+   an interpolation rule, argument-level provenance and functional twins
+   (section 5).
+2. `Layout`: fallible callback with `Ctx`, base-size semantics, and the
+   creation rule stated for it and for the kit, which says per element
+   whether it measures (3.2, 4).
+3. Baseline, edges, dash and colour contracts corrected, explicit states and
+   escapes kept; `Outline(title=NoneValue())` reclassified as documentation
+   (3.4, T9).
+4. Conversion errors stay located lowering errors; `Sides::zero` only; T10
+   waits for a reproducer (3.4).
+5. Kit elements have functional Typst twins and pass section 16's gates (4).
+6. Kit contracts: measurement width and keys, baseline from `measure`,
+   pagination, table columns and spans, line handling of `Lines`, one site
+   per composite (3.1, 3.3, 4).
+7. Lints restated with what each reads and cannot see; fixed-container
+   overflow is named as engine instrumentation outside the proposal (6).
+8. Section 2.4 and the evidence claims corrected; the guide and fixtures
+   come first; success is per finding and per port (1, 2.4, 9, 10).
+
+Optional points taken: marks as a separately named constructor in the kit;
+cards by cell fill before measurement; format utilities in their own
+package; fonts by `font_paths` fixtures before any embedding decision.
+
+## 12. Open questions for the owner
+
+1. Embed a sans-serif family for `doc`, or keep upstream's three families
+   and document `font_paths`?
+2. Lints on by default?
+3. The engine side channel that fixed-container overflow (S2) needs: wanted?
