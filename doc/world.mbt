@@ -146,3 +146,16 @@ pub impl @library.World for DocWorld with fn font(self, index) {
 pub impl @library.World for DocWorld with fn today(self, offset) {
   (self.today)(offset)
 }
+
+///|
+#deprecated("call as `World::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DocWorld with @library.World::{
+  main,
+  source,
+  file,
+  library,
+  today,
+  font,
+  book,
+}

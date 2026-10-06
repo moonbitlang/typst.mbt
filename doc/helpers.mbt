@@ -43,6 +43,11 @@ pub impl IntoContent for Quoted with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `IntoContent::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Quoted with IntoContent::{into_content}
+
+///|
 /// The display of a symbol: what markup's escapes (`\\#`) and shorthands
 /// (`~`, `--`, `...`) evaluate to. It is laid out like the text, but it is
 /// a `symbol` element until realization, which converted markup keeps.
@@ -75,3 +80,8 @@ pub fn Symbol::Symbol(
 pub impl IntoContent for Symbol with fn into_content(self) {
   self.content
 }
+
+///|
+#deprecated("call as `IntoContent::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Symbol with IntoContent::{into_content}

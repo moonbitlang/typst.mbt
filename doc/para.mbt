@@ -188,3 +188,8 @@ pub fn Para::Para(
 pub impl IntoContent for Para with fn into_content(self) {
   self.content
 }
+
+///|
+#deprecated("call as `IntoContent::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Para with IntoContent::{into_content}

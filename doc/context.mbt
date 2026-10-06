@@ -107,10 +107,10 @@ pub fn Ctx::measure(
   let span = self.enter("Ctx::measure", loc)
   let named : Array[(String, Value)] = []
   if width is Some(width) {
-    named.push(("width", width.to_value()))
+    named.push(("width", ToValue::to_value(width)))
   }
   if height is Some(height) {
-    named.push(("height", height.to_value()))
+    named.push(("height", ToValue::to_value(height)))
   }
   let value = self.native(
     @library.native_measure(),
@@ -163,6 +163,11 @@ pub impl ToValue for Counter with fn to_value(self) {
 }
 
 ///|
+#deprecated("call as `ToValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Counter with ToValue::{to_value}
+
+///|
 /// A counter read in a context.
 pub struct CounterHandle {
   priv cx : Ctx
@@ -194,7 +199,7 @@ pub fn CounterHandle::get(
   let span = self.cx.enter("CounterHandle::get", loc)
   let value = self.cx.native(
     @library.native_counter_get(),
-    [self.counter.to_value()],
+    [ToValue::to_value(self.counter)],
     [],
     span,
   )
@@ -212,7 +217,7 @@ pub fn CounterHandle::final_value(
   let span = self.cx.enter("CounterHandle::final_value", loc)
   let value = self.cx.native(
     @library.native_counter_final(),
-    [self.counter.to_value()],
+    [ToValue::to_value(self.counter)],
     [],
     span,
   )
@@ -231,7 +236,7 @@ pub fn[W] CounterHandle::at(
   let span = self.cx.enter("CounterHandle::at", loc)
   let value = self.cx.native(
     @library.native_counter_at(),
-    [self.counter.to_value(), selector.value],
+    [ToValue::to_value(self.counter), selector.value],
     [],
     span,
   )
@@ -249,9 +254,9 @@ pub fn CounterHandle::display(
   loc~ : SourceLoc,
 ) -> Content raise {
   let span = self.cx.enter("CounterHandle::display", loc)
-  let positional = [self.counter.to_value()]
+  let positional = [ToValue::to_value(self.counter)]
   if numbering is Some(numbering) {
-    positional.push(numbering.to_value())
+    positional.push(ToValue::to_value(numbering))
   }
   let named : Array[(String, Value)] = []
   if both is Some(both) {
@@ -281,7 +286,7 @@ pub fn CounterStep::CounterStep(
   args_loc~ : ArgsLoc,
 ) -> CounterStep {
   let args : Array[ArgNode] = [
-    { name: None, value: counter.to_value(), param: 0, },
+    { name: None, value: ToValue::to_value(counter), param: 0, },
   ]
   if level is Some(level) {
     args.push({ name: Some("level"), value: Value::int(level), param: 1, })
@@ -301,6 +306,11 @@ pub fn CounterStep::CounterStep(
 pub impl IntoContent for CounterStep with fn into_content(self) {
   self.content
 }
+
+///|
+#deprecated("call as `IntoContent::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CounterStep with IntoContent::{into_content}
 
 ///|
 /// Content that sets a counter (`counter.update(..)`): one value per
@@ -327,7 +337,7 @@ pub fn CounterUpdate::CounterUpdate(
       NCall({
         func: FNative(@library.native_counter_update()),
         args: [
-          { name: None, value: counter.to_value(), param: 0, },
+          { name: None, value: ToValue::to_value(counter), param: 0, },
           { name: None, value: update, param: 1, },
         ],
         origin: Site::new("CounterUpdate", loc, args_loc),
@@ -340,6 +350,11 @@ pub fn CounterUpdate::CounterUpdate(
 pub impl IntoContent for CounterUpdate with fn into_content(self) {
   self.content
 }
+
+///|
+#deprecated("call as `IntoContent::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CounterUpdate with IntoContent::{into_content}
 
 // Context callbacks.
 
@@ -365,6 +380,11 @@ pub fn Context::Context(
 pub impl IntoContent for Context with fn into_content(self) {
   self.content
 }
+
+///|
+#deprecated("call as `IntoContent::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Context with IntoContent::{into_content}
 
 // Layout callbacks.
 
@@ -441,3 +461,8 @@ pub fn Layout::Layout(
 pub impl IntoContent for Layout with fn into_content(self) {
   self.content
 }
+
+///|
+#deprecated("call as `IntoContent::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Layout with IntoContent::{into_content}

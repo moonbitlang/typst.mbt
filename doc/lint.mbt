@@ -19,6 +19,11 @@ pub(all) enum LintKind {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LintKind with Eq::{not_equal, equal}
+
+///|
 /// The name of the check, as `render` writes it (`adjacent-inline`).
 pub fn LintKind::name(self : LintKind) -> String {
   match self {

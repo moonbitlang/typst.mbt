@@ -321,6 +321,11 @@ pub impl IntoContent for Prose with fn into_content(self) {
   self.content
 }
 
+///|
+#deprecated("call as `IntoContent::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Prose with IntoContent::{into_content}
+
 // Interpolation: `\{description}` writes a placeholder (`Show`).
 
 ///|
@@ -329,9 +334,19 @@ pub impl @builtin.Show for Content with fn output(self, logger) {
 }
 
 ///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Content with @builtin.Show::{to_string, output}
+
+///|
 pub impl @builtin.Show for Prose with fn output(self, logger) {
   prose_placeholder(self.content, logger)
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Prose with @builtin.Show::{to_string, output}
 
 ///|
 pub impl @builtin.Show for Para with fn output(self, logger) {
@@ -339,9 +354,19 @@ pub impl @builtin.Show for Para with fn output(self, logger) {
 }
 
 ///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Para with @builtin.Show::{to_string, output}
+
+///|
 pub impl @builtin.Show for Seq with fn output(self, logger) {
   prose_placeholder(self.content, logger)
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Seq with @builtin.Show::{to_string, output}
 
 ///|
 pub impl @builtin.Show for Lit with fn output(self, logger) {
@@ -349,9 +374,19 @@ pub impl @builtin.Show for Lit with fn output(self, logger) {
 }
 
 ///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Lit with @builtin.Show::{to_string, output}
+
+///|
 pub impl @builtin.Show for Labelled with fn output(self, logger) {
   prose_placeholder(self.content, logger)
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Labelled with @builtin.Show::{to_string, output}
 
 ///|
 pub impl @builtin.Show for Keyed with fn output(self, logger) {
@@ -359,9 +394,19 @@ pub impl @builtin.Show for Keyed with fn output(self, logger) {
 }
 
 ///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Keyed with @builtin.Show::{to_string, output}
+
+///|
 pub impl @builtin.Show for Space with fn output(self, logger) {
   prose_placeholder(self.content, logger)
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Space with @builtin.Show::{to_string, output}
 
 ///|
 pub impl @builtin.Show for Symbol with fn output(self, logger) {
@@ -369,9 +414,19 @@ pub impl @builtin.Show for Symbol with fn output(self, logger) {
 }
 
 ///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Symbol with @builtin.Show::{to_string, output}
+
+///|
 pub impl @builtin.Show for Quoted with fn output(self, logger) {
   prose_placeholder(self.content, logger)
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Quoted with @builtin.Show::{to_string, output}
 
 ///|
 pub impl @builtin.Show for Markup with fn output(self, logger) {
@@ -379,9 +434,19 @@ pub impl @builtin.Show for Markup with fn output(self, logger) {
 }
 
 ///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Markup with @builtin.Show::{to_string, output}
+
+///|
 pub impl @builtin.Show for Equation with fn output(self, logger) {
   prose_placeholder(self.content, logger)
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Equation with @builtin.Show::{to_string, output}
 
 ///|
 pub impl @builtin.Show for Call with fn output(self, logger) {
@@ -389,9 +454,19 @@ pub impl @builtin.Show for Call with fn output(self, logger) {
 }
 
 ///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Call with @builtin.Show::{to_string, output}
+
+///|
 pub impl @builtin.Show for Context with fn output(self, logger) {
   prose_placeholder(self.content, logger)
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Context with @builtin.Show::{to_string, output}
 
 ///|
 pub impl @builtin.Show for Layout with fn output(self, logger) {
@@ -399,9 +474,19 @@ pub impl @builtin.Show for Layout with fn output(self, logger) {
 }
 
 ///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Layout with @builtin.Show::{to_string, output}
+
+///|
 pub impl @builtin.Show for CounterStep with fn output(self, logger) {
   prose_placeholder(self.content, logger)
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CounterStep with @builtin.Show::{to_string, output}
 
 ///|
 pub impl @builtin.Show for CounterUpdate with fn output(self, logger) {
@@ -409,6 +494,16 @@ pub impl @builtin.Show for CounterUpdate with fn output(self, logger) {
 }
 
 ///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CounterUpdate with @builtin.Show::{to_string, output}
+
+///|
 pub impl @builtin.Show for ContentView with fn output(self, logger) {
-  prose_placeholder(self.into_content(), logger)
+  prose_placeholder(IntoContent::into_content(self), logger)
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ContentView with @builtin.Show::{to_string, output}

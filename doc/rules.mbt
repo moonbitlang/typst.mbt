@@ -56,6 +56,11 @@ pub impl IntoContent for Show with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `IntoContent::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Show with IntoContent::{into_content}
+
+///|
 /// A show rule whose transformation is a value: a Typst function
 /// (`show link: underline`), content or a string (`show "a": [b]`); the
 /// value is cast like the transformation of a Typst show rule.
@@ -108,6 +113,11 @@ pub impl IntoContent for ShowWith with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `IntoContent::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ShowWith with IntoContent::{into_content}
+
+///|
 /// A show-set rule: `show selector: set f(..)`.
 pub struct ShowSet {
   priv content : Content
@@ -138,6 +148,11 @@ pub impl IntoContent for ShowSet with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `IntoContent::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ShowSet with IntoContent::{into_content}
+
+///|
 /// The generic set rule: `set path(named..)` for the element function with
 /// the qualified name `path` (`"table.cell"`).
 pub struct Set {
@@ -166,6 +181,11 @@ pub fn Set::Set(
 pub impl IntoContent for Set with fn into_content(self) {
   Content::of(NSetRule(self.node))
 }
+
+///|
+#deprecated("call as `IntoContent::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Set with IntoContent::{into_content}
 
 ///|
 pub impl SetRule for Set
@@ -207,6 +227,11 @@ pub impl IntoContent for Call with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `IntoContent::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Call with IntoContent::{into_content}
+
+///|
 /// Typst markup evaluated by the front end: the twin of
 /// `eval(source, mode: "markup", scope: (..))`.
 pub struct Markup {
@@ -239,6 +264,11 @@ pub fn Markup::Markup(
 pub impl IntoContent for Markup with fn into_content(self) {
   self.content
 }
+
+///|
+#deprecated("call as `IntoContent::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Markup with IntoContent::{into_content}
 
 ///|
 /// An equation from a Typst math string: `Equation("x^2")` is `$x^2$`,
@@ -274,7 +304,11 @@ pub fn Equation::Equation(
     })
   }
   if number_align is Some(v) {
-    args.push({ name: Some("number-align"), value: v.to_value(), param: 3, })
+    args.push({
+      name: Some("number-align"),
+      value: ToValue::to_value(v),
+      param: 3,
+    })
   }
   if supplement is Some(v) {
     args.push({
@@ -310,3 +344,8 @@ pub fn Equation::Equation(
 pub impl IntoContent for Equation with fn into_content(self) {
   self.content
 }
+
+///|
+#deprecated("call as `IntoContent::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Equation with IntoContent::{into_content}
