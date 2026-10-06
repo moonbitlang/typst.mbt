@@ -94,16 +94,18 @@ priv enum Extent {
   /// and how far the engine lets the glyph hang over the end of its line
   /// (`hang_of`), which runs along the x axis.
   EGlyph(@kurbo.Rect, @kurbo.Rect, Double)
-  /// The area of paths: the interior of a filled shape, the outline of
-  /// its stroke.
-  EPaths(Array[@kurbo.BezPath])
+  /// A shape: its path, which is where it is set; and the areas that are
+  /// drawn, the interior of a filled shape and the outline of its stroke
+  /// (`FrameLinter::shape`).
+  EShape(@kurbo.BezPath, Array[@kurbo.BezPath])
 }
 
 ///|
 /// The bounding box of the extent after the transform `ts`. For a path it
 /// is the box of the transformed path, so a rotated circle has the box of
-/// a circle; for a rectangle it is the box of its four corners. `set`: of
-/// a glyph the part that is set in a line, not all that is drawn.
+/// a circle; for a rectangle it is the box of its four corners. `set`:
+/// what is set, not all that is drawn (of a glyph the part in its line,
+/// of a shape its path without the stroke around it).
 fn Extent::bounds(
   self : Extent,
   ts : @kurbo.Affine,
@@ -113,7 +115,8 @@ fn Extent::bounds(
     ERect(rect) => Some(ts.transform_rect_bbox(rect))
     EGlyph(drawn, part, _) =>
       Some(ts.transform_rect_bbox(if set { part } else { drawn }))
-    EPaths(paths) => {
+    EShape(path, _) if set => Some(path.transform(ts).bounding_box())
+    EShape(_, paths) => {
       let mut all : @kurbo.Rect? = Option::None
       for path in paths {
         let box = path.transform(ts).bounding_box()
@@ -977,9 +980,16 @@ fn FrameLinter::text(
 }
 
 ///|
-/// A shape at `(x, y)` in a frame with the transform `mat`: the interior
-/// of a filled shape and the outline of its stroke (a dashed line counts
-/// as a whole line). A shape that draws nothing is nothing.
+/// A shape at `(x, y)` in a frame with the transform `mat`. A shape that
+/// draws nothing is nothing.
+///
+/// What is drawn is the interior of a filled shape and the outline of its
+/// stroke (a dashed line counts as a whole line): that is what the page
+/// cuts off. In a container a shape is where its path is: the engine
+/// draws a stroke on the path, half of it to either side, and gives it no
+/// room, so the stroke of what fills its container (the frame of a
+/// drawing, the rules of a table) is outside by half by the engine's
+/// choice, like the descenders of a line.
 fn FrameLinter::shape(
   self : FrameLinter,
   shape : @library.Shape,
@@ -1023,7 +1033,7 @@ fn FrameLinter::shape(
   self.drawing(
     "a shape",
     span,
-    EPaths(paths),
+    EShape(@kurbo.BezPath::from_vec(path), paths),
     mat * @kurbo.Affine::translate(x, y) * raw_to_pt,
     true,
   )

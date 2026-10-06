@@ -869,6 +869,24 @@ test "lint L3: what a container draws itself, and what the engine lets hang" {
     ]),
     content="",
   )
+  // A stroke is drawn on its path, half of it to either side: a frame
+  // that fills its drawing is where its path is. (On the edge of the page
+  // that half is cut off, which the lint of the page reports: above.)
+  inspect(
+    lints_on_page([
+      @doc.V(Pt(10)),
+      drawing(60, 30, [
+        @doc.Place(
+          @doc.Rect(
+            width=Pt(60),
+            height=Pt(30),
+            stroke=@doc.Sides(all=@doc.Stroke(thickness=Pt(6))),
+          ),
+        ),
+      ]),
+    ]),
+    content="",
+  )
   // The descenders of the last line are below every block: a line of
   // text ends at its baseline. A block that is exactly as high as its
   // line (6.58pt: the cap height of 10pt text) has nothing outside.
@@ -994,7 +1012,7 @@ test "lint L3: which frame is a container's" {
       ),
     ]),
     content=(
-      #|outside-container (Markup, bytes 17..47 of the source string) p1: a shape leaves its container (Block, 80pt by 20pt) at the right by 10.5pt
+      #|outside-container (Markup, bytes 17..47 of the source string) p1: a shape leaves its container (Block, 80pt by 20pt) at the right by 10pt
     ),
   )
 }
