@@ -220,6 +220,19 @@
   interpolated block (`is_block`) in a run of its own (`NPieces`) with
   `first-line-indent: 0pt`. `doc/para_test.mbt` starts with the engine
   facts this rests on (the "engine: .." tests).
+- EDSL kit (`doc/kit`, section 4 and "As built (step 3)" of
+  `docs/edsl-ports.md`): elements that are not one Typst element (`Cards`),
+  each an expansion into `doc`'s constructors with a functional Typst twin
+  (`doc/twins/kit.mbt`, pairs of the `edsl` stage). The conventions are in
+  the doc comment of `doc/kit/kit.mbt`: read them before adding an element.
+  Provenance goes through `@doc.Composite` (`doc/composite.mbt`): one call
+  site per element, forwarded arguments marked with `site.arg(i, v)`
+  (`Site::param` maps a primitive's argument to the caller's), callbacks
+  created in `build` re-enter its scope (`scoped_callback`). An element that
+  measures creates a callback and falls under the creation rule. Nothing in
+  `doc` depends on the kit. `doc/examples/report` holds one report written
+  with hand-written helpers and with the kit (identical pages), and
+  `scripts/edsl_helper_lines.py` counts helper lines for that comparison.
 - Typst-to-EDSL translator (`doc/convert`, design in `docs/edsl-convert.md`,
   Codex-approved; a stress test of the EDSL, not a compiler): typed where
   the design's narrow rules prove it exact, Typst source in `Markup`
