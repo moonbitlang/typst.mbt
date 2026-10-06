@@ -14,6 +14,11 @@ pub(all) enum CastInfo {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CastInfo with Eq::{not_equal, equal}
+
+///|
 /// Walk all contained non-union infos.
 pub fn CastInfo::walk(self : CastInfo, f : (CastInfo) -> Unit) -> Unit {
   match self {
@@ -192,9 +197,19 @@ pub impl IntoValue for Value with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Value with IntoValue::{into_value}
+
+///|
 pub impl FromValue for Value with fn from_value(v) {
   v
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Value with FromValue::{from_value}
 
 // Primitive types.
 
@@ -341,6 +356,11 @@ pub impl IntoValue for Length with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Length with IntoValue::{into_value}
+
+///|
 pub impl FromValue for Length with fn from_value(v) {
   match v {
     Length(l) => l
@@ -367,9 +387,19 @@ pub impl Reflect for Angle with fn castable(v) {
 }
 
 ///|
+#deprecated("call as `Reflect::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Angle with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for Angle with fn into_value(self) {
   Angle(self)
 }
+
+///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Angle with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for Angle with fn from_value(v) {
@@ -378,6 +408,11 @@ pub impl FromValue for Angle with fn from_value(v) {
     v => cast_fail_with(Type(Type::angle()), v)
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Angle with FromValue::{from_value}
 
 ///|
 pub impl Reflect for Ratio with fn input() {
@@ -395,9 +430,19 @@ pub impl Reflect for Ratio with fn castable(v) {
 }
 
 ///|
+#deprecated("call as `Reflect::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Ratio with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for Ratio with fn into_value(self) {
   Ratio(self)
 }
+
+///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Ratio with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for Ratio with fn from_value(v) {
@@ -426,9 +471,19 @@ pub impl Reflect for Fr with fn castable(v) {
 }
 
 ///|
+#deprecated("call as `Reflect::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Fr with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for Fr with fn into_value(self) {
   Fraction(self)
 }
+
+///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Fr with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for Fr with fn from_value(v) {
@@ -437,6 +492,11 @@ pub impl FromValue for Fr with fn from_value(v) {
     v => cast_fail_with(Type(Type::fraction()), v)
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Fr with FromValue::{from_value}
 
 ///|
 /// `Rel<Length>` accepts lengths, ratios and relative lengths.
@@ -453,6 +513,11 @@ pub impl Reflect for Rel[Length] with fn output() {
 pub impl Reflect for Rel[Length] with fn castable(v) {
   v is (Relative(_) | Length(_) | Ratio(_))
 }
+
+///|
+#deprecated("call as `Reflect::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Rel with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for Rel[Length] with fn into_value(self) {
@@ -539,6 +604,11 @@ pub impl IntoValue for Func with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Func with IntoValue::{into_value}
+
+///|
 pub impl FromValue for Func with fn from_value(v) {
   match v {
     Func(f) => f
@@ -567,9 +637,19 @@ pub impl Reflect for Type with fn castable(v) {
 }
 
 ///|
+#deprecated("call as `Reflect::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Type with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for Type with fn into_value(self) {
   Type(self)
 }
+
+///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Type with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for Type with fn from_value(v) {
@@ -578,6 +658,11 @@ pub impl FromValue for Type with fn from_value(v) {
     v => cast_fail_with(Type(Type::type_()), v)
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Type with FromValue::{from_value}
 
 ///|
 pub impl Reflect for Arr with fn input() {
@@ -601,6 +686,11 @@ pub extend Arr with Reflect::{output, input, castable}
 pub impl IntoValue for Arr with fn into_value(self) {
   Array(self)
 }
+
+///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Arr with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for Arr with fn from_value(v) {
@@ -629,9 +719,19 @@ pub impl Reflect for Dict with fn castable(v) {
 }
 
 ///|
+#deprecated("call as `Reflect::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Dict with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for Dict with fn into_value(self) {
   Dict(self)
 }
+
+///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Dict with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for Dict with fn from_value(v) {
@@ -640,6 +740,11 @@ pub impl FromValue for Dict with fn from_value(v) {
     v => cast_fail_with(Type(Type::dict()), v)
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Dict with FromValue::{from_value}
 
 ///|
 pub impl Reflect for Args with fn input() {
@@ -657,9 +762,19 @@ pub impl Reflect for Args with fn castable(v) {
 }
 
 ///|
+#deprecated("call as `Reflect::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Args with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for Args with fn into_value(self) {
   Args(self)
 }
+
+///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Args with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for Args with fn from_value(v) {
@@ -668,6 +783,11 @@ pub impl FromValue for Args with fn from_value(v) {
     v => cast_fail_with(Type(Type::args()), v)
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Args with FromValue::{from_value}
 
 ///|
 pub impl Reflect for Label with fn input() {
@@ -693,12 +813,22 @@ pub impl IntoValue for Label with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Label with IntoValue::{into_value}
+
+///|
 pub impl FromValue for Label with fn from_value(v) {
   match v {
     Label(l) => l
     v => cast_fail_with(Type(Type::label()), v)
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Label with FromValue::{from_value}
 
 // Generic containers.
 

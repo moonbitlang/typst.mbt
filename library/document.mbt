@@ -12,6 +12,21 @@ pub(all) enum DocumentFormat {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DocumentFormat with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DocumentFormat with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DocumentFormat with @debug.Debug::{to_repr}
+
+///|
 pub impl Reflect for DocumentFormat with fn input() {
   PagedFormat::input().union_with(
     Value(Str("html"), "The document format of the web."),
@@ -40,6 +55,11 @@ pub impl IntoValue for DocumentFormat with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DocumentFormat with IntoValue::{into_value}
+
+///|
 pub impl FromValue for DocumentFormat with fn from_value(v) {
   match v {
     Str("html") => Html
@@ -47,6 +67,11 @@ pub impl FromValue for DocumentFormat with fn from_value(v) {
     v => raise HintedError(DocumentFormat::input().error(v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DocumentFormat with FromValue::{from_value}
 
 ///|
 /// The target that a document in this format is compiled for.
@@ -102,6 +127,21 @@ pub(all) enum PagedFormat {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PagedFormat with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PagedFormat with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PagedFormat with @debug.Debug::{to_repr}
+
+///|
 let paged_format_names : ReadOnlyArray[String] = ["pdf", "png", "svg"]
 
 ///|
@@ -152,6 +192,16 @@ pub extend PagedFormat with FromValue::{from_value}
 pub(all) struct OneOrMultiple[T](Array[T]) derive(Eq, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend OneOrMultiple with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend OneOrMultiple with Hash::{hash, hash_combine}
+
+///|
 pub impl[T] Default for OneOrMultiple[T] with fn default() {
   OneOrMultiple([])
 }
@@ -163,6 +213,11 @@ pub extend OneOrMultiple with Default::{default}
 pub impl[T] Fold for OneOrMultiple[T] with fn fold(self, outer) {
   OneOrMultiple(outer.0 + self.0)
 }
+
+///|
+#deprecated("call as `Fold::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend OneOrMultiple with Fold::{fold}
 
 ///|
 pub impl[T : Reflect] Reflect for OneOrMultiple[T] with fn input() {
@@ -178,6 +233,11 @@ pub impl[T : Reflect] Reflect for OneOrMultiple[T] with fn output() {
 pub impl[T : Reflect] Reflect for OneOrMultiple[T] with fn castable(value) {
   value is Array(_) || T::castable(value)
 }
+
+///|
+#deprecated("call as `Reflect::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend OneOrMultiple with Reflect::{output, input, castable}
 
 ///|
 pub impl[T : IntoValue] IntoValue for OneOrMultiple[T] with fn into_value(self) {
@@ -202,6 +262,11 @@ pub impl[T : FromValue] FromValue for OneOrMultiple[T] with fn from_value(value)
       )
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend OneOrMultiple with FromValue::{from_value}
 
 ///|
 /// Details about the document.
@@ -241,6 +306,11 @@ pub fn DocumentInfo::new() -> DocumentInfo {
 pub impl Default for DocumentInfo with fn default() {
   DocumentInfo::new()
 }
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DocumentInfo with Default::{default}
 
 ///|
 /// Populate this document info with details from the given styles.

@@ -84,6 +84,16 @@ fn impl_csv(
 pub(all) struct Delimiter(Char) derive(Eq, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Delimiter with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Delimiter with Hash::{hash, hash_combine}
+
+///|
 pub fn Delimiter::default() -> Delimiter {
   Delimiter(',')
 }
@@ -104,9 +114,19 @@ pub impl Reflect for Delimiter with fn castable(v) {
 }
 
 ///|
+#deprecated("call as `Reflect::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Delimiter with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for Delimiter with fn into_value(self) {
   Str(self.0.to_string())
 }
+
+///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Delimiter with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for Delimiter with fn from_value(v) {
@@ -126,6 +146,11 @@ pub impl FromValue for Delimiter with fn from_value(v) {
 }
 
 ///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Delimiter with FromValue::{from_value}
+
+///|
 /// The type of parsed rows.
 ///
 /// (The variants are named `RowArray`/`RowDict` instead of upstream's
@@ -134,6 +159,21 @@ pub(all) enum RowType {
   RowArray
   RowDict
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RowType with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RowType with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RowType with @debug.Debug::{to_repr}
 
 ///|
 pub impl Reflect for RowType with fn input() {
@@ -151,12 +191,22 @@ pub impl Reflect for RowType with fn castable(v) {
 }
 
 ///|
+#deprecated("call as `Reflect::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RowType with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for RowType with fn into_value(self) {
   match self {
     RowArray => Type(Type::array())
     RowDict => Type(Type::dict())
   }
 }
+
+///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RowType with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for RowType with fn from_value(v) {
@@ -172,6 +222,11 @@ pub impl FromValue for RowType with fn from_value(v) {
     v => raise HintedError(cast_error((Ty::new() : Ty[RowType]), v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RowType with FromValue::{from_value}
 
 ///|
 /// Format the user-facing CSV error message.

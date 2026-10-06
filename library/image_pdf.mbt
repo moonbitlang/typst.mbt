@@ -11,6 +11,11 @@ pub(all) suberror LoadPdfError {
 } derive(Debug)
 
 ///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LoadPdfError with @debug.Debug::{to_repr}
+
+///|
 /// A PDF document.
 pub struct PdfDocument {
   /// The parsed document (`None` only for synthetic test documents).
@@ -27,9 +32,19 @@ pub impl Eq for PdfDocument with fn equal(self, other) {
 }
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PdfDocument with Eq::{not_equal, equal}
+
+///|
 pub impl Hash for PdfDocument with fn hash_combine(self, hasher) {
   hasher.combine(self.data)
 }
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PdfDocument with Hash::{hash, hash_combine}
 
 ///|
 /// Cache of loaded documents (upstream memoizes `PdfDocument::new`).
@@ -104,10 +119,20 @@ pub impl Eq for PdfImage with fn equal(self, other) {
 }
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PdfImage with Eq::{not_equal, equal}
+
+///|
 pub impl Hash for PdfImage with fn hash_combine(self, hasher) {
   hasher.combine(self.document)
   hasher.combine(self.page_index)
 }
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PdfImage with Hash::{hash, hash_combine}
 
 ///|
 /// Creates a new PDF image.

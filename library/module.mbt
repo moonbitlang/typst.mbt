@@ -141,3 +141,8 @@ pub fn Module::repr(self : Module) -> String {
 pub impl Eq for Module with fn equal(self, other) {
   self.name == other.name && physical_equal(self.inner, other.inner)
 }
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Module with Eq::{not_equal, equal}

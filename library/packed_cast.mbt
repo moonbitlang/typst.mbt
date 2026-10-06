@@ -38,14 +38,29 @@ pub impl Reflect for OutlineElem with fn castable(v) {
 }
 
 ///|
+#deprecated("call as `Reflect::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend OutlineElem with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for OutlineElem with fn into_value(self) {
   Content(self.0)
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend OutlineElem with IntoValue::{into_value}
+
+///|
 pub impl FromValue for OutlineElem with fn from_value(v) {
   OutlineElem(packed_from_value(outline_elem(), v))
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend OutlineElem with FromValue::{from_value}
 
 // cast! {
 //     OutlineEntry,
@@ -76,6 +91,11 @@ pub impl IntoValue for OutlineEntry with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend OutlineEntry with IntoValue::{into_value}
+
+///|
 pub impl FromValue for OutlineEntry with fn from_value(v) {
   if castable_of((Ty::new() : Ty[Content]), v) {
     let content : Content = v.cast()
@@ -87,6 +107,11 @@ pub impl FromValue for OutlineEntry with fn from_value(v) {
     raise HintedError(OutlineEntry::input().error(v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend OutlineEntry with FromValue::{from_value}
 
 ///|
 pub impl Reflect for CiteElem with fn input() {
@@ -104,14 +129,29 @@ pub impl Reflect for CiteElem with fn castable(v) {
 }
 
 ///|
+#deprecated("call as `Reflect::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CiteElem with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for CiteElem with fn into_value(self) {
   Content(self.0)
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CiteElem with IntoValue::{into_value}
+
+///|
 pub impl FromValue for CiteElem with fn from_value(v) {
   CiteElem(packed_from_value(cite_elem(), v))
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CiteElem with FromValue::{from_value}
 
 ///|
 pub impl Reflect for RawLine with fn input() {
@@ -129,11 +169,26 @@ pub impl Reflect for RawLine with fn castable(v) {
 }
 
 ///|
+#deprecated("call as `Reflect::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RawLine with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for RawLine with fn into_value(self) {
   Content(self.0)
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RawLine with IntoValue::{into_value}
+
+///|
 pub impl FromValue for RawLine with fn from_value(v) {
   RawLine(packed_from_value(raw_line_elem(), v))
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RawLine with FromValue::{from_value}

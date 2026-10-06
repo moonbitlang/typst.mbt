@@ -411,6 +411,11 @@ pub impl Eq for Func with fn equal(self, other) {
 }
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Func with Eq::{not_equal, equal}
+
+///|
 /// The name of the closure, if it has one.
 pub fn Closure::name(self : Closure) -> String? {
   match self.node {

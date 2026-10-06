@@ -9,6 +9,11 @@ pub(all) enum Supplement {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Supplement with Eq::{not_equal, equal}
+
+///|
 pub impl Reflect for Supplement with fn input() {
   Content::input().union_with(Type(Type::func()))
 }
@@ -35,6 +40,11 @@ pub impl IntoValue for Supplement with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Supplement with IntoValue::{into_value}
+
+///|
 pub impl FromValue for Supplement with fn from_value(v) {
   if Content::castable(v) {
     return Content(Content::from_value(v))
@@ -44,6 +54,11 @@ pub impl FromValue for Supplement with fn from_value(v) {
   }
   raise HintedError(Supplement::input().error(v))
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Supplement with FromValue::{from_value}
 
 ///|
 /// Tries to resolve the supplement into its content.
@@ -68,6 +83,21 @@ pub(all) enum RefForm {
   /// Produces a page reference to a label.
   Page
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RefForm with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RefForm with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RefForm with @debug.Debug::{to_repr}
 
 ///|
 pub impl Default for RefForm with fn default() {
@@ -117,6 +147,11 @@ pub impl FromValue for RefForm with fn from_value(v) {
     None => raise HintedError(RefForm::input().error(v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RefForm with FromValue::{from_value}
 
 ///|
 fn ref_elem_form_default() -> Value {

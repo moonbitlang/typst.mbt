@@ -10,6 +10,26 @@ pub(all) struct Axes[T] {
 } derive(Default, Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Axes with Default::{default}
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Axes with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Axes with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Axes with @debug.Debug::{to_repr}
+
+///|
 /// Create a new instance from the two components.
 pub fn[T] Axes::new(x : T, y : T) -> Axes[T] {
   { x, y, }
@@ -92,6 +112,11 @@ pub impl[T : Reflect] Reflect for Axes[T] with fn castable(value) {
 }
 
 ///|
+#deprecated("call as `Reflect::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Axes with Reflect::{output, input, castable}
+
+///|
 pub impl[T : FromValue] FromValue for Axes[T] with fn from_value(value) {
   let array : Arr = value.cast()
   match array.items {
@@ -102,6 +127,11 @@ pub impl[T : FromValue] FromValue for Axes[T] with fn from_value(value) {
       ])
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Axes with FromValue::{from_value}
 
 ///|
 pub impl[T : IntoValue] IntoValue for Axes[T] with fn into_value(self) {
@@ -119,6 +149,21 @@ pub(all) enum Axis {
   /// The vertical  axis.
   Y
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Axis with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Axis with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Axis with @debug.Debug::{to_repr}
 
 ///|
 /// The other axis.
@@ -150,12 +195,22 @@ pub impl Reflect for Axis with fn castable(value) {
 }
 
 ///|
+#deprecated("call as `Reflect::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Axis with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for Axis with fn into_value(self) {
   match self {
     X => Str("horizontal")
     Y => Str("vertical")
   }
 }
+
+///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Axis with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for Axis with fn from_value(value) {
@@ -165,3 +220,8 @@ pub impl FromValue for Axis with fn from_value(value) {
     _ => raise HintedError(axis_input().error(value))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Axis with FromValue::{from_value}

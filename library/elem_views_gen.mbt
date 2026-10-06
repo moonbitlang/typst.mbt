@@ -43,6 +43,15 @@ pub impl NativeElement for ContextElem with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ContextElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn ContextElem::func(self : ContextElem) -> Func {
   view_cast(self.0.field_raw(context_elem_func).unwrap(), "context.func")
 }
@@ -89,6 +98,15 @@ pub impl NativeElement for SymbolElem with fn from_content_unchecked(c) {
 ///|
 pub impl NativeElement for SymbolElem with fn into_content(self) {
   self.0
+}
+
+///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SymbolElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
 }
 
 ///|
@@ -142,6 +160,15 @@ pub impl NativeElement for TargetElem with fn from_content_unchecked(c) {
 ///|
 pub impl NativeElement for TargetElem with fn into_content(self) {
   self.0
+}
+
+///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TargetElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
 }
 
 ///|
@@ -225,6 +252,15 @@ pub impl NativeElement for CounterUpdateElem with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CounterUpdateElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn CounterUpdateElem::key(self : CounterUpdateElem) -> CounterKey {
   view_cast(
     self.0.field_raw(counter_update_elem_key).unwrap(),
@@ -305,6 +341,15 @@ pub impl NativeElement for CounterDisplayElem with fn from_content_unchecked(c) 
 ///|
 pub impl NativeElement for CounterDisplayElem with fn into_content(self) {
   self.0
+}
+
+///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CounterDisplayElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
 }
 
 ///|
@@ -413,6 +458,15 @@ pub impl NativeElement for MetadataElem with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MetadataElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn MetadataElem::value(self : MetadataElem) -> Value {
   view_cast(self.0.field_raw(metadata_elem_value).unwrap(), "metadata.value")
 }
@@ -463,6 +517,15 @@ pub impl NativeElement for StateUpdateElem with fn from_content_unchecked(c) {
 ///|
 pub impl NativeElement for StateUpdateElem with fn into_content(self) {
   self.0
+}
+
+///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StateUpdateElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
 }
 
 ///|
@@ -549,6 +612,15 @@ pub impl NativeElement for TagElem with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TagElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn TagElem::tag(self : TagElem) -> Tag {
   view_cast(self.0.field_raw(tag_elem_tag).unwrap(), "tag.tag")
 }
@@ -597,6 +669,15 @@ pub impl NativeElement for AlignElem with fn from_content_unchecked(c) {
 ///|
 pub impl NativeElement for AlignElem with fn into_content(self) {
   self.0
+}
+
+///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend AlignElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
 }
 
 ///|
@@ -689,6 +770,15 @@ pub impl NativeElement for ColumnsElem with fn from_content_unchecked(c) {
 ///|
 pub impl NativeElement for ColumnsElem with fn into_content(self) {
   self.0
+}
+
+///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ColumnsElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
 }
 
 ///|
@@ -939,6 +1029,15 @@ pub impl NativeElement for ColbreakElem with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ColbreakElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn ColbreakElem::weak(self : ColbreakElem, styles : StyleChain) -> Bool {
   let e = colbreak_elem()
   view_cast(
@@ -1016,6 +1115,15 @@ pub impl NativeElement for BoxElem with fn from_content_unchecked(c) {
 ///|
 pub impl NativeElement for BoxElem with fn into_content(self) {
   self.0
+}
+
+///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BoxElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
 }
 
 ///|
@@ -1435,6 +1543,15 @@ pub impl NativeElement for InlineElem with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend InlineElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn InlineElem::body(self : InlineElem) -> InlineCallback {
   view_cast(self.0.field_raw(inline_elem_body).unwrap(), "inline.body")
 }
@@ -1488,6 +1605,15 @@ pub impl NativeElement for BlockElem with fn from_content_unchecked(c) {
 ///|
 pub impl NativeElement for BlockElem with fn into_content(self) {
   self.0
+}
+
+///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BlockElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
 }
 
 ///|
@@ -2063,6 +2189,15 @@ pub impl NativeElement for GridElem with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GridElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn GridElem::columns(self : GridElem, styles : StyleChain) -> TrackSizings {
   let e = grid_elem()
   view_cast(
@@ -2469,6 +2604,15 @@ pub impl NativeElement for GridHeader with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GridHeader with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn GridHeader::repeat(self : GridHeader, styles : StyleChain) -> Bool {
   let e = grid_header_elem()
   view_cast(
@@ -2624,6 +2768,15 @@ pub impl NativeElement for GridFooter with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GridFooter with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn GridFooter::repeat(self : GridFooter, styles : StyleChain) -> Bool {
   let e = grid_footer_elem()
   view_cast(
@@ -2729,6 +2882,15 @@ pub impl NativeElement for GridHLine with fn from_content_unchecked(c) {
 ///|
 pub impl NativeElement for GridHLine with fn into_content(self) {
   self.0
+}
+
+///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GridHLine with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
 }
 
 ///|
@@ -3003,6 +3165,15 @@ pub impl NativeElement for GridVLine with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GridVLine with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn GridVLine::x(self : GridVLine, styles : StyleChain) -> Smart[USize] {
   let e = grid_v_line_elem()
   view_cast(
@@ -3267,6 +3438,15 @@ pub impl NativeElement for GridCell with fn from_content_unchecked(c) {
 ///|
 pub impl NativeElement for GridCell with fn into_content(self) {
   self.0
+}
+
+///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GridCell with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
 }
 
 ///|
@@ -3766,6 +3946,15 @@ pub impl NativeElement for HideElem with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend HideElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn HideElem::body(self : HideElem) -> Content {
   view_cast(self.0.field_raw(hide_elem_body).unwrap(), "hide.body")
 }
@@ -3829,6 +4018,15 @@ pub impl NativeElement for LayoutElem with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LayoutElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn LayoutElem::func(self : LayoutElem) -> Func {
   view_cast(self.0.field_raw(layout_elem_func).unwrap(), "layout.func")
 }
@@ -3879,6 +4077,15 @@ pub impl NativeElement for PadElem with fn from_content_unchecked(c) {
 ///|
 pub impl NativeElement for PadElem with fn into_content(self) {
   self.0
+}
+
+///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PadElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
 }
 
 ///|
@@ -4074,6 +4281,15 @@ pub impl NativeElement for PageElem with fn from_content_unchecked(c) {
 ///|
 pub impl NativeElement for PageElem with fn into_content(self) {
   self.0
+}
+
+///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PageElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
 }
 
 ///|
@@ -4353,6 +4569,15 @@ pub impl NativeElement for PagebreakElem with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PagebreakElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn PagebreakElem::weak(self : PagebreakElem, styles : StyleChain) -> Bool {
   let e = pagebreak_elem()
   view_cast(
@@ -4536,6 +4761,15 @@ pub impl NativeElement for PlaceElem with fn from_content_unchecked(c) {
 ///|
 pub impl NativeElement for PlaceElem with fn into_content(self) {
   self.0
+}
+
+///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PlaceElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
 }
 
 ///|
@@ -4829,6 +5063,15 @@ pub impl NativeElement for FlushElem with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FlushElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn FlushElem::new() -> FlushElem {
   FlushElem(Content::new(flush_elem(), []))
 }
@@ -4865,6 +5108,15 @@ pub impl NativeElement for RepeatElem with fn from_content_unchecked(c) {
 ///|
 pub impl NativeElement for RepeatElem with fn into_content(self) {
   self.0
+}
+
+///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RepeatElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
 }
 
 ///|
@@ -5000,6 +5252,15 @@ pub impl NativeElement for HElem with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend HElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn HElem::amount(self : HElem) -> Spacing {
   view_cast(self.0.field_raw(h_elem_amount).unwrap(), "h.amount")
 }
@@ -5084,6 +5345,15 @@ pub impl NativeElement for VElem with fn from_content_unchecked(c) {
 ///|
 pub impl NativeElement for VElem with fn into_content(self) {
   self.0
+}
+
+///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend VElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
 }
 
 ///|
@@ -5207,6 +5477,15 @@ pub impl NativeElement for StackElem with fn from_content_unchecked(c) {
 ///|
 pub impl NativeElement for StackElem with fn into_content(self) {
   self.0
+}
+
+///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StackElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
 }
 
 ///|
@@ -5342,6 +5621,15 @@ pub impl NativeElement for MoveElem with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MoveElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn MoveElem::dx(self : MoveElem, styles : StyleChain) -> Rel[Length] {
   let e = move_elem()
   view_cast(
@@ -5462,6 +5750,15 @@ pub impl NativeElement for RotateElem with fn from_content_unchecked(c) {
 ///|
 pub impl NativeElement for RotateElem with fn into_content(self) {
   self.0
+}
+
+///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RotateElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
 }
 
 ///|
@@ -5635,6 +5932,15 @@ pub impl NativeElement for ScaleElem with fn from_content_unchecked(c) {
 ///|
 pub impl NativeElement for ScaleElem with fn into_content(self) {
   self.0
+}
+
+///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ScaleElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
 }
 
 ///|
@@ -5843,6 +6149,15 @@ pub impl NativeElement for SkewElem with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SkewElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn SkewElem::ax(self : SkewElem, styles : StyleChain) -> Angle {
   let e = skew_elem()
   view_cast(
@@ -6042,6 +6357,15 @@ pub impl NativeElement for AccentElem with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend AccentElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn AccentElem::base(self : AccentElem) -> Content {
   view_cast(self.0.field_raw(accent_elem_base).unwrap(), "accent.base")
 }
@@ -6182,6 +6506,15 @@ pub impl NativeElement for MathAttachElem with fn from_content_unchecked(c) {
 ///|
 pub impl NativeElement for MathAttachElem with fn into_content(self) {
   self.0
+}
+
+///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MathAttachElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
 }
 
 ///|
@@ -6561,6 +6894,15 @@ pub impl NativeElement for PrimesElem with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PrimesElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn PrimesElem::count(self : PrimesElem) -> USize {
   view_cast(self.0.field_raw(primes_elem_count).unwrap(), "primes.count")
 }
@@ -6614,6 +6956,15 @@ pub impl NativeElement for ScriptsElem with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ScriptsElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn ScriptsElem::body(self : ScriptsElem) -> Content {
   view_cast(self.0.field_raw(scripts_elem_body).unwrap(), "scripts.body")
 }
@@ -6664,6 +7015,15 @@ pub impl NativeElement for LimitsElem with fn from_content_unchecked(c) {
 ///|
 pub impl NativeElement for LimitsElem with fn into_content(self) {
   self.0
+}
+
+///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LimitsElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
 }
 
 ///|
@@ -6761,6 +7121,15 @@ pub impl NativeElement for StretchElem with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StretchElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn StretchElem::body(self : StretchElem) -> Content {
   view_cast(self.0.field_raw(stretch_elem_body).unwrap(), "stretch.body")
 }
@@ -6855,6 +7224,15 @@ pub impl NativeElement for CancelElem with fn from_content_unchecked(c) {
 ///|
 pub impl NativeElement for CancelElem with fn into_content(self) {
   self.0
+}
+
+///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CancelElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
 }
 
 ///|
@@ -7166,6 +7544,15 @@ pub impl NativeElement for EquationElem with fn from_content_unchecked(c) {
 ///|
 pub impl NativeElement for EquationElem with fn into_content(self) {
   self.0
+}
+
+///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend EquationElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
 }
 
 ///|
@@ -7602,6 +7989,15 @@ pub impl NativeElement for FracElem with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FracElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn FracElem::num(self : FracElem) -> Content {
   view_cast(self.0.field_raw(frac_elem_num).unwrap(), "frac.num")
 }
@@ -7810,6 +8206,15 @@ pub impl NativeElement for BinomElem with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BinomElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn BinomElem::upper(self : BinomElem) -> Content {
   view_cast(self.0.field_raw(binom_elem_upper).unwrap(), "binom.upper")
 }
@@ -7871,6 +8276,15 @@ pub impl NativeElement for LrElem with fn from_content_unchecked(c) {
 ///|
 pub impl NativeElement for LrElem with fn into_content(self) {
   self.0
+}
+
+///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LrElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
 }
 
 ///|
@@ -7961,6 +8375,15 @@ pub impl NativeElement for MidElem with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MidElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn MidElem::body(self : MidElem) -> Content {
   view_cast(self.0.field_raw(mid_elem_body).unwrap(), "mid.body")
 }
@@ -8009,6 +8432,15 @@ pub impl NativeElement for VecElem with fn from_content_unchecked(c) {
 ///|
 pub impl NativeElement for VecElem with fn into_content(self) {
   self.0
+}
+
+///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend VecElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
 }
 
 ///|
@@ -8170,6 +8602,15 @@ pub impl NativeElement for MatElem with fn from_content_unchecked(c) {
 ///|
 pub impl NativeElement for MatElem with fn into_content(self) {
   self.0
+}
+
+///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MatElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
 }
 
 ///|
@@ -8410,6 +8851,15 @@ pub impl NativeElement for CasesElem with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CasesElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn CasesElem::delim(self : CasesElem, styles : StyleChain) -> DelimiterPair {
   let e = cases_elem()
   view_cast(
@@ -8580,6 +9030,15 @@ pub impl NativeElement for AlignPointElem with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend AlignPointElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn AlignPointElem::new() -> AlignPointElem {
   AlignPointElem(Content::new(align_point_elem(), []))
 }
@@ -8616,6 +9075,15 @@ pub impl NativeElement for ClassElem with fn from_content_unchecked(c) {
 ///|
 pub impl NativeElement for ClassElem with fn into_content(self) {
   self.0
+}
+
+///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ClassElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
 }
 
 ///|
@@ -8686,6 +9154,15 @@ pub impl NativeElement for OpElem with fn from_content_unchecked(c) {
 ///|
 pub impl NativeElement for OpElem with fn into_content(self) {
   self.0
+}
+
+///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend OpElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
 }
 
 ///|
@@ -8773,6 +9250,15 @@ pub impl NativeElement for RootElem with fn from_content_unchecked(c) {
 ///|
 pub impl NativeElement for RootElem with fn into_content(self) {
   self.0
+}
+
+///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RootElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
 }
 
 ///|
@@ -8867,6 +9353,15 @@ pub impl NativeElement for MathUnderlineElem with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MathUnderlineElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn MathUnderlineElem::body(self : MathUnderlineElem) -> Content {
   view_cast(
     self.0.field_raw(math_underline_elem_body).unwrap(),
@@ -8928,6 +9423,15 @@ pub impl NativeElement for MathOverlineElem with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MathOverlineElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn MathOverlineElem::body(self : MathOverlineElem) -> Content {
   view_cast(self.0.field_raw(math_overline_elem_body).unwrap(), "overline.body")
 }
@@ -8983,6 +9487,15 @@ pub impl NativeElement for UnderbraceElem with fn from_content_unchecked(c) {
 ///|
 pub impl NativeElement for UnderbraceElem with fn into_content(self) {
   self.0
+}
+
+///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend UnderbraceElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
 }
 
 ///|
@@ -9097,6 +9610,15 @@ pub impl NativeElement for OverbraceElem with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend OverbraceElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn OverbraceElem::body(self : OverbraceElem) -> Content {
   view_cast(self.0.field_raw(overbrace_elem_body).unwrap(), "overbrace.body")
 }
@@ -9205,6 +9727,15 @@ pub impl NativeElement for UnderbracketElem with fn from_content_unchecked(c) {
 ///|
 pub impl NativeElement for UnderbracketElem with fn into_content(self) {
   self.0
+}
+
+///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend UnderbracketElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
 }
 
 ///|
@@ -9322,6 +9853,15 @@ pub impl NativeElement for OverbracketElem with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend OverbracketElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn OverbracketElem::body(self : OverbracketElem) -> Content {
   view_cast(
     self.0.field_raw(overbracket_elem_body).unwrap(),
@@ -9436,6 +9976,15 @@ pub impl NativeElement for UnderparenElem with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend UnderparenElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn UnderparenElem::body(self : UnderparenElem) -> Content {
   view_cast(self.0.field_raw(underparen_elem_body).unwrap(), "underparen.body")
 }
@@ -9544,6 +10093,15 @@ pub impl NativeElement for OverparenElem with fn from_content_unchecked(c) {
 ///|
 pub impl NativeElement for OverparenElem with fn into_content(self) {
   self.0
+}
+
+///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend OverparenElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
 }
 
 ///|
@@ -9658,6 +10216,15 @@ pub impl NativeElement for UndershellElem with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend UndershellElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn UndershellElem::body(self : UndershellElem) -> Content {
   view_cast(self.0.field_raw(undershell_elem_body).unwrap(), "undershell.body")
 }
@@ -9766,6 +10333,15 @@ pub impl NativeElement for OvershellElem with fn from_content_unchecked(c) {
 ///|
 pub impl NativeElement for OvershellElem with fn into_content(self) {
   self.0
+}
+
+///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend OvershellElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
 }
 
 ///|
@@ -9880,6 +10456,15 @@ pub impl NativeElement for ArtifactElem with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ArtifactElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn ArtifactElem::kind(
   self : ArtifactElem,
   styles : StyleChain,
@@ -9983,6 +10568,15 @@ pub impl NativeElement for PdfPdfMarkerTag with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PdfPdfMarkerTag with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn PdfPdfMarkerTag::body(self : PdfPdfMarkerTag) -> Content {
   view_cast(
     self.0.field_raw(pdf_marker_tag_elem_body).unwrap(),
@@ -10063,6 +10657,15 @@ pub impl NativeElement for BibliographyElem with fn from_content_unchecked(c) {
 ///|
 pub impl NativeElement for BibliographyElem with fn into_content(self) {
   self.0
+}
+
+///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BibliographyElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
 }
 
 ///|
@@ -10440,6 +11043,15 @@ pub impl NativeElement for CslLightElem with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CslLightElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn CslLightElem::body(self : CslLightElem) -> Content {
   view_cast(self.0.field_raw(csl_light_elem_body).unwrap(), "csl-light.body")
 }
@@ -10493,6 +11105,15 @@ pub impl NativeElement for CslIndentElem with fn from_content_unchecked(c) {
 ///|
 pub impl NativeElement for CslIndentElem with fn into_content(self) {
   self.0
+}
+
+///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CslIndentElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
 }
 
 ///|
@@ -10551,6 +11172,15 @@ pub impl NativeElement for CiteElem with fn from_content_unchecked(c) {
 ///|
 pub impl NativeElement for CiteElem with fn into_content(self) {
   self.0
+}
+
+///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CiteElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
 }
 
 ///|
@@ -10746,6 +11376,15 @@ pub impl NativeElement for CiteGroup with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CiteGroup with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn CiteGroup::children(self : CiteGroup) -> Array[Content] {
   view_cast(
     self.0.field_raw(cite_group_elem_children).unwrap(),
@@ -10807,6 +11446,15 @@ pub impl NativeElement for DividerElem with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DividerElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn DividerElem::new() -> DividerElem {
   DividerElem(Content::new(divider_elem(), []))
 }
@@ -10843,6 +11491,15 @@ pub impl NativeElement for DocumentElem with fn from_content_unchecked(c) {
 ///|
 pub impl NativeElement for DocumentElem with fn into_content(self) {
   self.0
+}
+
+///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DocumentElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
 }
 
 ///|
@@ -11232,6 +11889,15 @@ pub impl NativeElement for EmphElem with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend EmphElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn EmphElem::body(self : EmphElem) -> Content {
   view_cast(self.0.field_raw(emph_elem_body).unwrap(), "emph.body")
 }
@@ -11280,6 +11946,15 @@ pub impl NativeElement for EnumElem with fn from_content_unchecked(c) {
 ///|
 pub impl NativeElement for EnumElem with fn into_content(self) {
   self.0
+}
+
+///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend EnumElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
 }
 
 ///|
@@ -11699,6 +12374,15 @@ pub impl NativeElement for EnumItem with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend EnumItem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn EnumItem::number(self : EnumItem, styles : StyleChain) -> Smart[U64] {
   let e = enum_item_elem()
   view_cast(
@@ -11785,6 +12469,15 @@ pub impl NativeElement for FigureElem with fn from_content_unchecked(c) {
 ///|
 pub impl NativeElement for FigureElem with fn into_content(self) {
   self.0
+}
+
+///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FigureElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
 }
 
 ///|
@@ -12270,6 +12963,15 @@ pub impl NativeElement for FigureCaption with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FigureCaption with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn FigureCaption::position(
   self : FigureCaption,
   styles : StyleChain,
@@ -12514,6 +13216,15 @@ pub impl NativeElement for FootnoteElem with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FootnoteElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn FootnoteElem::numbering(
   self : FootnoteElem,
   styles : StyleChain,
@@ -12620,6 +13331,15 @@ pub impl NativeElement for FootnoteEntry with fn from_content_unchecked(c) {
 ///|
 pub impl NativeElement for FootnoteEntry with fn into_content(self) {
   self.0
+}
+
+///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FootnoteEntry with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
 }
 
 ///|
@@ -12890,6 +13610,15 @@ pub impl NativeElement for FootnoteContainer with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FootnoteContainer with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn FootnoteContainer::new() -> FootnoteContainer {
   FootnoteContainer(Content::new(footnote_container_elem(), []))
 }
@@ -12929,6 +13658,15 @@ pub impl NativeElement for FootnoteMarker with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FootnoteMarker with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn FootnoteMarker::new() -> FootnoteMarker {
   FootnoteMarker(Content::new(footnote_marker_elem(), []))
 }
@@ -12965,6 +13703,15 @@ pub impl NativeElement for HeadingElem with fn from_content_unchecked(c) {
 ///|
 pub impl NativeElement for HeadingElem with fn into_content(self) {
   self.0
+}
+
+///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend HeadingElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
 }
 
 ///|
@@ -13424,6 +14171,15 @@ pub impl NativeElement for LinkElem with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LinkElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn LinkElem::dest(self : LinkElem) -> LinkTarget {
   view_cast(self.0.field_raw(link_elem_dest).unwrap(), "link.dest")
 }
@@ -13497,6 +14253,15 @@ pub impl NativeElement for DirectLinkElem with fn from_content_unchecked(c) {
 ///|
 pub impl NativeElement for DirectLinkElem with fn into_content(self) {
   self.0
+}
+
+///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DirectLinkElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
 }
 
 ///|
@@ -13597,6 +14362,15 @@ pub impl NativeElement for LinkMarker with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LinkMarker with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn LinkMarker::body(self : LinkMarker) -> Content {
   view_cast(
     self.0.field_raw(link_marker_elem_body).unwrap(),
@@ -13661,6 +14435,15 @@ pub impl NativeElement for ListElem with fn from_content_unchecked(c) {
 ///|
 pub impl NativeElement for ListElem with fn into_content(self) {
   self.0
+}
+
+///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ListElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
 }
 
 ///|
@@ -13965,6 +14748,15 @@ pub impl NativeElement for ListItem with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ListItem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn ListItem::body(self : ListItem) -> Content {
   view_cast(self.0.field_raw(list_item_elem_body).unwrap(), "item.body")
 }
@@ -14006,6 +14798,15 @@ pub impl NativeElement for OutlineElem with fn from_content_unchecked(c) {
 ///|
 pub impl NativeElement for OutlineElem with fn into_content(self) {
   self.0
+}
+
+///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend OutlineElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
 }
 
 ///|
@@ -14236,6 +15037,15 @@ pub impl NativeElement for OutlineEntry with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend OutlineEntry with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn OutlineEntry::level(self : OutlineEntry) -> NonZeroUSize {
   view_cast(self.0.field_raw(outline_entry_elem_level).unwrap(), "entry.level")
 }
@@ -14385,6 +15195,15 @@ pub impl NativeElement for PrefixInfo with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PrefixInfo with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn PrefixInfo::key(self : PrefixInfo) -> Location {
   view_cast(self.0.field_raw(prefix_info_elem_key).unwrap(), "prefix-info.key")
 }
@@ -14474,6 +15293,15 @@ pub impl NativeElement for ParElem with fn from_content_unchecked(c) {
 ///|
 pub impl NativeElement for ParElem with fn into_content(self) {
   self.0
+}
+
+///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ParElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
 }
 
 ///|
@@ -14837,6 +15665,15 @@ pub impl NativeElement for ParbreakElem with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ParbreakElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn ParbreakElem::new() -> ParbreakElem {
   ParbreakElem(Content::new(parbreak_elem(), []))
 }
@@ -14873,6 +15710,15 @@ pub impl NativeElement for ParLine with fn from_content_unchecked(c) {
 ///|
 pub impl NativeElement for ParLine with fn into_content(self) {
   self.0
+}
+
+///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ParLine with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
 }
 
 ///|
@@ -15007,6 +15853,15 @@ pub impl NativeElement for ParLineMarker with fn from_content_unchecked(c) {
 ///|
 pub impl NativeElement for ParLineMarker with fn into_content(self) {
   self.0
+}
+
+///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ParLineMarker with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
 }
 
 ///|
@@ -15145,6 +16000,15 @@ pub impl NativeElement for QuoteElem with fn from_content_unchecked(c) {
 ///|
 pub impl NativeElement for QuoteElem with fn into_content(self) {
   self.0
+}
+
+///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend QuoteElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
 }
 
 ///|
@@ -15338,6 +16202,15 @@ pub impl NativeElement for RefElem with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RefElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn RefElem::target(self : RefElem) -> Label {
   view_cast(self.0.field_raw(ref_elem_target).unwrap(), "ref.target")
 }
@@ -15495,6 +16368,15 @@ pub impl NativeElement for StrongElem with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StrongElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn StrongElem::delta(self : StrongElem, styles : StyleChain) -> Int64 {
   let e = strong_elem()
   view_cast(
@@ -15579,6 +16461,15 @@ pub impl NativeElement for TableElem with fn from_content_unchecked(c) {
 ///|
 pub impl NativeElement for TableElem with fn into_content(self) {
   self.0
+}
+
+///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TableElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
 }
 
 ///|
@@ -16033,6 +16924,15 @@ pub impl NativeElement for TableHeader with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TableHeader with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn TableHeader::repeat(self : TableHeader, styles : StyleChain) -> Bool {
   let e = table_header_elem()
   view_cast(
@@ -16194,6 +17094,15 @@ pub impl NativeElement for TableFooter with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TableFooter with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn TableFooter::repeat(self : TableFooter, styles : StyleChain) -> Bool {
   let e = table_footer_elem()
   view_cast(
@@ -16299,6 +17208,15 @@ pub impl NativeElement for TableHLine with fn from_content_unchecked(c) {
 ///|
 pub impl NativeElement for TableHLine with fn into_content(self) {
   self.0
+}
+
+///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TableHLine with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
 }
 
 ///|
@@ -16578,6 +17496,15 @@ pub impl NativeElement for TableVLine with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TableVLine with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn TableVLine::x(self : TableVLine, styles : StyleChain) -> Smart[USize] {
   let e = table_v_line_elem()
   view_cast(
@@ -16847,6 +17774,15 @@ pub impl NativeElement for TableCell with fn from_content_unchecked(c) {
 ///|
 pub impl NativeElement for TableCell with fn into_content(self) {
   self.0
+}
+
+///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TableCell with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
 }
 
 ///|
@@ -17403,6 +18339,15 @@ pub impl NativeElement for TermsElem with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TermsElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn TermsElem::tight(self : TermsElem, styles : StyleChain) -> Bool {
   let e = terms_elem()
   view_cast(
@@ -17681,6 +18626,15 @@ pub impl NativeElement for TermItem with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TermItem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn TermItem::term(self : TermItem) -> Content {
   view_cast(self.0.field_raw(term_item_elem_term).unwrap(), "item.term")
 }
@@ -17747,6 +18701,15 @@ pub impl NativeElement for TitleElem with fn from_content_unchecked(c) {
 ///|
 pub impl NativeElement for TitleElem with fn into_content(self) {
   self.0
+}
+
+///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TitleElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
 }
 
 ///|
@@ -17824,6 +18787,15 @@ pub impl NativeElement for UnderlineElem with fn from_content_unchecked(c) {
 ///|
 pub impl NativeElement for UnderlineElem with fn into_content(self) {
   self.0
+}
+
+///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend UnderlineElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
 }
 
 ///|
@@ -18147,6 +19119,15 @@ pub impl NativeElement for OverlineElem with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend OverlineElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn OverlineElem::stroke(
   self : OverlineElem,
   styles : StyleChain,
@@ -18457,6 +19438,15 @@ pub impl NativeElement for StrikeElem with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StrikeElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn StrikeElem::stroke(
   self : StrikeElem,
   styles : StyleChain,
@@ -18689,6 +19679,15 @@ pub impl NativeElement for HighlightElem with fn from_content_unchecked(c) {
 ///|
 pub impl NativeElement for HighlightElem with fn into_content(self) {
   self.0
+}
+
+///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend HighlightElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
 }
 
 ///|
@@ -19067,6 +20066,15 @@ pub impl NativeElement for LinebreakElem with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LinebreakElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn LinebreakElem::justify(
   self : LinebreakElem,
   styles : StyleChain,
@@ -19152,6 +20160,15 @@ pub impl NativeElement for TextElem with fn from_content_unchecked(c) {
 ///|
 pub impl NativeElement for TextElem with fn into_content(self) {
   self.0
+}
+
+///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TextElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
 }
 
 ///|
@@ -19734,6 +20751,15 @@ pub impl NativeElement for RawElem with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RawElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn RawElem::text(self : RawElem) -> RawContent {
   view_cast(self.0.field_raw(raw_elem_text).unwrap(), "raw.text")
 }
@@ -20027,6 +21053,15 @@ pub impl NativeElement for RawLine with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RawLine with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn RawLine::number(self : RawLine) -> Int64 {
   view_cast(self.0.field_raw(raw_line_elem_number).unwrap(), "line.number")
 }
@@ -20115,6 +21150,15 @@ pub impl NativeElement for SubElem with fn from_content_unchecked(c) {
 ///|
 pub impl NativeElement for SubElem with fn into_content(self) {
   self.0
+}
+
+///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SubElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
 }
 
 ///|
@@ -20281,6 +21325,15 @@ pub impl NativeElement for SuperElem with fn from_content_unchecked(c) {
 ///|
 pub impl NativeElement for SuperElem with fn into_content(self) {
   self.0
+}
+
+///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SuperElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
 }
 
 ///|
@@ -20468,6 +21521,15 @@ pub impl NativeElement for SmallcapsElem with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SmallcapsElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn SmallcapsElem::all(self : SmallcapsElem, styles : StyleChain) -> Bool {
   let e = smallcaps_elem()
   view_cast(
@@ -20568,6 +21630,15 @@ pub impl NativeElement for SmartQuoteElem with fn from_content_unchecked(c) {
 ///|
 pub impl NativeElement for SmartQuoteElem with fn into_content(self) {
   self.0
+}
+
+///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SmartQuoteElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
 }
 
 ///|
@@ -20820,6 +21891,15 @@ pub impl NativeElement for SpaceElem with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SpaceElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn SpaceElem::had_newline(self : SpaceElem) -> Bool {
   view_cast(
     self.0.field_raw(space_elem_had_newline).unwrap(),
@@ -20873,6 +21953,15 @@ pub impl NativeElement for CurveElem with fn from_content_unchecked(c) {
 ///|
 pub impl NativeElement for CurveElem with fn into_content(self) {
   self.0
+}
+
+///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CurveElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
 }
 
 ///|
@@ -21058,6 +22147,15 @@ pub impl NativeElement for CurveMove with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CurveMove with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn CurveMove::start(self : CurveMove) -> Axes[Rel[Length]] {
   view_cast(self.0.field_raw(curve_move_elem_start).unwrap(), "move.start")
 }
@@ -21161,6 +22259,15 @@ pub impl NativeElement for CurveLine with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CurveLine with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn CurveLine::end(self : CurveLine) -> Axes[Rel[Length]] {
   view_cast(self.0.field_raw(curve_line_elem_end).unwrap(), "line.end")
 }
@@ -21261,6 +22368,15 @@ pub impl NativeElement for CurveQuad with fn from_content_unchecked(c) {
 ///|
 pub impl NativeElement for CurveQuad with fn into_content(self) {
   self.0
+}
+
+///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CurveQuad with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
 }
 
 ///|
@@ -21383,6 +22499,15 @@ pub impl NativeElement for CurveCubic with fn from_content_unchecked(c) {
 ///|
 pub impl NativeElement for CurveCubic with fn into_content(self) {
   self.0
+}
+
+///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CurveCubic with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
 }
 
 ///|
@@ -21533,6 +22658,15 @@ pub impl NativeElement for CurveClose with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CurveClose with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn CurveClose::mode(self : CurveClose, styles : StyleChain) -> CloseMode {
   let e = curve_close_elem()
   view_cast(
@@ -21614,6 +22748,15 @@ pub impl NativeElement for ImageElem with fn from_content_unchecked(c) {
 ///|
 pub impl NativeElement for ImageElem with fn into_content(self) {
   self.0
+}
+
+///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ImageElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
 }
 
 ///|
@@ -22011,6 +23154,15 @@ pub impl NativeElement for LineElem with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LineElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn LineElem::start(
   self : LineElem,
   styles : StyleChain,
@@ -22244,6 +23396,15 @@ pub impl NativeElement for PolygonElem with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PolygonElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn PolygonElem::fill(self : PolygonElem, styles : StyleChain) -> Paint? {
   let e = polygon_elem()
   view_cast(
@@ -22440,6 +23601,15 @@ pub impl NativeElement for RectElem with fn from_content_unchecked(c) {
 ///|
 pub impl NativeElement for RectElem with fn into_content(self) {
   self.0
+}
+
+///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RectElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
 }
 
 ///|
@@ -22809,6 +23979,15 @@ pub impl NativeElement for SquareElem with fn from_content_unchecked(c) {
 ///|
 pub impl NativeElement for SquareElem with fn into_content(self) {
   self.0
+}
+
+///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SquareElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
 }
 
 ///|
@@ -23197,6 +24376,15 @@ pub impl NativeElement for EllipseElem with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend EllipseElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn EllipseElem::width(
   self : EllipseElem,
   styles : StyleChain,
@@ -23541,6 +24729,15 @@ pub impl NativeElement for CircleElem with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CircleElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn CircleElem::width(
   self : CircleElem,
   styles : StyleChain,
@@ -23879,6 +25076,15 @@ pub impl NativeElement for HtmlFormat with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend HtmlFormat with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn HtmlFormat::pretty(self : HtmlFormat, styles : StyleChain) -> Bool {
   let e = html_format_elem()
   view_cast(
@@ -23962,6 +25168,15 @@ pub impl NativeElement for HtmlElem with fn from_content_unchecked(c) {
 ///|
 pub impl NativeElement for HtmlElem with fn into_content(self) {
   self.0
+}
+
+///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend HtmlElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
 }
 
 ///|
@@ -24149,6 +25364,15 @@ pub impl NativeElement for FrameElem with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FrameElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn FrameElem::body(self : FrameElem) -> Content {
   view_cast(self.0.field_raw(frame_elem_body).unwrap(), "frame.body")
 }
@@ -24197,6 +25421,15 @@ pub impl NativeElement for PdfPdfFormat with fn from_content_unchecked(c) {
 ///|
 pub impl NativeElement for PdfPdfFormat with fn into_content(self) {
   self.0
+}
+
+///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PdfPdfFormat with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
 }
 
 ///|
@@ -24445,6 +25678,15 @@ pub impl NativeElement for PdfAttachElem with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PdfAttachElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn PdfAttachElem::path(self : PdfAttachElem) -> PathOrStr {
   view_cast(self.0.field_raw(pdf_attach_elem_path).unwrap(), "attach.path")
 }
@@ -24685,6 +25927,15 @@ pub impl NativeElement for SvgFormat with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SvgFormat with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn SvgFormat::pretty(self : SvgFormat, styles : StyleChain) -> Bool {
   let e = svg_format_elem()
   view_cast(
@@ -24769,6 +26020,15 @@ pub impl NativeElement for PngFormat with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PngFormat with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn PngFormat::ppi(self : PngFormat, styles : StyleChain) -> Scalar {
   let e = png_format_elem()
   view_cast(
@@ -24850,6 +26110,15 @@ pub impl NativeElement for BundleFormat with fn into_content(self) {
 }
 
 ///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BundleFormat with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
+}
+
+///|
 pub fn BundleFormat::new() -> BundleFormat {
   BundleFormat(Content::new(bundle_format_elem(), []))
 }
@@ -24886,6 +26155,15 @@ pub impl NativeElement for AssetElem with fn from_content_unchecked(c) {
 ///|
 pub impl NativeElement for AssetElem with fn into_content(self) {
   self.0
+}
+
+///|
+#deprecated("call as `NativeElement::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend AssetElem with NativeElement::{
+  into_content,
+  elem,
+  from_content_unchecked,
 }
 
 ///|

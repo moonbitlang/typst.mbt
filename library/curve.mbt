@@ -6,6 +6,21 @@
 pub(all) struct Curve(Array[CurveItem]) derive(Eq, Hash, Default)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Curve with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Curve with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Curve with Default::{default}
+
+///|
 /// An item in a curve.
 pub(all) enum CurveItem {
   Move(Point)
@@ -13,6 +28,16 @@ pub(all) enum CurveItem {
   Cubic(Point, Point, Point)
   Close
 } derive(Eq, Hash)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CurveItem with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CurveItem with Hash::{hash, hash_combine}
 
 ///|
 /// Creates an empty curve.
@@ -132,9 +157,19 @@ pub impl Reflect for CurveComponent with fn castable(v) {
 }
 
 ///|
+#deprecated("call as `Reflect::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CurveComponent with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for CurveComponent with fn into_value(self) {
   Content(self.0)
 }
+
+///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CurveComponent with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for CurveComponent with fn from_value(v) {
@@ -152,6 +187,11 @@ pub impl FromValue for CurveComponent with fn from_value(v) {
 }
 
 ///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CurveComponent with FromValue::{from_value}
+
+///|
 /// How to close a curve.
 pub(all) enum CloseMode {
   /// Closes the curve with a smooth segment that takes into account the
@@ -162,9 +202,29 @@ pub(all) enum CloseMode {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CloseMode with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CloseMode with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CloseMode with @debug.Debug::{to_repr}
+
+///|
 pub impl Default for CloseMode with fn default() {
   Smooth
 }
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CloseMode with Default::{default}
 
 ///|
 pub impl Reflect for CloseMode with fn input() {
@@ -199,6 +259,11 @@ pub impl IntoValue for CloseMode with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CloseMode with IntoValue::{into_value}
+
+///|
 pub impl FromValue for CloseMode with fn from_value(v) {
   match v {
     Str("smooth") => Smooth
@@ -206,3 +271,8 @@ pub impl FromValue for CloseMode with fn from_value(v) {
     v => raise HintedError(CloseMode::input().error(v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CloseMode with FromValue::{from_value}

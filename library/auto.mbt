@@ -10,9 +10,29 @@ pub(all) enum Smart[T] {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Smart with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Smart with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Smart with @debug.Debug::{to_repr}
+
+///|
 pub impl[T] Default for Smart[T] with fn default() {
   Auto
 }
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Smart with Default::{default}
 
 ///|
 /// Whether the value is `Auto`.
@@ -141,6 +161,11 @@ pub impl[T : Fold] Fold for Smart[T] with fn fold(self, outer) {
   }
 }
 
+///|
+#deprecated("call as `Fold::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Smart with Fold::{fold}
+
 // The `auto` value itself (upstream `AutoValue`).
 
 ///|
@@ -163,6 +188,11 @@ pub impl[T : Reflect] Reflect for Smart[T] with fn output() {
 pub impl[T : Reflect] Reflect for Smart[T] with fn castable(value) {
   value is Auto || T::castable(value)
 }
+
+///|
+#deprecated("call as `Reflect::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Smart with Reflect::{output, input, castable}
 
 ///|
 pub impl[T : IntoValue] IntoValue for Smart[T] with fn into_value(self) {

@@ -19,9 +19,29 @@ pub(all) enum FracStyle {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FracStyle with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FracStyle with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FracStyle with @debug.Debug::{to_repr}
+
+///|
 pub impl Default for FracStyle with fn default() {
   Vertical
 }
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FracStyle with Default::{default}
 
 ///|
 pub impl Reflect for FracStyle with fn input() {
@@ -69,6 +89,11 @@ pub impl FromValue for FracStyle with fn from_value(v) {
     v => raise HintedError(FracStyle::input().error(v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FracStyle with FromValue::{from_value}
 
 ///|
 /// How much padding to add around each side of a fraction (upstream

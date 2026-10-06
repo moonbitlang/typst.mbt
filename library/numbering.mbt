@@ -26,6 +26,11 @@ pub(all) enum Numbering {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Numbering with Eq::{not_equal, equal}
+
+///|
 /// Apply the pattern to the given numbers.
 pub fn Numbering::apply(
   self : Numbering,
@@ -106,6 +111,11 @@ pub impl FromValue for Numbering with fn from_value(v) {
 }
 
 ///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Numbering with FromValue::{from_value}
+
+///|
 /// How to turn a number into text.
 ///
 /// A pattern consists of a prefix, followed by one of the counter symbols
@@ -120,6 +130,11 @@ pub(all) struct NumberingPattern {
   suffix : String
   priv trimmed : Bool
 } derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend NumberingPattern with Eq::{not_equal, equal}
 
 ///|
 /// Apply the pattern to the given number.

@@ -14,6 +14,21 @@ pub(all) struct FontVariant {
 } derive(Eq, Hash, Compare)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontVariant with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontVariant with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontVariant with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
 pub impl Default for FontVariant with fn default() {
   {
     style: Normal,
@@ -47,6 +62,11 @@ pub impl Show for FontVariant with fn output(self, logger) {
     "\{style}-FontWeight(\{self.weight.0})-FontStretch(\{self.stretch.0})",
   )
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontVariant with Show::{to_string, output}
 
 ///|
 /// Maps an OpenType `wght` font variation value to a weight.
@@ -154,6 +174,21 @@ pub(all) struct FontAxis {
   /// The default value the font has set for this axis.
   default : AxisValue
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontAxis with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontAxis with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontAxis with @debug.Debug::{to_repr}
 
 ///|
 /// Determines the distance from the `target` value to the closest value

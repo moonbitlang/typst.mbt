@@ -189,6 +189,16 @@ pub(all) suberror FieldAccessError {
 } derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FieldAccessError with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FieldAccessError with @debug.Debug::{to_repr}
+
+///|
 /// Formats the field access error message.
 pub fn FieldAccessError::message(
   self : FieldAccessError,
@@ -393,6 +403,11 @@ pub impl Eq for Content with fn equal(self, other) {
     }
   }
 }
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Content with Eq::{not_equal, equal}
 
 ///|
 /// Create empty content.

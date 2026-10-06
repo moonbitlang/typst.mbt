@@ -231,6 +231,11 @@ pub(all) enum ResolvedLink {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ResolvedLink with Eq::{not_equal, equal}
+
+///|
 /// Turns the link into a relative URI, potentially with an `#` anchor
 /// fragment.
 ///

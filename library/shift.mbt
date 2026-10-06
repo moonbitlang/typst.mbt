@@ -17,6 +17,21 @@ pub(all) enum Smallcaps {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Smallcaps with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Smallcaps with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Smallcaps with @debug.Debug::{to_repr}
+
+///|
 pub impl Reflect for Smallcaps with fn input() {
   Union([Value(Str("minuscules"), ""), Value(Str("all"), "")])
 }
@@ -43,6 +58,11 @@ pub impl IntoValue for Smallcaps with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Smallcaps with IntoValue::{into_value}
+
+///|
 pub impl FromValue for Smallcaps with fn from_value(v) {
   match v {
     Str("minuscules") => Minuscules
@@ -50,6 +70,11 @@ pub impl FromValue for Smallcaps with fn from_value(v) {
     v => raise HintedError(Smallcaps::input().error(v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Smallcaps with FromValue::{from_value}
 
 ///|
 /// Configuration values for sub- or superscript text.
@@ -75,11 +100,36 @@ pub(all) struct ShiftSettings {
 } derive(Eq, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ShiftSettings with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ShiftSettings with Hash::{hash, hash_combine}
+
+///|
 /// The kind of script.
 pub(all) enum ScriptKind {
   Sub
   Super
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ScriptKind with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ScriptKind with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ScriptKind with @debug.Debug::{to_repr}
 
 ///|
 fn smart_em_into_value(v : Smart[Em]) -> Value {
@@ -137,6 +187,11 @@ pub impl IntoValue for ShiftSettings with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ShiftSettings with IntoValue::{into_value}
+
+///|
 pub impl FromValue for ShiftSettings with fn from_value(v) {
   match v {
     Dict(dict) => {
@@ -153,3 +208,8 @@ pub impl FromValue for ShiftSettings with fn from_value(v) {
     v => raise HintedError(ShiftSettings::input().error(v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ShiftSettings with FromValue::{from_value}

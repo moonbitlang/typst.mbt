@@ -6,6 +6,21 @@
 pub(all) struct Accent(Char) derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Accent with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Accent with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Accent with @debug.Debug::{to_repr}
+
+///|
 /// Tries to select the appropriate combining accent for a string, falling
 /// back to the string's lone character if there is no corresponding one.
 ///
@@ -183,6 +198,11 @@ pub impl IntoValue for Accent with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Accent with IntoValue::{into_value}
+
+///|
 pub impl FromValue for Accent with fn from_value(v) {
   // The string cast handles
   // - strings: `accent(a, "↔")`
@@ -207,6 +227,11 @@ pub impl FromValue for Accent with fn from_value(v) {
   }
   raise HintedError(Accent::input().error(v))
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Accent with FromValue::{from_value}
 
 ///|
 /// How much the accent can be shorter than the base (upstream

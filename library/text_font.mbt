@@ -16,6 +16,26 @@ pub(all) enum FontStyle {
 } derive(Eq, Hash, Compare, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontStyle with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontStyle with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontStyle with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontStyle with @debug.Debug::{to_repr}
+
+///|
 pub impl Default for FontStyle with fn default() {
   Normal
 }
@@ -69,6 +89,11 @@ pub impl FromValue for FontStyle with fn from_value(v) {
 }
 
 ///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontStyle with FromValue::{from_value}
+
+///|
 /// The conceptual distance between the styles, expressed as a number.
 pub fn FontStyle::distance(self : FontStyle, other : FontStyle) -> Int {
   if self == other {
@@ -86,6 +111,26 @@ pub fn FontStyle::distance(self : FontStyle, other : FontStyle) -> Int {
 ///|
 /// The weight of a font (100 - 900).
 pub(all) struct FontWeight(Int) derive(Eq, Hash, Compare, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontWeight with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontWeight with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontWeight with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontWeight with @debug.Debug::{to_repr}
 
 ///|
 /// Thin weight (100).
@@ -212,6 +257,26 @@ pub extend FontWeight with FromValue::{from_value}
 pub(all) struct FontStretch(Int) derive(Eq, Hash, Compare, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontStretch with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontStretch with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontStretch with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontStretch with @debug.Debug::{to_repr}
+
+///|
 /// Normal stretch (100%).
 pub let font_stretch_normal : FontStretch = FontStretch(1000)
 
@@ -281,6 +346,11 @@ pub impl FromValue for FontStretch with fn from_value(v) {
   }
 }
 
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontStretch with FromValue::{from_value}
+
 // tag.rs
 
 ///|
@@ -289,6 +359,26 @@ pub impl FromValue for FontStretch with fn from_value(v) {
 /// Upstream `ttf_parser::Tag`; renamed because `Tag` is the introspection
 /// tag of `introspection/tag.rs`.
 pub(all) struct OpenTypeTag(String) derive(Eq, Hash, Compare, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend OpenTypeTag with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend OpenTypeTag with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Compare::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend OpenTypeTag with Compare::{op_lt, op_le, op_ge, compare, op_gt}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend OpenTypeTag with @debug.Debug::{to_repr}
 
 ///|
 /// Creates a new tag from any number of bytes, padding with spaces.
@@ -332,6 +422,11 @@ pub extend OpenTypeTag with Reflect::{output, input, castable}
 pub impl IntoValue for OpenTypeTag with fn into_value(self) {
   Str(self.0)
 }
+
+///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend OpenTypeTag with IntoValue::{into_value}
 
 ///|
 // Tags must: https://learn.microsoft.com/en-us/typography/opentype/spec/otff#data-types
@@ -378,6 +473,21 @@ pub extend OpenTypeTag with FromValue::{from_value}
 pub(all) struct AxisValue(Double) derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend AxisValue with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend AxisValue with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend AxisValue with @debug.Debug::{to_repr}
+
+///|
 pub impl Reflect for AxisValue with fn input() {
   Type(Type::float())
 }
@@ -391,6 +501,11 @@ pub impl Reflect for AxisValue with fn output() {
 pub impl Reflect for AxisValue with fn castable(v) {
   v is (Float(_) | Int(_))
 }
+
+///|
+#deprecated("call as `Reflect::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend AxisValue with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for AxisValue with fn into_value(self) {
@@ -419,6 +534,21 @@ pub(all) struct FontVariations(Array[(OpenTypeTag, AxisValue)]) derive (
 )
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontVariations with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontVariations with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontVariations with @debug.Debug::{to_repr}
+
+///|
 pub impl Default for FontVariations with fn default() {
   FontVariations([])
 }
@@ -430,6 +560,11 @@ pub extend FontVariations with Default::{default}
 pub impl Fold for FontVariations with fn fold(self, outer) {
   FontVariations(outer.0 + self.0)
 }
+
+///|
+#deprecated("call as `Fold::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontVariations with Fold::{fold}
 
 ///|
 pub impl Reflect for FontVariations with fn input() {
@@ -485,6 +620,11 @@ pub impl FromValue for FontVariations with fn from_value(v) {
     v => raise HintedError(FontVariations::input().error(v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontVariations with FromValue::{from_value}
 
 ///|
 fn tag_hint_helper(index : Int, key_repr : String) -> String {

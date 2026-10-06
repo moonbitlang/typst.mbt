@@ -26,6 +26,11 @@ pub impl Default for FontBook with fn default() {
 }
 
 ///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FontBook with Default::{default}
+
+///|
 /// Create a font book from a collection of font infos.
 pub fn FontBook::from_infos(infos : Array[FontInfo]) -> FontBook {
   let book = FontBook::new()

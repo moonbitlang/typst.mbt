@@ -34,6 +34,21 @@ pub(all) enum ArtifactKind {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ArtifactKind with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ArtifactKind with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ArtifactKind with @debug.Debug::{to_repr}
+
+///|
 pub impl Default for ArtifactKind with fn default() {
   Other
 }
@@ -103,6 +118,11 @@ pub impl FromValue for ArtifactKind with fn from_value(v) {
 }
 
 ///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ArtifactKind with FromValue::{from_value}
+
+///|
 fn artifact_elem_kind_default() -> Value {
   ArtifactKind::default().into_value()
 }
@@ -127,6 +147,21 @@ pub(all) enum PdfMarkerTagKind {
   /// A generic `Lbl`.
   Label
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PdfMarkerTagKind with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PdfMarkerTagKind with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PdfMarkerTagKind with @debug.Debug::{to_repr}
 
 // Upstream `PdfMarkerTagKind` has no cast: it is only stored in the internal
 // `PdfMarkerTag::kind` field. Its value form here is the kebab-case variant
@@ -197,6 +232,11 @@ pub impl FromValue for PdfMarkerTagKind with fn from_value(v) {
   }
   raise HintedError(PdfMarkerTagKind::input().error(v))
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PdfMarkerTagKind with FromValue::{from_value}
 
 ///|
 /// Wrap content in a `PdfMarkerTag` of the given kind (upstream's

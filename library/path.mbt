@@ -63,6 +63,16 @@ pub(all) enum PathOrStr {
 } derive(Eq, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PathOrStr with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PathOrStr with Hash::{hash, hash_combine}
+
+///|
 /// Resolves this path or string relative to the file that resides at
 /// `within`.
 ///
@@ -125,6 +135,11 @@ pub impl Reflect for PathOrStr with fn castable(v) {
 }
 
 ///|
+#deprecated("call as `Reflect::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PathOrStr with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for PathOrStr with fn into_value(self) {
   match self {
     Path(v) => IntoValue::into_value(v)
@@ -145,6 +160,11 @@ pub impl FromValue for PathOrStr with fn from_value(v) {
     raise HintedError(cast_error((Ty::new() : Ty[PathOrStr]), v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PathOrStr with FromValue::{from_value}
 
 ///|
 /// Whether `v` can be cast to `T` (upstream `T::castable(v)`).
@@ -194,6 +214,16 @@ fn format_resolve_error(
 pub struct BundlePath(@syntax.VirtualPath) derive(Eq, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BundlePath with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BundlePath with Hash::{hash, hash_combine}
+
+///|
 /// Wraps a virtual path, ensuring it has at least one component.
 pub fn BundlePath::new(
   path : @syntax.VirtualPath,
@@ -226,9 +256,19 @@ pub impl Reflect for BundlePath with fn castable(v) {
 }
 
 ///|
+#deprecated("call as `Reflect::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BundlePath with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for BundlePath with fn into_value(self) {
   Str(self.0.into_with_slash())
 }
+
+///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BundlePath with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for BundlePath with fn from_value(v) {

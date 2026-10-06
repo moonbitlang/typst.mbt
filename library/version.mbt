@@ -13,6 +13,11 @@
 pub struct Version(Array[UInt]) derive(Hash)
 
 ///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Version with Hash::{hash, hash_combine}
+
+///|
 /// The names of the first three components.
 let version_components : ReadOnlyArray[String] = ["major", "minor", "patch"]
 
@@ -123,6 +128,11 @@ pub impl Eq for Version with fn equal(self, other) {
 }
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Version with Eq::{not_equal, equal}
+
+///|
 /// Upstream `Display for Version`: components separated by dots.
 pub fn Version::to_string(self : Version) -> String {
   self.0.map(c => c.to_string()).join(".")
@@ -132,6 +142,8 @@ pub fn Version::to_string(self : Version) -> String {
 pub impl Show for Version with fn output(self, logger) {
   logger.write_string(self.to_string())
 }
+// No `extend` for this impl, nothing is left to name: `to_string` is a regular
+// method of the type, and the `extend` of `Reflect` makes `output` one.
 
 ///|
 /// Upstream `Repr for Version`.
@@ -181,6 +193,11 @@ pub impl FromValue for VersionComponents with fn from_value(v) {
 }
 
 ///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend VersionComponents with FromValue::{from_value}
+
+///|
 pub impl Reflect for Version with fn input() {
   Type(Type::version())
 }
@@ -196,12 +213,17 @@ pub impl Reflect for Version with fn castable(v) {
 }
 
 ///|
-pub extend Version with Reflect::{input, castable}
+pub extend Version with Reflect::{output, input, castable}
 
 ///|
 pub impl IntoValue for Version with fn into_value(self) {
   Version(self)
 }
+
+///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Version with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for Version with fn from_value(v) {
@@ -210,6 +232,11 @@ pub impl FromValue for Version with fn from_value(v) {
     v => raise HintedError(Version::input().error(v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Version with FromValue::{from_value}
 
 ///|
 /// When a feature was introduced.
@@ -224,6 +251,16 @@ pub(all) enum Since {
 } derive(Eq, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Since with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Since with Hash::{hash, hash_combine}
+
+///|
 /// Upstream derives `Debug`; the version is an array there.
 pub impl @debug.Debug for Since with fn to_repr(self) {
   match self {
@@ -233,6 +270,11 @@ pub impl @debug.Debug for Since with fn to_repr(self) {
     Unreleased => @debug.Repr::literal("Unreleased")
   }
 }
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Since with @debug.Debug::{to_repr}
 
 ///|
 pub impl Reflect for Since with fn input() {
@@ -282,3 +324,8 @@ pub impl FromValue for Since with fn from_value(v) {
     v => raise HintedError(Since::input().error(v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Since with FromValue::{from_value}

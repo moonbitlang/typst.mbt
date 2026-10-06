@@ -14,6 +14,26 @@ pub(all) struct Corners[T] {
 } derive(Default, Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Corners with Default::{default}
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Corners with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Corners with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Corners with @debug.Debug::{to_repr}
+
+///|
 /// Create a new instance from the four components.
 pub fn[T] Corners::new(
   top_left : T,
@@ -108,6 +128,11 @@ pub impl[T : Reflect] Reflect for Corners[T?] with fn castable(value) {
 }
 
 ///|
+#deprecated("call as `Reflect::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Corners with Reflect::{output, input, castable}
+
+///|
 pub impl[T : IntoValue + Eq] IntoValue for Corners[T?] with fn into_value(self) {
   if self.is_uniform() && self.top_left is Some(top_left) {
     return IntoValue::into_value(top_left)
@@ -124,6 +149,11 @@ pub impl[T : IntoValue + Eq] IntoValue for Corners[T?] with fn into_value(self) 
   handle("bottom-left", self.bottom_left)
   Dict(dict)
 }
+
+///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Corners with IntoValue::{into_value}
 
 ///|
 pub impl[T : FromValue] FromValue for Corners[T?] with fn from_value(value) {
@@ -173,12 +203,22 @@ pub impl[T : FromValue] FromValue for Corners[T?] with fn from_value(value) {
 }
 
 ///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Corners with FromValue::{from_value}
+
+///|
 pub impl[T : Fold] Fold for Corners[T?] with fn fold(self, outer) {
   // Usually, folding an inner `None` with an `outer` prefers the explicit
   // `None`. However, here `None` means unspecified and thus we want
   // `outer`, so we use `fold_or` to opt into such behavior.
   self.zip(outer).map(p => fold_or(p.0, p.1))
 }
+
+///|
+#deprecated("call as `Fold::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Corners with Fold::{fold}
 
 ///|
 /// The four corners of a rectangle.
@@ -192,6 +232,21 @@ pub(all) enum Corner {
   /// The bottom left corner.
   BottomLeft
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Corner with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Corner with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Corner with @debug.Debug::{to_repr}
 
 ///|
 /// The opposite corner.

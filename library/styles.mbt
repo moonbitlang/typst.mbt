@@ -126,6 +126,11 @@ pub impl Eq for Styles with fn equal(self, other) {
 }
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Styles with Eq::{not_equal, equal}
+
+///|
 /// A single style property, recipe or revocation.
 pub(all) enum Style {
   /// A style property originating from a set rule or constructor.
@@ -135,6 +140,11 @@ pub(all) enum Style {
   /// Disables a specific show rule recipe.
   Revocation(Int)
 } derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Style with Eq::{not_equal, equal}
 
 ///|
 /// If this is a property, return it.
@@ -252,6 +262,11 @@ pub impl Eq for Property with fn equal(self, other) {
 }
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Property with Eq::{not_equal, equal}
+
+///|
 /// A show rule recipe.
 pub struct Recipe {
   /// Determines whether the recipe applies to an element.
@@ -281,6 +296,11 @@ pub impl Eq for Recipe with fn equal(self, other) {
   self.span == other.span &&
   self.outside == other.outside
 }
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Recipe with Eq::{not_equal, equal}
 
 ///|
 /// Apply the recipe to the given content.
@@ -327,6 +347,11 @@ pub(all) enum Transformation {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Transformation with Eq::{not_equal, equal}
+
+///|
 pub impl Reflect for Transformation with fn input() {
   Union([Type(Type::content()), Type(Type::func())])
 }
@@ -354,6 +379,11 @@ pub impl FromValue for Transformation with fn from_value(v) {
     raise HintedError(Transformation::input().error(v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Transformation with FromValue::{from_value}
 
 ///|
 /// A chain of styles, similar to a linked list.
@@ -662,6 +692,11 @@ pub impl Eq for StyleChain with fn equal(self, other) {
 }
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StyleChain with Eq::{not_equal, equal}
+
+///|
 pub impl Reflect for Styles with fn input() {
   Type(Type::styles())
 }
@@ -677,9 +712,19 @@ pub impl Reflect for Styles with fn castable(v) {
 }
 
 ///|
+#deprecated("call as `Reflect::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Styles with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for Styles with fn into_value(self) {
   Styles(self)
 }
+
+///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Styles with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for Styles with fn from_value(v) {
@@ -688,6 +733,11 @@ pub impl FromValue for Styles with fn from_value(v) {
     v => raise HintedError(CastInfo::Type(Type::styles()).error(v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Styles with FromValue::{from_value}
 
 ///|
 /// A property that is folded to determine its final value (upstream

@@ -36,6 +36,11 @@ pub(all) enum Selector {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Selector with Eq::{not_equal, equal}
+
+///|
 /// Define a simple text selector.
 pub fn Selector::text(text : String) -> Selector raise HintedError {
   if text.is_empty() {
@@ -303,6 +308,11 @@ pub extend Selector with FromValue::{from_value}
 pub(all) struct LocatableSelector(Selector) derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LocatableSelector with Eq::{not_equal, equal}
+
+///|
 /// Resolve this selector into a location that is guaranteed to be unique.
 pub fn LocatableSelector::resolve_unique(
   self : LocatableSelector,
@@ -402,6 +412,11 @@ pub extend LocatableSelector with FromValue::{from_value}
 pub(all) struct ShowableSelector(Selector) derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ShowableSelector with Eq::{not_equal, equal}
+
+///|
 pub impl Reflect for ShowableSelector with fn input() {
   Union([
     Type(Type::symbol()),
@@ -435,6 +450,11 @@ pub extend ShowableSelector with Reflect::{output, input, castable}
 pub impl IntoValue for ShowableSelector with fn into_value(self) {
   self.0.into_value()
 }
+
+///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ShowableSelector with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for ShowableSelector with fn from_value(v) {

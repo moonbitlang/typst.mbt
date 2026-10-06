@@ -303,6 +303,11 @@ pub impl Eq for Args with fn equal(self, other) {
 }
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Args with Eq::{not_equal, equal}
+
+///|
 /// Merge two argument lists (upstream `Add for Args`): named arguments of
 /// `rhs` replace those of `self`.
 pub fn Args::merge(self : Args, rhs : Args) -> Args {

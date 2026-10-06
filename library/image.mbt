@@ -205,6 +205,16 @@ pub struct Image {
 } derive(Eq, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Image with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Image with Hash::{hash, hash_combine}
+
+///|
 /// When scaling an image to it's natural size, we default to this DPI if the
 /// image doesn't contain DPI metadata.
 pub let image_default_dpi : Double = 72.0
@@ -299,6 +309,16 @@ pub(all) enum ImageKind {
 } derive(Eq, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ImageKind with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ImageKind with Hash::{hash, hash_combine}
+
+///|
 fn image_elem_height_default() -> Value {
   Sizing::default().into_value()
 }
@@ -324,6 +344,21 @@ pub(all) enum ImageFit {
   /// ratio and doesn't crop the image).
   Stretch
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ImageFit with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ImageFit with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ImageFit with @debug.Debug::{to_repr}
 
 ///|
 pub impl Reflect for ImageFit with fn input() {
@@ -379,6 +414,11 @@ pub impl FromValue for ImageFit with fn from_value(v) {
 }
 
 ///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ImageFit with FromValue::{from_value}
+
+///|
 /// A raster or vector image format.
 pub(all) enum ImageFormat {
   /// A raster graphics format.
@@ -386,6 +426,21 @@ pub(all) enum ImageFormat {
   /// A vector graphics format.
   Vector(VectorFormat)
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ImageFormat with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ImageFormat with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ImageFormat with @debug.Debug::{to_repr}
 
 ///|
 /// Try to detect the format of an image from data.
@@ -491,6 +546,11 @@ pub impl IntoValue for ImageFormat with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ImageFormat with IntoValue::{into_value}
+
+///|
 pub impl FromValue for ImageFormat with fn from_value(v) {
   if RasterFormat::castable(v) {
     Raster(RasterFormat::from_value(v))
@@ -502,6 +562,11 @@ pub impl FromValue for ImageFormat with fn from_value(v) {
 }
 
 ///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ImageFormat with FromValue::{from_value}
+
+///|
 /// A vector graphics format.
 pub(all) enum VectorFormat {
   /// The vector graphics format of the web.
@@ -510,6 +575,21 @@ pub(all) enum VectorFormat {
   /// reproduction in print.
   Pdf
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend VectorFormat with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend VectorFormat with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend VectorFormat with @debug.Debug::{to_repr}
 
 ///|
 pub impl Reflect for VectorFormat with fn input() {
@@ -569,6 +649,21 @@ pub(all) enum ImageScaling {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ImageScaling with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ImageScaling with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ImageScaling with @debug.Debug::{to_repr}
+
+///|
 pub impl Reflect for ImageScaling with fn input() {
   Union([
     Value(
@@ -604,6 +699,11 @@ pub impl IntoValue for ImageScaling with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ImageScaling with IntoValue::{into_value}
+
+///|
 pub impl FromValue for ImageScaling with fn from_value(v) {
   match v {
     Str("smooth") => Smooth
@@ -611,6 +711,11 @@ pub impl FromValue for ImageScaling with fn from_value(v) {
     v => raise HintedError(ImageScaling::input().error(v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ImageScaling with FromValue::{from_value}
 
 // raster.rs
 
@@ -622,6 +727,21 @@ pub(all) enum RasterFormat {
   /// A format of raw pixel data.
   Pixel(PixelFormat)
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RasterFormat with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RasterFormat with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend RasterFormat with @debug.Debug::{to_repr}
 
 ///|
 pub impl Reflect for RasterFormat with fn input() {
@@ -679,6 +799,21 @@ pub(all) enum ExchangeFormat {
   /// Raster format that supports both lossy and lossless compression.
   Webp
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ExchangeFormat with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ExchangeFormat with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ExchangeFormat with @debug.Debug::{to_repr}
 
 ///|
 /// Try to detect the format of data in a buffer (upstream: `image`'s
@@ -784,6 +919,21 @@ pub(all) struct PixelFormat {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PixelFormat with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PixelFormat with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PixelFormat with @debug.Debug::{to_repr}
+
+///|
 pub impl Reflect for PixelFormat with fn input() {
   Type(Type::dict())
 }
@@ -849,6 +999,21 @@ pub(all) enum PixelEncoding {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PixelEncoding with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PixelEncoding with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PixelEncoding with @debug.Debug::{to_repr}
+
+///|
 pub impl Reflect for PixelEncoding with fn input() {
   Union([
     Value(Str("rgb8"), "Three 8-bit channels: Red, green, blue."),
@@ -894,6 +1059,11 @@ pub impl FromValue for PixelEncoding with fn from_value(v) {
     v => raise HintedError(PixelEncoding::input().error(v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PixelEncoding with FromValue::{from_value}
 
 ///|
 /// Upstream `Synthesize for Packed<ImageElem>`.

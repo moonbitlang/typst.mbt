@@ -23,9 +23,19 @@ pub impl Reflect for TableElem with fn castable(value) {
 }
 
 ///|
+#deprecated("call as `Reflect::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TableElem with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for TableElem with fn into_value(self) {
   Content(self.0)
 }
+
+///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TableElem with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for TableElem with fn from_value(value) {
@@ -39,6 +49,11 @@ pub impl FromValue for TableElem with fn from_value(value) {
   }
   raise HintedError(Content::input().error(value))
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TableElem with FromValue::{from_value}
 
 ///|
 /// Upstream `Content::unpack`, as seen once the element is packed again:
@@ -68,6 +83,11 @@ pub(all) enum TableChild {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TableChild with Eq::{not_equal, equal}
+
+///|
 pub impl Reflect for TableChild with fn input() {
   Content::input()
 }
@@ -83,6 +103,11 @@ pub impl Reflect for TableChild with fn castable(value) {
 }
 
 ///|
+#deprecated("call as `Reflect::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TableChild with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for TableChild with fn into_value(self) {
   match self {
     Header(header) => Content(header)
@@ -92,6 +117,11 @@ pub impl IntoValue for TableChild with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TableChild with IntoValue::{into_value}
+
+///|
 pub impl FromValue for TableChild with fn from_value(value) {
   if Content::castable(value) {
     let v : Content = Content::from_value(value)
@@ -99,6 +129,11 @@ pub impl FromValue for TableChild with fn from_value(value) {
   }
   raise HintedError(Content::input().error(value))
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TableChild with FromValue::{from_value}
 
 ///|
 /// Upstream `TryFrom<Content> for TableChild`.
@@ -131,6 +166,11 @@ pub(all) enum TableItem {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TableItem with Eq::{not_equal, equal}
+
+///|
 pub impl Reflect for TableItem with fn input() {
   Content::input()
 }
@@ -146,6 +186,11 @@ pub impl Reflect for TableItem with fn castable(value) {
 }
 
 ///|
+#deprecated("call as `Reflect::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TableItem with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for TableItem with fn into_value(self) {
   match self {
     HLine(hline) => Content(hline)
@@ -155,6 +200,11 @@ pub impl IntoValue for TableItem with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TableItem with IntoValue::{into_value}
+
+///|
 pub impl FromValue for TableItem with fn from_value(value) {
   if Content::castable(value) {
     let v : Content = Content::from_value(value)
@@ -162,6 +212,11 @@ pub impl FromValue for TableItem with fn from_value(value) {
   }
   raise HintedError(Content::input().error(value))
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TableItem with FromValue::{from_value}
 
 ///|
 /// Upstream `TryFrom<Content> for TableItem`.
@@ -259,9 +314,19 @@ pub impl Reflect for TableCell with fn castable(value) {
 }
 
 ///|
+#deprecated("call as `Reflect::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TableCell with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for TableCell with fn into_value(self) {
   Content(self.0)
 }
+
+///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TableCell with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for TableCell with fn from_value(value) {
@@ -271,6 +336,11 @@ pub impl FromValue for TableCell with fn from_value(value) {
   }
   raise HintedError(Content::input().error(value))
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TableCell with FromValue::{from_value}
 
 ///|
 /// Describes what kind of table cell this is.
@@ -284,9 +354,29 @@ pub(all) enum TableCellKind {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TableCellKind with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TableCellKind with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TableCellKind with @debug.Debug::{to_repr}
+
+///|
 pub impl Default for TableCellKind with fn default() {
   Data
 }
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TableCellKind with Default::{default}
 
 // `TableCellKind` is not castable upstream; the internal `kind` field stores
 // it in an encoding private to this file.
@@ -330,6 +420,21 @@ pub(all) enum TableHeaderScope {
   /// The header cell refers to the row.
   Row
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TableHeaderScope with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TableHeaderScope with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TableHeaderScope with @debug.Debug::{to_repr}
 
 ///|
 pub impl Default for TableHeaderScope with fn default() {
@@ -387,6 +492,11 @@ pub impl IntoValue for TableHeaderScope with fn into_value(self) {
     Row => Str("row")
   }
 }
+
+///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend TableHeaderScope with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for TableHeaderScope with fn from_value(v) {

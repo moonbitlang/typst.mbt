@@ -9,6 +9,21 @@ pub(all) enum Feature {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Feature with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Feature with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Feature with @debug.Debug::{to_repr}
+
+///|
 pub fn Feature::all() -> Array[Feature] {
   [Html, Bundle, A11yExtras]
 }
@@ -25,6 +40,11 @@ pub impl Show for Feature with fn output(self, logger) {
 }
 
 ///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Feature with Show::{to_string, output}
+
+///|
 pub fn Feature::from_str(s : String) -> Feature? {
   match s {
     "html" => Some(Html)
@@ -37,6 +57,16 @@ pub fn Feature::from_str(s : String) -> Feature? {
 ///|
 /// A selection of in-development features that should be enabled.
 pub(all) struct Features(Array[Feature]) derive(Eq, Hash)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Features with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Features with Hash::{hash, hash_combine}
 
 ///|
 pub fn Features::all() -> Features {
@@ -74,11 +104,41 @@ pub(all) enum Category {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Category with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Category with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Category with @debug.Debug::{to_repr}
+
+///|
 /// Describes a deprecation of a binding.
 pub(all) struct Deprecation {
   message : String
   until : String?
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Deprecation with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Deprecation with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Deprecation with @debug.Debug::{to_repr}
 
 ///|
 pub fn Deprecation::new() -> Deprecation {
@@ -134,6 +194,21 @@ pub(all) enum Capturer {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Capturer with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Capturer with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Capturer with @debug.Debug::{to_repr}
+
+///|
 pub impl Show for Capturer with fn output(self, logger) {
   logger.write_string(
     match self {
@@ -142,6 +217,11 @@ pub impl Show for Capturer with fn output(self, logger) {
     },
   )
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Capturer with Show::{to_string, output}
 
 ///|
 priv enum BindingKind {
@@ -167,6 +247,16 @@ pub(all) struct BindingDocumentation {
   /// The keywords associated with this binding.
   keywords : ArrayView[String]
 } derive(Eq, Hash)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BindingDocumentation with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend BindingDocumentation with Hash::{hash, hash_combine}
 
 ///|
 /// Upstream `From<&'static NativeFuncData> for BindingDocumentation`.

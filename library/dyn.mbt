@@ -60,6 +60,11 @@ pub(all) enum DynValue {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend DynValue with Eq::{not_equal, equal}
+
+///|
 /// The type of the dynamic value.
 pub fn DynValue::ty(self : DynValue) -> Type {
   match self {

@@ -65,6 +65,21 @@ pub(all) enum MathStyle {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MathStyle with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MathStyle with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend MathStyle with @debug.Debug::{to_repr}
+
+///|
 /// Selects an appropriate `MathStyle` for the given `char`.
 ///
 /// If `variant` is `None`, then `Plain` is used. If `italic` is `None`, then

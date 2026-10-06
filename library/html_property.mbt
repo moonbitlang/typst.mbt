@@ -58,6 +58,21 @@ pub(all) enum CssDisplay {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CssDisplay with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CssDisplay with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend CssDisplay with @debug.Debug::{to_repr}
+
+///|
 /// Returns the default value for the given tag as defined by the user agent
 /// styles in § 15 of the HTML spec.
 pub fn CssDisplay::default_for(tag : HtmlTag) -> CssDisplay? {

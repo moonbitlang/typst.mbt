@@ -12,6 +12,11 @@ pub(all) enum Paint {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Paint with Eq::{not_equal, equal}
+
+///|
 /// Unwraps a solid color used for text rendering.
 pub fn Paint::unwrap_solid(self : Paint) -> Color {
   match self {

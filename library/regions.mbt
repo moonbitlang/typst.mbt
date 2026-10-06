@@ -17,6 +17,16 @@ pub(all) struct LayoutRegion {
 } derive(Eq, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LayoutRegion with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend LayoutRegion with Hash::{hash, hash_combine}
+
+///|
 /// Create a new region.
 pub fn LayoutRegion::new(size : Axes[Abs], expand : Axes[Bool]) -> LayoutRegion {
   { size, expand, }
@@ -164,3 +174,8 @@ pub impl Show for Regions with fn output(self, logger) {
   }
   logger.write_string("Regions [\{entries.join(", ")}]")
 }
+
+///|
+#deprecated("call as `Show::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Regions with Show::{to_string, output}

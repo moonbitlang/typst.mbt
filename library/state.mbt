@@ -14,6 +14,11 @@ pub(all) struct State {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend State with Eq::{not_equal, equal}
+
+///|
 /// Create a new state identified by a key.
 pub fn State::new(key : String, init : Value) -> State {
   { key, init, }
@@ -237,12 +242,22 @@ pub impl IntoValue for State with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend State with IntoValue::{into_value}
+
+///|
 pub impl FromValue for State with fn from_value(v) {
   match v {
     Dyn(State(state)) => state
     v => raise HintedError(State::input().error(v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend State with FromValue::{from_value}
 
 ///|
 /// An update to perform on a state.
@@ -252,6 +267,11 @@ pub(all) enum StateUpdate {
   /// Apply the given function to the state.
   Func(Func)
 } derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StateUpdate with Eq::{not_equal, equal}
 
 // cast! {
 //     StateUpdate,
@@ -297,6 +317,11 @@ pub impl FromValue for StateUpdate with fn from_value(v) {
   }
   Set(v)
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend StateUpdate with FromValue::{from_value}
 
 ///|
 fn state_update_elem_init(e : Element) -> Unit {

@@ -15,6 +15,16 @@ pub(all) enum Datetime {
 } derive(Eq, Hash)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Datetime with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Datetime with Hash::{hash, hash_combine}
+
+///|
 /// Create a datetime from year, month, and day.
 pub fn Datetime::from_ymd(year : Int, month : Int, day : Int) -> Datetime? {
   guard @time.Month::try_from_u8(month) is Some(month) else { return None }
@@ -628,6 +638,11 @@ pub impl IntoValue for SmartDisplayPattern with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SmartDisplayPattern with IntoValue::{into_value}
+
+///|
 pub impl FromValue for SmartDisplayPattern with fn from_value(v) {
   match v {
     Auto => Auto
@@ -635,6 +650,11 @@ pub impl FromValue for SmartDisplayPattern with fn from_value(v) {
     v => raise HintedError(SmartDisplayPattern::input().error(v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SmartDisplayPattern with FromValue::{from_value}
 
 ///|
 /// Upstream `cast! { Month, v: u8 => .. }`.
@@ -775,6 +795,11 @@ pub impl IntoValue for SmartTodayOffset with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SmartTodayOffset with IntoValue::{into_value}
+
+///|
 pub impl FromValue for SmartTodayOffset with fn from_value(v) {
   match v {
     Auto => Auto
@@ -782,6 +807,11 @@ pub impl FromValue for SmartTodayOffset with fn from_value(v) {
     v => raise HintedError(SmartTodayOffset::input().error(v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend SmartTodayOffset with FromValue::{from_value}
 
 ///|
 pub impl Reflect for Datetime with fn input() {
@@ -807,9 +837,19 @@ pub impl IntoValue for Datetime with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Datetime with IntoValue::{into_value}
+
+///|
 pub impl FromValue for Datetime with fn from_value(v) {
   match v {
     Datetime(d) => d
     v => raise HintedError(Datetime::input().error(v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Datetime with FromValue::{from_value}

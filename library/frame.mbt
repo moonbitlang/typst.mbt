@@ -69,6 +69,11 @@ pub impl Default for Frame with fn default() {
 }
 
 ///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Frame with Default::{default}
+
+///|
 /// A cheap copy of the frame that shares its items copy-on-write (upstream
 /// `Clone`).
 pub fn Frame::clone(self : Frame) -> Frame {
@@ -558,6 +563,11 @@ pub impl Eq for Frame with fn equal(self, other) {
 }
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Frame with Eq::{not_equal, equal}
+
+///|
 /// The hardness of a frame.
 ///
 /// This corresponds to whether or not the frame is considered to be the
@@ -576,9 +586,29 @@ pub(all) enum FrameKind {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FrameKind with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FrameKind with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FrameKind with @debug.Debug::{to_repr}
+
+///|
 pub impl Default for FrameKind with fn default() {
   Soft
 }
+
+///|
+#deprecated("call as `Default::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FrameKind with Default::{default}
 
 ///|
 /// Returns `true` if the frame is soft.
@@ -610,6 +640,11 @@ pub(all) enum FrameItem {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FrameItem with Eq::{not_equal, equal}
+
+///|
 /// A copy of the item whose group frame (if any) is a copy-on-write clone
 /// (upstream `Clone`).
 pub fn FrameItem::clone(self : FrameItem) -> FrameItem {
@@ -636,6 +671,11 @@ pub(all) struct GroupItem {
   /// the parent.
   mut parent : FrameParent?
 } derive(Eq)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend GroupItem with Eq::{not_equal, equal}
 
 ///|
 /// Create a new group with default settings.
@@ -665,6 +705,21 @@ pub(all) struct FrameParent {
   /// Whether the child has inherited the parent's styles.
   inherit_ : Inherit
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FrameParent with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FrameParent with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FrameParent with @debug.Debug::{to_repr}
 
 ///|
 /// Create a new frame parent.
@@ -701,3 +756,18 @@ pub(all) enum Inherit {
   Yes
   No
 } derive(Eq, Hash, Debug)
+
+///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Inherit with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Inherit with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend Inherit with @debug.Debug::{to_repr}

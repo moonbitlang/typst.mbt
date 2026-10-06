@@ -158,6 +158,11 @@ pub impl FromValue for ToFloat with fn from_value(v) {
 }
 
 ///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ToFloat with FromValue::{from_value}
+
+///|
 /// Parse a float like Rust's `str::parse::<f64>` after replacing the Unicode
 /// minus sign (upstream `parse_float`).
 fn parse_float(s : String) -> Double? {
@@ -255,6 +260,16 @@ pub fn rust_parse_f64(s : String) -> Double? {
 pub(all) struct PositiveF64(Double) derive(Eq, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PositiveF64 with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PositiveF64 with @debug.Debug::{to_repr}
+
+///|
 /// Wrap a float if it is positive.
 pub fn PositiveF64::new(value : Double) -> PositiveF64? {
   if value > 0.0 {
@@ -286,9 +301,19 @@ pub impl Reflect for PositiveF64 with fn castable(v) {
 }
 
 ///|
+#deprecated("call as `Reflect::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PositiveF64 with Reflect::{output, input, castable}
+
+///|
 pub impl IntoValue for PositiveF64 with fn into_value(self) {
   Float(self.get())
 }
+
+///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PositiveF64 with IntoValue::{into_value}
 
 ///|
 pub impl FromValue for PositiveF64 with fn from_value(v) {
@@ -298,3 +323,8 @@ pub impl FromValue for PositiveF64 with fn from_value(v) {
     None => bail("number must be positive")
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend PositiveF64 with FromValue::{from_value}

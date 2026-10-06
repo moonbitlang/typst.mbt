@@ -11,6 +11,11 @@ pub(all) enum OutlineIndent {
 } derive(Eq)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend OutlineIndent with Eq::{not_equal, equal}
+
+///|
 pub impl Reflect for OutlineIndent with fn input() {
   CastInfo::Type(Type::relative()).union_with(Type(Type::func()))
 }
@@ -37,6 +42,11 @@ pub impl IntoValue for OutlineIndent with fn into_value(self) {
 }
 
 ///|
+#deprecated("call as `IntoValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend OutlineIndent with IntoValue::{into_value}
+
+///|
 pub impl FromValue for OutlineIndent with fn from_value(v) {
   match v {
     Relative(_) | Length(_) | Ratio(_) => Rel(FromValue::from_value(v))
@@ -44,6 +54,11 @@ pub impl FromValue for OutlineIndent with fn from_value(v) {
     v => raise HintedError(OutlineIndent::input().error(v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend OutlineIndent with FromValue::{from_value}
 
 ///|
 /// Upstream `Some(RepeatElem::new(TextElem::packed("."))

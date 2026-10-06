@@ -112,5 +112,20 @@ pub(all) enum FragmentKind {
 } derive(Eq, Hash, Debug)
 
 ///|
+#deprecated("call as `Eq::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FragmentKind with Eq::{not_equal, equal}
+
+///|
+#deprecated("call as `Hash::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FragmentKind with Hash::{hash, hash_combine}
+
+///|
+#deprecated("call as `Debug::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend FragmentKind with @debug.Debug::{to_repr}
+
+///|
 /// A pair of content and a style chain that applies to it.
 pub type Pair = (Content, StyleChain)

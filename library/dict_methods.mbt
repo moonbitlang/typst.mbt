@@ -154,3 +154,8 @@ pub impl FromValue for ToDict with fn from_value(v) {
     v => raise HintedError(ToDict::input().error(v))
   }
 }
+
+///|
+#deprecated("call as `FromValue::m(x)`, or un-deprecate this `extend` to make it a method")
+#doc(hidden)
+pub extend ToDict with FromValue::{from_value}
