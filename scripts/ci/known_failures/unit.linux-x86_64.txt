@@ -1,24 +1,34 @@
-# Unit tests that fail on x86_64 Linux (measured in CI): their expectations
-# come from the Rust crates as they run on aarch64 macOS, and the ports are
-# bit-exact there only. One `<file> ("<test name>")` per line;
-# scripts/ci/unit_tests.py fails on any failure that is not listed, and on
-# listed tests that pass.
+# Unit tests that fail on x86_64 Linux. Their expectations were produced by
+# the Rust crates on aarch64 macOS; each entry was checked against the same
+# crates run on x86_64 Linux (CI, October 2026). One `<file> ("<test name>")`
+# per line; scripts/ci/unit_tests.py fails on any failure that is not
+# listed, and on listed tests that pass.
 #
-# The default NaN of x86 has its sign bit set (0.0 / 0.0, ln and sqrt of
-# negative numbers): the NaN's bytes in CBOR, ffc00000 instead of 7fc00000.
+# 1. Upstream gives another result on x86_64 Linux, and the port gives that
+#    same result there (regenerated expectations pass):
+#
+# The default NaN of x86 has its sign bit set (0.0 / 0.0, inf - inf,
+# sqrt/ln of a negative number: fff8.../ffc00000 where aarch64 gives
+# 7ff8.../7fc00000). The CBOR test builds its NaN as `0.0 / 0.0`.
 data/cbor/cbor_test.mbt ("encode")
 hayro/interpret/function/oracle_wbtest.mbt ("postscript programs match hayro-interpret")
 typst/oracle_wbtest.mbt ("oracle: location keys: negative zeros and NaNs")
 typst/oracle_wbtest.mbt ("oracle: floats: the bits of NaN values")
-# pattern_shading_type1_6.pdf (a PostScript function shading), 1 of 784.
-hayro/interpret/function/oracle_wbtest.mbt ("functions of test pdfs match hayro-interpret")
-hayro/render/oracle_test.mbt ("hayro::render matches the oracle")
-hayro/svg/oracle_test.mbt ("hayro-svg matches the oracle")
-# Results that go through the C library's sin/cos (`__sincos_stret` on Apple
-# platforms, see AGENTS.md on kurbo) and differ in the last place: 669 of
-# 3340 stroke cases, 19 of 114 transforms, 121 of 525 arcs, one rotation
-# sweep.
-kurbo/stroke_oracle_test.mbt ("kurbo stroke oracle")
+# Rust's f32/f64 math methods call the C library, whose results differ in
+# the last place between glibc and Apple's libm: `tan`, `sin`/`cos` in
+# svgtypes (19 of 114 transforms, 121 of 525 arcs), `sinf`/`cosf` in
+# tiny-skia-path's rotations, the PostScript function of
+# pattern_shading_type1_6.pdf in hayro (1 of 784 renderings).
 svgtypes/oracle_test.mbt ("oracle transform")
 svgtypes/oracle_test.mbt ("oracle simple_path")
 tiny_skia_path/oracle_wbtest.mbt ("8 rotation sweep")
+hayro/render/oracle_test.mbt ("hayro::render matches the oracle")
+# The same PDF in the two hayro oracles that could not be regenerated on
+# Linux (their generators are not in `oracle/`).
+hayro/interpret/function/oracle_wbtest.mbt ("functions of test pdfs match hayro-interpret")
+hayro/svg/oracle_test.mbt ("hayro-svg matches the oracle")
+#
+# 2. As 1 for 590 of the 669 failing cases (of 3340); in the other 79
+#    (`solve_cubic` 58, `nearest` 21) kurbo gives the same result on both
+#    platforms and only the port differs on Linux: see paged.linux-x86_64.txt.
+kurbo/stroke_oracle_test.mbt ("kurbo stroke oracle")

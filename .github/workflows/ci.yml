@@ -191,7 +191,7 @@ jobs:
   # pull requests.
   edsl-sweep:
     name: EDSL conversion sweep
-    # TEMP (measuring on the draft PR): if: github.event_name != 'pull_request' && github.event_name != 'merge_group'
+    if: github.event_name != 'pull_request' && github.event_name != 'merge_group'
     needs: goldens
     runs-on: ubuntu-latest
     timeout-minutes: 240
@@ -239,29 +239,9 @@ jobs:
           rustc --version
           rustc -O scripts/ci/probe.rs -o probe
           ./probe
-
-  probe-linux:
-    name: TEMP probe (Rust oracles on Linux)
-    needs: goldens
-    runs-on: ubuntu-latest
-    timeout-minutes: 120
-    steps:
-      - uses: actions/checkout@v5
-      - uses: ./.github/actions/setup-moon
-      - uses: ./.github/actions/test-data
-      - uses: actions/download-artifact@v4
-        with:
-          name: goldens
-      - run: |
-          mkdir golden-macos
-          tar -xzf goldens.tar.gz -C golden-macos
-          scripts/ci/probe_linux.sh
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: probe-linux
-          path: _build/ci/probe
-          retention-days: 14
+          rustc --edition 2024 -O scripts/ci/probe2.rs -o probe2
+          ./probe2
+          (cd oracle && rustc --version && rustc --edition 2024 -O ../scripts/ci/probe2.rs -o ../probe2-pinned && ../probe2-pinned) || true
 
   # The one check to require in the branch protection of `main`.
   required:

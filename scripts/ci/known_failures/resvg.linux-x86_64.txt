@@ -1,3 +1,4 @@
-# x86_64 Linux (measured in CI): the pixmap hash differs from the one of the
-# resvg crate on aarch64 macOS.
+# x86_64 Linux: the resvg crate itself renders this case differently there
+# (the oracle run on x86_64 Linux gives the hash the port gives there,
+# bddebb1a...; all 1723 cases pass against goldens made on Linux).
 FAIL tests/structure/image/no-width-and-height-on-svg
