@@ -1,8 +1,10 @@
-# What fourteen ports showed, and what the EDSL changes (proposal, revision 3)
+# What fourteen ports showed, and what the EDSL changes (proposal, revision 4)
 
-Status: proposal. Revisions 1 and 2 were reviewed by Codex (xhigh):
-`docs/edsl-reviews/ports-proposal-1.md` (eight required changes) and
-`ports-proposal-2.md` (six); section 11 says how each is resolved. This document extends
+Status: accepted for implementation after three review rounds by Codex
+(xhigh): `docs/edsl-reviews/ports-proposal-1.md` (eight required changes),
+`ports-proposal-2.md` (six) and `ports-proposal-3.md` (one); section 11 says
+how each is resolved. Details of later steps are settled in their pull
+requests. This document extends
 `docs/edsl-design.md` (revision 8); where the two disagree, that document
 holds until this one is accepted and folded into it.
 
@@ -226,18 +228,26 @@ Provenance of a composite. The kit is a separate package, so it cannot use
 
 ```moonbit
 #callsite(autofill(loc, args_loc))
-pub fn Chip(body, .., loc~ : SourceLoc, args_loc~ : ArgsLoc) -> @doc.Composite {
-  @doc.Composite("Chip", loc, args_loc, () => { @doc.Box(..) })
+pub fn Chip(body, fill~, .., loc~ : SourceLoc, args_loc~ : ArgsLoc) -> @doc.Composite {
+  @doc.Composite("Chip", loc, args_loc, site => {
+    @doc.Box(site.arg(0, body), fill=site.arg(1, fill), ..)
+  })
 }
 ```
 
 `Composite(name, loc, args_loc, build)` registers one site, the caller's
-call of the kit element with its argument ranges, and runs `build`.
+call of the kit element with its argument ranges, and runs `build` (eagerly,
+at construction, so callbacks created in it exist before compilation).
 Constructors that run inside `build` (the kit's own `Box`, `Grid`, `Place`)
-do not register sites: their content is attributed to the composite's site.
-Descriptions the caller passed in were constructed before `build` ran and
-keep their own origins. A measuring element calls the hook again, with the
-same site, inside its callback. So a selection inside a chip's text resolves
+do not register sites, and their own parameter indices are not used for
+locations (a primitive's argument index means nothing in the caller's
+argument list): what they produce is attributed to the composite's call as
+a whole. `site.arg(i, v)` ties a forwarded value or a body without a
+location of its own (a plain string) to the caller's argument `i`, so it
+resolves to that argument's range. Descriptions the caller passed in were
+constructed before `build` ran and A measuring element calls the hook again, with the same site, inside its
+callback, for the ordinary descriptions it rebuilds there; creating a new
+callback description there stays the existing error. So a selection inside a chip's text resolves
 to the caller's string or `Prose`, and a selection of the chip's box to the
 caller's `Chip(..)` call.
 
@@ -449,6 +459,10 @@ Second review (`ports-proposal-2.md`):
 6. The sticky paragraph is corrected (2.4).
 Its optional points: `Layout` passes a `Region`, not the `Size` of
 `measure` (3.2); `Lines` states empty lines, tab stops and wrapping (4).
+
+Third review (`ports-proposal-3.md`): `Composite` maps arguments explicitly
+(`site.arg(i, v)`); primitives inside `build` fall back to the composite's
+call instead of using their own parameter indices (4).
 
 Optional points of the first review taken: marks as a separately named constructor in the kit;
 cards by cell fill before measurement; format utilities in their own
