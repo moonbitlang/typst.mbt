@@ -17,7 +17,9 @@ test "Stroke::paint: the paint that a stroke was made with" {
   }
   inspect(name(@doc.Stroke(paint=Blue, thickness=Pt(2))), content="blue")
   inspect(name(@doc.Stroke(paint=Rgb("#abc"), dash=Dashed)), content="rgb #abc")
-  inspect(name(@doc.Stroke(paint=Auto)), content="auto")
+  // `auto` is no paint, however it is written.
+  inspect(name(@doc.Stroke(paint=Auto)), content="none")
+  inspect(name(@doc.Stroke(paint=Value(@doc.Value::auto()))), content="none")
   inspect(
     name(@doc.Stroke(paint=@doc.Paint::mix(Red, Blue))),
     content="a value",

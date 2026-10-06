@@ -330,6 +330,11 @@ pub fn Stroke::Stroke(
   if miter_limit is Some(v) {
     named.push(("miter-limit", Value::float(v)))
   }
+  // (`auto` is no paint, as `stroke(paint: auto).paint` is `auto`.)
+  let paint = match paint {
+    Some(Auto) | Some(Value({ val: VAuto, })) => Option::None
+    paint => paint
+  }
   {
     value: Value::native(@library.native_stroke_construct(), [], named~),
     paint,
@@ -350,9 +355,15 @@ pub fn Stroke::auto() -> Stroke {
 
 ///|
 /// The `paint` that the stroke was made with (`stroke(..).paint`), as it
-/// was given; `None` for a stroke without one, which is drawn in the paint
-/// of the stroke that it is folded with (a set rule of the document, or the
+/// was given; `None` for a stroke without one or with the paint `auto`
+/// (`Paint::Auto`, or the value `auto`), which is drawn in the paint of the
+/// stroke that it is folded with (a set rule of the document, or the
 /// default: black), and for `Stroke::none()` and `Stroke::auto()`.
+///
+/// It reads the description, not the document: it is the paint that was
+/// written, not what a rule of the document resolves a stroke to, and a
+/// paint that is computed when the document is compiled (a call value) is
+/// returned as that value, whatever it turns out to be.
 ///
 /// For packages of elements (`doc/kit`), to which a stroke is opaque: an
 /// element that draws a line and fills a shape in the paint of that line
