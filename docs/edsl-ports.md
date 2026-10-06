@@ -1,8 +1,8 @@
-# What fourteen ports showed, and what the EDSL changes (proposal, revision 2)
+# What fourteen ports showed, and what the EDSL changes (proposal, revision 3)
 
-Status: proposal. Revision 1 was reviewed by Codex (xhigh):
-`docs/edsl-reviews/ports-proposal-1.md`, REQUEST CHANGES with eight required
-changes; section 11 says how each is resolved. This document extends
+Status: proposal. Revisions 1 and 2 were reviewed by Codex (xhigh):
+`docs/edsl-reviews/ports-proposal-1.md` (eight required changes) and
+`ports-proposal-2.md` (six); section 11 says how each is resolved. This document extends
 `docs/edsl-design.md` (revision 8); where the two disagree, that document
 holds until this one is accepted and folded into it.
 
@@ -107,9 +107,10 @@ documents.
 - Auto columns take their measured content width, and what remains goes to
   fractional columns or is taken from the auto columns; this is not HTML's
   algorithm, and tables with several prose columns need weights.
-- `sticky` attaches a block to the block that follows it (consecutive sticky
-  blocks form a group); a heading, a paragraph of controls and a table do not
-  stay together unless the first two are one block.
+- `sticky` attaches a block to the block that follows it, and consecutive
+  sticky blocks form a group: a heading, a paragraph of controls and a table
+  stay together only if the paragraph is sticky too (or shares the heading's
+  block), which the port that hit this did not know.
 - `raw` sets its text size to 0.8em, and em sizes set on it compound.
 - A stroke dictionary that names one side leaves the others unspecified, and
   they fold from the outer value: for a table that is its default stroke.
@@ -159,9 +160,11 @@ a location).
 @doc.Layout() <| (size, cx) => { .. size.width .. cx.measure(..) .. }
 ```
 
-`layout(size => ..)` with a host callback `(Size, Ctx) -> &IntoContent
+`layout(size => ..)` with a host callback `(Region, Ctx) -> &IntoContent
 raise`, on the path `Context` uses; the engine already passes location and
-styles to it. `size` is the base size of the enclosing region
+styles to it. `Region` has `width` and `height` only (the engine's
+dictionary; it is not the `Size` that `measure` returns). It is the base
+size of the enclosing region
 (`regions.base()`): the width and height of the container, not the space
 that remains on the page, and a dimension can be infinite (an auto-sized
 container). Like every callback it falls under the creation rule
@@ -189,12 +192,18 @@ engine's explicit states, and the untyped escape (`extra=`, `Value`) stays.
   phase~)` with `DashLen` = `Dot` | `Len(Length)`, and `Raw(Value)` for what
   a script passes today (T3).
 - Colour operations on `Paint`, lowered to the engine's native functions
-  with the receiver as first argument: `transparentize(Double)` (percent;
-  multiplies the alpha by `1 − t`, upstream's meaning, not "set the alpha"),
-  `lighten`, `darken`, `mix(other, weight~, space~)` (default space Oklab, as
-  upstream; `space="rgb"` gives what CSS `color-mix(in srgb, ..)` gives).
-  They are defined for colours; a gradient or tiling is the engine's located
-  cast error (T4).
+  with the receiver as first argument. Amounts are percentages (`Double`)
+  lowered to the engine's `Ratio`; clamping and negative amounts are the
+  engine's. `transparentize(p)`: alpha × (1 − p/100), upstream's meaning,
+  not "set the alpha". `lighten(p)`, `darken(p)`. `mix(other, weight~ = 50,
+  space~ = Auto)` lowers to `color.mix((self, (100 − w)%), (other, w%),
+  space: ..)`; `space : ColorSpace` is an enum (`Auto`, `Oklab`, `Oklch`,
+  `Rgb`, `LinearRgb`, `Luma`, `Cmyk`, `Hsl`, `Hsv`) lowered to the engine's
+  space values (`oklab`, `rgb`, `color.linear-rgb`, ..), and `Auto` is
+  upstream's default (Oklab, or the common spot colorant). No equivalence
+  with CSS `color-mix` is claimed: Typst mixes channels without
+  premultiplying alpha. The operations are defined for colours; a gradient
+  or tiling is the engine's located cast error (T4).
 - `Length::sizing()`, `Length::spacing()` (= `Rel(self)`) (T6).
 - `Upper(body)`, `Lower(body)`. Twin: `upper[#body]`; on content this sets a
   text case property, which is not the same structure as `upper("x")` on a
@@ -212,6 +221,26 @@ function written with the same primitives (`doc/twins/kit.typ`), checked by
 the `edsl` stage like every other pair: structure, frames with memoization
 on and off, SVG and PDF bytes. Nothing in `doc` depends on the kit.
 
+Provenance of a composite. The kit is a separate package, so it cannot use
+`doc`'s private `Site`. `doc` gets one public hook:
+
+```moonbit
+#callsite(autofill(loc, args_loc))
+pub fn Chip(body, .., loc~ : SourceLoc, args_loc~ : ArgsLoc) -> @doc.Composite {
+  @doc.Composite("Chip", loc, args_loc, () => { @doc.Box(..) })
+}
+```
+
+`Composite(name, loc, args_loc, build)` registers one site, the caller's
+call of the kit element with its argument ranges, and runs `build`.
+Constructors that run inside `build` (the kit's own `Box`, `Grid`, `Place`)
+do not register sites: their content is attributed to the composite's site.
+Descriptions the caller passed in were constructed before `build` ran and
+keep their own origins. A measuring element calls the hook again, with the
+same site, inside its callback. So a selection inside a chip's text resolves
+to the caller's string or `Prose`, and a selection of the chip's box to the
+caller's `Chip(..)` call.
+
 Rule for callbacks: a kit element that measures creates a `Layout` or
 `Context` callback, so under the creation rule it cannot be built inside a
 callback (a show rule, a `Cells` function, another measuring element).
@@ -225,9 +254,9 @@ says for each element whether it measures.
 | `Cards(.., radius~)` | H3 | with a radius the cells cannot draw the card: rows are measured at the column width from `Layout`, each card is a rounded unbreakable `Block` of the row's height. Measured and final content are the same descriptions with the same keys | yes |
 | `Flow(items, gap~, row_gap~, align~)` | H9 | `Layout` + `measure`, greedy rows, each row a `Grid` aligned on the cross axis; an item wider than the region gets a row of its own; an infinite width gives one row | yes |
 | `DataTable(head, rows, columns~, numeric~, mark~, frame~, header~, rule~, column_text~, key~)` | H5 | `Table` with `TableHeader` (repeats on each page), cells unbreakable, the three `Cells` functions built once outside any callback, `rest=Stroke::none()` set explicitly, a clipped rounded `Block` as frame; `columns` is required (2.4); cells may be `TableCell` with spans; rows keyed by `key` or by index | no |
-| `Canvas(width, height, items, unit~)` with `text(x, y, body, anchor~)`, `line`, `rect`, `circle`, `curve`, `arrow(.., head~)` | H6 | a `Block` of that size with `Place`d items. Horizontal anchors use `Place`'s own alignment in the known width (`Center` with `dx = x − width/2`), vertical anchors `Top`, `Horizon`, `Bottom` likewise; arrowheads are polygons | no |
+| `Canvas(width, height, items, unit~)` with `text(x, y, body, anchor~)`, `line`, `rect`, `circle`, `curve`, `arrow(.., head~)` | H6 | an unbreakable `Block` of that size (one region, so one coordinate system) with `Place`d items. Horizontal anchors use `Place`'s own alignment in the known width (`Center` with `dx = x − width/2`), vertical anchors `Top`, `Horizon`, `Bottom` likewise; arrowheads are polygons | no |
 | `Canvas(.., width=Auto)`, `anchor=Baseline` | H6 | the width from `Layout`; the baseline from `measure` (3.3) | yes |
-| `Lines(lines)` | H8 | monospaced lines: each line a sequence of strings and styled spans, joined by `Linebreak`, leading spaces kept as no-break spaces, tabs expanded by `tab_size`, no wrapping marks. It is not a `raw` element (no highlighting, `Select::raw` does not match) and its name says so | no |
+| `Lines(lines)` | H8 | monospaced lines: each line a sequence of strings and styled spans, joined by `Linebreak`; empty lines and a trailing empty line are kept; leading spaces are no-break spaces; tabs expand to the next multiple of `tab_size` columns counted across the line's spans; a line longer than the measure wraps as text does, without hyphenation. It is not a `raw` element (no highlighting, `Select::raw` does not match) and its name says so | no |
 
 Chart helpers (`ticks(lo, hi, n)`, a linear scale) come with `Canvas`.
 
@@ -264,7 +293,11 @@ change, and the kit gets a separately named constructor to try:
   processed before marks.
 - Interpolated strings are text of the argument like any other, so marks in
   `\{data}` are parsed; `\{@doc.Lit(data)}` keeps data literal. Interpolated
-  descriptions are placeholders as in `Prose` and are never parsed.
+  descriptions are placeholders as in `Prose` and are never parsed. A
+  placeholder inside a code mark or inside a link's target cannot be lowered
+  (`raw` and a URL are strings): it is a located error, "a description cannot
+  be interpolated inside `code`" (resp. "a link target"); inside `**`, `_`
+  and a link's text it is content like anywhere else.
 - Lowering: each mark is the call its typed constructor makes. Twin:
   `raw("..")`, `strong[..]`, `emph[..]`, `link(..)[..]` around literal text
   with `Prose`'s white-space and quote expansion; not Typst markup of the
@@ -293,21 +326,29 @@ What each can and cannot promise:
   reported). It is a heuristic: it does not see through callbacks, `Call`
   or embedded content. `Para` is the fix it names.
 - L2, missing glyphs (S4). From the frames: glyph id 0 in a text item, with
-  the item's origin and the text of the cluster (a code-point sequence; for
-  clusters beyond the 65,535 range limit, the item's text).
+  the origin of that glyph's span (a text item can combine several origins)
+  and the text of the cluster (a code-point sequence; for clusters beyond the
+  65,535 range limit, the item's text).
 - L3, content outside the page. From the frames: an item whose bounds leave
-  the page by more than 1pt.
+  the page by more than 1pt. Its origin is the item's span where it has one;
+  decorations and other items with detached spans are reported with the
+  origin of the nearest enclosing group that has one, or with the page only.
   Not covered: overflow of a fixed-size container (S2). Frames do not record
   which container had a fixed size or where it was declared; that needs a
   side channel from layout (container identity, bounds, origin, clipping,
   fragments), which is an engine instrumentation decision outside this
-  proposal. Until then S2 is answered by the kit (its elements take no fixed
-  heights and are unbreakable where they measure) and the guide. S3 has no
+  proposal. Until then S2 is answered by the kit (apart from `Canvas`, whose
+  height the author gives and which is unbreakable, its elements take no
+  fixed heights, and measured cards are unbreakable) and the guide. S3 has no
   out-of-bounds geometry at all and is answered by `Cards`.
-- L4, ambiguous origins. Counted during lowering: more than a threshold of
-  occurrences of one call site with one key path. Reported as a note that
-  the review loop cannot tell these apart (reuse of a description is valid),
-  with `Keyed` and `#callsite` as remedies.
+- L4, ambiguous origins. On the description tree the author passes to
+  `compile_*`, before lowering: more than a threshold of distinct positions
+  in the tree that hold one call site with one key path. Content returned by
+  callbacks is not counted (callbacks are invoked an arbitrary number of
+  times during layout and measurement, so counts taken while lowering say
+  nothing). Reported as a note that the review loop cannot tell these
+  positions apart (reuse of a description is valid), with `Keyed` and
+  `#callsite` as remedies.
 
 ## 7. The guide
 
@@ -394,7 +435,22 @@ Small pull requests, each with tests and its twin check.
 8. Section 2.4 and the evidence claims corrected; the guide and fixtures
    come first; success is per finding and per port (1, 2.4, 9, 10).
 
-Optional points taken: marks as a separately named constructor in the kit;
+Second review (`ports-proposal-2.md`):
+
+1. Colour contract: percentages to `Ratio`, the `mix` pairs, `ColorSpace` as
+   an enum over the engine's space values, `Auto` as upstream's default, no
+   CSS equivalence (3.4).
+2. `Canvas` is an unbreakable block; the sentence about fixed heights is
+   corrected (4, 6).
+3. Lints: L2 per glyph span, L3 with ancestor or page-only origins, L4 on
+   the author's description tree, not on lowering counts (6).
+4. Placeholders inside code marks and link targets are located errors (5).
+5. Kit provenance through one public hook, `Composite` (4).
+6. The sticky paragraph is corrected (2.4).
+Its optional points: `Layout` passes a `Region`, not the `Size` of
+`measure` (3.2); `Lines` states empty lines, tab stops and wrapping (4).
+
+Optional points of the first review taken: marks as a separately named constructor in the kit;
 cards by cell fill before measurement; format utilities in their own
 package; fonts by `font_paths` fixtures before any embedding decision.
 
