@@ -18,7 +18,7 @@ priv enum ArgKind {
   OptionalValue(String)
   /// An option whose value is optional but may also be the next argument
   /// (`num_args = 0..=1` without `require_equals`, like `--color`).
-  LooseValue(String)
+  LooseValue
 }
 
 ///|
@@ -253,7 +253,7 @@ fn CommandSpec::usage(self : CommandSpec) -> String {
 fn ArgSpec::display(self : ArgSpec) -> String {
   match self.kind {
     Flag => "--\{self.long}"
-    Value | LooseValue(_) => "--\{self.long} <\{self.value_name}>"
+    Value | LooseValue => "--\{self.long} <\{self.value_name}>"
     OptionalValue(_) => "--\{self.long}[=<\{self.value_name}>]"
   }
 }
@@ -485,7 +485,7 @@ fn CommandSpec::parse(
         }
         OptionalValue(missing) =>
           state.occurrence(spec, Some(attached.unwrap_or(missing)), true)
-        LooseValue(_) | Value =>
+        LooseValue | Value =>
           match attached {
             Some(value) => state.occurrence(spec, Some(value), true)
             None => state.occurrence(spec, separate_value(), false)
@@ -513,7 +513,7 @@ fn CommandSpec::parse(
       state.resolve_pending()
       let spec = self.args[index]
       match spec.kind {
-        Flag | OptionalValue(_) | LooseValue(_) => state.flag(spec)
+        Flag | OptionalValue(_) | LooseValue => state.flag(spec)
         Value => {
           let rest = String::from_array(chars[k:])
           if rest.has_prefix("=") {

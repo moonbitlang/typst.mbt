@@ -440,18 +440,6 @@ fn table_elem_fill_default() -> Value {
 }
 
 ///|
-/// `Smart::Auto` of `Smart<Option<Paint>>`.
-fn table_cell_elem_fill_default() -> Value {
-  Auto
-}
-
-///|
-/// `Sides::splat(None)` of `Sides<Option<Option<Arc<Stroke>>>>`.
-fn table_cell_elem_stroke_default() -> Value {
-  Dict(Dict::new())
-}
-
-///|
 /// `Smart::Auto` of `Smart<TableCellKind>`.
 fn table_cell_elem_kind_default() -> Value {
   kind_to_value(Auto)

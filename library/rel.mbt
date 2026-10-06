@@ -25,6 +25,9 @@ pub fn[T] Rel::new(rel : Ratio, abs : T) -> Rel[T] {
 }
 
 ///|
+// The bound is upstream's (`impl<T: NumericLength> From<T> for Rel<T>`,
+// layout/rel.rs:181).
+#warnings("-unused_trait_bound")
 pub fn[T : Numeric] Rel::from_abs(abs : T) -> Rel[T] {
   { rel: Ratio::zero(), abs, }
 }

@@ -76,15 +76,6 @@ fn any_stroke(sides : @library.Sides[@library.FixedStroke?]) -> Bool {
 }
 
 ///|
-/// Upstream `Spacing::Rel(rel) => rel.resolve(styles)` for a relative length.
-fn resolve_rel(
-  rel : @library.Rel[@library.Length],
-  styles : @library.StyleChain,
-) -> @library.Rel[@library.Abs] {
-  rel.resolve(styles)
-}
-
-///|
 /// Upstream `Sizing::from(Smart<Rel>)`.
 fn sizing_from_smart(
   smart : @library.Smart[@library.Rel[@library.Length]],

@@ -9,6 +9,9 @@
 
 ///|
 /// A parsed TOML value.
+// A date-time keeps its text like `toml::Value::Datetime` keeps its value;
+// no manifest field is a date-time, so only its type name is ever used.
+#warnings("-unused_field")
 priv enum TomlValue {
   TString(String)
   TInteger(Int64)

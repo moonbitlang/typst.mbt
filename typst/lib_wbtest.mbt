@@ -185,6 +185,8 @@ impl @library.Output for Growing with fn introspector(self) {
 
 ///|
 /// Produces a delayed error in every iteration.
+// Only used as a type (`Output` is implemented with static methods).
+#warnings("-unused_constructor")
 priv struct Delaying(Unit)
 
 ///|
@@ -208,6 +210,8 @@ impl @library.Output for Delaying with fn introspector(_) {
 
 ///|
 /// Requires the HTML feature.
+// Only used as a type (`Output` is implemented with static methods).
+#warnings("-unused_constructor")
 priv struct HtmlLike(Unit)
 
 ///|

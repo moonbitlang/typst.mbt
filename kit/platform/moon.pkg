@@ -10,6 +10,11 @@ import {
   "moonbitlang/core/debug",
 } for "test"
 
+// `core/buffer` is only used by `platform_wasm.mbt` (wasm and wasm-gc), and
+// moon.pkg has no per-target imports.
+
+warnings = "-unused_package"
+
 options(
   "native-stub": [ "platform_stub.c" ],
   targets: {

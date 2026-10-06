@@ -147,7 +147,7 @@ pub impl Show for Capturer with fn output(self, logger) {
 priv enum BindingKind {
   Normal
   Captured(Capturer)
-} derive(Eq, Hash)
+}
 
 ///|
 /// Documentation metadata for a binding.
@@ -167,7 +167,7 @@ priv struct BindingInfo {
   /// standard library binding is shared by all of its captured copies, and
   /// its documentation is long).
   hash : LazyFingerprint
-} derive(Eq, Hash)
+}
 
 ///|
 /// A bound value with metadata.

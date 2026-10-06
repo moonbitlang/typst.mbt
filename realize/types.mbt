@@ -5,7 +5,6 @@ using @library {
   type Content,
   type StyleChain,
   type Styles,
-  type Style,
   type Engine,
   type Element,
   type Recipe,

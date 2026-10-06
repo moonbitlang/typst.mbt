@@ -31,7 +31,7 @@ priv enum ColorChoice {
   Auto
   Always
   Never
-} derive(Eq)
+}
 
 ///|
 /// The parsed command line arguments.
@@ -45,6 +45,10 @@ priv struct CliArguments {
 
 ///|
 /// What to do.
+// The arguments of `watch` and `completions` are parsed (and validated)
+// like upstream's, but those commands are not supported by this build
+// (README.md); upstream reads them in typst-cli/src/main.rs:72 and :78.
+#warnings("-unused_field")
 priv enum Command {
   /// Compiles an input file into a supported output format.
   Compile(CompileArgs)
@@ -152,6 +156,9 @@ priv struct WorldArgs {
 
 ///|
 /// Arguments for configuration the process of compilation itself.
+// `jobs` only sizes upstream's rayon thread pool
+// (typst-cli/src/world.rs:48); this port is single-threaded.
+#warnings("-unused_field")
 priv struct ProcessArgs {
   jobs : Int?
   features : Array[@library.Feature]
@@ -181,6 +188,9 @@ priv enum Input {
 }
 
 ///|
+// Upstream's `Display` (args.rs:592) is only used for the HTTP server of
+// `watch` (compile.rs:217, `cfg(feature = "http-server")`).
+#warnings("-unused_value")
 fn Input::to_string(self : Input) -> String {
   match self {
     Stdin => "stdin"
@@ -193,9 +203,12 @@ fn Input::to_string(self : Input) -> String {
 priv enum Output {
   Stdout
   Path(String)
-} derive(Eq)
+}
 
 ///|
+// Upstream's `Display` (args.rs:628) is only used by the status of `watch`
+// (watch.rs:131).
+#warnings("-unused_value")
 fn Output::to_string(self : Output) -> String {
   match self {
     Stdout => "stdout"
@@ -228,7 +241,7 @@ priv enum DepsFormat {
   Json
   Zero
   Make
-} derive(Eq)
+}
 
 ///|
 /// The target to compile for.
@@ -236,14 +249,14 @@ priv enum Target {
   Paged
   Html
   Bundle
-} derive(Eq)
+}
 
 ///|
 /// Output file format for query and info commands.
 priv enum SerializationFormat {
   Json
   Yaml
-} derive(Eq)
+}
 
 ///|
 /// Output file format for eval command.
@@ -251,7 +264,7 @@ priv enum EvalSerializationFormat {
   Json
   Yaml
   Raw
-} derive(Eq)
+}
 
 ///|
 let pdf_standard_names : ReadOnlyArray[(String, @library.PdfStandard)] = [
@@ -626,7 +639,10 @@ fn main_spec() -> CommandSpec {
           possible=["auto", "always", "never"],
           help="Whether to use color. When set to `auto`, uses color if the terminal supports it [default: auto] [possible values: auto, always, never]",
         ),
-        kind: LooseValue("always"),
+        // Upstream also sets `default_missing_value = "always"`
+        // (args.rs:70), which clap never applies to an argument that
+        // requires a value.
+        kind: LooseValue,
       },
       opt(
         "cert",

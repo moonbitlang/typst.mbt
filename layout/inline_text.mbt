@@ -128,12 +128,6 @@ fn Utf8Slice::slice(self : Utf8Slice, a : Int, b : Int) -> Utf8Slice {
 }
 
 ///|
-/// Whether the relative offset `i` is a char boundary.
-fn Utf8Slice::is_char_boundary(self : Utf8Slice, i : Int) -> Bool {
-  i == 0 || i == self.len() || self.src.u16[self.start + i] >= 0
-}
-
-///|
 /// The code point starting at relative offset `i`, or `-1`.
 fn Utf8Slice::char_at(self : Utf8Slice, i : Int) -> Int {
   if i >= 0 && i < self.len() {
@@ -177,43 +171,6 @@ fn Utf8Slice::last_char(self : Utf8Slice) -> Int? {
 /// Whether the slice ends with the given char.
 fn Utf8Slice::ends_with_char(self : Utf8Slice, c : Char) -> Bool {
   self.last_char() == Some(c.to_int())
-}
-
-///|
-/// Whether the slice starts with the given char.
-fn Utf8Slice::starts_with_char(self : Utf8Slice, c : Char) -> Bool {
-  self.first_char() == Some(c.to_int())
-}
-
-///|
-/// Whether the slice starts with the given ASCII string.
-fn Utf8Slice::starts_with_ascii(self : Utf8Slice, prefix : String) -> Bool {
-  let n = prefix.length()
-  if n > self.len() {
-    return false
-  }
-  for i in 0..<n {
-    if self.src.cps[self.start + i] != prefix.code_unit_at(i).to_int() {
-      return false
-    }
-  }
-  true
-}
-
-///|
-/// Whether the slice ends with the given ASCII string.
-fn Utf8Slice::ends_with_ascii(self : Utf8Slice, suffix : String) -> Bool {
-  let n = suffix.length()
-  if n > self.len() {
-    return false
-  }
-  let base = self.end - n
-  for i in 0..<n {
-    if self.src.cps[base + i] != suffix.code_unit_at(i).to_int() {
-      return false
-    }
-  }
-  true
 }
 
 ///|

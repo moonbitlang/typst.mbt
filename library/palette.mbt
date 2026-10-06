@@ -367,6 +367,10 @@ fn Xyz::from_linear_rgb(r : Float, g : Float, b : Float) -> Xyz {
 }
 
 ///|
+// palette's `FromColorUnclamped<Xyz> for Rgb` (src/rgb/rgb.rs:845) is only
+// reached for RGB spaces other than sRGB (rgb.rs:840, :1025), which Typst
+// does not use.
+#warnings("-unused_value")
 fn Xyz::to_linear_rgb(self : Xyz) -> (Float, Float, Float) {
   mul3(srgb_xyz_to_rgb, (self.x, self.y, self.z))
 }

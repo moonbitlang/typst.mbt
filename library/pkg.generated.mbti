@@ -11373,7 +11373,7 @@ pub impl Fingerprint for Transformation
 pub impl FromValue for Transformation
 pub impl Reflect for Transformation
 
-pub struct Ty[T](Unit)
+pub struct Ty[_](Unit)
 pub fn[T] Ty::new() -> Self[T]
 
 pub struct Type(NativeTypeData)

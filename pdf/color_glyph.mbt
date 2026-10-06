@@ -129,7 +129,6 @@ priv struct ColrSurfacePainter {
   mut path : @export.Path?
   mut transform : @otf.Transform
   transforms : Array[@otf.Transform]
-  context_color : Int
 }
 
 ///|
@@ -142,7 +141,7 @@ fn rgba_color(c : @otf.RgbaColor) -> (@export.Color, Double) {
 
 ///|
 fn ColrSurfacePainter::stops(
-  self : ColrSurfacePainter,
+  _self : ColrSurfacePainter,
   iter : @otf.GradientStopsIter,
 ) -> Array[@export.Stop] {
   let out = []
@@ -326,7 +325,6 @@ fn draw_colr_glyph(
     path: None,
     transform: @otf.Transform::default(),
     transforms: [],
-    context_color,
   }
   let foreground = @otf.RgbaColor::new(
     ((context_color >> 16) & 0xFF).to_byte(),

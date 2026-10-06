@@ -38,7 +38,7 @@ fn SidesMut::to_array(self : SidesMut) -> Array[PrioritzedStroke] {
 priv struct PrioritzedStroke {
   stroke : @library.ResolvedStroke?
   priority : StrokePriority
-} derive(Eq)
+}
 
 ///|
 priv enum StrokePriority {
