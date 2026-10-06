@@ -256,3 +256,13 @@ test "oracle: fields: an external field is not a field of the element" {
   ]
   assert_eq(oracle_metadata(source), expected)
 }
+
+///|
+test "oracle: packages: a float without an alignment keeps the vertical alignment of its content" {
+  let source = "// charged-ieee: a table in `figure(placement: auto)`. The body of a float\n// is laid out with `Alignment::CENTER` if its alignment is `auto`\n// (`PlacedChild::layout`), which is horizontal only: boxes and cells keep\n// the inherited vertical alignment.\n#set page(width: 200pt, height: 200pt, margin: 20pt)\n#let at(label) = context metadata(repr(locate(label).position()))\n#let mark(name) = box(width: 6pt, height: 6pt)[#metadata(name)#label(name)]\n#place(auto, float: true, box(width: 60pt, height: 40pt, mark(\"a\")))\n#place(top, float: true, box(width: 60pt, height: 40pt, mark(\"b\")))\n#place(auto, float: true, grid(columns: 2, mark(\"c\"), box(width: 6pt, height: 30pt)))\n#[\n  #set align(bottom)\n  #place(auto, float: true, box(width: 60pt, height: 40pt, mark(\"d\")))\n  #place(auto, float: true, table(columns: 2, mark(\"e\"), box(width: 6pt, height: 30pt)))\n]\n#at(<a>) #at(<b>) #at(<c>) #at(<d>) #at(<e>)\n"
+  let expected = [
+    "a", "b", "c", "d", "e", "(page: 1, x: 97pt, y: 20pt)", "(page: 1, x: 20pt, y: 76.5pt)",
+    "(page: 1, x: 94pt, y: 150pt)", "(page: 2, x: 97pt, y: 54pt)", "(page: 2, x: 89pt, y: 105.5pt)",
+  ]
+  assert_eq(oracle_metadata(source), expected)
+}

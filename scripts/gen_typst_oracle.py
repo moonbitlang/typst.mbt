@@ -33,6 +33,9 @@ document title of the HTML export (the plain text of the title's content).
 - `fields`: a field that upstream marks `#[external]` (the `body` of `text`
   and `page`, which is also `#[required]`) is documentation only: the
   element has no such field for `has`, `at` and field access.
+- `packages`: reductions of what the `packages` stage found (documents that
+  use real packages, tests/packages): each case is the engine behaviour a
+  package relied on, without the package.
 
 Usage: python3 scripts/gen_typst_oracle.py <path to upstream typst binary>
        (then `moon fmt`)
@@ -525,6 +528,27 @@ y
 #metadata(repr((h.has("body"), h.has("level"), h.has("numbering"), h.fields().keys())))
 #metadata(repr((r.has("text"), r.has("lang"), r.has("lines"), r.fields().keys())))
 #metadata(repr((text(red)[a].func(), text(red)[a].has("body"), text(red)[a].has("child"))))
+""",
+    ),
+    (
+        "packages: a float without an alignment keeps the vertical alignment of its content",
+        "metadata",
+        r"""// charged-ieee: a table in `figure(placement: auto)`. The body of a float
+// is laid out with `Alignment::CENTER` if its alignment is `auto`
+// (`PlacedChild::layout`), which is horizontal only: boxes and cells keep
+// the inherited vertical alignment.
+#set page(width: 200pt, height: 200pt, margin: 20pt)
+#let at(label) = context metadata(repr(locate(label).position()))
+#let mark(name) = box(width: 6pt, height: 6pt)[#metadata(name)#label(name)]
+#place(auto, float: true, box(width: 60pt, height: 40pt, mark("a")))
+#place(top, float: true, box(width: 60pt, height: 40pt, mark("b")))
+#place(auto, float: true, grid(columns: 2, mark("c"), box(width: 6pt, height: 30pt)))
+#[
+  #set align(bottom)
+  #place(auto, float: true, box(width: 60pt, height: 40pt, mark("d")))
+  #place(auto, float: true, table(columns: 2, mark("e"), box(width: 6pt, height: 30pt)))
+]
+#at(<a>) #at(<b>) #at(<c>) #at(<d>) #at(<e>)
 """,
     ),
 ]
