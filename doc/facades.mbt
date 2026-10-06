@@ -67,6 +67,84 @@ pub impl ToValue for Paint with fn to_value(self) {
 }
 
 ///|
+/// One length of a dash pattern.
+pub(all) enum DashLen {
+  /// A length equal to the thickness of the line (`"dot"`).
+  Dot
+  /// A length.
+  Len(Length)
+}
+
+///|
+pub impl ToValue for DashLen with fn to_value(self) {
+  match self {
+    Dot => Value::str("dot")
+    Len(length) => length.to_value()
+  }
+}
+
+///|
+/// The dash pattern of a stroke: Typst's predefined patterns by their
+/// names, or the lengths of the dashes and gaps.
+pub(all) enum Dash {
+  /// Explicit `auto`: the pattern is inherited (by default, none).
+  Auto
+  /// Explicit `none`: no pattern.
+  None
+  /// `"solid"`: the empty pattern (a solid line, but not `none`: the
+  /// stroke has a pattern, which is not inherited).
+  Solid
+  /// `"dotted"`.
+  Dotted
+  /// `"densely-dotted"`.
+  DenselyDotted
+  /// `"loosely-dotted"`.
+  LooselyDotted
+  /// `"dashed"`.
+  Dashed
+  /// `"densely-dashed"`.
+  DenselyDashed
+  /// `"loosely-dashed"`.
+  LooselyDashed
+  /// `"dash-dotted"`.
+  DashDotted
+  /// `"densely-dash-dotted"`.
+  DenselyDashDotted
+  /// `"loosely-dash-dotted"`.
+  LooselyDashDotted
+  /// Alternating lengths of dashes and gaps, and where in the pattern the
+  /// line starts: `(array: (10pt, 5pt, "dot", 5pt), phase: 10pt)`.
+  Pattern(Array[DashLen], phase~ : Length)
+  /// Any value the field accepts (a pattern name as a string, an array, a
+  /// dictionary).
+  RawValue(Value)
+}
+
+///|
+pub impl ToValue for Dash with fn to_value(self) {
+  match self {
+    Auto => Value::auto()
+    None => Value::none()
+    Solid => Value::str("solid")
+    Dotted => Value::str("dotted")
+    DenselyDotted => Value::str("densely-dotted")
+    LooselyDotted => Value::str("loosely-dotted")
+    Dashed => Value::str("dashed")
+    DenselyDashed => Value::str("densely-dashed")
+    LooselyDashed => Value::str("loosely-dashed")
+    DashDotted => Value::str("dash-dotted")
+    DenselyDashDotted => Value::str("densely-dash-dotted")
+    LooselyDashDotted => Value::str("loosely-dash-dotted")
+    Pattern(array, phase~) =>
+      Value::dict([
+        ("array", Value::array(array.map(length => length.to_value()))),
+        ("phase", phase.to_value()),
+      ])
+    RawValue(value) => value
+  }
+}
+
+///|
 /// A stroke (`stroke(paint: .., thickness: .., ..)`).
 pub struct Stroke {
   priv value : Value
@@ -78,7 +156,7 @@ pub fn Stroke::Stroke(
   thickness? : Length,
   cap? : String,
   join? : String,
-  dash? : Value,
+  dash? : Dash,
   miter_limit? : Double,
 ) -> Stroke {
   let named : Array[(String, Value)] = []
@@ -95,7 +173,7 @@ pub fn Stroke::Stroke(
     named.push(("join", Value::str(v)))
   }
   if dash is Some(v) {
-    named.push(("dash", v))
+    named.push(("dash", v.to_value()))
   }
   if miter_limit is Some(v) {
     named.push(("miter-limit", Value::float(v)))

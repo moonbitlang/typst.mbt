@@ -425,6 +425,30 @@ pub impl @builtin.Show for CurveView
 pub impl @debug.Debug for CurveView
 pub impl IntoContent for CurveView
 
+pub(all) enum Dash {
+  Auto
+  None
+  Solid
+  Dotted
+  DenselyDotted
+  LooselyDotted
+  Dashed
+  DenselyDashed
+  LooselyDashed
+  DashDotted
+  DenselyDashDotted
+  LooselyDashDotted
+  Pattern(Array[DashLen], phase~ : Length)
+  RawValue(Value)
+}
+pub impl ToValue for Dash
+
+pub(all) enum DashLen {
+  Dot
+  Len(Length)
+}
+pub impl ToValue for DashLen
+
 pub struct Diagnostic {
   severity : Severity
   message : String
@@ -2405,7 +2429,7 @@ pub impl IntoContent for StrikeView
 pub struct Stroke {
   // private fields
 }
-pub fn Stroke::Stroke(paint? : Paint, thickness? : Length, cap? : String, join? : String, dash? : Value, miter_limit? : Double) -> Self
+pub fn Stroke::Stroke(paint? : Paint, thickness? : Length, cap? : String, join? : String, dash? : Dash, miter_limit? : Double) -> Self
 pub fn Stroke::auto() -> Self
 pub fn Stroke::none() -> Self
 pub impl ToValue for Stroke

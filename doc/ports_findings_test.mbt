@@ -635,40 +635,50 @@ test "T2: `top_edge` and `bottom_edge` are typed; `extra` still reaches them" {
 }
 
 ///|
-test "T3: the dash of a `Stroke` is a `Value`" {
-  let report = compile(
-    [
-      ..small_page(),
-      @doc.Line(
-        length=Pt(50),
-        stroke=@doc.Stroke(thickness=Pt(1), dash=@doc.Value::str("dotted")),
-      ),
-      @doc.Line(
-        length=Pt(50),
-        stroke=@doc.Stroke(
-          thickness=Pt(1),
-          dash=@doc.Value::array([
-            @doc.Value::length(Pt(4)),
-            @doc.Value::length(Pt(2)),
-          ]),
+test "T3: the dash of a `Stroke` is a `Dash`; a `Value` goes through `RawValue`" {
+  let lines = (first : @doc.Dash, second : @doc.Dash) => {
+    let report = compile(
+      [
+        ..small_page(),
+        @doc.Line(
+          length=Pt(50),
+          stroke=@doc.Stroke(thickness=Pt(1), dash=first),
         ),
-      ),
-    ],
-  )
-  inspect(error_messages(report), content="")
-  // `"dotted"` is a dash as long as the line is wide (1pt) and a gap of
-  // 2pt.
+        @doc.Line(
+          length=Pt(50),
+          stroke=@doc.Stroke(thickness=Pt(1), dash=second),
+        ),
+      ],
+    )
+    if !report.errors.is_empty() {
+      fail(error_messages(report))
+    }
+    listing(marks(report))
+  }
+  // `Dotted` is a dash as long as the line is wide (1pt) and a gap of 2pt.
   inspect(
-    listing(marks(report)),
+    lines(Dotted, Pattern([Len(Pt(4)), Len(Pt(2))], phase=Pt(0))),
     content=(
       #|p1 line 10.0,10.0 50.0x0.0 dash 1.0 2.0
       #|p1 line 10.0,22.0 50.0x0.0 dash 4.0 2.0
     ),
   )
-  // A name that is no dash pattern is an error when the document is
-  // compiled, at the argument that holds the stroke.
+  // What the ports wrote while the parameter was a `Value` is the case
+  // `RawValue` now (`dash=Value::str(..)` no longer type-checks).
+  assert_eq(
+    lines(
+      RawValue(@doc.Value::str("dotted")),
+      RawValue(
+        @doc.Value::array([@doc.Value::length(Pt(4)), @doc.Value::length(Pt(2))]),
+      ),
+    ),
+    lines(Dotted, Pattern([Len(Pt(4)), Len(Pt(2))], phase=Pt(0))),
+  )
+  // The typed cases have no wrong names. An untyped name that is no dash
+  // pattern is an error when the document is compiled, at the argument
+  // that holds the stroke.
   let wrong = compile([
-    @doc.Line(stroke=@doc.Stroke(dash=@doc.Value::str("dots"))),
+    @doc.Line(stroke=@doc.Stroke(dash=RawValue(@doc.Value::str("dots")))),
   ])
   inspect(
     error_messages(wrong),

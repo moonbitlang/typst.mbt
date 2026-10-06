@@ -421,3 +421,122 @@ test "`top_edge` and `bottom_edge` lower to the engine's names" {
   )
   inspect(origin_of(ratio.errors[0]).kind, content="Highlight")
 }
+
+///|
+test "`Stroke(dash=)`: states, presets, patterns and the untyped escape" {
+  let stroke = (dash : @doc.Dash) => {
+    lowered([@doc.Line(stroke=@doc.Stroke(thickness=Pt(1), dash~))])
+  }
+  let cases : Array[(String, @doc.Dash)] = [
+    ("Auto", Auto),
+    ("None", None),
+    ("Solid", Solid),
+    ("Dotted", Dotted),
+    ("DenselyDotted", DenselyDotted),
+    ("LooselyDotted", LooselyDotted),
+    ("Dashed", Dashed),
+    ("DenselyDashed", DenselyDashed),
+    ("LooselyDashed", LooselyDashed),
+    ("DashDotted", DashDotted),
+    ("DenselyDashDotted", DenselyDashDotted),
+    ("LooselyDashDotted", LooselyDashDotted),
+    (
+      "Pattern",
+      Pattern([Len(Pt(10)), Len(Pt(5)), Dot, Len(Em(1))], phase=Pt(3)),
+    ),
+    ("RawValue", RawValue(@doc.Value::str("dotted"))),
+  ]
+  inspect(
+    cases.map(pair => "\{pair.0}: \{stroke(pair.1)}").join("\n"),
+    content=(
+      #|Auto: line(stroke: 1pt)
+      #|None: line(stroke: (thickness: 1pt, dash: none))
+      #|Solid: line(
+      #|  stroke: (thickness: 1pt, dash: (array: (), phase: 0pt)),
+      #|)
+      #|Dotted: line(
+      #|  stroke: (thickness: 1pt, dash: (array: ("dot", 2pt), phase: 0pt)),
+      #|)
+      #|DenselyDotted: line(
+      #|  stroke: (thickness: 1pt, dash: (array: ("dot", 1pt), phase: 0pt)),
+      #|)
+      #|LooselyDotted: line(
+      #|  stroke: (thickness: 1pt, dash: (array: ("dot", 4pt), phase: 0pt)),
+      #|)
+      #|Dashed: line(
+      #|  stroke: (thickness: 1pt, dash: (array: (3pt, 3pt), phase: 0pt)),
+      #|)
+      #|DenselyDashed: line(
+      #|  stroke: (thickness: 1pt, dash: (array: (3pt, 2pt), phase: 0pt)),
+      #|)
+      #|LooselyDashed: line(
+      #|  stroke: (thickness: 1pt, dash: (array: (3pt, 6pt), phase: 0pt)),
+      #|)
+      #|DashDotted: line(
+      #|  stroke: (thickness: 1pt, dash: (array: (3pt, 2pt, "dot", 2pt), phase: 0pt)),
+      #|)
+      #|DenselyDashDotted: line(
+      #|  stroke: (thickness: 1pt, dash: (array: (3pt, 1pt, "dot", 1pt), phase: 0pt)),
+      #|)
+      #|LooselyDashDotted: line(
+      #|  stroke: (thickness: 1pt, dash: (array: (3pt, 4pt, "dot", 4pt), phase: 0pt)),
+      #|)
+      #|Pattern: line(
+      #|  stroke: (thickness: 1pt, dash: (array: (10pt, 5pt, "dot", 1em), phase: 3pt)),
+      #|)
+      #|RawValue: line(
+      #|  stroke: (thickness: 1pt, dash: (array: ("dot", 2pt), phase: 0pt)),
+      #|)
+    ),
+  )
+  // Each preset is the Typst string of its name.
+  let names : Array[(@doc.Dash, String)] = [
+    (Solid, "solid"),
+    (Dotted, "dotted"),
+    (DenselyDotted, "densely-dotted"),
+    (LooselyDotted, "loosely-dotted"),
+    (Dashed, "dashed"),
+    (DenselyDashed, "densely-dashed"),
+    (LooselyDashed, "loosely-dashed"),
+    (DashDotted, "dash-dotted"),
+    (DenselyDashDotted, "densely-dash-dotted"),
+    (LooselyDashDotted, "loosely-dash-dotted"),
+  ]
+  for pair in names {
+    assert_eq(stroke(pair.0), stroke(RawValue(@doc.Value::str(pair.1))))
+  }
+  // What scripts passed while the parameter was a `Value`.
+  assert_eq(
+    stroke(Pattern([Len(Pt(4)), Dot], phase=Pt(0))),
+    stroke(
+      RawValue(
+        @doc.Value::array([@doc.Value::length(Pt(4)), @doc.Value::str("dot")]),
+      ),
+    ),
+  )
+  // An invalid pattern is Typst's cast error, at the stroke's argument.
+  let invalid = compile([
+    @doc.Line(stroke=@doc.Stroke(dash=Pattern([Len(Pct(50))], phase=Pt(0)))),
+  ])
+  inspect(
+    error_messages(invalid),
+    content=(
+      #|expected "dot" or length, found ratio
+    ),
+  )
+  inspect(
+    origin_arg(invalid.errors[0]),
+    content=(
+      #|Line, argument 4
+    ),
+  )
+  let unknown = compile([
+    @doc.Line(stroke=@doc.Stroke(dash=RawValue(@doc.Value::str("wavy")))),
+  ])
+  inspect(
+    error_messages(unknown),
+    content=(
+      #|expected "solid", "dotted", "densely-dotted", "loosely-dotted", "dashed", "densely-dashed", "loosely-dashed", "dash-dotted", "densely-dash-dotted", "loosely-dash-dotted", array, dictionary, none, or auto
+    ),
+  )
+}

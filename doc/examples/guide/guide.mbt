@@ -140,7 +140,7 @@ pub fn untyped_fields() -> Seq {
   Seq([
     Par(Highlight("tight", extra=edges)),
     Par(Seq(["A chip ", Box("moved down", fill=Luma(230), extra=lowered)])),
-    Line(length=Pt(60), stroke=Stroke(dash=Value::str("dotted"))),
+    Line(length=Pt(60), stroke=Stroke(dash=RawValue(Value::str("dotted")))),
     Rect(width=Pt(20), height=Pt(10), fill=Paint::Value(half)),
   ])
 }
