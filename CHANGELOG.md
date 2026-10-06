@@ -47,6 +47,11 @@ Typst source) are unchanged.
 - `library`: the `pub(all)` structs `Closure` and `Tiling` have a new field
   each (`hash`, `frame_hash`, both `LazyFingerprint`); code that builds them
   with a struct literal must supply it (`LazyFingerprint::new()`).
+- `library`: the `pub(all)` struct `BindingDocumentation` has two new
+  fields, `since : Since?` and `keywords : ArrayView[String]` (upstream's
+  `since` and `keywords`); code that builds one with a struct literal
+  must supply them. The bindings of the standard library now carry their
+  documentation (they had none), which changes their fingerprints.
 - `hayro/interpret`: `GraphicsState` and `TextState`, `hayro/svg`:
   `SvgRenderer`, `otf`: `CffIndex` are no longer exported. They were
   abstract types that no public function accepted or returned.
@@ -86,6 +91,15 @@ deriving it.
   `Paint`, `ProcessColor`, `Scope`, `Shape`, `SpotColorant`, `Stroke`,
   `Symbol`, `TextItem`, `Tiling`, `Transform`; `NodeHasher` for
   `SipHasher128`; `Tiling::frame_fingerprint_flags`.
+- `library`: `Since` (when a feature was introduced: `Forever`,
+  `Version(major, minor, patch)`, `Unreleased`; castable like upstream);
+  the field `since` on `NativeFuncData`, `NativeTypeData` and
+  `ElementData`, `keywords` on `NativeTypeData`, and the optional
+  parameters `since` / `keywords` of `NativeFuncData::new`,
+  `NativeTypeData::new`, `Element::new`; `Type::since`, `Type::keywords`,
+  `Element::since`, `Element::keywords`; `Binding::is_documented`,
+  `name`, `title`, `docs`, `since`, `keywords`;
+  `BindingDocumentation::from_func`, `from_type`, `from_elem`.
 - `read_fonts`: the `hdmx` table: `FontRef::hdmx`; `Hdmx` (`read`,
   `version`, `num_records`, `size_device_record`, `record_for_size`);
   `DeviceRecord` (fields and accessors `pixel_size`, `max_width`,
