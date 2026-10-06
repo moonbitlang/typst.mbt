@@ -5,7 +5,7 @@
 ///|
 /// Applies a row filter, writing the filtered row into `output[1..]`
 /// (upstream `filter_internal`; filter codes: 1 = Sub, 2 = Up, 3 = Avg, 4 =
-/// Paeth), and computes [sum_buffer] of the output, giving up
+/// Paeth), and computes upstream's `sum_buffer` of the output, giving up
 /// (with a partially filtered row) once the cost exceeds `limit`.
 /// Specialized loops without bounds checks (performance; same results): the
 /// guard checks `current[0..len]`, `previous[0..len]` and
