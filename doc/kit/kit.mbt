@@ -1,0 +1,51 @@
+// The kit: elements that are not one Typst element (docs/edsl-ports.md,
+// section 4). What the first element, `Cards`, settled for the ones that
+// follow:
+//
+// 1. An element is an expansion. It is defined by the constructors of
+//    `doc` that it expands to, and its documentation says which. It has no
+//    behaviour of its own in the engine: what a `set` or `show` rule of the
+//    document does to the element's primitives, it does to the element.
+//
+// 2. Names and parameters. An element is a type with a constructor of its
+//    name (`Cards(..)`), like the elements of `doc`, and it is content
+//    (`IntoContent`, interpolation into `Prose`, `Debug`). Its parameters
+//    have the names, the types and the defaults of the parameters of the
+//    primitives that they are passed to (`columns`, `gutter`, `fill`,
+//    `stroke`, `inset`), in the type of the primitive that draws them. A
+//    default differs from the primitive's only where the default is the
+//    reason the element exists, and the documentation says so. An element
+//    has no parameter for a fixed height, no `extra` and no `label`
+//    (`Labelled(element, ..)` labels what it expands to).
+//
+// 3. Provenance: `@doc.Composite`. The constructor takes `loc~` and
+//    `args_loc~` (`#callsite(autofill(loc, args_loc))`) and builds
+//    everything inside the hook's `build`, so that the element is one call
+//    site. Every argument of the caller that is passed on to a constructor
+//    is marked where it is passed, `site.arg(i, v)`, with `i` the index of
+//    the parameter in the element's declaration: text of the caller
+//    resolves to its argument, an error in a value is reported at its
+//    argument, and what the element generates is the call. A part that is
+//    built per item of the caller's data is wrapped in `Keyed` with the
+//    item's index, so that the parts are distinct occurrences.
+//
+// 4. Measuring. An element measures only where the engine cannot do the
+//    work (`Cards` does not: the grid makes the cells of a row equally
+//    high).
+//
+// 5. Invalid arguments. Constructors do not raise. An argument that the
+//    element cannot accept is `site.invalid(message)`: an error at the
+//    call when the document is compiled. What the engine rejects (a value
+//    of the wrong kind) is the engine's error, at the argument.
+//
+// 6. Twin. An element has a functional Typst twin: a Typst function with
+//    the same expansion (`doc/twins/kit.mbt`), and documents that use both
+//    are pairs of the `edsl` stage (structure, frames with memoization on
+//    and off, SVG, PDF, PNG). The function passes on only the arguments
+//    that it was given, as the element does.
+//
+// 7. Tests (`<element>_test.mbt`): the expansion (the lowered content is
+//    that of the primitives written out); the property the element exists
+//    for, from the frames; provenance through the review loop (a string of
+//    the caller, a description of the caller, what the element generates,
+//    an error in every forwarded argument at that argument's index, keys).

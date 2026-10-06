@@ -1,0 +1,14 @@
+// Elements that are not one Typst element (docs/edsl-ports.md, section 4),
+// each defined by an expansion into constructors of `doc` through its
+// public hook, `@doc.Composite`. This package imports `doc` only (and
+// core), and nothing in `doc` imports it. The conventions are in `kit.mbt`.
+
+import {
+  "moonbitlang/typst/doc",
+  "moonbitlang/core/debug",
+}
+
+import {
+  "moonbitlang/typst/library",
+  "moonbitlang/typst/layout",
+} for "test"
