@@ -811,3 +811,39 @@ test "`Upper` and `Lower` set the case of content" {
     ),
   )
 }
+
+///|
+test "`Sides::zero` is `0pt` on all sides; an inset has no `none`" {
+  assert_eq(
+    lowered([@doc.Block("x", inset=@doc.Sides::zero())]),
+    lowered([@doc.Block("x", inset=@doc.Sides(all=Pt(0)))]),
+  )
+  inspect(
+    lowered([
+      @doc.Block("x", inset=@doc.Sides::zero(), outset=@doc.Sides::zero()),
+    ]),
+    content=(
+      #|block(inset: 0% + 0pt, outset: 0% + 0pt, body: [x])
+    ),
+  )
+  let page = compile([@doc.SetPage(margin=@doc.Sides::zero()), "x"])
+  inspect(error_messages(page), content="")
+  let pad = compile([
+    @doc.Table(["a"], inset=@doc.Cells::all(@doc.Sides::zero())),
+  ])
+  inspect(error_messages(pad), content="")
+  // An inset has no `none`: Typst's cast error, at the argument.
+  let none = compile([@doc.Block("x", inset=@doc.Sides::none())])
+  inspect(
+    error_messages(none),
+    content=(
+      #|expected relative length or dictionary, found none
+    ),
+  )
+  inspect(
+    origin_arg(none.errors[0]),
+    content=(
+      #|Block, argument 7
+    ),
+  )
+}

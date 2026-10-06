@@ -938,13 +938,18 @@ test "T8: `Sides::none()` as an inset is an error at the argument" {
       #|(SetPage, argument 5)
     ),
   )
-  // No inset is a length of zero.
+  // No inset is a length of zero: `Sides::zero()`, which is
+  // `Sides(all=Pt(0))`.
   let zero = compile(
+    [..small_page(), @doc.Block("a", inset=@doc.Sides::zero(), fill=Luma(220))],
+  )
+  let written_out = compile(
     [
       ..small_page(),
       @doc.Block("a", inset=@doc.Sides(all=Pt(0)), fill=Luma(220)),
     ],
   )
+  assert_eq(listing(marks(written_out)), listing(marks(zero)))
   inspect(
     listing(marks(zero)),
     content=(

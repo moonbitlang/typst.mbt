@@ -2288,6 +2288,7 @@ pub struct Sides[T] {
 pub fn[T] Sides::Sides(all? : T, x? : T, y? : T, left? : T, top? : T, right? : T, bottom? : T, rest? : T) -> Self[T]
 pub fn[T] Sides::auto() -> Self[T]
 pub fn[T] Sides::none() -> Self[T]
+pub fn Sides::zero() -> Self[Length]
 pub impl[T : ToValue] ToValue for Sides[T]
 
 pub struct Size {

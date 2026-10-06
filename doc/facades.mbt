@@ -500,6 +500,14 @@ pub fn[T] Sides::none() -> Sides[T] {
 }
 
 ///|
+/// No inset, outset, padding or margin: `0pt` on all sides
+/// (`Sides(all=Pt(0))`). An inset is a length on each side and has no
+/// `none`: `Sides::none()` there is Typst's cast error.
+pub fn Sides::zero() -> Sides[Length] {
+  { all: Some(Pt(0)), sides: [], state: Option::None, }
+}
+
+///|
 pub impl[T : ToValue] ToValue for Sides[T] with fn to_value(self) {
   if self.state is Some(state) {
     return state
