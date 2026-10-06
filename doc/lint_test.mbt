@@ -52,6 +52,19 @@ test "lint L1: neighbours that are text, in an array that holds a block" {
   assert_eq(with_block(@doc.Align(Center, "x")), 1)
   assert_eq(with_block(@doc.Heading("x", label="h")), 1)
   assert_eq(with_block(@doc.Keyed("k", @doc.Block("x"))), 1)
+  // A block under rules of its own (`[#set ..;#table(..)]`) is that block
+  // in the flow: what an element is that gives its block a rule.
+  let own : Array[&@doc.IntoContent] = [
+    @doc.SetText(size=Pt(8)),
+    @doc.ShowSet(@doc.Select::strong(), @doc.SetText(fill=Red)),
+    @doc.Table(["x"]),
+  ]
+  assert_eq(with_block(@doc.Seq(own)), 1)
+  assert_eq(with_block(@doc.Seq([@doc.SetText(size=Pt(8)), "inline"])), 0)
+  assert_eq(
+    with_block(@doc.Seq([@doc.SetText(size=Pt(8)), "x", @doc.Table(["x"])])),
+    0,
+  )
   // What is no block is no evidence: inline content, and what the lint
   // does not look into.
   assert_eq(with_block(@doc.Raw("x")), 0)

@@ -217,6 +217,10 @@ upstream) for `Decimal`, `HtmlAttr`, `HtmlTag`, `Location`, `PdfStandards`,
   description takes as a cell of a table (`None` for a child that a table
   does not place in its row): what `DataTable` counts with, since a
   description is opaque outside `doc`.
+- `doc`: for the lint of adjacent text and for the text after a block in
+  a `Para`, a sequence of rules and then one block is that block (it was
+  inline content, like every other sequence): an element that gives its
+  block a rule of its own, like `DataTable`, is a block.
 
 ### Not a change for users
 

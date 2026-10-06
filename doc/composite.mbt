@@ -427,24 +427,45 @@ fn table_child_kind(func : FuncRef) -> String {
 }
 
 ///|
+/// A span of a cell as an `Int`: at least 1 (the engine rejects less, at
+/// the cell) and at most the largest `Int`.
+fn span_of(span : Int64) -> Int {
+  if span < 1L {
+    1
+  } else if span > 0x7fffffffL {
+    0x7fffffff
+  } else {
+    span.to_int()
+  }
+}
+
+///|
 /// `Content::table_cell_spans` of a call of `func` with `args`.
 fn call_spans(func : FuncRef, args : Array[ArgNode]) -> (Int, Int)? {
   match table_child_kind(func) {
     "cell" => {
-      // (The last argument of a name wins, as in Typst.)
+      // The last argument of a name wins, as in Typst: also one that the
+      // description does not show as an integer, which is 1 here.
+      let span = (value : Value) => {
+        match value.val {
+          VInt(span) => span_of(span)
+          _ => 1
+        }
+      }
       let mut colspan = 1
       let mut rowspan = 1
-      let mut placed = false
+      let mut x = false
+      let mut y = false
       for arg in args {
-        match (arg.name, arg.value.val) {
-          (Some("colspan"), VInt(n)) => colspan = n.to_int()
-          (Some("rowspan"), VInt(n)) => rowspan = n.to_int()
-          (Some("x"), VAuto) | (Some("y"), VAuto) => ()
-          (Some("x"), _) | (Some("y"), _) => placed = true
+        match arg.name {
+          Some("colspan") => colspan = span(arg.value)
+          Some("rowspan") => rowspan = span(arg.value)
+          Some("x") => x = !(arg.value.val is VAuto)
+          Some("y") => y = !(arg.value.val is VAuto)
           _ => ()
         }
       }
-      if placed {
+      if x || y {
         Option::None
       } else {
         Some((colspan, rowspan))
@@ -456,23 +477,64 @@ fn call_spans(func : FuncRef, args : Array[ArgNode]) -> (Int, Int)? {
 }
 
 ///|
+/// `Content::table_cell_spans` of content of the engine (a view): its
+/// element and its fields.
+fn engine_spans(content : @library.Content) -> (Int, Int)? {
+  let elem = content.elem()
+  if elem == @library.table_h_line_elem() ||
+    elem == @library.table_v_line_elem() ||
+    elem == @library.table_header_elem() ||
+    elem == @library.table_footer_elem() {
+    return Option::None
+  }
+  guard elem == @library.table_cell_elem() else { return Some((1, 1)) }
+  // (A field that is not set is not an integer.)
+  let field = (name : String) => {
+    let value : @library.Value = content.field_by_name(name) catch {
+      _ => @library.Value::Auto
+    }
+    match value {
+      Int(n) => Some(n)
+      _ => Option::None
+    }
+  }
+  // A cell that a table has placed has its position as fields: emitted
+  // again, it is a cell with that position.
+  guard field("x") is Option::None && field("y") is Option::None else {
+    return Option::None
+  }
+  Some(
+    (
+      span_of(field("colspan").unwrap_or(1L)),
+      span_of(field("rowspan").unwrap_or(1L)),
+    ),
+  )
+}
+
+///|
 /// The columns and the rows that a description takes as a child of a
-/// `Table` that places it after the child before it, as far as the
-/// description says:
+/// `Table` that places it after the child before it:
 ///
 /// - `Some((colspan, rowspan))` for a `TableCell` without an `x` or a `y`
 ///   (a span is 1 unless the cell names it), also under `Keyed`, with a
-///   label, and as what an element is made of (a [Composite]);
-/// - `Some((1, 1))` for everything else that a table makes a cell of: a
-///   string, another element, a sequence, a callback;
+///   label, as the only child of a `Seq` (a sequence of one is its child),
+///   as what an element is made of (a [Composite]), and as a view of a
+///   cell;
 /// - `None` for a child that a table does not place that way: a
 ///   `TableCell` with an `x` or a `y`, and a `TableHline`, a `TableVline`,
-///   a `TableHeader` or a `TableFooter`, which are not cells.
+///   a `TableHeader` or a `TableFooter`, which are not cells;
+/// - `Some((1, 1))` for every other description: what a table makes a
+///   cell of (a string, an element, a sequence, a callback, whatever it
+///   returns), and what it rejects, which is the engine's error (a
+///   `GridCell`).
 ///
-/// It reads the description, not the document: a cell that only the engine
-/// sees (the result of a callback or of `Markup`, a view) is one column
-/// and one row, and so is a span that is not an integer of the description
-/// (a computed value in `extra`) or that a rule of the document sets.
+/// It reads the description, and three things are not in it. A `Markup`
+/// is evaluated when the document is compiled: it is one column and one
+/// row here, which it is unless its source is nothing but one
+/// `table.cell(..)` with a span. A span that is not an integer of the
+/// description (a computed value in `extra`) is 1. And a rule of the
+/// document that gives cells a span or a position (`set table.cell(..)`)
+/// is not seen.
 ///
 /// For packages of elements (`doc/kit`), to which a description is opaque:
 /// an element that takes the cells of a table by rows checks with it that
@@ -481,9 +543,14 @@ pub fn Content::table_cell_spans(self : Content) -> (Int, Int)? {
   match self.node {
     NKeyed(_, body) | NLabelled(body, _, _, _) | NComposite(body, _) =>
       body.table_cell_spans()
+    // A sequence of one piece of content lowers to that piece (and a rule
+    // has nothing after it to style).
+    NSeq([only], _) if rule_of(only) is Option::None => only.table_cell_spans()
     NCall(call) => call_spans(call.func, call.args)
     NValue({ val: VContent(body), }) => body.table_cell_spans()
     NValue({ val: VCall(func, args), }) => call_spans(func, args)
+    NValue({ val: VEngine(Content(content)), }) | NEngine(content) =>
+      engine_spans(content)
     _ => Some((1, 1))
   }
 }
