@@ -306,7 +306,7 @@ def gen_pdf_fonts():
         for i in range(0, len(b64), 96):
             out.append("  #|%s\n" % b64[i : i + 96])
         out.append("\n")
-        out.append("///|\nlet %s_cell : Ref[Bytes?] = Ref::new(None)\n\n" % name)
+        out.append("///|\nlet %s_cell : Ref[Bytes?] = Ref(None)\n\n" % name)
         out.append(
             "///|\n/// %s\npub fn %s() -> Bytes {\n  load(%s_cell, %s_base64)\n}\n\n"
             % (doc, name, name, name)

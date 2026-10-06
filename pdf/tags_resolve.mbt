@@ -32,7 +32,7 @@ fn tags_resolve(
     tags_context_finish(gc.tags.tree)
   }
   let root = gc.tags.tree.groups.get(group_id_root)
-  let doc_lang = Ref::new(root.lang)
+  let doc_lang = Ref(root.lang)
   if tags_disabled(gc) {
     return (doc_lang.val, @export.TagTree::new())
   }
@@ -47,7 +47,7 @@ fn tags_resolve(
   }
   gc.tags.tree.errors.clear()
   let accum = Accumulator::root()
-  let no_bbox : Ref[BBoxCtx?] = Ref::new(None)
+  let no_bbox : Ref[BBoxCtx?] = Ref(None)
   for child in root.nodes {
     resolve_node(rs, doc_lang, no_bbox, accum, child)
   }
@@ -86,12 +86,10 @@ fn resolve_group_node(
   let group = rs.groups.get(id)
   let tag = build_group_tag(rs, group)
   let lang : Ref[@library.Locale?]? = match group.kind_lang() {
-    Some(l) if tag is Some(_) => Some(Ref::new(l))
+    Some(l) if tag is Some(_) => Some(Ref(l))
     _ => None
   }
-  let bbox : Ref[BBoxCtx?] = Ref::new(
-    rs.ctx.bbox(group.kind).map(b => b.copy()),
-  )
+  let bbox : Ref[BBoxCtx?] = Ref(rs.ctx.bbox(group.kind).map(b => b.copy()))
 
   // If this group doesn't produce a tag, don't create a nested accumulator
   // and push the children directly into the parent.
@@ -252,9 +250,7 @@ fn resolve_artifact_node(
   match node {
     Group(id) => {
       let group = rs.groups.get(id)
-      let bbox : Ref[BBoxCtx?] = Ref::new(
-        rs.ctx.bbox(group.kind).map(b => b.copy()),
-      )
+      let bbox : Ref[BBoxCtx?] = Ref(rs.ctx.bbox(group.kind).map(b => b.copy()))
       {
         let bbox = if bbox.val is Some(_) { bbox } else { parent_bbox }
         for child in group.nodes {

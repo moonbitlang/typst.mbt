@@ -137,8 +137,8 @@ fn gradient_pixmap(
   let hf = Float::from_uint(height)
   let ox = to_f32(offset.x)
   let oy = to_f32(offset.y)
-  let sx = scale.x.get().to_float()
-  let sy = scale.y.get().to_float()
+  let sx = Float::from_double(scale.x.get())
+  let sy = Float::from_double(scale.y.get())
   for x in 0..<w {
     for y in 0..<h {
       let color = gradient_sample_at(
@@ -258,8 +258,8 @@ fn to_sk_paint(
         Nearest,
         1.0,
         fill_transform.pre_scale(
-          container_size.x.signum().to_float() / state.pixel_per_pt,
-          container_size.y.signum().to_float() / state.pixel_per_pt,
+          Float::from_double(container_size.x.signum()) / state.pixel_per_pt,
+          Float::from_double(container_size.y.signum()) / state.pixel_per_pt,
         ),
       )
       sk_paint.anti_alias = gradient.anti_alias()

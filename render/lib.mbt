@@ -84,7 +84,7 @@ pub fn render(
     @library.Sides::splat(@library.Abs::zero())
   }
   let size = page.frame.size().add_size(bleed.sum_by_axis())
-  let pixel_per_pt = opts.format.ppi.to_float() / 72.0
+  let pixel_per_pt = Float::from_double(opts.format.ppi) / 72.0
   let pxw = @skia.f32_to_u32(
     @skia.fmax(@skia.roundf(pixel_per_pt * to_f32(size.x)), 1.0),
   )
@@ -118,7 +118,7 @@ pub fn render_merged(
 ) -> @skia.Pixmap raise RenderPanic {
   let opts = opts.resolve(PngFormatOptions::get(document.options()))
   let pixmaps = document.pages().map(page => render(page, opts))
-  let pixel_per_pt = opts.format.ppi.to_float() / 72.0
+  let pixel_per_pt = Float::from_double(opts.format.ppi) / 72.0
   let gap = @skia.f32_to_u32(@skia.roundf(pixel_per_pt * to_f32(gap)))
   let mut pxw = 0U
   let mut pxh = 0U
@@ -297,10 +297,10 @@ fn render_group(
 ///|
 fn to_sk_transform(transform : @library.Transform) -> @path.Transform {
   @path.Transform::from_row(
-    transform.sx.get().to_float(),
-    transform.ky.get().to_float(),
-    transform.kx.get().to_float(),
-    transform.sy.get().to_float(),
+    Float::from_double(transform.sx.get()),
+    Float::from_double(transform.ky.get()),
+    Float::from_double(transform.kx.get()),
+    Float::from_double(transform.sy.get()),
     to_f32(transform.tx),
     to_f32(transform.ty),
   )
@@ -309,5 +309,5 @@ fn to_sk_transform(transform : @library.Transform) -> @path.Transform {
 ///|
 /// Convert to a number of points as f32 (`AbsExt::to_f32`).
 fn to_f32(abs : @library.Abs) -> Float {
-  abs.to_pt().to_float()
+  Float::from_double(abs.to_pt())
 }

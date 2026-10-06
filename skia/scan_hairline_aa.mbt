@@ -792,7 +792,7 @@ impl Blitter for RectClipBlitter with fn blit_anti_h2(
   alpha0,
   alpha1,
 ) {
-  self.blit_anti_h(x, y, [alpha0, alpha1], 0, [1, 1, 0], 0)
+  Blitter::blit_anti_h(self, x, y, [alpha0, alpha1], 0, [1, 1, 0], 0)
 }
 
 ///|
@@ -803,8 +803,8 @@ impl Blitter for RectClipBlitter with fn blit_anti_v2(
   alpha0,
   alpha1,
 ) {
-  self.blit_anti_h(x, y, [alpha0], 0, [1, 0], 0)
-  self.blit_anti_h(x, y + 1, [alpha1], 0, [1, 0], 0)
+  Blitter::blit_anti_h(self, x, y, [alpha0], 0, [1, 0], 0)
+  Blitter::blit_anti_h(self, x, y + 1, [alpha1], 0, [1, 0], 0)
 }
 
 ///|
