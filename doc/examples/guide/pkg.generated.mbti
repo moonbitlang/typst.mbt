@@ -28,6 +28,8 @@ pub fn guide() -> @doc.Document
 
 pub fn half_width() -> @doc.Layout
 
+pub fn harvest_chart(Array[(String, Double)], Double) -> @doc.Layout
+
 pub fn harvest_table(Array[Array[&@doc.IntoContent]]) -> @kit.DataTable
 
 pub fn kept_title(&@doc.IntoContent) -> @doc.Seq
@@ -40,6 +42,8 @@ pub fn loose_title(&@doc.IntoContent) -> @doc.Seq
 pub fn note(&@doc.IntoContent, loc~ : SourceLoc, args_loc~ : ArgsLoc) -> @doc.Block
 
 pub fn notes() -> @doc.Seq
+
+pub fn number_and_unit() -> @kit.Canvas
 
 pub fn paragraphs() -> @doc.Seq
 
@@ -74,6 +78,8 @@ pub fn untyped_fields() -> @doc.Seq
 pub fn upper_case() -> @doc.Upper
 
 pub fn with_display() -> @doc.Seq
+
+pub fn year() -> @kit.Canvas
 
 // Errors
 
