@@ -4,7 +4,7 @@
     scripts/ci/unit_tests.py [--shard I/N] [--jobs J]
     scripts/ci/unit_tests.py --sum DIR --shards N
 
-Every test executable is a whole program, so building the tests of the 106
+Every test executable is a whole program, so building the tests of all
 packages costs far more than running them: CI splits the packages into N
 shards (`--shard`), balanced by an estimate of that cost, and one job per
 shard builds (`moon test --build-only`) and runs its packages. Without
