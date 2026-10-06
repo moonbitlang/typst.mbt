@@ -3,6 +3,19 @@
 // values. The pairs with a Typst twin are in `doc/twins/ports.mbt`.
 
 ///|
+/// A number with three decimals, for sizes that depend on font metrics.
+fn fixed3(x : Double) -> String {
+  if x.is_inf() {
+    return if x > 0.0 { "inf" } else { "-inf" }
+  }
+  let scaled = (x * 1000.0).round().to_int64()
+  let sign = if scaled < 0L { "-" } else { "" }
+  let scaled = scaled.abs()
+  let frac = (scaled % 1000L).to_string().pad_start(3, '0')
+  "\{sign}\{scaled / 1000L}.\{frac}"
+}
+
+///|
 /// The constructor and the argument a diagnostic is located at.
 fn origin_arg(diagnostic : @doc.Diagnostic) -> String raise {
   let origin = origin_of(diagnostic)
@@ -16,6 +29,21 @@ fn origin_arg(diagnostic : @doc.Diagnostic) -> String raise {
 /// The lowered content of a document, as Typst prints it.
 fn lowered(children : Array[&@doc.IntoContent]) -> String raise {
   @doc.Document(children).lower(@doc.DocWorld::in_memory()).unwrap().repr()
+}
+
+///|
+/// The SVG pages of a document on a small page.
+fn svg_of(children : Array[&@doc.IntoContent]) -> String raise {
+  let page : Array[&@doc.IntoContent] = [
+    @doc.SetPage(width=Pt(120), height=Pt(60), margin=@doc.Sides(all=Pt(6))),
+    @doc.SetText(size=Pt(10)),
+  ]
+  page.append(children)
+  let report = compile(page)
+  if !report.errors.is_empty() {
+    fail(error_messages(report))
+  }
+  report.svg_pages().unwrap().join("\n")
 }
 
 ///|
@@ -78,4 +106,112 @@ test "`Box(baseline=)` is the shift form; the other forms go through `extra`" {
       #|Box, argument 3
     ),
   )
+}
+
+///|
+test "`top_edge` and `bottom_edge` lower to the engine's names" {
+  let top : Array[@doc.TopEdge] = [
+    Ascender,
+    CapHeight,
+    XHeight,
+    Baseline,
+    Bounds,
+    Len(Em(0.7)),
+  ]
+  let bottom : Array[@doc.BottomEdge] = [
+    Baseline,
+    Descender,
+    Bounds,
+    Len(Pt(-2)),
+  ]
+  inspect(
+    top.map(edge => lowered([@doc.Highlight("x", top_edge=edge)])).join("\n"),
+    content=(
+      #|highlight(top-edge: "ascender", body: [x])
+      #|highlight(top-edge: "cap-height", body: [x])
+      #|highlight(top-edge: "x-height", body: [x])
+      #|highlight(top-edge: "baseline", body: [x])
+      #|highlight(top-edge: "bounds", body: [x])
+      #|highlight(top-edge: 0.7em, body: [x])
+    ),
+  )
+  inspect(
+    bottom
+    .map(edge => lowered([@doc.Highlight("x", bottom_edge=edge)]))
+    .join("\n"),
+    content=(
+      #|highlight(bottom-edge: "baseline", body: [x])
+      #|highlight(bottom-edge: "descender", body: [x])
+      #|highlight(bottom-edge: "bounds", body: [x])
+      #|highlight(bottom-edge: -2pt, body: [x])
+    ),
+  )
+  // On `Text` (whose lowered form is styled content, which does not print
+  // its styles) the edges are measured: each gives the height that the
+  // untyped argument gave before, and the heights differ by edge.
+  let heights : Array[String] = []
+  let report = compile([
+    @doc.SetText(size=Pt(10)),
+    @doc.Context() <| cx => {
+      heights.clear()
+      for edge in top {
+        let typed = cx.measure(@doc.Text("xg", top_edge=edge))
+        let untyped = cx.measure(
+          @doc.Text("xg", extra=[("top-edge", @doc.ToValue::to_value(edge))]),
+        )
+        assert_eq(typed.height, untyped.height)
+        heights.push("top \{fixed3(typed.height)}")
+      }
+      for edge in bottom {
+        let typed = cx.measure(@doc.Text("xg", bottom_edge=edge))
+        let untyped = cx.measure(
+          @doc.Text("xg", extra=[("bottom-edge", @doc.ToValue::to_value(edge))]),
+        )
+        assert_eq(typed.height, untyped.height)
+        heights.push("bottom \{fixed3(typed.height)}")
+      }
+      ""
+    },
+  ])
+  inspect(error_messages(report), content="")
+  inspect(
+    heights.join(", "),
+    content=(
+      #|top 8.940, top 6.580, top 4.290, top 0.000, top 4.620, top 7.000, bottom 6.580, bottom 9.040, bottom 8.960, bottom 8.580
+    ),
+  )
+  assert_eq(
+    svg_of([@doc.SetText(top_edge=Bounds, bottom_edge=Bounds), "xg"]),
+    svg_of([
+      @doc.SetText(extra=[
+        ("top-edge", @doc.Value::str("bounds")),
+        ("bottom-edge", @doc.Value::str("bounds")),
+      ]),
+      "xg",
+    ]),
+  )
+  assert_eq(
+    svg_of([@doc.Text("xg", top_edge=Len(Pt(9)), bottom_edge=Descender)]),
+    svg_of([@doc.Markup("#text(top-edge: 9pt, bottom-edge: \"descender\")[xg]")]),
+  )
+  // A name of the other edge is still reachable untyped, and is Typst's
+  // cast error there.
+  let wrong = compile([
+    @doc.Text("x", extra=[("top-edge", @doc.Value::str("descender"))]),
+  ])
+  inspect(
+    error_messages(wrong),
+    content=(
+      #|expected "ascender", "cap-height", "x-height", "baseline", "bounds", or length
+    ),
+  )
+  // A ratio is not an edge.
+  let ratio = compile([@doc.Highlight("x", bottom_edge=Len(Pct(10)))])
+  inspect(
+    error_messages(ratio),
+    content=(
+      #|expected "baseline", "descender", "bounds", or length, found ratio
+    ),
+  )
+  inspect(origin_of(ratio.errors[0]).kind, content="Highlight")
 }

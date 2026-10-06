@@ -156,6 +156,10 @@ LEAVES = {
     # The shift of a box's baseline (`box(baseline: 2pt)`); the alignment
     # and `(at:, shift:)` forms go through `extra`.
     "BaselinePos": ("Length", to_value),
+    # The edges of text: two facades, since the engine accepts different
+    # metric names for each.
+    "TopEdge": ("TopEdge", to_value),
+    "BottomEdge": ("BottomEdge", to_value),
 }
 
 # Variadic parameters of values: engine type -> (MoonBit array type,

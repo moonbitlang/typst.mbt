@@ -637,6 +637,63 @@ pub impl ToValue for FontWeight with fn to_value(self) {
 }
 
 ///|
+/// The top edge of text (`text.top-edge`, `highlight.top-edge`): a metric
+/// of the font or a length above the baseline.
+pub(all) enum TopEdge {
+  /// `"ascender"`: the font's ascender, which typically exceeds the height
+  /// of all glyphs.
+  Ascender
+  /// `"cap-height"`: the approximate height of uppercase letters.
+  CapHeight
+  /// `"x-height"`: the approximate height of non-ascending lowercase
+  /// letters.
+  XHeight
+  /// `"baseline"`: the baseline on which the letters rest.
+  Baseline
+  /// `"bounds"`: the top edge of the glyphs' bounding box.
+  Bounds
+  /// A length above the baseline.
+  Len(Length)
+}
+
+///|
+pub impl ToValue for TopEdge with fn to_value(self) {
+  match self {
+    Ascender => Value::str("ascender")
+    CapHeight => Value::str("cap-height")
+    XHeight => Value::str("x-height")
+    Baseline => Value::str("baseline")
+    Bounds => Value::str("bounds")
+    Len(length) => length.to_value()
+  }
+}
+
+///|
+/// The bottom edge of text (`text.bottom-edge`, `highlight.bottom-edge`): a
+/// metric of the font or a length above the baseline (negative: below it).
+pub(all) enum BottomEdge {
+  /// `"baseline"`: the baseline on which the letters rest.
+  Baseline
+  /// `"descender"`: the font's descender, which typically exceeds the depth
+  /// of all glyphs.
+  Descender
+  /// `"bounds"`: the bottom edge of the glyphs' bounding box.
+  Bounds
+  /// A length above the baseline.
+  Len(Length)
+}
+
+///|
+pub impl ToValue for BottomEdge with fn to_value(self) {
+  match self {
+    Baseline => Value::str("baseline")
+    Descender => Value::str("descender")
+    Bounds => Value::str("bounds")
+    Len(length) => length.to_value()
+  }
+}
+
+///|
 /// A direction (`ltr`, `rtl`, `ttb`, `btt`).
 pub(all) enum Dir {
   /// Explicit `auto` (the direction of the text's language).

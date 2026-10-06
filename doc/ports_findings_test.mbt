@@ -547,9 +547,7 @@ test "T1: `Box(baseline=)` is typed; `outset` and `extra` still work" {
 }
 
 ///|
-test "T2: `top-edge` and `bottom-edge` are reachable through `extra`" {
-  // (`text.top-edge`, `highlight.top-edge` and the bottom edges are in
-  // doc/elements_coverage.txt: unmapped types.)
+test "T2: `top_edge` and `bottom_edge` are typed; `extra` still reaches them" {
   let shown = (item : &@doc.IntoContent) => {
     listing(marks(compile([..small_page(), @doc.Par(item)])))
   }
@@ -563,16 +561,21 @@ test "T2: `top-edge` and `bottom-edge` are reachable through `extra`" {
   )
   // ... or as the edges say.
   inspect(
+    shown(@doc.Highlight("xo", top_edge=XHeight, bottom_edge=Baseline)),
+    content=(
+      #|p1 rect 10.0,12.3 9.9x4.3 rgb("#fffd11a1")
+      #|p1 text 10.0,16.6 w9.9 "xo"
+    ),
+  )
+  // The same through `extra`, as the ports wrote it.
+  assert_eq(
     shown(
       @doc.Highlight("xo", extra=[
         ("top-edge", @doc.Value::str("x-height")),
         ("bottom-edge", @doc.Value::str("baseline")),
       ]),
     ),
-    content=(
-      #|p1 rect 10.0,12.3 9.9x4.3 rgb("#fffd11a1")
-      #|p1 text 10.0,16.6 w9.9 "xo"
-    ),
+    shown(@doc.Highlight("xo", top_edge=XHeight, bottom_edge=Baseline)),
   )
   // The edges of text decide the height of its line: of a box around it.
   inspect(
@@ -585,10 +588,7 @@ test "T2: `top-edge` and `bottom-edge` are reachable through `extra`" {
   inspect(
     shown(
       @doc.Box(
-        @doc.Text("xo", extra=[
-          ("top-edge", @doc.Value::str("bounds")),
-          ("bottom-edge", @doc.Value::str("bounds")),
-        ]),
+        @doc.Text("xo", top_edge=Bounds, bottom_edge=Bounds),
         fill=Luma(220),
       ),
     ),
@@ -597,7 +597,26 @@ test "T2: `top-edge` and `bottom-edge` are reachable through `extra`" {
       #|p1 text 10.0,14.4 w9.9 "xo"
     ),
   )
-  // A wrong name is the engine's cast error, at the `extra` argument.
+  assert_eq(
+    shown(
+      @doc.Box(
+        @doc.Text("xo", extra=[
+          ("top-edge", @doc.Value::str("bounds")),
+          ("bottom-edge", @doc.Value::str("bounds")),
+        ]),
+        fill=Luma(220),
+      ),
+    ),
+    shown(
+      @doc.Box(
+        @doc.Text("xo", top_edge=Bounds, bottom_edge=Bounds),
+        fill=Luma(220),
+      ),
+    ),
+  )
+  // The typed parameters only have the names of their edge. Through
+  // `extra` a wrong name is the engine's cast error, at the `extra`
+  // argument (two parameters later than before: the two edges).
   let wrong = compile([
     @doc.Text("xo", extra=[("top-edge", @doc.Value::str("descender"))]),
   ])
@@ -610,7 +629,7 @@ test "T2: `top-edge` and `bottom-edge` are reachable through `extra`" {
   inspect(
     what(origin_of(wrong.errors[0])),
     content=(
-      #|(Text, argument 25)
+      #|(Text, argument 27)
     ),
   )
 }
