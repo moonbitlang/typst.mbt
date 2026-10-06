@@ -76,15 +76,16 @@ pub fn PluginFunc::transition(
 /// `#[comemo::memoize]`), keyed by the 128-bit hash of the function and
 /// arguments. Like comemo, only the hash of the inputs is kept (not the
 /// arguments themselves).
-let plugin_call_cache : Map[U128, Result[Bytes, HintedError]] = {}
+let plugin_call_cache : Map[U128, Result[Bytes, HintedError]] = Map([])
 
 ///|
-let plugin_transition_cache : Map[U128, Result[Module, HintedError]] = {}
+let plugin_transition_cache : Map[U128, Result[Module, HintedError]] = Map([])
 
 ///|
 /// The modules of memoized plugin loads (upstream `#[comemo::memoize]` on
 /// `Plugin::module`), keyed by the hash of the bytes.
-let plugin_module_cache : Map[U128, Array[(Bytes, Result[Module, HintedError])]] = {}
+let plugin_module_cache : Map[U128, Array[(Bytes, Result[Module, HintedError])]] = Map([],
+)
 
 ///|
 /// Memoizes `f` for the plugin function `func` and its arguments.

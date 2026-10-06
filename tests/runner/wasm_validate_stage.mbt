@@ -260,7 +260,7 @@ fn run_wasm_validate_stage(filter : String?, verbose : Bool) -> Unit {
     }
   }
   let golden = read(golden_path)
-  let expected : Map[String, String] = {}
+  let expected : Map[String, String] = Map([])
   let order = []
   for line in golden.split("\n") {
     let line = line.to_owned()
@@ -274,7 +274,7 @@ fn run_wasm_validate_stage(filter : String?, verbose : Bool) -> Unit {
     expected.set(name, line)
     order.push(name)
   }
-  let files : Map[String, String] = {}
+  let files : Map[String, String] = Map([])
   let corpus = []
   wasm_files(corpus_dir, "", corpus)
   for f in corpus {
@@ -284,7 +284,7 @@ fn run_wasm_validate_stage(filter : String?, verbose : Bool) -> Unit {
   let mut passed = 0
   let mut failed = 0
   // The last file read (mutations follow their file).
-  let cache : Map[String, Bytes] = {}
+  let cache : Map[String, Bytes] = Map([])
   for name in order {
     if filter is Some(f) && !name.contains(f) {
       continue

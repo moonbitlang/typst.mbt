@@ -129,7 +129,7 @@ fn Scanner::at_pred(self : Scanner, f : (Char) -> Bool) -> Bool {
 ///|
 fn Scanner::eat_if_char(self : Scanner, c : Char) -> Bool {
   if self.at_char(c) {
-    self.cursor += c.utf16_len()
+    self.cursor += c.len_utf16()
     true
   } else {
     false
@@ -150,7 +150,7 @@ fn Scanner::eat_if_str(self : Scanner, s : String) -> Bool {
 fn Scanner::eat_if_pred(self : Scanner, f : (Char) -> Bool) -> Bool {
   match self.peek() {
     Some(c) if f(c) => {
-      self.cursor += c.utf16_len()
+      self.cursor += c.len_utf16()
       true
     }
     _ => false
@@ -162,7 +162,7 @@ fn Scanner::eat_if_pred(self : Scanner, f : (Char) -> Bool) -> Bool {
 fn Scanner::eat_while(self : Scanner, f : (Char) -> Bool) -> String {
   let start = self.cursor
   while self.peek() is Some(c) && f(c) {
-    self.cursor += c.utf16_len()
+    self.cursor += c.len_utf16()
   }
   self.from(start)
 }
@@ -172,7 +172,7 @@ fn Scanner::eat_while(self : Scanner, f : (Char) -> Bool) -> String {
 fn Scanner::eat_until(self : Scanner, f : (Char) -> Bool) -> String {
   let start = self.cursor
   while self.peek() is Some(c) && !f(c) {
-    self.cursor += c.utf16_len()
+    self.cursor += c.len_utf16()
   }
   self.from(start)
 }
@@ -203,7 +203,10 @@ fn Scanner::after(self : Scanner) -> String {
 }
 
 ///|
-fn Char::utf16_len(self : Char) -> Int {
+/// The number of UTF-16 code units of a char (like Rust's `char::len_utf16`).
+/// Not the core `Char::utf16_len`: core methods are not inlined into the
+/// scanner's loops.
+fn Char::len_utf16(self : Char) -> Int {
   if self.to_int() >= 0x10000 {
     2
   } else {

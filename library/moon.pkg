@@ -31,6 +31,7 @@ import {
   "moonbitlang/typst/syntax/highlight",
   "moonbitlang/typst/wasmi",
   "moonbitlang/typst/wasmi/core" @wasmi_core,
+  "moonbitlang/core/cmp",
 }
 
 import {
@@ -38,3 +39,7 @@ import {
   "moonbitlang/core/env",
   "moonbitlang/x/fs",
 } for "test"
+
+import {
+  "moonbitlang/core/debug",
+} for "wbtest"

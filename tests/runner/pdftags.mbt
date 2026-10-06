@@ -182,10 +182,10 @@ fn pdftags_format(bytes : Bytes) -> String raise {
   let doc = @pdflite.pdf_read_document_from_bytes(bytes)
   let r : PdfReader = { doc, pages: [], named: [], }
   let catalog = doc.catalog()
-  let pages = {}
+  let pages = Map([])
   for idx, page_num in doc.page_reference_numbers() {
     let page = doc.lookup_object_or_null(page_num)
-    let marked_content = {}
+    let marked_content = Map([])
     if r.get(page, "Contents") is Some(contents) {
       let parts = match doc.direct(contents) {
         PdfArray(items) => items

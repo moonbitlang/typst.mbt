@@ -13047,7 +13047,7 @@ pub fn Op::set_branch_offset16(self : Op, new_value : BranchOffset16) -> Op? {
 /// Returns the `offset: BranchOffset` field of the instruction, if any.
 pub fn Op::branch_offset(self : Op) -> BranchOffset? {
   match self {
-    Branch(offset~, ..) => Some(offset)
+    Branch(offset~) => Some(offset)
     BranchTableTarget(offset~, ..) => Some(offset)
     _ => None
   }

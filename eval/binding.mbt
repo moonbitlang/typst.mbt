@@ -129,7 +129,7 @@ fn destructure_dict(
   f : (Vm, @ast.Expr, @library.Value) -> Unit raise @library.SourceError,
 ) -> Unit raise @library.SourceError {
   let mut sink : @ast.Expr? = None
-  let used : Map[String, Unit] = {}
+  let used : Map[String, Unit] = Map([])
   for p in destruct.items() {
     match p {
       Pattern(Normal(Ident(ident))) => {

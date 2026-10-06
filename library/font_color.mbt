@@ -63,7 +63,7 @@ pub fn GlyphFrameItem::pos(self : GlyphFrameItem) -> Point {
 
 ///|
 /// Memoized results of [glyph_frame] (upstream `#[comemo::memoize]`).
-let glyph_frame_cache : Map[(FontInstance, UInt16), GlyphFrame?] = {}
+let glyph_frame_cache : Map[(FontInstance, UInt16), GlyphFrame?] = Map([])
 
 ///|
 /// Returns a frame representing a glyph and whether it is a fallback tofu

@@ -11,7 +11,7 @@ fn target_dir() -> String? {
 }
 
 ///|
-let pdf_cache : Map[String, Array[BytesView]] = {}
+let pdf_cache : Map[String, Array[BytesView]] = Map([])
 
 ///|
 fn pdf_font_streams(path : String) -> Array[BytesView] {

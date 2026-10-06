@@ -17,7 +17,8 @@ pub(all) suberror IrError {
 } derive(Eq)
 pub impl Show for IrError
 
-pub(all) suberror OutOfBoundsConst derive(Eq, Show)
+pub(all) suberror OutOfBoundsConst derive(Eq)
+pub impl Show for OutOfBoundsConst
 
 // Types and methods
 pub(all) struct Address(UInt64) derive(Eq, Hash, @debug.Debug)

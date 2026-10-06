@@ -733,7 +733,7 @@ fn overhang(glyph : ShapedGlyph) -> @library.Abs {
 }
 
 ///|
-let overhang_tables : Map[@library.FontInstance, Array[(Int, Double)]] = {}
+let overhang_tables : Map[@library.FontInstance, Array[(Int, Double)]] = Map([])
 
 ///|
 /// Generates a sorted table with overhang ratios indexed by glyph ID for a

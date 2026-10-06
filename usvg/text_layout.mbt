@@ -279,7 +279,7 @@ fn layout_text(
     }
     let clusters = process_chunk(chunk, fonts_cache, resolver, fontdb)
     if clusters.is_empty() {
-      char_offset += chunk.text.char_length()
+      char_offset += chunk.text.char_count()
       continue
     }
     apply_writing_mode(text_node.writing_mode, clusters)
@@ -396,7 +396,7 @@ fn layout_text(
         })
       }
     }
-    char_offset += chunk.text.char_length()
+    char_offset += chunk.text.char_count()
     if text_node.writing_mode == TopToBottom {
       if chunk.text_flow is Linear {
         curr_pos = (curr_pos.1, curr_pos.0)
@@ -1814,7 +1814,7 @@ fn utf8_char_len(c : Char) -> Int {
 
 ///|
 /// The number of chars (Unicode scalar values) of a string.
-fn String::char_length(self : String) -> Int {
+fn String::char_count(self : String) -> Int {
   let mut n = 0
   for _ in self {
     n += 1

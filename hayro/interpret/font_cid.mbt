@@ -442,8 +442,8 @@ fn CidToGIdMap::new(dict : @hayro_syntax.Dict) -> CidToGIdMap? {
     }
   } else if (dict.get("CIDToGIDMap") : @hayro_syntax.Stream?) is Some(stream) {
     guard stream.decoded() is Ok(decoded) else { return None }
-    let forward = {}
-    let inverse = {}
+    let forward = Map([])
+    let inverse = Map([])
     for cid in 0..<(decoded.length() / 2) {
       let gid = GlyphId::new(
         (decoded[cid * 2].to_uint() << 8) | decoded[cid * 2 + 1].to_uint(),
@@ -480,7 +480,7 @@ fn CidToGIdMap::inverse_map(self : CidToGIdMap, gid : GlyphId) -> Int {
 /// Read a `(T, U)` tuple at the current position of a flex iterator,
 /// restoring nothing on failure (upstream `FlexArrayIter::next::<(T, U)>`).
 fn read_cid_widths(arr : @hayro_syntax.PdfArray) -> Map[UInt, Float]? {
-  let map = {}
+  let map = Map([])
   let items : Array[@hayro_syntax.Object] = arr.iter().collect()
   let mut i = 0
   while true {
@@ -520,7 +520,7 @@ fn read_cid_widths(arr : @hayro_syntax.PdfArray) -> Map[UInt, Float]? {
 fn read_cid_widths2(
   arr : @hayro_syntax.PdfArray,
 ) -> Map[UInt, FixedArray[Float]]? {
-  let map = {}
+  let map = Map([])
   let items : Array[@hayro_syntax.Object] = arr.iter().collect()
   let mut i = 0
   while true {

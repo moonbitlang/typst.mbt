@@ -4,6 +4,9 @@ import {
   "moonbitlang/core/string",
   "moonbitlang/core/double",
   "moonbitlang/core/ref",
+  "moonbitlang/core/int64",
+  "moonbitlang/core/cmp",
+  "moonbitlang/core/hashset",
 }
 
 // Upstream names the `PackageSpec` field `namespace`, which MoonBit reserves.

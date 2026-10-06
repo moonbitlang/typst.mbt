@@ -18,23 +18,23 @@
 ///|
 struct OperatorValidator {
   locals : Locals
-  priv local_inits : LocalInits
+  local_inits : LocalInits
 
   // This is a list of flags for wasm features which are used to gate various
   // instructions.
   features : WasmFeatures
 
   // Temporary storage used during `match_stack_operands`
-  priv popped_types_tmp : Array[MaybeType]
+  popped_types_tmp : Array[MaybeType]
   /// The `control` list is the list of blocks that we're currently in.
-  priv control : Array[Frame]
+  control : Array[Frame]
   /// The `operands` is the current type stack.
-  priv operands : Array[MaybeType]
+  operands : Array[MaybeType]
   /// Offset of the `end` instruction which emptied the `control` stack, which
   /// must be the end of the function.
-  priv mut end_which_emptied_control : Int?
+  mut end_which_emptied_control : Int?
   /// Whether validation is happening in a shared context.
-  priv mut shared : Bool
+  mut shared : Bool
 }
 
 ///|
@@ -139,13 +139,13 @@ let max_locals_to_track : Int = 50
 ///|
 struct Locals {
   // Total number of locals in the function.
-  priv mut num_locals : UInt
+  mut num_locals : UInt
 
   // The first MAX_LOCALS_TO_TRACK locals in a function. This is used to
   // optimize the theoretically common case where most functions don't have
   // many locals and don't need a full binary search in the entire local space
   // below.
-  priv first : Array[ValType]
+  first : Array[ValType]
 
   // This is a "compressed" list of locals for this function. The list of
   // locals are represented as a list of tuples. The second element is the
@@ -157,7 +157,7 @@ struct Locals {
   // `local.{get,set,tee}`. We do a binary search for the index desired, and
   // it either lies in a "hole" where the maximum index is specified later,
   // or it's at the end of the list meaning it's out of bounds.
-  priv all : Array[(UInt, ValType)]
+  all : Array[(UInt, ValType)]
 }
 
 ///|

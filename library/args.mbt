@@ -142,7 +142,7 @@ fn Args::missing_argument(self : Args, what : String) -> SourceDiagnostic {
 /// Find and consume the first castable positional argument.
 pub fn[T : FromValue] Args::find(self : Args) -> T? raise SourceError {
   for i, slot in self.items {
-    if slot.name is None && T::castable(slot.value.v) {
+    if slot.name is None && castable_of((Ty::new() : Ty[T]), slot.value.v) {
       let value = self.items.remove(i).value
       return Some(at(value.span, () => T::from_value(value.v)))
     }

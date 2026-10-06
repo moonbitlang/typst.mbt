@@ -185,7 +185,7 @@ fn Type1BlobKind::new(dict : @hayro_syntax.Dict) -> Type1BlobKind? {
     Some((f, _)) => Some(f)
     None => None
   }
-  let name_to_gid = {}
+  let name_to_gid = Map([])
   for item in font.glyph_names() {
     let (gid, name) = item
     name_to_gid[name] = gid
@@ -304,7 +304,7 @@ fn CffKind::new(dict : @hayro_syntax.Dict) -> CffKind? {
     None => None
   }
   let gid_to_name : Array[String?] = Array::make(font.num_glyphs(), None)
-  let name_to_gid = {}
+  let name_to_gid = Map([])
   for item in font.glyph_names() {
     let (gid, name) = item
     // Upstream indexes `gid_to_name` directly (panicking if out of bounds).

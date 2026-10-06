@@ -135,7 +135,7 @@ fn parse_top_level(
   fallback_name : String?,
 ) -> SyntaxDefinition raise ParseSyntaxError {
   guard doc.as_hash() is Some(h) else { raise TypeMismatch }
-  let variables = {}
+  let variables = Map([])
   if try_key(h, "variables", x => x.as_hash()) is Some(map) {
     for entry in map.iter() {
       let (key, value) = entry
@@ -189,7 +189,7 @@ fn parse_contexts(
   map : @yaml_rust.LinkedHashMap[@yaml_rust.Yaml, @yaml_rust.Yaml],
   state : ParserState,
 ) -> Map[String, Context] raise ParseSyntaxError {
-  let contexts = {}
+  let contexts = Map([])
   for entry in map.iter() {
     let (key, value) = entry
     if (key.as_str(), value.as_vec()) is (Some(name), Some(val_vec)) {

@@ -203,7 +203,7 @@ fn impl_symbol_construct(
 
   // Maps from canonicalized modifier lists to indices of variants we've seen
   // before.
-  let seen : Map[String, Int] = {}
+  let seen : Map[String, Int] = Map([])
   let errors : Array[SourceDiagnostic] = []
 
   // Validate the variants.

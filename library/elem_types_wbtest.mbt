@@ -73,7 +73,7 @@ test "margin casts" {
     ),
   )
   inspect(
-    cast_err_msg(fn() {
+    cast_err_msg(() => {
       let _ : Margin[Smart[Rel[Length]]] = Margin::from_value(
         Dict(
           Dict::from_pairs([("inside", Length(Length::zero())), ("left", Auto)]),

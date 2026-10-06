@@ -7,6 +7,7 @@ import {
   "moonbitlang/x/codec/base64",
   "moonbitlang/core/bigint",
   "moonbitlang/core/cmp",
+  "moonbitlang/core/math",
 }
 
 import {

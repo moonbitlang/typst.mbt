@@ -663,7 +663,8 @@ pub impl[H : AlignmentComponent, V : AlignmentComponent] Reflect for SpecificAli
   H,
   V,
 ] with fn castable(value) {
-  H::castable(value) || V::castable(value)
+  castable_of((Ty::new() : Ty[H]), value) ||
+  castable_of((Ty::new() : Ty[V]), value)
 }
 
 ///|
